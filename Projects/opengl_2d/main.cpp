@@ -53,7 +53,7 @@ public:
     using ANIMATED_VISUALIZATION<T>::last_frame_filename;using ANIMATED_VISUALIZATION<T>::frame;
     using ANIMATED_VISUALIZATION<T>::frame_increment;using ANIMATED_VISUALIZATION<T>::frame_title;
     using ANIMATED_VISUALIZATION<T>::Update_OpenGL_Strings;using ANIMATED_VISUALIZATION<T>::camera_script_filename;
-    using ANIMATED_VISUALIZATION<T>::Add_Component;using ANIMATED_VISUALIZATION<T>::Selection_Priority;
+    using ANIMATED_VISUALIZATION<T>::Add_Component;
     using ANIMATED_VISUALIZATION<T>::frame_rate;using ANIMATED_VISUALIZATION<T>::draw_all_objects_cb;
     using ANIMATED_VISUALIZATION<T>::Set_Current_Selection;using ANIMATED_VISUALIZATION<T>::stream_type;
     OPENGL_2D_VISUALIZATION(STREAM_TYPE stream_type);
@@ -193,7 +193,6 @@ Initialize_Components_And_Key_Bindings()
     //opengl_world.Unbind_Keys("abcdDeilLMnoOStTuvVZ 1!2@3#4$5%67&*890 ;'~\t=-`\\^[]");
     Read_Grid();
     std::string filename,filename2;
-    opengl_world.Set_Key_Binding_Category_Priority(1);
 
     // Density
     filename=basedir+"/%d/density";
@@ -320,7 +319,7 @@ Initialize_Components_And_Key_Bindings()
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/positive_particles_0",start_frame)){
         positive_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T>(stream_type,filename,basedir+"/%d/positive_particles_%d",true,particles_stored_per_cell_uniform);
         positive_particles_component->particles->template Add_Array<int>(ATTRIBUTE_ID_ID);
-        if(!positive_particles_component->Uses_Sets()) positive_particles_component->opengl_points->color=OPENGL_COLOR(1,.5,0);
+        if(!positive_particles_component->use_sets) positive_particles_component->opengl_points->color=OPENGL_COLOR(1,.5,0);
         Add_Component(positive_particles_component,"Positive particles",'1',BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::SELECTABLE);
         opengl_world.Append_Bind_Key('!',positive_particles_component->viewer_callbacks.Get("toggle_draw_point_numbers"));
         opengl_world.Append_Bind_Key('%',positive_particles_component->viewer_callbacks.Get("toggle_draw_radii"));
@@ -332,7 +331,7 @@ Initialize_Components_And_Key_Bindings()
         negative_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T>(stream_type,filename,
             basedir+"/%d/negative_particles_%d",true,particles_stored_per_cell_uniform);
         negative_particles_component->particles->template Add_Array<int>(ATTRIBUTE_ID_ID);
-        if(!negative_particles_component->Uses_Sets()) negative_particles_component->opengl_points->color=OPENGL_COLOR(0,.5,1);
+        if(!negative_particles_component->use_sets) negative_particles_component->opengl_points->color=OPENGL_COLOR(0,.5,1);
         Add_Component(negative_particles_component,"Negative particles",'2',BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::SELECTABLE);
         opengl_world.Append_Bind_Key('@',negative_particles_component->viewer_callbacks.Get("toggle_draw_point_numbers"));
         opengl_world.Append_Bind_Key('%',negative_particles_component->viewer_callbacks.Get("toggle_draw_radii"));
@@ -692,26 +691,6 @@ Initialize_Components_And_Key_Bindings()
     opengl_world.Set_Key_Binding_Category("Misc.");
     opengl_world.Append_Bind_Key('~',{[this](){Command_Prompt();},"command_prompt"});
     opengl_world.Append_Bind_Key('\\',{[this](){Toggle_2d_Mode();},"toggle_2d_mode"});
-
-    // Initialize priority ordering for selections
-    Selection_Priority(OPENGL_SELECTION<T>::DEBUG_PARTICLES_2D)=110;
-    Selection_Priority(OPENGL_SELECTION<T>::POINTS_2D)=100;
-    Selection_Priority(OPENGL_SELECTION<T>::COMPONENT_PARTICLES_2D)=100;
-    Selection_Priority(OPENGL_SELECTION<T>::ARTICULATED_RIGID_BODIES_JOINT_2D)=95;
-    Selection_Priority(OPENGL_SELECTION<T>::ARTICULATED_RIGID_BODIES_MUSCLE_2D)=95;
-    Selection_Priority(OPENGL_SELECTION<T>::COMPONENT_RIGID_BODIES_2D)=80;
-    Selection_Priority(OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_OBJECT_2D)=80;
-    Selection_Priority(OPENGL_SELECTION<T>::SEGMENTED_CURVE_VERTEX_2D)=79;
-    Selection_Priority(OPENGL_SELECTION<T>::SEGMENTED_CURVE_SEGMENT_2D)=78;
-    Selection_Priority(OPENGL_SELECTION<T>::TRIANGULATED_AREA_VERTEX)=77;
-    Selection_Priority(OPENGL_SELECTION<T>::TRIANGULATED_AREA_SEGMENT)=76;
-    Selection_Priority(OPENGL_SELECTION<T>::TRIANGULATED_AREA_TRIANGLE)=75;
-    Selection_Priority(OPENGL_SELECTION<T>::BEZIER_SPLINE_VERTEX_2D)=74;
-    Selection_Priority(OPENGL_SELECTION<T>::BEZIER_SPLINE_SEGMENT_2D)=73;
-    Selection_Priority(OPENGL_SELECTION<T>::B_SPLINE_VERTEX_2D)=72;
-    Selection_Priority(OPENGL_SELECTION<T>::B_SPLINE_SEGMENT_2D)=71;
-    Selection_Priority(OPENGL_SELECTION<T>::GRID_NODE_2D)=70;
-    Selection_Priority(OPENGL_SELECTION<T>::GRID_CELL_2D)=60;
 }
 //#####################################################################
 // Add_OpenGL_Initialization
@@ -752,17 +731,7 @@ Command_Prompt_Response()
         std::string command;
         std::istringstream sstream(opengl_world.prompt_response);
         sstream>>command;
-        if(command=="s"){
-            int id;
-            if(sstream>>id){
-                OPENGL_SELECTION<T>* selection=0;
-                // TODO : handle multiple particle sets
-                if(!selection && positive_particles_component) selection=positive_particles_component->Get_Selection_By_Id(id,1);
-                if(!selection && negative_particles_component) selection=negative_particles_component->Get_Selection_By_Id(id,1);
-                if(!selection && removed_positive_particles_component) selection=removed_positive_particles_component->Get_Selection_By_Id(id,1);
-                if(!selection && removed_negative_particles_component) selection=removed_negative_particles_component->Get_Selection_By_Id(id,1);
-                if(selection){Set_Current_Selection(selection);Update_OpenGL_Strings();}}}
-        else if(command=="p"){
+        if(command=="p"){
             std::string next_word;
             if(sstream>>next_word){
                 if(next_word=="auto"){

@@ -124,7 +124,7 @@ Handle_Reshape_Glut(int w,int h)
 template<class T> void OPENGL_WINDOW_GLUT<T>::
 Handle_Special_Keypress_Glut(int key,int x,int y)
 {
-    Single()->opengl_world.Handle_Keypress_Main(OPENGL_KEY::From_Glut_Special_Key(key,(glutGetModifiers()&GLUT_ACTIVE_CTRL)!=0,(glutGetModifiers()&GLUT_ACTIVE_ALT)!=0),x,y);
+    Single()->opengl_world.Handle_Keypress_Main(OPENGL_KEY::From_Glut_Special_Key(key,glutGetModifiers()),x,y);
 }
 //#####################################################################
 // Handle_Keypress_Glut
@@ -133,7 +133,7 @@ template<class T> void OPENGL_WINDOW_GLUT<T>::
 Handle_Keypress_Glut(unsigned char key,int x,int y)
 {
     if(Single()->opengl_world.prompt_mode) Single()->opengl_world.Handle_Keypress_Prompt(key);
-    else Single()->opengl_world.Handle_Keypress_Main(OPENGL_KEY::From_Glut_Key(key,(glutGetModifiers()&GLUT_ACTIVE_CTRL)!=0,(glutGetModifiers()&GLUT_ACTIVE_ALT)!=0),x,y);
+    else Single()->opengl_world.Handle_Keypress_Main(OPENGL_KEY::From_Glut_Key(key,glutGetModifiers()),x,y);
 }
 //#####################################################################
 // Handle_Click_Glut
@@ -141,9 +141,7 @@ Handle_Keypress_Glut(unsigned char key,int x,int y)
 template<class T> void OPENGL_WINDOW_GLUT<T>::
 Handle_Click_Glut(int button,int state,int x,int y)
 {
-    bool ctrl_pressed=(glutGetModifiers() & GLUT_ACTIVE_CTRL)!=0;
-    bool shift_pressed=glutGetModifiers() & GLUT_ACTIVE_SHIFT;
-    Single()->opengl_world.Handle_Click_Main(button,state,x,y,ctrl_pressed,shift_pressed);
+    Single()->opengl_world.Handle_Click_Main(button,state,x,y,glutGetModifiers());
 }
 //#####################################################################
 // Handle_Drag_Glut

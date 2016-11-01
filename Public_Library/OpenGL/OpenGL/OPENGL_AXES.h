@@ -16,17 +16,17 @@ namespace PhysBAM{
 template<class T>
 class OPENGL_AXES:public OPENGL_OBJECT<T>
 {
-    typedef VECTOR<T,3> TV;
 public:
+    typedef VECTOR<T,3> TV;
+    typedef VECTOR<int,3> TV_INT;
     using OPENGL_OBJECT<T>::frame;using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;
     using OPENGL_OBJECT<T>::World_Space_Box;
     RANGE<TV> box; // extents of axes with respect to local frame
     bool draw_box; // whether to draw a bounding box or axis vectors
-    bool draw_xz_grid,draw_xy_grid,draw_yz_grid; // whether to draw grids on each plane
-    T grid_spacing;
+    VECTOR<bool,TV::SPIN::m> draw_grid;
+    int number_grid_spaces;
 
-    OPENGL_AXES(STREAM_TYPE stream_type,const FRAME<TV>& frame_input=FRAME<TV>(),const RANGE<TV>& box_input=RANGE<TV>::Unit_Box(),
-        bool draw_box_input=false,bool draw_xz_grid_input=false,bool draw_xy_grid_input=false,bool draw_yz_grid_input=false,T grid_spacing_input=.1);
+    OPENGL_AXES(STREAM_TYPE stream_type,const FRAME<TV>& frame_input=FRAME<TV>(),const RANGE<TV>& box_input=RANGE<TV>::Unit_Box());
 
     virtual ~OPENGL_AXES();
 

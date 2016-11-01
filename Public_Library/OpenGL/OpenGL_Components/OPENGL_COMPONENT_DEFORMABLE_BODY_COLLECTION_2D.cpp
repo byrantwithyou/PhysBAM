@@ -21,9 +21,13 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>::
 OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D(STREAM_TYPE stream_type,const std::string& prefix,const int start_frame)
-    :OPENGL_COMPONENT<T>(stream_type,"Deformable Object List"),prefix(prefix),frame_loaded(-1),valid(false),display_mode(0),draw_velocities(false),velocity_scale(0.025),
+    :OPENGL_COMPONENT<T>(stream_type,"Deformable Object List"),prefix(prefix),
+    frame_loaded(-1),valid(false),display_mode(0),draw_velocities(false),velocity_scale(0.025),
     deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(0,0)),
-    velocity_field(stream_type,deformable_body_collection.particles.V,deformable_body_collection.particles.X),color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map())
+    velocity_field(stream_type,deformable_body_collection.particles.V,deformable_body_collection.particles.X),color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map()),
+    selected_segmented_curve(-1),selected_triangulated_area(-1),selected_triangles_of_material(-1),
+    selected_bezier_spline(-1),selected_embedded_curve(-1),selected_free_particles(-1),
+    selected_b_spline(-1),selected_index(-1),selected_object(0)
 {
     viewer_callbacks.Set("increase_vector_size",{[this](){Increase_Vector_Size();},"Increase vector size"});
     viewer_callbacks.Set("decrease_vector_size",{[this](){Decrease_Vector_Size();},"Decrease vector size"});
@@ -146,7 +150,9 @@ Set_Frame(int frame_input)
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>::
 Set_Draw(bool draw_input)
 {
-    OPENGL_COMPONENT<T>::Set_Draw(draw_input);Reinitialize();
+    OPENGL_COMPONENT<T>::Set_Draw(draw_input);
+    if(draw_input) active_list.Fill(true);
+    Reinitialize();
 }
 //#####################################################################
 // Function Display
@@ -162,26 +168,80 @@ Display() const
         case 2:draw_triangles_of_material=true;break;
         case 3:draw_triangulated_areas=true;break;
         case 4:draw_triangulated_areas=true;draw_triangles_of_material=true;break;}
+
+    glPushName(0);
+    glPushName(0);
     for(int i=0;i<segmented_curve_objects.m;i++){
-        glPushName(i);
-        glPushName(1);
-        if(segmented_curve_objects(i)) segmented_curve_objects(i)->Display();
-        glPopName();
-        if(draw_triangulated_areas && triangulated_area_objects(i)){
-            glPushName(2);triangulated_area_objects(i)->Display();glPopName();}
-        if(draw_triangles_of_material && triangles_of_material_objects(i)){
-            glPushName(3);triangles_of_material_objects(i)->Display();glPopName();}
-        glPushName(4);
-        if(bezier_spline_objects(i)) bezier_spline_objects(i)->Display();
-        glPopName();
-        glPushName(7);
-        if(b_spline_objects(i)) b_spline_objects(i)->Display();
-        glPopName();
-        if(draw_embedded_curves && embedded_curve_objects(i)){
-            glPushName(5);embedded_curve_objects(i)->Display();glPopName();}
+        if(!active_list(i)) continue;
+        if(segmented_curve_objects(i)){
+            glLoadName(i);
+            segmented_curve_objects(i)->Display();}}
+    glPopName();
+    glPopName();
+
+    glPushName(1);
+    glPushName(0);
+    if(draw_triangulated_areas){
+        for(int i=0;i<triangulated_area_objects.m;i++){
+            if(!active_list(i)) continue;
+            if(triangulated_area_objects(i)){
+                glLoadName(i);
+                triangulated_area_objects(i)->Display();}}}
+    glPopName();
+    glPopName();
+
+    glPushName(2);
+    glPushName(0);
+    if(draw_triangles_of_material){
+        for(int i=0;i<triangles_of_material_objects.m;i++){
+            if(!active_list(i)) continue;
+            if(triangles_of_material_objects(i)){
+                glLoadName(i);
+                triangles_of_material_objects(i)->Display();}}}
+    glPopName();
+    glPopName();
+    
+    glPushName(3);
+    glPushName(0);
+    for(int i=0;i<bezier_spline_objects.m;i++){
+        if(!active_list(i)) continue;
+        if(bezier_spline_objects(i)){
+            glLoadName(i);
+            bezier_spline_objects(i)->Display();}}
+    glPopName();
+    glPopName();
+
+    glPushName(6);
+    glPushName(0);
+    for(int i=0;i<b_spline_objects.m;i++){
+        if(!active_list(i)) continue;
+        if(b_spline_objects(i)){
+            glLoadName(i);
+            b_spline_objects(i)->Display();}}
+    glPopName();
+    glPopName();
+
+    glPushName(4);
+    glPushName(0);
+    if(draw_embedded_curves){
+        for(int i=0;i<segmented_curve_objects.m;i++){
+            if(!active_list(i)) continue;
+            if(embedded_curve_objects(i)){
+                glLoadName(i);
+                embedded_curve_objects(i)->Display();}}}
+    glPopName();
+    glPopName();
+
+    glPushName(5);
+    glPushName(0);
+    for(int i=0;i<segmented_curve_objects.m;i++){
+        if(!active_list(i)) continue;
         if(free_particles_objects(i) && display_mode!=1){
-            glPushName(6);free_particles_objects(i)->Display();glPopName();}
-        glPopName();}
+            glLoadName(i);
+            free_particles_objects(i)->Display();}}
+    glPopName();
+    glPopName();
+
     if(draw_velocities && deformable_body_collection.particles.store_velocity) velocity_field.Display();
 }
 //#####################################################################
@@ -191,11 +251,21 @@ template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>::
 Set_Vector_Size(const T vector_size)
 {
     velocity_scale=vector_size;
-    for(int i=0;i<segmented_curve_objects.m;i++) if(segmented_curve_objects(i)) segmented_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
-    for(int i=0;i<bezier_spline_objects.m;i++) if(bezier_spline_objects(i)) bezier_spline_objects(i)->velocity_scale=velocity_scale;
-    for(int i=0;i<b_spline_objects.m;i++) if(b_spline_objects(i)) b_spline_objects(i)->velocity_scale=velocity_scale;
-    for(int i=0;i<triangulated_area_objects.m;i++) if(triangulated_area_objects(i)) triangulated_area_objects(i)->velocity_scale=velocity_scale;
-    for(int i=0;i<embedded_curve_objects.m;i++) if(embedded_curve_objects(i)) embedded_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
+    for(int i=0;i<segmented_curve_objects.m;i++)
+        if(active_list(i) && segmented_curve_objects(i))
+            segmented_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
+    for(int i=0;i<bezier_spline_objects.m;i++)
+        if(active_list(i) && bezier_spline_objects(i))
+            bezier_spline_objects(i)->velocity_scale=velocity_scale;
+    for(int i=0;i<b_spline_objects.m;i++)
+        if(active_list(i) && b_spline_objects(i))
+            b_spline_objects(i)->velocity_scale=velocity_scale;
+    for(int i=0;i<triangulated_area_objects.m;i++)
+        if(active_list(i) && triangulated_area_objects(i))
+            triangulated_area_objects(i)->velocity_scale=velocity_scale;
+    for(int i=0;i<embedded_curve_objects.m;i++)
+        if(active_list(i) && embedded_curve_objects(i))
+            embedded_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
 }
 //#####################################################################
 // Function Increase_Vector_Size
@@ -205,12 +275,22 @@ Increase_Vector_Size()
 {
     T magnitude_adjustment=(T)1.1;
     velocity_scale*=magnitude_adjustment;
-    for(int i=0;i<segmented_curve_objects.m;i++) if(segmented_curve_objects(i)) segmented_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
-    for(int i=0;i<bezier_spline_objects.m;i++) if(bezier_spline_objects(i)) bezier_spline_objects(i)->velocity_scale=velocity_scale;
-    for(int i=0;i<b_spline_objects.m;i++) if(b_spline_objects(i)) b_spline_objects(i)->velocity_scale=velocity_scale;
-    for(int i=0;i<triangulated_area_objects.m;i++) if(triangulated_area_objects(i)) triangulated_area_objects(i)->velocity_scale=velocity_scale;
+    for(int i=0;i<segmented_curve_objects.m;i++)
+        if(active_list(i) && segmented_curve_objects(i))
+            segmented_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
+    for(int i=0;i<bezier_spline_objects.m;i++)
+        if(active_list(i) && bezier_spline_objects(i))
+            bezier_spline_objects(i)->velocity_scale=velocity_scale;
+    for(int i=0;i<b_spline_objects.m;i++)
+        if(active_list(i) && b_spline_objects(i))
+            b_spline_objects(i)->velocity_scale=velocity_scale;
+    for(int i=0;i<triangulated_area_objects.m;i++)
+        if(active_list(i) && triangulated_area_objects(i))
+            triangulated_area_objects(i)->velocity_scale=velocity_scale;
     velocity_field.Scale_Vector_Size(magnitude_adjustment);
-    for(int i=0;i<embedded_curve_objects.m;i++) if(embedded_curve_objects(i)) embedded_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
+    for(int i=0;i<embedded_curve_objects.m;i++)
+        if(active_list(i) && embedded_curve_objects(i))
+            embedded_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
 }
 //#####################################################################
 // Function Decrease_Vector_Size
@@ -220,12 +300,22 @@ Decrease_Vector_Size()
 {
     T magnitude_adjustment=(T)1/(T)1.1;
     velocity_scale*=magnitude_adjustment;
-    for(int i=0;i<segmented_curve_objects.m;i++) if(segmented_curve_objects(i)) segmented_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
-    for(int i=0;i<bezier_spline_objects.m;i++) if(bezier_spline_objects(i)) bezier_spline_objects(i)->velocity_scale=velocity_scale;
-    for(int i=0;i<b_spline_objects.m;i++) if(b_spline_objects(i)) b_spline_objects(i)->velocity_scale=velocity_scale;
-    for(int i=0;i<triangulated_area_objects.m;i++) if(triangulated_area_objects(i)) triangulated_area_objects(i)->velocity_scale=velocity_scale;
+    for(int i=0;i<segmented_curve_objects.m;i++)
+        if(active_list(i) && segmented_curve_objects(i))
+            segmented_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
+    for(int i=0;i<bezier_spline_objects.m;i++)
+        if(active_list(i) && bezier_spline_objects(i))
+            bezier_spline_objects(i)->velocity_scale=velocity_scale;
+    for(int i=0;i<b_spline_objects.m;i++)
+        if(active_list(i) && b_spline_objects(i))
+            b_spline_objects(i)->velocity_scale=velocity_scale;
+    for(int i=0;i<triangulated_area_objects.m;i++)
+        if(active_list(i) && triangulated_area_objects(i))
+            triangulated_area_objects(i)->velocity_scale=velocity_scale;
     velocity_field.Scale_Vector_Size(magnitude_adjustment);
-    for(int i=0;i<embedded_curve_objects.m;i++) if(embedded_curve_objects(i)) embedded_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
+    for(int i=0;i<embedded_curve_objects.m;i++)
+        if(active_list(i) && embedded_curve_objects(i))
+            embedded_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
 }
 //#####################################################################
 // Function Toggle_Draw_Velocities
@@ -234,11 +324,21 @@ template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>::
 Toggle_Draw_Velocities()
 {
     draw_velocities=!draw_velocities;
-    for(int i=0;i<segmented_curve_objects.m;i++) if(segmented_curve_objects(i)) segmented_curve_objects(i)->draw_velocities=draw_velocities;
-    for(int i=0;i<bezier_spline_objects.m;i++) if(bezier_spline_objects(i)) bezier_spline_objects(i)->draw_velocities=draw_velocities;
-    for(int i=0;i<b_spline_objects.m;i++) if(b_spline_objects(i)) b_spline_objects(i)->draw_velocities=draw_velocities;
-    for(int i=0;i<triangulated_area_objects.m;i++) if(triangulated_area_objects(i)) triangulated_area_objects(i)->draw_velocities=draw_velocities;
-    for(int i=0;i<embedded_curve_objects.m;i++) if(embedded_curve_objects(i)) embedded_curve_objects(i)->draw_velocities=draw_velocities;
+    for(int i=0;i<segmented_curve_objects.m;i++)
+        if(active_list(i) && segmented_curve_objects(i))
+            segmented_curve_objects(i)->draw_velocities=draw_velocities;
+    for(int i=0;i<bezier_spline_objects.m;i++)
+        if(active_list(i) && bezier_spline_objects(i))
+            bezier_spline_objects(i)->draw_velocities=draw_velocities;
+    for(int i=0;i<b_spline_objects.m;i++)
+        if(active_list(i) && b_spline_objects(i))
+            b_spline_objects(i)->draw_velocities=draw_velocities;
+    for(int i=0;i<triangulated_area_objects.m;i++)
+        if(active_list(i) && triangulated_area_objects(i))
+            triangulated_area_objects(i)->draw_velocities=draw_velocities;
+    for(int i=0;i<embedded_curve_objects.m;i++)
+        if(active_list(i) && embedded_curve_objects(i))
+            embedded_curve_objects(i)->draw_velocities=draw_velocities;
 }
 //#####################################################################
 // Function Cycle_Display_Mode
@@ -264,86 +364,120 @@ Bounding_Box() const
 {
     RANGE<VECTOR<T,3> > box;
     if(draw && valid && deformable_body_collection.structures.m>0){
-        for(int i=0;i<segmented_curve_objects.m;i++) if(segmented_curve_objects(i)) box.Enlarge_To_Include_Box(segmented_curve_objects(i)->Bounding_Box());
-        for(int i=0;i<bezier_spline_objects.m;i++) if(bezier_spline_objects(i)) box.Enlarge_To_Include_Box(bezier_spline_objects(i)->Bounding_Box());
-        for(int i=0;i<b_spline_objects.m;i++) if(b_spline_objects(i)) box.Enlarge_To_Include_Box(b_spline_objects(i)->Bounding_Box());
-        for(int i=0;i<triangulated_area_objects.m;i++) if(triangulated_area_objects(i)) box.Enlarge_To_Include_Box(triangulated_area_objects(i)->Bounding_Box());
-        for(int i=0;i<triangles_of_material_objects.m;i++) if(triangles_of_material_objects(i)) box.Enlarge_To_Include_Box(triangles_of_material_objects(i)->Bounding_Box());}
+        for(int i=0;i<segmented_curve_objects.m;i++)
+            if(active_list(i) && segmented_curve_objects(i))
+                box.Enlarge_To_Include_Box(segmented_curve_objects(i)->Bounding_Box());
+        for(int i=0;i<bezier_spline_objects.m;i++)
+            if(active_list(i) && bezier_spline_objects(i))
+                box.Enlarge_To_Include_Box(bezier_spline_objects(i)->Bounding_Box());
+        for(int i=0;i<b_spline_objects.m;i++)
+            if(active_list(i) && b_spline_objects(i))
+                box.Enlarge_To_Include_Box(b_spline_objects(i)->Bounding_Box());
+        for(int i=0;i<triangulated_area_objects.m;i++)
+            if(active_list(i) && triangulated_area_objects(i))
+                box.Enlarge_To_Include_Box(triangulated_area_objects(i)->Bounding_Box());
+        for(int i=0;i<triangles_of_material_objects.m;i++)
+            if(active_list(i) && triangles_of_material_objects(i))
+                box.Enlarge_To_Include_Box(triangles_of_material_objects(i)->Bounding_Box());}
     return box;
+}
+//#####################################################################
+// Function Get_Selection_Priority
+//#####################################################################
+template<class T> int OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>::
+Get_Selection_Priority(ARRAY_VIEW<GLuint> indices)
+{
+    switch(indices(0)){
+        case 0:return segmented_curve_objects(indices(1))->Get_Selection_Priority(indices.Array_View(2,indices.m-2));
+        case 1:return triangulated_area_objects(indices(1))->Get_Selection_Priority(indices.Array_View(2,indices.m-2));
+        case 2:return triangles_of_material_objects(indices(1))->Get_Selection_Priority(indices.Array_View(2,indices.m-2));
+        case 3:return bezier_spline_objects(indices(1))->Get_Selection_Priority(indices.Array_View(2,indices.m-2));
+        case 4:return embedded_curve_objects(indices(1))->Get_Selection_Priority(indices.Array_View(2,indices.m-2));
+        case 5:return free_particles_objects(indices(1))->Get_Selection_Priority(indices.Array_View(2,indices.m-2));
+        case 6:return b_spline_objects(indices(1))->Get_Selection_Priority(indices.Array_View(2,indices.m-2));
+        default:return 10;}
 }
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>::
-Get_Selection(GLuint* buffer,int buffer_size)
+template<class T> bool OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>::
+Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers)
 {
-    OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_2D<T>* selection=0;
-    if(buffer_size >= 1){
-        selection=new OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_2D<T>(this);
-        selection->body_index=buffer[0];selection->subobject_type=buffer[1];
-        switch(selection->subobject_type){
-            case 1:selection->subobject=segmented_curve_objects(buffer[0]);break;
-            case 2:selection->subobject=triangulated_area_objects(buffer[0]);break;
-            case 3:selection->subobject=triangles_of_material_objects(buffer[0]);break;
-            case 4:selection->subobject=bezier_spline_objects(buffer[0]);break;
-            case 7:selection->subobject=b_spline_objects(buffer[0]);break;
-            case 5:selection->subobject=embedded_curve_objects(buffer[0]);break;
-            case 6:selection->subobject=free_particles_objects(buffer[0]);break;
-            default:delete selection;return 0;}
-        selection->body_selection=selection->subobject->Get_Selection(&buffer[2],buffer_size-2);
-        if(!selection->body_selection){delete selection;selection=0;}}
-    return selection;
-}
-//#####################################################################
-// Function Highlight_Selection
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>::
-Highlight_Selection(OPENGL_SELECTION<T>* selection)
-{
-    if(selection->type != OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_OBJECT_2D) return;
-    OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_2D<T>* real_selection=(OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_2D<T>*)selection;
-    real_selection->subobject->Highlight_Selection(real_selection->body_selection);
+    if(modifiers&GLUT_ACTIVE_CTRL){
+        active_list(indices(1))=false;
+        return false;}
+
+    selected_index=indices(1);
+    switch(indices(0)){
+        case 0:
+            selected_segmented_curve=indices(1);
+            selected_object=segmented_curve_objects(indices(1));
+            break;
+        case 1:
+            selected_triangulated_area=indices(1);
+            selected_object=triangulated_area_objects(indices(1));
+            break;
+        case 2:
+            selected_triangles_of_material=indices(1);
+            selected_object=triangles_of_material_objects(indices(1));
+            break;
+        case 3:
+            selected_bezier_spline=indices(1);
+            selected_object=bezier_spline_objects(indices(1));
+            break;
+        case 4:
+            selected_embedded_curve=indices(1);
+            selected_object=embedded_curve_objects(indices(1));
+            break;
+        case 5:
+            selected_free_particles=indices(1);
+            selected_object=free_particles_objects(indices(1));
+            break;
+        case 6:
+            selected_b_spline=indices(1);
+            selected_object=b_spline_objects(indices(1));
+            break;
+        default:PHYSBAM_FATAL_ERROR();}
+    return selected_object->Set_Selection(indices.Array_View(2,indices.m-2),modifiers);
 }
 //#####################################################################
 // Function Clear_Highlight
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>::
-Clear_Highlight()
+Clear_Selection()
 {
-    for(int i=0;i<triangulated_area_objects.m;i++)if(triangulated_area_objects(i))triangulated_area_objects(i)->Clear_Highlight();
-    for(int i=0;i<triangles_of_material_objects.m;i++)if(triangles_of_material_objects(i))triangles_of_material_objects(i)->Clear_Highlight();
-    for(int i=0;i<free_particles_objects.m;i++)if(free_particles_objects(i))free_particles_objects(i)->Clear_Highlight();
-    for(int i=0;i<embedded_curve_objects.m;i++)if(embedded_curve_objects(i))embedded_curve_objects(i)->Clear_Highlight();
+    for(int i=0;i<triangulated_area_objects.m;i++)if(triangulated_area_objects(i))triangulated_area_objects(i)->Clear_Selection();
+    for(int i=0;i<triangles_of_material_objects.m;i++)if(triangles_of_material_objects(i))triangles_of_material_objects(i)->Clear_Selection();
+    for(int i=0;i<free_particles_objects.m;i++)if(free_particles_objects(i))free_particles_objects(i)->Clear_Selection();
+    for(int i=0;i<embedded_curve_objects.m;i++)if(embedded_curve_objects(i))embedded_curve_objects(i)->Clear_Selection();
 }
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection) const
+Print_Selection_Info(std::ostream& output_stream) const
 {
-    if(!selection) return;
-    if(selection->type != OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_OBJECT_2D) return;
-    OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_2D<T>* real_selection=(OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_2D<T>*)selection;
-    output_stream << "Deformable object " << real_selection->body_index << std::endl;
-    real_selection->subobject->Print_Selection_Info(output_stream,real_selection->body_selection);
+    output_stream<<"Deformable object "<<selected_index<<std::endl;
+    selected_object->Print_Selection_Info(output_stream);
 }
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>::
-Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection)
+template<class T> bool OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>::
+Destroy_Selection_After_Frame_Change()
 {
-    if(old_selection && old_selection->object==this && invalidate_deformable_objects_selection_each_frame) delete_selection=true;
-    return 0;
+    if(invalidate_deformable_objects_selection_each_frame){
+        Clear_Selection();
+        return true;}
+    return false;
 }
 //#####################################################################
-// Function Bounding_Box
+// Function Selection_Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_2D<T>::
-Bounding_Box() const
+template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>::
+Selection_Bounding_Box() const
 {
-    PHYSBAM_ASSERT(object && body_selection);
-    return object->World_Space_Box(body_selection->Bounding_Box());
+    return World_Space_Box(selected_object->Bounding_Box());
 }
 //#####################################################################
 namespace PhysBAM{

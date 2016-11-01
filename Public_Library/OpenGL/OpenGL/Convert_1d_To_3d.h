@@ -17,7 +17,7 @@ template<class T> inline VECTOR<T,3> Convert_1d_To_3d(const VECTOR<T,1>& v)
 {return VECTOR<T,3>(v.x,0,0);}
 
 template<class T> inline RANGE<VECTOR<T,3> > Convert_1d_To_3d(const RANGE<VECTOR<T,1> >& box)
-{return RANGE<VECTOR<T,3> >(box.min_corner.x,box.max_corner.x,0,0,0,0);}
+{return RANGE<VECTOR<T,3> >(VECTOR<T,3>(box.min_corner),VECTOR<T,3>(box.max_corner));}
 
 template<class T> inline ROTATION<VECTOR<T,3> > Convert_1d_To_3d(const ROTATION<VECTOR<T,1> >& c)
 {return ROTATION<VECTOR<T,3> >();}

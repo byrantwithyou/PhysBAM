@@ -37,7 +37,8 @@ Update()
 template<class T> RANGE<VECTOR<T,3> > OPENGL_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>::
 Bounding_Box() const
 {
-    return World_Space_Box(triangulated_area.bounding_box?*triangulated_area.bounding_box:RANGE<TV>::Centered_Box());
+    if(triangulated_area.bounding_box) return World_Space_Box(*triangulated_area.bounding_box);
+    return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 namespace PhysBAM{

@@ -76,16 +76,34 @@ inline void OpenGL_Eps_Emit(const char* str)
 {IF_OPENGL_EPS_OUTPUT(opengl_eps_output->Emit(str));}
 
 inline void OpenGL_Rotate(const ROTATION<VECTOR<float,3> >& r)
-{float angle;VECTOR<float,3> axis;r.Get_Angle_Axis(angle,axis);glRotatef(angle*180/(float)pi,axis.x,axis.y,axis.z);}
+{float angle;VECTOR<float,3> axis;r.Get_Angle_Axis(angle,axis);glRotatef(angle*(180/(float)pi),axis.x,axis.y,axis.z);}
 
 inline void OpenGL_Rotate(const ROTATION<VECTOR<double,3> >& r)
-{double angle;VECTOR<double,3> axis;r.Get_Angle_Axis(angle,axis);glRotated(angle*180/pi,axis.x,axis.y,axis.z);}
+{double angle;VECTOR<double,3> axis;r.Get_Angle_Axis(angle,axis);glRotated(angle*(180/pi),axis.x,axis.y,axis.z);}
+
+inline void OpenGL_Rotate(const ROTATION<VECTOR<float,2> >& r)
+{float angle=r.Angle();glRotatef(angle*(180/(float)pi),0,0,1);}
+
+inline void OpenGL_Rotate(const ROTATION<VECTOR<double,2> >& r)
+{double angle=r.Angle();glRotated(angle*(180/(double)pi),0,0,1);}
+
+inline void OpenGL_Rotate(const ROTATION<VECTOR<float,1> >& r)
+{}
+
+inline void OpenGL_Rotate(const ROTATION<VECTOR<double,1> >& r)
+{}
+
+inline void OpenGL_Translate(const VECTOR<float,1>& v)
+{glTranslatef(v.x,0,0);}
+
+inline void OpenGL_Translate(const VECTOR<double,1>& v)
+{glTranslated(v.x,0,0);}
 
 inline void OpenGL_Translate(const VECTOR<float,2>& v)
-{glTranslatef(v.x,v.y,(float)0);}
+{glTranslatef(v.x,v.y,0);}
 
 inline void OpenGL_Translate(const VECTOR<double,2>& v)
-{glTranslated(v.x,v.y,(double)0);}
+{glTranslated(v.x,v.y,0);}
 
 inline void OpenGL_Translate(const VECTOR<float,3>& v)
 {glTranslatef(v.x,v.y,v.z);}

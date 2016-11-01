@@ -66,11 +66,11 @@ Display() const
 // Function Print_Selection_Info
 //#####################################################################
 template<class T,class T2> void OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<T,T2>::
-Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const
+Print_Selection_Info(std::ostream& stream) const
 {
     if(Is_Up_To_Date(frame)){
         stream<<component_name<<": "<<std::endl;
-        opengl_face_scalar_field.Print_Selection_Info(stream,selection);}
+        opengl_face_scalar_field.Print_Selection_Info(stream);}
 }
 //#####################################################################
 // Function Bounding_Box
@@ -79,7 +79,7 @@ template<class T,class T2> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_FACE_SCALAR_FIEL
 Bounding_Box() const
 {
     if(valid && draw) return opengl_face_scalar_field.Bounding_Box();
-    else return RANGE<VECTOR<T,3> >::Centered_Box();
+    return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Scale

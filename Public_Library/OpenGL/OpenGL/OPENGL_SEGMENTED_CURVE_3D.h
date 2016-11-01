@@ -14,8 +14,6 @@
 #include <OpenGL/OpenGL/OPENGL_SELECTION.h>
 namespace PhysBAM{
 
-template<class T> class OPENGL_SELECTION;
-
 template<class T>
 class OPENGL_SEGMENTED_CURVE_3D:public OPENGL_OBJECT<T>
 {
@@ -32,20 +30,17 @@ public:
 
     OPENGL_SEGMENTED_CURVE_3D(STREAM_TYPE stream_type,const SEGMENTED_CURVE<TV>& curve_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::Cyan())
         :OPENGL_OBJECT<T>(stream_type),curve(curve_input),parent_curve(0),color(color_input),vertex_color(OPENGL_COLOR::Green(0.9)),
-        vertex_position_color(OPENGL_COLOR::Magenta()),draw_vertices(false),use_solid_color(true),smooth_normals(false),current_selection(0)
+        vertex_position_color(OPENGL_COLOR::Magenta()),draw_vertices(false),use_solid_color(true),smooth_normals(false),selected_vertex(-1),selected_segment(-1),selected_curve(-1)
     {}
 
     void Display() const override;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    virtual RANGE<TV> Bounding_Box() const override;
+    virtual RANGE<TV> Selection_Bounding_Box() const override;
 
-    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer,int buffer_size) override;
-    void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
-    void Clear_Highlight() override;
-    void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const override;
-
-    OPENGL_SELECTION<T>* Get_Vertex_Selection(int index);
-    OPENGL_SELECTION<T>* Get_Segment_Selection(int index);
-    OPENGL_SELECTION<T>* Get_Curve_Selection(int index);
+    virtual int Get_Selection_Priority(ARRAY_VIEW<GLuint> indices) override;
+    virtual bool Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers) override;
+    void Clear_Selection() override;
+    void Print_Selection_Info(std::ostream &output_stream) const override;
 
     void Turn_Smooth_Shading_On() override;
     void Turn_Smooth_Shading_Off() override;
@@ -59,43 +54,10 @@ private:
 
     bool smooth_normals;
 
-    OPENGL_SELECTION<T>* current_selection;
-};
-
-template<class T>
-class OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_3D:public OPENGL_SELECTION<T>
-{
 public:
-    using OPENGL_SELECTION<T>::object;
-    int index;
-    OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_3D(OPENGL_OBJECT<T>* object,int index=0) 
-        :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::SEGMENTED_CURVE_VERTEX_3D,object),index(index) {}
-
-    RANGE<VECTOR<T,3> > Bounding_Box() const override;
-};
-
-template<class T>
-class OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_3D:public OPENGL_SELECTION<T>
-{
-public:
-    using OPENGL_SELECTION<T>::object;
-    int index;
-    OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_3D(OPENGL_OBJECT<T>* object,int index=0) 
-        :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::SEGMENTED_CURVE_SEGMENT_3D,object),index(index) {}
-
-    RANGE<VECTOR<T,3> > Bounding_Box() const override;
-};
-
-template<class T>
-class OPENGL_SELECTION_SEGMENTED_CURVE_3D:public OPENGL_SELECTION<T>
-{
-public:
-    using OPENGL_SELECTION<T>::object;
-    int index;
-    OPENGL_SELECTION_SEGMENTED_CURVE_3D(OPENGL_OBJECT<T>* object,int index=0) 
-        :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::SEGMENTED_CURVE_3D,object),index(index) {}
-
-    RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    int selected_vertex;
+    int selected_segment;
+    int selected_curve;
 };
 
 }

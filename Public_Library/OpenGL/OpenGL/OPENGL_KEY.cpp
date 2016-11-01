@@ -16,8 +16,8 @@ std::string OPENGL_KEY::Name() const
 {
     static const char* special_names[]={"F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12","Left","Right","Down","Up","PgDn","PgUp","Home","End","Ins","?"};
     std::string name;
-    if(modifiers&ALT)  name+="Alt-";
-    if(modifiers&CTRL) name+="^";
+    if(modifiers&GLUT_ACTIVE_ALT)  name+="Alt-";
+    if(modifiers&GLUT_ACTIVE_CTRL) name+="^";
     if(key>=256) name+=std::string(special_names[(int)key-256]);
     else if(isprint(key)) name.append(1,(char)key);
     else if(key=='\t') name+="Tab";
@@ -34,19 +34,17 @@ VECTOR<int,2> OPENGL_KEY::Index() const
 //#####################################################################
 // Function From_Glut_Key
 //#####################################################################
-OPENGL_KEY OPENGL_KEY::From_Glut_Key(unsigned char key,bool ctrl_pressed,bool alt_pressed)
+OPENGL_KEY OPENGL_KEY::From_Glut_Key(unsigned char key,int modifiers)
 {
     // need to correct for the fact that pressing ctrl alters the keycode for regular letters
-    if('a'<=(key+'a'-1) && (key+'a'-1)<='z'){key+='a'-1; ctrl_pressed=true;}
-    char modifiers=0x00;if(ctrl_pressed) modifiers|=CTRL;if(alt_pressed) modifiers|=ALT;
+    if('a'<=(key+'a'-1) && (key+'a'-1)<='z'){key+='a'-1; modifiers|=GLUT_ACTIVE_CTRL;}
     return OPENGL_KEY(key,modifiers);
 }
 //#####################################################################
 // Function From_Glut_Special_Key
 //#####################################################################
-OPENGL_KEY OPENGL_KEY::From_Glut_Special_Key(int key,bool ctrl_pressed,bool alt_pressed)
+OPENGL_KEY OPENGL_KEY::From_Glut_Special_Key(int key,int modifiers)
 {
-    char modifiers=0x00;if(ctrl_pressed) modifiers|=CTRL;if(alt_pressed) modifiers|=ALT;
     switch(key){
         case GLUT_KEY_F1: return OPENGL_KEY(F1,modifiers);
         case GLUT_KEY_F2: return OPENGL_KEY(F2,modifiers);
@@ -91,7 +89,7 @@ OPENGL_KEY OPENGL_KEY::From_String(const std::string& key_string,unsigned int& i
     else if(key_string[i]=='\\'){ // suppress special meaning of what follows
         if(i+1<key_string.length()){i++;return OPENGL_KEY(key_string[i++]);} else return OPENGL_KEY(UNKNOWN);}
     else if(key_string[i]=='^'){ // ctrl-key sequence
-        if(i+1<key_string.length()){i++;return OPENGL_KEY(key_string[i++],OPENGL_KEY::CTRL);} else return OPENGL_KEY(UNKNOWN);}
+        if(i+1<key_string.length()){i++;return OPENGL_KEY(key_string[i++],GLUT_ACTIVE_CTRL);} else return OPENGL_KEY(UNKNOWN);}
     else if(key_string[i]=='<'){ // special named key sequence
         std::string::size_type end_index=key_string.find('>',i+1);
         if(end_index==std::string::npos){i=(unsigned int)key_string.size();return OPENGL_KEY(UNKNOWN);}

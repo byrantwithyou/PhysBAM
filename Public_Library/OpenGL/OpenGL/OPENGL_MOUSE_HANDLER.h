@@ -12,7 +12,7 @@ class OPENGL_MOUSE_HANDLER
 {
 public:
     virtual ~OPENGL_MOUSE_HANDLER() {}
-    virtual void Handle_Click(int button,int state,int x,int y,bool ctrl_pressed,bool shift_pressed)=0;
+    virtual void Handle_Click(int button,int state,int x,int y,int modifiers)=0;
     virtual void Handle_Drag(int x,int y){}
 //#####################################################################
 };

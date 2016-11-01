@@ -17,6 +17,7 @@ namespace PhysBAM
 template<class T>
 class OPENGL_COMPONENT_TRIANGULATED_SURFACE:public OPENGL_COMPONENT<T>
 {
+    typedef VECTOR<T,3> TV;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
     using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::stream_type;
@@ -29,12 +30,18 @@ public:
 
     void Display() const override;
     bool Use_Bounding_Box() const override { return draw && valid; }
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    virtual RANGE<TV> Bounding_Box() const override;
 
-    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size) override { return opengl_triangulated_surface.Get_Selection(buffer,buffer_size); }
-    virtual void Highlight_Selection(OPENGL_SELECTION<T>* selection) override { opengl_triangulated_surface.Highlight_Selection(selection); }
-    virtual void Clear_Highlight() override { opengl_triangulated_surface.Clear_Highlight(); }
+    virtual int Get_Selection_Priority(ARRAY_VIEW<GLuint> indices) override
+    {return opengl_triangulated_surface.Get_Selection_Priority(indices);}
 
+    virtual bool Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers) override
+    {return opengl_triangulated_surface.Set_Selection(indices,modifiers);}
+
+    virtual void Clear_Selection() override { opengl_triangulated_surface.Clear_Selection(); }
+
+    virtual RANGE<TV> Selection_Bounding_Box() const override;
+    
 private:
     void Reinitialize();    // Needs to be called after some state changes
 

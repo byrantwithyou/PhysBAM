@@ -26,17 +26,19 @@ public:
     using OPENGL_VECTOR_FIELD_3D<T>::World_Space_Box;
 
     GRID<TV>& grid;
-    ARRAY<VECTOR<T,3> ,VECTOR<int,3> >& V;
+    ARRAY<TV,TV_INT>& V;
     int max_vectors_3d;
-
-    OPENGL_GRID_BASED_VECTOR_FIELD_3D(STREAM_TYPE stream_type,GRID<TV>& grid,ARRAY<VECTOR<T,3> ,VECTOR<int,3> >& V);
+    TV_INT selected_cell;
+    TV_INT selected_node;
+    
+    OPENGL_GRID_BASED_VECTOR_FIELD_3D(STREAM_TYPE stream_type,GRID<TV>& grid,ARRAY<TV,TV_INT>& V);
     virtual ~OPENGL_GRID_BASED_VECTOR_FIELD_3D();
 
     void Update();  // Call when grid/V change
 
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    virtual RANGE<TV> Bounding_Box() const override;
     virtual void Slice_Has_Changed() override { Update(); }
-    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const override;
+    void Print_Selection_Info(std::ostream& stream) const override;
 
 };
 }

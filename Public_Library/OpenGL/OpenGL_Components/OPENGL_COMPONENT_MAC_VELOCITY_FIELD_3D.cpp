@@ -20,7 +20,7 @@ OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV> &g
     :OPENGL_COMPONENT<T>(stream_type,"MAC Velocity Field"),
     opengl_mac_velocity_field(stream_type,*new GRID<TV>(grid)),
      opengl_vorticity_magnitude(stream_type,opengl_mac_velocity_field.grid,opengl_vorticity_magnitude_array,OPENGL_COLOR_RAMP<T>::Matlab_Jet(0,1)),
-     draw_vorticity(false),velocity_filename(velocity_filename),valid(false),min_vorticity(FLT_MAX),max_vorticity(FLT_MIN)
+    draw_vorticity(false),selected_index(-1,-1,-1),velocity_filename(velocity_filename),valid(false),min_vorticity(FLT_MAX),max_vorticity(FLT_MIN)
 {
     viewer_callbacks.Set("toggle_velocity_mode",{[this](){Toggle_Velocity_Mode();},"Toggle velocity mode"});
     viewer_callbacks.Set("toggle_velocity_mode_and_draw",{[this](){Toggle_Velocity_Mode_And_Draw();},"Toggle velocity mode and draw"});
@@ -122,20 +122,18 @@ Reinitialize()
 // Function Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>::
-Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const
+Print_Selection_Info(std::ostream& stream) const
 {
     if(Is_Up_To_Date(frame)){
         stream<<component_name<<": ";
-        opengl_mac_velocity_field.Print_Selection_Info(stream,selection);
-        if(selection && selection->type==OPENGL_SELECTION<T>::GRID_CELL_3D && opengl_mac_velocity_field.grid.Is_MAC_Grid()){
-            VECTOR<int,3> index=((OPENGL_SELECTION_GRID_CELL_3D<T>*)selection)->index;
-            if(draw_vorticity) stream<<"vorticity magnitude = "<<opengl_vorticity_magnitude.values(index)<<std::endl;}}
+        opengl_mac_velocity_field.Print_Selection_Info(stream);
+        if(draw_vorticity) stream<<"vorticity magnitude = "<<opengl_vorticity_magnitude.values(selected_index)<<std::endl;}
 }
 //#####################################################################
 // Function Set_Vector_Size
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>::
-Set_Vector_Size(double size)
+Set_Vector_Size(T size)
 {
     opengl_mac_velocity_field.size = size;
 }

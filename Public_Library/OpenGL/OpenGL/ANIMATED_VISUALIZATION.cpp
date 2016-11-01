@@ -81,7 +81,6 @@ Initialize_Components_And_Key_Bindings()
     BASIC_VISUALIZATION<T>::Initialize_Components_And_Key_Bindings();
 
     opengl_world.Set_Key_Binding_Category("Default Keys (ANIMATED_VISUALIZATION)");
-    opengl_world.Set_Key_Binding_Category_Priority(100);
 
     opengl_world.Bind_Key('p',toggle_play_cb);
     opengl_world.Bind_Key('P',toggle_loop_cb);
@@ -95,7 +94,6 @@ Initialize_Components_And_Key_Bindings()
     opengl_world.Bind_Key("^d",capture_frames_cb);
 
     opengl_world.Set_Key_Binding_Category("User-Defined Keys");
-    opengl_world.Set_Key_Binding_Category_Priority(1);
 }
 //#####################################################################
 // Function Valid_Frame
@@ -209,11 +207,8 @@ Set_Frame(int frame_input)
     }
 
     // Update/Invalidate selections
-    for(int i=0;i<component_list.m;i++){
-        bool delete_selection=false;
-        OPENGL_SELECTION<T>* new_selection=component_list(i)->Create_Or_Destroy_Selection_After_Frame_Change(current_selection,delete_selection);
-        if(new_selection){Set_Current_Selection(new_selection);break;}
-        else if(delete_selection){Set_Current_Selection(0);break;}}
+    if(selected_object && selected_object->Destroy_Selection_After_Frame_Change())
+        selected_object=0;
 
     Set_Frame_Extra();
     Update_OpenGL_Strings();

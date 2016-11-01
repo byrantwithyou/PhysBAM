@@ -37,9 +37,9 @@ public:
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
     virtual void Set_Slice(OPENGL_SLICE *slice_input) override {slice=slice_input;opengl_mac_velocity_field.Set_Slice(slice_input);opengl_vorticity_magnitude.Set_Slice(slice_input);}
     virtual void Slice_Has_Changed() override { opengl_mac_velocity_field.Slice_Has_Changed();opengl_vorticity_magnitude.Slice_Has_Changed(); }
-    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const override;
+    void Print_Selection_Info(std::ostream& stream) const override;
 
-    void Set_Vector_Size(double size);
+    void Set_Vector_Size(T size);
 
     void Toggle_Velocity_Mode();
     void Toggle_Velocity_Mode_And_Draw();
@@ -58,6 +58,7 @@ public:
     ARRAY<T,VECTOR<int,3> > opengl_vorticity_magnitude_array;
     OPENGL_SCALAR_FIELD_3D<T> opengl_vorticity_magnitude;
     bool draw_vorticity;
+    TV_INT selected_index;
 
 private:
     std::string velocity_filename;

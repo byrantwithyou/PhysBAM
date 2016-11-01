@@ -42,7 +42,7 @@ public:
     void Set_Frame(int frame_input) override;
     void Set_Draw(bool draw_input = true) override;
     void Display() const override;
-    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const override;
+    void Print_Selection_Info(std::ostream& stream) const override;
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
     virtual void Set_Slice(OPENGL_SLICE *slice_input) override {slice=slice_input;opengl_scalar_field.Set_Slice(slice_input);}
     virtual void Slice_Has_Changed() override {opengl_scalar_field.Slice_Has_Changed();}

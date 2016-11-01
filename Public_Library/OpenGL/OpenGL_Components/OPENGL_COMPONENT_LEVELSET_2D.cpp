@@ -15,7 +15,8 @@ using namespace PhysBAM;
 template<class T> OPENGL_COMPONENT_LEVELSET_2D<T>::
 OPENGL_COMPONENT_LEVELSET_2D(STREAM_TYPE stream_type,const std::string& levelset_filename_input,const std::string filename_set_input)
     :OPENGL_COMPONENT<T>(stream_type,"Levelset 2D"),opengl_levelset(0),levelset_filename(levelset_filename_input),filename_set(filename_set_input),
-    frame_loaded(-1),set(0),use_sets(true),set_loaded(-1),valid(false),draw_multiple_levelsets(false)
+    frame_loaded(-1),set(0),use_sets(true),set_loaded(-1),valid(false),draw_multiple_levelsets(false),selected_cell(-1,-1),
+    selected_node(-1,-1)
 {
     viewer_callbacks.Set("toggle_color_mode",{[this](){Toggle_Color_Mode();},"Toggle color mode"});
     viewer_callbacks.Set("toggle_smooth",{[this](){Toggle_Smooth();},"Toggle smooth levelset draw"});
@@ -101,31 +102,28 @@ template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_LEVELSET_2D<T>::
 Bounding_Box() const
 {
     if(valid && draw) return opengl_levelset->Bounding_Box();
-    else return RANGE<VECTOR<T,3> >::Centered_Box();
+    return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_LEVELSET_2D<T>::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_selection) const
+Print_Selection_Info(std::ostream& output_stream) const
 {
     if(Is_Up_To_Date(frame)){
-        if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_CELL_2D && opengl_levelsets(0)->levelset.grid.Is_MAC_Grid()){
-            VECTOR<int,2> index=((OPENGL_SELECTION_GRID_CELL_2D<T>*)current_selection)->index;
+        if(selected_cell.x>=0 && opengl_levelsets(0)->levelset.grid.Is_MAC_Grid()){
             for(int i=0;i<opengl_levelsets.m;i++) 
-                output_stream<<component_name<<": phi["<<i<<"]="<<opengl_levelsets(i)->levelset.phi(index)
-                             <<" curvature["<<i<<"]="<<opengl_levelsets(i)->levelset.Compute_Curvature(opengl_levelsets(i)->levelset.grid.Center(index))<<std::endl;}
-        if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_NODE_2D && !opengl_levelsets(0)->levelset.grid.Is_MAC_Grid()){
-            VECTOR<int,2> index=((OPENGL_SELECTION_GRID_NODE_2D<T>*)current_selection)->index;
+                output_stream<<component_name<<": phi["<<i<<"]="<<opengl_levelsets(i)->levelset.phi(selected_cell)
+                             <<" curvature["<<i<<"]="<<opengl_levelsets(i)->levelset.Compute_Curvature(opengl_levelsets(i)->levelset.grid.Center(selected_cell))<<std::endl;}
+        if(selected_node.x>=0 && !opengl_levelsets(0)->levelset.grid.Is_MAC_Grid()){
             for(int i=0;i<opengl_levelsets.m;i++) 
-                output_stream<<component_name<<": phi["<<i<<"]="<<opengl_levelsets(i)->levelset.phi(index)<<std::endl;}
-        if(current_selection && current_selection->type==OPENGL_SELECTION<T>::COMPONENT_PARTICLES_2D){
-            OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T> *selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>*)current_selection;
-            VECTOR<T,2> location=selection->location;
-            for(int i=0;i<opengl_levelsets.m;i++) 
-                output_stream<<component_name<<": phi["<<i<<"] @ particle="<<opengl_levelsets(i)->levelset.Phi(location)<<std::endl;}}
+                output_stream<<component_name<<": phi["<<i<<"]="<<opengl_levelsets(i)->levelset.phi(selected_node)<<std::endl;}}
+        // if(current_selection && current_selection->type==OPENGL_SELECTION::COMPONENT_PARTICLES_2D){
+        //     OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T> *selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>*)current_selection;
+        //     VECTOR<T,2> location=selection->location;
+        //     for(int i=0;i<opengl_levelsets.m;i++) 
+        //         output_stream<<component_name<<": phi["<<i<<"] @ particle="<<opengl_levelsets(i)->levelset.Phi(location)<<std::endl;}}
 }
-
 //#####################################################################
 // Function Reinitialize
 //#####################################################################

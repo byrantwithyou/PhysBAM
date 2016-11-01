@@ -41,8 +41,7 @@ OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(STREAM_TYPE stream_type,const std::str
     rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(0)),articulated_rigid_body(0),
     velocity_field(stream_type,velocity_vectors,positions,OPENGL_COLOR::Cyan(),.25,true,true),
     angular_velocity_field(stream_type,angular_velocity_vectors,positions,OPENGL_COLOR::Magenta(),.25,true,true),need_destroy_rigid_body_collection(true),one_sided(false),
-    front_color_map(0),back_color_map(0),
-    current_selection(0)
+    front_color_map(0),back_color_map(0),selected_joint_id(-1),selected_surface(-1),selected_volume(-1)
 {
     Initialize();
 }
@@ -55,7 +54,7 @@ OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(STREAM_TYPE stream_type,RIGID_BODY_COL
     rigid_body_collection(rigid_body_collection),articulated_rigid_body(0),
     velocity_field(stream_type,velocity_vectors,positions,OPENGL_COLOR::Cyan(),.25,true,true),
     angular_velocity_field(stream_type,angular_velocity_vectors,positions,OPENGL_COLOR::Magenta(),.25,true,true),need_destroy_rigid_body_collection(false),one_sided(false),
-    front_color_map(0),back_color_map(0),current_selection(0)
+    front_color_map(0),back_color_map(0),selected_joint_id(-1),selected_surface(-1),selected_volume(-1)
 {
     Initialize();
 }
@@ -529,61 +528,52 @@ Bounding_Box() const
     return box;
 }
 //#####################################################################
-// Function Get_Selection
+// Function Get_Selection_Priority
 //#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
-Get_Selection(GLuint *buffer,int buffer_size)
+template<class T> int OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
+Get_Selection_Priority(ARRAY_VIEW<GLuint> indices)
 {
-    OPENGL_SELECTION<T>* selection=0;
-    if(buffer_size>=2){
-        int body_id(buffer[1]);
-        OPENGL_SELECTION<T>* body_selection=0;
-        if(buffer[0]==1){ // segmented curve
-            PHYSBAM_ASSERT(opengl_triangulated_surface(body_id));
-            body_selection=opengl_triangulated_surface(body_id)->Get_Selection(&buffer[2],buffer_size-2);}
-        else if(buffer[0]==2){ // tetrahedralized_volume
-            PHYSBAM_ASSERT(opengl_tetrahedralized_volume(body_id));
-            body_selection=opengl_tetrahedralized_volume(body_id)->Get_Selection(&buffer[2],buffer_size-2);}
-        else if(buffer[0]==4){ // articulation joints
-            selection=new OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_3D<T>(this,buffer[1]);}
-        if(body_selection) selection=new OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_3D<T>(this,body_id,body_selection);}
-    return selection;
+    if(!indices.m) return -1;
+    const static int priority[]={0,0,10,95};
+    if(indices(0)==0) // segmented curve
+        return opengl_triangulated_surface(indices(1))->Get_Selection_Priority(indices.Array_View(2,indices.m-2));
+    if(indices(0)==1) // tetrahedralized_volume
+        return opengl_tetrahedralized_volume(indices(1))->Get_Selection_Priority(indices.Array_View(2,indices.m-2));
+    return priority[indices(0)];
 }
 //#####################################################################
-// Function Highlight_Selection
+// Function Get_Selection
 //#####################################################################
-template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
-Highlight_Selection(OPENGL_SELECTION<T>* selection)
+template<class T> bool OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
+Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers)
 {
-    if(selection->type==OPENGL_SELECTION<T>::COMPONENT_RIGID_BODIES_3D){
-        OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_3D<T> *real_selection=(OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_3D<T>*)selection;
-        if(selection->hide) draw_object(real_selection->body_id)=false;
-        else if(real_selection->body_selection->type==OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_VERTEX ||
-           real_selection->body_selection->type==OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_SEGMENT ||
-           real_selection->body_selection->type==OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_TRIANGLE){ // triangulated surface
-            if(opengl_triangulated_surface(real_selection->body_id)) // might have become inactive
-                opengl_triangulated_surface(real_selection->body_id)->Highlight_Selection(real_selection->body_selection);}
-        else if(real_selection->body_selection->type==OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_VERTEX ||
-                real_selection->body_selection->type==OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_TETRAHEDRON){ // tetrahedralized volume
-            if(opengl_tetrahedralized_volume(real_selection->body_id)) // might have become inactive
-                opengl_tetrahedralized_volume(real_selection->body_id)->Highlight_Selection(real_selection->body_selection);}}
-    delete current_selection;
-    current_selection=0;
-    if(selection->type==OPENGL_SELECTION<T>::ARTICULATED_RIGID_BODIES_JOINT_3D){
-        current_selection=new OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_3D<T>(this,((OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_3D<T>*)selection)->joint_id);}
+    if(indices(0)<=1 && (modifiers&GLUT_ACTIVE_CTRL)){
+        draw_object(indices(1))=false;
+        return false;}
+    if(indices(0)==0){
+        selected_surface=indices(1);
+        return opengl_triangulated_surface(indices(1))->Set_Selection(indices.Array_View(2,indices.m-2),modifiers);}
+    else if(indices(0)==1){
+        selected_volume=indices(1);
+        return opengl_tetrahedralized_volume(indices(1))->Set_Selection(indices.Array_View(2,indices.m-2),modifiers);}
+    else if(indices(0)==3) // articulation joints
+        selected_joint_id=indices(1);
+    else return false;
+    return true;
 }
 //#####################################################################
 // Function Clear_Highlight
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
-Clear_Highlight()
+Clear_Selection()
 {
-    for(int i=0;i<opengl_triangulated_surface.Size();i++)
-        if(opengl_triangulated_surface(i)) opengl_triangulated_surface(i)->Clear_Highlight();
-    for(int i=0;i<opengl_tetrahedralized_volume.Size();i++)
-        if(opengl_tetrahedralized_volume(i)) opengl_tetrahedralized_volume(i)->Clear_Highlight();
-    delete current_selection;
-    current_selection=0;
+    if(selected_surface>=0){
+        opengl_triangulated_surface(selected_surface)->Clear_Selection();
+        selected_surface=-1;}
+    if(selected_volume>=0){
+        opengl_tetrahedralized_volume(selected_volume)->Clear_Selection();
+        selected_volume=-1;}
+    selected_joint_id=-1;
 }
 //#####################################################################
 // Function Turn_Smooth_Shading_On
@@ -662,7 +652,7 @@ Set_Use_Object_Bounding_Box(int i,bool use_it)
 // Function Set_Vector_Size
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
-Set_Vector_Size(double size)
+Set_Vector_Size(T size)
 {
     velocity_field.size=size;
     angular_velocity_field.size=size;
@@ -818,11 +808,12 @@ Manipulate_Individual_Body()
 //#####################################################################
 // Selection Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
-Bounding_Box() const
+template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
+Selection_Bounding_Box() const
 {
-    PHYSBAM_ASSERT(object && body_selection);
-    return object->World_Space_Box(body_selection->Bounding_Box());
+    if(selected_surface>=0) return opengl_triangulated_surface(selected_surface)->Selection_Bounding_Box();
+    if(selected_volume>=0) return opengl_tetrahedralized_volume(selected_volume)->Selection_Bounding_Box();
+    return RANGE<TV>::Centered_Box();
 }
 //#####################################################################
 // Function Read_Articulated_Information
@@ -868,29 +859,32 @@ Display() const
         glPushAttrib(GL_ENABLE_BIT);
         slice->Enable_Clip_Planes();}
     if(draw_triangulated_surface){
-        glPushName(1);
+        glPushName(0);
+        glPushName(0);
         for(int i=0;i<opengl_triangulated_surface.Size();i++) if(draw_object(i) && opengl_triangulated_surface(i)){
-            glPushName(Value(i));opengl_triangulated_surface(i)->Display();glPopName();}
+            glLoadName(Value(i));opengl_triangulated_surface(i)->Display();}
+        glPopName();
         glPopName();}
     if(draw_tetrahedralized_volume){
-        glPushName(2);
+        glPushName(1);
+        glPushName(0);
         for(int i=0;i<opengl_tetrahedralized_volume.Size();i++) if(draw_object(i) && opengl_tetrahedralized_volume(i)){
-            glPushName(Value(i));opengl_tetrahedralized_volume(i)->Display();glPopName();}
+            glLoadName(Value(i));opengl_tetrahedralized_volume(i)->Display();}
+        glPopName();
         glPopName();}
     if(draw_implicit_surface){
-        glPushName(3);
+        glPushName(2);glPushName(0);
         int levelset_count=0;
         for(int i=0;i<opengl_levelset.Size();i++) if(draw_object(i)){
-            glPushName(Value(i));
+            glLoadName(Value(i));
             if(opengl_levelset(i)){
                 if(++levelset_count>50){
                     PHYSBAM_WARNING("Refusing to draw more than 10 levelsets to save memory.");
                     OPENGL_WORLD<T>::Singleton()->Add_String("WARNING: Refusing to draw more than 10 levelsets to save memory.");
                     break;}
                 opengl_levelset(i)->Update();
-                opengl_levelset(i)->Display();}
-            glPopName();}
-        glPopName();}
+                opengl_levelset(i)->Display();}}
+        glPopName();glPopName();}
     if(draw_individual_axes)
         for(int i=0;i<opengl_axes.Size();i++){
             if(draw_object(i) && opengl_axes(i)){
@@ -913,18 +907,23 @@ Display() const
     if(articulated_rigid_body){
         if(draw_articulation_points){
             OPENGL_COLOR articulation_point_color(0.8,0.8,0.2),segment_color(0,0,1),com_color(1,0,0);
-            if(mode==GL_SELECT){glPushName(4);glPushAttrib(GL_POINT_BIT);glPointSize(OPENGL_PREFERENCES::selection_point_size);}
+            if(mode==GL_SELECT){
+                glPushName(3);
+                glPushName(0);
+                glPushAttrib(GL_POINT_BIT);
+                glPointSize(OPENGL_PREFERENCES::selection_point_size);}
             for(int i=0;i<articulation_points.m;i++){
-                glPushName(i);
-                OPENGL_SHAPES::Draw_Dot(articulation_points(i),articulation_point_color,5);
-                glPopName();}
+                glLoadName(i);
+                OPENGL_SHAPES::Draw_Dot(articulation_points(i),articulation_point_color,5);}
             OPENGL_SHAPES::Draw_Dot(projected_COM,com_color,10);
             if(mode!=GL_SELECT) for(int i=0;i<articulation_points.m;i+=2){
                 OPENGL_SHAPES::Draw_Segment(articulation_points(i),articulation_points(i+1),segment_color,5);}
-            if(mode==GL_SELECT){glPopName();glPopAttrib();}
-            if(mode!=GL_SELECT && current_selection && current_selection->type==OPENGL_SELECTION<T>::ARTICULATED_RIGID_BODIES_JOINT_3D){
-                int joint_id=((OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_3D<T>*)current_selection)->joint_id;
-                OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(articulation_points(joint_id));}}}
+            if(mode==GL_SELECT){
+                glPopName();
+                glPopName();
+                glPopAttrib();}
+            if(mode!=GL_SELECT && selected_joint_id>=0){
+                OPENGL_SELECTION::Draw_Highlighted_Vertex(articulation_points(selected_joint_id));}}}
 
     RANGE<TV> axes_box(RANGE<TV>::Unit_Box()*2);
     //RANGE<TV> axes_box(0,velocity_field.size,0,velocity_field.size,0,velocity_field.size);
@@ -952,21 +951,18 @@ Display() const
 // Function Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
-Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const
+Print_Selection_Info(std::ostream &output_stream) const
 {
-    if(!selection || selection->object!=this) return;
-
-    if(selection->type==OPENGL_SELECTION<T>::COMPONENT_RIGID_BODIES_3D){
-        OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_3D<T> *real_selection=(OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_3D<T>*)selection;
-
-        output_stream<<"Rigid body "<<real_selection->body_id<<std::endl;
+    int selected_body=selected_surface>=0?selected_surface:selected_volume;
+    if(selected_body>=0){
+        output_stream<<"Rigid body "<<selected_body<<std::endl;
 
         // handle case of body no longer being active
-        if(!rigid_body_collection.Is_Active(real_selection->body_id) || !opengl_triangulated_surface(real_selection->body_id)){
+        if(!rigid_body_collection.Is_Active(selected_body) || !opengl_triangulated_surface(selected_body)){
             output_stream<<"INACTIVE"<<std::endl;
             return;}
 
-        RIGID_BODY<TV> *body=const_cast<RIGID_BODY<TV>*>(&rigid_body_collection.Rigid_Body(real_selection->body_id));
+        RIGID_BODY<TV> *body=const_cast<RIGID_BODY<TV>*>(&rigid_body_collection.Rigid_Body(selected_body));
         body->Update_Angular_Velocity();
 
         if(!body->name.empty()){output_stream<<"Name ="<<body->name<<std::endl;}
@@ -976,25 +972,22 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection)
         output_stream<<"Kinetic energy = "<<body->Kinetic_Energy()<<std::endl;
         output_stream<<std::endl;
 
-        rigid_body_collection.rigid_body_particles.Print(output_stream,real_selection->body_id);
+        rigid_body_collection.rigid_body_particles.Print(output_stream,selected_body);
 
         MATRIX<T,4> body_transform=body->Frame().Matrix();
 
-        if(real_selection->body_selection->type==OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_VERTEX ||
-            real_selection->body_selection->type==OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_SEGMENT ||
-            real_selection->body_selection->type==OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_TRIANGLE){ // triangulated surface
-            if(opengl_triangulated_surface(real_selection->body_id))
-                opengl_triangulated_surface(real_selection->body_id)->Print_Selection_Info(output_stream,real_selection->body_selection,&body_transform);
-            if(real_selection->body_selection->type==OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_VERTEX){
-                VECTOR<T,3> position=body->simplicial_object->particles.X(((OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX<T>*)real_selection->body_selection)->index);
+        if(selected_surface>=0){
+            opengl_triangulated_surface(selected_surface)->Print_Selection_Info(output_stream,&body_transform);
+            int vertex=opengl_triangulated_surface(selected_surface)->selected_vertex;
+            if(vertex>=0){
+                TV position=body->simplicial_object->particles.X(vertex);
                 output_stream<<"Pointwise velocity = "<<body->Pointwise_Object_Velocity(body->World_Space_Point(position))<<std::endl;}}
-        else if(real_selection->body_selection->type==OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_VERTEX ||
-                real_selection->body_selection->type==OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_TETRAHEDRON){
-            if(opengl_tetrahedralized_volume(real_selection->body_id))
-                opengl_tetrahedralized_volume(real_selection->body_id)->Print_Selection_Info(output_stream,real_selection->body_selection,&body_transform);}}
-    else if(selection->type==OPENGL_SELECTION<T>::ARTICULATED_RIGID_BODIES_JOINT_3D){
-        OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_3D<T> *real_selection=(OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_3D<T>*)selection;
-        int articulation_id=real_selection->joint_id;int joint_index=(articulation_id+1/2);
+        if(selected_volume>=0)
+            opengl_tetrahedralized_volume(selected_volume)->Print_Selection_Info(output_stream,&body_transform);}
+
+    else if(selected_joint_id>=0){
+        int articulation_id=selected_joint_id;
+        int joint_index=(articulation_id+1/2);
         JOINT<TV>& joint=*articulated_rigid_body->joint_mesh.Joints(joint_index);JOINT_ID joint_id=joint.id_number;
         const RIGID_BODY<TV> *parent=articulated_rigid_body->Parent(joint_id),*child=articulated_rigid_body->Child(joint_id);
         output_stream<<"Joint id "<<joint_id<<" ("<<(!joint.name.empty()?joint.name:"UNNAMED")<<")"<<std::endl;
@@ -1049,15 +1042,6 @@ template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Toggle_Forces_And_Torques()
 {
     draw_forces_and_torques=!draw_forces_and_torques;
-}
-//#####################################################################
-// Function Bounding_Box
-//#####################################################################
-template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_3D<T>::
-Bounding_Box() const
-{
-    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
-    return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 namespace PhysBAM{

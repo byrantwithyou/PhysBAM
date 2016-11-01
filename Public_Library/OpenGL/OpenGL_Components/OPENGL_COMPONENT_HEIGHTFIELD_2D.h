@@ -22,11 +22,12 @@ namespace PhysBAM
 template<class T>
 class OPENGL_COMPONENT_HEIGHTFIELD_2D:public OPENGL_COMPONENT<T>
 {
-    typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
+    typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
+    typedef VECTOR<T,2> TV2;typedef VECTOR<int,2> TV_INT2;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
     using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
-    OPENGL_COMPONENT_HEIGHTFIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid, 
+    OPENGL_COMPONENT_HEIGHTFIELD_2D(STREAM_TYPE stream_type,const GRID<TV2> &grid, 
                                     const std::string& height_filename,
                                     const std::string& xz_filename_input="",
                                     const std::string& uv_filename_input="",
@@ -39,13 +40,14 @@ public:
     void Set_Draw(bool draw_input = true) override;
 
     void Display() const override;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    virtual RANGE<TV> Bounding_Box() const override;
     void Turn_Smooth_Shading_On() override;
     void Turn_Smooth_Shading_Off() override;
 
-    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size) override;
-    void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
-    void Clear_Highlight() override;
+    virtual int Get_Selection_Priority(ARRAY_VIEW<GLuint> indices) override;
+    virtual bool Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers) override;
+    void Clear_Selection() override;
+    virtual RANGE<VECTOR<T,3> > Selection_Bounding_Box() const override;
 
     void Set_Scale(T scale_input);
     void Use_Triangle_Strip(bool use_triangle_strip_input=true);
@@ -68,8 +70,8 @@ private:
     int To_Linear_Index(int i, int j) const
     {return (i-domain.min_corner.x) + (j-domain.min_corner.y)*counts.x + 1;}
 
-    VECTOR<int,2> From_Linear_Index(int idx) const
-    {return VECTOR<int,2>(idx % counts.x + domain.min_corner.x, (idx/counts.x)+domain.min_corner.y);}
+    TV_INT2 From_Linear_Index(int idx) const
+    {return TV_INT2(idx % counts.x + domain.min_corner.x, (idx/counts.x)+domain.min_corner.y);}
 
 public:
     TRIANGULATED_SURFACE<T>& triangulated_surface;
@@ -78,14 +80,14 @@ public:
     bool allow_smooth_shading;
     bool subdivide_surface;
 
-    GRID<TV> initial_grid;
-    GRID<TV> grid;
-    ARRAY<VECTOR<T,2>,VECTOR<int,2> > *xz;
-    ARRAY<VECTOR<T,2>,VECTOR<int,2> > *uv;
-    ARRAY<T,VECTOR<int,2> > height;
+    GRID<TV2> initial_grid;
+    GRID<TV2> grid;
+    ARRAY<TV2,TV_INT2 > *xz;
+    ARRAY<TV2,TV_INT2 > *uv;
+    ARRAY<T,TV_INT2 > height;
 
-    ARRAY<VECTOR<T,3> > vector_field;
-    ARRAY<VECTOR<T,3> > vector_locations;
+    ARRAY<TV> vector_field;
+    ARRAY<TV> vector_locations;
     OPENGL_VECTOR_FIELD_3D<T> opengl_vector_field;
 
 private:
@@ -98,23 +100,10 @@ private:
     int frame_loaded;
     bool valid;
     bool draw_velocities;
-    RANGE<VECTOR<int,2> > domain;
-    VECTOR<int,2> counts;
+    RANGE<TV_INT2> domain;
+    TV_INT2 counts;
     bool use_triangle_strip;
 };
-
-template<class T>
-class OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_2D:public OPENGL_SELECTION<T>
-{
-public:
-    using OPENGL_SELECTION<T>::object;
-    VECTOR<int,2> index;
-
-    OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_2D(OPENGL_OBJECT<T>* object) :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::COMPONENT_HEIGHTFIELD_2D, object) {}
-
-    RANGE<VECTOR<T,3> > Bounding_Box() const override;
-};
-
 }
 
 #endif

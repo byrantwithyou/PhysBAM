@@ -20,7 +20,7 @@ template<class TV> class GRID;
 template<class T>
 class OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D:public OPENGL_COMPONENT<T>
 {
-    typedef VECTOR<T,3> TV;
+    typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     GRID<TV> mac_grid;
     ARRAY<TRIPLE<VECTOR<int,3>,VECTOR<T,3>,char> > pseudo_dirichlet_cells;
@@ -29,6 +29,7 @@ private:
     std::string filename;
     int frame_loaded;
     bool valid;
+    TV_INT selected_cell;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
     using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
@@ -41,8 +42,8 @@ public:
     void Set_Draw(bool draw_input = true) override;
     void Display() const override;
     bool Use_Bounding_Box() const override { return draw && valid; }
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
-    void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_selection) const override;
+    virtual RANGE<TV> Bounding_Box() const override;
+    void Print_Selection_Info(std::ostream& output_stream) const override;
 
     void Set_Vector_Size(const T vector_size);
 

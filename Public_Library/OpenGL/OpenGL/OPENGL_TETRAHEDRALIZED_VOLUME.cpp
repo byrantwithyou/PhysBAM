@@ -35,9 +35,10 @@ static VECTOR<int,4> Spring_Nodes(unsigned char pair_id,const VECTOR<int,4>& n)
 template<class T> OPENGL_TETRAHEDRALIZED_VOLUME<T>::
 OPENGL_TETRAHEDRALIZED_VOLUME(STREAM_TYPE stream_type,TETRAHEDRON_MESH* mesh_input,GEOMETRY_PARTICLES<VECTOR<T,3> >* particles_input,const OPENGL_MATERIAL& material_input,
     const OPENGL_MATERIAL& inverted_material_input,bool initialize,ARRAY<OPENGL_COLOR>* color_map_input)
-    :OPENGL_OBJECT<T>(stream_type),material(material_input),inverted_material(inverted_material_input),use_inverted_material(true),mesh(mesh_input),particles(particles_input),current_tetrahedron(0),current_node(0),
-    current_boundary_triangle(0),boundary_only(true),draw_subsets(false),cutaway_mode(0),cutaway_fraction((T).5),color_map(color_map_input),smooth_normals(false),
-    vertex_normals(0),current_selection(0)
+    :OPENGL_OBJECT<T>(stream_type),material(material_input),inverted_material(inverted_material_input),
+    use_inverted_material(true),mesh(mesh_input),particles(particles_input),current_tetrahedron(0),current_node(0),
+    current_boundary_triangle(0),boundary_only(true),draw_subsets(false),cutaway_mode(0),cutaway_fraction((T).5),
+    color_map(color_map_input),smooth_normals(false),vertex_normals(0),selected_vertex(-1),selected_tet(-1)
 {
     if(initialize){
         if(!mesh->boundary_mesh)
@@ -68,9 +69,9 @@ Display() const
     glGetIntegerv(GL_RENDER_MODE,&mode);
     glDisable(GL_CULL_FACE);
     if(mode==GL_SELECT){
-        glPushName(1);
+        glPushName(0);
         Draw_Vertices_For_Selection();
-        glLoadName(2);
+        glLoadName(1);
         Draw_Tetrahedra_For_Selection();
         glPopName();}
     else if(cutaway_mode){
@@ -89,32 +90,29 @@ Display() const
         //Highlight_Nodes_Of_Minimum_Valence();
         //Highlight_Current_Boundary_Triangle();
 
-        if(current_selection){
-            if(current_selection->type==OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_VERTEX){
-                int index=((OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_VERTEX<T>*)current_selection)->index;
-                OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(particles->X(index),index);}
-            else if(current_selection->type==OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_TETRAHEDRON){
-                int index=((OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_TETRAHEDRON<T>*)current_selection)->index;
-                const VECTOR<int,4>& element_nodes=mesh->elements(index);
-                ARRAY_VIEW<const TV> X(particles->X);
-                OPENGL_SELECTION<T>::Draw_Highlighted_Tetrahedron_Boundary(X(element_nodes[0]),X(element_nodes[1]),X(element_nodes[2]),X(element_nodes[3]),index);
-                T distance;TV min_normal,weights;
-                int spring=Find_Shortest_Spring(element_nodes,distance,min_normal,weights);
-                VECTOR<int,4> spring_nodes;
-                spring_nodes=Spring_Nodes(spring,element_nodes);
+        if(selected_vertex>=0)
+            OPENGL_SELECTION::Draw_Highlighted_Vertex(particles->X(selected_vertex),selected_vertex);
+        else if(selected_tet>=0){
+            const VECTOR<int,4>& element_nodes=mesh->elements(selected_tet);
+            ARRAY_VIEW<const TV> X(particles->X);
+            VECTOR<TV,4> Y(X.Subset(element_nodes));
+            OPENGL_SELECTION::Draw_Highlighted_Tetrahedron_Boundary(Y(0),Y(1),Y(2),Y(3),selected_tet);
+            T distance;TV min_normal,weights;
+            int spring=Find_Shortest_Spring(element_nodes,distance,min_normal,weights);
+            VECTOR<int,4> spring_nodes=Spring_Nodes(spring,element_nodes);
 
-                glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);
-                glDisable(GL_LIGHTING);
-                glLineWidth(OPENGL_PREFERENCES::highlighted_line_width*2);
-                OPENGL_COLOR colors[]={OPENGL_COLOR::Red(),OPENGL_COLOR::Blue(),OPENGL_COLOR::Green(),OPENGL_COLOR::Yellow(),OPENGL_COLOR::Cyan(),OPENGL_COLOR::Magenta(),
-                                       OPENGL_COLOR::White()};
-                if(spring>=0){
-                    colors[spring].Send_To_GL_Pipeline();
-                    OpenGL_Begin(GL_LINES);
-                    if(spring<4) OpenGL_Line(X(spring_nodes[0]),TRIANGLE_3D<T>(X.Subset(spring_nodes.Remove_Index(0))).Point_From_Barycentric_Coordinates(weights));
-                    else if(spring<7) OpenGL_Line((1-weights.x)*X(spring_nodes[0])+weights.x*X(spring_nodes[1]),(1-weights.y)*X(spring_nodes[2])+weights.y*X(spring_nodes[3]));
-                    OpenGL_End();
-                    glPopAttrib();}}}}
+            glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);
+            glDisable(GL_LIGHTING);
+            glLineWidth(OPENGL_PREFERENCES::highlighted_line_width*2);
+            OPENGL_COLOR colors[]={OPENGL_COLOR::Red(),OPENGL_COLOR::Blue(),OPENGL_COLOR::Green(),OPENGL_COLOR::Yellow(),OPENGL_COLOR::Cyan(),OPENGL_COLOR::Magenta(),
+                                   OPENGL_COLOR::White()};
+            if(spring>=0){
+                colors[spring].Send_To_GL_Pipeline();
+                OpenGL_Begin(GL_LINES);
+                if(spring<4) OpenGL_Line(X(spring_nodes[0]),TRIANGLE_3D<T>(X.Subset(spring_nodes.Remove_Index(0))).Point_From_Barycentric_Coordinates(weights));
+                else if(spring<7) OpenGL_Line((1-weights.x)*X(spring_nodes[0])+weights.x*X(spring_nodes[1]),(1-weights.y)*X(spring_nodes[2])+weights.y*X(spring_nodes[3]));
+                OpenGL_End();
+                glPopAttrib();}}}
     glPopMatrix();
 
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,0);
@@ -503,61 +501,57 @@ Display_Subset()
     OpenGL_End();
 }
 //#####################################################################
-// Function Get_Selection
+// Function Get_Selection_Priority
 //#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_TETRAHEDRALIZED_VOLUME<T>::
-Get_Selection(GLuint* buffer,int buffer_size)
+template<class T> int OPENGL_TETRAHEDRALIZED_VOLUME<T>::
+Get_Selection_Priority(ARRAY_VIEW<GLuint> indices)
 {
-    OPENGL_SELECTION<T>* selection=0;
-    if(buffer_size==2){
-        if(buffer[0]==1)selection=Get_Vertex_Selection(buffer[1]);
-        else if(buffer[0]==2)selection=Get_Tetrahedron_Selection(buffer[1]);}
-    return selection;
+    if(!indices.m) return -1;
+    PHYSBAM_ASSERT(indices.m==2);
+    const static int priority[]={85,84};
+    return priority[indices(0)];
 }
 //#####################################################################
-// Function Highlight_Selection
+// Function Get_Selection
 //#####################################################################
-template<class T> void OPENGL_TETRAHEDRALIZED_VOLUME<T>::
-Highlight_Selection(OPENGL_SELECTION<T>* selection)
+template<class T> bool OPENGL_TETRAHEDRALIZED_VOLUME<T>::
+Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers)
 {
-    delete current_selection;current_selection=0;
-    // Make a copy of selection
-    if(selection->type==OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_VERTEX)
-        current_selection=new OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_VERTEX<T>(this,((OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_VERTEX<T>*)selection)->index);
-    else if(selection->type==OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_TETRAHEDRON)
-        current_selection=new OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_TETRAHEDRON<T>(this,((OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_TETRAHEDRON<T>*)selection)->index);
+    if(indices(0)==0) selected_vertex=indices(1);
+    else if(indices(0)==1) selected_tet=indices(1);
+    else return false;
+    return true;
 }
 //#####################################################################
 // Function Clear_Highlight
 //#####################################################################
 template<class T> void OPENGL_TETRAHEDRALIZED_VOLUME<T>::
-Clear_Highlight()
+Clear_Selection()
 {
-    delete current_selection;current_selection=0;
+    selected_vertex=-1;
+    selected_tet=-1;
 }
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_TETRAHEDRALIZED_VOLUME<T>::
-Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const
+Print_Selection_Info(std::ostream &output_stream) const
 {
-    Print_Selection_Info(output_stream,selection,0);
+    Print_Selection_Info(output_stream,0);
 }
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_TETRAHEDRALIZED_VOLUME<T>::
-Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection,MATRIX<T,4>* transform) const
+Print_Selection_Info(std::ostream &output_stream,MATRIX<T,4>* transform) const
 {
-    if(selection->type==OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_VERTEX){
-        int index=((OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_VERTEX<T>*)selection)->index;
-        output_stream<<"Vertex "<<index<<std::endl;
-        if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(particles->X(index))<<std::endl;}
-        particles->Print(output_stream,index);}
-    else if(selection->type==OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_TETRAHEDRON){
-        int index=((OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_TETRAHEDRON<T>*)selection)->index;
-        const VECTOR<int,4>& nodes=mesh->elements(index);
-        output_stream<<"Tetrahedron "<<index<<" ("<<nodes[0]<<", "<<nodes[1]<<", "<<nodes[2]<<", "<<nodes[3]<<")"<<std::endl;
+    if(selected_vertex>=0){
+        output_stream<<"Vertex "<<selected_vertex<<std::endl;
+        if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(particles->X(selected_vertex))<<std::endl;}
+        particles->Print(output_stream,selected_vertex);}
+    else if(selected_tet>=0){
+        const VECTOR<int,4>& nodes=mesh->elements(selected_tet);
+        output_stream<<"Tetrahedron "<<selected_tet<<" ("<<nodes[0]<<", "<<nodes[1]<<", "<<nodes[2]<<", "<<nodes[3]<<")"<<std::endl;
         output_stream<<"Signed Volume = "<<TETRAHEDRON<T>(particles->X.Subset(nodes)).Signed_Volume()<<std::endl;
         output_stream<<std::endl;
         output_stream<<"Vertex "<<nodes[0]<<std::endl;
@@ -582,25 +576,7 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection,
         if(spring<4) output_stream<<"point-face ";
         else if(spring<7) output_stream<<"edge-edge ";
         output_stream<<spring<<" nodes="<<Spring_Nodes(spring,nodes)<<std::endl;
-        output_stream<<"   distance="<<distance<<" normal="<<min_normal<<" weights="<<weights<<std::endl;
-    }
-
-}
-//#####################################################################
-// Function Get_Vertex_Selection
-//#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_TETRAHEDRALIZED_VOLUME<T>::
-Get_Vertex_Selection(int index)
-{
-    return new OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_VERTEX<T>(this,index);
-}
-//#####################################################################
-// Function Get_Tetrahedron_Selection
-//#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_TETRAHEDRALIZED_VOLUME<T>::
-Get_Tetrahedron_Selection(int index)
-{
-    return new OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_TETRAHEDRON<T>(this,index);
+        output_stream<<"   distance="<<distance<<" normal="<<min_normal<<" weights="<<weights<<std::endl;}
 }
 //#####################################################################
 // Function Draw_Vertices_For_Selection
@@ -608,7 +584,7 @@ Get_Tetrahedron_Selection(int index)
 template<class T> void OPENGL_TETRAHEDRALIZED_VOLUME<T>::
 Draw_Vertices_For_Selection() const
 {
-    OPENGL_SELECTION<T>::Draw_Vertices_For_Selection(*mesh,*particles);
+    OPENGL_SELECTION::Draw_Vertices_For_Selection(*mesh,*particles);
 }
 //#####################################################################
 // Function Draw_Tetrahedra_For_Selection
@@ -632,24 +608,14 @@ Draw_Tetrahedra_For_Selection() const
     glPopAttrib();
 }
 //#####################################################################
-// Selection object functions
+// Function Selection_Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_VERTEX<T>::
-Bounding_Box() const
+template<class T> RANGE<VECTOR<T,3> > OPENGL_TETRAHEDRALIZED_VOLUME<T>::
+Selection_Bounding_Box() const
 {
-    PHYSBAM_ASSERT(object);
-    const OPENGL_TETRAHEDRALIZED_VOLUME<T>& volume=dynamic_cast<OPENGL_TETRAHEDRALIZED_VOLUME<T>&>(*object);
-    return object->World_Space_Box(RANGE<VECTOR<T,3> >(volume.particles->X(index)));
-}
-//#####################################################################
-// Function Bounding_Box
-//#####################################################################
-template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_TETRAHEDRON<T>::
-Bounding_Box() const
-{
-    PHYSBAM_ASSERT(object);
-    const OPENGL_TETRAHEDRALIZED_VOLUME<T>& volume=dynamic_cast<OPENGL_TETRAHEDRALIZED_VOLUME<T>&>(*object);
-    return object->World_Space_Box(RANGE<VECTOR<T,3> >::Bounding_Box(volume.particles->X.Subset(volume.mesh->elements(index))));
+    if(selected_vertex>=0) return World_Space_Box(RANGE<TV>(particles->X(selected_vertex)));
+    if(selected_tet>=0) return World_Space_Box(RANGE<TV>::Bounding_Box(particles->X.Subset(mesh->elements(selected_tet))));
+    PHYSBAM_FATAL_ERROR();
 }
 //#####################################################################
 namespace PhysBAM{

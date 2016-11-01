@@ -16,6 +16,7 @@ namespace PhysBAM
 template<class T>
 class OPENGL_COMPONENT_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD:public OPENGL_COMPONENT<T>
 {
+    typedef VECTOR<T,3> TV;
 public:
     OPENGL_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD<T> opengl_vector_field;
 private:
@@ -37,7 +38,7 @@ public:
 
     void Display() const override;
     bool Use_Bounding_Box() const override { return draw && valid; }
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    virtual RANGE<TV> Bounding_Box() const override;
 
     void Increase_Vector_Size();
     void Decrease_Vector_Size();

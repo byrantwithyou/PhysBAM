@@ -22,7 +22,8 @@ class OPENGL_COMPONENT_HEIGHTFIELD_1D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,1> TV;typedef VECTOR<int,1> TV_INT;
 public:
-    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
+    using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::World_Space_Box;
     using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
     OPENGL_COMPONENT_HEIGHTFIELD_1D(STREAM_TYPE stream_type,const GRID<TV> &grid, 
                                     const std::string& height_filename,
@@ -39,9 +40,10 @@ public:
     void Display() const override;
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 
-    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size) override;
-    void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
-    void Clear_Highlight() override;
+    virtual int Get_Selection_Priority(ARRAY_VIEW<GLuint> indices) override;
+    virtual bool Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers) override;
+    void Clear_Selection() override;
+    virtual RANGE<VECTOR<T,3> > Selection_Bounding_Box() const override;
 
     void Set_Scale(T scale_input);
 
@@ -80,18 +82,6 @@ private:
     bool draw_velocities;
     bool draw_points;
     int selected_index;
-};
-
-template<class T>
-class OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D:public OPENGL_SELECTION<T>
-{
-public:
-    using OPENGL_SELECTION<T>::object;
-    int index;
-
-    OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D(OPENGL_OBJECT<T>* object) :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::COMPONENT_HEIGHTFIELD_1D, object) {}
-
-    RANGE<VECTOR<T,3> > Bounding_Box() const override;
 };
 
 }

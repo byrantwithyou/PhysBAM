@@ -55,7 +55,7 @@ Display() const
 template<class T> RANGE<VECTOR<T,3> > OPENGL_POINT_SIMPLICES_1D<T>::
 Bounding_Box() const
 {
-    return World_Space_Box(RANGE<VECTOR<T,1> >::Bounding_Box(simplices.particles.X));
+    return World_Space_Box(RANGE<VECTOR<T,3> >(RANGE<TV>::Bounding_Box(simplices.particles.X)));
 }
 //#####################################################################
 namespace PhysBAM{

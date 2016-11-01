@@ -75,8 +75,10 @@ protected:
     ARRAY<FRAME<TV> > joint_frames;
     ARRAY<PAIR<VECTOR<T,3>,VECTOR<T,3> >,int> forces_and_torques;
     VECTOR<T,3> projected_COM;
-    OPENGL_SELECTION<T>* current_selection;
-
+    int selected_joint_id;
+    int selected_surface;
+    int selected_volume;
+    
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
     using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
@@ -91,12 +93,13 @@ public:
 
     virtual void Display() const override;
     bool Use_Bounding_Box() const override;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    virtual RANGE<TV> Bounding_Box() const override;
 
-    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size) override;
-    void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
-    void Clear_Highlight() override;
-    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const override;
+    virtual int Get_Selection_Priority(ARRAY_VIEW<GLuint> indices) override;
+    virtual bool Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers) override;
+    void Clear_Selection() override;
+    void Print_Selection_Info(std::ostream &output_stream) const override;
+    virtual RANGE<TV> Selection_Bounding_Box() const override;
 
     void Turn_Smooth_Shading_On() override;
     void Turn_Smooth_Shading_Off() override;
@@ -107,7 +110,7 @@ public:
     void Set_Object_Material(int i, const OPENGL_MATERIAL &front_material_input);
     void Set_Object_Material(int i, const OPENGL_MATERIAL &front_material_input, const OPENGL_MATERIAL &back_material_input);
     void Set_Use_Object_Bounding_Box(int i, bool use_it);
-    void Set_Vector_Size(double size);
+    void Set_Vector_Size(T size);
 
     void Toggle_Velocity_Vectors();
     void Toggle_Angular_Velocity_Vectors();
@@ -150,36 +153,33 @@ protected:
     void Manipulate_Individual_Body_Prompt();
 };
 
-template<class T>
-class OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_3D:public OPENGL_SELECTION<T>
-{
-public:
-    using OPENGL_SELECTION<T>::object;
-    int body_id;
-    OPENGL_SELECTION<T>* body_selection;
+// template<class T>
+// class OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_3D:public OPENGL_SELECTION<T>
+// {
+// public:
+//     using OPENGL_SELECTION::object;
+//     int body_id;
+//     void body_selection;
 
-    OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_3D(OPENGL_OBJECT<T>* object,const int body_id,OPENGL_SELECTION<T>* body_selection)
-        :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::COMPONENT_RIGID_BODIES_3D,object),body_id(body_id),body_selection(body_selection)
-    {}
+//     OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_3D(OPENGL_OBJECT<T>* object,const int body_id,void body_selection)
+//         :OPENGL_SELECTION<T>(OPENGL_SELECTION::COMPONENT_RIGID_BODIES_3D,object),body_id(body_id),body_selection(body_selection)
+//     {}
 
-    virtual typename OPENGL_SELECTION<T>::TYPE Actual_Type() const override 
-    {return body_selection->Actual_Type();}
+//     virtual RANGE<TV> Bounding_Box() const override;
+// };
 
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
-};
+// template<class T>
+// class OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_3D:public OPENGL_SELECTION<T>
+// {
+// public:
+//     using OPENGL_SELECTION::object;
+//     int joint_id;
 
-template<class T>
-class OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_3D:public OPENGL_SELECTION<T>
-{
-public:
-    using OPENGL_SELECTION<T>::object;
-    int joint_id;
+//     OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_3D(OPENGL_OBJECT<T>* object,const int joint_id)
+//         :OPENGL_SELECTION<T>(OPENGL_SELECTION::ARTICULATED_RIGID_BODIES_JOINT_3D,object),joint_id(joint_id)
+//     {}
 
-    OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_3D(OPENGL_OBJECT<T>* object,const int joint_id)
-        :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::ARTICULATED_RIGID_BODIES_JOINT_3D,object),joint_id(joint_id)
-    {}
-
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
-};
+//     virtual RANGE<TV> Bounding_Box() const override;
+// };
 }
 #endif

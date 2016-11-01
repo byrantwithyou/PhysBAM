@@ -32,6 +32,7 @@
 #include <OpenGL/OpenGL/OPENGL_KEY.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>
 #include <ctime>
+#include <map>
 namespace PhysBAM{
 
 enum {PHYSBAM_MOUSE_LEFT_BUTTON,PHYSBAM_MOUSE_RIGHT_BUTTON,PHYSBAM_MOUSE_MIDDLE_BUTTON};
@@ -39,22 +40,20 @@ enum {PHYSBAM_MOUSE_DOWN,PHYSBAM_MOUSE_UP};
 
 template<class T> class OPENGL_WINDOW;
 struct OPENGL_CALLBACK;
-template<class T> class OPENGL_SELECTION;
 class OPENGL_LIGHT;
 class OPENGL_MOUSE_HANDLER;
 template<class T> class OPENGL_ARCBALL;
 
-class OPENGL_KEY_BINDING_CATEGORY
-{
-public:
-    std::string name;
-    int priority;
-    ARRAY<PAIR<OPENGL_KEY,OPENGL_CALLBACK> > key_bindings;
+// class OPENGL_KEY_BINDING_CATEGORY
+// {
+// public:
+//     std::string name;
+//     ARRAY<PAIR<OPENGL_KEY,OPENGL_CALLBACK> > key_bindings;
 
-    OPENGL_KEY_BINDING_CATEGORY() {}
-    OPENGL_KEY_BINDING_CATEGORY(const std::string &name,int priority) : name(name),priority(priority) {}
-    ~OPENGL_KEY_BINDING_CATEGORY() {}
-};
+//     OPENGL_KEY_BINDING_CATEGORY() {}
+//     OPENGL_KEY_BINDING_CATEGORY(const std::string &name) : name(name) {}
+//     ~OPENGL_KEY_BINDING_CATEGORY() {}
+// };
 
 template<class T>
 class OPENGL_WORLD
@@ -62,8 +61,6 @@ class OPENGL_WORLD
     typedef VECTOR<T,3> TV;
 public:
     enum FILL_MODE { DRAW_FILLED, DRAW_WIREFRAME, DRAW_FILLED_AND_WIREFRAME };
-
-    typedef void (*PROCESS_HITS_CB)(GLint hits, GLuint buffer[]);
 
 private:
     bool initialized;
@@ -113,7 +110,7 @@ private:
     // Camera
     bool left_handed_coordinate_system;
     T nearclip_factor,farclip_factor,nearclip,farclip;
-    OPENGL_ARCBALL<T>* arcball; // This maintains the arcballs info
+    OPENGL_ARCBALL<TV>* arcball; // This maintains the arcballs info
     T camera_distance;
     TV target_position;
     MATRIX<T,4> arcball_matrix; // This is used to extract the last extracted matrix from the arcball
@@ -128,14 +125,12 @@ private:
     TV target_x_drag_vector;
     TV target_y_drag_vector;
     OPENGL_MOUSE_HANDLER* external_mouse_handler;
-    bool shift_was_pressed; 
-    bool ctrl_was_pressed; 
 
     // Keyboard Interaction
     ARRAY<ARRAY<OPENGL_CALLBACK>,VECTOR<int,2> > key_bindings;
     std::string current_key_binding_category;
-    int current_key_binding_category_priority;
-    ARRAY<OPENGL_KEY_BINDING_CATEGORY> key_bindings_by_category;
+    std::map<std::string,ARRAY<PAIR<OPENGL_KEY,OPENGL_CALLBACK> > > key_bindings_by_category;
+//    ARRAY<OPENGL_KEY_BINDING_CATEGORY> 
 
 public:
     // Prompting
@@ -143,11 +138,11 @@ public:
     std::string prompt;
     std::string prompt_response;
     bool prompt_response_success;
+    std::function<void(GLint hits, GLuint buffer[],int modifiers)> process_hits_cb;
 private:
     OPENGL_CALLBACK prompt_response_cb;
 
     // Selection
-    PROCESS_HITS_CB process_hits_cb;
     bool selection_mode;  // selection stuff
     TV* current_selection; // pointer to current selection item    
 
@@ -165,7 +160,6 @@ public:
     void Set_Ambient_Light(const OPENGL_COLOR& color);
     void Add_Light(OPENGL_LIGHT* light);
     void Set_Key_Binding_Category(const std::string &category);
-    void Set_Key_Binding_Category_Priority(int priority=1);
 
     void Bind_Key(const OPENGL_KEY& key,OPENGL_CALLBACK callback);
     void Bind_Key(const std::string& key,OPENGL_CALLBACK callback);
@@ -186,17 +180,16 @@ public:
     void Set_Translation_Direction(bool up_is_move_in);
     void Set_Lighting_For_Wireframe(bool enable_flag);
     void Set_2D_Mode(bool mode=true);
-    void Set_Process_Hits_Callback(PROCESS_HITS_CB process_hits_cb_input);
 
     TV Get_Camera_Position();
     TV Get_Target_Position();
-    void Get_View_Frame(TV &view_forward, TV &view_up, TV &view_right);
-    void Set_View_Frame(const TV &view_forward, const TV &view_up, const TV &view_right);
-    void Get_Look_At(TV &camera, TV &target, TV &up);
-    void Set_Look_At(const TV &camera, const TV &target, const TV &up);
+    void Get_View_Frame(TV& view_forward, TV& view_up, TV& view_right);
+    void Set_View_Frame(const TV& view_forward, const TV& view_up, const TV& view_right);
+    void Get_Look_At(TV& camera, TV& target, TV& up);
+    void Set_Look_At(const TV& camera, const TV& target, const TV& up);
     void Save_View(const std::string& filename, bool verbose = false);
     bool Load_View(const std::string& filename, bool verbose = false);
-    RAY<VECTOR<T,3> > Ray_Through_Normalized_Image_Coordinate(VECTOR<T,2> coordinates);
+    RAY<TV> Ray_Through_Normalized_Image_Coordinate(VECTOR<T,2> coordinates);
     void Set_Left_Handed(const bool left_handed=false);
 
     RANGE<TV> Scene_Bounding_Box();
@@ -211,7 +204,7 @@ public:
     void Handle_Reshape_Main();
     void Handle_Keypress_Main(const OPENGL_KEY& key,int x,int y);
     void Handle_Keypress_Prompt(unsigned char raw_key);
-    void Handle_Click_Main(int button,int state,int x,int y,bool ctrl_pressed,bool shift_pressed);
+    void Handle_Click_Main(int button,int state,int x,int y,int modifiers);
     void Handle_Drag_Main(int x,int y);
     void Display_Target();
     void Display_Auto_Help();
@@ -232,9 +225,6 @@ public:
     void Remove_Clipping_Plane(GLenum id);
     void Remove_All_Clipping_Planes();
 
-    // To use this you need to set load_names_for_selection
-    void Get_Selections(ARRAY<OPENGL_SELECTION<T>*> &selections, GLint hits, GLuint buffer[]);
-
     void Save_Screen(const std::string& filename,const bool use_back_buffer,int jpeg_quality=90);
     template<int d> void Get_Image(ARRAY<VECTOR<T,d>,VECTOR<int,2> >& image,const bool use_back_buffer);
     static void Resize_Window(const int width,const int height);
@@ -244,7 +234,7 @@ public:
     void Prompt_User(const std::string& prompt,OPENGL_CALLBACK prompt_response_cb,const std::string& default_response);
 
     friend class OPENGL_WINDOW<T>;
-//    friend class OPENGL_WINDOW_GLUT<T>;
+//    friend class OPENGL_WINDOW_GLUT<TV>;
     friend class OPENGL_WINDOW_ANDROID;
 //#####################################################################
 };

@@ -23,7 +23,9 @@ public:
 
     ARRAY<TV> vector_field,vector_locations;
     GRID<TV>& grid;
-    ARRAY<VECTOR<T,2>,VECTOR<int,2> >& V;
+    ARRAY<TV,TV_INT>& V;
+    TV_INT selected_cell;
+    TV_INT selected_node;
 
     OPENGL_GRID_BASED_VECTOR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV>& grid,ARRAY<VECTOR<T,2>,VECTOR<int,2> >& V);
     virtual ~OPENGL_GRID_BASED_VECTOR_FIELD_2D();
@@ -31,7 +33,7 @@ public:
     void Update();  // Call when grid/V change
 
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
-    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const override;
+    void Print_Selection_Info(std::ostream& stream) const override;
 
 };
 }

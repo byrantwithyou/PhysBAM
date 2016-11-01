@@ -48,9 +48,9 @@ Display() const
     GLint mode=0;
     glGetIntegerv(GL_RENDER_MODE, &mode);
     if(mode==GL_SELECT){
-        glPushName(1);
+        glPushName(0);
         Draw_Vertices_For_Selection();
-        glLoadName(2);
+        glLoadName(1);
         Draw_Segments_For_Selection();
         glPopName();}
     else
@@ -84,21 +84,18 @@ Display() const
                         OpenGL_Vertex(Xs[0]);OpenGL_Vertex(Xs[1]);}}
                 OpenGL_End();}}
 
-        if(current_selection){
-            if(current_selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_VERTEX_3D){
-                int index=((OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_3D<T> *)current_selection)->index;
-                OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(curve.particles.X(index),index);} 
-            else if(current_selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_SEGMENT_3D){
-                int index=((OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_3D<T> *)current_selection)->index;
-                int node1,node2;curve.mesh.elements(index).Get(node1,node2);
-                OPENGL_SELECTION<T>::Draw_Highlighted_Segment(curve.particles.X(node1),curve.particles.X(node2),index);} 
-            else if(current_selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_3D) {
-                int node1,node2;
-                ARRAY<VECTOR<TV,2> > lines;
-                for(int i=0;i<selected_edges.m;i++){
-                    curve.mesh.elements(selected_edges(i)).Get(node1,node2);
-                    lines.Append(VECTOR<TV,2>(curve.particles.X(node1),curve.particles.X(node2)));}
-                OPENGL_SELECTION<T>::Draw_Highlighted_Curve(lines);}}}
+        if(selected_vertex>=0){
+            OPENGL_SELECTION::Draw_Highlighted_Vertex(curve.particles.X(selected_vertex),selected_vertex);} 
+        else if(selected_segment>=0){
+            int node1,node2;curve.mesh.elements(selected_segment).Get(node1,node2);
+            OPENGL_SELECTION::Draw_Highlighted_Segment(curve.particles.X(node1),curve.particles.X(node2),selected_segment);} 
+        else if(selected_curve>=0){
+            int node1,node2;
+            ARRAY<VECTOR<TV,2> > lines;
+            for(int i=0;i<selected_edges.m;i++){
+                curve.mesh.elements(selected_edges(i)).Get(node1,node2);
+                lines.Append(VECTOR<TV,2>(curve.particles.X(node1),curve.particles.X(node2)));}
+            OPENGL_SELECTION::Draw_Highlighted_Curve(lines);}}
 
     if(draw_vertices){
         vertex_color.Send_To_GL_Pipeline();
@@ -157,18 +154,25 @@ Bounding_Box() const
     return World_Space_Box(RANGE<TV>::Bounding_Box(curve.particles.X));
 }
 //#####################################################################
+// Function Get_Selection_Priority
+//#####################################################################
+template<class T> int OPENGL_SEGMENTED_CURVE_3D<T>::
+Get_Selection_Priority(ARRAY_VIEW<GLuint> indices)
+{
+    if(!indices.m) return -1;
+    PHYSBAM_ASSERT(indices.m==2);
+    return 78;
+}
+//#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_SEGMENTED_CURVE_3D<T>::
-Get_Selection(GLuint *buffer,int buffer_size)
+template<class T> bool OPENGL_SEGMENTED_CURVE_3D<T>::
+Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers)
 {
-    OPENGL_SELECTION<T>* selection = 0;
-    if(buffer_size==2)
-    {
-        if(buffer[0]==1) selection = Get_Vertex_Selection(buffer[1]);
-        else if(buffer[0]==2) selection = Get_Segment_Selection(buffer[1]);
-    }
-    return selection;
+    if(indices(0)==0) selected_vertex=indices(1);
+    else if(indices(0)==1) selected_segment=indices(1);
+    else return false;
+    return true;
 }
 //#####################################################################
 // Function Get_Selected_Edges
@@ -177,18 +181,14 @@ template<class T> ARRAY<int> OPENGL_SEGMENTED_CURVE_3D<T>::
 Get_Selected_Edges() const
 {
     ARRAY<int> sel_edges;
-    if(!(parent_curve && parent_curve->current_selection)) return sel_edges;
-    if(parent_curve->current_selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_SEGMENT_3D){
-        int index=((OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_3D<T> *)parent_curve->current_selection)->index;
-        sel_edges.Append(index);}
-    else if(parent_curve->current_selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_3D) {
+    if(selected_segment>=0) sel_edges.Append(selected_segment);
+    else if(selected_curve>=0) {
         int edge;
-        int index=((OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_3D<T> *)parent_curve->current_selection)->index;
         ARRAY<int> adjacent;
         parent_curve->curve.mesh.Initialize_Adjacent_Elements();
         QUEUE<int> edges(parent_curve->curve.mesh.adjacent_elements->m);
         HASHTABLE<int,bool> seen(parent_curve->curve.mesh.adjacent_elements->m);
-        edges.Enqueue(index);
+        edges.Enqueue(selected_curve);
         while(!edges.Empty()){
             edge=edges.Dequeue();
             sel_edges.Append(edge);
@@ -197,45 +197,27 @@ Get_Selected_Edges() const
     return sel_edges;
 }
 //#####################################################################
-// Function Highlight_Selection
-//#####################################################################
-template<class T> void OPENGL_SEGMENTED_CURVE_3D<T>::
-Highlight_Selection(OPENGL_SELECTION<T>* selection)
-{
-    delete current_selection;current_selection = 0;
-    // Make a copy of selection
-    if(selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_VERTEX_3D) 
-        current_selection=new OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_3D<T>(this,((OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_3D<T>*)selection)->index);
-    else if(selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_SEGMENT_3D)
-        current_selection=new OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_3D<T>(this,((OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_3D<T>*)selection)->index);
-    else if(selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_3D)
-        current_selection=new OPENGL_SELECTION_SEGMENTED_CURVE_3D<T>(this,((OPENGL_SELECTION_SEGMENTED_CURVE_3D<T>*)selection)->index);
-}
-//#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_SEGMENTED_CURVE_3D<T>::
-Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const
+Print_Selection_Info(std::ostream &output_stream) const
 {
-    if(selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_VERTEX_3D){
-        int index=((OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_3D<T> *)selection)->index;
-        output_stream<<"Vertex "<<index<<std::endl;
-        curve.particles.Print(output_stream,index);}
-    else if(selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_SEGMENT_3D){
-        int index=((OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_3D<T> *)selection)->index;
-        int node1,node2;curve.mesh.elements(index).Get(node1,node2);
-        output_stream<<"Segment "<<index<<" ("<<node1<<", "<<node2<<")"<<std::endl;
+    if(selected_vertex>=0){
+        output_stream<<"Vertex "<<selected_vertex<<std::endl;
+        curve.particles.Print(output_stream,selected_vertex);}
+    else if(selected_segment>=0){
+        int node1,node2;curve.mesh.elements(selected_segment).Get(node1,node2);
+        output_stream<<"Segment "<<selected_segment<<" ("<<node1<<", "<<node2<<")"<<std::endl;
         output_stream<<std::endl;
         output_stream<<"Vertex "<<node1<<std::endl;
         curve.particles.Print(output_stream,node1);
         output_stream<<std::endl;
         output_stream<<"Vertex "<<node2<<std::endl;
         curve.particles.Print(output_stream,node2);}
-    else if(selection->type==OPENGL_SELECTION<T>::SEGMENTED_CURVE_3D){
+    else if(selected_curve>=0){
         int node1,node2;
-        int index=((OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_3D<T> *)selection)->index;
         ARRAY<int> edges=Get_Selected_Edges(); 
-        output_stream<<"Curve "<<index<<std::endl;
+        output_stream<<"Curve "<<selected_curve<<std::endl;
         output_stream<<std::endl;
         for(int i=0;i<edges.m;i++) {curve.mesh.elements(edges(i)).Get(node1,node2);output_stream<<"("<<node1<<", "<<node2<<")"<<std::endl;}}
 }
@@ -243,33 +225,11 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection)
 // Function Clear_Highlight
 //#####################################################################
 template<class T> void OPENGL_SEGMENTED_CURVE_3D<T>::
-Clear_Highlight()
+Clear_Selection()
 {
-    delete current_selection;current_selection = 0;
-}
-//#####################################################################
-// Function Get_Vertex_Selection
-//#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_SEGMENTED_CURVE_3D<T>::
-Get_Vertex_Selection(int index)
-{
-    return new OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_3D<T>(this, index);
-}
-//#####################################################################
-// Function Get_Segment_Selection
-//#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_SEGMENTED_CURVE_3D<T>::
-Get_Segment_Selection(int index)
-{
-    return new OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_3D<T>(this, index);
-}
-//#####################################################################
-// Function Get_Curve_Selection
-//#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_SEGMENTED_CURVE_3D<T>::
-Get_Curve_Selection(int index)
-{
-    return new OPENGL_SELECTION_SEGMENTED_CURVE_3D<T>(this, index);
+    selected_vertex=-1;
+    selected_segment=-1;
+    selected_curve=-1;
 }
 //#####################################################################
 // Function Draw_Vertices_For_Selection
@@ -278,7 +238,7 @@ template<class T>
 void OPENGL_SEGMENTED_CURVE_3D<T>::
 Draw_Vertices_For_Selection() const
 {
-    OPENGL_SELECTION<T>::Draw_Vertices_For_Selection(curve.mesh,curve.particles);
+    OPENGL_SELECTION::Draw_Vertices_For_Selection(curve.mesh,curve.particles);
 }
 //#####################################################################
 // Function Draw_Segments_For_Selection
@@ -303,31 +263,13 @@ Draw_Segments_For_Selection() const
 // Function Bounding_Box
 //#####################################################################
 template<class T>
-RANGE<VECTOR<T,3> > OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_3D<T>::
-Bounding_Box() const
+RANGE<VECTOR<T,3> > OPENGL_SEGMENTED_CURVE_3D<T>::
+Selection_Bounding_Box() const
 {
-    PHYSBAM_ASSERT(object);
-    const SEGMENTED_CURVE<VECTOR<T,3> > &curve=((OPENGL_SEGMENTED_CURVE_3D<T> *)object)->curve;
-    RANGE<VECTOR<T,3> > box(VECTOR<T,3>(curve.particles.X(index)));
-    return object->World_Space_Box(box);
-}
-
-template<class T>
-RANGE<VECTOR<T,3> > OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_3D<T>::
-Bounding_Box() const
-{
-    PHYSBAM_ASSERT(object);
-    const SEGMENTED_CURVE<VECTOR<T,3> > &curve=((OPENGL_SEGMENTED_CURVE_3D<T> *)object)->curve;
-    return object->World_Space_Box(RANGE<VECTOR<T,3> >::Bounding_Box(curve.particles.X.Subset(curve.mesh.elements(index))));
-}
-
-template<class T>
-RANGE<VECTOR<T,3> > OPENGL_SELECTION_SEGMENTED_CURVE_3D<T>::
-Bounding_Box() const
-{
-    PHYSBAM_ASSERT(object);
-    const OPENGL_SEGMENTED_CURVE_3D<T> *curve=(OPENGL_SEGMENTED_CURVE_3D<T> *)object;
-    return curve->Bounding_Box();
+    if(selected_vertex>=0) return World_Space_Box(RANGE<TV>(curve.particles.X(selected_vertex)));
+    if(selected_segment>=0) return World_Space_Box(RANGE<TV>::Bounding_Box(curve.particles.X.Subset(curve.mesh.elements(selected_segment))));
+    if(selected_curve>=0) return World_Space_Box(RANGE<TV>::Bounding_Box(curve.particles.X));
+    PHYSBAM_FATAL_ERROR();
 }
 //#####################################################################
 namespace PhysBAM{

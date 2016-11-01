@@ -56,7 +56,7 @@ class VISUALIZATION:public ANIMATED_VISUALIZATION<T>
 public:
     using ANIMATED_VISUALIZATION<T>::last_frame_filename;using ANIMATED_VISUALIZATION<T>::camera_script_filename;
     using ANIMATED_VISUALIZATION<T>::opengl_window_title;using ANIMATED_VISUALIZATION<T>::opengl_world;
-    using ANIMATED_VISUALIZATION<T>::Add_Component;using ANIMATED_VISUALIZATION<T>::Selection_Priority;
+    using ANIMATED_VISUALIZATION<T>::Add_Component;
     using ANIMATED_VISUALIZATION<T>::frame_rate;using ANIMATED_VISUALIZATION<T>::start_frame;
     using ANIMATED_VISUALIZATION<T>::frame;using ANIMATED_VISUALIZATION<T>::draw_all_objects_cb;
     using ANIMATED_VISUALIZATION<T>::frame_title;using ANIMATED_VISUALIZATION<T>::Set_Current_Selection;
@@ -109,6 +109,9 @@ private:
 
 // ------------------------------------------------------------------
 
+//#####################################################################
+// Constructor
+//#####################################################################
 template<class T> VISUALIZATION<T>::
 VISUALIZATION(STREAM_TYPE stream_type)
     :ANIMATED_VISUALIZATION<T>(stream_type),positive_particles_component(0),negative_particles_component(0),
@@ -116,19 +119,22 @@ VISUALIZATION(STREAM_TYPE stream_type)
     allow_caching(true),always_add_mac_velocities(false)
 {
 }
-
+//#####################################################################
+// Destructor
+//#####################################################################
 template<class T> VISUALIZATION<T>::
 ~VISUALIZATION()
 {
     if(opengl_box) delete &opengl_box->box;
     delete slice;
 }
-
+//#####################################################################
+// Function Add_Arguments
+//#####################################################################
 template<class T> void VISUALIZATION<T>::
 Add_Arguments(PARSE_ARGS &parse_args)
 {
     basedir=".";
-
     ANIMATED_VISUALIZATION<T>::Add_Arguments(parse_args);
 
     parse_args.Add_Not("-no_caching",&allow_caching,"Allow caching");
@@ -137,7 +143,9 @@ Add_Arguments(PARSE_ARGS &parse_args)
     parse_args.Add("-deformable_no_draw",&deformable_no_draw_list,"id","Do not draw this deformable body (may be repeated)");
     parse_args.Extra_Optional(&basedir,"basedir","base directory");
 }
-
+//#####################################################################
+// Function Parse_Arguments
+//#####################################################################
 template<class T> void VISUALIZATION<T>::
 Parse_Arguments(PARSE_ARGS &parse_args)
 {
@@ -160,7 +168,9 @@ Parse_Arguments(PARSE_ARGS &parse_args)
     // don't override camera script filename if it was already set in base class based on command line argument
     if(camera_script_filename.empty()) camera_script_filename=basedir+"/camera_script";
 }
-
+//#####################################################################
+// Function Read_Grid
+//#####################################################################
 template<class T> void VISUALIZATION<T>::
 Read_Grid()
 {
@@ -196,7 +206,6 @@ template<class T> void VISUALIZATION<T>::
 Initialize_Components_And_Key_Bindings()
 {
     ANIMATED_VISUALIZATION<T>::Initialize_Components_And_Key_Bindings();
-    opengl_world.Set_Key_Binding_Category_Priority(1);
     opengl_world.Unbind_Keys("abBCdDEeFjJjkKlLMotTvV 1!2@3#4$5%67&89 ^=-`{}\b\\[]~\t");
 
     std::string filename,filename2,coarse_filename;
@@ -732,42 +741,30 @@ Initialize_Components_And_Key_Bindings()
     opengl_world.Append_Bind_Key('~',{[this](){Command_Prompt();},"command_prompt"});
 
     opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F5),draw_all_objects_cb);
-
-    // initialize selection priority (highest on top)
-    Selection_Priority(OPENGL_SELECTION<T>::DEBUG_PARTICLES_3D)=110;
-    Selection_Priority(OPENGL_SELECTION<T>::POINTS_3D)=100;
-    Selection_Priority(OPENGL_SELECTION<T>::COMPONENT_PARTICLES_3D)=100;
-    Selection_Priority(OPENGL_SELECTION<T>::ARTICULATED_RIGID_BODIES_JOINT_3D)=95;
-    Selection_Priority(OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_VERTEX)=90;
-    Selection_Priority(OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_SEGMENT)=89;
-    Selection_Priority(OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_TRIANGLE)=88;
-    Selection_Priority(OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_VERTEX)=85;
-    Selection_Priority(OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_TETRAHEDRON)=84;
-    Selection_Priority(OPENGL_SELECTION<T>::COMPONENT_RIGID_BODIES_3D)=80;
-    Selection_Priority(OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_COLLECTION_3D)=80;
-    Selection_Priority(OPENGL_SELECTION<T>::SEGMENTED_CURVE_VERTEX_3D)=79;
-    Selection_Priority(OPENGL_SELECTION<T>::SEGMENTED_CURVE_SEGMENT_3D)=78;
-    Selection_Priority(OPENGL_SELECTION<T>::GRID_NODE_3D)=70;
-    Selection_Priority(OPENGL_SELECTION<T>::GRID_CELL_3D)=60;
-    }
-
+}
+//#####################################################################
+// Function Update_OpenGL_Strings
+//#####################################################################
 template<class T> void VISUALIZATION<T>::
 Update_OpenGL_Strings()
 {
     ANIMATED_VISUALIZATION<T>::Update_OpenGL_Strings();
-
     // TODO: slice manager should be a component
     std::ostringstream output_stream;
     if(slice_manager.slice) slice_manager.slice->Print_Slice_Info(output_stream);
     opengl_world.Add_String(output_stream.str());
 }
-
+//#####################################################################
+// Function Pre_Frame_Extra
+//#####################################################################
 template<class T> void VISUALIZATION<T>::
 Pre_Frame_Extra()
 {
     if(grid_component) grid_component->Set_Frame(frame);
 }
-
+//#####################################################################
+// Function Set_Frame_Extra
+//#####################################################################
 template<class T> void VISUALIZATION<T>::
 Set_Frame_Extra()
 {
@@ -777,42 +774,24 @@ Set_Frame_Extra()
     filename=LOG::sprintf("%s/%d/time",basedir.c_str(),frame);
     if(FILE_UTILITIES::File_Exists(filename)){T time;FILE_UTILITIES::Read_From_File(stream_type,filename,time);frame_title=LOG::sprintf("(%.05f) ",time)+frame_title;}
 }
-
+//#####################################################################
+// Function Command_Prompt_Response
+//#####################################################################
 template<class T> void VISUALIZATION<T>::
 Command_Prompt_Response()
 {
-    if(!opengl_world.prompt_response.empty()){
-        std::string command;
-        std::istringstream sstream(opengl_world.prompt_response);
-        sstream>>command;
-        if(command=="s"){
-            int id;
-            if(sstream>>id){
-                OPENGL_SELECTION<T>* selection=0;
-                if(!selection && positive_particles_component) selection=positive_particles_component->Get_Selection_By_Id(id);
-                if(!selection && negative_particles_component) selection=negative_particles_component->Get_Selection_By_Id(id);
-                if(!selection && removed_positive_particles_component) selection=removed_positive_particles_component->Get_Selection_By_Id(id);
-                if(!selection && removed_negative_particles_component) selection=removed_negative_particles_component->Get_Selection_By_Id(id);
-                if(selection){Set_Current_Selection(selection); Update_OpenGL_Strings();}}}
-        else if(command=="n"){
-            int id;
-            if(sstream>>id){
-                OPENGL_SELECTION<T>* selection=0;
-                if(selection){Set_Current_Selection(selection); Update_OpenGL_Strings();}}}
-        else if(command=="c"){
-            int id;
-            if(sstream>>id){
-                OPENGL_SELECTION<T>* selection=0;
-                if(selection){Set_Current_Selection(selection); Update_OpenGL_Strings();}}}
-    }
 }
-
+//#####################################################################
+// Function Command_Prompt
+//#####################################################################
 template<class T> void VISUALIZATION<T>::
 Command_Prompt()
 {
     opengl_world.Prompt_User("Command: ",{[this](){Command_Prompt_Response();},"command_prompt_response"});
 }
-
+//#####################################################################
+// Function Slice_Has_Changed
+//#####################################################################
 template<class T> void VISUALIZATION<T>::
 Slice_Has_Changed()
 {

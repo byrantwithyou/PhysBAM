@@ -24,53 +24,42 @@ public:
     using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::World_Space_Box;
     T_ARRAY& points;
     OPENGL_COLOR color;
-    float point_size;
+    T point_size;
     bool draw_point_numbers,draw_radii; 
     ARRAY<OPENGL_COLOR>* point_colors;
     ARRAY<int>* point_ids;
     ARRAY<T>* point_radii;
 
+    int selected_index;
+    int selected_id;
+    OPENGL_COLOR selected_old_color;
+
     OPENGL_POINTS_2D(STREAM_TYPE stream_type,T_ARRAY& points_input,const OPENGL_COLOR &color_input = OPENGL_COLOR::White(),float point_size = 5);
     virtual ~OPENGL_POINTS_2D();
 
-    void Set_Points_From_Particles(const GEOMETRY_PARTICLES<TV>& particles,bool keep_colors=true,const bool use_ids=true);
+    void Set_Points_From_Particles(const GEOMETRY_PARTICLES<TV>& particles,bool keep_colors=true);
 
     bool Use_Bounding_Box() const override {return points.Size()>0;}
     virtual int Particle_Index(const int index) const {return index;}
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    virtual RANGE<VECTOR<T,3> > Selection_Bounding_Box() const override;
     void Display() const override;
 
-    OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size) override;
-    void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
-    void Clear_Highlight() override;
-    void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const override;
+    virtual int Get_Selection_Priority(ARRAY_VIEW<GLuint> indices) override;
+    bool Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers) override;
+    void Clear_Selection() override;
+    void Print_Selection_Info(std::ostream &output_stream) const override;
 
     void Store_Point_Colors(bool store_point_colors = true);
     void Store_Point_Ids(bool store_ids=true);
     void Store_Point_Radii(bool store_point_radii = true);
 
-    void Set_Point_Color(int index,const OPENGL_COLOR &point_color);
-    void Set_Point_Colors(const ARRAY<int> &indices,const OPENGL_COLOR &point_color);
+    void Set_Point_Color(int index,const OPENGL_COLOR& point_color);
+    void Set_Point_Colors(const ARRAY<int>& indices,const OPENGL_COLOR& point_color);
     void Reset_Point_Colors();
 
     void Select_Point(int index);
     void Select_Points(const ARRAY<int> &indices);
-    void Clear_Selection();
-
-};
-
-template<class T>
-class OPENGL_SELECTION_POINTS_2D:public OPENGL_SELECTION<T>
-{
-public:
-    using OPENGL_SELECTION<T>::object;
-    int index;
-    bool has_id;
-    int id;
-
-    OPENGL_SELECTION_POINTS_2D(OPENGL_OBJECT<T>* object):OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::POINTS_2D, object) {}
-
-    RANGE<VECTOR<T,3> > Bounding_Box() const override;
 };
 
 }

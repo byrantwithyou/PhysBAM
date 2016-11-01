@@ -91,7 +91,7 @@ public:
     void Toggle_Display_Overlay();
     void Toggle_Smooth_Slice_Texture();
     void Display() const override;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    virtual RANGE<TV> Bounding_Box() const override;
     void Turn_Smooth_Shading_On() override;
     void Turn_Smooth_Shading_Off() override;
     void Slice_Has_Changed() override;

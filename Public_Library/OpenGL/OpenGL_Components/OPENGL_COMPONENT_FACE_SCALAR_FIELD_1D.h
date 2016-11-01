@@ -16,6 +16,7 @@ template<class T,class T2=T>
 class OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,1> TV;
+    typedef VECTOR<T,TV::m+(TV::m==1)> TV_BOX;
 public:
     OPENGL_FACE_SCALAR_FIELD_1D<T,T2> opengl_face_scalar_field;
 private:
@@ -41,7 +42,7 @@ public:
     void Set_Frame(int frame_input) override;
     void Set_Draw(bool draw_input = true) override;
     void Display() const override;
-    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const override;
+    void Print_Selection_Info(std::ostream& stream) const override;
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
     virtual void Set_Slice(OPENGL_SLICE *slice_input) override {slice=slice_input;opengl_face_scalar_field.Set_Slice(slice_input);}
     virtual void Slice_Has_Changed() override {opengl_face_scalar_field.Slice_Has_Changed();}

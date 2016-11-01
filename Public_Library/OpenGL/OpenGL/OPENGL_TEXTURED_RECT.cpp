@@ -18,14 +18,6 @@ OPENGL_TEXTURED_RECT(STREAM_TYPE stream_type)
 {
 }
 //#####################################################################
-// Function Set_Texture
-//#####################################################################
-template<class T> void OPENGL_TEXTURED_RECT<T>::
-Set_Texture(OPENGL_TEXTURE *texture_input)
-{
-    texture = texture_input;
-}
-//#####################################################################
 // Function Display
 //#####################################################################
 template<class T> void OPENGL_TEXTURED_RECT<T>::
@@ -76,7 +68,7 @@ Display() const
 template<class T> RANGE<VECTOR<T,3> > OPENGL_TEXTURED_RECT<T>::
 Bounding_Box() const
 {
-    return World_Space_Box(RANGE<VECTOR<T,3> >(VECTOR<T,3>(-(T)0.5*width,-(T)0.5*height,0),VECTOR<T,3>((T)0.5*width,(T)0.5*height,0)));
+    return World_Space_Box(RANGE<VECTOR<T,2> >(VECTOR<T,2>(-(T)0.5*width,-(T)0.5*height),VECTOR<T,2>((T)0.5*width,(T)0.5*height)));
 }
 namespace PhysBAM{
 template class OPENGL_TEXTURED_RECT<double>;

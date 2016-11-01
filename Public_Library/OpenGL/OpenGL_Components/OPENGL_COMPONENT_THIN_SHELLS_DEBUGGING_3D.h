@@ -52,7 +52,7 @@ public:
     void Set_Draw(bool draw_input = true) override;
     void Display() const override;
     bool Use_Bounding_Box() const override { return draw && valid; }
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    virtual RANGE<TV> Bounding_Box() const override;
     void Set_Slice(OPENGL_SLICE *slice_input) override;
     void Slice_Has_Changed() override;    
 

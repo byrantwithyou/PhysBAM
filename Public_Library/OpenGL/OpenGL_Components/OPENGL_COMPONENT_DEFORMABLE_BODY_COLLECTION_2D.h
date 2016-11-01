@@ -35,8 +35,9 @@ protected:
     T velocity_scale;
     bool invalidate_deformable_objects_selection_each_frame;
 public:
-    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
+    using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::stream_type;
+    using OPENGL_OBJECT<T>::viewer_callbacks;using OPENGL_OBJECT<T>::World_Space_Box;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
     ARRAY<OPENGL_SEGMENTED_CURVE_2D<T>*> segmented_curve_objects;
     ARRAY<OPENGL_BEZIER_SPLINE_2D<T,3>*> bezier_spline_objects;
@@ -50,6 +51,16 @@ public:
     ARRAY<OPENGL_SEGMENTED_CURVE_2D<T>*> embedded_curve_objects;
     bool has_embedded_objects;
     ARRAY<ARRAY<T>*> phi_list;
+    int selected_segmented_curve;
+    int selected_triangulated_area;
+    int selected_triangles_of_material;
+    int selected_bezier_spline;
+    int selected_embedded_curve;
+    int selected_free_particles;
+    int selected_b_spline;
+    int selected_index;
+    OPENGL_OBJECT<T>* selected_object;
+    ARRAY<bool> active_list;
 
     OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D(STREAM_TYPE stream_type,const std::string& prefix,const int start_frame);
     virtual ~OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D();
@@ -61,12 +72,13 @@ public:
     virtual void Display() const override;
     bool Use_Bounding_Box() const override;
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    virtual RANGE<VECTOR<T,3> > Selection_Bounding_Box() const override;
 
-    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint* buffer, int buffer_size) override;
-    void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
-    void Clear_Highlight() override;
-    void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection) const override;
-    OPENGL_SELECTION<T>* Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection) override;
+    virtual int Get_Selection_Priority(ARRAY_VIEW<GLuint> indices) override;
+    virtual bool Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers) override;
+    void Clear_Selection() override;
+    void Print_Selection_Info(std::ostream& output_stream) const override;
+    bool Destroy_Selection_After_Frame_Change() override;
 
     void Set_Vector_Size(const T vector_size);
 
@@ -81,20 +93,19 @@ private:
     void Initialize();    // Needs to be called after some state changes
 };
 
-template<class T>
-class OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_2D:public OPENGL_SELECTION<T>
-{
-public:
-    using OPENGL_SELECTION<T>::object;
-    int body_index;
-    int subobject_type;
-    OPENGL_OBJECT<T>* subobject;
-    OPENGL_SELECTION<T>* body_selection;
+// template<class T>
+// class OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_2D:public OPENGL_SELECTION<T>
+// {
+// public:
+//     using OPENGL_SELECTION::object;
+//     int body_index;
+//     int subobject_type;
+//     OPENGL_OBJECT<T>* subobject;
+//     void body_selection;
 
-    OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_2D(OPENGL_OBJECT<T>* object):OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_OBJECT_2D, object){}
-    RANGE<VECTOR<T,3> > Bounding_Box() const override;
-    typename OPENGL_SELECTION<T>::TYPE Actual_Type() const override {return body_selection->Actual_Type();}
-};
+//     OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_2D(OPENGL_OBJECT<T>* object):OPENGL_SELECTION<T>(OPENGL_SELECTION::COMPONENT_DEFORMABLE_OBJECT_2D, object){}
+//     RANGE<TV> Bounding_Box() const override;
+// };
 
 }
 #endif

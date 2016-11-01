@@ -14,28 +14,17 @@
 
 using namespace PhysBAM;
 //#####################################################################
-namespace{
-    template<class T> BASIC_VISUALIZATION<T>*& The_Visualization()
-    {
-        static BASIC_VISUALIZATION<T>* the_visualization=0;
-        return the_visualization;
-    }
-    template<class T> static void Process_Hits_CB(GLint hits,GLuint buffer[]){The_Visualization<T>()->Process_Hits(hits,buffer);}
-}
-//#####################################################################
 // Constructor
 //#####################################################################
 template<class T> BASIC_VISUALIZATION<T>::
 BASIC_VISUALIZATION(STREAM_TYPE stream_type) 
     :stream_type(stream_type),opengl_axes(0),opengl_world(stream_type),set_window_position(false),opengl_window_title("OpenGL Visualization"),add_axes(true),render_offscreen(false),
-    opt_left_handed(false),opt_smooth(false),selection_enabled(true),current_selection(0)
+    opt_left_handed(false),opt_smooth(false),selection_enabled(true),selected_object(0)
 {
     reset_view_cb={[this](){Reset_View();},"Center view on selection (or reset if none)"};
     reset_up_cb={[this](){Reset_Up();},"Reset up vector for view"};
     toggle_axes_cb={[this](){Toggle_Axes();},"Toggle axes"};
     draw_all_objects_cb={[this](){Draw_All_Objects();},"draw_all_objects"};
-
-    The_Visualization<T>()=this;
 }
 //#####################################################################
 // Destructor
@@ -155,7 +144,6 @@ template<class T> void BASIC_VISUALIZATION<T>::
 Initialize_Components_And_Key_Bindings()
 {
     opengl_world.Set_Key_Binding_Category("Default Keys (BASIC_VISUALIZATION<T>)");
-    opengl_world.Set_Key_Binding_Category_Priority(100);
 
     // Remove some silly key bindings
     opengl_world.Unbind_Keys("^m^n^o^j^k^h^l^v^d");
@@ -169,7 +157,6 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Bind_Key('c',{[this](){opengl_world.Load_View(camera_script_filename,true);},"Load view"});}
 
     opengl_world.Set_Key_Binding_Category("User-Defined Keys");
-    opengl_world.Set_Key_Binding_Category_Priority(1);
 }
 //#####################################################################
 // Function Add_OpenGL_Initialization
@@ -213,7 +200,7 @@ PostInitialize_OpenGL_World()
     
     if(selection_enabled){
         opengl_world.load_names_for_selection=true;
-        opengl_world.Set_Process_Hits_Callback(Process_Hits_CB<T>);}
+        opengl_world.process_hits_cb=[=](GLint hits,GLuint buffer[],int modifiers){Process_Hits(hits,buffer,modifiers);};}
 }
 //#####################################################################
 // Function Initialize_Scene
@@ -236,7 +223,7 @@ template<class T> void BASIC_VISUALIZATION<T>::
 Update_OpenGL_Strings()
 {
     std::ostringstream output_stream;
-    for(int i=0;i<component_list.m;i++) component_list(i)->Print_Selection_Info(output_stream,current_selection);
+    if(selected_object) selected_object->Print_Selection_Info(output_stream);
     opengl_world.Add_String(output_stream.str());
 }
 //#####################################################################
@@ -258,8 +245,10 @@ Reset_Objects_In_World()
 template<class T> void BASIC_VISUALIZATION<T>::
 Reset_View()
 {
-    if(current_selection) opengl_world.Center_Camera_On_Bounding_Box(current_selection->Bounding_Box(),false);
-    else{opengl_world.Center_Camera_On_Scene();opengl_world.Reset_Camera_Orientation();}
+    if(selected_object) opengl_world.Center_Camera_On_Bounding_Box(selected_object->Selection_Bounding_Box(),false);
+    else{
+        opengl_world.Center_Camera_On_Scene();
+        opengl_world.Reset_Camera_Orientation();}
 }
 //#####################################################################
 // Function Reset_Up
@@ -290,36 +279,49 @@ Draw_All_Objects()
 // Function Process_Hits
 //#####################################################################
 template<class T> void BASIC_VISUALIZATION<T>::
-Process_Hits(GLint hits,GLuint buffer[])
+Process_Hits(GLint hits,GLuint buffer[],int modifiers)
 {
-    OPENGL_SELECTION<T>* new_selection=0;
-    ARRAY<OPENGL_SELECTION<T>*> selections;
 #ifndef NDEBUG
     opengl_world.Print_Hits(hits,buffer);
 #endif
-    opengl_world.Get_Selections(selections,hits,buffer);
+
     int current_priority=INT_MIN;
+    int current_idx=-1;
     float current_min_depth=FLT_MAX;
-    for(int i=0;i<selections.m;i++){
-        int this_priority=Selection_Priority(selections(i)->Actual_Type());
+    int idx=0;
+    for(int i=0;i<(int)hits;i++){
+        GLint names=buffer[idx];
+        int object_id=buffer[idx+3];
+        ARRAY_VIEW<GLuint> name_buffer(names-1,&buffer[idx+4]);
+        PHYSBAM_ASSERT(0<=object_id && object_id<opengl_world.object_list.m && opengl_world.object_list(object_id)->selectable);
+        unsigned int denom=0xffffffff;
+        T min_depth=(T)buffer[idx+1]/denom;
+        int this_priority=opengl_world.object_list(object_id)->Get_Selection_Priority(name_buffer);
+        int this_idx=idx;
+        idx +=names+3;
         if(this_priority<0) continue;
 
         // Ties and roundoff are likely, so be careful about it.
-        float depth_difference=selections(i)->min_depth-current_min_depth,tolerance=1e-3f;
+        float depth_difference=min_depth-current_min_depth,tolerance=1e-3f;
         if(depth_difference>tolerance) continue;
         if(this_priority<current_priority && depth_difference>-tolerance) continue;
         if(this_priority==current_priority && depth_difference>=0) continue;
 
-        new_selection=selections(i);
         current_priority=this_priority;
-        current_min_depth=selections(i)->min_depth;}
+        current_min_depth=min_depth;
+        current_idx=this_idx;}
 
-    // Delete all of the other selection objects
-    for(int i=0;i<selections.m;i++)
-        if(selections(i)!=new_selection)
-            delete selections(i);
+    if(selected_object) selected_object->Clear_Selection();
+    selected_object=0;
 
-    Set_Current_Selection(new_selection);
+    if(current_idx>=0){
+        GLint names=buffer[current_idx];
+        int object_id=buffer[current_idx+3];
+        PHYSBAM_ASSERT(0<=object_id && object_id<opengl_world.object_list.m && opengl_world.object_list(object_id)->selectable);
+        selected_object=opengl_world.object_list(object_id);
+        ARRAY_VIEW<GLuint> name_buffer(names-1,&buffer[current_idx+4]);
+        if(!selected_object->Set_Selection(name_buffer,modifiers))
+            selected_object=0;}
 
     Selection_Callback();
 }
@@ -327,18 +329,13 @@ Process_Hits(GLint hits,GLuint buffer[])
 // Function Set_Current_Selection
 //#####################################################################
 template<class T> void BASIC_VISUALIZATION<T>::
-Set_Current_Selection(OPENGL_SELECTION<T>* selection)
+Set_Current_Selection(OPENGL_OBJECT<T>* object)
 {
-    if(current_selection){
-        current_selection->object->Clear_Highlight();
-        delete current_selection;
-        current_selection=0;}
+    if(selected_object){
+        selected_object->Clear_Selection();
+        selected_object=0;}
 
-    if(selection){
-        current_selection=selection;
-        //only have support for deformable objects
-        if(selection->type==OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_COLLECTION_3D) current_selection->object->Set_Selection(current_selection);
-        current_selection->object->Highlight_Selection(current_selection);}
+    if(object) selected_object=object;
 }
 //#####################################################################
 // Function Selection_Callback
@@ -348,16 +345,6 @@ Selection_Callback()
 {
     Update_OpenGL_Strings();
     glutPostRedisplay();
-}
-//#####################################################################
-// Function Selection_Priority
-//#####################################################################
-template<class T> int &BASIC_VISUALIZATION<T>::
-Selection_Priority(typename OPENGL_SELECTION<T>::TYPE selection_type)
-{
-    int index=(int)selection_type; // to allow for zero
-    if(selection_priority.m<=index) selection_priority.Resize(index+1);
-    return selection_priority(index);
 }
 namespace PhysBAM{
 template class BASIC_VISUALIZATION<double>;

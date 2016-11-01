@@ -46,6 +46,9 @@ Display() const
     OpenGL_End();
     glPopAttrib();
 }
+//#####################################################################
+// Function Display_Bool_Helper
+//#####################################################################
 template<class T> void
 Display_Bool_Helper(const OPENGL_FACE_SCALAR_FIELD_1D<T,bool>& self)
 {
@@ -60,11 +63,17 @@ Display_Bool_Helper(const OPENGL_FACE_SCALAR_FIELD_1D<T,bool>& self)
     OpenGL_End();
     glPopAttrib();
 }
+//#####################################################################
+// Function Display
+//#####################################################################
 template<> void OPENGL_FACE_SCALAR_FIELD_1D<float,bool>::
 Display() const
 {
     Display_Bool_Helper(*this);
 }
+//#####################################################################
+// Function Display
+//#####################################################################
 template<> void OPENGL_FACE_SCALAR_FIELD_1D<double,bool>::
 Display() const
 {
@@ -82,12 +91,11 @@ Bounding_Box() const
 // Print_Selection_Info
 //#####################################################################
 template<class T,class T2> void OPENGL_FACE_SCALAR_FIELD_1D<T,T2>::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection) const
+Print_Selection_Info(std::ostream& output_stream) const
 {
     // TODO: this should also interpolate to particles
-    if(selection && selection->type==OPENGL_SELECTION<T>::GRID_CELL_1D && grid.Is_MAC_Grid()){
-        VECTOR<int,1> index=((OPENGL_SELECTION_GRID_CELL_1D<T>*)selection)->index;
-        FACE_INDEX<TV::m> ix(0,index);
+    if(selected_index.x>=0 && grid.Is_MAC_Grid()){
+        FACE_INDEX<TV::m> ix(0,selected_index);
         T2 left=face_values(ix);
         ix.index.x++;
         T2 right=face_values(ix);

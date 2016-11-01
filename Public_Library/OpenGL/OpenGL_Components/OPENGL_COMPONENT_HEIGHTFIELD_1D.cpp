@@ -214,6 +214,14 @@ Bounding_Box() const
     else return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
+// Function Bounding_Box
+//#####################################################################
+template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
+Selection_Bounding_Box() const
+{
+    return World_Space_Box(RANGE<VECTOR<T,3> >(VECTOR<T,3>(grid.X(TV_INT(selected_index)).x, scale*height(selected_index),0)));
+}
+//#####################################################################
 // Function Reinitialize
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
@@ -261,34 +269,27 @@ Reinitialize(bool force)
                 valid=true;}}}
 }
 //#####################################################################
-// Function Get_Selection
+// Function Get_Selection_Priority
 //#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
-Get_Selection(GLuint *buffer,int buffer_size)
+template<class T> int OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
+Get_Selection_Priority(ARRAY_VIEW<GLuint> indices)
 {
-    if(buffer_size == 1)
-    {
-        OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D<T> *selection=new OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D<T>(this);
-        selection->index=buffer[0];
-        return selection;
-    }
-    else return 0;
+    return 10;
 }
 //#####################################################################
-// Function Highlight_Selection
+// Function Get_Selection
 //#####################################################################
-template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
-Highlight_Selection(OPENGL_SELECTION<T>* selection)
+template<class T> bool OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
+Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers)
 {
-    if(selection->type != OPENGL_SELECTION<T>::COMPONENT_HEIGHTFIELD_1D) return;
-    OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D<T> *real_selection=(OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D<T>*)selection;
-    selected_index=real_selection->index;
+    selected_index=indices(0);
+    return true;
 }
 //#####################################################################
 // Function Clear_Highlight
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
-Clear_Highlight()
+Clear_Selection()
 {
     selected_index=-1;
 }
@@ -367,15 +368,6 @@ template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 Toggle_Draw_Points()
 {
     draw_points=!draw_points;
-}
-//#####################################################################
-// Function Bounding_Box
-//#####################################################################
-template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D<T>::
-Bounding_Box() const
-{
-    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
-    return RANGE<VECTOR<T,3> >::Empty_Box();
 }
 
 namespace PhysBAM{

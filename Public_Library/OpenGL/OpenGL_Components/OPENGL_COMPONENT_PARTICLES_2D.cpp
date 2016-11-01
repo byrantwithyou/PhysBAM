@@ -21,7 +21,8 @@ OPENGL_COMPONENT_PARTICLES_2D(STREAM_TYPE stream_type,const std::string &filenam
       filename(filename_input), filename_set(filename_set_input), frame_loaded(-1), set(0), set_loaded(-1),number_of_sets(0),use_sets(false),valid(false),
       draw_velocities(false), have_velocities(false), use_ids(use_ids_input), 
       particles_stored_per_cell_uniform(particles_stored_per_cell_uniform_input),
-      draw_multiple_particle_sets(false)
+draw_multiple_particle_sets(false),selected_set(-1)
+
 {
     viewer_callbacks.Set("toggle_draw_point_numbers",{[this](){Toggle_Draw_Point_Numbers();},"Toggle draw point numbers"});
     viewer_callbacks.Set("toggle_draw_radii",{[this](){Toggle_Draw_Radii();},"Toggle draw radii"});
@@ -40,7 +41,7 @@ OPENGL_COMPONENT_PARTICLES_2D(STREAM_TYPE stream_type,const std::string &filenam
     if(number_of_sets>0){use_sets=true;draw_multiple_particle_sets=true;}
     else number_of_sets=1;
 
-    particles_multiple.Resize(number_of_sets);opengl_points_multiple.Resize(number_of_sets);selected_ids.Resize(number_of_sets);
+    particles_multiple.Resize(number_of_sets);opengl_points_multiple.Resize(number_of_sets);
     particles_multiple(0)=particles;opengl_points_multiple(0)=opengl_points;
     OPENGL_INDEXED_COLOR_MAP* color_map=OPENGL_INDEXED_COLOR_MAP::Particle_Multiple_Color_Map();
     opengl_points->color=color_map->Lookup(0);
@@ -67,7 +68,7 @@ template<class T> OPENGL_COMPONENT_PARTICLES_2D<T>::
 template<class T> bool OPENGL_COMPONENT_PARTICLES_2D<T>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::Frame_File_Exists(filename, frame_input);
+    return FILE_UTILITIES::Frame_File_Exists(filename,frame_input);
 }
 //#####################################################################
 // Function Set_Frame
@@ -93,23 +94,28 @@ Set_Draw(bool draw_input)
 template<class T> void OPENGL_COMPONENT_PARTICLES_2D<T>::
 Display() const
 {
-    if(valid && draw){
-        GLint mode=0;
-        glGetIntegerv(GL_RENDER_MODE, &mode);
-        if(mode == GL_SELECT){
-            if(draw_multiple_particle_sets){
-                glPushName(0);
-                for(int i=0;i<number_of_sets;i++){
-                    glLoadName(i);
-                    opengl_points_multiple(i)->Display();}
-                glPopName();}
-            else opengl_points->Display();
-            if(draw_velocities && have_velocities) opengl_vector_field.Display();}
-        else
-        {
-            if(draw_multiple_particle_sets) for(int i=0;i<number_of_sets;i++) opengl_points_multiple(i)->Display();
-            else opengl_points->Display();
-            if(draw_velocities && have_velocities) opengl_vector_field.Display();}}
+    if(!valid || !draw) return;
+    GLint mode=0;
+    glGetIntegerv(GL_RENDER_MODE, &mode);
+    if(mode==GL_SELECT){
+        glPushName(0);
+        glPushName(0);
+        if(draw_multiple_particle_sets)
+            for(int i=0;i<number_of_sets;i++){
+                glLoadName(i);
+                opengl_points_multiple(i)->Display();}
+        else{
+            glLoadName(set);
+            opengl_points->Display();}
+        glPopName();
+        if(draw_velocities && have_velocities){
+            glLoadName(1);
+            opengl_vector_field.Display();}
+        glPopName();}
+    else{
+        if(draw_multiple_particle_sets) for(int i=0;i<number_of_sets;i++) opengl_points_multiple(i)->Display();
+        else opengl_points->Display();
+        if(draw_velocities && have_velocities) opengl_vector_field.Display();}
 }
 //#####################################################################
 // Function Bounding_Box
@@ -118,165 +124,69 @@ template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_PARTICLES_2D<T>::
 Bounding_Box() const
 {
     if(valid && draw) return opengl_points->Bounding_Box();
-    else return RANGE<VECTOR<T,3> >::Centered_Box();
+    return RANGE<VECTOR<T,3> >::Centered_Box();
+}
+//#####################################################################
+// Function Get_Selection_Priority
+//#####################################################################
+template<class T> int OPENGL_COMPONENT_PARTICLES_2D<T>::
+Get_Selection_Priority(ARRAY_VIEW<GLuint> indices)
+{
+    if(!indices.m) return -1;
+    return 100;
 }
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_COMPONENT_PARTICLES_2D<T>::
-Get_Selection(GLuint *buffer,int buffer_size)
+template<class T> bool OPENGL_COMPONENT_PARTICLES_2D<T>::
+Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers)
 {
-    int particle_set;int point_index;
-    if(buffer_size==1){particle_set=set;point_index=buffer[0];}
-    else if(buffer_size==2){particle_set=buffer[0];point_index=buffer[1];}
-    else return 0;
-
-    OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T> *selection=new OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>(this);
-
-    // We have the OPENGL_POINTS_2D index but need to find the particle index
-    int particle_index=0;
-    int active_count=0;
-    for(particle_index=0;particle_index<particles_multiple(particle_set)->Size();particle_index++){
-        if(active_count++==point_index) break;}
-    selection->index=particle_index;
-    selection->particle_set=particle_set;
-    selection->location=particles_multiple(particle_set)->X(particle_index);
-    ARRAY_VIEW<int>* ids=0;if(use_ids) ids=Get_Particles_Id_Array(particle_set);
-    if(ids){
-        selection->has_id=true;
-        selection->id=(*ids)(particle_index);}
-    else selection->has_id=false;
-    return selection;
-}
-//#####################################################################
-// Function Get_Selection_By_Id
-//#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_COMPONENT_PARTICLES_2D<T>::
-Get_Selection_By_Id(int id,int particle_set)
-{
-    OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T> *selection=0;
-    ARRAY_VIEW<int>* ids=0;if(use_ids) ids=Get_Particles_Id_Array(particle_set);
-    if(ids){
-        int index;
-        if(ids->Find(id,index)){
-            selection=new OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>(this);
-            selection->index=index;
-            selection->has_id=true;
-            selection->id=id;
-            selection->particle_set=particle_set;
-            selection->location=particles_multiple(particle_set)->X(index);}}
-    return selection;
-}
-//#####################################################################
-// Function Highlight_Selection
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_PARTICLES_2D<T>::
-Highlight_Selection(OPENGL_SELECTION<T>* selection)
-{
-    if(selection->type != OPENGL_SELECTION<T>::COMPONENT_PARTICLES_2D) return;
-    OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T> *real_selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>*)selection;
-    int particle_index=real_selection->index;
-    ARRAY_VIEW<int>* ids=0;
-    if(use_ids && (ids=Get_Particles_Id_Array(real_selection->particle_set))){
-        Select_Particle_By_Id((*ids)(particle_index),real_selection->particle_set);}
-    else{
-        int point_index=0;
-        for(int i=0;i<particle_index;i++)
-            point_index++;
-        opengl_points_multiple(real_selection->particle_set)->Select_Point(point_index);}
+    if(indices(0)==0){
+        selected_set=indices(1);
+        return opengl_points_multiple(selected_set)->Set_Selection(indices.Array_View(2,indices.m-2),modifiers);}
+    else if(indices(0)==1)
+        return opengl_vector_field.Set_Selection(indices.Array_View(1,indices.m-1),modifiers);
+    return false;
 }
 //#####################################################################
 // Function Clear_Highlight
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_PARTICLES_2D<T>::
-Clear_Highlight()
+Clear_Selection()
 {
-    if(use_ids) Clear_Id_Selection();
-    else for(int i=0;i<opengl_points_multiple.m;i++) opengl_points_multiple(i)->Clear_Selection();
+    opengl_points_multiple(selected_set)->Clear_Selection();
+    selected_set=-1;
+    opengl_vector_field.Clear_Selection();
 }
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_PARTICLES_2D<T>::
-Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const
+Print_Selection_Info(std::ostream &output_stream) const
 {
-    if(selection && selection->type == OPENGL_SELECTION<T>::COMPONENT_PARTICLES_2D && selection->object == this){
-        OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T> *real_selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>*)selection;
-        
-        if(!draw_multiple_particle_sets && real_selection->particle_set!=set) return;
+    if(!draw_multiple_particle_sets && selected_set!=set) return;
     
-        output_stream<<"Selected particle in ["<<component_name<<"("<<real_selection->particle_set<<")] (total number = "<<particles->Size()<<")"<<std::endl;
-    
-        int current_index=-1;
-        if(real_selection->has_id){
-            output_stream<<"  Selected by id "<<real_selection->id<<std::endl;
-            ARRAY_VIEW<int>* ids=Get_Particles_Id_Array(real_selection->particle_set);
-            if(!ids || !ids->Find(real_selection->id,current_index))
-                output_stream<<"  Doesn't exist"<<std::endl;}
-        else{
-            if(real_selection->index<particles_multiple(real_selection->particle_set)->Size()){
-                output_stream<<"  Selected by index "<<real_selection->index<<std::endl;
-                current_index=real_selection->index;}}
-
-        if(current_index>=0){
-            // real_selection->index is index into particles array at time of selection.  Not very useful. current_index is more useful
-            output_stream<<"current index = "<<current_index<<std::endl;
-            particles_multiple(real_selection->particle_set)->Print(output_stream,current_index);}}
+    output_stream<<"Selected particle in ["<<component_name<<"("<<selected_set<<")] (total number = "<<particles->Size()<<")"<<std::endl;
+    opengl_points_multiple(selected_set)->Print_Selection_Info(output_stream);
 }
 //#####################################################################
-// Function Create_Or_Destroy_Selection_After_Frame_Change
+// Function Destroy_Selection_After_Frame_Change
 //#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_COMPONENT_PARTICLES_2D<T>::
-Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection)
+template<class T> bool OPENGL_COMPONENT_PARTICLES_2D<T>::
+Destroy_Selection_After_Frame_Change()
 {
-    // TODO: reimplement transfering particles between objects.
-    if(old_selection && old_selection->object == this){
-        OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T> *real_selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>*)old_selection;
-        if(real_selection->has_id){
-            OPENGL_SELECTION<T>* new_selection=Get_Selection_By_Id(real_selection->id,real_selection->particle_set);
-            return new_selection;}
-        else delete_selection=true;
-    }
-    return 0;
+    if(opengl_points_multiple(selected_set)->Destroy_Selection_After_Frame_Change()){
+        selected_set=-1;
+        return true;}
+    return false;
 }
 //#####################################################################
 // Function Selection_Bounding_Box
 //#####################################################################
 template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_PARTICLES_2D<T>::
-Selection_Bounding_Box(OPENGL_SELECTION<T>* selection) const
+Selection_Bounding_Box() const
 {
-    int current_index=Get_Current_Index_Of_Selection(selection);
-    if(current_index != -1) return World_Space_Box(RANGE<TV>(particles->X(current_index)));
-    else return RANGE<VECTOR<T,3> >::Centered_Box();
-}
-//#####################################################################
-// Function Get_Current_Index_Of_Selection
-//#####################################################################
-template<class T> int OPENGL_COMPONENT_PARTICLES_2D<T>::
-Get_Current_Index_Of_Selection(OPENGL_SELECTION<T>* selection) const
-{
-    PHYSBAM_ASSERT(selection->type == OPENGL_SELECTION<T>::COMPONENT_PARTICLES_2D && selection->object == this);
-    OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T> *real_selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>*)selection;
-
-    int current_index=-1;
-
-    if(real_selection->has_id){
-        ARRAY_VIEW<int>* ids=Get_Particles_Id_Array(real_selection->particle_set);
-        if(ids) ids->Find(real_selection->id,current_index);}
-    else if(real_selection->index<particles_multiple(real_selection->particle_set)->Size()) current_index=real_selection->index;
-
-    return current_index;
-}
-//#####################################################################
-// Function Get_Particle_Set_Of_Selection
-//#####################################################################
-template<class T> GEOMETRY_PARTICLES<VECTOR<T,2> >* OPENGL_COMPONENT_PARTICLES_2D<T>::
-Get_Particle_Set_Of_Selection(OPENGL_SELECTION<T>* selection) const
-{
-    PHYSBAM_ASSERT(selection->type == OPENGL_SELECTION<T>::COMPONENT_PARTICLES_2D && selection->object == this);
-    OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T> *real_selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>*)selection;
-    PHYSBAM_ASSERT(real_selection->particle_set<particles_multiple.m);
-    return particles_multiple(real_selection->particle_set);
+    return opengl_points_multiple(selected_set)->Selection_Bounding_Box();
 }
 //#####################################################################
 // Function Reinitialize
@@ -285,7 +195,8 @@ template<class T> void OPENGL_COMPONENT_PARTICLES_2D<T>::
 Reinitialize(bool force)
 {
     if(!draw || !(force || !valid || (is_animation && frame_loaded != frame) || (!is_animation && frame_loaded<0))) return;
-    valid=true;have_velocities=false;
+    valid=true;
+    have_velocities=false;
 
     for(int i=0;i<number_of_sets;i++){
         std::string frame_filename;
@@ -308,7 +219,7 @@ Reinitialize(bool force)
             else{
                 Read_Binary(typed_input,*particles_multiple(i));}
             delete input_file;
-            opengl_points_multiple(i)->Set_Points_From_Particles(*particles_multiple(i),true,Get_Particles_Id_Array(i)!=0);}
+            opengl_points_multiple(i)->Set_Points_From_Particles(*particles_multiple(i),true);}
         catch(FILESYSTEM_ERROR&){valid=false;}}
     frame_loaded=frame;
 #if 0
@@ -317,7 +228,6 @@ Reinitialize(bool force)
         opengl_vector_field.vector_field.Resize(particles->Size());
         for(int i=0;i<particles->Size();i++)opengl_vector_field.vector_field(i)=particles->V(i);}
 #endif
-    if(use_ids) Apply_Id_Selection();
 }
 //#####################################################################
 // Function Toggle_Draw_Point_Numbers
@@ -355,24 +265,14 @@ Command_Prompt_Response()
     if(!OPENGL_WORLD<T>::Singleton()->prompt_response.empty()){
         std::string command;
         std::istringstream sstream(OPENGL_WORLD<T>::Singleton()->prompt_response);
-        sstream >> command;
-        if(command == "s")
-        {
-            ARRAY<int> indices;
+        sstream>>command;
+        if(command=="s"){
             int index;
-            while(sstream >> index) indices.Append(index);
-            if(use_ids && Get_Particles_Id_Array(set))
-            {
-                Clear_Id_Selection();
-                Select_Particles_By_Ids(indices);
-            }
-            else 
-            {
+            if(sstream>>index){
+                if(ARRAY_VIEW<int>* ids=particles_multiple(set)->template Get_Array<int>(ATTRIBUTE_ID_ID))
+                    if(!ids->Find(index,index)) return;
                 opengl_points->Clear_Selection();
-                opengl_points->Select_Points(indices);
-            }
-        }
-    }
+                opengl_points->Select_Point(index);}}}
 }
 //#####################################################################
 // Function Command_Prompt
@@ -413,54 +313,6 @@ Toggle_Draw_Multiple_Particle_Sets()
     draw_multiple_particle_sets=!draw_multiple_particle_sets;
 }
 //#####################################################################
-// Function Select_Particle_By_Id
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_PARTICLES_2D<T>::
-Select_Particle_By_Id(int id, int particle_set)
-{
-    selected_ids(particle_set).Append(id);
-    Apply_Id_Selection();
-}
-//#####################################################################
-// Function Select_Particles_By_Ids
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_PARTICLES_2D<T>::
-Select_Particles_By_Ids(const ARRAY<int> &ids)
-{
-    // TODO: implement for multiple particle sets
-    for(int i=0;i<ids.m;i++) selected_ids(0).Append(ids(i));
-    Apply_Id_Selection();
-}
-//#####################################################################
-// Function Clear_Id_Selection
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_PARTICLES_2D<T>::
-Clear_Id_Selection()
-{
-    for(int i=0;i<selected_ids.m;i++) selected_ids(i).Remove_All();
-    Apply_Id_Selection();
-}
-//#####################################################################
-// Function Apply_Id_Selection
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_PARTICLES_2D<T>::
-Apply_Id_Selection()
-{
-    for(int current_set=0;current_set<number_of_sets;current_set++){
-        opengl_points_multiple(current_set)->Clear_Selection();
-        if(use_ids && valid && opengl_points_multiple(current_set)->points.m == particles_multiple(current_set)->Size())
-        {
-            ARRAY_VIEW<int>* ids=Get_Particles_Id_Array(current_set);
-            if(!ids) continue;
-            int idx=0;
-            for(int i=0;i<particles_multiple(current_set)->Size();i++){
-                int dummy;
-                if(selected_ids(current_set).Find((*ids)(i),dummy)) opengl_points_multiple(current_set)->Select_Point(idx);
-                idx++;}
-        }
-    }
-}
-//#####################################################################
 // Function Get_Particles_Id_Array
 //#####################################################################
 template<class T> ARRAY_VIEW<int>* OPENGL_COMPONENT_PARTICLES_2D<T>::
@@ -470,15 +322,6 @@ Get_Particles_Id_Array(int set_number) const
     ARRAY_VIEW<int>* ids=particles_multiple(set_number)->template Get_Array<int>(ATTRIBUTE_ID_ID);
     if(ids && ids->Size() && (*ids)(0)) return ids; // A hack to ignore ids if the first one equals zero
     return 0;
-}
-//#####################################################################
-// Selection object functions
-//#####################################################################
-template<class T>
-RANGE<VECTOR<T,3> > OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>::
-Bounding_Box() const
-{
-    return object->Selection_Bounding_Box((OPENGL_SELECTION<T>*)this);
 }
 //#####################################################################
 namespace PhysBAM{

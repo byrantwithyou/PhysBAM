@@ -38,7 +38,7 @@ public:
     bool Use_Bounding_Box() const override { return draw && valid; }
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 
-    void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_selection) const override;
+    void Print_Selection_Info(std::ostream& output_stream) const override;
     void Toggle_Smooth();
     void Toggle_Draw_Mode();
     void Toggle_Color_Map();

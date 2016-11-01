@@ -23,7 +23,6 @@ public:
 
     OPENGL_TEXTURED_RECT(STREAM_TYPE stream_type);
 
-    void Set_Texture(OPENGL_TEXTURE *texture_input);
     void Display() const override;
     RANGE<VECTOR<T,3> > Bounding_Box() const override;
 };

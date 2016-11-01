@@ -20,7 +20,10 @@ namespace PhysBAM{
 //#####################################################################
 template<class T,class T2> OPENGL_SCALAR_FIELD_2D<T,T2>::
 OPENGL_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,2> > &values_input,OPENGL_COLOR_MAP<T2>* color_map_input,DRAW_MODE draw_mode_input)
-    :OPENGL_OBJECT<T>(stream_type),grid(grid_input),values(values_input),active_cells(0),draw_ghost_values(true),current_color_map(0),opengl_textured_rect(0),opengl_points(0),scale_range(false)
+    :OPENGL_OBJECT<T>(stream_type),grid(grid_input),values(values_input),active_cells(0),
+    draw_ghost_values(true),current_color_map(0),opengl_textured_rect(0),opengl_points(0),
+    scale_range(false),selected_cell(-1,-1),selected_node(-1,-1),selected_point(-1)
+
 {
     viewer_callbacks.Set("toggle_draw_ghost_values",{[this](){Toggle_Draw_Ghost_Values();},"toggle_draw_ghost_values"});
     PHYSBAM_ASSERT(color_map_input);
@@ -32,7 +35,9 @@ OPENGL_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,ARRAY<T2,VEC
 //#####################################################################
 template<class T,class T2> OPENGL_SCALAR_FIELD_2D<T,T2>::
 OPENGL_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,2> > &values_input,OPENGL_COLOR_MAP<T2>* color_map_input,ARRAY<bool,VECTOR<int,2> >* active_cells_input,DRAW_MODE draw_mode_input)
-    :OPENGL_OBJECT<T>(stream_type),grid(grid_input),values(values_input),active_cells(active_cells_input),draw_ghost_values(true),current_color_map(0),opengl_textured_rect(0),opengl_points(0),scale_range(false)
+    :OPENGL_OBJECT<T>(stream_type),grid(grid_input),values(values_input),active_cells(active_cells_input),
+    draw_ghost_values(true),current_color_map(0),opengl_textured_rect(0),opengl_points(0),
+    scale_range(false),selected_cell(-1,-1),selected_node(-1,-1),selected_point(-1)
 {
     viewer_callbacks.Set("toggle_draw_ghost_values",{[this](){Toggle_Draw_Ghost_Values();},"toggle_draw_ghost_values"});
     PHYSBAM_ASSERT(color_map_input);
@@ -206,12 +211,12 @@ Display_2D() const
     for(int i=0;i<grid.counts.x;i++)
         for(int j=0;j<grid.counts.y;j++){
             OpenGL_Begin(GL_TRIANGLE_STRIP);
-            VECTOR<T,2> pos=grid.X(TV_INT(i,j));
+            TV pos=grid.X(TV_INT(i,j));
             OpenGL_Color(color_map->Lookup(Pre_Map_Value(values(i,j))).rgba);
-            OpenGL_Vertex(VECTOR<T,2>(pos.x-0.5*grid.dX.x,pos.y-0.5*grid.dX.y));
-            OpenGL_Vertex(VECTOR<T,2>(pos.x-0.5*grid.dX.x,pos.y+0.5*grid.dX.y));
-            OpenGL_Vertex(VECTOR<T,2>(pos.x+0.5*grid.dX.x,pos.y-0.5*grid.dX.y));
-            OpenGL_Vertex(VECTOR<T,2>(pos.x+0.5*grid.dX.x,pos.y+0.5*grid.dX.y));
+            OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y-0.5*grid.dX.y));
+            OpenGL_Vertex(TV(pos.x-0.5*grid.dX.x,pos.y+0.5*grid.dX.y));
+            OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y-0.5*grid.dX.y));
+            OpenGL_Vertex(TV(pos.x+0.5*grid.dX.x,pos.y+0.5*grid.dX.y));
             OpenGL_End();}
 
     glDisable(GL_DEPTH_TEST);
@@ -246,7 +251,7 @@ Set_Draw_Mode(DRAW_MODE draw_mode_input)
     if(draw_mode==DRAW_TEXTURE) {
         if(!opengl_textured_rect) opengl_textured_rect=new OPENGL_TEXTURED_RECT<T>(stream_type);
     } else if(draw_mode==DRAW_POINTS) {
-        if(!opengl_points) opengl_points=new OPENGL_POINTS_2D<T>(stream_type,*new ARRAY<VECTOR<T,2> >);
+        if(!opengl_points) opengl_points=new OPENGL_POINTS_2D<T>(stream_type,*new ARRAY<TV>);
     }
 
     Update();
@@ -266,37 +271,33 @@ Update()
 //#####################################################################
 // Function Print_Selection_Info_Helper
 //#####################################################################
-template<class T2,class T> static void
-Print_Selection_Info_Helper(std::ostream& output_stream,OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>* selection,const GRID<VECTOR<T,2> >& grid,ARRAY<T2,VECTOR<int,2> >& values)
+template<class T2,class TV> static void
+Print_Selection_Info_Helper(std::ostream& output_stream,const TV& location,const GRID<TV >& grid,ARRAY<T2,VECTOR<int,2> >& values)
 {
-    output_stream<<" @ particle = "<<LINEAR_INTERPOLATION_UNIFORM<VECTOR<T,2>,T2>().Clamped_To_Array(grid,values,selection->location);
+//    output_stream<<" @ particle = "<<LINEAR_INTERPOLATION_UNIFORM<TV,T2>().Clamped_To_Array(grid,values,location);
 }
 //#####################################################################
 // Function Print_Selection_Info_Helper
 //#####################################################################
 // no interpolation for bool's and int's
-template<class T> static void
-Print_Selection_Info_Helper(std::ostream& output_stream,OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>* selection,const GRID<VECTOR<T,2> >&,ARRAY<bool,VECTOR<int,2> >& values){}
+template<class TV> static void
+Print_Selection_Info_Helper(std::ostream& output_stream,const TV& location,const GRID<TV >&,ARRAY<bool,VECTOR<int,2> >& values){}
 //#####################################################################
 // Function Print_Selection_Info_Helper
 //#####################################################################
-template<class T> static void
-Print_Selection_Info_Helper(std::ostream& output_stream,OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>* selection,const GRID<VECTOR<T,2> >&,ARRAY<int,VECTOR<int,2> >& values){}
+template<class TV> static void
+Print_Selection_Info_Helper(std::ostream& output_stream,const TV& location,const GRID<TV >&,ARRAY<int,VECTOR<int,2> >& values){}
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_selection) const
+Print_Selection_Info(std::ostream& output_stream) const
 {
-    if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_CELL_2D && grid.Is_MAC_Grid()){
-        VECTOR<int,2> index=((OPENGL_SELECTION_GRID_CELL_2D<T>*)current_selection)->index;
-        if(values.Valid_Index(index)) output_stream<<values(index);}
-    if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_NODE_2D && !grid.Is_MAC_Grid()){
-        VECTOR<int,2> index=((OPENGL_SELECTION_GRID_NODE_2D<T>*)current_selection)->index;
-        if(values.Valid_Index(index))output_stream<<values(index);}
-    if(current_selection && current_selection->type==OPENGL_SELECTION<T>::COMPONENT_PARTICLES_2D){
-        OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T> *selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>*)current_selection;
-        Print_Selection_Info_Helper(output_stream,selection,grid,values);}
+    if(selected_cell.x>=0 && grid.Is_MAC_Grid() && values.Valid_Index(selected_cell)) output_stream<<values(selected_cell);
+    if(selected_node.x>=0 && !grid.Is_MAC_Grid() && values.Valid_Index(selected_node)) output_stream<<values(selected_node);
+//    if(current_selection && current_selection->type==OPENGL_SELECTION::COMPONENT_PARTICLES_2D){
+        // OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T> *selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>*)current_selection;
+        // Print_Selection_Info_Helper(output_stream,selection,grid,values);}
     output_stream<<std::endl;
 }
 //#####################################################################
@@ -315,11 +316,11 @@ Update_Texture(const VECTOR<int,2>& start_index,const VECTOR<int,2>& end_index)
     }
 
     // Handle values arrays which are not (1,m)(1,n)
-    VECTOR<T,2> half_dX=(T)0.5*grid.dX;
-    RANGE<VECTOR<T,2> > domain(grid.X(start_index)-half_dX,grid.X(end_index-VECTOR<int,2>::All_Ones_Vector())+half_dX);
+    TV half_dX=(T)0.5*grid.dX;
+    RANGE<TV > domain(grid.X(start_index)-half_dX,grid.X(end_index-VECTOR<int,2>::All_Ones_Vector())+half_dX);
 
     // Set underlying OPENGL_OBJECT's transformation
-    opengl_textured_rect->frame->t=Convert_2d_To_3d(domain.Center());
+    opengl_textured_rect->frame->t=VECTOR<T,3>(domain.Center());
 
     // Set OPENGL_TEXTURED_RECT's dimensions
     opengl_textured_rect->width = domain.Edge_Lengths().x;

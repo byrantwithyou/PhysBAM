@@ -76,6 +76,27 @@ inline void Draw_Circle(const VECTOR<T,2>& center,const double radius,const int 
     OpenGL_End();
 }
 
+// Three axis circles.
+template<class T>
+inline void Draw_Circle(const VECTOR<T,3>& center,const double radius,const int slices,const bool fill=true)
+{
+    OpenGL_Begin(fill?GL_TRIANGLE_STRIP:GL_LINE_LOOP);
+    for(int i=0;i<=slices;++i){
+        T t=2*(T)pi*i/slices;
+        OpenGL_Vertex(VECTOR<T,3>(cos(t),sin(t),0)*radius+center);}
+    OpenGL_End();
+    OpenGL_Begin(fill?GL_TRIANGLE_STRIP:GL_LINE_LOOP);
+    for(int i=0;i<=slices;++i){
+        T t=2*(T)pi*i/slices;
+        OpenGL_Vertex(VECTOR<T,3>(cos(t),0,sin(t))*radius+center);}
+    OpenGL_End();
+    OpenGL_Begin(fill?GL_TRIANGLE_STRIP:GL_LINE_LOOP);
+    for(int i=0;i<=slices;++i){
+        T t=2*(T)pi*i/slices;
+        OpenGL_Vertex(VECTOR<T,3>(0,cos(t),sin(t))*radius+center);}
+    OpenGL_End();
+}
+
 template<class T>
 inline void Draw_Box(VECTOR<T,3> corner,VECTOR<T,3> width,VECTOR<T,3> height,VECTOR<T,3> depth)
 {
@@ -142,6 +163,30 @@ inline void Draw_Arrow(const VECTOR<T,2>& startpt,const VECTOR<T,2>& endpt,
     VECTOR<T,2> direction=endpt-startpt,p=endpt-(cos_angle*arrowhead_size)*direction,dp=(sin_angle*arrowhead_size)*direction.Rotate_Clockwise_90();
     OpenGL_Line(p+dp,endpt);
     OpenGL_Line(p-dp,endpt);
+}
+
+//#####################################################################
+// Function Draw_Arrow
+//#####################################################################
+// Assumes OpenGL_Begin(GL_LINES) and attributes are already set
+// size is length of arrowhead as fraction of length of arrow line length
+// angle is measured from arrow line
+template<class T>
+inline void Draw_Arrow(const VECTOR<T,3>& startpt,const VECTOR<T,3>& endpt,
+    T arrowhead_size=OPENGL_PREFERENCES::arrowhead_size,
+    T sin_angle=sin(OPENGL_PREFERENCES::arrowhead_angle),T cos_angle=cos(OPENGL_PREFERENCES::arrowhead_angle))
+{
+    typedef VECTOR<T,3> TV;
+    OpenGL_Line(startpt,endpt);
+    TV direction=endpt-startpt,p=endpt-(cos_angle*arrowhead_size)*direction;
+    TV n0=direction.Unit_Orthogonal_Vector();
+    TV n1=direction.Cross(n0);
+    TV dp0=(sin_angle*arrowhead_size*direction.Magnitude())*n0;
+    TV dp1=(sin_angle*arrowhead_size)*n1;
+    OpenGL_Line(p+dp0,endpt);
+    OpenGL_Line(p-dp0,endpt);
+    OpenGL_Line(p+dp1,endpt);
+    OpenGL_Line(p-dp1,endpt);
 }
 }
 }

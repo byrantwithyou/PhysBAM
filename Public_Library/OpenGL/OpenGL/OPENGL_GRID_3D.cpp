@@ -12,7 +12,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> OPENGL_GRID_3D<T>::
 OPENGL_GRID_3D(STREAM_TYPE stream_type,GRID<TV> &grid_input,const OPENGL_COLOR &color_input) 
-    :OPENGL_OBJECT<T>(stream_type),current_selection(0),grid(grid_input),color(color_input),draw_ghost_values(true),hide_non_selected_grid(false),owns_grid(false),scale(1)
+    :OPENGL_OBJECT<T>(stream_type),selected_cell(-1,-1,-1),selected_node(-1,-1,-1),grid(grid_input),color(color_input),draw_ghost_values(true),hide_non_selected_grid(false),owns_grid(false),scale(1)
 {
     viewer_callbacks.Set("toggle_draw_ghost_values",{[this](){Toggle_Draw_Ghost_Values();},"toggle_draw_ghost_values"});
 }
@@ -61,7 +61,7 @@ Display() const
         if(mode==GL_SELECT)
         {
             // Currently only support node selection in this mode
-            glPushName(2);
+            glPushName(1);
             Draw_Nodes_For_Selection(node_start,node_end);
             glPopName();
         }
@@ -90,7 +90,7 @@ Display() const
 
             TV pos_start=grid.Node(TV_INT(i_start,j_start,k_start));
 
-            glPushName(1);
+            glPushName(0);
             for(i=i_start, x=pos_start.x; i<i_end; i++, x+=grid.dX.x)
             {
                 glPushName(i);
@@ -153,31 +153,24 @@ Display() const
         }
     }
 
-    if(current_selection)
+    if(selected_cell.x>=0)
     {
-        if(current_selection->type==OPENGL_SELECTION<T>::GRID_CELL_3D)
-        {
-            OPENGL_SELECTION_GRID_CELL_3D<T> *real_selection=(OPENGL_SELECTION_GRID_CELL_3D<T>*)current_selection;
-            TV min_corner=grid.Node(real_selection->index),max_corner=min_corner+grid.dX;
-            OPENGL_SELECTION<T>::Draw_Highlighted_Box(min_corner,max_corner);
-        }
-        else if(current_selection->type==OPENGL_SELECTION<T>::GRID_NODE_3D)
-        {
-            OPENGL_SELECTION_GRID_NODE_3D<T> *real_selection=(OPENGL_SELECTION_GRID_NODE_3D<T>*)current_selection;
-            OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(grid.Node(real_selection->index));
-        }
-        else if(current_selection->type==OPENGL_SELECTION<T>::GRID_CELL_LIST_3D)
-        {
-            OPENGL_SELECTION_GRID_CELL_LIST_3D<T> *real_selection=(OPENGL_SELECTION_GRID_CELL_LIST_3D<T>*)current_selection;
-            for(int i=0;i<real_selection->indicies.m;i++){
-                TV min_corner=grid.Node(real_selection->indicies(i)),max_corner=min_corner+grid.dX;
-                OPENGL_SELECTION<T>::Draw_Highlighted_Box(min_corner,max_corner);}
-        }
-        else if(current_selection->type==OPENGL_SELECTION<T>::GRID_NODE_LIST_3D)
-        {
-            OPENGL_SELECTION_GRID_NODE_LIST_3D<T> *real_selection=(OPENGL_SELECTION_GRID_NODE_LIST_3D<T>*)current_selection;
-            for(int i=0;i<real_selection->indicies.m;i++) OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(grid.Node(real_selection->indicies(i)));
-        }
+        TV min_corner=grid.Node(selected_cell),max_corner=min_corner+grid.dX;
+        OPENGL_SELECTION::Draw_Highlighted_Box(min_corner,max_corner);
+    }
+    else if(selected_node.x>=0)
+    {
+        OPENGL_SELECTION::Draw_Highlighted_Vertex(grid.Node(selected_node));
+    }
+    else if(selected_cell_list.m)
+    {
+        for(int i=0;i<selected_cell_list.m;i++){
+            TV min_corner=grid.Node(selected_cell_list(i)),max_corner=min_corner+grid.dX;
+            OPENGL_SELECTION::Draw_Highlighted_Box(min_corner,max_corner);}
+    }
+    else if(selected_node_list.m)
+    {
+        for(int i=0;i<selected_node_list.m;i++) OPENGL_SELECTION::Draw_Highlighted_Vertex(grid.Node(selected_node_list(i)));
     }
 
     glPopAttrib();
@@ -257,126 +250,85 @@ Bounding_Box() const
     return World_Space_Box(grid.domain);
 }
 //#####################################################################
-// Function Get_Selection
+// Function Get_Selection_Priority
 //#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_GRID_3D<T>::
-Get_Selection(GLuint *buffer,int buffer_size)
+template<class T> int OPENGL_GRID_3D<T>::
+Get_Selection_Priority(ARRAY_VIEW<GLuint> indices)
 {
-    OPENGL_SELECTION<T>* selection=0;
-    if(buffer_size==4)
-    {
-        if(buffer[0]==1)
-            selection=new OPENGL_SELECTION_GRID_CELL_3D<T>(this,VECTOR<int,3>(buffer[1],buffer[2],buffer[3]));
-        else if(buffer[0]==2)
-            selection=new OPENGL_SELECTION_GRID_NODE_3D<T>(this,VECTOR<int,3>(buffer[1],buffer[2],buffer[3]));
-    } 
-    if(buffer_size%3==1)
-    {
-        ARRAY<VECTOR<int,3> > indicies;
-        for(int i=0;i<buffer_size/3;i++) indicies.Append(VECTOR<int,3>(buffer[3*i+1],buffer[3*i+2],buffer[3*i+3]));
-        if(buffer[0]==3) selection=new OPENGL_SELECTION_GRID_CELL_LIST_3D<T>(this,indicies);
-        if(buffer[0]==4) selection=new OPENGL_SELECTION_GRID_NODE_LIST_3D<T>(this,indicies);
-    }
-
-    return selection;
+    if(!indices.m) return -1;
+    const static int priority[]={60,70,60,70};
+    return priority[indices(0)];
 }
 //#####################################################################
-// Function Highlight_Selection
+// Function Get_Selection
 //#####################################################################
-template<class T> void OPENGL_GRID_3D<T>::
-Highlight_Selection(OPENGL_SELECTION<T>* selection)
+template<class T> bool OPENGL_GRID_3D<T>::
+Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers)
 {
-    delete current_selection; current_selection=0;
-    if(selection->type==OPENGL_SELECTION<T>::GRID_CELL_3D)
+    if(indices.m==4)
     {
-        OPENGL_SELECTION_GRID_CELL_3D<T> *real_selection=(OPENGL_SELECTION_GRID_CELL_3D<T>*)selection;
-        current_selection=new OPENGL_SELECTION_GRID_CELL_3D<T>(this,real_selection->index);
-    }
-    else if(selection->type==OPENGL_SELECTION<T>::GRID_NODE_3D)
+        if(indices(0)==0) selected_cell=TV_INT(indices(1),indices(2),indices(3));
+        else if(indices(0)==1) selected_node=TV_INT(indices(1),indices(2),indices(3));
+        else return false;
+        return true;
+    } 
+    else if(indices.m%3==1)
     {
-        OPENGL_SELECTION_GRID_NODE_3D<T> *real_selection=(OPENGL_SELECTION_GRID_NODE_3D<T>*)selection;
-        current_selection=new OPENGL_SELECTION_GRID_NODE_3D<T>(this,real_selection->index);
+        if(indices(0)==2)
+        {
+            selected_cell_list.Resize(indices.m/3);
+            for(int i=0;i<selected_cell_list.m;i++)
+                selected_cell_list(i)=TV_INT(indices(3*i+1),indices(3*i+2),indices(3*i+3));
+        }
+        else if(indices(0)==3)
+        {
+            selected_node_list.Resize(indices.m/3);
+            for(int i=0;i<selected_node_list.m;i++)
+                selected_node_list(i)=TV_INT(indices(3*i+1),indices(3*i+2),indices(3*i+3));
+        }
+        else return false;
+        return true;
     }
-    else if(selection->type==OPENGL_SELECTION<T>::GRID_CELL_LIST_3D)
-    {
-        OPENGL_SELECTION_GRID_CELL_LIST_3D<T> *real_selection=(OPENGL_SELECTION_GRID_CELL_LIST_3D<T>*)selection;
-        current_selection=new OPENGL_SELECTION_GRID_CELL_LIST_3D<T>(this,real_selection->indicies);
-    }
-    else if(selection->type==OPENGL_SELECTION<T>::GRID_NODE_LIST_3D)
-    {
-        OPENGL_SELECTION_GRID_NODE_LIST_3D<T> *real_selection=(OPENGL_SELECTION_GRID_NODE_LIST_3D<T>*)selection;
-        current_selection=new OPENGL_SELECTION_GRID_NODE_LIST_3D<T>(this,real_selection->indicies);
-    }
+    return false;
 }
 //#####################################################################
 // Function Clear_Highlight
 //#####################################################################
 template<class T> void OPENGL_GRID_3D<T>::
-Clear_Highlight()
+Clear_Selection()
 {
-    delete current_selection; current_selection=0;
+    selected_cell.Fill(-1);
+    selected_node.Fill(-1);
+    selected_cell_list.Remove_All();
+    selected_node_list.Remove_All();
 }
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_GRID_CELL_3D<T>::
-Bounding_Box() const
+template<class T> RANGE<VECTOR<T,3> > OPENGL_GRID_3D<T>::
+Selection_Bounding_Box() const
 {
-    PHYSBAM_ASSERT(object);
-    const GRID<TV> &grid=((OPENGL_GRID_3D<T> *)object)->grid;
-    TV min_corner=grid.Node(index),max_corner=min_corner+grid.dX;
-    return object->World_Space_Box(RANGE<TV>(min_corner,max_corner));
-}
-//#####################################################################
-// Function Bounding_Box
-//#####################################################################
-template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_GRID_NODE_3D<T>::
-Bounding_Box() const
-{
-    PHYSBAM_ASSERT(object);
-    const GRID<TV> &grid=((OPENGL_GRID_3D<T> *)object)->grid;
-    RANGE<TV> box(grid.Node(index));
-    return object->World_Space_Box(box);
-}
-//#####################################################################
-// Function Bounding_Box
-//#####################################################################
-template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_GRID_CELL_LIST_3D<T>::
-Bounding_Box() const
-{
-    PHYSBAM_ASSERT(object);
-    const GRID<TV> &grid=((OPENGL_GRID_3D<T> *)object)->grid;
-    TV min_corner=grid.Node(indicies(0)),max_corner=min_corner+grid.dX;
-    for(int i=1;i<indicies.m;i++){
-        min_corner=TV::Componentwise_Min(min_corner,grid.Node(indicies(i)));
-        max_corner=TV::Componentwise_Max(max_corner,grid.Node(indicies(i))+grid.dX);}
-    return object->World_Space_Box(RANGE<TV>(min_corner,max_corner));
+    if(selected_cell.x>=0)
+        return World_Space_Box(grid.Cell_Domain(selected_cell));
+    if(selected_node.x>=0)
+        return World_Space_Box(RANGE<TV>(grid.Node(selected_node)));
+    RANGE<TV> range;
+    for(int i=0;i<selected_cell_list.m;i++)
+        range=range.Unite(grid.Cell_Domain(selected_cell_list(i)));
+    for(int i=0;i<selected_node_list.m;i++)
+        range.Enlarge_To_Include_Point(grid.Node(selected_node_list(i)));
+    return World_Space_Box(range);
 }
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_GRID_3D<T>::
-Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const
+Print_Selection_Info(std::ostream& stream) const
 {
-    if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_NODE_3D){
-        VECTOR<int,3> index=((OPENGL_SELECTION_GRID_NODE_3D<T>*)current_selection)->index;
-        stream<<"Selected node "<<index<<" ("<<grid.Get_Regular_Grid().X(index)<<")"<<std::endl;}
-    else if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_CELL_3D){
-        VECTOR<int,3> index=((OPENGL_SELECTION_GRID_CELL_3D<T>*)current_selection)->index;
-        stream<<"Selected cell "<<index<<" ("<<grid.Get_MAC_Grid().X(index)<<")"<<std::endl;}
-}
-//#####################################################################
-// Function Bounding_Box
-//#####################################################################
-template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_GRID_NODE_LIST_3D<T>::
-Bounding_Box() const
-{
-    PHYSBAM_ASSERT(object);
-    const GRID<TV> &grid=((OPENGL_GRID_3D<T> *)object)->grid;
-    RANGE<TV> box(grid.Node(indicies(0)));
-    for(int i=1;i<indicies.m;i++)
-        box.Enlarge_To_Include_Point(grid.Node(indicies(i)));
-    return object->World_Space_Box(box);
+    if(selected_node.x>=0)
+        stream<<"Selected node "<<selected_node<<" ("<<grid.Get_Regular_Grid().X(selected_node)<<")"<<std::endl;
+    else if(selected_cell.x>=0)
+        stream<<"Selected cell "<<selected_cell<<" ("<<grid.Get_MAC_Grid().X(selected_cell)<<")"<<std::endl;
 }
 //#####################################################################
 // Function Bounding_Box

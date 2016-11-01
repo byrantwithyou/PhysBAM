@@ -16,7 +16,7 @@ namespace PhysBAM{
 template<class T>
 class OPENGL_COMPONENT_LEVELSET_3D:public OPENGL_COMPONENT<T>
 {
-    typedef VECTOR<T,3> TV;
+    typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
     using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
@@ -39,8 +39,8 @@ public:
     bool Valid_Frame(int frame_input) const override;
 
     void Display() const override;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
-    void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_selection) const override;
+    virtual RANGE<TV> Bounding_Box() const override;
+    void Print_Selection_Info(std::ostream& output_stream) const override;
     void Turn_Smooth_Shading_On() override;
     void Turn_Smooth_Shading_Off() override;
     virtual void Slice_Has_Changed() override;
@@ -78,6 +78,8 @@ private:
     bool draw_multiple_levelsets;
 public:
     int ghost_cells;
+    TV_INT selected_cell;
+    TV_INT selected_node;
 };
 
 }

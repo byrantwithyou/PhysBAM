@@ -17,6 +17,7 @@ template<class T>
 class OPENGL_VECTOR_FIELD_3D:public OPENGL_OBJECT<T>
 {
 public:
+    typedef VECTOR<T,3> TV;
     using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::World_Space_Point;
     ARRAY<VECTOR<T,3> >& vector_field;
     ARRAY<VECTOR<T,3> >& vector_locations;
@@ -35,7 +36,7 @@ public:
     virtual ~OPENGL_VECTOR_FIELD_3D();
 
 //#####################################################################
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    virtual RANGE<TV> Bounding_Box() const override;
     void Display() const override;
     void Scale_Vector_Size(const T scale);
     void Toggle_Arrowhead_Mode();

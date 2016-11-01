@@ -29,7 +29,10 @@ OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D(STREAM_TYPE stream_type,const std
     real_selection(0),has_tetrahedralized_volumes(false),has_hexahedralized_volumes(false),
     velocity_field(stream_type,velocity_vectors,positions,OPENGL_COLOR::Cyan(),.25,false,false),
     color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map()),
-    has_embedded_objects(false),has_soft_bindings(false)
+    has_embedded_objects(false),has_soft_bindings(false),
+    selected_segmented_curve(-1),selected_triangulated_surface(-1),selected_tetrahedralized_volume(-1),
+    selected_embedded_surface(-1),selected_boundary_surface(-1),selected_free_particles(-1),
+    selected_b_spline_patch(-1),selected_hard_bound_boundary_surface(-1),selected_hexahedralized_volume(-1),selected_index(-1),selected_object(0)
 {
     viewer_callbacks.Set("toggle_active_value",{[this](){Toggle_Active_Value();},"Toggle viewing of elements"});
     viewer_callbacks.Set("toggle_draw_interior",{[this](){Toggle_Draw_Interior();},"Toggle view of interior elements for tetraheralized volumes"});
@@ -137,7 +140,8 @@ Reinitialize(bool force,bool read_geometry)
     if(FILE_UTILITIES::File_Exists(frame_string+"/interaction_pairs") && interaction_pair_display_mode)
         FILE_UTILITIES::Read_From_File(stream_type,frame_string+"/interaction_pairs",point_triangle_interaction_pairs,edge_edge_interaction_pairs);
     else{
-        point_triangle_interaction_pairs.Remove_All();edge_edge_interaction_pairs.Remove_All();}
+        point_triangle_interaction_pairs.Remove_All();
+        edge_edge_interaction_pairs.Remove_All();}
     
     std::string filename=frame_string+"/deformable_object_force_data";
     if(FILE_UTILITIES::File_Exists(filename)){
@@ -146,17 +150,28 @@ Reinitialize(bool force,bool read_geometry)
     else force_data_list.Remove_All();
 
     if(read_static_variables){
-        int m=deformable_body_collection.structures.m;active_list.Resize(m,true,true,true);
-        segmented_curve_objects.Delete_Pointers_And_Clean_Memory();segmented_curve_objects.Resize(m);
-        triangulated_surface_objects.Delete_Pointers_And_Clean_Memory();triangulated_surface_objects.Resize(m);
-        tetrahedralized_volume_objects.Delete_Pointers_And_Clean_Memory();tetrahedralized_volume_objects.Resize(m);
-        hexahedralized_volume_objects.Delete_Pointers_And_Clean_Memory();hexahedralized_volume_objects.Resize(m);
-        b_spline_patch_objects.Delete_Pointers_And_Clean_Memory();b_spline_patch_objects.Resize(m);
-        free_particles_objects.Delete_Pointers_And_Clean_Memory();free_particles_objects.Resize(m);
-        free_particles_indirect_arrays.Delete_Pointers_And_Clean_Memory();free_particles_indirect_arrays.Resize(m);
-        embedded_surface_objects.Delete_Pointers_And_Clean_Memory();embedded_surface_objects.Resize(m);
-        boundary_surface_objects.Delete_Pointers_And_Clean_Memory();boundary_surface_objects.Resize(m);
-        hard_bound_boundary_surface_objects.Delete_Pointers_And_Clean_Memory();hard_bound_boundary_surface_objects.Resize(m);
+        int m=deformable_body_collection.structures.m;
+        active_list.Resize(m,true,true,true);
+        segmented_curve_objects.Delete_Pointers_And_Clean_Memory();
+        segmented_curve_objects.Resize(m);
+        triangulated_surface_objects.Delete_Pointers_And_Clean_Memory();
+        triangulated_surface_objects.Resize(m);
+        tetrahedralized_volume_objects.Delete_Pointers_And_Clean_Memory();
+        tetrahedralized_volume_objects.Resize(m);
+        hexahedralized_volume_objects.Delete_Pointers_And_Clean_Memory();
+        hexahedralized_volume_objects.Resize(m);
+        b_spline_patch_objects.Delete_Pointers_And_Clean_Memory();
+        b_spline_patch_objects.Resize(m);
+        free_particles_objects.Delete_Pointers_And_Clean_Memory();
+        free_particles_objects.Resize(m);
+        free_particles_indirect_arrays.Delete_Pointers_And_Clean_Memory();
+        free_particles_indirect_arrays.Resize(m);
+        embedded_surface_objects.Delete_Pointers_And_Clean_Memory();
+        embedded_surface_objects.Resize(m);
+        boundary_surface_objects.Delete_Pointers_And_Clean_Memory();
+        boundary_surface_objects.Resize(m);
+        hard_bound_boundary_surface_objects.Delete_Pointers_And_Clean_Memory();
+        hard_bound_boundary_surface_objects.Resize(m);
         int color_map_index=15;
         for(int i=0;i<m;i++){
             STRUCTURE<TV>* structure=deformable_body_collection.structures(i);
@@ -170,8 +185,10 @@ Reinitialize(bool force,bool read_geometry)
                 else LOG::cout<<"object "<<i<<": triangulated surface, empty\n";
                 triangulated_surface->mesh.Initialize_Segment_Mesh();
                 ARRAY<OPENGL_COLOR> front_colors,back_colors;
-                front_colors.Append(OPENGL_COLOR::Yellow());back_colors.Append(OPENGL_COLOR::Magenta());
-                front_colors.Append(OPENGL_COLOR::Green());back_colors.Append(OPENGL_COLOR::Cyan());
+                front_colors.Append(OPENGL_COLOR::Yellow());
+                back_colors.Append(OPENGL_COLOR::Magenta());
+                front_colors.Append(OPENGL_COLOR::Green());
+                back_colors.Append(OPENGL_COLOR::Cyan());
                 triangulated_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(stream_type,*triangulated_surface,false,
                     OPENGL_MATERIAL::Metal(front_colors(i%front_colors.Size())),OPENGL_MATERIAL::Metal(back_colors(i%back_colors.Size())));}
             else if(TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(structure)){
@@ -187,8 +204,10 @@ Reinitialize(bool force,bool read_geometry)
             else if(B_SPLINE_PATCH<TV,3>* b_spline_patch=dynamic_cast<B_SPLINE_PATCH<TV,3>*>(structure)){
                 if(first_time) LOG::cout<<"object "<<i<<": b-spline surface\n";
                 ARRAY<OPENGL_COLOR> front_colors,back_colors;
-                front_colors.Append(OPENGL_COLOR::Blue());back_colors.Append(OPENGL_COLOR::Yellow());
-                front_colors.Append(OPENGL_COLOR::Red());back_colors.Append(OPENGL_COLOR::Cyan());
+                front_colors.Append(OPENGL_COLOR::Blue());
+                back_colors.Append(OPENGL_COLOR::Yellow());
+                front_colors.Append(OPENGL_COLOR::Red());
+                back_colors.Append(OPENGL_COLOR::Cyan());
                 b_spline_patch_objects(i)=new OPENGL_B_SPLINE_PATCH<T>(stream_type,*b_spline_patch,
                     OPENGL_MATERIAL::Metal(front_colors(i%front_colors.Size())),OPENGL_MATERIAL::Metal(back_colors(i%back_colors.Size())));}
             else if(FREE_PARTICLES<TV>* fp=dynamic_cast<FREE_PARTICLES<TV>*>(structure)){
@@ -246,8 +265,8 @@ Reinitialize(bool force,bool read_geometry)
         for(int i=0;i<boundary_surface_objects.m;i++) if(boundary_surface_objects(i))boundary_surface_objects(i)->Initialize_Vertex_Normals();
         for(int i=0;i<embedded_surface_objects.m;i++) if(embedded_surface_objects(i))embedded_surface_objects(i)->Initialize_Vertex_Normals();}
     for(int i=0;i<free_particles_indirect_arrays.m;i++) if(free_particles_indirect_arrays(i)){
-        ARRAY_VIEW<TV> tmp(deformable_body_collection.particles.X);
-        free_particles_indirect_arrays(i)->array.Exchange(tmp);}
+            ARRAY_VIEW<TV> tmp(deformable_body_collection.particles.X);
+            free_particles_indirect_arrays(i)->array.Exchange(tmp);}
 
     Update_Velocity_Field();
     frame_loaded=frame;
@@ -270,7 +289,8 @@ Valid_Frame(int frame_input) const
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Set_Frame(int frame_input)
 {
-    OPENGL_COMPONENT<T>::Set_Frame(frame_input);Reinitialize();
+    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
+    Reinitialize();
 }
 //#####################################################################
 // Function Set_Draw
@@ -296,8 +316,8 @@ Draw_All_Objects()
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Set_Display_Modes(bool& display_triangulated_surface_objects,bool& display_tetrahedralized_volume_objects,
-        bool& display_hexahedralized_volume_objects,bool& display_free_particles_objects,bool& display_boundary_surface_objects,
-        bool& display_hard_bound_boundary_surface_objects) const
+    bool& display_hexahedralized_volume_objects,bool& display_free_particles_objects,bool& display_boundary_surface_objects,
+    bool& display_hard_bound_boundary_surface_objects) const
 {
     display_triangulated_surface_objects=display_mode!=1;
     display_tetrahedralized_volume_objects=display_mode!=2;
@@ -332,35 +352,74 @@ Display() const
         slice->Enable_Clip_Planes();}
 
     bool display_triangulated_surface_objects,display_tetrahedralized_volume_objects,display_hexahedralized_volume_objects,
-         display_boundary_surface_objects,display_hard_bound_boundary_surface_objects,display_free_particles_objects;
+        display_boundary_surface_objects,display_hard_bound_boundary_surface_objects,display_free_particles_objects;
     bool display_b_spline_patch_objects=true;
     Set_Display_Modes(display_triangulated_surface_objects,display_tetrahedralized_volume_objects,
-            display_hexahedralized_volume_objects,display_boundary_surface_objects,display_hard_bound_boundary_surface_objects,display_free_particles_objects);
+        display_hexahedralized_volume_objects,display_boundary_surface_objects,display_hard_bound_boundary_surface_objects,display_free_particles_objects);
 
+    glPushName(0);
+    glPushName(0);
     for(int i=0;i<segmented_curve_objects.m;i++){
         if(!active_list(i)) continue;
-        glPushName(i);
         if(segmented_curve_objects(i)){
-            glPushName(1);
-            segmented_curve_objects(i)->hide_unselected=hide_unselected;
-            if(real_selection) segmented_curve_objects(i)->parent_curve=dynamic_cast<OPENGL_SEGMENTED_CURVE_3D<T>*>(real_selection->subobject);
-            else segmented_curve_objects(i)->parent_curve=0;
-            segmented_curve_objects(i)->Display();
-            glPopName();}
-        if(triangulated_surface_objects(i) && display_triangulated_surface_objects){
-            glPushName(2);triangulated_surface_objects(i)->Display();glPopName();}
-        if(tetrahedralized_volume_objects(i) && display_tetrahedralized_volume_objects){
-            glPushName(3);tetrahedralized_volume_objects(i)->Display();glPopName();}
-        if(hexahedralized_volume_objects(i) && display_hexahedralized_volume_objects){
-            glPushName(3);hexahedralized_volume_objects(i)->Display();glPopName();}
-        if(free_particles_objects(i) && display_free_particles_objects){glPushName(6);free_particles_objects(i)->Display();glPopName();}
-        if(b_spline_patch_objects(i) && display_b_spline_patch_objects){glPushName(7);b_spline_patch_objects(i)->Display();glPopName();}
-        glPopName();}
+            glLoadName(i);
+            segmented_curve_objects(i)->Display();}}
+    glPopName();
+    glPopName();
 
+    glPushName(1);
+    glPushName(0);
+    for(int i=0;i<triangulated_surface_objects.m;i++){
+        if(!active_list(i)) continue;
+        if(triangulated_surface_objects(i) && display_triangulated_surface_objects){
+            glLoadName(i);
+            triangulated_surface_objects(i)->Display();}}
+    glPopName();
+    glPopName();
+
+    glPushName(2);
+    glPushName(0);
+    for(int i=0;i<tetrahedralized_volume_objects.m;i++){
+        if(!active_list(i)) continue;
+        if(tetrahedralized_volume_objects(i) && display_tetrahedralized_volume_objects){
+            glLoadName(i);
+            tetrahedralized_volume_objects(i)->Display();}}
+    glPopName();
+    glPopName();
+
+    glPushName(8);
+    glPushName(0);
+    for(int i=0;i<hexahedralized_volume_objects.m;i++){
+        if(!active_list(i)) continue;
+        if(hexahedralized_volume_objects(i) && display_hexahedralized_volume_objects){
+            glLoadName(i);
+            hexahedralized_volume_objects(i)->Display();}}
+    glPopName();
+    glPopName();
+
+    glPushName(5);
+    glPushName(0);
+    for(int i=0;i<segmented_curve_objects.m;i++){
+        if(!active_list(i)) continue;
+        if(free_particles_objects(i) && display_free_particles_objects){
+            glLoadName(i);
+            free_particles_objects(i)->Display();}}
+    glPopName();
+    glPopName();
+
+    glPushName(6);
+    glPushName(0);
+    for(int i=0;i<b_spline_patch_objects.m;i++){
+        if(!active_list(i)) continue;
+        if(b_spline_patch_objects(i) && display_b_spline_patch_objects){
+            glLoadName(i);
+            b_spline_patch_objects(i)->Display();}}
+    glPopName();
+    glPopName();
 
     if(slice && slice->Is_Slice_Mode()) glPopAttrib();
 
-    if(selected_vertex>=0) OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(deformable_body_collection.particles.X(selected_vertex),selected_vertex);
+    if(selected_vertex>=0) OPENGL_SELECTION::Draw_Highlighted_Vertex(deformable_body_collection.particles.X(selected_vertex),selected_vertex);
 
     if(slice && slice->Is_Slice_Mode()){
         glPushAttrib(GL_ENABLE_BIT);
@@ -385,16 +444,28 @@ Display() const
         OpenGL_End();
         glPopAttrib();}
 
+    glPushName(4);
+    glPushName(0);
     for(int i=0;i<boundary_surface_objects.m;i++){
         if(!active_list(i)) continue;
-        glPushName(i);
-        //if(embedded_surface_objects(i) && display_mode==3){glPushName(3);embedded_surface_objects(i)->Display();glPopName();}
         if(boundary_surface_objects(i) && display_boundary_surface_objects){
-          boundary_surface_objects(i)->wireframe_only=(display_mode==3);glPushName(5);boundary_surface_objects(i)->Display();glPopName();}
-        if(hard_bound_boundary_surface_objects(i) && display_hard_bound_boundary_surface_objects){
-            hard_bound_boundary_surface_objects(i)->wireframe_only=(display_mode==3);glPushName(5);hard_bound_boundary_surface_objects(i)->Display();glPopName();}
-        glPopName();}
+            glLoadName(i);
+            boundary_surface_objects(i)->wireframe_only=(display_mode==3);
+            boundary_surface_objects(i)->Display();}}
+    glPopName();
+    glPopName();
 
+    glPushName(7);
+    glPushName(0);
+    for(int i=0;i<hard_bound_boundary_surface_objects.m;i++){
+        if(!active_list(i)) continue;
+        if(hard_bound_boundary_surface_objects(i) && display_hard_bound_boundary_surface_objects){
+            glLoadName(i);
+            hard_bound_boundary_surface_objects(i)->wireframe_only=(display_mode==3);
+            hard_bound_boundary_surface_objects(i)->Display();}}
+    glPopName();
+    glPopName();
+    
     if(interaction_pair_display_mode){
         glPushAttrib(GL_ENABLE_BIT|GL_CURRENT_BIT);
         glEnable(GL_BLEND);
@@ -409,7 +480,9 @@ Display() const
                 glColor3f(.5f,1,.5f);
                 OpenGL_Line(X(0),PLANE<T>(X(1),X(2),X(3)).Surface(X(0)));
                 glColor3f(0,1,1);
-                OpenGL_Line(X(0),X(1));OpenGL_Line(X(0),X(2));OpenGL_Line(X(0),X(3));}
+                OpenGL_Line(X(0),X(1));
+                OpenGL_Line(X(0),X(2));
+                OpenGL_Line(X(0),X(3));}
             OpenGL_End();
             OpenGL_Begin(GL_TRIANGLES);
             for(int k=0;k<point_triangle_interaction_pairs.Size();k++){
@@ -428,11 +501,13 @@ Display() const
                 const REPULSION_PAIR<TV>& pair=edge_edge_interaction_pairs(k);
                 INDIRECT_ARRAY<const ARRAY_VIEW<TV>,VECTOR<int,4>&> X(deformable_body_collection.particles.X,pair.nodes);
                 glColor3f(1,1,0);
-                VECTOR<T,2> weights;SEGMENT_3D<T>(X(0),X(1)).Shortest_Vector_Between_Segments(SEGMENT_3D<T>(X(2),X(3)),weights);
+                VECTOR<T,2> weights;
+                SEGMENT_3D<T>(X(0),X(1)).Shortest_Vector_Between_Segments(SEGMENT_3D<T>(X(2),X(3)),weights);
                 OpenGL_Line((1-weights.x)*X(0)+weights.x*X(1),(1-weights.y)*X(2)+weights.y*X(3));
                 //OpenGL_Line(X(0),X(2));OpenGL_Line(X(0),X(3));OpenGL_Line(X(1),X(2));OpenGL_Line(X(1),X(3));
                 glColor3f(1,.5,0);
-                OpenGL_Line(X(0),X(1));OpenGL_Line(X(2),X(3));}
+                OpenGL_Line(X(0),X(1));
+                OpenGL_Line(X(2),X(3));}
             OpenGL_End();}
         glPopAttrib();}
 
@@ -449,7 +524,8 @@ Display() const
             else if(display_forces_mode==2 && force_data.name!="LINEAR_ALTITUDE_SPRINGS_3D") continue;
             else if(display_forces_mode==3 && force_data.name!="SCALED_SOLIDS_FORCES") continue;
 
-            OPENGL_COLOR force_color=color_map_forces->Lookup(force_data.state);force_color.Send_To_GL_Pipeline();
+            OPENGL_COLOR force_color=color_map_forces->Lookup(force_data.state);
+            force_color.Send_To_GL_Pipeline();
             OpenGL_Line(force_data.first_action_point,force_data.second_action_point);}
         OpenGL_End();
         glPopAttrib();}
@@ -504,7 +580,8 @@ Increase_Cutaway_Fraction()
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Create_One_Big_Triangulated_Surface_And_Write_To_File()
 {
-    GEOMETRY_PARTICLES<VECTOR<T,3> >& particles=deformable_body_collection.particles;TRIANGLE_MESH mesh;
+    GEOMETRY_PARTICLES<VECTOR<T,3> >& particles=deformable_body_collection.particles;
+    TRIANGLE_MESH mesh;
     TRIANGULATED_SURFACE<T> triangulated_surface(mesh,particles);
     for(int index=0;index<deformable_body_collection.structures.m;index++){
         LOG::cout<<"Adding "<<index<<"th triangulated surface out of "<<deformable_body_collection.structures.m<<" surfaces"<<std::endl;
@@ -571,8 +648,12 @@ Toggle_Hide_Unselected()
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Toggle_Draw_Interior()
 {
-    for(int i=0;i<tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i) && active_list(i)) tetrahedralized_volume_objects(i)->Toggle_Boundary_Only();
-    for(int i=0;i<hexahedralized_volume_objects.m;i++) if(hexahedralized_volume_objects(i) && active_list(i)) hexahedralized_volume_objects(i)->Toggle_Boundary_Only();
+    for(int i=0;i<tetrahedralized_volume_objects.m;i++)
+        if(tetrahedralized_volume_objects(i) && active_list(i))
+            tetrahedralized_volume_objects(i)->Toggle_Boundary_Only();
+    for(int i=0;i<hexahedralized_volume_objects.m;i++)
+        if(hexahedralized_volume_objects(i) && active_list(i))
+            hexahedralized_volume_objects(i)->Toggle_Boundary_Only();
 }
 //#####################################################################
 // Function Toggle_Draw_Subsets
@@ -580,10 +661,12 @@ Toggle_Draw_Interior()
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Toggle_Draw_Subsets()
 {
-    for(int i=0;i<tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i) && active_list(i))
-        tetrahedralized_volume_objects(i)->draw_subsets=!tetrahedralized_volume_objects(i)->draw_subsets;
-    for(int i=0;i<hexahedralized_volume_objects.m;i++) if(hexahedralized_volume_objects(i) && active_list(i))
-        hexahedralized_volume_objects(i)->draw_subsets=!hexahedralized_volume_objects(i)->draw_subsets;
+    for(int i=0;i<tetrahedralized_volume_objects.m;i++)
+        if(tetrahedralized_volume_objects(i) && active_list(i))
+            tetrahedralized_volume_objects(i)->draw_subsets=!tetrahedralized_volume_objects(i)->draw_subsets;
+    for(int i=0;i<hexahedralized_volume_objects.m;i++)
+        if(hexahedralized_volume_objects(i) && active_list(i))
+            hexahedralized_volume_objects(i)->draw_subsets=!hexahedralized_volume_objects(i)->draw_subsets;
 }
 //#####################################################################
 // Function Toggle_Use_Active_List
@@ -592,8 +675,11 @@ template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Toggle_Use_Active_List()
 {
     if(active_list.m<1) return;
-    use_active_list=!use_active_list;if(!use_active_list) active_list.Fill(true);
-    else{active_list.Fill(false);incremented_active_object=1;active_list(incremented_active_object)=true;}
+    use_active_list=!use_active_list;
+    if(!use_active_list) active_list.Fill(true);
+    else{active_list.Fill(false);
+        incremented_active_object=1;
+        active_list(incremented_active_object)=true;}
     Update_Velocity_Field();
 }
 //#####################################################################
@@ -602,18 +688,10 @@ Toggle_Use_Active_List()
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Toggle_Selection_Mode()
 {
-    if(!real_selection) return;
-    assert(real_selection->body_selection);
-    if(real_selection->body_selection->type == OPENGL_SELECTION<T>::SEGMENTED_CURVE_3D){
-        delete real_selection->body_selection;
-        real_selection->body_selection=real_selection->saved_selection;}
-    else if(real_selection->body_selection->type == OPENGL_SELECTION<T>::SEGMENTED_CURVE_SEGMENT_3D){
-        real_selection->saved_selection=real_selection->body_selection;
-        real_selection->body_selection=((OPENGL_SEGMENTED_CURVE_3D<T>*)real_selection->subobject)->Get_Curve_Selection(
-                ((OPENGL_SELECTION_SEGMENTED_CURVE_3D<T>*)real_selection->body_selection)->index);}
-    else return;
-    Highlight_Selection(real_selection);
-    glutPostRedisplay();
+    if(selected_segmented_curve>=0){
+        OPENGL_SEGMENTED_CURVE_3D<T>* curve=segmented_curve_objects(selected_segmented_curve);
+        std::swap(curve->selected_curve,curve->selected_segment);
+        glutPostRedisplay();}
 }
 //#####################################################################
 // Function Increment_Active_Object
@@ -622,83 +700,107 @@ template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Increment_Active_Object()
 {
     if(active_list.m<1 || !use_active_list) return;
-    active_list(incremented_active_object)=false;incremented_active_object++;
+    active_list(incremented_active_object)=false;
+    incremented_active_object++;
     if(incremented_active_object>active_list.m) incremented_active_object=0;
     active_list(incremented_active_object)=true;
     Update_Velocity_Field();
 }
 //#####################################################################
+// Function Get_Selection_Priority
+//#####################################################################
+template<class T> int OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
+Get_Selection_Priority(ARRAY_VIEW<GLuint> indices)
+{
+    switch(indices(0)){
+        case 0:return segmented_curve_objects(indices(1))->Get_Selection_Priority(indices.Array_View(2,indices.m-2));
+        case 1:return triangulated_surface_objects(indices(1))->Get_Selection_Priority(indices.Array_View(2,indices.m-2));
+        case 2:return tetrahedralized_volume_objects(indices(1))->Get_Selection_Priority(indices.Array_View(2,indices.m-2));
+        case 3:return embedded_surface_objects(indices(1))->Get_Selection_Priority(indices.Array_View(2,indices.m-2));
+        case 4:return boundary_surface_objects(indices(1))->Get_Selection_Priority(indices.Array_View(2,indices.m-2));
+        case 5:return free_particles_objects(indices(1))->Get_Selection_Priority(indices.Array_View(2,indices.m-2));
+        case 6:return b_spline_patch_objects(indices(1))->Get_Selection_Priority(indices.Array_View(2,indices.m-2));
+        case 7:return hard_bound_boundary_surface_objects(indices(1))->Get_Selection_Priority(indices.Array_View(2,indices.m-2));
+        case 8:return hexahedralized_volume_objects(indices(1))->Get_Selection_Priority(indices.Array_View(2,indices.m-2));
+        default:PHYSBAM_FATAL_ERROR();}
+}
+//#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
-Get_Selection(GLuint *buffer,int buffer_size)
+template<class T> bool OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
+Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers)
 {
-    OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>* selection=0;
-    if(buffer_size>=1){
-        selection=new OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>(this);
-        selection->body_index=buffer[0];selection->subobject_type=buffer[1];
-        switch(selection->subobject_type){
-            case 1:selection->subobject=segmented_curve_objects(buffer[0]);break;
-            case 2:selection->subobject=triangulated_surface_objects(buffer[0]);break;
-            case 3:selection->subobject=tetrahedralized_volume_objects(buffer[0]);break;
-            case 4:selection->subobject=embedded_surface_objects(buffer[0]);break;
-            case 5:selection->subobject=boundary_surface_objects(buffer[0]);break;
-            case 6:selection->subobject=free_particles_objects(buffer[0]);break;
-            case 7:selection->subobject=b_spline_patch_objects(buffer[0]);break;
-            default:PHYSBAM_FATAL_ERROR();}
-        selection->body_selection=selection->subobject->Get_Selection(&buffer[2],buffer_size-2);
-        if(!selection->body_selection){delete selection;selection=0;}}
-    return selection;
+    if(modifiers&GLUT_ACTIVE_CTRL){
+        active_list(indices(1))=false;
+        Update_Velocity_Field();
+        return false;}
+
+    selected_index=indices(1);
+    switch(indices(0)){
+        case 0:
+            selected_segmented_curve=indices(1);
+            selected_object=segmented_curve_objects(indices(1));
+            break;
+        case 1:
+            selected_triangulated_surface=indices(1);
+            selected_object=triangulated_surface_objects(indices(1));
+            break;
+        case 2:
+            selected_tetrahedralized_volume=indices(1);
+            selected_object=tetrahedralized_volume_objects(indices(1));
+            break;
+        case 3:
+            selected_embedded_surface=indices(1);
+            selected_object=embedded_surface_objects(indices(1));
+            break;
+        case 4:
+            selected_boundary_surface=indices(1);
+            selected_object=boundary_surface_objects(indices(1));
+            break;
+        case 5:
+            selected_free_particles=indices(1);
+            selected_object=free_particles_objects(indices(1));
+            break;
+        case 6:
+            selected_b_spline_patch=indices(1);
+            selected_object=b_spline_patch_objects(indices(1));
+            break;
+        case 7:
+            selected_hard_bound_boundary_surface=indices(1);
+            selected_object=hard_bound_boundary_surface_objects(indices(1));
+            break;
+        case 8:
+            selected_hexahedralized_volume=indices(1);
+            selected_object=hexahedralized_volume_objects(indices(1));
+            break;
+        default:PHYSBAM_FATAL_ERROR();}
+    return selected_object->Set_Selection(indices.Array_View(2,indices.m-2),modifiers);
 }
 //#####################################################################
-// Function Set_Selection
+// Function Clear_Selection
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
-Set_Selection(OPENGL_SELECTION<T>* selection)
+Clear_Selection()
 {
-    if(selection->type!=OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_COLLECTION_3D) return;
-    real_selection=(OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>*)selection;
-}
-//#####################################################################
-// Function Highlight_Selection
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
-Highlight_Selection(OPENGL_SELECTION<T>* selection)
-{
-    if(selection->type!=OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_COLLECTION_3D) return;
-    OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>* real_selection=(OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>*)selection;
-    if(selection->hide){
-        active_list(real_selection->body_index)=false;
-        Update_Velocity_Field();}
-    else real_selection->subobject->Highlight_Selection(real_selection->body_selection);
-}
-//#####################################################################
-// Function Clear_Highlight
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
-Clear_Highlight()
-{
-    for(int i=0;i<segmented_curve_objects.m;i++) if(segmented_curve_objects(i) && active_list(i)) segmented_curve_objects(i)->Clear_Highlight();
-    for(int i=0;i<triangulated_surface_objects.m;i++) if(triangulated_surface_objects(i) && active_list(i)) triangulated_surface_objects(i)->Clear_Highlight();
-    for(int i=0;i<tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i) && active_list(i)) tetrahedralized_volume_objects(i)->Clear_Highlight();
-    for(int i=0;i<hexahedralized_volume_objects.m;i++) if(hexahedralized_volume_objects(i) && active_list(i)) hexahedralized_volume_objects(i)->Clear_Highlight();
-    for(int i=0;i<free_particles_objects.m;i++) if(free_particles_objects(i) && active_list(i))free_particles_objects(i)->Clear_Highlight();
-    for(int i=0;i<boundary_surface_objects.m;i++) if(boundary_surface_objects(i) && active_list(i))boundary_surface_objects(i)->Clear_Highlight();
-    for(int i=0;i<embedded_surface_objects.m;i++) if(embedded_surface_objects(i) && active_list(i)) embedded_surface_objects(i)->Clear_Highlight();
-    for(int i=0;i<hard_bound_boundary_surface_objects.m;i++) if(hard_bound_boundary_surface_objects(i) && active_list(i))hard_bound_boundary_surface_objects(i)->Clear_Highlight();
-    if(hide_unselected) hide_unselected=false;
-    real_selection=0;
+    if(selected_object) selected_object->Clear_Selection();
+    selected_segmented_curve=-1;
+    selected_triangulated_surface=-1;
+    selected_tetrahedralized_volume=-1;
+    selected_hexahedralized_volume=-1;
+    selected_free_particles=-1;
+    selected_boundary_surface=-1;
+    selected_embedded_surface=-1;
+    selected_hard_bound_boundary_surface=-1;
+    selected_index=-1;
 }
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
-Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const
+Print_Selection_Info(std::ostream &output_stream) const
 {
-    if(selection && selection->type==OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_COLLECTION_3D && selection->object==this){
-        OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>* real_selection=(OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>*)selection;
-        output_stream<<"Deformable object "<<real_selection->body_index<<std::endl;
-        real_selection->subobject->Print_Selection_Info(output_stream,real_selection->body_selection);}
+    output_stream<<"Deformable object "<<selected_index<<std::endl;
+    selected_object->Print_Selection_Info(output_stream);
 }
 //#####################################################################
 // Function Toggle_Active_Value_Response
@@ -728,20 +830,18 @@ Highlight_Particle_Response()
     Reinitialize(true);
 }
 //#####################################################################
-// Function Bounding_Box
+// Function Selection_Bounding_Box
 //#####################################################################
-template<class T>
-RANGE<VECTOR<T,3> > OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>::
-Bounding_Box() const
+template<class T> auto OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
+Selection_Bounding_Box() const -> RANGE<TV>
 {
-    PHYSBAM_ASSERT(object && body_selection);
-    return object->World_Space_Box(body_selection->Bounding_Box());
+    return World_Space_Box(selected_object->Bounding_Box());
 }
 //#####################################################################
 // Function Set_Vector_Size
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
-Set_Vector_Size(double size)
+Set_Vector_Size(T size)
 {
     velocity_field.size=size;
 }
@@ -778,9 +878,9 @@ Update_Velocity_Field()
 {
     if(!draw_velocity_vectors) return;
     bool display_triangulated_surface_objects,display_tetrahedralized_volume_objects,display_hexahedralized_volume_objects,
-         display_boundary_surface_objects,display_hard_bound_boundary_surface_objects,display_free_particles_objects;
+        display_boundary_surface_objects,display_hard_bound_boundary_surface_objects,display_free_particles_objects;
     Set_Display_Modes(display_triangulated_surface_objects,display_tetrahedralized_volume_objects,
-            display_hexahedralized_volume_objects,display_boundary_surface_objects,display_hard_bound_boundary_surface_objects,display_free_particles_objects);
+        display_hexahedralized_volume_objects,display_boundary_surface_objects,display_hard_bound_boundary_surface_objects,display_free_particles_objects);
 
     velocity_vectors.Resize(deformable_body_collection.particles.V.m);
     velocity_vectors.Fill(TV());
@@ -815,11 +915,13 @@ Cycle_Relative_Velocity_Mode()
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
-Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection)
+template<class T> bool OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
+Destroy_Selection_After_Frame_Change()
 {
-    if(old_selection && old_selection->object==this && invalidate_deformable_objects_selection_each_frame) delete_selection=true;
-    return 0;
+    if(invalidate_deformable_objects_selection_each_frame){
+        Clear_Selection();
+        return true;}
+    return false;
 }
 //#####################################################################
 // Function Toggle_Differentiate_Inverted
@@ -839,7 +941,8 @@ Create_Hard_Bound_Boundary_Surface(TRIANGULATED_SURFACE<T>& boundary_surface)
     TRIANGULATED_SURFACE<T>& hard_bound_boundary_surface=*TRIANGULATED_SURFACE<T>::Create(boundary_surface.particles);
     ARRAY<int> particle_map(IDENTITY_ARRAY<>(boundary_surface.particles.Size()));
 #if 0 // TODO: Fix me
-    for(int b=0;b<deformable_body_collection.soft_bindings.bindings.m;b++){VECTOR<int,2>& binding=deformable_body_collection.soft_bindings.bindings(b);particle_map(binding.x)=binding.y;}
+    for(int b=0;b<deformable_body_collection.soft_bindings.bindings.m;b++){VECTOR<int,2>& binding=deformable_body_collection.soft_bindings.bindings(b);
+        particle_map(binding.x)=binding.y;}
 #endif
     for(int t=0;t<boundary_surface.mesh.elements.m;t++) hard_bound_boundary_surface.mesh.elements.Append(VECTOR<int,3>::Map(particle_map,boundary_surface.mesh.elements(t)));
     return hard_bound_boundary_surface;

@@ -10,7 +10,7 @@ namespace PhysBAM{
 //#####################################################################
 // Function template<cl
 //#####################################################################
-template<class T> class OPENGL_WORLD;
+template<class TV> class OPENGL_WORLD;
 
 template<class T>
 class OPENGL_WINDOW

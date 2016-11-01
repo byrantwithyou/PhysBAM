@@ -17,6 +17,7 @@ namespace PhysBAM
 template<class T>
 class OPENGL_COMPONENT_TRIANGULATED_AREA:public OPENGL_COMPONENT<T>
 {
+    typedef VECTOR<T,2> TV;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
     using OPENGL_COMPONENT<T>::stream_type;

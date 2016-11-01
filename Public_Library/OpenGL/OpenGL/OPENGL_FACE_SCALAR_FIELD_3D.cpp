@@ -19,7 +19,7 @@ namespace PhysBAM{
 template<class T,class T2> OPENGL_FACE_SCALAR_FIELD_3D<T,T2>::
 OPENGL_FACE_SCALAR_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV> &grid_input,ARRAY<T2,FACE_INDEX<3> > &face_values_input,OPENGL_COLOR_MAP<T2> *color_map_input)
     :OPENGL_OBJECT<T>(stream_type),grid(grid_input),face_values(face_values_input),
-    color_map(color_map_input),scale(1),opengl_points(stream_type,*new ARRAY<VECTOR<T,3> >)
+    color_map(color_map_input),opengl_points(stream_type,*new ARRAY<TV>)
 {
     PHYSBAM_ASSERT(color_map);
 }
@@ -39,7 +39,6 @@ template<class T,class T2> void OPENGL_FACE_SCALAR_FIELD_3D<T,T2>::
 Display() const
 {
     if(face_values.Component(0).domain.Empty()) return;
-
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     Send_Transform_To_GL_Pipeline();
@@ -107,12 +106,11 @@ Slice_Has_Changed()
 // Print_Selection_Info
 //#####################################################################
 template<class T,class T2> void OPENGL_FACE_SCALAR_FIELD_3D<T,T2>::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection) const
+Print_Selection_Info(std::ostream& output_stream) const
 {
     // TODO: this should also interpolate to particles
-    if(selection && selection->type==OPENGL_SELECTION<T>::GRID_CELL_3D && grid.Is_MAC_Grid()){
-        VECTOR<int,3> index=((OPENGL_SELECTION_GRID_CELL_3D<T>*)selection)->index;
-        FACE_INDEX<TV::m> ix(0,index),iy(1,index),iz(2,index);
+    if(selected_index.x>=0 && grid.Is_MAC_Grid()){
+        FACE_INDEX<TV::m> ix(0,selected_index),iy(1,selected_index),iz(2,selected_index);
         T2 left=face_values(ix);
         T2 bottom=face_values(iy);
         T2 back=face_values(iz);

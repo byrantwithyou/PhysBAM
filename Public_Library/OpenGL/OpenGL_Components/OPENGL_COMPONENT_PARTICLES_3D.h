@@ -33,25 +33,19 @@ public:
 
     void Display() const override;
     bool Use_Bounding_Box() const override { return draw && valid && opengl_points->Use_Bounding_Box(); }
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    virtual RANGE<TV> Bounding_Box() const override;
 
-    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size) override;
-    virtual OPENGL_SELECTION<T>* Get_Selection_By_Id(int id);
-    void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
-    void Clear_Highlight() override;
-    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const override;
-    virtual RANGE<VECTOR<T,3> > Selection_Bounding_Box(OPENGL_SELECTION<T>* selection) const override;
-    int Get_Current_Index_Of_Selection(OPENGL_SELECTION<T>* selection) const;
-
-    void Select_Particle_By_Id(int id);
-    void Select_Particles_By_Ids(const ARRAY<int> &ids);
-    void Clear_Id_Selection();
-    OPENGL_SELECTION<T>* Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection) override;
+    virtual int Get_Selection_Priority(ARRAY_VIEW<GLuint> indices) override;
+    virtual bool Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers) override;
+    virtual RANGE<TV> Selection_Bounding_Box() const override;
+    void Clear_Selection() override;
+    void Print_Selection_Info(std::ostream &output_stream) const override;
+    bool Destroy_Selection_After_Frame_Change() override;
 
     void Toggle_Draw_Point_Numbers();
     void Toggle_Draw_Velocities();
     void Command_Prompt();
-    void Set_Vector_Size(double size);
+    void Set_Vector_Size(T size);
     void Increase_Vector_Size();
     void Decrease_Vector_Size();
     void Toggle_Arrowhead();
@@ -61,7 +55,6 @@ public:
 
 protected:
     virtual void Reinitialize(bool force=false);
-    void Apply_Id_Selection();
     ARRAY_VIEW<int>* Get_Particles_Id_Array(int set_number=0) const;
 
     void Command_Prompt_Response();
@@ -69,7 +62,7 @@ protected:
 public:
     GEOMETRY_PARTICLES<TV>* particles;
     ARRAY<GEOMETRY_PARTICLES<TV>*> particles_multiple;
-    OPENGL_POINTS_3D<T,ARRAY<VECTOR<T,3> > >* opengl_points;
+    OPENGL_POINTS_3D<T>* opengl_points;
     ARRAY<OPENGL_POINTS_3D<T>*> opengl_points_multiple;
     OPENGL_VECTOR_FIELD_3D<T> opengl_vector_field;
 
@@ -86,25 +79,8 @@ protected:
     bool use_ids;
     bool particles_stored_per_cell_uniform;
     bool draw_multiple_particle_sets;
-    ARRAY<int> selected_ids;
+    int selected_set;
 };
-
-template<class T>
-class OPENGL_SELECTION_COMPONENT_PARTICLES_3D:public OPENGL_SELECTION<T>
-{
-    typedef VECTOR<T,3> TV;
-public:
-    using OPENGL_SELECTION<T>::object;
-    int index;  // index into particles array
-    bool has_id;
-    int id;
-    int particle_set;
-    VECTOR<T,3> location;
-
-    OPENGL_SELECTION_COMPONENT_PARTICLES_3D(OPENGL_OBJECT<T>* object) :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::COMPONENT_PARTICLES_3D, object) {}
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
-};
-
 }
 
 #endif

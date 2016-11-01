@@ -42,7 +42,7 @@ Set_Frame(int frame_input)
 // Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_DIAGNOSTICS<T>::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection) const
+Print_Selection_Info(std::ostream& output_stream) const
 {
     output_stream<<component_name<<":"<<std::endl;
     for(int i=0;i<lines.m;i++) output_stream<<"   "<<lines(i)<<std::endl;

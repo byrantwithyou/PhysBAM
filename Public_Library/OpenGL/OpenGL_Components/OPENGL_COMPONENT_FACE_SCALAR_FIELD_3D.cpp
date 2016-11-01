@@ -73,11 +73,11 @@ Bounding_Box() const
 // Function Print_Selection_Info
 //#####################################################################
 template<class T,class T2> void OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,T2>::
-Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const
+Print_Selection_Info(std::ostream& stream) const
 {
     if(Is_Up_To_Date(frame)){
         stream<<component_name<<": "<<std::endl;
-        opengl_scalar_field.Print_Selection_Info(stream,selection);}
+        opengl_scalar_field.Print_Selection_Info(stream);}
 }
 //#####################################################################
 // Function Reinitialize

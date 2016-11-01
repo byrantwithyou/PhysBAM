@@ -132,13 +132,12 @@ Update()
 // Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_MAC_VELOCITY_FIELD_3D<T>::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection) const
+Print_Selection_Info(std::ostream& output_stream) const
 {
-    if(selection && selection->type==OPENGL_SELECTION<T>::GRID_CELL_3D && grid.Is_MAC_Grid()){
-        VECTOR<int,3> index=((OPENGL_SELECTION_GRID_CELL_3D<T>*)selection)->index;
-        T u_left=u(index.x,index.y,index.z),u_right=u(index.x+1,index.y,index.z),
-            v_bottom=v(index.x,index.y,index.z),v_top=v(index.x,index.y+1,index.z),
-            w_back=w(index.x,index.y,index.z),w_front=w(index.x,index.y,index.z+1);
+    if(selected_index.x>=0 && grid.Is_MAC_Grid()){
+        T u_left=u(selected_index.x,selected_index.y,selected_index.z),u_right=u(selected_index.x+1,selected_index.y,selected_index.z),
+            v_bottom=v(selected_index.x,selected_index.y,selected_index.z),v_top=v(selected_index.x,selected_index.y+1,selected_index.z),
+            w_back=w(selected_index.x,selected_index.y,selected_index.z),w_front=w(selected_index.x,selected_index.y,selected_index.z+1);
 
         TV center_velocity(0.5*(u_left+u_right),0.5*(v_bottom+v_top),0.5*(w_back+w_front));
         output_stream<<"    u left = "<<u_left<<",right = "<<u_right<<" avg="<<center_velocity.x<<std::endl;
@@ -146,13 +145,13 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection)
         output_stream<<"    w back = "<<w_back<<",front = "<<w_front<<" avg="<<center_velocity.z<<std::endl;
         T ux=(u_right-u_left)*grid.one_over_dX.x,vy=(v_top-v_bottom)*grid.one_over_dX.y,wz=(w_front-w_back)*grid.one_over_dX.z;
         output_stream<<"    divergence = "<<ux+vy+wz<<" (ux="<<ux<<", vy="<<vy<<", wz="<<wz<<")"<<std::endl;}
-    if(selection && selection->type==OPENGL_SELECTION<T>::COMPONENT_PARTICLES_3D){
-        OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T> *particle_selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>*)selection;
-        LINEAR_INTERPOLATION_UNIFORM<TV,T> interpolation;
-        TV interp(interpolation.Clamped_To_Array(grid.Get_Face_Grid(0),u,particle_selection->location),
-            interpolation.Clamped_To_Array(grid.Get_Face_Grid(1),v,particle_selection->location),
-            interpolation.Clamped_To_Array(grid.Get_Face_Grid(2),w,particle_selection->location));
-        output_stream<<"    @ particle = "<<interp<<std::endl;}
+    // if(selection && selection->type==OPENGL_SELECTION::COMPONENT_PARTICLES_3D){
+    //     OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T> *particle_selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>*)selection;
+    //     LINEAR_INTERPOLATION_UNIFORM<TV,T> interpolation;
+    //     TV interp(interpolation.Clamped_To_Array(grid.Get_Face_Grid(0),u,particle_selection->location),
+    //         interpolation.Clamped_To_Array(grid.Get_Face_Grid(1),v,particle_selection->location),
+    //         interpolation.Clamped_To_Array(grid.Get_Face_Grid(2),w,particle_selection->location));
+    //     output_stream<<"    @ particle = "<<interp<<std::endl;}
 }
 //#####################################################################
 // Convenience functions

@@ -43,7 +43,8 @@ public:
 protected:
     bool smooth_normals;
     ARRAY<VECTOR<T,3> >* vertex_normals;
-    OPENGL_SELECTION<T>* current_selection;
+    int selected_vertex;
+    int selected_tet;
 public:
 
     OPENGL_TETRAHEDRALIZED_VOLUME(STREAM_TYPE stream_type,TETRAHEDRON_MESH* mesh_input,GEOMETRY_PARTICLES<VECTOR<T,3> >* particles_input,const OPENGL_MATERIAL& material_input,
@@ -51,14 +52,12 @@ public:
     ~OPENGL_TETRAHEDRALIZED_VOLUME();
 
     void Display() const override;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    virtual RANGE<TV> Bounding_Box() const override;
 
-    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint* buffer,int buffer_size) override;
-    void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
-    void Clear_Highlight() override;
-
-    OPENGL_SELECTION<T>* Get_Vertex_Selection(int index);
-    OPENGL_SELECTION<T>* Get_Tetrahedron_Selection(int index);
+    virtual int Get_Selection_Priority(ARRAY_VIEW<GLuint> indices) override;
+    virtual bool Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers) override;
+    virtual RANGE<TV> Selection_Bounding_Box() const override;
+    void Clear_Selection() override;
 
     void Set_Boundary_Only(bool boundary_only_input)
     {boundary_only=boundary_only_input;}
@@ -108,40 +107,14 @@ public:
     void Turn_Smooth_Shading_Off() override;
     void Display_Subset();
     void Update_Cutaway_Plane();
-    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const override;
-    void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection,MATRIX<T,4>* transform) const;
+    void Print_Selection_Info(std::ostream &output_stream) const override;
+    void Print_Selection_Info(std::ostream &output_stream,MATRIX<T,4>* transform) const;
     void Initialize_Vertex_Normals();
 protected:
     void Draw_Vertices_For_Selection() const;
     void Draw_Tetrahedra_For_Selection() const;
     int Find_Shortest_Spring(const VECTOR<int,4>& nodes,T& distance,TV& minimum_normal,TV& weights) const;
 //#####################################################################
-};
-
-template<class T>
-class OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_VERTEX:public OPENGL_SELECTION<T>
-{
-public:
-    using OPENGL_SELECTION<T>::object;
-    int index;
-    OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_VERTEX(OPENGL_OBJECT<T>* object,int index=0) 
-        :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_VERTEX,object),index(index)
-    {}
-
-    RANGE<VECTOR<T,3> > Bounding_Box() const override;
-};
-
-template<class T>
-class OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_TETRAHEDRON:public OPENGL_SELECTION<T>
-{
-public:
-    using OPENGL_SELECTION<T>::object;
-    int index;
-    OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_TETRAHEDRON(OPENGL_OBJECT<T>* object,int index=0) 
-        :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::TETRAHEDRALIZED_VOLUME_TETRAHEDRON,object),index(index)
-    {}
-
-    RANGE<VECTOR<T,3> > Bounding_Box() const override;
 };
 }
 #endif

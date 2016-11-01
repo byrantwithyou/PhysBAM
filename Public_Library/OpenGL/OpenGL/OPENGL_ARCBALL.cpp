@@ -24,18 +24,18 @@ OPENGL_ARCBALL(STREAM_TYPE stream_type,OPENGL_WORLD<T>& opengl_world_input)
 //#####################################################################
 // Function Reinitialize
 //#####################################################################
-template<class T> void OPENGL_ARCBALL<T>::
+template<class TV> void OPENGL_ARCBALL<TV>::
 Reinitialize()
 {
-    sphere=SPHERE<TV>();
-    qNow=qDown=qDrag=ROTATION<TV>();
+    sphere=SPHERE<TV3>();
+    qNow=qDown=qDrag=ROTATION<TV3>();
     center=vDown=VECTOR<T,2>();
-    vFrom=vTo=TV();
+    vFrom=vTo=TV3();
 }
 //#####################################################################
 // Function Update
 //#####################################################################
-template<class T> void OPENGL_ARCBALL<T>::
+template<class TV> void OPENGL_ARCBALL<TV>::
 Update(const VECTOR<T,2> &vNow)
 {
     Update_World(vNow);
@@ -43,7 +43,7 @@ Update(const VECTOR<T,2> &vNow)
 //#####################################################################
 // Function Update_World
 //#####################################################################
-template<class T> void OPENGL_ARCBALL<T>::
+template<class TV> void OPENGL_ARCBALL<TV>::
 Update_World(const VECTOR<T,2> &vNow)
 {
     vFrom=MouseOnSphere(vDown,center,sphere.radius);
@@ -55,7 +55,7 @@ Update_World(const VECTOR<T,2> &vNow)
 //#####################################################################
 // Function DrawColor
 //#####################################################################
-template<class T> void OPENGL_ARCBALL<T>::
+template<class TV> void OPENGL_ARCBALL<TV>::
 DrawColor(const OPENGL_COLOR &color,int roation_axis,int my_axis) const
 {
     if(rotation_axis==my_axis) highlight.Send_To_GL_Pipeline();
@@ -64,17 +64,17 @@ DrawColor(const OPENGL_COLOR &color,int roation_axis,int my_axis) const
 //#####################################################################
 // Function DrawAnyArcWorld
 //#####################################################################
-template<class T> void OPENGL_ARCBALL<T>::
-DrawAnyArcWorld(const TV &vFrom,const TV &vTo) const
+template<class TV> void OPENGL_ARCBALL<TV>::
+DrawAnyArcWorld(const TV3 &vFrom,const TV3 &vTo) const
 {
     assert(vFrom!=vTo);
     int i;
-    TV pts[NSEGS+1];
+    TV3 pts[NSEGS+1];
     double dot;
     pts[0]=vFrom;
     pts[1]=pts[NSEGS]=vTo;
     for(i=0;i<LG_NSEGS;i++) pts[1]=Bisect_Vectors(pts[0],pts[1]);
-    dot=2*TV::Dot_Product(pts[0],pts[1]);
+    dot=2*TV3::Dot_Product(pts[0],pts[1]);
     for(i=2;i<NSEGS;i++) pts[i]=(pts[i-1]*dot)-pts[i-2];
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
@@ -99,23 +99,23 @@ DrawAnyArcWorld(const TV &vFrom,const TV &vTo) const
 //#####################################################################
 // Function DrawAnyArcObj
 //#####################################################################
-template<class T> void OPENGL_ARCBALL<T>::
-DrawAnyArcObj(const TV &vFrom,const TV &vTo) const
+template<class TV> void OPENGL_ARCBALL<TV>::
+DrawAnyArcObj(const TV3 &vFrom,const TV3 &vTo) const
 {
     assert(vFrom!=vTo);
     int i;
     T radius=sphere.radius*world->Get_Camera_Position().Magnitude();
-    TV pts[NSEGS+1];
+    TV3 pts[NSEGS+1];
     double dot;
     pts[0]=vFrom;
     pts[1]=pts[NSEGS]=vTo;
     for(i=0;i<LG_NSEGS;i++) pts[1]=Bisect_Vectors(pts[0],pts[1]);
-    dot=2*TV::Dot_Product(pts[0],pts[1]);
+    dot=2*TV3::Dot_Product(pts[0],pts[1]);
     for(i=2;i<NSEGS;i++) pts[i]=(pts[i-1]*dot)-pts[i-2];
     glDepthMask(0);
     glDisable(GL_DEPTH_TEST);
     OpenGL_Begin(GL_LINE_STRIP);
-    TV camera=TV(world->Get_Camera_Position()-world->Get_Target_Position()).Normalized();
+    TV3 camera=TV3(world->Get_Camera_Position()-world->Get_Target_Position()).Normalized();
     for(i=0;i<NSEGS;i++){
         if(qDown.Rotate(pts[i]).Dot(camera)>-1e-8 || qNow.Rotate(pts[i]).Dot(camera)>1e-8)
             OpenGL_Vertex(qNow.Rotate(radius*pts[i]));
@@ -130,24 +130,24 @@ DrawAnyArcObj(const TV &vFrom,const TV &vTo) const
 //#####################################################################
 // Function DrawDragArc
 //#####################################################################
-template<class T> void OPENGL_ARCBALL<T>::
+template<class TV> void OPENGL_ARCBALL<TV>::
 DrawDragArc() const
 {
     if(dragging&&vFrom!=vTo){
         OPENGL_COLOR::Gray().Send_To_GL_Pipeline();
         OpenGL_Begin(GL_LINE_STRIP);
         OpenGL_Vertex(vFrom);
-        OpenGL_Vertex(TV());
+        OpenGL_Vertex(TV3());
         OpenGL_Vertex(vTo);
         OpenGL_End();}
 }
 //#####################################################################
 // Function Circ
 //#####################################################################
-template<class T> void OPENGL_ARCBALL<T>::
+template<class TV> void OPENGL_ARCBALL<TV>::
 Circ() const
 {
-    TV p(0,1,0),m(1,0,0),n(0,0,1);
+    TV3 p(0,1,0),m(1,0,0),n(0,0,1);
     DrawColor(outer_rim,rotation_axis,4);
     DrawAnyArcWorld(p,m);
     DrawAnyArcWorld(m,-p);
@@ -172,10 +172,10 @@ Circ() const
 //#####################################################################
 // Function MouseOnSphere
 //#####################################################################
-template<class T> auto OPENGL_ARCBALL<T>::
-MouseOnSphere(const VECTOR<T,2> &mouse,const VECTOR<T,2> &ballCenter,double ballRadius) -> TV
+template<class TV> auto OPENGL_ARCBALL<TV>::
+MouseOnSphere(const VECTOR<T,2> &mouse,const VECTOR<T,2> &ballCenter,double ballRadius) -> TV3
 {
-    TV ballMouse;
+    TV3 ballMouse;
     T mag;
     ballMouse.x=T((mouse.x-ballCenter.x)/ballRadius);
     ballMouse.y=T((mouse.y-ballCenter.y)/ballRadius);
@@ -191,22 +191,26 @@ MouseOnSphere(const VECTOR<T,2> &mouse,const VECTOR<T,2> &ballCenter,double ball
 //#####################################################################
 // Function Qt_FromBallPoints
 //#####################################################################
-template<class T> auto OPENGL_ARCBALL<T>::
-Qt_FromBallPoints(const TV &from,const TV &to) -> ROTATION<TV>
+template<class TV> auto OPENGL_ARCBALL<TV>::
+Qt_FromBallPoints(const TV3 &from,const TV3 &to) -> ROTATION<TV3>
 {
-    return ROTATION<TV>::From_Rotated_Vector(from,to);
+    return ROTATION<TV3>::From_Rotated_Vector(from,to);
 }
 //#####################################################################
 // Function Bisect_Vectors
 //#####################################################################
-template<class T> auto OPENGL_ARCBALL<T>::
-Bisect_Vectors(const TV &v1,const TV &v2) const -> TV
+template<class TV> auto OPENGL_ARCBALL<TV>::
+Bisect_Vectors(const TV3 &v1,const TV3 &v2) const -> TV3
 {
-    TV v=v1+v2;
+    TV3 v=v1+v2;
     T normal=v.Magnitude_Squared();
-    if(normal<1e-5) v=TV(0,0,1);
+    if(normal<1e-5) v=TV3(0,0,1);
     return v.Normalized();
 }
-template class OPENGL_ARCBALL<double>;
-template class OPENGL_ARCBALL<float>;
+template class OPENGL_ARCBALL<VECTOR<double,1> >;
+template class OPENGL_ARCBALL<VECTOR<double,2> >;
+template class OPENGL_ARCBALL<VECTOR<double,3> >;
+template class OPENGL_ARCBALL<VECTOR<float,1> >;
+template class OPENGL_ARCBALL<VECTOR<float,2> >;
+template class OPENGL_ARCBALL<VECTOR<float,3> >;
 }

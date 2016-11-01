@@ -69,7 +69,7 @@ template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_LEVELSET_1D<T>::
 Bounding_Box() const
 {
     if(valid && draw) return opengl_levelset->Bounding_Box();
-    else return RANGE<VECTOR<T,3> >::Centered_Box();
+    return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Reinitialize

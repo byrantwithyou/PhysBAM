@@ -28,7 +28,8 @@ template<class T,class T_ARRAY> OPENGL_POINTS_2D<T,T_ARRAY>::
 template<class T,class T_ARRAY> RANGE<VECTOR<T,3> > OPENGL_POINTS_2D<T,T_ARRAY>::
 Bounding_Box() const
 {
-    return World_Space_Box(RANGE<VECTOR<T,2> >::Bounding_Box(points));
+    if(!points.Size()) return RANGE<VECTOR<T,3> >::Empty_Box();
+    return World_Space_Box(RANGE<TV>::Bounding_Box(points));
 }
 //#####################################################################
 // Function Display
@@ -179,80 +180,65 @@ Select_Points(const ARRAY<int> &indices)
     Set_Point_Colors(indices,OPENGL_COLOR::Yellow());
 }
 //#####################################################################
-// Function Clear_Selection
+// Function Get_Selection_Priority
 //#####################################################################
-template<class T,class T_ARRAY> void OPENGL_POINTS_2D<T,T_ARRAY>::
-Clear_Selection()
+template<class T,class T_ARRAY> int OPENGL_POINTS_2D<T,T_ARRAY>::
+Get_Selection_Priority(ARRAY_VIEW<GLuint> indices)
 {
-    Store_Point_Colors(false);
+    PHYSBAM_ASSERT(indices.m==1);
+    return 100;
 }
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T,class T_ARRAY> OPENGL_SELECTION<T>* OPENGL_POINTS_2D<T,T_ARRAY>::
-Get_Selection(GLuint *buffer,int buffer_size)
+template<class T,class T_ARRAY> bool OPENGL_POINTS_2D<T,T_ARRAY>::
+Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers)
 {
-    if(buffer_size==1){
-        OPENGL_SELECTION_POINTS_2D<T> *selection=new OPENGL_SELECTION_POINTS_2D<T>(this);
-        selection->index=buffer[0];
-        if(point_ids){ 
-            selection->has_id=true;
-            selection->id=(*point_ids)(buffer[0]);}
-        else selection->has_id=false;
-        return selection;}
-    else return 0;
-}
-//#####################################################################
-// Function Highlight_Selection
-//#####################################################################
-template<class T,class T_ARRAY> void OPENGL_POINTS_2D<T,T_ARRAY>::
-Highlight_Selection(OPENGL_SELECTION<T>* selection)
-{
-    if(selection->type!=OPENGL_SELECTION<T>::POINTS_2D) return;
-    OPENGL_SELECTION_POINTS_2D<T> *real_selection=(OPENGL_SELECTION_POINTS_2D<T>*)selection;
-    Select_Point(real_selection->index);
+    selected_index=indices(0);
+    if(point_ids) selected_id=(*point_ids)(indices(0));
+    Store_Point_Colors(true);
+    selected_old_color=(*point_colors)(selected_index);
+    (*point_colors)(selected_index)=OPENGL_COLOR::Yellow();
+    return true;
 }
 //#####################################################################
 // Function Clear_Highlight
 //#####################################################################
 template<class T,class T_ARRAY> void OPENGL_POINTS_2D<T,T_ARRAY>::
-Clear_Highlight()
+Clear_Selection()
 {
-    Clear_Selection();
+    (*point_colors)(selected_index)=selected_old_color;
+    selected_index=-1;
+    selected_id=-1;
+    selected_old_color=color;
 }
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_POINTS_2D<T>::
-Bounding_Box() const
+template<class T,class T_ARRAY> RANGE<VECTOR<T,3> > OPENGL_POINTS_2D<T,T_ARRAY>::
+Selection_Bounding_Box() const
 {
-    PHYSBAM_ASSERT(object);
-    if(OPENGL_POINTS_2D<T,ARRAY<VECTOR<T,2> > >* opengl_points=dynamic_cast<OPENGL_POINTS_2D<T,ARRAY<VECTOR<T,2> > >*>(object))
-        return object->World_Space_Box(RANGE<VECTOR<T,2> >(opengl_points->points(index)));
-    else if(OPENGL_POINTS_2D<T,INDIRECT_ARRAY<ARRAY<VECTOR<T,2> > > >* opengl_points=dynamic_cast<OPENGL_POINTS_2D<T,INDIRECT_ARRAY<ARRAY<VECTOR<T,2> > > >*>(object))
-        return object->World_Space_Box(RANGE<VECTOR<T,2> >(opengl_points->points(index)));
-    else PHYSBAM_NOT_IMPLEMENTED();
+    return World_Space_Box(RANGE<TV>(points(selected_index)));
 }
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
 template<class T,class T_ARRAY> void OPENGL_POINTS_2D<T,T_ARRAY>::
-Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const
+Print_Selection_Info(std::ostream &output_stream) const
 {
-    if(selection->type!=OPENGL_SELECTION<T>::POINTS_2D) return;
-    OPENGL_SELECTION_POINTS_2D<T>* selection_points=dynamic_cast<OPENGL_SELECTION_POINTS_2D<T>*>(selection);
-    output_stream<<"Free particle "<<Particle_Index(selection_points->index)<<" (id ";
-    if(selection_points->has_id) output_stream<<selection_points->id;else output_stream<<"N/A";
+    output_stream<<"Free particle "<<Particle_Index(selected_index)<<" (id ";
+    if(selected_id>=0) output_stream<<selected_id;
+    else output_stream<<"N/A";
     output_stream<<")"<<std::endl;
 }
 //#####################################################################
 // Function Set_Points_From_Particles
 //#####################################################################
 template<class T,class T_ARRAY> void OPENGL_POINTS_2D<T,T_ARRAY>::
-Set_Points_From_Particles(const GEOMETRY_PARTICLES<TV>& particles,bool keep_colors,const bool use_ids)
+Set_Points_From_Particles(const GEOMETRY_PARTICLES<TV>& particles,bool keep_colors)
 {
     points=particles.X;
-    const ARRAY_VIEW<int>* id=use_ids?particles.template Get_Array<int>(ATTRIBUTE_ID_ID):0;
+    const ARRAY_VIEW<int>* id=particles.template Get_Array<int>(ATTRIBUTE_ID_ID);
     Store_Point_Ids(id!=0);
     if(point_colors && (!keep_colors || point_colors->m!=particles.Size()))
         Store_Point_Colors(false);

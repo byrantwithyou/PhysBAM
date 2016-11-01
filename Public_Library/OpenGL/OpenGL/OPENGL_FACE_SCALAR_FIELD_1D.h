@@ -16,13 +16,14 @@ namespace PhysBAM{
 template<class T,class T2=T>
 class OPENGL_FACE_SCALAR_FIELD_1D:public OPENGL_OBJECT<T>
 {
-    typedef VECTOR<T,1> TV;
+    typedef VECTOR<T,1> TV;typedef VECTOR<int,1> TV_INT;
 public:
     using OPENGL_OBJECT<T>::World_Space_Box;
     GRID<TV> grid;
     ARRAY<T2,FACE_INDEX<1> > &face_values;
     OPENGL_COLOR point_color;
     OPENGL_COLOR line_color;
+    TV_INT selected_index;
 private:
     T scale;
     
@@ -35,7 +36,7 @@ public:
     virtual ~OPENGL_FACE_SCALAR_FIELD_1D();
     void Display() const override;
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
-    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const override;
+    void Print_Selection_Info(std::ostream& stream) const override;
 //#####################################################################
 };
 }

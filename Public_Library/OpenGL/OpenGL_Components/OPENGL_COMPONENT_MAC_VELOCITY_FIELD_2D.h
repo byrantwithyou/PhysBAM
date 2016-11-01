@@ -41,7 +41,8 @@ private:
     int number_of_steps;
     T min_vorticity,max_vorticity;
     unsigned int streamline_seed;
-
+    TV_INT selected_cell;
+    
 public:
     OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string &velocity_filename_input);
     virtual ~OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D();
@@ -51,7 +52,7 @@ public:
     void Set_Frame(int frame_input) override;
     void Set_Draw(bool draw_input = true) override;
     void Display() const override;
-    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const override;
+    void Print_Selection_Info(std::ostream& stream) const override;
     bool Use_Bounding_Box() const override { return draw && valid; }
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 

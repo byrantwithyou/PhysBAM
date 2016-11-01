@@ -51,6 +51,9 @@ Display() const
     glPopAttrib();
     glPopMatrix();
 }
+//#####################################################################
+// Function Set_Frame
+//#####################################################################
 template<class T> void OPENGL_GRID_1D<T>::
 Set_Frame(int frame_input)
 {
@@ -72,17 +75,6 @@ template<class T> void OPENGL_GRID_1D<T>::
 Toggle_Draw_Ghost_Values()
 {
     draw_ghost_values=!draw_ghost_values;
-}
-//#####################################################################
-// Function Bounding_Box
-//#####################################################################
-template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_GRID_CELL_1D<T>::
-Bounding_Box() const
-{
-    PHYSBAM_ASSERT(object);
-    const GRID<TV>& grid=((OPENGL_GRID_1D<T>*)object)->grid;
-    RANGE<VECTOR<T,1> > box(grid.Node(index),grid.Node(index.x+1));
-    return object->World_Space_Box(RANGE<VECTOR<T,1> >(box));
 }
 //#####################################################################
 namespace PhysBAM{

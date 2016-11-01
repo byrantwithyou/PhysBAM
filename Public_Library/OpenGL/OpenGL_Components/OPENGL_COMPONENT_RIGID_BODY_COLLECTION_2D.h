@@ -45,7 +45,11 @@ protected:
     bool draw_forces_and_torques;
     bool draw_linear_muscles;
     bool need_destroy_rigid_body_collection;
-
+    int selected_curve;
+    int selected_area;
+    int selected_joint_id;
+    int selected_muscle_id;
+    
 public:
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
     ARTICULATED_RIGID_BODY<TV>* articulated_rigid_body;
@@ -65,7 +69,6 @@ protected:
     ARRAY<VECTOR<T,2> > node_velocity_vectors;
     OPENGL_VECTOR_FIELD_2D<ARRAY<TV> > velocity_field;
     OPENGL_VECTOR_FIELD_2D<ARRAY<TV> > node_velocity_field;
-    OPENGL_SELECTION<T>* current_selection;
     ARRAY<VECTOR<T,2> > articulation_points;
     ARRAY<PAIR<VECTOR<T,2>,T>,int> forces_and_torques;
 
@@ -84,16 +87,17 @@ public:
     bool Use_Bounding_Box() const override;
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 
-    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size) override;
-    void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
-    void Clear_Highlight() override;
-    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const override;
+    virtual int Get_Selection_Priority(ARRAY_VIEW<GLuint> indices) override;
+    virtual bool Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers) override;
+    void Clear_Selection() override;
+    void Print_Selection_Info(std::ostream &output_stream) const override;
+    virtual RANGE<VECTOR<T,3> > Selection_Bounding_Box() const override;
 
     void Set_Draw_Object(int i, bool draw_it);  // Need to call Reinitialize after changing draw objects
     bool Get_Draw_Object(int i) const;
     void Set_Object_Color(int i, const OPENGL_COLOR &color);
     void Set_Use_Object_Bounding_Box(int i, bool use_it);
-    void Set_Vector_Size(double size);
+    void Set_Vector_Size(T size);
 
     void Toggle_Velocity_Vectors();
     void Toggle_Individual_Axes();
@@ -118,51 +122,6 @@ protected:
     void Update_Geometry(const int id);
     void Destroy_Geometry(const int id);
     virtual void Update_Object_Labels();
-};
-
-template<class T>
-class OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_2D:public OPENGL_SELECTION<T>
-{
-public:
-    using OPENGL_SELECTION<T>::object;
-    int body_id;
-    OPENGL_SELECTION<T>* body_selection;
-
-    OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_2D(OPENGL_OBJECT<T>* object,const int body_id,OPENGL_SELECTION<T>* body_selection)
-        :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::COMPONENT_RIGID_BODIES_2D,object),body_id(body_id),body_selection(body_selection)
-    {}
-
-    virtual typename OPENGL_SELECTION<T>::TYPE Actual_Type() const override
-    {return body_selection->Actual_Type();}
-
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
-};
-
-template<class T>
-class OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_2D:public OPENGL_SELECTION<T>
-{
-public:
-    using OPENGL_SELECTION<T>::object;
-    int joint_id;
-
-    OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_2D(OPENGL_OBJECT<T>* object,const int joint_id)
-        :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::ARTICULATED_RIGID_BODIES_JOINT_2D,object),joint_id(joint_id)
-    {}
-
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
-};
-
-template<class T>
-class OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_MUSCLE_2D:public OPENGL_SELECTION<T>
-{
-public:
-    using OPENGL_SELECTION<T>::object;
-    int muscle_id;
-    OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_MUSCLE_2D(OPENGL_OBJECT<T>* object,const int muscle_id)
-        :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::ARTICULATED_RIGID_BODIES_MUSCLE_2D,object),muscle_id(muscle_id)
-    {}
-
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 };
 }
 

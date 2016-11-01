@@ -18,7 +18,8 @@ template<class T> OPENGL_B_SPLINE_PATCH<T>::
 OPENGL_B_SPLINE_PATCH(STREAM_TYPE stream_type,B_SPLINE_PATCH<VECTOR<T,3>>& patch_input,const OPENGL_MATERIAL& front_material_input,const OPENGL_MATERIAL& back_material_input)
     :OPENGL_OBJECT<T>(stream_type),patch(patch_input),two_sided(true),front_material(front_material_input),
     back_material(back_material_input),use_display_list(false),
-    owns_display_list(false),current_selection(0),current_node(1),highlight_current_node(false),wireframe_only(false), draw_particles(false)
+    owns_display_list(false),selected_vertex(-1),selected_element(-1),
+    current_node(1),highlight_current_node(false),wireframe_only(false), draw_particles(false)
 {
 }
 //#####################################################################
@@ -28,7 +29,6 @@ template<class T> OPENGL_B_SPLINE_PATCH<T>::
 ~OPENGL_B_SPLINE_PATCH()
 {
     if(owns_display_list) glDeleteLists(display_list_id,1);
-    delete current_selection;
 }
 //#####################################################################
 // Function Highlight_Current_Node
@@ -66,9 +66,9 @@ Display() const
         glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);}
 
     if(mode == GL_SELECT){
-        glPushName(1);
+        glPushName(0);
         Draw_Vertices_For_Selection();
-        glLoadName(2);
+        glLoadName(1);
         Draw_Elements_For_Selection();
         glPopName();}
     else if(use_display_list) glCallList(display_list_id);
@@ -76,14 +76,9 @@ Display() const
     if(wireframe_only) glPopAttrib();
 
     if(mode != GL_SELECT){
-        if(current_selection){
-            if(current_selection->type == OPENGL_SELECTION<T>::B_SPLINE_PATCH_VERTEX){
-                int index=((OPENGL_SELECTION_B_SPLINE_PATCH_VERTEX<T>*)current_selection)->index;
-                OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(patch.particles.X(index),index);}
-            else if(current_selection->type == OPENGL_SELECTION<T>::B_SPLINE_PATCH_ELEMENT){
-                int index=((OPENGL_SELECTION_B_SPLINE_PATCH_ELEMENT<T>*)current_selection)->index;
-                Draw_Selected_Element(index);
-            }}
+        if(selected_vertex>=0)
+            OPENGL_SELECTION::Draw_Highlighted_Vertex(patch.particles.X(selected_vertex),selected_vertex);
+        if(selected_element>=0) Draw_Selected_Element(selected_element);
         if(highlight_current_node) Highlight_Current_Node();}
 
     if(two_sided){
@@ -101,82 +96,61 @@ Bounding_Box() const
     return World_Space_Box(RANGE<VECTOR<T,3> >::Bounding_Box(patch.particles.X));
 }
 //#####################################################################
-// Function Get_Selection
+// Function Get_Selection_Priority
 //#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_B_SPLINE_PATCH<T>::
-Get_Selection(GLuint *buffer,int buffer_size)
+template<class T> int OPENGL_B_SPLINE_PATCH<T>::
+Get_Selection_Priority(ARRAY_VIEW<GLuint> indices)
 {
-    OPENGL_SELECTION<T>* selection=0;
-    if(buffer_size == 2){
-        if(buffer[0] == 1) selection=Get_Vertex_Selection(buffer[1]);
-        else if(buffer[0] == 2) selection=Get_Element_Selection(buffer[1]);}
-    return selection;
+    PHYSBAM_ASSERT(indices.m==2);
+    const static int priority[]={74,73};
+    return priority[indices(0)];
 }
 //#####################################################################
-// Function Highlight_Selection
+// Function Get_Selection
 //#####################################################################
-template<class T> void OPENGL_B_SPLINE_PATCH<T>::
-Highlight_Selection(OPENGL_SELECTION<T>* selection)
+template<class T> bool OPENGL_B_SPLINE_PATCH<T>::
+Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers)
 {
-    delete current_selection;current_selection=0;
-    // Make a copy of selection
-    if(selection->type == OPENGL_SELECTION<T>::B_SPLINE_PATCH_VERTEX)
-        current_selection=new OPENGL_SELECTION_B_SPLINE_PATCH_VERTEX<T>(this,((OPENGL_SELECTION_B_SPLINE_PATCH_VERTEX<T>*)selection)->index);
-    else if(selection->type == OPENGL_SELECTION<T>::B_SPLINE_PATCH_ELEMENT)
-        current_selection=new OPENGL_SELECTION_B_SPLINE_PATCH_ELEMENT<T>(this,((OPENGL_SELECTION_B_SPLINE_PATCH_ELEMENT<T>*)selection)->index);
+    if(indices(0) == 0) selected_vertex=indices(1);
+    else if(indices(0) == 1) selected_element=indices(1);
+    else return false;
+    return true;
 }
 //#####################################################################
 // Function Clear_Highlight
 //#####################################################################
 template<class T> void OPENGL_B_SPLINE_PATCH<T>::
-Clear_Highlight()
+Clear_Selection()
 {
-    delete current_selection;current_selection=0;
+    selected_vertex=-1;
+    selected_element=-1;
 }
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_B_SPLINE_PATCH<T>::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection) const
+Print_Selection_Info(std::ostream& output_stream) const
 {
-    Print_Selection_Info(output_stream,selection,0);
+    Print_Selection_Info(output_stream,0);
 }
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_B_SPLINE_PATCH<T>::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection,MATRIX<T,4>* transform) const
+Print_Selection_Info(std::ostream& output_stream,MATRIX<T,4>* transform) const
 {
-    if(selection->type == OPENGL_SELECTION<T>::B_SPLINE_PATCH_VERTEX){
-        int index=((OPENGL_SELECTION_B_SPLINE_PATCH_VERTEX<T>*)selection)->index;
-        output_stream<<"Vertex "<<index<<std::endl;
-        if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(patch.particles.X(index))<<std::endl;}
-        patch.particles.Print(output_stream,index);}
-    else if(selection->type == OPENGL_SELECTION<T>::B_SPLINE_PATCH_ELEMENT){
-        int index=((OPENGL_SELECTION_B_SPLINE_PATCH_ELEMENT<T>*)selection)->index;
-        output_stream<<"Patch ("<<index<<")"<<std::endl;
+    if(selected_vertex>=0){
+        output_stream<<"Vertex "<<selected_vertex<<std::endl;
+        if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(patch.particles.X(selected_vertex))<<std::endl;}
+        patch.particles.Print(output_stream,selected_vertex);}
+    else if(selected_element>=0){
+        output_stream<<"Patch ("<<selected_element<<")"<<std::endl;
         output_stream<<std::endl;
-        VECTOR<int,16> a=patch.Control_Points_For_Element(index);
+        VECTOR<int,16> a=patch.Control_Points_For_Element(selected_element);
         for(int i=0;i<a.m;i++){
             output_stream<<"Control Point "<<a(i)<<std::endl;
             if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(patch.particles.X(a(i)))<<std::endl;}
             patch.particles.Print(output_stream,a(i));}}
-}
-//#####################################################################
-// Function Get_Vertex_Selection
-//#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_B_SPLINE_PATCH<T>::
-Get_Vertex_Selection(int index)
-{
-    return new OPENGL_SELECTION_B_SPLINE_PATCH_VERTEX<T>(this,index);
-}
-//#####################################################################
-// Function Get_Patch_Selection
-//#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_B_SPLINE_PATCH<T>::
-Get_Element_Selection(int index)
-{
-    return new OPENGL_SELECTION_B_SPLINE_PATCH_ELEMENT<T>(this,index);
 }
 //#####################################################################
 // Function Set_Front_Material
@@ -260,7 +234,7 @@ Draw_Selected_Element(int index) const
 {
     VECTOR<int,16> a=patch.Control_Points_For_Element(index);
     for(int i=0;i<a.m;i++)
-            OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(patch.particles.X(a(i)),a(i));
+            OPENGL_SELECTION::Draw_Highlighted_Vertex(patch.particles.X(a(i)),a(i));
     RANGE<VECTOR<T,2>> r=patch.Range_For_Element(index);
     glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);
     glDisable(GL_LIGHTING);
@@ -336,22 +310,12 @@ Draw_Elements_For_Selection() const
 //#####################################################################
 //
 //#####################################################################
-template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_B_SPLINE_PATCH_VERTEX<T>::
-Bounding_Box() const
+template<class T> RANGE<VECTOR<T,3> > OPENGL_B_SPLINE_PATCH<T>::
+Selection_Bounding_Box() const
 {
-    PHYSBAM_ASSERT(object);
-    const B_SPLINE_PATCH<VECTOR<T,3>,3> &patch=((OPENGL_B_SPLINE_PATCH<T> *)object)->patch;
-    return object->World_Space_Box(RANGE<VECTOR<T,3> >(patch.particles.X(index)));
-}
-//#####################################################################
-// Function Bounding_Box
-//#####################################################################
-template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_B_SPLINE_PATCH_ELEMENT<T>::
-Bounding_Box() const
-{
-    PHYSBAM_ASSERT(object);
-    const B_SPLINE_PATCH<VECTOR<T,3>,3> &patch=((OPENGL_B_SPLINE_PATCH<T> *)object)->patch;
-    return object->World_Space_Box(RANGE<VECTOR<T,3> >::Bounding_Box(patch.particles.X.Subset(patch.Control_Points_For_Element(index))));
+    if(selected_vertex>=0) return World_Space_Box(RANGE<TV>(patch.particles.X(selected_vertex)));
+    if(selected_element>=0) return World_Space_Box(RANGE<TV>::Bounding_Box(patch.particles.X.Subset(patch.Control_Points_For_Element(selected_element))));
+    PHYSBAM_FATAL_ERROR();
 }
 //#####################################################################
 namespace PhysBAM{

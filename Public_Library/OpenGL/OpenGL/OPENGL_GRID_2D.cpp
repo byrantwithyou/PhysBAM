@@ -30,10 +30,10 @@ Display() const
 
     if(mode == GL_SELECT){
         glPushAttrib(GL_ENABLE_BIT|GL_POINT_BIT);glDisable(GL_CULL_FACE);
-        VECTOR<T,2> min_corner=grid.Node(TV_INT(-ghost_cells,-ghost_cells)),X;int i,j;
+        TV min_corner=grid.Node(TV_INT(-ghost_cells,-ghost_cells)),X;int i,j;
 
         // Draw grid cells for selection
-        glPushName(1);
+        glPushName(0);
         for(i=-ghost_cells,X.x=min_corner.x;i<grid.numbers_of_cells.x+ghost_cells;i++,X.x+=grid.dX.x){
             glPushName(i);
             for(j=-ghost_cells,X.y=min_corner.y;j<grid.numbers_of_cells.y+ghost_cells;j++,X.y+=grid.dX.y){
@@ -45,7 +45,7 @@ Display() const
             glPopName();}
 
         // Draw grid nodes for selection
-        glLoadName(2);
+        glLoadName(1);
         glPointSize(OPENGL_PREFERENCES::selection_point_size);
         for(i=-ghost_cells,X.x=min_corner.x;i<grid.numbers_of_cells.x+ghost_cells+1;i++,X.x+=grid.dX.x){
             glPushName(i);
@@ -61,8 +61,8 @@ Display() const
     {
         // Draw masks
         T x,y;int i,j,i_mask=1,j_mask=1;
-        VECTOR<T,2> min_corner=grid.Node(TV_INT()-ghost_cells);
-        VECTOR<T,2> max_corner=grid.Node(grid.numbers_of_cells+ghost_cells);
+        TV min_corner=grid.Node(TV_INT()-ghost_cells);
+        TV max_corner=grid.Node(grid.numbers_of_cells+ghost_cells);
 
         ARRAY<bool,TV_INT> *cell_mask=0;
         ARRAY<bool,FACE_INDEX<TV::m> > *face_mask=0;
@@ -81,7 +81,7 @@ Display() const
             OpenGL_Begin(GL_LINES);
             for(i=-ghost_cells,x=min_corner.x,i_mask=1;i<grid.numbers_of_cells.x+ghost_cells;i++,x+=grid.dX.x,i_mask++)
                 for(j=-ghost_cells,y=min_corner.y,j_mask=1;j<grid.numbers_of_cells.y+ghost_cells;j++,y+=grid.dX.y,j_mask++)
-                    if((*cell_mask)(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(VECTOR<T,2>(x,y),VECTOR<T,2>(x+grid.dX.x,y+grid.dX.y));}
+                    if((*cell_mask)(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(TV(x,y),TV(x+grid.dX.x,y+grid.dX.y));}
             OpenGL_End();
             glPopAttrib();}
 
@@ -92,11 +92,11 @@ Display() const
             mask_m_start=face_mask->Component(0).domain.min_corner.x,mask_n_start=face_mask->Component(0).domain.min_corner.y;
             for(i=-ghost_cells,x=min_corner.x,i_mask=1;i<grid.numbers_of_cells.x+ghost_cells+1;i++,x+=grid.dX.x,i_mask++)
                 for(j=-ghost_cells,y=min_corner.y,j_mask=1;j<grid.numbers_of_cells.y+ghost_cells;j++,y+=grid.dX.y,j_mask++)
-                    if((face_mask->Component(0))(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(VECTOR<T,2>(x,y),VECTOR<T,2>(x,y+grid.dX.y));}
+                    if((face_mask->Component(0))(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(TV(x,y),TV(x,y+grid.dX.y));}
             mask_m_start=face_mask->Component(1).domain.min_corner.x,mask_n_start=face_mask->Component(1).domain.min_corner.y;
             for(i=-ghost_cells,x=min_corner.x,i_mask=1;i<grid.numbers_of_cells.x+ghost_cells;i++,x+=grid.dX.x,i_mask++)
                 for(j=-ghost_cells,y=min_corner.y,j_mask=1;j<grid.numbers_of_cells.y+ghost_cells+1;j++,y+=grid.dX.y,j_mask++)
-                    if((face_mask->Component(1))(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(VECTOR<T,2>(x,y),VECTOR<T,2>(x+grid.dX.x,y));}
+                    if((face_mask->Component(1))(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(TV(x,y),TV(x+grid.dX.x,y));}
             OpenGL_End();
             glPopAttrib();}
 
@@ -106,32 +106,32 @@ Display() const
             OpenGL_Begin(GL_POINTS);
             for(i=-ghost_cells,x=min_corner.x,i_mask=1;i<grid.numbers_of_cells.x+ghost_cells+1;i++,x+=grid.dX.x,i_mask++)
                 for(j=-ghost_cells,y=min_corner.y,j_mask=1;j<grid.numbers_of_cells.y+ghost_cells+1;j++,y+=grid.dX.y,j_mask++)
-                    if((*node_mask)(mask_m_start+i_mask-1,mask_n_start+j_mask-1)) OpenGL_Vertex(VECTOR<T,2>(x,y));
+                    if((*node_mask)(mask_m_start+i_mask-1,mask_n_start+j_mask-1)) OpenGL_Vertex(TV(x,y));
             OpenGL_End();
             glPopAttrib();}
 
         // Draw grid
         if(active_face_mask){
-            if(draw_mask_type&&ghost_cells==4){ghost_cells=3;min_corner=min_corner+VECTOR<T,2>(grid.dX.x,grid.dX.y);max_corner=max_corner-VECTOR<T,2>(grid.dX.x,grid.dX.y);}
+            if(draw_mask_type&&ghost_cells==4){ghost_cells=3;min_corner=min_corner+TV(grid.dX.x,grid.dX.y);max_corner=max_corner-TV(grid.dX.x,grid.dX.y);}
             face_mask=active_face_mask;
             int mask_m_start,mask_n_start;
             OpenGL_Begin(GL_LINES);
             mask_m_start=face_mask->Component(0).domain.min_corner.x,mask_n_start=face_mask->Component(0).domain.min_corner.y;
             for(i=-ghost_cells,x=min_corner.x,i_mask=1;i<grid.numbers_of_cells.x+ghost_cells+1;i++,x+=grid.dX.x,i_mask++)
                 for(j=-ghost_cells,y=min_corner.y,j_mask=1;j<grid.numbers_of_cells.y+ghost_cells;j++,y+=grid.dX.y,j_mask++)
-                    if((face_mask->Component(0))(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(VECTOR<T,2>(x,y),VECTOR<T,2>(x,y+grid.dX.y));}
+                    if((face_mask->Component(0))(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(TV(x,y),TV(x,y+grid.dX.y));}
             mask_m_start=face_mask->Component(1).domain.min_corner.x,mask_n_start=face_mask->Component(1).domain.min_corner.y;
             for(i=-ghost_cells,x=min_corner.x,i_mask=1;i<grid.numbers_of_cells.x+ghost_cells;i++,x+=grid.dX.x,i_mask++)
                 for(j=-ghost_cells,y=min_corner.y,j_mask=1;j<grid.numbers_of_cells.y+ghost_cells+1;j++,y+=grid.dX.y,j_mask++)
-                    if((face_mask->Component(1))(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(VECTOR<T,2>(x,y),VECTOR<T,2>(x+grid.dX.x,y));}
+                    if((face_mask->Component(1))(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(TV(x,y),TV(x+grid.dX.x,y));}
             OpenGL_End();}
         else{
-            if(draw_mask_type&&ghost_cells==3){ghost_cells=4;min_corner=min_corner-VECTOR<T,2>(grid.dX.x,grid.dX.y);max_corner=max_corner+VECTOR<T,2>(grid.dX.x,grid.dX.y);}
+            if(draw_mask_type&&ghost_cells==3){ghost_cells=4;min_corner=min_corner-TV(grid.dX.x,grid.dX.y);max_corner=max_corner+TV(grid.dX.x,grid.dX.y);}
             OpenGL_Begin(GL_LINES);
             for(i=-ghost_cells,x=min_corner.x;i<grid.numbers_of_cells.x+ghost_cells+1;i++,x+=grid.dX.x){
-                OpenGL_Line(VECTOR<T,2>(x,min_corner.y),VECTOR<T,2>(x,max_corner.y));}
+                OpenGL_Line(TV(x,min_corner.y),TV(x,max_corner.y));}
             for(j=-ghost_cells,y=min_corner.y;j<grid.numbers_of_cells.y+ghost_cells+1;j++,y+=grid.dX.y){
-                OpenGL_Line(VECTOR<T,2>(min_corner.x,y),VECTOR<T,2>(max_corner.x,y));}
+                OpenGL_Line(TV(min_corner.x,y),TV(max_corner.x,y));}
             OpenGL_End();}
 
         // Outline boundary of real domain in wider line
@@ -143,14 +143,11 @@ Display() const
             glPopAttrib();}
 
         // Highlight current selection
-        if(current_selection){
-            if(current_selection->type == OPENGL_SELECTION<T>::GRID_CELL_2D){
-                OPENGL_SELECTION_GRID_CELL_2D<T>* real_selection=(OPENGL_SELECTION_GRID_CELL_2D<T>*)current_selection;
-                VECTOR<T,2> min_corner=grid.Node(real_selection->index),max_corner=min_corner+grid.dX;
-                OPENGL_SELECTION<T>::Draw_Highlighted_Quad(min_corner,max_corner);}
-            else if(current_selection->type == OPENGL_SELECTION<T>::GRID_NODE_2D){
-                OPENGL_SELECTION_GRID_NODE_2D<T>* real_selection=(OPENGL_SELECTION_GRID_NODE_2D<T>*)current_selection;
-                OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(grid.Node(real_selection->index));}}}
+        if(selected_cell.x>=0){
+            TV min_corner=grid.Node(selected_cell),max_corner=min_corner+grid.dX;
+            OPENGL_SELECTION::Draw_Highlighted_Quad(min_corner,max_corner);}
+        if(selected_node.x>=0){
+            OPENGL_SELECTION::Draw_Highlighted_Vertex(grid.Node(selected_node));}}
 
     glPopAttrib();
     glPopMatrix();
@@ -171,38 +168,35 @@ Bounding_Box() const
     return World_Space_Box(grid.domain);
 }
 //#####################################################################
+// Function Get_Selection_Priority
+//#####################################################################
+template<class T> int OPENGL_GRID_2D<T>::
+Get_Selection_Priority(ARRAY_VIEW<GLuint> indices)
+{
+    if(!indices.m) return -1;
+    PHYSBAM_ASSERT(indices.m==3);
+    const static int priority[]={60,70};
+    return priority[indices(0)];
+}
+//#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_GRID_2D<T>::
-Get_Selection(GLuint* buffer,int buffer_size)
+template<class T> bool OPENGL_GRID_2D<T>::
+Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers)
 {
-    OPENGL_SELECTION<T>* selection=0;
-    if(buffer_size == 3){
-        if(buffer[0] == 1) selection=new OPENGL_SELECTION_GRID_CELL_2D<T>(this,VECTOR<int,2>(buffer[1],buffer[2]));
-        else if(buffer[0] == 2) selection=new OPENGL_SELECTION_GRID_NODE_2D<T>(this,VECTOR<int,2>(buffer[1],buffer[2]));}
-    return selection;
+    if(indices(0)==0) selected_cell=TV_INT(indices(1),indices(2));
+    else if(indices(0)==1) selected_node=TV_INT(indices(1),indices(2));
+    else return false;
+    return true;
 }
 //#####################################################################
-// Function Highlight_Selection
+// Function Clear_Selection
 //#####################################################################
 template<class T> void OPENGL_GRID_2D<T>::
-Highlight_Selection(OPENGL_SELECTION<T>* selection)
+Clear_Selection()
 {
-    delete current_selection;current_selection=0;
-    if(selection->type == OPENGL_SELECTION<T>::GRID_CELL_2D){
-        OPENGL_SELECTION_GRID_CELL_2D<T>* real_selection=(OPENGL_SELECTION_GRID_CELL_2D<T>*)selection;
-        current_selection=new OPENGL_SELECTION_GRID_CELL_2D<T>(this,real_selection->index);}
-    else if(selection->type == OPENGL_SELECTION<T>::GRID_NODE_2D){
-        OPENGL_SELECTION_GRID_NODE_2D<T>* real_selection=(OPENGL_SELECTION_GRID_NODE_2D<T>*)selection;
-        current_selection=new OPENGL_SELECTION_GRID_NODE_2D<T>(this,real_selection->index);}
-}
-//#####################################################################
-// Function Clear_Highlight
-//#####################################################################
-template<class T> void OPENGL_GRID_2D<T>::
-Clear_Highlight()
-{
-    delete current_selection;current_selection=0;
+    selected_cell.Fill(-1);
+    selected_node.Fill(-1);
 }
 //#####################################################################
 // Function Toggle_Draw_Ghost_Values
@@ -258,36 +252,22 @@ Reinitialize()
 // Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_GRID_2D<T>::
-Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const
+Print_Selection_Info(std::ostream& stream) const
 {
-    if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_NODE_2D){
-        VECTOR<int,2> index=((OPENGL_SELECTION_GRID_NODE_2D<T>*)current_selection)->index;
-        stream<<"Selected node "<<index<<" ("<<grid.Get_Regular_Grid().X(index)<<")"<<std::endl;}
-    else if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_CELL_2D){
-        VECTOR<int,2> index=((OPENGL_SELECTION_GRID_CELL_2D<T>*)current_selection)->index;
-        stream<<"Selected cell "<<index<<" ("<<grid.Get_MAC_Grid().X(index)<<")"<<std::endl;}
+    if(selected_node.x>=0)
+        stream<<"Selected node "<<selected_node<<" ("<<grid.Get_Regular_Grid().X(selected_node)<<")"<<std::endl;
+    else if(selected_cell.x>=0)
+        stream<<"Selected cell "<<selected_cell<<" ("<<grid.Get_MAC_Grid().X(selected_cell)<<")"<<std::endl;
 }
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_GRID_CELL_2D<T>::
-Bounding_Box() const
+template<class T> RANGE<VECTOR<T,3> > OPENGL_GRID_2D<T>::
+Selection_Bounding_Box() const
 {
-    PHYSBAM_ASSERT(object);
-    const GRID<TV>& grid=((OPENGL_GRID_2D<T>*)object)->grid;
-    RANGE<VECTOR<T,2> > box(grid.Node(index),grid.Node(index+1));
-    return object->World_Space_Box(box);
-}
-//#####################################################################
-// Function Bounding_Box
-//#####################################################################
-template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_GRID_NODE_2D<T>::
-Bounding_Box() const
-{
-    PHYSBAM_ASSERT(object);
-    const GRID<TV>& grid=((OPENGL_GRID_2D<T>*)object)->grid;
-    RANGE<VECTOR<T,2> > box(grid.Node(index));
-    return object->World_Space_Box(box);
+    if(selected_node.x>=0) return World_Space_Box(RANGE<TV>(grid.Node(selected_node)));
+    if(selected_cell.x>=0) return World_Space_Box(RANGE<TV>(grid.Node(selected_cell),grid.Node(selected_cell+1)));
+    PHYSBAM_FATAL_ERROR();
 }
 //#####################################################################
 namespace PhysBAM{

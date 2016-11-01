@@ -14,7 +14,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> OPENGL_GRID_BASED_VECTOR_FIELD_3D<T>::
 OPENGL_GRID_BASED_VECTOR_FIELD_3D(STREAM_TYPE stream_type,GRID<TV> &grid, ARRAY<VECTOR<T,3> ,VECTOR<int,3> > &V)
-    :OPENGL_VECTOR_FIELD_3D<T>(stream_type,*(new ARRAY<VECTOR<T,3> >),*(new ARRAY<VECTOR<T,3> >),OPENGL_COLOR::Gray(.8f),.25f,true,false,false),grid(grid),V(V)
+    :OPENGL_VECTOR_FIELD_3D<T>(stream_type,*(new ARRAY<VECTOR<T,3> >),*(new ARRAY<VECTOR<T,3> >),OPENGL_COLOR::Gray(.8f),.25f,true,false,false),grid(grid),V(V),selected_cell(-1,-1,-1),selected_node(-1,-1,-1)
 {
     max_vectors_3d = 100000;
 }
@@ -88,15 +88,13 @@ Update()
 // Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_GRID_BASED_VECTOR_FIELD_3D<T>::
-Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* current_selection) const
+Print_Selection_Info(std::ostream& stream) const
 {
     // TODO: interpolate to particles
-    if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_NODE_3D && !grid.Is_MAC_Grid()){
-        VECTOR<int,3> index=((OPENGL_SELECTION_GRID_NODE_3D<T>*)current_selection)->index;
-        if(V.Valid_Index(index)) stream<<V(index);}
-    if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_CELL_3D && grid.Is_MAC_Grid()){
-        VECTOR<int,3> index=((OPENGL_SELECTION_GRID_CELL_3D<T>*)current_selection)->index;
-        if(V.Valid_Index(index)) stream<<V(index);}
+    if(selected_node.x>=0 && !grid.Is_MAC_Grid()){
+        if(V.Valid_Index(selected_node)) stream<<V(selected_node);}
+    if(selected_cell.x>=0 && grid.Is_MAC_Grid()){
+        if(V.Valid_Index(selected_cell)) stream<<V(selected_cell);}
     stream<<std::endl;
 }
 //#####################################################################

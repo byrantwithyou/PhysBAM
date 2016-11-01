@@ -22,8 +22,10 @@ template<class T> class OPENGL_SELECTION_TRIANGULATED_SURFACE_TRIANGLE;
 template<class T>
 class OPENGL_TRIANGULATED_SURFACE:public OPENGL_OBJECT<T>
 {
-public:
+    typedef VECTOR<T,3> TV;
+  public:
     using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::World_Space_Point;
+    using OPENGL_OBJECT<T>::World_Space_Box;
     OPENGL_TRIANGULATED_SURFACE(STREAM_TYPE stream_type,TRIANGULATED_SURFACE<T>& surface_input,bool smooth_normals_input,
                                 const OPENGL_MATERIAL& material_input);
     OPENGL_TRIANGULATED_SURFACE(STREAM_TYPE stream_type,TRIANGULATED_SURFACE<T>& surface_input,bool smooth_normals_input,
@@ -31,17 +33,14 @@ public:
     virtual ~OPENGL_TRIANGULATED_SURFACE();
 
     void Display() const override;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    virtual RANGE<TV> Bounding_Box() const override;
 
-    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size) override;
-    void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
-    void Clear_Highlight() override;
-    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const override;
-    void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection,MATRIX<T,4>* transform) const;
-
-    OPENGL_SELECTION<T>* Get_Vertex_Selection(int index);
-    OPENGL_SELECTION<T>* Get_Segment_Selection(int index);
-    OPENGL_SELECTION<T>* Get_Triangle_Selection(int index);
+    virtual int Get_Selection_Priority(ARRAY_VIEW<GLuint> indices) override;
+    virtual bool Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers) override;
+    void Clear_Selection() override;
+    void Print_Selection_Info(std::ostream &output_stream) const override;
+    void Print_Selection_Info(std::ostream &output_stream,MATRIX<T,4>* transform) const;
+    virtual RANGE<TV> Selection_Bounding_Box() const override;
 
     void Turn_Smooth_Shading_On() override;
     void Turn_Smooth_Shading_Off() override;
@@ -95,7 +94,9 @@ protected:
     int display_list_id;
 
 public:
-    OPENGL_SELECTION<T>* current_selection;
+    int selected_vertex;
+    int selected_segment;
+    int selected_triangle;
     int current_node;
     bool highlight_current_node;
     bool highlight_neighbors_of_current_node;
@@ -112,42 +113,6 @@ public:
     friend class OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX<T>;
     friend class OPENGL_SELECTION_TRIANGULATED_SURFACE_SEGMENT<T>;
     friend class OPENGL_SELECTION_TRIANGULATED_SURFACE_TRIANGLE<T>;
-};
-
-template<class T>
-class OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX:public OPENGL_SELECTION<T>
-{
-public:
-    using OPENGL_SELECTION<T>::object;
-    int index;
-    OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX(OPENGL_OBJECT<T>* object, int index=0) 
-        :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_VERTEX, object), index(index) {}
-
-    RANGE<VECTOR<T,3> > Bounding_Box() const override;
-};
-
-template<class T>
-class OPENGL_SELECTION_TRIANGULATED_SURFACE_SEGMENT:public OPENGL_SELECTION<T>
-{
-public:
-    using OPENGL_SELECTION<T>::object;
-    int index;
-    OPENGL_SELECTION_TRIANGULATED_SURFACE_SEGMENT(OPENGL_OBJECT<T>* object, int index=0) 
-        :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_SEGMENT, object), index(index) {}
-
-    RANGE<VECTOR<T,3> > Bounding_Box() const override;
-};
-
-template<class T>
-class OPENGL_SELECTION_TRIANGULATED_SURFACE_TRIANGLE:public OPENGL_SELECTION<T>
-{
-public:
-    using OPENGL_SELECTION<T>::object;
-    int index;
-    OPENGL_SELECTION_TRIANGULATED_SURFACE_TRIANGLE(OPENGL_OBJECT<T>* object, int index=0) 
-        :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_TRIANGLE, object), index(index) {}
-
-    RANGE<VECTOR<T,3> > Bounding_Box() const override;
 };
 
 }

@@ -81,7 +81,16 @@ template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_TRIANGULATED_SURFACE<T>::
 Bounding_Box() const
 {
     if(valid && draw) return opengl_triangulated_surface.Bounding_Box();
-    else return RANGE<VECTOR<T,3> >::Centered_Box();
+    return RANGE<VECTOR<T,3> >::Centered_Box();
+}
+//#####################################################################
+// Function Bounding_Box
+//#####################################################################
+template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_TRIANGULATED_SURFACE<T>::
+Selection_Bounding_Box() const
+{
+    if(valid && draw) return opengl_triangulated_surface.Selection_Bounding_Box();
+    return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Reinitialize

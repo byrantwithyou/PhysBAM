@@ -29,7 +29,7 @@ public:
     void Display() const override;
     bool Use_Bounding_Box() const override { return draw && valid; }
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
-    void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_selection) const override;
+    void Print_Selection_Info(std::ostream& output_stream) const override;
     bool Is_Up_To_Date(int frame) const override {return valid && frame_loaded == frame;}
 
     void Toggle_Color_Mode();
@@ -59,6 +59,8 @@ private:
     int set_loaded;
     bool valid;
     bool draw_multiple_levelsets;
+    TV_INT selected_cell;
+    TV_INT selected_node;
 };
 
 }

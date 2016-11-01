@@ -11,8 +11,9 @@ using namespace PhysBAM;
 // OPENGL_GRID_BASED_VECTOR_FIELD_2D
 //#####################################################################
 template<class T> OPENGL_GRID_BASED_VECTOR_FIELD_2D<T>::
-OPENGL_GRID_BASED_VECTOR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV>& grid, ARRAY<VECTOR<T,2>,VECTOR<int,2> >& V)
-    :OPENGL_VECTOR_FIELD_2D<ARRAY<TV> >(stream_type,vector_field,vector_locations),grid(grid),V(V)
+OPENGL_GRID_BASED_VECTOR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV>& grid,ARRAY<TV,TV_INT>& V)
+    :OPENGL_VECTOR_FIELD_2D<ARRAY<TV> >(stream_type,vector_field,vector_locations),grid(grid),V(V),
+    selected_cell(-1,-1),selected_node(-1,-1)
 {}
 //#####################################################################
 // ~OPENGL_GRID_BASED_VECTOR_FIELD_2D
@@ -46,15 +47,13 @@ Bounding_Box() const
 // Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_GRID_BASED_VECTOR_FIELD_2D<T>::
-Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* current_selection) const
+Print_Selection_Info(std::ostream& stream) const
 {
     // TODO: interpolate to particles
-    if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_NODE_2D && !grid.Is_MAC_Grid()){
-        VECTOR<int,2> index=((OPENGL_SELECTION_GRID_NODE_2D<T>*)current_selection)->index;
-        if(V.Valid_Index(index)) stream<<V(index);}
-    if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_CELL_2D && grid.Is_MAC_Grid()){
-        VECTOR<int,2> index=((OPENGL_SELECTION_GRID_CELL_2D<T>*)current_selection)->index;
-        if(V.Valid_Index(index)) stream<<V(index);}
+    if(selected_node.x>=0 && !grid.Is_MAC_Grid()){
+        if(V.Valid_Index(selected_node)) stream<<V(selected_node);}
+    if(selected_cell.x>=0 && grid.Is_MAC_Grid()){
+        if(V.Valid_Index(selected_cell)) stream<<V(selected_cell);}
     stream<<std::endl;
 }
 //#####################################################################

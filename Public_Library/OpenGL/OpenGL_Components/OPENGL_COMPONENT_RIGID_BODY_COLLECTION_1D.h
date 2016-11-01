@@ -24,6 +24,7 @@ class OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D:public OPENGL_COMPONENT<T>
 {
 protected:
     typedef VECTOR<T,1> TV;
+    typedef VECTOR<T,TV::m+(TV::m==1)> TV_BOX;
 
     std::string basedir;
     int frame_loaded;
@@ -44,7 +45,7 @@ protected:
     ARRAY<bool,int> use_object_bounding_box;
     ARRAY<VECTOR<T,1> > positions;
     ARRAY<VECTOR<T,1> > node_positions;
-    OPENGL_SELECTION<T>* current_selection;
+//    void current_selection;
     bool need_destroy_rigid_body_collection;
 
 public:

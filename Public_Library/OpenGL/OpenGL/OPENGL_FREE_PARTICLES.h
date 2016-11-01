@@ -20,7 +20,7 @@ template<class TV_input>
 class OPENGL_FREE_PARTICLES:public OPENGL_POLICY<TV_input>::OPENGL_POINTS
 {
     typedef TV_input TV;typedef typename TV::SCALAR T;typedef typename OPENGL_POLICY<TV>::OPENGL_POINTS BASE;
-    using BASE::points;
+    using BASE::points;using BASE::selected_index;
 public:
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
 
@@ -28,7 +28,7 @@ public:
     ~OPENGL_FREE_PARTICLES(){}
 
 //#####################################################################
-    void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const override;
+    void Print_Selection_Info(std::ostream &output_stream) const override;
     int Particle_Index(const int index) const override {return points.indices(index);}
 //#####################################################################
 };

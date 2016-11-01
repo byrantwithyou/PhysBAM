@@ -90,6 +90,6 @@ Height() const
 //#####################################################################
 namespace PhysBAM
 {
-template class OPENGL_WINDOW_PBUFFER<float>;
 template class OPENGL_WINDOW_PBUFFER<double>;
+template class OPENGL_WINDOW_PBUFFER<float>;
 }

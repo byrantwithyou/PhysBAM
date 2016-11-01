@@ -20,7 +20,7 @@ namespace PhysBAM{
 //#####################################################################
 template<class T,class T2> OPENGL_SCALAR_FIELD_3D<T,T2>::
 OPENGL_SCALAR_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,3> > &values_input,OPENGL_COLOR_MAP<T2> *color_map_input,DRAW_MODE draw_mode_input)
-    :OPENGL_OBJECT<T>(stream_type),grid(grid_input),values(values_input),current_color_map(0),opengl_textured_rect(0),opengl_points(0),smooth_slice_texture(false),scale_range(false)
+    :OPENGL_OBJECT<T>(stream_type),grid(grid_input),values(values_input),current_color_map(0),opengl_textured_rect(0),opengl_points(0),smooth_slice_texture(false),scale_range(false),selected_cell(-1,-1,-1),selected_node(-1,-1,-1),selected_point(-1)
 {
     PHYSBAM_ASSERT(color_map_input);
     Initialize_Color_Maps(color_map_input);
@@ -351,7 +351,7 @@ template<class T,class T2> RANGE<VECTOR<T,3> > OPENGL_SCALAR_FIELD_3D<T,T2>::
 Bounding_Box() const
 {
     if(slice && slice->Is_Slice_Mode() && opengl_textured_rect) return opengl_textured_rect->Bounding_Box();
-    else return World_Space_Box(grid.domain);
+    return World_Space_Box(grid.domain);
 }
 //#####################################################################
 // Function Set_Draw_Mode
@@ -382,40 +382,35 @@ Update()
 //#####################################################################
 // Function Print_Selection_Info_Helper
 //#####################################################################
-template<class T2,class T> static void
-Print_Selection_Info_Helper(std::ostream& output_stream,OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>* selection,const GRID<VECTOR<T,3> >& grid,ARRAY<T2,VECTOR<int,3> >& values)
+template<class T2,class TV> static void
+Print_Selection_Info_Helper(std::ostream& output_stream,const TV& location,const GRID<TV>& grid,ARRAY<T2,VECTOR<int,3> >& values)
 {
-    output_stream<<" @ particle = "<<LINEAR_INTERPOLATION_UNIFORM<VECTOR<T,3> ,T2>().Clamped_To_Array(grid,values,selection->location);
+    output_stream<<" @ particle = "<<LINEAR_INTERPOLATION_UNIFORM<TV,T2>().Clamped_To_Array(grid,values,location);
 }
 //#####################################################################
 // Function Print_Selection_Info_Helper
 //#####################################################################
 // no interpolation for bool's and int's
-template<class T> static void
-Print_Selection_Info_Helper(std::ostream& output_stream,OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>* selection,const GRID<VECTOR<T,3> >&,ARRAY<bool,VECTOR<int,3> >& values){}
+template<class TV> static void
+Print_Selection_Info_Helper(std::ostream& output_stream,const TV& location,const GRID<TV>&,ARRAY<bool,VECTOR<int,3> >& values){}
 //#####################################################################
 // Function Print_Selection_Info_Helper
 //#####################################################################
-template<class T> static void
-Print_Selection_Info_Helper(std::ostream& output_stream,OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>* selection,const GRID<VECTOR<T,3> >&,ARRAY<int,VECTOR<int,3> >& values){}
+template<class TV> static void
+Print_Selection_Info_Helper(std::ostream& output_stream,const TV& location,const GRID<TV>&,ARRAY<int,VECTOR<int,3> >& values){}
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
 template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_selection) const
+Print_Selection_Info(std::ostream& output_stream) const
 {
-    if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_CELL_3D && grid.Is_MAC_Grid()){
-        VECTOR<int,3> index=((OPENGL_SELECTION_GRID_CELL_3D<T>*)current_selection)->index;
-        if(values.Valid_Index(index)) output_stream<<values(index);}
-    if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_NODE_3D && !grid.Is_MAC_Grid()){
-        VECTOR<int,3> index=((OPENGL_SELECTION_GRID_NODE_3D<T>*)current_selection)->index;
-        if(values.Valid_Index(index))output_stream<<values(index);}
-    if(current_selection && current_selection->type==OPENGL_SELECTION<T>::COMPONENT_PARTICLES_3D){
-        OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T> *selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>*)current_selection;
-        Print_Selection_Info_Helper(output_stream,selection,grid,values);}
+    if(selected_cell.x>=0 && grid.Is_MAC_Grid() && values.Valid_Index(selected_cell)) output_stream<<values(selected_cell);
+    if(selected_node.x>=0 && !grid.Is_MAC_Grid() && values.Valid_Index(selected_node)) output_stream<<values(selected_node);
+    // if(current_selection && current_selection->type==OPENGL_SELECTION::COMPONENT_PARTICLES_3D){
+    //     OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T> *selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>*)current_selection;
+    //     Print_Selection_Info_Helper(output_stream,selection,grid,values);}
     output_stream<<std::endl;
 }
-
 namespace{
 //#####################################################################
 // Function Update_Slice_Helper

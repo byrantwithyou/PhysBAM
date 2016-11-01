@@ -150,7 +150,6 @@ Initialize_Components_And_Key_Bindings()
     opengl_world.Unbind_Keys("delmo7vDEMO&V+-");
 
 
-    opengl_world.Set_Key_Binding_Category_Priority(1);
     opengl_world.Set_Key_Binding_Category("Compressible");
 
     if(has_valid_grid){

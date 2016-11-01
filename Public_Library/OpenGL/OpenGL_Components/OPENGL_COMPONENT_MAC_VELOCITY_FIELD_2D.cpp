@@ -24,7 +24,8 @@ OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &g
     :OPENGL_COMPONENT<T>(stream_type,"MAC Velocity Field 2D"),draw_vorticity(false),
     velocity_filename(velocity_filename_input),valid(false),draw_divergence(false),
     draw_streamlines(false),use_seed_for_streamlines(false),opengl_divergence_field(0),
-    opengl_streamlines(stream_type,streamlines),psi_N_psi_D_basedir(""),min_vorticity(FLT_MAX),max_vorticity(FLT_MIN)
+    opengl_streamlines(stream_type,streamlines),psi_N_psi_D_basedir(""),min_vorticity(FLT_MAX),max_vorticity(FLT_MIN),
+    selected_cell(-1,-1)
 {
     viewer_callbacks.Set("toggle_velocity_mode",{[this](){Toggle_Velocity_Mode();},"Toggle velocity mode"});
     viewer_callbacks.Set("toggle_velocity_mode_and_draw",{[this](){Toggle_Velocity_Mode_And_Draw();},"Toggle velocity mode and draw"});
@@ -81,14 +82,13 @@ Valid_Frame(int frame_input) const
 // Function Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
-Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const
+Print_Selection_Info(std::ostream& stream) const
 {
     if(Is_Up_To_Date(frame)){
         stream<<component_name<<": "<<std::endl;
-        opengl_mac_velocity_field->Print_Selection_Info(stream,selection);
-        if(draw_vorticity && ((OPENGL_SELECTION_GRID_CELL_2D<T>*)selection)){
-            VECTOR<int,2> index=((OPENGL_SELECTION_GRID_CELL_2D<T>*)selection)->index;
-            stream<<"vorticity magnitude = "<<opengl_vorticity_magnitude->values(index)<<std::endl;}}
+        opengl_mac_velocity_field->Print_Selection_Info(stream);
+        if(selected_cell.x>=0){
+            stream<<"vorticity magnitude = "<<opengl_vorticity_magnitude->values(selected_cell)<<std::endl;}}
 }
 //#####################################################################
 // Function Set_Frame
@@ -127,7 +127,7 @@ template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>:
 Bounding_Box() const
 {
     if(valid && draw) return opengl_mac_velocity_field->Bounding_Box();
-    else return RANGE<VECTOR<T,3> >::Centered_Box();
+    return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Reinitialize

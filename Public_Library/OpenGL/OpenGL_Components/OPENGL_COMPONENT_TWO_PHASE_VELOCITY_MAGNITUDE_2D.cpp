@@ -68,7 +68,7 @@ template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNIT
 Bounding_Box() const
 {
     if(valid && draw) return opengl_two_phase_velocity_magnitude.Bounding_Box();
-    else return RANGE<VECTOR<T,3> >::Centered_Box();
+    return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Toggle_3D_Mode

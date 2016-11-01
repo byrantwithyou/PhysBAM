@@ -36,7 +36,7 @@ public:
 
     void Display() const override;
     virtual void Update();
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    virtual RANGE<TV> Bounding_Box() const override;
 //##################################################################### 
 };
 }

@@ -15,10 +15,13 @@ using namespace PhysBAM;
 // Constructor from geometry, one-sided
 //#####################################################################
 template<class T> OPENGL_TRIANGULATED_SURFACE<T>::
-OPENGL_TRIANGULATED_SURFACE(STREAM_TYPE stream_type,TRIANGULATED_SURFACE<T>& surface_input,bool smooth_normals_input,const OPENGL_MATERIAL& material_input)
+OPENGL_TRIANGULATED_SURFACE(STREAM_TYPE stream_type,TRIANGULATED_SURFACE<T>& surface_input,
+    bool smooth_normals_input,const OPENGL_MATERIAL& material_input)
     :OPENGL_OBJECT<T>(stream_type),surface(surface_input),two_sided(false),front_material(material_input),
-    back_material(material_input),vertex_normals(0),vertex_colors(0),smooth_normals(smooth_normals_input),use_display_list(false),
-    owns_display_list(false),current_selection(0),current_node(1),highlight_current_node(false),highlight_neighbors_of_current_node(true),highlight_boundary(false),
+    back_material(material_input),vertex_normals(0),vertex_colors(0),smooth_normals(smooth_normals_input),
+    use_display_list(false),owns_display_list(false),selected_vertex(-1),selected_segment(-1),
+    selected_triangle(-1),
+    current_node(1),highlight_current_node(false),highlight_neighbors_of_current_node(true),highlight_boundary(false),
     wireframe_only(false),draw_subsets(false),draw_velocities(false),draw_particles(false),velocity_scale((T).025)
 {
     if(smooth_normals) Initialize_Vertex_Normals();
@@ -27,10 +30,13 @@ OPENGL_TRIANGULATED_SURFACE(STREAM_TYPE stream_type,TRIANGULATED_SURFACE<T>& sur
 // Constructor from geometry, two-sided
 //#####################################################################
 template<class T> OPENGL_TRIANGULATED_SURFACE<T>::
-OPENGL_TRIANGULATED_SURFACE(STREAM_TYPE stream_type,TRIANGULATED_SURFACE<T>& surface_input,bool smooth_normals_input,const OPENGL_MATERIAL& front_material_input,const OPENGL_MATERIAL& back_material_input)
+OPENGL_TRIANGULATED_SURFACE(STREAM_TYPE stream_type,TRIANGULATED_SURFACE<T>& surface_input,
+    bool smooth_normals_input,const OPENGL_MATERIAL& front_material_input,const OPENGL_MATERIAL& back_material_input)
     :OPENGL_OBJECT<T>(stream_type),surface(surface_input),two_sided(true),front_material(front_material_input),
-    back_material(back_material_input),vertex_normals(0),vertex_colors(0),smooth_normals(smooth_normals_input),use_display_list(false),
-    owns_display_list(false),current_selection(0),current_node(1),highlight_current_node(false),highlight_neighbors_of_current_node(true),highlight_boundary(false),wireframe_only(false),
+    back_material(back_material_input),vertex_normals(0),vertex_colors(0),smooth_normals(smooth_normals_input),
+    use_display_list(false),owns_display_list(false),selected_vertex(-1),selected_segment(-1),
+    selected_triangle(-1),current_node(1),highlight_current_node(false),highlight_neighbors_of_current_node(true),
+    highlight_boundary(false),wireframe_only(false),
     draw_subsets(false),draw_velocities(false),draw_particles(false),velocity_scale((T).025)
 {
     if(smooth_normals) Initialize_Vertex_Normals();
@@ -42,7 +48,7 @@ template<class T> OPENGL_TRIANGULATED_SURFACE<T>::
 ~OPENGL_TRIANGULATED_SURFACE()
 {
     if(owns_display_list) glDeleteLists(display_list_id,1);
-    delete vertex_normals;delete vertex_colors;delete current_selection;
+    delete vertex_normals;delete vertex_colors;
 }
 //#####################################################################
 // Function Highlight_Current_Node
@@ -176,12 +182,12 @@ Display() const
         glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);}
 
     if(mode == GL_SELECT){
-        glPushName(1);
+        glPushName(0);
         Draw_Vertices_For_Selection();
         if(surface.mesh.segment_mesh){
-            glLoadName(2);
+            glLoadName(1);
             Draw_Segments_For_Selection();}
-        glLoadName(3);
+        glLoadName(2);
         Draw_Triangles_For_Selection();
         glPopName();}
     else if(use_display_list) glCallList(display_list_id);
@@ -190,18 +196,15 @@ Display() const
     if(wireframe_only) glPopAttrib();
 
     if(mode != GL_SELECT){
-        if(current_selection){
-            if(current_selection->type == OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_VERTEX){
-                int index=((OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX<T>*)current_selection)->index;
-                OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(surface.particles.X(index),index);}
-            else if(current_selection->type == OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_SEGMENT && surface.mesh.segment_mesh){
-                int index=((OPENGL_SELECTION_TRIANGULATED_SURFACE_SEGMENT<T>*)current_selection)->index;
-                int node1,node2;surface.mesh.segment_mesh->elements(index).Get(node1,node2);
-                OPENGL_SELECTION<T>::Draw_Highlighted_Segment(surface.particles.X(node1),surface.particles.X(node2),index);}
-            else if(current_selection->type == OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_TRIANGLE){
-                int index=((OPENGL_SELECTION_TRIANGULATED_SURFACE_TRIANGLE<T>*)current_selection)->index;
-                int node1,node2,node3;surface.mesh.elements(index).Get(node1,node2,node3);
-                OPENGL_SELECTION<T>::Draw_Highlighted_Triangle_Boundary(surface.particles.X(node1),surface.particles.X(node2),surface.particles.X(node3),index);}}
+        if(selected_vertex>=0){
+            OPENGL_SELECTION::Draw_Highlighted_Vertex(surface.particles.X(selected_vertex),selected_vertex);}
+        else if(selected_segment>=0 && surface.mesh.segment_mesh){
+            int node1,node2;
+            surface.mesh.segment_mesh->elements(selected_segment).Get(node1,node2);
+            OPENGL_SELECTION::Draw_Highlighted_Segment(surface.particles.X(node1),surface.particles.X(node2),selected_segment);}
+        else if(selected_triangle>=0){
+            int node1,node2,node3;surface.mesh.elements(selected_triangle).Get(node1,node2,node3);
+            OPENGL_SELECTION::Draw_Highlighted_Triangle_Boundary(surface.particles.X(node1),surface.particles.X(node2),surface.particles.X(node3),selected_triangle);}
 
         if(highlight_current_node){
             Highlight_Current_Node();
@@ -262,65 +265,60 @@ Bounding_Box() const
     return box;
 }
 //#####################################################################
-// Function Get_Selection
+// Function Get_Selection_Priority
 //#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_TRIANGULATED_SURFACE<T>::
-Get_Selection(GLuint *buffer,int buffer_size)
+template<class T> int OPENGL_TRIANGULATED_SURFACE<T>::
+Get_Selection_Priority(ARRAY_VIEW<GLuint> indices)
 {
-    OPENGL_SELECTION<T>* selection=0;
-    if(buffer_size == 2){
-        if(buffer[0] == 1) selection=Get_Vertex_Selection(buffer[1]);
-        else if(buffer[0] == 2) selection=Get_Segment_Selection(buffer[1]);
-        else if(buffer[0] == 3) selection=Get_Triangle_Selection(buffer[1]);}
-    return selection;
+    if(!indices.m) return -1;
+    PHYSBAM_ASSERT(indices.m==2);
+    const static int priority[]={90,89,88};
+    return priority[indices(0)];
 }
 //#####################################################################
-// Function Highlight_Selection
+// Function Get_Selection
 //#####################################################################
-template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
-Highlight_Selection(OPENGL_SELECTION<T>* selection)
+template<class T> bool OPENGL_TRIANGULATED_SURFACE<T>::
+Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers)
 {
-    delete current_selection;current_selection=0;
-    // Make a copy of selection
-    if(selection->type == OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_VERTEX)
-        current_selection=new OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX<T>(this,((OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX<T>*)selection)->index);
-    else if(selection->type == OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_SEGMENT)
-        current_selection=new OPENGL_SELECTION_TRIANGULATED_SURFACE_SEGMENT<T>(this,((OPENGL_SELECTION_TRIANGULATED_SURFACE_SEGMENT<T>*)selection)->index);
-    else if(selection->type == OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_TRIANGLE)
-        current_selection=new OPENGL_SELECTION_TRIANGULATED_SURFACE_TRIANGLE<T>(this,((OPENGL_SELECTION_TRIANGULATED_SURFACE_TRIANGLE<T>*)selection)->index);
+    if(indices(0)==0) selected_vertex=indices(1);
+    else if(indices(0)==1) selected_segment=indices(1);
+    else if(indices(0)==2) selected_triangle=indices(1);
+    else return false;
+    return true;
 }
 //#####################################################################
 // Function Clear_Highlight
 //#####################################################################
 template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
-Clear_Highlight()
+Clear_Selection()
 {
-    delete current_selection;current_selection=0;
+    selected_vertex=-1;
+    selected_segment=-1;
+    selected_triangle=-1;
 }
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection) const
+Print_Selection_Info(std::ostream& output_stream) const
 {
-    Print_Selection_Info(output_stream,selection,0);
+    Print_Selection_Info(output_stream,0);
 }
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection,MATRIX<T,4>* transform) const
+Print_Selection_Info(std::ostream& output_stream,MATRIX<T,4>* transform) const
 {
-    if(selection->type == OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_VERTEX){
-        int index=((OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX<T>*)selection)->index;
-        output_stream<<"Vertex "<<index<<std::endl;
-        if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(surface.particles.X(index))<<std::endl;}
-        surface.particles.Print(output_stream,index);}
-    else if(selection->type == OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_SEGMENT){
+    if(selected_vertex>=0){
+        output_stream<<"Vertex "<<selected_vertex<<std::endl;
+        if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(surface.particles.X(selected_vertex))<<std::endl;}
+        surface.particles.Print(output_stream,selected_vertex);}
+    else if(selected_segment>=0){
         PHYSBAM_ASSERT(surface.mesh.segment_mesh);
-        int index=((OPENGL_SELECTION_TRIANGULATED_SURFACE_SEGMENT<T>*)selection)->index;
-        int node1,node2;surface.mesh.segment_mesh->elements(index).Get(node1,node2);
-        output_stream<<"Segment "<<index<<" ("<<node1<<", "<<node2<<")"<<std::endl;
+        int node1,node2;surface.mesh.segment_mesh->elements(selected_segment).Get(node1,node2);
+        output_stream<<"Segment "<<selected_segment<<" ("<<node1<<", "<<node2<<")"<<std::endl;
         output_stream<<std::endl;
         output_stream<<"Vertex "<<node1<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(surface.particles.X(node1))<<std::endl;}
@@ -329,10 +327,9 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection,
         output_stream<<"Vertex "<<node2<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(surface.particles.X(node2))<<std::endl;}
         surface.particles.Print(output_stream,node2);}
-    else if(selection->type == OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_TRIANGLE){
-        int index=((OPENGL_SELECTION_TRIANGULATED_SURFACE_TRIANGLE<T>*)selection)->index;
-        int node1,node2,node3;surface.mesh.elements(index).Get(node1,node2,node3);
-        output_stream<<"Triangle "<<index<<" ("<<node1<<", "<<node2<<", "<<node3<<")"<<std::endl;
+    else if(selected_triangle>=0){
+        int node1,node2,node3;surface.mesh.elements(selected_triangle).Get(node1,node2,node3);
+        output_stream<<"Triangle "<<selected_triangle<<" ("<<node1<<", "<<node2<<", "<<node3<<")"<<std::endl;
         output_stream<<std::endl;
         output_stream<<"Vertex "<<node1<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(surface.particles.X(node1))<<std::endl;}
@@ -345,30 +342,6 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection,
         output_stream<<"Vertex "<<node3<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(surface.particles.X(node3))<<std::endl;}
         surface.particles.Print(output_stream,node3);}
-}
-//#####################################################################
-// Function Get_Vertex_Selection
-//#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_TRIANGULATED_SURFACE<T>::
-Get_Vertex_Selection(int index)
-{
-    return new OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX<T>(this,index);
-}
-//#####################################################################
-// Function Get_Segment_Selection
-//#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_TRIANGULATED_SURFACE<T>::
-Get_Segment_Selection(int index)
-{
-    return new OPENGL_SELECTION_TRIANGULATED_SURFACE_SEGMENT<T>(this,index);
-}
-//#####################################################################
-// Function Get_Triangle_Selection
-//#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_TRIANGULATED_SURFACE<T>::
-Get_Triangle_Selection(int index)
-{
-    return new OPENGL_SELECTION_TRIANGULATED_SURFACE_TRIANGLE<T>(this,index);
 }
 //#####################################################################
 // Function Set_Front_Material
@@ -514,7 +487,7 @@ Draw_Subsets() const
 template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
 Draw_Vertices_For_Selection() const
 {
-    OPENGL_SELECTION<T>::Draw_Vertices_For_Selection(surface.mesh,surface.particles);
+    OPENGL_SELECTION::Draw_Vertices_For_Selection(surface.mesh,surface.particles);
 }
 //#####################################################################
 // Function Draw_Segments_For_Selection
@@ -553,36 +526,13 @@ Draw_Triangles_For_Selection() const
 //#####################################################################
 //
 //#####################################################################
-template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX<T>::
-Bounding_Box() const
+template<class T> RANGE<VECTOR<T,3> > OPENGL_TRIANGULATED_SURFACE<T>::
+Selection_Bounding_Box() const
 {
-    PHYSBAM_ASSERT(object);
-    const TRIANGULATED_SURFACE<T> &surface=((OPENGL_TRIANGULATED_SURFACE<T> *)object)->surface;
-    return object->World_Space_Box(RANGE<VECTOR<T,3> >(surface.particles.X(index)));
-}
-//#####################################################################
-// Function Bounding_Box
-//#####################################################################
-template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_TRIANGULATED_SURFACE_SEGMENT<T>::
-Bounding_Box() const
-{
-    PHYSBAM_ASSERT(object);
-    const TRIANGULATED_SURFACE<T> &surface=((OPENGL_TRIANGULATED_SURFACE<T> *)object)->surface;
-    PHYSBAM_ASSERT(surface.mesh.segment_mesh);
-    int node1,node2;surface.mesh.segment_mesh->elements(index).Get(node1,node2);
-    RANGE<VECTOR<T,3> > box(surface.particles.X(node1));
-    box.Enlarge_To_Include_Point(surface.particles.X(node2));
-    return object->World_Space_Box(box);
-}
-//#####################################################################
-// Function Bounding_Box
-//#####################################################################
-template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_TRIANGULATED_SURFACE_TRIANGLE<T>::
-Bounding_Box() const
-{
-    PHYSBAM_ASSERT(object);
-    const TRIANGULATED_SURFACE<T> &surface=((OPENGL_TRIANGULATED_SURFACE<T> *)object)->surface;
-    return object->World_Space_Box(RANGE<VECTOR<T,3> >::Bounding_Box(surface.particles.X.Subset(surface.mesh.elements(index))));
+    if(selected_vertex>=0) return World_Space_Box(RANGE<VECTOR<T,3> >(surface.particles.X(selected_vertex)));
+    if(selected_segment>=0) return World_Space_Box(RANGE<VECTOR<T,3> >::Bounding_Box(surface.particles.X.Subset(surface.mesh.segment_mesh->elements(selected_segment))));
+    if(selected_triangle>=0) return World_Space_Box(RANGE<VECTOR<T,3> >::Bounding_Box(surface.particles.X.Subset(surface.mesh.elements(selected_triangle))));
+    PHYSBAM_FATAL_ERROR();
 }
 //#####################################################################
 namespace PhysBAM{

@@ -17,17 +17,18 @@ namespace PhysBAM{
 
 template<class T> class OPENGL_WORLD;
 
-template<class T>
+template<class TV>
 class OPENGL_ARCBALL
 {
-    typedef VECTOR<T,3> TV;
+    typedef typename TV::SCALAR T;
+    typedef VECTOR<T,3> TV3;
 public:
     OPENGL_WORLD<T>& opengl_world;
 
-    SPHERE<TV> sphere;
-    ROTATION<TV> qNow,qDown,qDrag;
+    SPHERE<TV3> sphere;
+    ROTATION<TV3> qNow,qDown,qDrag;
     VECTOR<T,2> center,vDown;
-    TV vFrom,vTo,vrTo;
+    TV3 vFrom,vTo,vrTo;
     bool dragging;
     OPENGL_WORLD<T>* world;
     int rotation_axis;
@@ -50,17 +51,17 @@ public:
     
 private:
     void DrawColor(const OPENGL_COLOR &color,int roation_axis,int my_axis) const;
-    void DrawAnyArc(const TV &vFrom,const TV &vTo) const
+    void DrawAnyArc(const TV3 &vFrom,const TV3 &vTo) const
     {assert(vFrom!=vTo);DrawAnyArcObj(vFrom,vTo);}
-    void DrawAnyArcWorld(const TV &vFrom,const TV &vTo) const;
-    void DrawAnyArcObj(const TV &vFrom,const TV &vTo) const;
+    void DrawAnyArcWorld(const TV3 &vFrom,const TV3 &vTo) const;
+    void DrawAnyArcObj(const TV3 &vFrom,const TV3 &vTo) const;
     void DrawOuterRing() const
     {Circ();}
     void DrawDragArc() const;
     void Circ() const;
-    TV MouseOnSphere(const VECTOR<T,2> &mouse,const VECTOR<T,2> &ballCenter,double ballRadius);
-    ROTATION<TV> Qt_FromBallPoints(const TV &from,const TV &to);
-    TV Bisect_Vectors(const TV &v1,const TV &v2) const;
+    TV3 MouseOnSphere(const VECTOR<T,2> &mouse,const VECTOR<T,2> &ballCenter,double ballRadius);
+    ROTATION<TV3> Qt_FromBallPoints(const TV3 &from,const TV3 &to);
+    TV3 Bisect_Vectors(const TV3 &v1,const TV3 &v2) const;
 };
 }
 #endif

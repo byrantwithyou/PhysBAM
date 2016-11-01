@@ -43,8 +43,10 @@ protected:
     bool own_deformable_body;
     int display_soft_bound_surface_mode,display_hard_bound_surface_mode,display_forces_mode,interaction_pair_display_mode;
 public:
-    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
-    using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;
+    using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
+    using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
+    using OPENGL_OBJECT<T>::World_Space_Box;
     DEFORMABLE_BODY_COLLECTION<TV> &deformable_body_collection;
     OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>* real_selection;
     ARRAY<OPENGL_SEGMENTED_CURVE_3D<T>*> segmented_curve_objects;
@@ -70,6 +72,17 @@ public:
     ARRAY<REPULSION_PAIR<TV> > edge_edge_interaction_pairs;
     ARRAY<FORCE_DATA<TV> > force_data_list;
     OPENGL_COLOR_RAMP<T>* color_map_forces;
+    int selected_segmented_curve;
+    int selected_triangulated_surface;
+    int selected_tetrahedralized_volume;
+    int selected_embedded_surface;
+    int selected_boundary_surface;
+    int selected_free_particles;
+    int selected_b_spline_patch;
+    int selected_hard_bound_boundary_surface;
+    int selected_hexahedralized_volume;
+    int selected_index;
+    OPENGL_OBJECT<T>* selected_object;
 
     OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D(STREAM_TYPE stream_type,const std::string& prefix,const int start_frame);
     virtual ~OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D();
@@ -84,19 +97,19 @@ public:
         bool& display_hard_bound_boundary_surface_objects) const;
     virtual void Display() const override;
     bool Use_Bounding_Box() const override;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    virtual RANGE<TV> Bounding_Box() const override;
 
-    virtual OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size) override;
-    void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
-    void Set_Selection(OPENGL_SELECTION<T>* selection) override;
-    void Clear_Highlight() override;
-    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const override;
+    virtual int Get_Selection_Priority(ARRAY_VIEW<GLuint> indices) override;
+    virtual bool Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers) override;
+    void Clear_Selection() override;
+    void Print_Selection_Info(std::ostream &output_stream) const override;
+    virtual RANGE<TV> Selection_Bounding_Box() const override;
     
     void Turn_Smooth_Shading_On() override;
     void Turn_Smooth_Shading_Off() override;
     void Set_Material(const int object,const OPENGL_MATERIAL& front_material,const OPENGL_MATERIAL& back_material);
     void Set_All_Materials(const OPENGL_MATERIAL& meshfront,const OPENGL_MATERIAL& front_material,const OPENGL_MATERIAL& back_material);
-    OPENGL_SELECTION<T>* Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection) override;
+    bool Destroy_Selection_After_Frame_Change() override;
     TRIANGULATED_SURFACE<T>& Create_Hard_Bound_Boundary_Surface(TRIANGULATED_SURFACE<T>& boundary_surface);
 
     void Toggle_Active_Value();
@@ -114,7 +127,7 @@ public:
     void Create_One_Big_Triangulated_Surface_And_Write_To_File();
     void Show_Only_First();
     void Highlight_Particle();
-    void Set_Vector_Size(double size);
+    void Set_Vector_Size(T size);
     void Toggle_Velocity_Vectors();
     void Decrease_Vector_Size();
     void Increase_Vector_Size();
@@ -132,21 +145,16 @@ private:
     void Initialize();    // Needs to be called after some state changes
 };
 
-template<class T>
-class OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D:public OPENGL_SELECTION<T>
-{
-public:
-    using OPENGL_SELECTION<T>::object;
-    int body_index;
-    int subobject_type;
-    OPENGL_OBJECT<T>* subobject;
-    OPENGL_SELECTION<T>* body_selection;
-    OPENGL_SELECTION<T>* saved_selection;
+// template<class T>
+// class OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D:public OPENGL_SELECTION<T>
+// {
+// public:
+//     void body_selection;
+//     void saved_selection;
 
-    OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D(OPENGL_OBJECT<T>* object) :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_COLLECTION_3D,object) {}
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
-    virtual typename OPENGL_SELECTION<T>::TYPE Actual_Type() const override {return body_selection->Actual_Type();}
-};
+//     OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D(OPENGL_OBJECT<T>* object) :OPENGL_SELECTION<T>(OPENGL_SELECTION::COMPONENT_DEFORMABLE_COLLECTION_3D,object) {}
+//     virtual RANGE<TV> Bounding_Box() const override;
+// };
 
 }
 #endif

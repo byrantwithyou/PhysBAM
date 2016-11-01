@@ -20,7 +20,7 @@ template<class T> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T>::
 OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(STREAM_TYPE stream_type,const std::string& basedir_input)
     :OPENGL_COMPONENT<T>(stream_type,"Rigid Geometry Collection 1D"),basedir(basedir_input),frame_loaded(-1),valid(false),show_object_names(false),output_positions(true),draw_velocity_vectors(false),
     draw_node_velocity_vectors(false),draw_point_simplices(true),
-    rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(0)),current_selection(0),need_destroy_rigid_body_collection(true)
+    rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(0)),need_destroy_rigid_body_collection(true)
 {
     viewer_callbacks.Set("toggle_output_positions",{[this](){Toggle_Output_Positions();},"Toggle output positions"});
     viewer_callbacks.Set("toggle_show_object_names",{[this](){Toggle_Show_Object_Names();},"Toggle show object names"});
@@ -35,7 +35,7 @@ OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(STREAM_TYPE stream_type,const std::str
 template<class T> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T>::
 OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(STREAM_TYPE stream_type,RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir_input)
     :OPENGL_COMPONENT<T>(stream_type,"Rigid Geometry Collection 1D"),basedir(basedir_input),frame_loaded(-1),valid(false),show_object_names(false),output_positions(true),draw_velocity_vectors(false),
-    draw_node_velocity_vectors(false),draw_point_simplices(true),rigid_body_collection(rigid_body_collection),current_selection(0),need_destroy_rigid_body_collection(false)
+    draw_node_velocity_vectors(false),draw_point_simplices(true),rigid_body_collection(rigid_body_collection),need_destroy_rigid_body_collection(false)
 {
     viewer_callbacks.Set("toggle_output_positions",{[this](){Toggle_Output_Positions();},"Toggle output positions"});
     viewer_callbacks.Set("toggle_show_object_names",{[this](){Toggle_Show_Object_Names();},"Toggle show object names"});
@@ -110,7 +110,7 @@ Create_Geometry(const int id)
 template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T>::
 Update_Geometry(const int id)
 {
-    if(opengl_axes(id)) *opengl_axes(id)->frame=FRAME<VECTOR<T,3> >(Convert_1d_To_3d(rigid_body_collection.Rigid_Body(id).Frame()));
+    if(opengl_axes(id)) *opengl_axes(id)->frame=Convert_1d_To_3d(FRAME<TV>(rigid_body_collection.Rigid_Body(id).Frame().t));
 }
 //#####################################################################
 // Function Destroy_Geometry

@@ -10,7 +10,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,class T_ARRAY> OPENGL_POINTS_3D<T,T_ARRAY>::
 OPENGL_POINTS_3D(STREAM_TYPE stream_type,T_ARRAY& points_input,const OPENGL_COLOR& color_input,const T point_size_input)
-    :OPENGL_OBJECT<T>(stream_type),points(points_input),color(color_input),point_size(point_size_input),draw_point_numbers(false),point_colors(0),point_ids(0),draw_mask(0)
+    :OPENGL_OBJECT<T>(stream_type),points(points_input),color(color_input),point_size(point_size_input),draw_point_numbers(false),point_colors(0),point_ids(0),draw_mask(0),selected_index(-1),selected_id(-1),selected_old_color(color)
 {}
 //#####################################################################
 // Destructor
@@ -29,7 +29,7 @@ template<class T,class T_ARRAY> RANGE<VECTOR<T,3> > OPENGL_POINTS_3D<T,T_ARRAY>:
 Bounding_Box() const
 {
     if(!points.Size()) return RANGE<VECTOR<T,3> >::Empty_Box();
-    return World_Space_Box(RANGE<VECTOR<T,3> >::Bounding_Box(points));
+    return World_Space_Box(RANGE<TV>::Bounding_Box(points));
 }
 //#####################################################################
 // Function Display
@@ -112,8 +112,12 @@ template<class T,class T_ARRAY> void OPENGL_POINTS_3D<T,T_ARRAY>::
 Store_Point_Colors(const bool store_point_colors)
 {
     if(store_point_colors){
-        if(!point_colors){point_colors=new ARRAY<OPENGL_COLOR>(points.Size(),false);point_colors->Fill(color);}
-        else if(point_colors->m!=points.Size()){point_colors->Resize(points.Size());point_colors->Fill(color);}}
+        if(!point_colors){
+            point_colors=new ARRAY<OPENGL_COLOR>(points.Size(),false);
+            point_colors->Fill(color);}
+        else if(point_colors->m!=points.Size()){
+            point_colors->Resize(points.Size());
+            point_colors->Fill(color);}}
     else{delete point_colors;point_colors=0;}
 }
 //#####################################################################
@@ -122,7 +126,9 @@ Store_Point_Colors(const bool store_point_colors)
 template<class T,class T_ARRAY> void OPENGL_POINTS_3D<T,T_ARRAY>::
 Store_Point_Ids(bool store_ids)
 {
-    if(store_ids){if(!point_ids) point_ids=new ARRAY<int>();point_ids->Resize(points.Size());}
+    if(store_ids){
+        if(!point_ids) point_ids=new ARRAY<int>();
+        point_ids->Resize(points.Size());}
     else{delete point_ids;point_ids=0;}
 }
 //#####################################################################
@@ -168,66 +174,53 @@ Select_Points(const ARRAY<int> &indices)
     Set_Point_Colors(indices,OPENGL_COLOR::Yellow());
 }
 //#####################################################################
-// Function Clear_Selection
+// Function Get_Selection_Priority
 //#####################################################################
-template<class T,class T_ARRAY> void OPENGL_POINTS_3D<T,T_ARRAY>::
-Clear_Selection()
+template<class T,class T_ARRAY> int OPENGL_POINTS_3D<T,T_ARRAY>::
+Get_Selection_Priority(ARRAY_VIEW<GLuint> indices)
 {
-    Store_Point_Colors(false);
+    PHYSBAM_ASSERT(indices.m==1);
+    return 100;
 }
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T,class T_ARRAY> OPENGL_SELECTION<T>* OPENGL_POINTS_3D<T,T_ARRAY>::
-Get_Selection(GLuint *buffer,int buffer_size)
+template<class T,class T_ARRAY> bool OPENGL_POINTS_3D<T,T_ARRAY>::
+Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers)
 {
-    if(buffer_size==1){
-        OPENGL_SELECTION_POINTS_3D<T> *selection=new OPENGL_SELECTION_POINTS_3D<T>(this);
-        selection->index=buffer[0];
-        if(point_ids){selection->has_id=true;selection->id=(*point_ids)(buffer[0]);}else selection->has_id=false;
-        return selection;}
-    return 0;
-}
-//#####################################################################
-// Function Highlight_Selection
-//#####################################################################
-template<class T,class T_ARRAY> void OPENGL_POINTS_3D<T,T_ARRAY>::
-Highlight_Selection(OPENGL_SELECTION<T>* selection)
-{
-    if(selection->type!=OPENGL_SELECTION<T>::POINTS_3D) return;
-    OPENGL_SELECTION_POINTS_3D<T> *real_selection=(OPENGL_SELECTION_POINTS_3D<T>*)selection;
-    Select_Point(real_selection->index);
+    selected_index=indices(0);
+    if(point_ids) selected_id=(*point_ids)(indices(0));
+    Store_Point_Colors(true);
+    selected_old_color=(*point_colors)(selected_index);
+    (*point_colors)(selected_index)=OPENGL_COLOR::Yellow();
+    return true;
 }
 //#####################################################################
 // Function Clear_Highlight
 //#####################################################################
 template<class T,class T_ARRAY> void OPENGL_POINTS_3D<T,T_ARRAY>::
-Clear_Highlight()
+Clear_Selection()
 {
-    Clear_Selection();
+    (*point_colors)(selected_index)=selected_old_color;
+    selected_index=-1;
+    selected_id=-1;
+    selected_old_color=color;
 }
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_POINTS_3D<T>::
-Bounding_Box() const
+template<class T,class T_ARRAY> RANGE<VECTOR<T,3> > OPENGL_POINTS_3D<T,T_ARRAY>::
+Selection_Bounding_Box() const
 {
-    PHYSBAM_ASSERT(object);
-    if(OPENGL_POINTS_3D<T,ARRAY<VECTOR<T,3> > >* opengl_points=dynamic_cast<OPENGL_POINTS_3D<T,ARRAY<VECTOR<T,3> > >*>(object))
-        return object->World_Space_Box(RANGE<VECTOR<T,3> >(opengl_points->points(index)));
-    else if(OPENGL_POINTS_3D<T,INDIRECT_ARRAY<ARRAY<VECTOR<T,3> > > >* opengl_points=dynamic_cast<OPENGL_POINTS_3D<T,INDIRECT_ARRAY<ARRAY<VECTOR<T,3> > > >*>(object))
-        return object->World_Space_Box(RANGE<VECTOR<T,3> >(opengl_points->points(index)));
-    else PHYSBAM_NOT_IMPLEMENTED();
+    return World_Space_Box(RANGE<VECTOR<T,3> >(points(selected_index)));
 }
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
 template<class T,class T_ARRAY> void OPENGL_POINTS_3D<T,T_ARRAY>::
-Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const
+Print_Selection_Info(std::ostream &output_stream) const
 {
-    if(selection->type!=OPENGL_SELECTION<T>::POINTS_3D) return;
-    int particle_index=Particle_Index(dynamic_cast<OPENGL_SELECTION_POINTS_3D<T>*>(selection)->index);
-    output_stream<<"Free particle "<<particle_index<<std::endl;
+    output_stream<<"Free particle "<<selected_index<<std::endl;
 }
 //#####################################################################
 namespace PhysBAM{

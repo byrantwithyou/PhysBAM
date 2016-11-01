@@ -13,7 +13,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>::
 OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string &filename_input)
-    :OPENGL_COMPONENT<T>(stream_type,"Pseudo Dirichlet"),mac_grid(grid.Get_MAC_Grid()),velocity_scale(0.025),filename(filename_input),frame_loaded(-1),valid(false)
+    :OPENGL_COMPONENT<T>(stream_type,"Pseudo Dirichlet"),mac_grid(grid.Get_MAC_Grid()),velocity_scale(0.025),filename(filename_input),frame_loaded(-1),valid(false),selected_cell(-1,-1,-1)
 {
     viewer_callbacks.Set("increase_vector_size",{[this](){Increase_Vector_Size();},"Increase vector size"});
     viewer_callbacks.Set("decrease_vector_size",{[this](){Decrease_Vector_Size();},"Decrease vector size"});
@@ -117,13 +117,12 @@ Bounding_Box() const
 // Bounding_Box
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_selection) const
+Print_Selection_Info(std::ostream& output_stream) const
 {
-    if(current_selection && current_selection->type==OPENGL_SELECTION<T>::GRID_CELL_3D && Is_Up_To_Date(frame)){
-        VECTOR<int,3> index=((OPENGL_SELECTION_GRID_CELL_3D<T>*)current_selection)->index;
+    if(selected_cell.x>=0 && Is_Up_To_Date(frame)){
         // TODO: This is not an efficient lookup...
         for(int i=0;i<pseudo_dirichlet_cells.m;i++){
-            if(pseudo_dirichlet_cells(i).x==index){
+            if(pseudo_dirichlet_cells(i).x==selected_cell){
                 output_stream<<component_name<<":  velocity = "<<pseudo_dirichlet_cells(i).y<<std::endl;}}}
 }
 //#####################################################################

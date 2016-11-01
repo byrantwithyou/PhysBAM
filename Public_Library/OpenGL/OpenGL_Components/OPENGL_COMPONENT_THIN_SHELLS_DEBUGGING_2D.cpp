@@ -170,7 +170,7 @@ template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<
 Bounding_Box() const
 {
     if(valid && draw) return World_Space_Box(grid.domain);
-    else return RANGE<VECTOR<T,3> >::Centered_Box();
+    return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 namespace PhysBAM{
 template class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<float>;

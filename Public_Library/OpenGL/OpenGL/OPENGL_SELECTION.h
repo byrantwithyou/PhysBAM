@@ -17,50 +17,18 @@
 #include <OpenGL/OpenGL/OPENGL_PREFERENCES.h>
 #include <OpenGL/OpenGL/OPENGL_PRIMITIVES.h>
 namespace PhysBAM{
-
-template<class T>
-class OPENGL_SELECTION:public NONCOPYABLE
+namespace OPENGL_SELECTION
 {
-public:
-    enum TYPE { GRID_CELL_1D,GRID_CELL_2D, GRID_NODE_2D, GRID_CELL_3D, GRID_CELL_LIST_3D, GRID_NODE_3D, GRID_NODE_LIST_3D, POINTS_2D, POINTS_3D, COMPONENT_PARTICLES_2D, COMPONENT_PARTICLES_3D, 
-                POINT_SIMPLICES_1D,
-                SEGMENTED_CURVE_VERTEX_2D, SEGMENTED_CURVE_SEGMENT_2D, SEGMENTED_CURVE_VERTEX_3D, SEGMENTED_CURVE_SEGMENT_3D, SEGMENTED_CURVE_3D,
-                TRIANGULATED_SURFACE_VERTEX, TRIANGULATED_SURFACE_SEGMENT, TRIANGULATED_SURFACE_TRIANGLE, 
-                TRIANGULATED_AREA_VERTEX, TRIANGULATED_AREA_SEGMENT, TRIANGULATED_AREA_TRIANGLE,
-                TETRAHEDRALIZED_VOLUME_VERTEX, TETRAHEDRALIZED_VOLUME_TETRAHEDRON, COMPONENT_RIGID_BODIES_2D, COMPONENT_RIGID_BODIES_3D, 
-                ARTICULATED_RIGID_BODIES_JOINT_2D, ARTICULATED_RIGID_BODIES_JOINT_3D, ARTICULATED_RIGID_BODIES_MUSCLE_2D, UNUSED_1, UNUSED_2,
-                COMPONENT_DEFORMABLE_COLLECTION_1D,
-                COMPONENT_DEFORMABLE_OBJECT_2D, COMPONENT_DEFORMABLE_OBJECT_2D_INTERACTIVE, 
-                COMPONENT_DEFORMABLE_COLLECTION_3D, COMPONENT_DEFORMABLE_COLLECTION_3D_INTERACTIVE,
-                COMPONENT_HEIGHTFIELD_1D, COMPONENT_HEIGHTFIELD_2D, COMPONENT_CURVE_VERTEX_2D, COMPONENT_CURVE_SEGMENT_2D, COMPONENT_MUSCLES_2D,DEBUG_PARTICLES_2D,DEBUG_PARTICLES_3D,
-                BEZIER_SPLINE_VERTEX_2D, BEZIER_SPLINE_SEGMENT_2D, B_SPLINE_VERTEX_2D, B_SPLINE_SEGMENT_2D, B_SPLINE_PATCH_VERTEX, B_SPLINE_PATCH_ELEMENT};
-
-    TYPE type;
-    OPENGL_OBJECT<T> *object;
-    T min_depth, max_depth;
-    bool hide;
-
-    OPENGL_SELECTION(TYPE type,OPENGL_OBJECT<T>* object);
-    virtual ~OPENGL_SELECTION();
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const=0;
-    virtual TYPE Actual_Type() const;
-
-//#####################################################################
-// Useful functions to draw highlighted primitives
-//#####################################################################
-    template<class TV> static void Draw_Highlighted_Vertex(const TV& position,int id=-1,const OPENGL_COLOR& color=OPENGL_PREFERENCES::selection_highlight_color);
-    template<class TV> static void Draw_Highlighted_Segment(const TV& x0,const TV& x1,int id=-1,const OPENGL_COLOR& color=OPENGL_PREFERENCES::selection_highlight_color);
-    template<class TV> static void Draw_Highlighted_Curve(const ARRAY<VECTOR<TV,2> >& X,int id=-1,const OPENGL_COLOR& color=OPENGL_PREFERENCES::selection_highlight_color);
-    template<class TV> static void Draw_Highlighted_Triangle_Boundary(const TV& x0,const TV& x1,const TV& x2,int id=-1,const OPENGL_COLOR& color=OPENGL_PREFERENCES::selection_highlight_color);
-    static void Draw_Highlighted_Tetrahedron_Boundary(const VECTOR<T,3>& x0,const VECTOR<T,3>& x1,const VECTOR<T,3>& x2,const VECTOR<T,3>& x3,int id=-1,
-        const OPENGL_COLOR& color=OPENGL_PREFERENCES::selection_highlight_color);
-    static void Draw_Highlighted_Quad(const VECTOR<T,2>& x00,const VECTOR<T,2>& x11,const OPENGL_COLOR& color=OPENGL_PREFERENCES::selection_highlight_color);
-    static void Draw_Highlighted_Quad(const VECTOR<T,3>& node1,const VECTOR<T,3>& node2,const VECTOR<T,3>& node3,const VECTOR<T,3>& node4,
-        const OPENGL_COLOR& color=OPENGL_PREFERENCES::selection_highlight_color);
-    static void Draw_Highlighted_Box(const VECTOR<T,3>& x000,const VECTOR<T,3>& x111,const OPENGL_COLOR& color=OPENGL_PREFERENCES::selection_highlight_color);
-    template<class TV,int d> static void Draw_Vertices_For_Selection(const SIMPLEX_MESH<d>& mesh,const GEOMETRY_PARTICLES<TV>& particles);
-};
-
+template<class TV> void Draw_Highlighted_Vertex(const TV& position,int id=-1,const OPENGL_COLOR& color=OPENGL_PREFERENCES::selection_highlight_color);
+template<class TV> void Draw_Highlighted_Segment(const TV& x0,const TV& x1,int id=-1,const OPENGL_COLOR& color=OPENGL_PREFERENCES::selection_highlight_color);
+template<class TV> void Draw_Highlighted_Curve(const ARRAY<VECTOR<TV,2> >& X,int id=-1,const OPENGL_COLOR& color=OPENGL_PREFERENCES::selection_highlight_color);
+template<class TV> void Draw_Highlighted_Triangle_Boundary(const TV& x0,const TV& x1,const TV& x2,int id=-1,const OPENGL_COLOR& color=OPENGL_PREFERENCES::selection_highlight_color);
+template<class TV> void Draw_Highlighted_Tetrahedron_Boundary(const TV& x0,const TV& x1,const TV& x2,const TV& x3,int id=-1,const OPENGL_COLOR& color=OPENGL_PREFERENCES::selection_highlight_color);
+template<class TV> void Draw_Highlighted_Quad(const TV& x00,const TV& x11,const OPENGL_COLOR& color=OPENGL_PREFERENCES::selection_highlight_color);
+template<class TV> void Draw_Highlighted_Quad(const TV& node1,const TV& node2,const TV& node3,const TV& node4,const OPENGL_COLOR& color=OPENGL_PREFERENCES::selection_highlight_color);
+template<class TV> void Draw_Highlighted_Box(const TV& x000,const TV& x111,const OPENGL_COLOR& color=OPENGL_PREFERENCES::selection_highlight_color);
+template<class TV,int d> void Draw_Vertices_For_Selection(const SIMPLEX_MESH<d>& mesh,const GEOMETRY_PARTICLES<TV>& particles);
+}
 }
 
 #endif

@@ -16,6 +16,7 @@ namespace PhysBAM
 template<class T>
 class OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD:public OPENGL_COMPONENT<T>
 {
+    typedef VECTOR<T,2> TV;
 public:
     OPENGL_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T> opengl_vector_field;
 private:

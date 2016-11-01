@@ -57,7 +57,7 @@ public:
     bool Use_Bounding_Box() const override
     {return draw&&valid;}
 
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override
+    virtual RANGE<TV> Bounding_Box() const override
     {if(valid&&draw)return opengl_symmetric_matrix_field.Bounding_Box();return RANGE<VECTOR<T,3> >::Centered_Box();}
 
     void Set_Slice(OPENGL_SLICE* slice_input) override

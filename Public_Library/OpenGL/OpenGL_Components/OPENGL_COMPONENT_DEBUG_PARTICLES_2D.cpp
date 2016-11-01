@@ -6,7 +6,12 @@
 #include <Core/Log/LOG.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
+#include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <OpenGL/OpenGL/OPENGL_INDEXED_COLOR_MAP.h>
+#include <OpenGL/OpenGL/OPENGL_MATERIAL.h>
+#include <OpenGL/OpenGL/OPENGL_SELECTION.h>
+#include <OpenGL/OpenGL/OPENGL_SHAPES.h>
 #include <OpenGL/OpenGL/OPENGL_WORLD.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_DEBUG_PARTICLES_2D.h>
 #include <sstream>
@@ -17,9 +22,14 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
 OPENGL_COMPONENT_DEBUG_PARTICLES_2D(STREAM_TYPE stream_type,const std::string &filename_input)
-    :OPENGL_COMPONENT<T>(stream_type,"Particles 2D"),particles(*new GEOMETRY_PARTICLES<TV>),debug_objects(*new ARRAY<DEBUG_OBJECT<TV> >),opengl_particles(*new OPENGL_DEBUG_PARTICLES_2D<T>(stream_type,particles,debug_objects)),
-    filename(filename_input),frame_loaded(-1),set(0),set_loaded(-1),valid(false),draw_multiple_particle_sets(false)
+    :OPENGL_COMPONENT<T>(stream_type,"Particles 2D"),particles(*new GEOMETRY_PARTICLES<TV>),
+    debug_objects(*new ARRAY<DEBUG_OBJECT<TV> >),default_color(OPENGL_COLOR::White()),
+    velocity_color(OPENGL_COLOR(1,(T).078,(T).576)),
+    draw_velocities(false),draw_arrows(true),scale_velocities((T).025),
+    filename(filename_input),frame_loaded(-1),valid(false),
+    selected_index(-1)
 {
+    viewer_callbacks.Set("show_colored_wireframe",{[this](){Show_Colored_Wireframe();},"Show colored wireframe"});
     viewer_callbacks.Set("toggle_draw_velocities",{[this](){Toggle_Draw_Velocities();},"Toggle draw velocities"});
     viewer_callbacks.Set("increase_vector_size",{[this](){Increase_Vector_Size();},"Increase vector size"});
     viewer_callbacks.Set("decrease_vector_size",{[this](){Decrease_Vector_Size();},"Decrease vector size"});
@@ -37,7 +47,6 @@ template<class T> OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
 {
     delete &particles;
     delete &debug_objects;
-    delete &opengl_particles;
 }
 //#####################################################################
 // Function Valid_Frame
@@ -71,7 +80,103 @@ Set_Draw(bool draw_input)
 template<class T> void OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
 Display() const
 {
-    if(valid && draw) opengl_particles.Display();
+    if(!valid || !draw) return;
+    if(slice && slice->Is_Slice_Mode()){
+        glPushAttrib(GL_ENABLE_BIT);
+        slice->Enable_Clip_Planes();}
+
+    for(int i=0;i<debug_objects.m;i++)
+        if(debug_objects(i).draw_vertices)
+            for(int i=0;i<debug_objects(i).type;i++)
+                OPENGL_SHAPES::Draw_Dot(debug_objects(i).X(i),OPENGL_COLOR(1,0,1),5);
+
+    if(TV::m==2){
+        glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+        glDisable(GL_LIGHTING);
+        glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,1);}
+    glDisable(GL_CULL_FACE);
+    if(TV::m==3) glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 1);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    Send_Transform_To_GL_Pipeline();
+
+    if(wireframe_only){
+        glPushAttrib(GL_POLYGON_BIT);
+        glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);}
+
+    for(int i=0;i<debug_objects.m;i++)
+        if(debug_objects(i).type==DEBUG_OBJECT<TV>::triangle){
+            OpenGL_Begin(GL_TRIANGLES);
+            OPENGL_MATERIAL::Plastic(OPENGL_COLOR(debug_objects(i).color)).Send_To_GL_Pipeline(GL_FRONT);
+            OPENGL_MATERIAL::Plastic(OPENGL_COLOR(debug_objects(i).bgcolor)).Send_To_GL_Pipeline(GL_BACK);
+            OpenGL_Triangle(debug_objects(i).X(0),debug_objects(i).X(1),debug_objects(i).X(2));
+            OpenGL_End();}
+
+    if(wireframe_only) glPopAttrib();
+
+    for(int i=0;i<debug_objects.m;i++)
+        if(debug_objects(i).type==DEBUG_OBJECT<TV>::segment){
+            if(debug_objects(i).separation && debug_objects(i).bgcolor!=debug_objects(i).color){
+                TV t=debug_objects(i).X(1)-debug_objects(i).X(0),n=t.Unit_Orthogonal_Vector()*debug_objects(i).separation;
+                OPENGL_SHAPES::Draw_Segment(debug_objects(i).X(0)+n,debug_objects(i).X(1)+n,OPENGL_COLOR(debug_objects(i).color),2);
+                OPENGL_SHAPES::Draw_Segment(debug_objects(i).X(0)-n,debug_objects(i).X(1)-n,OPENGL_COLOR(debug_objects(i).bgcolor),2);}
+            else OPENGL_SHAPES::Draw_Segment(debug_objects(i).X(0),debug_objects(i).X(1),OPENGL_COLOR(debug_objects(i).color),2);}
+
+    glPopAttrib();
+
+
+    GLint mode=0;
+    glGetIntegerv(GL_RENDER_MODE,&mode);
+
+    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,0);
+    glEnable(GL_CULL_FACE);
+    glPopMatrix();
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    Send_Transform_To_GL_Pipeline();
+
+    glPushAttrib(GL_ENABLE_BIT | GL_POINT_BIT);
+    glPointSize(5);
+    glDisable(GL_LIGHTING);
+
+    glGetIntegerv(GL_RENDER_MODE,&mode);
+
+    ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+    ARRAY_VIEW<T>* sizes=particles.template Get_Array<T>(ATTRIBUTE_ID_DISPLAY_SIZE);
+    ARRAY_VIEW<TV>* V=particles.template Get_Array<TV>(ATTRIBUTE_ID_V);
+
+    if(draw_velocities && V && mode!=GL_SELECT){
+        glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);
+        glDisable(GL_LIGHTING);
+        velocity_color.Send_To_GL_Pipeline();
+        OpenGL_Begin(GL_LINES);
+        for(int i=0;i<particles.X.m;i++){
+            TV X=particles.X(i);
+            TV Y=X+(*V)(i)*scale_velocities;
+            if(draw_arrows) OPENGL_SHAPES::Draw_Arrow(X,Y);
+            else OpenGL_Line(X,Y);}
+        OpenGL_End();
+        glPopAttrib();}
+
+    if(mode==GL_SELECT) glPushName(0);
+    for(int i=0;i<particles.X.m;i++){
+        if(mode==GL_SELECT) glLoadName(i);
+
+        if(colors) OPENGL_COLOR((*colors)(i)).Send_To_GL_Pipeline();
+        else default_color.Send_To_GL_Pipeline();
+
+        if(sizes && (*sizes)(i)) OPENGL_SHAPES::Draw_Circle(particles.X(i),(*sizes)(i)*scale_velocities,20,false);
+        else{
+            OpenGL_Begin(GL_POINTS);
+            OpenGL_Vertex(particles.X(i));
+            OpenGL_End();}}
+    if(mode==GL_SELECT) glPopName();
+
+    glPopAttrib();
+    glPopMatrix();
+    if(slice && slice->Is_Slice_Mode()) glPopAttrib();
 }
 //#####################################################################
 // Function Use_Bounding_Box
@@ -79,7 +184,7 @@ Display() const
 template<class T> bool OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
 Use_Bounding_Box() const
 {
-    return draw && valid && opengl_particles.Use_Bounding_Box();
+    return draw && valid && particles.X.Size()>0;
 }
 //#####################################################################
 // Function Bounding_Box
@@ -87,92 +192,60 @@ Use_Bounding_Box() const
 template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
 Bounding_Box() const
 {
-    if(valid && draw) return opengl_particles.Bounding_Box();
-    else return RANGE<VECTOR<T,3> >::Centered_Box();
+    if(valid && draw) return World_Space_Box(RANGE<TV>::Bounding_Box(particles.X));
+    return RANGE<VECTOR<T,3> >::Centered_Box();
+}
+//#####################################################################
+// Function Get_Selection_Priority
+//#####################################################################
+template<class T> int OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
+Get_Selection_Priority(ARRAY_VIEW<GLuint> indices)
+{
+    return 110;
 }
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
-Get_Selection(GLuint *buffer,int buffer_size)
+template<class T> bool OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
+Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers)
 {
-    int point_index;
-    if(buffer_size==1) point_index=buffer[0];
-    else if(buffer_size==2) point_index=buffer[1];
-    else return 0;
-
-    OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_2D<T> *selection=new OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_2D<T>(this);
-
-    // We have the OPENGL_PARTICLES_2D index but need to find the particle index
-    selection->index=point_index;
-    selection->location=particles.X(point_index);
-    return selection;
-}
-//#####################################################################
-// Function Highlight_Selection
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
-Highlight_Selection(OPENGL_SELECTION<T>* selection)
-{
-    if(selection->type != OPENGL_SELECTION<T>::DEBUG_PARTICLES_2D) return;
-    OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_2D<T> *real_selection=(OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_2D<T>*)selection;
-    int particle_index=real_selection->index;
-    int point_index=0;
-    for(int i=0;i<particle_index;i++)
-        point_index++;
-    opengl_particles.Select_Point(point_index);
+    selected_index=indices(0);
+    return true;
 }
 //#####################################################################
 // Function Clear_Highlight
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
-Clear_Highlight()
+Clear_Selection()
 {
-    opengl_particles.Clear_Selection();
+    selected_index=-1;
 }
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
-Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const
+Print_Selection_Info(std::ostream &output_stream) const
 {
-    if(selection && selection->type == OPENGL_SELECTION<T>::DEBUG_PARTICLES_2D && selection->object == this){
-        OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_2D<T> *real_selection=(OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_2D<T>*)selection;
-        
-        if(!draw_multiple_particle_sets && set!=0) return;
-    
-        output_stream<<"Selected particle in ["<<component_name<<"("<<1<<")] (total number = "<<particles.Size()<<")"<<std::endl;
-    
-        int current_index=-1;
-        if(real_selection->index<particles.Size()){
-            output_stream<<"  Selected by index "<<real_selection->index<<std::endl;
-            current_index=real_selection->index;}
-
-        if(current_index>=0){
-            // real_selection->index is index into particles array at time of selection.  Not very useful. current_index is more useful
-            output_stream<<"current index = "<<current_index<<std::endl;
-            particles.Print(output_stream,current_index);}}
+    if(selected_index>=0){
+        output_stream<<"(total number = "<<particles.Size()<<")"<<std::endl;
+        output_stream<<"current index = "<<selected_index<<std::endl;
+        particles.Print(output_stream,selected_index);}
 }
 //#####################################################################
-// Function Create_Or_Destroy_Selection_After_Frame_Change
+// Function Destroy_Selection_After_Frame_Change
 //#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
-Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection)
+template<class T> bool OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
+Destroy_Selection_After_Frame_Change()
 {
-    // TODO: reimplement transfering particles between objects.
-    if(old_selection && old_selection->object == this){
-        delete_selection=true;
-    }
-    return 0;
+    return true;
 }
 //#####################################################################
 // Function Selection_Bounding_Box
 //#####################################################################
 template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
-Selection_Bounding_Box(OPENGL_SELECTION<T>* selection) const
+Selection_Bounding_Box() const
 {
-    int current_index=dynamic_cast<OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_2D<T>&>(*selection).index;
-    return World_Space_Box(RANGE<TV>(particles.X(current_index)));
+    return World_Space_Box(RANGE<TV>(particles.X(selected_index)));
 }
 //#####################################################################
 // Function Reinitialize
@@ -195,12 +268,20 @@ Reinitialize(bool force)
     frame_loaded=frame;
 }
 //#####################################################################
+// Function Show_Colored_Wireframe
+//#####################################################################
+template<class T> void OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
+Show_Colored_Wireframe()
+{
+    wireframe_only=!wireframe_only;
+}
+//#####################################################################
 // Function Toggle_Draw_Velocities
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
 Toggle_Draw_Velocities()
 {
-    opengl_particles.draw_velocities=!opengl_particles.draw_velocities;
+    draw_velocities=!draw_velocities;
 }
 //#####################################################################
 // Function Increase_Vector_Size
@@ -208,7 +289,7 @@ Toggle_Draw_Velocities()
 template<class T> void OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
 Increase_Vector_Size()
 {
-    opengl_particles.scale_velocities*=(T)1.1;
+    scale_velocities*=(T)1.1;
 }
 //#####################################################################
 // Function Decrease_Vector_Size
@@ -216,7 +297,7 @@ Increase_Vector_Size()
 template<class T> void OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
 Decrease_Vector_Size()
 {
-    opengl_particles.scale_velocities/=(T)1.1;
+    scale_velocities/=(T)1.1;
 }
 //#####################################################################
 // Function Toggle_Arrowhead
@@ -224,7 +305,7 @@ Decrease_Vector_Size()
 template<class T> void OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
 Toggle_Arrowhead()
 {
-    opengl_particles.draw_arrows=!opengl_particles.draw_arrows;
+    draw_arrows=!draw_arrows;
 }
 //#####################################################################
 // Function Command_Prompt_Response
@@ -240,8 +321,18 @@ Command_Prompt_Response()
             ARRAY<int> indices;
             int index;
             while(sstream>>index) indices.Append(index);
-            opengl_particles.Clear_Selection();
-            opengl_particles.Select_Points(indices);}}
+            //Store_Point_Colors(false);
+            //Set_Point_Colors(indices,OPENGL_COLOR::Yellow());
+        }}
+}
+//#####################################################################
+// Function Set_Slice
+//#####################################################################
+template<class T> void OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
+Set_Slice(OPENGL_SLICE *slice_input)
+{
+    slice=slice_input;
+    Slice_Has_Changed();
 }
 //#####################################################################
 // Function Command_Prompt
@@ -250,15 +341,6 @@ template<class T> void OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
 Command_Prompt()
 {
     OPENGL_WORLD<T>::Singleton()->Prompt_User("Command: ",{[this](){Command_Prompt_Response();},""});
-}
-//#####################################################################
-// Selection object functions
-//#####################################################################
-template<class T>
-RANGE<VECTOR<T,3> > OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_2D<T>::
-Bounding_Box() const
-{
-    return object->Selection_Bounding_Box((OPENGL_SELECTION<T>*)this);
 }
 //#####################################################################
 namespace PhysBAM{

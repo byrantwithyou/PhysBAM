@@ -1,5 +1,5 @@
 //#####################################################################
-// Copyright 2004, Eran Guendelman.
+// Copyright 2004-2016, Eran Guendelman, craig.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Read_Write/FILE_UTILITIES.h>
@@ -10,7 +10,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_HEIGHTFIELD_2D<T>::
-OPENGL_COMPONENT_HEIGHTFIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid_input, 
+OPENGL_COMPONENT_HEIGHTFIELD_2D(STREAM_TYPE stream_type,const GRID<TV2> &grid_input, 
                                 const std::string& height_filename_input,
                                 const std::string& xz_filename_input,
                                 const std::string& uv_filename_input,
@@ -51,10 +51,10 @@ OPENGL_COMPONENT_HEIGHTFIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid_inp
     }
 
     height_filename=height_filename_input;
-    if(xz_filename_input.length()){xz=new ARRAY<VECTOR<T,2> ,VECTOR<int,2> >;xz_filename=xz_filename_input;}
+    if(xz_filename_input.length()){xz=new ARRAY<TV2,TV_INT2>;xz_filename=xz_filename_input;}
     else{xz=0;xz_filename="";}
     if(uv_filename_input.length()){
-        uv = new ARRAY<VECTOR<T,2> ,VECTOR<int,2> >;
+        uv = new ARRAY<TV2,TV_INT2>;
         vector_field.Resize(counts.Product());
         vector_locations.Resize(counts.Product());
         uv_filename=uv_filename_input;}
@@ -113,20 +113,20 @@ Display() const
         if(use_triangle_strip)
         {
             opengl_triangulated_surface.front_material.Send_To_GL_Pipeline();
-            VECTOR<T,3> v1,v2,v3,v4;
+            TV v1,v2,v3,v4;
             for(int i = domain.min_corner.x; i <= domain.max_corner.x-1; i++)
             {
                 OpenGL_Begin(GL_TRIANGLE_STRIP);
-                TV lo=grid.X(TV_INT(i,1)),hi=grid.X(TV_INT(i+1,1));
-                v1=VECTOR<T,3>(hi.x, scale*(height(i+1,0)+vertical_offset), hi.y);
-                v2=VECTOR<T,3>(lo.x, scale*(height(i,0)+vertical_offset), lo.y);
+                TV2 lo=grid.X(TV_INT2(i,1)),hi=grid.X(TV_INT2(i+1,1));
+                v1=TV(hi.x, scale*(height(i+1,0)+vertical_offset), hi.y);
+                v2=TV(lo.x, scale*(height(i,0)+vertical_offset), lo.y);
                 OpenGL_Vertex(v1);
                 OpenGL_Vertex(v2);
                 for(int j = domain.min_corner.y+1; j <= domain.max_corner.y; j++)
                 {
-                    TV nx=grid.X(TV_INT(i,j));
-                    v3=VECTOR<T,3>(hi.x, scale*(height(i+1,j)+vertical_offset), nx.y);
-                    v4=VECTOR<T,3>(lo.x, scale*(height(i,j)+vertical_offset), nx.y);
+                    TV2 nx=grid.X(TV_INT2(i,j));
+                    v3=TV(hi.x, scale*(height(i+1,j)+vertical_offset), nx.y);
+                    v4=TV(lo.x, scale*(height(i,j)+vertical_offset), nx.y);
 
                     OpenGL_Normal(PLANE<T>(v1,v2,v3).Normal());
                     OpenGL_Vertex(v3);
@@ -147,11 +147,11 @@ Display() const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_HEIGHTFIELD_2D<T>::
-Bounding_Box() const
+template<class T> auto OPENGL_COMPONENT_HEIGHTFIELD_2D<T>::
+Bounding_Box() const -> RANGE<TV>
 {
     if(valid && draw) return opengl_triangulated_surface.Bounding_Box();
-    else return RANGE<VECTOR<T,3> >::Centered_Box();
+    else return RANGE<TV>::Centered_Box();
 }
 //#####################################################################
 // Function Turn_Smooth_Shading_On
@@ -210,9 +210,9 @@ Reinitialize(bool force)
                     else{
                         int idx = 1;
                         for(int i=domain.min_corner.x;i<domain.max_corner.x;i++)for(int j=domain.min_corner.y;j<domain.max_corner.y;j++){
-                            vector_field(idx) = VECTOR<T,3>((*uv)(i,j).x,0,(*uv)(i,j).y);
-                            TV pt=grid.X(TV_INT(i,j));
-                            vector_locations(idx) = VECTOR<T,3>(pt.x, scale*(height(i,j)+vertical_offset), pt.y);
+                            vector_field(idx) = TV((*uv)(i,j).x,0,(*uv)(i,j).y);
+                            TV2 pt=grid.X(TV_INT2(i,j));
+                            vector_locations(idx) = TV(pt.x, scale*(height(i,j)+vertical_offset), pt.y);
                             idx++;}}}
                 else success=false;}
 
@@ -233,9 +233,9 @@ Update_Surface()
     {
         for(int i = domain.min_corner.x; i <= domain.max_corner.x; i++) for(int j = domain.min_corner.y; j <= domain.max_corner.y; j++)
         {
-            TV pt=grid.X(TV_INT(i,j));
+            TV2 pt=grid.X(TV_INT2(i,j));
             triangulated_surface.particles.X(To_Linear_Index(i,j)) = 
-                VECTOR<T,3>(pt.x + displacement_scale*((*xz)(i,j).x-pt.x), 
+                TV(pt.x + displacement_scale*((*xz)(i,j).x-pt.x), 
                     scale*(height(i,j)+vertical_offset), 
                     pt.y + displacement_scale*((*xz)(i,j).y-pt.y));
         }
@@ -253,9 +253,9 @@ Update_Surface()
 
         for(int i = domain.min_corner.x; i <= domain.max_corner.x; i++) for(int j = domain.min_corner.y; j <= domain.max_corner.y; j++)
         {
-            TV pt=grid.X(TV_INT(i,j));
+            TV2 pt=grid.X(TV_INT2(i,j));
             triangulated_surface.particles.X(To_Linear_Index(i,j)) = 
-                VECTOR<T,3>(pt.x, scale*(height(i,j)+vertical_offset), pt.y);
+                TV(pt.x, scale*(height(i,j)+vertical_offset), pt.y);
         }
 
         if(subdivide_surface) triangulated_surface.Loop_Subdivide();
@@ -266,46 +266,29 @@ Update_Surface()
         opengl_triangulated_surface.Delete_Vertex_Normals();
 }
 //#####################################################################
-// Function Get_Selection
+// Function Get_Selection_Priority
 //#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_COMPONENT_HEIGHTFIELD_2D<T>::
-Get_Selection(GLuint *buffer,int buffer_size)
+template<class T> int OPENGL_COMPONENT_HEIGHTFIELD_2D<T>::
+Get_Selection_Priority(ARRAY_VIEW<GLuint> indices)
 {
-    if(use_triangle_strip) return 0;
-    OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_2D<T> *new_selection = 0;
-    OPENGL_SELECTION<T>* selection = opengl_triangulated_surface.Get_Selection(buffer,buffer_size);
-    if(selection)
-    {
-        if(selection->type == OPENGL_SELECTION<T>::TRIANGULATED_SURFACE_VERTEX)
-        {
-            int index = ((OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX<T> *)selection)->index;
-            new_selection = new OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_2D<T>(this);
-            new_selection->index = From_Linear_Index(index);
-        }
-        delete selection;
-    }
-    return new_selection;
+    return opengl_triangulated_surface.Get_Selection_Priority(indices);
 }
 //#####################################################################
-// Function Highlight_Selection
+// Function Get_Selection
 //#####################################################################
-template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_2D<T>::
-Highlight_Selection(OPENGL_SELECTION<T>* selection)
+template<class T> bool OPENGL_COMPONENT_HEIGHTFIELD_2D<T>::
+Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers)
 {
-    if(selection->type != OPENGL_SELECTION<T>::COMPONENT_HEIGHTFIELD_2D) return;
-    OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_2D<T> *real_selection = (OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_2D<T>*)selection;
-    int vertex_index = To_Linear_Index(real_selection->index.x, real_selection->index.y);
-    OPENGL_SELECTION<T>* surface_selection = opengl_triangulated_surface.Get_Vertex_Selection(vertex_index);
-    opengl_triangulated_surface.Highlight_Selection(surface_selection);
-    delete surface_selection; // Highlight_Selection made a copy of it
+    if(use_triangle_strip) return false;
+    return opengl_triangulated_surface.Set_Selection(indices,modifiers);
 }
 //#####################################################################
 // Function Clear_Highlight
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_2D<T>::
-Clear_Highlight()
+Clear_Selection()
 {
-    opengl_triangulated_surface.Clear_Highlight();
+    opengl_triangulated_surface.Clear_Selection();
 }
 //#####################################################################
 // Function Set_Scale
@@ -395,13 +378,12 @@ Toggle_Subdivision()
     Reinitialize(true);
 }
 //#####################################################################
-// Function Bounding_Box
+// Function Selection_Bounding_Box
 //#####################################################################
-template<class T> RANGE<VECTOR<T,3> > OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_2D<T>::
-Bounding_Box() const
+template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_HEIGHTFIELD_2D<T>::
+Selection_Bounding_Box() const
 {
-    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
-    return RANGE<VECTOR<T,3> >::Centered_Box();
+    return opengl_triangulated_surface.Selection_Bounding_Box();
 }
 namespace PhysBAM{
 template class OPENGL_COMPONENT_HEIGHTFIELD_2D<float>;

@@ -29,15 +29,15 @@ public:
     bool Is_Up_To_Date(int frame) const override { return valid && frame_loaded == frame; }
 
     void Display() const override;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    virtual RANGE<TV> Bounding_Box() const override;
     virtual void Set_Slice(OPENGL_SLICE *slice_input) override { slice=slice_input; opengl_grid_based_vector_field.Set_Slice(slice_input); }
     virtual void Slice_Has_Changed() override { opengl_grid_based_vector_field.Slice_Has_Changed(); }
-    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const override;
+    void Print_Selection_Info(std::ostream& stream) const override;
 
     void Set_Frame(int frame_input) override;
     void Set_Draw(bool draw_input = true) override;
 
-    void Set_Vector_Size(double size);
+    void Set_Vector_Size(T size);
 
     void Increase_Vector_Size();
     void Decrease_Vector_Size();

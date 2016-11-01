@@ -55,14 +55,14 @@ public:
     virtual void Turn_Smooth_Shading_On() override
     {object.Turn_Smooth_Shading_On();}
 
-    OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer,int buffer_size) override
-    {return object.Get_Selection(buffer,buffer_size);}
+    virtual int Get_Selection_Priority(ARRAY_VIEW<GLuint> indices) override
+    {return object.Get_Selection_Priority(indices);}
 
-    virtual void Highlight_Selection(OPENGL_SELECTION<T>* selection) override
-    {object.Highlight_Selection(selection);}
+    bool Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers) override
+    {return object.Set_Selection(indices,modifiers);}
 
-    virtual void Clear_Highlight() override
-    {object.Clear_Highlight();}
+    virtual void Clear_Selection() override
+    {object.Clear_Selection();}
 
     virtual void Set_Slice(OPENGL_SLICE *slice_input) override
     {slice=slice_input;object.Set_Slice(slice_input);}
@@ -70,8 +70,8 @@ public:
     virtual void Slice_Has_Changed() override
     {object.Slice_Has_Changed();}
 
-    void Print_Selection_Info(std::ostream& ostream,OPENGL_SELECTION<T>* selection) const override
-    {object.Print_Selection_Info(ostream,selection);}
+    void Print_Selection_Info(std::ostream& ostream) const override
+    {object.Print_Selection_Info(ostream);}
 };
 }
 

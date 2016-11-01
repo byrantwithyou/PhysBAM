@@ -16,7 +16,7 @@ namespace PhysBAM{
 template<class T,class T2> OPENGL_FACE_SCALAR_FIELD_2D<T,T2>::
 OPENGL_FACE_SCALAR_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid_input,ARRAY<T2,FACE_INDEX<2> > &face_values_input,OPENGL_COLOR_MAP<T2> *color_map_input)
     :OPENGL_OBJECT<T>(stream_type),grid(grid_input),face_values(face_values_input),
-    color_map(color_map_input),opengl_points(stream_type,*new ARRAY<VECTOR<T,2> >)
+    color_map(color_map_input),opengl_points(stream_type,*new ARRAY<TV>)
 {
     PHYSBAM_ASSERT(color_map);
 }
@@ -27,6 +27,7 @@ template<class T,class T2> OPENGL_FACE_SCALAR_FIELD_2D<T,T2>::
 ~OPENGL_FACE_SCALAR_FIELD_2D()
 {
     delete &opengl_points.points;
+    delete color_map;
 }
 //#####################################################################
 // Display
@@ -62,25 +63,6 @@ Update()
         opengl_points.point_colors->Append(color_map->Lookup(face_values(it.Full_Index())));}
 }
 //#####################################################################
-// Print_Selection_Info
-//#####################################################################
-template<class T,class T2> void OPENGL_FACE_SCALAR_FIELD_2D<T,T2>::
-Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* selection) const
-{
-    // TODO: this should also interpolate to particles
-    if(selection && selection->type==OPENGL_SELECTION<T>::GRID_CELL_2D && grid.Is_MAC_Grid()){
-        VECTOR<int,2> index=((OPENGL_SELECTION_GRID_CELL_2D<T>*)selection)->index;
-        FACE_INDEX<TV::m> ix(0,index),iy(1,index);
-        T2 left=face_values(ix);
-        T2 bottom=face_values(iy);
-        ix.index.x++;
-        iy.index.y++;
-        T2 right=face_values(ix);
-        T2 top=face_values(iy);
-        output_stream<<"    left = "<<left<<",right = "<<right<<std::endl;
-        output_stream<<"    bottom = "<<bottom<<",top = "<<top<<std::endl;}
-}
-//#####################################################################
 // Function Bool_Update_Helper
 //#####################################################################
 template<class T> static void 
@@ -106,6 +88,24 @@ template<> void OPENGL_FACE_SCALAR_FIELD_2D<double,bool>::
 Update()
 {
     Bool_Update_Helper(*this);
+}
+//#####################################################################
+// Print_Selection_Info
+//#####################################################################
+template<class T,class T2> void OPENGL_FACE_SCALAR_FIELD_2D<T,T2>::
+Print_Selection_Info(std::ostream& output_stream) const
+{
+    // TODO: this should also interpolate to particles
+    if(selected_index.x>=0 && grid.Is_MAC_Grid()){
+        FACE_INDEX<TV::m> ix(0,selected_index),iy(1,selected_index);
+        T2 left=face_values(ix);
+        T2 bottom=face_values(iy);
+        ix.index.x++;
+        iy.index.y++;
+        T2 right=face_values(ix);
+        T2 top=face_values(iy);
+        output_stream<<"    left = "<<left<<",right = "<<right<<std::endl;
+        output_stream<<"    bottom = "<<bottom<<",top = "<<top<<std::endl;}
 }
 //#####################################################################
 template class OPENGL_FACE_SCALAR_FIELD_2D<float,int>;

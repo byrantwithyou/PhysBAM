@@ -28,26 +28,6 @@ Display() const
     BASE::Display();
 }
 //#####################################################################
-// Function Bounding_Box
-//#####################################################################
-template<class T,int d> RANGE<VECTOR<T,3> > OPENGL_SELECTION_B_SPLINE_VERTEX_2D<T,d>::
-Bounding_Box() const
-{
-    PHYSBAM_ASSERT(object);
-    const BEZIER_SPLINE<VECTOR<T,2>,d> &curve=((OPENGL_B_SPLINE_2D<T,d> *)object)->bezier_version;
-    return object->World_Space_Box(RANGE<VECTOR<T,2> >(curve.particles.X(index)));
-}
-//#####################################################################
-// Function Bounding_Box
-//#####################################################################
-template<class T,int d> RANGE<VECTOR<T,3> > OPENGL_SELECTION_B_SPLINE_SEGMENT_2D<T,d>::
-Bounding_Box() const
-{
-    PHYSBAM_ASSERT(object);
-    const BEZIER_SPLINE<VECTOR<T,2>,d> &curve=((OPENGL_B_SPLINE_2D<T,d> *)object)->bezier_version;
-    return object->World_Space_Box(RANGE<VECTOR<T,2> >::Bounding_Box(curve.particles.X.Subset(curve.control_points(index))));
-}
-//#####################################################################
 namespace PhysBAM{
 template class OPENGL_B_SPLINE_2D<float,3>;
 template class OPENGL_B_SPLINE_2D<double,3>;

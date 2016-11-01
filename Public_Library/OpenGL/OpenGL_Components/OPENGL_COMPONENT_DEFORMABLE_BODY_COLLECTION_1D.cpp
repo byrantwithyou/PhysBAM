@@ -133,16 +133,17 @@ Display() const
 {
     if(!draw || !valid) return;
 
+    glPushName(0);
+    glPushName(0);
     for(int i=0;i<point_simplices_1d_objects.m;i++){
         if(!active_list(i)) continue;
-        glPushName(i);
-        if(point_simplices_1d_objects(i)){
-            glPushName(1);
-            point_simplices_1d_objects(i)->Display();
-            glPopName();}
-        glPopName();}
-
-    if(selected_vertex>=0) OPENGL_SELECTION<T>::Draw_Highlighted_Vertex(deformable_body_collection.particles.X(selected_vertex),selected_vertex);
+        glLoadName(i);
+        if(point_simplices_1d_objects(i))
+            point_simplices_1d_objects(i)->Display();}
+    glPopName();
+    glPopName();
+    
+    if(selected_vertex>=0) OPENGL_SELECTION::Draw_Highlighted_Vertex(deformable_body_collection.particles.X(selected_vertex),selected_vertex);
 
     //if(draw_velocity_vectors) velocity_field.Display();
 }
@@ -214,14 +215,6 @@ Toggle_Use_Active_List()
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
 Toggle_Selection_Mode()
 {
-    if(!real_selection) return;
-    assert(real_selection->body_selection);
-    if(real_selection->body_selection->type == OPENGL_SELECTION<T>::POINT_SIMPLICES_1D){
-        delete real_selection->body_selection;
-        real_selection->body_selection=real_selection->saved_selection;}
-    else return;
-    Highlight_Selection(real_selection);
-    glutPostRedisplay();
 }
 //#####################################################################
 // Function Increment_Active_Object
@@ -235,61 +228,46 @@ Increment_Active_Object()
     active_list(incremented_active_object)=true;
 }
 //#####################################################################
+// Function Get_Selection_Priority
+//#####################################################################
+template<class T> int OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
+Get_Selection_Priority(ARRAY_VIEW<GLuint> indices)
+{
+    if(!indices.m) return -1;
+    return 10;
+}
+//#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
-Get_Selection(GLuint *buffer,int buffer_size)
+template<class T> bool OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
+Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers)
 {
-    OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_1D<T>* selection=0;
-    if(buffer_size>=1){
-        selection=new OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_1D<T>(this);
-        selection->body_index=buffer[0];selection->subobject_type=buffer[1];
-        switch(selection->subobject_type){
-            case 1:selection->subobject=point_simplices_1d_objects(buffer[0]);break;
-            default:PHYSBAM_FATAL_ERROR();}
-        selection->body_selection=selection->subobject->Get_Selection(&buffer[2],buffer_size-2);
-        if(!selection->body_selection){delete selection;selection=0;}}
-    return selection;
-}
-//#####################################################################
-// Function Set_Selection
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
-Set_Selection(OPENGL_SELECTION<T>* selection)
-{
-    if(selection->type!=OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_COLLECTION_1D) return;
-    real_selection=(OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_1D<T>*)selection;
-}
-//#####################################################################
-// Function Highlight_Selection
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
-Highlight_Selection(OPENGL_SELECTION<T>* selection)
-{
-    if(selection->type!=OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_COLLECTION_1D) return;
-    OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_1D<T>* real_selection=(OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_1D<T>*)selection;
-    if(selection->hide) active_list(real_selection->body_index)=false;
-    else real_selection->subobject->Highlight_Selection(real_selection->body_selection);
+    if(modifiers&GLUT_ACTIVE_CTRL){
+        active_list(indices(1))=false;
+        Update_Velocity_Field();
+        return false;}
+
+    if(indices(0)==0){
+        selected_vertex=indices(1);
+        return point_simplices_1d_objects(indices(1))->Set_Selection(indices.Array_View(2,indices.m-2),modifiers);}
+    return false;
 }
 //#####################################################################
 // Function Clear_Highlight
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
-Clear_Highlight()
+Clear_Selection()
 {
-    for(int i=0;i<point_simplices_1d_objects.m;i++) if(point_simplices_1d_objects(i) && active_list(i)) point_simplices_1d_objects(i)->Clear_Highlight();
-    real_selection=0;
+    selected_vertex=-1;
 }
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
-Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const
+Print_Selection_Info(std::ostream &output_stream) const
 {
-    if(selection && selection->type==OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_COLLECTION_1D && selection->object==this){
-        OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_1D<T>* real_selection=(OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_1D<T>*)selection;
-        output_stream<<"Deformable object "<<real_selection->body_index<<std::endl;
-        real_selection->subobject->Print_Selection_Info(output_stream,real_selection->body_selection);}
+    output_stream<<"Deformable object "<<selected_vertex<<std::endl;
+    point_simplices_1d_objects(selected_vertex)->Print_Selection_Info(output_stream);
 }
 //#####################################################################
 // Function Toggle_Active_Value_Response
@@ -320,18 +298,16 @@ Highlight_Particle_Response()
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T>
-RANGE<VECTOR<T,3> > OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_1D<T>::
-Bounding_Box() const
+template<class T> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
+Selection_Bounding_Box() const
 {
-    PHYSBAM_ASSERT(object && body_selection);
-    return object->World_Space_Box(body_selection->Bounding_Box());
+    return World_Space_Box(point_simplices_1d_objects(selected_vertex)->Bounding_Box());
 }
 //#####################################################################
 // Function Set_Vector_Size
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
-Set_Vector_Size(double size)
+Set_Vector_Size(T size)
 {
     //velocity_field.size=size;
 }
@@ -373,11 +349,13 @@ Update_Velocity_Field()
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
-Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection)
+template<class T> bool OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
+Destroy_Selection_After_Frame_Change()
 {
-    if(old_selection && old_selection->object==this && invalidate_deformable_objects_selection_each_frame) delete_selection=true;
-    return 0;
+    if(invalidate_deformable_objects_selection_each_frame){
+        Clear_Selection();
+        return true;}
+    return false;
 }
 //#####################################################################
 // Function Turn_Smooth_Shading_On

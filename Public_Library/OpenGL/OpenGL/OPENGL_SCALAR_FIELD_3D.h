@@ -41,12 +41,12 @@ public:
     T2 Pre_Map_Value(const T2 value) const;
 
     void Display() const override;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    virtual RANGE<TV> Bounding_Box() const override;
     void Slice_Has_Changed() override;    
 
     void Set_Draw_Mode(DRAW_MODE draw_mode);
     virtual void Update();  // Call when values or other attributes have changed
-    void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION<T>* current_selection) const override;
+    void Print_Selection_Info(std::ostream& output_stream) const override;
 
     // convenience functions
     void Toggle_Draw_Mode();
@@ -70,6 +70,9 @@ public:
     bool smooth_slice_texture;
     bool scale_range;
     T2 scale_range_min,scale_range_dx;
+    TV_INT selected_cell;
+    TV_INT selected_node;
+    int selected_point;
 };
 
 }

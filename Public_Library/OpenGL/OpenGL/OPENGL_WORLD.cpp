@@ -45,10 +45,10 @@ OPENGL_WORLD(STREAM_TYPE stream_type)
     display_strings(true),show_object_names(false),display_object_names_in_corner(false),view_auto_help(false),
     timer_id(0),idle_delay(0),idle_timer(0),view_target_timer(0),frame_counter_timer(0),frames_rendered(0),frames_per_second(0),show_frames_per_second(true),
     left_handed_coordinate_system(false),nearclip_factor(.0625),farclip_factor(4),nearclip(nearclip_factor),farclip(farclip_factor),
-    arcball(new OPENGL_ARCBALL<T>(stream_type,*this)),camera_distance(1),arcball_matrix(arcball->Value()),rotation_matrix(arcball->Value()),
+    arcball(new OPENGL_ARCBALL<TV>(stream_type,*this)),camera_distance(1),arcball_matrix(arcball->Value()),rotation_matrix(arcball->Value()),
     zoom_direction(1),translation_direction(1),oldmousex(0),oldmousey(0),do_mouse_rotation(false),do_mouse_zoom(false),do_mouse_target_xy(false),
-    do_mouse_target_z(false),external_mouse_handler(0),shift_was_pressed(false),ctrl_was_pressed(false),
-    current_key_binding_category("User-Defined Keys"),current_key_binding_category_priority(1),prompt_mode(false),
+    do_mouse_target_z(false),external_mouse_handler(0),
+    current_key_binding_category("User-Defined Keys"),prompt_mode(false),
     process_hits_cb(0),selection_mode(false),current_selection(0)
 {
     if(Opengl_World<T>()!=0) PHYSBAM_FATAL_ERROR(); 
@@ -57,7 +57,6 @@ OPENGL_WORLD(STREAM_TYPE stream_type)
     key_bindings.Resize(0,OPENGL_KEY::MAX_KEY_INDEX,0,OPENGL_KEY::MAX_MODIFIER_INDEX);
 
     Set_Key_Binding_Category("Default Keys (OPENGL_WORLD)");
-    Set_Key_Binding_Category_Priority(1000);
     Bind_Key("^q",{[this](){exit(0);},"Quit"});
     Bind_Key("^w",{[this](){fill_mode=(fill_mode+1)%3;},"Toggle wireframe mode"});
 
@@ -103,7 +102,6 @@ OPENGL_WORLD(STREAM_TYPE stream_type)
     Bind_Key("<F1>",{[this](){display_strings=!display_strings;},"Toggle display strings"});
 
     Set_Key_Binding_Category("User-Defined Keys");
-    Set_Key_Binding_Category_Priority(1);
     Set_View_Target_Timer(1);
     arcball->world=this;
 }
@@ -229,14 +227,6 @@ Set_Key_Binding_Category(const std::string &category)
     current_key_binding_category=category;
 }
 //#####################################################################
-// Function Set_Key_Binding_Category_Priority
-//####################################################################
-template<class T> void OPENGL_WORLD<T>::
-Set_Key_Binding_Category_Priority(int priority)
-{
-    current_key_binding_category_priority=priority;
-}
-//#####################################################################
 // Function Bind_Key
 //####################################################################
 template<class T> void OPENGL_WORLD<T>::
@@ -260,12 +250,8 @@ template<class T> void OPENGL_WORLD<T>::
 Append_Bind_Key(const OPENGL_KEY& key,OPENGL_CALLBACK callback)
 {
     key_bindings(key.Index()).Append(callback);
-    int index;
-    for(index=0;index<key_bindings_by_category.m;index++) if(key_bindings_by_category(index).name==current_key_binding_category) break;
-    if(index>=key_bindings_by_category.m){ // Insert in location dependent on priority
-        for(index=0;index<key_bindings_by_category.m && key_bindings_by_category(index).priority<=current_key_binding_category_priority;index++){}
-        key_bindings_by_category.Insert(OPENGL_KEY_BINDING_CATEGORY(current_key_binding_category,current_key_binding_category_priority),index);}
-    key_bindings_by_category(index).key_bindings.Append(PAIR<OPENGL_KEY,OPENGL_CALLBACK>(key,callback));
+    ARRAY<PAIR<OPENGL_KEY,OPENGL_CALLBACK> > list=key_bindings_by_category[current_key_binding_category];
+    list.Append(PAIR<OPENGL_KEY,OPENGL_CALLBACK>(key,callback));
 }
 //#####################################################################
 // Function Append_Bind_Key
@@ -282,11 +268,11 @@ template<class T> void OPENGL_WORLD<T>::
 Unbind_Key(const OPENGL_KEY& key)
 {
     key_bindings(key.Index()).Remove_All();
-    for(int i=0;i<key_bindings_by_category.m;i++)
-        for(int j=0;j<key_bindings_by_category(i).key_bindings.m;j++)
-            if(key_bindings_by_category(i).key_bindings(j).x==key){
-                key_bindings_by_category(i).key_bindings(j).y={0,0};
-                key_bindings_by_category(i).key_bindings.Remove_Index(j);}
+    for(auto& it:key_bindings_by_category)
+        for(int j=0;j<it.second.m;j++)
+            if(it.second(j).x==key){
+                it.second(j).y={0,0};
+                it.second.Remove_Index(j);}
 }
 //#####################################################################
 // Function Unbind_Keys
@@ -443,7 +429,7 @@ template<class T> void OPENGL_WORLD<T>::Render_World(bool selecting,bool swap_bu
         if((!selecting && object_list(i)->visible) || object_list(i)->selectable){
             if(load_names_for_selection) glLoadName(i);
             object_list(i)->Display();}
-    if(view_target_timer>0) Opengl_World<T>()->Display_Target();
+    if(view_target_timer>0) Display_Target();
     glEnable(GL_LIGHTING);
 
     if(!selecting){
@@ -552,28 +538,6 @@ template<class T> int OPENGL_WORLD<T>::Get_Number_Of_Valid_Hits(GLint hits,GLuin
     return i;
 }
 //#####################################################################
-// Function Get_Selections
-//#####################################################################
-template<class T> void OPENGL_WORLD<T>::Get_Selections(ARRAY<OPENGL_SELECTION<T>* > &selections,GLint hits,GLuint buffer[])
-{
-    selections.Remove_All();
-    int idx=0;
-    for(int i=0;i<(int)hits;i++){
-        GLint names=buffer[idx];
-        int object_id=buffer[idx+3];
-        PHYSBAM_ASSERT(0<=object_id && object_id<object_list.m && object_list(object_id)->selectable);
-        OPENGL_SELECTION<T>* selection=object_list(object_id)->Get_Selection(&buffer[idx+4],names-1);
-        if(selection){
-            unsigned int denom=0xffffffff;
-            selection->min_depth=(T)buffer[idx+1]/denom;
-            selection->max_depth=(T)buffer[idx+2]/denom;
-            selection->hide=shift_was_pressed && ctrl_was_pressed;
-            selections.Append(selection);
-        }
-        idx +=names+3;
-    }
-}
-//#####################################################################
 // Function Handle_Reshape_Main
 //#####################################################################
 // glut independent
@@ -621,21 +585,19 @@ Handle_Keypress_Prompt(unsigned char key)
 //#####################################################################
 // glut independent, although button and state should be GLUT defines
 template<class T> void OPENGL_WORLD<T>::
-Handle_Click_Main(int button,int state,int x,int y,bool ctrl_pressed,bool shift_pressed)
+Handle_Click_Main(int button,int state,int x,int y,int modifiers)
 {
     if(external_mouse_handler){
-        external_mouse_handler->Handle_Click(button,state,x,y,ctrl_pressed,shift_pressed);
+        external_mouse_handler->Handle_Click(button,state,x,y,modifiers);
         window->Redisplay();}
     
     switch(button){
         case GLUT_LEFT_BUTTON:
             // Add selection stuff
-            if((shift_pressed && state==GLUT_DOWN) || selection_mode){
+            if((modifiers&GLUT_ACTIVE_SHIFT && state==GLUT_DOWN) || selection_mode){
                 const int buff_size=512;
                 GLuint selectBuf[buff_size];
                 GLint viewport[4];
-                shift_was_pressed=shift_pressed!=0;
-                ctrl_was_pressed=ctrl_pressed!=0;
                 glGetIntegerv(GL_VIEWPORT,viewport);
                 glSelectBuffer(buff_size,selectBuf);
                 (void) glRenderMode (GL_SELECT);
@@ -655,12 +617,11 @@ Handle_Click_Main(int button,int state,int x,int y,bool ctrl_pressed,bool shift_
 
                 GLint hits=glRenderMode (GL_RENDER);
                 if(hits<0) hits=Get_Number_Of_Valid_Hits(hits,selectBuf,buff_size); // if had buffer overflow, get number of valid hit records
-                if(process_hits_cb) process_hits_cb(hits,selectBuf);
+                if(process_hits_cb) process_hits_cb(hits,selectBuf,modifiers);
             } else
             {
                 VECTOR<T,2> mouseVector=Convert_Mouse_Coordinates(x,y);
                 if(state==GLUT_UP){
-                    shift_was_pressed=false;
                     if(do_mouse_rotation){
                         arcball->End_Drag(mouseVector); // indictes that dragging should end
                         arcball_matrix=arcball->Value(); // extracts the current matrix transform
@@ -670,7 +631,7 @@ Handle_Click_Main(int button,int state,int x,int y,bool ctrl_pressed,bool shift_
                     }
                     do_mouse_rotation=do_mouse_target_xy=false;
                 } else if(state==GLUT_DOWN){
-                    if(mode_2d || ctrl_pressed) Prepare_For_Target_XY_Drag();
+                    if(mode_2d || (modifiers&GLUT_ACTIVE_CTRL)) Prepare_For_Target_XY_Drag();
                     else{
                         // Update
                         arcball->Begin_Drag(mouseVector); // indicates that dragging should begin
@@ -683,7 +644,7 @@ Handle_Click_Main(int button,int state,int x,int y,bool ctrl_pressed,bool shift_
         case GLUT_RIGHT_BUTTON:
             if(state==GLUT_UP){do_mouse_zoom=do_mouse_target_z=false;}
             else if(state==GLUT_DOWN){
-                if(ctrl_pressed){do_mouse_target_z=true;Set_View_Target_Timer(1);}
+                if(modifiers&GLUT_ACTIVE_CTRL){do_mouse_target_z=true;Set_View_Target_Timer(1);}
                 else do_mouse_zoom=true;}
             break;
         case GLUT_MIDDLE_BUTTON:
@@ -816,18 +777,18 @@ template<class T> void OPENGL_WORLD<T>::
 Display_Auto_Help()
 {
     ARRAY<std::string> strings1,strings2;
-    for(int i=0;i<key_bindings_by_category.m;i++){
-        if(key_bindings_by_category(i).key_bindings.m>0){
-            strings1.Append(key_bindings_by_category(i).name+":");
+    for(auto& it:key_bindings_by_category){
+        if(it.second.m>0){
+            strings1.Append(it.first+":");
             strings2.Append("");
-            for(int j=0;j<key_bindings_by_category(i).key_bindings.m;j++){
+            for(int j=0;j<it.second.m;j++){
                 std::ostringstream string_stream1;
                 string_stream1.flags(std::ios::right);
                 string_stream1.width(5);
-                string_stream1<<key_bindings_by_category(i).key_bindings(j).x.Name();
+                string_stream1<<it.second(j).x.Name();
                 string_stream1<<":";
                 strings1.Append(string_stream1.str());
-                strings2.Append(std::string("      ")+key_bindings_by_category(i).key_bindings(j).y.help);}}}
+                strings2.Append(std::string("      ")+it.second(j).y.help);}}}
 
     Display_Strings(strings2,OPENGL_COLOR::Yellow(),true,0,13,GLUT_BITMAP_8_BY_13);
     Display_Strings(strings1,OPENGL_COLOR::White(),false,0,13,GLUT_BITMAP_8_BY_13);
@@ -980,14 +941,6 @@ Set_2D_Mode(bool mode)
     mode_2d=mode;
 }
 //#####################################################################
-// Function Set_Process_Hits_Callback
-//#####################################################################
-template<class T> void OPENGL_WORLD<T>::
-Set_Process_Hits_Callback(PROCESS_HITS_CB process_hits_cb_input)
-{
-    process_hits_cb=process_hits_cb_input;
-}
-//#####################################################################
 // Function Get_View_Frame
 //   Returned vectors are already normalized (or at least should be!).
 //   view_forward is a vector in world space which in the current view
@@ -1124,7 +1077,7 @@ Ray_Through_Normalized_Image_Coordinate(VECTOR<T,2> coordinates)
     TV view_forward(-matrix(3,1),-matrix(3,2),-matrix(3,3));
     TV X(coordinates.x*(T)window->Width()/(T)window->Height(),coordinates.y,-1/tan(.5f*fovy*(T)pi/180));
     TV position=target_position-camera_distance*view_forward;
-    return RAY<VECTOR<T,3> >(position,matrix.Transposed().Homogeneous_Times(X));
+    return RAY<TV>(position,matrix.Transposed().Homogeneous_Times(X));
 }
 //#####################################################################
 // Function Set_Left_Handed
@@ -1162,18 +1115,18 @@ Get_Target_Position()
 template<class T> RANGE<VECTOR<T,3> > OPENGL_WORLD<T>::
 Scene_Bounding_Box()
 {
-    RANGE<TV> bounding_box;
+    RANGE<VECTOR<T,3> > bounding_box;
     bool first=true;
     for(int i=0;i<object_list.m;i++) if(use_bounding_box(i) && object_list(i)->Use_Bounding_Box()){
         if(first){bounding_box=object_list(i)->Bounding_Box();first=false;}
-        else bounding_box=RANGE<TV>::Combine(bounding_box,object_list(i)->Bounding_Box());}
+        else bounding_box=RANGE<VECTOR<T,3> >::Combine(bounding_box,object_list(i)->Bounding_Box());}
     return bounding_box;
 }
 //#####################################################################
 // Function Center_Camera_On_Box
 //#####################################################################
 template<class T> void OPENGL_WORLD<T>::
-Center_Camera_On_Bounding_Box(const RANGE<TV>& bounding_box,const bool adjust_distance)
+Center_Camera_On_Bounding_Box(const RANGE<VECTOR<T,3> >& bounding_box,const bool adjust_distance)
 {
     target_position=bounding_box.Center();
     if(!adjust_distance) return;
@@ -1206,7 +1159,7 @@ Reset_Camera_Orientation(const bool reset_up_vector_only)
 template<class T> void OPENGL_WORLD<T>::
 Center_Camera_On_Scene()
 {
-    RANGE<TV> bounding_box=Scene_Bounding_Box();
+    RANGE<VECTOR<T,3> > bounding_box=Scene_Bounding_Box();
     if(bounding_box.Empty()) bounding_box=RANGE<TV>::Centered_Box();
     Center_Camera_On_Bounding_Box(bounding_box,true);
 }
@@ -1214,8 +1167,8 @@ Center_Camera_On_Scene()
 // Function Convert_Mouse_Coordinates
 //#####################################################################
 // This function converts mouse space pixel coordinates to the normalize coordinates the arcball expects
-template<class T> VECTOR<T,2> OPENGL_WORLD<T>::
-Convert_Mouse_Coordinates(int x,int y)
+template<class T> auto OPENGL_WORLD<T>::
+Convert_Mouse_Coordinates(int x,int y) -> VECTOR<T,2>
 {
     if(left_handed_coordinate_system) x=window->Width()-x-1;
     VECTOR<T,2> coord;
@@ -1288,12 +1241,10 @@ template<class T> void OPENGL_WORLD<T>::Prompt_User(const std::string& prompt_in
     view_auto_help=false; // force it off
 }
 //#####################################################################
-template void OPENGL_WORLD<float>::Get_Image(ARRAY<VECTOR<float,3>,VECTOR<int,2> > &image,const bool use_back_buffer);
-template void OPENGL_WORLD<float>::Get_Image(ARRAY<VECTOR<float,4>,VECTOR<int,2> > &image,const bool use_back_buffer);
-template void OPENGL_WORLD<double>::Get_Image(ARRAY<VECTOR<double,3>,VECTOR<int,2> > &image,const bool use_back_buffer);
-template void OPENGL_WORLD<double>::Get_Image(ARRAY<VECTOR<double,4>,VECTOR<int,2> > &image,const bool use_back_buffer);
 }
 namespace PhysBAM{
 template class OPENGL_WORLD<double>;
 template class OPENGL_WORLD<float>;
+template void OPENGL_WORLD<double>::Get_Image<3>(ARRAY<VECTOR<double,3>,VECTOR<int,2> >&,bool);
+template void OPENGL_WORLD<float>::Get_Image<3>(ARRAY<VECTOR<float,3>,VECTOR<int,2> >&,bool);
 }

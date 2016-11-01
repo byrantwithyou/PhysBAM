@@ -15,6 +15,7 @@ template<class T>
 class OPENGL_COMPONENT_LEVELSET_1D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,1> TV;typedef VECTOR<int,TV::m> TV_INT;
+    typedef VECTOR<T,TV::m+(TV::m==1)> TV_BOX;
 private:
     std::string levelset_filename;
     int frame_loaded;

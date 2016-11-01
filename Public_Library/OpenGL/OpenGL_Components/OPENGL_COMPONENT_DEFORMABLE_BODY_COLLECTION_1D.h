@@ -32,8 +32,9 @@ protected:
     int selected_vertex;
     bool invalidate_deformable_objects_selection_each_frame;
 public:
-    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
+    using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::stream_type;
+    using OPENGL_OBJECT<T>::viewer_callbacks;using OPENGL_OBJECT<T>::World_Space_Box;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
     OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_1D<T>* real_selection;
     ARRAY<OPENGL_POINT_SIMPLICES_1D<T>*> point_simplices_1d_objects;
@@ -55,15 +56,15 @@ public:
     virtual void Display() const override;
     bool Use_Bounding_Box() const override;
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    virtual RANGE<VECTOR<T,3> > Selection_Bounding_Box() const override;
 
-    OPENGL_SELECTION<T>* Get_Selection(GLuint *buffer, int buffer_size) override;
-    void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
-    void Set_Selection(OPENGL_SELECTION<T>* selection) override;
-    void Clear_Highlight() override;
-    void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION<T>* selection) const override;
+    virtual int Get_Selection_Priority(ARRAY_VIEW<GLuint> indices) override;
+    bool Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers) override;
+    void Clear_Selection() override;
+    void Print_Selection_Info(std::ostream &output_stream) const override;
     void Turn_Smooth_Shading_On() override;
     void Turn_Smooth_Shading_Off() override;
-    OPENGL_SELECTION<T>* Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection) override;
+    bool Destroy_Selection_After_Frame_Change() override;
 
     void Toggle_Active_Value();
     void Toggle_Use_Active_List();
@@ -72,7 +73,7 @@ public:
     void Cycle_Display_Mode();
     void Show_Only_First();
     void Highlight_Particle();
-    void Set_Vector_Size(double size);
+    void Set_Vector_Size(T size);
     void Toggle_Velocity_Vectors();
     void Decrease_Vector_Size();
     void Increase_Vector_Size();
@@ -85,22 +86,5 @@ public:
 private:
     void Initialize();    // Needs to be called after some state changes
 };
-
-template<class T>
-class OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_1D:public OPENGL_SELECTION<T>
-{
-public:
-    using OPENGL_SELECTION<T>::object;
-    int body_index;
-    int subobject_type;
-    OPENGL_OBJECT<T>* subobject;
-    OPENGL_SELECTION<T>* body_selection;
-    OPENGL_SELECTION<T>* saved_selection;
-
-    OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_1D(OPENGL_OBJECT<T>* object) :OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::COMPONENT_DEFORMABLE_COLLECTION_3D,object) {}
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
-    virtual typename OPENGL_SELECTION<T>::TYPE Actual_Type() const override {return body_selection->Actual_Type();}
-};
-
 }
 #endif

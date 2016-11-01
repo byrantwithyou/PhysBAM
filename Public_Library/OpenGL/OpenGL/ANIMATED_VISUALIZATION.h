@@ -27,7 +27,7 @@ class ANIMATED_VISUALIZATION:public BASIC_VISUALIZATION<T>
 {
 public:
     using BASIC_VISUALIZATION<T>::opengl_world;using BASIC_VISUALIZATION<T>::component_list;
-    using BASIC_VISUALIZATION<T>::current_selection;using BASIC_VISUALIZATION<T>::Set_Current_Selection;
+    using BASIC_VISUALIZATION<T>::Set_Current_Selection;using BASIC_VISUALIZATION<T>::selected_object;
 
     ANIMATED_VISUALIZATION(STREAM_TYPE stream_type);
     virtual ~ANIMATED_VISUALIZATION(){}

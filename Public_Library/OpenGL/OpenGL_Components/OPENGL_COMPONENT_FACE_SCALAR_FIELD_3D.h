@@ -48,8 +48,8 @@ public:
     void Set_Frame(int frame_input) override;
     void Set_Draw(bool draw_input=true) override;
     void Display() const override;
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
-    void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const override;
+    virtual RANGE<TV> Bounding_Box() const override;
+    void Print_Selection_Info(std::ostream& stream) const override;
 private:
     void Reinitialize();
 //##################################################################### 

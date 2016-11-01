@@ -70,7 +70,7 @@ template<class T,class T2> RANGE<VECTOR<T,3> > OPENGL_COMPONENT_SCALAR_FIELD_1D<
 Bounding_Box() const
 {
     if(valid && draw) return opengl_scalar_field.Bounding_Box();
-    else return RANGE<VECTOR<T,3> >::Centered_Box();
+    return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Reinitialize

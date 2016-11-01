@@ -66,56 +66,50 @@ Turn_Smooth_Shading_Off()
 {
 }
 //#####################################################################
+// Function Get_Selection_Priority
+//#####################################################################
+template<class T> int OPENGL_OBJECT<T>::
+Get_Selection_Priority(ARRAY_VIEW<GLuint> indices)
+{
+    return -1;
+}
+//#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_OBJECT<T>::
-Get_Selection(GLuint *buffer,int buffer_size)
+template<class T> bool OPENGL_OBJECT<T>::
+Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers)
 {
-    return 0;
-}
-//#####################################################################
-// Function Set_Selection
-//#####################################################################
-template<class T> void OPENGL_OBJECT<T>::
-Set_Selection(OPENGL_SELECTION<T>* selection)
-{
-}
-//#####################################################################
-// Function Highlight_Selection
-//#####################################################################
-template<class T> void OPENGL_OBJECT<T>::
-Highlight_Selection(OPENGL_SELECTION<T>* selection)
-{
+    return false;
 }
 //#####################################################################
 // Function Clear_Highlight
 //#####################################################################
 template<class T> void OPENGL_OBJECT<T>::
-Clear_Highlight()
+Clear_Selection()
 {
 }
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_OBJECT<T>::
-Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const
+Print_Selection_Info(std::ostream &output_stream) const
 {
 }
 //#####################################################################
 // Function Selection_Bounding_Box
 //#####################################################################
 template<class T> RANGE<VECTOR<T,3> > OPENGL_OBJECT<T>::
-Selection_Bounding_Box(OPENGL_SELECTION<T>* selection) const
+Selection_Bounding_Box() const
 {
-    return RANGE<TV>::Centered_Box();
+    return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
-// Function Create_Or_Destroy_Selection_After_Frame_Change
+// Function Destroy_Selection_After_Frame_Change
 //#####################################################################
-template<class T> OPENGL_SELECTION<T>* OPENGL_OBJECT<T>::
-Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION<T>* old_selection,bool& delete_selection)
+template<class T> bool OPENGL_OBJECT<T>::
+Destroy_Selection_After_Frame_Change()
 {
-    return 0;
+    return false;
 }
 //#####################################################################
 // Function Set_Slice

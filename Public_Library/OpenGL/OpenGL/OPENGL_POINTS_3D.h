@@ -30,6 +30,10 @@ public:
     ARRAY<int>* point_ids;
     ARRAY<bool>* draw_mask;
 
+    int selected_index;
+    int selected_id;
+    OPENGL_COLOR selected_old_color;
+
     OPENGL_POINTS_3D(STREAM_TYPE stream_type,T_ARRAY& points_input,const OPENGL_COLOR& color_input=OPENGL_COLOR::White(),const T point_size=5);
     virtual ~OPENGL_POINTS_3D();
 
@@ -44,15 +48,16 @@ public:
 
     bool Use_Bounding_Box() const override {return points.Size()>0;}
     virtual int Particle_Index(const int index) const {return index;}
-    virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
+    virtual RANGE<TV> Bounding_Box() const override;
+    virtual RANGE<TV> Selection_Bounding_Box() const override;
     void Display() const override;
 
-    OPENGL_SELECTION<T>* Get_Selection(GLuint* buffer,int buffer_size) override;
-    void Highlight_Selection(OPENGL_SELECTION<T>* selection) override;
-    void Clear_Highlight() override;
-    void Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION<T>* selection) const override;
+    virtual int Get_Selection_Priority(ARRAY_VIEW<GLuint> indices) override;
+    bool Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers) override;
+    void Clear_Selection() override;
+    void Print_Selection_Info(std::ostream &output_stream) const override;
 
-    void Store_Point_Colors(const bool store_point_colors=true);
+    void Store_Point_Colors(bool store_point_colors=true);
     void Store_Point_Ids(bool store_ids=true);
     void Store_Draw_Mask(bool store_draw_mask=true);
     
@@ -65,21 +70,6 @@ public:
 
     void Select_Point(int index);
     void Select_Points(const ARRAY<int>& indices);
-    void Clear_Selection();
-};
-
-template<class T>
-class OPENGL_SELECTION_POINTS_3D:public OPENGL_SELECTION<T>
-{
-public:
-    using OPENGL_SELECTION<T>::object;
-    int index;
-    bool has_id;
-    int id;
-
-    OPENGL_SELECTION_POINTS_3D(OPENGL_OBJECT<T>* object):OPENGL_SELECTION<T>(OPENGL_SELECTION<T>::POINTS_3D,object){}
-
-    RANGE<VECTOR<T,3> > Bounding_Box() const override;
 };
 
 }

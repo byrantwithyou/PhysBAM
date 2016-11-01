@@ -14,11 +14,10 @@
 #include <OpenGL/OpenGL/OPENGL_SELECTION.h>
 namespace PhysBAM{
 
-template<class T> class OPENGL_SELECTION;
-
 template<class T>
 class OPENGL_POINT_SIMPLICES_1D:public OPENGL_OBJECT<T>
 {
+    typedef VECTOR<T,1> TV;
 public:
     using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::World_Space_Box;
     const POINT_SIMPLICES_1D<T>& simplices;

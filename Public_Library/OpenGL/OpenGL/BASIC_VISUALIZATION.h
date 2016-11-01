@@ -31,7 +31,7 @@ public:
     void Run();
     void Initialize_And_Run(PARSE_ARGS &parse_args);
 
-    virtual void Process_Hits(GLint hits, GLuint buffer[]);
+    virtual void Process_Hits(GLint hits, GLuint buffer[],int modifiers);
 protected:
     virtual void Add_Arguments(PARSE_ARGS &parse_args);
     virtual void Parse_Arguments(PARSE_ARGS &parse_args);
@@ -46,8 +46,7 @@ protected:
     void Add_Component(OPENGL_COMPONENT<T>* component,const std::string &name,const char toggle_draw_key,const int flags);
     const OPENGL_COMPONENT<T>* Find_Component(const std::string& name) const;
     OPENGL_COMPONENT<T>* Find_Component(const std::string& name);
-    void Set_Current_Selection(OPENGL_SELECTION<T>* selection);
-    int &Selection_Priority(typename OPENGL_SELECTION<T>::TYPE selection_type);
+    void Set_Current_Selection(OPENGL_OBJECT<T>* object);
 
 private:
     void Parse_Args(PARSE_ARGS &parse_args);
@@ -83,8 +82,7 @@ public:
 
     // Selection stuff
     bool selection_enabled;
-    OPENGL_SELECTION<T>* current_selection;
-    ARRAY<int> selection_priority;     // higher priority takes precedence; priority=0 is unselectable
+    OPENGL_OBJECT<T>* selected_object;
 };
 
 }

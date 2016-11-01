@@ -76,11 +76,11 @@ Bounding_Box() const
 // Function Print_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>::
-Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION<T>* selection) const
+Print_Selection_Info(std::ostream& stream) const
 {
     if(Is_Up_To_Date(frame)){
         stream<<component_name<<": ";
-        opengl_grid_based_vector_field.Print_Selection_Info(stream,selection);}
+        opengl_grid_based_vector_field.Print_Selection_Info(stream);}
 }
 //#####################################################################
 // Function Reinitialize
