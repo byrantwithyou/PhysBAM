@@ -34,6 +34,7 @@
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_LEVELSET_3D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D.h>
+#include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_MPM_PARTICLES_3D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_PARTICLES_3D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D.h>
@@ -395,6 +396,16 @@ Initialize_Components_And_Key_Bindings()
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_DEBUG_PARTICLES_3D<T>* component=new OPENGL_COMPONENT_DEBUG_PARTICLES_3D<T>(stream_type,filename);
         Add_Component(component,"Debug particles",'w',BASIC_VISUALIZATION<T>::SELECTABLE|BASIC_VISUALIZATION<T>::OWNED);
+        opengl_world.Append_Bind_Key('W',component->viewer_callbacks.Get("toggle_draw_velocities"));
+        opengl_world.Append_Bind_Key('q',component->viewer_callbacks.Get("show_colored_wireframe"));
+        opengl_world.Append_Bind_Key('=',component->viewer_callbacks.Get("increase_vector_size"));
+        opengl_world.Append_Bind_Key('-',component->viewer_callbacks.Get("decrease_vector_size"));
+        if(slice_manager.slice) slice_manager.Add_Object(component);}
+
+    filename=basedir+"/%d/mpm_particles";
+    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+        OPENGL_COMPONENT_MPM_PARTICLES_3D<T>* component=new OPENGL_COMPONENT_MPM_PARTICLES_3D<T>(stream_type,filename);
+        Add_Component(component,"Mpm particles",'w',BASIC_VISUALIZATION<T>::SELECTABLE|BASIC_VISUALIZATION<T>::OWNED);
         opengl_world.Append_Bind_Key('W',component->viewer_callbacks.Get("toggle_draw_velocities"));
         opengl_world.Append_Bind_Key('q',component->viewer_callbacks.Get("show_colored_wireframe"));
         opengl_world.Append_Bind_Key('=',component->viewer_callbacks.Get("increase_vector_size"));

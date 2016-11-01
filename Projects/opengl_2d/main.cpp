@@ -22,6 +22,7 @@
 #include <OpenGL/OpenGL/OPENGL_WORLD.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_BASIC.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_DEBUG_PARTICLES_2D.h>
+#include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_MPM_PARTICLES_2D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D.h>
@@ -621,6 +622,7 @@ Initialize_Components_And_Key_Bindings()
             new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Cyan()));
         Add_Component(psi_N_component,"Psi_N points",'\0',BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::OWNED);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),psi_N_component->viewer_callbacks.Get("toggle_draw"));}
+
     filename=basedir+"/%d/debug_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>* component=new OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>(stream_type,filename);
@@ -629,6 +631,16 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('h',component->viewer_callbacks.Get("toggle_arrowhead"));
         opengl_world.Append_Bind_Key('=',component->viewer_callbacks.Get("increase_vector_size"));
         opengl_world.Append_Bind_Key('-',component->viewer_callbacks.Get("decrease_vector_size"));}
+
+    filename=basedir+"/%d/mpm_particles";
+    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+        OPENGL_COMPONENT_MPM_PARTICLES_2D<T>* component=new OPENGL_COMPONENT_MPM_PARTICLES_2D<T>(stream_type,filename);
+        Add_Component(component,"Mpm particles",'w',BASIC_VISUALIZATION<T>::SELECTABLE|BASIC_VISUALIZATION<T>::OWNED);
+        opengl_world.Append_Bind_Key('W',component->viewer_callbacks.Get("toggle_draw_velocities"));
+        opengl_world.Append_Bind_Key('h',component->viewer_callbacks.Get("toggle_arrowhead"));
+        opengl_world.Append_Bind_Key('=',component->viewer_callbacks.Get("increase_vector_size"));
+        opengl_world.Append_Bind_Key('-',component->viewer_callbacks.Get("decrease_vector_size"));}
+
     filename=basedir+"/%d/residual_energy";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_PARTICLES_2D<T>* component=new OPENGL_COMPONENT_PARTICLES_2D<T>(stream_type,filename,"",false,false);

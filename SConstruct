@@ -232,7 +232,7 @@ def Link_Flags(env):
         env.Append(RPATH=[Dir(public_library).abspath])
     if env['USE_OPENGL']:
         env.Append(LIBS=['PhysBAM_OpenGL'+library_suffix])
-        env['USE_DEFORMABLES']=1
+        env['USE_HYBRID']=1
     if env['USE_RAY_TRACING']:
         env.Append(LIBS=['PhysBAM_Ray_Tracing'+library_suffix])
         env['USE_DYNAMICS']=1
