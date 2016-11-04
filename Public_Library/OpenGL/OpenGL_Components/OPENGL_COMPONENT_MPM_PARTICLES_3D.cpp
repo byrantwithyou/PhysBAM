@@ -25,7 +25,7 @@ OPENGL_COMPONENT_MPM_PARTICLES_3D(STREAM_TYPE stream_type,const std::string &fil
     :OPENGL_COMPONENT<T>(stream_type,"Particles 3D"),particles(*new MPM_PARTICLES<TV>),
     default_color(OPENGL_COLOR::Yellow()),velocity_color(OPENGL_COLOR(1,(T).078,(T).576)),
     draw_velocities(false),draw_arrows(true),draw_B(false),draw_F(false),
-    B_color(OPENGL_COLOR::Red()*.5,OPENGL_COLOR::Green()*.5,OPENGL_COLOR::Blue()*.5),
+    B_color{{1,.5f,.5f},{.5f,1,.5f},{.5f,.5f,1}},
     F_color(OPENGL_COLOR::Red(),OPENGL_COLOR::Green(),OPENGL_COLOR::Blue()),scale_velocities((T).025),
     filename(filename_input),frame_loaded(-1),valid(false),
     selected_index(-1)
@@ -34,6 +34,8 @@ OPENGL_COMPONENT_MPM_PARTICLES_3D(STREAM_TYPE stream_type,const std::string &fil
     viewer_callbacks.Set("increase_vector_size",{[this](){Increase_Vector_Size();},"Increase vector size"});
     viewer_callbacks.Set("decrease_vector_size",{[this](){Decrease_Vector_Size();},"Decrease vector size"});
     viewer_callbacks.Set("toggle_arrowhead",{[this](){Toggle_Arrowhead();},"Toggle arrow heads"});
+    viewer_callbacks.Set("toggle_F",{[this](){draw_F=!draw_F;},"Toggle F display"});
+    viewer_callbacks.Set("toggle_B",{[this](){draw_B=!draw_B;},"Toggle B display"});
 
     is_animation=FILE_UTILITIES::Is_Animated(filename);
     // Don't need to call Reinitialize here because it will be called in first call to Set_Frame
@@ -128,7 +130,7 @@ Display() const
         OpenGL_End();
         glPopAttrib();}
 
-    if(draw_B && particles.store_B && mode!=GL_SELECT){
+    if(draw_B && particles.B.m && mode!=GL_SELECT){
         glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);
         glDisable(GL_LIGHTING);
         OpenGL_Begin(GL_LINES);
@@ -154,6 +156,9 @@ Display() const
             OpenGL_Vertex(particles.X(i));
             OpenGL_End();}}
     if(mode==GL_SELECT) glPopName();
+
+    if(mode!=GL_SELECT && selected_index>=0)
+        OPENGL_SELECTION::Draw_Highlighted_Vertex(particles.X(selected_index),selected_index);
 
     glPopAttrib();
     glPopMatrix();
@@ -218,7 +223,7 @@ Print_Selection_Info(std::ostream &output_stream) const
 template<class T> bool OPENGL_COMPONENT_MPM_PARTICLES_3D<T>::
 Destroy_Selection_After_Frame_Change()
 {
-    return true;
+    return false;
 }
 //#####################################################################
 // Function Selection_Bounding_Box

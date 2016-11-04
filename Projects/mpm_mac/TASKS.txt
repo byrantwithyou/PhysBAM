@@ -5,12 +5,8 @@ To check:
 
 Broken:
 
-* Viewing velocities for 2d fluids   (o-fl2-00)
-
 * selecting grid cell in slice mode in 3d, nothing gets printed
 
 * cannot select anything o-be3-08
-
-* Selected MPM particle not retained across frames
 
 

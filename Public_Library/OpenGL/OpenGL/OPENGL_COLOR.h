@@ -19,7 +19,10 @@ public:
     typedef int HAS_UNTYPED_READ_WRITE;
     GLfloat rgba[4];
 
-    explicit OPENGL_COLOR(const float red=0,const float green=0,const float blue=0,const float alpha=1)
+    OPENGL_COLOR()
+    {rgba[0]=0;rgba[1]=0;rgba[2]=0;rgba[3]=1;}
+
+    OPENGL_COLOR(const float red,const float green,const float blue,const float alpha=1)
     {rgba[0]=red;rgba[1]=green;rgba[2]=blue;rgba[3]=alpha;}
 
     explicit OPENGL_COLOR(const VECTOR<double,3>& rgb,const float alpha=1)

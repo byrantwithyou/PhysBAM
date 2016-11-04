@@ -25,7 +25,7 @@ OPENGL_COMPONENT_MPM_PARTICLES_2D(STREAM_TYPE stream_type,const std::string &fil
     :OPENGL_COMPONENT<T>(stream_type,"Particles 2D"),particles(*new MPM_PARTICLES<TV>),
     default_color(OPENGL_COLOR::Yellow()),velocity_color(OPENGL_COLOR(1,(T).078,(T).576)),
     draw_velocities(false),draw_arrows(true),draw_B(false),draw_F(false),
-    B_color(OPENGL_COLOR::Red()*.5,OPENGL_COLOR::Green()*.5),
+    B_color(OPENGL_COLOR::Red(),OPENGL_COLOR::Green()),
     F_color(OPENGL_COLOR::Red(),OPENGL_COLOR::Green()),scale_velocities((T).025),
     filename(filename_input),frame_loaded(-1),valid(false),selected_index(-1)
 {
@@ -101,6 +101,7 @@ Display() const
     glGetIntegerv(GL_RENDER_MODE,&mode);
 
     ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+    ARRAY_VIEW<MATRIX<T,TV::m> >* B=particles.template Get_Array<MATRIX<T,TV::m> >(ATTRIBUTE_ID_B);
 
     if(draw_velocities && mode!=GL_SELECT){
         glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);
@@ -128,16 +129,15 @@ Display() const
         OpenGL_End();
         glPopAttrib();}
 
-    if(draw_B && particles.store_B && mode!=GL_SELECT){
+    if(draw_B && B && mode!=GL_SELECT){
         glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);
         glDisable(GL_LIGHTING);
         OpenGL_Begin(GL_LINES);
-        for(int i=0;i<particles.B.m;i++){
+        for(int i=0;i<B->m;i++){
             TV X=particles.X(i);
-            MATRIX<T,TV::m> B=particles.B(i);
             for(int a=0;a<TV::m;a++){
                 B_color(a).Send_To_GL_Pipeline();
-                OpenGL_Line(X,X+scale_velocities*B.Column(a));}}
+                OpenGL_Line(X,X+scale_velocities*(*B)(i).Column(a));}}
         OpenGL_End();
         glPopAttrib();}
 
@@ -153,6 +153,9 @@ Display() const
         OpenGL_End();}
     if(mode==GL_SELECT) glPopName();
 
+    if(mode!=GL_SELECT && selected_index>=0)
+        OPENGL_SELECTION::Draw_Highlighted_Vertex(particles.X(selected_index),selected_index);
+    
     glPopAttrib();
     glPopMatrix();
     if(slice && slice->Is_Slice_Mode()) glPopAttrib();
@@ -216,7 +219,7 @@ Print_Selection_Info(std::ostream &output_stream) const
 template<class T> bool OPENGL_COMPONENT_MPM_PARTICLES_2D<T>::
 Destroy_Selection_After_Frame_Change()
 {
-    return true;
+    return false;
 }
 //#####################################################################
 // Function Selection_Bounding_Box
