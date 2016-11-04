@@ -24,7 +24,9 @@ template<class T> OPENGL_COMPONENT_MPM_PARTICLES_3D<T>::
 OPENGL_COMPONENT_MPM_PARTICLES_3D(STREAM_TYPE stream_type,const std::string &filename_input)
     :OPENGL_COMPONENT<T>(stream_type,"Particles 3D"),particles(*new MPM_PARTICLES<TV>),
     default_color(OPENGL_COLOR::Yellow()),velocity_color(OPENGL_COLOR(1,(T).078,(T).576)),
-    draw_velocities(false),draw_arrows(true),scale_velocities((T).025),
+    draw_velocities(false),draw_arrows(true),draw_B(false),draw_F(false),
+    B_color(OPENGL_COLOR::Red()*.5,OPENGL_COLOR::Green()*.5,OPENGL_COLOR::Blue()*.5),
+    F_color(OPENGL_COLOR::Red(),OPENGL_COLOR::Green(),OPENGL_COLOR::Blue()),scale_velocities((T).025),
     filename(filename_input),frame_loaded(-1),valid(false),
     selected_index(-1)
 {
@@ -99,18 +101,43 @@ Display() const
 
     ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
     ARRAY_VIEW<T>* sizes=particles.template Get_Array<T>(ATTRIBUTE_ID_DISPLAY_SIZE);
-    ARRAY_VIEW<TV>* V=particles.template Get_Array<TV>(ATTRIBUTE_ID_V);
 
-    if(draw_velocities && V && mode!=GL_SELECT){
+    if(draw_velocities && mode!=GL_SELECT){
         glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);
         glDisable(GL_LIGHTING);
         velocity_color.Send_To_GL_Pipeline();
         OpenGL_Begin(GL_LINES);
         for(int i=0;i<particles.X.m;i++){
             TV X=particles.X(i);
-            TV Y=X+(*V)(i)*scale_velocities;
+            TV Y=X+particles.V(i)*scale_velocities;
             if(draw_arrows) OPENGL_SHAPES::Draw_Arrow(X,Y);
             else OpenGL_Line(X,Y);}
+        OpenGL_End();
+        glPopAttrib();}
+
+    if(draw_F && mode!=GL_SELECT){
+        glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);
+        glDisable(GL_LIGHTING);
+        OpenGL_Begin(GL_LINES);
+        for(int i=0;i<particles.F.m;i++){
+            TV X=particles.X(i);
+            MATRIX<T,TV::m> F=particles.F(i);
+            for(int a=0;a<TV::m;a++){
+                F_color(a).Send_To_GL_Pipeline();
+                OpenGL_Line(X,X+scale_velocities*F.Column(a));}}
+        OpenGL_End();
+        glPopAttrib();}
+
+    if(draw_B && particles.store_B && mode!=GL_SELECT){
+        glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);
+        glDisable(GL_LIGHTING);
+        OpenGL_Begin(GL_LINES);
+        for(int i=0;i<particles.B.m;i++){
+            TV X=particles.X(i);
+            MATRIX<T,TV::m> B=particles.B(i);
+            for(int a=0;a<TV::m;a++){
+                B_color(a).Send_To_GL_Pipeline();
+                OpenGL_Line(X,X+scale_velocities*B.Column(a));}}
         OpenGL_End();
         glPopAttrib();}
 

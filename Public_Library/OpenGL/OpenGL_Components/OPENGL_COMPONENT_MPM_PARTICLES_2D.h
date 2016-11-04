@@ -57,6 +57,10 @@ public:
     OPENGL_COLOR velocity_color;
     bool draw_velocities;
     bool draw_arrows;
+    bool draw_B;
+    bool draw_F;
+    VECTOR<OPENGL_COLOR,TV::m> B_color;
+    VECTOR<OPENGL_COLOR,TV::m> F_color;
     T scale_velocities;
 
 private:
