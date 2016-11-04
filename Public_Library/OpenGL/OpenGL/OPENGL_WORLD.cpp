@@ -250,7 +250,7 @@ template<class T> void OPENGL_WORLD<T>::
 Append_Bind_Key(const OPENGL_KEY& key,OPENGL_CALLBACK callback)
 {
     key_bindings(key.Index()).Append(callback);
-    ARRAY<PAIR<OPENGL_KEY,OPENGL_CALLBACK> > list=key_bindings_by_category[current_key_binding_category];
+    ARRAY<PAIR<OPENGL_KEY,OPENGL_CALLBACK> >& list=key_bindings_by_category[current_key_binding_category];
     list.Append(PAIR<OPENGL_KEY,OPENGL_CALLBACK>(key,callback));
 }
 //#####################################################################

@@ -36,6 +36,8 @@ VECTOR<int,2> OPENGL_KEY::Index() const
 //#####################################################################
 OPENGL_KEY OPENGL_KEY::From_Glut_Key(unsigned char key,int modifiers)
 {
+    // Don't register shift as part of the modifiers.
+    modifiers&=~GLUT_ACTIVE_SHIFT;
     // need to correct for the fact that pressing ctrl alters the keycode for regular letters
     if('a'<=(key+'a'-1) && (key+'a'-1)<='z'){key+='a'-1; modifiers|=GLUT_ACTIVE_CTRL;}
     return OPENGL_KEY(key,modifiers);
