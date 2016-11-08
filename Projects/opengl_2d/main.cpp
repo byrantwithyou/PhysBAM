@@ -168,14 +168,14 @@ Read_Grid()
     if(!FILE_UTILITIES::File_Exists(filename)) filename=LOG::sprintf("%s/%d/levelset_0",basedir.c_str(),start_frame);
 
     if(FILE_UTILITIES::File_Exists(filename)){
-        LOG::cout<<"Reading grid from '"<<filename<<"'..."<<std::endl<<std::flush;
+        LOG::cout<<"Reading grid from '"<<filename<<"'..."<<std::endl;
         ARRAY<T,VECTOR<int,2> > phi;
         LEVELSET<TV> levelset(grid,phi);
         FILE_UTILITIES::Read_From_File(stream_type,filename,levelset);
         has_valid_grid=true;}
     else if(FILE_UTILITIES::File_Exists(basedir+"/common/grid")){
         filename=basedir+"/common/grid";
-        LOG::cout<<"Reading grid from '"<<filename<<"'..."<<std::flush;
+        LOG::cout<<"Reading grid from '"<<filename<<"'..."<<std::endl;
         FILE_UTILITIES::Read_From_File(stream_type,filename,grid);
         has_valid_grid=true;}
 

@@ -122,7 +122,7 @@ Read_Grid()
     std::string filename;
     if(FILE_UTILITIES::File_Exists(basedir+"/common/grid")){
         filename=basedir+"/common/grid";
-        LOG::cout<<"Reading grid from '"<<filename<<"'..."<<std::flush;
+        LOG::cout<<"Reading grid from '"<<filename<<"'..."<<std::endl;
         FILE_UTILITIES::Read_From_File(stream_type,filename,grid);
         has_valid_grid=true;}
     if(has_valid_grid){
