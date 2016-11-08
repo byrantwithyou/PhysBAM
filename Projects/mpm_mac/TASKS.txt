@@ -7,6 +7,8 @@ Broken:
 
 * selecting grid cell in slice mode in 3d, nothing gets printed
 
+* grid does not print out velocities when selected in 2d
+
 * cannot select anything o-be3-08
 
 
