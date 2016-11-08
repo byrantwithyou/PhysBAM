@@ -405,7 +405,7 @@ Initialize_Components_And_Key_Bindings()
     filename=basedir+"/%d/mpm_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_MPM_PARTICLES_3D<T>* component=new OPENGL_COMPONENT_MPM_PARTICLES_3D<T>(stream_type,filename);
-        Add_Component(component,"Mpm particles",'w',BASIC_VISUALIZATION<T>::SELECTABLE|BASIC_VISUALIZATION<T>::OWNED);
+        Add_Component(component,"Mpm particles",'m',BASIC_VISUALIZATION<T>::SELECTABLE|BASIC_VISUALIZATION<T>::OWNED);
         opengl_world.Append_Bind_Key('W',component->viewer_callbacks.Get("toggle_draw_velocities"));
         opengl_world.Append_Bind_Key('q',component->viewer_callbacks.Get("show_colored_wireframe"));
         opengl_world.Append_Bind_Key('f',component->viewer_callbacks.Get("toggle_F"));
