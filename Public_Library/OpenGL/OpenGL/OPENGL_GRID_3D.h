@@ -8,10 +8,8 @@
 #ifndef __OPENGL_GRID_3D__
 #define __OPENGL_GRID_3D__
 #include <Grid_Tools/Grids/GRID.h>
-#include <OpenGL/OpenGL/OPENGL_CALLBACK.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>
-#include <OpenGL/OpenGL/OPENGL_SELECTION.h>
 namespace PhysBAM{
 
 template<class T>
