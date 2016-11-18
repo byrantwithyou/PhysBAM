@@ -127,6 +127,7 @@ Advance_One_Time_Step()
     Print_Grid_Stats("after forces",example.dt);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after forces",0,1);
     Pressure_Projection();
+    Print_Grid_Stats("after projection",example.dt);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after projection",0,1);
     Grid_To_Particle();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after grid to particle",0,1);
