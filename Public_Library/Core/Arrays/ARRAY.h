@@ -111,7 +111,7 @@ public:
     {assert((unsigned)Value(i)<(unsigned)Value(m));return base_pointer[Value(i)];}
 
     bool Valid_Index(const ID i) const
-    {return (unsigned)i<(unsigned)m;}
+    {return (unsigned)Value(i)<(unsigned)Value(m);}
 
     T* Get_Array_Pointer()
     {return base_pointer;}
