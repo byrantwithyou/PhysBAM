@@ -63,8 +63,10 @@ public:
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary;    
     RANGE<TV> source1;
     RANGE<TV> source2;
+#ifdef USE_PTHREAD
     pthread_mutex_t lock;
-
+#endif
+    
     // EAPIC
     bool use_eapic;
     int eapic_order;

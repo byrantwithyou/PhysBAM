@@ -8,7 +8,9 @@
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS_SPLINE.h>
 #include "SMOKE_EXAMPLE.h"
 #include "SMOKE_PARTICLES.h"
+#ifdef USE_PTHREAD
 #include <pthread.h>
+#endif
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -26,7 +28,9 @@ SMOKE_EXAMPLE(const STREAM_TYPE stream_type_input,int number_of_threads)
 {
     np=1; //number of points per cell
     for(int i=0;i<TV::dimension;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
+#ifdef USE_PTHREAD
     pthread_mutex_init(&lock,0);    
+#endif
 }
 //#####################################################################
 // Destructor
@@ -62,9 +66,13 @@ CFL_Threaded(RANGE<TV_INT>& domain,ARRAY<T,FACE_INDEX<TV::dimension> >& face_vel
         for(int axis=0;axis<GRID<TV>::dimension;axis++)
             local_V_norm+=grid.one_over_dX[axis]*maxabs(face_velocities(axis,grid.First_Face_Index_In_Cell(axis,cell)),face_velocities(axis,grid.Second_Face_Index_In_Cell(axis,cell)));
         dt_convection=max(dt_convection,local_V_norm);}
+#ifdef USE_PTHREAD
     pthread_mutex_lock(&lock);
+#endif
     dt=min(dt,(T)1.0/dt_convection);
+#ifdef USE_PTHREAD
     pthread_mutex_unlock(&lock);
+#endif
 }
 //#####################################################################
 // Function Time_At_Frame
