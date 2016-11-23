@@ -592,7 +592,7 @@ void Add_Constitutive_Model(TRIANGULATED_AREA<T>& ta,T stiffness,T poissons_rati
     solid_body_collection.Add_Force(Create_Finite_Volume(ta,new COROTATED_FIXED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier)));
 
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-    if(damping*damping_multiplier){
+    if(damping && damping_multiplier){
         DEFORMABLES_FORCES<TV>* force=Create_Finite_Volume(ta,new COROTATED_FIXED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier));
         force->Update_Position_Based_State(0,true,true);
         solid_body_collection.Add_Force(new RALEIGH_DAMPING_FORCE<TV>(particles,force,damping*damping_multiplier,1,save_dt));}

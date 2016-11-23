@@ -81,9 +81,9 @@ Dynamic_Tests_One_Size(int m,int n) const
     C=A;C/=s;Test(Assert_Equal(A/s,C,tolerance),"Scalar divide equals.",ok,A);
 
     Test(A==A,"Equality on equal matrices.",ok,A);
-    if(m*n) Test(!(A==B),"Equality on different matrices.",ok,A);
+    if(m && n) Test(!(A==B),"Equality on different matrices.",ok,A);
     Test(!(A!=A),"Inequality on equal matrices.",ok,A);
-    if(m*n) Test(A!=B,"Inequality on different matrices.",ok,A);
+    if(m && n) Test(A!=B,"Inequality on different matrices.",ok,A);
 
     Test(Assert_Equal(A.Identity_Matrix(m)*B,B,tolerance),"Left multiply identity.",ok,A);
     Test(Assert_Equal(A*A.Identity_Matrix(n),A,tolerance),"Right multiply identity.",ok,A);
