@@ -38,7 +38,7 @@ public:
     {return index;}
 
     TV_INT Cell_Index(int j) const
-    {TV_INT i(index);i(axis)+=j-2;return i;}
+    {TV_INT i(index);i(axis)+=j-1;return i;}
 
     template<class RW> void Read(std::istream& input)
     {Read_Binary<RW>(input,axis,index);}
