@@ -77,7 +77,7 @@ class PRECONDITIONER
 {
 public:
     typedef typename TV::SCALAR T;
-    static const int d=TV::dimension;
+    static const int d=TV::m;
 
     //needed for working with a rigid body collection with inactive bodies
     ARRAY<VECTOR<int,2> > coarse_to_fine_bodies_map;

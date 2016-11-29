@@ -82,8 +82,8 @@ Update_State_From_Joint_Frame(const bool enforce_constraints)
 template<class TV> void RIGID_JOINT<TV>::
 Angular_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& angular_constraint_matrix,MATRIX_MXN<T>* angular_unconstrained_matrix) const
 {
-    angular_constraint_matrix=MATRIX<T,T_SPIN::dimension>::Identity_Matrix();
-    if(angular_unconstrained_matrix) angular_unconstrained_matrix->Resize(T_SPIN::dimension,0);
+    angular_constraint_matrix=MATRIX<T,T_SPIN::m>::Identity_Matrix();
+    if(angular_unconstrained_matrix) angular_unconstrained_matrix->Resize(T_SPIN::m,0);
 }
 //#####################################################################
 namespace PhysBAM{

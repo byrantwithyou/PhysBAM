@@ -27,7 +27,7 @@ class COLLISION_GEOMETRY:public NONCOPYABLE
 {
 private:
     typedef typename TV::SCALAR T;
-    typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_SIMPLEX;  
+    typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m-1>::SIMPLEX T_SIMPLEX;  
     typedef VECTOR<int,TV::m> TV_INT;
 public:
     typedef TV VECTOR_T;

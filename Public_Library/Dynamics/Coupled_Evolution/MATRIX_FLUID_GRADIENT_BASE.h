@@ -22,7 +22,7 @@ template<class TV> class GRID;
 template<class TV>
 class MATRIX_FLUID_GRADIENT_BASE:public NONCOPYABLE,public SYSTEM_MATRIX_BASE<typename TV::SCALAR>
 {
-    enum WORKAROUND {d=TV::dimension};
+    enum WORKAROUND {d=TV::m};
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,d> TV_INT;
 

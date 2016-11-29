@@ -24,7 +24,7 @@ public:
     using BASE::max_strain_per_time_step;using BASE::use_rest_state_for_strain_rate;using BASE::compute_half_forces;
     typedef typename FORCE_ELEMENTS::ITERATOR SEGMENT_ITERATOR;
     typedef typename BASE::FREQUENCY_DATA FREQUENCY_DATA;
-    typedef MATRIX<T,TV::dimension> T_MATRIX;
+    typedef MATRIX<T,TV::m> T_MATRIX;
 
 public:
     SEGMENT_MESH& segment_mesh;

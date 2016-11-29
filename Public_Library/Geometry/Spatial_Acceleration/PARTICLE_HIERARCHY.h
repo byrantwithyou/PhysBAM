@@ -42,7 +42,7 @@ public:
     void Intersection_List(const ORIENTED_BOX<TV>& test_box,ARRAY<int>& intersection_list) const override;
     void Intersection_List(const T_HYPERPLANE& test_plane,ARRAY<int>& intersection_list,
         const T thickness_over_two=0) const override;
-    void Intersection_List(const IMPLICIT_OBJECT<TV>& implicit_object,const MATRIX<T,TV::dimension>& rotation,
+    void Intersection_List(const IMPLICIT_OBJECT<TV>& implicit_object,const MATRIX<T,TV::m>& rotation,
         const TV& translation,ARRAY<int>& intersection_list,const T contour_value=0) const override;
     void Initialize_Hierarchy_Using_KD_Tree() override;
     void Calculate_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes) const;

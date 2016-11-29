@@ -22,8 +22,8 @@ template<class TV> class GRID;
 template<class TV>
 class MATRIX_VISCOUS_FORCES:public NONCOPYABLE,public SYSTEM_MATRIX_BASE<typename TV::SCALAR>
 {
-    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::dimension> TV_INT;
-    enum WORKAROUND{d=TV::dimension};
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    enum WORKAROUND{d=TV::m};
 private:
     const GRID<TV>& grid;
     const COLLISION_AWARE_INDEX_MAP<TV>& index_map;

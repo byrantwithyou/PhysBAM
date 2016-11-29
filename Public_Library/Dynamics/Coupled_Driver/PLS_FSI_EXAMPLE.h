@@ -121,10 +121,10 @@ public:
     virtual void Update_Melting_Substep_Parameters(const T dt,const T time){}
     void After_Initialization() override;
     template<class T_MPI> void Adjust_Output_Directory_For_MPI(const T_MPI mpi);
-    virtual void Set_Boundary_Conditions_Callback(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N,ARRAY<T,TV_INT>& psi_D_value,
-        ARRAY<T,FACE_INDEX<TV::dimension> >& psi_N_value) const {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    void Set_Boundary_Conditions(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N,ARRAY<T,TV_INT>& psi_D_value,
-        ARRAY<T,FACE_INDEX<TV::dimension> >& psi_N_value) const;
+    virtual void Set_Boundary_Conditions_Callback(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,ARRAY<T,TV_INT>& psi_D_value,
+        ARRAY<T,FACE_INDEX<TV::m> >& psi_N_value) const {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
+    void Set_Boundary_Conditions(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,ARRAY<T,TV_INT>& psi_D_value,
+        ARRAY<T,FACE_INDEX<TV::m> >& psi_N_value) const;
 };
 }
 #endif

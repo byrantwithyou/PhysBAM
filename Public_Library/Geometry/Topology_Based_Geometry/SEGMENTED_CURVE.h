@@ -45,11 +45,11 @@ public:
 
     virtual std::string Name() const override {return Static_Name();}
     static std::string Static_Name()
-    {return LOG::sprintf("SIMPLICIAL_OBJECT<T,VECTOR<T,%d>,1>",TV::dimension);}
+    {return LOG::sprintf("SIMPLICIAL_OBJECT<T,VECTOR<T,%d>,1>",TV::m);}
 
     virtual std::string Extension() const override {return Static_Extension();}
     static std::string Static_Extension()
-    {return TV::dimension==2?"curve2d":(TV::dimension==1?"curve1d":"curve");}
+    {return TV::m==2?"curve2d":(TV::m==1?"curve1d":"curve");}
 
     TV Closest_Point_On_Boundary(const TV& location,const T max_depth=0,const T thickness_over_2=0,int* closest_segment=0,T* distance=0) const
     {return Closest_Point_On_Curve(location,thickness_over_2,closest_segment,distance);} // max_depth currently unused

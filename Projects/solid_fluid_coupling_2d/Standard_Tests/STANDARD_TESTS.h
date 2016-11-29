@@ -342,7 +342,7 @@ public:
             case 38:
             case 39:
                 fluids_parameters.grid->Initialize(TV_INT(resolution+1,(int)(1.5*resolution)+1),RANGE<TV>(TV(0,0),TV(1,1.5)));
-                for(int axis=0;axis<TV::dimension;axis++)for(int side=0;side<2;side++) fluids_parameters.domain_walls[axis][side]=false;
+                for(int axis=0;axis<TV::m;axis++)for(int side=0;side<2;side++) fluids_parameters.domain_walls[axis][side]=false;
                 break;
             case 32:
                 fluids_parameters.grid->Initialize(TV_INT(resolution,4*resolution),RANGE<TV>(TV(0,0),TV((T).04*scale_length,(T).16*scale_length)),true);
@@ -369,7 +369,7 @@ public:
                 break;
             case 43:
                 fluids_parameters.grid->Initialize(TV_INT(resolution+1,resolution+1),RANGE<TV>(TV(0,0),TV(1,1)));
-                for(int axis=0;axis<TV::dimension;axis++)for(int side=0;side<2;side++) fluids_parameters.domain_walls[axis][side]=false;
+                for(int axis=0;axis<TV::m;axis++)for(int side=0;side<2;side++) fluids_parameters.domain_walls[axis][side]=false;
                 break;
             case 44:
                 fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
@@ -566,7 +566,7 @@ void Initialize_Velocities() override
     if(test_number==43){
         // fluid velocities
         for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
-            FACE_INDEX<TV::dimension> face_index=iterator.Full_Index();
+            FACE_INDEX<TV::m> face_index=iterator.Full_Index();
             fluid_collection.incompressible_fluid_collection.face_velocities(face_index)=Oscillating_Disk_Domain_Velocity_Sample(iterator.Location())(face_index.axis);
         }
 
@@ -693,7 +693,7 @@ typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE Get_Boundary_Along_Ray(cons
             value=collision_bodies_affecting_fluid.Object_Velocity(body_id,ray.aggregate_id,ray.Point(ray.t_max))(f1.axis);
             type=BOUNDARY_CONDITIONS_CALLBACKS<TV>::noslip;}}
 
-    VECTOR<RANGE<TV_INT>,TV::dimension> fi=fluids_parameters.grid->Face_Indices(0);
+    VECTOR<RANGE<TV_INT>,TV::m> fi=fluids_parameters.grid->Face_Indices(0);
     for(int i=0;i<TV::m;i++){
         if(f2.index(i)<=fi(f2.axis).min_corner(i)-(f2.axis!=i)){
             T th=abs(fluids_parameters.grid->domain.min_corner(i)-X0(i))/dx;

@@ -63,8 +63,8 @@ Prismatic_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& constra
 template<class TV> void JOINT_FUNCTION<TV>::
 Angular_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& angular_constraint_matrix,MATRIX_MXN<T>* angular_unconstrained_matrix) const
 {
-    angular_constraint_matrix=MATRIX<T,T_SPIN::dimension>::Identity_Matrix();
-    if(angular_unconstrained_matrix) angular_unconstrained_matrix->Resize(T_SPIN::dimension,0);
+    angular_constraint_matrix=MATRIX<T,T_SPIN::m>::Identity_Matrix();
+    if(angular_unconstrained_matrix) angular_unconstrained_matrix->Resize(T_SPIN::m,0);
 }
 template<class TV> ROTATION<TV> JOINT_FUNCTION<TV>::
 Angle()

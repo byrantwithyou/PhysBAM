@@ -94,7 +94,7 @@ Initialize()
     if(example.restart) example.Read_Output_Files(example.restart);
     
     // setup domain boundaries
-    VECTOR<VECTOR<bool,2>,TV::dimension> constant_extrapolation;constant_extrapolation.Fill(VECTOR<bool,2>::Constant_Vector(true));
+    VECTOR<VECTOR<bool,2>,TV::m> constant_extrapolation;constant_extrapolation.Fill(VECTOR<bool,2>::Constant_Vector(true));
     example.incompressible.boundary->Set_Constant_Extrapolation(constant_extrapolation);
     example.boundary->Set_Constant_Extrapolation(constant_extrapolation);
     example.incompressible.Set_Custom_Boundary(*example.boundary);
@@ -196,7 +196,7 @@ Advance_To_Target_Time(const T target_time)
         kinematic_evolution.Set_External_Positions(example.rigid_body_collection.rigid_body_particles.frame,time+dt);
 
         RUNGEKUTTA<ARRAY<T,TV_INT> > rungekutta_scalar(example.density,example.order,dt,time);
-        for(RUNGEKUTTA<ARRAY<T,FACE_INDEX<TV::dimension> > > rungekutta_u(example.face_velocities,example.order,dt,time);rungekutta_u.Valid();){
+        for(RUNGEKUTTA<ARRAY<T,FACE_INDEX<TV::m> > > rungekutta_u(example.face_velocities,example.order,dt,time);rungekutta_u.Valid();){
             Scalar_Advance(dt,rungekutta_u.time);
             // velocity update
             if(!example.analytic_test){

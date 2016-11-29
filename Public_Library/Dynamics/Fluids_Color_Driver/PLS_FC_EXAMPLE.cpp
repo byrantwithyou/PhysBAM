@@ -49,7 +49,7 @@ template<class TV_input> PLS_FC_EXAMPLE<TV_input>::
 // Function Merge_Velocities
 //#####################################################################
 template<class TV_input> void PLS_FC_EXAMPLE<TV_input>::
-Merge_Velocities(ARRAY<T,FACE_INDEX<TV::dimension> >& V,const ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > > u,const ARRAY<int,FACE_INDEX<TV::dimension> >& color) const
+Merge_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& V,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > > u,const ARRAY<int,FACE_INDEX<TV::m> >& color) const
 {
     for(FACE_ITERATOR<TV> it(grid,number_of_ghost_cells);it.Valid();it.Next()){
         int c=color(it.Full_Index());
@@ -66,7 +66,7 @@ Write_Output_Files(const int frame)
 {
     if(!write_output_files) return;
     std::string f=LOG::sprintf("%d",frame);
-    ARRAY<T,FACE_INDEX<TV::dimension> > V(face_velocities(0).domain_indices);
+    ARRAY<T,FACE_INDEX<TV::m> > V(face_velocities(0).domain_indices);
     Merge_Velocities(V,face_velocities,face_color);
 
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/mac_velocities",V);
@@ -202,7 +202,7 @@ Fill_Levelsets_From_Levelset_Color()
 // Function Get_Levelset_Velocity
 //#####################################################################
 template<class TV_input> void PLS_FC_EXAMPLE<TV_input>::
-Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const
+Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const
 {
     PHYSBAM_FATAL_ERROR();
 }
@@ -210,9 +210,9 @@ Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_I
 // Function Get_Levelset_Velocity
 //#####################################################################
 template<class TV_input> void PLS_FC_EXAMPLE<TV_input>::
-Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset_multiple,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const
+Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset_multiple,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const
 {
-    ARRAY<T,FACE_INDEX<TV::dimension> > n(grid,number_of_ghost_cells),m(grid,number_of_ghost_cells);
+    ARRAY<T,FACE_INDEX<TV::m> > n(grid,number_of_ghost_cells),m(grid,number_of_ghost_cells);
     Merge_Velocities(n,face_velocities,face_color);
     Merge_Velocities(m,prev_face_velocities,prev_face_color);
     T alpha=(time-this->time)/dt;

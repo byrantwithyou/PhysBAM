@@ -28,7 +28,7 @@ template<class TV> IMPLICIT_BOUNDARY_CONDITION_COLLECTION<TV>::
 // Function Compute
 //#####################################################################
 template<class TV> void IMPLICIT_BOUNDARY_CONDITION_COLLECTION<TV>::
-Compute(const GRID<TV>& grid,ARRAY<T,TV_INT>& p,ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities,const T time)
+Compute(const GRID<TV>& grid,ARRAY<T,TV_INT>& p,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T time)
 {
     psi_D.Resize(grid.Domain_Indices(1));
     psi_N.Resize(grid,1);
@@ -53,7 +53,7 @@ Compute(const GRID<TV>& grid,ARRAY<T,TV_INT>& p,ARRAY<T,FACE_INDEX<TV::dimension
 // Function Compute_Boundary_Condition_Info
 //#####################################################################
 template<class TV> void IMPLICIT_BOUNDARY_CONDITION_COLLECTION<TV>::
-Compute_Boundary_Condition_Info(const GRID<TV>& grid,const ARRAY<T,TV_INT>& p,const ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities)
+Compute_Boundary_Condition_Info(const GRID<TV>& grid,const ARRAY<T,TV_INT>& p,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
 {
     boundary_condition_info.Remove_All();
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
@@ -64,7 +64,7 @@ Compute_Boundary_Condition_Info(const GRID<TV>& grid,const ARRAY<T,TV_INT>& p,co
 // Function Compute_Boundary_Condition_Info
 //#####################################################################
 template<class TV> void IMPLICIT_BOUNDARY_CONDITION_COLLECTION<TV>::
-Compute_Boundary_Condition_Info(const ARRAY<T,TV_INT>& p,const ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities,const FACE_INDEX<TV::m>& f,int in_side)
+Compute_Boundary_Condition_Info(const ARRAY<T,TV_INT>& p,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const FACE_INDEX<TV::m>& f,int in_side)
 {
     TV_INT a=f.Cell_Index(in_side),b=f.Cell_Index(1-in_side);
     if(psi_D(a) || !psi_D(b)) return;
@@ -84,7 +84,7 @@ Compute_Boundary_Condition_Info(const ARRAY<T,TV_INT>& p,const ARRAY<T,FACE_INDE
 template<class TV> bool IMPLICIT_BOUNDARY_CONDITION_COLLECTION<TV>::
 All_Cell_Faces_Neumann(const TV_INT& cell_index) const
 {
-    for(int axis=0;axis<TV::dimension;axis++)
+    for(int axis=0;axis<TV::m;axis++)
         if(!psi_N.Component(axis)(cell_index) || !psi_N.Component(axis)(cell_index+TV_INT::Axis_Vector(axis)))
             return false;
     return true;

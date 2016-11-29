@@ -60,7 +60,7 @@ public:
     bool Lazy_Outside_Extended_Levelset_And_Value(const TV& unclamped_X,T& phi_value,const T contour_value=0) const override;
     void Rescale(const T scaling_factor) override;
     void Translate(const TV& translation) override;
-    VECTOR<T,TV::dimension-1> Principal_Curvatures(const TV& X) const override;
+    VECTOR<T,TV::m-1> Principal_Curvatures(const TV& X) const override;
     virtual std::string Name() const override;
     static std::string Static_Name();
     virtual std::string Extension() const override;

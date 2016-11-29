@@ -83,7 +83,7 @@ public:
     T Minimum_Cell_Size() const override
     {return cell_size;}
 
-    VECTOR<T,TV::dimension-1> Principal_Curvatures(const TV& X) const override
+    VECTOR<T,TV::m-1> Principal_Curvatures(const TV& X) const override
     {return analytic.Principal_Curvatures(X);}
 
     SYMMETRIC_MATRIX<T,TV::m> Hessian(const TV& X) const override

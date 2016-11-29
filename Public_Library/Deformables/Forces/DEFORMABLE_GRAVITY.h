@@ -22,16 +22,16 @@ public:
     TV gravity;
 public:
 
-    DEFORMABLE_GRAVITY(DEFORMABLE_PARTICLES<TV>& particles_input,ARRAY<int>* influenced_particles_input,const TV& gravity_input=-(T)9.8*TV::Axis_Vector(1-(TV::dimension==1)))
+    DEFORMABLE_GRAVITY(DEFORMABLE_PARTICLES<TV>& particles_input,ARRAY<int>* influenced_particles_input,const TV& gravity_input=-(T)9.8*TV::Axis_Vector(1-(TV::m==1)))
         :POINTWISE_DEFORMABLE_FORCE<TV>(particles_input,influenced_particles_input),gravity(gravity_input)
     {}
 
-    DEFORMABLE_GRAVITY(DEFORMABLE_PARTICLES<TV>& particles_input,const bool influence_all_particles_input,const TV& gravity_input=-(T)9.8*TV::Axis_Vector(1-(TV::dimension==1)))
+    DEFORMABLE_GRAVITY(DEFORMABLE_PARTICLES<TV>& particles_input,const bool influence_all_particles_input,const TV& gravity_input=-(T)9.8*TV::Axis_Vector(1-(TV::m==1)))
         :POINTWISE_DEFORMABLE_FORCE<TV>(particles_input,influence_all_particles_input),gravity(gravity_input)
     {}
 
     template<class T_MESH>
-    DEFORMABLE_GRAVITY(DEFORMABLE_PARTICLES<TV>& particles_input,const T_MESH& mesh,const TV& gravity_input=-(T)9.8*TV::Axis_Vector(1-(TV::dimension==1)))
+    DEFORMABLE_GRAVITY(DEFORMABLE_PARTICLES<TV>& particles_input,const T_MESH& mesh,const TV& gravity_input=-(T)9.8*TV::Axis_Vector(1-(TV::m==1)))
         :POINTWISE_DEFORMABLE_FORCE<TV>(particles_input,mesh),gravity(gravity_input)
     {
         Get_Unique(*influenced_particles,mesh.elements.Flattened());

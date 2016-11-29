@@ -36,7 +36,7 @@ public:
     template<class T2> struct REBIND{typedef RANGE<T2> TYPE;};
     typedef T SCALAR;
     typedef TV VECTOR_T;
-    enum WORKAROUND {d=TV::dimension};
+    enum WORKAROUND {d=TV::m};
 
     TV min_corner,max_corner;
 
@@ -311,8 +311,8 @@ public:
     RANGE<VECTOR<T,d-1> > Remove_Dimension(int dimension) const
     {return RANGE<VECTOR<T,d-1> >(min_corner.Remove_Index(dimension),max_corner.Remove_Index(dimension));}
 
-    VECTOR<T,TV::dimension-1> Principal_Curvatures(const TV& X) const
-    {return VECTOR<T,TV::dimension-1>();}
+    VECTOR<T,TV::m-1> Principal_Curvatures(const TV& X) const
+    {return VECTOR<T,TV::m-1>();}
 
     const RANGE<TV>& Bounding_Box() const
     {return *this;}
@@ -321,10 +321,10 @@ public:
     {return *this;}
 
     template<class RW> void Read(std::istream& input)
-    {for(int i=0;i<TV::dimension;i++) Read_Binary<RW>(input,min_corner(i),max_corner(i));}
+    {for(int i=0;i<TV::m;i++) Read_Binary<RW>(input,min_corner(i),max_corner(i));}
 
     template<class RW> void Write(std::ostream& output) const
-    {for(int i=0;i<TV::dimension;i++) Write_Binary<RW>(output,min_corner(i),max_corner(i));}
+    {for(int i=0;i<TV::m;i++) Write_Binary<RW>(output,min_corner(i),max_corner(i));}
 
 //#####################################################################
     TV Normal(const int aggregate) const;

@@ -182,7 +182,7 @@ Advection(T dt,bool one_step,int from_time,int to_time,int bc_time) // -1 = n-1,
             (to_time-from_time)*dt,time+to_time*dt);
         return;}
 
-    ARRAY<T,FACE_INDEX<TV::dimension> >* u=&temp_face_velocities;
+    ARRAY<T,FACE_INDEX<TV::m> >* u=&temp_face_velocities;
     if(from_time+to_time==0) u=&example.face_velocities;
     else if(from_time+to_time==-2) u=&example.prev_face_velocities;
     else{

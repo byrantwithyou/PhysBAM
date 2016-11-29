@@ -24,8 +24,8 @@ public:
     using BASE::particles;
     typedef typename FORCE_ELEMENTS::ITERATOR ELEMENT_ITERATOR;
     typedef typename BASE::FREQUENCY_DATA DEFORMABLE_FREQUENCY_DATA;
-    typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::dimension-1>::OBJECT T_SIMPLICIAL_OBJECT;
-    typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_SIMPLEX;
+    typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_SIMPLICIAL_OBJECT;
+    typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m-1>::SIMPLEX T_SIMPLEX;
 
     TRIANGULATED_SURFACE<T>* triangulated_surface;
     bool use_constant_wind;

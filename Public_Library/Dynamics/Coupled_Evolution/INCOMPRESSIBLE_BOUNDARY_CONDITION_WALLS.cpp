@@ -10,7 +10,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> INCOMPRESSIBLE_BOUNDARY_CONDITION_WALLS<TV>::
-INCOMPRESSIBLE_BOUNDARY_CONDITION_WALLS(const VECTOR<VECTOR<bool,2>,TV::dimension>& walls_input,const VECTOR<VECTOR<bool,2>,TV::dimension>& mpi_boundary_input)
+INCOMPRESSIBLE_BOUNDARY_CONDITION_WALLS(const VECTOR<VECTOR<bool,2>,TV::m>& walls_input,const VECTOR<VECTOR<bool,2>,TV::m>& mpi_boundary_input)
     :walls(walls_input),mpi_boundary(mpi_boundary_input)
 {}
 //#####################################################################
@@ -23,10 +23,10 @@ template<class TV> INCOMPRESSIBLE_BOUNDARY_CONDITION_WALLS<TV>::
 // Function Update_Boundary_Conditions
 //#####################################################################
 template<class TV> void INCOMPRESSIBLE_BOUNDARY_CONDITION_WALLS<TV>::
-Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N,ARRAY<T,TV_INT>& p,
-    ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities,const T time)
+Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,ARRAY<T,TV_INT>& p,
+    ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T time)
 {   
-    for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
+    for(int axis=0;axis<TV::m;axis++) for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*axis+axis_side;
         if(mpi_boundary(axis)(axis_side)){
             for(FACE_ITERATOR<TV> iterator(grid,1,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next())

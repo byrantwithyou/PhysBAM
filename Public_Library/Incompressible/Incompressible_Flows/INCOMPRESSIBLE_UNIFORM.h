@@ -74,7 +74,7 @@ public:
     void Use_Variable_Vorticity_Confinement(GRID<TV>& grid,const bool use_variable_vorticity_confinement_input=true);
     void Use_Strain();
     void Apply_Pressure_Kinetic_Energy(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_new,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_old,const T dt,const T time);
-    void Add_Energy_With_Vorticity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const VECTOR<VECTOR<bool,2>,TV::dimension>& domain_boundary,const T dt,const T time,const int number_of_ghost_cells,LEVELSET<TV>* lsv=0,ARRAY<T,TV_INT>* density=0);
+    void Add_Energy_With_Vorticity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const VECTOR<VECTOR<bool,2>,TV::m>& domain_boundary,const T dt,const T time,const int number_of_ghost_cells,LEVELSET<TV>* lsv=0,ARRAY<T,TV_INT>* density=0);
     void Advance_One_Time_Step_Convection(const T dt,const T time,const ARRAY<T,FACE_INDEX<TV::m> >& advecting_face_velocities,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_to_advect,const int number_of_ghost_cells);
     void Advance_One_Time_Step_Forces(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,const bool implicit_viscosity,const ARRAY<T,TV_INT>* phi_ghost,const int number_of_ghost_cells);
     void Add_Gravity_Threaded(RANGE<TV_INT>&domain,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,int axis);

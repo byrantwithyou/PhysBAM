@@ -330,8 +330,8 @@ Apply_Prestabilization_To_Joint(const JOINT_ID joint_id,const T dt,const T epsil
         RIGID_BODY<TV>::Apply_Impulse(parent,child,location,jn);}
     else if(joint.Has_Angular_Constraint()){
         ANGULAR_CONSTRAINT_FUNCTION<TV> f_error(debug_cast<ARTICULATED_RIGID_BODY<TV>&>(*this),joint_id,dt,epsilon_scale);
-        if(TV::dimension==3) Compute_Constraint_Correcting_Impulse(f_error,j_tau);
-        else if(TV::dimension==2) j_tau=-epsilon_scale*(f_error.Jacobian(T_SPIN()).Inverse()*f_error.F(T_SPIN())); // f(j_tau) is linear in 2D
+        if(TV::m==3) Compute_Constraint_Correcting_Impulse(f_error,j_tau);
+        else if(TV::m==2) j_tau=-epsilon_scale*(f_error.Jacobian(T_SPIN()).Inverse()*f_error.F(T_SPIN())); // f(j_tau) is linear in 2D
         RIGID_BODY<TV>::Apply_Impulse(parent,child,TV(),TV(),j_tau);}
 }
 //####################################################################################
@@ -370,11 +370,11 @@ Apply_Poststabilization_To_Joint(const JOINT_ID joint_id,const bool target_pd)
         if(joint.Has_Angular_Constraint() || (joint.joint_function && joint.joint_function->active)) PHYSBAM_NOT_IMPLEMENTED("NOT SUPPORTED FOR NOW... JUST DOING THIS FOR UNACTUATED NET");
         //TV delta_relative_angular_velocity=precomputed_desired_damped_angular_velocities(joint_index);
         delta_relative_twist.angular/=joint.angular_damping;
-        MATRIX_MXN<T> angular_constraint_matrix(MATRIX<T,T_SPIN::dimension>::Identity_Matrix()),prismatic_constraint_matrix(MATRIX<T,T_SPIN::dimension>::Identity_Matrix());
+        MATRIX_MXN<T> angular_constraint_matrix(MATRIX<T,T_SPIN::m>::Identity_Matrix()),prismatic_constraint_matrix(MATRIX<T,T_SPIN::m>::Identity_Matrix());
         RIGID_BODY<TV>::Apply_Sticking_And_Angular_Sticking_Impulse(parent,child,location,delta_relative_twist,angular_constraint_matrix,prismatic_constraint_matrix);}
     else if(joint.Has_Prismatic_Constraint()){
         // get axes of constraint for rotation -- if PD is on, then all axes are assumed constrained
-        MATRIX_MXN<T> angular_constraint_matrix(MATRIX<T,T_SPIN::dimension>::Identity_Matrix()),prismatic_constraint_matrix(MATRIX<T,TV::dimension>::Identity_Matrix());
+        MATRIX_MXN<T> angular_constraint_matrix(MATRIX<T,T_SPIN::m>::Identity_Matrix()),prismatic_constraint_matrix(MATRIX<T,TV::m>::Identity_Matrix());
         if(!(target_pd && joint.joint_function && joint.joint_function->active)){
             joint.Angular_Constraint_Matrix(parent.Frame(),angular_constraint_matrix);joint.Prismatic_Constraint_Matrix(parent.Frame(),prismatic_constraint_matrix);}
         RIGID_BODY<TV>::Apply_Sticking_And_Angular_Sticking_Impulse(parent,child,location,delta_relative_twist,angular_constraint_matrix,prismatic_constraint_matrix);}

@@ -15,7 +15,7 @@ template<class TV>
 class NODE_ITERATOR:public GRID_ITERATOR_BASE<TV>
 {
 public:
-    typedef typename GRID<TV>::REGION T_REGION;typedef VECTOR<int,TV::dimension> TV_INT;
+    typedef typename GRID<TV>::REGION T_REGION;typedef VECTOR<int,TV::m> TV_INT;
     typedef TV VECTOR_T;
     using GRID_ITERATOR_BASE<TV>::grid;using GRID_ITERATOR_BASE<TV>::index;using GRID_ITERATOR_BASE<TV>::Add_Region;using GRID_ITERATOR_BASE<TV>::Reset;
 

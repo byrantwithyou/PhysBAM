@@ -48,7 +48,7 @@ public:
     filled_region_touches_dirichlet.Fill(true); // don't need to worry about Neumann regions in heat flow
     T_LAPLACE::Solve(time,true);}
 
-    void Find_A_Part_Two(RANGE<VECTOR<int,TV::dimension> >& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,ARRAY<int,TV_INT>& cell_index_to_matrix_index)
+    void Find_A_Part_Two(RANGE<VECTOR<int,TV::m> >& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,ARRAY<int,TV_INT>& cell_index_to_matrix_index)
     {if(!coefficient) PHYSBAM_FATAL_ERROR();
     if(coefficient!=1) f/=coefficient; // this will cancel with the multiplication below, leaving only the Dirichlet part multiplied by coefficient
     T_LAPLACE::Find_A_Part_Two(domain,A_array,b_array,cell_index_to_matrix_index);

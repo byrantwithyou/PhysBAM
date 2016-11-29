@@ -13,10 +13,10 @@
 namespace PhysBAM{
 
 template<class TV>
-class PCG_SPARSE_MPI_THREADED:public PCG_SPARSE_MPI<GRID<VECTOR<typename TV::SCALAR,TV::dimension> > >
+class PCG_SPARSE_MPI_THREADED:public PCG_SPARSE_MPI<GRID<VECTOR<typename TV::SCALAR,TV::m> > >
 {
     typedef typename TV::SCALAR T;
-    typedef VECTOR<int,TV::dimension> TV_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef PCG_SPARSE_MPI<TV> BASE;
 public:
     using BASE::pcg;using BASE::partition;using BASE::Fill_Ghost_Cells;

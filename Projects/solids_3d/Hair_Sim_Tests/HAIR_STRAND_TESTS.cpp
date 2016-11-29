@@ -136,7 +136,7 @@ Initialize_Bodies()
 
     particles.Store_Velocity(true);
     
-    T density=TV::dimension==1?1:TV::dimension==2?100:1000;
+    T density=TV::m==1?1:TV::m==2?100:1000;
     SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(edges,density,true);
     SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(extra_edges,density,true);
 

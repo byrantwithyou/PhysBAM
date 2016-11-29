@@ -301,7 +301,7 @@ Name() const
 template<class TV,int gauss_order> std::string OPENSUBDIV_SURFACE<TV,gauss_order>::
 Static_Name()
 {
-    return LOG::sprintf("OPENSUBDIV_SURFACE<VECTOR<T,%d>>",TV::dimension);
+    return LOG::sprintf("OPENSUBDIV_SURFACE<VECTOR<T,%d>>",TV::m);
 }
 //#####################################################################
 // Function Extension

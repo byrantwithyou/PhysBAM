@@ -23,7 +23,7 @@ class ARRAY<T,FACE_INDEX<d> >
 public:
     ARRAY_VIEW<T> array; // one-dimensional data storage
 
-    enum {dimension=TV::dimension};
+    enum {dimension=TV::m};
     template<class T2> struct REBIND{typedef ARRAY<T2,FACE_INDEX<dimension> > TYPE;};
     typedef ARRAY_VIEW<T,TV_INT> T_ARRAY_VIEW;
     typedef T ELEMENT;typedef FACE_INDEX<d> INDEX;typedef T& RESULT_TYPE;typedef const T& CONST_RESULT_TYPE;

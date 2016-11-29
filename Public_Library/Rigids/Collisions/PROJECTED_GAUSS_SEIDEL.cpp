@@ -144,7 +144,7 @@ bool Solve(ARRAY<TWIST<TV> >& velocities,
     ARRAY<bool>& has_infinite_inertia,
     ARRAY<SOLVE_CONTACT::CONTACT<TV> >& contacts,
     ARRAY<typename TV::SCALAR>& lambda_normal,
-    ARRAY<VECTOR<typename TV::SCALAR,TV::dimension-1> >& lambda_tangent,
+    ARRAY<VECTOR<typename TV::SCALAR,TV::m-1> >& lambda_tangent,
     typename TV::SCALAR tolerance,
     int iteration_maximum,
     bool friction)
@@ -153,7 +153,7 @@ bool Solve(ARRAY<TWIST<TV> >& velocities,
 
     typedef typename TV::SCALAR T;
     typedef TWIST<TV> T_TWIST;
-    const int d=TV::dimension;
+    const int d=TV::m;
 
     int n_contacts=contacts.m;
 
@@ -230,7 +230,7 @@ bool Solve(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<SOLVE_CONTACT:
 {
     typedef typename TV::SCALAR T;
     typedef TWIST<TV> T_TWIST;
-    const int d=TV::dimension;
+    const int d=TV::m;
 
     int n_bodies=rigid_body_collection.rigid_body_particles.Size();
     int n_contacts=contacts.m;

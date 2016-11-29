@@ -17,7 +17,7 @@ namespace INTERSECTION{
 template<class T,class TV> bool Intersects(const RANGE<TV>& box,const SPHERE<TV>& sphere,const T& thickness_over_two)
 {
     T dmin=0;TV min_diff=sphere.center-box.min_corner+thickness_over_two,max_diff=sphere.center-box.max_corner-thickness_over_two;
-    for(int i=0;i<TV::dimension;i++){if(min_diff(i)<0) dmin+=sqr(min_diff(i));else if(max_diff(i)>0) dmin+=sqr(max_diff(i));}
+    for(int i=0;i<TV::m;i++){if(min_diff(i)<0) dmin+=sqr(min_diff(i));else if(max_diff(i)>0) dmin+=sqr(max_diff(i));}
     return dmin<=sqr(sphere.radius);
 }
 //#####################################################################

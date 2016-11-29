@@ -25,9 +25,9 @@ public:
     bool test_system;
     mutable ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost;
     ARRAY<bool,TV_INT> psi_D;
-    ARRAY<bool,FACE_INDEX<TV::dimension> > psi_N;
+    ARRAY<bool,FACE_INDEX<TV::m> > psi_N;
     ARRAY<T,TV_INT> psi_D_value;
-    ARRAY<T,FACE_INDEX<TV::dimension> > psi_N_value;
+    ARRAY<T,FACE_INDEX<TV::m> > psi_N_value;
 
     KANG_POISSON_VISCOSITY(FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters_input,const ARRAY<T,TV_INT>& old_phi_input);
     ~KANG_POISSON_VISCOSITY();

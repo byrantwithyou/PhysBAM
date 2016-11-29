@@ -173,7 +173,7 @@ void Get_Analytic_Velocities(const T time) const override
     DETONATION_SHOCK_DYNAMICS<TV>& dsd=*fluids_parameters.incompressible->projection.dsd;
     dsd.Dn.boundary->Fill_Ghost_Cells(dsd.Dn.grid,dsd.Dn.array,dsd.Dn.array,0,time);
     LEVELSET<TV>& levelset=fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).levelset;
-    ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
+    ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
         TV_INT cell1,cell2;grid.Cells_Touching_Face(axis,face,cell1,cell2);

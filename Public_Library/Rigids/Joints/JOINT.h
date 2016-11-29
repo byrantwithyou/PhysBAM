@@ -23,7 +23,7 @@ class JOINT:public NONCOPYABLE
 public:
     typedef int HAS_TYPED_READ_WRITE;
     typedef typename TV::SPIN T_SPIN;
-    enum{dof=T_SPIN::dimension};
+    enum{dof=T_SPIN::m};
 
     FRAME<TV> frame_pj,frame_jp; // joint to parent and parent to joint, respectively, chosen so that the rest state is acheived with J=I
     FRAME<TV> frame_cj,frame_jc; // joint to child and child to joint, respectively, chosen to align the child's twist axis with the x-axis, and the bending axis with the z-axis
@@ -62,7 +62,7 @@ public:
 
 //#####################################################################
     //FRAME<TV> Joint_Error() const;
-    virtual VECTOR<bool,TV::SPIN::dimension> Angular_Constraints() const;
+    virtual VECTOR<bool,TV::SPIN::m> Angular_Constraints() const;
     TV Location(const RIGID_BODY<TV>& parent,const RIGID_BODY<TV>& child) const;
     FRAME<TV> Compute_Current_Joint_Frame(const RIGID_BODY<TV>& parent,const RIGID_BODY<TV>& child) const;
     FRAME<TV> F_pc() const;

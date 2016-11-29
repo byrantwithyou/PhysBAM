@@ -106,8 +106,8 @@ P_From_Strain_Rate_First_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<T> aggreg
     T id_alpha=Alpha(id),id_beta=Beta(id);
     SYMMETRIC_MATRIX<T,d> strain_rate=F_dot.Symmetric_Part(); // use linear damping because of problems with inverting elements...
     T sb=sqrt(2*id_beta);
-    T dd=sb/TV::dimension;
-    T sa=sqrt(id_alpha/TV::dimension+dd*dd)-dd;
+    T dd=sb/TV::m;
+    T sa=sqrt(id_alpha/TV::m+dd*dd)-dd;
     SYMMETRIC_MATRIX<T,d> s=sb*strain_rate+sa*strain_rate.Trace();
     *(MATRIX<T,d>*)aggregate.Get_Array_Pointer()+=s;
 }
@@ -120,8 +120,8 @@ P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<const T>
     T id_alpha=Alpha(id),id_beta=Beta(id);
     SYMMETRIC_MATRIX<T,d> strain_rate=(*(const MATRIX<T,d>*)aggregate.Get_Array_Pointer()).Symmetric_Part(); // use linear damping because of problems with inverting elements...
     T sb=sqrt(2*id_beta);
-    T dd=sb/TV::dimension;
-    T sa=sqrt(id_alpha/TV::dimension+dd*dd)-dd;
+    T dd=sb/TV::m;
+    T sa=sqrt(id_alpha/TV::m+dd*dd)-dd;
     return sb*strain_rate+sa*strain_rate.Trace();
 }
 //#####################################################################

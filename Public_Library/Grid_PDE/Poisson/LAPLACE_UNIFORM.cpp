@@ -71,7 +71,7 @@ Solve(const T time,const bool solution_regions_already_computed)
     ARRAY<ARRAY<ARRAY<INTERVAL<int> > > > ghost_indices(number_of_regions);
     for(int color=0;color<number_of_regions;color++){
         interior_indices(color).Resize(threaded_iterator.number_of_domains);ghost_indices(color).Resize(threaded_iterator.number_of_domains);
-        for(int i=0;i<threaded_iterator.domains.m;i++) ghost_indices(color)(i).Resize(2*TV::dimension);}
+        for(int i=0;i<threaded_iterator.domains.m;i++) ghost_indices(color)(i).Resize(2*TV::m);}
     if(!mpi_grid && !thread_queue) Compute_Matrix_Indices(grid.Domain_Indices(1),filled_region_cell_count,matrix_index_to_cell_index_array,cell_index_to_matrix_index);
     else if(thread_queue && !mpi_grid) Compute_Matrix_Indices_Threaded(threaded_iterator.domains,interior_indices,ghost_indices,filled_region_cell_count,matrix_index_to_cell_index_array,cell_index_to_matrix_index);
     else if(thread_queue) laplace_mpi->Find_Matrix_Indices_Threaded(threaded_iterator.domains,interior_indices,ghost_indices,filled_region_cell_count,cell_index_to_matrix_index,matrix_index_to_cell_index_array,this);
@@ -220,15 +220,15 @@ Compute_Matrix_Indices_Threaded(ARRAY<RANGE<TV_INT> >& domains,ARRAY<ARRAY<INTER
         for(int color=0;color<interior_indices.m;color++) interior_indices(color)(i).min_corner=filled_region_cell_count(color);
         Compute_Matrix_Indices(interior_domain,filled_region_cell_count,matrix_index_to_cell_index_array,cell_index_to_matrix_index);
         for(int color=0;color<interior_indices.m;color++) interior_indices(color)(i).max_corner=filled_region_cell_count(color);}
-    for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){int s=axis*2+side;
+    for(int axis=0;axis<TV::m;axis++) for(int side=0;side<2;side++){int s=axis*2+side;
         RANGE<TV_INT> exterior_domain(grid.Domain_Indices(1));
-        for(int axis2=axis+1;axis2<TV::dimension;axis2++){exterior_domain.min_corner(axis2)++;exterior_domain.max_corner(axis2)--;}
+        for(int axis2=axis+1;axis2<TV::m;axis2++){exterior_domain.min_corner(axis2)++;exterior_domain.max_corner(axis2)--;}
         if(side==0) exterior_domain.max_corner(axis)=exterior_domain.min_corner(axis);
         else exterior_domain.min_corner(axis)=exterior_domain.max_corner(axis);
         for(int i=0;i<domains.m;i++){
             RANGE<TV_INT> interior_domain(domains(i));
-            interior_domain.max_corner-=TV_INT::All_Ones_Vector();for(int axis=0;axis<TV_INT::dimension;axis++) if(interior_domain.max_corner(axis)==grid.Domain_Indices().max_corner(axis)) interior_domain.max_corner(axis)++;
-            interior_domain.min_corner+=TV_INT::All_Ones_Vector();for(int axis=0;axis<TV_INT::dimension;axis++) if(interior_domain.min_corner(axis)==grid.Domain_Indices().min_corner(axis)) interior_domain.min_corner(axis)--;
+            interior_domain.max_corner-=TV_INT::All_Ones_Vector();for(int axis=0;axis<TV_INT::m;axis++) if(interior_domain.max_corner(axis)==grid.Domain_Indices().max_corner(axis)) interior_domain.max_corner(axis)++;
+            interior_domain.min_corner+=TV_INT::All_Ones_Vector();for(int axis=0;axis<TV_INT::m;axis++) if(interior_domain.min_corner(axis)==grid.Domain_Indices().min_corner(axis)) interior_domain.min_corner(axis)--;
             for(int color=0;color<interior_indices.m;color++) ghost_indices(color)(i)(s).min_corner=filled_region_cell_count(color);
             Compute_Matrix_Indices(RANGE<TV_INT>::Intersect(exterior_domain,interior_domain),filled_region_cell_count,matrix_index_to_cell_index_array,cell_index_to_matrix_index);
             for(int color=0;color<interior_indices.m;color++) ghost_indices(color)(i)(s).max_corner=filled_region_cell_count(color);}}

@@ -25,14 +25,14 @@ Has_Prismatic_Constraint() const
 template<class TV> void PRISMATIC_TWIST_JOINT<TV>::
 Constrain_Prismatically(TV& translation) const
 {
-    for(int i=0;i<TV::dimension;i++) if(constrain(i)) translation(i)=clamp(translation(i),prismatic_min(i),prismatic_max(i));
+    for(int i=0;i<TV::m;i++) if(constrain(i)) translation(i)=clamp(translation(i),prismatic_min(i),prismatic_max(i));
 }
 template<class TV> void PRISMATIC_TWIST_JOINT<TV>::
 Constrain_Relative_Linear_Velocity(const FRAME<TV>& parent_frame,TV& relative_linear_velocity) const
 {
     ROTATION<TV> joint_orientation=parent_frame.r*F_pj().r;
     VECTOR<bool,TV::m> equality_constraint=Equality_Constraint();
-    for(int i=0;i<TV::dimension;i++) if(equality_constraint(i)){
+    for(int i=0;i<TV::m;i++) if(equality_constraint(i)){
         TV u=joint_orientation.Rotated_Axis(i);
         relative_linear_velocity-=TV::Dot_Product(relative_linear_velocity,u)*u;}
 }

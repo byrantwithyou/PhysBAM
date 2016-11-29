@@ -87,8 +87,8 @@ template<class TV> typename TV::SCALAR& ARTICULATED_VECTOR<TV>::
 Raw_Get(int i)
 {
     int o=i%TWIST<TV>::dimension,n=i/TWIST<TV>::dimension;
-    if(o<TV::dimension) return v(JOINT_ID(n)).linear(o);
-    return v(JOINT_ID(n)).angular(o-TV::dimension);
+    if(o<TV::m) return v(JOINT_ID(n)).linear(o);
+    return v(JOINT_ID(n)).angular(o-TV::m);
 }
 //#####################################################################
 // Function Clone_Default

@@ -57,7 +57,7 @@ Number_Of_Constraints() const
 template<class TV> void MATRIX_SOLID_INTERPOLATION<TV>::
 Compute(const int ghost_cells)
 {
-    typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_SIMPLEX;typedef VECTOR<int,TV::dimension> TV_INT;
+    typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m-1>::SIMPLEX T_SIMPLEX;typedef VECTOR<int,TV::m> TV_INT;
     // TODO: save ghost cells if no MPI?
     ARRAY<T_SIMPLEX> clipped_simplices;
     typename GRID<TV>::REGION region_type=ghost_cells?GRID<TV>::INTERIOR_REGION:GRID<TV>::WHOLE_REGION;
@@ -82,7 +82,7 @@ Compute(const int ghost_cells)
                 TV simplex_weight;
                 for(int c=0;c<clipped_simplices.m;c++)
                     simplex_weight+=simplex.Sum_Barycentric_Coordinates(clipped_simplices(c))*clipped_simplices(c).Size();
-                simplex_weight/=TV::dimension;
+                simplex_weight/=TV::m;
                 area=simplex_weight.Sum();
                 const TV_INT& element=deformable->object.mesh.elements(simplices(s).y);
                 for(int i=0;i<element.m;i++)
@@ -166,12 +166,12 @@ Print_Each_Matrix(int n,GENERALIZED_VELOCITY<TV>& G) const
         const int axis=rows(i).axis;
 
         for(int j=0;j<deformable_weights.m;j++)
-            oo.Add_Sparse_Entry(Value(i),reverse_map_deformable(deformable_weights(j).index)*TV::dimension+axis,deformable_weights(j).weight);
+            oo.Add_Sparse_Entry(Value(i),reverse_map_deformable(deformable_weights(j).index)*TV::m+axis,deformable_weights(j).weight);
 
         for(int j=0;j<rigid_weights.m;j++){
             int index=reverse_map_rigid(rigid_weights(j).index);
             if(index>=0){ // Prune out static/kinematic
-                int base=G.V.Size()*TV::dimension+index*TWIST<TV>::dimension;
+                int base=G.V.Size()*TV::m+index*TWIST<TV>::dimension;
                 oo.Add_Sparse_Entry(Value(i),base+axis,rigid_weights(j).weight);
                 VECTOR<T,TV::SPIN::m> cpm=MATRIX<T,TV::SPIN::m,TV::m>::Cross_Product_Matrix(rigid_weights(j).radius).Column(axis)*rigid_weights(j).weight;
                 for(int k=0;k<TV::SPIN::m;k++) oo.Add_Sparse_Entry(Value(i),base+TV::m+k,cpm(k));}}}
@@ -213,12 +213,12 @@ Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
         const int axis=rows(i).axis;
 
         for(int j=0;j<deformable_weights.m;j++)
-            data.Append(TRIPLE<int,int,T>(Value(i),reverse_map_deformable(deformable_weights(j).index)*TV::dimension+axis,deformable_weights(j).weight));
+            data.Append(TRIPLE<int,int,T>(Value(i),reverse_map_deformable(deformable_weights(j).index)*TV::m+axis,deformable_weights(j).weight));
 
         for(int j=0;j<rigid_weights.m;j++){
             int index=reverse_map_rigid(rigid_weights(j).index);
             if(index>=0){ // Prune out static/kinematic
-                int base=this->V_indices->m*TV::dimension+index*TWIST<TV>::dimension;
+                int base=this->V_indices->m*TV::m+index*TWIST<TV>::dimension;
                 data.Append(TRIPLE<int,int,T>(Value(i),base+axis,rigid_weights(j).weight));
                 VECTOR<T,TV::SPIN::m> cpm=MATRIX<T,TV::SPIN::m,TV::m>::Cross_Product_Matrix(rigid_weights(j).radius).Column(axis)*rigid_weights(j).weight;
                 for(int k=0;k<TV::SPIN::m;k++) data.Append(TRIPLE<int,int,T>(Value(i),base+TV::m+k,cpm(k)));}}}

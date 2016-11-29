@@ -499,7 +499,7 @@ Synchronize_J_Bounds(int& jmin,int& jmax) const
 // Function Exchange_Boundary_Cell_Data
 //#####################################################################
 template<class TV> template<class T_MPI_GRID,class T2> void MPI_GRID<TV>::
-Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& data,const int bandwidth,const bool include_corners) const
+Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,ARRAYS_ND_BASE<T2,VECTOR<int,TV::m> >& data,const int bandwidth,const bool include_corners) const
 {
     PHYSBAM_ASSERT(bandwidth>0,"0 bandwidth exchange");
     Exchange_Boundary_Cell_Data(mpi_grid,local_grid,data,bandwidth,include_corners);
@@ -514,7 +514,7 @@ Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,ARRAY_BASE<T2,T_ARRAYS,IN
 // Function Exchange_Boundary_Cell_Data
 //#####################################################################
 template<class TV> template<class T_MPI_GRID,class T2> void MPI_GRID<TV>::
-Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,const GRID<TV>& local_grid,ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& data,const int bandwidth,const bool include_corners) const
+Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,const GRID<TV>& local_grid,ARRAYS_ND_BASE<T2,VECTOR<int,TV::m> >& data,const int bandwidth,const bool include_corners) const
 {
     RANGE<TV_INT> sentinels=RANGE<TV_INT>::Zero_Box();
     ARRAY<MPI_PACKAGE> packages;ARRAY<MPI::Request> requests;
@@ -692,31 +692,31 @@ Assert_Common_Face_Data(const T_MPI_GRID& mpi_grid,ARRAY<T,FACE_INDEX<TV::m> >& 
 // Function Sync_Common_Face_Weights
 //#####################################################################
 template<class TV> void MPI_GRID<TV>::
-Sync_Common_Face_Weights_From(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FACE_INDEX<TV::dimension> >& weights_to,ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,int> >,FACE_INDEX<TV::dimension> >& weights_from,const int ghost_cells)
+Sync_Common_Face_Weights_From(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::m>,T> >,FACE_INDEX<TV::m> >& weights_to,ARRAY<ARRAY<PAIR<FACE_INDEX<TV::m>,int> >,FACE_INDEX<TV::m> >& weights_from,const int ghost_cells)
 {
     int tag=Get_Unique_Tag();
 
     RANGE<VECTOR<int,2> > range(VECTOR<int,2>(1,1),VECTOR<int,2>(number_of_processes,number_of_processes));
     ARRAY<int,VECTOR<int,2> > all_sizes(range);
-    ARRAY<ARRAY<TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T> > > transfer_per_proc(number_of_processes); 
-    ARRAY<ARRAY<TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T> > > receive_per_proc(number_of_processes); 
-    for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
+    ARRAY<ARRAY<TRIPLE<FACE_INDEX<TV::m>,FACE_INDEX<TV::m>,T> > > transfer_per_proc(number_of_processes); 
+    ARRAY<ARRAY<TRIPLE<FACE_INDEX<TV::m>,FACE_INDEX<TV::m>,T> > > receive_per_proc(number_of_processes); 
+    for(int axis=0;axis<TV::m;axis++) for(int side=0;side<2;side++){
         int other_rank=side_neighbor_ranks(2*axis+side);if(other_rank<0) continue;
         RANGE<TV_INT> domain=local_grid.Domain_Indices();
         if(side==0) domain.max_corner(axis)=domain.min_corner(axis)+(ghost_cells-1);
         else domain.min_corner(axis)=domain.max_corner(axis)-(ghost_cells-1);
-        for(int axis2=0;axis2<TV::dimension;axis2++){
+        for(int axis2=0;axis2<TV::m;axis2++){
             RANGE<TV_INT> face_domain=local_grid.Domain_Indices(ghost_cells);
             if(side==0) face_domain.min_corner(axis)+=ghost_cells;
             else face_domain.max_corner(axis)-=ghost_cells;
             if(axis2==axis) face_domain.min_corner(axis)++;
             else face_domain.max_corner(axis2)++;
-            for(FACE_ITERATOR<TV> iterator(local_grid,domain,axis2);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> cell=iterator.Full_Index();
-                ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >& local_weights=weights_to(cell);
+            for(FACE_ITERATOR<TV> iterator(local_grid,domain,axis2);iterator.Valid();iterator.Next()){FACE_INDEX<TV::m> cell=iterator.Full_Index();
+                ARRAY<PAIR<FACE_INDEX<TV::m>,T> >& local_weights=weights_to(cell);
                 for(int i=0;i<local_weights.m;i++){
                     if(!face_domain.Lazy_Inside_Half_Open(local_weights(i).x.index)) 
-                        transfer_per_proc(other_rank+1).Append(TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T>(FACE_INDEX<TV::dimension>(cell.axis,cell.index+local_to_global_offset),
-                            FACE_INDEX<TV::dimension>(local_weights(i).x.axis,local_weights(i).x.index+local_to_global_offset),local_weights(i).y));}}}}
+                        transfer_per_proc(other_rank+1).Append(TRIPLE<FACE_INDEX<TV::m>,FACE_INDEX<TV::m>,T>(FACE_INDEX<TV::m>(cell.axis,cell.index+local_to_global_offset),
+                            FACE_INDEX<TV::m>(local_weights(i).x.axis,local_weights(i).x.index+local_to_global_offset),local_weights(i).y));}}}}
     for(int i=0;i<number_of_processes;i++) all_sizes(rank+1,i)=transfer_per_proc(i).m;
     for(int i=0;i<number_of_processes;i++) for(int j=0;j<number_of_processes;j++){int output;MPI_UTILITIES::Reduce(all_sizes(i,j),output,MPI::MAX,*comm);all_sizes(i,j)=output;}
     for(int i=0;i<number_of_processes;i++) receive_per_proc(i).Resize(all_sizes(i,rank+1));
@@ -734,7 +734,7 @@ Sync_Common_Face_Weights_From(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FA
     MPI_UTILITIES::Wait_All(requests);
     for(int i=0;i<number_of_processes;i++){int position=0;
         for(int j=0;j<receive_per_proc(i).m;j++){
-            TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T>& data=receive_per_proc(i)(j);
+            TRIPLE<FACE_INDEX<TV::m>,FACE_INDEX<TV::m>,T>& data=receive_per_proc(i)(j);
             MPI_UTILITIES::Unpack(data.x.index,data.x.axis,data.y.index,data.y.axis,data.z,recv_buffers(i),position,*comm);
             data.x.index-=local_to_global_offset;data.y.index-=local_to_global_offset;
             RANGE<TV_INT> face_domain=local_grid.Domain_Indices();face_domain.max_corner(data.x.axis)++;
@@ -744,35 +744,35 @@ Sync_Common_Face_Weights_From(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FA
             if(data.z<0) data.z=0;
             if(index>=0) weights_to(data.x)(index).y=data.z;
             else{
-                weights_to(data.x).Append(PAIR<FACE_INDEX<TV::dimension>,T>(data.y,data.z));
-                weights_from(data.y).Append(PAIR<FACE_INDEX<TV::dimension>,int>(data.x,weights_to(data.x).m));}}}
+                weights_to(data.x).Append(PAIR<FACE_INDEX<TV::m>,T>(data.y,data.z));
+                weights_from(data.y).Append(PAIR<FACE_INDEX<TV::m>,int>(data.x,weights_to(data.x).m));}}}
 }
 template<class TV> void MPI_GRID<TV>::
-Sync_Common_Face_Weights_To(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FACE_INDEX<TV::dimension> >& weights_to,ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,int> >,FACE_INDEX<TV::dimension> >& weights_from,const int ghost_cells)
+Sync_Common_Face_Weights_To(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::m>,T> >,FACE_INDEX<TV::m> >& weights_to,ARRAY<ARRAY<PAIR<FACE_INDEX<TV::m>,int> >,FACE_INDEX<TV::m> >& weights_from,const int ghost_cells)
 {
     int tag=Get_Unique_Tag();
 
     RANGE<VECTOR<int,2> > range(VECTOR<int,2>(1,1),VECTOR<int,2>(number_of_processes,number_of_processes));
     ARRAY<int,VECTOR<int,2> > all_sizes(range);
-    ARRAY<ARRAY<TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T> > > transfer_per_proc(number_of_processes); 
-    ARRAY<ARRAY<TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T> > > receive_per_proc(number_of_processes); 
-    for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
+    ARRAY<ARRAY<TRIPLE<FACE_INDEX<TV::m>,FACE_INDEX<TV::m>,T> > > transfer_per_proc(number_of_processes); 
+    ARRAY<ARRAY<TRIPLE<FACE_INDEX<TV::m>,FACE_INDEX<TV::m>,T> > > receive_per_proc(number_of_processes); 
+    for(int axis=0;axis<TV::m;axis++) for(int side=0;side<2;side++){
         int other_rank=side_neighbor_ranks(2*axis+side);if(other_rank<0) continue;
         RANGE<TV_INT> domain=local_grid.Domain_Indices();
         if(side==0) domain.max_corner(axis)=domain.min_corner(axis)+(ghost_cells-1);
         else domain.min_corner(axis)=domain.max_corner(axis)-(ghost_cells-1);
-        for(int axis2=0;axis2<TV::dimension;axis2++){
+        for(int axis2=0;axis2<TV::m;axis2++){
             RANGE<TV_INT> face_domain=local_grid.Domain_Indices(ghost_cells);
             if(side==0) face_domain.min_corner(axis)+=ghost_cells;
             else face_domain.max_corner(axis)-=ghost_cells;
             if(axis2==axis) face_domain.min_corner(axis)++;
             else face_domain.max_corner(axis2)++;
-            for(FACE_ITERATOR<TV> iterator(local_grid,domain,axis2);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> cell=iterator.Full_Index();
-                ARRAY<PAIR<FACE_INDEX<TV::dimension>,int> >& local_weights=weights_from(cell);
+            for(FACE_ITERATOR<TV> iterator(local_grid,domain,axis2);iterator.Valid();iterator.Next()){FACE_INDEX<TV::m> cell=iterator.Full_Index();
+                ARRAY<PAIR<FACE_INDEX<TV::m>,int> >& local_weights=weights_from(cell);
                 for(int i=0;i<local_weights.m;i++){
                     if(!face_domain.Lazy_Inside_Half_Open(local_weights(i).x.index)) 
-                        transfer_per_proc(other_rank+1).Append(TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T>(FACE_INDEX<TV::dimension>(cell.axis,cell.index+local_to_global_offset),
-                            FACE_INDEX<TV::dimension>(local_weights(i).x.axis,local_weights(i).x.index+local_to_global_offset),weights_to(local_weights(i).x)(local_weights(i).y).y));}}}}
+                        transfer_per_proc(other_rank+1).Append(TRIPLE<FACE_INDEX<TV::m>,FACE_INDEX<TV::m>,T>(FACE_INDEX<TV::m>(cell.axis,cell.index+local_to_global_offset),
+                            FACE_INDEX<TV::m>(local_weights(i).x.axis,local_weights(i).x.index+local_to_global_offset),weights_to(local_weights(i).x)(local_weights(i).y).y));}}}}
     for(int i=0;i<number_of_processes;i++) all_sizes(rank+1,i)=transfer_per_proc(i).m;
     for(int i=0;i<number_of_processes;i++) for(int j=0;j<number_of_processes;j++){int output;MPI_UTILITIES::Reduce(all_sizes(i,j),output,MPI::MAX,*comm);all_sizes(i,j)=output;}
     for(int i=0;i<number_of_processes;i++) receive_per_proc(i).Resize(all_sizes(i,rank+1));
@@ -790,7 +790,7 @@ Sync_Common_Face_Weights_To(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FACE
     MPI_UTILITIES::Wait_All(requests);
     for(int i=0;i<number_of_processes;i++){int position=0;
         for(int j=0;j<receive_per_proc(i).m;j++){
-            TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T>& data=receive_per_proc(i)(j);
+            TRIPLE<FACE_INDEX<TV::m>,FACE_INDEX<TV::m>,T>& data=receive_per_proc(i)(j);
             MPI_UTILITIES::Unpack(data.x.index,data.x.axis,data.y.index,data.y.axis,data.z,recv_buffers(i),position,*comm);
             data.x.index-=local_to_global_offset;data.y.index-=local_to_global_offset;
             RANGE<TV_INT> face_domain=local_grid.Domain_Indices();face_domain.max_corner(data.x.axis)++;
@@ -800,8 +800,8 @@ Sync_Common_Face_Weights_To(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FACE
             if(data.z<0) data.z=0;
             if(index>=0) weights_to(data.y)(index).y=data.z;
             else{
-                weights_to(data.y).Append(PAIR<FACE_INDEX<TV::dimension>,T>(data.x,data.z));
-                weights_from(data.x).Append(PAIR<FACE_INDEX<TV::dimension>,int>(data.y,weights_to(data.y).m));}}}
+                weights_to(data.y).Append(PAIR<FACE_INDEX<TV::m>,T>(data.x,data.z));
+                weights_from(data.x).Append(PAIR<FACE_INDEX<TV::m>,int>(data.y,weights_to(data.y).m));}}}
 }
 template<class TV> void MPI_GRID<TV>::
 Sync_Common_Cell_Weights_From(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,ARRAY<ARRAY<PAIR<TV_INT,int> >,TV_INT>& weights_from,const int ghost_cells)
@@ -814,7 +814,7 @@ Sync_Common_Cell_Weights_From(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,A
     ARRAY<int,VECTOR<int,2> > all_sizes(range);
     ARRAY<ARRAY<TRIPLE<TV_INT,TV_INT,T> > > transfer_per_proc(number_of_processes); 
     ARRAY<ARRAY<TRIPLE<TV_INT,TV_INT,T> > > receive_per_proc(number_of_processes);
-    for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
+    for(int axis=0;axis<TV::m;axis++) for(int side=0;side<2;side++){
         int other_rank=side_neighbor_ranks(2*axis+side);if(other_rank<0) continue;
         RANGE<TV_INT> domain=local_grid.Domain_Indices(),ghost_domain=local_grid.Domain_Indices(ghost_cells);
         if(side==0) ghost_domain.min_corner(axis)+=ghost_cells;
@@ -862,7 +862,7 @@ Sync_Common_Cell_Weights_To(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,ARR
     ARRAY<int,VECTOR<int,2> > all_sizes(range);
     ARRAY<ARRAY<TRIPLE<TV_INT,TV_INT,T> > > transfer_per_proc(number_of_processes); 
     ARRAY<ARRAY<TRIPLE<TV_INT,TV_INT,T> > > receive_per_proc(number_of_processes);
-    for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
+    for(int axis=0;axis<TV::m;axis++) for(int side=0;side<2;side++){
         int other_rank=side_neighbor_ranks(2*axis+side);if(other_rank<0) continue;
         RANGE<TV_INT> domain=local_grid.Domain_Indices(),ghost_domain=local_grid.Domain_Indices(ghost_cells);
         if(side==0) ghost_domain.min_corner(axis)+=ghost_cells;
@@ -933,9 +933,9 @@ template<class TV> void MPI_GRID<TV>::Initialize(VECTOR<VECTOR<bool,2>,TV::m>& d
 template<class TV> bool MPI_GRID<TV>::Neighbor(const int axis,const int axis_side) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> void MPI_GRID<TV>::Synchronize_Dt(T&) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> void MPI_GRID<TV>::Synchronize_J_Bounds(int&,int&) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-template<class TV> template<class T_MPI_GRID,class T2> void MPI_GRID<TV>::Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& data,const int bandwidth,
+template<class TV> template<class T_MPI_GRID,class T2> void MPI_GRID<TV>::Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,ARRAYS_ND_BASE<T2,VECTOR<int,TV::m> >& data,const int bandwidth,
     const bool include_corners) const{PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-template<class TV> template<class T_MPI_GRID,class T2> void MPI_GRID<TV>::Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,const GRID<TV>& local_grid,ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& data,
+template<class TV> template<class T_MPI_GRID,class T2> void MPI_GRID<TV>::Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,const GRID<TV>& local_grid,ARRAYS_ND_BASE<T2,VECTOR<int,TV::m> >& data,
     const int bandwidth,const bool include_corners) const{PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> template<class T_MPI_GRID,class T2,class T_ARRAYS,class INDEX> void MPI_GRID<TV>::Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,ARRAY_BASE<T2,T_ARRAYS,INDEX>& data,const int bandwidth,
     const bool include_corners) const{PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
@@ -952,8 +952,8 @@ template<class TV> template<class T_MPI_GRID,class T_FACE_ARRAYS> void MPI_GRID<
     {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> template<class T2> void MPI_GRID<TV>::Reduce_Add(const T2& input,T2& output) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> template<class T2> T2 MPI_GRID<TV>::Reduce_Add(const T2& local_value) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-template<class TV> void MPI_GRID<TV>::Sync_Common_Face_Weights_From(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FACE_INDEX<TV::dimension> >& weights_to,ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,int> >,FACE_INDEX<TV::dimension> >& weights_from,const int ghost_cells){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-template<class TV> void MPI_GRID<TV>::Sync_Common_Face_Weights_To(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FACE_INDEX<TV::dimension> >& weights_to,ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,int> >,FACE_INDEX<TV::dimension> >& weights_from,const int ghost_cells){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
+template<class TV> void MPI_GRID<TV>::Sync_Common_Face_Weights_From(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::m>,T> >,FACE_INDEX<TV::m> >& weights_to,ARRAY<ARRAY<PAIR<FACE_INDEX<TV::m>,int> >,FACE_INDEX<TV::m> >& weights_from,const int ghost_cells){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
+template<class TV> void MPI_GRID<TV>::Sync_Common_Face_Weights_To(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::m>,T> >,FACE_INDEX<TV::m> >& weights_to,ARRAY<ARRAY<PAIR<FACE_INDEX<TV::m>,int> >,FACE_INDEX<TV::m> >& weights_from,const int ghost_cells){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> void MPI_GRID<TV>::Sync_Common_Cell_Weights_From(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,ARRAY<ARRAY<PAIR<TV_INT,int> >,TV_INT>& weights_from,const int ghost_cells) {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> void MPI_GRID<TV>::Sync_Common_Cell_Weights_To(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,ARRAY<ARRAY<PAIR<TV_INT,int> >,TV_INT>& weights_from,const int ghost_cells) {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 //#####################################################################

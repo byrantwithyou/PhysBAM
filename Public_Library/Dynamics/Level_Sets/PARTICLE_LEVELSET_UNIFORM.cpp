@@ -751,7 +751,7 @@ Reseed_Add_Particles_Threaded_Part_Two(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLE_L
     RANDOM_NUMBERS<T> local_random;
     for(NODE_ITERATOR<TV> iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();
         if(!number_of_particles_to_add(block_index)) continue;
-        VECTOR<T,TV::dimension+1> h;for(int axis=0;axis<TV::dimension;axis++) h(axis)=(T)block_index(axis);h(TV::dimension)=time;
+        VECTOR<T,TV::m+1> h;for(int axis=0;axis<TV::m;axis++) h(axis)=(T)block_index(axis);h(TV::m)=time;
         local_random.Set_Seed(Hash(h));
         BLOCK_UNIFORM<TV> block(levelset.grid,block_index);
         PARTICLE_LEVELSET_PARTICLES<TV>* cell_particles=particles(block_index);
@@ -868,12 +868,12 @@ Delete_Particles_Outside_Grid()
 
     RANGE<TV_INT> real_domain(levelset.grid.Domain_Indices());real_domain.max_corner+=TV_INT::All_Ones_Vector();
     RANGE<TV_INT> domain(levelset.grid.Domain_Indices(3));domain.max_corner+=TV_INT::All_Ones_Vector();
-    for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
+    for(int axis=0;axis<TV::m;axis++) for(int side=0;side<2;side++){
         RANGE<TV_INT> ghost_domain(domain);
         if(side==0) ghost_domain.max_corner(axis)=real_domain.min_corner(axis);
         else ghost_domain.min_corner(axis)=real_domain.max_corner(axis);
         DOMAIN_ITERATOR_THREADED_ALPHA<PARTICLE_LEVELSET_UNIFORM<TV>,TV>(ghost_domain,thread_queue).Run(*this,&PARTICLE_LEVELSET_UNIFORM<TV>::Delete_Particles_Far_Outside_Grid);}
-    for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
+    for(int axis=0;axis<TV::m;axis++) for(int side=0;side<2;side++){
         RANGE<TV_INT> boundary_domain(real_domain);
         if(side==0) boundary_domain.max_corner(axis)=real_domain.min_corner(axis)+1;
         else boundary_domain.min_corner(axis)=real_domain.max_corner(axis)-1;
@@ -1175,7 +1175,7 @@ Reincorporate_Removed_Particles(const BLOCK_UNIFORM<TV>& block,PARTICLE_LEVELSET
 {
     bool near_objects=levelset.collision_body_list?levelset.collision_body_list->Occupied_Block(block):false;if(near_objects) levelset.Enable_Collision_Aware_Interpolation(sign);
     T one_over_radius_multiplier=-sign/radius_fraction;
-    T half_unit_sphere_size_over_cell_size=(T).5*(T)unit_sphere_size[TV::dimension]/levelset.grid.Cell_Size();
+    T half_unit_sphere_size_over_cell_size=(T).5*(T)unit_sphere_size[TV::m]/levelset.grid.Cell_Size();
     for(int k=removed_particles.Size()-1;k>=0;k--) if(reincorporate_removed_particles_everywhere || (one_over_radius_multiplier*levelset.Phi(removed_particles.X(k))<removed_particles.radius(k))){
         if(!particles) particles=Allocate_Particles(template_particles);
         // rasterize the velocity onto the velocity field
@@ -1183,7 +1183,7 @@ Reincorporate_Removed_Particles(const BLOCK_UNIFORM<TV>& block,PARTICLE_LEVELSET
             TV_INT cell_index=levelset.grid.Cell(removed_particles.X(k),0);
             T r=removed_particles.radius(k);
             TV half_impulse;
-            half_impulse = removed_particles.V(k)*mass_scaling*pow<TV::dimension>(r)*half_unit_sphere_size_over_cell_size;
+            half_impulse = removed_particles.V(k)*mass_scaling*pow<TV::m>(r)*half_unit_sphere_size_over_cell_size;
             for(int i=0;i<TV::m;i++){
                 TV_INT face_index(cell_index);
                 ARRAYS_ND_BASE<T,TV_INT> &face_velocity=V->Component(i);

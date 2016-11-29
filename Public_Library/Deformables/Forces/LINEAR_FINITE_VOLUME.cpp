@@ -37,14 +37,14 @@ LINEAR_FINITE_VOLUME(T_OBJECT& object,const T youngs_modulus,const T poissons_ra
         Get_Unique(mesh_particles,mesh.elements.Flattened());
         for(int i=0;i<mesh_particles.m;i++) total_mass+=particles.mass(mesh_particles(i));
         density=total_mass/object.Total_Size();
-        if(density==0) density=TV::dimension==1?1:TV::dimension==2?100:1000;}
+        if(density==0) density=TV::m==1?1:TV::m==2?100:1000;}
     else{
         density_list=new ARRAY<T>(mesh.elements.m);
         for(int i=0;i<mesh.elements.m;i++){
             const VECTOR<int,d+1>& nodes=mesh.elements(i);
             T volume=object.Signed_Size(i);
             for(int j=0;j<nodes.m;j++) (*density_list)(i)+=particles.mass(nodes(j))/(*mesh.incident_elements)(nodes(j)).m/volume;
-            if((*density_list)(i)==0) (*density_list)(i)=TV::dimension==1?1:TV::dimension==2?100:1000;}}
+            if((*density_list)(i)==0) (*density_list)(i)=TV::m==1?1:TV::m==2?100:1000;}}
 }
 //#####################################################################
 // Destructor

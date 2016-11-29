@@ -33,9 +33,9 @@ public:
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<PAIR<int,T> > FACE_WEIGHT_ELEMENTS;
     typedef typename TV::SPIN T_SPIN;
-    typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::dimension-1>::OBJECT T_THIN_SHELL;
-    typedef typename T_THIN_SHELL::MESH T_THIN_SHELL_MESH;typedef VECTOR<int,TV::dimension> T_THIN_SHELL_ELEMENT;
-    typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_THIN_SHELL_SIMPLEX;
+    typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_THIN_SHELL;
+    typedef typename T_THIN_SHELL::MESH T_THIN_SHELL_MESH;typedef VECTOR<int,TV::m> T_THIN_SHELL_ELEMENT;
+    typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m-1>::SIMPLEX T_THIN_SHELL_SIMPLEX;
 protected:
     typedef NEWMARK_EVOLUTION<TV> BASE;
     using BASE::solid_body_collection;using BASE::solids_parameters;using BASE::example_forces_and_velocities;
@@ -45,7 +45,7 @@ protected:
     using BASE::X_save;using BASE::rigid_frame_save;using BASE::V_save;using BASE::rigid_velocity_save;
     using BASE::rigid_angular_momentum_save;using BASE::fully_implicit;
 
-    static const int rows_per_rigid_body=TV::dimension+T_SPIN::dimension;
+    static const int rows_per_rigid_body=TV::m+T_SPIN::m;
 
 public:
     int rigid_body_count;

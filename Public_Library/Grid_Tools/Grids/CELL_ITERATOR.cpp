@@ -17,7 +17,7 @@ CELL_ITERATOR(const GRID<TV>& grid_input,const int number_of_ghost_cells,const T
         case GRID<TV>::BOUNDARY_INTERIOR_REGION: // outer boundary of grid with specified ghost cells
             if(side<0){ // don't loop over the same node twice!
                 RANGE<TV_INT> domain_copy(domain);
-                for(int axis=TV::dimension-1;axis>=0;axis--){
+                for(int axis=TV::m-1;axis>=0;axis--){
                     domain.max_corner(axis)=domain.min_corner(axis)+1;
                     Add_Region(domain);
                     domain.min_corner(axis)=domain_copy.max_corner(axis)-1;
@@ -30,7 +30,7 @@ CELL_ITERATOR(const GRID<TV>& grid_input,const int number_of_ghost_cells,const T
         default: assert(region_type==GRID<TV>::GHOST_REGION && number_of_ghost_cells>0); // ghost region of grid with specified ghost cells
             if(side<0){ // don't loop over the same cell twice!
                 TV_INT max_copy(domain.max_corner);
-                for(int axis=TV::dimension-1;axis>=0;axis--){
+                for(int axis=TV::m-1;axis>=0;axis--){
                     domain.max_corner(axis)=0;
                     Add_Region(domain);
                     domain.max_corner(axis)=max_copy(axis);

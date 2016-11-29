@@ -399,8 +399,8 @@ Update_Fluid_Parameters(const T dt,const T time)
 // Function Set_Boundary_Conditions
 //#####################################################################
 template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
-Set_Boundary_Conditions(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N,ARRAY<T,TV_INT>& psi_D_value,
-    ARRAY<T,FACE_INDEX<TV::dimension> >& psi_N_value) const
+Set_Boundary_Conditions(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,ARRAY<T,TV_INT>& psi_D_value,
+    ARRAY<T,FACE_INDEX<TV::m> >& psi_N_value) const
 {
     void Resize(const RANGE<TV_INT>& box,const bool initialize_new_elements=true,const bool copy_existing_elements=true,const T& initialization_value=T());
 

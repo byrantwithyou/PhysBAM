@@ -98,13 +98,13 @@ Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& bx) const
 template<class TV> void FLUID_SYSTEM_MPI<TV>::
 Add_J_Deformable_Transpose_Times_Velocity(const SPARSE_MATRIX_FLAT_MXN<T>& J_deformable,const GENERALIZED_VELOCITY<TV>& V,ARRAY_VIEW<T> pressure) const
 {
-    assert(pressure.m==J_deformable.n && J_deformable.m==V.V.indices.Size()*TV::dimension);
+    assert(pressure.m==J_deformable.n && J_deformable.m==V.V.indices.Size()*TV::m);
     // computes pressure+=J*V.V
     int index=J_deformable.offsets(0);
     for(int i=0;i<J_deformable.m;i++){
         const int end=J_deformable.offsets(i+1);
         for(;index<end;index++){
-            int dynamic_particle_index=i/TV::dimension;int axis=i-dynamic_particle_index*TV::dimension;
+            int dynamic_particle_index=i/TV::m;int axis=i-dynamic_particle_index*TV::m;
             pressure(J_deformable.A(index).j)+=J_deformable.A(index).a*V.V(dynamic_particle_index)(axis);}}
 }
 //#####################################################################
@@ -120,8 +120,8 @@ Add_J_Rigid_Transpose_Times_Velocity(const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid,co
         const int end=J_rigid.offsets(i+1);
         for(;index<end;index++){
             int rigid_particle_index=i/rows_per_rigid_body;int component=i-rigid_particle_index*rows_per_rigid_body;
-            if(component<=TV::dimension) pressure(J_rigid.A(index).j)+=J_rigid.A(index).a*V.rigid_V(rigid_particle_index).linear(component);
-            else pressure(J_rigid.A(index).j)+=J_rigid.A(index).a*V.rigid_V(rigid_particle_index).angular(component-TV::dimension);}}
+            if(component<=TV::m) pressure(J_rigid.A(index).j)+=J_rigid.A(index).a*V.rigid_V(rigid_particle_index).linear(component);
+            else pressure(J_rigid.A(index).j)+=J_rigid.A(index).a*V.rigid_V(rigid_particle_index).angular(component-TV::m);}}
 }
 //#####################################################################
 // Function Add_J_Deformable_Times_Pressure
@@ -129,12 +129,12 @@ Add_J_Rigid_Transpose_Times_Velocity(const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid,co
 template<class TV> void FLUID_SYSTEM_MPI<TV>::
 Add_J_Deformable_Times_Pressure(const SPARSE_MATRIX_FLAT_MXN<T>& J_deformable,ARRAY_VIEW<const T> pressure,GENERALIZED_VELOCITY<TV>& V) const
 {
-    assert(pressure.m==J_deformable.n && J_deformable.m==V.V.indices.Size()*TV::dimension);
+    assert(pressure.m==J_deformable.n && J_deformable.m==V.V.indices.Size()*TV::m);
     int index=J_deformable.offsets(0);
     for(int i=0;i<J_deformable.m;i++){
         const int end=J_deformable.offsets(i+1);
         for(;index<end;index++){
-            int dynamic_particle_index=i/TV::dimension;int axis=i-dynamic_particle_index*TV::dimension;
+            int dynamic_particle_index=i/TV::m;int axis=i-dynamic_particle_index*TV::m;
             V.V(dynamic_particle_index)(axis)+=pressure(J_deformable.A(index).j)*J_deformable.A(index).a;}}
 }
 //#####################################################################
@@ -150,8 +150,8 @@ Add_J_Rigid_Times_Pressure(const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid,ARRAY_VIEW<c
         const int end=J_rigid.offsets(i+1);
         for(;index<end;index++){
             int rigid_particle_index=i/rows_per_rigid_body;int component=i-rigid_particle_index*rows_per_rigid_body;
-            if(component<=TV::dimension) V.rigid_V(rigid_particle_index).linear(component)+=J_rigid.A(index).a*pressure(J_rigid.A(index).j);
-            else V.rigid_V(rigid_particle_index).angular(component-TV::dimension)+=J_rigid.A(index).a*pressure(J_rigid.A(index).j);}}
+            if(component<=TV::m) V.rigid_V(rigid_particle_index).linear(component)+=J_rigid.A(index).a*pressure(J_rigid.A(index).j);
+            else V.rigid_V(rigid_particle_index).angular(component-TV::m)+=J_rigid.A(index).a*pressure(J_rigid.A(index).j);}}
 }
 #ifdef USE_MPI
 //#####################################################################

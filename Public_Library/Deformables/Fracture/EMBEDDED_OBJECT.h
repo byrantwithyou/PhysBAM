@@ -162,7 +162,7 @@ public:
 
     virtual std::string Name() const override {return Static_Name();}
     static std::string Static_Name()
-    {return LOG::sprintf("EMBEDDED_OBJECT<T,VECTOR<T,%d>,%d>",TV::dimension,d);}
+    {return LOG::sprintf("EMBEDDED_OBJECT<T,VECTOR<T,%d>,%d>",TV::m,d);}
 
     void Read(TYPED_ISTREAM& input) override;
     void Write(TYPED_OSTREAM& output) const override;

@@ -167,7 +167,7 @@ Create_Triangulated_Object(const std::string& filename,const RIGID_BODY_STATE<TV
     FILE_UTILITIES::Read_From_File(stream_type,filename,triangulated_object);
     triangulated_object.Rescale(scale);
     LOG::cout<<"Adding Triangulated Object - Triangles = "<<triangulated_object.mesh.elements.m<<std::endl;
-    T density=TV::dimension==1?1:TV::dimension==2?100:1000;
+    T density=TV::m==1?1:TV::m==2?100:1000;
     Set_Mass_Of_Particles(triangulated_object,density,use_constant_mass);
     Set_Initial_Particle_Configuration(particles,initial_state,relative_to_box_center);
     typename TOPOLOGY_BASED_GEOMETRY_POLICY<TV>::TRIANGULATED_OBJECT& copy=Copy_And_Add_Structure(triangulated_object);
@@ -184,7 +184,7 @@ Create_Segmented_Curve(const std::string& filename,const RIGID_BODY_STATE<TV>& i
     T_SEGMENTED_CURVE& segmented_curve=*T_SEGMENTED_CURVE::Create(particles);
     FILE_UTILITIES::Read_From_File(stream_type,filename,segmented_curve);
     LOG::cout<<"Adding Segmented Curve - Segments = "<<segmented_curve.mesh.elements.m<<std::endl;
-    T density=TV::dimension==1?1:TV::dimension==2?100:1000;
+    T density=TV::m==1?1:TV::m==2?100:1000;
     Set_Mass_Of_Particles(segmented_curve,density,use_constant_mass);
     Set_Initial_Particle_Configuration(particles,initial_state,relative_to_box_center);
     typename TOPOLOGY_BASED_GEOMETRY_POLICY<TV>::SEGMENTED_CURVE& copy=Copy_And_Add_Structure(segmented_curve);
@@ -262,7 +262,7 @@ Create_Embedded_Tetrahedralized_Volume(const T_SHAPE& shape,const RIGID_BODY_STA
     for(int p=0;p<phi.m;p++) phi(p)=shape.Signed_Distance(particles.X(p));
     // compute embedded surface
     particles.Store_Velocity();
-    T density=TV::dimension==1?1:TV::dimension==2?100:1000;
+    T density=TV::m==1?1:TV::m==2?100:1000;
     Set_Mass_Of_Particles(tetrahedralized_volume,density,true);
     embedded_tetrahedralized_volume.Calculate_Boundary_From_Levelset_On_Nodes(phi);
     tetrahedralized_volume.mesh.number_nodes=particles.Size();

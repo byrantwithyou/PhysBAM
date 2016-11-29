@@ -24,8 +24,8 @@ template<class TV> class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO;
 template<class TV>
 class COLLISION_AWARE_INDEX_MAP:public NONCOPYABLE
 {
-    enum WORKAROUND {d=TV::dimension};
-    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::dimension> TV_INT;
+    enum WORKAROUND {d=TV::m};
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
 
     int last_coupling_cell;
 

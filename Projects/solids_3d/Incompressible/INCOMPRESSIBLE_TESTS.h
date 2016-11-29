@@ -599,7 +599,7 @@ void Initialize_Bodies() override
             solids_parameters.triangle_collision_parameters.perform_self_collision=false;
             int number_side_panels=50;T aspect_ratio=(T)1;
             TRIANGULATED_SURFACE<T>& surface=tests.Create_Cloth_Panel(number_side_panels,(T)1,aspect_ratio,RIGID_BODY_STATE<TV>());
-            T density=TV::dimension==1?1:TV::dimension==2?100:1000;
+            T density=TV::m==1?1:TV::m==2?100:1000;
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(surface,density);
             int i,j;int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
             i=1;j=1;//particles.mass(i+m*(j-1))=FLT_MAX;

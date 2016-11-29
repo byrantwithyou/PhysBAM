@@ -24,8 +24,8 @@ class RIGID_WIND_DRAG:public RIGIDS_FORCES<TV>
 public:
     typedef RIGIDS_FORCES<TV> BASE;
     typedef typename BASE::FREQUENCY_DATA RIGID_FREQUENCY_DATA;
-    typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::dimension-1>::OBJECT T_SIMPLICIAL_OBJECT;
-    typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_SIMPLEX;
+    typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_SIMPLICIAL_OBJECT;
+    typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m-1>::SIMPLEX T_SIMPLEX;
 
     RIGID_BODY<TV>* rigid_body;
     bool use_constant_wind;

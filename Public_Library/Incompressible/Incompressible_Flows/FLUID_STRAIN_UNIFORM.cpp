@@ -53,10 +53,10 @@ Update_Strain_Equation_Helper_Cell_Centered(const T dt,const T time,const T dens
 
     TV one_over_two_DX=(T).5*Inverse(grid.dX);T one_over_dimension=1/TV::m;
     for(CELL_ITERATOR<TV> iterator(grid,0);iterator.Valid();iterator.Next()){
-        TV_INT cell=iterator.Cell_Index();MATRIX<T,TV::dimension> VX;
+        TV_INT cell=iterator.Cell_Index();MATRIX<T,TV::m> VX;
         for(int axis=0;axis<TV::m;axis++){TV_INT offset=TV_INT::Axis_Vector(axis);
             VX.Set_Column(axis,one_over_two_DX[axis]*(V(cell+offset)-V(cell-offset)));} // TODO: maybe change this to do a better difference for the derivative in the same axis as the face
-        e(cell)=SYMMETRIC_MATRIX<T,TV::m>::Conjugate(MATRIX<T,TV::dimension>::Rotation_Matrix(dt*VX.Antisymmetric_Part_Cross_Product_Vector()),e(cell));
+        e(cell)=SYMMETRIC_MATRIX<T,TV::m>::Conjugate(MATRIX<T,TV::m>::Rotation_Matrix(dt*VX.Antisymmetric_Part_Cross_Product_Vector()),e(cell));
         e(cell)+=dt*VX.Symmetric_Part();
         if(plasticity_alpha){
             SYMMETRIC_MATRIX<T,TV::m> e_prime=e_ghost(cell)-one_over_dimension*e_ghost(cell).Trace();T e_prime_norm=e_prime.Frobenius_Norm();

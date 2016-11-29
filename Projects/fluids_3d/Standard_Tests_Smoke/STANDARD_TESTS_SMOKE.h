@@ -106,7 +106,7 @@ void Get_Divergence(ARRAY<T,VECTOR<int,3> >& divergence,const T dt,const T time)
 //#####################################################################
 // Function Get_Body_Force
 //#####################################################################
-void Get_Body_Force(ARRAY<T,FACE_INDEX<TV::dimension> >& force,const T dt,const T time) override
+void Get_Body_Force(ARRAY<T,FACE_INDEX<TV::m> >& force,const T dt,const T time) override
 {
     BASE::Get_Body_Force(force,dt,time);
     tests.Get_Body_Force(force,dt,time);

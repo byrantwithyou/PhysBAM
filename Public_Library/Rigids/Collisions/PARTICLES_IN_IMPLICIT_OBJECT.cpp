@@ -56,7 +56,7 @@ template<class TV> void PARTICLES_IN_IMPLICIT_OBJECT<TV>::
 Append_All_Intersections_Triangles(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> >& particle_intersections,const typename TV::SCALAR contour_value,const bool use_triangle_hierarchy_center_phi_test)
 {
     typedef typename TV::SCALAR T;
-    static const int d=TV::dimension;
+    static const int d=TV::m;
 
     FRAME<TV> frame=body1.Frame().Inverse_Times(body0.Frame());
     MATRIX<T,d> rotation=frame.r.Rotation_Matrix();
@@ -80,7 +80,7 @@ template<class TV> void PARTICLES_IN_IMPLICIT_OBJECT<TV>::
 Append_All_Intersections_Edges(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> >& particle_intersections,const typename TV::SCALAR contour_value,const bool use_triangle_hierarchy_center_phi_test)
 {
     typedef typename TV::SCALAR T;
-    static const int d=TV::dimension;
+    static const int d=TV::m;
 
     FRAME<TV> frame=body1.Frame().Inverse_Times(body0.Frame());
     MATRIX<T,d> rotation=frame.r.Rotation_Matrix();
@@ -101,7 +101,7 @@ Append_All_Intersections_Edges(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,ARRAY
 //#####################################################################
 // Function Simplex_Hierarchy
 //#####################################################################
-template<class TV> const typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::dimension-1>::HIERARCHY& PARTICLES_IN_IMPLICIT_OBJECT<TV>::
+template<class TV> const typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::HIERARCHY& PARTICLES_IN_IMPLICIT_OBJECT<TV>::
 Simplex_Hierarchy(const RIGID_BODY<TV>& rigid_body)
 {
     PHYSBAM_ASSERT(rigid_body.simplicial_object);
@@ -114,12 +114,12 @@ Simplex_Hierarchy(const RIGID_BODY<TV>& rigid_body)
 // Function Get_Interfering_Simplices
 //#####################################################################
 template<class TV> void PARTICLES_IN_IMPLICIT_OBJECT<TV>::
-Get_Interfering_Simplices(const RIGID_BODY<TV>& body0,const RIGID_BODY<TV>& body1,ARRAY<int>& simplex_list,MATRIX<typename TV::SCALAR,TV::dimension,TV::dimension>& rotation,TV& translation,const bool use_triangle_hierarchy_center_phi_test)
+Get_Interfering_Simplices(const RIGID_BODY<TV>& body0,const RIGID_BODY<TV>& body1,ARRAY<int>& simplex_list,MATRIX<typename TV::SCALAR,TV::m,TV::m>& rotation,TV& translation,const bool use_triangle_hierarchy_center_phi_test)
 {
     typedef typename BASIC_GEOMETRY_POLICY<TV>::ORIENTED_BOX T_ORIENTED_BOX;
 
     simplex_list.Remove_All();
-    const typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::dimension-1>::HIERARCHY& hierarchy=Simplex_Hierarchy(body0);
+    const typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::HIERARCHY& hierarchy=Simplex_Hierarchy(body0);
     if(use_triangle_hierarchy_center_phi_test && body1.implicit_object)
         hierarchy.Intersection_List(*body1.implicit_object->object_space_implicit_object,rotation,translation,simplex_list);
     else
@@ -132,18 +132,18 @@ Get_Interfering_Simplices(const RIGID_BODY<TV>& body0,const RIGID_BODY<TV>& body
 // Function Transform_From_Body1_To_Body2_Coordinates
 //#####################################################################
 template<class TV> TV
-Transform_From_Body1_To_Body2_Coordinates(TV& v,MATRIX<typename TV::SCALAR,TV::dimension,TV::dimension>& rotation,TV& translation)
+Transform_From_Body1_To_Body2_Coordinates(TV& v,MATRIX<typename TV::SCALAR,TV::m,TV::m>& rotation,TV& translation)
 {return rotation*v+translation;}
 //#####################################################################
 // Function Intersections_Using_Hierarchy
 //#####################################################################
 template<class TV> void  PARTICLES_IN_IMPLICIT_OBJECT<TV>::
 Intersections_Using_Hierarchy(RIGID_BODY<TV>& particle_body,RIGID_BODY<TV>& levelset_body,ARRAY<int>& simplex_list,
-    ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> >& particle_intersections,const typename TV::SCALAR contour_value,const bool exit_early,MATRIX<typename TV::SCALAR,TV::dimension,TV::dimension>& rotation,TV& translation)
+    ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> >& particle_intersections,const typename TV::SCALAR contour_value,const bool exit_early,MATRIX<typename TV::SCALAR,TV::m,TV::m>& rotation,TV& translation)
 {
     ARRAY<bool> checked(particle_body.simplicial_object->particles.Size());
     ARRAY_VIEW<bool>* collidable=particle_body.simplicial_object->particles.template Get_Array<bool>(ATTRIBUTE_ID_COLLIDABLE);
-    for(int t=0;t<simplex_list.m;t++){const VECTOR<int,TV::dimension>& nodes=particle_body.simplicial_object->mesh.elements(simplex_list(t));
+    for(int t=0;t<simplex_list.m;t++){const VECTOR<int,TV::m>& nodes=particle_body.simplicial_object->mesh.elements(simplex_list(t));
         for(int i=0;i<nodes.m;i++){
             if(!checked(nodes[i])){checked(nodes[i])=true;
                 if((!collidable || (*collidable)(nodes[i])) && levelset_body.implicit_object->object_space_implicit_object->Lazy_Inside(Transform_From_Body1_To_Body2_Coordinates(particle_body.simplicial_object->particles.X(nodes[i]),rotation,translation))){
@@ -231,7 +231,7 @@ Intersections_Using_Hierarchy_And_Edges_Helper(RIGID_BODY<VECTOR<T,3> >& body0,R
 // Function Intersections_Using_Hierarchy_And_Edges
 //#####################################################################
 template<class TV> void PARTICLES_IN_IMPLICIT_OBJECT<TV>::
-Intersections_Using_Hierarchy_And_Edges(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,ARRAY<int>& simplex_list1,ARRAY<int>& simplex_list2,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> >& particle_intersections,const typename TV::SCALAR contour_value,const bool exit_early,MATRIX<typename TV::SCALAR,TV::dimension,TV::dimension>& rotation,TV& translation)
+Intersections_Using_Hierarchy_And_Edges(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& body1,ARRAY<int>& simplex_list1,ARRAY<int>& simplex_list2,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> >& particle_intersections,const typename TV::SCALAR contour_value,const bool exit_early,MATRIX<typename TV::SCALAR,TV::m,TV::m>& rotation,TV& translation)
 {
     Intersections_Using_Hierarchy_And_Edges_Helper(body0,body1,simplex_list1,simplex_list2,particle_intersections,contour_value,exit_early,rotation,translation);
 }
@@ -241,7 +241,7 @@ Intersections_Using_Hierarchy_And_Edges(RIGID_BODY<TV>& body0,RIGID_BODY<TV>& bo
 template<class TV> void PARTICLES_IN_IMPLICIT_OBJECT<TV>::
 Particles_In_Implicit_Object(RIGID_BODY<TV>& particle_body,RIGID_BODY<TV>& levelset_body,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> >& particle_intersections,const typename TV::SCALAR contour_value,const bool exit_early){
     typedef typename TV::SCALAR T;
-    static const int d=TV::dimension;
+    static const int d=TV::m;
     typedef typename BASIC_GEOMETRY_POLICY<TV>::ORIENTED_BOX T_ORIENTED_BOX;
 
     ARRAY_VIEW<bool>* collidable=particle_body.simplicial_object->particles.template Get_Array<bool>(ATTRIBUTE_ID_COLLIDABLE);
@@ -281,7 +281,7 @@ template<class TV> void PARTICLES_IN_IMPLICIT_OBJECT<TV>::
 Particles_In_Implicit_Object_Hierarchy(RIGID_BODY<TV>& particle_body,RIGID_BODY<TV>& levelset_body,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> >& particle_intersections,const typename TV::SCALAR contour_value,HASHTABLE<const GEOMETRY_PARTICLES<TV>*,const PARTICLE_HIERARCHY<TV>*>& particle_hierarchies)
 {
     typedef typename TV::SCALAR T;
-    static const int d=TV::dimension;
+    static const int d=TV::m;
 
     FRAME<TV> frame=levelset_body.Frame().Inverse_Times(particle_body.Frame());
     MATRIX<T,d> rotation=frame.r.Rotation_Matrix();
@@ -297,7 +297,7 @@ Particles_In_Implicit_Object_Hierarchy(RIGID_BODY<TV>& particle_body,RIGID_BODY<
 // Function Particle_Partition
 //#####################################################################
 template<class TV> const PARTICLE_PARTITION<TV>&
-Particle_Partition(const RIGID_BODY<TV>& rigid_body,const VECTOR<int,TV::dimension>& particle_partition_size)
+Particle_Partition(const RIGID_BODY<TV>& rigid_body,const VECTOR<int,TV::m>& particle_partition_size)
 {
     // TODO: regenerate if particle_partition_size changes
     PHYSBAM_ASSERT(rigid_body.simplicial_object);
@@ -309,10 +309,10 @@ Particle_Partition(const RIGID_BODY<TV>& rigid_body,const VECTOR<int,TV::dimensi
 // Function Particles_In_Implicit_Object_Partition
 //#####################################################################
 template<class TV> void PARTICLES_IN_IMPLICIT_OBJECT<TV>::
-Particles_In_Implicit_Object_Partition(RIGID_BODY<TV>& particle_body,RIGID_BODY<TV>& levelset_body,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> >& particle_intersections,const typename TV::SCALAR contour_value,const bool use_particle_partition_center_phi_test,const VECTOR<int,TV::dimension>& particle_partition_size,const bool exit_early)
+Particles_In_Implicit_Object_Partition(RIGID_BODY<TV>& particle_body,RIGID_BODY<TV>& levelset_body,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> >& particle_intersections,const typename TV::SCALAR contour_value,const bool use_particle_partition_center_phi_test,const VECTOR<int,TV::m>& particle_partition_size,const bool exit_early)
 {
     typedef typename TV::SCALAR T;
-    const int d=TV::dimension;
+    const int d=TV::m;
     typedef typename BASIC_GEOMETRY_POLICY<TV>::ORIENTED_BOX T_ORIENTED_BOX;
     
     FRAME<TV> frame=levelset_body.Frame().Inverse_Times(particle_body.Frame());

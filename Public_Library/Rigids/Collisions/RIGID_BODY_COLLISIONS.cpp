@@ -101,7 +101,7 @@ Adjust_Bounding_Boxes(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const T f
                             rigid_body->simplicial_object==rigid_body_collection.Rigid_Body(rigid_body_id_j).simplicial_object){
                             already_adjusted=true;break;}}
                     if(!already_adjusted){
-                        TV delta,edge_lengths=box.Edge_Lengths();for(int d=0;d<TV::dimension;d++) if(edge_lengths[d]==0) delta[d]=false_thickness;
+                        TV delta,edge_lengths=box.Edge_Lengths();for(int d=0;d<TV::m;d++) if(edge_lengths[d]==0) delta[d]=false_thickness;
                         box.Change_Size(delta+extra_padding_distance);}
                     rigid_body->Update_Bounding_Box();}}}}
 }
@@ -699,19 +699,19 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
 
     if(rigid_body_interactions.m==0) return false;
 
-    ARRAY<SYMMETRIC_MATRIX<T,TV::dimension> > K_inverse(rigid_body_interactions.m);
+    ARRAY<SYMMETRIC_MATRIX<T,TV::m> > K_inverse(rigid_body_interactions.m);
     for(int i=0;i<rigid_body_interactions.m;i++){
         RIGID_BODY<TV>& parent_other_rigid_body=rigid_body_collection.rigid_body_cluster_bindings.Get_Parent(rigid_body_collection.Rigid_Body(rigid_body_interactions(i)));
         if(!parent_other_rigid_body.Has_Infinite_Inertia() || use_static_body_masses) K_inverse(i)=parent_other_rigid_body.Impulse_Factor(rigid_body_collision_locations(i)).Inverse();
-        else K_inverse(i)=SYMMETRIC_MATRIX<T,TV::dimension>::Identity_Matrix();}
+        else K_inverse(i)=SYMMETRIC_MATRIX<T,TV::m>::Identity_Matrix();}
 
     TV velocity;T_SPIN angular_velocity;
     if(!parent_rigid_body.Has_Infinite_Inertia()){
         // TODO: static deformable particles
-        TV ms[2];VECTOR<T,T_SPIN::dimension> mrs[2];MATRIX<T,T_SPIN::dimension,TV::dimension> mr[2];MATRIX<T,T_SPIN::dimension> mrr[2];
+        TV ms[2];VECTOR<T,T_SPIN::m> mrs[2];MATRIX<T,T_SPIN::m,TV::m> mr[2];MATRIX<T,T_SPIN::m> mrr[2];
         T m=0; // non static particles
         
-        SYMMETRIC_MATRIX<T,TV::dimension> K_inverse_sum[2]; // non static bodies
+        SYMMETRIC_MATRIX<T,TV::m> K_inverse_sum[2]; // non static bodies
 
         int number_of_static_bodies=0;TV centroid;
         for(int i=0;i<rigid_body_interactions.m;i++){
@@ -722,7 +722,7 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
             if(index>=0){centroid+=rigid_body_collision_locations(i)-parent_rigid_body.Frame().t;number_of_static_bodies++;}
             TV K_inverse_s=K_inverse(i)*rigid_body_distances(i),radius=rigid_body_collision_locations(i)-parent_rigid_body.Frame().t;
             K_inverse_sum[index]+=K_inverse(i);ms[index]+=K_inverse_s;mrs[index]+=TV::Cross_Product(radius,K_inverse_s);
-            MATRIX<T,T_SPIN::dimension,TV::dimension> r_K_inverse=K_inverse(i).Cross_Product_Matrix_Times(radius);
+            MATRIX<T,T_SPIN::m,TV::m> r_K_inverse=K_inverse(i).Cross_Product_Matrix_Times(radius);
             mr[index]+=r_K_inverse;mrr[index]+=r_K_inverse.Times_Cross_Product_Matrix_Transpose(radius);}
 
         if(number_of_static_bodies) centroid/=(T)number_of_static_bodies;
@@ -732,60 +732,60 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
         mrr[0]+=parent_rigid_body.World_Space_Inertia_Tensor();
 
         // determine how static bodies affect the system
-        DIAGONAL_MATRIX<T,TV::m> eigenvalues;MATRIX<T,TV::dimension> eigenvectors;
+        DIAGONAL_MATRIX<T,TV::m> eigenvalues;MATRIX<T,TV::m> eigenvectors;
         int equation_type=0; // indicate which type of system we will be solving below
         if(number_of_static_bodies==0) equation_type=0; // 0 dof specified by static bodies
         else if(number_of_static_bodies==1) equation_type=1;
         else{ // need to figure out if the static bodies are effectively coincident or colinear
-            SYMMETRIC_MATRIX<T,TV::dimension> R_R_transpose;
+            SYMMETRIC_MATRIX<T,TV::m> R_R_transpose;
             for(int i=0;i<rigid_body_interactions.m;i++){
                 RIGID_BODY<TV>& parent_other_rigid_body=rigid_body_collection.rigid_body_cluster_bindings.Get_Parent(rigid_body_collection.Rigid_Body(rigid_body_interactions(i)));
-                if(parent_other_rigid_body.Has_Infinite_Inertia()) R_R_transpose+=SYMMETRIC_MATRIX<T,TV::dimension>::Outer_Product(rigid_body_collision_locations(i)-parent_rigid_body.Frame().t-centroid);}
+                if(parent_other_rigid_body.Has_Infinite_Inertia()) R_R_transpose+=SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(rigid_body_collision_locations(i)-parent_rigid_body.Frame().t-centroid);}
             R_R_transpose.Solve_Eigenproblem(eigenvalues,eigenvectors);
             int rank=eigenvalues.To_Vector().Componentwise_Greater_Equal(TV::All_Ones_Vector()*threshold).Number_True();
             if(rank==0) equation_type=1; // 3/6 dof (2/3 dof in 2d) specified by static bodies
-            else if(rank==1 && TV::dimension==3) equation_type=2; // 5 dof specified by static bodies (not possible in 2d)
+            else if(rank==1 && TV::m==3) equation_type=2; // 5 dof specified by static bodies (not possible in 2d)
             else equation_type=3;} // full constrained by static bodies
 
-        MATRIX<T,TV::dimension+T_SPIN::dimension> M[2];
+        MATRIX<T,TV::m+T_SPIN::m> M[2];
         for(int i=0;i<2;i++) if(equation_type!=(i?0:3)){
             M[i].Set_Submatrix(0,0,K_inverse_sum[i]);
-                M[i].Set_Submatrix(TV::dimension,0,mr[i]);
-            M[i].Set_Submatrix(0,TV::dimension,mr[i].Transposed());
-            M[i].Set_Submatrix(TV::dimension,TV::dimension,mrr[i]);}
+                M[i].Set_Submatrix(TV::m,0,mr[i]);
+            M[i].Set_Submatrix(0,TV::m,mr[i].Transposed());
+            M[i].Set_Submatrix(TV::m,TV::m,mrr[i]);}
 
         // set up our system
-        MATRIX<T,TV::dimension+T_SPIN::dimension> A;VECTOR<T,TV::dimension+T_SPIN::dimension> b;
-        if(equation_type==0){A=M[0];b=VECTOR<T,TV::dimension+T_SPIN::dimension>(ms[0],mrs[0]);}
-        else if(equation_type==3){A=M[1];b=VECTOR<T,TV::dimension+T_SPIN::dimension>(ms[1],mrs[1]);}
+        MATRIX<T,TV::m+T_SPIN::m> A;VECTOR<T,TV::m+T_SPIN::m> b;
+        if(equation_type==0){A=M[0];b=VECTOR<T,TV::m+T_SPIN::m>(ms[0],mrs[0]);}
+        else if(equation_type==3){A=M[1];b=VECTOR<T,TV::m+T_SPIN::m>(ms[1],mrs[1]);}
         else if(equation_type==1){ // one outer body static
-            MATRIX<T,T_SPIN::dimension,TV::dimension+T_SPIN::dimension> Z;
-            MATRIX<T,TV::dimension,TV::dimension+T_SPIN::dimension> Y;
-            Z.Set_Submatrix(0,0,-MATRIX_POLICY<TV>::CROSS_PRODUCT_MATRIX::Cross_Product_Matrix(centroid));Z.Set_Submatrix(0,TV::dimension,MATRIX<T,T_SPIN::dimension>::Identity_Matrix());
-            Y.Set_Submatrix(0,0,MATRIX<T,TV::dimension>::Identity_Matrix());Y.Set_Submatrix(0,T_SPIN::dimension,-MATRIX_POLICY<TV>::CROSS_PRODUCT_MATRIX::Cross_Product_Matrix(centroid));
+            MATRIX<T,T_SPIN::m,TV::m+T_SPIN::m> Z;
+            MATRIX<T,TV::m,TV::m+T_SPIN::m> Y;
+            Z.Set_Submatrix(0,0,-MATRIX_POLICY<TV>::CROSS_PRODUCT_MATRIX::Cross_Product_Matrix(centroid));Z.Set_Submatrix(0,TV::m,MATRIX<T,T_SPIN::m>::Identity_Matrix());
+            Y.Set_Submatrix(0,0,MATRIX<T,TV::m>::Identity_Matrix());Y.Set_Submatrix(0,T_SPIN::m,-MATRIX_POLICY<TV>::CROSS_PRODUCT_MATRIX::Cross_Product_Matrix(centroid));
             A.Set_Submatrix(0,0,Z*M[0]);
-            A.Set_Submatrix(T_SPIN::dimension,0,Y*M[1]);
-            b.Combine(Z*VECTOR<T,TV::dimension+T_SPIN::dimension>(ms[0],mrs[0]),Y*VECTOR<T,TV::dimension+T_SPIN::dimension>(ms[1],mrs[1]));}
+            A.Set_Submatrix(T_SPIN::m,0,Y*M[1]);
+            b.Combine(Z*VECTOR<T,TV::m+T_SPIN::m>(ms[0],mrs[0]),Y*VECTOR<T,TV::m+T_SPIN::m>(ms[1],mrs[1]));}
         else{
-            assert(equation_type==2 && TV::dimension==3);
+            assert(equation_type==2 && TV::m==3);
             int u_index=eigenvalues.To_Vector().Arg_Max();
-            MATRIX<T,TV::dimension,TV::dimension+T_SPIN::dimension> Z_helper;
-            Z_helper.Set_Submatrix(0,0,-MATRIX_POLICY<TV>::CROSS_PRODUCT_MATRIX::Cross_Product_Matrix(centroid));Z_helper.Set_Submatrix(0,TV::dimension,MATRIX<T,T_SPIN::dimension>::Identity_Matrix());
+            MATRIX<T,TV::m,TV::m+T_SPIN::m> Z_helper;
+            Z_helper.Set_Submatrix(0,0,-MATRIX_POLICY<TV>::CROSS_PRODUCT_MATRIX::Cross_Product_Matrix(centroid));Z_helper.Set_Submatrix(0,TV::m,MATRIX<T,T_SPIN::m>::Identity_Matrix());
             Z_helper=eigenvectors.Transpose_Times(Z_helper);
-            MATRIX<T,TV::dimension,TV::dimension+T_SPIN::dimension> Y;
-            Y.Set_Submatrix(0,0,MATRIX<T,TV::dimension>::Identity_Matrix());Y.Set_Submatrix(0,T_SPIN::dimension,MATRIX_POLICY<TV>::CROSS_PRODUCT_MATRIX::Cross_Product_Matrix(centroid));
-            VECTOR<T,TV::dimension+T_SPIN::dimension> b_helper[2]={VECTOR<T,TV::dimension+T_SPIN::dimension>(ms[0],mrs[0]),VECTOR<T,TV::dimension+T_SPIN::dimension>(ms[1],mrs[1])};
-            A.Set_Submatrix(TV::dimension*(TV::dimension==3),0,Y*M[1]); // Don't compile index out of bounds in 2D, even though this case cannot happen in 2D.
-            b.Array_View((int)TV::dimension,(int)TV::dimension)=Y*b_helper[1];
-            MATRIX<T,1,TV::dimension+T_SPIN::dimension> A_row;
-            for(int i=0;i<TV::dimension;i++){
+            MATRIX<T,TV::m,TV::m+T_SPIN::m> Y;
+            Y.Set_Submatrix(0,0,MATRIX<T,TV::m>::Identity_Matrix());Y.Set_Submatrix(0,T_SPIN::m,MATRIX_POLICY<TV>::CROSS_PRODUCT_MATRIX::Cross_Product_Matrix(centroid));
+            VECTOR<T,TV::m+T_SPIN::m> b_helper[2]={VECTOR<T,TV::m+T_SPIN::m>(ms[0],mrs[0]),VECTOR<T,TV::m+T_SPIN::m>(ms[1],mrs[1])};
+            A.Set_Submatrix(TV::m*(TV::m==3),0,Y*M[1]); // Don't compile index out of bounds in 2D, even though this case cannot happen in 2D.
+            b.Array_View((int)TV::m,(int)TV::m)=Y*b_helper[1];
+            MATRIX<T,1,TV::m+T_SPIN::m> A_row;
+            for(int i=0;i<TV::m;i++){
                 Z_helper.Get_Submatrix(i,0,A_row);
                 int matrix_index=i==u_index?0:1;
                 A.Set_Submatrix(i,0,A_row*M[matrix_index]);
                 b(i)=(A_row*b_helper[matrix_index]).x;}}
 
         // compute impulse as delta twist
-        VECTOR<T,TV::dimension+T_SPIN::dimension> delta_twist;
+        VECTOR<T,TV::m+T_SPIN::m> delta_twist;
         if(equation_type==0 || equation_type==3) delta_twist=A.In_Place_Cholesky_Solve(b);
         else delta_twist=A.Inverse_Times(b);
         delta_twist.Extract(velocity,angular_velocity);}

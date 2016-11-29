@@ -83,7 +83,7 @@ public:
     virtual void Initialize_Grid(const GRID<TV>& mac_grid_input);
     virtual void Solve(const T time=0,const bool solution_regions_already_computed=false);
     // Undefined in cpp.
-    //void Set_Threaded_Boundary(RANGE<TV_INT>& domain,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N);
+    //void Set_Threaded_Boundary(RANGE<TV_INT>& domain,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N);
     // Undefined in cpp.
     //void Solve_Threaded(RANGE<TV_INT>& domain,const GRID<TV>& threaded_grid,const T time=0);
     virtual void Find_A(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,const ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index);

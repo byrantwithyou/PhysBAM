@@ -13,15 +13,15 @@ template<class TV> class BOUNDARY_CONDITIONS_CALLBACKS;
 template<class TV>
 class EXAMPLE_BOUNDARY_CONDITION:public IMPLICIT_BOUNDARY_CONDITION<TV>
 {
-    typedef VECTOR<int,TV::dimension> TV_INT;typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;typedef typename TV::SCALAR T;
 public:
     BOUNDARY_CONDITIONS_CALLBACKS<TV>* callback;
 
     EXAMPLE_BOUNDARY_CONDITION(BOUNDARY_CONDITIONS_CALLBACKS<TV>* callback_input);
     virtual ~EXAMPLE_BOUNDARY_CONDITION();
 
-    void Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N,ARRAY<T,TV_INT>& p,
-        ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities,const T time) override;
+    void Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,ARRAY<T,TV_INT>& p,
+        ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T time) override;
 };
 }
 #endif

@@ -63,7 +63,7 @@ Average_Bounding_Box_Size()
             if(!rigid_collision_geometry->rigid_body.rigid_body_collection.Is_Active(rigid_collision_geometry->rigid_body.particle_index)) continue;
         if(collision_bodies(i)->add_to_spatial_partition){count++;TV size=collision_bodies(i)->Axis_Aligned_Bounding_Box().Edge_Lengths();average_size+=size.Sum();}}
     if(!count) return 0;
-    return average_size/(TV::dimension*count)+2*collision_body_thickness;
+    return average_size/(TV::m*count)+2*collision_body_thickness;
 }
 //#####################################################################
 // Function Maximum_Bounding_Box_Size

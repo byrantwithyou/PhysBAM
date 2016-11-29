@@ -264,7 +264,7 @@ Initialize_Bodies()
             else sim_guide_tet_edges.mesh.elements.Append(guide_tet_edges.mesh.elements(i)+VECTOR<int,2>(offset,offset));}
         for(int i=1;i<guide_volume->mesh.elements.m;i++) sim_guide_volume->mesh.elements.Append(guide_volume->mesh.elements(i)+VECTOR<int,4>(0,offset,offset,offset));}
 
-    T density=TV::dimension==1?1:TV::dimension==2?100:1000;
+    T density=TV::m==1?1:TV::m==2?100:1000;
     SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(edges,density,true);
     SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(extra_edges,density,true);
 

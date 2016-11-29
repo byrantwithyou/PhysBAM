@@ -114,7 +114,7 @@ Get_Ghost_Centered_Velocity(const T dt,const T time,const int number_of_ghost_ce
 template<class TV> void EULER_PROJECTION_UNIFORM<TV>::
 Make_Boundary_Faces_Neumann(ARRAY<bool,FACE_INDEX<TV::m> >& psi_N)
 {
-    for(int side=0;side<2*TV::dimension;side++)
+    for(int side=0;side<2*TV::m;side++)
         if(!euler->mpi_grid || euler->mpi_grid->side_neighbor_ranks(side)>0)
             for(FACE_ITERATOR<TV> iterator(euler->grid,0,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                 TV_INT face_index=iterator.Face_Index();int axis=iterator.Axis();

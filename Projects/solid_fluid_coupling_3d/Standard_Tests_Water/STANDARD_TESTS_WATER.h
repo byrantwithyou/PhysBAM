@@ -524,7 +524,7 @@ void Floppy_Fish()
         RIGID_BODY<TV>& bone=solids_tests.Add_Rigid_Body("miniplank25wide2",bone_scale,friction);
         bones.Append(&bone);
         bone.Frame()=FRAME<TV>(bone_positions[i]);
-        bone.Set_Mass(bone_density*bone_unscaled_volume*std::pow(bone_scale,TV::dimension));}
+        bone.Set_Mass(bone_density*bone_unscaled_volume*std::pow(bone_scale,TV::m));}
 
     T joint_strengths[4]={(T)500,(T)500,(T)200,(T)100};
     for(int i=1;i<bones.m;i++){

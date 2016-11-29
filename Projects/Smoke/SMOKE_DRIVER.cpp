@@ -84,7 +84,7 @@ Initialize()
     if(example.restart) example.Read_Output_Files(example.restart);
     
     // setup domain boundaries
-    VECTOR<VECTOR<bool,2>,TV::dimension> constant_extrapolation;constant_extrapolation.Fill(VECTOR<bool,2>::Constant_Vector(true));
+    VECTOR<VECTOR<bool,2>,TV::m> constant_extrapolation;constant_extrapolation.Fill(VECTOR<bool,2>::Constant_Vector(true));
     example.boundary->Set_Constant_Extrapolation(constant_extrapolation);
     example.Set_Boundary_Conditions(time, 1); // get so CFL is correct
 
@@ -122,7 +122,7 @@ Particle_To_Grid()
     example.face_velocities.Fill((T)0);
 
     example.boundary->Set_Fixed_Boundary(true,0);
-    ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_ghost(example.grid,ghost,false);
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(example.grid,ghost,false);
     example.boundary->Fill_Ghost_Faces(example.grid,example.face_velocities,face_velocities_ghost,time,ghost);
 
     // Rasterize mass and momentum to faces
@@ -162,7 +162,7 @@ template<class TV> void SMOKE_DRIVER<TV>::
 Grid_To_Particle()
 {
     example.boundary->Set_Fixed_Boundary(true,0);
-    ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_ghost(example.grid,ghost,false);
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(example.grid,ghost,false);
     example.boundary->Fill_Ghost_Faces(example.grid,example.face_velocities,face_velocities_ghost,time,ghost);
 
     SMOKE_PARTICLES<TV>& particles=example.particles;
@@ -274,7 +274,7 @@ Convect(const T dt,const T time)
         Particle_To_Grid();}
     else{
         example.boundary->Set_Fixed_Boundary(true,0);
-        ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_ghost(example.grid,ghost,false);
+        ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(example.grid,ghost,false);
         example.boundary->Fill_Ghost_Faces(example.grid,example.face_velocities,face_velocities_ghost,time,ghost);
         example.advection_scalar.Update_Advection_Equation_Face(
         example.grid,example.face_velocities,face_velocities_ghost,face_velocities_ghost,*example.boundary,dt,time);

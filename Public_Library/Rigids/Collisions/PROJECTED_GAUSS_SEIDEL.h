@@ -29,7 +29,7 @@ template<class T,int D> void Solve(ARRAY<MATRIX<T,D> >& A_block_diagonal,
     ARRAY<VECTOR<T,D> >& x,ARRAY<T>& lambda,T tolerance);
 template<class TV>
 bool Solve(ARRAY<TWIST<TV> >& velocities,ARRAY<bool>& has_infinite_inertia,ARRAY<SOLVE_CONTACT::CONTACT<TV> >& contacts,
-    ARRAY<typename TV::SCALAR>& lambda_normal,ARRAY<VECTOR<typename TV::SCALAR,TV::dimension-1> >& lambda_tangent,
+    ARRAY<typename TV::SCALAR>& lambda_normal,ARRAY<VECTOR<typename TV::SCALAR,TV::m-1> >& lambda_tangent,
     typename TV::SCALAR tolerance,int iteration_maximum,bool friction=false);
 template<class TV> bool
 Solve(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<SOLVE_CONTACT::CONTACT<TV> >& contacts,

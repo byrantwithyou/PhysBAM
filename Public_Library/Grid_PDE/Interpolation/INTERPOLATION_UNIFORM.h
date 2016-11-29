@@ -57,7 +57,7 @@ public:
     T Clamped_To_Array_Face_Component(const int axis,const GRID<TV>& grid,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const
     {assert(grid.Is_MAC_Grid());return From_Block_Face_Component(axis,grid,BLOCK_UNIFORM<TV>(grid,X,u.Number_Of_Ghost_Cells()),u,X);}
     
-    ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> > Clamped_To_Array_Face_Component_Weights(const int axis,const GRID<TV>& grid,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const
+    ARRAY<PAIR<FACE_INDEX<TV::m>,T> > Clamped_To_Array_Face_Component_Weights(const int axis,const GRID<TV>& grid,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const
     {assert(grid.Is_MAC_Grid());return From_Block_Face_Component_Weights(axis,grid,BLOCK_UNIFORM<TV>(grid,X,u.Number_Of_Ghost_Cells()),u,X);}
 
     VECTOR<T2,2> Extrema_Clamped_To_Array_Cell(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u_min,const ARRAYS_ND_BASE<T2,TV_INT>& u_max,const TV& X) const
@@ -85,7 +85,7 @@ public:
     virtual TV From_Block_Face(const GRID<TV>& grid,const BLOCK_UNIFORM<TV>& block,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
     virtual T From_Block_Face_Component(const int axis,const GRID<TV>& grid,const BLOCK_UNIFORM<TV>& block,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const
     {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-    virtual ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> > From_Block_Face_Component_Weights(const int axis,const GRID<TV>& grid,const BLOCK_UNIFORM<TV>& block,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const
+    virtual ARRAY<PAIR<FACE_INDEX<TV::m>,T> > From_Block_Face_Component_Weights(const int axis,const GRID<TV>& grid,const BLOCK_UNIFORM<TV>& block,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const
     {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
     virtual VECTOR<T2,2> Extrema_Clamped_To_Array(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u_min,const ARRAYS_ND_BASE<T2,TV_INT>& u_max,const TV& X) const 
     {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}

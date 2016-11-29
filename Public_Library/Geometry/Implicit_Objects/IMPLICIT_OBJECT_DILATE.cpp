@@ -263,7 +263,7 @@ Write(TYPED_OSTREAM& output) const
 template<class TV> std::string IMPLICIT_OBJECT_DILATE<TV>::
 Static_Name()
 {
-    return LOG::sprintf("IMPLICIT_OBJECT_DILATE<T,VECTOR<T,%d> >",TV::dimension);
+    return LOG::sprintf("IMPLICIT_OBJECT_DILATE<T,VECTOR<T,%d> >",TV::m);
 }
 //#####################################################################
 // Function Extension
@@ -271,7 +271,7 @@ Static_Name()
 template<class TV> std::string IMPLICIT_OBJECT_DILATE<TV>::
 Static_Extension()
 {
-    return TV::dimension==2?"dilate_phi2d":"dilate_phi";
+    return TV::m==2?"dilate_phi2d":"dilate_phi";
 }
 template class IMPLICIT_OBJECT_DILATE<VECTOR<float,1> >;
 template class IMPLICIT_OBJECT_DILATE<VECTOR<float,2> >;

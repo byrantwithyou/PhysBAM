@@ -21,7 +21,7 @@ class GRID_BASED_COLLISION_GEOMETRY:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef TV_INT T_INDEX;typedef typename GRID<TV>::BLOCK T_BLOCK;
-    typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_SIMPLEX;
+    typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m-1>::SIMPLEX T_SIMPLEX;
 public:
     COLLISION_BODY_COLLECTION<TV>& collision_geometry_collection;
     // TODO: Add flag to disable collision bodies for fluid.

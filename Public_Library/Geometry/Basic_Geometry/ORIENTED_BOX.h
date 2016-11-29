@@ -20,7 +20,7 @@ template<class TV>
 class ORIENTED_BOX
 {
     typedef typename TV::SCALAR T;
-    enum WORKAROUND{d=TV::dimension};
+    enum WORKAROUND{d=TV::m};
 public:
     typedef int HAS_UNTYPED_READ_WRITE;
     typedef TV VECTOR_T;
@@ -108,8 +108,8 @@ public:
         box.edges.Set_Column(i,box.edges.Column(i)+(u+u));}
     return box;}
 
-    VECTOR<T,TV::dimension-1> Principal_Curvatures(const TV& X) const
-    {return VECTOR<T,TV::dimension-1>();}
+    VECTOR<T,TV::m-1> Principal_Curvatures(const TV& X) const
+    {return VECTOR<T,TV::m-1>();}
 
     template<class RW> void Read(std::istream& input)
     {Read_Binary<RW>(input,corner,edges);}
@@ -132,6 +132,6 @@ private:
 };
 template<class TV>
 inline std::ostream& operator<<(std::ostream& output_stream,const ORIENTED_BOX<TV>& box)
-{output_stream<<"("<<box.corner<<")   (";for(int i=0;i<TV::dimension-1;i++) output_stream<<box.edges.Column(i)<<" : ";output_stream<<box.edges.Column(TV::dimension-1)<<")";return output_stream;}
+{output_stream<<"("<<box.corner<<")   (";for(int i=0;i<TV::m-1;i++) output_stream<<box.edges.Column(i)<<" : ";output_stream<<box.edges.Column(TV::m-1)<<")";return output_stream;}
 }
 #endif

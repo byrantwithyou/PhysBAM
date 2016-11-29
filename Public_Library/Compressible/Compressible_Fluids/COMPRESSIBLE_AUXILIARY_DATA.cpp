@@ -19,7 +19,7 @@ void Write_Auxiliary_Files(const STREAM_TYPE stream_type,const std::string& outp
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef VECTOR<T,TV::dimension+2> TV_DIMENSION;
+    typedef VECTOR<T,TV::m+2> TV_DIMENSION;
     typedef ARRAY<TV_DIMENSION,TV_INT> T_ARRAYS_DIMENSION_SCALAR;
 
     STATIC_ASSERT((is_same<T_ARRAYS,T_ARRAYS_DIMENSION_SCALAR>::value));

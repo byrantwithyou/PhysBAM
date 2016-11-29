@@ -98,7 +98,7 @@ public:
     virtual void Intersection_List(const T_HYPERPLANE& test_plane,ARRAY<int>& intersection_list,const T thickness_over_two=0) const
     {Intersection_List(root,test_plane,intersection_list,thickness_over_two);}
 
-    virtual void Intersection_List(const IMPLICIT_OBJECT<TV>& implicit_object,const MATRIX<T,TV::dimension>& rotation,const TV& translation,ARRAY<int>& intersection_list,const T contour_value=0) const
+    virtual void Intersection_List(const IMPLICIT_OBJECT<TV>& implicit_object,const MATRIX<T,TV::m>& rotation,const TV& translation,ARRAY<int>& intersection_list,const T contour_value=0) const
     {Intersection_List(root,implicit_object,rotation,translation,intersection_list,contour_value);}
     
 //#####################################################################
@@ -119,7 +119,7 @@ protected:
     void Intersection_List(const int box,const TV& point,ARRAY<int>& intersection_list,const T thickness_over_two) const;
     void Intersection_List(const int box,const ORIENTED_BOX<TV>& test_box,ARRAY<int>& intersection_list) const;
     void Intersection_List(const int box,const T_HYPERPLANE& test_plane,ARRAY<int>& intersection_list,const T thickness_over_two) const;
-    void Intersection_List(const int box,const IMPLICIT_OBJECT<TV>& implicit_object,const MATRIX<T,TV::dimension>& rotation,const TV& translation,ARRAY<int>& intersection_list,
+    void Intersection_List(const int box,const IMPLICIT_OBJECT<TV>& implicit_object,const MATRIX<T,TV::m>& rotation,const TV& translation,ARRAY<int>& intersection_list,
         const T contour_value) const;
     template<class T_VISITOR> void Intersection_List(const BOX_HIERARCHY<TV>& other_hierarchy,T_VISITOR& visitor,const int self_box,const int other_box,
         const T extra_thickness=0) const;

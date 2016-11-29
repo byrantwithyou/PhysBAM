@@ -52,7 +52,7 @@ public:
     bool Neighbor(const int axis,const int axis_side) const
     {return side_neighbor_ranks(2*axis+axis_side)!=-1;}
     
-    template<class T2> THREAD_PACKAGE Package_Cell_Data(ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& data,const RANGE<TV_INT>& send_region) const
+    template<class T2> THREAD_PACKAGE Package_Cell_Data(ARRAYS_ND_BASE<T2,VECTOR<int,TV::m> >& data,const RANGE<TV_INT>& send_region) const
     {
         int size=0;for(CELL_ITERATOR<TV> iterator(local_grid,send_region);iterator.Valid();iterator.Next()) size+=data.Pack_Size();
         int position=0;THREAD_PACKAGE pack(size);pack.send_tid=rank;
@@ -60,10 +60,10 @@ public:
         return pack;
     }
 
-    template<class T2> void Sync_Particles(const ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& local_data,ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& global_data) const
+    template<class T2> void Sync_Particles(const ARRAYS_ND_BASE<T2,VECTOR<int,TV::m> >& local_data,ARRAYS_ND_BASE<T2,VECTOR<int,TV::m> >& global_data) const
     {
         RANGE<TV_INT> domain=local_grid.Domain_Indices();
-        for(int axis=0;axis<TV::dimension;axis++) if(domain.max_corner(axis)+local_to_global_offset(axis)==global_grid.Domain_Indices().max_corner(axis)) domain.max_corner(axis)++;
+        for(int axis=0;axis<TV::m;axis++) if(domain.max_corner(axis)+local_to_global_offset(axis)==global_grid.Domain_Indices().max_corner(axis)) domain.max_corner(axis)++;
         for(NODE_ITERATOR<TV> iterator(local_grid,domain);iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();global_data(node+local_to_global_offset)=local_data(node);}
     }
 
@@ -71,14 +71,14 @@ public:
     void Synchronize_Dt(T& dt) const;
     void All_Reduce(bool& flag) const;
     void Allgather(ARRAY<int>& data) const;
-    template<class T2> void Exchange_Boundary_Cell_Data(ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& data,const int bandwidth,const bool include_corners=true) const;
-    template<class T2> void Exchange_Boundary_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data,const int bandwidth) const;
-    template<class T2> void Average_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data) const;
-    template<class T2> void Assert_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data,const T tolerance) const;
-    template<class T2> void Sync_Scalar(const ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& local_data,ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& global_data) const;
-    template<class T2> void Sync_Face_Scalar(const ARRAY<T2,FACE_INDEX<TV::dimension> >& local_data,ARRAY<T2,FACE_INDEX<TV::dimension> >& global_data) const;
-    template<class T2> void Distribute_Scalar(ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& local_data,const ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& global_data) const;
-    template<class T2> void Distribute_Face_Scalar(ARRAY<T2,FACE_INDEX<TV::dimension> >& local_data,const ARRAY<T2,FACE_INDEX<TV::dimension> >& global_data) const;
+    template<class T2> void Exchange_Boundary_Cell_Data(ARRAYS_ND_BASE<T2,VECTOR<int,TV::m> >& data,const int bandwidth,const bool include_corners=true) const;
+    template<class T2> void Exchange_Boundary_Face_Data(ARRAY<T2,FACE_INDEX<TV::m> >& data,const int bandwidth) const;
+    template<class T2> void Average_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::m> >& data) const;
+    template<class T2> void Assert_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::m> >& data,const T tolerance) const;
+    template<class T2> void Sync_Scalar(const ARRAYS_ND_BASE<T2,VECTOR<int,TV::m> >& local_data,ARRAYS_ND_BASE<T2,VECTOR<int,TV::m> >& global_data) const;
+    template<class T2> void Sync_Face_Scalar(const ARRAY<T2,FACE_INDEX<TV::m> >& local_data,ARRAY<T2,FACE_INDEX<TV::m> >& global_data) const;
+    template<class T2> void Distribute_Scalar(ARRAYS_ND_BASE<T2,VECTOR<int,TV::m> >& local_data,const ARRAYS_ND_BASE<T2,VECTOR<int,TV::m> >& global_data) const;
+    template<class T2> void Distribute_Face_Scalar(ARRAY<T2,FACE_INDEX<TV::m> >& local_data,const ARRAY<T2,FACE_INDEX<TV::m> >& global_data) const;
 };
 }
 #endif

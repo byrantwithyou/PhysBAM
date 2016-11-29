@@ -87,7 +87,7 @@ Initialize()
         example.boundary=&example.boundary_scalar;
         example.phi_boundary=&example.phi_boundary_water;}
 
-    VECTOR<VECTOR<bool,2>,TV::dimension> domain_open_boundaries=VECTOR_UTILITIES::Complement(example.domain_boundary);
+    VECTOR<VECTOR<bool,2>,TV::m> domain_open_boundaries=VECTOR_UTILITIES::Complement(example.domain_boundary);
     example.phi_boundary->Set_Constant_Extrapolation(domain_open_boundaries);
     example.boundary->Set_Constant_Extrapolation(domain_open_boundaries);
     example.particle_levelset_evolution.Levelset_Advection(0).Set_Custom_Advection(example.advection_scalar);
@@ -150,7 +150,7 @@ Initialize()
     example.particle_levelset_evolution.Delete_Particles_Outside_Grid();
     
     //add forces
-    example.incompressible.gravity=-(T)9.8*TV::Axis_Vector(1-(TV::dimension==1));
+    example.incompressible.gravity=-(T)9.8*TV::Axis_Vector(1-(TV::m==1));
     example.incompressible.Set_Body_Force(true);
     example.incompressible.projection.Use_Non_Zero_Divergence(false);
     example.incompressible.projection.elliptic_solver->Solve_Neumann_Regions(true);

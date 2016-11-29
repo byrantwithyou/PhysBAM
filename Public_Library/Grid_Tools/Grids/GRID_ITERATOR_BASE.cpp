@@ -31,8 +31,8 @@ GRID_ITERATOR_BASE(const GRID<TV>& grid_input,const RANGE<TV_INT>& region_input)
 template<class TV> void GRID_ITERATOR_BASE<TV>::
 Next_Helper()
 {
-    index(TV::dimension-1)=region.min_corner(TV::dimension-1);
-    for(int i=TV::dimension-2;i>=0;i--){
+    index(TV::m-1)=region.min_corner(TV::m-1);
+    for(int i=TV::m-2;i>=0;i--){
         if(index(i)<region.max_corner(i)-1){index(i)++;return;}
         index(i)=region.min_corner(i);}
     Reset(current_region+1);

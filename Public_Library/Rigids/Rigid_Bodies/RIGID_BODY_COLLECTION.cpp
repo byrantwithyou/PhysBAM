@@ -126,7 +126,7 @@ Add_Rigid_Body(const STREAM_TYPE stream_type,const bool thin_shell,const std::st
     rigid_body->thin_shell=thin_shell;
 
     // rigid body
-    std::string rgd=TV::dimension==2?"rgd2d":"rgd";
+    std::string rgd=TV::m==2?"rgd2d":"rgd";
     if(read_rgd_file){
         try{FILE_UTILITIES::Read_From_File(stream_type,basename+"."+rgd,rigid_body->Mass(),rigid_body->Inertia_Tensor(),rigid_body->Frame());}
         catch(FILESYSTEM_ERROR&){LOG::cout<<"Note: No "<<rgd<<" file for "<<basename<<" (using default values)"<<std::endl;}}
@@ -148,7 +148,7 @@ Add_Rigid_Body(RIGID_BODY<TV>* rigid_body,STREAM_TYPE stream_type,const std::str
     // structures
     ARRAY<int> structure_ids;
     TV structure_center=rigid_body_particles.frame(id).t;
-    if(TV::dimension==2){
+    if(TV::m==2){
         if(read_simplicial_boundary && !Find_Or_Read_Structure(stream_type,structure_ids,basename+".curve2d",scaling_factor,structure_center))
             LOG::cout<<"Note: No curve2d file for "<<basename<<std::endl;
         if(read_implicit_object && !Find_Or_Read_Structure(stream_type,structure_ids,basename+".phi2d",scaling_factor,structure_center))

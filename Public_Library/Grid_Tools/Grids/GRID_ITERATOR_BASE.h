@@ -16,11 +16,11 @@ namespace PhysBAM{
 template<class TV>
 class GRID_ITERATOR_BASE
 {
-    typedef VECTOR<int,TV::dimension> TV_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
 protected:
     const GRID<TV>& grid;
     int number_of_regions,current_region;
-    RANGE<TV_INT> region,regions[1<<TV::dimension]; // at most 2^d distinct regions for iteration
+    RANGE<TV_INT> region,regions[1<<TV::m]; // at most 2^d distinct regions for iteration
     TV_INT index;
     bool valid;
 
@@ -31,12 +31,12 @@ protected:
     {number_of_regions=0;}
 
     void Add_Region(const RANGE<TV_INT>& region_input)
-    {assert(number_of_regions<(1<<TV::dimension));
-    if(TV::dimension==0) return;
+    {assert(number_of_regions<(1<<TV::m));
+    if(TV::m==0) return;
     if(region_input.Edge_Lengths().Min()>=0) regions[number_of_regions++]=region_input;}
 
     void Reset(const int region_index=0)
-    {if(TV::dimension==0){valid=true;index=TV_INT();return;}
+    {if(TV::m==0){valid=true;index=TV_INT();return;}
     valid=(region_index<number_of_regions);if(valid){current_region=region_index;region=regions[current_region];index=region.Minimum_Corner();}}
 
 public:
@@ -44,11 +44,11 @@ public:
     {return valid;}
 
     void Next() PHYSBAM_ALWAYS_INLINE
-    {if(TV::dimension==0){valid=false;return;}
-    if(index(TV::dimension-1)<region.max_corner(TV::dimension-1)-1) index(TV::dimension-1)++;else Next_Helper();}
+    {if(TV::m==0){valid=false;return;}
+    if(index(TV::m-1)<region.max_corner(TV::m-1)-1) index(TV::m-1)++;else Next_Helper();}
 
     int Flat_Index()
-    {int result=index(0);for(int i=1;i<TV::dimension;i++){result=result*grid.counts(i)+index(i);}return result;}
+    {int result=index(0);for(int i=1;i<TV::m;i++){result=result*grid.counts(i)+index(i);}return result;}
 
 protected:
     void Next_Helper();

@@ -15,7 +15,7 @@ namespace PhysBAM{
 template<class TV>
 class CELL_ITERATOR:public GRID_ITERATOR_BASE<TV>
 {
-    typedef VECTOR<int,TV::dimension> TV_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
 public:
     typedef typename GRID<TV>::REGION T_REGION;
     typedef TV VECTOR_T;
@@ -45,11 +45,11 @@ public:
     TV_INT Second_Face_Index(const int axis) const
     {return grid.Second_Face_Index_In_Cell(axis,index);}
 
-    FACE_INDEX<TV::dimension> Full_First_Face_Index(const int axis) const
-    {return FACE_INDEX<TV::dimension>(axis,grid.First_Face_Index_In_Cell(axis,index));}
+    FACE_INDEX<TV::m> Full_First_Face_Index(const int axis) const
+    {return FACE_INDEX<TV::m>(axis,grid.First_Face_Index_In_Cell(axis,index));}
 
-    FACE_INDEX<TV::dimension> Full_Second_Face_Index(const int axis) const
-    {return FACE_INDEX<TV::dimension>(axis,grid.Second_Face_Index_In_Cell(axis,index));}
+    FACE_INDEX<TV::m> Full_Second_Face_Index(const int axis) const
+    {return FACE_INDEX<TV::m>(axis,grid.Second_Face_Index_In_Cell(axis,index));}
 
     TV_INT Cell_Neighbor(const int i) const // 1 to 2*dimension
     {return GRID<TV>::Node_Neighbor(index,i);}

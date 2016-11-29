@@ -37,8 +37,8 @@ public:
     void Constrain_Relative_Angular_Velocity(const FRAME<TV>& parent_frame,T_SPIN& relative_angular_velocity) const override
     {Constrain_Relative_Angular_Velocity_Helper(parent_frame,relative_angular_velocity);}
 
-    VECTOR<bool,T_SPIN::dimension> Angular_Constraints() const override
-    {VECTOR<bool,T_SPIN::dimension> constrain(VECTOR<bool,T_SPIN::dimension>::All_Ones_Vector());constrain.x=constrain_angle && angle_min>=angle_max;return constrain;}
+    VECTOR<bool,T_SPIN::m> Angular_Constraints() const override
+    {VECTOR<bool,T_SPIN::m> constrain(VECTOR<bool,T_SPIN::m>::All_Ones_Vector());constrain.x=constrain_angle && angle_min>=angle_max;return constrain;}
 
 //#####################################################################
     bool Has_Angular_Constraint() const override;

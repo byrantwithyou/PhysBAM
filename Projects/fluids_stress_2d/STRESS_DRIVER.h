@@ -25,7 +25,7 @@ public:
     
     STRESS_EXAMPLE<TV>& example;
     ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> next_polymer_stress;
-    ARRAY<T,FACE_INDEX<TV::dimension> > temp_face_velocities,temp_face_velocities2;
+    ARRAY<T,FACE_INDEX<TV::m> > temp_face_velocities,temp_face_velocities2;
 
     STRESS_DRIVER(STRESS_EXAMPLE<TV>& example);
     virtual ~STRESS_DRIVER();

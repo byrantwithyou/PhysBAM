@@ -16,7 +16,7 @@ template<class TV>
 class COMPRESSIBLE_FLUID_COLLECTION:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef VECTOR<T,TV::dimension+2> TV_DIMENSION;
+    typedef VECTOR<T,TV::m+2> TV_DIMENSION;
     typedef ARRAY<TV_DIMENSION,TV_INT> T_ARRAYS_DIMENSION_SCALAR;
 public:
     const GRID<TV>& grid;

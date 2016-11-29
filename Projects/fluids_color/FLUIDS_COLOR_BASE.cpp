@@ -653,7 +653,7 @@ Velocity_Error(T time)
     T u_inf=0,u_2=0,p_inf=0,p_2=0,p_ave=0,a=0,b=0,pa=0,pb=0,l_inf=0,l_2=0;
     int num_u=0,num_p=0,num_l=0;
         
-    ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > > saved_face_velocities(face_velocities);
+    ARRAY<ARRAY<T,FACE_INDEX<TV::m> > > saved_face_velocities(face_velocities);
     face_velocities*=(T)0;
     for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         int c=levelset_color.Color(it.Location());

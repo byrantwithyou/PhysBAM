@@ -21,7 +21,7 @@ template<class TV>
 class PCG_SPARSE_THREADED:public PCG_SPARSE<typename TV::SCALAR>
 {
     typedef typename TV::SCALAR T;
-    typedef VECTOR<int,TV::dimension> TV_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef PCG_SPARSE<T> BASE;
 public:
     THREAD_QUEUE& thread_queue;

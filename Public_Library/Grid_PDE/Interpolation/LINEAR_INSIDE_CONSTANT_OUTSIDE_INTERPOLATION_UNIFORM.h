@@ -13,7 +13,7 @@ namespace PhysBAM{
 template<class TV,class T2,class T_FACE_LOOKUP> // T_FACE_LOOKUP=FACE_LOOKUP_UNIFORM<TV>
 class LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM:public LINEAR_INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>
 {
-    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::dimension> TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
 public:
     template<class T3> struct REBIND{typedef LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<TV,T3,T_FACE_LOOKUP> TYPE;};
     using LINEAR_INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::Clamped_To_Array;

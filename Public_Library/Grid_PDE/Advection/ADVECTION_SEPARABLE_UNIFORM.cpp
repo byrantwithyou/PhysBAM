@@ -104,7 +104,7 @@ Update_Advection_Equation_Node(const GRID<TV>& grid,ARRAY<T2,TV_INT>& Z,const AR
     const ARRAY<T2,TV_INT>* Z_min_ghost,const ARRAY<T2,TV_INT>* Z_max_ghost,ARRAY<T2,TV_INT>* Z_min,ARRAY<T2,TV_INT>* Z_max)
 {
     assert(!Z_min && !Z_max);
-    UPDATE_ADVECTION_EQUATION_HELPER<TV::dimension>::Apply(*this,grid,Z,Z_ghost,V,dt,time);
+    UPDATE_ADVECTION_EQUATION_HELPER<TV::m>::Apply(*this,grid,Z,Z_ghost,V,dt,time);
 }
 //#####################################################################
 // Function Update_Advection_Equation_Cell_Lookup
@@ -119,7 +119,7 @@ Update_Advection_Equation_Cell_Lookup(const GRID<TV>& grid,ARRAY<T2,TV_INT>& Z,c
 
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) V_cell(iterator.Cell_Index())=averaging.Face_To_Cell_Vector(grid,iterator.Cell_Index(),V);
 
-    UPDATE_ADVECTION_EQUATION_HELPER<TV::dimension>::Apply(*this,grid,Z,Z_ghost,V_cell,dt,time);
+    UPDATE_ADVECTION_EQUATION_HELPER<TV::m>::Apply(*this,grid,Z,Z_ghost,V_cell,dt,time);
 }
 //#####################################################################
 // Function Update_Advection_Equation_Cell
@@ -136,7 +136,7 @@ Update_Advection_Equation_Face_Lookup(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<TV
 
     for(int i=0;i<TV::m;i++){
         GRID<TV> node_grid(grid.Get_Face_Grid(i));
-        UPDATE_ADVECTION_EQUATION_HELPER<TV::dimension>::Apply(*this,node_grid,Z.Component(i),Z_ghost.V_face.Component(i),V_face.Component(i),dt,time);}
+        UPDATE_ADVECTION_EQUATION_HELPER<TV::m>::Apply(*this,node_grid,Z.Component(i),Z_ghost.V_face.Component(i),V_face.Component(i),dt,time);}
 }
 //#####################################################################
 namespace PhysBAM{

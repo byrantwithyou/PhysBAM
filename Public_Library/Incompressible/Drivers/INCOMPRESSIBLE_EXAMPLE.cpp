@@ -23,7 +23,7 @@ INCOMPRESSIBLE_EXAMPLE(const STREAM_TYPE stream_type_input)
     incompressible.Set_Custom_Advection(advection_scalar);
     //incompressible.Add_Force(new INCOMPRESSIBILITY<TV>(projection));
     //incompressible.Add_Force(new FLUID_GRAVITY<TV>());
-    for(int i=0;i<TV::dimension;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
+    for(int i=0;i<TV::m;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
 }
 //#####################################################################
 // ~INCOMPRESSIBLE_EXAMPLE
@@ -44,7 +44,7 @@ Write_Output_Files(const int frame)
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/grid",mac_grid);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",mac_grid);
     if(write_debug_data){
-        ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_ghost(mac_grid,number_of_ghost_cells,false);
+        ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(mac_grid,number_of_ghost_cells,false);
         ARRAY<T,TV_INT> density_ghost(mac_grid.Domain_Indices(number_of_ghost_cells),false);
         incompressible.boundary->Fill_Ghost_Faces(mac_grid,face_velocities,face_velocities_ghost,0,number_of_ghost_cells);
         incompressible.boundary->Fill_Ghost_Cells(mac_grid,density,density_ghost,(T)0,0,number_of_ghost_cells);

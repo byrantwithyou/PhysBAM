@@ -18,7 +18,7 @@ PLS_EXAMPLE(const STREAM_TYPE stream_type_input)
     phi_boundary(0),collision_bodies_affecting_fluid(mac_grid)
 {
     incompressible.Set_Custom_Advection(advection_scalar);
-    for(int i=0;i<TV::dimension;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
+    for(int i=0;i<TV::m;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
     domain_boundary(1)(1)=false;
 }
 //#####################################################################

@@ -99,7 +99,7 @@ Intersection_List(const T_HYPERPLANE& test_plane,ARRAY<int>& intersection_list,c
 // Function Intersection_List
 //#####################################################################
 template<class TV,class T_ARRAY> void PARTICLE_HIERARCHY<TV,T_ARRAY>::
-Intersection_List(const IMPLICIT_OBJECT<TV>& implicit_object,const MATRIX<T,TV::dimension>& rotation,const TV& translation,ARRAY<int>& intersection_list,const T contour_value) const
+Intersection_List(const IMPLICIT_OBJECT<TV>& implicit_object,const MATRIX<T,TV::m>& rotation,const TV& translation,ARRAY<int>& intersection_list,const T contour_value) const
 {
     if(particles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);

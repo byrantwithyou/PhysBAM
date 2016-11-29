@@ -112,7 +112,7 @@ void Get_Initial_Data()
         
         for(int i=0;i<particles.Size();i++) particles.mass(i)=0;
         //volume->density=float(1)/volume->Total_Volume();
-        T density=TV::dimension==1?1:TV::dimension==2?100:1000;
+        T density=TV::m==1?1:TV::m==2?100:1000;
         SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(*surface,density);
 
         deformable_body_collection.Add_Structure(volume);

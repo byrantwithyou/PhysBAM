@@ -16,7 +16,7 @@ class POINT_JOINT:public JOINT<TV>
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::SPIN T_SPIN;
-    enum{dof=T_SPIN::dimension};
+    enum{dof=T_SPIN::m};
     typedef VECTOR<bool,dof> BOOL_VECTOR;
 public:
     using JOINT<TV>::J;using JOINT<TV>::J_inverse;using JOINT<TV>::F_pj;using JOINT<TV>::Constraint_Matrix_Helper;
@@ -59,7 +59,7 @@ public:
     void Remove_Theta_Constraint()
     {STATIC_ASSERT(dof==3);constrain.z=false;rotation_limits.min_corner.z=-FLT_MAX;rotation_limits.max_corner.z=FLT_MAX;}
 
-    VECTOR<bool,T_SPIN::dimension> Angular_Constraints() const override
+    VECTOR<bool,T_SPIN::m> Angular_Constraints() const override
     {return rotation_limits.min_corner.Componentwise_Greater_Equal(rotation_limits.max_corner);}
 
 //#####################################################################

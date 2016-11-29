@@ -276,7 +276,7 @@ void Initialize_Phi() override
             TV location=iterator.Location();
             fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index())=min(location.y-initial_water_level,source.Signed_Distance(location));}
 
-    ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
+    ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
     if(test_number==7)
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
@@ -391,7 +391,7 @@ void Get_Analytic_Velocities(const T time) const override
     PHYSBAM_FATAL_ERROR("broken");
 #if 0
     GRID<TV>& grid=*fluids_parameters.grid;
-    ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
+    ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
     if(test_number == 1 || test_number==11)
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT face=iterator.Face_Index();

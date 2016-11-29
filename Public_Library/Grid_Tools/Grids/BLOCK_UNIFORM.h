@@ -67,14 +67,14 @@ public:
     T& Face_Z_Reference(ARRAY<T,FACE_INDEX<TV::m> >& face_value,const int block_face_index) const
     {assert(TV::m==3);return face_value(2,Face_Z(block_face_index));}
 
-    FACE_INDEX<TV::dimension> Face_X_Index(const int block_face_index) const
-    {return FACE_INDEX<TV::dimension>(0,Face_X(block_face_index));}
+    FACE_INDEX<TV::m> Face_X_Index(const int block_face_index) const
+    {return FACE_INDEX<TV::m>(0,Face_X(block_face_index));}
     
-    FACE_INDEX<TV::dimension> Face_Y_Index(const int block_face_index) const
-    {assert(TV::m>=2);return FACE_INDEX<TV::dimension>(1,Face_Y(block_face_index));}
+    FACE_INDEX<TV::m> Face_Y_Index(const int block_face_index) const
+    {assert(TV::m>=2);return FACE_INDEX<TV::m>(1,Face_Y(block_face_index));}
     
-    FACE_INDEX<TV::dimension> Face_Z_Index(const int block_face_index) const
-    {assert(TV::m==3);return FACE_INDEX<TV::dimension>(2,Face_Z(block_face_index));}
+    FACE_INDEX<TV::m> Face_Z_Index(const int block_face_index) const
+    {assert(TV::m==3);return FACE_INDEX<TV::m>(2,Face_Z(block_face_index));}
 
     TV_INT Cell(const int cell_index) const
     {assert(0<=cell_index&&cell_index<GRID<TV>::number_of_cells_per_block);

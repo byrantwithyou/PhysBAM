@@ -663,7 +663,7 @@ void Get_Initial_Data()
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
-    T density=TV::dimension==1?1:TV::dimension==2?100:1000;
+    T density=TV::m==1?1:TV::m==2?100:1000;
     switch(test_number){
         case 1:{
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);

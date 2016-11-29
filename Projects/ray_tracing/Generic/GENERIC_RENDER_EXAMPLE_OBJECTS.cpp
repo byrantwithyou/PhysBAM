@@ -309,7 +309,7 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
             *density_data*=density_fraction_data;}
         if(use_cubic_for_density){
             LOG::cout<<"Using density cubic"<<std::endl;
-            for(CELL_ITERATOR<TV> iterator(*grid);iterator.Valid();iterator.Next()){VECTOR<int,TV::dimension> cell=iterator.Cell_Index();(*density_data)(cell)=(*density_data)(cell)*(*density_data)(cell)*(*density_data)(cell);}}
+            for(CELL_ITERATOR<TV> iterator(*grid);iterator.Valid();iterator.Next()){VECTOR<int,TV::m> cell=iterator.Cell_Index();(*density_data)(cell)=(*density_data)(cell)*(*density_data)(cell)*(*density_data)(cell);}}
         LOG::cout<<"  Read grid " <<*grid;
         RENDERING_UNIFORM_VOXELS<T> *voxels=new RENDERING_UNIFORM_VOXELS<T>(*grid,*density_data,(T)volume_step);
         if(temperature_filename!="<unknown>"){

@@ -84,7 +84,7 @@ private:
     ARRAY<bool,FACE_INDEX<TV::m> > cached_psi_N;
     ARRAY<T,COUPLING_CONSTRAINT_ID> coupling_face_velocities_cached;
     COUPLING_CONSTRAINT_ID number_of_coupling_faces_cached;
-    ARRAY<FACE_INDEX<TV::dimension> > indexed_faces_cached;
+    ARRAY<FACE_INDEX<TV::m> > indexed_faces_cached;
     T time_cached;
     bool cached_coupling_face_data;
 public:
@@ -127,7 +127,7 @@ private:
     void Warn_For_Exposed_Dirichlet_Cell(const ARRAY<bool,TV_INT>& psi_D,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N);
     void Set_Cached_Psi_N_And_Coupled_Face_Data(const COLLISION_AWARE_INDEX_MAP<TV>& index_map,
         const MATRIX_SOLID_INTERPOLATION<TV>& solid_interpolation,const T time);
-    void Fill_Coupled_Face_Data(const COUPLING_CONSTRAINT_ID number_of_coupling_faces,const ARRAY<FACE_INDEX<TV::dimension> >& indexed_faces,
+    void Fill_Coupled_Face_Data(const COUPLING_CONSTRAINT_ID number_of_coupling_faces,const ARRAY<FACE_INDEX<TV::m> >& indexed_faces,
         const ARRAY<T,COUPLING_CONSTRAINT_ID>& coupling_face_data,ARRAY<T,FACE_INDEX<TV::m> >& face_data);
     void Get_Coupled_Faces_And_Interpolated_Solid_Velocities(const COLLISION_AWARE_INDEX_MAP<TV>& index_map,
         const MATRIX_SOLID_INTERPOLATION<TV>& solid_interpolation,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N_domain,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,

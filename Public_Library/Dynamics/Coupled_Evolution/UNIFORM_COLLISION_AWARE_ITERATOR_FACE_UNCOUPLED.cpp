@@ -19,7 +19,7 @@ UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED(const UNIFORM_COLLISION_AWARE_IT
     :BASE(info.grid,number_of_ghost_cells_input,region_type_input,side_input,axis_input),outside_fluid(*info.outside_fluid),
     collision_index(0),collision_face_info(info.collision_face_info),scan_end(INT_MIN),use_outside(use_outside_input)
 {
-    index(TV::dimension-1)-=2;
+    index(TV::m-1)-=2;
     Next_Fluid();
 }
 template<class TV> UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED<TV>::
@@ -35,11 +35,11 @@ Next_Helper()
     BASE::Next();
     for(int c;(c=Compare_Collision_Index())<=0;collision_index++) if(!c) BASE::Next();
 
-    scan_end=grid.counts(TV::dimension-1)+(TV::dimension==axis)+number_of_ghost_cells+(region_type==GRID<TV>::WHOLE_REGION?1:0);
+    scan_end=grid.counts(TV::m-1)+(TV::m==axis)+number_of_ghost_cells+(region_type==GRID<TV>::WHOLE_REGION?1:0);
     if(collision_index<collision_face_info.Size()){
         const COLLISION_FACE_INFO<TV>& cfi=collision_face_info(collision_index);
-        if(axis==cfi.axis && index.Remove_Index(TV::dimension-1)==cfi.index.Remove_Index(TV::dimension-1))
-            scan_end=cfi.index(TV::dimension-1);}
+        if(axis==cfi.axis && index.Remove_Index(TV::m-1)==cfi.index.Remove_Index(TV::m-1))
+            scan_end=cfi.index(TV::m-1);}
 }
 //#####################################################################
 // Function Compare_Collision_Index
@@ -51,7 +51,7 @@ Compare_Collision_Index() const
     const COLLISION_FACE_INFO<TV>& cfi=collision_face_info(collision_index);
     if(cfi.axis<axis) return -1;
     if(cfi.axis>axis) return 1;
-    for(int i=0;i<TV::dimension;i++){
+    for(int i=0;i<TV::m;i++){
         if(cfi.index(i)<index(i)) return -1;
         if(cfi.index(i)>index(i)) return 1;}
     return 0;

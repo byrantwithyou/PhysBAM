@@ -48,15 +48,15 @@ Compute(const T dt,const ARRAY<bool,FACE_INDEX<d> >& psi_N,T mu)
         int axis=iterator.Axis();
         TV_INT face_index=iterator.Face_Index();
         FACE_INDEX<d> this_face(iterator.Full_Index());
-        for(int other_axis=0;other_axis<TV::dimension;other_axis++){
+        for(int other_axis=0;other_axis<TV::m;other_axis++){
             last_id++;
             FACE_INDEX<d> other_face(axis,face_index+TV_INT::Axis_Vector(other_axis));
             T weight=coefficient*face_areas(axis);
             int this_index=-1,other_index=-1;
             if(index_map.face_indices.Valid_Index(this_face)) this_index=index_map.face_indices(this_face);
-            else if(index_map.constraint_indices.Contains(SIDED_FACE_INDEX<TV::dimension>(1,this_face))) this_index=index_map.indexed_faces.m+index_map.constraint_indices.Get(SIDED_FACE_INDEX<TV::dimension>(1,this_face));
+            else if(index_map.constraint_indices.Contains(SIDED_FACE_INDEX<TV::m>(1,this_face))) this_index=index_map.indexed_faces.m+index_map.constraint_indices.Get(SIDED_FACE_INDEX<TV::m>(1,this_face));
             if(index_map.face_indices.Valid_Index(other_face)) other_index=index_map.face_indices(other_face);
-            else if(index_map.constraint_indices.Contains(SIDED_FACE_INDEX<TV::dimension>(0,other_face))) other_index=index_map.indexed_faces.m+index_map.constraint_indices.Get(SIDED_FACE_INDEX<TV::dimension>(0,other_face));
+            else if(index_map.constraint_indices.Contains(SIDED_FACE_INDEX<TV::m>(0,other_face))) other_index=index_map.indexed_faces.m+index_map.constraint_indices.Get(SIDED_FACE_INDEX<TV::m>(0,other_face));
             if((this_index>index_map.indexed_faces.m && other_index>index_map.indexed_faces.m) || !this_index || !other_index){last_id--;continue;}
             if(this_index>=0) entries.Append(ENTRY(-weight,this_index,last_id));
             if(other_index>=0) entries.Append(ENTRY(weight,other_index,last_id));}}

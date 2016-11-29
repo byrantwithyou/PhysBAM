@@ -24,8 +24,8 @@ template<class TV> INCOMPRESSIBLE_BOUNDARY_CONDITION_FREE_SURFACE<TV>::
 // Function Update_Boundary_Conditions
 //#####################################################################
 template<class TV> void INCOMPRESSIBLE_BOUNDARY_CONDITION_FREE_SURFACE<TV>::
-Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N,ARRAY<T,TV_INT>& p,
-    ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities,const T time)
+Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,ARRAY<T,TV_INT>& p,
+    ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T time)
 {
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
         if(phi(iterator.Cell_Index())>0){

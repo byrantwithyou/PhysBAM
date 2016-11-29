@@ -691,7 +691,7 @@ Post_Stabilization_Constraint_Matrix(const JOINT_ID joint_id)
     joint.Angular_Constraint_Matrix(rigid_bodies[0]->Frame(),angular_constraints);
     int p=prismatic_constraints.Columns(),a=angular_constraints.Columns();
 
-    int d=TV::dimension,s=T_SPIN::dimension;
+    int d=TV::m,s=T_SPIN::m;
     MATRIX_MXN<T> R_D[2];
     TV location=joint.Location(*rigid_bodies[0],*rigid_bodies[1]);
     for(int i=0;i<2;i++){

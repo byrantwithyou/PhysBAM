@@ -171,7 +171,7 @@ Constrain_Angles(T_SPIN& angles) const
 template<class TV> void JOINT<TV>::
 Prismatic_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& constrained_matrix,MATRIX_MXN<T>* unconstrained_matrix) const
 {
-    constrained_matrix=MATRIX<T,TV::dimension>::Identity_Matrix();if(unconstrained_matrix) unconstrained_matrix->Resize(TV::dimension,0);
+    constrained_matrix=MATRIX<T,TV::m>::Identity_Matrix();if(unconstrained_matrix) unconstrained_matrix->Resize(TV::m,0);
 }
 //#####################################################################
 // Function Angular_Constraint_Matrix
@@ -179,7 +179,7 @@ Prismatic_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& constra
 template<class TV> void JOINT<TV>::
 Angular_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& angular_constraint_matrix,MATRIX_MXN<T>* angular_unconstrained_matrix) const
 {
-    if(TV::dimension==3) PHYSBAM_FATAL_ERROR(); // must be overridden for 3D
+    if(TV::m==3) PHYSBAM_FATAL_ERROR(); // must be overridden for 3D
 }
 //#####################################################################
 // Function Constraint_Matrix_Helper
@@ -219,7 +219,7 @@ Location(const RIGID_BODY<TV>& parent,const RIGID_BODY<TV>& child) const
 //#####################################################################
 // Function Angular_Constraints
 //#####################################################################
-template<class TV> VECTOR<bool,TV::SPIN::dimension> JOINT<TV>::
+template<class TV> VECTOR<bool,TV::SPIN::m> JOINT<TV>::
 Angular_Constraints() const
 {
     PHYSBAM_FATAL_ERROR();

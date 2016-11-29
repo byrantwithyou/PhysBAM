@@ -250,21 +250,21 @@ Remove_Structure(STRUCTURE<TV>* structure)
 template<class TV> RANGE<TV> RIGID_BODY<TV>::
 World_Space_Simplex_Bounding_Box(const int id) const
 {
-    const VECTOR<int,TV::dimension>& elements=simplicial_object->mesh.elements(id);
-    VECTOR<TV,TV::dimension> pts;
-    for(int i=0;i<TV::dimension;i++) pts(i)=World_Space_Point(simplicial_object->particles.X(elements(i)));
+    const VECTOR<int,TV::m>& elements=simplicial_object->mesh.elements(id);
+    VECTOR<TV,TV::m> pts;
+    for(int i=0;i<TV::m;i++) pts(i)=World_Space_Point(simplicial_object->particles.X(elements(i)));
     return RANGE<TV>::Bounding_Box(pts);
 }
 //#####################################################################
 // Function World_Space_Simplex
 //#####################################################################
-template<class TV> typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX RIGID_BODY<TV>::
+template<class TV> typename BASIC_SIMPLEX_POLICY<TV,TV::m-1>::SIMPLEX RIGID_BODY<TV>::
 World_Space_Simplex(const int id) const
 {
-    const VECTOR<int,TV::dimension>& elements=simplicial_object->mesh.elements(id);
-    VECTOR<TV,TV::dimension> pts;
-    for(int i=0;i<TV::dimension;i++) pts(i)=World_Space_Point(simplicial_object->particles.X(elements(i)));
-    return typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX(pts);
+    const VECTOR<int,TV::m>& elements=simplicial_object->mesh.elements(id);
+    VECTOR<TV,TV::m> pts;
+    for(int i=0;i<TV::m;i++) pts(i)=World_Space_Point(simplicial_object->particles.X(elements(i)));
+    return typename BASIC_SIMPLEX_POLICY<TV,TV::m-1>::SIMPLEX(pts);
 }
 //#####################################################################
 // Function World_Space_Simplex_Bounding_Box
@@ -272,9 +272,9 @@ World_Space_Simplex(const int id) const
 template<class TV> RANGE<TV> RIGID_BODY<TV>::
 World_Space_Simplex_Bounding_Box(const int id,const FRAME<TV>& frame) const
 {
-    const VECTOR<int,TV::dimension>& elements=simplicial_object->mesh.elements(id);
-    VECTOR<TV,TV::dimension> pts;
-    for(int i=0;i<TV::dimension;i++) pts(i)=frame*simplicial_object->particles.X(elements(i));
+    const VECTOR<int,TV::m>& elements=simplicial_object->mesh.elements(id);
+    VECTOR<TV,TV::m> pts;
+    for(int i=0;i<TV::m;i++) pts(i)=frame*simplicial_object->particles.X(elements(i));
     return RANGE<TV>::Bounding_Box(pts);
 }
 template<class TV> void RIGID_BODY<TV>::
@@ -442,9 +442,9 @@ Apply_Sticking_And_Angular_Sticking_Impulse(RIGID_BODY<TV>& body0,RIGID_BODY<TV>
     TWIST<TV> impulse;
 
     // faster version for fully constrained prismatic and angular impulse
-    if(angular_constraint_matrix.Columns()==T_SPIN::dimension && prismatic_constraint_matrix.Columns()==TV::dimension)
+    if(angular_constraint_matrix.Columns()==T_SPIN::m && prismatic_constraint_matrix.Columns()==TV::m)
         impulse=Find_Impulse_And_Angular_Impulse(body0,body1,location,delta_relative_twist);
-    else if(angular_constraint_matrix.Columns()==0 && prismatic_constraint_matrix.Columns()==TV::dimension)
+    else if(angular_constraint_matrix.Columns()==0 && prismatic_constraint_matrix.Columns()==TV::m)
         impulse.linear=Impulse_Factor(body0,body1,location).Inverse()*delta_relative_twist.linear;
     else impulse=Find_Impulse_And_Angular_Impulse(body0,body1,location,delta_relative_twist,angular_constraint_matrix,prismatic_constraint_matrix);
     Apply_Impulse(body0,body1,location,impulse.linear,impulse.angular);

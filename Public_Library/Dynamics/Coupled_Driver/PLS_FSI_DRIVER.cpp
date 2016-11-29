@@ -180,7 +180,7 @@ Initialize()
     particle_levelset_evolution->Set_CFL_Number(example.fluids_parameters.cfl);
 
     // sets up the proper wall states
-    VECTOR<VECTOR<bool,2>,TV::dimension> domain_open_boundaries=VECTOR_UTILITIES::Complement(example.fluids_parameters.domain_walls);
+    VECTOR<VECTOR<bool,2>,TV::m> domain_open_boundaries=VECTOR_UTILITIES::Complement(example.fluids_parameters.domain_walls);
     if(example.fluids_parameters.phi_boundary) example.fluids_parameters.phi_boundary->Set_Constant_Extrapolation(domain_open_boundaries);
     if(example.fluids_parameters.fluid_boundary) example.fluids_parameters.fluid_boundary->Set_Constant_Extrapolation(domain_open_boundaries);
 
@@ -475,7 +475,7 @@ Advect_Fluid(const T dt,const int substep)
     ARRAY<T,TV_INT> exchanged_phi_ghost(grid.Domain_Indices(extrapolation_ghost_cells));
     particle_levelset_evolution->Particle_Levelset(0).levelset.boundary->Fill_Ghost_Cells(grid,particle_levelset_evolution->phi,exchanged_phi_ghost,0,time+dt,extrapolation_ghost_cells);
     if(example.convection_order>1){
-        for(RUNGEKUTTA<ARRAY<T,FACE_INDEX<TV::dimension> > > rk(face_velocities,example.convection_order,dt,time);rk.Valid();rk.Next()){
+        for(RUNGEKUTTA<ARRAY<T,FACE_INDEX<TV::m> > > rk(face_velocities,example.convection_order,dt,time);rk.Valid();rk.Next()){
 //            Extrapolate_Velocity_Across_Interface(face_velocities,particle_levelset_evolution->Particle_Levelset(0).levelset,extrapolation_bandwidth);
             if(!example.two_phase)
                 incompressible->Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,exchanged_phi_ghost,

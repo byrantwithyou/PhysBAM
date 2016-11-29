@@ -18,8 +18,8 @@ template<class TV> class GRID;
 template<class TV>
 class MATRIX_FLUID_POISSON:public NONCOPYABLE
 {
-    enum WORKAROUND {d=TV::dimension};
-    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::dimension> TV_INT;
+    enum WORKAROUND {d=TV::m};
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
 
     const COLLISION_AWARE_INDEX_MAP<TV>& index_map;
     const ARRAY<T,TV_INT>& one_over_rho_c_squared;

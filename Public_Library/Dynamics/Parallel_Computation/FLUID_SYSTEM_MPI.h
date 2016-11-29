@@ -25,7 +25,7 @@ class FLUID_SYSTEM_MPI:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
 public:
     typedef ARRAY<T> VECTOR_T;
     typedef KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_T> > KRYLOV_VECTOR_T;
-    static const int rows_per_rigid_body=TV::dimension+T_SPIN::dimension;
+    static const int rows_per_rigid_body=TV::m+T_SPIN::m;
 
     const ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& J_deformable_array;
     const ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& J_rigid_array;

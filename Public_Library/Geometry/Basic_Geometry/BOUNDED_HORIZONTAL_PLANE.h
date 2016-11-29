@@ -56,8 +56,8 @@ public:
     RANGE<TV> Bounding_Box() const
     {return RANGE<TV>(-half_width*TV::All_Ones_Vector(),half_width*TV::All_Ones_Vector());}
 
-    VECTOR<T,TV::dimension-1> Principal_Curvatures(const TV& X) const
-    {return VECTOR<T,TV::dimension-1>();}
+    VECTOR<T,TV::m-1> Principal_Curvatures(const TV& X) const
+    {return VECTOR<T,TV::m-1>();}
 
     static std::string Name()
     {return LOG::sprintf("BOUNDED_HORIZONTAL_PLANE<VECTOR<T,%d> >",TV::m);}

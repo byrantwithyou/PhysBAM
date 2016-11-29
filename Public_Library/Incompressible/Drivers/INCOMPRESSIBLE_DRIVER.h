@@ -25,7 +25,7 @@ protected:
 
     INCOMPRESSIBLE_EXAMPLE<TV>& example;
     KINEMATIC_EVOLUTION<TV> kinematic_evolution;
-    ARRAY<T,FACE_INDEX<TV::dimension> > sum_jc;
+    ARRAY<T,FACE_INDEX<TV::m> > sum_jc;
 public:
 
     INCOMPRESSIBLE_DRIVER(INCOMPRESSIBLE_EXAMPLE<TV>& example);

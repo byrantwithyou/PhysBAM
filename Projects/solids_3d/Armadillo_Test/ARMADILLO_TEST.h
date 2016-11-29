@@ -122,7 +122,7 @@ void Get_Initial_Data()
     for(int i=0;i<tet_nodes.m;i++) if(particles.X(tet_nodes(i)).y<(T).17) constrained_nodes.Insert(tet_nodes(i));
 
     // tet mass
-    T density=TV::dimension==1?1:TV::dimension==2?100:1000;
+    T density=TV::m==1?1:TV::m==2?100:1000;
     SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(volume,density);
 
     // collision geom

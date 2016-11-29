@@ -21,7 +21,7 @@ class IMPLICIT_OBJECT_INTERSECTOR
 private:
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef typename BASIC_GEOMETRY_POLICY<TV>::HYPERPLANE T_HYPERPLANE;
-    typedef VECTOR<int,TV::dimension+1> T_ELEMENT;typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension>::SIMPLEX T_SIMPLEX;
+    typedef VECTOR<int,TV::m+1> T_ELEMENT;typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX T_SIMPLEX;
     typedef IMPLICIT_OBJECT<TV> BASE;
     
 public:

@@ -138,8 +138,8 @@ public:
         RANGE<TV> box=Make_Random_Valid_Box<TV>();
         box.max_corner+=(T).1; // Avoid sliver boxes, as these cannot computed accurately enough.
         T random_value=rand.Get_Uniform_Number((T).1,(T)10);
-        Test(Equal_To_Tolerance((box*random_value).Size(),box.Size()*pow<TV::dimension,T>(random_value)),"Multiplication affects scaling of volume correctly.",ok);
-        Test(Equal_To_Tolerance((box/random_value).Size(),box.Size()/pow<TV::dimension,T>(random_value)),"Division affects scaling of volume correctly.",ok);}
+        Test(Equal_To_Tolerance((box*random_value).Size(),box.Size()*pow<TV::m,T>(random_value)),"Multiplication affects scaling of volume correctly.",ok);
+        Test(Equal_To_Tolerance((box/random_value).Size(),box.Size()/pow<TV::m,T>(random_value)),"Division affects scaling of volume correctly.",ok);}
     return ok;}
 
     template<class TV>
@@ -231,7 +231,7 @@ public:
             Test(Equal_To_Tolerance(copy.Size(),box.Thickened(random_delta_value).Size()),"Change_Size and Thicken produce same volume.",ok);
             copy=box;
             copy.Scale_About_Center(random_delta_value);
-            Test(Equal_To_Tolerance(copy.Size(),box.Size()*pow<TV::dimension,T>(random_delta_value)),"Scaling about the center affects volume correctly.",ok);
+            Test(Equal_To_Tolerance(copy.Size(),box.Size()*pow<TV::m,T>(random_delta_value)),"Scaling about the center affects volume correctly.",ok);
             TV random_delta_vector;
             rand.Fill_Uniform(random_delta_vector,(T)1e-3,(T)10);
             copy=box;
@@ -305,7 +305,7 @@ public:
             "\"Boolean\" volume identities hold",ok);
         Test(!(intersection.Empty() && (combination_volume<volume1+volume2 || intersection_volume>combination_volume)),"Volume sum/max properties hold under intersection and combination.",ok);
         TV min1=box1.Minimum_Corner(),min2=box2.Minimum_Corner(),max1=box1.Maximum_Corner(),max2=box2.Maximum_Corner();
-        for(int j=0;j<TV::dimension && ok;j++){
+        for(int j=0;j<TV::m && ok;j++){
             cyclic_shift(min1);cyclic_shift(min2);cyclic_shift(max1);cyclic_shift(max2);
             RANGE<TV> new_box1=RANGE<TV>(min1,max1),new_box2=RANGE<TV>(min2,max2);
             Test(Equal_To_Tolerance(intersection_volume,RANGE<TV>::Intersect(new_box1,new_box2).Size()) && Equal_To_Tolerance(combination_volume,RANGE<TV>::Combine(new_box1,new_box2).Size()),
@@ -345,11 +345,11 @@ public:
         RANGE<TV> box=Make_Random_Valid_Box<TV>();
         TV bounds=box.Edge_Lengths();
         T volume=box.Size();
-        for(int j=0;j<TV::dimension && ok;j++) Test(Equal_To_Tolerance(volume/bounds(j),box.Remove_Dimension(j).Size()),"Volume changes according to removed dimension.",ok);
+        for(int j=0;j<TV::m && ok;j++) Test(Equal_To_Tolerance(volume/bounds(j),box.Remove_Dimension(j).Size()),"Volume changes according to removed dimension.",ok);
         for(int j=0;j<num_iterations_per_subtest && ok;j++){
             TV inside_vector=rand.Get_Uniform_Vector(box);
             Test(box.Lazy_Inside(inside_vector),"Box contains random vector inside of it.",ok);
-            for(int k=0;k<TV::dimension && ok;k++) Test(box.Remove_Dimension(k).Lazy_Inside(inside_vector.Remove_Index(k)),"Box with removed dimension contains vector with removed dimension.",ok);}}
+            for(int k=0;k<TV::m && ok;k++) Test(box.Remove_Dimension(k).Lazy_Inside(inside_vector.Remove_Index(k)),"Box with removed dimension contains vector with removed dimension.",ok);}}
     return ok;}
 
     template<class TV>

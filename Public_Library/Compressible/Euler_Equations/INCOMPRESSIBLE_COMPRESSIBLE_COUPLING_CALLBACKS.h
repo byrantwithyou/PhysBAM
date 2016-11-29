@@ -13,7 +13,7 @@ template<class TV> class GRID;
 template<class TV>
 class INCOMPRESSIBLE_COMPRESSIBLE_COUPLING_CALLBACKS
 {
-    typedef typename TV::SCALAR T;typedef VECTOR<T,TV::dimension+2> TV_DIMENSION;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<T,TV::m+2> TV_DIMENSION;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<TV_DIMENSION,TV_INT> T_ARRAYS_DIMENSION_SCALAR;
 
 public:

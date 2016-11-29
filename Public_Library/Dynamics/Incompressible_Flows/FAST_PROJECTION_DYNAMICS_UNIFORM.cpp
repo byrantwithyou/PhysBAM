@@ -37,7 +37,7 @@ Initialize_Grid(const GRID<TV>& mac_grid)
     BASE::Initialize_Grid(mac_grid);
     int scale=mac_grid.counts.x;
     elliptic_solver->Set_Neumann_Outer_Boundaries();
-    int number_of_elements=TV::dimension==2?scale*scale:scale*scale*scale;
+    int number_of_elements=TV::m==2?scale*scale:scale*scale*scale;
     cell_index_to_matrix_index.Resize(mac_grid.Domain_Indices());
     cell_index_to_matrix_index.Fill(-1);
     matrix_index_to_cell_index.Resize(number_of_elements);
@@ -51,8 +51,8 @@ Initialize_Grid(const GRID<TV>& mac_grid)
         matrix_index_to_cell_index(matrix_index)=cell_index;}
     for(int i=0;i<row_counts.m;i++){
         int boundary=0;
-        for(int j=0;j<TV::dimension;j++) if(matrix_index_to_cell_index(i)(j)==0 || matrix_index_to_cell_index(i)(j)==mac_grid.counts(j)-1) boundary++;
-        row_counts(i)=(2*TV::dimension+1)-boundary;}
+        for(int j=0;j<TV::m;j++) if(matrix_index_to_cell_index(i)(j)==0 || matrix_index_to_cell_index(i)(j)==mac_grid.counts(j)-1) boundary++;
+        row_counts(i)=(2*TV::m+1)-boundary;}
     A.Set_Row_Lengths(row_counts);
     TV one_over_dx2=Inverse(mac_grid.dX*mac_grid.dX);
     T default_row_sum=-2*one_over_dx2.Sum_Abs();

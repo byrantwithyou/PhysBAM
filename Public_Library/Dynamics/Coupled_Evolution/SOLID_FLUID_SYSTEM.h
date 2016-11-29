@@ -27,7 +27,7 @@ class SOLID_FLUID_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
     typedef KRYLOV_SYSTEM_BASE<typename TV::SCALAR> BASE;
 public:
     typedef PRESSURE_VELOCITY_VECTOR<TV> VECTOR_T;
-    static const int rows_per_rigid_body=TV::dimension+T_SPIN::dimension;
+    static const int rows_per_rigid_body=TV::m+T_SPIN::m;
     using BASE::use_preconditioner;
 
     BACKWARD_EULER_SYSTEM<TV>& solid_system;

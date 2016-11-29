@@ -26,11 +26,11 @@ namespace PhysBAM{
 template<class TV,class T2>
 class BOUNDARY:public NONCOPYABLE
 {
-    typedef typename TV::SCALAR T;typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,TV::dimension> TV_SIDES;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,TV::m> TV_SIDES;typedef VECTOR<int,TV::m> TV_INT;
 public:
     bool use_fixed_boundary,clamp_below,clamp_above;
     T2 fixed_boundary_value,lower_threshold,upper_threshold;
-    VECTOR<VECTOR<bool,2>,TV::dimension> constant_extrapolation;
+    VECTOR<VECTOR<bool,2>,TV::m> constant_extrapolation;
 
     BOUNDARY();
     virtual ~BOUNDARY();

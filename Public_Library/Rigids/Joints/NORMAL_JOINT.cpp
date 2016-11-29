@@ -43,8 +43,8 @@ Constrain_Relative_Linear_Velocity(const FRAME<TV>& parent_frame,TV& relative_li
 template<class TV> void NORMAL_JOINT<TV>::
 Angular_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& angular_constraint_matrix,MATRIX_MXN<T>* angular_unconstrained_matrix) const
 {
-    angular_constraint_matrix.Resize(T_SPIN::dimension,0);
-    if(angular_unconstrained_matrix) (*angular_unconstrained_matrix)=MATRIX<T,T_SPIN::dimension>::Identity_Matrix();
+    angular_constraint_matrix.Resize(T_SPIN::m,0);
+    if(angular_unconstrained_matrix) (*angular_unconstrained_matrix)=MATRIX<T,T_SPIN::m>::Identity_Matrix();
 }
 //#####################################################################
 // Function Update_State_From_Joint_Frame

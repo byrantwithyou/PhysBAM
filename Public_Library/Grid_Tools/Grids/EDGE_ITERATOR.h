@@ -17,7 +17,7 @@ template<class TV>
 class EDGE_ITERATOR:public GRID_ITERATOR_BASE<TV>
 {
 public:
-    typedef typename GRID<TV>::REGION T_REGION;typedef VECTOR<int,TV::dimension> TV_INT;typedef typename TV::SCALAR T;
+    typedef typename GRID<TV>::REGION T_REGION;typedef VECTOR<int,TV::m> TV_INT;typedef typename TV::SCALAR T;
     using GRID_ITERATOR_BASE<TV>::grid;using GRID_ITERATOR_BASE<TV>::index;using GRID_ITERATOR_BASE<TV>::region;using GRID_ITERATOR_BASE<TV>::valid;
     using GRID_ITERATOR_BASE<TV>::Reset;using GRID_ITERATOR_BASE<TV>::current_region;using GRID_ITERATOR_BASE<TV>::Add_Region;
     using GRID_ITERATOR_BASE<TV>::Reset_Regions;
@@ -44,13 +44,13 @@ private:
 
 public:
     void Next() PHYSBAM_ALWAYS_INLINE // overloads GRID_ITERATOR_BASE::Next but we don't want that to be virtual to avoid virtual call overhead
-    {if(index(TV::dimension-1)<region.max_corner(TV::dimension-1)-1) index(TV::dimension-1)++;else Next_Helper();}
+    {if(index(TV::m-1)<region.max_corner(TV::m-1)-1) index(TV::m-1)++;else Next_Helper();}
 
     int Axis() const
     {return axis;}
 
-    EDGE_INDEX<TV::dimension> Full_Index() const
-    {return EDGE_INDEX<TV::dimension>(axis,index);}
+    EDGE_INDEX<TV::m> Full_Index() const
+    {return EDGE_INDEX<TV::m>(axis,index);}
 //#####################################################################
 };
 }

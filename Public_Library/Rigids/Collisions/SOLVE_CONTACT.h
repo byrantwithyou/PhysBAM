@@ -34,7 +34,7 @@ template<class TV> class CONTACT
 public:
     typedef typename TV::SCALAR T;
     typedef typename TV::SPIN T_SPIN;
-    enum WORKAROUND {d=TV::dimension,s=T_SPIN::dimension};
+    enum WORKAROUND {d=TV::m,s=T_SPIN::m};
 
     VECTOR<int,2> id;
 

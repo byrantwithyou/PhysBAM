@@ -18,7 +18,7 @@ namespace PhysBAM{
 template<class TYPE,class TV>
 class DOMAIN_ITERATOR_THREADED_ALPHA
 {
-    typedef VECTOR<int,TV::dimension> TV_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef typename TV::SCALAR T;
 
 public:
@@ -61,12 +61,12 @@ public:
                 for(NODE_ITERATOR<TV> iterator(process_grid);iterator.Valid();iterator.Next()){
                     TV_INT coordinates=iterator.Node_Index();
                     TV_INT start,end;
-                    for(int axis=0;axis<TV::dimension;axis++){
+                    for(int axis=0;axis<TV::m;axis++){
                         start[axis]=boundaries(axis)(coordinates[axis])+1;
                         end[axis]=boundaries(axis)(coordinates[axis]+1);}
                     domains(count).min_corner=start+domain.min_corner-TV_INT::Constant_Vector(overlap_rows);
                     domains(count).max_corner=end+domain.min_corner+TV_INT::Constant_Vector(overlap_rows);
-                    for(int axis=0;axis<TV::dimension;axis++){
+                    for(int axis=0;axis<TV::m;axis++){
                         domains(count).min_corner(axis)=max(domains(count).min_corner(axis),domain.min_corner(axis));
                         domains(count).max_corner(axis)=min(domains(count).max_corner(axis),domain.max_corner(axis));}
                     count++;}}

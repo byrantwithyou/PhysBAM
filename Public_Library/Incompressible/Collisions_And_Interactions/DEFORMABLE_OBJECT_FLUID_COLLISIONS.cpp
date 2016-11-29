@@ -50,7 +50,7 @@ Initialize_For_Thin_Shells_Fluid_Coupling()
 template<class TV> TV DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>::
 Pointwise_Object_Pseudo_Velocity(const int simplex_id,const TV& location,const int state1,const int state2) const
 {
-    VECTOR<int,TV::dimension> nodes=object.mesh.elements(simplex_id);
+    VECTOR<int,TV::m> nodes=object.mesh.elements(simplex_id);
     typename conditional<TV::m==1,FIXED_NUMBER<T,1>,TV>::type weights=T_SIMPLEX::Clamped_Barycentric_Coordinates(location,object.particles.X.Subset(nodes));
     TV dX=T_SIMPLEX::Point_From_Barycentric_Coordinates(weights,(saved_states(state2).x->X-saved_states(state1).x->X).Subset(nodes));
     return dX/(saved_states(state2).y-saved_states(state1).y);
@@ -164,7 +164,7 @@ Get_Simplex_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,const bool with_bod
 {
     if(with_body_motion && !saved_states(0).x){LOG::cerr<<"No saved_state"<<std::endl;PHYSBAM_FATAL_ERROR();}
     for(int t=0;t<object.mesh.elements.m;t++){
-        VECTOR<int,TV::dimension> nodes=object.mesh.elements(t);
+        VECTOR<int,TV::m> nodes=object.mesh.elements(t);
         RANGE<TV> box=RANGE<TV>::Bounding_Box(object.particles.X.Subset(nodes));
         if(with_body_motion) box.Enlarge_Nonempty_Box_To_Include_Points(saved_states(0).x->X.Subset(nodes));
         box.Change_Size(extra_thickness+body_thickness_factor*collision_thickness);
@@ -229,11 +229,11 @@ Pointwise_Object_Velocity(const int simplex_id,const TV& location) const
 {
     if(volume_object){
         typedef VECTOR<T,TV::m+1> T_VOLUME_WEIGHTS;
-        VECTOR<int,TV::dimension+1> nodes=(*volume_object).mesh.elements(simplex_id);
+        VECTOR<int,TV::m+1> nodes=(*volume_object).mesh.elements(simplex_id);
         T_VOLUME_WEIGHTS weights=T_VOLUME_SIMPLEX::Barycentric_Coordinates(location,particles.X.Subset(nodes));
         return T_VOLUME_SIMPLEX::Point_From_Barycentric_Coordinates(weights,particles.V.Subset(nodes));}
     else{
-        VECTOR<int,TV::dimension> nodes=object.mesh.elements(simplex_id);
+        VECTOR<int,TV::m> nodes=object.mesh.elements(simplex_id);
         typename conditional<TV::m==1,FIXED_NUMBER<T,1>,TV>::type weights=T_SIMPLEX::Clamped_Barycentric_Coordinates(location,particles.X.Subset(nodes));
         return T_SIMPLEX::Point_From_Barycentric_Coordinates(weights,particles.V.Subset(nodes));}
 }

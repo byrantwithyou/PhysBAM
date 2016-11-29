@@ -37,8 +37,8 @@ template<class TV> IMPLICIT_BOUNDARY_CONDITION_COLLISIONS<TV>::
 // Function Update_Boundary_Conditions
 //#####################################################################
 template<class TV> void IMPLICIT_BOUNDARY_CONDITION_COLLISIONS<TV>::
-Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N,ARRAY<T,TV_INT>& p,
-    ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities,const T time)
+Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,ARRAY<T,TV_INT>& p,
+    ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T time)
 {
     T p_inside_solid=0; // TODO: set to something nasty and make sure uncovered cells get good values for initial guess.
 

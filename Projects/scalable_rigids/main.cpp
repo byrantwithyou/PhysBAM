@@ -249,27 +249,27 @@ int main(int argc,char* argv[])
     LOG::cout << "constraint_pairs " << constraint_pairs << std::endl;
     LOG::cout << "constraint_normals " << constraint_normals << std::endl;
     
-    ARRAY<int> Mi_row_counts(TV::dimension*n);
+    ARRAY<int> Mi_row_counts(TV::m*n);
     Mi_row_counts.Fill(1);
     Mi.Set_Row_Lengths(Mi_row_counts);
-    Mi.n=TV::dimension*n;
+    Mi.n=TV::m*n;
     for(int i=0;i<n;i++)
-        for(int j=0;j<TV::dimension;j++)
+        for(int j=0;j<TV::m;j++)
         {
-            int k=TV::dimension*(i-1)+j;
+            int k=TV::m*(i-1)+j;
             Mi.Set_Element(k,k,1.0/masses(i));
         }
     
     ARRAY<int> C_row_counts(constraint_pairs.m);
-    C_row_counts.Fill(TV::dimension*2);
+    C_row_counts.Fill(TV::m*2);
     C.Set_Row_Lengths(C_row_counts);
     C.n=Mi.n;
     for(int i=0;i<constraint_pairs.m;i++)
     {
-        for(int j=0;j<TV::dimension;j++)
+        for(int j=0;j<TV::m;j++)
         {
-            C.Set_Element(i,(constraint_pairs(i)(1)-1)*TV::dimension+j,-constraint_normals(i)(j));
-            C.Set_Element(i,(constraint_pairs(i)(2)-1)*TV::dimension+j,constraint_normals(i)(j));
+            C.Set_Element(i,(constraint_pairs(i)(1)-1)*TV::m+j,-constraint_normals(i)(j));
+            C.Set_Element(i,(constraint_pairs(i)(2)-1)*TV::m+j,constraint_normals(i)(j));
         }
     }
     

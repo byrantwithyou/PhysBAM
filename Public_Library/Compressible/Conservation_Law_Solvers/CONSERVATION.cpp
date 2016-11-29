@@ -215,7 +215,7 @@ Update_Conservation_Law(GRID<TV>& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRA
 
         T momentum_dt=dt;
         T clamp_e_cell=clamp_e*EULER<TV>::e(U,cell_index);
-        for(int axis=0;axis<TV::dimension;axis++){
+        for(int axis=0;axis<TV::m;axis++){
             T tmp_dt=dt;
             T momentum_flux_sqr=rhs(cell_index)(axis+1)*rhs(cell_index)(axis+1);
             T a=2*rhs(cell_index)(0)*rhs(cell_index)(d-1)-momentum_flux_sqr-2*clamp_e_cell*rhs(cell_index)(0)*rhs(cell_index)(0);
@@ -231,7 +231,7 @@ Update_Conservation_Law(GRID<TV>& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRA
                 else tmp_dt=dt;}
             momentum_dt=min(momentum_dt,tmp_dt);}
         e_dt(cell_index)=dt;
-        for(int axis=0;axis<TV::dimension;axis++) e_dt(cell_index)=min(e_dt(cell_index),momentum_dt);}
+        for(int axis=0;axis<TV::m;axis++) e_dt(cell_index)=min(e_dt(cell_index),momentum_dt);}
 
     min_dt=min(rho_dt.Min(),e_dt.Min());
     LOG::cout<<"dt: "<<dt<<" Min dt: "<<min_dt<<std::endl;

@@ -36,14 +36,14 @@ FINITE_VOLUME_HEXAHEDRONS(STRAIN_MEASURE_HEXAHEDRONS<T>& strain_measure,CONSTITU
         Get_Unique(mesh_particles,strain_measure.mesh_object.mesh.elements.Flattened());
         for(int i=0;i<mesh_particles.m;i++) total_mass+=particles.mass(mesh_particles(i));
         density=total_mass/strain_measure.mesh_object.Total_Volume();
-        if(density==0) density=TV::dimension==1?1:TV::dimension==2?100:1000;}
+        if(density==0) density=TV::m==1?1:TV::m==2?100:1000;}
     else{
         density_list=new ARRAY<T>(strain_measure.mesh_object.mesh.elements.m);
         for(int i=0;i<strain_measure.mesh.elements.m;i++){
             const VECTOR<int,8>& nodes=strain_measure.mesh.elements(i);
             T volume=HEXAHEDRON<T>::Signed_Volume(particles.X(nodes(0)),particles.X(nodes(1)),particles.X(nodes(2)),particles.X(nodes(3)),particles.X(nodes(4)),particles.X(nodes(5)),particles.X(nodes(6)),particles.X(nodes(7)));
             for(int j=0;j<nodes.m;j++) (*density_list)(i)+=particles.mass(nodes(j))/(*strain_measure.mesh.incident_elements)(nodes(j)).m/volume;
-            if((*density_list)(i)==0) (*density_list)(i)=TV::dimension==1?1:TV::dimension==2?100:1000;}}
+            if((*density_list)(i)==0) (*density_list)(i)=TV::m==1?1:TV::m==2?100:1000;}}
 }
 //#####################################################################
 // Destructor

@@ -244,7 +244,7 @@ Apply_Pressure(const T dt,const T time, ARRAY<T,FACE_INDEX<TV::m> >& face_veloci
 
         ARRAY<T,FACE_INDEX<TV::m> > grad_p_cavitation_face(euler.grid);
         ARRAYS_UTILITIES<TV,T>::Compute_Gradient_At_Faces_From_Cell_Data(euler.grid,grad_p_cavitation_face,p_cavitation);
-        for(FACE_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> face_index=iterator.Full_Index();
+        for(FACE_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::m> face_index=iterator.Full_Index();
             TV_INT first_cell_index=iterator.First_Cell_Index(), second_cell_index=iterator.Second_Cell_Index();
             T rho_star_face=(T).5*(rho_star(first_cell_index)+rho_star(second_cell_index));
             T rho_np1_face=(T).5*(euler.U_ghost(first_cell_index)(0)+euler.U_ghost(second_cell_index)(0));

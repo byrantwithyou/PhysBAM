@@ -68,7 +68,7 @@ void Get_Initial_Data()
                 particles.X(count)=hair_layout_grid.X(TV_INT(i,j,ij));
                 segmented_curve.mesh.elements.Append(VECTOR<int,2>(count,count+1));count++;}
             particles.X(count)=hair_layout_grid.X(TV_INT(i,j,hair_layout_grid.counts.z));count++;}
-        T density=TV::dimension==1?1:TV::dimension==2?100:1000;
+        T density=TV::m==1?1:TV::m==2?100:1000;
         SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(segmented_curve,density);}
     else{
         for(int i=0;i<hair_layout_grid.counts.x;i++) for(int j=0;j<hair_layout_grid.counts.y;j++){
@@ -76,7 +76,7 @@ void Get_Initial_Data()
             for(int ij=1;ij<hair_layout_grid.counts.z;ij++){
                 particles.X(count)=hair_layout_grid.X(TV_INT(i,j,ij));
                 segmented_curve.mesh.elements.Append(VECTOR<int,2>(count,count+1));count++;}
-            T density=TV::dimension==1?1:TV::dimension==2?100:1000;
+            T density=TV::m==1?1:TV::m==2?100:1000;
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(segmented_curve,density);
             particles.X(count)=hair_layout_grid.X(TV_INT(i,j,hair_layout_grid.counts.z));count++;}}
     //RIGID_BODY<TV>& sphere_body=tests.Add_Rigid_Body("sphere",(T)1,(T)0.15);sphere_body.Frame().t=TV(0,(T)-1.2,0);

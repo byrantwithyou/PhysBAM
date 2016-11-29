@@ -153,7 +153,7 @@ public:
     {Inertia_Tensor()=inertia_tensor_input;}
 
     void Rescale(const T scaling_factor,const bool rescale_mass=true)
-    {Inertia_Tensor()*=sqr(scaling_factor);if(rescale_mass) Set_Mass(Mass()*pow(scaling_factor,TV::dimension-thin_shell));}
+    {Inertia_Tensor()*=sqr(scaling_factor);if(rescale_mass) Set_Mass(Mass()*pow(scaling_factor,TV::m-thin_shell));}
 
     T Length_Scale_Squared() const
     {return Inertia_Tensor().Max()/Mass();}
@@ -344,7 +344,7 @@ public:
     const RANGE<TV>& Object_Space_Bounding_Box() const;
     bool Simplex_Intersection(RAY<TV>& ray,const T collision_thickness) const;
     RANGE<TV> World_Space_Simplex_Bounding_Box(const int id) const;
-    typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX World_Space_Simplex(const int id) const;
+    typename BASIC_SIMPLEX_POLICY<TV,TV::m-1>::SIMPLEX World_Space_Simplex(const int id) const;
     RANGE<TV> World_Space_Simplex_Bounding_Box(const int id,const FRAME<TV>& frame) const;
 protected:
     void Remove_Structure(STRUCTURE<TV>* structure);

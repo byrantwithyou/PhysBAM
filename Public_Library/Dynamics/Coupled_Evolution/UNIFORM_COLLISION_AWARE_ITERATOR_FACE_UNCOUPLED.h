@@ -37,7 +37,7 @@ public:
     ~UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED();
 
     void Next()
-    {index(TV::dimension-1)++;if(index(TV::dimension-1)>=scan_end) Next_Helper();}
+    {index(TV::m-1)++;if(index(TV::m-1)>=scan_end) Next_Helper();}
 
     // TODO: Careful about ghost cells and the validity of outside_fluid.
     void Next_Fluid()

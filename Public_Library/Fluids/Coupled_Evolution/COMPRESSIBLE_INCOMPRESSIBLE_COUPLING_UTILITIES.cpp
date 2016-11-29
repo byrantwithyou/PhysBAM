@@ -73,7 +73,7 @@ Get_Dirichlet_Boundary_Conditions_For_Incompressible_Region(const GRID<TV>& grid
         const EOS_GAMMA<T> *eos_gamma=dynamic_cast<const EOS_GAMMA<T>*>(&euler_eos);
         // TODO(kwatra): This does not look right. It seems to be calculating p=(gamma-1)e
         p_dirichlet_incompressible(cell_index)=dt*(1/incompressible_density)*(eos_gamma->gamma-1)*
-            (U_dirichlet(cell_index)(TV::dimension+1)-((T).5*U_dirichlet(cell_index)(0)*EULER<TV>::Get_Velocity(U_dirichlet,cell_index).Magnitude_Squared()));}
+            (U_dirichlet(cell_index)(TV::m+1)-((T).5*U_dirichlet(cell_index)(0)*EULER<TV>::Get_Velocity(U_dirichlet,cell_index).Magnitude_Squared()));}
 }
 //#####################################################################
 // Function Compute_Compressible_Incompressible_Face_Velocities

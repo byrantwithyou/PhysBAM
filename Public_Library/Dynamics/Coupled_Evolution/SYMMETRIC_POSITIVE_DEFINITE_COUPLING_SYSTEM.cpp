@@ -116,10 +116,10 @@ Apply_Lambda_To_Euler_State(const VECTOR_T& V,const ARRAY<T,COUPLING_CONSTRAINT_
     for(UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED<TV> iterator(index_map.iterator_info,ghost_cells,region_type);iterator.Valid();iterator.Next()){
         TV_INT fluid_cell_index=iterator.Real_Cell_Index();
         T solid_interpolated_velocity_average=(coupled_faces_solid_interpolated_velocity_n(COUPLING_CONSTRAINT_ID(iterator.collision_index))+coupled_faces_solid_interpolated_velocity_np1(COUPLING_CONSTRAINT_ID(iterator.collision_index)))*(T).5;
-        T impulse=impulse_at_coupling_faces(index_map.indexed_faces.m+index_map.constraint_indices.Get(SIDED_FACE_INDEX<TV::dimension>(iterator.side,iterator.Full_Index())));
+        T impulse=impulse_at_coupling_faces(index_map.indexed_faces.m+index_map.constraint_indices.Get(SIDED_FACE_INDEX<TV::m>(iterator.side,iterator.Full_Index())));
 
         U(fluid_cell_index)(iterator.Axis()+1)+=impulse; // momentum update
-        U(fluid_cell_index)(TV::dimension+1)+=impulse*solid_interpolated_velocity_average;} // energy update
+        U(fluid_cell_index)(TV::m+1)+=impulse*solid_interpolated_velocity_average;} // energy update
 }
 //#####################################################################
 // Function Test_Viscosity
@@ -139,7 +139,7 @@ Test_Viscosity(const VECTOR_T& V,const VECTOR_T& B) const
 // Function Apply_Velocity_Update
 //#####################################################################
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Apply_Velocity_Update(const VECTOR_T& V,ARRAY<T,FACE_INDEX<TV::dimension> >& fluid_velocity,ARRAY<T,TV_INT>& fluid_pressures,GENERALIZED_VELOCITY<TV>& solid_velocity,
+Apply_Velocity_Update(const VECTOR_T& V,ARRAY<T,FACE_INDEX<TV::m> >& fluid_velocity,ARRAY<T,TV_INT>& fluid_pressures,GENERALIZED_VELOCITY<TV>& solid_velocity,
     GENERALIZED_VELOCITY<TV>& force_on_solid,bool want_solid,bool want_fluid) const
 {
     GENERALIZED_VELOCITY<TV> temporary_solids_velocity(temporary_velocities,temporary_twists,solid_system->solid_body_collection);
@@ -209,14 +209,14 @@ Apply_One_Sided_Interpolation_At_Coupling_Faces(const ARRAY<bool,FACE_INDEX<TV::
     constrained_fluid_velocity.Resize(index_map.indexed_constraints.m);
 
     for(int i=0;i<index_map.indexed_faces.m;i++){
-        FACE_INDEX<TV::dimension> face_index=index_map.indexed_faces(i);
+        FACE_INDEX<TV::m> face_index=index_map.indexed_faces(i);
         TV_INT first_cell_index=face_index.First_Cell_Index(),second_cell_index=face_index.Second_Cell_Index();
         beta_face(face_index)=Inverse((density(first_cell_index)+density(second_cell_index))*(T).5);}
 
     // Go through coupling faces and use density and velocity only on the fluid side
     for(UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED<TV> iterator(index_map.iterator_info);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Real_Cell_Index();
-        int constraint_number=index_map.constraint_indices.Get(SIDED_FACE_INDEX<TV::dimension>(iterator.side,iterator.Full_Index()));
+        int constraint_number=index_map.constraint_indices.Get(SIDED_FACE_INDEX<TV::m>(iterator.side,iterator.Full_Index()));
         constrained_beta_face(constraint_number) = Inverse(density(cell_index));
         if(use_one_sided_face_velocty_interpolation) constrained_fluid_velocity(constraint_number) = centered_velocity(cell_index)[iterator.Axis()];
         else constrained_fluid_velocity(constraint_number) = fluids_velocity(iterator.Full_Index());}
@@ -317,7 +317,7 @@ Add_Surface_Tension(ARRAY<T>& fluid_velocity_vector) const
 // Function Set_Up_RHS
 //#####################################################################
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Set_Up_RHS(VECTOR_T& V,VECTOR_T& F,const GENERALIZED_VELOCITY<TV>& solids_velocity_star,const ARRAY<T,FACE_INDEX<TV::dimension> >& fluids_velocity_star,
+Set_Up_RHS(VECTOR_T& V,VECTOR_T& F,const GENERALIZED_VELOCITY<TV>& solids_velocity_star,const ARRAY<T,FACE_INDEX<TV::m> >& fluids_velocity_star,
     const ARRAY<T,TV_INT>& p_advected_over_rho_c_squared_dt,const ARRAY<T,TV_INT>& p_advected,const ARRAY<T,TV_INT>& fluid_pressures)
 {
     Resize_Coupled_System_Vector(tolerances);
@@ -406,7 +406,7 @@ Setup_Initial_Guess(const VECTOR_T& F,VECTOR_T& V,const ARRAY<T,TV_INT>& p_advec
         index_map.Collect(p_advected,V.pressure);
         V.pressure*=dt;
         for(int i=0;i<index_map.indexed_faces.m;i++){
-            FACE_INDEX<TV::dimension> face_index=index_map.indexed_faces(i);
+            FACE_INDEX<TV::m> face_index=index_map.indexed_faces(i);
             T face_area=index_map.grid.Face_Size(face_index.axis);
             if(!(*index_map.iterator_info.outside_fluid)(face_index.First_Cell_Index())){
                 temporary_faces(i)=-p_advected(face_index.First_Cell_Index())*dt*face_area;}
@@ -727,7 +727,7 @@ Test_Matrix() const
 // Function Test_Incompressibility
 //#####################################################################
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Test_Incompressibility(const ARRAY<T,FACE_INDEX<TV::dimension> >& fluid_velocity,const ARRAY<T>& constrained_fluids_velocity) const
+Test_Incompressibility(const ARRAY<T,FACE_INDEX<TV::m> >& fluid_velocity,const ARRAY<T>& constrained_fluids_velocity) const
 {
     VECTOR_T a;
     Resize_Coupled_System_Vector(a);
@@ -766,7 +766,7 @@ Show_Constraints(ARRAY<bool,FACE_INDEX<TV::m> >& psi_N) const
 // Function Check_Constraints
 //#####################################################################
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Check_Constraints(const GENERALIZED_VELOCITY<TV>& solids_rhs,const ARRAY<T,FACE_INDEX<TV::dimension> >& fluids_rhs,const ARRAY<T>& constrained_rhs) const
+Check_Constraints(const GENERALIZED_VELOCITY<TV>& solids_rhs,const ARRAY<T,FACE_INDEX<TV::m> >& fluids_rhs,const ARRAY<T>& constrained_rhs) const
 {
     index_map.Collect(fluids_rhs,constrained_rhs,temporary_faces);
     fluid_interpolation->Times(temporary_faces,coupling_faces);

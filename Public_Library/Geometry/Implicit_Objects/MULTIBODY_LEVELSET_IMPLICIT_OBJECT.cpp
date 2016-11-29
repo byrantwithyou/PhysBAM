@@ -288,7 +288,7 @@ Translate(const TV& translation)
 //#####################################################################
 // Function Principal_Curvatures
 //#####################################################################
-template<class TV> VECTOR<typename TV::SCALAR,TV::dimension-1> MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>::
+template<class TV> VECTOR<typename TV::SCALAR,TV::m-1> MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>::
 Principal_Curvatures(const TV& X) const
 {
     int index=-1;
@@ -309,7 +309,7 @@ Name() const
 template<class TV> std::string MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>::
 Static_Name()
 {
-    return LOG::sprintf("MULTIBODY_LEVELSET_IMPLICIT_OBJECT<T,VECTOR<T,%d> >",TV::dimension);
+    return LOG::sprintf("MULTIBODY_LEVELSET_IMPLICIT_OBJECT<T,VECTOR<T,%d> >",TV::m);
 }
 //#####################################################################
 // Function Extension
@@ -325,7 +325,7 @@ Extension() const
 template<class TV> std::string MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>::
 Static_Extension()
 {
-    return TV::dimension==2?"mphi2d":"mphi";
+    return TV::m==2?"mphi2d":"mphi";
 }
 //#####################################################################
 // Function Read

@@ -28,7 +28,7 @@ template<class TV>
 class RIGID_DEFORMABLE_COLLISIONS:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;typedef typename TV::SPIN T_SPIN;
-    typedef VECTOR<int,TV::dimension> ELEMENT;typedef typename MESH_POLICY<TV::dimension>::MESH T_MESH;
+    typedef VECTOR<int,TV::m> ELEMENT;typedef typename MESH_POLICY<TV::m>::MESH T_MESH;
 public:
     struct PRECOMPUTE_CONTACT_PROJECTION
     {
@@ -41,7 +41,7 @@ public:
         ARRAY<TV> V_rel_target;
         ARRAY<TV> N_over_NT_K_N,r,N;
         ARRAY<T_SPIN> rN;
-        MATRIX<T,TV::dimension+T_SPIN::dimension> A;
+        MATRIX<T,TV::m+T_SPIN::m> A;
         bool A_inverted; // if true, j=Ab, else Aj=b
     };
 

@@ -101,7 +101,7 @@ Copy(const T c1,const KRYLOV_VECTOR_BASE<T>& bv1,const KRYLOV_VECTOR_BASE<T>& bv
 template<class TV> int MPM_KRYLOV_VECTOR<TV>::
 Raw_Size() const
 {
-    return valid_indices.m*TV::dimension;
+    return valid_indices.m*TV::m;
 }
 //#####################################################################
 // Function Raw_Get

@@ -47,13 +47,13 @@ public:
     PROJECTION_DYNAMICS_UNIFORM<TV> projection;
     PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV> particle_levelset_evolution;
     INCOMPRESSIBLE_UNIFORM<TV> incompressible;
-    ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities;
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities;
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<TV,T> advection_scalar;
     BOUNDARY<TV,T> boundary_scalar;
     BOUNDARY<TV,T> *boundary,*phi_boundary;
     T_BOUNDARY_PHI_WATER phi_boundary_water;
     //ARRAY<T,TV_INT> density,temperature;
-    VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary;
+    VECTOR<VECTOR<bool,2>,TV::m> domain_boundary;
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV> collision_bodies_affecting_fluid;    
 
     PLS_EXAMPLE(const STREAM_TYPE stream_type_input);
@@ -62,12 +62,12 @@ public:
     T Time_At_Frame(const int frame) const
     {return initial_time+(frame-first_frame)/frame_rate;}
 
-    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const override
+    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const override
     {V_levelset=face_velocities;}
 
     void Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,
         const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time) override;
-    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset_multiple,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const override {}
+    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset_multiple,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const override {}
     virtual void Write_Output_Files(const int frame);
     virtual void Read_Output_Files(const int frame);
     virtual void Set_Boundary_Conditions(const T time)=0;

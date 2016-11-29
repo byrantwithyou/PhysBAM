@@ -109,7 +109,7 @@ Clip_To_Box(const RANGE<TV>& box,ARRAY<TRIANGLE_2D<T> >& clipped_simplices) cons
     // cut with all sides of box
     clipped_simplices.Remove_All();
     clipped_simplices.Append(*this);
-    for(int axis=0;axis<TV::dimension;axis++){
+    for(int axis=0;axis<TV::m;axis++){
         for(int i=clipped_simplices.m-1;i>=0;i--){
             Cut_With_Hyperplane_And_Discard_Outside_Simplices(clipped_simplices(i),LINE_2D<T>(-TV::Axis_Vector(axis),box.min_corner),clipped_simplices);
             clipped_simplices.Remove_Index_Lazy(i);}

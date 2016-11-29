@@ -12,7 +12,7 @@ using namespace PhysBAM;
 
 template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS& parse_args,MPI_WORLD& mpi_world)
 { 
-    typedef VECTOR<int,TV::dimension> TV_INT;    
+    typedef VECTOR<int,TV::m> TV_INT;    
 
     // ARGS
     int threads=1;

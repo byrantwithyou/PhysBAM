@@ -113,12 +113,12 @@ Pack(ARRAY<T> &velocities) const
     PHYSBAM_ASSERT(velocities.Size()==Raw_Size());
     int index=0;
     for(int i=0;i<V.Size();i++)
-        for(int j=0;j<TV::dimension;j++)
+        for(int j=0;j<TV::m;j++)
             velocities(index++)=V.array(i)(j);
     for(int i=0;i<rigid_V.Size();i++){
-        for(int j=0;j<TV::dimension;j++)
+        for(int j=0;j<TV::m;j++)
             velocities(index++)=rigid_V(i).linear(j);
-        for(int j=0;j<T_SPIN::dimension;j++)
+        for(int j=0;j<T_SPIN::m;j++)
             velocities(index++)=rigid_V(i).angular(j);}
 }
 //#####################################################################
@@ -130,12 +130,12 @@ Unpack(ARRAY<T> &velocities)
     PHYSBAM_ASSERT(velocities.Size()==Raw_Size());
     int index=0;
     for(int i=0;i<V.Size();i++)
-        for(int j=0;j<TV::dimension;j++)
+        for(int j=0;j<TV::m;j++)
             V.array(i)(j)=velocities(index++);
     for(int i=0;i<rigid_V.Size();i++){
-        for(int j=0;j<TV::dimension;j++)
+        for(int j=0;j<TV::m;j++)
             rigid_V(i).linear(j)=velocities(index++);
-        for(int j=0;j<T_SPIN::dimension;j++)
+        for(int j=0;j<T_SPIN::m;j++)
             rigid_V(i).angular(j)=velocities(index++);}
 }
 //#####################################################################
@@ -147,12 +147,12 @@ Unpack_And_Add(ARRAY<T> &velocities)
     PHYSBAM_ASSERT(velocities.Size()==Raw_Size());
     int index=0;
     for(int i=0;i<V.Size();i++)
-        for(int j=0;j<TV::dimension;j++)
+        for(int j=0;j<TV::m;j++)
             V.array(i)(j)+=velocities(index++);
     for(int i=0;i<rigid_V.Size();i++){
-        for(int j=0;j<TV::dimension;j++)
+        for(int j=0;j<TV::m;j++)
             rigid_V(i).linear(j)+=velocities(index++);
-        for(int j=0;j<T_SPIN::dimension;j++)
+        for(int j=0;j<T_SPIN::m;j++)
             rigid_V(i).angular(j)+=velocities(index++);}
 }
 //#####################################################################
@@ -161,7 +161,7 @@ Unpack_And_Add(ARRAY<T> &velocities)
 template<class TV> int GENERALIZED_VELOCITY<TV>::
 Raw_Size() const
 {
-    return V.Size()*TV::dimension+rigid_V.Size()*TWIST<TV>::dimension;
+    return V.Size()*TV::m+rigid_V.Size()*TWIST<TV>::dimension;
 }
 //#####################################################################
 // Function Raw_Get
@@ -169,11 +169,11 @@ Raw_Size() const
 template<class TV> typename TV::SCALAR& GENERALIZED_VELOCITY<TV>::
 Raw_Get(int i)
 {
-    if(i<V.Size()*TV::dimension) return V(i/TV::dimension)(i%TV::dimension);
-    i-=V.Size()*TV::dimension;
+    if(i<V.Size()*TV::m) return V(i/TV::m)(i%TV::m);
+    i-=V.Size()*TV::m;
     int o=i%TWIST<TV>::dimension,n=i/TWIST<TV>::dimension;
-    if(o<TV::dimension) return rigid_V(n).linear(o);
-    return rigid_V(n).angular(o-TV::dimension);
+    if(o<TV::m) return rigid_V(n).linear(o);
+    return rigid_V(n).angular(o-TV::m);
 }
 //#####################################################################
 // Function Exchange

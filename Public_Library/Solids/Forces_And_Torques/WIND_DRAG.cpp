@@ -20,11 +20,11 @@ template<class TV> const LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<TV
 // Constructor
 //#####################################################################
 namespace{
-template<class TV> typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::dimension-1>::OBJECT& Simplicial_Object(typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::dimension-1>::OBJECT& simplicial_object)
+template<class TV> typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT& Simplicial_Object(typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT& simplicial_object)
 {
     return simplicial_object;
 }
-template<class TV> typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::dimension-1>::OBJECT& Simplicial_Object(TETRAHEDRALIZED_VOLUME<typename TV::SCALAR>& tetrahedralized_volume)
+template<class TV> typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT& Simplicial_Object(TETRAHEDRALIZED_VOLUME<typename TV::SCALAR>& tetrahedralized_volume)
 {
     if(!tetrahedralized_volume.triangulated_surface) tetrahedralized_volume.Initialize_Triangulated_Surface();
     return *tetrahedralized_volume.triangulated_surface;

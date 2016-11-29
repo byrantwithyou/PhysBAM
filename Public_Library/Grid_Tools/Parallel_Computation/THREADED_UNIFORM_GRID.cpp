@@ -217,7 +217,7 @@ All_Reduce(bool& flag) const
 // Function Exchange_Boundary_Cell_Data
 //#####################################################################
 template<class TV> template<class T2> void THREADED_UNIFORM_GRID<TV>::
-Exchange_Boundary_Cell_Data(ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& data,const int bandwidth,const bool include_corners) const
+Exchange_Boundary_Cell_Data(ARRAYS_ND_BASE<T2,VECTOR<int,TV::m> >& data,const int bandwidth,const bool include_corners) const
 {
 #ifdef USE_PTHREADS
     RANGE<TV_INT> sentinels=RANGE<TV_INT>::Zero_Box();
@@ -245,7 +245,7 @@ Exchange_Boundary_Cell_Data(ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& data,
 // Function Exchange_Boundary_Face_Data
 //#####################################################################
 template<class TV> template<class T2> void THREADED_UNIFORM_GRID<TV>::
-Exchange_Boundary_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data,const int bandwidth) const
+Exchange_Boundary_Face_Data(ARRAY<T2,FACE_INDEX<TV::m> >& data,const int bandwidth) const
 {   
 #ifdef USE_PTHREADS
     RANGE<VECTOR<int,1> > boundary_band(VECTOR<int,1>(0),VECTOR<int,1>(bandwidth-1)),ghost_band(VECTOR<int,1>(-bandwidth),VECTOR<int,1>(-1));
@@ -280,7 +280,7 @@ Exchange_Boundary_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data,const int
 // Function Average_Common_Face_Data
 //#####################################################################
 template<class TV> template<class T2> void THREADED_UNIFORM_GRID<TV>::
-Average_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data) const
+Average_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::m> >& data) const
 {
 #ifdef USE_PTHREADS
     ARRAY<ARRAY<RANGE<TV_INT> > > regions(TV::m);
@@ -297,7 +297,7 @@ Average_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data) const
     pthread_barrier_wait(barr);
     // average received data with local data (TODO: find a cleaner general way to do this)
     for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=-1){int axis=n/2;
-        ARRAY<T2,FACE_INDEX<TV::dimension> > local_data;local_data.Resize(data.Domain_Indices(),false,false);
+        ARRAY<T2,FACE_INDEX<TV::m> > local_data;local_data.Resize(data.Domain_Indices(),false,false);
         int index=-1;for(int i=0;i<buffers.m;i++) if(buffers(i).send_tid==side_neighbor_ranks(n) && buffers(i).recv_tid==rank) index=i;
         assert(index>=0);int position=0;
         for(FACE_ITERATOR<TV> iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()){
@@ -312,7 +312,7 @@ Average_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data) const
 // Function Assert_Common_Face_Data
 //#####################################################################
 template<class TV> template<class T2> void THREADED_UNIFORM_GRID<TV>::
-Assert_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data,const T tolerance) const
+Assert_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::m> >& data,const T tolerance) const
 {
 #ifdef USE_PTHREADS
     ARRAY<ARRAY<RANGE<TV_INT> > > regions(TV::m);
@@ -329,7 +329,7 @@ Assert_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data,const T toler
     pthread_barrier_wait(barr);
     // average received data with local data (TODO: find a cleaner general way to do this)
     for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=-1){int axis=n/2;
-        ARRAY<T2,FACE_INDEX<TV::dimension> > local_data;local_data.Resize(data.Domain_Indices(),false,false);
+        ARRAY<T2,FACE_INDEX<TV::m> > local_data;local_data.Resize(data.Domain_Indices(),false,false);
         int index=-1;for(int i=0;i<buffers.m;i++) if(buffers(i).send_tid==side_neighbor_ranks(n) && buffers(i).recv_tid==rank) index=i;
         assert(index>=0);int position=0;
         for(FACE_ITERATOR<TV> iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()){
@@ -344,7 +344,7 @@ Assert_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data,const T toler
 // Function Sync_Scalar
 //#####################################################################
 template<class TV> template<class T2> void THREADED_UNIFORM_GRID<TV>::
-Sync_Scalar(const ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& local_data,ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& global_data) const
+Sync_Scalar(const ARRAYS_ND_BASE<T2,VECTOR<int,TV::m> >& local_data,ARRAYS_ND_BASE<T2,VECTOR<int,TV::m> >& global_data) const
 {
     for(CELL_ITERATOR<TV> iterator(local_grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();global_data(cell+local_to_global_offset)=local_data(cell);}
 }
@@ -352,7 +352,7 @@ Sync_Scalar(const ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& local_data,ARRA
 // Function Distribute_Scalar
 //#####################################################################
 template<class TV> template<class T2> void THREADED_UNIFORM_GRID<TV>::
-Distribute_Scalar(ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& local_data,const ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& global_data) const
+Distribute_Scalar(ARRAYS_ND_BASE<T2,VECTOR<int,TV::m> >& local_data,const ARRAYS_ND_BASE<T2,VECTOR<int,TV::m> >& global_data) const
 {
     for(CELL_ITERATOR<TV> iterator(local_grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();local_data(cell)=global_data(cell+local_to_global_offset);}
 }
@@ -360,9 +360,9 @@ Distribute_Scalar(ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& local_data,cons
 // Function Sync_Face_Scalar
 //#####################################################################
 template<class TV> template<class T2> void THREADED_UNIFORM_GRID<TV>::
-Sync_Face_Scalar(const ARRAY<T2,FACE_INDEX<TV::dimension> >& local_data,ARRAY<T2,FACE_INDEX<TV::dimension> >& global_data) const
+Sync_Face_Scalar(const ARRAY<T2,FACE_INDEX<TV::m> >& local_data,ARRAY<T2,FACE_INDEX<TV::m> >& global_data) const
 {
-    for(int axis=0;axis<TV::dimension;axis++){
+    for(int axis=0;axis<TV::m;axis++){
         RANGE<TV_INT> domain=local_grid.Domain_Indices();if(domain.max_corner(axis)+local_to_global_offset(axis)==global_grid.Domain_Indices().max_corner(axis)) domain.max_corner(axis)++;
         for(FACE_ITERATOR<TV> iterator(local_grid,domain,axis);iterator.Valid();iterator.Next()){TV_INT face=iterator.Face_Index();
             global_data.Component(axis)(face+local_to_global_offset)=local_data.Component(axis)(face);}}
@@ -371,7 +371,7 @@ Sync_Face_Scalar(const ARRAY<T2,FACE_INDEX<TV::dimension> >& local_data,ARRAY<T2
 // Function Distribute_Face_Scalar
 //#####################################################################
 template<class TV> template<class T2> void THREADED_UNIFORM_GRID<TV>::
-Distribute_Face_Scalar(ARRAY<T2,FACE_INDEX<TV::dimension> >& local_data,const ARRAY<T2,FACE_INDEX<TV::dimension> >& global_data) const
+Distribute_Face_Scalar(ARRAY<T2,FACE_INDEX<TV::m> >& local_data,const ARRAY<T2,FACE_INDEX<TV::m> >& global_data) const
 {
     for(FACE_ITERATOR<TV> iterator(local_grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
         local_data.Component(axis)(face)=global_data.Component(axis)(face+local_to_global_offset);}

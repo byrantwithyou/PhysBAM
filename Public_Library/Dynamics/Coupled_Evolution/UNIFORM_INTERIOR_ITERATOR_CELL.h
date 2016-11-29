@@ -16,7 +16,7 @@ template<class TV>
 class UNIFORM_INTERIOR_ITERATOR_CELL:public CELL_ITERATOR<TV>
 {
 public:
-    enum WORKAROUND {d=TV::dimension};
+    enum WORKAROUND {d=TV::m};
     typedef typename TV::SCALAR T;typedef VECTOR<int,d> TV_INT;
     typedef CELL_ITERATOR<TV> BASE;
     using BASE::Valid;using BASE::index;

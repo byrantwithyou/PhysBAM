@@ -44,7 +44,7 @@ public:
 
     virtual std::string Name() const override {return Static_Name();}
     static std::string Static_Name()
-    {return LOG::sprintf("EMBEDDING<VECTOR<T,%d> >",TV::dimension);}
+    {return LOG::sprintf("EMBEDDING<VECTOR<T,%d> >",TV::m);}
 
     void Update_Number_Nodes() override
     {material_surface.Update_Number_Nodes();}

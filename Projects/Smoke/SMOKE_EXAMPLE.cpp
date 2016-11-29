@@ -27,7 +27,7 @@ SMOKE_EXAMPLE(const STREAM_TYPE stream_type_input,int number_of_threads)
     use_eapic(false),eapic_order(1),particles(*new SMOKE_PARTICLES<TV>)
 {
     np=1; //number of points per cell
-    for(int i=0;i<TV::dimension;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
+    for(int i=0;i<TV::m;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
 #ifdef USE_PTHREAD
     pthread_mutex_init(&lock,0);    
 #endif
@@ -48,17 +48,17 @@ template<class TV> SMOKE_EXAMPLE<TV>::
 // Function CFL
 //#####################################################################
 template<class TV> typename TV::SCALAR SMOKE_EXAMPLE<TV>::
-CFL(ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities)
+CFL(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
 {
     T dt=FLT_MAX;
-    DOMAIN_ITERATOR_THREADED_ALPHA<SMOKE_EXAMPLE<TV>,TV>(grid.Domain_Indices(),thread_queue).template Run<ARRAY<T,FACE_INDEX<TV::dimension> >&,T&>(*this,&SMOKE_EXAMPLE::CFL_Threaded,face_velocities,dt);
+    DOMAIN_ITERATOR_THREADED_ALPHA<SMOKE_EXAMPLE<TV>,TV>(grid.Domain_Indices(),thread_queue).template Run<ARRAY<T,FACE_INDEX<TV::m> >&,T&>(*this,&SMOKE_EXAMPLE::CFL_Threaded,face_velocities,dt);
     return dt;
 }
 //#####################################################################
 // Function CFL_Threaded
 //#####################################################################
 template<class TV> void SMOKE_EXAMPLE<TV>::
-CFL_Threaded(RANGE<TV_INT>& domain,ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities,T& dt)
+CFL_Threaded(RANGE<TV_INT>& domain,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T& dt)
 {
     T dt_convection=0;
     for(CELL_ITERATOR<TV> iterator(grid,domain);iterator.Valid();iterator.Next()){
@@ -141,13 +141,13 @@ template<class TV> void SMOKE_EXAMPLE<TV>::
 Set_Boundary_Conditions(const T time, const T source_velocities)
 {
     projection.elliptic_solver->psi_D.Fill(false);projection.elliptic_solver->psi_N.Fill(false);
-    for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
+    for(int axis=0;axis<TV::m;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
         if(domain_boundary(axis)(axis_side)){
             TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);    
             for(FACE_ITERATOR<TV> iterator(grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Face_Index()+interior_cell_offset;
                 TV_INT boundary_face=axis_side==0?iterator.Face_Index()+TV_INT::Axis_Vector(axis):iterator.Face_Index()-TV_INT::Axis_Vector(axis);
                 if(N_boundary){
-                    FACE_INDEX<TV::dimension> face(axis,boundary_face);
+                    FACE_INDEX<TV::m> face(axis,boundary_face);
                     projection.elliptic_solver->psi_N(face)=true;
                     face_velocities(face)=0;}
                 else projection.elliptic_solver->psi_D(cell)=true;projection.p(cell)=0;}}}

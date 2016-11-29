@@ -113,7 +113,7 @@ template<class TV>
 void Particles_In_Proximity(RIGID_BODY<TV>& particle_body,RIGID_BODY<TV>& levelset_body,ARRAY<TV>& locations,ARRAY<TV>& normals,ARRAY<typename TV::SCALAR>& distances,typename TV::SCALAR proximity_distance)
 {
     typedef typename TV::SCALAR T;
-    const int d=TV::dimension;
+    const int d=TV::m;
 
     FRAME<TV> frame=levelset_body.Frame().Inverse_Times(particle_body.Frame());
     MATRIX<T,d> rotation=frame.r.Rotation_Matrix();
@@ -172,7 +172,7 @@ PARTICLE_PARTITION<TV> Build_Particle_Partition(ARRAY<TV>& locations,typename TV
     T volume=box.Robust_Size();
 
     T cell_edge=cbrt(volume/n);
-    VECTOR<int,TV::dimension> counts=VECTOR<int,TV::dimension>(box.Edge_Lengths()*((T)(1.0/cell_edge)))+VECTOR<int,TV::dimension>::All_Ones_Vector();
+    VECTOR<int,TV::m> counts=VECTOR<int,TV::m>(box.Edge_Lengths()*((T)(1.0/cell_edge)))+VECTOR<int,TV::m>::All_Ones_Vector();
     
     PARTICLE_PARTITION<TV> partition(box,counts,GEOMETRY_PARTICLES<TV>(),false);
     
@@ -314,12 +314,12 @@ ARRAY<int> Eliminate_Redundant_Contact_Points(ARRAY<VECTOR<T,3> >& locations,ARR
             for(int j=1;j<region.m;j++)
                 normal+=normals(region(j));
             normal.Normalize();
-            VECTOR<TV,TV::dimension-1> tangents=Tangent_Space(normal);
+            VECTOR<TV,TV::m-1> tangents=Tangent_Space(normal);
             ARRAY<VECTOR<T,2> > projected_offsets(region.m);
             for(int k=0;k<region.m;k++)
             {
                 TV offset=locations(region(k))-locations(region(0));
-                for(int c=0;c<TV::dimension-1;c++)
+                for(int c=0;c<TV::m-1;c++)
                     projected_offsets(k)(c)=TV::Dot_Product(offset,tangents(c));
             }
             ARRAY<int> convex_hull=Convex_Hull(projected_offsets);

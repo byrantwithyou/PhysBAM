@@ -85,7 +85,7 @@ Initialize_Collision_Aware_Face_Iterator(const ARRAY<bool,TV_INT>& outside_fluid
         RAY<TV> ray(grid.X(second_cell_index),-TV::Axis_Vector(cfi.axis),true);ray.t_max=grid.dX(cfi.axis);ray.semi_infinite=false;
         for(int i=cfi.simplices.m-1;i>=0;i--){
             COLLISION_GEOMETRY<TV>* body=coupling_bodies(cfi.simplices(i).x);
-            typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX simplex=body->World_Space_Simplex(cfi.simplices(i).y);
+            typename BASIC_SIMPLEX_POLICY<TV,TV::m-1>::SIMPLEX simplex=body->World_Space_Simplex(cfi.simplices(i).y);
             if(!ray_intersection &&
                 (simplex.Inside(grid.X(first_cell_index),collision_body_thickness_over_two) || simplex.Inside(grid.X(second_cell_index),collision_body_thickness_over_two) || INTERSECTION::Intersects(ray,simplex,collision_body_thickness_over_two))) ray_intersection=true;}
         if(ray_intersection){

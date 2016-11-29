@@ -34,8 +34,8 @@ struct SIM_DATA
     int res;
     GRID<TV> grid;
     VECTOR<GRID<TV>,TV::m> face_grids;
-    ARRAY<int,FACE_INDEX<TV::dimension> > face_color;
-    ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > > face_velocities;
+    ARRAY<int,FACE_INDEX<TV::m> > face_color;
+    ARRAY<ARRAY<T,FACE_INDEX<TV::m> > > face_velocities;
     ARRAY<T,TV_INT> pressure,phi;
     LEVELSET<TV> levelset;
 

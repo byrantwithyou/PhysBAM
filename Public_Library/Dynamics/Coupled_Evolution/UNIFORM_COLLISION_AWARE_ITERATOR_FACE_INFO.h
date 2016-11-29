@@ -25,7 +25,7 @@ template<class TV>
 struct COLLISION_FACE_INFO
 {
     int axis;
-    VECTOR<int,TV::dimension> index;
+    VECTOR<int,TV::m> index;
     int side;
     ARRAY<PAIR<COLLISION_GEOMETRY_ID,int> > simplices;
 
@@ -40,8 +40,8 @@ struct COLLISION_FACE_INFO
 template<class TV>
 class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO:public NONCOPYABLE
 {
-    enum WORKAROUND {d=TV::dimension};
-    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::dimension> TV_INT;
+    enum WORKAROUND {d=TV::m};
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
 
     const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid;
 

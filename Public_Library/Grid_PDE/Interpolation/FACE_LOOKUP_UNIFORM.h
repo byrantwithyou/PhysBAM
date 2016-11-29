@@ -44,7 +44,7 @@ public:
     T operator()(const int axis,const TV_INT& face) const
     {return V_face.Component(axis)(face);}
 
-    T operator()(const FACE_INDEX<TV::dimension>& face) const
+    T operator()(const FACE_INDEX<TV::m>& face) const
     {return V_face(face);}
 
 //#####################################################################

@@ -572,14 +572,14 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T 
         TV KE=TV();
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
             KE[iterator.Axis()]+=sqr(face_velocities(iterator.Axis(),iterator.Face_Index()));
-        for(int axis=0;axis<TV::dimension;axis++)
+        for(int axis=0;axis<TV::m;axis++)
             LOG::cout<<"axis "<<axis<<": "<<KE[axis]<<std::endl;
         viscosity_helper.Add_Implicit_Forces_Before_Projection(grid,face_velocities,face_velocities,dt,time);
         LOG::cout<<"KE after viscosity: "<<std::endl;
         KE=TV();
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
             KE[iterator.Axis()]+=sqr(face_velocities(iterator.Axis(),iterator.Face_Index()));
-        for(int axis=0;axis<TV::dimension;axis++)
+        for(int axis=0;axis<TV::m;axis++)
             LOG::cout<<"axis "<<axis<<": "<<KE[axis]<<std::endl;
     }
 }
@@ -591,7 +591,7 @@ Warn_For_Exposed_Dirichlet_Cell(const ARRAY<bool,TV_INT>& psi_D,const ARRAY<bool
 {
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         if(!psi_D(cell_index)) continue;
-        for(int axis=0;axis<TV::dimension;axis++){
+        for(int axis=0;axis<TV::m;axis++){
             TV_INT first_cell_index=iterator.Cell_Neighbor(2*axis),second_cell_index=iterator.Cell_Neighbor(2*axis+1);
             TV_INT first_face_index=iterator.First_Face_Index(axis),second_face_index=iterator.Second_Face_Index(axis);
             if((grid.Inside_Domain(first_cell_index) && !psi_D(first_cell_index) && !psi_N.Component(axis)(first_face_index)) || 
@@ -615,11 +615,11 @@ Set_Cached_Psi_N_And_Coupled_Face_Data(const COLLISION_AWARE_INDEX_MAP<TV>& inde
 // Function Fill_Coupled_Face_Data
 //#####################################################################
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>::
-Fill_Coupled_Face_Data(const COUPLING_CONSTRAINT_ID number_of_coupling_faces,const ARRAY<FACE_INDEX<TV::dimension> >& indexed_faces,
+Fill_Coupled_Face_Data(const COUPLING_CONSTRAINT_ID number_of_coupling_faces,const ARRAY<FACE_INDEX<TV::m> >& indexed_faces,
     const ARRAY<T,COUPLING_CONSTRAINT_ID>& coupling_face_data,ARRAY<T,FACE_INDEX<TV::m> >& face_data)
 {
     for(COUPLING_CONSTRAINT_ID i(0);i<number_of_coupling_faces;i++){
-        FACE_INDEX<TV::dimension> face_index=indexed_faces(Value(i));
+        FACE_INDEX<TV::m> face_index=indexed_faces(Value(i));
         face_data(face_index)=coupling_face_data(i);}
 }
 //#####################################################################
@@ -677,8 +677,8 @@ Get_Coupled_Faces_And_Interpolated_Solid_Velocities(const T time,ARRAY<bool,FACE
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>::
 Setup_Boundary_Condition_Collection()
 {
-    VECTOR<VECTOR<bool,2>,TV::dimension> mpi_boundaries;mpi_boundaries.Fill(VECTOR<bool,2>(false,false));
-    if(fluids_parameters.mpi_grid) for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++)
+    VECTOR<VECTOR<bool,2>,TV::m> mpi_boundaries;mpi_boundaries.Fill(VECTOR<bool,2>(false,false));
+    if(fluids_parameters.mpi_grid) for(int axis=0;axis<TV::m;axis++) for(int axis_side=0;axis_side<2;axis_side++)
         if(fluids_parameters.mpi_grid->side_neighbor_ranks(2*axis+axis_side)>=0) mpi_boundaries(axis)(axis_side)=true;
 
     if(Simulate_Incompressible_Fluids()){

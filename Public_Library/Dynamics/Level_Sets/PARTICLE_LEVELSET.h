@@ -24,7 +24,7 @@ template<class TV>
 class PARTICLE_LEVELSET:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
-    typedef VECTOR<int,TV::dimension> TV_INT;typedef typename GRID<TV>::BLOCK T_BLOCK;
+    typedef VECTOR<int,TV::m> TV_INT;typedef typename GRID<TV>::BLOCK T_BLOCK;
 public:
     int number_particles_per_cell;
     bool only_use_negative_particles;

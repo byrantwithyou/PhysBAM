@@ -52,7 +52,7 @@ CFL(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities) const
     T dt_convection=0;
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         T local_V_norm=0;
-        for(int axis=0;axis<TV::dimension;axis++)
+        for(int axis=0;axis<TV::m;axis++)
             local_V_norm+=grid.one_over_dX[axis]*maxabs(face_velocities(axis,grid.First_Face_Index_In_Cell(axis,cell)),face_velocities(axis,grid.Second_Face_Index_In_Cell(axis,cell)));
         dt_convection=max(dt_convection,local_V_norm);}
     return 1/max(dt_convection,1/max_time_step);
@@ -100,7 +100,7 @@ Compute_Gradient(ARRAY<TV,TV_INT>& gradient,const T time) const
     ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells));boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
     gradient.Resize(grid.Domain_Indices(ghost_cells-1));
     for(CELL_ITERATOR<TV> iterator(grid,ghost_cells-1);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-        for(int axis=0;axis<TV::dimension;axis++){
+        for(int axis=0;axis<TV::m;axis++){
             TV_INT axis_vector=TV_INT::Axis_Vector(axis);
             gradient(cell_index)(axis)=(phi_ghost(cell_index+axis_vector)-phi_ghost(cell_index-axis_vector))*one_over_two_dx(axis);}}
 }

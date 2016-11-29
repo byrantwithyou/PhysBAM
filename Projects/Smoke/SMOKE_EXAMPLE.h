@@ -54,13 +54,13 @@ public:
     MPI_UNIFORM_GRID<TV> *mpi_grid;
     THREAD_QUEUE* thread_queue;    
     PROJECTION_UNIFORM<TV> projection;
-    ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities;
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities;
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<TV,T, AVERAGING_UNIFORM<TV, FACE_LOOKUP_UNIFORM<TV> >,T_INTERPOLATION > advection_scalar;
     BOUNDARY<TV,T> boundary_scalar;
     BOUNDARY<TV,T> *boundary;
     ARRAY<T,TV_INT> density;
     ARRAY<T,TV_INT> temperature;  //add temperature
-    VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary;    
+    VECTOR<VECTOR<bool,2>,TV::m> domain_boundary;    
     RANGE<TV> source1;
     RANGE<TV> source2;
 #ifdef USE_PTHREAD
@@ -80,8 +80,8 @@ public:
 
     SMOKE_EXAMPLE(const STREAM_TYPE stream_type_input,int refine=0);
     virtual ~SMOKE_EXAMPLE();
-    T CFL(ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities);
-    void CFL_Threaded(RANGE<TV_INT>& domain,ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities,T& dt);
+    T CFL(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);
+    void CFL_Threaded(RANGE<TV_INT>& domain,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T& dt);
     T Time_At_Frame(const int frame) const;
     void Initialize_Grid(TV_INT counts,RANGE<TV> domain);
     void Initialize_Fields();

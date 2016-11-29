@@ -102,8 +102,8 @@ template<class TV> void Rasterize_Object_Generic(const COLLISION_GEOMETRY<TV>& c
         for(int t=0;t<collision_geometry.Number_Of_Simplices();t++){
             typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m-1>::SIMPLEX T_SIMPLEX;
             T_SIMPLEX simplex=collision_geometry.World_Space_Simplex(t);
-            VECTOR<TV,TV::dimension> pts;
-            for(int d=0;d<TV::dimension;d++) pts(d)=simplex.X(d);
+            VECTOR<TV,TV::m> pts;
+            for(int d=0;d<TV::m;d++) pts(d)=simplex.X(d);
             RANGE<TV> box=RANGE<TV>::Bounding_Box(pts).Thickened(collision_geometry.collision_thickness);
             Rasterize_Box(grid,objects,box,id);}
     else
@@ -131,13 +131,13 @@ Compute_Occupied_Blocks_Generic(const COLLISION_GEOMETRY<TV>& collision_geometry
     for(int t=0;t<collision_geometry.Number_Of_Simplices();t++){
         typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m-1>::SIMPLEX T_SIMPLEX;
         T_SIMPLEX simplex=collision_geometry.World_Space_Simplex(t);
-        VECTOR<TV,TV::dimension> pts;
-        for(int d=0;d<TV::dimension;d++) pts(d)=simplex.X(d);
+        VECTOR<TV,TV::m> pts;
+        for(int d=0;d<TV::m;d++) pts(d)=simplex.X(d);
         RANGE<TV> box=RANGE<TV>::Bounding_Box(pts);
         if(with_body_motion){
             T_SIMPLEX simplex_saved=collision_geometry.World_Space_Simplex(t,1);
-            VECTOR<TV,TV::dimension> pts_saved;
-            for(int d=0;d<TV::dimension;d++) pts_saved(d)=simplex_saved.X(d);
+            VECTOR<TV,TV::m> pts_saved;
+            for(int d=0;d<TV::m;d++) pts_saved(d)=simplex_saved.X(d);
             box.Enlarge_To_Include_Box(RANGE<TV>::Bounding_Box(pts_saved));}
         box.Change_Size(extra_thickness+body_thickness_factor*collision_geometry.collision_thickness);
         Rasterize_Box_Onto_Blocks(grid,occupied,box);}

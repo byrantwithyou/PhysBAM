@@ -17,7 +17,7 @@ template<class TV> class GRID;
 template<class TV>
 class GENERALIZED_FLUID_MASS:public NONCOPYABLE,public SYSTEM_MATRIX_BASE<typename TV::SCALAR>
 {
-    enum WORKAROUND {d=TV::dimension};
+    enum WORKAROUND {d=TV::m};
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
 
     const COLLISION_AWARE_INDEX_MAP<TV>& index_map;

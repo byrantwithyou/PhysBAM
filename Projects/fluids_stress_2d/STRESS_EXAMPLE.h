@@ -40,7 +40,7 @@ public:
 
     GRID<TV> grid;
     ARRAY<T,TV_INT> bc_phi;
-    ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities,prev_face_velocities;
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities,prev_face_velocities;
     BOUNDARY_MAC_GRID_PERIODIC<TV,T> boundary;
     BOUNDARY_MAC_GRID_PERIODIC<TV,int> boundary_int;
     BOUNDARY_MAC_GRID_PERIODIC<TV,SYMMETRIC_MATRIX<T,TV::m> > boundary_stress;

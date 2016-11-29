@@ -23,7 +23,7 @@ template<class T_input> ANGLE_JOINT<VECTOR<T_input,1> >::
 template<class TV> bool ANGLE_JOINT<TV>::
 Has_Angular_Constraint() const
 {
-    return TV::dimension==3 || constrain_angle;
+    return TV::m==3 || constrain_angle;
 }
 //#####################################################################
 // Function Constrain_Prismatically
@@ -50,7 +50,7 @@ Constrain_Angles(T_SPIN& angles) const
 template<class TV> void ANGLE_JOINT<TV>::
 Angular_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& angular_constraint_matrix,MATRIX_MXN<T>* angular_unconstrained_matrix) const
 {
-    VECTOR<bool,T_SPIN::dimension> constrain(VECTOR<bool,T_SPIN::dimension>::All_Ones_Vector());
+    VECTOR<bool,T_SPIN::m> constrain(VECTOR<bool,T_SPIN::m>::All_Ones_Vector());
     constrain.x=constrain_angle && angle_min>=angle_max;
     Constraint_Matrix_Helper(parent_frame.r*F_pj().r,angular_constraint_matrix,angular_unconstrained_matrix,constrain);
 }

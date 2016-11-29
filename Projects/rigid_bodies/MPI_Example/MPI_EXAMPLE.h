@@ -330,7 +330,7 @@ void Many_Sphere_Test()
 //#####################################################################
 void Break_Levelset()
 {
-    typedef VECTOR<int,TV::dimension> TV_INT;
+    typedef VECTOR<int,TV::m> TV_INT;
     ARRAY<int,RIGID_CLUSTER_CONSTITUENT_ID> children;
     ARRAY<int>* referenced_rigid_particles=new ARRAY<int>;
     RIGID_BODY_PARTICLES<TV>& particles=solid_body_collection.rigid_body_collection.rigid_body_particles;    

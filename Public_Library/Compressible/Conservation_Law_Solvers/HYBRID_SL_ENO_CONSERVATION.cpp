@@ -40,20 +40,20 @@ Update_Conservation_Law(GRID<TV>& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRA
         LOG::SCOPE scope("Regular Update for Hybrid scheme.");
         for(CELL_ITERATOR<TV> iterator(grid,3);iterator.Valid();iterator.Next()){
             if(regular_cell(iterator.Cell_Index())){
-                bool compute_self_weight=true;for(int dim=0;dim<TV::dimension;dim++) compute_self_weight &= flux_face(iterator.Full_First_Face_Index(dim)) & flux_face(iterator.Full_Second_Face_Index(dim));
+                bool compute_self_weight=true;for(int dim=0;dim<TV::m;dim++) compute_self_weight &= flux_face(iterator.Full_First_Face_Index(dim)) & flux_face(iterator.Full_Second_Face_Index(dim));
                 regular_cell(iterator.Cell_Index())=compute_self_weight;
                 cell_near_interface_tmp(iterator.Cell_Index())=!compute_self_weight;}}
         for(CELL_ITERATOR<TV> iterator(grid,2);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
             cell_near_interface(cell_index)=cell_near_interface_tmp(cell_index);
             if(cell_near_interface_tmp(cell_index)){
-                for(int dim=0;dim<TV::dimension;dim++) {
+                for(int dim=0;dim<TV::m;dim++) {
                     if(psi(cell_index+TV_INT::Axis_Vector(dim))) cell_near_interface(cell_index+TV_INT::Axis_Vector(dim))=true;
                     if(psi(cell_index-TV_INT::Axis_Vector(dim))) cell_near_interface(cell_index-TV_INT::Axis_Vector(dim))=true;}
 #if 0
-                if(TV::dimension==2){
+                if(TV::m==2){
                     if(psi(cell_index+VECTOR<int,2>(-1,-1))) cell_near_interface(cell_index+VECTOR<int,2>(-1,-1))=true; if(psi(cell_index+VECTOR<int,2>( 1,-1))) cell_near_interface(cell_index+VECTOR<int,2>( 1,-1))=true;
                     if(psi(cell_index+VECTOR<int,2>(-1, 1))) cell_near_interface(cell_index+VECTOR<int,2>(-1, 1))=true; if(psi(cell_index+VECTOR<int,2>( 1, 1))) cell_near_interface(cell_index+VECTOR<int,2>( 1, 1))=true;}
-                if(TV::dimension==3){
+                if(TV::m==3){
                     if(psi(cell_index+VECTOR<int,3>(-1,-1,-1))) cell_near_interface(cell_index+VECTOR<int,3>(-1,-1,-1))=true; if(psi(cell_index+VECTOR<int,3>( 1,-1,-1))) cell_near_interface(cell_index+VECTOR<int,3>( 1,-1,-1))=true;
                     if(psi(cell_index+VECTOR<int,3>(-1, 1,-1))) cell_near_interface(cell_index+VECTOR<int,3>(-1, 1,-1))=true; if(psi(cell_index+VECTOR<int,3>( 1, 1,-1))) cell_near_interface(cell_index+VECTOR<int,3>( 1, 1,-1))=true;
                     if(psi(cell_index+VECTOR<int,3>(-1,-1, 1))) cell_near_interface(cell_index+VECTOR<int,3>(-1,-1, 1))=true; if(psi(cell_index+VECTOR<int,3>( 1,-1, 1))) cell_near_interface(cell_index+VECTOR<int,3>( 1,-1, 1))=true;
@@ -76,7 +76,7 @@ Update_Conservation_Law(GRID<TV>& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRA
             ARRAY<T,TV_INT> sigma;sigma.Resize(grid.Domain_Indices(3));
 
             for(FACE_ITERATOR<TV> iterator(grid,2);iterator.Valid();iterator.Next()){
-                FACE_INDEX<TV::dimension> face_index=iterator.Full_Index();
+                FACE_INDEX<TV::m> face_index=iterator.Full_Index();
                 if(flux_face(face_index) && (cell_near_interface(iterator.First_Cell_Index()) || cell_near_interface(iterator.Second_Cell_Index()))){
                     T weight=dt*face_fluxes(face_index)(dim);
                     INDEX donor_cell    = (weight >= 0 ? iterator.First_Cell_Index() : iterator.Second_Cell_Index());

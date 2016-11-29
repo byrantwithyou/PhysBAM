@@ -27,10 +27,10 @@ template<class TV> class BLOCK_UNIFORM;
 template<class TV>
 class GRID
 {
-    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::dimension> TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
 public:
     enum REGION {WHOLE_REGION,GHOST_REGION,BOUNDARY_REGION,INTERIOR_REGION,BOUNDARY_INTERIOR_REGION}; // for iterators
-    static const int dimension=TV::dimension;
+    static const int dimension=TV::m;
     static const int number_of_cells_per_block=1<<dimension;
     static const int number_of_faces_per_block=dimension==1?3:dimension==2?12:36;
     static const int number_of_incident_faces_per_block=2*dimension-2;
@@ -271,8 +271,8 @@ public:
     bool Inside_Domain(const TV_INT cell_index,const int ghost_cells=0) const
     {return Domain_Indices(ghost_cells).Lazy_Inside_Half_Open(cell_index);}
 
-    VECTOR<RANGE<TV_INT>,TV::dimension> Face_Indices(const int ghost_cells=0) const
-    {VECTOR<RANGE<TV_INT>,TV::dimension> v;for(int i=0;i<TV::dimension;i++) v(i)=Get_Face_Grid(i).Node_Indices(ghost_cells);return v;}
+    VECTOR<RANGE<TV_INT>,TV::m> Face_Indices(const int ghost_cells=0) const
+    {VECTOR<RANGE<TV_INT>,TV::m> v;for(int i=0;i<TV::m;i++) v(i)=Get_Face_Grid(i).Node_Indices(ghost_cells);return v;}
 
     bool Outside(const TV& location) const
     {return domain.Lazy_Outside(location);}
@@ -301,8 +301,8 @@ public:
     GRID<TV> Get_MAC_Grid_At_Regular_Positions() const
     {assert(!Is_MAC_Grid());TV expansion=(T).5*dX;return GRID<TV>(counts,RANGE<TV>(domain.min_corner-expansion,domain.max_corner+expansion),true);}
 
-    GRID<VECTOR<T,TV::dimension-1> > Remove_Dimension(int dimension) const
-    {return GRID<VECTOR<T,TV::dimension-1> >(counts.Remove_Index(dimension),domain.Remove_Dimension(dimension),Is_MAC_Grid());}
+    GRID<VECTOR<T,TV::m-1> > Remove_Dimension(int dimension) const
+    {return GRID<VECTOR<T,TV::m-1> >(counts.Remove_Index(dimension),domain.Remove_Dimension(dimension),Is_MAC_Grid());}
 
     GRID<VECTOR<T,1> > Get_1D_Grid(const int axis) const
     {return GRID<VECTOR<T,1> >(VECTOR<int,1>(counts[axis]),RANGE<VECTOR<T,1> >(VECTOR<T,1>(domain.Minimum_Corner()[axis]),VECTOR<T,1>(domain.Maximum_Corner()[axis])),Is_MAC_Grid());}

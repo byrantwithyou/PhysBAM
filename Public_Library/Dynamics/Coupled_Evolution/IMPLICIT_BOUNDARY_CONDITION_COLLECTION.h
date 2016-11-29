@@ -16,11 +16,11 @@ namespace PhysBAM{
 template<class TV>
 class IMPLICIT_BOUNDARY_CONDITION_COLLECTION
 {
-    typedef VECTOR<int,TV::dimension> TV_INT;typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;typedef typename TV::SCALAR T;
 public:
     ARRAY<bool,TV_INT> psi_D;
-    ARRAY<bool,FACE_INDEX<TV::dimension> > psi_N;
-    ARRAY<T,FACE_INDEX<TV::dimension> > psi_R;
+    ARRAY<bool,FACE_INDEX<TV::m> > psi_N;
+    ARRAY<T,FACE_INDEX<TV::m> > psi_R;
 
     BOUNDARY_CONDITIONS_CALLBACKS<TV>* callback;
     ARRAY<BOUNDARY_CONDITION_INFO<TV> > boundary_condition_info;
@@ -39,9 +39,9 @@ public:
     {boundary_conditions.Append(boundary_condition);}
 
     bool All_Cell_Faces_Neumann(const TV_INT& cell_index) const;
-    void Compute(const GRID<TV>& grid,ARRAY<T,TV_INT>& p,ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities,const T time);
-    void Compute_Boundary_Condition_Info(const GRID<TV>& grid,const ARRAY<T,TV_INT>& p,const ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities);
-    void Compute_Boundary_Condition_Info(const ARRAY<T,TV_INT>& p,const ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities,const FACE_INDEX<TV::m>& f,int in_side);
+    void Compute(const GRID<TV>& grid,ARRAY<T,TV_INT>& p,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T time);
+    void Compute_Boundary_Condition_Info(const GRID<TV>& grid,const ARRAY<T,TV_INT>& p,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);
+    void Compute_Boundary_Condition_Info(const ARRAY<T,TV_INT>& p,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const FACE_INDEX<TV::m>& f,int in_side);
 };
 }
 #endif

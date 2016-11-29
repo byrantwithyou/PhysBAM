@@ -92,7 +92,7 @@ Principal_Curvatures(const TV& X) const
 template<class TV> std::string SMOOTH_LEVELSET_IMPLICIT_OBJECT<TV>::
 Static_Name()
 {
-    return LOG::sprintf("SMOOTH_LEVELSET_IMPLICIT_OBJECT<T,VECTOR<T,%d> >",TV::dimension);
+    return LOG::sprintf("SMOOTH_LEVELSET_IMPLICIT_OBJECT<T,VECTOR<T,%d> >",TV::m);
 }
 //#####################################################################
 // Function Extension
@@ -100,7 +100,7 @@ Static_Name()
 template<class TV> std::string SMOOTH_LEVELSET_IMPLICIT_OBJECT<TV>::
 Static_Extension()
 {
-    return TV::dimension==2?"phi2d":"phi";
+    return TV::m==2?"phi2d":"phi";
 }
 //#####################################################################
 namespace PhysBAM{

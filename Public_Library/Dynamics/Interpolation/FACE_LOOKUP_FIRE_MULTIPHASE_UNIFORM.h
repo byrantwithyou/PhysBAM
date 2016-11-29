@@ -52,7 +52,7 @@ public:
         void Set_Reference_Point(const TV& reference_point) const
         {}
     
-        T operator()(const FACE_INDEX<TV::dimension>& face) const
+        T operator()(const FACE_INDEX<TV::m>& face) const
         {return face_lookup.projection.Face_Velocity_With_Ghost_Value_Multiphase(face_lookup.V_face,face.axis,face.index,reference_region);}
         
         T operator()(const int axis,const TV_INT& face) const

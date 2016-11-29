@@ -461,7 +461,7 @@ Revert_Cells_Near_Interface(const int iteration_number)
         for(CELL_ITERATOR<TV> iterator(euler.grid,1);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
             near_interface(cell_index) = (cut_cells_n(cell_index)!=0 || cut_cells_n_p_half(cell_index)!=0 || cut_cells_np1(cell_index)!=0);}
         for(CELL_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-            for(int dim=0;dim<TV::dimension;dim++) for(int n=-1;n<=1;n+=2){
+            for(int dim=0;dim<TV::m;dim++) for(int n=-1;n<=1;n+=2){
                 TV_INT neighbor_index=cell_index+n*TV_INT::Axis_Vector(dim);
                 if((cut_cells_n(cell_index) && (!cut_cells_n(cell_index)->dominant_element ||
                                                 !cut_cells_n(cell_index)->visibility(cut_cells_n(cell_index)->dominant_element).Contains(neighbor_index)))
@@ -484,8 +484,8 @@ void Add_Weight_To_Advection(const T weight, const VECTOR<int,d>& donor_cell, co
     // LOG::cout<<"Adding weight "<<weight<<" from "<<donor_cell<<" to "<<receiver_cell<<"; sigma("<<donor_cell<<") = "<<sigma(donor_cell)<<std::endl;
 }
 
-template<class TV> void Fill_Fluid_Velocity(const GRID<TV>& grid, const ARRAY<bool,VECTOR<int,TV::dimension> >& psi, const ARRAY<bool,VECTOR<int,TV::dimension> >& psi_new, const ARRAY<bool,VECTOR<int,TV::dimension> >& swept_cells,
-                                            const ARRAY<TV,VECTOR<int,TV::dimension> >& V_n, const ARRAY<VECTOR<typename TV::SCALAR,TV::dimension+2>,VECTOR<int,TV::dimension> >& U_new,ARRAY<TV,VECTOR<int,TV::dimension> >& velocity_field)
+template<class TV> void Fill_Fluid_Velocity(const GRID<TV>& grid, const ARRAY<bool,VECTOR<int,TV::m> >& psi, const ARRAY<bool,VECTOR<int,TV::m> >& psi_new, const ARRAY<bool,VECTOR<int,TV::m> >& swept_cells,
+                                            const ARRAY<TV,VECTOR<int,TV::m> >& V_n, const ARRAY<VECTOR<typename TV::SCALAR,TV::m+2>,VECTOR<int,TV::m> >& U_new,ARRAY<TV,VECTOR<int,TV::m> >& velocity_field)
 {
     typedef VECTOR<int,TV::m> TV_INT;
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
@@ -493,23 +493,23 @@ template<class TV> void Fill_Fluid_Velocity(const GRID<TV>& grid, const ARRAY<bo
         else if(swept_cells(cell_index)) velocity_field(cell_index)=V_n(cell_index);}
 }
 
-template<class TV> void Advect_Near_Interface_Data(const GRID<TV>& grid,const typename TV::SCALAR collision_thickness,const typename TV::SCALAR dt,const ARRAY<TV,VECTOR<int,TV::dimension> >& advection_velocity,const ARRAY<bool,VECTOR<int,TV::dimension> >& near_interface_mask,
-                                                   const ARRAY<bool,VECTOR<int,TV::dimension> >& swept_cells,const ARRAY<bool,VECTOR<int,TV::dimension> >& psi_np1,ARRAY<VECTOR<typename TV::SCALAR,TV::dimension+2>,FACE_INDEX<TV::dimension> > flux_boundary_conditions,
-                                                   const ARRAY<CUT_CELL<typename TV::SCALAR,TV::dimension>*,VECTOR<int,TV::dimension> >& cut_cells_n,  const ARRAY<typename TV::SCALAR,VECTOR<int,TV::dimension> >& cell_volumes_n,  const ARRAY<VECTOR<typename TV::SCALAR,TV::dimension+2>,VECTOR<int,TV::dimension> >& U_n,
-                                                   const ARRAY<CUT_CELL<typename TV::SCALAR,TV::dimension>*,VECTOR<int,TV::dimension> >& cut_cells_np1,const ARRAY<typename TV::SCALAR,VECTOR<int,TV::dimension> >& cell_volumes_np1,      ARRAY<VECTOR<typename TV::SCALAR,TV::dimension+2>,VECTOR<int,TV::dimension> >& U_np1)
+template<class TV> void Advect_Near_Interface_Data(const GRID<TV>& grid,const typename TV::SCALAR collision_thickness,const typename TV::SCALAR dt,const ARRAY<TV,VECTOR<int,TV::m> >& advection_velocity,const ARRAY<bool,VECTOR<int,TV::m> >& near_interface_mask,
+                                                   const ARRAY<bool,VECTOR<int,TV::m> >& swept_cells,const ARRAY<bool,VECTOR<int,TV::m> >& psi_np1,ARRAY<VECTOR<typename TV::SCALAR,TV::m+2>,FACE_INDEX<TV::m> > flux_boundary_conditions,
+                                                   const ARRAY<CUT_CELL<typename TV::SCALAR,TV::m>*,VECTOR<int,TV::m> >& cut_cells_n,  const ARRAY<typename TV::SCALAR,VECTOR<int,TV::m> >& cell_volumes_n,  const ARRAY<VECTOR<typename TV::SCALAR,TV::m+2>,VECTOR<int,TV::m> >& U_n,
+                                                   const ARRAY<CUT_CELL<typename TV::SCALAR,TV::m>*,VECTOR<int,TV::m> >& cut_cells_np1,const ARRAY<typename TV::SCALAR,VECTOR<int,TV::m> >& cell_volumes_np1,      ARRAY<VECTOR<typename TV::SCALAR,TV::m+2>,VECTOR<int,TV::m> >& U_np1)
 {   // TODO(jontg): Sparse data representation.
-    typedef typename TV::SCALAR T; typedef VECTOR<T,TV::dimension+2> TV_DIMENSION;
+    typedef typename TV::SCALAR T; typedef VECTOR<T,TV::m+2> TV_DIMENSION;
     typedef VECTOR<int,TV::m> TV_INT;
 
-    ARRAY<bool,VECTOR<int,TV::dimension> > near_interface(near_interface_mask);
+    ARRAY<bool,VECTOR<int,TV::m> > near_interface(near_interface_mask);
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(!psi_np1(iterator.Cell_Index())) near_interface(iterator.Cell_Index())=false;
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(near_interface(iterator.Cell_Index())) U_np1(iterator.Cell_Index())=TV_DIMENSION();
 
-    ARRAY<TRIPLE<FACE_INDEX<TV::dimension>,TV_INT,TV_INT> > hybrid_boundary_flux;
+    ARRAY<TRIPLE<FACE_INDEX<TV::m>,TV_INT,TV_INT> > hybrid_boundary_flux;
     for(FACE_ITERATOR<TV> iterator(grid,0,GRID<TV>::INTERIOR_REGION);iterator.Valid();iterator.Next()){
         TV_INT first_cell_index=iterator.First_Cell_Index(), second_cell_index=iterator.Second_Cell_Index();
         if((near_interface(first_cell_index) ^ near_interface(second_cell_index)) && psi_np1(first_cell_index) && psi_np1(second_cell_index))
-            hybrid_boundary_flux.Append(TRIPLE<FACE_INDEX<TV::dimension>,TV_INT,TV_INT>(iterator.Full_Index(),first_cell_index,second_cell_index));}
+            hybrid_boundary_flux.Append(TRIPLE<FACE_INDEX<TV::m>,TV_INT,TV_INT>(iterator.Full_Index(),first_cell_index,second_cell_index));}
 
     for(int variable_index=0;variable_index<TV_DIMENSION::dimension;variable_index++){
         ARRAY<PAIR<T,TV_INT> > weights;
@@ -532,7 +532,7 @@ template<class TV> void Advect_Near_Interface_Data(const GRID<TV>& grid,const ty
             if(swept_cells(cell_index)){
                 LOG::cout<<"Swept cell "<<cell_index<<" encountered"<<std::endl;
                 if(near_interface(cell_index)){ // Backward cast to populate a newly uncovered cell
-                    CUT_CELL<T,TV::dimension>* cut_cells=cut_cells_np1(cell_index);
+                    CUT_CELL<T,TV::m>* cut_cells=cut_cells_np1(cell_index);
                     if(cut_cells) for(int poly=0;poly<cut_cells->geometry.Size();poly++){
                         if(cut_cells->visibility(poly).Contains(cell_index)){
                             if(cut_cells->visibility(poly).Size()<=1) LOG::cout<<"Lost material in uncovered cell "<<cell_index<<" which has no visible neighbors at t_np1"<<std::endl;
@@ -546,7 +546,7 @@ template<class TV> void Advect_Near_Interface_Data(const GRID<TV>& grid,const ty
                                         Add_Weight_To_Advection(weight, neighbor, cell_index, weights, donors, receivers, sigma);}}}}}
                     else LOG::cout<<"Cell "<<cell_index<<" is swept but is not a cut cell at t_np1!"<<std::endl;}
 
-                CUT_CELL<T,TV::dimension>* cut_cells=cut_cells_n(cell_index); // Push out any data from a newly covered cell
+                CUT_CELL<T,TV::m>* cut_cells=cut_cells_n(cell_index); // Push out any data from a newly covered cell
                 if(cut_cells) for(int poly=0;poly<cut_cells->geometry.Size();poly++){
                         if(cut_cells->visibility(poly).Contains(cell_index)){
                             if(cut_cells->visibility(poly).Size()==1) LOG::cout<<"Lost material in uncovered cell "<<cell_index<<" which has no visible neighbors at t_n"<<std::endl;
@@ -576,7 +576,7 @@ template<class TV> void Advect_Near_Interface_Data(const GRID<TV>& grid,const ty
 
                 for(CELL_ITERATOR<TV> intersecting_iter(grid,affected_cells);intersecting_iter.Valid();intersecting_iter.Next()){
                     TV_INT donor_cell=intersecting_iter.Cell_Index();
-                    CUT_CELL<T,TV::dimension>* cut_cells=cut_cells_n(donor_cell);
+                    CUT_CELL<T,TV::m>* cut_cells=cut_cells_n(donor_cell);
                     if(!cut_cells){
                         if(swept_cells(donor_cell)) continue;// already handled in *forward* step above
                         if(near_interface(donor_cell) && (!visibility || visibility->Contains(donor_cell))){
@@ -625,7 +625,7 @@ template<class TV> void Advect_Near_Interface_Data(const GRID<TV>& grid,const ty
                     for(CELL_ITERATOR<TV> intersecting_iter(grid,affected_cells);intersecting_iter.Valid();intersecting_iter.Next()){
                         TV_INT receiver_cell=intersecting_iter.Cell_Index();
                         if(swept_cells(receiver_cell)) continue; // already handled in *backward* step above
-                        CUT_CELL<T,TV::dimension>* cut_cells=cut_cells_np1(receiver_cell);
+                        CUT_CELL<T,TV::m>* cut_cells=cut_cells_np1(receiver_cell);
                         if(!cut_cells){
                             if(near_interface(receiver_cell) && (!visibility || visibility->Contains(donor_cell))){
                                 T weight=cell_postimage.Intersection_Area(intersecting_iter.Bounding_Box());
@@ -674,14 +674,14 @@ Update_Cells_Near_Interface(const T dt,const int rk_order,const int rk_substep)
                 highest_eno_order.Component(axis)(face_index-offset*TV_INT::Axis_Vector(axis))=min(offset+1,highest_eno_order.Component(axis)(face_index-offset*TV_INT::Axis_Vector(axis)));
                 highest_eno_order.Component(axis)(face_index+offset*TV_INT::Axis_Vector(axis))=min(offset+1,highest_eno_order.Component(axis)(face_index+offset*TV_INT::Axis_Vector(axis)));}}}
 
-    for(FACE_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> face_index=iterator.Full_Index();
+    for(FACE_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::m> face_index=iterator.Full_Index();
         if(highest_eno_order(face_index)==saved_order) accumulated_flux(face_index) += euler.conservation->fluxes(face_index);}
 
     for(int ord=saved_order-2;ord>=0;--ord){
         euler.conservation->Set_Order(ord);
         euler.conservation->Update_Conservation_Law(euler.grid,euler.U,euler.U_ghost,euler.psi,dt,euler.eigensystems,euler.eigensystems_default,euler.euler_projection.elliptic_solver->psi_N,
                                                     euler.euler_projection.face_velocities,false,euler.open_boundaries);
-        for(FACE_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> face_index=iterator.Full_Index();
+        for(FACE_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::m> face_index=iterator.Full_Index();
             if(highest_eno_order(face_index)==ord && !(near_interface(iterator.First_Cell_Index()) && near_interface(iterator.Second_Cell_Index())))
                 accumulated_flux(face_index) += euler.conservation->fluxes(face_index);}}
     euler.conservation->Set_Order(saved_order);

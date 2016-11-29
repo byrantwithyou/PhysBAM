@@ -18,7 +18,7 @@ namespace PhysBAM{
 template<class TV>
 class MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED:public MATRIX_FLUID_INTERPOLATION_BASE<TV>
 {
-    enum WORKAROUND {d=TV::dimension};
+    enum WORKAROUND {d=TV::m};
     typedef typename TV::SCALAR T;typedef VECTOR<int,d> TV_INT;
     using MATRIX_FLUID_INTERPOLATION_BASE<TV>::index_map;
 

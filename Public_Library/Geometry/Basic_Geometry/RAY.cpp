@@ -12,7 +12,7 @@ namespace PhysBAM{
 template<class TV> void RAY<TV>::
 Compute_Lazy_Box_Intersection_Acceleration_Data()
 {
-    STATIC_ASSERT(TV::dimension==3);
+    STATIC_ASSERT(TV::m==3);
     if(computed_lazy_box_intersection_acceleration_data) return;
     const T tolerance=(T)1e-10,large_number=(T)1e10;
     if(direction.x<0){direction_is_negative.x=1;inverse_direction.x=(direction.x<-tolerance)?1/direction.x:-large_number;}

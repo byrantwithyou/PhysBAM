@@ -22,7 +22,7 @@ template<class TV> class GENERALIZED_FLUID_MASS;
 template<class TV>
 class MATRIX_FLUID_INTERPOLATION_BASE:public NONCOPYABLE,public SYSTEM_MATRIX_BASE<typename TV::SCALAR>
 {
-    enum WORKAROUND {d=TV::dimension};
+    enum WORKAROUND {d=TV::m};
     typedef typename TV::SCALAR T;
 protected:
     COLLISION_AWARE_INDEX_MAP<TV>& index_map;

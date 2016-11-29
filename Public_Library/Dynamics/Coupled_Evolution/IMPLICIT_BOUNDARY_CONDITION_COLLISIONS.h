@@ -12,7 +12,7 @@ namespace PhysBAM{
 template<class TV>
 class IMPLICIT_BOUNDARY_CONDITION_COLLISIONS:public IMPLICIT_BOUNDARY_CONDITION<TV>
 {
-    typedef VECTOR<int,TV::dimension> TV_INT;typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;typedef typename TV::SCALAR T;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX T_SIMPLEX;
 
     COLLISION_BODY_COLLECTION<TV>& collision_geometry_collection;
@@ -25,8 +25,8 @@ public:
     virtual ~IMPLICIT_BOUNDARY_CONDITION_COLLISIONS();
 
 //#####################################################################
-    void Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N,ARRAY<T,TV_INT>& p,
-        ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities,const T time) override;
+    void Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,ARRAY<T,TV_INT>& p,
+        ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T time) override;
 //#####################################################################
 };
 }

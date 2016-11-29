@@ -103,7 +103,7 @@ Initialize_Interface(RANGE<TV_INT>& domain,ARRAY<T,TV_INT>& phi_ghost,ARRAY<bool
     if(seed_indices){
         for(int i=0;i<seed_indices->m;i++)Add_To_Initial(done,close_k,(*seed_indices)(i));
         if(add_seed_indices_for_ghost_cells){
-            for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
+            for(int axis=0;axis<TV::m;axis++) for(int side=0;side<2;side++){
                 RANGE<TV_INT> ghost_domain=domain;if(side==0) ghost_domain.max_corner(axis)=interior_domain.min_corner(axis)-1;else ghost_domain.min_corner(axis)=interior_domain.max_corner(axis)+1;
                 for(CELL_ITERATOR<TV> iterator(cell_grid,ghost_domain);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
                     for(int i=0;i<GRID<TV>::number_of_neighbors_per_cell;i++){TV_INT neighbor_index(iterator.Cell_Neighbor(i));
@@ -114,7 +114,7 @@ Initialize_Interface(RANGE<TV_INT>& domain,ARRAY<T,TV_INT>& phi_ghost,ARRAY<bool
         ARRAY<T,TV_INT> phi_new(domain.Thickened(1),false); // same size as done and close_k for array accelerations
         phi_new.Fill(2*cell_grid.dX.Max()); // ok positive, since minmag is used below
         if(Neighbor_Visible){
-            for(int axis=0;axis<TV::dimension;axis++){
+            for(int axis=0;axis<TV::m;axis++){
                 domain.min_corner(axis)++;
                 for(FACE_ITERATOR<TV> iterator(cell_grid,domain,axis);iterator.Valid();iterator.Next()){TV_INT index1=iterator.First_Cell_Index(),index2=iterator.Second_Cell_Index();
                     if(!Neighbor_Visible(iterator.Axis(),index1)){
@@ -124,7 +124,7 @@ Initialize_Interface(RANGE<TV_INT>& domain,ARRAY<T,TV_INT>& phi_ghost,ARRAY<bool
                         Add_To_Initial(done,close_k,index1);Add_To_Initial(done,close_k,index2);}}
                 domain.min_corner(axis)--;}}
         else{
-            for(int axis=0;axis<TV::dimension;axis++){
+            for(int axis=0;axis<TV::m;axis++){
                 domain.min_corner(axis)++;
                 for(FACE_ITERATOR<TV> iterator(cell_grid,domain,axis);iterator.Valid();iterator.Next()){TV_INT index1=iterator.First_Cell_Index(),index2=iterator.Second_Cell_Index();
                     if(LEVELSET_UTILITIES<T>::Interface(phi_ghost(index1),phi_ghost(index2))){

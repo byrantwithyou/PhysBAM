@@ -174,7 +174,7 @@ Intersection_List(const int box,const T_HYPERPLANE& test_plane,ARRAY<int>& inter
 // Function Intersection_List
 //#####################################################################
 template<class TV> void BOX_HIERARCHY<TV>::
-Intersection_List(const int box,const IMPLICIT_OBJECT<TV>& implicit_object,const MATRIX<T,TV::dimension>& rotation,const TV& translation,ARRAY<int>& intersection_list,const T contour_value) const
+Intersection_List(const int box,const IMPLICIT_OBJECT<TV>& implicit_object,const MATRIX<T,TV::m>& rotation,const TV& translation,ARRAY<int>& intersection_list,const T contour_value) const
 {
     PHYSBAM_ASSERT(box_radius.m==box_hierarchy.m);
     traversal_stack.Remove_All();traversal_stack.Push(box);

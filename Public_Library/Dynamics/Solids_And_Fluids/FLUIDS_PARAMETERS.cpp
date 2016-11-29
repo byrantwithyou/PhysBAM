@@ -132,7 +132,7 @@ Initialize_Turbulence(const T time,const T frame_rate)
 template<class TV> void FLUIDS_PARAMETERS<TV>::
 Initialize_Domain_Boundary_Conditions()
 {
-    VECTOR<VECTOR<bool,2>,TV::dimension> domain_open_boundaries=VECTOR_UTILITIES::Complement(domain_walls);
+    VECTOR<VECTOR<bool,2>,TV::m> domain_open_boundaries=VECTOR_UTILITIES::Complement(domain_walls);
     if(phi_boundary) phi_boundary->Set_Constant_Extrapolation(domain_open_boundaries);
     if(fluid_boundary) fluid_boundary->Set_Constant_Extrapolation(domain_open_boundaries);
 

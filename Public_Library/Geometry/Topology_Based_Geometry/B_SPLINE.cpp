@@ -255,7 +255,7 @@ Name() const
 template<class TV, int d> std::string B_SPLINE<TV,d>::
 Static_Name()
 {
-    return LOG::sprintf("B_SPLINE<VECTOR<T,%d> ,%d>",TV::dimension,d);
+    return LOG::sprintf("B_SPLINE<VECTOR<T,%d> ,%d>",TV::m,d);
 }
 //#####################################################################
 // Function Extension

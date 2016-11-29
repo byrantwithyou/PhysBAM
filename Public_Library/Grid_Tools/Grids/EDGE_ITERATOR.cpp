@@ -47,7 +47,7 @@ template<class TV> void EDGE_ITERATOR<TV>::
 Next_Helper()
 {
     GRID_ITERATOR_BASE<TV>::Next_Helper();
-    if(!valid && !single_axis && axis<TV::dimension-1) Reset_Axis(axis+1);
+    if(!valid && !single_axis && axis<TV::m-1) Reset_Axis(axis+1);
 }
 //#####################################################################
 // Function Reset_Axis

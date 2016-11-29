@@ -29,7 +29,7 @@ template<class TV,class T2> class BOUNDARY_REFLECTION_UNIFORM;
 template <class TV>
 class FLUIDS_PARAMETERS:public NONCOPYABLE
 {
-    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::dimension> TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T> T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
     typedef ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,TV> T_ADVECTION_SEMI_LAGRANGIAN_VECTOR;
     typedef ADVECTION_HAMILTON_JACOBI_WENO<TV,T> T_ADVECTION_HAMILTON_JACOBI_WENO_SCALAR;
@@ -46,7 +46,7 @@ protected:
     bool need_destroy_grid;
 public:
     int maximum_tree_depth;
-    VECTOR<VECTOR<bool,2>,TV::dimension> domain_walls;
+    VECTOR<VECTOR<bool,2>,TV::m> domain_walls;
     T levelset_refinement_bandwidth;
     bool minimal_air_bandwidth;
     BOUNDARY<TV,T>* phi_boundary;

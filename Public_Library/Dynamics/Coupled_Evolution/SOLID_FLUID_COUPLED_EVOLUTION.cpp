@@ -562,7 +562,7 @@ Transfer_Momentum_And_Set_Boundary_Conditions(const T time,GENERALIZED_VELOCITY<
             RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(rigid_body_id);
 
             T_THIN_SHELL_SIMPLEX velocity_line(rigid_body.simplicial_object->Get_Element(rigid_simplex_index));
-            for(int i=0;i<TV::dimension;i++)
+            for(int i=0;i<TV::m;i++)
                 velocity_line.X(i)=rigid_body.Frame()*velocity_line.X(i);
             velocity_lines.Append(velocity_line);
             jet_velocities.Append(rigid_simplex_jet_velocities(rigid_simplex)*orientation);}
@@ -585,7 +585,7 @@ Transfer_Momentum_And_Set_Boundary_Conditions(const T time,GENERALIZED_VELOCITY<
             bounding_grid_cells.Change_Size(1);
             // wonder if this works
             TV total_length_by_dimension;
-            for(int axis=0;axis<TV::dimension;axis++){
+            for(int axis=0;axis<TV::m;axis++){
                 for(FACE_ITERATOR<TV> iterator(grid,bounding_grid_cells,axis);iterator.Valid();iterator.Next()){
                     RANGE<TV> dual_cell=iterator.Dual_Cell();
                     const TV_INT& face_index=iterator.Face_Index();
@@ -728,7 +728,7 @@ Compute_W(const T current_position_time)
     collision_bodies.Compute_Psi_N_Zero_Velocity(dual_cell_contains_solid,0);
     POISSON_COLLIDABLE_UNIFORM<TV>* poisson=Get_Poisson();
     fluids_parameters.Set_Domain_Boundary_Conditions(*poisson,face_velocities,current_position_time);
-    const T one_over_number_nodes_thin_shell=(T)1/TV::dimension;
+    const T one_over_number_nodes_thin_shell=(T)1/TV::m;
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();
         const TV axis_vector=TV::Axis_Vector(axis);const TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index();
         const RANGE<TV> dual_cell=iterator.Dual_Cell().Thickened(grid.dX.Min()*(T)1e-2);
@@ -828,7 +828,7 @@ template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION<TV>::
 Compute_Coupling_Terms_Deformable(const ARRAY<int,TV_INT>& cell_index_to_matrix_index,const ARRAY<INTERVAL<int> >& interior_regions,const int colors)
 {
     ARRAY<ARRAY<int> > row_counts(colors);
-    for(int i=0;i<colors;i++) row_counts(i).Resize(solid_body_collection.deformable_body_collection.dynamic_particles.Size()*TV::dimension); // TODO: fix // TODO: is this right?
+    for(int i=0;i<colors;i++) row_counts(i).Resize(solid_body_collection.deformable_body_collection.dynamic_particles.Size()*TV::m); // TODO: fix // TODO: is this right?
 
     // have face weights.  Want to set up W^T * \nabla.  dual cells correspond to rows of W.
     // stencil for grad p looks like (p_i+1 - p_i)/dx
@@ -853,7 +853,7 @@ Compute_Coupling_Terms_Deformable(const ARRAY<int,TV_INT>& cell_index_to_matrix_
             if(right_column_color>=0 && second_cell_index(axis)<domain_indices.max_corner(axis))
                 right_column_index=cell_index_to_matrix_index(second_cell_index);
             for(int i=0;i<dual_cell_weight.m;i++){
-                int j_row=TV::dimension*dual_cell_weight(i).x+axis;
+                int j_row=TV::m*dual_cell_weight(i).x+axis;
                 if(left_column_index>=0) row_counts(left_column_color)(j_row)++;
                 if(right_column_index>=0) row_counts(right_column_color)(j_row)++;
                 if(!fluids_parameters.compressible){
@@ -891,7 +891,7 @@ Compute_Coupling_Terms_Deformable(const ARRAY<int,TV_INT>& cell_index_to_matrix_
             if(right_column_color>=0 && second_cell_index(axis)<domain_indices.max_corner(axis)){
                 right_column_weight=(T)one_over_dx(axis);right_column_index=cell_index_to_matrix_index(second_cell_index);}
             for(int i=0;i<dual_cell_weight.m;i++){
-                int j_row=TV::dimension*dual_cell_weight(i).x+axis;T weight=dual_cell_weight(i).y;
+                int j_row=TV::m*dual_cell_weight(i).x+axis;T weight=dual_cell_weight(i).y;
                 if(left_column_index>=0) J_deformable(left_column_color).Add_Element(j_row,left_column_index,weight*left_column_weight);
                 if(right_column_index>=0) J_deformable(right_column_color).Add_Element(j_row,right_column_index,weight*right_column_weight);}}
         for(int i=0;i<colors;i++){SPARSE_MATRIX_FLAT_MXN<T> temp(J_deformable(i));temp.Compress(J_deformable(i));}}
@@ -941,10 +941,10 @@ Compute_Coupling_Terms_Rigid(const ARRAY<int,TV_INT>& cell_index_to_matrix_index
                 if(!fluids_parameters.fluid_affects_solid || rigid_body.Has_Infinite_Inertia()){
                     if(left_column_index>=0){
                         kinematic_row_counts(left_column_color)(base_row+axis)++;
-                        for(int j=0;j<T_SPIN::dimension;j++) kinematic_row_counts(left_column_color)(base_row+TV::dimension+j)++;}
+                        for(int j=0;j<T_SPIN::m;j++) kinematic_row_counts(left_column_color)(base_row+TV::m+j)++;}
                     if(right_column_index>=0){
                         kinematic_row_counts(right_column_color)(base_row+axis)++;
-                        for(int j=0;j<T_SPIN::dimension;j++) kinematic_row_counts(right_column_color)(base_row+TV::dimension+j)++;}}
+                        for(int j=0;j<T_SPIN::m;j++) kinematic_row_counts(right_column_color)(base_row+TV::m+j)++;}}
                 else{
                     const T weight=dual_cell_weight(i).y;
                     const int rigid_body_index=rigid_body_particles_to_dynamic_rigid_body_particles_map(rigid_body_id);
@@ -955,12 +955,12 @@ Compute_Coupling_Terms_Rigid(const ARRAY<int,TV_INT>& cell_index_to_matrix_index
                         rigid_body_updated_center_of_mass(rigid_body_index)(axis)+=location(axis)*dual_cell_fluid_mass_on_body;}
                     if(left_column_index>=0){
                         row_counts(left_column_color)(base_row+axis)++;kinematic_row_counts(left_column_color)(base_row+axis)++;
-                        for(int j=0;j<T_SPIN::dimension;j++){
-                            row_counts(left_column_color)(base_row+TV::dimension+j)++;kinematic_row_counts(left_column_color)(base_row+axis)++;}}
+                        for(int j=0;j<T_SPIN::m;j++){
+                            row_counts(left_column_color)(base_row+TV::m+j)++;kinematic_row_counts(left_column_color)(base_row+axis)++;}}
                     if(right_column_index>=0){
                         row_counts(right_column_color)(base_row+axis)++;kinematic_row_counts(right_column_color)(base_row+axis)++;
-                        for(int j=0;j<T_SPIN::dimension;j++){
-                            row_counts(right_column_color)(base_row+TV::dimension+j)++;kinematic_row_counts(right_column_color)(base_row+axis)++;}}}}}
+                        for(int j=0;j<T_SPIN::m;j++){
+                            row_counts(right_column_color)(base_row+TV::m+j)++;kinematic_row_counts(right_column_color)(base_row+axis)++;}}}}}
 
         for(int i=0;i<J_rigid_kinematic.m;i++){
             J_rigid_kinematic(i).n=interior_regions(i).Size();J_rigid_kinematic(i).Set_Row_Lengths(kinematic_row_counts(i));
@@ -1027,20 +1027,20 @@ Compute_Coupling_Terms_Rigid(const ARRAY<int,TV_INT>& cell_index_to_matrix_index
                 if(!fluids_parameters.fluid_affects_solid || rigid_body.Has_Infinite_Inertia()){
                     if(left_column_index>=0){
                         J_rigid_kinematic(left_column_color).Add_Element(base_row+axis,left_column_index,weight*left_column_weight);
-                        for(int j=0;j<T_SPIN::dimension;j++) J_rigid_kinematic(left_column_color).Add_Element(base_row+TV::dimension+j,left_column_index,weight*left_column_weight*cross_product(j));}
+                        for(int j=0;j<T_SPIN::m;j++) J_rigid_kinematic(left_column_color).Add_Element(base_row+TV::m+j,left_column_index,weight*left_column_weight*cross_product(j));}
                     if(right_column_index>=0){
                         J_rigid_kinematic(right_column_color).Add_Element(base_row+axis,right_column_index,weight*right_column_weight);
-                        for(int j=0;j<T_SPIN::dimension;j++) J_rigid_kinematic(right_column_color).Add_Element(base_row+TV::dimension+j,right_column_index,weight*right_column_weight*cross_product(j));}}
+                        for(int j=0;j<T_SPIN::m;j++) J_rigid_kinematic(right_column_color).Add_Element(base_row+TV::m+j,right_column_index,weight*right_column_weight*cross_product(j));}}
                 else{
                     if(!fluids_parameters.compressible){
                         const T dual_cell_fluid_mass_on_body=Get_Density_At_Face(axis,face_index)*dual_cell_fluid_volume(axis,face_index)*weight;
                         rigid_body_fluid_inertia(rigid_body_particles_to_dynamic_rigid_body_particles_map(rigid_body_id))+=dual_cell_fluid_mass_on_body*SYMMETRIC_MATRIX<T,TV::SPIN::m>::Outer_Product(cross_product);}
                     if(left_column_index>=0){
                         J_rigid(left_column_color).Add_Element(base_row+axis,left_column_index,weight*left_column_weight);
-                        for(int j=0;j<T_SPIN::dimension;j++) J_rigid(left_column_color).Add_Element(base_row+TV::dimension+j,left_column_index,weight*left_column_weight*cross_product(j));}
+                        for(int j=0;j<T_SPIN::m;j++) J_rigid(left_column_color).Add_Element(base_row+TV::m+j,left_column_index,weight*left_column_weight*cross_product(j));}
                     if(right_column_index>=0){
                         J_rigid(right_column_color).Add_Element(base_row+axis,right_column_index,weight*right_column_weight);
-                        for(int j=0;j<T_SPIN::dimension;j++) J_rigid(right_column_color).Add_Element(base_row+TV::dimension+j,right_column_index,weight*right_column_weight*cross_product(j));}}}}}
+                        for(int j=0;j<T_SPIN::m;j++) J_rigid(right_column_color).Add_Element(base_row+TV::m+j,right_column_index,weight*right_column_weight*cross_product(j));}}}}}
 
     if(!fluids_parameters.compressible && solids_fluids_parameters.mpi_solid_fluid){ // TODO see if we can change this to a single direction send
         int inertia_tensor_size=TV::SPIN::m*TV::SPIN::m;

@@ -45,7 +45,7 @@ public:
         DOMAIN_ITERATOR_THREADED_ALPHA<ARRAYS_ND_BASE<T2,TV_INT>,TV>(u.Domain_Indices(),&thread_queue).template Run<const ARRAYS_ND_BASE<T2,TV_INT>&,ARRAYS_ND_BASE<T2,TV_INT>&>(u_ghost,&ARRAYS_ND_BASE<T2,TV_INT>::Put_With_Range,u,u_ghost);
         VECTOR<RANGE<TV_INT>,2*TV::m> regions;boundary.Find_Ghost_Regions(grid,regions,number_of_ghost_cells_input);
         for(int side=0;side<GRID<TV>::number_of_faces_per_cell;side++){int axis=side/2;
-            DOMAIN_ITERATOR_THREADED_ALPHA<BOUNDARY<TV,T2>,TV>(regions(side),&thread_queue,axis%TV::dimension+1).template Run<const GRID<TV>&,ARRAYS_ND_BASE<T2,TV_INT>&,int>(boundary,&BOUNDARY<TV,T2>::Fill_Single_Ghost_Region_Threaded,grid,u_ghost,side);}
+            DOMAIN_ITERATOR_THREADED_ALPHA<BOUNDARY<TV,T2>,TV>(regions(side),&thread_queue,axis%TV::m+1).template Run<const GRID<TV>&,ARRAYS_ND_BASE<T2,TV_INT>&,int>(boundary,&BOUNDARY<TV,T2>::Fill_Single_Ghost_Region_Threaded,grid,u_ghost,side);}
     }
 
     void Fill_Ghost_Faces(const GRID<TV>& grid,const T_FACE_ARRAYS_T2& u,T_FACE_ARRAYS_T2& u_ghost,const T time,const int number_of_ghost_cells_input) const override

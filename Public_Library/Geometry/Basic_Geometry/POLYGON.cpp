@@ -47,7 +47,7 @@ void Constructor_Helper(POLYGON<VECTOR<T,3> >& p, const RANGE<VECTOR<T,3> >& ran
 };
 template<class TV> POLYGON<TV>::
 POLYGON(const RANGE<TV>& range)
-    :X(1<<TV::dimension)
+    :X(1<<TV::m)
 {Constructor_Helper<T>(*this,range);}
 //#####################################################################
 // Function Area

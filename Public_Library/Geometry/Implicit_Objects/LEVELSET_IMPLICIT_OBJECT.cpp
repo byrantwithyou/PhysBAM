@@ -257,7 +257,7 @@ Translate(const TV& translation)
 template<class TV> std::string LEVELSET_IMPLICIT_OBJECT<TV>::
 Static_Name()
 {
-    return LOG::sprintf("LEVELSET_IMPLICIT_OBJECT<T,VECTOR<T,%d> >",TV::dimension);
+    return LOG::sprintf("LEVELSET_IMPLICIT_OBJECT<T,VECTOR<T,%d> >",TV::m);
 }
 //#####################################################################
 // Function Extension
@@ -265,7 +265,7 @@ Static_Name()
 template<class TV> std::string LEVELSET_IMPLICIT_OBJECT<TV>::
 Static_Extension()
 {
-    return TV::dimension==2?"phi2d":"phi";
+    return TV::m==2?"phi2d":"phi";
 }
 //#####################################################################
 // Function Integration_Step
