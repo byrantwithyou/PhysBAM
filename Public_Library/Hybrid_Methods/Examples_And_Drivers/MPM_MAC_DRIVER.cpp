@@ -19,10 +19,8 @@
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
 #include <Hybrid_Methods/MPM_PLASTICITY_MODEL.h>
-#include <Hybrid_Methods/System/FLUID_KRYLOV_SYSTEM.h>
-#include <Hybrid_Methods/System/FLUID_KRYLOV_VECTOR.h>
-#include <Hybrid_Methods/System/KKT_KRYLOV_SYSTEM.h>
-#include <Hybrid_Methods/System/KKT_KRYLOV_VECTOR.h>
+#include <Hybrid_Methods/Projection/MPM_PROJECTION_SYSTEM.h>
+#include <Hybrid_Methods/Projection/MPM_PROJECTION_VECTOR.h>
 #include <Hybrid_Methods/System/MPM_KRYLOV_VECTOR.h>
 #include <Hybrid_Methods/System/MPM_OBJECTIVE.h>
 #ifdef USE_OPENMP
@@ -74,7 +72,6 @@ Initialize()
     output_number=current_frame=example.restart;
 
     example.Initialize();
-    example.projection=new PROJECTION_UNIFORM<TV>(example.grid,false,true);
 
     PHYSBAM_ASSERT(example.grid.Is_MAC_Grid());
     if(example.restart)
@@ -94,8 +91,6 @@ Initialize()
     example.location.Resize(example.grid,example.ghost);
     for(FACE_ITERATOR<TV> it(example.grid,example.ghost);it.Valid();it.Next())
         example.location(it.Full_Index())=it.Location();
-
-    example.projection->Initialize_Grid(example.grid);
 
     // TODO
     // for(CELL_ITERATOR<TV> iterator(example.grid,example.ghost,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next()){
@@ -281,43 +276,109 @@ Grid_To_Particle()
         });
 }
 //#####################################################################
+// Function Compute_Poisson_Matrix
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Compute_Poisson_Matrix()
+{
+    ARRAY<bool,FACE_INDEX<TV::m> > psi_N(example.grid);
+    for(FACE_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
+        TV X=it.Location();
+        for(int i=0;i<example.collision_objects.m;i++){
+            MPM_COLLISION_OBJECT<TV>* o=example.collision_objects(i);
+            if(o->Phi(X,example.time)<0){
+                psi_N(it.Full_Index())=true;
+                example.velocity(it.Full_Index())=o->Velocity(X,example.time)(it.axis);
+                break;}}}
+
+    ARRAY<int,TV_INT> cell_index(example.grid.Domain_Indices(1));
+    int next_cell=0;
+    for(CELL_ITERATOR<TV> it(example.grid,0);it.Valid();it.Next()){
+        bool dirichlet=false,all_N=true;
+        for(int a=0;a<TV::m;a++){
+            FACE_INDEX<TV::m> face(a,it.index);
+            for(int s=0;s<2;s++){
+                if(!psi_N(face)){
+                    all_N=false;
+                    if(!example.mass(face)) dirichlet=true;}
+                face.index(a)++;}}
+        cell_index(it.index)=(all_N || dirichlet)?-1:next_cell++;}
+    for(CELL_ITERATOR<TV> it(example.grid,1,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
+        cell_index(it.index)=-1;
+
+    SPARSE_MATRIX_FLAT_MXN<T>& A=example.projection_system.A;
+    A.Reset(next_cell);
+    for(CELL_ITERATOR<TV> it(example.grid,0);it.Valid();it.Next()){
+        int center_index=cell_index(it.index);
+        if(center_index<0) continue;
+    
+        T diag=0;
+        for(int a=0;a<TV::m;a++){
+            FACE_INDEX<TV::m> face(a,it.index);
+            for(int s=0;s<2;s++){
+                TV_INT cell=it.index;
+                cell(a)+=2*s-1;
+                assert(face.Cell_Index(s)==cell);
+                if(!psi_N(face)){
+                    T entry=sqr(example.grid.one_over_dX(a))/example.mass(face);
+                    diag+=entry;
+                    int ci=cell_index(cell);
+                    if(ci>=0) A.Append_Entry_To_Current_Row(ci,-entry);}
+                face.index(a)++;}}
+        A.Append_Entry_To_Current_Row(center_index,diag);
+        A.Finish_Row();}
+    A.Sort_Entries();
+    A.Construct_Incomplete_Cholesky_Factorization();
+
+    SPARSE_MATRIX_FLAT_MXN<T>& G=example.projection_system.gradient;
+    ARRAY<T>& M=example.projection_system.mass;
+    ARRAY<FACE_INDEX<TV::m> >& faces=example.projection_system.faces;
+    M.Remove_All();
+    faces.Remove_All();
+    G.Reset(next_cell);
+    for(FACE_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
+        if(psi_N(it.Full_Index())) continue;
+        T mass=example.mass(it.Full_Index());
+        if(!mass) continue;
+        int c0=cell_index(it.First_Cell_Index());
+        int c1=cell_index(it.Second_Cell_Index());
+        if(c0>=0) G.Append_Entry_To_Current_Row(c0,-example.grid.one_over_dX(it.axis));
+        if(c1>=0) G.Append_Entry_To_Current_Row(c1,example.grid.one_over_dX(it.axis));
+        if(c0<0 && c1<0) continue;
+        faces.Append(it.Full_Index());
+        M.Append(mass);
+        G.Finish_Row();}
+    G.Sort_Entries();
+}
+//#####################################################################
 // Function Pressure_Projection
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Pressure_Projection()
 {
-    example.projection->elliptic_solver->use_psi_R=false;
-    example.projection->elliptic_solver->periodic_boundary.Fill(false);
-    ARRAY<bool,TV_INT>& psi_D=example.projection->elliptic_solver->psi_D;
-    ARRAY<bool,FACE_INDEX<TV::m> >& psi_N=example.projection->elliptic_solver->psi_N;
-    psi_D.Fill(false);
-    example.projection->elliptic_solver->Set_Dirichlet_Outer_Boundaries();
+    Compute_Poisson_Matrix();
+    example.sol.v.Resize(example.projection_system.A.m);
+    example.rhs.v.Resize(example.projection_system.A.m);
 
-    for(FACE_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
-        TV X=it.Location();
-        bool fixed=false;
-        for(int i=0;i<example.collision_objects.m;i++){
-            MPM_COLLISION_OBJECT<TV>* o=example.collision_objects(i);
-            if(o->Phi(X,example.time)<0){
-                fixed=true;
-                psi_N(it.Full_Index())=true;
-                example.velocity(it.Full_Index())=o->Velocity(X,example.time)(it.axis);
-                break;}}
-        if(fixed) continue;
-        if(!example.mass(it.Full_Index())){
-            psi_D(it.First_Cell_Index())=true;
-            psi_D(it.Second_Cell_Index())=true;}
-        else{
-            example.projection->poisson->beta_face(it.Full_Index())=1/example.mass(it.Full_Index());}}
-
-    for(FACE_ITERATOR<TV> it(example.grid,1);it.Valid();it.Next())
-        if(psi_N(it.Full_Index()))
-            Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,1,1));
-    for(CELL_ITERATOR<TV> it(example.grid,1);it.Valid();it.Next())
-        if(psi_D(it.index))
-            Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,1));
+    ARRAY<T> tmp(example.projection_system.gradient.m);
+    for(int i=0;i<tmp.m;i++)
+        tmp(i)=example.velocity(example.projection_system.faces(i));
+    example.projection_system.gradient.Transpose_Times(tmp,example.rhs.v);
     
-    example.projection->Make_Divergence_Free(example.velocity,example.dt,example.time);
+    example.projection_system.Test_System(example.sol);
+    
+    CONJUGATE_GRADIENT<T> cg;
+    cg.finish_before_indefiniteness=true;
+    cg.relative_tolerance=true;
+    cg.print_diagnostics=true;
+    cg.print_residuals=true;
+    bool converged=cg.Solve(example.projection_system,example.sol,example.rhs,
+        example.av,example.solver_tolerance,0,example.solver_iterations);
+    if(!converged) LOG::printf("SOLVER DID NOT CONVERGE.\n");
+
+    example.projection_system.gradient.Times(example.sol.v,tmp);
+    for(int i=0;i<tmp.m;i++)
+        example.velocity(example.projection_system.faces(i))-=tmp(i)/example.projection_system.mass(i);
 }
 //#####################################################################
 // Function Apply_Forces

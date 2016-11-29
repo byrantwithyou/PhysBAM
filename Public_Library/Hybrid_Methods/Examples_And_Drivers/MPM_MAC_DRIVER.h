@@ -48,6 +48,7 @@ public:
     void Print_Grid_Stats(const char* str,T dt);
     void Print_Particle_Stats(const char* str,T dt);
     void Print_Energy_Stats(const char* str);
+    void Compute_Poisson_Matrix();
 //#####################################################################
 };
 }

@@ -11,6 +11,8 @@
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS_SPLINE.h>
 #include <Hybrid_Methods/MPM_PLASTICITY_MODEL.h>
+#include <Hybrid_Methods/Projection/MPM_PROJECTION_SYSTEM.h>
+#include <Hybrid_Methods/Projection/MPM_PROJECTION_VECTOR.h>
 #include <Hybrid_Methods/System/MPM_KRYLOV_VECTOR.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -18,13 +20,15 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> MPM_MAC_EXAMPLE<TV>::
 MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type)
-    :stream_type(stream_type),particles(*new MPM_PARTICLES<TV>),projection(0),
+    :stream_type(stream_type),particles(*new MPM_PARTICLES<TV>),
+    projection_system(*new MPM_PROJECTION_SYSTEM<TV>),
+    sol(*new MPM_PROJECTION_VECTOR<TV>),rhs(*new MPM_PROJECTION_VECTOR<TV>),
     ghost(3),gather_scatter(*new GATHER_SCATTER<TV>(grid,simulated_particles)),
     use_affine(true),use_early_gradient_transfer(false),initial_time(0),
     last_frame(100),write_substeps_level(-1),substeps_delay_frame(-1),
     output_directory("output"),data_directory("../../Public_Data"),restart(0),
     dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),
-    only_write_particles(false),cfl(1),solver_tolerance(.5),solver_iterations(1000),
+    only_write_particles(false),cfl(1),solver_tolerance(std::numeric_limits<T>::epsilon()*10),solver_iterations(1000),
     threads(1),debug_particles(*new DEBUG_PARTICLES<TV>),print_stats(false),
     last_te(0),last_grid_ke(0)
 {

@@ -22,6 +22,9 @@ template<class TV> class PARTICLE_GRID_FORCES;
 template<class TV> class PARTICLE_GRID_WEIGHTS;
 template<class TV> class MPM_PLASTICITY_MODEL;
 template<class TV> class PROJECTION_UNIFORM;
+template<class TV> class MPM_PROJECTION_SYSTEM;
+template<class TV> class MPM_PROJECTION_VECTOR;
+template<class TV> class KRYLOV_VECTOR_BASE;
 
 template<class TV>
 class MPM_MAC_EXAMPLE:public NONCOPYABLE
@@ -44,7 +47,10 @@ public:
     ARRAY<TV,FACE_INDEX<TV::m> > location;
     ARRAY<int> valid_flat_indices;
     ARRAY<FACE_INDEX<TV::m> > valid_indices;
-    PROJECTION_UNIFORM<TV>* projection;
+    MPM_PROJECTION_SYSTEM<TV>& projection_system;
+    ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
+    MPM_PROJECTION_VECTOR<TV>& sol;
+    MPM_PROJECTION_VECTOR<TV>& rhs;
     int ghost;
 
     // transfer stuff
