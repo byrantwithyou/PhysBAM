@@ -192,6 +192,12 @@ public:
     void Change_Size(const TV& delta)
     {min_corner-=delta;max_corner+=delta;}
 
+    void Shift(const TV& delta)
+    {min_corner+=delta;max_corner+=delta;}
+
+    void Shift(const T delta)
+    {min_corner+=delta;max_corner+=delta;}
+
     RANGE<TV> Thickened(const T thickness_over_two) const
     {return RANGE<TV>(min_corner-thickness_over_two,max_corner+thickness_over_two);}
 

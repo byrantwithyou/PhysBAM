@@ -47,7 +47,7 @@ public:
 //#####################################################################
     ORIENTED_BOX<TV> Get_Oriented_Bounding_Box(T radius_x,T radius_yz,const TV& position,const TV& major_axis) const;
     RANGE<TV> Get_Bounding_Box(T radius_x,T radius_yz,const TV& position,const TV& major_axis) const;
-    RANGE<TV> Get_Bounding_Box(const ELLIPSOID<T>& ellipsoid) const;
+    RANGE<TV> Get_Bounding_Box(const ELLIPSOID<TV>& ellipsoid) const;
 //#####################################################################
 };
 }

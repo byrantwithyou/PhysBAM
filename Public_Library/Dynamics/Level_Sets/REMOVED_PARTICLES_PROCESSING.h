@@ -24,7 +24,7 @@ class REMOVED_PARTICLES_PROCESSING:public NONCOPYABLE
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     PARTICLE_LEVELSET_REMOVED_PARTICLES<TV> particles;
-    ARRAY<ELLIPSOID<T> > ellipsoids;
+    ARRAY<ELLIPSOID<TV> > ellipsoids;
     ARRAY<SYMMETRIC_MATRIX<T,3> > metrics;
     REMOVED_PARTICLES_BLENDER_3D<T>* particle_blender;
     T blending_parameter;
@@ -48,7 +48,7 @@ public:
     T Phi(const TV& position) const;
     TV Normal(const TV& position) const;
 private:
-    ELLIPSOID<T> Get_Ellipsoid(const int p) const;
+    ELLIPSOID<TV> Get_Ellipsoid(const int p) const;
 //#####################################################################
 };
 }

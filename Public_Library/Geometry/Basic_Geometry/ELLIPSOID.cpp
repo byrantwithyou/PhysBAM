@@ -5,12 +5,13 @@
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Math_Tools/max.h>
 #include <Core/Math_Tools/min.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Geometry/Basic_Geometry/ELLIPSOID.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Normal
 //#####################################################################
-template<class T> VECTOR<T,3> ELLIPSOID<T>::
+template<class TV> TV ELLIPSOID<TV>::
 Normal(const TV& location) const   
 {
     return orientation.Rotate(sqr(radii).Inverse_Times(orientation.Inverse_Rotate(location-center))).Normalized();
@@ -18,7 +19,7 @@ Normal(const TV& location) const
 //#####################################################################
 // Function Inside
 //#####################################################################
-template<class T> bool ELLIPSOID<T>::
+template<class TV> bool ELLIPSOID<TV>::
 Inside(const TV& location,const T thickness_over_two) const
 {
     TV scaled_offset=radii.Inverse_Times(orientation.Inverse_Rotate(location-center));
@@ -27,7 +28,7 @@ Inside(const TV& location,const T thickness_over_two) const
 //#####################################################################
 // Function Outside
 //#####################################################################
-template<class T> bool ELLIPSOID<T>::
+template<class TV> bool ELLIPSOID<TV>::
 Outside(const TV& location,const T thickness_over_two) const
 {
     TV scaled_offset=radii.Inverse_Times(orientation.Inverse_Rotate(location-center));
@@ -36,7 +37,7 @@ Outside(const TV& location,const T thickness_over_two) const
 //#####################################################################
 // Function Boundary
 //#####################################################################
-template<class T> bool ELLIPSOID<T>::
+template<class TV> bool ELLIPSOID<TV>::
 Boundary(const TV& location,const T thickness_over_two) const
 {
     return !Inside(location,thickness_over_two) && !Outside(location,thickness_over_two);
@@ -45,7 +46,7 @@ Boundary(const TV& location,const T thickness_over_two) const
 // Function Approximate_Surface
 //#####################################################################
 // not necessarily the closest point on the surface, but approximates it in some sense
-template<class T> VECTOR<T,3> ELLIPSOID<T>::
+template<class TV> TV ELLIPSOID<TV>::
 Approximate_Surface(const TV& location) const 
 {
     TV scaled_offset=radii.Inverse_Times(orientation.Inverse_Rotate(location-center));
@@ -54,7 +55,7 @@ Approximate_Surface(const TV& location) const
 //#####################################################################
 // Function Approximate_Surface
 //#####################################################################
-template<class T> T ELLIPSOID<T>::
+template<class TV> typename TV::SCALAR ELLIPSOID<TV>::
 Approximate_Signed_Distance(const TV& location) const       
 {
     TV offset=orientation.Inverse_Rotate(location-center),scaled_offset=radii.Inverse_Times(offset);
@@ -64,9 +65,19 @@ Approximate_Signed_Distance(const TV& location) const
     return scaled_magnitude<1?-distance:distance;
 }
 //#####################################################################
+// Function Calculate_Approximate_Signed_Distance
+//#####################################################################
+// better to reinitialize after this because uses the Approximate_Signed_Distance() function
+template<class TV> void ELLIPSOID<TV>::
+Calculate_Approximate_Signed_Distance(const GRID<TV>& grid,ARRAY<T,TV_INT>& phi) const
+{  
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
+        phi(iterator.Cell_Index())=Approximate_Signed_Distance(iterator.Location());
+}
+//#####################################################################
 // Function Covariance_Ellipsoid
 //#####################################################################
-template<class T> template<class T_ARRAY_TV> ELLIPSOID<T> ELLIPSOID<T>::
+template<class TV> template<class T_ARRAY_TV> ELLIPSOID<TV> ELLIPSOID<TV>::
 Covariance_Ellipsoid(const T_ARRAY_TV& points)
 {
     TV average=points.Average();
@@ -76,13 +87,14 @@ Covariance_Ellipsoid(const T_ARRAY_TV& points)
         covariance.x00+=variance.x*variance.x;covariance.x10+=variance.y*variance.x;covariance.x20+=variance.z*variance.x;
         covariance.x11+=variance.y*variance.y;covariance.x21+=variance.z*variance.y;covariance.x22+=variance.z*variance.z;}
     covariance/=points.m-(T)1;covariance.Fast_Solve_Eigenproblem(eigenvalues,eigenvectors);
-    return ELLIPSOID<T>(average,eigenvalues.Sqrt(),eigenvectors);
+    return ELLIPSOID<TV>(average,eigenvalues.Sqrt(),eigenvectors);
 }
 //#####################################################################
 namespace PhysBAM{
-#define INSTANTIATION_HELPER(T) \
-    template class ELLIPSOID<T>; \
-    template ELLIPSOID<T> ELLIPSOID<T>::Covariance_Ellipsoid(const ARRAY<VECTOR<T,3> >& points);
-INSTANTIATION_HELPER(float)
-INSTANTIATION_HELPER(double)
+template class ELLIPSOID<VECTOR<double,2> >;
+template class ELLIPSOID<VECTOR<double,3> >;
+template class ELLIPSOID<VECTOR<float,2> >;
+template class ELLIPSOID<VECTOR<float,3> >;
+template ELLIPSOID<VECTOR<double,3> > ELLIPSOID<VECTOR<double,3> >::Covariance_Ellipsoid<ARRAY<VECTOR<double,3>,int> >(ARRAY<VECTOR<double,3>,int> const&);
+template ELLIPSOID<VECTOR<float,3> > ELLIPSOID<VECTOR<float,3> >::Covariance_Ellipsoid<ARRAY<VECTOR<float,3>,int> >(ARRAY<VECTOR<float,3>,int> const&);
 }

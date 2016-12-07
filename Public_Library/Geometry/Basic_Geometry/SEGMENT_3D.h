@@ -69,6 +69,11 @@ public:
     {return Edge_Edge_Interaction(segment,V_edges(0),V_edges(1),V_edges(2),V_edges(3),interaction_distance,distance,normal,weights,allow_negative_weights,small_number,exit_early,verbose);}
 
     template<class T_ARRAY>
+    bool Edge_Edge_Interaction_Velocity(const SEGMENT_3D<T>& segment,const INDIRECT_ARRAY<T_ARRAY,VECTOR<int,4>&> V_edges,const T interaction_distance,T& distance,TV& normal,
+        VECTOR<T,TV::m+1>& weights,T& relative_speed,const T small_number=0,const bool exit_early=false,const bool verbose=true) const
+    {return Edge_Edge_Interaction_Velocity(segment,V_edges(1),V_edges(2),V_edges(3),V_edges(4),interaction_distance,distance,normal,weights,relative_speed,small_number,exit_early,verbose);}
+
+    template<class T_ARRAY>
     bool Edge_Edge_Collision(const SEGMENT_3D<T>& segment,const INDIRECT_ARRAY<T_ARRAY,VECTOR<int,4>&> V_edges,const T dt,const T collision_thickness,T& collision_time,
         TV& normal,VECTOR<T,TV::m+1>& weights,const T small_number=0,const bool exit_early=false) const
     {return Edge_Edge_Collision(segment,V_edges(0),V_edges(1),V_edges(2),V_edges(3),dt,collision_thickness,collision_time,normal,weights,small_number,exit_early);}
@@ -89,6 +94,8 @@ public:
     bool Edge_Edge_Interaction(const SEGMENT_3D<T>& segment,const TV& v1,const TV& v2,const TV& v3,const TV& v4,
         const T interaction_distance,T& distance,TV& normal,VECTOR<T,TV::m+1>& weights,bool allow_negative_weights,const T small_number=0,
         const bool exit_early=false,const bool verbose=true) const;
+    bool Edge_Edge_Interaction_Velocity(const SEGMENT_3D<T>& segment,const TV& v1,const TV& v2,const TV& v3,const TV& v4,
+        const T interaction_distance,T& distance,TV& normal,VECTOR<T,TV::m+1>& weights,T& relative_speed,const T small_number=0,const bool exit_early=false,const bool verbose=true) const;
     bool Edge_Edge_Collision(const SEGMENT_3D<T>& segment,const TV& v1,const TV& v2,const TV& v3,const TV& v4,const T dt,
         const T collision_thickness,T& collision_time,TV& normal,VECTOR<T,TV::m+1>& weights,const T small_number=0,const bool exit_early=false) const;
     T Interpolation_Fraction(const TV& location) const;

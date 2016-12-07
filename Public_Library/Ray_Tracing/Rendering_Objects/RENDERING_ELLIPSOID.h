@@ -18,7 +18,7 @@ class RENDERING_ELLIPSOID:public RENDERING_OBJECT<T>
 public:
     using RENDERING_OBJECT<T>::small_number;
 
-    ELLIPSOID<T> ellipsoid;
+    ELLIPSOID<TV> ellipsoid;
 
     RENDERING_ELLIPSOID()
     {}

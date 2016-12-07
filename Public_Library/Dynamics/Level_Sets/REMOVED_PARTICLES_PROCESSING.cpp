@@ -90,7 +90,7 @@ Normal(const TV& position) const
 //#####################################################################
 // Function Get_Ellipsoid
 //#####################################################################
-template<class T> ELLIPSOID<T> REMOVED_PARTICLES_PROCESSING<T>::
+template<class T> ELLIPSOID<VECTOR<T,3> > REMOVED_PARTICLES_PROCESSING<T>::
 Get_Ellipsoid(const int p) const
 {
     // TODO: generalize, optimize, and add options -- still largely a placeholder function
@@ -105,12 +105,12 @@ Get_Ellipsoid(const int p) const
     ARRAY<TV> positions(number_of_points_in_estimate);
     for(int i=0;i<number_of_points_in_estimate;i++)positions(i)=particles.X(points_found(i));
 
-    ELLIPSOID<T> covariance=ELLIPSOID<T>::Covariance_Ellipsoid(positions);
+    ELLIPSOID<TV> covariance=ELLIPSOID<TV>::Covariance_Ellipsoid(positions);
     T density=number_of_points_in_estimate/((T)pi*4/3*cube(sqrt(max_squared_distance_to_points_found)));
 
     if(density<density_threshold){
         TV x_axis=particles.V(p).Normalized(),y_axis=x_axis.Unit_Orthogonal_Vector(),z_axis=TV::Cross_Product(x_axis,y_axis).Normalized();
-        return ELLIPSOID<T>(particles.X(p),DIAGONAL_MATRIX<T,3>(3*radius,radius,radius),x_axis,y_axis,z_axis);}
+        return ELLIPSOID<TV>(particles.X(p),DIAGONAL_MATRIX<T,3>(3*radius,radius,radius),MATRIX<T,3>(x_axis,y_axis,z_axis));}
     else{covariance.center=particles.X(p);T clamped_radius=min(3*radius,sqrt(max_squared_distance_to_points_found));
     covariance.radii=DIAGONAL_MATRIX<T,3>(clamped_radius,clamped_radius,(T).5*radius);return covariance;}
 }

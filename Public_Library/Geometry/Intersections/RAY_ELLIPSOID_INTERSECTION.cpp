@@ -13,7 +13,7 @@ namespace INTERSECTION{
 //#####################################################################
 // Function Intersects
 //#####################################################################
-template<class T> bool Intersects(RAY<VECTOR<T,3> >& ray,const ELLIPSOID<T>& ellipsoid,const T thickness)
+template<class T> bool Intersects(RAY<VECTOR<T,3> >& ray,const ELLIPSOID<VECTOR<T,3> >& ellipsoid,const T thickness)
 { // TODO(jontg): everything else takes thickness_over_two; this should be made consistent...
     typedef VECTOR<T,3> TV;
     // Apply inverse transformation to ray
@@ -43,7 +43,7 @@ template<class T> bool Intersects(RAY<VECTOR<T,3> >& ray,const ELLIPSOID<T>& ell
         else{ray.semi_infinite=false;ray.t_max=0;return true;}} // on the boundary
 }
 //#####################################################################
-template bool Intersects(RAY<VECTOR<float,3> >&,const ELLIPSOID<float>&,const float);
-template bool Intersects(RAY<VECTOR<double,3> >&,const ELLIPSOID<double>&,const double);
+template bool Intersects(RAY<VECTOR<float,3> >&,const ELLIPSOID<VECTOR<float,3> >&,const float);
+template bool Intersects(RAY<VECTOR<double,3> >&,const ELLIPSOID<VECTOR<double,3> >&,const double);
 };
 };

@@ -156,6 +156,18 @@ Edge_Edge_Interaction(const SEGMENT_3D<T>& segment,const TV& v1,const TV& v2,con
     return true;
 }
 //#####################################################################
+// Function Edge_Edge_Interaction_Velocity
+//#####################################################################
+template<class T> bool SEGMENT_3D<T>::
+Edge_Edge_Interaction_Velocity(const SEGMENT_3D<T>& segment,const TV& v1,const TV& v2,const TV& v3,const TV& v4,const T interaction_distance,
+    T& distance,TV& normal,VECTOR<T,TV::m+1>& weights,T& relative_speed,const T small_number,const bool exit_early,const bool verbose) const
+{
+    Edge_Edge_Interaction(segment,interaction_distance,distance,normal,weights,false);
+    Edge_Edge_Interaction_Data(segment,v1,v2,v3,v4,distance,normal,weights,small_number,verbose);
+    relative_speed=TV::Dot_Product(weights(0)*v1+weights(1)*v2-weights(2)*v3+weights(3)*v4,normal); // relative speed is in the normal direction
+    return true;
+}
+//#####################################################################
 // Function Edge_Edge_Collision
 //#####################################################################
 template<class T> bool SEGMENT_3D<T>::
@@ -178,7 +190,7 @@ Edge_Edge_Collision(const SEGMENT_3D<T>& segment,const TV& v1,const TV& v2,const
     T distance;
     ITERATIVE_SOLVER<double> iterative_solver;iterative_solver.tolerance=1e-14;
     for(int k=0;k<num_intervals;k++){
-        T collision_time=dt*(T)iterative_solver.Bisection_Secant_Root(cubic,intervals(k).min_corner,intervals(k).max_corner);
+        collision_time=dt*(T)iterative_solver.Bisection_Secant_Root(cubic,intervals(k).min_corner,intervals(k).max_corner);
         SEGMENT_3D<T> segment2(X.x+collision_time*v1,X.y+collision_time*v2);
         if(segment2.Edge_Edge_Interaction(SEGMENT_3D<T>(segment.X.x+collision_time*v3,segment.X.y+collision_time*v4),v1,v2,v3,v4,collision_thickness,distance,normal,weights,
                 false,small_number,exit_early)) return true;}

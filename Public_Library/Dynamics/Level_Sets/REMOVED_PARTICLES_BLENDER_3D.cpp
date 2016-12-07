@@ -49,7 +49,7 @@ Get_Bounding_Box(T radius_x,T radius_yz,const TV& position,const TV& major_axis)
 // Function Get_Bounding_Box
 //#####################################################################
 template<class T> RANGE<VECTOR<T,3> > REMOVED_PARTICLES_BLENDER_3D<T>::
-Get_Bounding_Box(const ELLIPSOID<T>& ellipsoid) const
+Get_Bounding_Box(const ELLIPSOID<TV>& ellipsoid) const
 {
     return ellipsoid.Oriented_Bounding_Box().Scaled_About_Center(R).Axis_Aligned_Bounding_Box();
 }

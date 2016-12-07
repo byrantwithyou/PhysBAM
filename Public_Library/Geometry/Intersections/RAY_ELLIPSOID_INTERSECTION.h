@@ -10,7 +10,7 @@
 namespace PhysBAM{
 namespace INTERSECTION{
 //#####################################################################
-template<class T> bool Intersects(RAY<VECTOR<T,3> >& ray,const ELLIPSOID<T>& ellipsoid, const T thickness=0);
+template<class T> bool Intersects(RAY<VECTOR<T,3> >& ray,const ELLIPSOID<VECTOR<T,3> >& ellipsoid, const T thickness=0);
 //#####################################################################
 };
 };
