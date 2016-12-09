@@ -251,10 +251,8 @@ public:
     DIAGONAL_MATRIX<T,3> Diagonal_Part() const
     {return DIAGONAL_MATRIX<T,3>(x[0],x[4],x[8]);}
 
-    void Normalize_Columns()
-    {T magnitude=sqrt(sqr(x[0])+sqr(x[1])+sqr(x[2]));assert(magnitude!=0);T s=1/magnitude;x[0]*=s;x[1]*=s;x[2]*=s;
-    magnitude=sqrt(sqr(x[3])+sqr(x[4])+sqr(x[5]));assert(magnitude!=0);s=1/magnitude;x[3]*=s;x[4]*=s;x[5]*=s;
-    magnitude=sqrt(sqr(x[6])+sqr(x[7])+sqr(x[8]));assert(magnitude!=0);s=1/magnitude;x[6]*=s;x[7]*=s;x[8]*=s;}
+    VECTOR<T,3> Normalize_Columns()
+    {VECTOR<T,3> a=Column(0),b=Column(1),c=Column(2),n(a.Normalize(),b.Normalize(),c.Normalize());*this=MATRIX<T,3>(a,b,c);return n;}
 
     VECTOR<T,3> Column_Magnitudes() const
     {return VECTOR<T,3>(Column(0).Magnitude(),Column(1).Magnitude(),Column(2).Magnitude());}

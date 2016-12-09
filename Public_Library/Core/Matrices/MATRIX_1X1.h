@@ -119,6 +119,9 @@ public:
     VECTOR<T,1> Column_Sum() const
     {return Column(0);}
 
+    VECTOR<T,1> Normalize_Columns()
+    {VECTOR<T,1> a=Column(0),n(a.Normalize());*this=MATRIX<T,1>(a);return n;}
+
     VECTOR<T,1> Column_Magnitudes() const
     {return VECTOR<T,1>(Column(0).Magnitude());}
 

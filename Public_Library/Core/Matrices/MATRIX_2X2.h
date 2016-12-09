@@ -123,6 +123,9 @@ public:
     VECTOR<T,2> Column_Sum() const
     {return VECTOR<T,2>(x[0]+x[2],x[1]+x[3]);}
 
+    VECTOR<T,2> Normalize_Columns()
+    {VECTOR<T,2> a=Column(0),b=Column(1),n(a.Normalize(),b.Normalize());*this=MATRIX<T,2>(a,b);return n;}
+
     VECTOR<T,2> Column_Magnitudes() const
     {return VECTOR<T,2>(Column(0).Magnitude(),Column(1).Magnitude());}
 
