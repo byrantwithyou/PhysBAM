@@ -11,7 +11,6 @@
 #include <Core/Math_Tools/FIXED_NUMBER.h>
 #include <Core/Matrices/MATRIX_POLICY.h>
 #include <Core/Matrices/ROTATION.h>
-#include <Core/Vectors/COMPLEX.h>
 #include <Core/Vectors/VECTOR.h>
 namespace PhysBAM{
 

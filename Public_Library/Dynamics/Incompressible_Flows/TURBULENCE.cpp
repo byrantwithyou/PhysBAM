@@ -5,7 +5,6 @@
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Math_Tools/constants.h>
 #include <Core/Math_Tools/sqr.h>
-#include <Core/Vectors/COMPLEX.h>
 #include <Grid_Tools/Fourier_Transforms/FFT_1D.h>
 #include <Grid_Tools/Fourier_Transforms/FFT_2D.h>
 #include <Grid_Tools/Fourier_Transforms/FFT_3D.h>
@@ -23,7 +22,7 @@ Generate_Random_Turbulence(const GRID<TV>& grid,VECTOR<ARRAY<T,TV_INT>,TV::m>& u
     TV_INT size(grid.counts-1);
     size(TV::m-1)=grid.counts(TV::m-1)/2;
     RANGE<TV_INT> range(TV_INT(),size);
-    VECTOR<ARRAY<COMPLEX<T>,TV_INT>,TV::m> u_hat;
+    VECTOR<ARRAY<std::complex<T>,TV_INT>,TV::m> u_hat;
     for(int i=0;i<TV::m;i++) u_hat(i).Resize(range);
 
     T coeff=(T)pi*(1<<(TV::m-1));
@@ -38,7 +37,7 @@ Generate_Random_Turbulence(const GRID<TV>& grid,VECTOR<ARRAY<T,TV_INT>,TV::m>& u
         T sqrt_energy_over_two=sqrt((T).5*energy);
         for(int i=0;i<TV::m;i++){
             T r=random->Get_Gaussian(),theta=(T)pi*random->Get_Uniform_Number((T)0,(T)1);
-            u_hat(i)(it.index)=COMPLEX<T>::Polar(sqrt_energy_over_two*r,theta);}}
+            u_hat(i)(it.index)=std::polar(sqrt_energy_over_two*r,theta);}}
 
     for(int i=0;i<TV::m;i++) fft.Enforce_Real_Valued_Symmetry(u_hat(i));
     if(incompressible) fft.Make_Divergence_Free(u_hat);

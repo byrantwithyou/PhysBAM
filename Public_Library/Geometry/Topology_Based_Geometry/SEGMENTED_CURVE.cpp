@@ -10,7 +10,6 @@
 #include <Core/Log/LOG.h>
 #include <Core/Math_Tools/constants.h>
 #include <Core/Math_Tools/RANGE.h>
-#include <Core/Vectors/COMPLEX.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Basic_Geometry/SEGMENT_1D.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
@@ -19,6 +18,7 @@
 #include <Geometry/Spatial_Acceleration/SEGMENT_HIERARCHY.h>
 #include <Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE.h>
+#include <complex>
 namespace PhysBAM{
 //#####################################################################
 // Constructor
@@ -105,8 +105,8 @@ Initialize_Circle_Mesh_And_Particles(const int m,const T radius)
     mesh.Initialize_Straight_Mesh(m,true);
     particles.Add_Elements(m);
     for(int p=0;p<m;p++){
-        COMPLEX<T> X=COMPLEX<T>::Polar(radius,(T)2*(T)pi/m*p);
-        particles.X(p)=TV(VECTOR<T,2>(X.re,X.im));}
+        std::complex<T> X=std::polar(radius,(T)2*(T)pi/m*p);
+        particles.X(p)=TV(VECTOR<T,2>(X.real(),X.imag()));}
 }
 template<> void SEGMENTED_CURVE<VECTOR<double,1> >::  
 Initialize_Circle_Mesh_And_Particles(const int m,const T radius)

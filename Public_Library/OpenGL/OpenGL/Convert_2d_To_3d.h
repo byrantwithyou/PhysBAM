@@ -10,7 +10,6 @@
 #include <Core/Math_Tools/RANGE.h>
 #include <Core/Matrices/FRAME.h>
 #include <Core/Matrices/ROTATION.h>
-#include <Core/Vectors/COMPLEX.h>
 #include <Core/Vectors/VECTOR.h>
 namespace PhysBAM{
 
@@ -21,7 +20,7 @@ template<class T> inline RANGE<VECTOR<T,3> > Convert_2d_To_3d(const RANGE<VECTOR
 {return RANGE<VECTOR<T,3> >(box.min_corner.Append(0),box.max_corner.Append(0));}
 
 template<class T> inline ROTATION<VECTOR<T,3> > Convert_2d_To_3d(const ROTATION<VECTOR<T,2> >& c)
-{COMPLEX<T> sqrt_c=c.Complex().Sqrt();return ROTATION<VECTOR<T,3> >::From_Components(sqrt_c.re,0,0,sqrt_c.im);}
+{std::complex<T> sqrt_c=sqrt(c.Complex());return ROTATION<VECTOR<T,3> >::From_Components(sqrt_c.real(),0,0,sqrt_c.imag());}
 
 template<class T> inline FRAME<VECTOR<T,3> > Convert_2d_To_3d(const FRAME<VECTOR<T,2> >& f)
 {return FRAME<VECTOR<T,3> >(Convert_2d_To_3d(f.t),Convert_2d_To_3d(f.r));}

@@ -189,7 +189,7 @@ void Spring()
         bool horizontal=((i-1)%2==0);int vertical_part=(i-1)/2;
         rigid_body[i]=&tests.Add_Rigid_Body("ground",(T).005*(horizontal?width:slanted_length),1);
         rigid_body[i]->Frame().t=TV(0,(vertical_part+(horizontal?0:(T).5))*vertical_separation);
-        if(!horizontal) rigid_body[i]->Frame().r=ROTATION<TV>::From_Complex(COMPLEX<T>(width,vertical_separation));
+        if(!horizontal) rigid_body[i]->Frame().r=ROTATION<TV>::From_Complex(std::complex<T>(width,vertical_separation));
         rigid_body[i]->Frame()=xform*rigid_body[i]->Frame();
         rigid_body[i]->Set_Coefficient_Of_Restitution(0);
         rigid_body[i]->coefficient_of_friction=1;

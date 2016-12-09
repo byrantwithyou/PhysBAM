@@ -20,10 +20,9 @@
 
 #include <Core/Arrays/ARRAY.h>
 #include <Grid_Tools/Grids/GRID.h>
+#include <complex>
 struct fftw_plan_s;struct fftwf_plan_s;
 namespace PhysBAM{
-
-template<class T> class COMPLEX;
 
 template<class T>
 class FFT_2D
@@ -34,7 +33,7 @@ public:
 private:
     // for fftw
     typedef typename conditional<is_same<T,float>::value,fftwf_plan_s*,fftw_plan_s*>::type T_FFTW_PLAN;
-    mutable ARRAY<COMPLEX<T>,TV_INT> u_hat_copy;
+    mutable ARRAY<std::complex<T>,TV_INT> u_hat_copy;
     mutable T_FFTW_PLAN plan_u_to_u_hat,plan_u_hat_to_u;
     mutable TV_INT plan_u_to_u_hat_counts,plan_u_hat_to_u_counts;
     // for NR
@@ -44,18 +43,18 @@ public:
     FFT_2D(const GRID<TV>& grid_input);
     ~FFT_2D();
 
-    void Inverse_Transform(const ARRAY<COMPLEX<T>,TV_INT>& u_hat,ARRAY<T,TV_INT>& u,bool normalize=true) const
-    {Inverse_Transform(const_cast<ARRAY<COMPLEX<T>,TV_INT>&>(u_hat),u,normalize,true);}
+    void Inverse_Transform(const ARRAY<std::complex<T>,TV_INT>& u_hat,ARRAY<T,TV_INT>& u,bool normalize=true) const
+    {Inverse_Transform(const_cast<ARRAY<std::complex<T>,TV_INT>&>(u_hat),u,normalize,true);}
 
 //#####################################################################
-    void Transform(const ARRAY<T,TV_INT>& u,ARRAY<COMPLEX<T>,TV_INT>& u_hat) const;
-    void Inverse_Transform(ARRAY<COMPLEX<T>,TV_INT>& u_hat,ARRAY<T,TV_INT>& u,bool normalize=true,bool preserve_u_hat=true) const;
-    void Enforce_Real_Valued_Symmetry(ARRAY<COMPLEX<T>,TV_INT>& u_hat) const;
-    void First_Derivatives(const ARRAY<COMPLEX<T>,TV_INT>& u_hat,ARRAY<COMPLEX<T>,TV_INT>& ux_hat,ARRAY<COMPLEX<T>,TV_INT>& uy_hat) const;
-    void Make_Divergence_Free(ARRAY<COMPLEX<T>,TV_INT>& u_hat,ARRAY<COMPLEX<T>,TV_INT>& v_hat) const;
-    void Make_Divergence_Free(VECTOR<ARRAY<COMPLEX<T>,TV_INT>,TV::m>& u_hat) const
+    void Transform(const ARRAY<T,TV_INT>& u,ARRAY<std::complex<T>,TV_INT>& u_hat) const;
+    void Inverse_Transform(ARRAY<std::complex<T>,TV_INT>& u_hat,ARRAY<T,TV_INT>& u,bool normalize=true,bool preserve_u_hat=true) const;
+    void Enforce_Real_Valued_Symmetry(ARRAY<std::complex<T>,TV_INT>& u_hat) const;
+    void First_Derivatives(const ARRAY<std::complex<T>,TV_INT>& u_hat,ARRAY<std::complex<T>,TV_INT>& ux_hat,ARRAY<std::complex<T>,TV_INT>& uy_hat) const;
+    void Make_Divergence_Free(ARRAY<std::complex<T>,TV_INT>& u_hat,ARRAY<std::complex<T>,TV_INT>& v_hat) const;
+    void Make_Divergence_Free(VECTOR<ARRAY<std::complex<T>,TV_INT>,TV::m>& u_hat) const
     {Make_Divergence_Free(u_hat.x,u_hat.y);}
-    void Filter_High_Frequencies(ARRAY<COMPLEX<T>,TV_INT>& u_hat,T scale=(T)1) const;
+    void Filter_High_Frequencies(ARRAY<std::complex<T>,TV_INT>& u_hat,T scale=(T)1) const;
 //#####################################################################
 };
 }

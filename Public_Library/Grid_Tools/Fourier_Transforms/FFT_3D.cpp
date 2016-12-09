@@ -7,10 +7,10 @@
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Math_Tools/constants.h>
 #include <Core/Math_Tools/Robust_Functions.h>
-#include <Core/Vectors/COMPLEX.h>
 #include <Grid_Tools/Fourier_Transforms/FFT_3D.h>
 #include <Grid_Tools/Fourier_Transforms/FFTW.h>
 using namespace PhysBAM;
+using namespace std::complex_literals;
 
 #ifdef USE_FFTW // FFTW-specific functions *******************************************************************************************************************************************************************
 //#####################################################################
@@ -33,7 +33,7 @@ template<class T> FFT_3D<T>::
 // Function Transform
 //#####################################################################
 template<class T> void FFT_3D<T>::
-Transform(const ARRAY<T,VECTOR<int,3> >& u,ARRAY<COMPLEX<T> ,VECTOR<int,3> >& u_hat) const
+Transform(const ARRAY<T,VECTOR<int,3> >& u,ARRAY<std::complex<T> ,VECTOR<int,3> >& u_hat) const
 {
     if(plan_u_to_u_hat_counts!=grid.Counts()){
         plan_u_to_u_hat_counts=grid.Counts();
@@ -45,7 +45,7 @@ Transform(const ARRAY<T,VECTOR<int,3> >& u,ARRAY<COMPLEX<T> ,VECTOR<int,3> >& u_
 // Function Inverse_Transform
 //#####################################################################
 template<class T> void FFT_3D<T>::
-Inverse_Transform(ARRAY<COMPLEX<T> ,VECTOR<int,3> >& u_hat,ARRAY<T,VECTOR<int,3> >& u,bool normalize,bool preserve_u_hat) const
+Inverse_Transform(ARRAY<std::complex<T> ,VECTOR<int,3> >& u_hat,ARRAY<T,VECTOR<int,3> >& u,bool normalize,bool preserve_u_hat) const
 {
     if(plan_u_hat_to_u_counts!=grid.Counts()){
         plan_u_hat_to_u_counts=grid.Counts();
@@ -78,27 +78,27 @@ template<class T> FFT_3D<T>::
 // Function Transform
 //#####################################################################
 template<class T> void FFT_3D<T>::
-Transform(const ARRAY<T,VECTOR<int,3> >& u,ARRAY<COMPLEX<T> ,VECTOR<int,3> >& u_hat) const
+Transform(const ARRAY<T,VECTOR<int,3> >& u,ARRAY<std::complex<T> ,VECTOR<int,3> >& u_hat) const
 {
     ARRAY<int> dim(grid.counts);
     data.Resize(2*grid.counts.x*grid.counts.y*grid.counts.z,false,false);
     int k=0;for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int ij=0;ij<grid.counts.z;ij++){data(k++)=(float)u(i,j,ij);data(k++)=0;}
     NR_fourn(-1,dim,data);
-    k=0;for(int i=0;i<grid.counts.x-1;i++) for(int j=0;j<grid.counts.y-1;j++) {for(int ij=0;ij<grid.counts.z/2;ij++){u_hat(i,j,ij).re=data(k++);u_hat(i,j,ij).im=data(k++);} k+=grid.counts.z-2;}
+    k=0;for(int i=0;i<grid.counts.x-1;i++) for(int j=0;j<grid.counts.y-1;j++) {for(int ij=0;ij<grid.counts.z/2;ij++){T r=data(k++),c=data(k++);u_hat(i,j,ij)=std::complex<T>(r,c);} k+=grid.counts.z-2;}
 }
 //#####################################################################
 // Function Inverse_Transform
 //#####################################################################
 template<class T> void FFT_3D<T>::
-Inverse_Transform(ARRAY<COMPLEX<T> ,VECTOR<int,3> >& u_hat,ARRAY<T,VECTOR<int,3> >& u,bool normalize,bool preserve_u_hat) const
+Inverse_Transform(ARRAY<std::complex<T> ,VECTOR<int,3> >& u_hat,ARRAY<T,VECTOR<int,3> >& u,bool normalize,bool preserve_u_hat) const
 {
     ARRAY<int> dim(grid.counts);
     data.Resize(2*grid.counts.x*grid.counts.y*grid.counts.z,false,false);
     int k=0;
     for(int i=0;i<grid.counts.x-1;i++){int negi=(i==0)?0:grid.counts.x-i;
         for(int j=0;j<grid.counts.y-1;j++){int negj=(j==0)?0:grid.counts.y-j;
-            for(int ij=0;ij<grid.counts.z/2;ij++){data(k++)=(float)u_hat(i,j,ij).re;data(k++)=(float)u_hat(i,j,ij).im;}
-            for(int ij=grid.counts.z/2+1;ij<grid.counts.z-1;ij++){data(k++)=(float)u_hat(negi,negj,grid.counts.z-ij).re;data(k++)=-(float)u_hat(negi,negj,grid.counts.z-ij).im;}}}
+            for(int ij=0;ij<grid.counts.z/2;ij++){data(k++)=(float)u_hat(i,j,ij).real();data(k++)=(float)u_hat(i,j,ij).imag();}
+            for(int ij=grid.counts.z/2+1;ij<grid.counts.z-1;ij++){data(k++)=(float)u_hat(negi,negj,grid.counts.z-ij).real();data(k++)=-(float)u_hat(negi,negj,grid.counts.z-ij).imag();}}}
     NR_fourn(+1,dim,data);
     if(normalize) {T coefficient=T(1.)/(grid.counts.x*grid.counts.y*grid.counts.z);k=0;for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int ij=0;ij<grid.counts.z;ij++) {u(i,j,ij)=coefficient*data(k++);k++;}}
     else {k=0;for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int ij=0;ij<grid.counts.z;ij++) {u(i,j,ij)=data(k++);k++;}}
@@ -111,36 +111,42 @@ Inverse_Transform(ARRAY<COMPLEX<T> ,VECTOR<int,3> >& u_hat,ARRAY<T,VECTOR<int,3>
 //#####################################################################
 // enforce symmetry so that the inverse transform is a real valued function
 template<class T> void FFT_3D<T>::
-Enforce_Real_Valued_Symmetry(ARRAY<COMPLEX<T> ,VECTOR<int,3> >& u_hat) const
+Enforce_Real_Valued_Symmetry(ARRAY<std::complex<T> ,VECTOR<int,3> >& u_hat) const
 {
     // imaginary part of the constant and cosine only terms are identically zero
-    u_hat(0,0,0).im=u_hat(grid.counts.x/2,0,0).im=u_hat(0,grid.counts.y/2,0).im=u_hat(grid.counts.x/2,grid.counts.y/2,0).im=0;
-    u_hat(0,0,grid.counts.z/2).im=u_hat(grid.counts.x/2,0,grid.counts.z/2).im=u_hat(0,grid.counts.y/2,grid.counts.z/2).im=u_hat(grid.counts.x/2,grid.counts.y/2,grid.counts.z/2).im=0;
+    u_hat(0,0,0)=u_hat(0,0,0).real();
+    u_hat(grid.counts.x/2,0,0)=u_hat(grid.counts.x/2,0,0).real();
+    u_hat(0,grid.counts.y/2,0)=u_hat(0,grid.counts.y/2,0).real();
+    u_hat(grid.counts.x/2,grid.counts.y/2,0)=u_hat(grid.counts.x/2,grid.counts.y/2,0).real();
+    u_hat(0,0,grid.counts.z/2)=u_hat(0,0,grid.counts.z/2).real();
+    u_hat(grid.counts.x/2,0,grid.counts.z/2)=u_hat(grid.counts.x/2,0,grid.counts.z/2).real();
+    u_hat(0,grid.counts.y/2,grid.counts.z/2)=u_hat(0,grid.counts.y/2,grid.counts.z/2).real();
+    u_hat(grid.counts.x/2,grid.counts.y/2,grid.counts.z/2)=u_hat(grid.counts.x/2,grid.counts.y/2,grid.counts.z/2).real();
     // enforce appropriate complex conjugates
     // front face - i.e. z=0
     for(int i=0;i<grid.counts.x/2-1;i++){
-        u_hat(grid.counts.x-i,0,0)=u_hat(i,0,0).Conjugated(); // reflect y=0 line
-        u_hat(grid.counts.x-i,grid.counts.y/2,0)=u_hat(i,grid.counts.y/2,0).Conjugated();} // reflect y=grid.counts.y/2 line
-    for(int j=0;j<grid.counts.y/2-1;j++){u_hat(0,grid.counts.y-j,0)=u_hat(0,j,0).Conjugated();} // reflect x=0 line
-    for(int i=0;i<grid.counts.x-1;i++) for(int j=0;j<grid.counts.y/2-1;j++){u_hat(grid.counts.x-i,grid.counts.y-j,0)=u_hat(i,j,0).Conjugated();} // reflect interior area
+        u_hat(grid.counts.x-i,0,0)=conj(u_hat(i,0,0)); // reflect y=0 line
+        u_hat(grid.counts.x-i,grid.counts.y/2,0)=conj(u_hat(i,grid.counts.y/2,0));} // reflect y=grid.counts.y/2 line
+    for(int j=0;j<grid.counts.y/2-1;j++){u_hat(0,grid.counts.y-j,0)=conj(u_hat(0,j,0));} // reflect x=0 line
+    for(int i=0;i<grid.counts.x-1;i++) for(int j=0;j<grid.counts.y/2-1;j++){u_hat(grid.counts.x-i,grid.counts.y-j,0)=conj(u_hat(i,j,0));} // reflect interior area
     // middle face - i.e. z=grid.counts.z/2
     for(int i=0;i<grid.counts.x/2-1;i++){
-        u_hat(grid.counts.x-i,0,grid.counts.z/2)=u_hat(i,0,grid.counts.z/2).Conjugated(); // reflect y=0 line
-        u_hat(grid.counts.x-i,grid.counts.y/2,grid.counts.z/2)=u_hat(i,grid.counts.y/2,grid.counts.z/2).Conjugated();} // reflect y=grid.counts.y/2 line
-    for(int j=0;j<grid.counts.y/2-1;j++){u_hat(0,grid.counts.y-j,grid.counts.z/2)=u_hat(0,j,grid.counts.z/2).Conjugated();} // reflect x=0 line
-    for(int i=0;i<grid.counts.x-1;i++) for(int j=0;j<grid.counts.y/2-1;j++){u_hat(grid.counts.x-i,grid.counts.y-j,grid.counts.z/2)=u_hat(i,j,grid.counts.z/2).Conjugated();} // reflect interior area
+        u_hat(grid.counts.x-i,0,grid.counts.z/2)=conj(u_hat(i,0,grid.counts.z/2)); // reflect y=0 line
+        u_hat(grid.counts.x-i,grid.counts.y/2,grid.counts.z/2)=conj(u_hat(i,grid.counts.y/2,grid.counts.z/2));} // reflect y=grid.counts.y/2 line
+    for(int j=0;j<grid.counts.y/2-1;j++){u_hat(0,grid.counts.y-j,grid.counts.z/2)=conj(u_hat(0,j,grid.counts.z/2));} // reflect x=0 line
+    for(int i=0;i<grid.counts.x-1;i++) for(int j=0;j<grid.counts.y/2-1;j++){u_hat(grid.counts.x-i,grid.counts.y-j,grid.counts.z/2)=conj(u_hat(i,j,grid.counts.z/2));} // reflect interior area
 }
 //#####################################################################
 // Function First_Derivatives
 //#####################################################################
 template<class T> void FFT_3D<T>::
-First_Derivatives(const ARRAY<COMPLEX<T> ,VECTOR<int,3> >& u_hat,ARRAY<COMPLEX<T> ,VECTOR<int,3> >& ux_hat,ARRAY<COMPLEX<T> ,VECTOR<int,3> >& uy_hat,ARRAY<COMPLEX<T> ,VECTOR<int,3> >& uz_hat) const
+First_Derivatives(const ARRAY<std::complex<T> ,VECTOR<int,3> >& u_hat,ARRAY<std::complex<T> ,VECTOR<int,3> >& ux_hat,ARRAY<std::complex<T> ,VECTOR<int,3> >& uy_hat,ARRAY<std::complex<T> ,VECTOR<int,3> >& uz_hat) const
 {
     VECTOR<T,3> coefficients=(T)(2*pi)/grid.domain.Edge_Lengths();
     for(int i=0;i<grid.counts.x-1;i++){T k1=coefficients.x*(i<grid.counts.x/2?i:i-grid.counts.x);
         for(int j=0;j<grid.counts.y-1;j++){T k2=coefficients.y*(j<grid.counts.y/2?j:j-grid.counts.y);
             for(int ij=0;ij<grid.counts.z/2;ij++){T k3=coefficients.z*ij;
-                ux_hat(i,j,ij)=uy_hat(i,j,ij)=uz_hat(i,j,ij)=u_hat(i,j,ij).Rotated_Counter_Clockwise_90();
+                ux_hat(i,j,ij)=uy_hat(i,j,ij)=uz_hat(i,j,ij)=u_hat(i,j,ij)*std::complex<T>(0,1);
                 ux_hat(i,j,ij)*=k1;uy_hat(i,j,ij)*=k2;uz_hat(i,j,ij)*=k3;}}}
     Enforce_Real_Valued_Symmetry(ux_hat);Enforce_Real_Valued_Symmetry(uy_hat);Enforce_Real_Valued_Symmetry(uz_hat);
 }
@@ -149,20 +155,20 @@ First_Derivatives(const ARRAY<COMPLEX<T> ,VECTOR<int,3> >& u_hat,ARRAY<COMPLEX<T
 //#####################################################################
 // the constant fields are unchanged
 template<class T> void FFT_3D<T>::
-Make_Divergence_Free(ARRAY<COMPLEX<T> ,VECTOR<int,3> >& u_hat,ARRAY<COMPLEX<T> ,VECTOR<int,3> >& v_hat,ARRAY<COMPLEX<T> ,VECTOR<int,3> >& w_hat) const
+Make_Divergence_Free(ARRAY<std::complex<T> ,VECTOR<int,3> >& u_hat,ARRAY<std::complex<T> ,VECTOR<int,3> >& v_hat,ARRAY<std::complex<T> ,VECTOR<int,3> >& w_hat) const
 {
     VECTOR<T,3> coefficients=(T)(2*pi)/grid.domain.Edge_Lengths();
     // front face - i.e. z=0
-    for(int i=0;i<grid.counts.x/2;i++) u_hat(i,0,0)=COMPLEX<T>(0,0); // u=0 on the bottom
+    for(int i=0;i<grid.counts.x/2;i++) u_hat(i,0,0)=std::complex<T>(0,0); // u=0 on the bottom
     for(int i=0;i<grid.counts.x-1;i++){T k1=coefficients.x*(i<grid.counts.x/2?i:i-grid.counts.x);
         for(int j=0;j<grid.counts.y/2;j++){T k2=coefficients.y*j,one_over_k_squared=1/(sqr(k1)+sqr(k2));
-            COMPLEX<T> correction=(k1*u_hat(i,j,0)+k2*v_hat(i,j,0))*one_over_k_squared;
+            std::complex<T> correction=(k1*u_hat(i,j,0)+k2*v_hat(i,j,0))*one_over_k_squared;
             u_hat(i,j,0)-=correction*k1;v_hat(i,j,0)-=correction*k2;}}
     // volume
     for(int i=0;i<grid.counts.x-1;i++){T k1=coefficients.x*(i<grid.counts.x/2?i:i-grid.counts.x);
         for(int j=0;j<grid.counts.y-1;j++){T k2=coefficients.y*(j<grid.counts.y/2?j:j-grid.counts.y);
             for(int ij=0;ij<grid.counts.z/2;ij++){T k3=coefficients.z*ij,one_over_k_squared=1/(sqr(k1)+sqr(k2)+sqr(k3));
-                COMPLEX<T> correction=(k1*u_hat(i,j,ij)+k2*v_hat(i,j,ij)+k3*w_hat(i,j,ij))*one_over_k_squared;
+                std::complex<T> correction=(k1*u_hat(i,j,ij)+k2*v_hat(i,j,ij)+k3*w_hat(i,j,ij))*one_over_k_squared;
                 u_hat(i,j,ij)-=correction*k1;v_hat(i,j,ij)-=correction*k2;w_hat(i,j,ij)-=correction*k3;}}}
     Enforce_Real_Valued_Symmetry(u_hat);Enforce_Real_Valued_Symmetry(v_hat);Enforce_Real_Valued_Symmetry(w_hat);
 }
@@ -171,7 +177,7 @@ Make_Divergence_Free(ARRAY<COMPLEX<T> ,VECTOR<int,3> >& u_hat,ARRAY<COMPLEX<T> ,
 //#####################################################################
 // Lanczos filter - doesn't change (0,0) frequency
 template<class T> void FFT_3D<T>::
-Filter_High_Frequencies(ARRAY<COMPLEX<T> ,VECTOR<int,3> >& u_hat,T scale) const
+Filter_High_Frequencies(ARRAY<std::complex<T> ,VECTOR<int,3> >& u_hat,T scale) const
 {
     T coefficient=2*T(pi)/sqrt((T)(sqr(grid.counts.x)+sqr(grid.counts.y)+sqr(grid.counts.z)));
     for(int i=0;i<grid.counts.x/2;i++){ // skip the (0,0) case

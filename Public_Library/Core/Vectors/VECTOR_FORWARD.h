@@ -16,7 +16,6 @@ template<class T,int d> class VECTOR;
 template<class T,int d> class ZERO_VECTOR;
 
 template<class T> class INTERVAL;
-template<class T> class COMPLEX;
 template<class T> class QUATERNION;
 template<class TV> class ROTATION;
 template<class T> class TETRAHEDRAL_GROUP;

@@ -13,6 +13,7 @@
 #include <Core/Read_Write/READ_WRITE_FORWARD.h>
 #include <Core/Read_Write/TYPED_STREAM.h>
 #include <Core/Utilities/TYPE_UTILITIES.h>
+#include <complex>
 namespace PhysBAM{
 
 template<class R,class A>
@@ -51,6 +52,10 @@ Read_Binary(std::istream& input,float& d)
 template<class RW> inline void
 Read_Binary(std::istream& input,double& d)
 {RW tmp;Read_Primitive(input,tmp);d=(double)tmp;}
+
+template<class RW,class T> inline void
+Read_Binary(std::istream& input,std::complex<T>& d)
+{RW r,c;Read_Primitive(input,r);Read_Primitive(input,c);d=std::complex<T>(r,c);}
 
 template<class RW,class T> inline void
 Read_Binary(std::istream& input,T*& d)
@@ -97,6 +102,10 @@ Write_Binary(std::ostream& output,const float& d)
 template<class RW> inline void
 Write_Binary(std::ostream& output,const double& d)
 {Write_Primitive(output,(RW)d);}
+
+template<class RW,class T> inline void
+Write_Binary(std::ostream& output,const std::complex<T>& d)
+{Write_Primitive(output,(RW)d.real());Write_Primitive(output,(RW)d.imag());}
 
 template<class RW,class T> inline void
 Write_Binary(std::ostream& output,const T* d)

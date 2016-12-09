@@ -5,10 +5,10 @@
 // Class BOWL_TESSELLATION
 //##################################################################### 
 #include <Core/Matrices/MATRIX_3X2.h>
-#include <Core/Vectors/COMPLEX.h>
 #include <Geometry/Basic_Geometry/BOWL.h>
 #include <Geometry/Tessellation/BOWL_TESSELLATION.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <complex>
 
 namespace PhysBAM{
 namespace TESSELLATION{
@@ -27,12 +27,15 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const BOWL<T>& bow
     radial_basis.Set_Column(1,TV(1,0,0));
     TV depth_axis(0,1,0);
     for(int i=0,p=0;i<n_radial;i++){
-        TV radial=radial_basis*COMPLEX<T>::Unit_Polar(T(2*pi/n_radial)*i).Vector();
+        std::complex<T> c=std::polar((T)1,T(2*pi/n_radial)*i);
+        TV radial=radial_basis*VECTOR<T,2>(c.real(),c.imag());
         for(int j=n_vertical;j>=0;j--){
-            TV spherical=radial_basis*COMPLEX<T>::Unit_Polar(T(0.5*pi/n_vertical)*j).Vector();
+            std::complex<T> c=std::polar((T)1,T(0.5*pi/n_vertical)*j);
+            TV spherical=radial_basis*VECTOR<T,2>(c.real(),c.imag());
             particles.X(p++)=radial*(bowl.hole_radius+spherical.z*bowl.height)+bowl.height*spherical.x*depth_axis;}
         for(int j=0;j<=n_vertical;j++){
-            TV spherical=radial_basis*COMPLEX<T>::Unit_Polar(T(0.5*pi/n_vertical)*j).Vector();
+            std::complex<T> c=std::polar((T)1,T(0.5*pi/n_vertical)*j);
+            TV spherical=radial_basis*VECTOR<T,2>(c.real(),c.imag());
             particles.X(p++)=radial*(bowl.hole_radius+spherical.z*bowl.depth)+bowl.depth*spherical.x*depth_axis;}}
     return surface;
 }

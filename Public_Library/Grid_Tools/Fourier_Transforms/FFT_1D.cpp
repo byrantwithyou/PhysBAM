@@ -7,7 +7,6 @@
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Math_Tools/constants.h>
 #include <Core/Math_Tools/Robust_Functions.h>
-#include <Core/Vectors/COMPLEX.h>
 #include <Grid_Tools/Fourier_Transforms/FFT_1D.h>
 #include <Grid_Tools/Fourier_Transforms/FFTW.h>
 using namespace PhysBAM;
@@ -33,7 +32,7 @@ template<class T> FFT_1D<T>::
 // Function Transform
 //#####################################################################
 template<class T> void FFT_1D<T>::
-Transform(const ARRAY<T,VECTOR<int,1> >& u,ARRAY<COMPLEX<T> ,VECTOR<int,1> >& u_hat) const
+Transform(const ARRAY<T,VECTOR<int,1> >& u,ARRAY<std::complex<T> ,VECTOR<int,1> >& u_hat) const
 {
     if(plan_u_to_u_hat_counts!=grid.Counts()){
         plan_u_to_u_hat_counts=grid.Counts();
@@ -45,7 +44,7 @@ Transform(const ARRAY<T,VECTOR<int,1> >& u,ARRAY<COMPLEX<T> ,VECTOR<int,1> >& u_
 // Function Inverse_Transform
 //#####################################################################
 template<class T> void FFT_1D<T>::
-Inverse_Transform(ARRAY<COMPLEX<T> ,VECTOR<int,1> >& u_hat,ARRAY<T,VECTOR<int,1> >& u,bool normalize,bool preserve_u_hat) const
+Inverse_Transform(ARRAY<std::complex<T> ,VECTOR<int,1> >& u_hat,ARRAY<T,VECTOR<int,1> >& u,bool normalize,bool preserve_u_hat) const
 {
     if(plan_u_hat_to_u_counts!=grid.Counts()){
         plan_u_hat_to_u_counts=grid.Counts();
@@ -79,25 +78,25 @@ template<class T> FFT_1D<T>::
 // Function Transform
 //#####################################################################
 template<class T> void FFT_1D<T>::
-Transform(const ARRAY<T,VECTOR<int,1> >& u,ARRAY<COMPLEX<T> ,VECTOR<int,1> >& u_hat) const
+Transform(const ARRAY<T,VECTOR<int,1> >& u,ARRAY<std::complex<T> ,VECTOR<int,1> >& u_hat) const
 {
     ARRAY<int> dim(grid.counts);
     data.Resize(2*grid.counts.x,false,false);
     for(int i=0,k=0;i<grid.counts.x;i++){data(k++)=(float)u(i);data(k++)=0;}
     NR_fourn(-1,dim,data);
-    for(int i=0,k=0;i<grid.counts.x/2;i++){u_hat(i).re=data(k++);u_hat(i).im=data(k++);}
+    for(int i=0,k=0;i<grid.counts.x/2;i++){T r=data(k++),c=data(k++);u_hat(i)=std::complex<T>(r,c);}
 }
 //#####################################################################
 // Function Inverse_Transform
 //#####################################################################
 template<class T> void FFT_1D<T>::
-Inverse_Transform(ARRAY<COMPLEX<T> ,VECTOR<int,1> >& u_hat,ARRAY<T,VECTOR<int,1> >& u,bool normalize,bool preserve_u_hat) const
+Inverse_Transform(ARRAY<std::complex<T> ,VECTOR<int,1> >& u_hat,ARRAY<T,VECTOR<int,1> >& u,bool normalize,bool preserve_u_hat) const
 {
     ARRAY<int> dim(grid.counts);
     data.Resize(2*grid.counts.x,false,false);
     int k=0;
-    for(int i=0;i<grid.counts.x/2;i++){data(k++)=(float)u_hat(i).re;data(k++)=(float)u_hat(i).im;}
-    for(int i=grid.counts.x/2+1;i<grid.counts.x-1;i++){data(k++)=(float)u_hat(grid.counts.x-i).re;data(k++)=-(float)u_hat(grid.counts.x-i).im;}
+    for(int i=0;i<grid.counts.x/2;i++){data(k++)=(float)u_hat(i).real();data(k++)=(float)u_hat(i).imag();}
+    for(int i=grid.counts.x/2+1;i<grid.counts.x-1;i++){data(k++)=(float)u_hat(grid.counts.x-i).real();data(k++)=-(float)u_hat(grid.counts.x-i).imag();}
     NR_fourn(+1,dim,data);
     if(normalize){T coefficient=(T)1/grid.counts.x;k=0;for(int i=0,k=0;i<grid.counts.x;i++){u(i)=coefficient*data(k++);k++;}}
     else for(int i=0,k=0;i<grid.counts.x;i++){u(i)=data(k++);k++;}
@@ -110,20 +109,21 @@ Inverse_Transform(ARRAY<COMPLEX<T> ,VECTOR<int,1> >& u_hat,ARRAY<T,VECTOR<int,1>
 //#####################################################################
 // enforce symmetry so that the inverse transform is a real valued function
 template<class T> void FFT_1D<T>::
-Enforce_Real_Valued_Symmetry(ARRAY<COMPLEX<T> ,VECTOR<int,1> >& u_hat) const
+Enforce_Real_Valued_Symmetry(ARRAY<std::complex<T> ,VECTOR<int,1> >& u_hat) const
 {
     // imaginary part of the constant and cosine only terms are identically zero
-    u_hat(0).im=u_hat(grid.counts.x/2).im=0;
+    u_hat(0)=u_hat(0).real();
+    u_hat(grid.counts.x/2)=u_hat(grid.counts.x/2).real();
 }
 //#####################################################################
 // Function First_Derivatives
 //#####################################################################
 template<class T> void FFT_1D<T>::
-First_Derivatives(const ARRAY<COMPLEX<T> ,VECTOR<int,1> >& u_hat,ARRAY<COMPLEX<T> ,VECTOR<int,1> >& ux_hat) const
+First_Derivatives(const ARRAY<std::complex<T> ,VECTOR<int,1> >& u_hat,ARRAY<std::complex<T> ,VECTOR<int,1> >& ux_hat) const
 {
     VECTOR<T,1> coefficients=(T)(2*pi)/grid.domain.Edge_Lengths();
     for(int i=0;i<grid.counts.x/2;i++){T k=coefficients.x*i;
-        ux_hat(i)=k*u_hat(i).Rotated_Counter_Clockwise_90();}
+        ux_hat(i)=k*u_hat(i)*std::complex<T>(0,1);}
     Enforce_Real_Valued_Symmetry(ux_hat);
 }
 //#####################################################################
@@ -131,9 +131,9 @@ First_Derivatives(const ARRAY<COMPLEX<T> ,VECTOR<int,1> >& u_hat,ARRAY<COMPLEX<T
 //#####################################################################
 // only the constant field is nonzero in 1D
 template<class T> void FFT_1D<T>::
-Make_Divergence_Free(ARRAY<COMPLEX<T> ,VECTOR<int,1> >& u_hat) const
+Make_Divergence_Free(ARRAY<std::complex<T> ,VECTOR<int,1> >& u_hat) const
 {
-    for(int i=0;i<grid.counts.x/2;i++) u_hat(i)=COMPLEX<T>(0,0);
+    for(int i=0;i<grid.counts.x/2;i++) u_hat(i)=std::complex<T>(0,0);
     Enforce_Real_Valued_Symmetry(u_hat);
 }
 //#####################################################################
@@ -141,7 +141,7 @@ Make_Divergence_Free(ARRAY<COMPLEX<T> ,VECTOR<int,1> >& u_hat) const
 //#####################################################################
 // Lanczos filter - doesn't change (0,0) frequency
 template<class T> void FFT_1D<T>::
-Filter_High_Frequencies(ARRAY<COMPLEX<T> ,VECTOR<int,1> >& u_hat,T scale) const
+Filter_High_Frequencies(ARRAY<std::complex<T> ,VECTOR<int,1> >& u_hat,T scale) const
 {
     T coefficient=2*(T)pi/grid.counts.x;
     for(int i=0;i<grid.counts.x/2;i++){

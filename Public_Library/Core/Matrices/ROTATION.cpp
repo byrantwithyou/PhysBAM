@@ -19,7 +19,7 @@ using ::std::cos;
 template<class T>  ROTATION<VECTOR<T,2> > ROTATION<VECTOR<T,2> >::
 From_Rotated_Vector(const TV& v1,const TV& v2)
 {
-    return ROTATION<TV>(COMPLEX<T>(v1.x,-v1.y)*COMPLEX<T>(v2.x,v2.y)).Normalized();
+    return ROTATION<TV>(std::complex<T>(v1.x,-v1.y)*std::complex<T>(v2.x,v2.y)).Normalized();
 }
 //#####################################################################
 // Function Scale_Angle
@@ -43,9 +43,9 @@ Spherical_Linear_Interpolation(const ROTATION<TV>& r1,const ROTATION<TV>& r2,con
 template<class T>  ROTATION<VECTOR<T,2> > ROTATION<VECTOR<T,2> >::
 Average_Rotation(const ARRAY<ROTATION<TV> >& rotations)
 {
-    COMPLEX<T> sum;
+    std::complex<T> sum;
     for(int i=0;i<rotations.m;i++) sum+=rotations(i).c;
-    return ROTATION<TV>(sum.Normalized());
+    return ROTATION<TV>(sum/abs(sum));
 }
 //#####################################################################
 // Constructor

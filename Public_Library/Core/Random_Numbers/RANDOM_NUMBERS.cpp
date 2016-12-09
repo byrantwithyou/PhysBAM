@@ -195,7 +195,7 @@ ROTATION<VECTOR<T,1> > Get_Rotation_Helper(const VECTOR<T,0>&)
 template<class T>
 ROTATION<VECTOR<T,2> > Get_Rotation_Helper(const VECTOR<T,2>& v)
 {
-    return ROTATION<VECTOR<T,2> >::From_Complex(COMPLEX<T>(v));
+    return ROTATION<VECTOR<T,2> >::From_Complex(std::complex<T>(v.x,v.y));
 }
 //#####################################################################
 // Function Get_Rotation_Helper

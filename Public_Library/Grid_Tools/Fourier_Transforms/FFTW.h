@@ -10,7 +10,6 @@
 #ifdef USE_FFTW
 
 #include <Core/Utilities/TYPE_UTILITIES.h>
-#include <Core/Vectors/COMPLEX.h>
 #include <Grid_Tools/Arrays/GRIDS_UNIFORM_ARRAYS_FORWARD.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <fftw3.h>
@@ -27,7 +26,7 @@ public:
     typedef VECTOR<T,d> TV;
     typedef VECTOR<int,d> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_T;
-    typedef ARRAY<COMPLEX<T>,TV_INT> T_ARRAYS_COMPLEX;
+    typedef ARRAY<std::complex<T>,TV_INT> T_ARRAYS_COMPLEX;
     typedef typename FFTW_POLICY<T>::PLAN T_PLAN;
 
     static const unsigned int plan_flags=FFTW_ESTIMATE | FFTW_UNALIGNED;

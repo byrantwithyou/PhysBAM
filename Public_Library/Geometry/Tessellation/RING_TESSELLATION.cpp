@@ -5,10 +5,10 @@
 // Class RING_TESSELLATION
 //##################################################################### 
 #include <Core/Matrices/MATRIX_3X2.h>
-#include <Core/Vectors/COMPLEX.h>
 #include <Geometry/Basic_Geometry/RING.h>
 #include <Geometry/Tessellation/RING_TESSELLATION.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <complex>
 
 namespace PhysBAM{
 namespace TESSELLATION{
@@ -25,7 +25,8 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const RING<T>& rin
     radial_basis.Set_Column(0,ring.plane1.normal.Orthogonal_Vector());
     radial_basis.Set_Column(1,TV::Cross_Product(ring.plane1.normal,radial_basis.Column(0)));
     for(int i=0,p=0;i<n;++i){
-        TV radial=radial_basis*COMPLEX<T>::Unit_Polar(T(2*pi/n)*i).Vector();
+        std::complex<T> c=std::polar((T)1,T(2*pi/n)*i);
+        TV radial=radial_basis*VECTOR<T,2>(c.real(),c.imag());
         particles.X(p++)=ring.plane1.x0+ring.inner_radius*radial;
         particles.X(p++)=ring.plane1.x0+ring.outer_radius*radial;
         particles.X(p++)=ring.plane2.x0+ring.outer_radius*radial;

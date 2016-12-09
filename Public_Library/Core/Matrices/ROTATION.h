@@ -11,7 +11,7 @@
 #include <Core/Matrices/MATRIX_FORWARD.h>
 #include <Core/Matrices/QUATERNION.h>
 #include <Core/Utilities/TYPE_UTILITIES.h>
-#include <Core/Vectors/COMPLEX.h>
+#include <complex>
 namespace PhysBAM{
 
 using ::std::atan2;
@@ -131,10 +131,10 @@ class ROTATION<VECTOR<T,2> >
     typedef VECTOR<T,1> T_SPIN;
 
 public:
-    COMPLEX<T> c;
+    std::complex<T> c;
 
 private:
-    ROTATION(const COMPLEX<T>& c2)
+    ROTATION(const std::complex<T>& c2)
         :c(c2)
     {}
 
@@ -147,13 +147,15 @@ public:
     {}
 
     explicit ROTATION(const MATRIX<T,2>& A)
-        :c(A.Column(0).Normalized())
-    {}
+    {
+        TV col=A.Column(0).Normalized();
+        c=std::complex<T>(col.x,col.y);
+    }
 
-    const COMPLEX<T>& Complex() const
+    const std::complex<T>& Complex() const
     {return c;}
 
-    static ROTATION<TV> From_Complex(const COMPLEX<T>& c2)
+    static ROTATION<TV> From_Complex(const std::complex<T>& c2)
     {return ROTATION<TV>(c2).Normalized();}
 
     bool operator==(const ROTATION<TV>& r) const
@@ -169,13 +171,13 @@ public:
     {return ROTATION<TV>(c*r.c);}
 
     ROTATION<TV> Inverse() const
-    {return ROTATION<TV>(c.Conjugated());}
+    {return ROTATION<TV>(conj(c));}
 
     TV Rotate(const TV& v) const
-    {return TV(c.re*v.x-c.im*v.y,c.im*v.x+c.re*v.y);}
+    {return TV(c.real()*v.x-c.imag()*v.y,c.imag()*v.x+c.real()*v.y);}
 
     TV Inverse_Rotate(const TV& v) const
-    {return TV(c.re*v.x+c.im*v.y,c.re*v.y-c.im*v.x);}
+    {return TV(c.real()*v.x+c.imag()*v.y,c.real()*v.y-c.imag()*v.x);}
 
     const T_SPIN& Rotate_Spin(const T_SPIN& spin) const
     {return spin;}
@@ -184,19 +186,19 @@ public:
     {return TWIST<TV>(Rotate(twist.linear),twist.angular);}
 
     T Normalize()
-    {return c.Normalize();}
+    {T a=abs(c);c/=a;return a;}
 
     ROTATION<TV> Normalized() const
     {ROTATION<TV> r(*this);r.Normalize();return r;}
 
     bool Is_Normalized(const T tolerance=(T)1e-3) const
-    {return abs(c.Magnitude_Squared()-(T)1)<=tolerance;}
+    {return abs(norm(c)-(T)1)<=tolerance;}
 
     void Get_Rotated_Frame(TV& x_axis,TV& y_axis) const
-    {assert(Is_Normalized());x_axis=TV(c.re,c.im);y_axis=TV(-c.im,c.re);}
+    {assert(Is_Normalized());x_axis=TV(c.real(),c.imag());y_axis=TV(-c.imag(),c.real());}
 
     T Angle() const
-    {return atan2(c.im,c.re);}
+    {return atan2(c.imag(),c.real());}
 
     VECTOR<T,1> Euler_Angles() const
     {return Rotation_Vector();}
@@ -205,19 +207,19 @@ public:
     {return VECTOR<T,1>(Angle());}
 
     MATRIX<T,2> Rotation_Matrix() const
-    {return MATRIX<T,2>(c.re,c.im,-c.im,c.re);}
+    {return MATRIX<T,2>(c.real(),c.imag(),-c.imag(),c.real());}
 
     TV Rotated_X_Axis() const // Q*(1,0)
-    {return TV(c.re,c.im);}
+    {return TV(c.real(),c.imag());}
 
     TV Rotated_Y_Axis() const // Q*(0,1)
-    {return TV(-c.im,c.re);}
+    {return TV(-c.imag(),c.real());}
 
     TV Rotated_Axis(const int axis) const
     {assert((unsigned)axis<2);if(axis==0) return Rotated_X_Axis();return Rotated_Y_Axis();}
 
     static ROTATION<TV> From_Angle(const T& a)
-    {return ROTATION<TV>(COMPLEX<T>::Unit_Polar(a));}
+    {return ROTATION<TV>(std::polar((T)1,a));}
 
     static ROTATION<TV> From_Rotation_Vector(const VECTOR<T,1>& v)
     {return From_Angle(v.x);}
@@ -244,7 +246,7 @@ inline std::ostream& operator<<(std::ostream& output_stream,const ROTATION<VECTO
 
 template<class T>
 inline std::istream& operator>>(std::istream& input_stream,ROTATION<VECTOR<T,2> >& r)
-{COMPLEX<T> c;input_stream>>c;r=ROTATION<VECTOR<T,3> >::From_Complex(c);return input_stream;}
+{std::complex<T> c;input_stream>>c;r=ROTATION<VECTOR<T,3> >::From_Complex(c);return input_stream;}
 
 //#####################################################################
 // 3D

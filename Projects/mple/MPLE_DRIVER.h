@@ -9,7 +9,6 @@
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Log/LOG.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Core/Vectors/COMPLEX.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Grid_Tools/Fourier_Transforms/FFT_2D.h>
 #include <Grid_Tools/Fourier_Transforms/FFT_3D.h>
@@ -74,7 +73,7 @@ public:
 
     ARRAY<T,TV_INT> u;                   // segmentation function
     ARRAY<T,TV_INT> force;               // force
-    ARRAY<COMPLEX<T>,TV_INT> fft;        // fft representation
+    ARRAY<std::complex<T>,TV_INT> fft;        // fft representation
     ARRAY<T,TV_INT> source;              // source
     ARRAY<TV,TV_INT> location;           // flat index to location
     ARRAY<TV_INT,TV_INT> index;          // flat to vector index
