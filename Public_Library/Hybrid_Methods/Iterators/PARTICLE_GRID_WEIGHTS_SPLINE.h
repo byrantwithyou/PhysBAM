@@ -24,7 +24,7 @@ public:
         VECTOR<TV,n> w,dw;
     };
 
-    GRID<TV> grid;
+    const GRID<TV>& grid;
     ARRAY<PRECOMPUTE_DATA> precompute_data;
 
     PARTICLE_GRID_WEIGHTS_SPLINE(const GRID<TV>& grid,int threads=1);
