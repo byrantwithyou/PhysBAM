@@ -74,6 +74,7 @@ Reinitialize(bool force)
 
     if(read_static_variables){
         int m=deformable_body_collection.structures.m;
+        active_list.Clean_Memory();active_list.Resize(m);active_list.Fill(true);
         embedded_curve_objects.Delete_Pointers_And_Clean_Memory();embedded_curve_objects.Resize(m);
         segmented_curve_objects.Delete_Pointers_And_Clean_Memory();segmented_curve_objects.Resize(m);
         bezier_spline_objects.Delete_Pointers_And_Clean_Memory();bezier_spline_objects.Resize(m);
