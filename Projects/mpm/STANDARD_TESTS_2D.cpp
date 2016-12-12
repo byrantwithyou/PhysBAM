@@ -1528,6 +1528,48 @@ Initialize()
             Add_Gravity(gravity);
         } break;
 
+        case 70:{ // Ringing test from original APIC paper
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            LOG::printf("DX %P %P\n",grid.dX,grid.one_over_dX);
+            Add_Walls(10,COLLISION_TYPE::separate,0,.1*m,false);
+            Add_Gravity(TV(0,-2*m/(s*s)));
+            max_dt=.005;
+            cfl=0.1;
+
+            // NOTE: mass is computed slightly differently.
+            T mass_density=scale_mass*4*unit_rho;
+            T E=scale_E*10*unit_p,nu=.3;
+            LOG::printf("MASS DENSITY: %P\n",mass_density);
+            
+            RANGE<TV> range0(TV(.6,.1),TV(.8,.4));
+            GRID<TV> grid0(TV_INT(TV(.625,.9375)*resolution)+1,range0);
+            TRIANGULATED_AREA<T>& ta0=*new TRIANGULATED_AREA<T>;
+            ta0.Initialize_Square_Mesh_And_Particles(grid0);
+            TRIANGULATED_AREA<T>& new_ta0=Seed_Lagrangian_Particles(ta0,[=](const TV& X){return TV(3*(m/s),0);},0,mass_density,true);
+            Add_Fixed_Corotated(new_ta0,E,nu);
+
+            T pinning_stiffness=1e5*unit_p;
+            PINNING_FORCE<TV>* pinning_force=new PINNING_FORCE<TV>(particles,dt,pinning_stiffness,0);
+            for(int i=0;i<grid0.counts.x;i++){
+                TV X0=particles.X(i);
+                pinning_force->Add_Target(i,[=](T time){return X0;});}
+            for(int i=particles.number-grid0.counts.x;i<particles.number;i++){
+                TV X0=particles.X(i);
+                pinning_force->Add_Target(i,[=](T time){return X0;});}
+            Add_Force(*pinning_force);
+            
+            RANGE<TV> range1(TV(.15,.2),TV(.25,.3));
+            GRID<TV> grid1(TV_INT(TV(.3125,.3125)*resolution)+1,range1);
+            TRIANGULATED_AREA<T>& ta1=*new TRIANGULATED_AREA<T>;
+            ta1.Initialize_Square_Mesh_And_Particles(grid1);
+            TRIANGULATED_AREA<T>& new_ta1=Seed_Lagrangian_Particles(ta1,[=](const TV& X){return TV(3*(m/s),0);},0,mass_density,true);
+            Add_Fixed_Corotated(new_ta1,E,nu);
+            LOG::printf("MASS: %P\n",particles.mass);
+
+            for(int i=0;i<this->deformable_body_collection.structures.m;i++)
+                this->deformable_body_collection.structures(i)->Update_Number_Nodes();
+        } break;
+
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     if(forced_collision_type!=-1)
