@@ -103,7 +103,7 @@ public:
 
     T Potential_Energy(const T time) const;
     void Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const;
-    void Set_Weights(int order,int threads);
+    void Set_Weights(int order);
     void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction,
         std::function<FRAME<TV>(T)> func_frame=0,std::function<TWIST<TV>(T)> func_twist=0);
     void Add_Fluid_Wall(IMPLICIT_OBJECT<TV>* io);

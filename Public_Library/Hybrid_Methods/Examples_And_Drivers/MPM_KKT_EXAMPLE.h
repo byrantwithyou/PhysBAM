@@ -126,7 +126,7 @@ public:
     void Update_Lagged_Forces(const T time) const;
     int Add_Force(PARTICLE_GRID_FORCES<TV>& force);
     int Add_Force(DEFORMABLES_FORCES<TV>& force);
-    void Set_Weights(PARTICLE_GRID_WEIGHTS<TV>* weights_input);
+    void Set_Weights(int order);
     void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction);
     void Add_Fluid_Wall(IMPLICIT_OBJECT<TV>* io);
     template<class OBJECT> typename enable_if<!is_pointer<OBJECT>::value>::type

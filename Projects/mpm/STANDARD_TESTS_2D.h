@@ -28,7 +28,7 @@ public:
     using BASE::substeps_delay_frame;using BASE::scale_mass;using BASE::scale_E;using BASE::scale_speed;
     using BASE::data_directory;using BASE::output_directory;using BASE::restart;using BASE::dt;using BASE::time;
     using BASE::frame_dt;using BASE::min_dt;using BASE::max_dt;using BASE::order;
-    using BASE::ghost;using BASE::use_affine;
+    using BASE::ghost;using BASE::use_affine;using BASE::Set_Grid;
     using BASE::use_midpoint;using BASE::print_stats;using BASE::flip;using BASE::cfl;
     using BASE::newton_tolerance;using BASE::newton_iterations;using BASE::solver_tolerance;
     using BASE::solver_iterations;using BASE::test_diff;using BASE::threads;

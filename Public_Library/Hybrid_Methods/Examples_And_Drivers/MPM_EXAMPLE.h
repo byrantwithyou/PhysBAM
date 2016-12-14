@@ -137,7 +137,7 @@ public:
     void Update_Lagged_Forces(const T time) const;
     int Add_Force(PARTICLE_GRID_FORCES<TV>& force);
     int Add_Force(DEFORMABLES_FORCES<TV>& force);
-    void Set_Weights(PARTICLE_GRID_WEIGHTS<TV>* weights_input);
+    void Set_Weights(int order);
     void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction,
         std::function<FRAME<TV>(T)> func_frame=0,std::function<TWIST<TV>(T)> func_twist=0);
     void Add_Fluid_Wall(IMPLICIT_OBJECT<TV>* io);

@@ -99,6 +99,8 @@ public:
     void Add_Walls(int flags,COLLISION_TYPE type,T inset); // -x +x -y +y [ -z +z ], as bit flags
 
     void Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale=TV_INT()+1,int default_resolution=32);
+    void Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale,TV_INT resolution_padding,
+        int resolution_multiple=1,int default_resolution=32);
 //#####################################################################
 };
 }

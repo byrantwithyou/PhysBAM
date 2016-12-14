@@ -204,19 +204,18 @@ Add_Force(DEFORMABLES_FORCES<TV>& force)
 // Function Set_Weights
 //#####################################################################
 template<class TV> void MPM_EXAMPLE<TV>::
-Set_Weights(PARTICLE_GRID_WEIGHTS<TV>* weights_input)
+Set_Weights(int order)
 {
-    weights=weights_input;
-    gather_scatter.weights=weights;
+    if(order==1) gather_scatter.weights=weights=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,1>(grid,threads);
+    else if(order==2) gather_scatter.weights=weights=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(grid,threads);
+    else if(order==3) gather_scatter.weights=weights=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,3>(grid,threads);
+    else PHYSBAM_FATAL_ERROR("Unrecognized interpolation order");
+    
     for(int i=0;i<TV::m;++i){
         GRID<TV> face_grid=grid.Get_Face_MAC_Grid(i);
-        if(weights->Order()==1)
-            face_weights(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,1>(face_grid,threads);
-        else if(weights->Order()==2)
-            face_weights(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(face_grid,threads);
-        else if(weights->Order()==3)
-            face_weights(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,3>(face_grid,threads);
-        else PHYSBAM_FATAL_ERROR("Unrecognized interpolation order");}
+        if(order==1) face_weights(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,1>(face_grid,threads);
+        else if(order==2) face_weights(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(face_grid,threads);
+        else if(order==3) face_weights(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,3>(face_grid,threads);}
 }
 //#####################################################################
 // Function Total_Particle_Linear_Momentum

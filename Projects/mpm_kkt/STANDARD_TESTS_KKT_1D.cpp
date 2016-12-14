@@ -70,7 +70,7 @@ Initialize()
     switch(test_number)
     {
         case 1:{ // circle free fall
-            grid.Initialize(TV_INT()+resolution*2-1,RANGE<TV>::Unit_Box(),true);
+            Set_Grid(RANGE<TV>::Unit_Box());
             RANGE<TV> box(TV(.45),TV(.55));
             T density=2*scale_mass;
             Seed_Particles(box,[=](const TV& X){return TV();},
@@ -85,14 +85,14 @@ Initialize()
             Add_Fluid_Wall(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(1),TV(5))));
         } break;
         case 2:{ // full box
-            grid.Initialize(TV_INT()+resolution*2-1,RANGE<TV>::Unit_Box(),true);
+            Set_Grid(RANGE<TV>::Unit_Box());
             RANGE<TV> box(grid.dX,TV::All_Ones_Vector()-grid.dX);
             T density=scale_mass;
             Seed_Particles(box,0,0,density,particles_per_cell);
             Add_Gravity(TV(-1.8));
         } break; 
         case 3:{ // constant velocity
-            grid.Initialize(TV_INT()+resolution*2-1,RANGE<TV>::Unit_Box(),true);
+            Set_Grid(RANGE<TV>::Unit_Box());
             RANGE<TV> box(TV(.45),TV(.55));
             T density=2*scale_mass;
             Seed_Particles(box,[=](const TV& X){return TV(0.2);},
@@ -100,7 +100,7 @@ Initialize()
                 density,particles_per_cell);
         } break;
         case 4:{ // constant velocity
-            grid.Initialize(TV_INT()+resolution*2-1,RANGE<TV>::Unit_Box(),true);
+            Set_Grid(RANGE<TV>::Unit_Box());
             RANGE<TV> box(TV(.45),TV(.55));
             T density=scale_mass;
             Seed_Particles(box,[=](const TV& X){return TV(0.2);},
@@ -109,7 +109,7 @@ Initialize()
             particles.lambda.Fill(1);
         } break;
         case 5:{ // gravity with one_over_lambda
-            grid.Initialize(TV_INT()+resolution*2-1,RANGE<TV>::Unit_Box(),true);
+            Set_Grid(RANGE<TV>::Unit_Box());
             RANGE<TV> box(TV(.45),TV(.55));
             T density=scale_mass;
             Seed_Particles(box,[=](const TV& X){return TV(0.2);},0,
@@ -118,7 +118,7 @@ Initialize()
             Add_Gravity(TV(-0.8));
         } break;
         case 6:{ // analytic test
-            grid.Initialize(TV_INT()+resolution*2-1,RANGE<TV>::Unit_Box(),true);
+            Set_Grid(RANGE<TV>::Unit_Box());
             RANGE<TV> box(TV(.4),TV(.6));
             T density=scale_mass;
             Seed_Particles(box,[=](const TV& X){return TV(0.5*cos((T)pi/0.2*(X(0)-0.4)));},
@@ -127,7 +127,7 @@ Initialize()
             particles.lambda.Fill(1);
         } break;
         case 7:{ // half box
-            grid.Initialize(TV_INT()+resolution*2-1,RANGE<TV>::Unit_Box(),true);
+            Set_Grid(RANGE<TV>::Unit_Box());
             RANGE<TV> box(TV(0.5),TV(1));
             T density=scale_mass;
             Seed_Particles(box,[=](const TV& X){return TV(0.5);},0,density,particles_per_cell);
@@ -136,8 +136,6 @@ Initialize()
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
-    // initialize coarse grid
-    coarse_grid.Initialize(TV_INT()+resolution,grid.domain.Thickened(grid.dX/2),true);
 }
 //#####################################################################
 // Function Begin_Frame

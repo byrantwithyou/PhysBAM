@@ -23,7 +23,7 @@ class STANDARD_TESTS_KKT<VECTOR<T,1> >:public STANDARD_TESTS_KKT_BASE<VECTOR<T,1
 
 public:
     using BASE::initial_time;using BASE::last_frame;using BASE::grid;using BASE::particles;
-    using BASE::mass;using BASE::force_helper;
+    using BASE::mass;using BASE::force_helper;using BASE::Set_Grid;
     using BASE::frame_title;using BASE::write_substeps_level;using BASE::particles_per_cell;
     using BASE::substeps_delay_frame;using BASE::scale_mass;using BASE::scale_E;using BASE::scale_speed;
     using BASE::output_directory;using BASE::restart;using BASE::dt;using BASE::time;

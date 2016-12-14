@@ -190,15 +190,16 @@ Add_Force(DEFORMABLES_FORCES<TV>& force)
 // Function Set_Weights
 //#####################################################################
 template<class TV> void MPM_KKT_EXAMPLE<TV>::
-Set_Weights(PARTICLE_GRID_WEIGHTS<TV>* weights_input)
+Set_Weights(int order)
 {
-    weights=weights_input;
-    gather_scatter.weights=weights;
-    if(weights->Order()==2)
-        coarse_weights=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,1>(coarse_grid,threads);
-    else if(weights->Order()==3)
-        coarse_weights=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(coarse_grid,threads);
+    if(order==2){
+        weights=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(grid,threads);
+        coarse_weights=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(coarse_grid,threads);}
+    else if(order==3){
+        weights=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,3>(grid,threads);
+        coarse_weights=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,3>(coarse_grid,threads);}
     else PHYSBAM_FATAL_ERROR("Unrecognized interpolation order");
+    gather_scatter.weights=weights;
     gather_scatter_coarse.weights=coarse_weights;
 }
 //#####################################################################

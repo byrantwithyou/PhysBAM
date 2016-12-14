@@ -101,6 +101,9 @@ public:
     int Add_Fixed_Corotated(T E,T nu,ARRAY<int>* affected_particles=0,bool no_mu=false);
     int Add_Neo_Hookean(T E,T nu,ARRAY<int>* affected_particles=0);
     void Add_Walls(int flags,COLLISION_TYPE type,T friction,T inset,bool penalty); // -x +x -y +y [ -z +z ], as bit flags
+    void Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale=TV_INT()+1,int default_resolution=32);
+    void Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale,TV_INT resolution_padding,
+        int resolution_multiple=1,int default_resolution=32);
 //#####################################################################
 };
 }

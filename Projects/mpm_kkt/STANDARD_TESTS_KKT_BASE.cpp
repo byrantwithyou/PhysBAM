@@ -105,11 +105,6 @@ STANDARD_TESTS_KKT_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_ar
     random.Set_Seed(seed);
 
     particles.Store_B(use_affine);
-
-    if(order==1) Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,1>(grid,threads));
-    else if(order==2) Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(grid,threads));
-    else if(order==3) Set_Weights(new PARTICLE_GRID_WEIGHTS_SPLINE<TV,3>(grid,threads));
-    else PHYSBAM_FATAL_ERROR("Unrecognized interpolation order");
 }
 //#####################################################################
 // Destructor
@@ -264,6 +259,31 @@ template<class TV> void STANDARD_TESTS_KKT_BASE<TV>::
 Add_Penalty_Collision_Object(IMPLICIT_OBJECT<TV>* io)
 {
     this->Add_Force(*new IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,io,penalty_collisions_stiffness,penalty_collisions_separation,penalty_collisions_length));
+}
+//#####################################################################
+// Function Set_Grid
+//#####################################################################
+template<class TV> void STANDARD_TESTS_KKT_BASE<TV>::
+Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale,int default_resolution)
+{
+    if(!user_resolution) resolution=default_resolution;
+    grid.Initialize(resolution_scale*resolution*2-1,domain,true);
+    coarse_grid.Initialize(resolution_scale*resolution,domain.Thickened(grid.dX/2),true);
+    Set_Weights(order);
+}
+//#####################################################################
+// Function Set_Grid
+//#####################################################################
+template<class TV> void STANDARD_TESTS_KKT_BASE<TV>::
+Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale,TV_INT resolution_padding,
+    int resolution_multiple,int default_resolution)
+{
+    if(!user_resolution) resolution=default_resolution;
+    int scaled_resolution=(resolution+resolution_multiple-1)/resolution_multiple;
+    TV_INT res=resolution_scale*scaled_resolution+resolution_padding;
+    grid.Initialize(res*2-1,domain,true);
+    coarse_grid.Initialize(res,domain.Thickened(grid.dX/2),true);
+    Set_Weights(order);
 }
 template class STANDARD_TESTS_KKT_BASE<VECTOR<float,1> >;
 template class STANDARD_TESTS_KKT_BASE<VECTOR<float,2> >;

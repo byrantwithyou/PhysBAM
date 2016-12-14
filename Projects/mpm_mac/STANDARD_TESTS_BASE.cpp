@@ -222,7 +222,19 @@ Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale,int default_resolution)
 {
     if(!user_resolution) resolution=default_resolution;
     grid.Initialize(resolution_scale*resolution,domain,true);
-    Set_Weights(order,threads);
+    Set_Weights(order);
+}
+//#####################################################################
+// Function Set_Grid
+//#####################################################################
+template<class TV> void STANDARD_TESTS_BASE<TV>::
+Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale,TV_INT resolution_padding,
+    int resolution_multiple,int default_resolution)
+{
+    if(!user_resolution) resolution=default_resolution;
+    int scaled_resolution=(resolution+resolution_multiple-1)/resolution_multiple;
+    grid.Initialize(resolution_scale*scaled_resolution+resolution_padding,domain,true);
+    Set_Weights(order);
 }
 template class STANDARD_TESTS_BASE<VECTOR<float,2> >;
 template class STANDARD_TESTS_BASE<VECTOR<float,3> >;

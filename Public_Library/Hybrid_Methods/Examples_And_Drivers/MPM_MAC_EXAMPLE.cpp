@@ -109,16 +109,16 @@ Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const
 // Function Set_Weights
 //#####################################################################
 template<class TV> void MPM_MAC_EXAMPLE<TV>::
-Set_Weights(int order,int threads)
+Set_Weights(int order)
 {
     for(int i=0;i<TV::m;i++){
         GRID<TV> face_grid=grid.Get_Face_MAC_Grid(i);
         if(order==1)
-            weights(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,1>(face_grid,threads);
+            weights(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,1>(face_grid);
         else if(order==2)
-            weights(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(face_grid,threads);
+            weights(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(face_grid);
         else if(order==3)
-            weights(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,3>(face_grid,threads);
+            weights(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,3>(face_grid);
         else PHYSBAM_FATAL_ERROR("Unrecognized interpolation order");}
     gather_scatter.face_weights=weights;
 }

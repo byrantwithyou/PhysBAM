@@ -141,6 +141,9 @@ public:
     int Add_Clamped_Plasticity(ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& icm,T theta_c,T theta_s,T max_hardening,
         T hardening_factor,ARRAY<int>* affected_particles);
     void Set_Lame_On_Particles(T E,T nu,ARRAY<int>* affected_particles=0);
+    void Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale=TV_INT()+1,int default_resolution=32);
+    void Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale,TV_INT resolution_padding,
+        int resolution_multiple=1,int default_resolution=32);
 //#####################################################################
 };
 }
