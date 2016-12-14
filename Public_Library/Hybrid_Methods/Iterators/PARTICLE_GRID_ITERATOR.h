@@ -15,10 +15,12 @@ class PARTICLE_GRID_ITERATOR
     typedef VECTOR<int,TV::m> TV_INT;
 public:
     typedef typename PARTICLE_GRID_WEIGHTS<TV>::SCRATCH SCRATCH;
-    SCRATCH& scratch;
+    const SCRATCH& scratch;
     int i;
 
     PARTICLE_GRID_ITERATOR(const PARTICLE_GRID_WEIGHTS<TV>* weights,int p,bool want_gradient,SCRATCH& scratch);
+    PARTICLE_GRID_ITERATOR(const PARTICLE_GRID_WEIGHTS<TV>* weights,const TV& X,bool want_gradient,SCRATCH& scratch);
+    PARTICLE_GRID_ITERATOR(const SCRATCH& scratch);
     const TV_INT& Index() const {return scratch.index(i);}
     const T& Weight() const {return scratch.weight(i);}
     const TV& Gradient() const {return scratch.gradient(i);}

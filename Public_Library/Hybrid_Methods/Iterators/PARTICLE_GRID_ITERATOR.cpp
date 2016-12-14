@@ -14,6 +14,23 @@ PARTICLE_GRID_ITERATOR(const PARTICLE_GRID_WEIGHTS<TV>* weights,int p,bool want_
 {
     weights->Compute(p,scratch,want_gradient);
 }
+//#####################################################################
+// Constructor
+//#####################################################################
+template<class TV> PARTICLE_GRID_ITERATOR<TV>::
+PARTICLE_GRID_ITERATOR(const PARTICLE_GRID_WEIGHTS<TV>* weights,const TV& X,bool want_gradient,SCRATCH& scratch)
+    :scratch(scratch),i(0)
+{
+    weights->Compute(X,scratch,want_gradient);
+}
+//#####################################################################
+// Constructor
+//#####################################################################
+template<class TV> PARTICLE_GRID_ITERATOR<TV>::
+PARTICLE_GRID_ITERATOR(const SCRATCH& scratch)
+    :scratch(scratch),i(0)
+{
+}
 template class PARTICLE_GRID_ITERATOR<VECTOR<float,1> >;
 template class PARTICLE_GRID_ITERATOR<VECTOR<float,2> >;
 template class PARTICLE_GRID_ITERATOR<VECTOR<float,3> >;

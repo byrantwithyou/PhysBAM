@@ -29,10 +29,12 @@ public:
     virtual ~PARTICLE_GRID_WEIGHTS();
 
     virtual void Compute(int p,SCRATCH& scratch,bool want_gradient) const=0;
+    virtual void Compute(const TV& X,SCRATCH& scratch,bool want_gradient) const=0;
     virtual void Update(const ARRAY_VIEW<TV>& X)=0;
     virtual T Constant_Scalar_Inverse_Dp() const=0;
     virtual SYMMETRIC_MATRIX<T,TV::m> Dp(const TV& X) const=0;
     virtual int Order() const=0;
+    virtual T Weight(const TV& u) const=0;
 //#####################################################################
 };
 }

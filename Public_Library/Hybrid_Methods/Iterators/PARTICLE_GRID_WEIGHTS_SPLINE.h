@@ -30,11 +30,15 @@ public:
     PARTICLE_GRID_WEIGHTS_SPLINE(const GRID<TV>& grid,int threads=1);
     virtual ~PARTICLE_GRID_WEIGHTS_SPLINE();
 
-    void Compute(int p,typename BASE::SCRATCH& scratch,bool want_gradient) const;
+    void Compute(const PRECOMPUTE_DATA& pd,typename BASE::SCRATCH& scratch,bool want_gradient) const;
+    void Compute(int p,typename BASE::SCRATCH& scratch,bool want_gradient) const override;
+    void Compute(const TV& X,typename BASE::SCRATCH& scratch,bool want_gradient) const override;
+    void Compute_Precompute_Data(PRECOMPUTE_DATA& pd,const TV& X) const;
     void Update(const ARRAY_VIEW<TV>& X);
     T Constant_Scalar_Inverse_Dp() const;
     SYMMETRIC_MATRIX<T,TV::m> Dp(const TV& X) const;
     int Order() const;
+    virtual T Weight(const TV& u) const override;
 //#####################################################################
 };
 }

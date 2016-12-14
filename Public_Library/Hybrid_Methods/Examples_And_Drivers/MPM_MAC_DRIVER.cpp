@@ -276,11 +276,41 @@ Grid_To_Particle()
         });
 }
 //#####################################################################
+// Function Compute_Volume_For_Face
+//#####################################################################
+template<class TV> typename TV::SCALAR MPM_MAC_DRIVER<TV>::
+Compute_Volume_For_Face(const FACE_INDEX<TV::m>& face) const
+{
+    T total_volume=0;
+    int num=0;
+    int width=example.weights(face.axis)->Order()+1;
+    RANGE<TV_INT> range(TV_INT(),TV_INT()+width*2);
+    for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
+        TV X=example.grid.dX*(TV(it.index-width)*(T).5+(T).25);
+        TV Y=example.grid.Face(face)+X;
+        bool in=false;
+        for(int i=0;i<example.collision_objects.m;i++){
+            MPM_COLLISION_OBJECT<TV>* o=example.collision_objects(i);
+            if(o->Phi(Y,example.time)<0){
+                Add_Debug_Particle(example.grid.Face(face),VECTOR<T,3>(.5,.5,.5));
+                in=true;
+                break;}}
+        if(in) continue;
+        T weight=example.weights(face.axis)->Weight(X);
+        num++;
+        total_volume+=weight;}
+    return total_volume;
+}
+//#####################################################################
 // Function Compute_Poisson_Matrix
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Compute_Poisson_Matrix()
 {
+    VECTOR<typename PARTICLE_GRID_WEIGHTS<TV>::SCRATCH,TV::m> scratch;
+    for(int i=0;i<TV::m;i++)
+        example.weights(i)->Compute(example.grid.Face(FACE_INDEX<TV::m>(i,TV_INT())),scratch(i),false);
+    ARRAY<T,FACE_INDEX<TV::m> > face_fraction(example.grid,3); // Fraction of region of influence that is inside
     ARRAY<bool,FACE_INDEX<TV::m> > psi_N(example.grid);
     for(FACE_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
         TV X=it.Location();
@@ -289,7 +319,10 @@ Compute_Poisson_Matrix()
             if(o->Phi(X,example.time)<0){
                 psi_N(it.Full_Index())=true;
                 example.velocity(it.Full_Index())=o->Velocity(X,example.time)(it.axis);
-                break;}}}
+                break;}}
+        if(!psi_N(it.Full_Index()))
+            for(PARTICLE_GRID_ITERATOR<TV> pit(scratch(it.axis));pit.Valid();pit.Next())
+                face_fraction(FACE_INDEX<TV::m>(it.axis,it.index+pit.Index()))+=pit.Weight();}
 
     ARRAY<int,TV_INT> cell_index(example.grid.Domain_Indices(1));
     int next_cell=0;
@@ -320,7 +353,7 @@ Compute_Poisson_Matrix()
                 cell(a)+=2*s-1;
                 assert(face.Cell_Index(s)==cell);
                 if(!psi_N(face)){
-                    T entry=sqr(example.grid.one_over_dX(a))/example.mass(face);
+                    T entry=sqr(example.grid.one_over_dX(a))*Compute_Volume_For_Face(face)/example.mass(face);
                     diag+=entry;
                     int ci=cell_index(cell);
                     if(ci>=0) A.Append_Entry_To_Current_Row(ci,-entry);}
@@ -346,7 +379,7 @@ Compute_Poisson_Matrix()
         if(c1>=0) G.Append_Entry_To_Current_Row(c1,example.grid.one_over_dX(it.axis));
         if(c0<0 && c1<0) continue;
         faces.Append(it.Full_Index());
-        M.Append(mass);
+        M.Append(mass/Compute_Volume_For_Face(it.Full_Index()));
         G.Finish_Row();}
     G.Sort_Entries();
 }

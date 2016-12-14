@@ -31,9 +31,8 @@ template<class TV,int degree> PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
 // Function Compute
 //#####################################################################
 template<class TV,int degree> void PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
-Compute(int p,typename BASE::SCRATCH& scratch,bool want_gradient) const
+Compute(const PRECOMPUTE_DATA& pd,typename BASE::SCRATCH& scratch,bool want_gradient) const
 {
-    const PRECOMPUTE_DATA& pd=precompute_data(p);
     int pow_n=pow<TV::m,int>(n);
     scratch.index.Resize(pow_n);
     scratch.weight.Resize(pow_n);
@@ -54,6 +53,24 @@ Compute(int p,typename BASE::SCRATCH& scratch,bool want_gradient) const
                     dw(i)*=(i==j)?dj:all_w(j);}
             scratch.gradient(k)=dw;}
         k++;}
+}
+//#####################################################################
+// Function Compute
+//#####################################################################
+template<class TV,int degree> void PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
+Compute(int p,typename BASE::SCRATCH& scratch,bool want_gradient) const
+{
+    Compute(precompute_data(p),scratch,want_gradient);
+}
+//#####################################################################
+// Function Compute
+//#####################################################################
+template<class TV,int degree> void PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
+Compute(const TV& X,typename BASE::SCRATCH& scratch,bool want_gradient) const
+{
+    PRECOMPUTE_DATA pd;
+    Compute_Precompute_Data(pd,X);
+    Compute(pd,scratch,want_gradient);
 }
 //#####################################################################
 // Function Compute_Weights
@@ -111,17 +128,23 @@ Compute_Weights(VECTOR<TV,4>& w,VECTOR<TV,4>& dw,TV x,TV one_over_dX)
     dw(3)=(T).5*one_over_dX*z2;
 }
 //#####################################################################
+// Function Compute_Precompute_Data
+//#####################################################################
+template<class TV,int degree> void PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
+Compute_Precompute_Data(PRECOMPUTE_DATA& pd,const TV& X) const
+{
+    pd.base=grid.Cell(X-(T).5*degree*grid.DX(),degree+1);
+    TV X_eval=X-grid.Center(pd.base);
+    Compute_Weights(pd.w,pd.dw,X_eval*grid.one_over_dX,grid.one_over_dX);
+}
+//#####################################################################
 // Function Update
 //#####################################################################
 template<class TV,int degree> void PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
 Update(const ARRAY_VIEW<TV>& X)
 {
     precompute_data.Resize(X.m);
-    for(int p=0;p<X.m;p++){
-        PRECOMPUTE_DATA& pd=precompute_data(p);
-        pd.base=grid.Cell(X(p)-(T).5*degree*grid.DX(),degree+1);
-        TV X_eval=X(p)-grid.Center(pd.base);
-        Compute_Weights(pd.w,pd.dw,X_eval*grid.one_over_dX,grid.one_over_dX);}
+    for(int p=0;p<X.m;p++) Compute_Precompute_Data(precompute_data(p),X(p));
 }
 //#####################################################################
 // Function Constant_Scalar_Dp
@@ -149,6 +172,46 @@ template<class TV,int degree> int PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
 Order() const
 {
     return degree;
+}
+//#####################################################################
+// Function Weights_Helper
+//#####################################################################
+template<class T> inline T
+Weights_Helper(T x,VECTOR<int,1>*)
+{
+    if(x>1) return 0;
+    return 1-x;
+}
+//#####################################################################
+// Function Weights_Helper
+//#####################################################################
+template<class T> inline T
+Weights_Helper(T x,VECTOR<int,2>*)
+{
+    if(x>(T)1.5) return 0;
+    if(x>(T).5) return (T).5*sqr(x-(T)1.5);
+    return -x*x+(T).75;
+}
+//#####################################################################
+// Function Weights_Helper
+//#####################################################################
+template<class T> inline T
+Weights_Helper(T x,VECTOR<int,3>*)
+{
+    if(x>2) return 0;
+    if(x<1) return ((T).5*x-1)*x*x+(T)2/3;
+    T z=2-x;
+    return ((T)1/6)*z*z*z;
+}
+//#####################################################################
+// Constructor
+//#####################################################################
+template<class TV,int degree> typename TV::SCALAR PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
+Weight(const TV& u) const
+{
+    TV v=u*grid.one_over_dX,w;
+    for(int i=0;i<TV::m;i++) w(i)=Weights_Helper(abs(v(i)),(VECTOR<int,degree>*)0);
+    return w.Product();
 }
 //#####################################################################
 template class PARTICLE_GRID_WEIGHTS_SPLINE<VECTOR<float,1>,1>;
