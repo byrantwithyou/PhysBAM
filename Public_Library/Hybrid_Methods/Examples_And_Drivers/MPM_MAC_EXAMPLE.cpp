@@ -28,9 +28,10 @@ MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type)
     last_frame(100),write_substeps_level(-1),substeps_delay_frame(-1),
     output_directory("output"),data_directory("../../Public_Data"),restart(0),
     dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),
-    only_write_particles(false),cfl(1),solver_tolerance(std::numeric_limits<T>::epsilon()*10),solver_iterations(1000),
-    threads(1),debug_particles(*new DEBUG_PARTICLES<TV>),print_stats(false),
-    last_te(0),last_grid_ke(0)
+    only_write_particles(false),cfl(1),
+    solver_tolerance(std::numeric_limits<T>::epsilon()*10),solver_iterations(1000),
+    threads(1),use_particle_volumes(false),debug_particles(*new DEBUG_PARTICLES<TV>),
+    print_stats(false),last_te(0),last_grid_ke(0)
 {
 }
 //#####################################################################

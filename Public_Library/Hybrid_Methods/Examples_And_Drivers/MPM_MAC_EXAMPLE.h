@@ -81,6 +81,7 @@ public:
     T solver_tolerance;
     int solver_iterations;
     int threads;
+    bool use_particle_volumes;
 
     // debugging
     DEBUG_PARTICLES<TV>& debug_particles;

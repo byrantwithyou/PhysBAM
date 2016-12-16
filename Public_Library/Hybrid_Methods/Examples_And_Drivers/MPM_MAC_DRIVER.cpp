@@ -354,7 +354,8 @@ Compute_Poisson_Matrix()
                 cell(a)+=2*s-1;
                 assert(face.Cell_Index(s)==cell);
                 if(!psi_N(face)){
-                    T entry=sqr(example.grid.one_over_dX(a))*Compute_Volume_For_Face(face)/example.mass(face);
+                    T entry=sqr(example.grid.one_over_dX(a))/example.mass(face);
+                    if(example.use_particle_volumes) entry*=example.volume(face);
                     diag+=entry;
                     int ci=cell_index(cell);
                     if(ci>=0) A.Append_Entry_To_Current_Row(ci,-entry);}
@@ -380,7 +381,8 @@ Compute_Poisson_Matrix()
         if(c1>=0) G.Append_Entry_To_Current_Row(c1,example.grid.one_over_dX(it.axis));
         if(c0<0 && c1<0) continue;
         faces.Append(it.Full_Index());
-        M.Append(mass/Compute_Volume_For_Face(it.Full_Index()));
+        if(example.use_particle_volumes) mass/=example.volume(it.Full_Index());
+        M.Append(mass);
         G.Finish_Row();}
     G.Sort_Entries();
 }
