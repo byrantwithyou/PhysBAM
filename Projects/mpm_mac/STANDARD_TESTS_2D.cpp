@@ -145,6 +145,13 @@ Initialize()
             gravity=TV(0,-1)*m/sqr(s);
             Add_Walls(-1,COLLISION_TYPE::slip,.1*m);
         } break;
+        case 6:{ // a dropping chunk of fluid
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            T density=2*unit_rho*scale_mass;
+            Seed_Particles(RANGE<TV>(TV(.2*m,.2*m),TV(.5*m,.8*m)),0,0,density,particles_per_cell);
+            gravity=TV(0,-1)*m/sqr(s);
+            Add_Walls(-1,COLLISION_TYPE::slip,.1*m);
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     if(forced_collision_type!=-1)
