@@ -401,13 +401,11 @@ Pressure_Projection()
         tmp(i)=example.velocity(example.projection_system.faces(i));
     example.projection_system.gradient.Transpose_Times(tmp,example.rhs.v);
     
-    example.projection_system.Test_System(example.sol);
+    if(example.test_system) example.projection_system.Test_System(example.sol);
     
     CONJUGATE_GRADIENT<T> cg;
     cg.finish_before_indefiniteness=true;
     cg.relative_tolerance=true;
-    cg.print_diagnostics=true;
-    cg.print_residuals=true;
     bool converged=cg.Solve(example.projection_system,example.sol,example.rhs,
         example.av,example.solver_tolerance,0,example.solver_iterations);
     if(!converged) LOG::printf("SOLVER DID NOT CONVERGE.\n");

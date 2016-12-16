@@ -71,7 +71,8 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-I",&extra_int,"int","extra int argument");
     parse_args.Add("-dump_collisions",&dump_collision_objects,"dump out collision objects");
     parse_args.Add("-use_volume",&use_particle_volumes,"use particle volumes to avoid boiling");
-    
+    parse_args.Add("-test_system",&test_system,"run sanity checks on Krylov systems");
+
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);
     if(use_slip) forced_collision_type=COLLISION_TYPE::slip;

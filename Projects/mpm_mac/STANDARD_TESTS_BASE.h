@@ -34,7 +34,7 @@ public:
     using BASE::use_affine;using BASE::print_stats;using BASE::only_write_particles;
     using BASE::cfl;using BASE::solver_tolerance;using BASE::solver_iterations;
     using BASE::threads;using BASE::weights;using BASE::stream_type;using BASE::Set_Weights;
-    using BASE::Add_Collision_Object;using BASE::use_particle_volumes;
+    using BASE::Add_Collision_Object;using BASE::use_particle_volumes;using BASE::test_system;
     using typename BASE::COLLISION_TYPE;using BASE::data_directory;using BASE::Add_Fluid_Wall;
 
     int test_number;

@@ -90,6 +90,7 @@ public:
     typename TV::SPIN last_angular_momentum;
     T last_te;
     T last_grid_ke;
+    bool test_system;
 
     MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type_input);
     virtual ~MPM_MAC_EXAMPLE();

@@ -31,7 +31,7 @@ MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type)
     only_write_particles(false),cfl(1),
     solver_tolerance(std::numeric_limits<T>::epsilon()*10),solver_iterations(1000),
     threads(1),use_particle_volumes(false),debug_particles(*new DEBUG_PARTICLES<TV>),
-    print_stats(false),last_te(0),last_grid_ke(0)
+    print_stats(false),last_te(0),last_grid_ke(0),test_system(false)
 {
 }
 //#####################################################################
