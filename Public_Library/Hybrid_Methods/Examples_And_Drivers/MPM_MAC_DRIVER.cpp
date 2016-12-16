@@ -101,7 +101,6 @@ Initialize()
 
     if(!example.restart) Write_Output_Files(0);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",0,1);
-    LOG::printf("%P\n",example.particles.V);
 }
 //#####################################################################
 // Function Advance_One_Time_Step
