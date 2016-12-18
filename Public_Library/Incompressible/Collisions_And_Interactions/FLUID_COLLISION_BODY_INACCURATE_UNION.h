@@ -118,10 +118,9 @@ public:
     void Read_State(TYPED_ISTREAM& input,const int state_index) override;
     void Write_State(TYPED_OSTREAM& output,const int state_index) const override;
     typename TV::SCALAR Implicit_Geometry_Extended_Value(const TV& location) const override;
-    void Initialize_Grid_Structures(const GRID<TV>& grid,OBJECTS_IN_CELL<TV,COLLISION_GEOMETRY_ID>& objects_in_cell,const COLLISION_GEOMETRY_ID id) const;
+    void Initialize_Grid_Structures();
 private:
     typename TV::SCALAR Implicit_Geometry_Extended_Value_Helper(const TV& location,UNIFORM_TAG<TV>) const;
-    void Initialize_Grid_Structures_Helper(OBJECTS_IN_CELL<TV,COLLISION_GEOMETRY_ID>& objects_in_cell,const COLLISION_GEOMETRY_ID id,UNIFORM_TAG<TV>);
     void Initialize_Grid_Structures_Subobject(T_FACE_ARRAYS_INT& face_velocities_count,T_FACE_ARRAYS_COLLISION_GEOMETRY_ID& face_operations,const COLLISION_GEOMETRY_ID subobject,UNIFORM_TAG<TV>);
 //#####################################################################
 };

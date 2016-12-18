@@ -22,9 +22,12 @@ FLUID_COLLISION_BODY_INACCURATE_UNION(GRID<TV>& grid_input)
 {
     collision_geometries_for_rasterization=&collision_bodies.collision_geometry_collection.bodies;
 }
+//#####################################################################
+// Constructor
+//#####################################################################
 template<class TV> FLUID_COLLISION_BODY_INACCURATE_UNION<TV>::
 FLUID_COLLISION_BODY_INACCURATE_UNION(GRID<TV>& grid_input,T contour_value_input)
-    :contour_value(contour_value_input),grid(grid_input),levelset(grid_input,phi)
+    :collision_bodies(grid_input),contour_value(contour_value_input),grid(grid_input),levelset(grid_input,phi)
 {
 }    
 //#####################################################################
@@ -89,16 +92,7 @@ Write_State(TYPED_OSTREAM& output,const int state_index) const
 // Function Initialize_Grid_Structures
 //#####################################################################
 template<class TV> void FLUID_COLLISION_BODY_INACCURATE_UNION<TV>::
-Initialize_Grid_Structures(const GRID<TV>& grid_input,OBJECTS_IN_CELL<TV,COLLISION_GEOMETRY_ID>& objects_in_cell,const COLLISION_GEOMETRY_ID id) const
-{
-    if(&grid!=&grid_input) PHYSBAM_FATAL_ERROR();
-    const_cast<FLUID_COLLISION_BODY_INACCURATE_UNION<TV>&>(*this).Initialize_Grid_Structures_Helper(objects_in_cell,id,typename GRID<TV>::GRID_TAG());
-}
-//#####################################################################
-// Function Initialize_Grid_Structures_Helper
-//#####################################################################
-template<class TV> void FLUID_COLLISION_BODY_INACCURATE_UNION<TV>::
-Initialize_Grid_Structures_Helper(OBJECTS_IN_CELL<TV,COLLISION_GEOMETRY_ID>& objects_in_cell,const COLLISION_GEOMETRY_ID id,UNIFORM_TAG<TV>)
+Initialize_Grid_Structures()
 {
     collision_bodies.collision_geometry_collection.Update_Bounding_Boxes();
     // phi and velocity
@@ -133,13 +127,10 @@ Initialize_Grid_Structures_Subobject(T_FACE_ARRAYS_INT& face_velocities_count,T_
                 face_velocities.Component(axis)(face2)=collision_body.Pointwise_Object_Velocity(grid.Face(FACE_INDEX<TV::m>(axis,face2)))[axis];face_velocities_count.Component(axis)(face2)++;}}}
 }
 //##################################################################### 
-#define P(...) __VA_ARGS__
-#define INSTANTIATION_HELPERV(TV) \
-    template FLUID_COLLISION_BODY_INACCURATE_UNION<P(TV) >::FLUID_COLLISION_BODY_INACCURATE_UNION(P(GRID<TV>)&); \
-    template void FLUID_COLLISION_BODY_INACCURATE_UNION<P(TV) >::Initialize_Grid_Structures(P(GRID<TV>) const&,OBJECTS_IN_CELL<P(TV),COLLISION_GEOMETRY_ID>&,COLLISION_GEOMETRY_ID) const; \
-    template FLUID_COLLISION_BODY_INACCURATE_UNION<TV>::~FLUID_COLLISION_BODY_INACCURATE_UNION();
-#define INSTANTIATION_HELPER_T(T) \
-    INSTANTIATION_HELPERV(P(VECTOR<T,1>)) INSTANTIATION_HELPERV(P(VECTOR<T,2>)) INSTANTIATION_HELPERV(P(VECTOR<T,3>))
-
-INSTANTIATION_HELPER_T(float);
-INSTANTIATION_HELPER_T(double);
+namespace PhysBAM
+{
+template class FLUID_COLLISION_BODY_INACCURATE_UNION<VECTOR<float,2> >;
+template class FLUID_COLLISION_BODY_INACCURATE_UNION<VECTOR<float,3> >;
+template class FLUID_COLLISION_BODY_INACCURATE_UNION<VECTOR<double,2> >;
+template class FLUID_COLLISION_BODY_INACCURATE_UNION<VECTOR<double,3> >;
+}

@@ -45,18 +45,30 @@ public:
         int cells=1*resolution;
         // set up the standard fluid environment
         frame_rate=24;
-        restart=false;restart_frame=0;
-        first_frame=0;last_frame=300;frame_rate=400;
-        fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
-        fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
+        restart=false;
+        restart_frame=0;
+        first_frame=0;
+        last_frame=300;
+        frame_rate=400;
+        fluids_parameters.domain_walls[0][0]=true;
+        fluids_parameters.domain_walls[0][1]=true;
+        fluids_parameters.domain_walls[1][0]=true;
+        fluids_parameters.domain_walls[1][1]=true;
         fluids_parameters.number_particles_per_cell=16;
-        fluids_parameters.viscosity=(T)0;fluids_parameters.implicit_viscosity=false;
-        fluids_parameters.write_levelset=true;fluids_parameters.write_velocity=true;fluids_parameters.write_particles=true;fluids_parameters.write_debug_data=true;
-        fluids_parameters.write_ghost_values=true;fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
+        fluids_parameters.viscosity=(T)0;
+        fluids_parameters.implicit_viscosity=false;
+        fluids_parameters.write_levelset=true;
+        fluids_parameters.write_velocity=true;fluids_parameters.write_particles=true;
+        fluids_parameters.write_debug_data=true;
+        fluids_parameters.write_ghost_values=true;
+        fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
+
         fluids_parameters.delete_fluid_inside_objects=true;
         fluids_parameters.incompressible_iterations=100;
-        fluids_parameters.use_removed_positive_particles=false;fluids_parameters.use_removed_negative_particles=false;
-        fluids_parameters.write_removed_positive_particles=false;fluids_parameters.write_removed_negative_particles=false;
+        fluids_parameters.use_removed_positive_particles=false;
+        fluids_parameters.use_removed_negative_particles=false;
+        fluids_parameters.write_removed_positive_particles=false;
+        fluids_parameters.write_removed_negative_particles=false;
         fluids_parameters.second_order_cut_cell_method=true;
         fluids_parameters.store_particle_ids=true;
         fluids_parameters.use_vorticity_confinement=false;
@@ -64,10 +76,10 @@ public:
  
         // set up the example parameters
         if(test_number!=1 && test_number!=2 && test_number!=3){LOG::cout<<"Unrecognized example: "<<test_number<<std::endl;PHYSBAM_FATAL_ERROR();}
-        fluids_parameters.densities(1)=(T)1.226;fluids_parameters.densities(2)=1000;
-        fluids_parameters.surface_tensions(1,2)=fluids_parameters.surface_tensions(2,1)=(T).0728;
-        fluids_parameters.viscosities(1)=(T).0000178;
-        fluids_parameters.viscosities(2)=(T).001137;
+        fluids_parameters.densities(0)=(T)1.226;fluids_parameters.densities(1)=1000;
+        fluids_parameters.surface_tensions(0,1)=fluids_parameters.surface_tensions(1,0)=(T).0728;
+        fluids_parameters.viscosities(0)=(T).0000178;
+        fluids_parameters.viscosities(1)=(T).001137;
         fluids_parameters.implicit_viscosity=false;
         fluids_parameters.incompressible_iterations=200;
         fluids_parameters.implicit_viscosity_iterations=200;
@@ -82,6 +94,7 @@ public:
 
         // set example-specific parameters
         fluids_parameters.object_friction=(test_number==2||test_number==3)?(T)1:0;
+        inaccurate_union.Initialize_Grid_Structures();
     }
 
     ~TWO_PHASE()
@@ -115,8 +128,8 @@ void Initialize_Phi() override
     T radius=(T)1/(T)300;
     for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
         TV X=iterator.Location();
-        fluids_parameters.particle_levelset_evolution_multiple->phis(1)(iterator.Cell_Index())=X.Magnitude()-radius;// center is at 0,0,0
-        fluids_parameters.particle_levelset_evolution_multiple->phis(2)(iterator.Cell_Index())=radius-X.Magnitude();}
+        fluids_parameters.particle_levelset_evolution_multiple->phis(0)(iterator.Cell_Index())=X.Magnitude()-radius;// center is at 0,0,0
+        fluids_parameters.particle_levelset_evolution_multiple->phis(1)(iterator.Cell_Index())=radius-X.Magnitude();}
 }
 //#####################################################################
 // Function Initial_Phi_Object

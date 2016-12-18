@@ -96,7 +96,7 @@ Initialize_Fluid_Evolution(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velo
         incompressible_multiphase=new INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>(grid->Get_MAC_Grid(),*projection);
         phi_boundary_multiphase.Resize(number_of_regions);for(int i=0;i<number_of_regions;i++) phi_boundary_multiphase(i)=&phi_boundary_reflection;
         phi_boundary=0;
-        particle_levelset_evolution=0;
+        particle_levelset_evolution=particle_levelset_evolution_multiple;
         incompressible=incompressible_multiphase;}
     else if(number_of_regions==1){ // free surface_flow
         particle_levelset_evolution=new PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>(*grid,*collision_bodies_affecting_fluid,number_of_ghost_cells,false);
