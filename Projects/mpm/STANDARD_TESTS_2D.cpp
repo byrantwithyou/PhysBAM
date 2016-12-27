@@ -1531,7 +1531,7 @@ Initialize()
         case 70:{ // Ringing test from original APIC paper
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
             LOG::printf("DX %P %P\n",grid.dX,grid.one_over_dX);
-            Add_Walls(10,COLLISION_TYPE::separate,0,.1*m,false);
+            Add_Walls(10,COLLISION_TYPE::separate,.2,.1*m,false);
             Add_Gravity(TV(0,-2*m/(s*s)));
             max_dt=.005;
             cfl=0.1;
@@ -1545,7 +1545,7 @@ Initialize()
             GRID<TV> grid0(TV_INT(TV(.625,.9375)*resolution)+1,range0);
             TRIANGULATED_AREA<T>& ta0=*new TRIANGULATED_AREA<T>;
             ta0.Initialize_Square_Mesh_And_Particles(grid0);
-            TRIANGULATED_AREA<T>& new_ta0=Seed_Lagrangian_Particles(ta0,[=](const TV& X){return TV(3*(m/s),0);},0,mass_density,true);
+            TRIANGULATED_AREA<T>& new_ta0=Seed_Lagrangian_Particles(ta0,0,0,mass_density,true);
             Add_Fixed_Corotated(new_ta0,E,nu);
 
             T pinning_stiffness=1e5*unit_p;
