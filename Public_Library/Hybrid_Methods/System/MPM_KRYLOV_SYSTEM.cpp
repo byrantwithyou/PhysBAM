@@ -54,7 +54,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
         const COLLISION& c=collisions(i);
         tmp.u.array(c.p).Project_Orthogonal_To_Unit_Direction(c.n);}
     
-    LOG::printf("project: %i\n",collisions.m);
+//    LOG::printf("project: %i\n",collisions.m);
 
     F*=0;
     example.Add_Hessian_Times(F.u,tmp.u,example.time);
