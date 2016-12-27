@@ -11,6 +11,7 @@
 #include <Core/Data_Structures/TRIPLE.h>
 #include <Core/Vectors/VECTOR_3D.h>
 #include <Grid_Tools/Grids/GRID.h>
+#include <OpenGL/OpenGL/OPENGL_GRID_OBJECT.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT.h>
 
 namespace PhysBAM
@@ -18,7 +19,7 @@ namespace PhysBAM
 template<class TV> class GRID;
 
 template<class T>
-class OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D:public OPENGL_COMPONENT<T>
+class OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D:public OPENGL_COMPONENT<T>,public OPENGL_GRID_OBJECT<VECTOR<T,3> >
 {
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
@@ -29,7 +30,6 @@ private:
     std::string filename;
     int frame_loaded;
     bool valid;
-    TV_INT selected_cell;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
     using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
@@ -43,8 +43,8 @@ public:
     void Display() const override;
     bool Use_Bounding_Box() const override { return draw && valid; }
     virtual RANGE<TV> Bounding_Box() const override;
-    void Print_Selection_Info(std::ostream& output_stream) const override;
-
+    void Print_Cell_Selection_Info(std::ostream& stream,const TV_INT& cell) const override;
+    void Print_Node_Selection_Info(std::ostream& stream,const TV_INT& node) const override;
     void Set_Vector_Size(const T vector_size);
 
     void Increase_Vector_Size();

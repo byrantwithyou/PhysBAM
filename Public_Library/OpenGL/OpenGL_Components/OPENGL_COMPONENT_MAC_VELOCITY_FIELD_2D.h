@@ -7,6 +7,7 @@
 #ifndef __OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D__
 #define __OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D__
 
+#include <OpenGL/OpenGL/OPENGL_GRID_OBJECT.h>
 #include <OpenGL/OpenGL/OPENGL_MAC_VELOCITY_FIELD_2D.h>
 #include <OpenGL/OpenGL/OPENGL_SCALAR_FIELD_2D.h>
 #include <OpenGL/OpenGL/OPENGL_SEGMENTED_CURVE_2D.h>
@@ -17,7 +18,7 @@ namespace PhysBAM
 template<class TV> class GRID;
 
 template<class T>
-class OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D:public OPENGL_COMPONENT<T>
+class OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D:public OPENGL_COMPONENT<T>,public OPENGL_GRID_OBJECT<VECTOR<T,2> >
 {
     typedef VECTOR<T,2> TV;typedef VECTOR<int,TV::m> TV_INT;
 public:
@@ -41,7 +42,6 @@ private:
     int number_of_steps;
     T min_vorticity,max_vorticity;
     unsigned int streamline_seed;
-    TV_INT selected_cell;
     
 public:
     OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string &velocity_filename_input);
@@ -52,7 +52,8 @@ public:
     void Set_Frame(int frame_input) override;
     void Set_Draw(bool draw_input = true) override;
     void Display() const override;
-    void Print_Selection_Info(std::ostream& stream) const override;
+    void Print_Cell_Selection_Info(std::ostream& stream,const TV_INT& cell) const override;
+    void Print_Node_Selection_Info(std::ostream& stream,const TV_INT& node) const override;
     bool Use_Bounding_Box() const override { return draw && valid; }
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 

@@ -10,13 +10,14 @@
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Vectors/VECTOR_3D.h>
 #include <Grid_Tools/Grids/GRID.h>
+#include <OpenGL/OpenGL/OPENGL_GRID_OBJECT.h>
 #include <OpenGL/OpenGL/OPENGL_VECTOR_FIELD_3D.h>
 namespace PhysBAM{
 
 template<class TV> class RANGE;
 
 template<class T_input>
-class OPENGL_GRID_BASED_VECTOR_FIELD_3D:public OPENGL_VECTOR_FIELD_3D<T_input>
+class OPENGL_GRID_BASED_VECTOR_FIELD_3D:public OPENGL_VECTOR_FIELD_3D<T_input>,public OPENGL_GRID_OBJECT<VECTOR<T_input,3> >
 {
     typedef T_input T;typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
@@ -28,8 +29,6 @@ public:
     GRID<TV>& grid;
     ARRAY<TV,TV_INT>& V;
     int max_vectors_3d;
-    TV_INT selected_cell;
-    TV_INT selected_node;
     
     OPENGL_GRID_BASED_VECTOR_FIELD_3D(STREAM_TYPE stream_type,GRID<TV>& grid,ARRAY<TV,TV_INT>& V);
     virtual ~OPENGL_GRID_BASED_VECTOR_FIELD_3D();
@@ -38,8 +37,8 @@ public:
 
     virtual RANGE<TV> Bounding_Box() const override;
     virtual void Slice_Has_Changed() override { Update(); }
-    void Print_Selection_Info(std::ostream& stream) const override;
-
+    void Print_Cell_Selection_Info(std::ostream& stream,const TV_INT& cell) const override;
+    void Print_Node_Selection_Info(std::ostream& stream,const TV_INT& node) const override;
 };
 }
 #endif

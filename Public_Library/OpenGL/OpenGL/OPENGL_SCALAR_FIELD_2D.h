@@ -11,6 +11,7 @@
 #include <Grid_Tools/Grids/GRID.h>
 #include <OpenGL/OpenGL/OPENGL_CALLBACK.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR_MAP.h>
+#include <OpenGL/OpenGL/OPENGL_GRID_OBJECT.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>
 
 namespace PhysBAM
@@ -20,7 +21,7 @@ template<class T,class T_ARRAY> class OPENGL_POINTS_2D;
 template<class T> class OPENGL_SEGMENTED_CURVE_2D;
 
 template<class T,class T2=T>
-class OPENGL_SCALAR_FIELD_2D:public OPENGL_OBJECT<T>
+class OPENGL_SCALAR_FIELD_2D:public OPENGL_OBJECT<T>,public OPENGL_GRID_OBJECT<VECTOR<T,2> >
 {
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
@@ -41,13 +42,12 @@ private:
     ARRAY<OPENGL_SEGMENTED_CURVE_2D<T>*> contour_curves;
     bool scale_range;
     T2 scale_range_min,scale_range_dx;
-    TV_INT selected_cell;
-    TV_INT selected_node;
     int selected_point;
-    
+    const char* info_name;
+
 public:
-    OPENGL_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,2> > &values_input,OPENGL_COLOR_MAP<T2>* color_map_input,DRAW_MODE draw_mode_input=DRAW_TEXTURE);
-    OPENGL_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,2> > &values_input,OPENGL_COLOR_MAP<T2>* color_map_input,ARRAY<bool,VECTOR<int,2> >* active_cells_input,DRAW_MODE draw_mode_input=DRAW_TEXTURE);
+    OPENGL_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,2> > &values_input,OPENGL_COLOR_MAP<T2>* color_map_input,const char* info_name,DRAW_MODE draw_mode_input=DRAW_TEXTURE);
+    OPENGL_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,2> > &values_input,OPENGL_COLOR_MAP<T2>* color_map_input,const char* info_name,ARRAY<bool,VECTOR<int,2> >* active_cells_input,DRAW_MODE draw_mode_input=DRAW_TEXTURE);
     virtual ~OPENGL_SCALAR_FIELD_2D();
 
     void Set_Scale_Range(const T2 range_min,const T2 range_max);
@@ -63,7 +63,8 @@ public:
     void Set_Draw_Mode(DRAW_MODE draw_mode);
     virtual void Update();  // Call when values or other attributes have changed
 
-    void Print_Selection_Info(std::ostream& output_stream) const override;
+    void Print_Cell_Selection_Info(std::ostream& stream,const TV_INT& cell) const override;
+    void Print_Node_Selection_Info(std::ostream& stream,const TV_INT& node) const override;
 
     // convenience functions
     void Toggle_Draw_Mode();

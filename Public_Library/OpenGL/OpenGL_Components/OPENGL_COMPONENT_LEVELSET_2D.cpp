@@ -15,8 +15,7 @@ using namespace PhysBAM;
 template<class T> OPENGL_COMPONENT_LEVELSET_2D<T>::
 OPENGL_COMPONENT_LEVELSET_2D(STREAM_TYPE stream_type,const std::string& levelset_filename_input,const std::string filename_set_input)
     :OPENGL_COMPONENT<T>(stream_type,"Levelset 2D"),opengl_levelset(0),levelset_filename(levelset_filename_input),filename_set(filename_set_input),
-    frame_loaded(-1),set(0),use_sets(true),set_loaded(-1),valid(false),draw_multiple_levelsets(false),selected_cell(-1,-1),
-    selected_node(-1,-1)
+    frame_loaded(-1),set(0),use_sets(true),set_loaded(-1),valid(false),draw_multiple_levelsets(false)
 {
     viewer_callbacks.Set("toggle_color_mode",{[this](){Toggle_Color_Mode();},"Toggle color mode"});
     viewer_callbacks.Set("toggle_smooth",{[this](){Toggle_Smooth();},"Toggle smooth levelset draw"});
@@ -105,24 +104,34 @@ Bounding_Box() const
     return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
-// Function Print_Selection_Info
+// Function Print_Cell_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_LEVELSET_2D<T>::
-Print_Selection_Info(std::ostream& output_stream) const
+Print_Cell_Selection_Info(std::ostream& stream,const TV_INT& cell) const
 {
+    if(!valid) return;
     if(Is_Up_To_Date(frame)){
-        if(selected_cell.x>=0 && opengl_levelsets(0)->levelset.grid.Is_MAC_Grid()){
+        if(opengl_levelsets(0)->levelset.grid.Is_MAC_Grid()){
             for(int i=0;i<opengl_levelsets.m;i++) 
-                output_stream<<component_name<<": phi["<<i<<"]="<<opengl_levelsets(i)->levelset.phi(selected_cell)
-                             <<" curvature["<<i<<"]="<<opengl_levelsets(i)->levelset.Compute_Curvature(opengl_levelsets(i)->levelset.grid.Center(selected_cell))<<std::endl;}
-        if(selected_node.x>=0 && !opengl_levelsets(0)->levelset.grid.Is_MAC_Grid()){
-            for(int i=0;i<opengl_levelsets.m;i++) 
-                output_stream<<component_name<<": phi["<<i<<"]="<<opengl_levelsets(i)->levelset.phi(selected_node)<<std::endl;}}
+                stream<<component_name<<": phi["<<i<<"]="<<opengl_levelsets(i)->levelset.phi(cell)
+                             <<" curvature["<<i<<"]="<<opengl_levelsets(i)->levelset.Compute_Curvature(opengl_levelsets(i)->levelset.grid.Center(cell))<<std::endl;}}
         // if(current_selection && current_selection->type==OPENGL_SELECTION::COMPONENT_PARTICLES_2D){
         //     OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T> *selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>*)current_selection;
         //     VECTOR<T,2> location=selection->location;
         //     for(int i=0;i<opengl_levelsets.m;i++) 
         //         output_stream<<component_name<<": phi["<<i<<"] @ particle="<<opengl_levelsets(i)->levelset.Phi(location)<<std::endl;}}
+}
+//#####################################################################
+// Function Print_Node_Selection_Info
+//#####################################################################
+template<class T> void OPENGL_COMPONENT_LEVELSET_2D<T>::
+Print_Node_Selection_Info(std::ostream& stream,const TV_INT& node) const
+{
+    if(!valid) return;
+    if(Is_Up_To_Date(frame)){
+        if(!opengl_levelsets(0)->levelset.grid.Is_MAC_Grid()){
+            for(int i=0;i<opengl_levelsets.m;i++) 
+                stream<<component_name<<": phi["<<i<<"]="<<opengl_levelsets(i)->levelset.phi(node)<<std::endl;}}
 }
 //#####################################################################
 // Function Reinitialize

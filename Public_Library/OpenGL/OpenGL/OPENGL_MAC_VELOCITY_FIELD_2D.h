@@ -8,6 +8,7 @@
 #define __OPENGL_MAC_VELOCITY_FIELD_2D__
 
 #include <Grid_Tools/Arrays/FACE_ARRAYS.h>
+#include <OpenGL/OpenGL/OPENGL_GRID_OBJECT.h>
 #include <OpenGL/OpenGL/OPENGL_VECTOR_FIELD_2D.h>
 namespace PhysBAM{
 
@@ -15,7 +16,7 @@ template<class TV> class GRID;
 template<class TV> class RANGE;
 
 template<class T_input>
-class OPENGL_MAC_VELOCITY_FIELD_2D:public OPENGL_VECTOR_FIELD_2D<ARRAY<VECTOR<T_input,2> > >
+class OPENGL_MAC_VELOCITY_FIELD_2D:public OPENGL_VECTOR_FIELD_2D<ARRAY<VECTOR<T_input,2> > >,public OPENGL_GRID_OBJECT<VECTOR<T_input,2> >
 {
     typedef T_input T;
     typedef VECTOR<T,2> TV;typedef VECTOR<int,TV::m> TV_INT;
@@ -31,14 +32,13 @@ public:
     ARRAY<TV> vector_field,vector_locations;
     ARRAY<bool,TV_INT> *active_cells;
     ARRAY<bool,FACE_INDEX<TV::m> > *active_faces;
-    TV_INT selected_cell;
     
     OPENGL_MAC_VELOCITY_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid_input);
     virtual ~OPENGL_MAC_VELOCITY_FIELD_2D();
 
     void Update();  // Call when grid/u/v change
-    void Print_Selection_Info(std::ostream& stream) const override;
-
+    void Print_Cell_Selection_Info(std::ostream& stream,const TV_INT& cell) const override;
+    void Print_Node_Selection_Info(std::ostream& stream,const TV_INT& node) const override;
     void Set_Velocity_Mode(VELOCITY_MODE velocity_mode_input);
 
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;

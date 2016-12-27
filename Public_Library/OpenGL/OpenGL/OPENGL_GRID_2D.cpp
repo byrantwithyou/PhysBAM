@@ -267,10 +267,14 @@ Reinitialize()
 template<class T> void OPENGL_GRID_2D<T>::
 Print_Selection_Info(std::ostream& stream) const
 {
-    if(selected_node.x>=0)
+    if(selected_node.x>=0){
         stream<<"Selected node "<<selected_node<<" ("<<grid.Get_Regular_Grid().X(selected_node)<<")"<<std::endl;
-    else if(selected_cell.x>=0)
+        for(int i=0;i<grid_objects.m;i++)
+            grid_objects(i)->Print_Node_Selection_Info(stream,selected_node);}
+    else if(selected_cell.x>=0){
         stream<<"Selected cell "<<selected_cell<<" ("<<grid.Get_MAC_Grid().X(selected_cell)<<")"<<std::endl;
+        for(int i=0;i<grid_objects.m;i++)
+            grid_objects(i)->Print_Cell_Selection_Info(stream,selected_cell);}
 }
 //#####################################################################
 // Function Bounding_Box

@@ -9,6 +9,7 @@
 #define __OPENGL_GRID_3D__
 #include <Grid_Tools/Grids/GRID.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR.h>
+#include <OpenGL/OpenGL/OPENGL_GRID_OBJECT.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>
 namespace PhysBAM{
 
@@ -31,6 +32,7 @@ public:
     bool hide_non_selected_grid;
     bool owns_grid;
     int scale;
+    ARRAY<OPENGL_GRID_OBJECT<TV>*> grid_objects;
 
 //##################################################################### 
     OPENGL_GRID_3D(STREAM_TYPE stream_type,GRID<TV> &grid_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::White());

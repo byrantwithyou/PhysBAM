@@ -10,6 +10,7 @@
 #include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR.h>
+#include <OpenGL/OpenGL/OPENGL_GRID_OBJECT.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>
 
 namespace PhysBAM
@@ -30,6 +31,7 @@ public:
     bool draw;
     bool draw_ghost_values;
     int draw_mask_type;
+    ARRAY<OPENGL_GRID_OBJECT<TV>*> grid_objects;
 private:
     TV_INT selected_cell;
     TV_INT selected_node;

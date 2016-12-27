@@ -314,6 +314,7 @@ Initialize_Components_And_Key_Bindings()
         filename2=allow_caching?(basedir+"/levelset_%d.tri"):"";}
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)||FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/levelset_0",start_frame)){
         OPENGL_COMPONENT_LEVELSET_3D<T>* levelset_component=new OPENGL_COMPONENT_LEVELSET_3D<T>(stream_type,filename,filename2,basedir+"/levelset_%d.%d",basedir+"/levelset_tesselated_%d.%d",true);
+        grid_component->object.grid_objects.Append(levelset_component);
         opengl_world.Set_Key_Binding_Category("Levelset");
         Add_Component(levelset_component,"Levelset",'l',BASIC_VISUALIZATION<T>::OWNED);
 //        levelset_component->Set_Surface_Material(OPENGL_MATERIAL::Plastic(OPENGL_COLOR((T).6,(T).65,1)),OPENGL_MATERIAL::Plastic(OPENGL_COLOR((T).6,(T).65,1)));
@@ -327,6 +328,7 @@ Initialize_Components_And_Key_Bindings()
             opengl_world.Append_Bind_Key('<',levelset_component->viewer_callbacks.Get("previous_set"));}}
     if(FILE_UTILITIES::Frame_File_Exists(coarse_filename,start_frame)){
         OPENGL_COMPONENT_LEVELSET_3D<T>* levelset_component=new OPENGL_COMPONENT_LEVELSET_3D<T>(stream_type,coarse_filename,filename2,basedir+"/coarse_levelset_%d.%d",basedir+"/coarse_levelset_tesselated_%d.%d",true);
+        grid_component->object.grid_objects.Append(levelset_component);
         levelset_component->ghost_cells=0;
         opengl_world.Set_Key_Binding_Category("Levelset");
         Add_Component(levelset_component,"Levelset coarse",'.',BASIC_VISUALIZATION<T>::OWNED);
@@ -339,6 +341,7 @@ Initialize_Components_And_Key_Bindings()
     filename2=basedir+"/%d/object_levelset_tesselated";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_LEVELSET_3D<T>* object_levelset_component=new OPENGL_COMPONENT_LEVELSET_3D<T>(stream_type,filename,filename2,"","",true);
+        grid_component->object.grid_objects.Append(object_levelset_component);
         Add_Component(object_levelset_component,"Object Levelset",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         if(slice_manager.slice) slice_manager.Add_Object(object_levelset_component);
         opengl_world.Set_Key_Binding_Category("Object Levelset");
@@ -460,6 +463,7 @@ Initialize_Components_And_Key_Bindings()
         if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
             if(node_based){
                 vector_velocity_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>(stream_type,regular_grid,filename);
+                grid_component->object.grid_objects.Append(&vector_velocity_component->opengl_grid_based_vector_field);
                 vector_velocity_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Green();
                 Add_Component(vector_velocity_component,"Node velocities",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
                 slice_manager.Add_Object(vector_velocity_component);}
@@ -496,6 +500,7 @@ Initialize_Components_And_Key_Bindings()
         filename=basedir+"/%d/centered_velocities";
         if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
             OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>* center_velocity_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>(stream_type,mac_grid,filename);
+            grid_component->object.grid_objects.Append(&center_velocity_component->opengl_grid_based_vector_field);
             center_velocity_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Green();
             Add_Component(center_velocity_component,"Centered velocities",'B',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
             opengl_world.Append_Bind_Key('=',center_velocity_component->viewer_callbacks.Get("increase_vector_size"));
@@ -506,6 +511,7 @@ Initialize_Components_And_Key_Bindings()
     filename=basedir+"/%d/object_velocities";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>* object_velocity_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>(stream_type,regular_grid,filename);
+        grid_component->object.grid_objects.Append(&object_velocity_component->opengl_grid_based_vector_field);
         object_velocity_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Yellow();
         Add_Component(object_velocity_component,"Object velocities",'%',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key('=',object_velocity_component->viewer_callbacks.Get("increase_vector_size"));
@@ -529,6 +535,7 @@ Initialize_Components_And_Key_Bindings()
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         if(node_based){
             OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>* vector_velocity_ghost_plus_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>(stream_type,regular_grid,filename);
+            grid_component->object.grid_objects.Append(&vector_velocity_ghost_plus_component->opengl_grid_based_vector_field);
             vector_velocity_ghost_plus_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Green();
             Add_Component(vector_velocity_ghost_plus_component,"Node ghost plus velocities",'b',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
             opengl_world.Append_Bind_Key('h',vector_velocity_ghost_plus_component->viewer_callbacks.Get("toggle_arrowhead"));
@@ -540,6 +547,7 @@ Initialize_Components_And_Key_Bindings()
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         if(node_based){
             OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>* vector_velocity_ghost_minus_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>(stream_type,regular_grid,filename);
+            grid_component->object.grid_objects.Append(&vector_velocity_ghost_minus_component->opengl_grid_based_vector_field);
             vector_velocity_ghost_minus_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Green();
             vector_velocity_ghost_minus_component->Set_Draw(false);
             Add_Component(vector_velocity_ghost_minus_component,"Node ghost minus velocities",'c',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
@@ -551,6 +559,7 @@ Initialize_Components_And_Key_Bindings()
     filename=basedir+"/%d/center_velocities";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame) && parameter_list.template Get_Parameter<bool>("use_cell_centered_velocities",false)){
         OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>* center_velocity_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>(stream_type,mac_grid,filename);
+        grid_component->object.grid_objects.Append(&center_velocity_component->opengl_grid_based_vector_field);
         center_velocity_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Green();
         Add_Component(center_velocity_component,"Centered velocities",'V',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key('=',center_velocity_component->viewer_callbacks.Get("increase_vector_size"));
@@ -561,6 +570,7 @@ Initialize_Components_And_Key_Bindings()
     filename=basedir+"/%d/pressure_jumps";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>* pressure_jump_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>(stream_type,grid,filename);
+        grid_component->object.grid_objects.Append(&pressure_jump_component->opengl_grid_based_vector_field);
         pressure_jump_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Magenta();
         Add_Component(pressure_jump_component,"Pressure jumps",'&',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key('=',pressure_jump_component->viewer_callbacks.Get("increase_vector_size"));
@@ -580,6 +590,7 @@ Initialize_Components_And_Key_Bindings()
     filename=basedir+"/%d/pseudo_dirichlet";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>* pseudo_dirichlet_component=new OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>(stream_type,grid,filename);
+        grid_component->object.grid_objects.Append(pseudo_dirichlet_component);
         pseudo_dirichlet_component->Set_Vector_Size(0.1);
         Add_Component(pseudo_dirichlet_component,"pseudo dirichlet",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F3),pseudo_dirichlet_component->viewer_callbacks.Get("toggle_draw"));

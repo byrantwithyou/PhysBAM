@@ -24,8 +24,8 @@ OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &g
     :OPENGL_COMPONENT<T>(stream_type,"MAC Velocity Field 2D"),draw_vorticity(false),
     velocity_filename(velocity_filename_input),valid(false),draw_divergence(false),
     draw_streamlines(false),use_seed_for_streamlines(false),opengl_divergence_field(0),
-    opengl_streamlines(stream_type,streamlines),psi_N_psi_D_basedir(""),min_vorticity(FLT_MAX),max_vorticity(FLT_MIN),
-    selected_cell(-1,-1)
+    opengl_streamlines(stream_type,streamlines),psi_N_psi_D_basedir(""),
+    min_vorticity(FLT_MAX),max_vorticity(FLT_MIN)
 {
     viewer_callbacks.Set("toggle_velocity_mode",{[this](){Toggle_Velocity_Mode();},"Toggle velocity mode"});
     viewer_callbacks.Set("toggle_velocity_mode_and_draw",{[this](){Toggle_Velocity_Mode_And_Draw();},"Toggle velocity mode and draw"});
@@ -45,7 +45,7 @@ OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &g
 
     opengl_mac_velocity_field=new OPENGL_MAC_VELOCITY_FIELD_2D<T>(stream_type,grid);
     number_of_steps=2*opengl_mac_velocity_field->grid.counts.x;
-    opengl_vorticity_magnitude=new OPENGL_SCALAR_FIELD_2D<T>(stream_type,opengl_mac_velocity_field->grid,*(new ARRAY<T,VECTOR<int,2> >),OPENGL_COLOR_RAMP<T>::Matlab_Jet(0,1));
+    opengl_vorticity_magnitude=new OPENGL_SCALAR_FIELD_2D<T>(stream_type,opengl_mac_velocity_field->grid,*new ARRAY<T,VECTOR<int,2> >,OPENGL_COLOR_RAMP<T>::Matlab_Jet(0,1),"vorticity_magnitude");
 
     OPENGL_COLOR_RAMP<T>* ramp=new OPENGL_COLOR_RAMP<T>;
     ramp->Add_Color(-1e+2,OPENGL_COLOR::Red());
@@ -55,7 +55,7 @@ OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &g
     ramp->Add_Color(1e-2,OPENGL_COLOR::Green());
     ramp->Add_Color(1,OPENGL_COLOR::Yellow());
     ramp->Add_Color(1e+2,OPENGL_COLOR::Red());
-    opengl_divergence_field=new OPENGL_SCALAR_FIELD_2D<T>(stream_type,opengl_mac_velocity_field->grid,divergence,ramp);
+    opengl_divergence_field=new OPENGL_SCALAR_FIELD_2D<T>(stream_type,opengl_mac_velocity_field->grid,divergence,ramp,"divergence");
 
     Reinitialize();
 }
@@ -79,16 +79,23 @@ Valid_Frame(int frame_input) const
     return FILE_UTILITIES::Frame_File_Exists(velocity_filename, frame_input);
 }
 //#####################################################################
-// Function Print_Selection_Info
+// Function Print_Cell_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
-Print_Selection_Info(std::ostream& stream) const
+Print_Cell_Selection_Info(std::ostream& stream,const TV_INT& cell) const
 {
+    if(!valid) return;
     if(Is_Up_To_Date(frame)){
         stream<<component_name<<": "<<std::endl;
         opengl_mac_velocity_field->Print_Selection_Info(stream);
-        if(selected_cell.x>=0){
-            stream<<"vorticity magnitude = "<<opengl_vorticity_magnitude->values(selected_cell)<<std::endl;}}
+        stream<<"vorticity magnitude = "<<opengl_vorticity_magnitude->values(cell)<<std::endl;}
+}
+//#####################################################################
+// Function Print_Node_Selection_Info
+//#####################################################################
+template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
+Print_Node_Selection_Info(std::ostream& stream,const TV_INT& node) const
+{
 }
 //#####################################################################
 // Function Set_Frame

@@ -10,11 +10,12 @@
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Vectors/VECTOR_2D.h>
 #include <Grid_Tools/Grids/GRID.h>
+#include <OpenGL/OpenGL/OPENGL_GRID_OBJECT.h>
 #include <OpenGL/OpenGL/OPENGL_VECTOR_FIELD_2D.h>
 namespace PhysBAM{
 
 template<class T_input>
-class OPENGL_GRID_BASED_VECTOR_FIELD_2D:public OPENGL_VECTOR_FIELD_2D<ARRAY<VECTOR<T_input,2> > >
+class OPENGL_GRID_BASED_VECTOR_FIELD_2D:public OPENGL_VECTOR_FIELD_2D<ARRAY<VECTOR<T_input,2> > >,public OPENGL_GRID_OBJECT<VECTOR<T_input,2> >
 {
     typedef T_input T;
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
@@ -24,8 +25,6 @@ public:
     ARRAY<TV> vector_field,vector_locations;
     GRID<TV>& grid;
     ARRAY<TV,TV_INT>& V;
-    TV_INT selected_cell;
-    TV_INT selected_node;
 
     OPENGL_GRID_BASED_VECTOR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV>& grid,ARRAY<VECTOR<T,2>,VECTOR<int,2> >& V);
     virtual ~OPENGL_GRID_BASED_VECTOR_FIELD_2D();
@@ -33,8 +32,8 @@ public:
     void Update();  // Call when grid/V change
 
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
-    void Print_Selection_Info(std::ostream& stream) const override;
-
+    void Print_Cell_Selection_Info(std::ostream& stream,const TV_INT& cell) const override;
+    void Print_Node_Selection_Info(std::ostream& stream,const TV_INT& node) const override;
 };
 }
 #endif

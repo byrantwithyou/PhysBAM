@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <OpenGL/OpenGL/OPENGL_GRID_BASED_VECTOR_FIELD_2D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -10,7 +11,8 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>::
 OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string &vector_field_filename)
-    :OPENGL_COMPONENT<T>(stream_type,"Grid Based Vector Field 2D"), opengl_grid_based_vector_field(stream_type,*(new GRID<TV>(grid)), *(new ARRAY<VECTOR<T,2> ,VECTOR<int,2> >)), 
+    :OPENGL_COMPONENT<T>(stream_type,"Grid Based Vector Field 2D"),
+    opengl_grid_based_vector_field(*new OPENGL_GRID_BASED_VECTOR_FIELD_2D<T>(stream_type,*new GRID<TV>(grid),*new ARRAY<VECTOR<T,2>,VECTOR<int,2> >)),
       vector_field_filename(vector_field_filename), valid(false)
 {
     viewer_callbacks.Set("increase_vector_size",{[this](){Increase_Vector_Size();},"Increase vector size"});
@@ -71,16 +73,6 @@ Bounding_Box() const
 {
     if(valid && draw) return opengl_grid_based_vector_field.Bounding_Box();
     else return RANGE<VECTOR<T,3> >::Centered_Box();
-}
-//#####################################################################
-// Function Print_Selection_Info
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>::
-Print_Selection_Info(std::ostream& stream) const
-{
-    if(Is_Up_To_Date(frame)){
-        stream<<component_name<<": ";
-        opengl_grid_based_vector_field.Print_Selection_Info(stream);}
 }
 //#####################################################################
 // Function Reinitialize

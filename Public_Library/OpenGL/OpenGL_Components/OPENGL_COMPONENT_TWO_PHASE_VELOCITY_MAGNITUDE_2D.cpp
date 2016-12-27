@@ -3,6 +3,10 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <OpenGL/OpenGL/OPENGL_GRID_BASED_VECTOR_FIELD_2D.h>
+#include <OpenGL/OpenGL/OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D.h>
+#include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D.h>
+#include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_LEVELSET_2D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -11,8 +15,10 @@ using namespace PhysBAM;
 template<class T> OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D<T>::
 OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D(STREAM_TYPE stream_type,OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>& V_minus_component,OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>& V_plus_component,
        OPENGL_COMPONENT_LEVELSET_2D<T>& levelset_component)
-    :OPENGL_COMPONENT<T>(stream_type,"Two-Phase Magnitude Velocity Field 2D"),magnitude_height_scale(0),V_minus_component(V_minus_component),V_plus_component(V_plus_component),levelset_component(levelset_component),
-    opengl_two_phase_velocity_magnitude(stream_type,V_minus_component.opengl_grid_based_vector_field.grid,V_minus_component.opengl_grid_based_vector_field.V,V_plus_component.opengl_grid_based_vector_field.V,levelset_component.opengl_levelset->levelset)
+    :OPENGL_COMPONENT<T>(stream_type,"Two-Phase Magnitude Velocity Field 2D"),
+    magnitude_height_scale(0),V_minus_component(V_minus_component),
+    V_plus_component(V_plus_component),levelset_component(levelset_component),
+    opengl_two_phase_velocity_magnitude(*new OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D<T>(stream_type,V_minus_component.opengl_grid_based_vector_field.grid,V_minus_component.opengl_grid_based_vector_field.V,V_plus_component.opengl_grid_based_vector_field.V,levelset_component.opengl_levelset->levelset))
 {
     viewer_callbacks.Set("toggle_3d_mode",{[this](){Toggle_3D_Mode();},"Toggle 3d mode"});
     viewer_callbacks.Set("increase_point_size",{[this](){Increase_Point_Size();},"Increase point size"});

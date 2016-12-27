@@ -18,8 +18,7 @@ using namespace std;
 template<class T> OPENGL_MAC_VELOCITY_FIELD_2D<T>::
 OPENGL_MAC_VELOCITY_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid_input)
     :OPENGL_VECTOR_FIELD_2D<ARRAY<TV> >(stream_type,vector_field,vector_locations),
-    grid(grid_input),u(face_velocities.Component(0)),v(face_velocities.Component(1)),active_cells(0),active_faces(0),
-    selected_cell(-1,-1)
+    grid(grid_input),u(face_velocities.Component(0)),v(face_velocities.Component(1)),active_cells(0),active_faces(0)
 {
     PHYSBAM_ASSERT(grid.Is_MAC_Grid());
     Set_Velocity_Mode(CELL_CENTERED);
@@ -83,27 +82,34 @@ Update()
         vector_locations.Resize(idx);}
 }
 //#####################################################################
-// Print_Selection_Info
+// Function Print_Cell_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_MAC_VELOCITY_FIELD_2D<T>::
-Print_Selection_Info(std::ostream& output_stream) const
+Print_Cell_Selection_Info(std::ostream& stream,const TV_INT& cell) const
 {
-    if(selected_cell.x>=0 && grid.Is_MAC_Grid()){
+    if(grid.Is_MAC_Grid()){
         T u_left,u_right,v_bottom,v_top;
-        u_left=u(selected_cell.x,selected_cell.y);
-        u_right=u(selected_cell.x+1,selected_cell.y);
-        v_bottom=v(selected_cell.x,selected_cell.y);
-        v_top=v(selected_cell.x,selected_cell.y+1);
+        u_left=u(cell.x,cell.y);
+        u_right=u(cell.x+1,cell.y);
+        v_bottom=v(cell.x,cell.y);
+        v_top=v(cell.x,cell.y+1);
         TV center_velocity(0.5*(u_left+u_right),0.5*(v_bottom+v_top));
-        output_stream<<"    u left = "<<u_left<<",right = "<<u_right<<" avg="<<center_velocity.x<<std::endl;
-        output_stream<<"    v bottom = "<<v_bottom<<",top = "<<v_top<<" avg="<<center_velocity.y<<std::endl;
+        stream<<"    u left = "<<u_left<<",right = "<<u_right<<" avg="<<center_velocity.x<<std::endl;
+        stream<<"    v bottom = "<<v_bottom<<",top = "<<v_top<<" avg="<<center_velocity.y<<std::endl;
         T ux=(u_right-u_left)*grid.one_over_dX.x,vy=(v_top-v_bottom)*grid.one_over_dX.y;
-        output_stream<<"    divergence = "<<ux+vy<<" (ux="<<ux<<", vy="<<vy<<")"<<std::endl;}
+        stream<<"    divergence = "<<ux+vy<<" (ux="<<ux<<", vy="<<vy<<")"<<std::endl;}
     // if(selection && selection->type==OPENGL_SELECTION::COMPONENT_PARTICLES_2D){
     //     OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T> *particle_selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>*)selection;
     //     LINEAR_INTERPOLATION_UNIFORM<TV,T> interpolation;
     //     VECTOR<T,2> interp(interpolation.Clamped_To_Array(grid.Get_Face_Grid(0),u,particle_selection->location),interpolation.Clamped_To_Array(grid.Get_Face_Grid(1),v,particle_selection->location));
-    //     output_stream<<"    @ particle = "<<interp<<std::endl;}
+    //     stream<<"    @ particle = "<<interp<<std::endl;}
+}
+//#####################################################################
+// Function Print_Node_Selection_Info
+//#####################################################################
+template<class T> void OPENGL_MAC_VELOCITY_FIELD_2D<T>::
+Print_Node_Selection_Info(std::ostream& stream,const TV_INT& node) const
+{
 }
 //#####################################################################
 // Convenience functions

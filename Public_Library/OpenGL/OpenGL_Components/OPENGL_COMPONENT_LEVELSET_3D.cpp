@@ -25,7 +25,7 @@ OPENGL_COMPONENT_LEVELSET_3D(STREAM_TYPE stream_type,const std::string& levelset
       filename_set(filename_set_input),filename_triangulated_surface_set(filename_triangulated_surface_set_input),
       write_generated_triangulated_surface(write_generated_triangulated_surface_input),
       frame_loaded(-1),check_triangulated_surface_file_time(check_triangulated_surface_file_time_input),
-set(0),set_loaded(-1),use_sets(true),draw_multiple_levelsets(true),ghost_cells(3),selected_cell(-1,-1,-1),selected_node(-1,-1,-1)
+set(0),set_loaded(-1),use_sets(true),draw_multiple_levelsets(true),ghost_cells(3)
 {
     viewer_callbacks.Set("toggle_display_overlay",{[this](){Toggle_Display_Overlay();},"Toggle display overlay (in slice mode)"});
     viewer_callbacks.Set("toggle_slice_color_mode",{[this](){Toggle_Slice_Color_Mode();},"Toggle solid/gradient slice colors"});
@@ -126,31 +126,44 @@ Bounding_Box() const
     else return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
-// Function Print_Selection_Info
+// Function Print_Cell_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_LEVELSET_3D<T>::
-Print_Selection_Info(std::ostream& output_stream) const
+Print_Cell_Selection_Info(std::ostream& stream,const TV_INT& cell) const
 {
+    if(!draw) return;
     if(Is_Up_To_Date(frame)){
         bool is_MAC=true;
         if(opengl_levelset_multiviews.Size() && opengl_levelset_multiviews(0)->Levelset() && !opengl_levelset_multiviews(0)->Levelset()->grid.Is_MAC_Grid()) is_MAC=false;
-        if(selected_cell.x>=0 && is_MAC){
-            TV_INT index=selected_cell;
+        if(is_MAC){
+            TV_INT index=cell;
             opengl_levelset_multiviews(0)->Levelset()->grid.Clamp(index,ghost_cells);
             for(int i=0;i<opengl_levelset_multiviews.m;i++){
                 const LEVELSET<TV>& levelset=*opengl_levelset_multiviews(i)->Levelset();
-                output_stream<<component_name<<": phi["<<i<<"]="<<levelset.phi(index)
-                             <<" curvature["<<i<<"]="<<levelset.Compute_Curvature(levelset.grid.Center(index))<<std::endl;}}
-        if(selected_node.x>=0 && !is_MAC){
-            TV_INT index=selected_node;
-            opengl_levelset_multiviews(0)->Levelset()->grid.Clamp(index,ghost_cells);
-            for(int i=0;i<opengl_levelset_multiviews.m;i++)  if(opengl_levelset_multiviews(i)->Levelset())
-                                                                 output_stream<<component_name<<": phi["<<i<<"]="<<(*opengl_levelset_multiviews(i)->Levelset()).phi(index)<<std::endl;}}
+                stream<<component_name<<": phi["<<i<<"]="<<levelset.phi(index)
+                             <<" curvature["<<i<<"]="<<levelset.Compute_Curvature(levelset.grid.Center(index))<<std::endl;}}}
         // if(current_selection && current_selection->type==OPENGL_SELECTION::COMPONENT_PARTICLES_3D){
         //     OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T> *selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>*)current_selection;
         //     VECTOR<T,3> location=selection->location;
         //     for(int i=0;i<opengl_levelset_multiviews.m;i++) if(opengl_levelset_multiviews(i)->Levelset())
         //         output_stream<<component_name<<": phi["<<i<<"] @ particle="<<opengl_levelset_multiviews(i)->Levelset()->Phi(location)<<std::endl;}}
+}
+//#####################################################################
+// Function Print_Node_Selection_Info
+//#####################################################################
+template<class T> void OPENGL_COMPONENT_LEVELSET_3D<T>::
+Print_Node_Selection_Info(std::ostream& stream,const TV_INT& node) const
+{
+    if(!draw) return;
+    if(Is_Up_To_Date(frame)){
+        bool is_MAC=true;
+        if(opengl_levelset_multiviews.Size() && opengl_levelset_multiviews(0)->Levelset() && !opengl_levelset_multiviews(0)->Levelset()->grid.Is_MAC_Grid()) is_MAC=false;
+        if(!is_MAC){
+            TV_INT index=node;
+            opengl_levelset_multiviews(0)->Levelset()->grid.Clamp(index,ghost_cells);
+            for(int i=0;i<opengl_levelset_multiviews.m;i++)
+                if(opengl_levelset_multiviews(i)->Levelset())
+                    stream<<component_name<<": phi["<<i<<"]="<<(*opengl_levelset_multiviews(i)->Levelset()).phi(index)<<std::endl;}}
 }
 //#####################################################################
 // Function Turn_Smooth_Shading_On

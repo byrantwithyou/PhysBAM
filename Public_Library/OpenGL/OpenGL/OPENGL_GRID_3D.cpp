@@ -14,7 +14,8 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> OPENGL_GRID_3D<T>::
 OPENGL_GRID_3D(STREAM_TYPE stream_type,GRID<TV> &grid_input,const OPENGL_COLOR &color_input) 
-    :OPENGL_OBJECT<T>(stream_type),selected_cell(-1,-1,-1),selected_node(-1,-1,-1),grid(grid_input),color(color_input),draw_ghost_values(true),hide_non_selected_grid(false),owns_grid(false),scale(1)
+    :OPENGL_OBJECT<T>(stream_type),grid(grid_input),color(color_input),
+    draw_ghost_values(true),hide_non_selected_grid(false),owns_grid(false),scale(1)
 {
     viewer_callbacks.Set("toggle_draw_ghost_values",{[this](){Toggle_Draw_Ghost_Values();},"toggle_draw_ghost_values"});
 }
@@ -327,10 +328,14 @@ Selection_Bounding_Box() const
 template<class T> void OPENGL_GRID_3D<T>::
 Print_Selection_Info(std::ostream& stream) const
 {
-    if(selected_node.x>=0)
+    if(selected_node.x>=0){
         stream<<"Selected node "<<selected_node<<" ("<<grid.Get_Regular_Grid().X(selected_node)<<")"<<std::endl;
-    else if(selected_cell.x>=0)
+        for(int i=0;i<grid_objects.m;i++)
+            grid_objects(i)->Print_Node_Selection_Info(stream,selected_node);}
+    else if(selected_cell.x>=0){
         stream<<"Selected cell "<<selected_cell<<" ("<<grid.Get_MAC_Grid().X(selected_cell)<<")"<<std::endl;
+        for(int i=0;i<grid_objects.m;i++)
+            grid_objects(i)->Print_Cell_Selection_Info(stream,selected_cell);}
 }
 //#####################################################################
 // Function Bounding_Box

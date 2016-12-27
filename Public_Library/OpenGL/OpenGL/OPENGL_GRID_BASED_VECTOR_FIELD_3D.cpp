@@ -14,7 +14,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> OPENGL_GRID_BASED_VECTOR_FIELD_3D<T>::
 OPENGL_GRID_BASED_VECTOR_FIELD_3D(STREAM_TYPE stream_type,GRID<TV> &grid, ARRAY<VECTOR<T,3> ,VECTOR<int,3> > &V)
-    :OPENGL_VECTOR_FIELD_3D<T>(stream_type,*(new ARRAY<VECTOR<T,3> >),*(new ARRAY<VECTOR<T,3> >),OPENGL_COLOR::Gray(.8f),.25f,true,false,false),grid(grid),V(V),selected_cell(-1,-1,-1),selected_node(-1,-1,-1)
+    :OPENGL_VECTOR_FIELD_3D<T>(stream_type,*new ARRAY<VECTOR<T,3> >,*new ARRAY<VECTOR<T,3> >,OPENGL_COLOR::Gray(.8f),.25f,true,false,false),grid(grid),V(V)
 {
     max_vectors_3d = 100000;
 }
@@ -85,17 +85,21 @@ Update()
             idx++;}}
 }
 //#####################################################################
-// Print_Selection_Info
+// Function Print_Cell_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_GRID_BASED_VECTOR_FIELD_3D<T>::
-Print_Selection_Info(std::ostream& stream) const
+Print_Cell_Selection_Info(std::ostream& stream,const TV_INT& cell) const
 {
+    if(V.Valid_Index(cell)) stream<<"velocity = "<<V(cell)<<std::endl;
     // TODO: interpolate to particles
-    if(selected_node.x>=0 && !grid.Is_MAC_Grid()){
-        if(V.Valid_Index(selected_node)) stream<<V(selected_node);}
-    if(selected_cell.x>=0 && grid.Is_MAC_Grid()){
-        if(V.Valid_Index(selected_cell)) stream<<V(selected_cell);}
-    stream<<std::endl;
+}
+//#####################################################################
+// Function Print_Node_Selection_Info
+//#####################################################################
+template<class T> void OPENGL_GRID_BASED_VECTOR_FIELD_3D<T>::
+Print_Node_Selection_Info(std::ostream& stream,const TV_INT& node) const
+{
+    if(V.Valid_Index(node)) stream<<"velocity = "<<V(node)<<std::endl;
 }
 //#####################################################################
 namespace PhysBAM{

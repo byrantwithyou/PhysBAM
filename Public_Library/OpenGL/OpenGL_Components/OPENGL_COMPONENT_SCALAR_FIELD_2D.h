@@ -23,9 +23,12 @@ public:
     using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
     using OPENGL_OBJECT<T>::viewer_callbacks;
     // Should be able to combine these two constructors into one (with a default arg) but for some reason I can't get it to compile in linux...
-    OPENGL_COMPONENT_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,const std::string &scalar_field_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input);
-    OPENGL_COMPONENT_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,const std::string &scalar_field_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input,
-                                     typename OPENGL_SCALAR_FIELD_2D<T,T2>::DRAW_MODE draw_mode_input);
+    OPENGL_COMPONENT_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,
+        const std::string &scalar_field_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input,
+        const char* info_name);
+    OPENGL_COMPONENT_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,
+        const std::string &scalar_field_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input,
+        const char* info_name,typename OPENGL_SCALAR_FIELD_2D<T,T2>::DRAW_MODE draw_mode_input);
     virtual ~OPENGL_COMPONENT_SCALAR_FIELD_2D();
 
     bool Valid_Frame(int frame_input) const override;

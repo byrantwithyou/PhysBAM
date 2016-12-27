@@ -10,6 +10,7 @@
 #include <Core/Arrays/ARRAY.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR_MAP.h>
+#include <OpenGL/OpenGL/OPENGL_GRID_OBJECT.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>
 
 namespace PhysBAM
@@ -18,7 +19,7 @@ template<class T> class OPENGL_TEXTURED_RECT;
 template<class T,class T_ARRAY> class OPENGL_POINTS_3D;
 
 template<class T,class T2=T>
-class OPENGL_SCALAR_FIELD_3D:public OPENGL_OBJECT<T>
+class OPENGL_SCALAR_FIELD_3D:public OPENGL_OBJECT<T>,public OPENGL_GRID_OBJECT<VECTOR<T,3> >
 {
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
@@ -46,7 +47,8 @@ public:
 
     void Set_Draw_Mode(DRAW_MODE draw_mode);
     virtual void Update();  // Call when values or other attributes have changed
-    void Print_Selection_Info(std::ostream& output_stream) const override;
+    void Print_Cell_Selection_Info(std::ostream& stream,const TV_INT& cell) const override;
+    void Print_Node_Selection_Info(std::ostream& stream,const TV_INT& node) const override;
 
     // convenience functions
     void Toggle_Draw_Mode();
@@ -70,8 +72,6 @@ public:
     bool smooth_slice_texture;
     bool scale_range;
     T2 scale_range_min,scale_range_dx;
-    TV_INT selected_cell;
-    TV_INT selected_node;
     int selected_point;
 };
 

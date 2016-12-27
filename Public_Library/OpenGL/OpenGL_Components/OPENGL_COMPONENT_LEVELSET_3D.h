@@ -8,13 +8,14 @@
 #define __OPENGL_COMPONENT_LEVELSET_3D__
 
 #include <Core/Arrays/ARRAY.h>
+#include <OpenGL/OpenGL/OPENGL_GRID_OBJECT.h>
 #include <OpenGL/OpenGL/OPENGL_LEVELSET_MULTIVIEW.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT.h>
 
 namespace PhysBAM{
 
 template<class T>
-class OPENGL_COMPONENT_LEVELSET_3D:public OPENGL_COMPONENT<T>
+class OPENGL_COMPONENT_LEVELSET_3D:public OPENGL_COMPONENT<T>,public OPENGL_GRID_OBJECT<VECTOR<T,3> >
 {
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
@@ -40,7 +41,8 @@ public:
 
     void Display() const override;
     virtual RANGE<TV> Bounding_Box() const override;
-    void Print_Selection_Info(std::ostream& output_stream) const override;
+    void Print_Cell_Selection_Info(std::ostream& stream,const TV_INT& cell) const override;
+    void Print_Node_Selection_Info(std::ostream& stream,const TV_INT& node) const override;
     void Turn_Smooth_Shading_On() override;
     void Turn_Smooth_Shading_Off() override;
     virtual void Slice_Has_Changed() override;
@@ -78,8 +80,6 @@ private:
     bool draw_multiple_levelsets;
 public:
     int ghost_cells;
-    TV_INT selected_cell;
-    TV_INT selected_node;
 };
 
 }

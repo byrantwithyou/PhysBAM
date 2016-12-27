@@ -19,10 +19,12 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class T,class T2> OPENGL_SCALAR_FIELD_2D<T,T2>::
-OPENGL_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,2> > &values_input,OPENGL_COLOR_MAP<T2>* color_map_input,DRAW_MODE draw_mode_input)
+OPENGL_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,
+    ARRAY<T2,VECTOR<int,2> > &values_input,OPENGL_COLOR_MAP<T2>* color_map_input,
+    const char* info_name,DRAW_MODE draw_mode_input)
     :OPENGL_OBJECT<T>(stream_type),grid(grid_input),values(values_input),active_cells(0),
     draw_ghost_values(true),current_color_map(0),opengl_textured_rect(0),opengl_points(0),
-    scale_range(false),selected_cell(-1,-1),selected_node(-1,-1),selected_point(-1)
+    scale_range(false),selected_point(-1),info_name(info_name)
 
 {
     viewer_callbacks.Set("toggle_draw_ghost_values",{[this](){Toggle_Draw_Ghost_Values();},"toggle_draw_ghost_values"});
@@ -34,10 +36,13 @@ OPENGL_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,ARRAY<T2,VEC
 // Constructor
 //#####################################################################
 template<class T,class T2> OPENGL_SCALAR_FIELD_2D<T,T2>::
-OPENGL_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,2> > &values_input,OPENGL_COLOR_MAP<T2>* color_map_input,ARRAY<bool,VECTOR<int,2> >* active_cells_input,DRAW_MODE draw_mode_input)
+OPENGL_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,
+    ARRAY<T2,VECTOR<int,2> > &values_input,OPENGL_COLOR_MAP<T2>* color_map_input,
+    const char* info_name,ARRAY<bool,VECTOR<int,2> >* active_cells_input,
+    DRAW_MODE draw_mode_input)
     :OPENGL_OBJECT<T>(stream_type),grid(grid_input),values(values_input),active_cells(active_cells_input),
     draw_ghost_values(true),current_color_map(0),opengl_textured_rect(0),opengl_points(0),
-    scale_range(false),selected_cell(-1,-1),selected_node(-1,-1),selected_point(-1)
+    scale_range(false),selected_point(-1),info_name(info_name)
 {
     viewer_callbacks.Set("toggle_draw_ghost_values",{[this](){Toggle_Draw_Ghost_Values();},"toggle_draw_ghost_values"});
     PHYSBAM_ASSERT(color_map_input);
@@ -269,6 +274,25 @@ Update()
     else Update_Contour_Curves();
 }
 //#####################################################################
+// Function Print_Cell_Selection_Info
+//#####################################################################
+template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
+Print_Cell_Selection_Info(std::ostream& stream,const TV_INT& cell) const
+{
+    if(grid.Is_MAC_Grid() && values.Valid_Index(cell)) stream<<info_name<<" = "<<values(cell)<<std::endl;
+//    if(current_selection && current_selection->type==OPENGL_SELECTION::COMPONENT_PARTICLES_2D){
+        // OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T> *selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>*)current_selection;
+        // Print_Selection_Info_Helper(output_stream,selection,grid,values);}
+}
+//#####################################################################
+// Function Print_Node_Selection_Info
+//#####################################################################
+template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
+Print_Node_Selection_Info(std::ostream& stream,const TV_INT& node) const
+{
+    if(!grid.Is_MAC_Grid() && values.Valid_Index(node)) stream<<info_name<<" = "<<values(node)<<std::endl;
+}
+//#####################################################################
 // Function Print_Selection_Info_Helper
 //#####################################################################
 template<class T2,class TV> static void
@@ -287,19 +311,6 @@ Print_Selection_Info_Helper(std::ostream& output_stream,const TV& location,const
 //#####################################################################
 template<class TV> static void
 Print_Selection_Info_Helper(std::ostream& output_stream,const TV& location,const GRID<TV >&,ARRAY<int,VECTOR<int,2> >& values){}
-//#####################################################################
-// Function Print_Selection_Info
-//#####################################################################
-template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
-Print_Selection_Info(std::ostream& output_stream) const
-{
-    if(selected_cell.x>=0 && grid.Is_MAC_Grid() && values.Valid_Index(selected_cell)) output_stream<<values(selected_cell);
-    if(selected_node.x>=0 && !grid.Is_MAC_Grid() && values.Valid_Index(selected_node)) output_stream<<values(selected_node);
-//    if(current_selection && current_selection->type==OPENGL_SELECTION::COMPONENT_PARTICLES_2D){
-        // OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T> *selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>*)current_selection;
-        // Print_Selection_Info_Helper(output_stream,selection,grid,values);}
-    output_stream<<std::endl;
-}
 //#####################################################################
 // Function Update_Texture
 //#####################################################################

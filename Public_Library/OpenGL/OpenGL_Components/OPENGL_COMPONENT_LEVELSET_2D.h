@@ -7,12 +7,13 @@
 #ifndef __OPENGL_COMPONENT_LEVELSET_2D__
 #define __OPENGL_COMPONENT_LEVELSET_2D__
 
+#include <OpenGL/OpenGL/OPENGL_GRID_OBJECT.h>
 #include <OpenGL/OpenGL/OPENGL_LEVELSET_2D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT.h>
 namespace PhysBAM{
 
 template<class T>
-class OPENGL_COMPONENT_LEVELSET_2D:public OPENGL_COMPONENT<T>
+class OPENGL_COMPONENT_LEVELSET_2D:public OPENGL_COMPONENT<T>,public OPENGL_GRID_OBJECT<VECTOR<T,2> >
 {
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
@@ -29,7 +30,8 @@ public:
     void Display() const override;
     bool Use_Bounding_Box() const override { return draw && valid; }
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
-    void Print_Selection_Info(std::ostream& output_stream) const override;
+    void Print_Cell_Selection_Info(std::ostream& stream,const TV_INT& cell) const override;
+    void Print_Node_Selection_Info(std::ostream& stream,const TV_INT& node) const override;
     bool Is_Up_To_Date(int frame) const override {return valid && frame_loaded == frame;}
 
     void Toggle_Color_Mode();
@@ -59,8 +61,6 @@ private:
     int set_loaded;
     bool valid;
     bool draw_multiple_levelsets;
-    TV_INT selected_cell;
-    TV_INT selected_node;
 };
 
 }

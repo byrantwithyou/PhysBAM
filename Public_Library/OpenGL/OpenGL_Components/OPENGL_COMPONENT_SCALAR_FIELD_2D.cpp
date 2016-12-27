@@ -10,26 +10,27 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T,class T2> OPENGL_COMPONENT_SCALAR_FIELD_2D<T,T2>::
-OPENGL_COMPONENT_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input, const std::string &scalar_field_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input)
-    :OPENGL_COMPONENT<T>(stream_type,"Scalar Field 2D"), opengl_scalar_field(stream_type,grid_input,*new ARRAY<T2,VECTOR<int,2> >,color_map_input),
-      scalar_field_filename(scalar_field_filename_input), frame_loaded(-1), valid(false)
+OPENGL_COMPONENT_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,const std::string &scalar_field_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input,const char* info_name)
+    :OPENGL_COMPONENT<T>(stream_type,"Scalar Field 2D"),opengl_scalar_field(stream_type,grid_input,*new ARRAY<T2,VECTOR<int,2> >,color_map_input,info_name),
+      scalar_field_filename(scalar_field_filename_input),frame_loaded(-1),valid(false)
 {
     viewer_callbacks.Set("toggle_smooth",{[this](){Toggle_Smooth();},"Toggle smooth"});
     viewer_callbacks.Set("toggle_draw_mode",{[this](){Toggle_Draw_Mode();},"Toggle draw mode"});
     viewer_callbacks.Set("toggle_color_map",{[this](){Toggle_Color_Map();},"Toggle color map"});
 
-    is_animation = FILE_UTILITIES::Is_Animated(scalar_field_filename);
+    is_animation=FILE_UTILITIES::Is_Animated(scalar_field_filename);
 }
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class T,class T2> OPENGL_COMPONENT_SCALAR_FIELD_2D<T,T2>::
-OPENGL_COMPONENT_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input, const std::string &scalar_field_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input,
-                                 typename OPENGL_SCALAR_FIELD_2D<T,T2>::DRAW_MODE draw_mode_input)
-    :OPENGL_COMPONENT<T>(stream_type,"Scalar Field 2D"), opengl_scalar_field(stream_type,grid_input,*new ARRAY<T2,VECTOR<int,2> >,color_map_input,draw_mode_input),
-      scalar_field_filename(scalar_field_filename_input), frame_loaded(-1), valid(false)
+OPENGL_COMPONENT_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,
+    const std::string &scalar_field_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input,
+    const char* info_name,typename OPENGL_SCALAR_FIELD_2D<T,T2>::DRAW_MODE draw_mode_input)
+    :OPENGL_COMPONENT<T>(stream_type,"Scalar Field 2D"),opengl_scalar_field(stream_type,grid_input,*new ARRAY<T2,VECTOR<int,2> >,color_map_input,info_name,draw_mode_input),
+      scalar_field_filename(scalar_field_filename_input),frame_loaded(-1),valid(false)
 {
-    is_animation = FILE_UTILITIES::Is_Animated(scalar_field_filename);
+    is_animation=FILE_UTILITIES::Is_Animated(scalar_field_filename);
 }
 
 //#####################################################################
@@ -46,7 +47,7 @@ template<class T,class T2> OPENGL_COMPONENT_SCALAR_FIELD_2D<T,T2>::
 template<class T,class T2> bool OPENGL_COMPONENT_SCALAR_FIELD_2D<T,T2>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::Frame_File_Exists(scalar_field_filename, frame_input);
+    return FILE_UTILITIES::Frame_File_Exists(scalar_field_filename,frame_input);
 }
 //#####################################################################
 // Function Set_Frame
@@ -104,16 +105,16 @@ Reinitialize()
         if((is_animation && frame_loaded != frame) ||
             (!is_animation && frame_loaded < 0))
         {
-            valid = false;
-            std::string filename = FILE_UTILITIES::Get_Frame_Filename(scalar_field_filename, frame);
+            valid=false;
+            std::string filename=FILE_UTILITIES::Get_Frame_Filename(scalar_field_filename,frame);
             if(FILE_UTILITIES::File_Exists(filename))
                 FILE_UTILITIES::Read_From_File(stream_type,filename,opengl_scalar_field.values);
             else
                 return;
 
             opengl_scalar_field.Update();
-            frame_loaded = frame;
-            valid = true;
+            frame_loaded=frame;
+            valid=true;
         }
     }
 }
