@@ -71,6 +71,8 @@ public:
     int substeps_delay_frame;
     std::string output_directory;
     std::string data_directory;
+    std::string test_output_prefix;
+    bool use_test_output;
     int restart;
     T dt,time,frame_dt,min_dt,max_dt;
     bool only_write_particles;

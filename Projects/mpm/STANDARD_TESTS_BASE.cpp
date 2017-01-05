@@ -113,7 +113,8 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-T",&extra_T,"float","extra float argument");
     parse_args.Add("-I",&extra_int,"int","extra int argument");
     parse_args.Add("-dump_collisions",&dump_collision_objects,"dump out collision objects");
-
+    parse_args.Add("-test_output_prefix",&test_output_prefix,&use_test_output,"","prefix to use for test output");
+    
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);
     if(use_slip) forced_collision_type=COLLISION_TYPE::slip;
@@ -297,9 +298,10 @@ template<class TV> int STANDARD_TESTS_BASE<TV>::
 Add_Fixed_Corotated(T E,T nu,ARRAY<int>* affected_particles,bool no_mu)
 {
     COROTATED_FIXED<T,TV::m>* coro=new COROTATED_FIXED<T,TV::m>(E,nu);
-    if(no_mu) coro->Zero_Out_Mu();
+    if(no_mu){nu=0;coro->Zero_Out_Mu();}
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model=*coro;
     MPM_FINITE_ELEMENTS<TV>& fe=*new MPM_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles);
+    Set_Lame_On_Particles(E,nu,affected_particles);
     return Add_Force(fe);
 }
 //#####################################################################
@@ -310,6 +312,7 @@ Add_Neo_Hookean(T E,T nu,ARRAY<int>* affected_particles)
 {
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model=*new NEO_HOOKEAN<T,TV::m>(E,nu);
     MPM_FINITE_ELEMENTS<TV>& fe=*new MPM_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles);
+    Set_Lame_On_Particles(E,nu,affected_particles);
     return Add_Force(fe);
 }
 //#####################################################################
@@ -319,9 +322,10 @@ template<class TV> int STANDARD_TESTS_BASE<TV>::
 Add_St_Venant_Kirchhoff_Hencky_Strain(T E,T nu,ARRAY<int>* affected_particles,bool no_mu)
 {
     ST_VENANT_KIRCHHOFF_HENCKY_STRAIN<T,TV::m>* hencky=new ST_VENANT_KIRCHHOFF_HENCKY_STRAIN<T,TV::m>(E,nu);
-    if(no_mu) hencky->Zero_Out_Mu();
+    if(no_mu){nu=0;hencky->Zero_Out_Mu();}
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model=*hencky;
     MPM_FINITE_ELEMENTS<TV>& fe=*new MPM_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles);
+    Set_Lame_On_Particles(E,nu,affected_particles);
     return Add_Force(fe);
 }
 //#####################################################################
@@ -331,7 +335,7 @@ template<class TV> int STANDARD_TESTS_BASE<TV>::
 Add_Drucker_Prager(T E,T nu,T a0,T a1,T a3,T a4,ARRAY<int>* affected_particles,bool no_mu,T sigma_Y)
 {
     ST_VENANT_KIRCHHOFF_HENCKY_STRAIN<T,TV::m>* hencky=new ST_VENANT_KIRCHHOFF_HENCKY_STRAIN<T,TV::m>(E,nu);
-    if(no_mu) hencky->Zero_Out_Mu();
+    if(no_mu){nu=0;hencky->Zero_Out_Mu();}
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model=*hencky;
     MPM_DRUCKER_PRAGER<TV>& plasticity=*new MPM_DRUCKER_PRAGER<TV>(particles,0,a0,a1,a3,a4);
     plasticity.use_implicit=use_implicit_plasticity;
@@ -345,6 +349,7 @@ Add_Drucker_Prager(T E,T nu,T a0,T a1,T a3,T a4,ARRAY<int>* affected_particles,b
         fe=mfe;}
     plasticity.Initialize_Particles(affected_particles,sigma_Y);
     plasticity_models.Append(&plasticity);
+    Set_Lame_On_Particles(E,nu,affected_particles);
     return Add_Force(*fe);
 }
 //#####################################################################

@@ -132,7 +132,6 @@ Initialize()
             T E=1e3*unit_p*scale_E;
             T nu=0.3;
             Add_Neo_Hookean(E,nu);
-            Set_Lame_On_Particles(E,nu);
         } break;
         case 2:{ // oscillating circle
             Set_Grid(RANGE<TV>::Unit_Box()*m);
@@ -608,7 +607,6 @@ Initialize()
             Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
             RANGE<TV> box(TV(.45,.11)*m,TV(.55,.31)*m);
             Seed_Particles(box,0,0,density,particles_per_cell);
-            Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-9.8));
         } break;
         case 34:{ // drip drop
@@ -672,7 +670,6 @@ Initialize()
             else{
                 PHYSBAM_WARNING("Couldn't open 'particles.dat'. Falling back to using random particle positions.");
                 Seed_Particles(box,0,0,density,number_of_particles*grid.dX.Product()/box.Size());}
-            Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-2));
         } break;
         case 36:{ // split
@@ -739,7 +736,6 @@ Initialize()
 //            this->plasticity=new MPM_DRUCKER_PRAGER<TV>(friction_angle,cohesion);
             RANGE<TV> box(TV(.4,.1001)*m,TV(.45,.6001)*m);
             Seed_Particles(box,0,0,density,particles_per_cell);
-            Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-9.81));
         } break;
         case 38:{ // sand box drop, wide
@@ -760,7 +756,6 @@ Initialize()
             T gap=grid.dX(1)*0.01;
             RANGE<TV> box(TV(.5*m-l0,.1*m+gap),TV(.5*m+l0,.1*m+gap+h0));
             Seed_Particles(box,0,0,density,particles_per_cell);
-            Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-9.81));
         } break;
         case 39:{ // DP on wedge
@@ -793,7 +788,6 @@ Initialize()
             else{
                 PHYSBAM_WARNING("Couldn't open 'particles.dat'. Falling back to using random particle positions.");
                 Seed_Particles(box,0,0,density,number_of_particles*grid.dX.Product()/box.Size());}
-            Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-2));
         } break;
         case 40:
@@ -822,7 +816,6 @@ Initialize()
             if(foo_T1){
                 if(!no_implicit_plasticity) use_implicit_plasticity=true;
                 Seed_Particles(box,0,0,density,particles_per_cell);
-                Set_Lame_On_Particles(E,nu);
                 Add_Drucker_Prager_Case(E,nu,test_number-40);}
             else{
                 if(!use_theta_c) theta_c=0.015;
@@ -830,11 +823,9 @@ Initialize()
                 if(!use_hardening_factor) hardening_factor=20;
                 if(!use_max_hardening) max_hardening=FLT_MAX;
                 Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
-                Seed_Particles(box,0,0,density,particles_per_cell);
-                Set_Lame_On_Particles(E,nu);}
+                Seed_Particles(box,0,0,density,particles_per_cell);}
             Seed_Particles(box,0,0,density,particles_per_cell);
             Add_Drucker_Prager_Case(E,nu,test_number-40);
-            Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-9.81));
         } break;
         case 50:
@@ -862,7 +853,6 @@ Initialize()
             ARRAY<int> sand_particles(particles.X.m);
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
             Add_Drucker_Prager(E,nu,(T)35,&sand_particles);
-            Set_Lame_On_Particles(E,nu);
             //seed lambda particles
             if(test_number==51){
                 T El=500*foo_T1,nul=.1*foo_T3;
@@ -955,7 +945,6 @@ Initialize()
             ARRAY<int> sand_particles(particles.X.m);
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
             Add_Drucker_Prager(E,nu,(T)35,&sand_particles);
-            Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-9.81));
             ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
             for(int i=0;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(.8,.7,.7);
@@ -1023,7 +1012,6 @@ Initialize()
             ARRAY<int> sand_particles(particles.X.m);
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
             Add_Drucker_Prager(E,nu,(T)35,&sand_particles,false,test_number==61?sigma_Y:0);
-            Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-9.81));
             ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
             for(int i=0;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(.8,.7,.7);
@@ -1050,7 +1038,6 @@ Initialize()
             T gap=grid.dX(1)*0.01;
             RANGE<TV> box(TV(.5*m-l0,.3*m+gap),TV(.5*m+l0,.3*m+gap+h0));
             Seed_Particles(box,0,0,density,particles_per_cell);
-            Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-9.81));
         } break;
         case 59:{ // sand falling into a pile.
@@ -1099,7 +1086,6 @@ Initialize()
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
             int case_num=use_hardening_mast_case?hardening_mast_case:2;
             Add_Drucker_Prager_Case(E,nu,case_num);
-            Set_Lame_On_Particles(E,nu);
             Add_Gravity(gravity);
         } break;
         case 60:{//cohesion sanity check
@@ -1118,7 +1104,6 @@ Initialize()
             T gap=grid.dX(1)*0.01;
             RANGE<TV> box(TV(.5*m-l0,.1*m+gap),TV(.5*m+l0,.1*m+gap+h0));
             Seed_Particles(box,0,0,density,particles_per_cell);
-            Set_Lame_On_Particles(E,nu);
             ARRAY<int> sand_particles(particles.X.m);
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
             if(!use_cohesion) sigma_Y=1;
@@ -1127,7 +1112,7 @@ Initialize()
         } break;
         case 62:{ // hourglass
             particles.Store_Fp(true);
-            Set_Grid(RANGE<TV>(TV(-0.2,-0.45)*m,TV(0.2,0.45)*m),TV_INT(4,9));
+            Set_Grid(RANGE<TV>(TV(-0.2,-0.45)*m,TV(0.2,0.45)*m),TV_INT(4,9),TV_INT(),4);
             LOG::cout<<"GRID DX: " <<grid.dX<<std::endl;
             IMPLICIT_OBJECT<TV>* hg=new ANALYTIC_IMPLICIT_OBJECT<HOURGLASS<TV> >(HOURGLASS<TV>(TV::Axis_Vector(1),TV(),(T).16,(T).0225,(T).8,(T).0225));
             IMPLICIT_OBJECT<TV>* inv=new IMPLICIT_OBJECT_INVERT<TV>(hg);
@@ -1144,7 +1129,6 @@ Initialize()
             ioi.owns_io.Fill(false);
             Seed_Particles(ioi,0,0,density,particles_per_cell);
             LOG::printf("added %i particles.",particles.X.m);
-            Set_Lame_On_Particles(E,nu);
             Add_Drucker_Prager_Case(E,nu,2);
             Add_Gravity(m/(s*s)*TV(0,-9.81));
         } break;
@@ -1201,7 +1185,6 @@ Initialize()
             ARRAY<int> sand_particles(particles.X.m);
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
             Add_Drucker_Prager(E,nu,(T)35,&sand_particles,false,0);
-            Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,9.81));
             //water
             if(!use_foo_T4) foo_T4=(T)1;
@@ -1270,7 +1253,6 @@ Initialize()
             ARRAY<int> sand_particles(particles.X.m);
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
             Add_Drucker_Prager(E,nu,(T)35,&sand_particles,false,0);
-            Set_Lame_On_Particles(E,nu);
             //water
             T porosity=0.3;
             T saturation_level=1;
@@ -1475,7 +1457,6 @@ Initialize()
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
             int case_num=use_hardening_mast_case?hardening_mast_case:2;
             Add_Drucker_Prager_Case(E,nu,case_num);
-            Set_Lame_On_Particles(E,nu);
             Add_Gravity(gravity);
         } break;
 
@@ -1508,7 +1489,6 @@ Initialize()
             ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
             T E=10,nu=0.3;
             Add_Fixed_Corotated(unit_p*scale_E*E,nu,&mpm_particles,true);
-            Set_Lame_On_Particles(unit_p*scale_E*E,nu);
             for(int i=0;i<particles.number;i++){
                 particles.mu(i)=0;
                 particles.mu0(i)=0;}

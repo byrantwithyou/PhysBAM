@@ -72,6 +72,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-dump_collisions",&dump_collision_objects,"dump out collision objects");
     parse_args.Add("-use_volume",&use_particle_volumes,"use particle volumes to avoid boiling");
     parse_args.Add("-test_system",&test_system,"run sanity checks on Krylov systems");
+    parse_args.Add("-test_output_prefix",&test_output_prefix,&use_test_output,"","prefix to use for test output");
 
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);

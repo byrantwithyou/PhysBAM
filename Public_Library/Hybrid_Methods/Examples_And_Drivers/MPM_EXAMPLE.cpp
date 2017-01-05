@@ -2,6 +2,7 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/LAGGED_FORCE.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
@@ -24,8 +25,8 @@ MPM_EXAMPLE(const STREAM_TYPE stream_type)
     lagrangian_forces(deformable_body_collection.deformables_forces),
     weights(0),gather_scatter(*new GATHER_SCATTER<TV>(grid,simulated_particles)),
     force_helper(*new MPM_FORCE_HELPER<TV>(particles,quad_F_coeff)),incompressible(false),kkt(false),
-    initial_time(0),last_frame(100),
-    write_substeps_level(-1),substeps_delay_frame(-1),output_directory("output"),data_directory("../../Public_Data"),
+    initial_time(0),last_frame(100),write_substeps_level(-1),substeps_delay_frame(-1),
+    output_directory("output"),data_directory("../../Public_Data"),use_test_output(false),
     mass_contour(-1),restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),ghost(3),
     use_affine(true),use_f2p(false),use_midpoint(false),use_symplectic_euler(false),
     use_early_gradient_transfer(false),use_oldroyd(false),print_stats(false),only_write_particles(false),flip(0),
@@ -59,6 +60,13 @@ template<class TV> void MPM_EXAMPLE<TV>::
 Write_Output_Files(const int frame)
 {
     std::string f=LOG::sprintf("%d",frame);
+    if(this->use_test_output){
+        std::string file=LOG::sprintf("%s/%s-%03d.txt",output_directory.c_str(),test_output_prefix.c_str(),frame);
+        OCTAVE_OUTPUT<T> oo(file.c_str());
+        oo.Write("X",particles.X.Flattened());
+        oo.Write("V",particles.V.Flattened());
+        oo.Write("u",current_velocity->array.Flattened());
+        oo.Write("mac_u",velocity_new_f.array);}
 
 #pragma omp parallel
 #pragma omp single
