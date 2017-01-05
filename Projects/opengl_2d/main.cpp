@@ -197,14 +197,11 @@ Initialize_Components_And_Key_Bindings()
     Read_Grid();
     std::string filename,filename2;
 
-    // Draw grid here so it'll be above particles and pressure
+    // Create grid here so other things can use it, but add it later so that it is draw on top of things.
     opengl_world.Set_Key_Binding_Category("Grid");
     if(has_valid_grid){
         OPENGL_GRID_2D<T>* opengl_grid=new OPENGL_GRID_2D<T>(stream_type,*(new GRID<TV>(grid)),OPENGL_COLOR::Gray(.5));
-        grid_component=new OPENGL_COMPONENT_BASIC<T,OPENGL_GRID_2D<T> >(stream_type,*opengl_grid);
-        Add_Component(grid_component,"Grid",'6',BASIC_VISUALIZATION<T>::SELECTABLE);
-        opengl_world.Append_Bind_Key('^',grid_component->object.viewer_callbacks.Get("toggle_draw_ghost_values"));}
-    opengl_world.Set_Key_Binding_Category("Sub Grids");
+        grid_component=new OPENGL_COMPONENT_BASIC<T,OPENGL_GRID_2D<T> >(stream_type,*opengl_grid);}
 
     // Density
     filename=basedir+"/%d/density";
@@ -589,6 +586,12 @@ Initialize_Components_And_Key_Bindings()
         pressure2_component->opengl_scalar_field.Set_Uniform_Contour_Values(-10000,10000,100);
         Add_Component(pressure2_component,"Pressure2",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F7),pressure2_component->viewer_callbacks.Get("toggle_draw"));}
+
+    // Draw grid here so it'll be above particles and pressure
+    if(grid_component){
+        Add_Component(grid_component,"Grid",'6',BASIC_VISUALIZATION<T>::SELECTABLE);
+        opengl_world.Append_Bind_Key('^',grid_component->object.viewer_callbacks.Get("toggle_draw_ghost_values"));}
+    opengl_world.Set_Key_Binding_Category("Sub Grids");
 
     // deformable and rigid bodies
     OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>* rigid_bodies_component=0;
