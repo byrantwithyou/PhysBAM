@@ -1,5 +1,5 @@
 //#####################################################################
-// Copyright 2005-2008, Eran Guendelman, Jerry Talton.
+// Copyright 2017, Ounan Ding, Lin Huang, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 // Class FACE_ITERATOR_THREADED
