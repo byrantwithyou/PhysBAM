@@ -50,11 +50,11 @@ Display() const
                         start(j)=(i&(1<<j))?box.min_corner(j):box.max_corner(j);
                     TV end=start;
                     end(a)=box.max_corner(a);
-                    OpenGL_Line(start,end);}
+                    OpenGL_Line(start,end);}}
         else{
             TV start=box.min_corner,end=box.min_corner;
             end(a)=box.max_corner(a);
-            OpenGL_Line(start,end);}}
+            OpenGL_Line(start,end);}
         for(int b=0;b<TV::m;b++){
             if(a==b) continue;
             int dg=TV::m*2-3-a-b;
