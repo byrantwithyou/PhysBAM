@@ -19,8 +19,13 @@ FACE_ITERATOR_THREADED(const GRID<TV>& grid_input,int number_of_ghost_cells,T_RE
     :GRID_ITERATOR_BASE<TV>(grid_input)
 {
     PHYSBAM_ASSERT(region_type==GRID<TV>::WHOLE_REGION || region_type==GRID<TV>::INTERIOR_REGION);
+#ifdef USE_OPENMP
     int threads=omp_get_num_threads();
     int tid=omp_get_thread_num();
+#else
+    int threads=1;
+    int tid=0;
+#endif
     
     Reset_Regions();
     RANGE<TV_INT> domain(grid.Cell_Indices(number_of_ghost_cells));
