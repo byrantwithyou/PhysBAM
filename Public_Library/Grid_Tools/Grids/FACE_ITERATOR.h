@@ -29,7 +29,6 @@ protected:
     int side;
     bool single_axis;
     int number_of_ghost_cells;
-    T face_size;
 
 public:
     // axis_input==0 means iterate through faces in all dimensions
@@ -56,9 +55,6 @@ public:
 
     FACE_INDEX<TV::m> Full_Index() const
     {return FACE_INDEX<TV::m>(axis,index);}
-
-    T Face_Size() const
-    {return face_size;}
 
     TV Location() const
     {return grid.Face(Full_Index());}

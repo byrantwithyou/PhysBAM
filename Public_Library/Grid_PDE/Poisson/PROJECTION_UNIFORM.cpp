@@ -150,11 +150,13 @@ Enforce_Velocity_Compatibility(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
         int color=elliptic_solver->filled_region_colors(iterator.Cell_Index());
         if(color>0 && !elliptic_solver->filled_region_touches_dirichlet(color)) compatibility_fraction(color)+=elliptic_solver->f(iterator.Cell_Index());}
 
+    VECTOR<T,TV::m> face_size;
+    for(int i=0;i<TV::m;i++) face_size(i)=p_grid.Face_Size(i);
     for(FACE_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){
         int color1=elliptic_solver->filled_region_colors(iterator.First_Cell_Index()),color2=elliptic_solver->filled_region_colors(iterator.Second_Cell_Index());
-        if(color1==color2) continue;T face_size=iterator.Face_Size();
-        if(color1>0 && !elliptic_solver->filled_region_touches_dirichlet(color1)) boundary_size(color1)+=face_size;
-        if(color2>0 && !elliptic_solver->filled_region_touches_dirichlet(color2)) boundary_size(color2)+=face_size;}
+        if(color1==color2) continue;
+        if(color1>0 && !elliptic_solver->filled_region_touches_dirichlet(color1)) boundary_size(color1)+=face_size(iterator.axis);
+        if(color2>0 && !elliptic_solver->filled_region_touches_dirichlet(color2)) boundary_size(color2)+=face_size(iterator.axis);}
 
     // sum up the boundary sizes and errors with the other nodes
     if(elliptic_solver->mpi_grid){

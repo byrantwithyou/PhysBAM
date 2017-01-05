@@ -145,6 +145,8 @@ Get_Cell_Velocities(const T dt,const T time,const int ghost_cells,ARRAY<TV,TV_IN
 template<class TV> void EULER_UNIFORM<TV>::
 Compute_Total_Conserved_Quantity(const bool update_boundary_flux,const T dt,TV_DIMENSION& total_conserved_quantity)
 {
+    VECTOR<T,TV::m> face_size;
+    for(int i=0;i<TV::m;i++) face_size(i)=grid.Face_Size(i);
     assert(conservation->save_fluxes);
     T cell_size=grid.Cell_Size();
     total_conserved_quantity=TV_DIMENSION();
@@ -155,8 +157,8 @@ Compute_Total_Conserved_Quantity(const bool update_boundary_flux,const T dt,TV_D
         const T direction=iterator.First_Boundary()?(T)1:(T)-1;
         const TV_INT inside_cell_index=iterator.First_Boundary()?iterator.Second_Cell_Index():iterator.First_Cell_Index();
         if(psi(inside_cell_index)){
-                accumulated_boundary_flux+=dt*direction*conservation->fluxes.Component(axis)(face_index)*iterator.Face_Size();
-                if(timesplit) accumulated_boundary_flux+=dt*direction*euler_projection.fluxes->Component(axis)(face_index)*iterator.Face_Size();}}
+            accumulated_boundary_flux+=dt*direction*conservation->fluxes.Component(axis)(face_index)*face_size(iterator.axis);
+            if(timesplit) accumulated_boundary_flux+=dt*direction*euler_projection.fluxes->Component(axis)(face_index)*face_size(iterator.axis);}}
     total_conserved_quantity-=accumulated_boundary_flux;
 }
 //#####################################################################
