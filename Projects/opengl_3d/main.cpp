@@ -237,6 +237,15 @@ Initialize_Components_And_Key_Bindings()
         OPENGL_COMPONENT_BASIC<T,OPENGL_BOX_3D<T> >* domain_box_component=new OPENGL_COMPONENT_BASIC<T,OPENGL_BOX_3D<T> >(stream_type,*opengl_box);
         Add_Component(domain_box_component,"Domain box",'6',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);}
 
+    if(has_valid_grid){
+        OPENGL_GRID_3D<T>* opengl_grid=new OPENGL_GRID_3D<T>(stream_type,*(new GRID<TV>(grid)),OPENGL_COLOR::Gray(0.5));
+        opengl_grid->owns_grid=true;
+        grid_component=new OPENGL_COMPONENT_BASIC<T,OPENGL_GRID_3D<T> >(stream_type,*opengl_grid);
+        opengl_world.Set_Key_Binding_Category("Grid");
+        Add_Component(grid_component,"Grid",'6',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::SELECTABLE);
+        opengl_world.Append_Bind_Key('^',grid_component->object.viewer_callbacks.Get("toggle_draw_ghost_values"));
+        slice_manager.Add_Object(grid_component);}
+
     {OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>* deformable_objects_component=0;
     std::string deformable_object_filename=basedir+LOG::sprintf("/%d/deformable_object_structures",start_frame);
     if(FILE_UTILITIES::File_Exists(basedir+"/common/deformable_object_structures") || FILE_UTILITIES::File_Exists(deformable_object_filename)){
@@ -605,15 +614,6 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F4),thin_shells_debugging_component->viewer_callbacks.Get("toggle_draw_grid_visibility_mode"));
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F5),thin_shells_debugging_component->viewer_callbacks.Get("toggle_draw_density_valid_mask"));
         slice_manager.Add_Object(thin_shells_debugging_component);}
-
-    if(has_valid_grid){
-        OPENGL_GRID_3D<T>* opengl_grid=new OPENGL_GRID_3D<T>(stream_type,*(new GRID<TV>(grid)),OPENGL_COLOR::Gray(0.5));
-        opengl_grid->owns_grid=true;
-        grid_component=new OPENGL_COMPONENT_BASIC<T,OPENGL_GRID_3D<T> >(stream_type,*opengl_grid);
-        opengl_world.Set_Key_Binding_Category("Grid");
-        Add_Component(grid_component,"Grid",'6',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::SELECTABLE);
-        opengl_world.Append_Bind_Key('^',grid_component->object.viewer_callbacks.Get("toggle_draw_ghost_values"));
-        slice_manager.Add_Object(grid_component);}
 
     opengl_world.Set_Key_Binding_Category("Particles");
 
