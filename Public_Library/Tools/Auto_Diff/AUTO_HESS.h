@@ -291,10 +291,14 @@ struct AUTO_HESS<TV,TV>
     {return AUTO_HESS(x-a,dx,ddx);}
 
     AUTO_HESS operator*(T a) const
-    {AUTO_HESS r(x*a,a*dx);for(int i=0;i<TV::m;i++) r.ddx(i)=ddx(i)*a;return r;}
+    {AUTO_HESS r(x*a,a*dx);
+    for(int i=0;i<TV::m;i++) r.ddx(i)=ddx(i)*a;
+    return r;}
 
     AUTO_HESS operator/(T a) const
-    {AUTO_HESS r(x/a,dx/a);for(int i=0;i<TV::m;i++) r.ddx(i)=ddx(i)/a;return r;}
+    {AUTO_HESS r(x/a,dx/a);
+    for(int i=0;i<TV::m;i++) r.ddx(i)=ddx(i)/a;
+    return r;}
 
     AUTO_HESS<T,TV> Dot(TV v) const
     {

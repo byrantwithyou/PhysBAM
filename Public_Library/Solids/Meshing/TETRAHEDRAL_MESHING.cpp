@@ -97,7 +97,9 @@ Initialize_Optimization(const bool verbose)
     mesh.Initialize_Boundary_Nodes(); // assumes that Initialize_Boundary_Nodes will use boundary_mesh
     map_from_nodes_to_boundary_list.Resize(mesh.number_nodes);
     for(int i=0;i<mesh.boundary_nodes->m;i++) map_from_nodes_to_boundary_list((*mesh.boundary_nodes)(i))=i;
-    for(int i=0;i<layers.m;i++) delete layers(i);layers.Resize(1);layers(0)=mesh.boundary_nodes;
+    for(int i=0;i<layers.m;i++) delete layers(i);
+    layers.Resize(1);
+    layers(0)=mesh.boundary_nodes;
     mesh.boundary_nodes=0; // we don't need it hanging off the mesh object any more
     if(verbose) LOG::cout<<"boundary layer has "<<layers(0)->m<<" nodes"<<std::endl;
     ARRAY<bool,VECTOR<int,1> > marked(0,mesh.number_nodes);for(int i=0;i<layers(0)->m;i++) marked((*layers(0))(i))=true;
@@ -543,8 +545,10 @@ Create_Initial_Mesh(const T bcc_lattice_cell_size,const bool use_adaptive_refine
             for(int p=0;p<parents.m;p++) (*dependent_nodes)(parents(p)).Append(binding_list.bindings(b)->particle_index);}
         binding_list.Update_Binding_Index_From_Particle_Index();}
     else{
-        for(int t=mesh.elements.m-1;t>=0;t--) if(!keep_tet_flag(t)) mesh.elements.Remove_Index_Lazy(t);mesh.elements.Compact();
-        mesh.Delete_Auxiliary_Structures();tetrahedralized_volume.Discard_Valence_Zero_Particles_And_Renumber();}
+        for(int t=mesh.elements.m-1;t>=0;t--) if(!keep_tet_flag(t)) mesh.elements.Remove_Index_Lazy(t);
+        mesh.elements.Compact();
+        mesh.Delete_Auxiliary_Structures();
+        tetrahedralized_volume.Discard_Valence_Zero_Particles_And_Renumber();}
 
 }
 //#####################################################################
@@ -576,7 +580,8 @@ Tetrahedron_Refinement_Criteria(const int index) const
             if(abs(phi)<minimum_cell_size_in_tetrahedron){ // close to the interface
                 VECTOR<T,2> curvatures=implicit_surface->Principal_Curvatures(x);
                 if(max_length*(abs(curvatures[0])+abs(curvatures[1]))>curvature_subdivision_threshold) return true;}
-            if(phi>=0) seen_positive=true;if(phi<=0) seen_negative=true;
+            if(phi>=0) seen_positive=true;
+            if(phi<=0) seen_negative=true;
             if(!seen_big_error){ // figure out linear interpolation of phi through the corners of the tet
                 MATRIX<T,4> A(1,1,1,1,xi.x,xj.x,xk.x,xl.x,xi.y,xj.y,xk.y,xl.y,xi.z,xj.z,xk.z,xl.z);A.Invert();
                 T phi0=A(0,0)*phi_i+A(0,1)*phi_j+A(0,2)*phi_k+A(0,3)*phi_l;

@@ -826,19 +826,29 @@ Delete_All_Particles_In_Cell(const TV_INT& block)
 template<class TV> void PARTICLE_LEVELSET_UNIFORM<TV>::
 Delete_Deep_Escaped_Particles(const T radius_fraction,const bool need_to_identify_escaped_particles,const bool verbose)
 {
-    if(verbose) LOG::cout << "positive particles - ";int number_of_positive_particles_deleted=0;
-    for(NODE_ITERATOR<TV> iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(positive_particles(block)){
-        number_of_positive_particles_deleted+=Delete_Deep_Escaped_Particles(BLOCK_UNIFORM<TV>(levelset.grid,block),*positive_particles(block),escaped_positive_particles(block),1,radius_fraction,
-            need_to_identify_escaped_particles);
-        if(positive_particles(block)->Size()==0) Free_Particle_And_Clear_Pointer(positive_particles(block));}}
+    if(verbose) LOG::cout << "positive particles - ";
+    int number_of_positive_particles_deleted=0;
+    for(NODE_ITERATOR<TV> iterator(levelset.grid);iterator.Valid();iterator.Next()){
+        TV_INT block=iterator.Node_Index();
+        if(positive_particles(block)){
+            number_of_positive_particles_deleted+=Delete_Deep_Escaped_Particles(
+                BLOCK_UNIFORM<TV>(levelset.grid,block),*positive_particles(block),
+                escaped_positive_particles(block),1,radius_fraction,need_to_identify_escaped_particles);
+            if(positive_particles(block)->Size()==0) Free_Particle_And_Clear_Pointer(positive_particles(block));}}
     if(verbose) LOG::cout << "deleted " << number_of_positive_particles_deleted << " particles" << std::endl;
-    if(verbose) LOG::cout << "negative particles - ";int number_of_negative_particles_deleted=0;
-    for(NODE_ITERATOR<TV> iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(negative_particles(block)){
-        number_of_negative_particles_deleted+=Delete_Deep_Escaped_Particles(BLOCK_UNIFORM<TV>(levelset.grid,block),*negative_particles(block),escaped_negative_particles(block),-1,radius_fraction,
-            need_to_identify_escaped_particles);
-        if(negative_particles(block)->Size()==0) Free_Particle_And_Clear_Pointer(negative_particles(block));}}
+    if(verbose) LOG::cout << "negative particles - ";
+    int number_of_negative_particles_deleted=0;
+    for(NODE_ITERATOR<TV> iterator(levelset.grid);iterator.Valid();iterator.Next()){
+        TV_INT block=iterator.Node_Index();
+        if(negative_particles(block)){
+            number_of_negative_particles_deleted+=Delete_Deep_Escaped_Particles(
+                BLOCK_UNIFORM<TV>(levelset.grid,block),*negative_particles(block),
+                escaped_negative_particles(block),-1,radius_fraction,need_to_identify_escaped_particles);
+            if(negative_particles(block)->Size()==0) Free_Particle_And_Clear_Pointer(negative_particles(block));}}
     if(verbose) LOG::cout << "deleted " << number_of_negative_particles_deleted << " particles" << std::endl;
-    for(NODE_ITERATOR<TV> iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();assert(deletion_list(block).m==0);}
+    for(NODE_ITERATOR<TV> iterator(levelset.grid);iterator.Valid();iterator.Next()){
+        TV_INT block=iterator.Node_Index();
+        assert(deletion_list(block).m==0);}
 }
 //#####################################################################
 // Function Delete_Deep_Escaped_Particles
@@ -1244,7 +1254,8 @@ Delete_Particles_Far_From_Interface_Part_Two(RANGE<TV_INT>& domain,T_ARRAYS_CHAR
     for(CELL_ITERATOR<TV> iterator(levelset.grid,ghost_domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         for(int axis=0;axis<TV::m;axis++){TV_INT neighbor=cell+TV_INT::Axis_Vector(axis);
             if(near_interface.Valid_Index(neighbor) && cell_neighbors_visible(cell)(axis) && (near_interface(cell)|near_interface(neighbor))&old_mask){
-                if(domain.Lazy_Inside_Half_Open(cell)) near_interface(cell)|=new_mask;if(domain.Lazy_Inside_Half_Open(neighbor)) near_interface(neighbor)|=new_mask;}}}
+                if(domain.Lazy_Inside_Half_Open(cell)) near_interface(cell)|=new_mask;
+                if(domain.Lazy_Inside_Half_Open(neighbor)) near_interface(neighbor)|=new_mask;}}}
 }
 //#####################################################################
 // Function Delete_Particles_Far_From_Interface

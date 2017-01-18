@@ -402,7 +402,8 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
 
     printf("\n");
     for(int i=0;i<TV::m;i++){for(int c=0;c<iss.cdi->colors;c++) printf("%c%d [%i]\t","uvw"[i],c,iss.cm_u(i)->dofs(c));printf("\n");}
-    for(int c=0;c<iss.cdi->colors;c++) printf("p%d [%i]\t",c,iss.cm_p->dofs(c));printf("\n");
+    for(int c=0;c<iss.cdi->colors;c++) printf("p%d [%i]\t",c,iss.cm_p->dofs(c));
+    printf("\n");
     printf("qn [%i]\t",iss.cdi->constraint_base_n);
     printf("qt [%i] ",iss.cdi->constraint_base_t);
     printf("\n");

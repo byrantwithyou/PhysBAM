@@ -38,7 +38,8 @@ MESH_OBJECT(T_MESH& mesh_input,GEOMETRY_PARTICLES<TV>& particles_input)
 template<class TV,class T_MESH> MESH_OBJECT<TV,T_MESH>::
 ~MESH_OBJECT()
 {
-    if(need_destroy_mesh) delete &mesh;if(need_destroy_particles) delete &particles;
+    if(need_destroy_mesh) delete &mesh;
+    if(need_destroy_particles) delete &particles;
     delete bounding_box;
     delete particle_partition;
 }

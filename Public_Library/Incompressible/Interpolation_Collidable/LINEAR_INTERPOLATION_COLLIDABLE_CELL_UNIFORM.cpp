@@ -57,7 +57,8 @@ From_Base_Node(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV&
     BLOCK_UNIFORM<TV> block(grid,cell+TV_INT::All_Ones_Vector());
     assert(block.Inside(X));
     if(!body_list.Occupied_Block(block)){interpolation_valid=true;LINEAR_INTERPOLATION_UNIFORM<TV,T2> linear;
-        if(extrema) *extrema=linear.Extrema_From_Base_Node(grid,u,u,X,cell);return linear.From_Base_Node(grid,u,X,cell);}
+        if(extrema) *extrema=linear.Extrema_From_Base_Node(grid,u,u,X,cell);
+        return linear.From_Base_Node(grid,u,X,cell);}
     COLLISION_GEOMETRY_ID body_id(0);int aggregate_id=0;
     if(body_list.Inside_Any_Simplex_Of_Any_Body(X,body_id,aggregate_id)) return Invalid_Value_Replacement(grid,u,X,cell,X,body_id,aggregate_id,interpolation_valid);
     int valid_mask=0;

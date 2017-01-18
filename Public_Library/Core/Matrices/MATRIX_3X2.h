@@ -34,7 +34,8 @@ public:
 
     explicit MATRIX(INITIAL_SIZE mm,INITIAL_SIZE nn)
     {
-        assert(mm==INITIAL_SIZE(3) && nn==INITIAL_SIZE(2));for(int i=0;i<6;i++) x[i]=T();
+        assert(mm==INITIAL_SIZE(3) && nn==INITIAL_SIZE(2));
+        for(int i=0;i<6;i++) x[i]=T();
     }
 
     MATRIX(const MATRIX& matrix_input)
@@ -61,12 +62,14 @@ public:
     template<class T_MATRIX>
     explicit MATRIX(const MATRIX_BASE<T,T_MATRIX>& A)
     {
-        assert(A.Rows()==3 && A.Columns()==2);for(int j=0;j<2;j++) for(int i=0;i<3;i++) (*this)(i,j)=A(i,j);
+        assert(A.Rows()==3 && A.Columns()==2);
+        for(int j=0;j<2;j++) for(int i=0;i<3;i++) (*this)(i,j)=A(i,j);
     }
 
     MATRIX& operator=(const MATRIX& matrix_input)
     {
-        for(int i=0;i<6;i++) x[i]=matrix_input.x[i];return *this;
+        for(int i=0;i<6;i++) x[i]=matrix_input.x[i];
+        return *this;
     }
 
     int Rows() const
@@ -103,7 +106,8 @@ public:
     {assert((unsigned)j<3);x[j]+=v.x;x[j+3]+=v.y;}
 
     bool operator==(const MATRIX& A) const
-    {for(int i=0;i<6;i++) if(x[i]!=A.x[i]) return false;return true;}
+    {for(int i=0;i<6;i++) if(x[i]!=A.x[i]) return false;
+    return true;}
 
     bool operator!=(const MATRIX& A) const
     {return !(*this==A);}
@@ -115,19 +119,24 @@ public:
     {return MATRIX(-x[0],-x[1],-x[2],-x[3],-x[4],-x[5]);}
 
     MATRIX& operator+=(const MATRIX& A)
-    {for(int i=0;i<6;i++) x[i]+=A.x[i];return *this;}
+    {for(int i=0;i<6;i++) x[i]+=A.x[i];
+    return *this;}
 
     MATRIX& operator-=(const MATRIX& A)
-    {for(int i=0;i<6;i++) x[i]-=A.x[i];return *this;}
+    {for(int i=0;i<6;i++) x[i]-=A.x[i];
+    return *this;}
 
     MATRIX& operator*=(const MATRIX<T,2>& A)
     {return *this=*this*A;}
 
     MATRIX& operator*=(const T a)
-    {for(int i=0;i<6;i++) x[i]*=a;return *this;}
+    {for(int i=0;i<6;i++) x[i]*=a;
+    return *this;}
 
     MATRIX& operator/=(const T a)
-    {assert(a!=0);T s=1/a;for(int i=0;i<6;i++) x[i]*=s;return *this;}
+    {assert(a!=0);T s=1/a;
+    for(int i=0;i<6;i++) x[i]*=s;
+    return *this;}
 
     MATRIX operator+(const MATRIX& A) const // 6 adds
     {return MATRIX(x[0]+A.x[0],x[1]+A.x[1],x[2]+A.x[2],x[3]+A.x[3],x[4]+A.x[4],x[5]+A.x[5]);}
@@ -139,7 +148,9 @@ public:
     {return MATRIX(x[0]*A.x[0]+x[3]*A.x[1],x[1]*A.x[0]+x[4]*A.x[1],x[2]*A.x[0]+x[5]*A.x[1],x[0]*A.x[2]+x[3]*A.x[3],x[1]*A.x[2]+x[4]*A.x[3],x[2]*A.x[2]+x[5]*A.x[3]);}
 
     MATRIX_MXN<T> operator*(const MATRIX_MXN<T>& A) const
-    {assert(2==A.m);MATRIX_MXN<T> matrix(3,A.n);for(int j=0;j<A.n;j++) for(int i=0;i<3;i++) for(int k=0;k<2;k++) matrix(i,j)+=(*this)(i,k)*A(k,j);return matrix;}
+    {assert(2==A.m);MATRIX_MXN<T> matrix(3,A.n);
+    for(int j=0;j<A.n;j++) for(int i=0;i<3;i++) for(int k=0;k<2;k++) matrix(i,j)+=(*this)(i,k)*A(k,j);
+    return matrix;}
 
     MATRIX Times_Transpose(const UPPER_TRIANGULAR_MATRIX<T,2>& A) const // 9 mults, 3 adds
     {return MATRIX(x[0]*A.x00+x[3]*A.x01,x[1]*A.x00+x[4]*A.x01,x[2]*A.x00+x[5]*A.x01,x[3]*A.x11,x[4]*A.x11,x[5]*A.x11);}
@@ -230,7 +241,9 @@ public:
     {return MATRIX<T,2,3>::Transposed(*this);}
 
     static MATRIX Outer_Product(const VECTOR<T,3>& u,const VECTOR<T,2>& v)
-    {MATRIX result;for(int i=0;i<3;i++) for(int j=0;j<2;j++) result(i,j)=u(i)*v(j);return result;}
+    {MATRIX result;
+    for(int i=0;i<3;i++) for(int j=0;j<2;j++) result(i,j)=u(i)*v(j);
+    return result;}
 
     template<class RW> void Read(std::istream& input)
     {Read_Binary_Array<RW>(input,x,m*n);}
@@ -269,6 +282,13 @@ inline MATRIX<T,3,2> operator*(const UPPER_TRIANGULAR_MATRIX<T,3>& A,const MATRI
 
 template<class T>
 inline std::istream& operator>>(std::istream& input,MATRIX<T,3,2>& A)
-{FILE_UTILITIES::Ignore(input,'[');for(int i=0;i<3;i++){for(int j=0;j<2;j++) input>>A.x[i+j*3];FILE_UTILITIES::Ignore(input,';');}FILE_UTILITIES::Ignore(input,']');return input;}
+{
+    FILE_UTILITIES::Ignore(input,'[');
+    for(int i=0;i<3;i++){
+        for(int j=0;j<2;j++) input>>A.x[i+j*3];
+        FILE_UTILITIES::Ignore(input,';');}
+    FILE_UTILITIES::Ignore(input,']');
+    return input;
+}
 }
 #endif

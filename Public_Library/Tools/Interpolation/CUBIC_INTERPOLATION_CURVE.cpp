@@ -73,7 +73,10 @@ template<class T,class T2> void CUBIC_INTERPOLATION_CURVE<T,T2>::
 Compute_Coefficients() const // ACM Algorithm 472
 {
     need_compute_coefficients=false;
-    if(control_points.m<=1) return;T2 r,s=T2();T u=T(),v=T();ARRAY<T> h(control_points.m),h_inv(control_points.m),g(control_points.m);
+    if(control_points.m<=1) return;
+    T2 r,s=T2();
+    T u=T(),v=T();
+    ARRAY<T> h(control_points.m),h_inv(control_points.m),g(control_points.m);
     for(int i=0;i<control_points.m-1;i++){const CONTROL_POINT &pt=control_points(i),&ptp1=control_points(i+1);
         h(i)=ptp1.t-pt.t;h_inv(i)=1/h(i);r=(ptp1.x-pt.x)*h_inv(i);pt.c=r-s;s=r;}
     r=s=control_points(0).c=control_points.Last().c=T2();

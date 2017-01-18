@@ -67,8 +67,10 @@ Delete_Auxiliary_Structures()
 template<int d> void SIMPLEX_MESH<d>::
 Refresh_Auxiliary_Structures()
 {
-    if(neighbor_nodes) Initialize_Neighbor_Nodes();if(incident_elements) Initialize_Incident_Elements();
-    if(adjacent_elements) Initialize_Adjacent_Elements();if(neighbor_elements) Initialize_Neighbor_Elements();
+    if(neighbor_nodes) Initialize_Neighbor_Nodes();
+    if(incident_elements) Initialize_Incident_Elements();
+    if(adjacent_elements) Initialize_Adjacent_Elements();
+    if(neighbor_elements) Initialize_Neighbor_Elements();
 }
 //#####################################################################
 // Function Simplex

@@ -106,7 +106,8 @@ public:
     VECTOR(const VECTOR<T,n>& v1,const VECTOR<T,3-n>& v2)
         :x(),y(),z()
     {
-        for(int i=0;i<n;i++) (*this)(i)=v1(i);for(int i=n;i<3;i++) (*this)(i)=v2(i-n);
+        for(int i=0;i<n;i++) (*this)(i)=v1(i);
+        for(int i=n;i<3;i++) (*this)(i)=v2(i-n);
     }
 
     ~VECTOR()
@@ -383,7 +384,9 @@ public:
     {assert((unsigned)index<3);return VECTOR<T,2>(index>0?x:y,index<2?z:y);}
 
     VECTOR<T,4> Insert(const T& element,const int index) const
-    {VECTOR<T,4> r;r[index]=element;for(int i=0;i<3;i++) r[i+(i>=index)]=(*this)[i];return r;}
+    {VECTOR<T,4> r;r[index]=element;
+    for(int i=0;i<3;i++) r[i+(i>=index)]=(*this)[i];
+    return r;}
 
     VECTOR<T,4> Prepend(const T& element) const
     {return VECTOR<T,4>(element,x,y,z);}
@@ -392,7 +395,9 @@ public:
     {return VECTOR<T,4>(x,y,z,element);}
 
     template<int d2> VECTOR<T,3+d2> Append_Elements(const VECTOR<T,d2>& elements) const
-    {VECTOR<T,3+d2> r;r[0]=x;r[1]=y;r[2]=z;for(int i=0;i<d2;i++) r[i+3]=elements[i];return r;}
+    {VECTOR<T,3+d2> r;r[0]=x;r[1]=y;r[2]=z;
+    for(int i=0;i<d2;i++) r[i+3]=elements[i];
+    return r;}
 
     VECTOR Sorted() const
     {VECTOR r(*this);exchange_sort(r.x,r.y,r.z);return r;}
@@ -409,7 +414,9 @@ public:
 
     template<int d1,int d2> VECTOR<T,d2-d1+1> Slice() const
     {STATIC_ASSERT(((0<=d1) && (d2<3)));
-    VECTOR<T,d2-d1+1> r;for(int i=d1;i<=d2;i++) r[i-d1]=(*this)[i];return r;}
+    VECTOR<T,d2-d1+1> r;
+    for(int i=d1;i<=d2;i++) r[i-d1]=(*this)[i];
+    return r;}
 
     template<int n> void Split(VECTOR<T,n>& v1,VECTOR<T,3-n>& v2) const
     {for(int i=0;i<n;i++) v1(i)=(*this)(i);

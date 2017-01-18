@@ -1121,7 +1121,9 @@ Shock_Propagation_Using_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>
                     if(skip_collision_check.Skip_Pair(id_1,id_2)) continue;
                     if(!parameters.use_projected_gauss_seidel || pairs_processed_by_contact.Contains(pairs(i).Sorted()))
                         if(SOLVE_CONTACT::Update_Contact_Pair(*this,collision_callbacks,analytic_contact_registry,id_1,id_2,false,shock_propagation_pair_iterations,epsilon_scale,dt,time,false)){
-                            if(!use_saved_pairs) saved_contact_pairs_for_level(level).Append_Unique(pairs(i));need_another_level_iteration=true;need_another_iteration=true;}}
+                            if(!use_saved_pairs) saved_contact_pairs_for_level(level).Append_Unique(pairs(i));
+                            need_another_level_iteration=true;
+                            need_another_iteration=true;}}
                 if(articulated_rigid_body && articulated_rigid_body->use_shock_propagation)
                     for(int i=0;i<articulated_rigid_body->shock_propagation_level_iterations;i++) for(int j=0;j<articulated_rigid_body->process_list(level).m;j++){
                         JOINT_ID joint_id=articulated_rigid_body->process_list(level)(j);

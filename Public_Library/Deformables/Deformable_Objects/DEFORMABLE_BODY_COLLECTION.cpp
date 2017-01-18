@@ -123,13 +123,15 @@ Write_Dynamic_Variables(const STREAM_TYPE stream_type,const std::string& prefix,
     std::string f=FILE_UTILITIES::Number_To_String(frame);
     if(binding_list.bindings.m>0 && !(check_stale && !binding_list.is_stale)){
         if(check_stale){
-            if(!binding_list.frame_list) binding_list.frame_list=new ARRAY<int>;binding_list.frame_list->Append(frame);
+            if(!binding_list.frame_list) binding_list.frame_list=new ARRAY<int>;
+            binding_list.frame_list->Append(frame);
             FILE_UTILITIES::Write_To_File(stream_type,prefix+"/common/bindings_list",*binding_list.frame_list);
             binding_list.is_stale=false;}
         FILE_UTILITIES::Write_To_File(stream_type,prefix+"/"+f+"/bindings",binding_list);}
     if(soft_bindings.bindings.m>0 && !(check_stale && !soft_bindings.is_stale)){
         if(check_stale){
-            if(!soft_bindings.frame_list) soft_bindings.frame_list=new ARRAY<int>;soft_bindings.frame_list->Append(frame);
+            if(!soft_bindings.frame_list) soft_bindings.frame_list=new ARRAY<int>;
+            soft_bindings.frame_list->Append(frame);
             FILE_UTILITIES::Write_To_File(stream_type,prefix+"/common/soft_bindings_list",*soft_bindings.frame_list);
             soft_bindings.is_stale=false;}
         FILE_UTILITIES::Write_To_File(stream_type,prefix+"/"+f+"/soft_bindings",soft_bindings);}

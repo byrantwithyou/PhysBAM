@@ -96,7 +96,8 @@ Initialize_Tetrahedralized_Volume()
         ph_outward=hex_particle_indices(h_outward);if(h_inward == 0) ph_inward=face_particle_indices(f); else ph_inward=hex_particle_indices(h_inward);
         tetrahedron_list.Append(VECTOR<int,4>(p1,ph_inward,p2,ph_outward));tetrahedron_list.Append(VECTOR<int,4>(p2,ph_inward,p3,ph_outward));
         tetrahedron_list.Append(VECTOR<int,4>(p3,ph_inward,p4,ph_outward));tetrahedron_list.Append(VECTOR<int,4>(p4,ph_inward,p1,ph_outward));}
-    if(tetrahedralized_volume) delete &(tetrahedralized_volume->mesh);delete tetrahedralized_volume;
+    if(tetrahedralized_volume) delete &(tetrahedralized_volume->mesh);
+    delete tetrahedralized_volume;
     tetrahedralized_volume=TETRAHEDRALIZED_VOLUME<T>::Create(particles);
     tetrahedralized_volume->mesh.Initialize_Mesh(particles.Size(),tetrahedron_list);
 }

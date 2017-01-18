@@ -17,7 +17,7 @@ Initialize(const TV_INT& counts_input,const RANGE<TV>& box,const bool MAC_grid)
     TV_INT effective_counts(counts);
     if(MAC_grid) MAC_offset=(T).5;
     else{MAC_offset=0;effective_counts-=1;}
-    if(!TV::m) return;
+    if(TV::m==0) return;
     numbers_of_cells=TV_INT::Componentwise_Max(effective_counts,TV_INT());
     if(effective_counts.Min()>0){
         dX=domain.Edge_Lengths()/TV(effective_counts);

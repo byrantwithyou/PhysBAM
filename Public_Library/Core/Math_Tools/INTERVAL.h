@@ -193,7 +193,9 @@ public:
     static INTERVAL Bounding_Box(const T_ARRAY& points)
     {STATIC_ASSERT((is_same<typename T_ARRAY::ELEMENT,T>::value));
     if(!points.Size()) return Empty_Box();
-    INTERVAL interval(points(0));for(int i=1;i<points.Size();i++) interval.Enlarge_Nonempty_Box_To_Include_Point(points(i));return interval;}
+    INTERVAL interval(points(0));
+    for(int i=1;i<points.Size();i++) interval.Enlarge_Nonempty_Box_To_Include_Point(points(i));
+    return interval;}
 
     T Signed_Distance(const T& X) const
     {return abs(X-Center())-Size();}

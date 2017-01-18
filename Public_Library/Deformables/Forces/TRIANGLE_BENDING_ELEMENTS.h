@@ -94,9 +94,11 @@ public:
     template<class T_FIELD>
     void Enable_Plasticity(const T_FIELD& plastic_yield_input,const T_FIELD& plastic_hardening_input)
     {if(!plastic_yield) plastic_yield=new ARRAY<T>;plastic_yield->Resize(bending_quadruples.m,false,false);
-    if(!plastic_hardening) plastic_hardening=new ARRAY<T>;plastic_hardening->Resize(bending_quadruples.m,false,false);
+    if(!plastic_hardening) plastic_hardening=new ARRAY<T>;
+    plastic_hardening->Resize(bending_quadruples.m,false,false);
     plastic_yield->Fill(plastic_yield_input);plastic_hardening->Fill(plastic_hardening_input);
-    if(!sine_half_elastic_angle) sine_half_elastic_angle=new ARRAY<T>;*sine_half_elastic_angle=sine_half_rest_angle;}
+    if(!sine_half_elastic_angle) sine_half_elastic_angle=new ARRAY<T>;
+    *sine_half_elastic_angle=sine_half_rest_angle;}
 
     void Set_Area_Cutoff_From_Triangulated_Surface(TRIANGULATED_SURFACE<T>& triangulated_surface,const T cutoff_ratio=(T)1)
     {area_cutoff=cutoff_ratio*triangulated_surface.Minimum_Area();}

@@ -90,7 +90,9 @@ public:
 
     int Positive_Count(const int t) const
     {VECTOR<T,d+1> phi_element=Get_Phi(t);
-    int count=0;for(int i=0;i<d+1;i++) if(phi_element[i]>0) count++;return count;}
+    int count=0;
+    for(int i=0;i<d+1;i++) if(phi_element[i]>0) count++;
+    return count;}
 
     T Phi_In_Simplex(const int node,const int simplex) const
     {assert(embedded_object.simplicial_object.mesh.Node_In_Simplex(node,simplex));

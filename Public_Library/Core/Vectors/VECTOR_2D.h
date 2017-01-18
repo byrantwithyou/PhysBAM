@@ -221,10 +221,15 @@ public:
     {return abs(x)+abs(y);}
 
     T Normalize()
-    {T magnitude=Magnitude();if(magnitude) *this*=1/magnitude;else *this=VECTOR(1,0);return magnitude;}
+    {T magnitude=Magnitude();
+    if(magnitude) *this*=1/magnitude;
+    else *this=VECTOR(1,0);
+    return magnitude;}
 
     VECTOR Normalized() const
-    {T magnitude=Magnitude();if(magnitude) return *this*(1/magnitude);else return VECTOR(1,0);}
+    {T magnitude=Magnitude();
+    if(magnitude) return *this*(1/magnitude);
+    return VECTOR(1,0);}
 
     VECTOR Rotate_Clockwise_90() const
     {return VECTOR(y,-x);}
@@ -233,7 +238,8 @@ public:
     {return VECTOR(-y,x);}
 
     VECTOR Rotate_Counterclockwise_Multiple_90(const int n) const
-    {VECTOR r(*this);if(n&2) r=-r;
+    {VECTOR r(*this);
+    if(n&2) r=-r;
     return n&1?r.Rotate_Counterclockwise_90():r;}
 
     VECTOR Perpendicular() const
@@ -394,7 +400,9 @@ public:
     {assert((unsigned)index<2);return VECTOR<T,1>((*this)[1-index]);}
 
     VECTOR<T,3> Insert(const T& element,const int index) const
-    {VECTOR<T,3> r;r[index]=element;for(int i=0;i<2;i++) r[i+(i>=index)]=(*this)[i];return r;}
+    {VECTOR<T,3> r;r[index]=element;
+    for(int i=0;i<2;i++) r[i+(i>=index)]=(*this)[i];
+    return r;}
 
     VECTOR<T,3> Prepend(const T& element) const
     {return VECTOR<T,3>(element,x,y);}
@@ -403,7 +411,9 @@ public:
     {return VECTOR<T,3>(x,y,element);}
 
     template<int d2> VECTOR<T,2+d2> Append_Elements(const VECTOR<T,d2>& elements) const
-    {VECTOR<T,2+d2> r;r[0]=x;r[1]=y;for(int i=0;i<d2;i++) r[i+2]=elements[i];return r;}
+    {VECTOR<T,2+d2> r;r[0]=x;r[1]=y;
+    for(int i=0;i<d2;i++) r[i+2]=elements[i];
+    return r;}
 
     VECTOR<T,2> Sorted() const
     {VECTOR<T,2> r(*this);exchange_sort(r.x,r.y);return r;}
@@ -420,7 +430,9 @@ public:
 
     template<int d1,int d2> VECTOR<T,d2-d1+1> Slice() const
     {STATIC_ASSERT(((0<=d1) && (d2<2)));
-    VECTOR<T,d2-d1+1> r;for(int i=d1;i<=d2;i++) r[i-d1]=(*this)[i];return r;}
+    VECTOR<T,d2-d1+1> r;
+    for(int i=d1;i<=d2;i++) r[i-d1]=(*this)[i];
+    return r;}
 
     template<int n> void Split(VECTOR<T,n>& v1,VECTOR<T,2-n>& v2) const
     {for(int i=0;i<n;i++) v1(i)=(*this)(i);

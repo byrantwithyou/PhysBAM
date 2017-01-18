@@ -56,11 +56,14 @@ template<class T> T Halfspace_Intersection_Size(const RANGE<VECTOR<T,3> >& box,c
     else if(z10<=0){volume=cube(z00)/(6*nx*ny);if(centroid) *centroid=(T).25*z00/normal;}
     else if(z01<=0){volume=(3*z00*z10+sqr(nx))/(6*ny);if(centroid){T z=(z00+z10)*(sqr(nx)+2*z00*z10);*centroid=VECTOR<T,3>(3*z10*(z00+z10)+z00*nx,z/ny,z)/(24*ny*volume);}}
     else{T a=cube(z00),b=cube(z10),c=cube(z01),d=max((T)0,z00-1),e=cube(d);volume=a-b-c-e;
-        if(centroid) *centroid=((T).25*(a*z00-b*z10-c*z01-e*d)/normal-VECTOR<T,3>(b,c,e))/volume;volume/=(6*nx*ny);}
+        if(centroid) *centroid=((T).25*(a*z00-b*z10-c*z01-e*d)/normal-VECTOR<T,3>(b,c,e))/volume;
+        volume/=(6*nx*ny);}
     // Undo the normalizations to convert normalized centroid and volume into world space.
     if(complement){volume=1-volume;if(centroid) *centroid=-((volume-1)**centroid+(T).5)/volume+1;}
     if(centroid){
-        if(exchange_xy) exchange(centroid->y,centroid->x);if(exchange_yz) exchange(centroid->z,centroid->y);if(exchange_xz) exchange(centroid->z,centroid->x);
+        if(exchange_xy) exchange(centroid->y,centroid->x);
+        if(exchange_yz) exchange(centroid->z,centroid->y);
+        if(exchange_xz) exchange(centroid->z,centroid->x);
         for(int i=0;i<3;i++) if(flip[i]) (*centroid)(i)=1-(*centroid)(i);
         *centroid=*centroid*scaling+box.min_corner;}
     return volume*box.Size();

@@ -53,7 +53,8 @@ public:
 
     MATRIX& operator=(const MATRIX& matrix_input)
     {
-        for(int i=0;i<16;i++) x[i]=matrix_input.x[i];return *this;
+        for(int i=0;i<16;i++) x[i]=matrix_input.x[i];
+        return *this;
     }
 
     int Rows() const
@@ -90,7 +91,8 @@ public:
     {assert((unsigned)j<4);x[j]+=v(0);x[j+4]+=v(1);x[j+8]+=v(2);x[j+12]+=v(3);}
 
     bool operator==(const MATRIX& A) const
-    {for(int i=0;i<16;i++) if(x[i]!=A.x[i]) return false;return true;}
+    {for(int i=0;i<16;i++) if(x[i]!=A.x[i]) return false;
+    return true;}
 
     bool operator!=(const MATRIX& A) const
     {return !(*this==A);}
@@ -99,19 +101,24 @@ public:
     {return MATRIX(-x[0],-x[1],-x[2],-x[3],-x[4],-x[5],-x[6],-x[7],-x[8],-x[9],-x[10],-x[11],-x[12],-x[13],-x[14],-x[15]);}
 
     MATRIX& operator+=(const MATRIX& A)
-    {for(int i=0;i<16;i++) x[i]+=A.x[i];return *this;}
+    {for(int i=0;i<16;i++) x[i]+=A.x[i];
+    return *this;}
 
     MATRIX& operator-=(const MATRIX& A)
-    {for(int i=0;i<16;i++) x[i]-=A.x[i];return *this;}
+    {for(int i=0;i<16;i++) x[i]-=A.x[i];
+    return *this;}
 
     MATRIX& operator*=(const MATRIX& A)
     {return *this=*this*A;}
 
     MATRIX& operator*=(const T a)
-    {for(int i=0;i<16;i++) x[i]*=a;return *this;}
+    {for(int i=0;i<16;i++) x[i]*=a;
+    return *this;}
 
     MATRIX& operator/=(const T a)
-    {assert(a!=0);T s=1/a;for(int i=0;i<16;i++) x[i]*=s;return *this;}
+    {assert(a!=0);T s=1/a;
+    for(int i=0;i<16;i++) x[i]*=s;
+    return *this;}
 
     MATRIX operator+(const T a) const
     {return MATRIX(x[0]+a,x[1],x[2],x[3],x[4],x[5]+a,x[6],x[7],x[8],x[9],x[10]+a,x[11],x[12],x[13],x[14],x[15]+a);}
@@ -239,6 +246,14 @@ inline MATRIX<T,4> operator*(const T a,const MATRIX<T,4>& A)
 
 template<class T>
 inline std::istream& operator>>(std::istream& input,MATRIX<T,4>& A)
-{FILE_UTILITIES::Ignore(input,'[');for(int i=0;i<4;i++){for(int j=0;j<4;j++) input>>A.x[i+j*4];FILE_UTILITIES::Ignore(input,';');}FILE_UTILITIES::Ignore(input,']');return input;}
+{
+    FILE_UTILITIES::Ignore(input,'[');
+    for(int i=0;i<4;i++){
+        for(int j=0;j<4;j++)
+            input>>A.x[i+j*4];
+        FILE_UTILITIES::Ignore(input,';');}
+    FILE_UTILITIES::Ignore(input,']');
+    return input;
+}
 }
 #endif

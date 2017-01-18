@@ -175,7 +175,8 @@ public:
 
         if(print_residuals) LOG::cout<<"Norm : "<<convergence_norm<<std::endl;
         if(convergence_norm<=tolerance){
-            if(print_diagnostics) LOG::Stat("cg iterations",0);return true;}
+            if(print_diagnostics) LOG::Stat("cg iterations",0);
+            return true;}
 
         ARRAY<T,TV_INT>::Exchange(z,p);
         system.Precondition_And_Compute_Dot_Product(r,p,rho,nullspace_component);
@@ -195,7 +196,8 @@ public:
 
             if(print_residuals) LOG::cout<<"Norm : "<<convergence_norm<<std::endl;
             if(convergence_norm<=tolerance){
-                if(print_diagnostics) LOG::Stat("cg iterations",iterations);if(iterations_used) *iterations_used=iterations;
+                if(print_diagnostics) LOG::Stat("cg iterations",iterations);
+                if(iterations_used) *iterations_used=iterations;
                 system.Saxpy(alpha,p,x);
                 return true;}
             if(iterations==max_iterations){
@@ -210,7 +212,8 @@ public:
 
         }
 
-        if(print_diagnostics) LOG::Stat("cg iterations",iterations);if(iterations_used) *iterations_used=iterations;
+        if(print_diagnostics) LOG::Stat("cg iterations",iterations);
+        if(iterations_used) *iterations_used=iterations;
         if(print_diagnostics) LOG::cout<<"cg not converged after "<<max_iterations<<" iterations, error = "<<convergence_norm<<std::endl;
         return false;
     }

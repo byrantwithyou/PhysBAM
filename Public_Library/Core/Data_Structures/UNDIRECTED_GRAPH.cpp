@@ -25,7 +25,8 @@ void UNDIRECTED_GRAPH_CORE::
 Reset()
 {
     edges.Remove_All();
-    for(int i=0;i<adjacent_edges.m;i++) adjacent_edges(i).Remove_All();adjacent_edges.Remove_All();
+    for(int i=0;i<adjacent_edges.m;i++) adjacent_edges(i).Remove_All();
+    adjacent_edges.Remove_All();
 }
 //#####################################################################
 // Function Add_Edge

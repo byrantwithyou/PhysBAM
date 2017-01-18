@@ -70,7 +70,10 @@ Store_Helper_Helper(const int segment1,const int segment2)
     if(intersecting_edge_edge_pairs.Size() && intersecting_edge_edge_pairs.Contains(nodes)) return;
     if(mpi_solids){
         VECTOR<PARTITION_ID,4> processors(mpi_solids->partition_id_from_particle_index.Subset(nodes));
-        for(int i=0;i<3;i++) if(processors(i)!=processors(4)) {pairs_external.Append(nodes);return;}
+        for(int i=0;i<3;i++)
+            if(processors(i)!=processors(4)){
+                pairs_external.Append(nodes);
+                return;}
         pairs_internal.Append(nodes);}
     else pairs_internal.Append(nodes);
 }

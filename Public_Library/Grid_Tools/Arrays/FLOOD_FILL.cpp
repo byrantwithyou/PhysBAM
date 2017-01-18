@@ -84,7 +84,8 @@ Flood_Fill_Node(ARRAY<int,TV_INT>& colors,const int fill_color,const VECTOR<ARRA
     STACK<TV_INT>& flood_fill_stack,const TV_INT& node)
 {
     if(colors(node)==-2){touches_uncolorable_node=true;return;}
-    else if(colors(node)!=-1)return;colors(node)=fill_color;
+    else if(colors(node)!=-1) return;
+    colors(node)=fill_color;
 
     for(int a=0;a<TV_INT::m;a++){
         TV_INT node0(node),node1(node);

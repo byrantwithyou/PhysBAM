@@ -71,7 +71,9 @@ Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_
         nullspace_measure=residual_magnitude_squared?abs(rho_old/residual_magnitude_squared):0;
         if((!rho_old || convergence_norm<=tolerance || (iterations && nullspace_measure<=nullspace_tolerance)) &&
             (iterations>=min_iterations || convergence_norm<small_number)){ // TODO: get the stopping criterion right
-            if(print_diagnostics) LOG::Stat("symmqmr iterations",iterations);if(iterations_used) *iterations_used=iterations;return true;}
+            if(print_diagnostics) LOG::Stat("symmqmr iterations",iterations);
+            if(iterations_used) *iterations_used=iterations;
+            return true;}
         if(iterations==max_iterations) break;
 
         const KRYLOV_VECTOR_BASE<T>& mr=system.Precondition(r,z);
@@ -80,7 +82,8 @@ Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_
         p.Copy(beta,p,mr);
         rho_old=rho;tau_old=tau;nu_old=nu;}
 
-    if(print_diagnostics) LOG::Stat("symmqmr iterations",iterations);if(iterations_used) *iterations_used=iterations;
+    if(print_diagnostics) LOG::Stat("symmqmr iterations",iterations);
+    if(iterations_used) *iterations_used=iterations;
     if(print_diagnostics) LOG::cout<<"symmqmr not converged after "<<max_iterations<<" iterations, error = "<<convergence_norm<<std::endl;
     return false;
 }

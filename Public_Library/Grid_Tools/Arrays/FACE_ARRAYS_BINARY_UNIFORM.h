@@ -56,13 +56,16 @@ public:
 
     template<class T2>
     ARRAY& operator*=(const T2 a)
-    {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) Component(side,i)*=a;return *this;}
+    {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) Component(side,i)*=a;
+    return *this;}
 
     ARRAY& operator+=(const ARRAY& a)
-    {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) Component(side,i)+=a.Component(side,i);return *this;}
+    {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) Component(side,i)+=a.Component(side,i);
+    return *this;}
 
     ARRAY& operator-=(const ARRAY& a)
-    {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) Component(side,i)-=a.Component(side,i);return *this;}
+    {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) Component(side,i)-=a.Component(side,i);
+    return *this;}
 
     void Resize(const RANGE<TV_INT>& domain,const bool initialize_new_elements=true,const bool copy_existing_elements=true,const T& initialization_value=T())
     {BASE::Resize(domain,initialize_new_elements,copy_existing_elements,initialization_value);u2.Resize(domain,initialize_new_elements,copy_existing_elements,initialization_value);}
@@ -99,7 +102,9 @@ public:
     {assert((unsigned)axis<dimension);return *sided_data[side](axis);}
 
     TV Cell_Centered_Average(const TV_INT& cell_index) const
-    {TV average;for(int axis=0;axis<dimension;axis++) average(axis)=(T).5*(Component(2,axis)(cell_index)+Component(1,axis)(cell_index+TV_INT::Axis_Vector(axis)));return average;}
+    {TV average;
+    for(int axis=0;axis<dimension;axis++) average(axis)=(T).5*(Component(2,axis)(cell_index)+Component(1,axis)(cell_index+TV_INT::Axis_Vector(axis)));
+    return average;}
 
     void Set_All_Faces(const T& value,const TV_INT& cell_index)
     {for(int axis=0;axis<dimension;axis++) Component(2,axis)(cell_index)=Component(1,axis)(cell_index+TV_INT::Axis_Vector(axis))=value;}
@@ -128,7 +133,9 @@ public:
     {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Put(old_copy.Component(side,i),new_copy.Component(side,i));}
 
     TV Max_Abs() const
-    {TV maxabs_values;for(int i=0;i<dimension;i++) maxabs_values(i)=max(Component(1,i).Max_Abs(),Component(2,i).Max_Abs());return maxabs_values;}
+    {TV maxabs_values;
+    for(int i=0;i<dimension;i++) maxabs_values(i)=max(Component(1,i).Max_Abs(),Component(2,i).Max_Abs());
+    return maxabs_values;}
 
     static void Exchange(ARRAY& a,ARRAY& b)
     {BASE::Exchange(a,b);BASE::Exchange(a.u2,b.u2);a.Initialize();b.Initialize();}

@@ -45,8 +45,14 @@ TETRAHEDRON_MESH(const TETRAHEDRON_MESH& tetrahedron_mesh)
 TETRAHEDRON_MESH::
 ~TETRAHEDRON_MESH()
 {
-    if(owns_segment_mesh) delete segment_mesh;delete triangle_mesh;
-    delete element_edges;delete tetrahedron_faces;delete boundary_mesh;delete node_on_boundary;delete boundary_nodes;delete edge_tetrahedrons;
+    if(owns_segment_mesh) delete segment_mesh;
+    delete triangle_mesh;
+    delete element_edges;
+    delete tetrahedron_faces;
+    delete boundary_mesh;
+    delete node_on_boundary;
+    delete boundary_nodes;
+    delete edge_tetrahedrons;
     delete triangle_tetrahedrons;
 }
 //#####################################################################
@@ -56,9 +62,24 @@ void TETRAHEDRON_MESH::
 Delete_Auxiliary_Structures()
 {
     SIMPLEX_MESH<3>::Delete_Auxiliary_Structures();
-    if(owns_segment_mesh) delete segment_mesh;segment_mesh=0;delete triangle_mesh;triangle_mesh=0;delete element_edges;element_edges=0;
-    delete tetrahedron_faces;tetrahedron_faces=0;delete boundary_mesh;boundary_mesh=0;delete node_on_boundary;node_on_boundary=0;
-    delete boundary_nodes;boundary_nodes=0;delete edge_tetrahedrons;edge_tetrahedrons=0;delete triangle_tetrahedrons;triangle_tetrahedrons=0;
+    if(owns_segment_mesh) delete segment_mesh;
+    segment_mesh=0;
+    delete triangle_mesh;
+    triangle_mesh=0;
+    delete element_edges;
+    element_edges=0;
+    delete tetrahedron_faces;
+    tetrahedron_faces=0;
+    delete boundary_mesh;
+    boundary_mesh=0;
+    delete node_on_boundary;
+    node_on_boundary=0;
+    delete boundary_nodes;
+    boundary_nodes=0;
+    delete edge_tetrahedrons;
+    edge_tetrahedrons=0;
+    delete triangle_tetrahedrons;
+    triangle_tetrahedrons=0;
 }
 //#####################################################################
 // Function Refresh_Auxiliary_Structures
@@ -67,9 +88,14 @@ void TETRAHEDRON_MESH::
 Refresh_Auxiliary_Structures()
 {
     SIMPLEX_MESH<3>::Refresh_Auxiliary_Structures();
-    if(segment_mesh) Initialize_Segment_Mesh();if(triangle_mesh) Initialize_Triangle_Mesh();
-    if(element_edges) Initialize_Element_Edges();if(tetrahedron_faces) Initialize_Tetrahedron_Faces();if(boundary_mesh) Initialize_Boundary_Mesh();
-    if(node_on_boundary) Initialize_Node_On_Boundary();if(boundary_nodes) Initialize_Boundary_Nodes();if(edge_tetrahedrons) Initialize_Edge_Tetrahedrons();
+    if(segment_mesh) Initialize_Segment_Mesh();
+    if(triangle_mesh) Initialize_Triangle_Mesh();
+    if(element_edges) Initialize_Element_Edges();
+    if(tetrahedron_faces) Initialize_Tetrahedron_Faces();
+    if(boundary_mesh) Initialize_Boundary_Mesh();
+    if(node_on_boundary) Initialize_Node_On_Boundary();
+    if(boundary_nodes) Initialize_Boundary_Nodes();
+    if(edge_tetrahedrons) Initialize_Edge_Tetrahedrons();
     if(triangle_tetrahedrons) Initialize_Triangle_Tetrahedrons();
 }
 //#####################################################################

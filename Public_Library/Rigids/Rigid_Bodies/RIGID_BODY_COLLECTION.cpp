@@ -508,7 +508,8 @@ Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame
     for(int id=0;id<rigid_body_particles.Size();id++) if(Is_Active(id)){active_ids.Append(id);rigid_body_names(id)=Rigid_Body(id).name;}
     if(active_ids.m>0 && !(check_stale && is_stale_active)){
         if(check_stale){
-            if(!frame_list_active) frame_list_active=new ARRAY<int>;frame_list_active->Append(frame);
+            if(!frame_list_active) frame_list_active=new ARRAY<int>;
+            frame_list_active->Append(frame);
             FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/common/rigid_body_active_ids_list",directory.c_str()),*frame_list_active);
             is_stale_active=false;}
         FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/rigid_body_active_ids",directory.c_str(),frame),(char)1,rigid_body_particles.Size(),active_ids);}
@@ -519,7 +520,8 @@ Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame
     char version=3;
     if(rigid_body_particles.structure_ids.m>0 && !(check_stale && is_stale_key)){
         if(check_stale){
-            if(!frame_list_key) frame_list_key=new ARRAY<int>;frame_list_key->Append(frame);
+            if(!frame_list_key) frame_list_key=new ARRAY<int>;
+            frame_list_key->Append(frame);
             FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/common/rigid_body_key_list",directory.c_str()),*frame_list_key);
             is_stale_key=false;}
         FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/rigid_body_key",directory.c_str(),frame),version,rigid_body_particles.structure_ids);}

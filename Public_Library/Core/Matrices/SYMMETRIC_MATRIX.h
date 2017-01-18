@@ -77,52 +77,67 @@ public:
     {return Column(axis);}
 
     bool operator==(const SYMMETRIC_MATRIX& A) const
-    {for(int i=0;i<size;i++) if(x[i]!=A.x[i]) return false;return true;}
+    {for(int i=0;i<size;i++) if(x[i]!=A.x[i]) return false;
+    return true;}
 
     bool operator!=(const SYMMETRIC_MATRIX& A) const
     {return !(*this==A);}
 
     static SYMMETRIC_MATRIX Componentwise_Min(const SYMMETRIC_MATRIX& v1,const SYMMETRIC_MATRIX& v2)
-    {SYMMETRIC_MATRIX s;for(int i=0;i<size;i++) s.x[i]=min(v1.x[i],v2.x[i]);return s;}
+    {SYMMETRIC_MATRIX s;for(int i=0;i<size;i++) s.x[i]=min(v1.x[i],v2.x[i]);
+    return s;}
 
     static SYMMETRIC_MATRIX Componentwise_Max(const SYMMETRIC_MATRIX& v1,const SYMMETRIC_MATRIX& v2)
-    {SYMMETRIC_MATRIX s;for(int i=0;i<size;i++) s.x[i]=max(v1.x[i],v2.x[i]);return s;}
+    {SYMMETRIC_MATRIX s;for(int i=0;i<size;i++) s.x[i]=max(v1.x[i],v2.x[i]);
+    return s;}
 
     SYMMETRIC_MATRIX operator-() const
-    {SYMMETRIC_MATRIX s;for(int i=0;i<size;i++) s.x[i]=-x[i];return s;}
+    {SYMMETRIC_MATRIX s;for(int i=0;i<size;i++) s.x[i]=-x[i];
+    return s;}
 
     SYMMETRIC_MATRIX& operator+=(const SYMMETRIC_MATRIX& A)
-    {for(int i=0;i<size;i++) x[i]+=A.x[i];return *this;}
+    {for(int i=0;i<size;i++) x[i]+=A.x[i];
+    return *this;}
 
     SYMMETRIC_MATRIX& operator+=(const T& a)
-    {for(int i=0;i<d;i++) Element_Lower(i,i)+=a;return *this;}
+    {for(int i=0;i<d;i++) Element_Lower(i,i)+=a;
+    return *this;}
 
     SYMMETRIC_MATRIX& operator-=(const SYMMETRIC_MATRIX& A)
-    {for(int i=0;i<size;i++) x[i]-=A.x[i];return *this;}
+    {for(int i=0;i<size;i++) x[i]-=A.x[i];
+    return *this;}
 
     SYMMETRIC_MATRIX& operator-=(const T& a)
-    {for(int i=0;i<d;i++) Element_Lower(i,i)-=a;return *this;}
+    {for(int i=0;i<d;i++) Element_Lower(i,i)-=a;
+    return *this;}
 
     SYMMETRIC_MATRIX& operator*=(const T a)
-    {for(int i=0;i<size;i++) x[i]*=a;return *this;}
+    {for(int i=0;i<size;i++) x[i]*=a;
+    return *this;}
 
     SYMMETRIC_MATRIX& operator/=(const T a)
     {assert(a!=0);return *this*=1/a;}
 
     SYMMETRIC_MATRIX operator+(const SYMMETRIC_MATRIX& A) const
-    {SYMMETRIC_MATRIX s;for(int i=0;i<size;i++) s.x[i]=x[i]+A.x[i];return s;}
+    {SYMMETRIC_MATRIX s;
+    for(int i=0;i<size;i++) s.x[i]=x[i]+A.x[i];
+    return s;}
 
     SYMMETRIC_MATRIX operator+(const T a) const
     {SYMMETRIC_MATRIX s(*this);s+=a;return s;}
 
     SYMMETRIC_MATRIX operator-(const SYMMETRIC_MATRIX& A) const
-    {SYMMETRIC_MATRIX s;for(int i=0;i<size;i++) s.x[i]=x[i]-A.x[i];return s;}
+    {SYMMETRIC_MATRIX s;
+    for(int i=0;i<size;i++) s.x[i]=x[i]-A.x[i];
+    return s;}
 
     SYMMETRIC_MATRIX operator-(const T a) const
     {SYMMETRIC_MATRIX s(*this);s-=a;return s;}
 
     SYMMETRIC_MATRIX operator*(const T a) const
-    {SYMMETRIC_MATRIX s;for(int i=0;i<size;i++) s.x[i]=x[i]*a;return s;}
+    {SYMMETRIC_MATRIX s;
+    for(int i=0;i<size;i++) s.x[i]=x[i]*a;
+    return s;}
 
     SYMMETRIC_MATRIX operator/(const T a) const
     {assert(a!=0);return *this*(1/a);}
@@ -150,22 +165,32 @@ public:
     {return *this-Dilational();}
 
     T Trace() const
-    {T z=0;for(int i=0;i<d;i++) z+=Element_Lower(i,i);return z;}
+    {T z=0;
+    for(int i=0;i<d;i++) z+=Element_Lower(i,i);
+    return z;}
 
     T Max_Abs() const
-    {T z=x[0];for(int i=0;i<size;i++) z=max(z,abs(x[i]));return z;}
+    {T z=x[0];
+    for(int i=0;i<size;i++) z=max(z,abs(x[i]));
+    return z;}
 
     static SYMMETRIC_MATRIX Outer_Product(const VECTOR<T,d>& u)
-    {SYMMETRIC_MATRIX s;for(int i=0;i<d;i++) for(int j=0;j<=i;j++) s.Element_Lower(i,j)=u(i)*u(j);return s;}
+    {SYMMETRIC_MATRIX s;
+    for(int i=0;i<d;i++) for(int j=0;j<=i;j++) s.Element_Lower(i,j)=u(i)*u(j);
+    return s;}
 
     static SYMMETRIC_MATRIX Symmetric_Outer_Product(const VECTOR<T,d>& u,const VECTOR<T,d>& v)
-    {SYMMETRIC_MATRIX s;for(int i=0;i<d;i++) for(int j=0;j<=i;j++) s.Element_Lower(i,j)=u(i)*v(j)+v(i)*u(j);return s;}
+    {SYMMETRIC_MATRIX s;
+    for(int i=0;i<d;i++) for(int j=0;j<=i;j++) s.Element_Lower(i,j)=u(i)*v(j)+v(i)*u(j);
+    return s;}
 
     static SYMMETRIC_MATRIX Identity_Matrix()
     {return SYMMETRIC_MATRIX()+1;}
 
     static SYMMETRIC_MATRIX Unit_Matrix(const T scale=1)
-    {SYMMETRIC_MATRIX s;for(int i=0;i<size;i++) s.x[i]=scale;return s;}
+    {SYMMETRIC_MATRIX s;
+    for(int i=0;i<size;i++) s.x[i]=scale;
+    return s;}
 
     template<class RW> void Read(std::istream& input)
     {Read_Binary_Array<RW>(input,x,size);}

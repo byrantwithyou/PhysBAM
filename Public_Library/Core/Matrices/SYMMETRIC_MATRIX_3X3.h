@@ -161,7 +161,9 @@ public:
                         x00*A.x20+x10*A.x21+x20*A.x22,x10*A.x20+x11*A.x21+x21*A.x22,x20*A.x20+x21*A.x21+x22*A.x22);}
 
     MATRIX_MXN<T> operator*(const MATRIX_MXN<T>& A) const
-    {assert(3==A.m);MATRIX_MXN<T> matrix(3,A.n);for(int j=0;j<A.n;j++) matrix.Set_Column(j,(*this)*VECTOR<T,3>(A(0,j),A(1,j),A(2,j)));return matrix;}
+    {assert(3==A.m);MATRIX_MXN<T> matrix(3,A.n);
+    for(int j=0;j<A.n;j++) matrix.Set_Column(j,(*this)*VECTOR<T,3>(A(0,j),A(1,j),A(2,j)));
+    return matrix;}
 
     template<class T_MATRIX>
     auto Transpose_Times(const T_MATRIX& M) const

@@ -103,7 +103,8 @@ template<class TV> typename TV::SCALAR& PRESSURE_VELOCITY_VECTOR<TV>::
 Raw_Get(int i)
 {
     int n=solid_velocity.Raw_Size();
-    if(i<n) return solid_velocity.Raw_Get(i);i-=n;
+    if(i<n) return solid_velocity.Raw_Get(i);
+    i-=n;
     for(int j=0;j<pressure.m;j++){
         if(i<pressure(j).m) return pressure(j)(i);
         i-=pressure(j).m;}

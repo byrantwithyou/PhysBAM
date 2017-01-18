@@ -31,22 +31,31 @@ public:
     {for(int i=0;i<d;i++) s(i,i)+=sc;}
 
     static void Rank_One(SM& s,T a,const SV& u,const SV& v)
-    {for(int i=0;i<d;i++){TV au=a*u(i);for(int j=0;j<d;j++) s(i,j)+=MATRIX<T,TV::m>::Outer_Product(au,v(j));}}
+    {for(int i=0;i<d;i++){TV au=a*u(i);
+    for(int j=0;j<d;j++) s(i,j)+=MATRIX<T,TV::m>::Outer_Product(au,v(j));}}
 
     static T Dot(const SV& a,const SV& b)
-    {T r=0;for(int i=0;i<d;i++) r+=a(i).Dot(b(i));return r;}
+    {T r=0;
+    for(int i=0;i<d;i++) r+=a(i).Dot(b(i));
+    return r;}
 
     static SV Transpose_Times(const SM& m,const SV& u)
-    {SV r;for(int i=0;i<d;i++) for(int j=0;j<d;j++) r(j)+=m(i,j).Transpose_Times(u(i));return r;}
+    {SV r;
+    for(int i=0;i<d;i++) for(int j=0;j<d;j++) r(j)+=m(i,j).Transpose_Times(u(i));
+    return r;}
 
     static SV Times(const SM& m,const SV& u)
-    {SV r;for(int i=0;i<d;i++) for(int j=0;j<d;j++) r(i)+=m(i,j)*u(j);return r;}
+    {SV r;
+    for(int i=0;i<d;i++) for(int j=0;j<d;j++) r(i)+=m(i,j)*u(j);
+    return r;}
 
     static void Add_Times(SM& o,const SM& m,const SM& n)
     {for(int i=0;i<d;i++) for(int j=0;j<d;j++) for(int k=0;k<d;k++) o(i,j)+=m(i,k)*n(k,j);}
 
     static SV Scale(T a,const SV& u)
-    {SV r;for(int i=0;i<d;i++) r(i)=a*u(i);return r;}
+    {SV r;
+    for(int i=0;i<d;i++) r(i)=a*u(i);
+    return r;}
 
     static void Add_Scale(SM& o,T a,const SM& m)
     {for(int i=0;i<d;i++) for(int j=0;j<d;j++) o(i,j)+=a*m(i,j);}

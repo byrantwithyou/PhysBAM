@@ -125,7 +125,8 @@ Octant_Volume(const VECTOR<T,3>& min_corner) const
         return vol-Octant_Volume_Wedge(-p.x,p.z)*r3;}
     // all coordinates negative; no octant edges intersect sphere - sphere with zero, one, or two caps removed
     vol-=Octant_Volume_Cap(-p.y)*r3;T ry=1-sqr(p.y),ryz=ry-sqr(p.z);if(ryz<=0 && p.x<=-1) return vol;
-    if(p.x>-1) vol-=Octant_Volume_Cap(-p.x)*r3;if(ryz<=0) return vol;
+    if(p.x>-1) vol-=Octant_Volume_Cap(-p.x)*r3;
+    if(ryz<=0) return vol;
     // all coordinates negative; two or three caps removed, one, two, or three wedges added back in to prevent duplicate removal
     vol+=Octant_Volume_Wedge(-p.y,-p.z)*r3;T rxz=1-sqr(p.x)-sqr(p.z);if(rxz<=0) return vol;
     vol+=Octant_Volume_Wedge(-p.x,-p.z)*r3;T rxy=ry-sqr(p.y);if(rxy<=0) return vol;

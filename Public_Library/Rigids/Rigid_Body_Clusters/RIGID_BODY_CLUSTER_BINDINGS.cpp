@@ -136,7 +136,10 @@ Delete_Binding(const int parent_particle)
 template<class TV> void RIGID_BODY_CLUSTER_BINDINGS<TV>::
 Make_Active_Parent(const int parent_particle,ARRAY<PAIR<int,RIGID_CLUSTER_CONSTITUENT_ID> >& child_list)
 {
-    for(int i=0;i<child_list.m;i++) if(child_list(i).x==parent_particle){exchange(child_list(0),child_list(i));return;}
+    for(int i=0;i<child_list.m;i++)
+        if(child_list(i).x==parent_particle){
+            exchange(child_list(0),child_list(i));
+            return;}
 }
 //#####################################################################
 // Function Set_Binding_Active

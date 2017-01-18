@@ -37,10 +37,12 @@ void LOG_ENTRY::
 Start(LOG_CLASS& instance)
 {
     if(depth<=verbosity_level){
-        if(start_on_separate_line) ::std::putchar('\n');start_on_separate_line=needs_indent=true;
+        if(start_on_separate_line) ::std::putchar('\n');
+        start_on_separate_line=needs_indent=true;
         ::std::printf("%*s%-*s",2*depth,"",50-2*depth,name.c_str());::std::fflush(stdout);}
     if(instance.log_file){
-        if(log_file_start_on_separate_line) ::std::putc('\n',instance.log_file);log_file_start_on_separate_line=log_file_needs_indent=true;
+        if(log_file_start_on_separate_line) ::std::putc('\n',instance.log_file);
+        log_file_start_on_separate_line=log_file_needs_indent=true;
         if(instance.xml) Start_XML(instance);
         else ::std::fprintf(instance.log_file,"%*s%-*s",2*depth,"",50-2*depth,name.c_str());
         ::std::fflush(instance.log_file);}

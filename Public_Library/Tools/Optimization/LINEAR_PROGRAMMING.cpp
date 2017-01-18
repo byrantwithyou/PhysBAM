@@ -16,7 +16,8 @@ template<class T> void LINEAR_PROGRAMMING<T>::
 Move_Column_From_B_To_N_And_Shift_Down(MATRIX_MXN<T>& B,ARRAY<int>& permute_B,const int b_column,MATRIX_MXN<T>& N,ARRAY<int>& permute_N,const int n_column)
 {
     assert(B.m==B.n);
-    for(int i=0;i<B.n;i++)N(i,n_column)=B(i,b_column);permute_N(n_column)=permute_B(b_column);
+    for(int i=0;i<B.n;i++)N(i,n_column)=B(i,b_column);
+    permute_N(n_column)=permute_B(b_column);
     for(int j=b_column;j<B.n;j++){for(int i=0;i<B.n;i++)B(i,j)=B(i,j+1);permute_B(j)=permute_B(j+1);}
 }
 //####################################################################################

@@ -37,19 +37,29 @@ public:
     {return x(i)(j,k);}
 
     TENSOR operator-() const
-    {TENSOR t;for(int i=0;i<m;i++) t.x(i)=-x(i);return t;}
+    {TENSOR t;
+    for(int i=0;i<m;i++) t.x(i)=-x(i);
+    return t;}
 
     TENSOR operator*(T a) const
-    {TENSOR t;for(int i=0;i<m;i++) t.x(i)=x(i)*a;return t;}
+    {TENSOR t;
+    for(int i=0;i<m;i++) t.x(i)=x(i)*a;
+    return t;}
 
     TENSOR operator/(T a) const
-    {TENSOR t;for(int i=0;i<m;i++) t.x(i)=x(i)/a;return t;}
+    {TENSOR t;
+    for(int i=0;i<m;i++) t.x(i)=x(i)/a;
+    return t;}
 
     SYMMETRIC_TENSOR<T,m,n> Twice_Symmetric_Part_12() const
-    {SYMMETRIC_TENSOR<T,m,n> t;for(int i=0;i<m;i++) t.x(i)=x(i).Twice_Symmetric_Part();return t;}
+    {SYMMETRIC_TENSOR<T,m,n> t;
+    for(int i=0;i<m;i++) t.x(i)=x(i).Twice_Symmetric_Part();
+    return t;}
 
     TENSOR<T,m,p,n> Transposed() const // swaps last two indices
-    {TENSOR<T,m,p,n> t;for(int i=0;i<m;i++) t.x(i)=x(i).Transposed();return t;}
+    {TENSOR<T,m,p,n> t;
+    for(int i=0;i<m;i++) t.x(i)=x(i).Transposed();
+    return t;}
 };
 
 template<class T,int m,int n,int p>

@@ -33,7 +33,8 @@ public:
     bool Project_Fe(const DIAGONAL_MATRIX<T,d>& Fe_trial,DIAGONAL_MATRIX<T,d>& Fe_project) const override
     {DIAGONAL_MATRIX<T,d> Fe_log=log(Fe_trial.Clamp_Min((T)1e-4));T dilation=Fe_log.Dilational();
     DIAGONAL_MATRIX<T,d> Fe_deviatoric=Fe_log-dilation;T deviatoric_sqr_norm=Fe_deviatoric.Frobenius_Norm_Squared();
-    if(deviatoric_sqr_norm<=sqr_log_yield_ratio)return false;Fe_deviatoric*=sqrt(sqr_log_yield_ratio/deviatoric_sqr_norm);
+    if(deviatoric_sqr_norm<=sqr_log_yield_ratio)return false;
+    Fe_deviatoric*=sqrt(sqr_log_yield_ratio/deviatoric_sqr_norm);
     Fe_project=exp(Fe_deviatoric+dilation);return true;}
     
     void Project_Fp(const int simplex,const MATRIX<T,d>& Fp_trial) override

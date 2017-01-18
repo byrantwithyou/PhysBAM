@@ -48,7 +48,9 @@ template<class T,class T2> T BSPLINE<T,T2>::
 Basis_Function(const int i,const int k,const T t)
 {
     T t_i=control_points_times(i),t_i_plus_1=control_points_times(i+1);
-    if(k==0){if(t_i<=t && t<t_i_plus_1) return 1;else return 0;}
+    if(k==0){
+        if(t_i<=t && t<t_i_plus_1) return 1;
+        return 0;}
     T t_i_plus_k_minus_1=control_points_times(i+k),t_i_plus_k=control_points_times(i+k);
     T result=0;
     if(t_i_plus_k_minus_1!=t_i) result+=((t-t_i)/(t_i_plus_k_minus_1-t_i))*Basis_Function(i,k-1,t);
@@ -62,14 +64,22 @@ template<class T,class T2> void BSPLINE<T,T2>::
 Clamp_End_Points()
 {
     assert(!closed);assert(k>=2);
-    int number_of_knots=control_points_times.m;int new_points=k-1;
-    ARRAY<T> new_control_points_times;new_control_points_times.Resize(number_of_knots+2*new_points);
-    ARRAY<T2> new_control_points;new_control_points.Resize(number_of_knots+2*new_points);
-    for(int i=0;i<number_of_knots;i++){new_control_points_times(i+new_points)=control_points_times(i);new_control_points(i+new_points)=control_points(i);}
+    int number_of_knots=control_points_times.m;
+    int new_points=k-1;
+    ARRAY<T> new_control_points_times;
+    new_control_points_times.Resize(number_of_knots+2*new_points);
+    ARRAY<T2> new_control_points;
+    new_control_points.Resize(number_of_knots+2*new_points);
+    for(int i=0;i<number_of_knots;i++){
+        new_control_points_times(i+new_points)=control_points_times(i);
+        new_control_points(i+new_points)=control_points(i);}
     for(int i=0;i<new_points;i++){
-        new_control_points_times(i)=control_points_times(0);new_control_points_times(number_of_knots+new_points+i)=control_points_times(number_of_knots);
-        new_control_points(i)=control_points(0);new_control_points(number_of_knots+new_points+i)=control_points(number_of_knots);}
-    control_points_times=new_control_points_times;control_points=new_control_points;
+        new_control_points_times(i)=control_points_times(0);
+        new_control_points_times(number_of_knots+new_points+i)=control_points_times(number_of_knots);
+        new_control_points(i)=control_points(0);
+        new_control_points(number_of_knots+new_points+i)=control_points(number_of_knots);}
+    control_points_times=new_control_points_times;
+    control_points=new_control_points;
 }
 //#####################################################################
 // Function Create_Closed_Points
@@ -77,7 +87,8 @@ Clamp_End_Points()
 template<class T,class T2> void BSPLINE<T,T2>::
 Create_Closed_Points()
 {
-    control_points.Resize(control_points.m+2*k);control_points_times.Resize(control_points_times.m+2*k);
+    control_points.Resize(control_points.m+2*k);
+    control_points_times.Resize(control_points_times.m+2*k);
     for(int i=0;i<2*k;i++){
         control_points(control_points.m-2*k+i)=control_points(i+1);
         control_points_times(control_points_times.m-2*k+i)=(control_points_times(i+1)-control_points_times(i)+control_points_times(control_points_times.m-2*k+i));}

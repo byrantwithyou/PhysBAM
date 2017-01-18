@@ -185,7 +185,8 @@ Add_To_Cell(const TV_INT& voxel,const ID index)
 template<class TV,class T_ARRAY,class ID> void COLLISION_GEOMETRY_SPATIAL_PARTITION<TV,T_ARRAY,ID>::
 Remove_If_Not_Still_Present(const RANGE<TV_INT>& old_locations,const RANGE<TV_INT>& new_locations,const ID index)
 {
-    if(new_locations.Contains(old_locations)) return;GRID<TV> unused;
+    if(new_locations.Contains(old_locations)) return;
+    GRID<TV> unused;
     for(CELL_ITERATOR<TV> iterator(unused,old_locations);iterator.Valid();iterator.Next()){TV_INT voxel=iterator.Cell_Index();
         if(new_locations.Lazy_Outside(voxel)) Remove_From_Cell(voxel,index);}
 }
@@ -195,7 +196,8 @@ Remove_If_Not_Still_Present(const RANGE<TV_INT>& old_locations,const RANGE<TV_IN
 template<class TV,class T_ARRAY,class ID> void COLLISION_GEOMETRY_SPATIAL_PARTITION<TV,T_ARRAY,ID>::
 Add_If_Newly_Present(const RANGE<TV_INT>& old_locations,const RANGE<TV_INT>& new_locations,const ID index)
 {
-    if(old_locations.Contains(new_locations)) return;GRID<TV> unused;
+    if(old_locations.Contains(new_locations)) return;
+    GRID<TV> unused;
     for(CELL_ITERATOR<TV> iterator(unused,new_locations);iterator.Valid();iterator.Next()){TV_INT voxel=iterator.Cell_Index();
         if(old_locations.Lazy_Outside(voxel)) Add_To_Cell(voxel,index);}
 }

@@ -150,7 +150,8 @@ Set_Boundary_Conditions(const T time, const T source_velocities)
                     FACE_INDEX<TV::m> face(axis,boundary_face);
                     projection.elliptic_solver->psi_N(face)=true;
                     face_velocities(face)=0;}
-                else projection.elliptic_solver->psi_D(cell)=true;projection.p(cell)=0;}}}
+                else projection.elliptic_solver->psi_D(cell)=true;
+                projection.p(cell)=0;}}}
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         if(source1.Lazy_Inside(iterator.Location())){
             projection.elliptic_solver->psi_N(iterator.Full_Index())=true;

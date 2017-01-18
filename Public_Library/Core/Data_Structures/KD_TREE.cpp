@@ -136,7 +136,8 @@ Balance_Sub_KD_Tree_Using_Leaf_Nodes_With_Grouping(KD_TREE_NODE<T>* cell,const i
 {
     if(last_index-first_index<=max_points_in_group){
         cell->split_axis=-1;cell->node_index=++current_group_index;
-        for(int i=first_index;i<last_index;i++) point_group(permutation_array(i))=current_group_index;return;}
+        for(int i=first_index;i<last_index;i++) point_group(permutation_array(i))=current_group_index;
+        return;}
     int partition_index=Choose_Partition_Index_Using_Leaf_Nodes(first_index,last_index);
     cell->split_axis=Choose_Partition_Axis(box.Edge_Lengths());
     Median_Split(partition_index,first_index,last_index,points,permutation_array,cell->split_axis);

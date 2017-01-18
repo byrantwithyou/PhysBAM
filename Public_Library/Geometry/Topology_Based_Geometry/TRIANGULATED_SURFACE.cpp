@@ -109,7 +109,9 @@ Rescale(const T scaling_x,const T scaling_y,const T scaling_z)
     typedef VECTOR<T,3> TV;
     if(scaling_x*scaling_y*scaling_z<=0) PHYSBAM_FATAL_ERROR();
     for(int k=0;k<particles.Size();k++) particles.X(k)*=TV(scaling_x,scaling_y,scaling_z);
-    if(triangle_list) Update_Triangle_List();if(hierarchy) hierarchy->Update_Boxes();if(bounding_box) Update_Bounding_Box();
+    if(triangle_list) Update_Triangle_List();
+    if(hierarchy) hierarchy->Update_Boxes();
+    if(bounding_box) Update_Bounding_Box();
 }
 //#####################################################################
 // Function Update_Triangle_List
@@ -369,7 +371,8 @@ Surface(const TV& location,const T max_depth,const T thickness_over_2,int* close
                 TV new_point=triangle.Closest_Point(location,weights);
                 T new_distance=(location-new_point).Magnitude_Squared();
                 if(new_distance < distance_temp){distance_temp=new_distance;point=new_point;if(closest_triangle) *closest_triangle=nearby_triangles(k);}}
-            if(distance) *distance=sqrt(distance_temp);return point;}}
+            if(distance) *distance=sqrt(distance_temp);
+            return point;}}
 
     // slow method
     TV weights;
@@ -380,7 +383,8 @@ Surface(const TV& location,const T max_depth,const T thickness_over_2,int* close
         TV new_point=triangle.Closest_Point(location,weights);
         T new_distance=(location-new_point).Magnitude_Squared();
         if(new_distance < distance_temp){distance_temp=new_distance;point=new_point;if(closest_triangle) *closest_triangle=k;}}
-    if(distance) *distance=sqrt(distance_temp);return point;
+    if(distance) *distance=sqrt(distance_temp);
+    return point;
 }
 //#####################################################################
 // Function Oriented_Surface
@@ -409,7 +413,8 @@ Oriented_Surface(const TV& location,const TV& normal,const T max_depth,const T t
                 TV new_point=triangle.Closest_Point(location,weights);
                 T new_distance=(location-new_point).Magnitude_Squared();
                 if(new_distance<distance_temp && TV::Dot_Product(normal,triangle.Raw_Normal())>0){distance_temp=new_distance;point=new_point;if(closest_triangle) *closest_triangle=nearby_triangles(k);}}
-            if(distance) *distance=sqrt(distance_temp);return point;}}
+            if(distance) *distance=sqrt(distance_temp);
+            return point;}}
 
     // slow method
     TV weights;
@@ -420,7 +425,8 @@ Oriented_Surface(const TV& location,const TV& normal,const T max_depth,const T t
         TV new_point=triangle.Closest_Point(location,weights);
         T new_distance=(location-new_point).Magnitude_Squared();
         if(new_distance<distance_temp&&TV::Dot_Product(normal,triangle.Raw_Normal())>0){distance_temp=new_distance;point=new_point;if(closest_triangle) *closest_triangle=k;}}
-    if(distance) *distance=sqrt(distance_temp);return point;
+    if(distance) *distance=sqrt(distance_temp);
+    return point;
 }
 //#####################################################################
 // Function Signed_Solid_Angle_Of_Triangle_Web
@@ -747,7 +753,8 @@ Maximum_Magnitude_Phi(const IMPLICIT_OBJECT<TV>& implicit_surface,int* index)
 {
     T phi=0,max_phi=0;int k=0;
     for(int i=0;i<particles.Size();i++){phi=abs(implicit_surface(particles.X(i)));if(phi > max_phi){max_phi=phi;k=i;}}
-    if(index)*index=k;return max_phi;
+    if(index)*index=k;
+    return max_phi;
 }
 //#####################################################################
 // Function Make_Orientations_Consistent_With_Implicit_Surface

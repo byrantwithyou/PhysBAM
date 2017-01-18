@@ -20,7 +20,9 @@ PROJECTION_UNIFORM(const GRID<TV>& mac_grid,const bool use_variable_beta,const b
 {
     if(use_variable_beta || use_poisson){
         poisson=new POISSON_UNIFORM<TV>(p_grid,p,true,false,true);
-        if(use_variable_beta) poisson->Set_Variable_beta();elliptic_solver=poisson;laplace=0;}
+        if(use_variable_beta) poisson->Set_Variable_beta();
+        elliptic_solver=poisson;
+        laplace=0;}
     else{laplace=new LAPLACE_UNIFORM<TV>(p_grid,p,true,true,thread_queue);elliptic_solver=laplace;poisson=0;}
     Initialize_Grid(mac_grid);
 }

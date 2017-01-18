@@ -424,7 +424,8 @@ Bounding_Box() const
 template<class T> void OPENGL_TETRAHEDRALIZED_VOLUME<T>::
 Turn_Smooth_Shading_On()
 {
-    if(!vertex_normals)Initialize_Vertex_Normals();smooth_normals=true;
+    if(!vertex_normals)Initialize_Vertex_Normals();
+    smooth_normals=true;
 }
 //#####################################################################
 // Function Turn_Smooth_Shading_Off

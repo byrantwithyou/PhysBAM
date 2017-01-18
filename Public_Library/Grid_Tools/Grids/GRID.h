@@ -272,7 +272,9 @@ public:
     {return Domain_Indices(ghost_cells).Lazy_Inside_Half_Open(cell_index);}
 
     VECTOR<RANGE<TV_INT>,TV::m> Face_Indices(const int ghost_cells=0) const
-    {VECTOR<RANGE<TV_INT>,TV::m> v;for(int i=0;i<TV::m;i++) v(i)=Get_Face_Grid(i).Node_Indices(ghost_cells);return v;}
+    {VECTOR<RANGE<TV_INT>,TV::m> v;
+    for(int i=0;i<TV::m;i++) v(i)=Get_Face_Grid(i).Node_Indices(ghost_cells);
+    return v;}
 
     bool Outside(const TV& location) const
     {return domain.Lazy_Outside(location);}

@@ -191,7 +191,9 @@ public:
     bool operator==(const T_ARRAY0& v) const
     {STATIC_ASSERT_SAME(T,typename T_ARRAY0::ELEMENT);
     const T_ARRAY& self=Derived();ID m=self.Size();
-    if(m!=v.Size()) return false;for(ID i(0);i<m;i++) if(self(i)!=v(i)) return false;return true;}
+    if(m!=v.Size()) return false;
+    for(ID i(0);i<m;i++) if(self(i)!=v(i)) return false;
+    return true;}
 
     template<class T_ARRAY0>
     bool operator!=(const T_ARRAY0& v) const
@@ -199,34 +201,49 @@ public:
 
     template<class T_ARRAY0>
     T_ARRAY& operator+=(const ARRAY_BASE<T,T_ARRAY0,ID>& v)
-    {T_ARRAY& self=Derived();ID m=self.Size();const T_ARRAY0& v_=v.Derived();assert(m==v_.Size());for(ID i(0);i<m;i++) self(i)+=v_(i);return self;}
+    {T_ARRAY& self=Derived();ID m=self.Size();const T_ARRAY0& v_=v.Derived();assert(m==v_.Size());
+    for(ID i(0);i<m;i++) self(i)+=v_(i);
+    return self;}
 
     T_ARRAY& operator+=(const T& a)
-    {T_ARRAY& self=Derived();ID m=self.Size();for(ID i(0);i<m;i++) self(i)+=a;return self;}
+    {T_ARRAY& self=Derived();ID m=self.Size();
+    for(ID i(0);i<m;i++) self(i)+=a;
+    return self;}
 
     const T_ARRAY& operator+() const
     {return *this;};
 
     template<class T_ARRAY0>
     T_ARRAY& operator-=(const ARRAY_BASE<T,T_ARRAY0,ID>& v)
-    {T_ARRAY& self=Derived();ID m=self.Size();const T_ARRAY0& v_=v.Derived();assert(m==v_.Size());for(ID i(0);i<m;i++) self(i)-=v_(i);return self;}
+    {T_ARRAY& self=Derived();ID m=self.Size();const T_ARRAY0& v_=v.Derived();assert(m==v_.Size());
+    for(ID i(0);i<m;i++) self(i)-=v_(i);
+    return self;}
 
     T_ARRAY& operator-=(const T& a)
-    {T_ARRAY& self=Derived();ID m=self.Size();for(ID i(0);i<m;i++) self(i)-=a;return self;}
+    {T_ARRAY& self=Derived();ID m=self.Size();
+    for(ID i(0);i<m;i++) self(i)-=a;
+    return self;}
 
     template<class T2,class T_ARRAY_T1>
     T_ARRAY& operator*=(const ARRAY_BASE<T2,T_ARRAY_T1,ID>& v)
-    {T_ARRAY& self=Derived();ID m=self.Size();const T_ARRAY_T1& v_=v.Derived();assert(m==v_.Size());for(ID i(0);i<m;i++) self(i)*=v_(i);return self;}
+    {T_ARRAY& self=Derived();ID m=self.Size();const T_ARRAY_T1& v_=v.Derived();assert(m==v_.Size());
+    for(ID i(0);i<m;i++) self(i)*=v_(i);
+    return self;}
 
     T_ARRAY& operator*=(const SCALAR& a)
-    {T_ARRAY& self=Derived();ID m=self.Size();for(ID i(0);i<m;i++) self(i)*=a;return self;}
+    {T_ARRAY& self=Derived();ID m=self.Size();
+    for(ID i(0);i<m;i++) self(i)*=a;
+    return self;}
 
     template<class T2,class T_ARRAY_T1>
     T_ARRAY& operator/=(const ARRAY_BASE<T2,T_ARRAY_T1,ID>& v)
-    {T_ARRAY& self=Derived();ID m=self.Size();const T_ARRAY_T1& v_=v.Derived();assert(m==v_.Size());for(ID i(0);i<m;i++){assert(v_(i));self(i)/=v_(i);}return self;}
+    {T_ARRAY& self=Derived();ID m=self.Size();const T_ARRAY_T1& v_=v.Derived();assert(m==v_.Size());
+    for(ID i(0);i<m;i++){assert(v_(i));self(i)/=v_(i);}return self;}
 
     T_ARRAY& operator/=(const SCALAR& a)
-    {T_ARRAY& self=Derived();ID m=self.Size();for(ID i(0);i<m;i++) self(i)/=a;return self;}
+    {T_ARRAY& self=Derived();ID m=self.Size();
+    for(ID i(0);i<m;i++) self(i)/=a;
+    return self;}
 
     T& Last()
     {T_ARRAY& self=Derived();return self(self.Size()-1);}
@@ -243,67 +260,104 @@ public:
 
     template<class T2,class T_ARRAY1> typename enable_if<!is_scalar<T2>::value,SCALAR>::type
     Inner_Product(const ARRAY_BASE<T2,T_ARRAY1,ID>& m,const ARRAY_BASE<T,T_ARRAY,ID>& a2) const
-    {assert(Size()==a2.Size());typename T_ARRAY1::SCALAR result(0);ID size=Size();for(ID i(0);i<size;i++) result+=m(i).Inner_Product((*this)(i),a2(i));return result;}
+    {assert(Size()==a2.Size());typename T_ARRAY1::SCALAR result(0);ID size=Size();
+    for(ID i(0);i<size;i++) result+=m(i).Inner_Product((*this)(i),a2(i));
+    return result;}
 
     template<class T_ARRAY1> double
     Inner_Product_Double_Precision(const ARRAY_BASE<SCALAR,T_ARRAY1,ID>& m,const ARRAY_BASE<T,T_ARRAY,ID>& a2) const
-    {assert(Size()==a2.Size());double d=0;for(ID i(0);i<Size();i++) d+=m(i)*(*this)(i).Dot(a2(i));return d;}
+    {assert(Size()==a2.Size());double d=0;
+    for(ID i(0);i<Size();i++) d+=m(i)*(*this)(i).Dot(a2(i));
+    return d;}
 
     template<class T2,class T_ARRAY1> typename enable_if<!is_scalar<T2>::value,double>::type
     Inner_Product_Double_Precision(const ARRAY_BASE<T2,T_ARRAY1,ID>& m,const ARRAY_BASE<T,T_ARRAY,ID>& a2) const
-    {assert(Size()==a2.Size());double result(0);ID size=Size();for(ID i(0);i<size;i++) result+=m(i).Inner_Product((*this)(i),a2(i));return result;}
+    {assert(Size()==a2.Size());double result(0);ID size=Size();
+    for(ID i(0);i<size;i++) result+=m(i).Inner_Product((*this)(i),a2(i));
+    return result;}
 
     T Max() const
-    {const T_ARRAY& self=Derived();T result=self(ID(0));ID m=self.Size();for(ID i(1);i<m;i++) result=PhysBAM::max(result,self(i));return result;}
+    {const T_ARRAY& self=Derived();T result=self(ID(0));ID m=self.Size();
+    for(ID i(1);i<m;i++) result=PhysBAM::max(result,self(i));
+    return result;}
 
     T Max_Abs() const
-    {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();for(ID i(0);i<m;i++) result=PhysBAM::max(result,abs(self(i)));return result;}
+    {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();
+    for(ID i(0);i<m;i++) result=PhysBAM::max(result,abs(self(i)));
+    return result;}
 
     T Max_Mag() const
-    {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();for(ID i(0);i<m;i++) result=PhysBAM::maxmag(result,self(i));return result;}
+    {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();
+    for(ID i(0);i<m;i++) result=PhysBAM::maxmag(result,self(i));
+    return result;}
 
     ID Arg_Max() const
-    {const T_ARRAY& self=Derived();ID result(0),m=self.Size();for(ID i(1);i<m;i++) if(self(i)>self(result)) result=i;return result;}
+    {const T_ARRAY& self=Derived();ID result(0),m=self.Size();
+    for(ID i(1);i<m;i++) if(self(i)>self(result)) result=i;
+    return result;}
 
     T Min() const
-    {const T_ARRAY& self=Derived();T result=self(ID(0));ID m=self.Size();for(ID i(1);i<m;i++) result=PhysBAM::min(result,self(i));return result;}
+    {const T_ARRAY& self=Derived();T result=self(ID(0));ID m=self.Size();
+    for(ID i(1);i<m;i++) result=PhysBAM::min(result,self(i));
+    return result;}
 
     T Min_Mag() const
-    {const T_ARRAY& self=Derived();T result=self(ID(0));ID m=self.Size();for(ID i(1);i<m;i++) result=PhysBAM::minmag(result,self(i));return result;}
+    {const T_ARRAY& self=Derived();T result=self(ID(0));ID m=self.Size();
+    for(ID i(1);i<m;i++) result=PhysBAM::minmag(result,self(i));
+    return result;}
 
     ID Arg_Min() const
-    {const T_ARRAY& self=Derived();ID result(0),m=self.Size();for(ID i(1);i<m;i++) if(self(i)<self(result)) result=i;return result;}
+    {const T_ARRAY& self=Derived();ID result(0),m=self.Size();
+    for(ID i(1);i<m;i++) if(self(i)<self(result)) result=i;
+    return result;}
 
     T Componentwise_Max_Abs() const
-    {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();for(ID i(0);i<m;i++) result=T::Componentwise_Max(result,abs(self(i)));return result;}
+    {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();
+    for(ID i(0);i<m;i++) result=T::Componentwise_Max(result,abs(self(i)));
+    return result;}
 
     T Sum() const
-    {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();for(ID i(0);i<m;i++) result+=self(i);return result;}
+    {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();
+    for(ID i(0);i<m;i++) result+=self(i);
+    return result;}
 
     T Product() const
-    {const T_ARRAY& self=Derived();T result(1);ID m=self.Size();for(ID i(0);i<m;i++) result*=self(i);return result;}
+    {const T_ARRAY& self=Derived();T result(1);ID m=self.Size();
+    for(ID i(0);i<m;i++) result*=self(i);
+    return result;}
 
     double Sum_Double_Precision() const
-    {const T_ARRAY& self=Derived();double result=0;ID m=self.Size();for(ID i(0);i<m;i++) result+=self(i);return result;}
+    {const T_ARRAY& self=Derived();double result=0;ID m=self.Size();
+    for(ID i(0);i<m;i++) result+=self(i);
+    return result;}
 
     T Sum_Abs() const
-    {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();for(ID i(0);i<m;i++) result+=abs(self(i));return result;}
+    {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();
+    for(ID i(0);i<m;i++) result+=abs(self(i));
+    return result;}
     
     T Average() const
-    {const T_ARRAY& self=Derived();return self.Size()?Sum()/typename ARRAY_BASE<T,T_ARRAY,ID>::SCALAR(self.Size()):T();}
+    {const T_ARRAY& self=Derived();
+    return self.Size()?Sum()/typename ARRAY_BASE<T,T_ARRAY,ID>::SCALAR(self.Size()):T();}
 
     T Lp_Norm(const T& p) const
-    {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();for(ID i(0);i<m;i++) result+=pow(abs(self(i)),p);return pow(result,1/p);}
+    {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();
+    for(ID i(0);i<m;i++) result+=pow(abs(self(i)),p);
+    return pow(result,1/p);}
 
     template<class T_ARRAY1> typename SCALAR_POLICY<T>::TYPE
     Dot(const ARRAY_BASE<T,T_ARRAY1,ID>& a) const
     {assert(Size()==a.Size());
-    typename SCALAR_POLICY<T>::TYPE result(0);ID m=Size();for(ID i(0);i<m;i++) result+=PhysBAM::Dot_Product((*this)(i),a(i));return result;}
+    typename SCALAR_POLICY<T>::TYPE result(0);ID m=Size();
+    for(ID i(0);i<m;i++) result+=PhysBAM::Dot_Product((*this)(i),a(i));
+    return result;}
 
     template<class T_ARRAY1> double
     Dot_Double_Precision(const ARRAY_BASE<T,T_ARRAY1,ID>& a) const
     {assert(Size()==a.Size());
-    double result(0);ID m=Size();for(ID i(0);i<m;i++) result+=PhysBAM::Dot_Product((*this)(i),a(i));return result;}
+    double result(0);ID m=Size();
+    for(ID i(0);i<m;i++) result+=PhysBAM::Dot_Product((*this)(i),a(i));
+    return result;}
 
     template<class T_ARRAY1> static typename SCALAR_POLICY<T>::TYPE
     Dot_Product(ARRAY_BASE& a1,const ARRAY_BASE<T,T_ARRAY1,ID>& a2)
@@ -314,7 +368,9 @@ public:
     {return a1.Dot_Double_Precision(a2);}
 
     typename SCALAR_POLICY<T>::TYPE Magnitude_Squared() const
-    {const T_ARRAY& self=Derived();typename SCALAR_POLICY<T>::TYPE result(0);ID m=self.Size();for(ID i(0);i<m;i++) result+=PhysBAM::Magnitude_Squared(self(i));return result;}
+    {const T_ARRAY& self=Derived();typename SCALAR_POLICY<T>::TYPE result(0);ID m=self.Size();
+    for(ID i(0);i<m;i++) result+=PhysBAM::Magnitude_Squared(self(i));
+    return result;}
 
     typename SCALAR_POLICY<T>::TYPE Magnitude() const
     {return sqrt(Magnitude_Squared());}
@@ -331,11 +387,15 @@ public:
 private:
     template<class U>
     typename enable_if<is_scalar<T>::value,U>::type Maximum_Magnitude(U*) const
-    {T result=(T)0;for(int i=0;i<Size();i++) result=PhysBAM::max(result,abs((*this)(i)));return result;}
+    {T result=(T)0;
+    for(int i=0;i<Size();i++) result=PhysBAM::max(result,abs((*this)(i)));
+    return result;}
 
     template<class U>
     typename U::SCALAR Maximum_Magnitude(U*) const
-    {typename T::SCALAR result(0);for(int i=0;i<Size();i++) result=PhysBAM::max(result,PhysBAM::Magnitude_Squared((*this)(i)));return sqrt(result);}
+    {typename T::SCALAR result(0);
+    for(int i=0;i<Size();i++) result=PhysBAM::max(result,PhysBAM::Magnitude_Squared((*this)(i)));
+    return sqrt(result);}
 
     template<class U>
     typename enable_if<is_scalar<T>::value,U>::type Arg_Maximum_Magnitude(U*) const
@@ -357,17 +417,22 @@ public:
     template<class T_ARRAY0>
     ELEMENT Weighted_Sum(const T_ARRAY0& weights) const
     {STATIC_ASSERT_SAME(typename T_ARRAY0::ELEMENT,SCALAR);assert(weights.Size()==Size());
-    ELEMENT result((ELEMENT()));INDEX m=Size();for(INDEX i(0);i<m;i++) result+=weights(i)*(*this)(i);return result;}
+    ELEMENT result((ELEMENT()));INDEX m=Size();
+    for(INDEX i(0);i<m;i++) result+=weights(i)*(*this)(i);
+    return result;}
 
     T_ARRAY Householder_Vector(const int k) const
-    {T_ARRAY v((INITIAL_SIZE)Size());T v_dot_v=0;for(int i=k;i<Size();i++){v(i)=(*this)(i);v_dot_v+=sqr(v(i));}
-    if((*this)(k)>=0) v(k)+=sqrt(v_dot_v);else v(k)-=sqrt(v_dot_v);
+    {T_ARRAY v((INITIAL_SIZE)Size());T v_dot_v=0;
+    for(int i=k;i<Size();i++){v(i)=(*this)(i);v_dot_v+=sqr(v(i));}
+    if((*this)(k)>=0) v(k)+=sqrt(v_dot_v);
+    else v(k)-=sqrt(v_dot_v);
     return v;}
 
     template<class T_ARRAY1>
     auto Householder_Transform(const ARRAY_BASE<T,T_ARRAY1>& v) const
     {Assert_Same_Size(*this,v);
-    T v_dot_a=0,v_dot_v=0;for(int i=0;i<Size();i++){v_dot_a+=v(i)*(*this)(i);v_dot_v+=sqr(v(i));}
+    T v_dot_a=0,v_dot_v=0;
+    for(int i=0;i<Size();i++){v_dot_a+=v(i)*(*this)(i);v_dot_v+=sqr(v(i));}
     return *this-2*v_dot_a/v_dot_v*v;}
 
     void Givens_Rotate(const int i,const int j,const T c,const T s)
@@ -384,8 +449,12 @@ public:
 
     template<class T_ARRAY0,class T_ARRAY1>
     static T Angle_Between(const ARRAY_BASE<T,T_ARRAY0>& u,const ARRAY_BASE<T,T_ARRAY1>& v) // 0 .. pi
-    {Assert_Same_Size(u,v);T u2=0,u1=u(0),v1=v(0),uv=0;for(int i=1;i<u.Size();i++){T ui=u(i);u2+=sqr(ui);uv+=ui*v(i);}u1+=sign_nonzero(u1)*sqrt(u2+sqr(u1));
-    T factor=2*(uv+u1*v1)/(u2+sqr(u1)),R01=v1-factor*u1,R11=0;for(int i=1;i<u.Size();i++) R11+=sqr(v(i)-factor*u(i));return atan2(sqrt(R11),-R01*sign_nonzero(u1));}
+    {Assert_Same_Size(u,v);T u2=0,u1=u(0),v1=v(0),uv=0;
+    for(int i=1;i<u.Size();i++){T ui=u(i);u2+=sqr(ui);uv+=ui*v(i);}
+    u1+=sign_nonzero(u1)*sqrt(u2+sqr(u1));
+    T factor=2*(uv+u1*v1)/(u2+sqr(u1)),R01=v1-factor*u1,R11=0;
+    for(int i=1;i<u.Size();i++) R11+=sqr(v(i)-factor*u(i));
+    return atan2(sqrt(R11),-R01*sign_nonzero(u1));}
 
     template<class T_ARRAY1>
     auto Componentwise_Greater_Equal(const ARRAY_BASE<T,T_ARRAY1>& v) const
@@ -401,7 +470,8 @@ public:
     template<class T_ARRAY0>
     bool All_Greater_Equal(const ARRAY_BASE<T,T_ARRAY0,ID>& v) const
     {Assert_Same_Size(*this,v);const T_ARRAY& self=Derived();const T_ARRAY0& vd=v.Derived();
-    for(int i=0,n=self.Size();i<n;i++) if(self(i)<vd(i)) return false;return true;}
+    for(int i=0,n=self.Size();i<n;i++) if(self(i)<vd(i)) return false;
+    return true;}
 
     template<class T_ARRAY0>
     bool All_Less_Equal(const ARRAY_BASE<T,T_ARRAY0,ID>& v) const
@@ -417,26 +487,35 @@ public:
 
     ID Find(const T& element) const
     {const T_ARRAY& self=Derived();ID m=self.Size();
-    for(ID i(0);i<m;i++) if(self(i)==element) return i;return -1;}
+    for(ID i(0);i<m;i++) if(self(i)==element) return i;
+    return -1;}
 
     bool Find(const T& element,ID& index) const // returns the first occurence of an element in an array
     {return Find(element,0,index);}
 
     bool Find(const T& element,const ID start_index,ID& index) const // returns the first occurence after start_index of an element in an array
     {const T_ARRAY& self=Derived();ID m=self.Size();
-    for(ID i=start_index;i<m;i++) if(self(i)==element){index=i;return true;}return false;}
+    for(ID i=start_index;i<m;i++)
+        if(self(i)==element){
+            index=i;
+            return true;}
+    return false;}
 
     bool Contains(const T& element) const
     {const T_ARRAY& self=Derived();ID m=self.Size();
-    for(ID i(0);i<m;i++) if(self(i)==element) return true;return false;}
+    for(ID i(0);i<m;i++) if(self(i)==element) return true;
+    return false;}
 
     bool Contains_Only(const T& element) const
     {const T_ARRAY& self=Derived();ID m=self.Size();
-    for(ID i(0);i<m;i++) if(self(i)!=element) return false;return true;}
+    for(ID i(0);i<m;i++) if(self(i)!=element) return false;
+    return true;}
 
     int Count_Matches(const T& value) const
     {const T_ARRAY& self=Derived();ID m=self.Size();
-    int count=0;for(ID i(0);i<m;i++) if(self(i)==value) count++;return count;}
+    int count=0;
+    for(ID i(0);i<m;i++) if(self(i)==value) count++;
+    return count;}
 
     int Number_True() const
     {STATIC_ASSERT_SAME(T,bool);return Count_Matches(true);}
@@ -446,7 +525,8 @@ public:
 
     template<class F>
     void Coalesce(F f)
-    {Sort();T_ARRAY& self=Derived();int j=-1;if(self.Size()>0) j=0;for(int i=1;i<self.Size();i++){if(!(self(j)<self(i))) f(self(j),self(i));else self(++j)=self(i);}self.Resize(j+1);}
+    {Sort();T_ARRAY& self=Derived();int j=-1;if(self.Size()>0) j=0;
+    for(int i=1;i<self.Size();i++){if(!(self(j)<self(i))) f(self(j),self(i));else self(++j)=self(i);}self.Resize(j+1);}
 
     template<class T_COMPARE>
     void Sort(const T_COMPARE comparison)
@@ -463,7 +543,8 @@ public:
     {Stable_Sort(std::less<typename T_ARRAY::ELEMENT>());}
 
     void Fill(T value)
-    {T_ARRAY& self=Derived();ID m=self.Size();for(ID i(0);i<m;i++) self(i)=value;}
+    {T_ARRAY& self=Derived();ID m=self.Size();
+    for(ID i(0);i<m;i++) self(i)=value;}
 
     template<class T_ARRAY0>
     void Copy(const T_ARRAY0& old_copy)
@@ -502,7 +583,8 @@ public:
     for(ID i(0);i<m;i++) (*this)(i+offset)=old_copy(i);}
 
     void Clamp_Below(const T& value)
-    {T_ARRAY& self=Derived();ID m=self.Size();for(ID i(0);i<m;i++) self(i)=clamp_min(self(i),value);}
+    {T_ARRAY& self=Derived();ID m=self.Size();
+    for(ID i(0);i<m;i++) self(i)=clamp_min(self(i),value);}
 
     template<class T_ARRAY0,class T_ARRAY1>
     static bool Equal_Dimensions(const T_ARRAY0& a,const T_ARRAY1& b)
@@ -585,14 +667,20 @@ public:
     {return ID(std::lower_bound(begin(),end(),value,comparison)-begin());}
 
     void Write_Raw(std::ostream& output) const
-    {const T_ARRAY& a=Derived();ID m=a.Size();for(ID i(0);i<m;i++){output<<a(i);if(i<m-1) output<<" ";}}
+    {const T_ARRAY& a=Derived();ID m=a.Size();
+    for(ID i(0);i<m;i++){output<<a(i);if(i<m-1) output<<" ";}}
 
 //#####################################################################
 };
 
 template<class T,class T_ARRAY,class ID>
 inline std::ostream& operator<<(std::ostream& output,const ARRAY_BASE<T,T_ARRAY,ID>& a)
-{output<<"(";a.Write_Raw(output);output<<")";return output;}
+{
+    output<<"(";
+    a.Write_Raw(output);
+    output<<")";
+    return output;
+}
 //#####################################################################
 template<class T_ARRAY0,class T_ARRAY1> struct CAN_ASSIGN<T_ARRAY0,T_ARRAY1,typename enable_if<IS_ARRAY<T_ARRAY0>::value && IS_ARRAY<T_ARRAY1>::value && is_same<typename T_ARRAY0::ELEMENT,typename T_ARRAY1::ELEMENT>::value && !is_same<T_ARRAY0,T_ARRAY1>::value>::type>
 {static const bool value=true;};

@@ -144,7 +144,8 @@ public:
     template<class T_MATRIX>
     auto Times_Transpose(const MATRIX_BASE<T,T_MATRIX>& A) const
     {assert(A.Columns()==1);decltype(A.Derived().Transposed()) M((INITIAL_SIZE)1,(INITIAL_SIZE)A.Rows());
-    for(int j=0;j<A.Rows();j++) M(0,j)+=x00*A(j,0);return M;}
+    for(int j=0;j<A.Rows();j++) M(0,j)+=x00*A(j,0);
+    return M;}
 
     template<class T_MATRIX>
     T_MATRIX Transpose_Times(const MATRIX_BASE<T,T_MATRIX>& A) const

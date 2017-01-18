@@ -105,7 +105,8 @@ public:
 
     bool operator==(const MATRIX_MXN& A) const
     {if(m!=A.m || n!=A.n) return false;
-    for(int i=0;i<m*n;i++) if(x(i)!=A.x(i)) return false;return true;}
+    for(int i=0;i<m*n;i++) if(x(i)!=A.x(i)) return false;
+    return true;}
 
     bool operator!=(const MATRIX_MXN& A) const
     {return !(*this==A);}
@@ -117,25 +118,36 @@ public:
     MATRIX_MXN<T>& operator=(const MATRIX_BASE<T,T_MATRIX>& A)
     {if((void*)&A==(void*)this) return *this;
     x.Resize(A.Rows()*A.Columns());
-    m=A.Rows();n=A.Columns();for(int i=0;i<m;i++) for(int j=0;j<n;j++) (*this)(i,j)=A(i,j);return *this;}
+    m=A.Rows();n=A.Columns();
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++) (*this)(i,j)=A(i,j);
+    return *this;}
 
     template<int d>
     MATRIX_MXN<T>& operator=(const DIAGONAL_MATRIX<T,d>& A)
-    {x.Resize(A.Rows()*A.Columns());m=n=d;for(int k=0;k<m*n;k++) x(k)=0;for(int i=0;i<d;i++) (*this)(i,i)=A(i,i);return *this;}
+    {x.Resize(A.Rows()*A.Columns());m=n=d;
+    for(int k=0;k<m*n;k++) x(k)=0;
+    for(int i=0;i<d;i++) (*this)(i,i)=A(i,i);
+    return *this;}
 
     template<int d>
     MATRIX_MXN<T>& operator=(const SYMMETRIC_MATRIX<T,d>& A)
-    {x.Resize(A.Rows()*A.Columns());m=n=d;for(int i=0;i<m;i++) for(int j=0;j<=i;j++) (*this)(i,j)=(*this)(j,i)=A.Element_Lower(i,j);return *this;}
+    {x.Resize(A.Rows()*A.Columns());m=n=d;
+    for(int i=0;i<m;i++) for(int j=0;j<=i;j++) (*this)(i,j)=(*this)(j,i)=A.Element_Lower(i,j);
+    return *this;}
 
     template<int d>
     MATRIX_MXN<T>& operator=(const UPPER_TRIANGULAR_MATRIX<T,d>& A)
-    {x.Resize(d*d);m=n=d;for(int j=0;j<d;j++) for(int i=0;i<=j;i++) (*this)(i,j)=A(i,j);return *this;}
+    {x.Resize(d*d);m=n=d;
+    for(int j=0;j<d;j++) for(int i=0;i<=j;i++) (*this)(i,j)=A(i,j);
+    return *this;}
 
     void Transpose()
     {*this=Transposed();}
 
     MATRIX_MXN<T> Transposed() const
-    {MATRIX_MXN<T> matrix(n,m);for(int i=0;i<m;i++) for(int j=0;j<n;j++) matrix(j,i)=(*this)(i,j);return matrix;}
+    {MATRIX_MXN<T> matrix(n,m);
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++) matrix(j,i)=(*this)(i,j);
+    return matrix;}
 
     MATRIX_MXN<T> Times_Cross_Product_Matrix_Transpose(const VECTOR<T,2>& v) const
     {assert(n==2);return (*this)*MATRIX<T,1,2>::Cross_Product_Matrix(v).Transposed();}
@@ -144,13 +156,23 @@ public:
     {assert(m==2);return MATRIX<T,1,2>::Cross_Product_Matrix(v)*(*this);}
 
     MATRIX_MXN<T> Times_Cross_Product_Matrix_Transpose(const VECTOR<T,3>& v) const
-    {assert(n==3);MATRIX_MXN<T> matrix(m,3);for(int i=0;i<m;i++) matrix.Set_Row(i,VECTOR<T,3>::Cross_Product(v,VECTOR<T,3>((*this)(i,0),(*this)(i,1),(*this)(i,2))));return matrix;}
+    {assert(n==3);MATRIX_MXN<T> matrix(m,3);
+    for(int i=0;i<m;i++) matrix.Set_Row(i,v.Cross(VECTOR<T,3>((*this)(i,0),(*this)(i,1),(*this)(i,2))));
+    return matrix;}
 
     MATRIX_MXN<T> Cross_Product_Matrix_Times(const VECTOR<T,3>& v) const
-    {assert(m==3);MATRIX_MXN<T> matrix(3,n);for(int i=0;i<n;i++) matrix.Set_Column(i,VECTOR<T,3>::Cross_Product(v,VECTOR<T,3>((*this)(0,i),(*this)(1,i),(*this)(2,i))));return matrix;}
+    {assert(m==3);MATRIX_MXN<T> matrix(3,n);
+    for(int i=0;i<n;i++) matrix.Set_Column(i,v.Cross(VECTOR<T,3>((*this)(0,i),(*this)(1,i),(*this)(2,i))));
+    return matrix;}
 
     MATRIX_MXN<T> Normal_Equations_Matrix() const
-    {MATRIX_MXN<T> result(n);for(int j=0;j<n;j++) for(int i=j;i<n;i++){T a=0;for(int k=0;k<m;k++) a+=(*this)(k,i)*(*this)(k,j);result(i,j)=result(j,i)=a;}return result;}
+    {MATRIX_MXN<T> result(n);
+    for(int j=0;j<n;j++)
+        for(int i=j;i<n;i++){
+            T a=0;
+            for(int k=0;k<m;k++) a+=(*this)(k,i)*(*this)(k,j);
+            result(i,j)=result(j,i)=a;}
+    return result;}
 
     ARRAY<T> Normal_Equations_Solve(const ARRAY<T>& b) const
     {MATRIX_MXN<T> A_transpose_A(Normal_Equations_Matrix());ARRAY<T> A_transpose_b(Transpose_Times(b));return A_transpose_A.Cholesky_Solve(A_transpose_b);}

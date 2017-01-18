@@ -171,12 +171,42 @@ template<class T> void Add_Phi_File(const std::string& filename,OPENGL_WORLD<T>&
         LOG::cout<<filename<<" statistics:"<<std::endl;
         LOG::cout<<"  grid = "<<surface->levelset.grid<<std::endl;
         LOG::cout<<"  phi array bounds = "<<phi.domain.min_corner.x<<" "<<phi.domain.max_corner.x<<", "<<phi.domain.min_corner.y<<" "<<phi.domain.max_corner.y<<", "<<phi.domain.min_corner.z<<" "<<phi.domain.max_corner.z<<std::endl;
-        for(int i=phi.domain.min_corner.x;i<phi.domain.max_corner.x;i++)for(int j=phi.domain.min_corner.y;j<phi.domain.max_corner.y;j++)if(phi(i,j,phi.domain.min_corner.z)<=0){LOG::cout<<"  phi<=0 on domain.min_corner.z"<<std::endl;goto check1_end;}check1_end:
-        for(int i=phi.domain.min_corner.x;i<phi.domain.max_corner.x;i++)for(int j=phi.domain.min_corner.y;j<phi.domain.max_corner.y;j++)if(phi(i,j,phi.domain.max_corner.z-1)<=0){LOG::cout<<"  phi<=0 on domain.max_corner.z"<<std::endl;goto check2_end;}check2_end:
-        for(int i=phi.domain.min_corner.x;i<phi.domain.max_corner.x;i++)for(int k=phi.domain.min_corner.z;k<phi.domain.max_corner.z;k++)if(phi(i,phi.domain.min_corner.y,k)<=0){LOG::cout<<"  phi<=0 on domain.min_corner.y"<<std::endl;goto check3_end;}check3_end:
-        for(int i=phi.domain.min_corner.x;i<phi.domain.max_corner.x;i++)for(int k=phi.domain.min_corner.z;k<phi.domain.max_corner.z;k++)if(phi(i,phi.domain.max_corner.y-1,k)<=0){LOG::cout<<"  phi<=0 on domain.max_corner.y"<<std::endl;goto check4_end;}check4_end:
-        for(int j=phi.domain.min_corner.y;j<phi.domain.max_corner.y;j++)for(int k=phi.domain.min_corner.z;k<phi.domain.max_corner.z;k++)if(phi(phi.domain.min_corner.x,j,k)<=0){LOG::cout<<"  phi<=0 on domain.min_corner.x"<<std::endl;goto check5_end;}check5_end:
-        for(int j=phi.domain.min_corner.y;j<phi.domain.max_corner.y;j++)for(int k=phi.domain.min_corner.z;k<phi.domain.max_corner.z;k++)if(phi(phi.domain.max_corner.x-1,j,k)<=0){LOG::cout<<"  phi<=0 on domain.max_corner.x"<<std::endl;goto check6_end;}check6_end:
+        for(int i=phi.domain.min_corner.x;i<phi.domain.max_corner.x;i++)
+            for(int j=phi.domain.min_corner.y;j<phi.domain.max_corner.y;j++)
+                if(phi(i,j,phi.domain.min_corner.z)<=0){
+                    LOG::cout<<"  phi<=0 on domain.min_corner.z"<<std::endl;
+                    goto check1_end;}
+      check1_end:
+        for(int i=phi.domain.min_corner.x;i<phi.domain.max_corner.x;i++)
+            for(int j=phi.domain.min_corner.y;j<phi.domain.max_corner.y;j++)
+                if(phi(i,j,phi.domain.max_corner.z-1)<=0){
+                    LOG::cout<<"  phi<=0 on domain.max_corner.z"<<std::endl;
+                    goto check2_end;}
+      check2_end:
+        for(int i=phi.domain.min_corner.x;i<phi.domain.max_corner.x;i++)
+            for(int k=phi.domain.min_corner.z;k<phi.domain.max_corner.z;k++)
+                if(phi(i,phi.domain.min_corner.y,k)<=0){
+                    LOG::cout<<"  phi<=0 on domain.min_corner.y"<<std::endl;
+                    goto check3_end;}
+      check3_end:
+        for(int i=phi.domain.min_corner.x;i<phi.domain.max_corner.x;i++)
+            for(int k=phi.domain.min_corner.z;k<phi.domain.max_corner.z;k++)
+                if(phi(i,phi.domain.max_corner.y-1,k)<=0){
+                    LOG::cout<<"  phi<=0 on domain.max_corner.y"<<std::endl;
+                    goto check4_end;}
+      check4_end:
+        for(int j=phi.domain.min_corner.y;j<phi.domain.max_corner.y;j++)
+            for(int k=phi.domain.min_corner.z;k<phi.domain.max_corner.z;k++)
+                if(phi(phi.domain.min_corner.x,j,k)<=0){
+                    LOG::cout<<"  phi<=0 on domain.min_corner.x"<<std::endl;
+                    goto check5_end;}
+      check5_end:
+        for(int j=phi.domain.min_corner.y;j<phi.domain.max_corner.y;j++)
+            for(int k=phi.domain.min_corner.z;k<phi.domain.max_corner.z;k++)
+                if(phi(phi.domain.max_corner.x-1,j,k)<=0){
+                    LOG::cout<<"  phi<=0 on domain.max_corner.x"<<std::endl;
+                    goto check6_end;}
+      check6_end:
         OPENGL_LEVELSET_MULTIVIEW<T>* opengl_surface=new OPENGL_LEVELSET_MULTIVIEW<T>(world.stream_type);
         opengl_surface->Set_Levelset(surface->levelset);
         opengl_surface->Generate_Triangulated_Surface(false,"");
@@ -196,10 +226,26 @@ template<class T> void Add_Phi2D_File(const std::string& filename,OPENGL_WORLD<T
         LOG::cout<<filename<<" statistics:"<<std::endl;
         LOG::cout<<"  grid = "<<area->levelset.grid<<std::endl;
         LOG::cout<<"  phi array bounds = "<<phi.domain.min_corner.x<<" "<<phi.domain.max_corner.x<<", "<<phi.domain.min_corner.y<<" "<<phi.domain.max_corner.y<<std::endl;
-        for(int i=phi.domain.min_corner.x;i<phi.domain.max_corner.x;i++)if(phi(i,phi.domain.min_corner.y)<=0){LOG::cout<<"  phi<=0 on domain.min_corner.y"<<std::endl;goto check1_end;}check1_end:
-        for(int i=phi.domain.min_corner.x;i<phi.domain.max_corner.x;i++)if(phi(i,phi.domain.max_corner.y-1)<=0){LOG::cout<<"  phi<=0 on domain.max_corner.y"<<std::endl;goto check2_end;}check2_end:
-        for(int j=phi.domain.min_corner.y;j<phi.domain.max_corner.y;j++)if(phi(phi.domain.min_corner.x,j)<=0){LOG::cout<<"  phi<=0 on domain.min_corner.x"<<std::endl;goto check5_end;}check5_end:
-        for(int j=phi.domain.min_corner.y;j<phi.domain.max_corner.y;j++)if(phi(phi.domain.max_corner.x-1,j)<=0){LOG::cout<<"  phi<=0 on domain.max_corner.x"<<std::endl;goto check6_end;}check6_end:
+        for(int i=phi.domain.min_corner.x;i<phi.domain.max_corner.x;i++)
+            if(phi(i,phi.domain.min_corner.y)<=0){
+                LOG::cout<<"  phi<=0 on domain.min_corner.y"<<std::endl;
+                goto check1_end;}
+      check1_end:
+        for(int i=phi.domain.min_corner.x;i<phi.domain.max_corner.x;i++)
+            if(phi(i,phi.domain.max_corner.y-1)<=0){
+                LOG::cout<<"  phi<=0 on domain.max_corner.y"<<std::endl;
+                goto check2_end;}
+      check2_end:
+        for(int j=phi.domain.min_corner.y;j<phi.domain.max_corner.y;j++)
+            if(phi(phi.domain.min_corner.x,j)<=0){
+                LOG::cout<<"  phi<=0 on domain.min_corner.x"<<std::endl;
+                goto check5_end;}
+      check5_end:
+        for(int j=phi.domain.min_corner.y;j<phi.domain.max_corner.y;j++)
+            if (phi(phi.domain.max_corner.x-1,j)<=0){
+                LOG::cout<<"  phi<=0 on domain.max_corner.x"<<std::endl;
+                goto check6_end;}
+      check6_end:
         SEGMENTED_CURVE_2D<T>* curve=DUALCONTOUR_2D<T>::Create_Segmented_Curve_From_Levelset(area->levelset);
         curve->Update_Bounding_Box();
         LOG::cout<<"bounding box: "<<*curve->bounding_box<<std::endl;

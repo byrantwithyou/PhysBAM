@@ -124,7 +124,8 @@ Conservation_Solver_Helper_Experimental(const int m,const T dx,const ARRAY<bool,
     // TODO: Currently using U_extrapolated for Jacobian always. We might want to move this decision to the boundary, as in some boundaries like MPI we wont want to use extrapolated values but real
     // values.
     ARRAY<TV_DIMENSION,VECTOR<int,1> > U_extrapolated(U);
-    if(outflow_boundaries(0)) U_extrapolated(0)=U(0);if(outflow_boundaries(1)) U_extrapolated(m+1)=U(m);
+    if(outflow_boundaries(0)) U_extrapolated(0)=U(0);
+    if(outflow_boundaries(1)) U_extrapolated(m+1)=U(m);
 
     ARRAY<bool,VECTOR<int,1> > psi_ghost(U.domain.min_corner.x+2,U.domain.max_corner.x-2);ARRAY<bool,VECTOR<int,1> >::Put(psi,psi_ghost); // ghost points for the if statement below  
     ARRAY<TV_DIMENSION,VECTOR<int,1> > flux(U.domain.min_corner.x+2,U.domain.max_corner.x-3); // fluxes to the right 0 of each point

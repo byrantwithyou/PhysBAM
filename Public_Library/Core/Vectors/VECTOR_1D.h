@@ -102,7 +102,8 @@ public:
     VECTOR(const VECTOR<T,n>& v1,const VECTOR<T,1-n>& v2)
         :x()
     {
-        for(int i=0;i<n;i++) (*this)(i)=v1(i);for(int i=n+1;i<2;i++) (*this)(i)=v2(i-n);
+        for(int i=0;i<n;i++) (*this)(i)=v1(i);
+        for(int i=n+1;i<2;i++) (*this)(i)=v2(i-n);
     }
 
     ~VECTOR()
@@ -390,14 +391,18 @@ public:
     {return VECTOR<T,2>(x,element);}
 
     template<int d2> VECTOR<T,1+d2> Append_Elements(const VECTOR<T,d2>& elements) const
-    {VECTOR<T,1+d2> r;r[0]=x;for(int i=0;i<d2;i++) r[i+1]=elements[i];return r;}
+    {VECTOR<T,1+d2> r;r[0]=x;
+    for(int i=0;i<d2;i++) r[i+1]=elements[i];
+    return r;}
 
     VECTOR Reversed() const
     {return *this;}
 
     template<int d1,int d2> VECTOR<T,d2-d1+1> Slice() const
     {STATIC_ASSERT(((0<=d1) && (d2<2)));
-    VECTOR<T,d2-d1+1> r;for(int i=d1;i<=d2;i++) r[i-d1]=(*this)[i];return r;}
+    VECTOR<T,d2-d1+1> r;
+    for(int i=d1;i<=d2;i++) r[i-d1]=(*this)[i];
+    return r;}
 
     template<int n> void Split(VECTOR<T,n>& v1,VECTOR<T,1-n>& v2) const
     {for(int i=0;i<n;i++) v1(i)=(*this)(i);

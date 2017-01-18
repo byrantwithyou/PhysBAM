@@ -48,7 +48,8 @@ public:
     
     bool Project_Fe(const DIAGONAL_MATRIX<T,3>& Fe_trial,DIAGONAL_MATRIX<T,3>& Fe_project) const override
     {DIAGONAL_MATRIX<T,3> Fe_log=log(Fe_trial.Max((T)1e-5));T sqr_norm=Fe_log.Frobenius_Norm_Squared();
-    if(sqr_norm<=sqr_log_yield_ratio)return false;Fe_log*=sqrt(sqr_log_yield_ratio/sqr_norm);
+    if(sqr_norm<=sqr_log_yield_ratio)return false;
+    Fe_log*=sqrt(sqr_log_yield_ratio/sqr_norm);
     Fe_project=exp(Fe_log);return true;}
     
     void Project_Fp(const int id,const MATRIX<T,3>& Fp_trial) override

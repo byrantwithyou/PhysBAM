@@ -51,7 +51,8 @@ public:
 
     template<class T2>
     ARRAY& operator*=(const T2 a)
-    {for(int i=0;i<dimension;i++) data(i)*=a;return *this;}
+    {for(int i=0;i<dimension;i++) data(i)*=a;
+    return *this;}
 
     ARRAY& operator+=(const ARRAY& a)
     {data+=a.data;return *this;}
@@ -130,7 +131,9 @@ public:
     {assert((unsigned)axis<dimension);return data(axis);}
 
     TV Cell_Centered_Average(const TV_INT& cell_index) const
-    {TV average;for(int i=0;i<dimension;i++) average(i)=(T).5*(data(i)(cell_index)+data(i)(cell_index+TV_INT::Axis_Vector(i)));return average;}
+    {TV average;
+    for(int i=0;i<dimension;i++) average(i)=(T).5*(data(i)(cell_index)+data(i)(cell_index+TV_INT::Axis_Vector(i)));
+    return average;}
 
     void Set_All_Faces(const T& value,const TV_INT& cell_index)
     {for(int i=0;i<dimension;i++) data(i)(cell_index)=data(i)(cell_index+TV_INT::Axis_Vector(i))=value;}
@@ -159,7 +162,9 @@ public:
     {for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Put(old_copy.data(i),new_copy.data(i));}
 
     TV Max_Abs() const
-    {TV maxabs_vector;for(int i=0;i<dimension;i++) maxabs_vector(i)=data(i).Max_Abs();return maxabs_vector;}
+    {TV maxabs_vector;
+    for(int i=0;i<dimension;i++) maxabs_vector(i)=data(i).Max_Abs();
+    return maxabs_vector;}
 
     static void Exchange(ARRAY& a,ARRAY& b)
     {a.Exchange(b);}
@@ -194,15 +199,26 @@ public:
         p_start+=(domain.Edge_Lengths()).Product();}}
 
     template<class RW> void Write(std::ostream& output) const
-    {Write_Binary<RW>(output,domain_indices);Write_Binary<RW>(output,array.m);Write_Binary_Array<RW>(output,array.base_pointer,array.m);for(int i=0;i<d;i++) Write_Binary<RW>(output,data(i).domain);}
+    {Write_Binary<RW>(output,domain_indices);
+    Write_Binary<RW>(output,array.m);
+    Write_Binary_Array<RW>(output,array.base_pointer,array.m);
+    for(int i=0;i<d;i++) Write_Binary<RW>(output,data(i).domain);}
 //#####################################################################
 };
 
 template<class T> inline std::ostream& operator<<(std::ostream& output_stream,const ARRAY<T,FACE_INDEX<1> >& a)
-{for(int i=a.domain_indices.min_corner.x;i<a.domain_indices.max_corner.x+1;i++) output_stream<<a.Component(0)(i)<<" ";output_stream<<std::endl;return output_stream;}
+{
+    for(int i=a.domain_indices.min_corner.x;i<a.domain_indices.max_corner.x+1;i++)
+        output_stream<<a.Component(0)(i)<<" ";
+    output_stream<<std::endl;
+    return output_stream;
+}
 
 template<class T,int d> inline std::ostream& operator<<(std::ostream& output_stream,const ARRAY<T,FACE_INDEX<d> >& a)
-{for(int i=0;i<d;i++) output_stream<<a.data(i)<<std::endl;return output_stream;}
+{
+    for(int i=0;i<d;i++) output_stream<<a.data(i)<<std::endl;
+    return output_stream;
+}
 
 extern template ARRAY<bool,FACE_INDEX<1> >::~ARRAY();
 extern template ARRAY<bool,FACE_INDEX<2> >::~ARRAY();

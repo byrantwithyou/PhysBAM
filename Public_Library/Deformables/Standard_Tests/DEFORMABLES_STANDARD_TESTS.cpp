@@ -435,7 +435,8 @@ Embed_Particles_In_Tetrahedralized_Volume(BINDING_LIST<VECTOR<T,3> >& binding_li
         int embedding_tet=0;
         while(!candidate_tets.m){
             tetrahedralized_volume.hierarchy->Intersection_List(X,candidate_tets,current_thickness_over_two);
-            if(candidate_tets.m || thickness_over_two==0) break;current_thickness_over_two*=2;}
+            if(candidate_tets.m || thickness_over_two==0) break;
+            current_thickness_over_two*=2;}
         for(int t=0;t<candidate_tets.m;t++) if(tetrahedron_list(candidate_tets(t)).Inside(X)){embedding_tet=candidate_tets(t);break;}
         if(!embedding_tet && candidate_tets.m){ // find closest tet
             T rho_min=FLT_MAX;

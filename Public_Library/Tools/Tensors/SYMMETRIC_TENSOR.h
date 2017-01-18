@@ -32,13 +32,19 @@ public:
     VECTOR<SYMMETRIC_MATRIX<T,nn>,mm> x;
 
     SYMMETRIC_TENSOR operator-() const
-    {SYMMETRIC_TENSOR t;for(int i=0;i<mm;i++) t.x(i)=-x(i);return t;}
+    {SYMMETRIC_TENSOR t;
+    for(int i=0;i<mm;i++) t.x(i)=-x(i);
+    return t;}
 
     SYMMETRIC_TENSOR operator*(T a) const
-    {SYMMETRIC_TENSOR t;for(int i=0;i<mm;i++) t.x(i)=x(i)*a;return t;}
+    {SYMMETRIC_TENSOR t;
+    for(int i=0;i<mm;i++) t.x(i)=x(i)*a;
+    return t;}
 
     SYMMETRIC_TENSOR operator/(T a) const
-    {SYMMETRIC_TENSOR t;for(int i=0;i<mm;i++) t.x(i)=x(i)/a;return t;}
+    {SYMMETRIC_TENSOR t;
+    for(int i=0;i<mm;i++) t.x(i)=x(i)/a;
+    return t;}
 };
 
 template<class T,int u,int m,int n>

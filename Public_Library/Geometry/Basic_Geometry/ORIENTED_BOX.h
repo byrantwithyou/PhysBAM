@@ -78,7 +78,9 @@ public:
     {ORIENTED_BOX box(*this);box.Scale_About_Center(edge_factor);return box;}
 
     RANGE<TV> Axis_Aligned_Bounding_Box() const
-    {RANGE<TV> box(corner);for(int i=0;i<d;i++) box.Enlarge_By_Sign(edges.Column(i));return box;}
+    {RANGE<TV> box(corner);
+    for(int i=0;i<d;i++) box.Enlarge_By_Sign(edges.Column(i));
+    return box;}
 
     RANGE<TV> Bounding_Box() const // for templatization purposes
     {return Axis_Aligned_Bounding_Box();}
@@ -132,6 +134,11 @@ private:
 };
 template<class TV>
 inline std::ostream& operator<<(std::ostream& output_stream,const ORIENTED_BOX<TV>& box)
-{output_stream<<"("<<box.corner<<")   (";for(int i=0;i<TV::m-1;i++) output_stream<<box.edges.Column(i)<<" : ";output_stream<<box.edges.Column(TV::m-1)<<")";return output_stream;}
+{
+    output_stream<<"("<<box.corner<<")   (";
+    for(int i=0;i<TV::m-1;i++) output_stream<<box.edges.Column(i)<<" : ";
+    output_stream<<box.edges.Column(TV::m-1)<<")";
+    return output_stream;
+}
 }
 #endif

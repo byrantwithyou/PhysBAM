@@ -772,10 +772,14 @@ Split_Along_Fracture_Plane(const PLANE<T>& plane,ARRAY<int>& particle_replicated
         int new_index=particles.Add_Element();particle_replicated(p)=new_index;number_of_new_particles++;
         particles.X(new_index)=particles.X(p);particles.V(new_index)=particles.V(p);}
     // loop through tets and change indices in negative_side to new_indices (from particle_replicated)
-    for(t=0;t<mesh.elements.m;t++) if(!positive_side(t)){ int i,j,k,l;mesh.elements(t).Get(i,j,k,l); // replace indices with replicated_indices
-        if(particle_replicated(i)) i=particle_replicated(i);if(particle_replicated(j)) j=particle_replicated(j);
-        if(particle_replicated(k)) k=particle_replicated(k);if(particle_replicated(l)) l=particle_replicated(l);
-        mesh.elements(t).Set(i,j,k,l);}
+    for(t=0;t<mesh.elements.m;t++)
+        if(!positive_side(t)){
+            int i,j,k,l;mesh.elements(t).Get(i,j,k,l); // replace indices with replicated_indices
+            if(particle_replicated(i)) i=particle_replicated(i);
+            if(particle_replicated(j)) j=particle_replicated(j);
+            if(particle_replicated(k)) k=particle_replicated(k);
+            if(particle_replicated(l)) l=particle_replicated(l);
+            mesh.elements(t).Set(i,j,k,l);}
     mesh.number_nodes=particles.Size();
     if(incident_elements_defined){delete mesh.incident_elements;mesh.incident_elements=0;}
 }
@@ -803,7 +807,10 @@ Split_Node(const int particle_index,const TV& normal)
             int this_incident_tet=(*mesh.incident_elements)(particle_index)(t);int i,j,k,l;mesh.elements(this_incident_tet).Get(i,j,k,l);
             TV x0=particles.X(i),x1=particles.X(j),x2=particles.X(k),x3=particles.X(l),centroid=(T).25*(x0+x1+x2+x3);
             if(plane.Signed_Distance(centroid) < 0){ // relabel with duplicate node
-                if(i == particle_index) i=new_particle;if(j == particle_index) j=new_particle;if(k == particle_index) k=new_particle;if(l == particle_index) l=new_particle;
+                if(i == particle_index) i=new_particle;
+                if(j == particle_index) j=new_particle;
+                if(k == particle_index) k=new_particle;
+                if(l == particle_index) l=new_particle;
                 mesh.elements(this_incident_tet).Set(i,j,k,l);}}
         if(incident_elements_defined){ //repair incident tetrahedrons if necessary
             (*mesh.incident_elements)(particle_index).Clean_Memory();

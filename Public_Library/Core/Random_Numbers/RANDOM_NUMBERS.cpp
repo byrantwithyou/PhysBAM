@@ -175,7 +175,7 @@ Get_Vector_In_Unit_Sphere()
 template<class T,class GENERATOR> template<class TV> TV RANDOM_NUMBERS<T,GENERATOR>::
 Get_Direction()
 {
-    if(!TV::m) return TV();
+    if(TV::m==0) return TV();
     for(;;){
         TV v=Get_Uniform_Vector(RANGE<TV>::Centered_Box());
         typename TV::SCALAR magnitude_squared=v.Magnitude_Squared();

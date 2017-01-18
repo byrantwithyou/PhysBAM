@@ -944,7 +944,9 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
         TV impulse=K_inverse(i)*(-rigid_body_distances(i)+velocity+TV::Cross_Product(angular_velocity,rigid_body_collision_locations(i)-parent_rigid_body.Frame().t));
         T_SPIN other_angular_velocity=parent_other_rigid_body.World_Space_Inertia_Tensor_Inverse()*TV::Cross_Product(rigid_body_collision_locations(i)-parent_other_rigid_body.Frame().t,impulse);
         parent_other_rigid_body.Frame().t+=impulse/parent_other_rigid_body.Mass();
-        if(solids_parameters.rigid_body_collision_parameters.use_push_out_rotation) parent_other_rigid_body.Frame().r=ROTATION<TV>::From_Rotation_Vector(other_angular_velocity)*parent_other_rigid_body.Frame().r;parent_other_rigid_body.Frame().r.Normalize();
+        if(solids_parameters.rigid_body_collision_parameters.use_push_out_rotation)
+            parent_other_rigid_body.Frame().r=ROTATION<TV>::From_Rotation_Vector(other_angular_velocity)*parent_other_rigid_body.Frame().r;
+        parent_other_rigid_body.Frame().r.Normalize();
         parent_other_rigid_body.Update_Angular_Velocity();
         parent_other_rigid_body.Update_Bounding_Box();
         rigid_body_collisions.skip_collision_check.Set_Last_Moved(other_rigid_body.particle_index);}
@@ -952,7 +954,9 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
     // apply push to the rigid body
     if(!parent_rigid_body.Has_Infinite_Inertia()){
         parent_rigid_body.Frame().t+=velocity;
-        if(solids_parameters.rigid_body_collision_parameters.use_push_out_rotation) parent_rigid_body.Frame().r=ROTATION<TV>::From_Rotation_Vector(angular_velocity)*parent_rigid_body.Frame().r;parent_rigid_body.Frame().r.Normalize();
+        if(solids_parameters.rigid_body_collision_parameters.use_push_out_rotation)
+            parent_rigid_body.Frame().r=ROTATION<TV>::From_Rotation_Vector(angular_velocity)*parent_rigid_body.Frame().r;
+        parent_rigid_body.Frame().r.Normalize();
         parent_rigid_body.Update_Angular_Velocity();
         parent_rigid_body.Update_Bounding_Box();
         rigid_body_collisions.skip_collision_check.Set_Last_Moved(rigid_body.particle_index);}

@@ -898,7 +898,8 @@ Add_String(const std::string& s)
     for(std::string::size_type start=0;start<s.length();){
         std::string::size_type end=s.find('\n',start);
         strings_to_print.Append(s.substr(start,end-start));
-        if(end==std::string::npos) break;start=end+1;}
+        if(end==std::string::npos) break;
+        start=end+1;}
 }
 //#####################################################################
 // Function Add_String

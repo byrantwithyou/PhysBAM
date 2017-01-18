@@ -39,10 +39,18 @@ public:
 };
 template<class T> inline std::istream& 
 operator>>(std::istream& input,MT19937<T>& g)
-{input>>g.index;for(int i=0;i<g.n;i++) input>>g.mt[i];return input;}
+{
+    input>>g.index;
+    for(int i=0;i<g.n;i++) input>>g.mt[i];
+    return input;
+}
 
 template<class T> inline std::ostream&
 operator<<(std::ostream& output,const MT19937<T>& g)
-{output<<g.index;for(int i=0;i<g.n;i++) output<<" "<<g.mt[i];return output;}
+{
+    output<<g.index;
+    for(int i=0;i<g.n;i++) output<<" "<<g.mt[i];
+    return output;
+}
 }
 #endif

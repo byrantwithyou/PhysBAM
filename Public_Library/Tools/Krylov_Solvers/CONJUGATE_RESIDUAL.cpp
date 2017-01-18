@@ -50,7 +50,9 @@ Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_
         nullspace_measure=(residual_magnitude_squared>small_number*small_number*100)?abs(rho_old/residual_magnitude_squared):0;
         if((convergence_norm<=tolerance || (iterations && nullspace_measure<=nullspace_tolerance)) &&
             (iterations>=min_iterations || convergence_norm<small_number)){ // TODO: get the stopping criterion right
-            if(print_diagnostics) LOG::Stat("conjugate_residual iterations",iterations);if(iterations_used) *iterations_used=iterations;return true;}
+            if(print_diagnostics) LOG::Stat("conjugate_residual iterations",iterations);
+            if(iterations_used) *iterations_used=iterations;
+            return true;}
         if(iterations==max_iterations) break;
         // actual iteration
         const KRYLOV_VECTOR_BASE<T>& mr=system.Precondition(r,z);

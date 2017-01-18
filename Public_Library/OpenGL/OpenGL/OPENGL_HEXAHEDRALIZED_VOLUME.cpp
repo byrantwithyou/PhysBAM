@@ -64,7 +64,8 @@ Draw_Vector_At_Hex_Center() const
     for(int i=0;i<vectors_at_hex_centers.m;i++){
         ARRAY<int> p(8);
         VECTOR<T,3> hex_center=VECTOR<T,3>(0,0,0);hexahedron_mesh->elements(i).Get(p(0),p(1),p(2),p(3),p(4),p(5),p(6),p(7));
-        for(int j=0;j<8;j++) hex_center+=particles->X(p(j));hex_center*=(T).125;
+        for(int j=0;j<8;j++) hex_center+=particles->X(p(j));
+        hex_center*=(T).125;
         head=hex_center+(T)vector_size*vectors_at_hex_centers(i);
         OpenGL_Line(hex_center,head);
         VECTOR<T,3> orth_vect=vectors_at_hex_centers(i).Orthogonal_Vector();

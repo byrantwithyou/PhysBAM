@@ -50,12 +50,14 @@ public:
     T_RANK rank_i(0),rank_j(0);ranks.Get(root_i,rank_i);ranks.Get(root_j,rank_j);
     ID root=rank_i>=rank_j?root_i:root_j;
     Path_Compress(i,root);Path_Compress(j,root);
-    if(rank_i==rank_j && root_i!=root_j) ranks.Get_Or_Insert(root)++;return root;}
+    if(rank_i==rank_j && root_i!=root_j) ranks.Get_Or_Insert(root)++;
+    return root;}
 
     template<class T_ARRAY>
     int Union(const T_ARRAY& array)
     {int root=-1;typename T_ARRAY::ELEMENT i(0);for(;i<array.Size();i++){root=Find(array(i));break;}if(root<0) return -1;
-    for(;i<array.Size();i++) Union(root,array(i));return Find(root);}
+    for(;i<array.Size();i++) Union(root,array(i));
+    return Find(root);}
 
     template<int d>
     ID Union(const VECTOR<ID,d>& indices)
@@ -66,7 +68,8 @@ public:
         if(max_rank<tmp_rank){max_rank=tmp_rank;root=root_i;max_tie=false;}
         else if(max_rank==tmp_rank && root!=root_i) max_tie=true;}
     for(int i=0;i<d;i++) Path_Compress(indices[i],root);
-    if(max_tie) ranks.Get_Or_Insert(root)++;return root;}
+    if(max_tie) ranks.Get_Or_Insert(root)++;
+    return root;}
 
     void Merge(const SPARSE_UNION_FIND<ID>& union_find)
     {assert(Size()==union_find.Size());for(const auto& it:union_find.parents) Union(it.Key(),it.Data());}

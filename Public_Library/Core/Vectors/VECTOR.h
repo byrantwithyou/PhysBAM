@@ -143,7 +143,8 @@ public:
     {assert((unsigned)i<d);return array[i];}
 
     bool operator==(const VECTOR& v) const
-    {for(int i=0;i<d;i++) if(array[i]!=v.array[i]) return false;return true;}
+    {for(int i=0;i<d;i++) if(array[i]!=v.array[i]) return false;
+    return true;}
 
     bool operator!=(const VECTOR& v) const
     {return !((*this)==v);}
@@ -152,34 +153,52 @@ public:
     {return *this;};
 
     VECTOR operator-() const
-    {VECTOR r;for(int i=0;i<d;i++) r.array[i]=-array[i];return r;}
+    {VECTOR r;
+    for(int i=0;i<d;i++) r.array[i]=-array[i];
+    return r;}
 
     VECTOR operator+(const T& a) const
-    {VECTOR r;for(int i=0;i<d;i++) r.array[i]=array[i]+a;return r;}
+    {VECTOR r;
+    for(int i=0;i<d;i++) r.array[i]=array[i]+a;
+    return r;}
 
     VECTOR operator-(const T& a) const
-    {VECTOR r;for(int i=0;i<d;i++) r.array[i]=array[i]-a;return r;}
+    {VECTOR r;
+    for(int i=0;i<d;i++) r.array[i]=array[i]-a;
+    return r;}
 
     VECTOR operator*(const T& a) const
-    {VECTOR r;for(int i=0;i<d;i++) r.array[i]=array[i]*a;return r;}
+    {VECTOR r;
+    for(int i=0;i<d;i++) r.array[i]=array[i]*a;
+    return r;}
 
     VECTOR operator/(const T& a) const
     {return *this*Inverse(a);}
 
     VECTOR operator+(const VECTOR& v) const
-    {VECTOR r;for(int i=0;i<d;i++) r.array[i]=array[i]+v.array[i];return r;}
+    {VECTOR r;
+    for(int i=0;i<d;i++) r.array[i]=array[i]+v.array[i];
+    return r;}
 
     VECTOR operator-(const VECTOR& v) const
-    {VECTOR r;for(int i=0;i<d;i++) r.array[i]=array[i]-v.array[i];return r;}
+    {VECTOR r;
+    for(int i=0;i<d;i++) r.array[i]=array[i]-v.array[i];
+    return r;}
 
     VECTOR operator*(const VECTOR& v) const
-    {VECTOR r;for(int i=0;i<d;i++) r.array[i]=array[i]*v.array[i];return r;}
+    {VECTOR r;
+    for(int i=0;i<d;i++) r.array[i]=array[i]*v.array[i];
+    return r;}
 
     VECTOR operator/(const VECTOR& v) const
-    {VECTOR r;for(int i=0;i<d;i++) r.array[i]=array[i]/v.array[i];return r;}
+    {VECTOR r;
+    for(int i=0;i<d;i++) r.array[i]=array[i]/v.array[i];
+    return r;}
 
     VECTOR operator*(const INT_INVERSE a) const
-    {VECTOR r;for(int i=0;i<d;i++) r.array[i]=array[i]*a;return r;}
+    {VECTOR r;
+    for(int i=0;i<d;i++) r.array[i]=array[i]*a;
+    return r;}
 
     FIXED_NUMBER<T,0> Dot(const ZERO_VECTOR<T,m>&) const
     {return FIXED_NUMBER<T,0>();}
@@ -188,7 +207,9 @@ public:
     {VECTOR r(*this);r.Normalize();return r;}
 
     bool Elements_Equal() const
-    {bool equal=true;for(int i=1;i<d;i++) equal&=(array[i]==array[0]);return equal;}
+    {bool equal=true;
+    for(int i=1;i<d;i++) equal&=(array[i]==array[0]);
+    return equal;}
 
     static VECTOR Componentwise_Min(const VECTOR& v1,const VECTOR& v2)
     {return v1.Componentwise_Min(v2);}
@@ -197,10 +218,14 @@ public:
     {return v1.Componentwise_Max(v2);}
 
     VECTOR Componentwise_Min(const VECTOR& v) const
-    {VECTOR r;for(int i=0;i<d;i++) r.array[i]=min(array[i],v.array[i]);return r;}
+    {VECTOR r;
+    for(int i=0;i<d;i++) r.array[i]=min(array[i],v.array[i]);
+    return r;}
 
     VECTOR Componentwise_Max(const VECTOR& v) const
-    {VECTOR r;for(int i=0;i<d;i++) r.array[i]=max(array[i],v.array[i]);return r;}
+    {VECTOR r;
+    for(int i=0;i<d;i++) r.array[i]=max(array[i],v.array[i]);
+    return r;}
 
     VECTOR Projected_On_Unit_Direction(const VECTOR& direction) const
     {return Dot_Product(*this,direction)*direction;}
@@ -221,13 +246,17 @@ public:
     {*this-=Dot_Product(*this,direction)*direction;}
 
     int Number_True() const
-    {STATIC_ASSERT((is_same<T,bool>::value));int count=0;for(int i=0;i<d;i++)if(array[i]) count++;return count;}
+    {STATIC_ASSERT((is_same<T,bool>::value));int count=0;
+    for(int i=0;i<d;i++)if(array[i]) count++;
+    return count;}
 
     static VECTOR Axis_Vector(const int axis)
     {VECTOR r;r(axis)=(T)1;return r;}
 
     static VECTOR Constant_Vector(const T& constant)
-    {VECTOR r;for(int i=0;i<d;i++) r.array[i]=constant;return r;}
+    {VECTOR r;
+    for(int i=0;i<d;i++) r.array[i]=constant;
+    return r;}
 
     static VECTOR All_Ones_Vector()
     {return Constant_Vector(1);}
@@ -245,13 +274,17 @@ public:
 
     template<class T_FUNCTION>
     static VECTOR Map(const T_FUNCTION& f,const VECTOR& v)
-    {VECTOR r;for(int i=0;i<d;i++) r.array[i]=f(v.array[i]);return r;}
+    {VECTOR r;
+    for(int i=0;i<d;i++) r.array[i]=f(v.array[i]);
+    return r;}
 
     int Find(const T& element) const
-    {for(int i=0;i<d;i++) if(array[i]==element) return i;return -1;}
+    {for(int i=0;i<d;i++) if(array[i]==element) return i;
+    return -1;}
 
     bool Contains(const T& element) const
-    {for(int i=0;i<d;i++) if(array[i]==element) return true;return false;}
+    {for(int i=0;i<d;i++) if(array[i]==element) return true;
+    return false;}
 
     template<class T_ARRAY>
     bool Contains_All(const T_ARRAY& elements) const
@@ -266,16 +299,25 @@ public:
     return false;}
 
     VECTOR<T,d-1> Remove_Index(const int index) const
-    {assert((unsigned)index<d);VECTOR<T,d-1> r;for(int i=0;i<d-1;i++) r[i]=(*this)[i+(i>=index)];return r;}
+    {assert((unsigned)index<d);VECTOR<T,d-1> r;
+    for(int i=0;i<d-1;i++) r[i]=(*this)[i+(i>=index)];
+    return r;}
 
     VECTOR<T,d+1> Insert(const T& element,const int index) const
-    {VECTOR<T,d+1> r;r[index]=element;for(int i=0;i<d;i++) r[i+(i>=index)]=(*this)[i];return r;}
+    {VECTOR<T,d+1> r;r[index]=element;
+    for(int i=0;i<d;i++) r[i+(i>=index)]=(*this)[i];
+    return r;}
 
     VECTOR<T,d+1> Prepend(const T& element) const
-    {VECTOR<T,d+1> r;r[0]=element;for(int i=0;i<d;i++) r[i+1]=(*this)[i];return r;}
+    {VECTOR<T,d+1> r;r[0]=element;
+    for(int i=0;i<d;i++) r[i+1]=(*this)[i];
+    return r;}
 
     VECTOR<T,d+1> Append(const T& element) const
-    {VECTOR<T,d+1> r;for(int i=0;i<d;i++) r[i]=(*this)[i];r[d]=element;return r;}
+    {VECTOR<T,d+1> r;
+    for(int i=0;i<d;i++) r[i]=(*this)[i];
+    r[d]=element;
+    return r;}
 
     template<int d2> VECTOR<T,d+d2> Append_Elements(const VECTOR<T,d2>& elements) const
     {VECTOR<T,d+d2> r;
@@ -287,11 +329,15 @@ public:
     {VECTOR r(*this);r.Sort();return r;}
 
     VECTOR Reversed() const
-    {VECTOR r;for(int i=0;i<d;i++) r.array[d-i-1]=array[i];return r;}
+    {VECTOR r;
+    for(int i=0;i<d;i++) r.array[d-i-1]=array[i];
+    return r;}
 
     template<int d1,int d2> VECTOR<T,d2-d1+1> Slice() const
     {STATIC_ASSERT(((0<=d1) && (d2<d)));
-    VECTOR<T,d2-d1+1> r;for(int i=d1;i<=d2;i++) r[i-d1]=(*this)[i];return r;}
+    VECTOR<T,d2-d1+1> r;
+    for(int i=d1;i<=d2;i++) r[i-d1]=(*this)[i];
+    return r;}
 
     template<int n> void Split(VECTOR<T,n>& v1,VECTOR<T,d-n>& v2) const
     {for(int i=0;i<n;i++) v1(i)=(*this)(i);
@@ -348,7 +394,11 @@ public:
 //#####################################################################
 template<class T,int d> inline VECTOR<T,d>
 operator+(const T& a,const VECTOR<T,d>& v)
-{VECTOR<T,d> r;for(int i=0;i<d;i++) r.array[i]=a+v.array[i];return r;}
+{
+    VECTOR<T,d> r;
+    for(int i=0;i<d;i++) r.array[i]=a+v.array[i];
+    return r;
+}
 
 template<class T,int d> inline VECTOR<T,d>
 operator*(const T& a,const VECTOR<T,d>& v)
@@ -356,15 +406,27 @@ operator*(const T& a,const VECTOR<T,d>& v)
 
 template<class T,int d> inline VECTOR<T,d>
 operator-(const T& a,const VECTOR<T,d>& v)
-{VECTOR<T,d> r;for(int i=0;i<d;i++) r.array[i]=a-v.array[i];return r;}
+{
+    VECTOR<T,d> r;
+    for(int i=0;i<d;i++) r.array[i]=a-v.array[i];
+    return r;
+}
 
 template<class T,int d> inline VECTOR<T,d>
 operator/(const T& a,const VECTOR<T,d>& v)
-{VECTOR<T,d> r;for(int i=0;i<d;i++) r.array[i]=a/v.array[i];return r;}
+{
+    VECTOR<T,d> r;
+    for(int i=0;i<d;i++) r.array[i]=a/v.array[i];
+    return r;
+}
 
 template<class T,int d> inline VECTOR<T,d>
 Inverse(const VECTOR<T,d>& v)
-{VECTOR<T,d> r;for(int i=0;i<d;i++) r.array[i]=1/v.array[i];return r;}
+{
+    VECTOR<T,d> r;
+    for(int i=0;i<d;i++) r.array[i]=1/v.array[i];
+    return r;
+}
 
 //#####################################################################
 // Function Dominant_Axis
@@ -374,7 +436,11 @@ Dominant_Axis() const
 {
     int axis=0;
     T abs_max=abs(array[0]);
-    for(int i=1;i<d;i++){T abs_i=abs(array[i]);if(abs_max<abs_i){abs_max=abs_i;axis=i;}}
+    for(int i=1;i<d;i++){
+        T abs_i=abs(array[i]);
+        if(abs_max<abs_i){
+            abs_max=abs_i;
+            axis=i;}}
     return axis;
 }
 //#####################################################################

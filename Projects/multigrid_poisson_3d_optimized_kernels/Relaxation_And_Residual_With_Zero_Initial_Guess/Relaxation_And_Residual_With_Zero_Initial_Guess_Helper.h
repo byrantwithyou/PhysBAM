@@ -134,10 +134,10 @@ public:
     }
 
     static void Initialize_Data(T* const u,T* const b,T* const r,unsigned char* const bit_writemask,unsigned char* const bit_interiormask)
-    {
-    int padded_length = padded_y_size*padded_y_size*padded_z_size;
+    {int padded_length = padded_y_size*padded_y_size*padded_z_size;
     int coarse_padded_length=coarse_padded_y_size*coarse_padded_y_size*coarse_padded_z_size;
-    for(int i=0;i<padded_length;i++) u[i]=b[i]=r[i]=(T)i;for(int i=0;i<coarse_padded_length;i++){ bit_writemask[i]=0xff; bit_interiormask[i]=0xff;}}
+    for(int i=0;i<padded_length;i++) u[i]=b[i]=r[i]=(T)i;
+    for(int i=0;i<coarse_padded_length;i++){bit_writemask[i]=0xff;bit_interiormask[i]=0xff;}}
 
 //#####################################################################
     void Run_Parallel(const int number_of_partitions);

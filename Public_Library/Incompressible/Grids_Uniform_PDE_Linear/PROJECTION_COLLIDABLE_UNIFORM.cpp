@@ -17,7 +17,9 @@ PROJECTION_COLLIDABLE_UNIFORM(const GRID<TV>& mac_grid,const bool multiphase,con
 {
     if(use_poisson){
         poisson=poisson_collidable=new POISSON_COLLIDABLE_UNIFORM<TV>(p_grid,p,true,multiphase,true);
-        if(use_variable_beta) poisson->Set_Variable_beta();elliptic_solver=poisson;collidable_solver=poisson_collidable;}
+        if(use_variable_beta) poisson->Set_Variable_beta();
+        elliptic_solver=poisson;
+        collidable_solver=poisson_collidable;}
     else{
         laplace=laplace_collidable=new LAPLACE_COLLIDABLE_UNIFORM<TV>(p_grid,p,true,false,true,thread_queue);elliptic_solver=laplace;collidable_solver=laplace_collidable;}
     Initialize_Grid(mac_grid);

@@ -73,8 +73,12 @@ Refresh_Auxiliary_Structures()
     SIMPLEX_MESH<2>::Refresh_Auxiliary_Structures();
     if(topologically_sorted_neighbor_nodes) Initialize_Topologically_Sorted_Neighbor_Nodes();
     if(topologically_sorted_incident_elements) Initialize_Topologically_Sorted_Incident_Elements();
-    if(segment_mesh) Initialize_Segment_Mesh();if(element_edges) Initialize_Element_Edges();if(edge_triangles) Initialize_Edge_Triangles();
-    if(boundary_mesh) Initialize_Boundary_Mesh();if(node_on_boundary) Initialize_Node_On_Boundary();if(boundary_nodes) Initialize_Boundary_Nodes();
+    if(segment_mesh) Initialize_Segment_Mesh();
+    if(element_edges) Initialize_Element_Edges();
+    if(edge_triangles) Initialize_Edge_Triangles();
+    if(boundary_mesh) Initialize_Boundary_Mesh();
+    if(node_on_boundary) Initialize_Node_On_Boundary();
+    if(boundary_nodes) Initialize_Boundary_Nodes();
 }
 //#####################################################################
 // Function Initialize_Square_Mesh
@@ -413,7 +417,8 @@ Make_Orientations_Consistent()
             for(int b=0;b<(*adjacent_elements)(t).m;b++){
                 int t2=(*adjacent_elements)(t)(b);if(orientation(t2))continue;
                 int i2,j2,k2;elements(t2).Get(i2,j2,k2);if(i!=i2&&i!=j2&&i!=k2)cyclic_shift(i,j,k);
-                if(i!=i2)cyclic_shift(i2,j2,k2);if(i!=i2)cyclic_shift(i2,j2,k2);
+                if(i!=i2)cyclic_shift(i2,j2,k2);
+                if(i!=i2)cyclic_shift(i2,j2,k2);
                 component.Append(t2);orientation(t2)=(j==k2||k==j2)?orientation(t):-orientation(t);}}
         int correct=positive>negative?1:-1;
         for(int a=0;a<component.m;a++)if(orientation(component(a))!=correct)
@@ -432,7 +437,8 @@ Orientations_Consistent()
         for(int a=0;a<(*adjacent_elements)(t).m;a++){
             int t2=(*adjacent_elements)(t)(a);if(t2<t)continue;
             int i2,j2,k2;elements(t2).Get(i2,j2,k2);if(i!=i2&&i!=j2&&i!=k2)cyclic_shift(i,j,k);
-            if(i!=i2)cyclic_shift(i2,j2,k2);if(i!=i2)cyclic_shift(i2,j2,k2);
+            if(i!=i2)cyclic_shift(i2,j2,k2);
+            if(i!=i2)cyclic_shift(i2,j2,k2);
             if(j==j2||k==k2){if(!adjacent_elements_defined){delete adjacent_elements;adjacent_elements=0;}return false;}}}
     if(!adjacent_elements_defined){delete adjacent_elements;adjacent_elements=0;}return true;
 }

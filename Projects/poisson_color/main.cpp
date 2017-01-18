@@ -189,7 +189,8 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_POISSON_TEST<TV>& at,int max_iter,boo
         [&](const TV& X,int color0,int color1){return at.u_jump(X,color0,color1);},
         [&](const TV& X,int color0,int color1){return at.j_surface(X,color0,color1);});
     printf("\n");
-    for(int c=0;c<ips.cdi->colors;c++) printf("u%d [%i]\t",c,ips.cm_u->dofs(c));printf("\n");
+    for(int c=0;c<ips.cdi->colors;c++) printf("u%d [%i]\t",c,ips.cm_u->dofs(c));
+    printf("\n");
     printf("q [%i] ",ips.cdi->constraint_base_scalar);
     printf("\n");
 

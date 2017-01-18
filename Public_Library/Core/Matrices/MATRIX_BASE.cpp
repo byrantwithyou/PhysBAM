@@ -68,7 +68,8 @@ In_Place_Gram_Schmidt_QR_Factorization(MATRIX_BASE<T,T_MATRIX1>& R)
 {
     R.Derived()=T_MATRIX1((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
     for(int j=0;j<Columns();j++){ // for each column
-        for(int i=0;i<Rows();i++) R(j,j)+=sqr((*this)(i,j));R(j,j)=sqrt(R(j,j)); // compute the L1 norm
+        for(int i=0;i<Rows();i++) R(j,j)+=sqr((*this)(i,j));
+        R(j,j)=sqrt(R(j,j)); // compute the L1 norm
         T one_over_Rjj=1/R(j,j);
         for(int i=0;i<Rows();i++) (*this)(i,j)*=one_over_Rjj; // orthogonalize the column
         for(int k=j+1;k<Columns();k++){ // subtract this columns contributution from the rest of the columns

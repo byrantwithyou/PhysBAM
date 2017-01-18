@@ -264,7 +264,8 @@ Extrapolate_Velocity_Across_Interface(ARRAY<T,FACE_INDEX<TV::m> >& face_velociti
             T_ARRAYS_BASE &phi_face=phi_faces.Component(axis),&face_velocity=face_velocities_ghost.Component(axis);ARRAYS_ND_BASE<bool,TV_INT>& fixed_face=fixed_faces.Component(axis);
             for(FACE_ITERATOR<TV> iterator(grid,ghost_cells,GRID<TV>::INTERIOR_REGION,-1,axis);iterator.Valid();iterator.Next()){
                 TV_INT index=iterator.Face_Index();phi_face(index)=(T).5*(phi_ghost(iterator.First_Cell_Index())+phi_ghost(iterator.Second_Cell_Index()));
-                if(phi_face(index)<=0) fixed_face(index)=true;if(phi_face(index) >= delta && !fixed_face(index)) face_velocity(index)=(T)0;}}
+                if(phi_face(index)<=0) fixed_face(index)=true;
+                if(phi_face(index) >= delta && !fixed_face(index)) face_velocity(index)=(T)0;}}
         //mpi_grid->Exchange_Boundary_Face_Data(fixed_faces);
         for(int axis=0;axis<TV::m;axis++){
             T_ARRAYS_BASE &phi_face=phi_faces.Component(axis),&face_velocity=face_velocities_ghost.Component(axis);ARRAYS_ND_BASE<bool,TV_INT>& fixed_face=fixed_faces.Component(axis);
@@ -282,7 +283,8 @@ Extrapolate_Velocity_Across_Interface(ARRAY<T,FACE_INDEX<TV::m> >& face_velociti
             if(fixed_faces_input) fixed_face=fixed_faces_input->Component(axis); else fixed_face=ARRAY<bool,TV_INT>(face_grid.Domain_Indices());
             for(FACE_ITERATOR<TV> iterator(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next()){
                 TV_INT index=iterator.Face_Index();phi_face(index)=(T).5*(phi_ghost(iterator.First_Cell_Index())+phi_ghost(iterator.Second_Cell_Index()));
-                if(phi_face(index)<=0) fixed_face(index)=true;if(phi_face(index) >= delta && !fixed_face(index)) face_velocity(index)=(T)0;}
+                if(phi_face(index)<=0) fixed_face(index)=true;
+                if(phi_face(index) >= delta && !fixed_face(index)) face_velocity(index)=(T)0;}
             LOG::cout<<"something..."<<std::endl;  // TODO(jontg): If this log statement doesn't appear, the code crashes in release mode...
             T_EXTRAPOLATION_SCALAR extrapolate(face_grid,phi_face,face_velocity,ghost_cells);extrapolate.Set_Band_Width(band_width);extrapolate.Set_Custom_Seed_Done(&fixed_face);
             if(face_neighbors_visible) extrapolate.Set_Collision_Aware_Extrapolation(face_neighbors_visible->Component(axis));

@@ -19,7 +19,8 @@ template<class T> void QUADRATIC_PROGRAMMING<T>::
 Move_Column_From_B_To_N_And_Shift_Down(MATRIX_MXN<T>& B,ARRAY<int>& permute_B,const int b_column,MATRIX_MXN<T>& N,ARRAY<int>& permute_N,const int n_column)
 {
     assert(B.m==B.n);
-    for(int i=0;i<B.n;i++)N(i,n_column)=B(i,b_column);permute_N(n_column)=permute_B(b_column);
+    for(int i=0;i<B.n;i++)N(i,n_column)=B(i,b_column);
+    permute_N(n_column)=permute_B(b_column);
     for(int j=b_column;j<B.n;j++){for(int i=0;i<B.n;i++)B(i,j)=B(i,j+1);permute_B(j)=permute_B(j+1);}
 }
 template<class T> void QUADRATIC_PROGRAMMING<T>::
@@ -192,7 +193,9 @@ Find_Optimal_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& S,MATRIX_MXN<T>& N,ARRAY<T
                 break;}
 
             // copy column from S to B and remove from S
-            for(int i=0;i<B.n;i++)B(i,B.n)=S(i,s_column);permute_B(B.n)=permute_S(s_column);x_B(B.n)=x_S(s_column);
+            for(int i=0;i<B.n;i++)B(i,B.n)=S(i,s_column);
+            permute_B(B.n)=permute_S(s_column);
+            x_B(B.n)=x_S(s_column);
             Remove_Column(s_column,S,permute_S,&x_S);
             if(debug_optimization) LOG::cout << "AFTER MOVING S COLUMN ("<<s_column<<") TO B\nB:\n" << B << "\nS:\n" << S << "\nN:\n" << N << std::endl;
         }

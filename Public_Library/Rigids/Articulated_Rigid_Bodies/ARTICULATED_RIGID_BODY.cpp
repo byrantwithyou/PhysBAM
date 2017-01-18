@@ -213,7 +213,9 @@ Restore_Velocities_And_Momenta()
 template<class TV> void ARTICULATED_RIGID_BODY_BASE<TV>::
 Update_Child_From_Parents(const int child_id,const ARRAY<int>& parents)
 {
-    if(!parents.m) return;TV F_wc_sum_t;ROTATION<TV> current_hemisphere;
+    if(!parents.m) return;
+    TV F_wc_sum_t;
+    ROTATION<TV> current_hemisphere;
     ARRAY<ROTATION<TV> > rotations;
     for(int p=0;p<parents.m;p++){
         JOINT_ID edge_id(0);
@@ -519,14 +521,16 @@ Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame
 {
     if(joint_mesh.Num_Joints()>0 && !(check_stale && !is_stale)){
         if(check_stale){
-            if(!frame_list) frame_list=new ARRAY<int>;frame_list->Append(frame);
+            if(!frame_list) frame_list=new ARRAY<int>;
+            frame_list->Append(frame);
             FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/common/arb_state_list",directory.c_str()),*frame_list);
             is_stale=false;}
         std::ostream* output=FILE_UTILITIES::Safe_Open_Output(LOG::sprintf("%s/%d/arb_state",directory.c_str(),frame));
         TYPED_OSTREAM typed_output(*output,stream_type);
         joint_mesh.Write(typed_output,directory,frame);
         delete output;}
-    if(muscle_list) muscle_list->Write(stream_type,directory,frame);Output_Articulation_Points(stream_type,directory,frame);
+    if(muscle_list) muscle_list->Write(stream_type,directory,frame);
+    Output_Articulation_Points(stream_type,directory,frame);
     if(muscle_activations.m>0) FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/muscle_activations",directory.c_str(),frame),muscle_activations);
 }
 //#####################################################################

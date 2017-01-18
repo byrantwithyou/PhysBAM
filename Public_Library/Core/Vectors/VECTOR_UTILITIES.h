@@ -17,7 +17,11 @@ inline bool Complement(const bool b)
 {return !b;}
 
 template<class T,int d> VECTOR<T,d> Complement(const VECTOR<T,d>& v)
-{VECTOR<T,d> v_complement;for(int i=0;i<d;i++) v_complement(i)=Complement(v(i));return v_complement;}
+{
+    VECTOR<T,d> v_complement;
+    for(int i=0;i<d;i++) v_complement(i)=Complement(v(i));
+    return v_complement;
+}
 
 template<class T> VECTOR<T,1> Complement(const VECTOR<T,1>& v)
 {return VECTOR<T,1>(Complement(v.x));}

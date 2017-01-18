@@ -383,7 +383,8 @@ Apply_Repulsions_To_Velocities(const T dt,T_ARRAY0& point_face_boundary_pairs,T_
         repulsions+=applied_repulsions;
         if(output_repulsion_results) LOG::Stat("total point face friction",applied_repulsions);}
     if(compute_edge_edge_friction){
-        if(used) mpi_solids->Gather_Repulsion_Inputs(X_self_collision_free,X,V,edge_edge_send_particles,edge_edge_receive_particles);used=true;
+        if(used) mpi_solids->Gather_Repulsion_Inputs(X_self_collision_free,X,V,edge_edge_send_particles,edge_edge_receive_particles);
+        used=true;
         Adjust_Velocity_For_Repulsion(dt,edge_edge_boundary_pairs,use_repulsions,true,use_repulsions,ee_target_impulses,
             ee_old_speeds,ee_normals,edge_edge_inelastic_collision_repulsion_attempts); // if not using repulsions, only do friction for inelastic component
         mpi_solids->Scatter_Repulsion_Outputs(X_self_collision_free,X,V,edge_edge_send_particles,edge_edge_receive_particles);
@@ -393,7 +394,8 @@ Apply_Repulsions_To_Velocities(const T dt,T_ARRAY0& point_face_boundary_pairs,T_
         repulsions+=applied_repulsions;
         if(output_repulsion_results) LOG::Stat("total edge edge friction",applied_repulsions);}
     if(compute_point_face_inelastic_collision_repulsion){
-        if(used) mpi_solids->Gather_Repulsion_Inputs(X_self_collision_free,X,V,point_face_send_particles,point_face_receive_particles);used=true;
+        if(used) mpi_solids->Gather_Repulsion_Inputs(X_self_collision_free,X,V,point_face_send_particles,point_face_receive_particles);
+        used=true;
         Adjust_Velocity_For_Repulsion(dt,point_face_boundary_pairs,false,false,use_repulsions,pf_target_impulses,
             pf_old_speeds,pf_normals,point_face_inelastic_collision_repulsion_attempts);
         mpi_solids->Scatter_Repulsion_Outputs(X_self_collision_free,X,V,point_face_send_particles,point_face_receive_particles);
@@ -403,7 +405,8 @@ Apply_Repulsions_To_Velocities(const T dt,T_ARRAY0& point_face_boundary_pairs,T_
         repulsions+=applied_repulsions;
         if(output_repulsion_results) LOG::Stat("total point face inelastic collision repulsion",applied_repulsions);}
     if(compute_edge_edge_inelastic_collision_repulsion){
-        if(used) mpi_solids->Gather_Repulsion_Inputs(X_self_collision_free,X,V,edge_edge_send_particles,edge_edge_receive_particles);used=true;
+        if(used) mpi_solids->Gather_Repulsion_Inputs(X_self_collision_free,X,V,edge_edge_send_particles,edge_edge_receive_particles);
+        used=true;
         Adjust_Velocity_For_Repulsion(dt,edge_edge_boundary_pairs,false,false,use_repulsions,ee_target_impulses,
             ee_old_speeds,ee_normals,edge_edge_inelastic_collision_repulsion_attempts);
         mpi_solids->Scatter_Repulsion_Outputs(X_self_collision_free,X,V,edge_edge_send_particles,edge_edge_receive_particles);
@@ -414,7 +417,8 @@ Apply_Repulsions_To_Velocities(const T dt,T_ARRAY0& point_face_boundary_pairs,T_
         if(output_repulsion_results) LOG::Stat("total edge edge inelastic collision repulsion",applied_repulsions);}
     if(use_repulsions){
         if(compute_point_face_repulsion){
-            if(used) mpi_solids->Gather_Repulsion_Inputs(X_self_collision_free,X,V,point_face_send_particles,point_face_receive_particles);used=true;
+            if(used) mpi_solids->Gather_Repulsion_Inputs(X_self_collision_free,X,V,point_face_send_particles,point_face_receive_particles);
+            used=true;
             Adjust_Velocity_For_Repulsion(dt,point_face_boundary_pairs,true,false,use_repulsions,pf_target_impulses,
                 pf_old_speeds,pf_normals,point_face_inelastic_collision_repulsion_attempts);
             mpi_solids->Scatter_Repulsion_Outputs(X_self_collision_free,X,V,point_face_send_particles,point_face_receive_particles);
@@ -424,7 +428,8 @@ Apply_Repulsions_To_Velocities(const T dt,T_ARRAY0& point_face_boundary_pairs,T_
             repulsions+=applied_repulsions;
             if(output_repulsion_results) LOG::Stat("total point face repulsion",applied_repulsions);}
         if(compute_edge_edge_repulsion){
-            if(used) mpi_solids->Gather_Repulsion_Inputs(X_self_collision_free,X,V,edge_edge_send_particles,edge_edge_receive_particles);used=true;
+            if(used) mpi_solids->Gather_Repulsion_Inputs(X_self_collision_free,X,V,edge_edge_send_particles,edge_edge_receive_particles);
+            used=true;
             Adjust_Velocity_For_Repulsion(dt,edge_edge_boundary_pairs,true,false,use_repulsions,ee_target_impulses,
                 ee_old_speeds,ee_normals,edge_edge_inelastic_collision_repulsion_attempts);
             mpi_solids->Scatter_Repulsion_Outputs(X_self_collision_free,X,V,edge_edge_send_particles,edge_edge_receive_particles);

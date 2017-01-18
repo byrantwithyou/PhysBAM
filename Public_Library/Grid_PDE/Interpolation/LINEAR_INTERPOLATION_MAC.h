@@ -21,7 +21,11 @@ public:
     }
 
     VECTOR<T2,TV::m> Clamped_To_Array(const ARRAY<T2,FACE_INDEX<TV::m> >& V,const TV& X) const
-    {VECTOR<T2,TV::m> Y;for(int d=0;d<TV::m;d++) Y(d)=interp.Clamped_To_Array(grids(d),V.Component(d),X);return Y;}
+    {
+        VECTOR<T2,TV::m> Y;
+        for(int d=0;d<TV::m;d++) Y(d)=interp.Clamped_To_Array(grids(d),V.Component(d),X);
+        return Y;
+    }
 
 //#####################################################################
 };

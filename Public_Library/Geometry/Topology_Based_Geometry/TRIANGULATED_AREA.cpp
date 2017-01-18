@@ -339,7 +339,9 @@ Split_Node(const int particle_index,const TV& normal)
             int this_incident_tri=(*mesh.incident_elements)(particle_index)(t);int i,j,k;mesh.elements(this_incident_tri).Get(i,j,k);
             VECTOR<T,2> x1=particles.X(i),x2=particles.X(j),x3=particles.X(k),centroid=((T)1/3)*(x1+x2+x3);
             if((centroid.x-x0.x)*normal.x+(centroid.y-x0.y)*normal.y < 0){ // relabel with duplicate node
-                if(i == particle_index) i=new_particle;if(j == particle_index) j=new_particle;if(k == particle_index) k=new_particle;
+                if(i == particle_index) i=new_particle;
+                if(j == particle_index) j=new_particle;
+                if(k == particle_index) k=new_particle;
                 mesh.elements(this_incident_tri).Set(i,j,k);}}        
         if(incident_elements_defined){ //repair incident triangles if necessary
             (*mesh.incident_elements)(particle_index).Clean_Memory();

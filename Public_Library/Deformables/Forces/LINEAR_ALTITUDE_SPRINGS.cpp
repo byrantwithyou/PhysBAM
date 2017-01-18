@@ -143,7 +143,8 @@ Enable_Plasticity(const T plastic_yield_strain_input,const T plastic_hardening_i
 template<class TV,int d> void LINEAR_ALTITUDE_SPRINGS<TV,d>::
 Set_Stiffness(const T youngs_modulus_input)
 {
-    for(int i=0;i<parameters.m;i++) for(int k=0;k<d+1;k++) parameters(i)(k).youngs_modulus=youngs_modulus_input;Invalidate_CFL();
+    for(int i=0;i<parameters.m;i++) for(int k=0;k<d+1;k++) parameters(i)(k).youngs_modulus=youngs_modulus_input;
+    Invalidate_CFL();
 }
 //#####################################################################
 // Function Set_Stiffness
@@ -151,7 +152,8 @@ Set_Stiffness(const T youngs_modulus_input)
 template<class TV,int d> void LINEAR_ALTITUDE_SPRINGS<TV,d>::
 Set_Stiffness(const ARRAY<VECTOR<T,d+1> >& youngs_modulus_input)
 {
-    for(int i=0;i<parameters.m;i++) for(int k=0;k<d+1;k++) parameters(i)(k).youngs_modulus=youngs_modulus_input(i)(k);Invalidate_CFL();
+    for(int i=0;i<parameters.m;i++) for(int k=0;k<d+1;k++) parameters(i)(k).youngs_modulus=youngs_modulus_input(i)(k);
+    Invalidate_CFL();
 }
 //#####################################################################
 // Function Set_Restlength
@@ -176,7 +178,8 @@ Clamp_Restlength(const T clamped_restlength)
 template<class TV,int d> void LINEAR_ALTITUDE_SPRINGS<TV,d>::
 Set_Damping(const ARRAY<VECTOR<T,d+1> >& damping_input)
 {
-    for(int i=0;i<parameters.m;i++) for(int k=0;k<d+1;k++) parameters(i)(k).damping=damping_input(i)(k);Invalidate_CFL();
+    for(int i=0;i<parameters.m;i++) for(int k=0;k<d+1;k++) parameters(i)(k).damping=damping_input(i)(k);
+    Invalidate_CFL();
 }
 //#####################################################################
 // Function Set_Damping
@@ -184,7 +187,8 @@ Set_Damping(const ARRAY<VECTOR<T,d+1> >& damping_input)
 template<class TV,int d> void LINEAR_ALTITUDE_SPRINGS<TV,d>::
 Set_Damping(const T damping_input)
 {
-    for(int i=0;i<parameters.m;i++) for(int k=0;k<d+1;k++) parameters(i)(k).damping=damping_input;Invalidate_CFL();
+    for(int i=0;i<parameters.m;i++) for(int k=0;k<d+1;k++) parameters(i)(k).damping=damping_input;
+    Invalidate_CFL();
 }
 //#####################################################################
 // Function Create_Altitude_Springs_Base

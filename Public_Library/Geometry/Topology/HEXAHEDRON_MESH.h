@@ -47,7 +47,9 @@ public:
 
     void Refresh_Auxiliary_Structures()
     {if(incident_elements) Initialize_Incident_Elements();if(adjacent_elements) Initialize_Adjacent_Elements();
-    if(faces) Initialize_Faces();if(node_on_boundary) Initialize_Node_On_Boundary();if(boundary_mesh) Initialize_Boundary_Mesh();
+    if(faces) Initialize_Faces();
+    if(node_on_boundary) Initialize_Node_On_Boundary();
+    if(boundary_mesh) Initialize_Boundary_Mesh();
     if(face_hexahedrons) Initialize_Face_Hexahedrons();}
 
     void Initialize_Mesh(const int number_nodes_input,const ARRAY<VECTOR<int,8> >& hexahedron_list)

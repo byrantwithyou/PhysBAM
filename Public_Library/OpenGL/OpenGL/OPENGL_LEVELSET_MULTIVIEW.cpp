@@ -19,17 +19,18 @@ using namespace PhysBAM;
 template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Reset()
 {
-levelset_filename="";
-triangulated_surface_filename="";
-generate_triangulated_surface=false;
-write_generated_triangulated_surface=false;
-if(i_own_levelset && levelset){delete &levelset->grid;delete &levelset->phi;delete levelset;}
-levelset=0;
-delete levelset_implicit_surface;
-levelset_implicit_surface=0;
-if(i_own_triangulated_surface) delete triangulated_surface;triangulated_surface=0;
-delete opengl_triangulated_surface;opengl_triangulated_surface=0;
-delete opengl_scalar_field;opengl_scalar_field=0;
+    levelset_filename="";
+    triangulated_surface_filename="";
+    generate_triangulated_surface=false;
+    write_generated_triangulated_surface=false;
+    if(i_own_levelset && levelset){delete &levelset->grid;delete &levelset->phi;delete levelset;}
+    levelset=0;
+    delete levelset_implicit_surface;
+    levelset_implicit_surface=0;
+    if(i_own_triangulated_surface) delete triangulated_surface;
+    triangulated_surface=0;
+    delete opengl_triangulated_surface;opengl_triangulated_surface=0;
+    delete opengl_scalar_field;opengl_scalar_field=0;
 }
 //#####################################################################
 // Function Reset_Surface
@@ -37,9 +38,11 @@ delete opengl_scalar_field;opengl_scalar_field=0;
 template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Reset_Surface()
 {
-triangulated_surface_filename="";
-if(i_own_triangulated_surface) delete triangulated_surface;triangulated_surface=0;
-delete opengl_triangulated_surface;opengl_triangulated_surface=0;
+    triangulated_surface_filename="";
+    if(i_own_triangulated_surface) delete triangulated_surface;
+    triangulated_surface=0;
+    delete opengl_triangulated_surface;
+    opengl_triangulated_surface=0;
 }
 //#####################################################################
 // Function Set_Levelset
@@ -47,9 +50,9 @@ delete opengl_triangulated_surface;opengl_triangulated_surface=0;
 template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Set_Levelset(LEVELSET<TV>& levelset_input)
 {
-Reset();
-levelset=&levelset_input;
-i_own_levelset=false;
+    Reset();
+    levelset=&levelset_input;
+    i_own_levelset=false;
 }
 //#####################################################################
 // Function Read_Levelset
@@ -57,8 +60,8 @@ i_own_levelset=false;
 template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Read_Levelset(const std::string& levelset_filename_input)
 {
-Reset();
-levelset_filename=levelset_filename_input;
+    Reset();
+    levelset_filename=levelset_filename_input;
 }
 //#####################################################################
 // Function Levelset
@@ -66,7 +69,7 @@ levelset_filename=levelset_filename_input;
 template<class T> const LEVELSET<VECTOR<T,3> >* OPENGL_LEVELSET_MULTIVIEW<T>::
 Levelset() const
 {
-return levelset;
+    return levelset;
 }
 //#####################################################################
 // Function Set_Triangulated_Surface
@@ -74,7 +77,7 @@ return levelset;
 template<class T> const TRIANGULATED_SURFACE<T>* OPENGL_LEVELSET_MULTIVIEW<T>::
 Get_Triangulated_Surface() const
 {
-return triangulated_surface;
+    return triangulated_surface;
 }
 //#####################################################################
 // Function Set_Triangulated_Surface
@@ -82,9 +85,9 @@ return triangulated_surface;
 template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Set_Triangulated_Surface(TRIANGULATED_SURFACE<T> &triangulated_surface_input)
 {
-PHYSBAM_ASSERT(!triangulated_surface);
-triangulated_surface=&triangulated_surface_input;
-i_own_triangulated_surface=false;
+    PHYSBAM_ASSERT(!triangulated_surface);
+    triangulated_surface=&triangulated_surface_input;
+    i_own_triangulated_surface=false;
 }
 //#####################################################################
 // Function Read_Triangulated_Surface
@@ -92,8 +95,8 @@ i_own_triangulated_surface=false;
 template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Read_Triangulated_Surface(const std::string& triangulated_surface_filename_input)
 {
-PHYSBAM_ASSERT(!triangulated_surface);
-triangulated_surface_filename=triangulated_surface_filename_input;
+    PHYSBAM_ASSERT(!triangulated_surface);
+    triangulated_surface_filename=triangulated_surface_filename_input;
 }
 //#####################################################################
 // Function Generate_Triangulated_Surface
@@ -101,10 +104,10 @@ triangulated_surface_filename=triangulated_surface_filename_input;
 template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Generate_Triangulated_Surface(bool write_generated_triangulated_surface_input,const std::string& triangulated_surface_filename_input)
 {
-PHYSBAM_ASSERT(!triangulated_surface);
-generate_triangulated_surface=true;
-write_generated_triangulated_surface=write_generated_triangulated_surface_input;
-if(write_generated_triangulated_surface) triangulated_surface_filename=triangulated_surface_filename_input;
+    PHYSBAM_ASSERT(!triangulated_surface);
+    generate_triangulated_surface=true;
+    write_generated_triangulated_surface=write_generated_triangulated_surface_input;
+    if(write_generated_triangulated_surface) triangulated_surface_filename=triangulated_surface_filename_input;
 }
 //#####################################################################
 // Function Initialize_Levelset
@@ -112,10 +115,10 @@ if(write_generated_triangulated_surface) triangulated_surface_filename=triangula
 template<class T> void OPENGL_LEVELSET_MULTIVIEW<T>::
 Initialize_Levelset()
 {
-if(!levelset){
-    if(levelset_filename.length() > 0){
-        levelset=new LEVELSET<TV>(*(new GRID<TV>),*(new ARRAY<T,VECTOR<int,3> >));
-        FILE_UTILITIES::Read_From_File(stream_type,levelset_filename,*levelset);
+    if(!levelset){
+        if(levelset_filename.length() > 0){
+            levelset=new LEVELSET<TV>(*(new GRID<TV>),*(new ARRAY<T,VECTOR<int,3> >));
+            FILE_UTILITIES::Read_From_File(stream_type,levelset_filename,*levelset);
             i_own_levelset=true;}}
 }
 //#####################################################################

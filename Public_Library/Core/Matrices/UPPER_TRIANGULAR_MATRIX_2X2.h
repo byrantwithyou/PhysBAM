@@ -138,17 +138,20 @@ public:
     template<class T_MATRIX>
     T_MATRIX operator*(const MATRIX_BASE<T,T_MATRIX>& A) const
     {assert(A.Rows()==2);T_MATRIX M(INITIAL_SIZE(2),INITIAL_SIZE(A.Columns()));
-    for(int j=0;j<A.Columns();j++) for(int k=0;k<2;k++) for(int i=0;i<=k;i++) M(i,j)+=(*this)(i,k)*A(k,j);return M;}
+    for(int j=0;j<A.Columns();j++) for(int k=0;k<2;k++) for(int i=0;i<=k;i++) M(i,j)+=(*this)(i,k)*A(k,j);
+    return M;}
 
     template<class T_MATRIX>
     auto Times_Transpose(const MATRIX_BASE<T,T_MATRIX>& A) const
     {assert(A.Columns()==2);decltype(A.Derived().Transposed()) M(INITIAL_SIZE(2),INITIAL_SIZE(A.Rows()));
-    for(int j=0;j<A.Rows();j++) for(int k=0;k<2;k++) for(int i=0;i<=k;i++) M(i,j)+=(*this)(i,k)*A(j,k);return M;}
+    for(int j=0;j<A.Rows();j++) for(int k=0;k<2;k++) for(int i=0;i<=k;i++) M(i,j)+=(*this)(i,k)*A(j,k);
+    return M;}
 
     template<class T_MATRIX>
     T_MATRIX Transpose_Times(const MATRIX_BASE<T,T_MATRIX>& A) const
     {assert(A.Rows()==2);T_MATRIX M(INITIAL_SIZE(2),INITIAL_SIZE(A.Columns()));
-    for(int j=0;j<A.Columns();j++) for(int k=0;k<2;k++) for(int i=0;i<=k;i++) M(k,j)+=(*this)(i,k)*A(i,j);return M;}
+    for(int j=0;j<A.Columns();j++) for(int k=0;k<2;k++) for(int i=0;i<=k;i++) M(k,j)+=(*this)(i,k)*A(i,j);
+    return M;}
 
     MATRIX<T,2,3> Times_Transpose(const MATRIX<T,3,2>& A) const
     {return MATRIX<T,2,3>(x00*A.x[0]+x01*A.x[3],x11*A.x[3],x00*A.x[1]+x01*A.x[4],x11*A.x[4],x00*A.x[2]+x01*A.x[5],x11*A.x[5]);}

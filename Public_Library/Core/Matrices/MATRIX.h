@@ -33,7 +33,7 @@ public:
 
     explicit MATRIX(INITIAL_SIZE mm=INITIAL_SIZE(m),INITIAL_SIZE nn=INITIAL_SIZE(n))
     {
-        STATIC_ASSERT(sizeof(MATRIX)==(size+!size)*sizeof(T));assert(mm==INITIAL_SIZE(m) && nn==INITIAL_SIZE(n));
+        STATIC_ASSERT(sizeof(MATRIX)==(size+(size==0))*sizeof(T));assert(mm==INITIAL_SIZE(m) && nn==INITIAL_SIZE(n));
         for(int i=0;i<size;i++) x[i]=T();
     }
 
@@ -59,7 +59,8 @@ public:
     template<class T_MATRIX>
     explicit MATRIX(const MATRIX_BASE<T,T_MATRIX>& A)
     {
-        assert(m==A.Rows() && n==A.Columns());for(int j=0;j<n;j++) for(int i=0;i<m;i++) (*this)(i,j)=A(i,j);
+        assert(m==A.Rows() && n==A.Columns());
+        for(int j=0;j<n;j++) for(int i=0;i<m;i++) (*this)(i,j)=A(i,j);
     }
 
     int Rows() const
@@ -78,101 +79,150 @@ public:
     {return (unsigned)i<m && (unsigned)j<n;}
 
     VECTOR<T,m> Column(const int j) const
-    {assert((unsigned)j<n);VECTOR<T,m> r;for(int i=0;i<m;i++) r(i)=x[m*j+i];return r;}
+    {assert((unsigned)j<n);VECTOR<T,m> r;
+    for(int i=0;i<m;i++) r(i)=x[m*j+i];
+    return r;}
 
     void Set_Column(const int j,const VECTOR<T,m>& v)
-    {assert((unsigned)j<n);for(int i=0;i<m;i++) x[m*j+i]=v(i);}
+    {assert((unsigned)j<n);
+    for(int i=0;i<m;i++) x[m*j+i]=v(i);}
 
     void Add_Column(const int j,const VECTOR<T,m>& v)
-    {assert((unsigned)j<n);for(int i=0;i<m;i++) x[m*j+i]+=v(i);}
+    {assert((unsigned)j<n);
+    for(int i=0;i<m;i++) x[m*j+i]+=v(i);}
 
     VECTOR<T,n> Row(const int j) const
-    {assert((unsigned)j<m);VECTOR<T,n> r;for(int i=0;i<n;i++) r(i)=(*this)(j,i);return r;}
+    {assert((unsigned)j<m);VECTOR<T,n> r;
+    for(int i=0;i<n;i++) r(i)=(*this)(j,i);
+    return r;}
 
     void Set_Row(const int j,const VECTOR<T,n>& v)
-    {assert((unsigned)j<m);for(int i=0;i<n;i++) (*this)(j,i)=v(i);}
+    {assert((unsigned)j<m);
+    for(int i=0;i<n;i++) (*this)(j,i)=v(i);}
 
     void Add_Row(const int j,const VECTOR<T,n>& v)
-    {assert((unsigned)j<m);for(int i=0;i<n;i++) (*this)(j,i)+=v(i);}
+    {assert((unsigned)j<m);
+    for(int i=0;i<n;i++) (*this)(j,i)+=v(i);}
 
     bool operator==(const MATRIX& A) const
-    {for(int i=0;i<size;i++) if(x[i]!=A.x[i]) return false;return true;}
+    {for(int i=0;i<size;i++) if(x[i]!=A.x[i]) return false;
+    return true;}
 
     bool operator!=(const MATRIX& A) const
     {return !(*this==A);}
 
     MATRIX& operator=(const MATRIX& A)
-    {for(int i=0;i<size;i++) x[i]=A.x[i];return *this;}
+    {for(int i=0;i<size;i++) x[i]=A.x[i];
+    return *this;}
 
     template<class T_MATRIX>
     MATRIX& operator=(const MATRIX_BASE<T,T_MATRIX>& A)
-    {assert(Rows()==A.Rows() && Columns()==A.Columns());for(int j=0;j<Columns();j++) for(int i=0;i<Rows();i++) (*this)(i,j)=A(i,j);return *this;}
+    {assert(Rows()==A.Rows() && Columns()==A.Columns());
+    for(int j=0;j<Columns();j++) for(int i=0;i<Rows();i++) (*this)(i,j)=A(i,j);
+    return *this;}
 
     MATRIX& operator*=(const T a)
-    {for(int i=0;i<size;i++) x[i]*=a;return *this;}
+    {for(int i=0;i<size;i++) x[i]*=a;
+    return *this;}
 
     MATRIX& operator+=(const MATRIX& A)
-    {for(int i=0;i<size;i++) x[i]+=A.x[i];return *this;}
+    {for(int i=0;i<size;i++) x[i]+=A.x[i];
+    return *this;}
 
     MATRIX& operator-=(const MATRIX& A)
-    {for(int i=0;i<size;i++) x[i]-=A.x[i];return *this;}
+    {for(int i=0;i<size;i++) x[i]-=A.x[i];
+    return *this;}
 
     MATRIX operator+(const MATRIX& A) const
-    {assert(n==A.n && m==A.m);MATRIX matrix;for(int i=0;i<size;i++) matrix.x[i]=x[i]+A.x[i];return matrix;}
+    {assert(n==A.n && m==A.m);MATRIX matrix;
+    for(int i=0;i<size;i++) matrix.x[i]=x[i]+A.x[i];
+    return matrix;}
 
     MATRIX operator-(const MATRIX& A) const
-    {assert(n==A.n && m==A.m);MATRIX matrix;for(int i=0;i<size;i++) matrix.x[i]=x[i]-A.x[i];return matrix;}
+    {assert(n==A.n && m==A.m);MATRIX matrix;
+    for(int i=0;i<size;i++) matrix.x[i]=x[i]-A.x[i];
+    return matrix;}
 
     MATRIX operator-() const
-    {MATRIX matrix;for(int i=0;i<size;i++) matrix.x[i]=-x[i];return matrix;}
+    {MATRIX matrix;
+    for(int i=0;i<size;i++) matrix.x[i]=-x[i];
+    return matrix;}
 
     MATRIX operator*(const T a) const
-    {MATRIX matrix;for(int i=0;i<size;i++) matrix.x[i]=x[i]*a;return matrix;}
+    {MATRIX matrix;
+    for(int i=0;i<size;i++) matrix.x[i]=x[i]*a;
+    return matrix;}
 
     VECTOR<T,m> operator*(const VECTOR<T,n>& y) const
-    {VECTOR<T,m> result;for(int j=0;j<n;j++) for(int i=0;i<m;i++) result(i)+=(*this)(i,j)*y(j);return result;}
+    {VECTOR<T,m> result;
+    for(int j=0;j<n;j++) for(int i=0;i<m;i++) result(i)+=(*this)(i,j)*y(j);
+    return result;}
 
     template<int p>
     MATRIX<T,m,p> operator*(const MATRIX<T,n,p>& A) const
-    {MATRIX<T,m,p> matrix;for(int j=0;j<p;j++) for(int k=0;k<n;k++) for(int i=0;i<m;i++) matrix(i,j)+=(*this)(i,k)*A(k,j);return matrix;}
+    {MATRIX<T,m,p> matrix;
+    for(int j=0;j<p;j++) for(int k=0;k<n;k++) for(int i=0;i<m;i++) matrix(i,j)+=(*this)(i,k)*A(k,j);
+    return matrix;}
 
     MATRIX<T,m,n> operator*(const SYMMETRIC_MATRIX<T,n>& A) const
-    {MATRIX<T,m,n> matrix;for(int j=0;j<n;j++) for(int k=0;k<n;k++) for(int i=0;i<m;i++) matrix(i,j)+=(*this)(i,k)*A(k,j);return matrix;}
+    {MATRIX<T,m,n> matrix;
+    for(int j=0;j<n;j++) for(int k=0;k<n;k++) for(int i=0;i<m;i++) matrix(i,j)+=(*this)(i,k)*A(k,j);
+    return matrix;}
 
     MATRIX<T,m,n> operator*(const DIAGONAL_MATRIX<T,n>& A) const
-    {MATRIX<T,m,n> matrix;for(int j=0;j<n;j++) for(int i=0;i<m;i++) matrix(i,j)=(*this)(i,j)*A(j,j);return matrix;}
+    {MATRIX<T,m,n> matrix;
+    for(int j=0;j<n;j++) for(int i=0;i<m;i++) matrix(i,j)=(*this)(i,j)*A(j,j);
+    return matrix;}
 
     MATRIX_MXN<T> operator*(const MATRIX_MXN<T>& A) const
-    {assert(n==A.m);MATRIX_MXN<T> matrix(m,A.n);for(int j=0;j<A.n;j++) for(int i=0;i<m;i++) for(int k=0;k<n;k++) matrix(i,j)+=(*this)(i,k)*A(k,j);return matrix;}
+    {assert(n==A.m);MATRIX_MXN<T> matrix(m,A.n);
+    for(int j=0;j<A.n;j++) for(int i=0;i<m;i++) for(int k=0;k<n;k++) matrix(i,j)+=(*this)(i,k)*A(k,j);
+    return matrix;}
 
     MATRIX<T,n,m> Transposed() const
-    {MATRIX<T,n,m> matrix;for(int i=0;i<m;i++) for(int j=0;j<n;j++) matrix(j,i)=(*this)(i,j);return matrix;}
+    {MATRIX<T,n,m> matrix;
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++) matrix(j,i)=(*this)(i,j);
+    return matrix;}
 
     VECTOR<T,n> Transpose_Times(const VECTOR<T,m>& y) const
-    {VECTOR<T,n> result;for(int j=0;j<n;j++) for(int i=0;i<m;i++) result(j)+=(*this)(i,j)*y(i);return result;}
+    {VECTOR<T,n> result;
+    for(int j=0;j<n;j++) for(int i=0;i<m;i++) result(j)+=(*this)(i,j)*y(i);
+    return result;}
 
     ZERO_VECTOR<T,n> Transpose_Times(const ZERO_VECTOR<T,m>& y) const
     {return ZERO_VECTOR<T,n>();}
 
     template<int p>
     MATRIX<T,n,p> Transpose_Times(const MATRIX<T,m,p>& A) const
-    {MATRIX<T,n,p> matrix;for(int j=0;j<p;j++) for(int i=0;i<n;i++) for(int k=0;k<m;k++) matrix(i,j)+=(*this)(k,i)*A(k,j);return matrix;}
+    {MATRIX<T,n,p> matrix;
+    for(int j=0;j<p;j++) for(int i=0;i<n;i++) for(int k=0;k<m;k++) matrix(i,j)+=(*this)(k,i)*A(k,j);
+    return matrix;}
 
     template<int p>
     MATRIX<T,m,p> Times_Transpose(const MATRIX<T,p,n>& A) const
-    {MATRIX<T,m,p> matrix;for(int j=0;j<p;j++) for(int i=0;i<m;i++) for(int k=0;k<n;k++) matrix(i,j)+=(*this)(i,k)*A(j,k);return matrix;}
+    {MATRIX<T,m,p> matrix;
+    for(int j=0;j<p;j++) for(int i=0;i<m;i++) for(int k=0;k<n;k++) matrix(i,j)+=(*this)(i,k)*A(j,k);
+    return matrix;}
 
     MATRIX Times_Cross_Product_Matrix(const VECTOR<T,3>& v) const
-    {STATIC_ASSERT(n==3);MATRIX matrix;for(int i=0;i<m;i++) matrix.Set_Row(i,VECTOR<T,3>::Cross_Product(VECTOR<T,3>((*this)(i,0),(*this)(i,1),(*this)(i,2)),v));return matrix;}
+    {STATIC_ASSERT(n==3);MATRIX matrix;
+    for(int i=0;i<m;i++) matrix.Set_Row(i,VECTOR<T,3>((*this)(i,0),(*this)(i,1),(*this)(i,2)).Cross(v));
+    return matrix;}
 
     MATRIX Times_Cross_Product_Matrix_Transpose(const VECTOR<T,3>& v) const
-    {STATIC_ASSERT(n==3);MATRIX matrix;for(int i=0;i<m;i++) matrix.Set_Row(i,VECTOR<T,3>::Cross_Product(v,VECTOR<T,3>((*this)(i,0),(*this)(i,1),(*this)(i,2))));return matrix;}
+    {STATIC_ASSERT(n==3);MATRIX matrix;
+    for(int i=0;i<m;i++) matrix.Set_Row(i,v.Cross(VECTOR<T,3>((*this)(i,0),(*this)(i,1),(*this)(i,2))));
+    return matrix;}
 
     MATRIX Cross_Product_Matrix_Times(const VECTOR<T,3>& v) const
-    {STATIC_ASSERT(m==3);MATRIX matrix;for(int i=0;i<n;i++) matrix.Set_Column(i,VECTOR<T,3>::Cross_Product(v,VECTOR<T,3>((*this)(0,i),(*this)(1,i),(*this)(2,i))));return matrix;}
+    {STATIC_ASSERT(m==3);MATRIX matrix;
+    for(int i=0;i<n;i++) matrix.Set_Column(i,v.Cross(VECTOR<T,3>((*this)(0,i),(*this)(1,i),(*this)(2,i))));
+    return matrix;}
 
     MATRIX Cross_Product_Matrix_Transpose_Times(const VECTOR<T,3>& v) const
-    {STATIC_ASSERT(m==3);MATRIX matrix;for(int i=0;i<n;i++) matrix.Set_Column(i,VECTOR<T,3>::Cross_Product(VECTOR<T,3>((*this)(0,i),(*this)(1,i),(*this)(2,i)),v));return matrix;}
+    {STATIC_ASSERT(m==3);MATRIX matrix;
+    for(int i=0;i<n;i++) matrix.Set_Column(i,VECTOR<T,3>((*this)(0,i),(*this)(1,i),(*this)(2,i)).Cross(v));
+    return matrix;}
 
     MATRIX<T,m,2> Times_Cross_Product_Matrix(const VECTOR<T,2>& v) const
     {STATIC_ASSERT(n==1);return (*this)*MATRIX<T,1,2>::Cross_Product_Matrix(v);}
@@ -214,7 +264,9 @@ public:
     {STATIC_ASSERT((m==0 && n==1));return MATRIX<T,0,1>();}
 
     MATRIX<T,n> Normal_Equations_Matrix() const
-    {MATRIX<T,n> result;for(int j=0;j<n;j++) for(int i=0;i<n;i++) for(int k=0;k<m;k++) result(i,j)+=(*this)(k,i)*(*this)(k,j);return result;}
+    {MATRIX<T,n> result;
+    for(int j=0;j<n;j++) for(int i=0;i<n;i++) for(int k=0;k<m;k++) result(i,j)+=(*this)(k,i)*(*this)(k,j);
+    return result;}
 
     VECTOR<T,n> Normal_Equations_Solve(const VECTOR<T,m>& b) const
     {MATRIX<T,n> A_transpose_A(Normal_Equations_Matrix());VECTOR<T,n> A_transpose_b(Transpose_Times(b));return A_transpose_A.Cholesky_Solve(A_transpose_b);}
@@ -313,14 +365,23 @@ inline MATRIX<T,m,n> operator*(const T a,const MATRIX<T,m,n>& A)
 
 template<class T,int m,int n>
 inline MATRIX<T,m,n> clamp(const MATRIX<T,m,n>& x,const MATRIX<T,m,n>& xmin,const MATRIX<T,m,n>& xmax)
-{MATRIX<T,m,n> r;for(int i=0;i<m*n;i++) r.x[i]=clamp(x.x[i],xmin.x[i],xmax.x[i]);return r;}
+{
+    MATRIX<T,m,n> r;
+    for(int i=0;i<m*n;i++) r.x[i]=clamp(x.x[i],xmin.x[i],xmax.x[i]);
+    return r;}
 
 template<class T,int m,int n>
 inline MATRIX<T,m,n> clamp_min(const MATRIX<T,m,n>& x,const MATRIX<T,m,n>& xmin)
-{MATRIX<T,m,n> r;for(int i=0;i<m*n;i++) r.x[i]=clamp_min(x.x[i],xmin.x[i]);return r;}
+{
+    MATRIX<T,m,n> r;
+    for(int i=0;i<m*n;i++) r.x[i]=clamp_min(x.x[i],xmin.x[i]);
+    return r;}
 
 template<class T,int m,int n>
 inline MATRIX<T,m,n> clamp_max(const MATRIX<T,m,n>& x,const MATRIX<T,m,n>& xmax)
-{MATRIX<T,m,n> r;for(int i=0;i<m*n;i++) r.x[i]=clamp_max(x.x[i],xmax.x[i]);return r;}
+{
+    MATRIX<T,m,n> r;
+    for(int i=0;i<m*n;i++) r.x[i]=clamp_max(x.x[i],xmax.x[i]);
+    return r;}
 }
 #endif

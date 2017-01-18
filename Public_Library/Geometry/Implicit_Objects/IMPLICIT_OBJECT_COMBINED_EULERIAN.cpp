@@ -30,7 +30,8 @@ IMPLICIT_OBJECT_COMBINED_EULERIAN(IMPLICIT_OBJECT<TV>* implicit_object1_input,bo
 template<class TV> IMPLICIT_OBJECT_COMBINED_EULERIAN<TV>::
 ~IMPLICIT_OBJECT_COMBINED_EULERIAN()
 {
-    if(owns_implicit_object1) delete implicit_object1;if(owns_implicit_object2) delete implicit_object2;
+    if(owns_implicit_object1) delete implicit_object1;
+    if(owns_implicit_object2) delete implicit_object2;
 }
 //#####################################################################
 // Function Set_Weights

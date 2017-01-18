@@ -120,7 +120,9 @@ public:
     {x/=a;return *this;}
 
     MATRIX<T,d> operator+(const MATRIX<T,d>& A) const
-    {MATRIX<T,d> r(A);for(int i=0;i<d;i++) r(i,i)+=x(i);return r;}
+    {MATRIX<T,d> r(A);
+    for(int i=0;i<d;i++) r(i,i)+=x(i);
+    return r;}
 
     MATRIX<T,d> operator-(const MATRIX<T,d>& A) const
     {return *this+-A;}
@@ -168,12 +170,15 @@ public:
     {return v/x;}
 
     VECTOR<T,d> Robust_Inverse_Times(const VECTOR<T,d>& v) const
-    {VECTOR<T,d> r;for(int i=0;i<d;i++) r(i)=Robust_Divide(v(i),x(i));return r;}
+    {VECTOR<T,d> r;
+    for(int i=0;i<d;i++) r(i)=Robust_Divide(v(i),x(i));
+    return r;}
 
     template<class T_MATRIX>
     auto Times_Transpose(const MATRIX_BASE<T,T_MATRIX>& B) const
     {WARN_IF_NOT_EFFICIENT(T_MATRIX);assert(B.Columns()==3);decltype(*this*B.Derived().Transposed()) M((INITIAL_SIZE)B.Columns(),(INITIAL_SIZE)B.Rows());
-    for(int k=0;k<B.Rows();k++) for(int i=0;i<B.Columns();i++) M(i,k)=x(i)*B(k,i);return M;}
+    for(int k=0;k<B.Rows();k++) for(int i=0;i<B.Columns();i++) M(i,k)=x(i)*B(k,i);
+    return M;}
 
     DIAGONAL_MATRIX Times_Transpose(const DIAGONAL_MATRIX& M) const
     {return *this*M;}
@@ -189,7 +194,9 @@ public:
     {return *this*M;}
 
     MATRIX<T,d> Times_Transpose(const MATRIX<T,d>& A) const
-    {MATRIX<T,d> r;for(int i=0;i<d;i++) for(int j=0;j<d;j++) r(i,j)=x(i)*A(j,i);return r;}
+    {MATRIX<T,d> r;
+    for(int i=0;i<d;i++) for(int j=0;j<d;j++) r(i,j)=x(i)*A(j,i);
+    return r;}
 
     MATRIX<T,d> Times_Transpose(const UPPER_TRIANGULAR_MATRIX<T,d>& M) const
     {return (M**this).Transposed();}
@@ -272,7 +279,9 @@ public:
     {return DIAGONAL_MATRIX(abs(x));}
 
     DIAGONAL_MATRIX Sign() const
-    {DIAGONAL_MATRIX r;for(int i=0;i<d;i++) r.x(i)=sign(x(i));return r;}
+    {DIAGONAL_MATRIX r;
+    for(int i=0;i<d;i++) r.x(i)=sign(x(i));
+    return r;}
 
     static DIAGONAL_MATRIX Identity_Matrix()
     {return DIAGONAL_MATRIX()+1;}

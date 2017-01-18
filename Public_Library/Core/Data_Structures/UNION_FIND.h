@@ -57,7 +57,8 @@ public:
         if(max_rank<ranks(root_i)){max_rank=ranks(root_i);root=root_i;max_tie=false;}
         else if(max_rank==ranks(root_i) && root_i!=root) max_tie=true;}
     for(int i=0;i<d;i++) Path_Compress(indices[i],root);
-    if(max_tie) ranks(root)++;return root;}
+    if(max_tie) ranks(root)++;
+    return root;}
 
     void Merge(const UNION_FIND<ID>& union_find)
     {assert(Size()==union_find.Size());

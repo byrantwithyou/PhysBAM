@@ -72,7 +72,9 @@ Noise_Function3(const VECTOR<T,3>& p)
 template<class T> T NOISE<T>::
 Noise1(const VECTOR<T,3>& p_input,const int octaves,const T persistance)
 {
-    if(!initialized) Initialize_Noise();T result=0,factor=1;VECTOR<T,3> p=p_input;
+    if(!initialized) Initialize_Noise();
+    T result=0,factor=1;
+    VECTOR<T,3> p=p_input;
     for(int i=0;i<octaves;i++,factor*=persistance){result+=Noise_Function1(p)*factor;p*=2;}
     return result/Normalization_Factor(octaves,persistance);
 }
@@ -83,7 +85,10 @@ template<class T> void NOISE<T>::
 Noise3(const VECTOR<T,3>& p_input,VECTOR<T,3>& v,const int octaves,const T persistance)
 {
     VECTOR<T,3> p=p_input;
-    if(!initialized) Initialize_Noise();VECTOR<T,3> c;T factor=1;v.x=v.y=v.z=0;
+    if(!initialized) Initialize_Noise();
+    VECTOR<T,3> c;
+    T factor=1;
+    v.x=v.y=v.z=0;
     for(int i=0;i<octaves;i++,factor*=persistance){v=Noise_Function3(p);c*=factor;v+=c;p*=2;}
 }
 //#####################################################################

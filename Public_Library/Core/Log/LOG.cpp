@@ -81,10 +81,12 @@ class LOG_CERR_BUFFER:public std::stringbuf
 {
     int sync()
     {if(!Instance()->suppress_cerr){
-        if(LOG_ENTRY::start_on_separate_line) ::std::putchar('\n');LOG_ENTRY::start_on_separate_line=false;
+        if(LOG_ENTRY::start_on_separate_line) ::std::putchar('\n');
+        LOG_ENTRY::start_on_separate_line=false;
         ::std::fputs(str().c_str(),stderr);}
     if(Instance()->log_file){
-        if(LOG_ENTRY::log_file_start_on_separate_line) ::std::putc('\n',Instance()->log_file);LOG_ENTRY::log_file_start_on_separate_line=false;
+        if(LOG_ENTRY::log_file_start_on_separate_line) ::std::putc('\n',Instance()->log_file);
+        LOG_ENTRY::log_file_start_on_separate_line=false;
         std::string buffer=str();
         for(size_t start=0;start<buffer.length();){
             size_t end=buffer.find('\n',start);
@@ -102,14 +104,19 @@ class LOG_CERR_BUFFER:public std::stringbuf
 LOG_CLASS::LOG_CLASS(const bool suppress_cout_input,const bool suppress_cerr_input,const bool suppress_timing_input,const int verbosity_level_input,const bool cache_initial_output)
     :timer_singleton(TIMER::Singleton()),suppress_cout(suppress_cout_input),suppress_cerr(suppress_cerr_input),suppress_timing(suppress_timing_input),log_file(0),verbosity_level(verbosity_level_input),xml(true)
 {
-    if(private_instance) delete private_instance;private_instance=this;
+    if(private_instance) delete private_instance;
+    private_instance=this;
     if(cache_initial_output){
         log_file=FILE_UTILITIES::Temporary_File();
         if(!log_file) PHYSBAM_FATAL_ERROR(LOG::sprintf("Couldn't create temporary log file tmpfile=%s",log_file));
         log_file_temporary=true;}
     timer_id=timer_singleton->Register_Timer();
-    if(cout_buffer) delete cout_buffer;cout_buffer=new LOG_COUT_BUFFER;cout.rdbuf(cout_buffer);
-    if(cerr_buffer) delete cerr_buffer;cerr_buffer=new LOG_CERR_BUFFER;cerr.rdbuf(cerr_buffer);
+    if(cout_buffer) delete cout_buffer;
+    cout_buffer=new LOG_COUT_BUFFER;
+    cout.rdbuf(cout_buffer);
+    if(cerr_buffer) delete cerr_buffer;
+    cerr_buffer=new LOG_CERR_BUFFER;
+    cerr.rdbuf(cerr_buffer);
     root=new LOG_SCOPE(0,0,timer_id,"SIMULATION","Simulation",verbosity_level);
     current_entry=root;root->Start(*this);
 }

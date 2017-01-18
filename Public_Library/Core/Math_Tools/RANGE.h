@@ -312,7 +312,9 @@ public:
     static RANGE<TV> Bounding_Box(const T_ARRAY& points)
     {STATIC_ASSERT((is_same<typename T_ARRAY::ELEMENT,TV>::value));
     if(!points.Size()) return Empty_Box();
-    RANGE<TV> box(points(0));for(int i=1;i<points.Size();i++) box.Enlarge_Nonempty_Box_To_Include_Point(points(i));return box;}
+    RANGE<TV> box(points(0));
+    for(int i=1;i<points.Size();i++) box.Enlarge_Nonempty_Box_To_Include_Point(points(i));
+    return box;}
 
     RANGE<VECTOR<T,d-1> > Remove_Dimension(int dimension) const
     {return RANGE<VECTOR<T,d-1> >(min_corner.Remove_Index(dimension),max_corner.Remove_Index(dimension));}

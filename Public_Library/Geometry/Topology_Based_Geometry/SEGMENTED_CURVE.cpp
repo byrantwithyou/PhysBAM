@@ -138,7 +138,8 @@ template<class TV> void SEGMENTED_CURVE<TV>::
 Rescale(const TV& scaling)
 {
     for(int k=0;k<particles.Size();k++) particles.X(k)*=scaling;
-    if(segment_list) Update_Segment_List();if(bounding_box) Update_Bounding_Box();
+    if(segment_list) Update_Segment_List();
+    if(bounding_box) Update_Bounding_Box();
 }
 //#####################################################################
 // Function Average_Edge_Length
