@@ -139,7 +139,7 @@ Write_Substep(const std::string& title,const int substep,const int level)
     if(level<=example.write_substeps_level){
         example.frame_title=title;
         LOG::printf("Writing substep [%s]: output_number=%i, time=%g, frame=%i, substep=%i\n",
-            example.frame_title,output_number+1,time,current_frame,substep);
+            example.frame_title,output_number+1,example.time,current_frame,substep);
         Write_Output_Files(++output_number);
         example.frame_title="";}
 }
