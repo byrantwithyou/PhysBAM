@@ -31,8 +31,8 @@ template<class TV> MPM_PROJECTION_SYSTEM<TV>::
 template<class TV> void MPM_PROJECTION_SYSTEM<TV>::
 Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
 {
-    const MPM_PROJECTION_VECTOR<TV>& vx=dynamic_cast<const MPM_PROJECTION_VECTOR<TV>&>(x);
-    MPM_PROJECTION_VECTOR<TV>& vresult=dynamic_cast<MPM_PROJECTION_VECTOR<TV>&>(result);
+    const MPM_PROJECTION_VECTOR<TV>& vx=debug_cast<const MPM_PROJECTION_VECTOR<TV>&>(x);
+    MPM_PROJECTION_VECTOR<TV>& vresult=debug_cast<MPM_PROJECTION_VECTOR<TV>&>(result);
     A.Times(vx.v,vresult.v);
 }
 //#####################################################################
@@ -41,7 +41,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
 template<class TV> double MPM_PROJECTION_SYSTEM<TV>::
 Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const
 {
-    const MPM_PROJECTION_VECTOR<TV>& vx=dynamic_cast<const MPM_PROJECTION_VECTOR<TV>&>(x),vy=dynamic_cast<const MPM_PROJECTION_VECTOR<TV>&>(y);
+    const MPM_PROJECTION_VECTOR<TV>& vx=debug_cast<const MPM_PROJECTION_VECTOR<TV>&>(x),vy=debug_cast<const MPM_PROJECTION_VECTOR<TV>&>(y);
     return vx.v.Dot_Product_Double_Precision(vx.v,vy.v);
 }
 //#####################################################################
@@ -50,7 +50,7 @@ Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) con
 template<class TV> typename TV::SCALAR MPM_PROJECTION_SYSTEM<TV>::
 Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const
 {
-    const MPM_PROJECTION_VECTOR<TV>& vx=dynamic_cast<const MPM_PROJECTION_VECTOR<TV>&>(x);
+    const MPM_PROJECTION_VECTOR<TV>& vx=debug_cast<const MPM_PROJECTION_VECTOR<TV>&>(x);
     return vx.v.Maximum_Magnitude();
 }
 //#####################################################################
@@ -80,8 +80,8 @@ Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const
 template<class TV> void MPM_PROJECTION_SYSTEM<TV>::
 Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const
 {
-    const MPM_PROJECTION_VECTOR<TV>& vr=dynamic_cast<const MPM_PROJECTION_VECTOR<TV>&>(r);
-    MPM_PROJECTION_VECTOR<TV>& vz=dynamic_cast<MPM_PROJECTION_VECTOR<TV>&>(z);
+    const MPM_PROJECTION_VECTOR<TV>& vr=debug_cast<const MPM_PROJECTION_VECTOR<TV>&>(r);
+    MPM_PROJECTION_VECTOR<TV>& vz=debug_cast<MPM_PROJECTION_VECTOR<TV>&>(z);
     temp_vector.Resize(A.m);
     A.C->Solve_Forward_Substitution(vr.v,temp_vector,true);
     A.C->Solve_Backward_Substitution(temp_vector,vz.v,false,true);

@@ -24,7 +24,7 @@ template<class TV> MPM_PROJECTION_VECTOR<TV>::
 template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>& MPM_PROJECTION_VECTOR<TV>::
 operator+=(const KRYLOV_VECTOR_BASE<T>& bv)
 {
-    v+=dynamic_cast<const MPM_PROJECTION_VECTOR&>(bv).v;
+    v+=debug_cast<const MPM_PROJECTION_VECTOR&>(bv).v;
     return *this;
 }
 //#####################################################################
@@ -33,7 +33,7 @@ operator+=(const KRYLOV_VECTOR_BASE<T>& bv)
 template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>& MPM_PROJECTION_VECTOR<TV>::
 operator-=(const KRYLOV_VECTOR_BASE<T>& bv)
 {
-    v-=dynamic_cast<const MPM_PROJECTION_VECTOR&>(bv).v;
+    v-=debug_cast<const MPM_PROJECTION_VECTOR&>(bv).v;
     return *this;
 }
 //#####################################################################
@@ -51,7 +51,7 @@ operator*=(const T a)
 template<class TV> void MPM_PROJECTION_VECTOR<TV>::
 Copy(const T c,const KRYLOV_VECTOR_BASE<T>& bv)
 {
-    v.Copy(c,dynamic_cast<const MPM_PROJECTION_VECTOR&>(bv).v);
+    v.Copy(c,debug_cast<const MPM_PROJECTION_VECTOR&>(bv).v);
 }
 //#####################################################################
 // Function Copy
@@ -59,7 +59,7 @@ Copy(const T c,const KRYLOV_VECTOR_BASE<T>& bv)
 template<class TV> void MPM_PROJECTION_VECTOR<TV>::
 Copy(const T c,const KRYLOV_VECTOR_BASE<T>& bv1,const KRYLOV_VECTOR_BASE<T>& bv2)
 {
-    v.Copy(c,dynamic_cast<const MPM_PROJECTION_VECTOR&>(bv1).v,dynamic_cast<const MPM_PROJECTION_VECTOR&>(bv2).v);
+    v.Copy(c,debug_cast<const MPM_PROJECTION_VECTOR&>(bv1).v,debug_cast<const MPM_PROJECTION_VECTOR&>(bv2).v);
 }
 //#####################################################################
 // Function Raw_Size
