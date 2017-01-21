@@ -5,11 +5,15 @@
 #include <Core/Log/DEBUG_SUBSTEPS.h>
 #include <Core/Log/LOG.h>
 #include <Core/Log/SCOPE.h>
+#include <Core/Matrices/SPARSE_MATRIX_THREADED_CONSTRUCTION.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/MINRES.h>
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
+#include <Tools/Parallel_Computation/APPEND_HOLDER.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR_THREADED.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR_THREADED.h>
 #include <Grid_PDE/Poisson/PROJECTION_UNIFORM.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_MAC_DRIVER.h>
@@ -232,13 +236,28 @@ Particle_To_Grid()
     example.valid_indices.Remove_All();
     example.valid_flat_indices.Remove_All();
 
-    for(FACE_ITERATOR<TV> it(example.grid,0);it.Valid();it.Next()){
-        int i=example.mass.Standard_Index(it.Full_Index());
-        if(example.mass.array(i)){
-            example.valid_flat_indices.Append(i);
-            example.valid_indices.Append(it.Full_Index());
-            example.velocity.array(i)/=example.mass.array(i);}
-        else example.velocity.array(i)=0;}
+    APPEND_HOLDER<int> flat_h(example.valid_flat_indices);
+    APPEND_HOLDER<FACE_INDEX<TV::m> > indices_h(example.valid_indices);
+#pragma omp parallel
+    {
+#pragma omp single
+        {
+            flat_h.Init();
+            indices_h.Init();
+        }
+#pragma omp barrier
+        ARRAY<int>& flat_t=flat_h.Array();
+        ARRAY<FACE_INDEX<TV::m> >& indices_t=indices_h.Array();
+        for(FACE_ITERATOR_THREADED<TV> it(example.grid,0);it.Valid();it.Next()){
+            int i=example.mass.Standard_Index(it.Full_Index());
+            if(example.mass.array(i)){
+                flat_t.Append(i);
+                indices_t.Append(it.Full_Index());
+                example.velocity.array(i)/=example.mass.array(i);}
+            else example.velocity.array(i)=0;}
+    }
+    flat_h.Combine();
+    indices_h.Combine();
 }
 //#####################################################################
 // Function Grid_To_Particle
@@ -310,21 +329,30 @@ Compute_Poisson_Matrix()
     VECTOR<typename PARTICLE_GRID_WEIGHTS<TV>::SCRATCH,TV::m> scratch;
     for(int i=0;i<TV::m;i++)
         example.weights(i)->Compute(example.grid.Face(FACE_INDEX<TV::m>(i,TV_INT())),scratch(i),false);
-    ARRAY<T,FACE_INDEX<TV::m> > face_fraction(example.grid,3); // Fraction of region of influence that is inside
-    ARRAY<bool,FACE_INDEX<TV::m> > psi_N(example.grid);
-    for(FACE_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
+//    ARRAY<T,FACE_INDEX<TV::m> > face_fraction(example.grid,0,false); // Fraction of region of influence that is inside
+    ARRAY<bool,FACE_INDEX<TV::m> > psi_N(example.grid,3,false);
+
+#pragma omp parallel
+    for(FACE_ITERATOR_THREADED<TV> it(example.grid,3);it.Valid();it.Next()){
         TV X=it.Location();
+        bool N=false;
         for(int i=0;i<example.collision_objects.m;i++){
             MPM_COLLISION_OBJECT<TV>* o=example.collision_objects(i);
             if(o->Phi(X,example.time)<0){
-                psi_N(it.Full_Index())=true;
+                N=true;
                 example.velocity(it.Full_Index())=o->Velocity(X,example.time)(it.axis);
                 break;}}
-        if(!psi_N(it.Full_Index()))
-            for(PARTICLE_GRID_ITERATOR<TV> pit(scratch(it.axis));pit.Valid();pit.Next())
-                face_fraction(FACE_INDEX<TV::m>(it.axis,it.index+pit.Index()))+=pit.Weight();}
+        psi_N(it.Full_Index())=N;}
 
-    ARRAY<int,TV_INT> cell_index(example.grid.Domain_Indices(1));
+// #pragma omp parallel
+//     for(FACE_ITERATOR_THREADED<TV> it(example.grid);it.Valid();it.Next()){
+//         T ff=0;
+//         for(PARTICLE_GRID_ITERATOR<TV> pit(scratch(it.axis));pit.Valid();pit.Next())
+//             if(!psi_N(FACE_INDEX<TV::m>(it.axis,it.index+pit.Index())))
+//                 ff+=pit.Weight();
+//         face_fraction(it.Full_Index())=ff;}
+
+    ARRAY<int,TV_INT> cell_index(example.grid.Domain_Indices(1),false);
     int next_cell=0;
     for(CELL_ITERATOR<TV> it(example.grid,0);it.Valid();it.Next()){
         bool dirichlet=false,all_N=true;
@@ -339,51 +367,70 @@ Compute_Poisson_Matrix()
     for(CELL_ITERATOR<TV> it(example.grid,1,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
         cell_index(it.index)=-1;
 
-    SPARSE_MATRIX_FLAT_MXN<T>& A=example.projection_system.A;
-    A.Reset(next_cell);
-    for(CELL_ITERATOR<TV> it(example.grid,0);it.Valid();it.Next()){
-        int center_index=cell_index(it.index);
-        if(center_index<0) continue;
+    example.projection_system.A.Reset(next_cell);
+    ARRAY<int> tmp0,tmp1;
+#pragma omp parallel
+    {
+        SPARSE_MATRIX_THREADED_CONSTRUCTION<T> helper(example.projection_system.A,tmp0,tmp1);
+        for(CELL_ITERATOR_THREADED<TV> it(example.grid,0);it.Valid();it.Next()){
+            int center_index=cell_index(it.index);
+            if(center_index<0) continue;
     
-        T diag=0;
-        for(int a=0;a<TV::m;a++){
-            FACE_INDEX<TV::m> face(a,it.index);
-            for(int s=0;s<2;s++){
-                TV_INT cell=it.index;
-                cell(a)+=2*s-1;
-                assert(face.Cell_Index(s)==cell);
-                if(!psi_N(face)){
-                    T entry=sqr(example.grid.one_over_dX(a))/example.mass(face);
-                    if(example.use_particle_volumes) entry*=example.volume(face);
-                    diag+=entry;
-                    int ci=cell_index(cell);
-                    if(ci>=0) A.Append_Entry_To_Current_Row(ci,-entry);}
-                face.index(a)++;}}
-        A.Append_Entry_To_Current_Row(center_index,diag);
-        A.Finish_Row();}
-    A.Sort_Entries();
-    A.Construct_Incomplete_Cholesky_Factorization();
+            T diag=0;
+            helper.Start_Row();
+            for(int a=0;a<TV::m;a++){
+                FACE_INDEX<TV::m> face(a,it.index);
+                for(int s=0;s<2;s++){
+                    TV_INT cell=it.index;
+                    cell(a)+=2*s-1;
+                    assert(face.Cell_Index(s)==cell);
+                    if(!psi_N(face)){
+                        T entry=sqr(example.grid.one_over_dX(a))/example.mass(face);
+                        if(example.use_particle_volumes) entry*=example.volume(face);
+                        diag+=entry;
+                        int ci=cell_index(cell);
+                        if(ci>=0) helper.Add_Entry(ci,-entry);}
+                    face.index(a)++;}}
+            helper.Add_Entry(center_index,diag);}
+        helper.Finish();
+    }
+    example.projection_system.A.Construct_Incomplete_Cholesky_Factorization();
 
-    SPARSE_MATRIX_FLAT_MXN<T>& G=example.projection_system.gradient;
-    ARRAY<T>& M=example.projection_system.mass;
-    ARRAY<FACE_INDEX<TV::m> >& faces=example.projection_system.faces;
-    M.Remove_All();
-    faces.Remove_All();
-    G.Reset(next_cell);
-    for(FACE_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
-        if(psi_N(it.Full_Index())) continue;
-        T mass=example.mass(it.Full_Index());
-        if(!mass) continue;
-        int c0=cell_index(it.First_Cell_Index());
-        int c1=cell_index(it.Second_Cell_Index());
-        if(c0>=0) G.Append_Entry_To_Current_Row(c0,-example.grid.one_over_dX(it.axis));
-        if(c1>=0) G.Append_Entry_To_Current_Row(c1,example.grid.one_over_dX(it.axis));
-        if(c0<0 && c1<0) continue;
-        faces.Append(it.Full_Index());
-        if(example.use_particle_volumes) mass/=example.volume(it.Full_Index());
-        M.Append(mass);
-        G.Finish_Row();}
-    G.Sort_Entries();
+    example.projection_system.mass.Remove_All();
+    example.projection_system.faces.Remove_All();
+    example.projection_system.gradient.Reset(next_cell);
+    APPEND_HOLDER<T> mass_h(example.projection_system.mass);
+    APPEND_HOLDER<FACE_INDEX<TV::m> > faces_h(example.projection_system.faces);
+    ARRAY<int> tmp2,tmp3;
+#pragma omp parallel
+    {
+#pragma omp single
+        {
+            mass_h.Init();
+            faces_h.Init();
+        }
+#pragma omp barrier
+        ARRAY<T>& mass_t=mass_h.Array();
+        ARRAY<FACE_INDEX<TV::m> >& faces_t=faces_h.Array();
+        SPARSE_MATRIX_THREADED_CONSTRUCTION<T> G_helper(example.projection_system.gradient,tmp2,tmp3);
+        for(FACE_ITERATOR_THREADED<TV> it(example.grid);it.Valid();it.Next()){
+            if(psi_N(it.Full_Index())) continue;
+            T mass=example.mass(it.Full_Index());
+            if(!mass) continue;
+            int c0=cell_index(it.First_Cell_Index());
+            int c1=cell_index(it.Second_Cell_Index());
+            if(c0<0 && c1<0) continue;
+            G_helper.Start_Row(); // cannot start a row if no elements in it
+            if(c0>=0) G_helper.Add_Entry(c0,-example.grid.one_over_dX(it.axis));
+            if(c1>=0) G_helper.Add_Entry(c1,example.grid.one_over_dX(it.axis));
+            faces_t.Append(it.Full_Index());
+            if(example.use_particle_volumes) mass/=example.volume(it.Full_Index());
+            mass_t.Append(mass);
+        }
+        G_helper.Finish();
+    }
+    mass_h.Combine();
+    faces_h.Combine();
 }
 //#####################################################################
 // Function Pressure_Projection
