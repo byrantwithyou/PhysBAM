@@ -25,6 +25,7 @@ template<class TV> MPM_PROJECTION_VECTOR<TV>::
 template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>& MPM_PROJECTION_VECTOR<TV>::
 operator+=(const KRYLOV_VECTOR_BASE<T>& bv)
 {
+    TIMER_SCOPE_FUNC;
     const ARRAY<T>& b_v=debug_cast<const MPM_PROJECTION_VECTOR&>(bv).v;
 #pragma omp parallel for
     for(int i=0;i<v.m;i++)
@@ -37,6 +38,7 @@ operator+=(const KRYLOV_VECTOR_BASE<T>& bv)
 template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>& MPM_PROJECTION_VECTOR<TV>::
 operator-=(const KRYLOV_VECTOR_BASE<T>& bv)
 {
+    TIMER_SCOPE_FUNC;
     const ARRAY<T>& b_v=debug_cast<const MPM_PROJECTION_VECTOR&>(bv).v;
 #pragma omp parallel for
     for(int i=0;i<v.m;i++)
@@ -49,6 +51,7 @@ operator-=(const KRYLOV_VECTOR_BASE<T>& bv)
 template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>& MPM_PROJECTION_VECTOR<TV>::
 operator*=(const T a)
 {
+    TIMER_SCOPE_FUNC;
 #pragma omp parallel for
     for(int i=0;i<v.m;i++)
         v(i)*=a;
@@ -60,6 +63,7 @@ operator*=(const T a)
 template<class TV> void MPM_PROJECTION_VECTOR<TV>::
 Copy(const T c,const KRYLOV_VECTOR_BASE<T>& bv)
 {
+    TIMER_SCOPE("Copy 2");
     const ARRAY<T>& b_v=debug_cast<const MPM_PROJECTION_VECTOR&>(bv).v;
 #pragma omp parallel for
     for(int i=0;i<v.m;i++)
@@ -71,6 +75,7 @@ Copy(const T c,const KRYLOV_VECTOR_BASE<T>& bv)
 template<class TV> void MPM_PROJECTION_VECTOR<TV>::
 Copy(const T c,const KRYLOV_VECTOR_BASE<T>& bv1,const KRYLOV_VECTOR_BASE<T>& bv2)
 {
+    TIMER_SCOPE("Copy 3");
     const ARRAY<T>& b_v1=debug_cast<const MPM_PROJECTION_VECTOR&>(bv1).v;
     const ARRAY<T>& b_v2=debug_cast<const MPM_PROJECTION_VECTOR&>(bv2).v;
 #pragma omp parallel for

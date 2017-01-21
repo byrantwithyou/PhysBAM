@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Log/DEBUG_SUBSTEPS.h>
+#include <Core/Log/FINE_TIMER.h>
 #include <Core/Log/LOG.h>
 #include <Core/Log/SCOPE.h>
 #include <Core/Matrices/SPARSE_MATRIX_THREADED_CONSTRUCTION.h>
@@ -62,6 +63,7 @@ Execute_Main_Program()
 {
     Initialize();
     Simulate_To_Frame(example.last_frame);
+    FINE_TIMER::Dump_Timing_Info();
 }
 //#####################################################################
 // Initialize
@@ -69,6 +71,7 @@ Execute_Main_Program()
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Initialize()
 {
+    TIMER_SCOPE_FUNC;
     LOG::cout<<std::setprecision(16)<<std::endl;
     DEBUG_SUBSTEPS::Set_Write_Substeps_Level(example.substeps_delay_frame<0?example.write_substeps_level:-1);
 
@@ -112,6 +115,7 @@ Initialize()
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Advance_One_Time_Step()
 {
+    TIMER_SCOPE_FUNC;
     example.Begin_Time_Step(example.time);
 
     Update_Simulated_Particles();
@@ -139,6 +143,7 @@ Advance_One_Time_Step()
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Simulate_To_Frame(const int frame)
 {
+    TIMER_SCOPE_FUNC;
     for(;current_frame<frame;current_frame++){
         LOG::SCOPE scope("FRAME","frame %d",current_frame+1);
         example.Begin_Frame(current_frame);
@@ -169,6 +174,7 @@ Simulate_To_Frame(const int frame)
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Write_Substep(const std::string& title,const int substep,const int level)
 {
+    TIMER_SCOPE_FUNC;
     if(level<=example.write_substeps_level){
         example.frame_title=title;
         LOG::printf("Writing substep [%s]: output_number=%i, time=%g, frame=%i, substep=%i\n",
@@ -182,6 +188,7 @@ Write_Substep(const std::string& title,const int substep,const int level)
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Write_Output_Files(const int frame)
 {
+    TIMER_SCOPE_FUNC;
     LOG::SCOPE scope("Write_Output_Files");
     FILE_UTILITIES::Create_Directory(example.output_directory);
     FILE_UTILITIES::Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
@@ -198,6 +205,7 @@ Write_Output_Files(const int frame)
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Update_Particle_Weights()
 {
+    TIMER_SCOPE_FUNC;
     for(int i=0;i<TV::m;++i)
         example.weights(i)->Update(example.particles.X);
 }
@@ -207,6 +215,7 @@ Update_Particle_Weights()
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Particle_To_Grid()
 {
+    TIMER_SCOPE_FUNC;
     MPM_PARTICLES<TV>& particles=example.particles;
 
 #pragma omp parallel for
@@ -265,6 +274,7 @@ Particle_To_Grid()
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Grid_To_Particle()
 {
+    TIMER_SCOPE_FUNC;
     struct HELPER
     {
         TV V;
@@ -300,6 +310,7 @@ Grid_To_Particle()
 template<class TV> typename TV::SCALAR MPM_MAC_DRIVER<TV>::
 Compute_Volume_For_Face(const FACE_INDEX<TV::m>& face) const
 {
+    TIMER_SCOPE_FUNC;
     T total_volume=0;
     int num=0;
     int width=example.weights(face.axis)->Order()+1;
@@ -326,6 +337,7 @@ Compute_Volume_For_Face(const FACE_INDEX<TV::m>& face) const
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Compute_Poisson_Matrix()
 {
+    TIMER_SCOPE_FUNC;
     VECTOR<typename PARTICLE_GRID_WEIGHTS<TV>::SCRATCH,TV::m> scratch;
     for(int i=0;i<TV::m;i++)
         example.weights(i)->Compute(example.grid.Face(FACE_INDEX<TV::m>(i,TV_INT())),scratch(i),false);
@@ -439,6 +451,7 @@ Compute_Poisson_Matrix()
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Pressure_Projection()
 {
+    TIMER_SCOPE_FUNC;
     Compute_Poisson_Matrix();
     example.sol.v.Resize(example.projection_system.A.m);
     example.rhs.v.Resize(example.projection_system.A.m);
@@ -467,6 +480,7 @@ Pressure_Projection()
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Apply_Forces()
 {
+    TIMER_SCOPE_FUNC;
     for(int i=0;i<example.valid_flat_indices.m;i++){
         int k=example.valid_flat_indices(i);
         example.velocity.array(k)+=example.dt*example.gravity(example.valid_indices(i).axis);}
@@ -477,6 +491,7 @@ Apply_Forces()
 template<class TV> typename TV::SCALAR MPM_MAC_DRIVER<TV>::
 Compute_Dt() const
 {
+    TIMER_SCOPE_FUNC;
     T critical_speed=example.cfl*example.grid.dX.Min()/example.max_dt;
     T v=Grid_V_Upper_Bound();
     return (v>critical_speed)?(example.cfl*example.grid.dX.Min()/v):example.max_dt;
@@ -487,6 +502,7 @@ Compute_Dt() const
 template<class TV> typename TV::SCALAR MPM_MAC_DRIVER<TV>::
 Max_Particle_Speed() const
 {
+    TIMER_SCOPE_FUNC;
     T v2=0;
 #pragma omp parallel for reduction(max:v2)
     for(int k=0;k<example.simulated_particles.m;k++){
@@ -500,6 +516,7 @@ Max_Particle_Speed() const
 template<class TV> typename TV::SCALAR MPM_MAC_DRIVER<TV>::
 Grid_V_Upper_Bound() const
 {
+    TIMER_SCOPE_FUNC;
     if(!example.use_affine || !example.weights(0)->constant_scalar_inertia_tensor) return Max_Particle_Speed();
     T result=0;
     T xi=(T)6*sqrt((T)TV::m)*example.grid.one_over_dX.Min();
@@ -517,6 +534,7 @@ Grid_V_Upper_Bound() const
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Update_Simulated_Particles()
 {
+    TIMER_SCOPE_FUNC;
     example.simulated_particles.Remove_All();
     for(int p=0;p<example.particles.number;p++)
         if(example.particles.valid(p))
@@ -532,6 +550,7 @@ Update_Simulated_Particles()
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Print_Grid_Stats(const char* str,T dt)
 {
+    TIMER_SCOPE_FUNC;
     if(!example.print_stats) return;
     typename TV::SPIN am=example.Total_Grid_Angular_Momentum(dt);
     TV lm=example.Total_Grid_Linear_Momentum();
@@ -549,6 +568,7 @@ Print_Grid_Stats(const char* str,T dt)
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Print_Particle_Stats(const char* str,T dt)
 {
+    TIMER_SCOPE_FUNC;
     if(!example.print_stats) return;
     typename TV::SPIN am=example.Total_Particle_Angular_Momentum();
     TV lm=example.Total_Particle_Linear_Momentum();
@@ -566,6 +586,7 @@ Print_Particle_Stats(const char* str,T dt)
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Print_Energy_Stats(const char* str)
 {
+    TIMER_SCOPE_FUNC;
     if(!example.print_stats) return;
     T ke=example.Total_Grid_Kinetic_Energy();
     T ke2=example.Total_Particle_Kinetic_Energy();

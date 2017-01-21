@@ -2,6 +2,9 @@
 // Copyright 2016, Lin Huang, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Log/FINE_TIMER.h>
+#include <Core/Log/LOG.h>
+#include <Core/Log/SCOPE.h>
 #include <Core/Matrices/MATRIX.h>
 #include <Core/Matrices/MATRIX_MXN.h>
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
@@ -31,6 +34,7 @@ template<class TV> MPM_PROJECTION_SYSTEM<TV>::
 template<class TV> void MPM_PROJECTION_SYSTEM<TV>::
 Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
 {
+    TIMER_SCOPE_FUNC;
     const MPM_PROJECTION_VECTOR<TV>& vx=debug_cast<const MPM_PROJECTION_VECTOR<TV>&>(x);
     MPM_PROJECTION_VECTOR<TV>& vresult=debug_cast<MPM_PROJECTION_VECTOR<TV>&>(result);
     A.Times_Threaded(vx.v,vresult.v);
@@ -41,6 +45,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
 template<class TV> double MPM_PROJECTION_SYSTEM<TV>::
 Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const
 {
+    TIMER_SCOPE_FUNC;
     const MPM_PROJECTION_VECTOR<TV>& vx=debug_cast<const MPM_PROJECTION_VECTOR<TV>&>(x),vy=debug_cast<const MPM_PROJECTION_VECTOR<TV>&>(y);
     double r=0;
 #pragma omp parallel for reduction(+:r)
@@ -54,6 +59,7 @@ Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) con
 template<class TV> typename TV::SCALAR MPM_PROJECTION_SYSTEM<TV>::
 Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const
 {
+    TIMER_SCOPE_FUNC;
     const MPM_PROJECTION_VECTOR<TV>& vx=debug_cast<const MPM_PROJECTION_VECTOR<TV>&>(x);
     T r=0;
 #pragma omp parallel for reduction(max:r)
