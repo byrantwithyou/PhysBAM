@@ -79,6 +79,9 @@ public:
     void Times_Add(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result) const;
     void Times_Add_Row(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result,const int row) const;
     void Times_Subtract(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result) const;
+    void Times_Threaded(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result) const;
+    void Times_Add_Threaded(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result) const;
+    void Times_Subtract_Threaded(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result) const;
     void Transpose_Times_Add(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result) const;
     void Transpose_Times_Subtract(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result) const;
     void Negate();

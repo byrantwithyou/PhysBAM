@@ -125,6 +125,19 @@ Times_Add(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result) const
         result(i)+=sum;}
 }
 //#####################################################################
+// Function Times_Add_Threaded
+//#####################################################################
+template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
+Times_Add_Threaded(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result) const
+{
+#pragma omp parallel for
+    for(int i=0;i<m;i++){
+        T sum=(T)0;
+        for(int j=offsets(i),end=offsets(i+1);j<end;j++)
+            sum+=A(j).a*x(A(j).j);
+        result(i)+=sum;}
+}
+//#####################################################################
 // Function Times_Add
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
@@ -149,6 +162,19 @@ Times_Subtract(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result) const
         result(i)-=sum;}
 }
 //#####################################################################
+// Function Times_Subtract_Threaded
+//#####################################################################
+template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
+Times_Subtract_Threaded(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result) const
+{
+#pragma omp parallel for
+    for(int i=0;i<m;i++){
+        T sum=(T)0;
+        for(int j=offsets(i),end=offsets(i+1);j<end;j++)
+            sum+=A(j).a*x(A(j).j);
+        result(i)-=sum;}
+}
+//#####################################################################
 // Function Times
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
@@ -156,6 +182,15 @@ Times(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result) const
 {
     result.Fill(0);
     Times_Add(x,result);
+}
+//#####################################################################
+// Function Times_Threaded
+//#####################################################################
+template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
+Times_Threaded(ARRAY_VIEW<const T> x,ARRAY_VIEW<T> result) const
+{
+    result.Fill(0);
+    Times_Add_Threaded(x,result);
 }
 //#####################################################################
 // Function Transpose_Times_Add
