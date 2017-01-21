@@ -2,6 +2,7 @@
 // Copyright 2016, Lin Huang, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Log/FINE_TIMER.h>
 #include <Hybrid_Methods/Projection/MPM_PROJECTION_VECTOR.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -24,7 +25,10 @@ template<class TV> MPM_PROJECTION_VECTOR<TV>::
 template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>& MPM_PROJECTION_VECTOR<TV>::
 operator+=(const KRYLOV_VECTOR_BASE<T>& bv)
 {
-    v+=debug_cast<const MPM_PROJECTION_VECTOR&>(bv).v;
+    const ARRAY<T>& b_v=debug_cast<const MPM_PROJECTION_VECTOR&>(bv).v;
+#pragma omp parallel for
+    for(int i=0;i<v.m;i++)
+        v(i)+=b_v(i);
     return *this;
 }
 //#####################################################################
@@ -33,7 +37,10 @@ operator+=(const KRYLOV_VECTOR_BASE<T>& bv)
 template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>& MPM_PROJECTION_VECTOR<TV>::
 operator-=(const KRYLOV_VECTOR_BASE<T>& bv)
 {
-    v-=debug_cast<const MPM_PROJECTION_VECTOR&>(bv).v;
+    const ARRAY<T>& b_v=debug_cast<const MPM_PROJECTION_VECTOR&>(bv).v;
+#pragma omp parallel for
+    for(int i=0;i<v.m;i++)
+        v(i)-=b_v(i);
     return *this;
 }
 //#####################################################################
@@ -42,7 +49,9 @@ operator-=(const KRYLOV_VECTOR_BASE<T>& bv)
 template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>& MPM_PROJECTION_VECTOR<TV>::
 operator*=(const T a)
 {
-    v*=a;
+#pragma omp parallel for
+    for(int i=0;i<v.m;i++)
+        v(i)*=a;
     return *this;
 }
 //#####################################################################
@@ -51,7 +60,10 @@ operator*=(const T a)
 template<class TV> void MPM_PROJECTION_VECTOR<TV>::
 Copy(const T c,const KRYLOV_VECTOR_BASE<T>& bv)
 {
-    v.Copy(c,debug_cast<const MPM_PROJECTION_VECTOR&>(bv).v);
+    const ARRAY<T>& b_v=debug_cast<const MPM_PROJECTION_VECTOR&>(bv).v;
+#pragma omp parallel for
+    for(int i=0;i<v.m;i++)
+        v(i)=c*b_v(i);
 }
 //#####################################################################
 // Function Copy
@@ -59,7 +71,11 @@ Copy(const T c,const KRYLOV_VECTOR_BASE<T>& bv)
 template<class TV> void MPM_PROJECTION_VECTOR<TV>::
 Copy(const T c,const KRYLOV_VECTOR_BASE<T>& bv1,const KRYLOV_VECTOR_BASE<T>& bv2)
 {
-    v.Copy(c,debug_cast<const MPM_PROJECTION_VECTOR&>(bv1).v,debug_cast<const MPM_PROJECTION_VECTOR&>(bv2).v);
+    const ARRAY<T>& b_v1=debug_cast<const MPM_PROJECTION_VECTOR&>(bv1).v;
+    const ARRAY<T>& b_v2=debug_cast<const MPM_PROJECTION_VECTOR&>(bv2).v;
+#pragma omp parallel for
+    for(int i=0;i<v.m;i++)
+        v(i)=c*b_v1(i)+b_v2(i);
 }
 //#####################################################################
 // Function Raw_Size

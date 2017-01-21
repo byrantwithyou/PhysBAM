@@ -33,7 +33,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
 {
     const MPM_PROJECTION_VECTOR<TV>& vx=debug_cast<const MPM_PROJECTION_VECTOR<TV>&>(x);
     MPM_PROJECTION_VECTOR<TV>& vresult=debug_cast<MPM_PROJECTION_VECTOR<TV>&>(result);
-    A.Times(vx.v,vresult.v);
+    A.Times_Threaded(vx.v,vresult.v);
 }
 //#####################################################################
 // Function Inner_Product
@@ -42,7 +42,11 @@ template<class TV> double MPM_PROJECTION_SYSTEM<TV>::
 Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const
 {
     const MPM_PROJECTION_VECTOR<TV>& vx=debug_cast<const MPM_PROJECTION_VECTOR<TV>&>(x),vy=debug_cast<const MPM_PROJECTION_VECTOR<TV>&>(y);
-    return vx.v.Dot_Product_Double_Precision(vx.v,vy.v);
+    double r=0;
+#pragma omp parallel for reduction(+:r)
+    for(int i=0;i<vx.v.m;i++)
+        r+=vx.v(i)*vy.v(i);
+    return r;
 }
 //#####################################################################
 // Function Convergence_Norm
@@ -51,7 +55,11 @@ template<class TV> typename TV::SCALAR MPM_PROJECTION_SYSTEM<TV>::
 Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const
 {
     const MPM_PROJECTION_VECTOR<TV>& vx=debug_cast<const MPM_PROJECTION_VECTOR<TV>&>(x);
-    return vx.v.Maximum_Magnitude();
+    T r=0;
+#pragma omp parallel for reduction(max:r)
+    for(int i=0;i<vx.v.m;i++)
+        r=std::max(r,std::abs(vx.v(i)));
+    return r;
 }
 //#####################################################################
 // Function Project
