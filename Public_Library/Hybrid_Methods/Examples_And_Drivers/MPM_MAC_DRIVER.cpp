@@ -394,7 +394,8 @@ Compute_Poisson_Matrix()
             helper.Add_Entry(center_index,diag);}
         helper.Finish();
     }
-    example.projection_system.A.Construct_Incomplete_Cholesky_Factorization();
+    if(example.projection_system.use_preconditioner)
+        example.projection_system.A.Construct_Incomplete_Cholesky_Factorization();
 
     example.projection_system.mass.Remove_All();
     example.projection_system.faces.Remove_All();

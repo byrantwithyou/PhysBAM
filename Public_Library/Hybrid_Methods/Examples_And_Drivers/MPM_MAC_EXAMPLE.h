@@ -84,6 +84,7 @@ public:
     int solver_iterations;
     int threads;
     bool use_particle_volumes;
+    bool use_preconditioner;
 
     // debugging
     DEBUG_PARTICLES<TV>& debug_particles;

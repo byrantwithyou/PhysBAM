@@ -15,6 +15,7 @@
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS_SPLINE.h>
+#include <Hybrid_Methods/Projection/MPM_PROJECTION_SYSTEM.h>
 #include "STANDARD_TESTS_BASE.h"
 #ifdef USE_OPENMP
 #include <omp.h>
@@ -73,6 +74,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-use_volume",&use_particle_volumes,"use particle volumes to avoid boiling");
     parse_args.Add("-test_system",&test_system,"run sanity checks on Krylov systems");
     parse_args.Add("-test_output_prefix",&test_output_prefix,&use_test_output,"","prefix to use for test output");
+    parse_args.Add_Not("-no_preconditioner",&this->projection_system.use_preconditioner,"disable preconditioner");
 
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);
