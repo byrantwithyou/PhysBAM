@@ -7,7 +7,7 @@
 
 #include <Core/Arrays/ATTRIBUTE_ID.h>
 #include <Core/Log/DEBUG_UTILITIES.h>
-#include <Hybrid_Methods/MPM_PLASTICITY_MODEL.h>
+#include <Hybrid_Methods/Forces/MPM_PLASTICITY_MODEL.h>
 #include <cmath>
 namespace PhysBAM{
 template<class TV>

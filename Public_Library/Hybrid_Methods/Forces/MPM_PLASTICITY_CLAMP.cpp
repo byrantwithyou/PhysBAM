@@ -6,7 +6,7 @@
 #include <Core/Matrices/MATRIX.h>
 #include <Core/Matrices/SYMMETRIC_MATRIX.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
-#include <Hybrid_Methods/MPM_PLASTICITY_CLAMP.h>
+#include <Hybrid_Methods/Forces/MPM_PLASTICITY_CLAMP.h>
 namespace PhysBAM{
 //#####################################################################
 // Constructor

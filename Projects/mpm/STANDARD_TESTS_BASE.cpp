@@ -19,13 +19,13 @@
 #include <Deformables/Forces/DEFORMABLE_GRAVITY.h>
 #include <Deformables/Forces/FINITE_VOLUME.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
+#include <Hybrid_Methods/Forces/MPM_DRUCKER_PRAGER.h>
 #include <Hybrid_Methods/Forces/MPM_FINITE_ELEMENTS.h>
 #include <Hybrid_Methods/Forces/MPM_GRAVITY.h>
 #include <Hybrid_Methods/Forces/MPM_PLASTIC_FINITE_ELEMENTS.h>
+#include <Hybrid_Methods/Forces/MPM_PLASTICITY_CLAMP.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS_SPLINE.h>
-#include <Hybrid_Methods/MPM_DRUCKER_PRAGER.h>
-#include <Hybrid_Methods/MPM_PLASTICITY_CLAMP.h>
 #include "STANDARD_TESTS_BASE.h"
 #ifdef USE_OPENMP
 #include <omp.h>

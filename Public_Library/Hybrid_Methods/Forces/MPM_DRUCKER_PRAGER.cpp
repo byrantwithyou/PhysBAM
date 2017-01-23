@@ -7,8 +7,8 @@
 #include <Core/Matrices/MATRIX.h>
 #include <Core/Matrices/SYMMETRIC_MATRIX.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
+#include <Hybrid_Methods/Forces/MPM_DRUCKER_PRAGER.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
-#include <Hybrid_Methods/MPM_DRUCKER_PRAGER.h>
 namespace PhysBAM{
 //#####################################################################
 // Constructor

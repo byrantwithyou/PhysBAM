@@ -15,9 +15,9 @@
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/MPM_PLASTIC_FINITE_ELEMENTS.h>
+#include <Hybrid_Methods/Forces/MPM_PLASTICITY_MODEL.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
-#include <Hybrid_Methods/MPM_PLASTICITY_MODEL.h>
 #include <Hybrid_Methods/System/FLUID_KRYLOV_SYSTEM.h>
 #include <Hybrid_Methods/System/FLUID_KRYLOV_VECTOR.h>
 #include <Hybrid_Methods/System/KKT_KRYLOV_SYSTEM.h>
