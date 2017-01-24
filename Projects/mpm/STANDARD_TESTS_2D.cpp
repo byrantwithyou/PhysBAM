@@ -152,8 +152,7 @@ Initialize()
 //            Add_Fixed_Corotated(1e2*unit_p*scale_E,0.3);
         } break;
         case 4:{ // colliding of two rings
-            if(!user_resolution) resolution=48;
-            Set_Grid(RANGE<TV>(TV(),TV(0.48,0.48))*m);
+            Set_Grid(RANGE<TV>(TV(),TV(0.48,0.48))*m,TV_INT()+1,48);
             ARRAY<SPHERE<TV> > spheres;
             ARRAY<TV> v0;
             ARRAY<T> r;
@@ -177,7 +176,7 @@ Initialize()
         case 5:{ // rebound of an elastic cylinder
             if(!user_resolution) resolution=10;
             T dx=(T)5/resolution*m;
-            Set_Grid(RANGE<TV>(TV(),TV(15,5)*m).Thickened(dx*(T)4.5),TV_INT(3,1),TV_INT()+9);
+            Set_Grid(RANGE<TV>(TV(),TV(15,5)*m).Thickened(dx*(T)4.5),TV_INT(3,1),TV_INT()+9,1,10);
             Add_Collision_Object(RANGE<TV>(TV(-5,-5)*m,TV(0+dx/2,15*m)),COLLISION_TYPE::slip,0);
             Add_Collision_Object(RANGE<TV>(TV(15*m-dx/2,-5*m),TV(20,15)*m),COLLISION_TYPE::slip,0);
             SPHERE<TV> sphere(TV(2.5,2.5)*m,1.5*m);
@@ -190,7 +189,7 @@ Initialize()
             if(!user_resolution) resolution=12;
             int third_resolution=(resolution+2)/3;
             T dx=(T)4/third_resolution;
-            Set_Grid(RANGE<TV>(TV(),TV(20,12)*m).Thickened(dx*(T)4.5),TV_INT(5,3),TV_INT()+9,3);
+            Set_Grid(RANGE<TV>(TV(),TV(20,12)*m).Thickened(dx*(T)4.5),TV_INT(5,3),TV_INT()+9,3,12);
             T density=5*unit_rho*scale_mass;
             SPHERE<TV> sphere1(TV(3,3)*m,2*m);
             Seed_Particles(sphere1,[=](const TV& X){return TV(0.75*(m/s),0);},0,density,particles_per_cell);
@@ -200,8 +199,7 @@ Initialize()
         } break;
         case 7:{ // ping-pong ring
             // ./mpm 7 -flip 0  -affine -midpoint -max_dt 1e-3 -cfl .1 -framerate 2400 -newton_tolerance 1e-5 -solver_tolerance 1e-5  -last_frame 240 -order 2 -print_stats | grep 'total'
-            if(!user_resolution) resolution=480;
-            Set_Grid(RANGE<TV>(TV(),TV(0.48,0.48)*m));
+            Set_Grid(RANGE<TV>(TV(),TV(0.48,0.48)*m),TV_INT()+1,480);
             Add_Collision_Object(RANGE<TV>(TV(-5,-5),TV(0.11,15))*m,COLLISION_TYPE::separate,0);
             Add_Collision_Object(RANGE<TV>(TV(0.3,-5),TV(20,15))*m,COLLISION_TYPE::separate,0);
             ARRAY<SPHERE<TV> > spheres;
@@ -222,8 +220,7 @@ Initialize()
             Add_Neo_Hookean(0.073e9*unit_p*scale_E,0.4);
         } break;
         case 8:{ // collision an elastic cylinder (TODO: fix description.)
-            if(!user_resolution) resolution=10;
-            Set_Grid(RANGE<TV>(TV(),TV(5,5))*m,TV_INT()+1,TV_INT()+9);
+            Set_Grid(RANGE<TV>(TV(),TV(5,5))*m,TV_INT()+1,TV_INT()+9,1,10);
             Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,false);
             Add_Collision_Object(SPHERE<TV>(TV(4,3)*m,1*m),COLLISION_TYPE::separate,.3);
             SPHERE<TV> sphere(TV(2.55,3.55)*m,.3*m);
@@ -234,8 +231,7 @@ Initialize()
             Add_Gravity(m/(s*s)*TV(0,-1.8));
         } break;
         case 9:{ // collision an elastic cylinder (TODO: fix description.)
-            if(!user_resolution) resolution=10;
-            Set_Grid(RANGE<TV>(TV(),TV(5,5))*m,TV_INT()+1,TV_INT()+9);
+            Set_Grid(RANGE<TV>(TV(),TV(5,5))*m,TV_INT()+1,TV_INT()+9,1,10);
             Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,false);
             SPHERE<TV> sphere(TV(2.55,3.55)*m,.3*m);
             T density=4*unit_rho*scale_mass;
