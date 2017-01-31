@@ -267,6 +267,7 @@ Particle_To_Grid()
     }
     flat_h.Combine();
     indices_h.Combine();
+    if(example.flip) example.velocity_save=example.velocity;
 }
 //#####################################################################
 // Function Grid_To_Particle
@@ -278,28 +279,32 @@ Grid_To_Particle()
     struct HELPER
     {
         TV V;
+        TV flip_V;
         MATRIX<T,TV::m> B;
     };
 
     MPM_PARTICLES<TV>& particles=example.particles;
     T dt=example.dt;
+    bool use_flip=example.flip;
     example.gather_scatter.template Gather<HELPER>(true,
         [](int p,HELPER& h){h=HELPER();},
-        [this,dt,&particles](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,HELPER& h)
+        [this,dt,&particles,use_flip](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,HELPER& h)
         {
             T w=it.Weight();
             FACE_INDEX<TV::m> index=it.Index();
             T V=example.velocity(index);
             h.V(index.axis)+=w*V;
+            if(use_flip) h.flip_V(index.axis)+=w*(V-example.velocity_save(index));
             if(example.use_affine){
                 TV Z=example.grid.Face(index);
                 h.B.Add_Row(index.axis,w*V*(Z-particles.X(p)));}
         },
-        [this,dt,&particles](int p,HELPER& h)
+        [this,dt,&particles,use_flip](int p,HELPER& h)
         {
             if(particles.store_B) particles.B(p)=h.B;
             particles.X(p)+=dt*h.V;
-            particles.V(p)=h.V;
+            if(use_flip) particles.V(p)=(1-example.flip)*h.V+example.flip*(particles.V(p)+h.flip_V);
+            else particles.V(p)=h.V;
 
             if(!example.grid.domain.Lazy_Inside(particles.X(p))) particles.valid(p)=false;
         });

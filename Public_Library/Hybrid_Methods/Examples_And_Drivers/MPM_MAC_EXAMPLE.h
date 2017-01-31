@@ -43,7 +43,7 @@ public:
 
     // grid stuff
     ARRAY<T,FACE_INDEX<TV::m> > mass,volume,density;
-    ARRAY<T,FACE_INDEX<TV::m> > velocity;
+    ARRAY<T,FACE_INDEX<TV::m> > velocity,velocity_save;
     ARRAY<TV,FACE_INDEX<TV::m> > location;
     ARRAY<int> valid_flat_indices;
     ARRAY<FACE_INDEX<TV::m> > valid_indices;
@@ -58,6 +58,7 @@ public:
     GATHER_SCATTER<TV>& gather_scatter;
     bool use_affine;
     bool use_early_gradient_transfer;
+    T flip;
 
     // objects
     ARRAY<MPM_COLLISION_OBJECT<TV>*> collision_objects;

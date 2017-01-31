@@ -25,7 +25,7 @@ MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type)
     projection_system(*new MPM_PROJECTION_SYSTEM<TV>),
     sol(*new MPM_PROJECTION_VECTOR<TV>),rhs(*new MPM_PROJECTION_VECTOR<TV>),
     ghost(3),gather_scatter(*new GATHER_SCATTER<TV>(grid,simulated_particles)),
-    use_affine(true),use_early_gradient_transfer(false),initial_time(0),
+    use_affine(true),use_early_gradient_transfer(false),flip(0),initial_time(0),
     last_frame(100),write_substeps_level(-1),substeps_delay_frame(-1),
     output_directory("output"),data_directory("../../Public_Data"),use_test_output(false),
     restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),
