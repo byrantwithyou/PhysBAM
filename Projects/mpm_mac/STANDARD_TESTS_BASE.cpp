@@ -200,8 +200,6 @@ Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,T
     if(particles.store_B && dV) particles.B(p)=dV(X)*weights(0)->Dp(X);
     if(particles.store_C && dV) particles.C(p)=dV(X);
     if(particles.store_S) particles.S(p)=SYMMETRIC_MATRIX<T,TV::m>()+1;
-    // Assign default value(0) for particle phase.
-    if(particles.store_phase) particles.phase(p)=0;
     particles.mass(p)=mass;
     particles.volume(p)=volume;
     ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
