@@ -419,6 +419,7 @@ Initialize_Components_And_Key_Bindings()
         OPENGL_COMPONENT_MPM_PARTICLES_3D<T>* component=new OPENGL_COMPONENT_MPM_PARTICLES_3D<T>(stream_type,filename);
         Add_Component(component,"Mpm particles",'m',BASIC_VISUALIZATION<T>::SELECTABLE|BASIC_VISUALIZATION<T>::OWNED);
         opengl_world.Append_Bind_Key('W',component->viewer_callbacks.Get("toggle_draw_velocities"));
+        opengl_world.Append_Bind_Key('y',component->viewer_callbacks.Get("toggle_draw_phases"));
         opengl_world.Append_Bind_Key('q',component->viewer_callbacks.Get("show_colored_wireframe"));
         opengl_world.Append_Bind_Key('f',component->viewer_callbacks.Get("toggle_F"));
         opengl_world.Append_Bind_Key('b',component->viewer_callbacks.Get("toggle_B"));

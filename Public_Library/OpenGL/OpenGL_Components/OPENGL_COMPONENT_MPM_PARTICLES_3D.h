@@ -10,6 +10,7 @@
 #include <Core/Arrays/ARRAY.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT.h>
+#include <OpenGL/OpenGL/OPENGL_INDEXED_COLOR_MAP.h>
 
 namespace PhysBAM
 {
@@ -43,12 +44,14 @@ public:
     virtual RANGE<TV> Selection_Bounding_Box() const override;
     bool Destroy_Selection_After_Frame_Change() override;
     void Toggle_Draw_Velocities();
+    void Toggle_Draw_Phases();
     void Increase_Vector_Size();
     void Decrease_Vector_Size();
     void Toggle_Arrowhead();
     void Set_Slice(OPENGL_SLICE *slice_input) override;
 
 private:
+    OPENGL_INDEXED_COLOR_MAP* color_map;
     void Reinitialize(bool force=false);
 
 public:
@@ -56,6 +59,7 @@ public:
     OPENGL_COLOR default_color;
     OPENGL_COLOR velocity_color;
     bool draw_velocities;
+    bool draw_phases;
     bool draw_arrows;
     bool draw_B;
     bool draw_F;
