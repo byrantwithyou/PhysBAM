@@ -17,7 +17,7 @@ template<class TV> class MPM_PARTICLES;
 template<class TV> class GATHER_SCATTER;
 template<class TV> class MPM_FORCE_HELPER;
 
-const ATTRIBUTE_ID ATTRIBUTE_ID_VISCOSITY(56);
+const ATTRIBUTE_ID ATTRIBUTE_ID_VISCOSITY(57);
 
 template<class TV>
 class MPM_VISCOSITY:public PARTICLE_GRID_FORCES<TV>
