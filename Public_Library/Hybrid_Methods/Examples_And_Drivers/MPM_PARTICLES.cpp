@@ -110,12 +110,8 @@ Store_Phase(bool store)
 {
     if(store_phase==store) return;
     store_phase=store;
-    if(store){
-        Add_Array(ATTRIBUTE_ID_PHASE,&phase);
-    }
-    else{
-        Remove_Array(ATTRIBUTE_ID_PHASE);
-    }
+    if(store) Add_Array(ATTRIBUTE_ID_PHASE,&phase);
+    else Remove_Array(ATTRIBUTE_ID_PHASE);
 }
 //#####################################################################
 // Function Initialize_MPM_Particles
