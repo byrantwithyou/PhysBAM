@@ -8,7 +8,6 @@
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
-#include <OpenGL/OpenGL/OPENGL_INDEXED_COLOR_MAP.h>
 #include <OpenGL/OpenGL/OPENGL_MATERIAL.h>
 #include <OpenGL/OpenGL/OPENGL_SELECTION.h>
 #include <OpenGL/OpenGL/OPENGL_SHAPES.h>
@@ -22,14 +21,19 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> OPENGL_COMPONENT_MPM_PARTICLES_2D<T>::
 OPENGL_COMPONENT_MPM_PARTICLES_2D(STREAM_TYPE stream_type,const std::string &filename_input)
-    :OPENGL_COMPONENT<T>(stream_type,"Particles 2D"),particles(*new MPM_PARTICLES<TV>),
+    :OPENGL_COMPONENT<T>(stream_type,"Particles 2D"), color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map()),
+    particles(*new MPM_PARTICLES<TV>),
     default_color(OPENGL_COLOR::Yellow()),velocity_color(OPENGL_COLOR(1,(T).078,(T).576)),
-    draw_velocities(false),draw_arrows(true),draw_B(false),draw_F(false),
+    draw_velocities(false),draw_phases(false),draw_arrows(true),draw_B(false),draw_F(false),
     B_color(OPENGL_COLOR::Red(),OPENGL_COLOR::Green()),
     F_color(OPENGL_COLOR::Red(),OPENGL_COLOR::Green()),scale_velocities((T).025),
     filename(filename_input),frame_loaded(-1),valid(false),selected_index(-1)
 {
+    // We use white color for the default phase(0).
+    color_map->Set_Color(0,OPENGL_COLOR(1, 1, 1));
+
     viewer_callbacks.Set("toggle_draw_velocities",{[this](){Toggle_Draw_Velocities();},"Toggle draw velocities"});
+    viewer_callbacks.Set("toggle_draw_phases",{[this](){Toggle_Draw_Phases();},"Toggle draw phases"});
     viewer_callbacks.Set("increase_vector_size",{[this](){Increase_Vector_Size();},"Increase vector size"});
     viewer_callbacks.Set("decrease_vector_size",{[this](){Decrease_Vector_Size();},"Decrease vector size"});
     viewer_callbacks.Set("toggle_arrowhead",{[this](){Toggle_Arrowhead();},"Toggle arrow heads"});
@@ -46,6 +50,7 @@ template<class T> OPENGL_COMPONENT_MPM_PARTICLES_2D<T>::
 ~OPENGL_COMPONENT_MPM_PARTICLES_2D()
 {
     delete &particles;
+    delete color_map;
 }
 //#####################################################################
 // Function Valid_Frame
@@ -103,6 +108,8 @@ Display() const
     ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
     ARRAY_VIEW<MATRIX<T,TV::m> >* B=particles.template Get_Array<MATRIX<T,TV::m> >(ATTRIBUTE_ID_B);
 
+    ARRAY_VIEW<int>* phase=particles.template Get_Array<int>(ATTRIBUTE_ID_PHASE);
+
     if(draw_velocities && mode!=GL_SELECT){
         glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);
         glDisable(GL_LIGHTING);
@@ -144,8 +151,9 @@ Display() const
     if(mode==GL_SELECT) glPushName(0);
     for(int i=0;i<particles.X.m;i++){
         if(mode==GL_SELECT) glLoadName(i);
-
-        if(colors) OPENGL_COLOR((*colors)(i)).Send_To_GL_Pipeline();
+        
+        if(draw_phases && phase) color_map->Lookup((*phase)(i)).Send_To_GL_Pipeline();
+        else if(colors) OPENGL_COLOR((*colors)(i)).Send_To_GL_Pipeline();
         else default_color.Send_To_GL_Pipeline();
 
         OpenGL_Begin(GL_POINTS);
@@ -256,6 +264,14 @@ template<class T> void OPENGL_COMPONENT_MPM_PARTICLES_2D<T>::
 Toggle_Draw_Velocities()
 {
     draw_velocities=!draw_velocities;
+}
+//#####################################################################
+// Function Toggle_Draw_Phases
+//#####################################################################
+template<class T> void OPENGL_COMPONENT_MPM_PARTICLES_2D<T>::
+Toggle_Draw_Phases()
+{
+    draw_phases=!draw_phases;
 }
 //#####################################################################
 // Function Increase_Vector_Size
