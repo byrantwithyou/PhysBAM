@@ -11,8 +11,6 @@ namespace PhysBAM{
 
 template<class TV> class FLUID_KRYLOV_SYSTEM;
 template<class TV> class FLUID_KRYLOV_VECTOR;
-template<class TV> class KKT_KRYLOV_SYSTEM;
-template<class TV> class KKT_KRYLOV_VECTOR;
 template<class TV> class MPM_EXAMPLE;
 template<class TV> class MPM_OBJECTIVE;
 template<class TV> class PARTICLE_GRID_WEIGHTS;
@@ -33,12 +31,6 @@ public:
     MPM_EXAMPLE<TV>& example;
     MPM_OBJECTIVE<TV>& objective;
     MPM_KRYLOV_VECTOR<TV>& dv,&rhs;
-    FLUID_KRYLOV_SYSTEM<TV>& fluid_sys;
-    FLUID_KRYLOV_VECTOR<TV>& fluid_p;
-    FLUID_KRYLOV_VECTOR<TV>& fluid_rhs;
-    KKT_KRYLOV_SYSTEM<TV>& kkt_sys;
-    KKT_KRYLOV_VECTOR<TV>& kkt_lhs;
-    KKT_KRYLOV_VECTOR<TV>& kkt_rhs;
     
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> bv;
@@ -57,16 +49,7 @@ public:
     void Update_Particle_Weights();
     void Particle_To_Grid();
     void Grid_To_Particle();
-    void Face_To_Particle();
-    void Compute_Cell_C();
-    void Cell_To_Face();
-    void Cell_To_Face_C();
-    void Face_To_Cell();
-    void Make_Incompressible();
-    T Pressure_Projection();
-    void Solve_KKT_System();
     void Update_Plasticity_And_Hardening();
-    void Add_C_Contribution_To_DT(TV_INT id,int a,int row,T val);
     void Apply_Forces();
     void Apply_Friction();
     T Compute_Dt() const;
@@ -76,7 +59,6 @@ public:
     void Print_Grid_Stats(const char* str,T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<TV,TV_INT>* u0);
     void Print_Particle_Stats(const char* str,T dt);
     void Print_Energy_Stats(const char* str,const ARRAY<TV,TV_INT>& u);
-    MATRIX<T,TV::m> Approximate_Exponential(const MATRIX<T,TV::m>& A);
 //#####################################################################
 };
 }

@@ -56,7 +56,6 @@ STANDARD_TESTS_KKT_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_ar
     parse_args.Add("-order",&order,"order","Interpolation basis order");
     parse_args.Add_Not("-no_affine",&use_affine,"Use affine PIC");
     parse_args.Add("-affine",&use_affine,"Use affine PIC");
-    parse_args.Add("-use_f2p",&use_f2p,"Use face to particle (direct) transfer");
     parse_args.Add("-midpoint",&use_midpoint,"Use midpoint rule");
     parse_args.Add("-symplectic_euler",&use_symplectic_euler,"Use forward euler for grid update");
     parse_args.Add("-print_stats",&print_stats,"Print momentum/energy stats");

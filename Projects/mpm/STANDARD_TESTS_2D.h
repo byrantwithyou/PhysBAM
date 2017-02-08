@@ -41,7 +41,7 @@ public:
     using BASE::random;using BASE::collision_objects;using BASE::user_resolution;using BASE::Add_Walls;
     using BASE::tests;using BASE::Seed_Lagrangian_Particles;using BASE::Add_Clamped_Plasticity;
     using BASE::Add_Collision_Object;using BASE::Add_Penalty_Collision_Object;
-    using BASE::Add_Force;using BASE::Add_Fluid_Wall;using BASE::quad_F_coeff;using BASE::use_penalty_collisions;
+    using BASE::Add_Force;using BASE::quad_F_coeff;using BASE::use_penalty_collisions;
     using BASE::use_theta_c;using BASE::theta_c;using BASE::use_theta_s;using BASE::theta_s;
     using BASE::hardening_factor;using BASE::use_hardening_factor;using BASE::max_hardening;using BASE::use_max_hardening;
     using BASE::hardening_mast_case;using BASE::use_hardening_mast_case;using BASE::no_regular_seeding;

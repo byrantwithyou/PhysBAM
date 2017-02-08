@@ -24,11 +24,11 @@ MPM_EXAMPLE(const STREAM_TYPE stream_type)
     debug_particles(*new DEBUG_PARTICLES<TV>),current_velocity(0),
     lagrangian_forces(deformable_body_collection.deformables_forces),
     weights(0),gather_scatter(*new GATHER_SCATTER<TV>(grid,simulated_particles)),
-    force_helper(*new MPM_FORCE_HELPER<TV>(particles,quad_F_coeff)),incompressible(false),kkt(false),
+    force_helper(*new MPM_FORCE_HELPER<TV>(particles,quad_F_coeff)),
     initial_time(0),last_frame(100),write_substeps_level(-1),substeps_delay_frame(-1),
     output_directory("output"),data_directory("../../Public_Data"),use_test_output(false),
     mass_contour(-1),restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),ghost(3),
-    use_affine(true),use_f2p(false),use_midpoint(false),use_symplectic_euler(false),
+    use_affine(true),use_midpoint(false),use_symplectic_euler(false),
     use_early_gradient_transfer(false),use_oldroyd(false),print_stats(false),only_write_particles(false),flip(0),
     cfl(1),inv_Wi(0),newton_tolerance(1),newton_iterations(100),solver_tolerance(.5),solver_iterations(1000),
     test_diff(false),threads(1),last_te(0),last_grid_ke(0),output_structures_each_frame(false),
@@ -49,7 +49,6 @@ template<class TV> MPM_EXAMPLE<TV>::
     delete &force_helper;
     plasticity_models.Delete_Pointers_And_Clean_Memory();
     collision_objects.Delete_Pointers_And_Clean_Memory();
-    fluid_walls.Delete_Pointers_And_Clean_Memory();
     forces.Delete_Pointers_And_Clean_Memory();
     av.Delete_Pointers_And_Clean_Memory();
 }
@@ -65,8 +64,7 @@ Write_Output_Files(const int frame)
         OCTAVE_OUTPUT<T> oo(file.c_str());
         oo.Write("X",particles.X.Flattened());
         oo.Write("V",particles.V.Flattened());
-        oo.Write("u",current_velocity->array.Flattened());
-        oo.Write("mac_u",velocity_new_f.array);}
+        oo.Write("u",current_velocity->array.Flattened());}
 
 #pragma omp parallel
 #pragma omp single
@@ -87,9 +85,6 @@ Write_Output_Files(const int frame)
         if(!only_write_particles){
 #pragma omp task
             FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/centered_velocities",output_directory.c_str(),frame),*current_velocity);
-#pragma omp task
-            if(incompressible)
-                FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/mac_velocities",output_directory.c_str(),frame),velocity_new_f);
 #pragma omp task
             {
                 ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
@@ -218,12 +213,6 @@ Set_Weights(int order)
     else if(order==2) gather_scatter.weights=weights=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(grid,threads);
     else if(order==3) gather_scatter.weights=weights=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,3>(grid,threads);
     else PHYSBAM_FATAL_ERROR("Unrecognized interpolation order");
-    
-    for(int i=0;i<TV::m;++i){
-        GRID<TV> face_grid=grid.Get_Face_MAC_Grid(i);
-        if(order==1) face_weights(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,1>(face_grid,threads);
-        else if(order==2) face_weights(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(face_grid,threads);
-        else if(order==3) face_weights(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,3>(face_grid,threads);}
 }
 //#####################################################################
 // Function Total_Particle_Linear_Momentum
@@ -353,14 +342,6 @@ template<class TV> void MPM_EXAMPLE<TV>::
 Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction,std::function<FRAME<TV>(T)> func_frame,std::function<TWIST<TV>(T)> func_twist)
 {
     collision_objects.Append(new MPM_COLLISION_IMPLICIT_OBJECT<TV>(io,type,friction,func_frame,func_twist));
-}
-//#####################################################################
-// Function Add_Fluid_Wall
-//#####################################################################
-template<class TV> void MPM_EXAMPLE<TV>::
-Add_Fluid_Wall(IMPLICIT_OBJECT<TV>* io)
-{
-    fluid_walls.Append(io);
 }
 //#####################################################################
 // Function Update_Lagged_Forces

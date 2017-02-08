@@ -7,7 +7,6 @@
 #include <Core/Matrices/MATRIX.h>
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Core/Utilities/NONCOPYABLE.h>
-#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
@@ -51,34 +50,10 @@ public:
     ARRAY<DEFORMABLES_FORCES<TV>*>& lagrangian_forces;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
     PARTICLE_GRID_WEIGHTS<TV>* weights;
-    VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m> face_weights;
     GATHER_SCATTER<TV>& gather_scatter;
     ARRAY<MPM_COLLISION_OBJECT<TV>*> collision_objects;
-    ARRAY<IMPLICIT_OBJECT<TV>* > fluid_walls;
     mutable ARRAY<TV> lagrangian_forces_V,lagrangian_forces_F;
     MPM_FORCE_HELPER<TV>& force_helper;
-
-    // fluid and kkt shared stuff
-    ARRAY<bool,TV_INT> cell_solid;
-    ARRAY<int,TV_INT> cell_pressure;
-    ARRAY<MATRIX<T,TV::m>,TV_INT> cell_C;
-
-    // fluid stuff
-    bool incompressible;
-    ARRAY<int> valid_pressure_indices;
-    ARRAY<TV_INT> valid_pressure_cell_indices;
-    ARRAY<int> valid_pressure_dofs;
-    ARRAY<TV_INT> valid_pressure_cell_dofs;
-    ARRAY<T,FACE_INDEX<TV::m> > mass_f,volume_f,density_f;
-    ARRAY<T,FACE_INDEX<TV::m> > velocity_f;
-    ARRAY<T,FACE_INDEX<TV::m> > velocity_new_f;
-
-    // kkt stuff
-    bool kkt;
-    ARRAY<T,TV_INT> one_over_lambda;
-    ARRAY<T,TV_INT> J;
-    ARRAY<T,TV_INT> density;
-    SPARSE_MATRIX_FLAT_MXN<T> DT;
 
     T initial_time;
     int last_frame;
@@ -94,7 +69,6 @@ public:
     T dt,time,frame_dt,min_dt,max_dt;
     int ghost;
     bool use_affine;
-    bool use_f2p;
     bool use_midpoint;
     bool use_symplectic_euler;
     bool use_early_gradient_transfer;
@@ -142,7 +116,6 @@ public:
     void Set_Weights(int order);
     void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction,
         std::function<FRAME<TV>(T)> func_frame=0,std::function<TWIST<TV>(T)> func_twist=0);
-    void Add_Fluid_Wall(IMPLICIT_OBJECT<TV>* io);
     template<class OBJECT> typename enable_if<!is_pointer<OBJECT>::value>::type
     Add_Collision_Object(const OBJECT& object,COLLISION_TYPE type,T friction,
         std::function<FRAME<TV>(T)> func_frame=0,std::function<TWIST<TV>(T)> func_twist=0)

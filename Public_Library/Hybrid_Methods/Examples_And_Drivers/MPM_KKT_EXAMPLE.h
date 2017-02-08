@@ -82,7 +82,6 @@ public:
     T dt,time,frame_dt,min_dt,max_dt;
     int ghost;
     bool use_affine;
-    bool use_f2p;
     bool use_midpoint;
     bool use_symplectic_euler;
     bool use_early_gradient_transfer;

@@ -441,16 +441,6 @@ Initialize()
             random.Fill_Uniform(particles.V,-1*(m/s),1*(m/s));
             Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
         } break;
-        case 22:{ // (fluid test) pool of water
-            Set_Grid(RANGE<TV>::Unit_Box()*m);
-            RANGE<TV> box(grid.dX*2,TV(1*m-2*grid.dX(0),0.25*m));
-            T density=2*unit_rho*scale_mass;
-            Seed_Particles(box,0,0,density,particles_per_cell);
-            Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
-            Add_Gravity(m/(s*s)*TV(0,-1.8));
-            if(this->kkt) particles.lambda.Fill(FLT_MAX);
-            Add_Fluid_Wall(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(RANGE<TV>(TV(-5,-5),TV(5,0.1))*m));
-        } break;
         case 23:{ // (fluid test) dam break
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             RANGE<TV> box(grid.dX*2,TV(0.2,0.75)*m);
@@ -467,7 +457,6 @@ Initialize()
             Seed_Particles(sphere,0,0,density,particles_per_cell);
             Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
             Add_Gravity(m/(s*s)*TV(0,-1.8));
-            if(this->kkt) particles.lambda.Fill(FLT_MAX);
         } break;
         case 25:{ // (fluid test) pool of water w/ single particle
             Set_Grid(RANGE<TV>::Unit_Box()*m);

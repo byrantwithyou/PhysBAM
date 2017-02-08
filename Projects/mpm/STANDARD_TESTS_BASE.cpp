@@ -67,7 +67,6 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-order",&order,"order","Interpolation basis order");
     parse_args.Add_Not("-no_affine",&use_affine,"Use affine PIC");
     parse_args.Add("-affine",&use_affine,"Use affine PIC");
-    parse_args.Add("-use_f2p",&use_f2p,"Use face to particle (direct) transfer");
     parse_args.Add("-midpoint",&use_midpoint,"Use midpoint rule");
     parse_args.Add("-symplectic_euler",&use_symplectic_euler,"Use forward euler for grid update");
     parse_args.Add("-print_stats",&print_stats,"Print momentum/energy stats");
@@ -90,8 +89,6 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-regular_seeding",&regular_seeding,"use regular particle seeding");
     parse_args.Add_Not("-no_regular_seeding",&no_regular_seeding,"use regular particle seeding");
     parse_args.Add("-use_early_gradient_transfer",&use_early_gradient_transfer,"use early gradient transfer for Cp");
-    parse_args.Add("-incompressible",&incompressible,"Make simulated media incompressible");
-    parse_args.Add("-kkt",&kkt,"Use KKT solver");
     parse_args.Add("-use_exp_F",&use_quasi_exp_F_update,"Use an approximation of the F update that prevents inversion");
     parse_args.Add("-use_plasticity",&use_plasticity,"Use plasticity in the F update");
     parse_args.Add("-theta_c",&theta_c,&use_theta_c,"theta_c","Critical compression coefficient for plasticity");
@@ -156,8 +153,8 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     random.Set_Seed(seed);
 
     particles.Store_Fp(use_plasticity);
-    particles.Store_B(use_affine && !incompressible);
-    particles.Store_C(use_affine && (incompressible || kkt));
+    particles.Store_B(use_affine);
+    particles.Store_C(false);
 }
 //#####################################################################
 // Destructor
