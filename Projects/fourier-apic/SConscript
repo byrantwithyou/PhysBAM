@@ -1,0 +1,6 @@
+# SConscript
+
+Import('env Automatic_Program')
+env=env.Copy(USE_HYBRID=1)
+env.Append(LIBS=["fftw3"])
+Automatic_Program(env,"fourier_apic",["main.cpp"])
