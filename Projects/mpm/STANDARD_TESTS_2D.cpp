@@ -89,7 +89,6 @@ STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
 template<class T> STANDARD_TESTS<VECTOR<T,2> >::
 ~STANDARD_TESTS()
 {
-    if(destroy) destroy();
 }
 //#####################################################################
 // Function Write_Output_Files

@@ -75,11 +75,6 @@ public:
     bool use_foo_T4;
     bool use_foo_T5;
 
-    TRIANGULATED_SURFACE<T>* foo_surface1;
-    TRIANGULATED_SURFACE<T>* foo_surface2;
-    LEVELSET_IMPLICIT_OBJECT<TV>* foo_levelset1;
-    CYLINDER<T>* foo_cylinder;
-
 //#####################################################################
 };
 }

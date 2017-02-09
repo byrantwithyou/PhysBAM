@@ -84,8 +84,7 @@ template<class T> STANDARD_TESTS<VECTOR<T,3> >::
 STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     :STANDARD_TESTS_BASE<TV>(stream_type_input,parse_args),
     foo_int1(0),foo_T1(0),foo_T2(0),foo_T3(0),foo_T4(0),foo_T5(0),
-    use_foo_T1(false),use_foo_T2(false),use_foo_T3(false),use_foo_T4(false),use_foo_T5(false),
-    foo_surface1(0),foo_surface2(0),foo_levelset1(0),foo_cylinder(0)
+    use_foo_T1(false),use_foo_T2(false),use_foo_T3(false),use_foo_T4(false),use_foo_T5(false)
 {
     parse_args.Add("-fooint1",&foo_int1,"int1","a interger");
     parse_args.Add("-fooT1",&foo_T1,&use_foo_T1,"T1","a scalar");
@@ -102,11 +101,6 @@ STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
 template<class T> STANDARD_TESTS<VECTOR<T,3> >::
 ~STANDARD_TESTS()
 {
-    if(foo_surface1) delete foo_surface1;
-    if(foo_surface2) delete foo_surface2;
-    if(foo_levelset1) delete foo_levelset1;
-    if(foo_cylinder) delete foo_cylinder;
-    if(destroy) destroy();
 }
 //#####################################################################
 // Function Write_Output_Files
@@ -428,26 +422,35 @@ Initialize()
             LOG::cout<<"...done!"<<std::endl;
             Add_Penalty_Collision_Object(levelset);
             // Rotating cylinder
+
+            struct STATE
+            {
+                TRIANGULATED_SURFACE<T>* surface1;
+                TRIANGULATED_SURFACE<T>* surface2;
+                LEVELSET_IMPLICIT_OBJECT<TV>* levelset1;
+                CYLINDER<T>* cylinder;
+            } * state = new STATE{};
+
             if(0){
-                foo_surface1=TRIANGULATED_SURFACE<T>::Create();
-                FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/cylinder.tri.gz",*foo_surface1);
-                foo_surface2=TRIANGULATED_SURFACE<T>::Create();
-                FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/cylinder.tri.gz",*foo_surface2);
-                LOG::cout<<"Read mesh elements "<<foo_surface1->mesh.elements.m<<std::endl;
-                LOG::cout<<"Read mesh particles "<<foo_surface1->particles.number<<std::endl;
-                foo_surface1->mesh.Initialize_Adjacent_Elements();    
-                foo_surface1->mesh.Initialize_Neighbor_Nodes();
-                foo_surface1->mesh.Initialize_Incident_Elements();
-                foo_surface1->Update_Bounding_Box();
-                foo_surface1->Initialize_Hierarchy();
-                foo_surface1->Update_Triangle_List();
+                state->surface1=TRIANGULATED_SURFACE<T>::Create();
+                FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/cylinder.tri.gz",*state->surface1);
+                state->surface2=TRIANGULATED_SURFACE<T>::Create();
+                FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/cylinder.tri.gz",*state->surface2);
+                LOG::cout<<"Read mesh elements "<<state->surface1->mesh.elements.m<<std::endl;
+                LOG::cout<<"Read mesh particles "<<state->surface1->particles.number<<std::endl;
+                state->surface1->mesh.Initialize_Adjacent_Elements();    
+                state->surface1->mesh.Initialize_Neighbor_Nodes();
+                state->surface1->mesh.Initialize_Incident_Elements();
+                state->surface1->Update_Bounding_Box();
+                state->surface1->Initialize_Hierarchy();
+                state->surface1->Update_Triangle_List();
                 LOG::cout<<"Building levelset for the cylinder stir..."<<std::endl;
-                foo_levelset1=Initialize_Implicit_Surface(*foo_surface1,100);
+                state->levelset1=Initialize_Implicit_Surface(*state->surface1,100);
                 LOG::cout<<"...done!"<<std::endl;
-                Add_Penalty_Collision_Object(foo_levelset1);}
+                Add_Penalty_Collision_Object(state->levelset1);}
             if(1){
-                foo_cylinder=new CYLINDER<T>(TV(-0.025,-0.034,0)*m,TV(0.025,-0.034,0)*m,0.007*m);
-                Add_Penalty_Collision_Object(*foo_cylinder);}
+                state->cylinder=new CYLINDER<T>(TV(-0.025,-0.034,0)*m,TV(0.025,-0.034,0)*m,0.007*m);
+                Add_Penalty_Collision_Object(*state->cylinder);}
             // Polyethylene glycol
             SPHERE<TV> seeder1(TV(0,0.015,0)*m,.03*m);
             T radius=0.03*1.3*m;TV P1(0,(0.014-0.035-0.018)*m,0);TV P2(0,(0.014+0.05)*m,0); CYLINDER<T> seeder2(P1,P2,radius);
@@ -461,8 +464,8 @@ Initialize()
             for(int k=0;k<particles.number;k++){
                 TV X=particles.X(k);
                 if(sqr(X(0))+sqr(X(2))>=sqr(0.046*m) || levelset->Extended_Phi(X)<=0 
-                    || (foo_levelset1 && foo_levelset1->Extended_Phi(X)<=0) 
-                    || (foo_cylinder && foo_cylinder->Lazy_Inside(X)))
+                    || (state->levelset1 && state->levelset1->Extended_Phi(X)<=0) 
+                    || (state->cylinder && state->cylinder->Lazy_Inside(X)))
                     particles.Add_To_Deletion_List(k);}
             particles.Delete_Elements_On_Deletion_List();
             particles.F.Fill(MATRIX<T,3>()+1);particles.S.Fill(SYMMETRIC_MATRIX<T,3>()+sqr(1));
@@ -474,43 +477,51 @@ Initialize()
             Add_Force(*new MPM_VISCOSITY<TV>(force_helper,gather_scatter,0,foo_T4));
             LOG::cout<<"Polyethylene glycol added. mu="<<neo->mu<<", lambda="<<neo->lambda<<", Weissenbergi="<<foo_T3<<std::endl;
             LOG::cout<<"Particle count: "<<particles.number<<std::endl;
-            begin_frame=[this](int frame)
+            begin_frame=[this,state](int frame)
                 {
-                    if(foo_levelset1){
-                        PHYSBAM_ASSERT(!foo_cylinder);
+                    if(state->levelset1){
+                        PHYSBAM_ASSERT(!state->cylinder);
                         delete lagrangian_forces(lagrangian_forces.m-1);
                         lagrangian_forces.Remove_End();
                         PHYSBAM_ASSERT(this->deformable_body_collection.structures.m==0);
                         LOG::cout<<"Building levelset for the cylinder stir..."<<std::endl;
-                        if(foo_levelset1) delete foo_levelset1;
+                        if(state->levelset1) delete state->levelset1;
                         LOG::cout<<"Deleted old levelset."<<std::endl;
                         ROTATION<TV> rotator((T)0.02*frame,TV(0,1,0));
-                        for(int k=0;k<foo_surface1->particles.number;k++)
-                            foo_surface1->particles.X(k)=rotator.Rotate(foo_surface2->particles.X(k));
-                        foo_surface1->Update_Bounding_Box();
-                        foo_surface1->Initialize_Hierarchy();
-                        foo_levelset1=Initialize_Implicit_Surface(*foo_surface1,50);
+                        for(int k=0;k<state->surface1->particles.number;k++)
+                            state->surface1->particles.X(k)=rotator.Rotate(state->surface2->particles.X(k));
+                        state->surface1->Update_Bounding_Box();
+                        state->surface1->Initialize_Hierarchy();
+                        state->levelset1=Initialize_Implicit_Surface(*state->surface1,50);
                         LOG::cout<<"...done!"<<std::endl;
-                        Add_Penalty_Collision_Object(foo_levelset1);
-                        Dump_Levelset(foo_levelset1->levelset.grid,*foo_levelset1,VECTOR<T,3>(0,1,0));}
-                    else if(foo_cylinder){
+                        Add_Penalty_Collision_Object(state->levelset1);
+                        Dump_Levelset(state->levelset1->levelset.grid,*state->levelset1,VECTOR<T,3>(0,1,0));}
+                    else if(state->cylinder){
                         LOG::cout<<"Dumping cylinder stirer level set.."<<std::endl;
-                        GRID<TV> ghost_grid(TV_INT(50,50,10),foo_cylinder->Bounding_Box(),true);
-                        Dump_Levelset(ghost_grid,ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T> >(*foo_cylinder),VECTOR<T,3>(1,1,0));
+                        GRID<TV> ghost_grid(TV_INT(50,50,10),state->cylinder->Bounding_Box(),true);
+                        Dump_Levelset(ghost_grid,ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T> >(*state->cylinder),VECTOR<T,3>(1,1,0));
                         LOG::cout<<"...done!"<<std::endl;}
                 };
-            begin_time_step=[this](T time)
+            begin_time_step=[this,state](T time)
                 {
-                    if(foo_cylinder){
-                        PHYSBAM_ASSERT(!foo_levelset1);
+                    if(state->cylinder){
+                        PHYSBAM_ASSERT(!state->levelset1);
                         delete lagrangian_forces(lagrangian_forces.m-1);
                         lagrangian_forces.Remove_End();
                         PHYSBAM_ASSERT(this->deformable_body_collection.structures.m==0);
                         LOG::cout<<"Adding new analytic cylinder stirer..."<<std::endl;
                         ROTATION<TV> rotator((T)3.1415*10*time/s,TV(0,1,0));
-                        foo_cylinder->Set_Endpoints(rotator.Rotate(TV(-0.025,-0.034,0)*m),rotator.Rotate(TV(0.025,-0.034,0)*m));
-                        Add_Penalty_Collision_Object(*foo_cylinder);
+                        state->cylinder->Set_Endpoints(rotator.Rotate(TV(-0.025,-0.034,0)*m),rotator.Rotate(TV(0.025,-0.034,0)*m));
+                        Add_Penalty_Collision_Object(*state->cylinder);
                         LOG::cout<<"...done!"<<std::endl;}
+                };
+            destroy=[=]()
+                {
+                    delete state->surface1;
+                    delete state->surface2;
+                    delete state->levelset1;
+                    delete state->cylinder;
+                    delete state;
                 };
         } break;
         case 16:{ // rotating cylinder oldroyd-b SCA energy with pinned particles as the cylinder
@@ -558,18 +569,18 @@ Initialize()
             LOG::cout<<"Polyethylene glycol added. mu="<<neo->mu<<", lambda="<<neo->lambda<<", Weissenbergi="<<foo_T3<<std::endl;
             LOG::cout<<"Particle count: "<<particles.number<<std::endl;
             // Give particles in cylinder pinning forces
-            foo_cylinder=new CYLINDER<T>(TV(-0.025,-0.028,0)*m,TV(0.025,-0.028,0)*m,0.007*m);
+            CYLINDER<T> cylinder(TV(-0.025,-0.028,0)*m,TV(0.025,-0.028,0)*m,0.007*m);
             VECTOR<T,3> angular_velocity(0,(T)31.41592653*scale_speed/s,0);
             PINNING_FORCE<TV>* pinning_force=new PINNING_FORCE<TV>(particles,dt,penalty_collisions_stiffness*kg/(m*s*s),
                 penalty_damping_stiffness*kg/s);
             for(int i=0;i<particles.X.m;i++){
-                if(foo_cylinder->Lazy_Inside(particles.X(i))){
+                if(cylinder.Lazy_Inside(particles.X(i))){
                     particles.mass(i)*=(T)1.1;
-                    TV dx=particles.X(i)-foo_cylinder->Bounding_Box().Center();
+                    TV dx=particles.X(i)-cylinder.Bounding_Box().Center();
                     pinning_force->Add_Target(i,
                         [=](T time){
                             ROTATION<TV> rot=ROTATION<TV>::From_Rotation_Vector(angular_velocity*time);
-                            return rot.Rotate(dx)+foo_cylinder->Bounding_Box().Center();});}}
+                            return rot.Rotate(dx)+cylinder.Bounding_Box().Center();});}}
             Add_Force(*pinning_force);
         } break;
         case 17:{ // sand box drop

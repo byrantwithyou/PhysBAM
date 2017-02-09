@@ -162,6 +162,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
 template<class TV> STANDARD_TESTS_BASE<TV>::
 ~STANDARD_TESTS_BASE()
 {
+    if(destroy) destroy();
 }
 //#####################################################################
 // Function Seed_Particles
