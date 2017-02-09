@@ -54,10 +54,6 @@ public:
     int forced_collision_type;
     std::function<void (int frame)> write_output_files;
     std::function<void (int frame)> read_output_files;
-    std::function<void (int frame)> begin_frame;
-    std::function<void (int frame)> end_frame;
-    std::function<void (T time)> begin_time_step;
-    std::function<void (T time)> end_time_step;
     std::function<void ()> destroy;
     ARRAY<T> extra_T;
     ARRAY<int> extra_int;

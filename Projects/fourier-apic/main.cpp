@@ -48,11 +48,6 @@ struct FOURIER_EXAMPLE: public MPM_EXAMPLE<TV>
             particles.mass(p)=1;
             particles.valid(p)=true;}
     }
-
-    void Begin_Frame(const int frame) override {}
-    void End_Frame(const int frame) override {}
-    void Begin_Time_Step(const T time) override {}
-    void End_Time_Step(const T time) override {}
 };
 
 int main(int argc, char* argv[])

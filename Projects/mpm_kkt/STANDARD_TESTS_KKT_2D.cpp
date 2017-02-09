@@ -141,34 +141,6 @@ Initialize()
     // initialize coarse grid
     coarse_grid.Initialize(TV_INT()+resolution,grid.domain.Thickened(grid.dX/2),true);
 }
-//#####################################################################
-// Function Begin_Frame
-//#####################################################################
-template<class T> void STANDARD_TESTS_KKT<VECTOR<T,2> >::
-Begin_Frame(const int frame)
-{
-}
-//#####################################################################
-// Function End_Frame
-//#####################################################################
-template<class T> void STANDARD_TESTS_KKT<VECTOR<T,2> >::
-End_Frame(const int frame)
-{
-}
-//#####################################################################
-// Function Begin_Time_Step
-//#####################################################################
-template<class T> void STANDARD_TESTS_KKT<VECTOR<T,2> >::
-Begin_Time_Step(const T time)
-{
-}
-//#####################################################################
-// Function End_Time_Step
-//#####################################################################
-template<class T> void STANDARD_TESTS_KKT<VECTOR<T,2> >::
-End_Time_Step(const T time)
-{
-}
 template class STANDARD_TESTS_KKT<VECTOR<float,2> >;
 template class STANDARD_TESTS_KKT<VECTOR<double,2> >;
 }

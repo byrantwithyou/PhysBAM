@@ -61,10 +61,6 @@ public:
     void Write_Output_Files(const int frame) override;
     void Read_Output_Files(const int frame) override;
     void Initialize() override;
-    void Begin_Frame(const int frame) override;
-    void End_Frame(const int frame) override;
-    void Begin_Time_Step(const T time) override;
-    void End_Time_Step(const T time) override;
 
     // additional storage
     int foo_int1;

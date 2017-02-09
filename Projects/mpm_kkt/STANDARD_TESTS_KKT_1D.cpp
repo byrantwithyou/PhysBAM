@@ -136,34 +136,6 @@ Initialize()
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
 }
-//#####################################################################
-// Function Begin_Frame
-//#####################################################################
-template<class T> void STANDARD_TESTS_KKT<VECTOR<T,1> >::
-Begin_Frame(const int frame)
-{
-}
-//#####################################################################
-// Function End_Frame
-//#####################################################################
-template<class T> void STANDARD_TESTS_KKT<VECTOR<T,1> >::
-End_Frame(const int frame)
-{
-}
-//#####################################################################
-// Function Begin_Time_Step
-//#####################################################################
-template<class T> void STANDARD_TESTS_KKT<VECTOR<T,1> >::
-Begin_Time_Step(const T time)
-{
-}
-//#####################################################################
-// Function End_Time_Step
-//#####################################################################
-template<class T> void STANDARD_TESTS_KKT<VECTOR<T,1> >::
-End_Time_Step(const T time)
-{
-}
 template class STANDARD_TESTS_KKT<VECTOR<float,1> >;
 template class STANDARD_TESTS_KKT<VECTOR<double,1> >;
 }

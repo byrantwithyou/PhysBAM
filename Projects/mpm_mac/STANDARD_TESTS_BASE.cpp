@@ -30,7 +30,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     user_last_frame(false),order(2),seed(1234),particles_per_cell(1<<TV::m),regular_seeding(false),
     no_regular_seeding(false),scale_mass(1),override_output_directory(false),
     m(1),s(1),kg(1),forced_collision_type(-1),write_output_files(0),read_output_files(0),
-    begin_frame(0),end_frame(0),begin_time_step(0),end_time_step(0),dump_collision_objects(false)
+    dump_collision_objects(false)
 {
     T framerate=24;
     bool use_quasi_exp_F_update=false;

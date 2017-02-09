@@ -124,7 +124,7 @@ Initialize_Location(const RANGE<TV_INT>& range,const GRID<TV>& grid,ARRAY<TV,TV_
 template<class TV> void MPM_KKT_DRIVER<TV>::
 Advance_One_Time_Step()
 {
-    example.Begin_Time_Step(example.time);
+    if(example.begin_time_step) example.begin_time_step(example.time);
     Update_Simulated_Particles();
     Print_Particle_Stats("particle state",example.dt);
     Update_Particle_Weights();
@@ -138,7 +138,7 @@ Advance_One_Time_Step()
     Grid_To_Particle();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after grid to particle",0,1);
 
-    example.End_Time_Step(example.time);
+    if(example.end_time_step) example.end_time_step(example.time);
 }
 //#####################################################################
 // Function Simulate_To_Frame
@@ -148,7 +148,7 @@ Simulate_To_Frame(const int frame)
 {
     for(;current_frame<frame;current_frame++){
         LOG::SCOPE scope("FRAME","frame %d",current_frame+1);
-        example.Begin_Frame(current_frame);
+        if(example.begin_frame) example.begin_frame(current_frame);
         if(example.substeps_delay_frame==current_frame)
             DEBUG_SUBSTEPS::Set_Write_Substeps_Level(example.write_substeps_level);
         T time_at_frame=example.time+example.frame_dt;
@@ -167,7 +167,7 @@ Simulate_To_Frame(const int frame)
 
             Advance_One_Time_Step();
             example.time=next_time;}
-        example.End_Frame(current_frame);
+        if(example.end_frame) example.end_frame(current_frame);
         Write_Output_Files(++output_number);}
 }
 //#####################################################################

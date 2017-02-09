@@ -158,38 +158,6 @@ Initialize()
         for(int i=0;i<collision_objects.m;i++)
             collision_objects(i)->type=(COLLISION_TYPE)forced_collision_type;
 }
-//#####################################################################
-// Function Begin_Frame
-//#####################################################################
-template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
-Begin_Frame(const int frame)
-{
-    if(begin_frame) begin_frame(frame);
-}
-//#####################################################################
-// Function End_Frame
-//#####################################################################
-template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
-End_Frame(const int frame)
-{
-    if(end_frame) end_frame(frame);
-}
-//#####################################################################
-// Function Begin_Time_Step
-//#####################################################################
-template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
-Begin_Time_Step(const T time)
-{
-    if(begin_time_step) begin_time_step(time);
-}
-//#####################################################################
-// Function End_Time_Step
-//#####################################################################
-template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
-End_Time_Step(const T time)
-{
-    if(end_time_step) end_time_step(time);
-}
 template class STANDARD_TESTS<VECTOR<float,2> >;
 template class STANDARD_TESTS<VECTOR<double,2> >;
 }

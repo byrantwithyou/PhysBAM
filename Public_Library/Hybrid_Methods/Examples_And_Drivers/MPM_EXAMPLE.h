@@ -100,10 +100,10 @@ public:
     virtual void Write_Output_Files(const int frame);
     virtual void Read_Output_Files(const int frame);
     virtual void Initialize()=0;
-    virtual void Begin_Frame(const int frame)=0;
-    virtual void End_Frame(const int frame)=0;
-    virtual void Begin_Time_Step(const T time)=0;
-    virtual void End_Time_Step(const T time)=0;
+    std::function<void(int frame)> begin_frame;
+    std::function<void(int frame)> end_frame;
+    std::function<void(T time)> begin_time_step;
+    std::function<void(T time)> end_time_step;
 
     void Capture_Stress();
     void Precompute_Forces(const T time,const T dt,const bool update_hessian);

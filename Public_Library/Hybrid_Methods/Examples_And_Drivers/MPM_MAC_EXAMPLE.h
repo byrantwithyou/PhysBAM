@@ -102,10 +102,10 @@ public:
     virtual void Write_Output_Files(const int frame);
     virtual void Read_Output_Files(const int frame);
     virtual void Initialize()=0;
-    virtual void Begin_Frame(const int frame)=0;
-    virtual void End_Frame(const int frame)=0;
-    virtual void Begin_Time_Step(const T time)=0;
-    virtual void End_Time_Step(const T time)=0;
+    std::function<void(int frame)> begin_frame;
+    std::function<void(int frame)> end_frame;
+    std::function<void(T time)> begin_time_step;
+    std::function<void(T time)> end_time_step;
 
     T Potential_Energy(const T time) const;
     void Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const;
