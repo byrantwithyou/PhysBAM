@@ -35,8 +35,7 @@ namespace PhysBAM{
 //#####################################################################
 template<class T> STANDARD_TESTS_KKT<VECTOR<T,2> >::
 STANDARD_TESTS_KKT(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
-    :STANDARD_TESTS_KKT_BASE<TV>(stream_type_input,parse_args),
-    use_surface_tension(false),Nsurface(0)
+    :STANDARD_TESTS_KKT_BASE<TV>(stream_type_input,parse_args)
 {
     parse_args.Parse();
 }

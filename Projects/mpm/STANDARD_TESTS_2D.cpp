@@ -73,7 +73,7 @@ Initialize_Implicit_Surface(TRIANGULATED_SURFACE<T>& surface,int max_res)
 template<class T> STANDARD_TESTS<VECTOR<T,2> >::
 STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     :STANDARD_TESTS_BASE<TV>(stream_type_input,parse_args),
-    use_surface_tension(false),Nsurface(0),foo_T1(0),foo_T2(0),foo_T3(0),foo_T4(0),
+    foo_T1(0),foo_T2(0),foo_T3(0),foo_T4(0),
     use_foo_T1(false),use_foo_T2(false),use_foo_T3(false),use_foo_T4(false)
 {
     parse_args.Add("-fooT1",&foo_T1,&use_foo_T1,"T1","a scalar");
@@ -324,29 +324,6 @@ Initialize()
             SEGMENTED_CURVE_2D<T>& new_sc=Seed_Lagrangian_Particles(*sc,[=](const TV& X){return TV(0.0,0)*(m/s);},0,density,true);
             SURFACE_TENSION_FORCE<TV>* stf=new SURFACE_TENSION_FORCE<TV>(new_sc,(T)0.01);
             Add_Force(*stf);
-        } break;
-        case 14:{ // surface tension static circle
-            Set_Grid(RANGE<TV>::Unit_Box()*m);
-            T density=2*unit_rho*scale_mass;
-            SPHERE<TV> sphere(TV(.5,.5)*m,.2*m);
-            Seed_Particles(sphere,0,0,density,particles_per_cell);
-            ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
-            bool no_mu=true;
-            Add_Fixed_Corotated(unit_p*scale_E*10,0.3,&mpm_particles,no_mu);
-            use_surface_tension=true;
-        } break;
-        case 15:{ // surface tension become a circle
-            //./mpm 15 -affine -resolution 64 -max_dt 1e-3
-            Set_Grid(RANGE<TV>::Unit_Box()*m);
-            T density=2*unit_rho*scale_mass;
-            RANGE<TV> box(TV(.3,.11)*m,TV(.5,.31)*m);
-            Seed_Particles(box,0,0,density,particles_per_cell);
-            RANGE<TV> box2(TV(.6,.15)*m,TV(.8,.25)*m);
-            Seed_Particles(box2,[=](const TV& X){return TV(-0.1,0)*(m/s);},0,density,particles_per_cell);
-            ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
-            bool no_mu=true;
-            Add_Fixed_Corotated(unit_p*scale_E*10,0.3,&mpm_particles,no_mu);
-            use_surface_tension=true;
         } break;
         case 16:{ // oscillating circle
             Set_Grid(RANGE<TV>::Unit_Box()*m);
@@ -600,33 +577,6 @@ Initialize()
             RANGE<TV> box(TV(.45,.11)*m,TV(.55,.31)*m);
             Seed_Particles(box,0,0,density,particles_per_cell);
             Add_Gravity(m/(s*s)*TV(0,-9.8));
-        } break;
-        case 34:{ // drip drop
-            Set_Grid(RANGE<TV>(TV(0,-1),TV(1,1))*m,TV_INT(1,2));
-            Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,true);
-            Add_Gravity(m/(s*s)*TV(0,-1));
-            T density=2*unit_rho*scale_mass;
-            RANGE<TV> box(TV(.4,.5)*m,TV(.6,.85)*m);
-            Seed_Particles(box,0,0,density,particles_per_cell);
-            ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
-            bool no_mu=true;
-            Add_Fixed_Corotated(unit_p*scale_E*20,0.3,&mpm_particles,no_mu);
-            Add_Force(*new MPM_VISCOSITY<TV>(force_helper,gather_scatter,0,0.000001*unit_mu));
-            use_surface_tension=true;
-            PINNING_FORCE<TV>* pinning_force=new PINNING_FORCE<TV>(particles,dt,penalty_collisions_stiffness*kg/(s*s),penalty_damping_stiffness*kg/s);
-            for(int i=0;i<particles.X.m;i++)
-                if(particles.X(i)(1)>0.8*m){TV x=particles.X(i);pinning_force->Add_Target(i,[=](T time){return x;});}
-            Add_Force(*pinning_force);
-            begin_time_step=[this](T time)
-                {
-                    Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,true);
-                    Add_Gravity(m/(s*s)*TV(0,-1));
-                    PINNING_FORCE<TV>* pinning_force=new PINNING_FORCE<TV>(particles,dt,penalty_collisions_stiffness*kg/(s*s),penalty_damping_stiffness*kg/s);
-                    for(int i=0;i<particles.X.m;i++)
-                        if(particles.X(i)(1)>0.8*m){TV x=particles.X(i);pinning_force->Add_Target(i,[=](T time){return x;});}
-                    Add_Force(*pinning_force);
-                };
-
         } break;
         case 35:{ // snow wedge
             // ./mpm 35 -flip 0.95 -max_dt .005 -cfl .1 -resolution 200
@@ -1571,123 +1521,6 @@ template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
 Begin_Time_Step(const T time)
 {
     if(begin_time_step) begin_time_step(time);
-
-    if(use_surface_tension){
-
-        bool use_bruteforce=true;
-        bool use_kdtree=false;
-
-        // Remove old surface particles
-        int N_non_surface=particles.number-Nsurface;
-        for(int k=N_non_surface;k<particles.number;k++){
-            particles.Add_To_Deletion_List(k);
-            int m=steal(k-N_non_surface);
-            TV old_momentum=particles.mass(m)*particles.V(m)+particles.mass(k)*particles.V(k);
-            particles.mass(m)+=particles.mass(k);
-            particles.volume(m)+=particles.volume(k);
-            particles.V(m)=old_momentum/particles.mass(m);
-            if(use_affine) particles.B(m)=(particles.B(m)+particles.B(k))*0.5;}
-        LOG::cout<<"deleting "<<Nsurface<<" particles..."<<std::endl;
-        particles.Delete_Elements_On_Deletion_List();
-        lagrangian_forces.Delete_Pointers_And_Clean_Memory();
-        this->deformable_body_collection.structures.Delete_Pointers_And_Clean_Memory();
-
-        // Dirty hack of rasterizing mass
-        this->simulated_particles.Remove_All();
-        for(int p=0;p<this->particles.number;p++)
-            if(this->particles.valid(p))
-                this->simulated_particles.Append(p);
-        this->particle_is_simulated.Remove_All();
-        this->particle_is_simulated.Resize(this->particles.X.m);
-        this->particle_is_simulated.Subset(this->simulated_particles).Fill(true);
-        this->weights->Update(this->particles.X);
-        this->gather_scatter.Prepare_Scatter(this->particles);
-        MPM_PARTICLES<TV>& my_particles=this->particles;
-#pragma omp parallel for
-        for(int i=0;i<this->mass.array.m;i++)
-            this->mass.array(i)=0;
-        this->gather_scatter.template Scatter<int>(false,
-            [this,&my_particles](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
-            {
-                T w=it.Weight();
-                TV_INT index=it.Index();
-                this->mass(index)+=w*my_particles.mass(p);
-            });
-
-        // Marching cube
-        SEGMENTED_CURVE_2D<T>* surface=SEGMENTED_CURVE_2D<T>::Create();
-        MARCHING_CUBES<TV>::Create_Surface(*surface,grid,mass,particles.mass(0)*.7);
-
-        // Improve surface quality
-        T min_edge_length=FLT_MAX;
-        for(int k=0;k<surface->mesh.elements.m;k++){
-            int a=surface->mesh.elements(k)(0),b=surface->mesh.elements(k)(1);
-            TV A=surface->particles.X(a),B=surface->particles.X(b);
-            T l2=(A-B).Magnitude_Squared();
-            if(l2<min_edge_length) min_edge_length=l2;}
-        min_edge_length=sqrt(min_edge_length);
-        LOG::cout<<"Marching cube min edge length: "<<min_edge_length<<std::endl;
-
-        // Seed surface particles
-        int Nold=particles.number;
-        Nsurface=surface->particles.number;
-        LOG::cout<<"adding "<<Nsurface<<" particles..."<<std::endl;
-        SEGMENTED_CURVE_2D<T>& new_sc=Seed_Lagrangian_Particles(*surface,0,0,(T)0.001*unit_rho,true);
-        ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
-        for(int i=Nold;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(0,1,0);
-
-        // Build K-d tree for non-surface particles
-        LOG::cout<<"building kdtree..."<<std::endl;
-        KD_TREE<TV> kdtree;
-        ARRAY<TV> nodes(Nold);
-        if(use_kdtree){
-            for(int p=0;p<Nold;p++) nodes(p)=particles.X(p);
-            kdtree.Create_Left_Balanced_KD_Tree(nodes);}
-
-        // Assign physical quantities
-        steal.Clean_Memory();
-        for(int k=Nold;k<particles.number;k++){
-            T dist2=FLT_MAX;
-            int m=-1;
-
-            // Find closest interior particle using brute force
-            if(use_bruteforce){
-                for(int q=0;q<Nold;q++){
-                    T dd=(particles.X(q)-particles.X(k)).Magnitude_Squared();
-                    if(dd<dist2){dist2=dd;m=q;}}}
-
-            // Find closest interior particle using kdtree
-            int number_of_points_in_estimate=1;
-            ARRAY<int> points_found(number_of_points_in_estimate);
-            ARRAY<T> squared_distance_to_points_found(number_of_points_in_estimate);
-            if(use_kdtree){
-                int number_of_points_found;T max_squared_distance_to_points_found;
-                kdtree.Locate_Nearest_Neighbors(particles.X(k),FLT_MAX,points_found,
-                    squared_distance_to_points_found,number_of_points_found,max_squared_distance_to_points_found,nodes);
-                PHYSBAM_ASSERT(number_of_points_found==number_of_points_in_estimate);}
-
-            // Debug kdtree
-            if(use_bruteforce && use_kdtree && m!=points_found(0)){
-                LOG::cout<<"Disagree!"<<std::endl;
-                PHYSBAM_FATAL_ERROR();}
-
-            if(use_kdtree) m=points_found(0);
-
-            T split_mass=particles.mass(m)*.5;
-            T split_volume=particles.volume(m)*.5;
-            TV com=particles.X(m);
-            particles.mass(m)=split_mass;
-            particles.volume(m)=split_volume;
-            particles.mass(k)=split_mass;
-            particles.volume(k)=split_volume;
-            particles.V(k)=particles.V(m);
-            if(use_affine) particles.B(k)=particles.B(m);
-            steal.Append(m);}
-
-        // Add surface tension force
-        SURFACE_TENSION_FORCE<TV>* stf=new SURFACE_TENSION_FORCE<TV>(new_sc,(T)1e-2);
-        Add_Force(*stf);
-    }
 }
 //#####################################################################
 // Function End_Time_Step

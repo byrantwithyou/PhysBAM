@@ -40,11 +40,6 @@ public:
     using BASE::tests;using BASE::Seed_Lagrangian_Particles;using BASE::Add_Collision_Object;
     using BASE::Add_Force;using BASE::Add_Fluid_Wall;using BASE::quad_F_coeff;using BASE::coarse_grid;
 
-    // surface tension stuff
-    bool use_surface_tension;
-    int Nsurface;
-    ARRAY<int> steal;
-
     STANDARD_TESTS_KKT(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS_KKT();
 
