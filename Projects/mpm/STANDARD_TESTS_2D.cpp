@@ -219,7 +219,7 @@ Initialize()
             Add_Neo_Hookean(0.073e9*unit_p*scale_E,0.4);
         } break;
         case 8:{ // collision an elastic cylinder (TODO: fix description.)
-            Set_Grid(RANGE<TV>(TV(),TV(5,5))*m,TV_INT()+1,TV_INT()+9,1,10);
+            Set_Grid(RANGE<TV>(TV(),TV(5,5))*m,TV_INT()+1,TV_INT()+9,1,32);
             Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,false);
             Add_Collision_Object(SPHERE<TV>(TV(4,3)*m,1*m),COLLISION_TYPE::separate,.3);
             SPHERE<TV> sphere(TV(2.55,3.55)*m,.3*m);
@@ -230,7 +230,7 @@ Initialize()
             Add_Gravity(m/(s*s)*TV(0,-1.8));
         } break;
         case 9:{ // collision an elastic cylinder (TODO: fix description.)
-            Set_Grid(RANGE<TV>(TV(),TV(5,5))*m,TV_INT()+1,TV_INT()+9,1,10);
+            Set_Grid(RANGE<TV>(TV(),TV(5,5))*m,TV_INT()+1,TV_INT()+9,1,32);
             Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,false);
             SPHERE<TV> sphere(TV(2.55,3.55)*m,.3*m);
             T density=4*unit_rho*scale_mass;
