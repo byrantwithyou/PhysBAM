@@ -26,28 +26,15 @@ typedef double T;
 typedef VECTOR<T,2> TV;
 typedef VECTOR<int,TV::m> TV_INT;
 
-int resolution=16;
-int particles_per_dim=2;
-
 template<class TV>
 struct FOURIER_EXAMPLE: public MPM_EXAMPLE<TV>
 {
-    using MPM_EXAMPLE<TV>::grid;using MPM_EXAMPLE<TV>::particles;
     FOURIER_EXAMPLE()
         :MPM_EXAMPLE<TV>(STREAM_TYPE((RW)0))
     {
     }
 
-    void Initialize() override
-    {
-        grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-        GRID<TV> init_grid(TV_INT()+particles_per_dim*resolution,RANGE<TV>::Unit_Box(),true);
-        for(CELL_ITERATOR<TV> it(init_grid);it.Valid();it.Next()){
-            int p=particles.Add_Element();
-            particles.X(p)=it.Location();
-            particles.mass(p)=1;
-            particles.valid(p)=true;}
-    }
+    void Initialize() override {}
 };
 
 int main(int argc, char* argv[])
@@ -59,6 +46,8 @@ int main(int argc, char* argv[])
     bool use_affine=false;
     T flip=0;
     int order=3;
+    int resolution=16;
+    int particles_per_dim=2;
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Add("-resolution",&resolution,"num","resolution");
     parse_args.Add("-affine",&use_affine,"use affine transfers");
@@ -72,7 +61,15 @@ int main(int argc, char* argv[])
 
     TV_INT center=TV_INT()+resolution/2;
 
-    driver.Initialize();
+    example.grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+    GRID<TV> init_grid(TV_INT()+particles_per_dim*resolution,RANGE<TV>::Unit_Box(),true);
+    for(CELL_ITERATOR<TV> it(init_grid);it.Valid();it.Next()){
+        int p=example.particles.Add_Element();
+        example.particles.X(p)=it.Location();
+        example.particles.mass(p)=1;
+        example.particles.valid(p)=true;}
+    example.velocity_new.Resize(example.grid.Cell_Indices(3));
+    example.velocity.Resize(example.grid.Cell_Indices(3));
     example.gather_scatter.Prepare_Scatter(example.particles);
     example.use_affine=use_affine;
     example.flip=flip;
