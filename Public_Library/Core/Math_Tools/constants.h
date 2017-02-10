@@ -8,7 +8,7 @@
 #include <cmath>
 namespace PhysBAM{
 
-const double pi=4*atan(1.);
+const double pi=M_PI;
 
 const double speed_of_light=2.99792458e8; // m/s
 const double plancks_constant=6.6260755e-34; // J*s
