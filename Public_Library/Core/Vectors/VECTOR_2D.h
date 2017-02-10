@@ -29,6 +29,7 @@
 namespace PhysBAM{
 
 using ::std::floor;
+using ::std::rint;
 using ::std::ceil;
 using ::std::sin;
 using ::std::cos;

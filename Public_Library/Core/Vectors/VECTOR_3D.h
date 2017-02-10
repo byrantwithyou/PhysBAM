@@ -28,6 +28,7 @@ using ::std::sin;
 using ::std::cos;
 using ::std::abs;
 using ::std::floor;
+using ::std::rint;
 using ::std::ceil;
 using ::std::sqrt;
 using ::std::log;

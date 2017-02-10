@@ -20,6 +20,7 @@
 #endif
 using ::std::abs;
 using ::std::floor;
+using ::std::rint;
 using ::std::ceil;
 using ::std::sqrt;
 using ::std::exp;

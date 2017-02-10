@@ -15,7 +15,6 @@
 #include <Core/Math_Tools/Inverse.h>
 #include <Core/Math_Tools/max.h>
 #include <Core/Math_Tools/min.h>
-#include <Core/Math_Tools/rint.h>
 #include <Core/Math_Tools/sign.h>
 #include <Core/Math_Tools/sqr.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
@@ -30,6 +29,7 @@
 namespace PhysBAM{
 
 using ::std::floor;
+using ::std::rint;
 using ::std::ceil;
 using ::std::sin;
 using ::std::cos;
