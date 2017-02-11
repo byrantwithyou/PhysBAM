@@ -48,12 +48,14 @@ int main(int argc, char* argv[])
     int order=3;
     int resolution=16;
     int particles_per_dim=2;
+    std::string output_filename="eigen.png";
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Add("-resolution",&resolution,"num","resolution");
     parse_args.Add("-affine",&use_affine,"use affine transfers");
     parse_args.Add("-flip",&flip,"num","flip ratio");
     parse_args.Add("-order",&order,"order","interpolation order");
     parse_args.Add("-ppd",&particles_per_dim,"num","particles per cell per dimension");
+    parse_args.Add("-o",&output_filename,"file.png","filename for output image");
     parse_args.Parse();
 
     FOURIER_EXAMPLE<TV> example;
@@ -70,29 +72,32 @@ int main(int argc, char* argv[])
         example.particles.valid(p)=true;}
     example.velocity_new.Resize(example.grid.Cell_Indices(3));
     example.velocity.Resize(example.grid.Cell_Indices(3));
+    example.mass.Resize(example.grid.Cell_Indices(3));
     example.gather_scatter.Prepare_Scatter(example.particles);
     example.use_affine=use_affine;
     example.flip=flip;
+    example.particles.Store_B(example.use_affine);
     example.velocity_new(center).x=1;
     example.velocity_friction=example.velocity_new;
     example.dt=0;
     example.Set_Weights(order);
+    driver.Update_Simulated_Particles();
     driver.Update_Particle_Weights();
     driver.Grid_To_Particle();
     driver.Particle_To_Grid();
 
     ARRAY<std::complex<T>,TV_INT> row(example.grid.Cell_Indices(0));
-    for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next())
-    {
+    for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
         TV_INT new_index=it.index+center;
         for(int i=0;i<TV::m;i++) new_index(i)%=resolution;
-        row(it.index)=example.velocity(new_index).x;
-    }
-    
+        row(it.index)=example.velocity(new_index).x;}
+    LOG::printf("%.16P\n",row);
+
     ARRAY<std::complex<T>,TV_INT> out(example.grid.Cell_Indices(0));
 
-    fftw_plan plan = fftw_plan_dft_2d(example.grid.counts.x, example.grid.counts.y,
-        (fftw_complex*)row.array.base_pointer, (fftw_complex*)out.array.base_pointer, FFTW_FORWARD, FFTW_ESTIMATE);
+    fftw_plan plan=fftw_plan_dft_2d(example.grid.counts.x,example.grid.counts.y,
+        (fftw_complex*)row.array.base_pointer,(fftw_complex*)out.array.base_pointer,
+        FFTW_FORWARD,FFTW_ESTIMATE);
     fftw_execute(plan);
     fftw_destroy_plan(plan);
 
@@ -107,12 +112,12 @@ int main(int argc, char* argv[])
     icm.colors.Add_Control_Point(1-.32,VECTOR<T,3>(0,0,1));
     icm.colors.Add_Control_Point(1-.64,VECTOR<T,3>(.5,0,1));
     icm.colors.Add_Control_Point(0,VECTOR<T,3>(0,0,0));
-    
+
     ARRAY<VECTOR<T,3>,TV_INT> image(example.grid.Cell_Indices(0));
     for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next())
         image(it.index)=icm(abs(out(it.index)));
 
-    PNG_FILE<T>::Write("eigen.png",image);
+    PNG_FILE<T>::Write(output_filename,image);
 
     return 0;
 }
