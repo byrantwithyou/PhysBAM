@@ -544,10 +544,6 @@ Update_Simulated_Particles()
     for(int p=0;p<example.particles.number;p++)
         if(example.particles.valid(p))
             example.simulated_particles.Append(p);
-    // example.simulated_particles=IDENTITY_ARRAY<>(example.particles.X.m);
-    example.particle_is_simulated.Remove_All();
-    example.particle_is_simulated.Resize(example.particles.X.m);
-    example.particle_is_simulated.Subset(example.simulated_particles).Fill(true);
 }
 //#####################################################################
 // Function Print_Grid_Stats

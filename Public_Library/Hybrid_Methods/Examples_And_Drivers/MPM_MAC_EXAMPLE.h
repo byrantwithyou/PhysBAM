@@ -39,7 +39,6 @@ public:
     // particle stuff
     MPM_PARTICLES<TV>& particles;
     ARRAY<int> simulated_particles;
-    ARRAY<bool> particle_is_simulated;
 
     // grid stuff
     ARRAY<T,FACE_INDEX<TV::m> > mass,volume,density;
