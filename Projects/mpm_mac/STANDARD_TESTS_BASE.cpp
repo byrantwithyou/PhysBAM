@@ -106,7 +106,6 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     PHYSBAM_ASSERT(threads==1);
 #endif
 
-    gather_scatter.threads=threads;
     stored_last_frame=last_frame;
     random.Set_Seed(seed);
 

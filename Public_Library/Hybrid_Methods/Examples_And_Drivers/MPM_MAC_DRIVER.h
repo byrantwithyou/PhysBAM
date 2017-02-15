@@ -19,6 +19,7 @@ class MPM_MAC_DRIVER
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
     typedef typename MPM_COLLISION_OBJECT<TV>::COLLISION_TYPE COLLISION_TYPE;
+    typedef typename MPM_MAC_EXAMPLE<TV>::PHASE PHASE;
 public:
 
     int current_frame;
@@ -37,8 +38,11 @@ public:
     void Write_Output_Files(const int frame);
     void Write_Substep(const std::string& title,const int substep,const int level=0);
     void Update_Particle_Weights();
+    void Prepare_Scatter();
     void Particle_To_Grid();
+    void Particle_To_Grid(PHASE& ph) const;
     void Grid_To_Particle();
+    void Grid_To_Particle(const PHASE& ph);
     void Pressure_Projection();
     void Apply_Forces();
     T Compute_Dt() const;

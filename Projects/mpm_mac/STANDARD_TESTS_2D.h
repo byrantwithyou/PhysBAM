@@ -23,7 +23,7 @@ class STANDARD_TESTS<VECTOR<T,2> >:public STANDARD_TESTS_BASE<VECTOR<T,2> >
 
 public:
     using BASE::initial_time;using BASE::last_frame;using BASE::grid;
-    using BASE::particles;using BASE::mass;using BASE::frame_title;
+    using BASE::particles;using BASE::frame_title;
     using BASE::write_substeps_level;using BASE::particles_per_cell;
     using BASE::substeps_delay_frame;using BASE::scale_mass;using BASE::data_directory;
     using BASE::output_directory;using BASE::restart;using BASE::dt;
@@ -32,13 +32,13 @@ public:
     using BASE::print_stats;using BASE::cfl;using BASE::solver_tolerance;
     using BASE::solver_iterations;using BASE::threads;using BASE::test_number;
     using BASE::resolution;using BASE::Seed_Particles;using BASE::Add_Particle;
-    using BASE::gather_scatter;using BASE::regular_seeding;using BASE::Set_Grid;
+    using BASE::regular_seeding;using BASE::Set_Grid;
     using BASE::random;using BASE::collision_objects;using BASE::user_resolution;using BASE::Add_Walls;
     using BASE::Add_Collision_Object;using BASE::Add_Fluid_Wall;using BASE::no_regular_seeding;
     using BASE::m;using BASE::s;using BASE::kg;using BASE::unit_p;using BASE::unit_mu;using BASE::unit_rho;
     using BASE::forced_collision_type;using BASE::destroy;using BASE::write_output_files;using BASE::read_output_files;
     using BASE::begin_frame;using BASE::end_frame;using BASE::begin_time_step;using BASE::end_time_step;
-    using BASE::extra_T;using BASE::extra_int;using BASE::gravity;
+    using BASE::extra_T;using BASE::extra_int;using BASE::gravity;using BASE::phases;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();

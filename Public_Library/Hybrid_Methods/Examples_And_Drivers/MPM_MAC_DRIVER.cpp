@@ -88,22 +88,14 @@ Initialize()
     example.particles.Store_C(false);
     PHYSBAM_ASSERT(!example.particles.store_B || !example.particles.store_C);
 
-    example.mass.Resize(example.grid.Domain_Indices(example.ghost));
-    example.volume.Resize(example.grid.Domain_Indices(example.ghost));
-    example.density.Resize(example.grid.Domain_Indices(example.ghost));
-    example.velocity.Resize(example.grid.Domain_Indices(example.ghost));
-    example.volume.Resize(example.grid.Domain_Indices(example.ghost));
+    for(PHASE_ID i(0);i<example.phases.m;i++)
+        example.phases(i).Initialize(example.grid,example.ghost,example.threads);
 
     RANGE<TV_INT> range(example.grid.Cell_Indices(example.ghost));
     example.location.Resize(example.grid,example.ghost);
     for(FACE_ITERATOR<TV> it(example.grid,example.ghost);it.Valid();it.Next())
         example.location(it.Full_Index())=it.Location();
 
-    // TODO
-    // for(CELL_ITERATOR<TV> iterator(example.grid,example.ghost,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next()){
-    //     for(int k=0;k<fluid_walls.m;k++){
-    //         if(fluid_walls(k)->Lazy_Inside(iterator.Location())){
-    //             cell_soli....
     Update_Simulated_Particles();
 
     if(!example.restart) Write_Output_Files(0);
@@ -121,7 +113,7 @@ Advance_One_Time_Step()
     Update_Simulated_Particles();
     Print_Particle_Stats("particle state",example.dt);
     Update_Particle_Weights();
-    example.gather_scatter.Prepare_Scatter(example.particles);
+    Prepare_Scatter();
     Particle_To_Grid();
     Print_Grid_Stats("after particle to grid",example.dt);
     Print_Energy_Stats("after particle to grid");
@@ -213,40 +205,40 @@ Update_Particle_Weights()
 // Function Particle_To_Grid
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Particle_To_Grid()
+Particle_To_Grid(PHASE& ph) const
 {
     TIMER_SCOPE_FUNC;
-    MPM_PARTICLES<TV>& particles=example.particles;
+    const MPM_PARTICLES<TV>& particles=example.particles;
 
 #pragma omp parallel for
-    for(int i=0;i<example.mass.array.m;i++){
-        example.mass.array(i)=0;
-        example.volume.array(i)=0;
-        example.velocity.array(i)=0;}
+    for(int i=0;i<ph.mass.array.m;i++){
+        ph.mass.array(i)=0;
+        ph.volume.array(i)=0;
+        ph.velocity.array(i)=0;}
 
     T scale=1;
     if(particles.store_B && !example.weights(0)->use_gradient_transfer)
         scale=example.weights(0)->Constant_Scalar_Inverse_Dp();
     bool use_gradient=false;
     ARRAY_VIEW<MATRIX<T,TV::m> > dV(particles.B);
-    example.gather_scatter.template Scatter<int>(true,
-        [this,scale,&particles,use_gradient,dV](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,int data)
+    ph.gather_scatter->template Scatter<int>(true,
+        [this,scale,&particles,use_gradient,dV,&ph](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,int data)
         {
             T w=it.Weight();
             FACE_INDEX<TV::m> index=it.Index();
-            example.mass(index)+=w*particles.mass(p);
-            example.volume(index)+=w*particles.volume(p);
+            ph.mass(index)+=w*particles.mass(p);
+            ph.volume(index)+=w*particles.volume(p);
             T V=particles.V(p)(index.axis);
             if(example.use_affine){
                 V+=dV(p).Row(index.axis).Dot(scale*(example.grid.Face(index)-particles.X(p)));}
-            example.velocity(index)+=particles.mass(p)*w*V;
+            ph.velocity(index)+=particles.mass(p)*w*V;
         });
 
-    example.valid_indices.Remove_All();
-    example.valid_flat_indices.Remove_All();
+    ph.valid_indices.Remove_All();
+    ph.valid_flat_indices.Remove_All();
 
-    APPEND_HOLDER<int> flat_h(example.valid_flat_indices);
-    APPEND_HOLDER<FACE_INDEX<TV::m> > indices_h(example.valid_indices);
+    APPEND_HOLDER<int> flat_h(ph.valid_flat_indices);
+    APPEND_HOLDER<FACE_INDEX<TV::m> > indices_h(ph.valid_indices);
 #pragma omp parallel
     {
 #pragma omp single
@@ -258,22 +250,31 @@ Particle_To_Grid()
         ARRAY<int>& flat_t=flat_h.Array();
         ARRAY<FACE_INDEX<TV::m> >& indices_t=indices_h.Array();
         for(FACE_ITERATOR_THREADED<TV> it(example.grid,0);it.Valid();it.Next()){
-            int i=example.mass.Standard_Index(it.Full_Index());
-            if(example.mass.array(i)){
+            int i=ph.mass.Standard_Index(it.Full_Index());
+            if(ph.mass.array(i)){
                 flat_t.Append(i);
                 indices_t.Append(it.Full_Index());
-                example.velocity.array(i)/=example.mass.array(i);}
-            else example.velocity.array(i)=0;}
+                ph.velocity.array(i)/=ph.mass.array(i);}
+            else ph.velocity.array(i)=0;}
     }
     flat_h.Combine();
     indices_h.Combine();
-    if(example.flip) example.velocity_save=example.velocity;
+    if(example.flip) ph.velocity_save=ph.velocity;
+}
+//#####################################################################
+// Function Particle_To_Grid
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Particle_To_Grid()
+{
+    for(PHASE_ID i(0);i<example.phases.m;i++)
+        Particle_To_Grid(example.phases(i));
 }
 //#####################################################################
 // Function Grid_To_Particle
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Grid_To_Particle()
+Grid_To_Particle(const PHASE& ph)
 {
     TIMER_SCOPE_FUNC;
     struct HELPER
@@ -286,15 +287,15 @@ Grid_To_Particle()
     MPM_PARTICLES<TV>& particles=example.particles;
     T dt=example.dt;
     bool use_flip=example.flip;
-    example.gather_scatter.template Gather<HELPER>(true,
+    ph.gather_scatter->template Gather<HELPER>(true,
         [](int p,HELPER& h){h=HELPER();},
-        [this,dt,&particles,use_flip](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,HELPER& h)
+        [this,dt,&particles,use_flip,&ph](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,HELPER& h)
         {
             T w=it.Weight();
             FACE_INDEX<TV::m> index=it.Index();
-            T V=example.velocity(index);
+            T V=ph.velocity(index);
             h.V(index.axis)+=w*V;
-            if(use_flip) h.flip_V(index.axis)+=w*(V-example.velocity_save(index));
+            if(use_flip) h.flip_V(index.axis)+=w*(V-ph.velocity_save(index));
             if(example.use_affine){
                 TV Z=example.grid.Face(index);
                 h.B.Add_Row(index.axis,w*V*(Z-particles.X(p)));}
@@ -308,6 +309,15 @@ Grid_To_Particle()
 
             if(!example.grid.domain.Lazy_Inside(particles.X(p))) particles.valid(p)=false;
         });
+}
+//#####################################################################
+// Function Grid_To_Particle
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Grid_To_Particle()
+{
+    for(PHASE_ID i(0);i<example.phases.m;i++)
+        Grid_To_Particle(example.phases(i));
 }
 //#####################################################################
 // Function Compute_Volume_For_Face
@@ -357,7 +367,7 @@ Compute_Poisson_Matrix()
             MPM_COLLISION_OBJECT<TV>* o=example.collision_objects(i);
             if(o->Phi(X,example.time)<0){
                 N=true;
-                example.velocity(it.Full_Index())=o->Velocity(X,example.time)(it.axis);
+                example.phases(PHASE_ID()).velocity(it.Full_Index())=o->Velocity(X,example.time)(it.axis);
                 break;}}
         psi_N(it.Full_Index())=N;}
 
@@ -378,7 +388,7 @@ Compute_Poisson_Matrix()
             for(int s=0;s<2;s++){
                 if(!psi_N(face)){
                     all_N=false;
-                    if(!example.mass(face)) dirichlet=true;}
+                    if(!example.phases(PHASE_ID()).mass(face)) dirichlet=true;}
                 face.index(a)++;}}
         cell_index(it.index)=(all_N || dirichlet)?-1:next_cell++;}
     for(CELL_ITERATOR<TV> it(example.grid,1,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
@@ -402,8 +412,8 @@ Compute_Poisson_Matrix()
                     cell(a)+=2*s-1;
                     assert(face.Cell_Index(s)==cell);
                     if(!psi_N(face)){
-                        T entry=sqr(example.grid.one_over_dX(a))/example.mass(face);
-                        if(example.use_particle_volumes) entry*=example.volume(face);
+                        T entry=sqr(example.grid.one_over_dX(a))/example.phases(PHASE_ID()).mass(face);
+                        if(example.use_particle_volumes) entry*=example.phases(PHASE_ID()).volume(face);
                         diag+=entry;
                         int ci=cell_index(cell);
                         if(ci>=0) helper.Add_Entry(ci,-entry);}
@@ -433,7 +443,7 @@ Compute_Poisson_Matrix()
         SPARSE_MATRIX_THREADED_CONSTRUCTION<T> G_helper(example.projection_system.gradient,tmp2,tmp3);
         for(FACE_ITERATOR_THREADED<TV> it(example.grid);it.Valid();it.Next()){
             if(psi_N(it.Full_Index())) continue;
-            T mass=example.mass(it.Full_Index());
+            T mass=example.phases(PHASE_ID()).mass(it.Full_Index());
             if(!mass) continue;
             int c0=cell_index(it.First_Cell_Index());
             int c1=cell_index(it.Second_Cell_Index());
@@ -442,7 +452,7 @@ Compute_Poisson_Matrix()
             if(c0>=0) G_helper.Add_Entry(c0,-example.grid.one_over_dX(it.axis));
             if(c1>=0) G_helper.Add_Entry(c1,example.grid.one_over_dX(it.axis));
             faces_t.Append(it.Full_Index());
-            if(example.use_particle_volumes) mass/=example.volume(it.Full_Index());
+            if(example.use_particle_volumes) mass/=example.phases(PHASE_ID()).volume(it.Full_Index());
             mass_t.Append(mass);
         }
         G_helper.Finish();
@@ -463,7 +473,7 @@ Pressure_Projection()
 
     ARRAY<T> tmp(example.projection_system.gradient.m);
     for(int i=0;i<tmp.m;i++)
-        tmp(i)=example.velocity(example.projection_system.faces(i));
+        tmp(i)=example.phases(PHASE_ID()).velocity(example.projection_system.faces(i));
     example.projection_system.gradient.Transpose_Times(tmp,example.rhs.v);
     
     if(example.test_system) example.projection_system.Test_System(example.sol);
@@ -477,7 +487,7 @@ Pressure_Projection()
 
     example.projection_system.gradient.Times(example.sol.v,tmp);
     for(int i=0;i<tmp.m;i++)
-        example.velocity(example.projection_system.faces(i))-=tmp(i)/example.projection_system.mass(i);
+        example.phases(PHASE_ID()).velocity(example.projection_system.faces(i))-=tmp(i)/example.projection_system.mass(i);
 }
 //#####################################################################
 // Function Apply_Forces
@@ -486,9 +496,11 @@ template<class TV> void MPM_MAC_DRIVER<TV>::
 Apply_Forces()
 {
     TIMER_SCOPE_FUNC;
-    for(int i=0;i<example.valid_flat_indices.m;i++){
-        int k=example.valid_flat_indices(i);
-        example.velocity.array(k)+=example.dt*example.gravity(example.valid_indices(i).axis);}
+    for(PHASE_ID p(0);p<example.phases.m;p++){
+        PHASE& ph=example.phases(p);
+        for(int i=0;i<ph.valid_flat_indices.m;i++){
+            int k=ph.valid_flat_indices(i);
+            ph.velocity.array(k)+=example.dt*example.gravity(ph.valid_indices(i).axis);}}
 }
 //#####################################################################
 // Function Compute_Dt
@@ -598,6 +610,15 @@ Print_Energy_Stats(const char* str)
     LOG::cout<<str<<" total energy "<<"time " <<example.time<<" value "<<te<<" diff "<<(te-example.last_te)<<std::endl;
     LOG::cout<<str<<" particle total energy "<<"time " <<example.time<<" value "<<(ke2+pe)<<std::endl;
     example.last_te=te;
+}
+//#####################################################################
+// Function Prepare_Scatter
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Prepare_Scatter()
+{
+    for(PHASE_ID i(0);i<example.phases.m;i++)
+        example.phases(i).gather_scatter->Prepare_Scatter(example.particles);
 }
 //#####################################################################
 namespace PhysBAM{

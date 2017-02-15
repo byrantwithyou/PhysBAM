@@ -110,6 +110,7 @@ Read_Output_Files(const int frame)
 template<class T> void STANDARD_TESTS<VECTOR<T,3> >::
 Initialize()
 {
+    PHASE_ID number_phases(1);
     switch(test_number)
     {
         case 1:{ // rotating sphere
@@ -141,6 +142,7 @@ Initialize()
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
+    phases.Resize(number_phases);
     if(forced_collision_type!=-1)
         for(int i=0;i<collision_objects.m;i++)
             collision_objects(i)->type=(COLLISION_TYPE)forced_collision_type;

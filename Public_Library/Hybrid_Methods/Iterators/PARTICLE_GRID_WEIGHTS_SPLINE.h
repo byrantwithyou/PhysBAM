@@ -34,10 +34,10 @@ public:
     void Compute(int p,typename BASE::SCRATCH& scratch,bool want_gradient) const override;
     void Compute(const TV& X,typename BASE::SCRATCH& scratch,bool want_gradient) const override;
     void Compute_Precompute_Data(PRECOMPUTE_DATA& pd,const TV& X) const;
-    void Update(const ARRAY_VIEW<TV>& X);
-    T Constant_Scalar_Inverse_Dp() const;
-    SYMMETRIC_MATRIX<T,TV::m> Dp(const TV& X) const;
-    int Order() const;
+    void Update(const ARRAY_VIEW<TV>& X) override;
+    T Constant_Scalar_Inverse_Dp() const override;
+    SYMMETRIC_MATRIX<T,TV::m> Dp(const TV& X) const override;
+    int Order() const override;
     virtual T Weight(const TV& u) const override;
 //#####################################################################
 };

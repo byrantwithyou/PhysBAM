@@ -11,6 +11,7 @@
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
+#include <Hybrid_Methods/Examples_And_Drivers/PHASE_ID.h>
 #include <functional>
 namespace PhysBAM{
 
@@ -36,16 +37,30 @@ public:
     GRID<TV> grid;
     STREAM_TYPE stream_type;
 
+    struct PHASE
+    {
+        ARRAY<T,FACE_INDEX<TV::m> > mass,volume;
+        ARRAY<T,FACE_INDEX<TV::m> > velocity,velocity_save;
+        ARRAY<int> valid_flat_indices;
+        ARRAY<FACE_INDEX<TV::m> > valid_indices;
+        ARRAY<int> simulated_particles;
+        GATHER_SCATTER<TV>* gather_scatter;
+
+        PHASE();
+        PHASE(const PHASE&) = delete;
+        ~PHASE();
+        void Initialize(const GRID<TV>& grid,int ghost,int threads);
+    };
+
+    ARRAY<PHASE,PHASE_ID> phases;
+    PHASE* phase;
+
     // particle stuff
     MPM_PARTICLES<TV>& particles;
     ARRAY<int> simulated_particles;
 
     // grid stuff
-    ARRAY<T,FACE_INDEX<TV::m> > mass,volume,density;
-    ARRAY<T,FACE_INDEX<TV::m> > velocity,velocity_save;
     ARRAY<TV,FACE_INDEX<TV::m> > location;
-    ARRAY<int> valid_flat_indices;
-    ARRAY<FACE_INDEX<TV::m> > valid_indices;
     MPM_PROJECTION_SYSTEM<TV>& projection_system;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
     MPM_PROJECTION_VECTOR<TV>& sol;
@@ -54,7 +69,6 @@ public:
 
     // transfer stuff
     VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m> weights;
-    GATHER_SCATTER<TV>& gather_scatter;
     bool use_affine;
     bool use_early_gradient_transfer;
     T flip;
@@ -119,9 +133,12 @@ public:
 
     TV Total_Particle_Linear_Momentum() const;
     TV Total_Grid_Linear_Momentum() const;
+    TV Total_Grid_Linear_Momentum(const PHASE& ph) const;
     typename TV::SPIN Total_Grid_Angular_Momentum(T dt) const;
+    typename TV::SPIN Total_Grid_Angular_Momentum(const PHASE& ph,T dt) const;
     typename TV::SPIN Total_Particle_Angular_Momentum() const;
     T Total_Grid_Kinetic_Energy() const;
+    T Total_Grid_Kinetic_Energy(const PHASE& ph) const;
     T Total_Particle_Kinetic_Energy() const;
     T Average_Particle_Mass() const;
 //#####################################################################

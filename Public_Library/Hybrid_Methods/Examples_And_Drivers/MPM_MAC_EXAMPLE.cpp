@@ -24,7 +24,7 @@ MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type)
     :stream_type(stream_type),particles(*new MPM_PARTICLES<TV>),
     projection_system(*new MPM_PROJECTION_SYSTEM<TV>),
     sol(*new MPM_PROJECTION_VECTOR<TV>),rhs(*new MPM_PROJECTION_VECTOR<TV>),
-    ghost(3),gather_scatter(*new GATHER_SCATTER<TV>(grid,simulated_particles)),
+    ghost(3),
     use_affine(true),use_early_gradient_transfer(false),flip(0),initial_time(0),
     last_frame(100),write_substeps_level(-1),substeps_delay_frame(-1),
     output_directory("output"),data_directory("../../Public_Data"),use_test_output(false),
@@ -44,9 +44,36 @@ template<class TV> MPM_MAC_EXAMPLE<TV>::
     delete &particles;
     delete &debug_particles;
     for(int i=0;i<TV::m;i++) delete weights(i);
-    delete &gather_scatter;
     collision_objects.Delete_Pointers_And_Clean_Memory();
     fluid_walls.Delete_Pointers_And_Clean_Memory();
+}
+//#####################################################################
+// Constructor
+//#####################################################################
+template<class TV> MPM_MAC_EXAMPLE<TV>::PHASE::
+PHASE()
+    :gather_scatter(0)
+{
+}
+//#####################################################################
+// Destructor
+//#####################################################################
+template<class TV> MPM_MAC_EXAMPLE<TV>::PHASE::
+~PHASE()
+{
+    delete gather_scatter;
+}
+//#####################################################################
+// Function Initialize
+//#####################################################################
+template<class TV> void MPM_MAC_EXAMPLE<TV>::PHASE::
+Initialize(const GRID<TV>& grid,int ghost,int threads)
+{
+    gather_scatter=new GATHER_SCATTER<TV>(grid,simulated_particles);
+    gather_scatter->threads=threads;
+    mass.Resize(grid.Domain_Indices(ghost));
+    volume.Resize(grid.Domain_Indices(ghost));
+    velocity.Resize(grid.Domain_Indices(ghost));
 }
 //#####################################################################
 // Function Write_Output_Files
@@ -60,7 +87,8 @@ Write_Output_Files(const int frame)
         OCTAVE_OUTPUT<T> oo(file.c_str());
         oo.Write("X",particles.X.Flattened());
         oo.Write("V",particles.V.Flattened());
-        oo.Write("u",velocity.array);}
+        for(PHASE_ID i(0);i<phases.m;i++)
+            oo.Write("u",phases(i).velocity.array);}
 
 #pragma omp parallel
 #pragma omp single
@@ -74,7 +102,7 @@ Write_Output_Files(const int frame)
 
         if(!only_write_particles){
 #pragma omp task
-            FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/mac_velocities",output_directory.c_str(),frame),velocity);
+            FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/mac_velocities",output_directory.c_str(),frame),phases(PHASE_ID()).velocity);
 #pragma omp task
             {
                 GRID<TV> ghost_grid(grid.numbers_of_cells+2*ghost,grid.Ghost_Domain(ghost),true);
@@ -128,7 +156,9 @@ Set_Weights(int order)
         else if(order==3)
             weights(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,3>(face_grid);
         else PHYSBAM_FATAL_ERROR("Unrecognized interpolation order");}
-    gather_scatter.face_weights=weights;
+    
+    for(PHASE_ID i(0);i<phases.m;i++)
+        phases(i).gather_scatter->face_weights=weights;
 }
 //#####################################################################
 // Function Total_Particle_Linear_Momentum
@@ -153,23 +183,34 @@ Total_Particle_Linear_Momentum() const
 // Function Total_Grid_Linear_Momentum
 //#####################################################################
 template<class TV> TV MPM_MAC_EXAMPLE<TV>::
-Total_Grid_Linear_Momentum() const
+Total_Grid_Linear_Momentum(const PHASE& ph) const
 {
     TV result;
 #pragma omp parallel for
     for(int t=0;t<threads;t++){
-        int a=t*valid_flat_indices.m/threads;
-        int b=(t+1)*valid_flat_indices.m/threads;
+        int a=t*ph.valid_flat_indices.m/threads;
+        int b=(t+1)*ph.valid_flat_indices.m/threads;
         TV result_local;
         for(int k=a;k<b;k++){
-            int j=valid_flat_indices(k);
-            result_local(valid_indices(k).axis)+=mass.array(j)*velocity.array(j);}
+            int j=ph.valid_flat_indices(k);
+            result_local(ph.valid_indices(k).axis)+=ph.mass.array(j)*ph.velocity.array(j);}
 #pragma omp critical
         result+=result_local;}
     return result;
 }
 //#####################################################################
-// Function Total_Grid_Angular_Momentum
+// Function Total_Grid_Linear_Momentum
+//#####################################################################
+template<class TV> TV MPM_MAC_EXAMPLE<TV>::
+Total_Grid_Linear_Momentum() const
+{
+    TV result;
+    for(PHASE_ID i(0);i<phases.m;i++)
+        result+=Total_Grid_Linear_Momentum(phases(i));
+    return result;
+}
+//#####################################################################
+// Function Total_Particle_Angular_Momentum
 //#####################################################################
 template<class TV> typename TV::SPIN MPM_MAC_EXAMPLE<TV>::
 Total_Particle_Angular_Momentum() const
@@ -192,20 +233,44 @@ Total_Particle_Angular_Momentum() const
 // Function Total_Grid_Angular_Momentum
 //#####################################################################
 template<class TV> typename TV::SPIN MPM_MAC_EXAMPLE<TV>::
-Total_Grid_Angular_Momentum(T dt) const
+Total_Grid_Angular_Momentum(const PHASE& ph,T dt) const
 {
     typename TV::SPIN result;
 #pragma omp parallel for
     for(int t=0;t<threads;t++){
-        int a=t*valid_flat_indices.m/threads;
-        int b=(t+1)*valid_flat_indices.m/threads;
+        int a=t*ph.valid_flat_indices.m/threads;
+        int b=(t+1)*ph.valid_flat_indices.m/threads;
         typename TV::SPIN result_local;
         for(int k=a;k<b;k++){
-            int i=valid_flat_indices(k);
+            int i=ph.valid_flat_indices(k);
             TV X=location.array(i);
-            result_local+=mass.array(i)*TV::Cross_Product(X,velocity.array(i)*TV::Axis_Vector(valid_indices(k).axis));}
+            result_local+=ph.mass.array(i)*TV::Cross_Product(X,ph.velocity.array(i)*TV::Axis_Vector(ph.valid_indices(k).axis));}
 #pragma omp critical
         result+=result_local;}
+    return result;
+}
+//#####################################################################
+// Function Total_Grid_Angular_Momentum
+//#####################################################################
+template<class TV> typename TV::SPIN MPM_MAC_EXAMPLE<TV>::
+Total_Grid_Angular_Momentum(T dt) const
+{
+    typename TV::SPIN result;
+    for(PHASE_ID i(0);i<phases.m;i++)
+        result+=Total_Grid_Angular_Momentum(phases(i),dt);
+    return result;
+}
+//#####################################################################
+// Function Total_Grid_Kinetic_Energy
+//#####################################################################
+template<class TV> typename TV::SCALAR MPM_MAC_EXAMPLE<TV>::
+Total_Grid_Kinetic_Energy(const PHASE& ph) const
+{
+    T result=0;
+#pragma omp parallel for reduction(+:result)
+    for(int i=0;i<ph.valid_flat_indices.m;i++){
+        int j=ph.valid_flat_indices(i);
+        result+=(T).5*ph.mass.array(j)*sqr(ph.velocity.array(j));}
     return result;
 }
 //#####################################################################
@@ -215,10 +280,8 @@ template<class TV> typename TV::SCALAR MPM_MAC_EXAMPLE<TV>::
 Total_Grid_Kinetic_Energy() const
 {
     T result=0;
-#pragma omp parallel for reduction(+:result)
-    for(int i=0;i<valid_flat_indices.m;i++){
-        int j=valid_flat_indices(i);
-        result+=(T).5*mass.array(j)*sqr(velocity.array(j));}
+    for(PHASE_ID i(0);i<phases.m;i++)
+        result+=Total_Grid_Kinetic_Energy(phases(i));
     return result;
 }
 //#####################################################################
