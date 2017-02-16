@@ -67,10 +67,16 @@ template<class TV> MPM_MAC_EXAMPLE<TV>::PHASE::
 // Function Initialize
 //#####################################################################
 template<class TV> void MPM_MAC_EXAMPLE<TV>::PHASE::
-Initialize(const GRID<TV>& grid,int ghost,int threads)
+Initialize(const GRID<TV>& grid,
+           const ARRAY<int>& simulated_particles,
+           const VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m>& weights,
+           int ghost,
+           int threads)
 {
     gather_scatter=new GATHER_SCATTER<TV>(grid,simulated_particles);
     gather_scatter->threads=threads;
+    gather_scatter->face_weights=weights;
+    
     mass.Resize(grid.Domain_Indices(ghost));
     volume.Resize(grid.Domain_Indices(ghost));
     velocity.Resize(grid.Domain_Indices(ghost));
@@ -156,9 +162,6 @@ Set_Weights(int order)
         else if(order==3)
             weights(i)=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,3>(face_grid);
         else PHYSBAM_FATAL_ERROR("Unrecognized interpolation order");}
-    
-    for(PHASE_ID i(0);i<phases.m;i++)
-        phases(i).gather_scatter->face_weights=weights;
 }
 //#####################################################################
 // Function Total_Particle_Linear_Momentum

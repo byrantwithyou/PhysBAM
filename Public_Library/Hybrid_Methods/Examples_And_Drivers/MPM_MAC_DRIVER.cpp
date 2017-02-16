@@ -89,7 +89,12 @@ Initialize()
     PHYSBAM_ASSERT(!example.particles.store_B || !example.particles.store_C);
 
     for(PHASE_ID i(0);i<example.phases.m;i++)
-        example.phases(i).Initialize(example.grid,example.ghost,example.threads);
+        example.phases(i).Initialize(
+                                     example.grid,
+                                     example.simulated_particles,
+                                     example.weights,
+                                     example.ghost,
+                                     example.threads);
 
     RANGE<TV_INT> range(example.grid.Cell_Indices(example.ghost));
     example.location.Resize(example.grid,example.ghost);

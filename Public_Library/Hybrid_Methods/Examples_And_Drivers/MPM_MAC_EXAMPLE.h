@@ -43,13 +43,15 @@ public:
         ARRAY<T,FACE_INDEX<TV::m> > velocity,velocity_save;
         ARRAY<int> valid_flat_indices;
         ARRAY<FACE_INDEX<TV::m> > valid_indices;
-        ARRAY<int> simulated_particles;
         GATHER_SCATTER<TV>* gather_scatter;
 
         PHASE();
         PHASE(const PHASE&) = delete;
         ~PHASE();
-        void Initialize(const GRID<TV>& grid,int ghost,int threads);
+        void Initialize(const GRID<TV>& grid,
+                        const ARRAY<int>& simulated_particles,
+                        const VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m>& weights,
+                        int ghost,int threads);
     };
 
     ARRAY<PHASE,PHASE_ID> phases;
