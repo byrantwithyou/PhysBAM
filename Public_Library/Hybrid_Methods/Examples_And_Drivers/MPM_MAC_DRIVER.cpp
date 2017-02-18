@@ -537,7 +537,7 @@ Max_Particle_Speed() const
 {
     TIMER_SCOPE_FUNC;
     T v=0;
-    for(PHASE_ID i(i);i<example.phases.m;i++)
+    for(PHASE_ID i(0);i<example.phases.m;i++)
         v=max(v,Max_Particle_Speed(example.phases(i)));
     return v;
 }
