@@ -43,13 +43,13 @@ public:
         ARRAY<T,FACE_INDEX<TV::m> > velocity,velocity_save;
         ARRAY<int> valid_flat_indices;
         ARRAY<FACE_INDEX<TV::m> > valid_indices;
+        ARRAY<int> simulated_particles;
         GATHER_SCATTER<TV>* gather_scatter;
 
         PHASE();
         PHASE(const PHASE&) = delete;
         ~PHASE();
         void Initialize(const GRID<TV>& grid,
-                        const ARRAY<int>& simulated_particles,
                         const VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m>& weights,
                         int ghost,int threads);
     };
@@ -59,7 +59,6 @@ public:
 
     // particle stuff
     MPM_PARTICLES<TV>& particles;
-    ARRAY<int> simulated_particles;
 
     // grid stuff
     ARRAY<TV,FACE_INDEX<TV::m> > location;
@@ -134,15 +133,19 @@ public:
     {Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<OBJECT>(object),type,friction,func_frame,func_twist);}
 
     TV Total_Particle_Linear_Momentum() const;
+    TV Total_Particle_Linear_Momentum(const PHASE& ph) const;
     TV Total_Grid_Linear_Momentum() const;
     TV Total_Grid_Linear_Momentum(const PHASE& ph) const;
     typename TV::SPIN Total_Grid_Angular_Momentum(T dt) const;
     typename TV::SPIN Total_Grid_Angular_Momentum(const PHASE& ph,T dt) const;
     typename TV::SPIN Total_Particle_Angular_Momentum() const;
+    typename TV::SPIN Total_Particle_Angular_Momentum(const PHASE& ph) const;
     T Total_Grid_Kinetic_Energy() const;
     T Total_Grid_Kinetic_Energy(const PHASE& ph) const;
     T Total_Particle_Kinetic_Energy() const;
+    T Total_Particle_Kinetic_Energy(const PHASE& ph) const;
     T Average_Particle_Mass() const;
+    T Average_Particle_Mass(const PHASE& ph) const;
 //#####################################################################
 };
 }

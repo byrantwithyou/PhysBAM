@@ -47,7 +47,9 @@ public:
     void Apply_Forces();
     T Compute_Dt() const;
     T Max_Particle_Speed() const;
+    T Max_Particle_Speed(const PHASE& ph) const;
     T Grid_V_Upper_Bound() const;
+    T Grid_V_Upper_Bound(const PHASE& ph) const;
     void Update_Simulated_Particles();
     void Print_Grid_Stats(const char* str,T dt);
     void Print_Particle_Stats(const char* str,T dt);

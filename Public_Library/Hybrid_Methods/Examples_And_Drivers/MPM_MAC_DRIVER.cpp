@@ -89,9 +89,7 @@ Initialize()
     PHYSBAM_ASSERT(!example.particles.store_B || !example.particles.store_C);
 
     for(PHASE_ID i(0);i<example.phases.m;i++)
-        example.phases(i).Initialize(
-                                     example.grid,
-                                     example.simulated_particles,
+        example.phases(i).Initialize(example.grid,
                                      example.weights,
                                      example.ghost,
                                      example.threads);
@@ -522,15 +520,42 @@ Compute_Dt() const
 // Function Max_Particle_Speed
 //#####################################################################
 template<class TV> typename TV::SCALAR MPM_MAC_DRIVER<TV>::
+Max_Particle_Speed(const PHASE& ph) const
+{
+    T v2=0;
+#pragma omp parallel for reduction(max:v2)
+    for(int k=0;k<ph.simulated_particles.m;k++){
+        int p=ph.simulated_particles(k);
+        v2=max(v2,example.particles.V(p).Magnitude_Squared());}
+    return sqrt(v2);
+}
+//#####################################################################
+// Function Max_Particle_Speed
+//#####################################################################
+template<class TV> typename TV::SCALAR MPM_MAC_DRIVER<TV>::
 Max_Particle_Speed() const
 {
     TIMER_SCOPE_FUNC;
-    T v2=0;
-#pragma omp parallel for reduction(max:v2)
-    for(int k=0;k<example.simulated_particles.m;k++){
-        int p=example.simulated_particles(k);
-        v2=max(v2,example.particles.V(p).Magnitude_Squared());}
-    return sqrt(v2);
+    T v=0;
+    for(PHASE_ID i(i);i<example.phases.m;i++)
+        v=max(v,Max_Particle_Speed(example.phases(i)));
+    return v;
+}
+//#####################################################################
+// Function Grid_V_Upper_Bound
+//#####################################################################
+template<class TV> typename TV::SCALAR MPM_MAC_DRIVER<TV>::
+Grid_V_Upper_Bound(const PHASE& ph) const
+{
+    T result=0;
+    T xi=(T)6*sqrt((T)TV::m)*example.grid.one_over_dX.Min();
+#pragma omp parallel for reduction(max:result)
+    for(int k=0;k<ph.simulated_particles.m;k++){
+        int p=ph.simulated_particles(k);
+        T v=example.particles.V(p).Magnitude();
+        if(example.particles.store_B) v+=example.particles.B(p).Frobenius_Norm()*xi;
+        result=max(result,v);}
+    return result;
 }
 //#####################################################################
 // Function Grid_V_Upper_Bound
@@ -540,14 +565,11 @@ Grid_V_Upper_Bound() const
 {
     TIMER_SCOPE_FUNC;
     if(!example.use_affine || !example.weights(0)->constant_scalar_inertia_tensor) return Max_Particle_Speed();
+
     T result=0;
-    T xi=(T)6*sqrt((T)TV::m)*example.grid.one_over_dX.Min();
-#pragma omp parallel for reduction(max:result)
-    for(int k=0;k<example.simulated_particles.m;k++){
-        int p=example.simulated_particles(k);
-        T v=example.particles.V(p).Magnitude();
-        if(example.particles.store_B) v+=example.particles.B(p).Frobenius_Norm()*xi;
-        result=max(result,v);}
+    
+    for(PHASE_ID i(0);i<example.phases.m;i++)
+        result=max(result,Grid_V_Upper_Bound(example.phases(i)));
     return result;
 }
 //#####################################################################
@@ -557,10 +579,31 @@ template<class TV> void MPM_MAC_DRIVER<TV>::
 Update_Simulated_Particles()
 {
     TIMER_SCOPE_FUNC;
-    example.simulated_particles.Remove_All();
-    for(int p=0;p<example.particles.number;p++)
-        if(example.particles.valid(p))
-            example.simulated_particles.Append(p);
+
+    if(!example.particles.store_phase){
+        // If particles do not have phase attribute,
+        // put them in the default(0) phase.
+        PHASE& ph=example.phases(PHASE_ID(0));
+        ph.simulated_particles.Remove_All();
+        
+        for(int p=0;p<example.particles.number;p++){
+            if(example.particles.valid(p))
+                ph.simulated_particles.Append(p);
+        }
+    }
+    else{
+        // Otherwise dispatch particles to their corresponding phase
+        // based on their phase attribute value.
+        for(PHASE_ID i(0);i<example.phases.m;i++)
+            example.phases(i).simulated_particles.Remove_All();
+        
+        for(int p=0;p<example.particles.number;p++){
+            int particle_phase=example.particles.phase(p);
+            PHASE& ph=example.phases(PHASE_ID(particle_phase));
+            if(example.particles.valid(p))
+                ph.simulated_particles.Append(p);
+        }
+    }
 }
 //#####################################################################
 // Function Print_Grid_Stats

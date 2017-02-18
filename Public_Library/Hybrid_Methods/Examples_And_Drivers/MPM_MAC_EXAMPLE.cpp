@@ -68,7 +68,6 @@ template<class TV> MPM_MAC_EXAMPLE<TV>::PHASE::
 //#####################################################################
 template<class TV> void MPM_MAC_EXAMPLE<TV>::PHASE::
 Initialize(const GRID<TV>& grid,
-           const ARRAY<int>& simulated_particles,
            const VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m>& weights,
            int ghost,
            int threads)
@@ -167,19 +166,30 @@ Set_Weights(int order)
 // Function Total_Particle_Linear_Momentum
 //#####################################################################
 template<class TV> TV MPM_MAC_EXAMPLE<TV>::
-Total_Particle_Linear_Momentum() const
+Total_Particle_Linear_Momentum(const PHASE& ph) const
 {
     TV result;
 #pragma omp parallel for
     for(int t=0;t<threads;t++){
-        int a=t*simulated_particles.m/threads;
-        int b=(t+1)*simulated_particles.m/threads;
+        int a=t*ph.simulated_particles.m/threads;
+        int b=(t+1)*ph.simulated_particles.m/threads;
         TV result_local;
         for(int k=a;k<b;k++){
-            int p=simulated_particles(k);
+            int p=ph.simulated_particles(k);
             result_local+=particles.mass(p)*particles.V(p);}
 #pragma omp critical
         result+=result_local;}
+    return result;
+}
+//#####################################################################
+// Function Total_Particle_Linear_Momentum
+//#####################################################################
+template<class TV> TV MPM_MAC_EXAMPLE<TV>::
+Total_Particle_Linear_Momentum() const
+{
+    TV result;
+    for(PHASE_ID i(0);i<phases.m;i++)
+        result+=Total_Particle_Linear_Momentum(phases(i));
     return result;
 }
 //#####################################################################
@@ -216,20 +226,31 @@ Total_Grid_Linear_Momentum() const
 // Function Total_Particle_Angular_Momentum
 //#####################################################################
 template<class TV> typename TV::SPIN MPM_MAC_EXAMPLE<TV>::
-Total_Particle_Angular_Momentum() const
+Total_Particle_Angular_Momentum(const PHASE& ph) const
 {
     typename TV::SPIN result;
 #pragma omp parallel for
     for(int t=0;t<threads;t++){
-        int a=t*simulated_particles.m/threads;
-        int b=(t+1)*simulated_particles.m/threads;
+        int a=t*ph.simulated_particles.m/threads;
+        int b=(t+1)*ph.simulated_particles.m/threads;
         typename TV::SPIN result_local;
         for(int k=a;k<b;k++){
-            int p=simulated_particles(k);
+            int p=ph.simulated_particles(k);
             result_local+=particles.mass(p)*particles.X(p).Cross(particles.V(p));
             if(particles.store_B) result_local-=particles.mass(p)*particles.B(p).Contract_Permutation_Tensor();}
 #pragma omp critical
         result+=result_local;}
+    return result;
+}
+//#####################################################################
+// Function Total_Particle_Angular_Momentum
+//#####################################################################
+template<class TV> typename TV::SPIN MPM_MAC_EXAMPLE<TV>::
+Total_Particle_Angular_Momentum() const
+{
+    typename TV::SPIN result;
+    for(PHASE_ID i(0);i<phases.m;i++)
+        result+=Total_Particle_Angular_Momentum(phases(i));
     return result;
 }
 //#####################################################################
@@ -291,18 +312,41 @@ Total_Grid_Kinetic_Energy() const
 // Function Total_Particle_Kinetic_Energy
 //#####################################################################
 template<class TV> typename TV::SCALAR MPM_MAC_EXAMPLE<TV>::
-Total_Particle_Kinetic_Energy() const
+Total_Particle_Kinetic_Energy(const PHASE& ph) const
 {
     T result=0,Dp_inverse=0;
     if(use_affine && weights(0)->constant_scalar_inertia_tensor)
         Dp_inverse=weights(0)->Constant_Scalar_Inverse_Dp();
 #pragma omp parallel for reduction(+:result)
-    for(int k=0;k<simulated_particles.m;k++){
-        int p=simulated_particles(k);
+    for(int k=0;k<ph.simulated_particles.m;k++){
+        int p=ph.simulated_particles(k);
         T result_local=particles.mass(p)/2*particles.V(p).Magnitude_Squared();
         if(particles.store_B) result_local+=particles.mass(p)/2*Dp_inverse*particles.B(p).Frobenius_Norm_Squared();
         result+=result_local;}
     return result;
+}
+//#####################################################################
+// Function Total_Particle_Kinetic_Energy
+//#####################################################################
+template<class TV> typename TV::SCALAR MPM_MAC_EXAMPLE<TV>::
+Total_Particle_Kinetic_Energy() const
+{
+    T result=0;
+    for(PHASE_ID i(0);i<phases.m;i++)
+        result+=Total_Particle_Kinetic_Energy(phases(i));
+    return result;
+}
+//#####################################################################
+// Function Average_Particle_Mass
+//#####################################################################
+template<class TV> typename TV::SCALAR MPM_MAC_EXAMPLE<TV>::
+Average_Particle_Mass(const PHASE& ph) const
+{
+    T result=0;
+#pragma omp parallel for reduction(+:result)
+    for(int k=0;k<ph.simulated_particles.m;k++)
+        result+=particles.mass(ph.simulated_particles(k));
+    return result/(T)particles.number;
 }
 //#####################################################################
 // Function Average_Particle_Mass
@@ -311,10 +355,9 @@ template<class TV> typename TV::SCALAR MPM_MAC_EXAMPLE<TV>::
 Average_Particle_Mass() const
 {
     T result=0;
-#pragma omp parallel for reduction(+:result)
-    for(int k=0;k<simulated_particles.m;k++)
-        result+=particles.mass(simulated_particles(k));
-    return result/(T)particles.number;
+    for(PHASE_ID i(0);i<phases.m;i++)
+        result+=Average_Particle_Mass(phases(i));
+    return result;
 }
 //#####################################################################
 // Function Add_Collision_Object
