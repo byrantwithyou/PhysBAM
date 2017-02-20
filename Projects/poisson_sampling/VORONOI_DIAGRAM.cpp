@@ -153,6 +153,15 @@ Select_First_In_Vertex(COEDGE* start,const TV& new_pt) const -> VERTEX*
     return start->tail;
 }
 //#####################################################################
+// Constructor
+//#####################################################################
+template<class T> VORONOI_DIAGRAM<T>::
+VORONOI_DIAGRAM()
+    :radius(0)
+{
+    random.Set_Seed(1235);
+}
+//#####################################################################
 // Function Discover_Inside
 //#####################################################################
 template<class T> void VORONOI_DIAGRAM<T>::
@@ -485,6 +494,9 @@ Insert_Coedge(COEDGE* ce)
     else{
         PIECE p;
         p.coedge=ce;
+        p.h.A=ce->cell->X;
+        p.h.B=ce->tail->X;
+        p.h.C=ce->head->X;
         T area=p.h.Compute(ce,radius,false);
         int i=pieces.Append(p);
         p.this_area=area;
@@ -521,8 +533,8 @@ Insert_Clipped_Coedge(COEDGE* ce)
         p.sub_pieces[i].C=polygon(i+2);
         area+=p.sub_pieces[i].Compute(ce,radius,true);}
 
-    int i=clipped_pieces.Append(p);
     p.this_area=area;
+    int i=clipped_pieces.Append(p);
     Update_Clipped_Piece_Tree(i,area);
     ce->piece=first_clipped_piece_index+i;
 }
@@ -582,15 +594,17 @@ Update_Coedge(COEDGE* ce)
 // Function Choose_Piece
 //#####################################################################
 template<class T> int VORONOI_DIAGRAM<T>::
-Choose_Piece()
+Choose_Piece() const
 {
-    T total_area=0;
-    if(pieces.m) total_area+=pieces(0).subtree_area;
-    if(clipped_pieces.m) total_area+=clipped_pieces(0).subtree_area;
+    T pieces_area=pieces.m?pieces(0).subtree_area:0;
+    T clipped_pieces_area=clipped_pieces.m?clipped_pieces(0).subtree_area:0;
+    T total_area=pieces_area+clipped_pieces_area;
+    assert(total_area>=0);
+    if(total_area==0) return -1;
     T r=random.Get_Uniform_Number(0,total_area);
     int i=0;
-    if(r<=clipped_pieces(0).subtree_area){
-        r-=clipped_pieces(0).subtree_area;
+    if(r>pieces_area){
+        r-=pieces_area;
         while(1){
             if(r<=clipped_pieces(i).this_area) return first_clipped_piece_index+i;
             int j=2*i+1,k=j+1;
@@ -611,25 +625,42 @@ Choose_Piece()
             if(k>=pieces.m){assert(r<1e-5);return j;}
             i=k;}}
 }
-template<class TV,class T>
-inline T Disk_Inside_Triangle(TV B,TV C,T radius)
+//#####################################################################
+// Function Choose_Feasible_Point
+//#####################################################################
+template<class T> auto VORONOI_DIAGRAM<T>::
+Choose_Feasible_Point(int p) const -> TV
 {
-    return B.Cross(C).x - TV::Angle_Between(B,C)*sqr(radius)/2;
+    if(p>=first_clipped_piece_index){
+        const CLIPPED_PIECE& cp=clipped_pieces(p-first_clipped_piece_index);
+        T r=random.Get_Uniform_Number(0,cp.this_area);
+        int s=0;
+        for(;s<cp.num_sub_pieces-1;s++){
+            r-=cp.sub_pieces[s].this_area;
+            if(r<=0) break;}
+        return cp.sub_pieces[s].Choose_Feasible_Point(random,radius);}
+    else return pieces(p).h.Choose_Feasible_Point(random,radius);
 }
 //#####################################################################
-// Function Compute_Available_Area
+// Function Disk_Inside_Triangle
+//#####################################################################
+template<class TV,class T> inline T
+Disk_Inside_Triangle(TV B,TV C,T radius)
+{
+    return (T).5*(B.Cross(C).x-TV::Angle_Between(B,C)*sqr(radius));
+}
+//#####################################################################
+// Function Compute
 //#####################################################################
 template<class T> T VORONOI_DIAGRAM<T>::PIECE_HELPER::
 Compute(COEDGE* ce,T radius,bool clipped)
 {
-    if(!clipped){
-        A=ce->cell->X;
-        B=ce->tail->X-A;
-        C=ce->head->X-A;}
+    B-=A;
+    C-=A;
 
     if(ce->cell->outside){
         type=no_disc;
-        return B.Cross(C).x;} // Just a triangle: case A
+        return this_area=(T).5*B.Cross(C).x;} // Just a triangle: case A
 
     T B_mag2_min_r2=B.Magnitude_Squared()-sqr(radius);
     T C_mag2_min_r2=C.Magnitude_Squared()-sqr(radius);
@@ -637,7 +668,7 @@ Compute(COEDGE* ce,T radius,bool clipped)
     bool C_in_disk=C_mag2_min_r2<=0;
     if(B_in_disk && C_in_disk){
         type=empty;
-        return 0;} // entire triangle in circle: case B
+        return this_area=0;} // entire triangle in circle: case B
 
     QUADRATIC<T> quad((B-C).Magnitude_Squared(),-2*B.Dot(B-C),B_mag2_min_r2);
     quad.Compute_Roots();
@@ -646,11 +677,11 @@ Compute(COEDGE* ce,T radius,bool clipped)
         type=full_disc;
         aux0=(quad.root1+quad.root2)/2; // for point sampling
         aux1=Disk_Inside_Triangle(B,C,radius);
-        return aux1;} // case C
+        return this_area=aux1;} // case C
 
     if(quad.root1<=0 && quad.root2>=1){
         type=empty;
-        return 0;} // case B (numerical error)
+        return this_area=0;} // case B (numerical error)
 
     if(quad.root1>0 && quad.root2<1){ // case E
         type=both_out;
@@ -660,15 +691,15 @@ Compute(COEDGE* ce,T radius,bool clipped)
         T A0=Disk_Inside_Triangle(B,P,radius);
         T A1=Disk_Inside_Triangle(Q,C,radius);
         aux2=A0/(A0+A1);
-        return A0+A1;}
+        return this_area=A0+A1;}
 
     aux0=quad.root1>0?quad.root1:quad.root2;
     TV P=B+aux0*(C-B);
     if(B_in_disk){
         type=out1;
-        return Disk_Inside_Triangle(P,C,radius);} // case D
+        return this_area=Disk_Inside_Triangle(P,C,radius);} // case D
     type=out0;
-    return Disk_Inside_Triangle(B,P,radius); // case D
+    return this_area=Disk_Inside_Triangle(B,P,radius); // case D
 }
 template<class TV,class T>
 inline TV Random_Sample_In_Triangle(RANDOM_NUMBERS<T>& random,const TV& B,const TV& C)
@@ -694,7 +725,7 @@ inline TV Random_Sample_In_Cut_Triangle(RANDOM_NUMBERS<T>& random,const TV& B,co
     }
 }
 //#####################################################################
-// Function Compute_Available_Area
+// Function Choose_Feasible_Point
 //#####################################################################
 template<class T> auto VORONOI_DIAGRAM<T>::PIECE_HELPER::
 Choose_Feasible_Point(RANDOM_NUMBERS<T>& random,T radius) const -> TV
@@ -705,26 +736,27 @@ Choose_Feasible_Point(RANDOM_NUMBERS<T>& random,T radius) const -> TV
         TV P=B+aux0*(C-B);
         P*=radius/P.Magnitude();
         T p=random.Get_Uniform_Number(0,aux1);
-        T AT=(B-P).Cross(C-P).x;
-        if(p<AT) return Random_Sample_In_Triangle(random,B-P,C-P)+P+A;
+        T AT=(T).5*(B-P).Cross(C-P).x;
+        if(p<=AT) return Random_Sample_In_Triangle(random,B-P,C-P)+P+A;
         p-=AT;
-        if(p<Disk_Inside_Triangle(P,C,radius))
-            return Random_Sample_In_Cut_Triangle(random,P,B,radius);
-        return Random_Sample_In_Cut_Triangle(random,P,C,radius);}
-    if(type==out0) return Random_Sample_In_Cut_Triangle(random,B+aux0*(C-B),C,radius);
-    if(type==out1) return Random_Sample_In_Cut_Triangle(random,B+aux0*(C-B),B,radius);
+        if(p<=Disk_Inside_Triangle(P,B,radius))
+            return Random_Sample_In_Cut_Triangle(random,P,B,radius)+A;
+        return Random_Sample_In_Cut_Triangle(random,P,C,radius)+A;}
+    if(type==out0) return Random_Sample_In_Cut_Triangle(random,B+aux0*(C-B),B,radius)+A;
+    if(type==out1) return Random_Sample_In_Cut_Triangle(random,B+aux0*(C-B),C,radius)+A;
 
     // case E
     if(random.Get_Uniform_Number(0,1)>aux2)
-        return Random_Sample_In_Cut_Triangle(random,B+aux0*(C-B),B,radius);
-    return Random_Sample_In_Cut_Triangle(random,B+aux1*(C-B),C,radius);
+        return Random_Sample_In_Cut_Triangle(random,B+aux0*(C-B),B,radius)+A;
+    return Random_Sample_In_Cut_Triangle(random,B+aux1*(C-B),C,radius)+A;
 }
 //#####################################################################
 // Function Init
 //#####################################################################
 template<class T> void VORONOI_DIAGRAM<T>::
-Init(const RANGE<TV>& box)
+Init(const RANGE<TV>& box,T radius_input)
 {
+    radius=radius_input;
     bounding_box=box;
     TV e=box.Edge_Lengths();
 
@@ -736,8 +768,6 @@ Init(const RANGE<TV>& box)
     P[1]=TV(P[2].x,P[0].y);
     P[3]=TV(P[0].x,P[2].y);
     TV E=random.Get_Uniform_Vector(box);
-
-    E=box.Center();
 
     CELL *cellP[4]={};
     COEDGE *PE[4]={},*EP[4]={},*PQ[4]={},*QP[4]={};

@@ -6,6 +6,7 @@
 #include <Core/Vectors/VECTOR.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Grid_Tools/Grids/GRID.h>
+#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include "VORONOI_DIAGRAM.h"
 
@@ -36,9 +37,14 @@ int main(int argc, char* argv[])
         vd.Insert_Point(vd.pieces(p).coedge,X);
         vd.Visualize_State("After insert");}
 */
-    vd.Init(RANGE<TV>::Unit_Box());
+    vd.Init(RANGE<TV>::Unit_Box(),(T).1);
     vd.Visualize_State("Initial");
 
+    for(int i=0;i<10000;i++){
+        int p=vd.Choose_Piece();
+        TV X=vd.Choose_Feasible_Point(p);
+        Add_Debug_Particle(X,VECTOR<T,3>(0,1,0));}
+    vd.Visualize_State("Initial");
 
     Flush_Frame<TV>("end");
 

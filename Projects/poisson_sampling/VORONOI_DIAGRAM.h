@@ -76,7 +76,7 @@ struct VORONOI_DIAGRAM
     std::set<VERTEX*> vertices;
     T radius;
     RANGE<TV> bounding_box;
-    RANDOM_NUMBERS<T> random;
+    mutable RANDOM_NUMBERS<T> random;
     enum PIECE_TYPE {unset,empty,no_disc,full_disc,out0,out1,both_out};
 
     struct PIECE_HELPER
@@ -84,6 +84,7 @@ struct VORONOI_DIAGRAM
         PIECE_TYPE type;
         TV A,B,C;
         T aux0,aux1,aux2;
+        T this_area;
 
         PIECE_HELPER()
             :type(unset),aux0(0),aux1(0),aux2(0)
@@ -126,7 +127,9 @@ struct VORONOI_DIAGRAM
     };
     ARRAY<CLIPPED_PIECE> clipped_pieces;
 
-    void Init(const RANGE<TV>& box);
+    VORONOI_DIAGRAM();
+
+    void Init(const RANGE<TV>& box,T radius_input);
     
     void Update_Piece_Tree(int i,T diff_area);
     void Update_Clipped_Piece_Tree(int i,T diff_area);
@@ -137,8 +140,8 @@ struct VORONOI_DIAGRAM
     void Remove_Clipped_Piece(int p);
     void Insert_Clipped_Coedge(COEDGE* ce);
     
-    T Compute_Available_Area(TV A,TV B,TV C,bool first_vertex_disk); // ccw order
-    int Choose_Piece();
+    int Choose_Piece() const;
+    TV Choose_Feasible_Point(int p) const;
     
     void Discover_Inside(ARRAY<COEDGE*>& in,ARRAY<COEDGE*>& adj,
         ARRAY<VERTEX*>& out_v,ARRAY<VERTEX*>& in_v,COEDGE* ce,const TV& new_pt);
