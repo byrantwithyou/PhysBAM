@@ -104,6 +104,8 @@ struct VORONOI_DIAGRAM
         PIECE()
             :this_area(0),subtree_area(0),coedge(0)
         {}
+
+        void Print() const;
     };
     ARRAY<PIECE> pieces;
 

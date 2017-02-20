@@ -76,7 +76,7 @@ Compute_Point()
     Compute_Point(A,B,C);
 }
 //#####################################################################
-// Function Criterion
+// Function Print
 //#####################################################################
 template<class T> void VORONOI_DIAGRAM<T>::VERTEX::
 Print() const
@@ -86,7 +86,7 @@ Print() const
         name,X,state_names[(int)state],first_coedge?first_coedge->name:'-');
 }
 //#####################################################################
-// Function Criterion
+// Function Print
 //#####################################################################
 template<class T> void VORONOI_DIAGRAM<T>::COEDGE::
 Print() const
@@ -95,7 +95,7 @@ Print() const
         name,pair?pair->name:'-',next?next->name:'-',prev?prev->name:'-',head?head->name:'-',tail?tail->name:'-',cell?cell->name:'-');
 }
 //#####################################################################
-// Function Criterion
+// Function Print
 //#####################################################################
 template<class T> void VORONOI_DIAGRAM<T>::CELL::
 Print() const
@@ -103,6 +103,18 @@ Print() const
     const char * state_names[] = {"non_incident","incident"};
     LOG::printf("cell name=%c X=%P state=%s first_coedge=%c\n",
         name,X,state_names[(int)state],first_coedge?first_coedge->name:'-');
+}
+//#####################################################################
+// Function Print
+//#####################################################################
+template<class T> void VORONOI_DIAGRAM<T>::PIECE::
+Print() const
+{
+    const char* type[]={"unset","empty","no_disc","full_disc","out0","out1","both_out"};
+
+    LOG::printf("piece coedge=%c this_area=%P subtree_area=%P type= A=%P B=%P C=%P aux0=%P aux1=%P aux2=%P\n",
+        coedge?coedge->name:'-',this_area,subtree_area,type[h.type],
+        h.A,h.B,h.C,h.aux0,h.aux1,h.aux2);
 }
 //#####################################################################
 // Function Select_First_In_Vertex
@@ -323,6 +335,7 @@ First_Three_Points(TV A,TV B,TV C)
     coedges.insert(BC);
     coedges.insert(CB);
     vertices.insert(V);
+
     puts("after First_Three_Points");
     Print();
 }
@@ -407,6 +420,7 @@ Print() const
     for(int i=0;i<cells.m;i++) cells(i)->Print();
     for(auto ce:coedges) ce->Print();
     for(auto v:vertices) v->Print();
+    for(auto p:pieces) p.Print();
 }
 //#####################################################################
 // Function Update_Piece_Tree
@@ -711,18 +725,69 @@ Init(const RANGE<TV>& box)
     TV e=box.Edge_Lengths();
 
     // Four points far enough out from the corners that no infinite edge can reach the box.
+
     TV P[4];
     P[0]=box.Center()+e*2;
     P[2]=box.Center()-e*2;
-    P[1]=TV(P[0].x,P[2].y);
-    P[3]=TV(P[2].x,P[0].y);
+    P[1]=TV(P[2].x,P[0].y);
+    P[3]=TV(P[0].x,P[2].y);
+    TV E=random.Get_Uniform_Vector(box);
+    CELL *cellP[4]={};
+    COEDGE *PE[4]={},*EP[4]={},*PQ[4]={},*QP[4]={};
+    VERTEX* V[4]={};
+    for(int i=0;i<4;i++){
+        PE[i]=new COEDGE;
+        EP[i]=new COEDGE;
+        PQ[i]=new COEDGE;
+        QP[i]=new COEDGE;
+        PE[i]->pair=EP[i];
+        EP[i]->pair=PE[i];
+        PQ[i]->pair=QP[i];
+        QP[i]->pair=PQ[i];
+        coedges.insert(PE[i]);
+        coedges.insert(EP[i]);
+        coedges.insert(PQ[i]);
+        coedges.insert(QP[i]);
+        cellP[i]=new CELL;
+        cellP[i]->X=P[i];
+        cellP[i]->outside=true;
+        cellP[i]->first_coedge=PE[i];
+        cells.Append(cellP[i]);
+        V[i]=new VERTEX;
+        V[i]->first_coedge=PE[i];
+        vertices.insert(V[i]);}
 
-    TV Q=random.Get_Uniform_Vector(box);
+    CELL* cellE=new CELL;
+    cellE->X=E;
+    cellE->outside=false;
+    cellE->first_coedge=EP[0];
+    cells.Append(cellE);
 
-    // TODO: Construct initial diagram.
+    for(int i=0;i<4;i++){
+        int k=(i+1)%4;
+        PE[i]->prev=PQ[i];
+        PQ[i]->next=PE[i];
+        QP[i]->prev=PE[k];
+        PE[k]->next=QP[i];
+        EP[i]->next=EP[k];
+        EP[k]->prev=EP[i];
+        PE[i]->cell=cellP[i];
+        EP[i]->cell=cellE;
+        PQ[i]->cell=cellP[i];
+        QP[i]->cell=cellP[k];
+        PE[i]->tail=V[i];
+        EP[i]->head=V[i];
+        PE[k]->head=V[i];
+        EP[k]->tail=V[i];
+        PQ[i]->head=V[i];
+        QP[i]->tail=V[i];
+    }
 
+    for(int i=0;i<4;i++)
+        V[i]->Compute_Point();
 
-    
+    Print();
+    Sanity_Checks();
 }
 namespace PhysBAM{
 template struct VORONOI_DIAGRAM<float>;

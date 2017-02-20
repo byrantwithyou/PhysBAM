@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),grid,"output");
     
     VORONOI_DIAGRAM<T> vd;
-
+/*
     vd.First_Three_Points(TV(0,0),TV(1,0),TV(.5,1));
     vd.Visualize_State("Initial");
     vd.Sanity_Checks();
@@ -35,6 +35,10 @@ int main(int argc, char* argv[])
         TV X=vd.pieces(p).h.Choose_Feasible_Point(vd.random,vd.radius);
         vd.Insert_Point(vd.pieces(p).coedge,X);
         vd.Visualize_State("After insert");}
+*/
+    vd.Init(RANGE<TV>::Unit_Box());
+    vd.Visualize_State("Initial");
+
 
     Flush_Frame<TV>("end");
 
