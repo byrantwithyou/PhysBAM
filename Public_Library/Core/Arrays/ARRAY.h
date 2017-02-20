@@ -9,6 +9,7 @@
 
 #include <Core/Arrays/ARRAY_BASE.h>
 #include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Math_Tools/exchange.h>
 #include <Core/Math_Tools/min.h>
 #include <Core/Utilities/EXCEPTIONS.h>
 #include <Core/Utilities/PHYSBAM_ATTRIBUTE.h>
@@ -201,11 +202,10 @@ public:
     assert(m-count>=ID());m-=count;
     return ARRAY_VIEW<const T>(count,base_pointer+m);}
 
-    template<class T2>
-    static void Compact_Array_Using_Compaction_Array(ARRAY<T2,ID>& array,const ARRAY<ID,ID>& compaction_array,ARRAY<T2,ID>* temporary_array=0)
+    static void Compact_Array_Using_Compaction_Array(ARRAY<T,ID>& array,const ARRAY<ID,ID>& compaction_array,ARRAY<T,ID>* temporary_array=0)
     {ID compaction_array_m=compaction_array.Size();
-    bool temporary_array_defined=temporary_array!=0;if(!temporary_array_defined) temporary_array=new ARRAY<T2,ID>(compaction_array_m,false);
-    ARRAY<T2,ID>::Put(array,*temporary_array);for(ID i(0);i<compaction_array_m;i++) if(compaction_array(i)>0) array(compaction_array(i))=(*temporary_array)(i);
+    bool temporary_array_defined=temporary_array!=0;if(!temporary_array_defined) temporary_array=new ARRAY<T,ID>(compaction_array_m,false);
+    ARRAY<T,ID>::Put(array,*temporary_array);for(ID i(0);i<compaction_array_m;i++) if(compaction_array(i)>0) array(compaction_array(i))=(*temporary_array)(i);
     if(!temporary_array_defined){delete temporary_array;temporary_array=0;}}
 
     T* begin() // for stl
@@ -220,12 +220,6 @@ public:
     const T* end() const // for stl
     {return Get_Array_Pointer()+m;}
 
-private:
-    template<class T2>
-    static void exchange(T2& a,T2& b)
-    {T2 tmp=a;a=b;b=tmp;}
-
-public:
     void Exchange(ARRAY<T,ID>& other)
     {STATIC_ASSERT(!is_const<T>::value); // make ARRAY_VIEW<const T> equivalent to const ARRAY_VIEW<const T>
     exchange(m,other.m);exchange(base_pointer,other.base_pointer);exchange(buffer_size,other.buffer_size);}
