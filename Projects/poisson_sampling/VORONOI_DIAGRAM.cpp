@@ -107,14 +107,36 @@ Print() const
 //#####################################################################
 // Function Print
 //#####################################################################
+template<class T> void VORONOI_DIAGRAM<T>::PIECE_HELPER::
+Print() const
+{
+    const char* type_name[]={"unset","empty","no_disc","full_disc","out0","out1","both_out"};
+
+    LOG::printf(" type=%s A=%P B=%P C=%P aux0=%P aux1=%P aux2=%P",
+        type_name[type],A,B,C,aux0,aux1,aux2);
+}
+//#####################################################################
+// Function Print
+//#####################################################################
 template<class T> void VORONOI_DIAGRAM<T>::PIECE::
 Print() const
 {
-    const char* type[]={"unset","empty","no_disc","full_disc","out0","out1","both_out"};
-
-    LOG::printf("piece coedge=%c this_area=%P subtree_area=%P type= A=%P B=%P C=%P aux0=%P aux1=%P aux2=%P\n",
-        coedge?coedge->name:'-',this_area,subtree_area,type[h.type],
-        h.A,h.B,h.C,h.aux0,h.aux1,h.aux2);
+    LOG::printf("piece coedge=%c this_area=%P subtree_area=%P",
+        coedge?coedge->name:'-',this_area,subtree_area);
+    h.Print();
+    LOG::printf("\n");
+}
+//#####################################################################
+// Function Print
+//#####################################################################
+template<class T> void VORONOI_DIAGRAM<T>::CLIPPED_PIECE::
+Print() const
+{
+    LOG::printf("piece coedge=%c this_area=%P subtree_area=%P [",
+        coedge?coedge->name:'-',this_area,subtree_area);
+    for(int i=0;i<num_sub_pieces;i++)
+        sub_pieces[i].Print();
+    LOG::printf(" ]\n");
 }
 //#####################################################################
 // Function Select_First_In_Vertex
@@ -180,7 +202,7 @@ Insert_Point(COEDGE* start,const TV& new_pt)
 //    Add_Debug_Particle(new_pt,VECTOR<T,3>(1,0,1));
     ARRAY<VERTEX*> in_vertices,out_vertices; // out_vertices not needed anymore.
     ARRAY<COEDGE*> in_coedges,adj_coedges,new_coedges;
-    
+
     // Make sure at least one vertex is in in_vertices
     VERTEX* v=Select_First_In_Vertex(start,new_pt);
     in_vertices.Append(v);
@@ -292,7 +314,7 @@ First_Three_Points(TV A,TV B,TV C)
     cellA->outside=true;
     cellB->outside=true;
     cellC->outside=true;
-    
+
     COEDGE* AB = new COEDGE;
     COEDGE* BA = new COEDGE;
     COEDGE* AC = new COEDGE;
@@ -352,10 +374,10 @@ Visualize_State(const char* title) const
     VECTOR<T,3> color_v(0,0,1);
     T unbounded_length = .5;
     T offset = .01;
-        
+
     for(int i=0;i<cells.m;i++)
         Add_Debug_Particle(cells(i)->X,color_r);
-        
+
     for(auto it:vertices)
         Add_Debug_Particle(it->X,color_v);
 
@@ -380,7 +402,7 @@ Visualize_State(const char* title) const
         }
 
         TV dir=(XH-XT).Normalized()*offset,dir_in=dir.Rotate_Counterclockwise_90();
-            
+
         Add_Debug_Object(VECTOR<TV,2>(XH-dir+dir_in,XT+dir+dir_in),color_c);
     }
 
@@ -417,10 +439,12 @@ Sanity_Checks() const
 template<class T> void VORONOI_DIAGRAM<T>::
 Print() const
 {
-    for(int i=0;i<cells.m;i++) cells(i)->Print();
+    LOG::printf("sizes %i %zi %zi %i\n",cells.m,coedges.size(),vertices.size(),pieces.m);
+    for(auto c:cells) c->Print();
     for(auto ce:coedges) ce->Print();
     for(auto v:vertices) v->Print();
     for(auto p:pieces) p.Print();
+    for(auto p:clipped_pieces) p.Print();
 }
 //#####################################################################
 // Function Update_Piece_Tree
@@ -727,8 +751,8 @@ Init(const RANGE<TV>& box)
     // Four points far enough out from the corners that no infinite edge can reach the box.
 
     TV P[4];
-    P[0]=box.Center()+e*2;
-    P[2]=box.Center()-e*2;
+    P[0]=box.Center()+e*3;
+    P[2]=box.Center()-e*3;
     P[1]=TV(P[2].x,P[0].y);
     P[3]=TV(P[0].x,P[2].y);
     TV E=random.Get_Uniform_Vector(box);
@@ -780,11 +804,13 @@ Init(const RANGE<TV>& box)
         PE[k]->head=V[i];
         EP[k]->tail=V[i];
         PQ[i]->head=V[i];
-        QP[i]->tail=V[i];
-    }
+        QP[i]->tail=V[i];}
 
     for(int i=0;i<4;i++)
         V[i]->Compute_Point();
+
+    for(int i=0;i<4;i++)
+        Insert_Coedge(EP[i]);
 
     Print();
     Sanity_Checks();

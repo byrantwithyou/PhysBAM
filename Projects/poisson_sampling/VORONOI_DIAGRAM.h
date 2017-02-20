@@ -91,6 +91,8 @@ struct VORONOI_DIAGRAM
 
         T Compute(COEDGE* ce,T radius,bool clipped);
         TV Choose_Feasible_Point(RANDOM_NUMBERS<T>& random,T radius) const;
+
+        void Print() const;
     };
     
     static const int first_clipped_piece_index=1<<30;
@@ -109,7 +111,7 @@ struct VORONOI_DIAGRAM
     };
     ARRAY<PIECE> pieces;
 
-    struct CLIPPED_PIECE:PIECE
+    struct CLIPPED_PIECE
     {
         T this_area;
         T subtree_area;
@@ -119,6 +121,8 @@ struct VORONOI_DIAGRAM
         CLIPPED_PIECE()
             :this_area(0),subtree_area(0),coedge(0),num_sub_pieces(0)
         {}
+
+        void Print() const;
     };
     ARRAY<CLIPPED_PIECE> clipped_pieces;
 
