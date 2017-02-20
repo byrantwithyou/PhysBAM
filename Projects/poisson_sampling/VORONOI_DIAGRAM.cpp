@@ -6,6 +6,7 @@
 #include <Tools/Polynomials/QUADRATIC.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
+#include <Geometry/Intersections/BOX_POLYGON_INTERSECTION.h>
 #include "VORONOI_DIAGRAM.h"
 using namespace PhysBAM;
 template<> char VORONOI_DIAGRAM<float>::next_cell = 'A';
@@ -498,47 +499,26 @@ Insert_Clipped_Coedge(COEDGE* ce)
 {
     assert(bounding_box.Lazy_Inside(ce->cell->X));
 
-    ARRAY<TV> vert;
-    vert.Append(ce->cell->X);
-    vert.Append(ce->tail->X);
-    vert.Append(ce->head->X);
-    vert.Append(ce->cell->X);
-
-    TV bound[2]={bounding_box.min_corner,bounding_box.max_corner};
-    for(int s=0;s<2;s++){
-        int sign=2*s-1;
-        for(int a=0;a<2;a++){
-            int i=1,j;
-            for(;i<vert.m-1;i++)
-                if(vert(i)(a)*sign<bound[s](a)*sign)
-                    break;
-            if(i==vert.m-1) continue;
-            for(j=i+1;j<vert.m-1;j++)
-                if(vert(j)(a)*sign>=bound[s](a)*sign)
-                    break;
-
-            T u=(bound[s](a)-vert(i)(a))/(vert(i-1)(a)-vert(i)(a));
-            T v=(bound[s](a)-vert(j)(a))/(vert(j-1)(a)-vert(j)(a));
-
-            TV A=vert(i)+u*(vert(i-1)-vert(i));
-            TV B=vert(j)+v*(vert(j-1)-vert(j));
-
-            ARRAY<TV> tmp(vert.Array_View(0,i));
-            tmp.Append(A);
-            tmp.Append(B);
-            tmp.Append_Elements(vert.Array_View(j,vert.m-j));
-            tmp.Exchange(vert);}}
-    vert.Pop();
-
-    assert(vert.m<=6);
+    ARRAY<TV> polygon;
+    polygon.Append(ce->cell->X);
+    polygon.Append(ce->tail->X);
+    polygon.Append(ce->head->X);
+    LOG::printf("before clip %P\n",polygon);
+    for(int i=0;i<polygon.m;i++) Add_Debug_Object(VECTOR<TV,2>(polygon(i),polygon((i+1)%polygon.m)),VECTOR<T,3>(1,1,0));
+    INTERSECTION::Box_Polygon_Intersection(bounding_box,polygon,false);
+    LOG::printf("after clip %P\n",polygon);
+    for(int i=0;i<polygon.m;i++) Add_Debug_Object(VECTOR<TV,2>(polygon(i),polygon((i+1)%polygon.m)),VECTOR<T,3>(0,1,0));
+    Flush_Frame<TV>("clip");
+    
+    assert(polygon.m<=6);
     CLIPPED_PIECE p;
     p.coedge=ce;
-    p.num_sub_pieces=vert.m-2;
+    p.num_sub_pieces=polygon.m-2;
     T area=0;
-    for(int i=0;i<vert.m-2;i++){
-        p.sub_pieces[i].A=vert(0);
-        p.sub_pieces[i].B=vert(i+1);
-        p.sub_pieces[i].C=vert(i+2);
+    for(int i=0;i<polygon.m-2;i++){
+        p.sub_pieces[i].A=polygon(0);
+        p.sub_pieces[i].B=polygon(i+1);
+        p.sub_pieces[i].C=polygon(i+2);
         area+=p.sub_pieces[i].Compute(ce,radius,true);}
 
     int i=clipped_pieces.Append(p);
@@ -751,11 +731,14 @@ Init(const RANGE<TV>& box)
     // Four points far enough out from the corners that no infinite edge can reach the box.
 
     TV P[4];
-    P[0]=box.Center()+e*3;
-    P[2]=box.Center()-e*3;
+    P[0]=box.Center()+e*(T)1.5;
+    P[2]=box.Center()-e*(T)1.5;
     P[1]=TV(P[2].x,P[0].y);
     P[3]=TV(P[0].x,P[2].y);
     TV E=random.Get_Uniform_Vector(box);
+
+    E=box.Center();
+
     CELL *cellP[4]={};
     COEDGE *PE[4]={},*EP[4]={},*PQ[4]={},*QP[4]={};
     VERTEX* V[4]={};
@@ -808,7 +791,8 @@ Init(const RANGE<TV>& box)
 
     for(int i=0;i<4;i++)
         V[i]->Compute_Point();
-
+    Visualize_State("before tiles");
+    
     for(int i=0;i<4;i++)
         Insert_Coedge(EP[i]);
 
