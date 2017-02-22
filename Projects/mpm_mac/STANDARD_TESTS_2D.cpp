@@ -152,6 +152,18 @@ Initialize()
             gravity=TV(0,-1)*m/sqr(s);
             Add_Walls(-1,COLLISION_TYPE::slip,.1*m);
         } break;
+        case 7:{ // stationary circles in two phases
+            number_phases=PHASE_ID(2);
+            particles.Store_Phase(true);
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            T density=2*unit_rho*scale_mass;
+            SPHERE<TV> sphere0(TV(.3,.3)*m,.1*m);
+            Seed_Particles(sphere0,0,0,density,particles_per_cell);
+            int n=particles.phase.m;
+            SPHERE<TV> sphere1(TV(.6,.6)*m,.1*m);
+            Seed_Particles(sphere1,0,0,density,particles_per_cell);
+            particles.phase.Array_View(n,particles.phase.m-n).Fill(1);
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     phases.Resize(number_phases);
