@@ -55,7 +55,6 @@ public:
     };
 
     ARRAY<PHASE,PHASE_ID> phases;
-    PHASE* phase;
 
     // particle stuff
     MPM_PARTICLES<TV>& particles;
