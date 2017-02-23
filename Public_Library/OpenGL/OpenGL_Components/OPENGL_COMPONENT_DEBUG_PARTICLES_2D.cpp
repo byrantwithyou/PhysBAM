@@ -5,6 +5,7 @@
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Log/LOG.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Geometry/Basic_Geometry/TRIANGLE_2D.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
@@ -108,8 +109,9 @@ Display() const
     for(int i=0;i<debug_objects.m;i++)
         if(debug_objects(i).type==DEBUG_OBJECT<TV>::triangle){
             OpenGL_Begin(GL_TRIANGLES);
-            OPENGL_MATERIAL::Plastic(OPENGL_COLOR(debug_objects(i).color)).Send_To_GL_Pipeline(GL_FRONT);
-            OPENGL_MATERIAL::Plastic(OPENGL_COLOR(debug_objects(i).bgcolor)).Send_To_GL_Pipeline(GL_BACK);
+            if(TRIANGLE_2D<T>::Signed_Area(debug_objects(i).X(0),debug_objects(i).X(1),debug_objects(i).X(2))>0)
+                OPENGL_COLOR(debug_objects(i).color).Send_To_GL_Pipeline();
+            else OPENGL_COLOR(debug_objects(i).bgcolor).Send_To_GL_Pipeline();
             OpenGL_Triangle(debug_objects(i).X(0),debug_objects(i).X(1),debug_objects(i).X(2));
             OpenGL_End();}
 
