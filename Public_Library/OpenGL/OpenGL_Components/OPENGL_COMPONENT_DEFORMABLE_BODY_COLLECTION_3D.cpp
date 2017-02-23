@@ -38,7 +38,7 @@ OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D(STREAM_TYPE stream_type,const std
     viewer_callbacks.Set("toggle_draw_interior",{[this](){Toggle_Draw_Interior();},"Toggle view of interior elements for tetraheralized volumes"});
     viewer_callbacks.Set("toggle_differentiate_inverted",{[this](){Toggle_Differentiate_Inverted();},"Toggle use of different color for inverted tetrahera"});
     viewer_callbacks.Set("toggle_draw_subsets",{[this](){Toggle_Draw_Subsets();},"Toggle drawing of subset tets and particles for tetraheralized volumes"});
-    viewer_callbacks.Set("toggle_hide_unselected",{[this](){Toggle_Hide_Unselected();},"Toggle drawing of the selected regions"});
+    viewer_callbacks.Set("toggle_hide_unselected",{[this](){hide_unselected=!hide_unselected;},"Toggle drawing of the selected regions"});
     viewer_callbacks.Set("toggle_use_active_list",{[this](){Toggle_Use_Active_List();},"Toggle drawing subset of the deformable objects in the list"});
     viewer_callbacks.Set("toggle_selection_mode",{[this](){Toggle_Selection_Mode();},"Toggle selecting a whole segment or just one part"});
     viewer_callbacks.Set("increment_active_object",{[this](){Increment_Active_Object();},"Increment deformable object being drawn"});
@@ -633,14 +633,6 @@ template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Toggle_Active_Value()
 {
     OPENGL_WORLD<T>::Singleton()->Prompt_User("Enter Component Number: ",{[this](){Toggle_Active_Value_Response();},""});
-}
-//#####################################################################
-// Function Toggle_Hide_Unselected
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
-Toggle_Hide_Unselected()
-{
-    if(real_selection) hide_unselected=!hide_unselected;
 }
 //#####################################################################
 // Function Toggle_Draw_Interior
