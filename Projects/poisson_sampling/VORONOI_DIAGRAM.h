@@ -17,6 +17,7 @@ struct VORONOI_DIAGRAM
     typedef VECTOR<T,2> TV;
     enum VERTEX_STATE {unknown,in,out};
     enum CELL_STATE {non_incident,incident};
+    enum CELL_TYPE {type_inside,type_outside};
     struct COEDGE;
     struct CELL;
 
@@ -50,10 +51,13 @@ struct VORONOI_DIAGRAM
         CELL* cell;
         char name;
         int piece;
+        int state;
         
         COEDGE()
-            :head(0),tail(0),pair(0),next(0),prev(0),cell(0),name(next_coedge++)
+            :head(0),tail(0),pair(0),next(0),prev(0),cell(0),
+            name(next_coedge++),piece(-1),state(0)
         {}
+
         void Print() const;
     };
 
@@ -61,12 +65,13 @@ struct VORONOI_DIAGRAM
     {
         TV X;
         CELL_STATE state;
+        CELL_TYPE type;
         COEDGE * first_coedge;
         bool outside;
         char name;
 
         CELL()
-            :state(non_incident),first_coedge(0),outside(false),name(next_cell++)
+            :state(non_incident),type(type_inside),first_coedge(0),outside(false),name(next_cell++)
         {}
         void Print() const;
     };
@@ -146,6 +151,7 @@ struct VORONOI_DIAGRAM
     void Discover_Inside(ARRAY<COEDGE*>& in,ARRAY<COEDGE*>& adj,
         ARRAY<VERTEX*>& out_v,ARRAY<VERTEX*>& in_v,COEDGE* ce,const TV& new_pt);
     void Insert_Point(COEDGE* start,const TV& new_pt);
+    void Insert_Point(int p,const TV& new_pt);
     void First_Three_Points(TV A,TV B,TV C);
     void Visualize_State(const char* title) const;
     void Sanity_Checks() const;

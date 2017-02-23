@@ -40,11 +40,18 @@ int main(int argc, char* argv[])
     vd.Init(RANGE<TV>::Unit_Box(),(T).1);
     vd.Visualize_State("Initial");
 
+    for(int i=0;i<1;i++){
+        int p=vd.Choose_Piece();
+        TV X=vd.Choose_Feasible_Point(p);
+        vd.Insert_Point(p,X);
+        Add_Debug_Particle(X,VECTOR<T,3>(0,1,0));
+        vd.Visualize_State("After insertion");}
+
     for(int i=0;i<10000;i++){
         int p=vd.Choose_Piece();
         TV X=vd.Choose_Feasible_Point(p);
         Add_Debug_Particle(X,VECTOR<T,3>(0,1,0));}
-    vd.Visualize_State("Initial");
+    vd.Visualize_State("End");
 
     Flush_Frame<TV>("end");
 

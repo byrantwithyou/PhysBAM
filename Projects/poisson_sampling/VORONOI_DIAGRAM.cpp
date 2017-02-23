@@ -23,6 +23,14 @@ inline void For_Each_Outgoing_Coedge(V* v,F func)
     func(b);
     func(c);
 }
+template<class V,class F>
+inline void For_Each_Outgoing_Coedge_Reverse(V* v,F func)
+{
+    auto* a=v->first_coedge,*b=a->pair->next,*c=b->pair->next;
+    func(c);
+    func(b);
+    func(a);
+}
 //#####################################################################
 // Function Criterion
 //#####################################################################
@@ -195,11 +203,21 @@ Discover_Inside(ARRAY<COEDGE*>& in_ce,ARRAY<COEDGE*>& adj_ce,
     ceR->cell->state=incident;
     in_v.Append(v);
     in_ce.Append(ce);
-    if(ceR->head) printf("try %c -> %c\n",ce->name,ceR->name);
-    if(ceR->head) Discover_Inside(in_ce,adj_ce,out_v,in_v,ceR,new_pt);
-    if(ceL->head) printf("try %c -> %c\n",ce->name,ceL->name);
-    if(ceL->head) Discover_Inside(in_ce,adj_ce,out_v,in_v,ceL,new_pt);
+    printf("try %c -> %c\n",ce->name,ceR->name);
+    Discover_Inside(in_ce,adj_ce,out_v,in_v,ceR,new_pt);
+    printf("try %c -> %c\n",ce->name,ceL->name);
+    Discover_Inside(in_ce,adj_ce,out_v,in_v,ceL,new_pt);
     printf("end %c\n",ce->name);
+}
+//#####################################################################
+// Function Insert_Point
+//#####################################################################
+template<class T> void VORONOI_DIAGRAM<T>::
+Insert_Point(int p,const TV& new_pt)
+{
+    if(p>=first_clipped_piece_index)
+        Insert_Point(clipped_pieces(p-first_clipped_piece_index).coedge,new_pt);
+    else Insert_Point(pieces(p).coedge,new_pt);
 }
 //#####################################################################
 // Function Insert_Point
@@ -218,7 +236,7 @@ Insert_Point(COEDGE* start,const TV& new_pt)
     in_vertices.Append(v);
     v->state=in;
     For_Each_Outgoing_Coedge(v,[](COEDGE* ce){ce->cell->state=incident;});
-    For_Each_Outgoing_Coedge(v,[&](COEDGE* ce){Discover_Inside(in_coedges,adj_coedges,out_vertices,in_vertices,ce,new_pt);});
+    For_Each_Outgoing_Coedge_Reverse(v,[&](COEDGE* ce){Discover_Inside(in_coedges,adj_coedges,out_vertices,in_vertices,ce,new_pt);});
 
     puts("after discovery");
     Print();
@@ -244,11 +262,18 @@ Insert_Point(COEDGE* start,const TV& new_pt)
     for(int i=0;i<adj_coedges.m;i++) printf(" %c",adj_coedges(i)->name);
     printf("\n");
 
+    for(int i=0;i<adj_coedges.m;i++) adj_coedges(i)->state=1;
+    for(int i=0;i<in_coedges.m;i++) in_coedges(i)->state=2;
+    Visualize_State("adj_coedges in_coedges");
+    for(int i=0;i<adj_coedges.m;i++) adj_coedges(i)->state=0;
+    for(int i=0;i<in_coedges.m;i++) in_coedges(i)->state=0;
+    
     adj_coedges.Append(+adj_coedges(0)); // + to avoid aliasing
     for(int i=0;i<adj_coedges.m-1;i++){
         COEDGE* ce=adj_coedges(i)->pair;
         if(ce->tail) puts("should not happen ce->tail");
         if(ce->tail) ce->tail->state=unknown;
+        ce->cell->first_coedge=ce;
 
         VERTEX* H=new VERTEX;
         vertices.insert(H);
@@ -256,7 +281,8 @@ Insert_Point(COEDGE* start,const TV& new_pt)
         ce->pair->tail=H;
         H->state=unknown;
         H->first_coedge=ce->pair;
-
+        H->Compute_Point(new_pt,ce->cell->X,ce->pair->cell->X);
+        
         COEDGE* A=new COEDGE;
         coedges.insert(A);
         new_coedges.Append(A);
@@ -265,33 +291,23 @@ Insert_Point(COEDGE* start,const TV& new_pt)
         A->next=adj_coedges(i+1);
         A->next->prev=A;
         A->cell=ce->cell;
+        A->cell->first_coedge=A;
         A->tail=H;
+        A->state=2;
         ce->cell->state=non_incident;
 
         COEDGE* B=new COEDGE;
         coedges.insert(B);
+        new_coedges.Append(B);
         A->pair=B;
         B->pair=A;
         B->head=H;
-        B->cell=cell;}
+        B->cell=cell;
+        B->state=1;
+        Visualize_State("pass");}
 
-    for(int i=0;i<adj_coedges.m-1;i++){
-        COEDGE* A=adj_coedges(i)->prev;
-        COEDGE* B=A->pair;
-        B->tail=A->head=adj_coedges(i+1)->tail;
-        B->prev=A->next->pair->next->pair;
-        B->prev->next=B;}
-
-    for(int i=0;i<adj_coedges.m-1;i++){
-        COEDGE* A=adj_coedges(i)->prev;
-        printf("compute on %c\n",A->head->name);
-        A->head->Compute_Point();}
-
-    for(int i=0;i<adj_coedges.m-1;i++)
-        Update_Coedge(adj_coedges(i));
-
-    for(int i=0;i<new_coedges.m;i++)
-        Insert_Coedge(new_coedges(i));
+    LOG::printf("before connect\n");
+    Print();
 
     for(int i=0;i<in_coedges.m;i++){
         Remove_Coedge(in_coedges(i));
@@ -300,9 +316,46 @@ Insert_Point(COEDGE* start,const TV& new_pt)
         delete in_coedges(i)->pair;
         delete in_coedges(i);}
 
+    for(int i=0;i<adj_coedges.m-1;i++){
+        COEDGE* D=adj_coedges(i+1)->pair->next;
+        COEDGE* E=adj_coedges(i)->pair->next->pair;
+        LOG::printf("vertex %c %P\n",adj_coedges(i)->tail->name,adj_coedges(i)->tail->X);
+        LOG::printf("base: %c %c %c   %c %c\n",
+            adj_coedges(i)->name,
+            adj_coedges(i+1)->name,
+            D->name,
+            E->name,
+            D->pair->name
+        );
+//        COEDGE* A=adj_coedges(i)->pair->next;
+//        COEDGE* B=A->pair;
+//        COEDGE* C=A->next;
+        D->next=adj_coedges(i);
+        D->next->prev=D;
+        D->head=D->next->tail;
+        E->next=D->pair;
+        D->pair->prev=E;
+        D->pair->tail=E->head;
+//        B->tail=A->head=C->tail;
+//        B->prev=C->pair->next->pair;
+//        B->prev->next=B;
+    }
+
+    cell->first_coedge=adj_coedges(0)->pair->next->pair;
+
+    Visualize_State("connections");
+    
+    for(int i=0;i<adj_coedges.m-1;i++)
+        Update_Coedge(adj_coedges(i));
+
+    for(int i=0;i<new_coedges.m;i++)
+        Insert_Coedge(new_coedges(i));
+
     for(int i=0;i<in_vertices.m;i++){
         vertices.erase(in_vertices(i));
         delete in_vertices(i);}
+    Sanity_Checks();
+    Visualize_State("done");
     puts("after Insert_Point");
     Print();
 }
@@ -377,20 +430,25 @@ First_Three_Points(TV A,TV B,TV C)
 template<class T> void VORONOI_DIAGRAM<T>::
 Visualize_State(const char* title) const
 {
-    VECTOR<T,3> color_r(1,0,0);
+    VECTOR<T,3> color_r[2]={{1,1,0},{0,1,0}};
     VECTOR<T,3> color_rc(1,.5,0);
-    VECTOR<T,3> color_c(1,1,0);
+    VECTOR<T,3> color_c[3]={{1,1,0},{1,0,0},{0,1,0}};
     VECTOR<T,3> color_cv(0,1,0);
-    VECTOR<T,3> color_v(0,0,1);
+    VECTOR<T,3> color_v[3]={{0,0,1},{1,0,0},{0,1,0}};
     T unbounded_length = .5;
     T offset = .01;
 
-    for(int i=0;i<cells.m;i++)
-        Add_Debug_Particle(cells(i)->X,color_r);
-
-    for(auto it:vertices)
-        Add_Debug_Particle(it->X,color_v);
-
+    VECTOR<T,3> color_p[]={{1,.5,.5},{.5,1,.5},{.5,.5,1},{0,1,0},{1,.5,0},{1,1,0},{0,.5,0}};
+    for(const auto& it:pieces)
+    {
+        Add_Debug_Object(VECTOR<TV,3>(TV(),it.h.B,it.h.C)+it.h.A,color_p[it.h.type]);
+    }
+    for(const auto& it:clipped_pieces)
+    {
+        for(int i=0;i<it.num_sub_pieces;i++)
+            Add_Debug_Object(VECTOR<TV,3>(TV(),it.sub_pieces[i].B,it.sub_pieces[i].C)+it.sub_pieces[i].A,color_p[it.sub_pieces[i].type]);
+    }
+    
     for(auto it:coedges)
     {
         const VERTEX* h=it->head;
@@ -398,23 +456,32 @@ Visualize_State(const char* title) const
         assert(h || t);
         TV XH,XT;
         if(h) XH=h->X;
-        else
-        {
+        else{
             TV dir = (it->cell->X - it->pair->cell->X).Rotate_Clockwise_90().Normalized();
-            XH=XT=t->X+dir*unbounded_length;
-        }
+            XH=XT=t->X+dir*unbounded_length;}
 
         if(t) XT=t->X;
-        else
-        {
+        else{
             TV dir = (it->cell->X - it->pair->cell->X).Rotate_Clockwise_90().Normalized();
-            XT=XH-dir*unbounded_length;
-        }
+            XT=XH-dir*unbounded_length;}
 
         TV dir=(XH-XT).Normalized()*offset,dir_in=dir.Rotate_Counterclockwise_90();
 
-        Add_Debug_Object(VECTOR<TV,2>(XH-dir+dir_in,XT+dir+dir_in),color_c);
+        Add_Debug_Object(VECTOR<TV,2>(XH-dir+dir_in,XT+dir+dir_in),color_c[it->state]);
+        Add_Debug_Object(VECTOR<TV,2>((XH+XT)/2+dir_in,it->cell->X),VECTOR<T,3>(1,0,1));
+        char name[2]={it->name};
+        Add_Debug_Text((XH+XT)/2+dir_in*4,name,color_c[it->state]);
     }
+
+    for(auto it:cells){
+        Add_Debug_Particle(it->X,color_r[it->state]);
+        char name[2]={it->name};
+        Add_Debug_Text(it->X,name,color_r[it->state]);}
+
+    for(auto it:vertices){
+        Add_Debug_Particle(it->X,color_v[it->state]);
+        char name[2]={it->name};
+        Add_Debug_Text(it->X,name,color_v[it->state]);}
 
     Flush_Frame<TV>(title);
 }
@@ -484,6 +551,8 @@ Update_Clipped_Piece_Tree(int i,T diff_area)
 template<class T> void VORONOI_DIAGRAM<T>::
 Insert_Coedge(COEDGE* ce)
 {
+    printf("insert coedge %c %c %i\n",ce->name,ce->cell->name,ce->cell->type);
+    if(ce->cell->type==type_outside) return;
     if(!ce->head || !ce->tail){ // Infinite edges should not intersect the bounding box.
         assert(ce->cell->outside);
         assert(ce->head || ce->tail);
@@ -534,6 +603,11 @@ Insert_Clipped_Coedge(COEDGE* ce)
         area+=p.sub_pieces[i].Compute(ce,radius,true);}
 
     p.this_area=area;
+    VECTOR<T,3> color_p[]={{1,.5,.5},{.5,1,.5},{.5,.5,1},{0,1,0},{1,.5,0},{1,1,0},{0,.5,0}};
+    for(int i=0;i<p.num_sub_pieces;i++)
+        Add_Debug_Object(VECTOR<TV,3>(TV(),p.sub_pieces[i].B,p.sub_pieces[i].C)+p.sub_pieces[i].A,color_p[p.sub_pieces[i].type]);
+    Flush_Frame<TV>("Insert");
+    
     int i=clipped_pieces.Append(p);
     Update_Clipped_Piece_Tree(i,area);
     ce->piece=first_clipped_piece_index+i;
@@ -544,8 +618,10 @@ Insert_Clipped_Coedge(COEDGE* ce)
 template<class T> void VORONOI_DIAGRAM<T>::
 Remove_Coedge(COEDGE* ce)
 {
-    if(ce->piece<first_clipped_piece_index) Remove_Piece(ce->piece);
-    else Remove_Clipped_Piece(ce->piece-first_clipped_piece_index);
+    assert((ce->cell->type==type_outside)==(ce->piece<0));
+    if(ce->piece>=first_clipped_piece_index)
+        Remove_Clipped_Piece(ce->piece-first_clipped_piece_index);
+    else if(ce->piece>=0) Remove_Piece(ce->piece);
 }
 //#####################################################################
 // Function Remove_Piece
@@ -572,13 +648,13 @@ Remove_Clipped_Piece(int p)
 {
     CLIPPED_PIECE& last=clipped_pieces.Last(), &rem=clipped_pieces(p);
     if(p==clipped_pieces.m-1)
-        Update_Piece_Tree(p,-rem.this_area);
+        Update_Clipped_Piece_Tree(p,-rem.this_area);
     else{
-        Update_Piece_Tree(clipped_pieces.m-1,-last.this_area);
+        Update_Clipped_Piece_Tree(clipped_pieces.m-1,-last.this_area);
         T diff=last.this_area-rem.this_area;
         last.subtree_area=rem.subtree_area;
         rem=last;
-        Update_Piece_Tree(p,diff);}
+        Update_Clipped_Piece_Tree(p,diff);}
     clipped_pieces.Pop();
 }
 //#####################################################################
@@ -763,8 +839,8 @@ Init(const RANGE<TV>& box,T radius_input)
     // Four points far enough out from the corners that no infinite edge can reach the box.
 
     TV P[4];
-    P[0]=box.Center()+e*(T)1.5;
-    P[2]=box.Center()-e*(T)1.5;
+    P[0]=box.Center()+e*(T)2;
+    P[2]=box.Center()-e*(T)2;
     P[1]=TV(P[2].x,P[0].y);
     P[3]=TV(P[0].x,P[2].y);
     TV E=random.Get_Uniform_Vector(box);
@@ -789,6 +865,7 @@ Init(const RANGE<TV>& box,T radius_input)
         cellP[i]->X=P[i];
         cellP[i]->outside=true;
         cellP[i]->first_coedge=PE[i];
+        cellP[i]->type=type_outside;
         cells.Append(cellP[i]);
         V[i]=new VERTEX;
         V[i]->first_coedge=PE[i];
