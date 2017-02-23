@@ -33,6 +33,21 @@ struct DEBUG_OBJECT
 };
 
 template<class TV>
+struct DEBUG_TEXT
+{
+    typedef typename TV::SCALAR T;
+    TV X;
+    std::string text;
+    VECTOR<T,3> color;
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,X,text,color);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,X,text,color);}
+};
+
+template<class TV>
 class DEBUG_PARTICLES
 {
 public:
@@ -42,6 +57,7 @@ public:
 
     GEOMETRY_PARTICLES<TV>& debug_particles;
     mutable ARRAY<DEBUG_OBJECT<TV> > debug_objects;
+    mutable ARRAY<DEBUG_TEXT<TV> > debug_text;
     T edge_separation;
 
     static DEBUG_PARTICLES<TV>* Store_Debug_Particles(DEBUG_PARTICLES<TV>* particle=0);
@@ -59,5 +75,6 @@ template<class TV,class TV_INT,class T> void Dump_Levelset(const GRID<TV>& grid,
 template<class TV,class TV_INT,class T> void Dump_Levelset(const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,const VECTOR<T,3>& color,const VECTOR<T,3>& bgcolor,T contour_value);
 template<class TV,class T> void Dump_Levelset(const GRID<TV>& grid,const IMPLICIT_OBJECT<TV>& phi,const VECTOR<T,3>& color){Dump_Levelset(grid,phi,color,color);}
 template<class TV,class T> void Dump_Levelset(const GRID<TV>& grid,const IMPLICIT_OBJECT<TV>& phi,const VECTOR<T,3>& color,const VECTOR<T,3>& bgcolor);
+template<class TV> void Add_Debug_Text(const TV& X,const std::string& text,const VECTOR<typename TV::SCALAR,3>& color);
 }
 #endif

@@ -50,9 +50,10 @@ template<class TV> void DEBUG_PARTICLES<TV>::
 Write_Debug_Particles(STREAM_TYPE stream_type,const std::string& output_directory,int frame) const
 {
     FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),frame));
-    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles,debug_objects);
+    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles,debug_objects,debug_text);
     debug_particles.Delete_All_Elements();
     debug_objects.Remove_All();
+    debug_text.Remove_All();
 }
 //#####################################################################
 // Function Add_Debug_Particle
@@ -135,6 +136,19 @@ Dump_Levelset(const GRID<TV>& grid,const IMPLICIT_OBJECT<TV>& phi,const VECTOR<T
         phi_array(it.index)=phi.Extended_Phi(it.Location());
     Dump_Levelset(node_grid,phi_array,color,bgcolor);
 }
+//#####################################################################
+// Function Add_Debug_Text
+//#####################################################################
+template<class TV> inline void PhysBAM::
+Add_Debug_Text(const TV& X,const std::string& text,const VECTOR<typename TV::SCALAR,3>& color)
+{
+    DEBUG_PARTICLES<TV>* dp=DEBUG_PARTICLES<TV>::Store_Debug_Particles();
+    DEBUG_TEXT<TV> dt;
+    dt.X=X;
+    dt.text=text;
+    dt.color=color;
+    dp->debug_text.Append(dt);
+}
 namespace PhysBAM{
 template class DEBUG_PARTICLES<VECTOR<float,1> >;
 template class DEBUG_PARTICLES<VECTOR<float,2> >;
@@ -198,4 +212,8 @@ template void Dump_Surface<TRIANGULATED_SURFACE<float>,float>(TRIANGULATED_SURFA
 template void Dump_Surface<TRIANGULATED_SURFACE<double>,double>(TRIANGULATED_SURFACE<double> const&,VECTOR<double,3> const&,VECTOR<double,3> const&);
 template void Dump_Surface<SEGMENTED_CURVE_2D<float>,float>(SEGMENTED_CURVE_2D<float> const&,VECTOR<float,3> const&,VECTOR<float,3> const&);
 template void Dump_Surface<SEGMENTED_CURVE_2D<double>,double>(SEGMENTED_CURVE_2D<double> const&,VECTOR<double,3> const&,VECTOR<double,3> const&);
+template void Add_Debug_Text<VECTOR<double,2> >(VECTOR<double,2> const&,std::string const&,VECTOR<double,3> const&);
+template void Add_Debug_Text<VECTOR<float,2> >(VECTOR<float,2> const&,std::string const&,VECTOR<float,3> const&);
+template void Add_Debug_Text<VECTOR<double,3> >(VECTOR<double,3> const&,std::string const&,VECTOR<double,3> const&);
+template void Add_Debug_Text<VECTOR<float,3> >(VECTOR<float,3> const&,std::string const&,VECTOR<float,3> const&);
 }

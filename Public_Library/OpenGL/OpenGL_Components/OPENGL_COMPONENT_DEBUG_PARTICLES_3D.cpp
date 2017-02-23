@@ -23,7 +23,8 @@ using namespace PhysBAM;
 template<class T> OPENGL_COMPONENT_DEBUG_PARTICLES_3D<T>::
 OPENGL_COMPONENT_DEBUG_PARTICLES_3D(STREAM_TYPE stream_type,const std::string &filename_input)
     :OPENGL_COMPONENT<T>(stream_type,"Particles 3D"),particles(*new GEOMETRY_PARTICLES<TV>),
-    debug_objects(*new ARRAY<DEBUG_OBJECT<TV> >),default_color(OPENGL_COLOR::White()),
+    debug_objects(*new ARRAY<DEBUG_OBJECT<TV> >),
+    debug_text(*new ARRAY<DEBUG_TEXT<TV> >),default_color(OPENGL_COLOR::White()),
     velocity_color(OPENGL_COLOR(1,(T).078,(T).576)),
     draw_velocities(false),draw_arrows(true),scale_velocities((T).025),
     filename(filename_input),frame_loaded(-1),valid(false),
@@ -124,6 +125,13 @@ Display() const
             else OPENGL_SHAPES::Draw_Segment(debug_objects(i).X(0),debug_objects(i).X(1),OPENGL_COLOR(debug_objects(i).color),2);}
 
     if(TV::m==2) glPopAttrib();
+
+    glPushAttrib(GL_ENABLE_BIT);
+    glDisable(GL_LIGHTING);
+    for(int i=0;i<debug_text.m;i++){
+        OPENGL_COLOR(debug_text(i).color).Send_To_GL_Pipeline();
+        OpenGL_String(debug_text(i).X,debug_text(i).text,GLUT_BITMAP_HELVETICA_12);}
+    glPopAttrib();
 
     GLint mode=0;
     glGetIntegerv(GL_RENDER_MODE,&mode);
@@ -261,7 +269,7 @@ Reinitialize(bool force)
     try{
         std::istream* input_file=FILE_UTILITIES::Safe_Open_Input(frame_filename);
         TYPED_ISTREAM typed_input(*input_file,stream_type);
-        Read_Binary(typed_input,particles,debug_objects);
+        Read_Binary(typed_input,particles,debug_objects,debug_text);
         delete input_file;}
     catch(FILESYSTEM_ERROR&){valid=false;}
     frame_loaded=frame;

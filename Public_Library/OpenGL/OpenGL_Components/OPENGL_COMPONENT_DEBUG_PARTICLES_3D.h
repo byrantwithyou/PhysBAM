@@ -14,6 +14,7 @@
 namespace PhysBAM
 {
 template<class TV> struct DEBUG_OBJECT;
+template<class TV> struct DEBUG_TEXT;
 template<class T>
 class OPENGL_COMPONENT_DEBUG_PARTICLES_3D:public OPENGL_COMPONENT<T>
 {
@@ -58,6 +59,7 @@ private:
 public:
     GEOMETRY_PARTICLES<TV>& particles;
     ARRAY<DEBUG_OBJECT<TV> >& debug_objects;
+    ARRAY<DEBUG_TEXT<TV> >& debug_text;
     OPENGL_COLOR default_color;
     OPENGL_COLOR velocity_color;
     bool draw_velocities;
