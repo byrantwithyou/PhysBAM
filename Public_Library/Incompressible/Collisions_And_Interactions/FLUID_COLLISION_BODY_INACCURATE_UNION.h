@@ -40,8 +40,7 @@ private:
     LINEAR_INTERPOLATION_UNIFORM<TV,T> interpolation;
 public:
 
-    FLUID_COLLISION_BODY_INACCURATE_UNION(GRID<TV>& grid_input);
-    FLUID_COLLISION_BODY_INACCURATE_UNION(GRID<TV>& grid_input,T contour_value_input);
+    FLUID_COLLISION_BODY_INACCURATE_UNION(GRID<TV>& grid_input,T contour_value_input=0);
     
     ~FLUID_COLLISION_BODY_INACCURATE_UNION();
 

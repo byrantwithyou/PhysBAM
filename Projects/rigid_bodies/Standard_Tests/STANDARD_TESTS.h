@@ -269,7 +269,7 @@ void Initialize_Bodies() override
 //             basic_forces->Set_Wind_Density((T).1);
 //             basic_forces->Use_Constant_Wind(0,TV(1,0,0));
         }}
-    if(test_number!=23 && test_number!=26 && test_number!=27 && test_number!=28) solid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,true));
+    if(test_number!=23 && test_number!=26 && test_number!=27 && test_number!=28) solid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection));
 }
 //#####################################################################
 // Function Bounce

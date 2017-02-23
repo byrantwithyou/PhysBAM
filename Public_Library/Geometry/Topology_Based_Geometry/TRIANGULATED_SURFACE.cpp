@@ -28,12 +28,8 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> TRIANGULATED_SURFACE<T>::
 TRIANGULATED_SURFACE()
-    :MESH_OBJECT<TV,TRIANGLE_MESH>(*new TRIANGLE_MESH,*new GEOMETRY_PARTICLES<TV>),
-    triangle_list(0),segment_lengths(0),hierarchy(0),particle_hierarchy(0),
-    avoid_normal_interpolation_across_sharp_edges(false),normal_variance_threshold((T).1),
-    vertex_normals(0),face_vertex_normals(0)
+    :TRIANGULATED_SURFACE(*new TRIANGLE_MESH,*new GEOMETRY_PARTICLES<TV>)
 {
-    Use_Face_Normals();
     this->need_destroy_mesh=this->need_destroy_particles=true;
 }
 //#####################################################################

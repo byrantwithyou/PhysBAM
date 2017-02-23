@@ -17,11 +17,8 @@ namespace PhysBAM{
 //#####################################################################
 template<class T> RENDERING_UNIFORM_VOXELS<T>::
 RENDERING_UNIFORM_VOXELS(GRID<TV>& grid_input,ARRAY<T,VECTOR<int,3> >& data_input,const T volumetric_step)
-    :grid(grid_input),coarse_grid(grid_input),volumetric_step(volumetric_step),number_of_smoothing_steps(0)
+    :RENDERING_UNIFORM_VOXELS(grid_input,grid_input,data_input,volumetric_step)
 {
-    box=grid_input.domain;
-    voxel_light_interpolation=&default_voxel_light_interpolation;voxel_source_interpolation=&default_voxel_source_interpolation;
-    data.Append(&data_input);
 }
 //#####################################################################
 // Constructor
@@ -32,7 +29,8 @@ RENDERING_UNIFORM_VOXELS(GRID<TV>& grid_input,GRID<TV>& coarse_grid_input,ARRAY<
     :grid(grid_input),coarse_grid(coarse_grid_input),volumetric_step(volumetric_step),number_of_smoothing_steps(0)
 {
     box=grid_input.domain;
-    voxel_light_interpolation=&default_voxel_light_interpolation;voxel_source_interpolation=&default_voxel_source_interpolation;
+    voxel_light_interpolation=&default_voxel_light_interpolation;
+    voxel_source_interpolation=&default_voxel_source_interpolation;
     data.Append(&data_input);
 }
 //#####################################################################

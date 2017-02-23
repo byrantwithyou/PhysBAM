@@ -21,18 +21,6 @@ RENDERING_PHONG_SHADER(const TV& ambient_color_input,const TV& diffuse_color_inp
 {
 }
 //#####################################################################
-// Constructor
-//#####################################################################
-template<class T> RENDERING_PHONG_SHADER<T>::
-RENDERING_PHONG_SHADER(const TV& ambient_color_input,const TV& diffuse_color_input,
-    const T diffuse_coefficient,const TV& specular_color_input,const T specular_coefficient,
-    const T specular_exponent_input,const MATERIAL_SHADER<T>& shader_input,RENDER_WORLD<T>& world_input)
-    :MATERIAL_SHADER<T>(world_input),ambient_color(ambient_color_input),
-    diffuse_color(diffuse_color_input*diffuse_coefficient),specular_color(specular_color_input*specular_coefficient),
-specular_exponent(specular_exponent_input),shader(shader_input)
-{
-}
-//#####################################################################
 // Function Shade_Surface_Using_Direct_Illumination
 //#####################################################################
 template<class T> auto RENDERING_PHONG_SHADER<T>::

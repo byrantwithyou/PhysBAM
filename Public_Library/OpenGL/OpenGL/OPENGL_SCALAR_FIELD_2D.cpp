@@ -21,23 +21,6 @@ namespace PhysBAM{
 template<class T,class T2> OPENGL_SCALAR_FIELD_2D<T,T2>::
 OPENGL_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,
     ARRAY<T2,VECTOR<int,2> > &values_input,OPENGL_COLOR_MAP<T2>* color_map_input,
-    const char* info_name,DRAW_MODE draw_mode_input)
-    :OPENGL_OBJECT<T>(stream_type),grid(grid_input),values(values_input),active_cells(0),
-    draw_ghost_values(true),current_color_map(0),opengl_textured_rect(0),opengl_points(0),
-    scale_range(false),selected_point(-1),info_name(info_name)
-
-{
-    viewer_callbacks.Set("toggle_draw_ghost_values",{[this](){Toggle_Draw_Ghost_Values();},"toggle_draw_ghost_values"});
-    PHYSBAM_ASSERT(color_map_input);
-    Initialize_Color_Maps(color_map_input);
-    Set_Draw_Mode(draw_mode_input);
-}
-//#####################################################################
-// Constructor
-//#####################################################################
-template<class T,class T2> OPENGL_SCALAR_FIELD_2D<T,T2>::
-OPENGL_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,
-    ARRAY<T2,VECTOR<int,2> > &values_input,OPENGL_COLOR_MAP<T2>* color_map_input,
     const char* info_name,ARRAY<bool,VECTOR<int,2> >* active_cells_input,
     DRAW_MODE draw_mode_input)
     :OPENGL_OBJECT<T>(stream_type),grid(grid_input),values(values_input),active_cells(active_cells_input),

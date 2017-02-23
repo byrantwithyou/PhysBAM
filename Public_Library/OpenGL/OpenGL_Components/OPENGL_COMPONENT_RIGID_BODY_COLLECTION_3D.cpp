@@ -37,13 +37,9 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(STREAM_TYPE stream_type,const std::string& basedir_input,bool use_display_lists)
-    :OPENGL_COMPONENT<T>(stream_type,"Rigid Geometry Collection"),basedir(basedir_input),use_display_lists(use_display_lists),frame_loaded(-1),valid(false),
-    rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(0)),articulated_rigid_body(0),
-    velocity_field(stream_type,velocity_vectors,positions,OPENGL_COLOR::Cyan(),.25,true,true),
-    angular_velocity_field(stream_type,angular_velocity_vectors,positions,OPENGL_COLOR::Magenta(),.25,true,true),need_destroy_rigid_body_collection(true),one_sided(false),
-    front_color_map(0),back_color_map(0),selected_joint_id(-1),selected_surface(-1),selected_volume(-1)
+    :OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(stream_type,*new RIGID_BODY_COLLECTION<TV>(0),basedir_input,use_display_lists)
 {
-    Initialize();
+    need_destroy_rigid_body_collection=true;
 }
 //#####################################################################
 // Constructor

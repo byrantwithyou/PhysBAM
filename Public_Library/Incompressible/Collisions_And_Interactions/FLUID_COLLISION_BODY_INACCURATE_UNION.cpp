@@ -14,21 +14,13 @@
 #include <Incompressible/Collisions_And_Interactions/FLUID_COLLISION_BODY_INACCURATE_UNION.h>
 using namespace PhysBAM;
 //#####################################################################
-// Function Constructor
-//#####################################################################
-template<class TV> FLUID_COLLISION_BODY_INACCURATE_UNION<TV>::
-FLUID_COLLISION_BODY_INACCURATE_UNION(GRID<TV>& grid_input)
-    :collision_bodies(grid_input),contour_value(0),grid(grid_input),levelset(grid_input,phi)
-{
-    collision_geometries_for_rasterization=&collision_bodies.collision_geometry_collection.bodies;
-}
-//#####################################################################
 // Constructor
 //#####################################################################
 template<class TV> FLUID_COLLISION_BODY_INACCURATE_UNION<TV>::
 FLUID_COLLISION_BODY_INACCURATE_UNION(GRID<TV>& grid_input,T contour_value_input)
     :collision_bodies(grid_input),contour_value(contour_value_input),grid(grid_input),levelset(grid_input,phi)
 {
+    collision_geometries_for_rasterization=&collision_bodies.collision_geometry_collection.bodies;
 }    
 //#####################################################################
 // Function Destructor
@@ -42,7 +34,12 @@ template<class TV> FLUID_COLLISION_BODY_INACCURATE_UNION<TV>::
 //#####################################################################
 template<class TV> typename TV::SCALAR FLUID_COLLISION_BODY_INACCURATE_UNION<TV>::
 Implicit_Geometry_Extended_Value_Helper(const TV& location,UNIFORM_TAG<TV>) const
-{return interpolation.Clamped_To_Array(grid,phi,location);}
+{
+    return interpolation.Clamped_To_Array(grid,phi,location);
+}
+//#####################################################################
+// Function Implicit_Geometry_Extended_Value
+//#####################################################################
 template<class TV> typename TV::SCALAR FLUID_COLLISION_BODY_INACCURATE_UNION<TV>::
 Implicit_Geometry_Extended_Value(const TV& location) const
 {

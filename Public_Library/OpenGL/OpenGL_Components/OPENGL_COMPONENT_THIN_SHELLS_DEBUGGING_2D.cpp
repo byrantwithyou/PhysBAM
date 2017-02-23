@@ -14,8 +14,8 @@ template<class T> OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T>::
 OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D(STREAM_TYPE stream_type,GRID<TV> &grid,const std::string& directory)
     :OPENGL_COMPONENT<T>(stream_type,"Thin Shells Debugging"),grid(grid),
     invalid_color_map(OPENGL_COLOR::Red()),
-    opengl_density_valid_mask(stream_type,grid,density_valid_mask,&invalid_color_map,"density_valid",OPENGL_SCALAR_FIELD_2D<T,bool>::DRAW_POINTS),
-    opengl_phi_valid_mask(stream_type,grid,phi_valid_mask,&invalid_color_map,"phi_valid",OPENGL_SCALAR_FIELD_2D<T,bool>::DRAW_POINTS),
+    opengl_density_valid_mask(stream_type,grid,density_valid_mask,&invalid_color_map,"density_valid",0,OPENGL_SCALAR_FIELD_2D<T,bool>::DRAW_POINTS),
+    opengl_phi_valid_mask(stream_type,grid,phi_valid_mask,&invalid_color_map,"phi_valid",0,OPENGL_SCALAR_FIELD_2D<T,bool>::DRAW_POINTS),
     directory(directory),frame_loaded(-1),valid(false),
     draw_grid_visibility(false),draw_density_valid_mask(false),draw_phi_valid_mask(false)
 {

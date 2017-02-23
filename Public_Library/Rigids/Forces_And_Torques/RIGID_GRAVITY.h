@@ -22,14 +22,9 @@ public:
     using BASE::force_rigid_body_particles;using BASE::rigid_body_collection;
 public:
 
-    RIGID_GRAVITY(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARRAY<int>* influenced_rigid_body_particles_input,
+    RIGID_GRAVITY(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARRAY<int>* influenced_rigid_body_particles_input=0,
         const TV& gravity_input=-(T)9.8*TV::Axis_Vector(1-(TV::m==1)))
         :BASE(rigid_body_collection_input,influenced_rigid_body_particles_input),gravity(gravity_input)
-    {}
-
-    RIGID_GRAVITY(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,const bool influence_all_rigid_body_particles_input,
-        const TV& gravity_input=-(T)9.8*TV::Axis_Vector(1-(TV::m==1)))
-        :BASE(rigid_body_collection_input,influence_all_rigid_body_particles_input),gravity(gravity_input)
     {}
 
     virtual ~RIGID_GRAVITY()

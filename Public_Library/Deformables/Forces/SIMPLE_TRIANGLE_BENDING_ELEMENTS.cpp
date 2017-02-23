@@ -18,11 +18,8 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> SIMPLE_TRIANGLE_BENDING_ELEMENTS<T>::
 SIMPLE_TRIANGLE_BENDING_ELEMENTS(DEFORMABLE_PARTICLES<TV>& particles,BINDING_LIST<TV>& binding_list_input)
-    :LINEAR_SPRINGS<TV>(particles,spring_connectivity),
-    bending_quadruples(bending_quadruples_default),binding_list(binding_list_input)
+    :SIMPLE_TRIANGLE_BENDING_ELEMENTS(particles,bending_quadruples_default,binding_list_input)
 {
-    Print_Number_Ignored();
-    Limit_Time_Step_By_Strain_Rate(false);
 }
 //#####################################################################
 // Constructor

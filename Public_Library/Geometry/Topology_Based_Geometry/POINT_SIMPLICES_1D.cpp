@@ -10,7 +10,7 @@ namespace PhysBAM{
 //#####################################################################
 template<class T> POINT_SIMPLICES_1D<T>::
 POINT_SIMPLICES_1D()
-    :MESH_OBJECT<TV,POINT_SIMPLEX_MESH>(*new POINT_SIMPLEX_MESH,*new GEOMETRY_PARTICLES<TV>),point_simplex_list(0),particle_partition(0),hierarchy(0),number_point_simplices(0)
+    :POINT_SIMPLICES_1D(*new POINT_SIMPLEX_MESH,*new GEOMETRY_PARTICLES<TV>)
 {
     this->need_destroy_mesh=this->need_destroy_particles=true;
 }

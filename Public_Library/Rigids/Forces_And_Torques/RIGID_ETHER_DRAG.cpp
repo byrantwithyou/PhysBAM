@@ -6,7 +6,7 @@
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 using namespace PhysBAM;
 //#####################################################################
-// Function Add_Velocity_Independent_Forces
+// Constructor
 //#####################################################################
 template<class TV> RIGID_ETHER_DRAG<TV>::
 RIGID_ETHER_DRAG(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARRAY<int>* influenced_rigid_body_particles_input,T dynamic_ether_viscosity,T angular_viscosity)
@@ -14,16 +14,16 @@ RIGID_ETHER_DRAG(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARRAY<in
     constant_wind_viscosity(dynamic_ether_viscosity),constant_wind_angular_viscosity(angular_viscosity),use_spatially_varying_wind(false),spatially_varying_wind_viscosity(0)
 {
 }
-template<class TV> RIGID_ETHER_DRAG<TV>::
-RIGID_ETHER_DRAG(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,const bool influence_all_rigid_body_particles_input,T dynamic_ether_viscosity,T angular_viscosity)
-    :RIGID_POINTWISE_FORCE<TV>(rigid_body_collection_input,influence_all_rigid_body_particles_input),use_constant_wind(dynamic_ether_viscosity!=0),
-    constant_wind_viscosity(dynamic_ether_viscosity),constant_wind_angular_viscosity(angular_viscosity),use_spatially_varying_wind(false),spatially_varying_wind_viscosity(0)
-{
-}
+//#####################################################################
+// Destructor
+//#####################################################################
 template<class TV> RIGID_ETHER_DRAG<TV>::
 ~RIGID_ETHER_DRAG()
 {
 }
+//#####################################################################
+// Function Add_Velocity_Independent_Forces
+//#####################################################################
 template<class TV> void RIGID_ETHER_DRAG<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const
 {

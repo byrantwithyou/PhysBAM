@@ -31,8 +31,7 @@ public:
     ARRAY<TV,TV_INT>* spatially_varying_wind;
     LINEAR_INTERPOLATION_UNIFORM<TV,TV> vector_interpolation;
 
-    RIGID_ETHER_DRAG(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARRAY<int>* influenced_rigid_body_particles_input,T dynamic_ether_viscosity=0,T angular_viscosity=0);
-    RIGID_ETHER_DRAG(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,const bool influence_all_rigid_body_particles_input,T dynamic_ether_viscosity=0,T angular_viscosity=0);
+    RIGID_ETHER_DRAG(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARRAY<int>* influenced_rigid_body_particles_input=0,T dynamic_ether_viscosity=0,T angular_viscosity=0);
     virtual ~RIGID_ETHER_DRAG();
 
     void Use_No_Drag()

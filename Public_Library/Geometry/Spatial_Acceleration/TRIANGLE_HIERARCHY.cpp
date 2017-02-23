@@ -17,7 +17,9 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> TRIANGLE_HIERARCHY<T>::
-TRIANGLE_HIERARCHY(TRIANGLE_MESH& triangle_mesh_input,GEOMETRY_PARTICLES<VECTOR<T,3> >& particles_input,const bool update_boxes,const int triangles_per_group_input)
+TRIANGLE_HIERARCHY(TRIANGLE_MESH& triangle_mesh_input,
+    GEOMETRY_PARTICLES<VECTOR<T,3> >& particles_input,const bool update_boxes,
+    const int triangles_per_group_input)
     :triangle_mesh(triangle_mesh_input),particles(particles_input),triangle_list(0),triangles_per_group(triangles_per_group_input)
 {
     if(triangle_mesh.elements.m){Initialize_Hierarchy_Using_KD_Tree();if(update_boxes) Update_Boxes();}else{leaves=0;root=0;}
@@ -26,10 +28,12 @@ TRIANGLE_HIERARCHY(TRIANGLE_MESH& triangle_mesh_input,GEOMETRY_PARTICLES<VECTOR<
 // Constructor
 //#####################################################################
 template<class T> TRIANGLE_HIERARCHY<T>::
-TRIANGLE_HIERARCHY(TRIANGLE_MESH& triangle_mesh_input,GEOMETRY_PARTICLES<VECTOR<T,3> >& particles_input,ARRAY<TRIANGLE_3D<T> >& triangle_list_input,const bool update_boxes,const int triangles_per_group_input)
-    :triangle_mesh(triangle_mesh_input),particles(particles_input),triangle_list(&triangle_list_input),triangles_per_group(triangles_per_group_input)
+TRIANGLE_HIERARCHY(TRIANGLE_MESH& triangle_mesh_input,
+    GEOMETRY_PARTICLES<VECTOR<T,3> >& particles_input,ARRAY<TRIANGLE_3D<T> >& triangle_list_input,
+    const bool update_boxes,const int triangles_per_group_input)
+    :TRIANGLE_HIERARCHY(triangle_mesh_input,particles_input,update_boxes,triangles_per_group_input)
 {
-    if(triangle_mesh.elements.m){Initialize_Hierarchy_Using_KD_Tree();if(update_boxes) Update_Boxes();}else{leaves=0;root=0;}
+    triangle_list=&triangle_list_input;
 }
 //#####################################################################
 // Destructor

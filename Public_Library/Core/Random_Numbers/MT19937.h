@@ -24,8 +24,7 @@ public:
     static const int n=624,m=397;
     static const unsigned int a=0x9908b0df,UPPER_MASK=0x80000000,LOWER_MASK=0x7fffffff;
 
-    MT19937();
-    explicit MT19937(const unsigned int value);
+    explicit MT19937(const unsigned int value=5489);
     virtual ~MT19937();
     void Set_Seed(const unsigned int value=5489);
     T operator()(); // in [0,1)

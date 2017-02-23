@@ -6,18 +6,27 @@
 //##################################################################### 
 #include <Solids/Meshing/RED_GREEN_TETRAHEDRA.h>
 using namespace PhysBAM; 
+//#####################################################################
+// Constructor
+//#####################################################################
 template<class T> RED_GREEN_TETRAHEDRA<T>::
 RED_GREEN_TETRAHEDRA(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume_input)
     :object(tetrahedralized_volume_input),segment_index_from_midpoint_index(0),rest_position(0)
 {
     Initialize();
 }
+//#####################################################################
+// Constructor
+//#####################################################################
 template<class T> RED_GREEN_TETRAHEDRA<T>::
 RED_GREEN_TETRAHEDRA(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume_input,ARRAY<VECTOR<T,3> >& rest_position_input)
-    :object(tetrahedralized_volume_input),rest_position(&rest_position_input)
+    :RED_GREEN_TETRAHEDRA(tetrahedralized_volume_input)
 {
-    PHYSBAM_FATAL_ERROR();Initialize(); // This constructor was broken.
+    rest_position=&rest_position_input;
 }
+//#####################################################################
+// Destructor
+//#####################################################################
 template<class T> RED_GREEN_TETRAHEDRA<T>::
 ~RED_GREEN_TETRAHEDRA()
 {

@@ -16,8 +16,9 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV,int d> B_SPLINE<TV,d>::
 B_SPLINE()
-    :need_destroy_particles(true),particles(*new GEOMETRY_PARTICLES<TV>)
+    :B_SPLINE(*new GEOMETRY_PARTICLES<TV>)
 {
+    need_destroy_particles=true;
 }
 //#####################################################################
 // Constructor

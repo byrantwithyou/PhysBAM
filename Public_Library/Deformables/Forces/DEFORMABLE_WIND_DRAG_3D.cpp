@@ -26,11 +26,18 @@ template<class T> TRIANGULATED_SURFACE<T>& Triangulated_Surface(TETRAHEDRALIZED_
     if(!tetrahedralized_volume.triangulated_surface) tetrahedralized_volume.Initialize_Triangulated_Surface();
     return *tetrahedralized_volume.triangulated_surface;
 }}
+//#####################################################################
+// Constructor
+//#####################################################################
 template<class T> template<class T_OBJECT> DEFORMABLE_WIND_DRAG_3D<T>::
 DEFORMABLE_WIND_DRAG_3D(T_OBJECT& object)
-    :DEFORMABLES_FORCES<TV>(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(object.particles)),triangulated_surface(&Triangulated_Surface(object)),use_constant_wind(false),
-    use_spatially_varying_wind(false),spatially_varying_wind(0),wind_density(0),spatially_varying_wind_density(0),spatially_varying_wind_pressure(0),linear_normal_viscosity(0),mpi_solids(0)
-{}
+    :DEFORMABLE_WIND_DRAG_3D(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(object.particles))
+{
+    triangulated_surface=&Triangulated_Surface(object);
+}
+//#####################################################################
+// Constructor
+//#####################################################################
 template<class T> DEFORMABLE_WIND_DRAG_3D<T>::
 DEFORMABLE_WIND_DRAG_3D(DEFORMABLE_PARTICLES<TV>& deformable_body_particles_input)
     :DEFORMABLES_FORCES<TV>(deformable_body_particles_input),triangulated_surface(0),use_constant_wind(false),

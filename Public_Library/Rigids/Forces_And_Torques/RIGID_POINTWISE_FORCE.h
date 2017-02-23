@@ -23,18 +23,12 @@ public:
 protected:
     ARRAY<int> *influenced_rigid_body_particles;
     bool need_destroy_influenced_rigid_body_particles;
-    bool influence_all_rigid_body_particles;
 public:
     FORCE_ELEMENTS force_rigid_body_particles;
 
     RIGID_POINTWISE_FORCE(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARRAY<int>* influenced_rigid_body_particles_input)
         :RIGIDS_FORCES<TV>(rigid_body_collection_input),influenced_rigid_body_particles(influenced_rigid_body_particles_input),
-        need_destroy_influenced_rigid_body_particles(false),influence_all_rigid_body_particles(false)
-    {}
-
-    RIGID_POINTWISE_FORCE(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,const bool influence_all_rigid_body_particles_input)
-        :RIGIDS_FORCES<TV>(rigid_body_collection_input),influenced_rigid_body_particles(0),need_destroy_influenced_rigid_body_particles(true),
-        influence_all_rigid_body_particles(influence_all_rigid_body_particles_input)
+        need_destroy_influenced_rigid_body_particles(false)
     {}
 
     virtual ~RIGID_POINTWISE_FORCE()

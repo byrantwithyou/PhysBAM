@@ -28,11 +28,7 @@ public:
     DEFORMABLE_PARTICLES<TV>& particles;
     int particle_index;
 
-    BINDING(DEFORMABLE_PARTICLES<TV>& particles_input)
-        :particles(particles_input),particle_index(0)
-    {}
-
-    BINDING(DEFORMABLE_PARTICLES<TV>& particles_input,const int particle_index_input)
+    BINDING(DEFORMABLE_PARTICLES<TV>& particles_input,const int particle_index_input=-1)
         :particles(particles_input),particle_index(particle_index_input)
     {}
 

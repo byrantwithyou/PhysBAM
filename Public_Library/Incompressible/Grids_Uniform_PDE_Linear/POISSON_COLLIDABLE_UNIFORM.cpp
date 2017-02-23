@@ -16,7 +16,9 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class TV> POISSON_COLLIDABLE_UNIFORM<TV>::
-POISSON_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input,const bool initialize_grid,const bool multiphase_input,const bool enforce_compatibility_input)
+POISSON_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input,
+    const bool initialize_grid,const bool multiphase_input,
+    const bool enforce_compatibility_input)
     :BASE(grid_input,u_input,initialize_grid,multiphase_input,enforce_compatibility_input),levelset_multiple(0),
     levelset_multiple_default(grid,phis_default,false),dt(0),dt_is_set(false)
 {
@@ -26,13 +28,13 @@ POISSON_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input,c
 // Constructor
 //#####################################################################
 template<class TV> POISSON_COLLIDABLE_UNIFORM<TV>::
-POISSON_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input,LEVELSET<TV>& cell_centered_levelset,const bool initialize_grid,const bool multiphase_input,
-    const bool enforce_compatibility_input)
-    :BASE(grid_input,u_input,initialize_grid,multiphase_input,enforce_compatibility_input),levelset_multiple(0),
-    levelset_multiple_default(grid,phis_default,false),dt(0),dt_is_set(false)
+POISSON_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input,
+    LEVELSET<TV>& cell_centered_levelset,const bool initialize_grid,
+    const bool multiphase_input,const bool enforce_compatibility_input)
+    :POISSON_COLLIDABLE_UNIFORM(grid_input,u_input,initialize_grid,multiphase_input,
+        enforce_compatibility_input)
 {
     levelset=&cell_centered_levelset;
-    Initialize_Grid(grid_input);
 }
 //#####################################################################
 // Destructor

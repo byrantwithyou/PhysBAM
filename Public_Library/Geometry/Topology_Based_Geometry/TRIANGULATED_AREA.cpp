@@ -18,8 +18,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> TRIANGULATED_AREA<T>::
 TRIANGULATED_AREA()
-    :MESH_OBJECT<TV,TRIANGLE_MESH>(*new TRIANGLE_MESH,*new GEOMETRY_PARTICLES<TV>),segmented_curve(0),hierarchy(0),triangle_area_fractions(0),triangle_areas(0),
-    nodal_areas(0)
+    :TRIANGULATED_AREA(*new TRIANGLE_MESH,*new GEOMETRY_PARTICLES<TV>)
 {
     this->need_destroy_mesh=this->need_destroy_particles=true;
 }
@@ -28,8 +27,8 @@ TRIANGULATED_AREA()
 //#####################################################################
 template<class T> TRIANGULATED_AREA<T>::
 TRIANGULATED_AREA(TRIANGLE_MESH& triangle_mesh_input,GEOMETRY_PARTICLES<TV>& particles_input)
-    :MESH_OBJECT<TV,TRIANGLE_MESH>(triangle_mesh_input,particles_input),segmented_curve(0),hierarchy(0),triangle_area_fractions(0),triangle_areas(0),
-    nodal_areas(0)
+    :MESH_OBJECT<TV,TRIANGLE_MESH>(triangle_mesh_input,particles_input),segmented_curve(0),
+    hierarchy(0),triangle_area_fractions(0),triangle_areas(0),nodal_areas(0)
 {
 }
 //#####################################################################

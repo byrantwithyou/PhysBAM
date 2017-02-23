@@ -29,26 +29,9 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(STREAM_TYPE stream_type,const std::string& basedir_input)
-    :OPENGL_COMPONENT<T>(stream_type,"Rigid Geometry Collection 2D"),basedir(basedir_input),frame_loaded(-1),valid(false),show_object_names(false),output_positions(true),draw_velocity_vectors(false),
-    draw_individual_axes(false),draw_node_velocity_vectors(false),draw_segmented_curve(true),draw_triangulated_area(false),draw_implicit_curve(false),
-    draw_articulation_points(false),draw_forces_and_torques(false),draw_linear_muscles(false),need_destroy_rigid_body_collection(true),selected_curve(-1),selected_area(-1),selected_joint_id(-1),selected_muscle_id(-1),
-rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(0)),articulated_rigid_body(0),
-velocity_field(stream_type,velocity_vectors,positions,OPENGL_COLOR::Cyan(),0.25,true,true),node_velocity_field(stream_type,node_velocity_vectors,node_positions,OPENGL_COLOR::Magenta(),0.25,true,true)
+    :OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(stream_type,*new RIGID_BODY_COLLECTION<TV>(0),basedir_input)
 {
-    viewer_callbacks.Set("toggle_velocity_vectors",{[this](){Toggle_Velocity_Vectors();},"Toggle velocity vectors"});
-    viewer_callbacks.Set("toggle_individual_axes",{[this](){Toggle_Individual_Axes();},"Toggle individual axes"});
-    viewer_callbacks.Set("toggle_output_positions",{[this](){Toggle_Output_Positions();},"Toggle output positions"});
-    viewer_callbacks.Set("toggle_show_object_names",{[this](){Toggle_Show_Object_Names();},"Toggle show object names"});
-    viewer_callbacks.Set("toggle_node_velocity_vectors",{[this](){Toggle_Node_Velocity_Vectors();},"Toggle node velocity vectors"});
-    viewer_callbacks.Set("toggle_draw_mode",{[this](){Toggle_Draw_Mode();},"Toggle draw mode"});
-    viewer_callbacks.Set("increase_vector_size",{[this](){Increase_Vector_Size();},"Increase vector size"});
-    viewer_callbacks.Set("decrease_vector_size",{[this](){Decrease_Vector_Size();},"Decrease vector size"});
-    viewer_callbacks.Set("toggle_articulation_points",{[this](){Toggle_Articulation_Points();},"Toggle articulation points"});
-    viewer_callbacks.Set("toggle_linear_muscles",{[this](){Toggle_Linear_Muscles();},"Toggle linear muscles"});
-    viewer_callbacks.Set("toggle_forces_and_torques",{[this](){Toggle_Forces_And_Torques();},"Toggle forces and torques"});
-
-    is_animation=true;
-    has_init_destroy_information=true;
+    need_destroy_rigid_body_collection=true;
 }
 //#####################################################################
 // Constructor

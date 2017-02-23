@@ -21,10 +21,9 @@ class OPENGL_COMPONENT_SCALAR_FIELD_3D:public OPENGL_COMPONENT<T>
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::viewer_callbacks;
     using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::stream_type;
-    // Should be able to combine these two constructors into one (with a default arg) but for some reason I can't get it to compile in linux...
-    OPENGL_COMPONENT_SCALAR_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV> &grid_input,const std::string &scalar_field_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input);
-    OPENGL_COMPONENT_SCALAR_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV> &grid_input,const std::string &scalar_field_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input,
-                                     typename OPENGL_SCALAR_FIELD_3D<T,T2>::DRAW_MODE draw_mode_input);
+    OPENGL_COMPONENT_SCALAR_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV> &grid_input,
+        const std::string &scalar_field_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input,
+        typename OPENGL_SCALAR_FIELD_3D<T,T2>::DRAW_MODE draw_mode_input=OPENGL_SCALAR_FIELD_3D<T,T2>::DRAW_TEXTURE);
     virtual ~OPENGL_COMPONENT_SCALAR_FIELD_3D();
 
     bool Valid_Frame(int frame_input) const override;

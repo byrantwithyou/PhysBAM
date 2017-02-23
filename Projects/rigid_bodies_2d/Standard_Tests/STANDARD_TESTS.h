@@ -191,7 +191,7 @@ void Kinematic()
     last_frame=(int)(15*frame_rate);
 
     // add forces
-    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,true));
+    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection));
 }
 //#####################################################################
 // Function Test_Example
@@ -218,7 +218,7 @@ void Test_Example()
     last_frame=200;
 
     // add forces
-    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,true));
+    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection));
 }
 //#####################################################################
 // Function Pyramid_Of_Boxes
@@ -251,7 +251,7 @@ void Pyramid_Of_Boxes()
 
     tests.Add_Ground(1, -10);
     last_frame = 400;
-    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection, true));
+    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection));
 }
 //#####################################################################
 // Function Stacked_Boxes
@@ -278,7 +278,7 @@ void Stacked_Boxes() {
 
     tests.Add_Ground(1, -10);
     last_frame = 250;
-    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection, true));
+    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection));
 }
 //#####################################################################
 // Function Partition_Test
@@ -392,7 +392,7 @@ void Contact_Test_1() {
             rigid_body->Frame().t = TV(i*4,j*2);}}
 
     tests.Add_Ground(1, -1);
-    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection, true));
+    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection));
 }
 //#####################################################################
 // Function Contact_Test_2
@@ -408,7 +408,7 @@ void Contact_Test_2() {
         width--;}
 
     tests.Add_Ground(1, -1);
-    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection, true));
+    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection));
 }
 //#####################################################################
 // Function Simple_Collision_Test

@@ -24,9 +24,6 @@ public:
     RENDERING_PHONG_SHADER(const TV& ambient_color_input,const TV& diffuse_color_input,
         const TV& specular_color_input,const T specular_exponent_input,
         const MATERIAL_SHADER<T>& shader_input,RENDER_WORLD<T>& world_input);
-    RENDERING_PHONG_SHADER(const TV& ambient_color_input,const TV& diffuse_color_input,
-        const T diffuse_coefficient,const TV& specular_color_input,const T specular_coefficient,
-        const T specular_exponent_input,const MATERIAL_SHADER<T>& shader_input,RENDER_WORLD<T>& world_input);
 
     TV Shade_Surface_Using_Direct_Illumination(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& exiting_object,
         const RENDERING_OBJECT<T>& entering_object,const RENDERING_OBJECT<T>& intersection_object,

@@ -29,7 +29,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> SEGMENT_ADHESION<TV>::
 SEGMENT_ADHESION(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& mesh,ARRAY<HAIR_ID>& particle_to_spring_id,HASHTABLE<VECTOR<int,4> >& intersecting_edge_edge_pairs)
-    :DEFORMABLES_FORCES<TV>(particles),mpi_solids(0),mesh(mesh),curve(mesh,dynamic_cast<GEOMETRY_PARTICLES<TV>&>(particles)),restlength((T).001),max_connections(5),
+    :DEFORMABLES_FORCES<TV>(particles),mpi_solids(0),mesh(mesh),curve(mesh,particles),restlength((T).001),max_connections(5),
     particle_to_spring_id(particle_to_spring_id),internal_curve(internal_mesh,particles),external_curve(external_mesh,particles),springs(new T_SPRING_HASH()),
     segments_with_springs(mesh.elements.m),intersecting_edge_edge_pairs(intersecting_edge_edge_pairs)
 {
@@ -40,11 +40,8 @@ SEGMENT_ADHESION(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& mesh,ARRAY<HA
 //#####################################################################
 template<class TV> SEGMENT_ADHESION<TV>::
 SEGMENT_ADHESION(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& mesh,ARRAY<HAIR_ID>& particle_to_spring_id)
-    :DEFORMABLES_FORCES<TV>(particles),mpi_solids(0),mesh(mesh),curve(mesh,particles),restlength((T).001),max_connections(5),
-    particle_to_spring_id(particle_to_spring_id),internal_curve(internal_mesh,particles),external_curve(external_mesh,particles),springs(new T_SPRING_HASH()),
-    segments_with_springs(mesh.elements.m),intersecting_edge_edge_pairs(default_intersecting_edge_edge_pairs)
+    :SEGMENT_ADHESION(particles,mesh,particle_to_spring_id,default_intersecting_edge_edge_pairs)
 {
-    for(int i=0;i<mesh.elements.m;i++) segments_with_springs(i).x.Preallocate(max_connections);
 }
 //#####################################################################
 // Function Update_Mpi
