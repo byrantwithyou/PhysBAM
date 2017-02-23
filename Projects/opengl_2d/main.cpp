@@ -599,14 +599,12 @@ Initialize_Components_And_Key_Bindings()
     std::string deformable_object_filename=LOG::sprintf("%s/%d/deformable_object_particles",basedir.c_str(),start_frame);
     if(FILE_UTILITIES::File_Exists(deformable_object_filename)){
         deformable_objects_component=new OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>(stream_type,basedir+"/",start_frame);
-        deformable_objects_component->Set_Vector_Size(.01);
         deformable_objects_component->selectable=true;
         // TODO: what the hell?
         if(!FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/rigid_body_particles",start_frame)){
             }}
     if(FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/rigid_body_particles",start_frame)){
         rigid_bodies_component=new OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>(stream_type,basedir);
-        rigid_bodies_component->Set_Vector_Size(.01);
         rigid_bodies_component->selectable=true;
         if(FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/colors",start_frame)) FILE_UTILITIES::template Read_From_File(stream_type,LOG::sprintf("%s/%d/colors",basedir.c_str(),start_frame),rigid_bodies_component->colors);
         for(int i=0;i<rigid_bodies_no_draw_list.m;i++){
@@ -633,7 +631,6 @@ Initialize_Components_And_Key_Bindings()
     std::string soft_constraints_deformable_object_filename=basedir+LOG::sprintf("/%d/soft_constraints_deformable_object_particles",start_frame);
     if(FILE_UTILITIES::File_Exists(soft_constraints_deformable_object_filename)){
         OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>* soft_constraints_deformable_objects_component=new OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>(stream_type,basedir+"/soft_constraints_",start_frame);
-        soft_constraints_deformable_objects_component->Set_Vector_Size(.01);
         Add_Component(soft_constraints_deformable_objects_component,"Soft Constraints Deformable Objects",'e',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::SELECTABLE);}
 
     opengl_world.Set_Key_Binding_Category("Fluid Boundaries");

@@ -43,8 +43,6 @@ public:
     bool Use_Bounding_Box() const override { return draw && valid; }
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 
-    void Set_Vector_Size(const T vector_size);
-
     void Increase_Vector_Size();
     void Decrease_Vector_Size();
 

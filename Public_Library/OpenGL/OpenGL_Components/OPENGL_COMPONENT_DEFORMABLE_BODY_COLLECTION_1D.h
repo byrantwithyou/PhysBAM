@@ -73,7 +73,6 @@ public:
     void Cycle_Display_Mode();
     void Show_Only_First();
     void Highlight_Particle();
-    void Set_Vector_Size(T size);
     void Toggle_Velocity_Vectors();
     void Decrease_Vector_Size();
     void Increase_Vector_Size();

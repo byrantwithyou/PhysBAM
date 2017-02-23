@@ -134,14 +134,6 @@ Print_Node_Selection_Info(std::ostream& stream,const TV_INT& node) const
 {
 }
 //#####################################################################
-// Function Set_Vector_Size
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>::
-Set_Vector_Size(const T vector_size)
-{
-    velocity_scale=vector_size;
-}
-//#####################################################################
 // Function Increase_Vector_Size
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>::

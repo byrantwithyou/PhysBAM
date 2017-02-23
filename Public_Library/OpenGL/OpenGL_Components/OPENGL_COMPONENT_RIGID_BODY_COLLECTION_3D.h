@@ -110,7 +110,6 @@ public:
     void Set_Object_Material(int i, const OPENGL_MATERIAL &front_material_input);
     void Set_Object_Material(int i, const OPENGL_MATERIAL &front_material_input, const OPENGL_MATERIAL &back_material_input);
     void Set_Use_Object_Bounding_Box(int i, bool use_it);
-    void Set_Vector_Size(T size);
 
     void Toggle_Velocity_Vectors();
     void Toggle_Angular_Velocity_Vectors();

@@ -45,7 +45,6 @@ public:
     virtual RANGE<TV> Bounding_Box() const override;
     void Print_Cell_Selection_Info(std::ostream& stream,const TV_INT& cell) const override;
     void Print_Node_Selection_Info(std::ostream& stream,const TV_INT& node) const override;
-    void Set_Vector_Size(const T vector_size);
 
     void Increase_Vector_Size();
     void Decrease_Vector_Size();

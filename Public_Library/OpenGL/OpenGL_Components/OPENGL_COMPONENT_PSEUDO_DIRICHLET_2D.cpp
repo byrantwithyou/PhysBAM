@@ -110,14 +110,6 @@ Bounding_Box() const
     return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
-// Function Set_Vector_Size
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_2D<T>::
-Set_Vector_Size(const T vector_size)
-{
-    velocity_scale=vector_size;
-}
-//#####################################################################
 // Function Increase_Vector_Size
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_2D<T>::

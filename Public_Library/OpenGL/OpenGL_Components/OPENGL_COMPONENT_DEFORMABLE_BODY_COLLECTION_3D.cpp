@@ -838,14 +838,6 @@ Selection_Bounding_Box() const -> RANGE<TV>
     return World_Space_Box(selected_object->Bounding_Box());
 }
 //#####################################################################
-// Function Set_Vector_Size
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
-Set_Vector_Size(T size)
-{
-    velocity_field.size=size;
-}
-//#####################################################################
 // Function Toggle_Velocity_Vectors
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::

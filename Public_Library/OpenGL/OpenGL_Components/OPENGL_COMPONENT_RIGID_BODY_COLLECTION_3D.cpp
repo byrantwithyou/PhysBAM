@@ -649,15 +649,6 @@ Set_Use_Object_Bounding_Box(int i,bool use_it)
     use_object_bounding_box(i)=use_it;
 }
 //#####################################################################
-// Function Set_Vector_Size
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
-Set_Vector_Size(T size)
-{
-    velocity_field.size=size;
-    angular_velocity_field.size=size;
-}
-//#####################################################################
 // Function Toggle_Velocity_Vectors
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::

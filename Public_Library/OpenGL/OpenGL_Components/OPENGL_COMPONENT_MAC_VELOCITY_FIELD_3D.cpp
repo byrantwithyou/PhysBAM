@@ -130,14 +130,6 @@ Print_Selection_Info(std::ostream& stream) const
         if(draw_vorticity) stream<<"vorticity magnitude = "<<opengl_vorticity_magnitude.values(selected_index)<<std::endl;}
 }
 //#####################################################################
-// Function Set_Vector_Size
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>::
-Set_Vector_Size(T size)
-{
-    opengl_mac_velocity_field.size = size;
-}
-//#####################################################################
 // Function Toggle_Velocity_Mode
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>::

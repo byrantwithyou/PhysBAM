@@ -322,14 +322,6 @@ Get_Particles_Id_Array(int set_number) const
     return 0;
 }
 //#####################################################################
-// Function Set_Vector_Size
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_PARTICLES_3D<T>::
-Set_Vector_Size(T size)
-{
-    opengl_vector_field.size=size;
-}
-//#####################################################################
 // Function Increase_Vector_Size
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_PARTICLES_3D<T>::

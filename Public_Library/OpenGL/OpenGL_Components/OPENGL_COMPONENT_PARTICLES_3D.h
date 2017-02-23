@@ -45,7 +45,6 @@ public:
     void Toggle_Draw_Point_Numbers();
     void Toggle_Draw_Velocities();
     void Command_Prompt();
-    void Set_Vector_Size(T size);
     void Increase_Vector_Size();
     void Decrease_Vector_Size();
     void Toggle_Arrowhead();

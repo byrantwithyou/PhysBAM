@@ -39,8 +39,6 @@ public:
     virtual void Slice_Has_Changed() override { opengl_mac_velocity_field.Slice_Has_Changed();opengl_vorticity_magnitude.Slice_Has_Changed(); }
     void Print_Selection_Info(std::ostream& stream) const override;
 
-    void Set_Vector_Size(T size);
-
     void Toggle_Velocity_Mode();
     void Toggle_Velocity_Mode_And_Draw();
     void Increase_Vector_Size();

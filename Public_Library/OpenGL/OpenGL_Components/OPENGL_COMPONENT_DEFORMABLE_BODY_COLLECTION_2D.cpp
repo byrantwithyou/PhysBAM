@@ -246,29 +246,6 @@ Display() const
     if(draw_velocities && deformable_body_collection.particles.store_velocity) velocity_field.Display();
 }
 //#####################################################################
-// Function Set_Vector_Size
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>::
-Set_Vector_Size(const T vector_size)
-{
-    velocity_scale=vector_size;
-    for(int i=0;i<segmented_curve_objects.m;i++)
-        if(active_list(i) && segmented_curve_objects(i))
-            segmented_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
-    for(int i=0;i<bezier_spline_objects.m;i++)
-        if(active_list(i) && bezier_spline_objects(i))
-            bezier_spline_objects(i)->velocity_scale=velocity_scale;
-    for(int i=0;i<b_spline_objects.m;i++)
-        if(active_list(i) && b_spline_objects(i))
-            b_spline_objects(i)->velocity_scale=velocity_scale;
-    for(int i=0;i<triangulated_area_objects.m;i++)
-        if(active_list(i) && triangulated_area_objects(i))
-            triangulated_area_objects(i)->velocity_scale=velocity_scale;
-    for(int i=0;i<embedded_curve_objects.m;i++)
-        if(active_list(i) && embedded_curve_objects(i))
-            embedded_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
-}
-//#####################################################################
 // Function Increase_Vector_Size
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>::

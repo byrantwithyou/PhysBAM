@@ -80,8 +80,6 @@ public:
     void Print_Selection_Info(std::ostream& output_stream) const override;
     bool Destroy_Selection_After_Frame_Change() override;
 
-    void Set_Vector_Size(const T vector_size);
-
     void Increase_Vector_Size();
     void Decrease_Vector_Size();
     void Toggle_Draw_Velocities();

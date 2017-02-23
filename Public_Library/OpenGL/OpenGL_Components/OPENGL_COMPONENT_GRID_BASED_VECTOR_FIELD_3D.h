@@ -37,8 +37,6 @@ public:
     void Set_Frame(int frame_input) override;
     void Set_Draw(bool draw_input = true) override;
 
-    void Set_Vector_Size(T size);
-
     void Increase_Vector_Size();
     void Decrease_Vector_Size();
     void Toggle_Arrowhead();

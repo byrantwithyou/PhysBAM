@@ -111,14 +111,6 @@ Print_Selection_Info(std::ostream& stream) const
         opengl_grid_based_vector_field.Print_Selection_Info(stream);}
 }
 //#####################################################################
-// Function Set_Vector_Size
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>::
-Set_Vector_Size(T size)
-{
-    opengl_grid_based_vector_field.size = size;
-}
-//#####################################################################
 // Function Increase_Vector_Size
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>::

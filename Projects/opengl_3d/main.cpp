@@ -284,7 +284,6 @@ Initialize_Components_And_Key_Bindings()
     if(FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/rigid_body_particles",start_frame)){
         OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>* rigid_bodies_component=0;
         rigid_bodies_component=new OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>(stream_type,basedir,true);
-        rigid_bodies_component->Set_Vector_Size(0.01);
         rigid_bodies_component->Set_Frame(start_frame); // needed before reinitialize so that no draw list will work
         rigid_bodies_component->Reinitialize();
         for(int i=0;i<rigid_bodies_no_draw_list.m;i++){
@@ -601,7 +600,6 @@ Initialize_Components_And_Key_Bindings()
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>* pseudo_dirichlet_component=new OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>(stream_type,grid,filename);
         grid_component->object.grid_objects.Append(pseudo_dirichlet_component);
-        pseudo_dirichlet_component->Set_Vector_Size(0.1);
         Add_Component(pseudo_dirichlet_component,"pseudo dirichlet",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F3),pseudo_dirichlet_component->viewer_callbacks.Get("toggle_draw"));
         opengl_world.Append_Bind_Key('=',pseudo_dirichlet_component->viewer_callbacks.Get("increase_vector_size"));
@@ -678,7 +676,6 @@ Initialize_Components_And_Key_Bindings()
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_VORTICITY_PARTICLES_3D<T>* vorticity_particles_component=new OPENGL_COMPONENT_VORTICITY_PARTICLES_3D<T>(stream_type,filename,true);
         vorticity_particles_component->opengl_points->color=OPENGL_COLOR(155,155,200);
-        vorticity_particles_component->Set_Vector_Size((T).01);
         Add_Component(vorticity_particles_component,"Vorticity particles",'j',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::SELECTABLE);
         opengl_world.Append_Bind_Key('J',vorticity_particles_component->viewer_callbacks.Get("toggle_draw_point_numbers"));
         opengl_world.Append_Bind_Key('h',vorticity_particles_component->viewer_callbacks.Get("toggle_arrowhead"));

@@ -127,7 +127,6 @@ public:
     void Create_One_Big_Triangulated_Surface_And_Write_To_File();
     void Show_Only_First();
     void Highlight_Particle();
-    void Set_Vector_Size(T size);
     void Toggle_Velocity_Vectors();
     void Decrease_Vector_Size();
     void Increase_Vector_Size();

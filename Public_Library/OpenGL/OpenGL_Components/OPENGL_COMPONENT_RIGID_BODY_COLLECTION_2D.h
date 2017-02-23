@@ -97,7 +97,6 @@ public:
     bool Get_Draw_Object(int i) const;
     void Set_Object_Color(int i, const OPENGL_COLOR &color);
     void Set_Use_Object_Bounding_Box(int i, bool use_it);
-    void Set_Vector_Size(T size);
 
     void Toggle_Velocity_Vectors();
     void Toggle_Individual_Axes();
