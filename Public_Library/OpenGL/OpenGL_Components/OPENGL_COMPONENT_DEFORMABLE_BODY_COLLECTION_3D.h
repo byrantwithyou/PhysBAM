@@ -26,8 +26,6 @@
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D.h>
 namespace PhysBAM{
 
-template<class T> class OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D;
-
 template<class T>
 class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D:public OPENGL_COMPONENT<T>
 {
@@ -48,7 +46,6 @@ public:
     using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
     using OPENGL_OBJECT<T>::World_Space_Box;
     DEFORMABLE_BODY_COLLECTION<TV> &deformable_body_collection;
-    OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>* real_selection;
     ARRAY<OPENGL_SEGMENTED_CURVE_3D<T>*> segmented_curve_objects;
     ARRAY<OPENGL_TRIANGULATED_SURFACE<T>*> triangulated_surface_objects;
     ARRAY<OPENGL_TETRAHEDRALIZED_VOLUME<T>*> tetrahedralized_volume_objects;
@@ -143,17 +140,6 @@ public:
 private:
     void Initialize();    // Needs to be called after some state changes
 };
-
-// template<class T>
-// class OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D:public OPENGL_SELECTION<T>
-// {
-// public:
-//     void body_selection;
-//     void saved_selection;
-
-//     OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D(OPENGL_OBJECT<T>* object) :OPENGL_SELECTION<T>(OPENGL_SELECTION::COMPONENT_DEFORMABLE_COLLECTION_3D,object) {}
-//     virtual RANGE<TV> Bounding_Box() const override;
-// };
 
 }
 #endif

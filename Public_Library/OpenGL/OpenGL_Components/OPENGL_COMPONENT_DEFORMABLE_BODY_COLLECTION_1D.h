@@ -17,8 +17,6 @@
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT.h>
 namespace PhysBAM{
 
-template<class T> class OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_1D;
-
 template<class T>
 class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D:public OPENGL_COMPONENT<T>
 {
@@ -36,7 +34,6 @@ public:
     using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::stream_type;
     using OPENGL_OBJECT<T>::viewer_callbacks;using OPENGL_OBJECT<T>::World_Space_Box;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
-    OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_1D<T>* real_selection;
     ARRAY<OPENGL_POINT_SIMPLICES_1D<T>*> point_simplices_1d_objects;
     ARRAY<bool> active_list;
     ARRAY<TV> positions;

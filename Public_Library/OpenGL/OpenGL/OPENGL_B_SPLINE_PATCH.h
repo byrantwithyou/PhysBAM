@@ -16,8 +16,6 @@ namespace PhysBAM{
 
 template<class TV,int d> class B_SPLINE_PATCH;
 template<class T> class TRIANGULATED_PATCH;
-template<class T> class OPENGL_SELECTION_B_SPLINE_PATCH_VERTEX;
-template<class T> class OPENGL_SELECTION_B_SPLINE_PATCH_ELEMENT;
 
 template<class T>
 class OPENGL_B_SPLINE_PATCH:public OPENGL_OBJECT<T>
@@ -81,9 +79,6 @@ public:
     bool wireframe_only;
     bool draw_particles;
     const int substeps=5;
-
-    friend class OPENGL_SELECTION_B_SPLINE_PATCH_VERTEX<T>;
-    friend class OPENGL_SELECTION_B_SPLINE_PATCH_ELEMENT<T>;
 };
 
 }

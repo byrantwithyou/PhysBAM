@@ -13,9 +13,6 @@
 namespace PhysBAM{
 
 template<class T> class TRIANGULATED_AREA;
-template<class T> class OPENGL_SELECTION_TRIANGULATED_AREA_VERTEX;
-template<class T> class OPENGL_SELECTION_TRIANGULATED_AREA_SEGMENT;
-template<class T> class OPENGL_SELECTION_TRIANGULATED_AREA_TRIANGLE;
 
 template<class T>
 class OPENGL_TRIANGULATED_AREA:public OPENGL_OBJECT<T>
@@ -62,10 +59,6 @@ protected:
     void Draw_Vertices_For_Selection() const;
     void Draw_Segments_For_Selection() const;
     void Draw_Triangles_For_Selection() const;
-
-    friend class OPENGL_SELECTION_TRIANGULATED_AREA_VERTEX<T>;
-    friend class OPENGL_SELECTION_TRIANGULATED_AREA_SEGMENT<T>;
-    friend class OPENGL_SELECTION_TRIANGULATED_AREA_TRIANGLE<T>;
 };
 }
 #endif

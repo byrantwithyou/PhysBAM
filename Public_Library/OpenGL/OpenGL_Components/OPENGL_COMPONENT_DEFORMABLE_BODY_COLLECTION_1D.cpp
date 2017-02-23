@@ -22,7 +22,7 @@ OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D(STREAM_TYPE stream_type,const std
     :OPENGL_COMPONENT<T>(stream_type,"Deformable Object List"),prefix(prefix),frame_loaded(-1),valid(false),use_active_list(false),display_mode(0),
     incremented_active_object(0),smooth_shading(false),selected_vertex(-1),
     deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(0,0)),
-    real_selection(0),color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map())
+    color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map())
 {
     viewer_callbacks.Set("toggle_active_value",{[this](){Toggle_Active_Value();},"Toggle viewing of elements"});
     viewer_callbacks.Set("toggle_use_active_list",{[this](){Toggle_Use_Active_List();},"Toggle drawing subset of the deformable objects in the list"});

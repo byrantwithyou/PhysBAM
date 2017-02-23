@@ -26,7 +26,7 @@ OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D(STREAM_TYPE stream_type,const std
     incremented_active_object(0),smooth_shading(false),selected_vertex(-1),
     display_hard_bound_surface_mode(0),display_forces_mode(0),interaction_pair_display_mode(0),
     deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(0,0)),
-    real_selection(0),has_tetrahedralized_volumes(false),has_hexahedralized_volumes(false),
+    has_tetrahedralized_volumes(false),has_hexahedralized_volumes(false),
     velocity_field(stream_type,velocity_vectors,positions,OPENGL_COLOR::Cyan(),.25,false,false),
     color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map()),
     has_embedded_objects(false),has_soft_bindings(false),

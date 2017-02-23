@@ -15,9 +15,6 @@
 namespace PhysBAM{
 
 template<class T> class TRIANGULATED_SURFACE;
-template<class T> class OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX;
-template<class T> class OPENGL_SELECTION_TRIANGULATED_SURFACE_SEGMENT;
-template<class T> class OPENGL_SELECTION_TRIANGULATED_SURFACE_TRIANGLE;
 
 template<class T>
 class OPENGL_TRIANGULATED_SURFACE:public OPENGL_OBJECT<T>
@@ -109,10 +106,6 @@ public:
 
     ARRAY<int> subset;
     ARRAY<int> subset_particles;
-
-    friend class OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX<T>;
-    friend class OPENGL_SELECTION_TRIANGULATED_SURFACE_SEGMENT<T>;
-    friend class OPENGL_SELECTION_TRIANGULATED_SURFACE_TRIANGLE<T>;
 };
 
 }

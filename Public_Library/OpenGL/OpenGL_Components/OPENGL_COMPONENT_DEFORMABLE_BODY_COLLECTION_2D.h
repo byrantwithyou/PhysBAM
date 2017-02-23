@@ -91,19 +91,5 @@ private:
     void Initialize();    // Needs to be called after some state changes
 };
 
-// template<class T>
-// class OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_2D:public OPENGL_SELECTION<T>
-// {
-// public:
-//     using OPENGL_SELECTION::object;
-//     int body_index;
-//     int subobject_type;
-//     OPENGL_OBJECT<T>* subobject;
-//     void body_selection;
-
-//     OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_2D(OPENGL_OBJECT<T>* object):OPENGL_SELECTION<T>(OPENGL_SELECTION::COMPONENT_DEFORMABLE_OBJECT_2D, object){}
-//     RANGE<TV> Bounding_Box() const override;
-// };
-
 }
 #endif

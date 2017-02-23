@@ -151,34 +151,5 @@ protected:
     
     void Manipulate_Individual_Body_Prompt();
 };
-
-// template<class T>
-// class OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_3D:public OPENGL_SELECTION<T>
-// {
-// public:
-//     using OPENGL_SELECTION::object;
-//     int body_id;
-//     void body_selection;
-
-//     OPENGL_SELECTION_COMPONENT_RIGID_BODY_COLLECTION_3D(OPENGL_OBJECT<T>* object,const int body_id,void body_selection)
-//         :OPENGL_SELECTION<T>(OPENGL_SELECTION::COMPONENT_RIGID_BODIES_3D,object),body_id(body_id),body_selection(body_selection)
-//     {}
-
-//     virtual RANGE<TV> Bounding_Box() const override;
-// };
-
-// template<class T>
-// class OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_3D:public OPENGL_SELECTION<T>
-// {
-// public:
-//     using OPENGL_SELECTION::object;
-//     int joint_id;
-
-//     OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_3D(OPENGL_OBJECT<T>* object,const int joint_id)
-//         :OPENGL_SELECTION<T>(OPENGL_SELECTION::ARTICULATED_RIGID_BODIES_JOINT_3D,object),joint_id(joint_id)
-//     {}
-
-//     virtual RANGE<TV> Bounding_Box() const override;
-// };
 }
 #endif
