@@ -26,7 +26,7 @@ OPENGL_COMPONENT_DEBUG_PARTICLES_2D(STREAM_TYPE stream_type,const std::string &f
     debug_objects(*new ARRAY<DEBUG_OBJECT<TV> >),default_color(OPENGL_COLOR::White()),
     velocity_color(OPENGL_COLOR(1,(T).078,(T).576)),
     draw_velocities(false),draw_arrows(true),scale_velocities((T).025),
-    filename(filename_input),frame_loaded(-1),valid(false),
+    wireframe_only(false),filename(filename_input),frame_loaded(-1),valid(false),
     selected_index(-1)
 {
     viewer_callbacks.Set("show_colored_wireframe",{[this](){Show_Colored_Wireframe();},"Show colored wireframe"});
