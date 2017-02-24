@@ -5,6 +5,7 @@
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Grid_PDE/Poisson/LAPLACE_UNIFORM.h>
 #include <Grid_PDE/Poisson/PROJECTION_UNIFORM.h>
+#include <Geometry/Level_Sets/LEVELSET.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_MAC_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
@@ -25,13 +26,16 @@ MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type)
     projection_system(*new MPM_PROJECTION_SYSTEM<TV>),
     sol(*new MPM_PROJECTION_VECTOR<TV>),rhs(*new MPM_PROJECTION_VECTOR<TV>),
     ghost(3),
+    levelsets(new LEVELSET<TV>(grid,phi,ghost)),
     use_affine(true),use_early_gradient_transfer(false),flip(0),initial_time(0),
     last_frame(100),write_substeps_level(-1),substeps_delay_frame(-1),
     output_directory("output"),data_directory("../../Public_Data"),use_test_output(false),
     restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),
     only_write_particles(false),cfl(1),
     solver_tolerance(std::numeric_limits<T>::epsilon()*10),solver_iterations(1000),
-    threads(1),use_particle_volumes(false),debug_particles(*new DEBUG_PARTICLES<TV>),
+    threads(1),use_particle_volumes(false),
+    use_shrink(false),use_reinit(false),
+    debug_particles(*new DEBUG_PARTICLES<TV>),
     print_stats(false),last_te(0),last_grid_ke(0),test_system(false)
 {
 }
@@ -43,6 +47,7 @@ template<class TV> MPM_MAC_EXAMPLE<TV>::
 {
     delete &particles;
     delete &debug_particles;
+    delete levelsets;
     for(int i=0;i<TV::m;i++) delete weights(i);
     collision_objects.Delete_Pointers_And_Clean_Memory();
     fluid_walls.Delete_Pointers_And_Clean_Memory();
@@ -75,6 +80,7 @@ Initialize(const GRID<TV>& grid,
     gather_scatter=new GATHER_SCATTER<TV>(grid,simulated_particles);
     gather_scatter->threads=threads;
     gather_scatter->face_weights=weights;
+    gather_scatter->weights=weights(0);
     
     mass.Resize(grid.Domain_Indices(ghost));
     volume.Resize(grid.Domain_Indices(ghost));
@@ -104,6 +110,8 @@ Write_Output_Files(const int frame)
         FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
 #pragma omp task
         FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
+#pragma omp task
+        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/levelset",output_directory.c_str(),frame),*levelsets);
 
         if(!only_write_particles){
 #pragma omp task

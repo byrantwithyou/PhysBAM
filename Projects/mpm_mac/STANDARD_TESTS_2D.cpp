@@ -164,6 +164,17 @@ Initialize()
             Seed_Particles(sphere1,0,0,density,particles_per_cell);
             particles.phase.Array_View(n,particles.phase.m-n).Fill(1);
         } break;
+        case 8:{ // concave shape
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            T density=2*unit_rho*scale_mass;
+            SPHERE<TV> sphere0(TV(.3,.3)*m,.1*m);
+            SPHERE<TV> sphere1(TV(.44,.44)*m,.1*m);
+            typedef ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> > TOBJ;
+            TOBJ* obj0=new TOBJ(sphere0);
+            TOBJ* obj1=new TOBJ(sphere1);
+            IMPLICIT_OBJECT_UNION<TV> shape(obj0,obj1);
+            Seed_Particles(shape,0,0,density,particles_per_cell);
+        } break;            
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     phases.Resize(number_phases);

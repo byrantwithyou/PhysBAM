@@ -15,6 +15,7 @@
 #include <functional>
 namespace PhysBAM{
 
+template<class TV> class LEVELSET;
 template<class TV> class DEBUG_PARTICLES;
 template<class TV> class GATHER_SCATTER;
 template<class TV> class IMPLICIT_OBJECT;
@@ -41,6 +42,7 @@ public:
     {
         ARRAY<T,FACE_INDEX<TV::m> > mass,volume;
         ARRAY<T,FACE_INDEX<TV::m> > velocity,velocity_save;
+
         ARRAY<int> valid_flat_indices;
         ARRAY<FACE_INDEX<TV::m> > valid_indices;
         ARRAY<int> simulated_particles;
@@ -66,6 +68,10 @@ public:
     MPM_PROJECTION_VECTOR<TV>& sol;
     MPM_PROJECTION_VECTOR<TV>& rhs;
     int ghost;
+
+    // signed distance field & level sets
+    ARRAY<T,TV_INT> phi;
+    LEVELSET<TV>* levelsets;
 
     // transfer stuff
     VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m> weights;
@@ -99,6 +105,9 @@ public:
     int threads;
     bool use_particle_volumes;
     bool use_preconditioner;
+
+    bool use_shrink,use_reinit;
+    T dilation;
 
     // debugging
     DEBUG_PARTICLES<TV>& debug_particles;

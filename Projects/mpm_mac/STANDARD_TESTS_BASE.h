@@ -37,6 +37,10 @@ public:
     using BASE::Add_Collision_Object;using BASE::use_particle_volumes;using BASE::test_system;
     using typename BASE::COLLISION_TYPE;using BASE::data_directory;using BASE::Add_Fluid_Wall;
     using BASE::test_output_prefix;using BASE::use_test_output;using BASE::flip;
+
+    using BASE::use_shrink;
+    using BASE::use_reinit;
+    using BASE::dilation;
     
     int test_number;
     int resolution;

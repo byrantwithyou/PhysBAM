@@ -77,6 +77,10 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add_Not("-no_preconditioner",&this->projection_system.use_preconditioner,"disable preconditioner");
     parse_args.Add("-flip",&flip,"frac","Use this fraction of flip in transfers");
 
+    parse_args.Add("-shrink",&use_shrink,"Use shrink");
+    parse_args.Add("-reinit",&use_reinit,"Use reinit");
+    parse_args.Add("-dilation",&dilation,"float","dilation distance");
+
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);
     if(use_slip) forced_collision_type=COLLISION_TYPE::slip;

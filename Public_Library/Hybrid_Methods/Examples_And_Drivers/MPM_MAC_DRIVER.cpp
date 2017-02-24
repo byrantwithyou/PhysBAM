@@ -11,6 +11,8 @@
 #include <Tools/Krylov_Solvers/MINRES.h>
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
 #include <Tools/Parallel_Computation/APPEND_HOLDER.h>
+#include <Geometry/Level_Sets/LEVELSET.h>
+#include <Geometry/Level_Sets/REINITIALIZATION.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR_THREADED.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
@@ -93,6 +95,7 @@ Initialize()
                                      example.weights,
                                      example.ghost,
                                      example.threads);
+    example.phi.Resize(example.grid.Domain_Indices(example.ghost));
 
     RANGE<TV_INT> range(example.grid.Cell_Indices(example.ghost));
     example.location.Resize(example.grid,example.ghost);
@@ -128,6 +131,7 @@ Advance_One_Time_Step()
     Print_Grid_Stats("after projection",example.dt);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after projection",0,1);
     Grid_To_Particle();
+    Build_Level_Sets();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after grid to particle",0,1);
 
     if(example.end_time_step) example.end_time_step(example.time);
@@ -263,6 +267,74 @@ Particle_To_Grid(PHASE& ph) const
     flat_h.Combine();
     indices_h.Combine();
     if(example.flip) ph.velocity_save=ph.velocity;
+}
+//#####################################################################
+// Function Build_Level_Sets
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Build_Level_Sets(const PHASE& ph)
+{
+#if 0
+    const MPM_PARTICLES<TV>& particles=example.particles;
+    const T dx=example.grid.dX.Max();
+
+    ph.gather_scatter->template Scatter<int>(true,
+        [this,&particles,dx](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
+        {
+            TV_INT index=it.Index();
+            // TODO: compute particle radius in any dimension
+            T r=sqrt(particles.volume(p)/pi)+2*dx;
+            T d=(example.grid.X(index)-particles.X(p)).Magnitude();
+            example.phi(index)=min(example.phi(index),d-r);
+        });
+#endif
+}
+//#####################################################################
+// Function Build_Level_Sets
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Build_Level_Sets()
+{
+    const T dx=example.grid.dX.Max();
+    const T dilation=example.dilation;
+    
+    for(int i=0;i<example.phi.array.m;i++){
+        example.phi.array(i)=10;}
+
+    for(PHASE_ID i(0);i<example.phases.m;i++)
+        Build_Level_Sets(example.phases(i));
+
+    const MPM_PARTICLES<TV>& particles=example.particles;
+    
+    for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
+        TV_INT index=it.Cell_Index();
+        for(int p=0;p<example.particles.X.m;p++){
+            TV grid_location=it.Location();
+            T r=sqrt(particles.volume(p)/pi)+dilation;
+            T d=(example.particles.X(p)-grid_location).Magnitude();
+            example.phi(index)=min(example.phi(index),d-r);
+        }
+    }
+
+#if 1
+    if(example.use_reinit)
+        Reinitialize(*example.levelsets,
+                     400,
+                     (T)40,
+                     (T)dilation,
+                     (T)dilation,
+                     (T)0.25,
+                     3,3,
+                     1);
+#endif
+
+#if 1
+    if(example.use_shrink)
+        for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
+            TV_INT index=it.Cell_Index();
+            example.phi(index)+=dilation;
+        }
+#endif
 }
 //#####################################################################
 // Function Particle_To_Grid
