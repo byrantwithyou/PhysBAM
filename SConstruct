@@ -164,15 +164,15 @@ env.Append(LIBS=env['LIBS_EXTRA'])
 
 ### compiler flags
 if env['CXX'].endswith('icc'):
-    if env['TYPE']=='optdebug' or env['TYPE']=='debug': env.Append(CXXFLAGS=' -g')
+    env.Append(CXXFLAGS=' -g')
     if env['TYPE']=='release' or env['TYPE']=='optdebug' or env['TYPE']=='profile':
         if env['ARCH']=='pentium4': env.Append(CXXFLAGS=' -O3 -xN')
         elif env['ARCH']=='nocona': env.Append(CXXFLAGS=' -O3 -xP')
         else: env.Append(CXXFLAGS=' -O3')
     env.Append(CXXFLAGS=' -w -vec-report0',LINKFLAGS=' -w -Kc++ -cxxlib-icc')
 elif env['PLATFORM'].startswith('win32'):
-    if env['PLATFORM']=="win32" and (env['TYPE']=='optdebug' or env['TYPE']=='debug'): env.Append(CXXFLAGS=' /Zi')
-    if env['TYPE']=='release' or env['TYPE']=='optdebug':
+    if env['PLATFORM']=="win32": env.Append(CXXFLAGS=' /Zi')
+    if env['TYPE']=='release' or env['TYPE']=='optdebug' or env['TYPE']=='profile':
         env.Append(CXXFLAGS=' /O2') 
     env.Append(CXXFLAGS=' /GR /W3 /Wp64 /wd4996 /wd4355 /wd4150 /WL /EHsc',CPPDEFINES=["WIN32","_CRT_SECURE_NO_DEPRECATE","NOMINMAX"])
     if env['TYPE']=='debug': env.Append(CXXFLAGS=' /RTC1 /MDd',CCFLAGS=' /MDd',LINKFLAGS=' /DEBUG')
@@ -189,7 +189,6 @@ else: # assume g++...
     else: machine_flags=''
     env.Append(CXXFLAGS=machine_flags)
     # type specific flags
-    if env['TYPE']=='optdebug': env.Append(CXXFLAGS=' -g3')
     if env['TYPE']=='release' or env['TYPE']=='optdebug' or env['TYPE']=='profile':
         optimization_flags=''
         if env['ARCH']=='pentium4': optimization_flags+=' -O2 -fexpensive-optimizations -falign-functions=4 -funroll-loops -fprefetch-loop-arrays'
@@ -201,7 +200,7 @@ else: # assume g++...
         optimization_flags+=' -fno-math-errno -fno-signed-zeros'
         env.Append(CXXFLAGS=optimization_flags)
         if env['TYPE']=='profile': env.Append(CXXFLAGS=' -pg',LINKFLAGS=' -pg')
-    elif env['TYPE']=='debug': env.Append(CXXFLAGS=' -g',LINKFLAGS=' -g')
+    env.Append(CXXFLAGS=' -g3',LINKFLAGS=' -g')
     env.Append(CXXFLAGS=' -Wall -Werror -Winit-self -Woverloaded-virtual -Wstrict-aliasing=2 -fno-strict-aliasing -std=gnu++14 -Wno-unknown-pragmas -Wno-strict-overflow -Wno-sign-compare')
 
 if env['TYPE']=='release' or env['TYPE']=='profile' or env['TYPE']=='optdebug': env.Append(CPPDEFINES=['NDEBUG'])
