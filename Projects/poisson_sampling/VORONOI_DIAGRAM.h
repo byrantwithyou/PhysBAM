@@ -21,19 +21,19 @@ struct VORONOI_DIAGRAM
     struct COEDGE;
     struct CELL;
 
-    static char next_cell;
-    static char next_vertex;
-    static char next_coedge;
+    static int next_cell;
+    static int next_vertex;
+    static int next_coedge;
     
     struct VERTEX
     {
         TV X;
         VERTEX_STATE state;
-        COEDGE* first_coedge; // outgoing
-        char name;
+        COEDGE* coedge; // outgoing
+        int name;
         
         VERTEX()
-            :state(unknown),first_coedge(0),name(next_vertex++)
+            :state(unknown),coedge(0),name(next_vertex++)
         {}
 
         T Criterion(const TV& A,const TV& B,const TV& C,const TV& D) const;
@@ -49,13 +49,12 @@ struct VORONOI_DIAGRAM
         VERTEX* head, *tail;
         COEDGE* pair, *next, *prev;
         CELL* cell;
-        char name;
+        int name;
         int piece;
-        int state;
         
         COEDGE()
             :head(0),tail(0),pair(0),next(0),prev(0),cell(0),
-            name(next_coedge++),piece(-1),state(0)
+            name(next_coedge++),piece(-1)
         {}
 
         void Print() const;
@@ -66,12 +65,12 @@ struct VORONOI_DIAGRAM
         TV X;
         CELL_STATE state;
         CELL_TYPE type;
-        COEDGE * first_coedge;
+        COEDGE * coedge;
         bool outside;
-        char name;
+        int name;
 
         CELL()
-            :state(non_incident),type(type_inside),first_coedge(0),outside(false),name(next_cell++)
+            :state(non_incident),type(type_inside),coedge(0),outside(false),name(next_cell++)
         {}
         void Print() const;
     };
@@ -101,7 +100,7 @@ struct VORONOI_DIAGRAM
         void Print() const;
     };
     
-    static const int first_clipped_piece_index=1<<30;
+    static const int clipped_piece_offset=1<<30;
     struct PIECE
     {
         T this_area;
@@ -136,8 +135,10 @@ struct VORONOI_DIAGRAM
 
     void Init(const RANGE<TV>& box,T radius_input);
     
-    void Update_Piece_Tree(int i,T diff_area);
-    void Update_Clipped_Piece_Tree(int i,T diff_area);
+    void Update_Piece_Tree(int i);
+    void Update_Piece_Subtree_Area(int i);
+    void Update_Clipped_Piece_Tree(int i);
+    void Update_Clipped_Piece_Subtree_Area(int i);
     void Insert_Coedge(COEDGE* ce);
     void Remove_Coedge(COEDGE* ce);
     void Update_Coedge(COEDGE* ce);

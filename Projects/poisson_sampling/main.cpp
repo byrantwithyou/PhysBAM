@@ -26,33 +26,35 @@ int main(int argc, char* argv[])
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),grid,"output");
     
     VORONOI_DIAGRAM<T> vd;
-/*
-    vd.First_Three_Points(TV(0,0),TV(1,0),TV(.5,1));
-    vd.Visualize_State("Initial");
-    vd.Sanity_Checks();
-
-    while(vd.pieces.m){
-        int p=vd.Choose_Piece();
-        TV X=vd.pieces(p).h.Choose_Feasible_Point(vd.random,vd.radius);
-        vd.Insert_Point(vd.pieces(p).coedge,X);
-        vd.Visualize_State("After insert");}
-*/
-    vd.Init(RANGE<TV>::Unit_Box(),(T).1);
+    vd.Init(RANGE<TV>::Unit_Box(),(T).001);
     vd.Visualize_State("Initial");
 
-    for(int i=0;i<1;i++){
+    T sample_density=10000*0;
+    int n=ceil(sample_density*((vd.pieces.m?vd.pieces(0).subtree_area:0)+(vd.clipped_pieces.m?vd.clipped_pieces(0).subtree_area:0)));
+    for(int i=0;i<n;i++){
         int p=vd.Choose_Piece();
-        TV X=vd.Choose_Feasible_Point(p);
-        vd.Insert_Point(p,X);
-        Add_Debug_Particle(X,VECTOR<T,3>(0,1,0));
-        vd.Visualize_State("After insertion");}
-
-    for(int i=0;i<10000;i++){
-        int p=vd.Choose_Piece();
+        if(p<0) break;
         TV X=vd.Choose_Feasible_Point(p);
         Add_Debug_Particle(X,VECTOR<T,3>(0,1,0));}
-    vd.Visualize_State("End");
+    vd.Visualize_State("Initial Sample");
+    
+    for(int i=0;;i++){
+        T area=(vd.pieces.m?vd.pieces(0).subtree_area:0)+(vd.clipped_pieces.m?vd.clipped_pieces(0).subtree_area:0);
+        printf("%i %g\n",i,area);
+        int p=vd.Choose_Piece();
+        if(p<0) break;
+        TV X=vd.Choose_Feasible_Point(p);
+        vd.Insert_Point(p,X);
 
+        int n=ceil(sample_density*((vd.pieces.m?vd.pieces(0).subtree_area:0)+(vd.clipped_pieces.m?vd.clipped_pieces(0).subtree_area:0)));
+        for(int i=0;i<n;i++){
+            int p=vd.Choose_Piece();
+            if(p<0) break;
+            TV X=vd.Choose_Feasible_Point(p);
+            Add_Debug_Particle(X,VECTOR<T,3>(0,1,0));}}
+    vd.Visualize_State("End");
+    vd.Sanity_Checks();
+    
     Flush_Frame<TV>("end");
 
     return 0;
