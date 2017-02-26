@@ -25,6 +25,7 @@ public:
     POISSON_DISK(T min_distance,int max_attemps=30);
     ~POISSON_DISK();
     void Sample(RANDOM_NUMBERS<T>& random,IMPLICIT_OBJECT<TV>& object,ARRAY<TV>& X);
+    void Sample(RANDOM_NUMBERS<T>& random,const RANGE<TV>& box,ARRAY<TV>& X);
     void Set_Distance_By_Volume(T volume_per_sample);
 private:
     TV Generate_Random_Point_Around_Annulus(RANDOM_NUMBERS<T>& random,TV& center) const;

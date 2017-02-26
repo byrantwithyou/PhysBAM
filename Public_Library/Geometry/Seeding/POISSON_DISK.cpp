@@ -30,16 +30,26 @@ template<class TV> void POISSON_DISK<TV>::
 Sample(RANDOM_NUMBERS<T>& random,IMPLICIT_OBJECT<TV>& object,ARRAY<TV>& X)
 {
     object.Update_Box();
-    RANGE<TV> bounding_box=object.box.Thickened(min_distance*2);
+    Sample(random,object.box,X);
+    for(int i=X.m-1;i>=0;i--)
+        if(object.Extended_Phi(X(i))>0)
+            X.Remove_Index_Lazy(i);
+}
+//#####################################################################
+// Function Sample
+//#####################################################################
+template<class TV> void POISSON_DISK<TV>::
+Sample(RANDOM_NUMBERS<T>& random,const RANGE<TV>& box,ARRAY<TV>& X)
+{
+    RANGE<TV> bounding_box=box.Thickened(min_distance*2);
     TV_INT cell_counts=TV_INT(bounding_box.Edge_Lengths()/h)+1;
     GRID<TV> grid(cell_counts+1,RANGE<TV>(bounding_box.min_corner,bounding_box.min_corner+(TV)cell_counts*h));
     ARRAY<int,TV_INT> grid_array(grid.Cell_Indices(ghost),true,-1);
-    PHYSBAM_ASSERT(grid.domain.Contains(object.box));
     if(X.m){
         for(int i=0;i<X.m;i++) grid_array(grid.Cell(X(i),ghost))=i;
     }
     else{
-        TV first_point=random.Get_Uniform_Vector(grid.domain);
+        TV first_point=random.Get_Uniform_Vector(box);
         grid_array(grid.Cell(first_point,ghost))=0;
         X.Append(first_point);}
     ARRAY<int> active(IDENTITY_ARRAY<>(X.m));
@@ -49,15 +59,12 @@ Sample(RANDOM_NUMBERS<T>& random,IMPLICIT_OBJECT<TV>& object,ARRAY<TV>& X)
         bool found_at_least_one=false;
         for(int i=0;i<max_attemps;i++){
             TV new_point=Generate_Random_Point_Around_Annulus(random,point);
-            if(Check_Distance(grid,grid_array,new_point,X) && grid.domain.Lazy_Inside(new_point)){
+            if(Check_Distance(grid,grid_array,new_point,X) && box.Lazy_Inside(new_point)){
                 found_at_least_one=true;
                 int index=X.Append(new_point);
                 active.Append(index);
                 grid_array(grid.Cell(new_point,ghost))=index;}}
         if(!found_at_least_one) active.Remove_Index_Lazy(random_index);}
-    for(int i=X.m-1;i>=0;i--)
-        if(object.Extended_Phi(X(i))>0)
-            X.Remove_Index_Lazy(i);
 }
 //#####################################################################
 // Function Generate_Random_Point_Around_Annulus
