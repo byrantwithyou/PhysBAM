@@ -103,9 +103,9 @@ Jacobi_Solve_Eigenproblem(ARRAY<VECTOR<int,2> >& givens_pairs,ARRAY<VECTOR<T,2> 
 //#####################################################################
 // Function Maximum_Eigenvalue_Eigenvector_Pair
 //#####################################################################
-template<class T> template<class GENERATOR>
+template<class T>
 void SYMMETRIC_MATRIX_NXN<T>::
-Maximum_Eigenvalue_Eigenvector_Pair(T& max_eigenvalue,ARRAY<T>& max_eigenvector,RANDOM_NUMBERS<T,GENERATOR>* random_numbers,const T tolerance,
+Maximum_Eigenvalue_Eigenvector_Pair(T& max_eigenvalue,ARRAY<T>& max_eigenvector,RANDOM_NUMBERS<T>* random_numbers,const T tolerance,
     const T randomization_decay_factor,const int max_iterations)
 {
     ARRAY<T> last_eigenvector(n);

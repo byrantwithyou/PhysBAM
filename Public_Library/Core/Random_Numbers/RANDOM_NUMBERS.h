@@ -7,9 +7,11 @@
 #ifndef __RANDOM_NUMBERS__
 #define __RANDOM_NUMBERS__
 
-#include <Core/Random_Numbers/MT19937.h>
+#include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Read_Write/READ_WRITE_FUNCTIONS.h>
 #include <Core/Utilities/NONCOPYABLE.h>
 #include <ctime>
+#include <random>
 namespace PhysBAM{
 
 template<class TV> class RANGE;
@@ -21,21 +23,26 @@ template<class T,int d> class DIAGONAL_MATRIX;
 template<class T,int d> class SYMMETRIC_MATRIX;
 template<class T,int d> class UPPER_TRIANGULAR_MATRIX;
 template<class T,class T_MATRIX> class MATRIX_BASE;
-template<class T,class T_ARRAY,class ID> class ARRAY_BASE;
 class TYPED_ISTREAM;
 class TYPED_OSTREAM;
 
-template<class T,class GENERATOR=MT19937<T> >
+template<class T>
 class RANDOM_NUMBERS:public NONCOPYABLE
 {
 public:
     typedef int HAS_UNTYPED_READ_WRITE;
     int gaussian_iset; // Used to force Get_Gaussian to reset
     T gset; // used internally by Get_Gaussian
-    GENERATOR random_number_generator;
+    std::mt19937 random_number_generator;
 
     T Get_Number()
-    {return random_number_generator();} // in [0,1)
+    {return random_number_generator()*(1/(T)4294967296.0);} // in [0,1)
+
+    int Get_Uniform_Integer(const int a,const int b) // in [a,b]
+    {return random_number_generator()%(b+1-a)+a;}
+
+    T Get_Uniform_Number(const T a,const T b)
+    {return a+(b-a)*Get_Number();} // in [a,b)
 
     explicit RANDOM_NUMBERS(const unsigned int seed=time(0));
     virtual ~RANDOM_NUMBERS();
@@ -57,8 +64,6 @@ public:
 
 //#####################################################################
     void Set_Seed(const unsigned int seed_input=time(0));
-    int Get_Uniform_Integer(const int a,const int b);
-    T Get_Uniform_Number(const T a,const T b);
     template<int d> VECTOR<T,d> Get_Uniform_Vector(const VECTOR<T,d>& v0,const VECTOR<T,d>& v1);
     template<int d> VECTOR<T,d> Get_Uniform_Vector(const T a,const T b);
     template<class TV> TV Get_Uniform_Vector(const RANGE<TV>& box);

@@ -11,7 +11,7 @@
 #include <cassert>
 #include <iostream>
 namespace PhysBAM{
-template<class T,class GENERATOR> class RANDOM_NUMBERS;
+template<class T> class RANDOM_NUMBERS;
 template<class T> class MATRIX_MXN;
 template<class T,int d> class VECTOR;
 
@@ -68,8 +68,7 @@ public:
     void Givens_Conjugate(const int i,const int j,const T c,const T s);
     void Jacobi_Solve_Eigenproblem(ARRAY<VECTOR<int,2> >& givens_pairs,ARRAY<VECTOR<T,2> >& givens_coefficients,const T tolerance=(T)1e-5,
         const int max_iterations=1000000);
-    template<class GENERATOR>
-    void Maximum_Eigenvalue_Eigenvector_Pair(T& max_eigenvalue,ARRAY<T>& max_eigenvector,RANDOM_NUMBERS<T,GENERATOR>* random_numbers=0,const T tolerance=(T)1e-5,
+    void Maximum_Eigenvalue_Eigenvector_Pair(T& max_eigenvalue,ARRAY<T>& max_eigenvector,RANDOM_NUMBERS<T>* random_numbers=0,const T tolerance=(T)1e-5,
         const T randomization_decay_factor=(T)0.9,const int max_iterations=1000000);
     void In_Place_Cholesky_Factorization(MATRIX_MXN<T>& L);
     SYMMETRIC_MATRIX_NXN<T>& operator=(const SYMMETRIC_MATRIX_NXN<T>& A);

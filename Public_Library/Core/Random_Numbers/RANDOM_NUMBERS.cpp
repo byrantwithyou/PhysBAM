@@ -25,7 +25,7 @@ namespace PhysBAM{
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T,class GENERATOR> RANDOM_NUMBERS<T,GENERATOR>::
+template<class T> RANDOM_NUMBERS<T>::
 RANDOM_NUMBERS(const unsigned int seed)
     :gaussian_iset(0)
 {
@@ -34,38 +34,21 @@ RANDOM_NUMBERS(const unsigned int seed)
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T,class GENERATOR> RANDOM_NUMBERS<T,GENERATOR>::
+template<class T> RANDOM_NUMBERS<T>::
 ~RANDOM_NUMBERS()
 {}
 //#####################################################################
 // Function Set_Seed
 //#####################################################################
-template<class T,class GENERATOR> void RANDOM_NUMBERS<T,GENERATOR>::
+template<class T> void RANDOM_NUMBERS<T>::
 Set_Seed(const unsigned int seed_input)
 {
-    random_number_generator.Set_Seed(seed_input);
-}
-//#####################################################################
-// Function Get_Uniform_Integer
-//#####################################################################
-template<class T,class GENERATOR> int RANDOM_NUMBERS<T,GENERATOR>::
-Get_Uniform_Integer(const int a,const int b)
-{
-    return min(b,(int)(a+(b+1-a)*Get_Number())); // in [a,b]
-}
-//#####################################################################
-// Function Get_Uniform_Number
-//#####################################################################
-template<class T,class GENERATOR> T RANDOM_NUMBERS<T,GENERATOR>::
-Get_Uniform_Number(const T a,const T b)
-{
-    STATIC_ASSERT((!std::numeric_limits<T>::is_integer));
-    return a+(b-a)*Get_Number(); // in [a,b)
+    random_number_generator.seed(seed_input);
 }
 //#####################################################################
 // Function Get_Uniform_Vector
 //#####################################################################
-template<class T,class GENERATOR> template<int d> VECTOR<T,d> RANDOM_NUMBERS<T,GENERATOR>::
+template<class T> template<int d> VECTOR<T,d> RANDOM_NUMBERS<T>::
 Get_Uniform_Vector(const VECTOR<T,d>& v0,const VECTOR<T,d>& v1)
 {
     VECTOR<T,d> r;
@@ -75,7 +58,7 @@ Get_Uniform_Vector(const VECTOR<T,d>& v0,const VECTOR<T,d>& v1)
 //#####################################################################
 // Function Get_Uniform_Vector
 //#####################################################################
-template<class T,class GENERATOR> template<int d> VECTOR<T,d> RANDOM_NUMBERS<T,GENERATOR>::
+template<class T> template<int d> VECTOR<T,d> RANDOM_NUMBERS<T>::
 Get_Uniform_Vector(const T a,const T b)
 {
     VECTOR<T,d> r;
@@ -85,7 +68,7 @@ Get_Uniform_Vector(const T a,const T b)
 //#####################################################################
 // Function Fill_Uniform
 //#####################################################################
-template<class T,class GENERATOR> void RANDOM_NUMBERS<T,GENERATOR>::
+template<class T> void RANDOM_NUMBERS<T>::
 Fill_Uniform(T& x,const T a,const T b)
 {
     x=Get_Uniform_Number(a,b);
@@ -93,7 +76,7 @@ Fill_Uniform(T& x,const T a,const T b)
 //#####################################################################
 // Function Fill_Uniform
 //#####################################################################
-template<class T,class GENERATOR> template<class T_VECTOR> void RANDOM_NUMBERS<T,GENERATOR>::
+template<class T> template<class T_VECTOR> void RANDOM_NUMBERS<T>::
 Fill_Uniform(ARRAY_BASE<T,T_VECTOR>& v,const T a,const T b)
 {
     for(int i=0;i<v.Size();i++) v(i)=Get_Uniform_Number(a,b);
@@ -101,7 +84,7 @@ Fill_Uniform(ARRAY_BASE<T,T_VECTOR>& v,const T a,const T b)
 //#####################################################################
 // Function Fill_Uniform_Matrix
 //#####################################################################
-template<class T,class GENERATOR> template<class T_MATRIX> void RANDOM_NUMBERS<T,GENERATOR>::
+template<class T> template<class T_MATRIX> void RANDOM_NUMBERS<T>::
 Fill_Uniform(MATRIX_BASE<T,T_MATRIX>& m,const T a,const T b)
 {
     for(int i=0;i<m.Rows();i++) for(int j=0;j<m.Columns();j++) m(i,j)=Get_Uniform_Number(a,b);
@@ -109,7 +92,7 @@ Fill_Uniform(MATRIX_BASE<T,T_MATRIX>& m,const T a,const T b)
 //#####################################################################
 // Function Fill_Uniform_Matrix
 //#####################################################################
-template<class T,class GENERATOR> template<int d> void RANDOM_NUMBERS<T,GENERATOR>::
+template<class T> template<int d> void RANDOM_NUMBERS<T>::
 Fill_Uniform(DIAGONAL_MATRIX<T,d>& m,const T a,const T b)
 {
     for(int i=0;i<m.Rows();i++) m(i,i)=Get_Uniform_Number(a,b);
@@ -117,7 +100,7 @@ Fill_Uniform(DIAGONAL_MATRIX<T,d>& m,const T a,const T b)
 //#####################################################################
 // Function Fill_Uniform_Matrix
 //#####################################################################
-template<class T,class GENERATOR> template<int d> void RANDOM_NUMBERS<T,GENERATOR>::
+template<class T> template<int d> void RANDOM_NUMBERS<T>::
 Fill_Uniform(SYMMETRIC_MATRIX<T,d>& m,const T a,const T b)
 {
     for(int i=0;i<m.Rows();i++) for(int j=0;j<=i;j++) m(i,j)=Get_Uniform_Number(a,b);
@@ -125,7 +108,7 @@ Fill_Uniform(SYMMETRIC_MATRIX<T,d>& m,const T a,const T b)
 //#####################################################################
 // Function Fill_Uniform_Matrix
 //#####################################################################
-template<class T,class GENERATOR> template<int d> void RANDOM_NUMBERS<T,GENERATOR>::
+template<class T> template<int d> void RANDOM_NUMBERS<T>::
 Fill_Uniform(UPPER_TRIANGULAR_MATRIX<T,d>& m,const T a,const T b)
 {
     for(int j=0;j<d;j++) for(int i=0;i<=j;i++) m(i,j)=Get_Uniform_Number(a,b);
@@ -133,7 +116,7 @@ Fill_Uniform(UPPER_TRIANGULAR_MATRIX<T,d>& m,const T a,const T b)
 //#####################################################################
 // Function Fill_Uniform
 //#####################################################################
-template<class T,class GENERATOR> template<class TV> void RANDOM_NUMBERS<T,GENERATOR>::
+template<class T> template<class TV> void RANDOM_NUMBERS<T>::
 Fill_Uniform(TWIST<TV>& m,const T a,const T b)
 {
     Fill_Uniform(m.linear,a,b);
@@ -142,7 +125,7 @@ Fill_Uniform(TWIST<TV>& m,const T a,const T b)
 //#####################################################################
 // Function Get_Uniform_Vector
 //#####################################################################
-template<class T,class GENERATOR> template<class TV> TV RANDOM_NUMBERS<T,GENERATOR>::
+template<class T> template<class TV> TV RANDOM_NUMBERS<T>::
 Get_Uniform_Vector(const RANGE<TV>& box)
 {
     return Get_Uniform_Vector(box.min_corner,box.max_corner);
@@ -150,7 +133,7 @@ Get_Uniform_Vector(const RANGE<TV>& box)
 //#####################################################################
 // Function Get_Gaussian
 //#####################################################################
-template<class T,class GENERATOR> T RANDOM_NUMBERS<T,GENERATOR>::
+template<class T> T RANDOM_NUMBERS<T>::
 Get_Gaussian()
 {
     T fac,rsq,v1,v2;
@@ -162,7 +145,7 @@ Get_Gaussian()
 //#####################################################################
 // Function Get_Vector_In_Unit_Sphere
 //#####################################################################
-template<class T,class GENERATOR> template<class TV> TV RANDOM_NUMBERS<T,GENERATOR>::
+template<class T> template<class TV> TV RANDOM_NUMBERS<T>::
 Get_Vector_In_Unit_Sphere()
 {
     for(;;){
@@ -172,7 +155,7 @@ Get_Vector_In_Unit_Sphere()
 //#####################################################################
 // Function Get_Direction
 //#####################################################################
-template<class T,class GENERATOR> template<class TV> TV RANDOM_NUMBERS<T,GENERATOR>::
+template<class T> template<class TV> TV RANDOM_NUMBERS<T>::
 Get_Direction()
 {
     if(TV::m==0) return TV();
@@ -208,7 +191,7 @@ ROTATION<VECTOR<T,3> > Get_Rotation_Helper(const VECTOR<T,4>& v)
 //#####################################################################
 // Function Get_Rotation
 //#####################################################################
-template<class T,class GENERATOR> template<class TV> ROTATION<TV> RANDOM_NUMBERS<T,GENERATOR>::
+template<class T> template<class TV> ROTATION<TV> RANDOM_NUMBERS<T>::
 Get_Rotation()
 {
     return Get_Rotation_Helper(Get_Direction<VECTOR<T,2*TV::m-2> >());
@@ -216,7 +199,7 @@ Get_Rotation()
 //#####################################################################
 // Function Get_Frame
 //#####################################################################
-template<class T,class GENERATOR> template<class TV> FRAME<TV> RANDOM_NUMBERS<T,GENERATOR>::
+template<class T> template<class TV> FRAME<TV> RANDOM_NUMBERS<T>::
 Get_Frame(const TV& v0,const TV& v1)
 {
     TV v=Get_Uniform_Vector(v0,v1);
@@ -225,7 +208,7 @@ Get_Frame(const TV& v0,const TV& v1)
 //#####################################################################
 // Function Get_Twist
 //#####################################################################
-template<class T,class GENERATOR> template<class TV> TWIST<TV> RANDOM_NUMBERS<T,GENERATOR>::
+template<class T> template<class TV> TWIST<TV> RANDOM_NUMBERS<T>::
 Get_Twist(const T& a)
 {
     TWIST<TV> tw;
@@ -248,7 +231,7 @@ Get_Twist(const T& a)
 #define IH(T) IHm(T,1);IHm(T,2);IHm(T,3);IHm(T,4);IHm(T,5);IHm(T,6)
 #define INST(T,d) \
     template VECTOR<T,d> RANDOM_NUMBERS<T>::Get_Uniform_Vector<d>(VECTOR<T,d> const&,VECTOR<T,d> const&); \
-    template void RANDOM_NUMBERS<T,MT19937<T> >::Fill_Uniform<VECTOR<T,d> >(ARRAY_BASE<T,VECTOR<T,d> >&,T,T);
+    template void RANDOM_NUMBERS<T>::Fill_Uniform<VECTOR<T,d> >(ARRAY_BASE<T,VECTOR<T,d> >&,T,T);
 
 #define INSTANTIATION_HELPER(T) \
     template class RANDOM_NUMBERS<T>; \
@@ -268,8 +251,8 @@ Get_Twist(const T& a)
     INST(T,12);
 
 INSTANTIATION_HELPER(float);
-template void RANDOM_NUMBERS<float,MT19937<float> >::Fill_Uniform<ARRAY_VIEW<float> >(ARRAY_BASE<float, ARRAY_VIEW<float> >&, float, float);
+template void RANDOM_NUMBERS<float>::Fill_Uniform<ARRAY_VIEW<float> >(ARRAY_BASE<float, ARRAY_VIEW<float> >&, float, float);
 INSTANTIATION_HELPER(double);
-template void RANDOM_NUMBERS<double,MT19937<double> >::Fill_Uniform<ARRAY_VIEW<double> >(ARRAY_BASE<double, ARRAY_VIEW<double> >&, double, double);
+template void RANDOM_NUMBERS<double>::Fill_Uniform<ARRAY_VIEW<double> >(ARRAY_BASE<double, ARRAY_VIEW<double> >&, double, double);
 #undef INST
 }
