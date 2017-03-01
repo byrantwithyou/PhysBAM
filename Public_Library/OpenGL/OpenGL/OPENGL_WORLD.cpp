@@ -575,7 +575,6 @@ Handle_Keypress_Prompt(unsigned char key)
     else if(key==13 || key==27) { // ENTER or ESC
         // If ESC pressed we set prompt_response to null to indicate aborted prompt
         if(key==27){prompt_response.clear();prompt_response_success=false;}
-        glPopAttrib();
         prompt_mode=false;
         prompt_response_cb.func();}
     window->Redisplay();
@@ -1236,8 +1235,6 @@ template<class T> void OPENGL_WORLD<T>::Prompt_User(const std::string& prompt_in
     prompt_response_success=true;
     prompt_response_cb=prompt_response_cb_input;
 
-    glPushAttrib(GL_COLOR_BUFFER_BIT);
-    glDrawBuffer(GL_FRONT);
     prompt_mode=true;
     view_auto_help=false; // force it off
 }

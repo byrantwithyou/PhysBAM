@@ -347,7 +347,7 @@ Capture_Frames()
     capture_frames_prompt_state.start_frame=start_frame;
     capture_frames_prompt_state.end_frame=INT_MAX;
     capture_frames_prompt_state.jpeg_quality=jpeg_quality;
-    capture_frames_prompt_state.step=1;
+    capture_frames_prompt_state.step=0;
     opengl_world.Prompt_User("Capture filename [" + saved_frame_filename + "]: ",capture_frames_prompt_cb,"");
 }
 namespace PhysBAM{
