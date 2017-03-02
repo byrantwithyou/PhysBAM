@@ -272,27 +272,6 @@ Particle_To_Grid(PHASE& ph) const
 // Function Build_Level_Sets
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Build_Level_Sets(const PHASE& ph)
-{
-#if 0
-    const MPM_PARTICLES<TV>& particles=example.particles;
-    const T dx=example.grid.dX.Max();
-
-    ph.gather_scatter->template Scatter<int>(true,
-        [this,&particles,dx](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
-        {
-            TV_INT index=it.Index();
-            // TODO: compute particle radius in any dimension
-            T r=sqrt(particles.volume(p)/pi)+2*dx;
-            T d=(example.grid.X(index)-particles.X(p)).Magnitude();
-            example.phi(index)=min(example.phi(index),d-r);
-        });
-#endif
-}
-//#####################################################################
-// Function Build_Level_Sets
-//#####################################################################
-template<class TV> void MPM_MAC_DRIVER<TV>::
 Build_Level_Sets()
 {
     const T dx=example.grid.dX.Max();
@@ -300,9 +279,6 @@ Build_Level_Sets()
     
     for(int i=0;i<example.phi.array.m;i++){
         example.phi.array(i)=10;}
-
-    for(PHASE_ID i(0);i<example.phases.m;i++)
-        Build_Level_Sets(example.phases(i));
 
     const MPM_PARTICLES<TV>& particles=example.particles;
     
@@ -316,7 +292,6 @@ Build_Level_Sets()
         }
     }
 
-#if 1
     if(example.use_reinit)
         Reinitialize(*example.levelsets,
                      400,
@@ -326,15 +301,12 @@ Build_Level_Sets()
                      (T)0.25,
                      3,3,
                      1);
-#endif
 
-#if 1
     if(example.use_shrink)
         for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
             TV_INT index=it.Cell_Index();
             example.phi(index)+=dilation;
         }
-#endif
 }
 //#####################################################################
 // Function Particle_To_Grid

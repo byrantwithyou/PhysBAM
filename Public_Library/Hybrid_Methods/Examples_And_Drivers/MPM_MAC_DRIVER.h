@@ -44,7 +44,6 @@ public:
     void Grid_To_Particle();
     void Grid_To_Particle(const PHASE& ph);
     void Build_Level_Sets();
-    void Build_Level_Sets(const PHASE& ph);
     void Pressure_Projection();
     void Apply_Forces();
     T Compute_Dt() const;
