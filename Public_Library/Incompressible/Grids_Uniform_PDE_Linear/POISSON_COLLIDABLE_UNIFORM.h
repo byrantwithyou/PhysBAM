@@ -80,7 +80,7 @@ public:
     void Find_Constant_beta(ARRAY<T,FACE_INDEX<TV::m> >& beta_face,const ARRAY<T,TV_INT>& phi_ghost);
     void Find_Constant_beta(const ARRAY<T,TV_INT>& phi_ghost);
     void Find_Constant_beta_Multiphase(ARRAY<ARRAY<T,TV_INT>>& phis_ghost);
-    virtual void Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index) override;
+    void Find_A(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,const ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index) override;
 private:
     void Add_Jump_To_b(const ARRAY<T,TV_INT>& phi_ghost);
     void Add_Jump_To_b_Multiphase(ARRAY<ARRAY<T,TV_INT>>& phis_ghost);

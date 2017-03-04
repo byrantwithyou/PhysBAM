@@ -11,7 +11,6 @@
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Matrices/SYMMETRIC_MATRIX.h>
 #include <Grid_Tools/Grids/GRID.h>
-#include <Grid_Tools/Parallel_Computation/THREADED_UNIFORM_GRID.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_FORWARD.h>
 #include <Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
@@ -61,7 +60,7 @@ public:
     using BASE::analytic_test;using BASE::hamilton_jacobi_weno;using BASE::compressible;using BASE::compressible_boundary;using BASE::compressible_pressure_boundary;
     using BASE::compressible_eos;using BASE::compressible_conservation_method;using BASE::compressible_set_max_time_step;using BASE::compressible_max_time_step;
     using BASE::compressible_spatial_order;using BASE::compressible_rungekutta_order;using BASE::compressible_timesplit;using BASE::compressible_apply_isobaric_fix;using BASE::compressible_apply_cavitation_correction;using BASE::compressible_adaptive_time_step;
-    using BASE::write_flattened_particles;using BASE::use_poisson;using BASE::simulate;using BASE::use_slip;using BASE::thread_queue;using BASE::number_of_threads;using BASE::removed_positive_particle_buoyancy_constant;
+    using BASE::write_flattened_particles;using BASE::use_poisson;using BASE::simulate;using BASE::use_slip;using BASE::removed_positive_particle_buoyancy_constant;
     using BASE::bandwidth_without_maccormack_near_interface;
 
     MPI_UNIFORM_GRID<TV>* mpi_grid;
@@ -136,8 +135,6 @@ public:
     void Adjust_Strain_For_Object(LEVELSET<TV>& levelset_object,ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT>& e_ghost,const T time);
     void Combustion(const T dt,const T time);
     void Evolve_Soot(const T dt,const T time);
-    void Sync_Parameters(FLUIDS_PARAMETERS_UNIFORM<TV>& single_parameters,THREADED_UNIFORM_GRID<TV>& threaded_grid);
-    void Distribute_Parameters(FLUIDS_PARAMETERS_UNIFORM<TV>& single_parameters,THREADED_UNIFORM_GRID<TV>& threaded_grid);
     template<class T_ARRAYS_PARTICLES> int Total_Number_Of_Particles(const T_ARRAYS_PARTICLES& particles) const;
     template<class T_ARRAYS_PARTICLES> void Write_Particles(const STREAM_TYPE stream_type,const PARTICLES<TV>& template_particles,const T_ARRAYS_PARTICLES& particles,
         const std::string& output_directory,const std::string& prefix,const int frame) const;

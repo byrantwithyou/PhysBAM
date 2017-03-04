@@ -11,7 +11,6 @@
 #include <Tools/Parallel_Computation/MPI_UTILITIES.h>
 #include <Grid_Tools/Parallel_Computation/FLOOD_FILL_MPI.h>
 #include <Grid_Tools/Parallel_Computation/PCG_SPARSE_MPI.h>
-#include <Grid_Tools/Parallel_Computation/PCG_SPARSE_MPI_THREADED.h>
 #endif
 using namespace PhysBAM;
 namespace PhysBAM{
@@ -93,28 +92,11 @@ Get_Total_Number_Of_Threads(const int input,const int color)
 // Function Solve
 //#####################################################################
 template<class TV> void LAPLACE_MPI<TV>::
-Solve_Threaded(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,ARRAY<INTERVAL<int> >& interior_indices,
-    ARRAY<ARRAY<INTERVAL<int> > >& ghost_indices,SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,
-    ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,const T tolerance,const int color,const int multi_proc_mode)
-{
-    if(color>filled_region_ranks.m){
-        if(multi_proc_mode){local_pcg_threaded->Solve(domain,domain_index,interior_indices,ghost_indices,A,x,b,tolerance);return;}
-        else{local_pcg.Solve(A,x,b,vectors,tolerance);return;}}
-    else{
-        PCG_SPARSE_MPI_THREADED<TV> pcg_mpi(*local_pcg_threaded,(*communicators)(color),partitions(color));
-        assert(Use_Parallel_Solve());
-        pcg_mpi.Solve(domain,domain_index,interior_indices,ghost_indices,A,x,b,tolerance);}
-}
-//#####################################################################
-// Function Solve
-//#####################################################################
-template<class TV> void LAPLACE_MPI<TV>::
 Solve(SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,const T tolerance,const int color)
 {
     if(color>filled_region_ranks.m){local_pcg.Solve(A,x,b,vectors,tolerance);return;}
     else{
         PCG_SPARSE_MPI<TV> pcg_mpi(local_pcg,(*communicators)(color),partitions(color));
-        pcg_mpi.thread_grid=mpi_grid->threaded_grid;
         if(Use_Parallel_Solve()) pcg_mpi.Parallel_Solve(A,x,b,tolerance);
         else pcg_mpi.Serial_Solve(A,x,b,vectors,1234,tolerance);}
 }
@@ -126,7 +108,6 @@ Solve(SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance,con
 {
     SPARSE_MATRIX_PARTITION temp_partition;
     PCG_SPARSE_MPI<TV> pcg_mpi(local_pcg,(*communicators)(color),temp_partition);
-    pcg_mpi.thread_grid=mpi_grid->threaded_grid;
     pcg_mpi.Parallel_Solve(A,x,b,global_column_index_boundaries,tolerance,true);
 }
 //#####################################################################
@@ -145,10 +126,6 @@ template<class TV> void LAPLACE_MPI<TV>::Solve(SPARSE_MATRIX_FLAT_MXN<T>&,ARRAY<
 template<class TV> void LAPLACE_MPI<TV>::Solve(SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance,const int color,
     const ARRAY<VECTOR<int,2> >& global_column_index_boundaries){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> int LAPLACE_MPI<TV>::Get_Total_Number_Of_Threads(const int input,const int color)
-{PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-template<class TV> void LAPLACE_MPI<TV>::Solve_Threaded(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,
-    ARRAY<INTERVAL<int> >& interior_indices,ARRAY<ARRAY<INTERVAL<int> > >& ghost_indices,SPARSE_MATRIX_FLAT_MXN<T>& A,
-    ARRAY<T>& x,ARRAY<T>& b,ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,const T tolerance,const int color,const int multi_proc_mode)
 {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 //#####################################################################
 

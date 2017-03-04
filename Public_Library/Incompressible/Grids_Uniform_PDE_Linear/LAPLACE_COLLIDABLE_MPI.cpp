@@ -87,7 +87,6 @@ Solve(SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,ARRAY<T>& q,ARRAY<T>&
     if(color>filled_region_ranks.m){local_pcg.Solve(A,x,b,q,s,r,k,z,tolerance);return;}
     else{
         PCG_SPARSE_MPI<TV> pcg_mpi(local_pcg,(*communicators)(color),partitions(color));
-        pcg_mpi.thread_grid=mpi_grid->threaded_grid;
         if(Use_Parallel_Solve()) pcg_mpi.Parallel_Solve(A,x,b,tolerance);
         else pcg_mpi.Serial_Solve(A,x,b,q,s,r,k,z,1234,tolerance);}
 }
@@ -99,7 +98,6 @@ Solve(SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance,con
 {
     SPARSE_MATRIX_PARTITION temp_partition;
     PCG_SPARSE_MPI<TV> pcg_mpi(local_pcg,(*communicators)(color),temp_partition);
-    pcg_mpi.thread_grid=mpi_grid->threaded_grid;
     pcg_mpi.Parallel_Solve(A,x,b,global_column_index_boundaries,tolerance,true);
 }
 //#####################################################################

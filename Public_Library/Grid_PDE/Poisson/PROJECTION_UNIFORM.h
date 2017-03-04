@@ -33,11 +33,10 @@ public:
     ARRAY<T,TV_INT> divergence; // use this to set up a non-zero divergence
     bool use_divergence_multiplier;
     ARRAY<T,TV_INT> divergence_multiplier;
-    THREAD_QUEUE* thread_queue;
 
-    PROJECTION_UNIFORM(const GRID<TV>& mac_grid,const bool use_variable_beta=false,const bool use_poisson=false,THREAD_QUEUE* thread_queue=0);
+    PROJECTION_UNIFORM(const GRID<TV>& mac_grid,const bool use_variable_beta=false,const bool use_poisson=false);
 protected:
-    PROJECTION_UNIFORM(THREAD_QUEUE* thread_queue_input=0);
+    PROJECTION_UNIFORM();
 public:
     virtual ~PROJECTION_UNIFORM();
 
@@ -60,7 +59,6 @@ public:
     void Restore_After_Projection(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);
     void Exchange_Pressures_For_Projection();
     void Compute_Divergence(const T_FACE_LOOKUP& face_lookup,LAPLACE_UNIFORM<TV>* solver);
-    void Compute_Divergence_Threaded(RANGE<TV_INT>& domain,const T_FACE_LOOKUP& face_lookup,LAPLACE_UNIFORM<TV>* solver);
 //#####################################################################
 };
 }

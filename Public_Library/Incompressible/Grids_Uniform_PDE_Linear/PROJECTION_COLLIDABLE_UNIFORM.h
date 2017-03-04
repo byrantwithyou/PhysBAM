@@ -24,7 +24,7 @@ public:
     LAPLACE_COLLIDABLE_UNIFORM<TV>* laplace_collidable; 
     POISSON_COLLIDABLE_UNIFORM<TV>* poisson_collidable;
 
-    PROJECTION_COLLIDABLE_UNIFORM(const GRID<TV>& mac_grid,const bool multiphase,const bool use_poisson,const bool use_variable_beta,THREAD_QUEUE* thread_queue=0);
+    PROJECTION_COLLIDABLE_UNIFORM(const GRID<TV>& mac_grid,const bool multiphase,const bool use_poisson,const bool use_variable_beta);
     PROJECTION_COLLIDABLE_UNIFORM(const GRID<TV>& mac_grid,LEVELSET<TV>& levelset_input);
     virtual ~PROJECTION_COLLIDABLE_UNIFORM();
 

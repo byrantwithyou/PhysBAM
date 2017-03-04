@@ -5,7 +5,6 @@
 #ifndef __SMOKE_DRIVER__
 #define __SMOKE_DRIVER__
 #include <Core/Vectors/VECTOR.h>
-#include <Tools/Parallel_Computation/THREAD_QUEUE.h>
 namespace PhysBAM{
 
 

@@ -50,13 +50,12 @@ public:
     T energy_clamp;
     int vc_projection_direction;
     T buoyancy_constant;
-    THREAD_QUEUE* thread_queue;
 protected:               
     BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<TV>& boundary_default;
     ADVECTION_MACCORMACK_UNIFORM<TV,T,ADVECTION<TV,T> >* advection_maccormack;
 public:
 
-    INCOMPRESSIBLE_UNIFORM(const GRID<TV>& grid_input,PROJECTION_DYNAMICS_UNIFORM<TV>& projection_input,THREAD_QUEUE* thread_queue_input=0);
+    INCOMPRESSIBLE_UNIFORM(const GRID<TV>& grid_input,PROJECTION_DYNAMICS_UNIFORM<TV>& projection_input);
     virtual ~INCOMPRESSIBLE_UNIFORM();
 
     void Set_Custom_Boundary(BOUNDARY<TV,T>& boundary_input)
@@ -77,8 +76,6 @@ public:
     void Add_Energy_With_Vorticity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const VECTOR<VECTOR<bool,2>,TV::m>& domain_boundary,const T dt,const T time,const int number_of_ghost_cells,LEVELSET<TV>* lsv=0,ARRAY<T,TV_INT>* density=0);
     void Advance_One_Time_Step_Convection(const T dt,const T time,const ARRAY<T,FACE_INDEX<TV::m> >& advecting_face_velocities,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_to_advect,const int number_of_ghost_cells);
     void Advance_One_Time_Step_Forces(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,const bool implicit_viscosity,const ARRAY<T,TV_INT>* phi_ghost,const int number_of_ghost_cells);
-    void Add_Gravity_Threaded(RANGE<TV_INT>&domain,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,int axis);
-    void Add_Body_Force_Threaded(RANGE<TV_INT>&domain,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,int axis);
     void Advance_One_Time_Step_Implicit_Part(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,const bool implicit_viscosity=false,BOUNDARY<TV,T>* projection_boundary=0,
         bool use_levelset_viscosity=false,BOUNDARY_CONDITIONS_CALLBACKS<TV>* bc_callbacks=0,bool print_viscosity_matrix=false);
     int Real_CFL(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const bool inviscid,const bool viscous_only,T input_dt) const;

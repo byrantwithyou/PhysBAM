@@ -19,8 +19,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> PROJECTION_DYNAMICS_UNIFORM<TV>::
-PROJECTION_DYNAMICS_UNIFORM(const GRID<TV>& mac_grid,const bool flame_input,const bool multiphase,const bool use_variable_beta,const bool use_poisson,THREAD_QUEUE* thread_queue)
-    :PROJECTION_COLLIDABLE_UNIFORM<TV>(mac_grid,multiphase,flame_input || multiphase || use_variable_beta || use_poisson,use_variable_beta,thread_queue),PROJECTION_DYNAMICS<T>(flame_input),
+PROJECTION_DYNAMICS_UNIFORM(const GRID<TV>& mac_grid,const bool flame_input,const bool multiphase,const bool use_variable_beta,const bool use_poisson)
+    :PROJECTION_COLLIDABLE_UNIFORM<TV>(mac_grid,multiphase,flame_input || multiphase || use_variable_beta || use_poisson,use_variable_beta),PROJECTION_DYNAMICS<T>(flame_input),
     use_flame_speed_multiplier(0),dsd(0),use_divergence_multiplier_save_for_sph(false),use_non_zero_divergence_save_for_sph(false),
     p_save_for_sph(0),divergence_save_for_sph(0),divergence_multiplier_save_for_sph(0),face_velocities_save_for_sph(0),elliptic_solver_save_for_sph(0),laplace_save_for_sph(0),poisson_save_for_sph(0),
     collidable_solver_save_for_sph(0)

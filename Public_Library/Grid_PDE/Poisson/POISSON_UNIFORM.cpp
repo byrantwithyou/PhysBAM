@@ -35,8 +35,24 @@ Find_Variable_beta()
 // Function Find_A
 //#####################################################################
 template<class TV> void POISSON_UNIFORM<TV>::
-Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index)
+Find_A(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,const ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index)
 {
+    ARRAY<ARRAY<int> > row_counts(A_array.m,false);
+    for(int i=0;i<A_array.m;i++){
+        row_counts(i).Resize(filled_region_cell_count(i),false,false);
+        b_array(i).Resize(filled_region_cell_count(i));}
+    // TODO: this should be rewritten in terms of faces cause this got really hacky with MPI
+    for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+        int color=filled_region_colors(cell_index);assert(color!=-1);
+        if(color!=-2 && (filled_region_touches_dirichlet(color)||solve_neumann_regions)){
+            int row_count=1;
+            for(int axis=0;axis<TV::m;axis++){TV_INT offset;offset[axis]=1;
+                if(((filled_region_colors.Valid_Index(cell_index-offset) && filled_region_colors(cell_index-offset)==color) ||
+                    (grid.Domain_Indices().Lazy_Outside_Half_Open(cell_index-offset) && periodic_boundary[axis])) && !psi_N.Component(axis)(cell_index)) row_count++;
+                if(((filled_region_colors.Valid_Index(cell_index+offset) && filled_region_colors(cell_index+offset)==color) ||
+                    (grid.Domain_Indices().Lazy_Outside_Half_Open(cell_index+offset) && periodic_boundary[axis])) && !psi_N.Component(axis)(cell_index+offset)) row_count++;}
+            row_counts(color)(cell_index_to_matrix_index(cell_index))=row_count;}}
+    for(int i=0;i<A_array.m;i++) A_array(i).Set_Row_Lengths(row_counts(i));
     TV one_over_dx2=Inverse(grid.dX*grid.dX);
     TV_INT grid_counts=grid.counts;
     if(use_weighted_divergence)

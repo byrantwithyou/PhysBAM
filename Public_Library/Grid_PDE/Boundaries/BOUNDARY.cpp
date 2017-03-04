@@ -69,14 +69,6 @@ Find_Ghost_Regions(const GRID<TV>& grid,VECTOR<RANGE<TV_INT>,2*TV::m>& regions,c
 // Function Fill_Single_Ghost_Region
 //#####################################################################
 template<class TV,class T2> void BOUNDARY<TV,T2>::
-Fill_Single_Ghost_Region_Threaded(RANGE<TV_INT>& region,const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const int side) const
-{
-    Fill_Single_Ghost_Region(grid,u_ghost,side,region);
-}
-//#####################################################################
-// Function Fill_Single_Ghost_Region
-//#####################################################################
-template<class TV,class T2> void BOUNDARY<TV,T2>::
 Fill_Single_Ghost_Region(const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const int side,const RANGE<TV_INT>& region) const
 {
     int axis=side/2,boundary=side&1?region.Minimum_Corner()[axis]-1:region.Maximum_Corner()[axis];

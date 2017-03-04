@@ -137,9 +137,9 @@ Find_Constant_beta_Multiphase(ARRAY<ARRAY<T,TV_INT>>& phis_ghost)
 // Function Find_A
 //#####################################################################
 template<class TV> void POISSON_COLLIDABLE_UNIFORM<TV>::
-Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index)
+Find_A(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,const ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index)
 {
-    BASE::Find_A_Part_Two(domain,A_array,b_array,cell_index_to_matrix_index);
+    BASE::Find_A(domain,A_array,b_array,filled_region_cell_count,cell_index_to_matrix_index);
     if(second_order_cut_cell_method) Apply_Second_Order_Cut_Cell_Method(domain,A_array,b_array,cell_index_to_matrix_index);
 }
 //#####################################################################

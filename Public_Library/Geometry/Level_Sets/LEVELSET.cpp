@@ -20,7 +20,7 @@ template<class TV> typename LEVELSET<TV>::T_LINEAR_INTERPOLATION_VECTOR LEVELSET
 template<class TV> LEVELSET<TV>::
 LEVELSET(GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input,const int number_of_ghost_cells_input)
     :levelset_callbacks(0),face_velocities_valid_mask_current(0),boundary_default(*new BOUNDARY<TV,T>),grid(grid_input),
-    phi(phi_input),normals(0),curvature(0),cell_range(0),thread_queue(0),number_of_ghost_cells(number_of_ghost_cells_input)
+    phi(phi_input),normals(0),curvature(0),cell_range(0),number_of_ghost_cells(number_of_ghost_cells_input)
 {
     Set_Small_Number();
     Set_Max_Time_Step();
@@ -302,7 +302,7 @@ Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,const T time,cons
 {
     const int ghost_cells=2*number_of_ghost_cells+1;
     ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells),false);boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
-    FAST_MARCHING_METHOD_UNIFORM<TV> fmm(static_cast<LEVELSET<TV>&>(*this),ghost_cells,thread_queue);
+    FAST_MARCHING_METHOD_UNIFORM<TV> fmm(static_cast<LEVELSET<TV>&>(*this),ghost_cells);
     fmm.Fast_Marching_Method(phi_ghost,stopping_distance,seed_indices,add_seed_indices_for_ghost_cells,process_sign);
     ARRAY<T,TV_INT>::Get(signed_distance,phi_ghost);
     boundary->Apply_Boundary_Condition(grid,signed_distance,time);

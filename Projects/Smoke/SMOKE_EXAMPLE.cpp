@@ -2,15 +2,12 @@
 // Copyright 2009-2010, Michael Lentine, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Grid_Tools/Parallel_Computation/DOMAIN_ITERATOR_THREADED.h>
+#include <Core/Log/LOG.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS_SPLINE.h>
 #include "SMOKE_EXAMPLE.h"
 #include "SMOKE_PARTICLES.h"
-#ifdef USE_PTHREAD
-#include <pthread.h>
-#endif
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -23,14 +20,11 @@ SMOKE_EXAMPLE(const STREAM_TYPE stream_type_input,int number_of_threads)
     restart(0),write_debug_data(true),output_directory("output"),N_boundary(false),
     debug_divergence(false),alpha(0.1),beta(0.00366),
     cfl(.9),grid(TV_INT(),RANGE<TV>::Unit_Box(),true),mpi_grid(0),
-    thread_queue(number_of_threads>1?new THREAD_QUEUE(number_of_threads):0),projection(grid,false,false,thread_queue),boundary(0),
+    projection(grid,false,false),boundary(0),
     use_eapic(false),eapic_order(1),particles(*new SMOKE_PARTICLES<TV>)
 {
     np=1; //number of points per cell
     for(int i=0;i<TV::m;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
-#ifdef USE_PTHREAD
-    pthread_mutex_init(&lock,0);    
-#endif
 }
 //#####################################################################
 // Destructor
@@ -38,8 +32,7 @@ SMOKE_EXAMPLE(const STREAM_TYPE stream_type_input,int number_of_threads)
 template<class TV> SMOKE_EXAMPLE<TV>::
 ~SMOKE_EXAMPLE()
 {
-    if(mpi_grid || thread_queue) delete boundary;
-    delete thread_queue;    
+    if(mpi_grid) delete boundary;
     delete &debug_particles;
     for(int i=0;i<TV::m;i++) delete weights(i);
     delete &particles;
@@ -51,28 +44,14 @@ template<class TV> typename TV::SCALAR SMOKE_EXAMPLE<TV>::
 CFL(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
 {
     T dt=FLT_MAX;
-    DOMAIN_ITERATOR_THREADED_ALPHA<SMOKE_EXAMPLE<TV>,TV>(grid.Domain_Indices(),thread_queue).template Run<ARRAY<T,FACE_INDEX<TV::m> >&,T&>(*this,&SMOKE_EXAMPLE::CFL_Threaded,face_velocities,dt);
-    return dt;
-}
-//#####################################################################
-// Function CFL_Threaded
-//#####################################################################
-template<class TV> void SMOKE_EXAMPLE<TV>::
-CFL_Threaded(RANGE<TV_INT>& domain,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T& dt)
-{
     T dt_convection=0;
-    for(CELL_ITERATOR<TV> iterator(grid,domain);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT cell=iterator.Cell_Index();T local_V_norm=0;
         for(int axis=0;axis<GRID<TV>::dimension;axis++)
             local_V_norm+=grid.one_over_dX[axis]*maxabs(face_velocities(axis,grid.First_Face_Index_In_Cell(axis,cell)),face_velocities(axis,grid.Second_Face_Index_In_Cell(axis,cell)));
         dt_convection=max(dt_convection,local_V_norm);}
-#ifdef USE_PTHREAD
-    pthread_mutex_lock(&lock);
-#endif
     dt=min(dt,(T)1.0/dt_convection);
-#ifdef USE_PTHREAD
-    pthread_mutex_unlock(&lock);
-#endif
+    return dt;
 }
 //#####################################################################
 // Function Time_At_Frame

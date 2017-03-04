@@ -13,9 +13,6 @@
 #include <Tools/Parallel_Computation/SPARSE_MATRIX_PARTITION.h>
 #include <Grid_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #include <Grid_PDE/Poisson/LAPLACE_MPI.h>
-#ifdef USE_PTHREADS
-#include <Tools/Parallel_Computation/PTHREAD.h>
-#endif
 namespace PhysBAM{
 
 class GRAPH;
@@ -36,17 +33,10 @@ public:
 
     bool sum_int_needs_init;
     int sum_int;
-#ifdef USE_PTHREADS
-    pthread_mutex_t sum_int_lock,lock;
-    pthread_barrier_t barr;
-#endif
 
     LAPLACE_UNIFORM_MPI(LAPLACE_UNIFORM<TV>& laplace)
         :LAPLACE_MPI<TV>(laplace),sum_int_needs_init(false),sum_int(0)
     {
-#ifdef USE_PTHREADS
-        pthread_mutex_init(&sum_int_lock,0);pthread_mutex_init(&lock,0);
-#endif
     }
 
     void Find_Matrix_Indices(ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index,ARRAY<ARRAY<TV_INT> >& matrix_index_to_cell_index_array) override
@@ -54,22 +44,10 @@ public:
 
     int Global_Sum(int input)
     {
-#ifdef USE_PTHREADS
-        pthread_mutex_lock(&sum_int_lock);
-        if(sum_int_needs_init){sum_int=input;sum_int_needs_init=false;}
-        else sum_int+=input;
-        pthread_mutex_unlock(&sum_int_lock);
-        pthread_barrier_wait(&barr);
-        sum_int_needs_init=true;
-        pthread_barrier_wait(&barr);
-        return sum_int;
-#else
         return input;
-#endif
     }
 
 //#####################################################################
-    void Find_Matrix_Indices_Threaded(ARRAY<RANGE<TV_INT> >& domains,ARRAY<ARRAY<INTERVAL<int> > >& interior_indices,ARRAY<ARRAY<ARRAY<INTERVAL<int> > > >& ghost_indices,ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index,ARRAY<ARRAY<TV_INT> >& matrix_index_to_cell_index_array,LAPLACE_UNIFORM<TV>* laplace);
 private:
     void Find_Matrix_Indices(ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index,ARRAY<ARRAY<TV_INT> >& matrix_index_to_cell_index_array,const VECTOR<T,1>&);
     void Find_Matrix_Indices(ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index,ARRAY<ARRAY<TV_INT> >& matrix_index_to_cell_index_array,const VECTOR<T,2>&);

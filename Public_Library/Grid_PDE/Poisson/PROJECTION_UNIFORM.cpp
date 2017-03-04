@@ -6,7 +6,6 @@
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Grid_Tools/Grids/GRID.h>
-#include <Grid_Tools/Parallel_Computation/DOMAIN_ITERATOR_THREADED.h>
 #include <Grid_PDE/Boundaries/BOUNDARY.h>
 #include <Grid_PDE/Interpolation/FACE_LOOKUP_UNIFORM.h>
 #include <Grid_PDE/Poisson/PROJECTION_UNIFORM.h>
@@ -15,23 +14,23 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> PROJECTION_UNIFORM<TV>::
-PROJECTION_UNIFORM(const GRID<TV>& mac_grid,const bool use_variable_beta,const bool use_poisson,THREAD_QUEUE* thread_queue_input)
-    :use_divergence_multiplier(false),thread_queue(thread_queue_input)
+PROJECTION_UNIFORM(const GRID<TV>& mac_grid,const bool use_variable_beta,const bool use_poisson)
+    :use_divergence_multiplier(false)
 {
     if(use_variable_beta || use_poisson){
         poisson=new POISSON_UNIFORM<TV>(p_grid,p,true,false,true);
         if(use_variable_beta) poisson->Set_Variable_beta();
         elliptic_solver=poisson;
         laplace=0;}
-    else{laplace=new LAPLACE_UNIFORM<TV>(p_grid,p,true,true,thread_queue);elliptic_solver=laplace;poisson=0;}
+    else{laplace=new LAPLACE_UNIFORM<TV>(p_grid,p,true,true);elliptic_solver=laplace;poisson=0;}
     Initialize_Grid(mac_grid);
 }
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class TV> PROJECTION_UNIFORM<TV>::
-PROJECTION_UNIFORM(THREAD_QUEUE* thread_queue_input)
-    :elliptic_solver(0),laplace(0),poisson(0),use_divergence_multiplier(false),thread_queue(thread_queue_input)
+PROJECTION_UNIFORM()
+    :elliptic_solver(0),laplace(0),poisson(0),use_divergence_multiplier(false)
 {
 }
 //#####################################################################
@@ -116,20 +115,15 @@ Apply_Pressure(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T t
 template<class TV> void PROJECTION_UNIFORM<TV>::
 Compute_Divergence(const T_FACE_LOOKUP& face_lookup,LAPLACE_UNIFORM<TV>* solver)
 {
-    DOMAIN_ITERATOR_THREADED_ALPHA<PROJECTION_UNIFORM<TV>,TV>(p_grid.Domain_Indices(),thread_queue).template Run<const T_FACE_LOOKUP&,LAPLACE_UNIFORM<TV>*>(*this,&PROJECTION_UNIFORM<TV>::Compute_Divergence_Threaded,face_lookup,solver);
-}
-template<class TV> void PROJECTION_UNIFORM<TV>::
-Compute_Divergence_Threaded(RANGE<TV_INT>& domain,const T_FACE_LOOKUP& face_lookup,LAPLACE_UNIFORM<TV>* solver)
-{
     TV one_over_dx=p_grid.one_over_dX;
-    for(CELL_ITERATOR<TV> iterator(p_grid,domain);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){
         const typename T_FACE_LOOKUP::LOOKUP& lookup=face_lookup.Starting_Point_Cell(iterator.Cell_Index());T divergence=0;
         for(int axis=0;axis<TV::m;axis++)divergence+=(lookup(axis,iterator.Second_Face_Index(axis))-lookup(axis,iterator.First_Face_Index(axis)))*one_over_dx[axis];
         solver->f(iterator.Cell_Index())=divergence;}
 
-    if(use_non_zero_divergence) for(CELL_ITERATOR<TV> iterator(p_grid,domain);iterator.Valid();iterator.Next())
+    if(use_non_zero_divergence) for(CELL_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next())
         solver->f(iterator.Cell_Index())-=divergence(iterator.Cell_Index());
-    if(use_divergence_multiplier) for(CELL_ITERATOR<TV> iterator(p_grid,domain);iterator.Valid();iterator.Next())
+    if(use_divergence_multiplier) for(CELL_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next())
         solver->f(iterator.Cell_Index())*=divergence_multiplier(iterator.Cell_Index());
 }
 //#####################################################################

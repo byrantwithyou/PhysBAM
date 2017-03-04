@@ -86,10 +86,6 @@ Initialize_Number_Of_Regions(const int number_of_regions_input)
 template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Initialize_Fluid_Evolution(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velocities)
 {
-    if(number_of_threads>1){
-        if(!thread_queue)thread_queue=new THREAD_QUEUE(number_of_threads);
-        else if(thread_queue->Number_Of_Threads()!=number_of_threads){delete thread_queue;thread_queue=new THREAD_QUEUE(number_of_threads);}
-        semi_lagrangian.thread_queue=thread_queue;maccormack_semi_lagrangian.thread_queue=thread_queue;}
     if(number_of_regions>=2){ // multiphase
         particle_levelset_evolution_multiple=new PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<TV>(grid->Get_MAC_Grid(),*collision_bodies_affecting_fluid,number_of_ghost_cells);
         if(!projection) projection=new PROJECTION_DYNAMICS_UNIFORM<TV>(*grid,fire,true,false);
@@ -100,11 +96,8 @@ Initialize_Fluid_Evolution(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velo
         incompressible=incompressible_multiphase;}
     else if(number_of_regions==1){ // free surface_flow
         particle_levelset_evolution=new PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>(*grid,*collision_bodies_affecting_fluid,number_of_ghost_cells,false);
-        particle_levelset_evolution->Particle_Levelset(0).thread_queue=thread_queue;
-        particle_levelset_evolution->Particle_Levelset(0).levelset.thread_queue=thread_queue;
         if(!projection)
-            projection=new PROJECTION_DYNAMICS_UNIFORM<TV>(*grid,fire,false,false,use_poisson,thread_queue);
-        projection->elliptic_solver->thread_queue=thread_queue;        
+            projection=new PROJECTION_DYNAMICS_UNIFORM<TV>(*grid,fire,false,false,use_poisson);
         incompressible=new INCOMPRESSIBLE_UNIFORM<TV>(*grid,*projection);
         phi_boundary=&phi_boundary_water; // override default
         phi_boundary_water.Set_Velocity_Pointer(incompressible_face_velocities);
@@ -137,7 +130,6 @@ Initialize_Fluid_Evolution(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velo
     density_container.Set_Velocity(&incompressible_face_velocities);
     density_container.Set_Velocity(&incompressible_face_velocities);
     temperature_container.Set_Velocity(&incompressible_face_velocities);
-    if(!compressible) incompressible->thread_queue=thread_queue;
 }
 //#####################################################################
 // Function Use_Fluid_Coupling_Defaults
@@ -548,46 +540,6 @@ Evolve_Soot(const T dt,const T time)
         if(use_soot_fuel_combustion) Combustion(dt,time);
         euler->euler_projection.Compute_Density_Weighted_Face_Velocities(dt,time,euler->euler_projection.elliptic_solver->psi_N);}
     BASE::Evolve_Soot(dt,time);
-}
-//#####################################################################
-// Function Sync_Parameters 
-//#####################################################################
-template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
-Sync_Parameters(FLUIDS_PARAMETERS_UNIFORM<TV>& global_parameters,THREADED_UNIFORM_GRID<TV>& threaded_grid)
-{
-    threaded_grid.Sync_Scalar(particle_levelset_evolution->phi,global_parameters.particle_levelset_evolution->phi);
-    threaded_grid.Sync_Scalar(incompressible->projection.p,global_parameters.incompressible->projection.p);
-    threaded_grid.Sync_Scalar(incompressible->projection.elliptic_solver->psi_D,global_parameters.incompressible->projection.elliptic_solver->psi_D);
-    threaded_grid.Sync_Face_Scalar(incompressible->projection.elliptic_solver->psi_N,global_parameters.incompressible->projection.elliptic_solver->psi_N);
-    for(int i=0;i<number_of_regions;i++){
-        threaded_grid.Sync_Particles(particle_levelset_evolution->Particle_Levelset(i).positive_particles,global_parameters.particle_levelset_evolution->Particle_Levelset(i).positive_particles);
-        threaded_grid.Sync_Particles(particle_levelset_evolution->Particle_Levelset(i).negative_particles,global_parameters.particle_levelset_evolution->Particle_Levelset(i).negative_particles);
-        threaded_grid.Sync_Particles(particle_levelset_evolution->Particle_Levelset(i).removed_positive_particles,global_parameters.particle_levelset_evolution->Particle_Levelset(i).removed_positive_particles);
-        threaded_grid.Sync_Particles(particle_levelset_evolution->Particle_Levelset(i).removed_negative_particles,global_parameters.particle_levelset_evolution->Particle_Levelset(i).removed_negative_particles);}
-}
-//#####################################################################
-// Function Distribute_Parameters 
-//#####################################################################
-template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
-Distribute_Parameters(FLUIDS_PARAMETERS_UNIFORM<TV>& global_parameters,THREADED_UNIFORM_GRID<TV>& threaded_grid)
-{
-    threaded_grid.Distribute_Scalar(particle_levelset_evolution->phi,global_parameters.particle_levelset_evolution->phi);
-    threaded_grid.Distribute_Scalar(incompressible->projection.p,global_parameters.incompressible->projection.p);
-    threaded_grid.Distribute_Scalar(incompressible->projection.elliptic_solver->psi_D,global_parameters.incompressible->projection.elliptic_solver->psi_D);
-    threaded_grid.Distribute_Face_Scalar(incompressible->projection.elliptic_solver->psi_N,global_parameters.incompressible->projection.elliptic_solver->psi_N);
-    confinement_parameter=global_parameters.confinement_parameter;
-    gravity=global_parameters.gravity;
-    use_surface_solve=global_parameters.use_surface_solve;
-    use_maccormack_for_incompressible=global_parameters.use_maccormack_for_incompressible;
-    cfl=global_parameters.cfl;
-    domain_walls=global_parameters.domain_walls;
-    mpi_grid->Initialize(domain_walls);
-    viscosity=global_parameters.viscosity;
-    removed_positive_particle_buoyancy_constant=global_parameters.removed_positive_particle_buoyancy_constant;
-    bandwidth_without_maccormack_near_interface=global_parameters.bandwidth_without_maccormack_near_interface;
-    elastic_modulus=global_parameters.elastic_modulus;
-    plasticity_alpha=global_parameters.plasticity_alpha;
-    plasticity_gamma=global_parameters.plasticity_gamma;
 }
 //#####################################################################
 // Function Total_Number_Of_Particles

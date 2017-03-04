@@ -20,8 +20,8 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class TV> LAPLACE_COLLIDABLE_UNIFORM<TV>::
-LAPLACE_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input,const bool initialize_grid,const bool multiphase_input,const bool enforce_compatibility_input,THREAD_QUEUE* thread_queue)
-    :BASE(grid_input,u_input,initialize_grid,enforce_compatibility_input,thread_queue),levelset_default(new LEVELSET<TV>(grid,phi_default))
+LAPLACE_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input,const bool initialize_grid,const bool multiphase_input,const bool enforce_compatibility_input)
+    :BASE(grid_input,u_input,initialize_grid,enforce_compatibility_input),levelset_default(new LEVELSET<TV>(grid,phi_default))
 {
 }
 //#####################################################################
@@ -29,8 +29,8 @@ LAPLACE_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input,c
 //#####################################################################
 template<class TV> LAPLACE_COLLIDABLE_UNIFORM<TV>::
 LAPLACE_COLLIDABLE_UNIFORM(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input,LEVELSET<TV>& cell_centered_levelset,const bool initialize_grid,const bool multiphase_input,
-    const bool enforce_compatibility_input,THREAD_QUEUE* thread_queue)
-    :BASE(grid_input,u_input,initialize_grid,enforce_compatibility_input,thread_queue),levelset_default(new LEVELSET<TV>(grid,phi_default))
+    const bool enforce_compatibility_input)
+    :BASE(grid_input,u_input,initialize_grid,enforce_compatibility_input),levelset_default(new LEVELSET<TV>(grid,phi_default))
 {
     levelset=&cell_centered_levelset;
 }
@@ -46,9 +46,9 @@ template<class TV> LAPLACE_COLLIDABLE_UNIFORM<TV>::
 // Function Find_A
 //#####################################################################
 template<class TV> void LAPLACE_COLLIDABLE_UNIFORM<TV>::
-Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index)
+Find_A(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,const ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index)
 {
-    BASE::Find_A_Part_Two(domain,A_array,b_array,cell_index_to_matrix_index);
+    BASE::Find_A(domain,A_array,b_array,filled_region_cell_count,cell_index_to_matrix_index);
     if(second_order_cut_cell_method) Apply_Second_Order_Cut_Cell_Method(domain,A_array,b_array,cell_index_to_matrix_index);
 }
 //#####################################################################

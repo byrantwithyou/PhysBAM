@@ -6,7 +6,6 @@
 #include <Core/Log/LOG.h>
 #include <Core/Log/SCOPE.h>
 #include <Grid_PDE/Boundaries/BOUNDARY_MPI.h>
-#include <Grid_PDE/Boundaries/BOUNDARY_THREADED.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_FACE_ITERATOR.h>
 #include "SMOKE_DRIVER.h"
@@ -62,11 +61,7 @@ Initialize()
     if(example.mpi_grid) example.mpi_grid->Initialize(example.domain_boundary);
     example.projection.elliptic_solver->mpi_grid=example.mpi_grid;
     if(example.mpi_grid) example.boundary=new BOUNDARY_MPI<TV>(example.mpi_grid,example.boundary_scalar);
-    else if(example.thread_queue) example.boundary=new BOUNDARY_THREADED<TV>(*example.thread_queue,example.boundary_scalar);    
     else example.boundary=&example.boundary_scalar;
-
-    //threading
-    example.projection.elliptic_solver->thread_queue=example.thread_queue;
 
     // setup grids and velocities
     example.projection.Initialize_Grid(example.grid);

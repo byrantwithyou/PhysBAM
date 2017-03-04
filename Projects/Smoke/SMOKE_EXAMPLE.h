@@ -52,7 +52,6 @@ public:
     T cfl;
     GRID<TV> grid;
     MPI_UNIFORM_GRID<TV> *mpi_grid;
-    THREAD_QUEUE* thread_queue;    
     PROJECTION_UNIFORM<TV> projection;
     ARRAY<T,FACE_INDEX<TV::m> > face_velocities;
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<TV,T, AVERAGING_UNIFORM<TV, FACE_LOOKUP_UNIFORM<TV> >,T_INTERPOLATION > advection_scalar;
@@ -63,9 +62,6 @@ public:
     VECTOR<VECTOR<bool,2>,TV::m> domain_boundary;    
     RANGE<TV> source1;
     RANGE<TV> source2;
-#ifdef USE_PTHREAD
-    pthread_mutex_t lock;
-#endif
     
     // EAPIC
     bool use_eapic;

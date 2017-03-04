@@ -12,7 +12,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> PROJECTION_COLLIDABLE_UNIFORM<TV>::
-PROJECTION_COLLIDABLE_UNIFORM(const GRID<TV>& mac_grid,const bool multiphase,const bool use_poisson,const bool use_variable_beta,THREAD_QUEUE* thread_queue)
+PROJECTION_COLLIDABLE_UNIFORM(const GRID<TV>& mac_grid,const bool multiphase,const bool use_poisson,const bool use_variable_beta)
     :laplace_collidable(0),poisson_collidable(0)
 {
     if(use_poisson){
@@ -21,7 +21,7 @@ PROJECTION_COLLIDABLE_UNIFORM(const GRID<TV>& mac_grid,const bool multiphase,con
         elliptic_solver=poisson;
         collidable_solver=poisson_collidable;}
     else{
-        laplace=laplace_collidable=new LAPLACE_COLLIDABLE_UNIFORM<TV>(p_grid,p,true,false,true,thread_queue);elliptic_solver=laplace;collidable_solver=laplace_collidable;}
+        laplace=laplace_collidable=new LAPLACE_COLLIDABLE_UNIFORM<TV>(p_grid,p,true,false,true);elliptic_solver=laplace;collidable_solver=laplace_collidable;}
     Initialize_Grid(mac_grid);
 }
 //#####################################################################

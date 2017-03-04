@@ -37,7 +37,6 @@ public:
 
 //#####################################################################
     int Synchronize_Colors();
-    int Synchronize_Colors_Threaded();
 protected:
     void Find_Global_Colors(ARRAY<bool,VECTOR<int,1> >& color_is_global,const RANGE<TV_INT>&) const;
     template<class T_BOX_HORIZONTAL_INT> void Find_Global_Colors(ARRAY<bool,VECTOR<int,1> >& color_is_global,const T_BOX_HORIZONTAL_INT&) const;

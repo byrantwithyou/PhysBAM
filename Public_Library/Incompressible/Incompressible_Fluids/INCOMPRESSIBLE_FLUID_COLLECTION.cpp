@@ -64,24 +64,6 @@ Initialize_Grids()
     face_velocities.Resize(grid);
 }
 //#####################################################################
-// Function Sync_Data
-//#####################################################################
-template<class TV> void INCOMPRESSIBLE_FLUID_COLLECTION<TV>::
-Sync_Data(INCOMPRESSIBLE_FLUID_COLLECTION<TV>& fluid_collection,THREADED_UNIFORM_GRID<TV>& threaded_grid)
-{
-    threaded_grid.Sync_Face_Scalar(face_velocities,fluid_collection.face_velocities);    
-    threaded_grid.Sync_Scalar(viscosity,fluid_collection.viscosity);    
-}
-//#####################################################################
-// Function Distribute_Data
-//#####################################################################
-template<class TV> void INCOMPRESSIBLE_FLUID_COLLECTION<TV>::
-Distribute_Data(INCOMPRESSIBLE_FLUID_COLLECTION<TV>& fluid_collection,THREADED_UNIFORM_GRID<TV>& threaded_grid)
-{
-    threaded_grid.Distribute_Face_Scalar(face_velocities,fluid_collection.face_velocities);    
-    threaded_grid.Distribute_Scalar(viscosity,fluid_collection.viscosity);    
-}
-//#####################################################################
 namespace PhysBAM{
 template class INCOMPRESSIBLE_FLUID_COLLECTION<VECTOR<float,1> >;
 template class INCOMPRESSIBLE_FLUID_COLLECTION<VECTOR<float,2> >;

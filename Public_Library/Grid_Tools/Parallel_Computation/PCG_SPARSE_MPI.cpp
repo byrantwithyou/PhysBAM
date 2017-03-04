@@ -85,7 +85,6 @@ Serial_Solve(SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,ARRAY<T>& q,AR
 template<class TV> void PCG_SPARSE_MPI<TV>::
 Parallel_Solve(SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance,const bool recompute_preconditioner)
 {
-    if(thread_grid){Parallel_Solve(A,x,b,thread_grid->global_column_index_boundaries,tolerance,recompute_preconditioner);return;}
     Initialize_Datatypes();
     int local_n=A.n,interior_n=partition.interior_indices.Size();
     int global_n=Global_Sum(interior_n);
@@ -288,49 +287,6 @@ Find_Ghost_Regions(SPARSE_MATRIX_FLAT_MXN<T>& A,const ARRAY<VECTOR<int,2> >& pro
     MPI_UTILITIES::Wait_All(requests);
 }
 //#####################################################################
-// Function Find_Ghost_Regions
-//#####################################################################
-template<class TV> void PCG_SPARSE_MPI<TV>::
-Find_Ghost_Regions_Threaded(SPARSE_MATRIX_FLAT_MXN<T>& A,const ARRAY<VECTOR<int,2> >& proc_column_index_boundaries)
-{
-    // Find which columns we need from each of the other procs
-    columns_to_receive.Resize(proc_column_index_boundaries.m);
-    columns_to_send.Resize(proc_column_index_boundaries.m);
-    ARRAY<bool> column_needed(A.n);
-    int row_index=A.offsets(0);
-    for(int row=0;row<A.n;row++){ // First out which columns of A we actually have stuff in
-        const int end=A.offsets(row+1);
-        for(;row_index<end;row_index++){
-            column_needed(A.A(row_index).j)=true;}}
-    int my_rank=thread_grid->rank;ARRAY<int> temp_indices;temp_indices.Preallocate(proc_column_index_boundaries(0).y-proc_column_index_boundaries(0).x);
-    for(int node_rank=0;node_rank<proc_column_index_boundaries.m;node_rank++){
-        if(node_rank!=my_rank){
-            temp_indices.Remove_All();
-            for(int column_index=proc_column_index_boundaries(node_rank).x;column_index<proc_column_index_boundaries(node_rank).y;column_index++)
-                if(column_needed(column_index)) temp_indices.Append(column_index);
-            temp_indices.Compact();
-            columns_to_receive(node_rank)=temp_indices;}}
-
-    for(int node_rank=0;node_rank<columns_to_receive.m;node_rank++){
-        if(node_rank!=my_rank){
-            int buffer_size=sizeof(int)+sizeof(T)*columns_to_receive(node_rank).m;
-            THREAD_PACKAGE pack(buffer_size);int position=0;pack.send_tid=my_rank;pack.recv_tid=node_rank-1;
-            *(int*)(&pack.buffer(position+1))=columns_to_receive(node_rank).m;position+=sizeof(int);
-            for(int i=0;i<columns_to_receive(node_rank).m;i++){*(int*)(&pack.buffer(position+1))=columns_to_receive(node_rank)(i);position+=sizeof(int);}
-            pthread_mutex_lock(thread_grid->lock);
-            thread_grid->buffers.Append(pack);
-            pthread_mutex_unlock(thread_grid->lock);}}
-    // Receive a list from each of the other procs, and store this list
-    pthread_barrier_wait(thread_grid->barr);
-    for(int buf=0;buf<thread_grid->buffers.m;buf++){if(thread_grid->buffers(buf).recv_tid!=my_rank) continue;
-        int source=thread_grid->buffers(buf).send_tid;int position=0;
-        columns_to_send(source+1).Resize(*(int*)(&thread_grid->buffers(buf).buffer(position+1)));position+=sizeof(int);
-        for(int i=0;i<columns_to_send(source+1).m;i++){columns_to_send(source+1)(i)=*(int*)(&thread_grid->buffers(buf).buffer(position+1));position+=sizeof(int);}}
-    pthread_barrier_wait(thread_grid->barr);
-    if(thread_grid->tid==1) thread_grid->buffers.m=0;
-    pthread_barrier_wait(thread_grid->barr);
-}
-//#####################################################################
 // Function Fill_Ghost_Cells_Far
 //#####################################################################
 template<class TV> void PCG_SPARSE_MPI<TV>::
@@ -356,39 +312,6 @@ Fill_Ghost_Cells_Far(ARRAY<T>& x)
             MPI_PACKAGE package(columns_to_receive_values(node_rank));
             packages.Append(package);requests.Append(package.Irecv(comm,node_rank-1,tag));}}
     MPI_UTILITIES::Wait_All(requests);MPI_PACKAGE::Free_All(packages);
-
-    // For the ones we received, stick them into x
-    for(int node_rank=0;node_rank<columns_to_receive.m;node_rank++){
-        if(node_rank!=my_rank)
-            for(int i=0;i<columns_to_receive(node_rank).m;i++)
-                x(columns_to_receive(node_rank)(i))=columns_to_receive_values(node_rank)(i);}
-}
-//#####################################################################
-// Function Fill_Ghost_Cells_Far
-//#####################################################################
-template<class TV> void PCG_SPARSE_MPI<TV>::
-Fill_Ghost_Cells_Threaded(ARRAY<T>& x)
-{
-    int my_rank=thread_grid->rank;
-    // Send out the column values that we owe other people
-    for(int node_rank=0;node_rank<columns_to_send.m;node_rank++){
-        if(node_rank!=my_rank){
-            // First build the array of column values wanted
-            THREAD_PACKAGE pack(columns_to_send(node_rank).m*sizeof(T));pack.send_tid=my_rank;pack.recv_tid=node_rank-1;int position=0;
-            for(int i=0;i<columns_to_send(node_rank).m;i++){*(T*)(pack.buffer(position+1))=x(columns_to_send(node_rank)(i));position+=sizeof(T);}
-            pthread_mutex_lock(thread_grid->lock);
-            thread_grid->buffers.Append(pack);
-            pthread_mutex_unlock(thread_grid->lock);}}
-    // Receive the column values that others owe us
-    ARRAY<ARRAY<T> > columns_to_receive_values(columns_to_receive.m);
-    pthread_barrier_wait(thread_grid->barr);
-    for(int buf=0;buf<thread_grid->buffers.m;buf++){if(my_rank!=thread_grid->buffers(buf).recv_tid) continue;
-        // First build the array of column values we will receive
-        int node_rank=thread_grid->buffers(buf).send_tid;columns_to_receive_values(node_rank).Resize(columns_to_receive(node_rank).m);int position=0;
-        for(int i=0;i<columns_to_receive_values(node_rank).m;i++){columns_to_receive_values(node_rank)(i)=*(T*)(&thread_grid->buffers(buf).buffer(position+1));position+=sizeof(T);}}
-    pthread_barrier_wait(thread_grid->barr);
-    if(thread_grid->tid==1) thread_grid->buffers.m=0;
-    pthread_barrier_wait(thread_grid->barr);
 
     // For the ones we received, stick them into x
     for(int node_rank=0;node_rank<columns_to_receive.m;node_rank++){

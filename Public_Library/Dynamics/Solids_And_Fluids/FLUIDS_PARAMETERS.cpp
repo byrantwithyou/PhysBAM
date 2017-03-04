@@ -83,8 +83,7 @@ FLUIDS_PARAMETERS(const TYPE type)
     compressible_use_sound_speed_based_dt_multiple_for_cfl(false),compressible_multiplication_factor_for_sound_speed_based_dt((T)1.),
     compressible_apply_cavitation_correction(false),compressible_adaptive_time_step(false),compressible_log_extremas(true),
     use_poisson(false),solids_override_source_velocities(false),use_slip(false),
-    use_slip_constraints_across_non_occluded_faces(false),use_preconditioner_for_slip_system(true),stokes_flow(false),
-    thread_queue(0),number_of_threads(1)
+    use_slip_constraints_across_non_occluded_faces(false),use_preconditioner_for_slip_system(true),stokes_flow(false)
 {
     phi_boundary=&phi_boundary_reflection;
     fluid_boundary=&boundary_mac_slip;

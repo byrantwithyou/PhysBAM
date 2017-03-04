@@ -43,7 +43,7 @@ protected:
     LAPLACE_COLLIDABLE<TV>* collidable_solver_save_for_sph;
 public:
 
-    PROJECTION_DYNAMICS_UNIFORM(const GRID<TV>& mac_grid,const bool flame_input=false,const bool multiphase=false,const bool use_variable_beta=false,const bool use_poisson=false,THREAD_QUEUE* thread_queue=0);
+    PROJECTION_DYNAMICS_UNIFORM(const GRID<TV>& mac_grid,const bool flame_input=false,const bool multiphase=false,const bool use_variable_beta=false,const bool use_poisson=false);
     PROJECTION_DYNAMICS_UNIFORM(const GRID<TV>& mac_grid,LEVELSET<TV>& levelset_input);
     virtual ~PROJECTION_DYNAMICS_UNIFORM();
 

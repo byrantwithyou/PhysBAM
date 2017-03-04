@@ -11,7 +11,6 @@
 #include <Core/Matrices/MATRIX_POLICY.h>
 #include <Core/Vectors/VECTOR_FORWARD.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
-#include <Tools/Parallel_Computation/THREAD_QUEUE.h>
 #include <Geometry/Level_Sets/LEVELSET_POLICY.h>
 #include <Incompressible/Boundaries/BOUNDARY_MAC_GRID_SOLID_WALL_SLIP.h>
 #include <Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
@@ -177,8 +176,6 @@ public:
     bool use_slip_constraints_across_non_occluded_faces;
     bool use_preconditioner_for_slip_system;
     bool stokes_flow;
-    THREAD_QUEUE* thread_queue;
-    int number_of_threads;
 
     FLUIDS_PARAMETERS(const TYPE type);
     virtual ~FLUIDS_PARAMETERS();

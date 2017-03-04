@@ -11,9 +11,6 @@
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Math_Tools/maxabs.h>
 #include <Tools/Krylov_Solvers/PCG_SPARSE.h>
-#include <Tools/Parallel_Computation/THREAD_QUEUE.h>
-#include <Grid_Tools/Parallel_Computation/DOMAIN_ITERATOR_THREADED.h>
-#include <Grid_Tools/Parallel_Computation/PCG_SPARSE_THREADED.h>
 #include <Grid_PDE/Interpolation/INTERPOLATION_UNIFORM.h>
 #include <Grid_PDE/Poisson/LAPLACE.h>
 #include <Grid_PDE/Poisson/LAPLACE_UNIFORM_MPI.h>
@@ -40,7 +37,6 @@ public:
     ARRAY<T,TV_INT>& u;
     ARRAY<T,TV_INT> f; // f will be modified and reused as b in Ax=b for PCG
     PCG_SPARSE<T> pcg;
-    PCG_SPARSE_THREADED<TV>* pcg_threaded;
     T_ARRAYS_INT filled_region_colors;
     ARRAY<bool> filled_region_touches_dirichlet;
     ARRAY<bool,FACE_INDEX<TV::m> > psi_N;
@@ -54,14 +50,9 @@ public:
     bool enforce_compatibility;
     bool solve_single_cell_neumann_regions;
     bool use_psi_R;
-    THREAD_QUEUE* thread_queue;
-#ifdef USE_PTHREADS
-    pthread_barrier_t barr;
-    pthread_mutex_t lock;
-#endif
 public:
 
-    LAPLACE_UNIFORM(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input,const bool initialize_grid,const bool enforce_compatibility_input,THREAD_QUEUE* thread_queue_input=0);
+    LAPLACE_UNIFORM(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& u_input,const bool initialize_grid,const bool enforce_compatibility_input);
     virtual ~LAPLACE_UNIFORM();
 
     bool All_Cell_Faces_Neumann(const TV_INT& cell_index) const
@@ -82,19 +73,11 @@ public:
     void Set_Dirichlet_Outer_Boundaries();
     virtual void Initialize_Grid(const GRID<TV>& mac_grid_input);
     virtual void Solve(const T time=0,const bool solution_regions_already_computed=false);
-    // Undefined in cpp.
-    //void Set_Threaded_Boundary(RANGE<TV_INT>& domain,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N);
-    // Undefined in cpp.
-    //void Solve_Threaded(RANGE<TV_INT>& domain,const GRID<TV>& threaded_grid,const T time=0);
     virtual void Find_A(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,const ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index);
-    virtual void Find_A_Part_One(RANGE<TV_INT>& domain,T_ARRAYS_INT& cell_index_to_matrix_index,ARRAY<ARRAY<int> >& row_counts);
-    virtual void Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index);
     void Find_Solution_Regions();
     void Compute_Matrix_Indices(ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,ARRAY<ARRAY<TV_INT> >& matrix_index_to_cell_index_array,T_ARRAYS_INT& cell_index_to_matrix_index);
     void Compute_Matrix_Indices(const RANGE<TV_INT>& domain,ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,ARRAY<ARRAY<TV_INT> >& matrix_index_to_cell_index_array,T_ARRAYS_INT& cell_index_to_matrix_index);
-    void Compute_Matrix_Indices_Threaded(ARRAY<RANGE<TV_INT> >& domains,ARRAY<ARRAY<INTERVAL<int> > >& interior_indices,ARRAY<ARRAY<ARRAY<INTERVAL<int> > > >& ghost_indices,ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,ARRAY<ARRAY<TV_INT> >& matrix_index_to_cell_index_array,T_ARRAYS_INT& cell_index_to_matrix_index);
-    void Solve_Subregion(ARRAY<TV_INT>& matrix_index_to_cell_index,SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& b,const int color=0,ARRAY<int,TV_INT>* domain_index=0);
-    void Solve_Subregion(ARRAY<INTERVAL<int> >& interior_indices,ARRAY<ARRAY<INTERVAL<int> > >& ghost_indices,ARRAY<TV_INT>& matrix_index_to_cell_index,SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& b,const int color=0,ARRAY<int,TV_INT>* domain_index=0);
+    void Solve_Subregion(ARRAY<TV_INT>& matrix_index_to_cell_index,SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& b,const int color=0);
     void Build_Single_Solution_Region(ARRAY<bool,TV_INT>& solve);
     void Use_Psi_R();
 //#####################################################################

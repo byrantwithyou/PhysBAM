@@ -22,18 +22,12 @@ private:
     ARRAY<CLONE_ARRAY<T_PARTICLES>*> allocated_batches; // pointer to the first particle in the batch (of size allocation_batch_size)
     STACK<T_PARTICLES*> free_pool;
     int allocation_batch_size;
-#ifdef USE_PTHREADS
-    pthread_mutex_t stack_lock,batch_lock;
-#endif
 public:
     int number_particles_per_cell;
 
     POINTS_POOL(const T_PARTICLES& template_particles,const int allocation_batch_size_input=100000)
         :template_particles(template_particles),allocation_batch_size(allocation_batch_size_input),number_particles_per_cell(0)
     {
-#ifdef USE_PTHREADS
-        pthread_mutex_init(&stack_lock,0);pthread_mutex_init(&batch_lock,0);
-#endif
     }
 
     ~POINTS_POOL()
@@ -44,35 +38,15 @@ public:
 
     T_PARTICLES* Allocate_Particle()
     {if(free_pool.Empty()){
-#ifdef USE_PTHREADS
-        pthread_mutex_lock(&batch_lock);
-        if(free_pool.Empty()) Allocate_New_Batch();
-        pthread_mutex_unlock(&batch_lock);
-#else
         Allocate_New_Batch();
-#endif
     }
-#ifdef USE_PTHREADS
-    pthread_mutex_lock(&stack_lock);
-    if(free_pool.Empty()){pthread_mutex_unlock(&stack_lock);return Allocate_Particle();} //Some other thread got what was there so try again
-#endif
     T_PARTICLES* particles=free_pool.Pop();
-#ifdef USE_PTHREADS
-    pthread_mutex_unlock(&stack_lock);
-#endif
     return particles;}
 
     void Free_Particle(T_PARTICLES* particle_class)
     {if(particle_class){
         Free_Particle(particle_class->next);particle_class->next=0;particle_class->Delete_All_Elements();
-#ifdef USE_PTHREADS
-        pthread_mutex_lock(&stack_lock);
-#endif
-        free_pool.Push(particle_class);
-#ifdef USE_PTHREADS
-        pthread_mutex_unlock(&stack_lock);
-#endif
-    }}
+        free_pool.Push(particle_class);}}
 
     T_PARTICLES& Add_Particle(T_PARTICLES& particles,int& index)
     {T_PARTICLES* particles_link=&particles;
@@ -89,14 +63,8 @@ private:
     CLONE_ARRAY<T_PARTICLES>* batch=new CLONE_ARRAY<T_PARTICLES>(template_particles,allocation_batch_size);
     for(int i=0;i<allocation_batch_size;i++) (*batch)(i).Preallocate(number_particles_per_cell);
     allocated_batches.Append(batch);
-#ifdef USE_PTHREADS
-    pthread_mutex_lock(&stack_lock);
-#endif
     free_pool.Increase_Size(allocation_batch_size);
     for(int i=0;i<allocation_batch_size;i++) free_pool.Push(&(*batch)(i));
-#ifdef USE_PTHREADS
-    pthread_mutex_unlock(&stack_lock);
-#endif
     }
 
 //#####################################################################

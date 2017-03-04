@@ -2,6 +2,7 @@
 // Copyright 2005-2006, Geoffrey Irving, Frank Losasso, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Log/LOG.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>

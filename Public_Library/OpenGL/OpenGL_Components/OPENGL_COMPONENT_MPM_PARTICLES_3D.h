@@ -8,9 +8,9 @@
 #define __OPENGL_COMPONENT_MPM_PARTICLES_3D__
 
 #include <Core/Arrays/ARRAY.h>
+#include <OpenGL/OpenGL/OPENGL_INDEXED_COLOR_MAP.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT.h>
-#include <OpenGL/OpenGL/OPENGL_INDEXED_COLOR_MAP.h>
 
 namespace PhysBAM
 {

@@ -20,7 +20,7 @@ class BOUNDARY_PHI_WATER:public BOUNDARY<TV,typename TV::SCALAR>
     typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,TV::m> TV_SIDES;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
 public:
     typedef BOUNDARY<TV,T> BASE;
-    using BASE::Set_Constant_Extrapolation;using BASE::Constant_Extrapolation;using BASE::Find_Ghost_Regions;using BASE::Boundary;
+    using BASE::Set_Constant_Extrapolation;using BASE::Constant_Extrapolation;using BASE::Find_Ghost_Regions;using BASE::Boundary;using BASE::Fill_Single_Ghost_Region;
 
     bool use_extrapolation_mode;
     T tolerance;
@@ -63,7 +63,6 @@ public:
 
 //#####################################################################
     void Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_BASE& u,T_ARRAYS_BASE& u_ghost,const T dt,const T time,const int number_of_ghost_cells) const; // uniform grids
-    void Fill_Single_Ghost_Region_Threaded(RANGE<TV_INT>& region,const GRID<TV>& grid,T_ARRAYS_BASE& u_ghost,const int side) const;
 //#####################################################################
 };
 }

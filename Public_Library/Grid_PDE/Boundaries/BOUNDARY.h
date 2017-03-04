@@ -69,7 +69,6 @@ public:
     virtual void Fill_Single_Ghost_Region(const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const RANGE<TV_INT>& region,const int side,const T dt,const T time,const int number_of_ghost_cells) const;
     void Find_Ghost_Regions(const GRID<TV>& grid,VECTOR<RANGE<TV_INT>,2*TV::m>& regions,const int number_of_ghost_cells) const;
     void Fill_Single_Ghost_Region(const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const int side,const RANGE<TV_INT>& region) const;
-    void Fill_Single_Ghost_Region_Threaded(RANGE<TV_INT>& region,const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const int side) const;
 //#####################################################################
 };
 }

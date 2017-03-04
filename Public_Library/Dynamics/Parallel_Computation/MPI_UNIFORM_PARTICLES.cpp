@@ -167,55 +167,6 @@ Recv_Particles(const MPI_UNIFORM_GRID<TV>& mpi_grid,T_PARTICLES& particles,const
         MPI_UTILITIES::Unpack(particles,++number,buffer,position,comm);
         particles.X(number)+=wrap_offset;}
 }
-//#####################################################################
-// Function Exchange_Boundary_Particles
-//#####################################################################
-template<class TV,class T_PARTICLES,class T_ARRAYS_PARTICLES> void
-Exchange_Boundary_Particles_Threaded(const THREADED_UNIFORM_GRID<TV>& threaded_grid,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int bandwidth,PARTICLE_LEVELSET<TV>& particle_levelset)
-{
-#ifdef USE_PTHREADS
-    typedef VECTOR<int,TV::m> TV_INT;
-    STATIC_ASSERT((is_same<T_PARTICLES,typename remove_pointer<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE>::value));
-    ARRAY<RANGE<TV_INT> > send_regions;
-    // this way Find_Boundary_Regions will return block indices which for uniform grids are the node index not minimum corner cell
-    RANGE<TV_INT> sentinels=RANGE<TV_INT>(TV_INT(),TV_INT::All_Ones_Vector());
-    threaded_grid.Find_Boundary_Regions(send_regions,sentinels,false,RANGE<VECTOR<int,1> >(0,bandwidth-1),true,false);
-    // send particles that have exited the domain
-    ARRAY<ARRAY<PAIR<T_PARTICLES*,int> > > exchange_particles(GRID<TV>::number_of_one_ring_neighbors_per_cell);
-    // TODO: this is inefficient because it does an entire box check even if only some sides are needed, and send a lot more corner particles than it should
-    RANGE<TV> domain=threaded_grid.local_grid.Domain();
-    for(int n=0;n<send_regions.m;n++) if(threaded_grid.all_neighbor_ranks(n)!=-1){
-        exchange_particles(n).Preallocate(100);
-        for(NODE_ITERATOR<TV> iterator(threaded_grid.local_grid,send_regions(n));iterator.Valid();iterator.Next())if(particles(iterator.Node_Index())){
-            T_PARTICLES* cell_particles=particles(iterator.Node_Index());
-            while(cell_particles){for(int i=0;i<cell_particles->Size();i++)if(!domain.Lazy_Inside(cell_particles->X(i))) // could be optimized further
-                exchange_particles(n).Append(PAIR<T_PARTICLES*,int>(cell_particles,i));cell_particles=cell_particles->next;}} // TODO: delete the particle locally?
-        if(!exchange_particles(n).m) continue;
-        THREAD_PACKAGE pack((sizeof(int)+sizeof(T_PARTICLES*))*exchange_particles(n).m+sizeof(int));pack.send_tid=threaded_grid.tid;pack.recv_tid=threaded_grid.all_neighbor_ranks(n);
-        int position=0;*(int*)(&pack.buffer(position+1))=exchange_particles(n).m;position+=sizeof(int);
-        for(int i=0;i<exchange_particles(n).m;i++){
-            *(T_PARTICLES**)(&pack.buffer(position+1))=exchange_particles(n)(i).x;position+=sizeof(T_PARTICLES*);
-            *(int*)(&pack.buffer(position+1))=exchange_particles(n)(i).y;position+=sizeof(int);}
-        pthread_mutex_lock(threaded_grid.lock);
-        threaded_grid.buffers.Append(pack);
-        pthread_mutex_unlock(threaded_grid.lock);}
-    pthread_barrier_wait(threaded_grid.barr);
-    // probe and receive
-    for(int buf=0;buf<threaded_grid.buffers.m;buf++){if(threaded_grid.tid!=threaded_grid.buffers(buf).recv_tid) continue;
-        THREAD_PACKAGE& pack=threaded_grid.buffers(buf);int position=0;int size=*(int*)(&pack.buffer(position+1));position+=sizeof(int);
-        for(int i=0;i<size;i++){
-            T_PARTICLES* recv_particles=*(T_PARTICLES**)(&pack.buffer(position+1));position+=sizeof(T_PARTICLES*);
-            int index=*(int*)(&pack.buffer(position+1));position+=sizeof(int);
-            TV& X=recv_particles->X(index);
-            TV_INT final_b=threaded_grid.local_grid.Block_Index(X,bandwidth-1); // TODO: check whether this is a good block
-            if(!particles(final_b)) particles(final_b)=particle_levelset.Allocate_Particles(template_particles);
-            particle_levelset.Copy_Particle(*recv_particles,*particles(final_b),index);}}
-    // wait for sends to complete
-    pthread_barrier_wait(threaded_grid.barr);
-    if(threaded_grid.tid==1) threaded_grid.buffers.m=0;
-    pthread_barrier_wait(threaded_grid.barr);
-#endif
-}
 template<class TV,class T_PARTICLES,class T_ARRAYS_PARTICLES> void
 Exchange_Boundary_Particles(const MPI_UNIFORM_GRID<TV>& mpi_grid,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int bandwidth,PARTICLE_LEVELSET<TV>& particle_levelset)
 {
@@ -247,55 +198,6 @@ Exchange_Boundary_Particles(const MPI_UNIFORM_GRID<TV>& mpi_grid,const T_PARTICL
         Recv_Particles(mpi_grid,template_particles,particles,tag,probe_status,particle_levelset);}
     // wait for sends to complete
     MPI_UTILITIES::Wait_All(requests);
-}
-//#####################################################################
-// Function Exchange_Overlapping_Block_Particles
-//#####################################################################
-template<class TV,class T_PARTICLES,class T_ARRAYS_PARTICLES> void
-Exchange_Overlapping_Block_Particles_Threaded(const THREADED_UNIFORM_GRID<TV>& threaded_grid,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int bandwidth,PARTICLE_LEVELSET<TV>& particle_levelset)
-{
-#ifdef USE_PTHREADS
-    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    STATIC_ASSERT((is_same<T_PARTICLES,typename remove_pointer<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE>::value));
-    ARRAY<RANGE<TV_INT> > send_regions;
-    // this way Find_Boundary_Regions will return block indices which for uniform grids are the node index not minimum corner cell
-    RANGE<TV_INT> sentinels=RANGE<TV_INT>(TV_INT(),TV_INT::All_Ones_Vector());
-    threaded_grid.Find_Boundary_Regions(send_regions,sentinels,false,RANGE<VECTOR<int,1> >(0,bandwidth-1),true,false);
-    // send particles that have exited the domain
-    ARRAY<ARRAY<PAIR<T_PARTICLES*,int> > > exchange_particles(GRID<TV>::number_of_one_ring_neighbors_per_cell);
-    // TODO: this is inefficient because it does an entire box check even if only some sides are needed, and send a lot more corner particles than it should
-    RANGE<TV> block_domain=threaded_grid.local_grid.Domain();block_domain.Change_Size(-(T).5*threaded_grid.local_grid.dX);
-    for(int n=0;n<send_regions.m;n++) if(threaded_grid.all_neighbor_ranks(n)!=-1){
-        exchange_particles(n).Preallocate(100);
-        for(NODE_ITERATOR<TV> iterator(threaded_grid.local_grid,send_regions(n));iterator.Valid();iterator.Next())if(particles(iterator.Node_Index())){
-            T_PARTICLES* cell_particles=particles(iterator.Node_Index());
-            while(cell_particles){for(int i=0;i<cell_particles->Size();i++) if(!block_domain.Thickened(3*threaded_grid.local_grid.dX.Min()).Lazy_Inside(cell_particles->X(i))) 
-                exchange_particles(n).Append(PAIR<T_PARTICLES*,int>(cell_particles,i));cell_particles=cell_particles->next;}} // TODO: delete the particle locally?
-        if(!exchange_particles(n).m) continue;
-        THREAD_PACKAGE pack((sizeof(int)+sizeof(T_PARTICLES*))*exchange_particles(n).m+sizeof(int));pack.send_tid=threaded_grid.tid;pack.recv_tid=threaded_grid.all_neighbor_ranks(n);
-        int position=0;*(int*)(&pack.buffer(position+1))=exchange_particles(n).m;position+=sizeof(int);
-        for(int i=0;i<exchange_particles(n).m;i++){
-            *(T_PARTICLES**)(&pack.buffer(position+1))=exchange_particles(n)(i).x;position+=sizeof(T_PARTICLES*);
-            *(int*)(&pack.buffer(position+1))=exchange_particles(n)(i).y;position+=sizeof(int);}
-        pthread_mutex_lock(threaded_grid.lock);
-        threaded_grid.buffers.Append(pack);
-        pthread_mutex_unlock(threaded_grid.lock);}
-    // probe and receive
-    pthread_barrier_wait(threaded_grid.barr);
-    for(int buf=0;buf<threaded_grid.buffers.m;buf++){if(threaded_grid.tid!=threaded_grid.buffers(buf).recv_tid) continue;
-        THREAD_PACKAGE& pack=threaded_grid.buffers(buf);int position=0;int size=*(int*)(&pack.buffer(position+1));position+=sizeof(int);
-        for(int i=0;i<size;i++){
-            T_PARTICLES* recv_particles=*(T_PARTICLES**)(&pack.buffer(position+1));position+=sizeof(T_PARTICLES*);
-            int index=*(int*)(&pack.buffer(position+1));position+=sizeof(int);
-            TV& X=recv_particles->X(index);
-            TV_INT final_b=threaded_grid.local_grid.Block_Index(X,bandwidth-1); // TODO: check whether this is a good block
-            if(!particles(final_b)) particles(final_b)=particle_levelset.Allocate_Particles(template_particles);
-            particle_levelset.Copy_Particle(*recv_particles,*particles(final_b),index);}}
-    // wait for sends to complete
-    pthread_barrier_wait(threaded_grid.barr);
-    if(threaded_grid.tid==1) threaded_grid.buffers.m=0;
-    pthread_barrier_wait(threaded_grid.barr);
-#endif
 }
 template<class TV,class T_PARTICLES,class T_ARRAYS_PARTICLES> void
 Exchange_Overlapping_Block_Particles(const MPI_UNIFORM_GRID<TV>& mpi_grid,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const int bandwidth,PARTICLE_LEVELSET<TV>& particle_levelset)

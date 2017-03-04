@@ -8,7 +8,6 @@
 #define __INCOMPRESSIBLE_FLUID_COLLECTION__
 
 #include <Grid_Tools/Arrays/FACE_ARRAYS.h>
-#include <Grid_Tools/Parallel_Computation/THREADED_UNIFORM_GRID.h>
 #include <Incompressible/Grid_Based_Fields/DENSITY_CONTAINER.h>
 #include <Incompressible/Grid_Based_Fields/TEMPERATURE_CONTAINER.h>
 namespace PhysBAM{
@@ -32,8 +31,6 @@ public:
     void Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const;
     void Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame);
     void Initialize_Grids();
-    void Sync_Data(INCOMPRESSIBLE_FLUID_COLLECTION<TV>& fluid_collection,THREADED_UNIFORM_GRID<TV>& threaded_grid);
-    void Distribute_Data(INCOMPRESSIBLE_FLUID_COLLECTION<TV>& fluid_collection,THREADED_UNIFORM_GRID<TV>& threaded_grid);
 //#####################################################################
 };
 }

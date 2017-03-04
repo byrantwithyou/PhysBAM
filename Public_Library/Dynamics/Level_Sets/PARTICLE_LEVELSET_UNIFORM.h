@@ -9,10 +9,6 @@
 
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Incompressible/Interpolation_Collidable/INTERPOLATION_COLLIDABLE_UNIFORM_FORWARD.h>
-#ifdef USE_PTHREADS
-#include <Tools/Parallel_Computation/PTHREAD.h>
-#endif
-#include <Tools/Parallel_Computation/THREAD_QUEUE.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET.h>
 namespace PhysBAM{
@@ -52,22 +48,12 @@ public:
 
     T_ARRAYS_ARRAY_TV positive_particle_positions,negative_particle_positions;
 
-    THREAD_QUEUE* thread_queue;
-#ifdef USE_PTHREADS
-    pthread_mutex_t cell_lock;
-    pthread_barrier_t cell_barr;
-#endif
-
     PARTICLE_LEVELSET_UNIFORM(GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input,GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_body_list_input,const int number_of_ghost_cells_input);
     ~PARTICLE_LEVELSET_UNIFORM();
-
-    void Set_Thread_Queue(THREAD_QUEUE* thread_queue_input)
-    {thread_queue=thread_queue_input;}
 
 //#####################################################################
     void Seed_Particles(const T time,const bool verbose=true);
     void Adjust_Particle_Radii();
-    void Adjust_Particle_Radii_Threaded(RANGE<TV_INT>& domain);
     void Modify_Levelset_Using_Escaped_Particles(ARRAY<T,FACE_INDEX<TV::m> >* V,ARRAY<T_ARRAYS_PARTICLE_LEVELSET_PARTICLES*>* other_positive_particles=0);
     void Update_Particles_To_Reflect_Mass_Conservation(ARRAY<T,TV_INT>& phi_old,const bool update_particle_cells=true,const bool verbose=false);
     void Update_Particles_To_Reflect_Mass_Conservation(const LEVELSET<TV>& levelset_old,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,
@@ -81,70 +67,38 @@ public:
         const bool update_particle_cells_after_euler_step=true,const bool assume_particles_in_correct_blocks=true,const bool enforce_domain_boundaries=true);
     template<class T_ARRAYS_PARTICLES> void Euler_Step_Particles(const ARRAY<T,FACE_INDEX<TV::m> >& V,T_ARRAYS_PARTICLES& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time,
         const bool update_particle_cells_after_euler_step=true,const bool assume_particles_in_correct_blocks=true,const bool enforce_domain_boundaries=true);
-    template<class T_ARRAYS_PARTICLES> void Euler_Step_Particles_Threaded(RANGE<TV_INT>& domain,const ARRAY<T,FACE_INDEX<TV::m> >& V,T_ARRAYS_PARTICLES& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time,
-        const bool assume_particles_in_correct_blocks=true,const bool enforce_domain_boundaries=true);
     template<class T_ARRAYS_PARTICLES> void Second_Order_Runge_Kutta_Step_Particles(const ARRAY<T,FACE_INDEX<TV::m> >& V,T_ARRAYS_PARTICLES& particles,
         const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time,const bool update_particle_cells_after_euler_step=true,const bool verbose=true);
-    template<class T_ARRAYS_PARTICLES> void Second_Order_Runge_Kutta_Step_Particles_Threaded(RANGE<TV_INT>& domain,const ARRAY<T,FACE_INDEX<TV::m> >& V,T_ARRAYS_PARTICLES& particles,
-        const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time,const bool verbose=true);
     template<class T_ARRAYS_PARTICLES> void Update_Particle_Cells(T_ARRAYS_PARTICLES& particles);
-    template<class T_ARRAYS_PARTICLES> void Update_Particle_Cells_Part_One_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES& particles,ARRAY<ARRAY<int>,TV_INT>& number_of_particles_per_block);
-#ifdef USE_PTHREADS
-    template<class T_ARRAYS_PARTICLES> void Update_Particle_Cells_Part_Two_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES& particles,const ARRAY<ARRAY<int>,TV_INT>& number_of_particles_per_block,ARRAY<ARRAY<TRIPLE<TV_INT,typename T_ARRAYS_PARTICLES::ELEMENT,int> >,TV_INT>& list_to_process,ARRAY<pthread_mutex_t>* mutexes,const ARRAY<int,TV_INT>* domain_index);
-    template<class T_ARRAYS_PARTICLES> void Update_Particle_Cells_Part_Three_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES& particles,const ARRAY<ARRAY<int>,TV_INT>& number_of_particles_per_block,ARRAY<ARRAY<TRIPLE<TV_INT,typename T_ARRAYS_PARTICLES::ELEMENT,int> >,TV_INT>& list_to_process,ARRAY<pthread_mutex_t>* mutexes,const ARRAY<int,TV_INT>* domain_index);
-#else
-    template<class T_ARRAYS_PARTICLES> void Update_Particle_Cells_Part_Two_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES& particles,const ARRAY<ARRAY<int>,TV_INT>& number_of_particles_per_block,ARRAY<ARRAY<TRIPLE<TV_INT,typename T_ARRAYS_PARTICLES::ELEMENT,int> >,TV_INT>& list_to_process,void* mutexes,const void* domain_index);
-    template<class T_ARRAYS_PARTICLES> void Update_Particle_Cells_Part_Three_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES& particles,const ARRAY<ARRAY<int>,TV_INT>& number_of_particles_per_block,ARRAY<ARRAY<TRIPLE<TV_INT,typename T_ARRAYS_PARTICLES::ELEMENT,int> >,TV_INT>& list_to_process,void* mutexes,const void* domain_index);
-#endif
-    template<class T_ARRAYS_PARTICLES> void Update_Particle_Cells_Find_List(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES& particles,const ARRAY<ARRAY<int>,TV_INT>& number_of_particles_per_block,ARRAY<ARRAY<TRIPLE<TV_INT,typename T_ARRAYS_PARTICLES::ELEMENT,int> >,TV_INT>& list_to_process);
-    template<class T_ARRAYS_PARTICLES> void Delete_Marked_Particles(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES& particles);
-    template<class T_ARRAYS_PARTICLES> void Consistency_Check(RANGE<TV_INT> domain,T_ARRAYS_PARTICLES& particles);
+    template<class T_ARRAYS_PARTICLES> void Update_Particle_Cells_Find_List(T_ARRAYS_PARTICLES& particles,const ARRAY<ARRAY<int>,TV_INT>& number_of_particles_per_block,ARRAY<ARRAY<TRIPLE<TV_INT,typename T_ARRAYS_PARTICLES::ELEMENT,int> >,TV_INT>& list_to_process);
+    template<class T_ARRAYS_PARTICLES> void Delete_Marked_Particles(T_ARRAYS_PARTICLES& particles);
+    template<class T_ARRAYS_PARTICLES> void Consistency_Check(T_ARRAYS_PARTICLES& particles);
     int Reseed_Particles(const T time,ARRAY<bool,TV_INT>* cell_centered_mask=0);
     int Reseed_Delete_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,const int sign);
-    void Identify_Escaped_Particles(RANGE<TV_INT>& domain,const int sign=0);
+    void Identify_Escaped_Particles(const int sign=0);
     void Delete_All_Particles_In_Cell(const TV_INT& block);
     void Delete_Deep_Escaped_Particles(const T radius_fraction=1.5,const bool need_to_identify_escaped_particles=true,const bool verbose=false);
     void Delete_Particles_Outside_Grid();
-    void Delete_Particles_Far_Outside_Grid(RANGE<TV_INT>& domain);
-    void Delete_Particles_Near_Outside_Grid(RANGE<TV_INT>& domain,int axis,int side);
+    void Delete_Particles_Far_Outside_Grid();
+    void Delete_Particles_Near_Outside_Grid(int axis,int side);
     void Delete_Particles_In_Local_Maximum_Phi_Cells(const int sign);
-    void Delete_Particles_In_Local_Maximum_Phi_Cells_Threaded(RANGE<TV_INT>& domain,const int sign,const T tolerance);
     void Identify_And_Remove_Escaped_Particles(const ARRAY<T,FACE_INDEX<TV::m> >& V,const T radius_fraction=1.5,const T time=0,const bool verbose=true);
-    void Identify_And_Remove_Escaped_Particles_Threaded(RANGE<TV_INT>& domain,const ARRAY<T,FACE_INDEX<TV::m> >& V,const T radius_fraction=1.5,const T time=0,const bool verbose=true);
     void Identify_And_Remove_Escaped_Positive_Particles(const ARRAY<T,FACE_INDEX<TV::m> >& V,const T radius_fraction=1.5,const T time=0,const bool verbose=true);
     void Reincorporate_Removed_Particles(const T radius_fraction,const T mass_scaling,ARRAY<T,FACE_INDEX<TV::m> >* V,const bool conserve_momentum_for_removed_negative_particles=true);
-    void Reincorporate_Removed_Particles_Threaded(RANGE<TV_INT>& domain,const T radius_fraction,const T mass_scaling,ARRAY<T,FACE_INDEX<TV::m> >* V);
     bool Fix_Momentum_With_Escaped_Particles(const ARRAY<T,FACE_INDEX<TV::m> >& V,const ARRAY<T,TV_INT>& momentum_lost,const T radius_fraction,const T mass_scaling,const T time,const bool force=true);
     bool Fix_Momentum_With_Escaped_Particles(const TV& location,const ARRAY<T,FACE_INDEX<TV::m> >& V,const T momentum_lost,const T radius_fraction,const T mass_scaling,const T time,const bool force=true);
 
     void Delete_Particles_Far_From_Interface(const int discrete_band=4);
-    void Delete_Particles_Far_From_Interface_Part_One(RANGE<TV_INT>& domain,T_ARRAYS_CHAR& near_interface);
-    void Delete_Particles_Far_From_Interface_Part_Two(RANGE<TV_INT>& domain,T_ARRAYS_CHAR& near_interface,const int discrete_band=4);
-    void Delete_Particles_Far_From_Interface_Part_Three(RANGE<TV_INT>& domain,T_ARRAYS_CHAR& near_interface);
     void Add_Negative_Particle(const TV& particle_location,const TV& particle_velocity,const unsigned short quantized_collision_distance);
     void Exchange_Overlap_Particles();
-    template<class T_ARRAYS_PARTICLES> void Modify_Levelset_Using_Escaped_Particles_Threaded(RANGE<TV_INT>& domain,ARRAY<T,TV_INT>& phi,T_ARRAYS_PARTICLES& particles,ARRAY<T,FACE_INDEX<TV::m> >* V,const int sign,const T one_over_radius_multiplier);
 protected:
-#ifdef USE_PTHREADS
     bool Attract_Individual_Particle_To_Interface_And_Adjust_Radius(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,PARTICLE_LEVELSET_PARTICLES<TV>& cell_particles,
         const T phi_min,const T phi_max,const BLOCK_UNIFORM<TV>& block,const int index,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time,const bool delete_particles_that_leave_original_cell,
-        RANDOM_NUMBERS<T>& local_random,ARRAY<ARRAY<TRIPLE<TV_INT,PARTICLE_LEVELSET_PARTICLES<TV>*,int> >,TV_INT>& list_to_process,ARRAY<pthread_mutex_t>* mutexes,const ARRAY<int,TV_INT>* domain_index);
-#else
-    bool Attract_Individual_Particle_To_Interface_And_Adjust_Radius(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,PARTICLE_LEVELSET_PARTICLES<TV>& cell_particles,
-        const T phi_min,const T phi_max,const BLOCK_UNIFORM<TV>& block,const int index,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time,const bool delete_particles_that_leave_original_cell,
-        RANDOM_NUMBERS<T>& local_random,ARRAY<ARRAY<TRIPLE<TV_INT,PARTICLE_LEVELSET_PARTICLES<TV>*,int> >,TV_INT>& list_to_process,void* mutexes,const void* domain_index);
-#endif
+        RANDOM_NUMBERS<T>& local_random,ARRAY<ARRAY<TRIPLE<TV_INT,PARTICLE_LEVELSET_PARTICLES<TV>*,int> >,TV_INT>& list_to_process);
     void Adjust_Particle_Radii(const BLOCK_UNIFORM<TV>& block,PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int sign);
     template<class T_ARRAYS_PARTICLES> void Modify_Levelset_Using_Escaped_Particles(ARRAY<T,TV_INT>& phi,T_ARRAYS_PARTICLES& particles,ARRAY<T,FACE_INDEX<TV::m> >* V,const int sign);
     int Reseed_Add_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& other_particles,const int sign,
         const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time,ARRAY<bool,TV_INT>* cell_centered_mask);
-    void Reseed_Add_Particles_Threaded_Part_One(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& other_particles,const int sign,ARRAY<bool,TV_INT>* cell_centered_mask,ARRAY<int,TV_INT>& number_of_particles_to_add);
-#ifdef USE_PTHREADS
-    void Reseed_Add_Particles_Threaded_Part_Two(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,const int sign,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time,const ARRAY<int,TV_INT>& number_of_particles_to_add,ARRAY<ARRAY<TRIPLE<TV_INT,PARTICLE_LEVELSET_PARTICLES<TV>*,int> >,TV_INT>& list_to_process,ARRAY<pthread_mutex_t>* mutexes,const ARRAY<int,TV_INT>* domain_index);
-#else
-    void Reseed_Add_Particles_Threaded_Part_Two(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,const int sign,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time,const ARRAY<int,TV_INT>& number_of_particles_to_add,ARRAY<ARRAY<TRIPLE<TV_INT,PARTICLE_LEVELSET_PARTICLES<TV>*,int> >,TV_INT>& list_to_process,void* mutexes,const void* domain_index);
-#endif
-    //void Copy_From_Move_List_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,ARRAY<ARRAY<TRIPLE<PARTICLE_LEVELSET_PARTICLES<TV>*,TV_INT,int> >,TV_INT>& move_particles,ARRAY<pthread_mutex_t>* mutexes,const ARRAY<int,TV_INT>* domain_index);
     void Identify_Escaped_Particles(const BLOCK_UNIFORM<TV>& block,PARTICLE_LEVELSET_PARTICLES<TV>& particles,ARRAY<bool>& escaped,const int sign);
     int Delete_Deep_Escaped_Particles(const BLOCK_UNIFORM<TV>& block,PARTICLE_LEVELSET_PARTICLES<TV>& particles,ARRAY<bool>& escaped,const int sign,const T radius_fraction,
         const bool need_to_identify_escaped_particles);

@@ -12,7 +12,6 @@
 #include <Core/Matrices/SYMMETRIC_MATRIX.h>
 #include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/SCALAR_POLICY.h>
-#include <Tools/Parallel_Computation/THREAD_QUEUE.h>
 #include <Grid_Tools/Grids/FACE_INDEX.h>
 #include <Grid_PDE/Interpolation/FACE_LOOKUP_UNIFORM.h>
 #include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>

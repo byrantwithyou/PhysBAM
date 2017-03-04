@@ -13,7 +13,6 @@
 #include <Core/Matrices/SYMMETRIC_MATRIX.h>
 #include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/SCALAR_POLICY.h>
-#include <Tools/Parallel_Computation/THREAD_QUEUE.h>
 #include <Grid_Tools/Grids/FACE_INDEX.h>
 #include <Grid_PDE/Interpolation/FACE_LOOKUP_UNIFORM.h>
 #include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
@@ -65,7 +64,6 @@ public:
     ARRAY<TV,TV_INT>* normals;
     ARRAY<T,TV_INT> *curvature;
     ARRAY<INTERVAL<T>,TV_INT> *cell_range;
-    THREAD_QUEUE *thread_queue;
     int number_of_ghost_cells;
 
     LEVELSET(GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input,const int number_of_ghost_cells_input=3);

@@ -34,40 +34,6 @@ RENDER_WORLD()
 //#####################################################################
 // Render
 //#####################################################################
-#ifdef USE_PTHREADS
-#include <Tools/Parallel_Computation/THREAD_QUEUE.h>
-template<class T>
-class RENDER_TASK:public THREAD_QUEUE::TASK
-{
-    RENDER_WORLD<T>& world;
-    PROGRESS_INDICATOR& progress;
-    pthread_mutex_t* mutex;
-    RANGE<VECTOR<int,2> > box;
-
-public:
-    RENDER_TASK(RENDER_WORLD<T>& world,PROGRESS_INDICATOR& progress,pthread_mutex_t* mutex,const RANGE<VECTOR<int,2> >& box)
-        :world(world),progress(progress),mutex(mutex),box(box)
-    {}
-
-    void Run()
-    {RENDERING_RAY<T> dummy_root;
-    ARRAY<typename FILM<T>::SAMPLE> samples;
-    world.camera.film.Generate_Samples(box,world.camera,samples);
-    for(int i=0;i<samples.m;i++){
-        typename FILM<T>::SAMPLE& sample=samples(i);
-        RENDERING_RAY<T> ray(RAY<VECTOR<T,3> >(world.camera.position,sample.world_position-world.camera.position),1,world.Point_Inside_Object(world.camera.position));
-        dummy_root.recursion_depth=0;dummy_root.current_object=world.ether;
-        sample.radiance=world.Cast_Ray(ray,dummy_root);
-        
-        world.camera.film.Add_Sample(sample);
-        if(i==samples.m){
-            progress.Progress();pthread_mutex_lock(mutex);pthread_mutex_unlock(mutex);}
-    }}
-
-    void Commit()
-    {progress.Progress();}
-};
-#endif
 template<class T> void RENDER_WORLD<T>::
 Render(const RANGE<VECTOR<int,2> >& pixels, PROGRESS_INDICATOR &progress)
 {
@@ -77,21 +43,7 @@ Render(const RANGE<VECTOR<int,2> >& pixels, PROGRESS_INDICATOR &progress)
     ARRAY<typename FILM<T>::SAMPLE> samples;
     progress.Initialize((lengths.x/box_size.x+1)*(lengths.y/box_size.y+1)); // +1 to account for rounding; occasionally will be incorrect, but will get close enough to 100% to judge
                                                                             // progress
-    if(threads>1){
-#ifdef USE_PTHREADS
-        pthread_mutex_t mutex;
-        pthread_mutex_init(&mutex,0);
-        THREAD_QUEUE task_queue(4);
-        for(int box_x=0;box_x*box_size.x<lengths.x;box_x++) for(int box_y=0;box_y*box_size.y<lengths.y;box_y++){
-                VECTOR<int,2> lower_corner=VECTOR<int,2>(box_x*box_size.x,box_y*box_size.y)+pixels.min_corner;
-                task_queue.Queue(new RENDER_TASK<T>(*this,progress,&mutex,RANGE<VECTOR<int,2> >(lower_corner,lower_corner+box_size)));}
-        task_queue.Wait();
-        pthread_mutex_destroy(&mutex);
-#else
-        PHYSBAM_FATAL_ERROR("Threads non 1, but USE_PTHREADS disabled");
-#endif
-    }
-    else for(int box_x=0;box_x*box_size.x<lengths.x;box_x++) for(int box_y=0;box_y*box_size.y<lengths.y;box_y++){
+    for(int box_x=0;box_x*box_size.x<lengths.x;box_x++) for(int box_y=0;box_y*box_size.y<lengths.y;box_y++){
         samples.Remove_All();
         VECTOR<int,2> lower_corner=VECTOR<int,2>(box_x*box_size.x,box_y*box_size.y)+pixels.min_corner;
         camera.film.Generate_Samples(RANGE<VECTOR<int,2> >(lower_corner,lower_corner+box_size),camera,samples);

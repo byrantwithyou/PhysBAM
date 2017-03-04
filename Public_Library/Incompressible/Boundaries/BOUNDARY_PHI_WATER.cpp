@@ -39,28 +39,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_BASE& u,T_ARRAYS_BASE& u_gh
     VECTOR<RANGE<TV_INT>,2*TV::m> regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells); 
     for(int axis=0;axis<TV::m;axis++)for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*axis+axis_side;
-        Fill_Single_Ghost_Region_Threaded(regions(side), grid, u_ghost, side);}
-}
-//#####################################################################
-// Function Fill_Single_Ghost_Region_Threaded
-//#####################################################################
-template<class TV> void BOUNDARY_PHI_WATER<TV>::
-Fill_Single_Ghost_Region_Threaded(RANGE<TV_INT>& region,const GRID<TV>& grid,T_ARRAYS_BASE& u_ghost,const int side) const
-{
-    if(use_extrapolation_mode && Constant_Extrapolation(side)) BOUNDARY<TV,T>::Fill_Single_Ghost_Region(grid,u_ghost,side,region);
-    else{ // either phi=phi_object for a wall, or no wall
-        int axis_side=side%2;
-        int axis=side/2;
-        RANGE<TV_INT> domain_indices=grid.Domain_Indices();
-        int inward_sign=axis_side==0?1:-1;T dx=grid.dX[axis],half_dx=(T).5*dx;
-        int cell_boundary=Boundary(side,region),face_boundary=cell_boundary+axis_side;
-        for(CELL_ITERATOR<TV> iterator(grid,region);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
-            TV_INT boundary_cell=cell,boundary_face=cell;boundary_cell[axis]=cell_boundary;boundary_face[axis]=face_boundary;
-            if(use_open_boundary_mode&&open_boundary(side)) u_ghost(cell)=callbacks->Open_Water_Phi(iterator.Location(),0);
-            else if(sign*u_ghost(boundary_cell) <= 0 && domain_indices.Lazy_Inside_Half_Open(boundary_cell) && inward_sign*V->Component(axis)(boundary_face) > tolerance){
-                T distance_to_boundary=inward_sign*dx*(cell_boundary-cell[axis]);
-                u_ghost(cell)=sign*(distance_to_boundary+max(-half_dx,sign*u_ghost(boundary_cell)));} // distance to wall
-            else u_ghost(cell)=u_ghost(boundary_cell);}}
+        Fill_Single_Ghost_Region(grid,u_ghost,side,regions(side));}
 }
 //#####################################################################
 template class BOUNDARY_PHI_WATER<VECTOR<float,1> >;

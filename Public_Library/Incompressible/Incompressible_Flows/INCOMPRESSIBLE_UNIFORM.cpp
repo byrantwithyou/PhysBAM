@@ -10,7 +10,6 @@
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Grid_Tools/Grids/NODE_ITERATOR.h>
-#include <Grid_Tools/Parallel_Computation/DOMAIN_ITERATOR_THREADED.h>
 #include <Grid_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #include <Grid_PDE/Advection/ADVECTION_MACCORMACK_UNIFORM.h>
 #include <Geometry/Level_Sets/EXTRAPOLATION_UNIFORM.h>
@@ -31,8 +30,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> INCOMPRESSIBLE_UNIFORM<TV>::
-INCOMPRESSIBLE_UNIFORM(const GRID<TV>& grid_input,PROJECTION_DYNAMICS_UNIFORM<TV>& projection_input,THREAD_QUEUE* thread_queue_input)
-    :grid(grid_input.Get_MAC_Grid()),mpi_grid(0),projection(projection_input),strain(0),collision_body_list(0),momentum_conserving_vorticity(false),use_vorticity_weights(false),energy_clamp(0),vc_projection_direction(0),buoyancy_constant(0),thread_queue(thread_queue_input),
+INCOMPRESSIBLE_UNIFORM(const GRID<TV>& grid_input,PROJECTION_DYNAMICS_UNIFORM<TV>& projection_input)
+    :grid(grid_input.Get_MAC_Grid()),mpi_grid(0),projection(projection_input),strain(0),collision_body_list(0),momentum_conserving_vorticity(false),use_vorticity_weights(false),energy_clamp(0),vc_projection_direction(0),buoyancy_constant(0),
     boundary_default(*new BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<TV>),advection_maccormack(0)
 { 
     boundary=&boundary_default;
@@ -79,12 +78,13 @@ Advance_One_Time_Step_Forces(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const 
     // update gravity
     for(int axis=0;axis<TV::m;axis++)
         if(gravity(axis))
-            DOMAIN_ITERATOR_THREADED_ALPHA<INCOMPRESSIBLE_UNIFORM<TV>,TV>(grid.Face_Indices()[axis],thread_queue).template Run<ARRAY<T,FACE_INDEX<TV::m> >&,const T,int>(*this,&INCOMPRESSIBLE_UNIFORM<TV>::Add_Gravity_Threaded,face_velocities,dt,axis);
+            for(FACE_ITERATOR<TV> iterator(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next())
+                face_velocities(iterator.Full_Index())+=dt*gravity[axis];
 
     // update body force
     if(use_force){
-        for(int axis=0;axis<TV::m;axis++)
-            DOMAIN_ITERATOR_THREADED_ALPHA<INCOMPRESSIBLE_UNIFORM<TV>,TV>(grid.Face_Indices()[axis],thread_queue).template Run<ARRAY<T,FACE_INDEX<TV::m> >&,const T,int>(*this,&INCOMPRESSIBLE_UNIFORM<TV>::Add_Body_Force_Threaded,face_velocities,dt,axis);
+        for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
+            face_velocities(iterator.Full_Index())+=dt*force(iterator.Full_Index());
         boundary->Apply_Boundary_Condition_Face(grid,face_velocities,time+dt);
         boundary->Fill_Ghost_Faces(grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);}
 
@@ -107,19 +107,6 @@ Advance_One_Time_Step_Forces(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const 
         Apply_Vorticity_Confinement_Force(face_velocities,F);}
 
     boundary->Apply_Boundary_Condition_Face(grid,face_velocities,time+dt);
-}
-template<class TV> void INCOMPRESSIBLE_UNIFORM<TV>::
-Add_Gravity_Threaded(RANGE<TV_INT>& domain,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,int axis)
-{
-    for(FACE_ITERATOR<TV> iterator(grid,domain,axis);iterator.Valid();iterator.Next())
-        if(gravity[axis])
-            face_velocities.Component(axis)(iterator.Face_Index())+=dt*gravity[axis];
-}
-template<class TV> void INCOMPRESSIBLE_UNIFORM<TV>::
-Add_Body_Force_Threaded(RANGE<TV_INT>& domain,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,int axis)
-{
-    for(FACE_ITERATOR<TV> iterator(grid,domain,axis);iterator.Valid();iterator.Next()){
-        face_velocities.Component(iterator.Axis())(iterator.Face_Index())+=dt*force.Component(iterator.Axis())(iterator.Face_Index());}
 }
 //#####################################################################
 // Function Update_Kinetic_Energy
@@ -437,7 +424,7 @@ Compute_Vorticity_Confinement_Force(const GRID<TV>& grid,const ARRAY<T,FACE_INDE
 template<class TV> void INCOMPRESSIBLE_UNIFORM<TV>::
 Use_Maccormack_Advection(const ARRAY<bool,TV_INT>* node_mask, const ARRAY<bool,TV_INT>* cell_mask, const ARRAY<bool,FACE_INDEX<TV::m> >* face_mask)
 {
-    advection_maccormack=new ADVECTION_MACCORMACK_UNIFORM<TV,T,ADVECTION<TV,T> >(*advection,node_mask,cell_mask,face_mask,thread_queue);
+    advection_maccormack=new ADVECTION_MACCORMACK_UNIFORM<TV,T,ADVECTION<TV,T> >(*advection,node_mask,cell_mask,face_mask);
     Set_Custom_Advection(*advection_maccormack);
 }
 //#####################################################################

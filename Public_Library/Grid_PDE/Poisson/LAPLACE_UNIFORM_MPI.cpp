@@ -76,39 +76,6 @@ Find_Matrix_Indices(ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS
     Find_Boundary_Indices_In_Region(6,RANGE<VECTOR<int,3> >(1,m,1,n,mn,mn),cell_index_to_matrix_index);
 }
 //#####################################################################
-// Function Find_Matrix_Indices
-//#####################################################################
-template<class TV> void LAPLACE_UNIFORM_MPI<TV>::
-Find_Matrix_Indices_Threaded(ARRAY<RANGE<TV_INT> >& domains,ARRAY<ARRAY<INTERVAL<int> > >& interior_indices,ARRAY<ARRAY<ARRAY<INTERVAL<int> > > >& ghost_indices,ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index,ARRAY<ARRAY<TV_INT> >& matrix_index_to_cell_index_array,LAPLACE_UNIFORM<TV>* laplace)
-{
-    assert(local_grid.Is_MAC_Grid());
-    //interior mpi cells, interior thread cells
-    for(int color=0;color<filled_region_ranks.m;color++) partitions(color).interior_indices.min_corner=filled_region_cell_count(color);
-    for(int i=0;i<domains.m;i++){
-        RANGE<TV_INT> interior_domain(domains(i));
-        interior_domain.max_corner-=TV_INT::All_Ones_Vector();interior_domain.min_corner+=TV_INT::All_Ones_Vector();
-        for(int color=0;color<interior_indices.m;color++) interior_indices(color)(i).min_corner=filled_region_cell_count(color);
-        laplace->Compute_Matrix_Indices(interior_domain,filled_region_cell_count,matrix_index_to_cell_index_array,cell_index_to_matrix_index);
-        for(int color=0;color<interior_indices.m;color++) interior_indices(color)(i).max_corner=filled_region_cell_count(color);}
-    for(int color=0;color<filled_region_ranks.m;color++) partitions(color).interior_indices.max_corner=filled_region_cell_count(color);
-    //boundary mpi cells
-    for(int axis=0;axis<TV::m;axis++) for(int side=0;side<2;side++){int s=axis*2+side;
-        for(int color=0;color<filled_region_ranks.m;color++) partitions(color).ghost_indices(s).min_corner=filled_region_cell_count(color);
-        RANGE<TV_INT> exterior_domain(local_grid.Domain_Indices(1));
-        for(int axis2=axis+1;axis2<TV::m;axis2++){exterior_domain.min_corner(axis2)++;exterior_domain.max_corner(axis2)--;}
-        if(side==0) exterior_domain.max_corner(axis)=exterior_domain.min_corner(axis);
-        else exterior_domain.min_corner(axis)=exterior_domain.max_corner(axis);
-        for(int i=0;i<domains.m;i++){
-            RANGE<TV_INT> interior_domain(domains(i));
-            interior_domain.max_corner-=TV_INT::All_Ones_Vector();for(int axis=0;axis<TV_INT::m;axis++) if(interior_domain.max_corner(axis)==local_grid.Domain_Indices().max_corner(axis)) interior_domain.max_corner(axis)++;
-            interior_domain.min_corner+=TV_INT::All_Ones_Vector();for(int axis=0;axis<TV_INT::m;axis++) if(interior_domain.min_corner(axis)==local_grid.Domain_Indices().min_corner(axis)) interior_domain.min_corner(axis)--;
-            for(int color=0;color<interior_indices.m;color++) ghost_indices(color)(i)(s).min_corner=filled_region_cell_count(color);
-            laplace->Compute_Matrix_Indices(RANGE<TV_INT>::Intersect(exterior_domain,interior_domain),filled_region_cell_count,matrix_index_to_cell_index_array,cell_index_to_matrix_index);
-            for(int color=0;color<interior_indices.m;color++) ghost_indices(color)(i)(s).max_corner=filled_region_cell_count(color);}
-        for(int color=0;color<filled_region_ranks.m;color++) partitions(color).ghost_indices(s).max_corner=filled_region_cell_count(color);
-        Find_Boundary_Indices_In_Region(s,exterior_domain,cell_index_to_matrix_index);}
-}
-//#####################################################################
 // Function Find_Matrix_Indices_In_Region
 //#####################################################################
 template<class TV> void LAPLACE_UNIFORM_MPI<TV>::
@@ -153,7 +120,6 @@ Find_Boundary_Indices_In_Region(const int side,const RANGE<TV_INT>& region,T_ARR
 template<class TV> void LAPLACE_UNIFORM_MPI<TV>::Find_Matrix_Indices(ARRAY<int,VECTOR<int,1> >&,T_ARRAYS_INT&,ARRAY<ARRAY<TV_INT> >&,const VECTOR<T,1>&){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> void LAPLACE_UNIFORM_MPI<TV>::Find_Matrix_Indices(ARRAY<int,VECTOR<int,1> >&,T_ARRAYS_INT&,ARRAY<ARRAY<TV_INT> >&,const VECTOR<T,2>&){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> void LAPLACE_UNIFORM_MPI<TV>::Find_Matrix_Indices(ARRAY<int,VECTOR<int,1> >&,T_ARRAYS_INT&,ARRAY<ARRAY<TV_INT> >&,const VECTOR<T,3>&){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-template<class TV> void LAPLACE_UNIFORM_MPI<TV>::Find_Matrix_Indices_Threaded(ARRAY<RANGE<TV_INT> >&,ARRAY<ARRAY<INTERVAL<int> > >&,ARRAY<ARRAY<ARRAY<INTERVAL<int> > > >&,ARRAY<int,VECTOR<int,1> >&,T_ARRAYS_INT&,ARRAY<ARRAY<TV_INT> >&,LAPLACE_UNIFORM<TV>*){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 //#####################################################################
 
 #endif
@@ -161,8 +127,7 @@ template<class TV> void LAPLACE_UNIFORM_MPI<TV>::Find_Matrix_Indices_Threaded(AR
 //#####################################################################
 #define P(...) __VA_ARGS__
 #define INSTANTIATION_HELPER(TV) \
-    template void LAPLACE_UNIFORM_MPI<TV>::Find_Matrix_Indices(ARRAY<int,VECTOR<int,1> >&,T_ARRAYS_INT&,ARRAY<ARRAY<TV_INT> >&,const TV&); \
-    template void LAPLACE_UNIFORM_MPI<TV>::Find_Matrix_Indices_Threaded(ARRAY<RANGE<TV_INT> >&,ARRAY<ARRAY<INTERVAL<int> > >&,ARRAY<ARRAY<ARRAY<INTERVAL<int> > > >&,ARRAY<int,VECTOR<int,1> >&,T_ARRAYS_INT&,ARRAY<ARRAY<TV_INT> >&,LAPLACE_UNIFORM<TV>*);
+    template void LAPLACE_UNIFORM_MPI<TV>::Find_Matrix_Indices(ARRAY<int,VECTOR<int,1> >&,T_ARRAYS_INT&,ARRAY<ARRAY<TV_INT> >&,const TV&);
 template LAPLACE_UNIFORM_MPI<VECTOR<float,1> >::LAPLACE_UNIFORM_MPI(LAPLACE_UNIFORM<P(VECTOR<float,1>) >&);
 template LAPLACE_UNIFORM_MPI<VECTOR<float,2> >::LAPLACE_UNIFORM_MPI(LAPLACE_UNIFORM<P(VECTOR<float,2>) >&);
 template LAPLACE_UNIFORM_MPI<VECTOR<float,3> >::LAPLACE_UNIFORM_MPI(LAPLACE_UNIFORM<P(VECTOR<float,3>) >&);

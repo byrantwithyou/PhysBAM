@@ -13,7 +13,6 @@
 #include <Tools/Parallel_Computation/MPI_UTILITIES.h>
 #include <Tools/Parallel_Computation/SPARSE_MATRIX_PARTITION.h>
 #include <Grid_Tools/Grids/GRID.h>
-#include <Grid_Tools/Parallel_Computation/THREADED_UNIFORM_GRID.h>
 namespace PhysBAM{
 
 class SPARSE_MATRIX_PARTITION;
@@ -25,7 +24,6 @@ class PCG_SPARSE_MPI:public NONCOPYABLE
 public:
     PCG_SPARSE<T>& pcg;
     MPI::Intracomm& comm;
-    THREADED_UNIFORM_GRID<TV>* thread_grid;
     SPARSE_MATRIX_PARTITION& partition;
     ARRAY<MPI::Datatype> boundary_datatypes,ghost_datatypes;
     ARRAY<ARRAY<int> > columns_to_send;
@@ -51,9 +49,7 @@ public:
     void Parallel_Solve(SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& x_local,ARRAY<T>& b_local,const ARRAY<VECTOR<int,2> >& proc_column_index_boundaries,
         const T tolerance=1e-7,const bool recompute_preconditioner=true);
     void Find_Ghost_Regions(SPARSE_MATRIX_FLAT_MXN<T>& A,const ARRAY<VECTOR<int,2> >& proc_column_index_boundaries);
-    void Find_Ghost_Regions_Threaded(SPARSE_MATRIX_FLAT_MXN<T>& A,const ARRAY<VECTOR<int,2> >& proc_column_index_boundaries);
     void Fill_Ghost_Cells_Far(ARRAY<T>& x);
-    void Fill_Ghost_Cells_Threaded(ARRAY<T>& x);    
     void Initialize_Datatypes();
 //#####################################################################
 };
