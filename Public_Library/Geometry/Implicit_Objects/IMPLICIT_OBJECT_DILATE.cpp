@@ -12,7 +12,6 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_DILATE.h>
 #include <Geometry/Intersections/RAY_BOX_INTERSECTION.h>
 #include <Geometry/Level_Sets/IMPLICIT_OBJECT_ON_A_RAY.h>
-#include <Geometry/Level_Sets/IMPLICIT_OBJECT_ON_A_RAY_SECONDARY_INTERPOLATION.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 namespace PhysBAM{
 //#####################################################################

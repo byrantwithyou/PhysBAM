@@ -11,7 +11,6 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Intersections/RAY_BOX_INTERSECTION.h>
 #include <Geometry/Level_Sets/IMPLICIT_OBJECT_ON_A_RAY.h>
-#include <Geometry/Level_Sets/IMPLICIT_OBJECT_ON_A_RAY_SECONDARY_INTERPOLATION.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -92,7 +91,6 @@ Intersection(RAY<TV>& ray,const T thickness) const
         else return false;}
     else{ // use_secondary_interpolation
         // set up marching
-        //IMPLICIT_OBJECT_ON_A_RAY_SECONDARY_INTERPOLATION<T> implicit_surface_on_a_ray(*this,ray); // TODO: we should probably be using this instead
         IMPLICIT_OBJECT_ON_A_RAY<IMPLICIT_OBJECT> implicit_surface_on_a_ray(*this,ray);
         ITERATIVE_SOLVER<T> iterative_solver;iterative_solver.tolerance=Iterative_Solver_Tolerance<T>()*thickness;
         // start marching
