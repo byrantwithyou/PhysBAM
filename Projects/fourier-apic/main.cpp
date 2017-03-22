@@ -12,6 +12,9 @@
 #include <Grid_Tools/Fourier_Transforms/FFT_2D.h>
 #include <Grid_Tools/Fourier_Transforms/FFTW.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
+#include <Geometry/Images/EPS_FILE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_DRIVER.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
@@ -23,7 +26,7 @@
 
 using namespace PhysBAM;
 
-typedef double RW;
+typedef float RW;
 typedef double T;
 typedef VECTOR<T,2> TV;
 typedef VECTOR<int,TV::m> TV_INT;
@@ -79,6 +82,8 @@ int main(int argc, char* argv[])
     int irregular_seeding=0;
     int seed=-1;
     std::string output_filename="eigen.png";
+    std::string viewer_directory="output";
+    bool dump_particles=false;
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Add("-resolution",&resolution,"num","transfer resolution");
     parse_args.Add("-size",&size,"num","analyze transfer as though this resolution");
@@ -87,8 +92,10 @@ int main(int argc, char* argv[])
     parse_args.Add("-order",&order,"order","interpolation order");
     parse_args.Add("-ppd",&particles_per_dim,"num","particles per cell per dimension");
     parse_args.Add("-o",&output_filename,"file.png","filename for output image");
+    parse_args.Add("-v",&viewer_directory,"dir","viewer directory");
     parse_args.Add("-irreg",&irregular_seeding,"num","each cell is seeded identicially with num particles");
     parse_args.Add("-seed",&seed,"seed","random number generator seed (-1 = timer)");
+    parse_args.Add("-dump_particles",&dump_particles,"Output particle distribution");
     parse_args.Parse();
 
     PHYSBAM_ASSERT(resolution<=size);
@@ -154,6 +161,14 @@ int main(int argc, char* argv[])
 
     PNG_FILE<T>::Write(output_filename,image);
 
+    if(dump_particles){
+        VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),example.grid,viewer_directory);
+        for(int i=0;i<example.particles.X.m;i++)
+            Add_Debug_Particle(example.particles.X(i),VECTOR<T,3>(1,0,0));
+        Flush_Frame<TV>("particles");
+        Flush_Frame<TV>("end");
+    }
+    
     return 0;
 }
 
