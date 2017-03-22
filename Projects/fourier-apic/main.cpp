@@ -3,6 +3,8 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
+#include <Core/Math_Tools/RANGE_ITERATOR.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Tools/Images/PNG_FILE.h>
 #include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
@@ -37,6 +39,31 @@ struct FOURIER_EXAMPLE: public MPM_EXAMPLE<TV>
     void Initialize() override {}
 };
 
+// X is particle seeding in unit box; replicate it in every grid cell
+void Replicate_Particles(MPM_PARTICLES<TV>& particles,const GRID<TV>& grid,const ARRAY<TV>& X)
+{
+    for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
+        TV offset=grid.Node(it.index);
+        for(int i=0;i<X.m;i++){
+            int p=particles.Add_Element();
+            particles.X(p)=offset+grid.dX*X(i);
+            particles.mass(p)=1;
+            particles.valid(p)=true;}}
+}
+
+void Sample_Box_Regularly(ARRAY<TV>& X,int particles_per_dim)
+{
+    GRID<TV> init_grid(TV_INT()+particles_per_dim,RANGE<TV>::Unit_Box(),true);
+    for(CELL_ITERATOR<TV> it(init_grid);it.Valid();it.Next())
+        X.Append(it.Location());
+}
+
+void Sample_Box_Random(RANDOM_NUMBERS<T>& rand,ARRAY<TV>& X,int number_of_particles)
+{
+    for(int i=0;i<number_of_particles;i++)
+        X.Append(rand.Get_Uniform_Vector(RANGE<TV>::Unit_Box()));
+}
+
 int main(int argc, char* argv[])
 {
 #ifdef USE_OPENMP
@@ -47,29 +74,38 @@ int main(int argc, char* argv[])
     T flip=0;
     int order=3;
     int resolution=16;
+    int size=256;
     int particles_per_dim=2;
+    int irregular_seeding=0;
+    int seed=-1;
     std::string output_filename="eigen.png";
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add("-resolution",&resolution,"num","resolution");
+    parse_args.Add("-resolution",&resolution,"num","transfer resolution");
+    parse_args.Add("-size",&size,"num","analyze transfer as though this resolution");
     parse_args.Add("-affine",&use_affine,"use affine transfers");
     parse_args.Add("-flip",&flip,"num","flip ratio");
     parse_args.Add("-order",&order,"order","interpolation order");
     parse_args.Add("-ppd",&particles_per_dim,"num","particles per cell per dimension");
     parse_args.Add("-o",&output_filename,"file.png","filename for output image");
+    parse_args.Add("-irreg",&irregular_seeding,"num","each cell is seeded identicially with num particles");
+    parse_args.Add("-seed",&seed,"seed","random number generator seed (-1 = timer)");
     parse_args.Parse();
 
+    PHYSBAM_ASSERT(resolution<=size);
+    
     FOURIER_EXAMPLE<TV> example;
     MPM_DRIVER<TV> driver(example);
 
     TV_INT center=TV_INT()+resolution/2;
-
+    RANDOM_NUMBERS<T> rand;
+    if(seed!=-1) rand.Set_Seed(seed);
+    
     example.grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-    GRID<TV> init_grid(TV_INT()+particles_per_dim*resolution,RANGE<TV>::Unit_Box(),true);
-    for(CELL_ITERATOR<TV> it(init_grid);it.Valid();it.Next()){
-        int p=example.particles.Add_Element();
-        example.particles.X(p)=it.Location();
-        example.particles.mass(p)=1;
-        example.particles.valid(p)=true;}
+    ARRAY<TV> unit_X;
+    if(irregular_seeding) Sample_Box_Random(rand,unit_X,irregular_seeding);
+    else Sample_Box_Regularly(unit_X,particles_per_dim);
+    Replicate_Particles(example.particles,example.grid,unit_X);
+
     example.velocity_new.Resize(example.grid.Cell_Indices(3));
     example.velocity.Resize(example.grid.Cell_Indices(3));
     example.mass.Resize(example.grid.Cell_Indices(3));
@@ -86,16 +122,15 @@ int main(int argc, char* argv[])
     driver.Grid_To_Particle();
     driver.Particle_To_Grid();
 
-    ARRAY<std::complex<T>,TV_INT> row(example.grid.Cell_Indices(0));
-    for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
-        TV_INT new_index=it.index+center;
-        for(int i=0;i<TV::m;i++) new_index(i)%=resolution;
-        row(it.index)=example.velocity(new_index).x;}
-    LOG::printf("%.16P\n",row);
+    ARRAY<std::complex<T>,TV_INT> row(TV_INT()+size);
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>::Unit_Box()*resolution);it.Valid();it.Next()){
+        TV_INT index=it.index-center;
+        for(int i=0;i<TV::m;i++) if(index(i)<0) index(i)+=size;
+        row(index)=example.velocity(it.index).x;}
 
-    ARRAY<std::complex<T>,TV_INT> out(example.grid.Cell_Indices(0));
+    ARRAY<std::complex<T>,TV_INT> out(row.domain);
 
-    fftw_plan plan=fftw_plan_dft_2d(example.grid.counts.x,example.grid.counts.y,
+    fftw_plan plan=fftw_plan_dft_2d(size,size,
         (fftw_complex*)row.array.base_pointer,(fftw_complex*)out.array.base_pointer,
         FFTW_FORWARD,FFTW_ESTIMATE);
     fftw_execute(plan);
@@ -113,8 +148,8 @@ int main(int argc, char* argv[])
     icm.colors.Add_Control_Point(1-.64,VECTOR<T,3>(.5,0,1));
     icm.colors.Add_Control_Point(0,VECTOR<T,3>(0,0,0));
 
-    ARRAY<VECTOR<T,3>,TV_INT> image(example.grid.Cell_Indices(0));
-    for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next())
+    ARRAY<VECTOR<T,3>,TV_INT> image(out.domain);
+    for(RANGE_ITERATOR<TV::m> it(image.domain);it.Valid();it.Next())
         image(it.index)=icm(abs(out(it.index)));
 
     PNG_FILE<T>::Write(output_filename,image);
