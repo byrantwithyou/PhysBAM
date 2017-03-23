@@ -32,6 +32,7 @@
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_DIAGNOSTICS.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D.h>
+#include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_HEIGHTFIELD_2D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_LEVELSET_3D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_MPM_PARTICLES_3D.h>
@@ -463,6 +464,14 @@ Initialize_Components_And_Key_Bindings()
         pressure_gradient_component->opengl_scalar_field.Update();
         Add_Component(pressure_gradient_component,"Pressure Gradient",'1',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         slice_manager.Add_Object(pressure_gradient_component);}
+
+    filename=basedir+"/%d/heightfield";
+    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+        std::string velocity_filename=basedir+"/%d/heightfield_velocity";
+        if(!FILE_UTILITIES::Frame_File_Exists(velocity_filename,start_frame)) velocity_filename="";
+        OPENGL_COMPONENT_HEIGHTFIELD_2D<T>* heightfield=new OPENGL_COMPONENT_HEIGHTFIELD_2D<T>(stream_type,grid.Remove_Dimension(1),filename,"",velocity_filename);
+        Add_Component(heightfield,"Heightfield",'1',BASIC_VISUALIZATION<T>::OWNED);
+        slice_manager.Add_Object(heightfield);}
 
     opengl_world.Set_Key_Binding_Category("Velocity");
     { // regular and mac velocity TODO: kill node based stuff?
