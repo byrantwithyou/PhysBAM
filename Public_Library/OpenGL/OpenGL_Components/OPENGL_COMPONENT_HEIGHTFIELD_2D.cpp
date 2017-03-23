@@ -208,7 +208,7 @@ Reinitialize(bool force)
                     if(!uv->Size().All_Greater_Equal(counts))
                         success = false;
                     else{
-                        int idx = 1;
+                        int idx = 0;
                         for(int i=domain.min_corner.x;i<domain.max_corner.x;i++)for(int j=domain.min_corner.y;j<domain.max_corner.y;j++){
                             vector_field(idx) = TV((*uv)(i,j).x,0,(*uv)(i,j).y);
                             TV2 pt=grid.X(TV_INT2(i,j));
