@@ -1,0 +1,5 @@
+# SConscript
+
+Import('env Automatic_Program')
+env=env.Copy(USE_COMPRESSIBLE=1)
+Automatic_Program(env,"shallow_water",["main.cpp","Tests_Common.cpp","Tests_2D.cpp","Tests_3D.cpp"]);
