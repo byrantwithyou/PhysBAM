@@ -34,7 +34,6 @@ private:
     void Update_Or_Add_Neighbor(ARRAY<T,TV_INT>& phi_ghost,ARRAY<bool,TV_INT>& done,ARRAY<int,TV_INT>& close_k,ARRAY<TV_INT>& heap,int& heap_length,const TV_INT& neighbor);
     void Initialize_Interface(ARRAY<T,TV_INT>& phi_ghost,ARRAY<bool,TV_INT>& done,ARRAY<int,TV_INT>& close_k,ARRAY<TV_INT>& heap,int& heap_length,const ARRAY<TV_INT>* seed_indices=0,
         const bool add_seed_indices_for_ghost_cells=false);
-    void Initialize_Interface(ARRAY<T,TV_INT>& phi_ghost,ARRAY<bool,TV_INT>& done,ARRAY<int,TV_INT>& close_k,ARRAY<TV_INT>& heap,int& heap_length,const bool add_seed_indices_for_ghost_cells=false);
     void Update_Close_Point(ARRAY<T,TV_INT>& phi_ghost,const ARRAY<bool,TV_INT>& done,const TV_INT& index);
     void Add_To_Initial(ARRAY<bool,TV_INT>& done,ARRAY<int,TV_INT>& close_k,const TV_INT& index);
 //#####################################################################
