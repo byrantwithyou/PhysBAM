@@ -90,12 +90,12 @@ Initialize()
     example.particles.Store_C(false);
     PHYSBAM_ASSERT(!example.particles.store_B || !example.particles.store_C);
 
-    for(PHASE_ID i(0);i<example.phases.m;i++)
-        example.phases(i).Initialize(example.grid,
-                                     example.weights,
-                                     example.ghost,
-                                     example.threads);
-    example.phi.Resize(example.grid.Domain_Indices(example.ghost));
+    if(Value(example.phases.m)>1) example.use_phi=true;
+    for(PHASE_ID i(0);i<example.phases.m;i++){
+        PHASE& ph=example.phases(i);
+        ph.Initialize(example.grid,example.weights,example.ghost,example.threads);
+        ph.phi.Resize(example.grid.Domain_Indices(example.ghost));
+        if(example.use_phi) ph.levelset=new LEVELSET<TV>(example.grid,ph.phi,example.ghost);}
 
     RANGE<TV_INT> range(example.grid.Cell_Indices(example.ghost));
     example.location.Resize(example.grid,example.ghost);
@@ -272,41 +272,34 @@ Particle_To_Grid(PHASE& ph) const
 // Function Build_Level_Sets
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Build_Level_Sets()
+Build_Level_Sets(PHASE& ph)
 {
-    const T dx=example.grid.dX.Max();
+    PHYSBAM_ASSERT(ph.levelset);
     const T dilation=example.dilation;
-    
-    for(int i=0;i<example.phi.array.m;i++){
-        example.phi.array(i)=10;}
+
+    ph.phi.array.Fill(10);
 
     const MPM_PARTICLES<TV>& particles=example.particles;
-    
-    for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
-        TV_INT index=it.Cell_Index();
-        for(int p=0;p<example.particles.X.m;p++){
-            TV grid_location=it.Location();
-            T r=sqrt(particles.volume(p)/pi)+dilation;
-            T d=(example.particles.X(p)-grid_location).Magnitude();
-            example.phi(index)=min(example.phi(index),d-r);
-        }
-    }
 
-    if(example.use_reinit)
-        Reinitialize(*example.levelsets,
-                     400,
-                     (T)40,
-                     (T)dilation,
-                     (T)dilation,
-                     (T)0.25,
-                     3,3,
-                     1);
+    T dx=example.grid.dX.Max();
+    RANGE<TV_INT> grid_domain=example.grid.Domain_Indices(example.ghost);
+    for(int p=0;p<example.particles.X.m;p++){
+//        T r=sqrt(particles.volume(p)/pi)+dilation;
+        T r=0.36*dx;
+        T influence_bound=r+dx*(T)1.1;
+        TV X=example.particles.X(p);
+        RANGE<TV> bound(X-influence_bound,X+influence_bound);
+        RANGE<TV_INT> range=example.grid.Clamp_To_Cell(bound).Intersect(grid_domain);
+        for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
+            T d=(X-example.grid.Cell(it.index)).Magnitude();
+            ph.phi(it.index)=min(ph.phi(it.index),d-r);}}
+
+    ph.levelset->Fast_Marching_Method(example.time,5*dx); // TODO: better distance
+
+    Reinitialize(*example.levelsets,400,40,dilation,dilation,(T)0.25,3,3,1);
 
     if(example.use_shrink)
-        for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
-            TV_INT index=it.Cell_Index();
-            example.phi(index)+=dilation;
-        }
+        example.phi.array+=dilation;
 }
 //#####################################################################
 // Function Particle_To_Grid

@@ -48,12 +48,16 @@ public:
         ARRAY<int> simulated_particles;
         GATHER_SCATTER<TV>* gather_scatter;
 
+        // signed distance field & level sets
+        ARRAY<T,TV_INT> phi;
+        LEVELSET<TV>* levelset;
+
         PHASE();
         PHASE(const PHASE&) = delete;
         ~PHASE();
         void Initialize(const GRID<TV>& grid,
-                        const VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m>& weights,
-                        int ghost,int threads);
+            const VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m>& weights,
+            int ghost,int threads);
     };
 
     ARRAY<PHASE,PHASE_ID> phases;
@@ -68,10 +72,6 @@ public:
     MPM_PROJECTION_VECTOR<TV>& sol;
     MPM_PROJECTION_VECTOR<TV>& rhs;
     int ghost;
-
-    // signed distance field & level sets
-    ARRAY<T,TV_INT> phi;
-    LEVELSET<TV>* levelsets;
 
     // transfer stuff
     VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m> weights;
@@ -105,9 +105,9 @@ public:
     int threads;
     bool use_particle_volumes;
     bool use_preconditioner;
-
     bool use_shrink,use_reinit;
     T dilation;
+    bool use_phi;
 
     // debugging
     DEBUG_PARTICLES<TV>& debug_particles;
