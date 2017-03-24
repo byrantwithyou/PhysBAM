@@ -165,6 +165,7 @@ Initialize()
             particles.phase.Array_View(n,particles.phase.m-n).Fill(1);
         } break;
         case 8:{ // concave shape
+            this->use_phi=true;
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             T density=2*unit_rho*scale_mass;
             SPHERE<TV> sphere0(TV(.3,.3)*m,.1*m);

@@ -11,13 +11,14 @@
 #include <Tools/Krylov_Solvers/MINRES.h>
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
 #include <Tools/Parallel_Computation/APPEND_HOLDER.h>
-#include <Geometry/Level_Sets/LEVELSET.h>
-#include <Geometry/Level_Sets/REINITIALIZATION.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR_THREADED.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR_THREADED.h>
 #include <Grid_PDE/Poisson/PROJECTION_UNIFORM.h>
+#include <Geometry/Level_Sets/FAST_MARCHING_METHOD_UNIFORM.h>
+#include <Geometry/Level_Sets/LEVELSET.h>
+#include <Geometry/Level_Sets/REINITIALIZATION.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_MAC_DRIVER.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_MAC_EXAMPLE.h>
@@ -272,16 +273,31 @@ Particle_To_Grid(PHASE& ph) const
 // Function Build_Level_Sets
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
+Build_Level_Sets()
+{
+    if(!example.use_phi) return;
+    for(PHASE_ID i(0);i<example.phases.m;i++)
+        Build_Level_Sets(example.phases(i));
+    if(Value(example.phases.m)==1) return;
+    for(CELL_ITERATOR<TV> it(example.grid,example.ghost);it.Valid();it.Next()){
+        T min1=FLT_MAX,min2=FLT_MAX;
+        for(PHASE_ID i(0);i<example.phases.m;i++){
+            T p=example.phases(i).phi(it.index);
+            if(p<min1){min2=min1;min1=p;}
+            else if(p<min2) min2=p;}
+        T shift=(T).5*(min2+min1);
+        for(PHASE_ID i(0);i<example.phases.m;i++)
+            example.phases(i).phi(it.index)-=shift;}
+}
+//#####################################################################
+// Function Build_Level_Sets
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
 Build_Level_Sets(PHASE& ph)
 {
     PHYSBAM_ASSERT(ph.levelset);
-    const T dilation=example.dilation;
-
-    ph.phi.array.Fill(10);
-
-    const MPM_PARTICLES<TV>& particles=example.particles;
-
     T dx=example.grid.dX.Max();
+    ph.phi.array.Fill(3*dx);
     RANGE<TV_INT> grid_domain=example.grid.Domain_Indices(example.ghost);
     for(int p=0;p<example.particles.X.m;p++){
 //        T r=sqrt(particles.volume(p)/pi)+dilation;
@@ -291,15 +307,17 @@ Build_Level_Sets(PHASE& ph)
         RANGE<TV> bound(X-influence_bound,X+influence_bound);
         RANGE<TV_INT> range=example.grid.Clamp_To_Cell(bound).Intersect(grid_domain);
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
-            T d=(X-example.grid.Cell(it.index)).Magnitude();
+            T d=(X-example.grid.Center(it.index)).Magnitude();
             ph.phi(it.index)=min(ph.phi(it.index),d-r);}}
 
-    ph.levelset->Fast_Marching_Method(example.time,5*dx); // TODO: better distance
+    ARRAY<TV_INT> seed_indices;
+    for(FACE_ITERATOR<TV> it(example.grid,example.ghost,GRID<TV>::INTERIOR_REGION);it.Valid();it.Next()){
+        TV_INT a=it.First_Cell_Index(),b=it.Second_Cell_Index();
+        if(ph.phi(a)<0){if(ph.phi(b)>=0) seed_indices.Append(b);}
+        else if(ph.phi(b)<0) seed_indices.Append(a);}
 
-    Reinitialize(*example.levelsets,400,40,dilation,dilation,(T)0.25,3,3,1);
-
-    if(example.use_shrink)
-        example.phi.array+=dilation;
+    FAST_MARCHING_METHOD_UNIFORM<TV> fmm(*ph.levelset,example.ghost);
+    fmm.Fast_Marching_Method(ph.phi,3*dx,&seed_indices);
 }
 //#####################################################################
 // Function Particle_To_Grid
