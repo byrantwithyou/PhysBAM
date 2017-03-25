@@ -51,8 +51,7 @@ Solve(const T time,const bool solution_regions_already_computed)
     filled_region_cell_count.Fill(0); // reusing this array in order to make the indirection arrays
     if(!mpi_grid) Compute_Matrix_Indices(grid.Domain_Indices(1),filled_region_cell_count,matrix_index_to_cell_index_array,cell_index_to_matrix_index);
     else laplace_mpi->Find_Matrix_Indices(filled_region_cell_count,cell_index_to_matrix_index,matrix_index_to_cell_index_array);
-    RANGE<TV_INT> domain=grid.Domain_Indices(1);
-    Find_A(domain,A_array,b_array,filled_region_cell_count,cell_index_to_matrix_index);
+    Find_A(A_array,b_array,filled_region_cell_count,cell_index_to_matrix_index);
     for(int color=0;color<number_of_regions;color++) if(filled_region_cell_count(color)>0 && (filled_region_touches_dirichlet(color)||solve_neumann_regions)){
         pcg.Enforce_Compatibility(!filled_region_touches_dirichlet(color)&&enforce_compatibility);
         Solve_Subregion(matrix_index_to_cell_index_array(color),A_array(color),b_array(color),color);}
@@ -63,12 +62,19 @@ Solve(const T time,const bool solution_regions_already_computed)
 // Function Find_A
 //#####################################################################
 template<class TV> void LAPLACE_UNIFORM<TV>::
-Find_A(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,const ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index)
+Find_A(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,const ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index)
 {
     ARRAY<ARRAY<int> > row_counts(A_array.m,false);
     for(int i=0;i<A_array.m;i++){
         row_counts(i).Resize(filled_region_cell_count(i),false,false);
         b_array(i).Resize(filled_region_cell_count(i));}
+    Find_A_Part_One(cell_index_to_matrix_index,row_counts);
+    for(int i=0;i<A_array.m;i++) A_array(i).Set_Row_Lengths(row_counts(i));
+    Find_A_Part_Two(A_array,b_array,cell_index_to_matrix_index);
+}
+template<class TV> void LAPLACE_UNIFORM<TV>::
+Find_A_Part_One(T_ARRAYS_INT& cell_index_to_matrix_index,ARRAY<ARRAY<int> >& row_counts)
+{
     // TODO: this should be rewritten in terms of faces cause this got really hacky with MPI
     for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         int color=filled_region_colors(cell_index);assert(color!=-1);
@@ -80,7 +86,10 @@ Find_A(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<AR
                 if(((filled_region_colors.Valid_Index(cell_index+offset) && filled_region_colors(cell_index+offset)==color) ||
                     (grid.Domain_Indices().Lazy_Outside_Half_Open(cell_index+offset) && periodic_boundary[axis])) && !psi_N.Component(axis)(cell_index+offset)) row_count++;}
             row_counts(color)(cell_index_to_matrix_index(cell_index))=row_count;}}
-    for(int i=0;i<A_array.m;i++) A_array(i).Set_Row_Lengths(row_counts(i));
+}
+template<class TV> void LAPLACE_UNIFORM<TV>::
+Find_A_Part_Two(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index)
+{
     TV one_over_dx2=Inverse(grid.dX*grid.dX);
     T default_row_sum=-2*one_over_dx2.Sum_Abs(),r=0;
     TV_INT grid_counts=grid.counts;
@@ -145,7 +154,7 @@ Compute_Matrix_Indices(ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,ARRAY
 template<class TV> void LAPLACE_UNIFORM<TV>::
 Compute_Matrix_Indices(const RANGE<TV_INT>& domain,ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,ARRAY<ARRAY<TV_INT> >& matrix_index_to_cell_index_array,T_ARRAYS_INT& cell_index_to_matrix_index)
 {
-    for(CELL_ITERATOR<TV> iterator(grid,domain);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){
         int color=filled_region_colors(iterator.Cell_Index());
         if(color>=0&&(filled_region_touches_dirichlet(color)||solve_neumann_regions)){
             matrix_index_to_cell_index_array(color)(filled_region_cell_count(color))=iterator.Cell_Index();

@@ -438,13 +438,21 @@ Update_Particle_Cells(T_ARRAYS_PARTICLES& particles)
             if(final_block!=block){
                 list_to_process(final_block).Append(TRIPLE<TV_INT,typename T_ARRAYS_PARTICLES::ELEMENT,int>(block,cell_particles,k));}}
         cell_particles=cell_particles->next;}}
+    Update_Particle_Cells_Part(domain,particles,number_of_particles_per_block,list_to_process);
+}
+//#####################################################################
+// Function Update_Particle_Cells_Threaded
+//#####################################################################
+template<class TV> template<class T_ARRAYS_PARTICLES> void PARTICLE_LEVELSET_UNIFORM<TV>::
+Update_Particle_Cells_Part(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES& particles,const ARRAY<ARRAY<int>,TV_INT>& number_of_particles_per_block,ARRAY<ARRAY<TRIPLE<TV_INT,typename T_ARRAYS_PARTICLES::ELEMENT,int> >,TV_INT>& list_to_process)
+{
     typedef typename remove_pointer<typename T_ARRAYS_PARTICLES::ELEMENT>::type T_PARTICLES;
+    const T_PARTICLES& template_particles=choice<(1-is_same<T_PARTICLES,PARTICLE_LEVELSET_PARTICLES<TV> >::value)>(this->template_particles,this->template_removed_particles);
     for(NODE_ITERATOR<TV> iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT final_block=iterator.Node_Index();
         for(int i=0;i<list_to_process(final_block).m;i++){
             T_PARTICLES* cell_particles=list_to_process(final_block)(i).y;int k=list_to_process(final_block)(i).z;
             if(!particles(final_block))particles(final_block)=Allocate_Particles(template_particles);
             Copy_Particle(*cell_particles,*particles(final_block),k);}}
-    typedef typename remove_pointer<typename T_ARRAYS_PARTICLES::ELEMENT>::type T_PARTICLES;
     for(NODE_ITERATOR<TV> iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT final_block=iterator.Node_Index();
         for(int i=0;i<list_to_process(final_block).m;i++){
             T_PARTICLES* cell_particles=list_to_process(final_block)(i).y;int k=list_to_process(final_block)(i).z;
@@ -577,6 +585,7 @@ Reseed_Add_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,T_ARRAYS_PA
         if(sign==-1){ // we add the negative particles first, and don't want to add too many of them...
             if(total_other_particles) number_of_particles_to_add(block_index)=(int)((T)number_of_particles_to_add(block_index)*(T)total_particles/(T)(total_particles+total_other_particles)+1);
             else if(!total_particles) number_of_particles_to_add(block_index)=(number_of_particles_to_add(block_index)+1)/2;}}
+
     RANDOM_NUMBERS<T> local_random;
     for(NODE_ITERATOR<TV> iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();
         if(!number_of_particles_to_add(block_index)) continue;
@@ -598,14 +607,7 @@ Reseed_Add_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,T_ARRAYS_PA
             cell_particles->X(index)=local_random.Get_Uniform_Vector(block_bounding_box);
             cell_particles->radius(index)=1;//Default value
             if(!Attract_Individual_Particle_To_Interface_And_Adjust_Radius(particles,*cell_particles,phi_min,phi_max,block,index,particle_type,time,true,local_random,list_to_process) && attempts++<5) k--;}}
-    for(NODE_ITERATOR<TV> iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT final_block=iterator.Node_Index();
-        for(int i=0;i<list_to_process(final_block).m;i++){
-            auto* cell_particles=list_to_process(final_block)(i).y;
-            int k=list_to_process(final_block)(i).z;
-            assert(cell_particles->radius(k)>0);
-            cell_particles->radius(k)=-(T)1;}}
-    Delete_Marked_Particles(particles);
-    Consistency_Check(particles);
+    Update_Particle_Cells_Part(domain,particles,number_of_particles_per_block,list_to_process);
     for(NODE_ITERATOR<TV> iterator(levelset.grid);iterator.Valid();iterator.Next()) number_added+=number_of_particles_to_add(iterator.Node_Index());
     return number_added;
 }
@@ -712,7 +714,7 @@ Delete_Particles_Outside_Grid()
         RANGE<TV_INT> ghost_domain(domain);
         if(side==0) ghost_domain.max_corner(axis)=real_domain.min_corner(axis);
         else ghost_domain.min_corner(axis)=real_domain.max_corner(axis);
-        for(NODE_ITERATOR<TV> iterator(levelset.grid);iterator.Valid();iterator.Next()) Delete_All_Particles_In_Cell(iterator.Node_Index());}
+        for(NODE_ITERATOR<TV> iterator(levelset.grid,ghost_domain);iterator.Valid();iterator.Next()) Delete_All_Particles_In_Cell(iterator.Node_Index());}
     for(int axis=0;axis<TV::m;axis++) for(int side=0;side<2;side++){
         RANGE<TV_INT> boundary_domain(real_domain);
         if(side==0) boundary_domain.max_corner(axis)=real_domain.min_corner(axis)+1;

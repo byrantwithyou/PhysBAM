@@ -40,11 +40,11 @@ public:
     {if(!solution_regions_already_computed) Find_Solution_Regions();
     T_LAPLACE::Solve(time,true);}
 
-    void Find_A(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,const ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,
+    void Find_A(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,const ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,
             ARRAY<int,TV_INT>& cell_index_to_matrix_index)
     {assert(dt_is_set);dt_is_set=false;
 
-    T_LAPLACE::Find_A(domain,A_array,b_array,filled_region_cell_count,cell_index_to_matrix_index);
+    T_LAPLACE::Find_A(A_array,b_array,filled_region_cell_count,cell_index_to_matrix_index);
     for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){INDEX cell_index=iterator.Cell_Index();
         int color=this->filled_region_colors(cell_index);
         if(color!=-2 && (filled_region_touches_dirichlet(color)||solve_neumann_regions)){

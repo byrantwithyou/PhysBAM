@@ -46,39 +46,32 @@ template<class TV> LAPLACE_COLLIDABLE_UNIFORM<TV>::
 // Function Find_A
 //#####################################################################
 template<class TV> void LAPLACE_COLLIDABLE_UNIFORM<TV>::
-Find_A(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,const ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index)
+Find_A(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,const ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index)
 {
-    BASE::Find_A(domain,A_array,b_array,filled_region_cell_count,cell_index_to_matrix_index);
-    if(second_order_cut_cell_method) Apply_Second_Order_Cut_Cell_Method(domain,A_array,b_array,cell_index_to_matrix_index);
+    BASE::Find_A(A_array,b_array,filled_region_cell_count,cell_index_to_matrix_index);
+    if(second_order_cut_cell_method) Apply_Second_Order_Cut_Cell_Method(A_array,b_array,cell_index_to_matrix_index);
 }
 //#####################################################################
 // Function Apply_Second_Order_Cut_Cell_Method
 //#####################################################################
 template<class TV> void LAPLACE_COLLIDABLE_UNIFORM<TV>::
-Apply_Second_Order_Cut_Cell_Method(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index)
+Apply_Second_Order_Cut_Cell_Method(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index)
 {
     assert(levelset);
     TV minus_one_over_dx_squared=(T)-1*Inverse(grid.dX*grid.dX);
-    for(int i=0;i<TV::m;i++){
-        RANGE<TV_INT> face_domain(domain);
-        for(int axis=0;axis<TV::m;axis++){
-            if(face_domain.min_corner(axis)==grid.Domain_Indices(1).min_corner(axis)) face_domain.min_corner(axis)+=1;
-            if(face_domain.max_corner(axis)==grid.Domain_Indices(1).max_corner(axis)) face_domain.max_corner(axis)-=1;}
-        if(face_domain.min_corner(i)==grid.Domain_Indices().min_corner(i)) face_domain.min_corner(i)+=1;
-        if(face_domain.max_corner(i)!=grid.Domain_Indices().max_corner(i)) face_domain.max_corner(i)+=1;
-        for(FACE_ITERATOR<TV> iterator(grid,face_domain,i);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face=iterator.Face_Index(),cell1=iterator.First_Cell_Index(),cell2=iterator.Second_Cell_Index();
-            if(!psi_N.Component(axis)(face) && LEVELSET_UTILITIES<T>::Interface(levelset->phi(cell1),levelset->phi(cell2))){
-                T theta=LEVELSET_UTILITIES<T>::Theta(levelset->phi(cell1),levelset->phi(cell2));
-                if(psi_D(cell1) && !psi_D(cell2) && domain.Lazy_Inside_Half_Open(cell2)){ // interface is to the negative side of second cell
-                    int color=filled_region_colors(cell2);int matrix_index=cell_index_to_matrix_index(cell2);
-                    T A_right_i=minus_one_over_dx_squared[axis];A_array(color).Add_Element(matrix_index,matrix_index,-A_right_i);b_array(color)(matrix_index)-=A_right_i*u(cell1);
-                    A_right_i/=max((1-theta),second_order_cut_cell_threshold);
-                    A_array(color).Add_Element(matrix_index,matrix_index,A_right_i);b_array(color)(matrix_index)+=A_right_i*u_interface.Component(axis)(face);}  
-                else if(psi_D(cell2) && !psi_D(cell1) && domain.Lazy_Inside_Half_Open(cell1)){ // interface is to the positive side of first cell
-                    int color=filled_region_colors(cell1);int matrix_index=cell_index_to_matrix_index(cell1);
-                    T A_right_i=minus_one_over_dx_squared[axis];A_array(color).Add_Element(matrix_index,matrix_index,-A_right_i);b_array(color)(matrix_index)-=A_right_i*u(cell2);
-                    A_right_i/=max(theta,second_order_cut_cell_threshold);
-                    A_array(color).Add_Element(matrix_index,matrix_index,A_right_i);b_array(color)(matrix_index)+=A_right_i*u_interface.Component(axis)(face);}}}}
+    for(FACE_ITERATOR<TV> iterator(grid,0,GRID<TV>::INTERIOR_REGION);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face=iterator.Face_Index(),cell1=iterator.First_Cell_Index(),cell2=iterator.Second_Cell_Index();
+        if(!psi_N.Component(axis)(face) && LEVELSET_UTILITIES<T>::Interface(levelset->phi(cell1),levelset->phi(cell2))){
+            T theta=LEVELSET_UTILITIES<T>::Theta(levelset->phi(cell1),levelset->phi(cell2));
+            if(psi_D(cell1) && !psi_D(cell2) && grid.Domain_Indices(1).Lazy_Inside_Half_Open(cell2)){ // interface is to the negative side of second cell
+                int color=filled_region_colors(cell2);int matrix_index=cell_index_to_matrix_index(cell2);
+                T A_right_i=minus_one_over_dx_squared[axis];A_array(color).Add_Element(matrix_index,matrix_index,-A_right_i);b_array(color)(matrix_index)-=A_right_i*u(cell1);
+                A_right_i/=max((1-theta),second_order_cut_cell_threshold);
+                A_array(color).Add_Element(matrix_index,matrix_index,A_right_i);b_array(color)(matrix_index)+=A_right_i*u_interface.Component(axis)(face);}  
+            else if(psi_D(cell2) && !psi_D(cell1) && grid.Domain_Indices(1).Lazy_Inside_Half_Open(cell1)){ // interface is to the positive side of first cell
+                int color=filled_region_colors(cell1);int matrix_index=cell_index_to_matrix_index(cell1);
+                T A_right_i=minus_one_over_dx_squared[axis];A_array(color).Add_Element(matrix_index,matrix_index,-A_right_i);b_array(color)(matrix_index)-=A_right_i*u(cell2);
+                A_right_i/=max(theta,second_order_cut_cell_threshold);
+                A_array(color).Add_Element(matrix_index,matrix_index,A_right_i);b_array(color)(matrix_index)+=A_right_i*u_interface.Component(axis)(face);}}}
 }
 template<class TV> void LAPLACE_COLLIDABLE_UNIFORM<TV>::
 Initialize_Grid(const GRID<TV>& mac_grid_input)

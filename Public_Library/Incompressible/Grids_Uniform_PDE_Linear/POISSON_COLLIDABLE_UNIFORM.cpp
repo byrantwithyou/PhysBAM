@@ -137,10 +137,10 @@ Find_Constant_beta_Multiphase(ARRAY<ARRAY<T,TV_INT>>& phis_ghost)
 // Function Find_A
 //#####################################################################
 template<class TV> void POISSON_COLLIDABLE_UNIFORM<TV>::
-Find_A(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,const ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index)
+Find_A(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,const ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index)
 {
-    BASE::Find_A(domain,A_array,b_array,filled_region_cell_count,cell_index_to_matrix_index);
-    if(second_order_cut_cell_method) Apply_Second_Order_Cut_Cell_Method(domain,A_array,b_array,cell_index_to_matrix_index);
+    BASE::Find_A(A_array,b_array,filled_region_cell_count,cell_index_to_matrix_index);
+    if(second_order_cut_cell_method) Apply_Second_Order_Cut_Cell_Method(A_array,b_array,cell_index_to_matrix_index);
 }
 //#####################################################################
 // Function Add_Jump_To_b
@@ -202,23 +202,17 @@ Add_Derivative_Jump_To_b(const ARRAY<T,TV_INT>& phi_ghost)
 // Function Apply_Second_Order_Cut_Cell_Method
 //#####################################################################
 template<class TV> void POISSON_COLLIDABLE_UNIFORM<TV>::
-Apply_Second_Order_Cut_Cell_Method(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index)
+Apply_Second_Order_Cut_Cell_Method(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index)
 {
     assert(levelset);
     TV minus_one_over_dx_squared=(T)-1*Inverse(grid.dX*grid.dX);
 
-    if(use_variable_beta && !beta_given_on_faces) for(int i=0;i<TV::m;i++){
-        RANGE<TV_INT> face_domain(domain);
-        for(int axis=0;axis<TV::m;axis++){
-            if(face_domain.min_corner(axis)==grid.Domain_Indices(1).min_corner(axis)) face_domain.min_corner(axis)+=1;
-            if(face_domain.max_corner(axis)==grid.Domain_Indices(1).max_corner(axis)) face_domain.max_corner(axis)-=1;}
-        if(face_domain.min_corner(i)==grid.Domain_Indices().min_corner(i)) face_domain.min_corner(i)+=1;
-        if(face_domain.max_corner(i)!=grid.Domain_Indices().max_corner(i)) face_domain.max_corner(i)+=1;
-        for(FACE_ITERATOR<TV> iterator(grid,face_domain,i);iterator.Valid();iterator.Next()){
+    if(use_variable_beta && !beta_given_on_faces){
+        for(FACE_ITERATOR<TV> iterator(grid,0,GRID<TV>::INTERIOR_REGION);iterator.Valid();iterator.Next()){
             TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index(),face_index=iterator.Face_Index();int axis=iterator.Axis();
             if(!psi_N.Component(axis)(face_index) && LEVELSET_UTILITIES<T>::Interface(levelset->phi(first_cell_index),levelset->phi(second_cell_index))){
                 T theta=LEVELSET_UTILITIES<T>::Theta(levelset->phi(first_cell_index),levelset->phi(second_cell_index));
-                if(psi_D(first_cell_index) && !psi_D(second_cell_index) && domain.Lazy_Inside_Half_Open(second_cell_index)){ // interface is to the negative side of second cell
+                if(psi_D(first_cell_index) && !psi_D(second_cell_index) && grid.Domain_Indices(1).Lazy_Inside_Half_Open(second_cell_index)){ // interface is to the negative side of second cell
                     int color=filled_region_colors(second_cell_index);int matrix_index=cell_index_to_matrix_index(second_cell_index);
                     T A_right_i=beta_face.Component(axis)(face_index)*minus_one_over_dx_squared[axis];A_array(color).Add_Element(matrix_index,matrix_index,-A_right_i);
                     b_array(color)(matrix_index)-=A_right_i*u(first_cell_index); 
@@ -226,7 +220,7 @@ Apply_Second_Order_Cut_Cell_Method(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLA
                     T beta_new=(T).5*(beta_ghost+variable_beta(second_cell_index));
                     A_right_i=beta_new/max((1-theta),second_order_cut_cell_threshold)*minus_one_over_dx_squared[axis];
                     A_array(color).Add_Element(matrix_index,matrix_index,A_right_i);b_array(color)(matrix_index)+=A_right_i*u_interface.Component(axis)(face_index);}
-                else if(psi_D(second_cell_index) && !psi_D(first_cell_index) && domain.Lazy_Inside_Half_Open(first_cell_index)){ // interface is to the positive side of first cell
+                else if(psi_D(second_cell_index) && !psi_D(first_cell_index) && grid.Domain_Indices(1).Lazy_Inside_Half_Open(first_cell_index)){ // interface is to the positive side of first cell
                     int color=filled_region_colors(first_cell_index);int matrix_index=cell_index_to_matrix_index(first_cell_index);
                     T A_right_i=beta_face.Component(axis)(face_index)*minus_one_over_dx_squared[axis];A_array(color).Add_Element(matrix_index,matrix_index,-A_right_i);
                     b_array(color)(matrix_index)-=A_right_i*u(second_cell_index);
@@ -234,24 +228,18 @@ Apply_Second_Order_Cut_Cell_Method(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLA
                     T beta_new=(T).5*(beta_ghost+variable_beta(first_cell_index));
                     A_right_i=beta_new/max(theta,second_order_cut_cell_threshold)*minus_one_over_dx_squared[axis];
                     A_array(color).Add_Element(matrix_index,matrix_index,A_right_i);b_array(color)(matrix_index)+=A_right_i*u_interface.Component(axis)(face_index);}}}}
-    else for(int i=0;i<TV::m;i++){
-        RANGE<TV_INT> face_domain(domain);
-        for(int axis=0;axis<TV::m;axis++){
-            if(face_domain.min_corner(axis)==grid.Domain_Indices(1).min_corner(axis)) face_domain.min_corner(axis)+=1;
-            if(face_domain.max_corner(axis)==grid.Domain_Indices(1).max_corner(axis)) face_domain.max_corner(axis)-=1;}
-        if(face_domain.min_corner(i)==grid.Domain_Indices().min_corner(i)) face_domain.min_corner(i)+=1;
-        if(face_domain.max_corner(i)!=grid.Domain_Indices().max_corner(i)) face_domain.max_corner(i)+=1;
-        for(FACE_ITERATOR<TV> iterator(grid,face_domain,i);iterator.Valid();iterator.Next()){
+    else{
+        for(FACE_ITERATOR<TV> iterator(grid,0,GRID<TV>::INTERIOR_REGION);iterator.Valid();iterator.Next()){
             TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index(),face_index=iterator.Face_Index();int axis=iterator.Axis();
             if(!psi_N.Component(axis)(face_index) && LEVELSET_UTILITIES<T>::Interface(levelset->phi(first_cell_index),levelset->phi(second_cell_index))){
                 T theta=LEVELSET_UTILITIES<T>::Theta(levelset->phi(first_cell_index),levelset->phi(second_cell_index));
-                if(psi_D(first_cell_index) && !psi_D(second_cell_index) && domain.Lazy_Inside_Half_Open(second_cell_index)){ // interface is to the negative side of second cell
+                if(psi_D(first_cell_index) && !psi_D(second_cell_index) && grid.Domain_Indices(1).Lazy_Inside_Half_Open(second_cell_index)){ // interface is to the negative side of second cell
                     int color=filled_region_colors(second_cell_index);int matrix_index=cell_index_to_matrix_index(second_cell_index);
                     T A_right_i=beta_face.Component(axis)(face_index)*minus_one_over_dx_squared[axis];A_array(color).Add_Element(matrix_index,matrix_index,-A_right_i);
                     b_array(color)(matrix_index)-=A_right_i*u(first_cell_index); 
                     A_right_i/=max((1-theta),second_order_cut_cell_threshold);
                     A_array(color).Add_Element(matrix_index,matrix_index,A_right_i);b_array(color)(matrix_index)+=A_right_i*u_interface.Component(axis)(face_index);}
-                else if(psi_D(second_cell_index) && !psi_D(first_cell_index) && domain.Lazy_Inside_Half_Open(first_cell_index)){ // interface is to the positive side of first cell
+                else if(psi_D(second_cell_index) && !psi_D(first_cell_index) && grid.Domain_Indices(1).Lazy_Inside_Half_Open(first_cell_index)){ // interface is to the positive side of first cell
                     int color=filled_region_colors(first_cell_index);int matrix_index=cell_index_to_matrix_index(first_cell_index);
                     T A_right_i=beta_face.Component(axis)(face_index)*minus_one_over_dx_squared[axis];A_array(color).Add_Element(matrix_index,matrix_index,-A_right_i);
                     b_array(color)(matrix_index)-=A_right_i*u(second_cell_index);

@@ -70,6 +70,7 @@ public:
     template<class T_ARRAYS_PARTICLES> void Second_Order_Runge_Kutta_Step_Particles(const ARRAY<T,FACE_INDEX<TV::m> >& V,T_ARRAYS_PARTICLES& particles,
         const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time,const bool update_particle_cells_after_euler_step=true,const bool verbose=true);
     template<class T_ARRAYS_PARTICLES> void Update_Particle_Cells(T_ARRAYS_PARTICLES& particles);
+    template<class T_ARRAYS_PARTICLES> void Update_Particle_Cells_Part(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES& particles,const ARRAY<ARRAY<int>,TV_INT>& number_of_particles_per_block,ARRAY<ARRAY<TRIPLE<TV_INT,typename T_ARRAYS_PARTICLES::ELEMENT,int> >,TV_INT>& list_to_process);
     template<class T_ARRAYS_PARTICLES> void Update_Particle_Cells_Find_List(T_ARRAYS_PARTICLES& particles,const ARRAY<ARRAY<int>,TV_INT>& number_of_particles_per_block,ARRAY<ARRAY<TRIPLE<TV_INT,typename T_ARRAYS_PARTICLES::ELEMENT,int> >,TV_INT>& list_to_process);
     template<class T_ARRAYS_PARTICLES> void Delete_Marked_Particles(T_ARRAYS_PARTICLES& particles);
     template<class T_ARRAYS_PARTICLES> void Consistency_Check(T_ARRAYS_PARTICLES& particles);

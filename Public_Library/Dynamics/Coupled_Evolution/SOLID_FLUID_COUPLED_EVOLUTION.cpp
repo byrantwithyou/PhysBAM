@@ -284,8 +284,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         if(dt && fluids_parameters.compressible) fluids_parameters.euler->euler_projection.Scale_Pressure_By_Dt(dt);
  
         poisson.Set_Dt(dt);
-        RANGE<TV_INT> domain(grid.Domain_Indices(1));
-        poisson.Find_A(domain,A_array,b_array,filled_region_cell_count,cell_index_to_matrix_index);
+        poisson.Find_A(A_array,b_array,filled_region_cell_count,cell_index_to_matrix_index);
 
         //TODO(kwatra): Why not just use number_of_regions
         colors=filled_region_cell_count.domain.max_corner.x;
