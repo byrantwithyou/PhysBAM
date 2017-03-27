@@ -125,6 +125,7 @@ Advance_One_Time_Step()
     Print_Grid_Stats("after particle to grid",example.dt);
     Print_Energy_Stats("after particle to grid");
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after particle to grid",0,1);
+    Build_Level_Sets();
     Apply_Forces();
     Print_Grid_Stats("after forces",example.dt);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after forces",0,1);
@@ -132,7 +133,6 @@ Advance_One_Time_Step()
     Print_Grid_Stats("after projection",example.dt);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after projection",0,1);
     Grid_To_Particle();
-    Build_Level_Sets();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after grid to particle",0,1);
 
     if(example.end_time_step) example.end_time_step(example.time);
@@ -285,7 +285,7 @@ Build_Level_Sets()
             T p=example.phases(i).phi(it.index);
             if(p<min1){min2=min1;min1=p;}
             else if(p<min2) min2=p;}
-        T shift=(T).5*(min2+min1);
+        T shift=(T).5*(min2-min1);
         for(PHASE_ID i(0);i<example.phases.m;i++)
             example.phases(i).phi(it.index)-=shift;}
 }
@@ -300,7 +300,6 @@ Build_Level_Sets(PHASE& ph)
     ph.phi.array.Fill(3*dx);
     RANGE<TV_INT> grid_domain=example.grid.Domain_Indices(example.ghost);
     for(int p=0;p<example.particles.X.m;p++){
-//        T r=sqrt(particles.volume(p)/pi)+dilation;
         T r=0.36*dx;
         T influence_bound=r+dx*(T)1.1;
         TV X=example.particles.X(p);
