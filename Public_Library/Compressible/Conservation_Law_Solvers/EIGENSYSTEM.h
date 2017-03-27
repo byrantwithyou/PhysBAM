@@ -39,7 +39,7 @@ public:
         ARRAY<TV_DIMENSION,VECTOR<int,1> >& F,const bool use_standard_average,ARRAY<TV_DIMENSION,VECTOR<int,1> >* U_clamped=0)
     {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
     virtual T Maximum_Magnitude_Eigenvalue(const TV_DIMENSION& U_cell){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-    virtual bool Eigenvalues(const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,const int i,ARRAY<T,VECTOR<int,1> >& lambda,ARRAY<T,VECTOR<int,1> >& lambda_left,ARRAY<T,VECTOR<int,1> >& lambda_right)=0;
+    virtual bool Eigenvalues(const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,const int i,VECTOR<T,d>& lambda,VECTOR<T,d>& lambda_left,VECTOR<T,d>& lambda_right)=0;
     virtual void Eigenvectors(const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,const int i,MATRIX<T,d,d>& L,MATRIX<T,d,d>& R)=0;
 //#####################################################################
 };   

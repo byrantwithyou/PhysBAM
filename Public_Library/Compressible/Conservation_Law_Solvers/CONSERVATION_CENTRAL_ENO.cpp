@@ -40,7 +40,7 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
     // calculate the fluxes 
     ARRAY<bool,VECTOR<int,1> > psi_ghost(0,m+1);ARRAY<bool,VECTOR<int,1> >::Put(psi,psi_ghost); // ghost points for the if statement below  
     ARRAY<TV_DIMENSION,VECTOR<int,1> > flux(0,m); // fluxes to the right of each point
-    ARRAY<T,VECTOR<int,1> > lambda(0,d),lambda_left(0,d),lambda_right(0,d);
+    VECTOR<T,d> lambda,lambda_left,lambda_right;
     for(i=0;i<m;i++) if( psi_ghost(i)|| psi_ghost(i+1) ){ // compute flux
         eigensystem.Eigenvalues(U,i,lambda,lambda_left,lambda_right);
         // find a flux in each component

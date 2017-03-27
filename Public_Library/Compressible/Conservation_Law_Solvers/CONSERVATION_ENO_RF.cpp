@@ -41,7 +41,7 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
     // calculate the fluxes 
     ARRAY<bool,VECTOR<int,1> > psi_ghost(0,m+1);ARRAY<bool,VECTOR<int,1> >::Put(psi,psi_ghost); // ghost points for the if statement below  
     ARRAY<TV_DIMENSION,VECTOR<int,1> > flux(0,m); // fluxes to the right of each point
-    ARRAY<T,VECTOR<int,1> > lambda(0,d),lambda_left(0,d),lambda_right(0,d);
+    VECTOR<T,d> lambda,lambda_left,lambda_right;
     MATRIX<T,d,d> L,R;
     ARRAY<VECTOR<T,eno_order> ,VECTOR<int,2> > LDU(0,d,-3,m+3),LDF(0,d,-3,m+3);
     ARRAY<VECTOR<T,eno_order> ,VECTOR<int,2> > *Dstate_ptr,*Dflux_ptr;

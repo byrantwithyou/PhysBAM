@@ -85,7 +85,7 @@ Maximum_Magnitude_Eigenvalue(const TV_DIMENSION& U_cell)
 //#####################################################################
 // eigenvalues for F(U) at flux i and and at points i and i+1
 template<class T> bool EULER_1D_EIGENSYSTEM_F<T>::
-Eigenvalues(const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,const int i,ARRAY<T,VECTOR<int,1> >& lambda,ARRAY<T,VECTOR<int,1> >& lambda_left,ARRAY<T,VECTOR<int,1> >& lambda_right)
+Eigenvalues(const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,const int i,VECTOR<T,d>& lambda,VECTOR<T,d>& lambda_left,VECTOR<T,d>& lambda_right)
 {
     bool cavitation=false;
 

@@ -86,7 +86,7 @@ Attenuate_To_Far_Field_Values_Using_Characteristics(const T_ARRAYS_DIMENSION_BAS
     int axis=side/2;
     MATRIX<T,d,d> L,R;
     TV_DIMENSION LU,LU_far_field;
-    ARRAY<T,VECTOR<int,1> > lambda(0,d),lambda_left(0,d),lambda_right(0,d);
+    VECTOR<T,d> lambda,lambda_left,lambda_right;
 
     // extract a 1d array
     int min_index=u_ghost.Domain_Indices().min_corner[axis],max_index=u_ghost.Domain_Indices().max_corner[axis];

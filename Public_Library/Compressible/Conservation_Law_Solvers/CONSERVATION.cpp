@@ -43,7 +43,7 @@ template<class TV,int d> CONSERVATION<TV,d>::
 // Function Alpha
 //#####################################################################
 template<class TV,int d> typename TV::SCALAR CONSERVATION<TV,d>::
-Alpha(const ARRAY<T,VECTOR<int,1> >& lambda_left,const ARRAY<T,VECTOR<int,1> >& lambda_right,const int k,const int length)
+Alpha(const VECTOR<T,d>& lambda_left,const VECTOR<T,d>& lambda_right,const int k,const int length)
 {
     if(field_by_field_alpha) return amplification_factor*maxabs(lambda_left(k),lambda_right(k));
     else{

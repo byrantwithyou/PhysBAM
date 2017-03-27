@@ -23,7 +23,7 @@ Flux(const int m,const ARRAY<VECTOR<T,2> ,VECTOR<int,1> >& U,ARRAY<VECTOR<T,2> ,
 //#####################################################################
 // eigenvalues for F(U) at flux i and and at points i and i+1
 template<class T> bool SHALLOW_WATER_1D_SPECIALIZED_EIGENSYSTEM_F<T>::
-Eigenvalues(const ARRAY<VECTOR<T,2> ,VECTOR<int,1> >& U,const int i,ARRAY<T,VECTOR<int,1> >& lambda,ARRAY<T,VECTOR<int,1> >& lambda_left,ARRAY<T,VECTOR<int,1> >& lambda_right)
+Eigenvalues(const ARRAY<VECTOR<T,2> ,VECTOR<int,1> >& U,const int i,VECTOR<T,d>& lambda,VECTOR<T,d>& lambda_left,VECTOR<T,d>& lambda_right)
 {
     int weakly_hyperbolic=0;
 

@@ -48,7 +48,7 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
 
     int start_index=U.domain.min_corner.x+number_ghost_cells,end_index=U.domain.max_corner.x-number_ghost_cells;
     ARRAY<bool,VECTOR<int,1> > psi_ghost(start_index-1,end_index+1);ARRAY<bool,VECTOR<int,1> >::Put(psi,psi_ghost);
-    ARRAY<T,VECTOR<int,1> > lambda(0,d),lambda_left(0,d),lambda_right(0,d);
+    VECTOR<T,d> lambda,lambda_left,lambda_right;
 
     // get globally max alpha
     TV_DIMENSION max_alpha;
@@ -129,7 +129,7 @@ Conservation_Solver_Helper_Experimental(const int m,const T dx,const ARRAY<bool,
 
     ARRAY<bool,VECTOR<int,1> > psi_ghost(U.domain.min_corner.x+2,U.domain.max_corner.x-2);ARRAY<bool,VECTOR<int,1> >::Put(psi,psi_ghost); // ghost points for the if statement below  
     ARRAY<TV_DIMENSION,VECTOR<int,1> > flux(U.domain.min_corner.x+2,U.domain.max_corner.x-3); // fluxes to the right 0 of each point
-    ARRAY<T,VECTOR<int,1> > lambda(0,d),lambda_left(0,d),lambda_right(0,d);
+    VECTOR<T,d> lambda,lambda_left,lambda_right;
     MATRIX<T,d,d> L,R;
     ARRAY<VECTOR<T,eno_order> ,VECTOR<int,2> > DLU(0,d,U.domain.min_corner.x,U.domain.max_corner.x),DLF(0,d,U.domain.min_corner.x,U.domain.max_corner.x);
     ARRAY<VECTOR<T,eno_order> ,VECTOR<int,2> > DU(0,d,U.domain.min_corner.x,U.domain.max_corner.x),DF(0,d,U.domain.min_corner.x,U.domain.max_corner.x);
