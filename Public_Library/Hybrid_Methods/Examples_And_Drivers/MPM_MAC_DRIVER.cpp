@@ -18,7 +18,6 @@
 #include <Grid_PDE/Poisson/PROJECTION_UNIFORM.h>
 #include <Geometry/Level_Sets/FAST_MARCHING_METHOD_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
-#include <Geometry/Level_Sets/REINITIALIZATION.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_MAC_DRIVER.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_MAC_EXAMPLE.h>
@@ -285,7 +284,7 @@ Build_Level_Sets()
             T p=example.phases(i).phi(it.index);
             if(p<min1){min2=min1;min1=p;}
             else if(p<min2) min2=p;}
-        T shift=(T).5*(min2-min1);
+        T shift=(T).5*(min2+min1);
         for(PHASE_ID i(0);i<example.phases.m;i++)
             example.phases(i).phi(it.index)-=shift;}
 }
