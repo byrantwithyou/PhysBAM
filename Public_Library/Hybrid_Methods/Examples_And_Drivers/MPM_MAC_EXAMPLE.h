@@ -108,7 +108,8 @@ public:
     bool use_shrink,use_reinit;
     T dilation;
     bool use_phi;
-
+    int rk_particle_order;
+    
     // debugging
     DEBUG_PARTICLES<TV>& debug_particles;
     bool print_stats;

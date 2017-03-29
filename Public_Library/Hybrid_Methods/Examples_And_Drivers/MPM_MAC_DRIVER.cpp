@@ -10,11 +10,13 @@
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/MINRES.h>
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
+#include <Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
 #include <Tools/Parallel_Computation/APPEND_HOLDER.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR_THREADED.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR_THREADED.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_MAC.h>
 #include <Grid_PDE/Poisson/PROJECTION_UNIFORM.h>
 #include <Geometry/Level_Sets/FAST_MARCHING_METHOD_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
@@ -343,6 +345,8 @@ Grid_To_Particle(const PHASE& ph)
     MPM_PARTICLES<TV>& particles=example.particles;
     T dt=example.dt;
     bool use_flip=example.flip;
+
+    LINEAR_INTERPOLATION_MAC<TV,T> li(example.grid);
     ph.gather_scatter->template Gather<HELPER>(true,
         [](int p,HELPER& h){h=HELPER();},
         [this,dt,&particles,use_flip,&ph](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,HELPER& h)
@@ -356,10 +360,13 @@ Grid_To_Particle(const PHASE& ph)
                 TV Z=example.grid.Face(index);
                 h.B.Add_Row(index.axis,w*V*(Z-particles.X(p)));}
         },
-        [this,dt,&particles,use_flip](int p,HELPER& h)
+        [this,dt,&particles,use_flip,&li,&ph](int p,HELPER& h)
         {
             if(particles.store_B) particles.B(p)=h.B;
-            particles.X(p)+=dt*h.V;
+            if(!example.rk_particle_order) particles.X(p)+=dt*h.V;
+            else // RK step particles with linear interpolation
+                for(RUNGEKUTTA<TV> rk(particles.X(p),example.rk_particle_order,dt,0);rk.Valid();rk.Next())
+                    particles.X(p)+=dt*li.Clamped_To_Array(ph.velocity,particles.X(p));
             if(use_flip) particles.V(p)=(1-example.flip)*h.V+example.flip*(particles.V(p)+h.flip_V);
             else particles.V(p)=h.V;
 
