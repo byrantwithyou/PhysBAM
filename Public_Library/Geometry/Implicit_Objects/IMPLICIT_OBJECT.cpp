@@ -127,13 +127,17 @@ Intersection(RAY<TV>& ray,const T thickness) const
 template<class TV> TV IMPLICIT_OBJECT<TV>::
 Closest_Point_On_Boundary(const TV& location,const T tolerance,const int max_iterations,T* distance) const
 {
-    if(distance) *distance=(*this)(location);
-    if(!tolerance) return location-(*this)(location)*Normal(location); // only take one iteration
-    else{
-        int iterations=1;
-        TV new_location(location-(*this)(location)*Normal(location));
-        while(iterations<max_iterations && abs((*this)(new_location))>tolerance){iterations++;new_location-=(*this)(new_location)*Normal(new_location);}
-        return new_location;}
+    T dist=(*this)(location);
+    TV new_location=location-dist*Normal(location);
+    if(!tolerance){
+        if(distance) *distance=dist;
+        return new_location;} // only take one iteration
+    for(int i=1;i<max_iterations;i++){
+        T dist=(*this)(new_location);
+        if(abs(dist)<=tolerance) break;
+        new_location-=dist*Normal(new_location);}
+    if(distance) *distance=(new_location-location).Magnitude();
+    return new_location;
 }
 //#####################################################################
 // Function Signed_Distance
