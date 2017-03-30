@@ -175,7 +175,24 @@ Initialize()
             TOBJ* obj1=new TOBJ(sphere1);
             IMPLICIT_OBJECT_UNION<TV> shape(obj0,obj1);
             Seed_Particles(shape,0,0,density,particles_per_cell);
-        } break;            
+        } break;
+        case 9:{ // freefall circles with different phases
+            number_phases=PHASE_ID(2);
+            particles.Store_Phase(true);
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            T density=2*unit_rho*scale_mass;
+            gravity=TV(0,-1)*m/sqr(s);
+            SPHERE<TV> sphere0(TV(.3,.5)*m,.1*m);
+            SPHERE<TV> sphere1(TV(.7,.5)*m,.1*m);
+            Seed_Particles(sphere0,0,0,density,particles_per_cell);
+            int n=particles.phase.m;
+            Seed_Particles(sphere1,0,0,density,particles_per_cell);
+            particles.phase.Array_View(n,particles.phase.m-n).Fill(1);
+            Add_Walls(-1,COLLISION_TYPE::slip,.1*m);
+            // a wall in the middle preventing the two circles from touching
+            RANGE<TV> wall=RANGE<TV>(TV(.45,0)*m,TV(.55,1)*m);
+            Add_Collision_Object(wall,COLLISION_TYPE::slip,0);
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     phases.Resize(number_phases);
