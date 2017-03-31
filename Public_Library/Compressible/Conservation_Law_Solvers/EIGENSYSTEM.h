@@ -7,11 +7,11 @@
 #ifndef __EIGENSYSTEM__
 #define __EIGENSYSTEM__   
 
-#include <Core/Log/DEBUG_UTILITIES.h>
-#include <Core/Matrices/MATRIX.h>
 #include <Core/Vectors/VECTOR_3D.h>
 #include <Grid_Tools/Arrays/ARRAYS_UNIFORM_FORWARD.h>
 namespace PhysBAM{
+
+template<class T,int m,int n> class MATRIX;
 
 template<class T,class TV_DIMENSION>
 class EIGENSYSTEM

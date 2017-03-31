@@ -12,17 +12,6 @@
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>
 #include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
-#include <Compressible/Euler_Equations/EULER_1D_EIGENSYSTEM_F_ADVECTION_ONLY.h>
-#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
-#include <Compressible/Euler_Equations/EULER_2D_EIGENSYSTEM_F_ADVECTION_ONLY.h>
-#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
-#include <Compressible/Euler_Equations/EULER_2D_EIGENSYSTEM_G_ADVECTION_ONLY.h>
-#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
-#include <Compressible/Euler_Equations/EULER_3D_EIGENSYSTEM_F_ADVECTION_ONLY.h>
-#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
-#include <Compressible/Euler_Equations/EULER_3D_EIGENSYSTEM_G_ADVECTION_ONLY.h>
-#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
-#include <Compressible/Euler_Equations/EULER_3D_EIGENSYSTEM_H_ADVECTION_ONLY.h>
 #include <Compressible/Euler_Equations/EULER_LAPLACE.h>
 #include <Compressible/Euler_Equations/EULER_UNIFORM.h>
 using namespace PhysBAM;
@@ -68,9 +57,9 @@ template<class TV> void EULER_UNIFORM<TV>::
 Set_Custom_Equation_Of_State(EOS<T>& eos_input)
 {
     for(int i=0;i<TV::m;i++){
-        (dynamic_cast<EULER_EIGENSYSTEM_BASE<TV>*>(eigensystems[i]))->eos=&eos_input;
-        (dynamic_cast<EULER_EIGENSYSTEM_BASE<TV>*>(eigensystems_default[i]))->eos=&eos_input;
-        (dynamic_cast<EULER_EIGENSYSTEM_BASE<TV>*>(eigensystems_pressureonly[i]))->eos=&eos_input;}
+        (dynamic_cast<EULER_EIGENSYSTEM<TV>*>(eigensystems[i]))->eos=&eos_input;
+        (dynamic_cast<EULER_EIGENSYSTEM<TV>*>(eigensystems_default[i]))->eos=&eos_input;
+        (dynamic_cast<EULER_EIGENSYSTEM<TV>*>(eigensystems_pressureonly[i]))->eos=&eos_input;}
     BASE::Set_Custom_Equation_Of_State(eos_input);
 }
 //#####################################################################
@@ -462,8 +451,8 @@ template<class TV,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T,VEC
     eigensystems_pressureonly[0]=new EULER_EIGENSYSTEM<TV>(eos,0);
     ((EULER_EIGENSYSTEM<TV>*)eigensystems_pressureonly[0])->only_pressure_flux=true;
     if(eigensystems[0]) delete eigensystems[0];
-    if(advection_only) eigensystems[0]=new EULER_1D_EIGENSYSTEM_F_ADVECTION_ONLY<T>(eos);
-    else eigensystems[0]=new EULER_EIGENSYSTEM<TV>(eos,0);
+    eigensystems[0]=new EULER_EIGENSYSTEM<TV>(eos,0);
+    ((EULER_EIGENSYSTEM<TV>*)eigensystems[0])->only_advection=advection_only;
 }
 template<class TV,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T,VECTOR<T,4> >*,2>& eigensystems_default,VECTOR<EIGENSYSTEM<T,VECTOR<T,4> >*,2>& eigensystems,VECTOR<EIGENSYSTEM<T,VECTOR<T,4> >*,2>& eigensystems_pressureonly,
     const EULER_PROJECTION_UNIFORM<TV>& euler_projection,const bool advection_only,EOS<T>* eos)
@@ -480,12 +469,10 @@ template<class TV,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T,VEC
     ((EULER_EIGENSYSTEM<TV>*)eigensystems_pressureonly[1])->only_pressure_flux=true;
     if(eigensystems[0]) delete eigensystems[0];
     if(eigensystems[1]) delete eigensystems[1];
-    if(advection_only){
-        eigensystems[0]=new EULER_2D_EIGENSYSTEM_F_ADVECTION_ONLY<T>(eos);
-        eigensystems[1]=new EULER_2D_EIGENSYSTEM_G_ADVECTION_ONLY<T>(eos);}
-    else{
-        eigensystems[0]=new EULER_EIGENSYSTEM<TV>(eos,0);
-        eigensystems[1]=new EULER_EIGENSYSTEM<TV>(eos,1);}
+    eigensystems[0]=new EULER_EIGENSYSTEM<TV>(eos,0);
+    eigensystems[1]=new EULER_EIGENSYSTEM<TV>(eos,1);
+    ((EULER_EIGENSYSTEM<TV>*)eigensystems[0])->only_advection=advection_only;
+    ((EULER_EIGENSYSTEM<TV>*)eigensystems[1])->only_advection=advection_only;
 }
 template<class TV,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T,VECTOR<T,5> >*,3>& eigensystems_default,VECTOR<EIGENSYSTEM<T,VECTOR<T,5> >*,3>& eigensystems,VECTOR<EIGENSYSTEM<T,VECTOR<T,5> >*,3>& eigensystems_pressureonly,
     const EULER_PROJECTION_UNIFORM<TV>& euler_projection,const bool advection_only,EOS<T>* eos)
@@ -508,14 +495,12 @@ template<class TV,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T,VEC
     if(eigensystems[0]) delete eigensystems[0];
     if(eigensystems[1]) delete eigensystems[1];
     if(eigensystems[2]) delete eigensystems[2];
-    if(advection_only){
-        eigensystems[0]=new EULER_3D_EIGENSYSTEM_F_ADVECTION_ONLY<T>(eos);
-        eigensystems[1]=new EULER_3D_EIGENSYSTEM_G_ADVECTION_ONLY<T>(eos);
-        eigensystems[2]=new EULER_3D_EIGENSYSTEM_H_ADVECTION_ONLY<T>(eos);}
-    else{
-        eigensystems[0]=new EULER_EIGENSYSTEM<TV>(eos,0);
-        eigensystems[1]=new EULER_EIGENSYSTEM<TV>(eos,1);
-        eigensystems[2]=new EULER_EIGENSYSTEM<TV>(eos,2);}
+    eigensystems[0]=new EULER_EIGENSYSTEM<TV>(eos,0);
+    eigensystems[1]=new EULER_EIGENSYSTEM<TV>(eos,1);
+    eigensystems[2]=new EULER_EIGENSYSTEM<TV>(eos,2);
+    ((EULER_EIGENSYSTEM<TV>*)eigensystems[0])->only_advection=advection_only;
+    ((EULER_EIGENSYSTEM<TV>*)eigensystems[1])->only_advection=advection_only;
+    ((EULER_EIGENSYSTEM<TV>*)eigensystems[2])->only_advection=advection_only;
 }
 
 template<class TV> void EULER_UNIFORM<TV>::

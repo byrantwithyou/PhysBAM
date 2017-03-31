@@ -5,6 +5,7 @@
 // Class SHALLOW_WATER_1D_EIGENSYSTEM_F  
 //##################################################################### 
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Matrices/MATRIX.h>
 #include <Compressible/Shallow_Water_Equations/SHALLOW_WATER_1D_EIGENSYSTEM_F.h>
 using namespace PhysBAM;
 //#####################################################################
