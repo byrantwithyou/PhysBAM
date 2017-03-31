@@ -6,7 +6,7 @@
 #include <Core/Math_Tools/sqr.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Compressible/Euler_Equations/EULER_3D_EIGENSYSTEM_G_ADVECTION_ONLY.h>
-#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
+#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM_BASE.h>
 namespace PhysBAM{
 //#####################################################################
 // Function Flux

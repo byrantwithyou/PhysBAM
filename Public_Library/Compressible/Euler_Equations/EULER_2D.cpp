@@ -4,8 +4,8 @@
 //#####################################################################
 #include <Compressible/Euler_Equations/EULER.h>
 #include <Compressible/Euler_Equations/EULER_2D.h>
-#include <Compressible/Euler_Equations/EULER_2D_EIGENSYSTEM_F.h>
-#include <Compressible/Euler_Equations/EULER_2D_EIGENSYSTEM_G.h>
+#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
+#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
 namespace PhysBAM{
 //#####################################################################
 // Function Euler_Step

@@ -9,16 +9,18 @@
 #define __EULER_2D_EIGENSYSTEM_F_ADVECTION_ONLY__
 
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
-#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
+#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM_BASE.h>
 namespace PhysBAM{
 
 template<class T_input>
-class EULER_2D_EIGENSYSTEM_F_ADVECTION_ONLY:public EULER_EIGENSYSTEM<VECTOR<T_input,2> >
+class EULER_2D_EIGENSYSTEM_F_ADVECTION_ONLY:public EULER_EIGENSYSTEM_BASE<VECTOR<T_input,2> >
 {
     typedef T_input T;typedef VECTOR<T,4> TV_DIMENSION;
     enum WORKAROUND1 {d=TV_DIMENSION::m};
+    typedef EULER_EIGENSYSTEM_BASE<VECTOR<T_input,2> > BASE;
 public:
-    EULER_2D_EIGENSYSTEM_F_ADVECTION_ONLY()
+    EULER_2D_EIGENSYSTEM_F_ADVECTION_ONLY(EOS<T>* eos_input)
+        :BASE(eos_input)
     {}
 
     bool All_Eigenvalues_Same() override {return true;}

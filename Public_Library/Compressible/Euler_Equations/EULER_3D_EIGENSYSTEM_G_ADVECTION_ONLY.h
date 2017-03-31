@@ -10,16 +10,18 @@
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Math_Tools/sqr.h>
 #include <Grid_Tools/Grids/GRID.h>
-#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
+#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM_BASE.h>
 namespace PhysBAM{
 
 template<class T_input>
-class EULER_3D_EIGENSYSTEM_G_ADVECTION_ONLY:public EULER_EIGENSYSTEM<VECTOR<T_input,3> >
+class EULER_3D_EIGENSYSTEM_G_ADVECTION_ONLY:public EULER_EIGENSYSTEM_BASE<VECTOR<T_input,3> >
 {
     typedef T_input T;typedef VECTOR<T,5> TV_DIMENSION;
     enum WORKAROUND1 {d=TV_DIMENSION::m};
+    typedef EULER_EIGENSYSTEM_BASE<VECTOR<T_input,3> > BASE;
 public:
-    EULER_3D_EIGENSYSTEM_G_ADVECTION_ONLY()
+    EULER_3D_EIGENSYSTEM_G_ADVECTION_ONLY(EOS<T>* eos_input)
+        :BASE(eos_input)
     {}
 
     bool All_Eigenvalues_Same() override {return true;}

@@ -18,9 +18,9 @@
 #define __EULER_3D__
 
 #include <Compressible/Euler_Equations/EULER.h>
-#include <Compressible/Euler_Equations/EULER_3D_EIGENSYSTEM_F.h>
-#include <Compressible/Euler_Equations/EULER_3D_EIGENSYSTEM_G.h>
-#include <Compressible/Euler_Equations/EULER_3D_EIGENSYSTEM_H.h>
+#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
+#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
+#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
 namespace PhysBAM{
 
 template<class T_input>
@@ -33,13 +33,13 @@ protected:
     GRID<TV>& grid;
     ARRAY<TV_DIMENSION,VECTOR<int,3> >& U;             // mass, momentum, and energy
     ARRAY<bool,VECTOR<int,3> >* psi_pointer; // defines cut out grid
-    EULER_3D_EIGENSYSTEM_F<T> eigensystem_F;
-    EULER_3D_EIGENSYSTEM_G<T> eigensystem_G;
-    EULER_3D_EIGENSYSTEM_H<T> eigensystem_H;
+    EULER_EIGENSYSTEM<TV> eigensystem_F;
+    EULER_EIGENSYSTEM<TV> eigensystem_G;
+    EULER_EIGENSYSTEM<TV> eigensystem_H;
     
 public:
     EULER_3D(EOS<T>& eos_input,GRID<TV>& grid_input,ARRAY<TV_DIMENSION,VECTOR<int,3> >& U_input)  
-        :grid(grid_input),U(U_input),psi_pointer(0),eigensystem_F(),eigensystem_G(),eigensystem_H()
+        :grid(grid_input),U(U_input),psi_pointer(0),eigensystem_F(&this->eos_default,0),eigensystem_G(&this->eos_default,1),eigensystem_H(&this->eos_default,2)
     {
         Set_Custom_Equation_Of_State(eos_input);
     }

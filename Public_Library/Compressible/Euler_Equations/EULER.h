@@ -35,12 +35,10 @@ public:
     VECTOR<bool,2*TV::m> open_boundaries;
     bool use_solid_velocity_in_ghost_cells;
 
-protected:
     bool cut_out_grid; // (1) cut out grid, (0) no cut out grid 
     T max_time_step;
     bool use_force;
     TV gravity;
-private:
     BOUNDARY<TV,TV_DIMENSION> boundary_default;
     CONSERVATION_ENO_LLF<TV,d> conservation_default;
     EOS_GAMMA<T> eos_default;

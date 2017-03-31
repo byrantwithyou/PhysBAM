@@ -5,7 +5,7 @@
 //#####################################################################
 #include <Compressible/Euler_Equations/EULER.h>
 #include <Compressible/Euler_Equations/EULER_1D.h>
-#include <Compressible/Euler_Equations/EULER_1D_EIGENSYSTEM_F.h>
+#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
 namespace PhysBAM{
 //#####################################################################
 // Function Euler_Step

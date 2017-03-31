@@ -5,7 +5,7 @@
 //#####################################################################
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Compressible/Euler_Equations/EULER_2D_EIGENSYSTEM_G_ADVECTION_ONLY.h>
-#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
+#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM_BASE.h>
 namespace PhysBAM{
 //#####################################################################
 // Function Flux

@@ -19,7 +19,7 @@
 #define __EULER_1D__
 
 #include <Compressible/Euler_Equations/EULER.h>
-#include <Compressible/Euler_Equations/EULER_1D_EIGENSYSTEM_F.h>
+#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
 namespace PhysBAM{
 
 template<class T_input>
@@ -34,17 +34,17 @@ public:
     GRID<TV> grid;
     ARRAY<TV_DIMENSION,VECTOR<int,1> >& U;         // mass, momentum, and energy
     ARRAY<bool,VECTOR<int,1> >* psi_pointer; // defines cut out grid
-    EULER_1D_EIGENSYSTEM_F<T> eigensystem_F;
+    EULER_EIGENSYSTEM<TV> eigensystem_F;
 
     EULER_1D(ARRAY<TV_DIMENSION,VECTOR<int,1> >& U_input)
-        :U(U_input)
+        :U(U_input),eigensystem_F(&this->eos_default,0)
     {}
     
     void Set_Up_Cut_Out_Grid(ARRAY<bool,VECTOR<int,1> >& psi_input)
     {psi_pointer=&psi_input;cut_out_grid=true;}
 
     void Set_Custom_Equation_Of_State(EOS<T>& eos_input)
-    {eigensystem_F.Set_Custom_Equation_Of_State(eos_input);EULER<TV>::Set_Custom_Equation_Of_State(eos_input);}
+    {eigensystem_F.eos=&eos_input;EULER<TV>::Set_Custom_Equation_Of_State(eos_input);}
     
     void Initialize_Domain(const int m, const T xmin, const T xmax)
     {grid.Initialize(m,xmin,xmax);}

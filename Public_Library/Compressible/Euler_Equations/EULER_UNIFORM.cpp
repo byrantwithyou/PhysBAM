@@ -11,17 +11,17 @@
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>
-#include <Compressible/Euler_Equations/EULER_1D_EIGENSYSTEM_F.h>
+#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
 #include <Compressible/Euler_Equations/EULER_1D_EIGENSYSTEM_F_ADVECTION_ONLY.h>
-#include <Compressible/Euler_Equations/EULER_2D_EIGENSYSTEM_F.h>
+#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
 #include <Compressible/Euler_Equations/EULER_2D_EIGENSYSTEM_F_ADVECTION_ONLY.h>
-#include <Compressible/Euler_Equations/EULER_2D_EIGENSYSTEM_G.h>
+#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
 #include <Compressible/Euler_Equations/EULER_2D_EIGENSYSTEM_G_ADVECTION_ONLY.h>
-#include <Compressible/Euler_Equations/EULER_3D_EIGENSYSTEM_F.h>
+#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
 #include <Compressible/Euler_Equations/EULER_3D_EIGENSYSTEM_F_ADVECTION_ONLY.h>
-#include <Compressible/Euler_Equations/EULER_3D_EIGENSYSTEM_G.h>
+#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
 #include <Compressible/Euler_Equations/EULER_3D_EIGENSYSTEM_G_ADVECTION_ONLY.h>
-#include <Compressible/Euler_Equations/EULER_3D_EIGENSYSTEM_H.h>
+#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
 #include <Compressible/Euler_Equations/EULER_3D_EIGENSYSTEM_H_ADVECTION_ONLY.h>
 #include <Compressible/Euler_Equations/EULER_LAPLACE.h>
 #include <Compressible/Euler_Equations/EULER_UNIFORM.h>
@@ -68,9 +68,9 @@ template<class TV> void EULER_UNIFORM<TV>::
 Set_Custom_Equation_Of_State(EOS<T>& eos_input)
 {
     for(int i=0;i<TV::m;i++){
-        (dynamic_cast<EULER_EIGENSYSTEM<TV>*>(eigensystems[i]))->Set_Custom_Equation_Of_State(eos_input);
-        (dynamic_cast<EULER_EIGENSYSTEM<TV>*>(eigensystems_default[i]))->Set_Custom_Equation_Of_State(eos_input);
-        (dynamic_cast<EULER_EIGENSYSTEM<TV>*>(eigensystems_pressureonly[i]))->Set_Custom_Equation_Of_State(eos_input);}
+        (dynamic_cast<EULER_EIGENSYSTEM_BASE<TV>*>(eigensystems[i]))->eos=&eos_input;
+        (dynamic_cast<EULER_EIGENSYSTEM_BASE<TV>*>(eigensystems_default[i]))->eos=&eos_input;
+        (dynamic_cast<EULER_EIGENSYSTEM_BASE<TV>*>(eigensystems_pressureonly[i]))->eos=&eos_input;}
     BASE::Set_Custom_Equation_Of_State(eos_input);
 }
 //#####################################################################
@@ -454,68 +454,74 @@ CFL(const T time) const
 // Function Set_Eigensystems
 //#####################################################################
 template<class TV,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T,VECTOR<T,3> >*,1>& eigensystems_default,VECTOR<EIGENSYSTEM<T,VECTOR<T,3> >*,1>& eigensystems,VECTOR<EIGENSYSTEM<T,VECTOR<T,3> >*,1>& eigensystems_pressureonly,
-    const EULER_PROJECTION_UNIFORM<TV>& euler_projection,const bool advection_only)
+    const EULER_PROJECTION_UNIFORM<TV>& euler_projection,const bool advection_only,EOS<T>* eos)
 {
     if(eigensystems_default[0]) delete eigensystems_default[0];
-    eigensystems_default[0]=new EULER_1D_EIGENSYSTEM_F<T>();
+    eigensystems_default[0]=new EULER_EIGENSYSTEM<TV>(eos,0);
     if(eigensystems_pressureonly[0]) delete eigensystems_pressureonly[0];
-    eigensystems_pressureonly[0]=new EULER_1D_EIGENSYSTEM_F<T>(true);
+    eigensystems_pressureonly[0]=new EULER_EIGENSYSTEM<TV>(eos,0);
+    ((EULER_EIGENSYSTEM<TV>*)eigensystems_pressureonly[0])->only_pressure_flux=true;
     if(eigensystems[0]) delete eigensystems[0];
-    if(advection_only) eigensystems[0]=new EULER_1D_EIGENSYSTEM_F_ADVECTION_ONLY<T>();
-    else eigensystems[0]=new EULER_1D_EIGENSYSTEM_F<T>();
+    if(advection_only) eigensystems[0]=new EULER_1D_EIGENSYSTEM_F_ADVECTION_ONLY<T>(eos);
+    else eigensystems[0]=new EULER_EIGENSYSTEM<TV>(eos,0);
 }
 template<class TV,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T,VECTOR<T,4> >*,2>& eigensystems_default,VECTOR<EIGENSYSTEM<T,VECTOR<T,4> >*,2>& eigensystems,VECTOR<EIGENSYSTEM<T,VECTOR<T,4> >*,2>& eigensystems_pressureonly,
-    const EULER_PROJECTION_UNIFORM<TV>& euler_projection,const bool advection_only)
+    const EULER_PROJECTION_UNIFORM<TV>& euler_projection,const bool advection_only,EOS<T>* eos)
 {
     if(eigensystems_default[0]) delete eigensystems_default[0];
-    eigensystems_default[0]=new EULER_2D_EIGENSYSTEM_F<T>();
+    eigensystems_default[0]=new EULER_EIGENSYSTEM<TV>(eos,0);
     if(eigensystems_default[1]) delete eigensystems_default[1];
-    eigensystems_default[1]=new EULER_2D_EIGENSYSTEM_G<T>();
+    eigensystems_default[1]=new EULER_EIGENSYSTEM<TV>(eos,1);
     if(eigensystems_pressureonly[0]) delete eigensystems_pressureonly[0];
-    eigensystems_pressureonly[0]=new EULER_2D_EIGENSYSTEM_F<T>(true);
+    eigensystems_pressureonly[0]=new EULER_EIGENSYSTEM<TV>(eos,0);
+    ((EULER_EIGENSYSTEM<TV>*)eigensystems_pressureonly[0])->only_pressure_flux=true;
     if(eigensystems_pressureonly[1]) delete eigensystems_pressureonly[1];
-    eigensystems_pressureonly[1]=new EULER_2D_EIGENSYSTEM_G<T>(true);
+    eigensystems_pressureonly[1]=new EULER_EIGENSYSTEM<TV>(eos,1);
+    ((EULER_EIGENSYSTEM<TV>*)eigensystems_pressureonly[1])->only_pressure_flux=true;
     if(eigensystems[0]) delete eigensystems[0];
     if(eigensystems[1]) delete eigensystems[1];
     if(advection_only){
-        eigensystems[0]=new EULER_2D_EIGENSYSTEM_F_ADVECTION_ONLY<T>();
-        eigensystems[1]=new EULER_2D_EIGENSYSTEM_G_ADVECTION_ONLY<T>();}
+        eigensystems[0]=new EULER_2D_EIGENSYSTEM_F_ADVECTION_ONLY<T>(eos);
+        eigensystems[1]=new EULER_2D_EIGENSYSTEM_G_ADVECTION_ONLY<T>(eos);}
     else{
-        eigensystems[0]=new EULER_2D_EIGENSYSTEM_F<T>();
-        eigensystems[1]=new EULER_2D_EIGENSYSTEM_G<T>();}
+        eigensystems[0]=new EULER_EIGENSYSTEM<TV>(eos,0);
+        eigensystems[1]=new EULER_EIGENSYSTEM<TV>(eos,1);}
 }
 template<class TV,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T,VECTOR<T,5> >*,3>& eigensystems_default,VECTOR<EIGENSYSTEM<T,VECTOR<T,5> >*,3>& eigensystems,VECTOR<EIGENSYSTEM<T,VECTOR<T,5> >*,3>& eigensystems_pressureonly,
-    const EULER_PROJECTION_UNIFORM<TV>& euler_projection,const bool advection_only)
+    const EULER_PROJECTION_UNIFORM<TV>& euler_projection,const bool advection_only,EOS<T>* eos)
 {
     if(eigensystems_default[0]) delete eigensystems_default[0];
-    eigensystems_default[0]=new EULER_3D_EIGENSYSTEM_F<T>();
+    eigensystems_default[0]=new EULER_EIGENSYSTEM<TV>(eos,0);
     if(eigensystems_default[1]) delete eigensystems_default[1];
-    eigensystems_default[1]=new EULER_3D_EIGENSYSTEM_G<T>();
+    eigensystems_default[1]=new EULER_EIGENSYSTEM<TV>(eos,1);
     if(eigensystems_default[2]) delete eigensystems_default[2];
-    eigensystems_default[2]=new EULER_3D_EIGENSYSTEM_H<T>();
+    eigensystems_default[2]=new EULER_EIGENSYSTEM<TV>(eos,2);
     if(eigensystems_pressureonly[0]) delete eigensystems_pressureonly[0];
-    eigensystems_pressureonly[0]=new EULER_3D_EIGENSYSTEM_F<T>(true);
+    eigensystems_pressureonly[0]=new EULER_EIGENSYSTEM<TV>(eos,0);
+    ((EULER_EIGENSYSTEM<TV>*)eigensystems_pressureonly[0])->only_pressure_flux=true;
     if(eigensystems_pressureonly[1]) delete eigensystems_pressureonly[1];
-    eigensystems_pressureonly[1]=new EULER_3D_EIGENSYSTEM_G<T>(true);
+    eigensystems_pressureonly[1]=new EULER_EIGENSYSTEM<TV>(eos,1);
+    ((EULER_EIGENSYSTEM<TV>*)eigensystems_pressureonly[1])->only_pressure_flux=true;
     if(eigensystems_pressureonly[2]) delete eigensystems_pressureonly[2];
-    eigensystems_pressureonly[2]=new EULER_3D_EIGENSYSTEM_H<T>(true);
+    eigensystems_pressureonly[2]=new EULER_EIGENSYSTEM<TV>(eos,2);
+    ((EULER_EIGENSYSTEM<TV>*)eigensystems_pressureonly[2])->only_pressure_flux=true;
     if(eigensystems[0]) delete eigensystems[0];
     if(eigensystems[1]) delete eigensystems[1];
     if(eigensystems[2]) delete eigensystems[2];
     if(advection_only){
-        eigensystems[0]=new EULER_3D_EIGENSYSTEM_F_ADVECTION_ONLY<T>();
-        eigensystems[1]=new EULER_3D_EIGENSYSTEM_G_ADVECTION_ONLY<T>();
-        eigensystems[2]=new EULER_3D_EIGENSYSTEM_H_ADVECTION_ONLY<T>();}
+        eigensystems[0]=new EULER_3D_EIGENSYSTEM_F_ADVECTION_ONLY<T>(eos);
+        eigensystems[1]=new EULER_3D_EIGENSYSTEM_G_ADVECTION_ONLY<T>(eos);
+        eigensystems[2]=new EULER_3D_EIGENSYSTEM_H_ADVECTION_ONLY<T>(eos);}
     else{
-        eigensystems[0]=new EULER_3D_EIGENSYSTEM_F<T>();
-        eigensystems[1]=new EULER_3D_EIGENSYSTEM_G<T>();
-        eigensystems[2]=new EULER_3D_EIGENSYSTEM_H<T>();}
+        eigensystems[0]=new EULER_EIGENSYSTEM<TV>(eos,0);
+        eigensystems[1]=new EULER_EIGENSYSTEM<TV>(eos,1);
+        eigensystems[2]=new EULER_EIGENSYSTEM<TV>(eos,2);}
 }
 
 template<class TV> void EULER_UNIFORM<TV>::
 Set_Eigensystems(const bool advection_only)
 {
-    Set_Eigensystems_Helper(eigensystems_default,eigensystems,eigensystems_pressureonly,euler_projection,advection_only);
+    Set_Eigensystems_Helper(eigensystems_default,eigensystems,eigensystems_pressureonly,euler_projection,advection_only,&this->eos_default);
     Set_Custom_Equation_Of_State(*eos);
 }
 //#####################################################################

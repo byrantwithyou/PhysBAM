@@ -18,8 +18,8 @@
 #define __EULER_2D__
 
 #include <Compressible/Euler_Equations/EULER.h>
-#include <Compressible/Euler_Equations/EULER_2D_EIGENSYSTEM_F.h>
-#include <Compressible/Euler_Equations/EULER_2D_EIGENSYSTEM_G.h>
+#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
+#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
 namespace PhysBAM{
 
 template<class T_input>
@@ -34,11 +34,11 @@ public:
     GRID<TV> grid;
     ARRAY<TV_DIMENSION,VECTOR<int,2> >& U; // mass, momentum, and energy
     ARRAY<bool,VECTOR<int,2> >* psi_pointer; // defines cut out grid
-    EULER_2D_EIGENSYSTEM_F<T> eigensystem_F;
-    EULER_2D_EIGENSYSTEM_G<T> eigensystem_G;
+    EULER_EIGENSYSTEM<TV> eigensystem_F;
+    EULER_EIGENSYSTEM<TV> eigensystem_G;
 
     EULER_2D(ARRAY<TV_DIMENSION,VECTOR<int,2> >& U_input)
-        :U(U_input)
+        :U(U_input),eigensystem_F(&this->eos_default,0),eigensystem_G(&this->eos_default,1)
     {}
     
     void Set_Up_Cut_Out_Grid(ARRAY<bool,VECTOR<int,2> >& psi_input)
