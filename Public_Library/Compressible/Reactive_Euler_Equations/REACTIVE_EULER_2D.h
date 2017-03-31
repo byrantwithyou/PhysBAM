@@ -18,8 +18,7 @@
 #define __REACTIVE_EULER_2D__
 
 #include <Compressible/Reactive_Euler_Equations/REACTIVE_EULER.h>
-#include <Compressible/Reactive_Euler_Equations/REACTIVE_EULER_2D_EIGENSYSTEM_F.h>
-#include <Compressible/Reactive_Euler_Equations/REACTIVE_EULER_2D_EIGENSYSTEM_G.h>
+#include <Compressible/Reactive_Euler_Equations/REACTIVE_EULER_EIGENSYSTEM.h>
 namespace PhysBAM{
 
 template<class T_input>
@@ -33,12 +32,11 @@ protected:
     GRID<TV>& grid;
     ARRAY<TV_DIMENSION,VECTOR<int,2> >& U;         // mass, momentum, and energy
     ARRAY<bool,VECTOR<int,2> >* psi_pointer; // defines cut out grid
-    REACTIVE_EULER_2D_EIGENSYSTEM_F<T> eigensystem_F;
-    REACTIVE_EULER_2D_EIGENSYSTEM_G<T> eigensystem_G;
+    REACTIVE_EULER_EIGENSYSTEM<TV> eigensystem_F,eigensystem_G;
 
 public:
     REACTIVE_EULER_2D(REACTIVE_EOS<T>& eos_input,GRID<VECTOR<T,2> >& grid_input,ARRAY<TV_DIMENSION,VECTOR<int,2> >& U_input)  
-        :REACTIVE_EULER<TV>(eos_input),grid(grid_input),U(U_input),eigensystem_F(eos_input),eigensystem_G(eos_input)
+        :REACTIVE_EULER<TV>(eos_input),grid(grid_input),U(U_input),eigensystem_F(eos_input,0),eigensystem_G(eos_input,1)
     {}
     
     void Set_Up_Cut_Out_Grid(ARRAY<bool,VECTOR<int,2> >& psi_input)
