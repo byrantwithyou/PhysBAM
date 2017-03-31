@@ -24,4 +24,5 @@ Apply_Boundary_Condition(const GRID<TV>& grid,T_ARRAYS_DIMENSION_T2& u,const T t
     for(int side=0;side<2*TV::m;side++) boundaries[side]->Apply_Boundary_Condition(grid,u,time);
 }
 template class BOUNDARY_MULTIPLE_UNIFORM<VECTOR<float,2>,VECTOR<float,4> >;
+template class BOUNDARY_MULTIPLE_UNIFORM<VECTOR<double,2>,VECTOR<double,4> >;
 }
