@@ -29,7 +29,7 @@ template<class T> void main_program(PARSE_ARGS& parse_args){
     parse_args.Add("-xprocs",&procs.x,"n","X procs");
     parse_args.Add("-yprocs",&procs.y,"n","Y procs");
     parse_args.Add("-zprocs",&procs.z,"n","Z procs");
-    parse_args.Parse();
+    parse_args.Parse(true);
 
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>* example=0;
     if(opt_sphere) example=new SPHERE_EXAMPLE<T>(stream_type,parse_args);
