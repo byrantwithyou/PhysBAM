@@ -29,7 +29,7 @@ Euler_Step(const T dt,const T time)
     ARRAY<bool,FACE_INDEX<TV::m> > psi_N(grid.Get_MAC_Grid_At_Regular_Positions());
     ARRAY<T,FACE_INDEX<TV::m> > face_velocities(grid.Get_MAC_Grid_At_Regular_Positions());
     conservation->Save_Fluxes();
-    VECTOR<EIGENSYSTEM<T,VECTOR<T,2> >*,1> eigensystem(&eigensystem_F);
+    VECTOR<EIGENSYSTEM<T,2>*,1> eigensystem(&eigensystem_F);
     conservation->Update_Conservation_Law(grid,U,U_ghost,psi,dt,eigensystem,eigensystem,psi_N,face_velocities);
 
     ARRAY_VIEW<TV_DIMENSION,VECTOR<int,1> >& old_flux=conservation->fluxes.Component(0);

@@ -13,7 +13,7 @@ namespace PhysBAM{
 template<class T> class EOS;
 
 template<class TV>
-class EULER_EIGENSYSTEM:public EIGENSYSTEM<typename TV::SCALAR,VECTOR<typename TV::SCALAR,TV::m+2> >
+class EULER_EIGENSYSTEM:public EIGENSYSTEM<typename TV::SCALAR,TV::m+2>
 {
     enum WORKAROUND1 {d=TV::m+2};
     typedef typename TV::SCALAR T;typedef VECTOR<T,d> TV_DIMENSION;

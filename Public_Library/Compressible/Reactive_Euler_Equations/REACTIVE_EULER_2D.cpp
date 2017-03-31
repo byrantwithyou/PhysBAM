@@ -21,7 +21,7 @@ Euler_Step(const T dt,const T time)
 
     ARRAY<bool,FACE_INDEX<TV::m> > psi_N(grid.Get_MAC_Grid_At_Regular_Positions());
     ARRAY<T,FACE_INDEX<TV::m> > face_velocities(grid.Get_MAC_Grid_At_Regular_Positions());
-    VECTOR<EIGENSYSTEM<T,VECTOR<T,5> >*,2> eigensystem(&eigensystem_F,&eigensystem_G);
+    VECTOR<EIGENSYSTEM<T,5>*,2> eigensystem(&eigensystem_F,&eigensystem_G);
     if(cut_out_grid) 
         conservation->Update_Conservation_Law(grid,U,U_ghost,*psi_pointer,dt,eigensystem,eigensystem,psi_N,face_velocities);
     else{ // not a cut out grid

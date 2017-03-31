@@ -12,7 +12,7 @@
 namespace PhysBAM{
 
 template<class T>
-class BURGERS_1D_EIGENSYSTEM_F:public EIGENSYSTEM<T,VECTOR<T,1> >
+class BURGERS_1D_EIGENSYSTEM_F:public EIGENSYSTEM<T,1>
 {
     typedef VECTOR<T,1> TV_DIMENSION;
     enum WORKAROUND1 {d=TV_DIMENSION::m};

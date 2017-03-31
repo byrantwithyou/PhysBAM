@@ -27,7 +27,8 @@ template<class TV>
 class EULER_UNIFORM:public EULER<TV>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef VECTOR<T,TV::m+2> TV_DIMENSION;
+    enum WORKAROUND1{d=TV::m+2};
+    typedef VECTOR<T,d> TV_DIMENSION;
     typedef ARRAY<TV_DIMENSION,TV_INT> T_ARRAYS_DIMENSION_SCALAR;
     typedef ARRAY<TV_DIMENSION,FACE_INDEX<TV::m> > T_FACE_ARRAYS_DIMENSION_SCALAR;
     typedef MPI_UNIFORM_GRID<TV> T_MPI_GRID;
@@ -47,7 +48,7 @@ public:
     const T_ARRAYS_DIMENSION_SCALAR& U_ghost;
     ARRAY<bool,TV_INT>* psi_pointer; // defines cut out grid
     ARRAY<bool,TV_INT> psi;
-    VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m> eigensystems,eigensystems_default,eigensystems_pressureonly;
+    VECTOR<EIGENSYSTEM<T,d>*,TV::m> eigensystems,eigensystems_default,eigensystems_pressureonly;
     bool timesplit,use_sound_speed_for_cfl,perform_rungekutta_for_implicit_part,compute_pressure_fluxes,thinshell;
     bool use_sound_speed_based_dt_multiple_for_cfl; // if set, dt will be set to multiplication_factor_for_sound_speed_based_dt*dt_based_on_c whenever this number is less than dt_based_on_u
     T multiplication_factor_for_sound_speed_based_dt;

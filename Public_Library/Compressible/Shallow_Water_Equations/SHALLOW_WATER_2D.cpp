@@ -25,7 +25,7 @@ Euler_Step(const T dt,const T time)
     ARRAY<bool,VECTOR<int,2> > psi(0,m,0,n);psi.Fill(true); // no cut out grids
     ARRAY<bool,FACE_INDEX<TV::m> > psi_N(grid.Get_MAC_Grid_At_Regular_Positions());
     ARRAY<T,FACE_INDEX<TV::m> > face_velocities(grid.Get_MAC_Grid_At_Regular_Positions());
-    VECTOR<EIGENSYSTEM<T,VECTOR<T,3> >*,2> eigensystem(&eigensystem_F,&eigensystem_G);
+    VECTOR<EIGENSYSTEM<T,3>*,2> eigensystem(&eigensystem_F,&eigensystem_G);
     conservation->Update_Conservation_Law(grid,U,U_ghost,psi,dt,eigensystem,eigensystem,psi_N,face_velocities);
 
     boundary->Apply_Boundary_Condition(grid,U,time+dt); 

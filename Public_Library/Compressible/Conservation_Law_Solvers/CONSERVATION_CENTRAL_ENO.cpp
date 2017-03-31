@@ -14,7 +14,7 @@ using namespace PhysBAM;
 //#####################################################################
 // psi is size (0,m) - U is size 3 by (-3,m+3) with 3 ghost cells - Fx is size 3 by (0,m)
 template<class TV,int d> void CONSERVATION_CENTRAL_ENO<TV,d>::
-Conservation_Solver(const int m,const T dx,const ARRAY<bool,VECTOR<int,1> >& psi,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,ARRAY<TV_DIMENSION,VECTOR<int,1> >& Fx,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem_explicit,
+Conservation_Solver(const int m,const T dx,const ARRAY<bool,VECTOR<int,1> >& psi,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,ARRAY<TV_DIMENSION,VECTOR<int,1> >& Fx,EIGENSYSTEM<T,d>& eigensystem,EIGENSYSTEM<T,d>& eigensystem_explicit,
         const VECTOR<bool,2>& outflow_boundaries,ARRAY<TV_DIMENSION,VECTOR<int,1> >* U_flux)
 {
     switch(order){
@@ -26,7 +26,7 @@ Conservation_Solver(const int m,const T dx,const ARRAY<bool,VECTOR<int,1> >& psi
 // Function Conservation_Solver_Helper
 //#####################################################################
 template<class TV,int d> template<int eno_order> void CONSERVATION_CENTRAL_ENO<TV,d>::
-Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1> >& psi,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,ARRAY<TV_DIMENSION,VECTOR<int,1> >& Fx,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem_explicit,
+Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1> >& psi,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,ARRAY<TV_DIMENSION,VECTOR<int,1> >& Fx,EIGENSYSTEM<T,d>& eigensystem,EIGENSYSTEM<T,d>& eigensystem_explicit,
         const VECTOR<bool,2>& outflow_boundaries)
 {
     int k,i,j;

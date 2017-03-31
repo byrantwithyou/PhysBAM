@@ -442,7 +442,7 @@ CFL(const T time) const
 //#####################################################################
 // Function Set_Eigensystems
 //#####################################################################
-template<class TV,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T,VECTOR<T,3> >*,1>& eigensystems_default,VECTOR<EIGENSYSTEM<T,VECTOR<T,3> >*,1>& eigensystems,VECTOR<EIGENSYSTEM<T,VECTOR<T,3> >*,1>& eigensystems_pressureonly,
+template<class TV,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T,3>*,1>& eigensystems_default,VECTOR<EIGENSYSTEM<T,3>*,1>& eigensystems,VECTOR<EIGENSYSTEM<T,3>*,1>& eigensystems_pressureonly,
     const EULER_PROJECTION_UNIFORM<TV>& euler_projection,const bool advection_only,EOS<T>* eos)
 {
     if(eigensystems_default[0]) delete eigensystems_default[0];
@@ -454,7 +454,7 @@ template<class TV,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T,VEC
     eigensystems[0]=new EULER_EIGENSYSTEM<TV>(eos,0);
     ((EULER_EIGENSYSTEM<TV>*)eigensystems[0])->only_advection=advection_only;
 }
-template<class TV,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T,VECTOR<T,4> >*,2>& eigensystems_default,VECTOR<EIGENSYSTEM<T,VECTOR<T,4> >*,2>& eigensystems,VECTOR<EIGENSYSTEM<T,VECTOR<T,4> >*,2>& eigensystems_pressureonly,
+template<class TV,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T,4>*,2>& eigensystems_default,VECTOR<EIGENSYSTEM<T,4>*,2>& eigensystems,VECTOR<EIGENSYSTEM<T,4>*,2>& eigensystems_pressureonly,
     const EULER_PROJECTION_UNIFORM<TV>& euler_projection,const bool advection_only,EOS<T>* eos)
 {
     if(eigensystems_default[0]) delete eigensystems_default[0];
@@ -474,7 +474,7 @@ template<class TV,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T,VEC
     ((EULER_EIGENSYSTEM<TV>*)eigensystems[0])->only_advection=advection_only;
     ((EULER_EIGENSYSTEM<TV>*)eigensystems[1])->only_advection=advection_only;
 }
-template<class TV,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T,VECTOR<T,5> >*,3>& eigensystems_default,VECTOR<EIGENSYSTEM<T,VECTOR<T,5> >*,3>& eigensystems,VECTOR<EIGENSYSTEM<T,VECTOR<T,5> >*,3>& eigensystems_pressureonly,
+template<class TV,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T,5>*,3>& eigensystems_default,VECTOR<EIGENSYSTEM<T,5>*,3>& eigensystems,VECTOR<EIGENSYSTEM<T,5>*,3>& eigensystems_pressureonly,
     const EULER_PROJECTION_UNIFORM<TV>& euler_projection,const bool advection_only,EOS<T>* eos)
 {
     if(eigensystems_default[0]) delete eigensystems_default[0];

@@ -13,7 +13,7 @@
 namespace PhysBAM{
 
 template<class T_input>
-class REACTIVE_EULER_2D_EIGENSYSTEM_F:public EIGENSYSTEM<T_input,VECTOR<T_input,5> >,public REACTIVE_EULER<VECTOR<T_input,2> >
+class REACTIVE_EULER_2D_EIGENSYSTEM_F:public EIGENSYSTEM<T_input,5>,public REACTIVE_EULER<VECTOR<T_input,2> >
 {
     typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<T,5> TV_DIMENSION;
     enum WORKAROUND1 {d=TV_DIMENSION::m};

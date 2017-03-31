@@ -11,7 +11,7 @@
 namespace PhysBAM{
 
 template<class T>
-class SHALLOW_WATER_2D_EIGENSYSTEM_F:public EIGENSYSTEM<T,VECTOR<T,3> >
+class SHALLOW_WATER_2D_EIGENSYSTEM_F:public EIGENSYSTEM<T,3>
 {
     enum WORKAROUND1 {d=3};
 public:

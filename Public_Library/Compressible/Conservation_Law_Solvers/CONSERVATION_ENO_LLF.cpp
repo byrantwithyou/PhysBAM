@@ -16,7 +16,7 @@ using namespace PhysBAM;
 // psi is size (0,m) - U is size 3 by (-2,m+3) with 3 ghost cells - Fx is size 3 by (0,m)
 template<class TV,int d> void CONSERVATION_ENO_LLF<TV,d>::
 Conservation_Solver(const int m,const T dx,const ARRAY<bool,VECTOR<int,1> >& psi,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,
-    ARRAY<TV_DIMENSION,VECTOR<int,1> >& Fx,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem_explicit,
+    ARRAY<TV_DIMENSION,VECTOR<int,1> >& Fx,EIGENSYSTEM<T,d>& eigensystem,EIGENSYSTEM<T,d>& eigensystem_explicit,
     const VECTOR<bool,2>& outflow_boundaries,ARRAY<TV_DIMENSION,VECTOR<int,1> >* U_flux)
 {
     switch(order){
@@ -32,7 +32,7 @@ Conservation_Solver(const int m,const T dx,const ARRAY<bool,VECTOR<int,1> >& psi
 // TODO(kwatra): can try implementing Flux_Divided_By_Velocity for fully explicit eigensystems and see if multiplying by face_velocity later works.
 template<class TV,int d> template<int eno_order> void CONSERVATION_ENO_LLF<TV,d>::
 Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1> >& psi,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,
-    ARRAY<TV_DIMENSION,VECTOR<int,1> >& Fx,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem_explicit,
+    ARRAY<TV_DIMENSION,VECTOR<int,1> >& Fx,EIGENSYSTEM<T,d>& eigensystem,EIGENSYSTEM<T,d>& eigensystem_explicit,
     const VECTOR<bool,2>& outflow_boundaries,ARRAY<TV_DIMENSION,VECTOR<int,1> >* U_flux)
 {
     int number_ghost_cells=3;
@@ -114,7 +114,7 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
 // Function Conservation_Solver_Helper
 //#####################################################################
 template<class TV,int d> template<int eno_order> void CONSERVATION_ENO_LLF<TV,d>::
-Conservation_Solver_Helper_Experimental(const int m,const T dx,const ARRAY<bool,VECTOR<int,1> >& psi,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,ARRAY<TV_DIMENSION,VECTOR<int,1> >& Fx,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem,EIGENSYSTEM<T,TV_DIMENSION>& eigensystem_explicit,
+Conservation_Solver_Helper_Experimental(const int m,const T dx,const ARRAY<bool,VECTOR<int,1> >& psi,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,ARRAY<TV_DIMENSION,VECTOR<int,1> >& Fx,EIGENSYSTEM<T,d>& eigensystem,EIGENSYSTEM<T,d>& eigensystem_explicit,
     const VECTOR<bool,2>& outflow_boundaries,ARRAY<TV_DIMENSION,VECTOR<int,1> >* U_flux)
 {
     ARRAY<TV_DIMENSION,VECTOR<int,1> > F(U.domain.min_corner.x,U.domain.max_corner.x);

@@ -12,7 +12,7 @@
 namespace PhysBAM{
 
 template<class T>
-class SHALLOW_WATER_2D_EIGENSYSTEM_G:public EIGENSYSTEM<T,VECTOR<T,3> >
+class SHALLOW_WATER_2D_EIGENSYSTEM_G:public EIGENSYSTEM<T,3>
 {
     typedef VECTOR<T,3> TV_DIMENSION;
     enum WORKAROUND1 {d=TV_DIMENSION::m};

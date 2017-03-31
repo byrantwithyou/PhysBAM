@@ -16,7 +16,7 @@
 namespace PhysBAM{
 
 template<class TV> class EULER_EIGENSYSTEM;
-template<class T,class TV_DIMENSION> class EIGENSYSTEM;
+template<class T,int d> class EIGENSYSTEM;
 template<class TV> class GRID;
 
 template<class TV,int d>
@@ -67,8 +67,8 @@ public:
     {BASE::Log_Parameters();conservation->Log_Parameters();}
 
     virtual void Update_Conservation_Law(GRID<TV>& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const T dt,
-        VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>& eigensystems,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>& eigensystems_explicit,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,
-        const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const bool thinshell=false,const VECTOR<bool,2*TV::m>& outflow_boundaries=(VECTOR<bool,2*TV::m>()),VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,TV::m>* eigensystems_auxiliary=0,
+        VECTOR<EIGENSYSTEM<T,d>*,TV::m>& eigensystems,VECTOR<EIGENSYSTEM<T,d>*,TV::m>& eigensystems_explicit,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,
+        const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const bool thinshell=false,const VECTOR<bool,2*TV::m>& outflow_boundaries=(VECTOR<bool,2*TV::m>()),VECTOR<EIGENSYSTEM<T,d>*,TV::m>* eigensystems_auxiliary=0,
         T_FACE_ARRAYS_DIMENSION_SCALAR* fluxes_auxiliary=0);
 };
 }

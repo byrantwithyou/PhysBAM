@@ -11,11 +11,11 @@
 namespace PhysBAM{
 
 template<class T>
-class SHALLOW_WATER_2D_SPECIALIZED_EIGENSYSTEM_F:public EIGENSYSTEM<T,VECTOR<T,2> >
+class SHALLOW_WATER_2D_SPECIALIZED_EIGENSYSTEM_F:public EIGENSYSTEM<T,2>
 {
     enum WORKAROUND1 {d=2};
 public:
-    using EIGENSYSTEM<T,VECTOR<T,2> >::slice_index;
+    using EIGENSYSTEM<T,2>::slice_index;
 
     T gravity;
     ARRAY<T,VECTOR<int,2> >& eta_ghost;
