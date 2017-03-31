@@ -213,7 +213,7 @@ Eigenvectors(const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,const int j,MATRIX<T,d,
     R(3,1)=0;
     R(3,2)=0;
     R(3,3)=-1;
-    R(4,4)=-w;
+    R(3,4)=-w;
     R(4,0)=1;
     R(4,1)=u;
     R(4,2)=v+sound_speed;
