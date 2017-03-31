@@ -126,7 +126,7 @@ Advance_One_Time_Step()
     Print_Grid_Stats("after particle to grid",example.dt);
     Print_Energy_Stats("after particle to grid");
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after particle to grid",0,1);
-    Build_Level_Sets();
+    //Build_Level_Sets();
     Apply_Forces();
     Print_Grid_Stats("after forces",example.dt);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after forces",0,1);
@@ -444,6 +444,7 @@ Compute_Poisson_Matrix()
 //         face_fraction(it.Full_Index())=ff;}
 
     ARRAY<int,TV_INT> cell_index(example.grid.Domain_Indices(1),false);
+    cell_index.Fill(-1);
     ARRAY<PHASE_ID,TV_INT> cell_phase(example.grid.Domain_Indices(1),false);
     int next_cell=0;
     for(CELL_ITERATOR<TV> it(example.grid,0);it.Valid();it.Next()){
@@ -458,9 +459,7 @@ Compute_Poisson_Matrix()
                     face.index(a)++;}}
             if(!(all_N || dirichlet)){
                 cell_index(it.index)=next_cell++;
-                cell_phase(it.index)=p;}
-            else
-                cell_index(it.index)=-1;}}
+                cell_phase(it.index)=p;}}}
     for(CELL_ITERATOR<TV> it(example.grid,1,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
         cell_index(it.index)=-1;
 
@@ -530,8 +529,7 @@ Compute_Poisson_Matrix()
                 faces_t.Append(it.Full_Index());
                 phases_t.Append(p);
                 if(example.use_particle_volumes) mass/=example.phases(p).volume(it.Full_Index());
-                mass_t.Append(mass);}
-        }
+                mass_t.Append(mass);}}
         G_helper.Finish();
     }
     mass_h.Combine();
@@ -565,7 +563,7 @@ Pressure_Projection()
 
     example.projection_system.gradient.Times(example.sol.v,tmp);
     for(int i=0;i<tmp.m;i++)
-        example.phases(PHASE_ID()).velocity(example.projection_system.faces(i))-=tmp(i)/example.projection_system.mass(i);
+        example.phases(example.projection_system.phases(i)).velocity(example.projection_system.faces(i))-=tmp(i)/example.projection_system.mass(i);
 }
 //#####################################################################
 // Function Apply_Forces
