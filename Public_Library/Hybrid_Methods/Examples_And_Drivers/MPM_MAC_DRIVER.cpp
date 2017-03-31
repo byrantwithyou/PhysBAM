@@ -430,7 +430,8 @@ Compute_Poisson_Matrix()
             MPM_COLLISION_OBJECT<TV>* o=example.collision_objects(i);
             if(o->Phi(X,example.time)<0){
                 N=true;
-                example.phases(PHASE_ID()).velocity(it.Full_Index())=o->Velocity(X,example.time)(it.axis);
+                for(PHASE_ID p(0);p<example.phases.m;p++)
+                    example.phases(p).velocity(it.Full_Index())=o->Velocity(X,example.time)(it.axis);
                 break;}}
         psi_N(it.Full_Index())=N;}
 
@@ -443,17 +444,23 @@ Compute_Poisson_Matrix()
 //         face_fraction(it.Full_Index())=ff;}
 
     ARRAY<int,TV_INT> cell_index(example.grid.Domain_Indices(1),false);
+    ARRAY<PHASE_ID,TV_INT> cell_phase(example.grid.Domain_Indices(1),false);
     int next_cell=0;
     for(CELL_ITERATOR<TV> it(example.grid,0);it.Valid();it.Next()){
-        bool dirichlet=false,all_N=true;
-        for(int a=0;a<TV::m;a++){
-            FACE_INDEX<TV::m> face(a,it.index);
-            for(int s=0;s<2;s++){
-                if(!psi_N(face)){
-                    all_N=false;
-                    if(!example.phases(PHASE_ID()).mass(face)) dirichlet=true;}
-                face.index(a)++;}}
-        cell_index(it.index)=(all_N || dirichlet)?-1:next_cell++;}
+        for(PHASE_ID p(0);p<example.phases.m;p++){
+            bool dirichlet=false,all_N=true;
+            for(int a=0;a<TV::m;a++){
+                FACE_INDEX<TV::m> face(a,it.index);
+                for(int s=0;s<2;s++){
+                    if(!psi_N(face)){
+                        all_N=false;
+                        if(!example.phases(p).mass(face)) dirichlet=true;}
+                    face.index(a)++;}}
+            if(!(all_N || dirichlet)){
+                cell_index(it.index)=next_cell++;
+                cell_phase(it.index)=p;}
+            else
+                cell_index(it.index)=-1;}}
     for(CELL_ITERATOR<TV> it(example.grid,1,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
         cell_index(it.index)=-1;
 
@@ -465,7 +472,8 @@ Compute_Poisson_Matrix()
         for(CELL_ITERATOR_THREADED<TV> it(example.grid,0);it.Valid();it.Next()){
             int center_index=cell_index(it.index);
             if(center_index<0) continue;
-    
+            PHASE_ID p=cell_phase(it.index);
+
             T diag=0;
             helper.Start_Row();
             for(int a=0;a<TV::m;a++){
@@ -475,8 +483,8 @@ Compute_Poisson_Matrix()
                     cell(a)+=2*s-1;
                     assert(face.Cell_Index(s)==cell);
                     if(!psi_N(face)){
-                        T entry=sqr(example.grid.one_over_dX(a))/example.phases(PHASE_ID()).mass(face);
-                        if(example.use_particle_volumes) entry*=example.phases(PHASE_ID()).volume(face);
+                        T entry=sqr(example.grid.one_over_dX(a))/example.phases(p).mass(face);
+                        if(example.use_particle_volumes) entry*=example.phases(p).volume(face);
                         diag+=entry;
                         int ci=cell_index(cell);
                         if(ci>=0) helper.Add_Entry(ci,-entry);}
@@ -489,9 +497,11 @@ Compute_Poisson_Matrix()
 
     example.projection_system.mass.Remove_All();
     example.projection_system.faces.Remove_All();
+    example.projection_system.phases.Remove_All();
     example.projection_system.gradient.Reset(next_cell);
     APPEND_HOLDER<T> mass_h(example.projection_system.mass);
     APPEND_HOLDER<FACE_INDEX<TV::m> > faces_h(example.projection_system.faces);
+    APPEND_HOLDER<PHASE_ID> phases_h(example.projection_system.phases);
     ARRAY<int> tmp2,tmp3;
 #pragma omp parallel
     {
@@ -499,29 +509,34 @@ Compute_Poisson_Matrix()
         {
             mass_h.Init();
             faces_h.Init();
+            phases_h.Init();
         }
 #pragma omp barrier
         ARRAY<T>& mass_t=mass_h.Array();
         ARRAY<FACE_INDEX<TV::m> >& faces_t=faces_h.Array();
+        ARRAY<PHASE_ID>& phases_t=phases_h.Array();
         SPARSE_MATRIX_THREADED_CONSTRUCTION<T> G_helper(example.projection_system.gradient,tmp2,tmp3);
         for(FACE_ITERATOR_THREADED<TV> it(example.grid);it.Valid();it.Next()){
-            if(psi_N(it.Full_Index())) continue;
-            T mass=example.phases(PHASE_ID()).mass(it.Full_Index());
-            if(!mass) continue;
-            int c0=cell_index(it.First_Cell_Index());
-            int c1=cell_index(it.Second_Cell_Index());
-            if(c0<0 && c1<0) continue;
-            G_helper.Start_Row(); // cannot start a row if no elements in it
-            if(c0>=0) G_helper.Add_Entry(c0,-example.grid.one_over_dX(it.axis));
-            if(c1>=0) G_helper.Add_Entry(c1,example.grid.one_over_dX(it.axis));
-            faces_t.Append(it.Full_Index());
-            if(example.use_particle_volumes) mass/=example.phases(PHASE_ID()).volume(it.Full_Index());
-            mass_t.Append(mass);
+            for(PHASE_ID p(0);p<example.phases.m;p++){
+                if(psi_N(it.Full_Index())) continue;
+                T mass=example.phases(p).mass(it.Full_Index());
+                if(!mass) continue;
+                int c0=cell_index(it.First_Cell_Index());
+                int c1=cell_index(it.Second_Cell_Index());
+                if(c0<0 && c1<0) continue;
+                G_helper.Start_Row(); // cannot start a row if no elements in it
+                if(c0>=0) G_helper.Add_Entry(c0,-example.grid.one_over_dX(it.axis));
+                if(c1>=0) G_helper.Add_Entry(c1,example.grid.one_over_dX(it.axis));
+                faces_t.Append(it.Full_Index());
+                phases_t.Append(p);
+                if(example.use_particle_volumes) mass/=example.phases(p).volume(it.Full_Index());
+                mass_t.Append(mass);}
         }
         G_helper.Finish();
     }
     mass_h.Combine();
     faces_h.Combine();
+    phases_h.Combine();
 }
 //#####################################################################
 // Function Pressure_Projection
@@ -536,7 +551,7 @@ Pressure_Projection()
 
     ARRAY<T> tmp(example.projection_system.gradient.m);
     for(int i=0;i<tmp.m;i++)
-        tmp(i)=example.phases(PHASE_ID()).velocity(example.projection_system.faces(i));
+        tmp(i)=example.phases(example.projection_system.phases(i)).velocity(example.projection_system.faces(i));
     example.projection_system.gradient.Transpose_Times(tmp,example.rhs.v);
     
     if(example.test_system) example.projection_system.Test_System(example.sol);

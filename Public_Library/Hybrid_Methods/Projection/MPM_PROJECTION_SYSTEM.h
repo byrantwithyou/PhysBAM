@@ -10,6 +10,8 @@
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Grid_Tools/Grids/FACE_INDEX.h>
+#include <Hybrid_Methods/Examples_And_Drivers/PHASE_ID.h>
+
 namespace PhysBAM{
 //#####################################################################
 // Class MPM_PROJECTION_SYSTEM
@@ -24,6 +26,7 @@ struct MPM_PROJECTION_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
     SPARSE_MATRIX_FLAT_MXN<T> gradient;
     ARRAY<T> mass;
     ARRAY<FACE_INDEX<TV::m> > faces;
+    ARRAY<PHASE_ID> phases;
     
     MPM_PROJECTION_SYSTEM();
     virtual ~MPM_PROJECTION_SYSTEM();
