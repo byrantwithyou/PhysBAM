@@ -168,7 +168,7 @@ Advect_Fluid(const T dt,const int substep)
     // initialize p_advected to current eos pressure
     if(euler.timesplit && !euler.perform_rungekutta_for_implicit_part){
         for(CELL_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-            euler.euler_projection.p_advected(cell_index)=euler.eos->p(compressible_fluid_collection.U(cell_index)(1),EULER<TV>::e(compressible_fluid_collection.U,cell_index));}}
+            euler.euler_projection.p_advected(cell_index)=euler.eos->p(compressible_fluid_collection.U(cell_index)(1),EULER<TV>::e(compressible_fluid_collection.U(cell_index)));}}
 
     RUNGEKUTTA<T_ARRAYS_DIMENSION_SCALAR> rungekutta_u(compressible_fluid_collection.U,example.rungekutta_order,dt,time);
     RUNGEKUTTA<ARRAY<T,TV_INT>> rungekutta_p_advected(euler.euler_projection.p_advected,example.rungekutta_order,dt,time);

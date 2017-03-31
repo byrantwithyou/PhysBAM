@@ -872,12 +872,12 @@ Calculate_Maximum_Allowable_dt(const T dt,T& min_dt,const int substep,RUNGEKUTTA
     ARRAY_VIEW<TV_DIMENSION,TV_INT> U_n(rungekutta_u.u_copy);
     for(CELL_ITERATOR<TV> iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         T clamp_rho_cell=euler->conservation->clamp_rho*U_n(cell_index)(0);
-        T clamp_e_cell=euler->conservation->clamp_e*EULER<TV>::e(U_n,cell_index);
+        T clamp_e_cell=euler->conservation->clamp_e*EULER<TV>::e(U_n(cell_index));
         if((euler->U(cell_index)(0)<U_n(cell_index)(0))&&(abs(euler->U(cell_index)(0)-U_n(cell_index)(0))>1e-5))
             min_dt=min(min_dt,((T)val*dt*(clamp_rho_cell-U_n(cell_index)(0)))/(euler->U(cell_index)(0)-U_n(cell_index)(0)));
         assert(min_dt>0);
-        if((EULER<TV>::e(euler->U,cell_index)<EULER<TV>::e(U_n,cell_index))&&(abs(EULER<TV>::e(euler->U,cell_index)-EULER<TV>::e(U_n,cell_index))>1e-5))
-            min_dt=min(min_dt,((T)val*dt*(clamp_e_cell-EULER<TV>::e(U_n,cell_index)))/(EULER<TV>::e(euler->U,cell_index)-EULER<TV>::e(U_n,cell_index)));
+        if((EULER<TV>::e(euler->U(cell_index))<EULER<TV>::e(U_n(cell_index)))&&(abs(EULER<TV>::e(euler->U(cell_index))-EULER<TV>::e(U_n(cell_index)))>1e-5))
+            min_dt=min(min_dt,((T)val*dt*(clamp_e_cell-EULER<TV>::e(U_n(cell_index))))/(EULER<TV>::e(euler->U(cell_index))-EULER<TV>::e(U_n(cell_index))));
         assert(min_dt>0);}
     if(min_dt!=dt){
         T alpha=min_dt/(val*dt);
@@ -1043,7 +1043,7 @@ Advect_Fluid(const T dt,const int substep)
                 else if((rk.substep==1)&&(rk.order==3)){T min_dt=dt;Calculate_Maximum_Allowable_dt(dt,min_dt,rk.substep,rk);*const_cast<T*>(&dt)=min_dt;rk.time-=dt/2;continue;}
                 else if((rk.substep==2)&&(rk.order==3)){T min_dt=dt;Calculate_Maximum_Allowable_dt(dt,min_dt,rk.substep,rk);restart_dt=min_dt;break;}}
             for(CELL_ITERATOR<TV> iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-                assert(euler->U(cell_index)(0)>0);assert(EULER<TV>::e(euler->U,cell_index)>0);}
+                assert(euler->U(cell_index)(0)>0);assert(EULER<TV>::e(euler->U(cell_index))>0);}
             if(euler->timesplit && euler->perform_rungekutta_for_implicit_part){assert(!euler->thinshell);
                 euler->Get_Dirichlet_Boundary_Conditions(dt,rk.time);
                 fluids_parameters.Get_Neumann_And_Dirichlet_Boundary_Conditions(euler->euler_projection.elliptic_solver,euler->euler_projection.face_velocities,dt,rk.time+dt);
@@ -1278,7 +1278,7 @@ Advance_Fluid_One_Time_Step_Implicit_Part(const bool done,const T dt,const int s
             for(CELL_ITERATOR<TV> iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
                 if(euler->psi(cell_index)){
                     T current_density=euler->U(cell_index)[0];
-                    TV current_velocity=EULER<TV>::Get_Velocity(euler->U,cell_index);
+                    TV current_velocity=EULER<TV>::Get_Velocity(euler->U(cell_index));
                     if(current_density<min_density){min_density=current_density;min_cell_index=cell_index;}
                     if(current_density>max_density){max_density=current_density;max_cell_index=cell_index;}
                     if(current_velocity.Magnitude()>max_velocity.Magnitude()){max_velocity=current_velocity;max_velocity_index=cell_index;}}}

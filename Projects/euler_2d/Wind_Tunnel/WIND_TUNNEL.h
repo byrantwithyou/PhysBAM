@@ -266,8 +266,8 @@ void Fill_Single_Ghost_Region(const GRID<TV>& grid,T_ARRAYS_DIMENSION_SCALAR& u_
             if(location.x>=(T).1667){
                 TV_INT reflected_node=cell_index;reflected_node[axis]=reflection_times_two-cell_index[axis];
                 T rho=u_ghost(reflected_node)(1);
-                TV velocity=EULER<TV>::Get_Velocity(u_ghost,reflected_node);velocity(axis)*=-1;
-                T e=EULER<TV>::e(u_ghost,reflected_node);
+                TV velocity=EULER<TV>::Get_Velocity(u_ghost(reflected_node));velocity(axis)*=-1;
+                T e=EULER<TV>::e(u_ghost(reflected_node));
                 EULER<TV>::Set_Euler_State_From_rho_velocity_And_internal_energy(u_ghost,cell_index,rho,velocity,e);}
             else{EULER<TV>::Set_Euler_State_From_rho_velocity_And_internal_energy(u_ghost,cell_index,rho_left,TV(u_left,v_left),euler.eos->e_From_p_And_rho(p_left,rho_left));}}}
     else if(side==4){

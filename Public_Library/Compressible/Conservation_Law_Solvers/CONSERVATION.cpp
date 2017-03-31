@@ -214,7 +214,7 @@ Update_Conservation_Law(GRID<TV>& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRA
         else rho_dt(cell_index)=dt;
 
         T momentum_dt=dt;
-        T clamp_e_cell=clamp_e*EULER<TV>::e(U,cell_index);
+        T clamp_e_cell=clamp_e*EULER<TV>::e(U(cell_index));
         for(int axis=0;axis<TV::m;axis++){
             T tmp_dt=dt;
             T momentum_flux_sqr=rhs(cell_index)(axis+1)*rhs(cell_index)(axis+1);

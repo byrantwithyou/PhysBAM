@@ -43,7 +43,7 @@ CFL()
     for(RANGE_ITERATOR<TV::m> it(grid.Domain_Indices());it.Valid();it.Next()){
         if(!psi_pointer || (*psi_pointer)(it.index)==1){
             T u=U(it.index)(1)/U(it.index)(0),v=U(it.index)(2)/U(it.index)(0),w=U(it.index)(3)/U(it.index)(0);
-            T sound_speed=eos->c(U(it.index)(0),e(U(it.index)(0),U(it.index)(1),U(it.index)(2),U(it.index)(3),U(it.index)(4)));
+            T sound_speed=eos->c(U(it.index)(0),e(U(it.index)));
             u_minus_c(it.index)=u-sound_speed;u_plus_c(it.index)=u+sound_speed;
             v_minus_c(it.index)=v-sound_speed;v_plus_c(it.index)=v+sound_speed;
             w_minus_c(it.index)=w-sound_speed;w_plus_c(it.index)=w+sound_speed;}}

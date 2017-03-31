@@ -376,8 +376,8 @@ CFL_Using_Sound_Speed() const
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
         if(psi(cell_index)){
-            TV velocity_cell=Get_Velocity(U,cell_index);
-            T sound_speed=eos->c(U(cell_index)(0),e(U,cell_index));
+            TV velocity_cell=Get_Velocity(U(cell_index));
+            T sound_speed=eos->c(U(cell_index)(0),e(U(cell_index)));
             max_sound_speed=max(max_sound_speed,sound_speed);
             velocity(cell_index)=velocity_cell;
             velocity_minus_c(cell_index)=velocity_cell-sound_speed*TV::All_Ones_Vector();velocity_plus_c(cell_index)=velocity_cell+sound_speed*TV::All_Ones_Vector();}}
@@ -405,7 +405,7 @@ CFL(const T time) const
         Fill_Ghost_Cells(last_dt,time,3);
         ARRAY<T,TV_INT> p_approx(grid.Domain_Indices(1));
         for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next())
-            p_approx(iterator.Cell_Index())=eos->p(U_ghost(iterator.Cell_Index())(0),e(U_ghost,iterator.Cell_Index()));
+            p_approx(iterator.Cell_Index())=eos->p(U_ghost(iterator.Cell_Index())(0),e(U_ghost(iterator.Cell_Index())));
         ARRAY<T,FACE_INDEX<TV::m> > p_approx_face(grid);
         euler_projection.Compute_Face_Pressure_From_Cell_Pressures(grid,U_ghost,psi,p_approx_face,p_approx);
         ARRAY<TV,TV_INT> grad_p_approx(grid.Domain_Indices());ARRAYS_UTILITIES<TV,T>::Compute_Gradient_At_Cells_From_Face_Data(grid,grad_p_approx,p_approx_face);

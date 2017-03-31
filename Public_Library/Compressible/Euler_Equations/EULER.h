@@ -24,9 +24,9 @@ template<class TV>
 class EULER
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef VECTOR<T,TV::m+2> TV_DIMENSION;
-    typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;typedef ARRAYS_ND_BASE<TV_DIMENSION,TV_INT> T_ARRAYS_DIMENSION_BASE;
     enum {d=TV::m+2};
+    typedef VECTOR<T,d> TV_DIMENSION;
+    typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;typedef ARRAYS_ND_BASE<TV_DIMENSION,TV_INT> T_ARRAYS_DIMENSION_BASE;
 public:
     EOS<T>* eos;
     BOUNDARY<TV,TV_DIMENSION>* boundary;
@@ -48,26 +48,8 @@ protected:
     virtual ~EULER();
 
 public:
-    static VECTOR<T,1> Get_Velocity(const ARRAYS_ND_BASE<VECTOR<T,3>,VECTOR<int,1> >& U,const VECTOR<int,1>& cell)
-    {return VECTOR<T,1>(U(cell)(1))/U(cell)(0);}
-
-    static VECTOR<T,2> Get_Velocity(const ARRAYS_ND_BASE<VECTOR<T,4>,VECTOR<int,2> >& U,const VECTOR<int,2>& cell)
-    {return VECTOR<T,2>(U(cell)(1),U(cell)(2))/U(cell)(0);}
-
-    static VECTOR<T,3> Get_Velocity(const ARRAYS_ND_BASE<VECTOR<T,5>,VECTOR<int,3> >& U,const VECTOR<int,3>& cell)
-    {return VECTOR<T,3>(U(cell)(1),U(cell)(2),U(cell)(3))/U(cell)(0);}
-
-    static VECTOR<T,1> Get_Velocity(const VECTOR<T,3>& u)
-    {return VECTOR<T,1>(u(1))/u(0);}
-
-    static VECTOR<T,2> Get_Velocity(const VECTOR<T,4>& u)
-    {return VECTOR<T,2>(u(1),u(2))/u(0);}
-
-    static VECTOR<T,3> Get_Velocity(const VECTOR<T,5>& u)
-    {return VECTOR<T,3>(u(1),u(2),u(3))/u(0);}
-
-    static T Get_Velocity_Component(const T_ARRAYS_DIMENSION_BASE& U,const TV_INT& cell,const int axis)
-    {assert((unsigned)axis<(unsigned)TV::m);return U(cell)(axis+1)/U(cell)(0);}
+    static TV Get_Velocity(const TV_DIMENSION& u)
+    {return u.template Slice<1,TV::m>()/u(0);}
 
     static T Get_Velocity_Component(const TV_DIMENSION& U,const int axis)
     {assert((unsigned)axis<(unsigned)TV::m);return U(axis+1)/U(0);}
@@ -90,32 +72,8 @@ public:
      U(TV::m+1)=rho*(e+(T).5*velocity.Magnitude_Squared());
      return U;}
 
-    static T e(const ARRAYS_ND_BASE<VECTOR<T,3>,VECTOR<int,1> >& U,const VECTOR<int,1>& cell)
-    {return e(U(cell)(0),U(cell)(1),U(cell)(2));}
-
-    static T e(const ARRAYS_ND_BASE<VECTOR<T,4>,VECTOR<int,2> >& U,const VECTOR<int,2>& cell)
-    {return e(U(cell)(0),U(cell)(1),U(cell)(2),U(cell)(3));}
-
-    static T e(const ARRAYS_ND_BASE<VECTOR<T,5>,VECTOR<int,3> >& U,const VECTOR<int,3>& cell)
-    {return e(U(cell)(0),U(cell)(1),U(cell)(2),U(cell)(3),U(cell)(4));}
-
-    static T e(const VECTOR<T,3>& u)
-    {return e(u(0),u(1),u(2));}
-
-    static T e(const VECTOR<T,4>& u)
-    {return e(u(0),u(1),u(2),u(3));}
-
-    static T e(const VECTOR<T,5>& u)
-    {return e(u(0),u(1),u(2),u(3),u(4));}
-
-    static T e(const T rho,const T rho_u,const T E)
-    {return E/rho-sqr(rho_u/rho)/2;}
-
-    static T e(const T rho,const T rho_u,const T rho_v,const T E)
-    {return E/rho-(sqr(rho_u/rho)+sqr(rho_v/rho))/2;}
-
-    static T e(const T rho,const T rho_u,const T rho_v,const T rho_w,const T E)
-    {return E/rho-(sqr(rho_u/rho)+sqr(rho_v/rho)+sqr(rho_w/rho))/2;}
+    static T e(const TV_DIMENSION& u)
+    {return u(d-1)/u(0)-Get_Velocity(u).Magnitude_Squared()/2;}
 
     static T p(EOS<T>* eos_input,const TV_DIMENSION& u)
     {return eos_input->p(u(0),e(u));}

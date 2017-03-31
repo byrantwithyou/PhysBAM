@@ -37,7 +37,7 @@ void Write_Auxiliary_Files(const STREAM_TYPE stream_type,const std::string& outp
         energy(cell)=EULER<TV>::Get_Total_Energy(U,cell);
         internal_energy(cell)=EULER<TV>::e(U(cell));
         temperature(cell)=eos.T(density(cell),internal_energy(cell));
-        velocity(cell)=EULER<TV>::Get_Velocity(U,cell);
+        velocity(cell)=EULER<TV>::Get_Velocity(U(cell));
         if(write_debug_data){
             momentum(cell)=velocity(cell)*density(cell);
             entropy(cell)=eos.S(density(cell),eos.e_From_p_And_rho(pressure(cell),density(cell)));

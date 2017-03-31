@@ -273,12 +273,12 @@ Apply_Isobaric_Fix(const T dt,const T time)
             if(encountered_neumann_face){
                 LOG::cout<<"ISOBARIC FIX: fixing cell "<<cell_index<<" with reference cell "<<reference_point<<std::endl;
                 T rho=euler.U(cell_index)(0);
-                TV velocity=EULER<TV>::Get_Velocity(euler.U,cell_index);
-                T e=EULER<TV>::e(euler.U,cell_index);
+                TV velocity=EULER<TV>::Get_Velocity(euler.U(cell_index));
+                T e=EULER<TV>::e(euler.U(cell_index));
                 T p_cell=euler.eos->p(rho,e);
 
                 T rho_reference=euler.U_ghost(reference_point)(0);
-                T e_reference=EULER<TV>::e(euler.U_ghost,reference_point);
+                T e_reference=EULER<TV>::e(euler.U_ghost(reference_point));
                 T p_reference=euler.eos->p(rho_reference,e_reference);
 
                 if(p_cell>p_reference) rho=rho_reference*sqrt(p_cell/p_reference); //isobaric fix
@@ -297,7 +297,7 @@ Extract_Time_N_Data_For_Explicit_Fluid_Forces()
     if(!fluid_affects_solid || euler.timesplit) return;
     ARRAY<T,TV_INT> p_approx(euler.grid.Domain_Indices(1));
     for(CELL_ITERATOR<TV> iterator(euler.grid,1);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-        p_approx(cell_index)=euler.eos->p(euler.U_ghost(cell_index)(0),euler.e(euler.U_ghost,cell_index));}
+        p_approx(cell_index)=euler.eos->p(euler.U_ghost(cell_index)(0),euler.e(euler.U_ghost(cell_index)));}
     euler.euler_projection.Compute_Face_Pressure_From_Cell_Pressures(euler.grid,euler.U_ghost,euler.psi,pressure_at_faces,p_approx);
 
     solid_fluid_face_time_n.Fill(false);

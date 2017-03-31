@@ -47,8 +47,8 @@ Attenuate_To_Far_Field_Values_Using_Riemann_Invariants(const T_ARRAYS_DIMENSION_
     T net_inflow_attenuation=exp((inflow_attenuation-1)*dt);
 
     T rho=u_ghost(node_index)(0);
-    T u_velocity=EULER<TV>::Get_Velocity_Component(u_ghost,node_index,1);
-    T e=EULER<TV>::e(u_ghost,node_index);
+    T u_velocity=EULER<TV>::Get_Velocity_Component(u_ghost(node_index),1);
+    T e=EULER<TV>::e(u_ghost(node_index));
 
     T c=euler->eos->c(rho,e);
     T S=euler->eos->S(rho,e);
@@ -152,8 +152,9 @@ Fill_Single_Ghost_Region(const GRID<TV>& grid,T_ARRAYS_DIMENSION_BASE& u_ghost,c
         for(CELL_ITERATOR<TV> iterator(grid,region);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
             TV_INT reflected_node=cell;reflected_node[axis]=reflection_times_two-cell[axis];
             T rho=u_ghost(reflected_node)(0);
-            TV velocity=EULER<TV>::Get_Velocity(u_ghost,reflected_node);velocity(axis)*=-1;
-            T e=EULER<TV>::e(u_ghost,reflected_node);
+            TV velocity=EULER<TV>::Get_Velocity(u_ghost(reflected_node));
+            velocity(axis)*=-1;
+            T e=EULER<TV>::e(u_ghost(reflected_node));
             EULER<TV>::Set_Euler_State_From_rho_velocity_And_internal_energy(u_ghost,cell,rho,velocity,e);}}
 }
 //#####################################################################
@@ -180,8 +181,8 @@ Apply_Boundary_Condition_Single_Side(const GRID<TV>& grid,T_ARRAYS_DIMENSION_BAS
         if(!Constant_Extrapolation(side)) for(CELL_ITERATOR<TV> iterator(grid,0,GRID<TV>::BOUNDARY_INTERIOR_REGION,side);iterator.Valid();iterator.Next()){
             TV_INT boundary_node=iterator.Cell_Index();
             T rho=u(boundary_node)(0);
-            TV velocity=EULER<TV>::Get_Velocity(u,boundary_node);
-            T e=EULER<TV>::e(u,boundary_node);
+            TV velocity=EULER<TV>::Get_Velocity(u(boundary_node));
+            T e=EULER<TV>::e(u(boundary_node));
             velocity[axis]=0; // Boundary condition
             EULER<TV>::Set_Euler_State_From_rho_velocity_And_internal_energy(u,boundary_node,rho,velocity,e);}}
 }

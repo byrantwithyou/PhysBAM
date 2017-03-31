@@ -33,7 +33,7 @@ Extrapolate_Compressible_State_Into_Incompressible_Region(const T dt,const T tim
     ARRAY<T,TV_INT> phi_ghost_negated(phi_ghost),entropy(phi_ghost,false),pressure(phi_ghost,false);ARRAY<TV,TV_INT> velocity(phi_ghost.Domain_Indices());
 
     for(CELL_ITERATOR<TV> iterator(grid,ghost_cells);iterator.Valid();iterator.Next()){
-        TV_INT cell_index=iterator.Cell_Index();T density=U_ghost(cell_index)(0);TV vel=EULER<TV>::Get_Velocity(U_ghost,cell_index);
+        TV_INT cell_index=iterator.Cell_Index();T density=U_ghost(cell_index)(0);TV vel=EULER<TV>::Get_Velocity(U_ghost(cell_index));
         T e=EULER<TV>::e(U_ghost(cell_index));
         phi_ghost_negated(cell_index)*=-1;
         pressure(cell_index)=eos.p(density,e);
@@ -73,7 +73,7 @@ Get_Dirichlet_Boundary_Conditions_For_Incompressible_Region(const GRID<TV>& grid
         const EOS_GAMMA<T> *eos_gamma=dynamic_cast<const EOS_GAMMA<T>*>(&euler_eos);
         // TODO(kwatra): This does not look right. It seems to be calculating p=(gamma-1)e
         p_dirichlet_incompressible(cell_index)=dt*(1/incompressible_density)*(eos_gamma->gamma-1)*
-            (U_dirichlet(cell_index)(TV::m+1)-((T).5*U_dirichlet(cell_index)(0)*EULER<TV>::Get_Velocity(U_dirichlet,cell_index).Magnitude_Squared()));}
+            (U_dirichlet(cell_index)(TV::m+1)-((T).5*U_dirichlet(cell_index)(0)*EULER<TV>::Get_Velocity(U_dirichlet(cell_index)).Magnitude_Squared()));}
 }
 //#####################################################################
 // Function Compute_Compressible_Incompressible_Face_Velocities
@@ -96,7 +96,7 @@ Compute_Compressible_Incompressible_Face_Velocities(const GRID<TV>& face_grid,co
 
             T rho_compressible=U(compressible_cell_index)(0),rho_incompressible=incompressible_density;
             compressible_face_velocities.Component(axis)(face_index)=(rho_incompressible*incompressible_face_velocities.Component(axis)(face_index)+
-                rho_compressible*EULER<TV>::Get_Velocity_Component(U,compressible_cell_index,axis))/(rho_compressible+rho_incompressible);}
+                rho_compressible*EULER<TV>::Get_Velocity_Component(U(compressible_cell_index),axis))/(rho_compressible+rho_incompressible);}
         else if(first_cell_incompressible && second_cell_incompressible) // TODO(jontg): Move this out.
             compressible_face_velocities.Component(axis)(face_index)=incompressible_face_velocities.Component(axis)(face_index);
     }
@@ -123,14 +123,14 @@ Compute_Compressible_Incompressible_Face_Pressures_From_Cell_Pressures(const GRI
             T u_star_first_cell,u_star_second_cell;
             if(first_cell_euler){
                 rho_first_cell=U(first_cell_index)(0);
-                u_star_first_cell=EULER<TV>::Get_Velocity_Component(U,first_cell_index,axis);
+                u_star_first_cell=EULER<TV>::Get_Velocity_Component(U(first_cell_index),axis);
                 rho_second_cell=incompressible_density;
                 u_star_second_cell=incompressible_face_velocities.Component(axis)(face_index);}
             else{
                 rho_first_cell=incompressible_density;
                 u_star_first_cell=incompressible_face_velocities.Component(axis)(face_index);
                 rho_second_cell=U(second_cell_index)(0);
-                u_star_second_cell=EULER<TV>::Get_Velocity_Component(U,second_cell_index,axis);}
+                u_star_second_cell=EULER<TV>::Get_Velocity_Component(U(second_cell_index),axis);}
 
             T correction_term=(T).5*rho_first_cell*rho_second_cell*face_grid.dX[axis]*(u_star_second_cell-u_star_first_cell)/(rho_first_cell+rho_second_cell);
             p_face.Component(axis)(iterator.Face_Index())=(rho_second_cell*p_cell(first_cell_index)+rho_first_cell*p_cell(second_cell_index))/(rho_first_cell+rho_second_cell)-correction_term;}}

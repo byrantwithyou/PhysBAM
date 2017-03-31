@@ -68,7 +68,7 @@ Get_Pressure(ARRAY<T,TV_INT>& pressure) const
             pressure(cell_index)=p(cell_index)*scaling;}}
     else{ 
         for(CELL_ITERATOR<TV> iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-            pressure(cell_index)=euler->eos->p(euler->U(cell_index)(0),euler->e(euler->U,cell_index));}}
+            pressure(cell_index)=euler->eos->p(euler->U(cell_index)(0),euler->e(euler->U(cell_index)));}}
 }
 //#####################################################################
 // Function Fill_Face_Weights_For_Projection
@@ -166,7 +166,7 @@ Get_Dirichlet_Boundary_Conditions(const T_ARRAYS_DIMENSION_SCALAR& U_dirichlet)
     TV_INT cell_index;
     for(CELL_ITERATOR<TV> iterator(euler->grid,1,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next()){
         cell_index=iterator.Cell_Index();
-        p_dirichlet(cell_index)=euler->eos->p(U_dirichlet(cell_index)(0),euler->e(U_dirichlet,cell_index));}
+        p_dirichlet(cell_index)=euler->eos->p(U_dirichlet(cell_index)(0),euler->e(U_dirichlet(cell_index)));}
 }
 //#####################################################################
 // Function Set_Dirichlet_Boundary_Conditions
@@ -218,7 +218,7 @@ Compute_Advected_Pressure(const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<T
 #if 1
     ARRAY<TV,TV_INT> v_cell(euler->grid.Domain_Indices(3));
     for(CELL_ITERATOR<TV> iterator(euler->grid,3);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-        v_cell(cell_index)=euler->Get_Velocity(U_ghost,cell_index);}
+        v_cell(cell_index)=euler->Get_Velocity(U_ghost(cell_index));}
 
     FLOOD_FILL<1> find_connected_components;
     ARRAY<T,TV_INT> rhs(euler->grid.Domain_Indices());ARRAY<T,VECTOR<int,1> > p_1d,u,u_px;
@@ -268,7 +268,7 @@ Compute_One_Over_rho_c_Squared()
     for(CELL_ITERATOR<TV> iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         if(euler->psi(cell_index)){
             T rho=euler->U_ghost(cell_index)(0);
-            T one_over_c=euler->eos->one_over_c(euler->U_ghost(cell_index)(0),euler->e(euler->U_ghost,cell_index));
+            T one_over_c=euler->eos->one_over_c(euler->U_ghost(cell_index)(0),euler->e(euler->U_ghost(cell_index)));
             one_over_rho_c_squared(cell_index)=(one_over_c*one_over_c)/rho;}
         else one_over_rho_c_squared(cell_index)=0;}
 }
@@ -289,8 +289,8 @@ Compute_Density_Weighted_Face_Velocities(const GRID<TV>& face_grid,ARRAY<T,FACE_
         first_cell_index=iterator.First_Cell_Index();second_cell_index=iterator.Second_Cell_Index();axis=iterator.Axis();
         if(!psi_N.Component(axis)(iterator.Face_Index()) && ((!psi.Valid_Index(first_cell_index) || psi(first_cell_index)) && (!psi.Valid_Index(second_cell_index) || psi(second_cell_index)))){
             T rho_first_cell=U_ghost(first_cell_index)(0),rho_second_cell=U_ghost(second_cell_index)(0);
-            face_velocities.Component(axis)(iterator.Face_Index())=(rho_first_cell*EULER<TV>::Get_Velocity_Component(U_ghost,first_cell_index,axis)+
-                    rho_second_cell*EULER<TV>::Get_Velocity_Component(U_ghost,second_cell_index,axis))/(rho_first_cell+rho_second_cell);}
+            face_velocities.Component(axis)(iterator.Face_Index())=(rho_first_cell*EULER<TV>::Get_Velocity_Component(U_ghost(first_cell_index),axis)+
+                rho_second_cell*EULER<TV>::Get_Velocity_Component(U_ghost(second_cell_index),axis))/(rho_first_cell+rho_second_cell);}
         else face_velocities(iterator.Full_Index())=(T)0;}
 }
 //#####################################################################

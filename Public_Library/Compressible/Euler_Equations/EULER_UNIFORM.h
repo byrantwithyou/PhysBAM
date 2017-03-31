@@ -75,7 +75,7 @@ public:
     T Get_Temperature(const TV_INT& cell)
     {
         T density=Get_Density(U,cell);
-        T internal_energy=e(U,cell);
+        T internal_energy=e(U(cell));
         return eos->T(density,internal_energy);
     }
 
