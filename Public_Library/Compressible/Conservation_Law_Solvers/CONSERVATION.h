@@ -54,9 +54,6 @@ public:
     bool use_exact_neumann_face_location,scale_outgoing_fluxes_to_clamp_variable;
     int clamped_variable_index;
     T clamped_value;
-    T clamp_rho,clamp_e,min_dt;
-    bool adaptive_time_step;
-
     // temp arrays used inside functions declared here for optimization
     ARRAY<TV_DIMENSION,VECTOR<int,1> > U_flux_1d_axis;
 public: 

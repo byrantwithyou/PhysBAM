@@ -168,7 +168,6 @@ public:
     bool compressible_use_sound_speed_based_dt_multiple_for_cfl;
     T compressible_multiplication_factor_for_sound_speed_based_dt;
     bool compressible_apply_cavitation_correction;
-    bool compressible_adaptive_time_step;
     bool compressible_log_extremas;
     bool use_poisson;
     bool solids_override_source_velocities;

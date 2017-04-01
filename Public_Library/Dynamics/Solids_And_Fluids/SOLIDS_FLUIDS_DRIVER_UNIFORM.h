@@ -62,7 +62,6 @@ public:
     void Rigid_Cluster_Fracture(const T dt_full_advance,const T dt_cfl,const int substep);
     void Project_Fluid(const T dt_projection,const T time_projection,const int substep);
     void Advance_Fluid_One_Time_Step_Implicit_Part_For_Object_Compatibility(const T dt_projection,const T time_projection,const int substep);
-    void Calculate_Maximum_Allowable_dt(const T dt,T& min_dt,const int substep,RUNGEKUTTA<T_ARRAYS_DIMENSION_SCALAR>& rungekutta_u);
     void Advect_Fluid(const T dt,const int substep);
     void Solid_Velocity_Update(const T dt,const int substep,const bool done);
     void Advance_Fluid_One_Time_Step_Implicit_Part(const bool done,const T dt,const int substep);

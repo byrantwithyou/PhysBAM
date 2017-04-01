@@ -435,11 +435,6 @@ Advance_To_Target_Time(const T target_time)
         Setup_Solids(time,substep);
         Setup_Fluids(time);
         T dt=Compute_Dt(time,target_time,done);
-        if((restart_dt!=0)&&reset_with_restart&&(fluids_parameters.compressible_adaptive_time_step)){
-            euler->Restore_State(euler->U_save,euler->euler_projection.face_velocities_save,euler->need_to_remove_added_internal_energy_save);
-            dt=restart_dt;restart_dt=0;
-            reset_with_restart=false;
-            LOG::cout<<"Corrected dt to "<<dt<<std::endl;}
         
         if(fluids_parameters.compressible) euler->Save_State(euler->U_save,euler->euler_projection.face_velocities_save,euler->need_to_remove_added_internal_energy_save);
         
@@ -468,7 +463,6 @@ Advance_To_Target_Time(const T target_time)
             if(fluids_parameters.solid_affects_fluid && solids_fluids_parameters.use_leakproof_solve) Advance_Fluid_One_Time_Step_Implicit_Part_For_Object_Compatibility(last_dt,time-last_dt,substep);/*F2*/
             Write_Substep("advect fluid",substep,1);
             Advect_Fluid(dt,substep);/*F3*/
-            if((restart_dt!=0)&&reset_with_restart&&(fluids_parameters.compressible_adaptive_time_step)) continue;
             if(fluids_parameters.compressible && !fluids_parameters.use_slip){//slip does one sided interpolation, so dont need it 
                 fluids_parameters.euler_solid_fluid_coupling_utilities->Fill_Solid_Cells();}}
 
@@ -859,31 +853,6 @@ Advance_Fluid_One_Time_Step_Implicit_Part_For_Object_Compatibility(const T dt_pr
         if(fluids_parameters.fluid_affects_solid) incompressible->projection.Exchange_Pressures_For_Projection();}
 }
 //#####################################################################
-// Function Calculate_Maximum_Allowable_dt
-//#####################################################################
-template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
-Calculate_Maximum_Allowable_dt(const T dt,T& min_dt,const int substep,RUNGEKUTTA<T_ARRAYS_DIMENSION_SCALAR>& rungekutta_u)
-{
-    int val=2;
-    if((substep==2)&&(rungekutta_u.order==3)) val=3;
-    else if((substep==3)&&(rungekutta_u.order==3)) val=4;
-
-    EULER_UNIFORM<TV>* euler=example.fluids_parameters.euler;
-    ARRAY_VIEW<TV_DIMENSION,TV_INT> U_n(rungekutta_u.u_copy);
-    for(CELL_ITERATOR<TV> iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-        T clamp_rho_cell=euler->conservation->clamp_rho*U_n(cell_index)(0);
-        T clamp_e_cell=euler->conservation->clamp_e*EULER<TV>::e(U_n(cell_index));
-        if((euler->U(cell_index)(0)<U_n(cell_index)(0))&&(abs(euler->U(cell_index)(0)-U_n(cell_index)(0))>1e-5))
-            min_dt=min(min_dt,((T)val*dt*(clamp_rho_cell-U_n(cell_index)(0)))/(euler->U(cell_index)(0)-U_n(cell_index)(0)));
-        assert(min_dt>0);
-        if((EULER<TV>::e(euler->U(cell_index))<EULER<TV>::e(U_n(cell_index)))&&(abs(EULER<TV>::e(euler->U(cell_index))-EULER<TV>::e(U_n(cell_index)))>1e-5))
-            min_dt=min(min_dt,((T)val*dt*(clamp_e_cell-EULER<TV>::e(U_n(cell_index))))/(EULER<TV>::e(euler->U(cell_index))-EULER<TV>::e(U_n(cell_index))));
-        assert(min_dt>0);}
-    if(min_dt!=dt){
-        T alpha=min_dt/(val*dt);
-        rungekutta_u.u.Copy(alpha,rungekutta_u.u,1-alpha,rungekutta_u.u_copy);}
-}
-//#####################################################################
 // Function Advect_Fluid
 //#####################################################################
 template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
@@ -1035,13 +1004,7 @@ Advect_Fluid(const T dt,const int substep)
             if(fluids_parameters.compressible_apply_cavitation_correction){
                 fluids_parameters.Get_Neumann_And_Dirichlet_Boundary_Conditions(euler->euler_cavitation_density.elliptic_solver,euler->euler_projection.face_velocities,dt,rk.time+dt);
                 fluids_parameters.Get_Neumann_And_Dirichlet_Boundary_Conditions(euler->euler_cavitation_internal_energy.elliptic_solver,euler->euler_projection.face_velocities,dt,rk.time+dt);}
-            euler->conservation->adaptive_time_step=fluids_parameters.compressible_adaptive_time_step;
             euler->Advance_One_Time_Step_Explicit_Part(dt,rk.time,rk.substep,rk.order);
-            if((euler->conservation->min_dt<dt)&&(fluids_parameters.compressible_adaptive_time_step)){
-                if(rk.substep==0){restart_dt=euler->conservation->min_dt;reset_with_restart=true;return;}
-                else if((rk.substep==1)&&(rk.order==2)){T min_dt=dt;Calculate_Maximum_Allowable_dt(dt,min_dt,rk.substep,rk);restart_dt=min_dt;break;}
-                else if((rk.substep==1)&&(rk.order==3)){T min_dt=dt;Calculate_Maximum_Allowable_dt(dt,min_dt,rk.substep,rk);*const_cast<T*>(&dt)=min_dt;rk.time-=dt/2;continue;}
-                else if((rk.substep==2)&&(rk.order==3)){T min_dt=dt;Calculate_Maximum_Allowable_dt(dt,min_dt,rk.substep,rk);restart_dt=min_dt;break;}}
             for(CELL_ITERATOR<TV> iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
                 assert(euler->U(cell_index)(0)>0);assert(EULER<TV>::e(euler->U(cell_index))>0);}
             if(euler->timesplit && euler->perform_rungekutta_for_implicit_part){assert(!euler->thinshell);

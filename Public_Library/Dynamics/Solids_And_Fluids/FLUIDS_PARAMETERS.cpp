@@ -81,7 +81,7 @@ FLUIDS_PARAMETERS(const TYPE type)
     compressible_iterations(0),compressible_timesplit(false),compressible_apply_isobaric_fix(false),compressible_monitor_conservation_error(false),
     compressible_perform_rungekutta_for_implicit_part(false),compressible_use_sound_speed_for_cfl(false),
     compressible_use_sound_speed_based_dt_multiple_for_cfl(false),compressible_multiplication_factor_for_sound_speed_based_dt((T)1.),
-    compressible_apply_cavitation_correction(false),compressible_adaptive_time_step(false),compressible_log_extremas(true),
+    compressible_apply_cavitation_correction(false),compressible_log_extremas(true),
     use_poisson(false),solids_override_source_velocities(false),use_slip(false),
     use_slip_constraints_across_non_occluded_faces(false),use_preconditioner_for_slip_system(true),stokes_flow(false)
 {

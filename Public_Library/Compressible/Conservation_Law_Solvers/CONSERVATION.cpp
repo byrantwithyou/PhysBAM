@@ -23,7 +23,7 @@ using namespace PhysBAM;
 template<class TV,int d> CONSERVATION<TV,d>::
 CONSERVATION()
     :save_fluxes(1),object_boundary_default(*new BOUNDARY_OBJECT_REFLECTION<TV,TV_DIMENSION>),use_exact_neumann_face_location(false),
-    scale_outgoing_fluxes_to_clamp_variable(false),clamped_variable_index(0),clamped_value(0),clamp_rho(.5),clamp_e(.5),min_dt(0),adaptive_time_step(false)
+    scale_outgoing_fluxes_to_clamp_variable(false),clamped_variable_index(0),clamped_value(0)
 {
     Set_Order();
     Use_Field_By_Field_Alpha();
@@ -207,39 +207,9 @@ Update_Conservation_Law(GRID<TV>& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRA
 
     Compute_Flux(grid,U,U_ghost,psi,dt,eigensystems,eigensystems_explicit,psi_N,face_velocities,outflow_boundaries,rhs,thinshell,eigensystems_auxiliary,fluxes_auxiliary);
 
-    ARRAY<T,TV_INT> rho_dt(grid.Domain_Indices()), e_dt(grid.Domain_Indices());
-    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-        T clamp_rho_cell=clamp_rho*U_ghost(cell_index)(0);
-        if(rhs(cell_index)(0)>0 && U_ghost(cell_index)(0)>=clamp_rho_cell) rho_dt(cell_index)=(U_ghost(cell_index)(0)-clamp_rho_cell)/rhs(cell_index)(0);
-        else rho_dt(cell_index)=dt;
-
-        T momentum_dt=dt;
-        T clamp_e_cell=clamp_e*EULER<TV>::e(U(cell_index));
-        for(int axis=0;axis<TV::m;axis++){
-            T tmp_dt=dt;
-            T momentum_flux_sqr=rhs(cell_index)(axis+1)*rhs(cell_index)(axis+1);
-            T a=2*rhs(cell_index)(0)*rhs(cell_index)(d-1)-momentum_flux_sqr-2*clamp_e_cell*rhs(cell_index)(0)*rhs(cell_index)(0);
-            T c=2*U_ghost(cell_index)(d-1)*U_ghost(cell_index)(0)-2*clamp_e_cell*U_ghost(cell_index)(0)*U_ghost(cell_index)(0)-U_ghost(cell_index)(axis+1)*U_ghost(cell_index)(axis+1);
-            if(dt*a>0){
-                T b_over_two=U_ghost(cell_index)(axis+1)*rhs(cell_index)(axis+1)-U_ghost(cell_index)(0)*rhs(cell_index)(d-1)-U_ghost(cell_index)(d-1)*rhs(cell_index)(0)+2*clamp_e_cell*U_ghost(cell_index)(0)*rhs(cell_index)(0);
-                T b_sqr_over_four=b_over_two*b_over_two;
-                T ac=a*c;
-                if(b_sqr_over_four>ac){
-                    T tmp_dt1=(-1*b_over_two-sqrt(b_sqr_over_four-ac))/a;
-                    T tmp_dt2=(-1*b_over_two+sqrt(b_sqr_over_four-ac))/a;
-                    tmp_dt=(tmp_dt1>=0)?(tmp_dt2>=0)?min(tmp_dt1,tmp_dt2):tmp_dt1:(tmp_dt2>=0)?tmp_dt2:dt;}
-                else tmp_dt=dt;}
-            momentum_dt=min(momentum_dt,tmp_dt);}
-        e_dt(cell_index)=dt;
-        for(int axis=0;axis<TV::m;axis++) e_dt(cell_index)=min(e_dt(cell_index),momentum_dt);}
-
-    min_dt=min(rho_dt.Min(),e_dt.Min());
-    LOG::cout<<"dt: "<<dt<<" Min dt: "<<min_dt<<std::endl;
-
-    if((min_dt==dt)||(!adaptive_time_step)){
-        for(CELL_ITERATOR<TV> iterator(grid,U_domain_indices.max_corner.x-grid.Domain_Indices().max_corner.x);iterator.Valid();iterator.Next()){
-            TV_INT cell_index=iterator.Cell_Index();
-            if(psi(cell_index)) U(cell_index)-=dt*rhs(cell_index);}}
+    for(CELL_ITERATOR<TV> iterator(grid,U_domain_indices.max_corner.x-grid.Domain_Indices().max_corner.x);iterator.Valid();iterator.Next()){
+        TV_INT cell_index=iterator.Cell_Index();
+        if(psi(cell_index)) U(cell_index)-=dt*rhs(cell_index);}
 }
 //#####################################################################
 // Function Update_Conservation_Law_For_Specialized_Shallow_Water_Equations
