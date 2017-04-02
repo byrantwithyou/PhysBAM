@@ -208,10 +208,24 @@ Conservation_Solver_Helper_Experimental(const int m,const T dx,const ARRAY<bool,
 }
 //#####################################################################
 namespace PhysBAM{
-template class CONSERVATION_ENO_LLF<VECTOR<float,1>,3>;
-template class CONSERVATION_ENO_LLF<VECTOR<float,2>,4>;
-template class CONSERVATION_ENO_LLF<VECTOR<float,3>,5>;
+template class CONSERVATION_ENO_LLF<VECTOR<double,1>,1>;
+template class CONSERVATION_ENO_LLF<VECTOR<double,1>,2>;
 template class CONSERVATION_ENO_LLF<VECTOR<double,1>,3>;
+template class CONSERVATION_ENO_LLF<VECTOR<double,1>,4>;
+template class CONSERVATION_ENO_LLF<VECTOR<double,2>,2>;
+template class CONSERVATION_ENO_LLF<VECTOR<double,2>,3>;
 template class CONSERVATION_ENO_LLF<VECTOR<double,2>,4>;
+template class CONSERVATION_ENO_LLF<VECTOR<double,2>,5>;
 template class CONSERVATION_ENO_LLF<VECTOR<double,3>,5>;
+template class CONSERVATION_ENO_LLF<VECTOR<double,3>,6>;
+template class CONSERVATION_ENO_LLF<VECTOR<float,1>,1>;
+template class CONSERVATION_ENO_LLF<VECTOR<float,1>,2>;
+template class CONSERVATION_ENO_LLF<VECTOR<float,1>,3>;
+template class CONSERVATION_ENO_LLF<VECTOR<float,1>,4>;
+template class CONSERVATION_ENO_LLF<VECTOR<float,2>,2>;
+template class CONSERVATION_ENO_LLF<VECTOR<float,2>,3>;
+template class CONSERVATION_ENO_LLF<VECTOR<float,2>,4>;
+template class CONSERVATION_ENO_LLF<VECTOR<float,2>,5>;
+template class CONSERVATION_ENO_LLF<VECTOR<float,3>,5>;
+template class CONSERVATION_ENO_LLF<VECTOR<float,3>,6>;
 }

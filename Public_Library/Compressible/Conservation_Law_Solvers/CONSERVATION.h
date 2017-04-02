@@ -34,7 +34,6 @@ template<class TV> class GRID;
 template<class TV,int d>
 class CONSERVATION
 {
-    STATIC_ASSERT(TV::m+2==d);
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
     typedef VECTOR<T,d> TV_DIMENSION;

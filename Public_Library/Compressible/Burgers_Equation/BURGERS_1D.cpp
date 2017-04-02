@@ -44,7 +44,5 @@ CFL()
     return 1/max(dt_convect,1/max_time_step);
 }
 //#####################################################################
-#if 0 // broken
 template class BURGERS_1D<float>;
 template class BURGERS_1D<double>;
-#endif

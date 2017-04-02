@@ -50,7 +50,5 @@ CFL()
     return 1/dt_convect;
 }
 //#####################################################################
-#if 0 // broken
 template class REACTIVE_EULER_2D<float>;
 template class REACTIVE_EULER_2D<double>;
-#endif
