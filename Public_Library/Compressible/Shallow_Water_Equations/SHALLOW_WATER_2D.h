@@ -12,8 +12,7 @@
 #define __SHALLOW_WATER_2D__
 
 #include <Compressible/Shallow_Water_Equations/SHALLOW_WATER.h>
-#include <Compressible/Shallow_Water_Equations/SHALLOW_WATER_2D_EIGENSYSTEM_F.h>
-#include <Compressible/Shallow_Water_Equations/SHALLOW_WATER_2D_EIGENSYSTEM_G.h>
+#include <Compressible/Shallow_Water_Equations/SHALLOW_WATER_EIGENSYSTEM.h>
 namespace PhysBAM{
 
 template<class T_input>
@@ -29,12 +28,12 @@ public:
 protected:
     GRID<TV>& grid;
     ARRAY<TV_DIMENSION,VECTOR<int,2> >& U; // h, h*u, and h*v
-    SHALLOW_WATER_2D_EIGENSYSTEM_F<T> eigensystem_F;
-    SHALLOW_WATER_2D_EIGENSYSTEM_G<T> eigensystem_G;
+    SHALLOW_WATER_EIGENSYSTEM<TV> eigensystem_F;
+    SHALLOW_WATER_EIGENSYSTEM<TV> eigensystem_G;
 
 public:
-    SHALLOW_WATER_2D(GRID<TV>& grid_input,ARRAY<TV_DIMENSION,VECTOR<int,2> >& U_input,T gravity_input=9.8,T min_height_input=1e-3)
-        :gravity(gravity_input),min_height(min_height_input),grid(grid_input),U(U_input),eigensystem_F(gravity_input),eigensystem_G(gravity_input)
+    SHALLOW_WATER_2D(GRID<TV>& grid_input,ARRAY<TV_DIMENSION,VECTOR<int,2> >& U_input,T gravity_input=9.8,T min_height_input=1e-3) 
+       :gravity(gravity_input),min_height(min_height_input),grid(grid_input),U(U_input),eigensystem_F(gravity_input,0),eigensystem_G(gravity_input,1)
     {}
     
 //#####################################################################
