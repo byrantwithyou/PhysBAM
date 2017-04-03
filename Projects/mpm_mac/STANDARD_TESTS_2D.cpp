@@ -176,8 +176,8 @@ Initialize()
             IMPLICIT_OBJECT_UNION<TV> shape(obj0,obj1);
             Seed_Particles(shape,0,0,density,particles_per_cell);
         } break;
-        case 9:
-        case 10:{ // freefall circles with different phases
+        case 9: // freefall circles with different phases
+        case 10:{ // freefall circles with same phase
             if(test_number==9) number_phases=PHASE_ID(2);
             particles.Store_Phase(true);
             Set_Grid(RANGE<TV>::Unit_Box()*m);

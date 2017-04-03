@@ -92,7 +92,6 @@ Initialize()
     example.particles.Store_C(false);
     PHYSBAM_ASSERT(!example.particles.store_B || !example.particles.store_C);
 
-    if(Value(example.phases.m)>1) example.use_phi=true;
     for(PHASE_ID i(0);i<example.phases.m;i++){
         PHASE& ph=example.phases(i);
         ph.Initialize(example.grid,example.weights,example.ghost,example.threads);
@@ -126,7 +125,7 @@ Advance_One_Time_Step()
     Print_Grid_Stats("after particle to grid",example.dt);
     Print_Energy_Stats("after particle to grid");
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after particle to grid",0,1);
-    //Build_Level_Sets();
+    Build_Level_Sets();
     Apply_Forces();
     Print_Grid_Stats("after forces",example.dt);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after forces",0,1);

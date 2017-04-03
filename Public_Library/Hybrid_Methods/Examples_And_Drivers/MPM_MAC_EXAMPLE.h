@@ -106,8 +106,6 @@ public:
     int threads;
     bool use_particle_volumes;
     bool use_preconditioner;
-    bool use_shrink,use_reinit;
-    T dilation;
     bool use_phi;
     int rk_particle_order;
     bool use_massless_particles;
