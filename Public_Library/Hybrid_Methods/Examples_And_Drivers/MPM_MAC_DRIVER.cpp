@@ -477,8 +477,13 @@ Compute_Poisson_Matrix()
                     cell(a)+=2*s-1;
                     assert(face.Cell_Index(s)==cell);
                     if(!psi_N(face)){
-                        T entry=sqr(example.grid.one_over_dX(a))/example.phases(p).mass(face);
-                        if(example.use_particle_volumes) entry*=example.phases(p).volume(face);
+                        T entry=sqr(example.grid.one_over_dX(a));
+                        if(example.use_massless_particles)
+                            entry/=example.phases(p).density;
+                        else{
+                            entry/=example.phases(p).mass(face);
+                            if(example.use_particle_volumes)
+                                entry*=example.phases(p).volume(face);}
                         diag+=entry;
                         int ci=cell_index(cell);
                         if(ci>=0) helper.Add_Entry(ci,-entry);}
@@ -511,10 +516,15 @@ Compute_Poisson_Matrix()
         ARRAY<PHASE_ID>& phases_t=phases_h.Array();
         SPARSE_MATRIX_THREADED_CONSTRUCTION<T> G_helper(example.projection_system.gradient,tmp2,tmp3);
         for(FACE_ITERATOR_THREADED<TV> it(example.grid);it.Valid();it.Next()){
+            if(psi_N(it.Full_Index())) continue;
             for(PHASE_ID p(0);p<example.phases.m;p++){
-                if(psi_N(it.Full_Index())) continue;
-                T mass=example.phases(p).mass(it.Full_Index());
-                if(!mass) continue;
+                T mass=0;
+                if(example.use_massless_particles) mass=example.phases(p).density;
+                else{
+                    mass=example.phases(p).mass(it.Full_Index());
+                    if(!mass) continue;
+                    if(example.use_particle_volumes)
+                        mass/=example.phases(p).volume(it.Full_Index());}
                 int c0=cell_index(it.First_Cell_Index());
                 int c1=cell_index(it.Second_Cell_Index());
                 if(c0<0 && c1<0) continue;
@@ -523,7 +533,6 @@ Compute_Poisson_Matrix()
                 if(c1>=0) G_helper.Add_Entry(c1,example.grid.one_over_dX(it.axis));
                 faces_t.Append(it.Full_Index());
                 phases_t.Append(p);
-                if(example.use_particle_volumes) mass/=example.phases(p).volume(it.Full_Index());
                 mass_t.Append(mass);}}
         G_helper.Finish();
     }

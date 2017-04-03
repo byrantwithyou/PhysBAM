@@ -47,6 +47,7 @@ public:
         ARRAY<FACE_INDEX<TV::m> > valid_indices;
         ARRAY<int> simulated_particles;
         GATHER_SCATTER<TV>* gather_scatter;
+        T density; // if not using per-particle mass
 
         // signed distance field & level sets
         ARRAY<T,TV_INT> phi;
@@ -109,7 +110,8 @@ public:
     T dilation;
     bool use_phi;
     int rk_particle_order;
-    
+    bool use_massless_particles;
+
     // debugging
     DEBUG_PARTICLES<TV>& debug_particles;
     bool print_stats;
