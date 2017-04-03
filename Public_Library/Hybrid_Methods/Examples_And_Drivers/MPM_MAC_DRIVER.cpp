@@ -458,6 +458,7 @@ Compute_Poisson_Matrix()
                     face.index(a)++;}}
             if(!(all_N || dirichlet)){
                 cell_index(it.index)=next_cell++;
+                LOG::cout<<it.index<<" "<<p<<"\n";
                 cell_phase(it.index)=p;}}}
     for(CELL_ITERATOR<TV> it(example.grid,1,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
         cell_index(it.index)=-1;
