@@ -443,8 +443,7 @@ Compute_Poisson_Matrix()
 //                 ff+=pit.Weight();
 //         face_fraction(it.Full_Index())=ff;}
 
-    ARRAY<int,TV_INT> cell_index(example.grid.Domain_Indices(1),false);
-    cell_index.Fill(-1);
+    ARRAY<int,TV_INT> cell_index(example.grid.Domain_Indices(1),true,-1);
     ARRAY<PHASE_ID,TV_INT> cell_phase(example.grid.Domain_Indices(1),false);
     int next_cell=0;
     for(CELL_ITERATOR<TV> it(example.grid,0);it.Valid();it.Next()){
