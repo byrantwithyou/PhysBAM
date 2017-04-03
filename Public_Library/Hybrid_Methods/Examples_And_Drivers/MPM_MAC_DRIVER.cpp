@@ -419,7 +419,6 @@ Compute_Poisson_Matrix()
     VECTOR<typename PARTICLE_GRID_WEIGHTS<TV>::SCRATCH,TV::m> scratch;
     for(int i=0;i<TV::m;i++)
         example.weights(i)->Compute(example.grid.Face(FACE_INDEX<TV::m>(i,TV_INT())),scratch(i),false);
-//    ARRAY<T,FACE_INDEX<TV::m> > face_fraction(example.grid,0,false); // Fraction of region of influence that is inside
     ARRAY<bool,FACE_INDEX<TV::m> > psi_N(example.grid,3,false);
 
 #pragma omp parallel
@@ -430,38 +429,34 @@ Compute_Poisson_Matrix()
             MPM_COLLISION_OBJECT<TV>* o=example.collision_objects(i);
             if(o->Phi(X,example.time)<0){
                 N=true;
+                T v=o->Velocity(X,example.time)(it.axis);
                 for(PHASE_ID p(0);p<example.phases.m;p++)
-                    example.phases(p).velocity(it.Full_Index())=o->Velocity(X,example.time)(it.axis);
+                    if(example.phases(p).mass(it.Full_Index()))
+                        example.phases(p).velocity(it.Full_Index())=v;
                 break;}}
         psi_N(it.Full_Index())=N;}
-
-// #pragma omp parallel
-//     for(FACE_ITERATOR_THREADED<TV> it(example.grid);it.Valid();it.Next()){
-//         T ff=0;
-//         for(PARTICLE_GRID_ITERATOR<TV> pit(scratch(it.axis));pit.Valid();pit.Next())
-//             if(!psi_N(FACE_INDEX<TV::m>(it.axis,it.index+pit.Index())))
-//                 ff+=pit.Weight();
-//         face_fraction(it.Full_Index())=ff;}
 
     ARRAY<int,TV_INT> cell_index(example.grid.Domain_Indices(1),true,-1);
     ARRAY<PHASE_ID,TV_INT> cell_phase(example.grid.Domain_Indices(1),false);
     int next_cell=0;
-    for(CELL_ITERATOR<TV> it(example.grid,0);it.Valid();it.Next()){
-        for(PHASE_ID p(0);p<example.phases.m;p++){
-            bool dirichlet=false,all_N=true;
-            for(int a=0;a<TV::m;a++){
-                FACE_INDEX<TV::m> face(a,it.index);
-                for(int s=0;s<2;s++){
-                    if(!psi_N(face)){
-                        all_N=false;
-                        if(!example.phases(p).mass(face)) dirichlet=true;}
-                    face.index(a)++;}}
-            if(!(all_N || dirichlet)){
-                cell_index(it.index)=next_cell++;
-                LOG::cout<<it.index<<" "<<p<<"\n";
-                cell_phase(it.index)=p;}}}
-    for(CELL_ITERATOR<TV> it(example.grid,1,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
-        cell_index(it.index)=-1;
+    for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
+        bool dirichlet=false,all_N=true;
+        PHASE_ID phase(-1);
+        for(int a=0;a<TV::m;a++){
+            FACE_INDEX<TV::m> face(a,it.index);
+            for(int s=0;s<2;s++){
+                if(!psi_N(face)){
+                    all_N=false;
+                    bool has_mass=false;
+                    for(PHASE_ID p(0);p<example.phases.m;p++)
+                        if(example.phases(p).mass(face)){
+                            phase=p;
+                            has_mass=true;}
+                    if(!has_mass) dirichlet=true;}
+                face.index(a)++;}}
+        if(!all_N && !dirichlet){
+            cell_index(it.index)=next_cell++;
+            cell_phase(it.index)=phase;}}
 
     example.projection_system.A.Reset(next_cell);
     ARRAY<int> tmp0,tmp1;
