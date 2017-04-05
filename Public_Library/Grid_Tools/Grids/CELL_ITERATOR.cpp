@@ -11,7 +11,7 @@ CELL_ITERATOR(const GRID<TV>& grid_input,const int number_of_ghost_cells,const T
     :GRID_ITERATOR_BASE<TV>(grid_input)
 {
     assert(-1<=side&&side<6);assert(region_type!=GRID<TV>::BOUNDARY_REGION && region_type!=GRID<TV>::INTERIOR_REGION); // these types may not really make sense here
-    RANGE<TV_INT> domain(grid.Domain_Indices(number_of_ghost_cells));
+    RANGE<TV_INT> domain(grid.Cell_Indices(number_of_ghost_cells));
     switch(region_type){
         case GRID<TV>::WHOLE_REGION: assert(side<0);Add_Region(domain);break;
         case GRID<TV>::BOUNDARY_INTERIOR_REGION: // outer boundary of grid with specified ghost cells
