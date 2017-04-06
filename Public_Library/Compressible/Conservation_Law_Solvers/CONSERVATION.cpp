@@ -212,48 +212,6 @@ Update_Conservation_Law(GRID<TV>& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRA
         if(psi(cell_index)) U(cell_index)-=dt*rhs(cell_index);}
 }
 //#####################################################################
-// Function Update_Conservation_Law_For_Specialized_Shallow_Water_Equations
-//#####################################################################
-// A specialized function only used in SHALLOW_WATER_2D_SPECIALIZED
-template<class TV,int d> template<class T_ARRAYS> void CONSERVATION<TV,d>::
-Update_Conservation_Law_For_Specialized_Shallow_Water_Equations(GRID<TV>& grid,T_ARRAYS& U,const T_ARRAYS& U_ghost,const ARRAY<bool,VECTOR<int,2> >& psi,const T dt,
-    EIGENSYSTEM<T,2>& eigensystem_F,EIGENSYSTEM<T,2>& eigensystem_G,CONSERVATION<TV,2>& solver,const VECTOR<bool,2*TV::m>& outflow_boundaries)
-{
-    STATIC_ASSERT((is_same<T_ARRAYS,ARRAY<VECTOR<T,3> ,VECTOR<int,2> > >::value));
-    if(save_fluxes!=solver.save_fluxes) PHYSBAM_FATAL_ERROR();
-
-    int i,j;int m=grid.counts.x,n=grid.counts.y;T dx=grid.dX.x,dy=grid.dX.y;
-    ARRAY<VECTOR<T,3> ,VECTOR<int,2> > rhs(0,m,0,n);
-
-    if(save_fluxes) fluxes.Resize(grid);
-
-    if(save_fluxes) solver.flux_temp.Resize(0,m,true,false);
-    ARRAY<VECTOR<T,2> ,VECTOR<int,1> > U_1d_x(-3,m+3),Fx_1d(0,m);
-    ARRAY<bool,VECTOR<int,1> > psi_x(0,m);
-    for(j=0;j<n;j++){
-        for(i=0;i<m;i++) psi_x(i)=psi(i,j);
-        for(i=-3;i<m+3;i++){U_1d_x(i)(0)=U_ghost(i,j)(0);U_1d_x(i)(1)=U_ghost(i,j)(1);}
-        eigensystem_F.slice_index=VECTOR<int,3>(0,j,0);
-        solver.Conservation_Solver(m,dx,psi_x,U_1d_x,Fx_1d,eigensystem_F,eigensystem_F,VECTOR<bool,2>(outflow_boundaries(0),outflow_boundaries(1)));
-        for(i=0;i<m;i++){rhs(i,j)(0)=Fx_1d(i)(0);rhs(i,j)(1)=Fx_1d(i)(1);}
-        if(save_fluxes) 
-            for(i=0;i<m;i++){fluxes.Component(0)(i+1,j)(0)=solver.flux_temp(i)(0);fluxes.Component(0)(i+1,j)(1)=solver.flux_temp(i)(1);fluxes.Component(0)(i+1,j)(2)=0;}}
-
-    if(save_fluxes) solver.flux_temp.Resize(0,n,true,false);
-    ARRAY<VECTOR<T,2> ,VECTOR<int,1> > U_1d_y(-3,n+3),Gy_1d(0,n);
-    ARRAY<bool,VECTOR<int,1> > psi_y(0,n);
-    for(i=0;i<m;i++){
-        for(j=0;j<n;j++) psi_y(j)=psi(i,j);
-        for(j=-3;j<n+3;j++){U_1d_y(j)(0)=U_ghost(i,j)(0);U_1d_y(j)(1)=U_ghost(i,j)(2);}
-        eigensystem_G.slice_index=VECTOR<int,3>(i,0,0);
-        solver.Conservation_Solver(n,dy,psi_y,U_1d_y,Gy_1d,eigensystem_G,eigensystem_G,VECTOR<bool,2>(outflow_boundaries(2),outflow_boundaries(3)));
-        for(j=0;j<n;j++){rhs(i,j)(0)+=Gy_1d(j)(0);rhs(i,j)(2)=Gy_1d(j)(1);}
-        if(save_fluxes)
-            for(j=0;j<n;j++){fluxes.Component(1)(i,j+1)(0)=solver.flux_temp(j)(0);fluxes.Component(1)(i,j+1)(1)=0;fluxes.Component(1)(i,j+1)(2)=solver.flux_temp(j)(1);}}
-
-    for(i=0;i<m;i++) for(j=0;j<n;j++) if(psi(i,j)) U(i,j)-=dt*rhs(i,j);
-}
-//#####################################################################
 // Function Log_Parameters
 //#####################################################################
 template<class TV,int d> void CONSERVATION<TV,d>::
