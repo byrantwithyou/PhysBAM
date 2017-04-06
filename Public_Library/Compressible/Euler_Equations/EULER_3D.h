@@ -19,8 +19,6 @@
 
 #include <Compressible/Euler_Equations/EULER.h>
 #include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
-#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
-#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
 namespace PhysBAM{
 
 template<class T_input>

@@ -14,8 +14,7 @@
 
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
-#include <Compressible/Euler_Equations/EULER_2D_EIGENSYSTEM_F.h>
-#include <Compressible/Euler_Equations/EULER_2D_EIGENSYSTEM_G.h>
+#include <Compressible/Euler_Equations/EULER_EIGENSYSTEM.h>
 #include <Compressible/Euler_Equations/EULER_UNIFORM.h>
 
 #include "EULER_2D_EXAMPLE.h"

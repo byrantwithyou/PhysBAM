@@ -8,8 +8,8 @@
 #define __PARTICLE_LEVELSET_UNIFORM__
 
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
-#include <Incompressible/Interpolation_Collidable/INTERPOLATION_COLLIDABLE_UNIFORM_FORWARD.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
+#include <Incompressible/Interpolation_Collidable/INTERPOLATION_COLLIDABLE_UNIFORM_FORWARD.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET.h>
 namespace PhysBAM{
 
