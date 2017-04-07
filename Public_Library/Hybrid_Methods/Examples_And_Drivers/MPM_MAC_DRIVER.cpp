@@ -299,7 +299,8 @@ Build_Level_Sets(PHASE& ph)
     T dx=example.grid.dX.Max();
     ph.phi.array.Fill(3*dx);
     RANGE<TV_INT> grid_domain=example.grid.Domain_Indices(example.ghost);
-    for(int p=0;p<example.particles.X.m;p++){
+    for(int k=0;k<ph.simulated_particles.m;k++){
+        int p=ph.simulated_particles(k);
         T r=0.36*dx;
         T influence_bound=r+dx*(T)1.1;
         TV X=example.particles.X(p);
