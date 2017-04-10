@@ -118,6 +118,7 @@ public:
     T last_te;
     T last_grid_ke;
     bool test_system;
+    bool print_matrix;
 
     MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type_input);
     virtual ~MPM_MAC_EXAMPLE();

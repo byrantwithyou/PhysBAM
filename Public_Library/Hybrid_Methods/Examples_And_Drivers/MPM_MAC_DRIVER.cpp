@@ -12,6 +12,7 @@
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
 #include <Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
 #include <Tools/Parallel_Computation/APPEND_HOLDER.h>
+#include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR_THREADED.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
@@ -546,7 +547,9 @@ Compute_Poisson_Matrix()
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Pressure_Projection()
 {
+    static int solve_id=-1;
     TIMER_SCOPE_FUNC;
+    
     Compute_Poisson_Matrix();
     example.sol.v.Resize(example.projection_system.A.m);
     example.rhs.v.Resize(example.projection_system.A.m);
@@ -556,14 +559,25 @@ Pressure_Projection()
         tmp(i)=example.phases(example.projection_system.phases(i)).velocity(example.projection_system.faces(i));
     example.projection_system.gradient.Transpose_Times(tmp,example.rhs.v);
     
+    solve_id++;
     if(example.test_system) example.projection_system.Test_System(example.sol);
-    
+    if(example.print_matrix){
+        LOG::cout<<"solve id: "<<solve_id<<std::endl;
+        KRYLOV_SOLVER<T>::Ensure_Size(example.av,example.sol,2);
+        const MPM_PROJECTION_SYSTEM<TV>& system=example.projection_system;
+        OCTAVE_OUTPUT<T>(LOG::sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,*example.av(0),*example.av(1));
+        OCTAVE_OUTPUT<T>(LOG::sprintf("P-%i.txt",solve_id).c_str()).Write_Projection("P",system,*example.av(0));
+        OCTAVE_OUTPUT<T>(LOG::sprintf("b-%i.txt",solve_id).c_str()).Write("b",example.rhs);}
+
     CONJUGATE_GRADIENT<T> cg;
     cg.finish_before_indefiniteness=true;
     cg.relative_tolerance=true;
     bool converged=cg.Solve(example.projection_system,example.sol,example.rhs,
         example.av,example.solver_tolerance,0,example.solver_iterations);
     if(!converged) LOG::printf("SOLVER DID NOT CONVERGE.\n");
+
+    if(example.print_matrix)
+        OCTAVE_OUTPUT<T>(LOG::sprintf("x-%i.txt",solve_id).c_str()).Write("x",example.sol);
 
     example.projection_system.gradient.Times(example.sol.v,tmp);
     for(int i=0;i<tmp.m;i++)
