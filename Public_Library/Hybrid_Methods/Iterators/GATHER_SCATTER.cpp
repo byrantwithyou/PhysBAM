@@ -37,7 +37,7 @@ Prepare_Scatter(const MPM_PARTICLES<TV>& particles)
     ARRAY<int> counts(grid.numbers_of_cells.x),sum_counts(grid.numbers_of_cells.x);
     for(int k=0;k<simulated_particles.m;++k){
         int p=simulated_particles(k);
-        TV_INT cell=grid.Cell(particles.X(p),0);
+        TV_INT cell=grid.Cell(particles.X(p));
         counts(cell.x)++;}
     sum_counts(0)=counts(0);
     for(int i=1;i<counts.m;i++) sum_counts(i)=sum_counts(i-1)+counts(i);
@@ -75,7 +75,7 @@ Prepare_Scatter(const MPM_PARTICLES<TV>& particles)
     bins.Resize(partitions*threads);
     for(int k=0;k<simulated_particles.m;++k){
         int p=simulated_particles(k);
-        TV_INT cell=grid.Cell(particles.X(p),0);
+        TV_INT cell=grid.Cell(particles.X(p));
         // int c=bin_map(cell.x);
         // Add_Debug_Particle(particles.X(p),VECTOR<T,3>(c&1,c/2&1,c/4&1));
         bins(bin_map(cell.x)).Append(p);}

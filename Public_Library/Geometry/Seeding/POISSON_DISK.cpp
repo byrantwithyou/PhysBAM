@@ -46,11 +46,11 @@ Sample(RANDOM_NUMBERS<T>& random,const RANGE<TV>& box,ARRAY<TV>& X)
     GRID<TV> grid(cell_counts+1,RANGE<TV>(bounding_box.min_corner,bounding_box.min_corner+(TV)cell_counts*h));
     ARRAY<int,TV_INT> grid_array(grid.Cell_Indices(ghost),true,-1);
     if(X.m){
-        for(int i=0;i<X.m;i++) grid_array(grid.Cell(X(i),ghost))=i;
+        for(int i=0;i<X.m;i++) grid_array(grid.Cell(X(i)))=i;
     }
     else{
         TV first_point=random.Get_Uniform_Vector(box);
-        grid_array(grid.Cell(first_point,ghost))=0;
+        grid_array(grid.Cell(first_point))=0;
         X.Append(first_point);}
     ARRAY<int> active(IDENTITY_ARRAY<>(X.m));
     while(active.m){
@@ -63,7 +63,7 @@ Sample(RANDOM_NUMBERS<T>& random,const RANGE<TV>& box,ARRAY<TV>& X)
                 found_at_least_one=true;
                 int index=X.Append(new_point);
                 active.Append(index);
-                grid_array(grid.Cell(new_point,ghost))=index;}}
+                grid_array(grid.Cell(new_point))=index;}}
         if(!found_at_least_one) active.Remove_Index_Lazy(random_index);}
 }
 //#####################################################################
@@ -84,7 +84,7 @@ Generate_Random_Point_Around_Annulus(RANDOM_NUMBERS<T>& random,TV& center) const
 template<class TV> bool POISSON_DISK<TV>::
 Check_Distance(const GRID<TV>& grid,ARRAY<int,TV_INT>& grid_array,const TV& point,ARRAY<TV>& X) const
 {
-    TV_INT cell=grid.Cell(point,ghost);
+    TV_INT cell=grid.Cell(point);
     RANGE<TV_INT> candidate_range(cell-1,cell+2);
     for(RANGE_ITERATOR<TV::m> it(candidate_range);it.Valid();it.Next()){
         if(grid_array(it.index)==-1) continue;

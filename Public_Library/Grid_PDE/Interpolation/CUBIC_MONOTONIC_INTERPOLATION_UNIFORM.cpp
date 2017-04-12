@@ -238,7 +238,7 @@ Base_Index(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) 
 template<class TV,class T2,class T_FACE_LOOKUP> VECTOR<int,TV::m> CUBIC_MONOTONIC_INTERPOLATION_UNIFORM<TV,T2,T_FACE_LOOKUP>::
 Base_Index_Face(const GRID<TV>& grid,const typename T_FACE_LOOKUP::LOOKUP& u,int axis,const TV& X) const
 {
-    return grid.Cell(X+(T).5*(TV::Axis_Vector(axis)-3)*grid.dX,10);
+    return grid.Cell(X+(T).5*(TV::Axis_Vector(axis)-3)*grid.dX);
 }
 //#####################################################################
 // Function From_Block_Face_Component

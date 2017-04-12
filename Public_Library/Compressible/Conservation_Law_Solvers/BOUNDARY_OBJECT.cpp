@@ -23,7 +23,7 @@ template<class TV,class TV_DIMENSION> void BOUNDARY_OBJECT<TV,TV_DIMENSION>::
 Get_State_At_Location(const GRID<VECTOR<T,1> >& grid_1d,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U_1d,const T location,const VECTOR<int,2>& region_boundaries,TV_DIMENSION& u_1d)
 {
     T dx=grid_1d.dX.x,one_over_dx=grid_1d.one_over_dX.x;
-    int lower_cell=grid_1d.Cell(VECTOR<T,1>(location),4).x; //using 4 ghost cells as thats the maximum we can have.
+    int lower_cell=grid_1d.Cell(VECTOR<T,1>(location)).x; //using 4 ghost cells as thats the maximum we can have.
     int higher_cell=lower_cell+1;
     T epsilon=location-grid_1d.Center(VECTOR<int,1>(lower_cell)).x;
     if(lower_cell>=region_boundaries.x){ //use lower_cell,lower_cell+1

@@ -48,9 +48,7 @@ public:
     if(initialized) for(int i=0;i<cells.array.m;i++) delete cells.array(i);
     cells.Resize(grid.Get_MAC_Grid().Domain_Indices(),false,false);cells.Fill(0);initialized=true;
     for(int k=0;k<boxes_input.m;k++){
-        RANGE<TV_INT> domain;
-        grid.Cell(boxes_input(k).x.Minimum_Corner(),domain.min_corner,0);
-        grid.Cell(boxes_input(k).x.Maximum_Corner(),domain.max_corner,0);
+        RANGE<TV_INT> domain(grid.Cell(boxes_input(k).x.min_corner),grid.Cell(boxes_input(k).x.max_corner));
         domain.max_corner=TV_INT::Componentwise_Min(domain.max_corner,grid.numbers_of_cells);
         for(RANGE_ITERATOR<TV::m> it(domain);it.Valid();it.Next()){
             if(!cells(it.index))cells(it.index)=new ARRAY<DATA_T>;

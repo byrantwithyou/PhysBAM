@@ -133,7 +133,7 @@ Compute_Weights(VECTOR<TV,4>& w,VECTOR<TV,4>& dw,TV x,TV one_over_dX)
 template<class TV,int degree> void PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
 Compute_Precompute_Data(PRECOMPUTE_DATA& pd,const TV& X) const
 {
-    pd.base=grid.Cell(X-(T).5*degree*grid.DX(),degree+1);
+    pd.base=grid.Cell(X-(T).5*degree*grid.DX());
     TV X_eval=X-grid.Center(pd.base);
     Compute_Weights(pd.w,pd.dw,X_eval*grid.one_over_dX,grid.one_over_dX);
 }
