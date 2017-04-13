@@ -29,7 +29,7 @@ public:
 
     void Update_Base_And_Weights(const GRID<TV>& grid)
     {
-        base_node=grid.Cell(X-(T).5*(w-2)*grid.dX,ghost*2);
+        base_node=grid.Cell(X-(T).5*(w-2)*grid.dX);
         const TV X_eval=X-grid.Node(base_node);
         const T one_over_dx=(T)1/grid.dX(0);
         PHYSBAM_ASSERT(grid.dX.Min()==grid.dX.Max());
