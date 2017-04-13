@@ -4,10 +4,6 @@
 //#####################################################################
 // Class SHALLOW_WATER
 //##################################################################### 
-//
-// Inherited by SHALLOW_WATER_1D, SHALLOW_WATER_2D, and SHALLOW_WATER_3D.
-//
-//#####################################################################
 #ifndef __SHALLOW_WATER__
 #define __SHALLOW_WATER__    
 
@@ -18,28 +14,30 @@ namespace PhysBAM{
 template<class TV>
 class SHALLOW_WATER
 {
-    typedef typename TV::SCALAR T;typedef VECTOR<T,TV::m+1> TV_DIMENSION;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    enum{d=TV::m+1};
+    typedef VECTOR<T,d> TV_DIMENSION;
 public:
     BOUNDARY<TV,TV_DIMENSION>* boundary;
     CONSERVATION<TV,TV::m+1>* conservation;
 private:
     BOUNDARY<TV,TV_DIMENSION> boundary_default;
     CONSERVATION_ENO_LLF<TV,TV::m+1> conservation_default;
-
-protected:
-    SHALLOW_WATER()
-    {
-        boundary=&boundary_default;
-        conservation=&conservation_default;
-    }
 public:
 
-    void Set_Custom_Boundary(BOUNDARY<TV,TV_DIMENSION>& boundary_input)
-    {boundary=&boundary_input;}
-    
-    void Set_Custom_Conservation(CONSERVATION<T,TV::m+1>& conservation_input)
-    {conservation=&conservation_input;}
+    T gravity;
+    T min_height;
+    GRID<TV>& grid;
+    ARRAY<TV_DIMENSION,TV_INT>& U; // h, h*u, and h*v
+    VECTOR<EIGENSYSTEM<T,d>*,TV::m> eigensystems;
 
+    SHALLOW_WATER(GRID<TV>& grid,ARRAY<TV_DIMENSION,TV_INT>& U,T gravity=9.8,
+        T min_height=1e-3);
+    ~SHALLOW_WATER();
+
+//#####################################################################
+    void Euler_Step(const T dt,const T time=0);
+    T CFL();
 //#####################################################################
 };
 }    
