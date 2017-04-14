@@ -30,6 +30,7 @@
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
 #include <Deformables/Forces/SURFACE_TENSION_FORCE.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
+#include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_SPHERE.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/MPM_GRAVITY.h>
@@ -145,7 +146,7 @@ Initialize()
             gravity=TV(0,-1)*m/sqr(s);
             Add_Walls(-1,COLLISION_TYPE::slip,.1*m);
         } break;
-        case 6:{ // a dropping chunk of fluid
+        case 6:{ // freefall rectangle
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             T density=2*unit_rho*scale_mass;
             Seed_Particles(RANGE<TV>(TV(.2*m,.2*m),TV(.5*m,.8*m)),0,0,density,particles_per_cell);
@@ -193,6 +194,15 @@ Initialize()
             // a wall in the middle preventing the two circles from touching
             RANGE<TV> wall=RANGE<TV>(TV(.45,0)*m,TV(.55,1)*m);
             Add_Collision_Object(wall,COLLISION_TYPE::slip,0);
+        } break;
+        case 11:{ // free fall circle with curved boundary
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            SPHERE<TV> sphere(TV(.5,.5)*m,.3*m);
+            T density=2*unit_rho*scale_mass;
+            Seed_Particles(sphere,0,0,density,particles_per_cell);
+            gravity=TV(0,-1)*m/sqr(s);
+            // add a circle collision object
+            collision_objects.Append(new MPM_COLLISION_IMPLICIT_SPHERE<TV>(COLLISION_TYPE::slip,0,0,0,TV(.5,.5)*m,.4*m,0));
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }

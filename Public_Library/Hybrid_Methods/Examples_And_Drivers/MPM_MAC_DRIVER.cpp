@@ -242,6 +242,9 @@ Particle_To_Grid(PHASE& ph) const
                 V+=dV(p).Row(index.axis).Dot(scale*(example.grid.Face(index)-particles.X(p)));}
             ph.velocity(index)+=particles.mass(p)*w*V;
         });
+    // TODO: move mass, momentum, volume inside
+    if(example.move_mass_inside)
+        Move_Mass_Momentum_Inside(ph);
 
     ph.valid_indices.Remove_All();
     ph.valid_flat_indices.Remove_All();
@@ -268,7 +271,7 @@ Particle_To_Grid(PHASE& ph) const
     }
     flat_h.Combine();
     indices_h.Combine();
-    if(example.flip) ph.velocity_save=ph.velocity;
+    if(example.flip) ph.velocity_save=ph.velocity; 
 }
 //#####################################################################
 // Function Build_Level_Sets
@@ -298,7 +301,7 @@ Build_Level_Sets(PHASE& ph)
 {
     PHYSBAM_ASSERT(ph.levelset);
     T dx=example.grid.dX.Max();
-    ph.phi.array.Fill(3*dx);
+ph.phi.array.Fill(3*dx);
     RANGE<TV_INT> grid_domain=example.grid.Domain_Indices(example.ghost);
     for(int k=0;k<ph.simulated_particles.m;k++){
         int p=ph.simulated_particles(k);
@@ -409,6 +412,65 @@ Compute_Volume_For_Face(const FACE_INDEX<TV::m>& face) const
         num++;
         total_volume+=weight;}
     return total_volume;
+}
+//#####################################################################
+// Function Move_Mass_Momentum_Inside
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Move_Mass_Momentum_Inside(PHASE& ph) const
+{
+    for(FACE_ITERATOR<TV> fit(example.grid,2);fit.Valid();fit.Next()){
+        TV loc=fit.Location();
+        T mass=ph.mass(fit.Full_Index());
+        if(!mass) continue;
+        T momentum=ph.velocity(fit.Full_Index());
+        T volume=0;
+        if(example.use_particle_volumes)
+            volume=ph.volume(fit.Full_Index());
+        for(int i=0;i<example.collision_objects.m;i++){
+            MPM_COLLISION_OBJECT<TV>* o=example.collision_objects(i);
+            if(o->Phi(loc,example.time)>=0) continue; // outside collision object
+            Add_Debug_Particle(loc,VECTOR<T,3>(0,0,1)); // DEBUG: the point mass will be moved out from
+            IMPLICIT_OBJECT<TV>* io=o->Get_Implicit_Object(example.time);
+            TV loc_bd=io->Closest_Point_On_Boundary(loc);
+            TV loc_reflect=loc+2*(loc_bd-loc); 
+            Add_Debug_Particle(loc_reflect,VECTOR<T,3>(1,0,0)); // DEBUG: reflection across boundary
+            FACE_INDEX<TV::m> first_face_index=example.grid.Face(loc_reflect,fit.axis); // get the smallest face index
+            TV first_face_loc=example.grid.Face(first_face_index);
+            TV offset=(loc_reflect-first_face_loc)*example.grid.one_over_dX;
+            VECTOR<T,1<<TV::m> weights;
+            for(int j=0;j<1<<TV::m;j++){
+                TV w=offset,loc=first_face_loc;
+                for(int k=0;k<TV::m;k++)
+                    if(j&(1<<k)){
+                        w(k)=1-w(k);
+                        loc(k)+=example.grid.dX(k);}
+                weights(j)=w.Product();
+                if(o->Phi(loc,example.time)>0){
+                    Add_Debug_Particle(loc,VECTOR<T,3>(1,1,0));/* DEBUG: mass moved to*/}
+                else{
+                    weights(j)=0;
+                    Add_Debug_Particle(loc,VECTOR<T,3>(0,1,1));/* DEBUG: mass won't be moved to*/}}
+            // scale weights if not all nodes are inside
+            weights/=weights.Sum();
+            for(int j=0;j<1<<TV::m;j++){
+                if(weights(j)){
+                    FACE_INDEX<TV::m> face(first_face_index);
+                    for(int k=0;k<TV::m;k++)
+                        if(j&(1<<k))
+                            face.index(k)++;
+                    // move mass momentum, inside
+                    ph.mass(face)+=weights(j)*mass;
+                    ph.velocity(face)+=weights(j)*momentum;
+                    if(example.use_particle_volumes) 
+                        ph.volume(face)+=weights(j)*volume;}}
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("faces mass moved to",0,1);
+            // clear mass,momentum outside
+            ph.mass(fit.Full_Index())=0;
+            ph.velocity(fit.Full_Index())=0;
+            if(example.use_particle_volumes)
+                ph.volume(fit.Full_Index())=0;
+            break;}}
 }
 //#####################################################################
 // Function Compute_Poisson_Matrix

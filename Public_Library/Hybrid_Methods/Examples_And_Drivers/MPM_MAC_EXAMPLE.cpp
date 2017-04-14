@@ -32,7 +32,7 @@ MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type)
     restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),
     only_write_particles(false),cfl(1),
     solver_tolerance(std::numeric_limits<T>::epsilon()*10),solver_iterations(1000),
-    threads(1),use_particle_volumes(false),
+    threads(1),use_particle_volumes(false),move_mass_inside(false),
     use_phi(false),rk_particle_order(0),
     use_massless_particles(false),debug_particles(*new DEBUG_PARTICLES<TV>),
     print_stats(false),last_te(0),last_grid_ke(0),test_system(false),print_matrix(false)
