@@ -587,6 +587,14 @@ Initialize_Components_And_Key_Bindings()
         Add_Component(pressure2_component,"Pressure2",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F7),pressure2_component->viewer_callbacks.Get("toggle_draw"));}
 
+    filename=basedir+"/%d/heightfield";
+    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+        std::string velocity_filename=basedir+"/%d/heightfield_velocity";
+        if(!FILE_UTILITIES::Frame_File_Exists(velocity_filename,start_frame)) velocity_filename="";
+        OPENGL_COMPONENT_HEIGHTFIELD_1D<T>* heightfield=new OPENGL_COMPONENT_HEIGHTFIELD_1D<T>(stream_type,grid.Remove_Dimension(1),filename,"",velocity_filename);
+        Add_Component(heightfield,"Heightfield",'1',BASIC_VISUALIZATION<T>::OWNED);
+        slice_manager.Add_Object(heightfield);}
+
     // Draw grid here so it'll be above particles and pressure
     if(grid_component){
         Add_Component(grid_component,"Grid",'6',BASIC_VISUALIZATION<T>::SELECTABLE);

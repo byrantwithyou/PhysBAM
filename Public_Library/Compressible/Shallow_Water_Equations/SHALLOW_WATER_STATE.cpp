@@ -4,6 +4,7 @@
 //#####################################################################
 #include <Core/Log/LOG.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Compressible/Shallow_Water_Equations/SHALLOW_WATER.h>
 #include <Compressible/Shallow_Water_Equations/SHALLOW_WATER_STATE.h>
 using namespace PhysBAM;
@@ -16,7 +17,7 @@ SHALLOW_WATER_STATE(const STREAM_TYPE stream_type)
     last_frame(100),write_substeps_level(-1),substeps_delay_frame(-1),
     output_directory("output"),data_directory("../../Public_Data"),use_test_output(false),
     restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),cfl(1),
-    shallow_water(*new SHALLOW_WATER<TV>(grid,U))
+    shallow_water(*new SHALLOW_WATER<TV>(grid,U)),debug_particles(*new DEBUG_PARTICLES<TV>)
 {
 }
 //#####################################################################

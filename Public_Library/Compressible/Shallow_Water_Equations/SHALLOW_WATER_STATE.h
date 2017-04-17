@@ -10,6 +10,7 @@
 namespace PhysBAM{
 
 template<class T> class SHALLOW_WATER;
+template<class TV> class DEBUG_PARTICLES;
 
 template<class TV>
 class SHALLOW_WATER_STATE:public NONCOPYABLE
@@ -39,6 +40,7 @@ public:
 
     ARRAY<T_VEC,TV_INT> U;
     SHALLOW_WATER<TV>& shallow_water;
+    DEBUG_PARTICLES<TV>& debug_particles;
 
     std::function<void()> initialize;
     std::function<void(int frame)> begin_frame;

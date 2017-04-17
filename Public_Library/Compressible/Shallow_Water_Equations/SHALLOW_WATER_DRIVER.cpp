@@ -5,6 +5,7 @@
 #include <Core/Log/DEBUG_SUBSTEPS.h>
 #include <Core/Log/LOG.h>
 #include <Core/Log/SCOPE.h>
+#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Compressible/Shallow_Water_Equations/SHALLOW_WATER.h>
 #include <Compressible/Shallow_Water_Equations/SHALLOW_WATER_DRIVER.h>
 #include <Compressible/Shallow_Water_Equations/SHALLOW_WATER_STATE.h>
@@ -55,7 +56,7 @@ Initialize()
 
     // setup time
     output_number=current_frame=state.restart;
-
+    state.U.Resize(state.grid.Node_Indices(state.ghost));
     PHYSBAM_ASSERT(state.initialize);
     state.initialize();
 
@@ -132,6 +133,18 @@ Write_Output_Files(const int frame)
         FILE_UTILITIES::Write_To_Text_File(state.output_directory+"/common/first_frame",frame,"\n");
     state.Write_Output_Files(frame);
     FILE_UTILITIES::Write_To_Text_File(state.output_directory+"/common/last_frame",frame,"\n");
+    FILE_UTILITIES::Write_To_File(state.stream_type,state.output_directory+"/common/grid",state.grid);
+
+    ARRAY<T,TV_INT> h(state.U.domain);
+    ARRAY<TV,TV_INT> v(state.U.domain);
+    for(RANGE_ITERATOR<TV::m> it(state.U.domain);it.Valid();it.Next()){
+        VECTOR<T,TV::m+1> UU=state.U(it.index);
+        T a=UU(0);
+        h(it.index)=a;
+        v(it.index)=UU.template Slice<1,TV::m>()/a;}
+    FILE_UTILITIES::Write_To_File(state.stream_type,LOG::sprintf("%s/%d/centered_velocities",state.output_directory.c_str(),frame),v);
+    FILE_UTILITIES::Write_To_File(state.stream_type,LOG::sprintf("%s/%d/heightfield",state.output_directory.c_str(),frame),h);
+    state.debug_particles.Write_Debug_Particles(state.stream_type,state.output_directory,frame);
 }
 //#####################################################################
 // Function Compute_Dt
