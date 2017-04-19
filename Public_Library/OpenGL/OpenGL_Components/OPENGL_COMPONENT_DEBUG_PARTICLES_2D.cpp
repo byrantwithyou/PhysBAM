@@ -210,6 +210,7 @@ Bounding_Box() const
 template<class T> int OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
 Get_Selection_Priority(ARRAY_VIEW<GLuint> indices)
 {
+    if(indices.m<1) return -1;
     return 110;
 }
 //#####################################################################
