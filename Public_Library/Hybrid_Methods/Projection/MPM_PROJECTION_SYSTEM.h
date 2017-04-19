@@ -38,6 +38,7 @@ struct MPM_PROJECTION_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
     void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& x) const override;
     void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const override;
     void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const override;
+    void Test() const;
 };
 //#####################################################################
 }

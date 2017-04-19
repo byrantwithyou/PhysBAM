@@ -8,6 +8,7 @@
 #include <Core/Matrices/MATRIX.h>
 #include <Core/Matrices/MATRIX_MXN.h>
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
 #include <Hybrid_Methods/Projection/MPM_PROJECTION_SYSTEM.h>
@@ -99,6 +100,40 @@ Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) co
     temp_vector.Resize(A.m);
     A.C->Solve_Forward_Substitution(vr.v,temp_vector,true);
     A.C->Solve_Backward_Substitution(temp_vector,vz.v,false,true);
+}
+//#####################################################################
+// Function Test_Helper
+//#####################################################################
+template<class T> static void
+Test_Helper(const ARRAY<T>& x,const ARRAY<T>& y,T tolerance,const char* msg)
+{
+    T a=x.Magnitude();
+    T b=y.Magnitude();
+    T c=(x-y).Magnitude();
+    T r=c/std::max(std::max(a,b),(T)1e-30);
+    if(r>=tolerance)
+        LOG::printf("FAIL: %s: %g %g %g  rel %g\n",msg,a,b,c,r);
+}
+//#####################################################################
+// Function Test
+//#####################################################################
+template<class TV> void MPM_PROJECTION_SYSTEM<TV>::
+Test() const
+{
+    T tolerance=(T)1e-5;
+    PHYSBAM_ASSERT(A.m==A.n && A.m==gradient.n && mass.m==gradient.m);
+    ARRAY<T> x(A.m),y(A.m),z(A.m),w(gradient.m);
+    RANDOM_NUMBERS<T> random;
+    random.Fill_Uniform(x,-1,1);
+    gradient.Times(x,w);
+    w/=mass;
+    gradient.Transpose_Times(w,y);
+    A.Times(x,z);
+    Test_Helper(y,z,tolerance,"A = G^T M^(-1) G");
+    MPM_PROJECTION_VECTOR<TV> v;
+    v.v=z;
+    Project(v);
+    Test_Helper(v.v,z,tolerance,"P A = A");
 }
 namespace PhysBAM{
 template class MPM_PROJECTION_SYSTEM<VECTOR<float,3> >;

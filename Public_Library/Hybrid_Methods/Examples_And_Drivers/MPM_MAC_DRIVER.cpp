@@ -560,7 +560,9 @@ Pressure_Projection()
     example.projection_system.gradient.Transpose_Times(tmp,example.rhs.v);
     
     solve_id++;
-    if(example.test_system) example.projection_system.Test_System(example.sol);
+    if(example.test_system){
+        example.projection_system.Test_System(example.sol);
+        example.projection_system.Test();}
     if(example.print_matrix){
         LOG::cout<<"solve id: "<<solve_id<<std::endl;
         KRYLOV_SOLVER<T>::Ensure_Size(example.av,example.sol,2);
