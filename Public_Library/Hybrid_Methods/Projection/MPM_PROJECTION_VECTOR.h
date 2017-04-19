@@ -20,8 +20,6 @@ public:
     ARRAY<T> v;
 
     MPM_PROJECTION_VECTOR();
-    MPM_PROJECTION_VECTOR(TV vector);
-    template<class VECTOR,class INDICES> MPM_PROJECTION_VECTOR(VECTOR& vector,const INDICES& index);
     virtual ~MPM_PROJECTION_VECTOR();
 
     KRYLOV_VECTOR_BASE<T>& operator+=(const KRYLOV_VECTOR_BASE<T>& bv) override;
