@@ -27,6 +27,7 @@
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D.h>
+#include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_HEIGHTFIELD_1D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_LEVELSET_2D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_MPM_PARTICLES_2D.h>
@@ -592,8 +593,7 @@ Initialize_Components_And_Key_Bindings()
         std::string velocity_filename=basedir+"/%d/heightfield_velocity";
         if(!FILE_UTILITIES::Frame_File_Exists(velocity_filename,start_frame)) velocity_filename="";
         OPENGL_COMPONENT_HEIGHTFIELD_1D<T>* heightfield=new OPENGL_COMPONENT_HEIGHTFIELD_1D<T>(stream_type,grid.Remove_Dimension(1),filename,"",velocity_filename);
-        Add_Component(heightfield,"Heightfield",'1',BASIC_VISUALIZATION<T>::OWNED);
-        slice_manager.Add_Object(heightfield);}
+        Add_Component(heightfield,"Heightfield",'1',BASIC_VISUALIZATION<T>::OWNED);}
 
     // Draw grid here so it'll be above particles and pressure
     if(grid_component){
