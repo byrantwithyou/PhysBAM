@@ -36,7 +36,7 @@ draw_multiple_particle_sets(false),selected_set(-1)
     while(filename_set!=""){
         std::string filename=LOG::sprintf(filename_set.c_str(),frame,number_of_sets);
         LOG::cout<<"Checking "<<filename<<std::endl;
-        if(FILE_UTILITIES::File_Exists(filename)) number_of_sets++;
+        if(File_Exists(filename)) number_of_sets++;
         else break;}
     if(number_of_sets>0){use_sets=true;draw_multiple_particle_sets=true;}
     else number_of_sets=1;
@@ -50,7 +50,7 @@ draw_multiple_particle_sets(false),selected_set(-1)
         opengl_points_multiple(i)=new OPENGL_POINTS_2D<T>(stream_type,*(new ARRAY<TV>),color_map->Lookup(i));}
     delete color_map;
         
-    is_animation=FILE_UTILITIES::Is_Animated(filename);
+    is_animation=Is_Animated(filename);
     // Don't need to call Reinitialize here because it will be called in first call to Set_Frame
 }
 //#####################################################################
@@ -68,7 +68,7 @@ template<class T> OPENGL_COMPONENT_PARTICLES_2D<T>::
 template<class T> bool OPENGL_COMPONENT_PARTICLES_2D<T>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::Frame_File_Exists(filename,frame_input);
+    return Frame_File_Exists(filename,frame_input);
 }
 //#####################################################################
 // Function Set_Frame
@@ -201,10 +201,10 @@ Reinitialize(bool force)
     for(int i=0;i<number_of_sets;i++){
         std::string frame_filename;
         if(use_sets) frame_filename=LOG::sprintf(filename_set.c_str(),frame,i);
-        else frame_filename=FILE_UTILITIES::Get_Frame_Filename(filename,frame);
+        else frame_filename=Get_Frame_Filename(filename,frame);
         
         try{
-            std::istream* input_file=FILE_UTILITIES::Safe_Open_Input(frame_filename);
+            std::istream* input_file=Safe_Open_Input(frame_filename);
             TYPED_ISTREAM typed_input(*input_file,stream_type);
             if(particles_stored_per_cell_uniform){
                 ARRAY<GEOMETRY_PARTICLES<TV>*,VECTOR<int,2> > particles_per_cell;

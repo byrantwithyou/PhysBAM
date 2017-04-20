@@ -448,9 +448,9 @@ inline MATRIX<T,3> operator-(const UPPER_TRIANGULAR_MATRIX<T,3>& A,const MATRIX<
 
 template<class T>
 inline std::istream& operator>>(std::istream& input,MATRIX<T,3>& A)
-{FILE_UTILITIES::Ignore(input,'[');
-    for(int i=0;i<3;i++){for(int j=0;j<3;j++) input>>A.x[i+j*3];FILE_UTILITIES::Ignore(input,';');}
-FILE_UTILITIES::Ignore(input,']');
+{Ignore(input,'[');
+    for(int i=0;i<3;i++){for(int j=0;j<3;j++) input>>A.x[i+j*3];Ignore(input,';');}
+Ignore(input,']');
 return input;}
 //#####################################################################
 }

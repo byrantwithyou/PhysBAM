@@ -125,15 +125,15 @@ template<class TV> void SHALLOW_WATER_DRIVER<TV>::
 Write_Output_Files(const int frame)
 {
     LOG::SCOPE scope("Write_Output_Files");
-    FILE_UTILITIES::Create_Directory(state.output_directory);
-    FILE_UTILITIES::Create_Directory(state.output_directory+LOG::sprintf("/%d",frame));
-    FILE_UTILITIES::Create_Directory(state.output_directory+"/common");
-    FILE_UTILITIES::Write_To_Text_File(state.output_directory+LOG::sprintf("/%d/frame_title",frame),state.frame_title);
+    Create_Directory(state.output_directory);
+    Create_Directory(state.output_directory+LOG::sprintf("/%d",frame));
+    Create_Directory(state.output_directory+"/common");
+    Write_To_Text_File(state.output_directory+LOG::sprintf("/%d/frame_title",frame),state.frame_title);
     if(frame==0)
-        FILE_UTILITIES::Write_To_Text_File(state.output_directory+"/common/first_frame",frame,"\n");
+        Write_To_Text_File(state.output_directory+"/common/first_frame",frame,"\n");
     state.Write_Output_Files(frame);
-    FILE_UTILITIES::Write_To_Text_File(state.output_directory+"/common/last_frame",frame,"\n");
-    FILE_UTILITIES::Write_To_File(state.stream_type,state.output_directory+"/common/grid",state.grid);
+    Write_To_Text_File(state.output_directory+"/common/last_frame",frame,"\n");
+    Write_To_File(state.stream_type,state.output_directory+"/common/grid",state.grid);
 
     ARRAY<T,TV_INT> h(state.U.domain);
     ARRAY<TV,TV_INT> v(state.U.domain);
@@ -142,8 +142,8 @@ Write_Output_Files(const int frame)
         T a=UU(0);
         h(it.index)=a;
         v(it.index)=UU.template Slice<1,TV::m>()/a;}
-    FILE_UTILITIES::Write_To_File(state.stream_type,LOG::sprintf("%s/%d/centered_velocities",state.output_directory.c_str(),frame),v);
-    FILE_UTILITIES::Write_To_File(state.stream_type,LOG::sprintf("%s/%d/heightfield",state.output_directory.c_str(),frame),h);
+    Write_To_File(state.stream_type,LOG::sprintf("%s/%d/centered_velocities",state.output_directory.c_str(),frame),v);
+    Write_To_File(state.stream_type,LOG::sprintf("%s/%d/heightfield",state.output_directory.c_str(),frame),h);
     state.debug_particles.Write_Debug_Particles(state.stream_type,state.output_directory,frame);
 }
 //#####################################################################

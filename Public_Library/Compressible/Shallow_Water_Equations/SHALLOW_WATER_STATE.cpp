@@ -39,8 +39,8 @@ Write_Output_Files(const int frame)
         std::string file=LOG::sprintf("%s/%s-%03d.txt",output_directory.c_str(),test_output_prefix.c_str(),frame);
         OCTAVE_OUTPUT<T> oo(file.c_str());}
 
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",grid);
-    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
+    Write_To_File(stream_type,output_directory+"/common/grid",grid);
+    Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
 }
 //#####################################################################
 // Function Read_Output_Files
@@ -49,7 +49,7 @@ template<class TV> void SHALLOW_WATER_STATE<TV>::
 Read_Output_Files(const int frame)
 {
     std::string f=LOG::sprintf("%d",frame);
-    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
+    Read_From_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
 }
 //#####################################################################
 namespace PhysBAM{

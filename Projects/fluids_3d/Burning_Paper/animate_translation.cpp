@@ -30,7 +30,7 @@ template<class T,class RW> void Process(int argc,char* argv[])
     std::string f=LOG::sprintf(".%d",frame);
     LOG::cout<<"frame = "<<frame<<", translation = "<<Translation_Vector<T>(frame)<<std::endl;
 
-    std::ostream* output=FILE_UTILITIES::Safe_Open_Output("animated_translation"+f,false);    
+    std::ostream* output=Safe_Open_Output("animated_translation"+f,false);    
     *output<<"Transform{\n"
            <<"  Type=Translate\n"
            <<"  Vector="<<Translation_Vector<T>(frame)<<"\n"

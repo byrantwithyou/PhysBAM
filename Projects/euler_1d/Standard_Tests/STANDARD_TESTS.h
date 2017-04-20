@@ -157,7 +157,7 @@ void Initialize_Advection() override
 {
     //set custom boundary
     fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<TV>(fluids_parameters.euler,T_FACE_VECTOR(state_left(0),state_right(0)),
-        T_FACE_VECTOR(state_left(2),state_right(2)),TV_FACE_VECTOR(TV(state_left(1)),TV(state_right(1))),(T).5,VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls));
+        T_FACE_VECTOR(state_left(2),state_right(2)),TV_FACE_VECTOR(TV(state_left(1)),TV(state_right(1))),(T).5,Complement(fluids_parameters.domain_walls));
 }
 //#####################################################################
 // Function Intialize_Euler_State

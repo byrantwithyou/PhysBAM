@@ -900,7 +900,7 @@ template<class T> void SURFACE_TENSION<T>::
 Write_Output_Files(const int frame) const
 {
     BASE::Write_Output_Files(frame);
-    FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),frame));
+    Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),frame));
     debug_particles.Write_Debug_Particles(this->stream_type,output_directory,frame);
 }
 //#####################################################################
@@ -1096,7 +1096,7 @@ FSI_Analytic_Test()
     analytic_solution=-(solid_mass*-solid_gravity.y+rho*size.x*size.y*-fluids_parameters.gravity.y)*size.x/(2*size.y*fluids_parameters.viscosity);
     LOG::cout<<"analytic_solution "<<analytic_solution<<std::endl;
 
-    FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),0));
+    Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),0));
 }
 //#####################################################################
 // Function Postprocess_Frame

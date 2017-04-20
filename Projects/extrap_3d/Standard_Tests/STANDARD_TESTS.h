@@ -2689,7 +2689,7 @@ void Plot_Contour_Landscape(int frame)
 {
     char buff[1000];
     sprintf(buff, "%s/data", output_directory.c_str());
-    FILE_UTILITIES::Create_Directory(buff);
+    Create_Directory(buff);
     sprintf(buff, "%s/data/%03d.txt", output_directory.c_str(), frame);
     std::ofstream out(buff);
 

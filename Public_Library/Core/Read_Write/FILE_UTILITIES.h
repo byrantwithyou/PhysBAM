@@ -2,8 +2,6 @@
 // Copyright 2002-2007, Ronald Fedkiw, Eran Guendelman, Geoffrey Irving, Igor Neverov, Andrew Selle, Eftychios Sifakis.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Namespace FILE_UTILITIES
-//#####################################################################
 #ifndef __FILE_UTILITIES__
 #define __FILE_UTILITIES__
 
@@ -12,13 +10,11 @@
 #include <Core/Utilities/EXCEPTIONS.h>
 namespace PhysBAM{
 
-namespace FILE_UTILITIES{
-
 //#####################################################################
 // ADD NEW FILE EXTENSIONS HERE
 // The enumeration should match the file_extensions array, and
 // UNKNOWN_FILE should be matched with a 0 in the array.
-enum FILE_TYPE{RGD_FILE,RGD2D_FILE,TRI_FILE,PHI_FILE,PHI2D_FILE,OCT_FILE,PLY_FILE,PLY2D_FILE,RGB_FILE,TRI2D_FILE,CURVE_FILE,CURVE2D_FILE,TET_FILE,HEX_FILE,BOX_FILE,PHONEME_FILE,UNKNOWN_FILE};
+enum FILE_TYPE{RGD_FILE,RGD2D_FILE,TRI_FILE,PHI_FILE,PHI2D_FILE,OCT_FILE,PLY_FILE,PLY2D_FILE,RGB_FILE_,TRI2D_FILE,CURVE_FILE,CURVE2D_FILE,TET_FILE,HEX_FILE,BOX_FILE,PHONEME_FILE,UNKNOWN_FILE};
 //#####################################################################
 
 //###################################################################
@@ -87,8 +83,8 @@ inline bool Is_Ply_File(const std::string& filename)
 inline bool Is_Ply2D_File(const std::string& filename)
 {return File_Type_Matches(filename,PLY2D_FILE);}
 
-inline bool Is_Rgb_File(const std::string& filename)
-{return File_Type_Matches(filename,RGB_FILE);}
+// inline bool Is_Rgb_File(const std::string& filename)
+// {return File_Type_Matches(filename,RGB_FILE);}
 
 inline bool Is_Curve_File(const std::string& filename)
 {return File_Type_Matches(filename,CURVE_FILE);}
@@ -108,7 +104,7 @@ std::string Get_Base_Directory_Name(const std::string& path);
 std::string Get_Short_Name(const std::string& filename);
 
 inline std::string Number_To_String(const int i)
-{return STRING_UTILITIES::Value_To_String(i);}
+{return Value_To_String(i);}
 
 std::string Find_First_Nonexistent_File_In_Sequence(std::string filename_pattern,const int id_start=0,int* id_result=0);
 std::string Find_First_Nonexistent_Directory_In_Sequence(std::string directory_pattern,const int id_start=0,int* id_final=0);
@@ -180,6 +176,5 @@ inline T* Create_From_File(const STREAM_TYPE stream_type,const std::string& file
 
 void Ignore(std::istream& input,char c);
 //#####################################################################
-}
 }
 #endif

@@ -88,7 +88,7 @@ Set_Write_Substeps_Level(const int level)
 template<class TV> void EXAMPLE<TV>::
 Write_Frame_Title(const int frame) const
 {
-    if(write_frame_title) FILE_UTILITIES::Write_To_Text_File(LOG::sprintf("%s/%d/frame_title",output_directory.c_str(),frame),frame_title);
+    if(write_frame_title) Write_To_Text_File(LOG::sprintf("%s/%d/frame_title",output_directory.c_str(),frame),frame_title);
 }
 template<class TV> void EXAMPLE<TV>::
 Limit_Dt(T& dt,const T time)
@@ -137,8 +137,8 @@ After_Construction()
 
     if(opt_query_output){LOG::cout<<output_directory;exit(0);}
     if(!opt_nolog){
-        if(!restart && !auto_restart) FILE_UTILITIES::Create_Directory(output_directory);
-        FILE_UTILITIES::Create_Directory(output_directory+"/common");
+        if(!restart && !auto_restart) Create_Directory(output_directory);
+        Create_Directory(output_directory+"/common");
         LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",restart);}
 
     LOG::cout<<stored_args<<std::endl;

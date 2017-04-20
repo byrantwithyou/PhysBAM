@@ -124,15 +124,15 @@ Initialize_Bodies()
     SEGMENTED_CURVE<TV>& torsion_edges=*SEGMENTED_CURVE<TV>::Create(particles);
     volume=TETRAHEDRALIZED_VOLUME<T>::Create(particles);
 
-    FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/"+sim_folder+"/masses",masses);
-    FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/"+sim_folder+"/particles",particles);
-    FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/"+sim_folder+"/edges.curve",edges.mesh);
-    FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/"+sim_folder+"/fixed_edges.curve",fixed_edges.mesh);
-    FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/"+sim_folder+"/extra_edges.curve",extra_edges.mesh);
-    FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/"+sim_folder+"/bending_edges.curve",bending_edges.mesh);
-    FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/"+sim_folder+"/torsion_edges.curve",torsion_edges.mesh);
-    FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/"+sim_folder+"/tets.gz",volume->mesh);
-    //FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/"+sim_folder+"/project_mesh.gz",project_mesh);
+    Read_From_File(stream_type,data_directory+"/"+sim_folder+"/masses",masses);
+    Read_From_File(stream_type,data_directory+"/"+sim_folder+"/particles",particles);
+    Read_From_File(stream_type,data_directory+"/"+sim_folder+"/edges.curve",edges.mesh);
+    Read_From_File(stream_type,data_directory+"/"+sim_folder+"/fixed_edges.curve",fixed_edges.mesh);
+    Read_From_File(stream_type,data_directory+"/"+sim_folder+"/extra_edges.curve",extra_edges.mesh);
+    Read_From_File(stream_type,data_directory+"/"+sim_folder+"/bending_edges.curve",bending_edges.mesh);
+    Read_From_File(stream_type,data_directory+"/"+sim_folder+"/torsion_edges.curve",torsion_edges.mesh);
+    Read_From_File(stream_type,data_directory+"/"+sim_folder+"/tets.gz",volume->mesh);
+    //Read_From_File(stream_type,data_directory+"/"+sim_folder+"/project_mesh.gz",project_mesh);
 
     particles.Store_Velocity(true);
     
@@ -209,8 +209,8 @@ Initialize_Bodies()
     deformable_body_collection.Add_Structure(&extra_edges);
     deformable_body_collection.Add_Structure(&bending_edges);
     deformable_body_collection.Add_Structure(&torsion_edges);
-    FILE_UTILITIES::Read_From_File<T>(LOG::sprintf("%s/%s/fixed_nodes_start",data_directory.c_str(),sim_folder.c_str()),fixed_nodes_start);
-    FILE_UTILITIES::Read_From_File<T>(LOG::sprintf("%s/%s/fixed_nodes_end",data_directory.c_str(),sim_folder.c_str()),fixed_nodes_end);
+    Read_From_File<T>(LOG::sprintf("%s/%s/fixed_nodes_start",data_directory.c_str(),sim_folder.c_str()),fixed_nodes_start);
+    Read_From_File<T>(LOG::sprintf("%s/%s/fixed_nodes_end",data_directory.c_str(),sim_folder.c_str()),fixed_nodes_end);
 
     PHYSBAM_FATAL_ERROR();
 #if 0

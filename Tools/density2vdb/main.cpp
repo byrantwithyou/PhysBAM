@@ -35,10 +35,10 @@ void Convert(const std::string& input_directory,const std::string& output_filena
 {
     ARRAY<T,VECTOR<int,3> > density; 
     int last_frame;
-    FILE_UTILITIES::Read_From_Text_File(input_directory+"/common/last_frame",last_frame);
+    Read_From_Text_File(input_directory+"/common/last_frame",last_frame);
     for(int i=0;i<=last_frame;++i){
         LOG::cout<<"Reading frame "<<i<<" density."<<std::endl;
-        FILE_UTILITIES::Read_From_File<T>(LOG::sprintf("%s/%d/density.gz",input_directory,i),density);
+        Read_From_File<T>(LOG::sprintf("%s/%d/density.gz",input_directory,i),density);
         WriteVDB<T>(LOG::sprintf(output_filename_pattern.c_str(),i),density);}
 }
 int main(int argc,char *argv[])

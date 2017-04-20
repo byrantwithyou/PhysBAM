@@ -31,7 +31,7 @@ Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& imag
 {  
     VECTOR<int,2> counts=image.domain.Edge_Lengths();
     assert(image.domain.min_corner.x==0 && image.domain.min_corner.y==0);
-    std::ostream* output=FILE_UTILITIES::Safe_Open_Output(filename,true,false); // no compression
+    std::ostream* output=Safe_Open_Output(filename,true,false); // no compression
     *output<<"P6"<<std::endl;
     *output<<"# Generated using PPM_FILE::Write"<<std::endl;
     *output<<counts.x<<" "<<counts.y<<std::endl;

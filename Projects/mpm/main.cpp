@@ -11,7 +11,7 @@ void Run_Test(PARSE_ARGS& parse_args,STREAM_TYPE stream_type)
 {
     MPM_EXAMPLE<TV>* example=new STANDARD_TESTS<TV>(stream_type,parse_args);
 
-    FILE_UTILITIES::Create_Directory(example->output_directory+"/common");
+    Create_Directory(example->output_directory+"/common");
     LOG::Instance()->Copy_Log_To_File(example->output_directory+"/common/log.txt",example->restart);
 
     MPM_DRIVER<TV> driver(*example);

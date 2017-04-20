@@ -34,7 +34,7 @@ OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D(STREAM_TYPE stream_type,const std
     viewer_callbacks.Set("toggle_draw_velocities",{[this](){Toggle_Draw_Velocities();},"Toggle draw velocities"});
     viewer_callbacks.Set("cycle_display_mode",{[this](){Cycle_Display_Mode();},"Cycle embedded display mode"});
     // check for per frame structures
-    if(FILE_UTILITIES::File_Exists(LOG::sprintf("%s/%d/deformable_object_structures",prefix.c_str(),start_frame)))
+    if(File_Exists(LOG::sprintf("%s/%d/deformable_object_structures",prefix.c_str(),start_frame)))
         invalidate_deformable_objects_selection_each_frame=true;
     else invalidate_deformable_objects_selection_each_frame=false;
 
@@ -67,7 +67,7 @@ Reinitialize(bool force)
     std::string filename=LOG::sprintf("%s/%d/deformable_object_structures",prefix.c_str(),frame);
     bool read_static_variables=!deformable_body_collection.structures.m;
     int static_frame=-1;
-    if(FILE_UTILITIES::File_Exists(filename)){static_frame=frame;read_static_variables=true;}
+    if(File_Exists(filename)){static_frame=frame;read_static_variables=true;}
     if(read_static_variables && first_time) LOG::cout << "Deformable bodies static variables will be read each frame" << std::endl;
     deformable_body_collection.Read(stream_type,prefix,prefix,frame,static_frame,read_static_variables,true); // Currently this will exit if any of the files don't exist... we should
                                                                                                                      // change it to not do that
@@ -120,10 +120,10 @@ Reinitialize(bool force)
     for(int i=0;i<deformable_body_collection.structures.m;i++){
         std::string suffix=LOG::sprintf("_%d",i);
         std::string frame_prefix=LOG::sprintf("%s/%d",prefix.c_str(),frame);
-        if(FILE_UTILITIES::File_Exists(frame_prefix+"stress_map_of_triangulated_area"+suffix)){
+        if(File_Exists(frame_prefix+"stress_map_of_triangulated_area"+suffix)){
             if(first_time) LOG::cout<<"adding stress map to triangulated area"<<std::endl;
             ARRAY<OPENGL_COLOR > *color_map=new ARRAY<OPENGL_COLOR >;
-            FILE_UTILITIES::Read_From_File(stream_type,frame_prefix+"stress_map_of_triangulated_area"+suffix,*color_map);
+            Read_From_File(stream_type,frame_prefix+"stress_map_of_triangulated_area"+suffix,*color_map);
             triangulated_area_objects(i)->Set_Color_Map(color_map);}}
     frame_loaded=frame;
     valid=true;
@@ -135,7 +135,7 @@ Reinitialize(bool force)
 template<class T> bool OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::File_Exists(LOG::sprintf("%s%d/deformable_object_particles",prefix.c_str(),frame_input));
+    return File_Exists(LOG::sprintf("%s%d/deformable_object_particles",prefix.c_str(),frame_input));
 }
 //#####################################################################
 // Function Set_Frame

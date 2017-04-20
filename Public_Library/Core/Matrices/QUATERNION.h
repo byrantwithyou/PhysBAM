@@ -137,7 +137,7 @@ inline std::ostream& operator<<(std::ostream& output,const QUATERNION<T>& q)
 
 template<class T>
 inline std::istream& operator>>(std::istream& input,QUATERNION<T>& q)
-{FILE_UTILITIES::Ignore(input,'(');input>>q.s>>q.v;FILE_UTILITIES::Ignore(input,')');return input;}
+{Ignore(input,'(');input>>q.s>>q.v;Ignore(input,')');return input;}
 
 }
 #endif

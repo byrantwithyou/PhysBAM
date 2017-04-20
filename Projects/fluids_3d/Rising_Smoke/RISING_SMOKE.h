@@ -100,7 +100,7 @@ void Write_Data_File(const GRID<TV>& grid,const ARRAY<T,VECTOR<int,3> >& u,const
     GRID<TV> grid_2d(n,mn,ymin,ymax,zmin,zmax);grid_2d.Set_MAC_Grid();
 
     if(write_matlab_files){
-        if(!FILE_UTILITIES::Directory_Exists(matlab_directory.c_str())) FILE_UTILITIES::Create_Directory(matlab_directory.c_str());
+        if(!Directory_Exists(matlab_directory.c_str())) Create_Directory(matlab_directory.c_str());
         MATLAB_OUTPUT matlab_output;ARRAY<T,VECTOR<int,2> > output(1,n,1,mn);
         sprintf(filename,"%s/header",matlab_directory.c_str());matlab_output.Write_Header_File(filename,grid_2d,frame);
         for(j=0;j<n;j++) for(ij=0;ij<mn;ij++)output(j,ij)=density(m/2,j,ij);
@@ -114,7 +114,7 @@ void Write_Data_File(const GRID<TV>& grid,const ARRAY<T,VECTOR<int,3> >& u,const
 
     if(write_output_files){
         std::ofstream output;
-        if(!FILE_UTILITIES::Directory_Exists(output_directory.c_str())) FILE_UTILITIES::Create_Directory(output_directory.c_str());
+        if(!Directory_Exists(output_directory.c_str())) Create_Directory(output_directory.c_str());
         if(frame == start_frame){
             sprintf(filename,"%s/common/grid",output_directory.c_str());output.open(filename,std::ios::binary);grid.Write(output);output.close();}
         sprintf(filename,"%s/%d/density",output_directory.c_str(),frame);output.open(filename,std::ios::binary);density.Write(output);output.close();

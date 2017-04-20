@@ -174,12 +174,12 @@ void Set_Dirichlet_Boundary_Conditions(const T time) override
 void Postprocess_Frame(const int frame) override
 {
     if(debug_particles.Size()){
-        FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),frame));
-        FILE_UTILITIES::Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles);
+        Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),frame));
+        Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles);
         debug_particles.Delete_All_Elements();}
     if(frame==1){
-        FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),0));
-        FILE_UTILITIES::Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),0),debug_particles);}
+        Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),0));
+        Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),0),debug_particles);}
 
     ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
     LINEAR_INTERPOLATION_UNIFORM<TV,T> interp;
@@ -250,7 +250,7 @@ void Write_Output_Files(const int frame) const override
     VORTICITY_UNIFORM<TV>::Vorticity(*fluids_parameters.grid,FACE_LOOKUP_UNIFORM<TV>(face_velocities_ghost),grid_vorticity,grid_vorticity_magnitude);
     //CELL_ITERATOR<TV> fuckyou(*fluids_parameters.grid,3,GRID<TV>::GHOST_REGION);
     for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid,3,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next()) grid_vorticity(iterator.Cell_Index())=VECTOR<T,1>();
-    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/grid_vorticity.%d",output_directory.c_str(),frame),grid_vorticity);
+    Write_To_File(stream_type,LOG::sprintf("%s/grid_vorticity.%d",output_directory.c_str(),frame),grid_vorticity);
 }
 //#####################################################################
 };

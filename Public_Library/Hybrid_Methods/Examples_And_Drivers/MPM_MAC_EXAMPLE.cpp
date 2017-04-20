@@ -102,18 +102,18 @@ Write_Output_Files(const int frame)
 #pragma omp single
     {
 #pragma omp task
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",grid);
+        Write_To_File(stream_type,output_directory+"/common/grid",grid);
 #pragma omp task
-        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
+        Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
 #pragma omp task
-        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
+        Write_To_File(stream_type,LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
 #pragma omp task
         if(phases(PHASE_ID(0)).levelset)
-            FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/levelset",output_directory.c_str(),frame),*phases(PHASE_ID(0)).levelset);
+            Write_To_File(stream_type,LOG::sprintf("%s/%d/levelset",output_directory.c_str(),frame),*phases(PHASE_ID(0)).levelset);
 
         if(!only_write_particles){
 #pragma omp task
-            FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/mac_velocities",output_directory.c_str(),frame),phases(PHASE_ID()).velocity);
+            Write_To_File(stream_type,LOG::sprintf("%s/%d/mac_velocities",output_directory.c_str(),frame),phases(PHASE_ID()).velocity);
 #pragma omp task
             {
                 GRID<TV> ghost_grid(grid.numbers_of_cells+2*ghost,grid.Ghost_Domain(ghost),true);
@@ -132,8 +132,8 @@ template<class TV> void MPM_MAC_EXAMPLE<TV>::
 Read_Output_Files(const int frame)
 {
     std::string f=LOG::sprintf("%d",frame);
-    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
-    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
+    Read_From_File(stream_type,LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
+    Read_From_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
 }
 //#####################################################################
 // Function Potential_Energy

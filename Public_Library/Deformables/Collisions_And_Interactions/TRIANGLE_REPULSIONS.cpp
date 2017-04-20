@@ -471,7 +471,7 @@ template<> int TRIANGLE_REPULSIONS<VECTOR<double,1> >::Get_Faces_Near_Points(STR
 template<class TV> void TRIANGLE_REPULSIONS<TV>::
 Output_Interaction_Pairs(const STREAM_TYPE stream_type,const std::string& filename) const
 {
-    FILE_UTILITIES::Write_To_File(stream_type,filename,point_face_interaction_pairs,edge_edge_interaction_pairs);
+    Write_To_File(stream_type,filename,point_face_interaction_pairs,edge_edge_interaction_pairs);
 }
 template<> void TRIANGLE_REPULSIONS<VECTOR<float,1> >::Output_Interaction_Pairs(const STREAM_TYPE,const std::string&) const {PHYSBAM_NOT_IMPLEMENTED();}
 template<> void TRIANGLE_REPULSIONS<VECTOR<double,1> >::Output_Interaction_Pairs(const STREAM_TYPE,const std::string&) const {PHYSBAM_NOT_IMPLEMENTED();}

@@ -51,8 +51,8 @@ public:
     int first_frame=(int)fractional_frame,second_frame=first_frame+1;T interpolation_fraction=fractional_frame-(T)first_frame;
     if(frame_length<=2){rigid_body_state=RIGID_BODY_STATE<VECTOR<T,3> >();return;} // HACK
     FRAME<TV> first_frame_rigid_transform,second_frame_rigid_transform;
-    FILE_UTILITIES::Read_From_File<RW>(rigid_transform_data_directory+"/"+rigid_transform_filename_prefix+"."+FILE_UTILITIES::Number_To_String(first_frame),first_frame_rigid_transform);
-    FILE_UTILITIES::Read_From_File<RW>(rigid_transform_data_directory+"/"+rigid_transform_filename_prefix+"."+FILE_UTILITIES::Number_To_String(second_frame),second_frame_rigid_transform);
+    Read_From_File<RW>(rigid_transform_data_directory+"/"+rigid_transform_filename_prefix+"."+Number_To_String(first_frame),first_frame_rigid_transform);
+    Read_From_File<RW>(rigid_transform_data_directory+"/"+rigid_transform_filename_prefix+"."+Number_To_String(second_frame),second_frame_rigid_transform);
     rigid_body_state.time=time;
     rigid_body_state.frame=FRAME<TV>::Interpolation(first_frame_rigid_transform,second_frame_rigid_transform,interpolation_fraction);
     rigid_body_state.velocity=(second_frame_rigid_transform.t-first_frame_rigid_transform.t)*((T)frame_length)/time_length;
@@ -64,8 +64,8 @@ public:
     int first_frame=(int)fractional_frame,second_frame=first_frame+1;T interpolation_fraction=fractional_frame-(T)first_frame;
     if(frame_length<=2) first_frame=second_frame=0; // HACK
     ARRAY<VECTOR<T,3> > first_frame_positions,second_frame_positions;
-    FILE_UTILITIES::Read_From_File<RW>(position_data_directory+"/"+position_filename_prefix+"."+FILE_UTILITIES::Number_To_String(first_frame),first_frame_positions);
-    FILE_UTILITIES::Read_From_File<RW>(position_data_directory+"/"+position_filename_prefix+"."+FILE_UTILITIES::Number_To_String(second_frame),second_frame_positions);
+    Read_From_File<RW>(position_data_directory+"/"+position_filename_prefix+"."+Number_To_String(first_frame),first_frame_positions);
+    Read_From_File<RW>(position_data_directory+"/"+position_filename_prefix+"."+Number_To_String(second_frame),second_frame_positions);
     if(!positions.m) positions.Resize(first_frame_positions.m);
     ARRAY<VECTOR<T,3> >::copy((T)1-interpolation_fraction,first_frame_positions,interpolation_fraction,second_frame_positions,positions);}
 

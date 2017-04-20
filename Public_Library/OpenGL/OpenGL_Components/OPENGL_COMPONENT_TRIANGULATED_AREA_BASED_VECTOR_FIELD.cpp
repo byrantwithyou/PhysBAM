@@ -17,7 +17,7 @@ OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD(STREAM_TYPE stream_type,TR
     viewer_callbacks.Set("decrease_vector_size",{[this](){Decrease_Vector_Size();},"Decrease vector size"});
     viewer_callbacks.Set("toggle_arrowhead",{[this](){Toggle_Arrowhead();},"Toggle arrowhead"});
 
-    is_animation = FILE_UTILITIES::Is_Animated(vector_field_filename);
+    is_animation = Is_Animated(vector_field_filename);
 }
 //#####################################################################
 // Destructor
@@ -33,7 +33,7 @@ template<class T> OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>::
 template<class T> bool OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::Frame_File_Exists(vector_field_filename, frame_input);
+    return Frame_File_Exists(vector_field_filename, frame_input);
 }
 //#####################################################################
 // Function Set_Frame
@@ -84,9 +84,9 @@ Reinitialize(bool force_load_even_if_not_drawn)
         {
             valid = false;
 
-            std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(vector_field_filename, frame);
-            if(FILE_UTILITIES::File_Exists(tmp_filename))
-                FILE_UTILITIES::Read_From_File(stream_type,tmp_filename,opengl_vector_field.V);
+            std::string tmp_filename = Get_Frame_Filename(vector_field_filename, frame);
+            if(File_Exists(tmp_filename))
+                Read_From_File(stream_type,tmp_filename,opengl_vector_field.V);
             else
                 return;
 

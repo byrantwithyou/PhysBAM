@@ -97,10 +97,10 @@ template<class T> void OPENGL_1D_VISUALIZATION<T>::
 Parse_Arguments(PARSE_ARGS& parse_args)
 {
 #ifdef __linux__
-    opengl_window_title="opengl_1d: " + FILE_UTILITIES::Real_Path(basedir);
+    opengl_window_title="opengl_1d: " + Real_Path(basedir);
 #endif
 
-    if(FILE_UTILITIES::File_Exists(basedir+"/common/first_frame")) FILE_UTILITIES::Read_From_Text_File(basedir+"/common/first_frame",start_frame);
+    if(File_Exists(basedir+"/common/first_frame")) Read_From_Text_File(basedir+"/common/first_frame",start_frame);
 
     ANIMATED_VISUALIZATION<T>::Parse_Arguments(parse_args);
 
@@ -120,10 +120,10 @@ Read_Grid()
 {
     has_valid_grid=false;
     std::string filename;
-    if(FILE_UTILITIES::File_Exists(basedir+"/common/grid")){
+    if(File_Exists(basedir+"/common/grid")){
         filename=basedir+"/common/grid";
         LOG::cout<<"Reading grid from '"<<filename<<"'..."<<std::endl;
-        FILE_UTILITIES::Read_From_File(stream_type,filename,grid);
+        Read_From_File(stream_type,filename,grid);
         has_valid_grid=true;}
     if(has_valid_grid){
         if(!grid.MAC_offset){
@@ -158,146 +158,146 @@ Initialize_Components_And_Key_Bindings()
         Add_Component(grid_component,"Grid",'6',BASIC_VISUALIZATION<T>::SELECTABLE);}
 
     filename=basedir+"/%d/u";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame))
+    if(Frame_File_Exists(filename,start_frame))
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Red(),OPENGL_COLOR::Magenta()),
             "u",'\0',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE);
     filename=basedir+"/%d/rigid_body_particles";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T>* rigid_bodies_component=
             new OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T>(stream_type,basedir);
         Add_Component(rigid_bodies_component,"Rigid Bodies",'5',BASIC_VISUALIZATION<T>::OWNED);
         opengl_world.Append_Bind_Key('n',rigid_bodies_component->viewer_callbacks.Get("toggle_show_object_names"));}
     filename=basedir+"/%d/deformable_object_particles";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>* deformable_geometry_component=new OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>(stream_type,basedir,start_frame);
         Add_Component(deformable_geometry_component,"Deformable Bodies",'8',BASIC_VISUALIZATION<T>::OWNED);}
     filename=basedir+"/%d/u_exact";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame))
+    if(Frame_File_Exists(filename,start_frame))
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Blue(),OPENGL_COLOR::Cyan()),
             "u_exact",'\0',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE);
     filename=basedir+"/%d/levelset";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame))
+    if(Frame_File_Exists(filename,start_frame))
         Add_Component(new OPENGL_COMPONENT_LEVELSET_1D<T>(stream_type,grid,filename,OPENGL_COLOR::Yellow(),OPENGL_COLOR::Yellow()),
             "levelset",'l',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE);
     // Compressible
     filename=basedir+"/%d/density";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame))
+    if(Frame_File_Exists(filename,start_frame))
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Yellow(),OPENGL_COLOR::Yellow()),
             "density",'1',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE);
     filename=basedir+"/%d/centered_velocities";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame))
+    if(Frame_File_Exists(filename,start_frame))
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Magenta(),OPENGL_COLOR::Magenta()),
             "velocity",'v',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE);
     filename=basedir+"/%d/mac_velocities";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame))
+    if(Frame_File_Exists(filename,start_frame))
         Add_Component(new OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Red(),OPENGL_COLOR::Red()),
             "mac_velocities",'a',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE | BASIC_VISUALIZATION<T>::START_HIDDEN);
     filename=basedir+"/%d/momentum";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame))
+    if(Frame_File_Exists(filename,start_frame))
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Magenta(),OPENGL_COLOR::Magenta()),
             "momentum",'2',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE | BASIC_VISUALIZATION<T>::START_HIDDEN);
     filename=basedir+"/%d/energy";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame))
+    if(Frame_File_Exists(filename,start_frame))
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Cyan(),OPENGL_COLOR::Cyan()),
             "energy",'3',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE | BASIC_VISUALIZATION<T>::START_HIDDEN);
     filename=basedir+"/%d/internal_energy";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame))
+    if(Frame_File_Exists(filename,start_frame))
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Cyan(),OPENGL_COLOR::Cyan()),
             "internal energy",'4',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE | BASIC_VISUALIZATION<T>::START_HIDDEN);
     filename=basedir+"/%d/pressure";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame))
+    if(Frame_File_Exists(filename,start_frame))
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Cyan(),OPENGL_COLOR::Cyan()),
             "pressure",'7',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE);
     filename=basedir+"/%d/compressible_implicit_pressure";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T>* compressible_implicit_pressure_component=
             new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Red(),OPENGL_COLOR::Red());
         Add_Component(compressible_implicit_pressure_component,
             "compressible_implicit_pressure",'9',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE | BASIC_VISUALIZATION<T>::START_HIDDEN);}
     filename=basedir+"/%d/entropy";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame))
+    if(Frame_File_Exists(filename,start_frame))
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Green(),OPENGL_COLOR::Green()),
             "entropy",'e',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE | BASIC_VISUALIZATION<T>::START_HIDDEN);
     filename=basedir+"/%d/speedofsound";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame))
+    if(Frame_File_Exists(filename,start_frame))
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Red(),OPENGL_COLOR::Red()),
             "speedofsound",'o',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE | BASIC_VISUALIZATION<T>::START_HIDDEN);
     filename=basedir+"/%d/machnumber";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame))
+    if(Frame_File_Exists(filename,start_frame))
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Blue(),OPENGL_COLOR::Magenta()),
             "machnumber",'m',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE | BASIC_VISUALIZATION<T>::START_HIDDEN);
     filename=basedir+"/%d/velocity_plus_c";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame))
+    if(Frame_File_Exists(filename,start_frame))
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Green(),OPENGL_COLOR::Green()),
             "velocityplusc",'+',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE | BASIC_VISUALIZATION<T>::START_HIDDEN);
     filename=basedir+"/%d/velocity_minus_c";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame))
+    if(Frame_File_Exists(filename,start_frame))
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Blue(),OPENGL_COLOR::Blue()),
             "velocityminusc",'-',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE | BASIC_VISUALIZATION<T>::START_HIDDEN);
     filename=basedir+"_exact/%d/density";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame))
+    if(Frame_File_Exists(filename,start_frame))
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Blue(),OPENGL_COLOR::Cyan()),
             "density_exact",'!',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE | BASIC_VISUALIZATION<T>::START_HIDDEN);
     filename=basedir+"_exact/%d/centered_velocities";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame))
+    if(Frame_File_Exists(filename,start_frame))
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Green(),OPENGL_COLOR::Yellow()),
             "velocity_exact",'V',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE | BASIC_VISUALIZATION<T>::START_HIDDEN);
     filename=basedir+"_exact/%d/energy";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame))
+    if(Frame_File_Exists(filename,start_frame))
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Red(),OPENGL_COLOR::Red()),
             "energy_exact",'#',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE | BASIC_VISUALIZATION<T>::START_HIDDEN);
     filename=basedir+"_exact/%d/internal_energy";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame))
+    if(Frame_File_Exists(filename,start_frame))
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Red(),OPENGL_COLOR::Red()),
             "internal energy_exact",'$',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE | BASIC_VISUALIZATION<T>::START_HIDDEN);
     filename=basedir+"_exact/%d/pressure";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame))
+    if(Frame_File_Exists(filename,start_frame))
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Red(),OPENGL_COLOR::Magenta()),
             "pressure_exact",'&',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE | BASIC_VISUALIZATION<T>::START_HIDDEN);
     filename=basedir+"_exact/%d/entropy";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame))
+    if(Frame_File_Exists(filename,start_frame))
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Blue(),OPENGL_COLOR::Cyan()),
             "entropy_exact",'E',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE | BASIC_VISUALIZATION<T>::START_HIDDEN);
     filename=basedir+"_exact/%d/speedofsound";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame))
+    if(Frame_File_Exists(filename,start_frame))
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Green(),OPENGL_COLOR::Yellow()),
             "speedofsound_exact",'O',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE | BASIC_VISUALIZATION<T>::START_HIDDEN);
     filename=basedir+"_exact/%d/machnumber";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(Frame_File_Exists(filename,start_frame)){
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Red(),OPENGL_COLOR::Magenta()),
             "machnumber_exact",'M',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE | BASIC_VISUALIZATION<T>::START_HIDDEN);}
     filename=basedir+"/%d/p_cavitation";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(Frame_File_Exists(filename,start_frame)){
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Red(),OPENGL_COLOR::Magenta()),
             "p_cavitation",'[',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE | BASIC_VISUALIZATION<T>::START_HIDDEN);}
     filename=basedir+"/%d/p_internal_energy";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(Frame_File_Exists(filename,start_frame)){
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Red(),OPENGL_COLOR::Magenta()),
             "p_internal_energy",']',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE | BASIC_VISUALIZATION<T>::START_HIDDEN);}
     filename=basedir+"/%d/density_flux";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(Frame_File_Exists(filename,start_frame)){
         Add_Component(new OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Red(),OPENGL_COLOR::Magenta()),
             "density_flux",'W',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE | BASIC_VISUALIZATION<T>::START_HIDDEN);}
     filename=basedir+"/%d/momentum_flux";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(Frame_File_Exists(filename,start_frame)){
         Add_Component(new OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Red(),OPENGL_COLOR::Cyan()),
             "momentum_flux",'S',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE | BASIC_VISUALIZATION<T>::START_HIDDEN);}
     filename=basedir+"/%d/energy_flux";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(Frame_File_Exists(filename,start_frame)){
         Add_Component(new OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<T,T>(stream_type,grid,filename,OPENGL_COLOR::Red(),OPENGL_COLOR::Yellow()),
             "energy_flux",'X',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE | BASIC_VISUALIZATION<T>::START_HIDDEN);}
 
     filename=basedir+"/%d/psi_N";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<T,bool>* psi_N_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<T,bool>(stream_type,grid,filename,OPENGL_COLOR::Cyan(),OPENGL_COLOR::Cyan());
         Add_Component(psi_N_component,"Psi_N points",'\0',BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::OWNED);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),psi_N_component->viewer_callbacks.Get("toggle_draw"));}
     filename=basedir+"/%d/psi_D";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame))
+    if(Frame_File_Exists(filename,start_frame))
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,bool>(stream_type,grid,filename,OPENGL_COLOR::Red(),OPENGL_COLOR::Red()),
             "psi_D",'D',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE | BASIC_VISUALIZATION<T>::START_HIDDEN);
     filename=basedir+"/%d/euler_psi";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame))
+    if(Frame_File_Exists(filename,start_frame))
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_1D<T,bool>(stream_type,grid,filename,OPENGL_COLOR::Red(),OPENGL_COLOR::Red()),
             "euler_psi",'P',BASIC_VISUALIZATION<T>::OWNED | BASIC_VISUALIZATION<T>::SELECTABLE | BASIC_VISUALIZATION<T>::START_HIDDEN);
 
@@ -319,10 +319,10 @@ template<class T> void OPENGL_1D_VISUALIZATION<T>::
 Set_Frame_Extra()
 {
     std::string filename=LOG::sprintf("%s/%d/frame_title",basedir.c_str(),frame);
-    if(FILE_UTILITIES::File_Exists(filename)){std::ifstream input(filename.c_str());getline(input,frame_title);}
+    if(File_Exists(filename)){std::ifstream input(filename.c_str());getline(input,frame_title);}
     else frame_title="";
     filename=LOG::sprintf("%s/%d/time",basedir.c_str(),frame);
-    if(FILE_UTILITIES::File_Exists(filename)){T time;FILE_UTILITIES::template Read_From_File(stream_type,filename,time);frame_title=LOG::sprintf("(%.05f) ",time)+frame_title;}
+    if(File_Exists(filename)){T time;Read_From_File(stream_type,filename,time);frame_title=LOG::sprintf("(%.05f) ",time)+frame_title;}
 }
 //#####################################################################
 // Function Pre_Frame_Extra

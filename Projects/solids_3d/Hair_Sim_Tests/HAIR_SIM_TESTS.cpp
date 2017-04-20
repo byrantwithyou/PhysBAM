@@ -62,7 +62,7 @@ HAIR_SIM_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     tests.data_directory=data_directory;
 
     std::string parameter_file=data_directory+"/"+sim_folder+"/"+param_file;
-    if(!FILE_UTILITIES::File_Exists(parameter_file)){
+    if(!File_Exists(parameter_file)){
         LOG::cerr<<"Parameter file '"<<parameter_file<<"' does not exist"<<std::endl;
         exit(1);}
     LOG::cout<<"PARAM FILE is "<<parameter_file<<std::endl;
@@ -166,7 +166,7 @@ Initialize_Bodies()
     
     // compute last frame
     if(use_deforming_levelsets){
-        int levelset_frames;FILE_UTILITIES::Read_From_Text_File(LOG::sprintf("%s/%s/motion/last_frame",data_directory.c_str(),sim_folder.c_str()),levelset_frames);
+        int levelset_frames;Read_From_Text_File(LOG::sprintf("%s/%s/motion/last_frame",data_directory.c_str(),sim_folder.c_str()),levelset_frames);
         last_frame=(int)((T)levelset_frames*levelset_frequency*(T)frame_rate)+round_number(start_time*frame_rate);
         last_frame-=1;}
     else{
@@ -174,7 +174,7 @@ Initialize_Bodies()
 
     // give mon hints
     LOG::cout<<"MONITOR begin_frame="<<this->first_frame<<std::endl;
-    LOG::cout<<"MONITOR output_directory="<<(FILE_UTILITIES::Get_Working_Directory()+"/"+output_directory)<<std::endl;
+    LOG::cout<<"MONITOR output_directory="<<(Get_Working_Directory()+"/"+output_directory)<<std::endl;
     LOG::cout<<"MONITOR end_frame="<<last_frame<<std::endl;
     if(cameras!=""){
         LOG::cout<<"MONITOR gl="<<cameras<<std::endl;
@@ -214,8 +214,8 @@ Initialize_Bodies()
     // Geometry Phase
     //################################################################
     ARRAY<int> fixed_nodes;
-    FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/"+sim_folder+"/fixed_nodes",fixed_nodes);
-    FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/"+sim_folder+"/masses",masses);
+    Read_From_File(stream_type,data_directory+"/"+sim_folder+"/fixed_nodes",fixed_nodes);
+    Read_From_File(stream_type,data_directory+"/"+sim_folder+"/masses",masses);
     SEGMENTED_CURVE<TV>& edges=*SEGMENTED_CURVE<TV>::Create(particles);
     SEGMENTED_CURVE<TV>& fixed_edges=*SEGMENTED_CURVE<TV>::Create(particles);
     SEGMENTED_CURVE<TV>& extra_edges=*SEGMENTED_CURVE<TV>::Create(particles);
@@ -229,17 +229,17 @@ Initialize_Bodies()
     sim_guide_volume=TETRAHEDRALIZED_VOLUME<T>::Create(particles);
 
     if(use_guide){
-        FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/"+sim_folder+"/guide_edges.curve",guide_tet_edges.mesh);
-        FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/"+sim_folder+"/guide_tets.gz",guide_volume->mesh);}
-    FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/"+sim_folder+"/particles",particles);
-    FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/"+sim_folder+"/edges.curve",edges.mesh);
-    FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/"+sim_folder+"/fixed_edges.curve",fixed_edges.mesh);
-    FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/"+sim_folder+"/extra_edges.curve",extra_edges.mesh);
-    FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/"+sim_folder+"/bending_edges.curve",bending_edges.mesh);
-    FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/"+sim_folder+"/torsion_edges.curve",torsion_edges.mesh);
-    FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/"+sim_folder+"/tets.gz",volume->mesh);
+        Read_From_File(stream_type,data_directory+"/"+sim_folder+"/guide_edges.curve",guide_tet_edges.mesh);
+        Read_From_File(stream_type,data_directory+"/"+sim_folder+"/guide_tets.gz",guide_volume->mesh);}
+    Read_From_File(stream_type,data_directory+"/"+sim_folder+"/particles",particles);
+    Read_From_File(stream_type,data_directory+"/"+sim_folder+"/edges.curve",edges.mesh);
+    Read_From_File(stream_type,data_directory+"/"+sim_folder+"/fixed_edges.curve",fixed_edges.mesh);
+    Read_From_File(stream_type,data_directory+"/"+sim_folder+"/extra_edges.curve",extra_edges.mesh);
+    Read_From_File(stream_type,data_directory+"/"+sim_folder+"/bending_edges.curve",bending_edges.mesh);
+    Read_From_File(stream_type,data_directory+"/"+sim_folder+"/torsion_edges.curve",torsion_edges.mesh);
+    Read_From_File(stream_type,data_directory+"/"+sim_folder+"/tets.gz",volume->mesh);
     
-    FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/"+sim_folder+"/project_mesh.gz",project_mesh);
+    Read_From_File(stream_type,data_directory+"/"+sim_folder+"/project_mesh.gz",project_mesh);
 
     particles.Store_Velocity(true);
     for(int i=0;i<particles.Size();i++) {active_particles.Append(i);}
@@ -414,8 +414,8 @@ Initialize_Bodies()
         ARRAY<T,VECTOR<int,3> >& phi_1=*new ARRAY<T,VECTOR<int,3> >;
         ARRAY<TV,VECTOR<int,3> >& velocity_1=*new ARRAY<TV,VECTOR<int,3> >;
         LEVELSET<TV> levelset_1(grid_1,phi_1);
-        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%s/motion/out.%d.phi",data_directory.c_str(),sim_folder.c_str(),current_levelset),levelset_1);
-        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%s/motion/velocities.%d",data_directory.c_str(),sim_folder.c_str(),current_levelset),velocity_1);
+        Read_From_File(stream_type,LOG::sprintf("%s/%s/motion/out.%d.phi",data_directory.c_str(),sim_folder.c_str(),current_levelset),levelset_1);
+        Read_From_File(stream_type,LOG::sprintf("%s/%s/motion/velocities.%d",data_directory.c_str(),sim_folder.c_str(),current_levelset),velocity_1);
         LOG::cout<<"READING LEVELSET NUMBER: "<<current_levelset<<std::endl;
         LEVELSET_IMPLICIT_OBJECT<TV> *levelset_implicit_object_1=new LEVELSET_IMPLICIT_OBJECT<TV>(levelset_1.grid,levelset_1.phi);
         levelset_implicit_object_1->V=&velocity_1;
@@ -423,8 +423,8 @@ Initialize_Bodies()
         ARRAY<T,VECTOR<int,3> > &phi_2=*new ARRAY<T,VECTOR<int,3> >;
         ARRAY<TV,VECTOR<int,3> >& velocity_2=*new ARRAY<TV,VECTOR<int,3> >;
         LEVELSET<TV> levelset_2(grid_2,phi_2);
-        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%s/motion/out.%d.phi",data_directory.c_str(),sim_folder.c_str(),++current_levelset),levelset_2);
-        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%s/motion/velocities.%d",data_directory.c_str(),sim_folder.c_str(),current_levelset),velocity_2);
+        Read_From_File(stream_type,LOG::sprintf("%s/%s/motion/out.%d.phi",data_directory.c_str(),sim_folder.c_str(),++current_levelset),levelset_2);
+        Read_From_File(stream_type,LOG::sprintf("%s/%s/motion/velocities.%d",data_directory.c_str(),sim_folder.c_str(),current_levelset),velocity_2);
         LOG::cout<<"READING LEVELSET NUMBER: "<<current_levelset<<std::endl;
         LEVELSET_IMPLICIT_OBJECT<TV> *levelset_implicit_object_2=new LEVELSET_IMPLICIT_OBJECT<TV>(levelset_2.grid,levelset_2.phi);
         levelset_implicit_object_2->V=&velocity_2;
@@ -452,7 +452,7 @@ Initialize_Bodies()
     // ignore collisions on nodes that start inside
     for(int i=0;i<fixed_nodes.m;i++) deformable_body_collection.collisions.ignored_nodes.Append(fixed_nodes(i));
     if(restart)
-        FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/ignored_nodes",deformable_body_collection.collisions.ignored_nodes);
+        Read_From_File(stream_type,output_directory+"/ignored_nodes",deformable_body_collection.collisions.ignored_nodes);
     else{
         /*for(int i=0;i<edges.mesh.elements.m;i++) {
             const VECTOR<int,2> &nodes=edges.mesh.elements(i);
@@ -463,13 +463,13 @@ Initialize_Bodies()
         for(int i=deformable_body_collection.collisions.ignored_nodes.m;i>1;i--) if(deformable_body_collection.collisions.ignored_nodes(i)==deformable_body_collection.collisions.ignored_nodes(i-1)) deformable_body_collection.collisions.ignored_nodes.Remove_Index_Lazy(i);*/
         for(int i=0;i<particles.Size();i++) 
             if(implicit_rigid_body->Implicit_Geometry_Lazy_Inside(particles.X(i))) deformable_body_collection.collisions.ignored_nodes.Append(i);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/ignored_nodes",deformable_body_collection.collisions.ignored_nodes);}
+        Write_To_File(stream_type,output_directory+"/ignored_nodes",deformable_body_collection.collisions.ignored_nodes);}
 
     comparator=new COLLISION_PAIR_COMPARATOR(&solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry,implicit_rigid_body);
     //comb
     if(test_number>6){
         ARRAY<int> tri_indicies;
-        FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/"+sim_folder+"/interpolation",tri_indicies);
+        Read_From_File(stream_type,data_directory+"/"+sim_folder+"/interpolation",tri_indicies);
         for(int i=0;i<tri_indicies.m;i++){
             if(tri_indicies(i)<0) continue;
             interp_points.Append(implicit_rigid_body->World_Space_Point(implicit_rigid_body->simplicial_object->Get_Element(tri_indicies(i)).Center()));
@@ -508,8 +508,8 @@ Initialize_Bodies()
     //Bindings
     ARRAY<TV> bindings1,bindings2; // Will be populated into ones to apply after MPI setup
     if(use_deforming_levelsets){
-        FILE_UTILITIES::Read_From_File<T>(LOG::sprintf("%s/%s/fixed_positions.%d",data_directory.c_str(),sim_folder.c_str(),(current_levelset-1)),bindings1);
-        FILE_UTILITIES::Read_From_File<T>(LOG::sprintf("%s/%s/fixed_positions.%d",data_directory.c_str(),sim_folder.c_str(),current_levelset),bindings2);}
+        Read_From_File<T>(LOG::sprintf("%s/%s/fixed_positions.%d",data_directory.c_str(),sim_folder.c_str(),(current_levelset-1)),bindings1);
+        Read_From_File<T>(LOG::sprintf("%s/%s/fixed_positions.%d",data_directory.c_str(),sim_folder.c_str(),current_levelset),bindings2);}
     else for(int i=0;i<fixed_nodes.m;i++){bindings1.Append(particles.X(fixed_nodes(i)));bindings2.Append(particles.X(fixed_nodes(i)));}
     // transform all points into world space
     for(int i=0;i<offset;i++) {particles.X(i)=implicit_rigid_body->World_Space_Point(particles.X(i));}
@@ -587,15 +587,15 @@ Update_Keyframed_Parameters_For_Time_Update_Helper(const T time,T_IMPLICIT_COMBI
     if (pseudo_time>=current_levelset){
         bindings1_to_apply=bindings2_to_apply;
         ARRAY<TV> bindings2;
-        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%s/fixed_positions.%d",data_directory.c_str(),sim_folder.c_str(),++current_levelset),bindings2);
+        Read_From_File(stream_type,LOG::sprintf("%s/%s/fixed_positions.%d",data_directory.c_str(),sim_folder.c_str(),++current_levelset),bindings2);
         bindings2_to_apply=bindings2.Subset(fixed_nodes_indices);
         Compute_Binding_Velocities();
         GRID<TV>& grid=*new GRID<TV>;
         ARRAY<T,VECTOR<int,3> >& phi=*new ARRAY<T,VECTOR<int,3> >;
         ARRAY<TV,VECTOR<int,3> >& velocity=*new ARRAY<TV,VECTOR<int,3> >;
         LEVELSET<TV> levelset(grid,phi);
-        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%s/motion/out.%d.phi",data_directory.c_str(),sim_folder.c_str(),current_levelset),levelset);
-        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%s/motion/velocities.%d",data_directory.c_str(),sim_folder.c_str(),current_levelset),velocity);
+        Read_From_File(stream_type,LOG::sprintf("%s/%s/motion/out.%d.phi",data_directory.c_str(),sim_folder.c_str(),current_levelset),levelset);
+        Read_From_File(stream_type,LOG::sprintf("%s/%s/motion/velocities.%d",data_directory.c_str(),sim_folder.c_str(),current_levelset),velocity);
         LOG::cout<<"PRE object1="<<combined.implicit_object1<<" object2="<<combined.implicit_object2<<std::endl;
         LOG::cout<<"READING LEVELSET NUMBER: "<<current_levelset<<std::endl;
         LEVELSET_IMPLICIT_OBJECT<TV> *levelset_implicit_object=new LEVELSET_IMPLICIT_OBJECT<TV>(levelset.grid,levelset.phi);
@@ -884,11 +884,11 @@ Write_Interpolated_Level_Set(const int frame,T_IMPLICIT_COMBINED& combined) cons
         ARRAY<T,VECTOR<int,3> > phi(grid.Domain_Indices());
         for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int ij=0;ij<grid.counts.z;ij++) phi(i,j,ij)=combined(grid.X(TV_INT(i,j,ij)));
         LEVELSET<TV> interpolated_levelset(grid,phi);
-        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/grid.%d",output_directory.c_str(),frame),grid);
-        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/levelset.%d",output_directory.c_str(),frame),interpolated_levelset);}
+        Write_To_File(stream_type,LOG::sprintf("%s/grid.%d",output_directory.c_str(),frame),grid);
+        Write_To_File(stream_type,LOG::sprintf("%s/levelset.%d",output_directory.c_str(),frame),interpolated_levelset);}
     else{
-        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/grid.%d",output_directory.c_str(),frame),((LEVELSET_IMPLICIT_OBJECT<TV>*)combined.implicit_object1)->levelset.grid);
-        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/levelset.%d",output_directory.c_str(),frame),((LEVELSET_IMPLICIT_OBJECT<TV>*)combined.implicit_object1)->levelset);}
+        Write_To_File(stream_type,LOG::sprintf("%s/grid.%d",output_directory.c_str(),frame),((LEVELSET_IMPLICIT_OBJECT<TV>*)combined.implicit_object1)->levelset.grid);
+        Write_To_File(stream_type,LOG::sprintf("%s/levelset.%d",output_directory.c_str(),frame),((LEVELSET_IMPLICIT_OBJECT<TV>*)combined.implicit_object1)->levelset);}
 }
 template<class T_input> void HAIR_SIM_TESTS<T_input>::
 Write_Output_Files(const int frame) const

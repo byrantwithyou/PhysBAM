@@ -38,7 +38,7 @@ OPENGL_COMPONENT_DEBUG_PARTICLES_2D(STREAM_TYPE stream_type,const std::string &f
     viewer_callbacks.Set("toggle_arrowhead",{[this](){Toggle_Arrowhead();},"Toggle arrow heads"});
     viewer_callbacks.Set("command_prompt",{[this](){Command_Prompt();},"Command prompt"});
 
-    is_animation=FILE_UTILITIES::Is_Animated(filename);
+    is_animation=Is_Animated(filename);
     // Don't need to call Reinitialize here because it will be called in first call to Set_Frame
 }
 //#####################################################################
@@ -56,7 +56,7 @@ template<class T> OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
 template<class T> bool OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::Frame_File_Exists(filename,frame_input);
+    return Frame_File_Exists(filename,frame_input);
 }
 //#####################################################################
 // Function Set_Frame
@@ -267,10 +267,10 @@ Reinitialize(bool force)
     valid=true;
 
     std::string frame_filename;
-    frame_filename=FILE_UTILITIES::Get_Frame_Filename(filename,frame);
+    frame_filename=Get_Frame_Filename(filename,frame);
         
     try{
-        std::istream* input_file=FILE_UTILITIES::Safe_Open_Input(frame_filename);
+        std::istream* input_file=Safe_Open_Input(frame_filename);
         TYPED_ISTREAM typed_input(*input_file,stream_type);
         Read_Binary(typed_input,particles,debug_objects,debug_text);
         delete input_file;}

@@ -97,7 +97,7 @@ void Emit_Smooth_Surface(std::ofstream& fout,TRIANGULATED_SURFACE<T>* ts, const 
     ARRAY<VECTOR<int,3> > map;
     if(const std::string* texture_map_file=options.Get_Pointer("texture_map")){
         int ignore;
-        FILE_UTILITIES::Read_From_File(STREAM_TYPE((RW)0),texture_map_file->c_str(),coords,ignore,map);
+        Read_From_File(STREAM_TYPE((RW)0),texture_map_file->c_str(),coords,ignore,map);
         LOG::cout<<"Texture mapping file data:  "<<texture_map_file<<"  "<<coords.m<<"  "<<ignore<<"  "<<map.m<<"  "<<ts->mesh.elements.m<<std::endl;}
     else if(const std::string* str=options.Get_Pointer("saved_texture_map")){
         TEXTURE* tex=saved_texture.Get(*str);
@@ -330,7 +330,7 @@ void Create_Texture_Map(std::ofstream& fout,const HASHTABLE<std::string,std::str
     saved_texture.Get_Or_Insert(options.Get("uv_save"))=tex;
     if(const std::string* str=options.Get_Pointer("uv_file")){
         sprintf(buff,str->c_str(),frame);
-        FILE_UTILITIES::Write_To_File(STREAM_TYPE((RW)0),buff,tex->coords,0,tex->map);}
+        Write_To_File(STREAM_TYPE((RW)0),buff,tex->coords,0,tex->map);}
 }
 
 bool Parse_Pair(const char*& str,std::string& key,std::string& value)

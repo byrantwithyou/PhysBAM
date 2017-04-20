@@ -17,7 +17,7 @@ using namespace PhysBAM;
 template<class T> void RGB_FILE<T>::
 Read(const std::string& filename,ARRAY<VECTOR<T,3> ,VECTOR<int,2> >& image)
 {
-    std::istream* input(FILE_UTILITIES::Safe_Open_Input(filename,true));
+    std::istream* input(Safe_Open_Input(filename,true));
     RGB_HEADER header;Read_Binary<T>(*input,header);
     image.Resize(0,header.width,0,header.height);unsigned char byte;
     VECTOR<int,2> counts=image.domain.Edge_Lengths();
@@ -60,7 +60,7 @@ Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& imag
 {  
     PHYSBAM_ASSERT(image.domain.min_corner.x==0 && image.domain.min_corner.y==0);
     VECTOR<int,2> counts=image.domain.Edge_Lengths();
-    std::ostream* output=FILE_UTILITIES::Safe_Open_Output(filename,true,false); // no compression
+    std::ostream* output=Safe_Open_Output(filename,true,false); // no compression
     RGB_HEADER header;header.Initialize(counts.x,counts.y);header.channels=d;
     Write_Binary<T>(*output,header);
     for(int j=0;j<counts.y;j++) for(int i=0;i<counts.x;i++) Write_Binary<T>(*output,IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j)[0]));

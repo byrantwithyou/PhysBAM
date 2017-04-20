@@ -154,8 +154,8 @@ Create_Structure(TYPED_ISTREAM& input)
 template<class TV> template<class RW> STRUCTURE<TV>*  STRUCTURE<TV>::
 Create_From_File(const std::string& filename)
 {
-    STRUCTURE<TV>* structure=STRUCTURE<TV>::Create_From_Extension(FILE_UTILITIES::Get_File_Extension(filename));
-    FILE_UTILITIES::template Read_From_File<RW>(filename,*structure);
+    STRUCTURE<TV>* structure=STRUCTURE<TV>::Create_From_Extension(Get_File_Extension(filename));
+    Read_From_File<RW>(filename,*structure);
     return structure;
 }
 //#####################################################################

@@ -58,7 +58,7 @@ OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D(STREAM_TYPE stream_type,const std
     viewer_callbacks.Set("cycle_interaction_pair_display_mode",{[this](){Cycle_Interaction_Pair_Display_Mode();},"Cycle display of interaction pairs"});
 
     // check for per frame particles
-    if(FILE_UTILITIES::File_Exists(LOG::sprintf("%s/%d/deformable_object_structures",prefix.c_str(),start_frame)))
+    if(File_Exists(LOG::sprintf("%s/%d/deformable_object_structures",prefix.c_str(),start_frame)))
         invalidate_deformable_objects_selection_each_frame=true;
     else invalidate_deformable_objects_selection_each_frame=false;
 
@@ -134,19 +134,19 @@ Reinitialize(bool force,bool read_geometry)
     static bool first_time=true;
     std::string frame_string=LOG::sprintf("%s/%d/",prefix.c_str(),frame);
     std::string static_frame_string=frame_string;
-    int static_frame=FILE_UTILITIES::File_Exists(frame_string+"deformable_object_structures")?frame:-1;
+    int static_frame=File_Exists(frame_string+"deformable_object_structures")?frame:-1;
     bool read_static_variables=static_frame!=-1 || first_time || !deformable_body_collection.structures.m;
     if(read_geometry) deformable_body_collection.Read(stream_type,prefix,prefix,frame,static_frame,read_static_variables,true);
-    if(FILE_UTILITIES::File_Exists(frame_string+"/interaction_pairs") && interaction_pair_display_mode)
-        FILE_UTILITIES::Read_From_File(stream_type,frame_string+"/interaction_pairs",point_triangle_interaction_pairs,edge_edge_interaction_pairs);
+    if(File_Exists(frame_string+"/interaction_pairs") && interaction_pair_display_mode)
+        Read_From_File(stream_type,frame_string+"/interaction_pairs",point_triangle_interaction_pairs,edge_edge_interaction_pairs);
     else{
         point_triangle_interaction_pairs.Remove_All();
         edge_edge_interaction_pairs.Remove_All();}
     
     std::string filename=frame_string+"/deformable_object_force_data";
-    if(FILE_UTILITIES::File_Exists(filename)){
+    if(File_Exists(filename)){
         if(first_time) LOG::cout<<"reading "<<filename<<std::endl;
-        FILE_UTILITIES::Read_From_File(stream_type,filename,force_data_list);}
+        Read_From_File(stream_type,filename,force_data_list);}
     else force_data_list.Remove_All();
 
     if(read_static_variables){
@@ -249,16 +249,16 @@ Reinitialize(bool force,bool read_geometry)
 #endif
         if(tetrahedralized_volume_objects(i)){
             std::string filename=LOG::sprintf("%s/%d/subset_%d",prefix.c_str(),frame,i);
-            if(FILE_UTILITIES::File_Exists(filename))FILE_UTILITIES::Read_From_File(stream_type,filename,tetrahedralized_volume_objects(i)->subset);
+            if(File_Exists(filename))Read_From_File(stream_type,filename,tetrahedralized_volume_objects(i)->subset);
             filename=LOG::sprintf("%s/%d/colliding_nodes_%d",prefix.c_str(),frame,i);
-            if(FILE_UTILITIES::File_Exists(filename))FILE_UTILITIES::Read_From_File(stream_type,filename,tetrahedralized_volume_objects(i)->subset_particles);}
+            if(File_Exists(filename))Read_From_File(stream_type,filename,tetrahedralized_volume_objects(i)->subset_particles);}
         else if(hexahedralized_volume_objects(i)){
             std::string filename=LOG::sprintf("%s/%d/subset_%d",prefix.c_str(),frame,i);
-            if(FILE_UTILITIES::File_Exists(filename))FILE_UTILITIES::Read_From_File(stream_type,filename,hexahedralized_volume_objects(i)->subset);
+            if(File_Exists(filename))Read_From_File(stream_type,filename,hexahedralized_volume_objects(i)->subset);
             filename=LOG::sprintf("%s/%d/colliding_nodes_%d",prefix.c_str(),frame,i);
-            if(FILE_UTILITIES::File_Exists(filename))FILE_UTILITIES::Read_From_File(stream_type,filename,hexahedralized_volume_objects(i)->subset_particles);
+            if(File_Exists(filename))Read_From_File(stream_type,filename,hexahedralized_volume_objects(i)->subset_particles);
             filename=LOG::sprintf("%s/%d/directions_%d",prefix.c_str(),frame,i);
-            if(FILE_UTILITIES::File_Exists(filename))FILE_UTILITIES::Read_From_File(stream_type,filename,hexahedralized_volume_objects(i)->vectors_at_hex_centers);}}
+            if(File_Exists(filename))Read_From_File(stream_type,filename,hexahedralized_volume_objects(i)->vectors_at_hex_centers);}}
     if(smooth_shading){
         for(int i=0;i<triangulated_surface_objects.m;i++) if(triangulated_surface_objects(i)) triangulated_surface_objects(i)->Initialize_Vertex_Normals();
         for(int i=0;i<tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i))tetrahedralized_volume_objects(i)->Initialize_Vertex_Normals();
@@ -281,7 +281,7 @@ Reinitialize(bool force,bool read_geometry)
 template<class T> bool OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::File_Exists(LOG::sprintf("%s/%d/deformable_object_particles",prefix.c_str(),frame_input));
+    return File_Exists(LOG::sprintf("%s/%d/deformable_object_particles",prefix.c_str(),frame_input));
 }
 //#####################################################################
 // Function Set_Frame
@@ -592,7 +592,7 @@ Create_One_Big_Triangulated_Surface_And_Write_To_File()
         int individual_number_of_triangles=individual_boundary_triangulated_surface.mesh.elements.m;
         for(int t=0;t<individual_number_of_triangles;t++) mesh.elements.Append(individual_boundary_triangulated_surface.mesh.elements(t));}
     mesh.number_nodes=particles.Size();
-    FILE_UTILITIES::Write_To_File<T>("one_big_tri_surface.tri",triangulated_surface);
+    Write_To_File<T>("one_big_tri_surface.tri",triangulated_surface);
 }
 //#####################################################################
 // Function Use_Bounding_Box
@@ -962,8 +962,8 @@ Cycle_Interaction_Pair_Display_Mode()
 {
     if(!interaction_pair_display_mode && !point_triangle_interaction_pairs.m && !edge_edge_interaction_pairs.m){
         std::string file=LOG::sprintf("%s/%d/interaction_pairs",prefix.c_str(),frame);
-        if(FILE_UTILITIES::File_Exists(file))
-            FILE_UTILITIES::Read_From_File(stream_type,file,point_triangle_interaction_pairs,edge_edge_interaction_pairs);}
+        if(File_Exists(file))
+            Read_From_File(stream_type,file,point_triangle_interaction_pairs,edge_edge_interaction_pairs);}
     interaction_pair_display_mode=(interaction_pair_display_mode+1)%4;
 }
 //#####################################################################

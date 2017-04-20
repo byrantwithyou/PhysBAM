@@ -83,7 +83,7 @@ Initialize()
 {
     if(example.auto_restart){
         std::string last_frame_file=example.output_directory+"/common/last_frame";
-        int last_frame;FILE_UTILITIES::Read_From_Text_File(last_frame_file,last_frame);
+        int last_frame;Read_From_Text_File(last_frame_file,last_frame);
         example.restart=true;example.restart_frame=last_frame;
         LOG::cout<<"Auto Restart from frame "<<last_frame<<" (from file "<<last_frame_file<<")"<<std::endl;}
     if(example.restart){current_frame=example.restart_frame;Read_Time(current_frame);}else current_frame=example.first_frame;
@@ -302,9 +302,9 @@ template<class TV> void SOLIDS_DRIVER<TV>::
 Write_Output_Files(const int frame)
 {
     LOG::SCOPE scope("writing output files");
-    FILE_UTILITIES::Create_Directory(example.output_directory);
-    FILE_UTILITIES::Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
-    FILE_UTILITIES::Create_Directory(example.output_directory+"/common");
+    Create_Directory(example.output_directory);
+    Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
+    Create_Directory(example.output_directory+"/common");
     Write_First_Frame(frame);
 
     example.Write_Output_Files(frame);

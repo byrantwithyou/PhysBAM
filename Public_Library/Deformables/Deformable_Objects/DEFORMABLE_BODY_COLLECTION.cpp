@@ -86,29 +86,29 @@ Update_Collision_Penalty_Forces_And_Derivatives()
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
 Read_Dynamic_Variables(const STREAM_TYPE stream_type,const std::string& prefix,const int frame)
 {
-    FILE_UTILITIES::Read_From_File(stream_type,prefix+"/"+FILE_UTILITIES::Number_To_String(frame)+"/deformable_object_particles",particles);
+    Read_From_File(stream_type,prefix+"/"+Number_To_String(frame)+"/deformable_object_particles",particles);
     // if number==0, the particles format doesn't remember the set of attributes, so the following line makes restarts look more exact
     particles.Store_Velocity();
-    std::string frame_string=FILE_UTILITIES::Number_To_String(frame);
+    std::string frame_string=Number_To_String(frame);
     // read in bindings
     int local_frame=frame;
     std::string binding_state_list_name=prefix+"/common/bindings_list";
     std::string binding_state_name=prefix+"/"+frame_string+"/bindings";
-    if(FILE_UTILITIES::File_Exists(binding_state_list_name)){
+    if(File_Exists(binding_state_list_name)){
         if(!binding_list.frame_list){
             binding_list.frame_list=new ARRAY<int>;
-            FILE_UTILITIES::Read_From_File(stream_type,binding_state_list_name,*binding_list.frame_list);}
+            Read_From_File(stream_type,binding_state_list_name,*binding_list.frame_list);}
         local_frame=(*binding_list.frame_list)(binding_list.frame_list->Binary_Search(frame));}
-    if(binding_list.last_read!=local_frame && FILE_UTILITIES::File_Exists(binding_state_name)){
-        FILE_UTILITIES::Read_From_File(stream_type,binding_state_name,binding_list);binding_list.last_read=local_frame;}
+    if(binding_list.last_read!=local_frame && File_Exists(binding_state_name)){
+        Read_From_File(stream_type,binding_state_name,binding_list);binding_list.last_read=local_frame;}
     local_frame=frame;
     std::string soft_binding_state_list_name=prefix+"/common/soft_bindings_list";
     std::string soft_binding_state_name=prefix+"/"+frame_string+"/soft_bindings";
-    if(FILE_UTILITIES::File_Exists(soft_binding_state_list_name)){
-        if(!soft_bindings.frame_list){soft_bindings.frame_list=new ARRAY<int>;FILE_UTILITIES::Read_From_File(stream_type,soft_binding_state_list_name,*soft_bindings.frame_list);}
+    if(File_Exists(soft_binding_state_list_name)){
+        if(!soft_bindings.frame_list){soft_bindings.frame_list=new ARRAY<int>;Read_From_File(stream_type,soft_binding_state_list_name,*soft_bindings.frame_list);}
         local_frame=(*soft_bindings.frame_list)(soft_bindings.frame_list->Binary_Search(frame));}
-    if(soft_bindings.last_read!=local_frame && FILE_UTILITIES::File_Exists(soft_binding_state_name)){
-        FILE_UTILITIES::Read_From_File(stream_type,soft_binding_state_name,soft_bindings);soft_bindings.last_read=local_frame;}
+    if(soft_bindings.last_read!=local_frame && File_Exists(soft_binding_state_name)){
+        Read_From_File(stream_type,soft_binding_state_name,soft_bindings);soft_bindings.last_read=local_frame;}
     // recompute auxiliary mass data (this data is destroyed when particles and read, and mass might have changed)
     particles.Compute_Auxiliary_Attributes(soft_bindings);
     soft_bindings.Set_Mass_From_Effective_Mass();
@@ -119,22 +119,22 @@ Read_Dynamic_Variables(const STREAM_TYPE stream_type,const std::string& prefix,c
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
 Write_Dynamic_Variables(const STREAM_TYPE stream_type,const std::string& prefix,const int frame) const
 {
-    FILE_UTILITIES::Write_To_File(stream_type,prefix+"/"+FILE_UTILITIES::Number_To_String(frame)+"/deformable_object_particles",particles);
-    std::string f=FILE_UTILITIES::Number_To_String(frame);
+    Write_To_File(stream_type,prefix+"/"+Number_To_String(frame)+"/deformable_object_particles",particles);
+    std::string f=Number_To_String(frame);
     if(binding_list.bindings.m>0 && !(check_stale && !binding_list.is_stale)){
         if(check_stale){
             if(!binding_list.frame_list) binding_list.frame_list=new ARRAY<int>;
             binding_list.frame_list->Append(frame);
-            FILE_UTILITIES::Write_To_File(stream_type,prefix+"/common/bindings_list",*binding_list.frame_list);
+            Write_To_File(stream_type,prefix+"/common/bindings_list",*binding_list.frame_list);
             binding_list.is_stale=false;}
-        FILE_UTILITIES::Write_To_File(stream_type,prefix+"/"+f+"/bindings",binding_list);}
+        Write_To_File(stream_type,prefix+"/"+f+"/bindings",binding_list);}
     if(soft_bindings.bindings.m>0 && !(check_stale && !soft_bindings.is_stale)){
         if(check_stale){
             if(!soft_bindings.frame_list) soft_bindings.frame_list=new ARRAY<int>;
             soft_bindings.frame_list->Append(frame);
-            FILE_UTILITIES::Write_To_File(stream_type,prefix+"/common/soft_bindings_list",*soft_bindings.frame_list);
+            Write_To_File(stream_type,prefix+"/common/soft_bindings_list",*soft_bindings.frame_list);
             soft_bindings.is_stale=false;}
-        FILE_UTILITIES::Write_To_File(stream_type,prefix+"/"+f+"/soft_bindings",soft_bindings);}
+        Write_To_File(stream_type,prefix+"/"+f+"/soft_bindings",soft_bindings);}
 }
 //#####################################################################
 // Function Read
@@ -435,8 +435,8 @@ Test_Force_Derivatives(const T time)
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
 Read_Static_Variables(const STREAM_TYPE stream_type,const std::string& prefix,const int frame)
 {
-    std::string f=frame==-1?"common":FILE_UTILITIES::Number_To_String(frame);
-    std::istream* input_raw=FILE_UTILITIES::Safe_Open_Input(prefix+"/"+f+"/deformable_object_structures");
+    std::string f=frame==-1?"common":Number_To_String(frame);
+    std::istream* input_raw=Safe_Open_Input(prefix+"/"+f+"/deformable_object_structures");
     TYPED_ISTREAM input(*input_raw,stream_type);
     int m;Read_Binary(input,m);
     // TODO: merge this functionality with dynamic lists to allow for more flexibility
@@ -458,8 +458,8 @@ Read_Static_Variables(const STREAM_TYPE stream_type,const std::string& prefix,co
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
 Write_Static_Variables(const STREAM_TYPE stream_type,const std::string& prefix,const int frame) const
 {
-    std::string f=frame==-1?"common":FILE_UTILITIES::Number_To_String(frame);
-    std::ostream* output_raw=FILE_UTILITIES::Safe_Open_Output(prefix+"/"+f+"/deformable_object_structures");
+    std::string f=frame==-1?"common":Number_To_String(frame);
+    std::ostream* output_raw=Safe_Open_Output(prefix+"/"+f+"/deformable_object_structures");
     TYPED_OSTREAM output(*output_raw,stream_type);
     Write_Binary(output,structures.m);
     for(int k=0;k<structures.m;k++) structures(k)->Write_Structure(output);

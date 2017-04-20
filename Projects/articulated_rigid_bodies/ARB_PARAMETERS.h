@@ -22,7 +22,7 @@ inline void Read_Common_Parameters(const std::string& filename,SOLIDS_EXAMPLE<VE
     ARTICULATED_RIGID_BODY<TV>& arb=example.solid_body_collection.rigid_body_collection.articulated_rigid_body;
 
     parameter_list.Set_Verbose(true);
-    if(FILE_UTILITIES::File_Exists(filename)){
+    if(File_Exists(filename)){
         LOG::cout<<"Reading parameter file '"<<filename<<"'"<<std::endl;
         parameter_list.Read(filename);}
 

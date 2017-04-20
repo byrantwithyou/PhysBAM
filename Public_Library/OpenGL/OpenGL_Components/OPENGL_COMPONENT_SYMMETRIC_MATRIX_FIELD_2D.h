@@ -32,14 +32,14 @@ public:
         viewer_callbacks.Set("increase_size",{[this](){Increase_Size();},"Increase symmetric matrix size"});
         viewer_callbacks.Set("decrease_size",{[this](){Decrease_Size();},"Decrease symmetric matrix size"});
 
-        is_animation=FILE_UTILITIES::Is_Animated(field_filename);Reinitialize();
+        is_animation=Is_Animated(field_filename);Reinitialize();
     }
 
     virtual ~OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D()
     {}
 
     bool Valid_Frame(int frame_input) const override
-    {return FILE_UTILITIES::Frame_File_Exists(field_filename,frame_input);}
+    {return Frame_File_Exists(field_filename,frame_input);}
 
     bool Is_Up_To_Date(int frame) const override
     {return valid && frame_loaded==frame;}

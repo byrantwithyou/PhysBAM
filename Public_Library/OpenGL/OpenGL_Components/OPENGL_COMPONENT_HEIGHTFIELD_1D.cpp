@@ -59,7 +59,7 @@ template<class T> OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 template<class T> bool OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::File_Exists(is_animation?LOG::sprintf(height_filename.c_str(),frame_input):height_filename);
+    return File_Exists(is_animation?LOG::sprintf(height_filename.c_str(),frame_input):height_filename);
 }
 //#####################################################################
 // Function Set_Frame
@@ -233,31 +233,31 @@ Reinitialize(bool force)
             valid=false;
 
             if(success){
-                std::string filename=FILE_UTILITIES::Get_Frame_Filename(height_filename,frame);
-                if(FILE_UTILITIES::File_Exists(filename)){
-                    FILE_UTILITIES::Read_From_File(stream_type,filename,height);
+                std::string filename=Get_Frame_Filename(height_filename,frame);
+                if(File_Exists(filename)){
+                    Read_From_File(stream_type,filename,height);
                     if(height.Size().x != grid.counts.x) success=false;}
                 else success=false;}
 
             if(success && x){
-                std::string filename=FILE_UTILITIES::Get_Frame_Filename(x_filename,frame);
-                if(FILE_UTILITIES::File_Exists(filename)){
-                    FILE_UTILITIES::Read_From_File(stream_type,filename,*x);
+                std::string filename=Get_Frame_Filename(x_filename,frame);
+                if(File_Exists(filename)){
+                    Read_From_File(stream_type,filename,*x);
                     if(height.Size().x != x->Size().x) success=false;}
                 else success=false;}
     
             if(success && ground){
-                std::string filename=FILE_UTILITIES::Get_Frame_Filename(ground_filename,frame);
-                if(FILE_UTILITIES::File_Exists(filename)){
-                    FILE_UTILITIES::Read_From_File(stream_type,filename,*ground);
+                std::string filename=Get_Frame_Filename(ground_filename,frame);
+                if(File_Exists(filename)){
+                    Read_From_File(stream_type,filename,*ground);
                     if(height.Size().x != ground->Size().x) success=false;
                     else height += (*ground);}
                 else success=false;}
 
             if(success && draw_velocities && u_filename.length()){
-                std::string filename=FILE_UTILITIES::Get_Frame_Filename(u_filename,frame);
-                if(FILE_UTILITIES::File_Exists(filename)){
-                    FILE_UTILITIES::Read_From_File(stream_type,filename,*u);
+                std::string filename=Get_Frame_Filename(u_filename,frame);
+                if(File_Exists(filename)){
+                    Read_From_File(stream_type,filename,*u);
                     if(height.Size().x != u->Size().x) success=false;
                     else for(int i=0;i<grid.counts.x;i++){
                             vector_field(i)=VECTOR<T,2>((*u)(i),0);

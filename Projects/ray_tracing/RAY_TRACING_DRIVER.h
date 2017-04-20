@@ -56,10 +56,10 @@ Initialize()
 
     output_filename=example.Get_Output_Filename(example.frame);
     alpha_filename=example.Get_Alpha_Filename(example.frame);
-    basedir=FILE_UTILITIES::Get_Base_Directory_Name(output_filename);FILE_UTILITIES::Create_Directory(basedir); // initialize output directory
+    basedir=Get_Base_Directory_Name(output_filename);Create_Directory(basedir); // initialize output directory
     if(!IMAGE<T>::Is_Supported(output_filename)){LOG::cerr<<"Image format for '"<<output_filename<<"' not supported!"<<std::endl;exit(1);}
-    if(FILE_UTILITIES::File_Exists(output_filename)){if(!FILE_UTILITIES::File_Writable(output_filename)){LOG::cerr<<"Output file '"<<output_filename<<"' not writable!"<<std::endl;exit(1);}}
-    else if(!FILE_UTILITIES::Directory_Writable(basedir)){LOG::cerr<<"Directory '"<<basedir<<"' not writable!"<<std::endl;exit(1);}
+    if(File_Exists(output_filename)){if(!File_Writable(output_filename)){LOG::cerr<<"Output file '"<<output_filename<<"' not writable!"<<std::endl;exit(1);}}
+    else if(!Directory_Writable(basedir)){LOG::cerr<<"Directory '"<<basedir<<"' not writable!"<<std::endl;exit(1);}
 
     // TODO: make sure alpha file is writable
 
@@ -93,7 +93,7 @@ Execute_Main_Program()
     //        // print a percentage progress if requested
     //        progress.Progress(); 
     //        if(example.pixels_between_output_directory_existence_checks && progress.done%example.pixels_between_output_directory_existence_checks==0
-    //            && !FILE_UTILITIES::Directory_Exists(basedir)){
+    //            && !Directory_Exists(basedir)){
     //            LOG::cout<<"RAY_TRACING_DRIVER<T>::Execute_Main_Program(): base directory "<<basedir<<" doesn't exist!"<<std::endl;exit(1);}}
 
     // write images

@@ -59,8 +59,8 @@ int main(int argc,char* argv[])
         ts.particles.X=X;
         ts.mesh.elements=surface[s];
         ts.Update_Number_Nodes();
-        FILE_UTILITIES::Write_To_File<RW>(files[s],ts);}
-    FILE_UTILITIES::Write_To_File<RW>("notch.tet.gz",tv);
+        Write_To_File<RW>(files[s],ts);}
+    Write_To_File<RW>("notch.tet.gz",tv);
 
     return 0;
 }

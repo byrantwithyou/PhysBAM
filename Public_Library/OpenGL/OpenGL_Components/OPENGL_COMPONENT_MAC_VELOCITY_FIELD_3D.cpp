@@ -30,7 +30,7 @@ OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV> &g
     viewer_callbacks.Set("toggle_draw_vorticity",{[this](){Toggle_Draw_Vorticity();},"Toggle draw vorticity"});
     viewer_callbacks.Set("normalize_vorticity_color_map",{[this](){Normalize_Vorticity_Color_Map();},"Normalize vorticity map based on current frame"});
 
-    is_animation = FILE_UTILITIES::Is_Animated(velocity_filename);
+    is_animation = Is_Animated(velocity_filename);
     opengl_vorticity_magnitude.Set_Scale_Range(0,100);
     frame_loaded = -1;
 }
@@ -48,7 +48,7 @@ template<class T> OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>::
 template<class T> bool OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::Frame_File_Exists(velocity_filename, frame_input);
+    return Frame_File_Exists(velocity_filename, frame_input);
 }
 //#####################################################################
 // Function Set_Frame
@@ -101,9 +101,9 @@ Reinitialize()
         {
             valid = false;
 
-            std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(velocity_filename, frame);
-            if(FILE_UTILITIES::File_Exists(tmp_filename))
-                FILE_UTILITIES::Read_From_File(stream_type,tmp_filename,opengl_mac_velocity_field.face_velocities);//u,opengl_mac_velocity_field.v,opengl_mac_velocity_field.w);
+            std::string tmp_filename = Get_Frame_Filename(velocity_filename, frame);
+            if(File_Exists(tmp_filename))
+                Read_From_File(stream_type,tmp_filename,opengl_mac_velocity_field.face_velocities);//u,opengl_mac_velocity_field.v,opengl_mac_velocity_field.w);
             else
                 return;
 

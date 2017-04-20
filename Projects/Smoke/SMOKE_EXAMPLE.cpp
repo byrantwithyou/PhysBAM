@@ -149,16 +149,16 @@ template<class TV> void SMOKE_EXAMPLE<TV>::
 Write_Output_Files(const int frame)
 {
     std::string f=LOG::sprintf("%d",frame);
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/mac_velocities",face_velocities);
-    if(mpi_grid) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/global_grid",mpi_grid->global_grid);
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/grid",grid);
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",grid);
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/density",density);
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/temperature",temperature);// add temperature
+    Write_To_File(stream_type,output_directory+"/"+f+"/mac_velocities",face_velocities);
+    if(mpi_grid) Write_To_File(stream_type,output_directory+"/common/global_grid",mpi_grid->global_grid);
+    Write_To_File(stream_type,output_directory+"/"+f+"/grid",grid);
+    Write_To_File(stream_type,output_directory+"/common/grid",grid);
+    Write_To_File(stream_type,output_directory+"/"+f+"/density",density);
+    Write_To_File(stream_type,output_directory+"/"+f+"/temperature",temperature);// add temperature
     if(write_debug_data){
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/pressure",projection.p);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_N",projection.elliptic_solver->psi_N);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_D",projection.elliptic_solver->psi_D);}
+        Write_To_File(stream_type,output_directory+"/"+f+"/pressure",projection.p);
+        Write_To_File(stream_type,output_directory+"/"+f+"/psi_N",projection.elliptic_solver->psi_N);
+        Write_To_File(stream_type,output_directory+"/"+f+"/psi_D",projection.elliptic_solver->psi_D);}
     for(int p=0;p<particles.number;p++){
         Add_Debug_Particle(particles.X(p),VECTOR<T,3>(0,1,0));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,particles.V(p));}
@@ -168,12 +168,12 @@ template<class TV> void SMOKE_EXAMPLE<TV>::
 Read_Output_Files(const int frame)
 {
     std::string f=LOG::sprintf("%d",frame);
-    FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/density",density);
+    Read_From_File(stream_type,output_directory+"/"+f+"/density",density);
     std::string filename;
     filename=output_directory+"/"+f+"/mac_velocities";
-    if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading mac_velocities "<<filename<<std::endl;FILE_UTILITIES::Read_From_File(stream_type,filename,face_velocities);}
+    if(File_Exists(filename)){LOG::cout<<"Reading mac_velocities "<<filename<<std::endl;Read_From_File(stream_type,filename,face_velocities);}
     filename=output_directory+"/"+f+"/pressure";
-    if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading pressure "<<filename<<std::endl;FILE_UTILITIES::Read_From_File(stream_type,filename,projection.p);}
+    if(File_Exists(filename)){LOG::cout<<"Reading pressure "<<filename<<std::endl;Read_From_File(stream_type,filename,projection.p);}
 }
 //#####################################################################
 namespace PhysBAM{

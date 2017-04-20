@@ -15,7 +15,7 @@ OPENGL_COMPONENT_TRIANGULATED_AREA(STREAM_TYPE stream_type,const std::string &fi
     opengl_triangulated_area(stream_type,triangulated_area),
       filename(filename),color_map_filename(0),frame_loaded(-1),valid(false)
 {
-    is_animation = FILE_UTILITIES::Is_Animated(filename);
+    is_animation = Is_Animated(filename);
     Reinitialize();
 }
 //#####################################################################
@@ -28,7 +28,7 @@ OPENGL_COMPONENT_TRIANGULATED_AREA(STREAM_TYPE stream_type,const std::string &fi
     opengl_triangulated_area(stream_type,triangulated_area,false,OPENGL_COLOR::Red(),OPENGL_COLOR::Black()),
       filename(filename),color_map_filename(&color_map_filename_input),frame_loaded(-1),valid(false)
 {
-    is_animation = FILE_UTILITIES::Is_Animated(filename);
+    is_animation = Is_Animated(filename);
     opengl_triangulated_area.Set_Color_Map(color_map);
     Reinitialize();
 }
@@ -48,7 +48,7 @@ template<class T> OPENGL_COMPONENT_TRIANGULATED_AREA<T>::
 template<class T> bool OPENGL_COMPONENT_TRIANGULATED_AREA<T>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::Frame_File_Exists(filename, frame_input);
+    return Frame_File_Exists(filename, frame_input);
 }
 //#####################################################################
 // Function Set_Frame
@@ -97,16 +97,16 @@ Reinitialize()
             (!is_animation && frame_loaded < 0))
         {
             valid = false;
-            std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(filename, frame);
-            if(FILE_UTILITIES::File_Exists(tmp_filename))
-                FILE_UTILITIES::Read_From_File(stream_type,tmp_filename,triangulated_area);
+            std::string tmp_filename = Get_Frame_Filename(filename, frame);
+            if(File_Exists(tmp_filename))
+                Read_From_File(stream_type,tmp_filename,triangulated_area);
             else
                 return;
             if(color_map) {
-                std::string tmp_color_map_filename = FILE_UTILITIES::Get_Frame_Filename(*color_map_filename, frame);
-                //if(FILE_UTILITIES::File_Exists(tmp_filename))
-                if(FILE_UTILITIES::File_Exists(tmp_color_map_filename))
-                    FILE_UTILITIES::Read_From_File(stream_type,tmp_color_map_filename,*color_map);
+                std::string tmp_color_map_filename = Get_Frame_Filename(*color_map_filename, frame);
+                //if(File_Exists(tmp_filename))
+                if(File_Exists(tmp_color_map_filename))
+                    Read_From_File(stream_type,tmp_color_map_filename,*color_map);
                 else
                     return;
             }            

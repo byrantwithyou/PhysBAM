@@ -335,7 +335,7 @@ public:
                 else fluids_parameters.use_soot_fuel_combustion=false;
                 fluids_parameters.use_fixed_soot_boundary=true;
                 fluids_parameters.ambient_soot=(T)0;
-                fluids_parameters.soot_boundary=new BOUNDARY_REFLECTION_ATTENUATION<TV,T>(VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls),fluids_parameters.ambient_soot,(T)1);}
+                fluids_parameters.soot_boundary=new BOUNDARY_REFLECTION_ATTENUATION<TV,T>(Complement(fluids_parameters.domain_walls),fluids_parameters.ambient_soot,(T)1);}
 
             if(incompressible){
                 if(vorticity_confinement>0){
@@ -476,8 +476,8 @@ public:
                 T linear_attenuation;
                 if(use_fixed_farfield_boundary) linear_attenuation=(T)1;
                 else linear_attenuation=(T).1;
-                fluids_parameters.density_boundary=new BOUNDARY_REFLECTION_ATTENUATION<TV,T>(VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls),fluids_parameters.ambient_density,linear_attenuation);
-                fluids_parameters.temperature_boundary=new BOUNDARY_REFLECTION_ATTENUATION<TV,T>(VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls),fluids_parameters.ambient_temperature,linear_attenuation);}
+                fluids_parameters.density_boundary=new BOUNDARY_REFLECTION_ATTENUATION<TV,T>(Complement(fluids_parameters.domain_walls),fluids_parameters.ambient_density,linear_attenuation);
+                fluids_parameters.temperature_boundary=new BOUNDARY_REFLECTION_ATTENUATION<TV,T>(Complement(fluids_parameters.domain_walls),fluids_parameters.ambient_temperature,linear_attenuation);}
 
             if(use_smoke_sourcing){
                 if(test_number==20){
@@ -594,8 +594,8 @@ void Read_Soot_Velocities()
     GRID<TV> soot_grid;
     ARRAY<T,TV_INT> soot_values;
     ARRAY<T,FACE_INDEX<TV::m> > soot_mac_velocities;
-    FILE_UTILITIES::Read_From_File(stream_type,soot_grid_file,soot_grid);
-    FILE_UTILITIES::Read_From_File(stream_type,soot_velocity_file,soot_mac_velocities);
+    Read_From_File(stream_type,soot_grid_file,soot_grid);
+    Read_From_File(stream_type,soot_velocity_file,soot_mac_velocities);
     T soot_dx_over_2=soot_grid.dX.Max()*(T).5;
     RANGE<TV> soot_domain=soot_grid.Domain();
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
@@ -676,8 +676,8 @@ void Adjust_Soot_With_Sources(const T time) override
         std::string soot_file=soot_data_dir+"/density";
         GRID<TV> soot_grid;
         ARRAY<T,TV_INT> soot_values;
-        FILE_UTILITIES::Read_From_File(stream_type,soot_grid_file,soot_grid);
-        FILE_UTILITIES::Read_From_File(stream_type,soot_file,soot_values);
+        Read_From_File(stream_type,soot_grid_file,soot_grid);
+        Read_From_File(stream_type,soot_file,soot_values);
         T soot_dx_over_2=soot_grid.dX.Max()*(T).5;
         RANGE<TV> soot_domain=soot_grid.Domain();
         for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
@@ -769,7 +769,7 @@ void Add_Wall()
 //#####################################################################
 void Add_Destructive_Wall()
 {
-    if(fracture_walls) FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fp),fracture_pattern);
+    if(fracture_walls) Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fp),fracture_pattern);
 
     TV edge_lengths((T)1.5,(T).1,(T)1);
     TV_INT dimensions(31,3,21);RANGE<TV> box((T)-.5*edge_lengths,(T).5*edge_lengths);TV dx=edge_lengths/TV(dimensions-1);
@@ -797,7 +797,7 @@ void Add_Destructive_Wall()
 //#####################################################################
 void Add_Room()
 {
-    if(fracture_walls) FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fp),fracture_pattern);
+    if(fracture_walls) Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fp),fracture_pattern);
 
     for(int i=0;i<4;i++){
         TV edge_lengths((T)1,(T).2,(T)1);
@@ -832,7 +832,7 @@ void Add_Room()
 void Add_Enclosed_Room()
 {
     if(!fp) fp = 7; // This one looks the best.
-    if(fracture_walls) FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fp),fracture_pattern);
+    if(fracture_walls) Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fp),fracture_pattern);
 
     for(int i=0;i<4;i++){
         TV edge_lengths((T)1,(T).2,(T)1);
@@ -914,15 +914,15 @@ void Bunny()
 {
     int cannon_id,ammo_id;
     if(!fp) fp = 6; // This one looks the best.
-    if(fracture_walls) FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fp),fracture_pattern);
+    if(fracture_walls) Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fp),fracture_pattern);
 
     { // The cannon.
         RIGID_BODY<TV>* rigid_body=new RIGID_BODY<TV>(rigid_body_collection,true);
         TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-        FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/Rigid_Bodies/cannon.tri.gz",*surface);
+        Read_From_File(stream_type,data_directory+"/Rigid_Bodies/cannon.tri.gz",*surface);
         surface->mesh.Initialize_Adjacent_Elements();
         LEVELSET_IMPLICIT_OBJECT<TV>* levelset=LEVELSET_IMPLICIT_OBJECT<TV>::Create();
-        FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/Rigid_Bodies/cannon.phi.gz",*levelset);
+        Read_From_File(stream_type,data_directory+"/Rigid_Bodies/cannon.phi.gz",*levelset);
         rigid_body->Add_Structure(*surface);
         rigid_body->Add_Structure(*levelset);
         rigid_body->Frame().r=ROTATION<TV>((T)pi,TV(0,(T)1,0))*ROTATION<TV>((T)-pi/2,TV(0,0,(T)1))*ROTATION<TV>((T)pi/5,TV(0,(T)1,0));
@@ -946,7 +946,7 @@ void Bunny()
         collision_manager->hash.Insert(PAIR<int,int>(ammo_id,cannon_id));
     }
     { // The bunny.
-        if(fracture_walls){fp=6;FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fp),fracture_pattern);}
+        if(fracture_walls){fp=6;Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fp),fracture_pattern);}
         RIGID_BODY<TV>& rigid_body=solid_tests.Add_Rigid_Body("bunny",6,(T).5,true,false);(void)rigid_body;
         rigid_body.simplicial_object->mesh.Initialize_Adjacent_Elements();
         rigid_body.Frame().t=TV(0,(T)-1,0);
@@ -1204,7 +1204,7 @@ void Preprocess_Substep(const T dt,const T time) override
 //#####################################################################
 void Update_Solids_Parameters(const T time) override
 {
-//    if(fracture_walls) FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fp),fracture_pattern);
+//    if(fracture_walls) Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fp),fracture_pattern);
     if(fluids_parameters.use_slip && solids_fluids_parameters.use_fluid_rigid_fracture){
         FRACTURE_PATTERN<T>* fp=(dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>&>(*solids_evolution)).fracture_pattern;
         if(solids_fluids_parameters.use_fluid_rigid_fracture && fp && !fp->regions.m){
@@ -1242,19 +1242,19 @@ void Create_Wall_Pattern()
         GRID<TV>& local_grid=*new GRID<TV>(actual_resolution,RANGE<TV>(-half_edge_length,half_edge_length),false);
         ARRAY<T,VECTOR<int,3> >& local_phi=*new ARRAY<T,VECTOR<int,3> >(local_grid.Domain_Indices());local_phi.Fill(FLT_MAX);
         LEVELSET_IMPLICIT_OBJECT<TV>* refined_lio=LEVELSET_IMPLICIT_OBJECT<TV>::Create();
-        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/wall/fragment.%d.phi",data_directory.c_str(),i),refined_lio->levelset);
+        Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/wall/fragment.%d.phi",data_directory.c_str(),i),refined_lio->levelset);
         LEVELSET_IMPLICIT_OBJECT<TV>* lio=new LEVELSET_IMPLICIT_OBJECT<TV>(local_grid,local_phi);
         for(NODE_ITERATOR<TV> iterator(local_grid);iterator.Valid();iterator.Next())
             local_phi(iterator.index)=refined_lio->levelset.Extended_Phi(iterator.Location());
         TV_INT center_index=local_grid.Domain_Indices().Center();
         Shrink_Levelset(local_grid,local_phi,2,center_index);
         TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-        FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/wall/fragment.%d.tri",data_directory.c_str(),i),*surface);
+        Read_From_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/wall/fragment.%d.tri",data_directory.c_str(),i),*surface);
         surface->Update_Number_Nodes();
         FRACTURE_REGION<T>* fr=new FRACTURE_REGION<T>(surface,lio,false);
         fr->fracture_offset=center_index;
         fp.regions.Append(fr);}
-    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),test_number),fp);
+    Write_To_File(stream_type,LOG::sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),test_number),fp);
     return;
 }
 //#####################################################################

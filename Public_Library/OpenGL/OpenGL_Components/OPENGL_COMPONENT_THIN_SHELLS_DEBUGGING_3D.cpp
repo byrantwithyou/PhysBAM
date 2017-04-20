@@ -125,15 +125,15 @@ Reinitialize(bool force)
         valid = false;
 
         if(draw_node_neighbors_visible || draw_face_corners_visible){
-            std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(directory+"/%d/thin_shells_grid_visibility",frame);
-            if(FILE_UTILITIES::File_Exists(tmp_filename))
-                FILE_UTILITIES::Read_From_File(stream_type,tmp_filename,node_neighbors_visible,face_corners_visible_from_face_center_u,face_corners_visible_from_face_center_v,face_corners_visible_from_face_center_w);
+            std::string tmp_filename = Get_Frame_Filename(directory+"/%d/thin_shells_grid_visibility",frame);
+            if(File_Exists(tmp_filename))
+                Read_From_File(stream_type,tmp_filename,node_neighbors_visible,face_corners_visible_from_face_center_u,face_corners_visible_from_face_center_v,face_corners_visible_from_face_center_w);
         }
 
         if(draw_density_valid_mask){
-            std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(directory+"/%d/density_valid_mask",frame);
-            if(FILE_UTILITIES::File_Exists(tmp_filename)){
-                FILE_UTILITIES::Read_From_File(stream_type,tmp_filename,density_valid_mask);
+            std::string tmp_filename = Get_Frame_Filename(directory+"/%d/density_valid_mask",frame);
+            if(File_Exists(tmp_filename)){
+                Read_From_File(stream_type,tmp_filename,density_valid_mask);
                 for(RANGE_ITERATOR<TV::m> it(density_valid_mask.domain);it.Valid();it.Next())
                     density_valid_mask(it.index)=!density_valid_mask(it.index); // negate
                 opengl_density_valid_mask.Update();}

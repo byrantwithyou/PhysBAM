@@ -95,8 +95,8 @@ Adjust_Output_Directory_For_MPI(const T_MPI mpi)
 {
     if(mpi && mpi->Number_Of_Processors()>1){
         output_directory+=LOG::sprintf("/%d",(mpi->rank+1));
-        FILE_UTILITIES::Create_Directory(output_directory);
-        FILE_UTILITIES::Create_Directory(output_directory+"/common");
+        Create_Directory(output_directory);
+        Create_Directory(output_directory+"/common");
         LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",restart);}
 }
 //#####################################################################

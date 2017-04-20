@@ -12,8 +12,8 @@ template<class T,class RW> void Convert(const std::string& input_filename,const 
 {
 //    typedef VECTOR<T,3> TV;
 
-    TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=0;FILE_UTILITIES::Create_From_File<RW>(input_filename,tetrahedralized_volume);
-    std::ostream* output=FILE_UTILITIES::Safe_Open_Output(output_filename,false);
+    TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=0;Create_From_File<RW>(input_filename,tetrahedralized_volume);
+    std::ostream* output=Safe_Open_Output(output_filename,false);
 
     std::string header("# simple obj file format:\n"
         "#   # vertex at coordinates (x,y,z)\n"
@@ -47,7 +47,7 @@ int main(int argc,char *argv[])
     parse_args.Extra(&output_filename,"obj file","output obj file name");
     parse_args.Parse();
 
-    if(!FILE_UTILITIES::Is_Tet_File(input_filename)){
+    if(!Is_Tet_File(input_filename)){
         std::cerr<<"Not a tet file: "<<input_filename<<std::endl;
         return -1;}
 

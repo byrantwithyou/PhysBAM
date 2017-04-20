@@ -272,7 +272,7 @@ Create(GEOMETRY_PARTICLES<TV>& particles)
 template<class TV,int gauss_order> void OPENSUBDIV_SURFACE<TV,gauss_order>::
 Initialize(const std::string& filename,T thickness_in)
 {
-    std::istream* input_raw=FILE_UTILITIES::Safe_Open_Input(filename);
+    std::istream* input_raw=Safe_Open_Input(filename);
     TYPED_ISTREAM input(*input_raw,STREAM_TYPE((RW())));
     Read(input);
     delete input_raw;

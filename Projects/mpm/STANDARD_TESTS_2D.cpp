@@ -1095,7 +1095,7 @@ Initialize()
 
             // voronoi
             TRIANGULATED_SURFACE<T>* strong=TRIANGULATED_SURFACE<T>::Create();
-            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_strong_50.tri.gz",*strong);
+            Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_strong_50.tri.gz",*strong);
             LOG::cout<<"Read mesh of strong #"<<strong->mesh.elements.m<<std::endl;
             LOG::cout<<"Read particles of strong #"<<strong->particles.number<<std::endl;
             for(int i=0;i<strong->particles.number;i++) strong->particles.X(i)/=20;
@@ -1147,7 +1147,7 @@ Initialize()
                     new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(rightwall)),COLLISION_TYPE::slip,0.3);
             // voronoi
             TRIANGULATED_SURFACE<T>* strong=TRIANGULATED_SURFACE<T>::Create();
-            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_strong_50.tri.gz",*strong);
+            Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_strong_50.tri.gz",*strong);
             LOG::cout<<"Read mesh of strong #"<<strong->mesh.elements.m<<std::endl;
             LOG::cout<<"Read particles of strong #"<<strong->particles.number<<std::endl;
             for(int i=0;i<strong->particles.number;i++) strong->particles.X(i)/=20;
@@ -1162,7 +1162,7 @@ Initialize()
 
             //full sphere
             TRIANGULATED_SURFACE<T>* full=TRIANGULATED_SURFACE<T>::Create();
-            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_full_50.tri.gz",*full);
+            Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_full_50.tri.gz",*full);
             LOG::cout<<"Read mesh of full #"<<full->mesh.elements.m<<std::endl;
             LOG::cout<<"Read particles of full #"<<full->particles.number<<std::endl;
             for(int i=0;i<full->particles.number;i++) full->particles.X(i)/=20;
@@ -1247,7 +1247,7 @@ Initialize()
                     new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(rightwall)),COLLISION_TYPE::slip,0.3);
             // voronoi
             TRIANGULATED_SURFACE<T>* strong=TRIANGULATED_SURFACE<T>::Create();
-            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_strong_50.tri.gz",*strong);
+            Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_strong_50.tri.gz",*strong);
             LOG::cout<<"Read mesh of strong #"<<strong->mesh.elements.m<<std::endl;
             LOG::cout<<"Read particles of strong #"<<strong->particles.number<<std::endl;
             for(int i=0;i<strong->particles.number;i++) strong->particles.X(i)/=20;
@@ -1262,7 +1262,7 @@ Initialize()
 
             //full sphere
             TRIANGULATED_SURFACE<T>* full=TRIANGULATED_SURFACE<T>::Create();
-            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_full_50.tri.gz",*full);
+            Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_full_50.tri.gz",*full);
             LOG::cout<<"Read mesh of full #"<<full->mesh.elements.m<<std::endl;
             LOG::cout<<"Read particles of full #"<<full->particles.number<<std::endl;
             for(int i=0;i<full->particles.number;i++) full->particles.X(i)/=20;

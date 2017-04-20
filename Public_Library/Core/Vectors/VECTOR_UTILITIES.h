@@ -8,8 +8,6 @@
 #include <Core/Vectors/VECTOR_3D.h>
 namespace PhysBAM{
 
-namespace VECTOR_UTILITIES
-{
 //#####################################################################
 // Function Complement
 //#####################################################################
@@ -32,6 +30,5 @@ template<class T> VECTOR<T,2> Complement(const VECTOR<T,2>& v)
 template<class T> VECTOR<T,3> Complement(const VECTOR<T,3>& v)
 {return VECTOR<T,3>(Complement(v.x),Complement(v.y),Complement(v.z));}
 
-}
 }
 #endif

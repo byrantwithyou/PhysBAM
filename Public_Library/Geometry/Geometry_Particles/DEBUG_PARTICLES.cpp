@@ -49,8 +49,8 @@ Store_Debug_Particles(DEBUG_PARTICLES<TV>* particle)
 template<class TV> void DEBUG_PARTICLES<TV>::
 Write_Debug_Particles(STREAM_TYPE stream_type,const std::string& output_directory,int frame) const
 {
-    FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),frame));
-    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles,debug_objects,debug_text);
+    Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),frame));
+    Write_To_File(stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles,debug_objects,debug_text);
     debug_particles.Delete_All_Elements();
     debug_objects.Remove_All();
     debug_text.Remove_All();

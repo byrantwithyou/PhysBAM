@@ -191,14 +191,14 @@ Write_Output_Files(const int frame)
 {
     TIMER_SCOPE_FUNC;
     LOG::SCOPE scope("Write_Output_Files");
-    FILE_UTILITIES::Create_Directory(example.output_directory);
-    FILE_UTILITIES::Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
-    FILE_UTILITIES::Create_Directory(example.output_directory+"/common");
-    FILE_UTILITIES::Write_To_Text_File(example.output_directory+LOG::sprintf("/%d/frame_title",frame),example.frame_title);
+    Create_Directory(example.output_directory);
+    Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
+    Create_Directory(example.output_directory+"/common");
+    Write_To_Text_File(example.output_directory+LOG::sprintf("/%d/frame_title",frame),example.frame_title);
     if(frame==0)
-        FILE_UTILITIES::Write_To_Text_File(example.output_directory+"/common/first_frame",frame,"\n");
+        Write_To_Text_File(example.output_directory+"/common/first_frame",frame,"\n");
     example.Write_Output_Files(frame);
-    FILE_UTILITIES::Write_To_Text_File(example.output_directory+"/common/last_frame",frame,"\n");
+    Write_To_Text_File(example.output_directory+"/common/last_frame",frame,"\n");
 }
 //#####################################################################
 // Function Update_Particle_Weights

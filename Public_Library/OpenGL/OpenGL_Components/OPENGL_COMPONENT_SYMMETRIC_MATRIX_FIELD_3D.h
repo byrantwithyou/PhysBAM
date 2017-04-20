@@ -30,7 +30,7 @@ public:
         :OPENGL_COMPONENT<T>(stream_type,"Symmetric Matrix Field 3D"),opengl_symmetric_matrix_field(stream_type,grid,field),
         field_filename(field_filename_input),frame_loaded(-1),valid(false)
     {
-        is_animation=FILE_UTILITIES::Is_Animated(field_filename);Reinitialize();
+        is_animation=Is_Animated(field_filename);Reinitialize();
 
         viewer_callbacks.Set("increase_size",{[this](){Increase_Size();},"Increase symmetric matrix size"});
         viewer_callbacks.Set("decrease_size",{[this](){Decrease_Size();},"Decrease symmetric matrix size"});
@@ -40,7 +40,7 @@ public:
     {}
 
     bool Valid_Frame(int frame_input) const override
-    {return FILE_UTILITIES::Frame_File_Exists(field_filename,frame_input);}
+    {return Frame_File_Exists(field_filename,frame_input);}
 
     bool Is_Up_To_Date(int frame) const override
     {return valid && frame_loaded==frame;}

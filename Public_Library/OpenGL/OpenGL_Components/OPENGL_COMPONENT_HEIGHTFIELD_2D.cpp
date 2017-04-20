@@ -60,7 +60,7 @@ OPENGL_COMPONENT_HEIGHTFIELD_2D(STREAM_TYPE stream_type,const GRID<TV2> &grid_in
         uv_filename=uv_filename_input;}
     else{uv=0;uv_filename="";}
 
-    is_animation = FILE_UTILITIES::Is_Animated(height_filename);
+    is_animation = Is_Animated(height_filename);
     frame_loaded = -1;
 
     Reinitialize();
@@ -82,7 +82,7 @@ template<class T> OPENGL_COMPONENT_HEIGHTFIELD_2D<T>::
 template<class T> bool OPENGL_COMPONENT_HEIGHTFIELD_2D<T>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::File_Exists(is_animation?LOG::sprintf(height_filename.c_str(),frame_input):height_filename);
+    return File_Exists(is_animation?LOG::sprintf(height_filename.c_str(),frame_input):height_filename);
 }
 //#####################################################################
 // Function Set_Frame
@@ -181,30 +181,30 @@ Reinitialize(bool force)
             valid = false;
 
             if(success && !grid_filename.empty()){
-                std::string filename=FILE_UTILITIES::Get_Frame_Filename(grid_filename,frame);
-                if(FILE_UTILITIES::File_Exists(filename)){
-                    FILE_UTILITIES::Read_From_File(stream_type,filename,grid);
+                std::string filename=Get_Frame_Filename(grid_filename,frame);
+                if(File_Exists(filename)){
+                    Read_From_File(stream_type,filename,grid);
                     PHYSBAM_ASSERT(grid.counts.x==initial_grid.counts.x && grid.counts.y==initial_grid.counts.y);}
                 else success=false;}
 
             if(success){
-                std::string filename=FILE_UTILITIES::Get_Frame_Filename(height_filename,frame);
-                if(FILE_UTILITIES::File_Exists(filename)){
-                    FILE_UTILITIES::Read_From_File(stream_type,filename,height);
+                std::string filename=Get_Frame_Filename(height_filename,frame);
+                if(File_Exists(filename)){
+                    Read_From_File(stream_type,filename,height);
                     if(!height.Size().All_Greater_Equal(counts)) success = false;}
                 else success=false;}
 
             if(success && xz){
-                std::string filename=FILE_UTILITIES::Get_Frame_Filename(xz_filename,frame);
-                if(FILE_UTILITIES::File_Exists(filename)){
-                    FILE_UTILITIES::Read_From_File(stream_type,filename,*xz);
+                std::string filename=Get_Frame_Filename(xz_filename,frame);
+                if(File_Exists(filename)){
+                    Read_From_File(stream_type,filename,*xz);
                     if(!xz->Size().All_Greater_Equal(counts)) success = false;}
                 else success=false;}
 
             if(success && draw_velocities && uv_filename.length()){
-                std::string filename=FILE_UTILITIES::Get_Frame_Filename(uv_filename,frame);
-                if(FILE_UTILITIES::File_Exists(filename)){
-                    FILE_UTILITIES::Read_From_File(stream_type,filename,*uv);
+                std::string filename=Get_Frame_Filename(uv_filename,frame);
+                if(File_Exists(filename)){
+                    Read_From_File(stream_type,filename,*uv);
                     if(!uv->Size().All_Greater_Equal(counts))
                         success = false;
                     else{

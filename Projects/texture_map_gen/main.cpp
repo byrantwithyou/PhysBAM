@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
     parse_args.Parse();
 
     TETRAHEDRALIZED_VOLUME<T> tet;
-    FILE_UTILITIES::Read_From_File(STREAM_TYPE(1.0f),"/home/craig/PhysBAM/Public_Data/Tetrahedralized_Volumes/adaptive_torus_float.tet.gz",tet);
+    Read_From_File(STREAM_TYPE(1.0f),"/home/craig/PhysBAM/Public_Data/Tetrahedralized_Volumes/adaptive_torus_float.tet.gz",tet);
     tet.Update_Number_Nodes();
     tet.Initialize_Triangulated_Surface();
     TRIANGULATED_SURFACE<T>* ts=tet.triangulated_surface->Create_Compact_Copy();
@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
     elem.Flattened()=map.Subset(elem.Flattened());
     RANGE<VECTOR<T,2> > texture_range=RANGE<VECTOR<T,2> >::Bounding_Box(pts);
     for(int i=0;i<pts.m;i++) pts(i)=(pts(i)-texture_range.min_corner)/texture_range.Edge_Lengths();
-    FILE_UTILITIES::Write_To_File(STREAM_TYPE(1.0f),"adaptive_torus_float.uv",pts,0,elem);
+    Write_To_File(STREAM_TYPE(1.0f),"adaptive_torus_float.uv",pts,0,elem);
 
     IV2 size(500,500);
     GRID<VECTOR<T,2> > grid(size,RANGE<VECTOR<T,2> >::Unit_Box());

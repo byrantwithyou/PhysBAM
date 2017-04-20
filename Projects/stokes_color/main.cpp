@@ -57,9 +57,9 @@ void Dump_Frame(const ARRAY<T,FACE_INDEX<d> >& u,const char* title)
     static int frame=0;
     char buff[100];
     sprintf(buff, "%s/%i", output_directory.c_str(), frame);
-    FILE_UTILITIES::Create_Directory(buff);
-    FILE_UTILITIES::Write_To_File<RW>((std::string)buff+"/mac_velocities.gz",u);
-    if(title) FILE_UTILITIES::Write_To_Text_File((std::string)buff+"/frame_title",title);
+    Create_Directory(buff);
+    Write_To_File<RW>((std::string)buff+"/mac_velocities.gz",u);
+    if(title) Write_To_Text_File((std::string)buff+"/frame_title",title);
     Get_Debug_Particles<VECTOR<T,d> >().Write_Debug_Particles(STREAM_TYPE((RW())),output_directory,frame);
     frame++;
 }
@@ -704,10 +704,10 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
 
     Global_Grid(&grid);
 
-    FILE_UTILITIES::Create_Directory(output_directory);
-    FILE_UTILITIES::Create_Directory(output_directory+"/common");
+    Create_Directory(output_directory);
+    Create_Directory(output_directory+"/common");
     LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",false);
-    FILE_UTILITIES::Write_To_File<RW>(output_directory+"/common/grid.gz",grid);
+    Write_To_File<RW>(output_directory+"/common/grid.gz",grid);
 
     Analytic_Test(grid,*test,max_iter,use_preconditioner,null,dump_matrix,debug_particles);
     LOG::Finish_Logging();

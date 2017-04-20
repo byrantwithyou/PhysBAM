@@ -468,9 +468,9 @@ template<class TV> void NEWMARK_EVOLUTION<TV>::
 Write_Position_Update_Projection_Data(const STREAM_TYPE stream_type,const std::string& prefix)
 {
     if(rigid_deformable_collisions->rigid_body_collisions.rigid_body_particles_intersections.Size())
-        FILE_UTILITIES::Write_To_File(stream_type,prefix+"projection_data_rigid_rigid",rigid_deformable_collisions->rigid_body_collisions.rigid_body_particles_intersections);
+        Write_To_File(stream_type,prefix+"projection_data_rigid_rigid",rigid_deformable_collisions->rigid_body_collisions.rigid_body_particles_intersections);
     if(!rigid_deformable_collisions->precompute_contact_projections.m) return;
-    std::ostream* output=FILE_UTILITIES::Safe_Open_Output(prefix+"projection_data_rigid_deformable");
+    std::ostream* output=Safe_Open_Output(prefix+"projection_data_rigid_deformable");
     TYPED_OSTREAM typed_output(*output,stream_type);
     Write_Binary(typed_output,rigid_deformable_collisions->precompute_contact_projections.m);
     for(int i=0;i<rigid_deformable_collisions->precompute_contact_projections.m;i++){
@@ -484,10 +484,10 @@ Write_Position_Update_Projection_Data(const STREAM_TYPE stream_type,const std::s
 template<class TV> void NEWMARK_EVOLUTION<TV>::
 Read_Position_Update_Projection_Data(const STREAM_TYPE stream_type,const std::string& prefix)
 {
-    if(FILE_UTILITIES::File_Exists(prefix+"projection_data_rigid_rigid"))
-        FILE_UTILITIES::Read_From_File(stream_type,prefix+"projection_data_rigid_rigid",rigid_deformable_collisions->rigid_body_collisions.rigid_body_particles_intersections);
-    if(!FILE_UTILITIES::File_Exists(prefix+"projection_data_rigid_deformable")) return;
-    std::istream* input=FILE_UTILITIES::Safe_Open_Input(prefix+"projection_data_rigid_deformable");
+    if(File_Exists(prefix+"projection_data_rigid_rigid"))
+        Read_From_File(stream_type,prefix+"projection_data_rigid_rigid",rigid_deformable_collisions->rigid_body_collisions.rigid_body_particles_intersections);
+    if(!File_Exists(prefix+"projection_data_rigid_deformable")) return;
+    std::istream* input=Safe_Open_Input(prefix+"projection_data_rigid_deformable");
     TYPED_ISTREAM typed_input(*input,stream_type);
     int precompute_contact_projections_size;
     Read_Binary(typed_input,precompute_contact_projections_size);

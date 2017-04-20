@@ -13,8 +13,8 @@ Reinitialize(bool force_load_even_if_not_drawn)
 {
     if(!draw&&!force_load_even_if_not_drawn)return;
     if(!valid || (is_animation && frame_loaded != frame) || (!is_animation && frame_loaded < 0)){
-        valid=false;std::string tmp_filename=FILE_UTILITIES::Get_Frame_Filename(field_filename,frame);
-        if(FILE_UTILITIES::File_Exists(tmp_filename))FILE_UTILITIES::Read_From_File(stream_type,tmp_filename,field);else return;
+        valid=false;std::string tmp_filename=Get_Frame_Filename(field_filename,frame);
+        if(File_Exists(tmp_filename))Read_From_File(stream_type,tmp_filename,field);else return;
         opengl_symmetric_matrix_field.Update();
         frame_loaded=frame;valid=true;}
 }

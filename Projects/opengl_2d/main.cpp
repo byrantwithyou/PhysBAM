@@ -136,12 +136,12 @@ template<class T> void OPENGL_2D_VISUALIZATION<T>::
 Parse_Arguments(PARSE_ARGS& parse_args)
 {
 #ifdef __linux__
-    opengl_window_title="opengl_2d: " + FILE_UTILITIES::Real_Path(basedir);
+    opengl_window_title="opengl_2d: " + Real_Path(basedir);
 #endif
 
-    if(FILE_UTILITIES::File_Exists(basedir+"/common/first_frame")){
+    if(File_Exists(basedir+"/common/first_frame")){
        int start_frame_from_file;
-       FILE_UTILITIES::Read_From_Text_File(basedir+"/common/first_frame",start_frame_from_file);
+       Read_From_Text_File(basedir+"/common/first_frame",start_frame_from_file);
        start_frame=std::max(start_frame,start_frame_from_file);}
 
     ANIMATED_VISUALIZATION<T>::Parse_Arguments(parse_args);
@@ -167,19 +167,19 @@ Read_Grid()
     sub_filename=LOG::sprintf("%s/%d/sub_grids",basedir.c_str(),start_frame);
     filename=LOG::sprintf("%s/%d/levelset",basedir.c_str(),start_frame);
     // For backwards compatibility
-    if(!FILE_UTILITIES::File_Exists(filename)) filename=LOG::sprintf("%s/%d/levelset.phi",basedir.c_str(),start_frame);
-    if(!FILE_UTILITIES::File_Exists(filename)) filename=LOG::sprintf("%s/%d/levelset_0",basedir.c_str(),start_frame);
+    if(!File_Exists(filename)) filename=LOG::sprintf("%s/%d/levelset.phi",basedir.c_str(),start_frame);
+    if(!File_Exists(filename)) filename=LOG::sprintf("%s/%d/levelset_0",basedir.c_str(),start_frame);
 
-    if(FILE_UTILITIES::File_Exists(filename)){
+    if(File_Exists(filename)){
         LOG::cout<<"Reading grid from '"<<filename<<"'..."<<std::endl;
         ARRAY<T,VECTOR<int,2> > phi;
         LEVELSET<TV> levelset(grid,phi);
-        FILE_UTILITIES::Read_From_File(stream_type,filename,levelset);
+        Read_From_File(stream_type,filename,levelset);
         has_valid_grid=true;}
-    else if(FILE_UTILITIES::File_Exists(basedir+"/common/grid")){
+    else if(File_Exists(basedir+"/common/grid")){
         filename=basedir+"/common/grid";
         LOG::cout<<"Reading grid from '"<<filename<<"'..."<<std::endl;
-        FILE_UTILITIES::Read_From_File(stream_type,filename,grid);
+        Read_From_File(stream_type,filename,grid);
         has_valid_grid=true;}
 
     if(has_valid_grid){
@@ -206,7 +206,7 @@ Initialize_Components_And_Key_Bindings()
 
     // Density
     filename=basedir+"/%d/density";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SCALAR_FIELD_2D<T>* density_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T>(stream_type,grid,filename,OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,1,OPENGL_COLOR::Gray(0,0),OPENGL_COLOR::Gray(1,1)),"density");
         density_component->opengl_scalar_field.Set_Uniform_Contour_Values(.2568,6.067,(6.067-.2568)/30.);
         density_component->opengl_scalar_field.Update();
@@ -216,7 +216,7 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F8),density_component->viewer_callbacks.Get("toggle_draw_mode"));
         opengl_world.Append_Bind_Key('`',density_component->viewer_callbacks.Get("toggle_smooth"));}
     filename=basedir+"/%d/density_gradient";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SCALAR_FIELD_2D<T>* density_gradient_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T>(stream_type,grid,filename,
             OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,1,OPENGL_COLOR::Gray(0,0),OPENGL_COLOR::Gray(1,1)),"density_gradient");
         density_gradient_component->opengl_scalar_field.Update();
@@ -225,7 +225,7 @@ Initialize_Components_And_Key_Bindings()
         Add_Component(density_gradient_component,"Density Gradient",'8',BASIC_VISUALIZATION<T>::OWNED);}
     // Soot
     filename=basedir+"/%d/soot";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SCALAR_FIELD_2D<T>* soot_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T>(stream_type,grid,filename,OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,.01,OPENGL_COLOR::Gray(0,0),OPENGL_COLOR::Gray(1,1)),"soot");
         soot_component->opengl_scalar_field.Set_Uniform_Contour_Values(0,2,.1);
         soot_component->opengl_scalar_field.Update();
@@ -235,7 +235,7 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F8),soot_component->viewer_callbacks.Get("toggle_draw_mode"));
         opengl_world.Append_Bind_Key('`',soot_component->viewer_callbacks.Get("toggle_smooth"));}
     filename=basedir+"/%d/internal_energy";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SCALAR_FIELD_2D<T>* internal_energy_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T>(stream_type,grid,filename,
             OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,1,OPENGL_COLOR::Gray(0,0),OPENGL_COLOR::Yellow(1,1)),"internal_energy");
         internal_energy_component->opengl_scalar_field.Update();
@@ -245,8 +245,8 @@ Initialize_Components_And_Key_Bindings()
 
     // Temperature
     filename=basedir+"/%d/temperature";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        ARRAY<T,VECTOR<int,2> > temp0;FILE_UTILITIES::Read_From_File(stream_type,FILE_UTILITIES::Get_Frame_Filename(filename,start_frame),temp0);
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
+        ARRAY<T,VECTOR<int,2> > temp0;Read_From_File(stream_type,Get_Frame_Filename(filename,start_frame),temp0);
         OPENGL_COMPONENT_SCALAR_FIELD_2D<T>* temperature_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T>(stream_type,grid,filename,OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,1,OPENGL_COLOR::Gray(0,0),OPENGL_COLOR::Red(1,1)),"temperature");
         temperature_component->opengl_scalar_field.Set_Scale_Range(temp0.Min(),temp0.Max());
         opengl_world.Set_Key_Binding_Category("Temperature");
@@ -256,7 +256,7 @@ Initialize_Components_And_Key_Bindings()
 
     // SPH
     filename=basedir+"/%d/sph_cell_weights";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         sph_cell_weight_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T>(stream_type,grid,filename,OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,100,OPENGL_COLOR::Cyan(0,0),OPENGL_COLOR::Cyan(1)),"sph_cell_weights");
         sph_cell_weight_component->opengl_scalar_field.Update();
         Add_Component(sph_cell_weight_component,"SPH Cell Weights",'\0',BASIC_VISUALIZATION<T>::OWNED);}
@@ -264,17 +264,17 @@ Initialize_Components_And_Key_Bindings()
     // Grid vorticity and rasterized vortex particles
     const T vorticity_visualization_min=-10,vorticity_visualization_max=10;
     filename=basedir+"/%d/grid_vorticity";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         opengl_world.Set_Key_Binding_Category("Vorticity");
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_2D<T>(stream_type,grid,filename,OPENGL_COLOR_RAMP<T>::Matlab_Jet(vorticity_visualization_min,vorticity_visualization_max),"grid_vorticity")
             ,"Grid Vorticity",'u',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);}
     filename=basedir+"/%d/grid_vorticity_raw_particles";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         opengl_world.Set_Key_Binding_Category("Vorticity");
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_2D<T>(stream_type,grid,filename,OPENGL_COLOR_RAMP<T>::Matlab_Jet(vorticity_visualization_min,vorticity_visualization_max),"vorticity_raw_particles"),
             "Grid Vorticity Raw Particles",'i',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);}
     filename=basedir+"/%d/grid_vorticity_particles";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         opengl_world.Set_Key_Binding_Category("Vorticity");
         Add_Component(new OPENGL_COMPONENT_SCALAR_FIELD_2D<T>(stream_type,grid,filename,OPENGL_COLOR_RAMP<T>::Matlab_Jet(vorticity_visualization_min,vorticity_visualization_max),"vorticity_particles"),
             "Grid Vorticity Particles",'o',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);}
@@ -282,8 +282,8 @@ Initialize_Components_And_Key_Bindings()
     // Level sets
     filename=basedir+"/%d/levelset";
     OPENGL_COMPONENT_LEVELSET_2D<T>* levelset_component=0;
-    if(!FILE_UTILITIES::Frame_File_Exists(filename,start_frame) && !FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/levelset_0",start_frame)) filename=basedir+"/%d/levelset.phi"; // for backwards compatiblity
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/levelset_0",start_frame)){
+    if(!Frame_File_Exists(filename,start_frame) && !Frame_File_Exists(basedir+"/%d/levelset_0",start_frame)) filename=basedir+"/%d/levelset.phi"; // for backwards compatiblity
+    if(Frame_File_Exists(filename,start_frame) || Frame_File_Exists(basedir+"/%d/levelset_0",start_frame)){
         levelset_component=new OPENGL_COMPONENT_LEVELSET_2D<T>(stream_type,filename,basedir+"/%d/levelset_%d");
         grid_component->object.grid_objects.Append(levelset_component);
         if(levelset_component->opengl_levelsets.m>1) for(int j=0;j<levelset_component->opengl_levelsets.m;j++){
@@ -309,7 +309,7 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('M',levelset_component->viewer_callbacks.Get("toggle_draw_multiple_levelsets"));
         opengl_world.Append_Bind_Key('^',levelset_component->viewer_callbacks.Get("toggle_draw_ghost_values"));}
     filename=basedir+"/%d/object_levelset";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_LEVELSET_2D<T>* object_levelset_component=new OPENGL_COMPONENT_LEVELSET_2D<T>(stream_type,filename);
         grid_component->object.grid_objects.Append(object_levelset_component);
         object_levelset_component->opengl_levelset->outside_color=OPENGL_COLOR::Red(.6);
@@ -328,7 +328,7 @@ Initialize_Components_And_Key_Bindings()
     bool particles_stored_per_cell_uniform=false;
     if(has_valid_grid) particles_stored_per_cell_uniform=true;
     filename=basedir+"/%d/positive_particles";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/positive_particles_0",start_frame)){
+    if(Frame_File_Exists(filename,start_frame) || Frame_File_Exists(basedir+"/%d/positive_particles_0",start_frame)){
         positive_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T>(stream_type,filename,basedir+"/%d/positive_particles_%d",true,particles_stored_per_cell_uniform);
         positive_particles_component->particles->template Add_Array<int>(ATTRIBUTE_ID_ID);
         if(!positive_particles_component->use_sets) positive_particles_component->opengl_points->color=OPENGL_COLOR(1,.5,0);
@@ -339,7 +339,7 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('<',positive_particles_component->viewer_callbacks.Get("previous_set"));
         opengl_world.Append_Bind_Key('M',positive_particles_component->viewer_callbacks.Get("toggle_draw_multiple_particle_sets"));}
     filename=basedir+"/%d/negative_particles";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/negative_particles_0",start_frame)){
+    if(Frame_File_Exists(filename,start_frame) || Frame_File_Exists(basedir+"/%d/negative_particles_0",start_frame)){
         negative_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T>(stream_type,filename,
             basedir+"/%d/negative_particles_%d",true,particles_stored_per_cell_uniform);
         negative_particles_component->particles->template Add_Array<int>(ATTRIBUTE_ID_ID);
@@ -351,7 +351,7 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('<',negative_particles_component->viewer_callbacks.Get("previous_set"));
         opengl_world.Append_Bind_Key('M',negative_particles_component->viewer_callbacks.Get("toggle_draw_multiple_particle_sets"));}
     filename=basedir+"/%d/removed_positive_particles";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/removed_positive_particles_0",start_frame)){
+    if(Frame_File_Exists(filename,start_frame) || Frame_File_Exists(basedir+"/%d/removed_positive_particles_0",start_frame)){
         removed_positive_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T>(stream_type,filename,basedir+"/%d/removed_positive_particles_%d",
             true,particles_stored_per_cell_uniform);
         removed_positive_particles_component->opengl_points->color=OPENGL_COLOR::Green();
@@ -362,7 +362,7 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('<',removed_positive_particles_component->viewer_callbacks.Get("previous_set"));
         opengl_world.Append_Bind_Key('M',removed_positive_particles_component->viewer_callbacks.Get("toggle_draw_multiple_particle_sets"));}
     filename=basedir+"/%d/removed_negative_particles";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/removed_negative_particles_0",start_frame)){
+    if(Frame_File_Exists(filename,start_frame) || Frame_File_Exists(basedir+"/%d/removed_negative_particles_0",start_frame)){
         removed_negative_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T>(stream_type,filename,
             basedir+"/%d/removed_negative_particles_%d",true,particles_stored_per_cell_uniform);
         removed_negative_particles_component->opengl_points->color=OPENGL_COLOR::Cyan();
@@ -373,17 +373,17 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('<',removed_negative_particles_component->viewer_callbacks.Get("previous_set"));
         opengl_world.Append_Bind_Key('M',removed_negative_particles_component->viewer_callbacks.Get("toggle_draw_multiple_particle_sets"));}
     filename=basedir+"/%d/particles";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_PARTICLES_2D<T>* particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T>(stream_type,filename,"",true,false);
         particles_component->opengl_points->color=OPENGL_COLOR(1,1,1);
         Add_Component(particles_component,"Particles",'P',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::SELECTABLE);}
     filename=basedir+"/%d/vorticity_particles";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_PARTICLES_2D<T>* vorticity_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T>(stream_type,filename,"",false);
         vorticity_particles_component->opengl_points->color=OPENGL_COLOR::Yellow();
         Add_Component(vorticity_particles_component,"Vorticity particles",'O',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::SELECTABLE|BASIC_VISUALIZATION<T>::START_HIDDEN);}
     filename=basedir+"/%d/sph_particles";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_PARTICLES_2D<T>* sph_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T>(stream_type,filename,"",false);
         sph_particles_component->opengl_points->color=OPENGL_COLOR::Blue();
         Add_Component(sph_particles_component,"SPH particles",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::SELECTABLE);}
@@ -394,7 +394,7 @@ Initialize_Components_And_Key_Bindings()
     OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>* vector_velocity_component=0;
     opengl_world.Set_Key_Binding_Category("Velocity");
     filename=basedir+"/%d/velocities";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         if(node_based){
             vector_velocity_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>(stream_type,regular_grid,filename);
         grid_component->object.grid_objects.Append(&vector_velocity_component->opengl_grid_based_vector_field);
@@ -406,7 +406,7 @@ Initialize_Components_And_Key_Bindings()
             mac_velocity_component->opengl_mac_velocity_field->vector_color=OPENGL_COLOR::Green();
             Add_Component(mac_velocity_component,"MAC velocities",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);}}
     filename=basedir+"/%d/kinetic_energy";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         ke_component=new OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>(stream_type,mac_grid,filename);
         grid_component->object.grid_objects.Append(ke_component);
         ke_component->opengl_mac_velocity_field->vector_color=OPENGL_COLOR::Green();
@@ -414,7 +414,7 @@ Initialize_Components_And_Key_Bindings()
         ke_component->Set_Psi_N_Psi_D_Basedir_For_Divergence(basedir);
         Add_Component(ke_component,"Kinetic Energy",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);}
     filename=basedir+"/%d/mac_velocities";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         mac_velocity_component=new OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>(stream_type,mac_grid,filename);
         grid_component->object.grid_objects.Append(mac_velocity_component);
         mac_velocity_component->opengl_mac_velocity_field->vector_color=OPENGL_COLOR::Magenta();
@@ -422,7 +422,7 @@ Initialize_Components_And_Key_Bindings()
         mac_velocity_component->Set_Psi_N_Psi_D_Basedir_For_Divergence(basedir);
         Add_Component(mac_velocity_component,"MAC velocities",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);}
     filename=basedir+"/%d/compressible_mac_velocities";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         mac_velocity_component=new OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>(stream_type,mac_grid,filename);
         grid_component->object.grid_objects.Append(mac_velocity_component);
         mac_velocity_component->opengl_mac_velocity_field->vector_color=OPENGL_COLOR::Magenta();
@@ -430,13 +430,13 @@ Initialize_Components_And_Key_Bindings()
         mac_velocity_component->Set_Psi_N_Psi_D_Basedir_For_Divergence(basedir);
         Add_Component(mac_velocity_component,"Compressible MAC velocities",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);}
     filename=basedir+"/%d/centered_velocities";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         vector_velocity_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>(stream_type,mac_grid,filename);
         grid_component->object.grid_objects.Append(&vector_velocity_component->opengl_grid_based_vector_field);
         vector_velocity_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Green();
         Add_Component(vector_velocity_component,"Centered velocities",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);}
     filename=basedir+"/%d/mass_fluxes";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         std::cout<<"Using mass fluxes (from "<<filename<<")"<<std::endl;
         OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>* face_flux_component=new OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>(stream_type,mac_grid,filename);
         grid_component->object.grid_objects.Append(face_flux_component);
@@ -473,13 +473,13 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('h',vector_velocity_component->viewer_callbacks.Get("toggle_arrowhead"));}
 
     filename=basedir+"/%d/beta_face";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D<T,T>* beta_face_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D<T,T>(stream_type,mac_grid,filename,OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,.002,OPENGL_COLOR::Gray(1),OPENGL_COLOR::Gray(0)));
         Add_Component(beta_face_component,"Beta Face",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F6),beta_face_component->viewer_callbacks.Get("toggle_draw"));}
 
     filename=basedir+"/%d/mac_velocities_fuel";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>* mac_velocity_fuel_component=new OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>(stream_type,mac_grid,filename);
         grid_component->object.grid_objects.Append(mac_velocity_fuel_component);
         mac_velocity_fuel_component->opengl_mac_velocity_field->vector_color=OPENGL_COLOR::Cyan();
@@ -491,7 +491,7 @@ Initialize_Components_And_Key_Bindings()
 
     filename=basedir+"/%d/velocities_ghost_fuel";
     OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>* vector_velocity_ghost_minus_component=0;
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         if(node_based){
             vector_velocity_ghost_minus_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>(stream_type,regular_grid,filename);
             grid_component->object.grid_objects.Append(&vector_velocity_ghost_minus_component->opengl_grid_based_vector_field);
@@ -514,7 +514,7 @@ Initialize_Components_And_Key_Bindings()
 
     filename=basedir+"/%d/velocities_ghost";
     OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>* vector_velocity_ghost_plus_component=0;
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         if(node_based){
             vector_velocity_ghost_plus_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>(stream_type,regular_grid,filename);
             grid_component->object.grid_objects.Append(&vector_velocity_ghost_plus_component->opengl_grid_based_vector_field);
@@ -549,7 +549,7 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('-',two_phase_velocity_magnitude_component->viewer_callbacks.Get("decrease_point_size"));}
 
     filename=basedir+"/%d/center_velocities";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>* center_velocity_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>(stream_type,mac_grid,filename);
         grid_component->object.grid_objects.Append(&center_velocity_component->opengl_grid_based_vector_field);
         center_velocity_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Green();
@@ -562,7 +562,7 @@ Initialize_Components_And_Key_Bindings()
     // TODO: these ramps are leaking memory
     OPENGL_COLOR_MAP<T>* pressure_for_pressure_coupling_color_map=OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(-10000,10000,OPENGL_COLOR::Cyan(0,0),OPENGL_COLOR::Cyan(1));
     filename=basedir+"/%d/pressure";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         pressure_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T>(stream_type,mac_grid,filename,OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,1,OPENGL_COLOR::Cyan(0,0),OPENGL_COLOR::Cyan(1)),"pressure");
         pressure_component->opengl_scalar_field.Set_Scale_Range(0,30);
         pressure_component->opengl_scalar_field.Set_Uniform_Contour_Values(2,28,(T)26/(T)53);
@@ -571,27 +571,27 @@ Initialize_Components_And_Key_Bindings()
 
     opengl_world.Set_Key_Binding_Category("Compressible_Implicit_Pressure");
     filename=basedir+"/%d/compressible_implicit_pressure";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SCALAR_FIELD_2D<T>* compressible_implicit_pressure_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T>(stream_type,mac_grid,filename,OPENGL_COLOR_RAMP<T>::Matlab_Jet(0,1),"compressible_implicit_pressure");
         compressible_implicit_pressure_component->opengl_scalar_field.Set_Uniform_Contour_Values(0,20,1);
         Add_Component(compressible_implicit_pressure_component,"Compressible_Implicit_Pressure",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F9),compressible_implicit_pressure_component->viewer_callbacks.Get("toggle_draw"));}
     filename=basedir+"/%d/pressure_gradient";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SCALAR_FIELD_2D<T>* pressure_gradient_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T>(stream_type,grid,filename,OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,1,OPENGL_COLOR::Gray(0,0),OPENGL_COLOR::Magenta(1,1)),"pressure_gradient");
         pressure_gradient_component->opengl_scalar_field.Update();
         Add_Component(pressure_gradient_component,"Pressure Gradient",'9',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);}
     filename=basedir+"/%d/pressure_for_pressure_coupling";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SCALAR_FIELD_2D<T>* pressure2_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T>(stream_type,mac_grid,filename,pressure_for_pressure_coupling_color_map,"pressure_for_pressure_coupling");
         pressure2_component->opengl_scalar_field.Set_Uniform_Contour_Values(-10000,10000,100);
         Add_Component(pressure2_component,"Pressure2",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F7),pressure2_component->viewer_callbacks.Get("toggle_draw"));}
 
     filename=basedir+"/%d/heightfield";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         std::string velocity_filename=basedir+"/%d/heightfield_velocity";
-        if(!FILE_UTILITIES::Frame_File_Exists(velocity_filename,start_frame)) velocity_filename="";
+        if(!Frame_File_Exists(velocity_filename,start_frame)) velocity_filename="";
         OPENGL_COMPONENT_HEIGHTFIELD_1D<T>* heightfield=new OPENGL_COMPONENT_HEIGHTFIELD_1D<T>(stream_type,grid.Remove_Dimension(1),filename,"",velocity_filename);
         Add_Component(heightfield,"Heightfield",'1',BASIC_VISUALIZATION<T>::OWNED);}
 
@@ -605,16 +605,16 @@ Initialize_Components_And_Key_Bindings()
     OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>* rigid_bodies_component=0;
     OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>* deformable_objects_component=0;
     std::string deformable_object_filename=LOG::sprintf("%s/%d/deformable_object_particles",basedir.c_str(),start_frame);
-    if(FILE_UTILITIES::File_Exists(deformable_object_filename)){
+    if(File_Exists(deformable_object_filename)){
         deformable_objects_component=new OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>(stream_type,basedir+"/",start_frame);
         deformable_objects_component->selectable=true;
         // TODO: what the hell?
-        if(!FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/rigid_body_particles",start_frame)){
+        if(!Frame_File_Exists(basedir+"/%d/rigid_body_particles",start_frame)){
             }}
-    if(FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/rigid_body_particles",start_frame)){
+    if(Frame_File_Exists(basedir+"/%d/rigid_body_particles",start_frame)){
         rigid_bodies_component=new OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>(stream_type,basedir);
         rigid_bodies_component->selectable=true;
-        if(FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/colors",start_frame)) FILE_UTILITIES::template Read_From_File(stream_type,LOG::sprintf("%s/%d/colors",basedir.c_str(),start_frame),rigid_bodies_component->colors);
+        if(Frame_File_Exists(basedir+"/%d/colors",start_frame)) Read_From_File(stream_type,LOG::sprintf("%s/%d/colors",basedir.c_str(),start_frame),rigid_bodies_component->colors);
         for(int i=0;i<rigid_bodies_no_draw_list.m;i++){
             LOG::cout<<"Rigid bodies: not drawing object "<<rigid_bodies_no_draw_list(i)<<std::endl;
             rigid_bodies_component->Set_Draw_Object(rigid_bodies_no_draw_list(i),false);}
@@ -637,19 +637,19 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('-',deformable_objects_component->viewer_callbacks.Get("decrease_vector_size"));}
 
     std::string soft_constraints_deformable_object_filename=basedir+LOG::sprintf("/%d/soft_constraints_deformable_object_particles",start_frame);
-    if(FILE_UTILITIES::File_Exists(soft_constraints_deformable_object_filename)){
+    if(File_Exists(soft_constraints_deformable_object_filename)){
         OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>* soft_constraints_deformable_objects_component=new OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>(stream_type,basedir+"/soft_constraints_",start_frame);
         Add_Component(soft_constraints_deformable_objects_component,"Soft Constraints Deformable Objects",'e',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::SELECTABLE);}
 
     opengl_world.Set_Key_Binding_Category("Fluid Boundaries");
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/psi_N",start_frame)){
+    if(has_valid_grid && Frame_File_Exists(basedir+"/%d/psi_N",start_frame)){
         OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D<T,bool>* psi_N_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D<T,bool>(stream_type,grid,basedir+"/%d/psi_N",
             new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Cyan()));
         Add_Component(psi_N_component,"Psi_N points",'\0',BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::OWNED);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),psi_N_component->viewer_callbacks.Get("toggle_draw"));}
 
     filename=basedir+"/%d/debug_particles";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>* component=new OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>(stream_type,filename);
         Add_Component(component,"Debug particles",'w',BASIC_VISUALIZATION<T>::SELECTABLE|BASIC_VISUALIZATION<T>::OWNED);
         opengl_world.Append_Bind_Key('W',component->viewer_callbacks.Get("toggle_draw_velocities"));
@@ -658,7 +658,7 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('-',component->viewer_callbacks.Get("decrease_vector_size"));}
 
     filename=basedir+"/%d/mpm_particles";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_MPM_PARTICLES_2D<T>* component=new OPENGL_COMPONENT_MPM_PARTICLES_2D<T>(stream_type,filename);
         Add_Component(component,"Mpm particles",'m',BASIC_VISUALIZATION<T>::SELECTABLE|BASIC_VISUALIZATION<T>::OWNED);
         opengl_world.Append_Bind_Key('W',component->viewer_callbacks.Get("toggle_draw_velocities"));
@@ -670,34 +670,34 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('-',component->viewer_callbacks.Get("decrease_vector_size"));}
 
     filename=basedir+"/%d/residual_energy";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_PARTICLES_2D<T>* component=new OPENGL_COMPONENT_PARTICLES_2D<T>(stream_type,filename,"",false,false);
         Add_Component(component,"Residual Energy",'k',BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::OWNED);}
     filename=basedir+"/%d/collision_iterators";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_PARTICLES_2D<T>* component=new OPENGL_COMPONENT_PARTICLES_2D<T>(stream_type,filename,"",false,false);
         Add_Component(component,"Collision Iterators",'I',BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::OWNED);}
     filename=basedir+"/%d/psi_D";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SCALAR_FIELD_2D<T,bool>* psi_D_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T,bool>(stream_type,mac_grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Magenta()),"psi_D",OPENGL_SCALAR_FIELD_2D<T,bool>::DRAW_POINTS);
         Add_Component(psi_D_component,"Psi_D points",'\0',BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::OWNED);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),psi_D_component->viewer_callbacks.Get("toggle_draw"));}
 
     filename=basedir+"/%d/euler_psi";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SCALAR_FIELD_2D<T,bool>* psi_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T,bool>(stream_type,mac_grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Red()),"euler_psi",OPENGL_SCALAR_FIELD_2D<T,bool>::DRAW_POINTS);
         Add_Component(psi_component,"Psi points",'\0',BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::OWNED);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F3),psi_component->viewer_callbacks.Get("toggle_draw"));}
 
     filename=basedir+"/%d/colors";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         OPENGL_INDEXED_COLOR_MAP* colors_color_map=OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map();colors_color_map->Set_Index_Mode(OPENGL_INDEXED_COLOR_MAP::PERIODIC);
         OPENGL_COMPONENT_SCALAR_FIELD_2D<T,int>* psi_colors_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T,int>(stream_type,mac_grid,filename,colors_color_map,"colors",OPENGL_SCALAR_FIELD_2D<T,int>::DRAW_POINTS);
         Add_Component(psi_colors_component,"Psi colors",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F2),psi_colors_component->viewer_callbacks.Get("toggle_draw"));}
 
     filename=basedir+"/%d/pressure_jumps";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>* pressure_jump_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>(stream_type,grid,filename);
         grid_component->object.grid_objects.Append(&pressure_jump_component->opengl_grid_based_vector_field);
         pressure_jump_component->opengl_grid_based_vector_field.vector_color=OPENGL_COLOR::Magenta();
@@ -706,7 +706,7 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('-',pressure_jump_component->viewer_callbacks.Get("decrease_vector_size"));}
 
     filename=basedir+"/%d/thin_shells_grid_visibility";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T>* thin_shells_debugging_component=new OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T>(stream_type,grid,basedir);
         opengl_world.Set_Key_Binding_Category("Thin Shells");
         Add_Component(thin_shells_debugging_component,"thin shells debugging",'\0',BASIC_VISUALIZATION<T>::OWNED);
@@ -715,14 +715,14 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F5),thin_shells_debugging_component->viewer_callbacks.Get("toggle_draw_phi_valid_mask"));}
 
     filename=basedir+"/%d/strain";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D<T>* strain_component=new OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D<T>(stream_type,grid,filename);
         Add_Component(strain_component,"Strain",'e',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key('+',strain_component->viewer_callbacks.Get("increase_size"));
         opengl_world.Append_Bind_Key('_',strain_component->viewer_callbacks.Get("decrease_size"));}
 
     filename=basedir+"/%d/strain_0";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+    if(has_valid_grid && Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D<T>* strain_component=new OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D<T>(stream_type,grid,filename);
         Add_Component(strain_component,"Strain",'e',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::START_HIDDEN);
         opengl_world.Append_Bind_Key('+',strain_component->viewer_callbacks.Get("increase_size"));
@@ -757,10 +757,10 @@ template<class T> void OPENGL_2D_VISUALIZATION<T>::
 Set_Frame_Extra()
 {
     std::string filename=LOG::sprintf("%s/%d/frame_title",basedir.c_str(),frame);
-    if(FILE_UTILITIES::File_Exists(filename)){std::ifstream input(filename.c_str());getline(input,frame_title);}
+    if(File_Exists(filename)){std::ifstream input(filename.c_str());getline(input,frame_title);}
     else frame_title="";
     filename=LOG::sprintf("%s/%d/time",basedir.c_str(),frame);
-    if(FILE_UTILITIES::File_Exists(filename)){T time;FILE_UTILITIES::Read_From_File(stream_type,filename,time);frame_title=LOG::sprintf("(%.05f) ",time)+frame_title;}
+    if(File_Exists(filename)){T time;Read_From_File(stream_type,filename,time);frame_title=LOG::sprintf("(%.05f) ",time)+frame_title;}
 }
 //#####################################################################
 // Command_Prompt_Response

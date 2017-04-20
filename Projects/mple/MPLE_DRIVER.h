@@ -200,8 +200,8 @@ public:
         char buff[100];
         sprintf(buff,"Frame %d",frame);
 
-        FILE_UTILITIES::Create_Directory(output_directory);
-        FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%d",output_directory,frame));
+        Create_Directory(output_directory);
+        Create_Directory(LOG::sprintf("%s/%d",output_directory,frame));
 
         for(int i=0;i<points.m;i++)
             Add_Debug_Particle<TV>(points(i).X,VECTOR<T,3>(1,0,0));
@@ -298,7 +298,7 @@ public:
 
     void Dump_Points()
     {
-        FILE_UTILITIES::Create_Directory(output_directory);
+        Create_Directory(output_directory);
         std::ofstream out(LOG::sprintf("%s/particles",output_directory).c_str());
         for(int i=0;i<points.m;i++){
             const MPLE_POINT<TV,w>& point=points(i);

@@ -61,11 +61,11 @@ Write_Output_Files(const int frame)
 {
     std::string f=LOG::sprintf("%d",frame);
 
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",grid);
-    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
-    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/centered_velocities",output_directory.c_str(),frame),*current_velocity);
-    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/density",output_directory.c_str(),frame),mass);
-    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
+    Write_To_File(stream_type,output_directory+"/common/grid",grid);
+    Write_To_File(stream_type,LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
+    Write_To_File(stream_type,LOG::sprintf("%s/%d/centered_velocities",output_directory.c_str(),frame),*current_velocity);
+    Write_To_File(stream_type,LOG::sprintf("%s/%d/density",output_directory.c_str(),frame),mass);
+    Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
     int static_frame=output_structures_each_frame?frame:-1;
     bool write_structures=(frame==0 || output_structures_each_frame);
     deformable_body_collection.Write(stream_type,output_directory,output_directory,frame,static_frame,write_structures,false);
@@ -97,8 +97,8 @@ template<class TV> void MPM_KKT_EXAMPLE<TV>::
 Read_Output_Files(const int frame)
 {
     std::string f=LOG::sprintf("%d",frame);
-    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
-    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
+    Read_From_File(stream_type,LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
+    Read_From_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
 }
 //#####################################################################
 // Function Capture_Stress

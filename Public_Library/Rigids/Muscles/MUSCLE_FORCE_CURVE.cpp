@@ -57,12 +57,12 @@ Initialize(const std::string& data_directory)
 template<class T> void MUSCLE_FORCE_CURVE<T>::
 Load_Data(const std::string& prefix,GRID<VECTOR<T,1> >& grid,ARRAY<T,VECTOR<int,1> >& values)
 {
-    {std::istream* input=FILE_UTILITIES::Safe_Open_Input(prefix+".grid",false);
+    {std::istream* input=Safe_Open_Input(prefix+".grid",false);
     *input>>grid.counts.x>>grid.domain.min_corner.x>>grid.domain.max_corner.x;
     grid.Initialize(grid.counts,grid.domain);
     values.Resize(grid.Domain_Indices());
     delete input;}
-    std::istream* input(FILE_UTILITIES::Safe_Open_Input(prefix+".values",false));
+    std::istream* input(Safe_Open_Input(prefix+".values",false));
     for(int i=0;i<values.array.m;i++) *input>>values.array(i);
     delete input;
 }

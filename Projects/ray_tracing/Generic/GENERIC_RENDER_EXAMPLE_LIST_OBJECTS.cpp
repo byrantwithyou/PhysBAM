@@ -114,12 +114,12 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         if(type=="Rigid_Body_List"){
             std::string rigid_body_particles_file_name=parameters.Get_Parameter("Prefix",std::string("unknown"));
             std::string parents_input=parameters.Get_Parameter("Parents",std::string(""));
-            STRING_UTILITIES::Parse_Integer_List(parents_input,parents);
-            if(parents.m) FILE_UTILITIES::Read_From_File<RW>(LOG::sprintf("%s/%d/rigid_body_parents",rigid_body_particles_file_name.c_str(),frame),rigid_body_parents);}
+            Parse_Integer_List(parents_input,parents);
+            if(parents.m) Read_From_File<RW>(LOG::sprintf("%s/%d/rigid_body_parents",rigid_body_particles_file_name.c_str(),frame),rigid_body_parents);}
         RIGID_BODY_COLLECTION<TV> &rigid_body_collection=Get_Rigid_Objects(parameters,frame,rigid_body_collection_name);
 
         if(range!="<unknown>"){
-            STRING_UTILITIES::Parse_Integer_List(range,integer_list);
+            Parse_Integer_List(range,integer_list);
             id_list.Resize(integer_list.Size());
             for(int i=0;i<integer_list.m;i++) id_list(i)=int(integer_list(i));}
         else if(type=="Rigid_Body_List"){for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++) if(rigid_body_collection.Is_Active(i)) id_list.Append(i);}
@@ -184,11 +184,11 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         std::string static_frame_prefix=parameters.Get_Parameter("Static_Frame_Prefix",prefix);
         prefix+="/";static_frame_prefix+="/";
         std::string frame_string=LOG::sprintf("%d/",local_frame);
-        int static_frame=FILE_UTILITIES::File_Exists(static_frame_prefix+frame_string+"deformable_object_structures")?frame:-1;
+        int static_frame=File_Exists(static_frame_prefix+frame_string+"deformable_object_structures")?frame:-1;
         std::string free_particles_geometry=parameters.Get_Parameter("Free_Particles_Geometry",std::string("Null")); // object to use instead of an extra object
         std::string free_particles_range=parameters.Get_Parameter("Free_Particles_Range",std::string("<unknown>"));
         deformable_body_collection.Read(STREAM_TYPE(RW()),prefix,static_frame_prefix,local_frame,static_frame,true,true);
-        if(range!="<unknown>") STRING_UTILITIES::Parse_Integer_List(range,integer_list);
+        if(range!="<unknown>") Parse_Integer_List(range,integer_list);
         else integer_list=IDENTITY_ARRAY<>(deformable_body_collection.structures.m);
         if(split_object){
             if(deformable_body_collection.structures.m!=1) PHYSBAM_NOT_IMPLEMENTED("Split_Object for more than one object");
@@ -235,7 +235,7 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
                 surface=new RENDERING_TRIANGULATED_SURFACE<T>(*embedding->material_surface.Create_Compact_Copy(),triangles_per_hierarchy_group);}
             else if(FREE_PARTICLES<TV>* free_particles=dynamic_cast<FREE_PARTICLES<TV>*>(structure)){
                 ARRAY<int> free_particles_list;
-                if(free_particles_range!="<unknown>") STRING_UTILITIES::Parse_Integer_List(free_particles_range,free_particles_list);
+                if(free_particles_range!="<unknown>") Parse_Integer_List(free_particles_range,free_particles_list);
                 else free_particles_list=IDENTITY_ARRAY<>(free_particles->nodes.m);
                 if(free_particles_list.m!=1) PHYSBAM_FATAL_ERROR("FREE_PARTICLES only supports one particle at a time");
                 RENDERING_OBJECT<T>* free_particles_object=objects.Get(free_particles_geometry);
@@ -270,7 +270,7 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
     else if(type=="Deformable_Object_Instance"){
         std::string object_name=parameters.Get_Parameter("Object_Name",std::string("<unknown>"));
         if(object_name==std::string("<unknown>")){LOG::cout<<"Unknown Deformable Object"<<std::endl;PHYSBAM_FATAL_ERROR();}
-        if(range!="<unknown>") STRING_UTILITIES::Parse_Integer_List(range,integer_list);
+        if(range!="<unknown>") Parse_Integer_List(range,integer_list);
         else{LOG::cout<<"A Range is Required for a Deformable_Object_Instance."<<std::endl;PHYSBAM_FATAL_ERROR();}
         for(int index=0;index<integer_list.m;index++){
             int i=integer_list(index);

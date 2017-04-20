@@ -16,7 +16,7 @@ template<class T> OPENGL_COMPONENT_LEVELSET_1D<T>::
 OPENGL_COMPONENT_LEVELSET_1D(STREAM_TYPE stream_type,GRID<TV> &grid,const std::string& levelset_filename_input,OPENGL_COLOR point_color,OPENGL_COLOR line_color)
     :OPENGL_COMPONENT<T>(stream_type,"Levelset 1D"),levelset_filename(levelset_filename_input),opengl_levelset(0)
 {
-    is_animation=FILE_UTILITIES::Is_Animated(levelset_filename);
+    is_animation=Is_Animated(levelset_filename);
     opengl_levelset=new OPENGL_LEVELSET_1D<T>(stream_type,*(new LEVELSET<TV>(grid,*(new ARRAY<T,TV_INT>))),point_color,line_color);
     Reinitialize();
 }
@@ -34,7 +34,7 @@ template<class T> OPENGL_COMPONENT_LEVELSET_1D<T>::
 template<class T> bool OPENGL_COMPONENT_LEVELSET_1D<T>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::Frame_File_Exists(levelset_filename, frame_input);
+    return Frame_File_Exists(levelset_filename, frame_input);
 }
 //#####################################################################
 // Function Set_Frame
@@ -79,9 +79,9 @@ Reinitialize()
 {
     if(draw && ((is_animation && frame_loaded != frame) || (!is_animation && frame_loaded<0))){
         valid=false;
-        std::string filename=FILE_UTILITIES::Get_Frame_Filename(levelset_filename,frame);
-        if(FILE_UTILITIES::File_Exists(filename)){
-            FILE_UTILITIES::Read_From_File(stream_type,filename,opengl_levelset->levelset);
+        std::string filename=Get_Frame_Filename(levelset_filename,frame);
+        if(File_Exists(filename)){
+            Read_From_File(stream_type,filename,opengl_levelset->levelset);
             frame_loaded=frame;valid=true;}}
 }
 //##################################################################### 

@@ -213,7 +213,7 @@ bool Adjust_Phi_With_Sources(const T time) override
 //#####################################################################
 void Postprocess_Frame(const int frame) override
 {
-    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/removed_particle_times.%d",output_directory.c_str(),frame),
+    Write_To_File(stream_type,LOG::sprintf("%s/removed_particle_times.%d",output_directory.c_str(),frame),
         fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).removed_particle_times);
     std::cout<<"Wrote "<<fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).removed_particle_times.m<<" number of particles"<<std::endl;
     fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).removed_particle_times.Clean_Memory();

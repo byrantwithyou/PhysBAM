@@ -748,9 +748,9 @@ void Get_Initial_Data()
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=tests.Create_Tetrahedralized_Volume(
                 data_directory+"/Tetrahedralized_Volumes/red_green_torus_with_t_junctions/tetrahedralized_volume.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,1000);
             tetrahedralized_volume.Update_Number_Nodes();
-            FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/Tetrahedralized_Volumes/red_green_torus_with_t_junctions/bindings",binding_list);
+            Read_From_File(stream_type,data_directory+"/Tetrahedralized_Volumes/red_green_torus_with_t_junctions/bindings",binding_list);
             tetrahedralized_volume.mesh.boundary_mesh=new TRIANGLE_MESH();
-            FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/Tetrahedralized_Volumes/red_green_torus_with_t_junctions/boundary_mesh",*tetrahedralized_volume.mesh.boundary_mesh);
+            Read_From_File(stream_type,data_directory+"/Tetrahedralized_Volumes/red_green_torus_with_t_junctions/boundary_mesh",*tetrahedralized_volume.mesh.boundary_mesh);
             tests.Initialize_Tetrahedron_Collisions(1,output_directory,tetrahedralized_volume,solids_parameters.triangle_collision_parameters);
             tests.Add_Ground();
             break;}
@@ -759,7 +759,7 @@ void Get_Initial_Data()
         case 18:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=tests.Create_Tetrahedralized_Volume(
                 data_directory+"/Tetrahedralized_Volumes/red_green_torus_with_t_junctions/tetrahedralized_volume.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,1000);
-            FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/Tetrahedralized_Volumes/red_green_torus_with_t_junctions/bindings",binding_list);
+            Read_From_File(stream_type,data_directory+"/Tetrahedralized_Volumes/red_green_torus_with_t_junctions/bindings",binding_list);
             SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.Add_Structure(&segmented_curve);
             constrained_particle=segmented_curve.particles.Add_Element();
             particles.mass(constrained_particle)=1;particles.X(constrained_particle)=TV(0,5,0);
@@ -1223,7 +1223,7 @@ void Get_Initial_Data()
                 TRIANGULATED_SURFACE<T>* surface=0,*new_surface=0;
                 if(model_mesh!=""){
                     surface=TRIANGULATED_SURFACE<T>::Create();
-                    FILE_UTILITIES::Read_From_File<float>(model_mesh,*surface);
+                    Read_From_File<float>(model_mesh,*surface);
                     surface->Update_Bounding_Box();
                     surface->particles.X-=surface->bounding_box->Center();
                     surface->particles.X/=surface->bounding_box->Edge_Lengths().y;
@@ -1610,7 +1610,7 @@ void Initialize_Bodies() override
                 LOG::cout<<"particles.Size()="<<particles.Size()<<std::endl;
                 //solid_body_collection.deformable_body_collection.mpi_solids->Simple_Partition(solid_body_collection,particles.X.array,VECTOR<int,3>(4,1,1));
                 solid_body_collection.deformable_body_collection.mpi_solids->KD_Tree_Partition(solid_body_collection.deformable_body_collection,solid_body_collection.rigid_body_collection,ARRAY<TV>(particles.X));
-                FILE_UTILITIES::Write_To_File<T>(output_directory+"/particles_of_partition",solid_body_collection.deformable_body_collection.mpi_solids->particles_of_partition);
+                Write_To_File<T>(output_directory+"/particles_of_partition",solid_body_collection.deformable_body_collection.mpi_solids->particles_of_partition);
                 break;}
             default:
                 LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}}

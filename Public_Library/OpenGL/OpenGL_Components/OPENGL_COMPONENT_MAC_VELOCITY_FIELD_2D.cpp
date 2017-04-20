@@ -40,7 +40,7 @@ OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &g
     viewer_callbacks.Set("toggle_draw_vorticity",{[this](){Toggle_Draw_Vorticity();},"Toggle draw vorticity"});
     viewer_callbacks.Set("normalize_vorticity_color_map",{[this](){Normalize_Vorticity_Color_Map();},"Normalize vorticity map based on current frame"});
 
-    is_animation=FILE_UTILITIES::Is_Animated(velocity_filename);
+    is_animation=Is_Animated(velocity_filename);
     frame_loaded=-1;
 
     opengl_mac_velocity_field=new OPENGL_MAC_VELOCITY_FIELD_2D<T>(stream_type,grid);
@@ -76,7 +76,7 @@ template<class T> OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
 template<class T> bool OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::Frame_File_Exists(velocity_filename, frame_input);
+    return Frame_File_Exists(velocity_filename, frame_input);
 }
 //#####################################################################
 // Function Print_Cell_Selection_Info
@@ -146,8 +146,8 @@ Reinitialize()
     if(draw || draw_divergence){
         if((is_animation && frame_loaded!=frame) || (!is_animation && frame_loaded < 0)){
             valid = false;
-            std::string tmp_filename=FILE_UTILITIES::Get_Frame_Filename(velocity_filename.c_str(), frame);
-            if(FILE_UTILITIES::File_Exists(tmp_filename)) FILE_UTILITIES::Read_From_File(stream_type,tmp_filename,opengl_mac_velocity_field->face_velocities);
+            std::string tmp_filename=Get_Frame_Filename(velocity_filename.c_str(), frame);
+            if(File_Exists(tmp_filename)) Read_From_File(stream_type,tmp_filename,opengl_mac_velocity_field->face_velocities);
             else return;
             opengl_mac_velocity_field->Update();
             frame_loaded=frame;
@@ -175,9 +175,9 @@ Update_Divergence()
         if(!psi_N_psi_D_basedir.empty()){
             std::string psi_N_filename=LOG::sprintf("%s/%d/psi_N",psi_N_psi_D_basedir.c_str(),frame);
             std::string psi_D_filename=LOG::sprintf("%s/%d/psi_D",psi_N_psi_D_basedir.c_str(),frame);
-            if(FILE_UTILITIES::File_Exists(psi_N_filename)) FILE_UTILITIES::Read_From_File(stream_type,psi_N_filename,psi_N);
+            if(File_Exists(psi_N_filename)) Read_From_File(stream_type,psi_N_filename,psi_N);
             else got_all_psi=false;
-            if(FILE_UTILITIES::File_Exists(psi_D_filename)) FILE_UTILITIES::Read_From_File(stream_type,psi_D_filename,psi_D);
+            if(File_Exists(psi_D_filename)) Read_From_File(stream_type,psi_D_filename,psi_D);
             else got_all_psi=false;}
         else got_all_psi=false;
         if(!got_all_psi){psi_N.Clean_Memory();psi_D.Clean_Memory();}

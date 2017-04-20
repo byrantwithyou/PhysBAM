@@ -75,14 +75,14 @@ virtual void Initialize_Implicit_Surface()
     // read octree or levelset implicit surface from file
         if(use_multiple_levelset_implicit_surface){
         LOG::Time("reading secondary levelset files");
-        FILE_UTILITIES::Create_From_File(stream_type,implicit_surface_filename,multiple_levelset_implicit_surface.primary_levelset);
+        Create_From_File(stream_type,implicit_surface_filename,multiple_levelset_implicit_surface.primary_levelset);
         LOG::Stop_Time();
         T max_secondary_cell_size=0;
         for(int secondary_index=1;;secondary_index++){
-            if(!FILE_UTILITIES::File_Exists(LOG::sprintf("%s_secondary_%d",implicit_surface_filename.c_str(),secondary_index))) break;
+            if(!File_Exists(LOG::sprintf("%s_secondary_%d",implicit_surface_filename.c_str(),secondary_index))) break;
             multiple_levelset_implicit_surface.secondary_levelsets.Resize(secondary_index);
             LOG::Time(LOG::sprintf("reading secondary levelset file %d",secondary_index));
-            FILE_UTILITIES::Create_From_File(stream_type,LOG::sprintf("%s_secondary_%d",implicit_surface_filename.c_str(),secondary_index),
+            Create_From_File(stream_type,LOG::sprintf("%s_secondary_%d",implicit_surface_filename.c_str(),secondary_index),
                 multiple_levelset_implicit_surface.secondary_levelsets(secondary_index));
             LOG::Stop_Time();
             max_secondary_cell_size=max(max_secondary_cell_size,multiple_levelset_implicit_surface.secondary_levelsets(secondary_index)->levelset.grid.dX.Max());}
@@ -90,7 +90,7 @@ virtual void Initialize_Implicit_Surface()
         multiple_levelset_implicit_surface.Compute_Normals();multiple_levelset_implicit_surface.Update_Box();multiple_levelset_implicit_surface.Update_Minimum_Cell_Size();
         multiple_levelset_implicit_surface.Set_Inside_Threshold((T)3*max_secondary_cell_size);}
     else{ // level set implicit surface
-        FILE_UTILITIES::Read_From_File(stream_type,implicit_surface_filename,levelset_implicit_surface);
+        Read_From_File(stream_type,implicit_surface_filename,levelset_implicit_surface);
         tetrahedral_meshing.Initialize(&levelset_implicit_surface);
         levelset_implicit_surface.Compute_Normals(); // can precompute normals in this case 
         levelset_implicit_surface.Update_Box();}

@@ -1125,7 +1125,7 @@ void Plot_Energy_Density(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm,T stiffness)
         if((fabs(Z.x)>fabs(Z.y)?Z.x:Z.y)<0) Z=-Z;
         VECTOR<T,3> Y(X.x,X.y,icm->P_From_Strain(DIAGONAL_MATRIX<T,2>(Z),0).x.x/stiffness);
         ts.particles.X(i)=Y;}
-    FILE_UTILITIES::Write_To_File(this->stream_type,"surface.tri",ts);
+    Write_To_File(this->stream_type,"surface.tri",ts);
 }
 //#####################################################################
 // Function Plot_Energy_Landscape
@@ -1170,7 +1170,7 @@ void Plot_Contour_Landscape(int frame)
 {
     char buff[1000];
     sprintf(buff, "%s/data", output_directory.c_str());
-    FILE_UTILITIES::Create_Directory(buff);
+    Create_Directory(buff);
     sprintf(buff, "%s/data/%03d.txt", output_directory.c_str(), frame);
     std::ofstream out(buff);
 
@@ -1205,7 +1205,7 @@ void Energy_Profile_Plot(int frame)
 {
     if(!dual_directory.length()) dual_directory=output_directory+"/dual_output";
 
-    if(this->write_first_frame && frame==this->first_frame) FILE_UTILITIES::Write_To_Text_File(dual_directory+"/common/first_frame",frame,"\n");
+    if(this->write_first_frame && frame==this->first_frame) Write_To_Text_File(dual_directory+"/common/first_frame",frame,"\n");
 
     ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>&>().isotropic_model;
     if(!energy_mesh){
@@ -1229,10 +1229,10 @@ void Energy_Profile_Plot(int frame)
         energy_profile_plot_range=pa.Max();
         pa*=plot_scale;}
 
-    FILE_UTILITIES::Create_Directory(dual_directory);
+    Create_Directory(dual_directory);
     std::string f=LOG::sprintf("%d",frame);
-    FILE_UTILITIES::Create_Directory(dual_directory+"/"+f);
-    FILE_UTILITIES::Create_Directory(dual_directory+"/common");
+    Create_Directory(dual_directory+"/"+f);
+    Create_Directory(dual_directory+"/common");
 
     LOG::cout<<this->debug_particles.debug_particles.X.m<<std::endl;
     energy_particles.Add_Elements(this->debug_particles.debug_particles.X.m);
@@ -1243,23 +1243,23 @@ void Energy_Profile_Plot(int frame)
         energy_particles.X(i)=X.Append((icm->Energy_Density(F,0)-energy_profile_plot_min)*plot_scale+1e-2);
         energy_particles.V(i)=-P.To_Vector().Append(P.To_Vector().Magnitude_Squared()).Normalized();}
 
-    FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",dual_directory.c_str(),frame));
-    FILE_UTILITIES::Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",dual_directory.c_str(),frame),energy_particles);
+    Create_Directory(LOG::sprintf("%s/%i",dual_directory.c_str(),frame));
+    Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",dual_directory.c_str(),frame),energy_particles);
     energy_particles.Delete_All_Elements();
 
-    FILE_UTILITIES::Write_To_File(this->stream_type,dual_directory+"/"+FILE_UTILITIES::Number_To_String(frame)+"/deformable_object_particles",energy_mesh->particles);
+    Write_To_File(this->stream_type,dual_directory+"/"+Number_To_String(frame)+"/deformable_object_particles",energy_mesh->particles);
     if(frame==1 || (this->restart && frame==this->first_frame)){
-        FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",dual_directory.c_str(),0));
-        FILE_UTILITIES::Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",dual_directory.c_str(),0),energy_particles);
-        FILE_UTILITIES::Write_To_File(this->stream_type,dual_directory+"/0/deformable_object_particles",energy_mesh->particles);
+        Create_Directory(LOG::sprintf("%s/%i",dual_directory.c_str(),0));
+        Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",dual_directory.c_str(),0),energy_particles);
+        Write_To_File(this->stream_type,dual_directory+"/0/deformable_object_particles",energy_mesh->particles);
         std::string f="common";
-        std::ostream* output_raw=FILE_UTILITIES::Safe_Open_Output(dual_directory+"/"+f+"/deformable_object_structures");
+        std::ostream* output_raw=Safe_Open_Output(dual_directory+"/"+f+"/deformable_object_structures");
         TYPED_OSTREAM output(*output_raw,this->stream_type);
         Write_Binary(output,1);
         energy_mesh->Write_Structure(output);
         delete output_raw;}
 
-    FILE_UTILITIES::Write_To_Text_File(dual_directory+"/common/last_frame",frame,"\n");
+    Write_To_Text_File(dual_directory+"/common/last_frame",frame,"\n");
 }
 //#####################################################################
 };

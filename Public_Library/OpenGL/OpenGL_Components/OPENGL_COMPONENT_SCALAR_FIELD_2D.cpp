@@ -20,7 +20,7 @@ OPENGL_COMPONENT_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,
     viewer_callbacks.Set("toggle_draw_mode",{[this](){Toggle_Draw_Mode();},"Toggle draw mode"});
     viewer_callbacks.Set("toggle_color_map",{[this](){Toggle_Color_Map();},"Toggle color map"});
 
-    is_animation=FILE_UTILITIES::Is_Animated(scalar_field_filename);
+    is_animation=Is_Animated(scalar_field_filename);
 }
 
 //#####################################################################
@@ -37,7 +37,7 @@ template<class T,class T2> OPENGL_COMPONENT_SCALAR_FIELD_2D<T,T2>::
 template<class T,class T2> bool OPENGL_COMPONENT_SCALAR_FIELD_2D<T,T2>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::Frame_File_Exists(scalar_field_filename,frame_input);
+    return Frame_File_Exists(scalar_field_filename,frame_input);
 }
 //#####################################################################
 // Function Set_Frame
@@ -96,9 +96,9 @@ Reinitialize()
             (!is_animation && frame_loaded < 0))
         {
             valid=false;
-            std::string filename=FILE_UTILITIES::Get_Frame_Filename(scalar_field_filename,frame);
-            if(FILE_UTILITIES::File_Exists(filename))
-                FILE_UTILITIES::Read_From_File(stream_type,filename,opengl_scalar_field.values);
+            std::string filename=Get_Frame_Filename(scalar_field_filename,frame);
+            if(File_Exists(filename))
+                Read_From_File(stream_type,filename,opengl_scalar_field.values);
             else
                 return;
 

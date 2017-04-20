@@ -40,11 +40,11 @@ Write_Output_Files(const int frame)
     if(!write_output_files) return;
     std::string f=LOG::sprintf("%d",frame);
 
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/mac_velocities",face_velocities);
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",grid);
-    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/levelset",output_directory.c_str(),frame),levelset);
+    Write_To_File(stream_type,output_directory+"/"+f+"/mac_velocities",face_velocities);
+    Write_To_File(stream_type,output_directory+"/common/grid",grid);
+    Write_To_File(stream_type,LOG::sprintf("%s/%d/levelset",output_directory.c_str(),frame),levelset);
     debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
-    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),
+    Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),
         time,face_velocities,prev_face_velocities);
 }
 //#####################################################################
@@ -54,8 +54,8 @@ template<class TV> void STRESS_EXAMPLE<TV>::
 Read_Output_Files(const int frame)
 {
     std::string f=LOG::sprintf("%d",frame);
-    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/levelset",output_directory.c_str(),frame),levelset);
-    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),
+    Read_From_File(stream_type,LOG::sprintf("%s/%d/levelset",output_directory.c_str(),frame),levelset);
+    Read_From_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),
         time,face_velocities,prev_face_velocities);
 }
 //#####################################################################

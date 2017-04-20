@@ -67,7 +67,7 @@ void Execute_Main_Program()
         example.tetrahedral_meshing.Initialize_Dynamics();
         example.tetrahedral_meshing.Create_Final_Mesh_With_Dynamics(example.time_step,example.number_of_force_steps,example.number_of_velocity_steps);}
     example.tetrahedral_meshing.Snap_Nodes_To_Level_Set_Boundary();
-    FILE_UTILITIES::Write_To_File(example.stream_type,example.tetrahedral_meshing.output_directory,deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>());
+    Write_To_File(example.stream_type,example.tetrahedral_meshing.output_directory,deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>());
 }
 //##############################################################################
 };

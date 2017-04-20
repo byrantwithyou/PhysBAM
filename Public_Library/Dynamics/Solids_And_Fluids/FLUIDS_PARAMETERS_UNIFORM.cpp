@@ -558,7 +558,7 @@ template<class TV> template<class T_ARRAYS_PARTICLES> void FLUIDS_PARAMETERS_UNI
 Write_Particles(const STREAM_TYPE stream_type,const PARTICLES<TV>& template_particles,const T_ARRAYS_PARTICLES& particles,const std::string& output_directory,const std::string& prefix,
     const int frame) const
 {
-    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,prefix.c_str()),particles);
+    Write_To_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,prefix.c_str()),particles);
     int total_number_of_particles=Total_Number_Of_Particles(particles);
     LOG::cout<<"Writing "<<total_number_of_particles<<" "<<prefix<<std::endl;
 
@@ -566,7 +566,7 @@ Write_Particles(const STREAM_TYPE stream_type,const PARTICLES<TV>& template_part
     if(write_flattened_particles){
         PARTICLES<TV>* all_particles=template_particles.Clone();
         all_particles->Initialize(particles.array);
-        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/%s_all",output_directory.c_str(),frame,prefix.c_str()),*all_particles);}
+        Write_To_File(stream_type,LOG::sprintf("%s/%d/%s_all",output_directory.c_str(),frame,prefix.c_str()),*all_particles);}
 }
 //#####################################################################
 // Function Read_Particles
@@ -576,7 +576,7 @@ Read_Particles(const STREAM_TYPE stream_type,const T_PARTICLES& template_particl
     const int frame)
 {
     STATIC_ASSERT((is_same<T_PARTICLES,typename remove_pointer<typename T_ARRAYS_PARTICLES::ELEMENT>::type>::value)); 
-    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,prefix.c_str()),particles);
+    Read_From_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,prefix.c_str()),particles);
     if(typeid(template_particles)!=typeid(T_PARTICLES)) // swap in clones of template_particle for pure T_PARTICLESs
         for(int i=0;i<particles.array.Size();i++) if(particles.array(i)){
             T_PARTICLES* replacement=template_particles.Clone();
@@ -592,21 +592,21 @@ template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame)
 {
     std::string f=LOG::sprintf("%d",frame);
-    FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/grid",*grid);
-    if(mpi_grid) FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/global_grid",mpi_grid->global_grid);
+    Read_From_File(stream_type,output_directory+"/"+f+"/grid",*grid);
+    if(mpi_grid) Read_From_File(stream_type,output_directory+"/"+f+"/global_grid",mpi_grid->global_grid);
 
-    if(use_soot) FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/soot",soot_container.density);
-    if(use_soot && use_soot_fuel_combustion) FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/soot_fuel",soot_fuel_container.density);
+    if(use_soot) Read_From_File(stream_type,output_directory+"/"+f+"/soot",soot_container.density);
+    if(use_soot && use_soot_fuel_combustion) Read_From_File(stream_type,output_directory+"/"+f+"/soot_fuel",soot_fuel_container.density);
     if(smoke || fire || water){
         // scalar fields
         if(smoke || fire){
-            if(use_density) FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/density",density_container.density);
-            if(use_temperature) FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/temperature",temperature_container.temperature);}
+            if(use_density) Read_From_File(stream_type,output_directory+"/"+f+"/density",density_container.density);
+            if(use_temperature) Read_From_File(stream_type,output_directory+"/"+f+"/temperature",temperature_container.temperature);}
         // particle levelset
         if(write_levelset){
             if(number_of_regions==1){
                 PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=particle_levelset_evolution->Particle_Levelset(0);
-                FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset.levelset);
+                Read_From_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset.levelset);
                 if(write_particles && frame%restart_data_write_rate==0){
                     Read_Particles(stream_type,particle_levelset.template_particles,particle_levelset.positive_particles,output_directory,"positive_particles",frame);
                     Read_Particles(stream_type,particle_levelset.template_particles,particle_levelset.negative_particles,output_directory,"negative_particles",frame);}
@@ -617,13 +617,13 @@ Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direct
                     Read_Particles(stream_type,particle_levelset.template_removed_particles,particle_levelset.removed_negative_particles,output_directory,
                         "removed_negative_particles",frame);
                 if(store_particle_ids)
-                    FILE_UTILITIES::Read_From_Text_File(output_directory+"/"+f+"/last_unique_particle_id",particle_levelset.last_unique_particle_id);
-                if(use_strain && write_strain) FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/strain",incompressible->strain->e);}
+                    Read_From_Text_File(output_directory+"/"+f+"/last_unique_particle_id",particle_levelset.last_unique_particle_id);
+                if(use_strain && write_strain) Read_From_File(stream_type,output_directory+"/"+f+"/strain",incompressible->strain->e);}
             else if(number_of_regions>=2){
                 for(int i=0;i<number_of_regions;i++){
                     std::string ii=LOG::sprintf("%d",i),i_dot_f=ii+"."+f; // TODO(jontg): This still does .%d.gz
                     PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=*particle_levelset_evolution_multiple->particle_levelset_multiple.particle_levelsets(i);
-                    FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/levelset_"+i_dot_f,particle_levelset.levelset);
+                    Read_From_File(stream_type,output_directory+"/levelset_"+i_dot_f,particle_levelset.levelset);
                     if(write_particles && frame%restart_data_write_rate==0){
                         Read_Particles(stream_type,particle_levelset.template_particles,particle_levelset.positive_particles,output_directory,"positive_particles_"+ii,frame);
                         Read_Particles(stream_type,particle_levelset.template_particles,particle_levelset.negative_particles,output_directory,"negative_particles_"+ii,frame);}
@@ -634,20 +634,20 @@ Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direct
                         Read_Particles(stream_type,particle_levelset.template_removed_particles,particle_levelset.removed_negative_particles,output_directory,
                             "removed_negative_particles_"+ii,frame);
                     //if(store_particle_ids)
-                    //    FILE_UTILITIES::Read_From_Text_File(output_directory+"/"+f+"/last_unique_particle_id",particle_levelset.last_unique_particle_id);
+                    //    Read_From_Text_File(output_directory+"/"+f+"/last_unique_particle_id",particle_levelset.last_unique_particle_id);
                     if(write_strain && use_multiphase_strain.Count_Matches(0)<number_of_regions) if(incompressible_multiphase->strains(i)){
                         if(incompressible_multiphase->strains(i))
-                            FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/strain_"+i_dot_f,incompressible_multiphase->strains(i)->e);}}}}
+                            Read_From_File(stream_type,output_directory+"/strain_"+i_dot_f,incompressible_multiphase->strains(i)->e);}}}}
 
         // pressure and velocities
         std::string filename;
         filename=output_directory+"/"+f+"/pressure";
-        if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading pressure "<<filename<<std::endl;
-            FILE_UTILITIES::Read_From_File(stream_type,filename,incompressible->projection.p);}}
+        if(File_Exists(filename)){LOG::cout<<"Reading pressure "<<filename<<std::endl;
+            Read_From_File(stream_type,filename,incompressible->projection.p);}}
 
     else if(compressible){
-        FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/euler_U",euler->U);
-        FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/euler_psi",euler->psi);}
+        Read_From_File(stream_type,output_directory+"/"+f+"/euler_U",euler->U);
+        Read_From_File(stream_type,output_directory+"/"+f+"/euler_psi",euler->psi);}
 }
 //#####################################################################
 // Function Write_Output_Files
@@ -662,37 +662,37 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
         ARRAY<T,TV_INT> soot_fuel_ghost(grid->Cell_Indices(number_of_ghost_cells),false);
         soot_container.boundary->Fill_Ghost_Cells(*grid,soot_container.density,soot_ghost,0,0,number_of_ghost_cells);
         soot_fuel_container.boundary->Fill_Ghost_Cells(*grid,soot_fuel_container.density,soot_fuel_ghost,0,0,number_of_ghost_cells);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/soot",soot_ghost);
-        if(use_soot_fuel_combustion) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/soot_fuel",soot_fuel_ghost);}
+        Write_To_File(stream_type,output_directory+"/"+f+"/soot",soot_ghost);
+        if(use_soot_fuel_combustion) Write_To_File(stream_type,output_directory+"/"+f+"/soot_fuel",soot_fuel_ghost);}
     if(smoke || fire || water || sph){
-        if(frame==first_frame){FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",*grid);
-        if(mpi_grid) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/global_grid",mpi_grid->global_grid);}
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/grid",*grid);
-        if(mpi_grid) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/global_grid",mpi_grid->global_grid);
+        if(frame==first_frame){Write_To_File(stream_type,output_directory+"/common/grid",*grid);
+        if(mpi_grid) Write_To_File(stream_type,output_directory+"/common/global_grid",mpi_grid->global_grid);}
+        Write_To_File(stream_type,output_directory+"/"+f+"/grid",*grid);
+        if(mpi_grid) Write_To_File(stream_type,output_directory+"/"+f+"/global_grid",mpi_grid->global_grid);
         // object levelset
         if(FLUID_COLLISION_BODY_INACCURATE_UNION<TV>* innacurate_union=
             Find_Type<FLUID_COLLISION_BODY_INACCURATE_UNION<TV>*>(collision_bodies_affecting_fluid->collision_geometry_collection.bodies))
-            FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/object_levelset",innacurate_union->levelset);
+            Write_To_File(stream_type,output_directory+"/"+f+"/object_levelset",innacurate_union->levelset);
         // scalar fields
         if(smoke || fire){
             if(use_density){
                 ARRAY<T,TV_INT> density_ghost(grid->Cell_Indices(number_of_ghost_cells),false);
                 density_container.boundary->Fill_Ghost_Cells(*grid,density_container.density,density_ghost,0,0,number_of_ghost_cells);
-                FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/density",density_ghost);}
+                Write_To_File(stream_type,output_directory+"/"+f+"/density",density_ghost);}
             if(use_temperature){
                 ARRAY<T,TV_INT> temperature_ghost(grid->Cell_Indices(number_of_ghost_cells),false);
                 temperature_container.boundary->Fill_Ghost_Cells(*grid,temperature_container.temperature,temperature_ghost,0,0,number_of_ghost_cells);
-                FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/temperature",temperature_ghost);}}
+                Write_To_File(stream_type,output_directory+"/"+f+"/temperature",temperature_ghost);}}
         // sph particles
-        if(sph) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/sph_particles",sph_evolution->sph_particles);
+        if(sph) Write_To_File(stream_type,output_directory+"/"+f+"/sph_particles",sph_evolution->sph_particles);
         // velocities
         if(write_velocity && frame%restart_data_write_rate==0){
-            if(fire) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/levelset_velocities",particle_levelset_evolution->V);}
+            if(fire) Write_To_File(stream_type,output_directory+"/"+f+"/levelset_velocities",particle_levelset_evolution->V);}
         // particle levelset
         if(write_levelset){
             if(number_of_regions==1){
                 PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=particle_levelset_evolution->Particle_Levelset(0);
-                FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset.levelset);
+                Write_To_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset.levelset);
                 if(write_particles && frame%restart_data_write_rate==0){
                     Write_Particles(stream_type,particle_levelset.template_particles,particle_levelset.positive_particles,output_directory,"positive_particles",frame);
                     Write_Particles(stream_type,particle_levelset.template_particles,particle_levelset.negative_particles,output_directory,"negative_particles",frame);}
@@ -703,12 +703,12 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
                     Write_Particles(stream_type,particle_levelset.template_removed_particles,particle_levelset.removed_negative_particles,output_directory,
                         "removed_negative_particles",frame);
                 if(store_particle_ids)
-                    FILE_UTILITIES::Write_To_Text_File(output_directory+"/"+f+"/last_unique_particle_id",particle_levelset.last_unique_particle_id);}
+                    Write_To_Text_File(output_directory+"/"+f+"/last_unique_particle_id",particle_levelset.last_unique_particle_id);}
             else if(number_of_regions>=2){
                 for(int i=0;i<number_of_regions;i++){
                     std::string ii=LOG::sprintf("%d",i),i_dot_f=ii+"."+f; // TODO(jontg) ...
                     PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=*particle_levelset_evolution_multiple->particle_levelset_multiple.particle_levelsets(i);
-                    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/levelset_"+i_dot_f,particle_levelset.levelset);
+                    Write_To_File(stream_type,output_directory+"/levelset_"+i_dot_f,particle_levelset.levelset);
                     if(write_particles && frame%restart_data_write_rate==0){
                         Write_Particles(stream_type,particle_levelset.template_particles,particle_levelset.positive_particles,output_directory,"positive_particles_"+ii,frame);
                         Write_Particles(stream_type,particle_levelset.template_particles,particle_levelset.negative_particles,output_directory,"negative_particles_"+ii,frame);}
@@ -719,61 +719,61 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
                         Write_Particles(stream_type,particle_levelset.template_removed_particles,particle_levelset.removed_negative_particles,output_directory,
                             "removed_negative_particles_"+ii,frame);
                     //if(store_particle_ids)
-                    //    FILE_UTILITIES::Write_To_Text_File(output_directory+"/last_unique_particle_id."+f,particle_levelset.last_unique_particle_id);
+                    //    Write_To_Text_File(output_directory+"/last_unique_particle_id."+f,particle_levelset.last_unique_particle_id);
                 }}}
         if(water){
             if(write_strain){
-                if(use_strain && number_of_regions==1) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/strain",incompressible->strain->e);
+                if(use_strain && number_of_regions==1) Write_To_File(stream_type,output_directory+"/"+f+"/strain",incompressible->strain->e);
                 if(use_multiphase_strain.Count_Matches(0)<number_of_regions && number_of_regions>=2)
                     for(int i=0;i<number_of_regions;i++){
                         if(incompressible_multiphase->strains(i)){
                             std::string i_dot_f=LOG::sprintf("%d.%s",i,f.c_str()); // TODO(jontg): ...
                             ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> e_ghost(grid->Domain_Indices(number_of_ghost_cells),false);
                             incompressible_multiphase->strains(i)->e_boundary->Fill_Ghost_Cells(*grid,incompressible_multiphase->strains(i)->e,e_ghost,0,0,number_of_ghost_cells); // TODO: use real dt/time
-                            FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/strain_"+i_dot_f,e_ghost);}}}}
+                            Write_To_File(stream_type,output_directory+"/strain_"+i_dot_f,e_ghost);}}}}
 
         // sph
-        if(sph_evolution) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/sph_cell_weights",sph_evolution->cell_weight);
+        if(sph_evolution) Write_To_File(stream_type,output_directory+"/"+f+"/sph_cell_weights",sph_evolution->cell_weight);
 
         // dsd
         if(use_dsd){
             ARRAY<T,TV_INT> reaction_speed_ghost(grid->Domain_Indices(number_of_ghost_cells));incompressible->boundary->Fill_Ghost_Cells(*grid,incompressible->projection.dsd->Dn.array,reaction_speed_ghost,0,0,number_of_ghost_cells); // TODO: use real dt/time
-            FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/reaction_speed",reaction_speed_ghost);}
+            Write_To_File(stream_type,output_directory+"/"+f+"/reaction_speed",reaction_speed_ghost);}
 
         if(write_debug_data || (write_restart_data && frame%restart_data_write_rate==0)){
-            FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/pressure",incompressible->projection.p);}
+            Write_To_File(stream_type,output_directory+"/"+f+"/pressure",incompressible->projection.p);}
         // debugging
         if(write_debug_data){
-            if(incompressible->projection.poisson) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/beta_face",incompressible->projection.poisson->beta_face);
-            if(use_body_force) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/forces",incompressible->force);
+            if(incompressible->projection.poisson) Write_To_File(stream_type,output_directory+"/"+f+"/beta_face",incompressible->projection.poisson->beta_face);
+            if(use_body_force) Write_To_File(stream_type,output_directory+"/"+f+"/forces",incompressible->force);
             if(use_maccormack_semi_lagrangian_advection){
-                FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/maccormack_cell_mask",maccormack_cell_mask);
-                FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/maccormack_face_mask",maccormack_face_mask);}
-            FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_N",incompressible->projection.elliptic_solver->psi_N);
-            FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_D",incompressible->projection.elliptic_solver->psi_D);
-            FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/colors",incompressible->projection.elliptic_solver->filled_region_colors);}}
+                Write_To_File(stream_type,output_directory+"/"+f+"/maccormack_cell_mask",maccormack_cell_mask);
+                Write_To_File(stream_type,output_directory+"/"+f+"/maccormack_face_mask",maccormack_face_mask);}
+            Write_To_File(stream_type,output_directory+"/"+f+"/psi_N",incompressible->projection.elliptic_solver->psi_N);
+            Write_To_File(stream_type,output_directory+"/"+f+"/psi_D",incompressible->projection.elliptic_solver->psi_D);
+            Write_To_File(stream_type,output_directory+"/"+f+"/colors",incompressible->projection.elliptic_solver->filled_region_colors);}}
     else if(compressible){
         if(frame==first_frame){
-            FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",euler->grid);
-            if(mpi_grid) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/global_grid",mpi_grid->global_grid);}
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/grid",euler->grid);
-        if(mpi_grid) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/global_grid",mpi_grid->global_grid);
+            Write_To_File(stream_type,output_directory+"/common/grid",euler->grid);
+            if(mpi_grid) Write_To_File(stream_type,output_directory+"/common/global_grid",mpi_grid->global_grid);}
+        Write_To_File(stream_type,output_directory+"/"+f+"/grid",euler->grid);
+        if(mpi_grid) Write_To_File(stream_type,output_directory+"/"+f+"/global_grid",mpi_grid->global_grid);
 
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/euler_U",euler->U);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/euler_psi",euler->psi);
+        Write_To_File(stream_type,output_directory+"/"+f+"/euler_U",euler->U);
+        Write_To_File(stream_type,output_directory+"/"+f+"/euler_psi",euler->psi);
         euler->Fill_Ghost_Cells(0,0,number_of_ghost_cells);
         COMPRESSIBLE_AUXILIARY_DATA::Write_Auxiliary_Files(stream_type,output_directory,frame,euler->grid,3,euler->U_ghost,euler->psi,*euler->eos,write_debug_data,&(euler->conservation->fluxes));
-        if(write_debug_data && euler->timesplit) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/compressible_implicit_pressure",euler->euler_projection.p);
+        if(write_debug_data && euler->timesplit) Write_To_File(stream_type,output_directory+"/"+f+"/compressible_implicit_pressure",euler->euler_projection.p);
         if(write_debug_data){
-            FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/mac_velocities",euler->euler_projection.face_velocities);
-            FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_D",euler->euler_projection.elliptic_solver->psi_D);
-            FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_N",euler->euler_projection.elliptic_solver->psi_N);
+            Write_To_File(stream_type,output_directory+"/"+f+"/mac_velocities",euler->euler_projection.face_velocities);
+            Write_To_File(stream_type,output_directory+"/"+f+"/psi_D",euler->euler_projection.elliptic_solver->psi_D);
+            Write_To_File(stream_type,output_directory+"/"+f+"/psi_N",euler->euler_projection.elliptic_solver->psi_N);
             if(euler->apply_cavitation_correction){
-                FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/p_cavitation",euler->euler_cavitation_density.p_cavitation);
-                FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/p_internal_energy",euler->euler_cavitation_internal_energy.p_cavitation);}}
+                Write_To_File(stream_type,output_directory+"/"+f+"/p_cavitation",euler->euler_cavitation_density.p_cavitation);
+                Write_To_File(stream_type,output_directory+"/"+f+"/p_internal_energy",euler->euler_cavitation_internal_energy.p_cavitation);}}
 
         if(number_of_regions && write_levelset){
-            FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset_evolution->Particle_Levelset(0).levelset);}}
+            Write_To_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset_evolution->Particle_Levelset(0).levelset);}}
 }
 //#####################################################################
 // Function Log_Parameters 

@@ -233,7 +233,7 @@ Read_Texture_Coordinates(const std::string& filename)
     texture_coordinates=new ARRAY<VECTOR<T,2> >;
     triangle_texture_coordinates=new ARRAY<VECTOR<int,3> >;
     int backward_compatible;
-    FILE_UTILITIES::Read_From_File<RW>(filename,*texture_coordinates,backward_compatible,*triangle_texture_coordinates);
+    Read_From_File<RW>(filename,*texture_coordinates,backward_compatible,*triangle_texture_coordinates);
     Compute_Per_Vertex_Tangent_Vectors();
 }
 //#####################################################################

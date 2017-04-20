@@ -108,7 +108,7 @@ public:
 //#####################################################################
 };
 template<class TV> inline std::istream& operator>>(std::istream& input,FRAME<TV>& f)
-{FILE_UTILITIES::Ignore(input,'(');input>>f.t>>f.r;FILE_UTILITIES::Ignore(input,')');return input;}
+{Ignore(input,'(');input>>f.t>>f.r;Ignore(input,')');return input;}
 
 template<class TV> inline std::ostream& operator<<(std::ostream& output,const FRAME<TV>& f)
 {output<<"("<<f.t<<"  "<<f.r<<")";return output;}

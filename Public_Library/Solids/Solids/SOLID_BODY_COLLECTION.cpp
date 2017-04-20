@@ -290,7 +290,7 @@ Read(const STREAM_TYPE stream_type,const std::string& prefix,const int frame,con
 {
     std::string local_prefix=prefix;
     if(deformable_body_collection.mpi_solids && deformable_body_collection.mpi_solids->rank && !read_from_every_process){ // modify prefix to always read from the root's output
-        std::string old_suffix="/"+STRING_UTILITIES::Value_To_String(deformable_body_collection.mpi_solids->rank+1),new_suffix="/1";
+        std::string old_suffix="/"+Value_To_String(deformable_body_collection.mpi_solids->rank+1),new_suffix="/1";
         size_t position=prefix.size()-old_suffix.size();
         PHYSBAM_ASSERT(prefix.substr(position)==old_suffix);
         local_prefix.replace(position,std::string::npos,new_suffix);}
@@ -312,12 +312,12 @@ Write(const STREAM_TYPE stream_type,const std::string& prefix,const int frame,co
         ARRAY<FORCE_DATA<TV> > spring_data_list;
         for(int i=0;i<solids_forces.m;i++) solids_forces(i)->Add_Force_Data(spring_data_list);
         for(int i=0;i<deformable_body_collection.deformables_forces.m;i++) deformable_body_collection.deformables_forces(i)->Add_Force_Data(spring_data_list);
-        std::string f=FILE_UTILITIES::Number_To_String(frame);
-        if(spring_data_list.m!=0) FILE_UTILITIES::Write_To_File(stream_type,prefix+"/"+f+"/force_data",spring_data_list);}
+        std::string f=Number_To_String(frame);
+        if(spring_data_list.m!=0) Write_To_File(stream_type,prefix+"/"+f+"/force_data",spring_data_list);}
     if(write_rigid_body)
         rigid_body_collection.Write(stream_type,prefix,frame);
     if(output_interaction_pairs)
-        deformable_body_collection.triangle_repulsions.Output_Interaction_Pairs(stream_type,prefix+"/"+FILE_UTILITIES::Number_To_String(frame)+"/interaction_pairs");
+        deformable_body_collection.triangle_repulsions.Output_Interaction_Pairs(stream_type,prefix+"/"+Number_To_String(frame)+"/interaction_pairs");
 }
 //#####################################################################
 // Function Add_All_Forces

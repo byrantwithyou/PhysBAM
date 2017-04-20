@@ -115,12 +115,12 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
         if(!grid.Is_MAC_Grid())
             output_grid=GRID<TV>(grid.counts,RANGE<TV>(grid.domain.min_corner-grid.dX/2,grid.domain.max_corner+grid.dX/2),true);
         // TODO: put this back if you need it
-        /*FILE_UTILITIES::Write_To_File<T>("grid.debug",output_grid);
-          FILE_UTILITIES::Write_To_File<T>("triangulated_surface.debug",triangulated_surface);*/}
+        /*Write_To_File<T>("grid.debug",output_grid);
+          Write_To_File<T>("triangulated_surface.debug",triangulated_surface);*/}
 
     if(use_orthogonal_vote){
         // TODO: put this back if you need it
-        /*if(write_debug_data){FILE_UTILITIES::Write_To_File<T>("edge_is_blocked.debug",edge_is_blocked.Component(0),edge_is_blocked.Component(1),edge_is_blocked.Component(2));}*/
+        /*if(write_debug_data){Write_To_File<T>("edge_is_blocked.debug",edge_is_blocked.Component(0),edge_is_blocked.Component(1),edge_is_blocked.Component(2));}*/
         if(verbose) LOG::Time("Computing sign using orthogonal vote");
         ARRAY<bool,TV_INT> is_inside(grid.Domain_Indices());
         for(RANGE_ITERATOR<TV::m> it(grid.Domain_Indices());it.Valid();it.Next()){
@@ -138,7 +138,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
             FLOOD_FILL<TV::m> flood_fill;flood_fill.Optimize_Fill_For_Single_Cell_Regions(true);
             int number_of_colors=flood_fill.Flood_Fill(colors,null_edge_is_blocked);
             // TODO: put this back if you need it
-            //if(write_debug_data){FILE_UTILITIES::Write_To_File<T>("colors.debug",colors);}
+            //if(write_debug_data){Write_To_File<T>("colors.debug",colors);}
             ARRAY<int> region_size(number_of_colors);
             for(RANGE_ITERATOR<TV::m> it(grid.Domain_Indices());it.Valid();it.Next()) if(colors(it.index)>0) region_size(colors(it.index))++;
             int max_region_size=region_size.Max();
@@ -157,8 +157,8 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
             return false;}
         // TODO: put this back if you need it
         /*if(write_debug_data){
-            FILE_UTILITIES::Write_To_File<T>("colors.debug",colors);
-            FILE_UTILITIES::Write_To_File<T>("edge_is_blocked.debug",edge_is_blocked.Component(0),edge_is_blocked.Component(1),edge_is_blocked.Component(2));}
+            Write_To_File<T>("colors.debug",colors);
+            Write_To_File<T>("edge_is_blocked.debug",edge_is_blocked.Component(0),edge_is_blocked.Component(1),edge_is_blocked.Component(2));}
         if(write_debug_path){
             ARRAY<TV_INT> path_nodes;
             bool path_exists=flood_fill.Path_Between_Nodes(RANGE<TV_INT>(1,grid.counts.x,1,grid.counts.y,1,grid.counts.z),path_start_node,path_end_node,
@@ -166,7 +166,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
             if(verbose){LOG::cout<<"Path between "<<path_start_node<<" and "<<path_end_node<<" "<<(path_exists?"exists":"doesn't exist")<<std::endl;}
             ARRAY<bool,TV_INT> path(grid.Domain_Indices());
             for(int i=0;i<path_nodes.m;i++){path(path_nodes(i))=true;}
-            FILE_UTILITIES::Write_To_File<T>("path.debug",path);}*/
+            Write_To_File<T>("path.debug",path);}*/
         ARRAY<bool,VECTOR<int,1> > color_is_inside(0,number_of_colors);
         if(only_boundary_region_is_outside){
             ARRAY<bool> color_touches_boundary(number_of_colors);
@@ -249,8 +249,8 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
     // TODO: put this back if you need it
     /*if(write_debug_data){
         GRID<TV> grid_copy=grid;LEVELSET<TV> levelset(grid_copy,phi);
-        FILE_UTILITIES::Write_To_File<T>("levelset.debug",levelset);
-        if(compute_velocity)FILE_UTILITIES::Write_To_File<T>("velocity.debug",velocity);}*/
+        Write_To_File<T>("levelset.debug",levelset);
+        if(compute_velocity)Write_To_File<T>("velocity.debug",velocity);}*/
 
     if(verbose) LOG::cout<<"Done"<<std::endl;
 

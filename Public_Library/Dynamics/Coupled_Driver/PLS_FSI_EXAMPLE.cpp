@@ -299,10 +299,10 @@ Write_Output_Files(const int frame) const
             oo.Write("if_u",fluid_collection.incompressible_fluid_collection.face_velocities.array);
         if(fluids_parameters.euler) oo.Write("cf_U",fluids_parameters.euler->U.array.Flattened());}
 
-    FILE_UTILITIES::Create_Directory(output_directory);
+    Create_Directory(output_directory);
     std::string f=LOG::sprintf("%d",frame);
-    FILE_UTILITIES::Create_Directory(output_directory+"/"+f);
-    FILE_UTILITIES::Create_Directory(output_directory+"/common");
+    Create_Directory(output_directory+"/"+f);
+    Create_Directory(output_directory+"/common");
     Write_Frame_Title(frame);
     solid_body_collection.Write(stream_type,output_directory,frame,first_frame,solids_parameters.write_static_variables_every_frame,
         solids_parameters.rigid_body_evolution_parameters.write_rigid_bodies,solids_parameters.write_deformable_body,solids_parameters.write_from_every_process,

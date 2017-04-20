@@ -69,27 +69,27 @@ template<class T,int N>
 void Convert(const std::string& input,const std::string& output_filename_pattern,int start_at,bool dump_valid,bool attentive)
 {
     bool has_format_str=std::regex_match(output_filename_pattern,std::regex(".*%[0-9]*d.*"));
-    if(FILE_UTILITIES::Directory_Exists(input)){
+    if(Directory_Exists(input)){
         if(!has_format_str){
             LOG::printf("Format string missing from output file name! E.g. %%04d\n");
             exit(-1);}
 
         int last_frame;
-        FILE_UTILITIES::Read_From_Text_File(input+"/common/last_frame",last_frame);
+        Read_From_Text_File(input+"/common/last_frame",last_frame);
         PHYSBAM_ASSERT(start_at>=0 && start_at<=last_frame);
 #pragma omp parallel for
         for(int i=start_at;i<=last_frame;++i){
             MPM_PARTICLES<VECTOR<T,N> > particles;
-            FILE_UTILITIES::Read_From_File<T>(LOG::sprintf("%s/%d/mpm_particles.gz",input,i),particles);
+            Read_From_File<T>(LOG::sprintf("%s/%d/mpm_particles.gz",input,i),particles);
             writePartio<T,N>(LOG::sprintf(output_filename_pattern.c_str(),i),particles,dump_valid);
             if(attentive)
-                FILE_UTILITIES::Read_From_Text_File(input+"/common/last_frame",last_frame);}}
+                Read_From_Text_File(input+"/common/last_frame",last_frame);}}
     else{
         if(has_format_str){
             LOG::printf("Format string found in output file name! Did you want to convert a whole sim?\n");
             exit(-1);}
         MPM_PARTICLES<VECTOR<T,N> > particles;
-        FILE_UTILITIES::Read_From_File<T>(input,particles);
+        Read_From_File<T>(input,particles);
         writePartio<T,N>(output_filename_pattern,particles,dump_valid);}
 }
 

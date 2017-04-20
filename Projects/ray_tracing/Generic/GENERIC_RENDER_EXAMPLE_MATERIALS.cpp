@@ -328,7 +328,7 @@ Material(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         std::string raw_field_file=parameters.Get_Parameter("Field",std::string("<unknown>"));
         if(raw_field_file == "<unknown>"){LOG::cerr<<"You have to supply a field file for blending."<<std::endl;exit(1);}
         std::string field_file=Animated_Filename(raw_field_file,frame);
-        ARRAY<T>* field=new ARRAY<T>;FILE_UTILITIES::Read_From_File<RW>(field_file,*field);
+        ARRAY<T>* field=new ARRAY<T>;Read_From_File<RW>(field_file,*field);
         T low_value=parameters.Get_Parameter("Low_Value",(T)0),high_value=parameters.Get_Parameter("High_Value",(T)1);
         shaders.Set(name,new RENDERING_BLEND_TRIANGULATED_SURFACE_SHADER<T>(*field,low_value,high_value,*child_shader1,*child_shader2,direct_shading_only,world));
         LOG::cout<<"Material '"<<name<<"' Field="<<field_file<<" Range=["<<low_value<<","<<high_value<<"] Shader1="<<shader1_name<<" Shader2="<<shader2_name<<std::endl;}
@@ -440,7 +440,7 @@ Volume_Material(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameter
         voxel_shader->Set_Absorption_Shadow(absorption_shadow*TV(1,1,1));
         std::string temperature_remap_filename=parameters.Get_Parameter("Temperature_Remap",std::string("none"));
         if(temperature_remap_filename!="none"){
-            ARRAY<T,VECTOR<int,1> > temperature_remap;FILE_UTILITIES::Read_From_File<RW>(temperature_remap_filename,temperature_remap);voxel_shader->Use_Temperature_Remap(temperature_remap);}
+            ARRAY<T,VECTOR<int,1> > temperature_remap;Read_From_File<RW>(temperature_remap_filename,temperature_remap);voxel_shader->Use_Temperature_Remap(temperature_remap);}
         volume_shaders.Set(name,voxel_shader);
         LOG::cout<<"Volume shader '"<<name<<"' Absorption="<<absorption<<"' Absorption_Shadow="<<absorption_shadow<<" Scattering="<<scattering<<" Inscattering_Amplification="<<inscattering_amplification<<" Emission_Amplification="<<emission_amplification
             <<" Use_LMS_Scaling="<<use_lms_scaling<<" Empty_Levelset="<<empty_levelset_object_name<<std::endl;}

@@ -112,7 +112,7 @@ Initialize()
 
     if(example.auto_restart){
         std::string last_frame_file=example.output_directory+"/common/last_frame";
-        int last_frame;FILE_UTILITIES::Read_From_Text_File(last_frame_file,last_frame);
+        int last_frame;Read_From_Text_File(last_frame_file,last_frame);
         example.restart=true;example.restart_frame=last_frame;
         LOG::cout<<"Auto Restart from frame "<<last_frame<<" (from file "<<last_frame_file<<")"<<std::endl;}
     if(example.restart){current_frame=example.restart_frame;Read_Time(current_frame);}
@@ -180,7 +180,7 @@ Initialize()
     particle_levelset_evolution->Set_CFL_Number(example.fluids_parameters.cfl);
 
     // sets up the proper wall states
-    VECTOR<VECTOR<bool,2>,TV::m> domain_open_boundaries=VECTOR_UTILITIES::Complement(example.fluids_parameters.domain_walls);
+    VECTOR<VECTOR<bool,2>,TV::m> domain_open_boundaries=Complement(example.fluids_parameters.domain_walls);
     if(example.fluids_parameters.phi_boundary) example.fluids_parameters.phi_boundary->Set_Constant_Extrapolation(domain_open_boundaries);
     if(example.fluids_parameters.fluid_boundary) example.fluids_parameters.fluid_boundary->Set_Constant_Extrapolation(domain_open_boundaries);
 
@@ -603,9 +603,9 @@ template<class TV> void PLS_FSI_DRIVER<TV>::
 Write_Output_Files(const int frame)
 {
     LOG::SCOPE scope("writing output files");
-    FILE_UTILITIES::Create_Directory(example.output_directory);
-    FILE_UTILITIES::Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
-    FILE_UTILITIES::Create_Directory(example.output_directory+"/common");
+    Create_Directory(example.output_directory);
+    Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
+    Create_Directory(example.output_directory+"/common");
     Write_First_Frame(frame);
 
     example.fluids_parameters.phi_boundary_water.Use_Extrapolation_Mode(false);

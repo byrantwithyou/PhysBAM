@@ -27,7 +27,7 @@ FLUIDS_PARAMETERS(const TYPE type)
     :smoke(type==SMOKE),fire(type==FIRE),water(type==WATER),sph(type==SPH),compressible(type==COMPRESSIBLE),
     number_of_ghost_cells(3),cfl((T).9),gravity(-(T)9.8*TV::Axis_Vector(TV::m==1?0:1)),grid(new GRID<TV>()),need_destroy_grid(true),maximum_tree_depth(1),
     levelset_refinement_bandwidth(6),minimal_air_bandwidth(false),
-    phi_boundary_reflection(*new BOUNDARY_REFLECTION_UNIFORM<TV,T>(VECTOR_UTILITIES::Complement(domain_walls))),phi_boundary_water(*new T_BOUNDARY_PHI_WATER),
+    phi_boundary_reflection(*new BOUNDARY_REFLECTION_UNIFORM<TV,T>(Complement(domain_walls))),phi_boundary_water(*new T_BOUNDARY_PHI_WATER),
     particle_half_bandwidth(3),reseeding_frame_rate(20),reinitialize_geometry_frame_rate(1),bias_towards_negative_particles(false),
     use_particle_levelset(true),number_particles_per_cell(64),
     use_removed_positive_particles(false),use_removed_negative_particles(false),
@@ -35,7 +35,7 @@ FLUIDS_PARAMETERS(const TYPE type)
     use_sph_for_removed_negative_particles(false),
     normal_flame_speed((T).5),curvature_flame_speed(0),
     fluid_boundary_water(*new BOUNDARY<TV,T>),
-    boundary_mac_slip(*new T_BOUNDARY_MAC_GRID_SOLID_WALL_SLIP(VECTOR_UTILITIES::Complement(domain_walls))),
+    boundary_mac_slip(*new T_BOUNDARY_MAC_GRID_SOLID_WALL_SLIP(Complement(domain_walls))),
     incompressible_tolerance((T)1e-8),incompressible_iterations(20),cg_restart_iterations(0),
     use_body_force(false),
     density((T)1e3),outside_density(0),density_fuel(1),
@@ -131,7 +131,7 @@ Initialize_Turbulence(const T time,const T frame_rate)
 template<class TV> void FLUIDS_PARAMETERS<TV>::
 Initialize_Domain_Boundary_Conditions()
 {
-    VECTOR<VECTOR<bool,2>,TV::m> domain_open_boundaries=VECTOR_UTILITIES::Complement(domain_walls);
+    VECTOR<VECTOR<bool,2>,TV::m> domain_open_boundaries=Complement(domain_walls);
     if(phi_boundary) phi_boundary->Set_Constant_Extrapolation(domain_open_boundaries);
     if(fluid_boundary) fluid_boundary->Set_Constant_Extrapolation(domain_open_boundaries);
 

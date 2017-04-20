@@ -15,7 +15,7 @@ OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV> &gr
     :OPENGL_COMPONENT<T>(stream_type,"Face Scalar Field 3D"),opengl_scalar_field(stream_type,grid_input,internal_scalar_field,color_map_input),
       values_filename(values_filename_input),frame_loaded(-1),valid(false)
 {
-    is_animation = FILE_UTILITIES::Is_Animated(values_filename);
+    is_animation = Is_Animated(values_filename);
     Reinitialize();
 }
 //#####################################################################
@@ -31,7 +31,7 @@ template<class T,class T2> OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,T2>::
 template<class T,class T2> bool OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,T2>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::Frame_File_Exists(values_filename,frame_input);
+    return Frame_File_Exists(values_filename,frame_input);
 }
 //#####################################################################
 // Function Set_Frame
@@ -93,9 +93,9 @@ Reinitialize()
             valid = false;
 
             std::string filename;
-            filename=FILE_UTILITIES::Get_Frame_Filename(values_filename,frame);
-            if(FILE_UTILITIES::File_Exists(filename))
-                FILE_UTILITIES::Read_From_File(stream_type,filename,opengl_scalar_field.face_values);
+            filename=Get_Frame_Filename(values_filename,frame);
+            if(File_Exists(filename))
+                Read_From_File(stream_type,filename,opengl_scalar_field.face_values);
             else return;
 
             opengl_scalar_field.Update();

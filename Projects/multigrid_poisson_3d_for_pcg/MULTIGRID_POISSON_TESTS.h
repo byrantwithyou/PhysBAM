@@ -78,8 +78,8 @@ public:
 
         output_dir=LOG::sprintf("Test_%d_Resolution_%d",test_number,resolution);
 
-        FILE_UTILITIES::Create_Directory(output_dir);
-        FILE_UTILITIES::Create_Directory(output_dir+"/common");
+        Create_Directory(output_dir);
+        Create_Directory(output_dir+"/common");
 
         LOG::Initialize_Logging();
         LOG::Instance()->Copy_Log_To_File(output_dir+"/common/log.txt",false);
@@ -207,7 +207,7 @@ public:
         MULTIGRID_POISSON<T,d>& multigrid_poisson=multigrid_poisson_solver->Discretization();
         std::string f=LOG::sprintf("%i",frame);
 
-        FILE_UTILITIES::Write_To_File<float>(output_dir+"/common/grid",multigrid_poisson.grid);
+        Write_To_File<float>(output_dir+"/common/grid",multigrid_poisson.grid);
         ARRAY<T,TV_INT> x_as_density(x);
         T x_min=std::numeric_limits<T>::max();
         T x_max=-x_min;
@@ -223,9 +223,9 @@ public:
         if(x_range)
             x_as_density/=x_range;
 
-        FILE_UTILITIES::Create_Directory(output_dir+"/"+f);
-        FILE_UTILITIES::Write_To_File<float>(output_dir+"/"+f+"/density",x_as_density);
-        FILE_UTILITIES::Write_To_Text_File(output_dir+"/common/last_frame",frame);
+        Create_Directory(output_dir+"/"+f);
+        Write_To_File<float>(output_dir+"/"+f+"/density",x_as_density);
+        Write_To_Text_File(output_dir+"/common/last_frame",frame);
     }
 
     void Write_Substep(int substep,int frame)
@@ -235,8 +235,8 @@ public:
         std::string f=LOG::sprintf("%i",frame);
         std::string s=LOG::sprintf("%i",substep);
 
-        FILE_UTILITIES::Create_Directory(output_dir+"/Frame_"+f+"_x");        
-        FILE_UTILITIES::Create_Directory(output_dir+"/Frame_"+f+"_residual");
+        Create_Directory(output_dir+"/Frame_"+f+"_x");        
+        Create_Directory(output_dir+"/Frame_"+f+"_residual");
         ARRAY<T,TV_INT> x_as_density(x);
         ARRAY<T,TV_INT> r_as_density(b);
         T x_min=std::numeric_limits<T>::max();
@@ -262,14 +262,14 @@ public:
             r_as_density/=r_max;
         
         if(substep==0){
-            FILE_UTILITIES::Write_To_File<float>(output_dir+"/Frame_"+f+"_x/grid",multigrid_poisson.grid);
-            FILE_UTILITIES::Write_To_File<float>(output_dir+"/Frame_"+f+"_residual/grid",multigrid_poisson.grid);
+            Write_To_File<float>(output_dir+"/Frame_"+f+"_x/grid",multigrid_poisson.grid);
+            Write_To_File<float>(output_dir+"/Frame_"+f+"_residual/grid",multigrid_poisson.grid);
         }
-        FILE_UTILITIES::Write_To_File<float>(output_dir+"/Frame_"+f+"_x/density."+s,x_as_density);
-        FILE_UTILITIES::Write_To_File<float>(output_dir+"/Frame_"+f+"_residual/density."+s,r_as_density);
+        Write_To_File<float>(output_dir+"/Frame_"+f+"_x/density."+s,x_as_density);
+        Write_To_File<float>(output_dir+"/Frame_"+f+"_residual/density."+s,r_as_density);
 
-        FILE_UTILITIES::Write_To_Text_File(output_dir+"/Frame_"+f+"_x/last_frame",s);
-        FILE_UTILITIES::Write_To_Text_File(output_dir+"/Frame_"+f+"_residual/last_frame",s);
+        Write_To_Text_File(output_dir+"/Frame_"+f+"_x/last_frame",s);
+        Write_To_Text_File(output_dir+"/Frame_"+f+"_residual/last_frame",s);
 
 
     }

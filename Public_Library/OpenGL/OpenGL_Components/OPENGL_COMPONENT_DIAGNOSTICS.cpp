@@ -27,7 +27,7 @@ template<class T> OPENGL_COMPONENT_DIAGNOSTICS<T>::
 template<class T> bool OPENGL_COMPONENT_DIAGNOSTICS<T>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::Frame_File_Exists(filename,frame_input);
+    return Frame_File_Exists(filename,frame_input);
 }
 //#####################################################################
 // Set_Frame
@@ -57,9 +57,9 @@ Reinitialize()
       if((is_animation && frame_loaded != frame) || (!is_animation && frame_loaded==INT_MIN)){
             lines.Remove_All();
             valid=false;
-            std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(filename, frame);
-            if(FILE_UTILITIES::File_Exists(tmp_filename)){
-                std::istream* input=FILE_UTILITIES::Safe_Open_Input(tmp_filename,false);
+            std::string tmp_filename = Get_Frame_Filename(filename, frame);
+            if(File_Exists(tmp_filename)){
+                std::istream* input=Safe_Open_Input(tmp_filename,false);
                 std::string line;while(std::getline(*input,line)) lines.Append(line);
                 delete input;frame_loaded=frame;valid=true;}}}
 }

@@ -283,11 +283,11 @@ inline MATRIX<T,3,2> operator*(const UPPER_TRIANGULAR_MATRIX<T,3>& A,const MATRI
 template<class T>
 inline std::istream& operator>>(std::istream& input,MATRIX<T,3,2>& A)
 {
-    FILE_UTILITIES::Ignore(input,'[');
+    Ignore(input,'[');
     for(int i=0;i<3;i++){
         for(int j=0;j<2;j++) input>>A.x[i+j*3];
-        FILE_UTILITIES::Ignore(input,';');}
-    FILE_UTILITIES::Ignore(input,']');
+        Ignore(input,';');}
+    Ignore(input,']');
     return input;
 }
 }

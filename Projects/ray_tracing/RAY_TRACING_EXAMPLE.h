@@ -40,22 +40,22 @@ public:
     std::string Get_Output_Filename(const int frame)
     {std::string filename;
     filename=LOG::sprintf(output_filename.c_str(),frame);
-    if(keep_old_files && FILE_UTILITIES::File_Exists(filename)){
+    if(keep_old_files && File_Exists(filename)){
         std::string test_filename;
         for(int i=1;;i++){
-            test_filename=FILE_UTILITIES::Get_Basename(filename)+"-"+FILE_UTILITIES::Number_To_String(i)+"."+FILE_UTILITIES::Get_File_Extension(filename);
-            if(!FILE_UTILITIES::File_Exists(test_filename)) break;}
+            test_filename=Get_Basename(filename)+"-"+Number_To_String(i)+"."+Get_File_Extension(filename);
+            if(!File_Exists(test_filename)) break;}
         filename=test_filename;}
     return filename;}
 
     std::string Get_Alpha_Filename(const int frame)
     {std::string filename;
     filename=LOG::sprintf(alpha_filename.c_str(),frame);
-    if(keep_old_files && FILE_UTILITIES::File_Exists(filename)){
+    if(keep_old_files && File_Exists(filename)){
         std::string test_filename;
         for(int i=1;;i++){
-            test_filename=FILE_UTILITIES::Get_Basename(filename)+"-"+FILE_UTILITIES::Number_To_String(i)+"."+FILE_UTILITIES::Get_File_Extension(filename);
-            if(!FILE_UTILITIES::File_Exists(test_filename)) break;}
+            test_filename=Get_Basename(filename)+"-"+Number_To_String(i)+"."+Get_File_Extension(filename);
+            if(!File_Exists(test_filename)) break;}
         filename=test_filename;}
     return filename;}
 

@@ -128,7 +128,7 @@ Add_Rigid_Body(const STREAM_TYPE stream_type,const bool thin_shell,const std::st
     // rigid body
     std::string rgd=TV::m==2?"rgd2d":"rgd";
     if(read_rgd_file){
-        try{FILE_UTILITIES::Read_From_File(stream_type,basename+"."+rgd,rigid_body->Mass(),rigid_body->Inertia_Tensor(),rigid_body->Frame());}
+        try{Read_From_File(stream_type,basename+"."+rgd,rigid_body->Mass(),rigid_body->Inertia_Tensor(),rigid_body->Frame());}
         catch(FILESYSTEM_ERROR&){LOG::cout<<"Note: No "<<rgd<<" file for "<<basename<<" (using default values)"<<std::endl;}}
     if(scaling_factor!=1) rigid_body->Rescale(scaling_factor);
     rigid_body->Update_Angular_Velocity();
@@ -377,7 +377,7 @@ template<class TV> bool RIGID_BODY_COLLECTION<TV>::
 Find_Or_Read_Structure(const STREAM_TYPE stream_type,ARRAY<int>& structure_ids,const std::string& filename,const T scaling_factor,const TV& center)
 {
     int id;
-    if(!FILE_UTILITIES::File_Exists(filename)) return false;
+    if(!File_Exists(filename)) return false;
     std::string hashname=LOG::sprintf("%s@%.6f",filename.c_str(),scaling_factor); // mangle hash name
     if(!always_create_structure&&structure_hash.Get(hashname,id)){ // already read in
         if(!structure_list.Is_Active(id)) PHYSBAM_FATAL_ERROR();} // // only works if the referenced geometry is still in memory
@@ -435,7 +435,7 @@ Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,
     else structure_list.template Read<float>(directory,"rigid_body_structure_",frame);
     ARRAY<RIGID_BODY<TV>*> bodies(rigid_body_particles.rigid_body);
     rigid_body_particles.rigid_body.Fill(0);
-    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/rigid_body_particles",directory.c_str(),frame),rigid_body_particles);
+    Read_From_File(stream_type,LOG::sprintf("%s/%d/rigid_body_particles",directory.c_str(),frame),rigid_body_particles);
     while(rigid_body_particles.rigid_body.m<bodies.m) delete bodies.Pop();
     rigid_body_particles.rigid_body.Prefix(bodies.m)=bodies;
 
@@ -445,11 +445,11 @@ Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,
     char version;int next_id=0;ARRAY<int> active_ids;int local_frame=frame;
     std::string active_list_name=LOG::sprintf("%s/common/rigid_body_active_ids_list",directory.c_str(),frame);
     std::string active_name=LOG::sprintf("%s/%d/rigid_body_active_ids",directory.c_str(),frame);
-    if(FILE_UTILITIES::File_Exists(active_list_name)){
-        if(!frame_list_active){frame_list_active=new ARRAY<int>;FILE_UTILITIES::Read_From_File(stream_type,active_list_name,*frame_list_active);}
+    if(File_Exists(active_list_name)){
+        if(!frame_list_active){frame_list_active=new ARRAY<int>;Read_From_File(stream_type,active_list_name,*frame_list_active);}
         local_frame=(*frame_list_active)(frame_list_active->Binary_Search(frame));}
-    if(last_read_active!=local_frame && FILE_UTILITIES::File_Exists(active_name)){
-        FILE_UTILITIES::Read_From_File(stream_type,active_name,version,next_id,active_ids);
+    if(last_read_active!=local_frame && File_Exists(active_name)){
+        Read_From_File(stream_type,active_name,version,next_id,active_ids);
         last_read_active=local_frame;PHYSBAM_ASSERT(version==1);
         if(needs_destroy) for(int i=next_id;i<rigid_body_particles.Size();i++) if(!rigid_body_particles.rigid_body(i)) needs_destroy->Append(i);
         rigid_body_particles.Resize(next_id);}
@@ -460,15 +460,15 @@ Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,
         std::string key_file_list=LOG::sprintf("%s/common/rigid_body_key_list",directory.c_str());
         std::string key_file=LOG::sprintf("%s/%d/rigid_body_key",directory.c_str(),frame);
         char version;
-        if(FILE_UTILITIES::File_Exists(key_file_list)){
-            if(!frame_list_key){frame_list_key=new ARRAY<int>;FILE_UTILITIES::Read_From_File(stream_type,key_file_list,*frame_list_key);}
+        if(File_Exists(key_file_list)){
+            if(!frame_list_key){frame_list_key=new ARRAY<int>;Read_From_File(stream_type,key_file_list,*frame_list_key);}
             local_frame=(*frame_list_key)(frame_list_key->Binary_Search(frame));}
-        if(last_read_key!=local_frame && FILE_UTILITIES::File_Exists(key_file)){
-            FILE_UTILITIES::Read_From_File(stream_type,key_file,version,rigid_body_particles.structure_ids);
+        if(last_read_key!=local_frame && File_Exists(key_file)){
+            Read_From_File(stream_type,key_file,version,rigid_body_particles.structure_ids);
             last_read_active=local_frame;PHYSBAM_ASSERT(version==2 || version==3);}
 
         try{
-            std::istream* input=FILE_UTILITIES::Safe_Open_Input(directory+"/common/rigid_body_names",false);
+            std::istream* input=Safe_Open_Input(directory+"/common/rigid_body_names",false);
             int num;*input>>num;input->ignore(INT_MAX,'\n');
             rigid_body_names.Resize(num);
             for(int i=0;i<rigid_body_names.Size();i++) std::getline(*input,rigid_body_names(i));
@@ -500,7 +500,7 @@ Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame
     articulated_rigid_body.Write(stream_type,directory,frame);
     if(stream_type.use_doubles) structure_list.template Write<double>(directory,"rigid_body_structure_",frame);
     else structure_list.template Write<float>(directory,"rigid_body_structure_",frame);
-    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/rigid_body_particles",directory.c_str(),frame),rigid_body_particles);
+    Write_To_File(stream_type,LOG::sprintf("%s/%d/rigid_body_particles",directory.c_str(),frame),rigid_body_particles);
 
     // update names
     rigid_body_names.Resize(rigid_body_particles.Size());
@@ -510,10 +510,10 @@ Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame
         if(check_stale){
             if(!frame_list_active) frame_list_active=new ARRAY<int>;
             frame_list_active->Append(frame);
-            FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/common/rigid_body_active_ids_list",directory.c_str()),*frame_list_active);
+            Write_To_File(stream_type,LOG::sprintf("%s/common/rigid_body_active_ids_list",directory.c_str()),*frame_list_active);
             is_stale_active=false;}
-        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/rigid_body_active_ids",directory.c_str(),frame),(char)1,rigid_body_particles.Size(),active_ids);}
-    std::ostream* output=FILE_UTILITIES::Safe_Open_Output(directory+"/common/rigid_body_names",false);
+        Write_To_File(stream_type,LOG::sprintf("%s/%d/rigid_body_active_ids",directory.c_str(),frame),(char)1,rigid_body_particles.Size(),active_ids);}
+    std::ostream* output=Safe_Open_Output(directory+"/common/rigid_body_names",false);
     *output<<rigid_body_names.Size()<<std::endl;
     for(int i=0;i<rigid_body_names.Size();i++) *output<<rigid_body_names(i)<<std::endl;
     delete output;
@@ -522,9 +522,9 @@ Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame
         if(check_stale){
             if(!frame_list_key) frame_list_key=new ARRAY<int>;
             frame_list_key->Append(frame);
-            FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/common/rigid_body_key_list",directory.c_str()),*frame_list_key);
+            Write_To_File(stream_type,LOG::sprintf("%s/common/rigid_body_key_list",directory.c_str()),*frame_list_key);
             is_stale_key=false;}
-        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/rigid_body_key",directory.c_str(),frame),version,rigid_body_particles.structure_ids);}
+        Write_To_File(stream_type,LOG::sprintf("%s/%d/rigid_body_key",directory.c_str(),frame),version,rigid_body_particles.structure_ids);}
 }
 //#####################################################################
 template class RIGID_BODY_COLLECTION<VECTOR<float,1> >;

@@ -62,26 +62,26 @@ void Write_Auxiliary_Files(const STREAM_TYPE stream_type,const std::string& outp
         GRADIENT::Compute_Magnitude(grid,number_of_ghost_cells,density,density_gradient);
         GRADIENT::Compute_Magnitude(grid,number_of_ghost_cells,pressure,pressure_gradient);
         
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/density_flux",density_flux);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/momentum_flux",momentum_flux);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/energy_flux",energy_flux);
+        Write_To_File(stream_type,output_directory+"/"+f+"/density_flux",density_flux);
+        Write_To_File(stream_type,output_directory+"/"+f+"/momentum_flux",momentum_flux);
+        Write_To_File(stream_type,output_directory+"/"+f+"/energy_flux",energy_flux);
 
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/momentum",momentum);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/energy",energy);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/density_gradient",density_gradient);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/pressure_gradient",pressure_gradient);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/entropy",entropy);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/enthalpy",enthalpy);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/speedofsound",speedofsound);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/machnumber",machnumber);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/internal_energy",internal_energy);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/velocity_plus_c",velocity_plus_c);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/velocity_minus_c",velocity_minus_c);}
+        Write_To_File(stream_type,output_directory+"/"+f+"/momentum",momentum);
+        Write_To_File(stream_type,output_directory+"/"+f+"/energy",energy);
+        Write_To_File(stream_type,output_directory+"/"+f+"/density_gradient",density_gradient);
+        Write_To_File(stream_type,output_directory+"/"+f+"/pressure_gradient",pressure_gradient);
+        Write_To_File(stream_type,output_directory+"/"+f+"/entropy",entropy);
+        Write_To_File(stream_type,output_directory+"/"+f+"/enthalpy",enthalpy);
+        Write_To_File(stream_type,output_directory+"/"+f+"/speedofsound",speedofsound);
+        Write_To_File(stream_type,output_directory+"/"+f+"/machnumber",machnumber);
+        Write_To_File(stream_type,output_directory+"/"+f+"/internal_energy",internal_energy);
+        Write_To_File(stream_type,output_directory+"/"+f+"/velocity_plus_c",velocity_plus_c);
+        Write_To_File(stream_type,output_directory+"/"+f+"/velocity_minus_c",velocity_minus_c);}
 
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/density",density);
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/pressure",pressure);
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/temperature",temperature);
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/centered_velocities",velocity);
+    Write_To_File(stream_type,output_directory+"/"+f+"/density",density);
+    Write_To_File(stream_type,output_directory+"/"+f+"/pressure",pressure);
+    Write_To_File(stream_type,output_directory+"/"+f+"/temperature",temperature);
+    Write_To_File(stream_type,output_directory+"/"+f+"/centered_velocities",velocity);
 }
 template<class TV>
 void Write_Auxiliary_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame,const COMPRESSIBLE_FLUID_COLLECTION<TV>& compressible_fluid_collection,const bool write_debug_data)

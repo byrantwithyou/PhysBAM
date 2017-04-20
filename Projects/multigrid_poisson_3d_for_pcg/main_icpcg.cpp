@@ -130,7 +130,7 @@ int main(int argc,char* argv[])
 
     const T h=(T)1/(T)m;                
 
-    FILE_UTILITIES::Create_Directory(output_dir);
+    Create_Directory(output_dir);
 
     LOG::Initialize_Logging();
     LOG::Instance()->Copy_Log_To_File(output_dir+"/log.txt",false);
@@ -144,10 +144,10 @@ int main(int argc,char* argv[])
         
         switch(test_number){
             case 1: // Water
-                FILE_UTILITIES::Read_From_File<T>("/u/gojira/s1/terangroup/amcadams/free_surface_output/medium_pour_512_deep_pool/cell_type.90",multigrid_poisson.cell_type);
+                Read_From_File<T>("/u/gojira/s1/terangroup/amcadams/free_surface_output/medium_pour_512_deep_pool/cell_type.90",multigrid_poisson.cell_type);
                 break;
             case 2: // car
-                FILE_UTILITIES::Read_From_File<T>("/u/godzilla/s2/jteran/aleka/smoke_output/768_car/cell_type.10",multigrid_poisson.cell_type);
+                Read_From_File<T>("/u/godzilla/s2/jteran/aleka/smoke_output/768_car/cell_type.10",multigrid_poisson.cell_type);
                 break;
             case 3: // sphere 64
             case 4:
@@ -210,12 +210,12 @@ int main(int argc,char* argv[])
             
             cg.print_residuals=true;
             
-            FILE_UTILITIES::Create_Directory("output_x");
-            FILE_UTILITIES::Create_Directory("output_r");
-            FILE_UTILITIES::Create_Directory("output_rhs");
-            FILE_UTILITIES::Write_To_File<float>("output_x/grid",multigrid_poisson.grid);
-            FILE_UTILITIES::Write_To_File<float>("output_r/grid",multigrid_poisson.grid);
-            FILE_UTILITIES::Write_To_File<float>("output_rhs/grid",multigrid_poisson.grid);
+            Create_Directory("output_x");
+            Create_Directory("output_r");
+            Create_Directory("output_rhs");
+            Write_To_File<float>("output_x/grid",multigrid_poisson.grid);
+            Write_To_File<float>("output_r/grid",multigrid_poisson.grid);
+            Write_To_File<float>("output_rhs/grid",multigrid_poisson.grid);
             ARRAYS_3D<T> r_as_density(multigrid_poisson.grid);
             ARRAYS_3D<T> rhs_as_density(multigrid_poisson.grid);
             
@@ -230,7 +230,7 @@ int main(int argc,char* argv[])
             
             LOG::cout<<"Max rhs : "<<rhs_max<<std::endl;
             
-            FILE_UTILITIES::Write_To_File<RW>("output_rhs/density.0",rhs_as_density);
+            Write_To_File<RW>("output_rhs/density.0",rhs_as_density);
             
             for(int i=0;i<30;i++){
                 x=x_save;
@@ -263,10 +263,10 @@ int main(int argc,char* argv[])
                 if(x_range)
                     x/=x_range;
                 
-                FILE_UTILITIES::Write_To_File<RW>("output_x/density."+FILE_UTILITIES::Number_To_String(i),x);
-                FILE_UTILITIES::Write_To_File<RW>("output_r/density."+FILE_UTILITIES::Number_To_String(i),r_as_density);
-                FILE_UTILITIES::Write_To_Text_File("output_x/last_frame",i,"\n");
-                FILE_UTILITIES::Write_To_Text_File("output_r/last_frame",i,"\n");
+                Write_To_File<RW>("output_x/density."+Number_To_String(i),x);
+                Write_To_File<RW>("output_r/density."+Number_To_String(i),r_as_density);
+                Write_To_Text_File("output_x/last_frame",i,"\n");
+                Write_To_Text_File("output_r/last_frame",i,"\n");
             }
             
         }

@@ -53,7 +53,7 @@ Reinitialize(const bool force,const bool read_geometry)
 {
     if(draw && (force || (is_animation && (frame_loaded!=frame)) || (!is_animation && (frame_loaded<0)))){
         valid=false;
-        if(!FILE_UTILITIES::File_Exists(LOG::sprintf("%s/%d/rigid_body_particles",basedir.c_str(),frame))) return;
+        if(!File_Exists(LOG::sprintf("%s/%d/rigid_body_particles",basedir.c_str(),frame))) return;
         rigid_body_collection.Read(stream_type,basedir,frame,&needs_init,&needs_destroy);
 
         if(has_init_destroy_information) for(int i=0;i<needs_destroy.m;i++) Destroy_Geometry(needs_destroy(i));
@@ -140,7 +140,7 @@ Update_Object_Labels()
 template<class T> bool OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::File_Exists(LOG::sprintf("%s/%d/rigid_bodies",basedir.c_str(),frame_input));
+    return File_Exists(LOG::sprintf("%s/%d/rigid_bodies",basedir.c_str(),frame_input));
 }
 //#####################################################################
 // Function Set_Frame

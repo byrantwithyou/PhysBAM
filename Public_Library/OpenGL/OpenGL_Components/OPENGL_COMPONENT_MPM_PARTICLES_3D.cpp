@@ -41,7 +41,7 @@ OPENGL_COMPONENT_MPM_PARTICLES_3D(STREAM_TYPE stream_type,const std::string &fil
     viewer_callbacks.Set("toggle_F",{[this](){draw_F=!draw_F;},"Toggle F display"});
     viewer_callbacks.Set("toggle_B",{[this](){draw_B=!draw_B;},"Toggle B display"});
 
-    is_animation=FILE_UTILITIES::Is_Animated(filename);
+    is_animation=Is_Animated(filename);
     // Don't need to call Reinitialize here because it will be called in first call to Set_Frame
 }
 //#####################################################################
@@ -58,7 +58,7 @@ template<class T> OPENGL_COMPONENT_MPM_PARTICLES_3D<T>::
 template<class T> bool OPENGL_COMPONENT_MPM_PARTICLES_3D<T>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::Frame_File_Exists(filename,frame_input);
+    return Frame_File_Exists(filename,frame_input);
 }
 //#####################################################################
 // Function Set_Frame
@@ -249,10 +249,10 @@ Reinitialize(bool force)
     valid=true;
 
     std::string frame_filename;
-    frame_filename=FILE_UTILITIES::Get_Frame_Filename(filename,frame);
+    frame_filename=Get_Frame_Filename(filename,frame);
         
     try{
-        std::istream* input_file=FILE_UTILITIES::Safe_Open_Input(frame_filename);
+        std::istream* input_file=Safe_Open_Input(frame_filename);
         TYPED_ISTREAM typed_input(*input_file,stream_type);
         Read_Binary(typed_input,particles);
         delete input_file;}

@@ -25,7 +25,7 @@ int main(int argc,char *argv[])
     GRID<VECTOR<T,3> > grid;
     ARRAY<T,VECTOR<int,3> > phi;
     LEVELSET_IMPLICIT_OBJECT<TV> implicit_surface(grid,phi);
-    FILE_UTILITIES::Read_From_File(stream_type,argv[1],implicit_surface);
+    Read_From_File(stream_type,argv[1],implicit_surface);
     std::cout<<"Grid : "<<grid<<std::endl;
 
     TRIANGULATED_SURFACE<T>& triangulated_surface=*DUALCONTOUR_3D<T>::Create_Triangulated_Surface_From_Levelset(implicit_surface.levelset);
@@ -33,7 +33,7 @@ int main(int argc,char *argv[])
     std::cout<<"Surface triangles : "<<triangulated_surface.mesh.elements.m<<std::endl;
     std::cout<<"Surface particles : "<<triangulated_surface.particles.Size()<<std::endl;
 
-    FILE_UTILITIES::Write_To_File(stream_type,argv[2],triangulated_surface);
+    Write_To_File(stream_type,argv[2],triangulated_surface);
 
     return 0;
 }

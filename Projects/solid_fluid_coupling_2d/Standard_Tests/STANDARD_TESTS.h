@@ -391,8 +391,8 @@ public:
     void Postprocess_Frame(const int frame) override
     {
         if(debug_particles.Size()){
-            FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),frame));
-            FILE_UTILITIES::Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles);
+            Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),frame));
+            Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles);
             debug_particles.Delete_All_Elements();}
 
         if(SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>* evolution=dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>*>(solids_evolution)){
@@ -1385,8 +1385,8 @@ void Analytic_Test()
     analytic_solution=-(solid_mass*solid_gravity.Magnitude()+rho*size.x*size.y*fluids_parameters.gravity.Magnitude())*size.x/(2*size.y*fluids_parameters.viscosity);
     LOG::cout<<"analytic_solution "<<analytic_solution<<std::endl;
 
-    FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),0));
-    FILE_UTILITIES::Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),0),debug_particles);
+    Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),0));
+    Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),0),debug_particles);
 }
 //#####################################################################
 // Function Flow_Past_Fixed_Cylinder
@@ -1428,8 +1428,8 @@ void Flow_Past_Fixed_Cylinder()
     sample_points.Append(TV(3,2.25));
     sample_points.Append(TV(2,3));
 
-    FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),0));
-    FILE_UTILITIES::Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),0),debug_particles);
+    Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),0));
+    Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),0),debug_particles);
 }
 //#####################################################################
 // Function Flow_Past_Fixed_Cylinder
@@ -1455,8 +1455,8 @@ void Vortex_Shedding()
     rigid_body.is_static=true;
     Add_Volumetric_Body_To_Fluid_Simulation(rigid_body);
 
-    FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),0));
-    FILE_UTILITIES::Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),0),debug_particles);
+    Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),0));
+    Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),0),debug_particles);
 }
 //#####################################################################
 // Function Oscillating_Disk_Domain_Velocity_Sample

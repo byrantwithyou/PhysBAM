@@ -69,7 +69,7 @@ inline PAIR<T1,T2> Tuple(const T1& x,const T2& y)
 
 template<class T1,class T2>
 inline std::istream& operator>>(std::istream& input,PAIR<T1,T2>& p)
-{FILE_UTILITIES::Ignore(input,'(');input>>p.x>>p.y;FILE_UTILITIES::Ignore(input,')');return input;}
+{Ignore(input,'(');input>>p.x>>p.y;Ignore(input,')');return input;}
 
 template<class T1,class T2>
 inline std::ostream& operator<<(std::ostream& output,const PAIR<T1,T2>& p)

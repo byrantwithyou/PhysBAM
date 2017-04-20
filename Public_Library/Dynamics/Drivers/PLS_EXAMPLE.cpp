@@ -39,19 +39,19 @@ Write_Output_Files(const int frame)
 {
     if(!write_output_files) return;
     std::string f=LOG::sprintf("%d",frame);
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/mac_velocities",face_velocities);
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",mac_grid);
-    if(mpi_grid) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/global_grid",mpi_grid->global_grid);
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/pressure",incompressible.projection.p);
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_N",projection.elliptic_solver->psi_N);
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_D",projection.elliptic_solver->psi_D);
+    Write_To_File(stream_type,output_directory+"/"+f+"/mac_velocities",face_velocities);
+    Write_To_File(stream_type,output_directory+"/common/grid",mac_grid);
+    if(mpi_grid) Write_To_File(stream_type,output_directory+"/common/global_grid",mpi_grid->global_grid);
+    Write_To_File(stream_type,output_directory+"/"+f+"/pressure",incompressible.projection.p);
+    Write_To_File(stream_type,output_directory+"/"+f+"/psi_N",projection.elliptic_solver->psi_N);
+    Write_To_File(stream_type,output_directory+"/"+f+"/psi_D",projection.elliptic_solver->psi_D);
     PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=particle_levelset_evolution.Particle_Levelset(0);
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset.levelset);
-    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,"positive_particles"),particle_levelset.positive_particles);
-    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,"negative_particles"),particle_levelset.negative_particles);
-    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,"removed_positive_particles"),particle_levelset.removed_positive_particles);
-    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,"removed_negative_particles"),particle_levelset.removed_negative_particles);
-    FILE_UTILITIES::Write_To_Text_File(output_directory+"/"+f+"/last_unique_particle_id",particle_levelset.last_unique_particle_id);
+    Write_To_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset.levelset);
+    Write_To_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,"positive_particles"),particle_levelset.positive_particles);
+    Write_To_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,"negative_particles"),particle_levelset.negative_particles);
+    Write_To_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,"removed_positive_particles"),particle_levelset.removed_positive_particles);
+    Write_To_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,"removed_negative_particles"),particle_levelset.removed_negative_particles);
+    Write_To_Text_File(output_directory+"/"+f+"/last_unique_particle_id",particle_levelset.last_unique_particle_id);
 }
 //#####################################################################
 // Function Read_Output_Files
@@ -61,17 +61,17 @@ Read_Output_Files(const int frame)
 {
     std::string f=LOG::sprintf("%d",frame);
     PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=particle_levelset_evolution.Particle_Levelset(0);
-    FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset.levelset);
-    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,"positive_particles"),particle_levelset.positive_particles);
-    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,"negative_particles"),particle_levelset.negative_particles);
-    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,"removed_positive_particles"),particle_levelset.removed_positive_particles);
-    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,"removed_negative_particles"),particle_levelset.removed_negative_particles);
-    FILE_UTILITIES::Read_From_Text_File(output_directory+"/"+f+"/last_unique_particle_id",particle_levelset.last_unique_particle_id);
+    Read_From_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset.levelset);
+    Read_From_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,"positive_particles"),particle_levelset.positive_particles);
+    Read_From_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,"negative_particles"),particle_levelset.negative_particles);
+    Read_From_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,"removed_positive_particles"),particle_levelset.removed_positive_particles);
+    Read_From_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,"removed_negative_particles"),particle_levelset.removed_negative_particles);
+    Read_From_Text_File(output_directory+"/"+f+"/last_unique_particle_id",particle_levelset.last_unique_particle_id);
     std::string filename;
     filename=output_directory+"/"+f+"/pressure";
-    if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading pressure "<<filename<<std::endl;FILE_UTILITIES::Read_From_File(stream_type,filename,incompressible.projection.p);}
+    if(File_Exists(filename)){LOG::cout<<"Reading pressure "<<filename<<std::endl;Read_From_File(stream_type,filename,incompressible.projection.p);}
     filename=output_directory+"/"+f+"/mac_velocities";
-    if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading mac_velocities "<<filename<<std::endl;FILE_UTILITIES::Read_From_File(stream_type,filename,face_velocities);}
+    if(File_Exists(filename)){LOG::cout<<"Reading mac_velocities "<<filename<<std::endl;Read_From_File(stream_type,filename,face_velocities);}
 }
 //#####################################################################
 // Function Adjust_Particle_For_Domain_Boundaries

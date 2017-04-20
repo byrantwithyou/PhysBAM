@@ -510,24 +510,24 @@ Read_Output_Files_Fluids(const int frame)
             /*
             if(fluids_parameters.smoke && fluids_parameters.use_density && fluids_parameters.semi_lagrangian_collidable_density.use_valid_mask){
                 filename=output_directory+"/density_valid_mask."+f;
-                if(FILE_UTILITIES::File_Exists(filename)){
+                if(File_Exists(filename)){
                     LOG::cout<<"Reading "<<filename<<std::endl;
-                    FILE_UTILITIES::Read_From_File(stream_type,filename,fluids_parameters.semi_lagrangian_collidable_density.valid_points_current);}}
+                    Read_From_File(stream_type,filename,fluids_parameters.semi_lagrangian_collidable_density.valid_points_current);}}
             if(fluids_parameters.smoke && fluids_parameters.use_temperature && fluids_parameters.semi_lagrangian_collidable_temperature.use_valid_mask){
                 filename=output_directory+"/temperature_valid_mask."+f;
-                if(FILE_UTILITIES::File_Exists(filename)){
+                if(File_Exists(filename)){
                     LOG::cout<<"Reading "<<filename<<std::endl;
-                    FILE_UTILITIES::Read_From_File(stream_type,filename,fluids_parameters.semi_lagrangian_collidable_temperature.valid_points_current);}}
+                    Read_From_File(stream_type,filename,fluids_parameters.semi_lagrangian_collidable_temperature.valid_points_current);}}
             if(fluids_parameters.semi_lagrangian_collidable_velocity.use_valid_mask){
                 filename=output_directory+"/velocity_valid_mask."+f;
-                if(FILE_UTILITIES::File_Exists(filename)){
+                if(File_Exists(filename)){
                     LOG::cout<<"Reading "<<filename<<std::endl;
-                    FILE_UTILITIES::Read_From_File(stream_type,filename,fluids_parameters.semi_lagrangian_collidable_velocity.valid_points_current);}}
+                    Read_From_File(stream_type,filename,fluids_parameters.semi_lagrangian_collidable_velocity.valid_points_current);}}
             if((fluids_parameters.water || fluids_parameters.fire) && fluids_parameters.semi_lagrangian_collidable_phi.use_valid_mask){
                 filename=output_directory+"/phi_valid_mask."+f;
-                if(FILE_UTILITIES::File_Exists(filename)){
+                if(File_Exists(filename)){
                     LOG::cout<<"Reading "<<filename<<std::endl;
-                    FILE_UTILITIES::Read_From_File(stream_type,filename,fluids_parameters.semi_lagrangian_collidable_phi.valid_points_current);}}*/}}
+                    Read_From_File(stream_type,filename,fluids_parameters.semi_lagrangian_collidable_phi.valid_points_current);}}*/}}
 }
 //#####################################################################
 // Function Write_Output_Files
@@ -552,10 +552,10 @@ Write_Output_Files(const int frame) const
         if(fluids_parameters.euler) oo.Write("cf_U",fluids_parameters.euler->U.array.Flattened());}
 
 
-    FILE_UTILITIES::Create_Directory(output_directory);
+    Create_Directory(output_directory);
     std::string f=LOG::sprintf("%d",frame);
-    FILE_UTILITIES::Create_Directory(output_directory+"/"+f);
-    FILE_UTILITIES::Create_Directory(output_directory+"/common");
+    Create_Directory(output_directory+"/"+f);
+    Create_Directory(output_directory+"/common");
     Write_Frame_Title(frame);
     debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
     solid_body_collection.Write(stream_type,output_directory,frame,first_frame,solids_parameters.write_static_variables_every_frame,
@@ -570,16 +570,16 @@ Write_Output_Files(const int frame) const
         if(fluids_parameters.solid_affects_fluid && fluids_parameters.fluid_affects_solid){
             if(fluids_parameters.write_debug_data){
                 /*
-                FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/thin_shells_grid_visibility."+f,fluids_parameters.collision_bodies_affecting_fluid->cell_neighbors_visible,
+                Write_To_File(stream_type,output_directory+"/thin_shells_grid_visibility."+f,fluids_parameters.collision_bodies_affecting_fluid->cell_neighbors_visible,
                     fluids_parameters.collision_bodies_affecting_fluid->face_corners_visible_from_face_center);
                 if(fluids_parameters.smoke && fluids_parameters.use_density && fluids_parameters.semi_lagrangian_collidable_density.use_valid_mask)
-                    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/density_valid_mask."+f,fluids_parameters.semi_lagrangian_collidable_density.valid_points_current);
+                    Write_To_File(stream_type,output_directory+"/density_valid_mask."+f,fluids_parameters.semi_lagrangian_collidable_density.valid_points_current);
                 if(fluids_parameters.smoke && fluids_parameters.use_temperature && fluids_parameters.semi_lagrangian_collidable_temperature.use_valid_mask)
-                    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/temperature_valid_mask."+f,fluids_parameters.semi_lagrangian_collidable_temperature.valid_points_current);
-                if(fluids_parameters.semi_lagrangian_collidable_velocity.use_valid_mask) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/velocity_valid_mask."+f,
+                    Write_To_File(stream_type,output_directory+"/temperature_valid_mask."+f,fluids_parameters.semi_lagrangian_collidable_temperature.valid_points_current);
+                if(fluids_parameters.semi_lagrangian_collidable_velocity.use_valid_mask) Write_To_File(stream_type,output_directory+"/velocity_valid_mask."+f,
                     fluids_parameters.semi_lagrangian_collidable_velocity.valid_points_current);
                 if((fluids_parameters.water || fluids_parameters.fire) && fluids_parameters.semi_lagrangian_collidable_phi.use_valid_mask)
-                    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/phi_valid_mask."+f,fluids_parameters.semi_lagrangian_collidable_phi.valid_points_current);*/}}}
+                    Write_To_File(stream_type,output_directory+"/phi_valid_mask."+f,fluids_parameters.semi_lagrangian_collidable_phi.valid_points_current);*/}}}
 }
 //#####################################################################
 // Function Log_Parameters 

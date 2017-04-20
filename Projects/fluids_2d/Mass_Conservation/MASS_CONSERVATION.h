@@ -61,7 +61,7 @@ public:
         parse_args.Parse();
         LOG::cout<<"Example number "<<test_number<<std::endl;
         std::string filename=LOG::sprintf("Mass_Conservation/example_%d.param",test_number);
-        if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading parameter file '"<<filename<<"'"<<std::endl;parameter_list.Read(filename);}
+        if(File_Exists(filename)){LOG::cout<<"Reading parameter file '"<<filename<<"'"<<std::endl;parameter_list.Read(filename);}
         random.Set_Seed(7411);
 
         // Common parameters

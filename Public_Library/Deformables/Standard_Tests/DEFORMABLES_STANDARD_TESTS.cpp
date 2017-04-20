@@ -129,7 +129,7 @@ Create_Tetrahedralized_Volume(const std::string& filename,const RIGID_BODY_STATE
     PHYSBAM_ASSERT(density>0);
     DEFORMABLE_PARTICLES<TV>& particles=*new DEFORMABLE_PARTICLES<TV>;
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=*TETRAHEDRALIZED_VOLUME<T>::Create(particles);
-    FILE_UTILITIES::Read_From_File(stream_type,filename,tetrahedralized_volume);
+    Read_From_File(stream_type,filename,tetrahedralized_volume);
     tetrahedralized_volume.Rescale(scale);
     LOG::cout<<"Adding Tetrahedralized Volume - Tetrahedra = "<<tetrahedralized_volume.mesh.elements.m<<std::endl;
     Set_Mass_Of_Particles(tetrahedralized_volume,density,use_constant_mass);
@@ -164,7 +164,7 @@ Create_Triangulated_Object(const std::string& filename,const RIGID_BODY_STATE<TV
     PHYSBAM_ASSERT(scale>0);
     DEFORMABLE_PARTICLES<TV>& particles=*new DEFORMABLE_PARTICLES<TV>;
     T_TRIANGULATED_OBJECT& triangulated_object=*T_TRIANGULATED_OBJECT::Create(particles);
-    FILE_UTILITIES::Read_From_File(stream_type,filename,triangulated_object);
+    Read_From_File(stream_type,filename,triangulated_object);
     triangulated_object.Rescale(scale);
     LOG::cout<<"Adding Triangulated Object - Triangles = "<<triangulated_object.mesh.elements.m<<std::endl;
     T density=TV::m==1?1:TV::m==2?100:1000;
@@ -182,7 +182,7 @@ Create_Segmented_Curve(const std::string& filename,const RIGID_BODY_STATE<TV>& i
 {
     DEFORMABLE_PARTICLES<TV>& particles=*new DEFORMABLE_PARTICLES<TV>;
     T_SEGMENTED_CURVE& segmented_curve=*T_SEGMENTED_CURVE::Create(particles);
-    FILE_UTILITIES::Read_From_File(stream_type,filename,segmented_curve);
+    Read_From_File(stream_type,filename,segmented_curve);
     LOG::cout<<"Adding Segmented Curve - Segments = "<<segmented_curve.mesh.elements.m<<std::endl;
     T density=TV::m==1?1:TV::m==2?100:1000;
     Set_Mass_Of_Particles(segmented_curve,density,use_constant_mass);
@@ -318,13 +318,13 @@ Initialize_Implicit_Surface(T_SURFACE& surface,int max_res) const
 template<class TV> LEVELSET_IMPLICIT_OBJECT<TV>* DEFORMABLES_STANDARD_TESTS<TV>::
 Read_Or_Initialize_Implicit_Surface(const std::string& levelset_filename,const std::string& output_directory,TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface) const
 {
-    if(FILE_UTILITIES::File_Exists(levelset_filename)){
+    if(File_Exists(levelset_filename)){
         LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*LEVELSET_IMPLICIT_OBJECT<TV>::Create();
-        FILE_UTILITIES::Read_From_File(stream_type,levelset_filename,undeformed_levelset);
+        Read_From_File(stream_type,levelset_filename,undeformed_levelset);
         return &undeformed_levelset;}
     LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*Initialize_Implicit_Surface(undeformed_triangulated_surface,100);
-    FILE_UTILITIES::Create_Directory(output_directory);
-    FILE_UTILITIES::Write_To_File(stream_type,levelset_filename,undeformed_levelset);
+    Create_Directory(output_directory);
+    Write_To_File(stream_type,levelset_filename,undeformed_levelset);
     return &undeformed_levelset;
 }
 //#####################################################################

@@ -12,8 +12,8 @@ template<class T,class RW> void Convert(const std::string& input_filename,const 
 {
 //    typedef VECTOR<T,3> TV;
 
-    TRIANGULATED_SURFACE<T>* triangulated_surface=0;FILE_UTILITIES::Create_From_File<RW>(input_filename,triangulated_surface);
-    std::ostream* output=FILE_UTILITIES::Safe_Open_Output(output_filename,false);
+    TRIANGULATED_SURFACE<T>* triangulated_surface=0;Create_From_File<RW>(input_filename,triangulated_surface);
+    std::ostream* output=Safe_Open_Output(output_filename,false);
 
     std::string header("# simple obj file format:\n"
         "#   # vertex at coordinates (x,y,z)\n"
@@ -48,7 +48,7 @@ int main(int argc,char *argv[])
     parse_args.Parse();
 
 
-    if(!FILE_UTILITIES::Is_Tri_File(input_filename)){
+    if(!Is_Tri_File(input_filename)){
         std::cerr<<"Not a tri file: "<<input_filename<<std::endl;
         return -1;}
 

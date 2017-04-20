@@ -192,7 +192,7 @@ Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency)
 template<class TV> void GUIDE_ADHESION<TV>::
 Write_State(STREAM_TYPE stream_type,const std::string& filename)
 {   
-    FILE_UTILITIES::Write_To_File(stream_type,filename,*springs);
+    Write_To_File(stream_type,filename,*springs);
 }
 //#####################################################################
 // Function Add_Implicit_Velocity_Independent_Forces

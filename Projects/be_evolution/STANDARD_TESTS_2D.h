@@ -340,7 +340,7 @@ void Get_Initial_Data()
             TRIANGULATED_AREA<T>& ta=tests.Create_Mattress(GRID<TV>(TV_INT(3,6),RANGE<TV>(TV(-1,-1),TV(1,4))),true,0,density);
             SEGMENT_MESH& sm=ta.Get_Segment_Mesh();
             initial_positions=particles.X;
-            FILE_UTILITIES::Create_Directory("initial");
+            Create_Directory("initial");
             ARRAY<VECTOR<T,3>,TV_INT> in_image;
             PNG_FILE<T>::Read("color_template.png",in_image);
 

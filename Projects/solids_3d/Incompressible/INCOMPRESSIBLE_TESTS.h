@@ -736,7 +736,7 @@ void Read_Output_Files_Solids(const int frame) override
         LOG::SCOPE scope("restart hack","restart hack");
         ARRAY<TV> X_save(particles.X);
         ARRAY<T> mass_save(particles.mass);
-        FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/deformable_body_collection_particles."+FILE_UTILITIES::Number_To_String(frame),particles);
+        Read_From_File(stream_type,output_directory+"/deformable_body_collection_particles."+Number_To_String(frame),particles);
         TETRAHEDRALIZED_VOLUME<T>& volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
         int particles_per_torus=volume.mesh.number_nodes/tori_initial_states.m;
         if(volume.mesh.number_nodes%particles_per_torus!=0 || particles.Size()%particles_per_torus!=0) PHYSBAM_FATAL_ERROR();

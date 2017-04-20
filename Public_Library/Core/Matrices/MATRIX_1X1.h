@@ -399,6 +399,6 @@ inline MATRIX<T,1> exp(const MATRIX<T,1>& A)
 
 template<class T>
 inline std::istream& operator>>(std::istream& input,MATRIX<T,1>& A)
-{FILE_UTILITIES::Ignore(input,'[');input>>A.x00;FILE_UTILITIES::Ignore(input,']');return input;}
+{Ignore(input,'[');input>>A.x00;Ignore(input,']');return input;}
 }
 #endif

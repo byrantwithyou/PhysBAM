@@ -107,7 +107,7 @@ LOG_CLASS::LOG_CLASS(const bool suppress_cout_input,const bool suppress_cerr_inp
     if(private_instance) delete private_instance;
     private_instance=this;
     if(cache_initial_output){
-        log_file=FILE_UTILITIES::Temporary_File();
+        log_file=Temporary_File();
         if(!log_file) PHYSBAM_FATAL_ERROR(LOG::sprintf("Couldn't create temporary log file tmpfile=%s",log_file));
         log_file_temporary=true;}
     timer_id=timer_singleton->Register_Timer();

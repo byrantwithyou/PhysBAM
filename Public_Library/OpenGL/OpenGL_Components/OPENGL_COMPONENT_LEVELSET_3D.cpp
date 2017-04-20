@@ -38,7 +38,7 @@ set(0),set_loaded(-1),use_sets(true),draw_multiple_levelsets(true),ghost_cells(3
     while(filename_set!=""){
         std::string filename=LOG::sprintf(filename_set.c_str(),frame,number_of_sets);
         LOG::cout<<"Checking "<<filename<<std::endl;
-        if(FILE_UTILITIES::File_Exists(filename)) number_of_sets++;
+        if(File_Exists(filename)) number_of_sets++;
         else break;}
     LOG::cout<<"Found "<<number_of_sets<<" levelsets for multiphase"<<std::endl;
 
@@ -103,8 +103,8 @@ Set_Slice_Color(const OPENGL_COLOR &inside_slice_color, const OPENGL_COLOR &outs
 template<class T> bool OPENGL_COMPONENT_LEVELSET_3D<T>::
 Valid_Frame(int frame_input) const
 {
-    if(use_sets) return FILE_UTILITIES::File_Exists(LOG::sprintf(filename_set.c_str(),frame,set));
-    else return FILE_UTILITIES::File_Exists(is_animation?LOG::sprintf(levelset_filename.c_str(),frame_input):levelset_filename);
+    if(use_sets) return File_Exists(LOG::sprintf(filename_set.c_str(),frame,set));
+    else return File_Exists(is_animation?LOG::sprintf(levelset_filename.c_str(),frame_input):levelset_filename);
 }
 //#####################################################################
 // Function Display
@@ -195,7 +195,7 @@ Reinitialize()
                 for(int i=0;i<opengl_levelset_multiviews.m;i++)
                     Reinitialize_Levelset(LOG::sprintf(filename_set.c_str(),frame,i),LOG::sprintf(filename_triangulated_surface_set.c_str(),i,frame),opengl_levelset_multiviews(i));
                 set_loaded=set;}
-            else Reinitialize_Levelset(FILE_UTILITIES::Get_Frame_Filename(levelset_filename.c_str(),frame), FILE_UTILITIES::Get_Frame_Filename(triangulated_surface_filename.c_str(),frame), opengl_levelset_multiview);
+            else Reinitialize_Levelset(Get_Frame_Filename(levelset_filename.c_str(),frame), Get_Frame_Filename(triangulated_surface_filename.c_str(),frame), opengl_levelset_multiview);
             frame_loaded=frame;
         }
     }
@@ -206,10 +206,10 @@ Reinitialize()
 template<class T> void OPENGL_COMPONENT_LEVELSET_3D<T>::
 Reinitialize_Levelset(const std::string& levelset_filename, const std::string& triangulated_surface_filename, OPENGL_LEVELSET_MULTIVIEW<T>* levelset_multiview)
 {
-    if(FILE_UTILITIES::File_Exists(levelset_filename)) levelset_multiview->Read_Levelset(levelset_filename);
+    if(File_Exists(levelset_filename)) levelset_multiview->Read_Levelset(levelset_filename);
     else return;
-    if(!triangulated_surface_filename.empty() && FILE_UTILITIES::File_Exists(triangulated_surface_filename) &&
-       (!check_triangulated_surface_file_time || FILE_UTILITIES::Compare_File_Times(triangulated_surface_filename, levelset_filename)>=0)){
+    if(!triangulated_surface_filename.empty() && File_Exists(triangulated_surface_filename) &&
+       (!check_triangulated_surface_file_time || Compare_File_Times(triangulated_surface_filename, levelset_filename)>=0)){
         levelset_multiview->Read_Triangulated_Surface(triangulated_surface_filename);}
     else levelset_multiview->Generate_Triangulated_Surface(write_generated_triangulated_surface,triangulated_surface_filename);
     levelset_multiview->Initialize();

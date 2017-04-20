@@ -38,7 +38,7 @@ public:
     TETRAHEDRALIZED_VOLUME_FIELD(const STREAM_TYPE stream_type,const std::string& filename)
         :field_volume(mesh,particles),default_value(0)
     {
-        FILE_UTILITIES::Read_From_File(stream_type,filename,field_volume,field);
+        Read_From_File(stream_type,filename,field_volume,field);
         field_volume.Update_Tetrahedron_List();
         field_volume.Initialize_Hierarchy();
         field_volume.Initialize_Triangulated_Surface();
@@ -87,7 +87,7 @@ public:
     TETRAHEDRALIZED_VOLUME_SURFACE_FIELD(const STREAM_TYPE stream_type,const std::string& filename)
         :field_volume(mesh,particles),default_value(0)
     {
-        FILE_UTILITIES::Read_From_File(stream_type,filename,field_volume,field);
+        Read_From_File(stream_type,filename,field_volume,field);
         field_volume.Update_Tetrahedron_List();
         //field_volume.Initialize_Hierarchy();
         field_volume.Initialize_Triangulated_Surface();
@@ -268,9 +268,9 @@ public:
         dis->Set_Expression(expression);
         tetrahedral_meshing.Initialize(dis);
         return;}
-    if(!FILE_UTILITIES::File_Exists(implicit_surface_filename)){
+    if(!File_Exists(implicit_surface_filename)){
         std::string new_filename=data_directory+"/"+implicit_surface_filename;
-        if(!FILE_UTILITIES::File_Exists(new_filename)){std::cerr<<"Can't find "<<implicit_surface_filename<<std::endl;exit(1);}
+        if(!File_Exists(new_filename)){std::cerr<<"Can't find "<<implicit_surface_filename<<std::endl;exit(1);}
         implicit_surface_filename=new_filename;}
     LOG::Time("reading levelset");
     LOG::cout<<"levelset file = "<<implicit_surface_filename<<std::endl;

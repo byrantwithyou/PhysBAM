@@ -596,8 +596,8 @@ Write_Output_Files(const int frame) const
 {
     BASE::Write_Output_Files(frame);
     if(debug_particles.Size() || frame==0){
-        FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),frame));
-        FILE_UTILITIES::Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles);}
+        Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),frame));
+        Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles);}
 }
 //#####################################################################
 // Function Initialize_Surface_Particles
@@ -762,8 +762,8 @@ FSI_Analytic_Test()
     analytic_solution=-(solid_mass*-solid_gravity.y+rho*size.x*size.y*fluids_parameters.gravity)*size.x/(2*size.y*fluids_parameters.viscosity);
     LOG::cout<<"analytic_solution "<<analytic_solution<<std::endl;
 
-    FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),0));
-    FILE_UTILITIES::Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),0),debug_particles);
+    Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),0));
+    Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),0),debug_particles);
 }
 //#####################################################################
 // Function Postprocess_Frame

@@ -17,7 +17,7 @@ OPENGL_COMPONENT_TRIANGULATED_SURFACE(STREAM_TYPE stream_type,const std::string 
                                   OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Blue())),
       filename(filename), frame_loaded(-1), valid(false), use_display_list(use_display_list)
 {
-    is_animation = FILE_UTILITIES::Is_Animated(filename);
+    is_animation = Is_Animated(filename);
     Reinitialize();
 }
 //#####################################################################
@@ -36,7 +36,7 @@ template<class T> OPENGL_COMPONENT_TRIANGULATED_SURFACE<T>::
 template<class T> bool OPENGL_COMPONENT_TRIANGULATED_SURFACE<T>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::Frame_File_Exists(filename, frame_input);
+    return Frame_File_Exists(filename, frame_input);
 }
 //#####################################################################
 // Function Set_Frame
@@ -104,9 +104,9 @@ Reinitialize()
             (!is_animation && frame_loaded < 0))
         {
             valid = false;
-            std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(filename, frame);
-            if(FILE_UTILITIES::File_Exists(tmp_filename))
-                FILE_UTILITIES::Read_From_File(stream_type,tmp_filename,triangulated_surface);
+            std::string tmp_filename = Get_Frame_Filename(filename, frame);
+            if(File_Exists(tmp_filename))
+                Read_From_File(stream_type,tmp_filename,triangulated_surface);
             else
                 return;
 

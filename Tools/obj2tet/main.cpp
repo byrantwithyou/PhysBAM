@@ -13,7 +13,7 @@ template<class T,class RW> void Convert(const std::string& input_filename,const 
 {
     typedef VECTOR<T,3> TV;
 
-    std::istream* input=FILE_UTILITIES::Safe_Open_Input(input_filename,false);
+    std::istream* input=Safe_Open_Input(input_filename,false);
     char buffer[2048];
     ARRAY<TV> vertices;
     ARRAY<VECTOR<int,4> > tetrahedra;
@@ -42,7 +42,7 @@ template<class T,class RW> void Convert(const std::string& input_filename,const 
     for(int v=0;v<vertices.m;v++)
         tetrahedralized_volume->particles.X(tetrahedralized_volume->particles.Add_Element())=vertices(v);
     tetrahedralized_volume->Update_Number_Nodes();
-    FILE_UTILITIES::Write_To_File<RW>(output_filename,*tetrahedralized_volume);
+    Write_To_File<RW>(output_filename,*tetrahedralized_volume);
 }
 
 int main(int argc,char *argv[])
@@ -60,7 +60,7 @@ int main(int argc,char *argv[])
     parse_args.Extra(&output_filename,"tet file","output tet file name");
     parse_args.Parse();
 
-    if(!FILE_UTILITIES::Is_Tet_File(output_filename)){
+    if(!Is_Tet_File(output_filename)){
         std::cerr<<"Not a tet file: "<<output_filename<<std::endl;
         return -1;}
 

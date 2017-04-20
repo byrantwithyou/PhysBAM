@@ -21,7 +21,7 @@ Read(const std::string& filename,ARRAY<VECTOR<T,4> ,VECTOR<int,2> >& image)
 template<class T> void BMP_FILE<T>::
 Read(const std::string& filename,ARRAY<VECTOR<T,3> ,VECTOR<int,2> >& image)
 {
-    std::istream* input=FILE_UTILITIES::Safe_Open_Input(filename);
+    std::istream* input=Safe_Open_Input(filename);
     BMP_HEADER header;Read_Binary<T>(*input,header);
     image.Resize(0,header.w,0,header.h,false,false);
     int line_width=header.w*3,line_padding=((line_width+3)&~3)-line_width;
@@ -39,7 +39,7 @@ template<class T> template<int d> void BMP_FILE<T>::
 Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& image)
 {  
     PHYSBAM_ASSERT(image.domain.min_corner.x==0 && image.domain.min_corner.y==0);
-    std::ostream* output=FILE_UTILITIES::Safe_Open_Output(filename,true,false); // no compression
+    std::ostream* output=Safe_Open_Output(filename,true,false); // no compression
     VECTOR<int,2> counts=image.domain.Edge_Lengths();
     BMP_HEADER header;header.Initialize(counts.x,counts.y);Write_Binary<T>(*output,header);
     int line_width=header.w*3,line_padding=((line_width+3)&~3)-line_width;

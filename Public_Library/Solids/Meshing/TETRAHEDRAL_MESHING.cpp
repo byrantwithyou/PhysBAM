@@ -82,7 +82,7 @@ Snap_Nodes_To_Level_Set_Boundary(const int iterations)
     for(int t=0;t<mesh.boundary_nodes->m;t++) for(int k=0;k<iterations;k++){
         int node=(*mesh.boundary_nodes)(t);TV X=deformable_body_collection.particles.X(node);
         deformable_body_collection.particles.X(node)-=implicit_surface->Extended_Phi(X)*implicit_surface->Extended_Normal(X);}
-    FILE_UTILITIES::Create_Directory(output_directory);
+    Create_Directory(output_directory);
     Write_Output_Files(++frame);
 }
 //#####################################################################
@@ -705,20 +705,20 @@ Write_Output_Files(const int frame)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-    FILE_UTILITIES::Create_Directory(output_directory);
+    Create_Directory(output_directory);
     std::string f=LOG::sprintf("%d",frame);
-    FILE_UTILITIES::Create_Directory(output_directory+"/"+f);
-    FILE_UTILITIES::Create_Directory(output_directory+"/common");
+    Create_Directory(output_directory+"/"+f);
+    Create_Directory(output_directory+"/common");
     // write state
     solid_body_collection.Write(stream_type,output_directory,frame,1,solids_parameters.write_static_variables_every_frame,solids_parameters.rigid_body_evolution_parameters.write_rigid_bodies,
         solids_parameters.write_deformable_body,solids_parameters.write_from_every_process,false);
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/tetrahedralized_volume_"+f+".tet",tetrahedralized_volume);
+    Write_To_File(stream_type,output_directory+"/tetrahedralized_volume_"+f+".tet",tetrahedralized_volume);
     // write boundary mesh and bindings
     if(replace_green_refinement_with_embedded_t_junctions && frame==0){
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/boundary_mesh",*boundary_mesh);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/bindings",solid_body_collection.deformable_body_collection.binding_list);}
+        Write_To_File(stream_type,output_directory+"/boundary_mesh",*boundary_mesh);
+        Write_To_File(stream_type,output_directory+"/bindings",solid_body_collection.deformable_body_collection.binding_list);}
     // write diagnostics
-    {std::ostream* output(FILE_UTILITIES::Safe_Open_Output(output_directory+"/diagnostics."+f,false));
+    {std::ostream* output(Safe_Open_Output(output_directory+"/diagnostics."+f,false));
     tetrahedralized_volume.Print_Statistics(*output);
     int index;
     *output<<"max_phi = "<<tetrahedralized_volume.Maximum_Magnitude_Phi_On_Boundary(*implicit_surface,&index);*output<<" ("<<index<<")"<<std::endl;
@@ -726,7 +726,7 @@ Write_Output_Files(const int frame)
     if(linear_springs){*output<<"max_edge_compression = "<<linear_springs->Maximum_Compression_Or_Expansion_Fraction(&index);*output<<" ("<<index<<")"<<std::endl;}
     delete output;}
     // write last frame
-    FILE_UTILITIES::Write_To_Text_File(output_directory+"/common/last_frame",frame,"\n");
+    Write_To_Text_File(output_directory+"/common/last_frame",frame,"\n");
 }
 //#####################################################################
 namespace PhysBAM{

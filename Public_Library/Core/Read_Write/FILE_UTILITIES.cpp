@@ -2,8 +2,6 @@
 // Copyright 2002-2007, Ronald Fedkiw, Eran Guendelman, Geoffrey Irving, Igor Neverov, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Namespace FILE_UTILITIES
-//#####################################################################
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Log/DEBUG_UTILITIES.h>
 #include <Core/Log/LOG.h>
@@ -21,7 +19,6 @@
 #include <sys/stat.h>
 #endif
 namespace PhysBAM{
-namespace FILE_UTILITIES{
 
 static const char *file_extensions[]={"rgd","rgd2d","tri","phi","phi2d","oct","ply","ply2d","rgb","tri2d","curve","curve2d","tet","hex","box","phoneme",0};
 
@@ -303,7 +300,7 @@ std::string Get_Short_Name_Ignoring_Compression_Suffix(const std::string& filena
 
 bool File_Extension_Matches_Ignoring_Compression_Suffix(const std::string& filename,const std::string& ext,const bool case_sensitive)
 {
-    return !STRING_UTILITIES::Compare_Strings(Get_File_Extension_Ignoring_Compression_Suffix(filename),ext,case_sensitive);
+    return !Compare_Strings(Get_File_Extension_Ignoring_Compression_Suffix(filename),ext,case_sensitive);
 }
 
 bool File_Is_Compressed(const std::string& filename)
@@ -401,6 +398,5 @@ void Ignore(std::istream& input,char c)
 {
     while(isspace(input.peek())) input.get();
     if(input.peek()==c) input.get();
-}
 }
 }

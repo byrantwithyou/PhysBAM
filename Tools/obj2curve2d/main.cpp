@@ -13,7 +13,7 @@ template<class T,class RW> void Convert(const std::string& input_filename,const 
 {
     typedef VECTOR<T,2> TV;
 
-    std::istream* input=FILE_UTILITIES::Safe_Open_Input(input_filename,false);
+    std::istream* input=Safe_Open_Input(input_filename,false);
     char buffer[2048];
     ARRAY<TV> vertices;
     ARRAY<VECTOR<int,2> > segments;
@@ -42,7 +42,7 @@ template<class T,class RW> void Convert(const std::string& input_filename,const 
     for(int v=0;v<vertices.m;v++)
         segmented_curve_2d->particles.X(segmented_curve_2d->particles.Add_Element())=vertices(v);
     segmented_curve_2d->Update_Number_Nodes();
-    FILE_UTILITIES::Write_To_File<RW>(output_filename,*segmented_curve_2d);
+    Write_To_File<RW>(output_filename,*segmented_curve_2d);
 }
 
 int main(int argc,char *argv[])
@@ -60,7 +60,7 @@ int main(int argc,char *argv[])
     parse_args.Extra(&output_filename,"curve2d file","output curve2d file name");
     parse_args.Parse();
 
-    if(!FILE_UTILITIES::Is_Curve2D_File(output_filename)){
+    if(!Is_Curve2D_File(output_filename)){
         std::cerr<<"Not a curve2d file: "<<output_filename<<std::endl;
         return -1;}
 

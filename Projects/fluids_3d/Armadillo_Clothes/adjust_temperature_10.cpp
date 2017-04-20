@@ -68,16 +68,16 @@ template<class T,class RW> void Process(int argc,char* argv[])
 
     ARRAY<T,VECTOR<int,3> > temperature,density,phi;
     GRID<TV> grid;LEVELSET<TV> levelset(grid,phi);
-    FILE_UTILITIES::Read_From_File<RW>("levelset"+f,levelset);
-    FILE_UTILITIES::Read_From_File<RW>("temperature"+f,temperature);
-    FILE_UTILITIES::Read_From_File<RW>("density"+f,density);
+    Read_From_File<RW>("levelset"+f,levelset);
+    Read_From_File<RW>("temperature"+f,temperature);
+    Read_From_File<RW>("density"+f,density);
 
     HEAT_3D<T>::Smooth(grid,phi,2);
     for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++)temperature(i,j,ij)=Adjust_Temperature<T>(Blur_Temperature(temperature(i,j,ij),phi(i,j,ij)*grid.one_over_dx),frame,grid.X(i,j,ij));
     for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++)density(i,j,ij)=Adjust_Density<T>(density(i,j,ij),frame,grid.X(i,j,ij));
-    FILE_UTILITIES::Write_To_File<RW>("adjusted_temperature"+f,temperature);
-    FILE_UTILITIES::Write_To_File<RW>("adjusted_density"+f,density);
-    FILE_UTILITIES::Write_To_File<RW>("adjusted_levelset"+f,levelset);
+    Write_To_File<RW>("adjusted_temperature"+f,temperature);
+    Write_To_File<RW>("adjusted_density"+f,density);
+    Write_To_File<RW>("adjusted_levelset"+f,levelset);
 }
 
 int main(int argc,char* argv[])

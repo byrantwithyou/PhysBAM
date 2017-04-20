@@ -26,7 +26,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> OPENGL_EPS_OUTPUT<T>::
 OPENGL_EPS_OUTPUT(const std::string& filename)
-    :stream(*FILE_UTILITIES::Safe_Open_Output(filename,false,false))
+    :stream(*Safe_Open_Output(filename,false,false))
 {
     Head();
 }

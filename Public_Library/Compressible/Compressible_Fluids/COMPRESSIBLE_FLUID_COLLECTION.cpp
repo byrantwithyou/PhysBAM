@@ -27,8 +27,8 @@ template<class TV> void COMPRESSIBLE_FLUID_COLLECTION<TV>::
 Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const
 {
     std::string f=LOG::sprintf("%d",frame);
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi",psi);
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/euler_U",U);
+    Write_To_File(stream_type,output_directory+"/"+f+"/psi",psi);
+    Write_To_File(stream_type,output_directory+"/"+f+"/euler_U",U);
 
     // TODO(jontg): Write this out optionally.
     COMPRESSIBLE_AUXILIARY_DATA::Write_Auxiliary_Files(stream_type,output_directory+"/"+f,frame,*this,false);
@@ -40,11 +40,11 @@ template<class TV> void COMPRESSIBLE_FLUID_COLLECTION<TV>::
 Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame)
 {
     std::string f=LOG::sprintf("%d",frame);
-    if(FILE_UTILITIES::File_Exists(output_directory+"/"+f+"/psi")){
-        FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/psi",psi);}
+    if(File_Exists(output_directory+"/"+f+"/psi")){
+        Read_From_File(stream_type,output_directory+"/"+f+"/psi",psi);}
 
-    if(FILE_UTILITIES::File_Exists(output_directory+"/"+f+"/euler_U")){
-        FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/euler_U",U);}
+    if(File_Exists(output_directory+"/"+f+"/euler_U")){
+        Read_From_File(stream_type,output_directory+"/"+f+"/euler_U",U);}
 }
 //#####################################################################
 // Function Initialize_Grids

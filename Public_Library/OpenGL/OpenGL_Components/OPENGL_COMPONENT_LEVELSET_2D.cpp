@@ -31,7 +31,7 @@ OPENGL_COMPONENT_LEVELSET_2D(STREAM_TYPE stream_type,const std::string& levelset
     while(filename_set!=""){
         std::string filename=LOG::sprintf(filename_set.c_str(),frame,number_of_sets);
         LOG::cout<<"Checking "<<filename<<std::endl;
-        if(FILE_UTILITIES::File_Exists(filename)) number_of_sets++;else break;}
+        if(File_Exists(filename)) number_of_sets++;else break;}
     LOG::cout<<"Found "<<number_of_sets<<" levelsets for multiphase"<<std::endl;
     if(number_of_sets==0){use_sets=false;number_of_sets=1;}else draw_multiple_levelsets=true;
 
@@ -42,7 +42,7 @@ OPENGL_COMPONENT_LEVELSET_2D(STREAM_TYPE stream_type,const std::string& levelset
     opengl_levelset=opengl_levelsets(0);
     delete color_map;
 
-    is_animation=FILE_UTILITIES::Is_Animated(levelset_filename);
+    is_animation=Is_Animated(levelset_filename);
     Reinitialize();
 }
 //#####################################################################
@@ -63,8 +63,8 @@ template<class T> OPENGL_COMPONENT_LEVELSET_2D<T>::
 template<class T> bool OPENGL_COMPONENT_LEVELSET_2D<T>::
 Valid_Frame(int frame_input) const
 {
-    if(use_sets) return FILE_UTILITIES::File_Exists(LOG::sprintf(filename_set.c_str(),frame_input,set));
-    else return FILE_UTILITIES::Frame_File_Exists(levelset_filename,frame_input);
+    if(use_sets) return File_Exists(LOG::sprintf(filename_set.c_str(),frame_input,set));
+    else return Frame_File_Exists(levelset_filename,frame_input);
 }
 //#####################################################################
 // Function Set_Frame
@@ -145,12 +145,12 @@ Reinitialize(const bool force_even_if_not_drawn)
             if(use_sets)
                 for(int i=0;i<opengl_levelsets.m;i++){
                     filename=LOG::sprintf(filename_set.c_str(),frame,i);
-                    if(FILE_UTILITIES::File_Exists(filename)) FILE_UTILITIES::Read_From_File(stream_type,filename.c_str(),opengl_levelsets(i)->levelset);
+                    if(File_Exists(filename)) Read_From_File(stream_type,filename.c_str(),opengl_levelsets(i)->levelset);
                     else return;
                     opengl_levelsets(i)->Update();}
             else{
-                filename=FILE_UTILITIES::Get_Frame_Filename(levelset_filename,frame);
-                if(FILE_UTILITIES::File_Exists(filename)) FILE_UTILITIES::Read_From_File(stream_type,filename.c_str(),opengl_levelset->levelset);
+                filename=Get_Frame_Filename(levelset_filename,frame);
+                if(File_Exists(filename)) Read_From_File(stream_type,filename.c_str(),opengl_levelset->levelset);
                 else return;
                 opengl_levelset->Update();}
             frame_loaded=frame;set_loaded=set;valid=true;}}

@@ -101,7 +101,7 @@ template<class TV> struct CAN_ASSIGN<TWIST<TV>,TWIST<TV> > {static const bool va
 //#####################################################################
 
 template<class TV> inline std::istream& operator>>(std::istream& input,TWIST<TV>& v)
-{FILE_UTILITIES::Ignore(input,'(');input>>v.linear>>v.angular;FILE_UTILITIES::Ignore(input,')');return input;}
+{Ignore(input,'(');input>>v.linear>>v.angular;Ignore(input,')');return input;}
 
 template<class TV> inline std::ostream& operator<<(std::ostream& output,const TWIST<TV>& v)
 {output<<"("<<v.linear<<"  "<<v.angular<<")";return output;}

@@ -67,7 +67,7 @@ template<class T> LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >*
 Levelset_From_File(const std::string& filename,int max_resolution=200)
 {
     TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-    FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),filename,*surface);
+    Read_From_File(STREAM_TYPE(0.f),filename,*surface);
     LOG::printf("Read mesh: %d triangle, %d particles\n",surface->mesh.elements.m,surface->particles.number);
     surface->mesh.Initialize_Adjacent_Elements();
     surface->mesh.Initialize_Neighbor_Nodes();
@@ -285,7 +285,7 @@ Initialize()
             grid.Initialize(TV_INT(resolution,resolution,resolution)+1,RANGE<TV>(TV(-2,-2,-2),TV(2,2,2))*m,true);
 
             TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-            FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/Rigid_Bodies/bowl.tri.gz",*surface);
+            Read_From_File(stream_type,data_directory+"/Rigid_Bodies/bowl.tri.gz",*surface);
             LOG::cout<<"Read mesh "<<surface->mesh.elements.m<<std::endl;
             LOG::cout<<"Read mesh "<<surface->particles.number<<std::endl;
             surface->mesh.Initialize_Adjacent_Elements();    
@@ -365,7 +365,7 @@ Initialize()
             grid.Initialize(TV_INT()+resolution,RANGE<TV>(TV(-1.5,-1.5,-1.5),TV(1.5,1.5,1.5))*m,true);
             T density=1*unit_rho*scale_mass;
             TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-            FILE_UTILITIES::Read_From_File(STREAM_TYPE(.0f),data_directory+"/Rigid_Bodies/sphere.tri.gz",*surface);
+            Read_From_File(STREAM_TYPE(.0f),data_directory+"/Rigid_Bodies/sphere.tri.gz",*surface);
             LOG::cout<<"Read mesh "<<surface->mesh.elements.m<<std::endl;
             LOG::cout<<"Read mesh "<<surface->particles.number<<std::endl;
             TRIANGULATED_SURFACE<T>& new_sc=Seed_Lagrangian_Particles(*surface,0,0,density,true);
@@ -408,7 +408,7 @@ Initialize()
             Add_Gravity(m/(s*s)*TV(0,-9.8,0));
             // Container glass
             TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/glass.tri.gz",*surface);
+            Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/glass.tri.gz",*surface);
             LOG::cout<<"Read mesh elements "<<surface->mesh.elements.m<<std::endl;
             LOG::cout<<"Read mesh particles "<<surface->particles.number<<std::endl;
             surface->mesh.Initialize_Adjacent_Elements();    
@@ -433,9 +433,9 @@ Initialize()
 
             if(0){
                 state->surface1=TRIANGULATED_SURFACE<T>::Create();
-                FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/cylinder.tri.gz",*state->surface1);
+                Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/cylinder.tri.gz",*state->surface1);
                 state->surface2=TRIANGULATED_SURFACE<T>::Create();
-                FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/cylinder.tri.gz",*state->surface2);
+                Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/cylinder.tri.gz",*state->surface2);
                 LOG::cout<<"Read mesh elements "<<state->surface1->mesh.elements.m<<std::endl;
                 LOG::cout<<"Read mesh particles "<<state->surface1->particles.number<<std::endl;
                 state->surface1->mesh.Initialize_Adjacent_Elements();    
@@ -531,7 +531,7 @@ Initialize()
             Add_Gravity(m/(s*s)*TV(0,-9.8,0));
             // Container glass
             TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/glass_tall.tri.gz",*surface);
+            Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/glass_tall.tri.gz",*surface);
             LOG::cout<<"Read mesh elements "<<surface->mesh.elements.m<<std::endl;
             LOG::cout<<"Read mesh particles "<<surface->particles.number<<std::endl;
             surface->mesh.Initialize_Adjacent_Elements();    
@@ -851,7 +851,7 @@ Initialize()
             Add_Gravity(m/(s*s)*TV(0,-9.81,0));
             if(dump_collision_objects){
                 TRIANGULATED_SURFACE<T>* ts=TESSELLATION::Tessellate_Boundary(hourglass,extra_int(0),extra_int(1));
-                FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("hourglass-%d-%d.tri.gz",extra_int(0),extra_int(1)),*ts);
+                Write_To_File(stream_type,LOG::sprintf("hourglass-%d-%d.tri.gz",extra_int(0),extra_int(1)),*ts);
                 delete ts;}
         } break;
         case 38:
@@ -880,7 +880,7 @@ Initialize()
                 density=(T)1582.22*unit_rho*scale_mass;
             T E=35.37e5*unit_p*scale_E,nu=.3;
             TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/voronoi_fracture_sphere.tri.gz",*surface);
+            Read_From_File(STREAM_TYPE(0.f),data_directory+"/voronoi_fracture_sphere.tri.gz",*surface);
             LOG::cout<<"Read mesh of voronoi sphere #"<<surface->mesh.elements.m<<std::endl;
             LOG::cout<<"Read mesh of voronoi sphere particle # "<<surface->particles.number<<std::endl;
             surface->mesh.Initialize_Adjacent_Elements();    
@@ -924,7 +924,7 @@ Initialize()
             Add_Collision_Object(ground,COLLISION_TYPE::slip,0.1);
             //strong levelset
             TRIANGULATED_SURFACE<T>* strong=TRIANGULATED_SURFACE<T>::Create();
-            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_strong_50.tri.gz",*strong);
+            Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_strong_50.tri.gz",*strong);
             LOG::cout<<"Read mesh of strong #"<<strong->mesh.elements.m<<std::endl;
             LOG::cout<<"Read particles of strong #"<<strong->particles.number<<std::endl;
             for(int i=0;i<strong->particles.number;i++) strong->particles.X(i)/=20;
@@ -938,7 +938,7 @@ Initialize()
             LEVELSET_IMPLICIT_OBJECT<TV>* strong_levelset=Initialize_Implicit_Surface(*strong,200);
             //full sphere
             TRIANGULATED_SURFACE<T>* full=TRIANGULATED_SURFACE<T>::Create();
-            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_full_50.tri.gz",*full);
+            Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_full_50.tri.gz",*full);
             LOG::cout<<"Read mesh of full #"<<full->mesh.elements.m<<std::endl;
             LOG::cout<<"Read particles of full #"<<full->particles.number<<std::endl;
             for(int i=0;i<full->particles.number;i++) full->particles.X(i)/=20;
@@ -1010,7 +1010,7 @@ Initialize()
             Add_Collision_Object(ground,COLLISION_TYPE::slip,0.3);
             // voronoi
             TRIANGULATED_SURFACE<T>* strong=TRIANGULATED_SURFACE<T>::Create();
-            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_strong_50.tri.gz",*strong);
+            Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_strong_50.tri.gz",*strong);
             LOG::cout<<"Read mesh of strong #"<<strong->mesh.elements.m<<std::endl;
             LOG::cout<<"Read particles of strong #"<<strong->particles.number<<std::endl;
             for(int i=0;i<strong->particles.number;i++) strong->particles.X(i)/=20;
@@ -1025,7 +1025,7 @@ Initialize()
 
             //full sphere
             TRIANGULATED_SURFACE<T>* full=TRIANGULATED_SURFACE<T>::Create();
-            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_full_50.tri.gz",*full);
+            Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_full_50.tri.gz",*full);
             LOG::cout<<"Read mesh of full #"<<full->mesh.elements.m<<std::endl;
             LOG::cout<<"Read particles of full #"<<full->particles.number<<std::endl;
             for(int i=0;i<full->particles.number;i++) full->particles.X(i)/=20;
@@ -1152,7 +1152,7 @@ Initialize()
             Add_Collision_Object(ground,COLLISION_TYPE::slip,0.3);
             // voronoi
             TRIANGULATED_SURFACE<T>* strong=TRIANGULATED_SURFACE<T>::Create();
-            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_strong_50.tri.gz",*strong);
+            Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_strong_50.tri.gz",*strong);
             LOG::cout<<"Read mesh of strong #"<<strong->mesh.elements.m<<std::endl;
             LOG::cout<<"Read particles of strong #"<<strong->particles.number<<std::endl;
             for(int i=0;i<strong->particles.number;i++) strong->particles.X(i)/=20;
@@ -1167,7 +1167,7 @@ Initialize()
 
             //full sphere
             TRIANGULATED_SURFACE<T>* full=TRIANGULATED_SURFACE<T>::Create();
-            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_full_50.tri.gz",*full);
+            Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_full_50.tri.gz",*full);
             LOG::cout<<"Read mesh of full #"<<full->mesh.elements.m<<std::endl;
             LOG::cout<<"Read particles of full #"<<full->particles.number<<std::endl;
             for(int i=0;i<full->particles.number;i++) full->particles.X(i)/=20;
@@ -1256,7 +1256,7 @@ Initialize()
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
             int case_num=use_hardening_mast_case?hardening_mast_case:2;
             TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/siggraph_letters.tri.gz",*surface);
+            Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/siggraph_letters.tri.gz",*surface);
             LOG::cout<<"Read mesh of siggraph letters triangle #"<<surface->mesh.elements.m<<std::endl;
             LOG::cout<<"Read mesh of siggraph letters particle # "<<surface->particles.number<<std::endl;
             surface->mesh.Initialize_Adjacent_Elements();    
@@ -1430,7 +1430,7 @@ Initialize()
             Seed_Particles(*levelset,0,0,density,particles_per_cell);
             LOG::printf("Particle count: %d\n",particles.number);
             Set_Lame_On_Particles(E,nu);
-            FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/all_particles",particles);
+            Write_To_File(stream_type,output_directory+"/common/all_particles",particles);
             for(int p=0;p<particles.number;++p)
                 if(live_box.Lazy_Outside(particles.X(p)))
                     particles.Add_To_Deletion_List(p);
@@ -1545,7 +1545,7 @@ Initialize()
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
             int case_num=use_hardening_mast_case?hardening_mast_case:2;
             TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/castle.tri.gz",*surface);
+            Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/castle.tri.gz",*surface);
             LOG::cout<<"Read mesh of castle triangle #"<<surface->mesh.elements.m<<std::endl;
             LOG::cout<<"Read mesh of castle particle # "<<surface->particles.number<<std::endl;
             surface->mesh.Initialize_Adjacent_Elements();    
@@ -1906,7 +1906,7 @@ Initialize()
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
             int case_num=use_hardening_mast_case?hardening_mast_case:2;
             TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/shovel_dune.tri.gz",*surface);
+            Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/shovel_dune.tri.gz",*surface);
             LOG::cout<<"Read mesh of dune triangle #"<<surface->mesh.elements.m<<std::endl;
             LOG::cout<<"Read mesh of dune particle # "<<surface->particles.number<<std::endl;
             surface->mesh.Initialize_Adjacent_Elements();    
@@ -1969,8 +1969,8 @@ Initialize()
                 density=(T)1582.22*unit_rho*scale_mass;
             T E=35.37e5*unit_p*scale_E,nu=.3;
             TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-            if(test_number==70) FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/voronoi_fracture_sphere.tri.gz",*surface);
-            else FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.),data_directory+"/../Private_Data/100_strong.tri.gz",*surface);
+            if(test_number==70) Read_From_File(STREAM_TYPE(0.f),data_directory+"/voronoi_fracture_sphere.tri.gz",*surface);
+            else Read_From_File(STREAM_TYPE(0.),data_directory+"/../Private_Data/100_strong.tri.gz",*surface);
             LOG::cout<<"Read mesh of voronoi sphere #"<<surface->mesh.elements.m<<std::endl;
             LOG::cout<<"Read mesh of voronoi sphere particle # "<<surface->particles.number<<std::endl;
             surface->mesh.Initialize_Adjacent_Elements();    
@@ -2095,7 +2095,7 @@ Initialize()
 
             // SEEDING FULL
             TRIANGULATED_SURFACE<T>* surface_strong=TRIANGULATED_SURFACE<T>::Create();
-            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_strong_50.tri.gz",*surface_strong);
+            Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_strong_50.tri.gz",*surface_strong);
             LOG::cout<<"Read mesh of strong voronoi triangle #"<<surface_strong->mesh.elements.m<<std::endl;
             LOG::cout<<"Read mesh of sterong voronoi particle # "<<surface_strong->particles.number<<std::endl;
             for(int i=0;i<surface_strong->particles.number;i++){
@@ -2110,7 +2110,7 @@ Initialize()
             LOG::cout<<"Converting the mesh to a level set..."<<std::endl;
             LEVELSET_IMPLICIT_OBJECT<TV>* strong_levelset=Initialize_Implicit_Surface(*surface_strong,200);
             TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_full_50.tri.gz",*surface);
+            Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_full_50.tri.gz",*surface);
             LOG::cout<<"Read mesh of full sandball triangle #"<<surface->mesh.elements.m<<std::endl;
             LOG::cout<<"Read mesh of full sandbval particle # "<<surface->particles.number<<std::endl;
             for(int i=0;i<surface->particles.number;i++){
@@ -2251,7 +2251,7 @@ Initialize()
 
             // SEEDING ALL SAND
             TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-            FILE_UTILITIES::Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_full_100.tri.gz",*surface);
+            Read_From_File(STREAM_TYPE(0.f),data_directory+"/../Private_Data/voronoi_full_100.tri.gz",*surface);
             LOG::cout<<"Read mesh of full sandball triangle #"<<surface->mesh.elements.m<<std::endl;
             LOG::cout<<"Read mesh of full sandbval particle # "<<surface->particles.number<<std::endl;
             for(int i=0;i<surface->particles.number;i++){surface->particles.X(i)/=3;surface->particles.X(i)+=TV(0,0.15,0);}

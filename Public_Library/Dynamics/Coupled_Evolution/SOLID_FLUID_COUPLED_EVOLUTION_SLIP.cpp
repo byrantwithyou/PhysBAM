@@ -443,8 +443,8 @@ Output_Iterators(const STREAM_TYPE stream_type,const char* output_directory,int 
         particles.X(p)=iterator.Location();
         color_attribute(p)=VECTOR<T,3>((T).5,(T).5,1);}
 
-    FILE_UTILITIES::Create_Directory(LOG::sprintf("%s/%i",output_directory,frame));
-    FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%i/collision_iterators",output_directory,frame),particles);
+    Create_Directory(LOG::sprintf("%s/%i",output_directory,frame));
+    Write_To_File(stream_type,LOG::sprintf("%s/%i/collision_iterators",output_directory,frame),particles);
 }
 //#####################################################################
 // Function Make_Divergence_Free

@@ -247,12 +247,12 @@ inline MATRIX<T,4> operator*(const T a,const MATRIX<T,4>& A)
 template<class T>
 inline std::istream& operator>>(std::istream& input,MATRIX<T,4>& A)
 {
-    FILE_UTILITIES::Ignore(input,'[');
+    Ignore(input,'[');
     for(int i=0;i<4;i++){
         for(int j=0;j<4;j++)
             input>>A.x[i+j*4];
-        FILE_UTILITIES::Ignore(input,';');}
-    FILE_UTILITIES::Ignore(input,']');
+        Ignore(input,';');}
+    Ignore(input,']');
     return input;
 }
 }

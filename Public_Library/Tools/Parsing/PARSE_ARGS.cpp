@@ -125,7 +125,7 @@ Print_Arguments() const
 {
     std::string s="command = ";
     for(int i=0;i<argc;i++){s+=argv[i];s+=' ';}
-    s+="\nworking directory = "+FILE_UTILITIES::Get_Working_Directory()+"\n";
+    s+="\nworking directory = "+Get_Working_Directory()+"\n";
     return s;
 }
 //#####################################################################

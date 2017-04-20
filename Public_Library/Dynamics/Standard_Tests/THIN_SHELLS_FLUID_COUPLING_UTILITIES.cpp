@@ -133,7 +133,7 @@ Add_Deformable_Object_From_File(const STREAM_TYPE stream_type,DEFORMABLE_BODY_CO
     DEFORMABLE_PARTICLES<VECTOR<T,3> >& particles=dynamic_cast<DEFORMABLE_PARTICLES<VECTOR<T,3> >&>(triangulated_surface.particles);
 
     particles.Store_Velocity(false);particles.Store_Mass(false); // need to do this before reading it in
-    FILE_UTILITIES::Read_From_File(stream_type,filename,triangulated_surface);
+    Read_From_File(stream_type,filename,triangulated_surface);
     particles.Store_Velocity(true);particles.Store_Mass(true);
 
     if(enslaved_halfplane){for(int i=0;i<particles.Size();i++) if(enslaved_halfplane->Lazy_Inside(particles.X(i))) deformable_body_collection_enslaved_nodes.Append(i);}

@@ -87,7 +87,7 @@ Initialize()
         example.boundary=&example.boundary_scalar;
         example.phi_boundary=&example.phi_boundary_water;}
 
-    VECTOR<VECTOR<bool,2>,TV::m> domain_open_boundaries=VECTOR_UTILITIES::Complement(example.domain_boundary);
+    VECTOR<VECTOR<bool,2>,TV::m> domain_open_boundaries=Complement(example.domain_boundary);
     example.phi_boundary->Set_Constant_Extrapolation(domain_open_boundaries);
     example.boundary->Set_Constant_Extrapolation(domain_open_boundaries);
     example.particle_levelset_evolution.Levelset_Advection(0).Set_Custom_Advection(example.advection_scalar);
@@ -329,14 +329,14 @@ Write_Substep(const std::string& title,const int substep,const int level)
 template<class TV> void PLS_DRIVER<TV>::
 Write_Output_Files(const int frame)
 {
-    FILE_UTILITIES::Create_Directory(example.output_directory);
-    FILE_UTILITIES::Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
-    FILE_UTILITIES::Create_Directory(example.output_directory+"/common");
-    FILE_UTILITIES::Write_To_Text_File(example.output_directory+LOG::sprintf("/%d/frame_title",frame),example.frame_title);
+    Create_Directory(example.output_directory);
+    Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
+    Create_Directory(example.output_directory+"/common");
+    Write_To_Text_File(example.output_directory+LOG::sprintf("/%d/frame_title",frame),example.frame_title);
     if(frame==example.first_frame) 
-        FILE_UTILITIES::Write_To_Text_File(example.output_directory+"/common/first_frame",frame,"\n");
+        Write_To_Text_File(example.output_directory+"/common/first_frame",frame,"\n");
     example.Write_Output_Files(frame);
-    FILE_UTILITIES::Write_To_Text_File(example.output_directory+"/common/last_frame",frame,"\n");
+    Write_To_Text_File(example.output_directory+"/common/last_frame",frame,"\n");
 }
 //#####################################################################
 namespace PhysBAM{

@@ -31,7 +31,6 @@
 #include <cstring>
 #include <fstream>
 using namespace PhysBAM;
-using namespace FILE_UTILITIES;
 template<class T> void Add_File(const std::string& filename,int number);
 template<class T> void Add_Tri2D_File(const std::string& filename,OPENGL_WORLD<T>& world,int number);
 template<class T> void Add_Tri_File(const std::string& filename,OPENGL_WORLD<T>& world,int number);
@@ -104,7 +103,7 @@ template<class T> void Add_Box_File(const std::string& filename,OPENGL_WORLD<T>&
 //    typedef VECTOR<T,3> TV;
     try{
         // BOX<TV>* box=new BOX<TV>;
-        // FILE_UTILITIES::Read_From_File<T>(filename,*box);
+        // Read_From_File<T>(filename,*box);
         // OPENGL_BOX_3D<T>* ob=new OPENGL_BOX_3D<T>(stream_type,*box);
         // world.Add_Object(ob,true,true);
     }
@@ -117,7 +116,7 @@ template<class T> void Add_Hex_File(const std::string& filename,OPENGL_WORLD<T>&
 {
     try{
         HEXAHEDRALIZED_VOLUME<T>* hex_vol;
-        FILE_UTILITIES::Create_From_File<T>(filename,hex_vol);
+        Create_From_File<T>(filename,hex_vol);
         OPENGL_HEXAHEDRALIZED_VOLUME<T>* ohv=new OPENGL_HEXAHEDRALIZED_VOLUME<T>(world.stream_type,&hex_vol->mesh,&hex_vol->particles,OPENGL_MATERIAL::Matte(OPENGL_COLOR(float(.7),float(1),float(.8))),OPENGL_MATERIAL::Matte(OPENGL_COLOR(float(.7),float(8),float(.1))));
         world.Add_Object(ohv,true,true);}
     catch(FILESYSTEM_ERROR&){}
@@ -129,7 +128,7 @@ template<class T> void Add_Tri2D_File(const std::string& filename,OPENGL_WORLD<T
 {
     try{
         TRIANGULATED_AREA<T>* area;
-        FILE_UTILITIES::Create_From_File<T>(filename,area);
+        Create_From_File<T>(filename,area);
         TRIANGULATED_SURFACE<T>* surface=new TRIANGULATED_SURFACE<T>(area->mesh,*new DEFORMABLE_PARTICLES<VECTOR<T,3> >);
         surface->particles.Add_Elements(area->particles.Size());
         for(int p=0;p<area->particles.Size();p++)surface->particles.X(p)=VECTOR<T,3>(area->particles.X(p));
@@ -148,7 +147,7 @@ template<class T> void Add_Tri_File(const std::string& filename,OPENGL_WORLD<T>&
 {
     try{
         TRIANGULATED_SURFACE<T>* surface;
-        FILE_UTILITIES::Create_From_File<T>(filename,surface);
+        Create_From_File<T>(filename,surface);
         {LOG::SCOPE scope("mesh statistics","mesh statistics");
         LOG::cout<<"filename = "<<filename<<std::endl;
         if(print_statistics) surface->Print_Statistics(LOG::cout);}
@@ -166,7 +165,7 @@ template<class T> void Add_Phi_File(const std::string& filename,OPENGL_WORLD<T>&
 {
     try{
         LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* surface;
-        FILE_UTILITIES::Create_From_File<T>(filename,surface);
+        Create_From_File<T>(filename,surface);
         ARRAY<T,VECTOR<int,3> >& phi=surface->levelset.phi;
         LOG::cout<<filename<<" statistics:"<<std::endl;
         LOG::cout<<"  grid = "<<surface->levelset.grid<<std::endl;
@@ -221,7 +220,7 @@ template<class T> void Add_Phi2D_File(const std::string& filename,OPENGL_WORLD<T
 {
     try{
         LEVELSET_IMPLICIT_OBJECT<VECTOR<T,2> >* area;
-        FILE_UTILITIES::Create_From_File<T>(filename,area);
+        Create_From_File<T>(filename,area);
         ARRAY<T,VECTOR<int,2> >& phi=area->levelset.phi;
         LOG::cout<<filename<<" statistics:"<<std::endl;
         LOG::cout<<"  grid = "<<area->levelset.grid<<std::endl;
@@ -260,7 +259,7 @@ template<class T> void Add_Curve_File(const std::string& filename,OPENGL_WORLD<T
 {
     try{
         SEGMENTED_CURVE<VECTOR<T,3> >* curve;
-        FILE_UTILITIES::Create_From_File<T>(filename,curve);
+        Create_From_File<T>(filename,curve);
         curve->Update_Bounding_Box();
         LOG::cout<<"bounding box: "<<*curve->bounding_box<<std::endl;
         OPENGL_SEGMENTED_CURVE_3D<T>* og_curve=new OPENGL_SEGMENTED_CURVE_3D<T>(world.stream_type,*curve,OPENGL_COLOR::Yellow());
@@ -274,7 +273,7 @@ template<class T> void Add_Curve2D_File(const std::string& filename,OPENGL_WORLD
 {
     try{
         SEGMENTED_CURVE_2D<T>* curve;
-        FILE_UTILITIES::Create_From_File<T>(filename,curve);
+        Create_From_File<T>(filename,curve);
         curve->Update_Bounding_Box();
         LOG::cout<<"bounding box: "<<*curve->bounding_box<<std::endl;
         OPENGL_SEGMENTED_CURVE_2D<T>* og_curve=new OPENGL_SEGMENTED_CURVE_2D<T>(world.stream_type,*curve,OPENGL_COLOR::Yellow());
@@ -288,7 +287,7 @@ template<class T> void Add_Tet_File(const std::string& filename,OPENGL_WORLD<T>&
 {
     try{
         TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume;
-        FILE_UTILITIES::Create_From_File<T>(filename,tetrahedralized_volume);
+        Create_From_File<T>(filename,tetrahedralized_volume);
         {LOG::SCOPE scope("mesh statistics","mesh statistics");
         LOG::cout<<"filename = "<<filename<<std::endl;
         if(print_statistics) tetrahedralized_volume->Print_Statistics(LOG::cout);}

@@ -146,8 +146,8 @@ OPENGL_EPS_OUTPUT<float>* PhysBAM::opengl_eps_output=0;
 template<class T> void ANIMATED_VISUALIZATION<T>::
 Capture_Frames(const std::string& filename_pattern,int capture_start_frame,int capture_end_frame,int jpeg_quality,bool swap_buffers)
 {
-    bool use_eps=STRING_UTILITIES::IEnds_With(filename_pattern,".eps");
-    bool movie=STRING_UTILITIES::IEnds_With(filename_pattern,".mov");
+    bool use_eps=IEnds_With(filename_pattern,".eps");
+    bool movie=IEnds_With(filename_pattern,".mov");
     MOV_WRITER<T>* mov=0;
     if(movie && MOV_WRITER<T>::Enabled()){
         mov=new MOV_WRITER<T>(filename_pattern,24);
@@ -254,7 +254,7 @@ Goto_Frame_Prompt()
 {
     if(!opengl_world.prompt_response.empty()){
         int input_frame;
-        STRING_UTILITIES::String_To_Value(opengl_world.prompt_response,input_frame);
+        String_To_Value(opengl_world.prompt_response,input_frame);
         if(Valid_Frame(input_frame)) Set_Frame(input_frame);}
 }
 //#####################################################################
@@ -318,17 +318,17 @@ Capture_Frames_Prompt()
         capture_frames_prompt_state.step=1;
         opengl_world.Prompt_User(LOG::sprintf("Start frame [%d]: ",start_frame),capture_frames_prompt_cb,"");}
     else if(capture_frames_prompt_state.step==1){
-        if(!opengl_world.prompt_response.empty()) STRING_UTILITIES::String_To_Value(opengl_world.prompt_response,capture_frames_prompt_state.start_frame);
+        if(!opengl_world.prompt_response.empty()) String_To_Value(opengl_world.prompt_response,capture_frames_prompt_state.start_frame);
         capture_frames_prompt_state.step=2;
         opengl_world.Prompt_User("End frame [last valid frame]: ",capture_frames_prompt_cb,"");}
     else if(capture_frames_prompt_state.step==2){
-        if(!opengl_world.prompt_response.empty()) STRING_UTILITIES::String_To_Value(opengl_world.prompt_response,capture_frames_prompt_state.end_frame);
+        if(!opengl_world.prompt_response.empty()) String_To_Value(opengl_world.prompt_response,capture_frames_prompt_state.end_frame);
         capture_frames_prompt_state.step=3;
-        if(STRING_UTILITIES::toupper(FILE_UTILITIES::Get_File_Extension(capture_frames_prompt_state.filename_pattern))=="JPG")
+        if(toupper(Get_File_Extension(capture_frames_prompt_state.filename_pattern))=="JPG")
             opengl_world.Prompt_User(LOG::sprintf("JPEG quality [%d]: ",jpeg_quality),capture_frames_prompt_cb,"");
         else done=true;}
     else if(capture_frames_prompt_state.step==3){
-        if(opengl_world.prompt_response.empty()) STRING_UTILITIES::String_To_Value(opengl_world.prompt_response,capture_frames_prompt_state.jpeg_quality);
+        if(opengl_world.prompt_response.empty()) String_To_Value(opengl_world.prompt_response,capture_frames_prompt_state.jpeg_quality);
         done=true;}
 
     if(done){

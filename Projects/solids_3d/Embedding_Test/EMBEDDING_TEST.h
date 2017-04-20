@@ -97,7 +97,7 @@ void Get_Initial_Data()
         deformable_body_collection.Add_Structure(&e_surface);}
     else if(test_number==2){
         TRIANGULATED_SURFACE<T>& temporary_surface=*TRIANGULATED_SURFACE<T>::Create();
-        FILE_UTILITIES::Read_From_File<T>(data_directory+"/Rigid_Bodies/sphere.tri",temporary_surface);
+        Read_From_File<T>(data_directory+"/Rigid_Bodies/sphere.tri",temporary_surface);
         LOG::cout<<"polygon count was "<<temporary_surface.mesh.elements.m<<std::endl;
         //temporary_surface.Loop_Subdivide();
         //temporary_surface.Loop_Subdivide();

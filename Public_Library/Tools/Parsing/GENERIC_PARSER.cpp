@@ -30,7 +30,7 @@ Get_Statement(std::string& identifier,PARAMETER_LIST& list)
         std::string::size_type start=partial_line.find("{");std::string::size_type end;
         if(start==std::string::npos){
             identifier+=partial_line;++line;
-            if(line==lines.end()){STRING_UTILITIES::Strip_Whitespace(identifier);if(identifier=="") return false;else goto parse_error;}
+            if(line==lines.end()){Strip_Whitespace(identifier);if(identifier=="") return false;else goto parse_error;}
             partial_line=*line;continue;}
         else {identifier+=partial_line.substr(0,start);rest=partial_line.substr(start+1);}
         //accumulate data until we find closing brace to end block
@@ -39,7 +39,7 @@ Get_Statement(std::string& identifier,PARAMETER_LIST& list)
         //LOG::cout<<"Got ident="<<identifier<<" data="<<data<<std::endl;
         std::istringstream string_stream(data.c_str());
         list.Read(string_stream);//,std::istringstream:in);
-        STRING_UTILITIES::Strip_Whitespace(identifier);
+        Strip_Whitespace(identifier);
         return true;}
   parse_error:
     LOG::cerr<<"Parse Error..."<<std::endl;
@@ -52,15 +52,15 @@ template<class T> void GENERIC_PARSER<T>::
 Preprocess_File(std::string raw_filename,const int frame)
 {
     // strip comments and do include files
-    std::string filename=FILE_UTILITIES::Get_Frame_Filename(raw_filename,frame);
+    std::string filename=Get_Frame_Filename(raw_filename,frame);
     std::ifstream input_stream(filename.c_str());
-    std::string directory=FILE_UTILITIES::Get_Base_Directory_Name(filename);
+    std::string directory=Get_Base_Directory_Name(filename);
     if(!input_stream) PHYSBAM_FATAL_ERROR(LOG::sprintf("Could not open scene file %s",filename.c_str()));
     std::string line,statement;
     while(std::getline(input_stream,line)){
         std::string::size_type comment=line.find("//");
         statement=(comment==std::string::npos)?line:line.substr(0,comment);
-        STRING_UTILITIES::Strip_Whitespace(statement);
+        Strip_Whitespace(statement);
         if(statement.substr(0,9)=="#include "){
             std::string::size_type start=statement.find("\""),end=statement.rfind("\"");
             if(start==std::string::npos||end==std::string::npos)

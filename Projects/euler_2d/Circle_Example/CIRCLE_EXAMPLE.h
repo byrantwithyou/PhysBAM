@@ -214,7 +214,7 @@ public:
             fluids_parameters.use_soot=true;
             fluids_parameters.use_fixed_soot_boundary=true;
             fluids_parameters.ambient_soot=(T)0;
-            fluids_parameters.soot_boundary=new BOUNDARY_REFLECTION_ATTENUATION<TV,T>(VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls),fluids_parameters.ambient_soot,(T)1);}
+            fluids_parameters.soot_boundary=new BOUNDARY_REFLECTION_ATTENUATION<TV,T>(Complement(fluids_parameters.domain_walls),fluids_parameters.ambient_soot,(T)1);}
 
         if(incompressible){
             fluids_parameters.use_vorticity_confinement=false;
@@ -308,8 +308,8 @@ public:
             T temperature_outside=eos_temp.T(rho_outside,e_outside);
             fluids_parameters.ambient_density=rho_outside;
             fluids_parameters.ambient_temperature=temperature_outside;
-            fluids_parameters.density_boundary=new BOUNDARY_REFLECTION_ATTENUATION<TV,T>(VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls),fluids_parameters.ambient_density,(T).1);
-            fluids_parameters.temperature_boundary=new BOUNDARY_REFLECTION_ATTENUATION<TV,T>(VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls),fluids_parameters.ambient_temperature,(T).1);}
+            fluids_parameters.density_boundary=new BOUNDARY_REFLECTION_ATTENUATION<TV,T>(Complement(fluids_parameters.domain_walls),fluids_parameters.ambient_density,(T).1);
+            fluids_parameters.temperature_boundary=new BOUNDARY_REFLECTION_ATTENUATION<TV,T>(Complement(fluids_parameters.domain_walls),fluids_parameters.ambient_temperature,(T).1);}
 
         // Set output directory
         if(timesplit) output_directory=LOG::sprintf("Circle_Example/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
@@ -345,13 +345,13 @@ void Initialize_Advection() override
             T_FACE_VECTOR(state_outside(0),state_outside(0),state_outside(0),state_outside(0)),
             T_FACE_VECTOR(state_outside(3),state_outside(3),state_outside(3),state_outside(3)),
             TV_FACE_VECTOR(far_field_velocity,far_field_velocity,far_field_velocity,far_field_velocity),
-            (T).5,VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls),true,T_FACE_VECTOR(1,1,1,1),T_FACE_VECTOR_BOOL(true,true,true,true));}
+            (T).5,Complement(fluids_parameters.domain_walls),true,T_FACE_VECTOR(1,1,1,1),T_FACE_VECTOR_BOOL(true,true,true,true));}
     else{
         fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<TV>(fluids_parameters.euler,
             T_FACE_VECTOR(state_outside(0),state_outside(0),state_outside(0),state_outside(0)),
             T_FACE_VECTOR(state_outside(3),state_outside(3),state_outside(3),state_outside(3)),
             TV_FACE_VECTOR(far_field_velocity,far_field_velocity,far_field_velocity,far_field_velocity),
-            (T).5,VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls));}
+            (T).5,Complement(fluids_parameters.domain_walls));}
 }
 //#####################################################################
 // Function Intialize_Euler_State

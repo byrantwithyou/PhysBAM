@@ -643,11 +643,11 @@ template<class T,int d> struct HASH_REDUCE<VECTOR<T,d> >
 template<class T,int d>
 inline std::istream& operator>>(std::istream& input,VECTOR<T,d>& v)
 {
-    FILE_UTILITIES::Ignore(input,'(');
-    FILE_UTILITIES::Ignore(input,'[');
+    Ignore(input,'(');
+    Ignore(input,'[');
     for(int i=0;i<d;i++) input>>v(i);
-    FILE_UTILITIES::Ignore(input,']');
-    FILE_UTILITIES::Ignore(input,')');
+    Ignore(input,']');
+    Ignore(input,')');
     return input;
 }
 

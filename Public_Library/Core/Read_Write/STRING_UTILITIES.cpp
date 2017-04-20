@@ -2,15 +2,11 @@
 // Copyright 2004-2007, Eran Guendelman, Geoffrey Irving.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Namespace STRING_UTILITIES
-//#####################################################################
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Read_Write/STRING_UTILITIES.h>
 #include <cctype>
 #include <cstdio>
 namespace PhysBAM{
-namespace STRING_UTILITIES{
-
 std::string Stripped_Whitespace(const std::string& str)
 {
     int first=0,last=(int)str.length()-1;
@@ -136,5 +132,4 @@ bool IEnds_With(const std::string& input,const std::string& test)
 }
 
 //#####################################################################
-}
 }

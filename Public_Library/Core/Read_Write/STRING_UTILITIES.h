@@ -2,8 +2,6 @@
 // Copyright 2004-2006, Eran Guendelman, Geoffrey Irving.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Namespace STRING_UTILITIES
-//#####################################################################
 #ifndef __STRING_UTILITIES__
 #define __STRING_UTILITIES__
 
@@ -13,8 +11,6 @@
 #include <sstream>
 #include <string>
 namespace PhysBAM{
-
-namespace STRING_UTILITIES{
 
 std::string Stripped_Whitespace(const std::string& str);
 
@@ -49,6 +45,5 @@ bool Ends_With(const std::string& input,const std::string& test);
 bool IEnds_With(const std::string& input,const std::string& test);
 
 //#####################################################################
-}
 }
 #endif

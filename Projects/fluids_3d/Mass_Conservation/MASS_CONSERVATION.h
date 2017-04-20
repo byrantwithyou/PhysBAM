@@ -61,7 +61,7 @@ public:
         parse_args.Parse();
 
         std::string filename=LOG::sprintf("Mass_Conservation/example_%d.param",test_number);
-        if(FILE_UTILITIES::File_Exists(filename)){std::cout<<"Reading parameter file '"<<filename<<"'"<<std::endl;parameter_list.Read(filename);}
+        if(File_Exists(filename)){std::cout<<"Reading parameter file '"<<filename<<"'"<<std::endl;parameter_list.Read(filename);}
 
         random.Set_Seed(3891);
         root_three_over_three=sqrt((T)3)/(T)3;

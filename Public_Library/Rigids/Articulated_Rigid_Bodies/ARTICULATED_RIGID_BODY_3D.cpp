@@ -511,7 +511,7 @@ template<class T> void ARTICULATED_RIGID_BODY<VECTOR<T,3> >::
 Output_Articulation_Points(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const
 {
     if(joint_mesh.Num_Joints()==0) return;
-    std::ostream* output=FILE_UTILITIES::Safe_Open_Output(LOG::sprintf("%s/%d/arb_info",output_directory.c_str(),frame));
+    std::ostream* output=Safe_Open_Output(LOG::sprintf("%s/%d/arb_info",output_directory.c_str(),frame));
     TYPED_OSTREAM typed_output(*output,stream_type);
     Write_Binary(typed_output,joint_mesh.Num_Joints()*2);
     for(int i=0;i<joint_mesh.Num_Joints();i++){

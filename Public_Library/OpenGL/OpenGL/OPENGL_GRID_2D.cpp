@@ -226,40 +226,40 @@ template<class T> void OPENGL_GRID_2D<T>::
 Reinitialize()
 {
     std::string filename=LOG::sprintf("%s/%d/active_cell_mask",basedir.c_str(),frame);
-    if(FILE_UTILITIES::File_Exists(filename)){
+    if(File_Exists(filename)){
         if(!active_cell_mask) active_cell_mask=new ARRAY<bool,TV_INT>();
         active_cell_mask->Clean_Memory();
-        FILE_UTILITIES::Read_From_File<bool>(filename,*active_cell_mask);}
+        Read_From_File<bool>(filename,*active_cell_mask);}
 
     filename=LOG::sprintf("%s/%d/ghost_cell_mask",basedir.c_str(),frame);
-    if(FILE_UTILITIES::File_Exists(filename)){
+    if(File_Exists(filename)){
         if(!ghost_cell_mask) ghost_cell_mask=new ARRAY<bool,TV_INT>();
         ghost_cell_mask->Clean_Memory();
-        FILE_UTILITIES::Read_From_File<bool>(filename,*ghost_cell_mask);}
+        Read_From_File<bool>(filename,*ghost_cell_mask);}
 
     filename=LOG::sprintf("%s/%d/active_face_mask",basedir.c_str(),frame);
-    if(FILE_UTILITIES::File_Exists(filename)){
+    if(File_Exists(filename)){
         if(!active_face_mask) active_face_mask=new ARRAY<bool,FACE_INDEX<TV::m> >();
         active_face_mask->Clean_Memory();
-        FILE_UTILITIES::Read_From_File<bool>(filename,*active_face_mask);}
+        Read_From_File<bool>(filename,*active_face_mask);}
 
     filename=LOG::sprintf("%s/%d/ghost_face_mask",basedir.c_str(),frame);
-    if(FILE_UTILITIES::File_Exists(filename)){
+    if(File_Exists(filename)){
         if(!ghost_face_mask) ghost_face_mask=new ARRAY<bool,FACE_INDEX<TV::m> >();
         ghost_face_mask->Clean_Memory();
-        FILE_UTILITIES::Read_From_File<bool>(filename,*ghost_face_mask);}
+        Read_From_File<bool>(filename,*ghost_face_mask);}
 
     filename=LOG::sprintf("%s/%d/active_node_mask",basedir.c_str(),frame);
-    if(FILE_UTILITIES::File_Exists(filename)){
+    if(File_Exists(filename)){
         if(!active_node_mask) active_node_mask=new ARRAY<bool,TV_INT>();
         active_node_mask->Clean_Memory();
-        FILE_UTILITIES::Read_From_File<bool>(filename,*active_node_mask);}
+        Read_From_File<bool>(filename,*active_node_mask);}
 
     filename=LOG::sprintf("%s/%d/ghost_node_mask",basedir.c_str(),frame);
-    if(FILE_UTILITIES::File_Exists(filename)){
+    if(File_Exists(filename)){
         if(!ghost_node_mask) ghost_node_mask=new ARRAY<bool,TV_INT>();
         ghost_node_mask->Clean_Memory();
-        FILE_UTILITIES::Read_From_File<bool>(filename,*ghost_node_mask);}
+        Read_From_File<bool>(filename,*ghost_node_mask);}
 }
 //#####################################################################
 // Print_Selection_Info

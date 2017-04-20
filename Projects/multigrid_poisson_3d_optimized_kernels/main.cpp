@@ -95,7 +95,7 @@ private:
             if(j==0) continue;
             if(shift_value!="" && j>0) shift_value+="+";
             if(j==-1) shift_value+="-";
-            else if(j!=1) shift_value+=STRING_UTILITIES::Value_To_String(j)+"*";
+            else if(j!=1) shift_value+=Value_To_String(j)+"*";
             shift_value+=Coordinate_Name_From_Index(i)+"_shift";}
         return shift_value;
     }

@@ -47,7 +47,7 @@ public:
     {array.Resize(grid.Cell_Indices(ghost_cells),initialize_new_elements,copy_existing_elements);}
   
     void Initialize_Domain_Boundary_Conditions(const TV_SIDES& domain_walls=TV_SIDES::Constant_Vector(TV_BOOL2::Constant_Vector(true)))
-    {boundary->Set_Constant_Extrapolation(VECTOR_UTILITIES::Complement(domain_walls));}
+    {boundary->Set_Constant_Extrapolation(Complement(domain_walls));}
 
     void Set_Custom_Boundary(BOUNDARY<TV,T>& boundary_input)
     {boundary=&boundary_input;}

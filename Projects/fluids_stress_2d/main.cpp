@@ -16,7 +16,7 @@ int main(int argc,char *argv[])
     LOG::cout<<parse_args.Print_Arguments()<<std::endl;
     FLUID_STRESS<TV>* example=new FLUID_STRESS<TV>(stream_type,parse_args);
 
-    FILE_UTILITIES::Create_Directory(example->output_directory+"/common");
+    Create_Directory(example->output_directory+"/common");
     LOG::Instance()->Copy_Log_To_File(example->output_directory+"/common/log.txt",false);
 
     STRESS_DRIVER<TV> driver(*example);

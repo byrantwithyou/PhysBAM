@@ -18,7 +18,7 @@ OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D(STREAM_TYPE stream_type,const GRID<TV> &gri
     viewer_callbacks.Set("increase_vector_size",{[this](){Increase_Vector_Size();},"Increase vector size"});
     viewer_callbacks.Set("decrease_vector_size",{[this](){Decrease_Vector_Size();},"Decrease vector size"});
 
-    is_animation = FILE_UTILITIES::Is_Animated(filename);
+    is_animation = Is_Animated(filename);
 }
 //#####################################################################
 // Function Valid_Frame
@@ -26,7 +26,7 @@ OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D(STREAM_TYPE stream_type,const GRID<TV> &gri
 template<class T> bool OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::Frame_File_Exists(filename, frame_input);
+    return Frame_File_Exists(filename, frame_input);
 }
 //#####################################################################
 // Function Set_Frame
@@ -93,9 +93,9 @@ Reinitialize(bool force)
         {
             valid = false;
 
-            std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(filename, frame);
-            if(FILE_UTILITIES::File_Exists(tmp_filename))
-                FILE_UTILITIES::Read_From_File(stream_type,tmp_filename,pseudo_dirichlet_cells);
+            std::string tmp_filename = Get_Frame_Filename(filename, frame);
+            if(File_Exists(tmp_filename))
+                Read_From_File(stream_type,tmp_filename,pseudo_dirichlet_cells);
             else
                 return;
 

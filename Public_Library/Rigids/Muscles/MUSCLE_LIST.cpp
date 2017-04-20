@@ -41,7 +41,7 @@ template<class TV> void MUSCLE_LIST<TV>::
 Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame)
 {
     Clean_Memory();
-    std::istream* input=FILE_UTILITIES::Safe_Open_Input(LOG::sprintf("%s/%d/muscle_states",directory.c_str(),frame));
+    std::istream* input=Safe_Open_Input(LOG::sprintf("%s/%d/muscle_states",directory.c_str(),frame));
     TYPED_ISTREAM typed_input=TYPED_ISTREAM(*input,stream_type);
     int num_muscles;Read_Binary(typed_input,num_muscles);//muscles.Resize(num_muscles);
     for(int i=0;i<num_muscles;i++){
@@ -56,7 +56,7 @@ Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame)
 template<class TV> void MUSCLE_LIST<TV>::
 Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame) const
 {
-    std::ostream* output=FILE_UTILITIES::Safe_Open_Output(LOG::sprintf("%s/%d/muscle_states",directory.c_str(),frame));
+    std::ostream* output=Safe_Open_Output(LOG::sprintf("%s/%d/muscle_states",directory.c_str(),frame));
     TYPED_OSTREAM typed_output=TYPED_OSTREAM(*output,stream_type);
     Write_Binary(typed_output,muscles.m);
     for(int i=0;i<muscles.m;i++) Write_Binary(typed_output,*muscles(i));

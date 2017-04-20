@@ -158,19 +158,19 @@ Reinitialize(const bool force,const bool read_geometry)
 {
     if(draw && (force || (is_animation && (frame_loaded!=frame)) || (!is_animation && (frame_loaded<0)))){
         valid=false;
-        if(!FILE_UTILITIES::File_Exists(LOG::sprintf("%s/%d/rigid_body_particles",basedir.c_str(),frame))) return;
+        if(!File_Exists(LOG::sprintf("%s/%d/rigid_body_particles",basedir.c_str(),frame))) return;
 
         // TODO: currently reads in all structures, should only read in certain kinds based on read_triangulated_surface,read_implicit_surface,read_tetrahedralized_volume
         rigid_body_collection.Read(stream_type,basedir,frame,&needs_init,&needs_destroy);
 
         std::string arb_state_file=LOG::sprintf("%s/%d/arb_state",basedir.c_str(),frame);
-        if(FILE_UTILITIES::File_Exists(arb_state_file)){
+        if(File_Exists(arb_state_file)){
             if(!articulated_rigid_body) articulated_rigid_body=new ARTICULATED_RIGID_BODY<TV>(rigid_body_collection); // TODO: read in the actual particles
             articulated_rigid_body->Read(stream_type,basedir,frame);
             Initialize();}
         else{delete articulated_rigid_body;articulated_rigid_body=0;}
 
-        if(FILE_UTILITIES::File_Exists(LOG::sprintf("%s/%d/arb_info",basedir.c_str(),frame))){
+        if(File_Exists(LOG::sprintf("%s/%d/arb_info",basedir.c_str(),frame))){
             Read_Articulated_Information(LOG::sprintf("%s/%d/arb_info",basedir.c_str(),frame));}
 
         // only enlarge array as we read in more geometry to memory
@@ -178,12 +178,12 @@ Reinitialize(const bool force,const bool read_geometry)
         Resize_Structures(max_number_of_bodies);
 
         std::string filename=LOG::sprintf("%s/%d/rigid_body_forces_and_torques",basedir.c_str(),frame);
-        if(FILE_UTILITIES::File_Exists(filename)) FILE_UTILITIES::Read_From_File(stream_type,filename,forces_and_torques);
+        if(File_Exists(filename)) Read_From_File(stream_type,filename,forces_and_torques);
         else forces_and_torques.Resize(0);
         if(has_init_destroy_information) for(int i=0;i<needs_destroy.m;i++) Destroy_Geometry(needs_destroy(i));
 
         std::string rigid_body_colors_file=LOG::sprintf("%s/%d/rigid_body_colors",basedir.c_str(),frame);
-        if(FILE_UTILITIES::File_Exists(rigid_body_colors_file)) FILE_UTILITIES::Read_From_File<T>(rigid_body_colors_file,opengl_colors);
+        if(File_Exists(rigid_body_colors_file)) Read_From_File<T>(rigid_body_colors_file,opengl_colors);
         else{opengl_colors.Resize(max_number_of_bodies);opengl_colors.Fill(OPENGL_COLOR::Cyan());}
 
         // Initialize bodies which have become active
@@ -193,9 +193,9 @@ Reinitialize(const bool force,const bool read_geometry)
         else for(int i=0;i<max_number_of_bodies;i++){if(rigid_body_collection.Is_Active(i)) Create_Geometry(i);} // TODO: can we figure out what bodies need_init
 
         // Only display real bodies (not ghost bodies)
-        if(FILE_UTILITIES::File_Exists(LOG::sprintf("%s/%d/partition",basedir.c_str(),frame))) {
+        if(File_Exists(LOG::sprintf("%s/%d/partition",basedir.c_str(),frame))) {
             ARRAY<int> particles_of_this_partition;
-            FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/partition",basedir.c_str(),frame),particles_of_this_partition);
+            Read_From_File(stream_type,LOG::sprintf("%s/%d/partition",basedir.c_str(),frame),particles_of_this_partition);
             for(int i=0;i<max_number_of_bodies;i++)
                 draw_object(i)=false;
             for(int i=0;i<particles_of_this_partition.Size();i++)
@@ -364,7 +364,7 @@ Create_Geometry(const int id)
     // add extra components
     if(opengl_tetrahedralized_volume(id)){
         std::string filename_pattern=LOG::sprintf("%s/accumulated_impulses_%d.%%d",basedir.c_str(),id);
-        if(FILE_UTILITIES::Frame_File_Exists(filename_pattern,frame)){
+        if(Frame_File_Exists(filename_pattern,frame)){
             LOG::cout<<"Adding accumulated impulses to rigid body "<<id<<std::endl;
             OPENGL_COMPONENT_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD<T>* component=
                 new OPENGL_COMPONENT_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD<T>(stream_type,*tetrahedralized_volume,filename_pattern);
@@ -380,9 +380,9 @@ Update_Geometry(const int id)
     if(opengl_axes(id)) *opengl_axes(id)->frame=FRAME<VECTOR<T,3> >(rigid_body_collection.Rigid_Body(id).Frame());
     if(opengl_tetrahedralized_volume(id)){
         std::string color_map_filename=LOG::sprintf("%s/%d/stress_map_of_tetrahedralized_volume_%d",basedir.c_str(),frame,id);
-        if(FILE_UTILITIES::File_Exists(color_map_filename)){
+        if(File_Exists(color_map_filename)){
             if(!opengl_tetrahedralized_volume(id)->color_map) opengl_tetrahedralized_volume(id)->color_map=new ARRAY<OPENGL_COLOR>;
-            FILE_UTILITIES::Read_From_File(stream_type,color_map_filename,*opengl_tetrahedralized_volume(id)->color_map);}
+            Read_From_File(stream_type,color_map_filename,*opengl_tetrahedralized_volume(id)->color_map);}
         else if(opengl_tetrahedralized_volume(id)->color_map){delete opengl_tetrahedralized_volume(id)->color_map;opengl_tetrahedralized_volume(id)->color_map=0;}}
     RIGID_BODY<TV> &rigid_body=rigid_body_collection.Rigid_Body(id);
     if(rigid_body.implicit_object && rigid_body.implicit_object->object_space_implicit_object->update_every_frame)
@@ -469,7 +469,7 @@ Update_Object_Labels()
 template<class T> bool OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::File_Exists(LOG::sprintf("%s/%d/rigid_body_particles",basedir.c_str(),frame_input));
+    return File_Exists(LOG::sprintf("%s/%d/rigid_body_particles",basedir.c_str(),frame_input));
 }
 //#####################################################################
 // Function Set_Frame
@@ -753,7 +753,7 @@ Turn_Off_Individual_Smooth_Shading_Prompt()
 {
     if(!OPENGL_WORLD<T>::Singleton()->prompt_response.empty()){
         int object_id;
-        STRING_UTILITIES::String_To_Value(OPENGL_WORLD<T>::Singleton()->prompt_response,object_id);
+        String_To_Value(OPENGL_WORLD<T>::Singleton()->prompt_response,object_id);
         if((unsigned)object_id<(unsigned)rigid_body_collection.rigid_body_particles.Size() && opengl_triangulated_surface(object_id))
             opengl_triangulated_surface(object_id)->Turn_Smooth_Shading_Off();}
 }
@@ -808,7 +808,7 @@ Selection_Bounding_Box() const
 template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Read_Articulated_Information(const std::string& filename)
 {
-    std::istream* input=FILE_UTILITIES::Safe_Open_Input(filename);
+    std::istream* input=Safe_Open_Input(filename);
     TYPED_ISTREAM typed_input(*input,stream_type);
     // this will need to be changed to reflect multiple articulation points per rigid body
     int numpoints=0;Read_Binary(typed_input,numpoints);articulation_points.Exact_Resize(numpoints);joint_frames.Exact_Resize(numpoints);

@@ -434,7 +434,7 @@ public:
 
         // give mon hints
         LOG::cout<<"MONITOR begin_frame="<<this->first_frame<<std::endl;
-        LOG::cout<<"MONITOR output_directory="<<(FILE_UTILITIES::Get_Working_Directory()+"/"+output_directory)<<std::endl;
+        LOG::cout<<"MONITOR output_directory="<<(Get_Working_Directory()+"/"+output_directory)<<std::endl;
         LOG::cout<<"MONITOR end_frame="<<last_frame<<std::endl;
     }
 

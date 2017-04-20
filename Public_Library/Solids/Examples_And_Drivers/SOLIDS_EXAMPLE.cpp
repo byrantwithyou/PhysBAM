@@ -112,8 +112,8 @@ Adjust_Output_Directory_For_MPI(const MPI_SOLIDS<TV>* mpi)
 {
     if(mpi && mpi->Number_Of_Processors()>1){
         output_directory+=LOG::sprintf("/%d",(mpi->rank+1));
-        FILE_UTILITIES::Create_Directory(output_directory);
-        FILE_UTILITIES::Create_Directory(output_directory+"/common");
+        Create_Directory(output_directory);
+        Create_Directory(output_directory+"/common");
         LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",restart);}
 }
 //#####################################################################
@@ -183,10 +183,10 @@ Write_Output_Files(const int frame) const
             ARRAY_VIEW<T> t(particle.twist.m*TWIST<TV>::m,(T*)particle.twist.Get_Array_Pointer());
             oo.Write("rb_twist",t);}}
 
-    FILE_UTILITIES::Create_Directory(output_directory);
+    Create_Directory(output_directory);
     std::string f=LOG::sprintf("%d",frame);
-    FILE_UTILITIES::Create_Directory(output_directory+"/"+f);
-    FILE_UTILITIES::Create_Directory(output_directory+"/common");
+    Create_Directory(output_directory+"/"+f);
+    Create_Directory(output_directory+"/common");
     Write_Frame_Title(frame);
     debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
     solid_body_collection.Write(stream_type,output_directory,frame,first_frame,solids_parameters.write_static_variables_every_frame,

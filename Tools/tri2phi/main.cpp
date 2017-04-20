@@ -96,14 +96,14 @@ template<class T,class RW> void Convert(int boundary_cells,PARSE_ARGS &parse_arg
 
     parse_args.Parse();
 
-    TRIANGULATED_SURFACE<T>* triangulated_surface=0;FILE_UTILITIES::Create_From_File<RW>(input_filename,triangulated_surface);
+    TRIANGULATED_SURFACE<T>* triangulated_surface=0;Create_From_File<RW>(input_filename,triangulated_surface);
     triangulated_surface->Update_Bounding_Box();
     RANGE<TV> box=*triangulated_surface->bounding_box;
 
     if(use_grid_size && dx){LOG::cerr<<"Only one of -g and -dx is allowed."<<std::endl;exit(1);}
     if(grid_size.Contains(0)){std::cerr<<"Invalid suggested grid size "<<grid_size<<std::endl;exit(1);}
 
-    if(!FILE_UTILITIES::Is_Tri_File(input_filename)){
+    if(!Is_Tri_File(input_filename)){
         std::cerr<<"Not a tri file: "<<input_filename<<std::endl;
         return;}
 
@@ -118,12 +118,12 @@ template<class T,class RW> void Convert(int boundary_cells,PARSE_ARGS &parse_arg
         grid=Make_Cube_Grid(original_grid,boundary_cells,use_octree,mac);}
 
     if(!exact_grid.empty()){
-        FILE_UTILITIES::Read_From_File<RW>(exact_grid,grid);
+        Read_From_File<RW>(exact_grid,grid);
         LOG::cout<<"reading grid from "<<exact_grid<<std::endl;}
 
     if(output_filename.empty()){
         std::string dimensions=LOG::sprintf("%dx%dx%d",grid.counts.x,grid.counts.y,grid.counts.z);
-        output_filename=FILE_UTILITIES::Get_Basename(input_filename)+dimensions+(use_octree?".oct":".phi");}
+        output_filename=Get_Basename(input_filename)+dimensions+(use_octree?".oct":".phi");}
 
     std::cout<<"Input filename: "<<input_filename<<std::endl;
     std::cout<<"Output filename: "<<output_filename<<std::endl;
@@ -172,7 +172,7 @@ template<class T,class RW> void Convert(int boundary_cells,PARSE_ARGS &parse_arg
             levelset_maker.Compute_Level_Set(*triangulated_surface,grid,phi);
             LEVELSET_IMPLICIT_OBJECT<TV> levelset_implicit_surface(grid,phi);
             //phi+=(T)1*grid.dX.Max();
-        FILE_UTILITIES::Write_To_File<RW>(output_filename,levelset_implicit_surface);}
+        Write_To_File<RW>(output_filename,levelset_implicit_surface);}
 }
 
 int main(int argc,char *argv[])

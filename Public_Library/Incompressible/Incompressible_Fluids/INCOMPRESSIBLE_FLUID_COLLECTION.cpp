@@ -30,7 +30,7 @@ template<class TV> void INCOMPRESSIBLE_FLUID_COLLECTION<TV>::
 Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const
 {
     std::string f=LOG::sprintf("%d",frame);
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/mac_velocities",face_velocities);
+    Write_To_File(stream_type,output_directory+"/"+f+"/mac_velocities",face_velocities);
 }
 //#####################################################################
 // Function Read_Output_Files
@@ -41,12 +41,12 @@ Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direct
     std::string f=LOG::sprintf("%d",frame);
     std::string filename=output_directory+"/"+f+"/mac_velocities";
     std::string centered_velocity_filename=output_directory+"/"+f+"/centered_velocities";
-    if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading mac_velocities "<<filename<<std::endl;
-        FILE_UTILITIES::Read_From_File(stream_type,filename,face_velocities);}
-    else if(FILE_UTILITIES::File_Exists(centered_velocity_filename)){
+    if(File_Exists(filename)){LOG::cout<<"Reading mac_velocities "<<filename<<std::endl;
+        Read_From_File(stream_type,filename,face_velocities);}
+    else if(File_Exists(centered_velocity_filename)){
         LOG::cout<<"Converting centered velocities from "<<centered_velocity_filename<<" to mac_velocities"<<std::endl;
         ARRAY<TV,TV_INT> centered_velocities;
-        FILE_UTILITIES::Read_From_File(stream_type,centered_velocity_filename,centered_velocities);
+        Read_From_File(stream_type,centered_velocity_filename,centered_velocities);
 
         TV_INT face_index,first_cell_index,second_cell_index;int axis;
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){

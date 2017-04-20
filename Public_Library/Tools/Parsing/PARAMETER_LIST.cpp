@@ -31,8 +31,8 @@ namespace
 
     static bool is_dash_parameter_name(const std::string &str,std::string *parameter_name=0)
     {if(str.length()>1 && str[0]=='-'){
-        std::string tmp_parameter_name=STRING_UTILITIES::Stripped_Whitespace(str.substr(1));
-        if(!STRING_UTILITIES::Is_Number(tmp_parameter_name) && tmp_parameter_name!="-"){
+        std::string tmp_parameter_name=Stripped_Whitespace(str.substr(1));
+        if(!Is_Number(tmp_parameter_name) && tmp_parameter_name!="-"){
             if(parameter_name) *parameter_name=tmp_parameter_name;
             return true;}}
     return false;}
@@ -86,7 +86,7 @@ Value_To_String(const bool &value,std::string &value_string)
 template<> bool PARAMETER_LIST::
 String_To_Value(const std::string &value_string,bool &value,bool commandline_style)
 {
-    std::string value_string_stripped=STRING_UTILITIES::Stripped_Whitespace(value_string);
+    std::string value_string_stripped=Stripped_Whitespace(value_string);
     if((commandline_style && value_string_stripped=="") || value_string_stripped=="true" || value_string_stripped=="1") value=true;
     else if(value_string_stripped=="false" || value_string_stripped=="0") value=false;
     else return false;
@@ -176,7 +176,7 @@ Begin_Parse(int argc,char *argv[],const std::string &default_extra_parameters_fi
     // Read in file specified by -param
     bool param_defined=Is_Defined("param");
     std::string param_filename=Get_Parameter_And_Set_If_Undefined<std::string>("param",default_extra_parameters_filename,"read extra parameters from");
-    if(!param_filename.empty() && (param_defined || FILE_UTILITIES::File_Exists(param_filename))){
+    if(!param_filename.empty() && (param_defined || File_Exists(param_filename))){
         LOG::cout<<"Note: Reading parameters from "<<param_filename<<std::endl;
         Read(param_filename);}
 }
@@ -254,12 +254,12 @@ Read(std::istream& input_stream,bool overwrite_existing_values)
     while(std::getline(input_stream,line)){
         std::string::size_type comment=line.find("//");
         std::string statement,description;
-        if(comment==std::string::npos){statement=STRING_UTILITIES::Stripped_Whitespace(line);description="";}
-        else{statement=STRING_UTILITIES::Stripped_Whitespace(line.substr(0,comment));description=STRING_UTILITIES::Stripped_Whitespace(line.substr(comment+2));}
+        if(comment==std::string::npos){statement=Stripped_Whitespace(line);description="";}
+        else{statement=Stripped_Whitespace(line.substr(0,comment));description=Stripped_Whitespace(line.substr(comment+2));}
         if(statement.empty())continue;
         std::string::size_type equals=statement.find("=");
         if(equals==std::string::npos){LOG::cerr<<"PARAMETER_LIST: Did not find '='"<<std::endl;return false;}
-        std::string name=STRING_UTILITIES::Stripped_Whitespace(statement.substr(0,equals)),value=STRING_UTILITIES::Stripped_Whitespace(statement.substr(equals+1));
+        std::string name=Stripped_Whitespace(statement.substr(0,equals)),value=Stripped_Whitespace(statement.substr(equals+1));
         Insert_Parameter(name,PARAMETER_INFO(value,description),overwrite_existing_values);}
     return true;
 }

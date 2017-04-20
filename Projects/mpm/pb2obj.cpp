@@ -19,8 +19,8 @@ void Run(PARSE_ARGS& parse_args,STREAM_TYPE stream_type)
 #pragma omp parallel for schedule(dynamic)
         for(int i=0;;i++){
             MPM_PARTICLES<TV> particle;
-            FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/mpm_particles.gz",directory,i),particle);
-            std::ostream* output=FILE_UTILITIES::Safe_Open_Output(LOG::sprintf("%s/%d.obj",output_directory,i+1),false);
+            Read_From_File(stream_type,LOG::sprintf("%s/%d/mpm_particles.gz",directory,i),particle);
+            std::ostream* output=Safe_Open_Output(LOG::sprintf("%s/%d.obj",output_directory,i+1),false);
             for(int p=0;p<particle.X.m;p++){
                 *output<<"v ";
                 particle.X(p).Write_Raw(*output);
@@ -58,7 +58,7 @@ int main(int argc,char *argv[])
     parse_args.Parse();
 
     output_directory=directory+"/mpm_particle_obj";
-    FILE_UTILITIES::Create_Directory(output_directory);
+    Create_Directory(output_directory);
 
     if(type_double) Run<VECTOR<double,3> >(parse_args,STREAM_TYPE(0.0));
     else Run<VECTOR<float,3> >(parse_args,STREAM_TYPE(0.0f));

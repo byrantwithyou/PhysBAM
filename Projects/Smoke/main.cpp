@@ -190,7 +190,7 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
         if(example->mpi_grid->Number_Of_Processors()>1) example->output_directory+=LOG::sprintf("/%d",(mpi_world.rank+1));}
 
     // OUTPUT DIR
-    FILE_UTILITIES::Create_Directory(example->output_directory+"/common");
+    Create_Directory(example->output_directory+"/common");
     LOG::Instance()->Copy_Log_To_File(example->output_directory+"/common/log.txt",false);
     
     // DRIVER MAIN LOOP

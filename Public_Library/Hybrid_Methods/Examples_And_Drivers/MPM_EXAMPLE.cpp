@@ -70,11 +70,11 @@ Write_Output_Files(const int frame)
 #pragma omp single
     {
 #pragma omp task
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",grid);
+        Write_To_File(stream_type,output_directory+"/common/grid",grid);
 #pragma omp task
         if(!system(LOG::sprintf("rm -f %s/%d/mpm_particles.gz ;  ln -s ./deformable_object_particles.gz %s/%d/mpm_particles.gz",output_directory.c_str(),frame,output_directory.c_str(),frame).c_str())){}
 #pragma omp task
-        FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
+        Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
 #pragma omp task
         {
             int static_frame=output_structures_each_frame?frame:-1;
@@ -84,7 +84,7 @@ Write_Output_Files(const int frame)
 
         if(!only_write_particles){
 #pragma omp task
-            FILE_UTILITIES::Write_To_File(stream_type,LOG::sprintf("%s/%d/centered_velocities",output_directory.c_str(),frame),*current_velocity);
+            Write_To_File(stream_type,LOG::sprintf("%s/%d/centered_velocities",output_directory.c_str(),frame),*current_velocity);
 #pragma omp task
             {
                 ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
@@ -109,8 +109,8 @@ template<class TV> void MPM_EXAMPLE<TV>::
 Read_Output_Files(const int frame)
 {
     std::string f=LOG::sprintf("%d",frame);
-    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
-    FILE_UTILITIES::Read_From_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
+    Read_From_File(stream_type,LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
+    Read_From_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
 }
 //#####################################################################
 // Function Capture_Stress

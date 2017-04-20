@@ -95,7 +95,7 @@ OPENGL_KEY OPENGL_KEY::From_String(const std::string& key_string,unsigned int& i
     else if(key_string[i]=='<'){ // special named key sequence
         std::string::size_type end_index=key_string.find('>',i+1);
         if(end_index==std::string::npos){i=(unsigned int)key_string.size();return OPENGL_KEY(UNKNOWN);}
-        else{std::string key_name=STRING_UTILITIES::toupper(key_string.substr(i+1,end_index-i-1));i=(unsigned int)end_index+1;
+        else{std::string key_name=toupper(key_string.substr(i+1,end_index-i-1));i=(unsigned int)end_index+1;
             for(int j=0;key_names[j];j++) if(key_name==std::string(key_names[j])) return OPENGL_KEY((OPENGL_KEY::SPECIAL_KEY)((int)OPENGL_KEY::F1+j));
             return OPENGL_KEY(UNKNOWN);}}
     else{return key_string[i++];}

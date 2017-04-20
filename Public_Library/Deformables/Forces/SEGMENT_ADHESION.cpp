@@ -291,7 +291,7 @@ Update_Partitions(bool restart,MPI_SOLIDS<TV>* mpi_solids,const std::string outp
 
     // Cull hairs that are close at beginning
     if(restart){
-        FILE_UTILITIES::Read_From_File<float>(output_directory+"/adhesion_existing",existing_pairs); // TODO: use real output_directory
+        Read_From_File<float>(output_directory+"/adhesion_existing",existing_pairs); // TODO: use real output_directory
         restart=false;}
     else{
         Update_Hierarchy();
@@ -299,7 +299,7 @@ Update_Partitions(bool restart,MPI_SOLIDS<TV>* mpi_solids,const std::string outp
         EDGE_EDGE_INITIAL_CULL_VISITOR<TV> external_visitor(*this,internal_segment_indices,external_segment_indices);
         internal_curve.hierarchy->Intersection_List(*internal_curve.hierarchy,internal_visitor,0);
         if(mpi_solids) internal_curve.hierarchy->Intersection_List(*external_curve.hierarchy,external_visitor,0);
-        FILE_UTILITIES::Write_To_File<float>(output_directory+"/adhesion_existing",existing_pairs);} // TODO: use real output_directory
+        Write_To_File<float>(output_directory+"/adhesion_existing",existing_pairs);} // TODO: use real output_directory
 }
 //#####################################################################
 // Function Update_Springs
@@ -381,7 +381,7 @@ template<class TV> void SEGMENT_ADHESION<TV>::
 Write_State(STREAM_TYPE stream_type,const std::string& filename)
 {   
     LOG::cout<<"WRITING: Number of springs: "<<springs->Size()<<std::endl;
-    FILE_UTILITIES::Write_To_File(stream_type,filename,*springs);
+    Write_To_File(stream_type,filename,*springs);
 }
 //#####################################################################
 // Function Write_To_File
@@ -389,7 +389,7 @@ Write_State(STREAM_TYPE stream_type,const std::string& filename)
 template<class TV> void SEGMENT_ADHESION<TV>::
 Read_State(STREAM_TYPE stream_type,const std::string& filename)
 {
-    FILE_UTILITIES::Read_From_File(stream_type,filename,*springs);
+    Read_From_File(stream_type,filename,*springs);
     LOG::cout<<"READING: Number of springs: "<<springs->Size()<<std::endl;
 }
 //#####################################################################

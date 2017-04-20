@@ -19,7 +19,7 @@ OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D(STREAM_TYPE stream_type,const GRID<T
     viewer_callbacks.Set("decrease_vector_size",{[this](){Decrease_Vector_Size();},"Decrease vector size"});
     viewer_callbacks.Set("toggle_arrowhead",{[this](){Toggle_Arrowhead();},"Toggle arrowhead"});
 
-    is_animation = FILE_UTILITIES::Is_Animated(vector_field_filename);
+    is_animation = Is_Animated(vector_field_filename);
     frame_loaded = -1;
 }
 //#####################################################################
@@ -37,7 +37,7 @@ template<class T> OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>::
 template<class T> bool OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>::
 Valid_Frame(int frame_input) const
 {
-    return FILE_UTILITIES::Frame_File_Exists(vector_field_filename, frame_input);
+    return Frame_File_Exists(vector_field_filename, frame_input);
 }
 //#####################################################################
 // Function Set_Frame
@@ -88,9 +88,9 @@ Reinitialize()
         {
             valid = false;
 
-            std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(vector_field_filename, frame);
-            if(FILE_UTILITIES::File_Exists(tmp_filename))
-                FILE_UTILITIES::Read_From_File(stream_type,tmp_filename,opengl_grid_based_vector_field.V);
+            std::string tmp_filename = Get_Frame_Filename(vector_field_filename, frame);
+            if(File_Exists(tmp_filename))
+                Read_From_File(stream_type,tmp_filename,opengl_grid_based_vector_field.V);
             else
                 return;
 

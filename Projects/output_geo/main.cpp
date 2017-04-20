@@ -112,7 +112,7 @@ int main(int argc,char *argv[])
     parse_args.Parse();
     if(parse_args.unclaimed_arguments){parse_args.Print_Usage();exit(0);}
 
-    std::ostream* output=FILE_UTILITIES::Safe_Open_Output(output_filename,false);
+    std::ostream* output=Safe_Open_Output(output_filename,false);
     DEFORMABLE_BODY_COLLECTION<TV>& collection=Load_Deformable_Geometry_Collection(input_folder,frame_number);
     Emit_Deformable_Bodies(*output,collection);
 
