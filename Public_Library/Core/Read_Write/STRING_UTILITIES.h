@@ -19,6 +19,7 @@ inline void Strip_Whitespace(std::string& str)
 
 bool Is_Number(const std::string& str); // integer or floating point
 int Compare_Strings(const std::string &str1,const std::string &str2,bool case_sensitive=true);
+int Compare_Strings(const char* str1,int len1,const char* str2,int len2,bool case_sensitive=true);
 std::string toupper(const std::string& str);
 bool Parse_Integer_Range(const std::string& str,ARRAY<int>& integer_list);
 

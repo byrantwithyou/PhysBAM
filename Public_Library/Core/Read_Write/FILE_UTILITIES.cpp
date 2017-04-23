@@ -298,14 +298,19 @@ std::string Get_Short_Name_Ignoring_Compression_Suffix(const std::string& filena
     return filename.substr(lastslash+1);
 }
 
-bool File_Extension_Matches_Ignoring_Compression_Suffix(const std::string& filename,const std::string& ext,const bool case_sensitive)
+bool File_Extension_Matches_Ignoring_Compression_Suffix(const std::string& filename,const char* ext,int len_ext,const bool case_sensitive)
 {
-    return !Compare_Strings(Get_File_Extension_Ignoring_Compression_Suffix(filename),ext,case_sensitive);
+    int len=filename.length();
+    const char* end=filename.c_str()+len;
+    if(len<=len_ext+1) return false;
+    if(len>4+len_ext && !Compare_Strings(end-3,3,".gz",3,case_sensitive)) end-=3;
+    if(Compare_Strings(end-len_ext,len_ext,ext,len_ext,case_sensitive)) return false;
+    return end[-len_ext-1]=='.';
 }
 
 bool File_Is_Compressed(const std::string& filename)
 {
-    return File_Extension_Matches_Ignoring_Compression_Suffix(filename,"gz");
+    return File_Extension_Matches_Ignoring_Compression_Suffix(filename,"gz",3,true);
 }
 
 bool File_Exists(const std::string& filename)
@@ -329,11 +334,6 @@ std::string Real_File(const std::string& filename)
     if(File_Exists_Ignoring_Compression_Suffix(filename))return filename;
     else if(!File_Is_Compressed(filename) && File_Exists_Ignoring_Compression_Suffix(filename+".gz"))return filename+".gz";
     return "";
-}
-
-bool File_Extension_Matches(const std::string& filename,const std::string& ext,const bool case_sensitive)
-{
-    return File_Extension_Matches_Ignoring_Compression_Suffix(Strip_Compression_Suffix(filename),ext,case_sensitive);
 }
 
 FILE_TYPE Get_File_Type_Ignoring_Compression_Suffix(const std::string& filename)

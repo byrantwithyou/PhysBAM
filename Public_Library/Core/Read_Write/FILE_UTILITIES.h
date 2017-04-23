@@ -8,6 +8,7 @@
 #include <Core/Read_Write/READ_WRITE_FUNCTIONS.h>
 #include <Core/Read_Write/STRING_UTILITIES.h>
 #include <Core/Utilities/EXCEPTIONS.h>
+#include <cstring>
 namespace PhysBAM{
 
 //#####################################################################
@@ -41,13 +42,16 @@ std::string Get_Working_Directory();
 std::string Get_File_Extension_Ignoring_Compression_Suffix(const std::string &filename);
 std::string Get_Basename_Ignoring_Compression_Suffix(const std::string& filename);
 std::string Get_Short_Name_Ignoring_Compression_Suffix(const std::string& filename);
-bool File_Extension_Matches_Ignoring_Compression_Suffix(const std::string& filename,const std::string& ext,const bool case_sensitive=true);
+bool File_Extension_Matches_Ignoring_Compression_Suffix(const std::string& filename,const char* ext,int len_ext,const bool case_sensitive);
+inline bool File_Extension_Matches_Ignoring_Compression_Suffix(const std::string& filename,const char* ext,const bool case_sensitive=true)
+{return File_Extension_Matches_Ignoring_Compression_Suffix(filename,ext,strlen(ext),case_sensitive);}
+inline bool File_Extension_Matches_Ignoring_Compression_Suffix(const std::string& filename,const std::string& ext,const bool case_sensitive=true)
+{return File_Extension_Matches_Ignoring_Compression_Suffix(filename,ext.c_str(),ext.length(),case_sensitive);}
 bool File_Is_Compressed(const std::string& filename);
 bool File_Exists(const std::string& filename);
 bool File_Writable(const std::string& filename);
 std::string Strip_Compression_Suffix(const std::string& filename);
 std::string Real_File(const std::string& filename);
-bool File_Extension_Matches(const std::string& filename,const std::string& ext,const bool case_sensitive=true);
 FILE_TYPE Get_File_Type_Ignoring_Compression_Suffix(const std::string& filename);
 FILE_TYPE Get_File_Type(const std::string& filename);
 bool File_Type_Matches_Ignoring_Compression_Suffix(const std::string& filename,FILE_TYPE type);
