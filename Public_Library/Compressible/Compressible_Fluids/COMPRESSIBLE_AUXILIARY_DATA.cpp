@@ -2,7 +2,6 @@
 // Copyright 2009, Jon Gretarsson, Nipun Kwatra.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Grid_Tools/Computations/GRADIENT_UNIFORM.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>

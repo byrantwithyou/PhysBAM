@@ -9,13 +9,12 @@
 
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Arrays/ARRAYS_FORWARD.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/VECTOR_3D.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 namespace PhysBAM{
 
 template<class T>
-class LEVELSET_MAKER:public NONCOPYABLE
+class LEVELSET_MAKER
 {
 protected:
     typedef VECTOR<int,3> TV_INT;typedef VECTOR<T,3> TV;
@@ -58,6 +57,8 @@ public:
         Use_Remove_Degenerate_Triangles();
         Set_Phi_Offset();
     }
+    LEVELSET_MAKER(const LEVELSET_MAKER&) = delete;
+    void operator=(const LEVELSET_MAKER&) = delete;
 
     void Verbose_Mode(const bool verbose_input=true)
     {verbose=verbose_input;}

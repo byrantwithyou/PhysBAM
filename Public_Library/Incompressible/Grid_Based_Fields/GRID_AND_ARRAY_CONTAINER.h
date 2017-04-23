@@ -8,7 +8,6 @@
 #define __GRID_AND_ARRAY_CONTAINER__
 
 #include <Core/Arrays/ARRAYS_FORWARD.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/VECTOR_UTILITIES.h>
 #include <Grid_PDE/Advection/ADVECTION_FORWARD.h>
 #include <Grid_PDE/Advection/ADVECTION_UNIFORM_FORWARD.h>
@@ -19,7 +18,7 @@ template<class TV,class T> struct BOUNDARY;
 template<class TV> struct GRID_ARRAYS_POLICY;
 
 template<class TV,class T2>
-class GRID_AND_ARRAY_CONTAINER:public NONCOPYABLE
+class GRID_AND_ARRAY_CONTAINER
 {
     typedef typename TV::SCALAR T;typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,TV::m> TV_SIDES;typedef VECTOR<int,TV::m> TV_INT;
     typedef ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T> T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
@@ -38,6 +37,8 @@ protected:
 public:
 
     GRID_AND_ARRAY_CONTAINER(GRID<TV>& grid_input);
+    GRID_AND_ARRAY_CONTAINER(const GRID_AND_ARRAY_CONTAINER&) = delete;
+    void operator=(const GRID_AND_ARRAY_CONTAINER&) = delete;
     virtual ~GRID_AND_ARRAY_CONTAINER();
 
     void Clean_Memory()

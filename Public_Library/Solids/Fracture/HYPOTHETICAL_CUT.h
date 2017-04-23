@@ -7,7 +7,6 @@
 #ifndef __HYPOTHETICAL_CUT__
 #define __HYPOTHETICAL_CUT__
 
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME.h>
 #include <Deformables/Fracture/EMBEDDED_TRIANGULATED_OBJECT.h>
 #include <Deformables/Fracture/EMBEDDING_POLICY.h>
@@ -15,7 +14,7 @@
 namespace PhysBAM{
 
 template<class TV,int d>
-class HYPOTHETICAL_CUT:public NONCOPYABLE
+class HYPOTHETICAL_CUT
 {
     typedef typename TV::SCALAR T;
     typedef typename EMBEDDING_POLICY<TV,d>::EMBEDDED_OBJECT T_EMBEDDED_OBJECT;
@@ -28,6 +27,8 @@ public:
     HYPOTHETICAL_CUT(const T_EMBEDDED_OBJECT& embedded_object_input)
         :embedded_object(embedded_object_input),cut_quality_metric(0)
     {}
+    HYPOTHETICAL_CUT(const HYPOTHETICAL_CUT&) = delete;
+    void operator=(const HYPOTHETICAL_CUT&) = delete;
 
 protected:
     void Add_Hypothetical_Node(const int parent1,const int parent2,const T interpolation_fraction)

@@ -14,14 +14,13 @@
 #ifndef __PCG_SPARSE__
 #define __PCG_SPARSE__
 
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
 namespace PhysBAM{
 
 template<class T> class SPARSE_MATRIX_FLAT_MXN;
 
 template<class T>
-class PCG_SPARSE:public NONCOPYABLE
+class PCG_SPARSE
 {
 public:
     bool enforce_compatibility; // for Neumann boundary conditions
@@ -45,6 +44,9 @@ public:
         Set_Maximum_Iterations();
     }
 
+    PCG_SPARSE(const PCG_SPARSE&) = delete;
+    void operator=(const PCG_SPARSE&) = delete;
+    
     virtual ~PCG_SPARSE()
     {}
 

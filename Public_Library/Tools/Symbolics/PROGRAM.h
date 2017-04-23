@@ -8,7 +8,6 @@
 #define __PROGRAM__
 
 #include <Core/Data_Structures/HASHTABLE.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Tools/Symbolics/CODE_BLOCK.h>
 #include <Tools/Symbolics/CODE_BLOCK_NODE.h>

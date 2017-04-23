@@ -7,11 +7,10 @@
 #ifndef __MPI_WORLD__
 #define __MPI_WORLD__
 
-#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 class PARSE_ARGS;
-class MPI_WORLD:public NONCOPYABLE
+class MPI_WORLD
 {
 public:
     bool initialized;
@@ -19,6 +18,8 @@ public:
 
     MPI_WORLD();
     MPI_WORLD(PARSE_ARGS& parse_args);
+    MPI_WORLD(const MPI_WORLD&) = delete;
+    void operator=(const MPI_WORLD&) = delete;
     ~MPI_WORLD();
 
 //#####################################################################

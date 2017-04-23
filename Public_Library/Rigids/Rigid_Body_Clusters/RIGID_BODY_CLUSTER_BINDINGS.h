@@ -11,7 +11,6 @@
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Data_Structures/PAIR.h>
 #include <Core/Matrices/MATRIX_POLICY.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 #include <Rigids/Joints/JOINT_ID.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
@@ -23,7 +22,7 @@ template<class TV> class ARTICULATED_RIGID_BODY;
 template<class TV> class GRID;
 
 template<class TV>
-class RIGID_BODY_CLUSTER_BINDINGS:public NONCOPYABLE
+class RIGID_BODY_CLUSTER_BINDINGS
 {
     typedef typename TV::SCALAR T;
 public:
@@ -76,6 +75,8 @@ public:
     typedef typename TV::SPIN T_SPIN;
 
     RIGID_BODY_CLUSTER_BINDINGS(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARTICULATED_RIGID_BODY<TV>& articulated_rigid_body_input);
+    RIGID_BODY_CLUSTER_BINDINGS(const RIGID_BODY_CLUSTER_BINDINGS&) = delete;
+    void operator=(const RIGID_BODY_CLUSTER_BINDINGS&) = delete;
 
     CALLBACKS* callbacks;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;

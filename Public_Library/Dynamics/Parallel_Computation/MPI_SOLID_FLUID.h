@@ -10,7 +10,6 @@
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_FORWARD.h>
 namespace MPI{class Group;class Intracomm;class Request;class Status;class Op;}
@@ -24,7 +23,7 @@ template<class TV> class SOLID_BODY_COLLECTION;
 class SPARSE_MATRIX_PARTITION;
 
 template<class TV>
-class MPI_SOLID_FLUID:public NONCOPYABLE
+class MPI_SOLID_FLUID
 {
     typedef typename TV::SCALAR T;
 public:
@@ -40,6 +39,8 @@ private:
 public:
 
     MPI_SOLID_FLUID();
+    MPI_SOLID_FLUID(const MPI_SOLID_FLUID&) = delete;
+    void operator=(const MPI_SOLID_FLUID&) = delete;
     ~MPI_SOLID_FLUID();
 
     int Number_Of_Processors() const

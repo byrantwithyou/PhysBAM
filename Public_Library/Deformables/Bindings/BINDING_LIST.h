@@ -17,7 +17,7 @@ namespace PhysBAM{
 template<class TV> class DEFORMABLE_BODY_COLLECTION;
 
 template<class TV>
-class BINDING_LIST:public NONCOPYABLE
+class BINDING_LIST
 {
     typedef typename TV::SCALAR T;
 public:
@@ -33,6 +33,8 @@ public:
     ARRAY<ARRAY<int> > neighbor_bindings;
 
     BINDING_LIST(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection);
+    BINDING_LIST(const BINDING_LIST&) = delete;
+    void operator=(const BINDING_LIST&) = delete;
     virtual ~BINDING_LIST();
 
     int Binding_Index_From_Particle_Index(const int particle) const

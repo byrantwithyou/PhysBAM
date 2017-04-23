@@ -8,13 +8,12 @@
 #define __LEVELSET_COLOR__
 
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Grid_Tools/Grids/GRID.h>
 
 namespace PhysBAM{
 
 template<class TV>
-class LEVELSET_COLOR:public NONCOPYABLE
+class LEVELSET_COLOR
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -27,6 +26,8 @@ public:
     LEVELSET_COLOR(GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input,ARRAY<int,TV_INT>& color_input)
         :grid(grid_input),phi(phi_input),color(color_input)
     {}
+    LEVELSET_COLOR(const LEVELSET_COLOR&) = delete;
+    void operator=(const LEVELSET_COLOR&) = delete;
 
     T Phi(const TV_INT& index) const
     {return phi(index);}

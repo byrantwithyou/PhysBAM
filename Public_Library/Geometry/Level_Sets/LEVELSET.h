@@ -11,7 +11,6 @@
 #include <Core/Math_Tools/constants.h>
 #include <Core/Math_Tools/INTERVAL.h>
 #include <Core/Matrices/SYMMETRIC_MATRIX.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/SCALAR_POLICY.h>
 #include <Grid_Tools/Grids/FACE_INDEX.h>
 #include <Grid_PDE/Interpolation/FACE_LOOKUP_UNIFORM.h>
@@ -30,7 +29,7 @@ template<class TV,class T2> class BOUNDARY;
 template<class TV> class LEVELSET;
 
 template<class TV>
-class LEVELSET:public NONCOPYABLE
+class LEVELSET
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef INTERPOLATION_UNIFORM<TV,T> T_INTERPOLATION_SCALAR;
@@ -67,6 +66,8 @@ public:
     int number_of_ghost_cells;
 
     LEVELSET(GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input,const int number_of_ghost_cells_input=3);
+    LEVELSET(const LEVELSET&) = delete;
+    void operator=(const LEVELSET&) = delete;
     ~LEVELSET();
 
     void Set_Small_Number(const T small_number_input=1e-8)

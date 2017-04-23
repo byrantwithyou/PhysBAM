@@ -13,7 +13,7 @@
 namespace PhysBAM{
 
 template<class TV>
-class SOLIDS_FLUIDS_DRIVER:public DRIVER<TV>,public NONCOPYABLE
+class SOLIDS_FLUIDS_DRIVER:public DRIVER<TV>
 {
     typedef typename TV::SCALAR T;
     typedef DRIVER<TV> BASE;
@@ -27,6 +27,8 @@ public:
     bool next_done; // for fluid time stepping
 
     SOLIDS_FLUIDS_DRIVER(SOLIDS_FLUIDS_EXAMPLE<TV>& example_input);
+    SOLIDS_FLUIDS_DRIVER(const SOLIDS_FLUIDS_DRIVER&) = delete;
+    void operator=(const SOLIDS_FLUIDS_DRIVER&) = delete;
     virtual ~SOLIDS_FLUIDS_DRIVER();
 
     virtual void Preprocess_Frame(const int frame)

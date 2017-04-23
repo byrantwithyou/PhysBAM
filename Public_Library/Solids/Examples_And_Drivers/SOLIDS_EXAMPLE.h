@@ -10,7 +10,6 @@
 #include <Core/Log/DEBUG_SUBSTEPS.h>
 #include <Core/Log/DEBUG_UTILITIES.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Ordinary_Differential_Equations/EXAMPLE.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
@@ -26,7 +25,7 @@ template<class TV> class SOLIDS_EVOLUTION;
 template<class TV> class SOLID_BODY_COLLECTION;
 
 template<class TV>
-class SOLIDS_EXAMPLE:public EXAMPLE<TV>,public EXAMPLE_FORCES_AND_VELOCITIES<TV>,public SOLIDS_EVOLUTION_CALLBACKS<TV>,public NONCOPYABLE
+class SOLIDS_EXAMPLE:public EXAMPLE<TV>,public EXAMPLE_FORCES_AND_VELOCITIES<TV>,public SOLIDS_EVOLUTION_CALLBACKS<TV>
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::SPIN T_SPIN;
@@ -55,6 +54,8 @@ public:
     bool opt_skip_debug_data;
 
     SOLIDS_EXAMPLE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args);
+    SOLIDS_EXAMPLE(const SOLIDS_EXAMPLE&) = delete;
+    void operator=(const SOLIDS_EXAMPLE&) = delete;
     virtual ~SOLIDS_EXAMPLE();
 
     void Set_Minimum_Collision_Thickness(const T minimum_collision_thickness_input=1e-6)

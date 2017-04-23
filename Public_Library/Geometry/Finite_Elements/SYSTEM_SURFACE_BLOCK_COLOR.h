@@ -8,7 +8,6 @@
 #ifndef __SYSTEM_SURFACE_BLOCK_COLOR__
 #define __SYSTEM_SURFACE_BLOCK_COLOR__
 
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Symbolics/STATIC_POLYNOMIAL.h>
 #include <Geometry/Finite_Elements/SYSTEM_SURFACE_BLOCK_HELPER_COLOR.h>
 #include <functional>
@@ -18,7 +17,7 @@ namespace PhysBAM{
 template<class TV> class CELL_DOMAIN_INTERFACE_COLOR;
 
 template<class TV,int static_degree>
-class SYSTEM_SURFACE_BLOCK_COLOR:public NONCOPYABLE
+class SYSTEM_SURFACE_BLOCK_COLOR
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -43,6 +42,10 @@ public:
     std::function<TV(const TV& X,int color0,int color1)> u_jump;
     std::function<TV(const TV& X,int color0,int color1)> j_surface;
 
+    SYSTEM_SURFACE_BLOCK_COLOR() = default;
+    SYSTEM_SURFACE_BLOCK_COLOR(const SYSTEM_SURFACE_BLOCK_COLOR&) = delete;
+    void operator=(const SYSTEM_SURFACE_BLOCK_COLOR&) = delete;
+    
     template<int d>
     void Initialize(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,
         bool use_discontinuous_velocity_input,std::function<TV(const TV& X,int color0,int color1)> u_jump_input,

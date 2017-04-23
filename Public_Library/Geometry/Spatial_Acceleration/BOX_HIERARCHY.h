@@ -13,7 +13,6 @@
 #include <Core/Math_Tools/RANGE.h>
 #include <Core/Matrices/MATRIX_1X1.h>
 #include <Core/Matrices/MATRIX_POLICY.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Geometry/Basic_Geometry/BASIC_GEOMETRY_POLICY.h>
 namespace PhysBAM{
@@ -60,7 +59,7 @@ struct BOX_VISITOR_MPI
 };
 
 template<class TV>
-class BOX_HIERARCHY:public NONCOPYABLE
+class BOX_HIERARCHY
 {
 private:
     typedef typename TV::SCALAR T;
@@ -75,6 +74,8 @@ public:
     ARRAY<T> box_radius;
 
     BOX_HIERARCHY();
+    BOX_HIERARCHY(const BOX_HIERARCHY&) = delete;
+    void operator=(const BOX_HIERARCHY&) = delete;
     virtual ~BOX_HIERARCHY();
 
     bool Leaf(const int box) const

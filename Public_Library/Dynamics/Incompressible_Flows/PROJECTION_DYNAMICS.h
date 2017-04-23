@@ -10,11 +10,10 @@
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Data_Structures/TRIPLE.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 template<class T>
-class PROJECTION_DYNAMICS:public NONCOPYABLE
+class PROJECTION_DYNAMICS
 {
 public:
     bool flame;
@@ -31,6 +30,8 @@ public:
     PROJECTION_DYNAMICS(const bool flame_input)  
         :flame(flame_input)
     {}
+    PROJECTION_DYNAMICS(const PROJECTION_DYNAMICS&) = delete;
+    void operator=(const PROJECTION_DYNAMICS&) = delete;
 
     virtual ~PROJECTION_DYNAMICS()
     {}

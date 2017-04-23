@@ -13,7 +13,6 @@
 #include <Core/Data_Structures/FORCE_ELEMENTS.h>
 #include <Core/Log/DEBUG_UTILITIES.h>
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Deformables/Particles/DEFORMABLES_PARTICLES_FORWARD.h>
 namespace PhysBAM{
 
@@ -40,7 +39,7 @@ struct FORCE_DATA{
 };
 
 template<class TV>
-class DEFORMABLES_FORCES:public NONCOPYABLE
+class DEFORMABLES_FORCES
 {
     typedef typename TV::SCALAR T;
 public:
@@ -66,6 +65,8 @@ public:
     bool compute_half_forces;
 
     DEFORMABLES_FORCES(DEFORMABLE_PARTICLES<TV>& particles);
+    DEFORMABLES_FORCES(const DEFORMABLES_FORCES&) = delete;
+    void operator=(const DEFORMABLES_FORCES&) = delete;
     virtual ~DEFORMABLES_FORCES();
 
     static int Get_Unique_Id()

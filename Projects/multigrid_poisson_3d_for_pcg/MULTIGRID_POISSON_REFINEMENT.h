@@ -9,7 +9,6 @@
 
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Log/LOG.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/VECTOR_2D.h>
 #include <Core/Vectors/VECTOR_3D.h>
 #include <Grid_Tools/Grids/GRID.h>

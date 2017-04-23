@@ -8,7 +8,6 @@
 #define __BW_COLLISIONS__    
 
 #include <Core/Arrays/ARRAY.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
 
 namespace PhysBAM{
@@ -19,7 +18,7 @@ template<class TV> class BW_BACKWARD_EULER_SYSTEM;
 template<class T> class KRYLOV_VECTOR_BASE;
 
 template<class TV>
-class BW_COLLISIONS:public NONCOPYABLE
+class BW_COLLISIONS
 {
     typedef typename TV::SCALAR T;
     typedef GENERALIZED_VELOCITY<TV> VECTOR_T;
@@ -28,6 +27,8 @@ public:
     SOLID_BODY_COLLECTION<TV>& solid_body_collection;
 
     BW_COLLISIONS(SOLID_BODY_COLLECTION<TV>& solid_body_collection_input);
+    BW_COLLISIONS(const BW_COLLISIONS&) = delete;
+    void operator=(const BW_COLLISIONS&) = delete;
     virtual ~BW_COLLISIONS();
 
 //#####################################################################

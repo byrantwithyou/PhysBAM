@@ -9,13 +9,12 @@
 
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Math_Tools/RANGE.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 namespace PhysBAM{
 
 template<class T>
-class SPHERE_PARTITION:public NONCOPYABLE
+class SPHERE_PARTITION
 {
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
@@ -29,6 +28,8 @@ public:
     {
         Set_Up_Grid(TV_INT()+1);
     }
+    SPHERE_PARTITION(const SPHERE_PARTITION&) = delete;
+    void operator=(const SPHERE_PARTITION&) = delete;
 
     virtual ~SPHERE_PARTITION()
     {voxel_sphere_list.Delete_Pointers_And_Clean_Memory();}

@@ -12,7 +12,6 @@
 #include <Core/Log/DEBUG_UTILITIES.h>
 #include <Core/Math_Tools/FIXED_NUMBER.h>
 #include <Core/Read_Write/TYPED_STREAM.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <Rigids/Collisions/COLLISIONS_GEOMETRY_FORWARD.h>
@@ -23,7 +22,7 @@ template<class TV> class RANGE;
 template<class TV> class COLLISION_PARTICLE_STATE;
 
 template<class TV>
-class COLLISION_GEOMETRY:public NONCOPYABLE
+class COLLISION_GEOMETRY
 {
 private:
     typedef typename TV::SCALAR T;
@@ -42,6 +41,8 @@ public:
     ARRAY<COLLISION_GEOMETRY<TV>*,COLLISION_GEOMETRY_ID>* collision_geometries_for_rasterization;
 
     COLLISION_GEOMETRY();
+    COLLISION_GEOMETRY(const COLLISION_GEOMETRY&) = delete;
+    void operator=(const COLLISION_GEOMETRY&) = delete;
     virtual ~COLLISION_GEOMETRY();
 
 //#####################################################################

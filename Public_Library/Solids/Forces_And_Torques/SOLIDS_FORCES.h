@@ -11,7 +11,6 @@
 #include <Core/Data_Structures/DATA_STRUCTURES_FORWARD.h>
 #include <Core/Data_Structures/ELEMENT_ID.h>
 #include <Core/Log/DEBUG_UTILITIES.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Rigids/Forces_And_Torques/RIGIDS_FORCES.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{
@@ -22,7 +21,7 @@ class SEGMENT_MESH;
 
 
 template<class TV>
-class SOLIDS_FORCES:public NONCOPYABLE
+class SOLIDS_FORCES
 {
     typedef typename TV::SCALAR T;
 public:
@@ -43,6 +42,8 @@ public:
     bool compute_half_forces;
 
     SOLIDS_FORCES(DEFORMABLE_PARTICLES<TV>& particles,RIGID_BODY_COLLECTION<TV>& rigid_body_collection);
+    SOLIDS_FORCES(const SOLIDS_FORCES&) = delete;
+    void operator=(const SOLIDS_FORCES&) = delete;
     virtual ~SOLIDS_FORCES();
 
     static int Get_Unique_Id()

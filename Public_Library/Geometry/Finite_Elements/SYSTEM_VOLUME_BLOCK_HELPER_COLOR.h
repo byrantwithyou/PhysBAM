@@ -10,7 +10,6 @@
 
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Matrices/MATRIX_MXN.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 
 namespace PhysBAM{
 
@@ -20,7 +19,7 @@ template<class TV,int d> struct BASIS_STENCIL_UNIFORM;
 template<class T> class SPARSE_MATRIX_FLAT_MXN;
 
 template<class TV>
-class SYSTEM_VOLUME_BLOCK_HELPER_COLOR:public NONCOPYABLE
+class SYSTEM_VOLUME_BLOCK_HELPER_COLOR
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -30,6 +29,10 @@ public:
     CELL_DOMAIN_INTERFACE_COLOR<TV>* cdi;
     ARRAY<CELL_MANAGER_COLOR<TV>*> cm; // size = # basis functions
     ARRAY<ARRAY<int> > flat_diff;
+
+    SYSTEM_VOLUME_BLOCK_HELPER_COLOR() = default;
+    SYSTEM_VOLUME_BLOCK_HELPER_COLOR(const SYSTEM_VOLUME_BLOCK_HELPER_COLOR&) = delete;
+    void operator=(const SYSTEM_VOLUME_BLOCK_HELPER_COLOR&) = delete;
 
     template<int d0,class ...Args> 
     void Initialize(CELL_DOMAIN_INTERFACE_COLOR<TV> &cdi_input,const BASIS_STENCIL_UNIFORM<TV,d0>& s0,CELL_MANAGER_COLOR<TV>& cm0,Args&& ...args);

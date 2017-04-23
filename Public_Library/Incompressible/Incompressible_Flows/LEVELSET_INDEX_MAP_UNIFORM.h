@@ -8,7 +8,6 @@
 #define __LEVELSET_INDEX_MAP_UNIFORM__
 
 #include <Core/Arrays/ARRAY.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Grid_Tools/Grids/FACE_INDEX.h>
 #include <Grid_Tools/Grids/GRID.h>
@@ -16,7 +15,7 @@ namespace PhysBAM{
 
 template<class TV> class BOUNDARY_CONDITIONS_CALLBACKS;
 template<class TV>
-class LEVELSET_INDEX_MAP_UNIFORM:public NONCOPYABLE
+class LEVELSET_INDEX_MAP_UNIFORM
 {
     typedef typename TV::SCALAR T;
     enum WORKAROUND {d=TV::m};
@@ -30,6 +29,8 @@ public:
     VECTOR<bool,d> periodic_boundary;
 
     LEVELSET_INDEX_MAP_UNIFORM(const GRID<TV>& grid_input,BOUNDARY_CONDITIONS_CALLBACKS<TV>* callback_input);
+    LEVELSET_INDEX_MAP_UNIFORM(const LEVELSET_INDEX_MAP_UNIFORM&) = delete;
+    void operator=(const LEVELSET_INDEX_MAP_UNIFORM&) = delete;
     ~LEVELSET_INDEX_MAP_UNIFORM();
 
     void Compute(int axis,VECTOR<bool,d> periodic_boundary_input);

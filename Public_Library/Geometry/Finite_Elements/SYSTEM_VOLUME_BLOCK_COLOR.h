@@ -7,14 +7,13 @@
 #ifndef __SYSTEM_VOLUME_BLOCK_COLOR__
 #define __SYSTEM_VOLUME_BLOCK_COLOR__
 
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Symbolics/STATIC_POLYNOMIAL.h>
 #include <Geometry/Finite_Elements/SYSTEM_VOLUME_BLOCK_HELPER_COLOR.h>
 
 namespace PhysBAM{
 
 template<class TV,int static_degree>
-class SYSTEM_VOLUME_BLOCK_COLOR:public NONCOPYABLE
+class SYSTEM_VOLUME_BLOCK_COLOR
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -47,6 +46,10 @@ public:
     ARRAY<OVERLAP_POLYNOMIAL> overlap_polynomials;
     ARRAY<OPEN_ENTRY> open_entries,open_subcell_entries[1<<TV::m];
 
+    SYSTEM_VOLUME_BLOCK_COLOR() = default;
+    SYSTEM_VOLUME_BLOCK_COLOR(const SYSTEM_VOLUME_BLOCK_COLOR&) = delete;
+    void operator=(const SYSTEM_VOLUME_BLOCK_COLOR&) = delete;
+    
     void Add_Entry(int flat_index,int flat_index_diff_ref,int color,T value);
     void Add_Open_Entry(int flat_index,int color,OPEN_ENTRY& oe);
     template<int d0,class ...Args>

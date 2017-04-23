@@ -9,7 +9,6 @@
 
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Data_Structures/ELEMENT_ID.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <Tools/Particles/PARTICLES_FORWARD.h>
 #include <Rigids/Rigids_Evolution/RIGIDS_KINEMATIC_EVOLUTION.h>
@@ -25,7 +24,7 @@ template<class TV> class GRID;
 template<class TV> class EXAMPLE_FORCES_AND_VELOCITIES;
 
 template<class TV>
-class SOLIDS_EVOLUTION:public NONCOPYABLE
+class SOLIDS_EVOLUTION
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::SPIN T_SPIN;
@@ -52,6 +51,8 @@ public:
     EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities;
 
     SOLIDS_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities);
+    SOLIDS_EVOLUTION(const SOLIDS_EVOLUTION&) = delete;
+    void operator=(const SOLIDS_EVOLUTION&) = delete;
     virtual ~SOLIDS_EVOLUTION();
 
     void Set_Solids_Evolution_Callbacks(SOLIDS_EVOLUTION_CALLBACKS<TV>& solids_evolution_callbacks_input)

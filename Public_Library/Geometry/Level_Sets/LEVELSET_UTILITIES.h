@@ -8,18 +8,19 @@
 #define __LEVELSET_UTILITIES__
 
 #include <Core/Math_Tools/constants.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/SCALAR_POLICY.h>
 #include <cassert>
 #include <cfloat>
 namespace PhysBAM{
 
 template<class T>
-class LEVELSET_UTILITIES:public NONCOPYABLE
+class LEVELSET_UTILITIES
 {
     STATIC_ASSERT((is_scalar<T>::value));
 protected:
     LEVELSET_UTILITIES() {};
+    LEVELSET_UTILITIES(const LEVELSET_UTILITIES&) = delete;
+    void operator=(const LEVELSET_UTILITIES&) = delete;
     virtual ~LEVELSET_UTILITIES() {};
 
 public:

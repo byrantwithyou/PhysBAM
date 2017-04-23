@@ -8,13 +8,12 @@
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Data_Structures/PAIR.h>
 #include <Core/Math_Tools/RANGE.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Ray_Tracing/Rendering/PHOTON.h>
 #include <Ray_Tracing/Rendering/RENDERING_RAY.h>
 namespace PhysBAM{
 
 template<class T>
-class PHOTON_MAP:public NONCOPYABLE
+class PHOTON_MAP
 {
   typedef VECTOR<T,3> TV;
 public:
@@ -30,6 +29,8 @@ public:
     {
         Resize_Photon_Map(maximum_photons);
     }
+    PHOTON_MAP(const PHOTON_MAP&) = delete;
+    void operator=(const PHOTON_MAP&) = delete;
 
     void Resize_Photon_Map(const int new_maximum_photons)
     {photons.Resize(new_maximum_photons);photons_stored=0;light_emission_start_index=-2;}

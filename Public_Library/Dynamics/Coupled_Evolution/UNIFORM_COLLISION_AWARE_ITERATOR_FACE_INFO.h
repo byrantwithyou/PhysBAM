@@ -9,7 +9,6 @@
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Core/Data_Structures/TRIPLE.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>
 
@@ -38,7 +37,7 @@ struct COLLISION_FACE_INFO
 };
 
 template<class TV>
-class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO:public NONCOPYABLE
+class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO
 {
     enum WORKAROUND {d=TV::m};
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
@@ -54,6 +53,8 @@ public:
     T iterator_rasterization_thickness;
 
     explicit UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO(const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collection);
+    UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO(const UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO&) = delete;
+    void operator=(const UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO&) = delete;
 
 //#####################################################################
     void Initialize_Collision_Aware_Face_Iterator(const ARRAY<bool,TV_INT>& outside_fluid_input,const ARRAY<bool,FACE_INDEX<d> >& kinematic_faces,int ghost_cells,const bool disable_thinshell);

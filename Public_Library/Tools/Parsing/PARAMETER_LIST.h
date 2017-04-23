@@ -35,7 +35,7 @@
 #include <Core/Log/LOG.h>
 namespace PhysBAM{
 
-class PARAMETER_LIST:public NONCOPYABLE
+class PARAMETER_LIST
 {
 private:
     class PARAMETER_INFO
@@ -65,6 +65,8 @@ public:
     PARAMETER_LIST()
         :verbose(false)
     {}
+    PARAMETER_LIST(const PARAMETER_LIST&) = delete;
+    void operator=(const PARAMETER_LIST&) = delete;
 
     //
     // Basic functions for adding parameters and getting their values

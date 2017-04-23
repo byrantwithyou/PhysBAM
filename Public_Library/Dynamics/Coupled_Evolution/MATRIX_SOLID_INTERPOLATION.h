@@ -8,7 +8,6 @@
 #define __MATRIX_SOLID_INTERPOLATION__
 #include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Core/Data_Structures/TRIPLE.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Dynamics/Coupled_Evolution/COUPLING_CONSTRAINT_ID.h>
 #include <Dynamics/Coupled_Evolution/MATRIX_SOLID_INTERPOLATION_BASE.h>
 

@@ -10,7 +10,6 @@
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Parallel_Computation/MPI_UTILITIES.h>
 #include <Tools/Parallel_Computation/SPARSE_MATRIX_PARTITION.h>
 #include <Grid_Tools/Arrays/FACE_ARRAYS_BINARY_UNIFORM.h>
@@ -29,7 +28,7 @@ template<class TV> class GRID;
 template<class T> class MPI_UNIFORM_GRID;
 
 template<class TV>
-class MPI_SOLID_FLUID_SLIP:public NONCOPYABLE
+class MPI_SOLID_FLUID_SLIP
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -53,6 +52,8 @@ private:
 public:
 
     MPI_SOLID_FLUID_SLIP();
+    MPI_SOLID_FLUID_SLIP(const MPI_SOLID_FLUID_SLIP&) = delete;
+    void operator=(const MPI_SOLID_FLUID_SLIP&) = delete;
     ~MPI_SOLID_FLUID_SLIP();
 
     int Number_Of_Processors() const

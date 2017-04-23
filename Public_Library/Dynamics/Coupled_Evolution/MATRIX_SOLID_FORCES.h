@@ -10,7 +10,6 @@
 #include <Core/Arrays/ARRAY_VIEW.h>
 #include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Core/Matrices/SYSTEM_MATRIX_HELPER.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/TWIST.h>
 #include <Dynamics/Coupled_Evolution/FORCE_AGGREGATE_ID.h>
 
@@ -19,7 +18,7 @@ template<class TV> class SOLID_BODY_COLLECTION;
 template<class TV> class GENERALIZED_VELOCITY;
 
 template<class TV>
-class MATRIX_SOLID_FORCES:public NONCOPYABLE,public SYSTEM_MATRIX_BASE<typename TV::SCALAR>
+class MATRIX_SOLID_FORCES:public SYSTEM_MATRIX_BASE<typename TV::SCALAR>
 {
     typedef typename TV::SCALAR T;
 public:
@@ -33,6 +32,8 @@ private:
 
 public:
     MATRIX_SOLID_FORCES(const SOLID_BODY_COLLECTION<TV>& solid_body_collection);
+    MATRIX_SOLID_FORCES(const MATRIX_SOLID_FORCES&) = delete;
+    void operator=(const MATRIX_SOLID_FORCES&) = delete;
     virtual ~MATRIX_SOLID_FORCES();
 
 //#####################################################################

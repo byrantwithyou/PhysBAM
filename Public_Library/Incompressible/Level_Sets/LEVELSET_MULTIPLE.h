@@ -15,7 +15,7 @@ template<class TV,class T2> class BOUNDARY;
 
 template<class TV> class LEVELSET_CALLBACKS; // TODO: invalid dependency
 template<class TV>
-class LEVELSET_MULTIPLE:public NONCOPYABLE
+class LEVELSET_MULTIPLE
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -31,6 +31,8 @@ public:
     bool use_external_levelsets;
 
     LEVELSET_MULTIPLE(GRID<TV>& grid_input,ARRAY<ARRAY<T,TV_INT>>& phis_input,const bool use_external_levelsets_input=false);
+    LEVELSET_MULTIPLE(const LEVELSET_MULTIPLE&) = delete;
+    void operator=(const LEVELSET_MULTIPLE&) = delete;
     ~LEVELSET_MULTIPLE();
 
     T Phi(const int region,const TV_INT& index) const

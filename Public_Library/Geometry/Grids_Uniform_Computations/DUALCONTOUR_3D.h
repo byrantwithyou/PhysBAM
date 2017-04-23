@@ -14,7 +14,7 @@ namespace PhysBAM{
 template<class T> class TRIANGULATED_SURFACE;
 
 template<class T>
-class DUALCONTOUR_3D:public NONCOPYABLE
+class DUALCONTOUR_3D
 {
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
@@ -30,6 +30,8 @@ public:
     {
         if(levelset_input.grid.Is_MAC_Grid()) grid=levelset_input.grid.Get_Regular_Grid_At_MAC_Positions();else grid=levelset_input.grid;
     }
+    DUALCONTOUR_3D(const DUALCONTOUR_3D&) = delete;
+    void operator=(const DUALCONTOUR_3D&) = delete;
 
     void Dualcontour()
     {Generate_Topology();Generate_Vertices();Ensure_Vertices_In_Correct_Cells();}

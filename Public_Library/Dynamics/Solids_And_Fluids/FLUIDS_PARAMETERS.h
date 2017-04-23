@@ -26,7 +26,7 @@ template<class TV> class TURBULENCE;
 template<class TV,class T2> class BOUNDARY_REFLECTION_UNIFORM;
 
 template <class TV>
-class FLUIDS_PARAMETERS:public NONCOPYABLE
+class FLUIDS_PARAMETERS
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T> T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
@@ -177,6 +177,8 @@ public:
     bool stokes_flow;
 
     FLUIDS_PARAMETERS(const TYPE type);
+    FLUIDS_PARAMETERS(const FLUIDS_PARAMETERS&) = delete;
+    void operator=(const FLUIDS_PARAMETERS&) = delete;
     virtual ~FLUIDS_PARAMETERS();
 
     void Set_Fluids_Parameters_Callbacks(FLUIDS_PARAMETERS_CALLBACKS<TV>& callbacks_input)

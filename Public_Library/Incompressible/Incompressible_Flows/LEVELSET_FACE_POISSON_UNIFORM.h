@@ -9,14 +9,13 @@
 
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 template<class TV> class BOUNDARY_CONDITIONS_CALLBACKS;
 template<class TV> class LEVELSET_INDEX_MAP_UNIFORM;
 
 template<class TV>
-class LEVELSET_FACE_POISSON_UNIFORM:public NONCOPYABLE
+class LEVELSET_FACE_POISSON_UNIFORM
 {
     typedef typename TV::SCALAR T;
     enum WORKAROUND {d=TV::m};
@@ -28,6 +27,8 @@ public:
     T theta_threshold;
 
     LEVELSET_FACE_POISSON_UNIFORM(LEVELSET_INDEX_MAP_UNIFORM<TV>& index_map_input);
+    LEVELSET_FACE_POISSON_UNIFORM(const LEVELSET_FACE_POISSON_UNIFORM&) = delete;
+    void operator=(const LEVELSET_FACE_POISSON_UNIFORM&) = delete;
     virtual ~LEVELSET_FACE_POISSON_UNIFORM();
 
 //#####################################################################

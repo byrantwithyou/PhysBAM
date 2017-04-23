@@ -5,7 +5,6 @@
 #ifndef __OD_EXAMPLE__
 #define __OD_EXAMPLE__
 #include <Core/Utilities/Find_Type.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 namespace PhysBAM{
@@ -16,7 +15,7 @@ template<class TV> class STRUCTURE;
 template<class T,int d> class CONSTITUTIVE_MODEL;
 
 template<class TV>
-class OD_EXAMPLE:public NONCOPYABLE
+class OD_EXAMPLE
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -42,7 +41,9 @@ public:
     int threads;
 
     OD_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
+    OD_EXAMPLE(const OD_EXAMPLE&) = delete;
     virtual ~OD_EXAMPLE();
+    void operator=(const OD_EXAMPLE&) = delete;
     
     virtual void Write_Output_Files(const int frame);
     virtual void Read_Output_Files(const int frame);

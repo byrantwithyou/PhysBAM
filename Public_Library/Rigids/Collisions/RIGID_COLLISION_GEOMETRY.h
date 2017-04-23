@@ -7,7 +7,6 @@
 #ifndef __RIGID_COLLISION_GEOMETRY__
 #define __RIGID_COLLISION_GEOMETRY__
 
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/VECTOR_1D.h>
 #include <Core/Vectors/VECTOR_2D.h>
 #include <Core/Vectors/VECTOR_3D.h>

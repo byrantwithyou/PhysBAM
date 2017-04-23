@@ -9,7 +9,6 @@
 
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Arrays/ARRAYS_FORWARD.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/VECTOR_2D.h>
 #include <Grid_Tools/Grids/FACE_INDEX.h>
 #include <Grid_PDE/Boundaries/BOUNDARY.h>
@@ -21,7 +20,7 @@ template<class TV> class RANGE;
 template<class TV> class GRID;
 
 template<class TV>
-class MPI_GRID:public NONCOPYABLE
+class MPI_GRID
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -51,6 +50,8 @@ public:
 
     MPI_GRID(GRID<TV>& local_grid_input,const int number_of_ghost_cells_input,const bool skip_initialization=false,const TV_INT& processes_per_dimension=TV_INT(),
         const VECTOR<bool,TV::m>& periodic_input=(VECTOR<bool,TV::m>()),MPI::Group* group_input=0);
+    MPI_GRID(const MPI_GRID&) = delete;
+    void operator=(const MPI_GRID&) = delete;
     ~MPI_GRID();
 
     int Number_Of_Processors() const

@@ -9,7 +9,6 @@
 
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Log/DEBUG_UTILITIES.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 
 namespace PhysBAM{
 template<class TV> class TWIST;

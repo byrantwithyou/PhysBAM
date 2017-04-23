@@ -9,7 +9,6 @@
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Data_Structures/TRIPLE.h>
 #include <Core/Math_Tools/INTERVAL.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 
 namespace PhysBAM{
 
@@ -24,7 +23,7 @@ struct SYSTEM_MATRIX_BASE
 };
 
 template<class T>
-struct SYSTEM_MATRIX_HELPER:public NONCOPYABLE
+struct SYSTEM_MATRIX_HELPER
 {
     ARRAY<TRIPLE<int,int,T> > data;
     int start;
@@ -33,6 +32,9 @@ struct SYSTEM_MATRIX_HELPER:public NONCOPYABLE
     SYSTEM_MATRIX_HELPER()
         :start(0), compacted(false)
     {}
+
+    SYSTEM_MATRIX_HELPER(const SYSTEM_MATRIX_HELPER&) = delete;
+    void operator=(const SYSTEM_MATRIX_HELPER&) = delete;
 
     void New_Block()
     {start=data.m;compacted=false;}

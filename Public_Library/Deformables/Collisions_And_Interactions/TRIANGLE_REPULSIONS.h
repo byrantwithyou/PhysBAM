@@ -62,7 +62,7 @@ struct PRECOMPUTE_PROJECT
 };
 
 template<class TV>
-class TRIANGLE_REPULSIONS:public NONCOPYABLE
+class TRIANGLE_REPULSIONS
 {
     typedef typename TV::SCALAR T;
     enum WORKAROUND {d=TV::m};
@@ -105,6 +105,8 @@ public:
     ARRAY<TV> ee_normals;
 
     TRIANGLE_REPULSIONS(TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<TV>& geometry);
+    TRIANGLE_REPULSIONS(const TRIANGLE_REPULSIONS&) = delete;
+    void operator=(const TRIANGLE_REPULSIONS&) = delete;
     ~TRIANGLE_REPULSIONS();
 
     // Note that if repulsion thickness is not constant, repulsion will be discontinuous since we pick the min repulsion among repelling elements.

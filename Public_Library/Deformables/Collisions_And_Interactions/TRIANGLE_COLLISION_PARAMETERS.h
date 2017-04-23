@@ -7,13 +7,12 @@
 #ifndef __TRIANGLE_COLLISION_PARAMETERS__
 #define __TRIANGLE_COLLISION_PARAMETERS__
 
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_OBJECT_FORWARD.h>
 namespace PhysBAM{
 
 template<class TV>
-class TRIANGLE_COLLISION_PARAMETERS:public NONCOPYABLE
+class TRIANGLE_COLLISION_PARAMETERS
 {
     typedef typename TV::SCALAR T;
 public:
@@ -51,6 +50,8 @@ public:
     bool use_gauss_jacobi;
 
     TRIANGLE_COLLISION_PARAMETERS();
+    TRIANGLE_COLLISION_PARAMETERS(const TRIANGLE_COLLISION_PARAMETERS&) = delete;
+    void operator=(const TRIANGLE_COLLISION_PARAMETERS&) = delete;
     virtual ~TRIANGLE_COLLISION_PARAMETERS();
 //#####################################################################
 };

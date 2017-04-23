@@ -7,7 +7,6 @@
 #ifndef __UNIFORM_REMOVED_PARTICLES_PROCESSING__
 #define __UNIFORM_REMOVED_PARTICLES_PROCESSING__
 
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Grid_Tools/Grids/GRID.h>
 namespace PhysBAM{
 
@@ -15,7 +14,7 @@ template<class TV> class PARTICLE_LEVELSET_REMOVED_PARTICLES;
 template<class TV> class LEVELSET_IMPLICIT_OBJECT;
 
 template<class T>
-class UNIFORM_REMOVED_PARTICLES_PROCESSING:public NONCOPYABLE
+class UNIFORM_REMOVED_PARTICLES_PROCESSING
 {
 public:
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
@@ -40,6 +39,8 @@ public:
     {
         Initialize();
     }
+    UNIFORM_REMOVED_PARTICLES_PROCESSING(const UNIFORM_REMOVED_PARTICLES_PROCESSING&) = delete;
+    void operator=(const UNIFORM_REMOVED_PARTICLES_PROCESSING&) = delete;
 
     void Initialize()
     {

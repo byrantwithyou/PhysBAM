@@ -17,7 +17,7 @@ template<class TV> struct ATTACHMENT_POINT;
 template<class TV> class RIGID_BODY_COLLECTION;
 
 template<class TV>
-class MUSCLE_LIST:public NONCOPYABLE
+class MUSCLE_LIST
 {
     typedef typename TV::SCALAR T;
 public:
@@ -30,6 +30,9 @@ public:
     MUSCLE_LIST(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input)
         :rigid_body_collection(rigid_body_collection_input)
     {}
+
+    MUSCLE_LIST(const MUSCLE_LIST&) = delete;
+    void operator=(const MUSCLE_LIST&) = delete;
 
     void Clean_Memory()
     {muscles.Delete_Pointers_And_Clean_Memory();muscle_activations.Clean_Memory();}

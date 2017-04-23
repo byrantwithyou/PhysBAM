@@ -28,7 +28,7 @@ template<class TV> class BINDING_LIST;
 template<class TV> class RIGID_COLLISION_GEOMETRY;
 
 template<class TV>
-class DEFORMABLE_OBJECT_COLLISIONS:public NONCOPYABLE
+class DEFORMABLE_OBJECT_COLLISIONS
 {
     typedef typename TV::SCALAR T;
 public:
@@ -62,6 +62,8 @@ public:
 
     DEFORMABLE_OBJECT_COLLISIONS(DEFORMABLE_PARTICLES<TV>& particles,DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection,ARRAY<STRUCTURE<TV>*>& deformable_object_structures,
         COLLISION_BODY_COLLECTION<TV>& collision_body_list);
+    DEFORMABLE_OBJECT_COLLISIONS(const DEFORMABLE_OBJECT_COLLISIONS&) = delete;
+    void operator=(const DEFORMABLE_OBJECT_COLLISIONS&) = delete;
 
     virtual ~DEFORMABLE_OBJECT_COLLISIONS();
 

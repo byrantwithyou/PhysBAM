@@ -14,7 +14,6 @@
 
 #include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Incompressible/Level_Sets/LEVELSET_MULTIPLE.h>
 #include <Dynamics/Advection_Equations/FIRE_ADVECTION_POLICY.h>
 namespace PhysBAM{
@@ -23,7 +22,7 @@ template<class TV> class PROJECTION_DYNAMICS_UNIFORM;
 template<class TV> class GRID_BASED_COLLISION_GEOMETRY_UNIFORM;
 
 template<class TV>
-class INCOMPRESSIBLE:public NONCOPYABLE
+class INCOMPRESSIBLE
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_UNIFORM<TV> T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE;
@@ -77,6 +76,8 @@ public:
 public:
 
     INCOMPRESSIBLE();
+    INCOMPRESSIBLE(const INCOMPRESSIBLE&) = delete;
+    void operator=(const INCOMPRESSIBLE&) = delete;
     virtual ~INCOMPRESSIBLE();
 
     virtual void Initialize_Grids(const GRID<TV>& grid)

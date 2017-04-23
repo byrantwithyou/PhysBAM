@@ -10,7 +10,6 @@
 #include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Core/Math_Tools/constants.h>
 #include <Core/Matrices/SYMMETRIC_MATRIX.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/SCALAR_POLICY.h>
 #include <Grid_Tools/Grids/FACE_INDEX.h>
 #include <Grid_PDE/Interpolation/FACE_LOOKUP_UNIFORM.h>

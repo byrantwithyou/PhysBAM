@@ -9,16 +9,17 @@
 
 #include <Core/Matrices/MATRIX.h>
 #include <Core/Matrices/SYMMETRIC_MATRIX.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 template<class TV>
-class OLDROYD_CONSTITUTIVE_MODEL:public NONCOPYABLE
+class OLDROYD_CONSTITUTIVE_MODEL
 {
     typedef typename TV::SCALAR T;
 public:
 
     OLDROYD_CONSTITUTIVE_MODEL(){}
+    OLDROYD_CONSTITUTIVE_MODEL(const OLDROYD_CONSTITUTIVE_MODEL&) = delete;
+    void operator=(const OLDROYD_CONSTITUTIVE_MODEL&) = delete;
     virtual ~OLDROYD_CONSTITUTIVE_MODEL(){}
 
 //#####################################################################

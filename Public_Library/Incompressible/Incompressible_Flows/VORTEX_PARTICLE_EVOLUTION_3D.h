@@ -13,7 +13,7 @@ namespace PhysBAM{
 template<class T> class MPI_UNIFORM_GRID;
 
 template<class T>
-class VORTEX_PARTICLE_EVOLUTION_3D:public NONCOPYABLE
+class VORTEX_PARTICLE_EVOLUTION_3D
 {
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
     typedef MPI_UNIFORM_GRID<TV> T_MPI_GRID;
@@ -39,6 +39,9 @@ public:
         scattered_interpolation.Use_Tent_Weights();
 //        Set_Radius();
     }
+
+    VORTEX_PARTICLE_EVOLUTION_3D(const VORTEX_PARTICLE_EVOLUTION_3D&) = delete;
+    void operator=(const VORTEX_PARTICLE_EVOLUTION_3D&) = delete;
 
     void Initialize(const GRID<TV>& grid_input)
     {grid=grid_input.Get_MAC_Grid();grid_vorticity.Resize(grid.Domain_Indices(2),false,false);grid_vorticity_particles.Resize(grid.Domain_Indices(2),false,false);

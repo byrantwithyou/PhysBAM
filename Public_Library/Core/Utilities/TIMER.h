@@ -8,13 +8,12 @@
 #define __TIMER__
 
 #include <Core/Arrays/ARRAY.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 double Get_Current_Time();
 double Initialize_Timer();
 
-class TIMER:public NONCOPYABLE
+class TIMER
 {
 private:
     struct DATA
@@ -30,6 +29,8 @@ private:
 public:
 
     TIMER();
+    TIMER(const TIMER&) = delete;
+    void operator=(const TIMER&) = delete;
     ~TIMER();
 
     //TODO: When to delete?

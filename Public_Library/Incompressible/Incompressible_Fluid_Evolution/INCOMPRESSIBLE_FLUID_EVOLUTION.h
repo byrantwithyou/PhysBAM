@@ -9,7 +9,6 @@
 
 #include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Core/Utilities/Find_Type.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Grid_PDE/Advection/ADVECTION_FORWARD.h>
 namespace PhysBAM{
 template<class TV> class INCOMPRESSIBLE_FLUIDS_FORCES;
@@ -17,7 +16,7 @@ template<class TV> class BOUNDARY_MAC_GRID_SOLID_WALL_SLIP;
 template<class TV,class T> class BOUNDARY;
 
 template<class TV>
-class INCOMPRESSIBLE_FLUID_EVOLUTION:public NONCOPYABLE
+class INCOMPRESSIBLE_FLUID_EVOLUTION
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
 public:
@@ -32,6 +31,8 @@ protected:
 public:
 
     INCOMPRESSIBLE_FLUID_EVOLUTION(const GRID<TV>& grid_input);
+    INCOMPRESSIBLE_FLUID_EVOLUTION(const INCOMPRESSIBLE_FLUID_EVOLUTION&) = delete;
+    void operator=(const INCOMPRESSIBLE_FLUID_EVOLUTION&) = delete;
     virtual ~INCOMPRESSIBLE_FLUID_EVOLUTION();
 
     void Set_Custom_Advection(ADVECTION<TV,T>& advection_input)

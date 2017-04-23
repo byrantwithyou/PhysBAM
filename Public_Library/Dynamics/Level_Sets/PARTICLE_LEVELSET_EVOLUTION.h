@@ -7,12 +7,11 @@
 #ifndef __PARTICLE_LEVELSET_EVOLUTION__
 #define __PARTICLE_LEVELSET_EVOLUTION__
 
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <cassert>
 namespace PhysBAM{
 
 template<class T>
-class PARTICLE_LEVELSET_EVOLUTION:public NONCOPYABLE
+class PARTICLE_LEVELSET_EVOLUTION
 {
 public:
     bool use_particle_levelset;
@@ -30,6 +29,8 @@ public:
         reseeding_frequency(20),use_frozen_velocity(true),runge_kutta_order_particles(2),
         runge_kutta_order_levelset(1),track_mass(),initial_mass()
     {}
+    PARTICLE_LEVELSET_EVOLUTION(const PARTICLE_LEVELSET_EVOLUTION&) = delete;
+    void operator=(const PARTICLE_LEVELSET_EVOLUTION&) = delete;
 
     virtual ~PARTICLE_LEVELSET_EVOLUTION()
     {}

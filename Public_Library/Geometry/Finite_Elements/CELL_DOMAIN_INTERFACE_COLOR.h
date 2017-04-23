@@ -12,7 +12,6 @@
 #include <Core/Data_Structures/PAIR.h>
 #include <Core/Data_Structures/TRIPLE.h>
 #include <Core/Math_Tools/RANGE.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Geometry/Basic_Geometry/LINE_2D.h>
 #include <Geometry/Basic_Geometry/PLANE.h>
@@ -25,7 +24,7 @@ namespace PhysBAM{
 template<class TV> class GRID;
 
 template<class TV>
-class CELL_DOMAIN_INTERFACE_COLOR:public NONCOPYABLE
+class CELL_DOMAIN_INTERFACE_COLOR
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -74,6 +73,8 @@ public:
     HASHTABLE<TV_INT,CELL_ELEMENTS> index_to_cell_elements;
     
     CELL_DOMAIN_INTERFACE_COLOR(const GRID<TV>& grid_input,int padding_input,int colors_input);
+    CELL_DOMAIN_INTERFACE_COLOR(const CELL_DOMAIN_INTERFACE_COLOR&) = delete;
+    void operator=(const CELL_DOMAIN_INTERFACE_COLOR&) = delete;
 
     int Flatten(const TV_INT& index) const
     {return index.Dot(a)+b;}

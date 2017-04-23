@@ -8,7 +8,6 @@
 #define __MATRIX_FLUID_POISSON__
 #include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 
 namespace PhysBAM{
 template<class TV> class COLLISION_AWARE_INDEX_MAP;
@@ -16,7 +15,7 @@ template<class T> class SPARSE_MATRIX_FLAT_MXN;
 template<class TV> class GRID;
 
 template<class TV>
-class MATRIX_FLUID_POISSON:public NONCOPYABLE
+class MATRIX_FLUID_POISSON
 {
     enum WORKAROUND {d=TV::m};
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
@@ -29,6 +28,8 @@ public:
 
     MATRIX_FLUID_POISSON(const COLLISION_AWARE_INDEX_MAP<TV>& index_map_input,
         const ARRAY<T,TV_INT>& one_over_rho_c_squared_input);
+    MATRIX_FLUID_POISSON(const MATRIX_FLUID_POISSON&) = delete;
+    void operator=(const MATRIX_FLUID_POISSON&) = delete;
 
 //#####################################################################
     void Compute(const SPARSE_MATRIX_FLAT_MXN<T>& gradient,const ARRAY<T>& one_over_fluid_mass,const T dt,const bool use_preconditioner);

@@ -7,13 +7,12 @@
 #ifndef __RIGID_BODY_COLLISION_PARAMETERS__
 #define __RIGID_BODY_COLLISION_PARAMETERS__
 
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
 #include <Rigids/Collisions/COLLISIONS_GEOMETRY_FORWARD.h>
 namespace PhysBAM{
 
 template<class TV>
-class RIGID_BODY_COLLISION_PARAMETERS:public NONCOPYABLE
+class RIGID_BODY_COLLISION_PARAMETERS
 {
     typedef typename TV::SCALAR T;
 public:
@@ -51,6 +50,8 @@ public:
     T projected_gauss_seidel_tolerance;
 
     RIGID_BODY_COLLISION_PARAMETERS();
+    RIGID_BODY_COLLISION_PARAMETERS(const RIGID_BODY_COLLISION_PARAMETERS&) = delete;
+    void operator=(const RIGID_BODY_COLLISION_PARAMETERS&) = delete;
     virtual ~RIGID_BODY_COLLISION_PARAMETERS();
 
     void Set_Collision_Body_Thickness(const T thickness=1e-6)

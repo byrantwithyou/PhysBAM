@@ -17,7 +17,7 @@
 namespace PhysBAM{
 
 template<class TV>
-class RED_GREEN_TRIANGLES:public NONCOPYABLE
+class RED_GREEN_TRIANGLES
 {
     typedef typename TV::SCALAR T;
     typedef typename TOPOLOGY_BASED_GEOMETRY_POLICY<TV>::TRIANGULATED_OBJECT T_TRIANGULATED_OBJECT;
@@ -48,6 +48,8 @@ public:
         :object(triangulated_object_input),rest_position(&rest_position_input)
     {Initialize();}
 
+    RED_GREEN_TRIANGLES(const RED_GREEN_TRIANGLES&) = delete;
+    void operator=(const RED_GREEN_TRIANGLES&) = delete;
     ~RED_GREEN_TRIANGLES()
     {Clean_Memory();delete free_segment_midpoints;}
 

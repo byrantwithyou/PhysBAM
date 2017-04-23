@@ -6,7 +6,6 @@
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Matrices/MATRIX_MXN.h>
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Geometry/Finite_Elements/BASIS_STENCIL_UNIFORM.h>
 #include <Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>

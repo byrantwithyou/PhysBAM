@@ -26,7 +26,7 @@ template<class T> class RENDERING_BSSRDF_SHADER;
 template<class T> class RENDER_WORLD;
 
 template<class T>
-class RENDERING_OBJECT:public NONCOPYABLE
+class RENDERING_OBJECT
 {
     typedef VECTOR<T,3> TV;
 public:
@@ -45,6 +45,8 @@ public:
     RENDERING_BSSRDF_SHADER<T>* bssrdf_shader;
 
     RENDERING_OBJECT();
+    RENDERING_OBJECT(const RENDERING_OBJECT&) = delete;
+    void operator=(const RENDERING_OBJECT&) = delete;
     virtual ~RENDERING_OBJECT();
 
     void Update_Transform(const MATRIX<T,4>& A)

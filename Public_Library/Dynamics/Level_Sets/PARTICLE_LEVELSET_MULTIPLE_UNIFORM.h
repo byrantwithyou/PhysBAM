@@ -12,7 +12,7 @@
 namespace PhysBAM{
 
 template<class TV>
-class PARTICLE_LEVELSET_MULTIPLE_UNIFORM:public NONCOPYABLE
+class PARTICLE_LEVELSET_MULTIPLE_UNIFORM
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<PARTICLE_LEVELSET_PARTICLES<TV>*,TV_INT> T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
@@ -24,6 +24,8 @@ public:
     int number_of_ghost_cells;
 
     PARTICLE_LEVELSET_MULTIPLE_UNIFORM(GRID<TV>& grid_input,ARRAY<ARRAY<T,TV_INT>>& phis_input,const int number_of_ghost_cells_input);
+    PARTICLE_LEVELSET_MULTIPLE_UNIFORM(const PARTICLE_LEVELSET_MULTIPLE_UNIFORM&) = delete;
+    void operator=(const PARTICLE_LEVELSET_MULTIPLE_UNIFORM&) = delete;
     ~PARTICLE_LEVELSET_MULTIPLE_UNIFORM();
 
     void Initialize_Particle_Levelsets_And_Grid_Values(GRID<TV>& grid,ARRAY<ARRAY<T,TV_INT>>& phis,

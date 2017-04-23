@@ -7,11 +7,10 @@
 #ifndef __FLUID_STRAIN__
 #define __FLUID_STRAIN__
 
-#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 template<class T>
-class FLUID_STRAIN:public NONCOPYABLE
+class FLUID_STRAIN
 {
 public:
     T viscosity_index,strainrate_time;
@@ -25,6 +24,9 @@ public:
         Set_Viscosity_Index();
         Set_Strainrate_Time();
     }
+
+    FLUID_STRAIN(const FLUID_STRAIN&) = delete;
+    void operator=(const FLUID_STRAIN&) = delete;
     
     ~FLUID_STRAIN()
     {}

@@ -12,7 +12,6 @@
 #include <Core/Math_Tools/RANGE.h>
 #include <Core/Matrices/MATRIX_3X3.h>
 #include <Core/Matrices/ROTATION.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/VECTOR_3D.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <OpenGL/OpenGL/Convert_1d_To_3d.h>
@@ -24,7 +23,7 @@
 namespace PhysBAM{
 
 template<class T>
-class OPENGL_OBJECT:public NONCOPYABLE
+class OPENGL_OBJECT
 {
     typedef VECTOR<T,3> TV;
 public:
@@ -42,6 +41,8 @@ public:
     HASHTABLE<std::string,OPENGL_CALLBACK> viewer_callbacks;
 
     OPENGL_OBJECT(STREAM_TYPE stream_type);
+    OPENGL_OBJECT(const OPENGL_OBJECT&) = delete;
+    void operator=(const OPENGL_OBJECT&) = delete;
     virtual ~OPENGL_OBJECT();
 
     void Set_Name(const std::string& name_input)

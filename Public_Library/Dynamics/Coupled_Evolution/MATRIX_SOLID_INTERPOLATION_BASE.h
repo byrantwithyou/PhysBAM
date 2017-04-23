@@ -9,7 +9,6 @@
 #include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Core/Data_Structures/TRIPLE.h>
 #include <Core/Matrices/SYSTEM_MATRIX_HELPER.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Dynamics/Coupled_Evolution/COUPLING_CONSTRAINT_ID.h>
 
 namespace PhysBAM{
@@ -20,7 +19,7 @@ template<class TV> class GRID;
 template<class TV> class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO;
 
 template<class TV>
-class MATRIX_SOLID_INTERPOLATION_BASE:public NONCOPYABLE,public SYSTEM_MATRIX_BASE<typename TV::SCALAR>
+class MATRIX_SOLID_INTERPOLATION_BASE:public SYSTEM_MATRIX_BASE<typename TV::SCALAR>
 {
     typedef typename TV::SCALAR T;
 protected:
@@ -28,6 +27,8 @@ protected:
 
 public:
     MATRIX_SOLID_INTERPOLATION_BASE(const UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<TV>& info);
+    MATRIX_SOLID_INTERPOLATION_BASE(const MATRIX_SOLID_INTERPOLATION_BASE&) = delete;
+    void operator=(const MATRIX_SOLID_INTERPOLATION_BASE&) = delete;
     virtual ~MATRIX_SOLID_INTERPOLATION_BASE();
 
     int V_size,rigid_V_size;

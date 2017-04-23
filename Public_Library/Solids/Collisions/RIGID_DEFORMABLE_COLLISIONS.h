@@ -10,7 +10,6 @@
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Matrices/MATRIX_POLICY.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Geometry/Topology/TOPOLOGY_POLICY.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY.h>
@@ -25,7 +24,7 @@ template<class TV> class DEFORMABLE_OBJECT;
 template<class TV> class RIGID_COLLISION_GEOMETRY;
 template<class TV> class SOLIDS_PARAMETERS;
 template<class TV>
-class RIGID_DEFORMABLE_COLLISIONS:public NONCOPYABLE
+class RIGID_DEFORMABLE_COLLISIONS
 {
     typedef typename TV::SCALAR T;typedef typename TV::SPIN T_SPIN;
     typedef VECTOR<int,TV::m> ELEMENT;typedef typename MESH_POLICY<TV::m>::MESH T_MESH;
@@ -59,6 +58,8 @@ public:
     const T normal_relative_velocity_threshold;
 
     RIGID_DEFORMABLE_COLLISIONS(SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions_input,SOLIDS_PARAMETERS<TV>& solids_parameters_input);
+    RIGID_DEFORMABLE_COLLISIONS(const RIGID_DEFORMABLE_COLLISIONS&) = delete;
+    void operator=(const RIGID_DEFORMABLE_COLLISIONS&) = delete;
     virtual ~RIGID_DEFORMABLE_COLLISIONS();
 
 //#####################################################################

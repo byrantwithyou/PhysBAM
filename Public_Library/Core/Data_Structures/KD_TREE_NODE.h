@@ -7,11 +7,10 @@
 #ifndef __KD_TREE_NODE__
 #define __KD_TREE_NODE__
 
-#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 template<class T>
-class KD_TREE_NODE:public NONCOPYABLE
+class KD_TREE_NODE
 {
 public:
     int split_axis; // -1 means leaf
@@ -23,6 +22,9 @@ public:
     KD_TREE_NODE()
         :split_axis(-1),split_value(0),left(0),right(0)
     {}
+
+    KD_TREE_NODE(const KD_TREE_NODE&) = delete;
+    void operator=(const KD_TREE_NODE&) = delete;
 
     ~KD_TREE_NODE()
     {}

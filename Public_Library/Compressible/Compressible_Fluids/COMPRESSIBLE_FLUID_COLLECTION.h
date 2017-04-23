@@ -7,13 +7,12 @@
 #ifndef __COMPRESSIBLE_FLUID_COLLECTION__
 #define __COMPRESSIBLE_FLUID_COLLECTION__
 
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Compressible/Equations_Of_State/EOS.h>
 namespace PhysBAM{
 
 template<class TV>
-class COMPRESSIBLE_FLUID_COLLECTION:public NONCOPYABLE
+class COMPRESSIBLE_FLUID_COLLECTION
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef VECTOR<T,TV::m+2> TV_DIMENSION;
@@ -26,6 +25,8 @@ public:
     T_ARRAYS_DIMENSION_SCALAR U;
         
     COMPRESSIBLE_FLUID_COLLECTION(const GRID<TV>& grid_input);
+    COMPRESSIBLE_FLUID_COLLECTION(const COMPRESSIBLE_FLUID_COLLECTION&) = delete;
+    void operator=(const COMPRESSIBLE_FLUID_COLLECTION&) = delete;
     ~COMPRESSIBLE_FLUID_COLLECTION();
 
     void Set_Equation_Of_State(EOS<T>* eos_input)

@@ -10,7 +10,6 @@
 #include <Core/Data_Structures/PAIR.h>
 #include <Core/Data_Structures/TRIPLE.h>
 #include <Core/Matrices/SYSTEM_MATRIX_HELPER.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Dynamics/Coupled_Evolution/COUPLING_CONSTRAINT_ID.h>
 
 namespace PhysBAM{
@@ -20,7 +19,7 @@ template<class TV> class GRID;
 template<class TV> class GENERALIZED_FLUID_MASS;
 
 template<class TV>
-class MATRIX_FLUID_INTERPOLATION_BASE:public NONCOPYABLE,public SYSTEM_MATRIX_BASE<typename TV::SCALAR>
+class MATRIX_FLUID_INTERPOLATION_BASE:public SYSTEM_MATRIX_BASE<typename TV::SCALAR>
 {
     enum WORKAROUND {d=TV::m};
     typedef typename TV::SCALAR T;
@@ -29,6 +28,8 @@ protected:
 
 public:
     MATRIX_FLUID_INTERPOLATION_BASE(COLLISION_AWARE_INDEX_MAP<TV>& index_map_input);
+    MATRIX_FLUID_INTERPOLATION_BASE(const MATRIX_FLUID_INTERPOLATION_BASE&) = delete;
+    void operator=(const MATRIX_FLUID_INTERPOLATION_BASE&) = delete;
     virtual ~MATRIX_FLUID_INTERPOLATION_BASE();
 
 //#####################################################################

@@ -9,13 +9,12 @@
 
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Math_Tools/RANGE.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 template<class TV> class GRID;
 
 template<class TV>
-class CELL_MAPPING:public NONCOPYABLE
+class CELL_MAPPING
 {
 public:
     typedef typename TV::SCALAR T;
@@ -62,6 +61,8 @@ public:
         :grid(grid_input),next_index(0)
     {for(int i=0;i<2;i++){cell_index[i].Resize(grid.Domain_Indices());cell_index[i].Fill(-1);}}
 
+    CELL_MAPPING(const CELL_MAPPING&) = delete;
+    void operator=(const CELL_MAPPING&) = delete;
     ~CELL_MAPPING(){}
 };
 }

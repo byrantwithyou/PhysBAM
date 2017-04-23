@@ -25,7 +25,7 @@ template<class TV,class ID> class STRUCTURE_LIST;
 template<class TV> class STRUCTURE;
 
 template<class TV>
-class RIGID_BODY_COLLECTION:public NONCOPYABLE
+class RIGID_BODY_COLLECTION
 {
     typedef typename TV::SCALAR T;
 public:
@@ -59,6 +59,8 @@ public:
     RIGID_BODY<TV>* New_Body(int index);
 
     RIGID_BODY_COLLECTION(COLLISION_BODY_COLLECTION<TV>* collision_body_list_input);
+    RIGID_BODY_COLLECTION(const RIGID_BODY_COLLECTION&) = delete;
+    void operator=(const RIGID_BODY_COLLECTION&) = delete;
     virtual ~RIGID_BODY_COLLECTION();
 
     RIGID_BODY_STATE<TV> State(const int particle) const

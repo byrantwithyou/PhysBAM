@@ -17,7 +17,7 @@ template<class TV> class RIGID_BODY_COLLECTION;
 template<class TV> class RIGID_BODY;
 
 template <class TV>
-class GRID_BASED_COLLISION_GEOMETRY:public NONCOPYABLE
+class GRID_BASED_COLLISION_GEOMETRY
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef TV_INT T_INDEX;typedef typename GRID<TV>::BLOCK T_BLOCK;
@@ -37,6 +37,8 @@ public:
     ARRAY<VECTOR<bool,TV::m>,FACE_INDEX<TV::m> > face_neighbors_visible; // length is TV::m, order: right top back (for dyadic, tree is fully refined where this would have any effect)
 
     GRID_BASED_COLLISION_GEOMETRY(GRID<TV>& grid_input);
+    GRID_BASED_COLLISION_GEOMETRY(const GRID_BASED_COLLISION_GEOMETRY&) = delete;
+    void operator=(const GRID_BASED_COLLISION_GEOMETRY&) = delete;
     virtual ~GRID_BASED_COLLISION_GEOMETRY();
 
 //#####################################################################

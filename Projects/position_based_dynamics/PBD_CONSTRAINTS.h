@@ -10,11 +10,13 @@
 namespace PhysBAM{
 
 template<class TV>
-class PBD_CONSTRAINTS_BASE:public NONCOPYABLE
+class PBD_CONSTRAINTS_BASE
 {
     typedef typename TV::SCALAR T;
 public:
     PBD_CONSTRAINTS_BASE();
+    PBD_CONSTRAINTS_BASE(const PBD_CONSTRAINTS_BASE&) = delete;
+    void operator=(const PBD_CONSTRAINTS_BASE&) = delete;
     virtual ~PBD_CONSTRAINTS_BASE();
 
     virtual void Project(ARRAY<TV>& P,const ARRAY<T>& w,int solver_iterations) const=0;

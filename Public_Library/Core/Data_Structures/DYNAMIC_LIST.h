@@ -16,10 +16,9 @@
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Data_Structures/ELEMENT_ID.h>
 #include <Core/Data_Structures/HASHTABLE.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
-class DYNAMIC_LIST_CORE:public NONCOPYABLE
+class DYNAMIC_LIST_CORE
 {
 private:
 
@@ -36,6 +35,8 @@ public:
     mutable ARRAY<int> needs_write; // ID
 
     DYNAMIC_LIST_CORE(void (*deleter)(void*));
+    DYNAMIC_LIST_CORE(const DYNAMIC_LIST_CORE&) = delete;
+    void operator=(const DYNAMIC_LIST_CORE&) = delete;
     ~DYNAMIC_LIST_CORE();
 
     bool Is_Active(const int id) const
@@ -64,7 +65,7 @@ private:
 };
 
 template<class T,class ID,class ID2=int>
-class DYNAMIC_LIST:public NONCOPYABLE
+class DYNAMIC_LIST
 {
 public:
     DYNAMIC_LIST_CORE core;
@@ -72,6 +73,9 @@ public:
     DYNAMIC_LIST()
         :core(&Delete)
     {}
+
+    DYNAMIC_LIST(const DYNAMIC_LIST&) = delete;
+    void operator=(const DYNAMIC_LIST&) = delete;
 
     void Set_Element(const ID id,const T* element)
     {core.array(core.id_to_index_map(Value(id)))=(void*)(element);}

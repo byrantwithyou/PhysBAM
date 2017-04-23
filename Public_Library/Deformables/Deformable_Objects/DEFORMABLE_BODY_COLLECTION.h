@@ -10,7 +10,6 @@
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Read_Write/READ_WRITE_FUNCTIONS.h>
 #include <Core/Utilities/Find_Type.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{
 
@@ -31,7 +30,7 @@ template<class TV> class TRIANGLE_COLLISION_PARAMETERS;
 template<class TV> class STRUCTURE;
 
 template<class TV>
-class DEFORMABLE_BODY_COLLECTION:public NONCOPYABLE
+class DEFORMABLE_BODY_COLLECTION
 {
     typedef typename TV::SCALAR T;
     typedef typename DEFORMABLES_FORCES<TV>::FREQUENCY_DATA T_FREQUENCY_DEFORMABLE;
@@ -82,6 +81,8 @@ public:
     bool own_particles,own_collision_body_collection;
 
     DEFORMABLE_BODY_COLLECTION(DEFORMABLE_PARTICLES<TV>* particles,COLLISION_BODY_COLLECTION<TV>* collision_body_list);
+    DEFORMABLE_BODY_COLLECTION(const DEFORMABLE_BODY_COLLECTION&) = delete;
+    void operator=(const DEFORMABLE_BODY_COLLECTION&) = delete;
     virtual ~DEFORMABLE_BODY_COLLECTION();
 
     template<class T_FORCE> T_FORCE

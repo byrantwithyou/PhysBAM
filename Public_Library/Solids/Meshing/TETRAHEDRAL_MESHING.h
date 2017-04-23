@@ -24,7 +24,7 @@ public:
 };
 
 template<class T>
-class TETRAHEDRAL_MESHING:public NONCOPYABLE
+class TETRAHEDRAL_MESHING
 {
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
@@ -62,6 +62,8 @@ private:
 public:
 
     TETRAHEDRAL_MESHING(const STREAM_TYPE stream_type);
+    TETRAHEDRAL_MESHING(const TETRAHEDRAL_MESHING&) = delete;
+    void operator=(const TETRAHEDRAL_MESHING&) = delete;
     ~TETRAHEDRAL_MESHING();
 
     void Set_Curvature_Subdivision_Threshold(const T curvature_subdivision_threshold_input=.7)

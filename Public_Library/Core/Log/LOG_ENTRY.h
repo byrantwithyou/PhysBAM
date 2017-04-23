@@ -13,7 +13,7 @@
 namespace PhysBAM{
 namespace LOG{
 
-class LOG_ENTRY:public NONCOPYABLE
+class LOG_ENTRY
 {
 public:
     LOG_ENTRY* parent;
@@ -29,6 +29,8 @@ public:
 
     LOG_ENTRY(LOG_ENTRY* parent_input,const int depth_input,const int timer_id_input,
         const std::string& name_input,int& verbosity_level_input);
+    LOG_ENTRY(const LOG_ENTRY&) = delete;
+    void operator=(const LOG_ENTRY&) = delete;
     virtual ~LOG_ENTRY();
 
     void Start(LOG_CLASS& instance);

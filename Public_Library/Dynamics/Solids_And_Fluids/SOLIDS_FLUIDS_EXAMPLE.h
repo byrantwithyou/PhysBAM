@@ -10,7 +10,6 @@
 #include <Core/Log/DEBUG_SUBSTEPS.h>
 #include <Core/Log/DEBUG_UTILITIES.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Ordinary_Differential_Equations/EXAMPLE.h>
 #include <Solids/Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.h>
 #include <Solids/Solids_Evolution/SOLIDS_EVOLUTION_CALLBACKS.h>
@@ -25,7 +24,7 @@ template<class TV> class SOLIDS_FLUIDS_PARAMETERS;
 
 template<class TV>
 class SOLIDS_FLUIDS_EXAMPLE:public EXAMPLE<TV>,public EXTERNAL_STRAIN_ADJUSTMENT<typename TV::SCALAR>,public EXAMPLE_FORCES_AND_VELOCITIES<TV>,
-                            public SOLIDS_EVOLUTION_CALLBACKS<TV>,public SOLIDS_FLUIDS_CALLBACKS<TV>,public NONCOPYABLE
+                            public SOLIDS_EVOLUTION_CALLBACKS<TV>,public SOLIDS_FLUIDS_CALLBACKS<TV>
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::SPIN T_SPIN;
@@ -47,6 +46,8 @@ public:
     bool opt_solidssymmqmr,opt_solidscr,opt_solidscg;
 
     SOLIDS_FLUIDS_EXAMPLE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args);
+    SOLIDS_FLUIDS_EXAMPLE(const SOLIDS_FLUIDS_EXAMPLE&) = delete;
+    void operator=(const SOLIDS_FLUIDS_EXAMPLE&) = delete;
     virtual ~SOLIDS_FLUIDS_EXAMPLE();
 
     void Set_Minimum_Collision_Thickness(const T minimum_collision_thickness_input=1e-6)

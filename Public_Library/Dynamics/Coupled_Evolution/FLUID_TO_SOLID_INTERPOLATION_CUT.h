@@ -7,7 +7,6 @@
 #ifndef __FLUID_TO_SOLID_INTERPOLATION_CUT__
 #define __FLUID_TO_SOLID_INTERPOLATION_CUT__
 #include <Core/Arrays/ARRAYS_FORWARD.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <Dynamics/Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION_BASE.h>
 

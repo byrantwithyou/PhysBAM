@@ -14,7 +14,7 @@
 namespace PhysBAM{
 
 template<class TV>
-class PLS_FSI_DRIVER:public DRIVER<TV>,public NONCOPYABLE
+class PLS_FSI_DRIVER:public DRIVER<TV>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef DRIVER<TV> BASE;
@@ -31,6 +31,8 @@ public:
     ARRAY<T,FACE_INDEX<TV::m> > face_velocities_scratch;
 
     PLS_FSI_DRIVER(PLS_FSI_EXAMPLE<TV>& example_input);
+    PLS_FSI_DRIVER(const PLS_FSI_DRIVER&) = delete;
+    void operator=(const PLS_FSI_DRIVER&) = delete;
     virtual ~PLS_FSI_DRIVER();
 
 //#####################################################################

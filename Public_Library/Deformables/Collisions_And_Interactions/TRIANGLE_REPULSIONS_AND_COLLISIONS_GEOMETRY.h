@@ -8,7 +8,6 @@
 #define __TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY__
 
 #include <Core/Arrays/ARRAY.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/VECTOR_2D.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_OBJECT_FORWARD.h>
 namespace PhysBAM{
@@ -22,7 +21,7 @@ template<class TV> class DEFORMABLE_BODY_COLLECTION;
 template<class TV> class MPI_SOLIDS;
 
 template<class TV>
-class TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY:public NONCOPYABLE
+class TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY
 {
     typedef typename TV::SCALAR T;
     enum WORKAROUND {d=TV::m};
@@ -59,6 +58,8 @@ public:
     };
 
     TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection);
+    TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY(const TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY&) = delete;
+    void operator=(const TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY&) = delete;
     ~TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY();
 
     void Set_Allow_Intersections_Tolerance(const T allow_intersections_tolerance_input=1e-8)

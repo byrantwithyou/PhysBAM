@@ -8,14 +8,13 @@
 #define __PARTICLE_GRID_FORCES__
 
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 template<class TV> class MPM_PARTICLES;
 template<class TV> class MPM_FORCE_HELPER;
 
 template<class TV>
-class PARTICLE_GRID_FORCES:public NONCOPYABLE
+class PARTICLE_GRID_FORCES
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -24,6 +23,8 @@ public:
     const MPM_PARTICLES<TV>& particles;
 
     PARTICLE_GRID_FORCES(const MPM_FORCE_HELPER<TV>& force_helper);
+    PARTICLE_GRID_FORCES(const PARTICLE_GRID_FORCES&) = delete;
+    void operator=(const PARTICLE_GRID_FORCES&) = delete;
     virtual ~PARTICLE_GRID_FORCES();
 
 //#####################################################################

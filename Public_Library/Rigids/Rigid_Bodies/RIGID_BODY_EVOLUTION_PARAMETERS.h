@@ -7,13 +7,12 @@
 #ifndef __RIGID_BODY_EVOLUTION_PARAMETERS__
 #define __RIGID_BODY_EVOLUTION_PARAMETERS__
 
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
 namespace PhysBAM{
 
 template<class TV>
-class RIGID_BODY_EVOLUTION_PARAMETERS:public NONCOPYABLE
+class RIGID_BODY_EVOLUTION_PARAMETERS
 {
     typedef typename TV::SCALAR T;
 public:
@@ -35,6 +34,8 @@ public:
     bool correct_contact_energy;
 
     RIGID_BODY_EVOLUTION_PARAMETERS();
+    RIGID_BODY_EVOLUTION_PARAMETERS(const RIGID_BODY_EVOLUTION_PARAMETERS&) = delete;
+    void operator=(const RIGID_BODY_EVOLUTION_PARAMETERS&) = delete;
     virtual ~RIGID_BODY_EVOLUTION_PARAMETERS();
 //#####################################################################
 };

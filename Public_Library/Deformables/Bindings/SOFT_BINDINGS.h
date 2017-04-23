@@ -15,7 +15,7 @@ template<class TV> class BINDING;
 template<class TV> class DEFORMABLE_PARTICLES;
 
 template<class TV>
-class SOFT_BINDINGS:public NONCOPYABLE
+class SOFT_BINDINGS
 {
     typedef typename TV::SCALAR T;
 public:
@@ -34,6 +34,8 @@ public:
     mutable ARRAY<int>* frame_list;
 public:
     SOFT_BINDINGS(BINDING_LIST<TV>& binding_list_input);
+    SOFT_BINDINGS(const SOFT_BINDINGS&) = delete;
+    void operator=(const SOFT_BINDINGS&) = delete;
 
     virtual ~SOFT_BINDINGS();
 

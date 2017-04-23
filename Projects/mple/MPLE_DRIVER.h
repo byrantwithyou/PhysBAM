@@ -59,7 +59,7 @@ int omp_get_num_threads_helper()
 namespace PhysBAM{
 
 template<class TV,int w>
-class MPLE_DRIVER:public NONCOPYABLE
+class MPLE_DRIVER
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -98,6 +98,8 @@ public:
     int threads;
     
     MPLE_DRIVER():transform(0),output_directory("output"),cfl((T)1),spread((T)1),rescale((T)1),identity((T)0),contour_value((T).5),frames(100),mu(5e-4){}
+    MPLE_DRIVER(const MPLE_DRIVER&) = delete;
+    void operator=(const MPLE_DRIVER&) = delete;
 
     ~MPLE_DRIVER()
     {delete transform;}

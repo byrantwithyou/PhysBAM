@@ -13,7 +13,7 @@
 namespace PhysBAM{
 
 template<class T_PARTICLES>
-class POINTS_POOL:public NONCOPYABLE
+class POINTS_POOL
 {
 private:
     typedef typename T_PARTICLES::VECTOR_T TV;
@@ -29,6 +29,9 @@ public:
         :template_particles(template_particles),allocation_batch_size(allocation_batch_size_input),number_particles_per_cell(0)
     {
     }
+
+    POINTS_POOL(const POINTS_POOL&) = delete;
+    void operator=(const POINTS_POOL&) = delete;
 
     ~POINTS_POOL()
     {allocated_batches.Delete_Pointers_And_Clean_Memory();}

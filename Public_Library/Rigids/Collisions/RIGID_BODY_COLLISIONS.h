@@ -11,7 +11,6 @@
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Data_Structures/TRIPLE.h>
 #include <Core/Matrices/MATRIX_POLICY.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/MULTIBODY_LEVELSET_IMPLICIT_OBJECT.h>
@@ -31,7 +30,7 @@ template<class TV> class RIGID_BODY_COLLISION_PARAMETERS;
 template<class TV> class RIGIDS_COLLISION_CALLBACKS;
 
 template<class TV>
-class RIGID_BODY_COLLISIONS:public NONCOPYABLE
+class RIGID_BODY_COLLISIONS
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::SPIN T_SPIN;
@@ -89,6 +88,8 @@ public:
 
     RIGID_BODY_COLLISIONS(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,RIGID_BODY_COLLISION_PARAMETERS<TV>& parameters_input,
         RIGIDS_COLLISION_CALLBACKS<TV>& collision_callbacks_input,RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>& rigids_example_forces_and_velocities_input);
+    RIGID_BODY_COLLISIONS(const RIGID_BODY_COLLISIONS&) = delete;
+    void operator=(const RIGID_BODY_COLLISIONS&) = delete;
     virtual ~RIGID_BODY_COLLISIONS();
 
     void Set_Collision_Pair_Iterations(const int collision_pair_iterations_input=20)

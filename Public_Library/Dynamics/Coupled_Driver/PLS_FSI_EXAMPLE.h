@@ -10,7 +10,6 @@
 #include <Core/Log/DEBUG_SUBSTEPS.h>
 #include <Core/Log/DEBUG_UTILITIES.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Ordinary_Differential_Equations/EXAMPLE.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_OBJECT_FORWARD.h>
 #include <Solids/Collisions/SOLIDS_COLLISIONS_FORWARD.h>
@@ -32,7 +31,7 @@ template<class TV> class KANG_POISSON_VISCOSITY;
 
 template<class TV_input>
 class PLS_FSI_EXAMPLE:public EXAMPLE<TV_input>,public EXAMPLE_FORCES_AND_VELOCITIES<TV_input>,public SOLIDS_EVOLUTION_CALLBACKS<TV_input>,public SOLIDS_FLUIDS_CALLBACKS<TV_input>,
-                      public LEVELSET_CALLBACKS<TV_input>,public FLUIDS_PARAMETERS_CALLBACKS<TV_input>,public NONCOPYABLE
+                      public LEVELSET_CALLBACKS<TV_input>,public FLUIDS_PARAMETERS_CALLBACKS<TV_input>
 {
     typedef TV_input TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef typename MATRIX_POLICY<TV>::TRANSFORMATION_MATRIX T_TRANSFORMATION_MATRIX;
@@ -63,6 +62,8 @@ public:
     bool opt_skip_debug_data,opt_solidscg,opt_solidscr,opt_solidssymmqmr;
 
     PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args,const int number_of_regions);
+    PLS_FSI_EXAMPLE(const PLS_FSI_EXAMPLE&) = delete;
+    void operator=(const PLS_FSI_EXAMPLE&) = delete;
     virtual ~PLS_FSI_EXAMPLE();
 
     void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const override

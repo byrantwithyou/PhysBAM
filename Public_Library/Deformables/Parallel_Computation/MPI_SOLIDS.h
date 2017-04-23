@@ -7,7 +7,6 @@
 
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Data_Structures/ELEMENT_ID.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Parallel_Computation/PARTITION_ID.h>
 #ifdef Status // Splendid choice for a macro.
 #undef Status
@@ -22,7 +21,7 @@ template<class TV> class DEFORMABLE_BODY_COLLECTION;
 template<class TV> class RIGID_BODY_COLLECTION;
 
 template<class TV>
-class MPI_SOLIDS:public NONCOPYABLE
+class MPI_SOLIDS
 {
 public:
     DEFORMABLE_BODY_COLLECTION<TV>* deformable_body_collection;
@@ -61,6 +60,8 @@ public:
     {return number_of_ranks;}
 
     MPI_SOLIDS();
+    MPI_SOLIDS(const MPI_SOLIDS&) = delete;
+    void operator=(const MPI_SOLIDS&) = delete;
     ~MPI_SOLIDS();
 
     int Get_Unique_Tag() const

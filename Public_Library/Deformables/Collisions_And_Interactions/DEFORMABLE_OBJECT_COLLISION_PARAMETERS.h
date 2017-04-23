@@ -7,14 +7,13 @@
 #ifndef __DEFORMABLE_OBJECT_COLLISION_PARAMETERS__
 #define __DEFORMABLE_OBJECT_COLLISION_PARAMETERS__
 
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
 #include <Rigids/Collisions/COLLISIONS_GEOMETRY_FORWARD.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_OBJECT_FORWARD.h>
 namespace PhysBAM{
 
 template<class TV>
-class DEFORMABLE_OBJECT_COLLISION_PARAMETERS:public NONCOPYABLE
+class DEFORMABLE_OBJECT_COLLISION_PARAMETERS
 {
     typedef typename TV::SCALAR T;
 public:
@@ -30,6 +29,8 @@ public:
     T spatial_partition_voxel_size_scale_factor;
 
     DEFORMABLE_OBJECT_COLLISION_PARAMETERS();
+    DEFORMABLE_OBJECT_COLLISION_PARAMETERS(const DEFORMABLE_OBJECT_COLLISION_PARAMETERS&) = delete;
+    void operator=(const DEFORMABLE_OBJECT_COLLISION_PARAMETERS&) = delete;
     virtual ~DEFORMABLE_OBJECT_COLLISION_PARAMETERS();
 //#####################################################################
 };

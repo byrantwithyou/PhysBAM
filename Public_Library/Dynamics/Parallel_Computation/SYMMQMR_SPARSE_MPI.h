@@ -20,7 +20,7 @@ template<class TV> class FLUID_SYSTEM_MPI_SLIP;
 template<class TV> class SOLID_SYSTEM_MPI_SLIP;
 
 template<class TV>
-class SYMMQMR_SPARSE_MPI:public NONCOPYABLE
+class SYMMQMR_SPARSE_MPI
 {
     typedef typename TV::SCALAR T;
 public:
@@ -47,6 +47,8 @@ public:
     {
         Use_Modified_Incomplete_Cholesky();
     }
+    SYMMQMR_SPARSE_MPI(const SYMMQMR_SPARSE_MPI&) = delete;
+    void operator=(const SYMMQMR_SPARSE_MPI&) = delete;
 
     ~SYMMQMR_SPARSE_MPI()
     {MPI_UTILITIES::Free_Elements_And_Clean_Memory(boundary_datatypes);

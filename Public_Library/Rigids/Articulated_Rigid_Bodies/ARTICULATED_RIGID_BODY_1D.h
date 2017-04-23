@@ -9,7 +9,6 @@
 
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Data_Structures/PAIR.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/VECTOR_1D.h>
 #include <Rigids/Joints/JOINT_ID.h>
 namespace PhysBAM{
@@ -21,7 +20,7 @@ template<class TV> class RIGID_BODY;
 template<class TV> class JOINT_MESH;
 
 template<class T>
-class ARTICULATED_RIGID_BODY<VECTOR<T,1> >:public NONCOPYABLE
+class ARTICULATED_RIGID_BODY<VECTOR<T,1> >
 {
     typedef VECTOR<T,1> TV;
 
@@ -40,6 +39,8 @@ public:
     int max_iterations;
 
     ARTICULATED_RIGID_BODY(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input);
+    ARTICULATED_RIGID_BODY(const ARTICULATED_RIGID_BODY&) = delete;
+    void operator=(const ARTICULATED_RIGID_BODY&) = delete;
 
     ~ARTICULATED_RIGID_BODY();
 

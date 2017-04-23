@@ -12,7 +12,7 @@
 namespace PhysBAM{
 
 template<class T>
-class RAY_TRACER_DEBUG_DATA:public NONCOPYABLE
+class RAY_TRACER_DEBUG_DATA
 {
 public:
     RENDERING_RAY_DEBUG<T>* ray_tree;
@@ -22,6 +22,8 @@ public:
         :ray_tree(0)
     {}
 
+    RAY_TRACER_DEBUG_DATA(const RAY_TRACER_DEBUG_DATA&) = delete;
+    void operator=(const RAY_TRACER_DEBUG_DATA&) = delete;
     ~RAY_TRACER_DEBUG_DATA()
     {delete ray_tree;}
 

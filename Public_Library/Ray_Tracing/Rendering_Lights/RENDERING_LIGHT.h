@@ -16,7 +16,7 @@ template<class T> class RENDERING_RAY;
 template<class T> class PHOTON_MAP;
 
 template<class T>
-class RENDERING_LIGHT:public NONCOPYABLE
+class RENDERING_LIGHT
 {
 public:
     int light_index;
@@ -35,6 +35,8 @@ public:
         global_photon_random.Set_Seed(0);caustic_photon_random.Set_Seed(1);volume_photon_random.Set_Seed(2);sample_points_random.Set_Seed(3);
     }
 
+    RENDERING_LIGHT(const RENDERING_LIGHT&) = delete;
+    void operator=(const RENDERING_LIGHT&) = delete;
     virtual ~RENDERING_LIGHT()
     {}
 

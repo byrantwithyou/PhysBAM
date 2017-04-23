@@ -9,12 +9,11 @@
 
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Compressible/Euler_Equations/EULER.h>
 namespace PhysBAM{
 
 template<class TV>
-class EULER_PROJECTION:public NONCOPYABLE
+class EULER_PROJECTION
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -25,6 +24,9 @@ class EULER_PROJECTION:public NONCOPYABLE
 public:
     EULER_PROJECTION()
     {}
+
+    EULER_PROJECTION(const EULER_PROJECTION&) = delete;
+    void operator=(const EULER_PROJECTION&) = delete;
 
     virtual ~EULER_PROJECTION()
     {}

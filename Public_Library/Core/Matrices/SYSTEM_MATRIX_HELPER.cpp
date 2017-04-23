@@ -4,7 +4,6 @@
 //#####################################################################
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Core/Matrices/SYSTEM_MATRIX_HELPER.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <map>
 using namespace PhysBAM;
 //#####################################################################

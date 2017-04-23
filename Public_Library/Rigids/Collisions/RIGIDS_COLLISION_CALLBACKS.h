@@ -8,7 +8,6 @@
 #define __RIGIDS_COLLISION_CALLBACKS__
 
 #include <Core/Arrays/ARRAYS_FORWARD.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 
 namespace PhysBAM{
 
@@ -18,13 +17,15 @@ template<class TV> class RIGID_BODY;
 template<class T,int d> class VECTOR;
 
 template<class TV>
-class RIGIDS_COLLISION_CALLBACKS:public NONCOPYABLE
+class RIGIDS_COLLISION_CALLBACKS
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::SPIN T_SPIN;
 public:
 
     RIGIDS_COLLISION_CALLBACKS() {}
+    RIGIDS_COLLISION_CALLBACKS(const RIGIDS_COLLISION_CALLBACKS&) = delete;
+    void operator=(const RIGIDS_COLLISION_CALLBACKS&) = delete;
     virtual ~RIGIDS_COLLISION_CALLBACKS() {};
 
     void Swap_States(const int id_1,const int id_2)

@@ -7,7 +7,6 @@
 #ifndef __MATERIAL_SHADER__
 #define __MATERIAL_SHADER__
 
-#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 template<class T,int d> class VECTOR;
@@ -18,7 +17,7 @@ template<class T> class RENDERING_LIGHT;
 template<class T> class PHOTON_MAP;
 
 template<class T>
-class MATERIAL_SHADER:public NONCOPYABLE
+class MATERIAL_SHADER
 {
     typedef VECTOR<T,3> TV;
 protected:
@@ -29,6 +28,8 @@ public:
         :world(world_input)
     {}
 
+    MATERIAL_SHADER(const MATERIAL_SHADER&) = delete;
+    void operator=(const MATERIAL_SHADER&) = delete;
     virtual ~MATERIAL_SHADER()
     {}
 

@@ -8,11 +8,10 @@
 #define __POISSON__
 
 #include <Core/Arrays/ARRAY.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 template<class T>
-class POISSON:public NONCOPYABLE
+class POISSON
 {
 protected:
     T beta_minus,beta_plus; // constant beta for phi <= 0 and phi > 0
@@ -35,6 +34,9 @@ public:
         Set_Constant_beta();
     }
 
+    POISSON(const POISSON&) = delete;
+    void operator=(const POISSON&) = delete;
+    
     void Set_Constant_beta(const T beta_minus_input=1,const T beta_plus_input=1)
     {beta_minus=beta_minus_input;beta_plus=beta_plus_input;use_variable_beta=false;}
 

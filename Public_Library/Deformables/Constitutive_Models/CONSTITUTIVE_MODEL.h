@@ -9,13 +9,12 @@
 
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Matrices/MATRIX_FORWARD.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Deformables/Constitutive_Models/CONSTITUTIVE_MODELS_FORWARD.h>
 namespace PhysBAM{
 
 template<class T,int d> class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE;
 template<class T,int d>
-class CONSTITUTIVE_MODEL:public NONCOPYABLE
+class CONSTITUTIVE_MODEL
 {
     typedef VECTOR<T,d> TV;
 public:
@@ -27,6 +26,8 @@ public:
 
 private:
     CONSTITUTIVE_MODEL();
+    CONSTITUTIVE_MODEL(const CONSTITUTIVE_MODEL&) = delete;
+    void operator=(const CONSTITUTIVE_MODEL&) = delete;
 
     // all constitutive models should derive from one of these
     friend class ISOTROPIC_CONSTITUTIVE_MODEL<T,d>;

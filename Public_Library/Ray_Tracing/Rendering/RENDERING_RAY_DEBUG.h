@@ -8,7 +8,6 @@
 #define __RENDERING_RAY_DEBUG__
 
 #include <Core/Arrays/ARRAY.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Ray_Tracing/Rendering/RENDERING_RAY.h>
 namespace PhysBAM{
 
@@ -16,7 +15,7 @@ template<class T> class PHOTON;
 template<class T> class IRRADIANCE_SAMPLE;
 
 template<class T>
-class RENDERING_RAY_DEBUG:public NONCOPYABLE
+class RENDERING_RAY_DEBUG
 {
 public:
     RENDERING_RAY<T> ray;
@@ -30,6 +29,8 @@ public:
 
     RENDERING_RAY_DEBUG();
     RENDERING_RAY_DEBUG(const RENDERING_RAY<T>& ray_input);
+    RENDERING_RAY_DEBUG(const RENDERING_RAY_DEBUG&) = delete;
+    void operator=(const RENDERING_RAY_DEBUG&) = delete;
     ~RENDERING_RAY_DEBUG();
     void Add_Child(RENDERING_RAY<T>& ray_to_add);
     void Add_Comment(const std::string& comment_string);

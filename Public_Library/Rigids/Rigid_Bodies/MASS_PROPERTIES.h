@@ -8,7 +8,6 @@
 #define __MASS_PROPERTIES__
 
 #include <Core/Matrices/SYMMETRIC_MATRIX.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Utilities/TYPE_UTILITIES.h>
 #include <Tools/Particles/PARTICLES.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
@@ -17,7 +16,7 @@ namespace PhysBAM{
 template <class TV> class FRAME;
 
 template<class TV,int d=TV::m-1>
-class MASS_PROPERTIES:public NONCOPYABLE
+class MASS_PROPERTIES
 {
     typedef typename TV::SCALAR T;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,d>::OBJECT T_SIMPLICIAL_OBJECT;
@@ -33,6 +32,8 @@ private:
 public:
 
     MASS_PROPERTIES(const T_SIMPLICIAL_OBJECT& object,const bool thin_shell);
+    MASS_PROPERTIES(const MASS_PROPERTIES&) = delete;
+    void operator=(const MASS_PROPERTIES&) = delete;
 
     void Set_Mass(const T mass_input)
     {mass=mass_input;use_mass=true;}

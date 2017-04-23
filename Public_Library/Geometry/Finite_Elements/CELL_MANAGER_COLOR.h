@@ -9,7 +9,6 @@
 
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Math_Tools/RANGE.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/GRID.h>
@@ -19,7 +18,7 @@ namespace PhysBAM{
 template<class TV> class CELL_DOMAIN_INTERFACE_COLOR;
 
 template<class TV>
-class CELL_MANAGER_COLOR:public NONCOPYABLE
+class CELL_MANAGER_COLOR
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -32,6 +31,8 @@ public:
     ARRAY<VECTOR<int,2> > uncompressed;
 
     CELL_MANAGER_COLOR(const CELL_DOMAIN_INTERFACE_COLOR<TV>& cdi_input);
+    CELL_MANAGER_COLOR(const CELL_MANAGER_COLOR&) = delete;
+    void operator=(const CELL_MANAGER_COLOR&) = delete;
 
     void Set_Active(int flat_index,int color)
     {compressed(color)(flat_index)=-2;compressed(color)(cdi.remap(flat_index))=-2;}

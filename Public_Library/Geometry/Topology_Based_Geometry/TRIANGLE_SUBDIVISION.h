@@ -8,12 +8,11 @@
 #define __TRIANGLE_SUBDIVISION__
 
 #include <Core/Arrays/ARRAY_VIEW.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 class TRIANGLE_MESH;
 
-class TRIANGLE_SUBDIVISION:public NONCOPYABLE
+class TRIANGLE_SUBDIVISION
 {
 public:
     TRIANGLE_MESH& triangle_mesh;
@@ -29,6 +28,8 @@ public:
         delete_boundary_mesh(false),delete_incident_elements(false)
     {}
 
+    TRIANGLE_SUBDIVISION(const TRIANGLE_SUBDIVISION&) = delete;
+    void operator=(const TRIANGLE_SUBDIVISION&) = delete;
     virtual ~TRIANGLE_SUBDIVISION()
     {Clean_Memory();}
 

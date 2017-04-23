@@ -7,12 +7,11 @@
 #ifndef __IMPLICIT_SOLVE_PARAMETERS__
 #define __IMPLICIT_SOLVE_PARAMETERS__
 
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
 namespace PhysBAM{
 
 template<class TV>
-class IMPLICIT_SOLVE_PARAMETERS:public NONCOPYABLE
+class IMPLICIT_SOLVE_PARAMETERS
 {
     typedef typename TV::SCALAR T;
 public:
@@ -30,6 +29,8 @@ public:
     bool print_matrix;
 
     IMPLICIT_SOLVE_PARAMETERS();
+    IMPLICIT_SOLVE_PARAMETERS(const IMPLICIT_SOLVE_PARAMETERS&) = delete;
+    void operator=(const IMPLICIT_SOLVE_PARAMETERS&) = delete;
     virtual ~IMPLICIT_SOLVE_PARAMETERS();
 //#####################################################################
 };

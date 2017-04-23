@@ -12,7 +12,6 @@
 #include <Core/Arrays_Nd/ARRAYS_ND_BASE.h>
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Data_Structures/PAIR.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Tools/Clone/CLONEABLE.h>
 #include <Tools/Particles/ARRAY_COLLECTION_ELEMENT.h>
 #include <Tools/Particles/ARRAY_COLLECTION_ELEMENT_BASE.h>
@@ -32,7 +31,7 @@ template<class E> void Register_Attribute_Sample() {Register_Attribute_Sample(ne
 template<class F,class D> void Register_Attribute_Sample() {Register_Attribute_Sample(new ARRAY_COLLECTION_ELEMENT<F>,new ARRAY_COLLECTION_ELEMENT<D>);}
 
 template<class TV>
-class PARTICLES:public CLONEABLE<PARTICLES<TV> >,public NONCOPYABLE
+class PARTICLES:public CLONEABLE<PARTICLES<TV> >
 {
     typedef typename TV::SCALAR T;
 public:
@@ -46,6 +45,8 @@ public:
     bool delete_data;
 
     PARTICLES();
+    PARTICLES(const PARTICLES&) = delete;
+    void operator=(const PARTICLES&) = delete;
     virtual ~PARTICLES();
 
     void Clone_Helper(const PARTICLES& particles)

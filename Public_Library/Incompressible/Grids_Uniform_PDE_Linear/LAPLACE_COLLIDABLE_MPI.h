@@ -20,7 +20,7 @@ template<class T> class MPI_UNIFORM_GRID;
 template<class TV> class LAPLACE_COLLIDABLE_UNIFORM;
 
 template<class TV>
-class LAPLACE_COLLIDABLE_MPI:public NONCOPYABLE
+class LAPLACE_COLLIDABLE_MPI
 {
     typedef typename TV::SCALAR T;typedef MPI_UNIFORM_GRID<TV> T_MPI_GRID;typedef VECTOR<int,TV::m> TV_INT;
     typedef TV_INT T_INDEX;
@@ -42,6 +42,8 @@ public:
     ARRAY<MPI::Intracomm>* communicators;
 
     LAPLACE_COLLIDABLE_MPI(LAPLACE_COLLIDABLE_UNIFORM<TV>& laplace);
+    LAPLACE_COLLIDABLE_MPI(const LAPLACE_COLLIDABLE_MPI&) = delete;
+    void operator=(const LAPLACE_COLLIDABLE_MPI&) = delete;
     virtual ~LAPLACE_COLLIDABLE_MPI();
 
 //#####################################################################

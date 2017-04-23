@@ -10,21 +10,22 @@
 #include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Core/Data_Structures/DATA_STRUCTURES_FORWARD.h>
 #include <Core/Log/DEBUG_UTILITIES.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Grid_Tools/Grids/FACE_INDEX.h>
 namespace PhysBAM{
 
 template<class TV> class GRID;
 
 template<class TV>
-class INCOMPRESSIBLE_FLUIDS_FORCES:public NONCOPYABLE
+class INCOMPRESSIBLE_FLUIDS_FORCES
 {
-    
     typedef typename TV::SCALAR T;
 public:
 
     INCOMPRESSIBLE_FLUIDS_FORCES()
     {}
+
+    INCOMPRESSIBLE_FLUIDS_FORCES(const INCOMPRESSIBLE_FLUIDS_FORCES&) = delete;
+    void operator=(const INCOMPRESSIBLE_FLUIDS_FORCES&) = delete;
 
     virtual ~INCOMPRESSIBLE_FLUIDS_FORCES()
     {}

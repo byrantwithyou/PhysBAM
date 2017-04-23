@@ -15,7 +15,6 @@
 #include <Core/Matrices/MATRIX_BASE.h>
 #include <Core/Matrices/UPPER_TRIANGULAR_MATRIX_2X2.h>
 #include <Core/Matrices/UPPER_TRIANGULAR_MATRIX_3X3.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Topology/TOPOLOGY_POLICY.h>
@@ -23,7 +22,7 @@
 namespace PhysBAM{
 
 template<class TV,int d>
-class STRAIN_MEASURE:public NONCOPYABLE
+class STRAIN_MEASURE
 {
     typedef typename TV::SCALAR T;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,d>::OBJECT T_MESH_OBJECT;
@@ -40,6 +39,8 @@ private:
 public:
 
     STRAIN_MEASURE(T_MESH_OBJECT& mesh_object);
+    STRAIN_MEASURE(const STRAIN_MEASURE&) = delete;
+    void operator=(const STRAIN_MEASURE&) = delete;
     ~STRAIN_MEASURE();
 
     T_MATRIX F(const int simplex) const

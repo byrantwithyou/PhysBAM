@@ -7,20 +7,22 @@
 
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Log/DEBUG_UTILITIES.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Grid_Tools/Grids/BLOCK_UNIFORM.h>
 #include <Grid_PDE/Interpolation/FACE_LOOKUP_UNIFORM.h>
 #include <Grid_PDE/Interpolation/INTERPOLATION_UNIFORM_FORWARD.h>
 namespace PhysBAM{
 
 template<class TV,class T2,class T_FACE_LOOKUP> // T_FACE_LOOKUP=FACE_LOOKUP_UNIFORM<TV>
-class INTERPOLATION_UNIFORM:public NONCOPYABLE
+class INTERPOLATION_UNIFORM
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     STATIC_ASSERT((is_same<typename GRID<TV>::GRID_TAG,UNIFORM_TAG<TV> >::value));
 public:
     template<class T3> struct REBIND{typedef INTERPOLATION_UNIFORM<TV,T3,T_FACE_LOOKUP> TYPE;};
 
+    INTERPOLATION_UNIFORM() = default;
+    INTERPOLATION_UNIFORM(const INTERPOLATION_UNIFORM&) = delete;
+    void operator=(const INTERPOLATION_UNIFORM&) = delete;
     virtual ~INTERPOLATION_UNIFORM()
     {}
 

@@ -15,7 +15,7 @@ namespace PhysBAM{
 template<class T> class MPI_UNIFORM_GRID;
 
 template<class TV>
-class FLOOD_FILL_MPI:public NONCOPYABLE
+class FLOOD_FILL_MPI
 {
     typedef typename TV::SCALAR T;
     typedef MPI_UNIFORM_GRID<TV> T_MPI_GRID;typedef VECTOR<int,TV::m> TV_INT;
@@ -33,6 +33,8 @@ public:
 
     FLOOD_FILL_MPI(const T_MPI_GRID& mpi_grid_input,const GRID<TV>& local_grid_input,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N_input,int& number_of_regions_input,T_ARRAYS_INT& colors_input,
         ARRAY<ARRAY<int> >& color_ranks_input,ARRAY<bool>* color_touches_uncolorable);
+    FLOOD_FILL_MPI(const FLOOD_FILL_MPI&) = delete;
+    void operator=(const FLOOD_FILL_MPI&) = delete;
     virtual ~FLOOD_FILL_MPI();
 
 //#####################################################################

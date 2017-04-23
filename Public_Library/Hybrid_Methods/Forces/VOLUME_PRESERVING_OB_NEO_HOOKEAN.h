@@ -11,7 +11,6 @@
 #include <Core/Matrices/IDENTITY_MATRIX.h>
 #include <Core/Matrices/MATRIX.h>
 #include <Core/Matrices/SYMMETRIC_MATRIX.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Hybrid_Methods/Forces/OLDROYD_CONSTITUTIVE_MODEL.h>
 namespace PhysBAM{
 

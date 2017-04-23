@@ -9,7 +9,6 @@
 
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Data_Structures/HASHTABLE.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <Rigids/Collisions/COLLISIONS_GEOMETRY_FORWARD.h>
@@ -18,7 +17,7 @@ namespace PhysBAM{
 template<class TV> class RAY;
 
 template<class TV>
-class COLLISION_BODY_COLLECTION:public NONCOPYABLE
+class COLLISION_BODY_COLLECTION
 {
     typedef typename TV::SCALAR T;
 public:
@@ -33,6 +32,8 @@ public:
     T collision_body_thickness;
 
     COLLISION_BODY_COLLECTION();
+    COLLISION_BODY_COLLECTION(const COLLISION_BODY_COLLECTION&) = delete;
+    void operator=(const COLLISION_BODY_COLLECTION&) = delete;
     virtual ~COLLISION_BODY_COLLECTION();
 
     COLLISION_GEOMETRY<TV>& operator()(const COLLISION_GEOMETRY_ID id)

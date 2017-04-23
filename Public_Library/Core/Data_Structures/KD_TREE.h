@@ -16,7 +16,7 @@
 namespace PhysBAM{
 
 template<class TV>
-class KD_TREE:public NONCOPYABLE
+class KD_TREE
 {
     typedef typename TV::SCALAR T;
 public:
@@ -27,6 +27,9 @@ public:
     KD_TREE(const bool store_values_on_internal_nodes_input=true)
         :root_node(0),store_values_on_internal_nodes(store_values_on_internal_nodes_input)
     {}
+
+    KD_TREE(const KD_TREE&) = delete;
+    void operator=(const KD_TREE&) = delete;
 
     ~KD_TREE()
     {}

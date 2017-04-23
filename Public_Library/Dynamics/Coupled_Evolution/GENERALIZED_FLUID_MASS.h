@@ -8,14 +8,13 @@
 #define __GENERALIZED_FLUID_MASS__
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Matrices/SYSTEM_MATRIX_HELPER.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 
 namespace PhysBAM{
 template<class TV> class COLLISION_AWARE_INDEX_MAP;
 template<class TV> class GRID;
 
 template<class TV>
-class GENERALIZED_FLUID_MASS:public NONCOPYABLE,public SYSTEM_MATRIX_BASE<typename TV::SCALAR>
+class GENERALIZED_FLUID_MASS:public SYSTEM_MATRIX_BASE<typename TV::SCALAR>
 {
     enum WORKAROUND {d=TV::m};
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
@@ -28,6 +27,8 @@ public:
     ARRAY<T> one_over_fluid_mass_at_faces;
 
     GENERALIZED_FLUID_MASS(const COLLISION_AWARE_INDEX_MAP<TV>& index_map_input,const ARRAY<T,FACE_INDEX<TV::m> >& beta_input,const ARRAY<T>& constrained_beta_input);
+    GENERALIZED_FLUID_MASS(const GENERALIZED_FLUID_MASS&) = delete;
+    void operator=(const GENERALIZED_FLUID_MASS&) = delete;
     virtual ~GENERALIZED_FLUID_MASS();
 
     void Compute();

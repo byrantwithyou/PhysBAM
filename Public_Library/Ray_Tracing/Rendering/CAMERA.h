@@ -21,7 +21,7 @@
 namespace PhysBAM{
 
 template<class T>
-class CAMERA:public NONCOPYABLE
+class CAMERA
 {
     typedef VECTOR<T,3> TV;
 
@@ -37,6 +37,8 @@ public:
     CAMERA()
         :position(0,0,-1),focal_point(0,0,0),vertical_vector(0,1,0)
     {}
+    CAMERA(const CAMERA&) = delete;
+    void operator=(const CAMERA&) = delete;
 
     void Position_And_Aim_Camera(const VECTOR<T,3>& position_input,const VECTOR<T,3>& look_at_point,const VECTOR<T,3>& pseudo_up_vector)
     {position=position_input;look_vector=(look_at_point-position).Normalized();

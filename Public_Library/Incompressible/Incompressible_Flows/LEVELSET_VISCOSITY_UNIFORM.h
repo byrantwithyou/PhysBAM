@@ -7,7 +7,6 @@
 #ifndef __LEVELSET_VISCOSITY_UNIFORM__
 #define __LEVELSET_VISCOSITY_UNIFORM__
 
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Incompressible/Incompressible_Flows/LEVELSET_INDEX_MAP_UNIFORM.h>
 #include <Incompressible/Incompressible_Flows/LEVELSET_VISCOSITY_UNIFORM_SYSTEM.h>
 namespace PhysBAM{
@@ -15,7 +14,7 @@ namespace PhysBAM{
 template<class TV> class BOUNDARY_CONDITIONS_CALLBACKS;
 
 template<class TV>
-class LEVELSET_VISCOSITY_UNIFORM:public NONCOPYABLE
+class LEVELSET_VISCOSITY_UNIFORM
 {
     typedef typename TV::SCALAR T;
     enum WORKAROUND {d=TV::m};
@@ -30,6 +29,8 @@ public:
     VECTOR<bool,d> periodic_boundary;
 
     LEVELSET_VISCOSITY_UNIFORM(BOUNDARY_CONDITIONS_CALLBACKS<TV>* callback_input,const GRID<TV>& grid_input,T dt,T density,T viscosity);
+    LEVELSET_VISCOSITY_UNIFORM(const LEVELSET_VISCOSITY_UNIFORM&) = delete;
+    void operator=(const LEVELSET_VISCOSITY_UNIFORM&) = delete;
     virtual ~LEVELSET_VISCOSITY_UNIFORM();
 
 //#####################################################################

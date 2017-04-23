@@ -10,11 +10,10 @@
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <Core/Matrices/SYMMETRIC_MATRIX_3X3.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 template<class T,int d>
-class PLASTICITY_MODEL:public NONCOPYABLE
+class PLASTICITY_MODEL
 {
     typedef VECTOR<T,d> TV;
 public:
@@ -25,6 +24,9 @@ public:
         Fp_inverse.Exact_Resize(elements);
         Fp_inverse.Fill(SYMMETRIC_MATRIX<T,d>::Identity_Matrix());
     }
+
+    PLASTICITY_MODEL(const PLASTICITY_MODEL&) = delete;
+    void operator=(const PLASTICITY_MODEL&) = delete;
     
     virtual ~PLASTICITY_MODEL()
     {}

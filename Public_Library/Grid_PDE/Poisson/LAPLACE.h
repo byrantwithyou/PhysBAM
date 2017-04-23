@@ -8,11 +8,10 @@
 #define __LAPLACE__
 
 #include <Core/Arrays/ARRAY.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 template<class T>
-class LAPLACE:public NONCOPYABLE
+class LAPLACE
 {
 public:
     T tolerance;
@@ -29,6 +28,8 @@ public:
         Solve_Neumann_Regions();
     }
 
+    LAPLACE(const LAPLACE&) = delete;
+    void operator=(const LAPLACE&) = delete;
     virtual ~LAPLACE()
     {}
 

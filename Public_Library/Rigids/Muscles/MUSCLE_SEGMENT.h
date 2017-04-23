@@ -10,7 +10,6 @@
 #include <Core/Log/DEBUG_UTILITIES.h>
 #include <Core/Matrices/FRAME.h>
 #include <Core/Matrices/MATRIX_POLICY.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <string>
 namespace PhysBAM{
 
@@ -19,7 +18,7 @@ template<class TV> class GEOMETRY_PARTICLES;
 template<class T> class QUEUE;
 
 template<class TV>
-class MUSCLE_SEGMENT:public NONCOPYABLE
+class MUSCLE_SEGMENT
 {
     typedef typename TV::SCALAR T;
 public:
@@ -34,6 +33,8 @@ public:
 
     MUSCLE_SEGMENT();
     MUSCLE_SEGMENT(ATTACHMENT_POINT<TV>* point_1_input,ATTACHMENT_POINT<TV>* point_2_input);
+    MUSCLE_SEGMENT(const MUSCLE_SEGMENT&) = delete;
+    void operator=(const MUSCLE_SEGMENT&) = delete;
 
     virtual ~MUSCLE_SEGMENT();
 

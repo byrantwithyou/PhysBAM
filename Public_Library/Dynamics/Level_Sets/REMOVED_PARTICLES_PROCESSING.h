@@ -19,7 +19,7 @@ template<class TV> class LEVELSET_IMPLICIT_OBJECT;
 template<class T> class REMOVED_PARTICLES_BLENDER_3D;
 
 template<class T>
-class REMOVED_PARTICLES_PROCESSING:public NONCOPYABLE
+class REMOVED_PARTICLES_PROCESSING
 {
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
@@ -38,6 +38,8 @@ public:
     
     REMOVED_PARTICLES_PROCESSING(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles_input);
     REMOVED_PARTICLES_PROCESSING(GRID<TV>& grid_input,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV> *,VECTOR<int,3> >& particles_array_input);
+    REMOVED_PARTICLES_PROCESSING(const REMOVED_PARTICLES_PROCESSING&) = delete;
+    void operator=(const REMOVED_PARTICLES_PROCESSING&) = delete;
 
 private:
     void Initialize(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles_input);

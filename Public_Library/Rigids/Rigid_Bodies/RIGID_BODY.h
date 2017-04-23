@@ -28,7 +28,7 @@
 namespace PhysBAM{
 
 template<class TV>
-class RIGID_BODY:public NONCOPYABLE
+class RIGID_BODY
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::SPIN T_SPIN;
@@ -61,6 +61,8 @@ public:
     ARRAY<STRUCTURE<TV>*> structures;
 
     RIGID_BODY(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,bool create_collision_geometry=false,int index=-1);
+    RIGID_BODY(const RIGID_BODY&) = delete;
+    void operator=(const RIGID_BODY&) = delete;
     virtual ~RIGID_BODY();
 
     template<class T_STRUCTURE>

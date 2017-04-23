@@ -21,7 +21,7 @@
 namespace PhysBAM{
 
 template<class TV,int d>
-class FRACTURE_OBJECT:public NONCOPYABLE
+class FRACTURE_OBJECT
 {
     typedef typename TV::SCALAR T;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,d>::OBJECT T_SIMPLICIAL_OBJECT;
@@ -66,6 +66,8 @@ public:
     ARRAY<T>* initiation_point_radii; // radii of initiation points.
 
     FRACTURE_OBJECT(T_EMBEDDED_OBJECT& embedded_object_input);
+    FRACTURE_OBJECT(const FRACTURE_OBJECT&) = delete;
+    void operator=(const FRACTURE_OBJECT&) = delete;
     virtual ~FRACTURE_OBJECT();
 
     void Set_Fracture_Bias_Magnitude(const T fracture_bias_magnitude_input=0)

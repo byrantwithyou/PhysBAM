@@ -13,7 +13,7 @@
 namespace PhysBAM{
 
 template<class T>
-class STRAIN_MEASURE_HEXAHEDRONS:public NONCOPYABLE
+class STRAIN_MEASURE_HEXAHEDRONS
 {
     typedef VECTOR<T,3> TV;
 public:
@@ -36,6 +36,9 @@ public:
         Initialize_H_DmH_Inverse_From_Current_Positions();
     }
 
+    STRAIN_MEASURE_HEXAHEDRONS(const STRAIN_MEASURE_HEXAHEDRONS&) = delete;
+    void operator=(const STRAIN_MEASURE_HEXAHEDRONS&) = delete;
+    
     ~STRAIN_MEASURE_HEXAHEDRONS()
     {delete H_DmH_inverse_save;}
 

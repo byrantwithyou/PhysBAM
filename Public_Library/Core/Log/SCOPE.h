@@ -8,13 +8,12 @@
 #define __SCOPE__
 
 #include <Core/Log/LOG_PRINTF.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <cassert>
 #include <ostream>
 #include <sstream>
 namespace PhysBAM{
 namespace LOG{
-class SCOPE:private NONCOPYABLE
+class SCOPE
 {
     bool active;
 public:
@@ -28,6 +27,8 @@ public:
     {
         LOG_CLASS::Push_Scope(scope_identifier,LOG::sprintf(format.c_str(),d1,args...));
     }
+    SCOPE(const SCOPE&) = delete;
+    void operator=(const SCOPE&) = delete;
 
     ~SCOPE();
     

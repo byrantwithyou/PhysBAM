@@ -4,7 +4,6 @@
 //#####################################################################
 #include <Core/Log/LOG_PRINTF.h>
 #include <Core/Log/SCOPE.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <cassert>
 #include <ostream>
 #include <sstream>

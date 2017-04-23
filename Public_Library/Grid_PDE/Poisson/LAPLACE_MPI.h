@@ -23,7 +23,7 @@ class SPARSE_MATRIX_PARTITION;
 template<class TV> class LAPLACE_UNIFORM;
 
 template<class TV>
-class LAPLACE_MPI:public NONCOPYABLE
+class LAPLACE_MPI
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -46,6 +46,8 @@ public:
     ARRAY<MPI::Intracomm>* communicators;
 
     LAPLACE_MPI(LAPLACE_UNIFORM<TV>& laplace);
+    LAPLACE_MPI(const LAPLACE_MPI&) = delete;
+    void operator=(const LAPLACE_MPI&) = delete;
     virtual ~LAPLACE_MPI();
 
 

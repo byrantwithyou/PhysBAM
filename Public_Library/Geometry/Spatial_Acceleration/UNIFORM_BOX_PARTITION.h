@@ -9,14 +9,13 @@
 
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Data_Structures/PAIR.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Intersections/RAY_BOX_INTERSECTION.h>
 namespace PhysBAM{
 
 template<class T,class DATA_T>
-class UNIFORM_BOX_PARTITION:public NONCOPYABLE
+class UNIFORM_BOX_PARTITION
 {
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
@@ -28,6 +27,8 @@ public:
     UNIFORM_BOX_PARTITION()
         :initialized(false)
     {}
+    UNIFORM_BOX_PARTITION(const UNIFORM_BOX_PARTITION&) = delete;
+    void operator=(const UNIFORM_BOX_PARTITION&) = delete;
 
     ~UNIFORM_BOX_PARTITION()
     {for(int i=0;i<cells.array.m;i++) delete cells.array(i);}

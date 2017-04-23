@@ -8,11 +8,10 @@
 #define __POINTER_POOL__
 
 #include <Core/Arrays/ARRAY.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 template<class T,int block_size=4096>
-class POINTER_POOL:public NONCOPYABLE
+class POINTER_POOL
 {
 private:
     ARRAY<T*> pools;
@@ -23,6 +22,9 @@ public:
         :current(0)
     {pools.Append(new T[block_size]);}
     
+    POINTER_POOL(const POINTER_POOL&) = delete;
+    void operator=(const POINTER_POOL&) = delete;
+
     ~POINTER_POOL()
     {Delete_All();}
 

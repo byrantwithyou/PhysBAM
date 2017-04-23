@@ -8,7 +8,6 @@
 #define __MPM_VISCOSITY__
 
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Hybrid_Methods/Forces/OLDROYD_CONSTITUTIVE_MODEL.h>
 #include <Hybrid_Methods/Forces/PARTICLE_GRID_FORCES.h>
 namespace PhysBAM{

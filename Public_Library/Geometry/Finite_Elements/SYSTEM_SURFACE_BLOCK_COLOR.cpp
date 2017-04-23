@@ -3,7 +3,6 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Geometry/Finite_Elements/BASIS_STENCIL_UNIFORM.h>
 #include <Geometry/Finite_Elements/SYSTEM_SURFACE_BLOCK_COLOR.h>
 #include <Geometry/Finite_Elements/SYSTEM_SURFACE_BLOCK_HELPER_COLOR.h>

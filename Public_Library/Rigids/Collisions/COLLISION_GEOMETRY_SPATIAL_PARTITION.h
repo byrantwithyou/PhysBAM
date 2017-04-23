@@ -20,7 +20,7 @@
 namespace PhysBAM{
 
 template<class TV,class T_ARRAY,class ID>
-class COLLISION_GEOMETRY_SPATIAL_PARTITION:public NONCOPYABLE
+class COLLISION_GEOMETRY_SPATIAL_PARTITION
 {
 private:
     typedef typename TV::SCALAR T;
@@ -37,6 +37,8 @@ public:
     mutable OPERATION_HASH<COLLISION_GEOMETRY_ID> already_added;
 
     COLLISION_GEOMETRY_SPATIAL_PARTITION(T_ARRAY& collision_bodies_input,T collision_body_thickness_input=0);
+    COLLISION_GEOMETRY_SPATIAL_PARTITION(const COLLISION_GEOMETRY_SPATIAL_PARTITION&) = delete;
+    void operator=(const COLLISION_GEOMETRY_SPATIAL_PARTITION&) = delete;
     ~COLLISION_GEOMETRY_SPATIAL_PARTITION();
 
     void Get_Potential_Collisions(const ID index,ARRAY<ID>& object_indices,bool only_higher_index=false) const

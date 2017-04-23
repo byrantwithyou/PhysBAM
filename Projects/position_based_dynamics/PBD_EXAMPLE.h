@@ -4,7 +4,6 @@
 //#####################################################################
 #ifndef __PBD_EXAMPLE__
 #define __PBD_EXAMPLE__
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 namespace PhysBAM{
@@ -13,7 +12,7 @@ template<class TV> class DEBUG_PARTICLES;
 template<class TV> class PBD_CONSTRAINTS_BASE;
 
 template<class TV>
-class PBD_EXAMPLE:public NONCOPYABLE
+class PBD_EXAMPLE
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -42,7 +41,9 @@ public:
     int threads;
 
     PBD_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
+    PBD_EXAMPLE(const PBD_EXAMPLE&) = delete;
     virtual ~PBD_EXAMPLE();
+    void operator=(const PBD_EXAMPLE&) = delete;
     
     virtual void Write_Output_Files(const int frame);
     virtual void Read_Output_Files(const int frame);

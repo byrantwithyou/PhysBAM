@@ -11,14 +11,13 @@
 #include <Core/Data_Structures/DATA_STRUCTURES_FORWARD.h>
 #include <Core/Data_Structures/ELEMENT_ID.h>
 #include <Core/Log/DEBUG_UTILITIES.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 template<class TV> class RIGID_BODY_COLLECTION;
 class SEGMENT_MESH;
 
 template<class TV>
-class RIGIDS_FORCES:public NONCOPYABLE
+class RIGIDS_FORCES
 {
     typedef typename TV::SCALAR T;
 public:
@@ -44,6 +43,8 @@ public:
     bool compute_half_forces;
 
     RIGIDS_FORCES(RIGID_BODY_COLLECTION<TV>& rigid_body_collection);
+    RIGIDS_FORCES(const RIGIDS_FORCES&) = delete;
+    void operator=(const RIGIDS_FORCES&) = delete;
     virtual ~RIGIDS_FORCES();
 
     static int Get_Unique_Id()

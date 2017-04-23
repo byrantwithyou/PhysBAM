@@ -7,7 +7,6 @@
 #ifndef __RUNGEKUTTA__
 #define __RUNGEKUTTA__
 
-#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 static const double rk_table[4][3][2]=
@@ -19,7 +18,7 @@ static const double rk_table[4][3][2]=
 };
 
 template<class TV>
-class RUNGEKUTTA:public NONCOPYABLE
+class RUNGEKUTTA
 {
     typedef typename TV::SCALAR T;
 public:
@@ -33,6 +32,9 @@ public:
     RUNGEKUTTA(TV& u,const int order,const T dt,const T time)
         :order(order),dt(dt),time(time),substep(0),u(u),u_copy(u)
     {}
+
+    RUNGEKUTTA(const RUNGEKUTTA&) = delete;
+    void operator=(const RUNGEKUTTA&) = delete;
 
     ~RUNGEKUTTA() {}
 

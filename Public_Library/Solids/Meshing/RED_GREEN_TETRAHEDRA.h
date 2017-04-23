@@ -15,7 +15,7 @@
 namespace PhysBAM{
 
 template<class T>
-class RED_GREEN_TETRAHEDRA:public NONCOPYABLE
+class RED_GREEN_TETRAHEDRA
 {
 public:
     static const int number_of_red_children=8;
@@ -37,8 +37,9 @@ private:
 public:
     RED_GREEN_TETRAHEDRA(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume_input);
     RED_GREEN_TETRAHEDRA(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume_input,ARRAY<VECTOR<T,3> >& rest_position_input);
+    RED_GREEN_TETRAHEDRA(const RED_GREEN_TETRAHEDRA&) = delete;
+    void operator=(const RED_GREEN_TETRAHEDRA&) = delete;
     ~RED_GREEN_TETRAHEDRA();
-
 
     bool Leaf(const int level,const int tet) const
     {return !(*children(level))(tet)(0);}

@@ -9,7 +9,6 @@
 #include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Data_Structures/TRIPLE.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Grid_Tools/Grids/SIDED_FACE_INDEX.h>
 #include <Dynamics/Coupled_Evolution/UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO.h>
@@ -22,7 +21,7 @@ template<class TV> class IMPLICIT_BOUNDARY_CONDITION_COLLECTION;
 template<class TV> class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO;
 
 template<class TV>
-class COLLISION_AWARE_INDEX_MAP:public NONCOPYABLE
+class COLLISION_AWARE_INDEX_MAP
 {
     enum WORKAROUND {d=TV::m};
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
@@ -46,6 +45,8 @@ public:
     IMPLICIT_BOUNDARY_CONDITION_COLLECTION<TV>& boundary_condition_collection;
 
     COLLISION_AWARE_INDEX_MAP(UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<TV>& info,IMPLICIT_BOUNDARY_CONDITION_COLLECTION<TV>& boundary_condition_collection_input);
+    COLLISION_AWARE_INDEX_MAP(const COLLISION_AWARE_INDEX_MAP&) = delete;
+    void operator=(const COLLISION_AWARE_INDEX_MAP&) = delete;
 
     int Number_Faces() const
     {return indexed_faces.m+indexed_constraints.m+number_extra_cells;}

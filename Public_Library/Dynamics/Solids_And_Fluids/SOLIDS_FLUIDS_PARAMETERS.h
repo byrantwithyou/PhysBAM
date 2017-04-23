@@ -7,8 +7,6 @@
 #ifndef __SOLIDS_FLUIDS_PARAMETERS__
 #define __SOLIDS_FLUIDS_PARAMETERS__
 
-#include <Core/Utilities/NONCOPYABLE.h>
-
 namespace PhysBAM{
 
 template<class TV> class MPI_SOLID_FLUID;
@@ -16,7 +14,7 @@ template<class TV> class MPI_SOLID_FLUID_SLIP;
 template<class TV> class SOLIDS_FLUIDS_CALLBACKS;
 
 template <class TV>
-class SOLIDS_FLUIDS_PARAMETERS:public NONCOPYABLE
+class SOLIDS_FLUIDS_PARAMETERS
 {
 public:
     SOLIDS_FLUIDS_CALLBACKS<TV>* callbacks;
@@ -25,6 +23,8 @@ public:
     bool use_leakproof_solve,use_fluid_rigid_fracture;
 
     SOLIDS_FLUIDS_PARAMETERS(SOLIDS_FLUIDS_CALLBACKS<TV>* callbacks);
+    SOLIDS_FLUIDS_PARAMETERS(const SOLIDS_FLUIDS_PARAMETERS&) = delete;
+    void operator=(const SOLIDS_FLUIDS_PARAMETERS&) = delete;
     virtual ~SOLIDS_FLUIDS_PARAMETERS();
 
 //#####################################################################

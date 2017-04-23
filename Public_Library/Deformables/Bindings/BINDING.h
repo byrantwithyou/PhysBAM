@@ -9,7 +9,6 @@
 
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Matrices/MATRIX_POLICY.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Geometry/Registry/REGISTRY.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 namespace PhysBAM{
@@ -19,7 +18,7 @@ class SEGMENT_MESH;
 template<class ID> class SPARSE_UNION_FIND;
 
 template<class TV>
-class BINDING:public NONCOPYABLE
+class BINDING
 {
     typedef typename TV::SCALAR T;
 public:
@@ -31,6 +30,9 @@ public:
     BINDING(DEFORMABLE_PARTICLES<TV>& particles_input,const int particle_index_input=-1)
         :particles(particles_input),particle_index(particle_index_input)
     {}
+
+    BINDING(const BINDING&) = delete;
+    void operator=(const BINDING&) = delete;
 
     virtual ~BINDING();
 

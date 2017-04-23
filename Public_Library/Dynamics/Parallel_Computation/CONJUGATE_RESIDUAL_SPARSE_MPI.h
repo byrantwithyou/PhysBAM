@@ -20,7 +20,7 @@ template<class TV> class FLUID_SYSTEM_MPI;
 template<class TV> class SOLID_SYSTEM_MPI;
 
 template<class TV>
-class CONJUGATE_RESIDUAL_SPARSE_MPI:public NONCOPYABLE
+class CONJUGATE_RESIDUAL_SPARSE_MPI
 {
     typedef typename TV::SCALAR T;
 public:
@@ -48,6 +48,8 @@ public:
     {
         Use_Modified_Incomplete_Cholesky();
     }
+    CONJUGATE_RESIDUAL_SPARSE_MPI(const CONJUGATE_RESIDUAL_SPARSE_MPI&) = delete;
+    void operator=(const CONJUGATE_RESIDUAL_SPARSE_MPI&) = delete;
 
     ~CONJUGATE_RESIDUAL_SPARSE_MPI()
     {for(int i=0;i<boundary_datatypes_array.m;i++) MPI_UTILITIES::Free_Elements_And_Clean_Memory(boundary_datatypes_array(i));

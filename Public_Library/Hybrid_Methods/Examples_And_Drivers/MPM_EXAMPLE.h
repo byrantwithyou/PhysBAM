@@ -6,7 +6,6 @@
 #define __MPM_EXAMPLE__
 #include <Core/Matrices/MATRIX.h>
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
@@ -27,7 +26,7 @@ template<class TV> class PARTICLE_GRID_WEIGHTS;
 template<class TV> class MPM_PLASTICITY_MODEL;
 
 template<class TV>
-class MPM_EXAMPLE:public NONCOPYABLE
+class MPM_EXAMPLE
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -95,6 +94,8 @@ public:
     bool asymmetric_system;
 
     MPM_EXAMPLE(const STREAM_TYPE stream_type_input);
+    MPM_EXAMPLE(const MPM_EXAMPLE&) = delete;
+    void operator=(const MPM_EXAMPLE&) = delete;
     virtual ~MPM_EXAMPLE();
     
     virtual void Write_Output_Files(const int frame);

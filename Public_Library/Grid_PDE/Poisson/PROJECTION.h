@@ -10,11 +10,10 @@
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Data_Structures/TRIPLE.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 template<class T>
-class PROJECTION:public NONCOPYABLE
+class PROJECTION
 {
 public:
     T density;
@@ -29,6 +28,9 @@ public:
         Set_Density(1000);
     }
 
+    PROJECTION(const PROJECTION&) = delete;
+    void operator=(const PROJECTION&) = delete;
+    
     virtual ~PROJECTION()
     {}
 

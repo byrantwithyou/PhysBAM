@@ -14,7 +14,7 @@ template<class T> class RENDER_WORLD;
 template<class T> class RENDERING_LIGHT;
 
 template<class T>
-class VOLUMETRIC_SHADER:public NONCOPYABLE
+class VOLUMETRIC_SHADER
 {
 public:
     bool supports_photon_mapping;
@@ -23,6 +23,9 @@ public:
     VOLUMETRIC_SHADER(RENDER_WORLD<T>& world_input)
         :supports_photon_mapping(false),world(world_input)
     {}
+
+    VOLUMETRIC_SHADER(const VOLUMETRIC_SHADER&) = delete;
+    void operator=(const VOLUMETRIC_SHADER&) = delete;
 
     virtual ~VOLUMETRIC_SHADER()
     {}

@@ -9,7 +9,6 @@
 #include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Core/Data_Structures/TRIPLE.h>
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Dynamics/Coupled_Evolution/MATRIX_FLUID_GRADIENT_BASE.h>
 
 namespace PhysBAM{

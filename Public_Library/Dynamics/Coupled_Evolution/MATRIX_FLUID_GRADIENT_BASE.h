@@ -10,7 +10,6 @@
 #include <Core/Data_Structures/TRIPLE.h>
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Core/Matrices/SYSTEM_MATRIX_HELPER.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Grid_Tools/Grids/FACE_INDEX.h>
 
@@ -20,7 +19,7 @@ template<class TV> class COLLISION_AWARE_INDEX_MAP;
 template<class TV> class GRID;
 
 template<class TV>
-class MATRIX_FLUID_GRADIENT_BASE:public NONCOPYABLE,public SYSTEM_MATRIX_BASE<typename TV::SCALAR>
+class MATRIX_FLUID_GRADIENT_BASE:public SYSTEM_MATRIX_BASE<typename TV::SCALAR>
 {
     enum WORKAROUND {d=TV::m};
     typedef typename TV::SCALAR T;
@@ -46,6 +45,8 @@ public:
 
     // TODO: the only reason index_map isn't const is because Array_View doesn't work for const quite yet
     MATRIX_FLUID_GRADIENT_BASE(COLLISION_AWARE_INDEX_MAP<TV>& index_map_input);
+    MATRIX_FLUID_GRADIENT_BASE(const MATRIX_FLUID_GRADIENT_BASE&) = delete;
+    void operator=(const MATRIX_FLUID_GRADIENT_BASE&) = delete;
     virtual ~MATRIX_FLUID_GRADIENT_BASE();
 
 //#####################################################################

@@ -7,7 +7,6 @@
 #ifndef __IMPLICIT_VISCOSITY_UNIFORM__
 #define __IMPLICIT_VISCOSITY_UNIFORM__
 
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Grid_PDE/Interpolation/AVERAGING_UNIFORM.h>
 namespace PhysBAM{
 
@@ -15,7 +14,7 @@ template<class TV> class LAPLACE_UNIFORM;
 template<class T> class MPI_UNIFORM_GRID;
 
 template<class TV>
-class IMPLICIT_VISCOSITY_UNIFORM:public NONCOPYABLE
+class IMPLICIT_VISCOSITY_UNIFORM
 {
     typedef VECTOR<int,TV::m> TV_INT;typedef typename TV::SCALAR T;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
@@ -39,6 +38,8 @@ public:
 
     IMPLICIT_VISCOSITY_UNIFORM(LAPLACE_UNIFORM<TV>& elliptic_solver_input,const ARRAY<T,TV_INT>& variable_viscosity_input,const T density_input,const T viscosity_input,T_MPI_GRID* mpi_grid_input,
         const int axis_input,bool use_variable_viscosity_input,bool use_psi_R_input);
+    IMPLICIT_VISCOSITY_UNIFORM(const IMPLICIT_VISCOSITY_UNIFORM&) = delete;
+    void operator=(const IMPLICIT_VISCOSITY_UNIFORM&) = delete;
     virtual ~IMPLICIT_VISCOSITY_UNIFORM();
 
 //#####################################################################

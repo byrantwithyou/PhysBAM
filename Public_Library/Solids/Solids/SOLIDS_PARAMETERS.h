@@ -7,7 +7,6 @@
 #ifndef __SOLIDS_PARAMETERS__
 #define __SOLIDS_PARAMETERS__
 
-#include <Core/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 template<class TV> class TRIANGLE_COLLISION_PARAMETERS;
@@ -17,7 +16,7 @@ template<class TV> class RIGID_BODY_EVOLUTION_PARAMETERS;
 template<class TV> class DEFORMABLE_OBJECT_COLLISION_PARAMETERS;
 
 template<class TV>
-class SOLIDS_PARAMETERS:public NONCOPYABLE
+class SOLIDS_PARAMETERS
 {
     typedef typename TV::SCALAR T;
 public:
@@ -53,6 +52,8 @@ public:
     bool allow_altitude_spring_change_between_updates;
 
     SOLIDS_PARAMETERS();
+    SOLIDS_PARAMETERS(const SOLIDS_PARAMETERS&) = delete;
+    void operator=(const SOLIDS_PARAMETERS&) = delete;
     virtual ~SOLIDS_PARAMETERS();
 //#####################################################################
 };

@@ -7,7 +7,6 @@
 #ifndef __LOG__
 #define __LOG__
 
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <cassert>
 #include <ostream>
 #include <sstream>

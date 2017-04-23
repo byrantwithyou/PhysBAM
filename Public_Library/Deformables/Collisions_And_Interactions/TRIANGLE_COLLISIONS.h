@@ -15,7 +15,7 @@ template<class TV> class MPI_SOLIDS;
 template<class TV> class TRIANGLE_COLLISION_PARAMETERS;
 
 template<class TV>
-class TRIANGLE_COLLISIONS:public NONCOPYABLE
+class TRIANGLE_COLLISIONS
 {
     typedef typename TV::SCALAR T;
     enum WORKAROUND {d=TV::m};
@@ -64,6 +64,8 @@ private:
 public:
 
     TRIANGLE_COLLISIONS(TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<TV>& geometry,const ARRAY<T>& repulsion_thickness);
+    TRIANGLE_COLLISIONS(const TRIANGLE_COLLISIONS&) = delete;
+    void operator=(const TRIANGLE_COLLISIONS&) = delete;
     ~TRIANGLE_COLLISIONS();
 
     void Set_Collision_Thickness(const T thickness=1e-6)

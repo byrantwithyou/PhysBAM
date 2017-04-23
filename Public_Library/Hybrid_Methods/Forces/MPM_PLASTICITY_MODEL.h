@@ -8,7 +8,6 @@
 #include <Core/Arrays/ATTRIBUTE_ID.h>
 #include <Core/Log/DEBUG_UTILITIES.h>
 #include <Core/Matrices/MATRIX_FORWARD.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/VECTOR_FORWARD.h>
 #include <Tools/Tensors/SYMMETRIC_TENSOR.h>
 namespace PhysBAM{
@@ -18,7 +17,7 @@ template<class TV> class GATHER_SCATTER;
 const ATTRIBUTE_ID ATTRIBUTE_ID_PLASTIC_DEFORMATION(54);
 
 template<class TV>
-class MPM_PLASTICITY_MODEL:public NONCOPYABLE
+class MPM_PLASTICITY_MODEL
 {
 public:
     typedef typename TV::SCALAR T;
@@ -27,6 +26,8 @@ public:
     bool use_implicit;
 
     MPM_PLASTICITY_MODEL(MPM_PARTICLES<TV>& particles,GATHER_SCATTER<TV>* gather_scatter=0);
+    MPM_PLASTICITY_MODEL(const MPM_PLASTICITY_MODEL&) = delete;
+    void operator=(const MPM_PLASTICITY_MODEL&) = delete;
     virtual ~MPM_PLASTICITY_MODEL();
 
     virtual void Initialize_Particles(ARRAY<int>* affected_particles) const;

@@ -15,7 +15,7 @@ template<class T> class SEGMENTED_CURVE_2D;
 template<class T> class TRIANGULATED_AREA;
 
 template<class T>
-class DUALCONTOUR_2D:public NONCOPYABLE
+class DUALCONTOUR_2D
 {
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 private:
@@ -32,6 +32,9 @@ public:
     DUALCONTOUR_2D(LEVELSET<TV>& levelset_input,const T contour_value_input=0,const bool is_distance_field_input=true)
         :levelset(levelset_input),contour_value(contour_value_input),is_distance_field(is_distance_field_input)
     {if(levelset_input.grid.Is_MAC_Grid()) grid=levelset_input.grid.Get_Regular_Grid_At_MAC_Positions();else grid=levelset_input.grid;}
+
+    DUALCONTOUR_2D(const DUALCONTOUR_2D&) = delete;
+    void operator=(const DUALCONTOUR_2D&) = delete;
 
     void Dualcontour()
     {Generate_Topology();Generate_Vertices();Ensure_Vertices_In_Correct_Cells();}

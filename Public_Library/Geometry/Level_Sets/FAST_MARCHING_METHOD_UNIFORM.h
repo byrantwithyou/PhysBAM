@@ -13,7 +13,7 @@
 namespace PhysBAM{
 
 template<class TV>
-class FAST_MARCHING_METHOD_UNIFORM:public NONCOPYABLE
+class FAST_MARCHING_METHOD_UNIFORM
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
 public:
@@ -26,6 +26,8 @@ public:
     std::function<bool(const int axis,const TV_INT& current_index)> Neighbor_Visible;
 
     FAST_MARCHING_METHOD_UNIFORM(const LEVELSET<TV>& levelset,const int ghost_cells);
+    FAST_MARCHING_METHOD_UNIFORM(const FAST_MARCHING_METHOD_UNIFORM&) = delete;
+    void operator=(const FAST_MARCHING_METHOD_UNIFORM&) = delete;
     ~FAST_MARCHING_METHOD_UNIFORM();
 
 //#####################################################################

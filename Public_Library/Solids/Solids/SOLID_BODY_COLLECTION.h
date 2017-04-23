@@ -21,7 +21,7 @@ template<class TV> class DEFORMABLES_FORCES;
 template<class TV> class RIGIDS_FORCES;
 
 template<class TV>
-class SOLID_BODY_COLLECTION:public NONCOPYABLE
+class SOLID_BODY_COLLECTION
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::SPIN T_SPIN;
@@ -46,6 +46,8 @@ public:
     int iterations_used_diagnostic;
 
     SOLID_BODY_COLLECTION();
+    SOLID_BODY_COLLECTION(const SOLID_BODY_COLLECTION&) = delete;
+    void operator=(const SOLID_BODY_COLLECTION&) = delete;
     virtual ~SOLID_BODY_COLLECTION();
 
     void Print_Diagnostics(const bool print_diagnostics_input=true)

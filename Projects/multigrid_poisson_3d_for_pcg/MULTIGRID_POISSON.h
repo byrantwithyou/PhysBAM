@@ -9,7 +9,6 @@
 
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Log/LOG.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/VECTOR_2D.h>
 #include <Core/Vectors/VECTOR_3D.h>
 #include <Grid_Tools/Grids/GRID.h>
@@ -17,7 +16,7 @@
 namespace PhysBAM{
 
 template<class T,int d>
-class MULTIGRID_POISSON:public NONCOPYABLE
+class MULTIGRID_POISSON
 {
     typedef VECTOR<T,d> TV;
     typedef VECTOR<int,d> T_INDEX;
@@ -81,6 +80,8 @@ public:
 //#####################################################################
 public:
     MULTIGRID_POISSON(const T_INDEX& n,const T h,const int& number_of_threads_input);
+    MULTIGRID_POISSON(const MULTIGRID_POISSON&) = delete;
+    void operator=(const MULTIGRID_POISSON&) = delete;
     void Initialize();
     void Reinitialize();
     T Apply_System_Matrix(const T_INDEX& index);

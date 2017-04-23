@@ -12,7 +12,7 @@
 namespace PhysBAM{
 
 template<class TV>
-class FLUID_COLLECTION:public NONCOPYABLE
+class FLUID_COLLECTION
 {
     typedef typename TV::SCALAR T;
 public:
@@ -21,6 +21,8 @@ public:
     INCOMPRESSIBLE_FLUID_COLLECTION<TV> incompressible_fluid_collection;
     
     FLUID_COLLECTION(const GRID<TV>& grid_input);
+    FLUID_COLLECTION(const FLUID_COLLECTION&) = delete;
+    void operator=(const FLUID_COLLECTION&) = delete;
     virtual ~FLUID_COLLECTION();
 
 //#####################################################################

@@ -17,7 +17,7 @@
 namespace PhysBAM{
 
 template<class T>
-class MUSCLE_FORCE_CURVE:public NONCOPYABLE
+class MUSCLE_FORCE_CURVE
 {
 public:
     GRID<VECTOR<T,1> > passive_force_grid,passive_force_slope_grid;
@@ -37,6 +37,8 @@ private:
 
 public:
     MUSCLE_FORCE_CURVE();
+    MUSCLE_FORCE_CURVE(const MUSCLE_FORCE_CURVE&) = delete;
+    void operator=(const MUSCLE_FORCE_CURVE&) = delete;
     virtual ~MUSCLE_FORCE_CURVE();
 
     void Set_Custom_Passive_Interpolation(INTERPOLATION_UNIFORM<VECTOR<T,1>,T>* passive_interpolation_input)

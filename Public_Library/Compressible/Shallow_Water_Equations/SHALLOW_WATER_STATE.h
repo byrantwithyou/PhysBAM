@@ -4,7 +4,6 @@
 //#####################################################################
 #ifndef __SHALLOW_WATER_STATE__
 #define __SHALLOW_WATER_STATE__
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <functional>
 namespace PhysBAM{
@@ -13,7 +12,7 @@ template<class T> class SHALLOW_WATER;
 template<class TV> class DEBUG_PARTICLES;
 
 template<class TV>
-class SHALLOW_WATER_STATE:public NONCOPYABLE
+class SHALLOW_WATER_STATE
 {
     STATIC_ASSERT(TV::m<3);
     typedef typename TV::SCALAR T;
@@ -51,6 +50,8 @@ public:
     std::function<void(int frame)> read_output_files;
 
     SHALLOW_WATER_STATE(const STREAM_TYPE stream_type);
+    SHALLOW_WATER_STATE(const SHALLOW_WATER_STATE&) = delete;
+    void operator=(const SHALLOW_WATER_STATE&) = delete;
     ~SHALLOW_WATER_STATE();
 
     void Write_Output_Files(const int frame);

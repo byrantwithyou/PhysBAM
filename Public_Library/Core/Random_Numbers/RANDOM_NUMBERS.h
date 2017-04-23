@@ -9,7 +9,6 @@
 
 #include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Core/Read_Write/READ_WRITE_FUNCTIONS.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <ctime>
 #include <random>
 namespace PhysBAM{
@@ -27,7 +26,7 @@ class TYPED_ISTREAM;
 class TYPED_OSTREAM;
 
 template<class T>
-class RANDOM_NUMBERS:public NONCOPYABLE
+class RANDOM_NUMBERS
 {
 public:
     typedef int HAS_UNTYPED_READ_WRITE;
@@ -45,6 +44,8 @@ public:
     {return a+(b-a)*Get_Number();} // in [a,b)
 
     explicit RANDOM_NUMBERS(const unsigned int seed=time(0));
+    RANDOM_NUMBERS(const RANDOM_NUMBERS&) = delete;
+    void operator=(const RANDOM_NUMBERS&) = delete;
     virtual ~RANDOM_NUMBERS();
 
     template<class T2,class T_ARRAY,class ID> void Fill_Uniform(ARRAY_BASE<T2,T_ARRAY,ID>& array,const T a,const T b)

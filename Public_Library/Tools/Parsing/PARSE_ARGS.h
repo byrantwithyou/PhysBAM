@@ -10,11 +10,10 @@
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Log/LOG.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/VECTOR.h>
 namespace PhysBAM{
 
-class PARSE_ARGS:public NONCOPYABLE
+class PARSE_ARGS
 {
 public:
     struct OPTION
@@ -51,6 +50,8 @@ public:
     bool unclaimed_arguments;
 
     PARSE_ARGS(int argc_input,char** argv_input);
+    PARSE_ARGS(const PARSE_ARGS&) = delete;
+    void operator=(const PARSE_ARGS&) = delete;
     ~PARSE_ARGS();
 
     template<class T> static bool store_impl(void* store,const std::string& s)

@@ -25,7 +25,7 @@ template<class T> class VOLUMETRIC_SHADER;
 template<class T> class MATERIAL_SHADER;
 
 template<class T>
-class RENDER_WORLD:public NONCOPYABLE
+class RENDER_WORLD
 {
     typedef VECTOR<T,3> TV;
 public:
@@ -53,6 +53,8 @@ public:
     int threads;
 
     RENDER_WORLD();
+    RENDER_WORLD(const RENDER_WORLD&) = delete;
+    void operator=(const RENDER_WORLD&) = delete;
 
     void Clean_Scene()
     {lights.Clean_Memory();standard_objects.Clean_Memory();volumetric_objects.Clean_Memory();standard_objects.Append(ether);}

@@ -6,7 +6,6 @@
 #define __MPM_KKT_EXAMPLE__
 #include <Core/Matrices/MATRIX.h>
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
@@ -29,7 +28,7 @@ template<class TV> class MPM_COLLISION_OBJECT;
 template<class TV> class MPM_FORCE_HELPER;
 
 template<class TV>
-class MPM_KKT_EXAMPLE:public NONCOPYABLE
+class MPM_KKT_EXAMPLE
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -108,6 +107,8 @@ public:
     bool use_FEM_mass;
 
     MPM_KKT_EXAMPLE(const STREAM_TYPE stream_type_input);
+    MPM_KKT_EXAMPLE(const MPM_KKT_EXAMPLE&) = delete;
+    void operator=(const MPM_KKT_EXAMPLE&) = delete;
     virtual ~MPM_KKT_EXAMPLE();
     
     virtual void Write_Output_Files(const int frame);

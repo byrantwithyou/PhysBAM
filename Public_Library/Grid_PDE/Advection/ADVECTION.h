@@ -14,7 +14,6 @@
 #define __ADVECTION__
 
 #include <Core/Log/DEBUG_UTILITIES.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Grid_Tools/Grids/FACE_INDEX.h>
 #include <Grid_PDE/Advection/ADVECTION_FORWARD.h>
 namespace PhysBAM{
@@ -26,13 +25,16 @@ template<class T,class ID> class ARRAY;
 template<class TV> class GRID;
 
 template<class TV,class T2,class T_FACE_LOOKUP> // T_FACE_LOOKUP=typename GRID<TV>::FACE_LOOKUP
-class ADVECTION:public NONCOPYABLE
+class ADVECTION
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
 public:
 
     ADVECTION()
     {}
+
+    ADVECTION(const ADVECTION&) = delete;
+    void operator=(const ADVECTION&) = delete;
 
     virtual ~ADVECTION()
     {}

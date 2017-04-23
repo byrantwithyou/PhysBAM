@@ -9,7 +9,6 @@
 
 #include <Core/Matrices/FRAME.h>
 #include <Core/Matrices/MATRIX_FORWARD.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/TWIST.h>
 #include <Rigids/Joints/JOINT_ID.h>
 namespace PhysBAM{
@@ -17,7 +16,7 @@ namespace PhysBAM{
 template<class TV> class JOINT_FUNCTION;
 template<class TV> class RIGID_BODY;
 template<class TV>
-class JOINT:public NONCOPYABLE
+class JOINT
 {
     typedef typename TV::SCALAR T;
 public:
@@ -39,6 +38,8 @@ public:
     VECTOR<bool,dof> control_dof;
 
     JOINT();
+    JOINT(const JOINT&) = delete;
+    void operator=(const JOINT&) = delete;
 
     virtual ~JOINT();
 

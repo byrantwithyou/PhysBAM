@@ -9,7 +9,6 @@
 
 #include <Core/Data_Structures/DATA_STRUCTURES_FORWARD.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_FORWARD.h>
 #include <Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 #include <Dynamics/Particles/SPH_PARTICLES.h>
@@ -19,7 +18,7 @@ namespace PhysBAM{
 template<class TV> class PARTICLE_LEVELSET_EVOLUTION_UNIFORM;
 
 template<class TV>
-class SPH_EVOLUTION_UNIFORM:public NONCOPYABLE
+class SPH_EVOLUTION_UNIFORM
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<ARRAY<int>,TV_INT> T_ARRAYS_ARRAY_INT;
@@ -68,6 +67,8 @@ public:
 
     SPH_EVOLUTION_UNIFORM(GRID<TV>& grid_input,INCOMPRESSIBLE_UNIFORM<TV>& incompressible_input,FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters_input,
         PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>* particle_levelset_evolution=0);
+    SPH_EVOLUTION_UNIFORM(const SPH_EVOLUTION_UNIFORM&) = delete;
+    void operator=(const SPH_EVOLUTION_UNIFORM&) = delete;
     ~SPH_EVOLUTION_UNIFORM();
 
     void Initialize_Grids(const GRID<TV>& grid_input)

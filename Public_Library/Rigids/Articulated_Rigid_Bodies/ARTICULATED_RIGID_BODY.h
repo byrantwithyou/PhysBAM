@@ -16,7 +16,7 @@ template<class TV> class JOINT_MESH;
 template<class TV> class RIGID_BODY_COLLECTION;
 template<class TV> class ARTICULATED_VECTOR;
 template<class TV>
-class ARTICULATED_RIGID_BODY_BASE:public NONCOPYABLE
+class ARTICULATED_RIGID_BODY_BASE
 {
     typedef typename TV::SCALAR T;typedef typename TV::SPIN T_SPIN;
 public:
@@ -58,6 +58,8 @@ public:
     ARRAY<int>* frame_list;
 
     ARTICULATED_RIGID_BODY_BASE(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input);
+    ARTICULATED_RIGID_BODY_BASE(const ARTICULATED_RIGID_BODY_BASE&) = delete;
+    void operator=(const ARTICULATED_RIGID_BODY_BASE&) = delete;
     virtual ~ARTICULATED_RIGID_BODY_BASE();
 
     void Set_Iterative_Tolerance(const T iterative_tolerance_input)

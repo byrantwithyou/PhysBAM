@@ -12,7 +12,6 @@
 #include <Core/Log/LOG.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Core/Read_Write/TYPED_STREAM.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/VECTOR_FORWARD.h>
 #include <string>
 #include <typeinfo>
@@ -22,7 +21,7 @@ template<class TV> class GEOMETRY_PARTICLES;
 
 
 template<class TV>
-class STRUCTURE:public NONCOPYABLE
+class STRUCTURE
 {
     typedef typename TV::SCALAR T;
 public:
@@ -35,6 +34,8 @@ public:
 protected:
     STRUCTURE();
 public:
+    STRUCTURE(const STRUCTURE&) = delete;
+    void operator=(const STRUCTURE&) = delete;
     virtual ~STRUCTURE();
 
     virtual void Read(TYPED_ISTREAM& input)=0;

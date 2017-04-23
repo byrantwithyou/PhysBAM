@@ -18,7 +18,7 @@ namespace PhysBAM{
 class SPARSE_MATRIX_PARTITION;
 
 template<class TV>
-class PCG_SPARSE_MPI:public NONCOPYABLE
+class PCG_SPARSE_MPI
 {
     typedef typename TV::SCALAR T;
 public:
@@ -33,6 +33,8 @@ public:
         :pcg(pcg_input),comm(comm_input),partition(partition_input)
     {}
 
+    PCG_SPARSE_MPI(const PCG_SPARSE_MPI&) = delete;
+    void operator=(const PCG_SPARSE_MPI&) = delete;
     ~PCG_SPARSE_MPI()
     {MPI_UTILITIES::Free_Elements_And_Clean_Memory(boundary_datatypes);MPI_UTILITIES::Free_Elements_And_Clean_Memory(ghost_datatypes);}
 

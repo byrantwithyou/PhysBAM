@@ -9,7 +9,6 @@
 #include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Core/Data_Structures/TRIPLE.h>
 #include <Core/Matrices/SYSTEM_MATRIX_HELPER.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 
 namespace PhysBAM{
 
@@ -19,7 +18,7 @@ template<class TV> class GRID;
 template<class TV> class COLLISION_AWARE_INDEX_MAP;
 
 template<class TV>
-class FLUID_TO_SOLID_INTERPOLATION_BASE:public NONCOPYABLE,public SYSTEM_MATRIX_BASE<typename TV::SCALAR>
+class FLUID_TO_SOLID_INTERPOLATION_BASE:public SYSTEM_MATRIX_BASE<typename TV::SCALAR>
 {
     typedef typename TV::SCALAR T;
 protected:
@@ -27,6 +26,8 @@ protected:
 
 public:
     FLUID_TO_SOLID_INTERPOLATION_BASE(const COLLISION_AWARE_INDEX_MAP<TV>& map);
+    FLUID_TO_SOLID_INTERPOLATION_BASE(const FLUID_TO_SOLID_INTERPOLATION_BASE&) = delete;
+    void operator=(const FLUID_TO_SOLID_INTERPOLATION_BASE&) = delete;
     virtual ~FLUID_TO_SOLID_INTERPOLATION_BASE();
 
     int V_size;

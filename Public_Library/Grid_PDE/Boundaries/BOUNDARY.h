@@ -15,7 +15,6 @@
 #include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Log/DEBUG_UTILITIES.h>
-#include <Core/Utilities/NONCOPYABLE.h>
 #include <Core/Vectors/VECTOR_3D.h>
 #include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Grid_Tools/Grids/FACE_INDEX.h>
@@ -24,7 +23,7 @@
 namespace PhysBAM{
 
 template<class TV,class T2>
-class BOUNDARY:public NONCOPYABLE
+class BOUNDARY
 {
     typedef typename TV::SCALAR T;typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,TV::m> TV_SIDES;typedef VECTOR<int,TV::m> TV_INT;
 public:
@@ -33,6 +32,8 @@ public:
     VECTOR<VECTOR<bool,2>,TV::m> constant_extrapolation;
 
     BOUNDARY();
+    BOUNDARY(const BOUNDARY&) = delete;
+    void operator=(const BOUNDARY&) = delete;
     virtual ~BOUNDARY();
 
     virtual void Set_Constant_Extrapolation(const TV_SIDES& constant_extrapolation_input=TV_SIDES::Constant_Vector(VECTOR<bool,2>::Constant_Vector(true)))
