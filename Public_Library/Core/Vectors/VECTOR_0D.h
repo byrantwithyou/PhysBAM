@@ -35,18 +35,15 @@ public:
     typedef ARRAY_BASE<T,VECTOR<T,0> > BASE;
     using BASE::Assert_Same_Size;
 
-    VECTOR()
-    {
-    }
+    VECTOR() = default;
 
     explicit VECTOR(INITIAL_SIZE n)
     {
         assert(n==INITIAL_SIZE());
     }
 
-    VECTOR(const VECTOR& vector_input)
-        :BASE()
-    {}
+    VECTOR(const VECTOR&) = default;
+    VECTOR(VECTOR&&) = default;
 
     template<class T2> explicit VECTOR(const VECTOR<T2,0>& vector_input)
     {}
@@ -61,6 +58,8 @@ public:
     {
     }
 
+    ~VECTOR() = default;
+
     template<class T_VECTOR>
     VECTOR& operator=(const ARRAY_BASE<T,T_VECTOR>& v)
     {
@@ -68,10 +67,8 @@ public:
         return *this;
     }
 
-    VECTOR& operator=(const VECTOR& v)
-    {
-        return *this;
-    }
+    VECTOR& operator=(const VECTOR& v) = default;
+    VECTOR& operator=(VECTOR&& v) = default;
 
     const T& operator[](const int) const
     {PHYSBAM_FATAL_ERROR();}

@@ -66,9 +66,10 @@ public:
     typedef typename SCALAR_POLICY<T>::TYPE SCALAR;
 
 protected:
-    ARRAY_BASE(){}
-    ARRAY_BASE(const ARRAY_BASE&){}
-    ~ARRAY_BASE(){}
+    ARRAY_BASE() = default;
+    ARRAY_BASE(const ARRAY_BASE&) = default;
+    ARRAY_BASE(ARRAY_BASE&&) = default;
+    ~ARRAY_BASE() = default;
 public:
 
     T_ARRAY& Derived()
@@ -94,6 +95,8 @@ protected:
     {T_ARRAY& self=Derived();ID m=self.Size();const T_ARRAY& source_=source.Derived();assert(m==source_.Size());
     if(!T_ARRAY::Same_Array(self,source_)) for(ID i(0);i<m;i++) self(i)=source_(i);
     return self;}
+
+    ARRAY_BASE& operator=(ARRAY_BASE&& source) = default;
 
     template<class T_ARRAY0>
     T_ARRAY& operator=(const T_ARRAY0& source)

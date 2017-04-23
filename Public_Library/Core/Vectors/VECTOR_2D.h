@@ -81,6 +81,10 @@ public:
         :x(vector_input.x),y(vector_input.y)
     {}
 
+    VECTOR(const VECTOR&& vector_input)
+        :x(vector_input.x),y(vector_input.y)
+    {}
+
     template<class T2> explicit VECTOR(const VECTOR<T2,2>& vector_input)
         :x((T)vector_input.x),y((T)vector_input.y)
     {}

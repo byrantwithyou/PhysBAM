@@ -21,7 +21,8 @@ public:
 
     template<int i> struct GET{typedef typename conditional<i==0,T1,T2>::type TYPE;};
 
-    T1 x;T2 y;
+    T1 x;
+    T2 y;
 
     PAIR() 
         :x(T1()),y(T2()) 
@@ -31,8 +32,11 @@ public:
         :x(x_input),y(y_input) 
     {}
 
-    ~PAIR()
-    {}
+    PAIR(const PAIR&) = default;
+    PAIR(PAIR&&) = default;
+    ~PAIR() = default;
+    PAIR& operator=(const PAIR&) = default;
+    PAIR& operator=(PAIR&&) = default;
 
     bool operator==(const PAIR& p) const
     {return x==p.x && y==p.y;}

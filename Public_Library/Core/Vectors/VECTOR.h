@@ -101,11 +101,8 @@ public:
         for(int i=d2;i<d;i++) array[i]=T();
     }
 
-    VECTOR(const VECTOR& v)
-        :BASE()
-    {
-        for(int i=0;i<d;i++) array[i]=v.array[i];
-    }
+    VECTOR(const VECTOR&) = default;
+    VECTOR(VECTOR&&) = default;
 
     template<int n>
     VECTOR(const VECTOR<T,n>& v1,const VECTOR<T,d-n>& v2)
@@ -114,11 +111,8 @@ public:
         for(int i=n;i<d;i++) (*this)(i)=v2(i-n);
     }
 
-    VECTOR& operator=(const VECTOR& v)
-    {
-        for(int i=0;i<d;i++) array[i]=v(i);
-        return *this;
-    }
+    VECTOR& operator=(const VECTOR&) = default;
+    VECTOR& operator=(VECTOR&&) = default;
 
     template<class T_VECTOR>
     VECTOR& operator=(const ARRAY_BASE<T,T_VECTOR>& v)
@@ -127,6 +121,8 @@ public:
         for(int i=0;i<d;i++) array[i]=v(i);
         return *this;
     }
+
+    ~VECTOR() = default;
 
     int Size() const
     {return m;}

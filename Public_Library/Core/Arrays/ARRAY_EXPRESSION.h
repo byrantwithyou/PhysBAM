@@ -37,6 +37,12 @@ public:
         :op(op),size(size)
     {}
 
+    ARRAY_EXPRESSION(const ARRAY_EXPRESSION&) = default;
+    ARRAY_EXPRESSION(ARRAY_EXPRESSION&&) = default;
+    ~ARRAY_EXPRESSION() = default;
+    ARRAY_EXPRESSION& operator=(const ARRAY_EXPRESSION&) = default;
+    ARRAY_EXPRESSION& operator=(ARRAY_EXPRESSION&&) = default;
+
     INDEX Size() const
     {return size;}
 

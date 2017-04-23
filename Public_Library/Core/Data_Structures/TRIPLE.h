@@ -26,6 +26,12 @@ public:
         :x(x_input),y(y_input),z(z_input)
     {}
 
+    TRIPLE(const TRIPLE&) = default;
+    TRIPLE(TRIPLE&&) = default;
+    ~TRIPLE() = default;
+    TRIPLE& operator=(const TRIPLE&) = default;
+    TRIPLE& operator=(TRIPLE&&) = default;
+
     bool operator==(const TRIPLE& t) const
     {return x==t.x && y==t.y && z==t.z;}
 

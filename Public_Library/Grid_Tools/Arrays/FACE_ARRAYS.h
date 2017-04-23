@@ -46,6 +46,8 @@ public:
     ARRAY(const ARRAY& old_array)
     {Resize(old_array.Domain_Indices(),false,false);Copy(old_array);}
 
+    ARRAY(ARRAY&& old_array) = default;
+
     virtual ~ARRAY()
     {delete[] array.base_pointer;}
 
@@ -65,6 +67,8 @@ public:
 
     ARRAY& operator=(const ARRAY& source)
     {if(source.Domain_Indices()!=Domain_Indices()) Resize(source.Domain_Indices(),false,false);Copy(source);return *this;}
+
+    ARRAY& operator=(ARRAY&&) = default;
 
     template<class T2>
     void Resize(const GRID<VECTOR<T2,dimension> >& grid,const int ghost_cells=0,const bool initialize_new_elements=true,const bool copy_existing_elements=true,const T& initialization_value=T())

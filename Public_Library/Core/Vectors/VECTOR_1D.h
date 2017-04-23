@@ -91,6 +91,10 @@ public:
         :x(vector_input.x)
     {}
 
+    VECTOR(const VECTOR&& vector_input)
+        :x(vector_input.x)
+    {}
+
     template<class T_VECTOR>
     explicit VECTOR(const ARRAY_BASE<T,T_VECTOR>& v)
         :x(v(0))

@@ -26,13 +26,11 @@ public:
     typedef ARRAYS_ND_BASE<T,VECTOR<int,d> > BASE;
 
     using BASE::array; // one-dimensional data storage
-    using BASE::domain;using BASE::Exchange;
+    using BASE::domain;using BASE::Exchange;using BASE::stride;using BASE::offset;
     using BASE::Calculate_Acceleration_Constants;
 public:
 
-    ARRAY()
-        :BASE()
-    {}
+    ARRAY() = default;
 
     ARRAY(const RANGE<TV_INT>& domain_input,const bool initialize_using_initialization_value=true,const T& initialization_value=T())
     {Initialize(domain_input,initialize_using_initialization_value,initialization_value);}
@@ -52,6 +50,8 @@ public:
 
     ARRAY(const ARRAY& old_array,const bool initialize_with_old_array=true)
     {Initialize(old_array.domain,false,T());if(initialize_with_old_array) array=old_array.array;}
+
+    ARRAY(ARRAY&&) = default;
 
     ~ARRAY()
     {delete[] array.Get_Array_Pointer();}
@@ -76,6 +76,9 @@ public:
     {if(this==&source) return *this;
     Resize_In_Place(source.Domain_Indices());
     array=source.array;return *this;}
+
+    ARRAY& operator=(ARRAY&& a)
+    {domain=a.domain;stride=a.stride;offset=a.offset;array=std::move(a.array);return *this;}
 
     template<class T_ARRAY1>
     ARRAY& operator=(const T_ARRAY1& source)

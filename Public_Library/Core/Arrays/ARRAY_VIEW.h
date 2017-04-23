@@ -43,9 +43,10 @@ public:
         :m(m),base_pointer(raw_data)
     {}
 
-    ARRAY_VIEW(const ARRAY_VIEW<T,ID>& array)
-        :m(array.m),base_pointer(array.base_pointer)
-    {}
+    ARRAY_VIEW(const ARRAY_VIEW<T,ID>&) = default;
+    ARRAY_VIEW(ARRAY_VIEW<T,ID>&& a)
+        :m(a.m),base_pointer(a.base_pointer)
+    {const_cast<T*&>(a.base_pointer)=0;}
 
     ARRAY_VIEW(const ARRAY_VIEW<typename conditional<is_const<T>::value,typename remove_const<T>::type,UNUSABLE>::type,ID>& array)
         :m(array.m),base_pointer(array.base_pointer)
@@ -61,6 +62,8 @@ public:
         :m(array.Size()),base_pointer(array.Get_Array_Pointer())
     {}
 
+    ~ARRAY_VIEW() = default;
+
     ID Size() const
     {return m;}
 
@@ -75,6 +78,10 @@ public:
 
     ARRAY_VIEW& operator=(const ARRAY_VIEW& source)
     {return BASE::operator=(source);}
+
+    ARRAY_VIEW& operator=(ARRAY_VIEW&& source)
+    {m=source.m;base_pointer=source.base_pointer;
+    const_cast<T*&>(source.base_pointer)=0;return *this;}
 
     template<class T_ARRAY1>
     ARRAY_VIEW& operator=(const T_ARRAY1& source)

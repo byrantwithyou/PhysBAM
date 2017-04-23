@@ -52,6 +52,8 @@ protected:
     T_ARRAY& self=Derived();RANGE<TV_INT> domain_indices=self.Domain_Indices();assert(domain_indices==source.Domain_Indices());
     if(!T_ARRAY::Same_Array(self,source)) for(RANGE_ITERATOR<dimension> iterator(domain_indices);iterator.Valid();iterator.Next()) self(iterator.index)=source(iterator.index);
     return self;}
+
+    ARRAY_BASE& operator=(ARRAY_BASE&&) = default;
 };
 
 template<class T,class TV_INT>
@@ -80,6 +82,9 @@ protected:
         :domain(TV_INT(),TV_INT()),array(0,0)
     {Calculate_Acceleration_Constants(range);}
 
+    ARRAYS_ND_BASE(const ARRAYS_ND_BASE&) = default;
+    ARRAYS_ND_BASE(ARRAYS_ND_BASE&&) = default;
+    
     void Calculate_Acceleration_Constants(const RANGE<TV_INT>& range)
     {domain=range;
     TV_INT counts(domain.Edge_Lengths());
@@ -91,6 +96,12 @@ public:
     template<class T_ARRAY1>
     ARRAYS_ND_BASE& operator=(const T_ARRAY1& source)
     {assert(Equal_Dimensions(*this,source));array=source.array;return *this;}
+
+    ARRAYS_ND_BASE& operator=(const ARRAYS_ND_BASE& source)
+    {assert(Equal_Dimensions(*this,source));array=source.array;return *this;}
+
+    ARRAYS_ND_BASE& operator=(ARRAYS_ND_BASE&& source)
+    {assert(Equal_Dimensions(*this,source));array=std::move(source.array);return *this;}
 
     const RANGE<TV_INT>& Domain_Indices() const
     {return domain;}

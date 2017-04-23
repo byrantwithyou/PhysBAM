@@ -64,6 +64,12 @@ public:
         for(int i=0;i<Value(m);i++) base_pointer[i]=array.base_pointer[i];
     }
 
+    ARRAY(ARRAY&& array)
+        :base_pointer(array.base_pointer),buffer_size(array.buffer_size),m(array.m)
+    {
+        array.base_pointer=0;
+    }
+
     template<class T_ARRAY>
     explicit ARRAY(const T_ARRAY& array,typename enable_if<is_same<T,typename T_ARRAY::ELEMENT>::value,UNUSABLE>::type unused=UNUSABLE())
         :base_pointer(0),buffer_size(array.Size()),m(array.Size())
@@ -91,6 +97,10 @@ public:
     m=source_m;
     for(ID i(0);i<source_m;i++) (*this)(i)=source(i);
     return *this;}
+
+    ARRAY& operator=(ARRAY&& array)
+    {base_pointer=array.base_pointer;buffer_size=array.buffer_size;
+    m=array.m;array.base_pointer=0;return *this;}
 
     template<class T_ARRAY>
     ARRAY& operator=(const T_ARRAY& source)
