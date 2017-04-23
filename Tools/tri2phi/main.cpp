@@ -103,7 +103,7 @@ template<class T,class RW> void Convert(int boundary_cells,PARSE_ARGS &parse_arg
     if(use_grid_size && dx){LOG::cerr<<"Only one of -g and -dx is allowed."<<std::endl;exit(1);}
     if(grid_size.Contains(0)){std::cerr<<"Invalid suggested grid size "<<grid_size<<std::endl;exit(1);}
 
-    if(!Is_Tri_File(input_filename)){
+    if(!File_Extension_Matches_Ignoring_Compression_Suffix(output_filename,"tri",false)){
         std::cerr<<"Not a tri file: "<<input_filename<<std::endl;
         return;}
 

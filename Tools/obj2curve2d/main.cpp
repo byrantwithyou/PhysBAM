@@ -60,7 +60,7 @@ int main(int argc,char *argv[])
     parse_args.Extra(&output_filename,"curve2d file","output curve2d file name");
     parse_args.Parse();
 
-    if(!Is_Curve2D_File(output_filename)){
+    if(!File_Extension_Matches_Ignoring_Compression_Suffix(output_filename,"curve2d",false)){
         std::cerr<<"Not a curve2d file: "<<output_filename<<std::endl;
         return -1;}
 

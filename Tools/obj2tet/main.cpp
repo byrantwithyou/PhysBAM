@@ -60,7 +60,7 @@ int main(int argc,char *argv[])
     parse_args.Extra(&output_filename,"tet file","output tet file name");
     parse_args.Parse();
 
-    if(!Is_Tet_File(output_filename)){
+    if(!File_Extension_Matches_Ignoring_Compression_Suffix(output_filename,"tet",false)){
         std::cerr<<"Not a tet file: "<<output_filename<<std::endl;
         return -1;}
 

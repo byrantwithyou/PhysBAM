@@ -11,13 +11,6 @@
 #include <cstring>
 namespace PhysBAM{
 
-//#####################################################################
-// ADD NEW FILE EXTENSIONS HERE
-// The enumeration should match the file_extensions array, and
-// UNKNOWN_FILE should be matched with a 0 in the array.
-enum FILE_TYPE{RGD_FILE,RGD2D_FILE,TRI_FILE,PHI_FILE,PHI2D_FILE,OCT_FILE,PLY_FILE,PLY2D_FILE,RGB_FILE_,TRI2D_FILE,CURVE_FILE,CURVE2D_FILE,TET_FILE,HEX_FILE,BOX_FILE,PHONEME_FILE,UNKNOWN_FILE};
-//#####################################################################
-
 //###################################################################
 // Platform Specific Function Definitions
 //###################################################################
@@ -52,55 +45,6 @@ bool File_Exists(const std::string& filename);
 bool File_Writable(const std::string& filename);
 std::string Strip_Compression_Suffix(const std::string& filename);
 std::string Real_File(const std::string& filename);
-FILE_TYPE Get_File_Type_Ignoring_Compression_Suffix(const std::string& filename);
-FILE_TYPE Get_File_Type(const std::string& filename);
-bool File_Type_Matches_Ignoring_Compression_Suffix(const std::string& filename,FILE_TYPE type);
-bool File_Type_Matches(const std::string& filename,FILE_TYPE type);
-
-inline bool Is_Rgd_File(const std::string& filename)
-{return File_Type_Matches(filename,RGD_FILE);}
-
-inline bool Is_Rgd2D_File(const std::string& filename)
-{return File_Type_Matches(filename,RGD2D_FILE);}
-
-inline bool Is_Tri_File(const std::string& filename)
-{return File_Type_Matches(filename,TRI_FILE);}
-
-inline bool Is_Tet_File(const std::string& filename)
-{return File_Type_Matches(filename,TET_FILE);}
-
-inline bool Is_Hex_File(const std::string& filename)
-{return File_Type_Matches(filename,HEX_FILE);}
-
-inline bool Is_Phi_File(const std::string& filename)
-{return File_Type_Matches(filename,PHI_FILE);}
-
-inline bool Is_Phi2D_File(const std::string& filename)
-{return File_Type_Matches(filename,PHI2D_FILE);}
-
-inline bool Is_Oct_File(const std::string& filename)
-{return File_Type_Matches(filename,OCT_FILE);}
-
-inline bool Is_Ply_File(const std::string& filename)
-{return File_Type_Matches(filename,PLY_FILE);}
-
-inline bool Is_Ply2D_File(const std::string& filename)
-{return File_Type_Matches(filename,PLY2D_FILE);}
-
-// inline bool Is_Rgb_File(const std::string& filename)
-// {return File_Type_Matches(filename,RGB_FILE);}
-
-inline bool Is_Curve_File(const std::string& filename)
-{return File_Type_Matches(filename,CURVE_FILE);}
-
-inline bool Is_Curve2D_File(const std::string& filename)
-{return File_Type_Matches(filename,CURVE2D_FILE);}
-
-inline bool Is_Box_File(const std::string& filename)
-{return File_Type_Matches(filename,BOX_FILE);}
-
-inline bool Is_Phoneme_File(const std::string& filename)
-{return File_Type_Matches(filename,PHONEME_FILE);}
 
 std::string Get_File_Extension(const std::string &filename);
 std::string Get_Basename(const std::string& filename);

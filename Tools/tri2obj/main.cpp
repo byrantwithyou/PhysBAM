@@ -48,7 +48,7 @@ int main(int argc,char *argv[])
     parse_args.Parse();
 
 
-    if(!Is_Tri_File(input_filename)){
+    if(!File_Extension_Matches_Ignoring_Compression_Suffix(output_filename,"tri",false)){
         std::cerr<<"Not a tri file: "<<input_filename<<std::endl;
         return -1;}
 

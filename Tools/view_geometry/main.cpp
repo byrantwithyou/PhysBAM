@@ -79,18 +79,21 @@ template<class T> void Add_File(const std::string& filename,int number)
     world.Bind_Key("^c",{[&world](){world.Save_View("camera_script",true);},"Save view"});
     world.Bind_Key('c',{[&world](){world.Load_View("camera_script",true);},"Load view"});
 
-    FILE_TYPE type=Get_File_Type(filename);
-    switch(type){
-        case TRI_FILE: Add_Tri_File<T>(filename,world,number);break;
-        case TRI2D_FILE: Add_Tri2D_File<T>(filename,world,number);break;
-        case PHI_FILE: Add_Phi_File<T>(filename,world,number);break;
-        case PHI2D_FILE: Add_Phi2D_File<T>(filename,world,number);break;
-        case CURVE_FILE: Add_Curve_File<T>(filename,world,number);break;
-        case CURVE2D_FILE: Add_Curve2D_File<T>(filename,world,number);break;
-        case TET_FILE: Add_Tet_File<T>(filename,world,number);break;
-        case HEX_FILE: Add_Hex_File<T>(filename,world,number);break;
-        case BOX_FILE: Add_Box_File<T>(filename,world,number);break;
-        default: LOG::cerr<<"Unrecognized file "<<filename<<std::endl;}
+    static std::map<std::string,std::function<void(const std::string&,OPENGL_WORLD<T>&,int)> > func_map;
+    if(func_map.empty()){
+        func_map["tri"]=Add_Tri_File<T>;
+        func_map["tri2d"]=Add_Tri2D_File<T>;
+        func_map["phi"]=Add_Phi_File<T>;
+        func_map["phi2d"]=Add_Phi2D_File<T>;
+        func_map["curve"]=Add_Curve_File<T>;
+        func_map["curve2d"]=Add_Curve2D_File<T>;
+        func_map["tet"]=Add_Tet_File<T>;
+        func_map["hex"]=Add_Hex_File<T>;
+        func_map["box"]=Add_Box_File<T>;}
+    
+    auto it=func_map.find(Get_File_Extension(filename));
+    if(it!=func_map.end()) it->second(filename,world,number);
+    else LOG::cerr<<"Unrecognized file "<<filename<<std::endl;
     LOG::cout<<std::flush;
     world.Center_Camera_On_Scene();
     world.window->Main_Loop();

@@ -20,8 +20,6 @@
 #endif
 namespace PhysBAM{
 
-static const char *file_extensions[]={"rgd","rgd2d","tri","phi","phi2d","oct","ply","ply2d","rgb","tri2d","curve","curve2d","tet","hex","box","phoneme",0};
-
 //###################################################################
 // Win32 Specific Function Definitions
 //###################################################################
@@ -334,28 +332,6 @@ std::string Real_File(const std::string& filename)
     if(File_Exists_Ignoring_Compression_Suffix(filename))return filename;
     else if(!File_Is_Compressed(filename) && File_Exists_Ignoring_Compression_Suffix(filename+".gz"))return filename+".gz";
     return "";
-}
-
-FILE_TYPE Get_File_Type_Ignoring_Compression_Suffix(const std::string& filename)
-{
-    std::string ext=Get_File_Extension_Ignoring_Compression_Suffix(filename);
-    for(int i=0;file_extensions[i];i++) if(ext==file_extensions[i]) return (FILE_TYPE)i;
-    return UNKNOWN_FILE;
-}
-
-FILE_TYPE Get_File_Type(const std::string& filename)
-{
-    return Get_File_Type_Ignoring_Compression_Suffix(Strip_Compression_Suffix(filename));
-}
-
-bool File_Type_Matches_Ignoring_Compression_Suffix(const std::string& filename,FILE_TYPE type)
-{
-    return File_Extension_Matches_Ignoring_Compression_Suffix(filename,file_extensions[(int)type]);
-}
-
-bool File_Type_Matches(const std::string& filename,FILE_TYPE type)
-{
-    return File_Type_Matches_Ignoring_Compression_Suffix(Strip_Compression_Suffix(filename),type);
 }
 
 std::string Get_File_Extension(const std::string &filename)
