@@ -96,30 +96,11 @@ Transfer_With_Tent_Weights(ARRAY_VIEW<const TV> domain,ARRAY_VIEW<const typename
         if(used_particles>0)grid_data(node)/=(T)used_particles;}
 }
 //#####################################################################
-// Function Transfer_With_Distance_Averaged_Weights
-//#####################################################################
-template<class TV> void SCATTERED_INTERPOLATION<TV>::
-Instantiate()
-{
-    // This is a work around for Visual C++ compiler.
-    typedef ARRAY<TV,TV_INT> T_ARRAYS_T2;
-    T_ARRAYS_T2 grid_data;
-    // Make enough copies to prevent inlining.
-    Transfer_To_Grid_Helper(ARRAY_VIEW<const TV>(0,0),ARRAY_VIEW<const TV>(0,0),GRID<TV>(),grid_data);
-    Transfer_To_Grid_Helper(ARRAY_VIEW<const TV>(0,0),ARRAY_VIEW<const TV>(0,0),GRID<TV>(),grid_data);
-    Transfer_To_Grid_Helper(ARRAY_VIEW<const TV>(0,0),ARRAY_VIEW<const TV>(0,0),GRID<TV>(),grid_data);
-    Transfer_To_Grid_Helper(ARRAY_VIEW<const TV>(0,0),ARRAY_VIEW<const TV>(0,0),GRID<TV>(),grid_data);
-    Transfer_To_Grid_Helper(ARRAY_VIEW<const TV>(0,0),ARRAY_VIEW<const TV>(0,0),GRID<TV>(),grid_data);
-    Transfer_To_Grid_Helper(ARRAY_VIEW<const TV>(0,0),ARRAY_VIEW<const TV>(0,0),GRID<TV>(),grid_data);
-    Transfer_To_Grid_Helper(ARRAY_VIEW<const TV>(0,0),ARRAY_VIEW<const TV>(0,0),GRID<TV>(),grid_data);
-    Transfer_To_Grid_Helper(ARRAY_VIEW<const TV>(0,0),ARRAY_VIEW<const TV>(0,0),GRID<TV>(),grid_data);
-    Transfer_To_Grid_Helper(ARRAY_VIEW<const TV>(0,0),ARRAY_VIEW<const TV>(0,0),GRID<TV>(),grid_data);
-    Transfer_To_Grid_Helper(ARRAY_VIEW<const TV>(0,0),ARRAY_VIEW<const TV>(0,0),GRID<TV>(),grid_data);
-}
-//#####################################################################
 namespace PhysBAM{
 template class SCATTERED_INTERPOLATION<VECTOR<float,1> >;
 template class SCATTERED_INTERPOLATION<VECTOR<float,3> >;
 template class SCATTERED_INTERPOLATION<VECTOR<double,1> >;
 template class SCATTERED_INTERPOLATION<VECTOR<double,3> >;
+template void SCATTERED_INTERPOLATION<VECTOR<double,3> >::Transfer_To_Grid_Helper<ARRAY<VECTOR<double,3>,VECTOR<int,3> > >(ARRAY_VIEW<VECTOR<double,3> const,int>,ARRAY_VIEW<ARRAY<VECTOR<double,3>,VECTOR<int,3> >::ELEMENT const,int>,GRID<VECTOR<double,3> > const&,ARRAY<VECTOR<double,3>,VECTOR<int,3> >&) const;
+template void SCATTERED_INTERPOLATION<VECTOR<float,3> >::Transfer_To_Grid_Helper<ARRAY<VECTOR<float,3>,VECTOR<int,3> > >(ARRAY_VIEW<VECTOR<float,3> const,int>,ARRAY_VIEW<ARRAY<VECTOR<float,3>,VECTOR<int,3> >::ELEMENT const,int>,GRID<VECTOR<float,3> > const&,ARRAY<VECTOR<float,3>,VECTOR<int,3> >&) const;
 }
