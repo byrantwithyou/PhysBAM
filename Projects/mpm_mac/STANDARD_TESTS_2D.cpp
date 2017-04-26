@@ -193,24 +193,17 @@ Initialize()
             RANGE<TV> wall(TV(.45,0)*m,TV(.55,1)*m);
             Add_Collision_Object(wall,COLLISION_TYPE::slip,0);
         } break;
-        case 11:{ // free fall circle with curved boundary
+        case 11:
+        case 12:{ // free fall circle with curved boundary
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             SPHERE<TV> sphere(TV(.5,.5)*m,.3*m);
+            if(test_number==12) sphere.radius=.4*m;
             T density=2*unit_rho*scale_mass;
             Seed_Particles(sphere,0,0,density,particles_per_cell);
             gravity=TV(0,-1)*m/sqr(s);
             // add a circle collision object
             SPHERE<TV> sph(TV(.5,.5)*m,.4*m);
             Add_Collision_Object(Invert(Make_IO(sph)),COLLISION_TYPE::slip,0,0,0);
-        } break;
-        case 12:{ // full stationary pool with circle boundary
-            Set_Grid(RANGE<TV>::Unit_Box()*m);
-            SPHERE<TV> sphere(TV(.5,.5)*m,.4*m);
-            T density=2*unit_rho*scale_mass;
-            Seed_Particles(sphere,0,0,density,particles_per_cell);
-            gravity=TV(0,-1)*m/sqr(s);
-            // add a circle collision object
-            collision_objects.Append(new MPM_COLLISION_IMPLICIT_SPHERE<TV>(COLLISION_TYPE::slip,0,0,0,TV(.5,.5)*m,.4*m,0));
         } break;
         case 13:{ // half filled stationary pool with curved boundary
             Set_Grid(RANGE<TV>::Unit_Box()*m);
