@@ -171,11 +171,9 @@ Initialize()
             T density=2*unit_rho*scale_mass;
             SPHERE<TV> sphere0(TV(.3,.3)*m,.1*m);
             SPHERE<TV> sphere1(TV(.44,.44)*m,.1*m);
-            typedef ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> > TOBJ;
-            TOBJ* obj0=new TOBJ(sphere0);
-            TOBJ* obj1=new TOBJ(sphere1);
-            IMPLICIT_OBJECT_UNION<TV> shape(obj0,obj1);
-            Seed_Particles(shape,0,0,density,particles_per_cell);
+            auto shape=Unite(Make_IO(sphere0),Make_IO(sphere1));
+            Seed_Particles(*shape,0,0,density,particles_per_cell);
+            delete shape;
         } break;
         case 9: // freefall circles with different phases
         case 10:{ // freefall circles with same phase
@@ -192,7 +190,7 @@ Initialize()
             if(test_number==9) particles.phase.Array_View(n,particles.phase.m-n).Fill(1);
             Add_Walls(-1,COLLISION_TYPE::slip,.1*m);
             // a wall in the middle preventing the two circles from touching
-            RANGE<TV> wall=RANGE<TV>(TV(.45,0)*m,TV(.55,1)*m);
+            RANGE<TV> wall(TV(.45,0)*m,TV(.55,1)*m);
             Add_Collision_Object(wall,COLLISION_TYPE::slip,0);
         } break;
         case 11:{ // free fall circle with curved boundary
@@ -202,7 +200,8 @@ Initialize()
             Seed_Particles(sphere,0,0,density,particles_per_cell);
             gravity=TV(0,-1)*m/sqr(s);
             // add a circle collision object
-            collision_objects.Append(new MPM_COLLISION_IMPLICIT_SPHERE<TV>(COLLISION_TYPE::slip,0,0,0,TV(.5,.5)*m,.4*m,0));
+            SPHERE<TV> sph(TV(.5,.5)*m,.4*m);
+            Add_Collision_Object(Invert(Make_IO(sph)),COLLISION_TYPE::slip,0,0,0);
         } break;
         case 12:{ // full stationary pool with circle boundary
             Set_Grid(RANGE<TV>::Unit_Box()*m);

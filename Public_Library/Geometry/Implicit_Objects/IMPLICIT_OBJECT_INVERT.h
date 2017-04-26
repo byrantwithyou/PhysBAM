@@ -75,5 +75,10 @@ public:
     void Write(TYPED_OSTREAM& output) const override;
 //#####################################################################
 };
+template<class TV>
+inline IMPLICIT_OBJECT_INVERT<TV>* Invert(IMPLICIT_OBJECT<TV>* io)
+{
+    return new IMPLICIT_OBJECT_INVERT<TV>(io);
+}
 }
 #endif

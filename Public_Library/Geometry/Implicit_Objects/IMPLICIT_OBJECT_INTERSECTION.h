@@ -83,5 +83,10 @@ public:
     void Write(TYPED_OSTREAM& output) const override;
 //#####################################################################
 };
+template<class TV,class ...Args>
+inline IMPLICIT_OBJECT_INTERSECTION<TV>* Intersect(IMPLICIT_OBJECT<TV>* o,Args&&... io_list)
+{
+    return new IMPLICIT_OBJECT_INTERSECTION<TV>(o,io_list...);
+}
 }
 #endif
