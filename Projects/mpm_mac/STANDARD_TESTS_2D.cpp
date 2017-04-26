@@ -204,6 +204,30 @@ Initialize()
             // add a circle collision object
             collision_objects.Append(new MPM_COLLISION_IMPLICIT_SPHERE<TV>(COLLISION_TYPE::slip,0,0,0,TV(.5,.5)*m,.4*m,0));
         } break;
+        case 12:{ // full stationary pool with circle boundary
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            SPHERE<TV> sphere(TV(.5,.5)*m,.4*m);
+            T density=2*unit_rho*scale_mass;
+            Seed_Particles(sphere,0,0,density,particles_per_cell);
+            gravity=TV(0,-1)*m/sqr(s);
+            // add a circle collision object
+            collision_objects.Append(new MPM_COLLISION_IMPLICIT_SPHERE<TV>(COLLISION_TYPE::slip,0,0,0,TV(.5,.5)*m,.4*m,0));
+        } break;
+        case 13:{ // half filled stationary pool with curved boundary
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            SPHERE<TV> sphere(TV(.5,.5)*m,.4*m);
+            RANGE<TV> box(TV(.1*m,.1*m),TV(.9*m,.5*m));
+            typedef ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> > SPHERE_OBJ;
+            typedef ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> > BOX_OBJ;
+            SPHERE_OBJ* o1=new SPHERE_OBJ(sphere);
+            BOX_OBJ* o2=new BOX_OBJ(box);
+            IMPLICIT_OBJECT_INTERSECTION<TV> seed_space(o1,o2);
+            T density=2*unit_rho*scale_mass;
+            Seed_Particles(seed_space,0,0,density,particles_per_cell);
+            gravity=TV(0,-1)*m/sqr(s);
+            // add a circle collision object
+            collision_objects.Append(new MPM_COLLISION_IMPLICIT_SPHERE<TV>(COLLISION_TYPE::slip,0,0,0,TV(.5,.5)*m,.4*m,0));
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     phases.Resize(number_phases);
