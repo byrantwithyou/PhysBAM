@@ -59,6 +59,7 @@ public:
     void Compute_Poisson_Matrix();
     T Compute_Volume_For_Face(const FACE_INDEX<TV::m>& face) const;
     void Move_Mass_Momentum_Inside(PHASE& ph) const;
+    void Move_Mass_Momentum_Inside_Nearest(PHASE& ph) const;
 //#####################################################################
 };
 }

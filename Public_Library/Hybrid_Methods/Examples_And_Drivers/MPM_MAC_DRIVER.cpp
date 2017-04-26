@@ -7,6 +7,7 @@
 #include <Core/Log/LOG.h>
 #include <Core/Log/SCOPE.h>
 #include <Core/Matrices/SPARSE_MATRIX_THREADED_CONSTRUCTION.h>
+#include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/MINRES.h>
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
@@ -245,6 +246,8 @@ Particle_To_Grid(PHASE& ph) const
     // TODO: move mass, momentum, volume inside
     if(example.move_mass_inside)
         Move_Mass_Momentum_Inside(ph);
+    else if(example.move_mass_inside_nearest)
+        Move_Mass_Momentum_Inside_Nearest(ph);
 
     ph.valid_indices.Remove_All();
     ph.valid_flat_indices.Remove_All();
@@ -471,6 +474,62 @@ Move_Mass_Momentum_Inside(PHASE& ph) const
             if(example.use_particle_volumes)
                 ph.volume(fit.Full_Index())=0;
             break;}}
+}
+//#####################################################################
+// Function Move_Mass_Momentum_Inside
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Move_Mass_Momentum_Inside_Nearest(PHASE& ph) const
+{
+    INTERPOLATED_COLOR_MAP<T> color_map;
+    color_map.Initialize_Colors(0,ph.mass.array.Max(),false,true,false);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("purge",0,1);
+    for(FACE_ITERATOR<TV> it(example.grid,2);it.Valid();it.Next())
+        if(ph.mass(it.Full_Index()))
+            Add_Debug_Particle(it.Location(),color_map(ph.mass(it.Full_Index())));
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("masses before ",0,1);
+
+    for(FACE_ITERATOR<TV> fit(example.grid,2);fit.Valid();fit.Next()){
+        TV loc=fit.Location();
+        T mass=ph.mass(fit.Full_Index());
+        if(!mass) continue;
+        T momentum=ph.velocity(fit.Full_Index());
+        T volume=0;
+        if(example.use_particle_volumes)
+            volume=ph.volume(fit.Full_Index());
+        for(int i=0;i<example.collision_objects.m;i++){
+            MPM_COLLISION_OBJECT<TV>* o=example.collision_objects(i);
+            if(o->Phi(loc,example.time)>=0) continue; // outside collision object
+            IMPLICIT_OBJECT<TV>* io=o->Get_Implicit_Object(example.time);
+            TV loc_bd=io->Closest_Point_On_Boundary(loc);
+            TV loc_reflect=loc+2*(loc_bd-loc); 
+            T closest_distance=FLT_MAX;
+            FACE_INDEX<TV::m> first_face_index=example.grid.Face(loc_reflect,fit.axis); // get the smallest face index
+            FACE_INDEX<TV::m> closest_face(first_face_index);
+            for(int j=0;j<1<<TV::m;j++){
+                FACE_INDEX<TV::m> f(first_face_index);
+                for(int k=0;k<TV::m;k++)
+                    if(j&(1<<k))
+                        f.index(k)++;
+                T dist2=(example.grid.Face(f)-loc).Magnitude_Squared();
+                if(ph.mass(f) && dist2<closest_distance){
+                    closest_distance=dist2;
+                    closest_face=f;}}
+            Add_Debug_Object(VECTOR<TV,2>(loc,example.grid.Face(closest_face)),VECTOR<T,3>(1,1,0));
+            ph.mass(closest_face)+=ph.mass(fit.Full_Index());
+            ph.mass(fit.Full_Index())=0;
+            ph.velocity(closest_face)+=ph.velocity(fit.Full_Index());
+            ph.velocity(fit.Full_Index())=0;
+            if(example.use_particle_volumes){
+                ph.volume(closest_face)+=ph.volume(fit.Full_Index());
+                ph.volume(fit.Full_Index())=0;}
+            break;}}
+
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("purge",0,1);
+    for(FACE_ITERATOR<TV> it(example.grid,2);it.Valid();it.Next())
+        if(ph.mass(it.Full_Index()))
+            Add_Debug_Particle(it.Location(),color_map(ph.mass(it.Full_Index())));
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("masses after",0,1);
 }
 //#####################################################################
 // Function Compute_Poisson_Matrix

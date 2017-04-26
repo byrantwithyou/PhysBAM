@@ -105,6 +105,7 @@ public:
     int threads;
     bool use_particle_volumes;
     bool move_mass_inside;
+    bool move_mass_inside_nearest;
     bool use_preconditioner;
     bool use_phi;
     int rk_particle_order;

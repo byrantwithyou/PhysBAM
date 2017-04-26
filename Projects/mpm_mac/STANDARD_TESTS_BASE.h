@@ -35,7 +35,7 @@ public:
     using BASE::cfl;using BASE::solver_tolerance;using BASE::solver_iterations;
     using BASE::threads;using BASE::weights;using BASE::stream_type;using BASE::Set_Weights;
     using BASE::Add_Collision_Object;using BASE::use_particle_volumes;using BASE::move_mass_inside;
-    using BASE::test_system;using BASE::print_matrix;
+    using BASE::test_system;using BASE::print_matrix;using BASE::move_mass_inside_nearest;
     using typename BASE::COLLISION_TYPE;using BASE::data_directory;using BASE::Add_Fluid_Wall;
     using BASE::test_output_prefix;using BASE::use_test_output;using BASE::flip;
 
