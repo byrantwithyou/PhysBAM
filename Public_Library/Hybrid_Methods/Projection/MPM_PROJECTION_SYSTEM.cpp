@@ -19,7 +19,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> MPM_PROJECTION_SYSTEM<TV>::
 MPM_PROJECTION_SYSTEM()
-    :KRYLOV_SYSTEM_BASE<T>(true,false)
+    :KRYLOV_SYSTEM_BASE<T>(true,false),dc_present(false)
 {
 }
 //#####################################################################
@@ -74,6 +74,7 @@ Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const
 template<class TV> void MPM_PROJECTION_SYSTEM<TV>::
 Project(KRYLOV_VECTOR_BASE<T>& x) const
 {
+    Project_Nullspace(x);
 }
 //#####################################################################
 // Function Set_Boundary_Conditions
@@ -83,11 +84,23 @@ Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& x) const
 {
 }
 //#####################################################################
+// Function Compute_Ones_Nullspace
+//#####################################################################
+template<class TV> void MPM_PROJECTION_SYSTEM<TV>::
+Compute_Ones_Nullspace()
+{
+    null_u.v.Resize(A.m);
+    null_u.v.Fill(1/sqrt(A.m));
+}
+//#####################################################################
 // Function Project_Nullspace
 //#####################################################################
 template<class TV> void MPM_PROJECTION_SYSTEM<TV>::
 Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const
 {
+    if(!dc_present){
+        MPM_PROJECTION_VECTOR<TV>& v=debug_cast<MPM_PROJECTION_VECTOR<TV>&>(x);
+        v.Copy(-Inner_Product(v,null_u),null_u,v);}
 } 
 //#####################################################################
 // Function Apply_Preconditioner

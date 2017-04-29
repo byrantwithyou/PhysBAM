@@ -558,6 +558,7 @@ Compute_Poisson_Matrix()
                 break;}}
         psi_N(it.Full_Index())=N;}
 
+    example.projection_system.dc_present=false;
     ARRAY<int,TV_INT> cell_index(example.grid.Domain_Indices(1),true,-1);
     ARRAY<PHASE_ID,TV_INT> cell_phase(example.grid.Domain_Indices(1),false);
     int next_cell=0;
@@ -574,7 +575,9 @@ Compute_Poisson_Matrix()
                         if(example.phases(p).mass(face)){
                             phase=p;
                             has_mass=true;}
-                    if(!has_mass) dirichlet=true;}
+                    if(!has_mass){
+                        dirichlet=true;
+                        example.projection_system.dc_present=true;}}
                 face.index(a)++;}}
         if(!all_N && !dirichlet){
             cell_index(it.index)=next_cell++;
@@ -679,6 +682,9 @@ Pressure_Projection()
     for(int i=0;i<tmp.m;i++)
         tmp(i)=example.phases(example.projection_system.phases(i)).velocity(example.projection_system.faces(i));
     example.projection_system.gradient.Transpose_Times(tmp,example.rhs.v);
+
+    if(!example.projection_system.dc_present)
+        example.projection_system.Compute_Ones_Nullspace();
     
     solve_id++;
     if(example.test_system){

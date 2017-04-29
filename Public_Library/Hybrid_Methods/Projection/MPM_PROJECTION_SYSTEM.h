@@ -10,6 +10,7 @@
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Grid_Tools/Grids/FACE_INDEX.h>
+#include <Hybrid_Methods/Projection/MPM_PROJECTION_VECTOR.h>
 #include <Hybrid_Methods/Examples_And_Drivers/PHASE_ID.h>
 
 namespace PhysBAM{
@@ -27,10 +28,13 @@ struct MPM_PROJECTION_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
     ARRAY<T> mass;
     ARRAY<FACE_INDEX<TV::m> > faces;
     ARRAY<PHASE_ID> phases;
+    bool dc_present;
+    MPM_PROJECTION_VECTOR<TV> null_u;
     
     MPM_PROJECTION_SYSTEM();
     virtual ~MPM_PROJECTION_SYSTEM();
 
+    void Compute_Ones_Nullspace();
     void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const override;
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const override;
     T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const override;
