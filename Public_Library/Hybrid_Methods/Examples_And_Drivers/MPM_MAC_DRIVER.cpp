@@ -4,13 +4,11 @@
 //#####################################################################
 #include <Core/Log/DEBUG_SUBSTEPS.h>
 #include <Core/Log/FINE_TIMER.h>
-#include <Core/Log/LOG.h>
 #include <Core/Log/SCOPE.h>
 #include <Core/Matrices/SPARSE_MATRIX_THREADED_CONSTRUCTION.h>
 #include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
-#include <Tools/Krylov_Solvers/MINRES.h>
-#include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
+#include <Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
 #include <Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
 #include <Tools/Parallel_Computation/APPEND_HOLDER.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
@@ -19,21 +17,15 @@
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR_THREADED.h>
 #include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_MAC.h>
-#include <Grid_PDE/Poisson/PROJECTION_UNIFORM.h>
 #include <Geometry/Level_Sets/FAST_MARCHING_METHOD_UNIFORM.h>
-#include <Geometry/Level_Sets/LEVELSET.h>
-#include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_MAC_DRIVER.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_MAC_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
-#include <Hybrid_Methods/Forces/MPM_PLASTIC_FINITE_ELEMENTS.h>
-#include <Hybrid_Methods/Forces/MPM_PLASTICITY_MODEL.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
+#include <Hybrid_Methods/Iterators/PARTICLE_GRID_FACE_ITERATOR.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
 #include <Hybrid_Methods/Projection/MPM_PROJECTION_SYSTEM.h>
 #include <Hybrid_Methods/Projection/MPM_PROJECTION_VECTOR.h>
-#include <Hybrid_Methods/System/MPM_KRYLOV_VECTOR.h>
-#include <Hybrid_Methods/System/MPM_OBJECTIVE.h>
 #ifdef USE_OPENMP
 #include <omp.h>
 #endif

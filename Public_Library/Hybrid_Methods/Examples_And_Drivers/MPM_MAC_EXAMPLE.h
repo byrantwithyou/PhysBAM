@@ -4,8 +4,6 @@
 //#####################################################################
 #ifndef __MPM_MAC_EXAMPLE__
 #define __MPM_MAC_EXAMPLE__
-#include <Core/Matrices/MATRIX.h>
-#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
@@ -143,7 +141,7 @@ public:
     template<class OBJECT> typename enable_if<!is_pointer<OBJECT>::value>::type
     Add_Collision_Object(const OBJECT& object,COLLISION_TYPE type,T friction,
         std::function<FRAME<TV>(T)> func_frame=0,std::function<TWIST<TV>(T)> func_twist=0)
-    {Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<OBJECT>(object),type,friction,func_frame,func_twist);}
+    {Add_Collision_Object(Make_IO(object),type,friction,func_frame,func_twist);}
 
     TV Total_Particle_Linear_Momentum() const;
     TV Total_Particle_Linear_Momentum(const PHASE& ph) const;

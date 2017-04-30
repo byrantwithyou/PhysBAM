@@ -2,42 +2,12 @@
 // Copyright 2015, Lin Huang, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Core/Data_Structures/KD_TREE.h>
-#include <Core/Math_Tools/RANGE_ITERATOR.h>
-#include <Core/Matrices/FRAME.h>
-#include <Core/Matrices/MATRIX.h>
-#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Tools/Parsing/PARSE_ARGS.h>
-#include <Geometry/Basic_Geometry/HOURGLASS.h>
-#include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
-#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>
-#include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
-#include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INTERSECTION.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INVERT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UNION.h>
-#include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
-#include <Geometry/Seeding/POISSON_DISK.h>
-#include <Geometry/Tessellation/SPHERE_TESSELLATION.h>
-#include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
-#include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
-#include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
-#include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
-#include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
-#include <Deformables/Forces/LINEAR_SPRINGS.h>
-#include <Deformables/Forces/SURFACE_TENSION_FORCE.h>
-#include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
-#include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_SPHERE.h>
-#include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
-#include <Hybrid_Methods/Forces/MPM_GRAVITY.h>
-#include <Hybrid_Methods/Forces/MPM_VISCOSITY.h>
-#include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
-#include <Hybrid_Methods/Iterators/PARTICLE_GRID_ITERATOR.h>
-#include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
 #include <fstream>
 #include "STANDARD_TESTS_2D.h"
 namespace PhysBAM{

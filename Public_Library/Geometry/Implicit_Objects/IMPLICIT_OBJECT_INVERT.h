@@ -8,10 +8,8 @@
 #define __IMPLICIT_OBJECT_INVERT__
 
 #include <Core/Math_Tools/RANGE.h>
-#include <Core/Matrices/MATRIX_POLICY.h>
-#include <Core/Utilities/TYPE_UTILITIES.h>
 #include <Geometry/Basic_Geometry/RAY.h>
-#include <Geometry/Topology_Based_Geometry/STRUCTURE.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 namespace PhysBAM{
 
 template<class TV>

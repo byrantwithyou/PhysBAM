@@ -7,8 +7,6 @@
 #ifndef __SPHERE__
 #define __SPHERE__
 
-#include <Core/Log/DEBUG_UTILITIES.h>
-#include <Core/Math_Tools/constants.h>
 #include <Core/Math_Tools/pow.h>
 #include <Core/Math_Tools/RANGE.h>
 #include <Core/Matrices/SYMMETRIC_MATRIX.h>
