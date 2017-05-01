@@ -189,7 +189,7 @@ Initialize()
             particles.V-=dV;
             bc_type.Fill(BC_PERIODIC);
         } break;
-        case 15:{ // Initialize velocity field as Taylor-Green Vortex
+        case 16:{ // Initialize velocity field as Taylor-Green Vortex
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             T density=2*unit_rho*scale_mass;
             T PI=3.1415926535;
