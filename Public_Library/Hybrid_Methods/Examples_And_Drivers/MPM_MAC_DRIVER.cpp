@@ -800,8 +800,7 @@ Update_Simulated_Particles()
         
         for(int p=0;p<example.particles.number;p++){
             if(example.particles.valid(p))
-                ph.simulated_particles.Append(p);
-        }
+                ph.simulated_particles.Append(p);}
     }
     else{
         // Otherwise dispatch particles to their corresponding phase
@@ -810,12 +809,9 @@ Update_Simulated_Particles()
             example.phases(i).simulated_particles.Remove_All();
         
         for(int p=0;p<example.particles.number;p++){
-            int particle_phase=example.particles.phase(p);
-            PHASE& ph=example.phases(PHASE_ID(particle_phase));
+            PHASE& ph=example.phases(example.particles.phase(p));
             if(example.particles.valid(p))
-                ph.simulated_particles.Append(p);
-        }
-    }
+                ph.simulated_particles.Append(p);}}
 }
 //#####################################################################
 // Function Print_Grid_Stats

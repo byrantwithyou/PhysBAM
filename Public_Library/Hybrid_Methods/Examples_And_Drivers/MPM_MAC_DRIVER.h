@@ -26,10 +26,10 @@ public:
     int output_number;
 
     MPM_MAC_EXAMPLE<TV>& example;
-    
+
     MPM_MAC_DRIVER(MPM_MAC_EXAMPLE<TV>& example);
     virtual ~MPM_MAC_DRIVER();
-    
+
     void Execute_Main_Program();
     void Initialize();
 

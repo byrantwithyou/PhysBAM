@@ -11,6 +11,7 @@
 #include <Core/Matrices/MATRIX.h>
 #include <Tools/Particles/PARTICLES.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
+#include <Hybrid_Methods/Examples_And_Drivers/PHASE_ID.h>
 
 namespace PhysBAM{
 
@@ -41,7 +42,7 @@ public:
     ARRAY_VIEW<SYMMETRIC_MATRIX<T,TV::m> > S;
     ARRAY_VIEW<bool> valid;
     ARRAY_VIEW<T> mu,lambda,mu0,lambda0;
-    ARRAY_VIEW<int> phase;
+    ARRAY_VIEW<PHASE_ID> phase;
 
     MPM_PARTICLES();
     virtual ~MPM_PARTICLES();

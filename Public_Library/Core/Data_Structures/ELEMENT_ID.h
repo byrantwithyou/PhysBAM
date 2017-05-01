@@ -128,5 +128,9 @@ template<class ID,class T,int flags> inline std::istream& operator>>(std::istrea
 {T i;input>>i;id=ID(i);return input;}
 template<class ID_TYPE> struct HASH_REDUCE<ID_TYPE,typename FIRST<void,typename ID_TYPE::ELEMENT_ID_TAG>::TYPE>
 {static int H(ID_TYPE id){return id.Value();}};
+
+template<class ID,class SCALAR>
+struct REPLACE_FLOATING_POINT<ID,SCALAR,typename enable_if<(typename ID::ELEMENT_ID_TAG)1>::type>
+{typedef ID TYPE;};
 }
 #endif
