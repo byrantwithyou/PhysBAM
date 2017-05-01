@@ -46,7 +46,7 @@ Fill_Ghost_Faces(const GRID<TV>& grid,const ARRAY<T2,FACE_INDEX<TV::m> >& u,ARRA
 // Function Find_Ghost_Regions
 //#####################################################################
 template<class TV,class T2> void BOUNDARY<TV,T2>::
-Find_Ghost_Regions(const GRID<TV>& grid,VECTOR<RANGE<TV_INT>,2*TV::m>& regions,const int ghost_cells) const
+Find_Ghost_Regions(const GRID<TV>& grid,VECTOR<RANGE<TV_INT>,2*TV::m>& regions,const int ghost_cells)
 {
     RANGE<TV_INT> inner=grid.Domain_Indices(),ghost=grid.Domain_Indices(ghost_cells),current=inner;
     for(int axis=0;axis<TV::m;axis++){
