@@ -18,12 +18,18 @@ class BOUNDARY_PERIODIC:public BOUNDARY<TV,T2>
     typedef BOUNDARY<TV,T2> BASE;
 public:
     using BASE::Find_Ghost_Regions;
+    VECTOR<bool,TV::m> is_periodic;
 
     BOUNDARY_PERIODIC()
-    {}
+    {
+        is_periodic.Fill(true);
+    }
+
+    ~BOUNDARY_PERIODIC() = default;
 
 //#####################################################################
-    void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) const override;
+    void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,
+        ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) const override;
     void Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u,const T time) const override;
 //#####################################################################
 };
