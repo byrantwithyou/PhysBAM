@@ -29,8 +29,8 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     :MPM_MAC_EXAMPLE<TV>(stream_type_input),test_number(0),resolution(32),user_resolution(false),stored_last_frame(0),
     user_last_frame(false),order(2),seed(1234),particles_per_cell(1<<TV::m),regular_seeding(false),
     no_regular_seeding(false),scale_mass(1),override_output_directory(false),
-    m(1),s(1),kg(1),forced_collision_type(-1),write_output_files(0),read_output_files(0),
-    dump_collision_objects(false)
+    m(1),s(1),kg(1),forced_collision_type(-1),write_output_files(0),read_output_files(0),dump_collision_objects(false),
+    a(1),b(1),c(1)
 {
     T framerate=24;
     bool use_quasi_exp_F_update=false;
@@ -79,6 +79,9 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-test_output_prefix",&test_output_prefix,&use_test_output,"","prefix to use for test output");
     parse_args.Add_Not("-no_preconditioner",&this->projection_system.use_preconditioner,"disable preconditioner");
     parse_args.Add("-flip",&flip,"frac","Use this fraction of flip in transfers");
+    parse_args.Add("-a",&a,"scale factor","velocity ( cos(ax)sin(by)sin(cz), sin(ax)cos(by)sin(cz),sin(ax)sin(by)cos(cz) )");
+    parse_args.Add("-b",&b,"scale factor","velocity ( cos(ax)sin(by)sin(cz), sin(ax)cos(by)sin(cz),sin(ax)sin(by)cos(cz) )");
+    parse_args.Add("-c",&c,"scale factor","velocity ( cos(ax)sin(by)sin(cz), sin(ax)cos(by)sin(cz),sin(ax)sin(by)cos(cz) )");
 
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);

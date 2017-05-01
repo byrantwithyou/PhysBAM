@@ -59,6 +59,7 @@ public:
     ARRAY<T> extra_T;
     ARRAY<int> extra_int;
     bool dump_collision_objects;
+    int a,b,c;
 
     RANDOM_NUMBERS<T> random;
 

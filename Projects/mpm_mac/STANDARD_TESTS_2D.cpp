@@ -189,6 +189,21 @@ Initialize()
             particles.V-=dV;
             bc_type.Fill(BC_PERIODIC);
         } break;
+        case 15:{ // Initialize velocity field as Taylor-Green Vortex
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            T density=2*unit_rho*scale_mass;
+            T PI=3.1415926535;
+            auto V_func=[this,PI](const TV& pos){
+                T x=(pos.x-0.1)/0.8*PI;
+                T y=(pos.y-0.1)/0.8*PI;
+                return TV(cos(a*x)*sin(b*y),sin(a*x)*cos(b*y));};
+            auto dV_func=[this,PI](const TV& pos){
+                T x=(pos.x-0.1)/0.8*PI;
+                T y=(pos.y-0.1)/0.8*PI;
+                return MATRIX<T,2>(-a*sin(a*x)*sin(b*y),b*cos(a*x)*cos(b*y),a*cos(a*x)*cos(b*y),-b*sin(a*x)*sin(b*y));};
+            Seed_Particles(RANGE<TV>(TV(.1*m,.1*m),TV(.9*m,.9*m)),V_func,dV_func,density,particles_per_cell);
+            Add_Walls(-1,COLLISION_TYPE::slip,.1*m);
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     phases.Resize(number_phases);
