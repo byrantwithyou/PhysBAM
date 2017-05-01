@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <Grid_PDE/Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
@@ -21,7 +22,7 @@ MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type)
     :stream_type(stream_type),particles(*new MPM_PARTICLES<TV>),
     projection_system(*new MPM_PROJECTION_SYSTEM<TV>),
     sol(*new MPM_PROJECTION_VECTOR<TV>),rhs(*new MPM_PROJECTION_VECTOR<TV>),
-    ghost(3),
+    ghost(3),periodic_boundary(*new BOUNDARY_MAC_GRID_PERIODIC<TV,T>),
     use_affine(true),use_early_gradient_transfer(false),flip(0),initial_time(0),
     last_frame(100),write_substeps_level(-1),substeps_delay_frame(-1),
     output_directory("output"),data_directory("../../Public_Data"),use_test_output(false),
@@ -33,6 +34,7 @@ MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type)
     use_massless_particles(false),debug_particles(*new DEBUG_PARTICLES<TV>),
     print_stats(false),last_te(0),last_grid_ke(0),test_system(false),print_matrix(false)
 {
+    bc_type.Fill(BC_WALL);
 }
 //#####################################################################
 // Destructor

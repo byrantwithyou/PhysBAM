@@ -112,7 +112,7 @@ Initialize()
             int n=particles.phase.m;
             SPHERE<TV> sphere1(TV(.6,.6)*m,.1*m);
             Seed_Particles(sphere1,0,0,density,particles_per_cell);
-            particles.phase.Array_View(n,particles.phase.m-n).Fill(1);
+            particles.phase.Array_View(n,particles.phase.m-n).Fill(PHASE_ID(1));
         } break;
         case 8:{ // concave shape
             this->use_phi=true;
@@ -136,7 +136,8 @@ Initialize()
             Seed_Particles(sphere0,0,0,density,particles_per_cell);
             int n=particles.phase.m;
             Seed_Particles(sphere1,0,0,density,particles_per_cell);
-            if(test_number==9) particles.phase.Array_View(n,particles.phase.m-n).Fill(1);
+            if(test_number==9)
+                particles.phase.Array_View(n,particles.phase.m-n).Fill(PHASE_ID(1));
             Add_Walls(-1,COLLISION_TYPE::slip,.1*m);
             // a wall in the middle preventing the two circles from touching
             RANGE<TV> wall(TV(.45,0)*m,TV(.55,1)*m);
@@ -184,6 +185,7 @@ Initialize()
             TV total_momentum=particles.V.Weighted_Sum(particles.mass);
             TV dV=total_momentum/total_mass;
             particles.V-=dV;
+            bc_type.Fill(BC_PERIODIC);
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }

@@ -39,6 +39,7 @@ public:
     using BASE::forced_collision_type;using BASE::destroy;using BASE::write_output_files;using BASE::read_output_files;
     using BASE::begin_frame;using BASE::end_frame;using BASE::begin_time_step;using BASE::end_time_step;
     using BASE::extra_T;using BASE::extra_int;using BASE::gravity;using BASE::phases;
+    using BASE::bc_type;using BASE::BC_PERIODIC;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();

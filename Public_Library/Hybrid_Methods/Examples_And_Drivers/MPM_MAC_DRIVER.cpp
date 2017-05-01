@@ -16,6 +16,7 @@
 #include <Grid_Tools/Grids/CELL_ITERATOR_THREADED.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR_THREADED.h>
+#include <Grid_PDE/Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
 #include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_MAC.h>
 #include <Geometry/Level_Sets/FAST_MARCHING_METHOD_UNIFORM.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_MAC_DRIVER.h>
@@ -77,6 +78,8 @@ Initialize()
     output_number=current_frame=example.restart;
 
     example.Initialize();
+    for(int i=0;i<TV::m;i++)
+        example.periodic_boundary.is_periodic(i)=example.bc_type(i)==example.BC_PERIODIC;
 
     PHYSBAM_ASSERT(example.grid.Is_MAC_Grid());
     if(example.restart)
@@ -90,7 +93,9 @@ Initialize()
         PHASE& ph=example.phases(i);
         ph.Initialize(example.grid,example.weights,example.ghost,example.threads);
         ph.phi.Resize(example.grid.Domain_Indices(example.ghost));
-        if(example.use_phi) ph.levelset=new LEVELSET<TV>(example.grid,ph.phi,example.ghost);}
+        if(example.use_phi){
+            ph.levelset=new LEVELSET<TV>(example.grid,ph.phi,example.ghost);
+            ph.levelset->boundary=&example.periodic_boundary;}}
 
     RANGE<TV_INT> range(example.grid.Cell_Indices(example.ghost));
     example.location.Resize(example.grid,example.ghost);
@@ -266,6 +271,9 @@ Particle_To_Grid(PHASE& ph) const
     }
     flat_h.Combine();
     indices_h.Combine();
+    Fix_Periodic(ph.mass);
+    Fix_Periodic(ph.velocity);
+    Fix_Periodic(ph.volume);
     if(example.flip) ph.velocity_save=ph.velocity; 
 }
 //#####################################################################
@@ -369,7 +377,14 @@ Grid_To_Particle(const PHASE& ph)
             if(use_flip) particles.V(p)=(1-example.flip)*h.V+example.flip*(particles.V(p)+h.flip_V);
             else particles.V(p)=h.V;
 
-            if(!example.grid.domain.Lazy_Inside(particles.X(p))) particles.valid(p)=false;
+            for(int i=0;i<TV::m;i++){
+                T &x=particles.X(p)(i),a=example.grid.domain.min_corner(i),b=example.grid.domain.max_corner(i);
+                if(x<a){
+                    if(example.bc_type(2*i)==example.BC_PERIODIC) x=wrap(x,a,b);
+                    else if(example.bc_type(2*i)==example.BC_INVALID) particles.valid(p)=false;}
+                if(x>b){
+                    if(example.bc_type(2*i+1)==example.BC_PERIODIC) x=wrap(x,a,b);
+                    else if(example.bc_type(2*i+1)==example.BC_INVALID) particles.valid(p)=false;}}
         });
 }
 //#####################################################################
@@ -549,7 +564,8 @@ Compute_Poisson_Matrix()
                         example.phases(p).velocity(it.Full_Index())=v;
                 break;}}
         psi_N(it.Full_Index())=N;}
-
+    Fix_Periodic(psi_N);
+    
     example.projection_system.dc_present=false;
     ARRAY<int,TV_INT> cell_index(example.grid.Domain_Indices(1),true,-1);
     ARRAY<PHASE_ID,TV_INT> cell_phase(example.grid.Domain_Indices(1),false);
@@ -574,6 +590,7 @@ Compute_Poisson_Matrix()
         if(!all_N && !dirichlet){
             cell_index(it.index)=next_cell++;
             cell_phase(it.index)=phase;}}
+    Fix_Periodic(cell_index,1);
 
     example.projection_system.A.Reset(next_cell);
     ARRAY<int> tmp0,tmp1;
@@ -703,6 +720,8 @@ Pressure_Projection()
     example.projection_system.gradient.Times(example.sol.v,tmp);
     for(int i=0;i<tmp.m;i++)
         example.phases(example.projection_system.phases(i)).velocity(example.projection_system.faces(i))-=tmp(i)/example.projection_system.mass(i);
+    for(PHASE_ID p(0);p<example.phases.m;p++)
+        Fix_Periodic(example.phases(p).velocity);
 }
 //#####################################################################
 // Function Apply_Forces
@@ -715,7 +734,8 @@ Apply_Forces()
         PHASE& ph=example.phases(p);
         for(int i=0;i<ph.valid_flat_indices.m;i++){
             int k=ph.valid_flat_indices(i);
-            ph.velocity.array(k)+=example.dt*example.gravity(ph.valid_indices(i).axis);}}
+            ph.velocity.array(k)+=example.dt*example.gravity(ph.valid_indices(i).axis);}
+        Fix_Periodic(ph.velocity);}
 }
 //#####################################################################
 // Function Compute_Dt
@@ -875,6 +895,27 @@ Prepare_Scatter()
 {
     for(PHASE_ID i(0);i<example.phases.m;i++)
         example.phases(i).gather_scatter->Prepare_Scatter(example.particles);
+}
+//#####################################################################
+// Function Fix_Periodic
+//#####################################################################
+template<class TV> template<class T2> void MPM_MAC_DRIVER<TV>::
+Fix_Periodic(ARRAY<T2,TV_INT>& u,int ghost) const
+{
+    if(!example.bc_type.Contains(example.BC_PERIODIC)) return;
+    if(ghost==INT_MAX) ghost=example.ghost;
+    Fill_Ghost_Cells_Periodic(example.grid,u,u,example.periodic_boundary.is_periodic,ghost);
+}
+//#####################################################################
+// Function Fix_Periodic
+//#####################################################################
+template<class TV> template<class T2> void MPM_MAC_DRIVER<TV>::
+Fix_Periodic(ARRAY<T2,FACE_INDEX<TV::m> >& u,int ghost) const
+{
+    if(!example.bc_type.Contains(example.BC_PERIODIC)) return;
+    if(ghost==INT_MAX) ghost=example.ghost;
+    Apply_Boundary_Condition_Face_Periodic(example.grid,u,example.periodic_boundary.is_periodic);
+    Fill_Ghost_Faces_Periodic(example.grid,u,u,example.periodic_boundary.is_periodic,ghost);
 }
 //#####################################################################
 namespace PhysBAM{

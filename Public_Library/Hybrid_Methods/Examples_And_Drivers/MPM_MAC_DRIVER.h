@@ -7,6 +7,7 @@
 #include <Core/Vectors/VECTOR.h>
 #include <Grid_Tools/Grids/FACE_INDEX.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
+#include <climits>
 namespace PhysBAM{
 
 template<class TV> class MPM_MAC_EXAMPLE;
@@ -60,6 +61,8 @@ public:
     T Compute_Volume_For_Face(const FACE_INDEX<TV::m>& face) const;
     void Move_Mass_Momentum_Inside(PHASE& ph) const;
     void Move_Mass_Momentum_Inside_Nearest(PHASE& ph) const;
+    template<class T2> void Fix_Periodic(ARRAY<T2,TV_INT>& u,int ghost=INT_MAX) const;
+    template<class T2> void Fix_Periodic(ARRAY<T2,FACE_INDEX<TV::m> >& u,int ghost=INT_MAX) const;
 //#####################################################################
 };
 }

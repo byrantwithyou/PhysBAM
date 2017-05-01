@@ -24,6 +24,7 @@ template<class TV> class PROJECTION_UNIFORM;
 template<class TV> class MPM_PROJECTION_SYSTEM;
 template<class TV> class MPM_PROJECTION_VECTOR;
 template<class TV> class KRYLOV_VECTOR_BASE;
+template<class TV,class T2> class BOUNDARY_MAC_GRID_PERIODIC;
 
 template<class TV>
 class MPM_MAC_EXAMPLE
@@ -34,7 +35,8 @@ public:
     typedef typename MPM_COLLISION_OBJECT<TV>::COLLISION_TYPE COLLISION_TYPE;
     GRID<TV> grid;
     STREAM_TYPE stream_type;
-
+    enum BC_TYPE {BC_INVALID, BC_WALL, BC_PERIODIC};
+    
     struct PHASE
     {
         ARRAY<T,FACE_INDEX<TV::m> > mass,volume;
@@ -70,6 +72,8 @@ public:
     MPM_PROJECTION_VECTOR<TV>& sol;
     MPM_PROJECTION_VECTOR<TV>& rhs;
     int ghost;
+    VECTOR<BC_TYPE,TV::m*2> bc_type; // -x, +x, -y, +y, -z, +z
+    BOUNDARY_MAC_GRID_PERIODIC<TV,T>& periodic_boundary;
 
     // transfer stuff
     VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m> weights;
