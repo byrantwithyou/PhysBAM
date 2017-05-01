@@ -58,7 +58,6 @@ public:
     void Print_Particle_Stats(const char* str,T dt);
     void Print_Energy_Stats(const char* str);
     void Compute_Poisson_Matrix();
-    T Compute_Volume_For_Face(const FACE_INDEX<TV::m>& face) const;
     void Move_Mass_Momentum_Inside(PHASE& ph) const;
     void Move_Mass_Momentum_Inside_Nearest(PHASE& ph) const;
     template<class T2> void Fix_Periodic(ARRAY<T2,TV_INT>& u,int ghost=INT_MAX) const;

@@ -78,8 +78,11 @@ Initialize()
     output_number=current_frame=example.restart;
 
     example.Initialize();
-    for(int i=0;i<TV::m;i++)
-        example.periodic_boundary.is_periodic(i)=example.bc_type(i)==example.BC_PERIODIC;
+    for(int i=0;i<TV::m;i++){
+        bool a=example.bc_type(i*2)==example.BC_PERIODIC;
+        bool b=example.bc_type(i*2+1)==example.BC_PERIODIC;
+        PHYSBAM_ASSERT(a==b);
+        example.periodic_boundary.is_periodic(i)=a;}
 
     PHYSBAM_ASSERT(example.grid.Is_MAC_Grid());
     if(example.restart)
@@ -397,33 +400,6 @@ Grid_To_Particle()
         Grid_To_Particle(example.phases(i));
 }
 //#####################################################################
-// Function Compute_Volume_For_Face
-//#####################################################################
-template<class TV> typename TV::SCALAR MPM_MAC_DRIVER<TV>::
-Compute_Volume_For_Face(const FACE_INDEX<TV::m>& face) const
-{
-    TIMER_SCOPE_FUNC;
-    T total_volume=0;
-    int num=0;
-    int width=example.weights(face.axis)->Order()+1;
-    RANGE<TV_INT> range(TV_INT(),TV_INT()+width*2);
-    for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
-        TV X=example.grid.dX*(TV(it.index-width)*(T).5+(T).25);
-        TV Y=example.grid.Face(face)+X;
-        bool in=false;
-        for(int i=0;i<example.collision_objects.m;i++){
-            MPM_COLLISION_OBJECT<TV>* o=example.collision_objects(i);
-            if(o->Phi(Y,example.time)<0){
-                Add_Debug_Particle(example.grid.Face(face),VECTOR<T,3>(.5,.5,.5));
-                in=true;
-                break;}}
-        if(in) continue;
-        T weight=example.weights(face.axis)->Weight(X);
-        num++;
-        total_volume+=weight;}
-    return total_volume;
-}
-//#####################################################################
 // Function Move_Mass_Momentum_Inside
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
@@ -550,19 +526,33 @@ Compute_Poisson_Matrix()
         example.weights(i)->Compute(example.grid.Face(FACE_INDEX<TV::m>(i,TV_INT())),scratch(i),false);
     ARRAY<bool,FACE_INDEX<TV::m> > psi_N(example.grid,3,false);
 
+    VECTOR<RANGE<TV_INT>,TV::m> domains;
+    for(int i=0;i<TV::m;i++){
+        domains(i)=example.grid.Domain_Indices();
+        domains(i).min_corner(i)++;}
 #pragma omp parallel
     for(FACE_ITERATOR_THREADED<TV> it(example.grid,3);it.Valid();it.Next()){
-        TV X=it.Location();
         bool N=false;
-        for(int i=0;i<example.collision_objects.m;i++){
-            MPM_COLLISION_OBJECT<TV>* o=example.collision_objects(i);
-            if(o->Phi(X,example.time)<0){
+        for(int i=0;i<TV::m;i++){
+            if((it.index(i)<domains(it.axis).min_corner(i) && example.bc_type(2*i)==example.BC_WALL) ||
+                (it.index(i)>=domains(it.axis).max_corner(i) && example.bc_type(2*i+1)==example.BC_WALL)){
                 N=true;
-                T v=o->Velocity(X,example.time)(it.axis);
                 for(PHASE_ID p(0);p<example.phases.m;p++)
                     if(example.phases(p).mass(it.Full_Index()))
-                        example.phases(p).velocity(it.Full_Index())=v;
+                        example.phases(p).velocity(it.Full_Index())=0;
                 break;}}
+        TV X=it.Location();
+        if(!N)
+            for(int i=0;i<example.collision_objects.m;i++){
+                MPM_COLLISION_OBJECT<TV>* o=example.collision_objects(i);
+                if(o->Phi(X,example.time)<0){
+                    N=true;
+                    T v=o->Velocity(X,example.time)(it.axis);
+                    for(PHASE_ID p(0);p<example.phases.m;p++)
+                        if(example.phases(p).mass(it.Full_Index()))
+                            example.phases(p).velocity(it.Full_Index())=v;
+                    break;}}
+        if(N) Add_Debug_Particle(X,VECTOR<T,3>(0,1,1));
         psi_N(it.Full_Index())=N;}
     Fix_Periodic(psi_N);
     
