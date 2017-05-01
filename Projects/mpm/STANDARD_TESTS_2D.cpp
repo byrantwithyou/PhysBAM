@@ -18,6 +18,7 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INTERSECTION.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INVERT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UNION.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UTILITIES.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Seeding/POISSON_DISK.h>
 #include <Geometry/Tessellation/SPHERE_TESSELLATION.h>
@@ -46,27 +47,6 @@
 #include "POUR_SOURCE.h"
 #include "STANDARD_TESTS_2D.h"
 namespace PhysBAM{
-//#####################################################################
-// Function Initialize_Implicit_Surface
-//
-// This was copied from DEFORMABLES_STANDARD_TESTS.cpp
-// TODO: put this function somewhere more convenient (maybe as a constructor of LEVELSET_IMPLICIT_OBJECT?)
-//#####################################################################
-template<class T> LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >*
-Initialize_Implicit_Surface(TRIANGULATED_SURFACE<T>& surface,int max_res)
-{
-    typedef VECTOR<int,3> TV_INT;
-    LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >& undeformed_levelset=*LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >::Create();
-    surface.Update_Bounding_Box();
-    RANGE<VECTOR<T,3> > box=*surface.bounding_box;
-    GRID<VECTOR<T,3> >& ls_grid=undeformed_levelset.levelset.grid;
-    ARRAY<T,TV_INT>& phi=undeformed_levelset.levelset.phi;
-    ls_grid=GRID<VECTOR<T,3> >::Create_Grid_Given_Cell_Size(box,box.Edge_Lengths().Max()/max_res,false,5);
-    phi.Resize(ls_grid.Domain_Indices(3));
-    LEVELSET_MAKER_UNIFORM<VECTOR<T,3> >::Compute_Level_Set(surface,ls_grid,3,phi);
-    undeformed_levelset.Update_Box();
-    return &undeformed_levelset;
-}
 //#####################################################################
 // Constructor
 //#####################################################################

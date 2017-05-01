@@ -12,46 +12,6 @@
 #include "STANDARD_TESTS_3D.h"
 namespace PhysBAM{
 //#####################################################################
-// Function Initialize_Implicit_Surface
-//
-// This was copied from DEFORMABLES_STANDARD_TESTS.cpp
-// TODO: put this function somewhere more convenient (maybe as a constructor of LEVELSET_IMPLICIT_OBJECT?)
-//#####################################################################
-template<class T> LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >*
-Initialize_Implicit_Surface(TRIANGULATED_SURFACE<T>& surface,int max_res)
-{
-    typedef VECTOR<int,3> TV_INT;
-    LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >& undeformed_levelset=*LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >::Create();
-    surface.Update_Bounding_Box();
-    RANGE<VECTOR<T,3> > box=*surface.bounding_box;
-    GRID<VECTOR<T,3> >& ls_grid=undeformed_levelset.levelset.grid;
-    ARRAY<T,TV_INT>& phi=undeformed_levelset.levelset.phi;
-    ls_grid=GRID<VECTOR<T,3> >::Create_Grid_Given_Cell_Size(box,box.Edge_Lengths().Max()/max_res,false,5);
-    phi.Resize(ls_grid.Domain_Indices(3));
-    LEVELSET_MAKER_UNIFORM<VECTOR<T,3> >::Compute_Level_Set(surface,ls_grid,3,phi);
-    undeformed_levelset.Update_Box();
-    return &undeformed_levelset;
-}
-//#####################################################################
-// Function Levelset_From_File
-//
-// TODO: put this function where it belongs
-//#####################################################################
-template<class T> LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* 
-Levelset_From_File(const std::string& filename,int max_resolution=200)
-{
-    TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-    Read_From_File(STREAM_TYPE(0.f),filename,*surface);
-    LOG::printf("Read mesh: %d triangle, %d particles\n",surface->mesh.elements.m,surface->particles.number);
-    surface->mesh.Initialize_Adjacent_Elements();
-    surface->mesh.Initialize_Neighbor_Nodes();
-    surface->mesh.Initialize_Incident_Elements();
-    surface->Update_Bounding_Box();
-    surface->Initialize_Hierarchy();
-    surface->Update_Triangle_List();
-    return Initialize_Implicit_Surface(*surface,max_resolution);
-}
-//#####################################################################
 // Constructor
 //#####################################################################
 template<class T> STANDARD_TESTS<VECTOR<T,3> >::

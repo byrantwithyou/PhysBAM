@@ -13,6 +13,7 @@
 #include <Geometry/Grids_Uniform_Computations/SEGMENTED_CURVE_2D_SIGNED_DISTANCE.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UTILITIES.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h>
 #include <Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
@@ -293,24 +294,6 @@ Substitute_Soft_Bindings_For_Nodes(T_OBJECT& object,SOFT_BINDINGS<TV>& soft_bind
         map_to_new_particles(node)=bound_node;
         soft_bindings.Add_Binding(VECTOR<int,2>(bound_node,node),use_impulses_for_collisions);}
     for(int i=0;i<object.mesh.elements.m;i++) object.mesh.elements(i)=map_to_new_particles.Subset(object.mesh.elements(i));
-}
-//#####################################################################
-// Function Initialize_Implicit_Surface
-//#####################################################################
-template<class TV> LEVELSET_IMPLICIT_OBJECT<TV>* DEFORMABLES_STANDARD_TESTS<TV>::
-Initialize_Implicit_Surface(T_SURFACE& surface,int max_res) const
-{
-    // undeformed levelset
-    LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*LEVELSET_IMPLICIT_OBJECT<TV>::Create();
-    surface.Update_Bounding_Box();
-    RANGE<TV>& box=*surface.bounding_box;
-    GRID<TV>& grid=undeformed_levelset.levelset.grid;
-    ARRAY<T,TV_INT>& phi=undeformed_levelset.levelset.phi;
-    grid=GRID<TV>::Create_Grid_Given_Cell_Size(box,box.Edge_Lengths().Max()/max_res,false,5);
-    phi.Resize(grid.Domain_Indices());
-    LEVELSET_MAKER_UNIFORM<TV>::Compute_Level_Set(surface,grid,0,phi);
-    undeformed_levelset.Update_Box();
-    return &undeformed_levelset;
 }
 //#####################################################################
 // Function Read_Or_Initialize_Implicit_Surface
@@ -675,7 +658,6 @@ template void DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::Set_Mass_Of_Particle
 template void DEFORMABLES_STANDARD_TESTS<VECTOR<float,1> >::Set_Mass_Of_Particles<SEGMENTED_CURVE<VECTOR<float,1> > >(SEGMENTED_CURVE<VECTOR<float,1> > const&,float,bool);
 template void DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::Create_Regular_Embedded_Surface(BINDING_LIST<VECTOR<float,3> >&,SOFT_BINDINGS<VECTOR<float,3> >&,
     TRIANGULATED_SURFACE<float>&,float,int,float,ARRAY<int,int>&,TRIANGULATED_SURFACE<float>**,TETRAHEDRALIZED_VOLUME<float>**,bool);
-template LEVELSET_IMPLICIT_OBJECT<VECTOR<float,3> >* DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::Initialize_Implicit_Surface(TRIANGULATED_SURFACE<float>&,int) const;
 template DEFORMABLES_STANDARD_TESTS<VECTOR<float,1> >::~DEFORMABLES_STANDARD_TESTS();
 template DEFORMABLES_STANDARD_TESTS<VECTOR<float,2> >::~DEFORMABLES_STANDARD_TESTS();
 template DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::~DEFORMABLES_STANDARD_TESTS();
@@ -688,7 +670,6 @@ template void DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::Set_Mass_Of_Particl
 template void DEFORMABLES_STANDARD_TESTS<VECTOR<double,1> >::Set_Mass_Of_Particles<SEGMENTED_CURVE<VECTOR<double,1> > >(SEGMENTED_CURVE<VECTOR<double,1> > const&,double,bool);
 template void DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::Create_Regular_Embedded_Surface(BINDING_LIST<VECTOR<double,3> >&,SOFT_BINDINGS<VECTOR<double,3> >&,
     TRIANGULATED_SURFACE<double>&,double,int,double,ARRAY<int,int>&,TRIANGULATED_SURFACE<double>**,TETRAHEDRALIZED_VOLUME<double>**,bool);
-template LEVELSET_IMPLICIT_OBJECT<VECTOR<double,3> >* DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::Initialize_Implicit_Surface(TRIANGULATED_SURFACE<double>&,int) const;
 template DEFORMABLES_STANDARD_TESTS<VECTOR<double,1> >::~DEFORMABLES_STANDARD_TESTS();
 template DEFORMABLES_STANDARD_TESTS<VECTOR<double,2> >::~DEFORMABLES_STANDARD_TESTS();
 template DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::~DEFORMABLES_STANDARD_TESTS();
@@ -702,8 +683,6 @@ template TETRAHEDRALIZED_VOLUME<double>& DEFORMABLES_STANDARD_TESTS<VECTOR<doubl
 template TETRAHEDRALIZED_VOLUME<float>& DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::Create_Cylinder(CYLINDER<float> const&,int,int,bool,RIGID_BODY_STATE<VECTOR<float,3> > const*,float);
 template BEZIER_SPLINE<VECTOR<float,2>,3>& DEFORMABLES_STANDARD_TESTS<VECTOR<float,2> >::Copy_And_Add_Structure<BEZIER_SPLINE<VECTOR<float,2>,3> >(BEZIER_SPLINE<VECTOR<float,2>,3>&,ARRAY<int,int>*,bool);
 template B_SPLINE<VECTOR<float,2>,3>& DEFORMABLES_STANDARD_TESTS<VECTOR<float,2> >::Copy_And_Add_Structure<B_SPLINE<VECTOR<float,2>,3> >(B_SPLINE<VECTOR<float,2>,3>&,ARRAY<int,int>*,bool);
-template LEVELSET_IMPLICIT_OBJECT<VECTOR<double,2> >* DEFORMABLES_STANDARD_TESTS<VECTOR<double,2> >::Initialize_Implicit_Surface(SEGMENTED_CURVE_2D<double>&,int) const;
-template LEVELSET_IMPLICIT_OBJECT<VECTOR<float,2> >* DEFORMABLES_STANDARD_TESTS<VECTOR<float,2> >::Initialize_Implicit_Surface(SEGMENTED_CURVE_2D<float>&,int) const;
 template OPENSUBDIV_SURFACE<VECTOR<double,3>,3>& DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::Copy_And_Add_Structure<OPENSUBDIV_SURFACE<VECTOR<double,3>,3> >(OPENSUBDIV_SURFACE<VECTOR<double,3>,3>&,ARRAY<int,int>*,bool);
 template OPENSUBDIV_SURFACE<VECTOR<float,3>,3>& DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::Copy_And_Add_Structure<OPENSUBDIV_SURFACE<VECTOR<float,3>,3> >(OPENSUBDIV_SURFACE<VECTOR<float,3>,3>&,ARRAY<int,int>*,bool);
 template void DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::Set_Mass_Of_Particles<3>(OPENSUBDIV_SURFACE<VECTOR<double,3>,3> const&,double,bool);

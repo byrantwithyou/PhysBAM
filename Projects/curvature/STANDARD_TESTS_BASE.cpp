@@ -7,6 +7,7 @@
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UTILITIES.h>
 #include <Geometry/Implicit_Objects/SMOOTH_LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
@@ -407,7 +408,7 @@ Initialize_Bodies_After()
                 DEFORMABLE_PARTICLES<TV>& undeformed_particles=*particles.Clone();
                 T_SURFACE& surface=object->Get_Boundary_Object();
                 T_SURFACE& undeformed_surface=*new T_SURFACE(surface.mesh,undeformed_particles);
-                LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*tests.Initialize_Implicit_Surface(undeformed_surface,10);
+                LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*Initialize_Implicit_Surface(undeformed_surface,10);
                 DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>* coll=
                     new DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,undeformed_particles,*object,
                         undeformed_surface,undeformed_levelset,penalty_collisions_stiffness,penalty_collisions_separation);

@@ -17,6 +17,7 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INTERSECTION.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INVERT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UNION.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UTILITIES.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
@@ -37,46 +38,6 @@
 #include "POUR_SOURCE.h"
 #include "STANDARD_TESTS_3D.h"
 namespace PhysBAM{
-//#####################################################################
-// Function Initialize_Implicit_Surface
-//
-// This was copied from DEFORMABLES_STANDARD_TESTS.cpp
-// TODO: put this function somewhere more convenient (maybe as a constructor of LEVELSET_IMPLICIT_OBJECT?)
-//#####################################################################
-template<class T> LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >*
-Initialize_Implicit_Surface(TRIANGULATED_SURFACE<T>& surface,int max_res)
-{
-    typedef VECTOR<int,3> TV_INT;
-    LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >& undeformed_levelset=*LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >::Create();
-    surface.Update_Bounding_Box();
-    RANGE<VECTOR<T,3> > box=*surface.bounding_box;
-    GRID<VECTOR<T,3> >& ls_grid=undeformed_levelset.levelset.grid;
-    ARRAY<T,TV_INT>& phi=undeformed_levelset.levelset.phi;
-    ls_grid=GRID<VECTOR<T,3> >::Create_Grid_Given_Cell_Size(box,box.Edge_Lengths().Max()/max_res,false,5);
-    phi.Resize(ls_grid.Domain_Indices(3));
-    LEVELSET_MAKER_UNIFORM<VECTOR<T,3> >::Compute_Level_Set(surface,ls_grid,3,phi);
-    undeformed_levelset.Update_Box();
-    return &undeformed_levelset;
-}
-//#####################################################################
-// Function Levelset_From_File
-//
-// TODO: put this function where it belongs
-//#####################################################################
-template<class T> LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* 
-Levelset_From_File(const std::string& filename,int max_resolution=200)
-{
-    TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-    Read_From_File(STREAM_TYPE(0.f),filename,*surface);
-    LOG::printf("Read mesh: %d triangle, %d particles\n",surface->mesh.elements.m,surface->particles.number);
-    surface->mesh.Initialize_Adjacent_Elements();
-    surface->mesh.Initialize_Neighbor_Nodes();
-    surface->mesh.Initialize_Incident_Elements();
-    surface->Update_Bounding_Box();
-    surface->Initialize_Hierarchy();
-    surface->Update_Triangle_List();
-    return Initialize_Implicit_Surface(*surface,max_resolution);
-}
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -1280,7 +1241,7 @@ Initialize()
             LOG::printf("REAL GRID: %P\n",grid);
 
             if(!friction_is_set)friction=0.5;
-            IMPLICIT_OBJECT<TV> *sandbox=Levelset_From_File<T>(data_directory+"/../Private_Data/sandbox_only.tri.gz");
+            IMPLICIT_OBJECT<TV> *sandbox=Levelset_From_Tri_File<T>(data_directory+"/../Private_Data/sandbox_only.tri.gz");
             Add_Collision_Object(sandbox,COLLISION_TYPE::stick,friction);
 
 
@@ -1305,7 +1266,7 @@ Initialize()
             T E=35.37e6*unit_p*scale_E,nu=.3;
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
 
-            LEVELSET_IMPLICIT_OBJECT<TV>* levelset=Levelset_From_File<T>(data_directory+"/../Private_Data/sanddune_square.tri.gz");
+            LEVELSET_IMPLICIT_OBJECT<TV>* levelset=Levelset_From_Tri_File<T>(data_directory+"/../Private_Data/sanddune_square.tri.gz");
             Seed_Particles(*levelset,0,0,density,particles_per_cell);
             LOG::printf("Particle count: %d\n",particles.number);
             Set_Lame_On_Particles(E,nu);
@@ -1323,7 +1284,7 @@ Initialize()
             LOG::printf("REAL GRID: %P\n",grid);
 
             if(!friction_is_set)friction=0.5;
-            IMPLICIT_OBJECT<TV> *sandbox=Levelset_From_File<T>(data_directory+"/../Private_Data/sandbox_butterfly_small.tri.gz");
+            IMPLICIT_OBJECT<TV> *sandbox=Levelset_From_Tri_File<T>(data_directory+"/../Private_Data/sandbox_butterfly_small.tri.gz");
             Add_Collision_Object(sandbox,COLLISION_TYPE::stick,friction);
 
 
@@ -1348,7 +1309,7 @@ Initialize()
             T E=35.37e6*unit_p*scale_E,nu=.3;
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
 
-            LEVELSET_IMPLICIT_OBJECT<TV>* levelset=Levelset_From_File<T>(data_directory+"/../Private_Data/sanddune_square.tri.gz");
+            LEVELSET_IMPLICIT_OBJECT<TV>* levelset=Levelset_From_Tri_File<T>(data_directory+"/../Private_Data/sanddune_square.tri.gz");
             IMPLICIT_OBJECT_INTERSECTION<TV> live_sand(levelset,new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV>>(live_box));
             live_sand.owns_io(0)=false;
             Seed_Particles(live_sand,0,0,density,particles_per_cell);
@@ -1368,10 +1329,10 @@ Initialize()
             if(!friction_is_set)friction=0.5;
             const TV start_pos(0.25*m,0,0);
 
-            IMPLICIT_OBJECT<TV> *sandbox=Levelset_From_File<T>(data_directory+"/../Private_Data/sandbox.tri.gz");
+            IMPLICIT_OBJECT<TV> *sandbox=Levelset_From_Tri_File<T>(data_directory+"/../Private_Data/sandbox.tri.gz");
             Add_Collision_Object(sandbox,COLLISION_TYPE::stick,friction);
 
-            LEVELSET_IMPLICIT_OBJECT<TV>* rake=Levelset_From_File<T>(data_directory+"/../Private_Data/rake.tri.gz");
+            LEVELSET_IMPLICIT_OBJECT<TV>* rake=Levelset_From_Tri_File<T>(data_directory+"/../Private_Data/rake.tri.gz");
 
             const T settle_wait(0.1);
             const T final_t(10);
@@ -1386,7 +1347,7 @@ Initialize()
             T E=35.37e6*unit_p*scale_E,nu=.3;
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
 
-            LEVELSET_IMPLICIT_OBJECT<TV>* levelset=Levelset_From_File<T>(data_directory+"/../Private_Data/sanddune_square.tri.gz");
+            LEVELSET_IMPLICIT_OBJECT<TV>* levelset=Levelset_From_Tri_File<T>(data_directory+"/../Private_Data/sanddune_square.tri.gz");
             Seed_Particles(*levelset,0,0,density,particles_per_cell);
             LOG::printf("Particle count: %d\n",particles.number);
             Set_Lame_On_Particles(E,nu);
@@ -1408,10 +1369,10 @@ Initialize()
             if(!friction_is_set)friction=0.5;
             const TV start_pos(0.25*m,0,0);
 
-            IMPLICIT_OBJECT<TV> *sandbox=Levelset_From_File<T>(data_directory+"/../Private_Data/sandbox_small.tri.gz");
+            IMPLICIT_OBJECT<TV> *sandbox=Levelset_From_Tri_File<T>(data_directory+"/../Private_Data/sandbox_small.tri.gz");
             Add_Collision_Object(sandbox,COLLISION_TYPE::stick,friction);
 
-            LEVELSET_IMPLICIT_OBJECT<TV>* rake=Levelset_From_File<T>(data_directory+"/../Private_Data/rake.tri.gz");
+            LEVELSET_IMPLICIT_OBJECT<TV>* rake=Levelset_From_Tri_File<T>(data_directory+"/../Private_Data/rake.tri.gz");
 
             const T settle_wait(0.1);
             const T final_t(10);
@@ -1426,7 +1387,7 @@ Initialize()
             T E=35.37e6*unit_p*scale_E,nu=.3;
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
 
-            LEVELSET_IMPLICIT_OBJECT<TV>* levelset=Levelset_From_File<T>(data_directory+"/../Private_Data/sanddune_square.tri.gz");
+            LEVELSET_IMPLICIT_OBJECT<TV>* levelset=Levelset_From_Tri_File<T>(data_directory+"/../Private_Data/sanddune_square.tri.gz");
             Seed_Particles(*levelset,0,0,density,particles_per_cell);
             LOG::printf("Particle count: %d\n",particles.number);
             Set_Lame_On_Particles(E,nu);
@@ -1881,7 +1842,7 @@ Initialize()
             else Add_Collision_Object(box,COLLISION_TYPE::stick,0); // THE BOX IS STICKY
             // ----------------- SHOVEL ----------------------------------------
             LOG::cout<<"READING SHOVEL AND CONVERTING TO LEVELSET COLLISION OBJECT..."<<std::endl;
-            LEVELSET_IMPLICIT_OBJECT<TV>* shovel=Levelset_From_File<T>(data_directory+"/../Private_Data/shovel.tri.gz",400); // MAY NEED HIGHRES TO CAPTURE THIN SHELL 
+            LEVELSET_IMPLICIT_OBJECT<TV>* shovel=Levelset_From_Tri_File<T>(data_directory+"/../Private_Data/shovel.tri.gz",400); // MAY NEED HIGHRES TO CAPTURE THIN SHELL 
             TV vA((1.0/100.0)/(1.0/24.0),(-1.0/200.0)/(1.0/24.0),0);
             TV vB((1.0/200.0)/(1.0/24.0),(1.0/120.0)/(1.0/24.0),0);
             TV critical_location(0.24,-0.12,0);

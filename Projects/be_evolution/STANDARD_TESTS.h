@@ -79,6 +79,7 @@
 #include <Geometry/Constitutive_Models/STRAIN_MEASURE.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UTILITIES.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/SMOOTH_LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
@@ -2315,7 +2316,7 @@ void Initialize_Bodies() override
                 if(!tetrahedralized_volume.triangulated_surface) tetrahedralized_volume.Initialize_Triangulated_Surface();
                 TRIANGULATED_SURFACE<T>* triangulated_surface=tetrahedralized_volume.triangulated_surface;
                 TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface=*(new TRIANGULATED_SURFACE<T>(triangulated_surface->mesh,undeformed_particles));
-                LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*tests.Initialize_Implicit_Surface(undeformed_triangulated_surface,10);
+                LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*Initialize_Implicit_Surface(undeformed_triangulated_surface,10);
                 DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>* coll=new DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>(particles,undeformed_particles,tetrahedralized_volume,
                     undeformed_triangulated_surface,undeformed_levelset,penalty_collisions_stiffness,penalty_collisions_separation);
                 if(self_collide_surface_only){
@@ -2327,7 +2328,7 @@ void Initialize_Bodies() override
                 LEVELSET_VOLUME_COLLISIONS<TV>* lvc=new LEVELSET_VOLUME_COLLISIONS<TV>(particles,penalty_collisions_stiffness);
                 for(int b=0;b<deformable_body_collection.structures.m;b++){
                     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(b);
-                    LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*tests.Initialize_Implicit_Surface(tetrahedralized_volume.Get_Boundary_Object(),20);
+                    LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*Initialize_Implicit_Surface(tetrahedralized_volume.Get_Boundary_Object(),20);
                     lvc->Add_Mesh(tetrahedralized_volume,undeformed_levelset);
                     delete &undeformed_levelset;}
                 int force_id=solid_body_collection.Add_Force(lvc);
