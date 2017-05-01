@@ -167,6 +167,24 @@ Initialize()
             SPHERE<TV> sph(TV(.5,.5)*m,.4*m);
             Add_Collision_Object(Invert(Make_IO(sph)),COLLISION_TYPE::slip,0,0,0);
         } break;
+        case 14:{ // rotating circle (periodic test)
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            VECTOR<T,1> angular_velocity(0.4/s);
+            T density=2*unit_rho*scale_mass;
+            for(int i=0;i<2;i++)
+                for(int j=0;j<2;j++){
+                    TV c(i*m,j*m);
+                    auto io=Intersect(Make_IO(SPHERE<TV>(c,.3*m)),Make_IO(grid.domain));
+                    Seed_Particles(*io,
+                        [=](const TV& X){return angular_velocity.Cross(X-c);},
+                        [=](const TV&){return MATRIX<T,2>::Cross_Product_Matrix(angular_velocity);},
+                        density,particles_per_cell);
+                    delete io;}
+            T total_mass=particles.mass.Sum();
+            TV total_momentum=particles.V.Weighted_Sum(particles.mass);
+            TV dV=total_momentum/total_mass;
+            particles.V-=dV;
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     phases.Resize(number_phases);
