@@ -61,7 +61,9 @@ Initialize()
             T density=2*unit_rho*scale_mass;
             Seed_Particles(sphere,0,0,density,particles_per_cell);
         } break;
-        case 2:{ // translating circle
+        case 2:    
+        case 15:{ // translating circle
+            if(test_number==2) bc_type.Fill(BC_INVALID);
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             SPHERE<TV> sphere(TV(.5,.5)*m,.3*m);
             T density=2*unit_rho*scale_mass;

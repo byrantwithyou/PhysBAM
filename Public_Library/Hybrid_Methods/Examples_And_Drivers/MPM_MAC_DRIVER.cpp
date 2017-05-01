@@ -552,7 +552,6 @@ Compute_Poisson_Matrix()
                         if(example.phases(p).mass(it.Full_Index()))
                             example.phases(p).velocity(it.Full_Index())=v;
                     break;}}
-        if(N) Add_Debug_Particle(X,VECTOR<T,3>(0,1,1));
         psi_N(it.Full_Index())=N;}
     Fix_Periodic(psi_N);
     
