@@ -26,7 +26,7 @@ public:
     const ARRAY<T,TV_INT>* phi;
 
     BOUNDARY_MAC_GRID_SOLID_WALL_SLIP(const TV_SIDES& constant_extrapolation=TV_SIDES());
-    ~BOUNDARY_MAC_GRID_SOLID_WALL_SLIP();
+    ~BOUNDARY_MAC_GRID_SOLID_WALL_SLIP() = default;
 
     void Set_Phi(ARRAY<T,TV_INT>& phi_input)
     {phi=&phi_input;}

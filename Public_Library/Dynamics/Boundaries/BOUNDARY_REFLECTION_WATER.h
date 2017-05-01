@@ -36,6 +36,8 @@ public:
         Set_Tolerance();
     }
 
+    ~BOUNDARY_REFLECTION_WATER() = default;
+
     void Use_Extrapolation_Mode(const bool use=true)
     {use_extrapolation_mode=use;}
 

@@ -21,12 +21,8 @@ class BOUNDARY_LINEAR_EXTRAPOLATION:public BOUNDARY<TV,T2>
 public:
     using BASE::Find_Ghost_Regions;using BASE::Boundary;
 
-    BOUNDARY_LINEAR_EXTRAPOLATION()
-    {}
-
-    virtual ~BOUNDARY_LINEAR_EXTRAPOLATION()
-    {}
-
+    BOUNDARY_LINEAR_EXTRAPOLATION() = default;
+    virtual ~BOUNDARY_LINEAR_EXTRAPOLATION() = default;
 //#####################################################################
     void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) const override;
     void Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u,const T time) const override {} // do nothing

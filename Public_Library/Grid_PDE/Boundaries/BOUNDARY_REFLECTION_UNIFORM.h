@@ -25,6 +25,8 @@ public:
         Set_Constant_Extrapolation(constant_extrapolation);
     }
 
+    ~BOUNDARY_REFLECTION_UNIFORM() = default;
+
 //#####################################################################
     virtual void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) const override;
     virtual void Fill_Single_Ghost_Region(const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const RANGE<TV_INT>& region,const int side,const T dt,const T time,const int number_of_ghost_cells=3) const override ;

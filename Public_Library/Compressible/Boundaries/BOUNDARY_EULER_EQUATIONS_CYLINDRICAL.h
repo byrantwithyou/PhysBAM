@@ -23,8 +23,8 @@ class BOUNDARY_EULER_EQUATIONS_CYLINDRICAL:public BOUNDARY<VECTOR<T_input,2>,VEC
     typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<T,4> TV_DIMENSION;typedef VECTOR<int,2> TV_INT;
     enum {d=4};
 public:
-    BOUNDARY_EULER_EQUATIONS_CYLINDRICAL()
-    {}
+    BOUNDARY_EULER_EQUATIONS_CYLINDRICAL() = default;
+    ~BOUNDARY_EULER_EQUATIONS_CYLINDRICAL() = default;
 
 //#####################################################################
     void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<TV_DIMENSION,VECTOR<int,2> >& u,ARRAYS_ND_BASE<TV_DIMENSION,VECTOR<int,2> >& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) const override;

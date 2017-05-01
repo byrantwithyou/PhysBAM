@@ -34,7 +34,7 @@ public:
     BOUNDARY();
     BOUNDARY(const BOUNDARY&) = delete;
     void operator=(const BOUNDARY&) = delete;
-    virtual ~BOUNDARY();
+    virtual ~BOUNDARY() = default;
 
     virtual void Set_Constant_Extrapolation(const TV_SIDES& constant_extrapolation_input=TV_SIDES::Constant_Vector(VECTOR<bool,2>::Constant_Vector(true)))
     {constant_extrapolation=constant_extrapolation_input;}

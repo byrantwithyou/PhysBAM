@@ -7,15 +7,14 @@
 #include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Incompressible/Boundaries/BOUNDARY_MAC_GRID_SOLID_WALL_SLIP.h>
 using namespace PhysBAM;
+//#####################################################################
+// Constructor
+//#####################################################################
 template<class TV> BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<TV>::
 BOUNDARY_MAC_GRID_SOLID_WALL_SLIP(const TV_SIDES& constant_extrapolation)
     :phi(0)
 {
     Set_Constant_Extrapolation(constant_extrapolation);
-}
-template<class TV> BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<TV>::
-~BOUNDARY_MAC_GRID_SOLID_WALL_SLIP()
-{
 }
 //#####################################################################
 // Function Fill_Ghost_Faces

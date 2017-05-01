@@ -34,7 +34,7 @@ private:
 public:
 
     BOUNDARY_PHI_WATER(const TV_SIDES& constant_extrapolation=TV_SIDES());
-    ~BOUNDARY_PHI_WATER();
+    ~BOUNDARY_PHI_WATER() = default;
 
     void Use_Extrapolation_Mode(const bool use=true)
     {use_extrapolation_mode=use;}

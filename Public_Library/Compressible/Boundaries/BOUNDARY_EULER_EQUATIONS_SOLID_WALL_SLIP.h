@@ -42,6 +42,8 @@ public:
         const bool always_attenuate_input=false,const T_FACE_VECTOR linear_attenuations_input=T_FACE_VECTOR(),
         const T_FACE_VECTOR_BOOL linear_attenuation_faces_input=T_FACE_VECTOR_BOOL());
 
+    ~BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP() = default;
+
 //#####################################################################
     void Attenuate_To_Far_Field_Values_Using_Riemann_Invariants(const T_ARRAYS_DIMENSION_BASE& u_ghost,const TV_INT& node_index,const int side,TV_DIMENSION &U,const T dt) const;
     void Attenuate_To_Far_Field_Values_Using_Characteristics(const T_ARRAYS_DIMENSION_BASE& u_ghost,const TV_INT& node_index,const int side,TV_DIMENSION &U,const T dt) const;

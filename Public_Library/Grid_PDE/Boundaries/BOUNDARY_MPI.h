@@ -28,7 +28,7 @@ public:
     BOUNDARY<TV,T2>& boundary;
 
     BOUNDARY_MPI(T_MPI_GRID* mpi_grid_input,BOUNDARY<TV,T2>& boundary_input);
-    ~BOUNDARY_MPI();
+    ~BOUNDARY_MPI() = default;
 
     void Set_Constant_Extrapolation(const TV_SIDES& constant_extrapolation_input=TV_SIDES::Constant_Vector(TV_BOOL2::Constant_Vector(true))) override;
     bool Constant_Extrapolation(const int side) const override;

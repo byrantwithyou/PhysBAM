@@ -15,13 +15,6 @@ BOUNDARY_MPI(T_MPI_GRID* mpi_grid_input,BOUNDARY<TV,T2>& boundary_input)
     assert(&boundary);
 }
 //#####################################################################
-// Destructor
-//#####################################################################
-template<class TV,class T2> BOUNDARY_MPI<TV,T2>::
-~BOUNDARY_MPI()
-{
-}
-//#####################################################################
 // Function Set_Constant_Extrapolation
 //#####################################################################
 template<class TV,class T2> void BOUNDARY_MPI<TV,T2>::

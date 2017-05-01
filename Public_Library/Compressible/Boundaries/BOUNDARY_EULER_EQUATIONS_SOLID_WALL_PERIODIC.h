@@ -37,6 +37,8 @@ public:
         Turn_Off_Constant_Extrapolation();
     }
 
+    ~BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC() = default;
+
 //#####################################################################
     // void Fill_Ghost_Cells_Helper(const GRID<TV>& grid,const ARRAY<VECTOR<T,3> ,VECTOR<int,1> >& u,ARRAY<VECTOR<T,3> ,VECTOR<int,1> >& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) const;
     // void Fill_Ghost_Cells_Helper(const GRID<TV>& grid,const ARRAY<VECTOR<T,4> ,VECTOR<int,2> >& u,ARRAY<VECTOR<T,4> ,VECTOR<int,2> >& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) const;

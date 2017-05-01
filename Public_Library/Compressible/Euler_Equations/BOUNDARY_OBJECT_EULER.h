@@ -22,11 +22,8 @@ class BOUNDARY_OBJECT_EULER:public BOUNDARY_OBJECT<TV,VECTOR<typename TV::SCALAR
     enum{d=TV::m+2};
 public:
 
-    BOUNDARY_OBJECT_EULER()
-    {}
-
-    ~BOUNDARY_OBJECT_EULER()
-    {}
+    BOUNDARY_OBJECT_EULER() = default;
+    ~BOUNDARY_OBJECT_EULER() = default;
 //#####################################################################
     void Apply_Neumann_Boundary_Condition(TV_DIMENSION& u_1d,const T neumann_face_velocity,const int axis) override;
     void Apply_Neumann_Boundary_Condition(T_ARRAYS_ELEMENT& u_1d,const TV& normal,const T object_velocity_normal_component) override;

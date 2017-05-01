@@ -24,8 +24,7 @@ public:
     BOUNDARY_OBJECT_REFLECTION(const bool flip_input=false)
     {flip=flip_input;}
 
-    ~BOUNDARY_OBJECT_REFLECTION()
-    {}
+    ~BOUNDARY_OBJECT_REFLECTION() = default;
 
     void Set_Flip(const bool flip_input)
     {flip=flip_input;}

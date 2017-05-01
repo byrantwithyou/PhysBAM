@@ -40,7 +40,7 @@ public:
         open_boundary(5)=back_open_boundary_input;
     }
 
-    ~BOUNDARY_OPEN_WATER(){}
+    ~BOUNDARY_OPEN_WATER() = default;
 
 public:
 

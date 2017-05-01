@@ -23,12 +23,6 @@ BOUNDARY_PHI_WATER(const TV_SIDES& constant_extrapolation)
     Set_Tolerance();
 }
 //#####################################################################
-// Destructor
-//#####################################################################
-template<class TV> BOUNDARY_PHI_WATER<TV>::
-~BOUNDARY_PHI_WATER()
-{}
-//#####################################################################
 // Function Fill_Ghost_Cells
 //#####################################################################
 template<class TV> void BOUNDARY_PHI_WATER<TV>::

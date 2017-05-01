@@ -16,11 +16,8 @@ class BOUNDARY_EXTRAPOLATE_CELL:public BOUNDARY<TV,T2>
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
 public:
 
-    BOUNDARY_EXTRAPOLATE_CELL()
-    {}
-
-    virtual ~BOUNDARY_EXTRAPOLATE_CELL()
-    {}
+    BOUNDARY_EXTRAPOLATE_CELL() = default;
+    virtual ~BOUNDARY_EXTRAPOLATE_CELL() = default;
 
 //#####################################################################
     void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) const override;

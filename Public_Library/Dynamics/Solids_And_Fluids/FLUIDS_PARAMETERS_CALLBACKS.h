@@ -27,10 +27,8 @@ class FLUIDS_PARAMETERS_CALLBACKS:public BOUNDARY_CONDITIONS_CALLBACKS<TV>
     typedef VECTOR<int,TV::m> TV_INT;
 public:
 
-    FLUIDS_PARAMETERS_CALLBACKS()
-    {}
-
-    virtual ~FLUIDS_PARAMETERS_CALLBACKS();
+    FLUIDS_PARAMETERS_CALLBACKS() = default;
+    virtual ~FLUIDS_PARAMETERS_CALLBACKS() = default;
 
 //#####################################################################
     virtual void Initialize_Phi();

@@ -22,8 +22,8 @@ class BOUNDARY_EULER_EQUATIONS_SPHERICAL:public BOUNDARY<VECTOR<T_input,1>,VECTO
 {
     typedef T_input T;typedef VECTOR<T,1> TV;typedef VECTOR<T,3> TV_DIMENSION;typedef VECTOR<int,1> TV_INT;typedef ARRAYS_ND_BASE<TV_DIMENSION,VECTOR<int,1> > T_ARRAYS_DIMENSION_BASE;
 public:
-    BOUNDARY_EULER_EQUATIONS_SPHERICAL() 
-    {}
+    BOUNDARY_EULER_EQUATIONS_SPHERICAL() = default;
+    ~BOUNDARY_EULER_EQUATIONS_SPHERICAL() = default;
 
 //#####################################################################
     void Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_DIMENSION_BASE& u,T_ARRAYS_DIMENSION_BASE& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) const override;
