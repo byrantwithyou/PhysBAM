@@ -190,16 +190,18 @@ Initialize()
             bc_type.Fill(BC_PERIODIC);
         } break;
         case 16:{ // Initialize velocity field as Taylor-Green Vortex
+            // To specify parameters, use: -I a -I b
+            int a=extra_int.m>=1?extra_int(0):2;
+            int b=extra_int.m>=2?extra_int(1):2;
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             T density=2*unit_rho*scale_mass;
-            T PI=3.1415926535;
-            auto V_func=[this,PI](const TV& pos){
-                T x=(pos.x-0.1)/0.8*PI;
-                T y=(pos.y-0.1)/0.8*PI;
+            auto V_func=[=](const TV& pos){
+                T x=(pos.x-0.1)/0.8*pi;
+                T y=(pos.y-0.1)/0.8*pi;
                 return TV(-sin(a*x)*cos(b*y),cos(a*x)*sin(b*y));};
-            auto dV_func=[this,PI](const TV& pos){
-                T x=(pos.x-0.1)/0.8*PI;
-                T y=(pos.y-0.1)/0.8*PI;
+            auto dV_func=[=](const TV& pos){
+                T x=(pos.x-0.1)/0.8*pi;
+                T y=(pos.y-0.1)/0.8*pi;
                 return MATRIX<T,2>(-a*cos(a*x)*cos(b*y),b*sin(a*x)*sin(b*y),-a*sin(a*x)*sin(b*y),b*cos(a*x)*cos(b*y));};
             Seed_Particles(RANGE<TV>(TV(.1*m,.1*m),TV(.9*m,.9*m)),V_func,dV_func,density,particles_per_cell);
             Add_Walls(-1,COLLISION_TYPE::slip,.1*m);
