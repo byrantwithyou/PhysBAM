@@ -39,7 +39,7 @@ public:
     using BASE::forced_collision_type;using BASE::destroy;using BASE::collision_objects;
     using BASE::write_output_files;using BASE::read_output_files;using BASE::begin_frame;
     using BASE::end_frame;using BASE::begin_time_step;using BASE::end_time_step;
-    using BASE::dump_collision_objects;using BASE::Perturb;using BASE::Uniform;using BASE::extra_T;
+    using BASE::dump_collision_objects;using BASE::extra_T;
     using BASE::extra_int;using BASE::phases;
 
 

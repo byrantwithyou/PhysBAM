@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Math_Tools/RANGE_ITERATOR.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/NODE_ITERATOR.h>
@@ -29,7 +30,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     :MPM_MAC_EXAMPLE<TV>(stream_type_input),test_number(0),resolution(32),user_resolution(false),stored_last_frame(0),
     user_last_frame(false),order(2),seed(1234),particles_per_cell(1<<TV::m),regular_seeding(false),
     no_regular_seeding(false),scale_mass(1),override_output_directory(false),
-    m(1),s(1),kg(1),forced_collision_type(-1),write_output_files(0),read_output_files(0),dump_collision_objects(false)
+    m(1),s(1),kg(1),forced_collision_type(-1),write_output_files(0),read_output_files(0),dump_collision_objects(false),test_diff(false)
 {
     T framerate=24;
     bool use_quasi_exp_F_update=false;
@@ -78,6 +79,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-test_output_prefix",&test_output_prefix,&use_test_output,"","prefix to use for test output");
     parse_args.Add_Not("-no_preconditioner",&this->projection_system.use_preconditioner,"disable preconditioner");
     parse_args.Add("-flip",&flip,"frac","Use this fraction of flip in transfers");
+    parse_args.Add("-test_diff",&test_diff,"test analytic derivatives");
 
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);
@@ -160,6 +162,8 @@ template<class TV> void STANDARD_TESTS_BASE<TV>::
 Seed_Particles(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
     std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,T particles_per_cell)
 {
+    if(test_diff) Test_dV(V,dV);
+
     if(!regular_seeding) return Seed_Particles_Poisson(object,V,dV,density,particles_per_cell);
 
     object.Update_Box();
@@ -169,22 +173,6 @@ Seed_Particles(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
     T scale=pow<1,TV::m>((T)particles_per_cell);
     GRID<TV> seed_grid(range.Edge_Lengths()*scale,RANGE<TV>(LB,UB),true);
     Seed_Particles_Uniform(object,V,dV,density,seed_grid);
-}
-//#####################################################################
-// Function Perturb
-//#####################################################################
-template<class TV> auto STANDARD_TESTS_BASE<TV>::
-Perturb(T a) -> T
-{
-    return random.Get_Uniform_Number(1-a,1+a);
-}
-//#####################################################################
-// Function Uniform
-//#####################################################################
-template<class TV> auto STANDARD_TESTS_BASE<TV>::
-Uniform(T a,T b) -> T
-{
-    return random.Get_Uniform_Number(a,b);
 }
 //#####################################################################
 // Function Add_Particle
@@ -243,6 +231,25 @@ Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale,TV_INT resolution_paddi
     int scaled_resolution=(resolution+resolution_multiple-1)/resolution_multiple;
     grid.Initialize(resolution_scale*scaled_resolution+resolution_padding,domain,true);
     Set_Weights(order);
+}
+//#####################################################################
+// Function Test_dV
+//#####################################################################
+template<class TV> void STANDARD_TESTS_BASE<TV>::
+Test_dV(std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)> dV) const
+{
+    PHYSBAM_ASSERT(V || !dV);
+    if(!dV) return;
+    RANDOM_NUMBERS<T> rand;
+    T eps=(T)1e-6;
+    TV x0,dx;
+    rand.Fill_Uniform(x0,-(T)1,(T)1);
+    rand.Fill_Uniform(dx,-eps,eps);
+    TV v0=V(x0),v1=V(x0+dx);
+    MATRIX<T,TV::m> dv0=dV(x0),dv1=dV(x0+dx);
+    TV a=(v1-v0)/eps,b=(T).5/eps*(dv0+dv1)*dx,c=a-b;
+    T ma=a.Magnitude(),mb=b.Magnitude(),mc=c.Magnitude();
+    LOG::printf("dV %g %g %g  rel %g\n",ma,mb,mc,mc/max(ma,mb,(T)1e-30));
 }
 template class STANDARD_TESTS_BASE<VECTOR<float,2> >;
 template class STANDARD_TESTS_BASE<VECTOR<float,3> >;

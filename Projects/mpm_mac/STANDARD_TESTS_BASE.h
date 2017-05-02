@@ -59,14 +59,12 @@ public:
     ARRAY<T> extra_T;
     ARRAY<int> extra_int;
     bool dump_collision_objects;
+    bool test_diff;
 
     RANDOM_NUMBERS<T> random;
 
     STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS_BASE();
-
-    T Perturb(T a);
-    T Uniform(T a,T b);
 
     void Seed_Particles_Poisson(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
         std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,T particles_per_cell);
@@ -99,6 +97,7 @@ public:
     void Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale=TV_INT()+1,int default_resolution=32);
     void Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale,TV_INT resolution_padding,
         int resolution_multiple=1,int default_resolution=32);
+    void Test_dV(std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)> dV) const;
 //#####################################################################
 };
 }
