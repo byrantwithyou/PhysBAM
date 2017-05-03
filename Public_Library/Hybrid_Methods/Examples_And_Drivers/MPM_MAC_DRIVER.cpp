@@ -307,7 +307,7 @@ Build_Level_Sets(PHASE& ph)
 {
     PHYSBAM_ASSERT(ph.levelset);
     T dx=example.grid.dX.Max();
-ph.phi.array.Fill(3*dx);
+    ph.phi.array.Fill(3*dx);
     RANGE<TV_INT> grid_domain=example.grid.Domain_Indices(example.ghost);
     for(int k=0;k<ph.simulated_particles.m;k++){
         int p=ph.simulated_particles(k);
@@ -515,17 +515,11 @@ Move_Mass_Momentum_Inside_Nearest(PHASE& ph) const
     PHYSBAM_DEBUG_WRITE_SUBSTEP("masses after",0,1);
 }
 //#####################################################################
-// Function Compute_Poisson_Matrix
+// Function Apply_BC
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Compute_Poisson_Matrix()
+Apply_BC(ARRAY<bool,FACE_INDEX<TV::m> >& psi_N)
 {
-    TIMER_SCOPE_FUNC;
-    VECTOR<typename PARTICLE_GRID_WEIGHTS<TV>::SCRATCH,TV::m> scratch;
-    for(int i=0;i<TV::m;i++)
-        example.weights(i)->Compute(example.grid.Face(FACE_INDEX<TV::m>(i,TV_INT())),scratch(i),false);
-    ARRAY<bool,FACE_INDEX<TV::m> > psi_N(example.grid,3,false);
-
     VECTOR<RANGE<TV_INT>,TV::m> domains;
     for(int i=0;i<TV::m;i++){
         domains(i)=example.grid.Domain_Indices();
@@ -554,10 +548,14 @@ Compute_Poisson_Matrix()
                     break;}}
         psi_N(it.Full_Index())=N;}
     Fix_Periodic(psi_N);
-    
+}
+//#####################################################################
+// Function Allocate_Projection_System_Variable
+//#####################################################################
+template<class TV> int MPM_MAC_DRIVER<TV>::
+Allocate_Projection_System_Variable(ARRAY<int,TV_INT>& cell_index,ARRAY<PHASE_ID,TV_INT>& cell_phase,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N)
+{
     example.projection_system.dc_present=false;
-    ARRAY<int,TV_INT> cell_index(example.grid.Domain_Indices(1),true,-1);
-    ARRAY<PHASE_ID,TV_INT> cell_phase(example.grid.Domain_Indices(1),false);
     int next_cell=0;
     for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
         bool dirichlet=false,all_N=true;
@@ -577,11 +575,17 @@ Compute_Poisson_Matrix()
                         example.projection_system.dc_present=true;}}
                 face.index(a)++;}}
         if(!all_N && !dirichlet){
-            cell_index(it.index)=next_cell++;
-            cell_phase(it.index)=phase;}}
+            cell_index(it.index)=next_cell++;}}
     Fix_Periodic(cell_index,1);
-
-    example.projection_system.A.Reset(next_cell);
+    return next_cell;
+}
+//#####################################################################
+// Function Compute_Laplacian
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Compute_Laplacian(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV_INT>& cell_index,const ARRAY<PHASE_ID,TV_INT>& cell_phase,int nvar)
+{
+    example.projection_system.A.Reset(nvar);
     ARRAY<int> tmp0,tmp1;
 #pragma omp parallel
     {
@@ -616,11 +620,17 @@ Compute_Poisson_Matrix()
     }
     if(example.projection_system.use_preconditioner)
         example.projection_system.A.Construct_Incomplete_Cholesky_Factorization();
-
+}
+//#####################################################################
+// Function Compute_Divergence
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Compute_Divergence(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV_INT>& cell_index,int nvar)
+{
     example.projection_system.mass.Remove_All();
     example.projection_system.faces.Remove_All();
     example.projection_system.phases.Remove_All();
-    example.projection_system.gradient.Reset(next_cell);
+    example.projection_system.gradient.Reset(nvar);
     APPEND_HOLDER<T> mass_h(example.projection_system.mass);
     APPEND_HOLDER<FACE_INDEX<TV::m> > faces_h(example.projection_system.faces);
     APPEND_HOLDER<PHASE_ID> phases_h(example.projection_system.phases);
@@ -664,6 +674,27 @@ Compute_Poisson_Matrix()
     phases_h.Combine();
 }
 //#####################################################################
+// Function Compute_Poisson_Matrix
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Compute_Poisson_Matrix()
+{
+    TIMER_SCOPE_FUNC;
+    VECTOR<typename PARTICLE_GRID_WEIGHTS<TV>::SCRATCH,TV::m> scratch;
+    for(int i=0;i<TV::m;i++)
+        example.weights(i)->Compute(example.grid.Face(FACE_INDEX<TV::m>(i,TV_INT())),scratch(i),false);
+
+    ARRAY<bool,FACE_INDEX<TV::m> > psi_N(example.grid,3,false);
+    Apply_BC(psi_N);
+
+    ARRAY<int,TV_INT> cell_index(example.grid.Domain_Indices(1),true,-1);
+    ARRAY<PHASE_ID,TV_INT> cell_phase(example.grid.Domain_Indices(1),false);
+    int nvar=Allocate_Projection_System_Variable(cell_index,cell_phase,psi_N);
+
+    Compute_Laplacian(psi_N,cell_index,cell_phase,nvar);
+    Compute_Divergence(psi_N,cell_index,nvar);
+}
+//#####################################################################
 // Function Pressure_Projection
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
@@ -671,7 +702,7 @@ Pressure_Projection()
 {
     static int solve_id=-1;
     TIMER_SCOPE_FUNC;
-    
+
     Compute_Poisson_Matrix();
     example.sol.v.Resize(example.projection_system.A.m);
     example.rhs.v.Resize(example.projection_system.A.m);
@@ -683,7 +714,7 @@ Pressure_Projection()
 
     if(!example.projection_system.dc_present)
         example.projection_system.Compute_Ones_Nullspace();
-    
+
     solve_id++;
     if(example.test_system){
         example.projection_system.Test_System(example.sol);

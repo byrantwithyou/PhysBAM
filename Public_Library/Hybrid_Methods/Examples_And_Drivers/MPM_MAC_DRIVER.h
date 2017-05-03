@@ -7,6 +7,7 @@
 #include <Core/Vectors/VECTOR.h>
 #include <Grid_Tools/Grids/FACE_INDEX.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
+#include <Hybrid_Methods/Examples_And_Drivers/PHASE_ID.h>
 #include <climits>
 namespace PhysBAM{
 
@@ -62,6 +63,11 @@ public:
     void Move_Mass_Momentum_Inside_Nearest(PHASE& ph) const;
     template<class T2> void Fix_Periodic(ARRAY<T2,TV_INT>& u,int ghost=INT_MAX) const;
     template<class T2> void Fix_Periodic(ARRAY<T2,FACE_INDEX<TV::m> >& u,int ghost=INT_MAX) const;
+private:
+    void Apply_BC(ARRAY<bool,FACE_INDEX<TV::m> >& psi_N);
+    int Allocate_Projection_System_Variable(ARRAY<int,TV_INT>& cell_index,ARRAY<PHASE_ID,TV_INT>& cell_phase,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N);
+    void Compute_Laplacian(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV_INT>& cell_index,const ARRAY<PHASE_ID,TV_INT>& cell_phase,int var);
+    void Compute_Divergence(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV_INT>& cell_index,int nvar);
 //#####################################################################
 };
 }
