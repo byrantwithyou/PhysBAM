@@ -18,6 +18,7 @@
 #include <Grid_Tools/Grids/FACE_ITERATOR_THREADED.h>
 #include <Grid_PDE/Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
 #include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_MAC.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Geometry/Level_Sets/FAST_MARCHING_METHOD_UNIFORM.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_MAC_DRIVER.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_MAC_EXAMPLE.h>
@@ -83,6 +84,10 @@ Initialize()
         bool b=example.bc_type(i*2+1)==example.BC_PERIODIC;
         PHYSBAM_ASSERT(a==b);
         example.periodic_boundary.is_periodic(i)=a;}
+    
+    // must have level sets in order to use multiphase projection
+    if(example.use_multiphase_projection){
+        PHYSBAM_ASSERT(example.use_phi);}
 
     PHYSBAM_ASSERT(example.grid.Is_MAC_Grid());
     if(example.restart)
@@ -515,7 +520,92 @@ Move_Mass_Momentum_Inside_Nearest(PHASE& ph) const
     PHYSBAM_DEBUG_WRITE_SUBSTEP("masses after",0,1);
 }
 //#####################################################################
-// Function Apply_BC
+// Function Face_Fraction
+//#####################################################################
+template<class TV> typename TV::SCALAR MPM_MAC_DRIVER<TV>::
+Face_Fraction(const FACE_INDEX<TV::m>& face_index,const ARRAY<T,TV_INT>& phi) const
+{
+    T phi0=phi(face_index.First_Cell_Index());
+    T phi1=phi(face_index.Second_Cell_Index());
+    T dx=example.grid.dX(face_index.axis);
+    T m=sqr(dx)-sqr(phi1-phi0);
+    T s=phi0+phi1;
+    if(s*s<m) return 0.5-s/(2*sqrt(m));
+    else if(s>=0) return 0;
+    else return 1;
+}
+//#####################################################################
+// Function Face_Fraction
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Face_Fraction(const FACE_INDEX<TV::m>& face_index,ARRAY<PAIR<PHASE_ID,T> >& face_fractions) const
+{
+    face_fractions.Remove_All();
+    if(!example.use_multiphase_projection){
+        for(PHASE_ID p=PHASE_ID(0);p<example.phases.m;p++){
+            if(example.phases(p).mass(face_index)){
+                face_fractions={{p,1}};
+                return;}}
+        return;}
+
+    LINEAR_INTERPOLATION_UNIFORM<TV,T> li;
+    GRID<TV> center_grid=example.grid.Get_Center_Grid();
+
+    VECTOR<T,GRID<TV>::number_of_nodes_per_face> phis;
+    VECTOR<PHASE_ID,GRID<TV>::number_of_nodes_per_face> phases;
+    for(int i=0;i<phis.m;i++){
+        TV X=example.grid.Node(example.grid.Face_Node_Index(face_index.axis,face_index.index,i));
+        for(PHASE_ID p(0);p<example.phases.m;p++){
+            T x=li.Clamped_To_Array(center_grid,example.phases(p).phi,X);
+            if(x<=0){
+                phis(i)=-x;
+                phases(i)=p;}}}
+    face_fractions.Append({phases(0),1});
+    for(int i=1;i<phases.m;i++)
+        if(phases(i)!=phases(0)){
+            face_fractions.Append({phases(i),0});
+            for(int j=i+1;j<phases.m;j++)
+                PHYSBAM_ASSERT(phases(j)==phases(0) || phases(j)==phases(i));
+            break;}
+
+    if(face_fractions.m==1) return;
+    T fraction=Face_Fraction(face_index,example.phases(face_fractions(0).x).phi);
+    face_fractions(0).y=fraction;
+    face_fractions(1).y=1-fraction;
+}
+//#####################################################################
+// Function Phase_Of_Cell
+//#####################################################################
+template<class TV> PAIR<PHASE_ID,typename TV::SCALAR> MPM_MAC_DRIVER<TV>::
+Phase_Of_Cell(const TV_INT& cell_index) const
+{
+    for(PHASE_ID p(0);p<example.phases.m;p++){
+        T x=example.phases(p).phi(cell_index);
+        if(x<=0) return {p,x};}
+    PHYSBAM_FATAL_ERROR("No phase!");
+}
+//#####################################################################
+// Function Density
+//#####################################################################
+template<class TV> typename TV::SCALAR MPM_MAC_DRIVER<TV>::
+Density(const FACE_INDEX<TV::m>& face_index) const
+{
+    if(!example.use_multiphase_projection){
+        for(PHASE_ID p=PHASE_ID(0);p<example.phases.m;p++)
+            if(T m=example.phases(p).mass(face_index)){
+                if(example.use_particle_volumes)
+                    m/=example.phases(p).volume(face_index);
+                return m;}
+        return 0;}
+
+    auto p0=Phase_Of_Cell(face_index.First_Cell_Index());
+    auto p1=Phase_Of_Cell(face_index.Second_Cell_Index());
+    if(p0.x==p1.x) return example.phases(p0.x).density;
+    T theta=p0.y/(p0.y+p1.y);
+    return example.phases(p0.x).density*theta+example.phases(p1.x).density*(1-theta);
+}
+//#####################################################################
+// Function Apply_Neumann_BC
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Apply_BC(ARRAY<bool,FACE_INDEX<TV::m> >& psi_N)
@@ -553,37 +643,37 @@ Apply_BC(ARRAY<bool,FACE_INDEX<TV::m> >& psi_N)
 // Function Allocate_Projection_System_Variable
 //#####################################################################
 template<class TV> int MPM_MAC_DRIVER<TV>::
-Allocate_Projection_System_Variable(ARRAY<int,TV_INT>& cell_index,ARRAY<PHASE_ID,TV_INT>& cell_phase,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N)
+Allocate_Projection_System_Variable(ARRAY<int,TV_INT>& cell_index,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N)
 {
+    cell_index.Resize(example.grid.Domain_Indices(1),true,false,-1);
+    int nvar=0;
     example.projection_system.dc_present=false;
-    int next_cell=0;
     for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
         bool dirichlet=false,all_N=true;
-        PHASE_ID phase(-1);
         for(int a=0;a<TV::m;a++){
             FACE_INDEX<TV::m> face(a,it.index);
             for(int s=0;s<2;s++){
                 if(!psi_N(face)){
                     all_N=false;
-                    bool has_mass=false;
-                    for(PHASE_ID p(0);p<example.phases.m;p++)
-                        if(example.phases(p).mass(face)){
-                            phase=p;
-                            has_mass=true;}
-                    if(!has_mass){
-                        dirichlet=true;
-                        example.projection_system.dc_present=true;}}
+                    if(!example.use_multiphase_projection){
+                        bool all_phase_dirichlet=true;
+                        for(PHASE_ID p=PHASE_ID(0);p<example.phases.m;p++){
+                            if(example.phases(p).mass(face)){
+                                all_phase_dirichlet=false;}}
+                        if(all_phase_dirichlet){
+                            dirichlet=true;
+                            example.projection_system.dc_present=true;}}}
                 face.index(a)++;}}
-        if(!all_N && !dirichlet){
-            cell_index(it.index)=next_cell++;}}
+        if(!all_N && !dirichlet)
+            cell_index(it.index)=nvar++;}
     Fix_Periodic(cell_index,1);
-    return next_cell;
+    return nvar;
 }
 //#####################################################################
 // Function Compute_Laplacian
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Compute_Laplacian(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV_INT>& cell_index,const ARRAY<PHASE_ID,TV_INT>& cell_phase,int nvar)
+Compute_Laplacian(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV_INT>& cell_index,int nvar)
 {
     example.projection_system.A.Reset(nvar);
     ARRAY<int> tmp0,tmp1;
@@ -593,7 +683,6 @@ Compute_Laplacian(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV
         for(CELL_ITERATOR_THREADED<TV> it(example.grid,0);it.Valid();it.Next()){
             int center_index=cell_index(it.index);
             if(center_index<0) continue;
-            PHASE_ID p=cell_phase(it.index);
 
             T diag=0;
             helper.Start_Row();
@@ -602,15 +691,10 @@ Compute_Laplacian(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV
                 for(int s=0;s<2;s++){
                     TV_INT cell=it.index;
                     cell(a)+=2*s-1;
-                    assert(face.Cell_Index(s)==cell);
+                    PHYSBAM_ASSERT(face.Cell_Index(s)==cell);
+
                     if(!psi_N(face)){
-                        T entry=sqr(example.grid.one_over_dX(a));
-                        if(example.use_massless_particles)
-                            entry/=example.phases(p).density;
-                        else{
-                            entry/=example.phases(p).mass(face);
-                            if(example.use_particle_volumes)
-                                entry*=example.phases(p).volume(face);}
+                        T entry=sqr(example.grid.one_over_dX(a))/Density(face);
                         diag+=entry;
                         int ci=cell_index(cell);
                         if(ci>=0) helper.Add_Entry(ci,-entry);}
@@ -618,60 +702,52 @@ Compute_Laplacian(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV
             helper.Add_Entry(center_index,diag);}
         helper.Finish();
     }
+
     if(example.projection_system.use_preconditioner)
         example.projection_system.A.Construct_Incomplete_Cholesky_Factorization();
 }
 //#####################################################################
-// Function Compute_Divergence
+// Function Compute_Gradient
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Compute_Divergence(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV_INT>& cell_index,int nvar)
+Compute_Gradient(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV_INT>& cell_index,int nvar)
 {
     example.projection_system.mass.Remove_All();
     example.projection_system.faces.Remove_All();
-    example.projection_system.phases.Remove_All();
     example.projection_system.gradient.Reset(nvar);
     APPEND_HOLDER<T> mass_h(example.projection_system.mass);
     APPEND_HOLDER<FACE_INDEX<TV::m> > faces_h(example.projection_system.faces);
-    APPEND_HOLDER<PHASE_ID> phases_h(example.projection_system.phases);
-    ARRAY<int> tmp2,tmp3;
+    ARRAY<int> tmp0,tmp1,tmp2,tmp3;
 #pragma omp parallel
     {
 #pragma omp single
         {
             mass_h.Init();
             faces_h.Init();
-            phases_h.Init();
         }
 #pragma omp barrier
         ARRAY<T>& mass_t=mass_h.Array();
         ARRAY<FACE_INDEX<TV::m> >& faces_t=faces_h.Array();
-        ARRAY<PHASE_ID>& phases_t=phases_h.Array();
         SPARSE_MATRIX_THREADED_CONSTRUCTION<T> G_helper(example.projection_system.gradient,tmp2,tmp3);
         for(FACE_ITERATOR_THREADED<TV> it(example.grid);it.Valid();it.Next()){
             if(psi_N(it.Full_Index())) continue;
-            for(PHASE_ID p(0);p<example.phases.m;p++){
-                T mass=0;
-                if(example.use_massless_particles) mass=example.phases(p).density;
-                else{
-                    mass=example.phases(p).mass(it.Full_Index());
-                    if(!mass) continue;
-                    if(example.use_particle_volumes)
-                        mass/=example.phases(p).volume(it.Full_Index());}
-                int c0=cell_index(it.First_Cell_Index());
-                int c1=cell_index(it.Second_Cell_Index());
-                if(c0<0 && c1<0) continue;
-                G_helper.Start_Row(); // cannot start a row if no elements in it
-                if(c0>=0) G_helper.Add_Entry(c0,-example.grid.one_over_dX(it.axis));
-                if(c1>=0) G_helper.Add_Entry(c1,example.grid.one_over_dX(it.axis));
-                faces_t.Append(it.Full_Index());
-                phases_t.Append(p);
-                mass_t.Append(mass);}}
+
+            T mass=Density(it.Full_Index());
+            if(!mass) continue;
+
+            int c0=cell_index(it.First_Cell_Index());
+            int c1=cell_index(it.Second_Cell_Index());
+            if(c0<0 && c1<0) continue;
+            G_helper.Start_Row();
+            if(c0>=0) G_helper.Add_Entry(c0,-example.grid.one_over_dX(it.axis));
+            if(c1>=0) G_helper.Add_Entry(c1,example.grid.one_over_dX(it.axis));
+            faces_t.Append(it.Full_Index());
+            mass_t.Append(mass);}
+
         G_helper.Finish();
     }
     mass_h.Combine();
     faces_h.Combine();
-    phases_h.Combine();
 }
 //#####################################################################
 // Function Compute_Poisson_Matrix
@@ -688,11 +764,10 @@ Compute_Poisson_Matrix()
     Apply_BC(psi_N);
 
     ARRAY<int,TV_INT> cell_index(example.grid.Domain_Indices(1),true,-1);
-    ARRAY<PHASE_ID,TV_INT> cell_phase(example.grid.Domain_Indices(1),false);
-    int nvar=Allocate_Projection_System_Variable(cell_index,cell_phase,psi_N);
+    int nvar=Allocate_Projection_System_Variable(cell_index,psi_N);
 
-    Compute_Laplacian(psi_N,cell_index,cell_phase,nvar);
-    Compute_Divergence(psi_N,cell_index,nvar);
+    Compute_Laplacian(psi_N,cell_index,nvar);
+    Compute_Gradient(psi_N,cell_index,nvar);
 }
 //#####################################################################
 // Function Pressure_Projection
@@ -708,8 +783,14 @@ Pressure_Projection()
     example.rhs.v.Resize(example.projection_system.A.m);
 
     ARRAY<T> tmp(example.projection_system.gradient.m);
-    for(int i=0;i<tmp.m;i++)
-        tmp(i)=example.phases(example.projection_system.phases(i)).velocity(example.projection_system.faces(i));
+    ARRAY<PAIR<PHASE_ID,T> > face_fractions;
+    for(int i=0;i<tmp.m;i++){
+        FACE_INDEX<TV::m> face(example.projection_system.faces(i));
+        Face_Fraction(face,face_fractions);
+        T u_star=0;
+        for(int j=0;j<face_fractions.m;j++)
+            u_star+=face_fractions(j).y*example.phases(face_fractions(j).x).velocity(face);
+        tmp(i)=u_star;}
     example.projection_system.gradient.Transpose_Times(tmp,example.rhs.v);
 
     if(!example.projection_system.dc_present)
@@ -724,6 +805,7 @@ Pressure_Projection()
         KRYLOV_SOLVER<T>::Ensure_Size(example.av,example.sol,2);
         const MPM_PROJECTION_SYSTEM<TV>& system=example.projection_system;
         OCTAVE_OUTPUT<T>(LOG::sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,*example.av(0),*example.av(1));
+        OCTAVE_OUTPUT<T>(LOG::sprintf("C-%i.txt",solve_id).c_str()).Write_Preconditioner("C",system,*example.av(0),*example.av(1));
         OCTAVE_OUTPUT<T>(LOG::sprintf("P-%i.txt",solve_id).c_str()).Write_Projection("P",system,*example.av(0));
         OCTAVE_OUTPUT<T>(LOG::sprintf("b-%i.txt",solve_id).c_str()).Write("b",example.rhs);}
 
@@ -743,9 +825,15 @@ Pressure_Projection()
         T r=example.projection_system.Convergence_Norm(*example.av(0));
         LOG::cout<<"residual: "<<r<<std::endl;}
 
+    tmp.Resize(example.projection_system.gradient.m);
     example.projection_system.gradient.Times(example.sol.v,tmp);
-    for(int i=0;i<tmp.m;i++)
-        example.phases(example.projection_system.phases(i)).velocity(example.projection_system.faces(i))-=tmp(i)/example.projection_system.mass(i);
+    for(int i=0;i<tmp.m;i++){
+        FACE_INDEX<TV::m> face(example.projection_system.faces(i));
+        Face_Fraction(face,face_fractions);
+        T dv=tmp(i)/example.projection_system.mass(i);
+        for(int j=0;j<face_fractions.m;j++)
+            example.phases(face_fractions(j).x).velocity(face)-=dv;}
+
     for(PHASE_ID p(0);p<example.phases.m;p++)
         Fix_Periodic(example.phases(p).velocity);
 }

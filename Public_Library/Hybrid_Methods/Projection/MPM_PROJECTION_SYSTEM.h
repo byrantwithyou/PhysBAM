@@ -25,6 +25,7 @@ struct MPM_PROJECTION_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
     mutable ARRAY<T> temp_vector;
 
     SPARSE_MATRIX_FLAT_MXN<T> gradient;
+    SPARSE_MATRIX_FLAT_MXN<T> divergence;
     ARRAY<T> mass;
     ARRAY<FACE_INDEX<TV::m> > faces;
     ARRAY<PHASE_ID> phases;

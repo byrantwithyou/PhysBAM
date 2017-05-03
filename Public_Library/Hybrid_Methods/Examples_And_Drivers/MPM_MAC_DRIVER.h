@@ -6,6 +6,7 @@
 #define __MPM_MAC_DRIVER__
 #include <Core/Vectors/VECTOR.h>
 #include <Grid_Tools/Grids/FACE_INDEX.h>
+#include <Hybrid_Methods/Examples_And_Drivers/PHASE_ID.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/PHASE_ID.h>
 #include <climits>
@@ -64,10 +65,15 @@ public:
     template<class T2> void Fix_Periodic(ARRAY<T2,TV_INT>& u,int ghost=INT_MAX) const;
     template<class T2> void Fix_Periodic(ARRAY<T2,FACE_INDEX<TV::m> >& u,int ghost=INT_MAX) const;
 private:
+    T Face_Fraction(const FACE_INDEX<TV::m>& face_index,const ARRAY<T,TV_INT>& phi) const;
+    void Face_Fraction(const FACE_INDEX<TV::m>& face_index,ARRAY<PAIR<PHASE_ID,T> >& face_fractions) const;
+    PAIR<PHASE_ID,typename TV::SCALAR> Phase_Of_Cell(const TV_INT& cell_index) const;
+    T Density(const FACE_INDEX<TV::m>& face_index) const;
+
     void Apply_BC(ARRAY<bool,FACE_INDEX<TV::m> >& psi_N);
-    int Allocate_Projection_System_Variable(ARRAY<int,TV_INT>& cell_index,ARRAY<PHASE_ID,TV_INT>& cell_phase,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N);
-    void Compute_Laplacian(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV_INT>& cell_index,const ARRAY<PHASE_ID,TV_INT>& cell_phase,int var);
-    void Compute_Divergence(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV_INT>& cell_index,int nvar);
+    int Allocate_Projection_System_Variable(ARRAY<int,TV_INT>& cell_index,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N);
+    void Compute_Laplacian(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV_INT>& cell_index,int var);
+    void Compute_Gradient(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV_INT>& cell_index,int nvar);
 //#####################################################################
 };
 }

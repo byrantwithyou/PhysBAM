@@ -112,6 +112,7 @@ public:
     bool use_phi;
     int rk_particle_order;
     bool use_massless_particles;
+    bool use_multiphase_projection;
 
     // debugging
     DEBUG_PARTICLES<TV>& debug_particles;
