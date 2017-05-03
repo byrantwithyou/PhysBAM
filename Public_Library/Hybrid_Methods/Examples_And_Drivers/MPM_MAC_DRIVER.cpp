@@ -706,6 +706,12 @@ Pressure_Projection()
     if(example.print_matrix)
         OCTAVE_OUTPUT<T>(LOG::sprintf("x-%i.txt",solve_id).c_str()).Write("x",example.sol);
 
+    if(example.test_system){
+        example.projection_system.Multiply(example.sol,*example.av(0));
+        *example.av(0)-=example.rhs;
+        T r=example.projection_system.Convergence_Norm(*example.av(0));
+        LOG::cout<<"residual: "<<r<<std::endl;}
+
     example.projection_system.gradient.Times(example.sol.v,tmp);
     for(int i=0;i<tmp.m;i++)
         example.phases(example.projection_system.phases(i)).velocity(example.projection_system.faces(i))-=tmp(i)/example.projection_system.mass(i);
