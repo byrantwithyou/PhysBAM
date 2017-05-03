@@ -32,7 +32,7 @@ public:
     using BASE::print_stats;using BASE::cfl;using BASE::solver_tolerance;
     using BASE::solver_iterations;using BASE::threads;using BASE::test_number;
     using BASE::resolution;using BASE::Seed_Particles;using BASE::Add_Particle;
-    using BASE::regular_seeding;using BASE::Set_Grid;
+    using BASE::regular_seeding;using BASE::Set_Grid;using BASE::Set_Phases;
     using BASE::random;using BASE::collision_objects;using BASE::user_resolution;using BASE::Add_Walls;
     using BASE::Add_Collision_Object;using BASE::Add_Fluid_Wall;using BASE::no_regular_seeding;
     using BASE::m;using BASE::s;using BASE::kg;using BASE::unit_p;using BASE::unit_mu;using BASE::unit_rho;

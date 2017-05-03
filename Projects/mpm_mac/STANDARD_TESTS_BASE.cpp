@@ -251,6 +251,16 @@ Test_dV(std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)>
     T ma=a.Magnitude(),mb=b.Magnitude(),mc=c.Magnitude();
     LOG::printf("dV %g %g %g  rel %g\n",ma,mb,mc,mc/max(ma,mb,(T)1e-30));
 }
+//#####################################################################
+// Function Set_Phases
+//#####################################################################
+template<class TV> void STANDARD_TESTS_BASE<TV>::
+Set_Phases(const ARRAY<T,PHASE_ID>& phase_densities)
+{
+    phases.Resize(phase_densities.m);
+    for(PHASE_ID i(0);i<phase_densities.m;i++)
+        phases(i).density=phase_densities(i);
+}
 template class STANDARD_TESTS_BASE<VECTOR<float,2> >;
 template class STANDARD_TESTS_BASE<VECTOR<float,3> >;
 template class STANDARD_TESTS_BASE<VECTOR<double,2> >;

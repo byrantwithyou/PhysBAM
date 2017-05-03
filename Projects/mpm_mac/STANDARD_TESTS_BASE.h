@@ -27,7 +27,7 @@ class STANDARD_TESTS_BASE:public MPM_MAC_EXAMPLE<TV>
 
 public:
     using BASE::initial_time;using BASE::last_frame;using BASE::grid;using BASE::particles;
-    using BASE::frame_title;using BASE::write_substeps_level;
+    using BASE::frame_title;using BASE::write_substeps_level;using BASE::phases;
     using BASE::collision_objects;using BASE::substeps_delay_frame;using BASE::output_directory;
     using BASE::restart;using BASE::dt;using BASE::time;using BASE::use_early_gradient_transfer;
     using BASE::frame_dt;using BASE::min_dt;using BASE::max_dt;using BASE::ghost;
@@ -98,6 +98,7 @@ public:
     void Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale,TV_INT resolution_padding,
         int resolution_multiple=1,int default_resolution=32);
     void Test_dV(std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)> dV) const;
+    void Set_Phases(const ARRAY<T,PHASE_ID>& phase_densities);
 //#####################################################################
 };
 }

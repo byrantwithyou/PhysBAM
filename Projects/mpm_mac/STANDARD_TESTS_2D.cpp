@@ -52,7 +52,7 @@ Read_Output_Files(const int frame)
 template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
 Initialize()
 {
-    PHASE_ID number_phases(1);
+    phases.Resize(PHASE_ID(1));
     switch(test_number)
     {
         case 1:{ // stationary circle
@@ -105,10 +105,10 @@ Initialize()
             Add_Walls(-1,COLLISION_TYPE::slip,.1*m);
         } break;
         case 7:{ // stationary circles in two phases
-            number_phases=PHASE_ID(2);
+            T density=2*unit_rho*scale_mass;
+            Set_Phases({density,density});
             particles.Store_Phase(true);
             Set_Grid(RANGE<TV>::Unit_Box()*m);
-            T density=2*unit_rho*scale_mass;
             SPHERE<TV> sphere0(TV(.3,.3)*m,.1*m);
             Seed_Particles(sphere0,0,0,density,particles_per_cell);
             int n=particles.phase.m;
@@ -128,10 +128,10 @@ Initialize()
         } break;
         case 9: // freefall circles with different phases
         case 10:{ // freefall circles with same phase
-            if(test_number==9) number_phases=PHASE_ID(2);
+            T density=2*unit_rho*scale_mass;
+            if(test_number==9) Set_Phases({density,density});
             particles.Store_Phase(true);
             Set_Grid(RANGE<TV>::Unit_Box()*m);
-            T density=2*unit_rho*scale_mass;
             gravity=TV(0,-1)*m/sqr(s);
             SPHERE<TV> sphere0(TV(.3,.5)*m,.1*m);
             SPHERE<TV> sphere1(TV(.7,.5)*m,.1*m);
@@ -208,7 +208,6 @@ Initialize()
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
-    phases.Resize(number_phases);
     if(forced_collision_type!=-1)
         for(int i=0;i<collision_objects.m;i++)
             collision_objects(i)->type=(COLLISION_TYPE)forced_collision_type;
