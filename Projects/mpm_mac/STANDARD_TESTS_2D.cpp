@@ -206,6 +206,22 @@ Initialize()
             Seed_Particles(RANGE<TV>(TV(.1*m,.1*m),TV(.9*m,.9*m)),V_func,dV_func,density,particles_per_cell);
             Add_Walls(-1,COLLISION_TYPE::slip,.1*m);
         } break;
+        case 17:{ // stationary pool with two phases
+            T water_density=1000*unit_rho*scale_mass;
+            T air_density=unit_rho*scale_mass;
+            Set_Phases({water_density,air_density});
+            particles.Store_Phase(true);
+            this->use_massless_particles=true;
+            this->use_phi=true;
+            this->use_multiphase_projection=true;
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            Seed_Particles(RANGE<TV>(TV(.1*m,.1*m),TV(.9*m,.5*m)),0,0,air_density,particles_per_cell);
+            int n=particles.phase.m;
+            Seed_Particles(RANGE<TV>(TV(.1*m,.5*m),TV(.9*m,.9*m)),0,0,air_density,particles_per_cell);
+            particles.phase.Array_View(n,particles.phase.m-n).Fill(PHASE_ID(1));
+            gravity=TV(0,-1)*m/sqr(s);
+            Add_Walls(-1,COLLISION_TYPE::slip,.1*m);
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     if(forced_collision_type!=-1)
