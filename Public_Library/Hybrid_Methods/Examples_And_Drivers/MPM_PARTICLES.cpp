@@ -129,6 +129,9 @@ static int Initialize_MPM_Particles()
     Register_Attribute_Name(ATTRIBUTE_ID_LAMBDA,"lambda");
     Register_Attribute_Name(ATTRIBUTE_ID_MU0,"mu0");
     Register_Attribute_Name(ATTRIBUTE_ID_LAMBDA0,"lambda0");
+    Register_Attribute_Name(ATTRIBUTE_ID_PHASE,"phase");
+
+    Register_Attribute_Sample<PHASE_ID>();
     return 0;
 }
 int initialize_mpm_particles=Initialize_MPM_Particles();
