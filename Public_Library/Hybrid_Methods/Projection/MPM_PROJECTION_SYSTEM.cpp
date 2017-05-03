@@ -101,7 +101,7 @@ Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const
     if(!dc_present){
         MPM_PROJECTION_VECTOR<TV>& v=debug_cast<MPM_PROJECTION_VECTOR<TV>&>(x);
         v.Copy(-Inner_Product(v,null_u),null_u,v);}
-} 
+}
 //#####################################################################
 // Function Apply_Preconditioner
 //#####################################################################
