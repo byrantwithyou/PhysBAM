@@ -256,7 +256,7 @@ void PhysBAM::Register_Attribute_Name(const ATTRIBUTE_ID id,const char* name)
     PHYSBAM_ASSERT(Attribute_Names_Registry().Set(id,name));
 }
 //#####################################################################
-// Function Register_Attribute_Name
+// Function Get_Attribute_Name
 //#####################################################################
 const char* PhysBAM::Get_Attribute_Name(const ATTRIBUTE_ID id)
 {
