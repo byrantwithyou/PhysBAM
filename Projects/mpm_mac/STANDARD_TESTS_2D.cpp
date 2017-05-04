@@ -196,15 +196,16 @@ Initialize()
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             T density=2*unit_rho*scale_mass;
             auto V_func=[=](const TV& pos){
-                T x=(pos.x-0.1)/0.8*pi;
-                T y=(pos.y-0.1)/0.8*pi;
+                T x=pos.x*pi;
+                T y=pos.y*pi;
                 return TV(-sin(a*x)*cos(b*y),cos(a*x)*sin(b*y));};
             auto dV_func=[=](const TV& pos){
-                T x=(pos.x-0.1)/0.8*pi;
-                T y=(pos.y-0.1)/0.8*pi;
+                T x=pos.x*pi;
+                T y=pos.y*pi;
                 return MATRIX<T,2>(-a*cos(a*x)*cos(b*y),b*sin(a*x)*sin(b*y),-a*sin(a*x)*sin(b*y),b*cos(a*x)*cos(b*y));};
-            Seed_Particles(RANGE<TV>(TV(.1*m,.1*m),TV(.9*m,.9*m)),V_func,dV_func,density,particles_per_cell);
-            Add_Walls(-1,COLLISION_TYPE::slip,.1*m);
+            Seed_Particles(RANGE<TV>(TV(0,0),TV(m,m)),V_func,dV_func,density,particles_per_cell);
+            //Add_Walls(-1,COLLISION_TYPE::slip,.1*m);
+            bc_type.Fill(BC_PERIODIC);
         } break;
         case 17:{ // stationary pool with two phases
             T water_density=1000*unit_rho*scale_mass;
@@ -221,6 +222,18 @@ Initialize()
             particles.phase.Array_View(n,particles.phase.m-n).Fill(PHASE_ID(1));
             gravity=TV(0,-1)*m/sqr(s);
             Add_Walls(-1,COLLISION_TYPE::slip,.1*m);
+        } break;
+        case 18:{ // full of fluid with random inital velocities
+            T a=extra_T.m>=1?extra_T(0):-1;
+            T b=extra_T.m>=2?extra_T(1):1;
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            T density=2*unit_rho*scale_mass;
+            RANDOM_NUMBERS<T> rand;
+            rand.Set_Seed();
+            auto V_func=[&](const TV& pos){
+                return TV(rand.Get_Uniform_Number(a,b),rand.Get_Uniform_Number(a,b));};
+            Seed_Particles(RANGE<TV>(TV(0,0),TV(m,m)),V_func,0,density,particles_per_cell);
+            bc_type.Fill(BC_PERIODIC);
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
