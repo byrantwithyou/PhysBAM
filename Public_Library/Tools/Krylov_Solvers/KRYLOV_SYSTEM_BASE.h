@@ -40,7 +40,6 @@ public:
     void Compute_Nullspace(const KRYLOV_VECTOR_BASE<T>& tmp,ARRAY<KRYLOV_VECTOR_BASE<T>*>& null,int max_null) const;
     void Compute_Small_Eigenvectors(const KRYLOV_VECTOR_BASE<T>& tmp,ARRAY<KRYLOV_VECTOR_BASE<T>*>& null,
         ARRAY<KRYLOV_VECTOR_BASE<T>*>& eigenvectors,ARRAY<T>& eigenvalues,int max_eigen,T tol,int power_iter) const;
-protected:
     virtual void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const;
 //#####################################################################
 };

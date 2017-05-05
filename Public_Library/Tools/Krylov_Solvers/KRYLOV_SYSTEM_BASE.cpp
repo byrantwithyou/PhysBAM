@@ -93,12 +93,15 @@ Test_System(const KRYLOV_VECTOR_BASE<T>& t) const
     r=abs(a-b)/maxabs((T)1e-30,a,b);
     if(r>tolerance) {pass=false;LOG::cout<<"Project Nullspace Idempotence Test: "<<a<<"  vs  "<<b<<"  relative  "<<r<<std::endl;}
 
-    z*=(T)0;
-    a=Inner_Product(y,Precondition(x,z));
-    z*=(T)0;
-    b=Inner_Product(x,Precondition(y,z));
-    r=abs(a-b)/maxabs((T)1e-30,a,b);
-    if(r>tolerance) {pass=false;LOG::cout<<"Preconditioner Symmetry Test: "<<a<<"  vs  "<<b<<"  relative  "<<r<<std::endl;}
+    if(use_preconditioner){
+        z*=(T)0;
+        Apply_Preconditioner(x,z);
+        a=Inner_Product(y,z);
+        z*=(T)0;
+        Apply_Preconditioner(y,z);
+        b=Inner_Product(x,z);
+        r=abs(a-b)/maxabs((T)1e-30,a,b);
+        if(r>tolerance) {pass=false;LOG::cout<<"Preconditioner Symmetry Test: "<<a<<"  vs  "<<b<<"  relative  "<<r<<std::endl;}}
 
     T rx=random.Get_Uniform_Number(-1,1);
     T ry=random.Get_Uniform_Number(-1,1);
@@ -116,22 +119,20 @@ Test_System(const KRYLOV_VECTOR_BASE<T>& t) const
     r=mag_resid/max((T)1e-30,mag_Aw,mag_Ax,mag_Ay);
     if(r>tolerance) {pass=false;LOG::cout<<"Linearity Test: "<<mag_resid<<"  relative  "<<r<<std::endl;}
 
-    w.Copy(rx,x);
-    w.Copy(ry,y,w);
-    const KRYLOV_VECTOR_BASE<T>& tz=Precondition(w,z);
-    if(&tz!=&z) z=tz;
-    mag_Aw=sqrt(Inner_Product(z,z));
-    const KRYLOV_VECTOR_BASE<T>& tw=Precondition(y,w);
-    if(&tw!=&z) w=tw;
-    mag_Ay=sqrt(Inner_Product(w,w));
-    z.Copy(-ry,w,z);
-    const KRYLOV_VECTOR_BASE<T>& tw2=Precondition(x,w);
-    if(&tw2!=&w) w=tw2;
-    mag_Ax=sqrt(Inner_Product(w,w));
-    z.Copy(-rx,w,z);
-    mag_resid=sqrt(Inner_Product(z,z));
-    r=mag_resid/max((T)1e-30,mag_Aw,mag_Ax,mag_Ay);
-    if(r>tolerance) {pass=false;LOG::cout<<"Preconditioner Linearity Test: "<<mag_resid<<"  relative  "<<r<<std::endl;}
+    if(use_preconditioner){
+        w.Copy(rx,x);
+        w.Copy(ry,y,w);
+        Apply_Preconditioner(w,z);
+        mag_Aw=sqrt(Inner_Product(z,z));
+        Apply_Preconditioner(y,w);
+        mag_Ay=sqrt(Inner_Product(w,w));
+        z.Copy(-ry,w,z);
+        Apply_Preconditioner(x,w);
+        mag_Ax=sqrt(Inner_Product(w,w));
+        z.Copy(-rx,w,z);
+        mag_resid=sqrt(Inner_Product(z,z));
+        r=mag_resid/max((T)1e-30,mag_Aw,mag_Ax,mag_Ay);
+        if(r>tolerance) {pass=false;LOG::cout<<"Preconditioner Linearity Test: "<<mag_resid<<"  relative  "<<r<<std::endl;}}
 
     LOG::cout<<"Krylov System Test Result: "<<(pass?"PASS":"FAIL")<<std::endl;
     delete &w;
