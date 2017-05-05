@@ -60,6 +60,7 @@ public:
     ARRAY<int> extra_int;
     bool dump_collision_objects;
     bool test_diff;
+    bool bc_periodic;
 
     RANDOM_NUMBERS<T> random;
 

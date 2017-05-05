@@ -53,6 +53,8 @@ template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
 Initialize()
 {
     phases.Resize(PHASE_ID(1));
+    if(bc_periodic)
+        bc_type.Fill(BC_PERIODIC);
     switch(test_number)
     {
         case 1:{ // stationary circle
@@ -204,8 +206,6 @@ Initialize()
                 T y=pos.y*pi;
                 return MATRIX<T,2>(-a*cos(a*x)*cos(b*y),b*sin(a*x)*sin(b*y),-a*sin(a*x)*sin(b*y),b*cos(a*x)*cos(b*y));};
             Seed_Particles(RANGE<TV>(TV(0,0),TV(m,m)),V_func,dV_func,density,particles_per_cell);
-            //Add_Walls(-1,COLLISION_TYPE::slip,.1*m);
-            bc_type.Fill(BC_PERIODIC);
         } break;
         case 17:{ // stationary pool with two phases
             T water_density=1000*unit_rho*scale_mass;
@@ -233,7 +233,6 @@ Initialize()
             auto V_func=[&](const TV& pos){
                 return TV(rand.Get_Uniform_Number(a,b),rand.Get_Uniform_Number(a,b));};
             Seed_Particles(RANGE<TV>(TV(0,0),TV(m,m)),V_func,0,density,particles_per_cell);
-            bc_type.Fill(BC_PERIODIC);
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
