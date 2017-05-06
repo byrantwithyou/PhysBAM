@@ -14,7 +14,7 @@
 namespace PhysBAM{
 
 template<class TV> struct BOUNDARY_POLICY;
-template<class TV,class T> struct BOUNDARY;
+template<class TV,class T> class BOUNDARY;
 template<class TV> struct GRID_ARRAYS_POLICY;
 
 template<class TV,class T2>
