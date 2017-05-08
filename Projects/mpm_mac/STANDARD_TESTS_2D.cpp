@@ -192,18 +192,17 @@ Initialize()
             bc_type.Fill(BC_PERIODIC);
         } break;
         case 16:{ // Initialize velocity field as Taylor-Green Vortex
-            // To specify parameters, use: -I a -I b
+            // To specify parameters, use: -I a
             int a=extra_int.m>=1?extra_int(0):2;
-            int b=extra_int.m>=2?extra_int(1):2;
             Set_Grid(RANGE<TV>::Unit_Box()*pi*m);
             T density=2*unit_rho*scale_mass;
-            auto V_func=[=](const TV& X){return TV(-sin(a*X.x)*cos(b*X.y),cos(a*X.x)*sin(b*X.y));};
+            auto V_func=[=](const TV& X){return TV(-sin(a*X.x)*cos(a*X.y),cos(a*X.x)*sin(a*X.y));};
             auto dV_func=[=](const TV& X)
                 {
-                    T c=cos(a*X.x)*cos(b*X.y),s=sin(a*X.x)*sin(b*X.y);
-                    return MATRIX<T,2>(-a*c,-a*s,b*s,b*c);
+                    T c=cos(a*X.x)*cos(a*X.y),s=sin(a*X.x)*sin(a*X.y);
+                    return MATRIX<T,2>(-c,-s,s,c)*a;
                 };
-            Seed_Particles(RANGE<TV>(TV(0,0),TV(m,m)),V_func,dV_func,density,particles_per_cell);
+            Seed_Particles(grid.domain,V_func,dV_func,density,particles_per_cell);
         } break;
         case 17:{ // stationary pool with two phases
             T water_density=1000*unit_rho*scale_mass;
