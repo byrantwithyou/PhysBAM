@@ -195,16 +195,14 @@ Initialize()
             // To specify parameters, use: -I a -I b
             int a=extra_int.m>=1?extra_int(0):2;
             int b=extra_int.m>=2?extra_int(1):2;
-            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            Set_Grid(RANGE<TV>::Unit_Box()*pi*m);
             T density=2*unit_rho*scale_mass;
-            auto V_func=[=](const TV& pos){
-                T x=pos.x*pi;
-                T y=pos.y*pi;
-                return TV(-sin(a*x)*cos(b*y),cos(a*x)*sin(b*y));};
-            auto dV_func=[=](const TV& pos){
-                T x=pos.x*pi;
-                T y=pos.y*pi;
-                return MATRIX<T,2>(-a*cos(a*x)*cos(b*y),b*sin(a*x)*sin(b*y),-a*sin(a*x)*sin(b*y),b*cos(a*x)*cos(b*y));};
+            auto V_func=[=](const TV& X){return TV(-sin(a*X.x)*cos(b*X.y),cos(a*X.x)*sin(b*X.y));};
+            auto dV_func=[=](const TV& X)
+                {
+                    T c=cos(a*X.x)*cos(b*X.y),s=sin(a*X.x)*sin(b*X.y);
+                    return MATRIX<T,2>(-a*c,-a*s,b*s,b*c);
+                };
             Seed_Particles(RANGE<TV>(TV(0,0),TV(m,m)),V_func,dV_func,density,particles_per_cell);
         } break;
         case 17:{ // stationary pool with two phases
@@ -230,7 +228,7 @@ Initialize()
             T density=2*unit_rho*scale_mass;
             RANDOM_NUMBERS<T> rand;
             rand.Set_Seed();
-            auto V_func=[&](const TV& pos){
+            auto V_func=[&](const TV&){
                 return TV(rand.Get_Uniform_Number(a,b),rand.Get_Uniform_Number(a,b));};
             Seed_Particles(RANGE<TV>(TV(0,0),TV(m,m)),V_func,0,density,particles_per_cell);
         } break;
