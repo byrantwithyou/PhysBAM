@@ -38,7 +38,8 @@ public:
     using BASE::test_system;using BASE::print_matrix;using BASE::move_mass_inside_nearest;
     using typename BASE::COLLISION_TYPE;using BASE::data_directory;using BASE::Add_Fluid_Wall;
     using BASE::test_output_prefix;using BASE::use_test_output;using BASE::flip;
-
+    using BASE::begin_frame;using BASE::end_frame;
+    
     int test_number;
     int resolution;
     bool user_resolution;
@@ -61,7 +62,9 @@ public:
     bool dump_collision_objects;
     bool test_diff;
     bool bc_periodic;
-
+    TV periodic_test_shift;
+    bool use_periodic_test_shift;
+    
     RANDOM_NUMBERS<T> random;
 
     STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
