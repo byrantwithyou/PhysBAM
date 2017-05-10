@@ -72,6 +72,11 @@ private:
     PAIR<PHASE_ID,typename TV::SCALAR> Phase_Of_Cell(const TV_INT& cell_index) const;
     T Density(const FACE_INDEX<TV::m>& face_index) const;
 
+    void Bump_Particles();
+    TV Nearest_Point_On_Surface(const TV& p,const PHASE& ph,
+        const ARRAY<TV,TV_INT>& gradient,
+        const ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT>& Hessian) const;
+
     void Apply_BC(ARRAY<bool,FACE_INDEX<TV::m> >& psi_N);
     int Allocate_Projection_System_Variable(ARRAY<int,TV_INT>& cell_index,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N);
     void Compute_Laplacian(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV_INT>& cell_index,int var);

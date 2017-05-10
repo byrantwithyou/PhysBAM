@@ -13,6 +13,8 @@
 #include <Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
 #include <Tools/Parallel_Computation/APPEND_HOLDER.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <Geometry/Level_Sets/FAST_MARCHING_METHOD_UNIFORM.h>
+#include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR_THREADED.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
@@ -20,7 +22,7 @@
 #include <Grid_PDE/Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
 #include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_MAC.h>
 #include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
-#include <Geometry/Level_Sets/FAST_MARCHING_METHOD_UNIFORM.h>
+#include <Grid_PDE/Interpolation/WENO_INTERPOLATION.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_MAC_DRIVER.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_MAC_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
@@ -147,6 +149,7 @@ Advance_One_Time_Step()
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after particle to grid",0,1);
 
     Build_Level_Sets();
+    Bump_Particles();
     Apply_Forces();
     Print_Grid_Stats("after forces",example.dt);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after forces",0,1);
@@ -377,6 +380,113 @@ Build_Level_Sets(PHASE& ph)
 
     FAST_MARCHING_METHOD_UNIFORM<TV> fmm(*ph.levelset,example.ghost);
     fmm.Fast_Marching_Method(ph.phi,3*dx,&seed_indices);
+}
+//#####################################################################
+// Function Bump_Particles
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Bump_Particles()
+{
+    if(!example.use_bump)
+        return;
+    
+    T weno_eps=(T)1e-6;
+    T dx=example.grid.dX.Max();
+    T one_over_dx=(T)1/dx;
+    TV halfdx=(T).5*example.grid.dX;
+    for(PHASE_ID i(0);i<example.phases.m;i++) {
+        PHASE& ph=example.phases(i);
+
+        ARRAY<T,TV_INT> curvature(example.grid.Cell_Indices(example.ghost-1));
+        for(CELL_ITERATOR<TV> it(example.grid,example.ghost-1);it.Valid();it.Next())
+            curvature(it.index)=ph.levelset->Compute_Curvature(ph.phi,it.index);
+
+        ARRAY<TV,TV_INT> gradient(example.grid.Cell_Indices(example.ghost-1));
+        for(CELL_ITERATOR<TV> it(example.grid,example.ghost-1);it.Valid();it.Next())
+            gradient(it.index)=ph.levelset->Gradient(ph.phi,it.index);
+
+        ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> Hessian(example.grid.Cell_Indices(example.ghost-1));
+        for(CELL_ITERATOR<TV> it(example.grid,example.ghost-1);it.Valid();it.Next()){
+            Hessian(it.index)=ph.levelset->Hessian(ph.phi,it.index);}
+
+        for(int j=0;j<ph.simulated_particles.m;j++){
+            int p=ph.simulated_particles(j);
+            TV X=example.particles.X(p);
+            TV_INT index=example.grid.Cell(X-halfdx);
+            TV c=(X-example.grid.Center(index))*example.grid.One_Over_DX();
+            T phi=WENO_Interpolation(c,ph.phi,index,weno_eps);
+            if(phi>-example.radius_sphere && phi<example.radius_escape){
+                T cell_k[1<<TV::m];
+                for(int l=0;l<(1<<TV::m);l++){
+                    TV_INT cell(index);
+                    for(int d=0;d<TV::m;d++)
+                        if(l&(1<<d))
+                            cell(d)++;
+                    cell_k[l]=curvature(cell);}
+                T absk=abs(LINEAR_INTERPOLATION<T,T>::Linear(cell_k,c));
+
+                T target=(T)0;
+                if(absk>(T)0.5*one_over_dx)
+                    continue;
+                if(absk<(T)0.25*one_over_dx)
+                    target=example.radius_sphere;
+
+                TV nearest=Nearest_Point_On_Surface(X,ph,gradient,Hessian);
+                T norm_grad=WENO_Interpolation(c,gradient,index,weno_eps).Magnitude();
+                T d=phi/norm_grad;
+
+                TV nq=nearest-X;
+                nq.Normalize();
+                if(d>=0)
+                    example.particles.X(p)=nearest+target*nq;
+                else if(d>-target)
+                    example.particles.X(p)=nearest-target*nq;}}}
+}
+//#####################################################################
+// Function Nearest_Point_On_Surface
+//#####################################################################
+template<class TV> TV MPM_MAC_DRIVER<TV>::
+Nearest_Point_On_Surface(const TV& p,const PHASE& ph,
+    const ARRAY<TV,TV_INT>& gradient,
+    const ARRAY<SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m>,TV_INT>& Hessian) const
+{
+    typedef VECTOR<T,TV::m+1> ETV;
+    typedef MATRIX<T,TV::m+1,TV::m+1> ETM;
+
+    T tolerance=(T)1e-10;
+    T weno_eps=(T)1e-6;
+    TV halfdx=(T)0.5*example.grid.dX;
+    MATRIX<T,TV::m,TV::m> I;
+    I.Set_Identity_Matrix();
+    int max_iterations=20;
+    int iterations=0;
+    T norm_grad=(T)1;
+
+    // initial guess: (x,y,multiplier) = (px,py,0)
+    ETV x(p,VECTOR<T,1>(0));
+    ARRAY_VIEW<T,int> loc=x.Array_View(0,p.Size());
+    while(iterations<max_iterations && norm_grad>tolerance){
+        T m=x(TV::m);
+
+        TV_INT index=example.grid.Cell(loc-halfdx);
+        TV c=(loc-example.grid.Center(index))*example.grid.one_over_dX;
+        TV n=WENO_Interpolation(c,gradient,index,weno_eps);
+        T dist=WENO_Interpolation(c,ph.phi,index,weno_eps);
+        SYMMETRIC_MATRIX<T,TV::m> h=WENO_Interpolation(c,Hessian,index,weno_eps);
+
+        ETV g=ETV((T)2*(loc-p)-m*n,VECTOR<T,1>(-dist));
+        norm_grad=g.Max_Abs();
+
+        ETM H;
+        H.Set_Submatrix(0,0,(T)2*I-m*h);
+        ETV en=ETV(-n,VECTOR<T,1>());
+        H.Set_Column(TV::m,en);
+        H.Set_Row(TV::m,en);
+
+        ETV dx=H.PLU_Solve(-g);
+        x=x+dx;
+        ++iterations;}
+    return TV(loc);
 }
 //#####################################################################
 // Function Particle_To_Grid
