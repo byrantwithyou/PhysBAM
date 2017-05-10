@@ -2,7 +2,12 @@
 // Copyright 2017, Ounan Ding, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Arrays_Nd/ARRAYS_ND_VIEW.h>
+#include <Core/Log/LOG.h>
 #include <Core/Math_Tools/sqr.h>
+#include <Core/Vectors/VECTOR.h>
+#include <Grid_PDE/Interpolation/WENO_INTERPOLATION.h>
 namespace PhysBAM{
 
 // From C. Macdonald and S. Ruuth, "Level set equations on surfaces via the Closest Point Method"
@@ -11,7 +16,7 @@ namespace PhysBAM{
 // Assumes x in [0,1].
 // eps is used to prevent division by zero; the paper uses eps=1e-6.
 template<class T> T
-WENO_Interpolation(T x,T z0,T z1,T z2,T z3,T z4,T z5,T eps)
+WENO_Interpolation_Helper(T x,T z0,T z1,T z2,T z3,T z4,T z5,T eps)
 {
     T A0=z2,A1=((T)1/6)*(3*z2+2*z3-6*z1+z0),A2=(T).5*(-2*z2+z3+z1),A3=((T)1/6)*(z3-3*z2+3*z1-z0);
     T B0=z2,B1=((T)1/6)*(-3*z2+6*z3-2*z1-z4),B2=(T).5*(-2*z2+z3+z1),B3=((T)1/6)*(z4-3*z3+3*z2-z1);
@@ -26,6 +31,78 @@ WENO_Interpolation(T x,T z0,T z1,T z2,T z3,T z4,T z5,T eps)
     return PA*wA+PB*wB+PC*wC;
 }
 
+template<class T,int d> static VECTOR<T,d>
+WENO_Interpolation_Helper(T x,const VECTOR<T,d>& z0,const VECTOR<T,d>& z1,const VECTOR<T,d>& z2,
+    const VECTOR<T,d>& z3,const VECTOR<T,d>& z4,const VECTOR<T,d>& z5,T eps)
+{
+    VECTOR<T,d> r;
+    for(int i=0;i<d;i++) r(i)=WENO_Interpolation(x,z0(i),z1(i),z2(i),z3(i),z4(i),z5(i),eps);
+    return r;
+}
+
+template<class T,class U> U
+WENO_Interpolation(T x,U z0,U z1,U z2,U z3,U z4,U z5,T eps)
+{
+    return WENO_Interpolation_Helper(x,z0,z1,z2,z3,z4,z5,eps);
+}
+
+template<class T,class U> U
+WENO_Interpolation_Helper(const VECTOR<T,1>& X,const ARRAYS_ND_BASE<U,VECTOR<int,1> >& z,const VECTOR<int,1>& index,T eps)
+{
+    VECTOR<int,1> r;
+    U u[6];
+    int i;
+    for(i=0,r.x=index.x-2;i<6;i++,r.x++)
+         u[i]=z(r);
+     return WENO_Interpolation(X.x,u,eps);
+}
+
+template<class T,class U> U
+WENO_Interpolation_Helper(const VECTOR<T,2>& X,const ARRAYS_ND_BASE<U,VECTOR<int,2> >& z,const VECTOR<int,2>& index,T eps)
+{
+    VECTOR<int,2> r;
+    U u[6],v[6];
+    int i,j;
+    for(i=0,r.x=index.x-2;i<6;i++,r.x++){
+        for(j=0,r.y=index.y-2;j<6;j++,r.y++)
+            v[j]=z(r);
+        u[i]=WENO_Interpolation(X.y,v,eps);}
+    return WENO_Interpolation(X.x,u,eps);
+}
+
+template<class T,class U> U
+WENO_Interpolation_Helper(const VECTOR<T,3>& X,const ARRAYS_ND_BASE<U,VECTOR<int,3> >& z,const VECTOR<int,3>& index,T eps)
+{
+    VECTOR<int,3> r;
+    U u[6],v[6],w[6];
+    int i,j,k;
+    for(i=0,r.x=index.x-2;i<6;i++,r.x++){
+        for(j=0,r.y=index.y-2;j<6;j++,r.y++){
+            for(k=0,r.z=index.z-2;k<6;k++,r.z++)
+                w[k]=z(r);
+            v[j]=WENO_Interpolation(X.z,w,eps);}
+        u[i]=WENO_Interpolation(X.y,v,eps);}
+    return WENO_Interpolation(X.x,u,eps);
+}
+
+template<class T,class U,int d> U
+WENO_Interpolation(const VECTOR<T,d>& x,const ARRAYS_ND_BASE<U,VECTOR<int,d> >& z,const VECTOR<int,d>& index,T eps)
+{
+    return WENO_Interpolation_Helper(x,z,index,eps);
+}
+
 template float WENO_Interpolation(float x,float z0,float z1,float z2,float z3,float z4,float z5,float eps);
+template float WENO_Interpolation<float,float,1>(VECTOR<float,1> const&,
+    ARRAYS_ND_BASE<float,VECTOR<int,1> > const&,VECTOR<int,1> const&,float);
+template float WENO_Interpolation<float,float,2>(VECTOR<float,2> const&,
+    ARRAYS_ND_BASE<float,VECTOR<int,2> > const&,VECTOR<int,2> const&,float);
+template float WENO_Interpolation<float,float,3>(VECTOR<float,3> const&,
+    ARRAYS_ND_BASE<float,VECTOR<int,3> > const&,VECTOR<int,3> const&,float);
 template double WENO_Interpolation(double x,double z0,double z1,double z2,double z3,double z4,double z5,double eps);
+template double WENO_Interpolation<double,double,1>(VECTOR<double,1> const&,
+    ARRAYS_ND_BASE<double,VECTOR<int,1> > const&,VECTOR<int,1> const&,double);
+template double WENO_Interpolation<double,double,2>(VECTOR<double,2> const&,
+    ARRAYS_ND_BASE<double,VECTOR<int,2> > const&,VECTOR<int,2> const&,double);
+template double WENO_Interpolation<double,double,3>(VECTOR<double,3> const&,
+    ARRAYS_ND_BASE<double,VECTOR<int,3> > const&,VECTOR<int,3> const&,double);
 }
