@@ -1,4 +1,3 @@
-
 //#####################################################################
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
@@ -32,7 +31,8 @@ MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type)
     solver_tolerance(std::numeric_limits<T>::epsilon()*10),solver_iterations(1000),
     threads(1),use_particle_volumes(false),move_mass_inside(false),move_mass_inside_nearest(false),
     use_phi(false),rk_particle_order(0),
-    use_massless_particles(false),use_multiphase_projection(false),use_periodic_test_shift(false),
+    use_massless_particles(false),use_multiphase_projection(false),use_bump(false),
+    use_periodic_test_shift(false),
     debug_particles(*new DEBUG_PARTICLES<TV>),
     print_stats(false),last_te(0),last_grid_ke(0),test_system(false),print_matrix(false)
 {
