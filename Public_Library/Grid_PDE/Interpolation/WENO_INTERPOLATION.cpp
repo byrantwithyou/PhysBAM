@@ -105,4 +105,14 @@ template double WENO_Interpolation<double,double,2>(VECTOR<double,2> const&,
     ARRAYS_ND_BASE<double,VECTOR<int,2> > const&,VECTOR<int,2> const&,double);
 template double WENO_Interpolation<double,double,3>(VECTOR<double,3> const&,
     ARRAYS_ND_BASE<double,VECTOR<int,3> > const&,VECTOR<int,3> const&,double);
+
+// Instantiation for field T^d -> T^d
+#define INSTV(T,d) template VECTOR<T,d>\
+    WENO_Interpolation<T,VECTOR<T,d>,d>(VECTOR<T,d> const&,\
+        ARRAYS_ND_BASE<VECTOR<T,d>,VECTOR<int,d> > const&,VECTOR<int,d> const&,T)
+
+INSTV(float,2);
+INSTV(float,3);
+INSTV(double,2);
+INSTV(double,3);
 }
