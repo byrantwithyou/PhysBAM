@@ -361,14 +361,13 @@ Build_Level_Sets(PHASE& ph)
     RANGE<TV_INT> grid_domain=example.grid.Domain_Indices(example.ghost);
     for(int k=0;k<ph.simulated_particles.m;k++){
         int p=ph.simulated_particles(k);
-        T r=0.36*dx;
-        T influence_bound=r+dx*(T)1.1;
+        T influence_bound=example.radius_sphere+dx*(T)1.1;
         TV X=example.particles.X(p);
         RANGE<TV> bound(X-influence_bound,X+influence_bound);
         RANGE<TV_INT> range=example.grid.Clamp_To_Cell(bound).Intersect(grid_domain);
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
             T d=(X-example.grid.Center(it.index)).Magnitude();
-            ph.phi(it.index)=min(ph.phi(it.index),d-r);}}
+            ph.phi(it.index)=min(ph.phi(it.index),d-example.radius_sphere);}}
 
     ARRAY<TV_INT> seed_indices;
     for(FACE_ITERATOR<TV> it(example.grid,example.ghost,GRID<TV>::INTERIOR_REGION);it.Valid();it.Next()){
