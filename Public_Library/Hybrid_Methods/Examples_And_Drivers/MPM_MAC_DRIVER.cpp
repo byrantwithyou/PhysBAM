@@ -86,6 +86,9 @@ Initialize()
         PHYSBAM_ASSERT(a==b);
         example.periodic_boundary.is_periodic(i)=a;}
 
+    example.radius_sphere=(T)0.36*example.grid.dX.Max();
+    example.radius_escape=TV::m==2?(T)1.5*example.grid.dX.Max():(T)1.1*example.grid.dX.Max();
+
     // must have level sets in order to use multiphase projection
     if(example.use_multiphase_projection){
         PHYSBAM_ASSERT(example.use_phi);}
