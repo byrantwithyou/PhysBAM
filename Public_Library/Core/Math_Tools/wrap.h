@@ -17,8 +17,15 @@
 namespace PhysBAM{
 
 inline int wrap(const int i,const int n)
-{if(i>=0) return i%n;
-else return n-(-i)%n;} // i < 0 case
+{
+    int k=i%n;
+    if(k<0) k+=n;
+    return k;
+}
+
+// ensure lower <= value < upper
+inline int wrap(const int value,const int lower,const int upper)
+{return wrap(value-lower,upper-lower)+lower;}
 
 inline float wrap(const float value,const float lower,const float upper)
 {float r=fmod(value-lower,upper-lower);if(r<0) return r+upper;else return r+lower;}
