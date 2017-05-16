@@ -248,6 +248,10 @@ Particle_To_Grid(PHASE& ph) const
                 V+=dV(p).Row(index.axis).Dot(scale*(example.grid.Face(index)-particles.X(p)));}
             ph.velocity(index)+=particles.mass(p)*w*V;
         });
+    Fix_Periodic_Accum(ph.mass);
+    Fix_Periodic_Accum(ph.velocity);
+    Fix_Periodic_Accum(ph.volume);
+
     // TODO: move mass, momentum, volume inside
     if(example.move_mass_inside)
         Move_Mass_Momentum_Inside(ph);
@@ -1030,6 +1034,26 @@ Fix_Periodic(ARRAY<T2,FACE_INDEX<TV::m> >& u,int ghost) const
     if(ghost==INT_MAX) ghost=example.ghost;
     Apply_Boundary_Condition_Face_Periodic(example.grid,u,example.periodic_boundary.is_periodic);
     Fill_Ghost_Faces_Periodic(example.grid,u,u,example.periodic_boundary.is_periodic,ghost);
+}
+//#####################################################################
+// Function Fix_Periodic
+//#####################################################################
+template<class TV> template<class T2> void MPM_MAC_DRIVER<TV>::
+Fix_Periodic_Accum(ARRAY<T2,TV_INT>& u,int ghost) const
+{
+    if(!example.bc_type.Contains(example.BC_PERIODIC)) return;
+    if(ghost==INT_MAX) ghost=example.ghost;
+    Fill_Ghost_Cells_Periodic_Accum(example.grid,u,u,example.periodic_boundary.is_periodic,ghost);
+}
+//#####################################################################
+// Function Fix_Periodic
+//#####################################################################
+template<class TV> template<class T2> void MPM_MAC_DRIVER<TV>::
+Fix_Periodic_Accum(ARRAY<T2,FACE_INDEX<TV::m> >& u,int ghost) const
+{
+    if(!example.bc_type.Contains(example.BC_PERIODIC)) return;
+    if(ghost==INT_MAX) ghost=example.ghost;
+    Fill_Ghost_Faces_Periodic_Accum(example.grid,u,u,example.periodic_boundary.is_periodic,ghost);
 }
 //#####################################################################
 namespace PhysBAM{
