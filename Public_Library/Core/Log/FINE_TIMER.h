@@ -25,7 +25,7 @@ struct GLOBAL
     long long child_time;
     long long num_calls;
 
-    GLOBAL(const char* name)
+    explicit GLOBAL(const char* name)
         :name(name),total_time(0),child_time(0),num_calls(0)
     {
         Get_Global().push_back(this);
@@ -40,7 +40,7 @@ struct LOCAL
     GLOBAL* global;
     GLOBAL* save_scope;
 
-    LOCAL(GLOBAL* global)
+    explicit LOCAL(GLOBAL* global)
         :start_time(__rdtsc()),global(global),save_scope(current_scope)
     {
         current_scope=global;

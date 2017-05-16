@@ -18,8 +18,9 @@ namespace PhysBAM{
 // Class MPM_PROJECTION_SYSTEM
 //#####################################################################
 template<class TV>
-struct MPM_PROJECTION_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
+class MPM_PROJECTION_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
 {
+public:
     typedef typename TV::SCALAR T;
     SPARSE_MATRIX_FLAT_MXN<T> A;
     mutable ARRAY<T> temp_vector;

@@ -53,7 +53,6 @@ Number_Of_Constraints() const
 template<class TV> void MATRIX_FLUID_INTERPOLATION<TV>::
 Compute(int ghost_cells)
 {
-    VECTOR<SIDED_FACE_INDEX<d>,2*d-2> neighbor_faces;
     rows.Remove_All();
     for(int i=0;i<index_map.indexed_constraints.m;i++) rows.Append(index_map.indexed_faces.m+i);
 }

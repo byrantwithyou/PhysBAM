@@ -5,7 +5,7 @@
 #include <Core/Math_Tools/max.h>
 #include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Compressible/Reactive_Euler_Equations/REACTIVE_EULER_2D.h>
-using namespace PhysBAM;
+namespace PhysBAM{
 //#####################################################################
 // Function Euler_Step
 //#####################################################################
@@ -52,3 +52,4 @@ CFL()
 //#####################################################################
 template class REACTIVE_EULER_2D<float>;
 template class REACTIVE_EULER_2D<double>;
+}

@@ -19,8 +19,8 @@ public:
 //#####################################################################
     static int Write_Substeps_Level();
     static void Set_Write_Substeps_Level(const int level);
-    static void Set_Substep_Writer(void* writer_object,void writer(void *,const std::string&,int,int));
-    static void Clear_Substep_Writer(void* writer_object);
+    static void Set_Substep_Writer(void* writer_object_input,void writer_input(void *,const std::string&,int,int));
+    static void Clear_Substep_Writer(void* writer_object_input);
     static void Write_Substep_Helper(const std::string& title,const int substep,const int level=0); // don't call directly
 //#####################################################################
 };

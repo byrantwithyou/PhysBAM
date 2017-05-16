@@ -14,7 +14,7 @@
 
 namespace PhysBAM
 {
-template<class TV> struct MPM_PARTICLES;
+template<class TV> class MPM_PARTICLES;
 template<class T>
 class OPENGL_COMPONENT_MPM_PARTICLES_3D:public OPENGL_COMPONENT<T>
 {

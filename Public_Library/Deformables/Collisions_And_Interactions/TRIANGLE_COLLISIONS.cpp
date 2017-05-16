@@ -308,7 +308,6 @@ Scale_And_Apply_Impulses()
             T new_scale=-(relative_speed-ee_old_speeds(i))/ee_old_speeds(i);
             ee_target_impulses(i)/=new_scale;}}
     // Apply the newly scaled impulses
-    ARRAY_VIEW<TV> V(geometry.deformable_body_collection.particles.V);
     for(int i=0;i<pf_target_impulses.m;i++){
         if(pf_target_impulses(i) == TV()) continue;
         const VECTOR<int,d+1>& nodes=point_face_pairs_internal(i);

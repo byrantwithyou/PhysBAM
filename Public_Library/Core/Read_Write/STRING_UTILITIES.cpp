@@ -26,10 +26,10 @@ bool Is_Number(const std::string& str) // integer or floating point
 int Compare_Strings(const char* str1,int len1,const char* str2,int len2,bool case_sensitive)
 {
     int min_len=std::min(len1,len2);
-    if(!case_sensitive)
+    if(!case_sensitive){
         for(int i=0;i<min_len;i++)
             if(int r=::tolower(str1[i])-::tolower(str2[i]))
-                return r<0?-1:1;
+                return r<0?-1:1;}
     else if(int r=memcmp(str1,str2,min_len)) return r;
     if(len1<len2) return -1;
     return len1>len2;

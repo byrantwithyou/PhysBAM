@@ -6,7 +6,7 @@
 #include <Grid_Tools/Grids/GRID.h>
 #include <Compressible/Reactive_Euler_Equations/REACTIVE_EULER.h>
 #include <cmath>
-using namespace PhysBAM;
+namespace PhysBAM{
 //#####################################################################
 // Function e
 //#####################################################################
@@ -41,3 +41,4 @@ template class REACTIVE_EULER<VECTOR<float,3> >;
 template class REACTIVE_EULER<VECTOR<double,1> >;
 template class REACTIVE_EULER<VECTOR<double,2> >;
 template class REACTIVE_EULER<VECTOR<double,3> >;
+}

@@ -15,7 +15,7 @@ namespace PhysBAM{
 #define PHYSBAM_SIMPLE_EXCEPTION(ERROR,BASE) \
     struct ERROR:public BASE                 \
     {                                        \
-        ERROR(const std::string& message)    \
+        explicit ERROR(const std::string& message)    \
             :BASE(message)                   \
         {}                                   \
                                              \

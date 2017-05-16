@@ -18,7 +18,7 @@ public:
     KRYLOV_VECTOR_BASE();
     virtual ~KRYLOV_VECTOR_BASE();
 
-    const KRYLOV_VECTOR_BASE& operator= (const KRYLOV_VECTOR_BASE& bv)
+    KRYLOV_VECTOR_BASE& operator= (const KRYLOV_VECTOR_BASE& bv)
     {Copy((T)1,bv);return *this;}
 
     virtual KRYLOV_VECTOR_BASE& operator+=(const KRYLOV_VECTOR_BASE& bv)=0;

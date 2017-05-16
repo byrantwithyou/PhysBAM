@@ -7,7 +7,7 @@
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Compressible/Burgers_Equation/BURGERS_1D.h>
-using namespace PhysBAM;
+namespace PhysBAM{
 //#####################################################################
 // Function Euler_Step
 //#####################################################################
@@ -46,3 +46,4 @@ CFL()
 //#####################################################################
 template class BURGERS_1D<float>;
 template class BURGERS_1D<double>;
+}

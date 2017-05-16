@@ -152,7 +152,7 @@ public:
     {return max_corner;}
 
     void Corners(VECTOR<TV,1<<TV::m>& corners) const
-    {TV s[2]={min_corner,max_corner};for(int i=0;i<(1<<TV::m);i++) for(int d=0;d<TV::m;d++) corners(i)(d)=s[(i>>d)&1](d);}
+    {TV s[2]={min_corner,max_corner};for(int i=0;i<(1<<TV::m);i++) for(int j=0;j<TV::m;j++) corners(i)(j)=s[(i>>j)&1](j);}
 
     T Size() const // assumes nonnegative entries
     {return Edge_Lengths().Product();}

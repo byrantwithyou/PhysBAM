@@ -15,8 +15,6 @@ template<class TV> void
 Setup_Common(SHALLOW_WATER_STATE<TV>& st,PARSE_ARGS& parse_args,COMMON_DATA<TV>& cd)
 {
     typedef typename TV::SCALAR T;
-    typedef VECTOR<int,TV::m> TV_INT;
-    typedef VECTOR<T,TV::m+1> T_VEC;
     T framerate=24;
     parse_args.Extra(&cd.test_number,"example number","example number to run");
     parse_args.Add("-restart",&st.restart,"frame","restart frame");

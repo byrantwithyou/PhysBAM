@@ -485,7 +485,6 @@ Move_Mass_Momentum_Inside_Nearest(PHASE& ph) const
         TV loc=fit.Location();
         T mass=ph.mass(fit.Full_Index());
         if(!mass) continue;
-        T momentum=ph.velocity(fit.Full_Index());
         T volume=0;
         if(example.use_particle_volumes)
             volume=ph.volume(fit.Full_Index());

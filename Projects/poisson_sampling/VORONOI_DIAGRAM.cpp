@@ -230,11 +230,11 @@ Visualize_State(const char* title) const
     VECTOR<T,3> color_rc(1,.5,0);
     VECTOR<T,3> color_c[3]={{1,1,0},{1,0,0},{0,1,0}};
     VECTOR<T,3> color_cv(0,1,0);
-    VECTOR<T,3> color_v[3]={{0,0,1},{1,0,0},{0,1,0}};
+//    VECTOR<T,3> color_v[3]={{0,0,1},{1,0,0},{0,1,0}};
     T unbounded_length = .5;
 //    T offset = 0;
 
-    VECTOR<T,3> color_p[]={{1,.5,.5},{.5,1,.5},{.5,.5,1},{0,1,0},{1,.5,0},{1,1,0},{0,.5,0}};
+//    VECTOR<T,3> color_p[]={{1,.5,.5},{.5,1,.5},{.5,.5,1},{0,1,0},{1,.5,0},{1,1,0},{0,.5,0}};
     
     // for(auto it:coedges)
     // {

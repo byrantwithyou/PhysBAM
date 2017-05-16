@@ -638,7 +638,6 @@ Scale_And_Apply_Impulses(const T_ARRAY& pairs,ARRAY<TV>& target_impulses,ARRAY<T
             T new_scale=-(relative_speed-old_speeds(i))/old_speeds(i);
             target_impulses(i)/=new_scale;}} // TODO: should we be doing this, or storing a maximum scale factor at each node?
     // Apply the newly scaled impulses
-    ARRAY_VIEW<TV> V(geometry.deformable_body_collection.particles.V);
     for(int i=0;i<target_impulses.m;i++){
         if(target_impulses(i)==TV()) continue;
         const REPULSION_PAIR<TV>& pair=pairs(i);

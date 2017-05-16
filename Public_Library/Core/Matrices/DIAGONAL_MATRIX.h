@@ -203,11 +203,11 @@ public:
 
     static VECTOR<T,1> Cofactor_Matrix_Helper(const VECTOR<T,1>& v,T& prod){prod=v.x;return VECTOR<T,1>(1);}
     static VECTOR<T,2> Cofactor_Matrix_Helper(const VECTOR<T,2>& v,T& prod){prod=v.Product();return VECTOR<T,2>(v.y,v.x);}
-    template<int n> static VECTOR<T,n> Cofactor_Matrix_Helper(const VECTOR<T,n>& v,T& prod)
+    template<int p> static VECTOR<T,p> Cofactor_Matrix_Helper(const VECTOR<T,p>& v,T& prod)
     {
         T p1,p2;
-        VECTOR<T,n/2> v1;
-        VECTOR<T,n-n/2> v2;
+        VECTOR<T,p/2> v1;
+        VECTOR<T,p-p/2> v2;
         v.Split(v1,v2);
         v1=Cofactor_Matrix_Helper(v1,p1);
         v2=Cofactor_Matrix_Helper(v2,p2);
