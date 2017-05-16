@@ -22,7 +22,7 @@ Apply_Boundary_Condition_Face_Periodic(const GRID<TV>& grid,ARRAY<T2,FACE_INDEX<
     const VECTOR<bool,TV::m>& is_periodic)
 {
     typedef VECTOR<int,TV::m> TV_INT;
-    TV_INT periods=grid.Domain_Indices().Maximum_Corner();
+    TV_INT periods=grid.numbers_of_cells;
     for(int axis=0;axis<TV::m;axis++){
         if(!is_periodic(axis)) continue;
         for(FACE_ITERATOR<TV> it(grid,0,GRID<TV>::BOUNDARY_REGION,2*axis,axis);it.Valid();it.Next()){
@@ -41,14 +41,12 @@ Fill_Ghost_Cells_Periodic(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<in
     typedef VECTOR<int,TV::m> TV_INT;
     ARRAYS_ND_BASE<T2,TV_INT>::Put(u,u_ghost); // interior
     TV_INT periods=grid.numbers_of_cells;
-    for(int axis=0;axis<TV::m;axis++){
-        if(!is_periodic(axis)) continue;
-        for(int axis_side=0;axis_side<2;axis_side++){
-            int shift=periods(axis)*(1-2*axis_side);
-            for(CELL_ITERATOR<TV> it(grid,number_of_ghost_cells,GRID<TV>::GHOST_REGION,2*axis+axis_side);it.Valid();it.Next()){
-                TV_INT ind(it.index);
-                ind(axis)+=shift;
-                u_ghost(it.index)=u_ghost(ind);}}}
+    for(CELL_ITERATOR<TV> it(grid,number_of_ghost_cells,GRID<TV>::GHOST_REGION);it.Valid();it.Next()){
+        TV_INT ind=it.index;
+        for(int i=0;i<TV::m;i++)
+            if(is_periodic(i))
+                ind(i)=wrap(ind(i),0,grid.numbers_of_cells(i));
+        u_ghost(it.index)=u(ind);}
 }
 //#####################################################################
 // Function Fill_Ghost_Faces_Periodic
@@ -66,7 +64,7 @@ Fill_Ghost_Faces_Periodic(const GRID<TV>& grid,const ARRAY<T2,FACE_INDEX<TV::m> 
         ARRAYS_ND_BASE<T2,TV_INT>& u_ghost_axis=u_ghost.Component(axis);
         ARRAYS_ND_BASE<T2,TV_INT>::Put(u_axis,u_ghost_axis); // interior
         GRID<TV> face_grid=grid.Get_Face_Grid(axis);
-        TV_INT periods=grid.Domain_Indices().Maximum_Corner();
+        TV_INT periods=grid.numbers_of_cells;
         VECTOR<RANGE<TV_INT>,2*TV::m> regions;
         BOUNDARY_MAC_GRID_PERIODIC<TV,typename TV::SCALAR>::Find_Ghost_Regions(face_grid,regions,number_of_ghost_cells);
         for(int face_axis=0;face_axis<TV::m;face_axis++)
@@ -76,6 +74,54 @@ Fill_Ghost_Faces_Periodic(const GRID<TV>& grid,const ARRAY<T2,FACE_INDEX<TV::m> 
                 for(NODE_ITERATOR<TV> iterator(face_grid,regions(side));iterator.Valid();iterator.Next()){
                     TV_INT node=iterator.Node_Index();
                     u_ghost_axis(node)=u_ghost_axis(node+period);}}}
+}
+//#####################################################################
+// Function Fill_Ghost_Cells_Periodic
+//#####################################################################
+template<class T2,class TV> void
+Fill_Ghost_Cells_Periodic_Accum(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,TV::m> >& u,
+    ARRAYS_ND_BASE<T2,VECTOR<int,TV::m> >& u_ghost,const VECTOR<bool,TV::m>& is_periodic,
+    const int number_of_ghost_cells)
+{
+    typedef VECTOR<int,TV::m> TV_INT;
+    ARRAYS_ND_BASE<T2,TV_INT>::Put(u,u_ghost); // interior
+    for(CELL_ITERATOR<TV> it(grid,number_of_ghost_cells,GRID<TV>::GHOST_REGION);it.Valid();it.Next()){
+        TV_INT ind(wrap(it.index,TV_INT(),grid.numbers_of_cells));
+        u_ghost(ind)+=u(it.index);}
+    Fill_Ghost_Cells_Periodic(grid,u_ghost,u_ghost,is_periodic,number_of_ghost_cells);
+}
+//#####################################################################
+// Function Fill_Ghost_Faces_Periodic
+//#####################################################################
+template<class T2,class TV> void
+Fill_Ghost_Faces_Periodic_Accum(const GRID<TV>& grid,const ARRAY<T2,FACE_INDEX<TV::m> >& u,
+    ARRAY<T2,FACE_INDEX<TV::m> >& u_ghost,const VECTOR<bool,TV::m>& is_periodic,
+    const int number_of_ghost_cells)
+{
+    typedef VECTOR<int,TV::m> TV_INT;
+    assert(grid.Is_MAC_Grid());
+    ARRAY<T2,FACE_INDEX<TV::m> >::Put(u,u_ghost); // interior
+    TV_INT periods=grid.numbers_of_cells;
+    for(FACE_ITERATOR<TV> it(grid,number_of_ghost_cells,GRID<TV>::GHOST_REGION);it.Valid();it.Next()){
+        FACE_INDEX<TV::m> fit(it.Full_Index());
+        for(int i=0;i<TV::m;i++)
+            if(is_periodic(i))
+                fit.index(i)=wrap(fit.index(i),0,grid.numbers_of_cells(i));
+        if(fit.index!=it.index)
+            u_ghost(fit)+=u(it.Full_Index());}
+    for(int axis=0;axis<TV::m;axis++){
+        if(!is_periodic(axis)) continue;
+        for(FACE_ITERATOR<TV> it(grid,0,GRID<TV>::BOUNDARY_REGION,2*axis,axis);it.Valid();it.Next()){
+            FACE_INDEX<TV::m> face(it.Full_Index());
+            face.index(axis)+=periods(axis);
+            u_ghost(it.Full_Index())+=u(face);
+            u_ghost(face)=u_ghost(it.Full_Index());}}
+    for(FACE_ITERATOR<TV> it(grid,number_of_ghost_cells,GRID<TV>::GHOST_REGION);it.Valid();it.Next()){
+        FACE_INDEX<TV::m> fit(it.Full_Index());
+        for(int i=0;i<TV::m;i++)
+            if(is_periodic(i))
+                fit.index(i)=wrap(fit.index(i),0,grid.numbers_of_cells(i));
+        u_ghost(it.Full_Index())=u_ghost(fit);}
 }
 //#####################################################################
 // Function Apply_Boundary_Condition
@@ -149,4 +195,28 @@ template void Fill_Ghost_Faces_Periodic<bool,VECTOR<float,2> >(
 template void Fill_Ghost_Faces_Periodic<bool,VECTOR<float,3> >(
     GRID<VECTOR<float,3> > const&,ARRAY<bool,FACE_INDEX<VECTOR<float,3>::m> > const&,
     ARRAY<bool,FACE_INDEX<VECTOR<float,3>::m> >&,VECTOR<bool,VECTOR<float,3>::m> const&,int);
+template void Fill_Ghost_Cells_Periodic<int,VECTOR<double,2> >(GRID<VECTOR<double,2> > const&,
+    ARRAYS_ND_BASE<int,VECTOR<int,VECTOR<double,2>::m> > const&,
+    ARRAYS_ND_BASE<int,VECTOR<int,VECTOR<double,2>::m> >&,
+    VECTOR<bool,VECTOR<double,2>::m> const&,int);
+template void Fill_Ghost_Cells_Periodic<int,VECTOR<float,2> >(GRID<VECTOR<float,2> > const&,
+    ARRAYS_ND_BASE<int,VECTOR<int,VECTOR<float,2>::m> > const&,
+    ARRAYS_ND_BASE<int,VECTOR<int,VECTOR<float,2>::m> >&,
+    VECTOR<bool,VECTOR<float,2>::m> const&,int);
+template void Fill_Ghost_Faces_Periodic_Accum<double,VECTOR<double,2> >(
+    GRID<VECTOR<double,2> > const&,ARRAY<double,FACE_INDEX<VECTOR<double,2>::m> > const&,
+    ARRAY<double,FACE_INDEX<VECTOR<double,2>::m> >&,
+    VECTOR<bool,VECTOR<double,2>::m> const&,int);
+template void Fill_Ghost_Faces_Periodic_Accum<double,VECTOR<double,3> >(
+    GRID<VECTOR<double,3> > const&,ARRAY<double,FACE_INDEX<VECTOR<double,3>::m> > const&,
+    ARRAY<double,FACE_INDEX<VECTOR<double,3>::m> >&,
+    VECTOR<bool,VECTOR<double,3>::m> const&,int);
+template void Fill_Ghost_Faces_Periodic_Accum<float,VECTOR<float,2> >(
+    GRID<VECTOR<float,2> > const&,ARRAY<float,FACE_INDEX<VECTOR<float,2>::m> > const&,
+    ARRAY<float,FACE_INDEX<VECTOR<float,2>::m> >&,
+    VECTOR<bool,VECTOR<float,2>::m> const&,int);
+template void Fill_Ghost_Faces_Periodic_Accum<float,VECTOR<float,3> >(
+    GRID<VECTOR<float,3> > const&,ARRAY<float,FACE_INDEX<VECTOR<float,3>::m> > const&,
+    ARRAY<float,FACE_INDEX<VECTOR<float,3>::m> >&,
+    VECTOR<bool,VECTOR<float,3>::m> const&,int);
 }

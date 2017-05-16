@@ -41,5 +41,14 @@ Fill_Ghost_Faces_Periodic(const GRID<TV>& grid,const ARRAY<T2,FACE_INDEX<TV::m> 
 template<class T2,class TV> void
 Apply_Boundary_Condition_Face_Periodic(const GRID<TV>& grid,ARRAY<T2,FACE_INDEX<TV::m> >& u,
     const VECTOR<bool,TV::m>& is_periodic);
+template<class T2,class TV> void
+Fill_Ghost_Cells_Periodic_Accum(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,TV::m> >& u,
+    ARRAYS_ND_BASE<T2,VECTOR<int,TV::m> >& u_ghost,const VECTOR<bool,TV::m>& is_periodic,
+    const int number_of_ghost_cells);
+template<class T2,class TV> void
+Fill_Ghost_Faces_Periodic_Accum(const GRID<TV>& grid,const ARRAY<T2,FACE_INDEX<TV::m> >& u,
+    ARRAY<T2,FACE_INDEX<TV::m> >& u_ghost,const VECTOR<bool,TV::m>& is_periodic,
+    const int number_of_ghost_cells);
+
 }
 #endif
