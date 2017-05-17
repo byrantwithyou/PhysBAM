@@ -434,14 +434,14 @@ Find_And_Read_Central_Header()
     std::ios::streamoff read_start=max_comment_size+read_size_before_comment;
     if(read_start>end_position) read_start=end_position;
     istream.seekg(end_position-read_start);
-    char *buf=new char[read_start];
     if(read_start<=0){LOG::cerr<<"ZIP: Invalid read buffer size"<<std::endl;return false;}
+    char *buf=new char[read_start];
     istream.read(buf,read_start);
     int found=-1;
     for(unsigned int i=0;(int)i<read_start-3;i++){
         if(buf[i]==0x50 && buf[i+1]==0x4b && buf[i+2]==0x05 && buf[i+3]==0x06){found=i;break;}}
     delete [] buf;
-    if(found==-1){LOG::cerr<<"ZIP: Failed to find zip header"<<std::endl;delete [] buf;return false;}
+    if(found==-1){LOG::cerr<<"ZIP: Failed to find zip header"<<std::endl;return false;}
     // seek to end of central header and read
     istream.seekg(end_position-(read_start-found));
     unsigned int word;
@@ -463,7 +463,8 @@ Find_And_Read_Central_Header()
     for(int i=0;i<num_files;i++){
         ZIP_FILE_HEADER* header=new ZIP_FILE_HEADER;
         bool valid=header->Read(istream,true);
-        if(valid) filename_to_header.Insert(header->filename,header);}
+        if(valid) filename_to_header.Insert(header->filename,header);
+        else delete header;}
     return true;
 }
 //#####################################################################
