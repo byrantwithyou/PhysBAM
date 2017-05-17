@@ -143,7 +143,7 @@ Construct_Balanced_KD_Tree()
     if(photons_stored<=0)return;
     ARRAY<int> permutation_array(photons.m),kdtree_array(photons.m);
     for(int i=0;i<photons.m;i++)permutation_array(i)=kdtree_array(i)=i;
-    Balance_Sub_KD_Tree(1,1,photons.m,permutation_array,kdtree_array,bounding_box);
+    Balance_Sub_KD_Tree(0,0,photons.m-1,permutation_array,kdtree_array,bounding_box);
     // reorder array (current_index position is always been saved so you can write new value there)
     int current_index=1;int index_of_photon_to_relocate=1;
     PHOTON<T> photon_to_relocate=photons(index_of_photon_to_relocate);
