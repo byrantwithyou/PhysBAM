@@ -157,6 +157,7 @@ Build_Matrix_With_Contract(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix,Args&& ...a
             if(pruned_cm(i)){
                 comp_n=&pruned_cm(i)->compressed(c);
                 n=pruned_cm(i)->dofs(c);}
+        PHYSBAM_ASSERT(comp_n);
     
         M.Reset(n);
         M.offsets.Resize(m+1);
