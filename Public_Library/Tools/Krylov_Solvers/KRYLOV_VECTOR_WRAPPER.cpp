@@ -108,6 +108,7 @@ Raw_Size() const
 template<class T,class TV> T& KRYLOV_VECTOR_WRAPPER<T,TV>::
 Raw_Get(int i)
 {
+    assert(v.Size()>0);
     return Raw_Get_Helper(i,(T*)0,v);
 }
 //#####################################################################
