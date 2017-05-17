@@ -260,6 +260,7 @@ Visualize_State(const char* title) const
     {
         Add_Debug_Particle(it->X,color_r[it->state]);
         COEDGE* ce=it->coedge;
+        PHYSBAM_ASSERT(ce);
         while(ce)
         {
             const VERTEX* h=ce->head;

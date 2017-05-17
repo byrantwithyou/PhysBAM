@@ -111,9 +111,9 @@ Add_Rigid_Body(const std::string& name,const T scaling_factor,const T friction,c
     if(!always_read_object){
         IMPLICIT_OBJECT<TV>* implicit=0;
         if(name=="sphere") implicit=::Add_Analytic_Sphere(TV(),scaling_factor);
-        if(name=="skinnycyllink") implicit=::Add_Analytic_Cylinder(TV(),scaling_factor);
-        if(name=="Rings_Test/ring_revolve") implicit=Add_Analytic_Ring(TV(),scaling_factor);
-        if(name=="ground") implicit=Add_Analytic_Ground(TV(),scaling_factor);
+        else if(name=="skinnycyllink") implicit=::Add_Analytic_Cylinder(TV(),scaling_factor);
+        else if(name=="Rings_Test/ring_revolve") implicit=Add_Analytic_Ring(TV(),scaling_factor);
+        else if(name=="ground") implicit=Add_Analytic_Ground(TV(),scaling_factor);
         if(implicit){
             if(TV::m==3){
                 STRUCTURE<TV>* structure=choice<TV::m-2>(implicit,TESSELLATION::Generate_Triangles(*implicit));
