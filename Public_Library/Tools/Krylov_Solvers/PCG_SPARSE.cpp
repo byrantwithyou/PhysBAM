@@ -25,6 +25,7 @@ Solve(SPARSE_MATRIX_FLAT_MXN<T>& A_matrix,ARRAY<T>& x,ARRAY<T>& b,ARRAY<KRYLOV_V
     if(evolution_solver_type==krylov_solver_cg){solver=&cg;}
     else if(evolution_solver_type==krylov_solver_cr){solver=&cr;}
     else if(evolution_solver_type==krylov_solver_symmqmr){solver=&symmqmr;}
+    else PHYSBAM_FATAL_ERROR("Invalid krylov solver");
     solver->print_diagnostics=show_results;solver->print_residuals=show_residual;
     solver->restart_iterations=cg_restart_iterations;
     PCG_SPARSE_SYSTEM<T> system(*this,A_matrix);

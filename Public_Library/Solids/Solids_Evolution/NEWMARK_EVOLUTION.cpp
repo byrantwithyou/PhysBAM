@@ -203,6 +203,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
     if(solids_parameters.implicit_solve_parameters.evolution_solver_type==krylov_solver_cg){solver=&cg;solver_name="CG";}
     else if(solids_parameters.implicit_solve_parameters.evolution_solver_type==krylov_solver_cr){solver=&cr;solver_name="CONJUGATE_RESIDUAL";}
     else if(solids_parameters.implicit_solve_parameters.evolution_solver_type==krylov_solver_symmqmr){solver=&symmqmr;solver_name="SYMMQMR";}
+    PHYSBAM_ASSERT(solver);
     solver->print_diagnostics=solid_body_collection.print_diagnostics;
     solver->print_residuals=solid_body_collection.print_residuals;
     solver->iterations_used=&solid_body_collection.iterations_used_diagnostic;

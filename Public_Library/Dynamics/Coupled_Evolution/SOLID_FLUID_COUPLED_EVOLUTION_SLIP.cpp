@@ -364,6 +364,7 @@ Solve(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velocities,const T dt,con
     if(solids_parameters.implicit_solve_parameters.evolution_solver_type==krylov_solver_cg){solver=&cg;solver_name="CG";}
     else if(solids_parameters.implicit_solve_parameters.evolution_solver_type==krylov_solver_cr){solver=&cr;solver_name="CONJUGATE_RESIDUAL";}
     else if(solids_parameters.implicit_solve_parameters.evolution_solver_type==krylov_solver_symmqmr){solver=&symmqmr;solver_name="SYMMQMR";}
+    PHYSBAM_ASSERT(solver);
     LOG::SCOPE solve_scope(solver_name);
 
     solver->nullspace_tolerance=(T)-1;
