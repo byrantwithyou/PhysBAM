@@ -365,7 +365,7 @@ bool Parse_Pair(const char*& str,std::string& key,std::string& value)
 void Emit_Camera(std::ofstream& fout,const HASHTABLE<std::string,std::string>& options)
 {
     TV loc, at, up;
-    T angle;
+    T angle=0;
     std::string file=options.Get("location"), line;
     std::ifstream fin(file.c_str());
     while(getline(fin, line))
