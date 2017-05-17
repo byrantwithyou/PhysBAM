@@ -20,7 +20,7 @@ namespace PhysBAM{
 template<class TV> IMPLICIT_OBJECT_DILATE<TV>::
 ~IMPLICIT_OBJECT_DILATE()
 {
-    if(owns_io) delete &io;
+    if(owns_io) delete io;
 }
 //#####################################################################
 // Function Update_Box
