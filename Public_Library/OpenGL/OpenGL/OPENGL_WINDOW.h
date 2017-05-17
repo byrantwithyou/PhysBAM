@@ -19,7 +19,7 @@ public:
     OPENGL_WORLD<T>& opengl_world;
     std::string window_title;
 
-    OPENGL_WINDOW(OPENGL_WORLD<T>& opengl_world_input)
+    explicit OPENGL_WINDOW(OPENGL_WORLD<T>& opengl_world_input)
         :opengl_world(opengl_world_input),window_title("PhysBAM OpenGL")
     {}
 
