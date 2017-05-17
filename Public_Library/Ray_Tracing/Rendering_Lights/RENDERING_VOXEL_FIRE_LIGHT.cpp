@@ -113,7 +113,7 @@ Emit_Photons(RENDERING_RAY<T>& parent_ray,PHOTON_MAP<T>& photon_map,const typena
         RANDOM_NUMBERS<T>* random=0;
         if(type==PHOTON_MAP<T>::GLOBAL_PHOTON_MAP) random=&global_photon_random;
         else if(type==PHOTON_MAP<T>::CAUSTIC_PHOTON_MAP) random=&caustic_photon_random;
-        else if(type==PHOTON_MAP<T>::VOLUME_PHOTON_MAP) random=&volume_photon_random;
+        else{PHYSBAM_ASSERT(type==PHOTON_MAP<T>::VOLUME_PHOTON_MAP);random=&volume_photon_random;}
         world.random.Set_Seed(abs((int)random->Get_Uniform_Number((T)0,(T)1)));
 
         T xi_x=world.random.Get_Uniform_Number((T)0,(T)1),xi_y=world.random.Get_Uniform_Number((T)0,(T)1),xi_z=world.random.Get_Uniform_Number((T)0,(T)1);
