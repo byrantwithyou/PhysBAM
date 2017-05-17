@@ -497,7 +497,7 @@ Process_Node(PROGRAM_PARSE_NODE* node)
             return reg;}
 
         case '?':{
-            PHYSBAM_ASSERT(node->b->type==':');
+            PHYSBAM_ASSERT(node->b && node->b->type==':');
             int result=num_tmp++;
             CODE_BLOCK* A=code_blocks.Last();
             CODE_BLOCK* B=new CODE_BLOCK;
