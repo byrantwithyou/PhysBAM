@@ -103,6 +103,7 @@ After_Construction()
 template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
 Add_Volumetric_Body_To_Fluid_Simulation(RIGID_BODY<TV>& rigid_body,bool add_collision,bool add_coupling)
 {
+    PHYSBAM_ASSERT(add_collision || add_coupling);
     RIGID_COLLISION_GEOMETRY<TV>* collision_geometry=new RIGID_COLLISION_GEOMETRY<TV>(rigid_body);
     if(add_collision) fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.Add_Body(collision_geometry,rigid_body.particle_index,true);
     if(add_coupling)
@@ -116,6 +117,7 @@ Add_Volumetric_Body_To_Fluid_Simulation(RIGID_BODY<TV>& rigid_body,bool add_coll
 template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
 Add_Thin_Shell_To_Fluid_Simulation(RIGID_BODY<TV>& rigid_body,bool add_collision,bool add_coupling)
 {
+    PHYSBAM_ASSERT(add_collision || add_coupling);
     RIGID_COLLISION_GEOMETRY<TV>* collision_geometry=new RIGID_COLLISION_GEOMETRY<TV>(rigid_body);
     if(add_collision) fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.Add_Body(collision_geometry,rigid_body.particle_index,true);
     if(add_coupling)
