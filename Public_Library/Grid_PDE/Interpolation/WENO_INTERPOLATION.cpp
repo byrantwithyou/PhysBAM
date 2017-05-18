@@ -6,6 +6,7 @@
 #include <Core/Arrays_Nd/ARRAYS_ND_VIEW.h>
 #include <Core/Log/LOG.h>
 #include <Core/Math_Tools/sqr.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Grid_PDE/Interpolation/WENO_INTERPOLATION.h>
 namespace PhysBAM{
@@ -37,6 +38,17 @@ WENO_Interpolation_Helper(T x,const VECTOR<T,d>& z0,const VECTOR<T,d>& z1,const 
 {
     VECTOR<T,d> r;
     for(int i=0;i<d;i++) r(i)=WENO_Interpolation(x,z0(i),z1(i),z2(i),z3(i),z4(i),z5(i),eps);
+    return r;
+}
+
+template<class T,int d> static SYMMETRIC_MATRIX<T,d>
+WENO_Interpolation_Helper(T x,const SYMMETRIC_MATRIX<T,d>& z0,const SYMMETRIC_MATRIX<T,d>& z1,const SYMMETRIC_MATRIX<T,d>& z2,
+    const SYMMETRIC_MATRIX<T,d>& z3,const SYMMETRIC_MATRIX<T,d>& z4,const SYMMETRIC_MATRIX<T,d>& z5,T eps)
+{
+    SYMMETRIC_MATRIX<T,d> r;
+    for(int i=0;i<d;i++)
+        for(int j=0;j<=i;j++)
+            r(i,j)=WENO_Interpolation(x,z0(i,j),z1(i,j),z2(i,j),z3(i,j),z4(i,j),z5(i,j),eps);
     return r;
 }
 
@@ -92,27 +104,27 @@ WENO_Interpolation(const VECTOR<T,d>& x,const ARRAYS_ND_BASE<U,VECTOR<int,d> >& 
 }
 
 template float WENO_Interpolation(float x,float z0,float z1,float z2,float z3,float z4,float z5,float eps);
-template float WENO_Interpolation<float,float,1>(VECTOR<float,1> const&,
-    ARRAYS_ND_BASE<float,VECTOR<int,1> > const&,VECTOR<int,1> const&,float);
-template float WENO_Interpolation<float,float,2>(VECTOR<float,2> const&,
-    ARRAYS_ND_BASE<float,VECTOR<int,2> > const&,VECTOR<int,2> const&,float);
-template float WENO_Interpolation<float,float,3>(VECTOR<float,3> const&,
-    ARRAYS_ND_BASE<float,VECTOR<int,3> > const&,VECTOR<int,3> const&,float);
 template double WENO_Interpolation(double x,double z0,double z1,double z2,double z3,double z4,double z5,double eps);
-template double WENO_Interpolation<double,double,1>(VECTOR<double,1> const&,
-    ARRAYS_ND_BASE<double,VECTOR<int,1> > const&,VECTOR<int,1> const&,double);
-template double WENO_Interpolation<double,double,2>(VECTOR<double,2> const&,
-    ARRAYS_ND_BASE<double,VECTOR<int,2> > const&,VECTOR<int,2> const&,double);
-template double WENO_Interpolation<double,double,3>(VECTOR<double,3> const&,
-    ARRAYS_ND_BASE<double,VECTOR<int,3> > const&,VECTOR<int,3> const&,double);
 
-// Instantiation for field T^d -> T^d
-#define INSTV(T,d) template VECTOR<T,d>\
-    WENO_Interpolation<T,VECTOR<T,d>,d>(VECTOR<T,d> const&,\
-        ARRAYS_ND_BASE<VECTOR<T,d>,VECTOR<int,d> > const&,VECTOR<int,d> const&,T)
+// Instantiation for field
+// T^d -> T(e.g. scalar field),
+// T^d -> T^d(e.g. gradient),
+// T^d -> T^{dxd}(e.g. Hessian)
+#define INSTV(T,d)\
+    template T\
+        WENO_Interpolation<T,T,d>(VECTOR<T,d> const&,\
+            ARRAYS_ND_BASE<T,VECTOR<int,d> > const&,VECTOR<int,d> const&,T);\
+    template VECTOR<T,d>\
+        WENO_Interpolation<T,VECTOR<T,d>,d>(VECTOR<T,d> const&,\
+            ARRAYS_ND_BASE<VECTOR<T,d>,VECTOR<int,d> > const&,VECTOR<int,d> const&,T);\
+    template SYMMETRIC_MATRIX<T,d>\
+        WENO_Interpolation<T,SYMMETRIC_MATRIX<T,d>,d>(VECTOR<T,d> const&,\
+            ARRAYS_ND_BASE<SYMMETRIC_MATRIX<T,d>,VECTOR<int,d> > const&,VECTOR<int,d> const&,T)
 
+INSTV(float,1);
 INSTV(float,2);
 INSTV(float,3);
+INSTV(double,1);
 INSTV(double,2);
 INSTV(double,3);
 }
