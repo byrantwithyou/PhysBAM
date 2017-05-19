@@ -204,7 +204,8 @@ Initialize()
                 };
             Seed_Particles(grid.domain,V_func,dV_func,density,particles_per_cell);
         } break;
-        case 17:{ // stationary pool with two phases
+        case 17:
+        case 19:{ // stationary pool with two phases
             T water_density=1000*unit_rho*scale_mass;
             T air_density=unit_rho*scale_mass;
             Set_Phases({water_density,air_density});
@@ -212,6 +213,9 @@ Initialize()
             this->use_massless_particles=true;
             this->use_phi=true;
             this->use_multiphase_projection=true;
+            if(test_number==19){
+                this->ghost=4;
+                this->use_bump=true;}
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             Seed_Particles(RANGE<TV>(TV(.1*m,.1*m),TV(.9*m,.5*m)),0,0,air_density,particles_per_cell);
             int n=particles.phase.m;
