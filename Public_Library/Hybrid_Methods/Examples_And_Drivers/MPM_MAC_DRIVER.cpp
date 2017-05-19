@@ -73,7 +73,7 @@ template<class TV> void MPM_MAC_DRIVER<TV>::
 Initialize()
 {
     TIMER_SCOPE_FUNC;
-    LOG::cout<<std::setprecision(16)<<std::endl;
+    LOG::cout<<std::setprecision(16);
     DEBUG_SUBSTEPS::Set_Write_Substeps_Level(example.substeps_delay_frame<0?example.write_substeps_level:-1);
 
     // setup time
@@ -85,7 +85,7 @@ Initialize()
         bool b=example.bc_type(i*2+1)==example.BC_PERIODIC;
         PHYSBAM_ASSERT(a==b);
         example.periodic_boundary.is_periodic(i)=a;}
-    
+
     // must have level sets in order to use multiphase projection
     if(example.use_multiphase_projection){
         PHYSBAM_ASSERT(example.use_phi);}
@@ -115,9 +115,11 @@ Initialize()
 
     if(!example.restart) Write_Output_Files(0);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",0,1);
-    RANDOM_NUMBERS<T> random;
-    for(int i=0;i<TV::m;i++)
-        example.periodic_test_shift(i)=random.Get_Uniform_Integer(0,example.grid.numbers_of_cells(i));
+    if(example.use_periodic_test_shift){
+        RANDOM_NUMBERS<T> random;
+        for(int i=0;i<TV::m;i++)
+            example.periodic_test_shift(i)=random.Get_Uniform_Integer(0,example.grid.numbers_of_cells(i)-1);
+        LOG::printf("shift %P\n",example.periodic_test_shift);}
 }
 //#####################################################################
 // Function Advance_One_Time_Step
@@ -128,9 +130,7 @@ Advance_One_Time_Step()
     TIMER_SCOPE_FUNC;
     if(example.begin_time_step) example.begin_time_step(example.time);
 
-    TV shift;
-    for(int i=0;i<TV::m;i++)
-        shift(i)=example.periodic_test_shift(i)*example.grid.dX(i);
+    TV shift=TV(example.periodic_test_shift)*example.grid.dX;
     if(example.use_periodic_test_shift)
         Shift_Particle_Position_Periodic(shift);
 
@@ -138,15 +138,10 @@ Advance_One_Time_Step()
     Print_Particle_Stats("particle state",example.dt);
     Update_Particle_Weights();
     Prepare_Scatter();
-    Particle_To_Grid();    
+    Particle_To_Grid();
     Print_Grid_Stats("after particle to grid",example.dt);
     Print_Energy_Stats("after particle to grid");
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after particle to grid",0,1);
-
-    PHASE_ID pid(0);
-    std::string mass_vname="grid_mass"; std::string momentum_vname="grid_momentum";
-    Dump_Grid_ShiftTest(mass_vname,example.phases(pid).mass);
-    Dump_Grid_ShiftTest(momentum_vname,example.phases(pid).velocity);
 
     Build_Level_Sets();
     Apply_Forces();
@@ -156,14 +151,11 @@ Advance_One_Time_Step()
     Print_Grid_Stats("after projection",example.dt);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after projection",0,1);
 
-    std::string velocity_vname="grid_velocity";
-    Dump_Grid_ShiftTest(velocity_vname,example.phases(pid).velocity);
-
     Grid_To_Particle();
 
     if(example.use_periodic_test_shift)
         Shift_Particle_Position_Periodic(-shift);
-    
+
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after grid to particle",0,1);
     if(example.end_time_step) example.end_time_step(example.time);
 }
@@ -180,9 +172,9 @@ Shift_Particle_Position_Periodic(TV shift)
 // Dump_Grid_ShiftTest
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Dump_Grid_ShiftTest(std::string& var_name,const ARRAY<T,FACE_INDEX<TV::m> >& arr)
+Dump_Grid_ShiftTest(const std::string& var_name,const ARRAY<T,FACE_INDEX<TV::m> >& arr)
 {
-    ARRAY<T,FACE_INDEX<TV::m> > arr_shift(arr);
+    ARRAY<T,FACE_INDEX<TV::m> > arr_shift(arr.domain_indices);
     TV_INT id_shift;
     for(FACE_ITERATOR<TV> fit(example.grid);fit.Valid();fit.Next()){
         id_shift=wrap(fit.index+example.periodic_test_shift,TV_INT(),example.grid.counts);
@@ -332,7 +324,7 @@ Particle_To_Grid(PHASE& ph) const
     Fix_Periodic(ph.mass);
     Fix_Periodic(ph.velocity);
     Fix_Periodic(ph.volume);
-    if(example.flip) ph.velocity_save=ph.velocity; 
+    if(example.flip) ph.velocity_save=ph.velocity;
 }
 //#####################################################################
 // Function Build_Level_Sets
@@ -474,7 +466,7 @@ Move_Mass_Momentum_Inside(PHASE& ph) const
             Add_Debug_Particle(loc,VECTOR<T,3>(0,0,1)); // DEBUG: the point mass will be moved out from
             IMPLICIT_OBJECT<TV>* io=o->Get_Implicit_Object(example.time);
             TV loc_bd=io->Closest_Point_On_Boundary(loc);
-            TV loc_reflect=loc+2*(loc_bd-loc); 
+            TV loc_reflect=loc+2*(loc_bd-loc);
             Add_Debug_Particle(loc_reflect,VECTOR<T,3>(1,0,0)); // DEBUG: reflection across boundary
             FACE_INDEX<TV::m> first_face_index=example.grid.Face(loc_reflect,fit.axis); // get the smallest face index
             TV first_face_loc=example.grid.Face(first_face_index);
@@ -503,7 +495,7 @@ Move_Mass_Momentum_Inside(PHASE& ph) const
                     // move mass momentum, inside
                     ph.mass(face)+=weights(j)*mass;
                     ph.velocity(face)+=weights(j)*momentum;
-                    if(example.use_particle_volumes) 
+                    if(example.use_particle_volumes)
                         ph.volume(face)+=weights(j)*volume;}}
             PHYSBAM_DEBUG_WRITE_SUBSTEP("faces mass moved to",0,1);
             // clear mass,momentum outside
@@ -539,7 +531,7 @@ Move_Mass_Momentum_Inside_Nearest(PHASE& ph) const
             if(o->Phi(loc,example.time)>=0) continue; // outside collision object
             IMPLICIT_OBJECT<TV>* io=o->Get_Implicit_Object(example.time);
             TV loc_bd=io->Closest_Point_On_Boundary(loc);
-            TV loc_reflect=loc+2*(loc_bd-loc); 
+            TV loc_reflect=loc+2*(loc_bd-loc);
             T closest_distance=FLT_MAX;
             FACE_INDEX<TV::m> first_face_index=example.grid.Face(loc_reflect,fit.axis); // get the smallest face index
             FACE_INDEX<TV::m> closest_face(first_face_index);
@@ -962,7 +954,7 @@ Grid_V_Upper_Bound() const
     if(!example.use_affine || !example.weights(0)->constant_scalar_inertia_tensor) return Max_Particle_Speed();
 
     T result=0;
-    
+
     for(PHASE_ID i(0);i<example.phases.m;i++)
         result=max(result,Grid_V_Upper_Bound(example.phases(i)));
     return result;
@@ -980,7 +972,7 @@ Update_Simulated_Particles()
         // put them in the default(0) phase.
         PHASE& ph=example.phases(PHASE_ID(0));
         ph.simulated_particles.Remove_All();
-        
+
         for(int p=0;p<example.particles.number;p++){
             if(example.particles.valid(p))
                 ph.simulated_particles.Append(p);}
@@ -990,7 +982,7 @@ Update_Simulated_Particles()
         // based on their phase attribute value.
         for(PHASE_ID i(0);i<example.phases.m;i++)
             example.phases(i).simulated_particles.Remove_All();
-        
+
         for(int p=0;p<example.particles.number;p++){
             PHASE& ph=example.phases(example.particles.phase(p));
             if(example.particles.valid(p))
