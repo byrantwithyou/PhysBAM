@@ -31,7 +31,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     user_last_frame(false),order(2),seed(1234),particles_per_cell(1<<TV::m),regular_seeding(false),
     no_regular_seeding(false),scale_mass(1),override_output_directory(false),
     m(1),s(1),kg(1),forced_collision_type(-1),write_output_files(0),read_output_files(0),dump_collision_objects(false),
-    test_diff(false),bc_periodic(false),use_periodic_test_shift(false)
+    test_diff(false),bc_periodic(false)
 {
     T framerate=24;
     bool use_quasi_exp_F_update=false;
@@ -89,24 +89,6 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     if(use_slip) forced_collision_type=COLLISION_TYPE::slip;
     if(use_stick) forced_collision_type=COLLISION_TYPE::stick;
     if(use_separate) forced_collision_type=COLLISION_TYPE::separate;
-
-    if(use_periodic_test_shift){
-        auto old_bf=begin_frame,old_ef=end_frame;
-        begin_frame=[this,old_bf](int frame)
-            {
-                if(frame==0)
-                    for(int i=0;i<TV::m;i++)
-                        periodic_test_shift(i)=random.Get_Uniform_Integer(0,grid.numbers_of_cells(i))*grid.dX(i);
-                for(int i=0;i<particles.X.m;i++)
-                    particles.X(i)=wrap(particles.X(i)+periodic_test_shift,grid.domain.min_corner,grid.domain.max_corner);
-                if(old_bf) old_bf(frame);
-            };
-        end_frame=[this,old_ef](int frame)
-            {
-                if(old_ef) old_ef(frame);
-                for(int i=0;i<particles.X.m;i++)
-                    particles.X(i)=wrap(particles.X(i)-periodic_test_shift,grid.domain.min_corner,grid.domain.max_corner);
-            };}
 
     unit_p=kg*pow<2-TV::m>(m)/(s*s);
     unit_rho=kg*pow<-TV::m>(m);

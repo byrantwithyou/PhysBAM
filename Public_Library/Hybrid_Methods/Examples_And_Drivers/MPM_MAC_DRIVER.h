@@ -76,6 +76,8 @@ private:
     int Allocate_Projection_System_Variable(ARRAY<int,TV_INT>& cell_index,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N);
     void Compute_Laplacian(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV_INT>& cell_index,int var);
     void Compute_Gradient(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV_INT>& cell_index,int nvar);
+    void Shift_Particle_Position_Periodic(TV shift);
+    void Dump_Grid_ShiftTest(std::string& var_name,const ARRAY<T,FACE_INDEX<TV::m> >& arr);
 //#####################################################################
 };
 }

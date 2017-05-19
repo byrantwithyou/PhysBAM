@@ -4,6 +4,7 @@
 //#####################################################################
 #include <Core/Log/DEBUG_SUBSTEPS.h>
 #include <Core/Log/FINE_TIMER.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Core/Log/SCOPE.h>
 #include <Core/Matrices/SPARSE_MATRIX_THREADED_CONSTRUCTION.h>
 #include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
@@ -114,6 +115,9 @@ Initialize()
 
     if(!example.restart) Write_Output_Files(0);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",0,1);
+    RANDOM_NUMBERS<T> random;
+    for(int i=0;i<TV::m;i++)
+        example.periodic_test_shift(i)=random.Get_Uniform_Integer(0,example.grid.numbers_of_cells(i));
 }
 //#####################################################################
 // Function Advance_One_Time_Step
@@ -124,14 +128,26 @@ Advance_One_Time_Step()
     TIMER_SCOPE_FUNC;
     if(example.begin_time_step) example.begin_time_step(example.time);
 
+    TV shift;
+    for(int i=0;i<TV::m;i++)
+        shift(i)=example.periodic_test_shift(i)*example.grid.dX(i);
+    if(example.use_periodic_test_shift)
+        Shift_Particle_Position_Periodic(shift);
+
     Update_Simulated_Particles();
     Print_Particle_Stats("particle state",example.dt);
     Update_Particle_Weights();
     Prepare_Scatter();
-    Particle_To_Grid();
+    Particle_To_Grid();    
     Print_Grid_Stats("after particle to grid",example.dt);
     Print_Energy_Stats("after particle to grid");
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after particle to grid",0,1);
+
+    PHASE_ID pid(0);
+    std::string mass_vname="grid_mass"; std::string momentum_vname="grid_momentum";
+    Dump_Grid_ShiftTest(mass_vname,example.phases(pid).mass);
+    Dump_Grid_ShiftTest(momentum_vname,example.phases(pid).velocity);
+
     Build_Level_Sets();
     Apply_Forces();
     Print_Grid_Stats("after forces",example.dt);
@@ -139,10 +155,40 @@ Advance_One_Time_Step()
     Pressure_Projection();
     Print_Grid_Stats("after projection",example.dt);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after projection",0,1);
-    Grid_To_Particle();
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after grid to particle",0,1);
 
+    std::string velocity_vname="grid_velocity";
+    Dump_Grid_ShiftTest(velocity_vname,example.phases(pid).velocity);
+
+    Grid_To_Particle();
+
+    if(example.use_periodic_test_shift)
+        Shift_Particle_Position_Periodic(-shift);
+    
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after grid to particle",0,1);
     if(example.end_time_step) example.end_time_step(example.time);
+}
+//#####################################################################
+// Shift_Particle_Position_Periodic
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Shift_Particle_Position_Periodic(TV shift)
+{
+    for(int i=0;i<example.particles.X.m;i++)
+        example.particles.X(i)=wrap(example.particles.X(i)+shift,example.grid.domain.min_corner,example.grid.domain.max_corner);
+}
+//#####################################################################
+// Dump_Grid_ShiftTest
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Dump_Grid_ShiftTest(std::string& var_name,const ARRAY<T,FACE_INDEX<TV::m> >& arr)
+{
+    ARRAY<T,FACE_INDEX<TV::m> > arr_shift(arr);
+    TV_INT id_shift;
+    for(FACE_ITERATOR<TV> fit(example.grid);fit.Valid();fit.Next()){
+        id_shift=wrap(fit.index+example.periodic_test_shift,TV_INT(),example.grid.counts);
+        FACE_INDEX<TV::m> fid_shift(fit.axis,id_shift);
+        arr_shift(fit.Full_Index())=arr(fid_shift);}
+    Write_To_Text_File(example.output_directory+LOG::sprintf("/%s",var_name),arr_shift.array,"\n");
 }
 //#####################################################################
 // Function Simulate_To_Frame

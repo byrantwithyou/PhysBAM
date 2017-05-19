@@ -113,6 +113,8 @@ public:
     int rk_particle_order;
     bool use_massless_particles;
     bool use_multiphase_projection;
+    bool use_periodic_test_shift;
+    TV_INT periodic_test_shift;
 
     // debugging
     DEBUG_PARTICLES<TV>& debug_particles;
