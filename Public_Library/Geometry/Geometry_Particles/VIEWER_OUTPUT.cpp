@@ -52,13 +52,13 @@ Flush_Frame(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const char* title
         Create_Directory(output_directory);
         Create_Directory(output_directory+"/common");
         LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",false);
-        Write_To_File(stream_type,output_directory+"/common/grid.gz",grid);
+        Write_To_File(stream_type,output_directory+"/common/grid",grid);
         Write_To_Text_File(output_directory+"/common/first_frame",frame,"\n");}
 
     debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
 
     std::string frame_directory=LOG::sprintf("%s/%i",output_directory.c_str(),frame);
-    Write_To_File(stream_type,frame_directory+"/mac_velocities.gz",face_velocities);
+    Write_To_File(stream_type,frame_directory+"/mac_velocities",face_velocities);
     if(title) Write_To_Text_File(frame_directory+"/frame_title",title);
 
     Write_To_Text_File(output_directory+"/common/last_frame",frame,"\n");
