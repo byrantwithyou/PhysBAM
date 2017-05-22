@@ -772,7 +772,7 @@ Compute_Gradient(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV_
         SPARSE_MATRIX_THREADED_CONSTRUCTION<T> G_helper(example.projection_system.gradient,tmp2,tmp3);
         for(FACE_ITERATOR_THREADED<TV> it(example.grid);it.Valid();it.Next()){
             if(psi_N(it.Full_Index())) continue;
-            if(example.bc_type(it.axis)&example.BC_PERIODIC)
+            if(example.bc_type(it.axis)==example.BC_PERIODIC)
                 if(it.index(it.axis)==example.grid.numbers_of_cells(it.axis))
                     continue;
 
