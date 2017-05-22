@@ -75,11 +75,12 @@ public:
     VECTOR<T,2> Row(const int axis) const
     {return Column(axis);}
 
+    // Note that i+j happens to compute the right index for any i,j
     T& operator()(int i,int j)
-    {return i<j?Element_Upper(i,j):Element_Lower(i,j);}
+    {assert((unsigned)i<2 && (unsigned)j<2);return array[i+j];}
 
     const T& operator()(int i,int j) const
-    {return i<j?Element_Upper(i,j):Element_Lower(i,j);}
+    {assert((unsigned)i<2 && (unsigned)j<2);return array[i+j];}
 
     bool Valid_Index(const int i,const int j) const
     {return (unsigned)i<2 && (unsigned)j<2;}
@@ -91,10 +92,10 @@ public:
     {return Element_Lower(j,i);}
 
     T& Element_Lower(int i,int j)
-    {assert((unsigned)i<(unsigned)2 && (unsigned)j<=(unsigned)i);return array[((3-j)*j>>1)+i];}
+    {assert((unsigned)i<(unsigned)2 && (unsigned)j<=(unsigned)i);return array[i+j];}
 
     const T& Element_Lower(int i,int j) const
-    {assert((unsigned)i<(unsigned)2 && (unsigned)j<=(unsigned)i);return array[((3-j)*j>>1)+i];}
+    {assert((unsigned)i<(unsigned)2 && (unsigned)j<=(unsigned)i);return array[i+j];}
 
     bool operator==(const SYMMETRIC_MATRIX& A) const
     {return x00==A.x00 && x10==A.x10 && x11==A.x11;}
