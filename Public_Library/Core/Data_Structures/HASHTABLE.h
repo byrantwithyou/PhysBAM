@@ -8,7 +8,6 @@
 #define __HASHTABLE__
 
 #include <Core/Arrays/ARRAY.h>
-#include <Core/Arrays/PROJECTED_ARRAY.h>
 #include <Core/Data_Structures/DATA_STRUCTURES_FORWARD.h>
 #include <Core/Data_Structures/HASH_REDUCE.h>
 #include <Core/Math_Tools/integer_log.h>
@@ -43,7 +42,6 @@ public:
     typedef TK KEY;
     typedef T ELEMENT;
     typedef ENTRY value_type; // for stl
-    typedef FIELD_PROJECTOR<HASHTABLE_ENTRY_TEMPLATE<TK,T>,HASHTABLE_ENTRY_STATE,&HASHTABLE_ENTRY_TEMPLATE<TK,T>::state> T_FIELD_PROJECTOR;
     typedef int HAS_UNTYPED_READ_WRITE;
 
     ARRAY<ENTRY> table;
@@ -192,9 +190,7 @@ public:
     {if(!Delete_If_Present(v)) throw KEY_ERROR("HASHTABLE::Delete");}
 
     void Remove_All()
-    {PROJECTED_ARRAY<ARRAY<HASHTABLE_ENTRY_TEMPLATE<TK,T>,int>,T_FIELD_PROJECTOR> projected_array=table.template Project<HASHTABLE_ENTRY_STATE,&HASHTABLE_ENTRY_TEMPLATE<TK,T>::state>();
-        projected_array.Fill(ENTRY_FREE);number_of_entries=0;}
-    //{table.template Project<HASHTABLE_ENTRY_STATE,&HASHTABLE_ENTRY_TEMPLATE<TK,T>::state>().Fill(ENTRY_FREE);number_of_entries=0;}
+    {for(int i=0;i<table.m;i++) table(i).state=ENTRY_FREE;number_of_entries=0;}
 
     void Exchange(const TK& x,const TK& y) // Exchange values at entries x and y; valid if x or y (or both) are not present; efficient for array values
     {bool a=Contains(x),b=Contains(y);if(a || b){exchange(Get_Or_Insert(x),Get_Or_Insert(y));if(!a || !b){Delete(a?x:y);}}}

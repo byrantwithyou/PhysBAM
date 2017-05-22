@@ -3,6 +3,7 @@
 // This file is part of PhysBAM hose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Arrays/IDENTITY_ARRAY.h>
+#include <Core/Arrays/PROJECTED_ARRAY.h>
 #include <Core/Log/DEBUG_SUBSTEPS.h>
 #include <Core/Math_Tools/Inverse.h>
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>

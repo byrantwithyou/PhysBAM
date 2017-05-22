@@ -59,6 +59,7 @@
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
 
+#include <Core/Arrays/PROJECTED_ARRAY.h>
 #include <Core/Log/LOG.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
