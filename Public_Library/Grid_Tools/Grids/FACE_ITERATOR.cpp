@@ -65,29 +65,24 @@ Reset_Axis(const int axis_input)
             Add_Region(domain);
             break;}
         case GRID<TV>::GHOST_REGION:{
+            domain.max_corner(axis)++;
             if(side<0){ // TODO(jontg): Beware of duplicates!
-                for(int side_iterator=0;side_iterator<TV::m*2;side_iterator++){
-                    int axis_of_side=side_iterator/2;
-                    if(!(side_iterator&1)){
-                        RANGE<TV_INT> domain_copy(domain);
-                        domain_copy.max_corner(axis)++;
-                        domain_copy.max_corner(axis_of_side)=domain_copy.min_corner(axis_of_side)+number_of_ghost_cells;
-                        Add_Region(domain_copy);}
-                    if(side_iterator&1){
-                        RANGE<TV_INT> domain_copy(domain);
-                        domain_copy.max_corner(axis)++;
-                        domain_copy.min_corner(axis_of_side)=domain_copy.max_corner(axis_of_side)-number_of_ghost_cells;
-                        Add_Region(domain_copy);}}}
+                for(int axis_of_side=0;axis_of_side<TV::m;axis_of_side++){
+                    RANGE<TV_INT> d0(domain),d1(domain);
+                    domain.min_corner(axis_of_side)+=number_of_ghost_cells;
+                    domain.max_corner(axis_of_side)-=number_of_ghost_cells;
+                    d0.max_corner(axis_of_side)=domain.min_corner(axis_of_side);
+                    d1.min_corner(axis_of_side)=domain.max_corner(axis_of_side);
+                    Add_Region(d0);
+                    Add_Region(d1);}}
             else{
                 int axis_of_side=side/2;
                 if(!(side&1)){
                     RANGE<TV_INT> domain_copy(domain);
-                    domain_copy.max_corner(axis)++;
                     domain_copy.max_corner(axis_of_side)=domain_copy.min_corner(axis_of_side)+number_of_ghost_cells;
                     Add_Region(domain_copy);}
                 if(side&1){
                     RANGE<TV_INT> domain_copy(domain);
-                    domain_copy.max_corner(axis)++;
                     domain_copy.min_corner(axis_of_side)=domain_copy.max_corner(axis_of_side)-number_of_ghost_cells;
                     Add_Region(domain_copy);}}
             break;}
