@@ -772,6 +772,9 @@ Compute_Gradient(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV_
         SPARSE_MATRIX_THREADED_CONSTRUCTION<T> G_helper(example.projection_system.gradient,tmp2,tmp3);
         for(FACE_ITERATOR_THREADED<TV> it(example.grid);it.Valid();it.Next()){
             if(psi_N(it.Full_Index())) continue;
+            if(example.bc_type(it.axis)&example.BC_PERIODIC)
+                if(it.index(it.axis)==example.grid.numbers_of_cells(it.axis))
+                    continue;
 
             T mass=Density(it.Full_Index());
             if(!mass) continue;
@@ -848,7 +851,8 @@ Pressure_Projection()
         OCTAVE_OUTPUT<T>(LOG::sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,*example.av(0),*example.av(1));
         OCTAVE_OUTPUT<T>(LOG::sprintf("C-%i.txt",solve_id).c_str()).Write_Preconditioner("C",system,*example.av(0),*example.av(1));
         OCTAVE_OUTPUT<T>(LOG::sprintf("P-%i.txt",solve_id).c_str()).Write_Projection("P",system,*example.av(0));
-        OCTAVE_OUTPUT<T>(LOG::sprintf("b-%i.txt",solve_id).c_str()).Write("b",example.rhs);}
+        OCTAVE_OUTPUT<T>(LOG::sprintf("b-%i.txt",solve_id).c_str()).Write("b",example.rhs);
+        OCTAVE_OUTPUT<T>(LOG::sprintf("G-%i.txt",solve_id).c_str()).Write("G",example.projection_system.gradient);}
 
     CONJUGATE_GRADIENT<T> cg;
     cg.finish_before_indefiniteness=true;
