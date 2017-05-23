@@ -80,11 +80,14 @@ public:
     int Columns() const
     {return 3;}
 
+    int Raw_Index(int i,int j) const
+    {return (0542431210>>(9*j+3*i))&7;}
+
     T& operator()(int i,int j)
-    {return i<j?Element_Upper(i,j):Element_Lower(i,j);}
+    {assert((unsigned)i<3 && (unsigned)j<3);return array[Raw_Index(i,j)];}
 
     const T& operator()(int i,int j) const
-    {return i<j?Element_Upper(i,j):Element_Lower(i,j);}
+    {assert((unsigned)i<3 && (unsigned)j<3);return array[Raw_Index(i,j)];}
 
     bool Valid_Index(const int i,const int j) const
     {return (unsigned)i<3 && (unsigned)j<3;}
@@ -96,10 +99,10 @@ public:
     {return Element_Lower(j,i);}
 
     T& Element_Lower(int i,int j)
-    {assert((unsigned)i<(unsigned)3 && (unsigned)j<=(unsigned)i);return array[((5-j)*j>>1)+i];}
+    {assert((unsigned)i<(unsigned)3 && (unsigned)j<=(unsigned)i);return array[Raw_Index(i,j)];}
 
     const T& Element_Lower(int i,int j) const
-    {assert((unsigned)i<(unsigned)3 && (unsigned)j<=(unsigned)i);return array[((5-j)*j>>1)+i];}
+    {assert((unsigned)i<(unsigned)3 && (unsigned)j<=(unsigned)i);return array[Raw_Index(i,j)];}
 
     VECTOR<T,3> Column(const int axis) const
     {assert((unsigned)axis<(unsigned)3);return axis==0?VECTOR<T,3>(x00,x10,x20):axis==1?VECTOR<T,3>(x10,x11,x21):VECTOR<T,3>(x20,x21,x22);}
