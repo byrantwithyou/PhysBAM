@@ -235,6 +235,29 @@ Initialize()
                 return TV(rand.Get_Uniform_Number(a,b),rand.Get_Uniform_Number(a,b));};
             Seed_Particles(RANGE<TV>(TV(0,0),TV(m,m)),V_func,0,density,particles_per_cell);
         } break;
+        case 20:{ // stationary sphere in air
+            T water_density=1000*unit_rho*scale_mass;
+            T air_density=unit_rho*scale_mass;
+            Set_Phases({water_density,air_density});
+            particles.Store_Phase(true);
+            this->use_massless_particles=true;
+            this->use_phi=true;
+            this->use_multiphase_projection=true;
+            this->ghost=4;
+            this->use_bump=true;
+            RANGE<TV> box=RANGE<TV>::Unit_Box()*m;
+            Set_Grid(box);
+            SPHERE<TV> sphere0(TV(.3,.3)*m,.1*m);
+            SPHERE<TV> sphere1(TV(.43,.43)*m,.1*m);
+            auto shape=Unite(Make_IO(sphere0),Make_IO(sphere1));
+            Seed_Particles(*shape,0,0,water_density,particles_per_cell);
+            int n=particles.phase.m;
+            box.Scale_About_Center(0.9);
+            auto cshape=Intersect(Make_IO(box),Invert(shape));
+            Seed_Particles(*cshape,0,0,air_density,particles_per_cell);
+            particles.phase.Array_View(n,particles.phase.m-n).Fill(PHASE_ID(1));
+            delete cshape;
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     if(forced_collision_type!=-1)
