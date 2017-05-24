@@ -451,42 +451,43 @@ Nearest_Point_On_Surface(const TV& p,const PHASE& ph,
     const ARRAY<SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m>,TV_INT>& Hessian) const
 {
     typedef VECTOR<T,TV::m+1> ETV;
-    typedef MATRIX<T,TV::m+1,TV::m+1> ETM;
 
-    T tolerance=(T)1e-10;
-    T weno_eps=(T)1e-6;
-    TV halfdx=(T)0.5*example.grid.dX;
-    MATRIX<T,TV::m,TV::m> I;
-    I.Set_Identity_Matrix();
     int max_iterations=20;
-    int iterations=0;
-    T norm_grad=(T)1;
+    T phi_tolerance=(T)0.01*example.grid.dX.Min(),dir_tolerance=(T)0.02;
+    auto Compute=[this,&gradient,&Hessian,&ph](const TV& X,TV& n,SYMMETRIC_MATRIX<T,TV::m>* h)
+    {
+        T weno_eps=(T)1e-6;
+        TV_INT index=example.grid.Cell(X-(T)0.5*example.grid.dX);
+        TV c=(X-example.grid.Center(index))*example.grid.one_over_dX;
+        n=WENO_Interpolation(c,gradient,index,weno_eps).Normalized();
+        if(h) *h=WENO_Interpolation(c,Hessian,index,weno_eps);
+        return WENO_Interpolation(c,ph.phi,index,weno_eps);
+    };
 
-    // initial guess: (x,y,multiplier) = (px,py,0)
-    ETV x(p,VECTOR<T,1>(0));
-    ARRAY_VIEW<T,int> loc=x.Array_View(0,p.Size());
-    while(iterations<max_iterations && norm_grad>tolerance){
-        T m=x(TV::m);
-
-        TV_INT index=example.grid.Cell(loc-halfdx);
-        TV c=(loc-example.grid.Center(index))*example.grid.one_over_dX;
-        TV n=WENO_Interpolation(c,gradient,index,weno_eps);
-        T dist=WENO_Interpolation(c,ph.phi,index,weno_eps);
-        SYMMETRIC_MATRIX<T,TV::m> h=WENO_Interpolation(c,Hessian,index,weno_eps);
-
-        ETV g=ETV((T)2*(loc-p)-m*n,VECTOR<T,1>(-dist));
-        norm_grad=g.Max_Abs();
-
-        ETM H;
-        H.Set_Submatrix(0,0,(T)2*I-m*h);
-        ETV en=ETV(-n,VECTOR<T,1>());
+    TV n;
+    T phi=Compute(p,n,0);
+    TV x=p-phi*n;
+    T lambda=-2*phi;
+    for(int i=0;i<max_iterations;i++){
+        SYMMETRIC_MATRIX<T,TV::m> h;
+        T phi=Compute(x,n,&h);
+        TV xp=x-p;
+        if(abs(phi)<=phi_tolerance){
+            T dist2=xp.Magnitude_Squared();
+            if(xp.Projected_Orthogonal_To_Unit_Direction(n).Magnitude_Squared()<=sqr(dir_tolerance)*dist2) break;
+            if(dist2<=sqr(phi_tolerance)){
+                x=p-sign(xp.Dot(n))*phi*n;
+                break;}}
+        ETV g=(xp*2-lambda*n).Append(-phi);
+        MATRIX<T,TV::m+1,TV::m+1> H;
+        H.Set_Submatrix(0,0,(T)2-lambda*h);
+        ETV en=(-n).Append(0);
         H.Set_Column(TV::m,en);
         H.Set_Row(TV::m,en);
-
         ETV dx=H.PLU_Solve(-g);
-        x=x+dx;
-        ++iterations;}
-    return TV(loc);
+        x+=dx.Remove_Index(TV::m);
+        lambda+=dx(TV::m);}
+    return x;
 }
 //#####################################################################
 // Function Particle_To_Grid
