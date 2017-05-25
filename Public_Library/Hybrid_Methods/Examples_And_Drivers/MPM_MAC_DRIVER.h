@@ -6,7 +6,6 @@
 #define __MPM_MAC_DRIVER__
 #include <Core/Vectors/VECTOR.h>
 #include <Grid_Tools/Grids/FACE_INDEX.h>
-#include <Hybrid_Methods/Examples_And_Drivers/PHASE_ID.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/PHASE_ID.h>
 #include <climits>

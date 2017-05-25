@@ -10,8 +10,8 @@
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Grid_Tools/Grids/FACE_INDEX.h>
-#include <Hybrid_Methods/Projection/MPM_PROJECTION_VECTOR.h>
 #include <Hybrid_Methods/Examples_And_Drivers/PHASE_ID.h>
+#include <Hybrid_Methods/Projection/MPM_PROJECTION_VECTOR.h>
 
 namespace PhysBAM{
 //#####################################################################
