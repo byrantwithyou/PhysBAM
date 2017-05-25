@@ -4,6 +4,7 @@
 //#####################################################################
 #ifndef __MPM_MAC_EXAMPLE__
 #define __MPM_MAC_EXAMPLE__
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
@@ -84,6 +85,7 @@ public:
     // objects
     ARRAY<MPM_COLLISION_OBJECT<TV>*> collision_objects;
     ARRAY<IMPLICIT_OBJECT<TV>* > fluid_walls;
+    RANDOM_NUMBERS<T> random;
 
     // initialization & output
     T initial_time;

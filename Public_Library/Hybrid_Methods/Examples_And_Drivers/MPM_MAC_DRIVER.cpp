@@ -398,15 +398,11 @@ Bump_Particles()
         PHASE& ph=example.phases(i);
 
         ARRAY<T,TV_INT> curvature(example.grid.Cell_Indices(example.ghost-1));
-        for(CELL_ITERATOR<TV> it(example.grid,example.ghost-1);it.Valid();it.Next())
-            curvature(it.index)=ph.levelset->Compute_Curvature(ph.phi,it.index);
-
         ARRAY<TV,TV_INT> gradient(example.grid.Cell_Indices(example.ghost-1));
-        for(CELL_ITERATOR<TV> it(example.grid,example.ghost-1);it.Valid();it.Next())
-            gradient(it.index)=ph.levelset->Gradient(ph.phi,it.index);
-
         ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> Hessian(example.grid.Cell_Indices(example.ghost-1));
         for(CELL_ITERATOR<TV> it(example.grid,example.ghost-1);it.Valid();it.Next()){
+            curvature(it.index)=ph.levelset->Compute_Curvature(ph.phi,it.index);
+            gradient(it.index)=ph.levelset->Gradient(ph.phi,it.index);
             Hessian(it.index)=ph.levelset->Hessian(ph.phi,it.index);}
 
         for(int j=0;j<ph.simulated_particles.m;j++){
@@ -488,6 +484,68 @@ Nearest_Point_On_Surface(const TV& p,const PHASE& ph,
         x+=dx.Remove_Index(TV::m);
         lambda+=dx(TV::m);}
     return x;
+}
+//#####################################################################
+// Function Reseeding
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Reseeding()
+{
+    LINEAR_INTERPOLATION_MAC<TV,T> li(example.grid);
+    int target_ppc=1<<TV::m;
+    ARRAY<ARRAY<int>,TV_INT> particle_counts(example.grid.Domain_Indices(example.ghost));
+    for(int i=0;i<example.particles.X.m;i++){
+        if(!example.particles.valid(i)) continue;
+        TV X=example.particles.X(i);
+        TV_INT index=example.grid.Cell(X);
+        particle_counts(index).Append(i);}
+    ARRAY<ARRAY<int>,PHASE_ID> particles_by_phase(example.phases.m);
+    for(CELL_ITERATOR<TV> it(example.grid,example.ghost);it.Valid();it.Next()){
+        ARRAY<int>& a=particle_counts(it.index);
+        int target=target_ppc;
+        PAIR<PHASE_ID,T> poc=Phase_Of_Cell(it.index);
+        if(abs(poc.y)<example.grid.dX.Max()) target*=4;
+        if(a.m<target_ppc){
+            RANGE<TV> range=example.grid.Cell_Domain(it.index);
+            for(int i=0;i<target_ppc-a.m;i++){
+                TV X;
+                example.random.Fill_Uniform(X,range);
+                PHASE_ID pid;
+                T phi=Phase_And_Phi(X,pid);
+                if(abs(phi)>=example.radius_sphere){
+                    int p=example.particles.Add_Element_From_Deletion_List();
+                    example.particles.valid(p)=true;
+                    example.particles.mass(p)=1;
+                    example.particles.phase(p)=pid;
+                    example.particles.V(p)=li.Clamped_To_Array(example.phases(pid).velocity,X);
+                    example.particles.X(p)=X;}}}
+        if(a.m>2*target_ppc){
+            for(int i=0;i<a.m;i++)
+                particles_by_phase(example.particles.phase(a(i))).Append(a(i));
+            for(PHASE_ID i(0);i<particles_by_phase.m;i++){
+                if(particles_by_phase(i).m<2*target_ppc){
+                    example.random.Random_Shuffle(particles_by_phase(i));
+                    int p=particles_by_phase(i).Pop();
+                    example.particles.valid(p)=false;
+                    example.particles.Add_To_Deletion_List(p);}
+                particles_by_phase(i).Remove_All();}}}
+    Update_Simulated_Particles();
+    Update_Particle_Weights();
+    Prepare_Scatter();
+}
+//#####################################################################
+// Function Phase_And_Phi
+//#####################################################################
+template<class TV> auto MPM_MAC_DRIVER<TV>::
+Phase_And_Phi(const TV& X,PHASE_ID& phase) const->T
+{
+    T min_phi=FLT_MAX;
+    for(PHASE_ID i(0);i<example.phases.m;i++){
+        T phi=example.phases(i).levelset->Phi(X);
+        if(phi<min_phi){
+            min_phi=phi;
+            phase=i;}}
+    return min_phi;
 }
 //#####################################################################
 // Function Particle_To_Grid

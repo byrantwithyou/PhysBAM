@@ -82,6 +82,8 @@ private:
     void Compute_Gradient(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV_INT>& cell_index,int nvar);
     void Shift_Particle_Position_Periodic(TV shift);
     void Dump_Grid_ShiftTest(const std::string& var_name,const ARRAY<T,FACE_INDEX<TV::m> >& arr);
+    void Reseeding();
+    T Phase_And_Phi(const TV& X,PHASE_ID& phase) const;
 //#####################################################################
 };
 }

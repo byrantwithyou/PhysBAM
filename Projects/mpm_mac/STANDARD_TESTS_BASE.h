@@ -39,6 +39,7 @@ public:
     using typename BASE::COLLISION_TYPE;using BASE::data_directory;using BASE::Add_Fluid_Wall;
     using BASE::test_output_prefix;using BASE::use_test_output;using BASE::flip;
     using BASE::begin_frame;using BASE::end_frame;using BASE::periodic_test_shift;using BASE::use_periodic_test_shift;
+    using BASE::random;
     
     int test_number;
     int resolution;
@@ -63,8 +64,6 @@ public:
     bool test_diff;
     bool bc_periodic;
     
-    RANDOM_NUMBERS<T> random;
-
     STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS_BASE();
 
