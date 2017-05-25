@@ -150,6 +150,7 @@ Advance_One_Time_Step()
 
     Build_Level_Sets();
     Bump_Particles();
+    Reseeding();
     Apply_Forces();
     Print_Grid_Stats("after forces",example.dt);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after forces",0,1);
@@ -491,23 +492,26 @@ Nearest_Point_On_Surface(const TV& p,const PHASE& ph,
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Reseeding()
 {
+    if(!example.use_reseeding)
+        return;
+
     LINEAR_INTERPOLATION_MAC<TV,T> li(example.grid);
     int target_ppc=1<<TV::m;
-    ARRAY<ARRAY<int>,TV_INT> particle_counts(example.grid.Domain_Indices(example.ghost));
+    ARRAY<ARRAY<int>,TV_INT> particle_counts(example.grid.Domain_Indices());
     for(int i=0;i<example.particles.X.m;i++){
         if(!example.particles.valid(i)) continue;
         TV X=example.particles.X(i);
         TV_INT index=example.grid.Cell(X);
         particle_counts(index).Append(i);}
     ARRAY<ARRAY<int>,PHASE_ID> particles_by_phase(example.phases.m);
-    for(CELL_ITERATOR<TV> it(example.grid,example.ghost);it.Valid();it.Next()){
+    for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
         ARRAY<int>& a=particle_counts(it.index);
         int target=target_ppc;
         PAIR<PHASE_ID,T> poc=Phase_Of_Cell(it.index);
         if(abs(poc.y)<example.grid.dX.Max()) target*=4;
-        if(a.m<target_ppc){
+        if(a.m<target){
             RANGE<TV> range=example.grid.Cell_Domain(it.index);
-            for(int i=0;i<target_ppc-a.m;i++){
+            for(int i=0;i<target-a.m;i++){
                 TV X;
                 example.random.Fill_Uniform(X,range);
                 PHASE_ID pid;
@@ -519,11 +523,11 @@ Reseeding()
                     example.particles.phase(p)=pid;
                     example.particles.V(p)=li.Clamped_To_Array(example.phases(pid).velocity,X);
                     example.particles.X(p)=X;}}}
-        if(a.m>2*target_ppc){
+        if(a.m>2*target){
             for(int i=0;i<a.m;i++)
                 particles_by_phase(example.particles.phase(a(i))).Append(a(i));
             for(PHASE_ID i(0);i<particles_by_phase.m;i++){
-                if(particles_by_phase(i).m<2*target_ppc){
+                if(particles_by_phase(i).m>2*target){
                     example.random.Random_Shuffle(particles_by_phase(i));
                     int p=particles_by_phase(i).Pop();
                     example.particles.valid(p)=false;

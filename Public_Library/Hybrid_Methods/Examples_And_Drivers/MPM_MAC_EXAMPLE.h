@@ -116,6 +116,7 @@ public:
     bool use_massless_particles;
     bool use_multiphase_projection;
     bool use_bump;
+    bool use_reseeding;
     T radius_sphere,radius_escape;
     bool use_periodic_test_shift;
     TV_INT periodic_test_shift;
