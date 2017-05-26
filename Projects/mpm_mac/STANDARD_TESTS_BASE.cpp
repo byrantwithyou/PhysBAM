@@ -199,21 +199,6 @@ Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,T
     (*color_attribute)(p)=VECTOR<T,3>(1,1,1);
 }
 //#####################################################################
-// Function Add_Walls
-//#####################################################################
-template<class TV> void STANDARD_TESTS_BASE<TV>::
-Add_Walls(int flags,COLLISION_TYPE type,T inset) // -x +x -y +y [ -z +z ], as bit flags
-{
-    RANGE<TV> range=grid.domain.Thickened(grid.dX*(ghost*2+1));
-    for(int a=0;a<TV::m;a++)
-        for(int s=0;s<2;s++)
-            if(flags&(1<<(a*2+s))){
-                RANGE<TV> wall=range;
-                if(s) wall.max_corner(a)=grid.domain.min_corner(a)+inset;
-                else wall.min_corner(a)=grid.domain.max_corner(a)-inset;
-                Add_Collision_Object(wall,type,0);}
-}
-//#####################################################################
 // Function Set_Grid
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::

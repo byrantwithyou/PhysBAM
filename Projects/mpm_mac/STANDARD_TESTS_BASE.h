@@ -93,7 +93,6 @@ public:
 
     void Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)> dV,
         const T mass,const T volume);
-    void Add_Walls(int flags,COLLISION_TYPE type,T inset); // -x +x -y +y [ -z +z ], as bit flags
 
     void Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale=TV_INT()+1,int default_resolution=32);
     void Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale,TV_INT resolution_padding,

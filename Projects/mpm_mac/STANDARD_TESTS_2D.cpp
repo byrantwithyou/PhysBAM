@@ -90,21 +90,18 @@ Initialize()
             T density=2*unit_rho*scale_mass;
             Seed_Particles(sphere,0,0,density,particles_per_cell);
             gravity=TV(0,-1)*m/sqr(s);
-            Add_Walls(-1,COLLISION_TYPE::slip,.1*m);
         } break;
         case 5:{ // stationary pool
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             T density=2*unit_rho*scale_mass;
-            Seed_Particles(RANGE<TV>(TV(.1*m,.1*m),TV(.9*m,.5*m)),0,0,density,particles_per_cell);
+            Seed_Particles(RANGE<TV>(TV(),TV(m,.5*m)),0,0,density,particles_per_cell);
             gravity=TV(0,-1)*m/sqr(s);
-            Add_Walls(-1,COLLISION_TYPE::slip,.1*m);
         } break;
         case 6:{ // freefall rectangle
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             T density=2*unit_rho*scale_mass;
             Seed_Particles(RANGE<TV>(TV(.2*m,.2*m),TV(.5*m,.8*m)),0,0,density,particles_per_cell);
             gravity=TV(0,-1)*m/sqr(s);
-            Add_Walls(-1,COLLISION_TYPE::slip,.1*m);
         } break;
         case 7:{ // stationary circles in two phases
             T density=2*unit_rho*scale_mass;
@@ -142,7 +139,6 @@ Initialize()
             Seed_Particles(sphere1,0,0,density,particles_per_cell);
             if(test_number==9)
                 particles.phase.Array_View(n,particles.phase.m-n).Fill(PHASE_ID(1));
-            Add_Walls(-1,COLLISION_TYPE::slip,.1*m);
             // a wall in the middle preventing the two circles from touching
             RANGE<TV> wall(TV(.45,0)*m,TV(.55,1)*m);
             Add_Collision_Object(wall,COLLISION_TYPE::slip,0);
@@ -163,7 +159,7 @@ Initialize()
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             T density=2*unit_rho*scale_mass;
             SPHERE<TV> sphere(TV(.5,.5)*m,.4*m);
-            RANGE<TV> box(TV(.1*m,.1*m),TV(.9*m,.5*m));
+            RANGE<TV> box(TV(),TV(m,.5*m));
             auto seed_space=Intersect(Make_IO(sphere),Make_IO(box));
             Seed_Particles(*seed_space,0,0,density,particles_per_cell);
             delete seed_space;
@@ -217,12 +213,11 @@ Initialize()
                 this->ghost=4;
                 this->use_bump=true;}
             Set_Grid(RANGE<TV>::Unit_Box()*m);
-            Seed_Particles(RANGE<TV>(TV(.1*m,.1*m),TV(.9*m,.5*m)),0,0,air_density,particles_per_cell);
+            Seed_Particles(RANGE<TV>(TV(),TV(m,.5*m)),0,0,air_density,particles_per_cell);
             int n=particles.phase.m;
-            Seed_Particles(RANGE<TV>(TV(.1*m,.5*m),TV(.9*m,.9*m)),0,0,air_density,particles_per_cell);
+            Seed_Particles(RANGE<TV>(TV(0,.5*m),TV(m,m)),0,0,air_density,particles_per_cell);
             particles.phase.Array_View(n,particles.phase.m-n).Fill(PHASE_ID(1));
             gravity=TV(0,-1)*m/sqr(s);
-            Add_Walls(-1,COLLISION_TYPE::slip,.1*m);
         } break;
         case 18:{ // full of fluid with random inital velocities
             T a=extra_T.m>=1?extra_T(0):-1;
@@ -233,7 +228,7 @@ Initialize()
             rand.Set_Seed();
             auto V_func=[&](const TV&){
                 return TV(rand.Get_Uniform_Number(a,b),rand.Get_Uniform_Number(a,b));};
-            Seed_Particles(RANGE<TV>(TV(0,0),TV(m,m)),V_func,0,density,particles_per_cell);
+            Seed_Particles(grid.domain,V_func,0,density,particles_per_cell);
         } break;
         case 20:{ // stationary sphere in air
             T water_density=1000*unit_rho*scale_mass;

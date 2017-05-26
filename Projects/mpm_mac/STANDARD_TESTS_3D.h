@@ -34,7 +34,7 @@ public:
     using BASE::solver_tolerance;
     using BASE::solver_iterations;using BASE::threads;using BASE::test_number;
     using BASE::resolution;using BASE::Seed_Particles;using BASE::random;
-    using BASE::Add_Walls;using BASE::data_directory;using BASE::stream_type;using BASE::Add_Particle;
+    using BASE::data_directory;using BASE::stream_type;using BASE::Add_Particle;
     using BASE::m;using BASE::s;using BASE::kg;using BASE::unit_p;using BASE::unit_mu;using BASE::unit_rho;
     using BASE::forced_collision_type;using BASE::destroy;using BASE::collision_objects;
     using BASE::write_output_files;using BASE::read_output_files;using BASE::begin_frame;
@@ -42,14 +42,12 @@ public:
     using BASE::dump_collision_objects;using BASE::extra_T;
     using BASE::extra_int;using BASE::phases;
 
-
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();
 
     void Write_Output_Files(const int frame) override;
     void Read_Output_Files(const int frame) override;
     void Initialize() override;
-
 //#####################################################################
 };
 }
