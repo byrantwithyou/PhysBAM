@@ -698,9 +698,6 @@ Move_Mass_Momentum_Inside_Nearest(PHASE& ph) const
         TV loc=fit.Location();
         T mass=ph.mass(fit.Full_Index());
         if(!mass) continue;
-        T volume=0;
-        if(example.use_particle_volumes)
-            volume=ph.volume(fit.Full_Index());
         for(int i=0;i<example.collision_objects.m;i++){
             MPM_COLLISION_OBJECT<TV>* o=example.collision_objects(i);
             if(o->Phi(loc,example.time)>=0) continue; // outside collision object
