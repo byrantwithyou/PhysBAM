@@ -1,7 +1,8 @@
 To check:
 
-* Look into MPM MAC transfer stability
+* Periodic poisson disk
 
+* BC option for slip vs stick, implement for viscosity
 
 Broken:
 
