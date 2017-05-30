@@ -55,8 +55,6 @@ public:
     T m,s,kg;
     T unit_p,unit_rho,unit_mu;
     int forced_collision_type;
-    std::function<void (int frame)> write_output_files;
-    std::function<void (int frame)> read_output_files;
     std::function<void ()> destroy;
     ARRAY<T> extra_T;
     ARRAY<int> extra_int;

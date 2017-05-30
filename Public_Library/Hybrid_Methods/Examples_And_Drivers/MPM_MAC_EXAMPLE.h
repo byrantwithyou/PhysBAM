@@ -136,13 +136,15 @@ public:
     void operator=(const MPM_MAC_EXAMPLE&) = delete;
     virtual ~MPM_MAC_EXAMPLE();
     
-    virtual void Write_Output_Files(const int frame);
-    virtual void Read_Output_Files(const int frame);
+    void Write_Output_Files(const int frame);
+    void Read_Output_Files(const int frame);
     virtual void Initialize()=0;
     std::function<void(int frame)> begin_frame;
     std::function<void(int frame)> end_frame;
     std::function<void(T time)> begin_time_step;
     std::function<void(T time)> end_time_step;
+    std::function<void (int frame)> write_output_files;
+    std::function<void (int frame)> read_output_files;
 
     T Potential_Energy(const T time) const;
     void Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const;

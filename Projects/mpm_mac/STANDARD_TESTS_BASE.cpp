@@ -30,7 +30,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     :MPM_MAC_EXAMPLE<TV>(stream_type_input),test_number(0),resolution(32),user_resolution(false),stored_last_frame(0),
     user_last_frame(false),order(2),seed(1234),particles_per_cell(1<<TV::m),regular_seeding(false),
     no_regular_seeding(false),scale_mass(1),override_output_directory(false),
-    m(1),s(1),kg(1),forced_collision_type(-1),write_output_files(0),read_output_files(0),dump_collision_objects(false),
+    m(1),s(1),kg(1),forced_collision_type(-1),dump_collision_objects(false),
     test_diff(false),bc_periodic(false)
 {
     T framerate=24;

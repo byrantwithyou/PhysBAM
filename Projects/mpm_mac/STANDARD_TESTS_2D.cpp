@@ -29,24 +29,6 @@ template<class T> STANDARD_TESTS<VECTOR<T,2> >::
 {
 }
 //#####################################################################
-// Function Write_Output_Files
-//#####################################################################
-template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
-Write_Output_Files(const int frame)
-{
-    if(write_output_files) write_output_files(frame);
-    BASE::Write_Output_Files(frame);
-}
-//#####################################################################
-// Function Read_Output_Files
-//#####################################################################
-template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
-Read_Output_Files(const int frame)
-{
-    if(read_output_files) read_output_files(frame);
-    BASE::Read_Output_Files(frame);
-}
-//#####################################################################
 // Function Initialize
 //#####################################################################
 template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
