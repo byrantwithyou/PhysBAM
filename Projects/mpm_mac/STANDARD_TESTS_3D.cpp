@@ -34,7 +34,6 @@ template<class T> STANDARD_TESTS<VECTOR<T,3> >::
 template<class T> void STANDARD_TESTS<VECTOR<T,3> >::
 Initialize()
 {
-    phases.Resize(PHASE_ID(1));
     switch(test_number)
     {
         case 1:{ // rotating sphere
@@ -42,6 +41,7 @@ Initialize()
             SPHERE<TV> sphere(TV(.5,.5,.5)*m,.3*m);
             VECTOR<T,3> angular_velocity(TV(0.4,0,0)/s);
             T density=2*unit_rho*scale_mass;
+            Set_Phases({density});
             Seed_Particles(sphere,[=](const TV& X){return angular_velocity.Cross(X-sphere.center);},
                 [=](const TV&){return MATRIX<T,3>::Cross_Product_Matrix(angular_velocity);}
                 ,density,particles_per_cell);
@@ -54,6 +54,7 @@ Initialize()
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
             SPHERE<TV> sphere(TV(.5,.5,.5)*m,.3*m);
             T density=2*unit_rho*scale_mass;
+            Set_Phases({density});
             Seed_Particles(sphere,0,[=](const TV&){return MATRIX<T,3>();},
                 density,particles_per_cell);
         } break;
@@ -61,6 +62,7 @@ Initialize()
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
             SPHERE<TV> sphere(TV(.5,.5,.5)*m,.3*m);
             T density=2*unit_rho*scale_mass;
+            Set_Phases({density});
             Seed_Particles(sphere,0,[=](const TV&){return MATRIX<T,3>();},
                 density,particles_per_cell);
         } break;
