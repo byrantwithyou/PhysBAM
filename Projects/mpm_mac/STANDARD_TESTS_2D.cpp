@@ -192,6 +192,11 @@ Initialize()
                     return MATRIX<T,2>(-c,-s,s,c)*a;
                 };
             Seed_Particles(grid.domain,V_func,dV_func,density,particles_per_cell);
+            analytic_velocity=[=](PHASE_ID pid,const TV& X,T time)
+                {
+                    return V_func(X)*exp(-2*sqr(a)*mu/density*time);
+                };
+            end_frame=[=](int frame){Check_Analytic_Velocity();};
         } break;
         case 17:
         case 19:{ // stationary pool with two phases
