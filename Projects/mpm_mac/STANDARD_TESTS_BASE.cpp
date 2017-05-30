@@ -32,7 +32,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     user_last_frame(false),order(2),seed(1234),particles_per_cell(1<<TV::m),regular_seeding(false),
     no_regular_seeding(false),scale_mass(1),override_output_directory(false),
     m(1),s(1),kg(1),forced_collision_type(-1),dump_collision_objects(false),
-    test_diff(false),bc_periodic(false)
+    test_diff(false),bc_periodic(false),mu(0)
 {
     T framerate=24;
     bool use_quasi_exp_F_update=false;
@@ -85,19 +85,21 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-test_diff",&test_diff,"test analytic derivatives");
     parse_args.Add("-bc_periodic",&bc_periodic,"set boundary condition periodic");
     parse_args.Add("-test_periodic",&use_periodic_test_shift,"test periodic bc");
+    parse_args.Add("-mu",&mu,"mu","viscosity");
 
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);
     if(use_slip) forced_collision_type=COLLISION_TYPE::slip;
     if(use_stick) forced_collision_type=COLLISION_TYPE::stick;
     if(use_separate) forced_collision_type=COLLISION_TYPE::separate;
-
+    
     unit_p=kg*pow<2-TV::m>(m)/(s*s);
     unit_rho=kg*pow<-TV::m>(m);
     unit_mu=kg*pow<2-TV::m>(m)/s;
     min_dt*=s;
     max_dt*=s;
-
+    mu*=unit_mu;
+    
     if(no_affine) use_affine=false;
 
     framerate/=s;

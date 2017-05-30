@@ -48,6 +48,7 @@ public:
         ARRAY<int> simulated_particles;
         GATHER_SCATTER<TV>* gather_scatter;
         T density; // if not using per-particle mass
+        T viscosity;
 
         // signed distance field & level sets
         ARRAY<T,TV_INT> phi;
@@ -123,7 +124,8 @@ public:
     T radius_sphere,radius_escape;
     bool use_periodic_test_shift;
     TV_INT periodic_test_shift;
-
+    bool use_viscosity;
+    
     // debugging
     DEBUG_PARTICLES<TV>& debug_particles;
     bool print_stats;

@@ -33,7 +33,7 @@ MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type)
     move_mass_inside(false),move_mass_inside_nearest(false),
     use_phi(false),rk_particle_order(0),
     use_massless_particles(false),use_multiphase_projection(false),use_bump(false),use_reseeding(false),
-    use_periodic_test_shift(false),
+    use_periodic_test_shift(false),use_viscosity(false),
     debug_particles(*new DEBUG_PARTICLES<TV>),
     print_stats(false),last_te(0),last_grid_ke(0),test_system(false),print_matrix(false)
 {

@@ -39,7 +39,7 @@ public:
     using typename BASE::COLLISION_TYPE;using BASE::data_directory;using BASE::Add_Fluid_Wall;
     using BASE::test_output_prefix;using BASE::use_test_output;using BASE::flip;
     using BASE::begin_frame;using BASE::end_frame;using BASE::periodic_test_shift;using BASE::use_periodic_test_shift;
-    using BASE::random;using typename BASE::PHASE;
+    using BASE::random;using BASE::use_viscosity;using typename BASE::PHASE;
     using BASE::use_constant_density;
 
     int test_number;
@@ -63,7 +63,8 @@ public:
     bool test_diff;
     bool bc_periodic;
     std::function<TV (PHASE_ID pid,const TV& X,T time)> analytic_velocity;
-
+    T mu;
+    
     STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS_BASE();
 

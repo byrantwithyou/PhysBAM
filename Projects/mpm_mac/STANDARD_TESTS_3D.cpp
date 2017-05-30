@@ -68,6 +68,9 @@ Initialize()
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
+    if(mu){
+        phases(PHASE_ID()).viscosity=mu;
+        use_viscosity=true;}
     if(forced_collision_type!=-1)
         for(int i=0;i<collision_objects.m;i++)
             collision_objects(i)->type=(COLLISION_TYPE)forced_collision_type;
