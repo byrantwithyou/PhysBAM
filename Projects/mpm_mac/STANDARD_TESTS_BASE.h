@@ -39,7 +39,7 @@ public:
     using typename BASE::COLLISION_TYPE;using BASE::data_directory;using BASE::Add_Fluid_Wall;
     using BASE::test_output_prefix;using BASE::use_test_output;using BASE::flip;
     using BASE::begin_frame;using BASE::end_frame;using BASE::periodic_test_shift;using BASE::use_periodic_test_shift;
-    using BASE::random;
+    using BASE::random;using typename BASE::PHASE;
     using BASE::use_constant_density;
 
     int test_number;
@@ -62,7 +62,8 @@ public:
     bool dump_collision_objects;
     bool test_diff;
     bool bc_periodic;
-    
+    std::function<TV (PHASE_ID pid,const TV& X,T time)> analytic_velocity;
+
     STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS_BASE();
 
@@ -98,6 +99,7 @@ public:
         int resolution_multiple=1,int default_resolution=32);
     void Test_dV(std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)> dV) const;
     void Set_Phases(const ARRAY<T,PHASE_ID>& phase_densities);
+    void Check_Analytic_Velocity() const;
 //#####################################################################
 };
 }

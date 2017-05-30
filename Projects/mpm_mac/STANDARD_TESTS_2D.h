@@ -40,6 +40,7 @@ public:
     using BASE::begin_frame;using BASE::end_frame;using BASE::begin_time_step;using BASE::end_time_step;
     using BASE::extra_T;using BASE::extra_int;using BASE::gravity;using BASE::phases;
     using BASE::bc_type;using BASE::BC_PERIODIC;using BASE::BC_INVALID;using BASE::Test_dV;using BASE::bc_periodic;
+    using BASE::analytic_velocity;using BASE::Check_Analytic_Velocity;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();

@@ -6,6 +6,7 @@
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Grid_Tools/Grids/NODE_ITERATOR.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Seeding/POISSON_DISK.h>
@@ -249,6 +250,30 @@ Set_Phases(const ARRAY<T,PHASE_ID>& phase_densities)
     phases.Resize(phase_densities.m);
     for(PHASE_ID i(0);i<phase_densities.m;i++)
         phases(i).density=phase_densities(i);
+}
+//#####################################################################
+// Function Check_Analytic_Velocity
+//#####################################################################
+template<class TV> void STANDARD_TESTS_BASE<TV>::
+Check_Analytic_Velocity() const
+{
+    if(!analytic_velocity) return;
+    T max_error=0,l2_error=0;
+    int num_l2_samples=0;
+    for(PHASE_ID i(0);i<phases.m;i++){
+        const PHASE& ph=phases(i);
+        for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
+            if(ph.mass(it.Full_Index())){
+                T u=ph.velocity(it.Full_Index());
+                TV v=analytic_velocity(i,it.Location(),time);
+                T e=abs(u-v(it.axis));
+                max_error=std::max(max_error,e);
+                l2_error+=sqr(e);
+                num_l2_samples++;}}
+        std::function<TV (PHASE_ID pid,const TV& X,T time)> analytic_velocity;}
+    if(num_l2_samples) l2_error/=num_l2_samples;
+    l2_error=sqrt(l2_error);
+    LOG::printf("velocity error: inf=%g l2=%g\n",max_error,l2_error);
 }
 template class STANDARD_TESTS_BASE<VECTOR<float,2> >;
 template class STANDARD_TESTS_BASE<VECTOR<float,3> >;
