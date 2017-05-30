@@ -10,6 +10,8 @@
 #include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
+#include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
+#include <Tools/Krylov_Solvers/MATRIX_SYSTEM.h>
 #include <Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
 #include <Tools/Parallel_Computation/APPEND_HOLDER.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
@@ -157,6 +159,9 @@ Advance_One_Time_Step()
     Pressure_Projection();
     Print_Grid_Stats("after projection",example.dt);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after projection",0,1);
+    Apply_Viscosity();
+    Print_Grid_Stats("after viscosity",example.dt);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after viscosity",0,1);
 
     Grid_To_Particle();
 
@@ -1267,6 +1272,112 @@ Fix_Periodic_Accum(ARRAY<T2,FACE_INDEX<TV::m> >& u,int ghost) const
     if(!example.bc_type.Contains(example.BC_PERIODIC)) return;
     if(ghost==INT_MAX) ghost=example.ghost;
     Fill_Ghost_Faces_Periodic_Accum(example.grid,u,u,example.periodic_boundary.is_periodic,ghost);
+}
+//#####################################################################
+// Function Apply_Viscosity
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Apply_Viscosity()
+{
+    if(!example.use_viscosity) return;
+    TIMER_SCOPE_FUNC;
+    PHYSBAM_ASSERT(example.phases.m==PHASE_ID(1)); // Single phase for now.
+    typedef KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > VEC;
+    typedef MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_MXN<T>,T,VEC> MAT;
+    PHASE& ph=example.phases(PHASE_ID(0));
+    if(!ph.viscosity) return;
+
+    // Based on logic from IMPLICIT_VISCOSITY_UNIFORM::Setup_Boundary_Conditions
+    for(int axis=0;axis<TV::m;axis++){
+        GRID<TV> face_grid(example.grid.Get_Face_MAC_Grid(axis));
+        ARRAY<int,TV_INT> velocity_index(face_grid.Domain_Indices(1),true,-1);
+        VEC rhs,sol;
+
+        // Allocate velocities that will be corrected; copy over initial guess
+        for(CELL_ITERATOR<TV> it(face_grid);it.Valid();it.Next()){
+            FACE_INDEX<TV::m> face(axis,it.index);
+            if(example.bc_type(axis)==example.BC_PERIODIC)
+                if(it.index(axis)==example.grid.numbers_of_cells(axis))
+                    continue;
+            if(!example.psi_N(face))
+                velocity_index(it.index)=rhs.v.Append(ph.velocity(face));}
+        Fix_Periodic(velocity_index,1);
+        
+        // Compute as needed rather than store.
+        auto psi_N=[axis,this](const FACE_INDEX<TV::m>& face)
+        {
+            if(face.axis==axis) return example.cell_index(face.index)<0;
+            TV_INT a=face.index,b=a;
+            b(axis)--;
+            if(example.cell_index(a)<0 && example.cell_index(b)<0) return true;
+            a(face.axis)--;
+            b(face.axis)--;
+            return example.cell_index(a)<0 && example.cell_index(b)<0;
+        };
+
+        SPARSE_MATRIX_FLAT_MXN<T> A;
+        MAT sys(A);
+        TV scale=ph.viscosity/ph.density*example.dt*sqr(example.grid.one_over_dX);
+
+        A.Reset(rhs.v.m);
+        sol.v=rhs.v;
+        ARRAY<int> tmp0,tmp1;
+#pragma omp parallel
+        {
+            SPARSE_MATRIX_THREADED_CONSTRUCTION<T> helper(A,tmp0,tmp1);
+            for(CELL_ITERATOR_THREADED<TV> it(example.grid,0);it.Valid();it.Next()){
+                int center_index=velocity_index(it.index);
+                if(center_index<0) continue;
+
+                T diag=1;
+                helper.Start_Row();
+                for(int a=0;a<TV::m;a++){
+                    FACE_INDEX<TV::m> face(a,it.index);
+                    for(int s=0;s<2;s++){
+                        TV_INT cell=it.index;
+                        cell(a)+=2*s-1;
+                        PHYSBAM_ASSERT(face.Cell_Index(s)==cell);
+                        
+                        if(!psi_N(face)){
+                            diag+=scale(a);
+                            int ci=velocity_index(cell);
+                            if(ci>=0) helper.Add_Entry(ci,-scale(a));}
+                        face.index(a)++;}}
+                helper.Add_Entry(center_index,diag);}
+            helper.Finish();
+        }
+
+        ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
+        static int solve_id=-1;
+        solve_id++;
+        if(example.test_system) sys.Test_System(sol);
+        if(example.print_matrix){
+            LOG::cout<<"solve id: "<<solve_id<<std::endl;
+            KRYLOV_SOLVER<T>::Ensure_Size(av,sol,2);
+            OCTAVE_OUTPUT<T>(LOG::sprintf("visc-M-%i.txt",solve_id).c_str()).Write("M",sys,*av(0),*av(1));
+            OCTAVE_OUTPUT<T>(LOG::sprintf("visc-C-%i.txt",solve_id).c_str()).Write_Preconditioner("C",sys,*av(0),*av(1));
+            OCTAVE_OUTPUT<T>(LOG::sprintf("visc-b-%i.txt",solve_id).c_str()).Write("b",rhs);}
+        CONJUGATE_GRADIENT<T> cg;
+        cg.finish_before_indefiniteness=true;
+        cg.relative_tolerance=true;
+        bool converged=cg.Solve(sys,sol,rhs,
+            av,example.solver_tolerance,0,example.solver_iterations);
+        if(!converged) LOG::printf("SOLVER DID NOT CONVERGE.\n");
+
+        if(example.print_matrix)
+            OCTAVE_OUTPUT<T>(LOG::sprintf("visc-x-%i.txt",solve_id).c_str()).Write("x",sol);
+
+        if(example.test_system){
+            sys.Multiply(sol,*av(0));
+            *av(0)-=rhs;
+            T r=sys.Convergence_Norm(*av(0));
+            LOG::cout<<"visc residual: "<<r<<std::endl;}
+
+        for(CELL_ITERATOR<TV> it(face_grid);it.Valid();it.Next()){
+            FACE_INDEX<TV::m> face(axis,it.index);
+            int i=velocity_index(it.index);
+            if(i>=0) ph.velocity(face)=sol.v(i);
+            else ph.velocity(face)=0;}}
 }
 //#####################################################################
 namespace PhysBAM{

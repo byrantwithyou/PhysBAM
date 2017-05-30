@@ -49,6 +49,7 @@ public:
     void Build_Level_Sets(PHASE& ph);
     void Pressure_Projection();
     void Apply_Forces();
+    void Apply_Viscosity();
     T Compute_Dt() const;
     T Max_Particle_Speed() const;
     T Max_Particle_Speed(const PHASE& ph) const;
