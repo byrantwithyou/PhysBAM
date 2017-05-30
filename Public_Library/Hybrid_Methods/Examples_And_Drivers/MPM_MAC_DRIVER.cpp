@@ -823,8 +823,9 @@ Density(const FACE_INDEX<TV::m>& face_index) const
 // Function Apply_Neumann_BC
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Apply_BC(ARRAY<bool,FACE_INDEX<TV::m> >& psi_N)
+Apply_BC()
 {
+    example.psi_N.Resize(example.grid,3,false);
     VECTOR<RANGE<TV_INT>,TV::m> domains;
     for(int i=0;i<TV::m;i++){
         domains(i)=example.grid.Domain_Indices();
@@ -851,16 +852,17 @@ Apply_BC(ARRAY<bool,FACE_INDEX<TV::m> >& psi_N)
                         if(example.phases(p).mass(it.Full_Index()))
                             example.phases(p).velocity(it.Full_Index())=v;
                     break;}}
-        psi_N(it.Full_Index())=N;}
-    Fix_Periodic(psi_N);
+        example.psi_N(it.Full_Index())=N;}
+    Fix_Periodic(example.psi_N);
 }
 //#####################################################################
 // Function Allocate_Projection_System_Variable
 //#####################################################################
 template<class TV> int MPM_MAC_DRIVER<TV>::
-Allocate_Projection_System_Variable(ARRAY<int,TV_INT>& cell_index,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N)
+Allocate_Projection_System_Variable()
 {
-    cell_index.Resize(example.grid.Domain_Indices(1),true,false,-1);
+    example.cell_index.Resize(example.grid.Domain_Indices(2),false,false);
+    example.cell_index.Fill(-1);
     int nvar=0;
     example.projection_system.dc_present=false;
     for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
@@ -868,7 +870,7 @@ Allocate_Projection_System_Variable(ARRAY<int,TV_INT>& cell_index,const ARRAY<bo
         for(int a=0;a<TV::m;a++){
             FACE_INDEX<TV::m> face(a,it.index);
             for(int s=0;s<2;s++){
-                if(!psi_N(face)){
+                if(!example.psi_N(face)){
                     all_N=false;
                     if(!example.use_multiphase_projection){
                         bool all_phase_dirichlet=true;
@@ -880,15 +882,15 @@ Allocate_Projection_System_Variable(ARRAY<int,TV_INT>& cell_index,const ARRAY<bo
                             example.projection_system.dc_present=true;}}}
                 face.index(a)++;}}
         if(!all_N && !dirichlet)
-            cell_index(it.index)=nvar++;}
-    Fix_Periodic(cell_index,1);
+            example.cell_index(it.index)=nvar++;}
+    Fix_Periodic(example.cell_index,1);
     return nvar;
 }
 //#####################################################################
 // Function Compute_Laplacian
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Compute_Laplacian(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV_INT>& cell_index,int nvar)
+Compute_Laplacian(int nvar)
 {
     example.projection_system.A.Reset(nvar);
     ARRAY<int> tmp0,tmp1;
@@ -896,7 +898,7 @@ Compute_Laplacian(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV
     {
         SPARSE_MATRIX_THREADED_CONSTRUCTION<T> helper(example.projection_system.A,tmp0,tmp1);
         for(CELL_ITERATOR_THREADED<TV> it(example.grid,0);it.Valid();it.Next()){
-            int center_index=cell_index(it.index);
+            int center_index=example.cell_index(it.index);
             if(center_index<0) continue;
 
             T diag=0;
@@ -908,10 +910,10 @@ Compute_Laplacian(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV
                     cell(a)+=2*s-1;
                     PHYSBAM_ASSERT(face.Cell_Index(s)==cell);
 
-                    if(!psi_N(face)){
+                    if(!example.psi_N(face)){
                         T entry=sqr(example.grid.one_over_dX(a))/Density(face);
                         diag+=entry;
-                        int ci=cell_index(cell);
+                        int ci=example.cell_index(cell);
                         if(ci>=0) helper.Add_Entry(ci,-entry);}
                     face.index(a)++;}}
             helper.Add_Entry(center_index,diag);}
@@ -925,7 +927,7 @@ Compute_Laplacian(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV
 // Function Compute_Gradient
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Compute_Gradient(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV_INT>& cell_index,int nvar)
+Compute_Gradient(int nvar)
 {
     example.projection_system.mass.Remove_All();
     example.projection_system.faces.Remove_All();
@@ -945,7 +947,7 @@ Compute_Gradient(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV_
         ARRAY<FACE_INDEX<TV::m> >& faces_t=faces_h.Array();
         SPARSE_MATRIX_THREADED_CONSTRUCTION<T> G_helper(example.projection_system.gradient,tmp2,tmp3);
         for(FACE_ITERATOR_THREADED<TV> it(example.grid);it.Valid();it.Next()){
-            if(psi_N(it.Full_Index())) continue;
+            if(example.psi_N(it.Full_Index())) continue;
             if(example.bc_type(it.axis)==example.BC_PERIODIC)
                 if(it.index(it.axis)==example.grid.numbers_of_cells(it.axis))
                     continue;
@@ -953,8 +955,8 @@ Compute_Gradient(const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const ARRAY<int,TV_
             T mass=Density(it.Full_Index());
             if(!mass) continue;
 
-            int c0=cell_index(it.First_Cell_Index());
-            int c1=cell_index(it.Second_Cell_Index());
+            int c0=example.cell_index(it.First_Cell_Index());
+            int c1=example.cell_index(it.Second_Cell_Index());
             if(c0<0 && c1<0) continue;
             G_helper.Start_Row();
             if(c0>=0) G_helper.Add_Entry(c0,-example.grid.one_over_dX(it.axis));
@@ -978,14 +980,10 @@ Compute_Poisson_Matrix()
     for(int i=0;i<TV::m;i++)
         example.weights(i)->Compute(example.grid.Face(FACE_INDEX<TV::m>(i,TV_INT())),scratch(i),false);
 
-    ARRAY<bool,FACE_INDEX<TV::m> > psi_N(example.grid,3,false);
-    Apply_BC(psi_N);
-
-    ARRAY<int,TV_INT> cell_index(example.grid.Domain_Indices(1),true,-1);
-    int nvar=Allocate_Projection_System_Variable(cell_index,psi_N);
-
-    Compute_Laplacian(psi_N,cell_index,nvar);
-    Compute_Gradient(psi_N,cell_index,nvar);
+    Apply_BC();
+    int nvar=Allocate_Projection_System_Variable();
+    Compute_Laplacian(nvar);
+    Compute_Gradient(nvar);
 }
 //#####################################################################
 // Function Pressure_Projection

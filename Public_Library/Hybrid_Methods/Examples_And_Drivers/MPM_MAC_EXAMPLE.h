@@ -75,6 +75,8 @@ public:
     int ghost;
     VECTOR<BC_TYPE,TV::m*2> bc_type; // -x, +x, -y, +y, -z, +z
     BOUNDARY_MAC_GRID_PERIODIC<TV,T>& periodic_boundary;
+    ARRAY<int,TV_INT> cell_index;
+    ARRAY<bool,FACE_INDEX<TV::m> > psi_N;
 
     // transfer stuff
     VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m> weights;
