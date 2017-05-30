@@ -806,6 +806,8 @@ Density(const FACE_INDEX<TV::m>& face_index) const
     if(!example.use_multiphase_projection){
         for(PHASE_ID p=PHASE_ID(0);p<example.phases.m;p++)
             if(T m=example.phases(p).mass(face_index)){
+                if(example.use_constant_density)
+                    return example.phases(p).density;
                 if(example.use_particle_volumes)
                     m/=example.phases(p).volume(face_index);
                 return m;}
