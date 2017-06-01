@@ -4,6 +4,15 @@ To check:
 
 * BC option for slip vs stick, implement for viscosity
 
+* Do a better BC treatment for viscosity.  Compute BC directly from raw information rather than from pressure information.
+
+* Optional Fourier decomposition of velocity field at end of frame
+
+* Optional generation of stats from decomposed velocity field
+  - Total KE
+  - histogram of KE by magnitude of k
+  - KE by eigenvalue (heat image)
+
 Broken:
 
 * selecting grid cell in slice mode in 3d, nothing gets printed
