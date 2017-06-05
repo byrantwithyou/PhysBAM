@@ -10,6 +10,7 @@
 #include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Core/Utilities/TYPE_UTILITIES.h>
 #include <Core/Vectors/VECTOR_FORWARD.h>
+#include <complex>
 namespace PhysBAM{
 
 template<class T> struct IS_SCALAR_BLOCK {static const bool value=is_scalar<T>::value;}; // true if memory layout is contiguous array of scalars
@@ -17,6 +18,7 @@ template<class T> struct IS_SCALAR_VECTOR_SPACE {static const bool value=is_scal
 
 template<class T,class ENABLER=void> struct SCALAR_POLICY{typedef struct UNUSABLE{} TYPE;};
 template<class T> struct SCALAR_POLICY<T,typename enable_if<is_scalar<T>::value>::type>{typedef T TYPE;};
+template<class T> struct SCALAR_POLICY<std::complex<T> >{typedef std::complex<T> TYPE;};
 template<class T> struct SCALAR_POLICY<T,typename conditional<true,void,typename T::SCALAR>::type> {typedef typename T::SCALAR TYPE;};
 
 }
