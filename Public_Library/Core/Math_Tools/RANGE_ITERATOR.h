@@ -18,6 +18,10 @@ struct RANGE_ITERATOR
     RANGE<TV_INT> domain;
     TV_INT index;
 
+    RANGE_ITERATOR(const TV_INT& size) PHYSBAM_ALWAYS_INLINE
+        :domain(TV_INT(),size)
+    {Reset();}
+
     RANGE_ITERATOR(const RANGE<TV_INT>& domain_input) PHYSBAM_ALWAYS_INLINE
         :domain(domain_input)
     {Reset();}
