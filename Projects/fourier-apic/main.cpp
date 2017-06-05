@@ -9,8 +9,7 @@
 #include <Tools/Images/PNG_FILE.h>
 #include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Grid_Tools/Fourier_Transforms/FFT_2D.h>
-#include <Grid_Tools/Fourier_Transforms/FFTW.h>
+#include <Grid_Tools/Fourier_Transforms/FFT.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
@@ -129,7 +128,7 @@ int main(int argc, char* argv[])
     driver.Grid_To_Particle();
     driver.Particle_To_Grid();
 
-    ARRAY<std::complex<T>,TV_INT> row(TV_INT()+size);
+    ARRAY<T,TV_INT> row(TV_INT()+size);
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>::Unit_Box()*resolution);it.Valid();it.Next()){
         TV_INT index=it.index-center;
         for(int i=0;i<TV::m;i++) if(index(i)<0) index(i)+=size;
@@ -137,12 +136,10 @@ int main(int argc, char* argv[])
 
     ARRAY<std::complex<T>,TV_INT> out(row.domain);
 
-    fftw_plan plan=fftw_plan_dft_2d(size,size,
-        (fftw_complex*)row.array.base_pointer,(fftw_complex*)out.array.base_pointer,
-        FFTW_FORWARD,FFTW_ESTIMATE);
-    fftw_execute(plan);
-    fftw_destroy_plan(plan);
-
+    GRID<TV> fft_grid(out.domain.Edge_Lengths(),RANGE<TV>::Unit_Box(),true);
+    FFT<TV> fft;
+    fft.Transform(row,out);
+    
     INTERPOLATED_COLOR_MAP<T> icm;
     icm.colors.Add_Control_Point(1.00001,VECTOR<T,3>(1,1,1));
     icm.colors.Add_Control_Point(1,VECTOR<T,3>(.5,0,0));

@@ -10,9 +10,7 @@
 #include <Core/Log/LOG.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Core/Vectors/VECTOR.h>
-#include <Grid_Tools/Fourier_Transforms/FFT_2D.h>
-#include <Grid_Tools/Fourier_Transforms/FFT_3D.h>
-#include <Grid_Tools/Fourier_Transforms/FFT_POLICY.h>
+#include <Grid_Tools/Fourier_Transforms/FFT.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Grid_Tools/Grids/NODE_ITERATOR.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
@@ -64,7 +62,6 @@ class MPLE_DRIVER
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
     typedef typename MARCHING_CUBES<TV>::T_SURFACE T_SURFACE;
-    typedef typename FFT_POLICY<TV>::FFT T_FFT;    
 
 public:
     
@@ -79,7 +76,7 @@ public:
     ARRAY<TV_INT,TV_INT> index;          // flat to vector index
     ARRAY<TV_INT,TV_INT> fft_index;      // flat to vector index
 
-    T_FFT* transform;
+    FFT<TV>* transform;
     
     int array_m;
     int fft_array_m;
@@ -119,7 +116,7 @@ public:
         index.Resize(grid.Node_Indices(),false);
         array_m=location.array.m;
 
-        transform=new T_FFT(grid);
+        transform=new FFT<TV>;
 
         int k=0;
         for(NODE_ITERATOR<TV> it(grid);it.Valid();it.Next(),k++){

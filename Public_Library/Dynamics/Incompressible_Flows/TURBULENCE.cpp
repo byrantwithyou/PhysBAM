@@ -5,10 +5,8 @@
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Math_Tools/constants.h>
 #include <Core/Math_Tools/sqr.h>
-#include <Grid_Tools/Fourier_Transforms/FFT_1D.h>
-#include <Grid_Tools/Fourier_Transforms/FFT_2D.h>
-#include <Grid_Tools/Fourier_Transforms/FFT_3D.h>
-#include <Grid_Tools/Fourier_Transforms/FFT_POLICY.h>
+#include <Grid_Tools/Fourier_Transforms/FFT.h>
+#include <Grid_Tools/Fourier_Transforms/FFT_UTILITIES.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Dynamics/Incompressible_Flows/TURBULENCE.h>
 using namespace PhysBAM;
@@ -18,7 +16,7 @@ using namespace PhysBAM;
 template<class TV> void TURBULENCE<TV>::
 Generate_Random_Turbulence(const GRID<TV>& grid,VECTOR<ARRAY<T,TV_INT>,TV::m>& u) const
 {
-    typename FFT_POLICY<TV>::FFT fft(grid);
+    FFT<TV> fft;
     TV_INT size(grid.counts-1);
     size(TV::m-1)=grid.counts(TV::m-1)/2;
     RANGE<TV_INT> range(TV_INT(),size);
@@ -39,9 +37,9 @@ Generate_Random_Turbulence(const GRID<TV>& grid,VECTOR<ARRAY<T,TV_INT>,TV::m>& u
             T r=random->Get_Gaussian(),theta=(T)pi*random->Get_Uniform_Number((T)0,(T)1);
             u_hat(i)(it.index)=std::polar(sqrt_energy_over_two*r,theta);}}
 
-    for(int i=0;i<TV::m;i++) fft.Enforce_Real_Valued_Symmetry(u_hat(i));
-    if(incompressible) fft.Make_Divergence_Free(u_hat);
-    for(int i=0;i<TV::m;i++) fft.Inverse_Transform(u_hat(i),u(i),false,false);
+    for(int i=0;i<TV::m;i++) Enforce_Real_Valued_Symmetry(u_hat(i));
+    if(incompressible) Make_Divergence_Free(u_hat,grid.domain.Edge_Lengths());
+    for(int i=0;i<TV::m;i++) fft.Inverse_Transform(u_hat(i),u(i));
 
     // rescale the final velocity
     if(rescaled_average_velocity){
