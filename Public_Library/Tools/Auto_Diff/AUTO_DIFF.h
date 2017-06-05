@@ -185,7 +185,7 @@ inline AUTO_DIFF<typename TV::SCALAR,TV> atan2(const AUTO_DIFF<typename TV::SCAL
 template<class TV>
 inline AUTO_DIFF<typename TV::SCALAR,TV> atan2(const AUTO_DIFF<typename TV::SCALAR,TV>& y,typename TV::SCALAR x)
 {
-    typename TV::SCALAR c=sqr(x)+sqr(y.x),d=x/c,e=y.x/c;
+    typename TV::SCALAR c=sqr(x)+sqr(y.x),d=x/c;
     TV f=d*y.dx;
     return AUTO_DIFF<typename TV::SCALAR,TV>(::std::atan2(y.x,x),f);
 }
