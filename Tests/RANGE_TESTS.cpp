@@ -332,9 +332,9 @@ public:
         RANGE<TV> box_two_points=RANGE<TV>::Bounding_Box(points(0),points(1)),box_three_points=RANGE<TV>::Bounding_Box(points(2),points(3),points(4)),
             box_four_points=RANGE<TV>::Bounding_Box(points(5),points(6),points(7),points(8)),box_full=RANGE<TV>::Bounding_Box(points);
         Test(box_two_points.Lazy_Inside(points(0)) && box_two_points.Lazy_Inside(points(1)),"Bounding box of two points contains those points.",ok);
-        Test(box_three_points.Lazy_Inside(points(2)) && box_three_points.Lazy_Inside(points(3)) && box_three_points.Lazy_Inside(points(4)),"Bounding box of two points contains those points.",ok);
-        Test(box_four_points.Lazy_Inside(points(5)) && box_four_points.Lazy_Inside(points(6)) && box_four_points.Lazy_Inside(points(7)) && box_four_points.Lazy_Inside(points(9)),
-            "Bounding box of two points contains those points.",ok);
+        Test(box_three_points.Lazy_Inside(points(2)) && box_three_points.Lazy_Inside(points(3)) && box_three_points.Lazy_Inside(points(4)),"Bounding box of three points contains those points.",ok);
+        Test(box_four_points.Lazy_Inside(points(5)) && box_four_points.Lazy_Inside(points(6)) && box_four_points.Lazy_Inside(points(7)) && box_four_points.Lazy_Inside(points(8)),
+            "Bounding box of four points contains those points.",ok);
         for(int j=0;j<20 && ok;j++) Test(box_full.Lazy_Inside(points(j)),"Full bounding box contains all points from which it was constructed.",ok);}
     return ok;}
 
