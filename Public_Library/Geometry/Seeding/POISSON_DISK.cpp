@@ -36,6 +36,35 @@ Sample(RANDOM_NUMBERS<T>& random,IMPLICIT_OBJECT<TV>& object,ARRAY<TV>& X)
             X.Remove_Index_Lazy(i);
 }
 //#####################################################################
+// Function Insert_In_Array
+//#####################################################################
+template<class TV_INT> static void
+Insert_In_Array(ARRAY<int,TV_INT>& a,const TV_INT& cell,int index,
+    const TV_INT& counts,int ghost,const VECTOR<bool,TV_INT::m>& is_periodic,
+    VECTOR<int,0>*)
+{
+    a(cell)=index;
+}
+//#####################################################################
+// Function Insert_In_Array
+//#####################################################################
+template<class TV_INT,int d> static void
+Insert_In_Array(ARRAY<int,TV_INT>& a,const TV_INT& cell,int index,
+    const TV_INT& counts,int ghost,const VECTOR<bool,TV_INT::m>& is_periodic,
+    VECTOR<int,d>*)
+{
+    Insert_In_Array(a,cell,index,counts,ghost,is_periodic,(VECTOR<int,d-1>*)0);
+    if(!is_periodic(d-1)) return;
+    if(cell(d-1)<ghost){
+        TV_INT c=cell;
+        c(d-1)+=counts(d-1);
+        Insert_In_Array(a,c,index,counts,ghost,is_periodic,(VECTOR<int,d-1>*)0);}
+    if(cell(d-1)>counts(d-1)-ghost){
+        TV_INT c=cell;
+        c(d-1)-=counts(d-1);
+        Insert_In_Array(a,c,index,counts,ghost,is_periodic,(VECTOR<int,d-1>*)0);}
+}
+//#####################################################################
 // Function Sample
 //#####################################################################
 template<class TV> void POISSON_DISK<TV>::
@@ -46,8 +75,9 @@ Sample(RANDOM_NUMBERS<T>& random,const RANGE<TV>& box,ARRAY<TV>& X)
     GRID<TV> grid(cell_counts+1,RANGE<TV>(bounding_box.min_corner,bounding_box.min_corner+(TV)cell_counts*h));
     ARRAY<int,TV_INT> grid_array(grid.Cell_Indices(ghost),true,-1);
     if(X.m){
-        for(int i=0;i<X.m;i++) grid_array(grid.Cell(X(i)))=i;
-    }
+        for(int i=0;i<X.m;i++)
+            Insert_In_Array(grid_array,grid.Cell(X(i)),i,grid.numbers_of_cells,
+                ghost,is_periodic,(TV_INT*)0);}
     else{
         TV first_point=random.Get_Uniform_Vector(box);
         grid_array(grid.Cell(first_point))=0;
@@ -63,7 +93,8 @@ Sample(RANDOM_NUMBERS<T>& random,const RANGE<TV>& box,ARRAY<TV>& X)
                 found_at_least_one=true;
                 int index=X.Append(new_point);
                 active.Append(index);
-                grid_array(grid.Cell(new_point))=index;}}
+                Insert_In_Array(grid_array,grid.Cell(new_point),index,
+                    grid.numbers_of_cells,ghost,is_periodic,(TV_INT*)0);}}
         if(!found_at_least_one) active.Remove_Index_Lazy(random_index);}
 }
 //#####################################################################

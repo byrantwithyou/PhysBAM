@@ -140,6 +140,7 @@ Seed_Particles_Poisson(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> 
 {
     POISSON_DISK<TV> poisson_disk(1);
     ARRAY<TV> X;
+    for(int i=0;i<TV::m;i++) poisson_disk.is_periodic(i)=(bc_type(i)==BC_PERIODIC);
     poisson_disk.Set_Distance_By_Volume(grid.dX.Product()/particles_per_cell);
     poisson_disk.Sample(random,object,X);
 

@@ -161,6 +161,7 @@ Initialize()
         } break;
         case 14:{ // rotating circle (periodic test)
             Set_Grid(RANGE<TV>::Unit_Box()*m);
+            bc_type.Fill(BC_PERIODIC);
             VECTOR<T,1> angular_velocity(0.4/s);
             T density=2*unit_rho*scale_mass;
             Set_Phases({density});
@@ -177,7 +178,6 @@ Initialize()
             TV total_momentum=particles.V.Weighted_Sum(particles.mass);
             TV dV=total_momentum/total_mass;
             particles.V-=dV;
-            bc_type.Fill(BC_PERIODIC);
         } break;
         case 16:{ // Initialize velocity field as Taylor-Green Vortex
             // To specify parameters, use: -I a

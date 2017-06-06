@@ -40,7 +40,7 @@ public:
     using BASE::test_output_prefix;using BASE::use_test_output;using BASE::flip;
     using BASE::begin_frame;using BASE::end_frame;using BASE::periodic_test_shift;using BASE::use_periodic_test_shift;
     using BASE::random;using BASE::use_viscosity;using typename BASE::PHASE;
-    using BASE::use_constant_density;
+    using BASE::use_constant_density;using BASE::bc_type;using BASE::BC_PERIODIC;
 
     int test_number;
     int resolution;

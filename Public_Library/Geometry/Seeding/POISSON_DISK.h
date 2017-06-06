@@ -22,6 +22,8 @@ public:
     int max_attemps;
     int ghost;
     T h;
+    VECTOR<bool,TV::m> is_periodic;
+
     POISSON_DISK(T min_distance,int max_attemps=30);
     ~POISSON_DISK();
     void Sample(RANDOM_NUMBERS<T>& random,IMPLICIT_OBJECT<TV>& object,ARRAY<TV>& X);
