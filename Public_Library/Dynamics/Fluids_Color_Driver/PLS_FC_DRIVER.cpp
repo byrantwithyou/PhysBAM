@@ -449,7 +449,7 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
         int c=example.levelset_color.Color(it.Location());
         example.face_color(it.Full_Index())=c;
         if(c<0) continue;
-        int k=iss.cm_u(it.Axis())->Get_Index(it.index,c);
+        int k=iss.cm_u(it.Axis())->Get_Index(it.face.index,c);
         assert(k>=0);
         example.face_velocities(c)(it.Full_Index())=sol.u(it.Axis())(c)(k);}
 
@@ -666,7 +666,7 @@ Dump_Vector(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,const KRYLOV_VECTOR_BAS
     for(FACE_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
         int c=example.face_color(it.Full_Index());
         if(c<0) continue;
-        int k=iss.cm_u(it.Axis())->Get_Index(it.index,c);
+        int k=iss.cm_u(it.Axis())->Get_Index(it.face.index,c);
         assert(k>=0);
         example.face_velocities(c)(it.Full_Index())=v.u(it.Axis())(c)(k);}
 

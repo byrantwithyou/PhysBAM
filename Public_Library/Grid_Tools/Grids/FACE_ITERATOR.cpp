@@ -11,87 +11,32 @@ using namespace PhysBAM;
 //#####################################################################
 // axis_input==0 means iterate through faces in all dimensions
 template<class TV> FACE_ITERATOR<TV>::
-FACE_ITERATOR(const GRID<TV>& grid_input,const int number_of_ghost_cells_input,const T_REGION& region_type_input,const int side_input,int axis_input)
-    :GRID_ITERATOR_BASE<TV>(grid_input),region_type(region_type_input),side(side_input),number_of_ghost_cells(number_of_ghost_cells_input)
+FACE_ITERATOR(const GRID<TV>& grid_input,const int number_of_ghost_cells_input,
+    const typename GRID<TV>::REGION& region_type_input,const int side_input,
+    int axis_input)
+    :grid(grid_input)
 {
-    assert(-1<=side&&side<2*TV::m&&(side<0||axis_input<0||side/2==axis_input));
-    assert(region_type!=GRID<TV>::BOUNDARY_INTERIOR_REGION); // TODO: implement this case!
-    if(region_type==GRID<TV>::BOUNDARY_REGION && side>=0) axis_input=side/2;
-    if(axis_input>=0){single_axis=true;Reset_Axis(axis_input);}
-    else{single_axis=false;Reset_Axis(0);}
+    int inner_ghost=0;
+    if(region_type_input==GRID<TV>::BOUNDARY_REGION) inner_ghost=number_of_ghost_cells_input;
+    Set_Range(grid_input.numbers_of_cells,number_of_ghost_cells_input,inner_ghost);
+    RF flags=RF::none;
+    switch(region_type_input){
+        case GRID<TV>::WHOLE_REGION:flags=RF::interior;break;
+        case GRID<TV>::GHOST_REGION:flags=RF::skip_inner;break;
+        case GRID<TV>::BOUNDARY_REGION:flags=RF::none;break;
+        case GRID<TV>::INTERIOR_REGION:flags=RF::interior|RF::skip_outer;break;
+        case GRID<TV>::BOUNDARY_INTERIOR_REGION:PHYSBAM_FATAL_ERROR();break;}
+    Initialize(flags,side_input,axis_input);
 }
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class TV> FACE_ITERATOR<TV>::
-FACE_ITERATOR(const GRID<TV>& grid_input,const RANGE<TV_INT>& explicit_region_input,const int axis_input)
-    :GRID_ITERATOR_BASE<TV>(grid_input),axis(axis_input),single_axis(true)
+FACE_ITERATOR(const GRID<TV>& grid_input,const RANGE<TV_INT>& explicit_region_input,
+    const int axis_input)
+    :FACE_RANGE_ITERATOR<TV::m>(explicit_region_input,RF::interior,axis_input),
+    grid(grid_input)
 {
-    assert(axis>=0);
-    Add_Region(explicit_region_input);
-    Reset();
-}
-//#####################################################################
-// Function Next_Helper
-//#####################################################################
-template<class TV> void FACE_ITERATOR<TV>::
-Next_Helper()
-{
-    GRID_ITERATOR_BASE<TV>::Next_Helper();
-    if(!valid && !single_axis && axis<TV::m-1) Reset_Axis(axis+1);
-}
-//#####################################################################
-// Function Reset_Axis
-//#####################################################################
-template<class TV> void FACE_ITERATOR<TV>::
-Reset_Axis(const int axis_input)
-{
-    axis=axis_input;
-    Reset_Regions();
-    RANGE<TV_INT> domain(grid.Cell_Indices(number_of_ghost_cells));
-    switch(region_type){
-        case GRID<TV>::WHOLE_REGION:{assert(side<0);
-            domain.max_corner(axis)++;
-            Add_Region(domain);
-            break;}
-        case GRID<TV>::GHOST_REGION:{
-            domain.max_corner(axis)++;
-            if(side<0){ // TODO(jontg): Beware of duplicates!
-                for(int axis_of_side=0;axis_of_side<TV::m;axis_of_side++){
-                    RANGE<TV_INT> d0(domain),d1(domain);
-                    domain.min_corner(axis_of_side)+=number_of_ghost_cells;
-                    domain.max_corner(axis_of_side)-=number_of_ghost_cells;
-                    d0.max_corner(axis_of_side)=domain.min_corner(axis_of_side);
-                    d1.min_corner(axis_of_side)=domain.max_corner(axis_of_side);
-                    Add_Region(d0);
-                    Add_Region(d1);}}
-            else{
-                int axis_of_side=side/2;
-                if(!(side&1)){
-                    RANGE<TV_INT> domain_copy(domain);
-                    domain_copy.max_corner(axis_of_side)=domain_copy.min_corner(axis_of_side)+number_of_ghost_cells;
-                    Add_Region(domain_copy);}
-                if(side&1){
-                    RANGE<TV_INT> domain_copy(domain);
-                    domain_copy.min_corner(axis_of_side)=domain_copy.max_corner(axis_of_side)-number_of_ghost_cells;
-                    Add_Region(domain_copy);}}
-            break;}
-        case GRID<TV>::BOUNDARY_REGION:{
-            if(side<0 || !(side&1)){
-                RANGE<TV_INT> domain_copy(domain);
-                domain_copy.max_corner(axis)=domain.min_corner(axis)+1;
-                Add_Region(domain_copy);}
-            if(side<0 || side&1){
-                RANGE<TV_INT> domain_copy(domain);
-                domain_copy.min_corner(axis)=domain.max_corner(axis);
-                domain_copy.max_corner(axis)=domain.max_corner(axis)+1;
-                Add_Region(domain_copy);}
-            break;}
-        default:{assert(region_type==GRID<TV>::INTERIOR_REGION && side<0);
-            domain.min_corner(axis)++;
-            Add_Region(domain);
-            break;}}
-    Reset();
 }
 //#####################################################################
 namespace PhysBAM{

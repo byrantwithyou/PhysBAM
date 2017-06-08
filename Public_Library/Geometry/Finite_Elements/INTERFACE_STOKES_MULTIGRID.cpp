@@ -134,7 +134,7 @@ Restriction(T_VECTOR& z,const T_VECTOR& x,int fine_level) const
     for(FACE_ITERATOR<TV> it(coarse_iss->grid);it.Valid();it.Next()){
         FACE_INDEX<TV::m> face(it.Full_Index());
         for(int c=0;c<coarse_iss->cdi->colors;c++){
-            int k=coarse_iss->cm_u(face.axis)->Get_Index(it.index,c);
+            int k=coarse_iss->cm_u(face.axis)->Get_Index(it.face.index,c);
             if(k>=0){
                 int weight=0;
                 T value=0;
@@ -175,7 +175,7 @@ Prolongation(T_VECTOR& z,const T_VECTOR& x,int fine_level) const
     for(FACE_ITERATOR<TV> it(coarse_iss->grid);it.Valid();it.Next()){
         FACE_INDEX<TV::m> face(it.Full_Index());
         for(int c=0;c<coarse_iss->cdi->colors;c++){
-            int k=coarse_iss->cm_u(face.axis)->Get_Index(it.index,c);
+            int k=coarse_iss->cm_u(face.axis)->Get_Index(it.face.index,c);
             if(k>=0){
                 VECTOR<const T*,3<<(TV::m-1)> from;
                 VECTOR<T*,3<<(TV::m-1)> to;

@@ -189,8 +189,8 @@ Dump_Grid_ShiftTest(const std::string& var_name,const ARRAY<T,FACE_INDEX<TV::m> 
     ARRAY<T,FACE_INDEX<TV::m> > arr_shift(arr.domain_indices);
     TV_INT id_shift;
     for(FACE_ITERATOR<TV> fit(example.grid);fit.Valid();fit.Next()){
-        id_shift=wrap(fit.index+example.periodic_test_shift,TV_INT(),example.grid.counts);
-        FACE_INDEX<TV::m> fid_shift(fit.axis,id_shift);
+        id_shift=wrap(fit.face.index+example.periodic_test_shift,TV_INT(),example.grid.counts);
+        FACE_INDEX<TV::m> fid_shift(fit.face.axis,id_shift);
         arr_shift(fit.Full_Index())=arr(fid_shift);}
     Write_To_Text_File(example.output_directory+LOG::sprintf("/%s",var_name),arr_shift.array,"\n");
 }
@@ -648,7 +648,7 @@ Move_Mass_Momentum_Inside(PHASE& ph) const
             TV loc_bd=io->Closest_Point_On_Boundary(loc);
             TV loc_reflect=loc+2*(loc_bd-loc);
             Add_Debug_Particle(loc_reflect,VECTOR<T,3>(1,0,0)); // DEBUG: reflection across boundary
-            FACE_INDEX<TV::m> first_face_index=example.grid.Face(loc_reflect,fit.axis); // get the smallest face index
+            FACE_INDEX<TV::m> first_face_index=example.grid.Face(loc_reflect,fit.face.axis); // get the smallest face index
             TV first_face_loc=example.grid.Face(first_face_index);
             TV offset=(loc_reflect-first_face_loc)*example.grid.one_over_dX;
             VECTOR<T,1<<TV::m> weights;
@@ -710,7 +710,7 @@ Move_Mass_Momentum_Inside_Nearest(PHASE& ph) const
             TV loc_bd=io->Closest_Point_On_Boundary(loc);
             TV loc_reflect=loc+2*(loc_bd-loc);
             T closest_distance=FLT_MAX;
-            FACE_INDEX<TV::m> first_face_index=example.grid.Face(loc_reflect,fit.axis); // get the smallest face index
+            FACE_INDEX<TV::m> first_face_index=example.grid.Face(loc_reflect,fit.face.axis); // get the smallest face index
             FACE_INDEX<TV::m> closest_face(first_face_index);
             for(int j=0;j<1<<TV::m;j++){
                 FACE_INDEX<TV::m> f(first_face_index);

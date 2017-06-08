@@ -107,7 +107,7 @@ Fill_Ghost_Faces_Periodic_Accum(const GRID<TV>& grid,const ARRAY<T2,FACE_INDEX<T
         for(int i=0;i<TV::m;i++)
             if(is_periodic(i))
                 fit.index(i)=wrap(fit.index(i),0,grid.numbers_of_cells(i));
-        if(fit.index!=it.index)
+        if(fit.index!=it.face.index)
             u_ghost(fit)+=u(it.Full_Index());}
     for(int axis=0;axis<TV::m;axis++){
         if(!is_periodic(axis)) continue;

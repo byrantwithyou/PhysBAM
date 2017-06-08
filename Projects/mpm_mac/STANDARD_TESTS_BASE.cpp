@@ -268,7 +268,7 @@ Check_Analytic_Velocity() const
             if(ph.mass(it.Full_Index())){
                 T u=ph.velocity(it.Full_Index());
                 TV v=analytic_velocity(i,it.Location(),time);
-                T e=abs(u-v(it.axis));
+                T e=abs(u-v(it.face.axis));
                 max_error=std::max(max_error,e);
                 l2_error+=sqr(e);
                 num_l2_samples++;}}

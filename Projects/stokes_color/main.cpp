@@ -103,7 +103,7 @@ void Dump_System(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,ANALYTIC_TEST<TV>&
         Dump_Interface<T,TV>(iss);
         sprintf(buff,"dofs %i %s",c,c>=0?"":names[-c-1]);
         for(FACE_ITERATOR<TV> it(iss.grid);it.Valid();it.Next()){
-            int index=iss.cm_u(it.Axis())->Get_Index(it.index,c);
+            int index=iss.cm_u(it.Axis())->Get_Index(it.face.index,c);
             if(index>=0){
                 Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
                 Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(it.Axis()));}}
@@ -159,7 +159,7 @@ void Dump_Vector(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,const INTERFACE_ST
         Dump_Interface<T,TV>(iss);
         sprintf(buff,"%s %i",title,c);
         for(FACE_ITERATOR<TV> it(iss.grid);it.Valid();it.Next()){
-            int index=iss.cm_u(it.Axis())->Get_Index(it.index,c);
+            int index=iss.cm_u(it.Axis())->Get_Index(it.face.index,c);
             if(index>=0){
                 Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
                 Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(it.Axis())*v.u(it.Axis())(c)(index));}}
@@ -336,7 +336,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
         int i=it.Axis();
         int c=at.phi_color(it.Location());
         if(c<0) continue;
-        int k=iss.cm_u(it.Axis())->Get_Index(it.index,c);
+        int k=iss.cm_u(it.Axis())->Get_Index(it.face.index,c);
         assert(k>=0);
         numer_u(it.Full_Index())=sol.u(i)(c)(k);}
 

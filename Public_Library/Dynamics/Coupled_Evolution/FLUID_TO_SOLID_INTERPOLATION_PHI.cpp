@@ -63,7 +63,7 @@ Setup_Mesh()
     HASHTABLE<TV_INT,ARRAY<FACE_INDEX<TV::m> > > cut_faces;
     for(FACE_ITERATOR<TV> it(index_map.grid);it.Valid();it.Next()){
         FACE_INDEX<TV::m> face=it.Full_Index();
-        TV_INT a=TV_INT::Axis_Vector(1-it.Axis()),node0=it.index-a,node1=it.index,node2=it.index+a,node3=it.index+2*a;
+        TV_INT a=TV_INT::Axis_Vector(1-it.Axis()),node0=it.face.index-a,node1=it.face.index,node2=it.face.index+a,node3=it.face.index+2*a;
         T phi1=dual_phi(node1),phi2=dual_phi(node2);
         if((phi1>0)==(phi2>0)) continue;
         T theta=0;

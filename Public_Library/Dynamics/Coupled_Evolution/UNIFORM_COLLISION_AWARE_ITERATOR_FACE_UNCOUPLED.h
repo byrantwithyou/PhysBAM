@@ -22,8 +22,8 @@ class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED:public FACE_ITERATOR<TV>
 public:
     typedef typename TV::SCALAR T;
     typedef FACE_ITERATOR<TV> BASE;typedef typename GRID<TV>::REGION T_REGION;
-    using BASE::grid;using BASE::index;using BASE::number_of_ghost_cells;using BASE::axis;
-    using BASE::First_Cell_Index;using BASE::Second_Cell_Index;using BASE::Valid;using BASE::region_type;
+    using BASE::grid;using BASE::First_Cell_Index;using BASE::Second_Cell_Index;
+    using BASE::Valid;using BASE::face;
 
     int collision_index;
     const ARRAY<COLLISION_FACE_INFO<TV> >& collision_face_info;
@@ -31,13 +31,12 @@ public:
     bool use_outside;
 
     // axis_input==0 means iterate through faces in all dimensions
-    explicit UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED(const UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<TV>& info,const int number_of_ghost_cells_input=0,bool use_outside_input=true,
-        const T_REGION& region_type_input=GRID<TV>::WHOLE_REGION,const int side_input=-1,int axis_input=-1);
+    explicit UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED(const UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<TV>& info,const int number_of_ghost_cells_input=0,bool use_outside_input=true);
 
     ~UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED();
 
     void Next()
-    {index(TV::m-1)++;if(index(TV::m-1)>=scan_end) Next_Helper();}
+    {face.index(TV::m-1)++;if(face.index(TV::m-1)>=scan_end) Next_Helper();}
 
     // TODO: Careful about ghost cells and the validity of outside_fluid.
     void Next_Fluid()

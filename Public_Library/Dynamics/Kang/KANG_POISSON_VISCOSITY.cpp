@@ -261,7 +261,7 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
     for(FACE_ITERATOR<TV> it(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);it.Valid();it.Next()){
         if(psi_N(it.Full_Index())) face_velocities(it.Full_Index())=psi_N_value(it.Full_Index());
         else if(!(psi_D(it.First_Cell_Index()) && psi_D(it.Second_Cell_Index())))
-            dual_cell_index(it.index)=++num_dual_cells;}
+            dual_cell_index(it.face.index)=++num_dual_cells;}
 
     SYSTEM_MATRIX_HELPER<T> helper;
     KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > u,b;
@@ -277,7 +277,7 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
     TV one_over_dX_2=sqr(dual_grid.one_over_dX);
 
     for(FACE_ITERATOR<TV> it(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);it.Valid();it.Next()){
-        int index=dual_cell_index(it.index);
+        int index=dual_cell_index(it.face.index);
         if(index>=0){
             b.v(index)=face_velocities(it.Full_Index());
             r.v(index)=Face_Phi(it.Full_Index())<0?rho_n:rho_p;}}
@@ -362,7 +362,7 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
     color_map.Initialize_Colors(u.v.Min(),u.v.Max(),false,true,false);
 
     for(FACE_ITERATOR<TV> it(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);it.Valid();it.Next()){
-        int index=dual_cell_index(it.index);
+        int index=dual_cell_index(it.face.index);
         if(index>=0){
             face_velocities(it.Full_Index())=u.v(index);
             /*Add_Debug_Particle(it.Location(),color_map(u.v(index)));*/}}

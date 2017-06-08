@@ -105,6 +105,7 @@ class FACE_RANGE_ITERATOR
 {
     typedef VECTOR<int,d> TV_INT;
 
+protected:
     TV_INT vecs[4];
     int axis_adj;
     int side_adj;

@@ -383,7 +383,7 @@ Pack(const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >& u,VECTOR<ARRAY<ARRAY<T> >,TV::m>
     for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         FACE_INDEX<TV::m> face(it.Full_Index());
         for(int c=0;c<cdi->colors;c++){
-            int k=cm_u(face.axis)->Get_Index(it.index,c);
+            int k=cm_u(face.axis)->Get_Index(it.face.index,c);
             if(k>=0) v(face.axis)(c)(k)=u(c)(face);}}
 }
 //#####################################################################

@@ -233,9 +233,9 @@ template<class TV> void SMOKE_DRIVER<TV>::
 Add_Buoyancy_Force(const T dt,const T time)
 {
     for(FACE_ITERATOR<TV> iterator(example.grid);iterator.Valid();iterator.Next()){
-        if(iterator.axis==1){
+        if(iterator.face.axis==1){
             TV_INT c1,c2;
-            example.grid.Cells_Touching_Face(iterator.axis,iterator.Face_Index(),c1,c2);
+            example.grid.Cells_Touching_Face(iterator.face.axis,iterator.Face_Index(),c1,c2);
             T rho=(example.density(c1)+example.density(c2))*(T).5;
             T tem=(example.temperature(c1)+example.temperature(c2))*(T).5; // add temperature 
             example.face_velocities(iterator.Full_Index())+=-dt*example.alpha*rho+dt*example.beta*tem;}}// add temperature

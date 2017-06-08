@@ -151,8 +151,8 @@ Enforce_Velocity_Compatibility(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
     for(FACE_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){
         int color1=elliptic_solver->filled_region_colors(iterator.First_Cell_Index()),color2=elliptic_solver->filled_region_colors(iterator.Second_Cell_Index());
         if(color1==color2) continue;
-        if(color1>0 && !elliptic_solver->filled_region_touches_dirichlet(color1)) boundary_size(color1)+=face_size(iterator.axis);
-        if(color2>0 && !elliptic_solver->filled_region_touches_dirichlet(color2)) boundary_size(color2)+=face_size(iterator.axis);}
+        if(color1>0 && !elliptic_solver->filled_region_touches_dirichlet(color1)) boundary_size(color1)+=face_size(iterator.face.axis);
+        if(color2>0 && !elliptic_solver->filled_region_touches_dirichlet(color2)) boundary_size(color2)+=face_size(iterator.face.axis);}
 
     // sum up the boundary sizes and errors with the other nodes
     if(elliptic_solver->mpi_grid){
