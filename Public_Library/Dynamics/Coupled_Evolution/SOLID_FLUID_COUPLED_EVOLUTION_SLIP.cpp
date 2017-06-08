@@ -638,7 +638,7 @@ Get_Coupled_Faces_And_Interpolated_Solid_Velocities(const COLLISION_AWARE_INDEX_
 
     // Set coupling faces as Neumann
     for(UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED<TV> iterator(index_map.iterator_info);iterator.Valid();iterator.Next()){
-        psi_N(iterator.axis,iterator.index)=true;}
+        psi_N(iterator.face)=true;}
 
     // Project solid velocities at coupling faces. (JV_s)
     GENERALIZED_VELOCITY<TV> V_S(particles.V,rigid_body_particles.twist,solid_body_collection);

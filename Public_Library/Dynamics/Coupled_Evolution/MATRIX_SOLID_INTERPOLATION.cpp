@@ -74,7 +74,7 @@ Compute(const int ghost_cells)
             COLLISION_GEOMETRY<TV>& body=*iterator_info.coupling_bodies(simplices(s).x);
             const T_SIMPLEX& simplex=body.World_Space_Simplex(simplices(s).y);
             TV normal=simplex.Normal();
-            T cosine=normal(iterator.axis),area=0;
+            T cosine=normal(iterator.face.axis),area=0;
             if(cosine<0){normal=-normal;cosine=-cosine;}
 
             simplex.Clip_To_Box(dual_cell,clipped_simplices);
@@ -96,7 +96,7 @@ Compute(const int ghost_cells)
             accumulated_flux+=cosine*area;}
 
         row.normal=accumulated_normal.Normalized();
-        row.axis=iterator.Axis();
+        row.axis=iterator.face.axis;
         if(accumulated_flux){
             T factor=1/accumulated_flux;
             for(int i=0;i<row.deformable_weights.m;i++) row.deformable_weights(i).weight*=factor;

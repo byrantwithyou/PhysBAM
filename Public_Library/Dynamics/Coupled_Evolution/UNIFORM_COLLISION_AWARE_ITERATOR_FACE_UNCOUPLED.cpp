@@ -38,8 +38,8 @@ Next_Helper()
     scan_end=grid.counts(TV::m-1)+(TV::m==axis)+number_of_ghost_cells+(region_type==GRID<TV>::WHOLE_REGION?1:0);
     if(collision_index<collision_face_info.Size()){
         const COLLISION_FACE_INFO<TV>& cfi=collision_face_info(collision_index);
-        if(axis==cfi.axis && index.Remove_Index(TV::m-1)==cfi.index.Remove_Index(TV::m-1))
-            scan_end=cfi.index(TV::m-1);}
+        if(axis==cfi.face.axis && index.Remove_Index(TV::m-1)==cfi.face.index.Remove_Index(TV::m-1))
+            scan_end=cfi.face.index(TV::m-1);}
 }
 //#####################################################################
 // Function Compare_Collision_Index
@@ -49,11 +49,11 @@ Compare_Collision_Index() const
 {
     if(collision_index>=collision_face_info.Size()) return 1;
     const COLLISION_FACE_INFO<TV>& cfi=collision_face_info(collision_index);
-    if(cfi.axis<axis) return -1;
-    if(cfi.axis>axis) return 1;
+    if(cfi.face.axis<axis) return -1;
+    if(cfi.face.axis>axis) return 1;
     for(int i=0;i<TV::m;i++){
-        if(cfi.index(i)<index(i)) return -1;
-        if(cfi.index(i)>index(i)) return 1;}
+        if(cfi.face.index(i)<index(i)) return -1;
+        if(cfi.face.index(i)>index(i)) return 1;}
     return 0;
 }
 //#####################################################################

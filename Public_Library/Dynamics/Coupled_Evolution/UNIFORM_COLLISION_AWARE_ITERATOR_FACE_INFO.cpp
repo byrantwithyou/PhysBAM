@@ -29,7 +29,7 @@ Register_Neighbors_As_Collision_Faces()
     HASHTABLE<FACE_INDEX<TV::m>,int> new_faces;
     VECTOR<FACE_INDEX<TV::m>,TV::m*2> faces;
     VECTOR<ARRAY<PAIR<COLLISION_GEOMETRY_ID,int> >,TV::m> simplices,merged;
-    for(int i=0;i<collision_face_info.m;i++) old_faces.Set(FACE_INDEX<TV::m>(collision_face_info(i).axis,collision_face_info(i).index),i);
+    for(int i=0;i<collision_face_info.m;i++) old_faces.Set(collision_face_info(i).face,i);
     for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         if((*outside_fluid)(it.index)) continue;
         grid.Neighboring_Faces(faces,it.index);
@@ -39,8 +39,7 @@ Register_Neighbors_As_Collision_Faces()
         for(int i=0;i<faces.m;i++) if(merged(i/2).m && !old_faces.Contains(faces(i))){
             if(int* a=new_faces.Get_Pointer(faces(i))) collision_face_info(*a).simplices.Append_Unique_Elements(merged(i/2));
             else{
-                cfi.axis=faces(i).axis;
-                cfi.index=faces(i).index;
+                cfi.face=faces(i);
                 cfi.side=0;
                 int id=collision_face_info.Append(cfi);
                 collision_face_info(id).simplices=merged(i/2);
@@ -78,11 +77,10 @@ Initialize_Collision_Aware_Face_Iterator(const ARRAY<bool,TV_INT>& outside_fluid
         if(!list1.m && !list2.m) continue;
         cfi.simplices=list1;
         cfi.simplices.Append_Unique_Elements(list2);
-        cfi.axis=iterator.Axis();
-        cfi.index=iterator.Face_Index();
+        cfi.face=iterator.Full_Index();
 
         bool ray_intersection=false;
-        RAY<TV> ray(grid.X(second_cell_index),-TV::Axis_Vector(cfi.axis),true);ray.t_max=grid.dX(cfi.axis);ray.semi_infinite=false;
+        RAY<TV> ray(grid.X(second_cell_index),-TV::Axis_Vector(cfi.face.axis),true);ray.t_max=grid.dX(cfi.face.axis);ray.semi_infinite=false;
         for(int i=cfi.simplices.m-1;i>=0;i--){
             COLLISION_GEOMETRY<TV>* body=coupling_bodies(cfi.simplices(i).x);
             typename BASIC_SIMPLEX_POLICY<TV,TV::m-1>::SIMPLEX simplex=body->World_Space_Simplex(cfi.simplices(i).y);

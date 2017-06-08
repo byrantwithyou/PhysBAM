@@ -23,15 +23,17 @@ template<class TV> class IMPLICIT_BOUNDARY_CONDITION_COLLECTION;
 template<class TV>
 struct COLLISION_FACE_INFO
 {
-    int axis;
-    VECTOR<int,TV::m> index;
+    FACE_INDEX<TV::m> face;
     int side;
     ARRAY<PAIR<COLLISION_GEOMETRY_ID,int> > simplices;
 
     bool operator<(const COLLISION_FACE_INFO& cfi) const
     {
-        if(axis!=cfi.axis) return axis<cfi.axis;
-        for(int i=0;i<TV::m;i++) if(index(i)!=cfi.index(i)) return index(i)<cfi.index(i);
+        if(face.axis!=cfi.face.axis)
+            return face.axis<cfi.face.axis;
+        for(int i=0;i<TV::m;i++)
+            if(face.index(i)!=cfi.face.index(i))
+                return face.index(i)<cfi.face.index(i);
         return false;
     }
 };

@@ -42,7 +42,7 @@ Construct_Indices(const int ghost_cells)
     Clear(ghost_cells);
 
     for(UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED<TV> iterator(iterator_info);iterator.Valid();iterator.Next()){
-        if(Register_Constrained_Face_Index(SIDED_FACE_INDEX<d>(iterator.side,iterator.Full_Index())))
+        if(Register_Constrained_Face_Index(SIDED_FACE_INDEX<d>(iterator.side,iterator.face)))
             Register_Cell_Index(iterator.Real_Cell_Index(),ghost_cells);}
 
     last_coupling_cell=indexed_cells.m;

@@ -99,7 +99,7 @@ template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
 Zero_Coupling_Faces_Values(ARRAY<T,FACE_INDEX<TV::m> >& face_array) const
 {
     for(UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED<TV> iterator(index_map.iterator_info);iterator.Valid();iterator.Next())
-        face_array(iterator.Full_Index())=0;
+        face_array(iterator.face)=0;
 }
 //#####################################################################
 // Function Apply_Lambda_To_Euler_State
@@ -116,9 +116,9 @@ Apply_Lambda_To_Euler_State(const VECTOR_T& V,const ARRAY<T,COUPLING_CONSTRAINT_
     for(UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED<TV> iterator(index_map.iterator_info,ghost_cells,region_type);iterator.Valid();iterator.Next()){
         TV_INT fluid_cell_index=iterator.Real_Cell_Index();
         T solid_interpolated_velocity_average=(coupled_faces_solid_interpolated_velocity_n(COUPLING_CONSTRAINT_ID(iterator.collision_index))+coupled_faces_solid_interpolated_velocity_np1(COUPLING_CONSTRAINT_ID(iterator.collision_index)))*(T).5;
-        T impulse=impulse_at_coupling_faces(index_map.indexed_faces.m+index_map.constraint_indices.Get(SIDED_FACE_INDEX<TV::m>(iterator.side,iterator.Full_Index())));
+        T impulse=impulse_at_coupling_faces(index_map.indexed_faces.m+index_map.constraint_indices.Get(SIDED_FACE_INDEX<TV::m>(iterator.side,iterator.face)));
 
-        U(fluid_cell_index)(iterator.Axis()+1)+=impulse; // momentum update
+        U(fluid_cell_index)(iterator.face.axis+1)+=impulse; // momentum update
         U(fluid_cell_index)(TV::m+1)+=impulse*solid_interpolated_velocity_average;} // energy update
 }
 //#####################################################################
@@ -216,10 +216,10 @@ Apply_One_Sided_Interpolation_At_Coupling_Faces(const ARRAY<bool,FACE_INDEX<TV::
     // Go through coupling faces and use density and velocity only on the fluid side
     for(UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED<TV> iterator(index_map.iterator_info);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Real_Cell_Index();
-        int constraint_number=index_map.constraint_indices.Get(SIDED_FACE_INDEX<TV::m>(iterator.side,iterator.Full_Index()));
+        int constraint_number=index_map.constraint_indices.Get(SIDED_FACE_INDEX<TV::m>(iterator.side,iterator.face));
         constrained_beta_face(constraint_number) = Inverse(density(cell_index));
-        if(use_one_sided_face_velocty_interpolation) constrained_fluid_velocity(constraint_number) = centered_velocity(cell_index)[iterator.Axis()];
-        else constrained_fluid_velocity(constraint_number) = fluids_velocity(iterator.Full_Index());}
+        if(use_one_sided_face_velocty_interpolation) constrained_fluid_velocity(constraint_number) = centered_velocity(cell_index)[iterator.face.axis];
+        else constrained_fluid_velocity(constraint_number) = fluids_velocity(iterator.face);}
 }
 //#####################################################################
 // Function Compute
@@ -746,7 +746,7 @@ Set_Coupling_Faces(const int ghost_cells,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N) 
 {
     typename GRID<TV>::REGION region_type=ghost_cells?GRID<TV>::INTERIOR_REGION:GRID<TV>::WHOLE_REGION;
     for(UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED<TV> iterator(index_map.iterator_info,ghost_cells,region_type);iterator.Valid();iterator.Next())
-        psi_N(iterator.axis,iterator.index)=true;
+        psi_N(iterator.face)=true;
 }
 //#####################################################################
 // Function Show_Constraints
@@ -759,7 +759,7 @@ Show_Constraints(ARRAY<bool,FACE_INDEX<TV::m> >& psi_N) const
     int ghost_cells=0;
     typename GRID<TV>::REGION region_type=ghost_cells?GRID<TV>::INTERIOR_REGION:GRID<TV>::WHOLE_REGION;
     for(UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED<TV> iterator(index_map.iterator_info,ghost_cells,region_type);iterator.Valid();iterator.Next())
-        psi_N(iterator.axis,iterator.index)=true;
+        psi_N(iterator.face)=true;
     psi_N=store_psi_N;
 }
 //#####################################################################
