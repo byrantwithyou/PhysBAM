@@ -111,9 +111,7 @@ Apply_Lambda_To_Euler_State(const VECTOR_T& V,const ARRAY<T,COUPLING_CONSTRAINT_
     ARRAY<T> impulse_at_coupling_faces(index_map.Number_Faces());
     fluid_interpolation->Transpose_Times(V.lambda,impulse_at_coupling_faces);
     impulse_at_coupling_faces*=(1/index_map.grid.Cell_Size());
-    int ghost_cells=0;
-    typename GRID<TV>::REGION region_type=ghost_cells?GRID<TV>::INTERIOR_REGION:GRID<TV>::WHOLE_REGION;
-    for(UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED<TV> iterator(index_map.iterator_info,ghost_cells,region_type);iterator.Valid();iterator.Next()){
+    for(UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED<TV> iterator(index_map.iterator_info);iterator.Valid();iterator.Next()){
         TV_INT fluid_cell_index=iterator.Real_Cell_Index();
         T solid_interpolated_velocity_average=(coupled_faces_solid_interpolated_velocity_n(COUPLING_CONSTRAINT_ID(iterator.collision_index))+coupled_faces_solid_interpolated_velocity_np1(COUPLING_CONSTRAINT_ID(iterator.collision_index)))*(T).5;
         T impulse=impulse_at_coupling_faces(index_map.indexed_faces.m+index_map.constraint_indices.Get(SIDED_FACE_INDEX<TV::m>(iterator.side,iterator.face)));
@@ -744,8 +742,7 @@ Test_Incompressibility(const ARRAY<T,FACE_INDEX<TV::m> >& fluid_velocity,const A
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
 Set_Coupling_Faces(const int ghost_cells,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N) const
 {
-    typename GRID<TV>::REGION region_type=ghost_cells?GRID<TV>::INTERIOR_REGION:GRID<TV>::WHOLE_REGION;
-    for(UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED<TV> iterator(index_map.iterator_info,ghost_cells,region_type);iterator.Valid();iterator.Next())
+    for(UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED<TV> iterator(index_map.iterator_info);iterator.Valid();iterator.Next())
         psi_N(iterator.face)=true;
 }
 //#####################################################################
@@ -756,9 +753,7 @@ Show_Constraints(ARRAY<bool,FACE_INDEX<TV::m> >& psi_N) const
 {
     ARRAY<bool,FACE_INDEX<TV::m> > store_psi_N=psi_N;
     psi_N.Fill(false);
-    int ghost_cells=0;
-    typename GRID<TV>::REGION region_type=ghost_cells?GRID<TV>::INTERIOR_REGION:GRID<TV>::WHOLE_REGION;
-    for(UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED<TV> iterator(index_map.iterator_info,ghost_cells,region_type);iterator.Valid();iterator.Next())
+    for(UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED<TV> iterator(index_map.iterator_info);iterator.Valid();iterator.Next())
         psi_N(iterator.face)=true;
     psi_N=store_psi_N;
 }

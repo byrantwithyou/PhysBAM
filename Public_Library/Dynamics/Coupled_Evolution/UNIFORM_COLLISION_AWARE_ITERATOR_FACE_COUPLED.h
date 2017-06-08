@@ -30,8 +30,7 @@ public:
 
     // TODO: Handle ghost cells, regions, side, and axis properly construction values properly.
     // axis_input==0 means iterate through faces in all dimensions
-    explicit UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED(const UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<TV>& info,const int number_of_ghost_cells_input=0,
-        const T_REGION& region_type_input=GRID<TV>::WHOLE_REGION,const int side_input=-1,int axis_input=-1);
+    explicit UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED(const UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<TV>& info);
 
     void Next()
     {if(++collision_index<collision_face_info.m){face=collision_face_info(collision_index).face;side=collision_face_info(collision_index).side;}}

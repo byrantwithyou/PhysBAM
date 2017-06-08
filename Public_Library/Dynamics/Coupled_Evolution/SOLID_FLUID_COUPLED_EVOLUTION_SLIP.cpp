@@ -434,7 +434,7 @@ Output_Iterators(const STREAM_TYPE stream_type,const char* output_directory,int 
     particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
     ARRAY_VIEW<VECTOR<T,3> >& color_attribute=*particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
 
-    for(UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED<TV> iterator(iterator_info,1);iterator.Valid();iterator.Next()){
+    for(UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED<TV> iterator(iterator_info);iterator.Valid();iterator.Next()){
         int p=particles.Add_Element();
         particles.X(p)=iterator.Location();
         color_attribute(p)=VECTOR<T,3>(0,(T).5,0);}

@@ -60,8 +60,7 @@ Compute(const int ghost_cells)
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m-1>::SIMPLEX T_SIMPLEX;typedef VECTOR<int,TV::m> TV_INT;
     // TODO: save ghost cells if no MPI?
     ARRAY<T_SIMPLEX> clipped_simplices;
-    typename GRID<TV>::REGION region_type=ghost_cells?GRID<TV>::INTERIOR_REGION:GRID<TV>::WHOLE_REGION;
-    for(UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED<TV> iterator(iterator_info,ghost_cells,region_type);iterator.Valid();iterator.Next()){
+    for(UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED<TV> iterator(iterator_info);iterator.Valid();iterator.Next()){
         const ARRAY<PAIR<COLLISION_GEOMETRY_ID,int> >& simplices=iterator.Get_Simplices();
         TV accumulated_normal;
         T accumulated_flux=0;

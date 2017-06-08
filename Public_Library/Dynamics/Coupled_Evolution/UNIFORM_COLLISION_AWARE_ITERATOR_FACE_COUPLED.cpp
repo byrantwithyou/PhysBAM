@@ -13,8 +13,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED<TV>::
-UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED(const UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<TV>& info,const int number_of_ghost_cells_input,const T_REGION& region_type_input,
-    const int side_input,int axis_input)
+UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED(const UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<TV>& info)
     :grid(info.grid),collision_index(-1),collision_face_info(info.collision_face_info)
 {
     Next();
