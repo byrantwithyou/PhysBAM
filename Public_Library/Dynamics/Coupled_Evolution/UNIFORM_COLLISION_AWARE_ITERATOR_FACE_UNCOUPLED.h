@@ -22,8 +22,8 @@ class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED:public FACE_ITERATOR<TV>
 public:
     typedef typename TV::SCALAR T;
     typedef FACE_ITERATOR<TV> BASE;typedef typename GRID<TV>::REGION T_REGION;
-    using BASE::grid;using BASE::index;using BASE::region;using BASE::valid;using BASE::Reset;using BASE::current_region;using BASE::number_of_ghost_cells;using BASE::axis;
-    using BASE::Add_Region;using BASE::Reset_Regions;using BASE::First_Cell_Index;using BASE::Second_Cell_Index;using BASE::Valid;using BASE::Full_Index;using BASE::region_type;
+    using BASE::grid;using BASE::index;using BASE::number_of_ghost_cells;using BASE::axis;
+    using BASE::First_Cell_Index;using BASE::Second_Cell_Index;using BASE::Valid;using BASE::region_type;
 
     int collision_index;
     const ARRAY<COLLISION_FACE_INFO<TV> >& collision_face_info;
