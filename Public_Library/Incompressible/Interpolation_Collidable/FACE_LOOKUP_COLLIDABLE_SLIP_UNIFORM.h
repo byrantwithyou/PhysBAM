@@ -75,6 +75,8 @@ public:
         {assert(reference_point_set);reference_point_set=false;reference_point_inside=false;}
 
         T operator()(const int axis,const TV_INT& face) const;
+        T operator()(const FACE_INDEX<TV::m>& face) const
+        {return (*this)(face.axis,face.index);}
     };
 //#####################################################################
 };

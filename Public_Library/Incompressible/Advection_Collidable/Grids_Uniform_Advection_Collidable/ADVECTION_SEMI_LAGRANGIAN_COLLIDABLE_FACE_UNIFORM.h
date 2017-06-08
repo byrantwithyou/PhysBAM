@@ -44,7 +44,7 @@ public:
     {ARRAY<bool,FACE_INDEX<TV::m> > face_velocities_valid_mask_next(grid,3,false);
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT face=iterator.Face_Index();int axis=iterator.Axis();
-        if(!body_list.Swept_Occupied_Face_Center(iterator)){
+        if(!body_list.Swept_Occupied_Face_Center(iterator.Full_Index())){
             TV interpolation_point=iterator.Location()-dt*averaging.Face_To_Face_Vector(grid,axis,face,face_velocities.Nested());
             Z.Component(axis)(face)=linear_interpolation.Clamped_To_Array_Face_Component(axis,grid,Z_ghost.Nested().Starting_Point_Face(axis,face),interpolation_point);
             face_velocities_valid_mask_next.Component(axis)(face)=true;

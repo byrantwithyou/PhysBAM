@@ -51,9 +51,8 @@ public:
     else return (T).5*(u_cell(cell1)+u_cell(cell2));}
 
     T Cell_To_Face(const GRID<TV>& grid,const int axis,const TV_INT& face_index,const ARRAY<TV,TV_INT>& u_cell) const // this never needs to set starting points doesn't use velocities
-    {FACE_ITERATOR<TV> iterator(grid,axis,face_index);
-    TV_INT cell1,cell2;grid.Cells_Touching_Face(axis,face_index,cell1,cell2);
-    if(body_list.Occupied_Face_Center(iterator)){
+    {TV_INT cell1,cell2;grid.Cells_Touching_Face(axis,face_index,cell1,cell2);
+    if(body_list.Occupied_Face_Center(FACE_INDEX<TV::m>(axis,face_index))){
         T cell1_value=default_replacement_value,cell2_value=default_replacement_value;
         if(body_list.Cell_Center_Visible_From_Face(cell1,axis,face_index)) cell1_value=u_cell(cell1)[axis];
         if(body_list.Cell_Center_Visible_From_Face(cell2,axis,face_index)) cell2_value=u_cell(cell2)[axis];
@@ -61,9 +60,8 @@ public:
     else return (T).5*(u_cell(cell1)[axis]+u_cell(cell2)[axis]);}
 
     TV Face_To_Face_Vector(const GRID<TV>& grid,const int axis,const TV_INT& face_index,const T_FACE_LOOKUP& u_face) const
-    {FACE_ITERATOR<TV> iterator(grid,axis,face_index);
-    const typename T_FACE_LOOKUP::LOOKUP& lookup=u_face.Starting_Point_Face(axis,face_index);lookup.Set_Reference_Point(grid.Face(FACE_INDEX<TV::m>(axis,face_index)));
-    return AVERAGING_UNIFORM<TV,T_FACE_LOOKUP>::Average_Face_To_Face_Vector_Helper(grid,iterator,lookup);}
+    {const typename T_FACE_LOOKUP::LOOKUP& lookup=u_face.Starting_Point_Face(axis,face_index);lookup.Set_Reference_Point(grid.Face(FACE_INDEX<TV::m>(axis,face_index)));
+    return AVERAGING_UNIFORM<TV,T_FACE_LOOKUP>::Average_Face_To_Face_Vector_Helper(grid,FACE_INDEX<TV::m>(axis,face_index),lookup);}
 
 //#####################################################################
 };

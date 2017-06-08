@@ -46,11 +46,11 @@ public:
     bool Swept_Occupied_Cell_Center(const TV_INT& cell_index) const
     {return swept_occupied_blocks(cell_index);} // this will check the occupied block that is left,bottom,front of the current cell.
 
-    bool Occupied_Face_Center(FACE_ITERATOR<TV>& iterator) const
-    {return occupied_blocks(iterator.Face_Node_Index(0));}
+    bool Occupied_Face_Center(const FACE_INDEX<TV::m>& face) const
+    {return occupied_blocks(grid.Face_Node_Index(face.axis,face.index,0));}
 
-    bool Swept_Occupied_Face_Center(FACE_ITERATOR<TV>& iterator) const
-    {return swept_occupied_blocks(iterator.Face_Node_Index(0));}
+    bool Swept_Occupied_Face_Center(const FACE_INDEX<TV::m>& face) const
+    {return swept_occupied_blocks(grid.Face_Node_Index(face.axis,face.index,0));}
 
     bool Latest_Cell_Crossover(const TV_INT& cell_index,const T dt) const
     {COLLISION_GEOMETRY_ID body_id;int aggregate_id;TV initial_hit_point,X=grid.Center(cell_index);

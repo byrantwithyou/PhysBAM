@@ -45,35 +45,34 @@ public:
     {return Cell_To_Face(grid,face_index.axis,face_index.index,u_cell);}
 
     TV Face_To_Face_Vector(const GRID<TV>& grid,const int axis,const TV_INT& face_index,const T_FACE_LOOKUP& u_face) const
-    {FACE_ITERATOR<TV> iterator(grid,axis,face_index);
-    return Average_Face_To_Face_Vector(grid,iterator,u_face);}
+    {return Average_Face_To_Face_Vector(grid,FACE_INDEX<TV::m>(axis,face_index),u_face);}
 
     TV Face_To_Face_Vector(const GRID<TV>& grid,const FACE_INDEX<TV::m>& face_index,const T_FACE_LOOKUP& u_face) const
     {return Face_To_Face_Vector(grid,face_index.axis,face_index.index,u_face);}
 
-    template<class T_FACE_LOOKUP_LOOKUP,class T_FACE_ITERATOR>
-    static TV Average_Face_To_Face_Vector(const GRID<TV>& grid,const T_FACE_ITERATOR& iterator,const T_FACE_LOOKUP_LOOKUP& u_face)
-    {const typename T_FACE_LOOKUP_LOOKUP::LOOKUP& lookup=u_face.Starting_Point_Face(iterator.Axis(),iterator.Face_Index());
-    return Average_Face_To_Face_Vector_Helper(grid,iterator,lookup);}
+    template<class T_FACE_LOOKUP_LOOKUP>
+    static TV Average_Face_To_Face_Vector(const GRID<TV>& grid,const FACE_INDEX<TV::m>& face,const T_FACE_LOOKUP_LOOKUP& u_face)
+    {const typename T_FACE_LOOKUP_LOOKUP::LOOKUP& lookup=u_face.Starting_Point_Face(face.axis,face.index);
+    return Average_Face_To_Face_Vector_Helper(grid,face,lookup);}
 
     template<class T_FACE_LOOKUP_LOOKUP>
-    static VECTOR<T,1> Average_Face_To_Face_Vector_Helper(const GRID<VECTOR<T,1> >& grid,const FACE_ITERATOR<VECTOR<T,1> >& iterator,const T_FACE_LOOKUP_LOOKUP& u_face)
-    {return VECTOR<T,1>(u_face(iterator.Axis(),iterator.Face_Index()));}
+    static VECTOR<T,1> Average_Face_To_Face_Vector_Helper(const GRID<VECTOR<T,1> >& grid,const FACE_INDEX<1>& face,const T_FACE_LOOKUP_LOOKUP& u_face)
+    {return VECTOR<T,1>(u_face(face));}
 
     template<class T_FACE_LOOKUP_LOOKUP>
-    static VECTOR<T,2> Average_Face_To_Face_Vector_Helper(const GRID<VECTOR<T,2> >& grid,const FACE_ITERATOR<VECTOR<T,2> >& iterator,const T_FACE_LOOKUP_LOOKUP& u_face)
-    {int axis=iterator.Axis();typename GRID<VECTOR<T,2> >::INDEX face=iterator.Face_Index(),cell1,cell2;iterator.Unordered_Cell_Indices_Touching_Face(cell1,cell2);
-    VECTOR<T,2> value;value[axis]=u_face(axis,face);
+    static VECTOR<T,2> Average_Face_To_Face_Vector_Helper(const GRID<VECTOR<T,2> >& grid,const FACE_INDEX<2>& face,const T_FACE_LOOKUP_LOOKUP& u_face)
+    {int axis=face.axis;VECTOR<int,2> cell=face.index,cell1(cell),cell2(cell);cell1(axis)--;
+    VECTOR<T,2> value;value[axis]=u_face(face);
     int other_axis=1-axis;
     value[other_axis]=(T).25*(u_face(other_axis,grid.First_Face_Index_In_Cell(other_axis,cell1))+u_face(other_axis,grid.Second_Face_Index_In_Cell(other_axis,cell1))+
                               u_face(other_axis,grid.First_Face_Index_In_Cell(other_axis,cell2))+u_face(other_axis,grid.Second_Face_Index_In_Cell(other_axis,cell2)));
     return value;}
 
     template<class T_FACE_LOOKUP_LOOKUP>
-    static VECTOR<T,3> Average_Face_To_Face_Vector_Helper(const GRID<VECTOR<T,3> >& grid,const FACE_ITERATOR<VECTOR<T,3> >& iterator,const T_FACE_LOOKUP_LOOKUP& u_face)
+    static VECTOR<T,3> Average_Face_To_Face_Vector_Helper(const GRID<VECTOR<T,3> >& grid,const FACE_INDEX<3>& face,const T_FACE_LOOKUP_LOOKUP& u_face)
     {static const int axis_to_other_axis[3][2]={{1,2},{0,2},{0,1}};
-    int axis=iterator.Axis();typename GRID<VECTOR<T,3> >::INDEX face=iterator.Face_Index(),cell1,cell2;iterator.Unordered_Cell_Indices_Touching_Face(cell1,cell2);
-    VECTOR<T,3> value;value[axis]=u_face(axis,face);
+    int axis=face.axis;VECTOR<int,3> cell=face.index,cell1(cell),cell2(cell);cell1(axis)--;
+    VECTOR<T,3> value;value[axis]=u_face(face);
     for(int i=0;i<TV::m-1;i++){
         int other_axis=axis_to_other_axis[axis][i];
         value[other_axis]=(T).25*(u_face(other_axis,grid.First_Face_Index_In_Cell(other_axis,cell1))+u_face(other_axis,grid.Second_Face_Index_In_Cell(other_axis,cell1))+

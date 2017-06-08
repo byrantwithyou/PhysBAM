@@ -35,8 +35,6 @@ public:
     FACE_ITERATOR(const GRID<TV>& grid_input,const int number_of_ghost_cells_input=0,const T_REGION& region_type_input=GRID<TV>::WHOLE_REGION,const int side_input=-1,
         int axis_input=-1);
 
-    FACE_ITERATOR(const GRID<TV>& grid_input,const int axis_input,const TV_INT& face_index);
-
     FACE_ITERATOR(const GRID<TV>& grid_input,const RANGE<TV_INT>& explicit_region_input,const int axis_input);
 
 private:

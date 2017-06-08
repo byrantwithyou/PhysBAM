@@ -24,16 +24,6 @@ FACE_ITERATOR(const GRID<TV>& grid_input,const int number_of_ghost_cells_input,c
 // Constructor
 //#####################################################################
 template<class TV> FACE_ITERATOR<TV>::
-FACE_ITERATOR(const GRID<TV>& grid_input,const int axis_input,const TV_INT& face_index)
-    :GRID_ITERATOR_BASE<TV>(grid_input,RANGE<TV_INT>(face_index,face_index+1))
-{
-    single_axis=true;
-    axis=axis_input;
-}
-//#####################################################################
-// Constructor
-//#####################################################################
-template<class TV> FACE_ITERATOR<TV>::
 FACE_ITERATOR(const GRID<TV>& grid_input,const RANGE<TV_INT>& explicit_region_input,const int axis_input)
     :GRID_ITERATOR_BASE<TV>(grid_input),axis(axis_input),single_axis(true)
 {

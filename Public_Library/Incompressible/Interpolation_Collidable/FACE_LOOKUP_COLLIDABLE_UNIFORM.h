@@ -87,6 +87,9 @@ public:
         else{
             if(face_lookup.valid_value_mask && !(*face_lookup.valid_value_mask).Component(axis)(face)) return 0;
             found_valid_point=true;return nested_lookup(axis,face);}}
+
+        T operator()(const FACE_INDEX<TV::m>& face) const
+        {return (*this)(face.axis,face.index);}
     };
 
 //#####################################################################
