@@ -36,11 +36,11 @@ void All_Flags_Tests(RF flags)
     for(int s=-1;s<2*d;s++)
     {
         ARRAY<FACE_INDEX<d> > a,b;
-        for(FACE_RANGE_ITERATOR<d> it(ro,ri,flags,-1,s);it.Valid();it.Next())
+        for(FACE_RANGE_ITERATOR<d> it(ro,ri,flags,s,-1);it.Valid();it.Next())
             a.Append(it.face);
         for(int i=0;i<d;i++){
             bool failed_axis_test=false;
-            for(FACE_RANGE_ITERATOR<d> it(ro,ri,flags,i,s);it.Valid();it.Next()){
+            for(FACE_RANGE_ITERATOR<d> it(ro,ri,flags,s,i);it.Valid();it.Next()){
                 if(it.face.axis!=i && !failed_axis_test){
                     failed_axis_test=true;
                     fr_test_ok=false;
@@ -53,9 +53,9 @@ void All_Flags_Tests(RF flags)
     for(int i=-1;i<d;i++)
         for(int s=-1;s<2*d;s++){
             ARRAY<FACE_INDEX<d> > a;
-            for(FACE_RANGE_ITERATOR<d> it(ro,ri,flags,i,s);it.Valid();it.Next())
+            for(FACE_RANGE_ITERATOR<d> it(ro,ri,flags,s,i);it.Valid();it.Next())
                 a.Append(it.face);
-            for(FACE_RANGE_ITERATOR<d> it(ro,ri,flags|RF::reverse,i,s);it.Prev_Valid();it.Prev()){
+            for(FACE_RANGE_ITERATOR<d> it(ro,ri,flags|RF::reverse,s,i);it.Prev_Valid();it.Prev()){
                 if(a.Pop()!=it.face){
                     fr_test_ok=false;
                     LOG::printf("reverse test failed; side=%i axis=%i flags=%i\n",s,i,(int)flags);
@@ -78,7 +78,7 @@ void All_Side_Tests(RF flags,bool ignore_dup)
         for(FACE_RANGE_ITERATOR<d> it(ro,ri,flags|io[i],-1,-1);it.Valid();it.Next())
             a.Append(it.face);
         for(int s=0;s<2*d;s++)
-            for(FACE_RANGE_ITERATOR<d> it(ro,ri,flags|io[i],-1,s);it.Valid();it.Next())
+            for(FACE_RANGE_ITERATOR<d> it(ro,ri,flags|io[i],s,-1);it.Valid();it.Next())
                 b.Append(it.face);
         if(ignore_dup){
             Get_Unique(c,a);
@@ -130,11 +130,11 @@ void Single_Side_Tests()
     for(int i=0;i<4;i++){
         for(int s=0;s<2*d;s++){
             ARRAY<FACE_INDEX<d> > a,b,c;
-            for(FACE_RANGE_ITERATOR<d> it(ro,ri,io[i],-1,s);it.Valid();it.Next())
+            for(FACE_RANGE_ITERATOR<d> it(ro,ri,io[i],s,-1);it.Valid();it.Next())
                 a.Append(it.face);
-            for(FACE_RANGE_ITERATOR<d> it(ro,ri,io[i]|RF::delay_corners,-1,s);it.Valid();it.Next())
+            for(FACE_RANGE_ITERATOR<d> it(ro,ri,io[i]|RF::delay_corners,s,-1);it.Valid();it.Next())
                 b.Append(it.face);
-            for(FACE_RANGE_ITERATOR<d> it(ro,ri,io[i]|RF::duplicate_corners,-1,s);it.Valid();it.Next())
+            for(FACE_RANGE_ITERATOR<d> it(ro,ri,io[i]|RF::duplicate_corners,s,-1);it.Valid();it.Next())
                 c.Append(it.face);
             a.Sort();
             b.Sort();

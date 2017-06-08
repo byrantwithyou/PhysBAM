@@ -118,15 +118,15 @@ public:
     FACE_INDEX<d> face;
 
     FACE_RANGE_ITERATOR(const RANGE<TV_INT>& outer,const RANGE<TV_INT>& inner,
-        RF flags=RF::none,int axis=-1,int side_input=-1);
+        RF flags=RF::none,int side_input=-1,int axis=-1);
     FACE_RANGE_ITERATOR(const RANGE<TV_INT>& range,int outer_ghost,
-        int inner_ghost,RF flags=RF::none,int axis=-1,int side_input=-1);
+        int inner_ghost,RF flags=RF::none,int side_input=-1,int axis=-1);
     FACE_RANGE_ITERATOR(const TV_INT& counts,int outer_ghost,int inner_ghost,
-        RF flags=RF::none,int axis=-1,int side_input=-1);
+        RF flags=RF::none,int side_input=-1,int axis=-1);
     FACE_RANGE_ITERATOR(const RANGE<TV_INT>& range,
-        RF flags=RF::none,int axis=-1,int side_input=-1); // implict RF::interior
+        RF flags=RF::none,int side_input=-1,int axis=-1); // implict RF::interior
     FACE_RANGE_ITERATOR(const TV_INT& counts,int outer_ghost,
-        RF flags=RF::none,int axis=-1,int side_input=-1); // implict RF::interior
+        RF flags=RF::none,int side_input=-1,int axis=-1); // implict RF::interior
     ~FACE_RANGE_ITERATOR()=default;
 
     void Next() PHYSBAM_ALWAYS_INLINE
@@ -147,8 +147,8 @@ private:
     void Next_Axis_Side();
     void Prev_Axis_Side();
     void Fill_Current();
-    void Encode(int axis,int side_input,RF flags);
-    void Initialize(int axis,int side_input,RF flags);
+    void Encode(int side_input,int axis,RF flags);
+    void Initialize(int side_input,int axis,RF flags);
     void Reset(RF flags);
 //#####################################################################
 };
