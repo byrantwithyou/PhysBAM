@@ -31,6 +31,9 @@ public:
     bool operator==(const FACE_INDEX& fi) const
     {return axis==fi.axis && index==fi.index;}
 
+    bool operator!=(const FACE_INDEX& fi) const
+    {return !(*this==fi);}
+
     TV_INT First_Cell_Index() const
     {TV_INT i(index);i(axis)--;return i;}
 
