@@ -49,7 +49,7 @@ FACE_RANGE_ITERATOR(const TV_INT& counts,int outer_ghost,int inner_ghost,
 template<int d> FACE_RANGE_ITERATOR<d>::
 FACE_RANGE_ITERATOR(const RANGE<TV_INT>& range,
     RF flags,int axis,int side_input) // implict RF::interior
-    :vecs{range.min_corner,TV_INT(),TV_INT(),range.max_corner-1}
+    :vecs{range.min_corner,range.min_corner,range.max_corner-1,range.max_corner-1}
 {
     Initialize(axis,side_input,flags|RF::interior);
 }
@@ -59,7 +59,8 @@ FACE_RANGE_ITERATOR(const RANGE<TV_INT>& range,
 template<int d> FACE_RANGE_ITERATOR<d>::
 FACE_RANGE_ITERATOR(const TV_INT& counts,int outer_ghost,
     RF flags,int axis,int side_input) // implict RF::interior
-    :vecs{TV_INT()-outer_ghost,TV_INT(),TV_INT(),counts+(outer_ghost-1)}
+    :vecs{TV_INT()-outer_ghost,TV_INT()-outer_ghost,
+        counts+(outer_ghost-1),counts+(outer_ghost-1)}
 {
     Initialize(axis,side_input,flags|RF::interior);
 }

@@ -13,6 +13,72 @@
 
 namespace PhysBAM{
 
+// 
+//   h   h   h   g   f   f   f   g   h   h   h
+// h X e X e X d X c X c X c X c X d X e X e X h
+//   e   e   e   c   c   c   c   c   e   e   e
+// h X e X e X d X c X c X c X c X d X e X e X h
+//   e   e   e   c   c   c   c   c   e   e   e
+// h X e X e X d X c X c X c X c X d X e X e X h
+//   d   d   d   b   b   b   b   b   d   d   d
+// g X c X c X b O a O a O a O a O b X c X c X g
+//   c   c   c   a   a   a   a   a   c   c   c
+// f X c X c X b O a O a O a O a O b X c X c X f
+//   c   c   c   a   a   a   a   a   c   c   c
+// f X c X c X b O a O a O a O a O b X c X c X f
+//   c   c   c   a   a   a   a   a   c   c   c
+// f X c X c X b O a O a O a O a O b X c X c X f
+//   c   c   c   a   a   a   a   a   c   c   c
+// g X c X c X b O a O a O a O a O b X c X c X g
+//   d   d   d   b   b   b   b   b   d   d   d
+// h X e X e X d X c X c X c X c X d X e X e X h
+//   e   e   e   c   c   c   c   c   e   e   e
+// h X e X e X d X c X c X c X c X d X e X e X h
+//   e   e   e   c   c   c   c   c   e   e   e
+// h X e X e X d X c X c X c X c X d X e X e X h
+//   h   h   h   g   f   f   f   g   h   h   h
+// 
+// Flags: (side=-1)
+//   (default)                               *  b+c+d+e+f+g+h
+//   interior                                    a+b+c+d+e+f+g+h
+// 
+//   skip_inner                              *  c+d+e+f+g+h
+//   skip_outer                              *  b+c+d+e
+//   skip_inner|skip_outer                   *  c+d+e
+//   interior|skip_outer                        a+b+c+d+e
+// 
+//   duplicate_corners                          b+c+d+d+e+e+f+g+h+h
+//   duplicate_corners|skip_inner               c+d+e+e+f+g+h+h
+//   duplicate_corners|skip_outer               b+c+d+d+e+e
+//   duplicate_corners|skip_inner|skip_outer    c+d+e+e
+// 
+// For combinations above with "*" these flags can be added:
+//   delay_corners         Corners are normally covered with the first
+//                         side that makes sense.  This flag delays the
+//                         corners until the last side that makes sense.
+//                         The faces covered does not change.
+//   partial_single_side   This flag only affects the behavior when one
+//                         side is being iterated.  Normally, when one
+//                         side is being iterated, all corners are
+//                         included.  This flag suppresses this.  Iterating
+//                         one side covers the same faces as would be
+//                         covered with that side when covering all sides.
+// 
+// Other flags:
+//   reverse               Reverses the order in which faces are visited.
+//                         Note that with this flag you must use Prev() and
+//                         Prev_Valid().
+//   end                   Like the reverse flag, but starts out one past
+//                         the end.  Calling Prev() once will give you the
+//                         iterator that the reverse flag returns.
+//   side_mask             Allows you to iterate over a subset of axes.
+//                         When this flag is set, the side input integer is
+//                         a bitmask.  When set, the iterator always behaves
+//                         as though multiple axes are being iterated.
+//   axis_mask             Allows you to iterate over a subset of axes.
+//                         When this flag is set, the axis input integer is
+//                         a bitmask.
+
 enum class RF
 {
     none=0,
