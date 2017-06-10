@@ -77,11 +77,6 @@ public:
     virtual void Set_Levelset_Callbacks(LEVELSET_CALLBACKS<TV>& levelset_callbacks)
     {particle_levelset->levelset.Set_Levelset_Callbacks(levelset_callbacks);}
 
-    virtual void Initialize_FMM_Initialization_Iterative_Solver(const bool refine_fmm_initialization_with_iterative_solver_input=true,const int fmm_initialization_iterations_input=10,
-        const T fmm_initialization_iterative_tolerance_input=1e-2,const T fmm_initialization_iterative_drift_fraction_input=.1)
-    {particle_levelset->levelset.Initialize_FMM_Initialization_Iterative_Solver(refine_fmm_initialization_with_iterative_solver_input,fmm_initialization_iterations_input,
-        fmm_initialization_iterative_tolerance_input,fmm_initialization_iterative_drift_fraction_input);}
-
     virtual void Bias_Towards_Negative_Particles(const bool bias_towards_negative_particles)
     {particle_levelset->Bias_Towards_Negative_Particles(bias_towards_negative_particles);}
 

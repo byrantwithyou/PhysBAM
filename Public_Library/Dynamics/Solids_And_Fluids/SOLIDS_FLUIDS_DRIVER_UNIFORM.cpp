@@ -173,7 +173,6 @@ Initialize()
     if(number_of_regions>=1){
         particle_levelset_evolution->Set_Number_Particles_Per_Cell(example.fluids_parameters.number_particles_per_cell);
         particle_levelset_evolution->Set_Levelset_Callbacks(example);
-        particle_levelset_evolution->Initialize_FMM_Initialization_Iterative_Solver(example.fluids_parameters.refine_fmm_initialization_with_iterative_solver);
 
         if(number_of_regions>=2) for(int i=0;i<number_of_regions;i++) particle_levelset_evolution->Levelset(i).Set_Custom_Boundary(*example.fluids_parameters.phi_boundary_multiphase(i));
         else particle_levelset_evolution->Particle_Levelset(0).levelset.Set_Custom_Boundary(*example.fluids_parameters.phi_boundary);

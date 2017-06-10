@@ -5,191 +5,76 @@
 #include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Grid_Tools/Grids/FACE_RANGE_ITERATOR.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Basic_Geometry/RAY.h>
+#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <Geometry/Level_Sets/FAST_MARCHING_METHOD_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 using namespace PhysBAM;
-//#####################################################################
-// Constructor
-//#####################################################################
-template<class TV> FAST_MARCHING_METHOD_UNIFORM<TV>::
-FAST_MARCHING_METHOD_UNIFORM(const LEVELSET<TV>& levelset,const int ghost_cells_input)
-    :levelset(levelset),ghost_cells(ghost_cells_input),Neighbor_Visible(0)
+template<class T,int d>
+struct HEAP_ENTRY
 {
-    cell_grid=levelset.grid.Is_MAC_Grid()?levelset.grid:levelset.grid.Get_MAC_Grid_At_Regular_Positions();
-    RANGE<TV_INT> domain_indices=cell_grid.Domain_Indices().Thickened(ghost_cells);dimension_start=domain_indices.Minimum_Corner();dimension_end=domain_indices.Maximum_Corner();
+    VECTOR<int,d> index;
+    int* close_ptr;
+    T dist;
+};
+//#####################################################################
+// Function Exchange
+//#####################################################################
+template<class T,int d> void
+Exchange(ARRAY<HEAP_ENTRY<T,d> >& heap,int& ia,int& ib)
+{
+    HEAP_ENTRY<T,d> &ha=heap(ia),&hb=heap(ib);
+    exchange(ha,hb);
+    *ha.close_ptr=ia;
+    *hb.close_ptr=ib;
+    exchange(ia,ib);
 }
-//#####################################################################
-// Destructor
-//#####################################################################
-template<class TV> FAST_MARCHING_METHOD_UNIFORM<TV>::
-~FAST_MARCHING_METHOD_UNIFORM()
-{}
 //#####################################################################
 // Function Up_Heap
 //#####################################################################
-template<class T2,class T3,class T4> static void
-Up_Heap(const T2& phi,T3& close_k,ARRAY<T4>& heap,int index)
+template<class T,int d> static void
+Up_Heap(ARRAY<HEAP_ENTRY<T,d> >& heap,int index)
 {
     while(index>0){
         int parent=(index-1)/2;
-        if(abs(phi(heap(index))) < abs(phi(heap(parent)))){
-            exchange(heap(index),heap(parent));
-            close_k(heap(index))=index; // update child k
-            close_k(heap(parent))=parent; // update parent k
-            index=parent;}
-        else break;}
-} // move up one
+        if(heap(index).dist>=heap(parent).dist) break;
+        Exchange(heap,index,parent);}
+}
 //#####################################################################
 // Function Down_Heap
 //#####################################################################
-template<class T2,class T3,class T4> static void
-Down_Heap(const T2& phi,T3& close_k,ARRAY<T4>& heap,const int heap_length)
+template<class T,int d> static void
+Down_Heap(ARRAY<HEAP_ENTRY<T,d> >& heap,int index)
 {
-    int index=0;
-    for(;;){
-        int left=2*index+1,right=2*index+2;
-        if(right >= heap_length) break;
-        else if(abs(phi(heap(left))) <= abs(phi(heap(right)))){
-            heap(index)=heap(left); // update i, j, ij
-            close_k(heap(index))=index; // update k
-            index=left;}  // move down one
-        else{
-            heap(index)=heap(right); // update i, j, ij
-            close_k(heap(index))=index; // update k
-            index=right;}} // move down one
-    // fill the hole with the last element
-    if(index != heap_length-1){
-        heap(index)=heap(heap_length-1); // update i, j, ij
-        close_k(heap(index))=index; // update k
-        Up_Heap(phi,close_k,heap,index);}
+    while(1){
+        int next=2*index+1;
+        if(next>=heap.m) break;
+        if(next+1<heap.m && heap(next).dist>heap(next+1).dist) next++;
+        if(heap(index).dist<=heap(next).dist) break;
+        Exchange(heap,index,next);}
 }
 //#####################################################################
-// Function Fast_Marching_Method
+// Function Down_Heap
 //#####################################################################
-template<class TV> void FAST_MARCHING_METHOD_UNIFORM<TV>::
-Fast_Marching_Method(ARRAY<T,TV_INT>& phi_ghost,const T stopping_distance,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells,int process_sign)
+template<class T,int d> static void
+Make_Heap(ARRAY<HEAP_ENTRY<T,d> >& heap)
 {
-    const RANGE<TV_INT>& domain=cell_grid.Domain_Indices(ghost_cells);
-    int heap_length=0;
-    ARRAY<T,TV_INT> phi_new(domain);
-    for(CELL_ITERATOR<TV> iterator(cell_grid,domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();phi_new(cell)=phi_ghost(cell);}
-    ARRAY<bool,TV_INT> done(domain.Thickened(1));
-    ARRAY<int,TV_INT> close_k(domain.Thickened(1),false); // extra cell so that it is the same size as the done array for optimizations
-    close_k.Fill(-1);
-    ARRAY<TV_INT> heap(domain.Size(),false); // a generic version of heap((m+6)*(n+6)*(mn+6),false);
-    Initialize_Interface(phi_new,done,close_k,heap,heap_length,seed_indices,add_seed_indices_for_ghost_cells);
-
-    while(heap_length != 0){
-        TV_INT index=heap(0); // smallest point is on top of heap
-        if(stopping_distance && abs(phi_new(index)) > stopping_distance){ // exit early
-            for(CELL_ITERATOR<TV> iterator(cell_grid,domain);iterator.Valid();iterator.Next()) if(!done(iterator.Cell_Index())){
-                phi_new(iterator.Cell_Index())=LEVELSET_UTILITIES<T>::Sign(phi_new(iterator.Cell_Index()))*stopping_distance;}
-            break;}
-        done(index)=true;close_k(index)=-1; // add to done, remove from close
-        Down_Heap(phi_new,close_k,heap,heap_length);heap_length--; // remove point from heap
-
-        if((process_sign==1 && phi_new(index)<0) || (process_sign==-1 && phi_new(index)>0)) continue;
-
-        for(int axis=0;axis<TV::m;axis++){
-            TV_INT axis_vector=TV_INT::Axis_Vector(axis);
-            if(index[axis] != domain.min_corner[axis] && !done(index-axis_vector) && (!Neighbor_Visible || Neighbor_Visible(axis,index-axis_vector)))
-                Update_Or_Add_Neighbor(phi_new,done,close_k,heap,heap_length,index-axis_vector);
-            if(index[axis] != domain.max_corner[axis]-1 && !done(index+axis_vector) && (!Neighbor_Visible || Neighbor_Visible(axis,index)))
-                Update_Or_Add_Neighbor(phi_new,done,close_k,heap,heap_length,index+axis_vector);}}
-
-    RANGE<TV_INT> interior_domain=domain.Thickened(-ghost_cells);
-    for(CELL_ITERATOR<TV> iterator(cell_grid,interior_domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();phi_ghost(cell)=phi_new(cell);}
+    for(int i=heap.m/2-1;i>=0;i--) Down_Heap(heap,i);
 }
 //#####################################################################
-// Function Update_Or_Add_Neighbor
+// Function Pop_Heap
 //#####################################################################
-template<class TV> inline void FAST_MARCHING_METHOD_UNIFORM<TV>::
-Update_Or_Add_Neighbor(ARRAY<T,TV_INT>& phi_ghost,ARRAY<bool,TV_INT>& done,ARRAY<int,TV_INT>& close_k,ARRAY<TV_INT>& heap,int& heap_length,const TV_INT& neighbor)
+template<class T,int d> static HEAP_ENTRY<T,d>
+Pop_Heap(ARRAY<HEAP_ENTRY<T,d> >& heap)
 {
-    if(close_k(neighbor)>=0){
-        Update_Close_Point(phi_ghost,done,neighbor);
-        Up_Heap(phi_ghost,close_k,heap,close_k(neighbor));}
-    else{
-        close_k(neighbor)=0; // add to close 
-        Update_Close_Point(phi_ghost,done,neighbor);
-        heap(heap_length++)=neighbor;
-        Up_Heap(phi_ghost,close_k,heap,heap_length-1);}
-}
-//#####################################################################
-// Function Initialize_Interface
-//#####################################################################
-// pass heap_length by reference
-template<class TV> void FAST_MARCHING_METHOD_UNIFORM<TV>::
-Initialize_Interface(ARRAY<T,TV_INT>& phi_ghost,ARRAY<bool,TV_INT>& done,ARRAY<int,TV_INT>& close_k,ARRAY<TV_INT>& heap,int& heap_length,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells)
-{ 
-    if(seed_indices){
-        for(int i=0;i<seed_indices->m;i++)Add_To_Initial(done,close_k,(*seed_indices)(i));
-        if(add_seed_indices_for_ghost_cells){RANGE<TV_INT> ghost_domain=cell_grid.Domain_Indices().Thickened(ghost_cells);
-            for(CELL_ITERATOR<TV> iterator(cell_grid,ghost_cells,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
-                for(int i=0;i<GRID<TV>::number_of_neighbors_per_cell;i++){TV_INT neighbor_index(iterator.Cell_Neighbor(i));
-                    if(ghost_domain.Lazy_Inside_Half_Open(neighbor_index) && LEVELSET_UTILITIES<T>::Interface(phi_ghost(index),phi_ghost(neighbor_index))){
-                        if(!done(index))Add_To_Initial(done,close_k,index);
-                        if(!done(neighbor_index))Add_To_Initial(done,close_k,neighbor_index);}}}}}
-    else{
-        ARRAY<T,TV_INT> phi_new(cell_grid.Domain_Indices(ghost_cells+1),false); // same size as done and close_k for array accelerations
-        phi_new.Fill(2*cell_grid.dX.Max()); // ok positive, since minmag is used below
-        for(FACE_ITERATOR<TV> iterator(cell_grid,ghost_cells,GRID<TV>::INTERIOR_REGION);iterator.Valid();iterator.Next()){
-            TV_INT index1=iterator.First_Cell_Index(),index2=iterator.Second_Cell_Index();
-            if(Neighbor_Visible && !Neighbor_Visible(iterator.Axis(),index1)){
-                if(phi_ghost(index1)<=0) Add_To_Initial(done,close_k,index1);
-                if(phi_ghost(index2)<=0) Add_To_Initial(done,close_k,index2);}
-            else if(LEVELSET_UTILITIES<T>::Interface(phi_ghost(index1),phi_ghost(index2))){
-                Add_To_Initial(done,close_k,index1);Add_To_Initial(done,close_k,index2);}}
-
-        LEVELSET<TV> levelset_ghost(cell_grid,phi_ghost);
-
-        T fmm_initialization_iterative_tolerance_absolute=levelset.fmm_initialization_iterative_tolerance*cell_grid.dX.Min();    
- 
-        for(CELL_ITERATOR<TV> iterator(cell_grid,ghost_cells);iterator.Valid();iterator.Next()){
-            TV_INT index=iterator.Cell_Index();
-            if(!done(index)) continue;
-            T value[3]={0}; // the phi value to use in the given direction
-            int number_of_axis=0; // the number of axis that we want to use later
-            TV location=iterator.Location();
-            for(int axis=0;axis<TV::m;axis++){
-                TV_INT axis_vector=TV_INT::Axis_Vector(axis),low=index-axis_vector,high=index+axis_vector;
-                T dx=cell_grid.dX[axis];
-                bool use_low=(done(low) && LEVELSET_UTILITIES<T>::Interface(phi_ghost(index),phi_ghost(low))),use_high=(done(high) && LEVELSET_UTILITIES<T>::Interface(phi_ghost(index),phi_ghost(high)));
-                if(!use_low){
-                    if(use_high) value[number_of_axis]=LEVELSET_UTILITIES<T>::Theta(phi_ghost(index),phi_ghost(high))*dx;
-                    else number_of_axis--;}
-                else if(!use_high) value[number_of_axis]=LEVELSET_UTILITIES<T>::Theta(phi_ghost(index),phi_ghost(low))*dx;
-                else value[number_of_axis]=min(LEVELSET_UTILITIES<T>::Theta(phi_ghost(index),phi_ghost(high)),LEVELSET_UTILITIES<T>::Theta(phi_ghost(index),phi_ghost(low)))*dx;
-                number_of_axis++;}
-            if(number_of_axis==1) phi_new(index)=value[0];
-            else if(number_of_axis==2){
-                if(T d2=sqr(value[0])+sqr(value[1])) phi_new(index)=value[0]*value[1]/sqrt(d2);
-                else phi_new(index)=0;}
-            else{PHYSBAM_ASSERT(TV::m==3); // 2d should never get to this point
-                T value_xy=value[0]*value[1],value_xz=value[0]*value[2],value_yz=value[1]*value[2],d2=sqr(value_xy)+sqr(value_xz)+sqr(value_yz);
-                if(d2) phi_new(index)=value_xy*value[2]/sqrt(d2);
-                else phi_new(index)=min(value[0],value[1],value[2]);}
-            if(levelset.refine_fmm_initialization_with_iterative_solver){TV location=iterator.Location();
-                TV vertex=location;T phi_value=phi_ghost(index);
-                for(int iterations=0;iterations<levelset.fmm_initialization_iterations;iterations++){
-                    if(abs(phi_value)>10*cell_grid.dX.Min())break; // stop if it looks like it's blowing up
-                    vertex-=phi_value*levelset_ghost.Normal(vertex);phi_value=levelset_ghost.Phi(vertex);
-                    if(abs(phi_value)<=fmm_initialization_iterative_tolerance_absolute){
-                        T new_phi_value=(vertex-location).Magnitude();
-                        if((new_phi_value-phi_new(index))/max(fmm_initialization_iterative_tolerance_absolute,phi_new(index))<levelset.fmm_initialization_iterative_drift_fraction && new_phi_value>0)
-                            phi_new(index)=new_phi_value;
-                        break;}}}
-            phi_new(index)*=LEVELSET_UTILITIES<T>::Sign(phi_ghost(index));}
-
-        for(CELL_ITERATOR<TV> iterator(cell_grid,ghost_cells);iterator.Valid();iterator.Next()) if(done(iterator.Cell_Index())) phi_ghost(iterator.Cell_Index())=phi_new(iterator.Cell_Index());} // initialize done points
-
-    // initialize close points
-    for(CELL_ITERATOR<TV> iterator(cell_grid,ghost_cells);iterator.Valid();iterator.Next()) if(close_k(iterator.Cell_Index())>=0){
-        Update_Close_Point(phi_ghost,done,iterator.Cell_Index());
-        heap(heap_length++)=iterator.Cell_Index();
-        Up_Heap(phi_ghost,close_k,heap,heap_length-1);}
+    int ia=0,ie=heap.m-1;
+    Exchange(heap,ia,ie);
+    HEAP_ENTRY<T,d> heap_entry=heap.Pop();
+    Down_Heap(heap,0);
+    return heap_entry;
 }
 //#####################################################################
 // Function Solve_Quadratic
@@ -197,10 +82,11 @@ Initialize_Interface(ARRAY<T,TV_INT>& phi_ghost,ARRAY<bool,TV_INT>& done,ARRAY<i
 template<class T> static T
 Solve_Quadratic(const T phi,const T value_x,const T value_y,const T dx,const T dy)
 {
-//    assert(LEVELSET_UTILITIES<T>::Sign(value_x)==LEVELSET_UTILITIES<T>::Sign(value_y));
+    assert(value_x*value_y>=0);
     if(abs(value_x) >= abs(value_y)+dy) return value_y+LEVELSET_UTILITIES<T>::Sign(phi)*dy;
-    else if(abs(value_y) >= abs(value_x)+dx) return value_x+LEVELSET_UTILITIES<T>::Sign(phi)*dx;
-    else{T dx2=sqr(dx),dy2=sqr(dy);return (dy2*value_x+dx2*value_y+LEVELSET_UTILITIES<T>::Sign(phi)*dx*dy*sqrt(dx2+dy2-sqr(value_x-value_y)))/(dx2+dy2);}
+    if(abs(value_y) >= abs(value_x)+dx) return value_x+LEVELSET_UTILITIES<T>::Sign(phi)*dx;
+    T dx2=sqr(dx),dy2=sqr(dy);
+    return (dy2*value_x+dx2*value_y+LEVELSET_UTILITIES<T>::Sign(phi)*dx*dy*sqrt(dx2+dy2-sqr(value_x-value_y)))/(dx2+dy2);
 }
 //#####################################################################
 // Function Solve_Close_Point
@@ -227,46 +113,198 @@ Solve_Close_Point(const T phi,const int number_of_axis,const VECTOR<T,d>& value,
 // Function Update_Close_Point
 //##################################################################### 
 // needs done=0 around the outside of the domain
-template<class TV> void FAST_MARCHING_METHOD_UNIFORM<TV>::
-Update_Close_Point(ARRAY<T,TV_INT>& phi_ghost,const ARRAY<bool,TV_INT>& done,const TV_INT& index)
+template<class T,class TV,class TV_INT> static void
+Update_Close_Point(const GRID<TV>& grid,ARRAY<T,TV_INT>& phi,const TV_INT& index,
+    ARRAY<int,TV_INT>& close_k,
+    std::function<bool(FACE_INDEX<TV_INT::m>& face)> Neighbor_Visible)
 {
     TV value; // the phi value to use in the given direction
     int number_of_axis=0; // the number of axis that we want to use later
-
-    // check each principal axis
     for(int axis=0;axis<TV::m;axis++){
-        TV_INT low=index,high=index;
-        low(axis)--;
-        high(axis)++;
-        bool check_low=done(low),check_high=done(high);
-        if(Neighbor_Visible){
-            if(check_low && !Neighbor_Visible(axis,low)) check_low=false;
-            if(check_high && !Neighbor_Visible(axis,index)) check_high=false;}
-        if(!check_low){
-            if(check_high)value[number_of_axis]=phi_ghost(high);
-            else number_of_axis--;}
-        else if(!check_high) value[number_of_axis]=phi_ghost(low);
-        else value[number_of_axis]=minmag(phi_ghost(low),phi_ghost(high));
-        number_of_axis++;}
-
-    phi_ghost(index)=Solve_Close_Point(phi_ghost(index),number_of_axis,value,cell_grid.dX);
+        T vals[2]={};
+        int used=0;
+        for(int s=0;s<2;s++){
+            TV_INT neighbor(index);
+            neighbor(axis)+=2*s-1;
+            if(close_k(neighbor)!=-2) continue;
+            if(Neighbor_Visible){
+                FACE_INDEX<TV::m> face(axis,index);
+                face.index(axis)+=s-1;
+                if(!Neighbor_Visible(face)) continue;}
+            vals[used++]=phi(neighbor);}
+        if(used==2) vals[0]=minmag(vals[0],vals[1]);
+        if(used) value[number_of_axis++]=vals[0];}
+    phi(index)=Solve_Close_Point(phi(index),number_of_axis,value,grid.dX);
 }
+//#####################################################################
+// Function Compute_Initial_Interface_Estimate
+//#####################################################################
+template<class TV,class TV_INT,class EP> inline auto
+Compute_Initial_Interface_Estimate(const LEVELSET<TV>& levelset,
+    ARRAY<int,TV_INT>& close_k,const TV_INT& index,const EP& ep)
+{
+    typedef typename TV::SCALAR T;
+    T phi_new=2*levelset.grid.dX.Max();
+    T value[3]={0}; // the phi value to use in the given direction
+    int number_of_axis=0; // the number of axis that we want to use later
+    for(int axis=0;axis<TV::m;axis++){
+        int used=0;
+        T vals[2]={};
+        T dx=levelset.grid.dX(axis),phi_index=levelset.phi(index);
+        for(int s=0;s<2;s++){
+            TV_INT i(index);
+            i(axis)+=2*s-1;
+            if(close_k(i)!=-2) continue;
+            T phi_i=levelset.phi(i);
+            if(LEVELSET_UTILITIES<T>::Interface(phi_index,phi_i))
+                vals[used++]=LEVELSET_UTILITIES<T>::Theta(phi_index,phi_i);}
+        if(used==2) vals[0]=min(vals[0],vals[1]);
+        if(used) value[number_of_axis++]=vals[0]*dx;}
+    if(number_of_axis==1) phi_new=value[0];
+    else if(number_of_axis==2){
+        if(T d2=sqr(value[0])+sqr(value[1])) phi_new=value[0]*value[1]/sqrt(d2);
+        else phi_new=0;}
+    else{PHYSBAM_ASSERT(TV::m==3); // 2d should never get to this point
+        T value_xy=value[0]*value[1],value_xz=value[0]*value[2],value_yz=value[1]*value[2],d2=sqr(value_xy)+sqr(value_xz)+sqr(value_yz);
+        if(d2) phi_new=value_xy*value[2]/sqrt(d2);
+        else phi_new=min(value[0],value[1],value[2]);}
+
+    if(ep.refine_with_iterative_solver){
+        T iterative_tolerance_absolute=ep.iterative_tolerance*levelset.grid.dX.Min();
+        TV location=levelset.grid.Center(index),vertex=location;
+        T phi_value=levelset.phi(index);
+        for(int iterations=0;iterations<ep.iterations;iterations++){
+            if(abs(phi_value)>10*levelset.grid.dX.Min())break; // stop if it looks like it's blowing up
+            vertex-=phi_value*levelset.Normal(vertex);
+            phi_value=levelset.Phi(vertex);
+            if(abs(phi_value)<=iterative_tolerance_absolute){
+                T new_phi_value=(vertex-location).Magnitude();
+                if((new_phi_value-phi_new)/max(iterative_tolerance_absolute,phi_new)<ep.iterative_drift_fraction && new_phi_value>0)
+                    phi_new=new_phi_value;
+                break;}}}
+    return phi_new*LEVELSET_UTILITIES<T>::Sign(levelset.phi(index));
+}
+
 //#####################################################################
 // Function Add_To_Initial
 //##################################################################### 
-template<class TV> void FAST_MARCHING_METHOD_UNIFORM<TV>::
-Add_To_Initial(ARRAY<bool,TV_INT>& done,ARRAY<int,TV_INT>& close_k,const TV_INT& index)
+template<class T,class TV_INT> static void
+Add_To_Initial(const ARRAY<T,TV_INT>& phi,ARRAY<int,TV_INT>& close_k,
+    ARRAY<HEAP_ENTRY<T,TV_INT::m> >& heap,const TV_INT& index,
+    std::function<bool(FACE_INDEX<TV_INT::m>& face)> Neighbor_Visible,
+    int process_sign)
 {
-    done(index)=true;close_k(index)=-1; // add to done, remove from close 
     // add neighbors to close if not done 
-    if(Neighbor_Visible){
-        for(int axis=0;axis<TV::m;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
-            if(!done(index-axis_vector) && Neighbor_Visible(axis,index-axis_vector)) close_k(index-axis_vector)=0;
-            if(!done(index+axis_vector) && Neighbor_Visible(axis,index)) close_k(index+axis_vector)=0;}}
-    else{
-        for(int axis=0;axis<TV::m;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
-            if(!done(index-axis_vector)) close_k(index-axis_vector)=0;
-            if(!done(index+axis_vector)) close_k(index+axis_vector)=0;}}
+    for(int a=0;a<TV_INT::m;a++){
+        for(int s=0;s<2;s++){
+            TV_INT neighbor(index);
+            neighbor(a)+=2*s-1;
+            int& k=close_k(neighbor);
+            if(k!=-1) continue;
+            if(process_sign && process_sign*phi(neighbor)<0) continue;
+            if(Neighbor_Visible){
+                FACE_INDEX<TV_INT::m> face(a,index);
+                face.index(a)+=s-1;
+                if(!Neighbor_Visible(face)) continue;}
+            k=heap.Append({neighbor,&k});}}
+}
+//#####################################################################
+// Function Initialize_Interface
+//#####################################################################
+// pass heap_length by reference
+template<class T,class TV,class TV_INT,class EP> inline void
+Initialize_Interface(GRID<TV>& grid,ARRAY<T,TV_INT>& phi,ARRAY<int,TV_INT>& close_k,
+    ARRAY<HEAP_ENTRY<T,TV_INT::m> >& heap,
+    std::function<bool(FACE_INDEX<TV_INT::m>& face)> Neighbor_Visible,
+    const ARRAY<TV_INT>* seed_indices,
+    const bool add_seed_indices_for_ghost_cells,int ghost_cells,
+    const EP& ep,int process_sign,bool correct_interface_phi)
+{
+    ARRAY<TV_INT> seeds;
+    // Use provided seeds
+    if(seed_indices){
+        seeds=*seed_indices;
+        for(int i=0;i<seeds.m;i++)
+            close_k(seeds(i))=-2;}
+
+    // Gather additional seeds; done check interior if seeds provided.
+    if(!seed_indices || add_seed_indices_for_ghost_cells){
+        for(FACE_RANGE_ITERATOR<TV::m> it(grid.Domain_Indices(),ghost_cells,
+                0,seed_indices?RF::skip_outer:RF::interior|RF::skip_outer);it.Valid();it.Next()){
+            TV_INT a[2]={it.face.First_Cell_Index(),it.face.Second_Cell_Index()};
+            if(Neighbor_Visible && !Neighbor_Visible(it.face)) continue;
+            if(!LEVELSET_UTILITIES<T>::Interface(phi(a[0]),phi(a[1]))) continue;
+            for(int i=0;i<2;i++)
+                if(close_k(a[i])==-1){
+                    close_k(a[i])=-2;
+                    if(process_sign && process_sign*phi(a[i])<0) continue;
+                    seeds.Append(a[i]);}}}
+
+    for(int i=0;i<seeds.m;i++)
+        Add_To_Initial(phi,close_k,heap,seeds(i),Neighbor_Visible,process_sign);
+
+    if(correct_interface_phi){
+        ARRAY<T> phi_new(seeds.m);
+        LEVELSET<TV> levelset(grid,phi);
+        for(int i=0;i<seeds.m;i++)
+            phi_new(i)=Compute_Initial_Interface_Estimate(levelset,close_k,seeds(i),ep);
+        for(int i=0;i<seeds.m;i++)
+            phi(seeds(i))=phi_new(i);}
+
+    for(int i=0;i<heap.m;i++){
+        PHYSBAM_ASSERT(close_k(heap(i).index)>=0);
+        Update_Close_Point(grid,phi,heap(i).index,close_k,Neighbor_Visible);
+        heap(i).dist=abs(phi(heap(i).index));}
+    Make_Heap(heap);
+}
+//#####################################################################
+// Function Fast_Marching_Method
+//#####################################################################
+// Updates phi only out ghost cells.
+template<class TV> void FAST_MARCHING_METHOD_UNIFORM<TV>::
+Fast_Marching_Method(const GRID<TV>& grid_input,int ghost,ARRAY<T,TV_INT>& phi,const T stopping_distance)
+{
+    GRID<TV> grid(grid_input.Is_MAC_Grid()?grid_input:grid_input.Get_MAC_Grid_At_Regular_Positions());
+    PHYSBAM_ASSERT(grid.Is_MAC_Grid());
+    RANGE<TV_INT> domain=grid.Domain_Indices(ghost);
+
+    // -1=unvisited, -2=done, -3=sentinal, (>=0)=index in heap
+    ARRAY<int,TV_INT> close_k(domain.Thickened(1),true,-1);
+
+    // Pad with a band of invalid cells; this avoids the need to bounds check.
+    for(int a=0;a<TV::m;a++)
+        for(RANGE_ITERATOR<TV::m-1> it(close_k.domain.Remove_Dimension(a));it.Valid();it.Next()){
+            close_k(it.index.Insert(close_k.domain.min_corner(a),a))=-3;
+            close_k(it.index.Insert(close_k.domain.max_corner(a)-1,a))=-3;}
+
+    ARRAY<HEAP_ENTRY<T,TV::m> > heap;
+    Initialize_Interface(grid,phi,close_k,heap,Neighbor_Visible,seed_indices,
+        add_seed_indices_for_ghost_cells,ghost,estimation_parameters,process_sign,
+        correct_interface_phi);
+
+    while(heap.m!=0){
+        HEAP_ENTRY<T,TV::m> heap_entry=Pop_Heap(heap);
+        if(stopping_distance && heap_entry.dist>stopping_distance){ // exit early
+            for(CELL_ITERATOR<TV> it(grid,domain);it.Valid();it.Next())
+                if(close_k(it.index)>-2)
+                    phi(it.index)=LEVELSET_UTILITIES<T>::Sign(phi(it.index))*stopping_distance;
+            break;}
+        *heap_entry.close_ptr=-2; // flag as done
+
+        for(int axis=0;axis<TV::m;axis++)
+            for(int s=0;s<2;s++){
+                TV_INT neighbor(heap_entry.index);
+                neighbor(axis)+=2*s-1;
+                if(close_k(neighbor)<=-2) continue;
+                if(Neighbor_Visible){
+                    FACE_INDEX<TV::m> face(axis,heap_entry.index);
+                    face.index(axis)+=s-1;
+                    if(!Neighbor_Visible(face)) continue;}
+                Update_Close_Point(grid,phi,neighbor,close_k,Neighbor_Visible);
+                int& k=close_k(neighbor);
+                if(k<0) k=heap.Append({neighbor,&k,abs(phi(neighbor))}); // add to close
+                else heap(k).dist=abs(phi(neighbor));
+                Up_Heap(heap,k);}}
 }
 //#####################################################################
 namespace PhysBAM{

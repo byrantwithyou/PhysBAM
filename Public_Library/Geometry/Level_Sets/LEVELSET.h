@@ -43,10 +43,6 @@ public:
     T_INTERPOLATION_VECTOR* normal_interpolation;
     T max_time_step;
     T sigma;
-    bool refine_fmm_initialization_with_iterative_solver;
-    int fmm_initialization_iterations;
-    T fmm_initialization_iterative_tolerance;
-    T fmm_initialization_iterative_drift_fraction;
     T half_band_width;
 
     BOUNDARY<TV,T>* boundary;
@@ -75,11 +71,6 @@ public:
 
     void Set_Max_Time_Step(const T max_time_step_input=1e8)
     {max_time_step=max_time_step_input;}
-
-    void Initialize_FMM_Initialization_Iterative_Solver(const bool refine_fmm_initialization_with_iterative_solver_input=true,const int fmm_initialization_iterations_input=10,
-        const T fmm_initialization_iterative_tolerance_input=1e-2,const T fmm_initialization_iterative_drift_fraction_input=.1)
-    {refine_fmm_initialization_with_iterative_solver=refine_fmm_initialization_with_iterative_solver_input;fmm_initialization_iterations=fmm_initialization_iterations_input;
-    fmm_initialization_iterative_tolerance=fmm_initialization_iterative_tolerance_input;fmm_initialization_iterative_drift_fraction=fmm_initialization_iterative_drift_fraction_input;}
 
 protected:
     void Initialize_Levelset_Grid_Values(const GRID<TV>& grid_input)

@@ -24,7 +24,6 @@ LEVELSET(GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input,const int number_of_gho
 {
     Set_Small_Number();
     Set_Max_Time_Step();
-    Initialize_FMM_Initialization_Iterative_Solver();
     boundary=&boundary_default;
     interpolation=&interpolation_default;
     curvature_interpolation=&interpolation_default;
@@ -301,9 +300,15 @@ template<class TV> void LEVELSET<TV>::
 Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,const T time,const T stopping_distance,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells,int process_sign)
 {
     const int ghost_cells=2*number_of_ghost_cells+1;
-    ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells),false);boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
-    FAST_MARCHING_METHOD_UNIFORM<TV> fmm(*this,ghost_cells);
-    fmm.Fast_Marching_Method(phi_ghost,stopping_distance,seed_indices,add_seed_indices_for_ghost_cells,process_sign);
+    ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells),false);
+    boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
+    FAST_MARCHING_METHOD_UNIFORM<TV> fmm;
+    fmm.seed_indices=seed_indices;
+    if(seed_indices) fmm.correct_interface_phi=false;
+    fmm.add_seed_indices_for_ghost_cells=add_seed_indices_for_ghost_cells;
+    fmm.process_sign=process_sign;
+    fmm.Fast_Marching_Method(grid,ghost_cells,phi_ghost,stopping_distance);
+
     ARRAY<T,TV_INT>::Get(signed_distance,phi_ghost);
     boundary->Apply_Boundary_Condition(grid,signed_distance,time);
 }

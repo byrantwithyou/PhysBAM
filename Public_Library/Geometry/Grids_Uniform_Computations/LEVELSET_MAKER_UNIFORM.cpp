@@ -58,8 +58,10 @@ Compute_Level_Set(T_SURFACE& surface,GRID<TV>& grid,int ghost_cells,ARRAY<T,TV_I
         next.Exchange(todo);}
 
     LEVELSET<TV> levelset(grid,phi);
-    FAST_MARCHING_METHOD_UNIFORM<TV> fmm(levelset,ghost_cells);
-    fmm.Fast_Marching_Method(phi,0,&seed_indices);
+    FAST_MARCHING_METHOD_UNIFORM<TV> fmm;
+    fmm.seed_indices=&seed_indices;
+    fmm.correct_interface_phi=false;
+    fmm.Fast_Marching_Method(grid,ghost_cells,phi,0);
 }
 namespace PhysBAM{
 template class LEVELSET_MAKER_UNIFORM<VECTOR<float,2> >;

@@ -125,7 +125,6 @@ Initialize()
 
     example.particle_levelset_evolution_multiple.Set_Number_Particles_Per_Cell(pow<TV::m>(4));
     example.particle_levelset_evolution_multiple.Set_Levelset_Callbacks(example);
-    example.particle_levelset_evolution_multiple.Initialize_FMM_Initialization_Iterative_Solver(true);
     example.particle_levelset_evolution_multiple.runge_kutta_order_levelset=3;
     example.particle_levelset_evolution_multiple.runge_kutta_order_particles=3;
     example.particle_levelset_evolution_multiple.Use_Hamilton_Jacobi_Weno_Advection();

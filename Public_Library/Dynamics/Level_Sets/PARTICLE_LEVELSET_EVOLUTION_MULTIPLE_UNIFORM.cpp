@@ -239,13 +239,6 @@ Set_Levelset_Callbacks(LEVELSET_CALLBACKS<TV>& levelset_callbacks)
     particle_levelset_multiple.levelset_multiple.Set_Levelset_Callbacks(levelset_callbacks);
 }
 template<class TV> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<TV>::
-Initialize_FMM_Initialization_Iterative_Solver(const bool refine_fmm_initialization_with_iterative_solver_input,const int fmm_initialization_iterations_input,
-        const T fmm_initialization_iterative_tolerance_input,const T fmm_initialization_iterative_drift_fraction_input)
-{
-    for(int i=0;i<phis.m;i++) particle_levelset_multiple.levelset_multiple.levelsets(i)->Initialize_FMM_Initialization_Iterative_Solver(refine_fmm_initialization_with_iterative_solver_input,
-        fmm_initialization_iterations_input,fmm_initialization_iterative_tolerance_input,fmm_initialization_iterative_drift_fraction_input);
-}
-template<class TV> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<TV>::
 Bias_Towards_Negative_Particles(const bool bias_towards_negative_particles)
 {
     for(int i=0;i<phis.m;i++) particle_levelset_multiple.particle_levelsets(i)->Bias_Towards_Negative_Particles(bias_towards_negative_particles);

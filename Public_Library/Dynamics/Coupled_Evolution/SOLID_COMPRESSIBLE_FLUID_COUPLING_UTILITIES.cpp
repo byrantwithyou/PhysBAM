@@ -206,8 +206,12 @@ Compute_Phi_Solids(const int number_of_ghost_cells)
             seed_indices.Append(iterator.First_Cell_Index());seed_indices.Append(iterator.Second_Cell_Index());}
 
         LEVELSET<TV> levelset(euler.grid,phi_all_solids_negated); // TODO(jontg): Make this a permanent member variable?
-        FAST_MARCHING_METHOD_UNIFORM<TV> fmm(levelset,number_of_cells_to_extrapolate);
-        fmm.Fast_Marching_Method(phi_all_solids_negated,euler.grid.dX.Max()*(T)number_of_cells_to_extrapolate,&seed_indices,true);}
+        FAST_MARCHING_METHOD_UNIFORM<TV> fmm;
+        fmm.seed_indices=&seed_indices;
+        fmm.correct_interface_phi=false;
+        fmm.add_seed_indices_for_ghost_cells=true;
+        fmm.Fast_Marching_Method(euler.grid,number_of_cells_to_extrapolate,phi_all_solids_negated,
+            euler.grid.dX.Max()*(T)number_of_cells_to_extrapolate);}
 }
 //#####################################################################
 // Function Fill_Solid_Cells

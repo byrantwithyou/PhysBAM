@@ -384,8 +384,10 @@ Build_Level_Sets(PHASE& ph)
         if(ph.phi(a)<0){if(ph.phi(b)>=0) seed_indices.Append(b);}
         else if(ph.phi(b)<0) seed_indices.Append(a);}
 
-    FAST_MARCHING_METHOD_UNIFORM<TV> fmm(*ph.levelset,example.ghost);
-    fmm.Fast_Marching_Method(ph.phi,3*dx,&seed_indices);
+    FAST_MARCHING_METHOD_UNIFORM<TV> fmm;
+    fmm.seed_indices=&seed_indices;
+    fmm.correct_interface_phi=false;
+    fmm.Fast_Marching_Method(example.grid,example.ghost,ph.phi,3*dx);
 }
 //#####################################################################
 // Function Bump_Particles

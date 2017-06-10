@@ -190,7 +190,6 @@ Initialize()
     // initialize levelset
     particle_levelset_evolution->Set_Number_Particles_Per_Cell(example.fluids_parameters.number_particles_per_cell);
     particle_levelset_evolution->Set_Levelset_Callbacks(example);
-    particle_levelset_evolution->Initialize_FMM_Initialization_Iterative_Solver(example.fluids_parameters.refine_fmm_initialization_with_iterative_solver);
 
     particle_levelset_evolution->Particle_Levelset(0).levelset.Set_Custom_Boundary(*example.fluids_parameters.phi_boundary);
     particle_levelset_evolution->Bias_Towards_Negative_Particles(example.fluids_parameters.bias_towards_negative_particles);

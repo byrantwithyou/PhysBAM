@@ -104,7 +104,6 @@ Initialize()
     example.particle_levelset_evolution.Particle_Levelset(0).number_of_ghost_cells=example.number_of_ghost_cells;
     example.particle_levelset_evolution.Set_Number_Particles_Per_Cell(16);
     example.particle_levelset_evolution.Set_Levelset_Callbacks(example);
-    example.particle_levelset_evolution.Initialize_FMM_Initialization_Iterative_Solver(true);
 
     example.particle_levelset_evolution.Particle_Levelset(0).levelset.Set_Custom_Boundary(*example.phi_boundary);
     example.particle_levelset_evolution.Bias_Towards_Negative_Particles(false);
