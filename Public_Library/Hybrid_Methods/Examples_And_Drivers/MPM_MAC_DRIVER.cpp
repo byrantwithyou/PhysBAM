@@ -2,6 +2,7 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Log/DEBUG_SUBSTEPS.h>
 #include <Core/Log/FINE_TIMER.h>
 #include <Core/Log/SCOPE.h>
@@ -373,7 +374,7 @@ Build_Level_Sets(PHASE& ph)
         T influence_bound=example.radius_sphere+dx*(T)1.1;
         TV X=example.particles.X(p);
         RANGE<TV> bound(X-influence_bound,X+influence_bound);
-        RANGE<TV_INT> range=example.grid.Clamp_To_Cell(bound).Intersect(grid_domain);
+        RANGE<TV_INT> range=example.grid.Clamp_To_Cell(bound,example.ghost).Intersect(grid_domain);
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
             T d=(X-example.grid.Center(it.index)).Magnitude();
             ph.phi(it.index)=min(ph.phi(it.index),d-example.radius_sphere);}}
@@ -383,11 +384,23 @@ Build_Level_Sets(PHASE& ph)
         TV_INT a=it.First_Cell_Index(),b=it.Second_Cell_Index();
         if(ph.phi(a)<0){if(ph.phi(b)>=0) seed_indices.Append(b);}
         else if(ph.phi(b)<0) seed_indices.Append(a);}
+    Prune_Duplicates(seed_indices);
 
     FAST_MARCHING_METHOD_UNIFORM<TV> fmm;
     fmm.seed_indices=&seed_indices;
     fmm.correct_interface_phi=false;
+    fmm.process_sign=1;
     fmm.Fast_Marching_Method(example.grid,example.ghost,ph.phi,3*dx);
+
+    T shift=10*dx;
+    for(int i=0;i<seed_indices.m;i++)
+        ph.phi(seed_indices(i))-=shift;
+
+    fmm.process_sign=-1;
+    fmm.Fast_Marching_Method(example.grid,example.ghost,ph.phi,shift+3*dx);
+
+    for(CELL_ITERATOR<TV> it(example.grid,example.ghost);it.Valid();it.Next())
+        if(ph.phi(it.index)<=0) ph.phi(it.index)+=shift;
 }
 //#####################################################################
 // Function Bump_Particles
