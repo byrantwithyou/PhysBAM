@@ -87,7 +87,7 @@ Print_Cell_Selection_Info(std::ostream& stream,const TV_INT& cell) const
     if(!valid) return;
     if(Is_Up_To_Date(frame)){
         stream<<component_name<<": "<<std::endl;
-        opengl_mac_velocity_field->Print_Selection_Info(stream);
+        opengl_mac_velocity_field->Print_Cell_Selection_Info(stream,cell);
         if(draw_vorticity)
             stream<<"vorticity magnitude = "<<opengl_vorticity_magnitude->values(cell)<<std::endl;}
 }
