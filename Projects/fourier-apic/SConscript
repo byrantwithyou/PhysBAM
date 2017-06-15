@@ -3,3 +3,4 @@
 Import('env Automatic_Program')
 env=env.Copy(USE_HYBRID=1,USE_FFTW=1)
 Automatic_Program(env,"fourier_apic",["main.cpp"])
+Automatic_Program(env,"fourier_mac",["main-mac.cpp"])
