@@ -84,6 +84,8 @@ int main(int argc, char* argv[])
     std::string output_filename="eigen.png";
     std::string viewer_directory="output";
     bool dump_particles=false;
+    bool use_pressure=false;
+    T mu=0;
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Add("-resolution",&resolution,"num","transfer resolution");
     parse_args.Add("-size",&size,"num","analyze transfer as though this resolution");
@@ -96,6 +98,8 @@ int main(int argc, char* argv[])
     parse_args.Add("-irreg",&irregular_seeding,"num","each cell is seeded identicially with num particles");
     parse_args.Add("-seed",&seed,"seed","random number generator seed (-1 = timer)");
     parse_args.Add("-dump_particles",&dump_particles,"Output particle distribution");
+    parse_args.Add("-pressure",&use_pressure,"Use pressure projection");
+    parse_args.Add("-mu",&mu,"mu","Viscosity amount");
     parse_args.Parse();
 
     PHYSBAM_ASSERT(resolution<=size);
@@ -108,19 +112,22 @@ int main(int argc, char* argv[])
     if(seed!=-1) rand.Set_Seed(seed);
     
     example.grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
+    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),example.grid,viewer_directory);
     ARRAY<TV> unit_X;
     if(irregular_seeding) Sample_Box_Random(rand,unit_X,irregular_seeding);
     else Sample_Box_Regularly(unit_X,particles_per_dim);
     Replicate_Particles(example.particles,example.grid,unit_X);
-
-    example.dt=0;
+    ARRAY<TV> store_X(example.particles.X);
+    
+    example.dt=example.grid.dX.Min();
     example.flip=flip;
     example.use_affine=use_affine;
     example.Set_Weights(order);
+    example.use_viscosity=mu>0;
     example.phases.Resize(PHASE_ID(1));
     auto& ph=example.phases(PHASE_ID());
     ph.density=1;
-    ph.viscosity=0;
+    ph.viscosity=mu;
     ph.Initialize(example.grid,example.weights,example.ghost,example.threads);
     ph.velocity.Resize(example.grid.Cell_Indices(3));
     ph.mass.Resize(example.grid.Cell_Indices(3));
@@ -163,7 +170,18 @@ int main(int argc, char* argv[])
             if(use_affine) example.particles.B.Fill(MATRIX<T,TV::m>());
             grid_dof(first_p+p,i)=1;
             driver.Particle_To_Grid();
+            if(use_pressure) driver.Pressure_Projection();
+            else if(mu){
+                driver.Apply_BC();
+                driver.Allocate_Projection_System_Variable();}
+            driver.Apply_Viscosity();
             driver.Grid_To_Particle();
+            example.particles.X=store_X;
+            if(dump_particles){
+                for(int i=0;i<example.particles.X.m;i++){
+                    Add_Debug_Particle(example.particles.X(i),VECTOR<T,3>(1,0,0));
+                    Debug_Particle_Set_Attribute<TV,TV>(ATTRIBUTE_ID_V,example.particles.V(i));}
+                Flush_Frame(ph.velocity,"particle dof");}
             for(int q=0;q<example.particles.V.m;q++)
             {
                 for(int j=0;j<dofs_per_particle;j++)
@@ -175,6 +193,7 @@ int main(int argc, char* argv[])
             }
         }
     }
+    if(dump_particles) Flush_Frame<TV>("end");
 
     ARRAY<ARRAY<ARRAY<std::complex<T>,TV_INT> > > F(dofs_per_cell);
 
@@ -197,13 +216,14 @@ int main(int argc, char* argv[])
     icm.colors.Add_Control_Point(1-.64,VECTOR<T,3>(.5,0,1));
     icm.colors.Add_Control_Point(0,VECTOR<T,3>(0,0,0));
 
-    ARRAY<VECTOR<T,3>,TV_INT> min_abs_eig(A(0)(0).domain);
+    TV_INT counts=example.grid.numbers_of_cells,hi=counts/2,lo=hi-counts;
+    TV coefficients=(T)(2*pi)/example.grid.domain.Edge_Lengths();
     ARRAY<VECTOR<T,3>,TV_INT> max_abs_eig(A(0)(0).domain);
     ARRAY<VECTOR<T,3>,TV_INT> sec_abs_eig(A(0)(0).domain);
     ARRAY<VECTOR<T,3>,TV_INT> thi_abs_eig(A(0)(0).domain);
-    ARRAY<VECTOR<T,3>,TV_INT> alg_mean_eig(A(0)(0).domain);
-    ARRAY<VECTOR<T,3>,TV_INT> geo_mean_eig(A(0)(0).domain);
+    ARRAY<VECTOR<T,3>,TV_INT> vis_abs_eig(A(0)(0).domain);
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>::Unit_Box()*size);it.Valid();it.Next()){
+        TV k=coefficients*TV(wrap(it.index,lo,hi));
         MATRIX_MXN<std::complex<T> > M(dofs_per_cell,dofs_per_cell);
         for(int i=0;i<dofs_per_cell;i++)
             for(int j=0;j<dofs_per_cell;j++)
@@ -213,27 +233,16 @@ int main(int argc, char* argv[])
         ARRAY<T> abs_eig(dofs_per_cell);
         for(int i=0;i<dofs_per_cell;i++) abs_eig(i)=abs(eig(i));
         abs_eig.Sort();
-        min_abs_eig(it.index)=icm(abs_eig(0));
+//        printf("PT %g %g\n",k.Magnitude_Squared(),abs_eig.Last());
         max_abs_eig(it.index)=icm(abs_eig.Last());
         sec_abs_eig(it.index)=icm(abs_eig(abs_eig.m-2));
         thi_abs_eig(it.index)=icm(abs_eig(abs_eig.m-3));
-        geo_mean_eig(it.index)=icm(pow(abs_eig.Product(),(T)1/dofs_per_cell));
-        alg_mean_eig(it.index)=icm(abs_eig.Average());}
+        vis_abs_eig(it.index)=icm(1/(1+k.Magnitude_Squared()*example.dt*mu));}
 
-    PNG_FILE<T>::Write("min-"+output_filename,min_abs_eig);
     PNG_FILE<T>::Write("max-"+output_filename,max_abs_eig);
     PNG_FILE<T>::Write("sec-"+output_filename,sec_abs_eig);
     PNG_FILE<T>::Write("thi-"+output_filename,thi_abs_eig);
-    PNG_FILE<T>::Write("geo-"+output_filename,geo_mean_eig);
-    PNG_FILE<T>::Write("alg-"+output_filename,alg_mean_eig);
-
-    if(dump_particles){
-        VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),example.grid,viewer_directory);
-        for(int i=0;i<example.particles.X.m;i++)
-            Add_Debug_Particle(example.particles.X(i),VECTOR<T,3>(1,0,0));
-        Flush_Frame<TV>("particles");
-        Flush_Frame<TV>("end");
-    }
+    PNG_FILE<T>::Write("vis-"+output_filename,vis_abs_eig);
     
     return 0;
 }
