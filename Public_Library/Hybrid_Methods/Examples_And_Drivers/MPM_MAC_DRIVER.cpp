@@ -996,10 +996,6 @@ template<class TV> void MPM_MAC_DRIVER<TV>::
 Compute_Poisson_Matrix()
 {
     TIMER_SCOPE_FUNC;
-    VECTOR<typename PARTICLE_GRID_WEIGHTS<TV>::SCRATCH,TV::m> scratch;
-    for(int i=0;i<TV::m;i++)
-        example.weights(i)->Compute(example.grid.Face(FACE_INDEX<TV::m>(i,TV_INT())),scratch(i),false);
-
     Apply_BC();
     int nvar=Allocate_Projection_System_Variable();
     Compute_Laplacian(nvar);
