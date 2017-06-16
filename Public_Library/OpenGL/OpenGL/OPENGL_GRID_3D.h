@@ -18,6 +18,13 @@ class OPENGL_GRID_3D:public OPENGL_OBJECT<T>
 {
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 
+    enum class SELECT_TYPE
+    {
+        NONE,
+        CELL,
+        NODE
+    };
+    SELECT_TYPE select_type;
     TV_INT selected_cell;
     TV_INT selected_node;
     ARRAY<TV_INT> selected_cell_list;

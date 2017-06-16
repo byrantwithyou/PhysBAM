@@ -13,7 +13,7 @@ OPENGL_GRID_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,const OPENGL_COLOR &
     const std::string basedir_input,const int frame_input)
     :OPENGL_OBJECT<T>(stream_type),grid(grid_input),active_cell_mask(0),ghost_cell_mask(0),
     active_face_mask(0),ghost_face_mask(0),active_node_mask(0),ghost_node_mask(0),color(color_input),
-    draw(true),draw_ghost_values(true),draw_mask_type(0),selected_cell(-1,-1),selected_node(-1,-1),
+    draw(true),draw_ghost_values(true),draw_mask_type(0),select_type(SELECT_TYPE::NONE),selected_cell(-1,-1),selected_node(-1,-1),
     basedir(basedir_input),frame(frame_input)
 {
     viewer_callbacks.Set("toggle_draw_ghost_values",{[this](){Toggle_Draw_Ghost_Values();},"toggle_draw_ghost_values"});
@@ -156,10 +156,10 @@ Display() const
             glPopAttrib();}
 
         // Highlight current selection
-        if(selected_cell.x>=0){
+        if(select_type==SELECT_TYPE::CELL){
             TV min_corner=grid.Node(selected_cell),max_corner=min_corner+grid.dX;
             OPENGL_SELECTION::Draw_Highlighted_Quad(min_corner,max_corner);}
-        if(selected_node.x>=0){
+        if(select_type==SELECT_TYPE::NODE){
             OPENGL_SELECTION::Draw_Highlighted_Vertex(grid.Node(selected_node));}}
 
     glPopAttrib();
@@ -197,9 +197,21 @@ Get_Selection_Priority(ARRAY_VIEW<GLuint> indices)
 template<class T> bool OPENGL_GRID_2D<T>::
 Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers)
 {
-    if(indices(0)==0) selected_cell=TV_INT(indices(1),indices(2));
-    else if(indices(0)==1) selected_node=TV_INT(indices(1),indices(2));
-    else return false;
+    ARRAY<int> signed_indices(indices.m);
+    for(int i=1;i<indices.m;i++)
+        if(indices(i)&(GLuint)(-1))
+            signed_indices(i)=-~(indices(i)-1);
+        else
+            signed_indices(i)=indices(i);
+    if(indices(0)==0){
+        select_type=SELECT_TYPE::CELL;
+        selected_cell=TV_INT(signed_indices(1),signed_indices(2));}
+    else if(indices(0)==1){
+        select_type=SELECT_TYPE::NODE;
+        selected_node=TV_INT(signed_indices(1),signed_indices(2));}
+    else{
+        select_type=SELECT_TYPE::NONE;
+        return false;}
     return true;
 }
 //#####################################################################
@@ -208,8 +220,7 @@ Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers)
 template<class T> void OPENGL_GRID_2D<T>::
 Clear_Selection()
 {
-    selected_cell.Fill(-1);
-    selected_node.Fill(-1);
+    select_type=SELECT_TYPE::NONE;
 }
 //#####################################################################
 // Function Toggle_Draw_Ghost_Values
@@ -267,11 +278,11 @@ Reinitialize()
 template<class T> void OPENGL_GRID_2D<T>::
 Print_Selection_Info(std::ostream& stream) const
 {
-    if(selected_node.x>=0){
+    if(select_type==SELECT_TYPE::NODE){
         stream<<"Selected node "<<selected_node<<" ("<<grid.Get_Regular_Grid().X(selected_node)<<")"<<std::endl;
         for(int i=0;i<grid_objects.m;i++)
             grid_objects(i)->Print_Node_Selection_Info(stream,selected_node);}
-    else if(selected_cell.x>=0){
+    else if(select_type==SELECT_TYPE::CELL){
         stream<<"Selected cell "<<selected_cell<<" ("<<grid.Get_MAC_Grid().X(selected_cell)<<")"<<std::endl;
         for(int i=0;i<grid_objects.m;i++)
             grid_objects(i)->Print_Cell_Selection_Info(stream,selected_cell);}
@@ -282,8 +293,8 @@ Print_Selection_Info(std::ostream& stream) const
 template<class T> RANGE<VECTOR<T,3> > OPENGL_GRID_2D<T>::
 Selection_Bounding_Box() const
 {
-    if(selected_node.x>=0) return World_Space_Box(RANGE<TV>(grid.Node(selected_node)));
-    if(selected_cell.x>=0) return World_Space_Box(RANGE<TV>(grid.Node(selected_cell),grid.Node(selected_cell+1)));
+    if(select_type==SELECT_TYPE::NODE) return World_Space_Box(RANGE<TV>(grid.Node(selected_node)));
+    if(select_type==SELECT_TYPE::CELL) return World_Space_Box(RANGE<TV>(grid.Node(selected_cell),grid.Node(selected_cell+1)));
     PHYSBAM_FATAL_ERROR();
 }
 //#####################################################################

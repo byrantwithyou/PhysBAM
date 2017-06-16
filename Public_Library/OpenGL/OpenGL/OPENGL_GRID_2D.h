@@ -33,6 +33,13 @@ public:
     int draw_mask_type;
     ARRAY<OPENGL_GRID_OBJECT<TV>*> grid_objects;
 private:
+    enum class SELECT_TYPE
+    {
+        NONE,
+        CELL,
+        NODE
+    };
+    SELECT_TYPE select_type;
     TV_INT selected_cell;
     TV_INT selected_node;
     std::string basedir;

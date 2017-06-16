@@ -14,7 +14,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> OPENGL_GRID_3D<T>::
 OPENGL_GRID_3D(STREAM_TYPE stream_type,GRID<TV> &grid_input,const OPENGL_COLOR &color_input) 
-    :OPENGL_OBJECT<T>(stream_type),grid(grid_input),color(color_input),
+    :OPENGL_OBJECT<T>(stream_type),select_type(SELECT_TYPE::NONE),grid(grid_input),color(color_input),
     draw_ghost_values(true),hide_non_selected_grid(false),owns_grid(false),scale(1)
 {
     viewer_callbacks.Set("toggle_draw_ghost_values",{[this](){Toggle_Draw_Ghost_Values();},"toggle_draw_ghost_values"});
@@ -156,12 +156,12 @@ Display() const
         }
     }
 
-    if(selected_cell.x>=0)
+    if(select_type==SELECT_TYPE::CELL)
     {
         TV min_corner=grid.Node(selected_cell),max_corner=min_corner+grid.dX;
         OPENGL_SELECTION::Draw_Highlighted_Box(min_corner,max_corner);
     }
-    else if(selected_node.x>=0)
+    else if(select_type==SELECT_TYPE::NODE)
     {
         OPENGL_SELECTION::Draw_Highlighted_Vertex(grid.Node(selected_node));
     }
@@ -268,11 +268,23 @@ Get_Selection_Priority(ARRAY_VIEW<GLuint> indices)
 template<class T> bool OPENGL_GRID_3D<T>::
 Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers)
 {
+    ARRAY<int> signed_indices(indices.m);
+    for(int i=1;i<indices.m;i++)
+        if(indices(i)&(GLuint)(-1))
+            signed_indices(i)=-~(indices(i)-1);
+        else
+            signed_indices(i)=indices(i);
     if(indices.m==4)
     {
-        if(indices(0)==0) selected_cell=TV_INT(indices(1),indices(2),indices(3));
-        else if(indices(0)==1) selected_node=TV_INT(indices(1),indices(2),indices(3));
-        else return false;
+        if(indices(0)==0){
+            select_type=SELECT_TYPE::CELL;
+            selected_cell=TV_INT(signed_indices(1),signed_indices(2),signed_indices(3));}
+        else if(indices(0)==1){
+            select_type=SELECT_TYPE::NODE;
+            selected_node=TV_INT(signed_indices(1),signed_indices(2),signed_indices(3));}
+        else{
+            select_type=SELECT_TYPE::NONE;
+            return false;}
         return true;
     } 
     else if(indices.m%3==1)
@@ -281,13 +293,13 @@ Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers)
         {
             selected_cell_list.Resize(indices.m/3);
             for(int i=0;i<selected_cell_list.m;i++)
-                selected_cell_list(i)=TV_INT(indices(3*i+1),indices(3*i+2),indices(3*i+3));
+                selected_cell_list(i)=TV_INT(signed_indices(3*i+1),signed_indices(3*i+2),signed_indices(3*i+3));
         }
         else if(indices(0)==3)
         {
             selected_node_list.Resize(indices.m/3);
             for(int i=0;i<selected_node_list.m;i++)
-                selected_node_list(i)=TV_INT(indices(3*i+1),indices(3*i+2),indices(3*i+3));
+                selected_node_list(i)=TV_INT(signed_indices(3*i+1),signed_indices(3*i+2),signed_indices(3*i+3));
         }
         else return false;
         return true;
@@ -300,8 +312,7 @@ Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers)
 template<class T> void OPENGL_GRID_3D<T>::
 Clear_Selection()
 {
-    selected_cell.Fill(-1);
-    selected_node.Fill(-1);
+    select_type=SELECT_TYPE::NONE;
     selected_cell_list.Remove_All();
     selected_node_list.Remove_All();
 }
@@ -311,9 +322,9 @@ Clear_Selection()
 template<class T> RANGE<VECTOR<T,3> > OPENGL_GRID_3D<T>::
 Selection_Bounding_Box() const
 {
-    if(selected_cell.x>=0)
+    if(select_type==SELECT_TYPE::CELL)
         return World_Space_Box(grid.Cell_Domain(selected_cell));
-    if(selected_node.x>=0)
+    if(select_type==SELECT_TYPE::NODE)
         return World_Space_Box(RANGE<TV>(grid.Node(selected_node)));
     RANGE<TV> range;
     for(int i=0;i<selected_cell_list.m;i++)
@@ -328,11 +339,11 @@ Selection_Bounding_Box() const
 template<class T> void OPENGL_GRID_3D<T>::
 Print_Selection_Info(std::ostream& stream) const
 {
-    if(selected_node.x>=0){
+    if(select_type==SELECT_TYPE::NODE){
         stream<<"Selected node "<<selected_node<<" ("<<grid.Get_Regular_Grid().X(selected_node)<<")"<<std::endl;
         for(int i=0;i<grid_objects.m;i++)
             grid_objects(i)->Print_Node_Selection_Info(stream,selected_node);}
-    else if(selected_cell.x>=0){
+    else if(select_type==SELECT_TYPE::CELL){
         stream<<"Selected cell "<<selected_cell<<" ("<<grid.Get_MAC_Grid().X(selected_cell)<<")"<<std::endl;
         for(int i=0;i<grid_objects.m;i++)
             grid_objects(i)->Print_Cell_Selection_Info(stream,selected_cell);}
