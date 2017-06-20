@@ -268,20 +268,14 @@ Get_Selection_Priority(ARRAY_VIEW<GLuint> indices)
 template<class T> bool OPENGL_GRID_3D<T>::
 Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers)
 {
-    ARRAY<int> signed_indices(indices.m);
-    for(int i=1;i<indices.m;i++)
-        if(indices(i)&(GLuint)(-1))
-            signed_indices(i)=-~(indices(i)-1);
-        else
-            signed_indices(i)=indices(i);
     if(indices.m==4)
     {
         if(indices(0)==0){
             select_type=SELECT_TYPE::CELL;
-            selected_cell=TV_INT(signed_indices(1),signed_indices(2),signed_indices(3));}
+            selected_cell=TV_INT(indices(1),indices(2),indices(3));}
         else if(indices(0)==1){
             select_type=SELECT_TYPE::NODE;
-            selected_node=TV_INT(signed_indices(1),signed_indices(2),signed_indices(3));}
+            selected_node=TV_INT(indices(1),indices(2),indices(3));}
         else{
             select_type=SELECT_TYPE::NONE;
             return false;}
@@ -293,13 +287,13 @@ Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers)
         {
             selected_cell_list.Resize(indices.m/3);
             for(int i=0;i<selected_cell_list.m;i++)
-                selected_cell_list(i)=TV_INT(signed_indices(3*i+1),signed_indices(3*i+2),signed_indices(3*i+3));
+                selected_cell_list(i)=TV_INT(indices(3*i+1),indices(3*i+2),indices(3*i+3));
         }
         else if(indices(0)==3)
         {
             selected_node_list.Resize(indices.m/3);
             for(int i=0;i<selected_node_list.m;i++)
-                selected_node_list(i)=TV_INT(signed_indices(3*i+1),signed_indices(3*i+2),signed_indices(3*i+3));
+                selected_node_list(i)=TV_INT(indices(3*i+1),indices(3*i+2),indices(3*i+3));
         }
         else return false;
         return true;

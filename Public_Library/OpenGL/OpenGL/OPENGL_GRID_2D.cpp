@@ -197,18 +197,12 @@ Get_Selection_Priority(ARRAY_VIEW<GLuint> indices)
 template<class T> bool OPENGL_GRID_2D<T>::
 Set_Selection(ARRAY_VIEW<GLuint> indices,int modifiers)
 {
-    ARRAY<int> signed_indices(indices.m);
-    for(int i=1;i<indices.m;i++)
-        if(indices(i)&(GLuint)(-1))
-            signed_indices(i)=-~(indices(i)-1);
-        else
-            signed_indices(i)=indices(i);
     if(indices(0)==0){
         select_type=SELECT_TYPE::CELL;
-        selected_cell=TV_INT(signed_indices(1),signed_indices(2));}
+        selected_cell=TV_INT(indices(1),indices(2));}
     else if(indices(0)==1){
         select_type=SELECT_TYPE::NODE;
-        selected_node=TV_INT(signed_indices(1),signed_indices(2));}
+        selected_node=TV_INT(indices(1),indices(2));}
     else{
         select_type=SELECT_TYPE::NONE;
         return false;}
