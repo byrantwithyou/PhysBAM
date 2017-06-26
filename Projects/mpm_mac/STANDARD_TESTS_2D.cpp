@@ -181,8 +181,9 @@ Initialize()
         } break;
         case 16:{ // Initialize velocity field as Taylor-Green Vortex
             // To specify parameters, use: -I a
-            int a=extra_int.m>=1?extra_int(0):2;
-            Set_Grid(RANGE<TV>::Unit_Box()*pi*m);
+            bc_type.Fill(BC_PERIODIC);
+            int a=extra_int.m>=1?extra_int(0):1;
+            Set_Grid(RANGE<TV>::Centered_Box()*pi*m);
             T density=2*unit_rho*scale_mass;
             Set_Phases({density});
             auto V_func=[=](const TV& X){return TV(-sin(a*X.x)*cos(a*X.y),cos(a*X.x)*sin(a*X.y));};
