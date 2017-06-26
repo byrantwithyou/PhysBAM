@@ -1,12 +1,9 @@
-#ifdef USE_LAPACK
 #include <Core/Matrices/MATRIX_MXN.h>
+using namespace PhysBAM;
+typedef double T;
+#ifdef USE_LAPACK
 #define lapack_complex_double std::complex<double>
 #include <lapacke.h>
-
-using namespace PhysBAM;
-
-typedef double T;
-
 void Compute_Eigenvalues(MATRIX_MXN<std::complex<T> > M,ARRAY<std::complex<T> >& eig)
 {
     PHYSBAM_ASSERT(M.m==M.n);
