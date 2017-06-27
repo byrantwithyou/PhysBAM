@@ -65,7 +65,9 @@ public:
     bool bc_periodic;
     std::function<TV (PHASE_ID pid,const TV& X,T time)> analytic_velocity;
     T mu;
-    
+    bool analyze_u_modes=false;
+    T max_ke=0;
+
     STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS_BASE();
 
@@ -102,6 +104,7 @@ public:
     void Test_dV(std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)> dV) const;
     void Set_Phases(const ARRAY<T,PHASE_ID>& phase_densities);
     void Check_Analytic_Velocity() const;
+    void Velocity_Fourier_Analysis(const std::string& base_filename,const ARRAY<T,FACE_INDEX<TV::m> >& u,T max_ke) const;
 //#####################################################################
 };
 }

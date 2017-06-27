@@ -4,7 +4,10 @@
 //#####################################################################
 #include <Core/Math_Tools/RANGE_ITERATOR.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Tools/Images/PNG_FILE.h>
+#include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
+#include <Grid_Tools/Fourier_Transforms/FFT.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Grid_Tools/Grids/NODE_ITERATOR.h>
@@ -18,6 +21,7 @@
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS_SPLINE.h>
 #include <Hybrid_Methods/Projection/MPM_PROJECTION_SYSTEM.h>
+#include <fstream>
 #include "STANDARD_TESTS_BASE.h"
 #ifdef USE_OPENMP
 #include <omp.h>
@@ -87,6 +91,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-bc_periodic",&bc_periodic,"set boundary condition periodic");
     parse_args.Add("-test_periodic",&use_periodic_test_shift,"test periodic bc");
     parse_args.Add("-mu",&mu,"mu","viscosity");
+    parse_args.Add("-analyze_u_modes",&analyze_u_modes,"Perform FFT analysis on velocity");
 
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);
@@ -123,6 +128,18 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
 
     particles.Store_B(use_affine);
     particles.Store_C(false);
+
+    if(analyze_u_modes){
+        Add_Callbacks(false,"p2g",[this](){
+                if(max_ke) return;
+                const PHASE& ph=phases(PHASE_ID());
+                for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next())
+                    for(int i=0;i<TV::m;i++)
+                        max_ke+=sqr(ph.velocity.Component(i)(it.index));
+                max_ke*=ph.density;});
+        Add_Callbacks(false,"time-step",[this](){
+                static int id=0;
+                Velocity_Fourier_Analysis(LOG::sprintf("u-%i",id++),phases(PHASE_ID()).velocity,max_ke);});}
 
     if(use_periodic_test_shift){
         auto shift_func=[this](int sign){
@@ -296,6 +313,63 @@ Check_Analytic_Velocity() const
     if(num_l2_samples) l2_error/=num_l2_samples;
     l2_error=sqrt(l2_error);
     LOG::printf("velocity error: inf=%g l2=%g\n",max_error,l2_error);
+}
+//#####################################################################
+// Function Dump_Image
+//#####################################################################
+template<class T> static void
+Dump_Image(const std::string& file,const ARRAY<T,VECTOR<int,2> >& ke)
+{
+    INTERPOLATED_COLOR_MAP<T> icm;
+    icm.colors.Add_Control_Point(1.00001,VECTOR<T,3>(1,1,1));
+    icm.colors.Add_Control_Point(1,VECTOR<T,3>(.5,0,0));
+    icm.colors.Add_Control_Point(1-.01,VECTOR<T,3>(1,0,0));
+    icm.colors.Add_Control_Point(1-.02,VECTOR<T,3>(1,.5,0));
+    icm.colors.Add_Control_Point(1-.04,VECTOR<T,3>(1,1,0));
+    icm.colors.Add_Control_Point(1-.08,VECTOR<T,3>(0,1,0));
+    icm.colors.Add_Control_Point(1-.16,VECTOR<T,3>(0,1,1));
+    icm.colors.Add_Control_Point(1-.32,VECTOR<T,3>(0,0,1));
+    icm.colors.Add_Control_Point(1-.64,VECTOR<T,3>(.5,0,1));
+    icm.colors.Add_Control_Point(0,VECTOR<T,3>(0,0,0));
+
+    ARRAY<VECTOR<T,3>,VECTOR<int,2> > image(ke.domain);
+    for(RANGE_ITERATOR<2> it(image.domain);it.Valid();it.Next())
+        image(it.index)=icm(ke(it.index));
+
+    PNG_FILE<T>::Write(file,image);
+}
+//#####################################################################
+// Function Dump_Image
+//#####################################################################
+template<class T,int d> static void
+Dump_Image(const std::string& file,const ARRAY<T,VECTOR<int,d> >& ke)
+{
+}
+//#####################################################################
+// Function Velocity_Fourier_Analysis
+//#####################################################################
+template<class TV> void STANDARD_TESTS_BASE<TV>::
+Velocity_Fourier_Analysis(const std::string& base_filename,const ARRAY<T,FACE_INDEX<TV::m> >& u,T max_ke) const
+{
+    FFT<TV> fft;
+    ARRAY<T,TV_INT> ua(grid.Domain_Indices()),ke(ua.domain);
+    ARRAY<std::complex<T>,TV_INT> out(ua.domain);
+
+    T scale=phases(PHASE_ID()).density/(max_ke*ke.domain.Size());
+    TV coefficients=(T)(2*pi)/grid.domain.Edge_Lengths();
+    TV_INT counts=grid.numbers_of_cells,hi=counts/2,lo=hi-counts;
+    ARRAY<T> bins(rint((coefficients*TV((hi-1).Componentwise_Max(-lo))).Magnitude())+1);
+    for(int a=0;a<TV::m;a++){
+        ua.Put(u.Component(a),ua);
+        fft.Transform(ua,out);
+        for(RANGE_ITERATOR<TV::m> it(ke.domain);it.Valid();it.Next()){
+            TV k=coefficients*TV(wrap(it.index,lo,hi));
+            ke(it.index)=sqr(abs(out(it.index)))*scale;
+            bins(rint(k.Magnitude()))+=ke(it.index);}
+        Dump_Image(base_filename+"-ke-"+"xyz"[a]+".png",ke);}
+    std::ofstream fout(base_filename+"-bins.txt");
+    for(int i=0;i<bins.m;i++)
+        fout<<i<<" "<<bins(i)<<std::endl;
 }
 template class STANDARD_TESTS_BASE<VECTOR<float,2> >;
 template class STANDARD_TESTS_BASE<VECTOR<float,3> >;
