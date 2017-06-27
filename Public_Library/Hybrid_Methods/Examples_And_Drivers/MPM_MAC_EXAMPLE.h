@@ -4,6 +4,8 @@
 //#####################################################################
 #ifndef __MPM_MAC_EXAMPLE__
 #define __MPM_MAC_EXAMPLE__
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/PAIR.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Grid_Tools/Grids/GRID.h>
@@ -128,11 +130,12 @@ public:
     
     // debugging
     DEBUG_PARTICLES<TV>& debug_particles;
-    bool print_stats;
     TV last_linear_momentum;
     typename TV::SPIN last_angular_momentum;
-    T last_te;
-    T last_grid_ke;
+    T last_grid_te=0;
+    T last_grid_ke=0;
+    T last_part_te=0;
+    T last_part_ke=0;
     bool test_system;
     bool print_matrix;
 
@@ -144,12 +147,12 @@ public:
     void Write_Output_Files(const int frame);
     void Read_Output_Files(const int frame);
     virtual void Initialize()=0;
-    std::function<void(int frame)> begin_frame;
-    std::function<void(int frame)> end_frame;
-    std::function<void(T time)> begin_time_step;
-    std::function<void(T time)> end_time_step;
-    std::function<void (int frame)> write_output_files;
-    std::function<void (int frame)> read_output_files;
+    ARRAY<std::function<void(int frame)> > begin_frame;
+    ARRAY<std::function<void(int frame)> > end_frame;
+    ARRAY<std::function<void(int frame)> > write_output_files;
+    ARRAY<std::function<void(int frame)> > read_output_files;
+
+    HASHTABLE<std::string,PAIR<bool,VECTOR<ARRAY<std::function<void()> >,2> > > time_step_callbacks; // begin, end
 
     T Potential_Energy(const T time) const;
     void Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const;
@@ -176,6 +179,10 @@ public:
     T Total_Particle_Kinetic_Energy(const PHASE& ph) const;
     T Average_Particle_Mass() const;
     T Average_Particle_Mass(const PHASE& ph) const;
+    void Execute_Callbacks(bool is_begin,const char* func_name);
+    void Add_Callbacks(bool is_begin,const char* func_name,std::function<void()> func);
+    void Print_Grid_Stats(const char* str);
+    void Print_Particle_Stats(const char* str);
 //#####################################################################
 };
 }

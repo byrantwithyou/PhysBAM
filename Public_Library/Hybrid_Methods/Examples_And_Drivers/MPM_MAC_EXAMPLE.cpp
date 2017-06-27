@@ -35,7 +35,7 @@ MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type)
     use_massless_particles(false),use_multiphase_projection(false),use_bump(false),use_reseeding(false),
     use_periodic_test_shift(false),use_viscosity(false),
     debug_particles(*new DEBUG_PARTICLES<TV>),
-    print_stats(false),last_te(0),last_grid_ke(0),test_system(false),print_matrix(false)
+    test_system(false),print_matrix(false)
 {
     bc_type.Fill(BC_WALL);
 }
@@ -125,7 +125,7 @@ Write_Output_Files(const int frame)
             }
         }
     }
-    if(write_output_files) write_output_files(frame);
+    for(int i=0;i<write_output_files.m;i++) write_output_files(i)(frame);
 }
 //#####################################################################
 // Function Read_Output_Files
@@ -136,7 +136,7 @@ Read_Output_Files(const int frame)
     std::string f=LOG::sprintf("%d",frame);
     Read_From_File(stream_type,LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
     Read_From_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
-    if(read_output_files) read_output_files(frame);
+    for(int i=0;i<read_output_files.m;i++) read_output_files(i)(frame);
 }
 //#####################################################################
 // Function Potential_Energy
@@ -383,6 +383,56 @@ template<class TV> void MPM_MAC_EXAMPLE<TV>::
 Add_Fluid_Wall(IMPLICIT_OBJECT<TV>* io)
 {
     fluid_walls.Append(io);
+}
+//#####################################################################
+// Function Add_Callbacks
+//#####################################################################
+template<class TV> void MPM_MAC_EXAMPLE<TV>::
+Add_Callbacks(bool is_begin,const char* func_name,std::function<void()> func)
+{
+    time_step_callbacks.Get_Or_Insert(func_name).y(is_begin).Append(func);
+}
+//#####################################################################
+// Function Print_Grid_Stats
+//#####################################################################
+template<class TV> void MPM_MAC_EXAMPLE<TV>::
+Print_Grid_Stats(const char* str)
+{
+    typename TV::SPIN am=Total_Grid_Angular_Momentum(dt);
+    TV lm=Total_Grid_Linear_Momentum();
+    T ke=Total_Grid_Kinetic_Energy();
+    T pe=Potential_Energy(time);
+    T te=ke+pe;
+    LOG::cout<<str<<" linear  "<<"time " <<time<<" value "<<lm<<"  diff "<<(lm-last_linear_momentum)<<std::endl;
+    LOG::cout<<str<<" angular "<<"time " <<time<<" value "<<am<<"  diff "<<(am-last_angular_momentum)<<std::endl;
+    LOG::cout<<str<<" ke "<<"time " <<time<<" value "<<ke<<"  diff "<<(ke-last_grid_ke)<<std::endl;
+    LOG::cout<<str<<" pe "<<"time " <<time<<" value "<<pe<<std::endl;
+    LOG::cout<<str<<" total energy "<<"time " <<time<<" value "<<te<<" diff "<<(te-last_grid_te)<<std::endl;
+    last_linear_momentum=lm;
+    last_angular_momentum=am;
+    last_grid_ke=ke;
+    last_grid_te=te;
+}
+//#####################################################################
+// Function Print_Grid_Stats
+//#####################################################################
+template<class TV> void MPM_MAC_EXAMPLE<TV>::
+Print_Particle_Stats(const char* str)
+{
+    typename TV::SPIN am=Total_Particle_Angular_Momentum();
+    TV lm=Total_Particle_Linear_Momentum();
+    T ke=Total_Particle_Kinetic_Energy();
+    T pe=Potential_Energy(time);
+    T te=ke+pe;
+    LOG::cout<<str<<" linear  "<<"time " <<time<<" value "<<lm<<"  diff "<<(lm-last_linear_momentum)<<std::endl;
+    LOG::cout<<str<<" angular "<<"time " <<time<<" value "<<am<<"  diff "<<(am-last_angular_momentum)<<std::endl;
+    LOG::cout<<str<<" ke "<<"time " <<time<<ke<<"  diff "<<(ke-last_part_ke)<<std::endl;
+    LOG::cout<<str<<" pe "<<"time " <<time<<" value "<<pe<<std::endl;
+    LOG::cout<<str<<" total energy "<<"time " <<time<<" value "<<te<<" diff "<<(te-last_part_te)<<std::endl;
+    last_linear_momentum=lm;
+    last_angular_momentum=am;
+    last_part_ke=ke;
+    last_part_te=te;
 }
 //#####################################################################
 namespace PhysBAM{

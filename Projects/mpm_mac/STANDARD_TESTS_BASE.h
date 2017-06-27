@@ -31,7 +31,7 @@ public:
     using BASE::collision_objects;using BASE::substeps_delay_frame;using BASE::output_directory;
     using BASE::restart;using BASE::dt;using BASE::time;using BASE::use_early_gradient_transfer;
     using BASE::frame_dt;using BASE::min_dt;using BASE::max_dt;using BASE::ghost;
-    using BASE::use_affine;using BASE::print_stats;using BASE::only_write_particles;
+    using BASE::use_affine;using BASE::only_write_particles;
     using BASE::cfl;using BASE::solver_tolerance;using BASE::solver_iterations;
     using BASE::threads;using BASE::weights;using BASE::stream_type;using BASE::Set_Weights;
     using BASE::Add_Collision_Object;using BASE::use_particle_volumes;using BASE::move_mass_inside;
@@ -41,6 +41,7 @@ public:
     using BASE::begin_frame;using BASE::end_frame;using BASE::periodic_test_shift;using BASE::use_periodic_test_shift;
     using BASE::random;using BASE::use_viscosity;using typename BASE::PHASE;
     using BASE::use_constant_density;using BASE::bc_type;using BASE::BC_PERIODIC;
+    using BASE::Add_Callbacks;using BASE::Print_Particle_Stats;using BASE::Print_Grid_Stats;
 
     int test_number;
     int resolution;

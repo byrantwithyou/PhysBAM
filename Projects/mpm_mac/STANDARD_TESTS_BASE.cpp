@@ -38,6 +38,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     bool use_quasi_exp_F_update=false;
     bool no_affine=false;
     bool use_separate=false,use_slip=false,use_stick=false;
+    bool print_stats=false;
     parse_args.Extra(&test_number,"example number","example number to run");
     parse_args.Add("-restart",&restart,"frame","restart frame");
     parse_args.Add("-resolution",&resolution,&user_resolution,"resolution","grid resolution");
@@ -122,6 +123,24 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
 
     particles.Store_B(use_affine);
     particles.Store_C(false);
+
+    if(use_periodic_test_shift){
+        auto shift_func=[this](int sign){
+                TV shift=TV(sign*periodic_test_shift)*grid.dX;
+                for(int i=0;i<particles.X.m;i++)
+                    particles.X(i)=wrap(particles.X(i)+shift,grid.domain.min_corner,grid.domain.max_corner);};
+        Add_Callbacks(true,"time-step",[=](){[=](){shift_func(1);};});
+        Add_Callbacks(false,"time-step",[=](){[=](){shift_func(-1);};});}
+
+    if(print_stats){
+        auto stats_p=[=](const char* name){Add_Callbacks(false,name,[=](){Print_Particle_Stats(name);});};
+        auto stats_g=[=](const char* name){Add_Callbacks(false,name,[=](){Print_Grid_Stats(name);});};
+        stats_p("simulated-particles");
+        stats_g("p2g");
+        stats_g("forces");
+        stats_g("projection");
+        stats_g("viscosity");
+        stats_p("g2p");}
 }
 //#####################################################################
 // Destructor

@@ -9,6 +9,7 @@
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/PHASE_ID.h>
 #include <climits>
+#include <functional>
 namespace PhysBAM{
 
 template<class TV> class MPM_MAC_EXAMPLE;
@@ -56,9 +57,6 @@ public:
     T Grid_V_Upper_Bound() const;
     T Grid_V_Upper_Bound(const PHASE& ph) const;
     void Update_Simulated_Particles();
-    void Print_Grid_Stats(const char* str,T dt);
-    void Print_Particle_Stats(const char* str,T dt);
-    void Print_Energy_Stats(const char* str);
     void Compute_Poisson_Matrix();
     void Move_Mass_Momentum_Inside(PHASE& ph) const;
     void Move_Mass_Momentum_Inside_Nearest(PHASE& ph) const;
@@ -80,10 +78,10 @@ public:
     int Allocate_Projection_System_Variable();
     void Compute_Laplacian(int var);
     void Compute_Gradient(int nvar);
-    void Shift_Particle_Position_Periodic(TV shift);
     void Dump_Grid_ShiftTest(const std::string& var_name,const ARRAY<T,FACE_INDEX<TV::m> >& arr);
     void Reseeding();
     T Phase_And_Phi(const TV& X,PHASE_ID& phase) const;
+    void Step(std::function<void()> func,const char* name,bool dump_substep=true,bool do_step=true);
 //#####################################################################
 };
 }

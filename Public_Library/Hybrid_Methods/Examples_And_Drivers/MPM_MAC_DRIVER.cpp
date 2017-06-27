@@ -69,6 +69,9 @@ Execute_Main_Program()
 {
     Initialize();
     Simulate_To_Frame(example.last_frame);
+    for(const auto& it:example.time_step_callbacks)
+        if(!it.data.x)
+            PHYSBAM_FATAL_ERROR("Unrecognized time step callback: "+it.key);
     FINE_TIMER::Dump_Timing_Info();
 }
 //#####################################################################
@@ -136,50 +139,17 @@ template<class TV> void MPM_MAC_DRIVER<TV>::
 Advance_One_Time_Step()
 {
     TIMER_SCOPE_FUNC;
-    if(example.begin_time_step) example.begin_time_step(example.time);
-
-    TV shift=TV(example.periodic_test_shift)*example.grid.dX;
-    if(example.use_periodic_test_shift)
-        Shift_Particle_Position_Periodic(shift);
-
-    Update_Simulated_Particles();
-    Print_Particle_Stats("particle state",example.dt);
-    Update_Particle_Weights();
-    Prepare_Scatter();
-    Particle_To_Grid();
-    Print_Grid_Stats("after particle to grid",example.dt);
-    Print_Energy_Stats("after particle to grid");
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after particle to grid",0,1);
-
-    Build_Level_Sets();
-    Bump_Particles();
-    Reseeding();
-    Apply_Forces();
-    Print_Grid_Stats("after forces",example.dt);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after forces",0,1);
-    Pressure_Projection();
-    Print_Grid_Stats("after projection",example.dt);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after projection",0,1);
-    Apply_Viscosity();
-    Print_Grid_Stats("after viscosity",example.dt);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after viscosity",0,1);
-
-    Grid_To_Particle();
-
-    if(example.use_periodic_test_shift)
-        Shift_Particle_Position_Periodic(-shift);
-
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after grid to particle",0,1);
-    if(example.end_time_step) example.end_time_step(example.time);
-}
-//#####################################################################
-// Shift_Particle_Position_Periodic
-//#####################################################################
-template<class TV> void MPM_MAC_DRIVER<TV>::
-Shift_Particle_Position_Periodic(TV shift)
-{
-    for(int i=0;i<example.particles.X.m;i++)
-        example.particles.X(i)=wrap(example.particles.X(i)+shift,example.grid.domain.min_corner,example.grid.domain.max_corner);
+    Step([=](){Update_Simulated_Particles();},"simulated-particles",false);
+    Step([=](){Update_Particle_Weights();},"update-weights",false);
+    Step([=](){Prepare_Scatter();},"prepare-scatter",false);
+    Step([=](){Particle_To_Grid();},"p2g");
+    Step([=](){Build_Level_Sets();},"build-level-sets",false,example.use_phi);
+    Step([=](){Bump_Particles();},"bump-particles",true,example.use_bump);
+    Step([=](){Reseeding();},"reseeding",true,example.use_reseeding);
+    Step([=](){Apply_Forces();},"forces");
+    Step([=](){Pressure_Projection();},"projection");
+    Step([=](){Apply_Viscosity();},"viscosity",true,example.use_viscosity);
+    Step([=](){Grid_To_Particle();},"g2p");
 }
 //#####################################################################
 // Dump_Grid_ShiftTest
@@ -204,7 +174,8 @@ Simulate_To_Frame(const int frame)
     TIMER_SCOPE_FUNC;
     for(;current_frame<frame;current_frame++){
         LOG::SCOPE scope("FRAME","frame %d",current_frame+1);
-        if(example.begin_frame) example.begin_frame(current_frame);
+        for(int i=0;i<example.begin_frame.m;i++)
+            example.begin_frame(i)(current_frame);
         if(example.substeps_delay_frame==current_frame)
             DEBUG_SUBSTEPS::Set_Write_Substeps_Level(example.write_substeps_level);
         T time_at_frame=example.time+example.frame_dt;
@@ -221,9 +192,10 @@ Simulate_To_Frame(const int frame)
             example.dt=next_time-example.time;
             LOG::cout<<"substep dt: "<<example.dt<<std::endl;
 
-            Advance_One_Time_Step();
+            Step([=](){Advance_One_Time_Step();},"time-step");
             example.time=next_time;}
-        if(example.end_frame) example.end_frame(current_frame);
+        for(int i=0;i<example.end_frame.m;i++)
+            example.end_frame(i)(current_frame);
         Write_Output_Files(++output_number);}
 }
 //#####################################################################
@@ -345,7 +317,6 @@ Particle_To_Grid(PHASE& ph) const
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Build_Level_Sets()
 {
-    if(!example.use_phi) return;
     for(PHASE_ID i(0);i<example.phases.m;i++)
         Build_Level_Sets(example.phases(i));
     if(Value(example.phases.m)==1) return;
@@ -408,9 +379,6 @@ Build_Level_Sets(PHASE& ph)
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Bump_Particles()
 {
-    if(!example.use_bump)
-        return;
-    
     T weno_eps=(T)1e-6;
     T dx=example.grid.dX.Max();
     T one_over_dx=(T)1/dx;
@@ -512,9 +480,6 @@ Nearest_Point_On_Surface(const TV& p,const PHASE& ph,
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Reseeding()
 {
-    if(!example.use_reseeding)
-        return;
-
     LINEAR_INTERPOLATION_MAC<TV,T> li(example.grid);
     int target_ppc=1<<TV::m;
     ARRAY<ARRAY<int>,TV_INT> particle_counts(example.grid.Domain_Indices());
@@ -1181,60 +1146,6 @@ Update_Simulated_Particles()
                 ph.simulated_particles.Append(p);}}
 }
 //#####################################################################
-// Function Print_Grid_Stats
-//#####################################################################
-template<class TV> void MPM_MAC_DRIVER<TV>::
-Print_Grid_Stats(const char* str,T dt)
-{
-    TIMER_SCOPE_FUNC;
-    if(!example.print_stats) return;
-    typename TV::SPIN am=example.Total_Grid_Angular_Momentum(dt);
-    TV lm=example.Total_Grid_Linear_Momentum();
-    T ke=example.Total_Grid_Kinetic_Energy();
-    LOG::cout<<str<<" linear  "<<"time " <<example.time<<" value "<<lm<<"  diff "<<(lm-example.last_linear_momentum)<<std::endl;
-    LOG::cout<<str<<" angular "<<"time " <<example.time<<" value "<<am<<"  diff "<<(am-example.last_angular_momentum)<<std::endl;
-    LOG::cout<<str<<" ke "<<"time " <<example.time<<" value "<<ke<<"  diff "<<(ke-example.last_grid_ke)<<std::endl;
-    example.last_linear_momentum=lm;
-    example.last_angular_momentum=am;
-    example.last_grid_ke=ke;
-}
-//#####################################################################
-// Function Print_Grid_Stats
-//#####################################################################
-template<class TV> void MPM_MAC_DRIVER<TV>::
-Print_Particle_Stats(const char* str,T dt)
-{
-    TIMER_SCOPE_FUNC;
-    if(!example.print_stats) return;
-    typename TV::SPIN am=example.Total_Particle_Angular_Momentum();
-    TV lm=example.Total_Particle_Linear_Momentum();
-    // T ke=example.Total_Particle_Kinetic_Energy();
-    LOG::cout<<str<<" linear  "<<"time " <<example.time<<" value "<<lm<<"  diff "<<(lm-example.last_linear_momentum)<<std::endl;
-    LOG::cout<<str<<" angular "<<"time " <<example.time<<" value "<<am<<"  diff "<<(am-example.last_angular_momentum)<<std::endl;
-    // LOG::cout<<str<<" ke "<<ke<<"  diff "<<(ke-example.last_grid_ke)<<std::endl;
-    example.last_linear_momentum=lm;
-    example.last_angular_momentum=am;
-    // example.last_grid_ke=ke;
-}
-//#####################################################################
-// Function Print_Energy_Stats
-//#####################################################################
-template<class TV> void MPM_MAC_DRIVER<TV>::
-Print_Energy_Stats(const char* str)
-{
-    TIMER_SCOPE_FUNC;
-    if(!example.print_stats) return;
-    T ke=example.Total_Grid_Kinetic_Energy();
-    T ke2=example.Total_Particle_Kinetic_Energy();
-    T pe=example.Potential_Energy(example.time);
-    T te=ke+pe;
-    LOG::cout<<str<<" kinetic  "<<"time " <<example.time<<" value "<<ke<<std::endl;
-    LOG::cout<<str<<" potential "<<"time " <<example.time<<" value "<<pe<<std::endl;
-    LOG::cout<<str<<" total energy "<<"time " <<example.time<<" value "<<te<<" diff "<<(te-example.last_te)<<std::endl;
-    LOG::cout<<str<<" particle total energy "<<"time " <<example.time<<" value "<<(ke2+pe)<<std::endl;
-    example.last_te=te;
-}
-//#####################################################################
 // Function Prepare_Scatter
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
@@ -1290,7 +1201,6 @@ Fix_Periodic_Accum(ARRAY<T2,FACE_INDEX<TV::m> >& u,int ghost) const
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Apply_Viscosity()
 {
-    if(!example.use_viscosity) return;
     TIMER_SCOPE_FUNC;
     PHYSBAM_ASSERT(example.phases.m==PHASE_ID(1)); // Single phase for now.
     typedef KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > VEC;
@@ -1389,6 +1299,20 @@ Apply_Viscosity()
             int i=velocity_index(it.index);
             if(i>=0) ph.velocity(face)=sol.v(i);
             else ph.velocity(face)=0;}}
+}
+//#####################################################################
+// Function Step
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Step(std::function<void()> func,const char* name,bool dump_substep,bool do_step)
+{
+    PAIR<bool,VECTOR<ARRAY<std::function<void()> >,2> >* p=example.time_step_callbacks.Get_Pointer(name);
+    if(p) p->x=true; // Flag the callback name as recognized, for sanity checking later
+    if(!do_step) return;
+    if(p) for(int i=0;i<p->y(1).m;i++) p->y(1)(i)();
+    func();
+    if(p) for(int i=0;i<p->y(0).m;i++) p->y(0)(i)();
+    if(dump_substep) PHYSBAM_DEBUG_WRITE_SUBSTEP(name,0,1);
 }
 //#####################################################################
 namespace PhysBAM{
