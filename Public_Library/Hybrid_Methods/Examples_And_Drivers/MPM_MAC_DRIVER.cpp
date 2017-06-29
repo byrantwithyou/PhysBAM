@@ -185,7 +185,7 @@ Simulate_To_Frame(const int frame)
             example.dt=Compute_Dt();
             example.dt=clamp(example.dt,example.min_dt,example.max_dt);
             T next_time=example.time+example.dt;
-            if(next_time>time_at_frame){
+            if(next_time*(T)1.00001>time_at_frame){ // Account for roundoff errors
                 next_time=time_at_frame;
                 done=true;}
             else if(next_time+example.dt>time_at_frame) next_time=(example.time+time_at_frame)/2;
