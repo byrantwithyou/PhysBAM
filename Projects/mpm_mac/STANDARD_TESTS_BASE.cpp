@@ -21,6 +21,7 @@
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS_SPLINE.h>
 #include <Hybrid_Methods/Projection/MPM_PROJECTION_SYSTEM.h>
+#include <Hybrid_Methods/Seeding/MPM_PARTICLE_SOURCE.h>
 #include <fstream>
 #include "STANDARD_TESTS_BASE.h"
 #ifdef USE_OPENMP
@@ -36,7 +37,8 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     user_last_frame(false),order(2),seed(1234),particles_per_cell(1<<TV::m),regular_seeding(false),
     no_regular_seeding(false),scale_mass(1),override_output_directory(false),
     m(1),s(1),kg(1),forced_collision_type(-1),dump_collision_objects(false),
-    test_diff(false),bc_periodic(false),mu(0)
+    test_diff(false),bc_periodic(false),mu(0),poisson_disk(*new POISSON_DISK<TV>(1))
+
 {
     T framerate=24;
     bool use_quasi_exp_F_update=false;
@@ -165,7 +167,8 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
 template<class TV> STANDARD_TESTS_BASE<TV>::
 ~STANDARD_TESTS_BASE()
 {
-    if(destroy) destroy();
+    for(int i=0;i<destroy.m;i++) destroy(i)();
+    delete &poisson_disk;
 }
 //#####################################################################
 // Function Seed_Particles
@@ -174,7 +177,6 @@ template<class TV> void STANDARD_TESTS_BASE<TV>::
 Seed_Particles_Poisson(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
     std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,T particles_per_cell)
 {
-    POISSON_DISK<TV> poisson_disk(1);
     ARRAY<TV> X;
     for(int i=0;i<TV::m;i++) poisson_disk.is_periodic(i)=(bc_type(i)==BC_PERIODIC);
     poisson_disk.Set_Distance_By_Volume(grid.dX.Product()/particles_per_cell);
@@ -225,14 +227,22 @@ template<class TV> void STANDARD_TESTS_BASE<TV>::
 Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)> dV,
     const T mass,const T volume)
 {
-    int p=particles.Add_Element();
+    Add_Particle(X,V?V(X):TV(),dV?dV(X):MATRIX<T,TV::m>(),mass,volume);
+}
+//#####################################################################
+// Function Add_Particle
+//#####################################################################
+template<class TV> void STANDARD_TESTS_BASE<TV>::
+Add_Particle(const TV& X,const TV& V,const MATRIX<T,TV::m>& dV,const T mass,const T volume)
+{
+    int p=particles.Add_Element_From_Deletion_List();
     particles.valid(p)=true;
     particles.X(p)=X;
-    if(V) particles.V(p)=V(X);
+    particles.V(p)=V;
     particles.F(p)=MATRIX<T,TV::m>()+1;
     if(particles.store_Fp) particles.Fp(p).Set_Identity_Matrix();
-    if(particles.store_B && dV) particles.B(p)=dV(X)*weights(0)->Dp(X);
-    if(particles.store_C && dV) particles.C(p)=dV(X);
+    if(particles.store_B) particles.B(p)=dV*weights(0)->Dp(X);
+    if(particles.store_C) particles.C(p)=dV;
     if(particles.store_S) particles.S(p)=SYMMETRIC_MATRIX<T,TV::m>()+1;
     particles.mass(p)=mass;
     particles.volume(p)=volume;
@@ -370,6 +380,28 @@ Velocity_Fourier_Analysis(const std::string& base_filename,const ARRAY<T,FACE_IN
     std::ofstream fout(base_filename+"-bins.txt");
     for(int i=0;i<bins.m;i++)
         fout<<i<<" "<<bins(i)<<std::endl;
+}
+//#####################################################################
+// Function Add_Source
+//#####################################################################
+template<class TV> void STANDARD_TESTS_BASE<TV>::
+Add_Source(const TV& X0,const TV& n,IMPLICIT_OBJECT<TV>* io,
+    std::function<void(TV X,T ts,T t,SOURCE_PATH<TV>& p)> path,T density,
+    T particles_per_cell,bool owns_io)
+{
+    MPM_PARTICLE_SOURCE<TV>* source=new MPM_PARTICLE_SOURCE<TV>(
+        poisson_disk,random,X0,n,io,path);
+    T volume=grid.dX.Product()/particles_per_cell;
+    T mass=density*volume;
+    // NOTE: assumes initial particles are already added.
+    source->Seed_Points(particles.X);
+    Add_Callbacks(false,"time-step",[=](){
+            ARRAY<TV> X,V;
+            ARRAY<MATRIX<T,TV::m> > dV;
+            source->Seed(time,dt,X,V,&dV);
+            for(int i=0;i<X.m;i++)
+                Add_Particle(X(i),V(i),dV(i),mass,volume);});
+    if(owns_io) destroy.Append([io](){delete io;});
 }
 template class STANDARD_TESTS_BASE<VECTOR<float,2> >;
 template class STANDARD_TESTS_BASE<VECTOR<float,3> >;

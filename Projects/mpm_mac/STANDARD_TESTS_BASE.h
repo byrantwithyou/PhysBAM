@@ -16,6 +16,8 @@ namespace PhysBAM{
 
 template<class TV> class STANDARD_TESTS;
 template<class T,int d> class ISOTROPIC_CONSTITUTIVE_MODEL;
+template<class TV> class POISSON_DISK;
+template<class TV> struct SOURCE_PATH;
 
 template<class TV>
 class STANDARD_TESTS_BASE:public MPM_MAC_EXAMPLE<TV>
@@ -26,6 +28,7 @@ class STANDARD_TESTS_BASE:public MPM_MAC_EXAMPLE<TV>
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m>::OBJECT T_VOLUME;
 
 public:
+//    typedef typename MPM_PARTICLE_SOURCE<TV>::PATH PATH;
     using BASE::initial_time;using BASE::last_frame;using BASE::grid;using BASE::particles;
     using BASE::frame_title;using BASE::write_substeps_level;using BASE::phases;
     using BASE::collision_objects;using BASE::substeps_delay_frame;using BASE::output_directory;
@@ -57,7 +60,7 @@ public:
     T m,s,kg;
     T unit_p,unit_rho,unit_mu;
     int forced_collision_type;
-    std::function<void ()> destroy;
+    ARRAY<std::function<void ()> > destroy;
     ARRAY<T> extra_T;
     ARRAY<int> extra_int;
     bool dump_collision_objects;
@@ -67,6 +70,7 @@ public:
     T mu;
     bool analyze_u_modes=false;
     T max_ke=0;
+    POISSON_DISK<TV>& poisson_disk;
 
     STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS_BASE();
@@ -97,6 +101,7 @@ public:
 
     void Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)> dV,
         const T mass,const T volume);
+    void Add_Particle(const TV& X,const TV& V,const MATRIX<T,TV::m>& dV,const T mass,const T volume);
 
     void Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale=TV_INT()+1,int default_resolution=32);
     void Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale,TV_INT resolution_padding,
@@ -105,6 +110,9 @@ public:
     void Set_Phases(const ARRAY<T,PHASE_ID>& phase_densities);
     void Check_Analytic_Velocity() const;
     void Velocity_Fourier_Analysis(const std::string& base_filename,const ARRAY<T,FACE_INDEX<TV::m> >& u,T max_ke) const;
+    void Add_Source(const TV& X0,const TV& n,IMPLICIT_OBJECT<TV>* io,
+        std::function<void(TV X,T ts,T t,SOURCE_PATH<TV>& p)> path,T density,
+        T particles_per_cell,bool owns_io);
 //#####################################################################
 };
 }
