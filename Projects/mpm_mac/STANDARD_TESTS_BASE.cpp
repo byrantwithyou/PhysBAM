@@ -40,9 +40,8 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     test_diff(false),bc_periodic(false),mu(0),poisson_disk(*new POISSON_DISK<TV>(1))
 
 {
-    T framerate=24;
+    T framerate=0;
     bool use_quasi_exp_F_update=false;
-    bool no_affine=false;
     bool use_separate=false,use_slip=false,use_stick=false;
     bool print_stats=false;
     parse_args.Extra(&test_number,"example number","example number to run");
@@ -54,6 +53,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-threads",&threads,"threads","Number of threads");
     parse_args.Add("-o",&output_directory,&override_output_directory,"dir","Output directory");
     parse_args.Add("-framerate",&framerate,"rate","Number of frames per second");
+    parse_args.Add("-frame_dt",&frame_dt,"rate","Number of frames per second");
     parse_args.Add("-min_dt",&min_dt,"dt","Minimum time step size");
     parse_args.Add("-max_dt",&max_dt,"dt","Maximum time step size");
     parse_args.Add("-order",&order,"order","Interpolation basis order");
@@ -100,18 +100,16 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     if(use_slip) forced_collision_type=COLLISION_TYPE::slip;
     if(use_stick) forced_collision_type=COLLISION_TYPE::stick;
     if(use_separate) forced_collision_type=COLLISION_TYPE::separate;
-    
+
     unit_p=kg*pow<2-TV::m>(m)/(s*s);
     unit_rho=kg*pow<-TV::m>(m);
     unit_mu=kg*pow<2-TV::m>(m)/s;
     min_dt*=s;
     max_dt*=s;
     mu*=unit_mu;
-    
-    if(no_affine) use_affine=false;
 
-    framerate/=s;
-    frame_dt=1/framerate;
+    if(framerate) frame_dt=1/framerate;
+    frame_dt*=s;
 
 #ifdef USE_OPENMP
     omp_set_num_threads(threads);
@@ -318,11 +316,26 @@ Check_Analytic_Velocity() const
                 T e=abs(u-v(it.face.axis));
                 max_error=std::max(max_error,e);
                 l2_error+=sqr(e);
-                num_l2_samples++;}}
-        std::function<TV (PHASE_ID pid,const TV& X,T time)> analytic_velocity;}
+                num_l2_samples++;}}}
     if(num_l2_samples) l2_error/=num_l2_samples;
     l2_error=sqrt(l2_error);
-    LOG::printf("velocity error: inf=%g l2=%g\n",max_error,l2_error);
+    LOG::printf("grid velocity error: L-inf: %g L-2: %g N: %i\n",max_error,l2_error,num_l2_samples);
+    max_error=0;
+    l2_error=0;
+    num_l2_samples=0;
+    for(int p=0;p<particles.X.m;p++){
+        if(!particles.valid(p)) continue;
+        PHASE_ID pid(0);
+        if(particles.store_phase) pid=particles.phase(p);
+        TV e=particles.V(p)-analytic_velocity(pid,particles.X(p),time);
+        max_error=std::max(max_error,e.Max_Abs());
+        l2_error+=e.Magnitude_Squared();
+        num_l2_samples+=TV::m;
+        PHYSBAM_ASSERT(l2_error<=num_l2_samples*max_error*max_error+1e-10);
+    }
+    if(num_l2_samples) l2_error/=num_l2_samples;
+    l2_error=sqrt(l2_error);
+    LOG::printf("particle velocity error: L-inf: %g L-2: %g N: %i\n",max_error,l2_error,num_l2_samples);
 }
 //#####################################################################
 // Function Dump_Image
