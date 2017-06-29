@@ -77,6 +77,10 @@ public:
     MPM_PROJECTION_VECTOR<TV>& rhs;
     int ghost;
     VECTOR<BC_TYPE,TV::m*2> bc_type; // -x, +x, -y, +y, -z, +z
+    // Valid if BC_WALL; velocity at face. null=0
+    VECTOR<std::function<T(FACE_INDEX<TV::m>,PHASE_ID,T)>,TV::m*2> bc_velocity;
+    // Valid if BC_INVALID; pressure at ghost cell. null=0
+    VECTOR<std::function<T(TV_INT,T)>,TV::m*2> bc_pressure;
     BOUNDARY_MAC_GRID_PERIODIC<TV,T>& periodic_boundary;
     ARRAY<int,TV_INT> cell_index;
     ARRAY<bool,FACE_INDEX<TV::m> > psi_N;

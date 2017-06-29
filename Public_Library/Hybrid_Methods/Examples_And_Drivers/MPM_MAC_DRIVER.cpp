@@ -818,12 +818,19 @@ Apply_BC()
     for(FACE_ITERATOR_THREADED<TV> it(example.grid,3);it.Valid();it.Next()){
         bool N=false;
         for(int i=0;i<TV::m;i++){
-            if((it.index(i)<domains(it.axis).min_corner(i) && example.bc_type(2*i)==example.BC_WALL) ||
-                (it.index(i)>=domains(it.axis).max_corner(i) && example.bc_type(2*i+1)==example.BC_WALL)){
+            if(it.index(i)<domains(it.axis).min_corner(i) && example.bc_type(2*i)==example.BC_WALL){
                 N=true;
                 for(PHASE_ID p(0);p<example.phases.m;p++)
                     if(example.phases(p).mass(it.Full_Index()))
-                        example.phases(p).velocity(it.Full_Index())=0;
+                        example.phases(p).velocity(it.Full_Index())=
+                            example.bc_velocity(2*i)?example.bc_velocity(2*i)(it.Full_Index(),p,example.time):0;
+                break;}
+            if(it.index(i)>=domains(it.axis).max_corner(i) && example.bc_type(2*i+1)==example.BC_WALL){
+                N=true;
+                for(PHASE_ID p(0);p<example.phases.m;p++)
+                    if(example.phases(p).mass(it.Full_Index()))
+                        example.phases(p).velocity(it.Full_Index())=
+                            example.bc_velocity(2*i+1)?example.bc_velocity(2*i+1)(it.Full_Index(),p,example.time):0;
                 break;}}
         TV X=it.Location();
         if(!N)
@@ -866,6 +873,8 @@ Allocate_Projection_System_Variable()
         if(!all_N && !dirichlet)
             example.cell_index(it.index)=nvar++;}
     Fix_Periodic(example.cell_index,1);
+    example.rhs.v.Remove_All();
+    example.rhs.v.Resize(nvar);
     return nvar;
 }
 //#####################################################################
@@ -898,7 +907,13 @@ Compute_Laplacian(int nvar)
                         diag+=entry;
                         int ci=example.cell_index(cell);
                         if(ci>=0) helper.Add_Entry(ci,-entry);
-                        else has_dirichlet=true;}
+                        else{
+                            has_dirichlet=true;
+                            for(int a=0;a<TV::m;a++){
+                                if(cell(a)<0 && example.bc_pressure(2*a))
+                                    example.rhs.v(center_index)+=entry*example.bc_pressure(2*a)(cell,example.time);
+                                else if(cell(a)>=example.grid.numbers_of_cells(a) && example.bc_pressure(2*a+1))
+                                    example.rhs.v(center_index)+=entry*example.bc_pressure(2*a+1)(cell,example.time);}}}
                     face.index(a)++;}}
             helper.Add_Entry(center_index,diag);}
         helper.Finish();
@@ -933,22 +948,32 @@ Compute_Gradient(int nvar)
         ARRAY<T>& mass_t=mass_h.Array();
         ARRAY<FACE_INDEX<TV::m> >& faces_t=faces_h.Array();
         SPARSE_MATRIX_THREADED_CONSTRUCTION<T> G_helper(example.projection_system.gradient,tmp2,tmp3);
+        ARRAY<PAIR<PHASE_ID,T> > face_fractions;
         for(FACE_ITERATOR_THREADED<TV> it(example.grid);it.Valid();it.Next()){
-            if(example.psi_N(it.Full_Index())) continue;
+            FACE_INDEX<TV::m> face=it.Full_Index();
+            int c0=example.cell_index(it.First_Cell_Index());
+            int c1=example.cell_index(it.Second_Cell_Index());
+            if(c0<0 && c1<0) continue;
+            if(example.psi_N(face)){
+                Face_Fraction(face,face_fractions);
+                T u_star=0;
+                for(int j=0;j<face_fractions.m;j++)
+                    u_star+=face_fractions(j).y*example.phases(face_fractions(j).x).velocity(face);
+                T rhs=example.grid.one_over_dX(it.axis)*u_star;
+                if(c0>=0) example.rhs.v(c0)-=rhs;
+                if(c1>=0) example.rhs.v(c1)+=rhs;
+                continue;}
             if(example.bc_type(it.axis)==example.BC_PERIODIC)
                 if(it.index(it.axis)==example.grid.numbers_of_cells(it.axis))
                     continue;
 
-            T mass=Density(it.Full_Index());
+            T mass=Density(face);
             if(!mass) continue;
 
-            int c0=example.cell_index(it.First_Cell_Index());
-            int c1=example.cell_index(it.Second_Cell_Index());
-            if(c0<0 && c1<0) continue;
             G_helper.Start_Row();
             if(c0>=0) G_helper.Add_Entry(c0,-example.grid.one_over_dX(it.axis));
             if(c1>=0) G_helper.Add_Entry(c1,example.grid.one_over_dX(it.axis));
-            faces_t.Append(it.Full_Index());
+            faces_t.Append(face);
             mass_t.Append(mass);}
 
         G_helper.Finish();
@@ -979,7 +1004,6 @@ Pressure_Projection()
 
     Compute_Poisson_Matrix();
     example.sol.v.Resize(example.projection_system.A.m);
-    example.rhs.v.Resize(example.projection_system.A.m);
 
     ARRAY<T> tmp(example.projection_system.gradient.m);
     ARRAY<PAIR<PHASE_ID,T> > face_fractions;
@@ -990,7 +1014,7 @@ Pressure_Projection()
         for(int j=0;j<face_fractions.m;j++)
             u_star+=face_fractions(j).y*example.phases(face_fractions(j).x).velocity(face);
         tmp(i)=u_star;}
-    example.projection_system.gradient.Transpose_Times(tmp,example.rhs.v);
+    example.projection_system.gradient.Transpose_Times_Add(tmp,example.rhs.v);
 
     if(!example.projection_system.dc_present)
         example.projection_system.Compute_Ones_Nullspace();
