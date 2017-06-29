@@ -848,7 +848,6 @@ Allocate_Projection_System_Variable()
     example.cell_index.Resize(example.grid.Domain_Indices(2),false,false);
     example.cell_index.Fill(-1);
     int nvar=0;
-    example.projection_system.dc_present=false;
     for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
         bool dirichlet=false,all_N=true;
         for(int a=0;a<TV::m;a++){
@@ -861,9 +860,8 @@ Allocate_Projection_System_Variable()
                         for(PHASE_ID p=PHASE_ID(0);p<example.phases.m;p++){
                             if(example.phases(p).mass(face)){
                                 all_phase_dirichlet=false;}}
-                        if(all_phase_dirichlet){
-                            dirichlet=true;
-                            example.projection_system.dc_present=true;}}}
+                        if(all_phase_dirichlet)
+                            dirichlet=true;}}
                 face.index(a)++;}}
         if(!all_N && !dirichlet)
             example.cell_index(it.index)=nvar++;}
@@ -880,6 +878,7 @@ Compute_Laplacian(int nvar)
     ARRAY<int> tmp0,tmp1;
 #pragma omp parallel
     {
+        bool has_dirichlet=false;
         SPARSE_MATRIX_THREADED_CONSTRUCTION<T> helper(example.projection_system.A,tmp0,tmp1);
         for(CELL_ITERATOR_THREADED<TV> it(example.grid,0);it.Valid();it.Next()){
             int center_index=example.cell_index(it.index);
@@ -898,10 +897,14 @@ Compute_Laplacian(int nvar)
                         T entry=sqr(example.grid.one_over_dX(a))/Density(face);
                         diag+=entry;
                         int ci=example.cell_index(cell);
-                        if(ci>=0) helper.Add_Entry(ci,-entry);}
+                        if(ci>=0) helper.Add_Entry(ci,-entry);
+                        else has_dirichlet=true;}
                     face.index(a)++;}}
             helper.Add_Entry(center_index,diag);}
         helper.Finish();
+        if(has_dirichlet)
+#pragma omp critical
+            example.projection_system.dc_present=true;
     }
 
     if(example.projection_system.use_preconditioner)
