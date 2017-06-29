@@ -79,7 +79,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-I",&extra_int,"int","extra int argument");
     parse_args.Add("-dump_collisions",&dump_collision_objects,"dump out collision objects");
     parse_args.Add("-use_volume",&use_particle_volumes,"use particle volumes to avoid boiling");
-    parse_args.Add("-const_density",&use_constant_density,"use particle volumes to avoid boiling");
+    parse_args.Add_Not("-use_mass",&use_constant_density,"use particle volumes to avoid boiling");
     parse_args.Add("-move_mass_inside",&move_mass_inside,"move mass and momentum transferred outside back in");
     parse_args.Add("-move_mass_inside_nearest",&move_mass_inside_nearest,"move mass and momentum transferred outside back in");
     parse_args.Add("-test_system",&test_system,"run sanity checks on Krylov systems");
