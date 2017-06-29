@@ -82,6 +82,7 @@ public:
     void Reseeding();
     T Phase_And_Phi(const TV& X,PHASE_ID& phase) const;
     void Step(std::function<void()> func,const char* name,bool dump_substep=true,bool do_step=true);
+    void Invalidate_Particle(int p);
 //#####################################################################
 };
 }

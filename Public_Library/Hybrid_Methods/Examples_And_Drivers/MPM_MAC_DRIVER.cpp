@@ -515,8 +515,7 @@ Reseeding()
                 if(particles_by_phase(i).m>2*target){
                     example.random.Random_Shuffle(particles_by_phase(i));
                     int p=particles_by_phase(i).Pop();
-                    example.particles.valid(p)=false;
-                    example.particles.Add_To_Deletion_List(p);}
+                    Invalidate_Particle(p);}
                 particles_by_phase(i).Remove_All();}}}
     Update_Simulated_Particles();
     Update_Particle_Weights();
@@ -591,10 +590,10 @@ Grid_To_Particle(const PHASE& ph)
                 T &x=particles.X(p)(i),a=example.grid.domain.min_corner(i),b=example.grid.domain.max_corner(i);
                 if(x<a){
                     if(example.bc_type(2*i)==example.BC_PERIODIC) x=wrap(x,a,b);
-                    else if(example.bc_type(2*i)==example.BC_INVALID) particles.valid(p)=false;}
+                    else if(example.bc_type(2*i)==example.BC_INVALID) Invalidate_Particle(p);}
                 if(x>b){
                     if(example.bc_type(2*i+1)==example.BC_PERIODIC) x=wrap(x,a,b);
-                    else if(example.bc_type(2*i+1)==example.BC_INVALID) particles.valid(p)=false;}}
+                    else if(example.bc_type(2*i+1)==example.BC_INVALID) Invalidate_Particle(p);}}
         });
 }
 //#####################################################################
@@ -1313,6 +1312,15 @@ Step(std::function<void()> func,const char* name,bool dump_substep,bool do_step)
     func();
     if(p) for(int i=0;i<p->y(0).m;i++) p->y(0)(i)();
     if(dump_substep) PHYSBAM_DEBUG_WRITE_SUBSTEP(name,0,1);
+}
+//#####################################################################
+// Function Invalidate_Particle
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Invalidate_Particle(int p)
+{
+    example.particles.valid(p)=false;
+    example.particles.Add_To_Deletion_List(p);
 }
 //#####################################################################
 namespace PhysBAM{
