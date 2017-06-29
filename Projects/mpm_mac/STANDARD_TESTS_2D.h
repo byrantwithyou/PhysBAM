@@ -29,7 +29,7 @@ public:
     using BASE::output_directory;using BASE::restart;using BASE::dt;
     using BASE::time;using BASE::frame_dt;using BASE::min_dt;using BASE::max_dt;
     using BASE::order;using BASE::ghost;using BASE::use_affine;
-    using BASE::cfl;using BASE::solver_tolerance;
+    using BASE::cfl;using BASE::solver_tolerance;using BASE::Add_Source;
     using BASE::solver_iterations;using BASE::threads;using BASE::test_number;
     using BASE::resolution;using BASE::Seed_Particles;using BASE::Add_Particle;
     using BASE::regular_seeding;using BASE::Set_Grid;using BASE::Set_Phases;
@@ -41,7 +41,7 @@ public:
     using BASE::extra_T;using BASE::extra_int;using BASE::gravity;using BASE::phases;
     using BASE::bc_type;using BASE::BC_PERIODIC;using BASE::BC_INVALID;using BASE::Test_dV;using BASE::bc_periodic;
     using BASE::analytic_velocity;using BASE::Check_Analytic_Velocity;using BASE::mu;
-    using BASE::use_viscosity;
+    using BASE::use_viscosity;using BASE::BC_WALL;using BASE::bc_velocity;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();

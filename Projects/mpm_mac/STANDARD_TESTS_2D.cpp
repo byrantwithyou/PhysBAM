@@ -8,6 +8,7 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INVERT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UNION.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
+#include <Hybrid_Methods/Seeding/MPM_PARTICLE_SOURCE.h>
 #include <fstream>
 #include "STANDARD_TESTS_2D.h"
 namespace PhysBAM{
@@ -251,9 +252,36 @@ Initialize()
             auto cshape=Intersect(Make_IO(box),Invert(shape));
             Seed_Particles(*cshape,0,0,air_density,particles_per_cell);
             particles.phase.Array_View(n,particles.phase.m-n).Fill(PHASE_ID(1));
+            delete shape;
             delete cshape;
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
+        case 21:{ // vortex shedding test
+            T density=2*unit_rho*scale_mass;
+            T velocity=1;
+            Set_Phases({density});
+            particles.Store_Phase(true);
+            Set_Grid(RANGE<TV>(TV(-2,-2),TV(14,2))*m,TV_INT(4,1));
+            SPHERE<TV> sphere(TV(),m);
+            auto shape=Intersect(Make_IO(grid.domain),Invert(Make_IO(sphere)));
+            Seed_Particles(*shape,0,0,density,particles_per_cell);
+            delete shape;
+            bc_type(1)=BC_INVALID;
+            bc_velocity(0)=[=](FACE_INDEX<TV::m> face,PHASE_ID pid,T time){return face.axis==0?velocity:0;};
+            Add_Collision_Object(sphere,COLLISION_TYPE::slip,0,0,0);
+            RANGE<TV> source_range=grid.domain;
+            source_range.min_corner.x-=grid.dX.x;
+            Add_Source(grid.domain.min_corner,TV(1,0),Make_IO(source_range),
+                [=](TV X,T ts,T t,SOURCE_PATH<TV>& p)
+                {
+                    p.vp=TV(velocity,0);
+                    p.xp=X+(t-ts)*p.vp;
+                    p.xp_ts=-p.vp;
+                    p.vp_ts=TV();
+                    p.xp_x=MATRIX<T,TV::m>()+1;
+                    p.vp_x=MATRIX<T,TV::m>();
+                },density,particles_per_cell,true);
+        } break;
     }
     if(mu){
         phases(PHASE_ID()).viscosity=mu;
