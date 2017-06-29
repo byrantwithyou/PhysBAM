@@ -146,8 +146,8 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
                 TV shift=TV(sign*periodic_test_shift)*grid.dX;
                 for(int i=0;i<particles.X.m;i++)
                     particles.X(i)=wrap(particles.X(i)+shift,grid.domain.min_corner,grid.domain.max_corner);};
-        Add_Callbacks(true,"time-step",[=](){[=](){shift_func(1);};});
-        Add_Callbacks(false,"time-step",[=](){[=](){shift_func(-1);};});}
+        Add_Callbacks(true,"time-step",[=](){shift_func(1);});
+        Add_Callbacks(false,"time-step",[=](){shift_func(-1);});}
 
     if(print_stats){
         auto stats_p=[=](const char* name){Add_Callbacks(false,name,[=](){Print_Particle_Stats(name);});};
