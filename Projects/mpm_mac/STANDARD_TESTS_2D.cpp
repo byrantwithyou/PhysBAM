@@ -42,7 +42,7 @@ Initialize()
         case 1:{ // stationary circle
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             SPHERE<TV> sphere(TV(.5,.5)*m,.3*m);
-            T density=2*unit_rho*scale_mass;
+            T density=unit_rho*scale_mass;
             Set_Phases({density});
             Seed_Particles(sphere,0,0,density,particles_per_cell);
         } break;
@@ -51,7 +51,7 @@ Initialize()
             if(test_number==2) bc_type.Fill(BC_INVALID);
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             SPHERE<TV> sphere(TV(.5,.5)*m,.3*m);
-            T density=2*unit_rho*scale_mass;
+            T density=unit_rho*scale_mass;
             Set_Phases({density});
             Seed_Particles(sphere,[=](const TV& X){return TV(m/s,0);},0,density,particles_per_cell);
         } break;
@@ -59,7 +59,7 @@ Initialize()
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             SPHERE<TV> sphere(TV(.5,.5)*m,.3*m);
             VECTOR<T,1> angular_velocity(0.4/s);
-            T density=2*unit_rho*scale_mass;
+            T density=unit_rho*scale_mass;
             Set_Phases({density});
             Seed_Particles(sphere,[=](const TV& X){return angular_velocity.Cross(X-sphere.center);},
                 [=](const TV&){return MATRIX<T,2>::Cross_Product_Matrix(angular_velocity);},
@@ -72,27 +72,27 @@ Initialize()
         case 4:{ // freefall circle
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             SPHERE<TV> sphere(TV(.5,.5)*m,.3*m);
-            T density=2*unit_rho*scale_mass;
+            T density=unit_rho*scale_mass;
             Set_Phases({density});
             Seed_Particles(sphere,0,0,density,particles_per_cell);
             gravity=TV(0,-1)*m/sqr(s);
         } break;
         case 5:{ // stationary pool
             Set_Grid(RANGE<TV>::Unit_Box()*m);
-            T density=2*unit_rho*scale_mass;
+            T density=unit_rho*scale_mass;
             Set_Phases({density});
             Seed_Particles(RANGE<TV>(TV(),TV(m,.5*m)),0,0,density,particles_per_cell);
             gravity=TV(0,-1)*m/sqr(s);
         } break;
         case 6:{ // freefall rectangle
             Set_Grid(RANGE<TV>::Unit_Box()*m);
-            T density=2*unit_rho*scale_mass;
+            T density=unit_rho*scale_mass;
             Set_Phases({density});
             Seed_Particles(RANGE<TV>(TV(.2*m,.2*m),TV(.5*m,.8*m)),0,0,density,particles_per_cell);
             gravity=TV(0,-1)*m/sqr(s);
         } break;
         case 7:{ // stationary circles in two phases
-            T density=2*unit_rho*scale_mass;
+            T density=unit_rho*scale_mass;
             Set_Phases({density,density});
             particles.Store_Phase(true);
             Set_Grid(RANGE<TV>::Unit_Box()*m);
@@ -106,7 +106,7 @@ Initialize()
         case 8:{ // concave shape
             this->use_phi=true;
             Set_Grid(RANGE<TV>::Unit_Box()*m);
-            T density=2*unit_rho*scale_mass;
+            T density=unit_rho*scale_mass;
             Set_Phases({density});
             SPHERE<TV> sphere0(TV(.3,.3)*m,.1*m);
             SPHERE<TV> sphere1(TV(.44,.44)*m,.1*m);
@@ -116,7 +116,7 @@ Initialize()
         } break;
         case 9: // freefall circles with different phases
         case 10:{ // freefall circles with same phase
-            T density=2*unit_rho*scale_mass;
+            T density=unit_rho*scale_mass;
             if(test_number==9) Set_Phases({density,density});
             else Set_Phases({density});
             particles.Store_Phase(true);
@@ -138,7 +138,7 @@ Initialize()
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             SPHERE<TV> sphere(TV(.5,.5)*m,.3*m);
             if(test_number==12) sphere.radius=.4*m;
-            T density=2*unit_rho*scale_mass;
+            T density=unit_rho*scale_mass;
             Set_Phases({density});
             Seed_Particles(sphere,0,0,density,particles_per_cell);
             gravity=TV(0,-1)*m/sqr(s);
@@ -148,7 +148,7 @@ Initialize()
         } break;
         case 13:{ // half filled stationary pool with curved boundary
             Set_Grid(RANGE<TV>::Unit_Box()*m);
-            T density=2*unit_rho*scale_mass;
+            T density=unit_rho*scale_mass;
             Set_Phases({density});
             SPHERE<TV> sphere(TV(.5,.5)*m,.4*m);
             RANGE<TV> box(TV(),TV(m,.5*m));
@@ -164,7 +164,7 @@ Initialize()
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             bc_type.Fill(BC_PERIODIC);
             VECTOR<T,1> angular_velocity(0.4/s);
-            T density=2*unit_rho*scale_mass;
+            T density=unit_rho*scale_mass;
             Set_Phases({density});
             for(int i=0;i<2;i++)
                 for(int j=0;j<2;j++){
@@ -185,7 +185,7 @@ Initialize()
             bc_type.Fill(BC_PERIODIC);
             int a=extra_int.m>=1?extra_int(0):1;
             Set_Grid(RANGE<TV>::Centered_Box()*pi*m);
-            T density=2*unit_rho*scale_mass;
+            T density=unit_rho*scale_mass;
             Set_Phases({density});
             auto V_func=[=](const TV& X){return TV(-sin(a*X.x)*cos(a*X.y),cos(a*X.x)*sin(a*X.y));};
             auto dV_func=[=](const TV& X)
@@ -223,7 +223,7 @@ Initialize()
             T a=extra_T.m>=1?extra_T(0):-1;
             T b=extra_T.m>=2?extra_T(1):1;
             Set_Grid(RANGE<TV>::Unit_Box()*m);
-            T density=2*unit_rho*scale_mass;
+            T density=unit_rho*scale_mass;
             Set_Phases({density});
             RANDOM_NUMBERS<T> rand;
             rand.Set_Seed();
@@ -257,7 +257,7 @@ Initialize()
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
         case 21:{ // vortex shedding test
-            T density=2*unit_rho*scale_mass;
+            T density=unit_rho*scale_mass;
             T velocity=1;
             Set_Phases({density});
             particles.Store_Phase(true);
