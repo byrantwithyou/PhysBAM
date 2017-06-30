@@ -147,7 +147,12 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
                 for(int i=0;i<particles.X.m;i++)
                     particles.X(i)=wrap(particles.X(i)+shift,grid.domain.min_corner,grid.domain.max_corner);};
         Add_Callbacks(true,"time-step",[=](){shift_func(1);});
-        Add_Callbacks(false,"time-step",[=](){shift_func(-1);});}
+        Add_Callbacks(false,"time-step",[=](){shift_func(-1);});
+        Add_Callbacks(false,"initialize",[=](){
+                RANDOM_NUMBERS<T> local_random;
+                for(int i=0;i<TV::m;i++)
+                    periodic_test_shift(i)=local_random.Get_Uniform_Integer(0,grid.numbers_of_cells(i)-1);
+                LOG::printf("shift %P\n",periodic_test_shift);});}
 
     if(print_stats){
         auto stats_p=[=](const char* name){Add_Callbacks(false,name,[=](){Print_Particle_Stats(name);});};

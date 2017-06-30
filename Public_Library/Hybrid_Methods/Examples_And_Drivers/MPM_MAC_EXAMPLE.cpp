@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Grid_PDE/Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
@@ -433,6 +434,20 @@ Print_Particle_Stats(const char* str)
     last_angular_momentum=am;
     last_part_ke=ke;
     last_part_te=te;
+}
+//#####################################################################
+// Dump_Grid_ShiftTest
+//#####################################################################
+template<class TV> void MPM_MAC_EXAMPLE<TV>::
+Dump_Grid_ShiftTest(const std::string& var_name,const ARRAY<T,FACE_INDEX<TV::m> >& arr)
+{
+    ARRAY<T,FACE_INDEX<TV::m> > arr_shift(arr.domain_indices);
+    TV_INT id_shift;
+    for(FACE_ITERATOR<TV> fit(grid);fit.Valid();fit.Next()){
+        id_shift=wrap(fit.face.index+periodic_test_shift,TV_INT(),grid.counts);
+        FACE_INDEX<TV::m> fid_shift(fit.face.axis,id_shift);
+        arr_shift(fit.Full_Index())=arr(fid_shift);}
+    LOG::printf("%s\n%P\n",var_name,arr_shift.array);
 }
 //#####################################################################
 namespace PhysBAM{

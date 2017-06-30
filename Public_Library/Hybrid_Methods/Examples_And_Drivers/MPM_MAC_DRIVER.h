@@ -78,7 +78,6 @@ public:
     int Allocate_Projection_System_Variable();
     void Compute_Laplacian(int var);
     void Compute_Gradient(int nvar);
-    void Dump_Grid_ShiftTest(const std::string& var_name,const ARRAY<T,FACE_INDEX<TV::m> >& arr);
     void Reseeding();
     T Phase_And_Phi(const TV& X,PHASE_ID& phase) const;
     void Step(std::function<void()> func,const char* name,bool dump_substep=true,bool do_step=true);

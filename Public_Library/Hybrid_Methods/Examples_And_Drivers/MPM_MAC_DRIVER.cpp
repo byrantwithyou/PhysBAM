@@ -67,7 +67,7 @@ template<class TV> MPM_MAC_DRIVER<TV>::
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Execute_Main_Program()
 {
-    Initialize();
+    Step([=](){Initialize();},"initialize");
     Simulate_To_Frame(example.last_frame);
     for(const auto& it:example.time_step_callbacks)
         if(!it.data.x)
@@ -125,12 +125,6 @@ Initialize()
     Update_Simulated_Particles();
 
     if(!example.restart) Write_Output_Files(0);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",0,1);
-    if(example.use_periodic_test_shift){
-        RANDOM_NUMBERS<T> random;
-        for(int i=0;i<TV::m;i++)
-            example.periodic_test_shift(i)=random.Get_Uniform_Integer(0,example.grid.numbers_of_cells(i)-1);
-        LOG::printf("shift %P\n",example.periodic_test_shift);}
 }
 //#####################################################################
 // Function Advance_One_Time_Step
@@ -150,20 +144,6 @@ Advance_One_Time_Step()
     Step([=](){Pressure_Projection();},"projection");
     Step([=](){Apply_Viscosity();},"viscosity",true,example.use_viscosity);
     Step([=](){Grid_To_Particle();},"g2p");
-}
-//#####################################################################
-// Dump_Grid_ShiftTest
-//#####################################################################
-template<class TV> void MPM_MAC_DRIVER<TV>::
-Dump_Grid_ShiftTest(const std::string& var_name,const ARRAY<T,FACE_INDEX<TV::m> >& arr)
-{
-    ARRAY<T,FACE_INDEX<TV::m> > arr_shift(arr.domain_indices);
-    TV_INT id_shift;
-    for(FACE_ITERATOR<TV> fit(example.grid);fit.Valid();fit.Next()){
-        id_shift=wrap(fit.face.index+example.periodic_test_shift,TV_INT(),example.grid.counts);
-        FACE_INDEX<TV::m> fid_shift(fit.face.axis,id_shift);
-        arr_shift(fit.Full_Index())=arr(fid_shift);}
-    Write_To_Text_File(example.output_directory+LOG::sprintf("/%s",var_name),arr_shift.array,"\n");
 }
 //#####################################################################
 // Function Simulate_To_Frame
@@ -1326,6 +1306,8 @@ Apply_Viscosity()
             int i=velocity_index(it.index);
             if(i>=0) ph.velocity(face)=sol.v(i);
             else ph.velocity(face)=0;}}
+
+    Fix_Periodic(ph.velocity);
 }
 //#####################################################################
 // Function Step

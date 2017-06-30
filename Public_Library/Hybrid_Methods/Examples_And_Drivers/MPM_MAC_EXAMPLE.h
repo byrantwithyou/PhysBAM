@@ -187,6 +187,7 @@ public:
     void Add_Callbacks(bool is_begin,const char* func_name,std::function<void()> func);
     void Print_Grid_Stats(const char* str);
     void Print_Particle_Stats(const char* str);
+    void Dump_Grid_ShiftTest(const std::string& var_name,const ARRAY<T,FACE_INDEX<TV::m> >& arr);
 //#####################################################################
 };
 }
