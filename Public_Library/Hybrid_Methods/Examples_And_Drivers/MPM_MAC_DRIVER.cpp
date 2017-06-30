@@ -1333,12 +1333,14 @@ Apply_Viscosity()
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Step(std::function<void()> func,const char* name,bool dump_substep,bool do_step)
 {
-    PAIR<bool,VECTOR<ARRAY<std::function<void()> >,2> >* p=example.time_step_callbacks.Get_Pointer(name);
-    if(p) p->x=true; // Flag the callback name as recognized, for sanity checking later
+    auto& p=example.time_step_callbacks.Get_Or_Insert(name);
+    p.x=true; // Flag the callback name as recognized, for sanity checking later
     if(!do_step) return;
-    if(p) for(int i=0;i<p->y(1).m;i++) p->y(1)(i)();
+    for(int i=0;i<p.y(1).m;i++) p.y(1)(i)();
     func();
-    if(p) for(int i=0;i<p->y(0).m;i++) p->y(0)(i)();
+    // Note: p may be invalidated by func(), so we must re-access it here.
+    const auto& q=example.time_step_callbacks.Get_Or_Insert(name);
+    for(int i=0;i<q.y(0).m;i++) q.y(0)(i)();
     if(dump_substep) PHYSBAM_DEBUG_WRITE_SUBSTEP(name,0,1);
 }
 //#####################################################################
