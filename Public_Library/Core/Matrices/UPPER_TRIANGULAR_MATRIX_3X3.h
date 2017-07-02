@@ -47,6 +47,10 @@ public:
         :x00(x11_input),x01(x12_input),x11(x22_input),x02(x13_input),x12(x23_input),x22(x33_input)
     {}
 
+    UPPER_TRIANGULAR_MATRIX(const UPPER_TRIANGULAR_MATRIX& matrix_input)
+        :x00(matrix_input.x00),x01(matrix_input.x01),x11(matrix_input.x11),x02(matrix_input.x02),x12(matrix_input.x12),x22(matrix_input.x22)
+    {}
+
     ~UPPER_TRIANGULAR_MATRIX()
     {
         x00.~T();

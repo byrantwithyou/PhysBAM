@@ -62,6 +62,9 @@ public:
         x00.~T();
     }
 
+    SYMMETRIC_MATRIX& operator=(const SYMMETRIC_MATRIX& m)
+    {x00=m.x00;return *this;}
+
     void From_Matrix(const MATRIX<T,1>& matrix_input)
     {x00=matrix_input(0,0);}
 
