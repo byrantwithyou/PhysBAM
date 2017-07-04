@@ -94,6 +94,8 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-test_periodic",&use_periodic_test_shift,"test periodic bc");
     parse_args.Add("-mu",&mu,"mu","viscosity");
     parse_args.Add("-analyze_u_modes",&analyze_u_modes,"Perform FFT analysis on velocity");
+    parse_args.Add("-dump_modes_freq",&dump_modes_freq,"num","Dump FFT modes every num time steps");
+    parse_args.Add("-max_ke",&max_ke,"value","Normalization for FFT images");
 
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);
@@ -131,15 +133,11 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
 
     if(analyze_u_modes){
         Add_Callbacks(false,"p2g",[this](){
-                if(max_ke) return;
-                const PHASE& ph=phases(PHASE_ID());
-                for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next())
-                    for(int i=0;i<TV::m;i++)
-                        max_ke+=sqr(ph.velocity.Component(i)(it.index));
-                max_ke*=ph.density;});
+                static bool done=false;
+                if(!done) Velocity_Fourier_Analysis();
+                done=true;});
         Add_Callbacks(false,"time-step",[this](){
-                static int id=0;
-                Velocity_Fourier_Analysis(LOG::sprintf("u-%i",id++),phases(PHASE_ID()).velocity,max_ke);});}
+                Velocity_Fourier_Analysis();});}
 
     if(use_periodic_test_shift){
         auto shift_func=[this](int sign){
@@ -349,20 +347,16 @@ template<class T> static void
 Dump_Image(const std::string& file,const ARRAY<T,VECTOR<int,2> >& ke)
 {
     INTERPOLATED_COLOR_MAP<T> icm;
-    icm.colors.Add_Control_Point(1.00001,VECTOR<T,3>(1,1,1));
-    icm.colors.Add_Control_Point(1,VECTOR<T,3>(.5,0,0));
-    icm.colors.Add_Control_Point(1-.01,VECTOR<T,3>(1,0,0));
-    icm.colors.Add_Control_Point(1-.02,VECTOR<T,3>(1,.5,0));
-    icm.colors.Add_Control_Point(1-.04,VECTOR<T,3>(1,1,0));
-    icm.colors.Add_Control_Point(1-.08,VECTOR<T,3>(0,1,0));
-    icm.colors.Add_Control_Point(1-.16,VECTOR<T,3>(0,1,1));
-    icm.colors.Add_Control_Point(1-.32,VECTOR<T,3>(0,0,1));
-    icm.colors.Add_Control_Point(1-.64,VECTOR<T,3>(.5,0,1));
-    icm.colors.Add_Control_Point(0,VECTOR<T,3>(0,0,0));
-
+    icm.Initialize_Colors((T)1e-8,1,true,true,false);
+    
     ARRAY<VECTOR<T,3>,VECTOR<int,2> > image(ke.domain);
     for(RANGE_ITERATOR<2> it(image.domain);it.Valid();it.Next())
         image(it.index)=icm(ke(it.index));
+
+    ARRAY<VECTOR<T,3>,VECTOR<int,2> > bar(VECTOR<int,2>(1000,1));
+    for(int i=0;i<1000;i++)
+        bar(VECTOR<int,2>(i,0))=icm.colors.Value((i/(T)999)*(icm.mx-icm.mn)+icm.mn);
+    PNG_FILE<T>::Write("bar.png",bar);
 
     PNG_FILE<T>::Write(file,image);
 }
@@ -377,27 +371,79 @@ Dump_Image(const std::string& file,const ARRAY<T,VECTOR<int,d> >& ke)
 // Function Velocity_Fourier_Analysis
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
-Velocity_Fourier_Analysis(const std::string& base_filename,const ARRAY<T,FACE_INDEX<TV::m> >& u,T max_ke) const
+Velocity_Fourier_Analysis() const
 {
+    static int id=-1;
+    id++;
+    LOG::printf("analysis id %i\n",id);
     FFT<TV> fft;
     ARRAY<T,TV_INT> ua(grid.Domain_Indices()),ke(ua.domain);
     ARRAY<std::complex<T>,TV_INT> out(ua.domain);
-
-    T scale=phases(PHASE_ID()).density/(max_ke*ke.domain.Size());
+    const PHASE& ph=phases(PHASE_ID());
+    
     TV coefficients=(T)(2*pi)/grid.domain.Edge_Lengths();
     TV_INT counts=grid.numbers_of_cells,hi=counts/2,lo=hi-counts;
     ARRAY<T> bins(rint((coefficients*TV((hi-1).Componentwise_Max(-lo))).Magnitude())+1);
+    int taylor_modes=extra_int.m>=1?extra_int(0):1;
+    T total_taylor=0;
     for(int a=0;a<TV::m;a++){
-        ua.Put(u.Component(a),ua);
+        ua.Put(ph.velocity.Component(a),ua);
         fft.Transform(ua,out);
+        out/=sqrt((T)ke.domain.Size());
         for(RANGE_ITERATOR<TV::m> it(ke.domain);it.Valid();it.Next()){
             TV k=coefficients*TV(wrap(it.index,lo,hi));
-            ke(it.index)=sqr(abs(out(it.index)))*scale;
+            ke(wrap(it.index+counts/2,TV_INT(),counts))=sqr(abs(out(it.index))/max_ke);
             bins(rint(k.Magnitude()))+=ke(it.index);}
-        Dump_Image(base_filename+"-ke-"+"xyz"[a]+".png",ke);}
-    std::ofstream fout(base_filename+"-bins.txt");
+        if(id%dump_modes_freq==0)
+            Dump_Image(LOG::sprintf("%s/modes-%i-%c.png",output_directory,id,"xyz"[a]),ke);
+        if(taylor_modes>0)
+            for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>::Unit_Box()*2);it.Valid();it.Next())
+                total_taylor+=sqr(abs(out(wrap((it.index*2-1)*taylor_modes,TV_INT(),grid.numbers_of_cells))));
+        else total_taylor+=sqr(abs(out(TV_INT())));}
+    std::ofstream fout(LOG::sprintf("%s/bins-%i.txt",output_directory,id).c_str());
     for(int i=0;i<bins.m;i++)
         fout<<i<<" "<<bins(i)<<std::endl;
+
+    T l2_u=0;
+    int num_l2_u=0;
+    auto valid=[&](FACE_INDEX<TV::m> face){return ph.mass(face) && (this->psi_N.domain_indices.Empty() || !this->psi_N(face));};
+    for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
+        if(bc_type(2*it.face.axis)==BC_PERIODIC)
+            if(it.face.index(it.face.axis)==grid.numbers_of_cells(it.face.axis))
+                continue;
+        if(!valid(it.face)) continue;
+        l2_u+=sqr(ph.velocity(it.face));
+        num_l2_u++;}
+    if(num_l2_u) l2_u/=num_l2_u;
+    if(num_l2_u) total_taylor/=num_l2_u;
+
+    T l2_omega=0;
+    int num_l2_omega=0;
+    for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
+        bool ok=true;
+        MATRIX<T,TV::m> dV;
+        for(int i=0;i<TV::m;i++)
+            for(int j=0;j<TV::m;j++){
+                if(i==j) continue;
+                FACE_INDEX<TV::m> A(i,it.index),B(A),C(A),D(A);
+                C.index(i)++;
+                D.index(i)++;
+                A.index(j)++;
+                B.index(j)--;
+                C.index(j)++;
+                D.index(j)--;
+                if(valid(A) && valid(B) && valid(C) && valid(D))
+                    dV(i,j)=(T).25*grid.one_over_dX(j)*(
+                        ph.velocity(A)-ph.velocity(B)+
+                        ph.velocity(C)-ph.velocity(D));
+                else ok=false;}
+        if(!ok) continue;
+        l2_omega+=dV.Contract_Permutation_Tensor().Magnitude_Squared();
+        num_l2_omega++;}
+    if(num_l2_omega) l2_omega/=num_l2_omega;
+
+    LOG::printf("l2 velocity %P  l2 vorticity %P\n",l2_u,l2_omega);
+    LOG::printf("taylor total %P\n",total_taylor);
 }
 //#####################################################################
 // Function Add_Source

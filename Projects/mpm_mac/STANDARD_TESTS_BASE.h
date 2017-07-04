@@ -69,6 +69,7 @@ public:
     std::function<TV (PHASE_ID pid,const TV& X,T time)> analytic_velocity;
     T mu;
     bool analyze_u_modes=false;
+    int dump_modes_freq=1;
     T max_ke=0;
     POISSON_DISK<TV>& poisson_disk;
 
@@ -109,7 +110,7 @@ public:
     void Test_dV(std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)> dV) const;
     void Set_Phases(const ARRAY<T,PHASE_ID>& phase_densities);
     void Check_Analytic_Velocity() const;
-    void Velocity_Fourier_Analysis(const std::string& base_filename,const ARRAY<T,FACE_INDEX<TV::m> >& u,T max_ke) const;
+    void Velocity_Fourier_Analysis() const;
     void Add_Source(const TV& X0,const TV& n,IMPLICIT_OBJECT<TV>* io,
         std::function<void(TV X,T ts,T t,SOURCE_PATH<TV>& p)> path,T density,
         T particles_per_cell,bool owns_io);
