@@ -1,0 +1,26 @@
+\documentclass[class=minimal,border=0pt]{standalone}
+\usepackage{pgfplots}
+
+\begin{document}
+\pgfplotsset{width=10cm,height=8cm,compat=1.13}
+\begin{tikzpicture}
+\begin{axis}[
+    enlargelimits=false,
+    legend cell align=left,
+    xlabel={Wave number},
+    ylabel={Eigenvalue},
+    legend entries={PIC(1), PIC(9), PIC(64), APIC(1), APIC(9), APIC(64)},
+    legend pos=north west,
+    ymin=0,
+    ymax=1,
+    legend style={fill=none,draw=none,nodes={scale=0.5, transform shape}}
+]
+\addplot[mark=none,solid,color=red] table[x=waven,y=eig]{pic-ppc1-xxx/eig-aaa.txt};
+\addplot[mark=none,dashed,color=red] table[x=waven,y=eig]{pic-ppc9-xxx/eig-aaa.txt};
+\addplot[mark=none,dotted,color=red,very thick] table[x=waven,y=eig]{pic-ppc64-xxx/eig-aaa.txt};
+\addplot[mark=none,solid,color=blue] table[x=waven,y=eig]{apic-ppc1-xxx/eig-aaa.txt};
+\addplot[mark=none,dashed,color=blue] table[x=waven,y=eig]{apic-ppc9-xxx/eig-aaa.txt};
+\addplot[mark=none,dotted,color=blue,very thick] table[x=waven,y=eig]{apic-ppc64-xxx/eig-aaa.txt};
+\end{axis}
+\end{tikzpicture}
+\end{document}
