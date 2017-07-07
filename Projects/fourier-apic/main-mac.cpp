@@ -19,6 +19,7 @@
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_MAC_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
+#include <fstream>
 #ifdef USE_OPENMP
 #include <omp.h>
 #endif
@@ -84,6 +85,7 @@ int main(int argc, char* argv[])
     std::string output_filename="eigen.png";
     std::string viewer_directory="output";
     bool dump_particles=false;
+    bool dump_eigenvalues=false;
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Add("-resolution",&resolution,"num","transfer resolution");
     parse_args.Add("-size",&size,"num","analyze transfer as though this resolution");
@@ -96,7 +98,9 @@ int main(int argc, char* argv[])
     parse_args.Add("-irreg",&irregular_seeding,"num","each cell is seeded identicially with num particles");
     parse_args.Add("-seed",&seed,"seed","random number generator seed (-1 = timer)");
     parse_args.Add("-dump_particles",&dump_particles,"Output particle distribution");
+    parse_args.Add("-dump_eigenvalues",&dump_eigenvalues,"Output eigenvalues");
     parse_args.Parse();
+    Create_Directory(viewer_directory);
 
     PHYSBAM_ASSERT(resolution<=size);
     
@@ -178,7 +182,22 @@ int main(int argc, char* argv[])
         Flush_Frame<TV>("particles");
         Flush_Frame<TV>("end");
     }
-    
+
+    if(dump_eigenvalues){
+        std::ofstream eig_x(LOG::sprintf("%s/eig-x.txt",viewer_directory).c_str());
+        std::ofstream eig_y(LOG::sprintf("%s/eig-y.txt",viewer_directory).c_str());
+        std::ofstream eig_xy(LOG::sprintf("%s/eig-xy.txt",viewer_directory).c_str());
+        const char* head="waven eig\n";
+        eig_x<<head;
+        eig_y<<head;
+        eig_xy<<head;
+        TV_INT lengths=centered_out.domain.Edge_Lengths();
+        int shift=lengths(0)/2;
+        for(int i=centered_out.domain.min_corner(0);i<centered_out.domain.max_corner(0);++i){
+            eig_x<<i-shift<<" "<<centered_out(TV_INT(i,0)).real()<<"\n";
+            eig_y<<i-shift<<" "<<centered_out(TV_INT(0,i)).real()<<"\n";
+            eig_xy<<i-shift<<" "<<centered_out(TV_INT(i,i)).real()<<"\n";}}
+
     return 0;
 }
 
