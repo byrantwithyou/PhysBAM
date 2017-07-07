@@ -142,11 +142,16 @@ int main(int argc, char* argv[])
         row(index)=ph.velocity(FACE_INDEX<TV::m>(0,it.index));
         PHYSBAM_ASSERT(!ph.velocity(FACE_INDEX<TV::m>(1,it.index)));}
 
-    ARRAY<std::complex<T>,TV_INT> out(row.domain);
+    ARRAY<std::complex<T>,TV_INT> out(row.domain),centered_out(row.domain);
 
     GRID<TV> fft_grid(out.domain.Edge_Lengths(),RANGE<TV>::Unit_Box(),true);
     FFT<TV> fft;
     fft.Transform(row,out);
+
+    // shift the origin to the center of image
+    TV_INT counts=out.domain.Edge_Lengths();
+    for(RANGE_ITERATOR<TV::m> it(out.domain);it.Valid();it.Next())
+        centered_out(it.index)=out(wrap(it.index-counts/2,TV_INT(),counts));
     
     INTERPOLATED_COLOR_MAP<T> icm;
     icm.colors.Add_Control_Point(1.00001,VECTOR<T,3>(1,1,1));
@@ -160,9 +165,9 @@ int main(int argc, char* argv[])
     icm.colors.Add_Control_Point(1-.64,VECTOR<T,3>(.5,0,1));
     icm.colors.Add_Control_Point(0,VECTOR<T,3>(0,0,0));
 
-    ARRAY<VECTOR<T,3>,TV_INT> image(out.domain);
+    ARRAY<VECTOR<T,3>,TV_INT> image(centered_out.domain);
     for(RANGE_ITERATOR<TV::m> it(image.domain);it.Valid();it.Next())
-        image(it.index)=icm(abs(out(it.index)));
+        image(it.index)=icm(abs(centered_out(it.index)));
 
     PNG_FILE<T>::Write(output_filename,image);
 
