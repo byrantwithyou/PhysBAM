@@ -18,8 +18,10 @@ if [ "X$FULL" = "X1" ] ; then
     mkdir -p $NAME
     for p in `seq 0 $((${#np[@]}-1))` ; do
         for o in `seq 0 $((${#order[@]}-1))` ; do
-            echo $ARGS ${np[$p]} ${order[$o]} -v $NAME/pic-${np_name[$p]}-${order_name[$o]}
-            echo $ARGS -affine ${np[$o]} ${order[$o]} -v $NAME/apic-${np_name[$p]}-${order_name[$o]}
+            pic_folder=$NAME/pic-${np_name[$p]}-${order_name[$o]}
+            apic_folder=$NAME/apic-${np_name[$p]}-${order_name[$o]}
+            echo $ARGS ${np[$p]} ${order[$o]} -v $pic_folder -o $pic_folder/eigen.png
+            echo $ARGS -affine ${np[$o]} ${order[$o]} -v $apic_folder -o $apic_folder/eigen.png
         done
     done | xargs -P 8 -n 1 -d '\n' bash -c
 fi
