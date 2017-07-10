@@ -194,8 +194,8 @@ int main(int argc, char* argv[])
         TV_INT lengths=centered_out.domain.Edge_Lengths();
         int shift=lengths(0)/2;
         for(int i=centered_out.domain.min_corner(0);i<centered_out.domain.max_corner(0);++i){
-            eig_x<<i-shift<<" "<<centered_out(TV_INT(i,0)).real()<<"\n";
-            eig_y<<i-shift<<" "<<centered_out(TV_INT(0,i)).real()<<"\n";
+            eig_x<<i-shift<<" "<<centered_out(TV_INT(i,shift)).real()<<"\n";
+            eig_y<<i-shift<<" "<<centered_out(TV_INT(shift,i)).real()<<"\n";
             eig_xy<<i-shift<<" "<<centered_out(TV_INT(i,i)).real()<<"\n";}}
 
     return 0;
