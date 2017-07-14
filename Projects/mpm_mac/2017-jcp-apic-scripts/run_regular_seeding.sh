@@ -7,8 +7,8 @@ FULL=1 # Set to 1 for a full rebuild; 0 to skip rerunning the simulations
 
 ARGS="../../fourier-apic/fourier_mac -resolution $RES -size $RES -dump_particles -dump_eigenvalues"
 
-np=("-ppd 1" "-ppd 2" "-ppd 3" "-ppd 5" "-ppd 8")
-np_name=("ppc1" "ppc4" "ppc9" "ppc25" "ppc64")
+np=("-ppd 1" "-ppd 2" "-ppd 3" "-ppd 4" "-ppd 5" "-ppd 8")
+np_name=("ppc1" "ppc4" "ppc9" "ppc16" "ppc25" "ppc64")
 
 order=("-order 2" "-order 3")
 order_name=("quadratic" "cubic")
