@@ -45,17 +45,22 @@ if [ "X$FULL" = "X1" ] ; then
     done | xargs -P 8 -n 1 -d '\n' bash -c
 fi
 
-plot_template='\\addplot [mark=none,solid] table[x=waven,y=eig]'
-node_template=' node[above right,pos=0.8,scale=0.5] '
+colors=('black' 'red' 'blue' 'green' 'purple' 'cyan')
+template='\\addplot [mark=none,solid,color=COLOR] table[x=waven,y=eig]{apic-single-X-Y-xxx\/eig-aaa.txt};'
 content=''
+legend=''
+nline=0
 for x in ${px[@]}; do
     for y in ${py[@]}; do
-        line=$plot_template'{apic-single-'$x-$y-'xxx\/eig-aaa.txt}'$node_template'{('$x,$y')};'
+        line=`echo $template | sed -e "s/X/$x/g; s/Y/$y/g; s/COLOR/${colors[$nline]}/g"`
+        nline=$((nline+1))
+        legend="$legend($x,$y)\\\\\\\\"
         content=$content$line'\n'
     done
 done
+legend_entries="legend entries={$legend}"
 
-sed -e "s/XXXXXX/$content/g" eig_irregular_seeding_ppc1_plot.tex > $NAME/eig_irregular_seeding_apic_ppc1.template
+sed -e "s/XXXXXX/$content/g; s/LEGEND/$legend_entries/g" eig_irregular_seeding_ppc1_plot.tex > $NAME/eig_irregular_seeding_apic_ppc1.template
 sed -e "s/apic/pic/g" $NAME/eig_irregular_seeding_apic_ppc1.template > $NAME/eig_irregular_seeding_pic_ppc1.template
 
 for a in x y xy ; do
