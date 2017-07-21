@@ -9,19 +9,19 @@
     legend cell align=left,
     xlabel={Wave number},
     ylabel={Eigenvalue},
-    legend entries={PIC(1), PIC(4), PIC(9), APIC(1), APIC(4), APIC(9)},
+    legend entries={PIC(4), PIC(9), PIC(16), APIC(4), APIC(9), APIC(16)},
     legend pos=south west,
     xmin=0,
     ymin=-0.04,
     ymax=1.04,
     legend style={fill=none,draw=none}
 ]
-\addplot[mark=none,solid,color=red] table[x=waven,y=eig]{pic-ppc1-xxx/eig-aaa.txt};
-\addplot[mark=none,dashed,color=red] table[x=waven,y=eig]{pic-ppc4-xxx/eig-aaa.txt};
-\addplot[mark=none,dotted,color=red,very thick] table[x=waven,y=eig]{pic-ppc9-xxx/eig-aaa.txt};
-\addplot[mark=none,solid,color=blue] table[x=waven,y=eig]{apic-ppc1-xxx/eig-aaa.txt};
-\addplot[mark=none,dashed,color=blue] table[x=waven,y=eig]{apic-ppc4-xxx/eig-aaa.txt};
-\addplot[mark=none,dotted,color=blue,very thick] table[x=waven,y=eig]{apic-ppc9-xxx/eig-aaa.txt};
+\addplot[mark=none,solid,color=red] table[x=waven,y=eig]{pic-ppc4-xxx/eig-aaa.txt};
+\addplot[mark=none,dashed,color=red] table[x=waven,y=eig]{pic-ppc9-xxx/eig-aaa.txt};
+\addplot[mark=none,dotted,color=red,very thick] table[x=waven,y=eig]{pic-ppc16-xxx/eig-aaa.txt};
+\addplot[mark=none,solid,color=blue] table[x=waven,y=eig]{apic-ppc4-xxx/eig-aaa.txt};
+\addplot[mark=none,dashed,color=blue] table[x=waven,y=eig]{apic-ppc9-xxx/eig-aaa.txt};
+\addplot[mark=none,dotted,color=blue,very thick] table[x=waven,y=eig]{apic-ppc16-xxx/eig-aaa.txt};
 \end{axis}
 \end{tikzpicture}
 \end{document}
