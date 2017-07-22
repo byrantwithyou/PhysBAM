@@ -219,4 +219,12 @@ template void Fill_Ghost_Faces_Periodic_Accum<float,VECTOR<float,3> >(
     GRID<VECTOR<float,3> > const&,ARRAY<float,FACE_INDEX<VECTOR<float,3>::m> > const&,
     ARRAY<float,FACE_INDEX<VECTOR<float,3>::m> >&,
     VECTOR<bool,VECTOR<float,3>::m> const&,int);
+template void Fill_Ghost_Faces_Periodic<float,VECTOR<float,2> >(
+    GRID<VECTOR<float,2> > const&,ARRAY<float,FACE_INDEX<VECTOR<float,2>::m> > const&,
+    ARRAY<float,FACE_INDEX<VECTOR<float,2>::m> >&,VECTOR<bool,VECTOR<float,2>::m> const&,
+    int);
+template void Fill_Ghost_Faces_Periodic<double,VECTOR<double,2> >(
+    GRID<VECTOR<double,2> > const&,ARRAY<double,FACE_INDEX<VECTOR<double,2>::m> > const&,
+    ARRAY<double,FACE_INDEX<VECTOR<double,2>::m> >&,VECTOR<bool,VECTOR<double,2>::m> const&,
+    int);
 }
