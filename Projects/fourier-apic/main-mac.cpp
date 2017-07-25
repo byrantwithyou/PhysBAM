@@ -189,13 +189,12 @@ int main(int argc, char* argv[])
     }
 
     if(dump_eigenvalues){
-        std::ofstream eig_x(LOG::sprintf("%s/eig-x.txt",viewer_directory).c_str());
-        std::ofstream eig_y(LOG::sprintf("%s/eig-y.txt",viewer_directory).c_str());
-        std::ofstream eig_xy(LOG::sprintf("%s/eig-xy.txt",viewer_directory).c_str());
-        const char* head="waven eig\n";
-        eig_x<<head;
-        eig_y<<head;
-        eig_xy<<head;
+        std::ofstream eig_x((viewer_directory+"/eig-x.txt").c_str());
+        std::ofstream eig_y((viewer_directory+"/eig-y.txt").c_str());
+        std::ofstream eig_xy((viewer_directory+"/eig-xy.txt").c_str());
+        eig_x<<"waven eig\n";
+        eig_y<<"waven eig\n";
+        eig_xy<<"waven eig\n";
         TV_INT lengths=out.domain.Edge_Lengths();
         int shift=lengths(0)/2;
         for(int i=out.domain.min_corner(0);i<out.domain.max_corner(0);++i){
