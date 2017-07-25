@@ -68,6 +68,12 @@ void Sample_Box_Random(RANDOM_NUMBERS<T>& rand,ARRAY<TV>& X,int number_of_partic
         X.Append(rand.Get_Uniform_Vector(RANGE<TV>::Unit_Box()));
 }
 
+static const std::complex<T>& centered_fft(const ARRAY<std::complex<T>,TV_INT>& f,const TV_INT& index)
+{
+    TV_INT counts=f.domain.Edge_Lengths();
+    return f(wrap(index-counts/2,TV_INT(),counts));
+}
+
 int main(int argc, char* argv[])
 {
 #ifdef USE_OPENMP
@@ -150,17 +156,12 @@ int main(int argc, char* argv[])
         row(index)=ph.velocity(FACE_INDEX<TV::m>(0,it.index));
         PHYSBAM_ASSERT(!ph.velocity(FACE_INDEX<TV::m>(1,it.index)));}
 
-    ARRAY<std::complex<T>,TV_INT> out(row.domain),centered_out(row.domain);
+    ARRAY<std::complex<T>,TV_INT> out(row.domain);
 
     GRID<TV> fft_grid(out.domain.Edge_Lengths(),RANGE<TV>::Unit_Box(),true);
     FFT<TV> fft;
     fft.Transform(row,out);
 
-    // shift the origin to the center of image
-    TV_INT counts=out.domain.Edge_Lengths();
-    for(RANGE_ITERATOR<TV::m> it(out.domain);it.Valid();it.Next())
-        centered_out(it.index)=out(wrap(it.index-counts/2,TV_INT(),counts));
-    
     INTERPOLATED_COLOR_MAP<T> icm;
     icm.colors.Add_Control_Point(1.00001,VECTOR<T,3>(1,1,1));
     icm.colors.Add_Control_Point(1,VECTOR<T,3>(.5,0,0));
@@ -173,9 +174,9 @@ int main(int argc, char* argv[])
     icm.colors.Add_Control_Point(1-.64,VECTOR<T,3>(.5,0,1));
     icm.colors.Add_Control_Point(0,VECTOR<T,3>(0,0,0));
 
-    ARRAY<VECTOR<T,3>,TV_INT> image(centered_out.domain);
+    ARRAY<VECTOR<T,3>,TV_INT> image(out.domain);
     for(RANGE_ITERATOR<TV::m> it(image.domain);it.Valid();it.Next())
-        image(it.index)=icm(abs(centered_out(it.index)));
+        image(it.index)=icm(abs(centered_fft(out,it.index)));
 
     PNG_FILE<T>::Write(output_filename,image);
 
@@ -195,12 +196,12 @@ int main(int argc, char* argv[])
         eig_x<<head;
         eig_y<<head;
         eig_xy<<head;
-        TV_INT lengths=centered_out.domain.Edge_Lengths();
+        TV_INT lengths=out.domain.Edge_Lengths();
         int shift=lengths(0)/2;
-        for(int i=centered_out.domain.min_corner(0);i<centered_out.domain.max_corner(0);++i){
-            eig_x<<i-shift<<" "<<centered_out(TV_INT(i,shift)).real()<<"\n";
-            eig_y<<i-shift<<" "<<centered_out(TV_INT(shift,i)).real()<<"\n";
-            eig_xy<<i-shift<<" "<<centered_out(TV_INT(i,i)).real()<<"\n";}}
+        for(int i=out.domain.min_corner(0);i<out.domain.max_corner(0);++i){
+            eig_x<<i-shift<<" "<<centered_fft(out,TV_INT(i,shift)).real()<<"\n";
+            eig_y<<i-shift<<" "<<centered_fft(out,TV_INT(shift,i)).real()<<"\n";
+            eig_xy<<i-shift<<" "<<centered_fft(out,TV_INT(i,i)).real()<<"\n";}}
 
     return 0;
 }
