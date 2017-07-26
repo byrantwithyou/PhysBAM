@@ -87,7 +87,8 @@ int main(int argc, char* argv[])
     int size=256;
     int particles_per_dim=2;
     int irregular_seeding=0;
-    T px=-1,py=-1;
+    bool use_px=false,use_py=false;
+    T px=0,py=0;
     int seed=-1;
     std::string output_filename="eigen.png";
     std::string viewer_directory="output";
@@ -103,8 +104,8 @@ int main(int argc, char* argv[])
     parse_args.Add("-o",&output_filename,"file.png","filename for output image");
     parse_args.Add("-v",&viewer_directory,"dir","viewer directory");
     parse_args.Add("-irreg",&irregular_seeding,"num","each cell is seeded identicially with num particles");
-    parse_args.Add("-px",&px,"px","particle x position");
-    parse_args.Add("-py",&py,"py","particle y position");
+    parse_args.Add("-px",&px,&use_px,"px","particle x position");
+    parse_args.Add("-py",&py,&use_py,"py","particle y position");
     parse_args.Add("-seed",&seed,"seed","random number generator seed (-1 = timer)");
     parse_args.Add("-dump_particles",&dump_particles,"Output particle distribution");
     parse_args.Add("-dump_eigenvalues",&dump_eigenvalues,"Output eigenvalues");
@@ -122,7 +123,7 @@ int main(int argc, char* argv[])
     
     example.grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
     ARRAY<TV> unit_X;
-    if(px>=0&&py>=0) unit_X.Append(TV(px,py));
+    if(use_px&&use_py) unit_X.Append(TV(px,py));
     else if(irregular_seeding) Sample_Box_Random(rand,unit_X,irregular_seeding);
     else Sample_Box_Regularly(unit_X,particles_per_dim);
     Replicate_Particles(example.particles,example.grid,unit_X);
