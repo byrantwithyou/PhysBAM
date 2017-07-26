@@ -13,25 +13,24 @@ ARGS="../../fourier-apic/fourier_mac -resolution $RES -size $RES -dump_particles
 np=("-irreg 1" "-irreg 4" "-irreg 9" "-irreg 16" "-irreg 25" "-irreg 64")
 np_name=("ppc1" "ppc4" "ppc9" "ppc16" "ppc25" "ppc64")
 
-order=("-order 2" "-order 3")
-order_name=("quadratic" "cubic")
+order=("-order 1" "-order 2" "-order 3")
+order_name=("linear" "quadratic" "cubic")
 
-px=($(seq 0 0.1 0.5))
-#py=($(seq 0 0.1 0.5))
-py=($(seq 0.1 0.1 0.1))
+px=(0 0.5 0.25 0.44140625 0.22265625 0.34765625)
+py=(0.50390625 0.98828125 0.75390625 0.76171875 0.58203125 0.546875)
 
 if [ "X$FULL" = "X1" ] ; then
     rm -rf $NAME
     mkdir -p $NAME
-    for x in ${px[@]}; do
-        for y in ${py[@]}; do
-            for o in `seq 0 $((${#order[@]}-1))` ; do
-                coord=$x-$y
-                pic_folder=$NAME/pic-single-$coord-${order_name[$o]}
-                apic_folder=$NAME/apic-single-$coord-${order_name[$o]}
-                echo $ARGS -px $x -py $y ${order[$o]} -v $pic_folder -o $pic_folder/eigen.png
-                echo $ARGS -affine -px $x -py $y ${order[$o]} -v $apic_folder -o $apic_folder/eigen.png
-            done
+    for i in `seq 0 $((${#px[@]}-1))` ; do
+        x=${px[$i]}
+        y=${py[$i]}
+        for o in `seq 0 $((${#order[@]}-1))` ; do
+            coord=$x-$y
+            pic_folder=$NAME/pic-single-$coord-${order_name[$o]}
+            apic_folder=$NAME/apic-single-$coord-${order_name[$o]}
+            echo $ARGS -px $x -py $y ${order[$o]} -v $pic_folder -o $pic_folder/eigen.png
+            echo $ARGS -affine -px $x -py $y ${order[$o]} -v $apic_folder -o $apic_folder/eigen.png
         done
     done | xargs -P 8 -n 1 -d '\n' bash -c
 
@@ -45,18 +44,18 @@ if [ "X$FULL" = "X1" ] ; then
     done | xargs -P 8 -n 1 -d '\n' bash -c
 fi
 
-colors=('black' 'red' 'blue' 'green' 'purple' 'cyan')
+colors=('black' 'red' 'blue' 'green' 'cyan' 'purple')
 template='\\addplot [mark=none,solid,color=COLOR] table[x=waven,y=eig]{apic-single-X-Y-xxx\/eig-aaa.txt};'
 content=''
 legend=''
 nline=0
-for x in ${px[@]}; do
-    for y in ${py[@]}; do
-        line=`echo $template | sed -e "s/X/$x/g; s/Y/$y/g; s/COLOR/${colors[$nline]}/g"`
-        nline=$((nline+1))
-        legend="$legend($x,$y)\\\\\\\\"
-        content=$content$line'\n'
-    done
+for i in `seq 0 $((${#px[@]}-1))` ; do
+    x=${px[$i]}
+    y=${py[$i]}
+    line=`echo $template | sed -e "s/X/$x/g; s/Y/$y/g; s/COLOR/${colors[$nline]}/g"`
+    nline=$((nline+1))
+    legend="$legend($x,$y)\\\\\\\\"
+    content=$content$line'\n'
 done
 legend_entries="legend entries={$legend}"
 
@@ -64,13 +63,12 @@ sed -e "s/XXXXXX/$content/g; s/LEGEND/$legend_entries/g" eig_irregular_seeding_p
 sed -e "s/apic/pic/g" $NAME/eig_irregular_seeding_apic_ppc1.template > $NAME/eig_irregular_seeding_pic_ppc1.template
 
 for a in x y xy ; do
-    sed -e "s/aaa/$a/g; s/xxx/quadratic/g" $NAME/eig_irregular_seeding_apic_ppc1.template > $NAME/eig-irregular-seeding-apic-ppc1-quadratic-$a.tex
-    sed -e "s/aaa/$a/g; s/xxx/cubic/g" $NAME/eig_irregular_seeding_apic_ppc1.template > $NAME/eig-irregular-seeding-apic-ppc1-cubic-$a.tex
-    sed -e "s/aaa/$a/g; s/xxx/quadratic/g" $NAME/eig_irregular_seeding_pic_ppc1.template > $NAME/eig-irregular-seeding-pic-ppc1-quadratic-$a.tex
-    sed -e "s/aaa/$a/g; s/xxx/cubic/g" $NAME/eig_irregular_seeding_pic_ppc1.template > $NAME/eig-irregular-seeding-pic-ppc1-cubic-$a.tex
+    for o in ${order_name[@]} ; do
+        sed -e "s/aaa/$a/g; s/xxx/$o/g" $NAME/eig_irregular_seeding_apic_ppc1.template > $NAME/eig-irregular-seeding-apic-ppc1-$o-$a.tex
+        sed -e "s/aaa/$a/g; s/xxx/$o/g" $NAME/eig_irregular_seeding_pic_ppc1.template > $NAME/eig-irregular-seeding-pic-ppc1-$o-$a.tex
 
-    sed -e "s/aaa/$a/g; s/xxx/quadratic/g" eig_irregular_seeding_plot.tex  > $NAME/eig-irregular-seeding-quadratic-$a.tex
-    sed -e "s/aaa/$a/g; s/xxx/cubic/g" eig_irregular_seeding_plot.tex  > $NAME/eig-irregular-seeding-cubic-$a.tex
+        sed -e "s/aaa/$a/g; s/xxx/$o/g" eig_irregular_seeding_plot.tex  > $NAME/eig-irregular-seeding-$o-$a.tex
+    done
 done
 
 cat <<EOF > $NAME/SConstruct
