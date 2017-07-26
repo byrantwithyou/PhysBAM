@@ -1,0 +1,24 @@
+\documentclass[class=minimal,border=0pt]{standalone}
+\usepackage{pgfplots}
+
+\begin{document}
+\pgfplotsset{width=10cm,height=8cm,compat=1.13}
+\begin{tikzpicture}
+\begin{axis}[
+    enlargelimits=false,
+    xmin=0,
+    xmax=1,
+    ymin=0,
+    ymax=1,
+    width=\axisdefaultwidth,
+    height=\axisdefaultwidth
+]
+\addplot [domain=-1:1, dotted] {x};
+\addplot [domain=-1:1, dotted] {0.5};
+\addplot [domain=-1:1, dotted] {-x+1};
+\addplot [mark=none, mark options={cyan}] coordinates{(0.5,0)(0.5,1)};
+XXXXXX
+%\addplot [mark=*, mark options={cyan}] coordinates{(0.3,0.5)};
+\end{axis}
+\end{tikzpicture}
+\end{document}

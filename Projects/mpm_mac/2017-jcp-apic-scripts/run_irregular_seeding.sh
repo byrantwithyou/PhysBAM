@@ -46,20 +46,23 @@ fi
 
 colors=('black' 'red' 'blue' 'green' 'cyan' 'purple')
 template='\\addplot [mark=none,solid,color=COLOR] table[x=waven,y=eig]{apic-single-X-Y-xxx\/eig-aaa.txt};'
+location_template='\\addplot [mark=*, mark options={COLOR}] coordinates{(X,Y)};'
 content=''
-legend=''
+location_content=''
 nline=0
 for i in `seq 0 $((${#px[@]}-1))` ; do
     x=${px[$i]}
+    shift_x=`echo $x+0.5 | bc`
     y=${py[$i]}
     line=`echo $template | sed -e "s/X/$x/g; s/Y/$y/g; s/COLOR/${colors[$nline]}/g"`
+    location_line=`echo $location_template | sed -e "s/X/$shift_x/g; s/Y/$y/g; s/COLOR/${colors[$nline]}/g"`
     nline=$((nline+1))
-    legend="$legend($x,$y)\\\\\\\\"
     content=$content$line'\n'
+    location_content=$location_content$location_line'\n'
 done
-legend_entries="legend entries={$legend}"
 
-sed -e "s/XXXXXX/$content/g; s/LEGEND/$legend_entries/g" eig_irregular_seeding_ppc1_plot.tex > $NAME/eig_irregular_seeding_apic_ppc1.template
+sed -e "s/XXXXXX/$location_content/g" eig_irregular_seeding_ppc1_particle_plot.tex > $NAME/eig-irregular-seeding-ppc1-particle.tex
+sed -e "s/XXXXXX/$content/g" eig_irregular_seeding_ppc1_plot.tex > $NAME/eig_irregular_seeding_apic_ppc1.template
 sed -e "s/apic/pic/g" $NAME/eig_irregular_seeding_apic_ppc1.template > $NAME/eig_irregular_seeding_pic_ppc1.template
 
 for a in x y xy ; do
