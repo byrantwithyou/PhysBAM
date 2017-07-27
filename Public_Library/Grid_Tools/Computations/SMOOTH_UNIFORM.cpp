@@ -46,5 +46,7 @@ template void Smooth<double,3,ARRAY<VECTOR<double,3>,VECTOR<int,3> > >(
     ARRAY<VECTOR<double,3>,VECTOR<int,3> >&,int,ARRAY<double,VECTOR<int,3> > const*);
 template void Smooth<float,3,ARRAY<VECTOR<float,3>,VECTOR<int,3> > >(
     ARRAY<VECTOR<float,3>,VECTOR<int,3> >&,int,ARRAY<float,VECTOR<int,3> > const*);
+template void Smooth<double,2,ARRAY<double,VECTOR<int,2> > >(
+    ARRAY<double,VECTOR<int,2> >&,int,ARRAY<double,VECTOR<int,2> > const*);
 }
 }
