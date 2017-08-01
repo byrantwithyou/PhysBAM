@@ -94,6 +94,8 @@ public:
         analytic_pressure.Append(Make_Analytic_Scalar<TV>(f));
     }
 
+    virtual TV Compute_Analytic_Force(PHASE_ID p,const TV& X,T time) const;
+
     void Seed_Particles_Poisson(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
         std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,T particles_per_cell);
 

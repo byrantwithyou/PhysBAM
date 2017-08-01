@@ -1046,6 +1046,8 @@ Apply_Forces()
         PHASE& ph=example.phases(p);
         for(int i=0;i<ph.valid_flat_indices.m;i++){
             int k=ph.valid_flat_indices(i);
+            TV af=example.Compute_Analytic_Force(p,example.grid.Face(ph.valid_indices(i)),example.time);
+            ph.velocity.array(k)+=example.dt*af(ph.valid_indices(i).axis);
             ph.velocity.array(k)+=example.dt*example.gravity(ph.valid_indices(i).axis);}
         Fix_Periodic(ph.velocity);}
 }

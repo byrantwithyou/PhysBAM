@@ -157,6 +157,14 @@ Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const
     // TODO:
 }
 //#####################################################################
+// Function Compute_Analytic_Force
+//#####################################################################
+template<class TV> TV MPM_MAC_EXAMPLE<TV>::
+Compute_Analytic_Force(PHASE_ID p,const TV& X,T time) const
+{
+    return TV();
+}
+//#####################################################################
 // Function Set_Weights
 //#####################################################################
 template<class TV> void MPM_MAC_EXAMPLE<TV>::

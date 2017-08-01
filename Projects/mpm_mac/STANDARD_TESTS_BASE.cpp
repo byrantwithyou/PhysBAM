@@ -345,6 +345,19 @@ Check_Analytic_Velocity() const
     LOG::printf("particle velocity error: L-inf: %g L-2: %g N: %i\n",max_error,l2_error,num_l2_samples);
 }
 //#####################################################################
+// Function Compute_Analytic_Force
+//#####################################################################
+template<class TV> TV STANDARD_TESTS_BASE<TV>::
+Compute_Analytic_Force(PHASE_ID p,const TV& X,T time) const
+{
+    if(!use_analytic_field) return TV();
+    const ANALYTIC_VECTOR<TV>* av=analytic_velocity(p);
+    const ANALYTIC_SCALAR<TV>* ap=analytic_pressure(p);
+    T mu=phases(p).viscosity;
+    T density=phases(p).density;
+    return av->dt(X,time)+av->dX(X,time)*av->v(X,time)-mu/density*av->L(X,time)+1/density*ap->dX(X,time);
+}
+//#####################################################################
 // Function Dump_Image
 //#####################################################################
 template<class T> static void
