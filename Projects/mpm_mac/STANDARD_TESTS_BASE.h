@@ -6,7 +6,11 @@
 #define __STANDARD_TESTS_BASE__
 
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Tools/Auto_Diff/AUTO_HESS_EXT.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
+#include <Tools/Tensors/SYMMETRIC_TENSOR.h>
+#include <Geometry/Analytic_Tests/ANALYTIC_SCALAR.h>
+#include <Geometry/Analytic_Tests/ANALYTIC_VECTOR.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Deformables/Standard_Tests/DEFORMABLES_STANDARD_TESTS.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_MAC_EXAMPLE.h>
@@ -66,7 +70,9 @@ public:
     bool dump_collision_objects;
     bool test_diff;
     bool bc_periodic;
-    std::function<TV (PHASE_ID pid,const TV& X,T time)> analytic_velocity;
+    bool use_analytic_field;
+    ARRAY<ANALYTIC_VECTOR<TV>*,PHASE_ID> analytic_velocity;
+    ARRAY<ANALYTIC_SCALAR<TV>*,PHASE_ID> analytic_pressure;
     T mu;
     bool analyze_u_modes=false;
     int dump_modes_freq=1;
@@ -75,6 +81,18 @@ public:
 
     STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS_BASE();
+
+    template<class F>
+    void Add_Velocity(F f)
+    {
+        analytic_velocity.Append(Make_Analytic_Vector<TV>(f));
+    }
+
+    template<class F>
+    void Add_Pressure(F f)
+    {
+        analytic_pressure.Append(Make_Analytic_Scalar<TV>(f));
+    }
 
     void Seed_Particles_Poisson(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
         std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,T particles_per_cell);
@@ -99,6 +117,13 @@ public:
     Seed_Particles(const T_OBJECT& object,std::function<TV(const TV&)> V,
         std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,T particles_per_cell)
     {ANALYTIC_IMPLICIT_OBJECT<T_OBJECT> obj(object);Seed_Particles(obj,V,dV,density,particles_per_cell);}
+
+    template<class T_OBJECT> auto
+    Seed_Particles_Analytic(const T_OBJECT& object,PHASE_ID pid,T density,T particles_per_cell)
+    {return Seed_Particles(object,
+            [this,pid](const TV& X){return analytic_velocity(pid)->v(X,0);},
+            [this,pid](const TV& X){return analytic_velocity(pid)->dX(X,0);},
+            density,particles_per_cell);}
 
     void Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)> dV,
         const T mass,const T volume);

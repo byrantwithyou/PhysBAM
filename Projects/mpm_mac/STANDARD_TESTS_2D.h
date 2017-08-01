@@ -40,8 +40,10 @@ public:
     using BASE::begin_frame;using BASE::end_frame;
     using BASE::extra_T;using BASE::extra_int;using BASE::gravity;using BASE::phases;
     using BASE::bc_type;using BASE::BC_PERIODIC;using BASE::BC_INVALID;using BASE::Test_dV;using BASE::bc_periodic;
-    using BASE::analytic_velocity;using BASE::Check_Analytic_Velocity;using BASE::mu;
-    using BASE::use_viscosity;using BASE::BC_WALL;using BASE::bc_velocity;
+    using BASE::use_analytic_field;using BASE::Seed_Particles_Analytic;
+    using BASE::analytic_pressure;using BASE::Add_Pressure;
+    using BASE::analytic_velocity;using BASE::Add_Velocity;using BASE::Check_Analytic_Velocity;
+    using BASE::mu;using BASE::use_viscosity;using BASE::BC_WALL;using BASE::bc_velocity;using BASE::bc_pressure;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();

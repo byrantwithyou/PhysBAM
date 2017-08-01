@@ -37,7 +37,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     user_last_frame(false),order(2),seed(1234),particles_per_cell(1<<TV::m),regular_seeding(false),
     no_regular_seeding(false),scale_mass(1),override_output_directory(false),
     m(1),s(1),kg(1),forced_collision_type(-1),dump_collision_objects(false),
-    test_diff(false),bc_periodic(false),mu(0),poisson_disk(*new POISSON_DISK<TV>(1))
+    test_diff(false),bc_periodic(false),use_analytic_field(false),mu(0),poisson_disk(*new POISSON_DISK<TV>(1))
 
 {
     T framerate=0;
@@ -167,6 +167,8 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
 template<class TV> STANDARD_TESTS_BASE<TV>::
 ~STANDARD_TESTS_BASE()
 {
+    analytic_velocity.Delete_Pointers_And_Clean_Memory();
+    analytic_pressure.Delete_Pointers_And_Clean_Memory();
     for(int i=0;i<destroy.m;i++) destroy(i)();
     delete &poisson_disk;
 }
@@ -309,7 +311,7 @@ Set_Phases(const ARRAY<T,PHASE_ID>& phase_densities)
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Check_Analytic_Velocity() const
 {
-    if(!analytic_velocity) return;
+    if(!use_analytic_field) return;
     T max_error=0,l2_error=0;
     int num_l2_samples=0;
     for(PHASE_ID i(0);i<phases.m;i++){
@@ -317,7 +319,7 @@ Check_Analytic_Velocity() const
         for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
             if(ph.mass(it.Full_Index())){
                 T u=ph.velocity(it.Full_Index());
-                TV v=analytic_velocity(i,it.Location(),time);
+                TV v=analytic_velocity(i)->v(it.Location(),time);
                 T e=abs(u-v(it.face.axis));
                 max_error=std::max(max_error,e);
                 l2_error+=sqr(e);
@@ -332,7 +334,7 @@ Check_Analytic_Velocity() const
         if(!particles.valid(p)) continue;
         PHASE_ID pid(0);
         if(particles.store_phase) pid=particles.phase(p);
-        TV e=particles.V(p)-analytic_velocity(pid,particles.X(p),time);
+        TV e=particles.V(p)-analytic_velocity(pid)->v(particles.X(p),time);
         max_error=std::max(max_error,e.Max_Abs());
         l2_error+=e.Magnitude_Squared();
         num_l2_samples+=TV::m;

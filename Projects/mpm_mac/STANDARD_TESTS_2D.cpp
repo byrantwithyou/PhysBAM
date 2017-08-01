@@ -9,6 +9,7 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UNION.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Seeding/MPM_PARTICLE_SOURCE.h>
+#include <Tools/Tensors/SYMMETRIC_TENSOR.h>
 #include <fstream>
 #include "STANDARD_TESTS_2D.h"
 namespace PhysBAM{
@@ -35,6 +36,7 @@ template<class T> STANDARD_TESTS<VECTOR<T,2> >::
 template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
 Initialize()
 {
+    MATRIX<T,2> rot(0,1,-1,0);
     if(bc_periodic)
         bc_type.Fill(BC_PERIODIC);
     switch(test_number)
@@ -187,17 +189,11 @@ Initialize()
             Set_Grid(RANGE<TV>::Centered_Box()*pi*m);
             T density=unit_rho*scale_mass;
             Set_Phases({density});
-            auto V_func=[=](const TV& X){return TV(-sin(a*X.x)*cos(a*X.y),cos(a*X.x)*sin(a*X.y));};
-            auto dV_func=[=](const TV& X)
-                {
-                    T c=cos(a*X.x)*cos(a*X.y),s=sin(a*X.x)*sin(a*X.y);
-                    return MATRIX<T,2>(-c,-s,s,c)*a;
-                };
-            Seed_Particles(grid.domain,V_func,dV_func,density,particles_per_cell);
-            analytic_velocity=[=](PHASE_ID pid,const TV& X,T time)
-                {
-                    return V_func(X)*exp(-2*sqr(a)*mu/density*time);
-                };
+            T b=-2*mu/density*sqr(a);
+            use_analytic_field=true;
+            Add_Velocity([=](auto X,auto t){return (rot*cos(X*a))*sin(X*a)*exp(b*t);});
+            Add_Pressure([=](auto X,auto t){return density/4*exp(2*b*t)*(cos(2*a*X(0))+cos(2*a*X(1)));});
+            Seed_Particles_Analytic(grid.domain,PHASE_ID(0),density,particles_per_cell);
             end_frame.Append([=](int frame){Check_Analytic_Velocity();});
         } break;
         case 17:
