@@ -310,6 +310,10 @@ template<class T,int d> DIAGONAL_MATRIX<T,d>
 Transpose_Times_Self(const DIAGONAL_MATRIX<T,d>& a)
 {return a*a;}
 
+template<class T,int d> DIAGONAL_MATRIX<T,d>
+Transpose_Times(const DIAGONAL_MATRIX<T,d>& a,const DIAGONAL_MATRIX<T,d>& b)
+{return DIAGONAL_MATRIX<T,d>(a.x*b.x);}
+
 template<class T,int d>
 inline DIAGONAL_MATRIX<T,d> operator*(const T a,const DIAGONAL_MATRIX<T,d>& A)
 {return A*a;}

@@ -115,7 +115,7 @@ void Hess_Test(F f,const char* str)
 
     T r0=abs(dx0-dx1)/maxabs(dx0,dx1,(T)1e-30);
     T r1=ddx2/maxabs(ddx0,ddx1,(T)1e-30);
-    if(r0<1e-5 && r1<1e-5){}
+    if(r0<1e-4 && r1<1e-4){}
     else printf("%8.4f %8.4f %10.4e   %8.4f %8.4f %10.4e  %s\n",abs(dx0/eps),abs(dx1/eps),r0,ddx0/eps,ddx1/eps,r1,str);
 }
 

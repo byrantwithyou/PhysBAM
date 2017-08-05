@@ -270,8 +270,10 @@ struct AUTO_HESS_EXT_VEC
 
     auto Sum() const -> decltype(Make_Hess(this->x.Sum(),this->dx.Transpose_Times(TV::All_Ones_Vector()),Contract_0(this->ddx,TV::All_Ones_Vector())))
     {return Make_Hess(x.Sum(),dx.Transpose_Times(TV::All_Ones_Vector()),Contract_0(ddx,TV::All_Ones_Vector()));}
-};
 
+    auto operator()(int i) const -> decltype(Dot(TV()))
+    {return Dot(TV::Axis_Vector(i));}
+};
 
 template<class T,class TV,class VEC1,class MAT1,int Q,class VEC2,class MAT2> auto
 Cross_Helper_1(const AUTO_HESS_EXT_VEC<VECTOR<T,3>,VEC1,MAT1,Q>& a,const AUTO_HESS_EXT_VEC<TV,VEC2,MAT2,Q>& b)
@@ -493,13 +495,15 @@ typename enable_if<IS_MATRIX<A>::value,AUTO_HESS_EXT_MAT<A,DIFF_UNUSED,DIFF_UNUS
 From_Const(const A& a)
 {return AUTO_HESS_EXT_MAT<A,DIFF_UNUSED,DIFF_UNUSED,0>(a);}
 
-
-
-
-
-
-
-
+template<class TV,class VEC,class MAT,int Q> inline auto
+Vector_Inverse(const AUTO_HESS_EXT_VEC<TV,VEC,MAT,Q>& a)
+{
+    typedef typename TV::SCALAR T;
+    TV ia=(T)1/a.x,ia2=ia*ia;
+    DIAGONAL_MATRIX<T,TV::m> dia2(-ia2);
+    DIAGONAL_TENSOR<T,TV::m> t(ia2*ia);
+    return Make_Hess_Vec(ia,dia2*a.dx,Contract_00(a.ddx,dia2)+Symmetric_Double_Contract_12_With_Tensor_Q<(Q&2)!=0>(t,a.dx,a.dx));
+}
 
 ///////////////// UNARY /////////////////
 
@@ -671,6 +675,39 @@ template<class TV,class VEC1,class MAT1,int Q> auto
 Sub_V_Av(const TV& a,const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q>& b)
 {
     return Make_Hess_Vec(a-b.x,-b.dx,-b.ddx);
+}
+
+template<class TV,class VEC,class MAT,class VEC1,class MAT1,int Q> auto
+Mul_Av_Av(const AUTO_HESS_EXT_VEC<TV,VEC,MAT,Q>& a,const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q>& b)
+{
+    DIAGONAL_TENSOR<typename TV::SCALAR,TV::m> o(TV()+1);
+    DIAGONAL_MATRIX<typename TV::SCALAR,TV::m> oa(a.x),ob(b.x);
+    return Make_Hess_Vec(a.x*b.x,oa*b.dx+ob*a.dx,Contract_00(a.ddx,ob)+Contract_00(b.ddx,oa)+Symmetric_Double_Contract_12_With_Tensor_Q<(Q&2)!=0>(o,a.dx,b.dx));
+}
+
+template<class TV,class VEC,class MAT,int Q> auto
+Mul_Av_V(const AUTO_HESS_EXT_VEC<TV,VEC,MAT,Q>& a,const TV& b)
+{
+    DIAGONAL_MATRIX<typename TV::SCALAR,TV::m> ob(b);
+    return Make_Hess_Vec(a.x*b,ob*a.dx,Contract_00(a.ddx,ob));
+}
+
+template<class TV,class VEC,class MAT,class VEC1,class MAT1,int Q> auto
+Div_Av_Av(const AUTO_HESS_EXT_VEC<TV,VEC,MAT,Q>& a,const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q>& b)
+{
+    return Mul_Av_Av(a,Vector_Inverse(b));
+}
+
+template<class TV,class VEC,class MAT,int Q> auto
+Div_Av_V(const AUTO_HESS_EXT_VEC<TV,VEC,MAT,Q>& a,const TV& b)
+{
+    return Mul_Av_V(a,(typename TV::SCALAR)1/b);
+}
+
+template<class TV,class VEC1,class MAT1,int Q> auto
+Div_V_Av(const TV& a,const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q>& b)
+{
+    return Mul_Av_V(Vector_Inverse(b),a);
 }
 
 ///////////// SCALAR MATRIX /////////////
@@ -1022,6 +1059,18 @@ template<class TV,class VEC,class MAT,int Q> auto
 Outer_Product(const AUTO_HESS_EXT_VEC<TV,VEC,MAT,Q>& a)
 {return Make_Hess_Mat(Outer_Product(a.x),Twice_Symmetric_Part_01_Q<Q&1>(Tensor_Product_1_Q<Q&1>(a.dx,a.x)),Twice_Symmetric_Part_01_Q<(Q&2)!=0>(Tensor_Product_1_Q<(Q&2)!=0>(a.ddx,a.x))+Symmetric_Tensor_Product_02_23_Q<(Q&2)!=0>(a.dx,a.dx));}
 
+template<class TV,int i,class A> auto
+Make_Vector_Helper(A&& a)
+{STATIC_ASSERT(i==TV::m-1);return TV::Axis_Vector(i)*a;}
+
+template<class TV,int i,class A,class... Args> auto
+Make_Vector_Helper(A&& a,Args&&... args)
+{return TV::Axis_Vector(i)*a+Make_Vector_Helper<TV,i+1>(args...);}
+
+template<class T,class A,class... Args> auto
+Make_Vector(A&& a,Args&&... args)
+{return Make_Vector_Helper<VECTOR<T,1+sizeof...(Args)>,0>(a,args...);}
+
 template<class T> struct IS_AUTO_HESS {static const int value=false;};
 template<class T,class VEC,class MAT,int Q> struct IS_AUTO_HESS<AUTO_HESS_EXT<T,VEC,MAT,Q> > {static const bool value=true;};
 template<class T,class VEC,class MAT,int Q> struct IS_AUTO_HESS<AUTO_HESS_EXT_VEC<T,VEC,MAT,Q> > {static const bool value=true;};
@@ -1094,6 +1143,9 @@ template<class T,class U> struct AUTO_HESS_DISPATCH_MUL<T,U,6,3> {static auto f(
 template<class T,class U> struct AUTO_HESS_DISPATCH_MUL<T,U,6,4> {static auto f(const T& a,const U& b){return Mul_As_Am(b,a);}};
 template<class T,class U> struct AUTO_HESS_DISPATCH_MUL<T,U,6,5> {static auto f(const T& a,const U& b){return Mul_Am_Av(a,b);}};
 template<class T,class U> struct AUTO_HESS_DISPATCH_MUL<T,U,6,6> {static auto f(const T& a,const U& b){return Mul_Am_Am(a,b);}};
+template<class T,class U> struct AUTO_HESS_DISPATCH_MUL<T,U,2,5> {static auto f(const T& a,const U& b){return Mul_Av_V(b,a);}};
+template<class T,class U> struct AUTO_HESS_DISPATCH_MUL<T,U,5,2> {static auto f(const T& a,const U& b){return Mul_Av_V(a,b);}};
+template<class T,class U> struct AUTO_HESS_DISPATCH_MUL<T,U,5,5> {static auto f(const T& a,const U& b){return Mul_Av_Av(a,b);}};
 template<class T,class U,bool enable> struct AUTO_HESS_MUL;
 template<class T,class U> struct AUTO_HESS_MUL<T,U,true> {typedef decltype(AUTO_HESS_DISPATCH_MUL<T,U,AUTO_HESS_RANK<T>::value,AUTO_HESS_RANK<U>::value>::f(T(),U())) TYPE;};
 
@@ -1107,6 +1159,9 @@ template<class T,class U> struct AUTO_HESS_DISPATCH_DIV<T,U,5,1> {static auto f(
 template<class T,class U> struct AUTO_HESS_DISPATCH_DIV<T,U,5,4> {static auto f(const T& a,const U& b){return Div_Av_As(a,b);}};
 template<class T,class U> struct AUTO_HESS_DISPATCH_DIV<T,U,6,1> {static auto f(const T& a,const U& b){return Div_Am_S(a,b);}};
 template<class T,class U> struct AUTO_HESS_DISPATCH_DIV<T,U,6,4> {static auto f(const T& a,const U& b){return Div_Am_As(a,b);}};
+template<class T,class U> struct AUTO_HESS_DISPATCH_DIV<T,U,2,5> {static auto f(const T& a,const U& b){return Div_V_Av(a,b);}};
+template<class T,class U> struct AUTO_HESS_DISPATCH_DIV<T,U,5,2> {static auto f(const T& a,const U& b){return Div_Av_V(a,b);}};
+template<class T,class U> struct AUTO_HESS_DISPATCH_DIV<T,U,5,5> {static auto f(const T& a,const U& b){return Div_Av_Av(a,b);}};
 template<class T,class U,bool enable> struct AUTO_HESS_DIV;
 template<class T,class U> struct AUTO_HESS_DIV<T,U,true> {typedef decltype(AUTO_HESS_DISPATCH_DIV<T,U,AUTO_HESS_RANK<T>::value,AUTO_HESS_RANK<U>::value>::f(T(),U())) TYPE;};
 
@@ -1151,5 +1206,6 @@ using HETERO_DIFF::abs;
 //using HETERO_DIFF::hypot;
 using HETERO_DIFF::sqr;
 using HETERO_DIFF::sqrt;
+using HETERO_DIFF::Make_Vector;
 }
 #endif

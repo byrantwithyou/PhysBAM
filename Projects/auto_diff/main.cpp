@@ -40,6 +40,7 @@ void test_26();
 void test_27();
 void test_28();
 void test_29();
+void test_30();
 
 int main(int argc, char* argv[])
 {
@@ -75,6 +76,7 @@ int main(int argc, char* argv[])
     test_27();
     test_28();
     test_29();
+    test_30();
 
     return 0;
 }

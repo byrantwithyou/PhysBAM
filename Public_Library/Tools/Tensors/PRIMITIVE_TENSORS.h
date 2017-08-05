@@ -31,12 +31,14 @@ VECTOR
 ZERO_MATRIX
 IDENTITY_MATRIX
 SCALE_MATRIX
+DIAGONAL_MATRIX
 SYMMETRIC_MATRIX
 MATRIX
 
 ZERO_TENSOR
 TENSOR
 SYMMETRIC_TENSOR
+DIAGONAL_TENSOR
 VEC_ID_TENSOR
 VEC_ID_SYM_TENSOR
 PERMUTATION_TENSOR
@@ -947,6 +949,66 @@ operator+(const TENSOR<T,3,3,3>& b,const PERMUTATION_TENSOR<T>& a)
     return t+=a;
 }
 
+template<class T,int m> DIAGONAL_TENSOR<T,m>
+operator+(const DIAGONAL_TENSOR<T,m>& a,const DIAGONAL_TENSOR<T,m>& b)
+{
+    return DIAGONAL_TENSOR<T,m>(a.v+b.v);
+}
+
+template<class T,int u,int m> SYMMETRIC_TENSOR<T,u,m,m>
+operator+(const VEC_ID_TENSOR<T,u,m,m>& a,const DIAGONAL_TENSOR<T,m>& b)
+{
+    SYMMETRIC_TENSOR<T,u,m,m> t;
+    t+=a;
+    t+=b;
+    return t;
+}
+
+template<class T,int u,int m> SYMMETRIC_TENSOR<T,u,m,m>
+operator+(const VEC_ID_SYM_TENSOR<T,u,m>& a,const DIAGONAL_TENSOR<T,m>& b)
+{
+    SYMMETRIC_TENSOR<T,u,m,m> t;
+    t+=a;
+    t+=b;
+    return t;
+}
+
+template<class T> TENSOR<T,3>
+operator+(const PERMUTATION_TENSOR<T>& a,const DIAGONAL_TENSOR<T,3>& b)
+{
+    TENSOR<T,3> t;
+    t+=a;
+    t+=b;
+    return t;
+}
+
+template<class T,int u,int m> SYMMETRIC_TENSOR<T,u,m,m>
+operator+(const DIAGONAL_TENSOR<T,m>& b,const VEC_ID_TENSOR<T,u,m,m>& a)
+{
+    SYMMETRIC_TENSOR<T,u,m,m> t;
+    t+=a;
+    t+=b;
+    return t;
+}
+
+template<class T,int u,int m> SYMMETRIC_TENSOR<T,u,m,m>
+operator+(const DIAGONAL_TENSOR<T,m>& b,const VEC_ID_SYM_TENSOR<T,u,m>& a)
+{
+    SYMMETRIC_TENSOR<T,u,m,m> t;
+    t+=a;
+    t+=b;
+    return t;
+}
+
+template<class T> TENSOR<T,3>
+operator+(const DIAGONAL_TENSOR<T,3>& b,const PERMUTATION_TENSOR<T>& a)
+{
+    TENSOR<T,3> t;
+    t+=a;
+    t+=b;
+    return t;
+}
+
 //#####################################################################
 // operator-
 //##################################################################### 
@@ -1084,6 +1146,68 @@ operator-(const TEN0& a,const TEN1& b)
     TENSOR<typename TEN0::SCALAR,TEN0::m,TEN0::n,TEN0::p> t;
     t+=a;
     t-=b;
+    return t;
+}
+
+
+
+template<class T,int m> DIAGONAL_TENSOR<T,m>
+operator-(const DIAGONAL_TENSOR<T,m>& a,const DIAGONAL_TENSOR<T,m>& b)
+{
+    return DIAGONAL_TENSOR<T,m>(a.v-b.v);
+}
+
+template<class T,int u,int m> SYMMETRIC_TENSOR<T,u,m,m>
+operator-(const VEC_ID_TENSOR<T,u,m,m>& a,const DIAGONAL_TENSOR<T,m>& b)
+{
+    SYMMETRIC_TENSOR<T,u,m,m> t;
+    t+=a;
+    t-=b;
+    return t;
+}
+
+template<class T,int u,int m> SYMMETRIC_TENSOR<T,u,m,m>
+operator-(const VEC_ID_SYM_TENSOR<T,u,m>& a,const DIAGONAL_TENSOR<T,m>& b)
+{
+    SYMMETRIC_TENSOR<T,u,m,m> t;
+    t+=a;
+    t-=b;
+    return t;
+}
+
+template<class T> TENSOR<T,3>
+operator-(const PERMUTATION_TENSOR<T>& a,const DIAGONAL_TENSOR<T,3>& b)
+{
+    TENSOR<T,3> t;
+    t+=a;
+    t-=b;
+    return t;
+}
+
+template<class T,int u,int m> SYMMETRIC_TENSOR<T,u,m,m>
+operator-(const DIAGONAL_TENSOR<T,m>& b,const VEC_ID_TENSOR<T,u,m,m>& a)
+{
+    SYMMETRIC_TENSOR<T,u,m,m> t;
+    t-=a;
+    t+=b;
+    return t;
+}
+
+template<class T,int u,int m> SYMMETRIC_TENSOR<T,u,m,m>
+operator-(const DIAGONAL_TENSOR<T,m>& b,const VEC_ID_SYM_TENSOR<T,u,m>& a)
+{
+    SYMMETRIC_TENSOR<T,u,m,m> t;
+    t-=a;
+    t+=b;
+    return t;
+}
+
+template<class T> TENSOR<T,3>
+operator-(const DIAGONAL_TENSOR<T,3>& b,const PERMUTATION_TENSOR<T>& a)
+{
+    TENSOR<T,3> t;
+    t-=a;
+    t+=b;
     return t;
 }
 
@@ -1629,6 +1753,12 @@ Contract(const DIAGONAL_TENSOR<T,m>& a,const MATRIX<T,p,m>& M)
     return t;
 }
 
+template<int r,int s,class T,int m> DIAGONAL_TENSOR<T,m>
+Contract(const DIAGONAL_TENSOR<T,m>& a,const DIAGONAL_MATRIX<T,m>& M)
+{
+    return DIAGONAL_TENSOR<T,m>(a.v*M.x);
+}
+
 template<int r,int s,class T,int m,int n,int p>
 typename enable_if<s==0,VEC_ID_TENSOR<T,r,p,n> >::type
 Contract(const VEC_ID_TENSOR<T,r,m,n>& a,const MATRIX<T,m,p>& M)
@@ -1837,6 +1967,23 @@ template<class T,int m> SYMMETRIC_TENSOR<T,0,m,m> Symmetric_Double_Contract_12(c
     for(int i=0;i<m;i++) s.x(i)=t.v(i)*MATRIX<T,m>::Outer_Product(cm1.Row(i),cm2.Row(i)).Twice_Symmetric_Part();;
     return s;
 }
+
+template<class T,int m> ZERO_TENSOR<T,m> Symmetric_Double_Contract_12(const DIAGONAL_TENSOR<T,m>& t,const ZERO_MATRIX<T,m>& cm1,const DIAGONAL_MATRIX<T,m>){return ZERO_TENSOR<T,m>();}
+template<class T,int m> DIAGONAL_TENSOR<T,m> Symmetric_Double_Contract_12(const DIAGONAL_TENSOR<T,m>& t,const IDENTITY_MATRIX<T,m>& cm1,const DIAGONAL_MATRIX<T,m>& cm2)
+{return DIAGONAL_TENSOR<T,m>(t.v*cm2.x*2);}
+template<class T,int m> DIAGONAL_TENSOR<T,m> Symmetric_Double_Contract_12(const DIAGONAL_TENSOR<T,m>& t,const SCALE_MATRIX<T,m>& cm1,const DIAGONAL_MATRIX<T,m>& cm2)
+{return DIAGONAL_TENSOR<T,m>(t.v*cm2.x*(2*cm1.x));}
+template<class T,int m> ZERO_TENSOR<T,m> Symmetric_Double_Contract_12(const DIAGONAL_TENSOR<T,m>& t,const DIAGONAL_MATRIX<T,m>& cm1,const ZERO_MATRIX<T,m>& cm2){return ZERO_TENSOR<T,m>();}
+template<class T,int m> DIAGONAL_TENSOR<T,m> Symmetric_Double_Contract_12(const DIAGONAL_TENSOR<T,m>& t,const DIAGONAL_MATRIX<T,m>& cm1,const IDENTITY_MATRIX<T,m>& cm2)
+{return Symmetric_Double_Contract_12(t,cm2,cm1);}
+template<class T,int m> DIAGONAL_TENSOR<T,m> Symmetric_Double_Contract_12(const DIAGONAL_TENSOR<T,m>& t,const DIAGONAL_MATRIX<T,m>& cm1,const SCALE_MATRIX<T,m>& cm2)
+{return Symmetric_Double_Contract_12(t,cm2,cm1);}
+template<class T,int m> DIAGONAL_TENSOR<T,m> Symmetric_Double_Contract_12(const DIAGONAL_TENSOR<T,m>& t,const DIAGONAL_MATRIX<T,m>& cm1,const DIAGONAL_MATRIX<T,m>& cm2)
+{return DIAGONAL_TENSOR<T,m>(t.v*cm1.x*cm2.x*2);}
+template<class T,int m> SYMMETRIC_TENSOR<T,0,m,m> Symmetric_Double_Contract_12(const DIAGONAL_TENSOR<T,m>& t,const DIAGONAL_MATRIX<T,m>& cm1,const MATRIX<T,m>& cm2)
+{return (DIAGONAL_MATRIX<T,m>(t.v*cm1.x)*cm2).Twice_Symmetric_Part();}
+template<class T,int m> SYMMETRIC_TENSOR<T,0,m,m> Symmetric_Double_Contract_12(const DIAGONAL_TENSOR<T,m>& t,const MATRIX<T,m>& cm1,const DIAGONAL_MATRIX<T,m>& cm2)
+{return Symmetric_Double_Contract_12(t,cm2,cm1);}
 
 template<class T_TEN> typename enable_if<IS_TENSOR<T_TEN>::value,T_TEN>::type Choose(const T_TEN& a,const T_TEN& b);
 template<class T_TEN0,class T_TEN1>
