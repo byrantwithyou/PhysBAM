@@ -33,8 +33,6 @@ public:
     MPM_KRYLOV_VECTOR<TV>& dv,&rhs;
     
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
-    ARRAY<KRYLOV_VECTOR_BASE<T>*> bv;
-    ARRAY<KRYLOV_VECTOR_BASE<T>*> cv;
 
     MPM_DRIVER(MPM_EXAMPLE<TV>& example);
     virtual ~MPM_DRIVER();

@@ -52,8 +52,6 @@ template<class TV> MPM_DRIVER<TV>::
     delete &dv;
     delete &rhs;
     av.Delete_Pointers_And_Clean_Memory();
-    bv.Delete_Pointers_And_Clean_Memory();
-    cv.Delete_Pointers_And_Clean_Memory();
 }
 //#####################################################################
 // Execute_Main_Program
