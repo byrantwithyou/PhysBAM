@@ -172,8 +172,8 @@ int main(int argc, char* argv[])
             if(use_pressure) driver.Pressure_Projection();
             else if(mu){
                 driver.Apply_BC();
-                driver.Allocate_Projection_System_Variable();}
-            driver.Apply_Viscosity();
+                driver.Allocate_Projection_System_Variable();
+                driver.Apply_Viscosity();}
             driver.Grid_To_Particle();
             example.particles.X=store_X;
             if(dump_particles){
@@ -232,7 +232,6 @@ int main(int argc, char* argv[])
         ARRAY<T> abs_eig(dofs_per_cell);
         for(int i=0;i<dofs_per_cell;i++) abs_eig(i)=abs(eig(i));
         abs_eig.Sort();
-//        printf("PT %g %g\n",k.Magnitude_Squared(),abs_eig.Last());
         max_abs_eig(it.index)=icm(abs_eig.Last());
         sec_abs_eig(it.index)=icm(abs_eig(abs_eig.m-2));
         thi_abs_eig(it.index)=icm(abs_eig(abs_eig.m-3));
