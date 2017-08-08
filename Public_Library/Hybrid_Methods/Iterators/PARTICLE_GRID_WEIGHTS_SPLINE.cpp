@@ -18,6 +18,7 @@ PARTICLE_GRID_WEIGHTS_SPLINE(const GRID<TV>& grid,int threads)
     :BASE(threads),grid(grid)
 {
     this->use_gradient_transfer=(degree==1);
+    this->stencil_width=degree+1;
 }
 //#####################################################################
 // Destructor
@@ -170,14 +171,6 @@ template<class TV,int degree> void PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
 Dp_Inverse(ARRAY_VIEW<const TV> X,ARRAY_VIEW<SYMMETRIC_MATRIX<T,TV::m> > Dp_inv) const
 {
     for(int i=0;i<X.m;i++) Dp_inv(i)=Dp_Inverse_Helper<degree>(grid,X(i));
-}
-//#####################################################################
-// Function Order
-//#####################################################################
-template<class TV,int degree> int PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
-Order() const
-{
-    return degree;
 }
 //#####################################################################
 // Function Weights_Helper

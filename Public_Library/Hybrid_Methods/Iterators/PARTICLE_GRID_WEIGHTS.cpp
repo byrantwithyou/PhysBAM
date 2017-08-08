@@ -9,7 +9,7 @@ namespace PhysBAM{
 //#####################################################################
 template<class TV> PARTICLE_GRID_WEIGHTS<TV>::
 PARTICLE_GRID_WEIGHTS(int threads)
-    :use_gradient_transfer(false)
+    :use_gradient_transfer(false),stencil_width(0)
 {
 }
 //#####################################################################

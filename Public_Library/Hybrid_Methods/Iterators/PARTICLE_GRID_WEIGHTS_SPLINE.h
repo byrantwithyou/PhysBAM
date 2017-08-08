@@ -37,7 +37,6 @@ public:
     void Update(ARRAY_VIEW<const TV> X) override;
     virtual SYMMETRIC_MATRIX<T,TV::m> Dp_Inverse(const TV& X) const;
     virtual void Dp_Inverse(ARRAY_VIEW<const TV> X,ARRAY_VIEW<SYMMETRIC_MATRIX<T,TV::m> > Dp_inv) const;
-    int Order() const override;
     virtual T Weight(const TV& u) const override;
 //#####################################################################
 };

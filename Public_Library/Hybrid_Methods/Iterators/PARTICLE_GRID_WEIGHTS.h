@@ -24,6 +24,9 @@ public:
 
     bool use_gradient_transfer;
 
+    // Uses this many grid nodes in each direction
+    int stencil_width;
+
     PARTICLE_GRID_WEIGHTS(int threads);
     virtual ~PARTICLE_GRID_WEIGHTS();
 
@@ -32,7 +35,6 @@ public:
     virtual void Update(ARRAY_VIEW<const TV> X)=0;
     virtual SYMMETRIC_MATRIX<T,TV::m> Dp_Inverse(const TV& X) const=0;
     virtual void Dp_Inverse(ARRAY_VIEW<const TV> X,ARRAY_VIEW<SYMMETRIC_MATRIX<T,TV::m> > Dp_inv) const=0;
-    virtual int Order() const=0;
     virtual T Weight(const TV& u) const=0;
 //#####################################################################
 };
