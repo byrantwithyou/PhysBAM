@@ -176,49 +176,20 @@ Set_Weights(int order)
 // Function Total_Particle_Linear_Momentum
 //#####################################################################
 template<class TV> TV MPM_MAC_EXAMPLE<TV>::
-Total_Particle_Linear_Momentum(const PHASE& ph) const
-{
-    TV result;
-#pragma omp parallel for
-    for(int t=0;t<threads;t++){
-        int a=t*ph.simulated_particles.m/threads;
-        int b=(t+1)*ph.simulated_particles.m/threads;
-        TV result_local;
-        for(int k=a;k<b;k++){
-            int p=ph.simulated_particles(k);
-            result_local+=particles.mass(p)*particles.V(p);}
-#pragma omp critical
-        result+=result_local;}
-    return result;
-}
-//#####################################################################
-// Function Total_Particle_Linear_Momentum
-//#####################################################################
-template<class TV> TV MPM_MAC_EXAMPLE<TV>::
 Total_Particle_Linear_Momentum() const
 {
     TV result;
     for(PHASE_ID i(0);i<phases.m;i++)
-        result+=Total_Particle_Linear_Momentum(phases(i));
-    return result;
-}
-//#####################################################################
-// Function Total_Grid_Linear_Momentum
-//#####################################################################
-template<class TV> TV MPM_MAC_EXAMPLE<TV>::
-Total_Grid_Linear_Momentum(const PHASE& ph) const
-{
-    TV result;
 #pragma omp parallel for
-    for(int t=0;t<threads;t++){
-        int a=t*ph.valid_flat_indices.m/threads;
-        int b=(t+1)*ph.valid_flat_indices.m/threads;
-        TV result_local;
-        for(int k=a;k<b;k++){
-            int j=ph.valid_flat_indices(k);
-            result_local(ph.valid_indices(k).axis)+=ph.mass.array(j)*ph.velocity.array(j);}
+        for(int t=0;t<threads;t++){
+            int a=t*phases(i).simulated_particles.m/threads;
+            int b=(t+1)*phases(i).simulated_particles.m/threads;
+            TV result_local;
+            for(int k=a;k<b;k++){
+                int p=phases(i).simulated_particles(k);
+                result_local+=particles.mass(p)*particles.V(p);}
 #pragma omp critical
-        result+=result_local;}
+            result+=result_local;}
     return result;
 }
 //#####################################################################
@@ -228,28 +199,18 @@ template<class TV> TV MPM_MAC_EXAMPLE<TV>::
 Total_Grid_Linear_Momentum() const
 {
     TV result;
-    for(PHASE_ID i(0);i<phases.m;i++)
-        result+=Total_Grid_Linear_Momentum(phases(i));
-    return result;
-}
-//#####################################################################
-// Function Total_Particle_Angular_Momentum
-//#####################################################################
-template<class TV> typename TV::SPIN MPM_MAC_EXAMPLE<TV>::
-Total_Particle_Angular_Momentum(const PHASE& ph) const
-{
-    typename TV::SPIN result;
+    for(PHASE_ID i(0);i<phases.m;i++){
+        const PHASE& ph=phases(i);
 #pragma omp parallel for
-    for(int t=0;t<threads;t++){
-        int a=t*ph.simulated_particles.m/threads;
-        int b=(t+1)*ph.simulated_particles.m/threads;
-        typename TV::SPIN result_local;
-        for(int k=a;k<b;k++){
-            int p=ph.simulated_particles(k);
-            result_local+=particles.mass(p)*particles.X(p).Cross(particles.V(p));
-            if(particles.store_B) result_local-=particles.mass(p)*particles.B(p).Contract_Permutation_Tensor();}
+        for(int t=0;t<threads;t++){
+            int a=t*ph.valid_flat_indices.m/threads;
+            int b=(t+1)*ph.valid_flat_indices.m/threads;
+            TV result_local;
+            for(int k=a;k<b;k++){
+                int j=ph.valid_flat_indices(k);
+                result_local(ph.valid_indices(k).axis)+=ph.mass.array(j)*ph.velocity.array(j);}
 #pragma omp critical
-        result+=result_local;}
+            result+=result_local;}}
     return result;
 }
 //#####################################################################
@@ -259,28 +220,19 @@ template<class TV> typename TV::SPIN MPM_MAC_EXAMPLE<TV>::
 Total_Particle_Angular_Momentum() const
 {
     typename TV::SPIN result;
-    for(PHASE_ID i(0);i<phases.m;i++)
-        result+=Total_Particle_Angular_Momentum(phases(i));
-    return result;
-}
-//#####################################################################
-// Function Total_Grid_Angular_Momentum
-//#####################################################################
-template<class TV> typename TV::SPIN MPM_MAC_EXAMPLE<TV>::
-Total_Grid_Angular_Momentum(const PHASE& ph,T dt) const
-{
-    typename TV::SPIN result;
+    for(PHASE_ID i(0);i<phases.m;i++){
+        const PHASE& ph=phases(i);
 #pragma omp parallel for
-    for(int t=0;t<threads;t++){
-        int a=t*ph.valid_flat_indices.m/threads;
-        int b=(t+1)*ph.valid_flat_indices.m/threads;
-        typename TV::SPIN result_local;
-        for(int k=a;k<b;k++){
-            int i=ph.valid_flat_indices(k);
-            TV X=location.array(i);
-            result_local+=ph.mass.array(i)*TV::Cross_Product(X,ph.velocity.array(i)*TV::Axis_Vector(ph.valid_indices(k).axis));}
+        for(int t=0;t<threads;t++){
+            int a=t*ph.simulated_particles.m/threads;
+            int b=(t+1)*ph.simulated_particles.m/threads;
+            typename TV::SPIN result_local;
+            for(int k=a;k<b;k++){
+                int p=ph.simulated_particles(k);
+                result_local+=particles.mass(p)*particles.X(p).Cross(particles.V(p));
+                if(particles.store_B) result_local-=particles.mass(p)*particles.B(p).Contract_Permutation_Tensor();}
 #pragma omp critical
-        result+=result_local;}
+            result+=result_local;}}
     return result;
 }
 //#####################################################################
@@ -290,21 +242,19 @@ template<class TV> typename TV::SPIN MPM_MAC_EXAMPLE<TV>::
 Total_Grid_Angular_Momentum(T dt) const
 {
     typename TV::SPIN result;
-    for(PHASE_ID i(0);i<phases.m;i++)
-        result+=Total_Grid_Angular_Momentum(phases(i),dt);
-    return result;
-}
-//#####################################################################
-// Function Total_Grid_Kinetic_Energy
-//#####################################################################
-template<class TV> typename TV::SCALAR MPM_MAC_EXAMPLE<TV>::
-Total_Grid_Kinetic_Energy(const PHASE& ph) const
-{
-    T result=0;
-#pragma omp parallel for reduction(+:result)
-    for(int i=0;i<ph.valid_flat_indices.m;i++){
-        int j=ph.valid_flat_indices(i);
-        result+=(T).5*ph.mass.array(j)*sqr(ph.velocity.array(j));}
+    for(PHASE_ID i(0);i<phases.m;i++){
+        const PHASE& ph=phases(i);
+#pragma omp parallel for
+        for(int t=0;t<threads;t++){
+            int a=t*ph.valid_flat_indices.m/threads;
+            int b=(t+1)*ph.valid_flat_indices.m/threads;
+            typename TV::SPIN result_local;
+            for(int k=a;k<b;k++){
+                int i=ph.valid_flat_indices(k);
+                TV X=location.array(i);
+                result_local+=ph.mass.array(i)*TV::Cross_Product(X,ph.velocity.array(i)*TV::Axis_Vector(ph.valid_indices(k).axis));}
+#pragma omp critical
+            result+=result_local;}}
     return result;
 }
 //#####################################################################
@@ -314,27 +264,12 @@ template<class TV> typename TV::SCALAR MPM_MAC_EXAMPLE<TV>::
 Total_Grid_Kinetic_Energy() const
 {
     T result=0;
-    for(PHASE_ID i(0);i<phases.m;i++)
-        result+=Total_Grid_Kinetic_Energy(phases(i));
-    return result;
-}
-//#####################################################################
-// Function Total_Particle_Kinetic_Energy
-//#####################################################################
-template<class TV> typename TV::SCALAR MPM_MAC_EXAMPLE<TV>::
-Total_Particle_Kinetic_Energy(const PHASE& ph) const
-{
-    T result=0;
+    for(PHASE_ID i(0);i<phases.m;i++){
+        const PHASE& ph=phases(i);
 #pragma omp parallel for reduction(+:result)
-    for(int k=0;k<ph.simulated_particles.m;k++){
-        int p=ph.simulated_particles(k);
-        T result_local=particles.mass(p)/2*particles.V(p).Magnitude_Squared();
-        if(particles.store_B)
-            for(int a=0;a<TV::m;a++){
-                SYMMETRIC_MATRIX<T,TV::m> D=lag_Dp?Dp_inv(a)(p).Inverse():Dp_inv(a)(p);
-                TV b=particles.B(p).Row(a);
-                result_local+=particles.mass(p)/2*b.Dot(D*b);}
-        result+=result_local;}
+        for(int i=0;i<ph.valid_flat_indices.m;i++){
+            int j=ph.valid_flat_indices(i);
+            result+=(T).5*ph.mass.array(j)*sqr(ph.velocity.array(j));}}
     return result;
 }
 //#####################################################################
@@ -345,20 +280,17 @@ Total_Particle_Kinetic_Energy() const
 {
     T result=0;
     for(PHASE_ID i(0);i<phases.m;i++)
-        result+=Total_Particle_Kinetic_Energy(phases(i));
-    return result;
-}
-//#####################################################################
-// Function Average_Particle_Mass
-//#####################################################################
-template<class TV> typename TV::SCALAR MPM_MAC_EXAMPLE<TV>::
-Average_Particle_Mass(const PHASE& ph) const
-{
-    T result=0;
 #pragma omp parallel for reduction(+:result)
-    for(int k=0;k<ph.simulated_particles.m;k++)
-        result+=particles.mass(ph.simulated_particles(k));
-    return result/(T)particles.number;
+        for(int k=0;k<phases(i).simulated_particles.m;k++){
+            int p=phases(i).simulated_particles(k);
+            T result_local=particles.mass(p)/2*particles.V(p).Magnitude_Squared();
+            if(particles.store_B)
+                for(int a=0;a<TV::m;a++){
+                    SYMMETRIC_MATRIX<T,TV::m> D=lag_Dp?Dp_inv(a)(p).Inverse():Dp_inv(a)(p);
+                    TV b=particles.B(p).Row(a);
+                    result_local+=particles.mass(p)/2*b.Dot(D*b);}
+            result+=result_local;}
+    return result;
 }
 //#####################################################################
 // Function Average_Particle_Mass
@@ -368,8 +300,10 @@ Average_Particle_Mass() const
 {
     T result=0;
     for(PHASE_ID i(0);i<phases.m;i++)
-        result+=Average_Particle_Mass(phases(i));
-    return result;
+#pragma omp parallel for reduction(+:result)
+        for(int k=0;k<phases(i).simulated_particles.m;k++)
+            result+=particles.mass(phases(i).simulated_particles(k));
+    return result/(T)particles.number;
 }
 //#####################################################################
 // Function Add_Collision_Object

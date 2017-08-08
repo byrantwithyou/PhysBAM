@@ -53,9 +53,7 @@ public:
     void Apply_Viscosity();
     T Compute_Dt() const;
     T Max_Particle_Speed() const;
-    T Max_Particle_Speed(const PHASE& ph) const;
     T Grid_V_Upper_Bound() const;
-    T Grid_V_Upper_Bound(const PHASE& ph) const;
     void Update_Simulated_Particles();
     void Compute_Poisson_Matrix();
     void Move_Mass_Momentum_Inside(PHASE& ph) const;

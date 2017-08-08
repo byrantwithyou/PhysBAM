@@ -171,19 +171,12 @@ public:
     {Add_Collision_Object(Make_IO(object),type,friction,func_frame,func_twist);}
 
     TV Total_Particle_Linear_Momentum() const;
-    TV Total_Particle_Linear_Momentum(const PHASE& ph) const;
     TV Total_Grid_Linear_Momentum() const;
-    TV Total_Grid_Linear_Momentum(const PHASE& ph) const;
     typename TV::SPIN Total_Grid_Angular_Momentum(T dt) const;
-    typename TV::SPIN Total_Grid_Angular_Momentum(const PHASE& ph,T dt) const;
     typename TV::SPIN Total_Particle_Angular_Momentum() const;
-    typename TV::SPIN Total_Particle_Angular_Momentum(const PHASE& ph) const;
     T Total_Grid_Kinetic_Energy() const;
-    T Total_Grid_Kinetic_Energy(const PHASE& ph) const;
     T Total_Particle_Kinetic_Energy() const;
-    T Total_Particle_Kinetic_Energy(const PHASE& ph) const;
     T Average_Particle_Mass() const;
-    T Average_Particle_Mass(const PHASE& ph) const;
     void Execute_Callbacks(bool is_begin,const char* func_name);
     void Add_Callbacks(bool is_begin,const char* func_name,std::function<void()> func);
     void Print_Grid_Stats(const char* str);

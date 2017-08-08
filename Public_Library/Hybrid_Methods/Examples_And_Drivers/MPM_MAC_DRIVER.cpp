@@ -1071,42 +1071,16 @@ Compute_Dt() const
 // Function Max_Particle_Speed
 //#####################################################################
 template<class TV> typename TV::SCALAR MPM_MAC_DRIVER<TV>::
-Max_Particle_Speed(const PHASE& ph) const
-{
-    T v2=0;
-#pragma omp parallel for reduction(max:v2)
-    for(int k=0;k<ph.simulated_particles.m;k++){
-        int p=ph.simulated_particles(k);
-        v2=max(v2,example.particles.V(p).Magnitude_Squared());}
-    return sqrt(v2);
-}
-//#####################################################################
-// Function Max_Particle_Speed
-//#####################################################################
-template<class TV> typename TV::SCALAR MPM_MAC_DRIVER<TV>::
 Max_Particle_Speed() const
 {
-    TIMER_SCOPE_FUNC;
-    T v=0;
-    for(PHASE_ID i(0);i<example.phases.m;i++)
-        v=max(v,Max_Particle_Speed(example.phases(i)));
-    return v;
-}
-//#####################################################################
-// Function Grid_V_Upper_Bound
-//#####################################################################
-template<class TV> typename TV::SCALAR MPM_MAC_DRIVER<TV>::
-Grid_V_Upper_Bound(const PHASE& ph) const
-{
-    T result=0;
-    T xi=(T)6*sqrt((T)TV::m)*example.grid.one_over_dX.Min();
-#pragma omp parallel for reduction(max:result)
-    for(int k=0;k<ph.simulated_particles.m;k++){
-        int p=ph.simulated_particles(k);
-        T v=example.particles.V(p).Magnitude();
-        if(example.particles.store_B) v+=example.particles.B(p).Frobenius_Norm()*xi;
-        result=max(result,v);}
-    return result;
+    T v2=0;
+    for(PHASE_ID p(0);p<example.phases.m;p++){
+        const PHASE& ph=example.phases(p);
+#pragma omp parallel for reduction(max:v2)
+        for(int k=0;k<ph.simulated_particles.m;k++){
+            int p=ph.simulated_particles(k);
+            v2=max(v2,example.particles.V(p).Magnitude_Squared());}}
+    return sqrt(v2);
 }
 //#####################################################################
 // Function Grid_V_Upper_Bound
@@ -1114,13 +1088,15 @@ Grid_V_Upper_Bound(const PHASE& ph) const
 template<class TV> typename TV::SCALAR MPM_MAC_DRIVER<TV>::
 Grid_V_Upper_Bound() const
 {
-    TIMER_SCOPE_FUNC;
-    if(!example.use_affine) return Max_Particle_Speed();
-
     T result=0;
-
+    T xi=(T)6*sqrt((T)TV::m)*example.grid.one_over_dX.Min();
     for(PHASE_ID i(0);i<example.phases.m;i++)
-        result=max(result,Grid_V_Upper_Bound(example.phases(i)));
+#pragma omp parallel for reduction(max:result)
+    for(int k=0;k<example.phases(i).simulated_particles.m;k++){
+        int p=example.phases(i).simulated_particles(k);
+        T v=example.particles.V(p).Magnitude();
+        if(example.particles.store_B) v+=example.particles.B(p).Frobenius_Norm()*xi;
+        result=max(result,v);}
     return result;
 }
 //#####################################################################
