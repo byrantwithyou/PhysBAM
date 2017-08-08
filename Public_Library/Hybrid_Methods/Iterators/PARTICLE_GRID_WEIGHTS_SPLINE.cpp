@@ -18,7 +18,6 @@ PARTICLE_GRID_WEIGHTS_SPLINE(const GRID<TV>& grid,int threads)
     :BASE(threads),grid(grid)
 {
     this->use_gradient_transfer=(degree==1);
-    this->constant_scalar_inertia_tensor=(degree!=1);
 }
 //#####################################################################
 // Destructor
@@ -141,29 +140,36 @@ Compute_Precompute_Data(PRECOMPUTE_DATA& pd,const TV& X) const
 // Function Update
 //#####################################################################
 template<class TV,int degree> void PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
-Update(const ARRAY_VIEW<TV>& X)
+Update(ARRAY_VIEW<const TV> X)
 {
     precompute_data.Resize(X.m);
     for(int p=0;p<X.m;p++) Compute_Precompute_Data(precompute_data(p),X(p));
 }
 //#####################################################################
-// Function Constant_Scalar_Dp
+// Function Dp_Inverse_Helper
 //#####################################################################
-template<class TV,int degree> typename TV::SCALAR PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
-Constant_Scalar_Inverse_Dp() const
+template<int degree,class T,int d,class TV> SYMMETRIC_MATRIX<T,d>
+Dp_Inverse_Helper(const GRID<TV>& grid,const VECTOR<T,d>& X)
 {
-    PHYSBAM_ASSERT(degree>1);
-    return (6-degree)*sqr(grid.one_over_dX(0));
+    if(degree>1) return DIAGONAL_MATRIX<T,TV::m>((6-degree)*grid.one_over_dX*grid.one_over_dX);
+    TV Z=X-grid.Center(grid.Index(X));
+    return DIAGONAL_MATRIX<T,TV::m>(Z*(grid.dX-Z)).Inverse();
 }
 //#####################################################################
-// Function Dp
+// Function Dp_Inverse
 //#####################################################################
-template<class TV,int degree> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
-Dp(const TV& X) const
+template<class TV,int degree> auto PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
+Dp_Inverse(const TV& X) const -> SYMMETRIC_MATRIX<T,TV::m>
 {
-    if(degree>1) return SYMMETRIC_MATRIX<T,TV::m>()+sqr(grid.dX(0))/(6-degree);
-    TV Z=X-grid.Center(grid.Index(X));
-    return DIAGONAL_MATRIX<T,TV::m>(Z*(grid.dX-Z));
+    return Dp_Inverse_Helper<degree>(grid,X);
+}
+//#####################################################################
+// Function Dp_Inverse
+//#####################################################################
+template<class TV,int degree> void PARTICLE_GRID_WEIGHTS_SPLINE<TV,degree>::
+Dp_Inverse(ARRAY_VIEW<const TV> X,ARRAY_VIEW<SYMMETRIC_MATRIX<T,TV::m> > Dp_inv) const
+{
+    for(int i=0;i<X.m;i++) Dp_inv(i)=Dp_Inverse_Helper<degree>(grid,X(i));
 }
 //#####################################################################
 // Function Order

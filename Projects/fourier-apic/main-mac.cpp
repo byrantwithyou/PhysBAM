@@ -143,7 +143,6 @@ int main(int argc, char* argv[])
     example.periodic_boundary.is_periodic.Fill(true);
     example.bc_type.Fill(example.BC_PERIODIC);
     example.particles.Store_B(example.use_affine);
-    example.particles.Store_C(false);
     ph.velocity(FACE_INDEX<TV::m>(0,center))=1;
     driver.Update_Simulated_Particles();
     driver.Update_Particle_Weights();

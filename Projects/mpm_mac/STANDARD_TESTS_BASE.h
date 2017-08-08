@@ -32,7 +32,7 @@ public:
     using BASE::initial_time;using BASE::last_frame;using BASE::grid;using BASE::particles;
     using BASE::frame_title;using BASE::write_substeps_level;using BASE::phases;
     using BASE::collision_objects;using BASE::substeps_delay_frame;using BASE::output_directory;
-    using BASE::restart;using BASE::dt;using BASE::time;using BASE::use_early_gradient_transfer;
+    using BASE::restart;using BASE::dt;using BASE::time;using BASE::lag_Dp;
     using BASE::frame_dt;using BASE::min_dt;using BASE::max_dt;using BASE::ghost;
     using BASE::use_affine;using BASE::only_write_particles;
     using BASE::cfl;using BASE::solver_tolerance;using BASE::solver_iterations;

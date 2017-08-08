@@ -68,6 +68,7 @@ public:
 
     // particle stuff
     MPM_PARTICLES<TV>& particles;
+    VECTOR<ARRAY<SYMMETRIC_MATRIX<T,TV::m> >,TV::m> Dp_inv;
 
     // grid stuff
     ARRAY<TV,FACE_INDEX<TV::m> > location;
@@ -88,7 +89,7 @@ public:
     // transfer stuff
     VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m> weights;
     bool use_affine;
-    bool use_early_gradient_transfer;
+    bool lag_Dp;
     T flip;
 
     // objects

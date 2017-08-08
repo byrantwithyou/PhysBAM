@@ -39,6 +39,7 @@ public:
     DEBUG_PARTICLES<TV>& debug_particles;
     ARRAY<int> simulated_particles;
     ARRAY<bool> particle_is_simulated;
+    ARRAY<SYMMETRIC_MATRIX<T,TV::m> > Dp_inv;
     ARRAY<T,TV_INT> mass,volume;
     ARRAY<TV,TV_INT> location;
     ARRAY<TV,TV_INT> velocity,velocity_new,velocity_friction,*current_velocity;
@@ -70,7 +71,7 @@ public:
     bool use_affine;
     bool use_midpoint;
     bool use_symplectic_euler;
-    bool use_early_gradient_transfer;
+    bool lag_Dp; // Bp will actually store Cp
     bool use_oldroyd;
     bool print_stats;
     bool only_write_particles;

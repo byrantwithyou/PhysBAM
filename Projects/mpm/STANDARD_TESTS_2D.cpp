@@ -1200,7 +1200,6 @@ Initialize()
                     particles.F(p)=particles.F(i);
                     if(particles.store_Fp) particles.Fp(p)=particles.Fp(i);
                     if(particles.store_B) particles.B(p)=particles.B(i);
-                    if(particles.store_C) particles.C(p)=particles.C(i);
                     if(particles.store_S) particles.S(p)=particles.S(i);
                     particles.volume(p)=volume_lambda;
                     particles.mu(p)=(T)0;
@@ -1313,7 +1312,6 @@ Initialize()
                 particles.F(p)=particles.F(i);
                 if(particles.store_Fp) particles.Fp(p)=particles.Fp(i);
                 if(particles.store_B) particles.B(p)=particles.B(i);
-                if(particles.store_C) particles.C(p)=particles.C(i);
                 if(particles.store_S) particles.S(p)=particles.S(i);
                 particles.volume(p)=volume_lambda;
                 particles.mu(p)=(T)0;

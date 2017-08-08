@@ -86,11 +86,10 @@ Initialize()
     rhs.u.Resize(example.grid.Domain_Indices(example.ghost));
     objective.system.tmp.u.Resize(example.grid.Domain_Indices(example.ghost));
 
-    example.particles.Store_B(example.use_affine && !(0));
-    example.particles.Store_C(example.use_affine && (0));
+    example.particles.Store_B(example.use_affine);
     example.particles.Store_S(example.use_oldroyd);
     example.current_velocity=&example.velocity;
-    PHYSBAM_ASSERT(!example.particles.store_B || !example.particles.store_C);
+    if(example.particles.store_B) example.Dp_inv.Resize(example.particles.X.m);
 
     RANGE<TV_INT> range(example.grid.Cell_Indices(example.ghost));
     example.location.Resize(range,false,false);
@@ -207,6 +206,7 @@ template<class TV> void MPM_DRIVER<TV>::
 Update_Particle_Weights()
 {
     example.weights->Update(example.particles.X);
+    if(example.particles.store_B) example.weights->Dp_Inverse(example.particles.X,example.Dp_inv);
 }
 //#####################################################################
 // Function Particle_To_Grid
@@ -223,21 +223,18 @@ Particle_To_Grid()
         example.velocity.array(i)=TV();
         example.velocity_new.array(i)=TV();}
 
-    T scale=1;
-    if(particles.store_B && !example.weights->use_gradient_transfer)
-        scale=example.weights->Constant_Scalar_Inverse_Dp();
-    bool use_gradient=!0 && !0 && example.weights->use_gradient_transfer;
-    ARRAY_VIEW<MATRIX<T,TV::m> > dV((0)?particles.C:particles.B);
+    bool use_gradient=example.weights->use_gradient_transfer;
     example.gather_scatter.template Scatter<int>(true,
-        [this,scale,&particles,use_gradient,dV](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
+        [this,&particles,use_gradient](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int data)
         {
             T w=it.Weight();
             TV_INT index=it.Index();
             example.mass(index)+=w*particles.mass(p);
             TV V=w*particles.V(p);
             if(example.use_affine){
-                if(use_gradient) V+=particles.B(p)*it.Gradient();
-                else V+=dV(p)*(w*scale*(example.grid.Center(index)-particles.X(p)));}
+                TV Y=example.grid.Center(index)-particles.X(p);
+                if(!example.lag_Dp) Y=example.Dp_inv(p)*Y;
+                V+=particles.B(p)*Y*w;}
             example.velocity(index)+=particles.mass(p)*V;
         });
 
@@ -261,13 +258,13 @@ Grid_To_Particle()
     struct HELPER
     {
         TV V_pic,V_weight_old,V_pic_fric;
-        MATRIX<T,TV::m> B,grad_Vp,grad_Vp_fric,D;
+        MATRIX<T,TV::m> B,grad_Vp,grad_Vp_fric;
     };
 
     MPM_PARTICLES<TV>& particles=example.particles;
     T dt=example.dt;
-    bool need_dv_fric=(example.use_affine && example.use_early_gradient_transfer) ||
-        (particles.store_C && example.weights->Order()==1);
+    bool use_gradient_transfer=example.weights->use_gradient_transfer;
+    bool need_dv_fric=(example.use_affine && use_gradient_transfer);
 
     example.gather_scatter.template Gather<HELPER>(true,
         [](int p,HELPER& h){h=HELPER();},
@@ -283,17 +280,14 @@ Grid_To_Particle()
             h.V_weight_old+=w*V_old;
             h.V_pic_fric+=w*V_fric;
             TV V_grid=example.use_midpoint?(T).5*(V_new+V_old):V_new;
-            h.grad_Vp+=MATRIX<T,TV::m>::Outer_Product(V_grid,dw);
+            h.grad_Vp+=Outer_Product(V_grid,dw);
             if(need_dv_fric){
                 TV V_grid_fric=example.use_midpoint?(T).5*(V_fric+V_old):V_new;
-                h.grad_Vp_fric+=MATRIX<T,TV::m>::Outer_Product(V_grid_fric,dw);}
-            if(example.use_affine && !example.use_early_gradient_transfer){
+                h.grad_Vp_fric+=Outer_Product(V_grid_fric,dw);}
+            if(example.use_affine && !example.lag_Dp){
                 TV Z=example.grid.Center(index);
                 TV xi_new=Z+dt*V_grid;
-                h.B+=w/2*(MATRIX<T,TV::m>::Outer_Product(V_fric,Z+xi_new)
-                    +MATRIX<T,TV::m>::Outer_Product(Z-xi_new,V_fric));
-                if(particles.store_C && example.weights->Order()>1)
-                    h.D+=w*MATRIX<T,TV::m>::Outer_Product(Z-particles.X(p),Z-particles.X(p));}
+                h.B+=w/2*(Outer_Product(V_fric,Z+xi_new)+Outer_Product(Z-xi_new,V_fric));}
         },
         [this,dt,&particles](int p,HELPER& h)
         {
@@ -306,14 +300,13 @@ Grid_To_Particle()
             if(particles.store_S){
                 T k=example.dt*example.inv_Wi;
                 particles.S(p)=(SYMMETRIC_MATRIX<T,TV::m>::Conjugate(A,particles.S(p))+k)/(1+k);}
-            if(example.use_affine && example.use_early_gradient_transfer)
-                h.B=h.grad_Vp_fric/example.weights->Constant_Scalar_Inverse_Dp();
-            else if(example.use_affine)
-                h.B-=(T).5*(MATRIX<T,TV::m>::Outer_Product(h.V_pic_fric,particles.X(p)+xp_new)
-                    +MATRIX<T,TV::m>::Outer_Product(particles.X(p)-xp_new,h.V_pic_fric));
+            if(example.use_affine)
+                h.B-=(T).5*(Outer_Product(h.V_pic_fric,particles.X(p)+xp_new)
+                    +Outer_Product(particles.X(p)-xp_new,h.V_pic_fric));
 
-            if(particles.store_B) particles.B(p)=h.B;
-            if(particles.store_C) particles.C(p)=example.weights->Order()==1?h.grad_Vp_fric:h.B*h.D.Inverse();
+            if(example.weights->use_gradient_transfer) particles.B(p)=h.grad_Vp_fric;
+            else if(example.lag_Dp) particles.B(p)=h.B*example.Dp_inv(p);
+            else particles.B(p)=h.B;
             particles.X(p)=xp_new;
             TV V_flip=particles.V(p)+h.V_pic_fric-h.V_weight_old;
             particles.V(p)=V_flip*example.flip+h.V_pic_fric*(1-example.flip);
@@ -441,7 +434,7 @@ Max_Particle_Speed() const
 template<class TV> typename TV::SCALAR MPM_DRIVER<TV>::
 Grid_V_Upper_Bound() const
 {
-    if(!example.use_affine || !example.weights->constant_scalar_inertia_tensor) return Max_Particle_Speed();
+    if(!example.use_affine) return Max_Particle_Speed();
     T result=0;
     T xi=(T)6*sqrt((T)TV::m)*example.grid.one_over_dX.Min();
 #pragma omp parallel for reduction(max:result)

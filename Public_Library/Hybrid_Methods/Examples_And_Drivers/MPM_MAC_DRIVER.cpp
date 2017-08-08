@@ -106,8 +106,9 @@ Initialize()
         example.Read_Output_Files(example.restart);
 
     example.particles.Store_B(example.use_affine);
-    example.particles.Store_C(false);
-    PHYSBAM_ASSERT(!example.particles.store_B || !example.particles.store_C);
+    if(example.particles.store_B)
+        for(int i=0;i<TV::m;i++)
+            example.Dp_inv(i).Resize(example.particles.X.m);
 
     for(PHASE_ID i(0);i<example.phases.m;i++){
         PHASE& ph=example.phases(i);
@@ -217,8 +218,10 @@ template<class TV> void MPM_MAC_DRIVER<TV>::
 Update_Particle_Weights()
 {
     TIMER_SCOPE_FUNC;
-    for(int i=0;i<TV::m;++i)
+    for(int i=0;i<TV::m;++i){
         example.weights(i)->Update(example.particles.X);
+        if(example.particles.store_B)
+            example.weights(i)->Dp_Inverse(example.particles.X,example.Dp_inv(i));}
 }
 //#####################################################################
 // Function Particle_To_Grid
@@ -235,22 +238,19 @@ Particle_To_Grid(PHASE& ph) const
         ph.volume.array(i)=0;
         ph.velocity.array(i)=0;}
 
-    T scale=1;
-    if(particles.store_B && !example.weights(0)->use_gradient_transfer)
-        scale=example.weights(0)->Constant_Scalar_Inverse_Dp();
-    bool use_gradient=false;
-    ARRAY_VIEW<MATRIX<T,TV::m> > dV(particles.B);
     ph.gather_scatter->template Scatter<int>(true,
-        [this,scale,&particles,use_gradient,dV,&ph](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,int data)
+        [this,&particles,&ph](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,int data)
         {
             T w=it.Weight();
             FACE_INDEX<TV::m> index=it.Index();
             ph.mass(index)+=w*particles.mass(p);
             ph.volume(index)+=w*particles.volume(p);
-            T V=particles.V(p)(index.axis);
+            T V=w*particles.V(p)(index.axis);
             if(example.use_affine){
-                V+=dV(p).Row(index.axis).Dot(scale*(example.grid.Face(index)-particles.X(p)));}
-            ph.velocity(index)+=particles.mass(p)*w*V;
+                TV Y=example.grid.Face(index)-particles.X(p);
+                if(!example.lag_Dp) Y=example.Dp_inv(index.axis)(p)*Y;
+                V+=particles.B(p).Row(index.axis).Dot(Y)*w;}
+            ph.velocity(index)+=particles.mass(p)*V;
         });
     Fix_Periodic_Accum(ph.mass);
     Fix_Periodic_Accum(ph.velocity);
@@ -1115,7 +1115,7 @@ template<class TV> typename TV::SCALAR MPM_MAC_DRIVER<TV>::
 Grid_V_Upper_Bound() const
 {
     TIMER_SCOPE_FUNC;
-    if(!example.use_affine || !example.weights(0)->constant_scalar_inertia_tensor) return Max_Particle_Speed();
+    if(!example.use_affine) return Max_Particle_Speed();
 
     T result=0;
 

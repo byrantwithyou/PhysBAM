@@ -24,7 +24,7 @@ MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type)
     projection_system(*new MPM_PROJECTION_SYSTEM<TV>),
     sol(*new MPM_PROJECTION_VECTOR<TV>),rhs(*new MPM_PROJECTION_VECTOR<TV>),
     ghost(3),periodic_boundary(*new BOUNDARY_MAC_GRID_PERIODIC<TV,T>),
-    use_affine(true),use_early_gradient_transfer(false),flip(0),initial_time(0),
+    use_affine(true),lag_Dp(false),flip(0),initial_time(0),
     last_frame(100),write_substeps_level(-1),substeps_delay_frame(-1),
     output_directory("output"),data_directory("../../Public_Data"),use_test_output(false),
     restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),
@@ -324,14 +324,16 @@ Total_Grid_Kinetic_Energy() const
 template<class TV> typename TV::SCALAR MPM_MAC_EXAMPLE<TV>::
 Total_Particle_Kinetic_Energy(const PHASE& ph) const
 {
-    T result=0,Dp_inverse=0;
-    if(use_affine && weights(0)->constant_scalar_inertia_tensor)
-        Dp_inverse=weights(0)->Constant_Scalar_Inverse_Dp();
+    T result=0;
 #pragma omp parallel for reduction(+:result)
     for(int k=0;k<ph.simulated_particles.m;k++){
         int p=ph.simulated_particles(k);
         T result_local=particles.mass(p)/2*particles.V(p).Magnitude_Squared();
-        if(particles.store_B) result_local+=particles.mass(p)/2*Dp_inverse*particles.B(p).Frobenius_Norm_Squared();
+        if(particles.store_B)
+            for(int a=0;a<TV::m;a++){
+                SYMMETRIC_MATRIX<T,TV::m> D=lag_Dp?Dp_inv(a)(p).Inverse():Dp_inv(a)(p);
+                TV b=particles.B(p).Row(a);
+                result_local+=particles.mass(p)/2*b.Dot(D*b);}
         result+=result_local;}
     return result;
 }

@@ -88,7 +88,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-penalty_damping",&penalty_damping_stiffness,"tol","penalty damping stiffness");
     parse_args.Add("-regular_seeding",&regular_seeding,"use regular particle seeding");
     parse_args.Add_Not("-no_regular_seeding",&no_regular_seeding,"use regular particle seeding");
-    parse_args.Add("-use_early_gradient_transfer",&use_early_gradient_transfer,"use early gradient transfer for Cp");
+    parse_args.Add("-lag_Dp",&lag_Dp,"use early gradient transfer for Cp");
     parse_args.Add("-use_exp_F",&use_quasi_exp_F_update,"Use an approximation of the F update that prevents inversion");
     parse_args.Add("-use_plasticity",&use_plasticity,"Use plasticity in the F update");
     parse_args.Add("-theta_c",&theta_c,&use_theta_c,"theta_c","Critical compression coefficient for plasticity");
@@ -154,7 +154,6 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
 
     particles.Store_Fp(use_plasticity);
     particles.Store_B(use_affine);
-    particles.Store_C(false);
 }
 //#####################################################################
 // Destructor
@@ -241,8 +240,10 @@ Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,T
     if(V) particles.V(p)=V(X);
     particles.F(p)=MATRIX<T,TV::m>()+1;
     if(particles.store_Fp) particles.Fp(p).Set_Identity_Matrix();
-    if(particles.store_B && dV) particles.B(p)=dV(X)*weights->Dp(X);
-    if(particles.store_C && dV) particles.C(p)=dV(X);
+    if(particles.store_B && dV){
+        if(lag_Dp) particles.B(p)=dV(X);
+        else
+            particles.B(p)=dV(X)*weights->Dp_Inverse(X).Inverse();}
     if(particles.store_S) particles.S(p)=SYMMETRIC_MATRIX<T,TV::m>()+1;
     particles.mass(p)=mass;
     particles.volume(p)=volume;
@@ -270,7 +271,6 @@ Add_Lambda_Particles(ARRAY<int>* affected_particles,T E,T nu,T density,bool no_m
         particles.F(p)=particles.F(i);
         if(particles.store_Fp) particles.Fp(p)=particles.Fp(i); 
         if(particles.store_B) particles.B(p)=particles.B(i);
-        if(particles.store_C) particles.C(p)=particles.C(i);
         if(particles.store_S) particles.S(p)=particles.S(i);
         particles.mass(p)=mass_lambda;
         particles.volume(p)=volume_lambda;
@@ -426,15 +426,20 @@ Seed_Lagrangian_Particles(T_STRUCTURE& object,std::function<TV(const TV&)> V,
     int old_particles_number=particles.number;
     T_STRUCTURE& new_object=tests.Copy_And_Add_Structure(object,0,destroy_after);
     tests.Set_Mass_Of_Particles(new_object,density,use_constant_mass);
+    ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
     for(int p=old_particles_number;p<particles.number;p++){
         TV X=particles.X(p);
         particles.valid(p)=true;
         if(V) particles.V(p)=V(X);
-        if(particles.store_B && dV) particles.B(p)=dV(X)*weights->Dp(X);
-        if(particles.store_C && dV) particles.C(p)=dV(X);
+        if(particles.store_B && dV){
+            if(lag_Dp) particles.B(p)=dV(X);
+            else
+                particles.B(p)=dV(X)*weights->Dp_Inverse(X).Inverse();}
         particles.F(p)=MATRIX<T,TV::m>()+1;
+        if(particles.store_Fp) particles.Fp(p).Set_Identity_Matrix();
         if(particles.store_S) particles.S(p)=SYMMETRIC_MATRIX<T,TV::m>()+1;
-        particles.volume(p)=particles.mass(p)/density;}
+        particles.volume(p)=particles.mass(p)/density;
+        (*color_attribute)(p)=VECTOR<T,3>(1,1,1);}
     return new_object;
 }
 //#####################################################################

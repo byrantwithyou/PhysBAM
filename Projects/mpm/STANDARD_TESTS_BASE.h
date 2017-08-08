@@ -31,7 +31,7 @@ public:
     using BASE::frame_title;using BASE::write_substeps_level;using BASE::gather_scatter;
     using BASE::collision_objects;using BASE::substeps_delay_frame;
     using BASE::output_directory;using BASE::mass_contour;using BASE::plasticity_models;
-    using BASE::restart;using BASE::dt;using BASE::time;using BASE::use_early_gradient_transfer;
+    using BASE::restart;using BASE::dt;using BASE::time;using BASE::lag_Dp;
     using BASE::frame_dt;using BASE::min_dt;using BASE::max_dt;
     using BASE::ghost;using BASE::use_affine;
     using BASE::use_midpoint;using BASE::use_symplectic_euler;using BASE::test_output_prefix;

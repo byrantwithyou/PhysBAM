@@ -29,7 +29,7 @@ MPM_EXAMPLE(const STREAM_TYPE stream_type)
     output_directory("output"),data_directory("../../Public_Data"),use_test_output(false),
     mass_contour(-1),restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),ghost(3),
     use_affine(true),use_midpoint(false),use_symplectic_euler(false),
-    use_early_gradient_transfer(false),use_oldroyd(false),print_stats(false),only_write_particles(false),flip(0),
+    lag_Dp(false),use_oldroyd(false),print_stats(false),only_write_particles(false),flip(0),
     cfl(1),inv_Wi(0),newton_tolerance(1),newton_iterations(100),solver_tolerance(.5),solver_iterations(1000),
     test_diff(false),threads(1),last_te(0),last_grid_ke(0),output_structures_each_frame(false),
     quad_F_coeff(0),asymmetric_system(false)
@@ -312,14 +312,15 @@ Total_Grid_Kinetic_Energy(const ARRAY<TV,TV_INT>& u) const
 template<class TV> typename TV::SCALAR MPM_EXAMPLE<TV>::
 Total_Particle_Kinetic_Energy() const
 {
-    T result=0,Dp_inverse=0;
-    if(use_affine && weights->constant_scalar_inertia_tensor)
-        Dp_inverse=weights->Constant_Scalar_Inverse_Dp();
+    T result=0;
 #pragma omp parallel for reduction(+:result)
     for(int k=0;k<simulated_particles.m;k++){
         int p=simulated_particles(k);
         T result_local=particles.mass(p)/2*particles.V(p).Magnitude_Squared();
-        if(particles.store_B) result_local+=particles.mass(p)/2*Dp_inverse*particles.B(p).Frobenius_Norm_Squared();
+        if(particles.store_B){
+            SYMMETRIC_MATRIX<T,TV::m> D=lag_Dp?Dp_inv(p).Inverse():Dp_inv(p);
+            T a=(particles.B(p)*D).Double_Contract(particles.B(p));
+            result_local+=particles.mass(p)/2*a;}
         result+=result_local;}
     return result;
 }
