@@ -922,6 +922,13 @@ Times_Transpose(const T_MAT0& a,const AUTO_HESS<T_MAT1,VECTOR<T,m>,Q>& b)
     return {a*a.x,Contract<1,1>(a.dx,a)};
 }
 
+template<class T,int d,int m,int Q>
+AUTO_HESS<SYMMETRIC_MATRIX<T,d>,VECTOR<T,m>,Q>
+Outer_Product(const AUTO_HESS<VECTOR<T,d>,VECTOR<T,m>,Q>& a)
+{
+    return {Outer_Product(a.x),Symmetric_Tensor_Product<0,1>(a.dx,a.x)};
+}
+
 template<class T,class TV> using AUTO_DIFF=AUTO_HESS<T,TV,1>;
 template<class T,class TV> using AUTO_NO_DIFF=AUTO_HESS<T,TV,0>;
 }
