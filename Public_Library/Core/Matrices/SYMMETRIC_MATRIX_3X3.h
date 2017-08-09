@@ -246,6 +246,10 @@ public:
     T Double_Contract(const SYMMETRIC_MATRIX& A) const
     {return Inner_Product(*this,A);}
 
+    template<class T_MATRIX>
+    T Double_Contract(const MATRIX_BASE<T,T_MATRIX>& A) const
+    {return A.Double_Contract(*this);}
+
     T Frobenius_Norm_Squared() const
     {return x00*x00+x11*x11+x22*x22+2*(x10*x10+x20*x20+x21*x21);}
 

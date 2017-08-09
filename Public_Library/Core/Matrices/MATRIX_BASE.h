@@ -403,6 +403,12 @@ public:
     for(int j=0;j<Columns();j++) for(int i=0;i<Rows();i++) sum+=(*this)(i,j)*a(i,j);
     return sum;}
 
+    template<int d>
+    T Double_Contract(const SYMMETRIC_MATRIX<T,d>& a) const
+    {assert(d==Rows() && d==Columns());T sum=0;
+    for(int j=0;j<Columns();j++) for(int i=0;i<Rows();i++) sum+=(*this)(i,j)*a(i,j);
+    return sum;}
+
     template<class T_MATRIX1>
     void Set_Submatrix(const int istart,const int jstart,const MATRIX_BASE<T,T_MATRIX1>& a)
     {for(int i=0;i<a.Rows();i++) for(int j=0;j<a.Columns();j++) (*this)(istart+i,jstart+j)=a(i,j);}
