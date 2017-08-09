@@ -7,8 +7,9 @@
 
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Dynamics/Fluids_Color_Driver/PLS_FC_EXAMPLE.h>
-#include "ANALYTIC_POLYMER_STRESS.h"
-#include "ANALYTIC_VELOCITY.h"
+#include "ANALYTIC_SCALAR.h"
+#include "ANALYTIC_SYMMETRIC_MATRIX.h"
+#include "ANALYTIC_VECTOR.h"
 
 namespace PhysBAM{
 
@@ -67,9 +68,9 @@ public:
     
     TV gravity;
 
-    ARRAY<ANALYTIC_VELOCITY<TV>*> analytic_velocity,initial_analytic_velocity;
-    ARRAY<ANALYTIC_PRESSURE<TV>*> analytic_pressure,initial_analytic_pressure;
-    ARRAY<ANALYTIC_POLYMER_STRESS<TV>*> analytic_polymer_stress;
+    ARRAY<ANALYTIC_VECTOR<TV>*> analytic_velocity,initial_analytic_velocity;
+    ARRAY<ANALYTIC_SCALAR<TV>*> analytic_pressure,initial_analytic_pressure;
+    ARRAY<ANALYTIC_SYMMETRIC_MATRIX<TV>*> analytic_polymer_stress;
     ANALYTIC_LEVELSET<TV>* analytic_levelset;
     bool analytic_initial_only;
     int number_of_threads;
@@ -84,19 +85,19 @@ public:
     template<class F>
     void Add_Velocity(F f)
     {
-        analytic_velocity.Append(Make_Velocity<TV>(f));
+        analytic_velocity.Append(Make_Analytic_Vector<TV>(f));
     }
 
     template<class F>
     void Add_Pressure(F f)
     {
-        analytic_pressure.Append(Make_Pressure<TV>(f));
+        analytic_pressure.Append(Make_Analytic_Scalar<TV>(f));
     }
 
     template<class F>
     void Add_Polymer_Stress(F f)
     {
-        analytic_polymer_stress.Append(Make_Polymer_Stress<TV>(f));
+        analytic_polymer_stress.Append(Make_Analytic_Symmetric_Matrix<TV>(f));
     }
 
     void After_Initialize_Example();

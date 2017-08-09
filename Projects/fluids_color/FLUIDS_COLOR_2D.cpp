@@ -83,7 +83,7 @@ template<class T> FLUIDS_COLOR<VECTOR<T,2> >::
 template<class T> void FLUIDS_COLOR<VECTOR<T,2> >::
 Initialize_Example()
 {
-    IDENTITY_MATRIX<T,TV::m> id;
+    SYMMETRIC_MATRIX<T,TV::m> id(SYMMETRIC_MATRIX<T,TV::m>()+1);
     switch(test_number){
         case 1:
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(2*(T)pi)*m,true);
@@ -386,7 +386,7 @@ Initialize_Example()
             auto rot=[=](auto X,auto t){return MATRIX<T,2>::Cross_Product_Matrix(VECTOR<T,1>(1))*(X-(TV()+(T).5));};
             Add_Velocity(rot);
             Add_Pressure([=](auto X,auto t){return (T).5*(this->rho0/this->unit_rho)*rot(X,t).Magnitude_Squared();});
-            analytic_polymer_stress.Append(new ANALYTIC_POLYMER_STRESS_QUADRATIC<TV>(rho0/unit_rho));
+            analytic_polymer_stress.Append(new ANALYTIC_SYMMETRIC_MATRIX_QUADRATIC<TV>(rho0/unit_rho));
             if(!override_beta0) polymer_stress_coefficient.Append(1.2*unit_p);
             if(!override_inv_Wi0) inv_Wi.Append(1.3/s);
             if(bc_type!=NEUMANN) use_p_null_mode=true;
