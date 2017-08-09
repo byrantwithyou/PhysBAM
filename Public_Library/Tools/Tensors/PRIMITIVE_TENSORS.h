@@ -1939,10 +1939,10 @@ template<class T,int m> SYMMETRIC_TENSOR<T,0,m,m> Symmetric_Double_Contract_12(c
     return s;
 }
 
-template<class T,int m> ZERO_TENSOR<T,m> Symmetric_Double_Contract_12(const DIAGONAL_TENSOR<T,m>& t,const ZERO_MATRIX<T,m>& cm1,const ZERO_MATRIX<T,m>& cm2){return ZERO_TENSOR<T,m>();}
+template<class T,int m,int n> ZERO_TENSOR<T,m,n,n> Symmetric_Double_Contract_12(const DIAGONAL_TENSOR<T,m>& t,const ZERO_MATRIX<T,m,n>& cm1,const ZERO_MATRIX<T,m,n>& cm2){return ZERO_TENSOR<T,m,n,n>();}
 template<class T,int m> ZERO_TENSOR<T,m> Symmetric_Double_Contract_12(const DIAGONAL_TENSOR<T,m>& t,const ZERO_MATRIX<T,m>& cm1,const IDENTITY_MATRIX<T,m>& cm2){return ZERO_TENSOR<T,m>();}
 template<class T,int m> ZERO_TENSOR<T,m> Symmetric_Double_Contract_12(const DIAGONAL_TENSOR<T,m>& t,const ZERO_MATRIX<T,m>& cm1,const SCALE_MATRIX<T,m>& cm2){return ZERO_TENSOR<T,m>();}
-template<class T,int m> ZERO_TENSOR<T,m> Symmetric_Double_Contract_12(const DIAGONAL_TENSOR<T,m>& t,const ZERO_MATRIX<T,m>& cm1,const MATRIX<T,m>){return ZERO_TENSOR<T,m>();}
+template<class T,int m,int n> ZERO_TENSOR<T,m,n,n> Symmetric_Double_Contract_12(const DIAGONAL_TENSOR<T,m>& t,const ZERO_MATRIX<T,m,n>& cm1,const MATRIX<T,m,n>){return ZERO_TENSOR<T,m,n,n>();}
 
 template<class T,int m> ZERO_TENSOR<T,m> Symmetric_Double_Contract_12(const DIAGONAL_TENSOR<T,m>& t,const IDENTITY_MATRIX<T,m>& cm1,const ZERO_MATRIX<T,m>& cm2){return ZERO_TENSOR<T,m>();}
 template<class T,int m> DIAGONAL_TENSOR<T,m> Symmetric_Double_Contract_12(const DIAGONAL_TENSOR<T,m>& t,const IDENTITY_MATRIX<T,m>& cm1,const IDENTITY_MATRIX<T,m>& cm2){return t*2;}
@@ -1956,15 +1956,15 @@ template<class T,int m> DIAGONAL_TENSOR<T,m> Symmetric_Double_Contract_12(const 
 template<class T,int m> SYMMETRIC_TENSOR<T,0,m,m> Symmetric_Double_Contract_12(const DIAGONAL_TENSOR<T,m>& t,const SCALE_MATRIX<T,m>& cm1,const MATRIX<T,m>& cm2)
 {return (DIAGONAL_MATRIX<T,m>(cm1.x*t.v)*cm2).Twice_Symmetric_Part();}
 
-template<class T,int m> ZERO_TENSOR<T,m> Symmetric_Double_Contract_12(const DIAGONAL_TENSOR<T,m>& t,const MATRIX<T,m>& cm1,const ZERO_MATRIX<T,m>& cm2){return ZERO_TENSOR<T,m>();}
+template<class T,int m,int n> ZERO_TENSOR<T,m,n,n> Symmetric_Double_Contract_12(const DIAGONAL_TENSOR<T,m>& t,const MATRIX<T,m,n>& cm1,const ZERO_MATRIX<T,m,n>& cm2){return ZERO_TENSOR<T,m,n,n>();}
 template<class T,int m> SYMMETRIC_TENSOR<T,0,m,m> Symmetric_Double_Contract_12(const DIAGONAL_TENSOR<T,m>& t,const MATRIX<T,m>& cm1,const IDENTITY_MATRIX<T,m>& cm2)
 {return Symmetric_Double_Contract_12(t,cm2,cm1);}
 template<class T,int m> SYMMETRIC_TENSOR<T,0,m,m> Symmetric_Double_Contract_12(const DIAGONAL_TENSOR<T,m>& t,const MATRIX<T,m>& cm1,const SCALE_MATRIX<T,m>& cm2)
 {return Symmetric_Double_Contract_12(t,cm2,cm1);}
-template<class T,int m> SYMMETRIC_TENSOR<T,0,m,m> Symmetric_Double_Contract_12(const DIAGONAL_TENSOR<T,m>& t,const MATRIX<T,m>& cm1,const MATRIX<T,m>& cm2)
+template<class T,int m,int n> SYMMETRIC_TENSOR<T,0,m,n> Symmetric_Double_Contract_12(const DIAGONAL_TENSOR<T,m>& t,const MATRIX<T,m,n>& cm1,const MATRIX<T,m,n>& cm2)
 {
-    SYMMETRIC_TENSOR<T,0,m,m> s;
-    for(int i=0;i<m;i++) s.x(i)=t.v(i)*MATRIX<T,m>::Outer_Product(cm1.Row(i),cm2.Row(i)).Twice_Symmetric_Part();;
+    SYMMETRIC_TENSOR<T,0,m,n> s;
+    for(int i=0;i<m;i++) s.x(i)=t.v(i)*Outer_Product(cm1.Row(i),cm2.Row(i)).Twice_Symmetric_Part();;
     return s;
 }
 
