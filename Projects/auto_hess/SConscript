@@ -1,0 +1,5 @@
+# SConscript
+
+Import('env Automatic_Program')
+env=env.Copy(USE_TOOLS=1)
+Automatic_Program(env,"auto_hess",["main.cpp","TEST_S.cpp","TEST_V.cpp","TEST_M.cpp","TEST_MV.cpp","TEST_MM.cpp","TEST_MM_mult.cpp"])
