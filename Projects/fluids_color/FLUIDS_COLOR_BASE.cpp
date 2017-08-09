@@ -15,13 +15,13 @@
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET_ROTATE.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET_SPHERE.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET_TRANSLATE.h>
+#include <Geometry/Analytic_Tests/ANALYTIC_SYMMETRIC_MATRIX.h>
+#include <Geometry/Analytic_Tests/ANALYTIC_VECTOR.h>
 #include <Geometry/Basic_Geometry/LINE_2D.h>
 #include <Geometry/Basic_Geometry/PLANE.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
-#include "ANALYTIC_SYMMETRIC_MATRIX.h"
-#include "ANALYTIC_VECTOR.h"
 #include "FLUIDS_COLOR_BASE.h"
 #ifdef USE_OPENMP
 #include <omp.h>

@@ -6,10 +6,10 @@
 #define __FLUIDS_COLOR_BASE__
 
 #include <Tools/Parsing/PARSE_ARGS.h>
+#include <Geometry/Analytic_Tests/ANALYTIC_SCALAR.h>
+#include <Geometry/Analytic_Tests/ANALYTIC_SYMMETRIC_MATRIX.h>
+#include <Geometry/Analytic_Tests/ANALYTIC_VECTOR.h>
 #include <Dynamics/Fluids_Color_Driver/PLS_FC_EXAMPLE.h>
-#include "ANALYTIC_SCALAR.h"
-#include "ANALYTIC_SYMMETRIC_MATRIX.h"
-#include "ANALYTIC_VECTOR.h"
 
 namespace PhysBAM{
 
@@ -68,8 +68,8 @@ public:
     
     TV gravity;
 
-    ARRAY<ANALYTIC_VECTOR<TV>*> analytic_velocity,initial_analytic_velocity;
-    ARRAY<ANALYTIC_SCALAR<TV>*> analytic_pressure,initial_analytic_pressure;
+    ARRAY<ANALYTIC_VECTOR<TV>*> analytic_velocity;
+    ARRAY<ANALYTIC_SCALAR<TV>*> analytic_pressure;
     ARRAY<ANALYTIC_SYMMETRIC_MATRIX<TV>*> analytic_polymer_stress;
     ANALYTIC_LEVELSET<TV>* analytic_levelset;
     bool analytic_initial_only;
