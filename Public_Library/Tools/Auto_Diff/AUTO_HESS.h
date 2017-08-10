@@ -384,6 +384,9 @@ struct AUTO_HESS<VECTOR<T,d>,VECTOR<T,m>,Q>
     void Set_Entry(int i,const AUTO_HESS<T,TV,Q>& a)
     {x(i)=a.x;dx.Set_Row(i,a.dx);ddx.x(i)=a.ddx;}
 
+    void Set_Entry(int i,const T& a)
+    {x(i)=a;dx.Set_Row(i,TV());ddx.x(i)=decltype(ddx.x(i))();}
+
     AUTO_HESS operator-() const
     {return {-x,-dx,-ddx};}
 
@@ -930,6 +933,41 @@ Outer_Product(const AUTO_HESS<VECTOR<T,d>,VECTOR<T,m>,Q>& a)
 }
 
 template<class T,class TV,int Q> T Value(const AUTO_HESS<T,TV,Q>& a){return a.x;}
+
+template<class A> A
+Auto_Hess_Vector_Scalar_Type(A&& a)
+{return a;}
+
+template<class A,class B,class... Args> auto
+Auto_Hess_Vector_Scalar_Type(A&& a,B&& b,Args&&... args)
+{return a+Auto_Hess_Vector_Scalar_Type(b,args...);}
+
+template<int i,class T,int d,int m,int Q,class A> void
+Auto_Hess_Vector_Fill(AUTO_HESS<VECTOR<T,d>,VECTOR<T,m>,Q>& out,A&& a)
+{STATIC_ASSERT(i==d-1);out.Set_Entry(i,a);}
+
+template<int i,class T,int d,int m,int Q,class A,class B,class... Args> void
+Auto_Hess_Vector_Fill(AUTO_HESS<VECTOR<T,d>,VECTOR<T,m>,Q>& out,A&& a,B&& b,Args&&... args)
+{out.Set_Entry(i,a);Auto_Hess_Vector_Fill<i+1>(out,b,args...);}
+
+template<int i,class T,int d,class A> void
+Auto_Hess_Vector_Fill(VECTOR<T,d>& out,A&& a)
+{STATIC_ASSERT(i==d-1);out(i)=a;}
+
+template<int i,class T,int d,class A,class B,class... Args> void
+Auto_Hess_Vector_Fill(VECTOR<T,d>& out,A&& a,B&& b,Args&&... args)
+{out(i)=a;Auto_Hess_Vector_Fill<i+1>(out,b,args...);}
+
+template<class A,class... Args> auto
+Auto_Hess_Vector(A&& a,Args&&... args)
+{
+    typedef decltype(Auto_Hess_Vector_Scalar_Type(a,args...)) AH;
+    typedef decltype(Value(AH())) T;
+    typedef VECTOR<T,1+sizeof...(Args)> TV;
+    decltype(TV()*AH()) out;
+    Auto_Hess_Vector_Fill<0>(out,a,args...);
+    return out;
+}
 
 template<class T,class TV> using AUTO_DIFF=AUTO_HESS<T,TV,1>;
 template<class T,class TV> using AUTO_NO_DIFF=AUTO_HESS<T,TV,0>;
