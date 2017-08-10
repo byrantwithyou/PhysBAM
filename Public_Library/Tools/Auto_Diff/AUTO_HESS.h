@@ -929,6 +929,8 @@ Outer_Product(const AUTO_HESS<VECTOR<T,d>,VECTOR<T,m>,Q>& a)
     return {Outer_Product(a.x),Symmetric_Tensor_Product<0,1>(a.dx,a.x)};
 }
 
+template<class T,class TV,int Q> T Value(const AUTO_HESS<T,TV,Q>& a){return a.x;}
+
 template<class T,class TV> using AUTO_DIFF=AUTO_HESS<T,TV,1>;
 template<class T,class TV> using AUTO_NO_DIFF=AUTO_HESS<T,TV,0>;
 }
