@@ -24,6 +24,7 @@ struct ANALYTIC_SCALAR
     virtual T f(const TV& X,T t) const=0;
     virtual TV dX(const TV& X,T t) const=0;
     virtual SYMMETRIC_MATRIX<T,TV::m> ddX(const TV& X,T t) const=0;
+    virtual T L(const TV& X,T t) const{return ddX(X,t).Trace();}
     virtual T dt(const TV& X,T t) const=0;
     virtual void Test(const TV& X,T t) const
     {
