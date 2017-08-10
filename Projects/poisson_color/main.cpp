@@ -19,9 +19,6 @@
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET_LINE.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET_NEST.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET_SPHERE.h>
-#include <Geometry/Analytic_Tests/ANALYTIC_POISSON_SOLUTION_AFFINE.h>
-#include <Geometry/Analytic_Tests/ANALYTIC_POISSON_SOLUTION_QUADRATIC.h>
-#include <Geometry/Analytic_Tests/ANALYTIC_POISSON_TEST.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
 #include <Geometry/Finite_Elements/CELL_MANAGER_COLOR.h>
@@ -33,6 +30,7 @@
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Level_Sets/REINITIALIZATION.h>
 #include <iostream>
+#include "ANALYTIC_POISSON_TEST.h"
 #ifdef USE_OPENMP
 #include <omp.h>
 #endif
@@ -114,7 +112,7 @@ void Dump_System(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,ANALYTIC_POISSON_
         int c=0;
         at.analytic_levelset->phi(it.Location(),0,c);
         if(c>=0){
-            T f_volume=-at.mu(c)*at.analytic_solution(c)->Laplacian(it.Location());
+            T f_volume=-at.mu(c)*at.analytic_solution(c)->L(it.Location(),0);
             Add_Debug_Particle(it.Location(),f_volume==0?VECTOR<T,3>(0.25,0.25,0.25):(f_volume>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0)));
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,f_volume);}}
         Flush_Frame<TV>("volumetric forces");
@@ -196,7 +194,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_POISSON_TEST<TV>& at,int max_iter,boo
 
     INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV> rhs,sol;
 
-    ips.Set_RHS(rhs,[&](const TV& X,int color){return -at.mu(color)*at.analytic_solution(color)->Laplacian(X);});
+    ips.Set_RHS(rhs,[&](const TV& X,int color){return -at.mu(color)*at.analytic_solution(color)->L(X,0);});
     ips.Resize_Vector(sol);
 
     MINRES<T> mr;
@@ -236,7 +234,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_POISSON_TEST<TV>& at,int max_iter,boo
         int c=0;
         at.analytic_levelset->phi(it.Location(),0,c);
         if(c>=0){
-            exact_u(it.index)=at.analytic_solution(c)->u(it.Location());
+            exact_u(it.index)=at.analytic_solution(c)->f(it.Location(),0);
             error_u(it.index)=numer_u(it.index)-exact_u(it.index);
             avg_u+=error_u(it.index);
             cnt_u++;}}
@@ -320,42 +318,28 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
 
     ANALYTIC_POISSON_TEST<TV> test;
 
-    struct ANALYTIC_POISSON_SOLUTION_EXP_SIN_COS:public ANALYTIC_POISSON_SOLUTION<TV>
-    {
-        T s,c;
-        TV v,e;
-        ANALYTIC_POISSON_SOLUTION_EXP_SIN_COS(T s,T c,TV v,TV e): s(s),c(c),v(v),e(e) {}
-        virtual ~ANALYTIC_POISSON_SOLUTION_EXP_SIN_COS() {}
-        T u_local(const TV& X,T ts,T tc) const {return (ts*sin(X.Dot(v))+tc*cos(X.Dot(v)))*exp(X.Dot(e));}
-        virtual T u(const TV& X) const {return u_local(X,s,c);}
-        virtual TV du(const TV& X) const {return e*u_local(X,s,c)+v*u_local(X,-c,s);}
-        virtual T Laplacian(const TV& X) const {return u_local(X,s,c)*(e.Magnitude_Squared()-v.Magnitude_Squared())+2*e.Dot(v)*u_local(X,-c,s);}
-    };
+    auto Add_Exp_Sin_Cos=[=,&test](T s,T c,TV v,TV e)
+        {
+            auto f=Make_Analytic_Scalar<TV>([=](auto X,auto t){return (s*sin(X.Dot(v))+c*cos(X.Dot(v)))*exp(X.Dot(e));});
+            test.analytic_solution.Append(f);
+        };
 
-    struct ANALYTIC_POISSON_SOLUTION_EXP_QUADRATIC:public ANALYTIC_POISSON_SOLUTION<TV>
-    {
-        T k;
-        SYMMETRIC_MATRIX<T,TV::m> M;
-        TV a;
-        T b;
-        ANALYTIC_POISSON_SOLUTION_EXP_QUADRATIC(T k,const MATRIX<T,TV::m>& M,TV a,T b): k(k),M(M.Symmetric_Part()),a(a),b(b) {}
-        virtual ~ANALYTIC_POISSON_SOLUTION_EXP_QUADRATIC() {}
-        T u_local(const TV& X) const {return k*exp(X.Dot(M*X+a)+b);}
-        virtual T u(const TV& X) const {return u_local(X);}
-        virtual TV du(const TV& X) const {return (M*X*2+a)*u_local(X);}
-        virtual T Laplacian(const TV& X) const {return ((M*X*2+a).Magnitude_Squared()+2*M.Trace())*u_local(X);}
-    };
+    auto Add_Exp_Quad=[=,&test](T k,const MATRIX<T,TV::m>& M,TV a,T b)
+        {
+            auto f=Make_Analytic_Scalar<TV>([=](auto X,auto t){return k*exp(X.Dot(M*X+a)+b);});
+            test.analytic_solution.Append(f);
+        };
 
     switch(test_number){
         case 0:{ // One color, periodic. No interface, no forces, u=0.
             test.mu.Append(1);
             test.analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-1,0,-4);
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_AFFINE<TV>(TV(),0));
+            test.analytic_solution.Append(Make_Analytic_Scalar<TV>([=](auto X,auto t){return 0;}));
             break;}
         case 1:{ // One color, periodic. No interface, u=sin(2*pi*x), f=(2*pi)^2*sin(2*pi*x).
             test.mu.Append(1);
             test.analytic_levelset=new ANALYTIC_LEVELSET_CONST<TV>(-1,0,-4);
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_SIN_COS(1,0,TV::Axis_Vector(0)*(2*pi),TV()));
+            Add_Exp_Sin_Cos(1,0,TV::Axis_Vector(0)*(2*pi),TV());
             break;}
         case 2:{ // Two colors, periodic. Linear on [0,1/3],[1/3,2/3],[2/3,1], no volumetric forces.
             test.mu.Append(1);
@@ -363,28 +347,22 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)/3,TV::Axis_Vector(0),0,1);
             ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-ANALYTIC_LEVELSET<TV>::Large_Phi(),0,-4);
             test.analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*((T)2/3),TV::Axis_Vector(0),0,1)))->Add(ab)->Add(cd);
-            struct ANALYTIC_POISSON_SOLUTION_2a:public ANALYTIC_POISSON_SOLUTION<TV>
-            {
-                virtual T u(const TV& X) const {return (X.x>0.5)?(1-X.x):(-X.x);}
-                virtual TV du(const TV& X) const {return -TV::Axis_Vector(0);}
-                virtual T Laplacian(const TV& X) const {return 0;}
-            };
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_2a);
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_AFFINE<TV>(TV::Axis_Vector(0)*2,-1));
+            test.analytic_solution.Append(Make_Analytic_Scalar<TV>([=](auto X,auto t){return (Value(X(0))>0.5)?(1-X(0)):(-X(0));}));
+            test.analytic_solution.Append(Make_Analytic_Scalar<TV>([=](auto X,auto t){return X(0)*2-1;}));
             break;}
         case 3:{ // Two colors, periodic. u=||x||^2 for r<R, zero elsewhere.
             test.mu.Append(1);
             test.mu.Append(2);
             test.analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T)0.5,1/(T)pi,1,0);
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_AFFINE<TV>(TV(),0));
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_QUADRATIC<TV>(MATRIX<T,TV::m>()+1,TV()-1,(T).25*TV::m));
+            test.analytic_solution.Append(Make_Analytic_Scalar<TV>([=](auto X,auto t){return 0;}));
+            test.analytic_solution.Append(Make_Analytic_Scalar<TV>([=](auto X,auto t){return X.Magnitude_Squared()+X.Dot(TV()-1)+(T).25*TV::m;}));
             break;}
         case 4:{ // Two colors, periodic. u=exp(-x^2) for r<R, zero elsewhere.
             test.mu.Append(1);
             test.mu.Append(2);
             test.analytic_levelset=new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+(T)0.5,1/(T)pi,1,0);
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_AFFINE<TV>(TV(),0));
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_QUADRATIC(1,MATRIX<T,TV::m>()-1,TV()+1,-(T).25*TV::m));
+            test.analytic_solution.Append(Make_Analytic_Scalar<TV>([=](auto X,auto t){return 0;}));
+            Add_Exp_Quad(1,MATRIX<T,TV::m>()-1,TV()+1,-(T).25*TV::m);
             break;}
         case 5:{ // Three colors, periodic. Stripes in x 0:[0,a], 1:[a,b], 2:[b,c], 0:[c,1].
             test.mu.Append(1);
@@ -394,9 +372,9 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*a,TV::Axis_Vector(0),0,1);
             ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*c,TV::Axis_Vector(0),2,0);
             test.analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*b,TV::Axis_Vector(0),0,1)))->Add(ab)->Add(cd);
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_AFFINE<TV>(TV(),0));
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_SIN_COS(0,1,TV(),TV::Axis_Vector(0)));
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_SIN_COS(1,0,TV::Axis_Vector(1)*(2*(T)pi),TV()));
+            test.analytic_solution.Append(Make_Analytic_Scalar<TV>([=](auto X,auto t){return 0;}));
+            Add_Exp_Sin_Cos(0,1,TV(),TV::Axis_Vector(0));
+            Add_Exp_Sin_Cos(1,0,TV::Axis_Vector(1)*(2*(T)pi),TV());
             break;}
         case 6:{ // Three colors (one dirichlet or neumann), periodic. Stripes in x 0:[0,a], 1:[a,b], 2:[b,c], 0:[c,1].
             T a=(T)1/6,b=(T)5/12,c=(T)5/6,constraint=-1;
@@ -405,8 +383,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*a,TV::Axis_Vector(0),constraint,0);
             ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*c,TV::Axis_Vector(0),1,constraint);
             test.analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_LINE<TV>(TV::Axis_Vector(0)*b,TV::Axis_Vector(0),0,1)))->Add(ab)->Add(cd);
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_SIN_COS(0,1,TV(),TV::Axis_Vector(0)));
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_SIN_COS(1,0,TV::Axis_Vector(1)*(2*(T)pi),TV()));
+            Add_Exp_Sin_Cos(0,1,TV(),TV::Axis_Vector(0));
+            Add_Exp_Sin_Cos(1,0,TV::Axis_Vector(1)*(2*(T)pi),TV());
             break;}
         case 7:{ // Three colors, periodic. u=a for r<R and x>0, u=b for r<R and x<0, zero elsewhere.
             T r=1/(T)pi,a0=0,a1=5,a2=7;
@@ -419,9 +397,9 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV()+(T).5,n,2,1);
             ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-ANALYTIC_LEVELSET<TV>::Large_Phi(),0,-4);
             test.analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+.5,r,0,1)))->Add(ab)->Add(cd);
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_AFFINE<TV>(TV(),a0));
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_AFFINE<TV>(TV(),a1));
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_AFFINE<TV>(TV(),a2));
+            test.analytic_solution.Append(Make_Analytic_Scalar<TV>([=](auto X,auto t){return a0;}));
+            test.analytic_solution.Append(Make_Analytic_Scalar<TV>([=](auto X,auto t){return a1;}));
+            test.analytic_solution.Append(Make_Analytic_Scalar<TV>([=](auto X,auto t){return a2;}));
             break;}
         case 8:{ // Three colors, periodic. u=a*x^2 for r<R and x*n>0, u=b*x^2 for r<R and x*n<0, zero elsewhere.
             T r=1/(T)pi,a0=0,a1=5,a2=7;
@@ -434,9 +412,9 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV()+(T).5,n,2,1);
             ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-ANALYTIC_LEVELSET<TV>::Large_Phi(),0,-4);
             test.analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+.5,r,0,1)))->Add(ab)->Add(cd);
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_QUADRATIC<TV>(MATRIX<T,TV::m>()+a0,TV()-a0,(T).25*TV::m*a0));
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_QUADRATIC<TV>(MATRIX<T,TV::m>()+a1,TV()-a1,(T).25*TV::m*a1));
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_QUADRATIC<TV>(MATRIX<T,TV::m>()+a2,TV()-a2,(T).25*TV::m*a2));
+            test.analytic_solution.Append(Make_Analytic_Scalar<TV>([=](auto X,auto t){return a0*X.Magnitude_Squared()+X.Dot(TV()-a0)+(T).25*a0*TV::m;}));
+            test.analytic_solution.Append(Make_Analytic_Scalar<TV>([=](auto X,auto t){return a1*X.Magnitude_Squared()+X.Dot(TV()-a1)+(T).25*a1*TV::m;}));
+            test.analytic_solution.Append(Make_Analytic_Scalar<TV>([=](auto X,auto t){return a2*X.Magnitude_Squared()+X.Dot(TV()-a2)+(T).25*a2*TV::m;}));
             break;}
         case 9:{ // Three colors, periodic. u=a*exp(-x^2) for r<R and x*n>0, u=b*exp(-x^2) for r<R and x*n<0, zero elsewhere.
             T r=1/(T)pi,a0=0,a1=5,a2=7;
@@ -449,9 +427,9 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV()+(T).5,n,2,1);
             ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-ANALYTIC_LEVELSET<TV>::Large_Phi(),0,-4);
             test.analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+.5,r,0,1)))->Add(ab)->Add(cd);
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_QUADRATIC(a0,MATRIX<T,TV::m>()-1,TV()+1,-(T).25*TV::m*1));
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_QUADRATIC(a1,MATRIX<T,TV::m>()-1,TV()+1,-(T).25*TV::m*1));
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_QUADRATIC(a2,MATRIX<T,TV::m>()-1,TV()+1,-(T).25*TV::m*1));
+            Add_Exp_Quad(a0,MATRIX<T,TV::m>()-1,TV()+1,-(T).25*TV::m*1);
+            Add_Exp_Quad(a1,MATRIX<T,TV::m>()-1,TV()+1,-(T).25*TV::m*1);
+            Add_Exp_Quad(a2,MATRIX<T,TV::m>()-1,TV()+1,-(T).25*TV::m*1);
             break;}
         case 10:{ // Three colors (dirichlet/neumann outside), periodic. u=a*exp(-x^2) for r<R and x*n>0, u=b*exp(-x^2) for r<R and x*n<0, zero elsewhere.
             T r=1/(T)pi,a0=0,a1=5;
@@ -464,8 +442,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_LINE<TV>(TV()+(T).5,n,1,0);
             ANALYTIC_LEVELSET_SIGNED<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-ANALYTIC_LEVELSET<TV>::Large_Phi(),constraint,-4);
             test.analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV()+.5,r,0,1)))->Add(ab)->Add(cd);
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_QUADRATIC(a0,MATRIX<T,TV::m>()-1,TV()+1,-(T).25*TV::m*1));
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_QUADRATIC(a1,MATRIX<T,TV::m>()-1,TV()+1,-(T).25*TV::m*1));
+            Add_Exp_Quad(a0,MATRIX<T,TV::m>()-1,TV()+1,-(T).25*TV::m*1);
+            Add_Exp_Quad(a1,MATRIX<T,TV::m>()-1,TV()+1,-(T).25*TV::m*1);
             break;}
         case 11:{ // Four colors (dirichlet outside). Three equal bubbles.
             test.mu.Append(1);
@@ -532,10 +510,10 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 }
             };
             test.analytic_levelset=new ANALYTIC_POISSON_LEVELSET_11;
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_SIN_COS(1,0,TV::Axis_Vector(0),TV()));
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_EXP_SIN_COS(0,1,TV::Axis_Vector(1),TV()));
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_QUADRATIC<TV>(MATRIX<T,TV::m>()+1,TV(),0));
-            test.analytic_solution.Append(new ANALYTIC_POISSON_SOLUTION_AFFINE<TV>(TV(),0));
+            Add_Exp_Sin_Cos(1,0,TV::Axis_Vector(0),TV());
+            Add_Exp_Sin_Cos(0,1,TV::Axis_Vector(1),TV());
+            test.analytic_solution.Append(Make_Analytic_Scalar<TV>([=](auto X,auto t){return X.Magnitude_Squared();}));
+            test.analytic_solution.Append(Make_Analytic_Scalar<TV>([=](auto X,auto t){return 0;}));
             break;}
         default:{
             LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}

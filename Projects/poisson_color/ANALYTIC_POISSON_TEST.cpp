@@ -4,7 +4,7 @@
 //#####################################################################
 #include <Core/Log/LOG.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Geometry/Analytic_Tests/ANALYTIC_POISSON_TEST.h>
+#include "ANALYTIC_POISSON_TEST.h"
 using namespace PhysBAM;
 template<class TV> void ANALYTIC_POISSON_TEST<TV>::
 Test(const RANGE<TV>& domain) const
@@ -20,7 +20,7 @@ Test(const RANGE<TV>& domain) const
         LOG::cout<<"Could not find nonnegative color for poisson solution test."<<std::endl;
         return;}
     for(int i=0;i<analytic_solution.m;i++)
-        analytic_solution(i)->Test(X);
+        analytic_solution(i)->Test(X,0);
 }
 namespace PhysBAM{
 template struct ANALYTIC_POISSON_TEST<VECTOR<float,1> >;

@@ -7,7 +7,7 @@
 #ifndef __ANALYTIC_POISSON_TEST__
 #define __ANALYTIC_POISSON_TEST__
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET.h>
-#include <Geometry/Analytic_Tests/ANALYTIC_POISSON_SOLUTION.h>
+#include <Geometry/Analytic_Tests/ANALYTIC_SCALAR.h>
 
 namespace PhysBAM{
 
@@ -17,7 +17,7 @@ struct ANALYTIC_POISSON_TEST
     typedef typename TV::SCALAR T;
 
     ANALYTIC_LEVELSET<TV>* analytic_levelset;
-    ARRAY<ANALYTIC_POISSON_SOLUTION<TV>*> analytic_solution;
+    ARRAY<ANALYTIC_SCALAR<TV>*> analytic_solution;
     ARRAY<T> mu;
 
     ANALYTIC_POISSON_TEST()
@@ -31,11 +31,11 @@ struct ANALYTIC_POISSON_TEST
     }
 
     T u_jump(const TV& X,int color0,int color1)
-    {return analytic_solution(color1)->u(X)-analytic_solution(color0)->u(X);}
+    {return analytic_solution(color1)->f(X,0)-analytic_solution(color0)->f(X,0);}
 
     T j_surface(const TV& X,int color0,int color1)
     {
-        TV du0=analytic_solution(color0)->du(X),du1=analytic_solution(color1)->du(X);
+        TV du0=analytic_solution(color0)->dX(X,0),du1=analytic_solution(color1)->dX(X,0);
         return (mu(color1)*du1-mu(color0)*du0).Dot(analytic_levelset->N(X,0,color1));
     }
 

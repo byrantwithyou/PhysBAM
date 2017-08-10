@@ -2,4 +2,4 @@
 
 Import('env Automatic_Program')
 env=env.Copy(USE_GEOMETRY=1)
-Automatic_Program(env,"poisson_color",["main.cpp"])
+Automatic_Program(env,"poisson_color",["main.cpp","ANALYTIC_POISSON_TEST.cpp"])
