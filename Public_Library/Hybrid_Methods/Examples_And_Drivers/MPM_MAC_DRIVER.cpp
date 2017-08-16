@@ -778,46 +778,50 @@ Density(const FACE_INDEX<TV::m>& face_index) const
     return example.phases(p0.x).density*theta+example.phases(p1.x).density*(1-theta);
 }
 //#####################################################################
+// Function Neumann_Boundary_Condition
+//#####################################################################
+template<class TV> bool MPM_MAC_DRIVER<TV>::
+Neumann_Boundary_Condition(const FACE_INDEX<TV::m>& face,ARRAY<T,PHASE_ID>& bc) const
+{
+    VECTOR<RANGE<TV_INT>,TV::m> domains;
+    for(int i=0;i<TV::m;i++){
+        domains(i)=example.grid.Domain_Indices();
+        domains(i).min_corner(i)++;}
+    for(int i=0;i<TV::m;i++){
+        if(face.index(i)<domains(face.axis).min_corner(i) && example.bc_type(2*i)==example.BC_WALL){
+            for(PHASE_ID p(0);p<example.phases.m;p++)
+                if(example.phases(p).mass(face))
+                    bc(p)=example.bc_velocity(2*i)?example.bc_velocity(2*i)(face,p,example.time):0;
+            return true;}
+        if(face.index(i)>=domains(face.axis).max_corner(i) && example.bc_type(2*i+1)==example.BC_WALL){
+            for(PHASE_ID p(0);p<example.phases.m;p++)
+                if(example.phases(p).mass(face))
+                    bc(p)=example.bc_velocity(2*i+1)?example.bc_velocity(2*i+1)(face,p,example.time):0;
+            return true;}}
+    TV X=example.grid.Face(face);
+    for(int i=0;i<example.collision_objects.m;i++){
+        MPM_COLLISION_OBJECT<TV>* o=example.collision_objects(i);
+        if(o->Phi(X,example.time)<0){
+            bc.Fill(o->Velocity(X,example.time)(face.axis));
+            return true;}}
+    return false;
+}
+//#####################################################################
 // Function Apply_BC
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Apply_BC()
 {
     example.psi_N.Resize(example.grid,3,false);
-    VECTOR<RANGE<TV_INT>,TV::m> domains;
-    for(int i=0;i<TV::m;i++){
-        domains(i)=example.grid.Domain_Indices();
-        domains(i).min_corner(i)++;}
 #pragma omp parallel
     for(FACE_ITERATOR_THREADED<TV> it(example.grid,3);it.Valid();it.Next()){
-        bool N=false;
-        for(int i=0;i<TV::m;i++){
-            if(it.index(i)<domains(it.axis).min_corner(i) && example.bc_type(2*i)==example.BC_WALL){
-                N=true;
-                for(PHASE_ID p(0);p<example.phases.m;p++)
-                    if(example.phases(p).mass(it.Full_Index()))
-                        example.phases(p).velocity(it.Full_Index())=
-                            example.bc_velocity(2*i)?example.bc_velocity(2*i)(it.Full_Index(),p,example.time):0;
-                break;}
-            if(it.index(i)>=domains(it.axis).max_corner(i) && example.bc_type(2*i+1)==example.BC_WALL){
-                N=true;
-                for(PHASE_ID p(0);p<example.phases.m;p++)
-                    if(example.phases(p).mass(it.Full_Index()))
-                        example.phases(p).velocity(it.Full_Index())=
-                            example.bc_velocity(2*i+1)?example.bc_velocity(2*i+1)(it.Full_Index(),p,example.time):0;
-                break;}}
-        TV X=it.Location();
-        if(!N)
-            for(int i=0;i<example.collision_objects.m;i++){
-                MPM_COLLISION_OBJECT<TV>* o=example.collision_objects(i);
-                if(o->Phi(X,example.time)<0){
-                    N=true;
-                    T v=o->Velocity(X,example.time)(it.axis);
-                    for(PHASE_ID p(0);p<example.phases.m;p++)
-                        if(example.phases(p).mass(it.Full_Index()))
-                            example.phases(p).velocity(it.Full_Index())=v;
-                    break;}}
-        example.psi_N(it.Full_Index())=N;}
+        ARRAY<T,PHASE_ID> u_bc(example.phases.m);
+        bool N=Neumann_Boundary_Condition(it.Full_Index(),u_bc);
+        example.psi_N(it.Full_Index())=N;
+        if(!N) continue;
+        for(PHASE_ID p(0);p<example.phases.m;p++)
+            if(example.phases(p).mass(it.Full_Index()))
+                example.phases(p).velocity(it.Full_Index())=u_bc(p);}
     Fix_Periodic(example.psi_N);
 }
 //#####################################################################
@@ -1198,16 +1202,18 @@ Apply_Viscosity()
             if(example.bc_type(axis)==example.BC_PERIODIC)
                 if(it.index(axis)==example.grid.numbers_of_cells(axis))
                     continue;
+            if(example.cell_index(face.First_Cell_Index())<0 && example.cell_index(face.Second_Cell_Index())<0)
+                continue;
             if(!example.psi_N(face))
                 velocity_index(it.index)=rhs.v.Append(ph.velocity(face));}
         Fix_Periodic(velocity_index,1);
-        
-        // Compute as needed rather than store.
+
+        // Compute as needed rather than store.  face_grid index.
         auto psi_N=[axis,this](const FACE_INDEX<TV::m>& face)
         {
-            if(face.axis==axis) return example.cell_index(face.index)<0;
             TV_INT a=face.index,b=a;
             b(axis)--;
+            if(face.axis==axis) return example.cell_index(b)<0;
             if(example.cell_index(a)<0 && example.cell_index(b)<0) return true;
             a(face.axis)--;
             b(face.axis)--;
@@ -1223,10 +1229,14 @@ Apply_Viscosity()
         ARRAY<int> tmp0,tmp1;
 #pragma omp parallel
         {
+            ARRAY<T,PHASE_ID> u_bc(example.phases.m);
             SPARSE_MATRIX_THREADED_CONSTRUCTION<T> helper(A,tmp0,tmp1);
-            for(CELL_ITERATOR_THREADED<TV> it(example.grid,0);it.Valid();it.Next()){
+            for(CELL_ITERATOR_THREADED<TV> it(face_grid,0);it.Valid();it.Next()){
                 int center_index=velocity_index(it.index);
                 if(center_index<0) continue;
+                if(example.bc_type(axis)==example.BC_PERIODIC)
+                    if(it.index(axis)==example.grid.numbers_of_cells(axis))
+                        continue;
 
                 T diag=1;
                 helper.Start_Row();
@@ -1236,11 +1246,17 @@ Apply_Viscosity()
                         TV_INT cell=it.index;
                         cell(a)+=2*s-1;
                         PHYSBAM_ASSERT(face.Cell_Index(s)==cell);
-                        
-                        if(!psi_N(face)){
+                        if(psi_N(face)){
+                            // Assume for now that the boundary condition is zero.
+                        }
+                        else{
                             diag+=scale(a);
                             int ci=velocity_index(cell);
-                            if(ci>=0) helper.Add_Entry(ci,-scale(a));}
+                            if(ci>=0) helper.Add_Entry(ci,-scale(a));
+                            else{
+                                bool N=Neumann_Boundary_Condition(FACE_INDEX<TV::m>(axis,cell),u_bc);
+                                PHYSBAM_ASSERT(N);
+                                rhs.v(center_index)+=scale(a)*u_bc(PHASE_ID(0));}}
                         face.index(a)++;}}
                 helper.Add_Entry(center_index,diag);}
             helper.Finish();
