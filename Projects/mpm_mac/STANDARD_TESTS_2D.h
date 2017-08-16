@@ -44,6 +44,7 @@ public:
     using BASE::analytic_pressure;using BASE::Add_Pressure;
     using BASE::analytic_velocity;using BASE::Add_Velocity;using BASE::Check_Analytic_Velocity;
     using BASE::mu;using BASE::use_viscosity;using BASE::BC_WALL;using BASE::bc_velocity;using BASE::bc_pressure;
+    using BASE::Setup_Analytic_Boundary_Conditions;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();

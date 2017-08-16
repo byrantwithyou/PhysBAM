@@ -49,6 +49,7 @@ public:
     using BASE::random;using BASE::use_viscosity;using typename BASE::PHASE;
     using BASE::use_constant_density;using BASE::bc_type;using BASE::BC_PERIODIC;
     using BASE::Add_Callbacks;using BASE::Print_Particle_Stats;using BASE::Print_Grid_Stats;
+    using BASE::bc_velocity;using BASE::bc_pressure;using BASE::BC_WALL;
 
     int test_number;
     int resolution;
@@ -94,6 +95,8 @@ public:
         analytic_pressure.Append(Make_Analytic_Scalar<TV>(f));
     }
 
+    void Setup_Analytic_Boundary_Conditions();
+    
     virtual TV Compute_Analytic_Force(PHASE_ID p,const TV& X,T time) const;
 
     void Seed_Particles_Poisson(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,

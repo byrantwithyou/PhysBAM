@@ -484,6 +484,20 @@ Add_Source(const TV& X0,const TV& n,IMPLICIT_OBJECT<TV>* io,
                 Add_Particle(X(i),V(i),dV(i),mass,volume);});
     if(owns_io) destroy.Append([io](){delete io;});
 }
+//#####################################################################
+// Function Setup_Analytic_Boundary_Conditions
+//#####################################################################
+template<class TV> void STANDARD_TESTS_BASE<TV>::
+Setup_Analytic_Boundary_Conditions()
+{
+    auto bc_v=[this](FACE_INDEX<TV::m> f,PHASE_ID p,T t)
+        {return analytic_velocity(p)->v(grid.Face(f),t)(f.axis);};
+    for(int i=0;i<bc_velocity.m;i++)
+        if(bc_type(i)==BC_WALL)
+            bc_velocity(i)=bc_v;
+    bc_pressure=[this](TV_INT c,PHASE_ID p,T t)
+        {return analytic_pressure(p)->f(grid.Center(c),t);};
+}
 template class STANDARD_TESTS_BASE<VECTOR<float,2> >;
 template class STANDARD_TESTS_BASE<VECTOR<float,3> >;
 template class STANDARD_TESTS_BASE<VECTOR<double,2> >;

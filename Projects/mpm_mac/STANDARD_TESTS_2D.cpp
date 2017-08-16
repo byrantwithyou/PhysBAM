@@ -193,6 +193,7 @@ Initialize()
             use_analytic_field=true;
             Add_Velocity([=](auto X,auto t){return (rot*cos(X*a))*sin(X*a)*exp(b*t);});
             Add_Pressure([=](auto X,auto t){return density/4*exp(2*b*t)*(cos(2*a*X(0))+cos(2*a*X(1)));});
+            Setup_Analytic_Boundary_Conditions();
             Seed_Particles_Analytic(grid.domain,PHASE_ID(0),density,particles_per_cell);
             end_frame.Append([=](int frame){Check_Analytic_Velocity();});
         } break;
@@ -297,6 +298,7 @@ Initialize()
                     return rot*dr;
                 });
             Add_Pressure([](auto X,auto t){return X(0)-X(0)*X(1)+X(1)*X(1)+t;});
+            Setup_Analytic_Boundary_Conditions();
             Seed_Particles_Analytic(grid.domain,PHASE_ID(0),density,particles_per_cell);
             end_frame.Append([=](int frame){Check_Analytic_Velocity();});
         } break;
@@ -307,6 +309,7 @@ Initialize()
             use_analytic_field=true;
             Add_Velocity([=](auto X,auto t){return Auto_Hess_Vector(-t*t-X(0),-(T)2*t+X(1));});
             Add_Pressure([](auto X,auto t){return X(0)-X(0)*X(1)+X(1)*X(1)+t;});
+            Setup_Analytic_Boundary_Conditions();
             SPHERE<TV> sphere(TV(.5,.5),.1);
             Seed_Particles_Analytic(sphere,PHASE_ID(0),density,particles_per_cell);
             end_frame.Append([=](int frame){Check_Analytic_Velocity();});
