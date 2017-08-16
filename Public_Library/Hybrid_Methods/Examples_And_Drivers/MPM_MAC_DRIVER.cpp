@@ -887,11 +887,7 @@ Compute_Laplacian(int nvar)
                         if(ci>=0) helper.Add_Entry(ci,-entry);
                         else{
                             has_dirichlet=true;
-                            for(int a=0;a<TV::m;a++){
-                                if(cell(a)<0 && example.bc_pressure(2*a))
-                                    example.rhs.v(center_index)+=entry*example.bc_pressure(2*a)(cell,example.time);
-                                else if(cell(a)>=example.grid.numbers_of_cells(a) && example.bc_pressure(2*a+1))
-                                    example.rhs.v(center_index)+=entry*example.bc_pressure(2*a+1)(cell,example.time);}}}
+                            example.rhs.v(center_index)+=example.bc_pressure?entry*example.bc_pressure(cell,PHASE_ID(0),example.time):0;}}
                     face.index(a)++;}}
             helper.Add_Entry(center_index,diag);}
         helper.Finish();
