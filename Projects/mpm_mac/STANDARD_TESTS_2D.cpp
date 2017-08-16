@@ -292,15 +292,13 @@ Initialize()
                 {
                     auto X=Y/m;
                     TV o(1,1);
+                    return X*(o-X)*(rot*(o-X*2));
+                });
+            Add_Pressure([](auto X,auto t){
                     auto x=X(0),y=X(1);
                     auto p=x*y*(1-x)*(1-y);
-                    auto q=x*y+y*t*t-x*t*2;
-                    auto dp=X*(X-o)*(X*2-o);
-                    auto dq=Auto_Hess_Vector(-2*t+y,t*t+x);
-                    auto dr=p*dq+q*dp;
-                    return rot*dr;
+                    return (X(0)-X(0)*X(1)+X(1)*X(1)+t)*p;
                 });
-            Add_Pressure([](auto X,auto t){return X(0)-X(0)*X(1)+X(1)*X(1)+t;});
             Setup_Analytic_Boundary_Conditions();
             Seed_Particles_Analytic(grid.domain,PHASE_ID(0),density,particles_per_cell);
             end_frame.Append([=](int frame){Check_Analytic_Velocity();});
