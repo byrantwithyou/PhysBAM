@@ -52,6 +52,7 @@ public:
     void Apply_Forces();
     void Apply_Viscosity();
     void Move_Particles();
+    void Extrapolate_Velocity();
     T Compute_Dt() const;
     T Max_Particle_Speed() const;
     T Grid_V_Upper_Bound() const;

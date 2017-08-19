@@ -20,6 +20,7 @@
 #include <Grid_Tools/Grids/CELL_ITERATOR_THREADED.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR_THREADED.h>
+#include <Grid_Tools/Grids/FACE_RANGE_ITERATOR.h>
 #include <Grid_PDE/Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
 #include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_MAC.h>
 #include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
@@ -150,6 +151,7 @@ Advance_One_Time_Step()
     Step([=](){Apply_Forces();},"forces");
     Step([=](){Pressure_Projection();},"projection");
     Step([=](){Apply_Viscosity();},"viscosity",true,example.use_viscosity);
+    Step([=](){Extrapolate_Velocity();},"velocity-extrapolation",true);
     Step([=](){Grid_To_Particle();},"g2p");
 }
 //#####################################################################
@@ -1172,6 +1174,31 @@ Fix_Periodic_Accum(ARRAY<T2,FACE_INDEX<TV::m> >& u,int ghost) const
     if(!example.bc_type.Contains(example.BC_PERIODIC)) return;
     if(ghost==INT_MAX) ghost=example.ghost;
     Fill_Ghost_Faces_Periodic_Accum(example.grid,u,u,example.periodic_boundary.is_periodic,ghost);
+}
+//#####################################################################
+// Function Extrapolate_Velocity
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Extrapolate_Velocity()
+{
+    for(int side=0;side<2*TV::m;side++){
+        for(int axis=0;axis<TV::m;axis++){
+            int mirror=example.grid.Domain_Indices(0).min_corner(axis);
+            if(side%2)
+                mirror=example.grid.Domain_Indices(0).max_corner(axis);
+            int side_axis=side/2;
+            int shift=axis!=side_axis?1:0;
+            T sign=axis==side_axis?-1:1;
+            if(example.bc_type(axis)==example.BC_WALL || example.bc_type(axis)==example.BC_INVALID){
+                for(FACE_RANGE_ITERATOR<TV::m> it(
+                    example.grid.Domain_Indices(example.ghost),
+                    example.grid.Domain_Indices(0),
+                    RF::skip_inner|RF::partial_single_side|RF::delay_corners,
+                    side,axis);it.Valid();it.Next()){
+                    FACE_INDEX<TV::m> f=it.face;
+                    f.index(side_axis)=2*mirror-it.face.index(side_axis)-shift;
+                    for(PHASE_ID p(0);p<example.phases.m;p++)
+                        example.phases(p).velocity(it.face)=sign*example.phases(p).velocity(f);}}}}
 }
 //#####################################################################
 // Function Apply_Viscosity
