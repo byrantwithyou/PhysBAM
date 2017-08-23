@@ -1227,7 +1227,7 @@ Apply_Viscosity()
     for(int axis=0;axis<TV::m;axis++){
         GRID<TV> face_grid(example.grid.Get_Face_MAC_Grid(axis));
         ARRAY<int,TV_INT> velocity_index(face_grid.Domain_Indices(1),true,-1);
-        VEC rhs,sol;
+        VEC rhs,sol,tmp_vector;
 
         // Allocate velocities that will be corrected; copy over initial guess
         for(CELL_ITERATOR<TV> it(face_grid);it.Valid();it.Next()){
@@ -1259,6 +1259,7 @@ Apply_Viscosity()
 
         A.Reset(rhs.v.m);
         sol.v=rhs.v;
+        tmp_vector.v.Resize(rhs.v.m);
         ARRAY<int> tmp0,tmp1;
 #pragma omp parallel
         {
@@ -1294,6 +1295,9 @@ Apply_Viscosity()
                 helper.Add_Entry(center_index,diag);}
             helper.Finish();
         }
+        if(example.projection_system.use_preconditioner){
+            A.Construct_Incomplete_Cholesky_Factorization();
+            sys.Set_Preconditioner(*A.C,tmp_vector);}
 
         ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
         static int solve_id=-1;
