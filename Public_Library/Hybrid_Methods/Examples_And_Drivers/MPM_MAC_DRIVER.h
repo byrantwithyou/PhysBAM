@@ -24,6 +24,7 @@ class MPM_MAC_DRIVER
     typedef typename MPM_COLLISION_OBJECT<TV>::COLLISION_TYPE COLLISION_TYPE;
     typedef typename MPM_MAC_EXAMPLE<TV>::PHASE PHASE;
 public:
+    enum {pressure_D=-1,pressure_N=-2,pressure_uninit=-3};
 
     int current_frame;
     int output_number;

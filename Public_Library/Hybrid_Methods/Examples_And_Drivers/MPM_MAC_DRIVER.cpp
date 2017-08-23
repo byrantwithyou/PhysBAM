@@ -832,8 +832,15 @@ Apply_BC()
 template<class TV> int MPM_MAC_DRIVER<TV>::
 Allocate_Projection_System_Variable()
 {
-    example.cell_index.Resize(example.grid.Domain_Indices(2),false,false);
-    example.cell_index.Fill(-1);
+    int ghost=2;
+    example.cell_index.Resize(example.grid.Domain_Indices(ghost),false,false);
+    for(int s=0;s<2*TV::m;s++){
+        int value=pressure_uninit;
+        if(example.bc_type(s)==example.BC_WALL) value=pressure_N;
+        else if(example.bc_type(s)==example.BC_INVALID) value=pressure_D;
+        for(CELL_ITERATOR<TV> it(example.grid,ghost,GRID<TV>::GHOST_REGION,s);it.Valid();it.Next())
+            example.cell_index(it.index)=value;}
+
     int nvar=0;
     for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
         bool dirichlet=false,all_N=true;
@@ -850,8 +857,9 @@ Allocate_Projection_System_Variable()
                         if(all_phase_dirichlet)
                             dirichlet=true;}}
                 face.index(a)++;}}
-        if(!all_N && !dirichlet)
-            example.cell_index(it.index)=nvar++;}
+        if(all_N) example.cell_index(it.index)=pressure_N;
+        else if(dirichlet) example.cell_index(it.index)=pressure_D;
+        else example.cell_index(it.index)=nvar++;}
     Fix_Periodic(example.cell_index,1);
     example.rhs.v.Remove_All();
     example.rhs.v.Resize(nvar);
@@ -1213,6 +1221,8 @@ Apply_Viscosity()
     PHASE& ph=example.phases(PHASE_ID(0));
     if(!ph.viscosity) return;
 
+    auto p_psi_D=[this](const TV_INT& c){return example.cell_index(c)==pressure_D;};
+
     // Based on logic from IMPLICIT_VISCOSITY_UNIFORM::Setup_Boundary_Conditions
     for(int axis=0;axis<TV::m;axis++){
         GRID<TV> face_grid(example.grid.Get_Face_MAC_Grid(axis));
@@ -1225,22 +1235,22 @@ Apply_Viscosity()
             if(example.bc_type(axis)==example.BC_PERIODIC)
                 if(it.index(axis)==example.grid.numbers_of_cells(axis))
                     continue;
-            if(example.cell_index(face.First_Cell_Index())<0 && example.cell_index(face.Second_Cell_Index())<0)
+            if(p_psi_D(face.First_Cell_Index()) && p_psi_D(face.Second_Cell_Index()))
                 continue;
             if(!example.psi_N(face))
                 velocity_index(it.index)=rhs.v.Append(ph.velocity(face));}
         Fix_Periodic(velocity_index,1);
 
         // Compute as needed rather than store.  face_grid index.
-        auto psi_N=[axis,this](const FACE_INDEX<TV::m>& face)
+        auto psi_N=[axis,this,p_psi_D](const FACE_INDEX<TV::m>& face)
         {
             TV_INT a=face.index,b=a;
             b(axis)--;
-            if(face.axis==axis) return example.cell_index(b)<0;
-            if(example.cell_index(a)<0 && example.cell_index(b)<0) return true;
+            if(face.axis==axis) return p_psi_D(b);
+            if(p_psi_D(a) && p_psi_D(b)) return true;
             a(face.axis)--;
             b(face.axis)--;
-            return example.cell_index(a)<0 && example.cell_index(b)<0;
+            return p_psi_D(a) && p_psi_D(b);
         };
 
         SPARSE_MATRIX_FLAT_MXN<T> A;
