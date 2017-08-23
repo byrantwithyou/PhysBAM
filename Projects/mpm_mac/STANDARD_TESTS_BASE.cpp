@@ -105,6 +105,8 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     if(use_stick) forced_collision_type=COLLISION_TYPE::stick;
     if(use_separate) forced_collision_type=COLLISION_TYPE::separate;
 
+    this->debug_particles.debug_particles.template Add_Array<T>(ATTRIBUTE_ID_DISPLAY_SIZE);
+    
     unit_p=kg*pow<2-TV::m>(m)/(s*s);
     unit_rho=kg*pow<-TV::m>(m);
     unit_mu=kg*pow<2-TV::m>(m)/s;
@@ -325,7 +327,9 @@ Check_Analytic_Velocity() const
                 T e=abs(u-v(it.face.axis));
                 max_error=std::max(max_error,e);
                 l2_error+=sqr(e);
-                num_l2_samples++;}}}
+                num_l2_samples++;
+                Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,e);}}}
     if(num_l2_samples) l2_error/=num_l2_samples;
     l2_error=sqrt(l2_error);
     LOG::printf("grid velocity error: L-inf: %g L-2: %g N: %i\n",max_error,l2_error,num_l2_samples);
