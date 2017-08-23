@@ -87,7 +87,7 @@ Set_Preconditioner(const T_MATRIX_PRECON& preconditioner,VECTOR_T& vector)
 // Function Apply_Preconditioner_Helper
 //#####################################################################
 template<class T,class VECTOR_T> static void
-Apply_Preconditioner_Helper(SPARSE_MATRIX_FLAT_MXN<T>* P,const VECTOR_T& vr,VECTOR_T& vz,VECTOR_T* temp_vector)
+Apply_Preconditioner_Helper(const SPARSE_MATRIX_FLAT_MXN<T>* P,const VECTOR_T& vr,VECTOR_T& vz,VECTOR_T* temp_vector)
 {
     P->Solve_Forward_Substitution(vr.v,temp_vector->v,true);
     P->Solve_Backward_Substitution(temp_vector->v,vz.v,false,true);
