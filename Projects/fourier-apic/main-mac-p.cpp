@@ -122,6 +122,9 @@ int main(int argc, char* argv[])
     example.dt=example.grid.dX.Min();
     example.flip=flip;
     example.use_affine=use_affine;
+    if(example.use_affine)
+        for(int i=0;i<TV::m;i++)
+            example.Dp_inv(i).Resize(example.particles.X.m);
     example.Set_Weights(order);
     example.use_viscosity=mu>0;
     example.phases.Resize(PHASE_ID(1));

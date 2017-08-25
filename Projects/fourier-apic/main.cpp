@@ -117,6 +117,7 @@ int main(int argc, char* argv[])
     example.mass.Resize(example.grid.Cell_Indices(3));
     example.gather_scatter.Prepare_Scatter(example.particles);
     example.use_affine=use_affine;
+    if(example.use_affine) example.Dp_inv.Resize(example.particles.X.m);
     example.flip=flip;
     example.particles.Store_B(example.use_affine);
     example.velocity_new(center).x=1;

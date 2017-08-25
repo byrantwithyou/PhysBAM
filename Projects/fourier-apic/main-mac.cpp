@@ -131,6 +131,9 @@ int main(int argc, char* argv[])
     example.dt=0;
     example.flip=flip;
     example.use_affine=use_affine;
+    if(example.use_affine)
+        for(int i=0;i<TV::m;i++)
+            example.Dp_inv(i).Resize(example.particles.X.m);
     example.Set_Weights(order);
     example.phases.Resize(PHASE_ID(1));
     auto& ph=example.phases(PHASE_ID());
