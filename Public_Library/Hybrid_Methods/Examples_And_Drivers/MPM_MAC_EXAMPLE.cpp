@@ -23,7 +23,7 @@ MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type)
     :stream_type(stream_type),particles(*new MPM_PARTICLES<TV>),
     projection_system(*new MPM_PROJECTION_SYSTEM<TV>),
     sol(*new MPM_PROJECTION_VECTOR<TV>),rhs(*new MPM_PROJECTION_VECTOR<TV>),
-    ghost(3),periodic_boundary(*new BOUNDARY_MAC_GRID_PERIODIC<TV,T>),
+    ghost(3),periodic_boundary(*new BOUNDARY_MAC_GRID_PERIODIC<TV,T>),extrap_type('r'),use_extrap(false),
     use_affine(true),lag_Dp(false),flip(0),initial_time(0),
     last_frame(100),write_substeps_level(-1),substeps_delay_frame(-1),
     output_directory("output"),data_directory("../../Public_Data"),use_test_output(false),

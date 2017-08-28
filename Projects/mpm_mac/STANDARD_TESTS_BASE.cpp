@@ -96,6 +96,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-analyze_u_modes",&analyze_u_modes,"Perform FFT analysis on velocity");
     parse_args.Add("-dump_modes_freq",&dump_modes_freq,"num","Dump FFT modes every num time steps");
     parse_args.Add("-max_ke",&max_ke,"value","Normalization for FFT images");
+    parse_args.Add("-extrap",&extrap_type,&use_extrap,"type","Velocity extrapolation");
 
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);
@@ -490,8 +491,8 @@ Add_Source(const TV& X0,const TV& n,IMPLICIT_OBJECT<TV>* io,
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Setup_Analytic_Boundary_Conditions()
 {
-    auto bc_v=[this](FACE_INDEX<TV::m> f,PHASE_ID p,T t)
-        {return analytic_velocity(p)->v(grid.Face(f),t)(f.axis);};
+    auto bc_v=[this](const TV& X,int axis,PHASE_ID p,T t)
+        {return analytic_velocity(p)->v(X,t)(axis);};
     for(int i=0;i<bc_velocity.m;i++)
         if(bc_type(i)==BC_WALL)
             bc_velocity(i)=bc_v;

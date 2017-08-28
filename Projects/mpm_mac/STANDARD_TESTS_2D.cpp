@@ -266,7 +266,7 @@ Initialize()
             Seed_Particles(*shape,0,0,density,particles_per_cell);
             delete shape;
             bc_type(1)=BC_INVALID;
-            bc_velocity(0)=[=](FACE_INDEX<TV::m> face,PHASE_ID pid,T time){return face.axis==0?velocity:0;};
+            bc_velocity(0)=[=](const TV& X,int axis,PHASE_ID pid,T time){return axis==0?velocity:0;};
             Add_Collision_Object(sphere,COLLISION_TYPE::slip,0,0,0);
             RANGE<TV> source_range=grid.domain;
             source_range.min_corner.x-=grid.dX.x;

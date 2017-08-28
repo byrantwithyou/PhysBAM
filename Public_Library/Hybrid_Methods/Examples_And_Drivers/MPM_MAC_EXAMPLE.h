@@ -79,12 +79,23 @@ public:
     int ghost;
     VECTOR<BC_TYPE,TV::m*2> bc_type; // -x, +x, -y, +y, -z, +z
     // Valid if BC_WALL; velocity at face. null=0
-    VECTOR<std::function<T(FACE_INDEX<TV::m>,PHASE_ID,T)>,TV::m*2> bc_velocity;
+    VECTOR<std::function<T(const TV& X,int axis,PHASE_ID,T)>,TV::m*2> bc_velocity;
     // Valid if BC_INVALID; pressure at ghost cell. null=0
     std::function<T(TV_INT,PHASE_ID,T)> bc_pressure;
     BOUNDARY_MAC_GRID_PERIODIC<TV,T>& periodic_boundary;
     ARRAY<int,TV_INT> cell_index;
     ARRAY<bool,FACE_INDEX<TV::m> > psi_N;
+    // Extrapolation functions.
+    // Options:
+    // 0: fill zeros
+    // C: copy nearest interior
+    // c: copy nearest interior (use BC values if any)
+    // L: linearly extrapolate from interior
+    // l: linearly extrapolate from interior (use BC values if any)
+    // a: extrpolate using analytic function
+    // r: reflect the interior for tangential directions; reflect with negation for normal directions
+    char extrap_type;
+    bool use_extrap;
 
     // transfer stuff
     VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m> weights;

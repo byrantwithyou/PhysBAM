@@ -792,13 +792,17 @@ Neumann_Boundary_Condition(const FACE_INDEX<TV::m>& face,ARRAY<T,PHASE_ID>& bc) 
     for(int i=0;i<TV::m;i++){
         if(face.index(i)<domains(face.axis).min_corner(i) && example.bc_type(2*i)==example.BC_WALL){
             for(PHASE_ID p(0);p<example.phases.m;p++)
-                if(example.phases(p).mass(face))
-                    bc(p)=example.bc_velocity(2*i)?example.bc_velocity(2*i)(face,p,example.time):0;
+                if(example.phases(p).mass(face)){
+                    bc(p)=0;
+                    if(example.bc_velocity(2*i))
+                        bc(p)=example.bc_velocity(2*i)(example.grid.Face(face),face.axis,p,example.time);}
             return true;}
         if(face.index(i)>=domains(face.axis).max_corner(i) && example.bc_type(2*i+1)==example.BC_WALL){
             for(PHASE_ID p(0);p<example.phases.m;p++)
-                if(example.phases(p).mass(face))
-                    bc(p)=example.bc_velocity(2*i+1)?example.bc_velocity(2*i+1)(face,p,example.time):0;
+                if(example.phases(p).mass(face)){
+                    bc(p)=0;
+                    if(example.bc_velocity(2*i+1))
+                        bc(p)=example.bc_velocity(2*i+1)(example.grid.Face(face),face.axis,p,example.time);}
             return true;}}
     TV X=example.grid.Face(face);
     for(int i=0;i<example.collision_objects.m;i++){
@@ -1189,24 +1193,93 @@ Fix_Periodic_Accum(ARRAY<T2,FACE_INDEX<TV::m> >& u,int ghost) const
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Extrapolate_Velocity()
 {
-    for(int side=0;side<2*TV::m;side++){
-        for(int axis=0;axis<TV::m;axis++){
-            int mirror=example.grid.Domain_Indices(0).min_corner(axis);
-            if(side%2)
-                mirror=example.grid.Domain_Indices(0).max_corner(axis);
-            int side_axis=side/2;
-            int shift=axis!=side_axis?1:0;
-            T sign=axis==side_axis?-1:1;
-            if(example.bc_type(axis)==example.BC_WALL || example.bc_type(axis)==example.BC_INVALID){
-                for(FACE_RANGE_ITERATOR<TV::m> it(
-                    example.grid.Domain_Indices(example.ghost),
-                    example.grid.Domain_Indices(0),
-                    RF::skip_inner|RF::partial_single_side|RF::delay_corners,
-                    side,axis);it.Valid();it.Next()){
-                    FACE_INDEX<TV::m> f=it.face;
-                    f.index(side_axis)=2*mirror-it.face.index(side_axis)-shift;
-                    for(PHASE_ID p(0);p<example.phases.m;p++)
-                        example.phases(p).velocity(it.face)=sign*example.phases(p).velocity(f);}}}}
+    for(PHASE_ID i(0);i<example.phases.m;i++)
+        Extrapolate_Velocity(i);
+}
+//#####################################################################
+// Function Extrapolate_Velocity
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Extrapolate_Velocity(PHASE_ID p) const
+{
+    if(!example.use_extrap) return;
+    PHASE& ph=example.phases(p);
+    RANGE<TV_INT> domain=example.grid.Domain_Indices(0);
+    RANGE<TV_INT> ghost_domain=example.grid.Domain_Indices(example.ghost);
+    TV_INT bound[TV::m];
+    for(int i=0;i<TV::m;i++){
+        bound[i]=domain.max_corner;
+        for(int j=0;j<TV::m;j++)
+            if(i!=j)
+                bound[i](j)++;}
+    for(FACE_RANGE_ITERATOR<TV::m> it(ghost_domain,domain,RF::skip_inner|RF::delay_corners);it.Valid();it.Next()){
+        bool wall=example.bc_type(it.side)==example.BC_WALL;
+        if(!wall && example.bc_type(it.side)!=example.BC_INVALID) continue;
+        char extrap_type=example.extrap_type;
+        int side_axis=it.side/2;
+        bool normal=side_axis==it.face.axis;
+        TV_INT corner=it.side%2?domain.max_corner:domain.min_corner;
+        if(!wall){
+            if(extrap_type=='c') extrap_type='C';
+            else if(extrap_type=='l') extrap_type='L';}
+        if(!normal){
+            if(it.face.index.Componentwise_Greater_Equal(TV_INT()).Count_Matches(false)+
+               it.face.index.Componentwise_Greater_Equal(bound[side_axis]).Count_Matches(true)>=2){
+                if(extrap_type=='c') extrap_type='C';
+                else if(extrap_type=='l') extrap_type='L';}}
+        int sign_out=it.side%2?1:-1;
+        auto bc=example.bc_velocity(it.side);
+        T& u=ph.velocity(it.face);
+        switch(extrap_type){
+            case 'r':{
+                FACE_INDEX<TV::m> f=it.face;
+                f.index(side_axis)=2*corner(side_axis)-it.face.index(side_axis);
+                if(!normal) f.index(side_axis)-=1;
+                u=ph.velocity(f);
+                if(normal) u=-u;
+                break;}
+            case 'a': u=bc(example.grid.Face(it.face),it.face.axis,p,example.time);break;
+            case '0': u=0;break;
+            case 'c': case 'C': case 'l': case 'L':{
+                auto further=[=](FACE_INDEX<TV::m> f){
+                    f.index(side_axis)-=sign_out;
+                    return f;};
+                FACE_INDEX<TV::m> nearest_face[2]={it.face,it.face};
+                nearest_face[0].index(side_axis)=nearest_face[1].index(side_axis)=corner(side_axis);
+                nearest_face[1].axis=side_axis;
+                if(it.side%2) nearest_face[0]=further(nearest_face[0]);
+                TV nearest_point=example.grid.Face(it.face);
+                nearest_point(side_axis)=example.grid.Face(nearest_face[1])(side_axis);
+
+                if(extrap_type=='c')
+                    u=bc(nearest_point,it.face.axis,p,example.time);
+                else if(extrap_type=='C'){
+                    FACE_INDEX<TV::m> f=nearest_face[normal];
+                    if(wall && normal) f=further(f);
+                    u=ph.velocity(f);}
+                else if(extrap_type=='l'){
+                    T u0=bc(nearest_point,it.face.axis,p,example.time);
+                    FACE_INDEX<TV::m> f=nearest_face[normal];
+                    if(normal) f=further(f);
+                    T u1=ph.velocity(f);
+                    // compute how far from u to u0(given by bc), measured in number of |u0-u1|
+                    int n=normal?
+                        abs(it.face.index(side_axis)-nearest_face[normal].index(side_axis)):
+                        2*abs(it.face.index(side_axis)-nearest_face[normal].index(side_axis))-1;
+                    u=u0+n*(u0-u1);}
+                else if(extrap_type=='L'){
+                    FACE_INDEX<TV::m> f0=nearest_face[normal];
+                    FACE_INDEX<TV::m> f1=further(f0);
+                    int n=abs(it.face.index(side_axis)-f0.index(side_axis));
+                    if(wall && normal){
+                        f0=f1;
+                        f1=further(f0);
+                        n+=1;}
+                    T u0=ph.velocity(f0);
+                    T u1=ph.velocity(f1);
+                    u=u0+n*(u0-u1);}
+                break;}
+            default: PHYSBAM_FATAL_ERROR("Unrecognized extrapolation type");}}
 }
 //#####################################################################
 // Function Apply_Viscosity
