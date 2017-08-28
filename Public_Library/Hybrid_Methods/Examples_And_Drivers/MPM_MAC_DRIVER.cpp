@@ -1328,8 +1328,7 @@ Apply_Viscosity()
         for(CELL_ITERATOR<TV> it(face_grid);it.Valid();it.Next()){
             FACE_INDEX<TV::m> face(axis,it.index);
             int i=velocity_index(it.index);
-            if(i>=0) ph.velocity(face)=sol.v(i);
-            else ph.velocity(face)=0;}}
+            if(i>=0) ph.velocity(face)=sol.v(i);}}
 
     Fix_Periodic(ph.velocity);
 }
