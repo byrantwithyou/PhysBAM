@@ -285,7 +285,7 @@ Particle_To_Grid(PHASE& ph) const
 #pragma omp barrier
         ARRAY<int>& flat_t=flat_h.Array();
         ARRAY<FACE_INDEX<TV::m> >& indices_t=indices_h.Array();
-        for(FACE_ITERATOR_THREADED<TV> it(example.grid,0);it.Valid();it.Next()){
+        for(FACE_ITERATOR_THREADED<TV> it(example.grid,example.ghost);it.Valid();it.Next()){
             int i=ph.mass.Standard_Index(it.Full_Index());
             if(ph.mass.array(i)){
                 flat_t.Append(i);
