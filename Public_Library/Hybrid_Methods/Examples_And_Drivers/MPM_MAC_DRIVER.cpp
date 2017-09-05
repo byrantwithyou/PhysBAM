@@ -235,10 +235,11 @@ Update_Particle_Weights()
 // Function Particle_To_Grid
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Particle_To_Grid(PHASE& ph) const
+Particle_To_Grid(PHASE_ID pid) const
 {
     TIMER_SCOPE_FUNC;
     const MPM_PARTICLES<TV>& particles=example.particles;
+    PHASE& ph=example.phases(pid);
 
 #pragma omp parallel for
     for(int i=0;i<ph.mass.array.m;i++){
@@ -298,7 +299,9 @@ Particle_To_Grid(PHASE& ph) const
     Fix_Periodic(ph.mass);
     Fix_Periodic(ph.velocity);
     Fix_Periodic(ph.volume);
-    if(example.flip) ph.velocity_save=ph.velocity;
+    if(example.flip){
+        Extrapolate_Velocity(pid);
+        ph.velocity_save=ph.velocity;}
 }
 //#####################################################################
 // Function Build_Level_Sets
@@ -531,7 +534,7 @@ template<class TV> void MPM_MAC_DRIVER<TV>::
 Particle_To_Grid()
 {
     for(PHASE_ID i(0);i<example.phases.m;i++)
-        Particle_To_Grid(example.phases(i));
+        Particle_To_Grid(i);
 }
 //#####################################################################
 // Function Grid_To_Particle
@@ -1200,10 +1203,10 @@ Extrapolate_Velocity()
 // Function Extrapolate_Velocity
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Extrapolate_Velocity(PHASE_ID p) const
+Extrapolate_Velocity(PHASE_ID pid) const
 {
     if(!example.use_extrap) return;
-    PHASE& ph=example.phases(p);
+    PHASE& ph=example.phases(pid);
     RANGE<TV_INT> domain=example.grid.Domain_Indices(0);
     RANGE<TV_INT> ghost_domain=example.grid.Domain_Indices(example.ghost);
     TV_INT bound[TV::m];
@@ -1238,7 +1241,7 @@ Extrapolate_Velocity(PHASE_ID p) const
                 u=ph.velocity(f);
                 if(normal) u=-u;
                 break;}
-            case 'a': u=bc(example.grid.Face(it.face),it.face.axis,p,example.time);break;
+            case 'a': u=bc(example.grid.Face(it.face),it.face.axis,pid,example.time);break;
             case '0': u=0;break;
             case 'c': case 'C': case 'l': case 'L':{
                 auto further=[=](FACE_INDEX<TV::m> f){
@@ -1252,13 +1255,13 @@ Extrapolate_Velocity(PHASE_ID p) const
                 nearest_point(side_axis)=example.grid.Face(nearest_face[1])(side_axis);
 
                 if(extrap_type=='c')
-                    u=bc(nearest_point,it.face.axis,p,example.time);
+                    u=bc(nearest_point,it.face.axis,pid,example.time);
                 else if(extrap_type=='C'){
                     FACE_INDEX<TV::m> f=nearest_face[normal];
                     if(wall && normal) f=further(f);
                     u=ph.velocity(f);}
                 else if(extrap_type=='l'){
-                    T u0=bc(nearest_point,it.face.axis,p,example.time);
+                    T u0=bc(nearest_point,it.face.axis,pid,example.time);
                     FACE_INDEX<TV::m> f=nearest_face[normal];
                     if(normal) f=further(f);
                     T u1=ph.velocity(f);

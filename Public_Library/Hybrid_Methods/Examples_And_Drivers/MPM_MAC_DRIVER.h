@@ -44,7 +44,7 @@ public:
     void Update_Particle_Weights();
     void Prepare_Scatter();
     void Particle_To_Grid();
-    void Particle_To_Grid(PHASE& ph) const;
+    void Particle_To_Grid(PHASE_ID pid) const;
     void Grid_To_Particle();
     void Grid_To_Particle(const PHASE& ph);
     void Build_Level_Sets();
@@ -54,7 +54,7 @@ public:
     void Apply_Viscosity();
     void Move_Particles();
     void Extrapolate_Velocity();
-    void Extrapolate_Velocity(PHASE_ID ph) const;
+    void Extrapolate_Velocity(PHASE_ID pid) const;
     T Compute_Dt() const;
     T Max_Particle_Speed() const;
     T Grid_V_Upper_Bound() const;
