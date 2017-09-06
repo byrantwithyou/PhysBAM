@@ -39,7 +39,7 @@ MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type)
     debug_particles(*new DEBUG_PARTICLES<TV>),
     test_system(false),print_matrix(false)
 {
-    bc_type.Fill(BC_WALL);
+    bc_type.Fill(BC_SLIP);
 }
 //#####################################################################
 // Destructor

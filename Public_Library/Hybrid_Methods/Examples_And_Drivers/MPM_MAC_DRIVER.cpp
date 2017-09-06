@@ -798,7 +798,7 @@ Neumann_Boundary_Condition(const FACE_INDEX<TV::m>& face,ARRAY<T,PHASE_ID>& bc) 
         domains(i)=example.grid.Domain_Indices();
         domains(i).min_corner(i)++;}
     for(int i=0;i<TV::m;i++){
-        if(face.index(i)<domains(face.axis).min_corner(i) && example.bc_type(2*i)==example.BC_WALL){
+        if(face.index(i)<domains(face.axis).min_corner(i) && example.bc_type(2*i)==example.BC_SLIP){
             for(PHASE_ID p(0);p<example.phases.m;p++)
                 if(example.phases(p).mass(face)){
                     bc(p)=0;
@@ -806,7 +806,7 @@ Neumann_Boundary_Condition(const FACE_INDEX<TV::m>& face,ARRAY<T,PHASE_ID>& bc) 
                         TV X=example.grid.domain.Clamp(example.grid.Face(face));
                         bc(p)=example.bc_velocity(2*i)(X,face.axis,p,example.time);}}
             return true;}
-        if(face.index(i)>=domains(face.axis).max_corner(i) && example.bc_type(2*i+1)==example.BC_WALL){
+        if(face.index(i)>=domains(face.axis).max_corner(i) && example.bc_type(2*i+1)==example.BC_SLIP){
             for(PHASE_ID p(0);p<example.phases.m;p++)
                 if(example.phases(p).mass(face)){
                     bc(p)=0;
@@ -850,8 +850,8 @@ Allocate_Projection_System_Variable()
     example.cell_index.Resize(example.grid.Domain_Indices(ghost),false,false);
     for(int s=0;s<2*TV::m;s++){
         int value=pressure_uninit;
-        if(example.bc_type(s)==example.BC_WALL) value=pressure_N;
-        else if(example.bc_type(s)==example.BC_INVALID) value=pressure_D;
+        if(example.bc_type(s)==example.BC_SLIP) value=pressure_N;
+        else if(example.bc_type(s)==example.BC_FREE) value=pressure_D;
         for(CELL_ITERATOR<TV> it(example.grid,ghost,GRID<TV>::GHOST_REGION,s);it.Valid();it.Next())
             example.cell_index(it.index)=value;}
 
@@ -1223,8 +1223,8 @@ Extrapolate_Velocity(PHASE_ID pid) const
             if(i!=j)
                 bound[i](j)++;}
     for(FACE_RANGE_ITERATOR<TV::m> it(ghost_domain,domain,RF::skip_inner|RF::delay_corners);it.Valid();it.Next()){
-        bool wall=example.bc_type(it.side)==example.BC_WALL;
-        if(!wall && example.bc_type(it.side)!=example.BC_INVALID) continue;
+        bool wall=example.bc_type(it.side)==example.BC_SLIP;
+        if(!wall && example.bc_type(it.side)!=example.BC_FREE) continue;
         char extrap_type=example.extrap_type;
         int side_axis=it.side/2;
         bool normal=side_axis==it.face.axis;
@@ -1452,12 +1452,12 @@ Move_Particles()
                 T &x=example.particles.X(p)(i),a=example.grid.domain.min_corner(i),b=example.grid.domain.max_corner(i);
                 if(x<a){
                     if(example.bc_type(2*i)==example.BC_PERIODIC) x=wrap(x,a,b);
-                    else if(example.bc_type(2*i)==example.BC_INVALID) Invalidate_Particle(p);
-                    else if(example.clamp_particles && example.bc_type(2*i)==example.BC_WALL) x=a;}
+                    else if(example.bc_type(2*i)==example.BC_FREE) Invalidate_Particle(p);
+                    else if(example.clamp_particles && example.bc_type(2*i)==example.BC_SLIP) x=a;}
                 if(x>b){
                     if(example.bc_type(2*i+1)==example.BC_PERIODIC) x=wrap(x,a,b);
-                    else if(example.bc_type(2*i+1)==example.BC_INVALID) Invalidate_Particle(p);
-                    else if(example.clamp_particles && example.bc_type(2*i+1)==example.BC_WALL) x=b;}}
+                    else if(example.bc_type(2*i+1)==example.BC_FREE) Invalidate_Particle(p);
+                    else if(example.clamp_particles && example.bc_type(2*i+1)==example.BC_SLIP) x=b;}}
         };
 
     if(example.rk_particle_order){

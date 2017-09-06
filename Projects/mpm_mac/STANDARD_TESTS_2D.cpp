@@ -51,7 +51,7 @@ Initialize()
         } break;
         case 2:
         case 15:{ // translating circle
-            if(test_number==2) bc_type.Fill(BC_INVALID);
+            if(test_number==2) bc_type.Fill(BC_FREE);
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             SPHERE<TV> sphere(TV(.5,.5)*m,.3*m);
             T density=unit_rho*scale_mass;
@@ -265,7 +265,7 @@ Initialize()
             auto shape=Intersect(Make_IO(grid.domain),Invert(Make_IO(sphere)));
             Seed_Particles(*shape,0,0,density,particles_per_cell);
             delete shape;
-            bc_type(1)=BC_INVALID;
+            bc_type(1)=BC_FREE;
             bc_velocity(0)=[=](const TV& X,int axis,PHASE_ID pid,T time){return axis==0?velocity:0;};
             Add_Collision_Object(sphere,COLLISION_TYPE::slip,0,0,0);
             RANGE<TV> source_range=grid.domain;

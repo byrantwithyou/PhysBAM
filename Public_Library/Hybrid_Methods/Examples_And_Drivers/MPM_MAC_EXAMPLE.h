@@ -38,7 +38,7 @@ public:
     typedef typename MPM_COLLISION_OBJECT<TV>::COLLISION_TYPE COLLISION_TYPE;
     GRID<TV> grid;
     STREAM_TYPE stream_type;
-    enum BC_TYPE {BC_INVALID, BC_WALL, BC_PERIODIC};
+    enum BC_TYPE {BC_FREE, BC_SLIP, BC_PERIODIC};
     
     struct PHASE
     {
@@ -78,9 +78,9 @@ public:
     MPM_PROJECTION_VECTOR<TV>& rhs;
     int ghost;
     VECTOR<BC_TYPE,TV::m*2> bc_type; // -x, +x, -y, +y, -z, +z
-    // Valid if BC_WALL; velocity at face. null=0
+    // Valid if BC_SLIP; velocity at face. null=0
     VECTOR<std::function<T(const TV& X,int axis,PHASE_ID,T)>,TV::m*2> bc_velocity;
-    // Valid if BC_INVALID; pressure at ghost cell. null=0
+    // Valid if BC_FREE; pressure at ghost cell. null=0
     std::function<T(TV_INT,PHASE_ID,T)> bc_pressure;
     BOUNDARY_MAC_GRID_PERIODIC<TV,T>& periodic_boundary;
     ARRAY<int,TV_INT> cell_index;
