@@ -51,6 +51,7 @@ public:
     using BASE::Add_Callbacks;using BASE::Print_Particle_Stats;using BASE::Print_Grid_Stats;
     using BASE::bc_velocity;using BASE::bc_pressure;using BASE::BC_WALL;
     using BASE::extrap_type;using BASE::use_extrap;
+    using BASE::clamp_particles;
 
     int test_number;
     int resolution;

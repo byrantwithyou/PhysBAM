@@ -1452,10 +1452,12 @@ Move_Particles()
                 T &x=example.particles.X(p)(i),a=example.grid.domain.min_corner(i),b=example.grid.domain.max_corner(i);
                 if(x<a){
                     if(example.bc_type(2*i)==example.BC_PERIODIC) x=wrap(x,a,b);
-                    else if(example.bc_type(2*i)==example.BC_INVALID) Invalidate_Particle(p);}
+                    else if(example.bc_type(2*i)==example.BC_INVALID) Invalidate_Particle(p);
+                    else if(example.clamp_particles && example.bc_type(2*i)==example.BC_WALL) x=a;}
                 if(x>b){
                     if(example.bc_type(2*i+1)==example.BC_PERIODIC) x=wrap(x,a,b);
-                    else if(example.bc_type(2*i+1)==example.BC_INVALID) Invalidate_Particle(p);}}
+                    else if(example.bc_type(2*i+1)==example.BC_INVALID) Invalidate_Particle(p);
+                    else if(example.clamp_particles && example.bc_type(2*i+1)==example.BC_WALL) x=b;}}
         };
 
     if(example.rk_particle_order){
