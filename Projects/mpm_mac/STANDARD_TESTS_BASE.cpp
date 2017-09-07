@@ -495,7 +495,7 @@ Setup_Analytic_Boundary_Conditions()
     auto bc_v=[this](const TV& X,int axis,PHASE_ID p,T t)
         {return analytic_velocity(p)->v(X,t)(axis);};
     for(int i=0;i<bc_velocity.m;i++)
-        if(bc_type(i)==BC_SLIP)
+        if(bc_type(i)==BC_SLIP || bc_type(i)==BC_NOSLIP)
             bc_velocity(i)=bc_v;
     bc_pressure=[this](TV_INT c,PHASE_ID p,T t)
         {return analytic_pressure(p)->f(grid.Center(c),t);};

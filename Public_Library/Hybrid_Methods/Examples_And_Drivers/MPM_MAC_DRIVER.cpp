@@ -1451,13 +1451,17 @@ Move_Particles()
             for(int i=0;i<TV::m;i++){
                 T &x=example.particles.X(p)(i),a=example.grid.domain.min_corner(i),b=example.grid.domain.max_corner(i);
                 if(x<a){
-                    if(example.bc_type(2*i)==example.BC_PERIODIC) x=wrap(x,a,b);
-                    else if(example.bc_type(2*i)==example.BC_FREE) Invalidate_Particle(p);
-                    else if(example.clamp_particles && example.bc_type(2*i)==example.BC_SLIP) x=a;}
+                    typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.bc_type(2*i);
+                    bool wall=bc_type==example.BC_SLIP||bc_type==example.BC_NOSLIP;
+                    if(bc_type==example.BC_PERIODIC) x=wrap(x,a,b);
+                    else if(bc_type==example.BC_FREE) Invalidate_Particle(p);
+                    else if(example.clamp_particles && wall) x=a;}
                 if(x>b){
-                    if(example.bc_type(2*i+1)==example.BC_PERIODIC) x=wrap(x,a,b);
-                    else if(example.bc_type(2*i+1)==example.BC_FREE) Invalidate_Particle(p);
-                    else if(example.clamp_particles && example.bc_type(2*i+1)==example.BC_SLIP) x=b;}}
+                    typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.bc_type(2*i+1);
+                    bool wall=bc_type==example.BC_SLIP||bc_type==example.BC_NOSLIP;
+                    if(bc_type==example.BC_PERIODIC) x=wrap(x,a,b);
+                    else if(bc_type==example.BC_FREE) Invalidate_Particle(p);
+                    else if(example.clamp_particles && wall) x=b;}}
         };
 
     if(example.rk_particle_order){
