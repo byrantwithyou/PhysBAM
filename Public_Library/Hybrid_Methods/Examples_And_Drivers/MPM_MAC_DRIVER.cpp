@@ -798,7 +798,8 @@ Neumann_Boundary_Condition(const FACE_INDEX<TV::m>& face,ARRAY<T,PHASE_ID>& bc) 
         domains(i)=example.grid.Domain_Indices();
         domains(i).min_corner(i)++;}
     for(int i=0;i<TV::m;i++){
-        if(face.index(i)<domains(face.axis).min_corner(i) && example.bc_type(2*i)==example.BC_SLIP){
+        bool wall=example.bc_type(2*i)==example.BC_SLIP||example.bc_type(2*i)==example.BC_NOSLIP;
+        if(face.index(i)<domains(face.axis).min_corner(i) && wall){
             for(PHASE_ID p(0);p<example.phases.m;p++)
                 if(example.phases(p).mass(face)){
                     bc(p)=0;
@@ -806,7 +807,8 @@ Neumann_Boundary_Condition(const FACE_INDEX<TV::m>& face,ARRAY<T,PHASE_ID>& bc) 
                         TV X=example.grid.domain.Clamp(example.grid.Face(face));
                         bc(p)=example.bc_velocity(2*i)(X,face.axis,p,example.time);}}
             return true;}
-        if(face.index(i)>=domains(face.axis).max_corner(i) && example.bc_type(2*i+1)==example.BC_SLIP){
+        wall=example.bc_type(2*i+1)==example.BC_SLIP||example.bc_type(2*i+1)==example.BC_NOSLIP;
+        if(face.index(i)>=domains(face.axis).max_corner(i) && wall){
             for(PHASE_ID p(0);p<example.phases.m;p++)
                 if(example.phases(p).mass(face)){
                     bc(p)=0;
@@ -850,7 +852,8 @@ Allocate_Projection_System_Variable()
     example.cell_index.Resize(example.grid.Domain_Indices(ghost),false,false);
     for(int s=0;s<2*TV::m;s++){
         int value=pressure_uninit;
-        if(example.bc_type(s)==example.BC_SLIP) value=pressure_N;
+        typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.bc_type(s);
+        if(bc_type==example.BC_SLIP || bc_type==example.BC_NOSLIP) value=pressure_N;
         else if(example.bc_type(s)==example.BC_FREE) value=pressure_D;
         for(CELL_ITERATOR<TV> it(example.grid,ghost,GRID<TV>::GHOST_REGION,s);it.Valid();it.Next())
             example.cell_index(it.index)=value;}
@@ -1219,17 +1222,18 @@ Extrapolate_Velocity(PHASE_ID pid) const
     TV_INT bound[TV::m];
     for(int i=0;i<TV::m;i++){
         bound[i]=domain.max_corner;
-        for(int j=0;j<TV::m;j++)
-            if(i!=j)
-                bound[i](j)++;}
+        for(int j=0;j<TV::m;j++) if(i!=j)
+            bound[i](j)++;}
     for(FACE_RANGE_ITERATOR<TV::m> it(ghost_domain,domain,RF::skip_inner|RF::delay_corners);it.Valid();it.Next()){
-        bool wall=example.bc_type(it.side)==example.BC_SLIP;
-        if(!wall && example.bc_type(it.side)!=example.BC_FREE) continue;
-        char extrap_type=example.extrap_type;
+        typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.bc_type(it.side);
+        if(bc_type==example.BC_PERIODIC) continue;
         int side_axis=it.side/2;
         bool normal=side_axis==it.face.axis;
+        bool has_bc=(bc_type==example.BC_SLIP && normal)||example.BC_NOSLIP;
+        bool is_normal_bc=(bc_type==example.BC_SLIP||bc_type==example.BC_NOSLIP)&&normal;
+        char extrap_type=example.extrap_type;
         TV_INT corner=it.side%2?domain.max_corner:domain.min_corner;
-        if(!wall){
+        if(bc_type==example.BC_FREE || !has_bc){
             if(extrap_type=='c') extrap_type='C';
             else if(extrap_type=='l') extrap_type='L';}
         if(!normal){
@@ -1239,6 +1243,13 @@ Extrapolate_Velocity(PHASE_ID pid) const
                 else if(extrap_type=='l') extrap_type='L';}}
         int sign_out=it.side%2?1:-1;
         auto bc=example.bc_velocity(it.side);
+        auto further=[=](FACE_INDEX<TV::m> f){f.index(side_axis)-=sign_out;return f;};
+        FACE_INDEX<TV::m> nearest_face[2]={it.face,it.face};
+        nearest_face[0].index(side_axis)=nearest_face[1].index(side_axis)=corner(side_axis);
+        nearest_face[1].axis=side_axis;
+        if(it.side%2) nearest_face[0]=further(nearest_face[0]);
+        TV nearest_point=example.grid.Face(it.face);
+        nearest_point(side_axis)=example.grid.Face(nearest_face[1])(side_axis);
         T& u=ph.velocity(it.face);
         switch(extrap_type){
             case 'r':{
@@ -1246,48 +1257,39 @@ Extrapolate_Velocity(PHASE_ID pid) const
                 f.index(side_axis)=2*corner(side_axis)-it.face.index(side_axis);
                 if(!normal) f.index(side_axis)-=1;
                 u=ph.velocity(f);
-                if(normal) u=-u;
+                if(has_bc) u=2*bc(nearest_point,it.face.axis,pid,example.time)-u;
                 break;}
             case 'a': u=bc(example.grid.Face(it.face),it.face.axis,pid,example.time);break;
             case '0': u=0;break;
-            case 'c': case 'C': case 'l': case 'L':{
-                auto further=[=](FACE_INDEX<TV::m> f){
-                    f.index(side_axis)-=sign_out;
-                    return f;};
-                FACE_INDEX<TV::m> nearest_face[2]={it.face,it.face};
-                nearest_face[0].index(side_axis)=nearest_face[1].index(side_axis)=corner(side_axis);
-                nearest_face[1].axis=side_axis;
-                if(it.side%2) nearest_face[0]=further(nearest_face[0]);
-                TV nearest_point=example.grid.Face(it.face);
-                nearest_point(side_axis)=example.grid.Face(nearest_face[1])(side_axis);
-
-                if(extrap_type=='c')
-                    u=bc(nearest_point,it.face.axis,pid,example.time);
-                else if(extrap_type=='C'){
-                    FACE_INDEX<TV::m> f=nearest_face[normal];
-                    if(wall && normal) f=further(f);
-                    u=ph.velocity(f);}
-                else if(extrap_type=='l'){
-                    T u0=bc(nearest_point,it.face.axis,pid,example.time);
-                    FACE_INDEX<TV::m> f=nearest_face[normal];
-                    if(normal) f=further(f);
-                    T u1=ph.velocity(f);
-                    // compute how far from u to u0(given by bc), measured in number of |u0-u1|
-                    int n=normal?
-                        abs(it.face.index(side_axis)-nearest_face[normal].index(side_axis)):
-                        2*abs(it.face.index(side_axis)-nearest_face[normal].index(side_axis))-1;
-                    u=u0+n*(u0-u1);}
-                else if(extrap_type=='L'){
-                    FACE_INDEX<TV::m> f0=nearest_face[normal];
-                    FACE_INDEX<TV::m> f1=further(f0);
-                    int n=abs(it.face.index(side_axis)-f0.index(side_axis));
-                    if(wall && normal){
-                        f0=f1;
-                        f1=further(f0);
-                        n+=1;}
-                    T u0=ph.velocity(f0);
-                    T u1=ph.velocity(f1);
-                    u=u0+n*(u0-u1);}
+            case 'c': u=bc(nearest_point,it.face.axis,pid,example.time);break;
+            case 'C':{
+                FACE_INDEX<TV::m> f=nearest_face[normal];
+                if(is_normal_bc) f=further(f);
+                u=ph.velocity(f);
+                if(has_bc) u=2*bc(nearest_point,it.face.axis,pid,example.time)-u;
+                break;}
+            case 'l':{
+                T u0=bc(nearest_point,it.face.axis,pid,example.time);
+                FACE_INDEX<TV::m> f=nearest_face[normal];
+                if(is_normal_bc) f=further(f);
+                T u1=ph.velocity(f);
+                // compute how far from u to u0(given by bc), measured in number of |u0-u1|
+                int n=normal?
+                    abs(it.face.index(side_axis)-nearest_face[normal].index(side_axis)):
+                    2*abs(it.face.index(side_axis)-nearest_face[normal].index(side_axis))-1;
+                u=u0+n*(u0-u1);
+                break;}
+            case 'L':{
+                FACE_INDEX<TV::m> f0=nearest_face[normal];
+                FACE_INDEX<TV::m> f1=further(f0);
+                int n=abs(it.face.index(side_axis)-f0.index(side_axis));
+                if(is_normal_bc){
+                    f0=f1;
+                    f1=further(f0);
+                    n+=1;}
+                T u0=ph.velocity(f0);
+                T u1=ph.velocity(f1);
+                u=u0+n*(u0-u1);
                 break;}
             default: PHYSBAM_FATAL_ERROR("Unrecognized extrapolation type");}}
 }
@@ -1325,11 +1327,15 @@ Apply_Viscosity()
         Fix_Periodic(velocity_index,1);
 
         // Compute as needed rather than store.  face_grid index.
-        auto psi_N=[axis,this,p_psi_D](const FACE_INDEX<TV::m>& face)
+        auto psi_N=[axis,this,p_psi_D](const FACE_INDEX<TV::m>& face,int s)
         {
             TV_INT a=face.index,b=a;
             b(axis)--;
             if(face.axis==axis) return p_psi_D(b);
+            int index=face.index(face.axis);
+            bool boundary=index==example.grid.Domain_Indices().min_corner(face.axis)||
+                index==example.grid.Domain_Indices().max_corner(face.axis);
+            if(boundary && example.bc_type(2*face.axis+s)==example.BC_SLIP) return true;
             if(p_psi_D(a) && p_psi_D(b)) return true;
             a(face.axis)--;
             b(face.axis)--;
@@ -1363,17 +1369,14 @@ Apply_Viscosity()
                         TV_INT cell=it.index;
                         cell(a)+=2*s-1;
                         PHYSBAM_ASSERT(face.Cell_Index(s)==cell);
-                        if(psi_N(face)){
+                        if(psi_N(face,s)){
                             // Assume for now that the boundary condition is zero.
                         }
                         else{
                             diag+=scale(a);
                             int ci=velocity_index(cell);
                             if(ci>=0) helper.Add_Entry(ci,-scale(a));
-                            else{
-                                bool N=Neumann_Boundary_Condition(FACE_INDEX<TV::m>(axis,cell),u_bc);
-                                PHYSBAM_ASSERT(N);
-                                rhs.v(center_index)+=scale(a)*u_bc(PHASE_ID(0));}}
+                            else rhs.v(center_index)+=scale(a)*ph.velocity(FACE_INDEX<TV::m>(axis,cell));}
                         face.index(a)++;}}
                 helper.Add_Entry(center_index,diag);}
             helper.Finish();
