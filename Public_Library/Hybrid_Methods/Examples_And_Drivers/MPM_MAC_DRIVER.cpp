@@ -797,15 +797,17 @@ Neumann_Boundary_Condition(const FACE_INDEX<TV::m>& face,ARRAY<T,PHASE_ID>& bc) 
             for(PHASE_ID p(0);p<example.phases.m;p++)
                 if(example.phases(p).mass(face)){
                     bc(p)=0;
-                    if(example.bc_velocity(2*i))
-                        bc(p)=example.bc_velocity(2*i)(example.grid.Face(face),face.axis,p,example.time);}
+                    if(example.bc_velocity(2*i)){
+                        TV X=example.grid.domain.Clamp(example.grid.Face(face));
+                        bc(p)=example.bc_velocity(2*i)(X,face.axis,p,example.time);}}
             return true;}
         if(face.index(i)>=domains(face.axis).max_corner(i) && example.bc_type(2*i+1)==example.BC_WALL){
             for(PHASE_ID p(0);p<example.phases.m;p++)
                 if(example.phases(p).mass(face)){
                     bc(p)=0;
-                    if(example.bc_velocity(2*i+1))
-                        bc(p)=example.bc_velocity(2*i+1)(example.grid.Face(face),face.axis,p,example.time);}
+                    if(example.bc_velocity(2*i+1)){
+                        TV X=example.grid.domain.Clamp(example.grid.Face(face));
+                        bc(p)=example.bc_velocity(2*i+1)(X,face.axis,p,example.time);}}
             return true;}}
     TV X=example.grid.Face(face);
     for(int i=0;i<example.collision_objects.m;i++){
