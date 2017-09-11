@@ -821,9 +821,9 @@ Neumann_Boundary_Condition(const FACE_INDEX<TV::m>& face,ARRAY<T,PHASE_ID>& bc) 
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Apply_BC()
 {
-    example.psi_N.Resize(example.grid,3,false);
+    example.psi_N.Resize(example.grid,example.ghost,false);
 #pragma omp parallel
-    for(FACE_ITERATOR_THREADED<TV> it(example.grid,3);it.Valid();it.Next()){
+    for(FACE_ITERATOR_THREADED<TV> it(example.grid,example.ghost);it.Valid();it.Next()){
         ARRAY<T,PHASE_ID> u_bc(example.phases.m);
         bool N=Neumann_Boundary_Condition(it.Full_Index(),u_bc);
         example.psi_N(it.Full_Index())=N;
