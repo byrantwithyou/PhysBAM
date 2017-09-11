@@ -274,6 +274,13 @@ Particle_To_Grid(PHASE_ID pid) const
     ph.valid_indices.Remove_All();
     ph.valid_flat_indices.Remove_All();
 
+#pragma omp parallel
+    for(FACE_ITERATOR_THREADED<TV> it(example.grid,example.ghost);it.Valid();it.Next()){
+        int i=ph.mass.Standard_Index(it.Full_Index());
+        if(ph.mass.array(i)){
+            ph.velocity.array(i)/=ph.mass.array(i);}
+        else ph.velocity.array(i)=0;}
+
     APPEND_HOLDER<int> flat_h(ph.valid_flat_indices);
     APPEND_HOLDER<FACE_INDEX<TV::m> > indices_h(ph.valid_indices);
 #pragma omp parallel
@@ -286,13 +293,11 @@ Particle_To_Grid(PHASE_ID pid) const
 #pragma omp barrier
         ARRAY<int>& flat_t=flat_h.Array();
         ARRAY<FACE_INDEX<TV::m> >& indices_t=indices_h.Array();
-        for(FACE_ITERATOR_THREADED<TV> it(example.grid,example.ghost);it.Valid();it.Next()){
+        for(FACE_ITERATOR_THREADED<TV> it(example.grid);it.Valid();it.Next()){
             int i=ph.mass.Standard_Index(it.Full_Index());
             if(ph.mass.array(i)){
                 flat_t.Append(i);
-                indices_t.Append(it.Full_Index());
-                ph.velocity.array(i)/=ph.mass.array(i);}
-            else ph.velocity.array(i)=0;}
+                indices_t.Append(it.Full_Index());}}
     }
     flat_h.Combine();
     indices_h.Combine();
