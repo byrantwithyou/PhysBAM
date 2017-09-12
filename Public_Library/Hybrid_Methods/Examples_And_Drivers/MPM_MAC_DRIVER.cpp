@@ -1215,7 +1215,6 @@ Extrapolate_Velocity()
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Extrapolate_Velocity(PHASE_ID pid) const
 {
-    if(!example.use_extrap) return;
     PHASE& ph=example.phases(pid);
     RANGE<TV_INT> domain=example.grid.Domain_Indices(0);
     RANGE<TV_INT> ghost_domain=example.grid.Domain_Indices(example.ghost);

@@ -96,7 +96,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-analyze_u_modes",&analyze_u_modes,"Perform FFT analysis on velocity");
     parse_args.Add("-dump_modes_freq",&dump_modes_freq,"num","Dump FFT modes every num time steps");
     parse_args.Add("-max_ke",&max_ke,"value","Normalization for FFT images");
-    parse_args.Add("-extrap",&extrap_type,&use_extrap,"type","Velocity extrapolation");
+    parse_args.Add("-extrap",&extrap_type,"type","Velocity extrapolation");
     parse_args.Add("-clamp",&clamp_particles,"clamp particles on wall");
 
     parse_args.Parse(true);

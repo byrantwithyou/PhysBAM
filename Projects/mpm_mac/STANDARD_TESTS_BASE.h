@@ -50,7 +50,7 @@ public:
     using BASE::use_constant_density;using BASE::bc_type;using BASE::BC_PERIODIC;
     using BASE::Add_Callbacks;using BASE::Print_Particle_Stats;using BASE::Print_Grid_Stats;
     using BASE::bc_velocity;using BASE::bc_pressure;using BASE::BC_SLIP;using BASE::BC_NOSLIP;
-    using BASE::extrap_type;using BASE::use_extrap;
+    using BASE::extrap_type;
     using BASE::clamp_particles;
 
     int test_number;
