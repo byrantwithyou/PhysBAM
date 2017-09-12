@@ -300,13 +300,12 @@ Grid_To_Particle()
             if(particles.store_S){
                 T k=example.dt*example.inv_Wi;
                 particles.S(p)=(SYMMETRIC_MATRIX<T,TV::m>::Conjugate(A,particles.S(p))+k)/(1+k);}
-            if(example.use_affine)
+            if(example.use_affine){
                 h.B-=(T).5*(Outer_Product(h.V_pic_fric,particles.X(p)+xp_new)
                     +Outer_Product(particles.X(p)-xp_new,h.V_pic_fric));
-
-            if(example.weights->use_gradient_transfer) particles.B(p)=h.grad_Vp_fric;
-            else if(example.lag_Dp) particles.B(p)=h.B*example.Dp_inv(p);
-            else particles.B(p)=h.B;
+                if(example.weights->use_gradient_transfer) particles.B(p)=h.grad_Vp_fric;
+                else if(example.lag_Dp) particles.B(p)=h.B*example.Dp_inv(p);
+                else particles.B(p)=h.B;}
             particles.X(p)=xp_new;
             TV V_flip=particles.V(p)+h.V_pic_fric-h.V_weight_old;
             particles.V(p)=V_flip*example.flip+h.V_pic_fric*(1-example.flip);
