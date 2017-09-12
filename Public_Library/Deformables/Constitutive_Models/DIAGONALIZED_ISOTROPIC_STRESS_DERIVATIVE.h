@@ -45,6 +45,8 @@ public:
 //#####################################################################
     void Enforce_Definiteness();
     void Compute_From_Singular_Value_Derivatives(const DIAGONAL_MATRIX<T,TV::m>& F,const TV& dE_ds,const SYMMETRIC_MATRIX<T,TV::m>& dE_dsds); // Not robust
+    // div_diff=(dE/ds0-dE/ds1)/(s0-s1), div_sum=(dE/ds0+dE/ds1)/(s0+s1), same ordering as B and C.
+    void Compute_From_Derivatives_And_Differences(const SYMMETRIC_MATRIX<T,TV::m>& hess,const typename TV::SPIN& div_diff,const typename TV::SPIN& div_sum); // Robust
 //#####################################################################
 };
 }

@@ -42,10 +42,20 @@ Compute_From_Singular_Value_Derivatives(const DIAGONAL_MATRIX<T,TV::m>& F,const 
 {
     H=dE_dsds;
     for(int i=0;i<B.m;i++){
-        int j=(i+1)%B.m,k=(j+1)%B.m;
+        int j=(i+1)%TV::m,k=(j+1)%TV::m;
         T d=1/(sqr(F.x(j))-sqr(F.x(k)));
         B(i)=(-dE_ds(k)*F.x(k)+dE_ds(j)*F.x(j))*d;
         C(i)=(-dE_ds(k)*F.x(j)+dE_ds(j)*F.x(k))*d;}
+}
+//#####################################################################
+// Function Compute_From_Derivatives_And_Differences
+//#####################################################################
+template<class TV> void DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>::
+Compute_From_Derivatives_And_Differences(const SYMMETRIC_MATRIX<T,TV::m>& hess,const typename TV::SPIN& div_diff,const typename TV::SPIN& div_sum)
+{
+    H=hess;
+    B=(T).5*(div_diff+div_sum);
+    C=(T).5*(div_diff-div_sum);
 }
 //#####################################################################
 namespace PhysBAM{
