@@ -85,6 +85,14 @@ Update_Lame_Constants(const T youngs_modulus_input, const T poissons_ratio_input
     constant_alpha=Rayleigh_coefficient_input*constant_lambda;
     constant_beta=Rayleigh_coefficient_input*constant_mu;
 }
+//#####################################################################
+// Function P_From_Strain_Rate
+//#####################################################################
+template<class T,int d> MATRIX<T,d> CONSTITUTIVE_MODEL<T,d>::
+P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const int id) const
+{
+    PHYSBAM_FUNCTION_IS_NOT_DEFINED();
+}
 namespace PhysBAM{
 template class CONSTITUTIVE_MODEL<float,1>;
 template class CONSTITUTIVE_MODEL<float,2>;
