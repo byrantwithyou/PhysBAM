@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Data_Structures/KD_TREE.h>
+#include <Core/Math_Tools/pow.h>
 #include <Core/Math_Tools/RANGE_ITERATOR.h>
 #include <Core/Matrices/FRAME.h>
 #include <Core/Matrices/MATRIX.h>
@@ -85,7 +86,7 @@ Write_Output_Files(const int frame)
 // Function Read_Output_Files
 //#####################################################################
 template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
-    Read_Output_Files(const int frame)
+Read_Output_Files(const int frame)
 {
     if(read_output_files) read_output_files(frame);
     BASE::Read_Output_Files(frame);
@@ -1471,14 +1472,21 @@ Initialize()
                 this->deformable_body_collection.structures(i)->Update_Number_Nodes();
         } break;
         case 71:{ // (fluid test) dam break; Rabecca Brannon test
-            Set_Grid(RANGE<TV>(TV(),TV(1,2))*m,TV_INT(1,2),100);
+            Set_Grid(RANGE<TV>(TV(),TV(1,2)).Thickened(.3)*m,TV_INT(1,2),160);
             RANGE<TV> box(TV(.6,0)*m,TV(1,.4)*m);
             T density=1000*unit_rho;
             Seed_Particles(box,0,0,density,particles_per_cell);
-            T stiffness=15e3*unit_p,gamma=7;
+            T stiffness=15e3*scale_E*unit_p,gamma=extra_T.m?extra_T(0):7;
             QUASI_INCOMPRESSIBLE_FORCE<TV>* quasi=new QUASI_INCOMPRESSIBLE_FORCE<TV>(stiffness,gamma);
             Add_Force(*new MPM_FINITE_ELEMENTS<TV>(force_helper,*quasi,gather_scatter,0));
             Add_Gravity(m/(s*s)*TV(0,-9.81));
+            Add_Walls(-1,COLLISION_TYPE::separate,0,.3*m,false);
+            end_time_step=[=](T time)
+                {
+                    for(int i=0;i<particles.F.m;i++){
+                        T J=particles.F(i).Determinant();
+                        particles.F(i)=MATRIX<T,TV::m>()+pow<1,TV::m>(J);}
+                };
         } break;
 
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
