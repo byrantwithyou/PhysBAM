@@ -7,12 +7,6 @@
 #include <Tools/Ordinary_Differential_Equations/DRIVER.h>
 #include <Tools/Ordinary_Differential_Equations/EXAMPLE.h>
 using namespace PhysBAM;
-namespace{
-template<class TV> void Write_Substep_Helper(void*writer,const std::string& title,int substep,int level)
-{
-    ((DRIVER<TV>*)writer)->Write_Substep(title,substep,level);
-}
-};
 //#####################################################################
 // DRIVER
 //#####################################################################
@@ -20,7 +14,8 @@ template<class TV> DRIVER<TV>::
 DRIVER(EXAMPLE<TV>& example)
     :time(0),example(example),current_frame(0),output_number(example.first_frame)
 {
-    DEBUG_SUBSTEPS::Set_Substep_Writer((void*)this,&Write_Substep_Helper<TV>);
+    DEBUG_SUBSTEPS::write_substeps_level=example.write_substeps_level;
+    DEBUG_SUBSTEPS::writer=[=](const std::string& title){Write_Substep(title);};
 }
 //#####################################################################
 // ~DRIVER
@@ -28,7 +23,7 @@ DRIVER(EXAMPLE<TV>& example)
 template<class TV> DRIVER<TV>::
 ~DRIVER()
 {
-    DEBUG_SUBSTEPS::Clear_Substep_Writer((void*)this);
+    DEBUG_SUBSTEPS::writer=0;
 }
 //#####################################################################
 // Execute_Main_Program
@@ -56,12 +51,12 @@ Initialize()
 // Function Write_Substep
 //#####################################################################
 template<class TV> void DRIVER<TV>::
-Write_Substep(const std::string& title,const int substep,const int level)
+Write_Substep(const std::string& title)
 {
-    if(level<=example.write_substeps_level){
-        example.frame_title=title;
-        LOG::cout<<"Writing substep ["<<example.frame_title<<"]: output_number="<<output_number+1<<", time="<<time<<", frame="<<current_frame<<", substep="<<substep<<std::endl;
-        Write_Output_Files(++output_number);example.frame_title="";}
+    example.frame_title=title;
+    LOG::cout<<"Writing substep ["<<example.frame_title<<"]: output_number="<<output_number+1<<", time="<<time<<", frame="<<current_frame<<std::endl;
+    Write_Output_Files(++output_number);
+    example.frame_title="";
 }
 //#####################################################################
 // Simulate_To_Frame

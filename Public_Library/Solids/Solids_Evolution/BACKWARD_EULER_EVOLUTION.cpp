@@ -119,7 +119,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
     solid_body_collection.Print_Energy(time+dt,1);
     tmp1=tmp0;
     minimization_objective.Project_Gradient_And_Prune_Constraints(tmp1,true);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("before friction",1,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("before friction",1);
     for(int i=0;i<minimization_system.collisions.m;i++){
         const typename BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>::COLLISION& c=minimization_system.collisions(i);
         T normal_force=c.n.Dot(tmp0.V.array(c.p)-tmp1.V.array(c.p));
@@ -133,14 +133,14 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
         if(COLLISION_FORCE<TV>* cf=dynamic_cast<COLLISION_FORCE<TV>*>(solid_body_collection.deformable_body_collection.deformables_forces(i)))
             cf->Apply_Friction(particles.V,time,dt);
     solid_body_collection.Print_Energy(time+dt,2);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after friction",1,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after friction",1);
 
     if(solids_parameters.triangle_collision_parameters.perform_self_collision){
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("before repulsions",1,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("before repulsions",1);
         solid_body_collection.deformable_body_collection.triangle_repulsions.Adjust_Velocity_For_Self_Repulsion(dt,false);
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("after repulsions",1,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after repulsions",1);
         solid_body_collection.deformable_body_collection.triangle_collisions.Adjust_Velocity_For_Self_Collisions(dt,time,false,true);
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("after collisions",1,1);}
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after collisions",1);}
 
     T max_velocity_squared=0;
     solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities(particles.V);

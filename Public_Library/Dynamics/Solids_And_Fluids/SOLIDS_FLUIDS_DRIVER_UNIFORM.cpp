@@ -357,7 +357,7 @@ Rigid_Cluster_Fracture(const T dt_full_advance,const T dt_cfl,const int substep)
         // TODO update example.fluids_parameters.collision_bodies_affecting_fluid for Deactivate_And_Return_Clusters
         rigid_bindings.Deactivate_And_Return_Clusters(active_clusters);
         example.solid_body_collection.Update_Simulated_Particles();
-        Write_Substep("Before declustered evolution",substep,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("Before declustered evolution",1);
 
         rigid_bindings.callbacks->Pre_Advance_Unclustered(dt,time);
         example.solids_evolution->kinematic_evolution.Set_External_Positions(example.solid_body_collection.rigid_body_collection.rigid_body_particles.frame,time);
@@ -367,11 +367,11 @@ Rigid_Cluster_Fracture(const T dt_full_advance,const T dt_cfl,const int substep)
         rigid_bindings.callbacks->Post_Advance_Unclustered(dt,time);
         rigid_bindings.callbacks->Compute_New_Clusters_Based_On_Unclustered_Strain();
 
-        Write_Substep("After declustered evolution",substep,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("After declustered evolution",1);
         NEWMARK_EVOLUTION<TV>& newmark_evolution=dynamic_cast<NEWMARK_EVOLUTION<TV>&>(*example.solids_evolution);
         example.solids_evolution->Restore_Position_After_Hypothetical_Position_Evolution(newmark_evolution.X_save,newmark_evolution.rigid_frame_save);
         rigid_bindings.Reactivate_Bindings(active_clusters);
-        Write_Substep("After restore",substep,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("After restore",1);
 
         rigid_bindings.callbacks->Create_New_Clusters();
         example.solid_body_collection.Update_Simulated_Particles();
@@ -447,29 +447,29 @@ Advance_To_Target_Time(const T target_time)
 
         if(fluids && Two_Way_Coupled()){
             if(fluids_parameters.compressible) fluids_parameters.Get_Neumann_And_Dirichlet_Boundary_Conditions(euler->euler_projection.elliptic_solver,euler->euler_projection.face_velocities,dt,time); // Put valid state on coupled faces.
-            Write_Substep("integrate fluid forces for solid coupling",substep,1);
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("integrate fluid forces for solid coupling",1);
             Integrate_Fluid_Non_Advection_Forces(example.fluid_collection.incompressible_fluid_collection.face_velocities,dt/2,substep);/*F1*/}
 
-        Write_Substep("solid position update",substep,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("solid position update",1);
         Solid_Position_Update(dt,substep);/*S1*/
 
         if(fluids){
-            Write_Substep("object compatibility",substep,1);
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("object compatibility",1);
             if(Two_Way_Coupled()){  // Restore time n fluid state
                 if(Simulate_Incompressible_Fluids()) incompressible->projection.Restore_After_Projection(example.fluid_collection.incompressible_fluid_collection.face_velocities);
                 if(fluids_parameters.compressible) euler->Restore_State(euler->U_save,euler->euler_projection.face_velocities_save,euler->need_to_remove_added_internal_energy_save);}
 
             if(fluids_parameters.solid_affects_fluid && solids_fluids_parameters.use_leakproof_solve) Advance_Fluid_One_Time_Step_Implicit_Part_For_Object_Compatibility(last_dt,time-last_dt,substep);/*F2*/
-            Write_Substep("advect fluid",substep,1);
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("advect fluid",1);
             Advect_Fluid(dt,substep);/*F3*/
             if(fluids_parameters.compressible && !fluids_parameters.use_slip){//slip does one sided interpolation, so dont need it 
                 fluids_parameters.euler_solid_fluid_coupling_utilities->Fill_Solid_Cells();}}
 
-        Write_Substep("solid velocity update",substep,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("solid velocity update",1);
         Solid_Velocity_Update(dt,substep,done);/*S2*/
 
         if(fluids){
-            Write_Substep("project fluid at end of substep",substep,1);
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("project fluid at end of substep",1);
             Advance_Fluid_One_Time_Step_Implicit_Part(done,dt,substep);
             if(fluids_parameters.compressible && (!euler->timesplit || !euler->thinshell)) fluids_parameters.euler_solid_fluid_coupling_utilities->Fill_Solid_Cells();}/*F4*/
 
@@ -477,7 +477,7 @@ Advance_To_Target_Time(const T target_time)
 
         last_dt=restart_dt?restart_dt:dt;time+=last_dt;restart_dt=0;
 
-        Write_Substep(LOG::sprintf("END Substep %d",substep),substep,0);}
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("END Substep %d",0,substep);}
 }
 //#####################################################################
 // Function Integrate_Fluid_Non_Advection_Forces
@@ -513,16 +513,16 @@ Integrate_Fluid_Non_Advection_Forces(ARRAY<T,FACE_INDEX<TV::m> >& face_velocitie
         if(Simulate_Incompressible_Fluids()){
             if(fluids_parameters.fluid_affects_solid) incompressible->projection.Set_Up_For_Projection(face_velocities);
             // TODO(kwatra): Check if SPH case is handled properly.
-            Write_Substep("before viscosity",substep,1);
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("before viscosity",1);
             if(SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>* coupled_evolution=dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>*>(fluids_parameters.projection))
                 coupled_evolution->Apply_Viscosity(face_velocities,dt,time);
-            Write_Substep("after viscosity",substep,1);
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("after viscosity",1);
             if(number_of_regions>=2)
                 incompressible_multiphase->Advance_One_Time_Step_Forces(face_velocities,dt,time,fluids_parameters.implicit_viscosity,&particle_levelset_evolution_multiple->phis,
                     &fluids_parameters.pseudo_dirichlet_regions,fluids_parameters.number_of_ghost_cells);
             else if(!fluids_parameters.sph) incompressible->Advance_One_Time_Step_Forces(face_velocities,dt,time,fluids_parameters.implicit_viscosity,&particle_levelset_evolution->phi,fluids_parameters.number_of_ghost_cells);}
         fluids_parameters.Blend_In_External_Velocity(face_velocities,dt,time);
-        Write_Substep("after integrate non advection forces",substep,1);}
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after integrate non advection forces",1);}
 }
 //#####################################################################
 // Function Setup_Solids
@@ -618,7 +618,7 @@ Solid_Position_Update(const T dt,const int substep)
     if(solids_fluids_parameters.mpi_solid_fluid && Simulate_Fluids()){
         solids_fluids_parameters.mpi_solid_fluid->Exchange_Solid_Positions_And_Velocities(example.solid_body_collection);}
 
-    Write_Substep("solid position updated",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("solid position updated",1);
     if(fluids){
         // MELTING BROKEN !!! if(example.use_melting && !number_of_regions) example.Modify_Fluid_For_Melting(dt,time);
         LOG::Time("rasterize objects");
@@ -642,7 +642,7 @@ Solid_Position_Update(const T dt,const int substep)
 
         collision_bodies_affecting_fluid.Rasterize_Objects(); // non-swept
         collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*grid.dX.Min(),5);  // static occupied blocks
-        Write_Substep("body update",substep,1);}
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("body update",1);}
 }
 //#####################################################################
 // Function Project_Fluid
@@ -670,7 +670,7 @@ Project_Fluid(const T dt_projection,const T time_projection,const int substep)
     if(!fluids_parameters.analytic_test){
         ARRAY<T,TV_INT> phi_for_dirichlet_regions;LEVELSET<TV> levelset_for_dirichlet_regions(grid,phi_for_dirichlet_regions); // for Dirichlet boundaries, surface tension and extrapolation
         LOG::Time("getting Neumann and Dirichlet boundary conditions");
-        Write_Substep("before get boundary conditions (Project_Fluid)",substep,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("before get boundary conditions (Project_Fluid)",1);
         // todo: modify Get_Object_Velocities as necessary
         if(!fluids_parameters.compressible||number_of_regions==1)
             fluids_parameters.Get_Neumann_And_Dirichlet_Boundary_Conditions(incompressible->projection.elliptic_solver,fluid_collection.incompressible_fluid_collection.face_velocities,dt_projection,time_projection+dt_projection);
@@ -705,14 +705,14 @@ Project_Fluid(const T dt_projection,const T time_projection,const int substep)
         if(fluids_parameters.use_sph_for_removed_negative_particles && !fluids_parameters.sph_evolution->use_two_way_coupling){
             LOG::Time("updating removed negative particle velocities via sph");
             incompressible->projection.Set_Up_For_SPH(example.fluid_collection.incompressible_fluid_collection.face_velocities,fluids_parameters.sph_evolution->use_variable_density_solve,true);
-            Write_Substep("before one-way coupled sph solve",substep,1);
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("before one-way coupled sph solve",1);
             // TODO: check this dt
             fluids_parameters.sph_evolution->Make_Incompressible(particle_levelset_evolution->Particle_Levelset(0).removed_negative_particles,example.fluid_collection.incompressible_fluid_collection.face_velocities,dt_projection,time_projection);
-            Write_Substep("after one-way coupled sph solve",substep,1);
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("after one-way coupled sph solve",1);
             incompressible->projection.Restore_After_SPH(example.fluid_collection.incompressible_fluid_collection.face_velocities,fluids_parameters.sph_evolution->use_variable_density_solve,true);}
 
         LOG::Time("solving for the pressure and viscosity");
-        Write_Substep("before laplace solve (Project_Fluid)",substep,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("before laplace solve (Project_Fluid)",1);
         if(euler){
             if(euler->timesplit && !euler->perform_rungekutta_for_implicit_part){
                 LOG::Time("compressible implicit update");
@@ -737,22 +737,22 @@ Project_Fluid(const T dt_projection,const T time_projection,const int substep)
                 incompressible->Advance_One_Time_Step_Implicit_Part(example.fluid_collection.incompressible_fluid_collection.face_velocities,dt_projection,time_projection,
                     fluids_parameters.implicit_viscosity,0,fluids_parameters.use_levelset_viscosity,fluids_parameters.callbacks,fluids_parameters.print_viscosity_matrix);}
             if(euler->timesplit && !euler->perform_rungekutta_for_implicit_part){
-                Write_Substep("after compressible implicit solve",substep,1);}}
+                PHYSBAM_DEBUG_WRITE_SUBSTEP("after compressible implicit solve",1);}}
         else if(fluids_parameters.sph){
-            Write_Substep("before sph solve",substep,1);
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("before sph solve",1);
             incompressible->projection.Set_Up_For_SPH(example.fluid_collection.incompressible_fluid_collection.face_velocities,fluids_parameters.sph_evolution->use_variable_density_solve);
-            Write_Substep("after sph solve",substep,1);
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("after sph solve",1);
             fluids_parameters.sph_evolution->Make_Incompressible(example.fluid_collection.incompressible_fluid_collection.face_velocities,dt_projection,time_projection);
             incompressible->projection.Restore_After_SPH(example.fluid_collection.incompressible_fluid_collection.face_velocities,fluids_parameters.sph_evolution->use_variable_density_solve);}
         else if(fluids_parameters.use_sph_for_removed_negative_particles && fluids_parameters.sph_evolution->use_two_way_coupling){
             incompressible->projection.Set_Up_For_SPH(example.fluid_collection.incompressible_fluid_collection.face_velocities,fluids_parameters.sph_evolution->use_variable_density_solve);
             fluids_parameters.sph_evolution->Copy_Particle_Attributes_From_Array(particle_levelset_evolution->Particle_Levelset(0).removed_negative_particles);
             fluids_parameters.sph_evolution->Set_Up_For_Projection(example.fluid_collection.incompressible_fluid_collection.face_velocities,time);
-            Write_Substep("before two-way coupled sph solve",substep,1);
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("before two-way coupled sph solve",1);
             // TODO: sph people check this
             incompressible->Advance_One_Time_Step_Implicit_Part(example.fluid_collection.incompressible_fluid_collection.face_velocities,dt_projection,time_projection,
                 fluids_parameters.implicit_viscosity,0,fluids_parameters.use_levelset_viscosity,fluids_parameters.callbacks,fluids_parameters.print_viscosity_matrix);
-            Write_Substep("after two-way coupled sph solve",substep,1);
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("after two-way coupled sph solve",1);
             fluids_parameters.sph_evolution->Postprocess_Particles(example.fluid_collection.incompressible_fluid_collection.face_velocities,dt_projection,time_projection);
             fluids_parameters.sph_evolution->Copy_Particle_Attributes_To_Array(particle_levelset_evolution->Particle_Levelset(0).removed_negative_particles);
             incompressible->projection.Restore_After_SPH(example.fluid_collection.incompressible_fluid_collection.face_velocities,fluids_parameters.sph_evolution->use_variable_density_solve);}
@@ -770,10 +770,10 @@ Project_Fluid(const T dt_projection,const T time_projection,const int substep)
             particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.Get_Single_Levelset(fluids_parameters.pseudo_dirichlet_regions,
                 levelset_for_pseudo_dirichlet_regions,false);
             incompressible->Extrapolate_Velocity_Across_Interface(face_velocities,phi_for_pseudo_dirichlet_regions);
-            Write_Substep("before pseudo dirichlet solve 1",substep,1);
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("before pseudo dirichlet solve 1",1);
             incompressible->Advance_One_Time_Step_Implicit_Part(face_velocities,dt_projection,time_projection,fluids_parameters.implicit_viscosity,0,fluids_parameters.use_levelset_viscosity,
                 fluids_parameters.callbacks,fluids_parameters.print_viscosity_matrix);
-            Write_Substep("after pseudo dirichlet solve 1",substep,1);
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("after pseudo dirichlet solve 1",1);
             for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
                 if(incompressible_multiphase->projection.elliptic_solver->psi_D(iterator.Cell_Index()))incompressible->projection.p(iterator.Cell_Index())=p_old(iterator.Cell_Index());
             incompressible->projection.elliptic_solver->psi_D=psi_D_old;
@@ -786,15 +786,15 @@ Project_Fluid(const T dt_projection,const T time_projection,const int substep)
                     incompressible_multiphase->projection.elliptic_solver->psi_N(iterator.Axis(),iterator.Face_Index())=true;
                 // TODO: drink me
                 else face_velocities(iterator.Axis(),iterator.Face_Index())=air_velocities_save(iterator.Axis(),iterator.Face_Index());}
-            Write_Substep("before pseudo dirichlet solve 2",substep,1);
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("before pseudo dirichlet solve 2",1);
             incompressible->Advance_One_Time_Step_Implicit_Part(example.fluid_collection.incompressible_fluid_collection.face_velocities,dt_projection,time_projection,fluids_parameters.implicit_viscosity,0,fluids_parameters.use_levelset_viscosity,fluids_parameters.callbacks,fluids_parameters.print_viscosity_matrix);
-            Write_Substep("after pseudo dirichlet solve 2",substep,1);
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("after pseudo dirichlet solve 2",1);
             incompressible->projection.elliptic_solver->psi_N=psi_N_old;}
         if(fluids_parameters.use_sph_for_removed_negative_particles) particle_levelset_evolution->Delete_Particles_Outside_Grid();
 
-        Write_Substep("after laplace solve (Project_Fluid)",substep,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after laplace solve (Project_Fluid)",1);
         example.Clamp_Velocities(time);
-        Write_Substep("after velocity clamping",substep,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after velocity clamping",1);
         if(!fluids_parameters.fire && !fluids_parameters.surface_tension && !fluids_parameters.variable_surface_tension && dt_projection && (!fluids_parameters.compressible || number_of_regions==1))
             incompressible->projection.p*=(1/dt_projection); // scale pressure back to get a real pressure
         if(fluids_parameters.compressible&&number_of_regions==1) incompressible->projection.p*=incompressible->projection.density;
@@ -918,11 +918,11 @@ Advect_Fluid(const T dt,const int substep)
         particle_levelset_evolution->Advance_Levelset(dt);
         if(number_of_regions==1) fluids_parameters.phi_boundary_water.Use_Extrapolation_Mode(true);
         example.Extrapolate_Phi_Into_Objects(time+dt);
-        Write_Substep("after levelset advection",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after levelset advection",1);
         LOG::Time("advecting particles");
         if(fluids_parameters.analytic_test) particle_levelset_evolution->Advance_Particles(*advection_face_velocities_ghost,dt,fluids_parameters.analytic_test);
         else for(int i=0;i<number_of_regions;i++) particle_levelset_evolution->Particle_Levelset(i).Euler_Step_Particles(*advection_face_velocities_ghost,dt,time,true,true,false,fluids_parameters.analytic_test);
-        Write_Substep("after particle advection",0,1);}
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after particle advection",1);}
     if(fluids_parameters.sph){LOG::Time("advecting sph particles");fluids_parameters.sph_evolution->Euler_Step(dt,time);}
 
     example.Scalar_Advection_Callback(dt,time);
@@ -979,22 +979,22 @@ Advect_Fluid(const T dt,const int substep)
                 Integrate_Fluid_Non_Advection_Forces(face_velocities,dt,substep);}}
         else if(!fluids_parameters.sph){
             if(Two_Way_Coupled() && solids_fluids_parameters.use_leakproof_solve){
-                Write_Substep("before forces",substep,1);
+                PHYSBAM_DEBUG_WRITE_SUBSTEP("before forces",1);
                 incompressible->Advance_One_Time_Step_Convection(dt,time,*advection_face_velocities_ghost,incompressible->projection.face_velocities_save_for_projection,fluids_parameters.number_of_ghost_cells);
-                Write_Substep("before restore",substep,1);
+                PHYSBAM_DEBUG_WRITE_SUBSTEP("before restore",1);
                 incompressible->projection.Restore_After_Projection(example.fluid_collection.incompressible_fluid_collection.face_velocities);
                 Integrate_Fluid_Non_Advection_Forces(face_velocities,dt,substep);
-                Write_Substep("before convection",substep,1);}
+                PHYSBAM_DEBUG_WRITE_SUBSTEP("before convection",1);}
             else{
-                Write_Substep("before forces",substep,1);
+                PHYSBAM_DEBUG_WRITE_SUBSTEP("before forces",1);
                 if(!fluids_parameters.stokes_flow) incompressible->Advance_One_Time_Step_Convection(dt,time,*advection_face_velocities_ghost,face_velocities,fluids_parameters.number_of_ghost_cells);
                 Integrate_Fluid_Non_Advection_Forces(face_velocities,dt,substep);}}
         fluids_parameters.Blend_In_External_Velocity(face_velocities,dt,time);
-        Write_Substep("after explicit part",substep,1);}
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after explicit part",1);}
 
     // compressible update
     if(fluids_parameters.simulate && fluids_parameters.compressible){
-        Write_Substep("before compressible explicit solve",substep,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("before compressible explicit solve",1);
         euler_solid_fluid_coupling_utilities->Extract_Time_N_Data_For_Explicit_Fluid_Forces();
         LOG::Time("compressible explicit update");
         for(RUNGEKUTTA<T_ARRAYS_DIMENSION_SCALAR> rk(euler->U,fluids_parameters.compressible_rungekutta_order,dt,time);rk.Valid();){
@@ -1017,18 +1017,18 @@ Advect_Fluid(const T dt,const int substep)
             if(rk.substep!=rk.order-1) euler->Clamp_Internal_Energy(dt,rk.time);
 
             if(euler->timesplit && euler->thinshell){
-                Write_Substep("before applying FSI update for near-interface cells",substep,1);
+                PHYSBAM_DEBUG_WRITE_SUBSTEP("before applying FSI update for near-interface cells",1);
                 euler_solid_fluid_coupling_utilities->Update_Cells_Near_Interface(dt,rk.order,rk.substep);}
-            Write_Substep("after compressible explicit rk substep",substep,1);}
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("after compressible explicit rk substep",1);}
 
         if(euler->timesplit && !euler->perform_rungekutta_for_implicit_part) euler->Get_Dirichlet_Boundary_Conditions(dt,time);
         if(euler->timesplit) euler->euler_projection.Get_Pressure(euler->euler_projection.p_advected);
         if(euler->timesplit && euler->thinshell) euler_solid_fluid_coupling_utilities->Compute_Post_Advected_Variables(); // TODO(jontg): MPI?
-        Write_Substep("after compressible explicit solve",substep,1);}
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after compressible explicit solve",1);}
 
     LOG::Time("effective velocity acceleration structures");
     // revalidate scalars and velocity in body's new position
-    Write_Substep("before scalar revalidation",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("before scalar revalidation",1);
     collision_bodies_affecting_fluid.Restore_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_NEW_STATE);
     collision_bodies_affecting_fluid.Update_Intersection_Acceleration_Structures(false); // NON-swept acceleration structures
     collision_bodies_affecting_fluid.Rasterize_Objects(); // non-swept
@@ -1039,7 +1039,7 @@ Advect_Fluid(const T dt,const int substep)
     if(fluids_parameters.compressible && fluids_parameters.solid_affects_fluid) euler_solid_fluid_coupling_utilities->Update_Cut_Out_Grid();
 
     if(incompressible) example.Revalidate_Fluid_Velocity(fluid_collection.incompressible_fluid_collection.face_velocities); // uses visibility
-    Write_Substep("after scalar revalidation",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after scalar revalidation",1);
 
     if(number_of_regions){
         if(fluids_parameters.use_reacting_flow){
@@ -1049,15 +1049,15 @@ Advect_Fluid(const T dt,const int substep)
         LOG::Time("modifying levelset");
         particle_levelset_evolution->Fill_Levelset_Ghost_Cells(time+dt);
         for(int i=0;i<number_of_regions;i++) particle_levelset_evolution->Particle_Levelset(i).Exchange_Overlap_Particles();
-        Write_Substep("after filling level set ghost cells and exchanging overlap particles",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after filling level set ghost cells and exchanging overlap particles",1);
         if(fluids_parameters.use_sph_for_removed_negative_particles && fluids_parameters.sph_evolution->convert_particles_to_fluid){
             LOG::Time("converting particles to fluid and modifying levelset");
             fluids_parameters.sph_evolution->Modify_Levelset_And_Particles_To_Create_Fluid(time+dt,&face_velocities_ghost);}
         else particle_levelset_evolution->Modify_Levelset_And_Particles(&face_velocities_ghost);
-        Write_Substep("after modify levelset and particles",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after modify levelset and particles",1);
         example.Revalidate_Phi_After_Modify_Levelset(); // second revalidation -- uses visibility too
         if(number_of_regions>=2) particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.Project_Levelset();
-        Write_Substep("after revalidate phi",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after revalidate phi",1);
 
         // fixing the velocity in regions that are no longer pseudo-Dirichlet
         if(fluids_parameters.pseudo_dirichlet_regions.Number_True()>0) for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
@@ -1074,7 +1074,7 @@ Advect_Fluid(const T dt,const int substep)
         ARRAY<bool,TV_INT>* source_mask=0;example.Get_Source_Reseed_Mask(source_mask,time+dt);
         if(source_mask){LOG::Time("reseeding sources");particle_levelset_evolution->Reseed_Particles(time+dt,0,source_mask);delete source_mask;}
         if(fluids_parameters.sph_evolution){LOG::Time("adding SPH particles for sources");example.Add_SPH_Particles_For_Sources(dt,time+dt);}
-        Write_Substep("after adding sources",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after adding sources",1);
 
         LOG::Time("deleting particles"); // needs to be after adding sources, since it does a reseed
         particle_levelset_evolution->Delete_Particles_Outside_Grid();
@@ -1086,7 +1086,7 @@ Advect_Fluid(const T dt,const int substep)
                 particle_levelset_evolution->Particle_Levelset(i).Delete_Particles_In_Local_Maximum_Phi_Cells(-1);
             LOG::Time("deleting particles far from interface");
             for(int i=0;i<number_of_regions;i++) particle_levelset_evolution->Particle_Levelset(i).Delete_Particles_Far_From_Interface(); // uses visibility
-            Write_Substep("after delete particles far from interface",0,1);}
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("after delete particles far from interface",1);}
 
         LOG::Time("re-incorporating removed particles");
         example.Modify_Removed_Particles_Before_Reincorporation(dt,time+dt);
@@ -1117,7 +1117,7 @@ Advect_Fluid(const T dt,const int substep)
     // update ghost phi values
     if(number_of_regions>=1) particle_levelset_evolution->Fill_Levelset_Ghost_Cells(time+dt);
 
-    Write_Substep("after scalar update",substep,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after scalar update",1);
     scalar_scope.Pop();
 }
 //#####################################################################
@@ -1169,10 +1169,10 @@ Advance_Fluid_One_Time_Step_Implicit_Part(const bool done,const T dt,const int s
             dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION<TV>&>(solids_evolution).Apply_Pressure(dt,time);
         if(incompressible) incompressible->projection.p_save_for_projection.Copy(incompressible->projection.p); // save the good pressure for later
 
-        Write_Substep("after apply pressure",substep,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after apply pressure",1);
         if(fluids_parameters.compressible){
             example.Apply_Isobaric_Fix(dt,time);
-            Write_Substep("after isobaric fix",substep,1);}
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("after isobaric fix",1);}
 
         // TODO: this block below is identical with the end of Project_Fluid and could be broken out into a function
         if(fluids_parameters.compressible&&number_of_regions==1) incompressible->projection.p*=fluids_parameters.density;

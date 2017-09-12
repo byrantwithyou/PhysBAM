@@ -13,12 +13,6 @@
 #include <omp.h>
 #endif
 namespace PhysBAM{
-namespace{
-    template<class TV> void Write_Substep_Helper(void* writer,const std::string& title,int substep,int level)
-    {
-        ((SHALLOW_WATER_DRIVER<TV>*)writer)->Write_Substep(title,substep,level);
-    }
-};
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -26,7 +20,7 @@ template<class TV> SHALLOW_WATER_DRIVER<TV>::
 SHALLOW_WATER_DRIVER(SHALLOW_WATER_STATE<TV>& state)
     :state(state)
 {
-    DEBUG_SUBSTEPS::Set_Substep_Writer((void*)this,&Write_Substep_Helper<TV>);
+    DEBUG_SUBSTEPS::writer=[=](const std::string& title){Write_Substep(title);};
 }
 //#####################################################################
 // Destructor
@@ -34,7 +28,7 @@ SHALLOW_WATER_DRIVER(SHALLOW_WATER_STATE<TV>& state)
 template<class TV> SHALLOW_WATER_DRIVER<TV>::
 ~SHALLOW_WATER_DRIVER()
 {
-    DEBUG_SUBSTEPS::Clear_Substep_Writer((void*)this);
+    DEBUG_SUBSTEPS::writer=0;
 }
 //#####################################################################
 // Execute_Main_Program
@@ -52,7 +46,7 @@ template<class TV> void SHALLOW_WATER_DRIVER<TV>::
 Initialize()
 {
     LOG::cout<<std::setprecision(16)<<std::endl;
-    DEBUG_SUBSTEPS::Set_Write_Substeps_Level(state.substeps_delay_frame<0?state.write_substeps_level:-1);
+    DEBUG_SUBSTEPS::write_substeps_level=state.substeps_delay_frame<0?state.write_substeps_level:-1;
 
     // setup time
     output_number=current_frame=state.restart;
@@ -63,7 +57,7 @@ Initialize()
     if(state.restart) state.Read_Output_Files(state.restart);
 
     if(!state.restart) Write_Output_Files(0);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",1);
 }
 //#####################################################################
 // Function Advance_One_Time_Step
@@ -85,7 +79,7 @@ Simulate_To_Frame(const int frame)
         LOG::SCOPE scope("FRAME","frame %d",current_frame+1);
         if(state.begin_frame) state.begin_frame(current_frame);
         if(state.substeps_delay_frame==current_frame)
-            DEBUG_SUBSTEPS::Set_Write_Substeps_Level(state.write_substeps_level);
+            DEBUG_SUBSTEPS::write_substeps_level=state.write_substeps_level;
         T time_at_frame=state.time+state.frame_dt;
         bool done=false;
         for(int substep=0;!done;substep++){
@@ -109,14 +103,13 @@ Simulate_To_Frame(const int frame)
 // Function Write_Substep
 //#####################################################################
 template<class TV> void SHALLOW_WATER_DRIVER<TV>::
-Write_Substep(const std::string& title,const int substep,const int level)
+Write_Substep(const std::string& title)
 {
-    if(level<=state.write_substeps_level){
-        state.frame_title=title;
-        LOG::printf("Writing substep [%s]: output_number=%i, time=%g, frame=%i, substep=%i\n",
-            state.frame_title,output_number+1,state.time,current_frame,substep);
-        Write_Output_Files(++output_number);
-        state.frame_title="";}
+    state.frame_title=title;
+    LOG::printf("Writing substep [%s]: output_number=%i, time=%g, frame=%i\n",
+        state.frame_title,output_number+1,state.time,current_frame);
+    Write_Output_Files(++output_number);
+    state.frame_title="";
 }
 //#####################################################################
 // Write_Output_Files

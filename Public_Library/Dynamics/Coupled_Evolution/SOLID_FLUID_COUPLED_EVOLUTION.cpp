@@ -278,7 +278,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         if(!poisson.mpi_grid) poisson.Compute_Matrix_Indices(filled_region_cell_count,matrix_index_to_cell_index_array,cell_index_to_matrix_index);
         else poisson.laplace_mpi->Find_Matrix_Indices(filled_region_cell_count,cell_index_to_matrix_index,matrix_index_to_cell_index_array);
 
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("before poisson setup for coupled solve (sf coupled evolution)",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("before poisson setup for coupled solve (sf coupled evolution)",1);
 
         ARRAY<T,TV_INT>& p=Get_Pressure();
         if(dt && !fluids_parameters.compressible) p*=dt; // RESCALE PRESSURE FOR A BETTER INITIAL GUESS!
@@ -318,7 +318,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         b_array*=-grid.Cell_Size();A_array*=-grid.Cell_Size();
 
         if(!fluids_parameters.compressible){
-            PHYSBAM_DEBUG_WRITE_SUBSTEP("using face velocities to set up solid RHS (sf coupled evolution)",0,1);
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("using face velocities to set up solid RHS (sf coupled evolution)",1);
             ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=Get_Face_Velocities();
             for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
                 const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();TV axis_vector=TV::Axis_Vector(axis);
@@ -466,7 +466,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
             solve_id++;
             if(print_matrix_rhs_and_solution) OCTAVE_OUTPUT<T>(LOG::sprintf("bo-%i.txt",solve_id).c_str()).Write("bo",B_coupled);
             if(!solver->Solve(solid_fluid_system,V_coupled,B_coupled,coupled_vectors,solids_parameters.implicit_solve_parameters.cg_tolerance,1,solids_parameters.implicit_solve_parameters.cg_iterations))
-                PHYSBAM_DEBUG_WRITE_SUBSTEP("FAILED CONVERGENCE",0,1);
+                PHYSBAM_DEBUG_WRITE_SUBSTEP("FAILED CONVERGENCE",1);
             KRYLOV_SOLVER<T>::Ensure_Size(coupled_vectors,V_coupled,2);
             if(print_matrix_rhs_and_solution){
                 OCTAVE_OUTPUT<T>(LOG::sprintf("xo-%i.txt",solve_id).c_str()).Write("xo",V_coupled);
@@ -499,7 +499,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         ARRAY<T,TV_INT>& p=Get_Pressure();
         // Copy pressures back into pressure array
         for(int i=0;i<x_array.v.m;i++) for(int j=0;j<x_array.v(i).m;j++) p(matrix_index_to_cell_index_array(i)(j))=x_array.v(i)(j);
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("unscaled final pressures (sf coupled evolution)",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("unscaled final pressures (sf coupled evolution)",1);
 
         // scale pressure back to get a real pressure
         if(dt && !fluids_parameters.compressible) p*=1/dt;
@@ -626,10 +626,10 @@ Set_Neumann_and_Dirichlet_Boundary_Conditions(const T time)
     fluids_parameters.Set_Domain_Boundary_Conditions(poisson,face_velocities,time);
 
     // We aren't actually sourcing here, since these velocities get reset later
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("before sourcing (sf coupled evolution)",0,1);  // TODO(jontg): What's the right thing to do here in the one-way coupled case?
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("before sourcing (sf coupled evolution)",1);  // TODO(jontg): What's the right thing to do here in the one-way coupled case?
     if(fluids_parameters.solids_override_source_velocities) fluids_parameters.callbacks->Get_Source_Velocities_Masked(time,dual_cell_contains_solid);
     else fluids_parameters.callbacks->Get_Source_Velocities(face_velocities,poisson.psi_N,time);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after sourcing (sf coupled evolution)",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after sourcing (sf coupled evolution)",1);
 
     fluids_parameters.callbacks->Set_Dirichlet_Boundary_Conditions(time);
 

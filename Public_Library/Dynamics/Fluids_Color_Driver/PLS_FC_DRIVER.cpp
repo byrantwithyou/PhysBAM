@@ -42,12 +42,6 @@
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
 #include <functional>
 using namespace PhysBAM;
-namespace{
-    template<class TV> void Write_Substep_Helper(void* writer,const std::string& title,int substep,int level)
-    {
-        ((PLS_FC_DRIVER<TV>*)writer)->Write_Substep(title,substep,level);
-    }
-};
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -55,7 +49,8 @@ template<class TV> PLS_FC_DRIVER<TV>::
 PLS_FC_DRIVER(PLS_FC_EXAMPLE<TV>& example)
     :example(example)
 {
-    DEBUG_SUBSTEPS::Set_Substep_Writer((void*)this,&Write_Substep_Helper<TV>);
+    DEBUG_SUBSTEPS::write_substeps_level=example.write_substeps_level;
+    DEBUG_SUBSTEPS::writer=[=](const std::string& title){Write_Substep(title);};
 }
 //#####################################################################
 // Destructor
@@ -63,7 +58,7 @@ PLS_FC_DRIVER(PLS_FC_EXAMPLE<TV>& example)
 template<class TV> PLS_FC_DRIVER<TV>::
 ~PLS_FC_DRIVER()
 {
-    DEBUG_SUBSTEPS::Clear_Substep_Writer((void*)this);
+    DEBUG_SUBSTEPS::writer=0;
 }
 //#####################################################################
 // Execute_Main_Program
@@ -81,7 +76,7 @@ template<class TV> void PLS_FC_DRIVER<TV>::
 Initialize()
 {
     LOG::cout<<std::setprecision(16)<<std::endl;
-    DEBUG_SUBSTEPS::Set_Write_Substeps_Level(example.substeps_delay_frame<0?example.write_substeps_level:-1);
+    DEBUG_SUBSTEPS::write_substeps_level=example.substeps_delay_frame<0?example.write_substeps_level:-1;
 
     // setup time
     current_frame=example.restart;
@@ -161,7 +156,7 @@ Initialize()
     example.particle_levelset_evolution_multiple.Delete_Particles_Outside_Grid();
 
     if(!example.restart) Write_Output_Files(0);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",1);
 }
 //#####################################################################
 // Function Update_Pls
@@ -179,20 +174,20 @@ Update_Pls(T dt)
     example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(true,dt*maximum_fluid_speed+2*max_particle_collision_distance+(T).5*example.grid.dX.Max(),10);
 
     LOG::Time("Fill ghost");
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("before PLS phi advection",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("before PLS phi advection",1);
     ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(example.grid,example.number_of_ghost_cells);
     example.Merge_Velocities(face_velocities_ghost,example.face_velocities,example.face_color);
     example.boundary.Apply_Boundary_Condition_Face(example.grid,face_velocities_ghost,time+example.dt);
     example.boundary.Fill_Ghost_Faces(example.grid,face_velocities_ghost,face_velocities_ghost,time+dt,example.number_of_ghost_cells);
 
     LOG::Time("Advect Levelset");
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("phi BCs prior to advection",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("phi BCs prior to advection",1);
     example.particle_levelset_evolution_multiple.Advance_Levelset(dt);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after phi",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after phi",1);
     LOG::Time("advecting particles");
     example.particle_levelset_evolution_multiple.particle_levelset_multiple.Euler_Step_Particles(face_velocities_ghost,dt,time,true,true,false);
 
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after particle advection",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after particle advection",1);
 
     LOG::Time("updating removed particle velocities");
     example.Make_Levelsets_Consistent();
@@ -208,26 +203,26 @@ Update_Pls(T dt)
     LOG::Time("adjusting particle radii");
     example.particle_levelset_evolution_multiple.particle_levelset_multiple.Adjust_Particle_Radii();
     LOG::Stop_Time();
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after particles",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after particles",1);
 
     LOG::Time("deleting particles"); // needs to be after adding sources, since it does a reseed
     example.particle_levelset_evolution_multiple.Delete_Particles_Outside_Grid();
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after delete 1",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after delete 1",1);
     LOG::Time("deleting particles in local maxima");
     for(int i=0;i<example.number_of_colors;i++)
         example.particle_levelset_evolution_multiple.Particle_Levelset(i).Delete_Particles_In_Local_Maximum_Phi_Cells(0);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after delete 2",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after delete 2",1);
     LOG::Time("deleting particles far from interface");
     for(int i=0;i<example.number_of_colors;i++)
         example.particle_levelset_evolution_multiple.Particle_Levelset(i).Delete_Particles_Far_From_Interface(); // uses visibility
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after delete 3",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after delete 3",1);
 
     LOG::Time("re-incorporating removed particles");
     for(int i=0;i<example.number_of_colors;i++)
         example.particle_levelset_evolution_multiple.Particle_Levelset(i).Identify_And_Remove_Escaped_Particles(face_velocities_ghost,5,time+dt);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after remove",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after remove",1);
     example.Rebuild_Levelset_Color();
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after rebuilding level set again",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after rebuilding level set again",1);
 }
 //#####################################################################
 // Function Advance_One_Time_Step
@@ -239,26 +234,26 @@ Advance_One_Time_Step(bool first_step)
     if(example.use_polymer_stress) Extrapolate_Polymer_Stress(example.polymer_stress,example.cell_color);
     example.Begin_Time_Step(time);
     T dt=example.dt;
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("before levelset evolution",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("before levelset evolution",1);
 
     if(example.use_level_set_method) Update_Level_Set(dt,first_step);
     else if(example.use_pls) Update_Pls(dt);
 
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("before velocity advection",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("before velocity advection",1);
     Extrapolate_Velocity(example.face_velocities,example.face_color);
     if(example.use_polymer_stress) Extrapolate_Polymer_Stress(example.polymer_stress,example.cell_color);
     Advection_And_BDF(dt,first_step);
     Extrapolate_Velocity(example.face_velocities,example.face_color);
     if(example.use_polymer_stress) Extrapolate_Polymer_Stress(example.polymer_stress,example.cell_color);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("before solve",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("before solve",1);
     Apply_Pressure_And_Viscosity(dt,first_step);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after solve",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after solve",1);
 
     example.time=time+=dt;
     Extrapolate_Velocity(example.face_velocities,example.face_color);
     if(example.use_polymer_stress){
         Update_Polymer_Stress(dt);
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("after update polymer stress",0,1);}
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after update polymer stress",1);}
     if(example.use_polymer_stress) Extrapolate_Polymer_Stress(example.polymer_stress,example.cell_color);
     example.End_Time_Step(time);
 }
@@ -268,12 +263,12 @@ Advance_One_Time_Step(bool first_step)
 template<class TV> void PLS_FC_DRIVER<TV>::
 Update_Level_Set(T dt,bool first_step)
 {
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("before phi advection",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("before phi advection",1);
     example.particle_levelset_evolution_multiple.Advance_Levelset(dt);
     example.Make_Levelsets_Consistent();
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("before reinitialization",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("before reinitialization",1);
     example.particle_levelset_evolution_multiple.Make_Signed_Distance();
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after level set update",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after level set update",1);
     example.Rebuild_Levelset_Color();
 }
 //#####################################################################
@@ -563,7 +558,7 @@ Simulate_To_Frame(const int frame)
     for(;current_frame<frame;current_frame++){
         LOG::SCOPE scope("FRAME","frame %d",current_frame+1);
         if(example.substeps_delay_frame==current_frame)
-            DEBUG_SUBSTEPS::Set_Write_Substeps_Level(example.write_substeps_level);
+            DEBUG_SUBSTEPS::write_substeps_level=example.write_substeps_level;
         for(int substep=0;substep<example.time_steps_per_frame;substep++){
             LOG::SCOPE scope("SUBSTEP","substep %d",substep+1);
             Advance_One_Time_Step(current_frame==0 && substep==0);}
@@ -576,13 +571,12 @@ Simulate_To_Frame(const int frame)
 // Function Write_Substep
 //#####################################################################
 template<class TV> void PLS_FC_DRIVER<TV>::
-Write_Substep(const std::string& title,const int substep,const int level)
+Write_Substep(const std::string& title)
 {
-    if(level<=example.write_substeps_level){
-        example.frame_title=title;
-        LOG::cout<<"Writing substep ["<<example.frame_title<<"]: output_number="<<output_number+1<<", time="<<time<<", frame="<<current_frame<<", substep="<<substep<<std::endl;
-        Write_Output_Files(++output_number);
-        example.frame_title="";}
+    example.frame_title=title;
+    LOG::cout<<"Writing substep ["<<example.frame_title<<"]: output_number="<<output_number+1<<", time="<<time<<", frame="<<current_frame<<std::endl;
+    Write_Output_Files(++output_number);
+    example.frame_title="";
 }
 //#####################################################################
 // Write_Output_Files
@@ -678,7 +672,7 @@ Dump_Vector(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,const KRYLOV_VECTOR_BAS
         Add_Debug_Particle(it.Location(),VECTOR<T,3>(p<0,p>=0,0));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
 
-    PHYSBAM_DEBUG_WRITE_SUBSTEP(str,0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP(str,1);
     example.face_velocities=fv;
 }
 //#####################################################################

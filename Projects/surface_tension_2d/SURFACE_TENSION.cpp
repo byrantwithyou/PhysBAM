@@ -681,7 +681,7 @@ Test_Analytic_Velocity(T time)
 
     LOG::cout<<"error velocity "<<max_error<<"        "<<L1_error/cnt<<"         "<<max_error/max_u<<"        "<<L1_error/cnt/max_u<<std::endl;
     
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("velocity error",0,0);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("velocity error",0);
     fluid_collection.incompressible_fluid_collection.face_velocities=u2;
 }
 //#####################################################################
@@ -1030,7 +1030,7 @@ Substitute_Coupling_Matrices(KRYLOV_SYSTEM_BASE<T>& coupled_system,T dt,T curren
 
         force->Update_Position_Based_State(current_position_time,true,true);
 
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("after particle rebuild",0,0);}
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after particle rebuild",0);}
 }
 //#####################################################################
 // Function Advance_One_Time_Step_Begin_Callback

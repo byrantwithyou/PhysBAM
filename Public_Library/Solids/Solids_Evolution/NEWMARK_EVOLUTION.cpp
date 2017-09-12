@@ -338,7 +338,7 @@ template<class TV> void NEWMARK_EVOLUTION<TV>::
 Advance_One_Time_Step_Position(const T dt,const T time, const bool solids)
 {
     PHYSBAM_ASSERT(solids_parameters.use_post_cg_constraints || !solids_parameters.rigid_body_collision_parameters.enforce_rigid_rigid_contact_in_cg);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP(LOG::sprintf("Advance_One_Time_Step_Position Start dt=%f time=%f",dt,time),2,2);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("Advance_One_Time_Step_Position Start dt=%f time=%f",2,dt,time);
     MPI_SOLIDS<TV>* mpi_solids=solid_body_collection.deformable_body_collection.mpi_solids;
     ARTICULATED_RIGID_BODY<TV>& articulated_rigid_body=solid_body_collection.rigid_body_collection.articulated_rigid_body; // Needn't be a pointer
     const bool advance_rigid_bodies=true; //solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m!=0;  TODO: Fix this.
@@ -428,7 +428,7 @@ Advance_One_Time_Step_Position(const T dt,const T time, const bool solids)
     Restore_Velocity();
     Diagnostics(dt,time,0,2,22,"restore velocity");
 
-    PHYSBAM_DEBUG_WRITE_SUBSTEP(LOG::sprintf("Advance_One_Time_Step_Position End dt=%f time=%f",dt,time),2,2);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("Advance_One_Time_Step_Position End dt=%f time=%f",2,dt,time);
 }
 //#####################################################################
 // Function Apply_Projections_In_Position_Update
@@ -521,7 +521,7 @@ Process_Collisions(const T dt,const T time,const bool advance_rigid_bodies)
 template<class TV> void NEWMARK_EVOLUTION<TV>::
 Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
 {
-    PHYSBAM_DEBUG_WRITE_SUBSTEP(LOG::sprintf("Advance_One_Time_Step_Velocity Start dt=%f time=%f",dt,time),2,2);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("Advance_One_Time_Step_Velocity Start dt=%f time=%f",2,dt,time);
 
     MPI_SOLIDS<TV>* mpi_solids=solid_body_collection.deformable_body_collection.mpi_solids;
     ARTICULATED_RIGID_BODY<TV>& articulated_rigid_body=solid_body_collection.rigid_body_collection.articulated_rigid_body;
@@ -535,7 +535,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
 
         // initialize data needed for rigid/deformable contact projection in CG
         if(solids_parameters.use_rigid_deformable_contact) rigid_deformable_collisions->Initialize_All_Contact_Projections();
-        PHYSBAM_DEBUG_WRITE_SUBSTEP(LOG::sprintf("after creating joints.  before trapezoidal velocities dt=%f time=%f",dt,time),2,2);}
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after creating joints.  before trapezoidal velocities dt=%f time=%f",2,dt,time);}
 
     if(solids_parameters.use_trapezoidal_rule_for_velocities){
         Average_And_Exchange_Position(); // move to positions at time+dt/2 for trapezoidal step
@@ -568,7 +568,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
         solids_evolution_callbacks->Filter_Velocities(dt,time+dt,true);}
 
     if(solids){
-        PHYSBAM_DEBUG_WRITE_SUBSTEP(LOG::sprintf("after removing joints.  after trapezoidal velocities dt=%f time=%f",dt,time),2,2);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after removing joints.  after trapezoidal velocities dt=%f time=%f",2,dt,time);
 
         if(!solids_parameters.no_contact_friction){
             if(solids_parameters.use_post_cg_constraints) Apply_Constraints(dt,time);
@@ -583,7 +583,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
 
     example_forces_and_velocities.Advance_One_Time_Step_End_Callback(dt,time);
 
-    PHYSBAM_DEBUG_WRITE_SUBSTEP(LOG::sprintf("Advance_One_Time_Step_Velocity End dt=%f time=%f",dt,time),2,2);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("Advance_One_Time_Step_Velocity End dt=%f time=%f",2,dt,time);
 }
 //#####################################################################
 // Function Apply_Constraints
@@ -658,8 +658,7 @@ Diagnostics(const T dt,const T time,const int velocity_time,const int position_t
 {
     static const char* time_table[]={"n","(n+1/2)","(n+1)","(n+3/2)","(n+2)"};
     solid_body_collection.Print_Energy(time+position_time*(T).5*time,step);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP(LOG::sprintf("Finished step %i (%s).  State: x^%s  v^%s.   dt=%f time=%f",step,description,
-        time_table[position_time],time_table[velocity_time],dt,time),2,3);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("Finished step %i (%s).  State: x^%s  v^%s.   dt=%f time=%f",3,step,description,time_table[position_time],time_table[velocity_time],dt,time);
 }
 //#####################################################################
 // Function Update_Positions_And_Apply_Contact_Forces

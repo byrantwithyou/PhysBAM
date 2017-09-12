@@ -823,7 +823,7 @@ Add_External_Impulses_Helper(ARRAY_VIEW<TV> V,const T time,const T dt,bool use_m
     if(write_substeps_level>-1){
         ARRAY<TV> positions_save(particles.X);
         for(int i=0;i<particles.Size();i++) particles.X(i)=particles.X(i)+dt*V(i);
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("before impulse",2,2);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("before impulse",2);
         particles.X=positions_save;}
     
     if(use_momentum_conserving){
@@ -869,7 +869,7 @@ Add_External_Impulses_Helper(ARRAY_VIEW<TV> V,const T time,const T dt,bool use_m
     if(write_substeps_level>-1){
         ARRAY<TV> positions_save(particles.X);
         for(int i=0;i<particles.Size();i++) particles.X(i)=particles.X(i)+dt*V(i);
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("after impulse",2,2);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after impulse",2);
         particles.X=positions_save;}
 }
 //#####################################################################

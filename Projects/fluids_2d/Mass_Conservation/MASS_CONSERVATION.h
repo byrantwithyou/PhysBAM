@@ -337,7 +337,7 @@ void Initialize_Phi() override
                 PARTICLE_LEVELSET_PARTICLES<TV>& block_particles=*fluids_parameters.particle_levelset_evolution->particle_levelset.positive_particles(block);
                 for(int k=0;k<block_particles.Size();k++) block_particles.X(k).y=(T)100-block_particles.X(k).y;}}}
 
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("initialized phi",0,0);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("initialized phi",0);
 }
 //#####################################################################
 // Function Adjust_Phi_With_Sources

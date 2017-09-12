@@ -937,7 +937,7 @@ Set_MPI(MPI_SOLID_FLUID<TV>& mpi_solid_fluid_input,MPI_UNIFORM_GRID<TV>& mpi_gri
 // Function Dump_Substep
 //#####################################################################
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Dump_Substep(const ARRAY<T>& fluid_velocity,const char* name,int substep,int level) const
+Dump_Substep(const ARRAY<T>& fluid_velocity,const char* name,int level) const
 {
     ARRAY<T,FACE_INDEX<TV::m> > tmp(debug_velocity->Domain_Indices());
     ARRAY<T> tmp_constrained(index_map.indexed_constraints.m);
@@ -946,17 +946,17 @@ Dump_Substep(const ARRAY<T>& fluid_velocity,const char* name,int substep,int lev
     if(fluid_to_solid_interpolation)
         if(FLUID_TO_SOLID_INTERPOLATION_CUT<TV>* cut=dynamic_cast<FLUID_TO_SOLID_INTERPOLATION_CUT<TV>*>(fluid_to_solid_interpolation))
             cut->Dump_Extra_Velocities(fluid_velocity);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP(name,substep,level);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP(name,level);
     debug_velocity->Exchange(*debug_velocity,tmp);
 }
 //#####################################################################
 // Function Dump_Substep
 //#####################################################################
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Dump_Substep(const ARRAY<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_velocity,const char* name,int substep,int level) const
+Dump_Substep(const ARRAY<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_velocity,const char* name,int level) const
 {
     debug_generalized_velocity->Exchange(solid_velocity);
-    Dump_Substep(fluid_velocity,name,substep,level);
+    Dump_Substep(fluid_velocity,name,level);
     debug_generalized_velocity->Exchange(solid_velocity);
 }
 //#####################################################################

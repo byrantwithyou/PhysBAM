@@ -111,7 +111,7 @@ template<class T> struct FLUID_TO_SOLID_INTERPOLATION_CUT_DISPATCH<VECTOR<T,2> >
                 FACE_INDEX<TV::m> face=index_map.indexed_faces(i);
                 if(index_map.cell_indices(face.First_Cell_Index())<0 || index_map.cell_indices(face.Second_Cell_Index())<0){
                     unused_faces.Set(i);}}
-            PHYSBAM_DEBUG_WRITE_SUBSTEP("unused faces",0,1);}
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("unused faces",1);}
 
         entries.Resize(X.m);
         int last_face=index_map.indexed_faces.m;
@@ -183,11 +183,11 @@ template<class T> struct FLUID_TO_SOLID_INTERPOLATION_CUT_DISPATCH<VECTOR<T,2> >
 
 //        for(typename HASHTABLE<FACE_INDEX<TV::m>,T>::ITERATOR it(face_lengths);it.Valid();it.Next())
 //            Add_Debug_Particle(index_map.grid.Face(it.Key()),VECTOR<T,3>(1,0,0));
-//        PHYSBAM_DEBUG_WRITE_SUBSTEP("registered",0,1);
+//        PHYSBAM_DEBUG_WRITE_SUBSTEP("registered",1);
 
         this_.Compute_Beta();
         this_.Compute_Gradient();
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("setup interp",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("setup interp",1);
     }
 };
 }
@@ -405,7 +405,7 @@ Compute_Beta()
     for(typename HASHTABLE<TV_INT,CUT_CELL>::ITERATOR it(cut_cells);it.Valid();it.Next()){
         //Add_Debug_Particle(it.Data().segment.Center(),VECTOR<T,3>(.5,.5,.5));
         beta_inverse(it.Data().face)=use_cut_volume?Inverse((T).5*(density*it.Data().inside_volume+outside_density*(full_volume-it.Data().inside_volume))):Inverse((T).5*((density+outside_density)*dx*it.Data().segment.Length()));}
-    PHYSBAM_DEBUG_WRITE_SUBSTEP(__FUNCTION__,0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP(__FUNCTION__,1);
 }
 //#####################################################################
 // Function Cut_Face
@@ -485,7 +485,7 @@ Compute_Gradient()
         if(index_map.two_phase) gradient->gradient.Append_Entry_To_Current_Row(cc.other_cell,len);
         gradient->gradient.Finish_Row();}
     gradient->gradient.Sort_Entries();
-    PHYSBAM_DEBUG_WRITE_SUBSTEP(__FUNCTION__,0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP(__FUNCTION__,1);
 }
 //#####################################################################
 // Function Times_Add

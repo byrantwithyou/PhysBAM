@@ -510,7 +510,7 @@ Adjust_Strain_For_Object(LEVELSET<TV>& levelset_object,ARRAY<SYMMETRIC_MATRIX<T,
 template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Combustion(const T dt,const T time)
 {
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("Before Combustion",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("Before Combustion",1);
 
     for(CELL_ITERATOR<TV> iterator(*grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         T fuel_fraction=soot_fuel_container.density(cell_index);
@@ -528,7 +528,7 @@ Combustion(const T dt,const T time)
             soot_container.density(cell_index)+=fuel_fraction_burnt;
             euler->U(cell_index)(TV::m+1)+=energy_generated;}}
     euler->Invalidate_Ghost_Cells();
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("After Combustion",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("After Combustion",1);
 }
 //#####################################################################
 // Function Evolve_Soot

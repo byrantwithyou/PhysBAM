@@ -245,7 +245,7 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,bool implicit)
     fluids_parameters.incompressible->boundary->Fill_Ghost_Faces(*fluids_parameters.grid,face_velocities,face_velocities_ghost,0,3);
     for(int d=0;d<TV::m;d++){
         Apply_Viscosity(face_velocities,d,dt,implicit);
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("after viscosity direction",0,1);}
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after viscosity direction",1);}
 }
 //#####################################################################
 // Function Apply_Viscosity

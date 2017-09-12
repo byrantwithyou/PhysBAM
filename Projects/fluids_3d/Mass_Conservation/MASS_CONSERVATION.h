@@ -270,7 +270,7 @@ void Initialize_Phi() override
 
     fluids_parameters.particle_levelset_evolution->Reseed_Particles(0);
     fluids_parameters.particle_levelset_evolution->particle_levelset.levelset.refine_fmm_initialization_with_iterative_solver=true;
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("initialized phi",0,0);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("initialized phi",0);
 }
 //#####################################################################
 // Function Get_Analytic_Velocities

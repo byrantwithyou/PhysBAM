@@ -131,7 +131,7 @@ void Initialize_Velocities() override
 //#####################################################################
 void Initialize_Phi() override
 {
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("After Initialize_Phi",1,0);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("After Initialize_Phi",0);
     GRID<TV>& grid=*fluids_parameters.grid;
     ARRAY<T,VECTOR<int,3> >& phi=fluids_parameters.particle_levelset_evolution->phi;
     T initial_phi;
@@ -140,7 +140,7 @@ void Initialize_Phi() override
         initial_phi=1;
         for(int s=0;s<sources.m;s++) initial_phi=min(initial_phi,sources(s).Signed_Distance(X));
         phi(iterator.Cell_Index())=initial_phi;}
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("After Initialize_Phi",1,0);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("After Initialize_Phi",0);
 }
 //#####################################################################
 // Function Update_Fluid_Parameters

@@ -278,12 +278,12 @@ Advance_One_Time_Step_Explicit_Part(const T dt,const T time,const int rk_substep
     Invalidate_Ghost_Cells();
 
     if(apply_cavitation_correction){
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("Before cavitation correction",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("Before cavitation correction",1);
         Compute_Cavitation_Velocity(rho_n,face_velocities_n,momentum_n);
         euler_cavitation_density.Apply_Cavitation_Correction(dt,time,face_velocities_n);
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("After cavitation density correction",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("After cavitation density correction",1);
         //euler_cavitation_internal_energy.Apply_Cavitation_Correction(dt,time,face_velocities_n);
-        //PHYSBAM_DEBUG_WRITE_SUBSTEP("After cavitation energy correction",0,1);
+        //PHYSBAM_DEBUG_WRITE_SUBSTEP("After cavitation energy correction",1);
     }
 }
 //#####################################################################

@@ -13,12 +13,6 @@
 #include "SMOKE_PARTICLES.h"
 
 using namespace PhysBAM;
-namespace{
-template<class TV> void Write_Substep_Helper(void* writer,const std::string& title,int substep,int level)
-{
-    ((SMOKE_DRIVER<TV>*)writer)->Write_Substep(title,substep,level);
-}
-};
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -26,7 +20,8 @@ template<class TV> SMOKE_DRIVER<TV>::
 SMOKE_DRIVER(SMOKE_EXAMPLE<TV>& example)
     :ghost(5),example(example)
 {
-    DEBUG_SUBSTEPS::Set_Substep_Writer((void*)this,&Write_Substep_Helper<TV>);
+    DEBUG_SUBSTEPS::write_substeps_level=example.write_substeps_level;
+    DEBUG_SUBSTEPS::writer=[=](const std::string& title){Write_Substep(title);};
 }
 //#####################################################################
 // Destructor
@@ -34,7 +29,7 @@ SMOKE_DRIVER(SMOKE_EXAMPLE<TV>& example)
 template<class TV> SMOKE_DRIVER<TV>::
 ~SMOKE_DRIVER()
 {
-    DEBUG_SUBSTEPS::Clear_Substep_Writer((void*)this);
+    DEBUG_SUBSTEPS::writer=0;
 }
 //#####################################################################
 // Function Execute_Main_Program
@@ -51,7 +46,7 @@ Execute_Main_Program()
 template<class TV> void SMOKE_DRIVER<TV>::
 Initialize()
 {
-    DEBUG_SUBSTEPS::Set_Write_Substeps_Level(example.write_substeps_level);
+    DEBUG_SUBSTEPS::write_substeps_level=example.write_substeps_level;
 
     // setup time
     if(example.restart) current_frame=example.restart;else current_frame=example.first_frame;    
@@ -328,12 +323,12 @@ Simulate_To_Frame(const int frame)
 // Function Write_Substep
 //#####################################################################
 template<class TV> void SMOKE_DRIVER<TV>::
-Write_Substep(const std::string& title,const int substep,const int level)
+Write_Substep(const std::string& title)
 {
-    if(level<=example.write_substeps_level){
-        example.frame_title=title;
-        LOG::cout<<"Writing substep ["<<example.frame_title<<"]: output_number="<<output_number+1<<", time="<<time<<", frame="<<current_frame<<", substep="<<substep<<std::endl;
-        Write_Output_Files(++output_number);example.frame_title="";}
+    example.frame_title=title;
+    LOG::cout<<"Writing substep ["<<example.frame_title<<"]: output_number="<<output_number+1<<", time="<<time<<", frame="<<current_frame<<std::endl;
+    Write_Output_Files(++output_number);
+    example.frame_title="";
 }
 //#####################################################################
 // Function Write_Output_Files

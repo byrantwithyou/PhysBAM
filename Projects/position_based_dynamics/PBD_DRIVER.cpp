@@ -5,12 +5,6 @@
 #include "PBD_CONSTRAINTS.h"
 #include "PBD_DRIVER.h"
 using namespace PhysBAM;
-namespace{
-    template<class TV> void Write_Substep_Helper(void* writer,const std::string& title,int substep,int level)
-    {
-        ((PBD_DRIVER<TV>*)writer)->Write_Substep(title,substep,level);
-    }
-};
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -18,7 +12,7 @@ template<class TV> PBD_DRIVER<TV>::
 PBD_DRIVER(PBD_EXAMPLE<TV>& example)
     :example(example)
 {
-    DEBUG_SUBSTEPS::Set_Substep_Writer((void*)this,&Write_Substep_Helper<TV>);
+    DEBUG_SUBSTEPS::writer=[=](const std::string& title){Write_Substep(title);};
 }
 //#####################################################################
 // Destructor
@@ -26,7 +20,7 @@ PBD_DRIVER(PBD_EXAMPLE<TV>& example)
 template<class TV> PBD_DRIVER<TV>::
 ~PBD_DRIVER()
 {
-    DEBUG_SUBSTEPS::Clear_Substep_Writer((void*)this);
+    DEBUG_SUBSTEPS::writer=0;
 }
 //#####################################################################
 // Execute_Main_Program
@@ -44,7 +38,7 @@ template<class TV> void PBD_DRIVER<TV>::
 Initialize()
 {
     LOG::cout<<std::setprecision(16)<<std::endl;
-    DEBUG_SUBSTEPS::Set_Write_Substeps_Level(example.substeps_delay_frame<0?example.write_substeps_level:-1);
+    DEBUG_SUBSTEPS::write_substeps_level=example.substeps_delay_frame<0?example.write_substeps_level:-1;
 
     // setup time
     output_number=current_frame=example.restart;
@@ -56,7 +50,7 @@ Initialize()
     example.P.Resize(example.X.m);
 
     if(!example.restart) Write_Output_Files(0);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",1);
 }
 //#####################################################################
 // Function Advance_One_Time_Step
@@ -76,10 +70,10 @@ Advance_One_Time_Step()
     for(int i=0;i<X.m;i++)
         P(i)=X(i)+dt*V(i);
 
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after external forces",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after external forces",1);
     for(int i=0;i<example.solver_iterations;i++)
         Project_Constraints();
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after projecting constraints",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after projecting constraints",1);
 
     for(int i=0;i<X.m;i++){
         V(i)=(P(i)-X(i))/dt;
@@ -111,7 +105,7 @@ Simulate_To_Frame(const int frame)
         LOG::SCOPE scope("FRAME","frame %d",current_frame+1);
         example.Begin_Frame(current_frame);
         if(example.substeps_delay_frame==current_frame)
-            DEBUG_SUBSTEPS::Set_Write_Substeps_Level(example.write_substeps_level);
+            DEBUG_SUBSTEPS::write_substeps_level=example.write_substeps_level;
         T time_at_frame=example.time+example.frame_dt;
         bool done=false;
         for(int substep=0;!done;substep++){
@@ -134,14 +128,13 @@ Simulate_To_Frame(const int frame)
 // Function Write_Substep
 //#####################################################################
 template<class TV> void PBD_DRIVER<TV>::
-Write_Substep(const std::string& title,const int substep,const int level)
+Write_Substep(const std::string& title)
 {
-    if(level<=example.write_substeps_level){
-        example.frame_title=title;
-        LOG::printf("Writing substep [%s]: output_number=%i, time=%g, frame=%i, substep=%i\n",
-            example.frame_title,output_number+1,example.time,current_frame,substep);
-        Write_Output_Files(++output_number);
-        example.frame_title="";}
+    example.frame_title=title;
+    LOG::printf("Writing substep [%s]: output_number=%i, time=%g, frame=%i\n",
+        example.frame_title,output_number+1,example.time,current_frame);
+    Write_Output_Files(++output_number);
+    example.frame_title="";
 }
 //#####################################################################
 // Write_Output_Files

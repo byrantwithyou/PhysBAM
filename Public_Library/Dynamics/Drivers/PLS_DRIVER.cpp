@@ -16,12 +16,6 @@
 #include <Dynamics/Drivers/PLS_EXAMPLE.h>
 #include <Dynamics/Level_Sets/LEVELSET_ADVECTION.h>
 using namespace PhysBAM;
-namespace{
-template<class TV> void Write_Substep_Helper(void* writer,const std::string& title,int substep,int level)
-{
-    ((PLS_DRIVER<TV>*)writer)->Write_Substep(title,substep,level);
-}
-};
 //#####################################################################
 // Initialize
 //#####################################################################
@@ -29,7 +23,8 @@ template<class TV> PLS_DRIVER<TV>::
 PLS_DRIVER(PLS_EXAMPLE<TV>& example)
     :example(example)
 {
-    DEBUG_SUBSTEPS::Set_Substep_Writer((void*)this,&Write_Substep_Helper<TV>);
+    DEBUG_SUBSTEPS::write_substeps_level=example.write_substeps_level;
+    DEBUG_SUBSTEPS::writer=[=](const std::string& title){Write_Substep(title);};
 }
 //#####################################################################
 // Initialize
@@ -37,7 +32,7 @@ PLS_DRIVER(PLS_EXAMPLE<TV>& example)
 template<class TV> PLS_DRIVER<TV>::
 ~PLS_DRIVER()
 {
-    DEBUG_SUBSTEPS::Clear_Substep_Writer((void*)this);
+    DEBUG_SUBSTEPS::writer=0;
 }
 //#####################################################################
 // Initialize
@@ -54,7 +49,7 @@ Execute_Main_Program()
 template<class TV> void PLS_DRIVER<TV>::
 Initialize()
 {
-    DEBUG_SUBSTEPS::Set_Write_Substeps_Level(example.write_substeps_level);
+    DEBUG_SUBSTEPS::write_substeps_level=example.write_substeps_level;
 
     // setup time
     if(example.restart) current_frame=example.restart;else current_frame=example.first_frame;
@@ -170,7 +165,7 @@ Initialize()
 
     example.Set_Boundary_Conditions(time); // get so CFL is correct
     if(!example.restart) Write_Output_Files(example.first_frame);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",1);
 }
 //#####################################################################
 // Advance_To_Target_Time
@@ -192,24 +187,24 @@ Advance_To_Target_Time(const T target_time)
         example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(true,dt*maximum_fluid_speed+2*max_particle_collision_distance+(T).5*example.mac_grid.dX.Max(),10);
 
         LOG::Time("Fill ghost");
-PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",0,1);
+PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",1);
         ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost;face_velocities_ghost.Resize(example.incompressible.grid,example.number_of_ghost_cells,false);
         example.incompressible.boundary->Fill_Ghost_Faces(example.mac_grid,example.face_velocities,face_velocities_ghost,time+dt,example.number_of_ghost_cells);
 
         ARRAY<T,TV_INT> phi_back(example.mac_grid.Domain_Indices(example.number_of_ghost_cells));
         example.phi_boundary->Fill_Ghost_Cells(example.mac_grid,example.particle_levelset_evolution.Particle_Levelset(0).levelset.phi,phi_back,dt,time,example.number_of_ghost_cells);
         LOG::Time("Advect Levelset");
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("before phi",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("before phi",1);
         example.phi_boundary_water.Use_Extrapolation_Mode(false);
         example.particle_levelset_evolution.Advance_Levelset(dt);
         ARRAY<T,TV_INT> phi_ghost(example.mac_grid.Domain_Indices(example.number_of_ghost_cells));
         //example.phi_boundary_water.Fill_Ghost_Cells(example.mac_grid,example.particle_levelset_evolution.phi,phi_ghost,dt,time,example.number_of_ghost_cells);
         //example.advection_scalar.Update_Advection_Equation_Cell(example.mac_grid,example.particle_levelset_evolution.phi,phi_ghost,example.face_velocities,example.phi_boundary_water,dt,time);
         example.phi_boundary_water.Use_Extrapolation_Mode(true);
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("after phi",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after phi",1);
         LOG::Time("advecting particles");
         example.particle_levelset_evolution.Particle_Levelset(0).Euler_Step_Particles(face_velocities_ghost,dt,time,true,true,false,false);
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("after advection",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after advection",1);
         
         LOG::Time("updating removed particle velocities");
         example.phi_boundary_water.Use_Extrapolation_Mode(true);
@@ -226,25 +221,25 @@ PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",0,1);
             PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*pls.removed_negative_particles(iterator.Node_Index());
             for(int p=0;p<particles.Size();p++) particles.V(p)+=-TV::Axis_Vector(1)*dt*9.8; // ballistic
             for(int p=0;p<particles.Size();p++) particles.V(p)+=dt*interpolation.Clamped_To_Array_Face(example.mac_grid,example.incompressible.force,particles.X(p));} // external forces
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("after particles",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after particles",1);
 
         example.particle_levelset_evolution.Make_Signed_Distance();
         example.phi_boundary->Fill_Ghost_Cells(example.mac_grid,pls.levelset.phi,phi_ghost,dt,time,example.number_of_ghost_cells);
         example.incompressible.Advance_One_Time_Step_Convection(dt,time,example.face_velocities,example.face_velocities,example.number_of_ghost_cells);
         //example.incompressible.Advance_One_Time_Step_Convection(dt,time,example.face_velocities,example.face_velocities,example.number_of_ghost_cells);
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("after convection",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after convection",1);
         example.Advect_Particles(dt,time);
         example.incompressible.Add_Energy_With_Vorticity(example.face_velocities,example.domain_boundary,dt,time,example.number_of_ghost_cells,&pls.levelset);
         example.incompressible.Advance_One_Time_Step_Forces(example.face_velocities,dt,time,false,0,example.number_of_ghost_cells);
         example.boundary->Fill_Ghost_Faces(example.mac_grid,example.face_velocities,face_velocities_ghost,time+dt,example.number_of_ghost_cells);
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("after forces",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after forces",1);
 
         LOG::Time("modifying levelset");
         example.particle_levelset_evolution.Fill_Levelset_Ghost_Cells(time+dt);
         example.particle_levelset_evolution.Particle_Levelset(0).Exchange_Overlap_Particles();
         example.particle_levelset_evolution.Modify_Levelset_And_Particles(&face_velocities_ghost);
         example.particle_levelset_evolution.Make_Signed_Distance();
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("after particles",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after particles",1);
 
         LOG::Time("adding sources");
         example.Adjust_Phi_With_Sources(time+dt);
@@ -253,38 +248,38 @@ PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",0,1);
 
         LOG::Time("deleting particles"); // needs to be after adding sources, since it does a reseed
         example.particle_levelset_evolution.Delete_Particles_Outside_Grid();
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("after delete 1",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after delete 1",1);
         LOG::Time("deleting particles in local maxima");
         example.particle_levelset_evolution.Particle_Levelset(0).Delete_Particles_In_Local_Maximum_Phi_Cells(0);
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("after delete 2",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after delete 2",1);
         LOG::Time("deleting particles far from interface");
         example.particle_levelset_evolution.Particle_Levelset(0).Delete_Particles_Far_From_Interface(); // uses visibility
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("after delete 3",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after delete 3",1);
 
         LOG::Time("re-incorporating removed particles");
         example.particle_levelset_evolution.Particle_Levelset(0).Identify_And_Remove_Escaped_Particles(face_velocities_ghost,1.5,time+dt);
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("after remove",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after remove",1);
         if(example.particle_levelset_evolution.Particle_Levelset(0).use_removed_positive_particles || example.particle_levelset_evolution.Particle_Levelset(0).use_removed_negative_particles)
             example.particle_levelset_evolution.Particle_Levelset(0).Reincorporate_Removed_Particles(1,1,0,true);
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("after reincorporate",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after reincorporate",1);
 
         // update ghost phi values
         example.particle_levelset_evolution.Fill_Levelset_Ghost_Cells(time+dt);
 
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("before boundary",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("before boundary",1);
         LOG::Time("getting Neumann and Dirichlet boundary conditions");
         example.Set_Boundary_Conditions(time);
         example.incompressible.Set_Dirichlet_Boundary_Conditions(&example.particle_levelset_evolution.phi,0);
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("after boundary",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after boundary",1);
 
         example.projection.p*=dt;
         example.projection.collidable_solver->Set_Up_Second_Order_Cut_Cell_Method();
         example.incompressible.Advance_One_Time_Step_Implicit_Part(example.face_velocities,dt,time,true);
         example.projection.p*=(1/dt);
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("after solve",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after solve",1);
 
         example.incompressible.boundary->Apply_Boundary_Condition_Face(example.incompressible.grid,example.face_velocities,time+dt);
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("after boundary",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after boundary",1);
         example.projection.collidable_solver->Set_Up_Second_Order_Cut_Cell_Method(false);
 
         LOG::Time("extrapolating velocity across interface");
@@ -292,7 +287,7 @@ PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",0,1);
         ARRAY<T,TV_INT> exchanged_phi_ghost(example.mac_grid.Domain_Indices(2*band_width+2));
         example.particle_levelset_evolution.Particle_Levelset(0).levelset.boundary->Fill_Ghost_Cells(example.mac_grid,example.particle_levelset_evolution.phi,exchanged_phi_ghost,0,time+dt,2*band_width+2);
         example.incompressible.Extrapolate_Velocity_Across_Interface(example.face_velocities,exchanged_phi_ghost,false,band_width,0,TV());
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("after extrapolate",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after extrapolate",1);
 
         time+=dt;}
 }
@@ -315,12 +310,12 @@ Simulate_To_Frame(const int frame)
 // Function Write_Substep
 //#####################################################################
 template<class TV> void PLS_DRIVER<TV>::
-Write_Substep(const std::string& title,const int substep,const int level)
+Write_Substep(const std::string& title)
 {
-    if(level<=example.write_substeps_level){
-        example.frame_title=title;
-        LOG::cout<<"Writing substep ["<<example.frame_title<<"]: output_number="<<output_number+1<<", time="<<time<<", frame="<<current_frame<<", substep="<<substep<<std::endl;
-        Write_Output_Files(++output_number);example.frame_title="";}
+    example.frame_title=title;
+    LOG::cout<<"Writing substep ["<<example.frame_title<<"]: output_number="<<output_number+1<<", time="<<time<<", frame="<<current_frame<<std::endl;
+    Write_Output_Files(++output_number);
+    example.frame_title="";
 }
 //#####################################################################
 // Write_Output_Files

@@ -353,7 +353,7 @@ Solve(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velocities,const T dt,con
 
     T fluid_tolerance=(T)(1e-6*divergence_scaling*fluids_parameters.grid->Cell_Size());
     if(!fluid_tolerance) fluid_tolerance=solids_parameters.implicit_solve_parameters.cg_tolerance;
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("Before Cholesky factorization",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("Before Cholesky factorization",1);
 
     int max_iterations=solids_parameters.implicit_solve_parameters.cg_iterations;
     static CONJUGATE_RESIDUAL<T> cr;
@@ -376,12 +376,12 @@ Solve(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velocities,const T dt,con
 
     if(print_each_matrix) OCTAVE_OUTPUT<T>(LOG::sprintf("b-%i.txt",solve_id).c_str()).Write("b",coupled_b);    // TODO: this isn't actually valid for all the solver types
     if(!solver->Solve(*coupled_system,coupled_x,coupled_b,coupled_vectors,fluid_tolerance,1,max_iterations))
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("FAILED CONVERGENCE",0,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("FAILED CONVERGENCE",1);
     if(print_each_matrix) OCTAVE_OUTPUT<T>(LOG::sprintf("x-%i.txt",solve_id).c_str()).Write("x",coupled_x);
     LOG::cout<<"Residual L_inf norm="<<coupled_system->Residual_Linf_Norm(coupled_x,coupled_b)<<std::endl;
 
     LOG::Stop_Time();
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("After coupled solve (sf coupled evolution)",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("After coupled solve (sf coupled evolution)",1);
 
     bool want_fluid=fluids && (!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Fluid_Node()) && Simulate_Incompressible_Fluids();
     coupled_system->Apply_Velocity_Update(coupled_x,incompressible_face_velocities,pressure,V,F,solids && !leakproof_solve,want_fluid);
@@ -391,7 +391,7 @@ Solve(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velocities,const T dt,con
         pressure_impulses_twist=coupled_system->pressure_impulses_twist;}
         // TODO: only need to exchange velocities
     if(solids_fluids_parameters.mpi_solid_fluid) solids_fluids_parameters.mpi_solid_fluid->Exchange_Solid_Positions_And_Velocities(solid_body_collection);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("After solid velocity update (sf coupled evolution)",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("After solid velocity update (sf coupled evolution)",1);
 
     if(fluids && (!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Fluid_Node()) && Simulate_Compressible_Fluids()){
         ARRAY<T,COUPLING_CONSTRAINT_ID> coupled_faces_solid_interpolated_velocity_n;
@@ -406,16 +406,16 @@ Solve(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velocities,const T dt,con
             coupled_system->Zero_Coupling_Faces_Values(p_face);
             euler_projection.Apply_Pressure(pressure,p_face,fluids_face_velocities,boundary_condition_collection.psi_D,boundary_condition_collection.psi_N,dt,current_position_time);
             euler_projection.p=pressure;// only for writing to file and viewing in debugger
-            PHYSBAM_DEBUG_WRITE_SUBSTEP("After apply pressure at non-coupled faces (sf coupled evolution)",0,1);
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("After apply pressure at non-coupled faces (sf coupled evolution)",1);
             coupled_system->Apply_Lambda_To_Euler_State(coupled_x,coupled_faces_solid_interpolated_velocity_n,coupled_faces_solid_interpolated_velocity_np1,fluids_parameters.euler->U);
             fluids_parameters.euler->Invalidate_Ghost_Cells();
-            PHYSBAM_DEBUG_WRITE_SUBSTEP("After apply lambda to euler state (sf coupled evolution)",0,1);}}
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("After apply lambda to euler state (sf coupled evolution)",1);}}
     coupled_system->Get_Pressure(coupled_x,pressure);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("After complete fluid state update (sf coupled evolution)",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("After complete fluid state update (sf coupled evolution)",1);
 
     if(!leakproof_solve && (!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Solid_Node())){
         this->Finish_Backward_Euler_Step(*coupled_system,dt,current_position_time,velocity_update);}
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("unscaled final pressures (sf coupled evolution)",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("unscaled final pressures (sf coupled evolution)",1);
 
     coupled_system->Mark_Valid_Faces(solved_faces);
 
@@ -551,9 +551,9 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T 
         LEVELSET_VISCOSITY_UNIFORM<TV> levelset_viscosity(fluids_parameters.callbacks,grid,dt,fluids_parameters.density,fluids_parameters.viscosity);
         levelset_viscosity.periodic_boundary=fluids_parameters.periodic_boundary;
         levelset_viscosity.print_matrix=fluids_parameters.print_viscosity_matrix;
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("before viscosity",0,2);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("before viscosity",2);
         levelset_viscosity.Apply_Viscosity(face_velocities,false,true,false);
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("after viscosity",0,2);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after viscosity",2);
         return;}
 
     // TODO(kwatra): not handled for compressible flow
@@ -655,7 +655,7 @@ Get_Coupled_Faces_And_Interpolated_Solid_Velocities(const T time,ARRAY<bool,FACE
         assert(time==time_cached);
         psi_N=cached_psi_N;
         Fill_Coupled_Face_Data(number_of_coupling_faces_cached,indexed_faces_cached,coupling_face_velocities_cached,face_velocities);
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("after Get_Coupled_Faces_And_Velocities using cached data (sf coupled evolution)",0,2);}
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after Get_Coupled_Faces_And_Velocities using cached data (sf coupled evolution)",2);}
     else{
         boundary_condition_collection.Compute(grid,pressure,face_velocities,time);
 
@@ -670,7 +670,7 @@ Get_Coupled_Faces_And_Interpolated_Solid_Velocities(const T time,ARRAY<bool,FACE
         ARRAY<T,COUPLING_CONSTRAINT_ID> coupling_face_velocities;
         Get_Coupled_Faces_And_Interpolated_Solid_Velocities(index_map,solid_interpolation,boundary_condition_collection.psi_N,psi_N,coupling_face_velocities);
         Fill_Coupled_Face_Data(solid_interpolation.Number_Of_Constraints(),index_map.indexed_faces,coupling_face_velocities,face_velocities);
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("after Get_Coupled_Faces_And_Velocities (sf coupled evolution)",0,2);}
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after Get_Coupled_Faces_And_Velocities (sf coupled evolution)",2);}
 }
 //#####################################################################
 // Function Setup_Boundary_Condition_Collection

@@ -83,7 +83,7 @@ template<class TV> void EXAMPLE<TV>::
 Set_Write_Substeps_Level(const int level)
 {
     write_substeps_level=level;
-    DEBUG_SUBSTEPS::Set_Write_Substeps_Level(level);
+    DEBUG_SUBSTEPS::write_substeps_level=level;
 }
 template<class TV> void EXAMPLE<TV>::
 Write_Frame_Title(const int frame) const

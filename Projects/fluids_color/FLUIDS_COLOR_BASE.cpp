@@ -631,7 +631,7 @@ Level_Set_Error(T time)
         T p=levelset_color.phi(it.index);
         Add_Debug_Particle(it.Location(),colors(c+3));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("level set",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("level set",1);
     for(CELL_ITERATOR<TV> it(grid,1);it.Valid();it.Next()){
         int c=-4;
         T p=analytic_levelset->phi(it.Location()/m,time/s,c)*m;
@@ -641,7 +641,7 @@ Level_Set_Error(T time)
         else{
             Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,1,0));
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(levelset_color.phi(it.index)-p));}}
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("level set error",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("level set error",1);
 }
 //#####################################################################
 // Function Velocity_Error
@@ -667,7 +667,7 @@ Velocity_Error(T time)
         face_velocities(c)(it.Full_Index())=A-B;}
     if(num_u) u_2/=num_u;
     u_2=sqrt(u_2);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("velocity error",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("velocity error",1);
     face_velocities=saved_face_velocities;
     if(use_p_null_mode){
         int cnt=0;
@@ -706,7 +706,7 @@ Velocity_Error(T time)
     l_2=sqrt(l_2);
 
     LOG::printf("max_error %-22.16g %-22.16g %-22.16g %-22.16g  p %-22.16g %-22.16g %-22.16g %-22.16g  l %-22.16g %-22.16g", u_inf, u_2, a, b, p_inf, p_2, pa, pb, l_inf, l_2);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("pressure error",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("pressure error",1);
 
     if(use_polymer_stress){
         T max_S=0;
@@ -719,7 +719,7 @@ Velocity_Error(T time)
             Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,norm);}
         LOG::printf("S error: %-22.16g",max_S);
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("polymer stress error",0,1);}
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("polymer stress error",1);}
     LOG::printf("\n");
 }
 //#####################################################################
@@ -744,7 +744,7 @@ Dump_Analytic_Levelset(T time)
         if(c==-4) c=bc_type;
         Add_Debug_Particle(it.Location(),colors(c+3));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("analytic level set (phi)",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("analytic level set (phi)",1);
     for(CELL_ITERATOR<TV> it(grid,1);it.Valid();it.Next()){
         int c=-4;
         T p=analytic_levelset->phi(it.Location()/m,time/s,c)*m;
@@ -752,7 +752,7 @@ Dump_Analytic_Levelset(T time)
         if(c==-4) c=bc_type;
         Add_Debug_Particle(it.Location(),colors(c+3));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,analytic_levelset->N(it.Location()/m,time/s,c));}
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("analytic level set (N)",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("analytic level set (N)",1);
 }
 //#####################################################################
 // Function Get_Initial_Velocities

@@ -99,7 +99,8 @@ Simulate_To_Frame(const int frame_input)
         Advance_To_Target_Time(example.Time_At_Frame(current_frame+1));
         Postprocess_Frame(++current_frame);
         if(example.write_output_files && example.write_substeps_level==-1) Write_Output_Files(current_frame);
-        else if(example.write_substeps_level!=-1) Write_Substep(LOG::sprintf("END Frame %d",current_frame),0,example.write_substeps_level);
+        else if(example.write_substeps_level!=-1)
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("END Frame %d",example.write_substeps_level,current_frame);
         LOG::cout<<"TIME = "<<time<<std::endl;}
 }
 //#####################################################################
@@ -294,22 +295,22 @@ First_Order_Time_Step(int substep,T dt)
 
     if(example.use_pls_evolution_for_structure) Advance_Particles_With_PLS(dt);
 
-    Write_Substep("start step",substep,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("start step",1);
     if(example.kang_poisson_viscosity && !fluids_parameters.implicit_viscosity){
         face_velocities_scratch=face_velocities;
-        Write_Substep("explicit viscosity",substep,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("explicit viscosity",1);
         example.kang_poisson_viscosity->Apply_Viscosity(face_velocities,dt,fluids_parameters.implicit_viscosity);
-        Write_Substep("explicit viscosity",substep,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("explicit viscosity",1);
         face_velocities_scratch.Exchange(face_velocities,face_velocities_scratch);
         face_velocities_scratch-=face_velocities;
-        Write_Substep("revert velocity and store difference",substep,1);}
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("revert velocity and store difference",1);}
 
     Advect_Fluid(dt,substep);
     LOG::cout<<"Maximum face velocity (after advect) = ("<<face_velocities.Max_Abs().Magnitude()<<": "<<face_velocities.Max_Abs()<<std::endl;
-    Write_Substep("advect",substep,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("advect",1);
     if(example.kang_poisson_viscosity && !fluids_parameters.implicit_viscosity){
         face_velocities+=face_velocities_scratch;
-        Write_Substep("apply stored explicit viscosity",substep,1);}
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("apply stored explicit viscosity",1);}
     
 
     example.solids_evolution->example_forces_and_velocities.Update_Time_Varying_Material_Properties(time+dt);
@@ -320,25 +321,25 @@ First_Order_Time_Step(int substep,T dt)
         slip->Solve(face_velocities,dt,time,time+dt,false,false);}
     else if(example.kang_poisson_viscosity)
         example.kang_poisson_viscosity->Project_Fluid(face_velocities,dt);
-    Write_Substep("pressure solve",substep,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("pressure solve",1);
 
     if(slip) slip->Print_Maximum_Velocities(time);
 
 //        if(incompressible) incompressible->projection.p_save_for_projection.Copy(incompressible->projection.p); // save the good pressure for later
     if(!example.use_pls_evolution_for_structure && slip) slip->Euler_Step_Position(dt,time+dt);
 
-    Write_Substep("euler step position",substep,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("euler step position",1);
 
     LOG::Time("extrapolating velocity across interface");
 //    Extrapolate_Velocity_Across_Interface(example.face_velocities,particle_levelset_evolution->Particle_Levelset(0).levelset,extrapolation_bandwidth);
     if(!example.two_phase) Extrapolate_Velocity_Across_Interface(time,dt);
         //incompressible->Extrapolate_Velocity_Across_Interface(example.face_velocities,exchanged_phi_ghost,
         //    fluids_parameters.enforce_divergence_free_extrapolation,extrapolation_bandwidth,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);
-    Write_Substep("extrapolate about interface",substep,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("extrapolate about interface",1);
     incompressible->boundary->Apply_Boundary_Condition_Face(incompressible->grid,face_velocities,time+dt);
     LOG::cout<<"Maximum face velocity = ("<<face_velocities.Max_Abs().Magnitude()<<": "<<face_velocities.Max_Abs()<<std::endl;
 
-    Write_Substep("end step",substep,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("end step",1);
     example.solids_evolution->time+=dt;
     time+=dt;
 }
@@ -409,7 +410,7 @@ Advance_To_Target_Time(const T target_time)
         example.solids_evolution->example_forces_and_velocities.Advance_One_Time_Step_End_Callback(dt,time);
         solids_evolution_callbacks->Postprocess_Solids_Substep(example.solids_evolution->time,substep);
         example.Postprocess_Substep(dt,time);
-        Write_Substep(LOG::sprintf("END Substep %d",substep),substep,0);}
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("END Substep %d",0,substep);}
 }
 //#####################################################################
 // Function Advect_Fluid
@@ -440,12 +441,12 @@ Advect_Fluid(const T dt,const int substep)
 #endif // #ifndef DISABLE_LEVELSET_ADVECTION
     fluids_parameters.phi_boundary_water.Use_Extrapolation_Mode(true);
     example.Extrapolate_Phi_Into_Objects(time+dt);
-    Write_Substep("after levelset advection",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after levelset advection",1);
     LOG::Time("advecting particles");
 #ifndef DISABLE_LEVELSET_ADVECTION
     particle_levelset_evolution->Advance_Particles(face_velocities_ghost,dt,false);
 #endif // #ifndef DISABLE_LEVELSET_ADVECTION
-    Write_Substep("after particle advection",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after particle advection",1);
 
     example.Scalar_Advection_Callback(dt,time);
 
@@ -467,7 +468,7 @@ Advect_Fluid(const T dt,const int substep)
             particles.V(p)+=dt*interpolation.Clamped_To_Array_Face(grid,incompressible->force,particles.X(p));} // external forces
 
     LOG::Time("updating velocity (explicit part)");
-    Write_Substep("before advection",substep,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",1);
 
     int extrapolation_ghost_cells=2*fluids_parameters.number_of_ghost_cells+2;
     T extrapolation_bandwidth=(T)(extrapolation_ghost_cells-1);
@@ -481,24 +482,24 @@ Advect_Fluid(const T dt,const int substep)
                     fluids_parameters.enforce_divergence_free_extrapolation,extrapolation_bandwidth,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);
             incompressible->Advance_One_Time_Step_Convection(dt,rk.time,face_velocities,face_velocities,fluids_parameters.number_of_ghost_cells);}}
     else incompressible->Advance_One_Time_Step_Convection(dt,time,face_velocities_ghost,face_velocities,fluids_parameters.number_of_ghost_cells);
-    Write_Substep("after advection",substep,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after advection",1);
 
     if(fluids_parameters.use_body_force) fluids_parameters.callbacks->Get_Body_Force(fluids_parameters.incompressible->force,dt,time);
     incompressible->Advance_One_Time_Step_Forces(face_velocities,dt,time,fluids_parameters.implicit_viscosity,&particle_levelset_evolution->phi,example.fluids_parameters.number_of_ghost_cells);
-    Write_Substep("after integrate non advection forces",substep,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after integrate non advection forces",1);
 
     LOG::Time("updating velocity (explicit part without convection)");
-    Write_Substep("before viscosity",substep,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("before viscosity",1);
     if(SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>* coupled_evolution=dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>*>(example.solids_evolution))
         coupled_evolution->Apply_Viscosity(face_velocities,dt,time);
     else if(example.kang_poisson_viscosity && fluids_parameters.implicit_viscosity)
         example.kang_poisson_viscosity->Apply_Viscosity(face_velocities,dt,fluids_parameters.implicit_viscosity);
 
-    Write_Substep("after viscosity",substep,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after viscosity",1);
 
     LOG::Time("effective velocity acceleration structures");
     // revalidate scalars and velocity in body's new position
-    Write_Substep("before scalar revalidation",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("before scalar revalidation",1);
     collision_bodies_affecting_fluid.Update_Intersection_Acceleration_Structures(false); // NON-swept acceleration structures
     collision_bodies_affecting_fluid.Rasterize_Objects(); // non-swept
     collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*grid.dX.Min(),5);  // static occupied blocks
@@ -506,15 +507,15 @@ Advect_Fluid(const T dt,const int substep)
     example.Revalidate_Fluid_Scalars(); // uses visibility
 
     example.Revalidate_Fluid_Velocity(fluid_collection.incompressible_fluid_collection.face_velocities); // uses visibility
-    Write_Substep("after scalar revalidation",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after scalar revalidation",1);
 
     LOG::Time("modifying levelset");
     particle_levelset_evolution->Fill_Levelset_Ghost_Cells(time+dt);
-    Write_Substep("after filling level set ghost cells and exchanging overlap particles",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after filling level set ghost cells and exchanging overlap particles",1);
     particle_levelset_evolution->Modify_Levelset_And_Particles(&face_velocities_ghost);
-    Write_Substep("after modify levelset and particles",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after modify levelset and particles",1);
     example.Revalidate_Phi_After_Modify_Levelset(); // second revalidation -- uses visibility too
-    Write_Substep("after revalidate phi",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after revalidate phi",1);
 
     LOG::Time("adding sources");
     if(example.Adjust_Phi_With_Sources(time+dt)) particle_levelset_evolution->Make_Signed_Distance();
@@ -522,7 +523,7 @@ Advect_Fluid(const T dt,const int substep)
     LOG::Time("getting sources");
     ARRAY<bool,TV_INT>* source_mask=0;example.Get_Source_Reseed_Mask(source_mask,time+dt);
     if(source_mask){LOG::Time("reseeding sources");particle_levelset_evolution->Reseed_Particles(time+dt,0,source_mask);delete source_mask;}
-    Write_Substep("after adding sources",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after adding sources",1);
 
     LOG::Time("deleting particles"); // needs to be after adding sources, since it does a reseed
     particle_levelset_evolution->Delete_Particles_Outside_Grid();
@@ -531,7 +532,7 @@ Advect_Fluid(const T dt,const int substep)
     particle_levelset_evolution->Particle_Levelset(0).Delete_Particles_In_Local_Maximum_Phi_Cells(1);
     LOG::Time("deleting particles far from interface");
     particle_levelset_evolution->Particle_Levelset(0).Delete_Particles_Far_From_Interface(); // uses visibility
-    Write_Substep("after delete particles far from interface",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after delete particles far from interface",1);
 
     LOG::Time("re-incorporating removed particles");
     // TODO: if your particles fall entirely within the grid this shouldn't need ghost cells, but it may need them for MPI
@@ -543,7 +544,7 @@ Advect_Fluid(const T dt,const int substep)
     // update ghost phi values
     particle_levelset_evolution->Fill_Levelset_Ghost_Cells(time+dt);
 
-    Write_Substep("after scalar update",substep,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after scalar update",1);
 }
 //#####################################################################
 // Function Postprocess_Frame

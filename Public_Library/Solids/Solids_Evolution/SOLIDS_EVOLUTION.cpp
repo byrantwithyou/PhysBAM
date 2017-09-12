@@ -218,7 +218,7 @@ Postprocess_Frame(const int frame)
     if(solids_parameters.triangle_collision_parameters.perform_self_collision && solids_parameters.triangle_collision_parameters.check_mesh_for_self_intersection
         && (!solid_body_collection.deformable_body_collection.mpi_solids || solid_body_collection.deformable_body_collection.mpi_solids->rank==0)){
         if(solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.Check_For_Intersection(false,solids_parameters.triangle_collision_parameters.collisions_small_number)){
-            PHYSBAM_DEBUG_WRITE_SUBSTEP("Intersections Found",0,0);
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("Intersections Found",0);
             throw std::runtime_error("Intersections Found");}}
 }
 //#####################################################################

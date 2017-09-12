@@ -140,12 +140,12 @@ Advance_One_Time_Step_Implicit_Part(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities
 {
     int ghost_cells=3;
     // boundary conditions
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("Before apply boundary",0,0);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("Before apply boundary",0);
     if(!projection_boundary) projection_boundary=boundary;
     projection_boundary->Apply_Boundary_Condition_Face(projection.p_grid,face_velocities,time+dt);
     ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(projection.p_grid,ghost_cells);
     projection_boundary->Fill_Ghost_Faces(projection.p_grid,face_velocities,face_velocities_ghost,time,ghost_cells);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("After apply boundary",0,0);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("After apply boundary",0);
 
     assert(Consistent_Boundary_Conditions(face_velocities));
 
@@ -161,7 +161,7 @@ Advance_One_Time_Step_Implicit_Part(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities
         //viscosity_helper.Add_Implicit_Forces_Before_Projection(grid,face_velocities,face_velocities,dt,time);}
 
     projection.Make_Divergence_Free(face_velocities,dt,time);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("After final projection",0,0);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("After final projection",0);
 }
 //#####################################################################
 // Function Implicit_Viscous_Update
@@ -308,7 +308,7 @@ Set_Dirichlet_Boundary_Conditions(const ARRAY<T,TV_INT>* phi,const T pressure)
     if(projection.elliptic_solver->mpi_grid){
         projection.elliptic_solver->mpi_grid->Exchange_Boundary_Cell_Data(psi_D,1,false);
         projection.elliptic_solver->mpi_grid->Exchange_Boundary_Cell_Data(projection.p,1,false);}
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("After exchange dirichlet",0,0);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("After exchange dirichlet",0);
 }
 //#####################################################################
 // Function Set_Dirichlet_Boundary_Conditions
@@ -322,7 +322,7 @@ Set_Dirichlet_Boundary_Conditions(const ARRAY<T,TV_INT>* phi,const ARRAY<T,TV_IN
     if(mpi_grid){
         mpi_grid->Exchange_Boundary_Cell_Data(psi_D,1,false);
         mpi_grid->Exchange_Boundary_Cell_Data(projection.p,1,false);}
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("After exchange dirichlet",0,0);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("After exchange dirichlet",0);
 }
 //#####################################################################
 // Function Add_Surface_Tension

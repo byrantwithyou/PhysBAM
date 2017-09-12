@@ -13,12 +13,6 @@
 
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 using namespace PhysBAM;
-namespace{
-template<class TV> void Write_Substep_Helper(void* writer,const std::string& title,int substep,int level)
-{
-    ((INCOMPRESSIBLE_DRIVER<TV>*)writer)->Write_Substep(title,substep,level);
-}
-};
 //#####################################################################
 // Initialize
 //#####################################################################
@@ -26,7 +20,8 @@ template<class TV> INCOMPRESSIBLE_DRIVER<TV>::
 INCOMPRESSIBLE_DRIVER(INCOMPRESSIBLE_EXAMPLE<TV>& example)
     :example(example),kinematic_evolution(example.rigid_body_collection,example,true)
 {
-    DEBUG_SUBSTEPS::Set_Substep_Writer((void*)this,&Write_Substep_Helper<TV>);
+    DEBUG_SUBSTEPS::write_substeps_level=example.write_substeps_level;
+    DEBUG_SUBSTEPS::writer=[=](const std::string& title){Write_Substep(title);};
 }
 //#####################################################################
 // Initialize
@@ -34,7 +29,7 @@ INCOMPRESSIBLE_DRIVER(INCOMPRESSIBLE_EXAMPLE<TV>& example)
 template<class TV> INCOMPRESSIBLE_DRIVER<TV>::
 ~INCOMPRESSIBLE_DRIVER()
 {
-    DEBUG_SUBSTEPS::Clear_Substep_Writer((void*)this);
+    DEBUG_SUBSTEPS::writer=0;
 }
 //#####################################################################
 // Initialize
@@ -51,7 +46,7 @@ Execute_Main_Program()
 template<class TV> void INCOMPRESSIBLE_DRIVER<TV>::
 Initialize()
 {
-    DEBUG_SUBSTEPS::Set_Write_Substeps_Level(example.write_substeps_level);
+    DEBUG_SUBSTEPS::write_substeps_level=example.write_substeps_level;
 
     // setup time
     if(example.restart) current_frame=example.restart;else current_frame=example.first_frame;
@@ -118,13 +113,13 @@ Scalar_Advance(const T dt,const T time)
 {
     LOG::Time("Scalar Advance");
     example.Get_Scalar_Field_Sources(time);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",1);
     ARRAY<T,TV_INT> density_ghost(example.mac_grid.Domain_Indices(2*example.number_of_ghost_cells+1));
     example.boundary->Set_Fixed_Boundary(true,0);
     example.boundary->Fill_Ghost_Cells(example.mac_grid,example.density,density_ghost,dt,time,2*example.number_of_ghost_cells+1);
     example.incompressible.advection->Update_Advection_Equation_Cell(example.mac_grid,example.density,density_ghost,example.face_velocities,*example.boundary,dt,time);
     example.boundary->Set_Fixed_Boundary(false);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after advection",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after advection",1);
 }
 //#####################################################################
 // Convect
@@ -134,10 +129,10 @@ Convect(const T dt,const T time)
 {
     LOG::Time("Velocity Advection");
     example.boundary->Set_Fixed_Boundary(true,0);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("before convection",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("before convection",1);
     example.incompressible.Advance_One_Time_Step_Convection(dt,time,example.face_velocities,example.face_velocities,example.number_of_ghost_cells);
     example.boundary->Set_Fixed_Boundary(false);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after convection",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after convection",1);
 }
 //#####################################################################
 // Add_Forces
@@ -152,7 +147,7 @@ Add_Forces(const T dt,const T time)
         example.boundary->Fill_Ghost_Cells(example.mac_grid,example.density,density_ghost,dt,time,example.number_of_ghost_cells);
         example.Get_Body_Force(example.incompressible.force,density_ghost,dt,time);}
     example.incompressible.Advance_One_Time_Step_Forces(example.face_velocities,dt,time,true,0,example.number_of_ghost_cells);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after forces",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after forces",1);
     kinematic_evolution.Set_External_Velocities(example.rigid_body_collection.rigid_body_particles.twist,time+dt,time+dt);
 }
 //#####################################################################
@@ -163,13 +158,13 @@ Project(const T dt,const T time)
 {
     LOG::Time("Project");
     example.Set_Boundary_Conditions(time+dt);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after boundary",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after boundary",1);
     example.projection.p*=dt; // rescale pressure for guess
     example.incompressible.Advance_One_Time_Step_Implicit_Part(example.face_velocities,dt,time,true);
     example.projection.p*=(1/dt); // unscale pressure
     example.incompressible.Apply_Pressure_Kinetic_Energy(example.face_velocities_save,example.face_velocities,dt,time);
     example.face_velocities_save=example.face_velocities;
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after projection",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after projection",1);
 }
 //#####################################################################
 // Advance_To_Target_Time
@@ -227,12 +222,12 @@ Simulate_To_Frame(const int frame)
 // Function Write_Substep
 //#####################################################################
 template<class TV> void INCOMPRESSIBLE_DRIVER<TV>::
-Write_Substep(const std::string& title,const int substep,const int level)
+Write_Substep(const std::string& title)
 {
-    if(level<=example.write_substeps_level){
-        example.frame_title=title;
-        LOG::cout<<"Writing substep ["<<example.frame_title<<"]: output_number="<<output_number+1<<", time="<<time<<", frame="<<current_frame<<", substep="<<substep<<std::endl;
-        Write_Output_Files(++output_number);example.frame_title="";}
+    example.frame_title=title;
+    LOG::cout<<"Writing substep ["<<example.frame_title<<"]: output_number="<<output_number+1<<", time="<<time<<", frame="<<current_frame<<std::endl;
+    Write_Output_Files(++output_number);
+    example.frame_title="";
 }
 //#####################################################################
 // Write_Output_Files

@@ -24,12 +24,6 @@
 #include <omp.h>
 #endif
 using namespace PhysBAM;
-namespace{
-    template<class TV> void Write_Substep_Helper(void* writer,const std::string& title,int substep,int level)
-    {
-        ((MPM_DRIVER<TV>*)writer)->Write_Substep(title,substep,level);
-    }
-};
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -39,7 +33,8 @@ MPM_DRIVER(MPM_EXAMPLE<TV>& example)
     dv(*new MPM_KRYLOV_VECTOR<TV>(example.valid_grid_indices)),
     rhs(*new MPM_KRYLOV_VECTOR<TV>(example.valid_grid_indices))
 {
-    DEBUG_SUBSTEPS::Set_Substep_Writer((void*)this,&Write_Substep_Helper<TV>);
+    DEBUG_SUBSTEPS::write_substeps_level=example.write_substeps_level;
+    DEBUG_SUBSTEPS::writer=[=](const std::string& title){Write_Substep(title);};
 }
 //#####################################################################
 // Destructor
@@ -47,7 +42,7 @@ MPM_DRIVER(MPM_EXAMPLE<TV>& example)
 template<class TV> MPM_DRIVER<TV>::
 ~MPM_DRIVER()
 {
-    DEBUG_SUBSTEPS::Clear_Substep_Writer((void*)this);
+    DEBUG_SUBSTEPS::writer=0;
     delete &objective;
     delete &dv;
     delete &rhs;
@@ -69,7 +64,7 @@ template<class TV> void MPM_DRIVER<TV>::
 Initialize()
 {
     LOG::cout<<std::setprecision(16)<<std::endl;
-    DEBUG_SUBSTEPS::Set_Write_Substeps_Level(example.substeps_delay_frame<0?example.write_substeps_level:-1);
+    DEBUG_SUBSTEPS::write_substeps_level=example.substeps_delay_frame<0?example.write_substeps_level:-1;
 
     // setup time
     output_number=current_frame=example.restart;
@@ -113,7 +108,7 @@ Initialize()
     Update_Simulated_Particles();
 
     if(!example.restart) Write_Output_Files(0);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",1);
 }
 //#####################################################################
 // Function Advance_One_Time_Step
@@ -130,12 +125,12 @@ Advance_One_Time_Step()
     Particle_To_Grid();
     Print_Grid_Stats("after particle to grid",example.dt,example.velocity,0);
     Print_Energy_Stats("after particle to grid",example.velocity);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after particle to grid",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after particle to grid",1);
     Apply_Forces();
     Print_Grid_Stats("after forces",example.dt,example.velocity_new,&example.velocity);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after forces",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after forces",1);
     Grid_To_Particle();
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after grid to particle",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after grid to particle",1);
     Update_Plasticity_And_Hardening();
 
     if(example.end_time_step) example.end_time_step(example.time);
@@ -150,7 +145,7 @@ Simulate_To_Frame(const int frame)
         LOG::SCOPE scope("FRAME","frame %d",current_frame+1);
         if(example.begin_frame) example.begin_frame(current_frame);
         if(example.substeps_delay_frame==current_frame)
-            DEBUG_SUBSTEPS::Set_Write_Substeps_Level(example.write_substeps_level);
+            DEBUG_SUBSTEPS::write_substeps_level=example.write_substeps_level;
         T time_at_frame=example.time+example.frame_dt;
         bool done=false;
         for(int substep=0;!done;substep++){
@@ -174,14 +169,13 @@ Simulate_To_Frame(const int frame)
 // Function Write_Substep
 //#####################################################################
 template<class TV> void MPM_DRIVER<TV>::
-Write_Substep(const std::string& title,const int substep,const int level)
+Write_Substep(const std::string& title)
 {
-    if(level<=example.write_substeps_level){
-        example.frame_title=title;
-        LOG::printf("Writing substep [%s]: output_number=%i, time=%g, frame=%i, substep=%i\n",
-            example.frame_title,output_number+1,example.time,current_frame,substep);
-        Write_Output_Files(++output_number);
-        example.frame_title="";}
+    example.frame_title=title;
+    LOG::printf("Writing substep [%s]: output_number=%i, time=%g, frame=%i\n",
+        example.frame_title,output_number+1,example.time,current_frame);
+    Write_Output_Files(++output_number);
+    example.frame_title="";
 }
 //#####################################################################
 // Write_Output_Files

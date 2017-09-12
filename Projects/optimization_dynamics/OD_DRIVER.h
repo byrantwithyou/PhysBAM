@@ -30,7 +30,7 @@ public:
     void Advance_One_Time_Step();
     void Simulate_To_Frame(const int frame_input);
     void Write_Output_Files(const int frame);
-    void Write_Substep(const std::string& title,const int substep,const int level=0);
+    void Write_Substep(const std::string& title);
     void Apply_External_Forces();
 //#####################################################################
 };

@@ -72,7 +72,8 @@ Simulate_To_Frame(const int frame_input)
         Advance_To_Target_Time(example.Time_At_Frame(current_frame+1));
         Postprocess_Frame(++current_frame);
         if(example.write_output_files && example.write_substeps_level==-1) Write_Output_Files(current_frame);
-        else if(example.write_substeps_level!=-1) Write_Substep(LOG::sprintf("END Frame %d",current_frame),0,example.write_substeps_level);
+        else if(example.write_substeps_level!=-1)
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("END Frame %d",example.write_substeps_level,current_frame);
         LOG::cout<<"TIME = "<<time<<std::endl;}
 }
 //#####################################################################
@@ -128,7 +129,7 @@ Rigid_Cluster_Fracture(const T dt_full_advance,const T dt_cfl,const int substep)
         // TODO update example.fluids_parameters.collision_bodies_affecting_fluid for Deactivate_And_Return_Clusters
         rigid_bindings.Deactivate_And_Return_Clusters(active_clusters);
         example.solid_body_collection.Update_Simulated_Particles();
-        Write_Substep("Before declustered evolution",substep,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("Before declustered evolution",1);
 
         rigid_bindings.callbacks->Pre_Advance_Unclustered(dt,time);
         example.solids_evolution->kinematic_evolution.Set_External_Positions(example.solid_body_collection.rigid_body_collection.rigid_body_particles.frame,time);
@@ -138,11 +139,11 @@ Rigid_Cluster_Fracture(const T dt_full_advance,const T dt_cfl,const int substep)
         rigid_bindings.callbacks->Post_Advance_Unclustered(dt,time);
         rigid_bindings.callbacks->Compute_New_Clusters_Based_On_Unclustered_Strain();
 
-        Write_Substep("After declustered evolution",substep,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("After declustered evolution",1);
         NEWMARK_EVOLUTION<TV>& newmark_evolution=dynamic_cast<NEWMARK_EVOLUTION<TV>&>(*example.solids_evolution);
         example.solids_evolution->Restore_Position_After_Hypothetical_Position_Evolution(newmark_evolution.X_save,newmark_evolution.rigid_frame_save);
         rigid_bindings.Reactivate_Bindings(active_clusters);
-        Write_Substep("After restore",substep,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("After restore",1);
 
         rigid_bindings.callbacks->Create_New_Clusters();
         example.solid_body_collection.Update_Simulated_Particles();
@@ -169,17 +170,17 @@ Advance_To_Target_Time(const T target_time)
 
         example.Preprocess_Substep(dt,time);
 
-        Write_Substep("solid position update",substep,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("solid position update",1);
         Solid_Position_Update(dt,substep);/*S1*/
 
-        Write_Substep("solid velocity update",substep,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("solid velocity update",1);
         Solid_Velocity_Update(dt,substep,done);/*S2*/
 
         example.Postprocess_Substep(dt,time);
 
         last_dt=restart_dt?restart_dt:dt;time+=last_dt;restart_dt=0;
 
-        Write_Substep(LOG::sprintf("END Substep %d",substep),substep,0);}
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("END Substep %d",0,substep);}
 }
 //#####################################################################
 // Function Setup_Solids
@@ -233,7 +234,7 @@ Solid_Position_Update(const T dt,const int substep)
         solids_evolution.Adjust_Velocity_For_Self_Repulsion_And_Self_Collisions(dt,time,repulsions,collisions_found,false);
         solids_parameters.triangle_collision_parameters.steps_since_self_collision_free=0;}
     // Exchange solid positions back to fluid nodes so that they can figure out effective velocity and do collidable advection
-    Write_Substep("solid position updated",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("solid position updated",1);
 }
 //#####################################################################
 // Function Solid_Velocity_Update

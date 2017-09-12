@@ -97,19 +97,19 @@ Advance_To_Target_Time(const T target_time)
         example.Advance_Kinematic_Collision_Bodies(dt,time);
         Restore_Solids_To_Time_N(time+dt);
 
-        Write_Substep("object compatibility",substep,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("object compatibility",1);
         if(example.solid_affects_fluid) example.euler_solid_fluid_coupling_utilities.Fill_Solid_Cells();
-        Write_Substep("advect fluid",substep,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("advect fluid",1);
         Advect_Fluid(dt,substep);
 
         Restore_Solids_To_Time_N_Plus_One();
 
-        Write_Substep("project fluid at end of substep",substep,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("project fluid at end of substep",1);
         Advance_Fluid_One_Time_Step_Implicit_Part(dt,time,substep);
 
         time+=dt;
 
-        Write_Substep(LOG::sprintf("END Substep %d",substep),substep,0);}
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("END Substep %d",0,substep);}
 }
 //#####################################################################
 // Setup_Fluids
@@ -155,7 +155,7 @@ Advect_Fluid(const T dt,const int substep)
     SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<TV>& euler_solid_fluid_coupling_utilities=example.euler_solid_fluid_coupling_utilities;
     COMPRESSIBLE_FLUID_COLLECTION<TV>& compressible_fluid_collection=example.compressible_fluid_collection;
 
-    Write_Substep("before compressible explicit solve",substep,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("before compressible explicit solve",1);
     if(euler_solid_fluid_coupling_utilities.thinshell){
         euler_solid_fluid_coupling_utilities.uncovered_cells.Fill(false);
         for(CELL_ITERATOR<TV> iterator(euler.grid);iterator.Valid();iterator.Next())
@@ -186,7 +186,7 @@ Advect_Fluid(const T dt,const int substep)
         if(rk_substep!=rungekutta_u.order) euler.Clamp_Internal_Energy(dt,rungekutta_u.time);}
     if(euler.timesplit && !euler.perform_rungekutta_for_implicit_part) euler.Get_Dirichlet_Boundary_Conditions(dt,time);
     LOG::Stop_Time();
-    Write_Substep("after compressible explicit solve",substep,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after compressible explicit solve",1);
 }
 //#####################################################################
 // Advance_Fluid_One_Time_Step_Implicit_Part
@@ -203,7 +203,7 @@ Advance_Fluid_One_Time_Step_Implicit_Part(const T dt_projection,const T time_pro
         euler.Advance_One_Time_Step_Implicit_Part(dt_projection,time_projection);
         example.Apply_Isobaric_Fix(dt_projection,time_projection);
         euler.Remove_Added_Internal_Energy(dt_projection,time_projection);
-        Write_Substep("after compressible implicit solve",substep,1);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("after compressible implicit solve",1);
         LOG::Stop_Time();}
 }
 //#####################################################################

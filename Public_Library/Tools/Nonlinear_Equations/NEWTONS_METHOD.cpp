@@ -45,10 +45,8 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
         T norm_grad=sys.Convergence_Norm(grad);
         if(debug) LOG::printf("GRAD STATS %.16g %.16g %.16g %.16g\n", E, (E-last_E), norm_grad, tolerance);
 
-        if(debug){
-            char buff[1000];
-            sprintf(buff,"newton %d   %.16g %.16g %.16g %.16g", iterations_used, E, (E-last_E), norm_grad, tolerance);
-            PHYSBAM_DEBUG_WRITE_SUBSTEP(buff,1,1);}
+        if(debug)
+             PHYSBAM_DEBUG_WRITE_SUBSTEP("newton %d   %.16g %.16g %.16g %.16g",1,iterations_used,E,(E-last_E),norm_grad,tolerance);
         
         if(norm_grad<tolerance && (iterations_used || !require_one_iteration || !norm_grad)){result=true;break;}
         if(norm_grad<countdown_tolerance){

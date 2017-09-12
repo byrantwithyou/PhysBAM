@@ -127,7 +127,7 @@ Initialize_Bodies()
             else beta_face(axis,face_index)=volume_fraction;}
     }
 
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("After calling Initialize Bodies",0,0);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("After calling Initialize Bodies",0);
 }
 //#####################################################################
 // Function Get_Divergence

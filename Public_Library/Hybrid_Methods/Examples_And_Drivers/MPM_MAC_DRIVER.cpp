@@ -39,12 +39,6 @@
 #include <omp.h>
 #endif
 using namespace PhysBAM;
-namespace{
-    template<class TV> void Write_Substep_Helper(void* writer,const std::string& title,int substep,int level)
-    {
-        ((MPM_MAC_DRIVER<TV>*)writer)->Write_Substep(title,substep,level);
-    }
-};
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -52,7 +46,8 @@ template<class TV> MPM_MAC_DRIVER<TV>::
 MPM_MAC_DRIVER(MPM_MAC_EXAMPLE<TV>& example)
     :example(example)
 {
-    DEBUG_SUBSTEPS::Set_Substep_Writer((void*)this,&Write_Substep_Helper<TV>);
+    DEBUG_SUBSTEPS::write_substeps_level=example.write_substeps_level;
+    DEBUG_SUBSTEPS::writer=[=](const std::string& title){Write_Substep(title);};
 }
 //#####################################################################
 // Destructor
@@ -60,7 +55,7 @@ MPM_MAC_DRIVER(MPM_MAC_EXAMPLE<TV>& example)
 template<class TV> MPM_MAC_DRIVER<TV>::
 ~MPM_MAC_DRIVER()
 {
-    DEBUG_SUBSTEPS::Clear_Substep_Writer((void*)this);
+    DEBUG_SUBSTEPS::writer=0;
 }
 //#####################################################################
 // Execute_Main_Program
@@ -83,7 +78,7 @@ Initialize()
 {
     TIMER_SCOPE_FUNC;
     LOG::cout<<std::setprecision(16);
-    DEBUG_SUBSTEPS::Set_Write_Substeps_Level(example.substeps_delay_frame<0?example.write_substeps_level:-1);
+    DEBUG_SUBSTEPS::write_substeps_level=example.substeps_delay_frame<0?example.write_substeps_level:-1;
 
     // setup time
     output_number=current_frame=example.restart;
@@ -166,7 +161,7 @@ Simulate_To_Frame(const int frame)
         for(int i=0;i<example.begin_frame.m;i++)
             example.begin_frame(i)(current_frame);
         if(example.substeps_delay_frame==current_frame)
-            DEBUG_SUBSTEPS::Set_Write_Substeps_Level(example.write_substeps_level);
+            DEBUG_SUBSTEPS::write_substeps_level=example.write_substeps_level;
         T time_at_frame=example.time+example.frame_dt;
         bool done=false;
         for(int substep=0;!done;substep++){
@@ -192,15 +187,14 @@ Simulate_To_Frame(const int frame)
 // Function Write_Substep
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Write_Substep(const std::string& title,const int substep,const int level)
+Write_Substep(const std::string& title)
 {
     TIMER_SCOPE_FUNC;
-    if(level<=example.write_substeps_level){
-        example.frame_title=title;
-        LOG::printf("Writing substep [%s]: output_number=%i, time=%g, frame=%i, substep=%i\n",
-            example.frame_title,output_number+1,example.time,current_frame,substep);
-        Write_Output_Files(++output_number);
-        example.frame_title="";}
+    example.frame_title=title;
+    LOG::printf("Writing substep [%s]: output_number=%i, time=%g, frame=%i\n",
+        example.frame_title,output_number+1,example.time,current_frame);
+    Write_Output_Files(++output_number);
+    example.frame_title="";
 }
 //#####################################################################
 // Write_Output_Files
@@ -640,7 +634,7 @@ Move_Mass_Momentum_Inside(PHASE& ph) const
                     ph.velocity(face)+=weights(j)*momentum;
                     if(example.use_particle_volumes)
                         ph.volume(face)+=weights(j)*volume;}}
-            PHYSBAM_DEBUG_WRITE_SUBSTEP("faces mass moved to",0,1);
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("faces mass moved to",1);
             // clear mass,momentum outside
             ph.mass(fit.Full_Index())=0;
             ph.velocity(fit.Full_Index())=0;
@@ -656,11 +650,11 @@ Move_Mass_Momentum_Inside_Nearest(PHASE& ph) const
 {
     INTERPOLATED_COLOR_MAP<T> color_map;
     color_map.Initialize_Colors(0,ph.mass.array.Max(),false,true,false);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("purge",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("purge",1);
     for(FACE_ITERATOR<TV> it(example.grid,2);it.Valid();it.Next())
         if(ph.mass(it.Full_Index()))
             Add_Debug_Particle(it.Location(),color_map(ph.mass(it.Full_Index())));
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("masses before ",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("masses before ",1);
 
     for(FACE_ITERATOR<TV> fit(example.grid,2);fit.Valid();fit.Next()){
         TV loc=fit.Location();
@@ -694,11 +688,11 @@ Move_Mass_Momentum_Inside_Nearest(PHASE& ph) const
                 ph.volume(fit.Full_Index())=0;}
             break;}}
 
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("purge",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("purge",1);
     for(FACE_ITERATOR<TV> it(example.grid,2);it.Valid();it.Next())
         if(ph.mass(it.Full_Index()))
             Add_Debug_Particle(it.Location(),color_map(ph.mass(it.Full_Index())));
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("masses after",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("masses after",1);
 }
 //#####################################################################
 // Function Face_Fraction
@@ -1433,7 +1427,7 @@ Step(std::function<void()> func,const char* name,bool dump_substep,bool do_step)
     // Note: p may be invalidated by func(), so we must re-access it here.
     const auto& q=example.time_step_callbacks.Get_Or_Insert(name);
     for(int i=0;i<q.y(0).m;i++) q.y(0)(i)();
-    if(dump_substep) PHYSBAM_DEBUG_WRITE_SUBSTEP(name,0,1);
+    if(dump_substep) PHYSBAM_DEBUG_WRITE_SUBSTEP(name,1);
 }
 //#####################################################################
 // Function Invalidate_Particle

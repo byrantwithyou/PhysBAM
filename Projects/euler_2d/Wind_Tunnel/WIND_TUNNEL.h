@@ -322,7 +322,7 @@ void Woodward_Collela_Fix(bool fix_entropy,bool fix_enthalpy)
         euler.Set_Euler_State_From_rho_velocity_And_internal_energy(euler.U,cell_index,rho_b,sqrt(alpha)*q_b,P_b/(rho_b*(gamma-(T)1)));
         assert(euler.p(euler.eos,euler.U(cell_index))>0);}
 
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after applying woodward & colella isobaric fix",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after applying woodward & colella isobaric fix",1);
 }
 void Fedkiw_Isobaric_Fix(bool fix_only_6_cells)
 {
@@ -365,11 +365,11 @@ void Fedkiw_Isobaric_Fix(bool fix_only_6_cells)
             euler.Set_Euler_State_From_rho_velocity_And_internal_energy(euler.U,cell_index,new_rho,euler.Get_Velocity(euler.U(cell_index)),
                 euler.p(euler.eos,euler.U(cell_index))/(new_rho*(gamma-1)));
             break;}}
-     PHYSBAM_DEBUG_WRITE_SUBSTEP("after applying isobaric fix",0,1);
+     PHYSBAM_DEBUG_WRITE_SUBSTEP("after applying isobaric fix",1);
 }
 void Apply_Isobaric_Fix(const T dt,const T time) override
 {
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("before applying isobaric fix",0,1);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("before applying isobaric fix",1);
     if(test_number==1){
         Fedkiw_Isobaric_Fix(isobaric_fix_only_6_cells);
         Woodward_Collela_Fix(woodward_fix_entropy,woodward_fix_enthalpy);}
