@@ -1228,7 +1228,7 @@ Extrapolate_Velocity(PHASE_ID pid) const
         if(bc_type==example.BC_PERIODIC) continue;
         int side_axis=it.side/2;
         bool normal=side_axis==it.face.axis;
-        bool has_bc=(bc_type==example.BC_SLIP && normal)||example.BC_NOSLIP;
+        bool has_bc=(bc_type==example.BC_SLIP && normal)||(bc_type==example.BC_NOSLIP);
         bool is_normal_bc=(bc_type==example.BC_SLIP||bc_type==example.BC_NOSLIP)&&normal;
         char extrap_type=example.extrap_type;
         TV_INT corner=it.side%2?domain.max_corner:domain.min_corner;
@@ -1241,7 +1241,9 @@ Extrapolate_Velocity(PHASE_ID pid) const
                 if(extrap_type=='c') extrap_type='C';
                 else if(extrap_type=='l') extrap_type='L';}}
         int sign_out=it.side%2?1:-1;
-        auto bc=example.bc_velocity(it.side);
+        auto bc=[this,it](const TV& X,int axis,PHASE_ID p,T t){
+            if(example.bc_velocity(it.side)) return example.bc_velocity(it.side)(X,axis,p,t);
+            else return (T)0;};
         auto further=[=](FACE_INDEX<TV::m> f){f.index(side_axis)-=sign_out;return f;};
         FACE_INDEX<TV::m> nearest_face[2]={it.face,it.face};
         nearest_face[0].index(side_axis)=nearest_face[1].index(side_axis)=corner(side_axis);
