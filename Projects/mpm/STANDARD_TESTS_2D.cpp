@@ -28,6 +28,7 @@
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
+#include <Deformables/Constitutive_Models/QUASI_INCOMPRESSIBLE_FORCE.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
 #include <Deformables/Forces/SURFACE_TENSION_FORCE.h>
@@ -35,6 +36,7 @@
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/MPM_DRUCKER_PRAGER.h>
+#include <Hybrid_Methods/Forces/MPM_FINITE_ELEMENTS.h>
 #include <Hybrid_Methods/Forces/MPM_GRAVITY.h>
 #include <Hybrid_Methods/Forces/MPM_OLDROYD_FINITE_ELEMENTS.h>
 #include <Hybrid_Methods/Forces/MPM_VISCOSITY.h>
@@ -1467,6 +1469,16 @@ Initialize()
 
             for(int i=0;i<this->deformable_body_collection.structures.m;i++)
                 this->deformable_body_collection.structures(i)->Update_Number_Nodes();
+        } break;
+        case 71:{ // (fluid test) dam break; Rabecca Brannon test
+            Set_Grid(RANGE<TV>(TV(),TV(1,2))*m,TV_INT(1,2),100);
+            RANGE<TV> box(TV(.6,0)*m,TV(1,.4)*m);
+            T density=1000*unit_rho;
+            Seed_Particles(box,0,0,density,particles_per_cell);
+            T stiffness=15e3*unit_p,gamma=7;
+            QUASI_INCOMPRESSIBLE_FORCE<TV>* quasi=new QUASI_INCOMPRESSIBLE_FORCE<TV>(stiffness,gamma);
+            Add_Force(*new MPM_FINITE_ELEMENTS<TV>(force_helper,*quasi,gather_scatter,0));
+            Add_Gravity(m/(s*s)*TV(0,-9.81));
         } break;
 
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
