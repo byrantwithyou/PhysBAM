@@ -31,42 +31,14 @@ Times(const MATRIX<T,TV::m>& M) const -> MATRIX<T,TV::m>
     return A;
 }
 //#####################################################################
-// Function Set_Helper
-//#####################################################################
-template<class T> void
-Set_Helper(VECTOR<T,0>& sum,VECTOR<T,0>& diff,const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,1>& dPi_dF)
-{
-}
-//#####################################################################
-// Function Set_Helper
-//#####################################################################
-template<class T> void
-Set_Helper(VECTOR<T,1>& sum,VECTOR<T,1>& diff,const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dPi_dF)
-{
-    diff(0)=dPi_dF.x1010+dPi_dF.x1001;
-    sum(0)=dPi_dF.x1010-dPi_dF.x1001;
-}
-//#####################################################################
-// Function Set_Helper
-//#####################################################################
-template<class T> void
-Set_Helper(VECTOR<T,3>& sum,VECTOR<T,3>& diff,const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF)
-{
-    diff(2)=dPi_dF.x1010+dPi_dF.x1001;
-    diff(1)=dPi_dF.x2020+dPi_dF.x2002;
-    diff(0)=dPi_dF.x2121+dPi_dF.x2112;
-    sum(2)=dPi_dF.x1010-dPi_dF.x1001;
-    sum(1)=dPi_dF.x2020-dPi_dF.x2002;
-    sum(0)=dPi_dF.x2121-dPi_dF.x2112;
-}
-//#####################################################################
 // Function Set
 //#####################################################################
 template<class TV> void MPM_PLASTIC_FINITE_ELEMENTS<TV>::HESSIAN_HELPER::
-Set(const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,TV::m>& dPi_dF)
+Set(const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dPi_dF)
 {
-    diag=dPi_dF.Get_Hessian_Block();
-    Set_Helper(off_diag_sum,off_diag_diff,dPi_dF);
+    diag=dPi_dF.H;
+    off_diag_diff=dPi_dF.B+dPi_dF.C;
+    off_diag_sum=dPi_dF.B-dPi_dF.C;
 }
 //#####################################################################
 // Constructor
@@ -131,7 +103,7 @@ Precompute(const T time,const T dt,bool want_dE,bool want_ddE)
             PFT(p)=U(p)*P_hat.Times_Transpose(FV(p));
 
             if(want_ddE){
-                DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,TV::m> dPi_dF;
+                DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV> dPi_dF;
                 constitutive_model.Isotropic_Stress_Derivative(new_sigma,dPi_dF,p);
                 HESSIAN_HELPER& hh=hessian_helper(p);
                 hh.Set(dPi_dF);

@@ -56,7 +56,7 @@ P_From_Strain_Rate(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& F_dot,const 
 // Function Isotropic_Stress_Derivative
 //#####################################################################
 template<class T> void MOONEY_RIVLIN_3D2<T>::
-Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,const int id) const
+Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<VECTOR<T,3> >& dPi_dF,const int id) const
 {
     DIAGONAL_MATRIX<T,3> F_threshold=F.Clamp_Min(failure_threshold),C=F_threshold*F_threshold,F_cube=C*F_threshold,F_inverse=F_threshold.Inverse();
     T I_C=C.Trace(),II_C=(C*C).Trace(),J=F_threshold.Determinant(),Jcc=pow(J,-((T)2/3));
@@ -77,10 +77,10 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC
     eta.x22=Jcc*((T)1/9)*(4*mu_10*I_C+Jcc*8*mu_01*(I_C*I_C-II_C))+kappa;
     MATRIX<T,3> F_base(F_threshold.x,F_cube.x,F_inverse.x);
     SYMMETRIC_MATRIX<T,3> gamma=SYMMETRIC_MATRIX<T,3>::Conjugate(F_base,eta);
-    dPi_dF.x0000=alpha.x00+beta.x00+gamma.x00;dPi_dF.x1111=alpha.x11+beta.x11+gamma.x11;dPi_dF.x2222=alpha.x22+beta.x22+gamma.x22;
-    dPi_dF.x1100=gamma.x10;dPi_dF.x2200=gamma.x20;dPi_dF.x2211=gamma.x21;
-    dPi_dF.x1010=alpha.x10;dPi_dF.x2020=alpha.x20;dPi_dF.x2121=alpha.x21;
-    dPi_dF.x1001=beta.x10;dPi_dF.x2002=beta.x20;dPi_dF.x2112=beta.x20;
+    dPi_dF.H(0,0)=alpha.x00+beta.x00+gamma.x00;dPi_dF.H(1,1)=alpha.x11+beta.x11+gamma.x11;dPi_dF.H(2,2)=alpha.x22+beta.x22+gamma.x22;
+    dPi_dF.H(1,0)=gamma.x10;dPi_dF.H(2,0)=gamma.x20;dPi_dF.H(2,1)=gamma.x21;
+    dPi_dF.B(2)=alpha.x10;dPi_dF.B(1)=alpha.x20;dPi_dF.B(0)=alpha.x21;
+    dPi_dF.C(2)=beta.x10;dPi_dF.C(1)=beta.x20;dPi_dF.C(0)=beta.x20;
     if(enforce_definiteness) dPi_dF.Enforce_Definiteness();
 }
 template class MOONEY_RIVLIN_3D2<float>;

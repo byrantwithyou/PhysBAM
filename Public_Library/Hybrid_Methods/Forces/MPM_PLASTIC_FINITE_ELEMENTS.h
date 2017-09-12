@@ -38,7 +38,7 @@ public:
         typename TV::SPIN off_diag_sum,off_diag_diff;
 
         MATRIX<T,TV::m> Times(const MATRIX<T,TV::m>& M) const;
-        void Set(const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,TV::m>& dPi_dF);
+        void Set(const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dPi_dF);
     };
 
     ARRAY<HESSIAN_HELPER> hessian_helper;

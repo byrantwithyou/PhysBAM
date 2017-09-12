@@ -46,7 +46,7 @@ Maximum_Damping_Stiffness(const int id) const // for damping CFL computation
 // Function Isotropic_Stress_Derivative
 //#####################################################################
 template<class T,int d> void CONSTITUTIVE_MODEL<T,d>::
-Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dPi_dF,const int id) const
+Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dPi_dF,const int id) const
 {
     PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }

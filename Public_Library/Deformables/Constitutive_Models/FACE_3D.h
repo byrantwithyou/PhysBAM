@@ -130,7 +130,7 @@ public:
         return 2*id_beta*strain_rate+id_alpha*strain_rate.Trace();
     }
 
-    void Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,const int tetrahedron_index=0) const override
+    void Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<VECTOR<T,3> >& dPi_dF,const int tetrahedron_index=0) const override
     {T mu_10=(tet_mu_10)?(*tet_mu_10)(tetrahedron_index):constant_mu_10,mu_01=(tet_mu_01)?(*tet_mu_01)(tetrahedron_index):constant_mu_01,kappa=(tet_kappa)?(*tet_kappa)(tetrahedron_index):constant_kappa;
     DIAGONAL_MATRIX<T,3> F_threshold=F.Max(failure_threshold),C=F_threshold*F_threshold,F_cube=C*F_threshold,F_inverse=F_threshold.Inverse();
     T I_C=C.Trace(),II_C=(C*C).Trace(),J=F_threshold.Determinant(),Jcc=pow(J,-((T)2/3));
@@ -151,16 +151,16 @@ public:
     eta.x22=Jcc*((T)1/9)*(4*mu_10*I_C+Jcc*8*mu_01*(I_C*I_C-II_C))+kappa;
     MATRIX<T,3> F_base(F_threshold.x.x,F_threshold.x.y,F_threshold.x.z,F_cube.x00,F_cube.x11,F_cube.x22,F_inverse.x00,F_inverse.x11,F_inverse.x22);
     SYMMETRIC_MATRIX<T,3> gamma=SYMMETRIC_MATRIX<T,3>::Conjugate(F_base,eta);
-    dPi_dF.x0000=alpha.x00+beta.x00+gamma.x00;dPi_dF.x1111=alpha.x11+beta.x11+gamma.x11;dPi_dF.x2222=alpha.x22+beta.x22+gamma.x22;
-    dPi_dF.x1100=gamma.x10;dPi_dF.x2200=gamma.x20;dPi_dF.x2211=gamma.x21;
-    dPi_dF.x1010=alpha.x10;dPi_dF.x2020=alpha.x20;dPi_dF.x2121=alpha.x21;
-    dPi_dF.x1001=beta.x10;dPi_dF.x2002=beta.x20;dPi_dF.x2112=beta.x20;
+    dPi_dF.H(0,0)=alpha.x00+beta.x00+gamma.x00;dPi_dF.H(1,1)=alpha.x11+beta.x11+gamma.x11;dPi_dF.H(2,2)=alpha.x22+beta.x22+gamma.x22;
+    dPi_dF.H(1,0)=gamma.x10;dPi_dF.H(2,0)=gamma.x20;dPi_dF.H(2,1)=gamma.x21;
+    dPi_dF.B(2)=alpha.x10;dPi_dF.B(1)=alpha.x20;dPi_dF.B(0)=alpha.x21;
+    dPi_dF.C(2)=beta.x10;dPi_dF.C(1)=beta.x20;dPi_dF.C(0)=beta.x20;
     if(enforce_definiteness) dPi_dF.Enforce_Definiteness();}
 
     void Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,DIAGONALIZED_STRESS_DERIVATIVE<T,3>& dP_dF,const int id) const override
     {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 
-    MATRIX<T,3> dP_From_dF(const MATRIX<T,3>& dF,const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,const int tetrahedron_index) const
+    MATRIX<T,3> dP_From_dF(const MATRIX<T,3>& dF,const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<VECTOR<T,3> >& dPi_dF,const int tetrahedron_index) const
     {MATRIX<T,3> dP=dPi_dF.Differential(dF);
     DIAGONAL_MATRIX<T,3> F_threshold=F.Max(failure_threshold);
     for(int m=0;m<tet_muscles(tetrahedron_index).m;m++){

@@ -30,7 +30,7 @@ public:
     bool affect_all;
     GATHER_SCATTER<TV>& gather_scatter;
     mutable ARRAY<MATRIX<T,TV::m> > tmp;
-    ARRAY<DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,TV::m> > dPi_dF;
+    ARRAY<DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV> > dPi_dF;
 
     MPM_FINITE_ELEMENTS(const MPM_FORCE_HELPER<TV>& force_helper,
         ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model,

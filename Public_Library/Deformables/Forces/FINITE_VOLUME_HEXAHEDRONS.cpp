@@ -61,7 +61,7 @@ template<class T> void FINITE_VOLUME_HEXAHEDRONS<T>::
 Save_Stress_Derivative()
 {
     if(isotropic_model || anisotropic_model->use_isotropic_component_of_stress_derivative_only){
-        if(!dPi_dFe) dPi_dFe=new ARRAY<VECTOR<DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>,8> >();
+        if(!dPi_dFe) dPi_dFe=new ARRAY<VECTOR<DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<VECTOR<T,3> >,8> >();
         delete dP_dFe;
         dP_dFe=0;}
     else{

@@ -12,7 +12,7 @@
 #include <Deformables/Constitutive_Models/CONSTITUTIVE_MODELS_FORWARD.h>
 namespace PhysBAM{
 
-template<class T,int d> class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE;
+template<class TV> class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE;
 template<class T,int d>
 class CONSTITUTIVE_MODEL
 {
@@ -46,7 +46,7 @@ public:
 
 //#####################################################################
     virtual MATRIX<T,d> P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const int id) const=0;
-    virtual void Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dPi_dF,const int id) const;
+    virtual void Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dPi_dF,const int id) const;
     virtual int P_From_Strain_Rate_Forces_Size() const;
     virtual void P_From_Strain_Rate_First_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<T> aggregate,const MATRIX<T,d>& F_dot,const int id) const;
     virtual MATRIX<T,d> P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,const ARRAY_VIEW<const T> aggregate,const int id) const;

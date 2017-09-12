@@ -17,7 +17,7 @@ template<class T,int d> class ISOTROPIC_CONSTITUTIVE_MODEL;
 template<class T,int d> class ANISOTROPIC_CONSTITUTIVE_MODEL;
 template<class T,int d> class PLASTICITY_MODEL;
 template<class T,int d> class DIAGONALIZED_STRESS_DERIVATIVE;
-template<class T,int d> class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE;
+template<class TV> class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE;
 
 }
 #endif

@@ -10,18 +10,19 @@
 #include <Deformables/Constitutive_Models/CONSTITUTIVE_MODEL.h>
 namespace PhysBAM{
 
-template<class T,int d> class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE;
+template<class TV> class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE;
 
 template<class T,int d>
 class ISOTROPIC_CONSTITUTIVE_MODEL:public CONSTITUTIVE_MODEL<T,d>
 {
+    typedef VECTOR<T,d> TV;
 public:
     using CONSTITUTIVE_MODEL<T,d>::Isotropic_Stress_Derivative;
     ISOTROPIC_CONSTITUTIVE_MODEL();
     virtual ~ISOTROPIC_CONSTITUTIVE_MODEL();
 
 //#####################################################################
-    MATRIX<T,d> dP_From_dF(const MATRIX<T,d>& dF,const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dPi_dF,const int id) const;
+    MATRIX<T,d> dP_From_dF(const MATRIX<T,d>& dF,const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dPi_dF,const int id) const;
     virtual DIAGONAL_MATRIX<T,d> P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const int id) const=0;
     virtual void Update_State_Dependent_Auxiliary_Variables(const DIAGONAL_MATRIX<T,d>& F,const int id);
     virtual T Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int id) const=0;

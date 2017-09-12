@@ -13,6 +13,7 @@ namespace PhysBAM{
 template<class T,int d>
 class ANISOTROPIC_CONSTITUTIVE_MODEL:public CONSTITUTIVE_MODEL<T,d>
 {
+    typedef VECTOR<T,d> TV;
 public:
     bool use_isotropic_component_of_stress_derivative_only;
 
@@ -20,7 +21,7 @@ public:
     virtual ~ANISOTROPIC_CONSTITUTIVE_MODEL();
 
 //#####################################################################
-    virtual MATRIX<T,d> dP_From_dF(const MATRIX<T,d>& dF,const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& V,const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dPi_dF,
+    virtual MATRIX<T,d> dP_From_dF(const MATRIX<T,d>& dF,const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& V,const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dPi_dF,
         const int id) const;
     virtual MATRIX<T,d> dP_From_dF(const MATRIX<T,d>& dF,const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& V,const DIAGONALIZED_STRESS_DERIVATIVE<T,d>& dP_dF,
         const int id) const;

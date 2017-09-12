@@ -93,7 +93,7 @@ template<class TV,int d> void FINITE_VOLUME<TV,d>::
 Save_Stress_Derivative()
 {
     if(isotropic_model || anisotropic_model->use_isotropic_component_of_stress_derivative_only){
-        if(!dPi_dFe) dPi_dFe=new ARRAY<DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d> >();
+        if(!dPi_dFe) dPi_dFe=new ARRAY<DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<VECTOR<T,d> > >();
         delete dP_dFe;
         dP_dFe=0;}
     else{

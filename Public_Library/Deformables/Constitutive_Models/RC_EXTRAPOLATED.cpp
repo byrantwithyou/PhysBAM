@@ -87,7 +87,7 @@ P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const int id) const
 // Function Isotropic_Stress_Derivative_Helper
 //#####################################################################
 template<class T> static void
-Isotropic_Stress_Derivative_Helper(const RC_EXTRAPOLATED<T,2>& re,const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int id)
+Isotropic_Stress_Derivative_Helper(const RC_EXTRAPOLATED<T,2>& re,const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<VECTOR<T,2> >& dP_dF,const int id)
 {
     T J=F.To_Vector().Product();
     if(J<re.extrapolation_cutoff){
@@ -96,29 +96,29 @@ Isotropic_Stress_Derivative_Helper(const RC_EXTRAPOLATED<T,2>& re,const DIAGONAL
         if(b){
             helper.Compute_dE(re.base,re.extra_force_coefficient*re.youngs_modulus,F.To_Vector(),id);
             helper.Compute_ddE(re.base,re.extra_force_coefficient*re.youngs_modulus,F.To_Vector(),id);
-            dP_dF.x0000=helper.ddE.x00;
-            dP_dF.x1100=helper.ddE.x10;
-            dP_dF.x1111=helper.ddE.x11;
+            dP_dF.H(0,0)=helper.ddE.x00;
+            dP_dF.H(1,0)=helper.ddE.x10;
+            dP_dF.H(1,1)=helper.ddE.x11;
             T ss1=sqr(F.x.x),ss2=sqr(F.x.y);
             T s01=ss1-ss2;
             if(fabs(s01)<re.panic_threshold) s01=s01<0?-re.panic_threshold:re.panic_threshold;
-            dP_dF.x1001=(-helper.dE.y*F.x.x+helper.dE.x*F.x.y)/s01;
-            dP_dF.x1010=(-helper.dE.y*F.x.y+helper.dE.x*F.x.x)/s01;
+            dP_dF.C(0)=(-helper.dE.y*F.x.x+helper.dE.x*F.x.y)/s01;
+            dP_dF.B(0)=(-helper.dE.y*F.x.y+helper.dE.x*F.x.x)/s01;
             return;}}
     T x = F.x.x, y = F.x.y, xpy = x+y;
-    dP_dF.x0000 = re.base.Exx(x,y,id);
-    dP_dF.x1100 = re.base.Exy(x,y,id);
-    dP_dF.x1111 = re.base.Eyy(x,y,id);
+    dP_dF.H(0,0) = re.base.Exx(x,y,id);
+    dP_dF.H(1,0) = re.base.Exy(x,y,id);
+    dP_dF.H(1,1) = re.base.Eyy(x,y,id);
     if(fabs(xpy)<re.panic_threshold) xpy=xpy<0?-re.panic_threshold:re.panic_threshold;
     T S=re.P_From_Strain(F,id).Trace()/xpy, D=re.base.Ex_Ey_x_y(x,y,id);
-    dP_dF.x1001 = (D-S)/2;
-    dP_dF.x1010 = (D+S)/2;
+    dP_dF.C(0) = (D-S)/2;
+    dP_dF.B(0) = (D+S)/2;
 }
 ///#####################################################################
 // Function Isotropic_Stress_Derivative_Helper
 //#####################################################################
 template<class T> static void
-Isotropic_Stress_Derivative_Helper(const RC_EXTRAPOLATED<T,3>& re,const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dP_dF,const int id)
+Isotropic_Stress_Derivative_Helper(const RC_EXTRAPOLATED<T,3>& re,const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<VECTOR<T,3> >& dP_dF,const int id)
 {
     T J=F.To_Vector().Product();
     if(J<re.extrapolation_cutoff){
@@ -127,50 +127,50 @@ Isotropic_Stress_Derivative_Helper(const RC_EXTRAPOLATED<T,3>& re,const DIAGONAL
         if(b){
             helper.Compute_dE(re.base,re.extra_force_coefficient*re.youngs_modulus,F.To_Vector(),id);
             helper.Compute_ddE(re.base,re.extra_force_coefficient*re.youngs_modulus,F.To_Vector(),id);
-            dP_dF.x0000=helper.ddE.x00;
-            dP_dF.x1111=helper.ddE.x11;
-            dP_dF.x2222=helper.ddE.x22;
-            dP_dF.x1100=helper.ddE.x10;
-            dP_dF.x2200=helper.ddE.x20;
-            dP_dF.x2211=helper.ddE.x21;
+            dP_dF.H(0,0)=helper.ddE.x00;
+            dP_dF.H(1,1)=helper.ddE.x11;
+            dP_dF.H(2,2)=helper.ddE.x22;
+            dP_dF.H(1,0)=helper.ddE.x10;
+            dP_dF.H(2,0)=helper.ddE.x20;
+            dP_dF.H(2,1)=helper.ddE.x21;
             T ss1=sqr(F.x.x),ss2=sqr(F.x.y),ss3=sqr(F.x.z);
             T s01=ss1-ss2,s02=ss1-ss3,s12=ss2-ss3;
             if(fabs(s01)<re.panic_threshold) s01=s01<0?-re.panic_threshold:re.panic_threshold;
             if(fabs(s02)<re.panic_threshold) s02=s02<0?-re.panic_threshold:re.panic_threshold;
             if(fabs(s12)<re.panic_threshold) s12=s12<0?-re.panic_threshold:re.panic_threshold;
-            dP_dF.x1001=(-helper.dE.y*F.x.x+helper.dE.x*F.x.y)/s01;
-            dP_dF.x1010=(-helper.dE.y*F.x.y+helper.dE.x*F.x.x)/s01;
-            dP_dF.x2002=(-helper.dE.z*F.x.x+helper.dE.x*F.x.z)/s02;
-            dP_dF.x2020=(-helper.dE.z*F.x.z+helper.dE.x*F.x.x)/s02;
-            dP_dF.x2112=(-helper.dE.z*F.x.y+helper.dE.y*F.x.z)/s12;
-            dP_dF.x2121=(-helper.dE.z*F.x.z+helper.dE.y*F.x.y)/s12;
+            dP_dF.C(2)=(-helper.dE.y*F.x.x+helper.dE.x*F.x.y)/s01;
+            dP_dF.B(2)=(-helper.dE.y*F.x.y+helper.dE.x*F.x.x)/s01;
+            dP_dF.C(1)=(-helper.dE.z*F.x.x+helper.dE.x*F.x.z)/s02;
+            dP_dF.B(1)=(-helper.dE.z*F.x.z+helper.dE.x*F.x.x)/s02;
+            dP_dF.C(0)=(-helper.dE.z*F.x.y+helper.dE.y*F.x.z)/s12;
+            dP_dF.B(0)=(-helper.dE.z*F.x.z+helper.dE.y*F.x.y)/s12;
             return;}}
     T x = F.x.x, y = F.x.y, z = F.x.z, xpy = x+y, xpz = x+z, ypz = y+z;
-    dP_dF.x0000 = re.base.Exx(x,y,z,id);
-    dP_dF.x1111 = re.base.Eyy(x,y,z,id);
-    dP_dF.x2222 = re.base.Ezz(x,y,z,id);
-    dP_dF.x1100 = re.base.Exy(x,y,z,id);
-    dP_dF.x2200 = re.base.Exz(x,y,z,id);
-    dP_dF.x2211 = re.base.Eyz(x,y,z,id);
+    dP_dF.H(0,0) = re.base.Exx(x,y,z,id);
+    dP_dF.H(1,1) = re.base.Eyy(x,y,z,id);
+    dP_dF.H(2,2) = re.base.Ezz(x,y,z,id);
+    dP_dF.H(1,0) = re.base.Exy(x,y,z,id);
+    dP_dF.H(2,0) = re.base.Exz(x,y,z,id);
+    dP_dF.H(2,1) = re.base.Eyz(x,y,z,id);
     if(fabs(xpy)<re.panic_threshold) xpy=xpy<0?-re.panic_threshold:re.panic_threshold;
     VECTOR<T,3> P=re.P_From_Strain(F,id).To_Vector();
     T S01=(P.x+P.y)/xpy, D01=re.base.Ex_Ey_x_y(x,y,z,id);
-    dP_dF.x1001 = (D01-S01)/2;
-    dP_dF.x1010 = (D01+S01)/2;
+    dP_dF.C(2) = (D01-S01)/2;
+    dP_dF.B(2) = (D01+S01)/2;
     if(fabs(xpz)<re.panic_threshold) xpz=xpz<0?-re.panic_threshold:re.panic_threshold;
     T S02=(P.x+P.z)/xpz, D02=re.base.Ex_Ez_x_z(x,y,z,id);
-    dP_dF.x2002 = (D02-S02)/2;
-    dP_dF.x2020 = (D02+S02)/2;
+    dP_dF.C(1) = (D02-S02)/2;
+    dP_dF.B(1) = (D02+S02)/2;
     if(fabs(ypz)<re.panic_threshold) ypz=ypz<0?-re.panic_threshold:re.panic_threshold;
     T S12=(P.y+P.z)/ypz, D12=re.base.Ey_Ez_y_z(x,y,z,id);
-    dP_dF.x2112 = (D12-S12)/2;
-    dP_dF.x2121 = (D12+S12)/2;
+    dP_dF.C(0) = (D12-S12)/2;
+    dP_dF.B(0) = (D12+S12)/2;
 }
 //#####################################################################
 // Function Isotropic_Stress_Derivative
 //#####################################################################
 template<class T,int d> void RC_EXTRAPOLATED<T,d>::
-Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dP_dF,const int id) const
+Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dP_dF,const int id) const
 {
     return Isotropic_Stress_Derivative_Helper(*this,F,dP_dF,id);
 }

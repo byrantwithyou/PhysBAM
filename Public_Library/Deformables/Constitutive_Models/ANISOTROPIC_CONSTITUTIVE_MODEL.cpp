@@ -14,7 +14,7 @@ template<class T,int d> ANISOTROPIC_CONSTITUTIVE_MODEL<T,d>::
 {
 }
 template<class T,int d> MATRIX<T,d> ANISOTROPIC_CONSTITUTIVE_MODEL<T,d>::
-dP_From_dF(const MATRIX<T,d>& dF,const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& V,const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dPi_dF,const int id) const
+dP_From_dF(const MATRIX<T,d>& dF,const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& V,const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dPi_dF,const int id) const
 {
     return dPi_dF.Differential(dF);
 }

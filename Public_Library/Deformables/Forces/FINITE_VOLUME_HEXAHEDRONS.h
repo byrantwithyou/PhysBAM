@@ -16,7 +16,7 @@ namespace PhysBAM{
 
 template<class T> class STRAIN_MEASURE_HEXAHEDRONS;
 template<class T, int d> class CONSTITUTIVE_MODEL;
-template<class T, int d> class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE;
+template<class TV> class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE;
 template<class T, int d> class DIAGONALIZED_STRESS_DERIVATIVE;
 template<class T, int d> class ISOTROPIC_CONSTITUTIVE_MODEL;
 template<class T, int d> class ANISOTROPIC_CONSTITUTIVE_MODEL;
@@ -38,7 +38,7 @@ public:
     ARRAY<VECTOR<MATRIX<T,3>,8> > U;
     ARRAY<VECTOR<ARRAY<TV>,8> > De_inverse_hat; // actually H (Dm H)^-1 Fp^-1
     ARRAY<VECTOR<DIAGONAL_MATRIX<T,3>,8> > Fe_hat;
-    ARRAY<VECTOR<DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>,8> >* dPi_dFe;
+    ARRAY<VECTOR<DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<VECTOR<T,3> >,8> >* dPi_dFe;
     ARRAY<VECTOR<DIAGONALIZED_STRESS_DERIVATIVE<T,3>,8> >* dP_dFe;
     ARRAY<VECTOR<T,8> >* Be_scales_save;
     ARRAY<VECTOR<MATRIX<T,3>,8> >* V;
