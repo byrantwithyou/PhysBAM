@@ -54,7 +54,7 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,TV::m>& F,DIAGONALIZED_ISOTR
     typename TV::SPIN Fh=Helper(F.x),div_diff=(b-1)*stiffness*Fh,div_sum=-div_diff;
     for(int i=0;i<TV::SPIN::m;i++){
         int j=(i+1)%TV::m,k=(j+1)%TV::m;
-        hess(j,k)=s*Fh(i);}
+        hess(j,k)=-s*Fh(i);}
     dP_dF.Compute_From_Derivatives_And_Differences(hess,div_diff,div_sum);
 }
 //#####################################################################
