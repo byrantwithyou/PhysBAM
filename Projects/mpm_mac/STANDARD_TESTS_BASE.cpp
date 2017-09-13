@@ -348,7 +348,7 @@ Check_Analytic_Velocity() const
         num_l2_samples+=TV::m;
         PHYSBAM_ASSERT(l2_error<=num_l2_samples*max_error*max_error+1e-10);
         Add_Debug_Particle(particles.X(p),VECTOR<T,3>(0,1,0));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,e);
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,e);
     }
     PHYSBAM_DEBUG_WRITE_SUBSTEP("particle error",1);
     if(num_l2_samples) l2_error/=num_l2_samples;
