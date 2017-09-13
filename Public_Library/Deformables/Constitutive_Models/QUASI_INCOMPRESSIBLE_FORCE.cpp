@@ -63,8 +63,8 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,TV::m>& F,DIAGONALIZED_ISOTR
 template<class TV> typename TV::SCALAR QUASI_INCOMPRESSIBLE_FORCE<TV>::
 Energy_Density(const DIAGONAL_MATRIX<T,TV::m>& F,const int id) const
 {
-    T J=F.Determinant();
-    return stiffness*(J-pow(J,1-gamma)/(1-gamma));
+    T J=F.Determinant(),g=gamma-1;
+    return stiffness*(J-1+(pow(J,-g)-1)/g);
 }
 namespace PhysBAM{
 template class QUASI_INCOMPRESSIBLE_FORCE<VECTOR<float,1> >;
