@@ -105,8 +105,8 @@ template<class TV,class T_ARRAY,class ID> void COLLISION_GEOMETRY_SPATIAL_PARTIT
 Reinitialize()
 {
     assert(reinitialize_counter>=0);
-    hashtable.Map([](auto&k,auto&v){delete v;v=0;});
-    if(reinitialize_counter%10 == 0) hashtable.Remove_All();
+    if(reinitialize_counter%10 == 0){hashtable.Map([](auto&k,auto&v){delete v;v=0;});hashtable.Remove_All();}
+    else hashtable.Map([](auto&k,auto&v){v->Remove_All();});
     reinitialize_counter++;
     voxel_range.Resize(collision_bodies.Size());
     bodies_not_in_partition.Remove_All();
