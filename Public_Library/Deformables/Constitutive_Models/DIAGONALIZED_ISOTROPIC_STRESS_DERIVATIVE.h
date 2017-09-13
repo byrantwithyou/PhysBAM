@@ -22,7 +22,7 @@ Differential_Helper(const SYMMETRIC_MATRIX<T,3>& H,const VECTOR<T,3>& B,const VE
 template<class T> MATRIX<T,2>
 Differential_Helper(const SYMMETRIC_MATRIX<T,2>& H,const VECTOR<T,1>& B,const VECTOR<T,1>& C,const MATRIX<T,2>& dF)
 {
-    return MATRIX<T,2>(H(0,0)*dF.x[0]+H(1,0)*dF.x[3],B(10)*dF.x[1]+C(10)*dF.x[2],C(10)*dF.x[1]+B(10)*dF.x[2],H(1,0)*dF.x[0]+H(1,1)*dF.x[3]);
+    return MATRIX<T,2>(H(0,0)*dF.x[0]+H(1,0)*dF.x[3],B(0)*dF.x[1]+C(0)*dF.x[2],C(0)*dF.x[1]+B(0)*dF.x[2],H(1,0)*dF.x[0]+H(1,1)*dF.x[3]);
 }
 template<class T> MATRIX<T,1>
 Differential_Helper(const SYMMETRIC_MATRIX<T,1>& H,const VECTOR<T,0>& B,const VECTOR<T,0>& C,const MATRIX<T,1>& dF)
