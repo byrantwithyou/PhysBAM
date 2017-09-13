@@ -2,6 +2,7 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Log/DEBUG_SUBSTEPS.h>
 #include <Core/Math_Tools/RANGE_ITERATOR.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Images/PNG_FILE.h>
@@ -330,6 +331,7 @@ Check_Analytic_Velocity() const
                 num_l2_samples++;
                 Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
                 Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,e);}}}
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("grid error",1);
     if(num_l2_samples) l2_error/=num_l2_samples;
     l2_error=sqrt(l2_error);
     LOG::printf("grid velocity error: L-inf: %g L-2: %g N: %i\n",max_error,l2_error,num_l2_samples);
@@ -345,7 +347,10 @@ Check_Analytic_Velocity() const
         l2_error+=e.Magnitude_Squared();
         num_l2_samples+=TV::m;
         PHYSBAM_ASSERT(l2_error<=num_l2_samples*max_error*max_error+1e-10);
+        Add_Debug_Particle(particles.X(p),VECTOR<T,3>(0,1,0));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,e);
     }
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("particle error",1);
     if(num_l2_samples) l2_error/=num_l2_samples;
     l2_error=sqrt(l2_error);
     LOG::printf("particle velocity error: L-inf: %g L-2: %g N: %i\n",max_error,l2_error,num_l2_samples);
