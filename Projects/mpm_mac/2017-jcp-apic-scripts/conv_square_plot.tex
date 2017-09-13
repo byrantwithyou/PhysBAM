@@ -1,0 +1,39 @@
+\documentclass[class=minimal,border=0pt]{standalone}
+\usepackage{pgfplots}
+
+\begin{document}
+\pgfplotsset{width=10cm,height=8cm,compat=1.13}
+\begin{tikzpicture}
+\begin{loglogaxis}[
+    enlargelimits=false,
+    legend cell align=left,
+    xlabel={Resolution},
+    ylabel={Error},
+    legend entries={$L^\infty_G$ (order=grid-order-inf),$L^2_G$ (order=grid-order-2),$L^\infty_P$ (order=particle-order-inf),$L^2_P$ (order=particle-order-2)},
+    legend pos=south west,
+%    ymin=0,
+%    ymax=40,
+%    xmax=16,
+    legend style={fill=none,draw=none},
+    tick scale binop=\times,
+    scale ticks above exponent=1,
+    y tick label style={
+        /pgf/number format/.cd,
+            fixed,
+            fixed zerofill,
+            precision=0,
+        /tikz/.cd
+    }%,
+%    title={Convergence plot (XXX)}
+]
+\addplot[only marks,mark options={solid,color=red,fill=red},mark=square*,color=red] table[x=res,y=linf]{grid-xxx.txt};
+\addplot[only marks,mark options={solid,color=green,fill=green},mark=square,color=green] table[x=res,y=l2]{grid-xxx.txt};
+\addplot[only marks,mark options={solid,color=blue,fill=blue},mark=triangle*,color=blue] table[x=res,y=linf]{particle-xxx.txt};
+\addplot[only marks,mark options={solid,color=black,fill=black},mark=triangle,color=black] table[x=res,y=l2]{particle-xxx.txt};
+\addplot[mark=none,color=red] table[x=res,y=linf]{grid-xxx-regres.txt};
+\addplot[mark=none,color=green] table[x=res,y=l2]{grid-xxx-regres.txt};
+\addplot[mark=none,color=blue] table[x=res,y=linf]{particle-xxx-regres.txt};
+\addplot[mark=none,color=black] table[x=res,y=l2]{particle-xxx-regres.txt};
+\end{loglogaxis}
+\end{tikzpicture}
+\end{document}
