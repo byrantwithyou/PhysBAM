@@ -237,6 +237,7 @@ template<class T> void OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
 Print_Selection_Info(std::ostream &output_stream) const
 {
     if(selected_index>=0){
+        output_stream<<"debug particle"<<std::endl;
         output_stream<<"(total number = "<<particles.Size()<<")"<<std::endl;
         output_stream<<"current index = "<<selected_index<<std::endl;
         particles.Print(output_stream,selected_index);}
