@@ -30,6 +30,7 @@
 #include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
 #include <Deformables/Constitutive_Models/QUASI_INCOMPRESSIBLE_FORCE.h>
+#include <Deformables/Constitutive_Models/TAIT_PRESSURE_FORCE.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
 #include <Deformables/Forces/SURFACE_TENSION_FORCE.h>
@@ -1477,8 +1478,16 @@ Initialize()
             T density=1000*unit_rho;
             Seed_Particles(box,0,0,density,particles_per_cell);
             T stiffness=15e3*scale_E*unit_p,gamma=extra_T.m?extra_T(0):7;
-            QUASI_INCOMPRESSIBLE_FORCE<TV>* quasi=new QUASI_INCOMPRESSIBLE_FORCE<TV>(stiffness,gamma);
-            Add_Force(*new MPM_FINITE_ELEMENTS<TV>(force_helper,*quasi,gather_scatter,0));
+            T tait_const=0.0894;
+            ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* cm=0;
+            if(extra_int.m && extra_int(0)==1)
+                cm=new TAIT_PRESSURE_FORCE<TV>(stiffness,tait_const);
+            else cm=new QUASI_INCOMPRESSIBLE_FORCE<TV>(stiffness,gamma);
+            DIAGONAL_MATRIX<T,2> dm;
+            RANDOM_NUMBERS<T> rn;
+            rn.Fill_Uniform(dm,.5,2);
+            cm->Test(dm,0);
+            Add_Force(*new MPM_FINITE_ELEMENTS<TV>(force_helper,*cm,gather_scatter,0));
             Add_Gravity(m/(s*s)*TV(0,-9.81));
             Add_Walls(-1,COLLISION_TYPE::separate,0,.3*m,false);
             end_time_step=[=](T time)
