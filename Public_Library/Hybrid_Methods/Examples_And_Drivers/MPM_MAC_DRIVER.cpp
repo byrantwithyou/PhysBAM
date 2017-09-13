@@ -177,6 +177,7 @@ Simulate_To_Frame(const int frame)
             LOG::cout<<"substep dt: "<<example.dt<<std::endl;
 
             Step([=](){Advance_One_Time_Step();},"time-step");
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("end substep %i",0,substep);
             LOG::cout<<"max velocity: "<<Max_Particle_Speed()<<"  bound: "<<Grid_V_Upper_Bound()<<std::endl;
             example.time=next_time;}
         for(int i=0;i<example.end_frame.m;i++)

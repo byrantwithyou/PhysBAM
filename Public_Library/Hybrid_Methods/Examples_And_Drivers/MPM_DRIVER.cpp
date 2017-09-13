@@ -161,6 +161,7 @@ Simulate_To_Frame(const int frame)
             LOG::cout<<"substep dt: "<<example.dt<<std::endl;
 
             Advance_One_Time_Step();
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("end substep %i",0,substep);
             example.time=next_time;}
         if(example.end_frame) example.end_frame(current_frame);
         Write_Output_Files(++output_number);}
