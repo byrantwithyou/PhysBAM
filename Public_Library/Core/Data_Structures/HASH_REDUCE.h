@@ -7,6 +7,7 @@
 #ifndef __HASH_REDUCE__
 #define __HASH_REDUCE__
 
+#include <Core/Utilities/STATIC_ASSERT.h>
 #include <Core/Utilities/TYPE_UTILITIES.h>
 #include <cstring>
 #include <string>

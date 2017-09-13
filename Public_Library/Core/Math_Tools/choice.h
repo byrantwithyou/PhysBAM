@@ -7,9 +7,10 @@
 #ifndef __choice__
 #define __choice__
 
-#include <Core/Utilities/TYPE_UTILITIES.h>
 #include <cassert>
+#include <type_traits>
 namespace PhysBAM{
+using std::conditional;
 
 template<int i,class T1,class T2,class T3> struct choice_helper;
 

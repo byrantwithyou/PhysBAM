@@ -7,7 +7,6 @@
 #ifndef __TYPE_UTILITIES__
 #define __TYPE_UTILITIES__
 
-#include <Core/Utilities/STATIC_ASSERT.h>
 #include <cstdio>
 #include <cstdlib>
 #include <type_traits>
