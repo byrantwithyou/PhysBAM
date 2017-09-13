@@ -71,7 +71,7 @@ protected:
     {}
 
     ~REGISTRY()
-    {name_registry.Delete_Pointers_Stored_In_Table();}
+    {name_registry.Map([](auto&k,auto&v){delete v;v=0;});}
 
     template<class T_OBJECT> static T_OBJECT* Create_Representative()
     {return T_OBJECT::Create();}

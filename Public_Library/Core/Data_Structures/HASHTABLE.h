@@ -206,14 +206,9 @@ public:
     for(int h=0;h<table.m;h++)
          output<<h<<":"<<(table(h).state==ENTRY_ACTIVE?"ACTIVE":(table(h).state==ENTRY_DELETED?"DELETED":"FREE"))<<" key="<<table(h).key<<" value="<<table(h).data<<std::endl;}
 
-    void Apply_Function_To_All_Entries(void (*function)(TK&,T_UNLESS_VOID&))
+    template<class FUNC>
+    void Map(FUNC function) // function(key,data)
     {for(int h=0;h<table.m;h++) if(table(h).state==ENTRY_ACTIVE) function(table(h).key,table(h).data);}
-
-    void Delete_Pointers_Stored_In_Table() // of course, only valid if pointers are stored in table
-    {for(int h=0;h<table.m;h++) if(table(h).state==ENTRY_ACTIVE){delete table(h).data;table(h).data=0;}}
-
-    void Reset_List_Arrays_Stored_In_Table() // of course, only works if pointers to ARRAY are stored in table
-    {for(int h=0;h<table.m;h++) if(table(h).state==ENTRY_ACTIVE){table(h).data->Remove_All();}}
 
     void Append_Keys(ARRAY<TK>& keys) const
     {keys.Preallocate(Size());for(int h=0;h<table.m;h++) if(table(h).state==ENTRY_ACTIVE) keys.Append(table(h).key);}
@@ -221,14 +216,8 @@ public:
     void Get_Keys(ARRAY<TK>& keys) const
     {keys.Remove_All();Append_Keys(keys);}
 
-    template<class T_ARRAY0,class T_ARRAY1>
-    void Get_Complementary_Keys(const T_ARRAY0& keys_universe,T_ARRAY1& keys_complementary) const
-    {STATIC_ASSERT(is_same<typename T_ARRAY0::ELEMENT,TK>::value && is_same<typename T_ARRAY1::ELEMENT,TK>::value);
-    keys_complementary.Remove_All();keys_complementary.Preallocate(keys_universe.Size()-Size());
-    for(typename T_ARRAY0::INDEX i(0);i<keys_universe.Size();i++) if(!Contains(keys_universe(i))) keys_complementary.Append(keys_universe(i));}
-
     void Append_Data(ARRAY<T_UNLESS_VOID>& data) const
-    {data.Preallocate(Size());for(int h=0;h<table.m;h++) if(table(h).state==ENTRY_ACTIVE) data.Append(table(h).data);}
+    {data.Preallocate(data.m+Size());for(int h=0;h<table.m;h++) if(table(h).state==ENTRY_ACTIVE) data.Append(table(h).data);}
 
     void Get_Data(ARRAY<T_UNLESS_VOID>& data) const
     {data.Remove_All();Append_Data(data);}

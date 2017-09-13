@@ -193,8 +193,8 @@ template<class T> DYNAMIC_IMPLICIT_SURFACE<T>::
 ~DYNAMIC_IMPLICIT_SURFACE()
 {
     eval_list.Delete_Pointers_And_Clean_Memory();
-    dict.Delete_Pointers_Stored_In_Table();
-    token_lookup.Delete_Pointers_Stored_In_Table();
+    dict.Map([](auto&k,auto&v){delete v;v=0;});
+    token_lookup.Map([](auto&k,auto&v){delete v;v=0;});
 }
 //#####################################################################
 // Function Initialize_Tokens
