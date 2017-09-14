@@ -42,6 +42,9 @@ public:
     void Test_Diff(const KRYLOV_VECTOR_BASE<T>& dv);
     void Update_F(const MPM_KRYLOV_VECTOR<TV>& v) const;
     void Restore_F() const;
+    bool Test_Add_Collision(MPM_KRYLOV_VECTOR<TV>& dv,int object,int p,
+        bool prune,bool stick,ARRAY<COLLISION>& collisions,
+        ARRAY<int>& stuck_nodes,ARRAY<TV>& stuck_velocity) const;
 };
 }
 #endif
