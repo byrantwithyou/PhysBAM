@@ -1495,6 +1495,7 @@ Initialize()
                     for(int i=0;i<particles.F.m;i++){
                         T J=particles.F(i).Determinant();
                         particles.F(i)=MATRIX<T,TV::m>()+pow<1,TV::m>(J);}
+                    if(dt<1e-7) PHYSBAM_FATAL_ERROR("DT TOO SMALL");
                     for(int i=0;i<particles.V.m;i++)
                         if(particles.V(i).Magnitude()>50)
                             PHYSBAM_FATAL_ERROR("VELOCITY TOO BIG");
