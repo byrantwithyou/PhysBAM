@@ -36,7 +36,10 @@ template<class TV> DIAGONAL_MATRIX<typename TV::SCALAR,TV::m> TAIT_PRESSURE_FORC
 P_From_Strain(const DIAGONAL_MATRIX<typename TV::SCALAR,TV::m>& F,const int id) const
 {
     T J=F.Determinant();
-    return -tait_const*stiffness*(exp((1-J)/tait_const)-1)*F.Cofactor_Matrix();
+    if(J<1e-10) return DIAGONAL_MATRIX<T,TV::m>()+1e20;
+    T e=exp((1-J)/tait_const);
+    T g=stiffness*(e-1)*tait_const;
+    return -g*F.Cofactor_Matrix();
 }
 template<class T> static VECTOR<T,3> Helper(const VECTOR<T,3>& f){return f;}
 template<class T> static VECTOR<T,1> Helper(const VECTOR<T,2>& f){return VECTOR<T,1>(1);}
@@ -47,7 +50,9 @@ template<class T> static VECTOR<T,0> Helper(const VECTOR<T,1>& f){return VECTOR<
 template<class TV> void TAIT_PRESSURE_FORCE<TV>::
 Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,TV::m>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dP_dF,const int id) const
 {
-    T J=F.Determinant(),e=exp((1-J)/tait_const);
+    T J=F.Determinant();
+    if(J<1e-10) return;
+    T e=exp((1-J)/tait_const);
     T g=stiffness*(e-1)*tait_const;
     T f=stiffness*e*J-g;
     DIAGONAL_MATRIX<T,TV::m> CF=F.Cofactor_Matrix();
@@ -64,7 +69,9 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,TV::m>& F,DIAGONALIZED_ISOTR
 template<class TV> typename TV::SCALAR TAIT_PRESSURE_FORCE<TV>::
 Energy_Density(const DIAGONAL_MATRIX<T,TV::m>& F,const int id) const
 {
-    T J=F.Determinant(),e=exp((1-J)/tait_const);
+    T J=F.Determinant();
+    if(J<1e-10) return 1e20;
+    T e=exp((1-J)/tait_const);
     return tait_const*stiffness*(tait_const*(e-1)+J-1);
 }
 namespace PhysBAM{
