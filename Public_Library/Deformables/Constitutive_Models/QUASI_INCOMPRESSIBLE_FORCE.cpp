@@ -36,6 +36,7 @@ template<class TV> DIAGONAL_MATRIX<typename TV::SCALAR,TV::m> QUASI_INCOMPRESSIB
 P_From_Strain(const DIAGONAL_MATRIX<typename TV::SCALAR,TV::m>& F,const int id) const
 {
     T J=F.Determinant();
+    if(J<1e-10) return DIAGONAL_MATRIX<T,TV::m>()+1e20;
     return stiffness*(1-pow(J,-gamma))*F.Cofactor_Matrix();
 }
 template<class T> static VECTOR<T,3> Helper(const VECTOR<T,3>& f){return f;}
@@ -48,6 +49,7 @@ template<class TV> void QUASI_INCOMPRESSIBLE_FORCE<TV>::
 Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,TV::m>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dP_dF,const int id) const
 {
     T J=F.Determinant();
+    if(J<1e-10) return;
     T a=pow(J,-1-gamma),b=a*J,r=stiffness*gamma*a,s=stiffness*((1-gamma)*b-1);
     DIAGONAL_MATRIX<T,TV::m> CF=F.Cofactor_Matrix();
     SYMMETRIC_MATRIX<T,TV::m> hess(r*CF*CF);
@@ -64,6 +66,7 @@ template<class TV> typename TV::SCALAR QUASI_INCOMPRESSIBLE_FORCE<TV>::
 Energy_Density(const DIAGONAL_MATRIX<T,TV::m>& F,const int id) const
 {
     T J=F.Determinant(),g=gamma-1;
+    if(J<1e-10) return 1e20;
     return stiffness*(J-1+(pow(J,-g)-1)/g);
 }
 namespace PhysBAM{
