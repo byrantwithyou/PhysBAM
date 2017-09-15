@@ -227,6 +227,31 @@ Update_Particle_Weights()
             example.weights(i)->Dp_Inverse(example.particles.X,example.Dp_inv(i));}
 }
 //#####################################################################
+// Function Extrapolate_Boundary
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Extrapolate_Boundary(PHASE& ph) const
+{
+    int d=1;
+    auto extrapolate=[this,&ph,d](auto it){
+        if(example.bc_type(it.side)==example.BC_PERIODIC) return;
+        int side_axis=it.side/2;
+        int sign_out=it.side%2?1:-1;
+        auto further=[=](FACE_INDEX<TV::m> f){f.index(side_axis)-=sign_out;return f;};
+        FACE_INDEX<TV::m> f0=it.face;
+        for(int j=d;j>0;--j) f0=further(f0);
+        FACE_INDEX<TV::m> f1=further(f0);
+        ph.velocity(it.face)=(d+1)*ph.velocity(f0)-d*ph.velocity(f1);};
+
+    for(int n=example.weights[0]->stencil_width-2;n>0;--n){ // assume all dimensions use the same interpolation order
+        RANGE<TV_INT> inner=example.grid.Domain_Indices(0).Thickened(-n);
+        RANGE<TV_INT> outer=inner.Thickened(1);
+        for(FACE_RANGE_ITERATOR<TV::m> it(outer,inner,RF::skip_inner|RF::skip_outer);it.Valid();it.Next())
+            extrapolate(it);
+        for(FACE_RANGE_ITERATOR<TV::m> it(outer,outer);it.Valid();it.Next())
+            extrapolate(it);}
+}
+//#####################################################################
 // Function Particle_To_Grid
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
@@ -300,6 +325,7 @@ Particle_To_Grid(PHASE_ID pid) const
     Fix_Periodic(ph.velocity);
     Fix_Periodic(ph.volume);
     if(example.flip){
+        Extrapolate_Boundary(ph);
         Extrapolate_Velocity(pid);
         ph.velocity_save=ph.velocity;}
 }

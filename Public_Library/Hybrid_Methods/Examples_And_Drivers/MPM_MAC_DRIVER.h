@@ -55,6 +55,7 @@ public:
     void Move_Particles();
     void Extrapolate_Velocity();
     void Extrapolate_Velocity(PHASE_ID pid) const;
+    void Extrapolate_Boundary(PHASE& ph) const;
     T Compute_Dt() const;
     T Max_Particle_Speed() const;
     T Grid_V_Upper_Bound() const;
