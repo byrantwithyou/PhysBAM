@@ -11,9 +11,11 @@
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
+#include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_DRIVER.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
+#include <Hybrid_Methods/Forces/MPM_FINITE_ELEMENTS.h>
 #include <Hybrid_Methods/Forces/MPM_PLASTIC_FINITE_ELEMENTS.h>
 #include <Hybrid_Methods/Forces/MPM_PLASTICITY_MODEL.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
@@ -129,6 +131,8 @@ Advance_One_Time_Step()
     Apply_Forces();
     Print_Grid_Stats("after forces",example.dt,example.velocity_new,&example.velocity);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after forces",1);
+    Grid_To_Particle_Limit_Dt();
+    Limit_Dt_Sound_Speed();
     Grid_To_Particle();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after grid to particle",1);
     Update_Plasticity_And_Hardening();
@@ -161,6 +165,13 @@ Simulate_To_Frame(const int frame)
             LOG::cout<<"substep dt: "<<example.dt<<std::endl;
 
             Advance_One_Time_Step();
+
+            // Time step was reduced
+            if(example.dt<next_time-example.time){
+                LOG::printf("dt reduced: %g to %g\n",next_time-example.time,example.dt);
+                next_time=example.time+example.dt;
+                done=false;}
+
             PHYSBAM_DEBUG_WRITE_SUBSTEP("end substep %i",0,substep);
             example.time=next_time;}
         if(example.end_frame) example.end_frame(current_frame);
@@ -277,7 +288,7 @@ Grid_To_Particle()
             TV V_grid=example.use_midpoint?(T).5*(V_new+V_old):V_new;
             h.grad_Vp+=Outer_Product(V_grid,dw);
             if(need_dv_fric){
-                TV V_grid_fric=example.use_midpoint?(T).5*(V_fric+V_old):V_new;
+                TV V_grid_fric=example.use_midpoint?(T).5*(V_fric+V_old):V_fric;
                 h.grad_Vp_fric+=Outer_Product(V_grid_fric,dw);}
             if(example.use_affine && !example.lag_Dp){
                 TV Z=example.grid.Center(index);
@@ -307,6 +318,103 @@ Grid_To_Particle()
 
             if(!example.grid.domain.Lazy_Inside(particles.X(p))) particles.valid(p)=false;
         });
+}
+// Lower s if necessary so that |t*(a+t*b)|<=bound for all 0<=t<=s
+template<class T>
+void Enforce_Limit_Max(T& s,T bound,T a,T b)
+{
+    if(a<0){a=-a;b=-b;}
+    if(a*a+4*b*bound>=0){
+        if(s*(a+s*b)>bound)
+            s=(2*bound)/(a+sqrt(a*a+4*b*bound));}
+    else{
+        if(s*(a+s*b)<-bound)
+            s=-(a+sqrt(a*a-4*b*bound))/(2*b);}
+}
+// Lower s if necessary so that t*(a+t*b)<=bound for all 0<=t<=s
+template<class T,int d>
+void Enforce_Limit_Max(T& s,T bound,const VECTOR<T,d>& a,const VECTOR<T,d>& b)
+{
+    for(int i=0;i<d;i++) Enforce_Limit_Max(s,bound,a(i),b(i));
+}
+// Lower s if necessary so that t*(a+t*b)<=bound for all 0<=t<=s
+template<class T,int d>
+void Enforce_Limit_Max(T& s,T bound,const MATRIX<T,d>& a,const MATRIX<T,d>& b)
+{
+    for(int i=0;i<d;i++)
+        for(int j=0;j<d;j++)
+            Enforce_Limit_Max(s,bound,a(i,j),b(i,j));
+}
+//#####################################################################
+// Function Grid_To_Particle_Limit_Dt
+//#####################################################################
+template<class TV> void MPM_DRIVER<TV>::
+Grid_To_Particle_Limit_Dt()
+{
+    if(!example.use_strong_cfl) return;
+    struct HELPER
+    {
+        TV V_pic,V_pic_s,V_weight_old;
+        MATRIX<T,TV::m> grad_Vp,grad_Vp_s;
+    };
+
+    T dt=example.dt,s=1;
+    T midpoint_frac=example.use_midpoint?(T).5:1;
+
+    // TODO: this is NOT threadsafe.
+    example.gather_scatter.template Gather<HELPER>(true,
+        [](int p,HELPER& h){h=HELPER();},
+        [this,midpoint_frac](int p,const PARTICLE_GRID_ITERATOR<TV>& it,HELPER& h)
+        {
+            T w=it.Weight();
+            TV dw=it.Gradient();
+            TV_INT index=it.Index();
+            TV V_new=example.velocity_new(index);
+            TV V_old=example.velocity(index);
+            TV V_fric=example.velocity_friction(index);
+
+            h.V_pic+=w*V_old;
+            h.V_pic_s+=w*(V_new-V_old);
+            h.V_weight_old+=w*V_old;
+            TV V_grid=V_old;
+            TV V_grid_s=midpoint_frac*(V_new-V_old);
+            h.grad_Vp+=Outer_Product(V_grid,dw);
+            h.grad_Vp_s+=Outer_Product(V_grid_s,dw);
+        },
+        [this,dt,&s](int p,HELPER& h)
+        {
+            Enforce_Limit_Max(s,example.cfl_F,dt*h.grad_Vp,dt*h.grad_Vp_s);
+            TV xp_new_s,xp_new_s2;
+            if(example.use_midpoint){xp_new_s=dt/2*(h.V_weight_old+h.V_pic);xp_new_s2=dt/2*h.V_pic_s;}
+            else{xp_new_s=dt*h.V_pic;xp_new_s2=dt*h.V_pic_s;}
+            Enforce_Limit_Max(s,example.cfl,xp_new_s,xp_new_s2);
+        });
+    example.dt*=s;
+    example.velocity_new.array=(example.velocity_new.array-example.velocity.array)*s+example.velocity.array;
+    example.velocity_friction.array=(example.velocity_friction.array-example.velocity.array)*s+example.velocity.array;
+}
+//#####################################################################
+// Function Limit_Dt_Sound_Speed
+//#####################################################################
+template<class TV> void MPM_DRIVER<TV>::
+Limit_Dt_Sound_Speed()
+{
+    if(!example.use_sound_speed_cfl) return;
+    T dt=example.dt;
+    for(int f=0;f<example.forces.m;f++){
+        if(const MPM_FINITE_ELEMENTS<TV>* force=dynamic_cast<MPM_FINITE_ELEMENTS<TV>*>(example.forces(f))){
+            for(int k=0;k<example.simulated_particles.m;k++){
+                int p=example.simulated_particles(k);
+                const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& d=force->dPi_dF(p);
+                T K=d.H.Diagonal_Part().x.Max_Abs();
+                T J=example.particles.F(p).Determinant();
+                T rho=example.particles.mass(p)/(example.particles.volume(p)*J);
+                T speed=sqrt(K/(J*rho));
+                T new_dt=example.grid.dX.Min()/speed;
+                dt=min(dt,new_dt);}}}
+    if(dt<example.dt){
+        LOG::printf("SOUND CFL %g %g\n",example.dt,dt);
+        example.dt=dt*example.cfl_sound;}
 }
 //#####################################################################
 // Function Update_Plasticity_And_Hardening

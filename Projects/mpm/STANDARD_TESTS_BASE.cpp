@@ -73,6 +73,8 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-only_write_particles",&only_write_particles,"Only write particle data (ignore grid data, restart data etc)");
     parse_args.Add("-flip",&flip,&no_affine,"frac","Flip ratio");
     parse_args.Add("-cfl",&cfl,"cfl","CFL number");
+    parse_args.Add("-cfl_F",&cfl_F,"cfl","CFL number for F update");
+    parse_args.Add("-cfl_c",&cfl_sound,"cfl","CFL number for sound speed");
     parse_args.Add("-newton_tolerance",&newton_tolerance,"tol","Newton tolerance");
     parse_args.Add("-newton_iterations",&newton_iterations,"iter","Newton iterations");
     parse_args.Add("-solver_tolerance",&solver_tolerance,"tol","Solver tolerance");
@@ -111,6 +113,9 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-I",&extra_int,"int","extra int argument");
     parse_args.Add("-dump_collisions",&dump_collision_objects,"dump out collision objects");
     parse_args.Add("-test_output_prefix",&test_output_prefix,&use_test_output,"","prefix to use for test output");
+    parse_args.Add("-strong_cfl",&use_strong_cfl,"limit dt based on final change in X and F");
+    parse_args.Add("-sound_cfl",&use_sound_speed_cfl,"limit dt based on final change in X and F");
+
     
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);

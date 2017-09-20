@@ -76,9 +76,12 @@ public:
     bool print_stats;
     bool only_write_particles;
     T flip;
-    T cfl;
+    T cfl,cfl_F,cfl_sound;
     T inv_Wi;
+    bool use_strong_cfl;
+    bool use_sound_speed_cfl;
 
+    
     T newton_tolerance;
     int newton_iterations;
     T solver_tolerance;

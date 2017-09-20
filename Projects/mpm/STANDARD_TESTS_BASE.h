@@ -33,7 +33,7 @@ public:
     using BASE::output_directory;using BASE::mass_contour;using BASE::plasticity_models;
     using BASE::restart;using BASE::dt;using BASE::time;using BASE::lag_Dp;
     using BASE::frame_dt;using BASE::min_dt;using BASE::max_dt;
-    using BASE::ghost;using BASE::use_affine;
+    using BASE::ghost;using BASE::use_affine;using BASE::cfl_F;using BASE::use_strong_cfl;
     using BASE::use_midpoint;using BASE::use_symplectic_euler;using BASE::test_output_prefix;
     using BASE::print_stats;using BASE::only_write_particles;using BASE::use_test_output;
     using BASE::flip;using BASE::cfl;using BASE::newton_tolerance;
@@ -42,7 +42,7 @@ public:
     using BASE::lagrangian_forces;using BASE::stream_type;
     using BASE::Add_Force;using BASE::Set_Weights;using BASE::deformable_body_collection;
     using BASE::Add_Collision_Object;using typename BASE::COLLISION_TYPE;using BASE::data_directory;
-    using BASE::quad_F_coeff;
+    using BASE::quad_F_coeff;using BASE::use_sound_speed_cfl;using BASE::cfl_sound;
 
     int test_number;
     int resolution;

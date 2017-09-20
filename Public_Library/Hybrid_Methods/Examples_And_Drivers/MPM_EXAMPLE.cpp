@@ -27,11 +27,13 @@ MPM_EXAMPLE(const STREAM_TYPE stream_type)
     force_helper(*new MPM_FORCE_HELPER<TV>(particles,quad_F_coeff)),
     initial_time(0),last_frame(100),write_substeps_level(-1),substeps_delay_frame(-1),
     output_directory("output"),data_directory("../../Public_Data"),use_test_output(false),
-    mass_contour(-1),restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),ghost(3),
-    use_affine(true),use_midpoint(false),use_symplectic_euler(false),
+    mass_contour(-1),restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),
+    ghost(3),use_affine(true),use_midpoint(false),use_symplectic_euler(false),
     lag_Dp(false),use_oldroyd(false),print_stats(false),only_write_particles(false),flip(0),
-    cfl(1),inv_Wi(0),newton_tolerance(1),newton_iterations(100),solver_tolerance(.5),solver_iterations(1000),
-    test_diff(false),threads(1),last_te(0),last_grid_ke(0),output_structures_each_frame(false),
+    cfl(1),cfl_F((T).5),cfl_sound((T).9),inv_Wi(0),use_strong_cfl(false),
+    use_sound_speed_cfl(false),newton_tolerance(1),newton_iterations(100),
+    solver_tolerance(.5),solver_iterations(1000),test_diff(false),threads(1),
+    last_te(0),last_grid_ke(0),output_structures_each_frame(false),
     quad_F_coeff(0),asymmetric_system(false)
 {
 }
