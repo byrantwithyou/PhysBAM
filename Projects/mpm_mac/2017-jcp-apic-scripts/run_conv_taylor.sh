@@ -7,9 +7,9 @@ ARGS="../mpm_mac 16 -last_frame 1 -frame_dt 1 -mu 2 -scale_mass 3"
 FULL=1 # Set to 1 for a full rebuild; 0 to skip rerunning the simulations
 
 LO=32
-LO_REG_RES=32
+LO_REG_RES=64
 HI=256
-SKIP=16
+SKIP=8
 
 if [ "X$FULL" = "X1" ] ; then
     rm -rf $NAME

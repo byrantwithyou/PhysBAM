@@ -17,8 +17,7 @@ FULL=1 # Set to 1 for a full rebuild; 0 to skip rerunning the simulations
 LO=32
 LO_REG_RES=64
 HI=256
-HI=192
-SKIP=16
+SKIP=8
 
 if [ "X$FULL" = "X1" ] ; then
     rm -rf $NAME
