@@ -146,7 +146,7 @@ Advance_One_Time_Step()
     Step([=](){Apply_Forces();},"forces");
     Step([=](){Pressure_Projection();},"projection");
     Step([=](){Apply_Viscosity();},"viscosity",true,example.use_viscosity);
-    Step([=](){Extrapolate_Velocity();},"velocity-extrapolation",true);
+    Step([=](){Extrapolate_Velocity(!example.flip);},"velocity-extrapolation",true);
     Step([=](){Grid_To_Particle();},"g2p");
 }
 //#####################################################################
@@ -326,7 +326,7 @@ Particle_To_Grid(PHASE_ID pid) const
     Fix_Periodic(ph.volume);
     if(example.flip){
         Extrapolate_Boundary(ph);
-        Extrapolate_Velocity(pid);
+        Extrapolate_Velocity(pid,false);
         ph.velocity_save=ph.velocity;}
 }
 //#####################################################################
@@ -1225,16 +1225,16 @@ Fix_Periodic_Accum(ARRAY<T2,FACE_INDEX<TV::m> >& u,int ghost) const
 // Function Extrapolate_Velocity
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Extrapolate_Velocity()
+Extrapolate_Velocity(bool use_bc)
 {
     for(PHASE_ID i(0);i<example.phases.m;i++)
-        Extrapolate_Velocity(i);
+        Extrapolate_Velocity(i,use_bc);
 }
 //#####################################################################
 // Function Extrapolate_Velocity
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Extrapolate_Velocity(PHASE_ID pid) const
+Extrapolate_Velocity(PHASE_ID pid,bool use_bc) const
 {
     PHASE& ph=example.phases(pid);
     RANGE<TV_INT> domain=example.grid.Domain_Indices(0);
@@ -1279,7 +1279,15 @@ Extrapolate_Velocity(PHASE_ID pid) const
                 f.index(side_axis)=2*corner(side_axis)-it.face.index(side_axis);
                 if(!normal) f.index(side_axis)-=1;
                 u=ph.velocity(f);
-                if(has_bc) u=2*bc(nearest_point,it.face.axis,pid,example.time)-u;
+                if(has_bc){
+                    T v=0;
+                    if(use_bc) v=bc(nearest_point,it.face.axis,pid,example.time);
+                    else if(normal) v=ph.velocity(nearest_face[normal]);
+                    else{
+                        FACE_INDEX<TV::m> f0=nearest_face[false];
+                        FACE_INDEX<TV::m> f1=further(f0);
+                        v=1.5*ph.velocity(f0)-0.5*ph.velocity(f1);}
+                    u=2*v-u;}
                 break;}
             case 'a': u=bc(example.grid.Face(it.face),it.face.axis,pid,example.time);break;
             case '0': u=0;break;
@@ -1288,7 +1296,6 @@ Extrapolate_Velocity(PHASE_ID pid) const
                 FACE_INDEX<TV::m> f=nearest_face[normal];
                 if(is_normal_bc) f=further(f);
                 u=ph.velocity(f);
-                if(has_bc) u=2*bc(nearest_point,it.face.axis,pid,example.time)-u;
                 break;}
             case 'l':{
                 T u0=bc(nearest_point,it.face.axis,pid,example.time);

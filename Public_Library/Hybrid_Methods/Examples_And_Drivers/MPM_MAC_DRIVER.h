@@ -53,8 +53,8 @@ public:
     void Apply_Forces();
     void Apply_Viscosity();
     void Move_Particles();
-    void Extrapolate_Velocity();
-    void Extrapolate_Velocity(PHASE_ID pid) const;
+    void Extrapolate_Velocity(bool use_bc);
+    void Extrapolate_Velocity(PHASE_ID pid,bool use_bc) const;
     void Extrapolate_Boundary(PHASE& ph) const;
     T Compute_Dt() const;
     T Max_Particle_Speed() const;
