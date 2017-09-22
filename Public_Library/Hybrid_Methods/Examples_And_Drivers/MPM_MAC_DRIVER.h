@@ -77,7 +77,7 @@ public:
         const ARRAY<TV,TV_INT>& gradient,
         const ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT>& Hessian) const;
 
-    void Apply_BC();
+    void Compute_Boundary_Conditions();
     int Allocate_Projection_System_Variable();
     void Compute_Laplacian(int var);
     void Compute_Gradient(int nvar);

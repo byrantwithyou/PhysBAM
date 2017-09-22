@@ -174,7 +174,7 @@ int main(int argc, char* argv[])
             driver.Particle_To_Grid();
             if(use_pressure) driver.Pressure_Projection();
             else if(mu){
-                driver.Apply_BC();
+                driver.Compute_Boundary_Conditions();
                 driver.Allocate_Projection_System_Variable();
                 driver.Apply_Viscosity();}
             driver.Grid_To_Particle();

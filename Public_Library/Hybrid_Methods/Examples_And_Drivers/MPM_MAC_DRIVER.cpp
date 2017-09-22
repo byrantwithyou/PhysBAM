@@ -144,6 +144,7 @@ Advance_One_Time_Step()
     Step([=](){Bump_Particles();},"bump-particles",true,example.use_bump);
     Step([=](){Reseeding();},"reseeding",true,example.use_reseeding);
     Step([=](){Apply_Forces();},"forces");
+    Step([=](){Compute_Boundary_Conditions();},"compute boundary conditions",false);
     Step([=](){Pressure_Projection();},"projection");
     Step([=](){Apply_Viscosity();},"viscosity",true,example.use_viscosity);
     Step([=](){Extrapolate_Velocity(!example.flip);},"velocity-extrapolation",true);
@@ -846,10 +847,10 @@ Neumann_Boundary_Condition(const FACE_INDEX<TV::m>& face,ARRAY<T,PHASE_ID>& bc) 
     return false;
 }
 //#####################################################################
-// Function Apply_BC
+// Function Compute_Boundary_Conditions
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Apply_BC()
+Compute_Boundary_Conditions()
 {
     example.psi_N.Resize(example.grid,example.ghost,false);
 #pragma omp parallel
@@ -1010,7 +1011,6 @@ template<class TV> void MPM_MAC_DRIVER<TV>::
 Compute_Poisson_Matrix()
 {
     TIMER_SCOPE_FUNC;
-    Apply_BC();
     int nvar=Allocate_Projection_System_Variable();
     Compute_Laplacian(nvar);
     Compute_Gradient(nvar);
