@@ -1,5 +1,5 @@
 //#####################################################################
-// Copyright 2005-2010, Eran Guendelman, Avi Robinson-Mosher, Andrew Selle, Jonathan Su.
+// Copyright 2005-2017, Eran Guendelman, Avi Robinson-Mosher, Craig Schroeder, Andrew Selle, Jonathan Su.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 // Class CELL_ITERATOR
@@ -7,25 +7,25 @@
 #ifndef __CELL_ITERATOR__
 #define __CELL_ITERATOR__
 
+#include <Core/Math_Tools/RANGE_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_INDEX.h>
 #include <Grid_Tools/Grids/GRID.h>
-#include <Grid_Tools/Grids/GRID_ITERATOR_BASE.h>
 namespace PhysBAM{
 
 template<class TV>
-class CELL_ITERATOR:public GRID_ITERATOR_BASE<TV>
+class CELL_ITERATOR:public RANGE_ITERATOR<TV::m>
 {
     typedef VECTOR<int,TV::m> TV_INT;
 public:
     typedef typename GRID<TV>::REGION T_REGION;
     typedef TV VECTOR_T;
-    using GRID_ITERATOR_BASE<TV>::grid;using GRID_ITERATOR_BASE<TV>::index;using GRID_ITERATOR_BASE<TV>::Add_Region;using GRID_ITERATOR_BASE<TV>::Reset;
+    using RANGE_ITERATOR<TV::m>::index;
 
-    CELL_ITERATOR(const GRID<TV>& grid_input,const int number_of_ghost_cells=0,const T_REGION& region_type=GRID<TV>::WHOLE_REGION,const int side=-1);
+    const GRID<TV>& grid;
+    CELL_ITERATOR(const GRID<TV>& grid_input,const int number_of_ghost_cells=0,
+        const T_REGION& region_type=GRID<TV>::WHOLE_REGION,const int side=-1);
 
-    CELL_ITERATOR(const GRID<TV>& grid_input,const RANGE<TV_INT>& region_input)
-        :GRID_ITERATOR_BASE<TV>(grid_input,region_input)
-    {}
+    CELL_ITERATOR(const GRID<TV>& grid_input,const RANGE<TV_INT>& region_input);
 
     const TV_INT& Cell_Index() const
     {return index;}
@@ -34,7 +34,7 @@ public:
     {return grid.Center(index);}
 
     RANGE<TV> Bounding_Box() const
-    {TV minimum_corner=grid.Node(index);return RANGE<TV>(minimum_corner,minimum_corner+grid.dX);}
+    {return grid.Cell_Domain(index);}
 
     TV_INT Cell_Node_Index(const int node) const
     {return index+GRID<TV>::Binary_Counts(index)(node);}
