@@ -194,7 +194,7 @@ public:
     {TV X=location-(T).5*dX;X(axis)=location(axis);return FACE_INDEX<TV::m>(axis,Cell(X));}
 
     RANGE<TV> Cell_Domain(const TV_INT& index) const
-    {TV corner=domain.min_corner+TV(index+1)*dX;return RANGE<TV>(corner-dX,corner);}
+    {TV corner=domain.min_corner+TV(index)*dX;return RANGE<TV>(corner,corner+dX);}
 
     RANGE<TV> Cell_Domain(const RANGE<TV_INT>& cell_range) const
     {return RANGE<TV>(Node(cell_range.min_corner),Node(cell_range.max_corner));}
