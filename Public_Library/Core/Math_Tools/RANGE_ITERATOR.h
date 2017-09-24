@@ -25,8 +25,8 @@ namespace PhysBAM{
 // c c c b b b b b c c c
 // 
 // Flags: (side=-1)
-//   (default)                               *  b+c
-//   interior                                   a+b+c
+//   (default)                                  a+b+c
+//   ghost                                   *  b+c
 //   duplicate_corners                          a+b+c+c
 // 
 // For combinations above with "*" these flags can be added:
@@ -56,7 +56,7 @@ namespace PhysBAM{
 enum class RI
 {
     none=0,
-    interior=1,
+    ghost=1,
     delay_corners=2,
     duplicate_corners=4,
     partial_single_side=0x20,
@@ -96,10 +96,9 @@ public:
         int inner_ghost,RI flags=RI::none,int side_input=-1);
     RANGE_ITERATOR(const TV_INT& counts,int outer_ghost,int inner_ghost,
         RI flags=RI::none,int side_input=-1);
-    explicit RANGE_ITERATOR(const RANGE<TV_INT>& range,
-        RI flags=RI::none); // implict RI::interior
+    explicit RANGE_ITERATOR(const RANGE<TV_INT>& range,RI flags=RI::none);
     explicit RANGE_ITERATOR(const TV_INT& counts,int outer_ghost=0,
-        RI flags=RI::none); // implict RI::interior
+        RI flags=RI::none);
     ~RANGE_ITERATOR()=default;
 
     void Next() PHYSBAM_ALWAYS_INLINE

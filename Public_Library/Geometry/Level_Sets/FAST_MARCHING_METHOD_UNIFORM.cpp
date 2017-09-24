@@ -230,7 +230,7 @@ Initialize_Interface(GRID<TV>& grid,ARRAY<T,TV_INT>& phi,ARRAY<int,TV_INT>& clos
     // Gather additional seeds; done check interior if seeds provided.
     if(!seed_indices || add_seed_indices_for_ghost_cells){
         for(FACE_RANGE_ITERATOR<TV::m> it(grid.Domain_Indices(),ghost_cells,
-                0,seed_indices?RF::skip_outer:RF::interior|RF::skip_outer);it.Valid();it.Next()){
+                0,seed_indices?RF::ghost|RF::skip_outer:RF::skip_outer);it.Valid();it.Next()){
             TV_INT a[2]={it.face.First_Cell_Index(),it.face.Second_Cell_Index()};
             if(Neighbor_Visible && !Neighbor_Visible(it.face)) continue;
             if(!LEVELSET_UTILITIES<T>::Interface(phi(a[0]),phi(a[1]))) continue;

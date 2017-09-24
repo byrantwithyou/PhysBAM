@@ -21,7 +21,7 @@ CELL_ITERATOR(const GRID<TV>& grid_input,const int number_of_ghost_cells,
 
     int inner_ghost=region_type==GRID<TV>::BOUNDARY_INTERIOR_REGION?-1:0;
     this->Set_Range(grid_input.numbers_of_cells,number_of_ghost_cells,inner_ghost);
-    RI flags=region_type==GRID<TV>::GHOST_REGION?RI::none:RI::interior;
+    RI flags=region_type==GRID<TV>::GHOST_REGION?RI::ghost:RI::none;
     this->Initialize(flags,side);
 }
 //#####################################################################

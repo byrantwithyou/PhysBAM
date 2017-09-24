@@ -8,8 +8,8 @@ namespace PhysBAM{
 int face_range_lookup[2][5]=
 {
     // indices, axis_adj, side_adj, skip_outer, skip_inner
-    {0x312001,0x887889,0x878888,0x788998,0x879887}, // NO FLAGS
-    {0x333000,0x888888,0x888888,0x777999,0x888888}  // FLAG_INTERIOR
+    {0x333000,0x888888,0x888888,0x777999,0x888888}, // interior
+    {0x312001,0x887889,0x878888,0x788998,0x879887}  // ghost
 };
 //#####################################################################
 // Constructor
@@ -48,21 +48,21 @@ FACE_RANGE_ITERATOR(const TV_INT& counts,int outer_ghost,int inner_ghost,
 //#####################################################################
 template<int d> FACE_RANGE_ITERATOR<d>::
 FACE_RANGE_ITERATOR(const RANGE<TV_INT>& range,
-    RF flags,int axis) // implict RF::interior
+    RF flags,int axis)
     :vecs{range.min_corner,range.min_corner,range.max_corner-1,range.max_corner-1}
 {
-    Initialize(flags|RF::interior,-1,axis);
+    Initialize(flags,-1,axis);
 }
 //#####################################################################
 // Constructor
 //#####################################################################
 template<int d> FACE_RANGE_ITERATOR<d>::
 FACE_RANGE_ITERATOR(const TV_INT& counts,int outer_ghost,
-    RF flags,int axis) // implict RF::interior
+    RF flags,int axis)
     :vecs{TV_INT()-outer_ghost,TV_INT()-outer_ghost,
         counts+(outer_ghost-1),counts+(outer_ghost-1)}
 {
-    Initialize(flags|RF::interior,-1,axis);
+    Initialize(flags,-1,axis);
 }
 //#####################################################################
 // Function Set_Range
@@ -134,16 +134,16 @@ Encode(RF flags,int side_input,int axis)
     if(any(flags&RF::side_mask)) side_mask=side_input;
     else side_mask=side_input<0?(1<<2*d)-1:(1<<side_input);
     flags=flags&~(RF::reverse|RF::end|RF::axis_mask);
-    if(any(flags&RF::interior)) side_mask=1;
+    if(!any(flags&RF::ghost)) side_mask=1;
 
     // Explicitly check for flag combinations that do not make sense.
-    if(any(flags&RF::interior)){
-        PHYSBAM_ASSERT(!(flags&~(RF::interior|RF::skip_outer)));}
+    if(!any(flags&RF::ghost)){
+        PHYSBAM_ASSERT(!(flags&~(RF::ghost|RF::skip_outer)));}
     if(any(flags&RF::duplicate_corners)){
-        PHYSBAM_ASSERT(!(flags&~(RF::duplicate_corners|RF::skip_outer|RF::skip_inner|RF::side_mask)));}
+        PHYSBAM_ASSERT(!(flags&~(RF::duplicate_corners|RF::ghost|RF::skip_outer|RF::skip_inner|RF::side_mask)));}
 
     int offsets[3];
-    int mode=(int)(flags&RF::interior);
+    int mode=(int)(flags&RF::ghost);
     for(int i=0;i<3;i++) offsets[i]=face_range_lookup[mode][i];
     if(any(flags&RF::skip_outer)) offsets[1]+=face_range_lookup[mode][3]-0x888888;
     if(any(flags&RF::skip_inner)) offsets[1]+=face_range_lookup[mode][4]-0x888888;

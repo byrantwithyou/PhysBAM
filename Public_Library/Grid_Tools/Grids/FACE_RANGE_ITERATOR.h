@@ -39,18 +39,18 @@ namespace PhysBAM{
 //   h   h   h   g   f   f   f   g   h   h   h
 // 
 // Flags: (side=-1)
-//   (default)                               *  b+c+d+e+f+g+h
-//   interior                                    a+b+c+d+e+f+g+h
+//   (default)                                      a+b+c+d+e+f+g+h
+//   ghost                                       *  b+c+d+e+f+g+h
 // 
-//   skip_inner                              *  c+d+e+f+g+h
-//   skip_outer                              *  b+c+d+e
-//   skip_inner|skip_outer                   *  c+d+e
-//   interior|skip_outer                        a+b+c+d+e
+//   ghost|skip_inner                            *  c+d+e+f+g+h
+//   ghost|skip_outer                            *  b+c+d+e
+//   ghost|skip_inner|skip_outer                 *  c+d+e
+//   skip_outer                                     a+b+c+d+e
 // 
-//   duplicate_corners                          b+c+d+d+e+e+f+g+h+h
-//   duplicate_corners|skip_inner               c+d+e+e+f+g+h+h
-//   duplicate_corners|skip_outer               b+c+d+d+e+e
-//   duplicate_corners|skip_inner|skip_outer    c+d+e+e
+//   ghost|duplicate_corners                        b+c+d+d+e+e+f+g+h+h
+//   ghost|duplicate_corners|skip_inner             c+d+e+e+f+g+h+h
+//   ghost|duplicate_corners|skip_outer             b+c+d+d+e+e
+//   ghost|duplicate_corners|skip_inner|skip_outer  c+d+e+e
 // 
 // For combinations above with "*" these flags can be added:
 //   delay_corners         Corners are normally covered with the first
@@ -82,7 +82,7 @@ namespace PhysBAM{
 enum class RF
 {
     none=0,
-    interior=1,
+    ghost=1,
     delay_corners=2,
     duplicate_corners=4,
     skip_inner=8,
@@ -126,9 +126,9 @@ public:
     FACE_RANGE_ITERATOR(const TV_INT& counts,int outer_ghost,int inner_ghost,
         RF flags=RF::none,int side_input=-1,int axis=-1);
     explicit FACE_RANGE_ITERATOR(const RANGE<TV_INT>& range,
-        RF flags=RF::none,int axis=-1); // implict RF::interior
+        RF flags=RF::none,int axis=-1);
     FACE_RANGE_ITERATOR(const TV_INT& counts,int outer_ghost,
-        RF flags=RF::none,int axis=-1); // implict RF::interior
+        RF flags=RF::none,int axis=-1);
     ~FACE_RANGE_ITERATOR()=default;
 
     void Next() PHYSBAM_ALWAYS_INLINE

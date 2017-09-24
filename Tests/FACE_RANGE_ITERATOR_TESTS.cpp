@@ -75,10 +75,10 @@ void All_Side_Tests(RF flags,bool ignore_dup)
 
     for(int i=0;i<4;i++){
         ARRAY<FACE_INDEX<d> > a,b,c;
-        for(FACE_RANGE_ITERATOR<d> it(ro,ri,flags|io[i],-1,-1);it.Valid();it.Next())
+        for(FACE_RANGE_ITERATOR<d> it(ro,ri,RF::ghost|flags|io[i],-1,-1);it.Valid();it.Next())
             a.Append(it.face);
         for(int s=0;s<2*d;s++)
-            for(FACE_RANGE_ITERATOR<d> it(ro,ri,flags|io[i],s,-1);it.Valid();it.Next())
+            for(FACE_RANGE_ITERATOR<d> it(ro,ri,RF::ghost|flags|io[i],s,-1);it.Valid();it.Next())
                 b.Append(it.face);
         if(ignore_dup){
             Get_Unique(c,a);
@@ -88,7 +88,7 @@ void All_Side_Tests(RF flags,bool ignore_dup)
         a.Sort();
         b.Sort();
         if(a!=b){
-            LOG::printf("side test failed; flags=%i\n",(int)(flags|io[i]));
+            LOG::printf("side test failed; flags=%i\n",(int)(RF::ghost|flags|io[i]));
             fr_test_ok=false;}}
 }
 
@@ -105,14 +105,14 @@ void Delay_Tests(RF flags)
 
     for(int i=0;i<4;i++){
         ARRAY<FACE_INDEX<d> > a,b;
-        for(FACE_RANGE_ITERATOR<d> it(ro,ri,flags|io[i],-1,-1);it.Valid();it.Next())
+        for(FACE_RANGE_ITERATOR<d> it(ro,ri,RF::ghost|flags|io[i],-1,-1);it.Valid();it.Next())
             a.Append(it.face);
-        for(FACE_RANGE_ITERATOR<d> it(ro,ri,flags|io[i]|RF::delay_corners,-1,-1);it.Valid();it.Next())
+        for(FACE_RANGE_ITERATOR<d> it(ro,ri,RF::ghost|flags|io[i]|RF::delay_corners,-1,-1);it.Valid();it.Next())
             b.Append(it.face);
         a.Sort();
         b.Sort();
         if(a!=b){
-            LOG::printf("delay test failed; flags=%i\n",(int)(flags|io[i]));
+            LOG::printf("delay test failed; flags=%i\n",(int)(RF::ghost|flags|io[i]));
             fr_test_ok=false;}}
 }
 
@@ -130,17 +130,17 @@ void Single_Side_Tests()
     for(int i=0;i<4;i++){
         for(int s=0;s<2*d;s++){
             ARRAY<FACE_INDEX<d> > a,b,c;
-            for(FACE_RANGE_ITERATOR<d> it(ro,ri,io[i],s,-1);it.Valid();it.Next())
+            for(FACE_RANGE_ITERATOR<d> it(ro,ri,RF::ghost|io[i],s,-1);it.Valid();it.Next())
                 a.Append(it.face);
-            for(FACE_RANGE_ITERATOR<d> it(ro,ri,io[i]|RF::delay_corners,s,-1);it.Valid();it.Next())
+            for(FACE_RANGE_ITERATOR<d> it(ro,ri,RF::ghost|io[i]|RF::delay_corners,s,-1);it.Valid();it.Next())
                 b.Append(it.face);
-            for(FACE_RANGE_ITERATOR<d> it(ro,ri,io[i]|RF::duplicate_corners,s,-1);it.Valid();it.Next())
+            for(FACE_RANGE_ITERATOR<d> it(ro,ri,RF::ghost|io[i]|RF::duplicate_corners,s,-1);it.Valid();it.Next())
                 c.Append(it.face);
             a.Sort();
             b.Sort();
             c.Sort();
             if(a!=b || a!=c){
-                LOG::printf("single side test failed; flags=%i side=%i (sizes %i %i %i)\n",(int)(io[i]),s,a.m,b.m,c.m);
+                LOG::printf("single side test failed; flags=%i side=%i (sizes %i %i %i)\n",(int)(RF::ghost|io[i]),s,a.m,b.m,c.m);
                 fr_test_ok=false;}}}
 }
 
@@ -178,9 +178,9 @@ void Dim_Tests()
                RF::partial_single_side,RF::partial_single_side|RF::delay_corners};
     for(int i=0;i<4;i++)
         for(int j=0;j<5;j++)
-            All_Flags_Tests<d>(io[i]|epu[j]);
-    All_Flags_Tests<d>(RF::interior);
-    All_Flags_Tests<d>(RF::interior|RF::skip_outer);
+            All_Flags_Tests<d>(RF::ghost|io[i]|epu[j]);
+    All_Flags_Tests<d>(RF::none);
+    All_Flags_Tests<d>(RF::skip_outer);
 
     All_Side_Tests<d>(RF::none,true);
     All_Side_Tests<d>(RF::duplicate_corners,false);
@@ -197,15 +197,15 @@ void Dim_Tests()
     RF op_o[2]={RF::none,RF::skip_outer};
 
     for(int i=0;i<2;i++)
-        Containment_Tests<d>(RF::interior|RF::skip_outer,op_o[i],RF::interior|op_o[i]);
+        Containment_Tests<d>(RF::skip_outer,RF::ghost|op_o[i],op_o[i]);
     for(int i=0;i<2;i++)
-        Containment_Tests<d>(RF::interior,RF::skip_inner|op_o[i],RF::interior|op_o[i]);
-    for(int i=0;i<2;i++)
-        for(int j=0;j<2;j++)
-            Containment_Tests<d>(RF::skip_outer|op_i[j],op_o[i],op_o[i]|op_i[j]);
+        Containment_Tests<d>(RF::none,RF::ghost|RF::skip_inner|op_o[i],op_o[i]);
     for(int i=0;i<2;i++)
         for(int j=0;j<2;j++)
-            Containment_Tests<d>(op_i[j],RF::skip_inner|op_o[i],op_o[i]|op_i[j]);
+            Containment_Tests<d>(RF::ghost|RF::skip_outer|op_i[j],RF::ghost|op_o[i],RF::ghost|op_o[i]|op_i[j]);
+    for(int i=0;i<2;i++)
+        for(int j=0;j<2;j++)
+            Containment_Tests<d>(RF::ghost|op_i[j],RF::ghost|RF::skip_inner|op_o[i],RF::ghost|op_o[i]|op_i[j]);
 }
 
 class FACE_RANGE_ITERATOR_TESTS:public TEST_BASE

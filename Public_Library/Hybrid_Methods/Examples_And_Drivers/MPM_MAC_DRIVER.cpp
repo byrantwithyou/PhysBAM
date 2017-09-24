@@ -244,13 +244,10 @@ Extrapolate_Boundary(PHASE& ph) const
         FACE_INDEX<TV::m> f1=further(f0);
         ph.velocity(it.face)=(d+1)*ph.velocity(f0)-d*ph.velocity(f1);};
 
-    for(int n=example.weights[0]->stencil_width-2;n>0;--n){ // assume all dimensions use the same interpolation order
-        RANGE<TV_INT> inner=example.grid.Domain_Indices(0).Thickened(-n);
-        RANGE<TV_INT> outer=inner.Thickened(1);
-        for(FACE_RANGE_ITERATOR<TV::m> it(outer,inner,RF::skip_inner|RF::skip_outer);it.Valid();it.Next())
+    for(int n=example.weights[0]->stencil_width-2;n>0;--n) // assume all dimensions use the same interpolation order
+        for(FACE_RANGE_ITERATOR<TV::m> it(example.grid.Domain_Indices(),1-n,-n,
+                RF::ghost|RF::skip_inner);it.Valid();it.Next())
             extrapolate(it);
-        for(FACE_RANGE_ITERATOR<TV::m> it(outer,outer);it.Valid();it.Next())
-            extrapolate(it);}
 }
 //#####################################################################
 // Function Particle_To_Grid
@@ -1244,7 +1241,7 @@ Extrapolate_Velocity(PHASE_ID pid,bool use_bc) const
         bound[i]=domain.max_corner;
         for(int j=0;j<TV::m;j++) if(i!=j)
             bound[i](j)++;}
-    for(FACE_RANGE_ITERATOR<TV::m> it(ghost_domain,domain,RF::skip_inner|RF::delay_corners);it.Valid();it.Next()){
+    for(FACE_RANGE_ITERATOR<TV::m> it(ghost_domain,domain,RF::ghost|RF::skip_inner|RF::delay_corners);it.Valid();it.Next()){
         typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.bc_type(it.side);
         if(bc_type==example.BC_PERIODIC) continue;
         int side_axis=it.side/2;

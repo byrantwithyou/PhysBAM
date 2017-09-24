@@ -20,10 +20,10 @@ NODE_ITERATOR(const GRID<TV>& grid_input,const int number_of_ghost_cells,
     int inner_ghost=0,outer_ghost=number_of_ghost_cells;
     RI flags=RI::none;
     switch(region_type){
-        case GRID<TV>::WHOLE_REGION:flags=RI::interior;break;
-        case GRID<TV>::GHOST_REGION:break;
-        case GRID<TV>::BOUNDARY_REGION:inner_ghost=outer_ghost-1;break;
-        case GRID<TV>::INTERIOR_REGION:flags=RI::interior;outer_ghost--;break;
+        case GRID<TV>::WHOLE_REGION:break;
+        case GRID<TV>::GHOST_REGION:flags=RI::ghost;break;
+        case GRID<TV>::BOUNDARY_REGION:inner_ghost=outer_ghost-1;flags=RI::ghost;break;
+        case GRID<TV>::INTERIOR_REGION:outer_ghost--;break;
         case GRID<TV>::BOUNDARY_INTERIOR_REGION:PHYSBAM_FATAL_ERROR();break;}
     this->Set_Range(grid_input.Numbers_Of_Nodes(),outer_ghost,inner_ghost);
     this->Initialize(flags,side);

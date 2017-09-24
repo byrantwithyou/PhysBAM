@@ -21,10 +21,10 @@ FACE_ITERATOR(const GRID<TV>& grid_input,const int number_of_ghost_cells_input,
     Set_Range(grid_input.numbers_of_cells,number_of_ghost_cells_input,inner_ghost);
     RF flags=RF::none;
     switch(region_type_input){
-        case GRID<TV>::WHOLE_REGION:flags=RF::interior;break;
-        case GRID<TV>::GHOST_REGION:flags=RF::skip_inner;break;
-        case GRID<TV>::BOUNDARY_REGION:flags=RF::none;break;
-        case GRID<TV>::INTERIOR_REGION:flags=RF::interior|RF::skip_outer;break;
+        case GRID<TV>::WHOLE_REGION:break;
+        case GRID<TV>::GHOST_REGION:flags=RF::ghost|RF::skip_inner;break;
+        case GRID<TV>::BOUNDARY_REGION:flags=RF::ghost;break;
+        case GRID<TV>::INTERIOR_REGION:flags=RF::skip_outer;break;
         case GRID<TV>::BOUNDARY_INTERIOR_REGION:PHYSBAM_FATAL_ERROR();break;}
     Initialize(flags,side_input,axis_input);
 }
@@ -34,7 +34,7 @@ FACE_ITERATOR(const GRID<TV>& grid_input,const int number_of_ghost_cells_input,
 template<class TV> FACE_ITERATOR<TV>::
 FACE_ITERATOR(const GRID<TV>& grid_input,const RANGE<TV_INT>& explicit_region_input,
     const int axis_input)
-    :FACE_RANGE_ITERATOR<TV::m>(explicit_region_input,RF::interior,axis_input),
+    :FACE_RANGE_ITERATOR<TV::m>(explicit_region_input,RF::none,axis_input),
     grid(grid_input)
 {
 }

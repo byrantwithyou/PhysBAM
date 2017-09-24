@@ -5,11 +5,11 @@
 #include <Core/Log/LOG.h>
 #include <Core/Math_Tools/RANGE_ITERATOR.h>
 namespace PhysBAM{
-int range_lookup[2][5]=
+int range_lookup[2][2]=
 {
     // indices, side_adj
-    {0x312001,0x878888}, // NO FLAGS
-    {0x333000,0x888888}  // FLAG_INTERIOR
+    {0x333000,0x888888}, // interior
+    {0x312001,0x878888}  // ghost
 };
 //#####################################################################
 // Constructor
@@ -47,22 +47,20 @@ RANGE_ITERATOR(const TV_INT& counts,int outer_ghost,int inner_ghost,
 // Constructor
 //#####################################################################
 template<int d> RANGE_ITERATOR<d>::
-RANGE_ITERATOR(const RANGE<TV_INT>& range,
-    RI flags) // implict RI::interior
+RANGE_ITERATOR(const RANGE<TV_INT>& range,RI flags)
     :vecs{range.min_corner,range.min_corner,range.max_corner-1,range.max_corner-1}
 {
-    Initialize(flags|RI::interior,-1);
+    Initialize(flags,-1);
 }
 //#####################################################################
 // Constructor
 //#####################################################################
 template<int d> RANGE_ITERATOR<d>::
-RANGE_ITERATOR(const TV_INT& counts,int outer_ghost,
-    RI flags) // implict RI::interior
+RANGE_ITERATOR(const TV_INT& counts,int outer_ghost,RI flags)
     :vecs{TV_INT()-outer_ghost,TV_INT()-outer_ghost,
         counts+(outer_ghost-1),counts+(outer_ghost-1)}
 {
-    Initialize(flags|RI::interior,-1);
+    Initialize(flags,-1);
 }
 //#####################################################################
 // Function Set_Range
@@ -130,16 +128,16 @@ Encode(RI flags,int side_input)
     if(any(flags&RI::side_mask)) side_mask=side_input;
     else side_mask=side_input<0?(1<<2*d)-1:(1<<side_input);
     flags=flags&~(RI::reverse|RI::end);
-    if(any(flags&RI::interior)) side_mask=1;
+    if(!any(flags&RI::ghost)) side_mask=1;
 
     // Explicitly check for flag combinations that do not make sense.
-    if(any(flags&RI::interior)){
-        PHYSBAM_ASSERT(!(flags&~(RI::interior)));}
+    if(!any(flags&RI::ghost)){
+        PHYSBAM_ASSERT(!(flags&~(RI::ghost)));}
     if(any(flags&RI::duplicate_corners)){
-        PHYSBAM_ASSERT(!(flags&~(RI::duplicate_corners|RI::side_mask)));}
+        PHYSBAM_ASSERT(!(flags&~(RI::ghost|RI::duplicate_corners|RI::side_mask)));}
 
     int offsets[2];
-    int mode=(int)(flags&RI::interior);
+    int mode=(int)(flags&RI::ghost);
     for(int i=0;i<2;i++) offsets[i]=range_lookup[mode][i];
 
     if(one_side && !(flags&RI::partial_single_side))
