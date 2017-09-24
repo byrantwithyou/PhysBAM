@@ -327,7 +327,7 @@ Write(const char* name,const ARRAY<T2,VECTOR<int,2> >& m)
     out<<"% name: "<<name<<"\n% type: matrix\n% rows: "<<counts.y<<"\n% columns: "<<counts.x<<"\n";
     for(RANGE_ITERATOR<2> it(m.domain);it.Valid();it.Next()){
         out<<m(it.index)<<" ";
-        if(it.index(0)>=it.domain.max_corner(0)) out<<"\n";}
+        if(it.index(0)>=m.domain.max_corner(0)) out<<"\n";}
 }
 //#####################################################################
 // Function Write
