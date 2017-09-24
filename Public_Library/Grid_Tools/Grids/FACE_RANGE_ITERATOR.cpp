@@ -64,6 +64,7 @@ FACE_RANGE_ITERATOR(const TV_INT& counts,int outer_ghost,
 {
     Initialize(flags|RF::interior,-1,axis);
 }
+//#####################################################################
 // Function Set_Range
 //#####################################################################
 template<int d> void FACE_RANGE_ITERATOR<d>::
@@ -97,7 +98,7 @@ Set_Range(const TV_INT& counts,int outer_ghost,int inner_ghost)
     vecs[3]=counts+(outer_ghost-1);
 }
 //#####################################################################
-// Function Encode
+// Function Initialize
 //#####################################################################
 template<int d> void FACE_RANGE_ITERATOR<d>::
 Initialize(RF flags,int side_input,int axis)
@@ -107,7 +108,7 @@ Initialize(RF flags,int side_input,int axis)
     if(any(flags&RF::end)) face.index(d-1)++;
 }
 //#####################################################################
-// Function Reset_Axis_Side
+// Function Reset
 //#####################################################################
 template<int d> void FACE_RANGE_ITERATOR<d>::
 Reset(RF flags)
@@ -177,7 +178,7 @@ Next_Helper()
     Next_Axis_Side();
 }
 //#####################################################################
-// Function Next_Helper
+// Function Prev_Helper
 //#####################################################################
 template<int d> void FACE_RANGE_ITERATOR<d>::
 Prev_Helper()
@@ -190,7 +191,7 @@ Prev_Helper()
     Prev_Axis_Side();
 }
 //#####################################################################
-// Function Next_Helper
+// Function Next_Axis_Side
 //#####################################################################
 template<int d> void FACE_RANGE_ITERATOR<d>::
 Next_Axis_Side()
@@ -210,7 +211,7 @@ Next_Axis_Side()
     if(!current[0].All_Less(current[1])) Next_Axis_Side();
 }
 //#####################################################################
-// Function Next_Helper
+// Function Prev_Axis_Side
 //#####################################################################
 template<int d> void FACE_RANGE_ITERATOR<d>::
 Prev_Axis_Side()
