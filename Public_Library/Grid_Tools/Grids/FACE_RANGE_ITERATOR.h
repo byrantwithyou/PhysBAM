@@ -125,7 +125,7 @@ public:
         int inner_ghost,RF flags=RF::none,int side_input=-1,int axis=-1);
     FACE_RANGE_ITERATOR(const TV_INT& counts,int outer_ghost,int inner_ghost,
         RF flags=RF::none,int side_input=-1,int axis=-1);
-    FACE_RANGE_ITERATOR(const RANGE<TV_INT>& range,
+    explicit FACE_RANGE_ITERATOR(const RANGE<TV_INT>& range,
         RF flags=RF::none,int axis=-1); // implict RF::interior
     FACE_RANGE_ITERATOR(const TV_INT& counts,int outer_ghost,
         RF flags=RF::none,int axis=-1); // implict RF::interior
