@@ -12,12 +12,14 @@
 namespace PhysBAM{
 
 template<class TV>
-class NODE_ITERATOR:public GRID_ITERATOR_BASE<TV>
+class NODE_ITERATOR:public RANGE_ITERATOR<TV::m>
 {
 public:
     typedef typename GRID<TV>::REGION T_REGION;typedef VECTOR<int,TV::m> TV_INT;
     typedef TV VECTOR_T;
-    using GRID_ITERATOR_BASE<TV>::grid;using GRID_ITERATOR_BASE<TV>::index;using GRID_ITERATOR_BASE<TV>::Add_Region;using GRID_ITERATOR_BASE<TV>::Reset;
+    using RANGE_ITERATOR<TV::m>::index;
+
+    const GRID<TV>& grid;
 
     NODE_ITERATOR(const GRID<TV>& grid_input,const int number_of_ghost_cells=0,const T_REGION& region_type=GRID<TV>::WHOLE_REGION,const int side=-1);
     NODE_ITERATOR(const GRID<TV>& grid_input,const RANGE<TV_INT>& region_input);

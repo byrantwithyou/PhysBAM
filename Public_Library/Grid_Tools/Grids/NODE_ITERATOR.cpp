@@ -10,49 +10,30 @@ using namespace PhysBAM;
 // Function NODE_ITERATOR
 //#####################################################################
 template<class TV> NODE_ITERATOR<TV>::
-NODE_ITERATOR(const GRID<TV>& grid_input,const int number_of_ghost_cells,const T_REGION& region_type,const int side)
-    :GRID_ITERATOR_BASE<TV>(grid_input)
+NODE_ITERATOR(const GRID<TV>& grid_input,const int number_of_ghost_cells,
+    const T_REGION& region_type,const int side)
+    :grid(grid_input)
 {
-    assert(-1<=side&&side<2*TV::m);assert(region_type!=GRID<TV>::BOUNDARY_INTERIOR_REGION);
-    TV_INT counts=grid.Numbers_Of_Nodes(); // exact number of nodes (even if MAC)
-    RANGE<TV_INT> domain(grid.Node_Indices(number_of_ghost_cells));
+    assert(-1<=side&&side<2*TV::m);
+    assert(region_type!=GRID<TV>::BOUNDARY_INTERIOR_REGION);
+
+    int inner_ghost=0,outer_ghost=number_of_ghost_cells;
+    RI flags=RI::none;
     switch(region_type){
-        case GRID<TV>::WHOLE_REGION: assert(side<0);Add_Region(domain);break;
-        case GRID<TV>::GHOST_REGION: assert(number_of_ghost_cells>0); // ghost region of grid with specified ghost cells
-            // TODO(jontg): counts doesn't take into account number_of_ghost_cells, so I believe this to be incorrect.
-            if(side<0){ // don't loop over the same cell twice!
-                TV_INT max_copy(domain.max_corner);
-                for(int axis=TV::m-1;axis>=0;axis--){
-                    domain.max_corner(axis)=0;
-                    Add_Region(domain);
-                    domain.max_corner(axis)=max_copy(axis);
-                    domain.min_corner(axis)=counts(axis);
-                    Add_Region(domain);
-                    domain.max_corner(axis)=counts(axis);
-                    domain.min_corner(axis)=0;}}
-            else{int axis=side/2;if(side&1) domain.min_corner(axis)=counts(axis)+1;else domain.max_corner(axis)=0;Add_Region(domain);}
-            break;
-        case GRID<TV>::BOUNDARY_REGION: // outer boundary of grid with specified ghost cells
-            if(side<0){ // don't loop over the same node twice!
-                RANGE<TV_INT> domain_copy(domain);
-                for(int axis=TV::m-1;axis>=0;axis--){
-                    domain.max_corner(axis)=domain.min_corner(axis);
-                    Add_Region(domain);
-                    domain.max_corner(axis)=domain.min_corner(axis)=domain_copy.max_corner(axis);
-                    Add_Region(domain);
-                    domain.max_corner(axis)=domain_copy.max_corner(axis)-1;
-                    domain.min_corner(axis)=domain_copy.min_corner(axis)+1;}}
-            else{int axis=side/2;if(side&1) domain.min_corner(axis)=domain.max_corner(axis);else domain.max_corner(axis)=domain.min_corner(axis);Add_Region(domain);}
-            break;
-        default: assert(region_type==GRID<TV>::INTERIOR_REGION && side<0);domain.Change_Size(-1);Add_Region(domain);break;}
-    Reset();
+        case GRID<TV>::WHOLE_REGION:flags=RI::interior;break;
+        case GRID<TV>::GHOST_REGION:break;
+        case GRID<TV>::BOUNDARY_REGION:inner_ghost=outer_ghost-1;break;
+        case GRID<TV>::INTERIOR_REGION:flags=RI::interior;outer_ghost--;break;
+        case GRID<TV>::BOUNDARY_INTERIOR_REGION:PHYSBAM_FATAL_ERROR();break;}
+    this->Set_Range(grid_input.Numbers_Of_Nodes(),outer_ghost,inner_ghost);
+    this->Initialize(flags,side);
 }
 //#####################################################################
 // Function NODE_ITERATOR
 //#####################################################################
 template<class TV> NODE_ITERATOR<TV>::
 NODE_ITERATOR(const GRID<TV>& grid_input,const RANGE<TV_INT>& region_input)
-    :GRID_ITERATOR_BASE<TV>(grid_input,region_input)
+    :RANGE_ITERATOR<TV::m>(region_input),grid(grid_input)
 {
 }
 //#####################################################################
