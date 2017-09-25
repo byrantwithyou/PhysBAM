@@ -246,7 +246,7 @@ Extrapolate_Boundary(PHASE& ph) const
 
     for(int n=example.weights[0]->stencil_width-2;n>0;--n) // assume all dimensions use the same interpolation order
         for(FACE_RANGE_ITERATOR<TV::m> it(example.grid.Domain_Indices(),1-n,-n,
-                RF::ghost|RF::skip_inner);it.Valid();it.Next())
+                RF::ghost|RF::skip_inner|RF::delay_corners);it.Valid();it.Next())
             extrapolate(it);
 }
 //#####################################################################
