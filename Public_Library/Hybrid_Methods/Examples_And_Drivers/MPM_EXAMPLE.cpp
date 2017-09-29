@@ -201,6 +201,7 @@ Add_Force(DEFORMABLES_FORCES<TV>& force)
 template<class TV> void MPM_EXAMPLE<TV>::
 Set_Weights(int order)
 {
+    delete weights;
     if(order==1) gather_scatter.weights=weights=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,1>(grid,threads);
     else if(order==2) gather_scatter.weights=weights=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,2>(grid,threads);
     else if(order==3) gather_scatter.weights=weights=new PARTICLE_GRID_WEIGHTS_SPLINE<TV,3>(grid,threads);
