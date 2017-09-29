@@ -47,7 +47,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     m(1),s(1),kg(1),forced_collision_type(-1),friction(0),friction_is_set(false),sigma_Y(0),use_cohesion(false),write_output_files(0),read_output_files(0),
     dump_collision_objects(false),tests(stream_type_input,deformable_body_collection)
 {
-    T framerate=24;
+    T framerate=0;
     bool use_quasi_exp_F_update=false;
     bool no_affine=false;
     bool use_separate=false,use_slip=false,use_stick=false;
@@ -62,6 +62,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-o",&output_directory,&override_output_directory,"dir","Output directory");
     parse_args.Add("-mass_contour",&mass_contour,"contour","Draw mass contour as a scale to particle average mass");
     parse_args.Add("-framerate",&framerate,"rate","Number of frames per second");
+    parse_args.Add("-frame_dt",&frame_dt,"rate","Number of frames per second");
     parse_args.Add("-min_dt",&min_dt,"dt","Minimum time step size");
     parse_args.Add("-max_dt",&max_dt,"dt","Maximum time step size");
     parse_args.Add("-order",&order,"order","Interpolation basis order");
@@ -135,8 +136,8 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
 
     if(no_affine) use_affine=false;
 
-    framerate/=s;
-    frame_dt=1/framerate;
+    if(framerate) frame_dt=1/framerate;
+    frame_dt*=s;
 
     quad_F_coeff=(T)0;
     if(use_quasi_exp_F_update) quad_F_coeff=(T).5;
