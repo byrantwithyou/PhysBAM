@@ -41,7 +41,8 @@ public:
     using BASE::test_diff;using BASE::threads;using BASE::weights;
     using BASE::lagrangian_forces;using BASE::stream_type;
     using BASE::Add_Force;using BASE::Set_Weights;using BASE::deformable_body_collection;
-    using BASE::Add_Collision_Object;using typename BASE::COLLISION_TYPE;using BASE::data_directory;
+    using BASE::Add_Collision_Object;using typename BASE::COLLISION_TYPE;
+    using BASE::data_directory;using BASE::reflection_bc_flags;
     using BASE::quad_F_coeff;using BASE::use_sound_speed_cfl;using BASE::cfl_sound;
 
     int test_number;
@@ -125,6 +126,7 @@ public:
         const T mass,const T volume);
     void Add_Lambda_Particles(ARRAY<int>* affected_particles,T E,T nu,T density,bool no_mu=false,T porosity=(T)1,T saturation_level=(T)1);
     int Add_Gravity(TV g,ARRAY<int>* affected_particles=0);
+    int Add_Gravity2(TV g,ARRAY<int>* affected_particles=0);
     int Add_Fixed_Corotated(T E,T nu,ARRAY<int>* affected_particles=0,bool no_mu=false);
     int Add_Neo_Hookean(T E,T nu,ARRAY<int>* affected_particles=0);
     int Add_Fixed_Corotated(T_VOLUME& object,T E,T nu);

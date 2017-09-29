@@ -59,6 +59,8 @@ public:
     void Print_Energy_Stats(const char* str,const ARRAY<TV,TV_INT>& u);
     void Grid_To_Particle_Limit_Dt();
     void Limit_Dt_Sound_Speed();
+    template<class S> void Reflection_Boundary_Condition(ARRAY<S,TV_INT>& u,bool flip_sign);
+    void Reflect_Or_Invalidate_Particle(int p);
 //#####################################################################
 };
 }

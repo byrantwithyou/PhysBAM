@@ -116,8 +116,8 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-test_output_prefix",&test_output_prefix,&use_test_output,"","prefix to use for test output");
     parse_args.Add("-strong_cfl",&use_strong_cfl,"limit dt based on final change in X and F");
     parse_args.Add("-sound_cfl",&use_sound_speed_cfl,"limit dt based on final change in X and F");
+    parse_args.Add("-reflection_bc",&reflection_bc_flags,"flags","Flags indicating which walls should be reflection BC");
 
-    
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);
     if(use_slip) forced_collision_type=COLLISION_TYPE::slip;
@@ -294,6 +294,16 @@ template<class TV> int STANDARD_TESTS_BASE<TV>::
 Add_Gravity(TV g,ARRAY<int>* affected_particles)
 {
     return Add_Force(*new MPM_GRAVITY<TV>(force_helper,g,gather_scatter,affected_particles));
+}
+//#####################################################################
+// Function Add_Gravity2
+//#####################################################################
+template<class TV> int STANDARD_TESTS_BASE<TV>::
+Add_Gravity2(TV g,ARRAY<int>* affected_particles)
+{
+    if(affected_particles)
+        return Add_Force(*new DEFORMABLE_GRAVITY<TV>(particles,affected_particles,g));
+    return Add_Force(*new DEFORMABLE_GRAVITY<TV>(particles,true,g));
 }
 //#####################################################################
 // Function Add_Fixed_Corotated

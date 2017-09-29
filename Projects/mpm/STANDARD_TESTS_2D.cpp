@@ -1474,6 +1474,8 @@ Initialize()
         } break;
         case 71:{ // (fluid test) dam break; Rabecca Brannon test
             Set_Grid(RANGE<TV>(TV(),TV(1,2)).Thickened(.25)*m,TV_INT(3,5),TV_INT(),2,100);
+            if(this->reflection_bc_flags!=0)
+                Set_Grid(RANGE<TV>(TV(),TV(1,2))*m,TV_INT(1,2),100);
             RANGE<TV> box(TV(.6,0)*m,TV(1,.4)*m);
             T density=1000*unit_rho;
             Seed_Particles(box,0,0,density,particles_per_cell);
@@ -1488,8 +1490,9 @@ Initialize()
             rn.Fill_Uniform(dm,.5,2);
             cm->Test(dm,0);
             Add_Force(*new MPM_FINITE_ELEMENTS<TV>(force_helper,*cm,gather_scatter,0));
-            Add_Gravity(m/(s*s)*TV(0,-9.81));
-            Add_Walls(-1,COLLISION_TYPE::separate,0,.25*m,false);
+            this->Add_Gravity2(m/(s*s)*TV(0,-9.81));
+            if(this->reflection_bc_flags==0)
+                Add_Walls(-1,COLLISION_TYPE::separate,0,.25*m,false);
             end_time_step=[=](T time)
                 {
                     for(int i=0;i<particles.F.m;i++){

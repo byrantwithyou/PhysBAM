@@ -247,6 +247,9 @@ Particle_To_Grid()
     example.valid_grid_indices.Remove_All();
     example.valid_grid_cell_indices.Remove_All();
 
+    Reflection_Boundary_Condition(example.velocity,true);
+    Reflection_Boundary_Condition(example.mass,false);
+
     for(RANGE_ITERATOR<TV::m> it(example.mass.domain);it.Valid();it.Next()){
         int i=example.mass.Standard_Index(it.index);
         if(example.mass.array(i)){
@@ -316,7 +319,7 @@ Grid_To_Particle()
             TV V_flip=particles.V(p)+h.V_pic_fric-h.V_weight_old;
             particles.V(p)=V_flip*example.flip+h.V_pic_fric*(1-example.flip);
 
-            if(!example.grid.domain.Lazy_Inside(particles.X(p))) particles.valid(p)=false;
+            Reflect_Or_Invalidate_Particle(p);
         });
 }
 // Lower s if necessary so that |t*(a+t*b)|<=bound for all 0<=t<=s
@@ -445,6 +448,7 @@ Apply_Forces()
         example.Precompute_Forces(example.time,example.dt,0);
         objective.tmp2.u*=0;
         example.Add_Forces(objective.tmp2.u,example.time);
+        Reflection_Boundary_Condition(objective.tmp2.u,true);
         for(int i=0;i<example.valid_grid_indices.m;i++){
             int p=example.valid_grid_indices(i);
             dv.u.array(p)=example.dt/example.mass.array(p)*objective.tmp2.u.array(p);}
@@ -627,6 +631,50 @@ Print_Energy_Stats(const char* str,const ARRAY<TV,TV_INT>& u)
     LOG::cout<<str<<" total energy "<<"time " <<example.time<<" value "<<te<<" diff "<<(te-example.last_te)<<std::endl;
     LOG::cout<<str<<" particle total energy "<<"time " <<example.time<<" value "<<(ke2+pe)<<std::endl;
     example.last_te=te;
+}
+template<class T,int d> void flip(VECTOR<T,d>& u,int a){u(a)=-u(a);}
+template<class T> void flip(T& u,int a){}
+//#####################################################################
+// Function Reflection_Boundary_Condition
+//#####################################################################
+template<class TV> template<class S> void MPM_DRIVER<TV>::
+Reflection_Boundary_Condition(ARRAY<S,TV_INT>& u,bool flip_sign)
+{
+    if(!example.reflection_bc_flags) return;
+    TV_INT ranges[2]={TV_INT(),example.grid.numbers_of_cells};
+    for(RANGE_ITERATOR<TV::m> it(example.grid.Domain_Indices(),example.ghost,0,
+            RI::ghost|RI::side_mask,example.reflection_bc_flags);it.Valid();it.Next()){
+        int axis=it.side/2,side=it.side%2;
+        TV_INT pair=it.index;
+        pair(axis)=2*ranges[side](axis)-it.index(axis)-1;
+        if(flip_sign) flip(u(it.index),axis);
+        u(pair)+=u(it.index);
+        u(it.index)=S();}
+    for(RANGE_ITERATOR<TV::m> it(example.grid.Domain_Indices(),example.ghost,0,
+            RI::ghost|RI::delay_corners|RI::side_mask,example.reflection_bc_flags);it.Valid();it.Next()){
+        int axis=it.side/2,side=it.side%2;
+        TV_INT pair=it.index;
+        pair(axis)=2*ranges[side](axis)-it.index(axis)-1;
+        u(it.index)=u(pair);
+        if(flip_sign) flip(u(it.index),axis);}
+}
+//#####################################################################
+// Function Reflect_Particles
+//#####################################################################
+template<class TV> void MPM_DRIVER<TV>::
+Reflect_Or_Invalidate_Particle(int p)
+{
+    int f=example.reflection_bc_flags;
+    TV A=example.grid.domain.min_corner;
+    TV B=example.grid.domain.max_corner;
+    TV& X=example.particles.X(p),&V=example.particles.V(p);
+    for(int a=0;a<TV::m;a++){
+        if(X(a)<A(a)){
+            if((f>>(2*a))&1){X(a)=2*A(a)-X(a);V(a)=-V(a);}
+            else example.particles.valid(p)=false;}
+        else if(X(a)>B(a)){
+            if((f>>(2*a+1))&1){X(a)=2*B(a)-X(a);V(a)=-V(a);}
+            else example.particles.valid(p)=false;}}
 }
 //#####################################################################
 namespace PhysBAM{
