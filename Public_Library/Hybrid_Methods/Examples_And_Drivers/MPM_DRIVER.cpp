@@ -442,9 +442,12 @@ Apply_Forces()
     objective.Reset();
     LOG::printf("max velocity: %.16P\n",Max_Particle_Speed());
     if(example.use_symplectic_euler){
-        objective.tmp1.Copy(-(example.use_midpoint?2:1),objective.v0);
-        objective.Compute_Unconstrained(objective.tmp1,0,&objective.tmp2,0);
-        dv.Copy(-(example.use_midpoint?4:1),objective.tmp2,objective.tmp1);
+        example.Precompute_Forces(example.time,example.dt,0);
+        objective.tmp2.u*=0;
+        example.Add_Forces(objective.tmp2.u,example.time);
+        for(int i=0;i<example.valid_grid_indices.m;i++){
+            int p=example.valid_grid_indices(i);
+            dv.u.array(p)=example.dt/example.mass.array(p)*objective.tmp2.u.array(p);}
         objective.system.forced_collisions.Remove_All();
         objective.tmp1=dv;
         objective.Adjust_For_Collision(dv);
