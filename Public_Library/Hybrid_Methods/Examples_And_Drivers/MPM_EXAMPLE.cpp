@@ -79,10 +79,6 @@ Write_Output_Files(const int frame)
             Write_To_File(stream_type,LOG::sprintf("%s/%d/centered_velocities",output_directory.c_str(),frame),*current_velocity);
 #pragma omp task
             {
-                ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
-                for(int i=0;i<particles.X.m;i++){
-                    Add_Debug_Particle(particles.X(i),particles.valid(i)?(*color_attribute)(i):VECTOR<T,3>(1,0,1));
-                    Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,particles.V(i));}
                 GRID<TV> ghost_grid(grid.numbers_of_cells+2*ghost,grid.Ghost_Domain(ghost),true);
                 for(int i=0;i<collision_objects.m;i++)
                     if(IMPLICIT_OBJECT<TV>* io=collision_objects(i)->Get_Implicit_Object(time))
