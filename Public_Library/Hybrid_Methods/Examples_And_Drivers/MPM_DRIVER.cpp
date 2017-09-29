@@ -389,6 +389,9 @@ Grid_To_Particle_Limit_Dt()
             else{xp_new_s=dt*h.V_pic;xp_new_s2=dt*h.V_pic_s;}
             Enforce_Limit_Max(s,example.cfl,xp_new_s,xp_new_s2);
         });
+    if(example.dt*s<example.min_dt) s=example.min_dt/example.dt;
+    if(s>=1) return;
+    LOG::printf("X J CFL scale: %g -> %g\n",example.dt,example.dt*s);
     example.dt*=s;
     example.velocity_new.array=(example.velocity_new.array-example.velocity.array)*s+example.velocity.array;
     example.velocity_friction.array=(example.velocity_friction.array-example.velocity.array)*s+example.velocity.array;
@@ -410,11 +413,15 @@ Limit_Dt_Sound_Speed()
                 T J=example.particles.F(p).Determinant();
                 T rho=example.particles.mass(p)/(example.particles.volume(p)*J);
                 T speed=sqrt(K/(J*rho));
-                T new_dt=example.grid.dX.Min()/speed;
+                T new_dt=example.grid.dX.Min()/speed*example.cfl_sound;
                 dt=min(dt,new_dt);}}}
-    if(dt<example.dt){
-        LOG::printf("SOUND CFL %g %g\n",example.dt,dt);
-        example.dt=dt*example.cfl_sound;}
+    if(dt<example.min_dt) dt=example.min_dt;
+    if(dt>=example.dt) return;
+    T s=dt/example.dt;
+    LOG::printf("SOUND CFL %g %g (%g)\n",example.dt,dt,s);
+    example.velocity_new.array=(example.velocity_new.array-example.velocity.array)*s+example.velocity.array;
+    example.velocity_friction.array=(example.velocity_friction.array-example.velocity.array)*s+example.velocity.array;
+    example.dt=dt;
 }
 //#####################################################################
 // Function Update_Plasticity_And_Hardening
