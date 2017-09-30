@@ -125,7 +125,7 @@ template<int d> void RANGE_ITERATOR<d>::
 Encode(RI flags,int side_input)
 {
     bool one_side=!(flags&RI::side_mask) && side_input>=0;
-    if(any(flags&RI::side_mask)) side_mask=side_input;
+    if(any(flags&RI::side_mask)) side_mask=side_input&((1<<2*d)-1);
     else side_mask=side_input<0?(1<<2*d)-1:(1<<side_input);
     flags=flags&~(RI::reverse|RI::end);
     if(!any(flags&RI::ghost)) side_mask=1;

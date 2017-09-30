@@ -131,7 +131,7 @@ Encode(RF flags,int side_input,int axis)
     bool one_side=!(flags&RF::side_mask) && side_input>=0;
     if(any(flags&RF::axis_mask)) axis_mask=axis;
     else axis_mask=axis<0?(1<<d)-1:(1<<axis);
-    if(any(flags&RF::side_mask)) side_mask=side_input;
+    if(any(flags&RF::side_mask)) side_mask=side_input&((1<<2*d)-1);
     else side_mask=side_input<0?(1<<2*d)-1:(1<<side_input);
     flags=flags&~(RF::reverse|RF::end|RF::axis_mask);
     if(!any(flags&RF::ghost)) side_mask=1;
