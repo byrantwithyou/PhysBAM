@@ -860,6 +860,7 @@ Compute_Boundary_Conditions()
             if(example.phases(p).mass(it.Full_Index()))
                 example.phases(p).velocity(it.Full_Index())=u_bc(p);}
     Fix_Periodic(example.psi_N);
+    example.dof=Allocate_Projection_System_Variable();
 }
 //#####################################################################
 // Function Allocate_Projection_System_Variable
@@ -1008,9 +1009,8 @@ template<class TV> void MPM_MAC_DRIVER<TV>::
 Compute_Poisson_Matrix()
 {
     TIMER_SCOPE_FUNC;
-    int nvar=Allocate_Projection_System_Variable();
-    Compute_Laplacian(nvar);
-    Compute_Gradient(nvar);
+    Compute_Laplacian(example.dof);
+    Compute_Gradient(example.dof);
 }
 //#####################################################################
 // Function Pressure_Projection

@@ -84,6 +84,7 @@ public:
     std::function<T(TV_INT,PHASE_ID,T)> bc_pressure;
     BOUNDARY_MAC_GRID_PERIODIC<TV,T>& periodic_boundary;
     ARRAY<int,TV_INT> cell_index;
+    int dof;
     ARRAY<bool,FACE_INDEX<TV::m> > psi_N;
     // Extrapolation functions.
     // Options:
