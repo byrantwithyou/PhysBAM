@@ -308,7 +308,9 @@ bool File_Extension_Matches_Ignoring_Compression_Suffix(const std::string& filen
 
 bool File_Is_Compressed(const std::string& filename)
 {
-    return File_Extension_Matches_Ignoring_Compression_Suffix(filename,"gz",3,true);
+    int len=filename.length();
+    const char* end=filename.c_str()+len;
+    return len>4 && !Compare_Strings(end-3,3,".gz",3,true);
 }
 
 bool File_Exists(const std::string& filename)
