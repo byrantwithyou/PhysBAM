@@ -34,6 +34,7 @@ using namespace PhysBAM;
 template<class T> void Add_File(const std::string& filename,int number);
 template<class T> void Add_Tri2D_File(const std::string& filename,OPENGL_WORLD<T>& world,int number);
 template<class T> void Add_Tri_File(const std::string& filename,OPENGL_WORLD<T>& world,int number);
+template<class T> void Add_Obj_File(const std::string& filename,OPENGL_WORLD<T>& world,int number);
 template<class T> void Add_Phi_File(const std::string& filename,OPENGL_WORLD<T>& world,int number);
 template<class T> void Add_Phi2D_File(const std::string& filename,OPENGL_WORLD<T>& world,int number);
 template<class T> void Add_Curve_File(const std::string& filename,OPENGL_WORLD<T>& world,int number);
@@ -82,6 +83,7 @@ template<class T> void Add_File(const std::string& filename,int number)
     static std::map<std::string,std::function<void(const std::string&,OPENGL_WORLD<T>&,int)> > func_map;
     if(func_map.empty()){
         func_map["tri"]=Add_Tri_File<T>;
+        func_map["obj"]=Add_Obj_File<T>;
         func_map["tri2d"]=Add_Tri2D_File<T>;
         func_map["phi"]=Add_Phi_File<T>;
         func_map["phi2d"]=Add_Phi2D_File<T>;
@@ -90,7 +92,7 @@ template<class T> void Add_File(const std::string& filename,int number)
         func_map["tet"]=Add_Tet_File<T>;
         func_map["hex"]=Add_Hex_File<T>;
         func_map["box"]=Add_Box_File<T>;}
-    
+
     auto it=func_map.find(Get_File_Extension(filename));
     if(it!=func_map.end()) it->second(filename,world,number);
     else LOG::cerr<<"Unrecognized file "<<filename<<std::endl;
@@ -151,6 +153,24 @@ template<class T> void Add_Tri_File(const std::string& filename,OPENGL_WORLD<T>&
     try{
         TRIANGULATED_SURFACE<T>* surface;
         Create_From_File<T>(filename,surface);
+        {LOG::SCOPE scope("mesh statistics","mesh statistics");
+        LOG::cout<<"filename = "<<filename<<std::endl;
+        if(print_statistics) surface->Print_Statistics(LOG::cout);}
+        OPENGL_TRIANGULATED_SURFACE<T>* opengl_triangulated_surface=new OPENGL_TRIANGULATED_SURFACE<T>(world.stream_type,*surface,false,
+            OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Red()),OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Blue()));
+        if(triangulated_surface_highlight_boundary) opengl_triangulated_surface->highlight_boundary=true;
+        world.Bind_Key('0'+number,{[opengl_triangulated_surface](){static bool is_two_sided=false;is_two_sided=!is_two_sided;opengl_triangulated_surface->Set_Two_Sided(is_two_sided);},"Toggle Two Sided"});
+        world.Add_Object(opengl_triangulated_surface,true,true);}
+    catch(FILESYSTEM_ERROR&){}
+}
+//#################################################################
+// Function Add_Tri_File
+//#################################################################
+template<class T> void Add_Obj_File(const std::string& filename,OPENGL_WORLD<T>& world,int number)
+{
+    try{
+        TRIANGULATED_SURFACE<T>* surface=new TRIANGULATED_SURFACE<T>;
+        surface->Read_Obj(filename);
         {LOG::SCOPE scope("mesh statistics","mesh statistics");
         LOG::cout<<"filename = "<<filename<<std::endl;
         if(print_statistics) surface->Print_Statistics(LOG::cout);}
