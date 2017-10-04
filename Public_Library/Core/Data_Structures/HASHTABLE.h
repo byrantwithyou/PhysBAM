@@ -353,7 +353,8 @@ std::ostream& operator<<(std::ostream& output,const HASHTABLE<K,T>& hashtable)
     output<<"(";
     bool first=true;
     for(const auto& it:hashtable){
-        if(!first){output<<" ";first=false;}
+        if(!first) output<<" ";
+        first=false;
         output<<it.key<<":"<<it.data;}
     output<<")";
     return output;
@@ -365,7 +366,8 @@ std::ostream& operator<<(std::ostream& output,const HASHTABLE<K,void>& hashtable
     output<<"(";
     bool first=true;
     for(const auto& data:hashtable){
-        if(!first){output<<" ";first=false;}
+        if(!first) output<<" ";
+        first=false;
         output<<data;}
     output<<")";
     return output;
