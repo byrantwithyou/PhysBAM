@@ -172,11 +172,10 @@ int main(int argc, char* argv[])
             if(use_affine) example.particles.B.Fill(MATRIX<T,TV::m>());
             grid_dof(first_p+p,i)=1;
             driver.Particle_To_Grid();
-            if(use_pressure) driver.Pressure_Projection();
-            else if(mu){
+            if(use_pressure || mu)
                 driver.Compute_Boundary_Conditions();
-                driver.Allocate_Projection_System_Variable();
-                driver.Apply_Viscosity();}
+            if(use_pressure) driver.Pressure_Projection();
+            if(mu) driver.Apply_Viscosity();
             driver.Grid_To_Particle();
             example.particles.X=store_X;
             if(dump_particles){
