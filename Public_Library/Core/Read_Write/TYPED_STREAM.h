@@ -20,6 +20,10 @@ class STREAM_TYPE
 public:
     const bool use_doubles; // otherwise use floats
 
+    explicit STREAM_TYPE(const bool use_doubles)
+        :use_doubles(use_doubles)
+    {}
+
     explicit STREAM_TYPE(const float)
         :use_doubles(false)
     {}
