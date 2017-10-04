@@ -105,7 +105,7 @@ Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) co
 template<class TV> void MPM_VISCOSITY<TV>:: 
 Use_Variable_Viscosity()
 {
-    const_cast<MPM_PARTICLES<TV>&>(particles).Add_Array(ATTRIBUTE_ID_VISCOSITY,&viscosity);
+    const_cast<MPM_PARTICLES<TV>&>(particles).Add_Array("viscosity",&viscosity);
     viscosity.Fill(constant_viscosity);
 }
 template class MPM_VISCOSITY<VECTOR<float,2> >;

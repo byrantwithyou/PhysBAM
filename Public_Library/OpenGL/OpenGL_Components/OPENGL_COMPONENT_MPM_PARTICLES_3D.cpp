@@ -6,7 +6,6 @@
 #include <Core/Log/LOG.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
-#include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <OpenGL/OpenGL/OPENGL_MATERIAL.h>
 #include <OpenGL/OpenGL/OPENGL_SELECTION.h>
@@ -105,9 +104,9 @@ Display() const
 
     glGetIntegerv(GL_RENDER_MODE,&mode);
 
-    ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
-    ARRAY_VIEW<T>* sizes=particles.template Get_Array<T>(ATTRIBUTE_ID_DISPLAY_SIZE);
-    ARRAY_VIEW<int>* phase=particles.template Get_Array<int>(ATTRIBUTE_ID_PHASE);
+    ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
+    ARRAY_VIEW<T>* sizes=particles.template Get_Array<T>("display_size");
+    ARRAY_VIEW<int>* phase=particles.template Get_Array<int>("phase");
 
     if(draw_velocities && mode!=GL_SELECT){
         glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);

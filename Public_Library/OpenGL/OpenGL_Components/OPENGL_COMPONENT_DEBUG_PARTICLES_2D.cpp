@@ -8,7 +8,6 @@
 #include <Geometry/Basic_Geometry/TRIANGLE_2D.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
-#include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <OpenGL/OpenGL/OPENGL_INDEXED_COLOR_MAP.h>
 #include <OpenGL/OpenGL/OPENGL_MATERIAL.h>
 #include <OpenGL/OpenGL/OPENGL_SELECTION.h>
@@ -152,9 +151,9 @@ Display() const
 
     glGetIntegerv(GL_RENDER_MODE,&mode);
 
-    ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
-    ARRAY_VIEW<T>* sizes=particles.template Get_Array<T>(ATTRIBUTE_ID_DISPLAY_SIZE);
-    ARRAY_VIEW<TV>* V=particles.template Get_Array<TV>(ATTRIBUTE_ID_V);
+    ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
+    ARRAY_VIEW<T>* sizes=particles.template Get_Array<T>("display_size");
+    ARRAY_VIEW<TV>* V=particles.template Get_Array<TV>("V");
 
     if(draw_velocities && V && mode!=GL_SELECT){
         glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);

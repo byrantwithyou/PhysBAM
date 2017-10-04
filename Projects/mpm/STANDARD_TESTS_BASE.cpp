@@ -253,7 +253,7 @@ Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,T
     if(particles.store_S) particles.S(p)=SYMMETRIC_MATRIX<T,TV::m>()+1;
     particles.mass(p)=mass;
     particles.volume(p)=volume;
-    ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+    ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
     (*color_attribute)(p)=VECTOR<T,3>(1,1,1);
 }
 //#####################################################################
@@ -262,7 +262,7 @@ Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,T
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Add_Lambda_Particles(ARRAY<int>* affected_particles,T E,T nu,T density,bool no_mu,T porosity,T saturation_level)
 {
-    ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+    ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
     ARRAY<int> lambda_particles(affected_particles->m);
     T volume_lambda=particles.volume(0)*porosity*saturation_level;
     T mass_lambda=density*volume_lambda;
@@ -432,7 +432,7 @@ Seed_Lagrangian_Particles(T_STRUCTURE& object,std::function<TV(const TV&)> V,
     int old_particles_number=particles.number;
     T_STRUCTURE& new_object=tests.Copy_And_Add_Structure(object,0,destroy_after);
     tests.Set_Mass_Of_Particles(new_object,density,use_constant_mass);
-    ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+    ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
     for(int p=old_particles_number;p<particles.number;p++){
         TV X=particles.X(p);
         particles.valid(p)=true;

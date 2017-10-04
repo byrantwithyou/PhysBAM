@@ -11,7 +11,6 @@
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
-#include <Deformables/Particles/DEFORMABLES_PARTICLES_FORWARD.h>
 #include <Solids/Collisions/BW_COLLISIONS.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids_Evolution/BW_BACKWARD_EULER_SYSTEM.h>

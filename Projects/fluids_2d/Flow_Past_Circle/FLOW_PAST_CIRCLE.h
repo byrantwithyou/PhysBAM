@@ -58,7 +58,7 @@ public:
         sample_points.Append(TV(2,3));
 
         output_directory="Flow_Past_Circle/output";
-        debug_particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+        debug_particles.template Add_Array<VECTOR<T,3> >("color");
 
         parse_args.Add("-viscosity",&fluids_parameters.viscosity,"value","viscosity");
         parse_args.Add("-enlarge",&opt_enlarge,"value","Enlarge");
@@ -230,7 +230,7 @@ typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE Get_Boundary_Along_Ray(cons
 
     static VECTOR<T,3> color_map[]={VECTOR<T,3>(1,0,0),VECTOR<T,3>(1,.5,0),VECTOR<T,3>(1,0,1),VECTOR<T,3>(0,.5,0),VECTOR<T,3>(0,1,1),VECTOR<T,3>(1,1,0)};
 
-    if(ARRAY_VIEW<VECTOR<T,3> >* color_attribute=debug_particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR)){
+    if(ARRAY_VIEW<VECTOR<T,3> >* color_attribute=debug_particles.template Get_Array<VECTOR<T,3> >("color")){
         int p=debug_particles.Add_Element();
         debug_particles.X(p)=X0+theta*(X1-X0);
         (*color_attribute)(p)=color_map[type];}

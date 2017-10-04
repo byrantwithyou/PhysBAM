@@ -26,7 +26,7 @@ MPM_EXAMPLE(const STREAM_TYPE stream_type)
     gather_scatter(*new GATHER_SCATTER<TV>(grid,simulated_particles)),
     force_helper(*new MPM_FORCE_HELPER<TV>(particles,quad_F_coeff))
 {
-    debug_particles.debug_particles.template Add_Array<T>(ATTRIBUTE_ID_DISPLAY_SIZE);
+    debug_particles.debug_particles.template Add_Array<T>("display_size");
 }
 //#####################################################################
 // Destructor

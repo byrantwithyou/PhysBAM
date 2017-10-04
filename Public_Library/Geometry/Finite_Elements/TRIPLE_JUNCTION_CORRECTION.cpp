@@ -15,7 +15,6 @@
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <Geometry/Finite_Elements/TRIPLE_JUNCTION_CORRECTION.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
-#include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <Geometry/Grids_Uniform_Computations/MARCHING_TETRAHEDRA.h>
 #include <Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
@@ -145,7 +144,7 @@ Initialize_Pairwise_Level_Set()
         PAIRWISE_LEVEL_SET_DATA& data=pairwise_data(it.index);
         if(data.trust.x>=0){
             Add_Debug_Particle(it.Location(),VECTOR<T,3>(data.trust.y==1,data.trust.Sum()==2,data.trust.x==1)/(1+(data.phi<0)));
-            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(data.phi));
+            Debug_Particle_Set_Attribute<TV>("display_size",abs(data.phi));
             pairwise_phi(data.trust.x)(data.trust.y)(it.index)=data.phi;}}
     Flush_Frame<TV>(__FUNCTION__);
 }
@@ -302,7 +301,7 @@ One_Step_Triple_Junction_Correction()
                                 VECTOR<T,3> pp;
                                 TV X=Zero_Phi(VECTOR<PHI,3>(ab,ac,bc),pp),Y=X*grid.dX+grid.Node(it.index);
                                 Add_Debug_Particle(Y,VECTOR<T,3>(pp(0)>0,pp(1)>0,pp(2)>0));
-                                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(pp(0)));
+                                Debug_Particle_Set_Attribute<TV>("display_size",abs(pp(0)));
 //                                Add_Debug_Particle(it.Location(),VECTOR<T,3>(pp(0)>0,pp(1)>0,pp(2)>0));
                                 if(abs(pp(0))>max_move) pp*=max_move/abs(pp(0));
                                 T div=(b01 && b02 && b12)?1:3;
@@ -633,14 +632,14 @@ Compute_Pairwise_Level_Set_Data()
         if((pairwise_data(it.index).valid_flags&3)==3)
             Add_Debug_Particle(it.Location(),VECTOR<T,3>(pairwise_data(it.index).trust==VECTOR<short,2>(0,1),0,1));
         Add_Debug_Particle(it.Location(),VECTOR<T,3>(p<0,p>=0,0));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
+        Debug_Particle_Set_Attribute<TV>("display_size",abs(p));}
 
     for(NODE_ITERATOR<TV> it(grid,ghost);it.Valid();it.Next()){
         T p=pairwise_phi(0)(1)(it.index);
         if((pairwise_data(it.index).valid_flags&3)==3)
             Add_Debug_Particle(it.Location(),VECTOR<T,3>(pairwise_data(it.index).trust==VECTOR<short,2>(0,1),0,1));
         Add_Debug_Particle(it.Location(),VECTOR<T,3>(p<0,p>=0,0));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
+        Debug_Particle_Set_Attribute<TV>("display_size",abs(p));}
     Flush_Frame<TV>(__FUNCTION__);
 
     for(int t=0;t<20;t++)

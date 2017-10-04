@@ -6,7 +6,7 @@
 using namespace PhysBAM;
 ARRAY_COLLECTION_ELEMENT_BASE::
 ARRAY_COLLECTION_ELEMENT_BASE()
-    :id(ATTRIBUTE_ID()),owns_data(true)
+    :owns_data(true)
 {
 }
 ARRAY_COLLECTION_ELEMENT_BASE::

@@ -596,12 +596,12 @@ Reseed_Add_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,T_ARRAYS_PA
         T phi_min=sign*minimum_particle_radius,phi_max=sign*half_band_width;if(phi_min>phi_max) exchange(phi_min,phi_max);
         RANGE<TV> block_bounding_box=block.Bounding_Box();
         int attempts=0;
-        ARRAY_VIEW<int>* id=store_unique_particle_id?cell_particles->template Get_Array<int>(ATTRIBUTE_ID_ID):0;
+        ARRAY_VIEW<int>* id=store_unique_particle_id?cell_particles->template Get_Array<int>("id"):0;
         for(int k=0;k<number_of_particles_to_add(block_index);k++){
             PARTICLE_LEVELSET_PARTICLES<TV>* local_cell_particles=cell_particles;
             int index=Add_Particle(cell_particles);
             if(local_cell_particles!=cell_particles){
-                if(store_unique_particle_id) id=cell_particles->template Get_Array<int>(ATTRIBUTE_ID_ID);}
+                if(store_unique_particle_id) id=cell_particles->template Get_Array<int>("id");}
             if(id) (*id)(index)=last_unique_particle_id++;
             cell_particles->quantized_collision_distance(index)=(unsigned short)(local_random.Get_Number()*USHRT_MAX);
             cell_particles->X(index)=local_random.Get_Uniform_Vector(block_bounding_box);
@@ -861,7 +861,7 @@ Remove_Escaped_Particles(const BLOCK_UNIFORM<TV>& block,PARTICLE_LEVELSET_PARTIC
     bool near_objects=levelset.collision_body_list?levelset.collision_body_list->Occupied_Block(block):false;if(near_objects) levelset.Enable_Collision_Aware_Interpolation(sign);
     int removed=0;T one_over_radius_multiplier=-sign/radius_fraction;
     // TODO: limit the amount of mass removed - don't let the particles just set their own radii
-    ARRAY_VIEW<int>* id=save_removed_particle_times && store_unique_particle_id?particles.template Get_Array<int>(ATTRIBUTE_ID_ID):0;
+    ARRAY_VIEW<int>* id=save_removed_particle_times && store_unique_particle_id?particles.template Get_Array<int>("id"):0;
     ARRAY<PAIR<int,T> > removed_particle_times_local;
     ARRAY<bool> local_escaped(escaped);
     PARTICLE_LEVELSET_PARTICLES<TV>* cell_particles=&particles;
@@ -1048,7 +1048,7 @@ Add_Negative_Particle(const TV& location,const TV& particle_velocity,const unsig
         cell_particles->X(index)=location;negative_particles(block)->radius(index)=minimum_particle_radius;
         cell_particles->quantized_collision_distance(index)=quantized_collision_distance;
         if(store_unique_particle_id){
-            ARRAY_VIEW<int>* id=cell_particles->template Get_Array<int>(ATTRIBUTE_ID_ID);
+            ARRAY_VIEW<int>* id=cell_particles->template Get_Array<int>("id");
             PHYSBAM_ASSERT(id);
             (*id)(index)=last_unique_particle_id++;}}
     else{
@@ -1057,7 +1057,7 @@ Add_Negative_Particle(const TV& location,const TV& particle_velocity,const unsig
         removed_negative_particles(block)->X(index)=location;removed_negative_particles(block)->radius(index)=minimum_particle_radius;
         removed_negative_particles(block)->V(index)=particle_velocity;removed_negative_particles(block)->quantized_collision_distance(index)=quantized_collision_distance;
         if(store_unique_particle_id){
-            ARRAY_VIEW<int>* id=removed_negative_particles(block)->template Get_Array<int>(ATTRIBUTE_ID_ID);
+            ARRAY_VIEW<int>* id=removed_negative_particles(block)->template Get_Array<int>("id");
             PHYSBAM_ASSERT(id);
             (*id)(index)=last_unique_particle_id++;}}
 }

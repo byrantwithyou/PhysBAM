@@ -330,7 +330,7 @@ Initialize_Components_And_Key_Bindings()
     filename=basedir+"/%d/positive_particles";
     if(Frame_File_Exists(filename,start_frame) || Frame_File_Exists(basedir+"/%d/positive_particles_0",start_frame)){
         positive_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T>(stream_type,filename,basedir+"/%d/positive_particles_%d",true,particles_stored_per_cell_uniform);
-        positive_particles_component->particles->template Add_Array<int>(ATTRIBUTE_ID_ID);
+        positive_particles_component->particles->template Add_Array<int>("id");
         if(!positive_particles_component->use_sets) positive_particles_component->opengl_points->color=OPENGL_COLOR(1,.5,0);
         Add_Component(positive_particles_component,"Positive particles",'1',BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::SELECTABLE);
         opengl_world.Append_Bind_Key('!',positive_particles_component->viewer_callbacks.Get("toggle_draw_point_numbers"));
@@ -342,7 +342,7 @@ Initialize_Components_And_Key_Bindings()
     if(Frame_File_Exists(filename,start_frame) || Frame_File_Exists(basedir+"/%d/negative_particles_0",start_frame)){
         negative_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T>(stream_type,filename,
             basedir+"/%d/negative_particles_%d",true,particles_stored_per_cell_uniform);
-        negative_particles_component->particles->template Add_Array<int>(ATTRIBUTE_ID_ID);
+        negative_particles_component->particles->template Add_Array<int>("id");
         if(!negative_particles_component->use_sets) negative_particles_component->opengl_points->color=OPENGL_COLOR(0,.5,1);
         Add_Component(negative_particles_component,"Negative particles",'2',BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::SELECTABLE);
         opengl_world.Append_Bind_Key('@',negative_particles_component->viewer_callbacks.Get("toggle_draw_point_numbers"));

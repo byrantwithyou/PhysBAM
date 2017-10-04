@@ -590,7 +590,7 @@ Dump_Extra_Velocities(const ARRAY<T>& fluid_velocity_vector)
         VECTOR<T,2> V=fluid_velocity_vector(it.Data().face)*N.Normalized();
         T x=fluid_velocity_vector(it.Data().face);
         Add_Debug_Particle(it.Data().segment.Center(),color_map(x));
-        Debug_Particle_Set_Attribute<VECTOR<T,2>,VECTOR<T,2> >(ATTRIBUTE_ID_V,V);}*/
+        Debug_Particle_Set_Attribute<VECTOR<T,2>,VECTOR<T,2> >("V",V);}*/
 }
 //#####################################################################
 namespace PhysBAM{

@@ -16,7 +16,6 @@
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
-#include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
@@ -209,7 +208,7 @@ public:
             T value=u.array(i);
             if(value){
                 Add_Debug_Particle(location.array(i),value>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(0,.5,1));
-                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,value);}}
+                Debug_Particle_Set_Attribute<TV>("display_size",value);}}
         
         T_SURFACE surface;
         MARCHING_CUBES<TV>::Create_Surface(surface,grid,u,contour_value);

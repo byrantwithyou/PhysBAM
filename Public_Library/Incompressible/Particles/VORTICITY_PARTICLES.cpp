@@ -14,8 +14,8 @@ template<class TV> VORTICITY_PARTICLES<TV>::
 VORTICITY_PARTICLES()
     :vorticity(0,0),radius(0,0)
 {
-    this->Add_Array(ATTRIBUTE_ID_VORTICITY,&vorticity);
-    this->Add_Array(ATTRIBUTE_ID_RADIUS,&radius);
+    this->Add_Array("vorticity",&vorticity);
+    this->Add_Array("radius",&radius);
 }
 //#####################################################################
 // Constructor
@@ -25,7 +25,6 @@ template<class TV> VORTICITY_PARTICLES<TV>::
 {}
 static int Initialize_Vorticity_Particles()
 {
-    Register_Attribute_Name(ATTRIBUTE_ID_VORTICITY,"vorticity");
     return 0;
 }
 int initialize_vorticity_particles=Initialize_Vorticity_Particles();

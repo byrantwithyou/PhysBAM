@@ -7,7 +7,6 @@
 #include <Tools/Parsing/PARAMETER_LIST.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Grid_Tools/Grids/GRID.h>
-#include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Incompressible/Particles/VORTICITY_PARTICLES.h>
 #include <Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>

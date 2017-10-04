@@ -20,7 +20,7 @@ template<class TV> DEBUG_PARTICLES<TV>::
 DEBUG_PARTICLES()
     :debug_particles(*new GEOMETRY_PARTICLES<TV>),edge_separation(0)
 {
-    debug_particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+    debug_particles.template Add_Array<VECTOR<T,3> >("color");
     debug_particles.Store_Velocity(true);
     Store_Debug_Particles(this);
 }
@@ -63,7 +63,7 @@ Add_Debug_Particle(const TV& X, const VECTOR<typename TV::SCALAR,3>& color)
 {
     typedef typename TV::SCALAR T;
     DEBUG_PARTICLES<TV>* particles=DEBUG_PARTICLES<TV>::Store_Debug_Particles();
-    ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles->debug_particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+    ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles->debug_particles.template Get_Array<VECTOR<T,3> >("color");
     int p=particles->debug_particles.Add_Element();
     particles->debug_particles.X(p)=X;
     (*color_attribute)(p)=color;
@@ -72,10 +72,10 @@ Add_Debug_Particle(const TV& X, const VECTOR<typename TV::SCALAR,3>& color)
 // Function Debug_Particle_Set_Attribute
 //#####################################################################
 template<class TV,class ATTR> void PhysBAM::
-Debug_Particle_Set_Attribute(ATTRIBUTE_ID id,const ATTR& attr)
+Debug_Particle_Set_Attribute(const std::string& name,const ATTR& attr)
 {
     DEBUG_PARTICLES<TV>* particles=DEBUG_PARTICLES<TV>::Store_Debug_Particles();
-    ARRAY_VIEW<ATTR>* attribute=particles->debug_particles.template Get_Array<ATTR>(id);
+    ARRAY_VIEW<ATTR>* attribute=particles->debug_particles.template Get_Array<ATTR>(name);
     attribute->Last()=attr;
 }
 //#####################################################################
@@ -175,18 +175,18 @@ template void Add_Debug_Particle<VECTOR<double,3> >(VECTOR<double,3> const&,VECT
 template void Add_Debug_Particle<VECTOR<float,1> >(VECTOR<float,1> const&,VECTOR<float,3> const&);
 template void Add_Debug_Particle<VECTOR<float,2> >(VECTOR<float,2> const&,VECTOR<float,3> const&);
 template void Add_Debug_Particle<VECTOR<float,3> >(VECTOR<float,3> const&,VECTOR<float,3> const&);
-template void Debug_Particle_Set_Attribute<VECTOR<double,1>,VECTOR<double,1> >(ATTRIBUTE_ID,VECTOR<double,1> const&);
-template void Debug_Particle_Set_Attribute<VECTOR<double,1>,double>(ATTRIBUTE_ID,double const&);
-template void Debug_Particle_Set_Attribute<VECTOR<double,2>,VECTOR<double,2> >(ATTRIBUTE_ID,VECTOR<double,2> const&);
-template void Debug_Particle_Set_Attribute<VECTOR<double,2>,double>(ATTRIBUTE_ID,double const&);
-template void Debug_Particle_Set_Attribute<VECTOR<double,3>,VECTOR<double,3> >(ATTRIBUTE_ID,VECTOR<double,3> const&);
-template void Debug_Particle_Set_Attribute<VECTOR<double,3>,double>(ATTRIBUTE_ID,double const&);
-template void Debug_Particle_Set_Attribute<VECTOR<float,1>,VECTOR<float,1> >(ATTRIBUTE_ID,VECTOR<float,1> const&);
-template void Debug_Particle_Set_Attribute<VECTOR<float,1>,float>(ATTRIBUTE_ID,float const&);
-template void Debug_Particle_Set_Attribute<VECTOR<float,2>,VECTOR<float,2> >(ATTRIBUTE_ID,VECTOR<float,2> const&);
-template void Debug_Particle_Set_Attribute<VECTOR<float,2>,float>(ATTRIBUTE_ID,float const&);
-template void Debug_Particle_Set_Attribute<VECTOR<float,3>,VECTOR<float,3> >(ATTRIBUTE_ID,VECTOR<float,3> const&);
-template void Debug_Particle_Set_Attribute<VECTOR<float,3>,float>(ATTRIBUTE_ID,float const&);
+template void Debug_Particle_Set_Attribute<VECTOR<double,1>,VECTOR<double,1> >(const std::string&,VECTOR<double,1> const&);
+template void Debug_Particle_Set_Attribute<VECTOR<double,1>,double>(const std::string&,double const&);
+template void Debug_Particle_Set_Attribute<VECTOR<double,2>,VECTOR<double,2> >(const std::string&,VECTOR<double,2> const&);
+template void Debug_Particle_Set_Attribute<VECTOR<double,2>,double>(const std::string&,double const&);
+template void Debug_Particle_Set_Attribute<VECTOR<double,3>,VECTOR<double,3> >(const std::string&,VECTOR<double,3> const&);
+template void Debug_Particle_Set_Attribute<VECTOR<double,3>,double>(const std::string&,double const&);
+template void Debug_Particle_Set_Attribute<VECTOR<float,1>,VECTOR<float,1> >(const std::string&,VECTOR<float,1> const&);
+template void Debug_Particle_Set_Attribute<VECTOR<float,1>,float>(const std::string&,float const&);
+template void Debug_Particle_Set_Attribute<VECTOR<float,2>,VECTOR<float,2> >(const std::string&,VECTOR<float,2> const&);
+template void Debug_Particle_Set_Attribute<VECTOR<float,2>,float>(const std::string&,float const&);
+template void Debug_Particle_Set_Attribute<VECTOR<float,3>,VECTOR<float,3> >(const std::string&,VECTOR<float,3> const&);
+template void Debug_Particle_Set_Attribute<VECTOR<float,3>,float>(const std::string&,float const&);
 template void Dump_Levelset<VECTOR<double,1>,VECTOR<int,1>,double>(GRID<VECTOR<double,1> > const&,ARRAY<double,VECTOR<int,1> > const&,VECTOR<double,3> const&,VECTOR<double,3> const&);
 template void Dump_Levelset<VECTOR<double,2>,VECTOR<int,2>,double>(GRID<VECTOR<double,2> > const&,ARRAY<double,VECTOR<int,2> > const&,VECTOR<double,3> const&,VECTOR<double,3> const&);
 template void Dump_Levelset<VECTOR<double,3>,VECTOR<int,3>,double>(GRID<VECTOR<double,3> > const&,ARRAY<double,VECTOR<int,3> > const&,VECTOR<double,3> const&,VECTOR<double,3> const&);

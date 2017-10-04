@@ -54,7 +54,7 @@ Write_Output_Files(const int frame)
 
     for(int i=0;i<particles.X.m;i++){
         Add_Debug_Particle(particles.X(i),VECTOR<T,3>(1,1,1));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,particles.V(i));}
+        Debug_Particle_Set_Attribute<TV>("V",particles.V(i));}
     debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
 }
 //#####################################################################

@@ -10,13 +10,14 @@
 #include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Core/Arrays/ATTRIBUTE_ID.h>
 #include <Tools/Clone/CLONEABLE.h>
+#include <string>
 namespace PhysBAM{
 
 class ARRAY_COLLECTION_ELEMENT_BASE:public CLONEABLE_ABSTRACT<ARRAY_COLLECTION_ELEMENT_BASE>
 {
 public:
     typedef int HAS_TYPED_READ_WRITE;
-    ATTRIBUTE_ID id;
+    std::string name;
     bool owns_data;
 
     ARRAY_COLLECTION_ELEMENT_BASE();
@@ -33,12 +34,9 @@ public:
     virtual int Pack_Size() const=0;
     virtual void Pack(ARRAY_VIEW<char> buffer,int& position,const int p) const=0;
     virtual void Unpack(ARRAY_VIEW<const char> buffer,int& position,const int p)=0;
-    virtual ATTRIBUTE_ID Hashed_Id() const=0;
-    virtual ATTRIBUTE_ID Typed_Hashed_Id(float) const=0;
-    virtual ATTRIBUTE_ID Typed_Hashed_Id(double) const=0;
+    virtual const char* Type_Name() const=0;
     virtual void Read(TYPED_ISTREAM& input)=0;
     virtual void Write(TYPED_OSTREAM& output) const=0;
-    virtual int Write_Size(bool use_doubles) const=0;
     virtual void Print(std::ostream& output,const int p) const=0;
 };
 }

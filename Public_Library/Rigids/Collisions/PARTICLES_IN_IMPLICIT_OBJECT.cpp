@@ -9,7 +9,6 @@
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Geometry/Basic_Geometry/BASIC_GEOMETRY_POLICY.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
-#include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Geometry/Intersections/RAY_TRIANGLE_3D_INTERSECTION.h>
 #include <Geometry/Spatial_Acceleration/PARTICLE_HIERARCHY.h>
@@ -142,7 +141,7 @@ Intersections_Using_Hierarchy(RIGID_BODY<TV>& particle_body,RIGID_BODY<TV>& leve
     ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> >& particle_intersections,const typename TV::SCALAR contour_value,const bool exit_early,MATRIX<typename TV::SCALAR,TV::m,TV::m>& rotation,TV& translation)
 {
     ARRAY<bool> checked(particle_body.simplicial_object->particles.Size());
-    ARRAY_VIEW<bool>* collidable=particle_body.simplicial_object->particles.template Get_Array<bool>(ATTRIBUTE_ID_COLLIDABLE);
+    ARRAY_VIEW<bool>* collidable=particle_body.simplicial_object->particles.template Get_Array<bool>("collidable");
     for(int t=0;t<simplex_list.m;t++){const VECTOR<int,TV::m>& nodes=particle_body.simplicial_object->mesh.elements(simplex_list(t));
         for(int i=0;i<nodes.m;i++){
             if(!checked(nodes[i])){checked(nodes[i])=true;
@@ -179,7 +178,7 @@ Intersections_Using_Hierarchy_And_Edges_Helper(RIGID_BODY<VECTOR<T,3> >& body0,R
 
     ARRAY<bool> checked(body0.simplicial_object->particles.Size()),segment_checked(body0.simplicial_object->mesh.segment_mesh->elements.m);
     ARRAY<T> phi_value(body0.simplicial_object->particles.Size()); // only meaningful if node is outside
-    ARRAY_VIEW<bool>* collidable=body0.simplicial_object->particles.template Get_Array<bool>(ATTRIBUTE_ID_COLLIDABLE);
+    ARRAY_VIEW<bool>* collidable=body0.simplicial_object->particles.template Get_Array<bool>("collidable");
     T value;TRIANGLE_MESH& mesh=body0.simplicial_object->mesh;
     if(!mesh.segment_mesh) mesh.Initialize_Segment_Mesh();
     if(!mesh.segment_mesh->incident_elements) mesh.segment_mesh->Initialize_Incident_Elements();
@@ -244,7 +243,7 @@ Particles_In_Implicit_Object(RIGID_BODY<TV>& particle_body,RIGID_BODY<TV>& level
     static const int d=TV::m;
     typedef typename BASIC_GEOMETRY_POLICY<TV>::ORIENTED_BOX T_ORIENTED_BOX;
 
-    ARRAY_VIEW<bool>* collidable=particle_body.simplicial_object->particles.template Get_Array<bool>(ATTRIBUTE_ID_COLLIDABLE);
+    ARRAY_VIEW<bool>* collidable=particle_body.simplicial_object->particles.template Get_Array<bool>("collidable");
     FRAME<TV> frame=levelset_body.Frame().Inverse_Times(particle_body.Frame());
     MATRIX<T,d> rotation=frame.r.Rotation_Matrix();
     VECTOR<T,d> translation=frame.t;

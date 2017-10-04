@@ -182,7 +182,7 @@ int main(int argc, char* argv[])
             if(dump_particles){
                 for(int i=0;i<example.particles.X.m;i++){
                     Add_Debug_Particle(example.particles.X(i),VECTOR<T,3>(1,0,0));
-                    Debug_Particle_Set_Attribute<TV,TV>(ATTRIBUTE_ID_V,example.particles.V(i));}
+                    Debug_Particle_Set_Attribute<TV,TV>("V",example.particles.V(i));}
                 Flush_Frame(ph.velocity,"particle dof");}
             for(int q=0;q<example.particles.V.m;q++)
             {

@@ -20,15 +20,23 @@
 #include <memory>
 namespace PhysBAM{
 
-void Register_Attribute_Name(const ATTRIBUTE_ID id,const char* name);
-const char* Get_Attribute_Name(const ATTRIBUTE_ID id);
+void Register_Attribute_Sample(int id,int scalar,int m,int n,
+    int size_scalar,int size,ARRAY_COLLECTION_ELEMENT_BASE* float_element,
+    ARRAY_COLLECTION_ELEMENT_BASE* double_element);
 
-void Register_Attribute_Sample(ARRAY_COLLECTION_ELEMENT_BASE* element);
+template<class E> void Register_Attribute_Sample(int id,int scalar,int m,int n,int size)
+{
+    ARRAY_COLLECTION_ELEMENT_BASE* e=new ARRAY_COLLECTION_ELEMENT<E>;
+    Register_Attribute_Sample(id,scalar,m,n,0,size,e,e);
+}
 
-void Register_Attribute_Sample(ARRAY_COLLECTION_ELEMENT_BASE* element_float,ARRAY_COLLECTION_ELEMENT_BASE* element_double);
-
-template<class E> void Register_Attribute_Sample() {Register_Attribute_Sample(new ARRAY_COLLECTION_ELEMENT<E>);}
-template<class F,class D> void Register_Attribute_Sample() {Register_Attribute_Sample(new ARRAY_COLLECTION_ELEMENT<F>,new ARRAY_COLLECTION_ELEMENT<D>);}
+template<class F,class D> void Register_Attribute_Sample(int id,int m,int n,
+    int size_scalar,int size)
+{
+    ARRAY_COLLECTION_ELEMENT_BASE* f=new ARRAY_COLLECTION_ELEMENT<F>;
+    ARRAY_COLLECTION_ELEMENT_BASE* d=new ARRAY_COLLECTION_ELEMENT<D>;
+    Register_Attribute_Sample(id,0,m,n,size_scalar,size,f,d);
+}
 
 template<class TV>
 class PARTICLES:public CLONEABLE<PARTICLES<TV> >
@@ -82,14 +90,14 @@ public:
     void Add_To_Deletion_List(const int p)
     {assert((unsigned)p<(unsigned)number);deletion_list.Append(p);}
 
-    ATTRIBUTE_INDEX Get_Attribute_Index(const ATTRIBUTE_ID attribute_id) const
-    {ATTRIBUTE_INDEX index=Find_Attribute_Index(attribute_id);if(index<arrays.m && arrays(index)->id==attribute_id) return index;return ATTRIBUTE_INDEX(-1);}
+    ATTRIBUTE_INDEX Get_Attribute_Index(const std::string& name) const
+    {ATTRIBUTE_INDEX index=Find_Attribute_Index(name);if(index<arrays.m && arrays(index)->name==name) return index;return ATTRIBUTE_INDEX(-1);}
 
-    template<class E> ARRAY_VIEW<E>* Get_Array(const ATTRIBUTE_ID attribute_id)
-    {ATTRIBUTE_INDEX index=Get_Attribute_Index(attribute_id); if(index!=ATTRIBUTE_INDEX(-1)) return Get_Array_From_Index<E>(index);return 0;}
+    template<class E> ARRAY_VIEW<E>* Get_Array(const std::string& name)
+    {ATTRIBUTE_INDEX index=Get_Attribute_Index(name); if(index!=ATTRIBUTE_INDEX(-1)) return Get_Array_From_Index<E>(index);return 0;}
 
-    template<class E> const ARRAY_VIEW<E>* Get_Array(const ATTRIBUTE_ID attribute_id) const
-    {ATTRIBUTE_INDEX index=Get_Attribute_Index(attribute_id); if(index!=ATTRIBUTE_INDEX(-1)) return Get_Array_From_Index<E>(index);return 0;}
+    template<class E> const ARRAY_VIEW<E>* Get_Array(const std::string& name) const
+    {ATTRIBUTE_INDEX index=Get_Attribute_Index(name); if(index!=ATTRIBUTE_INDEX(-1)) return Get_Array_From_Index<E>(index);return 0;}
 
     template<class E> ARRAY_VIEW<E>* Get_Array_From_Index(const ATTRIBUTE_INDEX attribute_index)
     {return dynamic_cast<ARRAY_COLLECTION_ELEMENT<E>*>(arrays(attribute_index))->array;}
@@ -97,17 +105,17 @@ public:
     template<class E> const ARRAY_VIEW<E>* Get_Array_From_Index(const ATTRIBUTE_INDEX attribute_index) const
     {return dynamic_cast<ARRAY_COLLECTION_ELEMENT<E>*>(arrays(attribute_index))->array;}
 
-    template<class E> ATTRIBUTE_INDEX Add_Array(const ATTRIBUTE_ID attribute_id,ARRAY_VIEW<E>* array)
-    {if(ARRAY_VIEW<E>* existing=Get_Array<E>(attribute_id)){PHYSBAM_ASSERT(array==existing);return Get_Attribute_Index(attribute_id);}
-    return Add_Array(attribute_id,new ARRAY_COLLECTION_ELEMENT<E>(array));}
+    template<class E> ATTRIBUTE_INDEX Add_Array(const std::string& name,ARRAY_VIEW<E>* array)
+    {if(ARRAY_VIEW<E>* existing=Get_Array<E>(name)){PHYSBAM_ASSERT(array==existing);return Get_Attribute_Index(name);}
+    return Add_Array(name,new ARRAY_COLLECTION_ELEMENT<E>(array));}
 
-    template<class E> ATTRIBUTE_INDEX Add_Array(const ATTRIBUTE_ID attribute_id)
-    {ATTRIBUTE_INDEX index=Get_Attribute_Index(attribute_id);
+    template<class E> ATTRIBUTE_INDEX Add_Array(const std::string& name)
+    {ATTRIBUTE_INDEX index=Get_Attribute_Index(name);
     if(index!=ATTRIBUTE_INDEX(-1)) return index;
-    return Add_Array(attribute_id,new ARRAY_COLLECTION_ELEMENT<E>);}
+    return Add_Array(name,new ARRAY_COLLECTION_ELEMENT<E>);}
 
-    void Remove_Array(const ATTRIBUTE_ID attribute_id)
-    {ATTRIBUTE_INDEX index=Get_Attribute_Index(attribute_id);if(index!=ATTRIBUTE_INDEX(-1)) Remove_Array_Using_Index(index);}
+    void Remove_Array(const std::string& name)
+    {ATTRIBUTE_INDEX index=Get_Attribute_Index(name);if(index!=ATTRIBUTE_INDEX(-1)) Remove_Array_Using_Index(index);}
 
     ATTRIBUTE_INDEX Number_Of_Arrays() const
     {return arrays.m;}
@@ -138,13 +146,14 @@ public:
     {Append(source);source.Delete_All_Elements();}
 
 //#####################################################################
+    void Legacy_Read(TYPED_ISTREAM& input);
     void Read(TYPED_ISTREAM& input);
     void Write(TYPED_OSTREAM& output) const;
     void Print(std::ostream& output,const int p) const;
     virtual void Clean_Memory();
     bool operator==(const PARTICLES& particles) const;
     virtual void Resize(const int new_size);
-    ATTRIBUTE_INDEX Add_Array(const ATTRIBUTE_ID attribute_id,ARRAY_COLLECTION_ELEMENT_BASE* array);
+    ATTRIBUTE_INDEX Add_Array(const std::string& name,ARRAY_COLLECTION_ELEMENT_BASE* array);
     void Initialize(const PARTICLES& elements);
     void Initialize(ARRAY_VIEW<const PARTICLES* const> elements_per_cell);
     void Add_Arrays(const PARTICLES& elements);
@@ -152,7 +161,7 @@ public:
     void Delete_Elements_On_Deletion_List(const bool preserve_order=false);
     void Copy_Element(const PARTICLES& from_elements,const int from,const int to);
     void Copy_All_Elements_Helper(const PARTICLES& from_elements,const int offset);
-    ATTRIBUTE_INDEX Find_Attribute_Index(const ATTRIBUTE_ID attribute_id) const;
+    ATTRIBUTE_INDEX Find_Attribute_Index(const std::string& name) const;
     int Pack_Size() const;
     void Pack(ARRAY_VIEW<char> buffer,int& position,const int p) const;
     void Unpack(ARRAY_VIEW<const char> buffer,int& position,const int p);

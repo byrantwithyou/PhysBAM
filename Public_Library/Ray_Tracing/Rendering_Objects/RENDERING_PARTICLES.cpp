@@ -40,7 +40,7 @@ Intersection(RAY<TV>& ray) const
             for(int ij=particles_array.domain.min_corner.z;ij<particles_array.domain.max_corner.z;ij++){
                 GEOMETRY_PARTICLES<TV>* particles=particles_array(i,j,ij);
                 if(particles){
-                    ARRAY_VIEW<T> radius=*particles->template Get_Array<T>(ATTRIBUTE_ID(15)); // radius is attribute 15
+                    ARRAY_VIEW<T> radius=*particles->template Get_Array<T>("radius");
                     for(int p=0;p<particles->Size();p++)
                         if(INTERSECTION::Intersects(object_space_ray,SPHERE<TV>(particles->X(p),scale*radius(p)),small_number)){
                             object_space_ray.aggregate_id=particle_to_aggregate_id(i,j,ij)(p);intersection=true;}}}
@@ -55,7 +55,7 @@ Intersection(RAY<TV>& ray,const int aggregate) const
 {
     RAY<TV> object_space_ray=Object_Space_Ray(ray);bool intersection=false;
     GEOMETRY_PARTICLES<TV>* particles=particles_array(aggregate_id_to_particle(aggregate).x);int p=aggregate_id_to_particle(aggregate).y;
-    ARRAY_VIEW<T> radius=*particles->template Get_Array<T>(ATTRIBUTE_ID(15)); // radius is attribute 15
+    ARRAY_VIEW<T> radius=*particles->template Get_Array<T>("radius");
     if(INTERSECTION::Intersects(object_space_ray,(SPHERE<TV>(particles->X(p),scale*radius(p))),small_number)){
         ray.t_max=object_space_ray.t_max;ray.semi_infinite=object_space_ray.semi_infinite;ray.aggregate_id=aggregate;intersection=true;}
     return intersection;
@@ -71,7 +71,7 @@ Inside(const TV& location) const
             for(int ij=particles_array.domain.min_corner.z;ij<particles_array.domain.max_corner.z;ij++){
                 GEOMETRY_PARTICLES<TV>* particles=particles_array(i,j,ij);
                 if(particles){
-                    ARRAY_VIEW<T> radius=*particles->template Get_Array<T>(ATTRIBUTE_ID(15)); // radius is attribute 15
+                    ARRAY_VIEW<T> radius=*particles->template Get_Array<T>("radius");
                     for(int p=0;p<particles->Size();p++)
                         if(SPHERE<TV>(particles->X(p),scale*radius(p)).Inside(Object_Space_Point(location),small_number))
                             return true;}}
@@ -84,7 +84,7 @@ template<class T> auto RENDERING_PARTICLES<T>::
 Normal(const TV& location,const int aggregate) const -> TV
 {
     GEOMETRY_PARTICLES<TV>* particles=particles_array(aggregate_id_to_particle(aggregate).x);int p=aggregate_id_to_particle(aggregate).y;
-    ARRAY_VIEW<T> radius=*particles->template Get_Array<T>(ATTRIBUTE_ID(15)); // radius is attribute 15
+    ARRAY_VIEW<T> radius=*particles->template Get_Array<T>("radius");
     return (SPHERE<TV>(particles->X(p),scale*radius(p))).Normal(location);
 }
 //#####################################################################
@@ -98,7 +98,7 @@ Get_Aggregate_World_Space_Bounding_Boxes(ARRAY<RENDERING_OBJECT_ACCELERATION_PRI
             for(int ij=particles_array.domain.min_corner.z;ij<particles_array.domain.max_corner.z;ij++){
                 GEOMETRY_PARTICLES<TV>* particles=particles_array(i,j,ij);
                 if(particles){
-                    ARRAY_VIEW<T> radius=*particles->template Get_Array<T>(ATTRIBUTE_ID(15)); // radius is attribute 15
+                    ARRAY_VIEW<T> radius=*particles->template Get_Array<T>("radius");
                     for(int p=0;p<particles->Size();p++){
                         T radius_scalar=scale*radius(p);
                         TV radius_vector(radius_scalar,radius_scalar,radius_scalar),world_center=transform.Homogeneous_Times(particles->X(p));

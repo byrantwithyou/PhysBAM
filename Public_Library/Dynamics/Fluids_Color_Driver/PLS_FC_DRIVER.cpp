@@ -670,7 +670,7 @@ Dump_Vector(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,const KRYLOV_VECTOR_BAS
         assert(k>=0);
         T p=v.p(c)(k);
         Add_Debug_Particle(it.Location(),VECTOR<T,3>(p<0,p>=0,0));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
+        Debug_Particle_Set_Attribute<TV>("display_size",abs(p));}
 
     PHYSBAM_DEBUG_WRITE_SUBSTEP(str,1);
     example.face_velocities=fv;

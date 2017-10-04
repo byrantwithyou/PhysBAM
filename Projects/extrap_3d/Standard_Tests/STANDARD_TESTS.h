@@ -2374,7 +2374,7 @@ void Postprocess_Substep(const T dt,const T time) override
             for(int i=0;i<sv.m;i++){
                 svout << sv(i).x.x << " " << sv(i).x.y << " " << sv(i).x.z << std::endl;
                 Add_Debug_Particle(sv(i).To_Vector(),TV(1,1,0));
-                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,-force_field->isotropic_model->P_From_Strain(sv(i),i).To_Vector());}}}
+                Debug_Particle_Set_Attribute<TV>("V",-force_field->isotropic_model->P_From_Strain(sv(i),i).To_Vector());}}}
     if(test_number==48){
         stuck_particles.Remove_All();
         T r=std::max((T)0,hole-time*stretch);

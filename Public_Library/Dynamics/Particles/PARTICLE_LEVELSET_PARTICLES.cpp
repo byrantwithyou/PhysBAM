@@ -13,9 +13,9 @@ template<class TV> PARTICLE_LEVELSET_PARTICLES<TV>::
 PARTICLE_LEVELSET_PARTICLES()
     :quantized_collision_distance(0,0),age(0,0),radius(0,0),next(0)
 {
-    Add_Array(ATTRIBUTE_ID_QUANTIZED_COLLISION_DISTANCE,&quantized_collision_distance);
-    Add_Array(ATTRIBUTE_ID_AGE,&age);
-    Add_Array(ATTRIBUTE_ID_RADIUS,&radius);
+    Add_Array("quantized_collision_distance",&quantized_collision_distance);
+    Add_Array("age",&age);
+    Add_Array("radius",&radius);
 }
 //#####################################################################
 // Constructor

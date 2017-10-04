@@ -63,7 +63,7 @@ public:
     static DEBUG_PARTICLES<TV>* Store_Debug_Particles(DEBUG_PARTICLES<TV>* particle=0);
     void Write_Debug_Particles(STREAM_TYPE stream_type,const std::string& output_directory,int frame) const;
 };
-template<class TV,class ATTR> void Debug_Particle_Set_Attribute(ATTRIBUTE_ID id,const ATTR& attr);
+template<class TV,class ATTR> void Debug_Particle_Set_Attribute(const std::string& name,const ATTR& attr);
 template<class TV> void Add_Debug_Particle(const TV& X, const VECTOR<typename TV::SCALAR,3>& color);
 template<class TV,int d> inline void Add_Debug_Object(const VECTOR<TV,d>& object,const VECTOR<typename TV::SCALAR,3>& color){Add_Debug_Object(object,color,color);}
 template<class TV,int d> void Add_Debug_Object(const VECTOR<TV,d>& object,const VECTOR<typename TV::SCALAR,3>& color,const VECTOR<typename TV::SCALAR,3>& bgcolor);

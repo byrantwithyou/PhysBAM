@@ -11,7 +11,6 @@
 #include <Tools/Clone/CLONEABLE.h>
 #include <Tools/Particles/PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
-#include <Deformables/Particles/DEFORMABLES_PARTICLES_FORWARD.h>
 
 namespace PhysBAM{
 
@@ -35,7 +34,7 @@ public:
     virtual ~DEFORMABLE_PARTICLES();
 
     void Store_Mass(bool store=true)
-    {store_mass=store;if(store) this->Add_Array(ATTRIBUTE_ID_MASS,&mass);else Remove_Array(ATTRIBUTE_ID_MASS);}
+    {store_mass=store;if(store) this->Add_Array("mass",&mass);else Remove_Array("mass");}
 
     T Min_Mass() const 
     {return mass.Size()?mass.Min():FLT_MAX;}

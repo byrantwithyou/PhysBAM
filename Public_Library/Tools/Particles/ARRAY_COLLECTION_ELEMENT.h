@@ -18,7 +18,7 @@ class ARRAY_COLLECTION_ELEMENT:public CLONEABLE<ARRAY_COLLECTION_ELEMENT<T>,ARRA
     typedef CLONEABLE<ARRAY_COLLECTION_ELEMENT<T>,ARRAY_COLLECTION_ELEMENT_BASE> BASE;
 public:
     typedef int HAS_TYPED_READ_WRITE;
-    using BASE::owns_data;using BASE::id;
+    using BASE::owns_data;using BASE::name;
     ARRAY_VIEW<T>* array;
     int buffer_size;
 
@@ -36,19 +36,19 @@ public:
     void Clone_Helper(const ARRAY_COLLECTION_ELEMENT& element)
     {array=element.array;owns_data=false;}
 
-    void Clean_Memory()
+    void Clean_Memory() override
     {Reallocate(0);}
 
-    void Clear(const int p)
+    void Clear(const int p) override
     {(*array)(p)=T();}
 
-    void Clear_Range(const int start,const int end)
+    void Clear_Range(const int start,const int end) override
     {for(int i=start;i<end;i++) (*array)(i)=T();}
 
-    void Set_Size(const int new_size)
+    void Set_Size(const int new_size) override
     {assert(buffer_size>=new_size);int n=array->m;array->m=new_size;Clear_Range(n,array->m);}
 
-    void Reallocate(const int new_size)
+    void Reallocate(const int new_size) override
     {if(new_size<array->m) array->m=new_size;
     buffer_size=new_size;
     assert(array->m<=buffer_size);
@@ -57,45 +57,35 @@ public:
     temp.Exchange(*array);
     delete[] temp.Get_Array_Pointer();}
 
-    void Copy_Element(const int from,const int to)
+    void Copy_Element(const int from,const int to) override
     {(*array)(to)=(*array)(from);}
 
-    void Copy_Element(const ARRAY_COLLECTION_ELEMENT_BASE& from_attribute,const int from,const int to)
+    void Copy_Element(const ARRAY_COLLECTION_ELEMENT_BASE& from_attribute,const int from,const int to) override
     {(*array)(to)=(*dynamic_cast<const ARRAY_COLLECTION_ELEMENT<T>&>(from_attribute).array)(from);}
 
-    void Copy_With_Offset(const ARRAY_COLLECTION_ELEMENT_BASE& from_attribute,const int offset)
+    void Copy_With_Offset(const ARRAY_COLLECTION_ELEMENT_BASE& from_attribute,const int offset) override
     {array->Copy_With_Offset(*dynamic_cast<const ARRAY_COLLECTION_ELEMENT<T>&>(from_attribute).array,offset);}
-    int Pack_Size() const
+
+    int Pack_Size() const override
     {return array->Pack_Size();}
 
-    void Pack(ARRAY_VIEW<char> buffer,int& position,const int p) const
+    void Pack(ARRAY_VIEW<char> buffer,int& position,const int p) const override
     {array->Pack(buffer,position,p);}
 
-    void Unpack(ARRAY_VIEW<const char> buffer,int& position,const int p)
+    void Unpack(ARRAY_VIEW<const char> buffer,int& position,const int p) override
     {array->Unpack(buffer,position,p);}
+ 
+    virtual const char* Type_Name() const override
+    {return typeid(ARRAY_COLLECTION_ELEMENT<T>).name();}
 
-    ATTRIBUTE_ID Hashed_Id() const
-    {return ATTRIBUTE_ID(Hash(typeid(ARRAY_COLLECTION_ELEMENT<T>).name())*0x10000+Value(id));}
+    virtual void Read(TYPED_ISTREAM& input) override
+    {Read_Binary(input,*array);}
 
-    ATTRIBUTE_ID Typed_Hashed_Id(float) const
-    {return ATTRIBUTE_ID(Hash(typeid(ARRAY_COLLECTION_ELEMENT<typename REPLACE_FLOATING_POINT<T,float>::TYPE>).name())*0x10000+Value(id));}
+    virtual void Write(TYPED_OSTREAM& output) const override
+    {Write_Binary(output,*array);}
 
-    ATTRIBUTE_ID Typed_Hashed_Id(double) const
-    {return ATTRIBUTE_ID(Hash(typeid(ARRAY_COLLECTION_ELEMENT<typename REPLACE_FLOATING_POINT<T,double>::TYPE>).name())*0x10000+Value(id));}
-
-    virtual void Read(TYPED_ISTREAM& input)
-    {if(!is_pointer<T>::value) Read_Binary(input,*array);}
-
-    virtual void Write(TYPED_OSTREAM& output) const
-    {if(!is_pointer<T>::value) Write_Binary(output,*array);}
-
-    virtual int Write_Size(bool use_doubles) const
-    {return is_pointer<T>::value?0:(use_doubles?sizeof(double):sizeof(float))*array->Size()+sizeof(int);}
-
-    virtual void Print(std::ostream& output,const int p) const
-    {if(const char* name=Get_Attribute_Name(id)) output<<name;
-    else output<<"id "<<id;
-    output<<" = "<<(*array)(p)<<std::endl;}
+    virtual void Print(std::ostream& output,const int p) const override
+    {output<<name<<" = "<<(*array)(p)<<std::endl;}
 };
 }
 #endif

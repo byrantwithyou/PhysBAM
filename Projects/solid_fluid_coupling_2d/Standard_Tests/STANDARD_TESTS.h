@@ -710,7 +710,7 @@ typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE Get_Boundary_Along_Ray(cons
 
     static VECTOR<T,3> color_map[]={VECTOR<T,3>(1,0,0),VECTOR<T,3>(1,.5,0),VECTOR<T,3>(1,0,1),VECTOR<T,3>(0,.5,0),VECTOR<T,3>(0,1,1),VECTOR<T,3>(1,1,0)};
 
-    if(ARRAY_VIEW<VECTOR<T,3> >* color_attribute=debug_particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR)){
+    if(ARRAY_VIEW<VECTOR<T,3> >* color_attribute=debug_particles.template Get_Array<VECTOR<T,3> >("color")){
         int p=debug_particles.Add_Element();
         debug_particles.X(p)=X0+theta*(X1-X0);
         (*color_attribute)(p)=color_map[type];}
@@ -1350,7 +1350,7 @@ void Analytic_Test()
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     fluids_parameters.collision_bodies_affecting_fluid->use_collision_face_neighbors=true;
 
-    debug_particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+    debug_particles.template Add_Array<VECTOR<T,3> >("color");
 
     fluids_parameters.gravity.y=-(T)9.8*scale_length;
     fluids_parameters.density=(T)100/(scale_length*scale_length);
@@ -1399,7 +1399,7 @@ void Flow_Past_Fixed_Cylinder()
     fluids_parameters.collision_bodies_affecting_fluid->use_collision_face_neighbors=true;
     fluids_parameters.use_coupled_implicit_viscosity=true;
 
-    debug_particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+    debug_particles.template Add_Array<VECTOR<T,3> >("color");
 
     fluids_parameters.gravity=TV();
     fluids_parameters.density=1;
@@ -1439,7 +1439,7 @@ void Vortex_Shedding()
     fluids_parameters.collision_bodies_affecting_fluid->use_collision_face_neighbors=true;
     fluids_parameters.use_coupled_implicit_viscosity=true;
 
-    debug_particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+    debug_particles.template Add_Array<VECTOR<T,3> >("color");
 
     fluids_parameters.gravity=TV();
     fluids_parameters.density=1;
@@ -1535,7 +1535,7 @@ void Oscillating_Disk()
     fluids_parameters.use_levelset_viscosity=true;
     fluids_parameters.second_order_cut_cell_method=true;
 
-    debug_particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+    debug_particles.template Add_Array<VECTOR<T,3> >("color");
 
     fluids_parameters.fluid_boundary=new BOUNDARY_MAC_GRID_PERIODIC<TV,T>;
     fluids_parameters.periodic_boundary.Fill(true);

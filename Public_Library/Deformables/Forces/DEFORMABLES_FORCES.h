@@ -13,10 +13,10 @@
 #include <Core/Data_Structures/FORCE_ELEMENTS.h>
 #include <Core/Log/DEBUG_UTILITIES.h>
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Deformables/Particles/DEFORMABLES_PARTICLES_FORWARD.h>
 namespace PhysBAM{
 
 template<class TV> class MPI_SOLIDS;
+template<class TV> class DEFORMABLE_PARTICLES;
 class SEGMENT_MESH;
 
 template<class TV>

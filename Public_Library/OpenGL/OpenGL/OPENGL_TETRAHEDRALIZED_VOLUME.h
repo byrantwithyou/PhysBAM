@@ -8,7 +8,6 @@
 #define __OPENGL_TETRAHEDRALIZED_VOLUME__
 
 #include <Core/Vectors/VECTOR_3D.h>
-#include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <Geometry/Topology/TETRAHEDRON_MESH.h>
 #include <OpenGL/OpenGL/OPENGL_MATERIAL.h>
 #include <OpenGL/OpenGL/OPENGL_OBJECT.h>

@@ -7,10 +7,11 @@
 #ifndef __TRIANGLE_HIERARCHY__
 #define __TRIANGLE_HIERARCHY__
 
-#include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <Geometry/Spatial_Acceleration/BOX_HIERARCHY.h>
 #include <Geometry/Topology/TOPOLOGY_POLICY.h>
 namespace PhysBAM{
+
+template<class TV> class GEOMETRY_PARTICLES;
 
 template<class T_input>
 class TRIANGLE_HIERARCHY:public BOX_HIERARCHY<VECTOR<T_input,3> >
@@ -18,18 +19,18 @@ class TRIANGLE_HIERARCHY:public BOX_HIERARCHY<VECTOR<T_input,3> >
     typedef T_input T;
     typedef VECTOR<T,3> TV;
 public:
-    typedef BOX_HIERARCHY<VECTOR<T,3> > BASE;
+    typedef BOX_HIERARCHY<TV> BASE;
     using BASE::leaves;using BASE::root;using BASE::parents;using BASE::children;using BASE::box_hierarchy;using BASE::box_radius;using BASE::Leaf;using BASE::Update_Nonleaf_Boxes;
     using BASE::Intersection_List;using BASE::Thicken_Leaf_Boxes;using BASE::Initialize_Hierarchy_Using_KD_Tree_Helper;
 
     TRIANGLE_MESH& triangle_mesh;
-    GEOMETRY_PARTICLES<VECTOR<T,3> >& particles;
+    GEOMETRY_PARTICLES<TV>& particles;
     ARRAY<TRIANGLE_3D<T> >* triangle_list;
     ARRAY<ARRAY<int> > triangles_in_group;
     int triangles_per_group;
     
-    TRIANGLE_HIERARCHY(TRIANGLE_MESH& triangle_mesh_input,GEOMETRY_PARTICLES<VECTOR<T,3> >& particles_input,const bool update_boxes=true,const int triangles_per_group=0);
-    TRIANGLE_HIERARCHY(TRIANGLE_MESH& triangle_mesh_input,GEOMETRY_PARTICLES<VECTOR<T,3> >& particles_input,ARRAY<TRIANGLE_3D<T> >& triangle_list_input,const bool update_boxes=true,const int triangles_per_group=0);
+    TRIANGLE_HIERARCHY(TRIANGLE_MESH& triangle_mesh_input,GEOMETRY_PARTICLES<TV>& particles_input,const bool update_boxes=true,const int triangles_per_group=0);
+    TRIANGLE_HIERARCHY(TRIANGLE_MESH& triangle_mesh_input,GEOMETRY_PARTICLES<TV>& particles_input,ARRAY<TRIANGLE_3D<T> >& triangle_list_input,const bool update_boxes=true,const int triangles_per_group=0);
     virtual ~TRIANGLE_HIERARCHY();
 
     void Update_Boxes(const T extra_thickness=0)
@@ -73,23 +74,23 @@ public:
     {Calculate_Bounding_Boxes_Helper(bounding_boxes,start_X,end_X);}
 
 //#####################################################################
-    void Intersection_List(const VECTOR<T,3>& point,ARRAY<int>& intersection_list,
+    void Intersection_List(const TV& point,ARRAY<int>& intersection_list,
         const T thickness_over_two=0) const override;
     void Intersection_List(const RANGE<TV>& test_box,ARRAY<int>& intersection_list,
         const T thickness_over_two=0) const override;
     void Intersection_List(const ORIENTED_BOX<TV>& test_box,ARRAY<int>& intersection_list) const override;
     void Intersection_List(const PLANE<T>& test_plane,ARRAY<int>& intersection_list,
         const T thickness_over_two=0) const override;
-    void Intersection_List(const IMPLICIT_OBJECT<VECTOR<T,3> >& implicit_surface,const MATRIX<T,3>& rotation,
-        const VECTOR<T,3>& translation,ARRAY<int>& intersection_list,const T contour_value=0) const override;
+    void Intersection_List(const IMPLICIT_OBJECT<TV>& implicit_surface,const MATRIX<T,3>& rotation,
+        const TV& translation,ARRAY<int>& intersection_list,const T contour_value=0) const override;
     void Initialize_Hierarchy_Using_KD_Tree() override;
     void Calculate_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes);
     void Calculate_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,const FRAME<TV>& start_frame,const FRAME<TV>& end_frame);
     void Calculate_Bounding_Box_Radii(const ARRAY<RANGE<TV> >& bounding_boxes,ARRAY<T>& radius) override;
-    bool Intersection(RAY<VECTOR<T,3> >& ray,const T thickness_over_two=0,const bool use_ray_bounding_box=false) const;
-    bool Intersection(RAY<VECTOR<T,3> >& ray,VECTOR<T,3>& weights,const T thickness_over_two=0,const bool use_ray_bounding_box=false) const;
+    bool Intersection(RAY<TV>& ray,const T thickness_over_two=0,const bool use_ray_bounding_box=false) const;
+    bool Intersection(RAY<TV>& ray,TV& weights,const T thickness_over_two=0,const bool use_ray_bounding_box=false) const;
     // for internal use - but octrees use them as well so they're not private
-    bool Intersection(const int box,RAY<VECTOR<T,3> >& ray,const T thickness,const T thickness_over_two,const bool use_ray_bounding_box=false) const;
+    bool Intersection(const int box,RAY<TV>& ray,const T thickness,const T thickness_over_two,const bool use_ray_bounding_box=false) const;
 private:
     template<class T_ARRAY_TV> void Calculate_Bounding_Boxes_Helper(ARRAY<RANGE<TV> >& bounding_boxes,T_ARRAY_TV X);
     template<class T_ARRAY_TV> void Calculate_Bounding_Boxes_Helper(ARRAY<RANGE<TV> >& bounding_boxes,T_ARRAY_TV start_X,T_ARRAY_TV end_X);

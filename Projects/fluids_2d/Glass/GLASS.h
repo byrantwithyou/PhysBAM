@@ -346,7 +346,7 @@ void Add_SPH_Particles_For_Sources(const ARRAY<ORIENTED_BOX<TV> > &sph_sources,c
                 while(removed_negative_particles(block)->Size()<target_density_factor*fraction_of_particles_for_sph*fluids_parameters.number_particles_per_cell){
                     TV X=random.Get_Uniform_Vector(block_bounding_box);
                     int id=removed_negative_particles(block)->Add_Element();
-                    (*removed_negative_particles(block)->template Get_Array<int>(ATTRIBUTE_ID_ID))(id)=particle_id++;
+                    (*removed_negative_particles(block)->template Get_Array<int>("id"))(id)=particle_id++;
                     removed_negative_particles(block)->X(id)=X;removed_negative_particles(block)->V(id)=sources_velocity(s);
                     removed_negative_particles(block)->radius(id)=(T).1*grid.dX.Min();}}}}
 }

@@ -4,7 +4,6 @@
 //#####################################################################
 #include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
-#include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <Geometry/Seeding/POISSON_DISK.h>
 #include "POUR_SOURCE.h"
 #include "STANDARD_TESTS_BASE.h"
@@ -62,7 +61,7 @@ Write_Output_Files(const int frame)
                 V=velocity+gravity*t;
                 X+=(T).5*t*t*gravity;}
             Add_Debug_Particle(X,waiting_particle_color(i));
-            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,V);}}
+            Debug_Particle_Set_Attribute<TV>("V",V);}}
 }
 //#####################################################################
 // Function Read_Output_Files

@@ -29,8 +29,8 @@ PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input)
     advection_scalar(*new ADVECTION_HAMILTON_JACOBI_ENO<TV,T>),
     levelset_color(grid,*new ARRAY<T,TV_INT>,*new ARRAY<int,TV_INT>),debug_particles(*new DEBUG_PARTICLES<TV>)
 {
-    debug_particles.debug_particles.template Add_Array<TV>(ATTRIBUTE_ID_V);
-    debug_particles.debug_particles.template Add_Array<T>(ATTRIBUTE_ID_DISPLAY_SIZE);
+    debug_particles.debug_particles.template Add_Array<TV>("V");
+    debug_particles.debug_particles.template Add_Array<T>("display_size");
 }
 //#####################################################################
 // Destructor

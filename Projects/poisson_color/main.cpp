@@ -25,7 +25,6 @@
 #include <Geometry/Finite_Elements/INTERFACE_POISSON_SYSTEM_COLOR.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
-#include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Level_Sets/REINITIALIZATION.h>
@@ -105,7 +104,7 @@ void Dump_System(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,ANALYTIC_POISSON_
             T k=0;
             if(V.color_pair.x>=-1) k=at.j_surface(V.face.Center(),V.color_pair.x,V.color_pair.y);
             else if(V.color_pair.x==-2) k=at.u_jump(V.face.Center(),V.color_pair.x,V.color_pair.y);
-            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,k*T_FACE::Normal(V.face.X));}}
+            Debug_Particle_Set_Attribute<TV>("V",k*T_FACE::Normal(V.face.X));}}
     
     Dump_Interface<T,TV>(ips);
     for(CELL_ITERATOR<TV> it(ips.grid);it.Valid();it.Next()){
@@ -114,7 +113,7 @@ void Dump_System(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,ANALYTIC_POISSON_
         if(c>=0){
             T f_volume=-at.mu(c)*at.analytic_solution(c)->L(it.Location(),0);
             Add_Debug_Particle(it.Location(),f_volume==0?VECTOR<T,3>(0.25,0.25,0.25):(f_volume>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0)));
-            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,f_volume);}}
+            Debug_Particle_Set_Attribute<TV>("display_size",f_volume);}}
         Flush_Frame<TV>("volumetric forces");
 }
 
@@ -130,7 +129,7 @@ void Dump_Vector(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,const INTERFACE_P
             if(k>=0){
                 T u_value=v.u(c)(k);
                 Add_Debug_Particle(it.Location(),u_value==0?VECTOR<T,3>(0.25,0.25,0.25):(u_value>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0)));
-                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,u_value);}}
+                Debug_Particle_Set_Attribute<TV>("display_size",u_value);}}
         Flush_Frame<TV>(buff);}
 }
 
@@ -144,7 +143,7 @@ void Dump_Vector(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,const ARRAY<T,VEC
     for(CELL_ITERATOR<TV> it(ips.grid);it.Valid();it.Next()){
         T u_value=u(it.index);
         Add_Debug_Particle(it.Location(),u_value==0?VECTOR<T,3>(0.25,0.25,0.25):(u_value>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0)));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,u_value);}
+        Debug_Particle_Set_Attribute<TV>("display_size",u_value);}
     Flush_Frame<TV>(title);
 }
 
@@ -173,12 +172,12 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_POISSON_TEST<TV>& at,int max_iter,boo
         for(NODE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
             T p=color_phi(c)(it.index);
             Add_Debug_Particle(it.Location(),color_map[c]/(p>0?2:1));
-            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,p);}
+            Debug_Particle_Set_Attribute<TV>("display_size",p);}
         Flush_Frame<TV>("reinitialized level set");
         LEVELSET<TV> levelset(grid,color_phi(c),1);
         for(NODE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
             Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
-            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,levelset.Normal(it.Location()));}
+            Debug_Particle_Set_Attribute<TV>("V",levelset.Normal(it.Location()));}
         Flush_Frame<TV>("normals");}
 
     INTERFACE_POISSON_SYSTEM_COLOR<TV> ips(grid,color_phi);
@@ -531,14 +530,14 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
         int c=-4;
         T p=test.analytic_levelset->phi(it.Location(),0,c);
         Add_Debug_Particle(it.Location(),color_map[c+3]);
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,p);}
+        Debug_Particle_Set_Attribute<TV>("display_size",p);}
     Flush_Frame<TV>("level set");
     for(int c=-3;c<test.analytic_solution.m;c++){
         for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
             T p=test.analytic_levelset->dist(it.Location(),0,c);
             Add_Debug_Particle(it.Location(),color_map[c+3]/(p>0?2:1));
-            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));
-            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,test.analytic_levelset->N(it.Location(),0,c));}
+            Debug_Particle_Set_Attribute<TV>("display_size",abs(p));
+            Debug_Particle_Set_Attribute<TV>("V",test.analytic_levelset->N(it.Location(),0,c));}
         Flush_Frame<TV>("normals");}
 
     Analytic_Test(grid,test,max_iter,use_preconditioner,null,dump_matrix,debug_particles);

@@ -197,7 +197,7 @@ Compute_G0()
 template<class TV,int gauss_order> void OPENSUBDIV_SURFACE<TV,gauss_order>::
 Set_Mass(T density,bool use_constant_mass) const
 {
-    ARRAY_VIEW<T>* mass_attr=particles.template Get_Array<T>(ATTRIBUTE_ID_MASS);
+    ARRAY_VIEW<T>* mass_attr=particles.template Get_Array<T>("mass");
     PHYSBAM_ASSERT(mass_attr);
     if(use_constant_mass&&control_points.m)
         PHYSBAM_NOT_IMPLEMENTED(); // would need Total_Size() for this class.

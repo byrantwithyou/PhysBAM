@@ -238,19 +238,19 @@ template<class T,class T_ARRAY> void OPENGL_POINTS_2D<T,T_ARRAY>::
 Set_Points_From_Particles(const GEOMETRY_PARTICLES<TV>& particles,bool keep_colors)
 {
     points=particles.X;
-    const ARRAY_VIEW<int>* id=particles.template Get_Array<int>(ATTRIBUTE_ID_ID);
+    const ARRAY_VIEW<int>* id=particles.template Get_Array<int>("id");
     Store_Point_Ids(id!=0);
     if(point_colors && (!keep_colors || point_colors->m!=particles.Size()))
         Store_Point_Colors(false);
 
-    if(const ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR)){
+    if(const ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color")){
         Store_Point_Colors(true);
         for(int i=0;i<point_colors->m;i++)
             (*point_colors)(i)=OPENGL_COLOR((*color_attribute)(i));}
 
     if(id) *point_ids=*id;
 
-    if(const ARRAY_VIEW<T>* radius_attribute=particles.template Get_Array<T>(ATTRIBUTE_ID_RADIUS)){
+    if(const ARRAY_VIEW<T>* radius_attribute=particles.template Get_Array<T>("radius")){
         Store_Point_Radii(true);
         for(int i=0;i<point_radii->m;i++)
             (*point_radii)(i)=(*radius_attribute)(i);}

@@ -431,8 +431,8 @@ Output_Iterators(const STREAM_TYPE stream_type,const char* output_directory,int 
     // This isn't so great - it means the iterator might actually be different from the one used.
     LOG::cout<<"OUTPUT ITERATORS"<<std::endl;
     GEOMETRY_PARTICLES<TV> particles;
-    particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
-    ARRAY_VIEW<VECTOR<T,3> >& color_attribute=*particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+    particles.template Add_Array<VECTOR<T,3> >("color");
+    ARRAY_VIEW<VECTOR<T,3> >& color_attribute=*particles.template Get_Array<VECTOR<T,3> >("color");
 
     for(UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED<TV> iterator(iterator_info);iterator.Valid();iterator.Next()){
         int p=particles.Add_Element();

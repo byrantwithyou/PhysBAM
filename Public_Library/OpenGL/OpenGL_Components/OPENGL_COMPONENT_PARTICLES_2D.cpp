@@ -269,7 +269,7 @@ Command_Prompt_Response()
         if(command=="s"){
             int index;
             if(sstream>>index){
-                if(ARRAY_VIEW<int>* ids=particles_multiple(set)->template Get_Array<int>(ATTRIBUTE_ID_ID))
+                if(ARRAY_VIEW<int>* ids=particles_multiple(set)->template Get_Array<int>("id"))
                     if(!ids->Find(index,index)) return;
                 opengl_points->Clear_Selection();
                 opengl_points->Select_Point(index);}}}
@@ -319,7 +319,7 @@ template<class T> ARRAY_VIEW<int>* OPENGL_COMPONENT_PARTICLES_2D<T>::
 Get_Particles_Id_Array(int set_number) const
 {
     if(set_number<0) set_number=set;
-    ARRAY_VIEW<int>* ids=particles_multiple(set_number)->template Get_Array<int>(ATTRIBUTE_ID_ID);
+    ARRAY_VIEW<int>* ids=particles_multiple(set_number)->template Get_Array<int>("id");
     if(ids && ids->Size() && (*ids)(0)) return ids; // A hack to ignore ids if the first one equals zero
     return 0;
 }

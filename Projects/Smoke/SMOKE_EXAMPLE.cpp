@@ -161,7 +161,7 @@ Write_Output_Files(const int frame)
         Write_To_File(stream_type,output_directory+"/"+f+"/psi_D",projection.elliptic_solver->psi_D);}
     for(int p=0;p<particles.number;p++){
         Add_Debug_Particle(particles.X(p),VECTOR<T,3>(0,1,0));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,particles.V(p));}
+        Debug_Particle_Set_Attribute<TV>("V",particles.V(p));}
     debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
 }
 template<class TV> void SMOKE_EXAMPLE<TV>::

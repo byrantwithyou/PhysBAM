@@ -5,6 +5,7 @@
 #include <Core/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Auto_Diff/AUTO_HESS.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Grid_PDE/Interpolation/CUBIC_MN_INTERPOLATION_UNIFORM.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET_BOX.h>
@@ -20,7 +21,6 @@
 #include <Geometry/Basic_Geometry/LINE_2D.h>
 #include <Geometry/Basic_Geometry/PLANE.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
-#include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
 #include "FLUIDS_COLOR_BASE.h"
 #ifdef USE_OPENMP
@@ -630,17 +630,17 @@ Level_Set_Error(T time)
         int c=levelset_color.color(it.index);
         T p=levelset_color.phi(it.index);
         Add_Debug_Particle(it.Location(),colors(c+3));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
+        Debug_Particle_Set_Attribute<TV>("display_size",abs(p));}
     PHYSBAM_DEBUG_WRITE_SUBSTEP("level set",1);
     for(CELL_ITERATOR<TV> it(grid,1);it.Valid();it.Next()){
         int c=-4;
         T p=analytic_levelset->phi(it.Location()/m,time/s,c)*m;
         if(levelset_color.color(it.index)!=(c==-4?bc_type:c)){
             Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
-            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(levelset_color.phi(it.index))+abs(p));}
+            Debug_Particle_Set_Attribute<TV>("display_size",abs(levelset_color.phi(it.index))+abs(p));}
         else{
             Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,1,0));
-            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(levelset_color.phi(it.index)-p));}}
+            Debug_Particle_Set_Attribute<TV>("display_size",abs(levelset_color.phi(it.index)-p));}}
     PHYSBAM_DEBUG_WRITE_SUBSTEP("level set error",1);
 }
 //#####################################################################
@@ -690,7 +690,7 @@ Velocity_Error(T time)
         p_2+=sqr(D);
         num_p++;
         Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(D));}
+        Debug_Particle_Set_Attribute<TV>("display_size",abs(D));}
     if(num_p) p_2/=num_p;
     p_2=sqrt(p_2);
 
@@ -717,7 +717,7 @@ Velocity_Error(T time)
             T norm=D.Frobenius_Norm();
             max_S=max(max_S,norm);
             Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
-            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,norm);}
+            Debug_Particle_Set_Attribute<TV>("display_size",norm);}
         LOG::printf("S error: %-22.16g",max_S);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("polymer stress error",1);}
     LOG::printf("\n");
@@ -743,7 +743,7 @@ Dump_Analytic_Levelset(T time)
         T p=analytic_levelset->phi(it.Location()/m,time/s,c)*m;
         if(c==-4) c=bc_type;
         Add_Debug_Particle(it.Location(),colors(c+3));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
+        Debug_Particle_Set_Attribute<TV>("display_size",abs(p));}
     PHYSBAM_DEBUG_WRITE_SUBSTEP("analytic level set (phi)",1);
     for(CELL_ITERATOR<TV> it(grid,1);it.Valid();it.Next()){
         int c=-4;
@@ -751,7 +751,7 @@ Dump_Analytic_Levelset(T time)
         (void)p;
         if(c==-4) c=bc_type;
         Add_Debug_Particle(it.Location(),colors(c+3));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,analytic_levelset->N(it.Location()/m,time/s,c));}
+        Debug_Particle_Set_Attribute<TV>("V",analytic_levelset->N(it.Location()/m,time/s,c));}
     PHYSBAM_DEBUG_WRITE_SUBSTEP("analytic level set (N)",1);
 }
 //#####################################################################
@@ -892,7 +892,7 @@ Jump_Interface_Condition(const TV& X,int color0,int color1,T time)
         T k=CUBIC_MN_INTERPOLATION_UNIFORM<TV,T>().Clamped_To_Array(grid,*ls.curvature,X);
         TV n=CUBIC_MN_INTERPOLATION_UNIFORM<TV,TV>().Clamped_To_Array(grid,*ls.normals,X).Normalized();
         Add_Debug_Particle(X,VECTOR<T,3>(0,0,1));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,k*surface_tension*n);
+        Debug_Particle_Set_Attribute<TV>("V",k*surface_tension*n);
         return k*surface_tension*n;}
 
     if(analytic_velocity.m && analytic_levelset && !analytic_initial_only){

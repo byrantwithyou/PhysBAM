@@ -17,9 +17,9 @@ template<class TV> MPM_DRUCKER_PRAGER<TV>::
 MPM_DRUCKER_PRAGER(MPM_PARTICLES<TV>& particles,GATHER_SCATTER<TV>* gather_scatter,T a0,T a1,T a3,T a4)
     :MPM_PLASTICITY_MODEL<TV>(particles,gather_scatter),a0(a0),a1(a1),a3(a3),a4(a4)
 {
-    particles.Add_Array(ATTRIBUTE_ID_PLASTIC_DEFORMATION,&plastic_def);
-    particles.Add_Array(ATTRIBUTE_ID_DP_RHO_F,&rho_F);
-    particles.Add_Array(ATTRIBUTE_ID_DP_COHESION,&sigma_Y);
+    particles.Add_Array("plastic_deformation",&plastic_def);
+    particles.Add_Array("dp_rho_f",&rho_F);
+    particles.Add_Array("dp_cohesion",&sigma_Y);
 }
 //#####################################################################
 // Destructor
@@ -122,15 +122,6 @@ Update_Hardening(int id,T plastic_def_increment) const
     T sin_phi_F=sin(phi_F);
     rho_F(id)=sqrt(2.0/3.0)*2*sin_phi_F/(3-sin_phi_F);
 }
-
-static int Register_Attributes()
-{
-    Register_Attribute_Name(ATTRIBUTE_ID_PLASTIC_DEFORMATION,"plastic_def");
-    Register_Attribute_Name(ATTRIBUTE_ID_DP_RHO_F,"rho_F");
-    Register_Attribute_Name(ATTRIBUTE_ID_DP_COHESION,"cohesion");
-    return 0;
-}
-int MPM_DRUCKER_PRAGER_zzz=Register_Attributes();
 template class MPM_DRUCKER_PRAGER<VECTOR<float,2>>;
 template class MPM_DRUCKER_PRAGER<VECTOR<float,3>>;
 template class MPM_DRUCKER_PRAGER<VECTOR<double,2>>;

@@ -47,29 +47,21 @@ Compute_Auxiliary_Attributes(const SOFT_BINDINGS<TV>& soft_bindings)
 template<class TV> template<class T_INDICES> void DEFORMABLE_PARTICLES<TV>::
 Compute_Auxiliary_Attributes(const SOFT_BINDINGS<TV>& soft_bindings,const T_INDICES& indices,const bool copy_existing_elements)
 {
-    if(this->template Get_Array<T>(ATTRIBUTE_ID_ONE_OVER_MASS))
-        Remove_Array_Using_Index(Get_Attribute_Index(ATTRIBUTE_ID_ONE_OVER_MASS));
-    this->template Add_Array<T>(ATTRIBUTE_ID_ONE_OVER_MASS,&one_over_mass);
-    if(this->template Get_Array<T>(ATTRIBUTE_ID_EFFECTIVE_MASS))
-        Remove_Array_Using_Index(Get_Attribute_Index(ATTRIBUTE_ID_EFFECTIVE_MASS));
-    this->template Add_Array<T>(ATTRIBUTE_ID_EFFECTIVE_MASS,&effective_mass);
-    if(this->template Get_Array<T>(ATTRIBUTE_ID_ONE_OVER_EFFECTIVE_MASS))
-        Remove_Array_Using_Index(Get_Attribute_Index(ATTRIBUTE_ID_ONE_OVER_EFFECTIVE_MASS));
-    this->template Add_Array<T>(ATTRIBUTE_ID_ONE_OVER_EFFECTIVE_MASS,&one_over_effective_mass);
+    if(this->template Get_Array<T>("one_over_mass"))
+        Remove_Array_Using_Index(Get_Attribute_Index("one_over_mass"));
+    this->template Add_Array<T>("one_over_mass",&one_over_mass);
+    if(this->template Get_Array<T>("effective_mass"))
+        Remove_Array_Using_Index(Get_Attribute_Index("effective_mass"));
+    this->template Add_Array<T>("effective_mass",&effective_mass);
+    if(this->template Get_Array<T>("ove_over_effective_mass"))
+        Remove_Array_Using_Index(Get_Attribute_Index("ove_over_effective_mass"));
+    this->template Add_Array<T>("ove_over_effective_mass",&one_over_effective_mass);
     for(int i=0;i<indices.Size();i++){int p=indices(i);
         one_over_mass(p)=Robust_Inverse(mass(p));}
     for(int i=0;i<indices.Size();i++){int p=indices(i);
         one_over_effective_mass(p)=soft_bindings.One_Over_Effective_Mass(p);
         effective_mass(p)=Robust_Inverse(one_over_effective_mass(p));}
 }
-static int Initialize_Deformables_Particles()
-{
-    Register_Attribute_Name(ATTRIBUTE_ID_ONE_OVER_MASS,"one_over_mass");
-    Register_Attribute_Name(ATTRIBUTE_ID_EFFECTIVE_MASS,"effective_mass");
-    Register_Attribute_Name(ATTRIBUTE_ID_ONE_OVER_EFFECTIVE_MASS,"one_over_effective_mass");
-    return 0;
-}
-int initialize_deformables_particles=Initialize_Deformables_Particles();
 //#####################################################################
 template class DEFORMABLE_PARTICLES<VECTOR<float,1> >;
 template class DEFORMABLE_PARTICLES<VECTOR<float,2> >;

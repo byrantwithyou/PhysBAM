@@ -7,7 +7,6 @@
 #ifndef __COLLISIONS_GEOMETRY_FORWARD__
 #define __COLLISIONS_GEOMETRY_FORWARD__
 
-#include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 namespace PhysBAM{
 
 template<class TV> class COLLISION_GEOMETRY;

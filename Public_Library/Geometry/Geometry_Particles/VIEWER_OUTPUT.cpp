@@ -8,7 +8,6 @@
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
-#include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -19,8 +18,8 @@ VIEWER_OUTPUT(STREAM_TYPE stream_type,const GRID<TV>& grid,const std::string& ou
     :frame(0),output_directory(output_directory),stream_type(stream_type),grid(grid),debug_particles(*new DEBUG_PARTICLES<TV>)
 {
     Singleton(this);
-    debug_particles.debug_particles.template Add_Array<T>(ATTRIBUTE_ID_DISPLAY_SIZE);
-    debug_particles.debug_particles.template Add_Array<TV>(ATTRIBUTE_ID_V);
+    debug_particles.debug_particles.template Add_Array<T>("display_size");
+    debug_particles.debug_particles.template Add_Array<TV>("V");
 }
 //#####################################################################
 // Destructor

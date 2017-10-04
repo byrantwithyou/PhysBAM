@@ -15,7 +15,6 @@
 #include <Tools/Polynomials/CUBIC.h>
 #include <Tools/Polynomials/QUADRATIC.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
-#include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
 #include <Deformables/Constitutive_Models/RC2_EXTRAPOLATED.h>
 using namespace PhysBAM;
@@ -78,10 +77,10 @@ P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const int id) const
         if(b){
             helper.Compute_dE(base,F.To_Vector(),id);
 //            Add_Debug_Particle(F.To_Vector(),VECTOR<T,3>(1,0,0));
-//            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,-helper.dE/youngs_modulus);
+//            Debug_Particle_Set_Attribute<TV>("V",-helper.dE/youngs_modulus);
             return DIAGONAL_MATRIX<T,d>(helper.dE);}}
 //    Add_Debug_Particle(F.To_Vector(),VECTOR<T,3>(0,1,0));
-//    Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,-base.dE(F.To_Vector(),id)/youngs_modulus);
+//    Debug_Particle_Set_Attribute<TV>("V",-base.dE(F.To_Vector(),id)/youngs_modulus);
 
     return DIAGONAL_MATRIX<T,d>(base.dE(F.To_Vector(),id));
 }

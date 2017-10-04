@@ -1161,7 +1161,7 @@ void Plot_Energy_Landscape()
 
     for(int i=0;i<X.m;i++){
         Add_Debug_Particle(X(i),mp(E(i)));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,N(i));}
+        Debug_Particle_Set_Attribute<TV>("V",N(i));}
     particles.X=TX;
 }
 //#####################################################################

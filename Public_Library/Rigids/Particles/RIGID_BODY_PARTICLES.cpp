@@ -4,7 +4,6 @@
 //#####################################################################
 #include <Core/Matrices/DIAGONAL_MATRIX.h>
 #include <Rigids/Particles/RIGID_BODY_PARTICLES.h>
-#include <Rigids/Particles/RIGIDS_PARTICLES_FORWARD.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 namespace PhysBAM{
 //#####################################################################
@@ -14,13 +13,13 @@ template<class TV> RIGID_BODY_PARTICLES<TV>::
 RIGID_BODY_PARTICLES()
     :frame(0,0),twist(0,0),structure_ids(0,0),angular_momentum(0,0),mass(0,0),inertia_tensor(0,0),kinematic(0,0)
 {
-    Add_Array(ATTRIBUTE_ID_FRAME,&frame);
-    Add_Array(ATTRIBUTE_ID_TWIST,&twist);
-    Add_Array(ATTRIBUTE_ID_STRUCTURE_IDS,&structure_ids);
-    Add_Array(ATTRIBUTE_ID_ANGULAR_MOMENTUM,&angular_momentum);
-    Add_Array(ATTRIBUTE_ID_RIGID_MASS,&mass);
-    Add_Array(ATTRIBUTE_ID_RIGID_INERTIA_TENSOR,&inertia_tensor);
-    Add_Array(ATTRIBUTE_ID_KINEMATIC,&kinematic);
+    Add_Array("frame",&frame);
+    Add_Array("twist",&twist);
+    Add_Array("structure_ids",&structure_ids);
+    Add_Array("angular_momentum",&angular_momentum);
+    Add_Array("rigid_mass",&mass);
+    Add_Array("rigid_inertia_tensor",&inertia_tensor);
+    Add_Array("kinematic",&kinematic);
 }
 //#####################################################################
 // Destructor
@@ -29,14 +28,6 @@ template<class TV> RIGID_BODY_PARTICLES<TV>::
 ~RIGID_BODY_PARTICLES()
 {
     Delete_All_Particles();
-}
-static int Initialize_Rigids_Particles()
-{
-    Register_Attribute_Name(ATTRIBUTE_ID_RIGID_MASS,"rigid_mass");
-    Register_Attribute_Name(ATTRIBUTE_ID_RIGID_INERTIA_TENSOR,"rigid_inertia_tensor");
-    Register_Attribute_Name(ATTRIBUTE_ID_ANGULAR_MOMENTUM,"angular_momentum");
-    Register_Attribute_Name(ATTRIBUTE_ID_KINEMATIC,"kinematic");
-    return 0;
 }
 //#####################################################################
 // Resize
@@ -86,7 +77,6 @@ Clone_Helper(const RIGID_BODY_PARTICLES& particles)
 {
     PHYSBAM_FATAL_ERROR();
 }
-int initialize_rigids_particles=Initialize_Rigids_Particles();
 //#####################################################################
 template class RIGID_BODY_PARTICLES<VECTOR<float,1> >;
 template class RIGID_BODY_PARTICLES<VECTOR<float,2> >;

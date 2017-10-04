@@ -4,9 +4,32 @@
 //#####################################################################
 #include <Core/Arrays/ARRAY_VIEW.h>
 #include <Core/Log/LOG.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/FRAME.h>
+#include <Core/Matrices/MATRIX.h>
+#include <Core/Vectors/TWIST.h>
 #include <Tools/Particles/PARTICLES.h>
 #include <sstream>
 using namespace PhysBAM;
+namespace{
+struct ATTRIBUTE_INFO
+{
+    int id;
+    int scalar;
+    int m,n;
+    int size[2];
+    int Encode(bool use_doubles) const
+    {
+        int sc=scalar<2?use_doubles:scalar;
+        return (id<<20)|(sc<<16)|(m<<12)|(n<<8)|size[use_doubles];
+    }
+};
+}
+inline int Adjust_Scalar(int id,bool use_doubles)
+{
+    if((id&0xf)>=2) return id;
+    return (id&0xfffffff0)|use_doubles;
+}
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -53,11 +76,11 @@ Add_Arrays(const PARTICLES& particles)
 {
     ATTRIBUTE_INDEX i(0),j(0);
     for(;i<arrays.m && j<arrays.m;i++){
-        if(arrays(i)->id<arrays(j)->id) continue;
-        if(arrays(i)->id>arrays(j)->id) Add_Array(arrays(j)->id,arrays(j)->Clone_Default());
+        if(arrays(i)->name<arrays(j)->name) continue;
+        if(arrays(i)->name>arrays(j)->name) Add_Array(arrays(j)->name,arrays(j)->Clone_Default());
         j++;}
     for(;j<arrays.m;j++)
-        Add_Array(arrays(j)->id,arrays(j)->Clone_Default());
+        Add_Array(arrays(j)->name,arrays(j)->Clone_Default());
 }
 //#####################################################################
 // Function Add_Elements_From_Deletion_List
@@ -97,8 +120,8 @@ Copy_Element(const PARTICLES& from_particles,const int from,const int to)
 {
     ATTRIBUTE_INDEX i(0),j(0);
     while(i<arrays.m && j<from_particles.arrays.m){
-        if(arrays(i)->id<from_particles.arrays(j)->id) arrays(i++)->Clear(to);
-        else if(arrays(i)->id>from_particles.arrays(j)->id) j++;
+        if(arrays(i)->name<from_particles.arrays(j)->name) arrays(i++)->Clear(to);
+        else if(arrays(i)->name>from_particles.arrays(j)->name) j++;
         else arrays(i++)->Copy_Element(*from_particles.arrays(j++),from,to);}
     for(;i<arrays.m;i++) arrays(i)->Clear(to);
 }
@@ -111,8 +134,8 @@ Copy_All_Elements_Helper(const PARTICLES& from_particles,const int offset)
     PHYSBAM_ASSERT(this!=&from_particles);
     ATTRIBUTE_INDEX i(0),j(0);
     while(i<arrays.m && j<from_particles.arrays.m){
-        if(arrays(i)->id<from_particles.arrays(j)->id) arrays(i++)->Clear_Range(offset+1,offset+from_particles.number);
-        else if(arrays(i)->id>from_particles.arrays(j)->id) j++;
+        if(arrays(i)->name<from_particles.arrays(j)->name) arrays(i++)->Clear_Range(offset+1,offset+from_particles.number);
+        else if(arrays(i)->name>from_particles.arrays(j)->name) j++;
         else arrays(i++)->Copy_With_Offset(*from_particles.arrays(j++),offset);}
     for(;i<arrays.m;i++) arrays(i)->Clear_Range(offset+1,offset+from_particles.number);
 }
@@ -120,12 +143,12 @@ Copy_All_Elements_Helper(const PARTICLES& from_particles,const int offset)
 // Function Get_Attribute_Index
 //#####################################################################
 template<class TV> ATTRIBUTE_INDEX PARTICLES<TV>::
-Find_Attribute_Index(const ATTRIBUTE_ID attribute_id) const
+Find_Attribute_Index(const std::string& name) const
 {
     ATTRIBUTE_INDEX first(0),last(arrays.m);
     while(first<last){
         ATTRIBUTE_INDEX middle((Value(first)+Value(last))/2);
-        if(arrays(middle)->id<attribute_id) first=middle+1;
+        if(arrays(middle)->name<name) first=middle+1;
         else last=middle;}
     return first;
 }
@@ -148,7 +171,7 @@ operator==(const PARTICLES& particles) const
     if(this==&particles) return true;
     if(arrays.m!=arrays.m) return false;
     for(ATTRIBUTE_INDEX i(0);i<arrays.m;i++){
-        if(arrays(i)->id!=arrays(i)->id) return false;
+        if(arrays(i)->name!=arrays(i)->name) return false;
         assert(typeid(arrays(i))==typeid(arrays(i)));
         if(arrays(i)!=arrays(i)) return false;}
     return true;
@@ -167,13 +190,13 @@ Resize(const int new_size)
 // Function Add_Array
 //#####################################################################
 template<class TV> ATTRIBUTE_INDEX PARTICLES<TV>::
-Add_Array(const ATTRIBUTE_ID attribute_id,ARRAY_COLLECTION_ELEMENT_BASE* array)
+Add_Array(const std::string& name,ARRAY_COLLECTION_ELEMENT_BASE* array)
 {
-    ATTRIBUTE_INDEX index=Find_Attribute_Index(attribute_id);
-    if(index<arrays.m && arrays(index)->id==attribute_id){
+    ATTRIBUTE_INDEX index=Find_Attribute_Index(name);
+    if(index<arrays.m && arrays(index)->name==name){
         PHYSBAM_ASSERT(array==arrays(index));
         return index;}
-    array->id=attribute_id;
+    array->name=name;
     array->Reallocate(buffer_size);
     array->Set_Size(number);
     arrays.Insert(array,index);
@@ -233,43 +256,65 @@ namespace PhysBAM{
 //#####################################################################
 // Function Attribute_Sample_Registry
 //#####################################################################
-static HASHTABLE<ATTRIBUTE_ID,ARRAY_COLLECTION_ELEMENT_BASE*>&
-Attribute_Sample_Registry(int type=0) // 0 = actual type, 1 = float version, 2 = double version
+static HASHTABLE<int,VECTOR<ARRAY_COLLECTION_ELEMENT_BASE*,2> >&
+Attribute_Sample_Registry()
 {
-    static HASHTABLE<ATTRIBUTE_ID,ARRAY_COLLECTION_ELEMENT_BASE*> registry[3];
-    return registry[type];
+    static HASHTABLE<int,VECTOR<ARRAY_COLLECTION_ELEMENT_BASE*,2> > registry;
+    return registry;
+}
+//#####################################################################
+// Function Attribute_Sample_Registry
+//#####################################################################
+static HASHTABLE<std::string,ATTRIBUTE_INFO>&
+Attribute_Id_Lookup() // 0 = actual type, 1 = float version, 2 = double version
+{
+    static HASHTABLE<std::string,ATTRIBUTE_INFO> hash;
+    return hash;
 }
 }
 //#####################################################################
-// Function Attribute_Names_Registry
+// Function Legacy_Read
 //#####################################################################
-static HASHTABLE<ATTRIBUTE_ID,const char*>& Attribute_Names_Registry()
+template<class TV> void PARTICLES<TV>::
+Legacy_Read(TYPED_ISTREAM& input)
 {
-    static HASHTABLE<ATTRIBUTE_ID,const char*> names_registry;
-    return names_registry;
-}
-//#####################################################################
-// Function Register_Attribute_Name
-//#####################################################################
-void PhysBAM::Register_Attribute_Name(const ATTRIBUTE_ID id,const char* name)
-{
-    PHYSBAM_ASSERT(Attribute_Names_Registry().Set(id,name));
-}
-//#####################################################################
-// Function Get_Attribute_Name
-//#####################################################################
-const char* PhysBAM::Get_Attribute_Name(const ATTRIBUTE_ID id)
-{
-    if(const char** name=Attribute_Names_Registry().Get_Pointer(id)) return *name;
-    return 0;
-}
-inline ATTRIBUTE_ID Type_Only(ATTRIBUTE_ID id)
-{
-    return ATTRIBUTE_ID(Value(id)&0xFFFF0000);
-}
-inline ATTRIBUTE_ID Id_Only(ATTRIBUTE_ID id)
-{
-    return ATTRIBUTE_ID(Value(id)&0x0000FFFF);
+    static const char* attribute_table[]={
+        "","X","V","frame","twist","rigid_body","structure_ids","mass",
+        "rigid_mass","angular_momentum","E","rho","age","phi","grad_phi",
+        "radius","vorticity","material_volume","quantized_collision_distance",
+        "one_over_mass","id","effective_mass","one_over_effective_mass",
+        "rigid_inertia_tensor","kinematic","","","","","","collidable","color",
+        "display_size","","","","","","","","F","volume","B","valid","S","C",
+        "","","","Fp","mu","lambda","mu0","lambda0","plastic_deformation",
+        "dp_rho_f","dp_cohesion","viscosity","phase"
+    };
+    
+    int size;
+    ATTRIBUTE_INDEX num_attributes;
+    Read_Binary(input,size,size,num_attributes);
+    if(size<0) throw READ_ERROR(LOG::sprintf("Invalid negative size %d",size));
+    Clean_Memory();
+    Resize(size);
+
+    bool use_doubles=sizeof(T)==sizeof(double);
+    for(ATTRIBUTE_INDEX i(0);i<num_attributes;i++){
+        int hashed_id,read_size;
+        Read_Binary(input,hashed_id,read_size);
+        int type=hashed_id&0xFFFF0000,id=hashed_id&0x0000FFFF;
+
+        VECTOR<ARRAY_COLLECTION_ELEMENT_BASE*,2> sample_attribute;
+        for(const auto& it:Attribute_Id_Lookup())
+            if(Hash(it.key)*0x10000==type){
+                int coded_id=it.data.Encode(input.type.use_doubles);
+                Attribute_Sample_Registry().Get(coded_id,sample_attribute);
+                break;}
+        PHYSBAM_ASSERT(sample_attribute(use_doubles));
+        std::string name=attribute_table[id];
+        ATTRIBUTE_INDEX index=Get_Attribute_Index(name);
+        if(index<ATTRIBUTE_INDEX())
+            index=Add_Array(name,sample_attribute(use_doubles)->Clone_Default());
+        arrays(index)->Read(input);
+        arrays(index)->name=name;}
 }
 //#####################################################################
 // Function Read_Arrays
@@ -277,45 +322,53 @@ inline ATTRIBUTE_ID Id_Only(ATTRIBUTE_ID id)
 template<class TV> void PARTICLES<TV>::
 Read(TYPED_ISTREAM& input)
 {
+    // bit 0 => doubles
     int version;
     Read_Binary(input,version);
-    if(version!=1) throw READ_ERROR(LOG::sprintf("Unrecognized particle version %d",(int)version));
+    if(version==1) return Legacy_Read(input);
+    if(version!=2) throw READ_ERROR(LOG::sprintf("Unrecognized particle version %d",(int)version));
 
     int size;
-    Read_Binary(input,size);
+    ATTRIBUTE_INDEX num_attributes;
+    Read_Binary(input,size,num_attributes);
+
     if(size<0) throw READ_ERROR(LOG::sprintf("Invalid negative size %d",size));
     Clean_Memory();
     Resize(size);
-    ATTRIBUTE_INDEX num_attributes;
-    Read_Binary(input,size,num_attributes);
-    Resize(size);
 
+    bool use_doubles=sizeof(T)==sizeof(double);
     for(ATTRIBUTE_INDEX i(0);i<num_attributes;i++){
-        ATTRIBUTE_ID hashed_id;int read_size;
-        Read_Binary(input,hashed_id,read_size);
+        std::string name;
+        int coded_id;
+        Read_Binary(input,coded_id,name);
+        VECTOR<ARRAY_COLLECTION_ELEMENT_BASE*,2> sample_attribute;
+        if(!Attribute_Sample_Registry().Get(coded_id,sample_attribute)){
+            int skip_size=(coded_id&0xff)*number+sizeof(int);
+            input.stream.ignore(skip_size);
+            continue;}
 
-        ARRAY_COLLECTION_ELEMENT_BASE* sample_attribute=0;
-        if(!Attribute_Sample_Registry(sizeof(T)==sizeof(float)?1:2).Get(Type_Only(hashed_id),sample_attribute)){
-            input.stream.ignore(read_size);continue;}
-
-        ATTRIBUTE_INDEX index=Get_Attribute_Index(Id_Only(hashed_id));
-        if(index<ATTRIBUTE_INDEX()) index=Add_Array(Id_Only(hashed_id),sample_attribute->Clone_Default());
-        // TODO: this really ought to know whether we're running in float or double
-        arrays(index)->Read(input);
-        arrays(index)->id=Id_Only(hashed_id);}
+        ATTRIBUTE_INDEX index=Get_Attribute_Index(name);
+        if(index<ATTRIBUTE_INDEX())
+            index=Add_Array(name,sample_attribute(use_doubles)->Clone_Default());
+        int scalar=(coded_id>>16)&0xf;
+        bool read_doubles=scalar<2?scalar:input.type.use_doubles;
+        TYPED_ISTREAM actual_input(input.stream,STREAM_TYPE(read_doubles));
+        arrays(index)->Read(actual_input);
+        arrays(index)->name=name;}
 }
 //#####################################################################
-// Function Write_Arrays
+// Function Write
 //#####################################################################
 template<class TV> void PARTICLES<TV>::
 Write(TYPED_OSTREAM& output) const
 {
-    Write_Binary(output,1,Size(),number,arrays.m);
+    Write_Binary(output,2,number,arrays.m);
     for(ATTRIBUTE_INDEX i(0);i<arrays.m;i++){
         const ARRAY_COLLECTION_ELEMENT_BASE* entry=arrays(i);
-        int calculated_write_size=entry->Write_Size(output.type.use_doubles);
-        Write_Binary(output,output.type.use_doubles?entry->Typed_Hashed_Id(0.):entry->Typed_Hashed_Id(0.f),calculated_write_size);
-        if(calculated_write_size) entry->Write(output);}
+        const ATTRIBUTE_INFO& ai=Attribute_Id_Lookup().Get(entry->Type_Name());
+        int coded_id=ai.Encode(output.type.use_doubles);
+        Write_Binary(output,coded_id,entry->name);
+        arrays(i)->Write(output);}
 }
 //#####################################################################
 // Function Print
@@ -341,29 +394,64 @@ struct ELEMENT_SAMPLES_HELPER
     ~ELEMENT_SAMPLES_HELPER()
     {samples.Delete_Pointers_And_Clean_Memory();}
 };
-void PhysBAM::Register_Attribute_Sample(ARRAY_COLLECTION_ELEMENT_BASE* element)
+void PhysBAM::Register_Attribute_Sample(int id,int scalar,int m,int n,
+    int size_scalar,int size,ARRAY_COLLECTION_ELEMENT_BASE* float_element,
+    ARRAY_COLLECTION_ELEMENT_BASE* double_element)
 {
     static ELEMENT_SAMPLES_HELPER sample_helper;
-    element->id=ATTRIBUTE_ID();
-    PHYSBAM_ASSERT(Attribute_Sample_Registry(0).Set(Type_Only(element->Hashed_Id()),element));
-    PHYSBAM_ASSERT(Attribute_Sample_Registry(1).Set(Type_Only(element->Hashed_Id()),element));
-    PHYSBAM_ASSERT(Attribute_Sample_Registry(2).Set(Type_Only(element->Hashed_Id()),element));
-    sample_helper.samples.Append(element);
+    float_element->name="";
+    double_element->name="";
+    int sf=size_scalar*sizeof(float)+size;
+    int sd=size_scalar*sizeof(double)+size;
+    ATTRIBUTE_INFO ai={id,scalar,m,n,{sf,sd}};
+    VECTOR<ARRAY_COLLECTION_ELEMENT_BASE*,2> e={float_element,double_element};
+    PHYSBAM_ASSERT(Attribute_Id_Lookup().Set(float_element->Type_Name(),ai));
+    PHYSBAM_ASSERT(Attribute_Sample_Registry().Set(ai.Encode(false),e));
+    sample_helper.samples.Append(float_element);
+    if(double_element!=float_element){
+        PHYSBAM_ASSERT(Attribute_Id_Lookup().Set(double_element->Type_Name(),ai));
+        PHYSBAM_ASSERT(Attribute_Sample_Registry().Set(ai.Encode(true),e));
+        sample_helper.samples.Append(double_element);}
 }
-void PhysBAM::Register_Attribute_Sample(ARRAY_COLLECTION_ELEMENT_BASE* element_float,ARRAY_COLLECTION_ELEMENT_BASE* element_double)
+template<class T,int d> void Register_Attributes_ts(int s)
 {
-    static ELEMENT_SAMPLES_HELPER sample_helper;
-    element_float->id=ATTRIBUTE_ID();
-    element_double->id=ATTRIBUTE_ID();
-    PHYSBAM_ASSERT(Attribute_Sample_Registry(0).Set(Type_Only(element_float->Hashed_Id()),element_float));
-    PHYSBAM_ASSERT(Attribute_Sample_Registry(1).Set(Type_Only(element_float->Hashed_Id()),element_float));
-    PHYSBAM_ASSERT(Attribute_Sample_Registry(2).Set(Type_Only(element_float->Hashed_Id()),element_double));
-    PHYSBAM_ASSERT(Attribute_Sample_Registry(0).Set(Type_Only(element_double->Hashed_Id()),element_double));
-    PHYSBAM_ASSERT(Attribute_Sample_Registry(1).Set(Type_Only(element_double->Hashed_Id()),element_float));
-    PHYSBAM_ASSERT(Attribute_Sample_Registry(2).Set(Type_Only(element_double->Hashed_Id()),element_double));
-    sample_helper.samples.Append(element_float);
-    sample_helper.samples.Append(element_double);
 }
+template<int d> void Register_Attributes_s()
+{
+    Register_Attribute_Sample<VECTOR<float,d>,VECTOR<double,d> >(2,0,d,d,0);
+    Register_Attribute_Sample<MATRIX<float,d,d>,MATRIX<double,d,d> >(3,d,d,d*d,0);
+    Register_Attribute_Sample<DIAGONAL_MATRIX<float,d>,DIAGONAL_MATRIX<double,d> >(4,d,d,d,0);
+    Register_Attribute_Sample<VECTOR<int,d> >(2,2,0,d,d*sizeof(int));
+}
+template<class T,int d> void Register_Attributes_ts(int s,int fs,int ts)
+{
+}
+template<int d> void Register_Attributes_s(int fs,int ts)
+{
+    Register_Attribute_Sample<FRAME<VECTOR<float,d> >,FRAME<VECTOR<double,d> > >(5,0,d,fs,0);
+    Register_Attribute_Sample<TWIST<VECTOR<float,d> >,TWIST<VECTOR<double,d> > >(6,0,d,ts,0);
+}
+//#####################################################################
+// Function Register_Attributes
+//#####################################################################
+static int Register_Attributes()
+{
+    Register_Attributes_s<0>();
+    Register_Attributes_s<1>();
+    Register_Attributes_s<2>();
+    Register_Attributes_s<3>();
+    Register_Attributes_s<1>(1,1);
+    Register_Attributes_s<2>(4,3);
+    Register_Attributes_s<3>(7,6);
+
+    Register_Attribute_Sample<float,double>(1,0,0,1,0);
+    Register_Attribute_Sample<int>(1,2,0,0,sizeof(int));
+    Register_Attribute_Sample<bool>(1,3,0,0,sizeof(bool));
+    Register_Attribute_Sample<unsigned short>(1,4,0,0,sizeof(unsigned short));
+
+    return 1;
+}
+int register_attributes=Register_Attributes();
 //#####################################################################
 namespace PhysBAM{
 template class PARTICLES<VECTOR<float,1> >;

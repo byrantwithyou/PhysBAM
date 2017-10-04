@@ -13,7 +13,6 @@
 #include <Core/Vectors/TWIST.h>
 #include <Tools/Clone/CLONEABLE.h>
 #include <Tools/Particles/PARTICLES.h>
-#include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 namespace PhysBAM{
 
 template<class TV> class RIGID_BODY;

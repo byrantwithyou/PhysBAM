@@ -106,7 +106,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     if(use_stick) forced_collision_type=COLLISION_TYPE::stick;
     if(use_separate) forced_collision_type=COLLISION_TYPE::separate;
 
-    this->debug_particles.debug_particles.template Add_Array<T>(ATTRIBUTE_ID_DISPLAY_SIZE);
+    this->debug_particles.debug_particles.template Add_Array<T>("display_size");
     
     unit_p=kg*pow<2-TV::m>(m)/(s*s);
     unit_rho=kg*pow<-TV::m>(m);
@@ -256,7 +256,7 @@ Add_Particle(const TV& X,const TV& V,const MATRIX<T,TV::m>& dV,const T mass,cons
     if(particles.store_S) particles.S(p)=SYMMETRIC_MATRIX<T,TV::m>()+1;
     particles.mass(p)=mass;
     particles.volume(p)=volume;
-    ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+    ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
     (*color_attribute)(p)=VECTOR<T,3>(1,1,1);
 }
 //#####################################################################
@@ -330,7 +330,7 @@ Check_Analytic_Velocity() const
                 l2_error+=sqr(e);
                 num_l2_samples++;
                 Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
-                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,e);}}}
+                Debug_Particle_Set_Attribute<TV>("display_size",e);}}}
     PHYSBAM_DEBUG_WRITE_SUBSTEP("grid error",1);
     if(num_l2_samples) l2_error/=num_l2_samples;
     l2_error=sqrt(l2_error);
@@ -348,7 +348,7 @@ Check_Analytic_Velocity() const
         num_l2_samples+=TV::m;
         PHYSBAM_ASSERT(l2_error<=num_l2_samples*max_error*max_error+1e-10);
         Add_Debug_Particle(particles.X(p),VECTOR<T,3>(0,1,0));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,e);
+        Debug_Particle_Set_Attribute<TV>("V",e);
     }
     PHYSBAM_DEBUG_WRITE_SUBSTEP("particle error",1);
     if(num_l2_samples) l2_error/=num_l2_samples;

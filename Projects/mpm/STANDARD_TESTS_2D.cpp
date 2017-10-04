@@ -390,7 +390,7 @@ Initialize()
                             x+=.5*a*t*t;}
                         else v=0;}
                     Add_Debug_Particle(frame*(box.max_corner+TV(x,0)),VECTOR<T,3>(1,0,0));
-                    Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,frame.r.Rotate(TV(v,0)));
+                    Debug_Particle_Set_Attribute<TV>("V",frame.r.Rotate(TV(v,0)));
                 };
         } break;
         case 21:{ // circle with random initial velocities
@@ -530,7 +530,7 @@ Initialize()
                 if((particles.X(k)-large1.center).Magnitude_Squared()<sqr(large1.radius*0.6)
                     || (particles.X(k)-large2.center).Magnitude_Squared()<sqr(large2.radius*0.6))
                     particles.deletion_list.Append(k);
-            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
             for(int i=0;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(0,1,1);
             particles.Delete_Elements_On_Deletion_List();
             ARRAY<int> mpm_particles(IDENTITY_ARRAY<>(particles.number));
@@ -788,7 +788,7 @@ Initialize()
                 int ns=particles.X.m;
                 Seed_Particles(box,0,0,foo_T2,foo_T4);
                 ARRAY<int> lambda_particles(particles.X.m-ns);
-                ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+                ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
                 //fix volume and mass
                 T volume=grid.dX.Product()/particles_per_cell;
                 T mass_sand=density*volume;
@@ -871,7 +871,7 @@ Initialize()
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
             Add_Drucker_Prager(E,nu,(T)35,&sand_particles);
             Add_Gravity(m/(s*s)*TV(0,-9.81));
-            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
             for(int i=0;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(.8,.7,.7);
             //Add water particles for case 57
             if(test_number==57){
@@ -938,7 +938,7 @@ Initialize()
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
             Add_Drucker_Prager(E,nu,(T)35,&sand_particles,false,test_number==61?sigma_Y:0);
             Add_Gravity(m/(s*s)*TV(0,-9.81));
-            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
             for(int i=0;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(.8,.7,.7);
             //Add water particles for case 58
             if(test_number==58){
@@ -1183,7 +1183,7 @@ Initialize()
             T saturation_level=1;
             T water_density=(T)1000*unit_rho;
             T water_E=E*foo_T4;
-            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
             ARRAY<int> strong_lambda_particles;
             T volume_lambda=particles.volume(0)*porosity*saturation_level;
             T mass_lambda=water_density*volume_lambda;
@@ -1298,7 +1298,7 @@ Initialize()
             T water_density=(T)1000*unit_rho;
             if(!use_foo_T4) foo_T4=1e-3;
             T water_E=E*foo_T4;
-            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
             ARRAY<int> lambda_particles;
             T volume_lambda=particles.volume(0)*porosity*saturation_level;
             T mass_lambda=water_density*volume_lambda;

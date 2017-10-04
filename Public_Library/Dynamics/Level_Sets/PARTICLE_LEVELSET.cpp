@@ -70,11 +70,11 @@ Store_Unique_Particle_Id(const bool store_unique_particle_id_input)
 {
     store_unique_particle_id=store_unique_particle_id_input;
     if(store_unique_particle_id){
-        template_particles.template Add_Array<int>(ATTRIBUTE_ID_ID);
-        template_removed_particles.template Add_Array<int>(ATTRIBUTE_ID_ID);}
+        template_particles.template Add_Array<int>("id");
+        template_removed_particles.template Add_Array<int>("id");}
     else{
-        template_particles.Remove_Array(ATTRIBUTE_ID_ID);
-        template_removed_particles.Remove_Array(ATTRIBUTE_ID_ID);}
+        template_particles.Remove_Array("id");
+        template_removed_particles.Remove_Array("id");}
 }
 //#####################################################################
 // Function Add_Particle

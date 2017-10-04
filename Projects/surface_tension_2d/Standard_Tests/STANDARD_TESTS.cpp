@@ -24,7 +24,7 @@ STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     solid_density(0),solid_width(0),analytic_solution(0),linear_force(0),rand(0),use_viscosity(false)
 {
     LOG::cout<<std::setprecision(16);
-    debug_particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+    debug_particles.template Add_Array<VECTOR<T,3> >("color");
     debug_particles.Store_Velocity(true);
     Store_Debug_Particles(&debug_particles);
 
@@ -729,7 +729,7 @@ FSI_Analytic_Test()
     fluids_parameters.collision_bodies_affecting_fluid->use_collision_face_neighbors=true;
     TV solid_gravity=TV(0,-(T)9.8*m/(s*s));
     fluids_parameters.surface_tension=0;
-    debug_particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+    debug_particles.template Add_Array<VECTOR<T,3> >("color");
 
     fluids_parameters.gravity.y=-(T)9.8*m;
     fluids_parameters.density=(T)100/(m*m);

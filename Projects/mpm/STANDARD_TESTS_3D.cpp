@@ -861,7 +861,7 @@ Initialize()
             Add_Drucker_Prager(E,nu,(T)35,&sand_particles,false,test_number==38?sigma_Y:0);
             Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-9.81,0));
-            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
             for(int i=0;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(.8,.7,.7);
             //Add water particles for case 39
             if(test_number==39){
@@ -927,7 +927,7 @@ Initialize()
             T saturation_level=foo_T3;
             T water_density=(T)1000*unit_rho;
             T water_E=E*foo_T5;
-            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
             ARRAY<int> strong_lambda_particles;
             ARRAY<int> weak_lambda_particles;
             T volume_lambda=particles.volume(0)*porosity*saturation_level;
@@ -1028,7 +1028,7 @@ Initialize()
             T water_density=(T)1000*unit_rho;
             if(!use_foo_T4) foo_T4=1e-3;
             T water_E=E*foo_T4;
-            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
             ARRAY<int> lambda_particles;
             T volume_lambda=particles.volume(0)*porosity*saturation_level;
             T mass_lambda=water_density*volume_lambda;
@@ -1169,7 +1169,7 @@ Initialize()
             T water_density=(T)1000*unit_rho;
             if(!use_foo_T4) foo_T4=1e-3;
             T water_E=E*foo_T4;
-            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
             ARRAY<int> lambda_particles;
             T volume_lambda=particles.volume(0)*porosity*saturation_level;
             T mass_lambda=water_density*volume_lambda;
@@ -1571,7 +1571,7 @@ Initialize()
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
             Add_Drucker_Prager(E,nu,(T)21,&sand_particles);
             Set_Lame_On_Particles(E,nu);
-            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
             T g=9.81*m/(s*s);
             for(int i=0;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(.8,.7,.7);
             {
@@ -1669,7 +1669,7 @@ Initialize()
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
             Add_Drucker_Prager(E,nu,(T)21,&sand_particles);
             Set_Lame_On_Particles(E,nu);
-            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
             for(int i=0;i<particles.X.m;i++) (*color_attribute)(i)=VECTOR<T,3>(.8,.7,.7);
             Add_Gravity(TV(0,-g,0));
         } break;
@@ -1709,7 +1709,7 @@ Initialize()
             particles.Resize(number_of_particles);
             ARRAY<int> sand_particles(number_of_particles);
             for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
-            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
             for(int p=0;p<number_of_particles;p++){
                 particles.valid(p)=true;
                 particles.X(p)=random.template Get_Vector_In_Unit_Sphere<TV>()*padded_ball.radius+padded_ball.center;
@@ -1947,7 +1947,7 @@ Initialize()
             if(!use_cohesion) sigma_Y=0;
             Add_Drucker_Prager(E,nu,(T)35,&sand_particles,false,sigma_Y);
             Set_Lame_On_Particles(E,nu);
-            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
             //deal with radius
             T max_radius=0;
             for(int p=0;p<particles.X.m;p++) if(particles.X(p).Magnitude()>max_radius) max_radius=particles.X(p).Magnitude();
@@ -2098,7 +2098,7 @@ Initialize()
             T saturation_level=foo_T3; // 0 - 1
             T water_density=(T)1000*unit_rho;
             T water_E=E*foo_T5; // 0.5
-            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
             ARRAY<int> strong_lambda_particles;
             ARRAY<int> weak_lambda_particles;
             T volume_lambda=particles.volume(0)*porosity*saturation_level;
@@ -2151,7 +2151,7 @@ Initialize()
             const T volume_per_particle=block_volume/number_of_particles;
             particles.Resize(number_of_particles);
 
-            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
             for(int p=0;p<number_of_particles;p++){
                 particles.valid(p)=true;
                 particles.X(p)=random.Get_Uniform_Vector(block);

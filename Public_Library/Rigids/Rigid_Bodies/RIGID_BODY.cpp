@@ -31,7 +31,6 @@
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
-#include <Rigids/Particles/RIGIDS_PARTICLES_FORWARD.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 namespace PhysBAM{
 //#####################################################################

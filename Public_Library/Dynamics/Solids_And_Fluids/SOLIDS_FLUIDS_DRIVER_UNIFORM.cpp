@@ -96,8 +96,8 @@ Initialize()
     if(example.fluids_parameters.use_sph_for_removed_negative_particles){
         for(int i=0;i<number_of_regions;i++){
             PARTICLE_LEVELSET_UNIFORM<TV>& pls=example.fluids_parameters.particle_levelset_evolution->Particle_Levelset(i);
-            pls.template_particles.template Add_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME);
-            pls.template_removed_particles.template Add_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME);}
+            pls.template_particles.template Add_Array<T>("material_volume");
+            pls.template_removed_particles.template Add_Array<T>("material_volume");}
         example.fluids_parameters.sph_evolution=new SPH_EVOLUTION_UNIFORM<TV>(grid,*incompressible,example.fluids_parameters,particle_levelset_evolution);
         example.fluids_parameters.sph_evolution->Set_SPH_Callbacks(example);
         example.fluids_parameters.fluid_boundary=&example.fluids_parameters.fluid_boundary_water;}

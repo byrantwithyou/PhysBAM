@@ -9,7 +9,6 @@
 
 #include <Core/Arrays/ARRAY.h>
 #include <Tools/Particles/PARTICLES.h>
-#include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 namespace PhysBAM{
 
 template<class TV>
@@ -27,7 +26,7 @@ public:
     virtual ~GEOMETRY_PARTICLES();
 
     void Store_Velocity(bool store=true)
-    {store_velocity=store;if(store) Add_Array(ATTRIBUTE_ID_V,&V);else Remove_Array(ATTRIBUTE_ID_V);}
+    {store_velocity=store;if(store) Add_Array("V",&V);else Remove_Array("V");}
 
     template<class T_INDICES>
     void Euler_Step(const T_INDICES& indices,const T dt)

@@ -11,7 +11,6 @@
 #include <Core/Matrices/SYMMETRIC_MATRIX.h>
 #include <Deformables/Bindings/BINDING.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
-#include <Deformables/Particles/DEFORMABLES_PARTICLES_FORWARD.h>
 namespace PhysBAM{
 
 template<class TV> class DEFORMABLE_BODY_COLLECTION;
