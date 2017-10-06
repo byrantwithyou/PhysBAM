@@ -158,7 +158,10 @@ int main(int argc, char* argv[])
         for(int i=0;i<TV::m;i++) if(index(i)<0) index(i)+=size;
         row(index)=ph.velocity(FACE_INDEX<TV::m>(0,it.index));
         PHYSBAM_ASSERT(!ph.velocity(FACE_INDEX<TV::m>(1,it.index)));}
-
+    T max_diff=0;
+    for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>::Centered_Box()*4);it.Valid();it.Next())
+        max_diff=std::max(max_diff,std::abs(ph.velocity(FACE_INDEX<TV::m>(0,center+it.index))-ph.velocity(FACE_INDEX<TV::m>(0,center-it.index))));
+    LOG::printf("symmetric error: %g\n",max_diff);
     ARRAY<std::complex<T>,TV_INT> out(row.domain);
 
     GRID<TV> fft_grid(out.domain.Edge_Lengths(),RANGE<TV>::Unit_Box(),true);
