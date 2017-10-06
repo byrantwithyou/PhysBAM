@@ -2,16 +2,16 @@
 
 NAME=eig-regular-seeding
 
-RES=64
+RES=512
 FULL=1 # Set to 1 for a full rebuild; 0 to skip rerunning the simulations
 
-ARGS="../../fourier-apic/fourier_mac -resolution $RES -size $RES -dump_particles -dump_eigenvalues"
+ARGS="../../fourier-apic/fourier_mac -resolution 16 -size $RES -dump_particles -dump_eigenvalues >&/dev/null"
 
 np=("-ppd 1" "-ppd 2" "-ppd 3" "-ppd 4" "-ppd 5" "-ppd 8")
 np_name=("ppc1" "ppc4" "ppc9" "ppc16" "ppc25" "ppc64")
 
-order=("-order 2" "-order 3")
-order_name=("quadratic" "cubic")
+order=("-order 1" "-order 2" "-order 3")
+order_name=("linear" "quadratic" "cubic")
 
 if [ "X$FULL" = "X1" ] ; then
     rm -rf $NAME
@@ -27,6 +27,7 @@ if [ "X$FULL" = "X1" ] ; then
 fi
 
 for a in x y xy ; do
+    sed -e "s/aaa/$a/g; s/xxx/linear/g" eig_regular_seeding_plot.tex  > $NAME/eig-regular-seeding-linear-$a.tex
     sed -e "s/aaa/$a/g; s/xxx/quadratic/g" eig_regular_seeding_plot.tex  > $NAME/eig-regular-seeding-quadratic-$a.tex
     sed -e "s/aaa/$a/g; s/xxx/cubic/g" eig_regular_seeding_plot.tex  > $NAME/eig-regular-seeding-cubic-$a.tex
 done

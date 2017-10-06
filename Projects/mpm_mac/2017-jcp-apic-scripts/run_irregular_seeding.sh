@@ -2,12 +2,12 @@
 
 NAME=eig-irregular-seeding
 
-RES=64
+RES=256
 FULL=1 # Set to 1 for a full rebuild; 0 to skip rerunning the simulations
 
 SEED=42
 
-ARGS="../../fourier-apic/fourier_mac -resolution $RES -size $RES -dump_particles -dump_eigenvalues -seed $SEED >&/dev/null"
+ARGS="../../fourier-apic/fourier_mac -resolution 16 -size $RES -dump_particles -dump_eigenvalues -seed $SEED >&/dev/null"
 
 
 np=("-irreg 1" "-irreg 4" "-irreg 9" "-irreg 16" "-irreg 25" "-irreg 64")

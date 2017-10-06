@@ -59,7 +59,7 @@ void Sample_Box_Regularly(ARRAY<TV>& X,int particles_per_dim)
 {
     GRID<TV> init_grid(TV_INT()+particles_per_dim,RANGE<TV>::Unit_Box(),true);
     for(CELL_ITERATOR<TV> it(init_grid);it.Valid();it.Next())
-        X.Append(it.Location());
+        X.Append(it.Location()+(T).0001);
 }
 
 void Sample_Box_Random(RANDOM_NUMBERS<T>& rand,ARRAY<TV>& X,int number_of_particles)
