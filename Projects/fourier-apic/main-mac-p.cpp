@@ -109,6 +109,7 @@ int main(int argc, char* argv[])
     parse_args.Parse();
 
     PHYSBAM_ASSERT(resolution<=size);
+    PHYSBAM_ASSERT(!use_pressure || resolution==size);
     
     FOURIER_EXAMPLE<TV> example;
     MPM_MAC_DRIVER<TV> driver(example);
@@ -178,6 +179,11 @@ int main(int argc, char* argv[])
             if(use_affine) example.particles.B.Fill(MATRIX<T,TV::m>());
             grid_dof(first_p+p,i)=1;
             driver.Particle_To_Grid();
+            if(dump_particles){
+                for(int i=0;i<example.particles.X.m;i++){
+                    Add_Debug_Particle(example.particles.X(i),VECTOR<T,3>(1,0,0));
+                    Debug_Particle_Set_Attribute<TV,TV>("V",example.particles.V(i));}
+                Flush_Frame(ph.velocity,"p2g");}
             if(use_pressure || mu)
                 driver.Compute_Boundary_Conditions();
             if(use_pressure) driver.Pressure_Projection();
@@ -229,6 +235,8 @@ int main(int argc, char* argv[])
     ARRAY<VECTOR<T,3>,TV_INT> sec_abs_eig(A(0)(0).domain);
     ARRAY<VECTOR<T,3>,TV_INT> thi_abs_eig(A(0)(0).domain);
     ARRAY<VECTOR<T,3>,TV_INT> vis_abs_eig(A(0)(0).domain);
+    ARRAY<ARRAY<VECTOR<T,3>,TV_INT> > all_images(dofs_per_cell);
+    for(int i=0;i<dofs_per_cell;i++) all_images(i).Resize(A(0)(0).domain);
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>::Unit_Box()*size);it.Valid();it.Next()){
         TV k=coefficients*TV(wrap(it.index,lo,hi));
         MATRIX_MXN<std::complex<T> > M(dofs_per_cell,dofs_per_cell);
@@ -240,6 +248,7 @@ int main(int argc, char* argv[])
         ARRAY<T> abs_eig(dofs_per_cell);
         for(int i=0;i<dofs_per_cell;i++) abs_eig(i)=abs(eig(i));
         abs_eig.Sort();
+        for(int i=0;i<dofs_per_cell;i++) all_images(i)(it.index)=icm(abs_eig(i));
         max_abs_eig(it.index)=icm(abs_eig.Last());
         sec_abs_eig(it.index)=icm(abs_eig(abs_eig.m-2));
         thi_abs_eig(it.index)=icm(abs_eig(abs_eig.m-3));
@@ -249,6 +258,8 @@ int main(int argc, char* argv[])
     PNG_FILE<T>::Write("sec-"+output_filename,sec_abs_eig);
     PNG_FILE<T>::Write("thi-"+output_filename,thi_abs_eig);
     PNG_FILE<T>::Write("vis-"+output_filename,vis_abs_eig);
+
+    for(int i=0;i<dofs_per_cell;i++) PNG_FILE<T>::Write(LOG::sprintf("all-%i-%s",i,output_filename),all_images(i));
     
     return 0;
 }
