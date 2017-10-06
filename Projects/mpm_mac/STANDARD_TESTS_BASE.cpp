@@ -13,6 +13,7 @@
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Grid_Tools/Grids/NODE_ITERATOR.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
+#include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Seeding/POISSON_DISK.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
@@ -323,6 +324,7 @@ Check_Analytic_Velocity() const
         const PHASE& ph=phases(i);
         for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
             if(ph.mass(it.Full_Index())){
+                if(this->use_phi && ph.levelset->Phi(grid.Face(it.Full_Index()))>0) continue;
                 T u=ph.velocity(it.Full_Index());
                 TV v=analytic_velocity(i)->v(it.Location(),time);
                 T e=abs(u-v(it.face.axis));
