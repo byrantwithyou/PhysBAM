@@ -2,7 +2,7 @@
 
 NAME=eig-irregular-seeding
 
-RES=256
+RES=512
 FULL=1 # Set to 1 for a full rebuild; 0 to skip rerunning the simulations
 
 SEED=42
@@ -45,7 +45,7 @@ if [ "X$FULL" = "X1" ] ; then
 fi
 
 colors=('black' 'red' 'blue' 'green' 'cyan' 'purple')
-template='\\addplot [mark=none,solid,color=COLOR] table[x=waven,y=eig]{apic-single-X-Y-xxx\/eig-aaa.txt};'
+template='\\addplot [mark=none,solid,color=COLOR] table[x=x,y=eig]{apic-single-X-Y-xxx\/eig-aaa.txt};'
 location_template='\\addplot [mark=*, mark options={COLOR}] coordinates{(X,Y)};'
 content=''
 location_content=''

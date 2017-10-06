@@ -32,6 +32,16 @@ for a in x y xy ; do
     sed -e "s/aaa/$a/g; s/xxx/cubic/g" eig_regular_seeding_plot.tex  > $NAME/eig-regular-seeding-cubic-$a.tex
 done
 
+Y=(x,0 0,x x,x)
+A=(x y xy)
+XM=(.5 .125)
+YN=(-.04 .8)
+for a in 0 1 2 ; do
+    for b in 0 1 ; do
+        sed -e "s/aaa/${A[$a]}/g;s/bbb/${Y[$a]}/;s/XM/${XM[$b]}/;s/YN/${YN[$b]}/" eig_regular_seeding_plot_combined.tex  > $NAME/eig-regular-seeding-combined-${A[$a]}-$b.tex
+    done
+done
+    
 cat <<EOF > $NAME/SConstruct
 import os
 import re

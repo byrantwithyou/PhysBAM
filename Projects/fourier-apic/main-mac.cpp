@@ -198,15 +198,14 @@ int main(int argc, char* argv[])
         std::ofstream eig_x((viewer_directory+"/eig-x.txt").c_str());
         std::ofstream eig_y((viewer_directory+"/eig-y.txt").c_str());
         std::ofstream eig_xy((viewer_directory+"/eig-xy.txt").c_str());
-        eig_x<<"waven eig\n";
-        eig_y<<"waven eig\n";
-        eig_xy<<"waven eig\n";
-        TV_INT lengths=out.domain.Edge_Lengths();
-        int shift=lengths(0)/2;
+        eig_x<<"waven x eig\n";
+        eig_y<<"waven x eig\n";
+        eig_xy<<"waven x eig\n";
+        int shift=size/2;
         for(int i=out.domain.min_corner(0);i<out.domain.max_corner(0);++i){
-            eig_x<<i-shift<<" "<<centered_fft(out,TV_INT(i,shift)).real()<<"\n";
-            eig_y<<i-shift<<" "<<centered_fft(out,TV_INT(shift,i)).real()<<"\n";
-            eig_xy<<i-shift<<" "<<centered_fft(out,TV_INT(i,i)).real()<<"\n";}}
+            eig_x<<i-shift<<" "<<(T)(i-shift)/size<<" "<<centered_fft(out,TV_INT(i,shift)).real()<<"\n";
+            eig_y<<i-shift<<" "<<(T)(i-shift)/size<<" "<<centered_fft(out,TV_INT(shift,i)).real()<<"\n";
+            eig_xy<<i-shift<<" "<<(T)(i-shift)/size<<" "<<centered_fft(out,TV_INT(i,i)).real()<<"\n";}}
 
     return 0;
 }
