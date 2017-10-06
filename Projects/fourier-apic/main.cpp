@@ -57,13 +57,19 @@ void Sample_Box_Regularly(ARRAY<TV>& X,int particles_per_dim)
 {
     GRID<TV> init_grid(TV_INT()+particles_per_dim,RANGE<TV>::Unit_Box(),true);
     for(CELL_ITERATOR<TV> it(init_grid);it.Valid();it.Next())
-        X.Append(it.Location());
+        X.Append(it.Location()+(T).0001);
 }
 
 void Sample_Box_Random(RANDOM_NUMBERS<T>& rand,ARRAY<TV>& X,int number_of_particles)
 {
     for(int i=0;i<number_of_particles;i++)
         X.Append(rand.Get_Uniform_Vector(RANGE<TV>::Unit_Box()));
+}
+
+static const std::complex<T>& centered_fft(const ARRAY<std::complex<T>,TV_INT>& f,const TV_INT& index)
+{
+    TV_INT counts=f.domain.Edge_Lengths();
+    return f(wrap(index-counts/2,TV_INT(),counts));
 }
 
 int main(int argc, char* argv[])
@@ -140,7 +146,7 @@ int main(int argc, char* argv[])
     GRID<TV> fft_grid(out.domain.Edge_Lengths(),RANGE<TV>::Unit_Box(),true);
     FFT<TV> fft;
     fft.Transform(row,out);
-    
+
     INTERPOLATED_COLOR_MAP<T> icm;
     icm.colors.Add_Control_Point(1.00001,VECTOR<T,3>(1,1,1));
     icm.colors.Add_Control_Point(1,VECTOR<T,3>(.5,0,0));
@@ -155,7 +161,7 @@ int main(int argc, char* argv[])
 
     ARRAY<VECTOR<T,3>,TV_INT> image(out.domain);
     for(RANGE_ITERATOR<TV::m> it(image.domain);it.Valid();it.Next())
-        image(it.index)=icm(abs(out(it.index)));
+        image(it.index)=icm(abs(centered_fft(out,it.index)));
 
     PNG_FILE<T>::Write(output_filename,image);
 

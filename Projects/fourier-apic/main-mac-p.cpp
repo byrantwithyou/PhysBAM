@@ -67,6 +67,12 @@ void Sample_Box_Random(RANDOM_NUMBERS<T>& rand,ARRAY<TV>& X,int number_of_partic
 
 void Compute_Eigenvalues(MATRIX_MXN<std::complex<T> > M,ARRAY<std::complex<T> >& eig);
 
+static const std::complex<T>& centered_fft(const ARRAY<std::complex<T>,TV_INT>& f,const TV_INT& index)
+{
+    TV_INT counts=f.domain.Edge_Lengths();
+    return f(wrap(index-counts/2,TV_INT(),counts));
+}
+
 int main(int argc, char* argv[])
 {
 #ifdef USE_OPENMP
@@ -228,7 +234,7 @@ int main(int argc, char* argv[])
         MATRIX_MXN<std::complex<T> > M(dofs_per_cell,dofs_per_cell);
         for(int i=0;i<dofs_per_cell;i++)
             for(int j=0;j<dofs_per_cell;j++)
-                M(i,j)=F(i)(j)(it.index);
+                M(i,j)=centered_fft(F(i)(j),it.index);
         ARRAY<std::complex<T> > eig(dofs_per_cell);
         Compute_Eigenvalues(M,eig);
         ARRAY<T> abs_eig(dofs_per_cell);
