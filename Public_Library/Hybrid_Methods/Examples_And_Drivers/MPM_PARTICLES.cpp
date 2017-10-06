@@ -49,6 +49,17 @@ Store_B(bool store)
     else Remove_Array("B");
 }
 //#####################################################################
+// Function Store_B
+//#####################################################################
+template<class TV> void MPM_PARTICLES<TV>::
+Store_C(bool store)
+{
+    if(store_C==store) return;
+    store_C=store;
+    if(store) Add_Array("C",&C);
+    else Remove_Array("C");
+}
+//#####################################################################
 // Function Store_S
 //#####################################################################
 template<class TV> void MPM_PARTICLES<TV>::

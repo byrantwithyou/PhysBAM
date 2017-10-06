@@ -308,6 +308,14 @@ Initialize()
             SURFACE_TENSION_FORCE<TV>* stf=new SURFACE_TENSION_FORCE<TV>(new_sc,(T)0.01);
             Add_Force(*stf);
         } break;
+        case 15:{ // colliding circles
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            SPHERE<TV> sphere0(TV(.25,.5)*m,.2*m);
+            SPHERE<TV> sphere1(TV(.75,.5)*m,.2*m);
+            T density=unit_rho*scale_mass;
+            Seed_Particles(sphere0,[=](const TV& X){return TV(m/s,0);},0,density,particles_per_cell);
+            Seed_Particles(sphere1,[=](const TV& X){return TV(-m/s,0);},0,density,particles_per_cell);
+        } break;
         case 16:{ // oscillating circle
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             SPHERE<TV> sphere(TV(.5,.5)*m,.3*m);

@@ -106,6 +106,7 @@ Display() const
 
     ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
     ARRAY_VIEW<MATRIX<T,TV::m> >* B=particles.template Get_Array<MATRIX<T,TV::m> >("B");
+    if(!B) B=particles.template Get_Array<MATRIX<T,TV::m> >("C");
 
     ARRAY_VIEW<PHASE_ID>* phase=particles.template Get_Array<PHASE_ID>("phase");
 

@@ -23,9 +23,9 @@ class MPM_PARTICLES:public CLONEABLE<MPM_PARTICLES<TV>,DEFORMABLE_PARTICLES<TV> 
 public:
     using BASE::Add_Array;using BASE::Remove_Array;
 
-    bool store_Fp,store_B,store_S,store_lame,store_lame0,store_plastic_def,store_phase;
+    bool store_Fp,store_B,store_C,store_S,store_lame,store_lame0,store_plastic_def,store_phase;
     ARRAY_VIEW<T> volume;
-    ARRAY_VIEW<MATRIX<T,TV::m> > F,Fp,B;
+    ARRAY_VIEW<MATRIX<T,TV::m> > F,Fp,B,C;
     ARRAY_VIEW<SYMMETRIC_MATRIX<T,TV::m> > S;
     ARRAY_VIEW<bool> valid;
     ARRAY_VIEW<T> mu,lambda,mu0,lambda0;
@@ -35,6 +35,7 @@ public:
     virtual ~MPM_PARTICLES();
     void Store_Fp(bool store);
     void Store_B(bool store);
+    void Store_C(bool store);
     void Store_S(bool store);
     void Store_Lame(bool store);
     void Store_Lame0(bool store);
