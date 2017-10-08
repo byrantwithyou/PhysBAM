@@ -315,7 +315,7 @@ Set_Phases(const ARRAY<T,PHASE_ID>& phase_densities)
 // Function Check_Analytic_Velocity
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
-Check_Analytic_Velocity() const
+Check_Analytic_Velocity(std::function<bool(const FACE_INDEX<TV::m>&)> valid_face) const
 {
     if(!use_analytic_field) return;
     T max_error=0,l2_error=0;
@@ -324,7 +324,7 @@ Check_Analytic_Velocity() const
         const PHASE& ph=phases(i);
         for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
             if(ph.mass(it.Full_Index())){
-                if(this->use_phi && ph.levelset->Phi(grid.Face(it.Full_Index()))>0) continue;
+                if(!valid_face(it.Full_Index())) continue;
                 T u=ph.velocity(it.Full_Index());
                 TV v=analytic_velocity(i)->v(it.Location(),time);
                 T e=abs(u-v(it.face.axis));

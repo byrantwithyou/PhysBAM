@@ -141,7 +141,8 @@ public:
         int resolution_multiple=1,int default_resolution=32);
     void Test_dV(std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)> dV) const;
     void Set_Phases(const ARRAY<T,PHASE_ID>& phase_densities);
-    void Check_Analytic_Velocity() const;
+    void Check_Analytic_Velocity(std::function<bool(const FACE_INDEX<TV::m>&)>
+        valid_face=[](const FACE_INDEX<TV::m>&){return true;}) const;
     void Velocity_Fourier_Analysis() const;
     void Add_Source(const TV& X0,const TV& n,IMPLICIT_OBJECT<TV>* io,
         std::function<void(TV X,T ts,T t,SOURCE_PATH<TV>& p)> path,T density,
