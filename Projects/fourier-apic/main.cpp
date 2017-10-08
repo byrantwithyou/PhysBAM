@@ -88,6 +88,7 @@ int main(int argc, char* argv[])
     int seed=-1;
     std::string output_filename="eigen.png";
     std::string viewer_directory="output";
+    std::string color_filename="color_scale.png";
     bool dump_particles=false;
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Add("-resolution",&resolution,"num","transfer resolution");
@@ -158,6 +159,19 @@ int main(int argc, char* argv[])
     icm.colors.Add_Control_Point(1-.32,VECTOR<T,3>(0,0,1));
     icm.colors.Add_Control_Point(1-.64,VECTOR<T,3>(.5,0,1));
     icm.colors.Add_Control_Point(0,VECTOR<T,3>(0,0,0));
+
+    ARRAY<VECTOR<T,3>,VECTOR<int,2> > bar(VECTOR<int,2>(1000,1));
+    for(int i=0;i<1000;i++)
+        bar(VECTOR<int,2>(i,0))=icm.colors.Value((i/(T)999)*(icm.mx-icm.mn)+icm.mn);
+    PNG_FILE<T>::Write("bar.png",bar);
+
+    for(int i=0;i<1000;i++)
+    {
+        T x=i/(T)999;
+        T y=1-pow(2,-x*8);
+        bar(VECTOR<int,2>(i,0))=icm.colors.Value(y*(icm.mx-icm.mn)+icm.mn);
+    }
+    PNG_FILE<T>::Write("log-bar.png",bar);
 
     ARRAY<VECTOR<T,3>,TV_INT> image(out.domain);
     for(RANGE_ITERATOR<TV::m> it(image.domain);it.Valid();it.Next())

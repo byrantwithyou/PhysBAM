@@ -229,6 +229,11 @@ int main(int argc, char* argv[])
     icm.colors.Add_Control_Point(1-.64,VECTOR<T,3>(.5,0,1));
     icm.colors.Add_Control_Point(0,VECTOR<T,3>(0,0,0));
 
+    ARRAY<VECTOR<T,3>,VECTOR<int,2> > bar(VECTOR<int,2>(1000,1));
+    for(int i=0;i<1000;i++)
+        bar(VECTOR<int,2>(i,0))=icm.colors.Value((i/(T)999)*(icm.mx-icm.mn)+icm.mn);
+    PNG_FILE<T>::Write("bar.png",bar);
+
     TV_INT counts=example.grid.numbers_of_cells,hi=counts/2,lo=hi-counts;
     TV coefficients=(T)(2*pi)/example.grid.domain.Edge_Lengths();
     ARRAY<VECTOR<T,3>,TV_INT> max_abs_eig(A(0)(0).domain);

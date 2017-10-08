@@ -54,7 +54,7 @@ for i in `seq 0 $((${#px[@]}-1))` ; do
     x=${px[$i]}
     shift_x=`echo $x+0.5 | bc`
     y=${py[$i]}
-    line="`echo '$template' | sed -e "s/X/$x/g; s/Y/$y/g; s/COLOR/${colors[$nline]}/g"`"
+    line=`echo "$template" | sed -e "s/X/$x/g; s/Y/$y/g; s/COLOR/${colors[$nline]}/g"`
     location_line="`echo $location_template | sed -e "s/X/$shift_x/g; s/Y/$y/g; s/COLOR/${colors[$nline]}/g"`"
     nline=$((nline+1))
     content="$content$line\n"
@@ -65,12 +65,14 @@ sed -e "s/XXXXXX/$location_content/g" eig_irregular_seeding_ppc1_particle_plot.t
 sed -e "s/XXXXXX/$content/g" eig_irregular_seeding_ppc1_plot.tex > $NAME/eig_irregular_seeding_apic_ppc1.template
 sed -e "s/apic/pic/g" $NAME/eig_irregular_seeding_apic_ppc1.template > $NAME/eig_irregular_seeding_pic_ppc1.template
 
-for a in x y xy ; do
-    for o in ${order_name[@]} ; do
-        sed -e "s/aaa/$a/g; s/xxx/$o/g" $NAME/eig_irregular_seeding_apic_ppc1.template > $NAME/eig-irregular-seeding-apic-ppc1-$o-$a.tex
-        sed -e "s/aaa/$a/g; s/xxx/$o/g" $NAME/eig_irregular_seeding_pic_ppc1.template > $NAME/eig-irregular-seeding-pic-ppc1-$o-$a.tex
+Y=(x,0 0,x x,x)
+A=(x y xy)
 
-        sed -e "s/aaa/$a/g; s/xxx/$o/g" eig_irregular_seeding_plot.tex  > $NAME/eig-irregular-seeding-$o-$a.tex
+for a in 0 1 2 ; do
+    for o in ${order_name[@]} ; do
+        sed -e "s/aaa/${A[$a]}/g;s/bbb/${Y[$a]}/; s/xxx/$o/g" $NAME/eig_irregular_seeding_apic_ppc1.template > $NAME/eig-irregular-seeding-apic-ppc1-$o-${A[$a]}.tex
+        sed -e "s/aaa/${A[$a]}/g;s/bbb/${Y[$a]}/; s/xxx/$o/g" $NAME/eig_irregular_seeding_pic_ppc1.template > $NAME/eig-irregular-seeding-pic-ppc1-$o-${A[$a]}.tex
+        sed -e "s/aaa/${A[$a]}/g;s/bbb/${Y[$a]}/; s/xxx/$o/g" eig_irregular_seeding_plot.tex  > $NAME/eig-irregular-seeding-$o-${A[$a]}.tex
     done
 done
 
