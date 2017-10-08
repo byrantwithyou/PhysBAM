@@ -955,8 +955,10 @@ Compute_Gradient(int nvar)
     example.projection_system.mass.Remove_All();
     example.projection_system.faces.Remove_All();
     example.projection_system.gradient.Reset(nvar);
+    example.projection_system.gradp_bc.Remove_All();
     APPEND_HOLDER<T> mass_h(example.projection_system.mass);
     APPEND_HOLDER<FACE_INDEX<TV::m> > faces_h(example.projection_system.faces);
+    APPEND_HOLDER<T> gradp_bc_h(example.projection_system.gradp_bc);
     ARRAY<int> tmp0,tmp1,tmp2,tmp3;
 #pragma omp parallel
     {
@@ -964,10 +966,12 @@ Compute_Gradient(int nvar)
         {
             mass_h.Init();
             faces_h.Init();
+            gradp_bc_h.Init();
         }
 #pragma omp barrier
         ARRAY<T>& mass_t=mass_h.Array();
         ARRAY<FACE_INDEX<TV::m> >& faces_t=faces_h.Array();
+        ARRAY<T>& gradp_bc_t=gradp_bc_h.Array();
         SPARSE_MATRIX_THREADED_CONSTRUCTION<T> G_helper(example.projection_system.gradient,tmp2,tmp3);
         ARRAY<PAIR<PHASE_ID,T> > face_fractions;
         for(FACE_ITERATOR_THREADED<TV> it(example.grid);it.Valid();it.Next()){
@@ -992,15 +996,23 @@ Compute_Gradient(int nvar)
             if(!mass) continue;
 
             G_helper.Start_Row();
+            T gradp_bc=0;
             if(c0>=0) G_helper.Add_Entry(c0,-example.grid.one_over_dX(it.axis));
+            else if(c0==pressure_D){
+                T pr=example.bc_pressure?example.bc_pressure(it.First_Cell_Index(),PHASE_ID(0),example.time):0;
+                gradp_bc+=-example.grid.one_over_dX(it.axis)*pr;}
             if(c1>=0) G_helper.Add_Entry(c1,example.grid.one_over_dX(it.axis));
+            else if(c1==pressure_D){
+                T pr=example.bc_pressure?example.bc_pressure(it.Second_Cell_Index(),PHASE_ID(0),example.time):0;
+                gradp_bc+=example.grid.one_over_dX(it.axis)*pr;}
+            gradp_bc_t.Append(gradp_bc);
             faces_t.Append(face);
             mass_t.Append(mass);}
-
         G_helper.Finish();
     }
     mass_h.Combine();
     faces_h.Combine();
+    gradp_bc_h.Combine();
 }
 //#####################################################################
 // Function Compute_Poisson_Matrix
@@ -1073,7 +1085,7 @@ Pressure_Projection()
     for(int i=0;i<tmp.m;i++){
         FACE_INDEX<TV::m> face(example.projection_system.faces(i));
         Face_Fraction(face,face_fractions);
-        T dv=tmp(i)/example.projection_system.mass(i);
+        T dv=(tmp(i)+example.projection_system.gradp_bc(i))/example.projection_system.mass(i);
         for(int j=0;j<face_fractions.m;j++)
             example.phases(face_fractions(j).x).velocity(face)-=dv;}
 

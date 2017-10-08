@@ -29,6 +29,7 @@ public:
     SPARSE_MATRIX_FLAT_MXN<T> divergence;
     ARRAY<T> mass;
     ARRAY<FACE_INDEX<TV::m> > faces;
+    ARRAY<T> gradp_bc;
     ARRAY<PHASE_ID> phases;
     bool dc_present;
     MPM_PROJECTION_VECTOR<TV> null_u;
