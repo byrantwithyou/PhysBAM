@@ -2,7 +2,7 @@
 
 NAME=conv-circle
 
-ARGS="../mpm_mac 23 -last_frame 1 -frame_dt 0.4 -mu 0 -scale_mass 3 -clamp -particles_per_cell 8"
+ARGS="../mpm_mac 23 -last_frame 1 -frame_dt 0.4 -mu 0 -scale_mass 3 -clamp"
 
 if [ ! -z $1 ]; then
     NAME=$NAME-$1
