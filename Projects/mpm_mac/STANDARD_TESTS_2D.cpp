@@ -350,6 +350,13 @@ Initialize()
             Seed_Particles_Analytic(grid.domain,PHASE_ID(0),density,particles_per_cell);
             end_frame.Append([=](int frame){Check_Analytic_Velocity();});
         } break;
+        case 25:{ // Dam break
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            T density=unit_rho*scale_mass;
+            Set_Phases({density});
+            Seed_Particles(RANGE<TV>(TV(.0,.0),TV(m/3,2*m/3)),0,0,density,particles_per_cell);
+            gravity=TV(0,-1)*m/sqr(s);
+        } break;
     }
     if(mu){
         phases(PHASE_ID()).viscosity=mu;
