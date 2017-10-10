@@ -449,6 +449,8 @@ Velocity_Fourier_Analysis() const
 
     T l2_omega=0;
     int num_l2_omega=0;
+    ARRAY<T,TV_INT> vort(grid.Domain_Indices());
+    T max_vort=-1;
     for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         bool ok=true;
         MATRIX<T,TV::m> dV;
@@ -468,9 +470,21 @@ Velocity_Fourier_Analysis() const
                         ph.velocity(C)-ph.velocity(D));
                 else ok=false;}
         if(!ok) continue;
-        l2_omega+=dV.Contract_Permutation_Tensor().Magnitude_Squared();
+        vort(it.index)=dV.Contract_Permutation_Tensor().Magnitude_Squared();
+        max_vort=max(max_vort,vort(it.index));
+        l2_omega+=vort(it.index);
         num_l2_omega++;}
     if(num_l2_omega) l2_omega/=num_l2_omega;
+
+    LINEAR_INTERPOLATION_UNIFORM<TV,T> li;
+    GRID<TV> center_grid=grid.Get_Center_Grid();
+    INTERPOLATED_COLOR_MAP<T> icm;
+    icm.Initialize_Colors((T)1e-8,1,true,true,false);
+    for(int p=0;p<particles.X.m;p++){
+        if(!particles.valid(p)) continue;
+        T v=li.Clamped_To_Array(center_grid,vort,particles.X(p));
+        if(max_vort) v/=max_vort;
+        Add_Debug_Particle(particles.X(p),icm(v));}
 
     LOG::printf("l2 velocity %P  l2 vorticity %P\n",l2_u,l2_omega);
     LOG::printf("taylor total %P\n",total_taylor);
