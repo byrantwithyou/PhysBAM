@@ -27,9 +27,12 @@ while(<STDIN>)
         }
         else
         {
-            $vel/=$init_vel;
-            $vort/=$init_vort;
-            $tay/=$init_tay;
+            if($init_vel!=0 && $init_vort!=0 && $init_tay!=0)
+            {
+                $vel/=$init_vel;
+                $vort/=$init_vort;
+                $tay/=$init_tay;
+            }
             print "$time $vel $vort $tay\n";
         }
     }
