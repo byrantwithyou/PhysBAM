@@ -2,7 +2,7 @@
 
 NAME=vort-dambreak
 
-FULL=0 # Set to 1 for a full rebuild; 0 to skip rerunning the simulations
+FULL=1 # Set to 1 for a full rebuild; 0 to skip rerunning the simulations
 
 ARGS="../mpm_mac 25 -last_frame 10 -frame_dt 1 -clamp -mu 0 -scale_mass 3 -analyze_u_modes -max_ke 15"
 
@@ -10,7 +10,6 @@ opt=("" "-regular_seeding" "-order 3" "-regular_seeding -order 3")
 opt_name=("default" "regular" "default-cubic" "regular-cubic")
 
 LO=32
-LO_REG_RES=64
 HI=256
 SKIP=32
 
