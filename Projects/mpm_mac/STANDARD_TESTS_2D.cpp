@@ -310,7 +310,7 @@ Initialize()
             Set_Phases({density});
             use_analytic_field=true;
             Add_Velocity([=](auto X,auto t){return Auto_Hess_Vector(X(0),-X(1))*m/s;});
-            Add_Pressure([=](auto X,auto t){return 0*unit_p;});
+            Add_Pressure([=](auto X,auto t){return (X(0)-X(0)*X(1)+X(1)*X(1)+t)*unit_p;});
             Setup_Analytic_Boundary_Conditions();
             SPHERE<TV> sphere(TV(.5,.5),.1);
             Seed_Particles_Analytic(sphere,PHASE_ID(0),density,particles_per_cell);
