@@ -934,7 +934,10 @@ Compute_Laplacian(int nvar)
                         if(ci>=0) helper.Add_Entry(ci,-entry);
                         else{
                             has_dirichlet=true;
-                            example.rhs.v(center_index)+=example.bc_pressure?entry*example.bc_pressure(cell,PHASE_ID(0),example.time):0;}}
+                            T rhs=0;
+                            if(example.bc_pressure)
+                                rhs=entry*example.dt*example.bc_pressure(cell,PHASE_ID(0),example.time);
+                            example.rhs.v(center_index)+=rhs;}}
                     face.index(a)++;}}
             helper.Add_Entry(center_index,diag);}
         helper.Finish();
@@ -978,7 +981,6 @@ Compute_Gradient(int nvar)
             FACE_INDEX<TV::m> face=it.Full_Index();
             int c0=example.cell_index(it.First_Cell_Index());
             int c1=example.cell_index(it.Second_Cell_Index());
-            if(c0<0 && c1<0) continue;
             if(example.psi_N(face)){
                 Face_Fraction(face,face_fractions);
                 T u_star=0;
@@ -1000,11 +1002,11 @@ Compute_Gradient(int nvar)
             if(c0>=0) G_helper.Add_Entry(c0,-example.grid.one_over_dX(it.axis));
             else if(c0==pressure_D){
                 T pr=example.bc_pressure?example.bc_pressure(it.First_Cell_Index(),PHASE_ID(0),example.time):0;
-                gradp_bc+=-example.grid.one_over_dX(it.axis)*pr;}
+                gradp_bc+=-example.dt*example.grid.one_over_dX(it.axis)*pr;}
             if(c1>=0) G_helper.Add_Entry(c1,example.grid.one_over_dX(it.axis));
             else if(c1==pressure_D){
                 T pr=example.bc_pressure?example.bc_pressure(it.Second_Cell_Index(),PHASE_ID(0),example.time):0;
-                gradp_bc+=example.grid.one_over_dX(it.axis)*pr;}
+                gradp_bc+=example.dt*example.grid.one_over_dX(it.axis)*pr;}
             gradp_bc_t.Append(gradp_bc);
             faces_t.Append(face);
             mass_t.Append(mass);}
