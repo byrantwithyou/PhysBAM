@@ -323,7 +323,7 @@ Particle_To_Grid(PHASE_ID pid) const
     Fix_Periodic(ph.velocity);
     Fix_Periodic(ph.volume);
     if(example.flip){
-        Extrapolate_Boundary(ph);
+        if(example.extrap_boundary) Extrapolate_Boundary(ph);
         Extrapolate_Velocity(pid,false);
         ph.velocity_save=ph.velocity;}
 }

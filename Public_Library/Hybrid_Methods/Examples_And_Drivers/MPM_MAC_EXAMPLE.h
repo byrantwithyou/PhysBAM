@@ -96,6 +96,7 @@ public:
     // a: extrpolate using analytic function
     // r: reflect the interior for tangential directions; reflect with negation for normal directions
     char extrap_type;
+    bool extrap_boundary;
     bool clamp_particles;
 
     // transfer stuff
