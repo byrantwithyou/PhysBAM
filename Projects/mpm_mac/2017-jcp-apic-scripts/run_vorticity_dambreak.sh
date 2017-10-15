@@ -22,12 +22,12 @@ if [ "X$FULL" = "X1" ] ; then
             DT="-max_dt $dt -min_dt $dt"
             echo $ARGS $DT -no_affine ${opt[$o]} -resolution $r -dump_modes_freq $r -o $NAME/pic-${opt_name[$o]}-$r
             echo $ARGS $DT -affine ${opt[$o]} -resolution $r -dump_modes_freq $r -o $NAME/apic-${opt_name[$o]}-$r
-            #echo $ARGS $DT -no_affine ${opt[$o]} -flip 1 -resolution $r -dump_modes_freq $r -o $NAME/flip-${opt_name[$o]}-$r
+            echo $ARGS $DT -no_affine ${opt[$o]} -flip 1 -resolution $r -dump_modes_freq $r -o $NAME/flip-${opt_name[$o]}-$r
         done
     done | xargs -P 16 -n 1 -d '\n' bash -c
 fi
 
-for s in pic apic ; do
+for s in pic apic flip ; do
     for r in `seq $HI -$SKIP $LO` ; do
         for o in `seq 0 $((${#opt[@]}-1))` ; do
             ./vort_parse_data.pl < $NAME/$s-${opt_name[$o]}-$r/common/log.txt > $NAME/$s-${opt_name[$o]}-$r/norms.txt
@@ -41,7 +41,7 @@ for o in ${opt_name[@]} ; do
     sed -e "s/xxx/$o/" -e "s/rrr/$RES/" vel_dambreak_plot.tex  > $NAME/plot-dambreak-vel-$o.tex
 done
 
-for i in {pic,apic}-{default,regular} ; do
+for i in {pic,apic,flip}-{default,regular} ; do
     for j in {0..10} ; do
         convert -scale 512 $NAME/$i-$RES/modes-$(($j*$RES))-x.png `printf $NAME/$i-dambreak-vort-%02d.png $j`
         convert -scale 512 $NAME/$i-$RES/modes-$(($j*$RES))-x.png `printf $NAME/$i-dambreak-vort-%02d.eps $j`

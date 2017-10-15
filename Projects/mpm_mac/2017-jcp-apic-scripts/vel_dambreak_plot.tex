@@ -14,7 +14,8 @@
       %PIC $E_{vort}$,%PIC $E_{taylor}$,
       APIC $E_{vel}$,
       %APIC $E_{vort}$,%APIC $E_{taylor}$,
-      %FLIP $E_{vel}$,%FLIP $E_{vort}$,FLIP $E_{taylor}$
+      FLIP $E_{vel}$,
+      %FLIP $E_{vort}$,FLIP $E_{taylor}$
     },
     legend pos=north east,
 %    ymin=0.92,
@@ -38,7 +39,7 @@
 \addplot[mark=none,solid,color=red] table[x=time,y=vel]{apic-xxx-rrr/norms.txt};
 %\addplot[mark=none,dashed,color=red] table[x=time,y=vort]{apic-xxx-norms.txt};
 %\addplot[mark=none,dotted,color=red,very thick] table[x=time,y=tay]{apic-xxx-norms.txt};
-%\addplot[mark=none,solid,color=green] table[x=time,y=vel]{flip-xxx-norms.txt};
+\addplot[mark=none,solid,color=green] table[x=time,y=vel]{flip-xxx-rrr/norms.txt};
 %\addplot[mark=none,dashed,color=green] table[x=time,y=vort]{flip-xxx-norms.txt};
 %\addplot[mark=none,dotted,color=green,very thick] table[x=time,y=tay]{flip-xxx-norms.txt};
 \end{axis}
