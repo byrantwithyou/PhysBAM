@@ -173,7 +173,7 @@ public:
     HASHTABLE<std::string,PAIR<bool,VECTOR<ARRAY<std::function<void()> >,2> > > time_step_callbacks; // begin, end
 
     T Potential_Energy(const T time) const;
-    void Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const;
+    void Apply_Forces(const T time);
     virtual TV Compute_Analytic_Force(PHASE_ID p,const TV& X,const T time) const;
     void Set_Weights(int order);
     void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction,

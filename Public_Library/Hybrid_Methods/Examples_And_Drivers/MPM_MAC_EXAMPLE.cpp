@@ -150,12 +150,19 @@ Potential_Energy(const T time) const
     return 0;
 }
 //#####################################################################
-// Function Add_Forces
+// Function Apply_Forces
 //#####################################################################
 template<class TV> void MPM_MAC_EXAMPLE<TV>::
-Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const
+Apply_Forces(const T time)
 {
-    // TODO:
+    for(PHASE_ID p(0);p<phases.m;p++){
+        PHASE& ph=phases(p);
+        for(int i=0;i<ph.valid_flat_indices.m;i++){
+            int k=ph.valid_flat_indices(i);
+            FACE_INDEX<TV::m> f=ph.valid_indices(i);
+            TV af=Compute_Analytic_Force(p,grid.Face(f),time);
+            ph.velocity.array(k)+=dt*af(f.axis);
+            ph.velocity.array(k)+=dt*gravity(f.axis);}}
 }
 //#####################################################################
 // Function Compute_Analytic_Force

@@ -1101,14 +1101,9 @@ template<class TV> void MPM_MAC_DRIVER<TV>::
 Apply_Forces()
 {
     TIMER_SCOPE_FUNC;
-    for(PHASE_ID p(0);p<example.phases.m;p++){
-        PHASE& ph=example.phases(p);
-        for(int i=0;i<ph.valid_flat_indices.m;i++){
-            int k=ph.valid_flat_indices(i);
-            TV af=example.Compute_Analytic_Force(p,example.grid.Face(ph.valid_indices(i)),example.time);
-            ph.velocity.array(k)+=example.dt*af(ph.valid_indices(i).axis);
-            ph.velocity.array(k)+=example.dt*example.gravity(ph.valid_indices(i).axis);}
-        Fix_Periodic(ph.velocity);}
+    example.Apply_Forces(example.time);
+    for(PHASE_ID p(0);p<example.phases.m;p++)
+        Fix_Periodic(example.phases(p).velocity);
 }
 //#####################################################################
 // Function Compute_Dt
