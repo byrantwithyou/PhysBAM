@@ -24,6 +24,13 @@ class vec:
     def norm(self):
         return self.dot(self)
 
+class entry:
+    def __init__(self,loc,func,var,value):
+        self.loc=loc
+        self.func=func
+        self.var=var
+        self.value=value
+
 tu=re.compile("TEST_UNITS (\S+) (\S+) (.*?) @BEGIN@ (.*?) @END@")
 nu=re.compile("[0-9eE.+-]+")
 def parse_sim(m,k,s):
@@ -31,7 +38,7 @@ def parse_sim(m,k,s):
     s=subprocess.check_output(sys.argv[1:]+['-m',str(m),'-kg',str(k),'-s',str(s)])
     r = []
     for g in tu.findall(s):
-        r.append((g[0],g[1],g[2],vec([float(i) for i in nu.findall(g[3])])))
+        r.append(entry(g[0],g[1],g[2],vec([float(i) for i in nu.findall(g[3])])))
     return r
 
 X=parse_sim(1,1,1)
@@ -47,32 +54,33 @@ def get_pow(x,u,name):
     fail=None
     if e>tol*tol:
         print "Unit error (%s): %g"%(name,e)
-        return None
+        return (0,0)
     p=math.log(r)/math.log(2)
     if abs(p-round(p))>tol:
         print "Power (%s) not a unit: %g"%(name,p)
-    return int(round(p))
+        return (1,int(round(p)))
+    return (2,int(round(p)))
 
 for i in range(N):
-    x=X[i][3]
-    m=M[i][3]
-    k=K[i][3]
-    s=S[i][3]
+    x=X[i].value
+    m=M[i].value
+    k=K[i].value
+    s=S[i].value
     if(len(x.x)!=len(m.x) or len(x.x)!=len(k.x) or len(x.x)!=len(s.x)):
-        print "Different numbers of entries\nfile %s\nfunction %s\nquantity %s"%X[i][0:3]
+        print "Different numbers of entries\nfile %s\nfunction %s\nquantity %s"%(X[i].loc,X[i].func,X[i].var)
         exit()
     if x.norm()<tol*tol:
-        print "%s: 0"%X[i][2]
+        print "%s: 0"%X[i].var
         continue
-    pm=get_pow(x,m,'m')
-    pk=get_pow(x,k,'kg')
-    ps=get_pow(x,s,'s')
-    if pm==None or pk==None or ps==None:
-        print "No clean unit\nfile %s\nfunction %s\nquantity %s"%X[i][0:3]
+    (flag_m,pm)=get_pow(x,m,'m')
+    (flag_k,pk)=get_pow(x,k,'kg')
+    (flag_s,ps)=get_pow(x,s,'s')
+    if flag_m!=2 or flag_k!=2 or flag_s!=2:
+        print "No clean unit\nfile %s\nfunction %s\nquantity %s"%(X[i].loc,X[i].func,X[i].var)
         print "Got:",pm,pk,ps
         exit()
     seen=None
-    sys.stdout.write(X[i][2]+":")
+    sys.stdout.write(X[i].var+":")
     if pm==0 and pk==0 and ps==0:
         print " 1"
     else:
