@@ -147,7 +147,10 @@ Advance_One_Time_Step()
     Step([=](){Compute_Boundary_Conditions();},"compute boundary conditions",false);
     Step([=](){Pressure_Projection();},"projection");
     Step([=](){Apply_Viscosity();},"viscosity",true,example.use_viscosity);
-    Step([=](){Extrapolate_Velocity(!example.flip);},"velocity-extrapolation",true);
+    Step([=](){
+        if(example.extrap_type=='p')
+            Reflect_Boundary(&MPM_MAC_DRIVER::Reflect_Boundary_Velocity_Copy_Only,RF::ghost|RF::delay_corners);
+        else Extrapolate_Velocity(!example.flip);},"velocity-extrapolation",true);
     Step([=](){Grid_To_Particle();},"g2p");
 }
 //#####################################################################
@@ -283,6 +286,10 @@ Particle_To_Grid(PHASE_ID pid) const
     Fix_Periodic_Accum(ph.velocity);
     Fix_Periodic_Accum(ph.volume);
 
+    if(example.flip && example.extrap_type=='p'){
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("before reflect",1);
+        Reflect_Boundary(&MPM_MAC_DRIVER::Reflect_Boundary_Mass_Momentum,RF::ghost|RF::duplicate_corners);}
+
     // TODO: move mass, momentum, volume inside
     if(example.move_mass_inside)
         Move_Mass_Momentum_Inside(ph);
@@ -323,8 +330,9 @@ Particle_To_Grid(PHASE_ID pid) const
     Fix_Periodic(ph.velocity);
     Fix_Periodic(ph.volume);
     if(example.flip){
-        if(example.extrap_boundary) Extrapolate_Boundary(ph);
-        Extrapolate_Velocity(pid,false);
+        if(example.extrap_type!='p'){
+            Extrapolate_Boundary(ph);
+            Extrapolate_Velocity(pid,false);}
         ph.velocity_save=ph.velocity;}
 }
 //#####################################################################
@@ -1235,6 +1243,72 @@ Extrapolate_Velocity(bool use_bc)
 {
     for(PHASE_ID i(0);i<example.phases.m;i++)
         Extrapolate_Velocity(i,use_bc);
+}
+//#####################################################################
+// Function Reflect_Boundary_Mass_Momentum
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Reflect_Boundary_Mass_Momentum(const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side) const
+{
+    for(PHASE_ID pid(0);pid<example.phases.m;pid++){
+        PHASE& ph=example.phases(pid);
+        T& m_in=ph.mass(in),&m_out=ph.mass(out);
+
+        T& moment_in=ph.velocity(in),&moment_out=ph.velocity(out);
+        typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.bc_type(side);
+        if((bc_type==example.BC_SLIP && side/2==out.axis) || bc_type==example.BC_NOSLIP){
+            T bc=0;
+            if(example.bc_velocity(side)){
+                TV nearest_point=example.grid.Clamp(example.grid.Face(out));
+                bc=example.bc_velocity(side)(nearest_point,out.axis,pid,example.time);}
+            T mv_in_old=moment_in;
+            T mv_out_old=moment_out;
+            moment_in+=2*bc*m_out-moment_out;
+            moment_out=mv_out_old+2*bc*m_in-mv_in_old;
+        }
+        else{
+            moment_in+=moment_out;
+            moment_out=moment_in;}
+        m_in+=m_out;
+        m_out=m_in;}
+}
+//#####################################################################
+// Function Reflect_Boundary_Copy_Only
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Reflect_Boundary_Velocity_Copy_Only(const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side) const
+{
+    for(PHASE_ID pid(0);pid<example.phases.m;pid++){
+        PHASE& ph=example.phases(pid);
+
+        const T& vel_in=ph.velocity(in);
+        T& vel_out=ph.velocity(out);
+        typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.bc_type(side);
+        if((bc_type==example.BC_SLIP && side/2==out.axis) || bc_type==example.BC_NOSLIP){
+            T bc=0;
+            if(example.bc_velocity(side)){
+                TV nearest_point=example.grid.Clamp(example.grid.Face(out));
+                bc=example.bc_velocity(side)(nearest_point,out.axis,pid,example.time);}
+            vel_out=(2*bc-vel_in);
+        }
+        else vel_out=vel_in;}
+}
+//#####################################################################
+// Function Reflect_Boundary
+//#####################################################################
+template<class TV> template<class F> void MPM_MAC_DRIVER<TV>::
+Reflect_Boundary(F func,RF flag) const
+{
+    RANGE<TV_INT> domain=example.grid.Domain_Indices(0);
+    TV_INT corner[2]={domain.min_corner,domain.max_corner};
+    for(FACE_RANGE_ITERATOR<TV::m> it(domain,example.ghost,0,flag);it.Valid();it.Next()){
+        typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.bc_type(it.side);
+        if(bc_type==example.BC_PERIODIC) continue;
+        int side_axis=it.side/2;
+        FACE_INDEX<TV::m> f=it.face;
+        f.index(side_axis)=2*corner[it.side%2](side_axis)-it.face.index(side_axis);
+        if(side_axis!=it.face.axis) f.index(side_axis)-=1;
+        (this->*func)(f,it.face,it.side);}
 }
 //#####################################################################
 // Function Extrapolate_Velocity
