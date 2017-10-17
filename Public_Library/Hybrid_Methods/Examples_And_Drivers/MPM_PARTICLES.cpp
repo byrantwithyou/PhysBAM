@@ -9,7 +9,7 @@ namespace PhysBAM{
 //#####################################################################
 template<class TV> MPM_PARTICLES<TV>::
 MPM_PARTICLES()
-    :store_Fp(false),store_B(false),store_S(false),store_lame(false),store_lame0(false),
+    :store_Fp(false),store_B(false),store_C(false),store_S(false),store_lame(false),store_lame0(false),
      store_phase(false)
 {
     this->Store_Velocity();

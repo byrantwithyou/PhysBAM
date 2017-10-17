@@ -151,7 +151,7 @@ Simulate_To_Frame(const int frame)
                 LOG::printf("dt reduced: %g to %g\n",next_time-example.time,example.dt);
                 next_time=example.time+example.dt;
                 done=false;}
-
+            
             PHYSBAM_DEBUG_WRITE_SUBSTEP("end substep %i",0,substep);
             example.time=next_time;}
         if(example.end_frame) example.end_frame(current_frame);
@@ -437,7 +437,7 @@ Grid_V_Upper_Bound() const
 {
     if(!example.use_affine) return Max_Particle_Speed();
     T result=0;
-    T xi=(T)6*sqrt((T)TV::m)*example.grid.one_over_dX.Min();
+    T xi=(T).5*example.weights->stencil_width*example.grid.dX.Magnitude();
 #pragma omp parallel for reduction(max:result)
     for(int k=0;k<example.simulated_particles.m;k++){
         int p=example.simulated_particles(k);
