@@ -147,14 +147,11 @@ template<class TV> typename TV::SCALAR MPM_MAC_EXAMPLE<TV>::
 Potential_Energy(const T time) const
 {
     T potential=0;
-    int num=0;
     for(PHASE_ID p(0);p<phases.m;p++){
         const PHASE& ph=phases(p);
         for(int i=0;i<ph.valid_flat_indices.m;i++){
             FACE_INDEX<TV::m> f=ph.valid_indices(i);
-            num++;
-            potential-=gravity(f.axis)*grid.Face(f)(f.axis);}}
-    if(num) potential/=num;
+            potential-=ph.mass(f)*gravity(f.axis)*grid.Face(f)(f.axis);}}
     return potential;
 }
 //#####################################################################

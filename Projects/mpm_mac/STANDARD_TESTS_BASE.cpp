@@ -434,7 +434,7 @@ Velocity_Fourier_Analysis() const
     for(int i=0;i<bins.m;i++)
         fout<<i<<" "<<bins(i)<<std::endl;
 
-    T l2_u=0;
+    T l2_u=0,ke_grid=0;
     int num_l2_u=0;
     auto valid=[&](FACE_INDEX<TV::m> face){return ph.mass(face) && (this->psi_N.domain_indices.Empty() || !this->psi_N(face));};
     for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
@@ -443,6 +443,7 @@ Velocity_Fourier_Analysis() const
                 continue;
         if(!valid(it.face)) continue;
         l2_u+=sqr(ph.velocity(it.face));
+        ke_grid+=0.5*ph.mass(it.face)*sqr(ph.velocity(it.face));
         num_l2_u++;}
     if(num_l2_u) l2_u/=num_l2_u;
     if(num_l2_u) total_taylor/=num_l2_u;
@@ -476,6 +477,12 @@ Velocity_Fourier_Analysis() const
         num_l2_omega++;}
     if(num_l2_omega) l2_omega/=num_l2_omega;
 
+    T ke_particle=0,pe_particle=0;
+    for(int p=0;p<particles.X.m;p++){
+        if(!particles.valid(p)) continue;
+        pe_particle-=particles.mass(p)*this->gravity.Dot(particles.X(p));
+        ke_particle+=0.5*particles.mass(p)*particles.V(p).Magnitude_Squared();}
+
     LINEAR_INTERPOLATION_UNIFORM<TV,T> li;
     GRID<TV> center_grid=grid.Get_Center_Grid();
     INTERPOLATED_COLOR_MAP<T> icm;
@@ -487,6 +494,8 @@ Velocity_Fourier_Analysis() const
         Add_Debug_Particle(particles.X(p),icm(v));}
 
     LOG::printf("l2 velocity %P  l2 vorticity %P\n",l2_u,l2_omega);
+    LOG::printf("ke grid %P  ke particle %P\n",ke_grid,ke_particle);
+    LOG::printf("te grid %P  te particle %P\n",ke_grid+this->Potential_Energy(time),ke_particle+pe_particle);
     LOG::printf("taylor total %P\n",total_taylor);
 }
 //#####################################################################
