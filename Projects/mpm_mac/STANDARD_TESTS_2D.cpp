@@ -357,6 +357,19 @@ Initialize()
             Seed_Particles(RANGE<TV>(TV(.0,.0),TV(m/3,2*m/3)),0,0,density,particles_per_cell);
             gravity=TV(0,-1)*m/sqr(s);
         } break;
+        case 26:{ // One Taylor-Green Vortex in [0,pi]^2, with slip BC.
+            bc_type.Fill(BC_SLIP);
+            Set_Grid(RANGE<TV>::Unit_Box()*pi*m);
+            T density=unit_rho*scale_mass;
+            Set_Phases({density});
+            T b=-2*mu/density/s;
+            use_analytic_field=true;
+            Add_Velocity([=](auto X,auto t){return (rot*cos(X/m))*sin(X/m)*exp(b*t)*m/s;});
+            Add_Pressure([=](auto X,auto t){return X(0)-X(0)*X(1)+X(1)*X(1)+t;});
+            Setup_Analytic_Boundary_Conditions();
+            Seed_Particles_Analytic(grid.domain,PHASE_ID(0),density,particles_per_cell);
+            end_frame.Append([=](int frame){Check_Analytic_Velocity();});
+        } break;
     }
     if(mu){
         phases(PHASE_ID()).viscosity=mu;
