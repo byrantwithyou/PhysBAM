@@ -370,6 +370,30 @@ Initialize()
             Seed_Particles_Analytic(grid.domain,PHASE_ID(0),density,particles_per_cell);
             end_frame.Append([=](int frame){Check_Analytic_Velocity();});
         } break;
+        case 27:{ // Periodic version of "square" test (22)
+            bc_type.Fill(BC_PERIODIC);
+            Set_Grid(RANGE<TV>::Centered_Box()*m);
+            T density=unit_rho*scale_mass;
+            Set_Phases({density});
+            use_analytic_field=true;
+            typedef DIAGONAL_MATRIX<T,2> TM;
+            Add_Velocity(
+                [=](auto Y,auto t)
+                {
+                    auto X=Y/m;
+                    TV o(1,1);
+                    return X*(o-abs(X))*(rot*(o-abs(X)*2));
+                });
+            Add_Pressure([](auto X,auto t){
+                    //auto x=X(0),y=X(1);
+                    //auto p=x*y*(1-x)*(1-y);
+                    //return (X(0)-X(0)*X(1)+X(1)*X(1)+t)*p;
+                    return 0;
+                });
+            Setup_Analytic_Boundary_Conditions();
+            Seed_Particles_Analytic(grid.domain,PHASE_ID(0),density,particles_per_cell);
+            end_frame.Append([=](int frame){Check_Analytic_Velocity();});
+        } break;
     }
     if(mu){
         phases(PHASE_ID()).viscosity=mu;
