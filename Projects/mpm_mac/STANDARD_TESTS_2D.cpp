@@ -288,12 +288,17 @@ Initialize()
             Set_Phases({density});
             use_analytic_field=true;
             typedef DIAGONAL_MATRIX<T,2> TM;
+            auto f=[=](auto x){return x*(1-x)*(x*x-x-1);};
+            auto df=[=](auto x){return (1-2*x)*(2*x*x-2*x-1);};
+            auto g=[=](auto x){return x*(1-x)*(x+1)*(3*x*x-7);};
+            auto dg=[=](auto x){return (1-3*x*x)*(3*x*x-7)+x*(1-x)*(x+1)*(6*x);};
+            int a=1,b=0,c=0;
             Add_Velocity(
                 [=](auto Y,auto t)
                 {
                     auto X=Y/m;
-                    TV o(1,1);
-                    return X*(o-X)*(rot*(o-X*2));
+                    auto x=X(0),y=X(1);
+                    return (T)a*Make_Vector<T>(-df(y)*f(x),df(x)*f(y))+(b+c*t)*Make_Vector<T>(-df(y)*g(x),dg(x)*f(y));
                 });
             Add_Pressure([](auto X,auto t){
                     auto x=X(0),y=X(1);
