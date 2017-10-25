@@ -52,12 +52,16 @@ public:
     void Build_Level_Sets(PHASE& ph);
     void Pressure_Projection();
     void Apply_Forces();
+    void Apply_Particle_Forces();
+    void Apply_Grid_Forces();
     void Apply_Viscosity();
     void Move_Particles();
     void Extrapolate_Velocity(bool use_bc);
     template <class F>
     void Reflect_Boundary(F func,RF flag) const;
     void Reflect_Boundary_Mass_Momentum(const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side) const;
+    void Reflect_Boundary_Particle_Force(const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side) const;
+    void Reflect_Boundary_Grid_Force(const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side) const;
     void Reflect_Boundary_Velocity_Copy_Only(const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side) const;
     void Extrapolate_Velocity(PHASE_ID pid,bool use_bc) const;
     void Extrapolate_Boundary(PHASE& ph) const;

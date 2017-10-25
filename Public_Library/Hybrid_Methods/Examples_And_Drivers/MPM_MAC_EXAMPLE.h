@@ -86,6 +86,7 @@ public:
     ARRAY<int,TV_INT> cell_index;
     int dof;
     ARRAY<bool,FACE_INDEX<TV::m> > psi_N;
+    ARRAY<T,FACE_INDEX<TV::m> > force;
     // Extrapolation functions.
     // Options:
     // 0: fill zeros

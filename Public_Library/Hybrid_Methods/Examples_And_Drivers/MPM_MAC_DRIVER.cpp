@@ -126,6 +126,9 @@ Initialize()
         Prepare_Scatter();
         Particle_To_Grid();}
 
+    if(example.extrap_type=='p')
+        example.force.Resize(example.grid.Domain_Indices(example.ghost));
+
     if(!example.restart) Write_Output_Files(0);
 }
 //#####################################################################
@@ -1103,13 +1106,64 @@ Pressure_Projection()
         Fix_Periodic(example.phases(p).velocity);
 }
 //#####################################################################
+// Function Apply_Particle_Forces
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Apply_Particle_Forces()
+{
+#pragma omp parallel for
+    for(int i=0;i<example.force.array.m;i++)
+        example.force.array(i)=0;
+    for(PHASE_ID pid(0);pid<example.phases.m;pid++)
+        example.phases(pid).gather_scatter->template Scatter<int>(true,
+            [this](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,int data)
+            {
+                T w=it.Weight();
+                FACE_INDEX<TV::m> index=it.Index();
+                example.force(index)+=w*example.gravity(index.axis)*example.particles.mass(p);
+            });
+    Reflect_Boundary(&MPM_MAC_DRIVER::Reflect_Boundary_Particle_Force,RF::ghost|RF::duplicate_corners);
+    for(PHASE_ID p(0);p<example.phases.m;p++){
+        PHASE& ph=example.phases(p);
+#pragma omp parallel for
+        for(int i=0;i<ph.velocity.array.m;i++)
+            if(ph.mass.array(i))
+                ph.velocity.array(i)+=example.force.array(i)/ph.mass.array(i)*example.dt;}
+}
+//#####################################################################
+// Function Apply_Grid_Forces
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Apply_Grid_Forces()
+{
+#pragma omp parallel for
+    for(int i=0;i<example.force.array.m;i++)
+        example.force.array(i)=0;
+    for(PHASE_ID p(0);p<example.phases.m;p++){
+        PHASE& ph=example.phases(p);
+        for(int i=0;i<ph.valid_flat_indices.m;i++){
+            int k=ph.valid_flat_indices(i);
+            FACE_INDEX<TV::m> f=ph.valid_indices(i);
+            TV af=example.Compute_Analytic_Force(p,example.grid.Face(f),example.time);
+            example.force.array(k)+=af(f.axis);}}
+    Reflect_Boundary(&MPM_MAC_DRIVER::Reflect_Boundary_Grid_Force,RF::ghost|RF::delay_corners);
+    for(PHASE_ID p(0);p<example.phases.m;p++){
+        PHASE& ph=example.phases(p);
+#pragma omp parallel for
+        for(int i=0;i<ph.velocity.array.m;i++)
+            ph.velocity.array(i)+=example.force.array(i)*example.dt;}
+}
+//#####################################################################
 // Function Apply_Forces
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Apply_Forces()
 {
     TIMER_SCOPE_FUNC;
-    example.Apply_Forces(example.time);
+    if(example.extrap_type=='p'){
+        Apply_Particle_Forces();
+        Apply_Grid_Forces();}
+    else example.Apply_Forces(example.time);
     for(PHASE_ID p(0);p<example.phases.m;p++)
         Fix_Periodic(example.phases(p).velocity);
 }
@@ -1243,6 +1297,32 @@ Extrapolate_Velocity(bool use_bc)
 {
     for(PHASE_ID i(0);i<example.phases.m;i++)
         Extrapolate_Velocity(i,use_bc);
+}
+//#####################################################################
+// Function Reflect_Boundary_Particle_Force
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Reflect_Boundary_Particle_Force(const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side) const
+{
+    typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.bc_type(side);
+    if((bc_type==example.BC_SLIP && side/2==out.axis) || bc_type==example.BC_NOSLIP){
+        example.force(in)-=example.force(out);
+        example.force(out)=-example.force(in);}
+    else{
+        example.force(in)+=example.force(out);
+        example.force(out)=example.force(in);}
+}
+//#####################################################################
+// Function Reflect_Boundary_Grid_Force
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Reflect_Boundary_Grid_Force(const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side) const
+{
+    typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.bc_type(side);
+    if((bc_type==example.BC_SLIP && side/2==out.axis) || bc_type==example.BC_NOSLIP)
+        example.force(out)=-example.force(in);
+    else
+        example.force(out)=example.force(in);
 }
 //#####################################################################
 // Function Reflect_Boundary_Mass_Momentum
