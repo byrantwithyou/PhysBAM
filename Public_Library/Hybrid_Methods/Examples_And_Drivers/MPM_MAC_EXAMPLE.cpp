@@ -155,6 +155,33 @@ Potential_Energy(const T time) const
     return potential;
 }
 //#####################################################################
+// Function Total_Particle_Vorticity
+//#####################################################################
+template<class TV> typename TV::SCALAR MPM_MAC_EXAMPLE<TV>::
+Total_Particle_Vorticity() const
+{
+    struct HELPER
+    {
+        T sqr_vort;
+        HELPER():sqr_vort(0){}
+    };
+
+    T l2_vort=0;
+    for(PHASE_ID p(0);p<phases.m;p++){
+        const PHASE& ph=phases(p);
+        ph.gather_scatter->template Gather<HELPER>(true,
+            [](int p,HELPER& h){h=HELPER();},
+            [this,&ph](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,HELPER& h)
+            {
+                h.sqr_vort+=it.Gradient().Cross(TV::Axis_Vector(it.axis)*ph.velocity(it.Index())).Magnitude_Squared();
+            },
+            [this,&l2_vort](int p,HELPER& h)
+            {
+                l2_vort+=0.5*particles.mass(p)*h.sqr_vort;
+            });}
+    return l2_vort;
+}
+//#####################################################################
 // Function Apply_Forces
 //#####################################################################
 template<class TV> void MPM_MAC_EXAMPLE<TV>::

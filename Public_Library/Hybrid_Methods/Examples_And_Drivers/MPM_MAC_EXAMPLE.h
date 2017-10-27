@@ -173,6 +173,7 @@ public:
     HASHTABLE<std::string,PAIR<bool,VECTOR<ARRAY<std::function<void()> >,2> > > time_step_callbacks; // begin, end
 
     T Potential_Energy(const T time) const;
+    T Total_Particle_Vorticity() const;
     void Apply_Forces(const T time);
     virtual TV Compute_Analytic_Force(PHASE_ID p,const TV& X,const T time) const;
     void Set_Weights(int order);

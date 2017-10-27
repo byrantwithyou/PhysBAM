@@ -496,6 +496,7 @@ Velocity_Fourier_Analysis() const
     LOG::printf("l2 velocity %P  l2 vorticity %P\n",l2_u,l2_omega);
     LOG::printf("ke grid %P  ke particle %P\n",ke_grid,ke_particle);
     LOG::printf("te grid %P  te particle %P\n",ke_grid+this->Potential_Energy(time),ke_particle+pe_particle);
+    LOG::printf("vort particle %P\n",this->Total_Particle_Vorticity());
     LOG::printf("taylor total %P\n",total_taylor);
 }
 //#####################################################################
