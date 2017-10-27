@@ -23,7 +23,7 @@ if [ "X$FULL" = "X1" ] ; then
     rm -rf $NAME
     mkdir -p $NAME
     for r in `seq $HI -$SKIP $LO` ; do
-        dt=`perl -e "print (1.0/$r)"`
+        dt=`perl -e "print (1.0/$r/4)"`
         DT="-max_dt $dt -min_dt $dt"
         echo $ARGS $DT -no_affine -o $NAME/pic-$r -resolution $r
         echo $ARGS $DT -affine -o $NAME/apic-$r -resolution $r
