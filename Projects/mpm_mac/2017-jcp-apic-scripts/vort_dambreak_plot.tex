@@ -8,18 +8,16 @@
     enlargelimits=false,
     legend cell align=left,
     xlabel={Time},
-    ylabel={Vorticity},
+    ylabel={LLL},
     legend entries={
-      %PIC $E_{vel}$,
-      PIC $E_{vort}$,%PIC $E_{taylor}$,
-      %APIC $E_{vel}$,
-      APIC $E_{vort}$,%APIC $E_{taylor}$,
-      FLIP $E_{vort}$,%FLIP $E_{vort}$,FLIP $E_{taylor}$
+      %PIC grid,
+      PIC particle,
+      %APIC grid,
+      APIC particle,
+      %FLIP grid,
+      FLIP particle,
     },
-    legend pos=north west,
-%    ymin=0.92,
-%    ymax=1,
-%    xmax=16,
+    legend pos=north east,
     legend style={fill=none,draw=none},
     tick scale binop=\times,
     scale ticks above exponent=2,
@@ -32,15 +30,12 @@
     }%,
 %    title={Convergence plot (XXX)}
 ]
-%\addplot[mark=none,solid,color=blue] table[x=time,y=vel]{pic-xxx-norms.txt};
-\addplot[mark=none,dashed,color=blue] table[x=time,y=vort]{pic-xxx-rrr/norms.txt};
-%\addplot[mark=none,dotted,color=blue] table[x=time,y=tay]{pic-xxx-norms.txt};
-%\addplot[mark=none,solid,color=red] table[x=time,y=vel]{apic-xxx-norms.txt};
-\addplot[mark=none,dashed,color=red] table[x=time,y=vort]{apic-xxx-rrr/norms.txt};
-%\addplot[mark=none,dotted,color=red,very thick] table[x=time,y=tay]{apic-xxx-norms.txt};
-\addplot[mark=none,dashed,color=green] table[x=time,y=vort]{flip-xxx-rrr/norms.txt};
-%\addplot[mark=none,dashed,color=green] table[x=time,y=vort]{flip-xxx-norms.txt};
-%\addplot[mark=none,dotted,color=green,very thick] table[x=time,y=tay]{flip-xxx-norms.txt};
+%\addplot[mark=none,dashed,color=blue] table[x=time,y=DDD-grid]{pic-xxx-rrr/norms.txt};
+\addplot[mark=none,solid,color=blue] table[x=time,y=DDD-particle]{pic-xxx-rrr/norms.txt};
+%\addplot[mark=none,dashed,color=red] table[x=time,y=DDD-grid]{apic-xxx-rrr/norms.txt};
+\addplot[mark=none,solid,color=red] table[x=time,y=DDD-particle]{apic-xxx-rrr/norms.txt};
+%\addplot[mark=none,dashed,color=green] table[x=time,y=DDD-grid]{flip-xxx-rrr/norms.txt};
+\addplot[mark=none,solid,color=green] table[x=time,y=DDD-particle]{flip-xxx-rrr/norms.txt};
 \end{axis}
 \end{tikzpicture}
 \end{document}
