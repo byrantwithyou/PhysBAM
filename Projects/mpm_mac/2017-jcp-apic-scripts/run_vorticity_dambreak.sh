@@ -10,10 +10,9 @@ opt=("" "-regular_seeding" "-order 3" "-regular_seeding -order 3")
 opt_name=("default" "regular" "default-cubic" "regular-cubic")
 
 LO=32
-LO=64
-HI=256
-HI=96
+HI=192
 SKIP=32
+RES=96
 
 if [ "X$FULL" = "X1" ] ; then
     rm -rf $NAME
@@ -22,9 +21,13 @@ if [ "X$FULL" = "X1" ] ; then
         for r in `seq $HI -$SKIP $LO` ; do
             dt=`perl -e "print (1.0/$r)"`
             DT="-max_dt $dt -min_dt $dt"
-            echo $ARGS $DT -no_affine ${opt[$o]} -resolution $r -dump_modes_freq $r -o $NAME/pic-${opt_name[$o]}-$r
-            echo $ARGS $DT -affine ${opt[$o]} -resolution $r -dump_modes_freq $r -o $NAME/apic-${opt_name[$o]}-$r
-            echo $ARGS $DT -no_affine ${opt[$o]} -flip 1 -resolution $r -dump_modes_freq $r -o $NAME/flip-${opt_name[$o]}-$r
+            PVORT=""
+            if [ "X$r" = "X$RES" ]; then
+                PVORT="-particle_vort"
+            fi
+            echo $ARGS $DT $PVORT -no_affine ${opt[$o]} -resolution $r -dump_modes_freq $r -o $NAME/pic-${opt_name[$o]}-$r
+            echo $ARGS $DT $PVORT -affine ${opt[$o]} -resolution $r -dump_modes_freq $r -o $NAME/apic-${opt_name[$o]}-$r
+            echo $ARGS $DT $PVORT -no_affine ${opt[$o]} -flip 1 -resolution $r -dump_modes_freq $r -o $NAME/flip-${opt_name[$o]}-$r
         done
     done | xargs -P 16 -n 1 -d '\n' bash -c
 fi
@@ -37,7 +40,6 @@ for s in pic apic flip ; do
     done
 done
 
-RES=64
 for o in ${opt_name[@]} ; do
     sed -e "s/xxx/$o/; s/rrr/$RES/; s/LLL/Vorticity/; s/DDD/vort/" vort_dambreak_plot.tex  > $NAME/plot-dambreak-vort-$o.tex
     sed -e "s/xxx/$o/; s/rrr/$RES/; s/LLL/Kinetic energy/; s/DDD/ke/" dambreak_plot.tex  > $NAME/plot-dambreak-ke-$o.tex
