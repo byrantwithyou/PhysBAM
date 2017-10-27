@@ -45,25 +45,23 @@ public:
     void Update_Particle_Weights();
     void Prepare_Scatter();
     void Particle_To_Grid();
-    void Particle_To_Grid(PHASE_ID pid) const;
+    void Particle_To_Grid(PHASE& ph) const;
     void Grid_To_Particle();
     void Grid_To_Particle(const PHASE& ph);
     void Build_Level_Sets();
     void Build_Level_Sets(PHASE& ph);
     void Pressure_Projection();
     void Apply_Forces();
-    void Apply_Particle_Forces();
-    void Apply_Grid_Forces();
     void Apply_Viscosity();
     void Move_Particles();
-    void Extrapolate_Velocity(bool use_bc);
-    template <class F>
-    void Reflect_Boundary(F func,RF flag) const;
-    void Reflect_Boundary_Mass_Momentum(const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side) const;
-    void Reflect_Boundary_Particle_Force(const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side) const;
-    void Reflect_Boundary_Grid_Force(const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side) const;
-    void Reflect_Boundary_Velocity_Copy_Only(const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side) const;
-    void Extrapolate_Velocity(PHASE_ID pid,bool use_bc) const;
+    void Extrapolate_Velocity(bool use_bc,bool extrapolate_boundary);
+    template <class D,class N>
+    void Reflect_Boundary(D func_d,N func_n,RF flag) const;
+    void Reflect_Boundary_Mass_Momentum(PHASE& ph) const;
+    void Reflect_Boundary_Particle_Force(ARRAY<T,FACE_INDEX<TV::m> >& force) const;
+    void Reflect_Boundary_Grid_Force(ARRAY<T,FACE_INDEX<TV::m> >& force) const;
+    void Reflect_Boundary_Velocity_Copy_Only(PHASE& ph) const;
+    void Extrapolate_Velocity(PHASE& ph,bool use_bc,bool extrapolate_boundary) const;
     void Extrapolate_Boundary(PHASE& ph) const;
     T Compute_Dt() const;
     T Max_Particle_Speed() const;

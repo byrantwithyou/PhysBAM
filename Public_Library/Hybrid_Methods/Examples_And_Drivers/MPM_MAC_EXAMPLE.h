@@ -42,6 +42,7 @@ public:
     
     struct PHASE
     {
+        PHASE_ID id;
         ARRAY<T,FACE_INDEX<TV::m> > mass,volume;
         ARRAY<T,FACE_INDEX<TV::m> > velocity,velocity_save;
 
@@ -61,7 +62,7 @@ public:
         ~PHASE();
         void Initialize(const GRID<TV>& grid,
             const VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m>& weights,
-            int ghost,int threads);
+            int ghost,int threads,PHASE_ID pid);
     };
 
     ARRAY<PHASE,PHASE_ID> phases;

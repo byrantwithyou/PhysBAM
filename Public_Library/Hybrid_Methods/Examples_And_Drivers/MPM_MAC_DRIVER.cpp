@@ -110,7 +110,7 @@ Initialize()
 
     for(PHASE_ID i(0);i<example.phases.m;i++){
         PHASE& ph=example.phases(i);
-        ph.Initialize(example.grid,example.weights,example.ghost,example.threads);
+        ph.Initialize(example.grid,example.weights,example.ghost,example.threads,i);
         ph.phi.Resize(example.grid.Domain_Indices(example.ghost));
         if(example.use_phi){
             ph.levelset=new LEVELSET<TV>(example.grid,ph.phi,example.ghost);
@@ -128,8 +128,7 @@ Initialize()
         Prepare_Scatter();
         Particle_To_Grid();}
 
-    if(example.extrap_type=='p')
-        example.force.Resize(example.grid.Domain_Indices(example.ghost));
+    example.force.Resize(example.grid.Domain_Indices(example.ghost));
 
     if(!example.restart) Write_Output_Files(0);
 }
@@ -152,10 +151,7 @@ Advance_One_Time_Step()
     Step([=](){Compute_Boundary_Conditions();},"compute boundary conditions",false);
     Step([=](){Pressure_Projection();},"projection");
     Step([=](){Apply_Viscosity();},"viscosity",true,example.use_viscosity);
-    Step([=](){
-        if(example.extrap_type=='p')
-            Reflect_Boundary(&MPM_MAC_DRIVER::Reflect_Boundary_Velocity_Copy_Only,RF::ghost|RF::delay_corners);
-        else Extrapolate_Velocity(!example.flip);},"velocity-extrapolation",true);
+    Step([=](){Extrapolate_Velocity(!example.flip,false);},"velocity-extrapolation",true);
     Step([=](){Grid_To_Particle();},"g2p");
 }
 //#####################################################################
@@ -242,30 +238,26 @@ template<class TV> void MPM_MAC_DRIVER<TV>::
 Extrapolate_Boundary(PHASE& ph) const
 {
     int d=1;
-    auto extrapolate=[this,&ph,d](auto it){
-        if(example.bc_type(it.side)==example.BC_PERIODIC) return;
-        int side_axis=it.side/2;
-        int sign_out=it.side%2?1:-1;
-        auto further=[=](FACE_INDEX<TV::m> f){f.index(side_axis)-=sign_out;return f;};
-        FACE_INDEX<TV::m> f0=it.face;
-        for(int j=d;j>0;--j) f0=further(f0);
-        FACE_INDEX<TV::m> f1=further(f0);
-        ph.velocity(it.face)=(d+1)*ph.velocity(f0)-d*ph.velocity(f1);};
-
     for(int n=example.weights[0]->stencil_width-2;n>0;--n) // assume all dimensions use the same interpolation order
         for(FACE_RANGE_ITERATOR<TV::m> it(example.grid.Domain_Indices(),1-n,-n,
-                RF::ghost|RF::skip_inner|RF::delay_corners);it.Valid();it.Next())
-            extrapolate(it);
+                RF::ghost|RF::skip_inner|RF::delay_corners);it.Valid();it.Next()){
+            if(example.bc_type(it.side)==example.BC_PERIODIC) return;
+            int side_axis=it.side/2;
+            int sign_out=it.side%2?1:-1;
+            auto further=[=](FACE_INDEX<TV::m> f){f.index(side_axis)-=sign_out;return f;};
+            FACE_INDEX<TV::m> f0=it.face;
+            for(int j=d;j>0;--j) f0=further(f0);
+            FACE_INDEX<TV::m> f1=further(f0);
+            ph.velocity(it.face)=(d+1)*ph.velocity(f0)-d*ph.velocity(f1);}
 }
 //#####################################################################
 // Function Particle_To_Grid
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Particle_To_Grid(PHASE_ID pid) const
+Particle_To_Grid(PHASE& ph) const
 {
     TIMER_SCOPE_FUNC;
     const MPM_PARTICLES<TV>& particles=example.particles;
-    PHASE& ph=example.phases(pid);
 
 #pragma omp parallel for
     for(int i=0;i<ph.mass.array.m;i++){
@@ -291,9 +283,9 @@ Particle_To_Grid(PHASE_ID pid) const
     Fix_Periodic_Accum(ph.velocity);
     Fix_Periodic_Accum(ph.volume);
 
-    if(example.flip && example.extrap_type=='p'){
+    if(example.extrap_type=='p'){
         PHYSBAM_DEBUG_WRITE_SUBSTEP("before reflect",1);
-        Reflect_Boundary(&MPM_MAC_DRIVER::Reflect_Boundary_Mass_Momentum,RF::ghost|RF::duplicate_corners);}
+        Reflect_Boundary_Mass_Momentum(ph);}
 
     // TODO: move mass, momentum, volume inside
     if(example.move_mass_inside)
@@ -335,9 +327,8 @@ Particle_To_Grid(PHASE_ID pid) const
     Fix_Periodic(ph.velocity);
     Fix_Periodic(ph.volume);
     if(example.flip){
-        if(example.extrap_type!='p'){
-            Extrapolate_Boundary(ph);
-            Extrapolate_Velocity(pid,false);}
+        if(example.extrap_type!='p')
+            Extrapolate_Velocity(ph,false,true);
         ph.velocity_save=ph.velocity;}
 }
 //#####################################################################
@@ -571,7 +562,7 @@ template<class TV> void MPM_MAC_DRIVER<TV>::
 Particle_To_Grid()
 {
     for(PHASE_ID i(0);i<example.phases.m;i++)
-        Particle_To_Grid(i);
+        Particle_To_Grid(example.phases(i));
 }
 //#####################################################################
 // Function Grid_To_Particle
@@ -1111,63 +1102,31 @@ Pressure_Projection()
 // Function Apply_Particle_Forces
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Apply_Particle_Forces()
+Apply_Forces()
 {
-#pragma omp parallel for
-    for(int i=0;i<example.force.array.m;i++)
-        example.force.array(i)=0;
-    for(PHASE_ID pid(0);pid<example.phases.m;pid++)
-        example.phases(pid).gather_scatter->template Scatter<int>(true,
+    TIMER_SCOPE_FUNC;
+    for(PHASE_ID p(0);p<example.phases.m;p++){
+        PHASE& ph=example.phases(p);
+        ph.gather_scatter->template Scatter<int>(true,
             [this](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,int data)
             {
                 T w=it.Weight();
                 FACE_INDEX<TV::m> index=it.Index();
                 example.force(index)+=w*example.gravity(index.axis)*example.particles.mass(p);
             });
-    Reflect_Boundary(&MPM_MAC_DRIVER::Reflect_Boundary_Particle_Force,RF::ghost|RF::duplicate_corners);
-    for(PHASE_ID p(0);p<example.phases.m;p++){
-        PHASE& ph=example.phases(p);
+        if(example.extrap_type=='p') Reflect_Boundary_Particle_Force(example.force);
 #pragma omp parallel for
-        for(int i=0;i<ph.velocity.array.m;i++)
-            if(ph.mass.array(i))
-                ph.velocity.array(i)+=example.force.array(i)/ph.mass.array(i)*example.dt;}
-}
-//#####################################################################
-// Function Apply_Grid_Forces
-//#####################################################################
-template<class TV> void MPM_MAC_DRIVER<TV>::
-Apply_Grid_Forces()
-{
-#pragma omp parallel for
-    for(int i=0;i<example.force.array.m;i++)
-        example.force.array(i)=0;
-    for(PHASE_ID p(0);p<example.phases.m;p++){
-        PHASE& ph=example.phases(p);
         for(int i=0;i<ph.valid_flat_indices.m;i++){
             int k=ph.valid_flat_indices(i);
             FACE_INDEX<TV::m> f=ph.valid_indices(i);
             TV af=example.Compute_Analytic_Force(p,example.grid.Face(f),example.time);
-            example.force.array(k)+=af(f.axis);}}
-    Reflect_Boundary(&MPM_MAC_DRIVER::Reflect_Boundary_Grid_Force,RF::ghost|RF::delay_corners);
-    for(PHASE_ID p(0);p<example.phases.m;p++){
-        PHASE& ph=example.phases(p);
+            example.force.array(k)+=af(f.axis);}
+        if(example.extrap_type=='p') Reflect_Boundary_Grid_Force(example.force);
 #pragma omp parallel for
-        for(int i=0;i<ph.velocity.array.m;i++)
-            ph.velocity.array(i)+=example.force.array(i)*example.dt;}
-}
-//#####################################################################
-// Function Apply_Forces
-//#####################################################################
-template<class TV> void MPM_MAC_DRIVER<TV>::
-Apply_Forces()
-{
-    TIMER_SCOPE_FUNC;
-    if(example.extrap_type=='p'){
-        Apply_Particle_Forces();
-        Apply_Grid_Forces();}
-    else example.Apply_Forces(example.time);
-    for(PHASE_ID p(0);p<example.phases.m;p++)
-        Fix_Periodic(example.phases(p).velocity);
+        for(int i=0;i<ph.velocity.array.m;i++){
+            ph.velocity.array(i)+=example.force.array(i)*example.dt;
+            example.force.array(i)=0;}
+        Fix_Periodic(ph.velocity);}
 }
 //#####################################################################
 // Function Compute_Dt
@@ -1295,91 +1254,95 @@ Fix_Periodic_Accum(ARRAY<T2,FACE_INDEX<TV::m> >& u,int ghost) const
 // Function Extrapolate_Velocity
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Extrapolate_Velocity(bool use_bc)
+Extrapolate_Velocity(bool use_bc,bool extrapolate_boundary)
 {
     for(PHASE_ID i(0);i<example.phases.m;i++)
-        Extrapolate_Velocity(i,use_bc);
+        Extrapolate_Velocity(example.phases(i),use_bc,extrapolate_boundary);
 }
 //#####################################################################
 // Function Reflect_Boundary_Particle_Force
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Reflect_Boundary_Particle_Force(const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side) const
+Reflect_Boundary_Particle_Force(ARRAY<T,FACE_INDEX<TV::m> >& force) const
 {
-    typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.bc_type(side);
-    if((bc_type==example.BC_SLIP && side/2==out.axis) || bc_type==example.BC_NOSLIP){
-        example.force(in)-=example.force(out);
-        example.force(out)=-example.force(in);}
-    else{
-        example.force(in)+=example.force(out);
-        example.force(out)=example.force(in);}
+    Reflect_Boundary(
+        [&](const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side)
+        {force(in)-=force(out);},
+        [&](const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side)
+        {force(in)+=force(out);},
+        RF::ghost|RF::duplicate_corners);
 }
 //#####################################################################
 // Function Reflect_Boundary_Grid_Force
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Reflect_Boundary_Grid_Force(const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side) const
+Reflect_Boundary_Grid_Force(ARRAY<T,FACE_INDEX<TV::m> >& force) const
 {
-    typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.bc_type(side);
-    if((bc_type==example.BC_SLIP && side/2==out.axis) || bc_type==example.BC_NOSLIP)
-        example.force(out)=-example.force(in);
-    else
-        example.force(out)=example.force(in);
+    Reflect_Boundary(
+        [&](const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side)
+        {force(out)=-force(in);},
+        [&](const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side)
+        {force(out)=force(in);},
+        RF::ghost|RF::delay_corners);
 }
 //#####################################################################
 // Function Reflect_Boundary_Mass_Momentum
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Reflect_Boundary_Mass_Momentum(const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side) const
+Reflect_Boundary_Mass_Momentum(PHASE& ph) const
 {
-    for(PHASE_ID pid(0);pid<example.phases.m;pid++){
-        PHASE& ph=example.phases(pid);
-        T& m_in=ph.mass(in),&m_out=ph.mass(out);
-
-        T& moment_in=ph.velocity(in),&moment_out=ph.velocity(out);
-        typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.bc_type(side);
-        if((bc_type==example.BC_SLIP && side/2==out.axis) || bc_type==example.BC_NOSLIP){
+    Reflect_Boundary(
+        [&](const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side)
+        {
             T bc=0;
             if(example.bc_velocity(side)){
                 TV nearest_point=example.grid.Clamp(example.grid.Face(out));
-                bc=example.bc_velocity(side)(nearest_point,out.axis,pid,example.time);}
-            T mv_in_old=moment_in;
-            T mv_out_old=moment_out;
+                bc=example.bc_velocity(side)(nearest_point,out.axis,ph.id,example.time);}
+            T& moment_in=ph.velocity(in),&moment_out=ph.velocity(out);
+            T mv_in_old=moment_in,mv_out_old=moment_out;
+            T& m_in=ph.mass(in),&m_out=ph.mass(out);
             moment_in+=2*bc*m_out-moment_out;
             moment_out=mv_out_old+2*bc*m_in-mv_in_old;
-        }
-        else{
+            m_in+=m_out;
+            m_out=m_in;
+        },
+        [&](const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side)
+        {
+            T& moment_in=ph.velocity(in),&moment_out=ph.velocity(out);
             moment_in+=moment_out;
-            moment_out=moment_in;}
-        m_in+=m_out;
-        m_out=m_in;}
+            moment_out=moment_in;
+            T& m_in=ph.mass(in),&m_out=ph.mass(out);
+            m_in+=m_out;
+            m_out=m_in;
+        },
+        RF::ghost|RF::duplicate_corners);
 }
 //#####################################################################
 // Function Reflect_Boundary_Copy_Only
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Reflect_Boundary_Velocity_Copy_Only(const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side) const
+Reflect_Boundary_Velocity_Copy_Only(PHASE& ph) const
 {
-    for(PHASE_ID pid(0);pid<example.phases.m;pid++){
-        PHASE& ph=example.phases(pid);
-
-        const T& vel_in=ph.velocity(in);
-        T& vel_out=ph.velocity(out);
-        typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.bc_type(side);
-        if((bc_type==example.BC_SLIP && side/2==out.axis) || bc_type==example.BC_NOSLIP){
+    Reflect_Boundary(
+        [&](const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side)
+        {
             T bc=0;
             if(example.bc_velocity(side)){
                 TV nearest_point=example.grid.Clamp(example.grid.Face(out));
-                bc=example.bc_velocity(side)(nearest_point,out.axis,pid,example.time);}
-            vel_out=(2*bc-vel_in);
-        }
-        else vel_out=vel_in;}
+                bc=example.bc_velocity(side)(nearest_point,out.axis,ph.id,example.time);}
+            ph.velocity(out)=(2*bc-ph.velocity(in));
+        },
+        [&](const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side)
+        {
+            ph.velocity(out)=ph.velocity(in);
+        },
+        RF::ghost|RF::delay_corners);
 }
 //#####################################################################
 // Function Reflect_Boundary
 //#####################################################################
-template<class TV> template<class F> void MPM_MAC_DRIVER<TV>::
-Reflect_Boundary(F func,RF flag) const
+template<class TV> template<class D,class N> void MPM_MAC_DRIVER<TV>::
+Reflect_Boundary(D func_d,N func_n,RF flag) const
 {
     RANGE<TV_INT> domain=example.grid.Domain_Indices(0);
     TV_INT corner[2]={domain.min_corner,domain.max_corner};
@@ -1390,15 +1353,21 @@ Reflect_Boundary(F func,RF flag) const
         FACE_INDEX<TV::m> f=it.face;
         f.index(side_axis)=2*corner[it.side%2](side_axis)-it.face.index(side_axis);
         if(side_axis!=it.face.axis) f.index(side_axis)-=1;
-        (this->*func)(f,it.face,it.side);}
+        if((bc_type==example.BC_SLIP && it.side/2==it.face.axis) || bc_type==example.BC_NOSLIP)
+            func_d(f,it.face,it.side);
+        else func_n(f,it.face,it.side);}
 }
 //#####################################################################
 // Function Extrapolate_Velocity
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Extrapolate_Velocity(PHASE_ID pid,bool use_bc) const
+Extrapolate_Velocity(PHASE& ph,bool use_bc,bool extrapolate_boundary) const
 {
-    PHASE& ph=example.phases(pid);
+    if(example.extrap_type=='p'){
+        Reflect_Boundary_Velocity_Copy_Only(ph);
+        return;}
+
+    if(extrapolate_boundary) Extrapolate_Boundary(ph);
     RANGE<TV_INT> domain=example.grid.Domain_Indices(0);
     RANGE<TV_INT> ghost_domain=example.grid.Domain_Indices(example.ghost);
     TV_INT bound[TV::m];
@@ -1443,7 +1412,7 @@ Extrapolate_Velocity(PHASE_ID pid,bool use_bc) const
                 u=ph.velocity(f);
                 if(has_bc){
                     T v=0;
-                    if(use_bc) v=bc(nearest_point,it.face.axis,pid,example.time);
+                    if(use_bc) v=bc(nearest_point,it.face.axis,ph.id,example.time);
                     else if(normal) v=ph.velocity(nearest_face[normal]);
                     else{
                         FACE_INDEX<TV::m> f0=nearest_face[false];
@@ -1451,16 +1420,16 @@ Extrapolate_Velocity(PHASE_ID pid,bool use_bc) const
                         v=1.5*ph.velocity(f0)-0.5*ph.velocity(f1);}
                     u=2*v-u;}
                 break;}
-            case 'a': u=bc(example.grid.Face(it.face),it.face.axis,pid,example.time);break;
+            case 'a': u=bc(example.grid.Face(it.face),it.face.axis,ph.id,example.time);break;
             case '0': u=0;break;
-            case 'c': u=bc(nearest_point,it.face.axis,pid,example.time);break;
+            case 'c': u=bc(nearest_point,it.face.axis,ph.id,example.time);break;
             case 'C':{
                 FACE_INDEX<TV::m> f=nearest_face[normal];
                 if(is_normal_bc) f=further(f);
                 u=ph.velocity(f);
                 break;}
             case 'l':{
-                T u0=bc(nearest_point,it.face.axis,pid,example.time);
+                T u0=bc(nearest_point,it.face.axis,ph.id,example.time);
                 FACE_INDEX<TV::m> f=nearest_face[normal];
                 if(is_normal_bc) f=further(f);
                 T u1=ph.velocity(f);

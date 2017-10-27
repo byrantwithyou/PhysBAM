@@ -76,8 +76,9 @@ template<class TV> MPM_MAC_EXAMPLE<TV>::PHASE::
 //#####################################################################
 template<class TV> void MPM_MAC_EXAMPLE<TV>::PHASE::
 Initialize(const GRID<TV>& grid,const VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m>& weights,
-    int ghost,int threads)
+    int ghost,int threads,PHASE_ID pid)
 {
+    id=pid;
     gather_scatter=new GATHER_SCATTER<TV>(grid,simulated_particles);
     gather_scatter->threads=threads;
     gather_scatter->face_weights=weights;
