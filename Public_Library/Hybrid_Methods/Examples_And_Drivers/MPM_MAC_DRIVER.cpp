@@ -106,6 +106,8 @@ Initialize()
         for(int i=0;i<TV::m;i++)
             example.Dp_inv(i).Resize(example.particles.X.m);
 
+    example.particles.Store_Vort(example.particle_vort);
+
     for(PHASE_ID i(0);i<example.phases.m;i++){
         PHASE& ph=example.phases(i);
         ph.Initialize(example.grid,example.weights,example.ghost,example.threads);

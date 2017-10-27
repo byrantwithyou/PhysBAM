@@ -52,6 +52,7 @@ public:
     using BASE::bc_velocity;using BASE::bc_pressure;using BASE::BC_SLIP;using BASE::BC_NOSLIP;
     using BASE::extrap_type;
     using BASE::clamp_particles;
+    using BASE::particle_vort;
 
     int test_number;
     int resolution;

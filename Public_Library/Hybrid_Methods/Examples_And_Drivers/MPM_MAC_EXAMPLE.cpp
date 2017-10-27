@@ -37,7 +37,8 @@ MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type)
     use_massless_particles(false),use_multiphase_projection(false),use_bump(false),use_reseeding(false),
     use_periodic_test_shift(false),use_viscosity(false),
     debug_particles(*new DEBUG_PARTICLES<TV>),
-    test_system(false),print_matrix(false)
+    test_system(false),print_matrix(false),
+    particle_vort(false)
 {
     bc_type.Fill(BC_SLIP);
 }
@@ -177,7 +178,9 @@ Total_Particle_Vorticity() const
             },
             [this,&l2_vort](int p,HELPER& h)
             {
-                l2_vort+=0.5*particles.mass(p)*h.sqr_vort;
+                T v=0.5*particles.mass(p)*h.sqr_vort;
+                if(particle_vort) particles.vort(p)=v;
+                l2_vort+=v;
             });}
     return l2_vort;
 }

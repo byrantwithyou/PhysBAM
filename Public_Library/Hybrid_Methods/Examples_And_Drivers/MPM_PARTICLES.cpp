@@ -10,7 +10,7 @@ namespace PhysBAM{
 template<class TV> MPM_PARTICLES<TV>::
 MPM_PARTICLES()
     :store_Fp(false),store_B(false),store_C(false),store_S(false),store_lame(false),store_lame0(false),
-     store_phase(false)
+     store_phase(false),store_vort(false)
 {
     this->Store_Velocity();
     this->Store_Mass();
@@ -111,6 +111,17 @@ Store_Phase(bool store)
     store_phase=store;
     if(store) Add_Array("phase",&phase);
     else Remove_Array("phase");
+}
+//#####################################################################
+// Function Store_Vort
+//#####################################################################
+template <class TV> void MPM_PARTICLES<TV>::
+Store_Vort(bool store)
+{
+    if(store_vort==store) return;
+    store_vort=store;
+    if(store) Add_Array("vort",&vort);
+    else Remove_Array("vort");
 }
 //#####################################################################
 // Function Initialize_MPM_Particles

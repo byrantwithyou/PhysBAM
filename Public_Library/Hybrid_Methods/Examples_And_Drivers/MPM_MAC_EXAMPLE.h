@@ -156,6 +156,7 @@ public:
     T last_part_ke=0;
     bool test_system;
     bool print_matrix;
+    bool particle_vort;
 
     MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type_input);
     MPM_MAC_EXAMPLE(const MPM_MAC_EXAMPLE&) = delete;
