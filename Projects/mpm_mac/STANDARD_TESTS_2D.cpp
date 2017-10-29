@@ -292,7 +292,7 @@ Initialize()
             auto df=[=](auto x){return (1-2*x)*(2*x*x-2*x-1);};
             auto g=[=](auto x){return x*(1-x)*(x+1)*(3*x*x-7);};
             auto dg=[=](auto x){return (1-3*x*x)*(3*x*x-7)+x*(1-x)*(x+1)*(6*x);};
-            int a=1,b=0,c=0;
+            int a=1,b=0,c=1;
             Add_Velocity(
                 [=](auto Y,auto t)
                 {
