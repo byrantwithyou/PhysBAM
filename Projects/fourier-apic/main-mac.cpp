@@ -139,7 +139,7 @@ int main(int argc, char* argv[])
     auto& ph=example.phases(PHASE_ID());
     ph.density=1;
     ph.viscosity=0;
-    ph.Initialize(example.grid,example.weights,example.ghost,example.threads);
+    ph.Initialize(example.grid,example.weights,example.ghost,example.threads,PHASE_ID(0));
     ph.velocity.Resize(example.grid.Cell_Indices(3));
     ph.mass.Resize(example.grid.Cell_Indices(3));
     ph.gather_scatter->Prepare_Scatter(example.particles);
