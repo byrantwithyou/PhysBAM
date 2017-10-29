@@ -1120,11 +1120,13 @@ Apply_Forces()
             int k=ph.valid_flat_indices(i);
             FACE_INDEX<TV::m> f=ph.valid_indices(i);
             TV af=example.Compute_Analytic_Force(p,example.grid.Face(f),example.time);
-            example.force.array(k)+=af(f.axis);}
+            example.force.array(k)+=af(f.axis)*ph.mass(f);}
         if(example.extrap_type=='p') Reflect_Boundary_Grid_Force(example.force);
 #pragma omp parallel for
         for(int i=0;i<ph.velocity.array.m;i++){
-            ph.velocity.array(i)+=example.force.array(i)*example.dt;
+            T acc=0;
+            if(ph.mass.array(i)) acc=example.force.array(i)/ph.mass.array(i);
+            ph.velocity.array(i)+=acc*example.dt;
             example.force.array(i)=0;}
         Fix_Periodic(ph.velocity);}
 }
