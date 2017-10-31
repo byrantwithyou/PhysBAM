@@ -79,6 +79,7 @@ public:
     ARRAY<ANALYTIC_SCALAR<TV>*,PHASE_ID> analytic_pressure;
     T mu;
     bool analyze_u_modes=false;
+    bool analyze_energy_vort=false;
     int dump_modes_freq=1;
     T max_ke=0;
     POISSON_DISK<TV>& poisson_disk;
@@ -145,6 +146,7 @@ public:
     void Check_Analytic_Velocity(std::function<bool(const FACE_INDEX<TV::m>&)>
         valid_face=[](const FACE_INDEX<TV::m>&){return true;}) const;
     void Velocity_Fourier_Analysis() const;
+    void Energy_Vorticity_Analysis() const;
     void Add_Source(const TV& X0,const TV& n,IMPLICIT_OBJECT<TV>* io,
         std::function<void(TV X,T ts,T t,SOURCE_PATH<TV>& p)> path,T density,
         T particles_per_cell,bool owns_io);

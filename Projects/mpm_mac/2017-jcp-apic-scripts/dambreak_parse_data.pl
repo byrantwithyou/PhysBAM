@@ -16,9 +16,7 @@ while(<STDIN>)
     if(/l2 velocity (.*)  l2 vorticity (.*)</){$vort=$2;}
     if(/ke grid (.*)  ke particle (.*)</){$ke_grid=$1;$ke_particle=$2;}
     if(/te grid (.*)  te particle (.*)</){$te_grid=$1;$te_particle=$2;}
-    if(/vort particle (.*)</){$vort_particle=$1;}
-    if(/taylor total (.*)</)
-    {
-        print "$time $ke_grid $ke_particle $te_grid $te_particle $vort_particle\n";
-    }
+    if(/vort particle (.*)</){
+        $vort_particle=$1;
+        print "$time $ke_grid $ke_particle $te_grid $te_particle $vort_particle\n";}
 }

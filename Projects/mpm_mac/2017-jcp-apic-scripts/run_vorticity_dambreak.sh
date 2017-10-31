@@ -4,7 +4,7 @@ NAME=vort-dambreak
 
 FULL=1 # Set to 1 for a full rebuild; 0 to skip rerunning the simulations
 
-ARGS="../mpm_mac 25 -last_frame 10 -frame_dt 1 -clamp -mu 0 -scale_mass 3 -analyze_u_modes -max_ke 15 -extrap p"
+ARGS="../mpm_mac 25 -last_frame 10 -frame_dt 1 -clamp -mu 0 -scale_mass 3 -analyze_energy_vort -extrap p"
 
 opt=("" "-regular_seeding" "-order 3" "-regular_seeding -order 3")
 opt_name=("default" "regular" "default-cubic" "regular-cubic")
@@ -45,14 +45,6 @@ for o in ${opt_name[@]} ; do
     sed -e "s/xxx/$o/; s/rrr/$RES/; s/LLL/Kinetic energy/; s/DDD/ke/" dambreak_plot.tex  > $NAME/plot-dambreak-ke-$o.tex
     sed -e "s/xxx/$o/; s/rrr/$RES/; s/LLL/Total energy/; s/DDD/te/" dambreak_plot.tex  > $NAME/plot-dambreak-te-$o.tex
 done
-
-for i in {pic,apic,flip}-{default,regular} ; do
-    for j in {0..10} ; do
-        convert -scale 512 $NAME/$i-$RES/modes-$(($j*$RES))-x.png `printf $NAME/$i-dambreak-vort-%02d.png $j`
-        convert -scale 512 $NAME/$i-$RES/modes-$(($j*$RES))-x.png `printf $NAME/$i-dambreak-vort-%02d.eps $j`
-    done
-done
-
 
 cat <<EOF > $NAME/SConstruct
 import os

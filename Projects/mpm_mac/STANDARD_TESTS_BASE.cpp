@@ -96,6 +96,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-test_periodic",&use_periodic_test_shift,"test periodic bc");
     parse_args.Add("-mu",&mu,"mu","viscosity");
     parse_args.Add("-analyze_u_modes",&analyze_u_modes,"Perform FFT analysis on velocity");
+    parse_args.Add("-analyze_energy_vort",&analyze_energy_vort,"Analyze energy and vorticity");
     parse_args.Add("-dump_modes_freq",&dump_modes_freq,"num","Dump FFT modes every num time steps");
     parse_args.Add("-max_ke",&max_ke,"value","Normalization for FFT images");
     parse_args.Add("-extrap",&extrap_type,"type","Velocity extrapolation");
@@ -144,6 +145,14 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
                 done=true;});
         Add_Callbacks(false,"time-step",[this](){
                 Velocity_Fourier_Analysis();});}
+
+    if(analyze_energy_vort){
+        Add_Callbacks(false,"p2g",[this](){
+                static bool done=false;
+                if(!done) Energy_Vorticity_Analysis();
+                done=true;});
+        Add_Callbacks(false,"time-step",[this](){
+                Energy_Vorticity_Analysis();});}
 
     if(use_periodic_test_shift){
         auto shift_func=[this](int sign){
@@ -399,6 +408,25 @@ Dump_Image(const std::string& file,const ARRAY<T,VECTOR<int,d> >& ke)
 {
 }
 //#####################################################################
+// Function Energy_Vorticity_Analysis
+//#####################################################################
+template<class TV> void STANDARD_TESTS_BASE<TV>::
+Energy_Vorticity_Analysis() const
+{
+    T pe_particle=0;
+    for(int p=0;p<particles.X.m;p++){
+        if(!particles.valid(p)) continue;
+        pe_particle-=particles.mass(p)*this->gravity.Dot(particles.X(p));}
+
+    LOG::printf("ke grid %P  ke particle %P\n",
+        this->Total_Grid_Kinetic_Energy(),
+        this->Total_Particle_Kinetic_Energy());
+    LOG::printf("te grid %P  te particle %P\n",
+        this->Total_Grid_Kinetic_Energy()+this->Potential_Energy(time),
+        this->Total_Particle_Kinetic_Energy()+pe_particle);
+    LOG::printf("vort particle %P\n",this->Total_Particle_Vorticity());
+}
+//#####################################################################
 // Function Velocity_Fourier_Analysis
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
@@ -475,31 +503,7 @@ Velocity_Fourier_Analysis() const
         num_l2_omega++;}
     if(num_l2_omega) l2_omega/=num_l2_omega;
 
-    T pe_particle=0;
-    T max_vort=-1;
-    T vort_grid=this->Total_Particle_Vorticity();
-    for(int p=0;p<particles.X.m;p++){
-        if(!particles.valid(p)) continue;
-        pe_particle-=particles.mass(p)*this->gravity.Dot(particles.X(p));
-        if(particle_vort) max_vort=max(max_vort,particles.vort(p));}
-
-    if(particle_vort){
-        INTERPOLATED_COLOR_MAP<T> icm;
-        icm.Initialize_Colors((T)1e-8,1,true,true,false);
-        for(int p=0;p<particles.X.m;p++){
-            if(!particles.valid(p)) continue;
-            T v=particles.vort(p);
-            if(max_vort) v/=max_vort;
-            Add_Debug_Particle(particles.X(p),icm(v));}}
-
     LOG::printf("l2 velocity %P  l2 vorticity %P\n",l2_u,l2_omega);
-    LOG::printf("ke grid %P  ke particle %P\n",
-        this->Total_Grid_Kinetic_Energy(),
-        this->Total_Particle_Kinetic_Energy());
-    LOG::printf("te grid %P  te particle %P\n",
-        this->Total_Grid_Kinetic_Energy()+this->Potential_Energy(time),
-        this->Total_Particle_Kinetic_Energy()+pe_particle);
-    LOG::printf("vort particle %P\n",this->Total_Particle_Vorticity());
     LOG::printf("taylor total %P\n",total_taylor);
 }
 //#####################################################################
