@@ -102,9 +102,6 @@ Initialize()
         example.Read_Output_Files(example.restart);
 
     example.particles.Store_B(example.use_affine);
-    if(example.particles.store_B)
-        for(int i=0;i<TV::m;i++)
-            example.Dp_inv(i).Resize(example.particles.X.m);
 
     example.particles.Store_Vort(example.particle_vort);
 
@@ -228,8 +225,9 @@ Update_Particle_Weights()
     TIMER_SCOPE_FUNC;
     for(int i=0;i<TV::m;++i){
         example.weights(i)->Update(example.particles.X);
-        if(example.particles.store_B)
-            example.weights(i)->Dp_Inverse(example.particles.X,example.Dp_inv(i));}
+        if(example.particles.store_B){
+            example.Dp_inv(i).Resize(example.particles.X.m);
+            example.weights(i)->Dp_Inverse(example.particles.X,example.Dp_inv(i));}}
 }
 //#####################################################################
 // Function Extrapolate_Boundary
