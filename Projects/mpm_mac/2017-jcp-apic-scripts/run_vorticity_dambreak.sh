@@ -15,9 +15,7 @@ SKIP=32
 RES=96
 
 MOVIE_RES=64
-FRAME_LO=500
-FRAME_HI=600
-FRAME_SKIP=25
+FRAME_SKIP=150
 
 if [ "X$FULL" = "X1" ] ; then
     rm -rf $NAME
@@ -49,7 +47,8 @@ for s in pic apic flip ; do
     for o in ${opt_name[@]} ; do
         folder=$NAME/movie-$s-$o-$MOVIE_RES
         mkdir -p $folder
-        for t in `seq $FRAME_LO $FRAME_SKIP $FRAME_HI` ; do
+        last=`perl -e "print (4*$FRAME_SKIP)"`
+        for t in `seq 0 $FRAME_SKIP $last` ; do
             plot="\\\\dbplot{..\\/$s-$o-$MOVIE_RES\\/pvort-$t}\\n"
             sed -e "s/XXX/$plot/;" dambreak_movie_plot.tex > $folder/frame-$t.tex
         done
