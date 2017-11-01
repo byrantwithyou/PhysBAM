@@ -1,0 +1,42 @@
+\documentclass[tikz,crop,border=0pt]{standalone}
+\usepackage{pgfplots}
+
+\pgfmathdeclarefunction{lg10}{1}{%
+    \pgfmathparse{ln(#1)/ln(10)}%
+}
+
+\newcommand{\dbplot}[1]{
+\begin{tikzpicture}
+\begin{axis}[
+    enlargelimits=false,
+    xlabel={X},
+    ylabel={Y},
+    xmin=0,
+    xmax=1,
+    ymin=0,
+    ymax=1,
+    colormap/jet,
+    colorbar horizontal,
+    colorbar style={
+        xticklabel=\pgfmathparse{10^\tick}\pgfmathprintnumber\pgfmathresult,
+        xticklabel style={font=\tiny,rotate=45,anchor=east}
+    },
+    tick scale binop=\times,
+    scale ticks above exponent=2,
+    y tick label style={
+        /pgf/number format/.cd,
+            fixed,
+            fixed zerofill,
+            precision=2,
+        /tikz/.cd
+    }
+]
+    \addplot[scatter,scatter src=explicit,point meta min=-4,point meta max=-0.1,only marks,mark options={mark size=0.5}] table[x=x,y=y,meta expr=lg10(\thisrow{vort})]{#1.txt};
+\end{axis}
+\end{tikzpicture}
+}
+
+\begin{document}
+\pgfplotsset{width=10cm,height=8cm,compat=1.13}
+XXX
+\end{document}

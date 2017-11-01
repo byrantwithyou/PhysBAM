@@ -14,6 +14,11 @@ HI=192
 SKIP=32
 RES=96
 
+MOVIE_RES=64
+FRAME_LO=500
+FRAME_HI=600
+FRAME_SKIP=25
+
 if [ "X$FULL" = "X1" ] ; then
     rm -rf $NAME
     mkdir -p $NAME
@@ -22,7 +27,7 @@ if [ "X$FULL" = "X1" ] ; then
             dt=`perl -e "print (1.0/$r)"`
             DT="-max_dt $dt -min_dt $dt"
             PVORT=""
-            if [ "X$r" = "X$RES" ]; then
+            if [ "X$r" = "X$MOVIE_RES" ]; then
                 PVORT="-particle_vort"
             fi
             echo $ARGS $DT $PVORT -no_affine ${opt[$o]} -resolution $r -dump_modes_freq $r -o $NAME/pic-${opt_name[$o]}-$r
@@ -37,6 +42,32 @@ for s in pic apic flip ; do
         for o in `seq 0 $((${#opt[@]}-1))` ; do
             ./dambreak_parse_data.pl < $NAME/$s-${opt_name[$o]}-$r/common/log.txt > $NAME/$s-${opt_name[$o]}-$r/norms.txt
         done
+    done
+done
+
+for s in pic apic flip ; do
+    for o in ${opt_name[@]} ; do
+        folder=$NAME/movie-$s-$o-$MOVIE_RES
+        mkdir -p $folder
+        for t in `seq $FRAME_LO $FRAME_SKIP $FRAME_HI` ; do
+            plot="\\\\dbplot{..\\/$s-$o-$MOVIE_RES\\/pvort-$t}\\n"
+            sed -e "s/XXX/$plot/;" dambreak_movie_plot.tex > $folder/frame-$t.tex
+        done
+        cat <<EOF > $folder/SConstruct
+import os
+import re
+env=Environment(ENV = os.environ)
+env['PSSUFFIX']=".eps"
+r=re.compile(".*\.tex$")
+for f in [x for x in os.listdir(".") if r.match(x)]:
+    t=env.DVI(f)
+    env.PostScript(t)
+    env.PDF(t)
+EOF
+        (
+            cd $folder
+            scons -j 8
+        )
     done
 done
 
