@@ -413,11 +413,19 @@ Dump_Image(const std::string& file,const ARRAY<T,VECTOR<int,d> >& ke)
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Energy_Vorticity_Analysis() const
 {
+    static int id=-1;
+    id++;
     T pe_particle=0;
     for(int p=0;p<particles.X.m;p++){
         if(!particles.valid(p)) continue;
         pe_particle-=particles.mass(p)*this->gravity.Dot(particles.X(p));}
 
+    if(particle_vort){
+        std::ofstream fout(LOG::sprintf("%s/pvort-%i.txt",output_directory,id).c_str());
+        fout<<"vort x y\n";
+        for(int p=0;p<particles.X.m;p++){
+            if(!particles.valid(p)) continue;
+            fout<<particles.vort(p)<<" "<<particles.X(p)[0]<<" "<<particles.X(p)[1]<<"\n";}}
     LOG::printf("ke grid %P  ke particle %P\n",
         this->Total_Grid_Kinetic_Energy(),
         this->Total_Particle_Kinetic_Energy());
