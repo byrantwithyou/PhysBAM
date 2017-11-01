@@ -1609,46 +1609,55 @@ Invalidate_Particle(int p)
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Move_Particles()
 {
-    auto Clip=[this](int p,int data=0)
-        {
-            for(int i=0;i<TV::m;i++){
-                T &x=example.particles.X(p)(i),a=example.grid.domain.min_corner(i),b=example.grid.domain.max_corner(i);
-                if(x<a){
-                    typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.bc_type(2*i);
-                    bool wall=bc_type==example.BC_SLIP||bc_type==example.BC_NOSLIP;
-                    if(bc_type==example.BC_PERIODIC) x=wrap(x,a,b);
-                    else if(bc_type==example.BC_FREE) Invalidate_Particle(p);
-                    else if(example.clamp_particles && wall) x=a;}
-                if(x>b){
-                    typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.bc_type(2*i+1);
-                    bool wall=bc_type==example.BC_SLIP||bc_type==example.BC_NOSLIP;
-                    if(bc_type==example.BC_PERIODIC) x=wrap(x,a,b);
-                    else if(bc_type==example.BC_FREE) Invalidate_Particle(p);
-                    else if(example.clamp_particles && wall) x=b;}}
-        };
+    TV wall[2]={example.grid.domain.min_corner,example.grid.domain.max_corner};
+    ARRAY<ARRAY<int> > invalidate_lists(example.threads);
+#pragma omp parallel
+    {
+        ARRAY<int> invalidate_list;
 
-    if(example.rk_particle_order){
-        LINEAR_INTERPOLATION_MAC<TV,T> li(example.grid);
-#pragma omp parallel for
-        for(int p=0;p<example.particles.X.m;p++)
-            if(example.particles.valid(p)){
-                const PHASE& ph=example.phases(example.particles.phase(p));
-                for(RUNGEKUTTA<TV> rk(example.particles.X(p),example.rk_particle_order,example.dt,0);rk.Valid();rk.Next())
-                    example.particles.X(p)+=example.dt*li.Clamped_To_Array(ph.velocity,example.particles.X(p));
-                Clip(p);}}
-    else if(example.flip){
-        for(PHASE_ID i(0);i<example.phases.m;i++){
-            PHASE& ph=example.phases(i);
-            ph.gather_scatter->template Gather<int>(false,
-                [this,&ph](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,int data)
-                {example.particles.X(p)(it.Index().axis)+=example.dt*it.Weight()*ph.velocity(it.Index());},
-                Clip);}}
-    else{
-#pragma omp parallel for
-        for(int p=0;p<example.particles.X.m;p++)
-            if(example.particles.valid(p)){
-                example.particles.X(p)+=example.dt*example.particles.V(p);
-                Clip(p);}}
+        auto Clip=[this,wall,&invalidate_list](int p,int data=0)
+            {
+                TV X=example.particles.X(p);
+                for(int i=0;i<TV::m;i++){
+                    int side;
+                    if(X(i)<wall[0](i)) side=0;
+                    else if(X(i)>wall[1](i)) side=1;
+                    else continue;
+                    typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.bc_type(2*i+side);
+                    if(bc_type==example.BC_PERIODIC) X(i)=wrap(X(i),wall[0](i),wall[1](i));
+                    else if(bc_type==example.BC_FREE) invalidate_list.Append(p);
+                    else if(example.clamp_particles) X(i)=wall[side](i);}
+            };
+        
+        if(example.rk_particle_order){
+            LINEAR_INTERPOLATION_MAC<TV,T> li(example.grid);
+#pragma omp for
+            for(int p=0;p<example.particles.X.m;p++)
+                if(example.particles.valid(p)){
+                    const PHASE& ph=example.phases(example.particles.phase(p));
+                    for(RUNGEKUTTA<TV> rk(example.particles.X(p),example.rk_particle_order,example.dt,0);rk.Valid();rk.Next())
+                        example.particles.X(p)+=example.dt*li.Clamped_To_Array(ph.velocity,example.particles.X(p));
+                    Clip(p);}}
+        else if(example.flip){
+            for(PHASE_ID i(0);i<example.phases.m;i++){
+                PHASE& ph=example.phases(i);
+                ph.gather_scatter->template Gather<int>(false,
+                    [this,&ph](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,int data)
+                    {example.particles.X(p)(it.Index().axis)+=example.dt*it.Weight()*ph.velocity(it.Index());},
+                    Clip);}}
+        else{
+#pragma omp for
+            for(int p=0;p<example.particles.X.m;p++)
+                if(example.particles.valid(p)){
+                    example.particles.X(p)+=example.dt*example.particles.V(p);
+                    Clip(p);}}
+
+        invalidate_lists(omp_get_thread_num()).Exchange(invalidate_list);
+    }
+
+    for(int t=0;t<invalidate_lists.m;t++)
+        for(int i=0;i<invalidate_lists(t).m;i++)
+            Invalidate_Particle(invalidate_lists(t)(i));
 }
 //#####################################################################
 namespace PhysBAM{
