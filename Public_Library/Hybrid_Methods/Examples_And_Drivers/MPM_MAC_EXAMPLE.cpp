@@ -164,8 +164,7 @@ Total_Particle_Vorticity() const
 {
     struct HELPER
     {
-        T sqr_vort;
-        HELPER():sqr_vort(0){}
+        decltype(TV().Cross(TV())) vort;
     };
 
     T l2_vort=0;
@@ -175,13 +174,12 @@ Total_Particle_Vorticity() const
             [](int p,HELPER& h){h=HELPER();},
             [this,&ph](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,HELPER& h)
             {
-                h.sqr_vort+=it.Gradient().Cross(TV::Axis_Vector(it.axis)*ph.velocity(it.Index())).Magnitude_Squared();
+                h.vort+=it.Gradient().Cross(TV::Axis_Vector(it.axis)*ph.velocity(it.Index()));
             },
             [this,&l2_vort](int p,HELPER& h)
             {
-                T v=0.5*particles.mass(p)*h.sqr_vort;
-                if(particle_vort) particles.vort(p)=v;
-                l2_vort+=v;
+                if(particle_vort) particles.vort(p)=h.vort(0);
+                l2_vort+=0.5*particles.mass(p)*h.vort.Magnitude_Squared();
             });}
     return l2_vort;
 }
