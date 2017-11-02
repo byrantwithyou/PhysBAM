@@ -4,6 +4,7 @@
 //#####################################################################
 
 #include <Core/Data_Structures/KD_TREE.h>
+#include <Core/Data_Structures/UNION_FIND.h>
 #include <Core/Matrices/DIAGONAL_MATRIX.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Core/Vectors/VECTOR.h>
@@ -131,11 +132,10 @@ void Orient_Normals(ARRAY<TV2>& curvatures,ARRAY<TV>& eig0,ARRAY<TV>& eig1,ARRAY
     ARRAY<TRIPLE<T,int,int> > edges;
     ARRAY<int> points_found;
     ARRAY<T> distance_squared_of_points_found;
-    for(int i=0;i<ts.particles.X.m;i++)
+    for(int i=0;i<X.m;i++)
     {
-        TV X=ts.particles.X(i);
-        kd_tree.Find_Points_Within_Radius(X,sqr(seed_dist),points_found,
-            distance_squared_of_points_found,ts.particles.X);
+        kd_tree.Find_Points_Within_Radius(X(i),sqr(dist),points_found,
+            distance_squared_of_points_found,X);
         for(int j=0;j<points_found.m;j++){
             int p=points_found(j);
             edges.Append({abs(normals(i).Dot(normals(p))),i,p});}
@@ -143,11 +143,11 @@ void Orient_Normals(ARRAY<TV2>& curvatures,ARRAY<TV>& eig0,ARRAY<TV>& eig1,ARRAY
         distance_squared_of_points_found.Remove_All();
     }
     edges.Sort([](const auto& a,const auto& b){return a.x>b.x;});
-    UNION_FIND<> uf(ts.particles.X.m);
-    ARRAY<ARRAY<int> > adj(ts.particles.X.m);
+    UNION_FIND<> uf(X.m);
+    ARRAY<ARRAY<int> > adj(X.m);
     for(int i=0;i<edges.m;i++){
         if(uf.Find(edges(i).y)==uf.Find(edges(i).z)) continue;
-        uf.Unite(edges(i).y,edges(i).z);
+        uf.Union(edges(i).y,edges(i).z);
         adj(edges(i).y).Append(edges(i).z);
         adj(edges(i).z).Append(edges(i).y);}
 }
@@ -194,11 +194,9 @@ int main(int argc, char* argv[])
         ARRAY<int> points_found;
         ARRAY<T> distance_squared_of_points_found;
         ARRAY<int> sample_points;
-        Compute_Samples();
-        Compute_Normals();
-        Orient_Normals();
-        
-        
+        Compute_Samples(sample_points,ts.particles.X,kd_tree,seed_dist);
+        Compute_Normals(normals,ts.particles.X,kd_tree,min_dist);
+        Orient_Normals(curvatures,eig0,eig1,ts.particles.X,kd_tree,normals,min_dist);
         
         ARRAY<T> dists(sample_points.m);
         for(int i=0;i<sample_points.m;i++)
