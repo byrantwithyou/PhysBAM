@@ -4,15 +4,17 @@ NAME=vort-dambreak
 
 FULL=1 # Set to 1 for a full rebuild; 0 to skip rerunning the simulations
 
-ARGS="../mpm_mac 25 -last_frame 10 -frame_dt 1 -clamp -mu 0 -scale_mass 3 -analyze_energy_vort -extrap p"
+ARGS="../mpm_mac 25 -frame_dt 1 -clamp -mu 0 -scale_mass 3 -analyze_energy_vort -extrap p"
 
 opt=("" "-regular_seeding" "-order 3" "-regular_seeding -order 3")
 opt_name=("default" "regular" "default-cubic" "regular-cubic")
 
 LO=32
-HI=192
+HI=96
 SKIP=32
 RES=96
+T=10
+MOVIE_T=15
 
 MOVIE_RES=64
 FRAME_SKIP=150
@@ -25,12 +27,15 @@ if [ "X$FULL" = "X1" ] ; then
             dt=`perl -e "print (1.0/$r)"`
             DT="-max_dt $dt -min_dt $dt"
             PVORT=""
+            last_frame=$T
             if [ "X$r" = "X$MOVIE_RES" ]; then
+                last_frame=$MOVIE_T
                 PVORT="-particle_vort"
             fi
-            echo $ARGS $DT $PVORT -no_affine ${opt[$o]} -resolution $r -dump_modes_freq $r -o $NAME/pic-${opt_name[$o]}-$r
-            echo $ARGS $DT $PVORT -affine ${opt[$o]} -resolution $r -dump_modes_freq $r -o $NAME/apic-${opt_name[$o]}-$r
-            echo $ARGS $DT $PVORT -no_affine ${opt[$o]} -flip 1 -resolution $r -dump_modes_freq $r -o $NAME/flip-${opt_name[$o]}-$r
+            LF="-last_frame $last_frame"
+            echo $ARGS $DT $LF $PVORT -no_affine ${opt[$o]} -resolution $r -dump_modes_freq $r -o $NAME/pic-${opt_name[$o]}-$r
+            echo $ARGS $DT $LF $PVORT -affine ${opt[$o]} -resolution $r -dump_modes_freq $r -o $NAME/apic-${opt_name[$o]}-$r
+            echo $ARGS $DT $LF $PVORT -no_affine ${opt[$o]} -flip 1 -resolution $r -dump_modes_freq $r -o $NAME/flip-${opt_name[$o]}-$r
         done
     done | xargs -P 16 -n 1 -d '\n' bash -c
 fi
@@ -68,6 +73,39 @@ EOF
             scons -j 8
         )
     done
+done
+
+for s in apic pic flip ; do
+    o="default"
+    folder=$NAME/fullmovie-$s-$o-$MOVIE_RES
+    mkdir -p $folder
+    last=`perl -e "print ($MOVIE_T*$MOVIE_RES)"`
+    for t in `seq 0 $last` ; do
+        plot="\\\\dbplot{..\\/$s-$o-$MOVIE_RES\\/pvort-$t}\\n"
+        sed -e "s/XXX/$plot/;" dambreak_movie_plot.tex > $folder/frame-$(printf "%03d" $t).tex
+    done
+    cat <<EOF > $folder/SConstruct
+import os
+import re
+env=Environment(ENV = os.environ)
+r=re.compile(".*\.tex$")
+for f in [x for x in os.listdir(".") if r.match(x)]:
+    t=env.DVI(f)
+    env.PDF(t)
+EOF
+        (
+            cd $folder
+            scons -j 16
+        )
+
+    (
+        cd $folder
+        for t in `seq 0 $last` ; do
+            tname=$(printf "%03d" $t)
+            echo convert -density 300 -quality 100 -flatten -sharpen 0x1.0 -scale 1024x768 frame-$tname.pdf frame-$tname.png
+        done | xargs -P 16 -n 1 -d '\n' bash -c
+        ffmpeg -y -i "frame-%03d.png" -r 30 -c:v libx264 -crf 20 -pix_fmt yuv420p movie.mov
+    )
 done
 
 cp dambreak_movie_colorbar.tex $NAME/movie-colorbar.tex
