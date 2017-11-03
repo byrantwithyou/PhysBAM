@@ -261,7 +261,7 @@ Initialize()
             Set_Phases({density});
             particles.Store_Phase(true);
             Set_Grid(RANGE<TV>(TV(-2,-2),TV(14,2))*m,TV_INT(4,1));
-            SPHERE<TV> sphere(TV(),m);
+            SPHERE<TV> sphere(TV(),.25*m);
             auto shape=Intersect(Make_IO(grid.domain),Invert(Make_IO(sphere)));
             Seed_Particles(*shape,[=](const TV& X){return TV(velocity,0);},0,density,particles_per_cell);
             delete shape;
