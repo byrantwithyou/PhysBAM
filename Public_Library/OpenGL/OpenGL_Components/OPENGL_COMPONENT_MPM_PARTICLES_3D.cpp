@@ -107,6 +107,7 @@ Display() const
     ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
     ARRAY_VIEW<T>* sizes=particles.template Get_Array<T>("display_size");
     ARRAY_VIEW<int>* phase=particles.template Get_Array<int>("phase");
+    ARRAY_VIEW<bool>* valid_p=particles.template Get_Array<bool>("valid");
 
     if(draw_velocities && mode!=GL_SELECT){
         glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);
@@ -149,6 +150,7 @@ Display() const
 
     if(mode==GL_SELECT) glPushName(0);
     for(int i=0;i<particles.X.m;i++){
+        if(valid_p && !(*valid_p)(i)) continue;
         if(mode==GL_SELECT) glLoadName(i);
 
         if(draw_phases && phase) color_map->Lookup((*phase)(i)).Send_To_GL_Pipeline();

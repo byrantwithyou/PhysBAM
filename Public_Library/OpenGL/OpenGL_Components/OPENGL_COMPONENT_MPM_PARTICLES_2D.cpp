@@ -107,6 +107,7 @@ Display() const
     ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
     ARRAY_VIEW<MATRIX<T,TV::m> >* B=particles.template Get_Array<MATRIX<T,TV::m> >("B");
     if(!B) B=particles.template Get_Array<MATRIX<T,TV::m> >("C");
+    ARRAY_VIEW<bool>* valid_p=particles.template Get_Array<bool>("valid");
 
     ARRAY_VIEW<PHASE_ID>* phase=particles.template Get_Array<PHASE_ID>("phase");
 
@@ -150,6 +151,7 @@ Display() const
 
     if(mode==GL_SELECT) glPushName(0);
     for(int i=0;i<particles.X.m;i++){
+        if(valid_p && !(*valid_p)(i)) continue;
         if(mode==GL_SELECT) glLoadName(i);
 
         if(draw_phases && phase) color_map->Lookup(Value((*phase)(i))).Send_To_GL_Pipeline();
