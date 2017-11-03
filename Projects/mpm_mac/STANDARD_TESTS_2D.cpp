@@ -263,7 +263,7 @@ Initialize()
             Set_Grid(RANGE<TV>(TV(-2,-2),TV(14,2))*m,TV_INT(4,1));
             SPHERE<TV> sphere(TV(),m);
             auto shape=Intersect(Make_IO(grid.domain),Invert(Make_IO(sphere)));
-            Seed_Particles(*shape,0,0,density,particles_per_cell);
+            Seed_Particles(*shape,[=](const TV& X){return TV(velocity,0);},0,density,particles_per_cell);
             delete shape;
             bc_type(1)=BC_FREE;
             bc_velocity(0)=[=](const TV& X,int axis,PHASE_ID pid,T time){return axis==0?velocity:0;};
