@@ -42,20 +42,20 @@ public:
     
     struct PHASE
     {
-        PHASE_ID id;
+        PHASE_ID id=PHASE_ID();
         ARRAY<T,FACE_INDEX<TV::m> > mass,volume;
         ARRAY<T,FACE_INDEX<TV::m> > velocity,velocity_save;
 
         ARRAY<int> valid_flat_indices;
         ARRAY<FACE_INDEX<TV::m> > valid_indices;
         ARRAY<int> simulated_particles;
-        GATHER_SCATTER<TV>* gather_scatter;
-        T density; // if not using per-particle mass
-        T viscosity;
+        GATHER_SCATTER<TV>* gather_scatter=0;
+        T density=0; // if not using per-particle mass
+        T viscosity=0;
 
         // signed distance field & level sets
         ARRAY<T,TV_INT> phi;
-        LEVELSET<TV>* levelset;
+        LEVELSET<TV>* levelset=0;
 
         PHASE();
         PHASE(const PHASE&) = delete;

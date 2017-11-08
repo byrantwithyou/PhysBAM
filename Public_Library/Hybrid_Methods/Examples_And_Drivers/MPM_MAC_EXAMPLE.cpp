@@ -59,7 +59,6 @@ template<class TV> MPM_MAC_EXAMPLE<TV>::
 //#####################################################################
 template<class TV> MPM_MAC_EXAMPLE<TV>::PHASE::
 PHASE()
-    :gather_scatter(0),levelset(0)
 {
 }
 //#####################################################################
