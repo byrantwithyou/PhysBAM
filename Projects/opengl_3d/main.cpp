@@ -419,7 +419,6 @@ Initialize_Components_And_Key_Bindings()
         Add_Component(component,"Mpm particles",'m',BASIC_VISUALIZATION<T>::SELECTABLE|BASIC_VISUALIZATION<T>::OWNED);
         opengl_world.Append_Bind_Key('W',component->viewer_callbacks.Get("toggle_draw_velocities"));
         opengl_world.Append_Bind_Key('y',component->viewer_callbacks.Get("toggle_draw_phases"));
-        opengl_world.Append_Bind_Key('q',component->viewer_callbacks.Get("show_colored_wireframe"));
         opengl_world.Append_Bind_Key('f',component->viewer_callbacks.Get("toggle_F"));
         opengl_world.Append_Bind_Key('b',component->viewer_callbacks.Get("toggle_B"));
         opengl_world.Append_Bind_Key('=',component->viewer_callbacks.Get("increase_vector_size"));
