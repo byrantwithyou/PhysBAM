@@ -66,6 +66,13 @@ Initialize()
             Seed_Particles(sphere,0,[=](const TV&){return MATRIX<T,3>();},
                 density,particles_per_cell);
         } break;
+        case 4:{ // Dam break
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            T density=unit_rho*scale_mass;
+            Set_Phases({density});
+            Seed_Particles(RANGE<TV>(TV(.0,.0,.0),TV(m/3,2*m/3,m)),0,0,density,particles_per_cell);
+            gravity=TV(0,-1,0)*m/sqr(s);
+        } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     if(mu){
