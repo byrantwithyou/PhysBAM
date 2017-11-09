@@ -40,6 +40,7 @@ public:
     using BASE::write_output_files;using BASE::read_output_files;using BASE::dump_collision_objects;
     using BASE::extra_T;using BASE::extra_int;using BASE::phases;using BASE::mu;using BASE::Set_Phases;
     using BASE::use_viscosity;
+    using BASE::Set_Grid;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();

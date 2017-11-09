@@ -37,7 +37,7 @@ Initialize()
     switch(test_number)
     {
         case 1:{ // rotating sphere
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
             SPHERE<TV> sphere(TV(.5,.5,.5)*m,.3*m);
             VECTOR<T,3> angular_velocity(TV(0.4,0,0)/s);
             T density=2*unit_rho*scale_mass;
@@ -51,7 +51,7 @@ Initialize()
             particles.V-=dV;
         } break;
         case 2:{ // Oscillating sphere
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
             SPHERE<TV> sphere(TV(.5,.5,.5)*m,.3*m);
             T density=2*unit_rho*scale_mass;
             Set_Phases({density});
@@ -59,7 +59,7 @@ Initialize()
                 density,particles_per_cell);
         } break;
         case 3:{ // Freefall sphere
-            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
             SPHERE<TV> sphere(TV(.5,.5,.5)*m,.3*m);
             T density=2*unit_rho*scale_mass;
             Set_Phases({density});
