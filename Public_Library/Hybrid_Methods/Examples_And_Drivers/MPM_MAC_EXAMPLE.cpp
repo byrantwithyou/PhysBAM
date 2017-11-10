@@ -29,7 +29,7 @@ MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type)
     last_frame(100),write_substeps_level(-1),substeps_delay_frame(-1),
     output_directory("output"),data_directory("../../Public_Data"),use_test_output(false),
     restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),
-    only_write_particles(false),cfl(1),
+    only_write_particles(false),only_log(false),cfl(1),
     solver_tolerance(std::numeric_limits<T>::epsilon()*10),solver_iterations(1000),
     threads(1),use_particle_volumes(false),use_constant_density(true),
     move_mass_inside(false),move_mass_inside_nearest(false),
@@ -98,6 +98,9 @@ Initialize(const GRID<TV>& grid,const VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m>& 
 template<class TV> void MPM_MAC_EXAMPLE<TV>::
 Write_Output_Files(const int frame)
 {
+    if(only_log){
+        debug_particles.Clear_Debug_Particles();
+        return;}
     std::string f=LOG::sprintf("%d",frame);
     if(this->use_test_output){
         std::string file=LOG::sprintf("%s/%s-%03d.txt",output_directory.c_str(),test_output_prefix.c_str(),frame);

@@ -44,6 +44,16 @@ Store_Debug_Particles(DEBUG_PARTICLES<TV>* particle)
     return tmp;
 }
 //#####################################################################
+// Function Clear_Debug_Particles
+//#####################################################################
+template<class TV> void DEBUG_PARTICLES<TV>::
+Clear_Debug_Particles() const
+{
+    debug_particles.Delete_All_Elements();
+    debug_objects.Remove_All();
+    debug_text.Remove_All();
+}
+//#####################################################################
 // Function Write_Debug_Particles
 //#####################################################################
 template<class TV> void DEBUG_PARTICLES<TV>::
@@ -51,9 +61,7 @@ Write_Debug_Particles(STREAM_TYPE stream_type,const std::string& output_director
 {
     Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),frame));
     Write_To_File(stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles,debug_objects,debug_text);
-    debug_particles.Delete_All_Elements();
-    debug_objects.Remove_All();
-    debug_text.Remove_All();
+    Clear_Debug_Particles();
 }
 //#####################################################################
 // Function Add_Debug_Particle

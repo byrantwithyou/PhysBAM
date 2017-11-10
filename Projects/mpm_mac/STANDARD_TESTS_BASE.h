@@ -38,7 +38,7 @@ public:
     using BASE::collision_objects;using BASE::substeps_delay_frame;using BASE::output_directory;
     using BASE::restart;using BASE::dt;using BASE::time;using BASE::lag_Dp;
     using BASE::frame_dt;using BASE::min_dt;using BASE::max_dt;using BASE::ghost;
-    using BASE::use_affine;using BASE::only_write_particles;
+    using BASE::use_affine;using BASE::only_write_particles;using BASE::only_log;
     using BASE::cfl;using BASE::solver_tolerance;using BASE::solver_iterations;
     using BASE::threads;using BASE::weights;using BASE::stream_type;using BASE::Set_Weights;
     using BASE::Add_Collision_Object;using BASE::use_particle_volumes;using BASE::move_mass_inside;

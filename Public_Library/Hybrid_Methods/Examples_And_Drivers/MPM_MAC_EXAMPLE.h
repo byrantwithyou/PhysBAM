@@ -124,6 +124,7 @@ public:
     int restart;
     T dt,time,frame_dt,min_dt,max_dt;
     bool only_write_particles;
+    bool only_log;
 
     // parameters
     TV gravity;

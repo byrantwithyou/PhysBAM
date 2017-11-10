@@ -63,6 +63,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-affine",&use_affine,"Use affine PIC");
     parse_args.Add("-print_stats",&print_stats,"Print momentum/energy stats");
     parse_args.Add("-only_write_particles",&only_write_particles,"Only write particle data (ignore grid data, restart data etc)");
+    parse_args.Add("-only_log",&only_log,"Output log file only");
     parse_args.Add("-cfl",&cfl,"cfl","CFL number");
     parse_args.Add("-solver_tolerance",&solver_tolerance,"tol","Solver tolerance");
     parse_args.Add("-solver_iterations",&solver_iterations,"iter","Solver iterations");
