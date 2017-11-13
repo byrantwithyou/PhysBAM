@@ -99,7 +99,7 @@ public:
     return *this;}
 
     ARRAY& operator=(ARRAY&& array)
-    {base_pointer=array.base_pointer;buffer_size=array.buffer_size;
+    {delete[] base_pointer;base_pointer=array.base_pointer;buffer_size=array.buffer_size;
     m=array.m;array.base_pointer=0;return *this;}
 
     template<class T_ARRAY>
