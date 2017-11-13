@@ -50,8 +50,13 @@ template<class TV> MPM_MAC_EXAMPLE<TV>::
 {
     delete &particles;
     delete &debug_particles;
+    delete &projection_system;
+    delete &sol;
+    delete &rhs;
+    delete &periodic_boundary;
     for(int i=0;i<TV::m;i++) delete weights(i);
     collision_objects.Delete_Pointers_And_Clean_Memory();
+    av.Delete_Pointers_And_Clean_Memory();
     fluid_walls.Delete_Pointers_And_Clean_Memory();
 }
 //#####################################################################
