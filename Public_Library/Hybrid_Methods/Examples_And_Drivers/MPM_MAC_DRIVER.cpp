@@ -1617,16 +1617,16 @@ Move_Particles()
 
         auto Clip=[this,wall,&invalidate_list](int p,int data=0)
             {
-                TV X=example.particles.X(p);
                 for(int i=0;i<TV::m;i++){
+                    T& x=example.particles.X(p)(i);
                     int side;
-                    if(X(i)<wall[0](i)) side=0;
-                    else if(X(i)>wall[1](i)) side=1;
+                    if(x<wall[0](i)) side=0;
+                    else if(x>wall[1](i)) side=1;
                     else continue;
                     typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.bc_type(2*i+side);
-                    if(bc_type==example.BC_PERIODIC) X(i)=wrap(X(i),wall[0](i),wall[1](i));
+                    if(bc_type==example.BC_PERIODIC) x=wrap(x,wall[0](i),wall[1](i));
                     else if(bc_type==example.BC_FREE) invalidate_list.Append(p);
-                    else if(example.clamp_particles) X(i)=wall[side](i);}
+                    else if(example.clamp_particles) x=wall[side](i);}
             };
         
         if(example.rk_particle_order){
