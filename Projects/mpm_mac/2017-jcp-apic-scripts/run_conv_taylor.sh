@@ -2,13 +2,13 @@
 
 NAME=conv-taylor
 
-ARGS="../mpm_mac 16 -last_frame 1 -frame_dt 1 -mu 0 -scale_mass 3"
+ARGS="../mpm_mac 16 -last_frame 1 -frame_dt 1 -mu 0 -scale_mass 3 -only_log"
 
 FULL=1 # Set to 1 for a full rebuild; 0 to skip rerunning the simulations
 
 LO=32
 LO_REG_RES=64
-HI=256
+HI=512
 SKIP=8
 
 if [ "X$FULL" = "X1" ] ; then

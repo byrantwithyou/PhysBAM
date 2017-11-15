@@ -2,7 +2,7 @@
 
 NAME=conv-circle
 
-ARGS="../mpm_mac 23 -last_frame 1 -frame_dt 0.4 -mu 0 -scale_mass 3 -clamp"
+ARGS="../mpm_mac 23 -last_frame 1 -frame_dt 0.4 -mu 0 -scale_mass 3 -clamp -only_log"
 
 if [ ! -z $1 ]; then
     NAME=$NAME-$1
@@ -16,7 +16,7 @@ FULL=1 # Set to 1 for a full rebuild; 0 to skip rerunning the simulations
 
 LO=32
 LO_REG_RES=64
-HI=256
+HI=512
 SKIP=8
 
 if [ "X$FULL" = "X1" ] ; then
