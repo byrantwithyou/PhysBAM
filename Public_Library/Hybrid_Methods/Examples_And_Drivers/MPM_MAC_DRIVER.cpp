@@ -1641,7 +1641,7 @@ Move_Particles()
         else if(example.flip){
             for(PHASE_ID i(0);i<example.phases.m;i++){
                 PHASE& ph=example.phases(i);
-                ph.gather_scatter->template Gather<int>(false,
+                ph.gather_scatter->template Gather_Parallel<int>(false,
                     [this,&ph](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,int data)
                     {example.particles.X(p)(it.Index().axis)+=example.dt*it.Weight()*ph.velocity(it.Index());},
                     Clip);}}

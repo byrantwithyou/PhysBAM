@@ -51,28 +51,49 @@ public:
     void Scatter(bool want_gradient,Args&&... args)
     {
         if(threads>=2){
-            for(int pass=0;pass<partitions;++pass){
-#pragma omp parallel for
-                for(int i=0;i<threads;++i){
-                    DATA data((DATA()));
-                    int bin_id=i*partitions+pass;
-                    T_FACE_SCRATCH face_scratch;
-                    for(int k=0;k<bins(bin_id).m;k++){
-                        int p=bins(bin_id)(k);
-                        Helper(face_scratch,want_gradient,p,data,args...);}}}}
-        else{
-            T_FACE_SCRATCH face_scratch;
-            DATA data((DATA()));
-            for(int k=0;k<simulated_particles.m;k++){
-                int p=simulated_particles(k);
-                Helper(face_scratch,want_gradient,p,data,args...);}}
+#pragma omp parallel
+            Scatter_Parallel<DATA>(want_gradient,args...);}
+        else Scatter_Serial<DATA>(want_gradient,args...);
+    }
+
+    template<class DATA,class... Args>
+    void Scatter_Serial(bool want_gradient,Args&&... args)
+    {
+        T_FACE_SCRATCH face_scratch;
+        DATA data((DATA()));
+        for(int k=0;k<simulated_particles.m;k++){
+            int p=simulated_particles(k);
+            Helper(face_scratch,want_gradient,p,data,args...);}
+    }
+
+    template<class DATA,class... Args>
+    void Scatter_Parallel(bool want_gradient,Args&&... args)
+    {
+        for(int pass=0;pass<partitions;++pass){
+#pragma omp for
+            for(int i=0;i<threads;++i){
+                DATA data((DATA()));
+                int bin_id=i*partitions+pass;
+                T_FACE_SCRATCH face_scratch;
+                for(int k=0;k<bins(bin_id).m;k++){
+                    int p=bins(bin_id)(k);
+                    Helper(face_scratch,want_gradient,p,data,args...);}}
+#pragma omp barrier
+        }
     }
 
     // Safe to write to particle data
     template<class DATA,class... Args>
     void Gather(bool want_gradient,Args&&... args)
     {
-#pragma omp parallel for
+#pragma omp parallel
+        Gather_Parallel<DATA>(want_gradient,args...);
+    }
+
+    template<class DATA,class... Args>
+    void Gather_Parallel(bool want_gradient,Args&&... args)
+    {
+#pragma omp for
         for(int tid=0;tid<threads;tid++){
             int a=tid*simulated_particles.m/threads;
             int b=(tid+1)*simulated_particles.m/threads;
