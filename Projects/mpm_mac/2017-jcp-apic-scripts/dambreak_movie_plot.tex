@@ -19,7 +19,7 @@
         /tikz/.cd
     }
 ]
-    \addplot[scatter,scatter src=explicit,point meta min=-0.5,point meta max=2,only marks,mark options={mark size=0.5pt}] table[x=x,y=y,meta=vort]{#1.txt};
+    \addplot[scatter,scatter src=explicit,point meta min=-2,point meta max=2,only marks,mark options={mark size=0.5pt}] table[x=x,y=y,meta=vort]{#1.txt};
 \end{axis}
 \end{tikzpicture}
 }
