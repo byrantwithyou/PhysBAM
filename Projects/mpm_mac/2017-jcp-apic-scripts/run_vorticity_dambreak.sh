@@ -33,9 +33,9 @@ if [ "X$FULL" = "X1" ] ; then
                 PVORT="-particle_vort"
             fi
             LF="-last_frame $last_frame"
-            echo $ARGS $DT $LF $PVORT -no_affine ${opt[$o]} -resolution $r -dump_modes_freq $r -o $NAME/pic-${opt_name[$o]}-$r
-            echo $ARGS $DT $LF $PVORT -affine ${opt[$o]} -resolution $r -dump_modes_freq $r -o $NAME/apic-${opt_name[$o]}-$r
-            echo $ARGS $DT $LF $PVORT -no_affine ${opt[$o]} -flip 1 -resolution $r -dump_modes_freq $r -o $NAME/flip-${opt_name[$o]}-$r
+            echo $ARGS $DT $LF $PVORT -no_affine ${opt[$o]} -resolution $r -o $NAME/pic-${opt_name[$o]}-$r
+            echo $ARGS $DT $LF $PVORT -affine ${opt[$o]} -resolution $r -o $NAME/apic-${opt_name[$o]}-$r
+            echo $ARGS $DT $LF $PVORT -no_affine ${opt[$o]} -flip 1 -resolution $r -o $NAME/flip-${opt_name[$o]}-$r
         done
     done | xargs -P 16 -n 1 -d '\n' bash -c
 fi
