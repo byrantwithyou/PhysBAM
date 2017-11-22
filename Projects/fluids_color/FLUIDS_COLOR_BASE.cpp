@@ -312,6 +312,24 @@ Initialize_Common_Example()
                 use_p_null_mode=true;
             }
             break;
+        case 16:
+            grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
+            {
+                T x0=(T).05,x1=(T).95;
+                ANALYTIC_LEVELSET_SIGNED<TV>* ab=new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),x0,DIRICHLET,0);
+                ANALYTIC_LEVELSET<TV>* cd=new ANALYTIC_LEVELSET_CONST<TV>(-Large_Phi(),DIRICHLET,DIRICHLET);
+                analytic_levelset=(new ANALYTIC_LEVELSET_NEST<TV>(new ANALYTIC_LEVELSET_SPHERE<TV>(TV(),x1,0,1)))->Add(ab)->Add(cd);
+                Add_Velocity([x0,x1](auto X,auto t)
+                    {
+                        if(Value(X.Magnitude())<(x0+x1)/2) return TV::Axis_Vector(0);
+                        return TV();
+                    });
+                Add_Pressure([](auto X,auto t){return 0;});
+                analytic_initial_only=true;
+//                use_discontinuous_velocity=true;
+                use_p_null_mode=true;
+            }
+            break;
         case 17:
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
             {
@@ -929,7 +947,7 @@ template<class TV> TV FLUIDS_COLOR_BASE<TV>::
 Velocity_Jump(const TV& X,int color0,int color1,T time)
 {
     Add_Debug_Particle(X,VECTOR<T,3>(1,0,0));
-    if(analytic_velocity.m && analytic_levelset && !analytic_initial_only){
+    if(analytic_velocity.m && analytic_levelset && (true || !analytic_initial_only)){
         TV jump_u=analytic_velocity(color1)->v(X/m,time/s);
         if(color0>=0) jump_u-=analytic_velocity(color0)->v(X/m,time/s);
         return jump_u*m/s;}
