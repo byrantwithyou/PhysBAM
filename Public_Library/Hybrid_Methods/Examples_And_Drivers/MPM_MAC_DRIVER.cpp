@@ -1305,6 +1305,9 @@ Reflect_Boundary_Mass_Momentum(PHASE& ph) const
             moment_out=mv_out_old+2*bc*m_in-mv_in_old;
             m_in+=m_out;
             m_out=m_in;
+            T& vol_in=ph.volume(in),&vol_out=ph.volume(out);
+            vol_in+=vol_out;
+            vol_out=vol_in;
         },
         [&](const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side)
         {
@@ -1314,6 +1317,9 @@ Reflect_Boundary_Mass_Momentum(PHASE& ph) const
             T& m_in=ph.mass(in),&m_out=ph.mass(out);
             m_in+=m_out;
             m_out=m_in;
+            T& vol_in=ph.volume(in),&vol_out=ph.volume(out);
+            vol_in+=vol_out;
+            vol_out=vol_in;
         },
         RF::ghost|RF::duplicate_corners);
 }
