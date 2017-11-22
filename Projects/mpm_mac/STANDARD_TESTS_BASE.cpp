@@ -171,7 +171,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     if(print_stats){
         auto stats_p=[=](const char* name){Add_Callbacks(false,name,[=](){Print_Particle_Stats(name);});};
         auto stats_g=[=](const char* name){Add_Callbacks(false,name,[=](){Print_Grid_Stats(name);});};
-        stats_p("simulated-particles");
+        stats_p("update-weights");
         stats_g("p2g");
         stats_g("forces");
         stats_g("projection");
