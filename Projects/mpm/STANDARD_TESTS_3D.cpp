@@ -25,6 +25,7 @@
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/OPENSUBDIV_SURFACE_CURVATURE_FORCE.h>
 #include <Deformables/Forces/SURFACE_TENSION_FORCE_3D.h>
+#include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_SPHERE.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
@@ -332,7 +333,7 @@ Initialize()
             TRIANGULATED_SURFACE<T>& new_sc=Seed_Lagrangian_Particles(*surface,0,0,density,true);
             SURFACE_TENSION_FORCE_3D<TV>* stf=new SURFACE_TENSION_FORCE_3D<TV>(new_sc,(T).1);
             Add_Force(*stf);
-            this->deformable_body_collection.Test_Forces(0);
+            this->solid_body_collection.deformable_body_collection.Test_Forces(0);
             Add_Neo_Hookean(31.685*unit_p*scale_E,0.44022); //solve({E/(2*(1+r))=11,E*r/((1+r)*(1-2*r))=81},{E,r});
         } break;
         case 14:{ // drop an oldroyd-b to a ground SCA energy
@@ -356,7 +357,7 @@ Initialize()
                 {
                     if(time>=10/24.0*s){
                         lagrangian_forces.Delete_Pointers_And_Clean_Memory();
-                        this->deformable_body_collection.structures.Delete_Pointers_And_Clean_Memory();
+                        this->solid_body_collection.deformable_body_collection.structures.Delete_Pointers_And_Clean_Memory();
                         RANGE<TV> ym(TV(-5,0,-5)*m,TV(5,.1+(time/s-10/24.0)*.5,5)*m);
                         Add_Penalty_Collision_Object(ym);
                         Add_Gravity(m/(s*s)*TV(0,-9.8,0));}
@@ -444,7 +445,7 @@ Initialize()
                         PHYSBAM_ASSERT(!state->cylinder);
                         delete lagrangian_forces(lagrangian_forces.m-1);
                         lagrangian_forces.Remove_End();
-                        PHYSBAM_ASSERT(this->deformable_body_collection.structures.m==0);
+                        PHYSBAM_ASSERT(this->solid_body_collection.deformable_body_collection.structures.m==0);
                         LOG::cout<<"Building levelset for the cylinder stir..."<<std::endl;
                         if(state->levelset1) delete state->levelset1;
                         LOG::cout<<"Deleted old levelset."<<std::endl;
@@ -469,7 +470,7 @@ Initialize()
                         PHYSBAM_ASSERT(!state->levelset1);
                         delete lagrangian_forces(lagrangian_forces.m-1);
                         lagrangian_forces.Remove_End();
-                        PHYSBAM_ASSERT(this->deformable_body_collection.structures.m==0);
+                        PHYSBAM_ASSERT(this->solid_body_collection.deformable_body_collection.structures.m==0);
                         LOG::cout<<"Adding new analytic cylinder stirer..."<<std::endl;
                         ROTATION<TV> rotator((T)3.1415*10*time/s,TV(0,1,0));
                         state->cylinder->Set_Endpoints(rotator.Rotate(TV(-0.025,-0.034,0)*m),rotator.Rotate(TV(0.025,-0.034,0)*m));

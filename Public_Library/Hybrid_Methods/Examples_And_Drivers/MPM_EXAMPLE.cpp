@@ -5,6 +5,7 @@
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/LAGGED_FORCE.h>
+#include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
@@ -20,9 +21,9 @@ using namespace PhysBAM;
 template<class TV> MPM_EXAMPLE<TV>::
 MPM_EXAMPLE(const STREAM_TYPE stream_type)
     :stream_type(stream_type),particles(*new MPM_PARTICLES<TV>),
-    deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(&particles,0)),
+    solid_body_collection(*new SOLID_BODY_COLLECTION<TV>(&particles)),
     debug_particles(*new DEBUG_PARTICLES<TV>),
-    lagrangian_forces(deformable_body_collection.deformables_forces),
+    lagrangian_forces(solid_body_collection.deformable_body_collection.deformables_forces),
     gather_scatter(*new GATHER_SCATTER<TV>(grid,simulated_particles)),
     force_helper(*new MPM_FORCE_HELPER<TV>(particles,quad_F_coeff))
 {
@@ -34,7 +35,7 @@ MPM_EXAMPLE(const STREAM_TYPE stream_type)
 template<class TV> MPM_EXAMPLE<TV>::
 ~MPM_EXAMPLE()
 {
-    delete &deformable_body_collection;
+    delete &solid_body_collection;
     delete &particles;
     delete &debug_particles;
     delete weights;
@@ -52,7 +53,7 @@ template<class TV> void MPM_EXAMPLE<TV>::
 Write_Output_Files(const int frame)
 {
     std::string f=LOG::sprintf("%d",frame);
-    if(this->use_test_output){
+    if(use_test_output){
         std::string file=LOG::sprintf("%s/%s-%03d.txt",output_directory.c_str(),test_output_prefix.c_str(),frame);
         OCTAVE_OUTPUT<T> oo(file.c_str());
         oo.Write("X",particles.X.Flattened());
@@ -70,9 +71,7 @@ Write_Output_Files(const int frame)
         Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
 #pragma omp task
         {
-            int static_frame=output_structures_each_frame?frame:-1;
-            bool write_structures=(frame==0 || output_structures_each_frame);
-            deformable_body_collection.Write(stream_type,output_directory,output_directory,frame,static_frame,write_structures,false);
+            solid_body_collection.Write(stream_type,output_directory,frame,0,false,true,true,true,false);
         }
 
         if(!only_write_particles){
@@ -118,7 +117,7 @@ Precompute_Forces(const T time,const T dt,const bool update_hessian)
 {
     for(int i=0;i<forces.m;i++)
         forces(i)->Precompute(time,dt,true,update_hessian);
-    deformable_body_collection.Update_Position_Based_State(time,false,update_hessian);
+    solid_body_collection.Update_Position_Based_State(time,false,update_hessian);
 }
 //#####################################################################
 // Function Potential_Energy
@@ -147,7 +146,7 @@ Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const
 #pragma omp parallel for
     for(int i=0;i<lagrangian_forces_F.m;i++)
         lagrangian_forces_F(i)=TV();
-    deformable_body_collection.Add_Velocity_Independent_Forces(lagrangian_forces_F,time);
+    solid_body_collection.deformable_body_collection.Add_Velocity_Independent_Forces(lagrangian_forces_F,time);
     gather_scatter.template Scatter<int>(false,
         [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid){
             F(it.Index())+=it.Weight()*lagrangian_forces_F(p);});
@@ -171,7 +170,7 @@ Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) co
     gather_scatter.template Gather<int>(false,
         [this,&V](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid){
             lagrangian_forces_V(p)+=it.Weight()*V(it.Index());});
-    deformable_body_collection.Add_Implicit_Velocity_Independent_Forces(lagrangian_forces_V,lagrangian_forces_F,time);
+    solid_body_collection.deformable_body_collection.Add_Implicit_Velocity_Independent_Forces(lagrangian_forces_V,lagrangian_forces_F,time);
     gather_scatter.template Scatter<int>(false,
         [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid){
             F(it.Index())-=it.Weight()*lagrangian_forces_F(p);});
@@ -190,7 +189,7 @@ Add_Force(PARTICLE_GRID_FORCES<TV>& force)
 template<class TV> int MPM_EXAMPLE<TV>::
 Add_Force(DEFORMABLES_FORCES<TV>& force)
 {
-    return deformable_body_collection.Add_Force(&force);
+    return solid_body_collection.deformable_body_collection.Add_Force(&force);
 }
 //#####################################################################
 // Function Set_Weights
@@ -340,8 +339,8 @@ Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction,std:
 template<class TV> void MPM_EXAMPLE<TV>::
 Update_Lagged_Forces(const T time) const
 {
-    for(int i=0;i<deformable_body_collection.deformables_forces.m;i++)
-        if(LAGGED_FORCE<TV>* lf=dynamic_cast<LAGGED_FORCE<TV>*>(deformable_body_collection.deformables_forces(i)))
+    for(int i=0;i<solid_body_collection.deformable_body_collection.deformables_forces.m;i++)
+        if(LAGGED_FORCE<TV>* lf=dynamic_cast<LAGGED_FORCE<TV>*>(solid_body_collection.deformable_body_collection.deformables_forces(i)))
             lf->Lagged_Update_Position_Based_State(time);
 }
 //#####################################################################

@@ -40,7 +40,7 @@ public:
     using BASE::newton_iterations;using BASE::solver_tolerance;using BASE::solver_iterations;
     using BASE::test_diff;using BASE::threads;using BASE::weights;
     using BASE::lagrangian_forces;using BASE::stream_type;
-    using BASE::Add_Force;using BASE::Set_Weights;using BASE::deformable_body_collection;
+    using BASE::Add_Force;using BASE::Set_Weights;using BASE::solid_body_collection;
     using BASE::Add_Collision_Object;using typename BASE::COLLISION_TYPE;
     using BASE::data_directory;using BASE::reflection_bc_flags;
     using BASE::quad_F_coeff;using BASE::use_sound_speed_cfl;using BASE::cfl_sound;

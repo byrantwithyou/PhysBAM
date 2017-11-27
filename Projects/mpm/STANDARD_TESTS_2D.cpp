@@ -34,6 +34,7 @@
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
 #include <Deformables/Forces/SURFACE_TENSION_FORCE.h>
+#include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
@@ -279,7 +280,7 @@ Initialize()
                 {
                     if(time>=10/24.0*s){
                         lagrangian_forces.Delete_Pointers_And_Clean_Memory();
-                        this->deformable_body_collection.structures.Delete_Pointers_And_Clean_Memory();
+                        this->solid_body_collection.deformable_body_collection.structures.Delete_Pointers_And_Clean_Memory();
                         this->output_structures_each_frame=true;
                         Add_Walls(-1,COLLISION_TYPE::separate,1.9,.1+(T)(time/s-10/24.0)*0.08*m,true);
                         Add_Gravity(m/(s*s)*TV(0,-9.8));}
@@ -904,7 +905,7 @@ Initialize()
                         T stop=2*treshold;
                         if(time<=stop){
                             lagrangian_forces.Delete_Pointers_And_Clean_Memory();
-                            this->deformable_body_collection.structures.Delete_Pointers_And_Clean_Memory();
+                            this->solid_body_collection.deformable_body_collection.structures.Delete_Pointers_And_Clean_Memory();
                             this->output_structures_each_frame=true;
                             delete collision_objects(collision_objects.m-1);
                             collision_objects.Pop();
@@ -1477,8 +1478,8 @@ Initialize()
             Add_Fixed_Corotated(new_ta1,E,nu);
             LOG::printf("MASS: %P\n",particles.mass);
 
-            for(int i=0;i<this->deformable_body_collection.structures.m;i++)
-                this->deformable_body_collection.structures(i)->Update_Number_Nodes();
+            for(int i=0;i<this->solid_body_collection.deformable_body_collection.structures.m;i++)
+                this->solid_body_collection.deformable_body_collection.structures(i)->Update_Number_Nodes();
         } break;
         case 71:{ // (fluid test) dam break; Rabecca Brannon test
             Set_Grid(RANGE<TV>(TV(),TV(1,2)).Thickened(.25)*m,TV_INT(3,5),TV_INT(),2,100);

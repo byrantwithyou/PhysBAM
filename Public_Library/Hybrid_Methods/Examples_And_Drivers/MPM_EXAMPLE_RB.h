@@ -7,6 +7,8 @@
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 namespace PhysBAM{
 
+template<class TV> class RIGID_BODY_COLLECTION;
+
 template<class TV>
 class MPM_EXAMPLE_RB:public MPM_EXAMPLE<TV>
 {
@@ -17,6 +19,8 @@ public:
     MPM_EXAMPLE_RB(const MPM_EXAMPLE_RB&) = delete;
     void operator=(const MPM_EXAMPLE_RB&) = delete;
     virtual ~MPM_EXAMPLE_RB();
+
+    RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
 //#####################################################################
 };
 }

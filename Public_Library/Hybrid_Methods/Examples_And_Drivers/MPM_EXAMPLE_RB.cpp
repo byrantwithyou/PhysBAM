@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/LAGGED_FORCE.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
@@ -19,7 +20,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> MPM_EXAMPLE_RB<TV>::
 MPM_EXAMPLE_RB(const STREAM_TYPE stream_type)
-    :MPM_EXAMPLE<TV>(stream_type)
+    :MPM_EXAMPLE<TV>(stream_type),rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(0))
 {
 }
 //#####################################################################
@@ -28,6 +29,7 @@ MPM_EXAMPLE_RB(const STREAM_TYPE stream_type)
 template<class TV> MPM_EXAMPLE_RB<TV>::
 ~MPM_EXAMPLE_RB()
 {
+    delete &rigid_body_collection;
 }
 //#####################################################################
 namespace PhysBAM{

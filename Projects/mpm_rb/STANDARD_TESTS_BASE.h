@@ -9,6 +9,7 @@
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Deformables/Standard_Tests/DEFORMABLES_STANDARD_TESTS.h>
+#include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE_RB.h>
 #include <functional>
 
@@ -40,7 +41,7 @@ public:
     using BASE::newton_iterations;using BASE::solver_tolerance;using BASE::solver_iterations;
     using BASE::test_diff;using BASE::threads;using BASE::weights;
     using BASE::lagrangian_forces;using BASE::stream_type;
-    using BASE::Add_Force;using BASE::Set_Weights;using BASE::deformable_body_collection;
+    using BASE::Add_Force;using BASE::Set_Weights;using BASE::solid_body_collection;
     using BASE::Add_Collision_Object;using typename BASE::COLLISION_TYPE;
     using BASE::data_directory;using BASE::reflection_bc_flags;
     using BASE::quad_F_coeff;using BASE::use_sound_speed_cfl;using BASE::cfl_sound;
@@ -81,7 +82,7 @@ public:
     bool dump_collision_objects;
 
     RANDOM_NUMBERS<T> random;
-    DEFORMABLES_STANDARD_TESTS<TV> tests;
+    SOLIDS_STANDARD_TESTS<TV> tests;
 
     STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS_BASE();

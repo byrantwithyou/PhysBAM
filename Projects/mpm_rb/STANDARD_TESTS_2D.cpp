@@ -26,6 +26,7 @@
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
@@ -100,13 +101,24 @@ Initialize()
 {
     switch(test_number)
     {
-        case 1:{ // full box
+        case 1:{ // half-full box
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             RANGE<TV> box(TV(),TV(1,(T).5)*m);
             T density=2*unit_rho*scale_mass;
             Seed_Particles(box,0,0,density,particles_per_cell);
             Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
             Add_Gravity(m/(s*s)*TV(0,-1.8));
+        } break;
+
+        case 2:{ // half-full box with rigid body
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            RANGE<TV> box(TV(),TV(1,(T).5)*m);
+            T density=2*unit_rho*scale_mass;
+            Seed_Particles(box,0,0,density,particles_per_cell);
+            Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
+            Add_Gravity(m/(s*s)*TV(0,-1.8));
+            RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("circle",(T).2,(T).5);
+            rigid_body.Frame().t=TV((T)0.5,(T)0.75);
         } break;
 
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
