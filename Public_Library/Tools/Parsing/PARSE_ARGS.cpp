@@ -38,7 +38,7 @@ Parse(bool partial)
             if(o->found) *o->found=o->found_value;
             if(o->store)
                 if(!argv[++i] || !o->store_func(o->store,argv[i])){
-                    LOG::cerr<<"Option '"<<argv[i]<<"' expects an argument."<<std::endl;
+                    LOG::cerr<<"Option '"<<argv[i-1]<<"' expects an argument."<<std::endl;
                     Print_Usage(true);}}
         else argv[kept++]=argv[i];}
     argc=kept;
