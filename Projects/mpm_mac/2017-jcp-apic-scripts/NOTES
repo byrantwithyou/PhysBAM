@@ -1,0 +1,23 @@
+Memo for MPM_MAC JCP
+
+Artifacts in dam break 2D simulation sequences
+* A "cavity" is caused by a single particle when constant density is used.
+  With constant density, a particle would occupy 3x3(order=2) volumes.
+  Use "-use_mass" would alleviate this problem but introduce boiling/vorticity.
+  Note that should treat very small mass as 0 when "-use_mass".
+  In the paper, we planed to use this simulation to illustrate the reason
+  of this artifact. Also we wanted to show this method conserves angular
+  momentum and talk about why we do not use this in the dam break test
+  (because we want to measure the true vorticity).
+* Incorrect vorticity in PIC. When fluid climb to the right wall,
+  there is a noticeable ccw vorticity on the concave surface.
+  The reason is unknown.
+  But I suspect that this is because we did not do extrapolation for free surface.
+  Thus the outer layer moves much slower than the layer ones,
+  which leads to shear.
+
+Issues in dam break 3D
+FLIP seems get much larger volume in the simulation.
+This needs to be reconfirmed.
+
+  
