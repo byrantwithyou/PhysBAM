@@ -239,11 +239,12 @@ def Link_Flags(env):
     if env['USE_COMPRESSIBLE'] or env['USE_INCOMPRESSIBLE'] or env['USE_DYNAMICS']:
         env.Append(LIBS=['PhysBAM_Dynamics'+library_suffix])
         env['USE_SOLIDS']=1
-    if env['USE_SOLIDS']:
-        env.Append(LIBS=['PhysBAM_Solids'+library_suffix])
-        env['USE_DEFORMABLES']=1
     if env['USE_HYBRID']:
         env.Append(LIBS=['PhysBAM_Hybrid_Methods'+library_suffix])
+        env['USE_DEFORMABLES']=1
+        env['USE_SOLIDS']=1
+    if env['USE_SOLIDS']:
+        env.Append(LIBS=['PhysBAM_Solids'+library_suffix])
         env['USE_DEFORMABLES']=1
     if env['USE_DEFORMABLES']:
         env.Append(LIBS=['PhysBAM_Deformables'+library_suffix])
