@@ -75,7 +75,7 @@ public:
     static std::string Static_Name()
     {return LOG::sprintf("ANALYTIC_IMPLICIT_OBJECT<%s>",T_ANALYTIC::Name().c_str());}
 
-    std::string Extension() const override {return "";}
+    std::string Extension() const override {return "analytic";}
 
     T Minimum_Cell_Size_Within_Box(const RANGE<TV>& box) const override
     {return cell_size;}
