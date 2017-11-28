@@ -45,7 +45,7 @@ public:
     bool simulate;
     int iterations_used_diagnostic;
 
-    SOLID_BODY_COLLECTION();
+    SOLID_BODY_COLLECTION(DEFORMABLE_PARTICLES<TV>* particles=0);
     SOLID_BODY_COLLECTION(const SOLID_BODY_COLLECTION&) = delete;
     void operator=(const SOLID_BODY_COLLECTION&) = delete;
     virtual ~SOLID_BODY_COLLECTION();
