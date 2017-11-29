@@ -10,8 +10,10 @@
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
+#include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_DRIVER_RB.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE_RB.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
@@ -257,6 +259,8 @@ Particle_To_Grid()
             example.valid_grid_cell_indices.Append(it.index);
             example.velocity.array(i)/=example.mass.array(i);}
         else example.velocity.array(i)=TV();}
+
+    Rasterize_Rigid_Bodies();
 }
 //#####################################################################
 // Function Grid_To_Particle
@@ -321,6 +325,8 @@ Grid_To_Particle()
 
             Reflect_Or_Invalidate_Particle(p);
         });
+
+    Move_Rigid_Bodies();
 }
 // Lower s if necessary so that |t*(a+t*b)|<=bound for all 0<=t<=s
 template<class T>
@@ -490,6 +496,8 @@ Apply_Forces()
         example.velocity_friction.array(j)+=objective.v0.u.array(j);}
     example.velocity_friction.array.Subset(objective.system.stuck_nodes)=objective.system.stuck_velocity;
     example.current_velocity=&example.velocity_new;
+
+    Apply_Rigid_Body_Forces();
 }
 //#####################################################################
 // Function Apply_Friction
@@ -567,6 +575,9 @@ Grid_V_Upper_Bound() const
 template<class TV> void MPM_DRIVER_RB<TV>::
 Update_Simulated_Particles()
 {
+    RIGID_BODY_COLLECTION<TV>& rigid_body_collection=example.solid_body_collection.rigid_body_collection;
+    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=rigid_body_collection.rigid_body_particles;
+
     example.simulated_particles.Remove_All();
     for(int p=0;p<example.particles.number;p++)
         if(example.particles.valid(p))
@@ -578,6 +589,13 @@ Update_Simulated_Particles()
 
     for(int i=0;i<example.lagrangian_forces.m;i++)
         example.lagrangian_forces(i)->Update_Mpi(example.particle_is_simulated,0);
+
+    example.rigid_body_is_simulated.Resize(rigid_body_particles.frame.m);
+    for(int b=0;b<rigid_body_particles.frame.m;b++)
+        example.rigid_body_is_simulated(b)=rigid_body_collection.Is_Active(b);
+
+    for(int i=0;i<rigid_body_collection.rigids_forces.m;i++)
+        rigid_body_collection.rigids_forces(i)->Update_Mpi(example.rigid_body_is_simulated);
 }
 //#####################################################################
 // Function Print_Grid_Stats
@@ -675,6 +693,82 @@ Reflect_Or_Invalidate_Particle(int p)
         else if(X(a)>B(a)){
             if((f>>(2*a+1))&1){X(a)=2*B(a)-X(a);V(a)=-V(a);}
             else example.particles.valid(p)=false;}}
+}
+//#####################################################################
+// Function Update_Rotation_Helper
+//#####################################################################
+template<class T>
+inline VECTOR<T,3> Update_Rotation_Helper(const T dt,RIGID_BODY<VECTOR<T,3> >& rigid_body)
+{
+    const VECTOR<T,3> &w=rigid_body.Twist().angular,&L=rigid_body.Angular_Momentum();
+    return w-(T).5*dt*rigid_body.World_Space_Inertia_Tensor_Inverse_Times(w.Cross(L));
+}
+//#####################################################################
+// Function Update_Rotation_Helper
+//#####################################################################
+template<class T>
+inline VECTOR<T,1> Update_Rotation_Helper(const T dt,RIGID_BODY<VECTOR<T,2> >& rigid_body)
+{
+    return rigid_body.Twist().angular;
+}
+//#####################################################################
+// Function Move_Rigid_Bodies
+//#####################################################################
+template<class TV> void MPM_DRIVER_RB<TV>::
+Move_Rigid_Bodies()
+{
+    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=example.solid_body_collection.rigid_body_collection.rigid_body_particles;
+    for(int b=0;b<rigid_body_particles.frame.m;b++){
+        if(!example.solid_body_collection.rigid_body_collection.Is_Active(b)) continue;
+        rigid_body_particles.frame(b).t+=example.dt*rigid_body_particles.twist(b).linear;
+        ROTATION<TV>& R=rigid_body_particles.frame(b).r;
+        typename TV::SPIN rotate_amount=Update_Rotation_Helper(example.dt,*rigid_body_particles.rigid_body(b));
+        R=ROTATION<TV>::From_Rotation_Vector(example.dt*rotate_amount)*R;
+        R.Normalize();
+        rigid_body_particles.rigid_body(b)->Update_Angular_Velocity();} // Note that the value of w changes here.
+}
+//#####################################################################
+// Function Apply_Rigid_Body_Forces
+//#####################################################################
+template<class TV> void MPM_DRIVER_RB<TV>::
+Apply_Rigid_Body_Forces()
+{
+    RIGID_BODY_COLLECTION<TV>& rigid_body_collection=example.solid_body_collection.rigid_body_collection;
+    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=rigid_body_collection.rigid_body_particles;
+    rigid_forces.Resize(rigid_body_particles.frame.m);
+    rigid_forces.Fill(TWIST<TV>());
+
+    rigid_body_collection.Update_Position_Based_State(example.time+example.dt);
+    rigid_body_collection.Add_Velocity_Independent_Forces(rigid_forces,example.time);
+    LOG::printf("num forces: %P\n",rigid_body_collection.rigids_forces.m);
+    LOG::printf("forces: %P\n",rigid_forces);
+    
+    for(int b=0;b<rigid_body_particles.frame.m;b++){
+        if(!rigid_body_collection.Is_Active(b)) continue;
+        rigid_body_particles.twist(b)+=rigid_body_particles.rigid_body(b)->Inertia_Inverse_Times(rigid_forces(b)*example.dt);}
+
+    rigid_body_collection.Update_Angular_Momentum();
+}
+//#####################################################################
+// Function Rasterize_Rigid_Bodies
+//#####################################################################
+template<class TV> void MPM_DRIVER_RB<TV>::
+Rasterize_Rigid_Bodies()
+{
+    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=example.solid_body_collection.rigid_body_collection.rigid_body_particles;
+    T padding=example.grid.dX.Max()*2;
+    RANGE<TV_INT> cell_domain=example.grid.Domain_Indices(example.ghost);
+    example.rasterized_data.Resize(cell_domain);
+    for(int b=0;b<rigid_body_particles.frame.m;b++){
+        RIGID_BODY<TV>& rigid_body=*rigid_body_particles.rigid_body(b);
+        rigid_body.Update_Bounding_Box_From_Implicit_Geometry();
+        RANGE<TV> box=rigid_body.Axis_Aligned_Bounding_Box().Thickened(padding);
+        RANGE<TV_INT> grid_range=example.grid.Clamp_To_Cell(box,example.ghost+1).Intersect(cell_domain);
+        for(RANGE_ITERATOR<TV::m> it(grid_range);it.Valid();it.Next()){
+            TV X=example.grid.Center(it.index);
+            T phi=rigid_body.Implicit_Geometry_Extended_Value(X);
+            if(phi<padding)
+                example.rasterized_data.Insert(it.index,{b,phi});}}
 }
 //#####################################################################
 namespace PhysBAM{

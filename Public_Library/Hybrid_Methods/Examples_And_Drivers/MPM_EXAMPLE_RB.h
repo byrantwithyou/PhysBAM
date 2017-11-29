@@ -4,6 +4,7 @@
 //#####################################################################
 #ifndef __MPM_EXAMPLE_RB__
 #define __MPM_EXAMPLE_RB__
+#include <Core/Data_Structures/CHAINED_ARRAY.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 namespace PhysBAM{
 
@@ -20,7 +21,14 @@ public:
     void operator=(const MPM_EXAMPLE_RB&) = delete;
     virtual ~MPM_EXAMPLE_RB();
 
-    RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
+    // First entry MUST be int, and its value MUST be nonnegative.
+    struct RASTERIZED_DATA
+    {
+        int id;
+        T phi;
+    };
+    CHAINED_ARRAY<RASTERIZED_DATA,TV_INT> rasterized_data;
+    ARRAY<bool> rigid_body_is_simulated;
 //#####################################################################
 };
 }

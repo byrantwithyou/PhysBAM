@@ -31,6 +31,7 @@ public:
     MPM_EXAMPLE_RB<TV>& example;
     MPM_OBJECTIVE<TV>& objective;
     MPM_KRYLOV_VECTOR<TV>& dv,&rhs;
+    ARRAY<TWIST<TV> > rigid_forces;
     
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
 
@@ -61,6 +62,9 @@ public:
     void Limit_Dt_Sound_Speed();
     template<class S> void Reflection_Boundary_Condition(ARRAY<S,TV_INT>& u,bool flip_sign);
     void Reflect_Or_Invalidate_Particle(int p);
+    void Move_Rigid_Bodies();
+    void Apply_Rigid_Body_Forces();
+    void Rasterize_Rigid_Bodies();
 //#####################################################################
 };
 }

@@ -20,7 +20,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> MPM_EXAMPLE_RB<TV>::
 MPM_EXAMPLE_RB(const STREAM_TYPE stream_type)
-    :MPM_EXAMPLE<TV>(stream_type),rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(0))
+    :MPM_EXAMPLE<TV>(stream_type)
 {
 }
 //#####################################################################
@@ -29,7 +29,6 @@ MPM_EXAMPLE_RB(const STREAM_TYPE stream_type)
 template<class TV> MPM_EXAMPLE_RB<TV>::
 ~MPM_EXAMPLE_RB()
 {
-    delete &rigid_body_collection;
 }
 //#####################################################################
 namespace PhysBAM{
