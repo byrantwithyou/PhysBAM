@@ -57,14 +57,8 @@ namespace PhysBAM{
 //#####################################################################
 template<class T> STANDARD_TESTS<VECTOR<T,2> >::
 STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
-    :STANDARD_TESTS_BASE<TV>(stream_type_input,parse_args),
-    foo_T1(0),foo_T2(0),foo_T3(0),foo_T4(0),
-    use_foo_T1(false),use_foo_T2(false),use_foo_T3(false),use_foo_T4(false)
+    :STANDARD_TESTS_BASE<TV>(stream_type_input,parse_args)
 {
-    parse_args.Add("-fooT1",&foo_T1,&use_foo_T1,"T1","a scalar");
-    parse_args.Add("-fooT2",&foo_T2,&use_foo_T2,"T2","a scalar");
-    parse_args.Add("-fooT3",&foo_T3,&use_foo_T3,"T3","a scalar");
-    parse_args.Add("-fooT4",&foo_T4,&use_foo_T4,"T4","a scalar");
     parse_args.Parse();
     if(!this->override_output_directory) output_directory=LOG::sprintf("Test_%i",test_number);
 }

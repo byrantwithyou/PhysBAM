@@ -58,14 +58,6 @@ public:
     void Write_Output_Files(const int frame) override;
     void Read_Output_Files(const int frame) override;
     void Initialize() override;
-    
-    // additional storage
-    T foo_T1;
-    T foo_T2;
-    T foo_T3;
-    T foo_T4;
-    bool use_foo_T1,use_foo_T2,use_foo_T3,use_foo_T4;
-    T current_fill_level;
 
 //#####################################################################
 };
