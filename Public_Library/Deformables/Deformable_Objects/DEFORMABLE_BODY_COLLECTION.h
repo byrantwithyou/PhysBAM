@@ -49,7 +49,7 @@ public:
     Find_Structure(const int index=0) const
     {return Find_Type<T_STRUCTURE>(structures,index);}
 
-    bool simulate; // TODO: use one of those per fragment
+    bool simulate;
 
     // These are pruned for MPI.
     ARRAY<int> simulated_particles;
@@ -76,7 +76,7 @@ public:
     DEFORMABLE_OBJECT_COLLISIONS<TV>& collisions;
     ARRAY<COLLISION_PENALTY_FORCES<TV>*> collision_penalty_forces;
     bool use_embedded_collisions;
-    bool use_nonembedded_self_collision; // TODO: have one of these per fragment
+    bool use_nonembedded_self_collision;
     bool check_stale;
     bool own_particles,own_collision_body_collection;
 
