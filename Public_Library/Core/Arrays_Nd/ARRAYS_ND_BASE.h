@@ -152,6 +152,11 @@ public:
     const T* Get_Array_Pointer() const
     {return array.Get_Array_Pointer();}
 
+    T* begin(){return array.begin();}
+    const T* begin() const {return array.begin();}
+    T* end(){return array.end();}
+    const T* end() const {return array.end();}
+
     int Number_True() const
     {return array.Number_True();}
 

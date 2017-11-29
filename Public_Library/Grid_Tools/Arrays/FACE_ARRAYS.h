@@ -134,6 +134,11 @@ public:
     const T_ARRAY_VIEW& Component(const int axis) const
     {assert((unsigned)axis<dimension);return data(axis);}
 
+    T* begin(){return array.begin();}
+    const T* begin() const {return array.begin();}
+    T* end(){return array.end();}
+    const T* end() const {return array.end();}
+
     TV Cell_Centered_Average(const TV_INT& cell_index) const
     {TV average;
     for(int i=0;i<dimension;i++) average(i)=(T).5*(data(i)(cell_index)+data(i)(cell_index+TV_INT::Axis_Vector(i)));
