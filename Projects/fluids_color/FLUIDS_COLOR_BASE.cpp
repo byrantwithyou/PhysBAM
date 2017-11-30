@@ -312,7 +312,7 @@ Initialize_Common_Example()
                 use_p_null_mode=true;
             }
             break;
-        case 16:
+        case 34:
             grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
             {
                 T x0=(T).05,x1=(T).95;
@@ -947,7 +947,7 @@ template<class TV> TV FLUIDS_COLOR_BASE<TV>::
 Velocity_Jump(const TV& X,int color0,int color1,T time)
 {
     Add_Debug_Particle(X,VECTOR<T,3>(1,0,0));
-    if(analytic_velocity.m && analytic_levelset && (true || !analytic_initial_only)){
+    if(analytic_velocity.m && analytic_levelset && !analytic_initial_only){
         TV jump_u=analytic_velocity(color1)->v(X/m,time/s);
         if(color0>=0) jump_u-=analytic_velocity(color0)->v(X/m,time/s);
         return jump_u*m/s;}
