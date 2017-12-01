@@ -5,7 +5,6 @@
 // Class TRIANGLE_COLLISIONS  
 //##################################################################### 
 #include <Core/Arrays/INDIRECT_ARRAY.h>
-#include <Core/Data_Structures/OPERATION_HASH.h>
 #include <Core/Data_Structures/SPARSE_UNION_FIND.h>
 #include <Core/Log/DEBUG_SUBSTEPS.h>
 #include <Core/Log/DEBUG_UTILITIES.h>

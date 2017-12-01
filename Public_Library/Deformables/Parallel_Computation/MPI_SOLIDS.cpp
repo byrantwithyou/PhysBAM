@@ -6,7 +6,6 @@
 #include <Core/Data_Structures/DATA_STRUCTURES_FORWARD.h>
 #include <Core/Data_Structures/ELEMENT_ID.h>
 #include <Core/Data_Structures/KD_TREE.h>
-#include <Core/Data_Structures/OPERATION_HASH.h>
 #include <Core/Data_Structures/PAIR.h>
 #include <Core/Data_Structures/UNION_FIND.h>
 #include <Core/Utilities/PROCESS_UTILITIES.h>

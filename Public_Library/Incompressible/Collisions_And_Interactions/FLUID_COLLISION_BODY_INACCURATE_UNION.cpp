@@ -4,7 +4,6 @@
 //#####################################################################
 // Class FLUID_COLLISION_BODY_INACCURATE_UNION
 //##################################################################### 
-#include <Core/Data_Structures/OPERATION_HASH.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>
