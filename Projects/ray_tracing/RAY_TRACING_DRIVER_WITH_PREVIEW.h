@@ -60,7 +60,7 @@ template<class T> RAY_TRACING_DRIVER_WITH_PREVIEW<T>* RAY_TRACING_DRIVER_WITH_PR
 template<class T> void RAY_TRACING_DRIVER_WITH_PREVIEW<T>::
 Initialize_Preview()
 {
-    int argc=1;const char *(argv[1]);argv[0]="render";
+    int argc=1;const char *argv[1];argv[0]="render";
     glutInit(&argc,(char**)argv);
     glutInitDisplayMode(GLUT_SINGLE|GLUT_RGB);
 

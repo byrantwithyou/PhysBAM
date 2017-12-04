@@ -24,7 +24,7 @@ OPENGL_WINDOW_PBUFFER(OPENGL_WORLD<T>& opengl_world_input,const std::string& win
     pbuffer=new OPENGL_PBUFFER;
     if(!pbuffer->Create(width,height)) PHYSBAM_FATAL_ERROR("Could not set up pbuffer");
     // need glut init to make sure we can run glut functions
-    static int argc=1;static const char *(argv[1]);argv[0]="Visualization";
+    static int argc=1;static const char *argv[1];argv[0]="Visualization";
     glutInit(&argc,(char**)argv);
 }
 //#####################################################################

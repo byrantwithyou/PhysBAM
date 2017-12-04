@@ -17,7 +17,7 @@ OPENGL_WINDOW_GLUT(OPENGL_WORLD<T>& opengl_world_input,const std::string& window
     if(Single()) PHYSBAM_FATAL_ERROR("Only one glut context allowed");
     Single()=this;
 
-    static int argc=1;static const char *(argv[1]);argv[0]="Visualization";
+    static int argc=1;static const char *argv[1];argv[0]="Visualization";
     glutInit(&argc,(char**)argv);
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH|GLUT_ALPHA);
     glutInitWindowSize(width,height);
