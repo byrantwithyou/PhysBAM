@@ -1658,7 +1658,11 @@ Move_Particles()
                     example.particles.X(p)+=example.dt*example.particles.V(p);
                     Clip(p);}}
 
+#ifdef USE_OPENMP
         invalidate_lists(omp_get_thread_num()).Exchange(invalidate_list);
+#else
+        invalidate_lists(0).Exchange(invalidate_list);
+#endif
     }
 
     for(int t=0;t<invalidate_lists.m;t++)
