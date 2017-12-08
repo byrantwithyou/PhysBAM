@@ -455,6 +455,7 @@ Apply_Forces()
         objective.tmp2.u*=0;
         example.Add_Forces(objective.tmp2.u,example.time);
         Reflection_Boundary_Condition(objective.tmp2.u,true);
+        Apply_Rigid_Body_Forces();
         for(int i=0;i<example.valid_grid_indices.m;i++){
             int p=example.valid_grid_indices(i);
             dv.u.array(p)=example.dt/example.mass.array(p)*objective.tmp2.u.array(p);}
@@ -488,6 +489,7 @@ Apply_Forces()
         objective.system.forced_collisions.Remove_All();
 
         bool converged=newtons_method.Newtons_Method(objective,objective.system,dv,av);
+        Apply_Rigid_Body_Forces();
 
         if(!converged) LOG::cout<<"WARNING: Newton's method did not converge"<<std::endl;
         Apply_Friction();
@@ -499,8 +501,6 @@ Apply_Forces()
         example.velocity.array(j)=dv.u.array(j)+objective.v0.u.array(j);
         example.velocity_friction_save.array(j)+=objective.v0.u.array(j);}
     example.velocity_friction_save.array.Subset(objective.system.stuck_nodes)=objective.system.stuck_velocity;
-
-    Apply_Rigid_Body_Forces();
 }
 //#####################################################################
 // Function Apply_Friction
@@ -772,6 +772,13 @@ Rasterize_Rigid_Bodies()
             T phi=rigid_body.Implicit_Geometry_Extended_Value(X);
             if(phi<padding)
                 example.rasterized_data.Insert(it.index,{b,phi});}}
+}
+//#####################################################################
+// Function Process_Pairwise_Collisions
+//#####################################################################
+template<class TV> void MPM_DRIVER_RB<TV>::
+Process_Pairwise_Collisions()
+{
 }
 //#####################################################################
 namespace PhysBAM{

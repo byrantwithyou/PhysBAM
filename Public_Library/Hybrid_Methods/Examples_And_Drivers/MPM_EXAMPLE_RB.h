@@ -29,6 +29,8 @@ public:
     };
     CHAINED_ARRAY<RASTERIZED_DATA,TV_INT> rasterized_data;
     ARRAY<bool> rigid_body_is_simulated;
+
+    bool pairwise_collisions=false;
 //#####################################################################
 };
 }
