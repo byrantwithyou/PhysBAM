@@ -58,7 +58,7 @@ Write_Output_Files(const int frame)
         OCTAVE_OUTPUT<T> oo(file.c_str());
         oo.Write("X",particles.X.Flattened());
         oo.Write("V",particles.V.Flattened());
-        oo.Write("u",current_velocity->array.Flattened());}
+        oo.Write("u",velocity.array.Flattened());}
 
 #pragma omp parallel
 #pragma omp single
@@ -76,7 +76,7 @@ Write_Output_Files(const int frame)
 
         if(!only_write_particles){
 #pragma omp task
-            Write_To_File(stream_type,LOG::sprintf("%s/%d/centered_velocities",output_directory.c_str(),frame),*current_velocity);
+            Write_To_File(stream_type,LOG::sprintf("%s/%d/centered_velocities",output_directory.c_str(),frame),velocity);
 #pragma omp task
             {
                 GRID<TV> ghost_grid(grid.numbers_of_cells+2*ghost,grid.Ghost_Domain(ghost),true);

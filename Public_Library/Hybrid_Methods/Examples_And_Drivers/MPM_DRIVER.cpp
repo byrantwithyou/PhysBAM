@@ -78,14 +78,13 @@ Initialize()
 
     example.mass.Resize(example.grid.Domain_Indices(example.ghost));
     example.velocity.Resize(example.grid.Domain_Indices(example.ghost));
-    example.velocity_new.Resize(example.grid.Domain_Indices(example.ghost));
+    example.velocity_save.Resize(example.grid.Domain_Indices(example.ghost));
     dv.u.Resize(example.grid.Domain_Indices(example.ghost));
     rhs.u.Resize(example.grid.Domain_Indices(example.ghost));
     objective.system.tmp.u.Resize(example.grid.Domain_Indices(example.ghost));
 
     example.particles.Store_B(example.use_affine);
     example.particles.Store_S(example.use_oldroyd);
-    example.current_velocity=&example.velocity;
     if(example.particles.store_B) example.Dp_inv.Resize(example.particles.X.m);
 
     RANGE<TV_INT> range(example.grid.Cell_Indices(example.ghost));
@@ -129,7 +128,7 @@ Advance_One_Time_Step()
     Print_Energy_Stats("after particle to grid",example.velocity);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after particle to grid",1);
     Apply_Forces();
-    Print_Grid_Stats("after forces",example.dt,example.velocity_new,&example.velocity);
+    Print_Grid_Stats("after forces",example.dt,example.velocity,&example.velocity_save);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after forces",1);
     Grid_To_Particle_Limit_Dt();
     Limit_Dt_Sound_Speed();
@@ -221,13 +220,12 @@ template<class TV> void MPM_DRIVER<TV>::
 Particle_To_Grid()
 {
     MPM_PARTICLES<TV>& particles=example.particles;
-    example.current_velocity=&example.velocity;
 
 #pragma omp parallel for
     for(int i=0;i<example.mass.array.m;i++){
         example.mass.array(i)=0;
         example.velocity.array(i)=TV();
-        example.velocity_new.array(i)=TV();}
+        example.velocity_save.array(i)=TV();}
 
     bool use_gradient=example.weights->use_gradient_transfer;
     example.gather_scatter.template Scatter<int>(true,
@@ -255,7 +253,9 @@ Particle_To_Grid()
         if(example.mass.array(i)){
             example.valid_grid_indices.Append(i);
             example.valid_grid_cell_indices.Append(it.index);
-            example.velocity.array(i)/=example.mass.array(i);}
+            TV v=example.velocity.array(i)/example.mass.array(i);
+            example.velocity.array(i)=v;
+            example.velocity_save.array(i)=v;}
         else example.velocity.array(i)=TV();}
 }
 //#####################################################################
@@ -282,9 +282,9 @@ Grid_To_Particle()
             T w=it.Weight();
             TV dw=it.Gradient();
             TV_INT index=it.Index();
-            TV V_new=example.velocity_new(index);
-            TV V_old=example.velocity(index);
-            TV V_fric=example.velocity_friction(index);
+            TV V_new=example.velocity(index);
+            TV V_old=example.velocity_save(index);
+            TV V_fric=example.velocity_friction_save(index);
             h.V_pic+=w*V_new;
             h.V_weight_old+=w*V_old;
             h.V_pic_fric+=w*V_fric;
@@ -372,9 +372,9 @@ Grid_To_Particle_Limit_Dt()
             T w=it.Weight();
             TV dw=it.Gradient();
             TV_INT index=it.Index();
-            TV V_new=example.velocity_new(index);
-            TV V_old=example.velocity(index);
-            TV V_fric=example.velocity_friction(index);
+            TV V_new=example.velocity(index);
+            TV V_old=example.velocity_save(index);
+            TV V_fric=example.velocity_friction_save(index);
 
             h.V_pic+=w*V_old;
             h.V_pic_s+=w*(V_new-V_old);
@@ -396,8 +396,8 @@ Grid_To_Particle_Limit_Dt()
     if(s>=1) return;
     LOG::printf("X J CFL scale: %g -> %g\n",example.dt,example.dt*s);
     example.dt*=s;
-    example.velocity_new.array=(example.velocity_new.array-example.velocity.array)*s+example.velocity.array;
-    example.velocity_friction.array=(example.velocity_friction.array-example.velocity.array)*s+example.velocity.array;
+    example.velocity.array=(example.velocity.array-example.velocity_save.array)*s+example.velocity_save.array;
+    example.velocity_friction_save.array=(example.velocity_friction_save.array-example.velocity_save.array)*s+example.velocity_save.array;
 }
 //#####################################################################
 // Function Limit_Dt_Sound_Speed
@@ -422,8 +422,8 @@ Limit_Dt_Sound_Speed()
     if(dt>=example.dt) return;
     T s=dt/example.dt;
     LOG::printf("SOUND CFL %g %g (%g)\n",example.dt,dt,s);
-    example.velocity_new.array=(example.velocity_new.array-example.velocity.array)*s+example.velocity.array;
-    example.velocity_friction.array=(example.velocity_friction.array-example.velocity.array)*s+example.velocity.array;
+    example.velocity.array=(example.velocity.array-example.velocity_save.array)*s+example.velocity_save.array;
+    example.velocity_friction_save.array=(example.velocity_friction_save.array-example.velocity_save.array)*s+example.velocity_save.array;
     example.dt=dt;
 }
 //#####################################################################
@@ -486,10 +486,9 @@ Apply_Forces()
 #pragma omp parallel for
     for(int i=0;i<example.valid_grid_indices.m;i++){
         int j=example.valid_grid_indices(i);
-        example.velocity_new.array(j)=dv.u.array(j)+objective.v0.u.array(j);
-        example.velocity_friction.array(j)+=objective.v0.u.array(j);}
-    example.velocity_friction.array.Subset(objective.system.stuck_nodes)=objective.system.stuck_velocity;
-    example.current_velocity=&example.velocity_new;
+        example.velocity.array(j)=dv.u.array(j)+objective.v0.u.array(j);
+        example.velocity_friction_save.array(j)+=objective.v0.u.array(j);}
+    example.velocity_friction_save.array.Subset(objective.system.stuck_nodes)=objective.system.stuck_velocity;
 }
 //#####################################################################
 // Function Apply_Friction
@@ -497,7 +496,7 @@ Apply_Forces()
 template<class TV> void MPM_DRIVER<TV>::
 Apply_Friction()
 {
-    example.velocity_friction=dv.u;
+    example.velocity_friction_save=dv.u;
     if(!example.collision_objects.m) return;
     if(example.use_symplectic_euler){
         objective.v1.Copy(1,objective.v0,dv);}
@@ -519,7 +518,7 @@ Apply_Friction()
         if(t_mag<=k)
             v.Project_On_Unit_Direction(c.n);
         else v-=k*t;
-        example.velocity_friction.array(c.p)=v-objective.v0.u.array(c.p);}
+        example.velocity_friction_save.array(c.p)=v-objective.v0.u.array(c.p);}
 }
 //#####################################################################
 // Function Compute_Dt

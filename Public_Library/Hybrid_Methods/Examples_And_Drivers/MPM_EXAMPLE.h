@@ -42,7 +42,7 @@ public:
     ARRAY<SYMMETRIC_MATRIX<T,TV::m> > Dp_inv;
     ARRAY<T,TV_INT> mass,volume;
     ARRAY<TV,TV_INT> location;
-    ARRAY<TV,TV_INT> velocity,velocity_new,velocity_friction,*current_velocity=0;
+    ARRAY<TV,TV_INT> velocity,velocity_save,velocity_friction_save;
     ARRAY<int> valid_grid_indices;
     ARRAY<TV_INT> valid_grid_cell_indices;
     ARRAY<PARTICLE_GRID_FORCES<TV>*> forces;

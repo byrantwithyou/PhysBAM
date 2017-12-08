@@ -119,16 +119,16 @@ int main(int argc, char* argv[])
     else Sample_Box_Regularly(unit_X,particles_per_dim);
     Replicate_Particles(example.particles,example.grid,unit_X);
 
-    example.velocity_new.Resize(example.grid.Cell_Indices(3));
     example.velocity.Resize(example.grid.Cell_Indices(3));
+    example.velocity_save.Resize(example.grid.Cell_Indices(3));
     example.mass.Resize(example.grid.Cell_Indices(3));
     example.gather_scatter.Prepare_Scatter(example.particles);
     example.use_affine=use_affine;
     if(example.use_affine) example.Dp_inv.Resize(example.particles.X.m);
     example.flip=flip;
     example.particles.Store_B(example.use_affine);
-    example.velocity_new(center).x=1;
-    example.velocity_friction=example.velocity_new;
+    example.velocity(center).x=1;
+    example.velocity_friction_save=example.velocity;
     example.dt=0;
     example.Set_Weights(order);
     driver.Update_Simulated_Particles();
