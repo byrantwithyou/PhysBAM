@@ -456,14 +456,18 @@ Apply_Forces()
         example.Add_Forces(objective.tmp2.u,example.time);
         Reflection_Boundary_Condition(objective.tmp2.u,true);
         Apply_Rigid_Body_Forces();
-        for(int i=0;i<example.valid_grid_indices.m;i++){
-            int p=example.valid_grid_indices(i);
-            dv.u.array(p)=example.dt/example.mass.array(p)*objective.tmp2.u.array(p);}
-        objective.system.forced_collisions.Remove_All();
         if(example.pairwise_collisions){
+#pragma omp parallel for
+            for(int i=0;i<example.valid_grid_indices.m;i++){
+                int p=example.valid_grid_indices(i);
+                example.velocity.array(p)+=example.dt/example.mass.array(p)*objective.tmp2.u.array(p);}
             Process_Pairwise_Collisions();
-            example.velocity_friction_save=dv.u;}
+            example.velocity_friction_save=example.velocity;}
         else{
+            for(int i=0;i<example.valid_grid_indices.m;i++){
+                int p=example.valid_grid_indices(i);
+                dv.u.array(p)=example.dt/example.mass.array(p)*objective.tmp2.u.array(p);}
+            objective.system.forced_collisions.Remove_All();
             objective.tmp1=dv;
             objective.Adjust_For_Collision(dv);
             objective.tmp0=dv;
@@ -495,12 +499,13 @@ Apply_Forces()
         Apply_Friction();
         objective.Restore_F();}
 
+    if(!example.pairwise_collisions){
 #pragma omp parallel for
-    for(int i=0;i<example.valid_grid_indices.m;i++){
-        int j=example.valid_grid_indices(i);
-        example.velocity.array(j)=dv.u.array(j)+objective.v0.u.array(j);
-        example.velocity_friction_save.array(j)+=objective.v0.u.array(j);}
-    example.velocity_friction_save.array.Subset(objective.system.stuck_nodes)=objective.system.stuck_velocity;
+        for(int i=0;i<example.valid_grid_indices.m;i++){
+            int j=example.valid_grid_indices(i);
+            example.velocity.array(j)=dv.u.array(j)+objective.v0.u.array(j);
+            example.velocity_friction_save.array(j)+=objective.v0.u.array(j);}
+        example.velocity_friction_save.array.Subset(objective.system.stuck_nodes)=objective.system.stuck_velocity;}
 }
 //#####################################################################
 // Function Apply_Friction
@@ -779,6 +784,7 @@ Rasterize_Rigid_Bodies()
 template<class TV> void MPM_DRIVER_RB<TV>::
 Process_Pairwise_Collisions()
 {
+    
 }
 //#####################################################################
 namespace PhysBAM{
