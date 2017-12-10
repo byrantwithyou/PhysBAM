@@ -107,6 +107,7 @@ Initialize()
         } break;
 
         case 2:{ // half-full box with rigid body
+            this->pairwise_collisions=true;
             PHYSBAM_ASSERT(sizeof(T)==sizeof(float));
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             RANGE<TV> box(TV(),TV(1,(T).5)*m);
@@ -122,6 +123,7 @@ Initialize()
         } break;
 
         case 3:{ // rigid sphere on rigid ground
+            this->pairwise_collisions=true;
             PHYSBAM_ASSERT(sizeof(T)==sizeof(float));
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             tests.Add_Ground((T).5,(T).1,0,1);

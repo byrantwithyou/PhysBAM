@@ -11,6 +11,7 @@
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
+#include <Rigids/Collisions/COLLISION_HELPER.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
@@ -784,7 +785,50 @@ Rasterize_Rigid_Bodies()
 template<class TV> void MPM_DRIVER_RB<TV>::
 Process_Pairwise_Collisions()
 {
-    
+    RIGID_BODY_COLLECTION<TV>& rigid_body_collection=example.solid_body_collection.rigid_body_collection;
+    bool need_another_iteration=true;
+    for(int i=0;i<example.collision_iterations && need_another_iteration;i++){
+        need_another_iteration=false;
+        for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
+            TV X=it.Location();
+            auto collisions=example.rasterized_data.Get(it.index);
+            for(int c1=0;c1<collisions.m-1;c1++) for(int c2=c1+1;c2<collisions.m;c2++){
+                int r1=collisions(c1).id,r2=collisions(c2).id;
+                if(collisions(c1).phi+collisions(c2).phi<=0){
+                    RIGID_BODY<TV>& body1=rigid_body_collection.Rigid_Body(r1);
+                    RIGID_BODY<TV>& body2=rigid_body_collection.Rigid_Body(r2);
+                    TV linear_impulse=PhysBAM::Compute_Collision_Impulse(
+                        -body1.Implicit_Geometry_Normal(X),
+                        RIGID_BODY<TV>::Impulse_Factor(body1,body2,X),
+                        RIGID_BODY<TV>::Relative_Velocity(body1,body2,X),
+                        RIGID_BODY<TV>::Coefficient_Of_Restitution(body1,body2),
+                        RIGID_BODY<TV>::Coefficient_Of_Friction(body1,body2),
+                        0);
+                    RIGID_BODY<TV>::Apply_Impulse(body1,body2,X,linear_impulse);
+                    need_another_iteration=true;
+                }
+            }
+            if(example.mass(it.index)){
+                for(int c=0;c<collisions.m;c++){
+                    if(collisions(c).phi>0) continue;
+                    RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(collisions(c).id);
+                    TV linear_impulse=PhysBAM::Compute_Collision_Impulse(
+                        -body.Implicit_Geometry_Normal(X),
+                        body.Impulse_Factor(X)+1/example.mass(it.index),
+                        body.Pointwise_Object_Velocity(X)-example.velocity(it.index),
+                        body.coefficient_of_restitution,
+                        body.coefficient_of_friction,
+                        0);
+                    body.Apply_Impulse_To_Body(X,linear_impulse);
+                    example.velocity(it.index)-=linear_impulse/example.mass(it.index);
+                    need_another_iteration=true;
+                }
+            }
+        }
+
+        if(!need_another_iteration && i<example.collision_iterations-1){
+            i=example.collision_iterations-2;
+            need_another_iteration=true;}} // force it to the last iteration (so it picks up contact pairs for rigid/rigid one time at least)
 }
 //#####################################################################
 namespace PhysBAM{

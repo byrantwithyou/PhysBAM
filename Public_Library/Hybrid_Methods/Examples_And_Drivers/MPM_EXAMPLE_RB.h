@@ -31,6 +31,7 @@ public:
     ARRAY<bool> rigid_body_is_simulated;
 
     bool pairwise_collisions=false;
+    int collision_iterations=5;
 //#####################################################################
 };
 }
