@@ -820,13 +820,7 @@ Process_Pairwise_Collisions()
                         0);
                     body.Apply_Impulse_To_Body(X,linear_impulse);
                     example.velocity(it.index)-=linear_impulse/example.mass(it.index);
-                    need_another_iteration=true;}}}
-
-        // TODO: Do we actually need this?
-        // force it to the last iteration (so it picks up contact pairs for rigid/rigid one time at least)
-        if(!need_another_iteration && i<example.collision_iterations-1){
-            i=example.collision_iterations-2;
-            need_another_iteration=true;}}
+                    need_another_iteration=true;}}}}
 }
 //#####################################################################
 namespace PhysBAM{
