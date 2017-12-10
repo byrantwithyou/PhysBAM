@@ -749,8 +749,6 @@ Apply_Rigid_Body_Forces()
 
     rigid_body_collection.Update_Position_Based_State(example.time+example.dt);
     rigid_body_collection.Add_Velocity_Independent_Forces(rigid_forces,example.time);
-    LOG::printf("num forces: %P\n",rigid_body_collection.rigids_forces.m);
-    LOG::printf("forces: %P\n",rigid_forces);
     
     for(int b=0;b<rigid_body_particles.frame.m;b++){
         if(!rigid_body_collection.Is_Active(b)) continue;
