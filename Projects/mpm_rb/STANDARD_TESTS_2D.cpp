@@ -106,6 +106,7 @@ Initialize()
             Add_Gravity(m/(s*s)*TV(0,-1.8));
         } break;
 
+            // ./mpm_rb 2 -float -sound_cfl -strong_cfl -reflection_bc -1 -symplectic_euler -scale_E .1
         case 2:{ // half-full box with rigid body
             this->pairwise_collisions=true;
             PHYSBAM_ASSERT(sizeof(T)==sizeof(float));
@@ -118,10 +119,12 @@ Initialize()
             Add_Gravity(g);
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("circle",(T).2,(T).5);
             rigid_body.Frame().t=TV((T)0.5,(T)0.75);
+            rigid_body.Set_Mass(1);
             auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
             solid_body_collection.rigid_body_collection.Add_Force(rg);
         } break;
 
+            // ./mpm_rb 3 -float -symplectic_euler
         case 3:{ // rigid sphere on rigid ground
             this->pairwise_collisions=true;
             PHYSBAM_ASSERT(sizeof(T)==sizeof(float));
@@ -129,6 +132,20 @@ Initialize()
             tests.Add_Ground((T).5,(T).1,0,1);
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("circle",(T).2,(T).5);
             rigid_body.Frame().t=TV((T)0.5,(T)0.75);
+            TV g=m/(s*s)*TV(0,-1.8);
+            auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
+            solid_body_collection.rigid_body_collection.Add_Force(rg);
+        } break;
+
+            // ./mpm_rb 4 -float -symplectic_euler
+        case 4:{ // rigid sphere on rigid ground, bouncy
+            this->pairwise_collisions=true;
+            PHYSBAM_ASSERT(sizeof(T)==sizeof(float));
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            tests.Add_Ground((T).5,(T).1,1,1);
+            RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("circle",(T).2,(T).5);
+            rigid_body.Frame().t=TV((T)0.5,(T)0.75);
+            rigid_body.coefficient_of_restitution=1;
             TV g=m/(s*s)*TV(0,-1.8);
             auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
             solid_body_collection.rigid_body_collection.Add_Force(rg);
