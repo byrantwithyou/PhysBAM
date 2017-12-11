@@ -621,7 +621,7 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Set_Key_Binding_Category("Rigid Bodies");
         Add_Component(rigid_bodies_component,"Rigid Bodies",'\0',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::SELECTABLE);
         opengl_world.Append_Bind_Key('5',rigid_bodies_component->viewer_callbacks.Get("toggle_draw_mode"));
-        opengl_world.Append_Bind_Key('%',rigid_bodies_component->viewer_callbacks.Get("toggle_velocity_vectors"));
+        opengl_world.Append_Bind_Key('U',rigid_bodies_component->viewer_callbacks.Get("toggle_velocity_vectors"));
         opengl_world.Append_Bind_Key('a',rigid_bodies_component->viewer_callbacks.Get("toggle_articulation_points"));
         opengl_world.Append_Bind_Key('%',rigid_bodies_component->viewer_callbacks.Get("toggle_show_object_names"));
         opengl_world.Append_Bind_Key('=',rigid_bodies_component->viewer_callbacks.Get("increase_vector_size"));
