@@ -792,7 +792,7 @@ Process_Pairwise_Collisions()
             auto collisions=example.rasterized_data.Get(it.index);
             for(int c1=0;c1<collisions.m-1;c1++)
                 for(int c2=c1+1;c2<collisions.m;c2++){
-                    if(collisions(c1).phi+collisions(c2).phi<=0){
+                    if(max(collisions(c1).phi,collisions(c2).phi)<=0){
                         RIGID_BODY<TV>& body1=rigid_body_collection.Rigid_Body(collisions(c1).id);
                         RIGID_BODY<TV>& body2=rigid_body_collection.Rigid_Body(collisions(c2).id);
                         if(body1.Has_Infinite_Inertia() && body2.Has_Infinite_Inertia())
