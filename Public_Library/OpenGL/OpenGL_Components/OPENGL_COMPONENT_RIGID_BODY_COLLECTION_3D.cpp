@@ -449,14 +449,16 @@ Update_Object_Labels()
     if(draw_velocity_vectors) velocity_vectors.Resize(number_of_drawn_bodies);
     if(draw_angular_velocity_vectors) angular_velocity_vectors.Resize(number_of_drawn_bodies);
 
+    int idx=0;
     for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++) if(draw_object(i)){
         if(draw_velocity_vectors || draw_angular_velocity_vectors){
-            positions(i)=rigid_body_collection.rigid_body_particles.frame(i).t;
+            positions(idx)=rigid_body_collection.rigid_body_particles.frame(i).t;
             if(draw_velocity_vectors)
-                velocity_vectors(i)=rigid_body_collection.rigid_body_particles.twist(i).linear;
+                velocity_vectors(idx)=rigid_body_collection.rigid_body_particles.twist(i).linear;
             if(draw_angular_velocity_vectors){
                 //rigid_body_collection.Rigid_Body(i).Update_Angular_Velocity();
-                angular_velocity_vectors(i)=rigid_body_collection.rigid_body_particles.twist(i).angular;}}
+                angular_velocity_vectors(idx)=rigid_body_collection.rigid_body_particles.twist(i).angular;}
+            idx++;}
         if(opengl_triangulated_surface(i)){
             if(output_positions)
                 opengl_triangulated_surface(i)->Set_Name(

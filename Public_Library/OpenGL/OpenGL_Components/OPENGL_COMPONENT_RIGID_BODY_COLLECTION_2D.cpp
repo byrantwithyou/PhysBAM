@@ -233,27 +233,30 @@ Update_Object_Labels()
         node_positions.Resize(number_of_drawn_bodies*4);
         node_velocity_vectors.Resize(number_of_drawn_bodies*4);}
 
+    int idx=0;
     for(int i=0;i<rigid_body_collection.rigid_body_particles.Size();i++){
         if(draw_object(i)){
             if(draw_velocity_vectors || draw_node_velocity_vectors){
                 if(draw_velocity_vectors){
-                    positions(i)=rigid_body_collection.rigid_body_particles.frame(i).t;
-                    velocity_vectors(i)=rigid_body_collection.rigid_body_particles.twist(i).linear;}
+                    positions(idx)=rigid_body_collection.rigid_body_particles.frame(i).t;
+                    velocity_vectors(idx)=rigid_body_collection.rigid_body_particles.twist(i).linear;}
                 if(draw_node_velocity_vectors){
                     //only valid for squares . . .
                     RIGID_BODY<TV>* rigid_body=&rigid_body_collection.Rigid_Body(i);
 
-                    node_positions(i*4)=rigid_body->World_Space_Point(VECTOR<T,2>(1,1));
-                    node_velocity_vectors(i*4)=rigid_body->Pointwise_Object_Velocity(rigid_body->World_Space_Vector(VECTOR<T,2>(1,1)));
+                    node_positions(idx*4)=rigid_body->World_Space_Point(VECTOR<T,2>(1,1));
+                    node_velocity_vectors(idx*4)=rigid_body->Pointwise_Object_Velocity(rigid_body->World_Space_Vector(VECTOR<T,2>(1,1)));
 
-                    node_positions(i*4+1)=rigid_body->World_Space_Point(VECTOR<T,2>(1,-1));
-                    node_velocity_vectors(i*4+1)=rigid_body->Pointwise_Object_Velocity(rigid_body->World_Space_Vector(VECTOR<T,2>(1,-1)));
+                    node_positions(idx*4+1)=rigid_body->World_Space_Point(VECTOR<T,2>(1,-1));
+                    node_velocity_vectors(idx*4+1)=rigid_body->Pointwise_Object_Velocity(rigid_body->World_Space_Vector(VECTOR<T,2>(1,-1)));
 
-                    node_positions(i*4+2)=rigid_body->World_Space_Point(VECTOR<T,2>(-1,1));
-                    node_velocity_vectors(i*4+2)=rigid_body->Pointwise_Object_Velocity(rigid_body->World_Space_Vector(VECTOR<T,2>(-1,1)));
+                    node_positions(idx*4+2)=rigid_body->World_Space_Point(VECTOR<T,2>(-1,1));
+                    node_velocity_vectors(idx*4+2)=rigid_body->Pointwise_Object_Velocity(rigid_body->World_Space_Vector(VECTOR<T,2>(-1,1)));
 
-                    node_positions(i*4+3)=rigid_body->World_Space_Point(VECTOR<T,2>(-1,-1));
-                    node_velocity_vectors(i*4+3)=rigid_body->Pointwise_Object_Velocity(rigid_body->World_Space_Vector(VECTOR<T,2>(-1,-1)));}}
+                    node_positions(idx*4+3)=rigid_body->World_Space_Point(VECTOR<T,2>(-1,-1));
+                    node_velocity_vectors(idx*4+3)=rigid_body->Pointwise_Object_Velocity(rigid_body->World_Space_Vector(VECTOR<T,2>(-1,-1)));}
+
+                idx++;}
             if(opengl_segmented_curve(i)){
                 if(output_positions){
                     opengl_segmented_curve(i)->Set_Name(
