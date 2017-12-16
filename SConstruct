@@ -57,28 +57,27 @@ external_libraries={
     'boost':      {'default':1,'libs':['']},
     'boostregex': {'libs':['boost_regex']},
     'zlib':       {'default':1,'libs':['z']},
-    'ffmpeg':     {'default':0,'flags':['USE_FFMPEG'],'libs':['libavformat','libavcodec','libavutil'],'filter':'VIDEO'},
-    'boost_geometry':     {'default':0,'flags':['USE_BOOST_GEOMETRY'],'libs':[],'filter':''},
-    'geompack':     {'default':0,'flags':['USE_GEOMPACK'],'libs':['geompack'],'filter':''},
-    'boost_serialization':     {'default':0,'flags':['USE_BOOST_SERIALIZATION'],'libs':['libboost_serialization'],'filter':''},
-    'libjpeg':    {'default':1,'flags':['USE_LIBJPEG'],'libs':['jpeg'],'filter':'(MOV_FILE)|(JPG_FILE)'},
-    'libpng':     {'default':1,'flags':['USE_LIBPNG'],'libs':['png'],'filter':'PNG_FILE'},
-    'fftw':       {'default':0,'flags':['USE_FFTW'],'libs':['fftw3f','fftw3'],'filter':''},
-    'lapack':     {'default':0,'flags':['USE_LAPACK'],'libs':['lapack'],'filter':''},
+    'ffmpeg':     {'default':0,'flags':['USE_FFMPEG'],'libs':['libavformat','libavcodec','libavutil']},
+    'boost_geometry':     {'default':0,'flags':['USE_BOOST_GEOMETRY'],'libs':[]},
+    'geompack':     {'default':0,'flags':['USE_GEOMPACK'],'libs':['geompack']},
+    'boost_serialization':     {'default':0,'flags':['USE_BOOST_SERIALIZATION'],'libs':['libboost_serialization']},
+    'libjpeg':    {'default':1,'flags':['USE_LIBJPEG'],'libs':['jpeg']},
+    'libpng':     {'default':1,'flags':['USE_LIBPNG'],'libs':['png']},
+    'fftw':       {'default':0,'flags':['USE_FFTW'],'libs':['fftw3f','fftw3']},
+    'lapack':     {'default':0,'flags':['USE_LAPACK'],'libs':['lapack']},
     'gl2ps':      {'libs':['gl2ps']},
     'OpenGL':     {'libs':['GL','GLU','glut'],'libpath':['/usr/X11R6/lib','/usr/X11R6/lib64'],'cpppath':['/opt/X11/include']},
-    'boostpython':{'flags':['USE_BOOSTPYTHON'],'cpppath':['/usr/include/python2.4'],'libs':['boost_python','python2.4'],'filter':''},
-    'numpy':      {'flags':['USE_NUMPY'],'cpppath':[],'libs':[],'filter':''},
-    'lam':        {'flags':['USE_MPI'],'libs':['lammpio','lammpi++','mpi','lam','util','dl'],'linkflags':' -pthread','filter':''},
-    'openmpi':    {'flags':['USE_MPI'],'libs':['mpi_cxx','open-rte','mpi','open-pal','util','dl','nsl'],'linkflags':' -pthread','filter':''},
-    'mpich':      {'flags':['USE_MPI'],'libs':['lammpio','lammpi++','mpi','lam','util','dl'],'linkflags':' -pthread','filter':''},
-    'pthreads':    {'default':0,'flags':['USE_PTHREADS'],'libs':[],'linkflags':' -pthread','filter':''},
-    'openmp':    {'default':0,'flags':['USE_OPENMP'],'libs':[],'linkflags':' -fopenmp','filter':''},
-    'renderman':  {'default':0,'flags':['USE_RENDERMAN'],'cpppath':[],'libs':[],'filter':'renderman'}}
+    'boostpython':{'flags':['USE_BOOSTPYTHON'],'cpppath':['/usr/include/python2.4'],'libs':['boost_python','python2.4']},
+    'numpy':      {'flags':['USE_NUMPY'],'cpppath':[],'libs':[]},
+    'lam':        {'flags':['USE_MPI'],'libs':['lammpio','lammpi++','mpi','lam','util','dl'],'linkflags':' -pthread'},
+    'openmpi':    {'flags':['USE_MPI'],'libs':['mpi_cxx','open-rte','mpi','open-pal','util','dl','nsl'],'linkflags':' -pthread'},
+    'mpich':      {'flags':['USE_MPI'],'libs':['lammpio','lammpi++','mpi','lam','util','dl'],'linkflags':' -pthread'},
+    'pthreads':    {'default':0,'flags':['USE_PTHREADS'],'libs':[],'linkflags':' -pthread'},
+    'openmp':    {'default':0,'flags':['USE_OPENMP'],'libs':[],'linkflags':' -fopenmp'},
+    'renderman':  {'default':0,'flags':['USE_RENDERMAN'],'cpppath':[],'libs':[]}}
 for name,lib in external_libraries.items():
-    defaults={'default':0,'flags':'','linkflags':'','cpppath':[],'libpath':[],'filter':''}
+    defaults={'default':0,'flags':'','linkflags':'','cpppath':[],'libpath':[]}
     for f in defaults.keys(): lib.setdefault(f,defaults[f])
-    lib['filter']=re.compile(lib['filter'])
     variables.AddVariables(BoolVariable('USE_'+name.upper(),'Use '+name,lib['default']),
                            (name+'_include','Include directory for '+name,0),
                            (name+'_libpath','Library directory for '+name,0),
@@ -307,9 +306,8 @@ def Automatic_Object_Helper(env,source,libraries):
     cppdefines_reversed=env['CPPDEFINES'][::-1]
     cpppath_reversed=env['CPPPATH_HIDDEN'][::-1]
     for lib in libraries:
-        if lib['filter'].search(source) or lib['filter'].search(File(source).srcnode().path):
-            cppdefines_reversed.extend(lib['flags'][::-1])
-            cpppath_reversed.extend(lib['cpppath'][::-1])
+        cppdefines_reversed.extend(lib['flags'][::-1])
+        cpppath_reversed.extend(lib['cpppath'][::-1])
     if source.endswith('.h'):
         cpp=source+'.cpp'
         source_path=File(source).srcnode().path
