@@ -18,7 +18,6 @@ Solve()
     app.Options()->SetNumericValue("tol",tolerance);
     app.Options()->SetStringValue("mu_strategy","adaptive");
     app.Options()->SetIntegerValue("print_level",0);
-    
 
     Ipopt::ApplicationReturnStatus status;
     status=app.Initialize();
@@ -66,8 +65,8 @@ get_bounds_info(Index n,Number* x_l,Number* x_u,
         x_u[i]=dof_range(i).max_corner;}
 
     for(int i=0; i<constraint_range.m; i++){
-        g_l[i]=i<constraint_range(i).min_corner;
-        g_u[i]=i<constraint_range(i).max_corner;}
+        g_l[i]=constraint_range(i).min_corner;
+        g_u[i]=constraint_range(i).max_corner;}
 
     return true;
 }
