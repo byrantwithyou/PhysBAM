@@ -106,9 +106,8 @@ Initialize()
             Add_Gravity(m/(s*s)*TV(0,-1.8));
         } break;
 
-            // ./mpm_rb 2 -float -sound_cfl -strong_cfl -reflection_bc -1 -symplectic_euler -scale_E .1
+            // ./mpm_rb 2 -float -sound_cfl -strong_cfl -reflection_bc -1 -symplectic_euler -scale_E .1 -coll_pair
         case 2:{ // half-full box with rigid body
-            this->pairwise_collisions=true;
             PHYSBAM_ASSERT(sizeof(T)==sizeof(float));
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             RANGE<TV> box(TV(),TV(1,(T).5)*m);
@@ -124,9 +123,8 @@ Initialize()
             solid_body_collection.rigid_body_collection.Add_Force(rg);
         } break;
 
-            // ./mpm_rb 3 -float -symplectic_euler
+            // ./mpm_rb 3 -float -symplectic_euler -coll_pair
         case 3:{ // rigid sphere on rigid ground
-            this->pairwise_collisions=true;
             PHYSBAM_ASSERT(sizeof(T)==sizeof(float));
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             tests.Add_Ground((T).5,(T).1,0,1);
@@ -137,9 +135,8 @@ Initialize()
             solid_body_collection.rigid_body_collection.Add_Force(rg);
         } break;
 
-            // ./mpm_rb 4 -float -symplectic_euler
+            // ./mpm_rb 4 -float -symplectic_euler -coll_pair
         case 4:{ // rigid sphere on rigid ground, bouncy
-            this->pairwise_collisions=true;
             PHYSBAM_ASSERT(sizeof(T)==sizeof(float));
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             tests.Add_Ground((T).5,(T).1,1,1);

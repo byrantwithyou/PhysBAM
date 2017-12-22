@@ -23,7 +23,7 @@ class STANDARD_TESTS_BASE:public MPM_EXAMPLE_RB<TV>
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef MPM_EXAMPLE<TV> BASE;
+    typedef MPM_EXAMPLE_RB<TV> BASE;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m>::OBJECT T_VOLUME;
 
 public:
@@ -45,7 +45,8 @@ public:
     using BASE::Add_Collision_Object;using typename BASE::COLLISION_TYPE;
     using BASE::data_directory;using BASE::reflection_bc_flags;
     using BASE::quad_F_coeff;using BASE::use_sound_speed_cfl;using BASE::cfl_sound;
-
+    using BASE::pairwise_collisions;using BASE::projected_collisions;
+    
     int test_number;
     int resolution;
     bool user_resolution;
@@ -80,7 +81,7 @@ public:
     ARRAY<T> extra_T;
     ARRAY<int> extra_int;
     bool dump_collision_objects;
-
+    
     RANDOM_NUMBERS<T> random;
     SOLIDS_STANDARD_TESTS<TV> tests;
 
