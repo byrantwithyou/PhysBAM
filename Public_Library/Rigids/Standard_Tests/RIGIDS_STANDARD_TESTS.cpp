@@ -156,10 +156,15 @@ Add_Analytic_Box(const VECTOR<T,1>& scaling_factor)
     GEOMETRY_PARTICLES<TV>& particles=*new GEOMETRY_PARTICLES<TV>;
     POINT_SIMPLICES_1D<T>& simplicial_object=*POINT_SIMPLICES_1D<T>::Create(particles);
     particles.Add_Elements(2);
-    POINT_SIMPLEX_MESH& segment_mesh=simplicial_object.mesh;segment_mesh.number_nodes=2;segment_mesh.elements.Preallocate(1);
-    particles.X(0)=VECTOR<T,1>(box.min_corner.x);particles.X(1)=VECTOR<T,1>(box.max_corner.x);
-    simplicial_object.mesh.elements.Append(VECTOR<int,1>(0));simplicial_object.mesh.directions.Append(false);
-    simplicial_object.mesh.elements.Append(VECTOR<int,1>(1));simplicial_object.mesh.directions.Append(true);
+    POINT_SIMPLEX_MESH& segment_mesh=simplicial_object.mesh;
+    segment_mesh.number_nodes=2;
+    segment_mesh.elements.Preallocate(1);
+    particles.X(0)=VECTOR<T,1>(box.min_corner.x);
+    particles.X(1)=VECTOR<T,1>(box.max_corner.x);
+    simplicial_object.mesh.elements.Append(VECTOR<int,1>(0));
+    simplicial_object.mesh.directions.Append(false);
+    simplicial_object.mesh.elements.Append(VECTOR<int,1>(1));
+    simplicial_object.mesh.directions.Append(true);
     rigid_body.Add_Structure(simplicial_object);
     simplicial_object.Update_Point_Simplex_List();
     assert(simplicial_object.point_simplex_list);
@@ -178,14 +183,18 @@ Add_Analytic_Box(const VECTOR<T,2>& scaling_factor,int segments_per_side)
     GEOMETRY_PARTICLES<TV>& particles=*new GEOMETRY_PARTICLES<TV>;
     SEGMENTED_CURVE_2D<T>& simplicial_object=*SEGMENTED_CURVE_2D<T>::Create(particles);
     particles.Add_Elements(4*segments_per_side);
-    SEGMENT_MESH& segment_mesh=simplicial_object.mesh;segment_mesh.number_nodes=4*segments_per_side;segment_mesh.elements.Preallocate(4*segments_per_side);
-    int last_node=-1;VECTOR<T,2> position=VECTOR<T,2>(box.min_corner.x,box.min_corner.y);
-    for(int side=0;side<4;side++) for(int vertex=0;vertex<segments_per_side;vertex++){
-        int current_node=side*segments_per_side+vertex;particles.X(current_node)=position;
-        position((side+1)%2)+=(T)(side<2?1:-1)*(side%2?((box.max_corner.x-box.min_corner.x)/(T)segments_per_side):((box.max_corner.y-box.min_corner.y)/(T)segments_per_side));
-        if(last_node>=0) simplicial_object.mesh.elements.Append(VECTOR<int,2>(last_node,current_node));
-        last_node=current_node;}
-    simplicial_object.mesh.elements.Append(VECTOR<int,2>(last_node,1));
+    SEGMENT_MESH& segment_mesh=simplicial_object.mesh;
+    segment_mesh.number_nodes=4*segments_per_side;
+    segment_mesh.elements.Preallocate(4*segments_per_side);
+    int last_node=4*segments_per_side-1;
+    VECTOR<T,2> position=box.min_corner,e=box.Edge_Lengths(),dir[4]={{e.x,0},{0,e.y},{-e.x,0},{0,-e.y}};
+    for(int side=0;side<4;side++)
+        for(int vertex=0;vertex<segments_per_side;vertex++){
+            int current_node=side*segments_per_side+vertex;
+            particles.X(current_node)=position;
+            position+=dir[side];
+            simplicial_object.mesh.elements.Append(VECTOR<int,2>(last_node,current_node));
+            last_node=current_node;}
     rigid_body.Add_Structure(simplicial_object);
     simplicial_object.Update_Segment_List();
     assert(simplicial_object.segment_list);
