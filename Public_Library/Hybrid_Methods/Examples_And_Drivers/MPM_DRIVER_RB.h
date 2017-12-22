@@ -34,7 +34,7 @@ public:
     ARRAY<TWIST<TV> > rigid_forces;
     
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
-
+    
     MPM_DRIVER_RB(MPM_EXAMPLE_RB<TV>& example);
     virtual ~MPM_DRIVER_RB();
     
@@ -66,6 +66,7 @@ public:
     void Apply_Rigid_Body_Forces();
     void Rasterize_Rigid_Bodies();
     void Process_Pairwise_Collisions();
+    void Process_Projected_Collisions(T dt);
 //#####################################################################
 };
 }

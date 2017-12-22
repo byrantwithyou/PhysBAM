@@ -5,6 +5,8 @@
 #ifndef __MPM_EXAMPLE_RB__
 #define __MPM_EXAMPLE_RB__
 #include <Core/Data_Structures/CHAINED_ARRAY.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/PAIR.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 namespace PhysBAM{
 
@@ -29,8 +31,14 @@ public:
     };
     CHAINED_ARRAY<RASTERIZED_DATA,TV_INT> rasterized_data;
     ARRAY<bool> rigid_body_is_simulated;
-
+    HASHTABLE<PAIR<int,int>,TV> stored_contacts_rr;
+    HASHTABLE<PAIR<int,TV_INT>,TV> stored_contacts_rm;
+    T contact_factor=1; // omega
+    T impulse_interpolation=1; // lambda
+    T min_impulse_change=1e-4;
+    
     bool pairwise_collisions=false;
+    bool projected_collisions=false;
     int collision_iterations=5;
 //#####################################################################
 };
