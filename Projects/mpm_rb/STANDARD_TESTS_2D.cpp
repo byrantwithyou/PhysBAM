@@ -148,6 +148,27 @@ Initialize()
             solid_body_collection.rigid_body_collection.Add_Force(rg);
         } break;
 
+            // ./mpm_rb 3 -float -symplectic_euler -coll_pair
+        case 5:{ // Many rigid spheres in box
+            PHYSBAM_ASSERT(sizeof(T)==sizeof(float));
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            RIGID_BODY<TV>& wl=tests.Add_Analytic_Box(TV(1,1));
+            wl.Frame().t=TV(-.5,.5);
+            wl.is_static=true;
+            RIGID_BODY<TV>& wb=tests.Add_Analytic_Box(TV(1,1));
+            wb.Frame().t=TV(.5,-.5);
+            wb.is_static=true;
+            RIGID_BODY<TV>& wr=tests.Add_Analytic_Box(TV(1,1));
+            wr.Frame().t=TV(1.5,.5);
+            wr.is_static=true;
+            for(int i=0;i<10;i++){
+                RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("circle",(T).2,(T).5);
+                rigid_body.Frame().t=TV((T)0.5,(T)0.75+i*.5);}
+            TV g=m/(s*s)*TV(0,-1.8);
+            auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
+            solid_body_collection.rigid_body_collection.Add_Force(rg);
+        } break;
+
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     if(forced_collision_type!=-1)
