@@ -204,7 +204,7 @@ finalize_solution(SolverReturn status,
 template<class T> bool IPOPT<T>::
 Solve()
 {
-#ifndef USE_IPOPT
+#ifdef USE_IPOPT
     Ipopt::IpoptApplication app;
     app.RethrowNonIpoptException(true);
     app.Options()->SetNumericValue("tol",tolerance);
