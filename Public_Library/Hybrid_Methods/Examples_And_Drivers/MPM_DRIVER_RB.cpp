@@ -23,8 +23,8 @@
 #include <Hybrid_Methods/Forces/MPM_PLASTICITY_MODEL.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
-#include <Hybrid_Methods/System/MPM_KRYLOV_VECTOR.h>
-#include <Hybrid_Methods/System/MPM_OBJECTIVE.h>
+#include <Hybrid_Methods/System/MPM_KRYLOV_VECTOR_RB.h>
+#include <Hybrid_Methods/System/MPM_OBJECTIVE_RB.h>
 #ifdef USE_OPENMP
 #include <omp.h>
 #endif
@@ -34,9 +34,9 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> MPM_DRIVER_RB<TV>::
 MPM_DRIVER_RB(MPM_EXAMPLE_RB<TV>& example)
-    :example(example),objective(*new MPM_OBJECTIVE<TV>(example)),
-    dv(*new MPM_KRYLOV_VECTOR<TV>(example.valid_grid_indices)),
-    rhs(*new MPM_KRYLOV_VECTOR<TV>(example.valid_grid_indices))
+    :example(example),objective(*new MPM_OBJECTIVE_RB<TV>(example)),
+    dv(*new MPM_KRYLOV_VECTOR_RB<TV>(example.valid_grid_indices)),
+    rhs(*new MPM_KRYLOV_VECTOR_RB<TV>(example.valid_grid_indices))
 {
     DEBUG_SUBSTEPS::write_substeps_level=example.write_substeps_level;
     DEBUG_SUBSTEPS::writer=[=](const std::string& title){Write_Substep(title);};
@@ -84,7 +84,11 @@ Initialize()
     example.velocity_save.Resize(example.grid.Domain_Indices(example.ghost));
     dv.u.Resize(example.grid.Domain_Indices(example.ghost));
     rhs.u.Resize(example.grid.Domain_Indices(example.ghost));
+    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=example.solid_body_collection.rigid_body_collection.rigid_body_particles;
+    dv.twists.Resize(rigid_body_particles.number);
+    rhs.twists.Resize(rigid_body_particles.number);
     objective.system.tmp.u.Resize(example.grid.Domain_Indices(example.ghost));
+    objective.system.tmp.twists.Resize(rigid_body_particles.number);
 
     example.particles.Store_B(example.use_affine);
     example.particles.Store_S(example.use_oldroyd);
@@ -248,8 +252,8 @@ Particle_To_Grid()
     example.valid_grid_indices.Remove_All();
     example.valid_grid_cell_indices.Remove_All();
 
-    Reflection_Boundary_Condition(example.velocity,true);
-    Reflection_Boundary_Condition(example.mass,false);
+    example.Reflection_Boundary_Condition(example.velocity,true);
+    example.Reflection_Boundary_Condition(example.mass,false);
 
     for(RANGE_ITERATOR<TV::m> it(example.mass.domain);it.Valid();it.Next()){
         int i=example.mass.Standard_Index(it.index);
@@ -454,9 +458,8 @@ Apply_Forces()
     if(example.use_symplectic_euler){
         example.Precompute_Forces(example.time,example.dt,0);
         objective.tmp2.u*=0;
-        example.Add_Forces(objective.tmp2.u,example.time);
-        Reflection_Boundary_Condition(objective.tmp2.u,true);
-        Apply_Rigid_Body_Forces();
+        example.Add_Forces(objective.tmp2.u,objective.tmp2.twists,example.time);
+        example.Reflection_Boundary_Condition(objective.tmp2.u,true);
         if(example.pairwise_collisions || example.projected_collisions){
 #pragma omp parallel for
             for(int i=0;i<example.valid_grid_indices.m;i++){
@@ -495,7 +498,6 @@ Apply_Forces()
         objective.system.forced_collisions.Remove_All();
 
         bool converged=newtons_method.Newtons_Method(objective,objective.system,dv,av);
-        Apply_Rigid_Body_Forces();
 
         if(!converged) LOG::cout<<"WARNING: Newton's method did not converge"<<std::endl;
         Apply_Friction();
@@ -507,7 +509,8 @@ Apply_Forces()
             int j=example.valid_grid_indices(i);
             example.velocity.array(j)=dv.u.array(j)+objective.v0.u.array(j);
             example.velocity_friction_save.array(j)+=objective.v0.u.array(j);}
-        example.velocity_friction_save.array.Subset(objective.system.stuck_nodes)=objective.system.stuck_velocity;}
+        example.velocity_friction_save.array.Subset(objective.system.stuck_nodes)=objective.system.stuck_velocity;
+        example.solid_body_collection.rigid_body_collection.rigid_body_particles.twist=objective.v0.twists+dv.twists;}
 }
 //#####################################################################
 // Function Apply_Friction
@@ -526,7 +529,7 @@ Apply_Friction()
 
     objective.v1.u.array.Subset(objective.system.stuck_nodes).Fill(TV());
     for(int i=0;i<objective.system.collisions.m;i++){
-        const typename MPM_KRYLOV_SYSTEM<TV>::COLLISION& c=objective.system.collisions(i);
+        const typename MPM_KRYLOV_SYSTEM_RB<TV>::COLLISION& c=objective.system.collisions(i);
         TV& v=objective.v1.u.array(c.p);
         // Note: tmp0,tmp1 already have mass removed; they have units of velocity
         T normal_force=TV::Dot_Product(c.n,objective.tmp0.u.array(c.p)-objective.tmp1.u.array(c.p));
@@ -660,32 +663,6 @@ Print_Energy_Stats(const char* str,const ARRAY<TV,TV_INT>& u)
     LOG::cout<<str<<" particle total energy "<<"time " <<example.time<<" value "<<(ke2+pe)<<std::endl;
     example.last_te=te;
 }
-template<class T,int d> void flip(VECTOR<T,d>& u,int a){u(a)=-u(a);}
-template<class T> void flip(T& u,int a){}
-//#####################################################################
-// Function Reflection_Boundary_Condition
-//#####################################################################
-template<class TV> template<class S> void MPM_DRIVER_RB<TV>::
-Reflection_Boundary_Condition(ARRAY<S,TV_INT>& u,bool flip_sign)
-{
-    if(!example.reflection_bc_flags) return;
-    TV_INT ranges[2]={TV_INT(),example.grid.numbers_of_cells};
-    for(RANGE_ITERATOR<TV::m> it(example.grid.Domain_Indices(),example.ghost,0,
-            RI::ghost|RI::side_mask,example.reflection_bc_flags);it.Valid();it.Next()){
-        int axis=it.side/2,side=it.side%2;
-        TV_INT pair=it.index;
-        pair(axis)=2*ranges[side](axis)-it.index(axis)-1;
-        if(flip_sign) flip(u(it.index),axis);
-        u(pair)+=u(it.index);
-        u(it.index)=S();}
-    for(RANGE_ITERATOR<TV::m> it(example.grid.Domain_Indices(),example.ghost,0,
-            RI::ghost|RI::delay_corners|RI::side_mask,example.reflection_bc_flags);it.Valid();it.Next()){
-        int axis=it.side/2,side=it.side%2;
-        TV_INT pair=it.index;
-        pair(axis)=2*ranges[side](axis)-it.index(axis)-1;
-        u(it.index)=u(pair);
-        if(flip_sign) flip(u(it.index),axis);}
-}
 //#####################################################################
 // Function Reflect_Particles
 //#####################################################################
@@ -708,18 +685,31 @@ Reflect_Or_Invalidate_Particle(int p)
 // Function Update_Rotation_Helper
 //#####################################################################
 template<class T>
-inline VECTOR<T,3> Update_Rotation_Helper(const T dt,RIGID_BODY<VECTOR<T,3> >& rigid_body)
+inline VECTOR<T,3> Update_Rotation_Helper(const T dt,const VECTOR<T,3>& omega,const SYMMETRIC_MATRIX<T,3>& inertia)
 {
-    const VECTOR<T,3> &w=rigid_body.Twist().angular,&L=rigid_body.Angular_Momentum();
-    return w-(T).5*dt*rigid_body.World_Space_Inertia_Tensor_Inverse_Times(w.Cross(L));
+    VECTOR<T,3> L=inertia*omega;
+    return omega-(T).5*dt*inertia.Inverse_Times(omega.Cross(L));
 }
 //#####################################################################
 // Function Update_Rotation_Helper
 //#####################################################################
 template<class T>
-inline VECTOR<T,1> Update_Rotation_Helper(const T dt,RIGID_BODY<VECTOR<T,2> >& rigid_body)
+inline VECTOR<T,1> Update_Rotation_Helper(const T dt,const VECTOR<T,1>& omega,const SYMMETRIC_MATRIX<T,1>& inertia)
 {
-    return rigid_body.Twist().angular;
+    return omega;
+}
+//#####################################################################
+// Function Move_Rigid_Body
+//#####################################################################
+template<class TV,class T>
+FRAME<TV> PhysBAM::Move_Rigid_Body(T dt,const FRAME<TV>& frame,const TWIST<TV>& twist,
+    const SYMMETRIC_MATRIX<T,TV::SPIN::m>& inertia)
+{
+    FRAME<TV> fr(frame);
+    fr.t+=dt*twist.linear;
+    typename TV::SPIN rotate_amount=Update_Rotation_Helper(dt,twist.angular,inertia);
+    fr.r=ROTATION<TV>::From_Rotation_Vector(dt*rotate_amount)*fr.r;
+    return fr;
 }
 //#####################################################################
 // Function Move_Rigid_Bodies
@@ -730,11 +720,9 @@ Move_Rigid_Bodies()
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=example.solid_body_collection.rigid_body_collection.rigid_body_particles;
     for(int b=0;b<rigid_body_particles.frame.m;b++){
         if(!example.solid_body_collection.rigid_body_collection.Is_Active(b)) continue;
-        rigid_body_particles.frame(b).t+=example.dt*rigid_body_particles.twist(b).linear;
-        ROTATION<TV>& R=rigid_body_particles.frame(b).r;
-        typename TV::SPIN rotate_amount=Update_Rotation_Helper(example.dt,*rigid_body_particles.rigid_body(b));
-        R=ROTATION<TV>::From_Rotation_Vector(example.dt*rotate_amount)*R;
-        R.Normalize();
+        rigid_body_particles.frame(b)=Move_Rigid_Body(example.dt,rigid_body_particles.frame(b),
+            rigid_body_particles.twist(b),rigid_body_particles.rigid_body(b)->World_Space_Inertia_Tensor());
+        rigid_body_particles.frame(b).r.Normalize();
         rigid_body_particles.rigid_body(b)->Update_Angular_Velocity();} // Note that the value of w changes here.
 }
 //#####################################################################

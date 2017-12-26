@@ -118,7 +118,7 @@ Initialize()
             Add_Gravity(g);
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("circle",(T).2,(T).5);
             rigid_body.Frame().t=TV((T)0.5,(T)0.75);
-            rigid_body.Set_Mass(1);
+            rigid_body.Set_Mass(2);
             auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
             solid_body_collection.rigid_body_collection.Add_Force(rg);
         } break;

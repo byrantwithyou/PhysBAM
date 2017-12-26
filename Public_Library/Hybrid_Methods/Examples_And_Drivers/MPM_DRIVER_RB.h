@@ -9,12 +9,10 @@
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 namespace PhysBAM{
 
-template<class TV> class FLUID_KRYLOV_SYSTEM;
-template<class TV> class FLUID_KRYLOV_VECTOR;
 template<class TV> class MPM_EXAMPLE_RB;
-template<class TV> class MPM_OBJECTIVE;
+template<class TV> class MPM_OBJECTIVE_RB;
 template<class TV> class PARTICLE_GRID_WEIGHTS;
-template<class TV> class MPM_KRYLOV_VECTOR;
+template<class TV> class MPM_KRYLOV_VECTOR_RB;
 template<class T> class KRYLOV_VECTOR_BASE;
 
 template<class TV>
@@ -29,8 +27,8 @@ public:
     int output_number;
 
     MPM_EXAMPLE_RB<TV>& example;
-    MPM_OBJECTIVE<TV>& objective;
-    MPM_KRYLOV_VECTOR<TV>& dv,&rhs;
+    MPM_OBJECTIVE_RB<TV>& objective;
+    MPM_KRYLOV_VECTOR_RB<TV>& dv,&rhs;
     ARRAY<TWIST<TV> > rigid_forces;
     
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
@@ -60,7 +58,6 @@ public:
     void Print_Energy_Stats(const char* str,const ARRAY<TV,TV_INT>& u);
     void Grid_To_Particle_Limit_Dt();
     void Limit_Dt_Sound_Speed();
-    template<class S> void Reflection_Boundary_Condition(ARRAY<S,TV_INT>& u,bool flip_sign);
     void Reflect_Or_Invalidate_Particle(int p);
     void Move_Rigid_Bodies();
     void Apply_Rigid_Body_Forces();
@@ -69,5 +66,9 @@ public:
     void Process_Projected_Collisions(T dt);
 //#####################################################################
 };
+
+template<class TV,class T>
+FRAME<TV> Move_Rigid_Body(T dt,const FRAME<TV>& frame,const TWIST<TV>& twist,
+    const SYMMETRIC_MATRIX<T,TV::SPIN::m>& inertia);
 }
 #endif
