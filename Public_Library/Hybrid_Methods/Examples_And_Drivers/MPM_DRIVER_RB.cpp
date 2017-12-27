@@ -937,4 +937,12 @@ template class MPM_DRIVER_RB<VECTOR<float,2> >;
 template class MPM_DRIVER_RB<VECTOR<float,3> >;
 template class MPM_DRIVER_RB<VECTOR<double,2> >;
 template class MPM_DRIVER_RB<VECTOR<double,3> >;
+template FRAME<VECTOR<double,2> > Move_Rigid_Body<VECTOR<double,2>,double>(
+    double,FRAME<VECTOR<double,2> > const&,TWIST<VECTOR<double,2> > const&,SYMMETRIC_MATRIX<double,VECTOR<double,2>::SPIN::m> const&);
+template FRAME<VECTOR<double,3> > Move_Rigid_Body<VECTOR<double,3>,double>(
+    double,FRAME<VECTOR<double,3> > const&,TWIST<VECTOR<double,3> > const&,SYMMETRIC_MATRIX<double,VECTOR<double,3>::SPIN::m> const&);
+template FRAME<VECTOR<float,2> > Move_Rigid_Body<VECTOR<float,2>,float>(
+    float,FRAME<VECTOR<float,2> > const&,TWIST<VECTOR<float,2> > const&,SYMMETRIC_MATRIX<float,VECTOR<float,2>::SPIN::m> const&);
+template FRAME<VECTOR<float,3> > Move_Rigid_Body<VECTOR<float,3>,float>(
+    float,FRAME<VECTOR<float,3> > const&,TWIST<VECTOR<float,3> > const&,SYMMETRIC_MATRIX<float,VECTOR<float,3>::SPIN::m> const&);
 }
