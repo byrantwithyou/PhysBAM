@@ -116,9 +116,9 @@ Initialize()
             Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
             TV g=m/(s*s)*TV(0,-1.8);
             Add_Gravity(g);
-            RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("circle",(T).2,(T).5);
-            rigid_body.Frame().t=TV((T)0.5,(T)0.75);
-            rigid_body.Set_Mass(2);
+            RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("circle",(T).2*m,(T).5);
+            rigid_body.Frame().t=TV((T)0.5,(T)0.75)*m;
+            rigid_body.Set_Mass(2*kg);
             auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
             solid_body_collection.rigid_body_collection.Add_Force(rg);
         } break;
@@ -128,8 +128,9 @@ Initialize()
             PHYSBAM_ASSERT(sizeof(T)==sizeof(float));
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             tests.Add_Ground((T).5,(T).1,0,1);
-            RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("circle",(T).2,(T).5);
-            rigid_body.Frame().t=TV((T)0.5,(T)0.75);
+            RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("circle",(T).2*m,(T).5);
+            rigid_body.Frame().t=TV((T)0.5,(T)0.75)*m;
+            rigid_body.Set_Mass(1*kg);
             TV g=m/(s*s)*TV(0,-1.8);
             auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
             solid_body_collection.rigid_body_collection.Add_Force(rg);
@@ -140,8 +141,9 @@ Initialize()
             PHYSBAM_ASSERT(sizeof(T)==sizeof(float));
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             tests.Add_Ground((T).5,(T).1,1,1);
-            RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("circle",(T).2,(T).5);
-            rigid_body.Frame().t=TV((T)0.5,(T)0.75);
+            RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("circle",(T).2*m,(T).5);
+            rigid_body.Frame().t=TV((T)0.5,(T)0.75)*m;
+            rigid_body.Set_Mass(1*kg);
             rigid_body.coefficient_of_restitution=1;
             TV g=m/(s*s)*TV(0,-1.8);
             auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
