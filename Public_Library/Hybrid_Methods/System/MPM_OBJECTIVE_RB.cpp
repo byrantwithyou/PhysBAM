@@ -92,6 +92,7 @@ Compute_Unconstrained(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,
         MPM_KRYLOV_VECTOR_RB<TV>& gg=debug_cast<MPM_KRYLOV_VECTOR_RB<TV>&>(*g);
         tmp2*=0;
         system.example.Add_Forces(tmp2.u,tmp2.twists,system.example.time);
+        system.example.Reflection_Boundary_Condition(tmp2.u,true);
 #pragma omp parallel for
         for(int i=0;i<system.example.valid_grid_indices.m;i++){
             int p=system.example.valid_grid_indices(i);

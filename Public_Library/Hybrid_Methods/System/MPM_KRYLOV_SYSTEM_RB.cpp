@@ -58,6 +58,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
 
     F*=0;
     example.Add_Hessian_Times(F.u,tmp.u,F.twists,tmp.twists,example.time);
+    example.Reflection_Boundary_Condition(F.u,true);
     T scale=example.use_midpoint?(T).25:1,scaled_dt_squared=sqr(example.dt*scale);
 
 #pragma omp parallel for
