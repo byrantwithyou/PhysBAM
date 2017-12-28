@@ -143,15 +143,9 @@ Update_F(const MPM_KRYLOV_VECTOR_RB<TV>& v) const
         });
 
     RIGID_BODY_PARTICLES<TV>& rbp=system.example.solid_body_collection.rigid_body_collection.rigid_body_particles;
-    system.rigid_mass.Resize(rbp.number);
-    system.rigid_mass_inverse.Resize(rbp.number);
 #pragma omp parallel
-    for(int i=0;i<rbp.number;i++){
+    for(int i=0;i<rbp.number;i++)
         rbp.frame(i)=Move_Rigid_Body(system.example.dt,frame0(i),v.twists(i),inertia0(i));
-        RIGID_BODY_STATE<TV> state=system.example.solid_body_collection.rigid_body_collection.State(i);
-        RIGID_BODY_MASS<TV> rm(rbp.rigid_body(i)->Rigid_Mass());
-        system.rigid_mass(i)=state.World_Space_Rigid_Mass(rm);
-        system.rigid_mass_inverse(i)=state.World_Space_Rigid_Mass_Inverse(rm);}
 }
 //#####################################################################
 // Function Compute
@@ -321,6 +315,8 @@ Reset()
     RIGID_BODY_PARTICLES<TV>& rbp=system.example.solid_body_collection.rigid_body_collection.rigid_body_particles;
     frame0.Resize(rbp.number);
     inertia0.Resize(rbp.number);
+    system.rigid_mass.Resize(rbp.number);
+    system.rigid_mass_inverse.Resize(rbp.number);
 #pragma omp parallel for
     for(int k=0;k<system.example.simulated_particles.m;k++){
         int p=system.example.simulated_particles(k);
@@ -329,9 +325,13 @@ Reset()
         X0(p)=system.example.particles.X(p);}
 
 #pragma omp parallel
-    for(int i=0;i<frame0.m;i++){
+    for(int i=0;i<rbp.number;i++){
         frame0(i)=rbp.frame(i);
-        inertia0(i)=rbp.rigid_body(i)->World_Space_Inertia_Tensor();}
+        inertia0(i)=rbp.rigid_body(i)->World_Space_Inertia_Tensor();
+        RIGID_BODY_STATE<TV> state=system.example.solid_body_collection.rigid_body_collection.State(i);
+        RIGID_BODY_MASS<TV> rm(rbp.rigid_body(i)->Rigid_Mass());
+        system.rigid_mass(i)=state.World_Space_Rigid_Mass(rm);
+        system.rigid_mass_inverse(i)=state.World_Space_Rigid_Mass_Inverse(rm);}
     
     v0.u=system.example.velocity;
     v0.twists=rbp.twist;
