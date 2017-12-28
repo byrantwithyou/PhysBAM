@@ -143,7 +143,7 @@ public:
     T Total_Grid_Kinetic_Energy(const ARRAY<TV,TV_INT>& u) const;
     T Total_Particle_Kinetic_Energy() const;
     T Average_Particle_Mass() const;
-    template<class S> void Reflection_Boundary_Condition(ARRAY<S,TV_INT>& u,bool flip_sign);
+    template<class S> void Reflection_Boundary_Condition(ARRAY<S,TV_INT>& u,bool flip_sign) const;
 
     // First entry MUST be int, and its value MUST be nonnegative.
     struct RASTERIZED_DATA

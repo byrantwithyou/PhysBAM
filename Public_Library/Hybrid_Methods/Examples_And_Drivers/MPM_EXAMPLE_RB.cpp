@@ -362,7 +362,7 @@ template<class T> void flip_normal(T& u,int a){}
 // Function Reflection_Boundary_Condition
 //#####################################################################
 template<class TV> template<class S> void MPM_EXAMPLE_RB<TV>::
-Reflection_Boundary_Condition(ARRAY<S,TV_INT>& u,bool flip_sign)
+Reflection_Boundary_Condition(ARRAY<S,TV_INT>& u,bool flip_sign) const
 {
     if(!reflection_bc_flags) return;
     TV_INT ranges[2]={TV_INT(),grid.numbers_of_cells};
@@ -389,19 +389,19 @@ template class MPM_EXAMPLE_RB<VECTOR<float,3> >;
 template class MPM_EXAMPLE_RB<VECTOR<double,2> >;
 template class MPM_EXAMPLE_RB<VECTOR<double,3> >;
 template void MPM_EXAMPLE_RB<VECTOR<double,2> >::Reflection_Boundary_Condition<VECTOR<double,2> >(
-    ARRAY<VECTOR<double,2>,VECTOR<int,2> >&,bool);
+    ARRAY<VECTOR<double,2>,VECTOR<int,2> >&,bool) const;
 template void MPM_EXAMPLE_RB<VECTOR<double,2> >::Reflection_Boundary_Condition<double>(
-    ARRAY<double,VECTOR<int,2> >&,bool);
+    ARRAY<double,VECTOR<int,2> >&,bool) const;
 template void MPM_EXAMPLE_RB<VECTOR<double,3> >::Reflection_Boundary_Condition<VECTOR<double,3> >(
-    ARRAY<VECTOR<double,3>,VECTOR<int,3> >&,bool);
+    ARRAY<VECTOR<double,3>,VECTOR<int,3> >&,bool) const;
 template void MPM_EXAMPLE_RB<VECTOR<double,3> >::Reflection_Boundary_Condition<double>(
-    ARRAY<double,VECTOR<int,3> >&,bool);
+    ARRAY<double,VECTOR<int,3> >&,bool) const;
 template void MPM_EXAMPLE_RB<VECTOR<float,2> >::Reflection_Boundary_Condition<VECTOR<float,2> >(
-    ARRAY<VECTOR<float,2>,VECTOR<int,2> >&,bool);
+    ARRAY<VECTOR<float,2>,VECTOR<int,2> >&,bool) const;
 template void MPM_EXAMPLE_RB<VECTOR<float,2> >::Reflection_Boundary_Condition<float>(
-    ARRAY<float,VECTOR<int,2> >&,bool);
+    ARRAY<float,VECTOR<int,2> >&,bool) const;
 template void MPM_EXAMPLE_RB<VECTOR<float,3> >::Reflection_Boundary_Condition<VECTOR<float,3> >(
-    ARRAY<VECTOR<float,3>,VECTOR<int,3> >&,bool);
+    ARRAY<VECTOR<float,3>,VECTOR<int,3> >&,bool) const;
 template void MPM_EXAMPLE_RB<VECTOR<float,3> >::Reflection_Boundary_Condition<float>(
-    ARRAY<float,VECTOR<int,3> >&,bool);
+    ARRAY<float,VECTOR<int,3> >&,bool) const;
 }
