@@ -10,6 +10,7 @@
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
+#include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 #include <Hybrid_Methods/System/MPM_KRYLOV_SYSTEM_RB.h>
 namespace PhysBAM{
 template<class TV> class MPM_KRYLOV_SYSTEM_RB;
