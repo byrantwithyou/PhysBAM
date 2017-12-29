@@ -112,6 +112,32 @@ public:
     T rd_penalty_friction=0.3;
     bool use_rd_penalty=false;
 
+    CHAINED_ARRAY<int,TV_INT> cell_particles;
+    CHAINED_ARRAY<int,TV_INT> cell_objects;
+
+    // First entry MUST be int, and its value MUST be nonnegative.
+    struct RASTERIZED_DATA
+    {
+        int id;
+        T phi;
+    };
+    CHAINED_ARRAY<RASTERIZED_DATA,TV_INT> rasterized_data;
+    ARRAY<bool> rigid_body_is_simulated;
+    HASHTABLE<PAIR<int,int>,TV> stored_contacts_rr;
+    HASHTABLE<PAIR<int,TV_INT>,TV> stored_contacts_rm;
+    T contact_factor=1; // omega
+    T impulse_interpolation=1; // lambda
+    T min_impulse_change=1e-4;
+    
+    bool pairwise_collisions=false;
+    bool projected_collisions=false;
+    int collision_iterations=5;
+
+    RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>* rd_penalty=0;
+
+
+
+    
     MPM_EXAMPLE_RB(const STREAM_TYPE stream_type_input);
     MPM_EXAMPLE_RB(const MPM_EXAMPLE_RB&) = delete;
     void operator=(const MPM_EXAMPLE_RB&) = delete;
@@ -151,30 +177,8 @@ public:
     T Average_Particle_Mass() const;
     template<class S> void Reflection_Boundary_Condition(ARRAY<S,TV_INT>& u,bool flip_sign) const;
     void Update_Collision_Detection_Structures();
-
-    CHAINED_ARRAY<int,TV_INT> cell_particles;
     void Collect_Collision_Pairs(IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* penalty_force);
-    CHAINED_ARRAY<int,TV_INT> cell_objects;
-
-    // First entry MUST be int, and its value MUST be nonnegative.
-    struct RASTERIZED_DATA
-    {
-        int id;
-        T phi;
-    };
-    CHAINED_ARRAY<RASTERIZED_DATA,TV_INT> rasterized_data;
-    ARRAY<bool> rigid_body_is_simulated;
-    HASHTABLE<PAIR<int,int>,TV> stored_contacts_rr;
-    HASHTABLE<PAIR<int,TV_INT>,TV> stored_contacts_rm;
-    T contact_factor=1; // omega
-    T impulse_interpolation=1; // lambda
-    T min_impulse_change=1e-4;
-    
-    bool pairwise_collisions=false;
-    bool projected_collisions=false;
-    int collision_iterations=5;
-
-    RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>* rd_penalty=0;
+    void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,T stiffness,T friction);
 //#####################################################################
 };
 }

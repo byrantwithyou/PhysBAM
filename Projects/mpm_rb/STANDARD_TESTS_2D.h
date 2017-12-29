@@ -51,7 +51,8 @@ public:
     using BASE::destroy;using BASE::plasticity_models;using BASE::write_output_files;using BASE::read_output_files;
     using BASE::begin_frame;using BASE::end_frame;using BASE::begin_time_step;using BASE::end_time_step;
     using BASE::extra_T;using BASE::extra_int;using BASE::solid_body_collection;
-
+    using BASE::rd_penalty_stiffness;using BASE::rd_penalty_friction;
+    
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();
 

@@ -10,7 +10,9 @@
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Geometry/Basic_Geometry/HOURGLASS.h>
+#include <Geometry/Basic_Geometry/LINE_2D.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
+#include <Geometry/Basic_Geometry/PLANE.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>
@@ -172,7 +174,7 @@ Initialize()
             solid_body_collection.rigid_body_collection.Add_Force(rg);
         } break;
 
-            // ./mpm_rb 6 -float -scale_E .1
+            // ./mpm_rb 6 -float -scale_E .1  -last_frame 20 -rd_stiffness 1e3
         case 6:{ // MPM in box
             PHYSBAM_ASSERT(sizeof(T)==sizeof(float));
             Set_Grid(RANGE<TV>::Unit_Box()*m);
@@ -182,20 +184,12 @@ Initialize()
             Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
             TV g=m/(s*s)*TV(0,-1.8);
             Add_Gravity(g);
-            RIGID_BODY<TV>& wl=tests.Add_Analytic_Box(TV(1,1));
-            wl.Frame().t=TV(-.5,.5);
-            wl.is_static=true;
-            RIGID_BODY<TV>& wb=tests.Add_Analytic_Box(TV(1,1));
-            wb.Frame().t=TV(.5,-.5);
-            wb.is_static=true;
-            RIGID_BODY<TV>& wr=tests.Add_Analytic_Box(TV(1,1));
-            wr.Frame().t=TV(1.5,.5);
-            wr.is_static=true;
-            auto penalty_force=new IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>(particles,
-                [this](IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* force){
-                    this->Collect_Collision_Pairs(force);},
-                (IMPLICIT_OBJECT<TV>*)wb.implicit_object,10,0);
-            Add_Force(*penalty_force);
+            auto* wl=new ANALYTIC_IMPLICIT_OBJECT<LINE_2D<T> >(LINE_2D<T>(TV(1,0),TV(0.1,0.1)));
+            auto* wb=new ANALYTIC_IMPLICIT_OBJECT<LINE_2D<T> >(LINE_2D<T>(TV(0,1),TV(0.1,0.1)));
+            auto* wr=new ANALYTIC_IMPLICIT_OBJECT<LINE_2D<T> >(LINE_2D<T>(TV(-1,0),TV(.9,.1)));
+            Add_Collision_Object(wl,rd_penalty_stiffness,rd_penalty_friction);
+            Add_Collision_Object(wb,rd_penalty_stiffness,rd_penalty_friction);
+            Add_Collision_Object(wr,rd_penalty_stiffness,rd_penalty_friction);
         } break;
 
             // ./mpm_rb 7 -float -scale_E .1 -rd_stiffness 1e3

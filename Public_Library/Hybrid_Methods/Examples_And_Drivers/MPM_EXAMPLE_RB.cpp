@@ -390,18 +390,17 @@ Reflection_Boundary_Condition(ARRAY<S,TV_INT>& u,bool flip_sign) const
 template<class TV> void MPM_EXAMPLE_RB<TV>::
 Collect_Collision_Pairs(IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* penalty_force)
 {
+    // TODO: Put all objects in one penalty_force, then handle discovery as the rigid-deformable version does.
     T padding=grid.dX.Max();
-    RANGE<TV_INT> cell_domain=grid.Domain_Indices();
+    RANGE<TV_INT> cell_domain=grid.Domain_Indices(ghost);
     RANGE<TV> box=penalty_force->io->Box().Thickened(padding);
-    RANGE<TV_INT> grid_range=grid.Clamp_To_Cell(box).Intersect(cell_domain);
-    for(RANGE_ITERATOR<TV::m> it(grid_range);it.Valid();it.Next()){
+    for(RANGE_ITERATOR<TV::m> it(cell_domain);it.Valid();it.Next()){
         auto candidates=cell_particles.Get(it.index);
         for(int i=0;i<candidates.m;i++){
             int p=candidates(i);
             TV X=particles.X(p);
             T phi=penalty_force->io->Extended_Phi(X);
-            TV n=penalty_force->io->Extended_Normal(X);
-            if(phi>0 || n.Dot(particles.V(p))>0) continue;
+            if(phi>0) continue;
             TV attach_point=penalty_force->io->Closest_Point_On_Boundary(X);
             penalty_force->Insert_Collision_Pair(p,attach_point);}}
 }
@@ -433,6 +432,17 @@ Update_Collision_Detection_Structures()
             T phi=rigid_body.Implicit_Geometry_Extended_Value(X);
             if(phi<padding)
                 rasterized_data.Insert(it.index,{b,phi});}}
+}
+//#####################################################################
+// Function Add_Collision_Object
+//#####################################################################
+template<class TV> void MPM_EXAMPLE_RB<TV>::
+Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,T stiffness,T friction)
+{
+    auto penalty_force=new IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>(particles,
+        [this](IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* force){
+            Collect_Collision_Pairs(force);},io,stiffness,friction);
+    Add_Force(*penalty_force);
 }
 //#####################################################################
 namespace PhysBAM{
