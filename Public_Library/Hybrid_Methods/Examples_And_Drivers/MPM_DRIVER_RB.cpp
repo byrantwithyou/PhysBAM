@@ -221,6 +221,18 @@ Update_Particle_Weights()
     if(example.particles.store_B) example.weights->Dp_Inverse(example.particles.X,example.Dp_inv);
 }
 //#####################################################################
+// Function Register_Particles
+//#####################################################################
+template<class TV> void MPM_DRIVER_RB<TV>::
+Register_Particles()
+{
+    example.cell_particles.Resize(example.grid.Domain_Indices());
+    for(int i=0;i<example.simulated_particles.m;i++){
+        int p=example.simulated_particles(i);
+        TV_INT cell_index=example.grid.Cell(example.particles.X(p));
+        example.cell_particles.Insert(cell_index,p);}
+}
+//#####################################################################
 // Function Particle_To_Grid
 //#####################################################################
 template<class TV> void MPM_DRIVER_RB<TV>::
@@ -266,6 +278,7 @@ Particle_To_Grid()
         else example.velocity.array(i)=TV();}
 
     Rasterize_Rigid_Bodies();
+    Register_Particles();
 }
 //#####################################################################
 // Function Grid_To_Particle

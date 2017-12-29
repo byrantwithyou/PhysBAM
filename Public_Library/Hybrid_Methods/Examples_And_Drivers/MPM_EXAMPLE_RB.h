@@ -146,6 +146,8 @@ public:
     T Average_Particle_Mass() const;
     template<class S> void Reflection_Boundary_Condition(ARRAY<S,TV_INT>& u,bool flip_sign) const;
 
+    CHAINED_ARRAY<int,TV_INT> cell_particles;
+
     // First entry MUST be int, and its value MUST be nonnegative.
     struct RASTERIZED_DATA
     {

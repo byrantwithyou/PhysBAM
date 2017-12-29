@@ -45,6 +45,7 @@ public:
     void Write_Substep(const std::string& title);
     void Update_Particle_Weights();
     void Particle_To_Grid();
+    void Register_Particles();
     void Grid_To_Particle();
     void Update_Plasticity_And_Hardening();
     void Apply_Forces();
