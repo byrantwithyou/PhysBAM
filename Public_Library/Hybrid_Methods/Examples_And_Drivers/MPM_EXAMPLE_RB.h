@@ -95,6 +95,7 @@ public:
     T solver_tolerance=(T).5;
     int solver_iterations=1000;
     bool test_diff=false;
+    bool test_system=false;
     int threads=1;
 
     TV last_linear_momentum;

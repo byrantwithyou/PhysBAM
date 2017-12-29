@@ -58,6 +58,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-substeps_delay",&substeps_delay_frame,"frame","delay substeps until after this frame");
     parse_args.Add("-last_frame",&last_frame,&user_last_frame,"frame","number of frames to simulate");
     parse_args.Add("-test_diff",&test_diff,"test analytic derivatives");
+    parse_args.Add("-test_system",&test_system,"test Krylov system properties");
     parse_args.Add("-threads",&threads,"threads","Number of threads");
     parse_args.Add("-o",&output_directory,&override_output_directory,"dir","Output directory");
     parse_args.Add("-mass_contour",&mass_contour,"contour","Draw mass contour as a scale to particle average mass");
