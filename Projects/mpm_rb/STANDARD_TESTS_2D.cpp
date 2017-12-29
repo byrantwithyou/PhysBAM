@@ -187,9 +187,9 @@ Initialize()
             auto* wl=new ANALYTIC_IMPLICIT_OBJECT<LINE_2D<T> >(LINE_2D<T>(TV(1,0),TV(0.1,0.1)));
             auto* wb=new ANALYTIC_IMPLICIT_OBJECT<LINE_2D<T> >(LINE_2D<T>(TV(0,1),TV(0.1,0.1)));
             auto* wr=new ANALYTIC_IMPLICIT_OBJECT<LINE_2D<T> >(LINE_2D<T>(TV(-1,0),TV(.9,.1)));
-            Add_Collision_Object(wl,rd_penalty_stiffness,rd_penalty_friction);
-            Add_Collision_Object(wb,rd_penalty_stiffness,rd_penalty_friction);
-            Add_Collision_Object(wr,rd_penalty_stiffness,rd_penalty_friction);
+            Add_Collision_Object(wl);
+            Add_Collision_Object(wb);
+            Add_Collision_Object(wr);
         } break;
 
             // ./mpm_rb 7 -float -scale_E .1 -rd_stiffness 1e3

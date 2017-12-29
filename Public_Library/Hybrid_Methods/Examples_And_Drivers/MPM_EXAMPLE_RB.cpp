@@ -3,11 +3,13 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION.h>
 #include <Deformables/Forces/LAGGED_FORCE.h>
+#include <Solids/Forces_And_Torques/RIGID_DEFORMABLE_PENALTY_WITH_FRICTION.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE_RB.h>
@@ -385,26 +387,6 @@ Reflection_Boundary_Condition(ARRAY<S,TV_INT>& u,bool flip_sign) const
         if(flip_sign) flip_normal(u(it.index),axis);}
 }
 //#####################################################################
-// Function Collect_Collision_Pairs
-//#####################################################################
-template<class TV> void MPM_EXAMPLE_RB<TV>::
-Collect_Collision_Pairs(IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* penalty_force)
-{
-    // TODO: Put all objects in one penalty_force, then handle discovery as the rigid-deformable version does.
-    T padding=grid.dX.Max();
-    RANGE<TV_INT> cell_domain=grid.Domain_Indices(ghost);
-    RANGE<TV> box=penalty_force->io->Box().Thickened(padding);
-    for(RANGE_ITERATOR<TV::m> it(cell_domain);it.Valid();it.Next()){
-        auto candidates=cell_particles.Get(it.index);
-        for(int i=0;i<candidates.m;i++){
-            int p=candidates(i);
-            TV X=particles.X(p);
-            T phi=penalty_force->io->Extended_Phi(X);
-            if(phi>0) continue;
-            TV attach_point=penalty_force->io->Closest_Point_On_Boundary(X);
-            penalty_force->Insert_Collision_Pair(p,attach_point);}}
-}
-//#####################################################################
 // Function Update_Collision_Detection_Structures
 //#####################################################################
 template<class TV> void MPM_EXAMPLE_RB<TV>::
@@ -418,7 +400,9 @@ Update_Collision_Detection_Structures()
 
     for(int k=0;k<simulated_particles.m;k++){
         int p=simulated_particles(k);
-        cell_particles.Insert(grid.Clamp_To_Cell(particles.X(p),ghost+1),p);}
+        TV_INT index=grid.Clamp_To_Cell(particles.X(p),ghost+1);
+        if(cell_domain.Lazy_Inside_Half_Open(index))
+            cell_particles.Insert(index,p);}
 
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
     T padding=grid.dX.Max()*2;
@@ -437,12 +421,51 @@ Update_Collision_Detection_Structures()
 // Function Add_Collision_Object
 //#####################################################################
 template<class TV> void MPM_EXAMPLE_RB<TV>::
-Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,T stiffness,T friction)
+Add_Collision_Object(IMPLICIT_OBJECT<TV>* io)
 {
-    auto penalty_force=new IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>(particles,
-        [this](IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* force){
-            Collect_Collision_Pairs(force);},io,stiffness,friction);
-    Add_Force(*penalty_force);
+    if(!d_io_penalty){
+        d_io_penalty=new IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>(
+            solid_body_collection.deformable_body_collection.particles,
+            rd_penalty_stiffness,rd_penalty_friction);
+        d_io_penalty->get_candidates=[this](){Get_IO_Collision_Candidates();};
+        cell_objects.Resize(grid.Domain_Indices(ghost));
+        solid_body_collection.deformable_body_collection.Add_Force(d_io_penalty);}
+
+    T padding=grid.dX.Magnitude()/2;
+    int o=d_io_penalty->ios.Append(io);
+    for(CELL_ITERATOR<TV> it(grid,ghost);it.Valid();it.Next())
+        if(io->Extended_Phi(it.Location())<padding)
+            cell_objects.Insert(it.index,o);
+}
+//#####################################################################
+// Function Get_IO_Collision_Candidates
+//#####################################################################
+template<class TV> void MPM_EXAMPLE_RB<TV>::
+Get_IO_Collision_Candidates()
+{
+    for(CELL_ITERATOR<TV> it(grid,ghost);it.Valid();it.Next()){
+        auto D=cell_particles.Get(it.index);
+        if(!D.m) continue;
+        auto O=cell_objects.Get(it.index);
+        if(!O.m) continue;
+        for(int i=0;i<D.m;i++)
+            for(int j=0;j<O.m;j++)
+                d_io_penalty->Add_Pair(D(i),O(j));}
+}
+//#####################################################################
+// Function Get_RD_Collision_Candidates
+//#####################################################################
+template<class TV> void MPM_EXAMPLE_RB<TV>::
+Get_RD_Collision_Candidates()
+{
+    for(CELL_ITERATOR<TV> it(grid,ghost);it.Valid();it.Next()){
+        auto D=cell_particles.Get(it.index);
+        if(!D.m) continue;
+        auto R=rasterized_data.Get(it.index);
+        if(!R.m) continue;
+        for(int i=0;i<D.m;i++)
+            for(int j=0;j<R.m;j++)
+                rd_penalty->Add_Pair(D(i),R(j).id);}
 }
 //#####################################################################
 namespace PhysBAM{

@@ -134,7 +134,7 @@ public:
     int collision_iterations=5;
 
     RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>* rd_penalty=0;
-
+    IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* d_io_penalty=0;
 
 
     
@@ -177,8 +177,9 @@ public:
     T Average_Particle_Mass() const;
     template<class S> void Reflection_Boundary_Condition(ARRAY<S,TV_INT>& u,bool flip_sign) const;
     void Update_Collision_Detection_Structures();
-    void Collect_Collision_Pairs(IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* penalty_force);
-    void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,T stiffness,T friction);
+    void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io);
+    void Get_RD_Collision_Candidates();
+    void Get_IO_Collision_Candidates();
 //#####################################################################
 };
 }

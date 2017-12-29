@@ -1,5 +1,5 @@
 //#####################################################################
-// Copyright 2010.
+// Copyright 2017.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Data_Structures/TRIPLE.h>
@@ -14,10 +14,9 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>::
 IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION(DEFORMABLE_PARTICLES<TV>& particles_input,
-    std::function<void(IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* self)> cp_func,
-    IMPLICIT_OBJECT<TV>* io,T stiffness_coefficient,T friction)
-    :BASE(particles_input),collect_collision_pairs(cp_func),
-    io(io),stiffness_coefficient(stiffness_coefficient),friction(friction)
+    T stiffness_coefficient,T friction)
+    :BASE(particles_input),stiffness_coefficient(stiffness_coefficient),
+    friction(friction)
 {
 }
 //#####################################################################
@@ -26,14 +25,6 @@ IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION(DEFORMABLE_PARTICLES<TV>& particles_
 template<class TV> IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>::
 ~IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION()
 {
-}
-//#####################################################################
-// Function Insert_Collision_Pair
-//#####################################################################
-template<class TV> void IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>::
-Insert_Collision_Pair(int p,const TV& attach_point)
-{
-    collision_pairs.Append({p,attach_point});
 }
 //#####################################################################
 // Function Add_Velocity_Independent_Forces
@@ -52,8 +43,8 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 template<class TV> void IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>::
 Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
-    collision_pairs.Remove_All();
-    collect_collision_pairs(this);
+    get_candidates();
+
     for(int i=0;i<collision_pairs.m;i++)
         Relax_Attachment(i);
 }
@@ -88,6 +79,7 @@ template<class TV> void IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>::
 Relax_Attachment(int cp)
 {
     COLLISION_PAIR& c=collision_pairs(cp);
+    IMPLICIT_OBJECT<TV>* io=ios(c.o);
     TV Z=particles.X(c.p);
     T phi=io->Extended_Phi(Z);
     if(phi>=0){c.Y=Z;c.active=false;return;}
@@ -107,6 +99,36 @@ Relax_Attachment(int cp)
     q.Compute_Roots_In_Interval(0,1);
     PHYSBAM_ASSERT(q.roots==1);
     c.Y=io->Closest_Point_On_Boundary(q.root1*H+c.X);
+}
+//#####################################################################
+// Function Update_Attachments_And_Prune_Pairs
+//#####################################################################
+template<class TV> void IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>::
+Update_Attachments_And_Prune_Pairs()
+{
+    int k=0;
+    for(int i=0;i<collision_pairs.m;i++){
+        COLLISION_PAIR c=collision_pairs(i);
+        if(c.active){
+            c.X=c.Y;
+            collision_pairs(k++)=c;}
+        else hash.Delete({c.p,c.o});}
+    collision_pairs.Resize(k);
+}
+//#####################################################################
+// Function Add_Pair
+//#####################################################################
+template<class TV> void IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>::
+Add_Pair(int p,int o)
+{
+    // TODO: Interpolate X^n and X^(n+1) to choose surface point.
+    if(hash.Contains({p,o})) return;
+    TV X=particles.X(p);
+    if(ios(o)->Extended_Phi(X)>0) return;
+    TV W=ios(o)->Closest_Point_On_Boundary(X);
+    COLLISION_PAIR c={p,o,W};
+    collision_pairs.Append(c);
+    hash.Insert({p,o});
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces

@@ -122,9 +122,9 @@ Initialize()
             example.solid_body_collection.deformable_body_collection.particles,
             example.solid_body_collection.rigid_body_collection,
             example.rd_penalty_stiffness,example.rd_penalty_friction);
-        example.rd_penalty->get_candidates=[this](){Get_RD_Collision_Candidates();};
+        example.rd_penalty->get_candidates=[this](){example.Get_RD_Collision_Candidates();};
         example.solid_body_collection.Add_Force(example.rd_penalty);}
-
+    
     if(!example.restart) Write_Output_Files(0);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",1);
 }
@@ -931,21 +931,6 @@ Process_Projected_Collisions(T dt)
         example.stored_contacts_rr.Set({ci.b0->particle_index,ci.b1->particle_index},ci.impulse);}
 
 
-}
-//#####################################################################
-// Function Get_RD_Collision_Candidates
-//#####################################################################
-template<class TV> void MPM_DRIVER_RB<TV>::
-Get_RD_Collision_Candidates()
-{
-    for(CELL_ITERATOR<TV> it(example.grid,example.ghost);it.Valid();it.Next()){
-        auto D=example.cell_particles.Get(it.index);
-        if(!D.m) continue;
-        auto R=example.rasterized_data.Get(it.index);
-        if(!R.m) continue;
-        for(int i=0;i<D.m;i++)
-            for(int j=0;j<R.m;j++)
-                example.rd_penalty->Add_Pair(D(i),R(j).id);}
 }
 //#####################################################################
 namespace PhysBAM{
