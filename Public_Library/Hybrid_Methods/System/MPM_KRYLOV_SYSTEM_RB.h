@@ -2,10 +2,10 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class MPM_KRYLOV_SYSTEM
+// Class MPM_KRYLOV_SYSTEM_RB
 //#####################################################################
-#ifndef __MPM_KRYLOV_SYSTEM__
-#define __MPM_KRYLOV_SYSTEM__
+#ifndef __MPM_KRYLOV_SYSTEM_RB__
+#define __MPM_KRYLOV_SYSTEM_RB__
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Vectors/VECTOR.h>

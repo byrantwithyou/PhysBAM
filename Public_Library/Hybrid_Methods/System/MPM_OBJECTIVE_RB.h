@@ -4,8 +4,8 @@
 //#####################################################################
 // Class MPM_OBJECTIVE_RB
 //#####################################################################
-#ifndef __MPM_OBJECTIVE__
-#define __MPM_OBJECTIVE__
+#ifndef __MPM_OBJECTIVE_RB__
+#define __MPM_OBJECTIVE_RB__
 #include <Core/Arrays/ARRAY.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
