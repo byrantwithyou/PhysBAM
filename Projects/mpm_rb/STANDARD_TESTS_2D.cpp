@@ -34,6 +34,7 @@
 #include <Deformables/Constitutive_Models/QUASI_INCOMPRESSIBLE_FORCE.h>
 #include <Deformables/Constitutive_Models/TAIT_PRESSURE_FORCE.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
+#include <Deformables/Forces/IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION.h>
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
 #include <Deformables/Forces/SURFACE_TENSION_FORCE.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
@@ -169,6 +170,32 @@ Initialize()
             TV g=m/(s*s)*TV(0,-1.8);
             auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
             solid_body_collection.rigid_body_collection.Add_Force(rg);
+        } break;
+
+            // ./mpm_rb 6 -float -scale_E .1
+        case 6:{ // MPM in box
+            PHYSBAM_ASSERT(sizeof(T)==sizeof(float));
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            RANGE<TV> box(TV((T).2,(T).2)*m,TV((T).5,(T).5)*m);
+            T density=2*unit_rho*scale_mass;
+            Seed_Particles(box,0,0,density,particles_per_cell);
+            Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
+            TV g=m/(s*s)*TV(0,-1.8);
+            Add_Gravity(g);
+            RIGID_BODY<TV>& wl=tests.Add_Analytic_Box(TV(1,1));
+            wl.Frame().t=TV(-.5,.5);
+            wl.is_static=true;
+            RIGID_BODY<TV>& wb=tests.Add_Analytic_Box(TV(1,1));
+            wb.Frame().t=TV(.5,-.5);
+            wb.is_static=true;
+            RIGID_BODY<TV>& wr=tests.Add_Analytic_Box(TV(1,1));
+            wr.Frame().t=TV(1.5,.5);
+            wr.is_static=true;
+            auto penalty_force=new IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>(particles,
+                [this](IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* force){
+                    this->Collect_Collision_Pairs(force);},
+                (IMPLICIT_OBJECT<TV>*)wb.implicit_object,10,0);
+            Add_Force(*penalty_force);
         } break;
 
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
