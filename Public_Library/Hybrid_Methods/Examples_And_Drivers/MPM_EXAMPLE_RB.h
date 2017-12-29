@@ -30,6 +30,7 @@ template<class TV> class PARTICLE_GRID_FORCES;
 template<class TV> class PARTICLE_GRID_WEIGHTS;
 template<class TV> class MPM_PLASTICITY_MODEL;
 template<class TV> class IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION;
+template<class T> class RIGID_DEFORMABLE_PENALTY_WITH_FRICTION;
 
 template<class TV>
 class MPM_EXAMPLE_RB
@@ -106,7 +107,10 @@ public:
     bool output_structures_each_frame=false;
     T quad_F_coeff=0;
     bool asymmetric_system=false;
-    
+
+    T rd_penalty_stiffness=0;
+    T rd_penalty_friction=0.3;
+    bool use_rd_penalty=false;
 
     MPM_EXAMPLE_RB(const STREAM_TYPE stream_type_input);
     MPM_EXAMPLE_RB(const MPM_EXAMPLE_RB&) = delete;
@@ -146,9 +150,11 @@ public:
     T Total_Particle_Kinetic_Energy() const;
     T Average_Particle_Mass() const;
     template<class S> void Reflection_Boundary_Condition(ARRAY<S,TV_INT>& u,bool flip_sign) const;
+    void Update_Collision_Detection_Structures();
 
     CHAINED_ARRAY<int,TV_INT> cell_particles;
     void Collect_Collision_Pairs(IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* penalty_force);
+    CHAINED_ARRAY<int,TV_INT> cell_objects;
 
     // First entry MUST be int, and its value MUST be nonnegative.
     struct RASTERIZED_DATA
@@ -167,6 +173,8 @@ public:
     bool pairwise_collisions=false;
     bool projected_collisions=false;
     int collision_iterations=5;
+
+    RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>* rd_penalty=0;
 //#####################################################################
 };
 }

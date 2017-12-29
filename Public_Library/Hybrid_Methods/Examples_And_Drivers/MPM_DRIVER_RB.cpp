@@ -10,10 +10,12 @@
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
-#include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Collisions/COLLISION_HELPER.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
+#include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
+#include <Solids/Forces_And_Torques/RIGID_DEFORMABLE_PENALTY_WITH_FRICTION.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_DRIVER_RB.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE_RB.h>
@@ -114,6 +116,14 @@ Initialize()
     //         if(fluid_walls(k)->Lazy_Inside(iterator.Location())){
     //             cell_soli....
     Update_Simulated_Particles();
+
+    if(example.use_rd_penalty && example.solid_body_collection.rigid_body_collection.rigid_body_particles.number>0){
+        example.rd_penalty=new RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>(
+            example.solid_body_collection.deformable_body_collection.particles,
+            example.solid_body_collection.rigid_body_collection,
+            example.rd_penalty_stiffness,example.rd_penalty_friction);
+        example.rd_penalty->get_candidates=[this](){Get_RD_Collision_Candidates();};
+        example.solid_body_collection.Add_Force(example.rd_penalty);}
 
     if(!example.restart) Write_Output_Files(0);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",1);
@@ -226,7 +236,7 @@ Update_Particle_Weights()
 template<class TV> void MPM_DRIVER_RB<TV>::
 Register_Particles()
 {
-    example.cell_particles.Resize(example.grid.Domain_Indices());
+    example.cell_particles.Resize(example.grid.Domain_Indices(example.ghost));
     for(int i=0;i<example.simulated_particles.m;i++){
         int p=example.simulated_particles(i);
         TV_INT cell_index=example.grid.Cell(example.particles.X(p));
@@ -277,7 +287,6 @@ Particle_To_Grid()
             example.velocity_save.array(i)=v;}
         else example.velocity.array(i)=TV();}
 
-    Rasterize_Rigid_Bodies();
     Register_Particles();
 }
 //#####################################################################
@@ -759,27 +768,6 @@ Apply_Rigid_Body_Forces()
     rigid_body_collection.Update_Angular_Momentum();
 }
 //#####################################################################
-// Function Rasterize_Rigid_Bodies
-//#####################################################################
-template<class TV> void MPM_DRIVER_RB<TV>::
-Rasterize_Rigid_Bodies()
-{
-    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=example.solid_body_collection.rigid_body_collection.rigid_body_particles;
-    T padding=example.grid.dX.Max()*2;
-    RANGE<TV_INT> cell_domain=example.grid.Domain_Indices(example.ghost);
-    example.rasterized_data.Resize(cell_domain);
-    for(int b=0;b<rigid_body_particles.frame.m;b++){
-        RIGID_BODY<TV>& rigid_body=*rigid_body_particles.rigid_body(b);
-        rigid_body.Update_Bounding_Box_From_Implicit_Geometry();
-        RANGE<TV> box=rigid_body.Axis_Aligned_Bounding_Box().Thickened(padding);
-        RANGE<TV_INT> grid_range=example.grid.Clamp_To_Cell(box,example.ghost+1).Intersect(cell_domain);
-        for(RANGE_ITERATOR<TV::m> it(grid_range);it.Valid();it.Next()){
-            TV X=example.grid.Center(it.index);
-            T phi=rigid_body.Implicit_Geometry_Extended_Value(X);
-            if(phi<padding)
-                example.rasterized_data.Insert(it.index,{b,phi});}}
-}
-//#####################################################################
 // Function Process_Pairwise_Collisions
 //#####################################################################
 template<class TV> void MPM_DRIVER_RB<TV>::
@@ -943,6 +931,21 @@ Process_Projected_Collisions(T dt)
         example.stored_contacts_rr.Set({ci.b0->particle_index,ci.b1->particle_index},ci.impulse);}
 
 
+}
+//#####################################################################
+// Function Get_RD_Collision_Candidates
+//#####################################################################
+template<class TV> void MPM_DRIVER_RB<TV>::
+Get_RD_Collision_Candidates()
+{
+    for(CELL_ITERATOR<TV> it(example.grid,example.ghost);it.Valid();it.Next()){
+        auto D=example.cell_particles.Get(it.index);
+        if(!D.m) continue;
+        auto R=example.rasterized_data.Get(it.index);
+        if(!R.m) continue;
+        for(int i=0;i<D.m;i++)
+            for(int j=0;j<R.m;j++)
+                example.rd_penalty->Add_Pair(D(i),R(j).id);}
 }
 //#####################################################################
 namespace PhysBAM{

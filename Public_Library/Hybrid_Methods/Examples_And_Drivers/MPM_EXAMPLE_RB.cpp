@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION.h>
@@ -403,6 +404,35 @@ Collect_Collision_Pairs(IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* penalty
             if(phi>0 || n.Dot(particles.V(p))>0) continue;
             TV attach_point=penalty_force->io->Closest_Point_On_Boundary(X);
             penalty_force->Insert_Collision_Pair(p,attach_point);}}
+}
+//#####################################################################
+// Function Update_Collision_Detection_Structures
+//#####################################################################
+template<class TV> void MPM_EXAMPLE_RB<TV>::
+Update_Collision_Detection_Structures()
+{
+    RANGE<TV_INT> cell_domain=grid.Domain_Indices(ghost);
+    cell_particles.Resize(cell_domain);
+    cell_particles.Remove_All();
+    rasterized_data.Resize(cell_domain);
+    rasterized_data.Remove_All();
+
+    for(int k=0;k<simulated_particles.m;k++){
+        int p=simulated_particles(k);
+        cell_particles.Insert(grid.Clamp_To_Cell(particles.X(p),ghost+1),p);}
+
+    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
+    T padding=grid.dX.Max()*2;
+    for(int b=0;b<rigid_body_particles.frame.m;b++){
+        RIGID_BODY<TV>& rigid_body=*rigid_body_particles.rigid_body(b);
+        rigid_body.Update_Bounding_Box_From_Implicit_Geometry();
+        RANGE<TV> box=rigid_body.Axis_Aligned_Bounding_Box().Thickened(padding);
+        RANGE<TV_INT> grid_range=grid.Clamp_To_Cell(box,ghost+1).Intersect(cell_domain);
+        for(RANGE_ITERATOR<TV::m> it(grid_range);it.Valid();it.Next()){
+            TV X=grid.Center(it.index);
+            T phi=rigid_body.Implicit_Geometry_Extended_Value(X);
+            if(phi<padding)
+                rasterized_data.Insert(it.index,{b,phi});}}
 }
 //#####################################################################
 namespace PhysBAM{

@@ -62,9 +62,9 @@ public:
     void Reflect_Or_Invalidate_Particle(int p);
     void Move_Rigid_Bodies();
     void Apply_Rigid_Body_Forces();
-    void Rasterize_Rigid_Bodies();
     void Process_Pairwise_Collisions();
     void Process_Projected_Collisions(T dt);
+    void Get_RD_Collision_Candidates();
 //#####################################################################
 };
 

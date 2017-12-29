@@ -46,6 +46,8 @@ public:
     using BASE::data_directory;using BASE::reflection_bc_flags;
     using BASE::quad_F_coeff;using BASE::use_sound_speed_cfl;using BASE::cfl_sound;
     using BASE::pairwise_collisions;using BASE::projected_collisions;
+    using BASE::rd_penalty_stiffness;using BASE::rd_penalty_friction;
+    using BASE::use_rd_penalty;
     
     int test_number;
     int resolution;

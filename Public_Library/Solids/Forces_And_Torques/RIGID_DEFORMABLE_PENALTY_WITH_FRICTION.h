@@ -34,7 +34,8 @@ public:
     };
     ARRAY<COLLISION_PAIR> collision_pairs;
     HASHTABLE<PAIR<int,int> > hash;
-    
+    std::function<void()> get_candidates=0; // Call Add_Pair on collision candidates.
+
     RIGID_DEFORMABLE_PENALTY_WITH_FRICTION(DEFORMABLE_PARTICLES<TV>& particles_input,
         RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,T stiffness_coefficient,
         T friction);

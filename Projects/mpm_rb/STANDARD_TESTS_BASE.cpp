@@ -120,7 +120,10 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-reflection_bc",&reflection_bc_flags,"flags","Flags indicating which walls should be reflection BC");
     parse_args.Add("-coll_pair",&pairwise_collisions,"use pairwise collisions");
     parse_args.Add("-coll_proj",&projected_collisions,"use pairwise collisions");
+    parse_args.Add("-rd_stiffness",&rd_penalty_stiffness,&use_rd_penalty,"stiffness","rigid-deformable penalty force stiffness");
+    parse_args.Add("-rd_friction",&rd_penalty_friction,"friction","rigid-deformable penalty force friction");
 
+    
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);
     if(use_slip) forced_collision_type=COLLISION_TYPE::slip;

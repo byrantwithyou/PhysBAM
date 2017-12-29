@@ -198,6 +198,24 @@ Initialize()
             Add_Force(*penalty_force);
         } break;
 
+            // ./mpm_rb 7 -float -scale_E .1 -rd_stiffness 1e3
+        case 7:{ // MPM block and rigid circle, no collisions with boundary.
+            PHYSBAM_ASSERT(sizeof(T)==sizeof(float));
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            RANGE<TV> box(TV(.2,.2)*m,TV(.8,(T).5)*m);
+            T density=2*unit_rho*scale_mass;
+            Seed_Particles(box,0,0,density,particles_per_cell);
+            Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
+            // TV g=m/(s*s)*TV(0,-1.8);
+            // Add_Gravity(g);
+            RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("circle",(T).2*m,(T).5);
+            rigid_body.Frame().t=TV((T)0.5,(T)0.75)*m;
+            rigid_body.Set_Mass(2*kg);
+            rigid_body.Twist().linear=TV(0,-1)*m/s;
+            // auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
+            // solid_body_collection.rigid_body_collection.Add_Force(rg);
+        } break;
+
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     if(forced_collision_type!=-1)

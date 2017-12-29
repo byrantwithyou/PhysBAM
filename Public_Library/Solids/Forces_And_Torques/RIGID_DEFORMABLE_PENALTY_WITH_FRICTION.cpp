@@ -48,6 +48,8 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,
 template<class TV> void RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>::
 Update_Position_Based_State(const T time)
 {
+    get_candidates();
+
     for(int i=0;i<collision_pairs.m;i++)
         Relax_Attachment(i);
 }
@@ -132,6 +134,7 @@ Update_Attachments_And_Prune_Pairs()
 template<class TV> void RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>::
 Add_Pair(int p,int b)
 {
+    // TODO: Interpolate X^n and X^(n+1) to choose surface point.
     if(hash.Contains({p,b})) return;
     TV X=particles.X(p);
     const RIGID_BODY<TV>& rb=rigid_body_collection.Rigid_Body(b);
@@ -221,7 +224,6 @@ Initialize_CFL(ARRAY_VIEW<typename BASE::DEFORMABLE_FREQUENCY_DATA> frequency,AR
 template<class TV> void RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>::
 Add_Force_Data(ARRAY<FORCE_DATA<TV> >& force_data_list,const std::string& force_name) const
 {
-    PHYSBAM_FATAL_ERROR();
 }
 //#####################################################################
 // Function Velocity_Dependent_Forces_Size
@@ -242,4 +244,6 @@ CFL_Strain_Rate() const
 namespace PhysBAM{
 template class RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<VECTOR<float,2> >;
 template class RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<VECTOR<double,2> >;
+template class RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<VECTOR<float,3> >;
+template class RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<VECTOR<double,3> >;
 }
