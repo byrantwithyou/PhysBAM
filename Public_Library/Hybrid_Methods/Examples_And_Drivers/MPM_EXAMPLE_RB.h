@@ -29,6 +29,7 @@ template<class TV> class MPM_PARTICLES;
 template<class TV> class PARTICLE_GRID_FORCES;
 template<class TV> class PARTICLE_GRID_WEIGHTS;
 template<class TV> class MPM_PLASTICITY_MODEL;
+template<class TV> class IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION;
 
 template<class TV>
 class MPM_EXAMPLE_RB
@@ -147,6 +148,7 @@ public:
     template<class S> void Reflection_Boundary_Condition(ARRAY<S,TV_INT>& u,bool flip_sign) const;
 
     CHAINED_ARRAY<int,TV_INT> cell_particles;
+    void Collect_Collision_Pairs(IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* penalty_force);
 
     // First entry MUST be int, and its value MUST be nonnegative.
     struct RASTERIZED_DATA

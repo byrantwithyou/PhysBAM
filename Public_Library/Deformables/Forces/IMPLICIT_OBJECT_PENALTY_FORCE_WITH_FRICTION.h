@@ -20,6 +20,7 @@ public:
     typedef DEFORMABLES_FORCES<TV> BASE;
     using BASE::particles;
 
+    std::function<void(IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* self)> collect_collision_pairs;
     IMPLICIT_OBJECT<TV>* io=0;
     T stiffness_coefficient;
     T friction;
@@ -34,8 +35,10 @@ public:
     ARRAY<COLLISION_PAIR> collision_pairs;
     
     IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION(DEFORMABLE_PARTICLES<TV>& particles_input,
+        std::function<void(IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* self)> cp_func,
         IMPLICIT_OBJECT<TV>* io,T stiffness_coefficient,T friction);
     virtual ~IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION();
+    void Insert_Collision_Pair(int p, const TV& attach_point);
 
 //#####################################################################
     void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) override;

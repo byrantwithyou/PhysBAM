@@ -14,9 +14,10 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>::
 IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION(DEFORMABLE_PARTICLES<TV>& particles_input,
+    std::function<void(IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* self)> cp_func,
     IMPLICIT_OBJECT<TV>* io,T stiffness_coefficient,T friction)
-    :BASE(particles_input),io(io),stiffness_coefficient(stiffness_coefficient),
-    friction(friction)
+    :BASE(particles_input),collect_collision_pairs(cp_func),
+    io(io),stiffness_coefficient(stiffness_coefficient),friction(friction)
 {
 }
 //#####################################################################
@@ -25,6 +26,14 @@ IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION(DEFORMABLE_PARTICLES<TV>& particles_
 template<class TV> IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>::
 ~IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION()
 {
+}
+//#####################################################################
+// Function Insert_Collision_Pair
+//#####################################################################
+template<class TV> void IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>::
+Insert_Collision_Pair(int p,const TV& attach_point)
+{
+    collision_pairs.Append({p,attach_point});
 }
 //#####################################################################
 // Function Add_Velocity_Independent_Forces
@@ -43,6 +52,8 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 template<class TV> void IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>::
 Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
+    collision_pairs.Remove_All();
+    collect_collision_pairs(this);
     for(int i=0;i<collision_pairs.m;i++)
         Relax_Attachment(i);
 }

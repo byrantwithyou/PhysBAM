@@ -5,6 +5,7 @@
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
+#include <Deformables/Forces/IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION.h>
 #include <Deformables/Forces/LAGGED_FORCE.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
@@ -381,6 +382,27 @@ Reflection_Boundary_Condition(ARRAY<S,TV_INT>& u,bool flip_sign) const
         pair(axis)=2*ranges[side](axis)-it.index(axis)-1;
         u(it.index)=u(pair);
         if(flip_sign) flip_normal(u(it.index),axis);}
+}
+//#####################################################################
+// Function Collect_Collision_Pairs
+//#####################################################################
+template<class TV> void MPM_EXAMPLE_RB<TV>::
+Collect_Collision_Pairs(IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* penalty_force)
+{
+    T padding=grid.dX.Max();
+    RANGE<TV_INT> cell_domain=grid.Domain_Indices();
+    RANGE<TV> box=penalty_force->io->Box().Thickened(padding);
+    RANGE<TV_INT> grid_range=grid.Clamp_To_Cell(box).Intersect(cell_domain);
+    for(RANGE_ITERATOR<TV::m> it(grid_range);it.Valid();it.Next()){
+        auto candidates=cell_particles.Get(it.index);
+        for(int i=0;i<candidates.m;i++){
+            int p=candidates(i);
+            TV X=particles.X(p);
+            T phi=penalty_force->io->Extended_Phi(X);
+            TV n=penalty_force->io->Extended_Normal(X);
+            if(phi>0 || n.Dot(particles.V(p))>0) continue;
+            TV attach_point=penalty_force->io->Closest_Point_On_Boundary(X);
+            penalty_force->Insert_Collision_Pair(p,attach_point);}}
 }
 //#####################################################################
 namespace PhysBAM{
