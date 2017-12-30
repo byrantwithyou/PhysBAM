@@ -82,6 +82,10 @@ Potential_Energy(const T time) const
             pe+=(T).5*stiffness_coefficient*(particles.X(c.p)-c.Y).Magnitude_Squared();}
     return pe;
 }
+namespace PhysBAM{
+template<class TV,class T> PAIR<TV,bool>
+Relax_Attachment_Helper(const TV& Z,const TV& X,T phi,const TV& n,T mu);
+}
 //#####################################################################
 // Function Relax_Attachment
 //#####################################################################
@@ -94,23 +98,10 @@ Relax_Attachment(int cp)
     TV X=rb.Frame()*c.X;
     TV Z=particles.X(c.p);
     T phi=io->Extended_Phi(Z);
-    if(phi>=0){c.Y=Z;c.active=false;return;}
     TV n=io->Extended_Normal(Z);
-    
-    TV F=X-Z;
-    T fn=F.Dot(n);
-    if(fn<0){c.Y=Z;c.active=false;return;}
-    T ft=(F-n*fn).Magnitude();
-    c.active=true;
-    if(ft<=friction*fn){c.Y=X;return;}
-
-    // Project to friction cone.
-    TV W=io->Closest_Point_On_Boundary(Z),H=W-X;
-    T mu2=(1+sqr(friction)),Hn=H.Dot(n),Fn=F.Dot(n);
-    QUADRATIC<T> q(mu2*sqr(Hn)-H.Dot(H),2*(mu2*Hn*Fn-H.Dot(F)),mu2*sqr(Fn)-F.Dot(F));
-    q.Compute_Roots_In_Interval(0,1);
-    PHYSBAM_ASSERT(q.roots==1);
-    c.Y=io->Closest_Point_On_Boundary(q.root1*H+X);
+    auto pr=Relax_Attachment_Helper(Z,X,phi,n,friction);
+    c.Y=pr.x;
+    c.active=pr.y;
 }
 //#####################################################################
 // Function Update_Attachments_And_Prune_Pairs

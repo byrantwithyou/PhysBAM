@@ -72,6 +72,27 @@ Potential_Energy(const T time) const
             pe+=(T).5*stiffness_coefficient*(particles.X(c.p)-c.Y).Magnitude_Squared();}
     return pe;
 }
+// Z = colliding point, X = original attachment, Y = computed attachment
+// phi = phi(Z), n = normal(Z)
+namespace PhysBAM{
+template<class TV,class T>
+PAIR<TV,bool> Relax_Attachment_Helper(const TV& Z,const TV& X,T phi,const TV& n,T mu)
+{
+    if(phi>=0) return {Z,false};
+    TV F=X-Z;
+    T Fn=F.Dot(n);
+    if(Fn<0) return {Z,false};
+    T qc=(1+sqr(mu))*sqr(Fn)-F.Dot(F);
+    if(qc>=0) return {X,true};
+    T qb=Fn*phi*sqr(mu);
+    T qa=sqr(phi*mu);
+    // a^2*qc - 2*a*(1-a)*qb + (1-a)^2*qa = 0
+    // exactly true: qc < 0, qb <= 0, qa >= 0; thus a unique in [0,1].
+    T D=sqrt(sqr(qb)-qa*qc)+qb;
+    T a=qa/(qa+D);
+    return {(1-a)*(Z-n*phi)+a*X,true};
+}
+}
 //#####################################################################
 // Function Relax_Attachment
 //#####################################################################
@@ -82,23 +103,10 @@ Relax_Attachment(int cp)
     IMPLICIT_OBJECT<TV>* io=ios(c.o);
     TV Z=particles.X(c.p);
     T phi=io->Extended_Phi(Z);
-    if(phi>=0){c.Y=Z;c.active=false;return;}
     TV n=io->Extended_Normal(Z);
-    
-    TV F=c.X-Z;
-    T fn=F.Dot(n);
-    if(fn<0){c.Y=Z;c.active=false;return;}
-    T ft=(F-n*fn).Magnitude();
-    c.active=true;
-    if(ft<=friction*fn){c.Y=c.X;return;}
-
-    // Project to friction cone.
-    TV W=io->Closest_Point_On_Boundary(Z),H=W-c.X;
-    T mu2=(1+sqr(friction)),Hn=H.Dot(n),Fn=F.Dot(n);
-    QUADRATIC<T> q(mu2*sqr(Hn)-H.Dot(H),2*(mu2*Hn*Fn-H.Dot(F)),mu2*sqr(Fn)-F.Dot(F));
-    q.Compute_Roots_In_Interval(0,1);
-    PHYSBAM_ASSERT(q.roots==1);
-    c.Y=io->Closest_Point_On_Boundary(q.root1*H+c.X);
+    auto pr=Relax_Attachment_Helper(Z,c.X,phi,n,friction);
+    c.Y=pr.x;
+    c.active=pr.y;
 }
 //#####################################################################
 // Function Update_Attachments_And_Prune_Pairs
@@ -214,4 +222,12 @@ template class IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<VECTOR<float,2> >;
 template class IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<VECTOR<float,3> >;
 template class IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<VECTOR<double,2> >;
 template class IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<VECTOR<double,3> >;
+template PAIR<VECTOR<double,2>,bool> Relax_Attachment_Helper<VECTOR<double,2>,double>(
+    VECTOR<double,2> const&,VECTOR<double,2> const&,double,VECTOR<double,2> const&,double);
+template PAIR<VECTOR<double,3>,bool> Relax_Attachment_Helper<VECTOR<double,3>,double>(
+    VECTOR<double,3> const&,VECTOR<double,3> const&,double,VECTOR<double,3> const&,double);
+template PAIR<VECTOR<float,2>,bool> Relax_Attachment_Helper<VECTOR<float,2>,float>(
+    VECTOR<float,2> const&,VECTOR<float,2> const&,float,VECTOR<float,2> const&,float);
+template PAIR<VECTOR<float,3>,bool> Relax_Attachment_Helper<VECTOR<float,3>,float>(
+    VECTOR<float,3> const&,VECTOR<float,3> const&,float,VECTOR<float,3> const&,float);
 }
