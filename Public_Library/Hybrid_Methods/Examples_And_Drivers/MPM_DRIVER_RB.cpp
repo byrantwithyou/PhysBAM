@@ -15,6 +15,7 @@
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
+#include <Deformables/Forces/IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION.h>
 #include <Solids/Forces_And_Torques/RIGID_DEFORMABLE_PENALTY_WITH_FRICTION.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_DRIVER_RB.h>
@@ -521,6 +522,11 @@ Apply_Forces()
 
         bool converged=newtons_method.Newtons_Method(objective,objective.system,dv,av);
 
+        if(example.rd_penalty)
+            example.rd_penalty->Update_Attachments_And_Prune_Pairs();
+        if(example.d_io_penalty)
+            example.d_io_penalty->Update_Attachments_And_Prune_Pairs();
+        
         if(!converged) LOG::cout<<"WARNING: Newton's method did not converge"<<std::endl;
         Apply_Friction();
         objective.Restore_F();}

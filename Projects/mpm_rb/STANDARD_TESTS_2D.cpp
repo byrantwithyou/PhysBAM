@@ -98,6 +98,7 @@ Read_Output_Files(const int frame)
 template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
 Initialize()
 {
+    this->asymmetric_system=true;
     switch(test_number)
     {
         case 1:{ // half-full box
@@ -208,6 +209,51 @@ Initialize()
             rigid_body.Twist().linear=TV(0,-1)*m/s;
             // auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
             // solid_body_collection.rigid_body_collection.Add_Force(rg);
+        } break;
+
+            // ./mpm_rb 8 -float -scale_E .1 -rd_stiffness 1e3 -T .1 -T .1 -regular_seeding
+        case 8:{ // MPM block and rigid circle, no collisions with boundary.
+            T angle=extra_T(0);
+            T vel=extra_T(1);
+            PHYSBAM_ASSERT(angle>=0 && angle<=pi/2 && vel>=0);
+            TV n(-sin(angle),cos(angle));
+            TV t(cos(angle),sin(angle));
+            MATRIX<T,2> M(t,n);
+            TV c(.5,.5);
+            
+            PHYSBAM_ASSERT(sizeof(T)==sizeof(float));
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            RANGE<TV> box(TV((T).4,(T).5)*m,TV((T).6,(T).7)*m);
+            T density=2*unit_rho*scale_mass;
+            Seed_Particles(box,0,0,density,particles_per_cell);
+            for(int i=0;i<particles.number;i++){
+                particles.X(i)=M*(particles.X(i)-c)+c;
+                particles.V(i)=-t*vel;}
+
+            Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
+            TV g=m/(s*s)*TV(0,-1.8);
+            Add_Gravity(g);
+            Add_Collision_Object(Make_IO(LINE_2D<T>(n,c)));
+
+            // Dump solution to viewer
+            write_output_files=[=](int frame)
+            {
+                T time=frame*frame_dt;
+                T mu=rd_penalty_friction;
+                T acc=fabs(g.y)*(cos(angle)*mu-sin(angle));
+                if(vel+time*acc>0) // sliding
+                {
+                    T dist=(T).5*acc*sqr(time)+time*vel;
+                    Add_Debug_Particle(c-t*dist,VECTOR<T,3>(0,1,0));
+                }
+                else // stopped
+                {
+                    T stop_time=-vel/acc;
+                    T dist=(T).5*acc*sqr(stop_time)+stop_time*vel;
+                    Add_Debug_Particle(c-t*dist,VECTOR<T,3>(0,1,0));
+                }
+                Add_Debug_Object(VECTOR<TV,2>(c-t,c+t),VECTOR<T,3>(1,0,0));
+            };
         } break;
 
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
