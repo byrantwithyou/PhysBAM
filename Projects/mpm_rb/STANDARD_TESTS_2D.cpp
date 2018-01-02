@@ -239,7 +239,7 @@ Initialize()
             {
                 T time=frame*frame_dt;
                 T mu=rd_penalty_friction;
-                T acc=fabs(g.y)*(cos(angle)*mu-sin(angle));
+                T acc=g.y*(cos(angle)*mu-sin(angle));
                 if(vel+time*acc>0) // sliding
                 {
                     T dist=(T).5*acc*sqr(time)+time*vel;
@@ -249,7 +249,7 @@ Initialize()
                 {
                     T stop_time=-vel/acc;
                     T dist=(T).5*acc*sqr(stop_time)+stop_time*vel;
-                    Add_Debug_Particle(c-t*dist,VECTOR<T,3>(0,1,0));
+                    Add_Debug_Particle(c-t*dist,VECTOR<T,3>(1,1,0));
                 }
                 Add_Debug_Object(VECTOR<TV,2>(c-t,c+t),VECTOR<T,3>(1,0,0));
             };
