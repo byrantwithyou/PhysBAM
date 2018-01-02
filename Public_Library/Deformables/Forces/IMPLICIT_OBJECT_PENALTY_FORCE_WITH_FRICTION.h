@@ -30,6 +30,7 @@ public:
         int o; // colliding implicit object
         TV X; // original attachment point
         TV Y; // relaxed attachment point
+        MATRIX<T,TV::m> dYdZ; // Dependence of Y on X(p)
         bool active;
     };
     ARRAY<COLLISION_PAIR> collision_pairs;
@@ -60,5 +61,18 @@ public:
     void Add_Pair(int p,int b);
 //#####################################################################
 };
+
+template<class TV>
+struct RELAX_ATTACHMENT_HELPER
+{
+    TV Y;
+    bool active;
+
+    MATRIX<typename TV::SCALAR,TV::m> dYdZ,dYdX;
+    TV dYdphi;
+    MATRIX<typename TV::SCALAR,TV::m> dYdn;
+};
+template<class TV,class T> RELAX_ATTACHMENT_HELPER<TV>
+Relax_Attachment_Helper(const TV& Z,const TV& X,T phi,const TV& n,T mu);
 }
 #endif

@@ -8,6 +8,7 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
+#include <Deformables/Forces/IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Solids/Forces_And_Torques/RIGID_DEFORMABLE_PENALTY_WITH_FRICTION.h>
 using namespace PhysBAM;
@@ -82,10 +83,6 @@ Potential_Energy(const T time) const
             pe+=(T).5*stiffness_coefficient*(particles.X(c.p)-c.Y).Magnitude_Squared();}
     return pe;
 }
-namespace PhysBAM{
-template<class TV,class T> PAIR<TV,bool>
-Relax_Attachment_Helper(const TV& Z,const TV& X,T phi,const TV& n,T mu);
-}
 //#####################################################################
 // Function Relax_Attachment
 //#####################################################################
@@ -100,8 +97,9 @@ Relax_Attachment(int cp)
     T phi=io->Extended_Phi(Z);
     TV n=io->Extended_Normal(Z);
     auto pr=Relax_Attachment_Helper(Z,X,phi,n,friction);
-    c.Y=pr.x;
-    c.active=pr.y;
+    c.Y=pr.Y;
+    c.active=pr.active;
+    // TODO: Fix derivatives
 }
 //#####################################################################
 // Function Update_Attachments_And_Prune_Pairs

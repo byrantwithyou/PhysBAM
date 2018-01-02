@@ -3,7 +3,9 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Data_Structures/TRIPLE.h>
+#include <Core/Matrices/IDENTITY_MATRIX.h>
 #include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/ZERO_MATRIX.h>
 #include <Tools/Polynomials/QUADRATIC.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Deformables/Forces/IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION.h>
@@ -57,7 +59,7 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F
     for(int i=0;i<collision_pairs.m;i++){
         const COLLISION_PAIR& c=collision_pairs(i);
         if(c.active)
-            F(c.p)-=stiffness_coefficient*V(c.p);}
+            F(c.p)-=stiffness_coefficient*(V(c.p)-c.dYdZ*V(c.p));}
 }
 //#####################################################################
 // Function Potential_Energy
@@ -75,22 +77,51 @@ Potential_Energy(const T time) const
 // Z = colliding point, X = original attachment, Y = computed attachment
 // phi = phi(Z), n = normal(Z)
 namespace PhysBAM{
-template<class TV,class T>
-PAIR<TV,bool> Relax_Attachment_Helper(const TV& Z,const TV& X,T phi,const TV& n,T mu)
+template<class TV,class T> RELAX_ATTACHMENT_HELPER<TV>
+Relax_Attachment_Helper(const TV& Z,const TV& X,T phi,const TV& n,T mu)
 {
-    if(phi>=0) return {Z,false};
+    RELAX_ATTACHMENT_HELPER<TV> h;
+
+    if(phi>=0){h.Y=Z;h.active=false;h.dYdZ+=1;return h;}
     TV F=X-Z;
     T Fn=F.Dot(n);
-    if(Fn<0) return {Z,false};
+    if(Fn<0){h.Y=Z;h.active=false;h.dYdZ+=1;return h;}
     T qc=(1+sqr(mu))*sqr(Fn)-F.Dot(F);
-    if(qc>=0) return {X,true};
+    TV dqcdX=2*(1+sqr(mu))*Fn*n-2*F;
+    TV dqcdZ=-dqcdX;
+    TV dqcdn=2*(1+sqr(mu))*Fn*F;
+
+    if(qc>=0){h.Y=X;h.active=true;h.dYdX+=1;return h;}
     T qb=Fn*phi*sqr(mu);
+    TV dqbdX=n*phi*sqr(mu);
+    TV dqbdZ=-dqbdX;
+    TV dqbdn=F*phi*sqr(mu);
+    T dqbdphi=Fn*sqr(mu);
     T qa=sqr(phi*mu);
+    T dqadphi=2*phi*sqr(mu);
+
     // a^2*qc - 2*a*(1-a)*qb + (1-a)^2*qa = 0
     // exactly true: qc < 0, qb <= 0, qa >= 0; thus a unique in [0,1].
-    T D=sqrt(sqr(qb)-qa*qc)+qb;
-    T a=qa/(qa+D);
-    return {(1-a)*(Z-n*phi)+a*X,true};
+    T D=sqrt(sqr(qb)-qa*qc);
+    TV dDdX=(2*qb*dqbdX-qa*dqcdX)/(2*D);
+    TV dDdZ=(2*qb*dqbdZ-qa*dqcdZ)/(2*D);
+    TV dDdn=(2*qb*dqbdn-qa*dqcdn)/(2*D);
+    T dDdphi=(2*qb*dqbdphi-qc*dqadphi)/(2*D);
+
+    T a=qa/(D+qb+qa);
+    TV dadX=-qa/sqr(D+qb+qa)*(dqbdX+dDdX);
+    TV dadZ=-qa/sqr(D+qb+qa)*(dqbdZ+dDdZ);
+    TV dadn=-qa/sqr(D+qb+qa)*(dqbdn+dDdn);
+    T dadphi=dqadphi/(D+qb+qa)-qa/sqr(D+qb+qa)*(dqbdphi+dqadphi+dDdphi);
+
+    h.Y=(1-a)*(Z-n*phi)+a*X;
+    h.dYdX=Outer_Product(Z-n*phi,-dadX)+Outer_Product(X,dadX)+a;
+    h.dYdZ=Outer_Product(Z-n*phi,-dadZ)+(1-a)+Outer_Product(X,dadZ);
+    h.dYdn=Outer_Product(Z-n*phi,-dadn)+(1-a)*(-phi)+Outer_Product(X,dadn);
+    h.dYdphi=(Z-n*phi)*(-dadphi)+(1-a)*(-n)+dadphi*X;
+    h.active=true;
+
+    return h;
 }
 }
 //#####################################################################
@@ -104,9 +135,11 @@ Relax_Attachment(int cp)
     TV Z=particles.X(c.p);
     T phi=io->Extended_Phi(Z);
     TV n=io->Extended_Normal(Z);
+    SYMMETRIC_MATRIX<T,TV::m> H=io->Hessian(Z);
     auto pr=Relax_Attachment_Helper(Z,c.X,phi,n,friction);
-    c.Y=pr.x;
-    c.active=pr.y;
+    c.Y=pr.Y;
+    c.active=pr.active;
+    c.dYdZ=pr.dYdZ+Outer_Product(pr.dYdphi,n)+pr.dYdn*H;
 }
 //#####################################################################
 // Function Update_Attachments_And_Prune_Pairs
@@ -222,12 +255,12 @@ template class IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<VECTOR<float,2> >;
 template class IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<VECTOR<float,3> >;
 template class IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<VECTOR<double,2> >;
 template class IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<VECTOR<double,3> >;
-template PAIR<VECTOR<double,2>,bool> Relax_Attachment_Helper<VECTOR<double,2>,double>(
+template RELAX_ATTACHMENT_HELPER<VECTOR<double,2> > Relax_Attachment_Helper<VECTOR<double,2>,double>(
     VECTOR<double,2> const&,VECTOR<double,2> const&,double,VECTOR<double,2> const&,double);
-template PAIR<VECTOR<double,3>,bool> Relax_Attachment_Helper<VECTOR<double,3>,double>(
+template RELAX_ATTACHMENT_HELPER<VECTOR<double,3> > Relax_Attachment_Helper<VECTOR<double,3>,double>(
     VECTOR<double,3> const&,VECTOR<double,3> const&,double,VECTOR<double,3> const&,double);
-template PAIR<VECTOR<float,2>,bool> Relax_Attachment_Helper<VECTOR<float,2>,float>(
+template RELAX_ATTACHMENT_HELPER<VECTOR<float,2> > Relax_Attachment_Helper<VECTOR<float,2>,float>(
     VECTOR<float,2> const&,VECTOR<float,2> const&,float,VECTOR<float,2> const&,float);
-template PAIR<VECTOR<float,3>,bool> Relax_Attachment_Helper<VECTOR<float,3>,float>(
+template RELAX_ATTACHMENT_HELPER<VECTOR<float,3> > Relax_Attachment_Helper<VECTOR<float,3>,float>(
     VECTOR<float,3> const&,VECTOR<float,3> const&,float,VECTOR<float,3> const&,float);
 }
