@@ -221,7 +221,6 @@ Initialize()
             MATRIX<T,2> M(t,n);
             TV c(.5,.5);
             
-            PHYSBAM_ASSERT(sizeof(T)==sizeof(float));
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             RANGE<TV> box(TV((T).4,(T).5)*m,TV((T).6,(T).7)*m);
             T density=2*unit_rho*scale_mass;
