@@ -302,6 +302,33 @@ Initialize()
             };
         } break;
 
+            // ./mpm_rb 10 -float -scale_E .1 -rd_stiffness 1e1 -max_dt .01 -T 0.1 -regular_seeding
+        case 10:{ // Rigid body and MPM, friction test.
+            T angle=extra_T(0);
+            PHYSBAM_ASSERT(angle>=0 && angle<=pi/2);
+            TV n(-sin(angle),cos(angle));
+            TV t(cos(angle),sin(angle));
+            MATRIX<T,2> M(t,n);
+            TV c(.5,.5);
+
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            RANGE<TV> box(TV((T).2,(T).2)*m,TV((T).8,(T).5)*m);
+            T density=2*unit_rho*scale_mass;
+            Seed_Particles(box,0,0,density,particles_per_cell);
+            for(int i=0;i<particles.number;i++)
+                particles.X(i)=M*(particles.X(i)-c)+c;
+
+            Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
+            TV g=m/(s*s)*TV(0,-1.8);
+            Add_Gravity(-g);
+            RIGID_BODY<TV>& rigid_body=tests.Add_Analytic_Box(TV(0.6,0.4));
+            rigid_body.Frame().t=TV((T)0.5,(T)0.7)*m;
+            rigid_body.Frame().r=ROTATION<TV>(M);
+            rigid_body.Set_Mass(density*0.18*kg);
+            auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
+            solid_body_collection.rigid_body_collection.Add_Force(rg);
+        } break;
+
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     if(forced_collision_type!=-1)
