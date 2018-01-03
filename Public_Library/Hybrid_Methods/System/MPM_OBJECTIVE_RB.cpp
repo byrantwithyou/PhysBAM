@@ -146,10 +146,12 @@ Update_F(const MPM_KRYLOV_VECTOR_RB<TV>& v) const
             else system.example.particles.X(p)=X0(p)+system.example.dt*h.Vp;
         });
 
-    RIGID_BODY_PARTICLES<TV>& rbp=system.example.solid_body_collection.rigid_body_collection.rigid_body_particles;
+    RIGID_BODY_COLLECTION<TV>& rbc=system.example.solid_body_collection.rigid_body_collection;
+    RIGID_BODY_PARTICLES<TV>& rbp=rbc.rigid_body_particles;
 #pragma omp parallel
-    for(int i=0;i<rbp.number;i++)
-        rbp.frame(i)=Move_Rigid_Body(system.example.dt,frame0(i),v.twists(i),inertia0(i));
+    for(int i=0;i<rbp.number;i++){
+        if(!rbc.Rigid_Body(i).is_static)
+            rbp.frame(i)=Move_Rigid_Body(system.example.dt,frame0(i),v.twists(i),inertia0(i));}
 }
 //#####################################################################
 // Function Compute

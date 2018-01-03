@@ -538,7 +538,12 @@ Apply_Forces()
             example.velocity.array(j)=dv.u.array(j)+objective.v0.u.array(j);
             example.velocity_friction_save.array(j)+=objective.v0.u.array(j);}
         example.velocity_friction_save.array.Subset(objective.system.stuck_nodes)=objective.system.stuck_velocity;
-        example.solid_body_collection.rigid_body_collection.rigid_body_particles.twist=objective.v0.twists+dv.twists;}
+        RIGID_BODY_COLLECTION<TV>& rigid_body_collection=example.solid_body_collection.rigid_body_collection;
+        RIGID_BODY_PARTICLES<TV>& rigid_body_particles=rigid_body_collection.rigid_body_particles;
+#pragma omp parallel for
+        for(int b=0;b<rigid_body_particles.frame.m;b++){
+            if(!rigid_body_collection.Rigid_Body(b).is_static)
+                rigid_body_particles.twist(b)=objective.v0.twists(b)+dv.twists(b);}}
 }
 //#####################################################################
 // Function Apply_Friction
