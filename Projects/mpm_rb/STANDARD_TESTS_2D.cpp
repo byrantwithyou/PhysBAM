@@ -112,7 +112,6 @@ Initialize()
 
             // ./mpm_rb 2 -float -sound_cfl -strong_cfl -reflection_bc -1 -symplectic_euler -scale_E .1 -coll_pair
         case 2:{ // half-full box with rigid body
-            PHYSBAM_ASSERT(sizeof(T)==sizeof(float));
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             RANGE<TV> box(TV(),TV(1,(T).5)*m);
             T density=2*unit_rho*scale_mass;
@@ -129,7 +128,6 @@ Initialize()
 
             // ./mpm_rb 3 -float -symplectic_euler -coll_pair
         case 3:{ // rigid sphere on rigid ground
-            PHYSBAM_ASSERT(sizeof(T)==sizeof(float));
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             tests.Add_Ground((T).5,(T).1,0,1);
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("circle",(T).2*m,(T).5);
@@ -142,7 +140,6 @@ Initialize()
 
             // ./mpm_rb 4 -float -symplectic_euler -coll_pair
         case 4:{ // rigid sphere on rigid ground, bouncy
-            PHYSBAM_ASSERT(sizeof(T)==sizeof(float));
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             tests.Add_Ground((T).5,(T).1,1,1);
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("circle",(T).2*m,(T).5);
@@ -156,7 +153,6 @@ Initialize()
 
             // ./mpm_rb 3 -float -symplectic_euler -coll_pair
         case 5:{ // Many rigid spheres in box
-            PHYSBAM_ASSERT(sizeof(T)==sizeof(float));
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             RIGID_BODY<TV>& wl=tests.Add_Analytic_Box(TV(1,1));
             wl.Frame().t=TV(-.5,.5);
@@ -177,7 +173,6 @@ Initialize()
 
             // ./mpm_rb 6 -float -scale_E .1  -last_frame 20 -rd_stiffness 1e3
         case 6:{ // MPM in box
-            PHYSBAM_ASSERT(sizeof(T)==sizeof(float));
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             RANGE<TV> box(TV((T).2,(T).2)*m,TV((T).5,(T).5)*m);
             T density=2*unit_rho*scale_mass;
@@ -195,7 +190,6 @@ Initialize()
 
             // ./mpm_rb 7 -float -scale_E .1 -rd_stiffness 1e3
         case 7:{ // MPM block and rigid circle, no collisions with boundary.
-            PHYSBAM_ASSERT(sizeof(T)==sizeof(float));
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             RANGE<TV> box(TV(.2,.2)*m,TV(.8,(T).5)*m);
             T density=2*unit_rho*scale_mass;
