@@ -256,6 +256,52 @@ Initialize()
             };
         } break;
 
+        case 9:{ // Static rigid body version of test 8
+            T angle=extra_T(0);
+            T vel=extra_T(1);
+            PHYSBAM_ASSERT(angle>=0 && angle<=pi/2 && vel>=0);
+            TV n(-sin(angle),cos(angle));
+            TV t(cos(angle),sin(angle));
+            MATRIX<T,2> M(t,n);
+            TV c(.5,.5);
+
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            RANGE<TV> box(TV((T).4,(T).5)*m,TV((T).6,(T).7)*m);
+            T density=2*unit_rho*scale_mass;
+            Seed_Particles(box,0,0,density,particles_per_cell);
+            for(int i=0;i<particles.number;i++){
+                particles.X(i)=M*(particles.X(i)-c)+c;
+                particles.V(i)=-t*vel;}
+
+            Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
+            TV g=m/(s*s)*TV(0,-1.8);
+            Add_Gravity(g);
+            RIGID_BODY<TV>& rigid_body=tests.Add_Analytic_Box(TV(2,2));
+            rigid_body.Frame().t=TV((T)0.5,(T)-0.5)*m;
+            rigid_body.Frame().r=ROTATION<TV>(M);
+            rigid_body.is_static=true;
+
+            // Dump solution to viewer
+            write_output_files=[=](int frame)
+            {
+                T time=frame*frame_dt;
+                T mu=rd_penalty_friction;
+                T acc=g.y*(cos(angle)*mu-sin(angle));
+                if(vel+time*acc>0) // sliding
+                {
+                    T dist=(T).5*acc*sqr(time)+time*vel;
+                    Add_Debug_Particle(c-t*dist,VECTOR<T,3>(0,1,0));
+                }
+                else // stopped
+                {
+                    T stop_time=-vel/acc;
+                    T dist=(T).5*acc*sqr(stop_time)+stop_time*vel;
+                    Add_Debug_Particle(c-t*dist,VECTOR<T,3>(1,1,0));
+                }
+                Add_Debug_Object(VECTOR<TV,2>(c-t,c+t),VECTOR<T,3>(1,0,0));
+            };
+        } break;
+
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     if(forced_collision_type!=-1)
