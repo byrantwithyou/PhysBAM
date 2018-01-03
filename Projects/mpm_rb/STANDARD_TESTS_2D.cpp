@@ -329,6 +329,21 @@ Initialize()
             solid_body_collection.rigid_body_collection.Add_Force(rg);
         } break;
 
+            // ./mpm_rb 11 -float -scale_E .1 -rd_stiffness 1e1 -max_dt .01 -regular_seeding -rd_friction 0.1
+        case 11:{ // "Wedge" test
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            RANGE<TV> box(TV((T).1,(T).3),TV((T).5,(T).7));
+            T density=2*unit_rho*scale_mass;
+            Seed_Particles(box,0,0,density,particles_per_cell);
+            Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
+            TV g=m/(s*s)*TV(0,-1.8);
+            Add_Gravity(g);
+            Add_Collision_Object(Make_IO(LINE_2D<T>(TV(1,0),TV(0.1,0.5))));
+            RIGID_BODY<TV>& rigid_body=tests.Add_Analytic_Box(TV(0.4,0.8));
+            rigid_body.Frame().t=TV((T)0.65,(T)0.5)*m;
+            rigid_body.is_static=true;
+        } break;
+
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     if(forced_collision_type!=-1)
