@@ -30,7 +30,7 @@ public:
     using BASE::substeps_delay_frame;using BASE::scale_mass;using BASE::scale_E;
     using BASE::output_directory;using BASE::restart;using BASE::dt;using BASE::time;
     using BASE::frame_dt;using BASE::min_dt;using BASE::max_dt;using BASE::order;
-    using BASE::ghost;using BASE::use_affine;
+    using BASE::ghost;using BASE::use_affine;using BASE::Set_Grid;
     using BASE::use_midpoint;using BASE::print_stats;using BASE::flip;using BASE::cfl;
     using BASE::newton_tolerance;using BASE::newton_iterations;using BASE::solver_tolerance;
     using BASE::lagrangian_forces;using BASE::mass;using BASE::gather_scatter;
@@ -54,6 +54,7 @@ public:
     using BASE::write_output_files;using BASE::read_output_files;using BASE::begin_frame;
     using BASE::end_frame;using BASE::begin_time_step;using BASE::end_time_step;
     using BASE::dump_collision_objects;using BASE::Perturb;using BASE::Uniform;using BASE::extra_T;using BASE::extra_int;
+    using BASE::rd_penalty_stiffness;using BASE::rd_penalty_friction;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();

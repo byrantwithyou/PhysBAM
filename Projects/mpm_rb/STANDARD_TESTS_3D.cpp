@@ -4,6 +4,7 @@
 //#####################################################################
 #include <Core/Data_Structures/KD_TREE.h>
 #include <Core/Matrices/FRAME.h>
+#include <Core/Matrices/ROTATION.h>
 #include <Grid_Tools/Grids/NODE_ITERATOR.h>
 #include <Geometry/Basic_Geometry/CONE.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
@@ -88,8 +89,56 @@ Read_Output_Files(const int frame)
 template<class T> void STANDARD_TESTS<VECTOR<T,3> >::
 Initialize()
 {
+    this->asymmetric_system=true;
     switch(test_number)
     {
+            // sticking: ./mpm_rb -3d 8 -float -scale_E .1 -rd_stiffness 1e-1 -max_dt .01 -T .1 -T .1 -T .2 -regular_seeding
+            // sliding:
+            // ./mpm_rb -3d 8 -float -scale_E .1 -rd_stiffness 1e-1 -max_dt .01 -T .1 -T .1 -T .2 -regular_seeding -rd_friction 0.1
+        case 8:{ // MPM block and rigid circle, no collisions with boundary.
+            T angle=extra_T(0);
+            T vel=extra_T(1);
+            T angle_t=extra_T(2);
+            PHYSBAM_ASSERT(angle>=0 && angle<=pi/2 && angle_t>=0 && angle_t<=pi/2 && vel>=0);
+            ROTATION<TV> Q(angle,TV(0,0,1)),Qn(angle_t,TV(0,1,0));
+            ROTATION<TV> R=Q*Qn;
+            TV n,t,t1;
+            Q.Get_Rotated_Frame(t,n,t1);
+            TV c(.5,.5,.5);
+
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            RANGE<TV> box(TV((T).4,(T).5,(T).4)*m,TV((T).6,(T).7,(T).6)*m);
+            T density=2*unit_rho*scale_mass;
+            Seed_Particles(box,0,0,density,particles_per_cell);
+            for(int i=0;i<particles.number;i++){
+                particles.X(i)=R.Rotate(particles.X(i)-c)+c;
+                particles.V(i)=-t*vel;}
+
+            Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
+            TV g=m/(s*s)*TV(0,-1.8,0);
+            Add_Gravity(g);
+            Add_Collision_Object(Make_IO(PLANE<T>(n,c)));
+
+            // Dump solution to viewer
+            write_output_files=[=](int frame)
+            {
+                T time=frame*frame_dt;
+                T mu=rd_penalty_friction;
+                T acc=g.y*(cos(angle)*mu-sin(angle));
+                if(vel+time*acc>0) // sliding
+                {
+                    T dist=(T).5*acc*sqr(time)+time*vel;
+                    Add_Debug_Particle(c-t*dist,VECTOR<T,3>(0,1,0));
+                }
+                else // stopped
+                {
+                    T stop_time=-vel/acc;
+                    T dist=(T).5*acc*sqr(stop_time)+stop_time*vel;
+                    Add_Debug_Particle(c-t*dist,VECTOR<T,3>(1,1,0));
+                }
+                Add_Debug_Object(VECTOR<TV,2>(c-t,c+t),VECTOR<T,3>(1,0,0));
+            };
+        } break;
 
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
