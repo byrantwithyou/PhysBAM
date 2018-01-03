@@ -211,7 +211,8 @@ Initialize()
             // solid_body_collection.rigid_body_collection.Add_Force(rg);
         } break;
 
-            // ./mpm_rb 8 -float -scale_E .1 -rd_stiffness 1e1 -max_dt .01 -T .1 -T .1 -regular_seeding
+            // sticking ./mpm_rb 8 -float -scale_E .1 -rd_stiffness 1e1 -max_dt .01 -T .1 -T .1 -regular_seeding
+            // sliding: ./mpm_rb 8 -float -scale_E .1 -rd_stiffness 1e1 -max_dt .01   -T .1 -T .1 -regular_seeding -rd_friction 0.1
         case 8:{ // MPM block and rigid circle, no collisions with boundary.
             T angle=extra_T(0);
             T vel=extra_T(1);
