@@ -542,7 +542,7 @@ Apply_Forces()
         RIGID_BODY_PARTICLES<TV>& rigid_body_particles=rigid_body_collection.rigid_body_particles;
 #pragma omp parallel for
         for(int b=0;b<rigid_body_particles.frame.m;b++){
-            if(!rigid_body_collection.Rigid_Body(b).is_static)
+            if(!rigid_body_collection.Rigid_Body(b).Has_Infinite_Inertia())
                 rigid_body_particles.twist(b)=objective.v0.twists(b)+dv.twists(b);}}
 }
 //#####################################################################
