@@ -8,6 +8,7 @@
 //#####################################################################
 #include <Core/Math_Tools/RANGE.h>
 #include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/FRAME.h>
 #include <Core/Matrices/MATRIX.h>
 #include <Core/Matrices/MATRIX_MXN.h>
 #include <Core/Matrices/ROTATION.h>
@@ -217,6 +218,7 @@ Get_Twist(const T& a)
 }
 //#####################################################################
 #define INSTANTIATION_HELPER_V(T,d) \
+    template FRAME<VECTOR<T,d> > RANDOM_NUMBERS<T>::Get_Frame<VECTOR<T,d> >(VECTOR<T,d> const&,VECTOR<T,d> const&); \
     template VECTOR<T,d> RANDOM_NUMBERS<T>::Get_Direction<VECTOR<T,d> >(); \
     template VECTOR<T,d> RANDOM_NUMBERS<T>::Get_Uniform_Vector<VECTOR<T,d> >(RANGE<VECTOR<T,d> > const&); \
     template VECTOR<T,d> RANDOM_NUMBERS<T>::Get_Vector_In_Unit_Sphere<VECTOR<T,d> >(); \
