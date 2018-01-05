@@ -4,9 +4,11 @@
 //#####################################################################
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Log/LOG.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
+#include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -115,48 +117,48 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
 //#####################################################################
 // Function Test_Diff
 //#####################################################################
-// template<class TV> void SURFACE_TENSION_FORCE_3D<TV>::
-// Test_Diff(const T time) 
-// {
-//     PHYSBAM_ASSERT(sizeof(T)==sizeof(double));
-//     RANDOM_NUMBERS<T> random;
-//     T e=(T)1e-5;
-//     ARRAY<TV> dX(particles.X.m);
-//     random.Fill_Uniform(dX,-e,e);
-//     ARRAY<TV> X2a(particles.X+dX);
-//     ARRAY_VIEW<TV> X1(X2a);
-//     ARRAY<TV> F0(particles.X.m);
-//     ARRAY<TV> F1(particles.X.m);
-//     ARRAY<TV> G0(particles.X.m);
-//     ARRAY<TV> G1(particles.X.m);
-//     Update_Position_Based_State(time,true,false);
-//     T psi0=Potential_Energy(time);
-//     Add_Velocity_Independent_Forces(F0,time);
-//     Add_Implicit_Velocity_Independent_Forces(dX,G0,time);
-//     particles.X.Exchange(X1);
-//     Update_Position_Based_State(time,true,false);
-//     T psi1=Potential_Energy(time);
-//     Add_Velocity_Independent_Forces(F1,time);
-//     Add_Implicit_Velocity_Independent_Forces(dX,G1,time);
-//     particles.X.Exchange(X1);
-//     Update_Position_Based_State(time,true,false);
+template<class TV> void DEFORMABLES_FORCES<TV>::
+Test_Diff(const T time) 
+{
+    PHYSBAM_ASSERT(sizeof(T)==sizeof(double));
+    RANDOM_NUMBERS<T> random;
+    T e=(T)1e-5;
+    ARRAY<TV> dX(particles.X.m);
+    random.Fill_Uniform(dX,-e,e);
+    ARRAY<TV> X2a(particles.X+dX);
+    ARRAY_VIEW<TV> X1(X2a);
+    ARRAY<TV> F0(particles.X.m);
+    ARRAY<TV> F1(particles.X.m);
+    ARRAY<TV> G0(particles.X.m);
+    ARRAY<TV> G1(particles.X.m);
+    Update_Position_Based_State(time,true,false);
+    T psi0=Potential_Energy(time);
+    Add_Velocity_Independent_Forces(F0,time);
+    Add_Implicit_Velocity_Independent_Forces(dX,G0,time);
+    particles.X.Exchange(X1);
+    Update_Position_Based_State(time,true,false);
+    T psi1=Potential_Energy(time);
+    Add_Velocity_Independent_Forces(F1,time);
+    Add_Implicit_Velocity_Independent_Forces(dX,G1,time);
+    particles.X.Exchange(X1);
+    Update_Position_Based_State(time,true,false);
         
-//     ARRAY<TV> F0pF1(particles.X.m);
-//     ARRAY<TV> F1mF0(particles.X.m);
-//     ARRAY<TV> G0pG1o2(particles.X.m);
-//     for(int k=0;k<F0.m;k++){
-//         F0pF1(k)=F0(k)+F1(k);
-//         G0pG1o2(k)=(G0(k)+G1(k))/2;
-//         F1mF0(k)=F1(k)-F0(k);}
-//     T df=(F0pF1.Dot(dX)/2);
-//     T dpsi=(psi1-psi0);
-//     T error=(dpsi+df)/e;
-//     LOG::cout<<"Energy Diff Test: "<<psi0<<" "<<psi1<<" "<<error<<std::endl;        
-//     T MF=sqrt(F1mF0.Magnitude_Squared());
-//     T MG=sqrt(G0pG1o2.Magnitude_Squared());
-//     T ferror=sqrt((F1mF0-G0pG1o2).Magnitude_Squared());
-//     LOG::cout<<"Force Diff Test: "<<MF<<" "<<MG<<" "<<ferror<<" "<<ferror/max((T)1e-30,MF,MG)<<std::endl;
-// }
+    ARRAY<TV> F0pF1(particles.X.m);
+    ARRAY<TV> F1mF0(particles.X.m);
+    ARRAY<TV> G0pG1o2(particles.X.m);
+    for(int k=0;k<F0.m;k++){
+        F0pF1(k)=F0(k)+F1(k);
+        G0pG1o2(k)=(G0(k)+G1(k))/2;
+        F1mF0(k)=F1(k)-F0(k);}
+    T df=(F0pF1.Dot(dX)/2);
+    T dpsi=(psi1-psi0);
+    T error=(dpsi+df)/e;
+    LOG::cout<<"Energy Diff Test: "<<psi0<<" "<<psi1<<" "<<error<<std::endl;        
+    T MF=sqrt(F1mF0.Magnitude_Squared());
+    T MG=sqrt(G0pG1o2.Magnitude_Squared());
+    T ferror=sqrt((F1mF0-G0pG1o2).Magnitude_Squared());
+    LOG::cout<<"Force Diff Test: "<<MF<<" "<<MG<<" "<<ferror<<" "<<ferror/max((T)1e-30,MF,MG)<<std::endl;
+}
 //#####################################################################
 namespace PhysBAM{
 #define INSTANTIATION_HELPER(T,d)                       \
