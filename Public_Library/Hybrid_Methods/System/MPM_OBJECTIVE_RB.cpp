@@ -75,6 +75,7 @@ Compute(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_
 template<class TV> void MPM_OBJECTIVE_RB<TV>::
 Compute_Unconstrained(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_BASE<T>* g,T* e) const
 {
+    // TODO: handle static rigid bodies
     bool use_midpoint=system.example.use_midpoint;
     T dt=system.example.dt;
     
