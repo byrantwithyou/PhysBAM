@@ -11,6 +11,7 @@
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Rigids/Collisions/COLLISION_HELPER.h>
+#include <Rigids/Forces_And_Torques/RIGID_PENALTY_WITH_FRICTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
@@ -119,11 +120,16 @@ Initialize()
     Update_Simulated_Particles();
 
     if(example.use_rd_penalty && example.solid_body_collection.rigid_body_collection.rigid_body_particles.number>0){
+        example.rr_penalty=new RIGID_PENALTY_WITH_FRICTION<TV>(
+            example.solid_body_collection.rigid_body_collection,
+            example.rd_penalty_stiffness,example.rd_penalty_friction);
         example.rd_penalty=new RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>(
             example.solid_body_collection.deformable_body_collection.particles,
             example.solid_body_collection.rigid_body_collection,
             example.rd_penalty_stiffness,example.rd_penalty_friction);
+        example.rr_penalty->get_candidates=[this](){example.Get_RR_Collision_Candidates();};
         example.rd_penalty->get_candidates=[this](){example.Get_RD_Collision_Candidates();};
+        example.solid_body_collection.Add_Force(example.rr_penalty);
         example.solid_body_collection.Add_Force(example.rd_penalty);}
     
     if(!example.restart) Write_Output_Files(0);

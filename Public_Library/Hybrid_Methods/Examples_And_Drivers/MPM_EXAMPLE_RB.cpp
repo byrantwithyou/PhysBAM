@@ -6,9 +6,11 @@
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
+#include <Rigids/Forces_And_Torques/RIGID_PENALTY_WITH_FRICTION.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION.h>
 #include <Deformables/Forces/LAGGED_FORCE.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Solids/Forces_And_Torques/RIGID_DEFORMABLE_PENALTY_WITH_FRICTION.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
@@ -395,6 +397,8 @@ Update_Collision_Detection_Structures()
     RANGE<TV_INT> cell_domain=grid.Domain_Indices(ghost);
     cell_particles.Resize(cell_domain);
     cell_particles.Remove_All();
+    cell_vertices.Resize(cell_domain);
+    cell_vertices.Remove_All();
     rasterized_data.Resize(cell_domain);
     rasterized_data.Remove_All();
 
@@ -416,6 +420,14 @@ Update_Collision_Detection_Structures()
             T phi=rigid_body.Implicit_Geometry_Extended_Value(X);
             if(phi<padding)
                 rasterized_data.Insert(it.index,{b,phi});}}
+
+    for(int b=0;b<rigid_body_particles.frame.m;b++){
+        RIGID_BODY<TV>& rigid_body=*rigid_body_particles.rigid_body(b);
+        for(int v=0;v<rigid_body.simplicial_object->particles.number;v++){
+            TV X=rigid_body.Frame()*rigid_body.simplicial_object->particles.X(v);
+            TV_INT index=grid.Clamp_To_Cell(X,ghost+1);
+            if(cell_domain.Lazy_Inside_Half_Open(index))
+                cell_vertices.Insert(index,{b,v});}}
 }
 //#####################################################################
 // Function Add_Collision_Object
@@ -466,6 +478,21 @@ Get_RD_Collision_Candidates()
         for(int i=0;i<D.m;i++)
             for(int j=0;j<R.m;j++)
                 rd_penalty->Add_Pair(D(i),R(j).id);}
+}
+//#####################################################################
+// Function Get_RR_Collision_Candidates
+//#####################################################################
+template<class TV> void MPM_EXAMPLE_RB<TV>::
+Get_RR_Collision_Candidates()
+{
+    for(CELL_ITERATOR<TV> it(grid,ghost);it.Valid();it.Next()){
+        auto V=cell_vertices.Get(it.index);
+        if(!V.m) continue;
+        auto R=rasterized_data.Get(it.index);
+        if(!R.m) continue;
+        for(int i=0;i<V.m;i++)
+            for(int j=0;j<R.m;j++)
+                rr_penalty->Add_Pair(V(i).x,V(i).y,R(j).id);}
 }
 //#####################################################################
 namespace PhysBAM{

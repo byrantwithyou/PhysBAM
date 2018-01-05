@@ -31,6 +31,7 @@ template<class TV> class PARTICLE_GRID_WEIGHTS;
 template<class TV> class MPM_PLASTICITY_MODEL;
 template<class TV> class IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION;
 template<class T> class RIGID_DEFORMABLE_PENALTY_WITH_FRICTION;
+template<class T> class RIGID_PENALTY_WITH_FRICTION;
 
 template<class TV>
 class MPM_EXAMPLE_RB
@@ -114,6 +115,7 @@ public:
 
     CHAINED_ARRAY<int,TV_INT> cell_particles;
     CHAINED_ARRAY<int,TV_INT> cell_objects;
+    CHAINED_ARRAY<PAIR<int,int>,TV_INT> cell_vertices; // <rigid_body,vertex>
 
     // First entry MUST be int, and its value MUST be nonnegative.
     struct RASTERIZED_DATA
@@ -135,7 +137,7 @@ public:
 
     RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>* rd_penalty=0;
     IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* d_io_penalty=0;
-
+    RIGID_PENALTY_WITH_FRICTION<TV>* rr_penalty=0;
 
     
     MPM_EXAMPLE_RB(const STREAM_TYPE stream_type_input);
@@ -180,6 +182,7 @@ public:
     void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io);
     void Get_RD_Collision_Candidates();
     void Get_IO_Collision_Candidates();
+    void Get_RR_Collision_Candidates();
 //#####################################################################
 };
 }
