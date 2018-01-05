@@ -338,6 +338,20 @@ Initialize()
             rigid_body.is_static=true;
         } break;
 
+            // ./mpm_rb -float 12 -rd_stiffness 1e2 -max_dt .01
+        case 12:{ // rigid sphere on rigid ground
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            RIGID_BODY<TV>& ground=tests.Add_Analytic_Box(TV(1,.3));
+            ground.Frame().t=TV((T)0.5,0)*m;
+            ground.is_static=true;
+            RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("circle",(T).2*m,(T).5);
+            rigid_body.Frame().t=TV((T)0.5,(T)0.75)*m;
+            rigid_body.Set_Mass(1*kg);
+            TV g=m/(s*s)*TV(0,-1.8);
+            auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
+            solid_body_collection.rigid_body_collection.Add_Force(rg);
+        } break;
+
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     if(forced_collision_type!=-1)
