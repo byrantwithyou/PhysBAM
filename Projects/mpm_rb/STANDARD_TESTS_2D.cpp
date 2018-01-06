@@ -271,7 +271,7 @@ Initialize()
             TV g=m/(s*s)*TV(0,-1.8);
             Add_Gravity(g);
             RIGID_BODY<TV>& rigid_body=tests.Add_Analytic_Box(TV(2,2));
-            rigid_body.Frame().t=TV((T)0.5,(T)-0.5)*m;
+            rigid_body.Frame().t=(c-M*TV(0,1))*m;
             rigid_body.Frame().r=ROTATION<TV>(M);
             rigid_body.is_static=true;
 
