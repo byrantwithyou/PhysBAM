@@ -352,7 +352,8 @@ Initialize()
             solid_body_collection.rigid_body_collection.Add_Force(rg);
         } break;
 
-            // ./mpm_rb 13 -float -rd_stiffness 1e1 -max_dt .01 -T .1 -T .1
+            // sliding: ./mpm_rb 13 -float -rd_stiffness 1e3 -max_dt .01 -T .1 -T .1 -rd_friction .01
+            // sticking: ./mpm_rb 13 -float -rd_stiffness 1e3 -max_dt .01 -T .1 -T .1 -rd_friction 0.12
         case 13:{ // Rigid-rigid version of inclined plane.
             T angle=extra_T(0);
             T vel=extra_T(1);
