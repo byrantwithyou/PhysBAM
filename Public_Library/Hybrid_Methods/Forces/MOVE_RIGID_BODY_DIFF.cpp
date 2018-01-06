@@ -4,6 +4,7 @@
 //#####################################################################
 
 #include <Core/Math_Tools/Robust_Functions.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Core/Vectors/TWIST.h>
 #include <Hybrid_Methods/Forces/MOVE_RIGID_BODY_DIFF.h>
 namespace PhysBAM{
@@ -63,8 +64,71 @@ Frame_Inverse_Times(TV v,MATRIX<T,TV::m>& dZdv,MATRIX<T,TV::m>& dZdL,
     dZdA=Contract<0>(tensor,v-frame.t);
     return frame.Inverse_Times(v);
 }
+//#####################################################################
+// Function Test_Move_Rigid_Body_Diff
+//#####################################################################
+template<class TV> void
+Test_Move_Rigid_Body_Diff()
+{
+    typedef typename TV::SCALAR T;
+    T eps=1e-6;
+    
+    RANDOM_NUMBERS<T> rand;
+
+    FRAME<TV> frame0=rand.template Get_Frame<TV>(TV()-1,TV()+1);
+    MATRIX<T,TV::m> inertia_tmp;
+    rand.Fill_Uniform(inertia_tmp,-1,1);
+    SYMMETRIC_MATRIX<T,TV::m> inertia0=inertia_tmp.Outer_Product_Matrix();
+
+    TWIST<TV> w[2],dw;
+    rand.Fill_Uniform(w[0],-1,1);
+    rand.Fill_Uniform(dw,-eps,eps);
+    w[1]=w[0]+dw;
+
+    TV vec[2],dvec;
+    rand.Fill_Uniform(vec[0],-1,1);
+    rand.Fill_Uniform(dvec,-eps,eps);
+    vec[1]=vec[0]+dvec;
+    T dt;
+    rand.Fill_Uniform(dt,.1,1);
+
+    TV Y[2];
+    MATRIX<T,TV::m> dYdV[2];
+    MATRIX<T,TV::m> dYdL[2];
+    MATRIX<T,TV::m,TV::SPIN::m> dYdA[2];
+    TV Z[2];
+    MATRIX<T,TV::m> dZdV[2];
+    MATRIX<T,TV::m> dZdL[2];
+    MATRIX<T,TV::m,TV::SPIN::m> dZdA[2];
+    MOVE_RIGID_BODY_DIFF<TV> mr[2];
+    for(int s=0;s<2;s++)
+    {
+        mr[s].Compute(frame0,dt*w[s]);
+        Y[s]=mr[s].Frame_Times(vec[s],dYdV[s],dYdL[s],dYdA[s]);
+        Z[s]=mr[s].Frame_Inverse_Times(vec[s],dZdV[s],dZdL[s],dZdA[s]);
+    }
+    TV dY0=Y[1]-Y[0];
+    dY0/=eps;
+    TV dY1;
+    dY1+=dYdV[0]*dvec+dYdL[0]*dw.linear*dt+dYdA[0]*dw.angular*dt;
+    dY1+=dYdV[1]*dvec+dYdL[1]*dw.linear*dt+dYdA[1]*dw.angular*dt;
+    dY1/=2*eps;
+    LOG::printf("%P %P %P\n",dY0.Magnitude(),dY1.Magnitude(),(dY0-dY1).Magnitude());
+
+    TV dZ0=Z[1]-Z[0];
+    dZ0/=eps;
+    TV dZ1;
+    dZ1+=dZdV[0]*dvec+dZdL[0]*dw.linear*dt+dZdA[0]*dw.angular*dt;
+    dZ1+=dZdV[1]*dvec+dZdL[1]*dw.linear*dt+dZdA[1]*dw.angular*dt;
+    dZ1/=2*eps;
+    LOG::printf("%P %P %P\n",dZ0.Magnitude(),dZ1.Magnitude(),(dZ0-dZ1).Magnitude());
+}
 template class MOVE_RIGID_BODY_DIFF<VECTOR<float,2> >;
 template class MOVE_RIGID_BODY_DIFF<VECTOR<float,3> >;
 template class MOVE_RIGID_BODY_DIFF<VECTOR<double,2> >;
 template class MOVE_RIGID_BODY_DIFF<VECTOR<double,3> >;
+template void Test_Move_Rigid_Body_Diff<VECTOR<float,2> >();
+template void Test_Move_Rigid_Body_Diff<VECTOR<float,3> >();
+template void Test_Move_Rigid_Body_Diff<VECTOR<double,2> >();
+template void Test_Move_Rigid_Body_Diff<VECTOR<double,3> >();
 }
