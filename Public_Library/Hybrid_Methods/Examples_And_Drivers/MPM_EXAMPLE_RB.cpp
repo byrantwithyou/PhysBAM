@@ -493,7 +493,8 @@ Get_RR_Collision_Candidates()
         if(!R.m) continue;
         for(int i=0;i<V.m;i++)
             for(int j=0;j<R.m;j++)
-                rr_penalty->Add_Pair(V(i).x,V(i).y,R(j).id);}
+                if(V(i).x!=R(j).id)
+                    rr_penalty->Add_Pair(V(i).x,V(i).y,R(j).id);}
 }
 //#####################################################################
 namespace PhysBAM{
