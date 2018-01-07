@@ -121,7 +121,7 @@ Initialize()
 
     if(example.use_rd_penalty && example.solid_body_collection.rigid_body_collection.rigid_body_particles.number>0){
         example.rr_penalty=new RIGID_PENALTY_WITH_FRICTION<TV>(
-            example.solid_body_collection.rigid_body_collection,
+            example.solid_body_collection.rigid_body_collection,example.move_rb_diff,
             example.rd_penalty_stiffness,example.rd_penalty_friction);
         example.rd_penalty=new RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>(
             example.solid_body_collection.deformable_body_collection.particles,

@@ -8,10 +8,12 @@
 #define __RIGID_PENALTY_WITH_FRICTION__
 
 #include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/TRIPLE.h>
 #include <Rigids/Forces_And_Torques/RIGIDS_FORCES.h>
 #include <functional>
 namespace PhysBAM{
 
+template<class TV> class MOVE_RIGID_BODY_DIFF;
 template<class TV>
 class RIGID_PENALTY_WITH_FRICTION:public RIGIDS_FORCES<TV>
 {
@@ -25,18 +27,23 @@ public:
     
     struct COLLISION_PAIR
     {
-        int b1,v; // colliding vertex
-        int b2; // colliding rigid body
+        int bs,v; // colliding vertex (simplicial mesh)
+        int bi; // colliding rigid body (implicit object)
         TV X; // original attachment point (object space)
         TV Y; // relaxed attachment point (world space)
+        TV Z; // simplicial point
+        MATRIX<T,TV::m> dYdLs,dYdLi,dZdLs; // Dependence on twist.linear
+        MATRIX<T,TV::m,TV::SPIN::m> dYdAs,dYdAi,dZdAs; // Dependence on twist.angular
         bool active;
     };
     ARRAY<COLLISION_PAIR> collision_pairs;
-    HASHTABLE<PAIR<PAIR<int,int>,int> > hash;
+    HASHTABLE<TRIPLE<int,int,int> > hash;
     std::function<void()> get_candidates=0; // Call Add_Pair on collision candidates.
+    const ARRAY<MOVE_RIGID_BODY_DIFF<TV> >& move_rb_diff;
 
     RIGID_PENALTY_WITH_FRICTION(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,
-        T stiffness_coefficient,T friction);
+        const ARRAY<MOVE_RIGID_BODY_DIFF<TV> >& move_rb_diff,T stiffness_coefficient,
+        T friction);
     virtual ~RIGID_PENALTY_WITH_FRICTION();
 
 //#####################################################################

@@ -6,6 +6,7 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <Rigids/Forces_And_Torques/MOVE_RIGID_BODY_DIFF.h>
 #include <Rigids/Forces_And_Torques/RIGID_PENALTY_WITH_FRICTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Deformables/Forces/IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION.h>
@@ -15,9 +16,11 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> RIGID_PENALTY_WITH_FRICTION<TV>::
 RIGID_PENALTY_WITH_FRICTION(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,
-    T stiffness_coefficient,T friction)
+    const ARRAY<MOVE_RIGID_BODY_DIFF<TV> >& move_rb_diff,T stiffness_coefficient,
+    T friction)
     :BASE(rigid_body_collection_input),
-    stiffness_coefficient(stiffness_coefficient),friction(friction)
+    stiffness_coefficient(stiffness_coefficient),friction(friction),
+    move_rb_diff(move_rb_diff)
 {
 }
 //#####################################################################
@@ -35,13 +38,12 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) con
 {
     for(int i=0;i<collision_pairs.m;i++){
         const COLLISION_PAIR& c=collision_pairs(i);
-        const RIGID_BODY<TV>& rb1=rigid_body_collection.Rigid_Body(c.b1),
-            &rb2=rigid_body_collection.Rigid_Body(c.b2);
+        const RIGID_BODY<TV>& rbs=rigid_body_collection.Rigid_Body(c.bs),
+            &rbi=rigid_body_collection.Rigid_Body(c.bi);
         if(c.active){
-            TV X=rb1.Frame()*rb1.simplicial_object->particles.X(c.v);
-            TV j=stiffness_coefficient*(X-c.Y);
-            rigid_F(c.b1)-=rb1.Gather(TWIST<TV>(j,typename TV::SPIN()),X);
-            rigid_F(c.b2)+=rb2.Gather(TWIST<TV>(j,typename TV::SPIN()),c.Y);}}
+            TV j=stiffness_coefficient*(c.Z-c.Y);
+            rigid_F(c.bs)-=rbs.Gather(TWIST<TV>(j,typename TV::SPIN()),c.Z);
+            rigid_F(c.bi)+=rbi.Gather(TWIST<TV>(j,typename TV::SPIN()),c.Y);}}
 }
 //#####################################################################
 // Function Update_Position_Based_State
@@ -63,13 +65,17 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,
 {
     for(int i=0;i<collision_pairs.m;i++){
         const COLLISION_PAIR& c=collision_pairs(i);
-        const RIGID_BODY<TV>& rb1=rigid_body_collection.Rigid_Body(c.b1),
-            &rb2=rigid_body_collection.Rigid_Body(c.b2);
+        const RIGID_BODY<TV>& rbs=rigid_body_collection.Rigid_Body(c.bs),
+            &rbi=rigid_body_collection.Rigid_Body(c.bi);
         if(c.active){
-            TV X=rb1.Frame()*rb1.simplicial_object->particles.X(c.v);
-            TV j=stiffness_coefficient*(rb1.Scatter(rigid_V(c.b1),X).linear-rb2.Scatter(rigid_V(c.b2),c.Y).linear);
-            rigid_F(c.b1)-=rb1.Gather(TWIST<TV>(j,typename TV::SPIN()),X);
-            rigid_F(c.b2)+=rb2.Gather(TWIST<TV>(j,typename TV::SPIN()),c.Y);}}
+            TV j=stiffness_coefficient*(c.Z-c.Y);
+            TV dLs=rigid_V(c.bs).linear,dLi=rigid_V(c.bi).linear;
+            auto dAs=rigid_V(c.bs).angular,dAi=rigid_V(c.bi).angular;
+            TV dZ=c.dZdLs*dLs+c.dZdAs*dAs;
+            TV dY=c.dYdLs*dLs+c.dYdAs*dAs+c.dYdLi*dLi+c.dYdAi*dAi;
+            TV dj=stiffness_coefficient*(dZ-dY);
+            rigid_F(c.bs)-=rbs.Gather(TWIST<TV>(j,(dZ-dLs).Cross(j)),c.Z);
+            rigid_F(c.bi)+=rbi.Gather(TWIST<TV>(j,(dY-dLi).Cross(j)),c.Y);}}
 }
 //#####################################################################
 // Function Potential_Energy
@@ -81,8 +87,8 @@ Potential_Energy(const T time) const
     for(int i=0;i<collision_pairs.m;i++){
         const COLLISION_PAIR& c=collision_pairs(i);
         if(c.active){
-            const RIGID_BODY<TV>& rb1=rigid_body_collection.Rigid_Body(c.b1);
-            TV X=rb1.Frame()*rb1.simplicial_object->particles.X(c.v);
+            const RIGID_BODY<TV>& rbs=rigid_body_collection.Rigid_Body(c.bs);
+            TV X=rbs.Frame()*rbs.simplicial_object->particles.X(c.v);
             pe+=(T).5*stiffness_coefficient*(X-c.Y).Magnitude_Squared();}}
     return pe;
 }
@@ -93,17 +99,36 @@ template<class TV> void RIGID_PENALTY_WITH_FRICTION<TV>::
 Relax_Attachment(int cp)
 {
     COLLISION_PAIR& c=collision_pairs(cp);
-    const RIGID_BODY<TV>& rb1=rigid_body_collection.Rigid_Body(c.b1),
-        &rb2=rigid_body_collection.Rigid_Body(c.b2);
-    const IMPLICIT_OBJECT<TV>* io=rb2.implicit_object;
-    TV X=rb2.Frame()*c.X;
-    TV Z=rb1.Frame()*rb1.simplicial_object->particles.X(c.v);
-    T phi=io->Extended_Phi(Z);
-    TV n=io->Extended_Normal(Z);
-    auto pr=Relax_Attachment_Helper(Z,X,phi,n,friction);
+    const RIGID_BODY<TV>& rbs=rigid_body_collection.Rigid_Body(c.bs),
+        &rbi=rigid_body_collection.Rigid_Body(c.bi);
+    const IMPLICIT_OBJECT<TV>* io=rbi.implicit_object;
+
+    MATRIX<T,TV::m> dXdv,dXdLi,dZdv,dUdZ,dUdLi,dndN;
+    MATRIX<T,TV::m,TV::SPIN::m> dXdAi,dZdAs,dUdAi,dndAi;
+    const MOVE_RIGID_BODY_DIFF<TV>& mrs=move_rb_diff(c.bs);
+    const MOVE_RIGID_BODY_DIFF<TV>& mri=move_rb_diff(c.bi);
+    TV Xs=rbs.simplicial_object->particles.X(c.v);
+    c.Z=mrs.Frame_Times(Xs,dZdv,c.dZdLs,c.dZdAs);
+    TV X=mri.Frame_Times(c.X,dXdv,dXdLi,dXdAi);
+
+    TV U=mri.Frame_Inverse_Times(c.Z,dUdZ,dUdLi,dUdAi);
+    T phi=io->Extended_Phi(U);
+    TV dphidU=io->Extended_Normal(U);
+
+    TV N=io->Extended_Normal(U);
+    TV n=mri.Rotate(N,dndN,dndAi);
+    SYMMETRIC_MATRIX<T,TV::m> dNdU=io->Hessian(U);
+    MATRIX<T,TV::m> dndU=dndN*dNdU;
+
+    auto pr=Relax_Attachment_Helper(c.Z,X,phi,n,friction);
+    MATRIX<T,TV::m> dYdU=Outer_Product(pr.dYdphi,dphidU)+pr.dYdn*dndU;
+    MATRIX<T,TV::m> dYdZ=pr.dYdZ+dYdU*dUdZ;
     c.Y=pr.Y;
     c.active=pr.active;
-    // TODO: Fix derivatives
+    c.dYdLs=dYdZ*c.dZdLs;
+    c.dYdAs=dYdZ*c.dZdAs;
+    c.dYdLi=pr.dYdX*dXdLi+dYdU*dUdLi;
+    c.dYdAi=pr.dYdX*dXdAi+dYdU*dUdAi+pr.dYdn*dndAi;
 }
 //#####################################################################
 // Function Update_Attachments_And_Prune_Pairs
@@ -115,28 +140,28 @@ Update_Attachments_And_Prune_Pairs()
     for(int i=0;i<collision_pairs.m;i++){
         COLLISION_PAIR c=collision_pairs(i);
         if(c.active){
-            const RIGID_BODY<TV>& rb2=rigid_body_collection.Rigid_Body(c.b2);
-            c.X=rb2.Frame().Inverse_Times(c.Y);
+            const RIGID_BODY<TV>& rbi=rigid_body_collection.Rigid_Body(c.bi);
+            c.X=rbi.Frame().Inverse_Times(c.Y);
             collision_pairs(k++)=c;}
-        else hash.Delete({{c.b1,c.v},c.b2});}
+        else hash.Delete({c.bs,c.v,c.bi});}
     collision_pairs.Resize(k);
 }
 //#####################################################################
 // Function Add_Pair
 //#####################################################################
 template<class TV> void RIGID_PENALTY_WITH_FRICTION<TV>::
-Add_Pair(int b1,int v,int b2)
+Add_Pair(int bs,int v,int bi)
 {
     // TODO: Interpolate X^n and X^(n+1) to choose surface point.
-    if(hash.Contains({{b1,v},b2})) return;
-    const RIGID_BODY<TV>& rb1=rigid_body_collection.Rigid_Body(b1),
-        &rb2=rigid_body_collection.Rigid_Body(b2);
-    TV X=rb1.Frame()*rb1.simplicial_object->particles.X(v);
-    if(rb2.implicit_object->Extended_Phi(X)>0) return;
-    TV W=rb2.implicit_object->Closest_Point_On_Boundary(X);
-    COLLISION_PAIR c={b1,v,b2,rb2.Frame().Inverse_Times(W)};
+    if(hash.Contains({bs,v,bi})) return;
+    const RIGID_BODY<TV>& rbs=rigid_body_collection.Rigid_Body(bs),
+        &rbi=rigid_body_collection.Rigid_Body(bi);
+    TV X=rbs.Frame()*rbs.simplicial_object->particles.X(v);
+    if(rbi.implicit_object->Extended_Phi(X)>0) return;
+    TV W=rbi.implicit_object->Closest_Point_On_Boundary(X);
+    COLLISION_PAIR c={bs,v,bi,rbi.Frame().Inverse_Times(W)};
     collision_pairs.Append(c);
-    hash.Insert({{b1,v},b2});
+    hash.Insert({bs,v,bi});
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces
