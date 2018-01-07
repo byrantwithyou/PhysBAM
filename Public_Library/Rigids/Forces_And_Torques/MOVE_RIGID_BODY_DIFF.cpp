@@ -6,7 +6,7 @@
 #include <Core/Math_Tools/Robust_Functions.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Core/Vectors/TWIST.h>
-#include <Hybrid_Methods/Forces/MOVE_RIGID_BODY_DIFF.h>
+#include <Rigids/Forces_And_Torques/MOVE_RIGID_BODY_DIFF.h>
 namespace PhysBAM{
 namespace{
 template<class T>

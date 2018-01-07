@@ -11,8 +11,8 @@
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
+#include <Rigids/Forces_And_Torques/MOVE_RIGID_BODY_DIFF.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
-#include <Hybrid_Methods/Forces/MOVE_RIGID_BODY_DIFF.h>
 #include <functional>
 namespace PhysBAM{
 
