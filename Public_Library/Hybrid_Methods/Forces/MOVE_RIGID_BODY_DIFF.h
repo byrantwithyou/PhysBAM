@@ -18,12 +18,15 @@ struct MOVE_RIGID_BODY_DIFF
     typedef typename TV::SCALAR T;
     FRAME<TV> frame;
     TENSOR<T,TV::m,TV::m,TV::SPIN::m> tensor;
+    MATRIX<T,TV::m> R;
 
     void Compute(const FRAME<TV>& frame0,const TWIST<TV>& dt_twist);
     TV Frame_Times(TV v,MATRIX<T,TV::m>& dZdv,MATRIX<T,TV::m>& dZdL,
         MATRIX<T,TV::m,TV::SPIN::m>& dZdA) const;
     TV Frame_Inverse_Times(TV v,MATRIX<T,TV::m>& dZdv,MATRIX<T,TV::m>& dZdL,
         MATRIX<T,TV::m,TV::SPIN::m>& dZdA) const;
+    TV Rotate(TV v,MATRIX<T,TV::m>& dZdv,MATRIX<T,TV::m,TV::SPIN::m>& dZdA) const;
+    TV Inverse_Rotate(TV v,MATRIX<T,TV::m>& dZdv,MATRIX<T,TV::m,TV::SPIN::m>& dZdA) const;
 };
 }
 #endif

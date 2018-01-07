@@ -39,6 +39,7 @@ Compute(const FRAME<TV>& frame0,const TWIST<TV>& dt_twist)
     frame.r=ROTATION<TV>::From_Rotation_Vector(dt_twist.angular)*frame0.r;
     Move_Rigid_Body_Diff_Helper(tensor,dt_twist.angular);
     tensor=Contract<1,0>(tensor,frame0.r.Rotation_Matrix());
+    R=frame.r.Rotation_Matrix();
 }
 //#####################################################################
 // Function Frame_Times
@@ -47,7 +48,7 @@ template<class TV> TV MOVE_RIGID_BODY_DIFF<TV>::
 Frame_Times(TV v,MATRIX<T,TV::m>& dZdv,MATRIX<T,TV::m>& dZdL,
     MATRIX<T,TV::m,TV::SPIN::m>& dZdA) const
 {
-    dZdv=frame.r.Rotation_Matrix();
+    dZdv=R;
     dZdL=MATRIX<T,TV::m>()+1;
     dZdA=Contract<1>(tensor,v);
     return frame*v;
@@ -59,10 +60,30 @@ template<class TV> TV MOVE_RIGID_BODY_DIFF<TV>::
 Frame_Inverse_Times(TV v,MATRIX<T,TV::m>& dZdv,MATRIX<T,TV::m>& dZdL,
     MATRIX<T,TV::m,TV::SPIN::m>& dZdA) const
 {
-    dZdv=frame.r.Rotation_Matrix().Transposed();
-    dZdL=-frame.r.Rotation_Matrix().Transposed();
+    dZdv=R.Transposed();
+    dZdL=-R.Transposed();
     dZdA=Contract<0>(tensor,v-frame.t);
     return frame.Inverse_Times(v);
+}
+//#####################################################################
+// Function Rotate
+//#####################################################################
+template<class TV> TV MOVE_RIGID_BODY_DIFF<TV>::
+Rotate(TV v,MATRIX<T,TV::m>& dZdv,MATRIX<T,TV::m,TV::SPIN::m>& dZdA) const
+{
+    dZdv=R;
+    dZdA=Contract<1>(tensor,v);
+    return R*v;
+}
+//#####################################################################
+// Function Inverse_Rotate
+//#####################################################################
+template<class TV> TV MOVE_RIGID_BODY_DIFF<TV>::
+Inverse_Rotate(TV v,MATRIX<T,TV::m>& dZdv,MATRIX<T,TV::m,TV::SPIN::m>& dZdA) const
+{
+    dZdv=R.Transposed();
+    dZdA=Contract<0>(tensor,v);
+    return R.Transpose_Times(v);
 }
 //#####################################################################
 // Function Test_Move_Rigid_Body_Diff
@@ -100,12 +121,20 @@ Test_Move_Rigid_Body_Diff()
     MATRIX<T,TV::m> dZdV[2];
     MATRIX<T,TV::m> dZdL[2];
     MATRIX<T,TV::m,TV::SPIN::m> dZdA[2];
+    TV A[2];
+    MATRIX<T,TV::m> dAdV[2];
+    MATRIX<T,TV::m,TV::SPIN::m> dAdA[2];
+    TV B[2];
+    MATRIX<T,TV::m> dBdV[2];
+    MATRIX<T,TV::m,TV::SPIN::m> dBdA[2];
     MOVE_RIGID_BODY_DIFF<TV> mr[2];
     for(int s=0;s<2;s++)
     {
         mr[s].Compute(frame0,dt*w[s]);
         Y[s]=mr[s].Frame_Times(vec[s],dYdV[s],dYdL[s],dYdA[s]);
         Z[s]=mr[s].Frame_Inverse_Times(vec[s],dZdV[s],dZdL[s],dZdA[s]);
+        A[s]=mr[s].Rotate(vec[s],dAdV[s],dAdA[s]);
+        B[s]=mr[s].Inverse_Rotate(vec[s],dBdV[s],dBdA[s]);
     }
     TV dY0=Y[1]-Y[0];
     dY0/=eps;
@@ -122,6 +151,22 @@ Test_Move_Rigid_Body_Diff()
     dZ1+=dZdV[1]*dvec+dZdL[1]*dw.linear*dt+dZdA[1]*dw.angular*dt;
     dZ1/=2*eps;
     LOG::printf("%P %P %P\n",dZ0.Magnitude(),dZ1.Magnitude(),(dZ0-dZ1).Magnitude());
+
+    TV dA0=A[1]-A[0];
+    dA0/=eps;
+    TV dA1;
+    dA1+=dAdV[0]*dvec+dAdA[0]*dw.angular*dt;
+    dA1+=dAdV[1]*dvec+dAdA[1]*dw.angular*dt;
+    dA1/=2*eps;
+    LOG::printf("%P %P %P\n",dA0.Magnitude(),dA1.Magnitude(),(dA0-dA1).Magnitude());
+
+    TV dB0=B[1]-B[0];
+    dB0/=eps;
+    TV dB1;
+    dB1+=dBdV[0]*dvec+dBdA[0]*dw.angular*dt;
+    dB1+=dBdV[1]*dvec+dBdA[1]*dw.angular*dt;
+    dB1/=2*eps;
+    LOG::printf("%P %P %P\n",dB0.Magnitude(),dB1.Magnitude(),(dB0-dB1).Magnitude());
 }
 template class MOVE_RIGID_BODY_DIFF<VECTOR<float,2> >;
 template class MOVE_RIGID_BODY_DIFF<VECTOR<float,3> >;
