@@ -11,15 +11,19 @@
 #include <Deformables/Forces/IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Solids/Forces_And_Torques/RIGID_DEFORMABLE_PENALTY_WITH_FRICTION.h>
+#include <Hybrid_Methods/Forces/MOVE_RIGID_BODY_DIFF.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class TV> RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>::
 RIGID_DEFORMABLE_PENALTY_WITH_FRICTION(DEFORMABLE_PARTICLES<TV>& particles_input,
-    RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,T stiffness_coefficient,T friction)
+    RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,
+    const ARRAY<MOVE_RIGID_BODY_DIFF<TV> >& move_rb_diff,T stiffness_coefficient,
+    T friction)
     :BASE(particles_input,rigid_body_collection_input),
-    stiffness_coefficient(stiffness_coefficient),friction(friction)
+    stiffness_coefficient(stiffness_coefficient),friction(friction),
+    move_rb_diff(move_rb_diff)
 {
 }
 //#####################################################################
@@ -66,9 +70,13 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,
         const COLLISION_PAIR& c=collision_pairs(i);
         const RIGID_BODY<TV>& rb=rigid_body_collection.Rigid_Body(c.b);
         if(c.active){
-            TV j=stiffness_coefficient*(V(c.p)-rb.Scatter(rigid_V(c.b),c.Y).linear);
-            F(c.p)-=j;
-            rigid_F(c.b)+=rb.Gather(TWIST<TV>(j,typename TV::SPIN()),c.Y);}}
+            TV j=stiffness_coefficient*(particles.X(c.p)-c.Y);
+            TV dZ=V(c.p),dL=rigid_V(c.b).linear;
+            auto dA=rigid_V(c.b).angular;
+            TV dY=c.dYdZ*dZ+c.dYdL*dL+c.dYdA*dA;
+            TV dj=stiffness_coefficient*(dZ-dY);
+            F(c.p)-=dj;
+            rigid_F+=rb.Gather(TWIST<TV>(dj,(dY-dL).Cross(j)),c.Y);}}
 }
 //#####################################################################
 // Function Potential_Energy
@@ -91,16 +99,32 @@ Relax_Attachment(int cp)
 {
     COLLISION_PAIR& c=collision_pairs(cp);
     const RIGID_BODY<TV>& rb=rigid_body_collection.Rigid_Body(c.b);
-    const IMPLICIT_OBJECT<TV>* io=rb.implicit_object;
-    TV X=rb.Frame()*c.X;
+    const IMPLICIT_OBJECT<TV>* io=rb.implicit_object->object_space_implicit_object;
+
+    MATRIX<T,TV::m> dXdv,dXdL,dUdZ,dUdL,dndN;
+    MATRIX<T,TV::m,TV::SPIN::m> dXdA,dUdA,dndA;
+    const MOVE_RIGID_BODY_DIFF<TV>& mr=move_rb_diff(c.b);
+    TV X=mr.Frame_Times(c.X,dXdv,dXdL,dXdA);
     TV Z=particles.X(c.p);
-    T phi=io->Extended_Phi(Z);
-    TV n=io->Extended_Normal(Z);
+
+    TV U=mr.Frame_Inverse_Times(Z,dUdZ,dUdL,dUdA);
+    T phi=io->Extended_Phi(U);
+    TV dphidU=io->Extended_Normal(U);
+
+    TV N=io->Extended_Normal(U);
+    TV n=mr.Rotate(N,dndN,dndA);
+    SYMMETRIC_MATRIX<T,TV::m> dNdU=io->Hessian(U);
+    MATRIX<T,TV::m> dndU=dndN*dNdU;
+
     auto pr=Relax_Attachment_Helper(Z,X,phi,n,friction);
+    MATRIX<T,TV::m> dYdU=Outer_Product(pr.dYdphi,dphidU)+pr.dYdn*dndU;
     c.Y=pr.Y;
     c.active=pr.active;
-    // TODO: Fix derivatives
+    c.dYdZ=pr.dYdZ+dYdU*dUdZ;
+    c.dYdL=pr.dYdX*dXdL+dYdU*dUdL;
+    c.dYdA=pr.dYdX*dXdA+dYdU*dUdA+pr.dYdn*dndA;
 }
+
 //#####################################################################
 // Function Update_Attachments_And_Prune_Pairs
 //#####################################################################

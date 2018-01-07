@@ -11,6 +11,7 @@
 #include <functional>
 namespace PhysBAM{
 
+template<class TV> class MOVE_RIGID_BODY_DIFF;
 template<class TV>
 class RIGID_DEFORMABLE_PENALTY_WITH_FRICTION:public SOLIDS_FORCES<TV>
 {
@@ -28,14 +29,19 @@ public:
         int b; // colliding rigid body
         TV X; // original attachment point (object space)
         TV Y; // relaxed attachment point (world space)
+        MATRIX<T,TV::m> dYdZ; // Dependence of Y on X(p)
+        MATRIX<T,TV::m> dYdL; // Dependence of Y on twist.linear
+        MATRIX<T,TV::m,TV::SPIN::m> dYdA; // Dependence of Y on twist.angular
         bool active;
     };
     ARRAY<COLLISION_PAIR> collision_pairs;
     HASHTABLE<PAIR<int,int> > hash;
     std::function<void()> get_candidates=0; // Call Add_Pair on collision candidates.
+    const ARRAY<MOVE_RIGID_BODY_DIFF<TV> >& move_rb_diff;
 
     RIGID_DEFORMABLE_PENALTY_WITH_FRICTION(DEFORMABLE_PARTICLES<TV>& particles_input,
-        RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,T stiffness_coefficient,
+        RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,
+        const ARRAY<MOVE_RIGID_BODY_DIFF<TV> >& move_rb_diff,T stiffness_coefficient,
         T friction);
     virtual ~RIGID_DEFORMABLE_PENALTY_WITH_FRICTION();
 
