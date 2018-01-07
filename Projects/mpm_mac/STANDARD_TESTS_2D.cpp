@@ -2,6 +2,7 @@
 // Copyright 2015, Lin Huang, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Tools/Tensors/SYMMETRIC_TENSOR.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INTERSECTION.h>
@@ -9,7 +10,6 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UNION.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Seeding/MPM_PARTICLE_SOURCE.h>
-#include <Tools/Tensors/SYMMETRIC_TENSOR.h>
 #include <fstream>
 #include "STANDARD_TESTS_2D.h"
 namespace PhysBAM{

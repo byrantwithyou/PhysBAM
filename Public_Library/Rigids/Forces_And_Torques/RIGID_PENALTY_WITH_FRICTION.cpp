@@ -6,9 +6,9 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <Rigids/Forces_And_Torques/RIGID_PENALTY_WITH_FRICTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Deformables/Forces/IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION.h>
-#include <Rigids/Forces_And_Torques/RIGID_PENALTY_WITH_FRICTION.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor

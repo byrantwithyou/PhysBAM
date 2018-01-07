@@ -2,7 +2,7 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include<Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Log/DEBUG_UTILITIES.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Tools/Optimization/IPOPT.h>
 #include <Tools/Parsing/PARSE_ARGS.h>

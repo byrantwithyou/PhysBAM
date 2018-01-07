@@ -10,8 +10,8 @@
 #include <Core/Matrices/MATRIX_3X3.h>
 #include <Core/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <Core/Matrices/SYMMETRIC_MATRIX_3X3.h>
-#include <Deformables/Constitutive_Models/TAIT_PRESSURE_FORCE.h>
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
+#include <Deformables/Constitutive_Models/TAIT_PRESSURE_FORCE.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
