@@ -12,6 +12,7 @@
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
+#include <Hybrid_Methods/Forces/MOVE_RIGID_BODY_DIFF.h>
 #include <functional>
 namespace PhysBAM{
 
@@ -138,7 +139,7 @@ public:
     RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>* rd_penalty=0;
     IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* d_io_penalty=0;
     RIGID_PENALTY_WITH_FRICTION<TV>* rr_penalty=0;
-
+    ARRAY<MOVE_RIGID_BODY_DIFF<TV> > move_rb_diff;
     
     MPM_EXAMPLE_RB(const STREAM_TYPE stream_type_input);
     MPM_EXAMPLE_RB(const MPM_EXAMPLE_RB&) = delete;

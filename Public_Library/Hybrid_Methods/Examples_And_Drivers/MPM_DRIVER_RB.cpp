@@ -125,7 +125,7 @@ Initialize()
             example.rd_penalty_stiffness,example.rd_penalty_friction);
         example.rd_penalty=new RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>(
             example.solid_body_collection.deformable_body_collection.particles,
-            example.solid_body_collection.rigid_body_collection,
+            example.solid_body_collection.rigid_body_collection,example.move_rb_diff,
             example.rd_penalty_stiffness,example.rd_penalty_friction);
         example.rr_penalty->get_candidates=[this](){example.Get_RR_Collision_Candidates();};
         example.rd_penalty->get_candidates=[this](){example.Get_RD_Collision_Candidates();};
@@ -186,7 +186,6 @@ Simulate_To_Frame(const int frame)
             else if(next_time+example.dt>time_at_frame) next_time=(example.time+time_at_frame)/2;
             example.dt=next_time-example.time;
             LOG::cout<<"substep dt: "<<example.dt<<std::endl;
-
             Advance_One_Time_Step();
 
             // Time step was reduced
@@ -726,8 +725,9 @@ Reflect_Or_Invalidate_Particle(int p)
 template<class T>
 inline VECTOR<T,3> Update_Rotation_Helper(const T dt,const VECTOR<T,3>& omega,const SYMMETRIC_MATRIX<T,3>& inertia)
 {
-    VECTOR<T,3> L=inertia*omega;
-    return omega-(T).5*dt*inertia.Inverse_Times(omega.Cross(L));
+//    VECTOR<T,3> L=inertia*omega;
+//    return omega-(T).5*dt*inertia.Inverse_Times(omega.Cross(L));
+    return omega;
 }
 //#####################################################################
 // Function Update_Rotation_Helper

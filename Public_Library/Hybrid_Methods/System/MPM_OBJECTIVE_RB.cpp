@@ -151,8 +151,9 @@ Update_F(const MPM_KRYLOV_VECTOR_RB<TV>& v) const
     RIGID_BODY_PARTICLES<TV>& rbp=rbc.rigid_body_particles;
 #pragma omp parallel
     for(int i=0;i<rbp.number;i++){
-        if(!rbc.Rigid_Body(i).Has_Infinite_Inertia())
-            rbp.frame(i)=Move_Rigid_Body(system.example.dt,frame0(i),v.twists(i),inertia0(i));}
+        if(!rbc.Rigid_Body(i).Has_Infinite_Inertia()){
+            system.example.move_rb_diff(i).Compute(frame0(i),system.example.dt*v.twists(i));
+            rbp.frame(i)=system.example.move_rb_diff(i).frame;}}
 }
 //#####################################################################
 // Function Compute
@@ -350,6 +351,7 @@ Reset()
     tmp0.twists.Resize(rbp.number);
     tmp1.twists.Resize(rbp.number);
     tmp2.twists.Resize(rbp.number);
+    system.example.move_rb_diff.Resize(rbp.number);
 }
 //#####################################################################
 // Function Test_Diff
