@@ -86,6 +86,7 @@
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
+#include <Rigids/Forces_And_Torques/MOVE_RIGID_BODY_DIFF.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
 #include <Deformables/Bindings/RIGID_BODY_BINDING.h>
@@ -107,6 +108,7 @@
 #include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Forces_And_Torques/ETHER_DRAG.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
+#include <Solids/Forces_And_Torques/RIGID_DEFORMABLE_PENALTY_WITH_FRICTION.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_EVOLUTION.h>
@@ -197,6 +199,11 @@ public:
     T collision_height;
     T collision_speed;
     int threads;
+    T rd_penalty_stiffness=0;
+    T rd_penalty_friction=0.3;
+    bool use_rd_penalty=false;
+    RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>* rd_penalty=0;
+    ARRAY<MOVE_RIGID_BODY_DIFF<TV> > move_rb_diff;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
         :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),test_forces(false),
@@ -305,6 +312,8 @@ public:
         parse_args.Add("-collision_height",&collision_height,"height","height of collision body in test 68");
         parse_args.Add("-collision_speed",&collision_speed,"speed","speed of collision body in test 68");
         parse_args.Add("-threads",&threads,"threads","Number of threads");
+        parse_args.Add("-rd_stiffness",&rd_penalty_stiffness,&use_rd_penalty,"stiffness","rigid-deformable penalty force stiffness");
+        parse_args.Add("-rd_friction",&rd_penalty_friction,"friction","rigid-deformable penalty force friction");
         parse_args.Parse();
 
 #ifdef USE_OPENMP
@@ -421,6 +430,10 @@ public:
             case 68:
             case 69:
             case 77:
+            case 701:
+                // Test rigid-deformable penalty force with friction.
+                // ./be_evolution 701 -no_collisions_in_solve -rd_stiffness 1e2
+                backward_euler_evolution->asymmetric_system=true;
                 solids_parameters.cfl=(T)5;
                 /* solids_parameters.implicit_solve_parameters.cg_iterations=100000; */
                 break;
@@ -1800,6 +1813,10 @@ void Get_Initial_Data()
                 while(fin>>n) stuck_particles.Append(n);
                 LOG::printf("stuck_particles %P\n",stuck_particles.m);}
             break;
+        case 701:{
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)5,0)*m)),true,true,density,m);
+            tests.Add_Ground(0,1.99*m);
+            break;}
         default:
             LOG::cerr<<"Initial Data: Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
@@ -2279,6 +2296,11 @@ void Initialize_Bodies() override
             if(test_number==201) rand.Fill_Uniform(particles.X,-1,1);
             if(test_number==202) Add_Gravity();
             break;}
+        case 701:{
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+            Add_Constitutive_Model(tetrahedralized_volume,(T)1e5*unit_p,(T).45,(T).01*s);
+            Add_Gravity();
+            break;}
         default:
             LOG::cerr<<"Missing bodies implementation for test number "<<test_number<<std::endl;exit(1);}
 
@@ -2340,6 +2362,16 @@ void Initialize_Bodies() override
         solid_body_collection.Add_Force(new TRIANGLE_REPULSIONS_PENALTY<TV>(particles,deformable_body_collection.triangle_repulsions.point_face_interaction_pairs));
         solid_body_collection.Add_Force(new TRIANGLE_REPULSIONS_PENALTY<TV>(particles,deformable_body_collection.triangle_repulsions.edge_edge_interaction_pairs));}
 
+    if(use_rd_penalty && rigid_body_collection.rigid_body_particles.number>0){
+        move_rb_diff.Resize(rigid_body_collection.rigid_body_particles.number);
+        backward_euler_evolution->minimization_objective.move_rb_diff=&move_rb_diff;
+        rd_penalty=new RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>(
+            solid_body_collection.deformable_body_collection.particles,
+            solid_body_collection.rigid_body_collection,move_rb_diff,
+            rd_penalty_stiffness,rd_penalty_friction);
+        rd_penalty->get_candidates=[this](){Get_RD_Collision_Candidates();};
+        solid_body_collection.Add_Force(rd_penalty);}
+
     if(enforce_definiteness) solid_body_collection.Enforce_Definiteness(true);
     if(backward_euler_evolution) backward_euler_evolution->minimization_objective.Disable_Current_Colliding_Pairs(0);
 
@@ -2347,6 +2379,22 @@ void Initialize_Bodies() override
     for(int i=0;i<deformable_body_collection.deformables_forces.m;i++)
         if(COLLISION_FORCE<TV>* cf=dynamic_cast<COLLISION_FORCE<TV>*>(solid_body_collection.deformable_body_collection.deformables_forces(i)))
             cf->coefficient_of_friction=input_friction;
+}
+
+//#####################################################################
+// Function Get_RD_Collision_Candidates
+//#####################################################################
+void Get_RD_Collision_Candidates()
+{
+    // TODO use BOX_HIERARCHY
+    DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
+    RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
+    for(int d=0;d<particles.number;d++){
+        TV X=particles.X(d);
+        for(int r=0;r<rigid_body_collection.rigid_body_particles.number;r++){
+            if(rigid_body_collection.Rigid_Body(r).Implicit_Geometry_Extended_Value(X)<0)
+                rd_penalty->Add_Pair(d,r);}}
 }
 
 //#####################################################################
@@ -2672,6 +2720,9 @@ void Postprocess_Substep(const T dt,const T time) override
                 for(int i=0;i<mesh_particles.m;i++)
                   if(particles.V(mesh_particles(i)).y<-attachment_velocity)
                     particles.V(mesh_particles(i)).y=-attachment_velocity;}}}
+
+    if(rd_penalty)
+        rd_penalty->Update_Attachments_And_Prune_Pairs();
 }
 //#####################################################################
 // Function Bind_Intersecting_Particles

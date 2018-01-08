@@ -89,17 +89,26 @@ Compute_Unconstrained(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,
         tmp0.V.array(p)=particles.mass(p)*dV;}
     solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Positions(particles.X);
 
+    RIGID_BODY_COLLECTION<TV>& rbc=solid_body_collection.rigid_body_collection;
+    ARRAY<MOVE_RIGID_BODY_DIFF<TV> >& mrd=*move_rb_diff;
 #pragma omp parallel for
-    for(int p=0;p<rigid_body_particles.number;p++){
-        RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(p);
-        if(rigid_body.Has_Infinite_Inertia()) continue;
-        const TWIST<TV>& d_twist=dv.rigid_V.array(p);
-        TWIST<TV>& twist=v1.rigid_V.array(p);
-        twist=v0.rigid_V.array(p)+d_twist;
-        FRAME<TV>& frame=rigid_body_particles.frame(p);
-        frame.t=frame0(p).t+dt*twist.linear;
-        frame.r=ROTATION<TV>::From_Rotation_Vector(dt*twist.angular)*frame0(p).r;
-        tmp0.rigid_V.array(p)=rigid_body.Inertia_Times(d_twist);}
+    for(int i=0;i<rigid_body_particles.number;i++){
+        RIGID_BODY<TV>& rigid_body=rbc.Rigid_Body(i);
+        T s=rigid_body.Has_Infinite_Inertia()?0:1;
+        const TWIST<TV>& d_twist=dv.rigid_V.array(i);
+        TWIST<TV>& twist=v1.rigid_V.array(i);
+        twist=v0.rigid_V.array(i)+d_twist;
+        if(move_rb_diff){
+            mrd(i).Compute(frame0(i),s*dt*twist);
+            rigid_body_particles.frame(i)=mrd(i).frame;
+            if(!rigid_body.Has_Infinite_Inertia())
+                tmp0.rigid_V.array(i)=rigid_body.Inertia_Times(d_twist);}
+        else{
+            if(rigid_body.Has_Infinite_Inertia()) continue;
+            FRAME<TV>& frame=rigid_body_particles.frame(i);
+            frame.t=frame0(i).t+dt*twist.linear;
+            frame.r=ROTATION<TV>::From_Rotation_Vector(dt*twist.angular)*frame0(i).r;
+            tmp0.rigid_V.array(i)=rigid_body.Inertia_Times(d_twist);}}
 
     T energy=minimization_system.Inner_Product(dv,tmp0)/2;
     energy+=Update_Position_Based_State_Early_Out(time,true,h?FLT_MAX:last_energy,h);
@@ -220,8 +229,8 @@ Make_Feasible(KRYLOV_VECTOR_BASE<T>& dv) const
 //#####################################################################
 // Function Initial_Guess
 //#####################################################################
-template<class TV> void BACKWARD_EULER_MINIMIZATION_OBJECTIVE<TV>::
-Initial_Guess(KRYLOV_VECTOR_BASE<T>& Bdv) const
+template<class TV> bool BACKWARD_EULER_MINIMIZATION_OBJECTIVE<TV>::
+Initial_Guess(KRYLOV_VECTOR_BASE<T>& Bdv,bool no_test) const
 {
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
@@ -237,8 +246,10 @@ Initial_Guess(KRYLOV_VECTOR_BASE<T>& Bdv) const
         RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(p);
         if(rigid_body.Has_Infinite_Inertia()) continue;
         dv.rigid_V.array(p)=-rigid_body.Inertia_Inverse_Times(tmp0.rigid_V.array(p));}
+    if(no_test) return true;
     Compute(dv,0,0,&e1);
     if(e1>e0) dv*=0;
+    return false;
 }
 //#####################################################################
 // Function Reset
@@ -343,10 +354,8 @@ Test_Diff(const KRYLOV_VECTOR_BASE<T>& dv)
     delete b;
     delete t0;
 }
-template class BACKWARD_EULER_MINIMIZATION_OBJECTIVE<VECTOR<float,1> >;
 template class BACKWARD_EULER_MINIMIZATION_OBJECTIVE<VECTOR<float,2> >;
 template class BACKWARD_EULER_MINIMIZATION_OBJECTIVE<VECTOR<float,3> >;
-template class BACKWARD_EULER_MINIMIZATION_OBJECTIVE<VECTOR<double,1> >;
 template class BACKWARD_EULER_MINIMIZATION_OBJECTIVE<VECTOR<double,2> >;
 template class BACKWARD_EULER_MINIMIZATION_OBJECTIVE<VECTOR<double,3> >;
 }

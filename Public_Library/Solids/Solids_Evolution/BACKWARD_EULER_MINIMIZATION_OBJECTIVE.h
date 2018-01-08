@@ -14,6 +14,7 @@
 #include <Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_MINIMIZATION_SYSTEM.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_SYSTEM.h>
+#include <Rigids/Forces_And_Torques/MOVE_RIGID_BODY_DIFF.h>
 namespace PhysBAM{
 template<class TV> class SOLID_BODY_COLLECTION;
 template<class TV> class BACKWARD_EULER_MINIMIZATION_SYSTEM;
@@ -40,6 +41,7 @@ public:
     HASHTABLE<int> solids_forces_lazy,rigids_forces_lazy,deformables_forces_lazy;
     mutable T last_energy;
     bool collisions_in_solve;
+    ARRAY<MOVE_RIGID_BODY_DIFF<TV> >* move_rb_diff;
 
     BACKWARD_EULER_MINIMIZATION_OBJECTIVE(SOLID_BODY_COLLECTION<TV>& solid_body_collection,BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>& minimization_system);
     virtual ~BACKWARD_EULER_MINIMIZATION_OBJECTIVE();
@@ -47,7 +49,7 @@ public:
     void Reset();
     void Compute(const KRYLOV_VECTOR_BASE<T>& dv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_BASE<T>* g,T* e) const override;
     void Compute_Unconstrained(const KRYLOV_VECTOR_BASE<T>& dv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_BASE<T>* g,T* e) const;
-    void Initial_Guess(KRYLOV_VECTOR_BASE<T>& dv) const;
+    bool Initial_Guess(KRYLOV_VECTOR_BASE<T>& dv,bool no_test) const;
     void Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const;
     void Make_Feasible(KRYLOV_VECTOR_BASE<T>& dv) const override;
     void Project_Gradient_And_Prune_Constraints(KRYLOV_VECTOR_BASE<T>& dv,bool allow_sep) const;

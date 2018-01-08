@@ -94,10 +94,14 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
         if(LAGGED_FORCE<TV>* lf=dynamic_cast<LAGGED_FORCE<TV>*>(solid_body_collection.deformable_body_collection.deformables_forces(i)))
             lf->Lagged_Update_Position_Based_State(time);
 
-    minimization_objective.Initial_Guess(dv);
+    newtons_method.require_one_iteration=!minimization_objective.Initial_Guess(dv,asymmetric_system);
     if(test_diff) minimization_objective.Test_Diff(dv);
 
     newtons_method.tolerance*=dt;
+    if(asymmetric_system){
+        newtons_method.use_gmres=true;
+        newtons_method.use_cg=false;
+        newtons_method.Make_Vanilla_Newton();}
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
     bool converged=newtons_method.Newtons_Method(minimization_objective,minimization_system,dv,av);
     av.Delete_Pointers_And_Clean_Memory();
@@ -178,10 +182,8 @@ Use_CFL() const
 }
 //#####################################################################
 namespace PhysBAM{
-template class BACKWARD_EULER_EVOLUTION<VECTOR<float,1> >;
 template class BACKWARD_EULER_EVOLUTION<VECTOR<float,2> >;
 template class BACKWARD_EULER_EVOLUTION<VECTOR<float,3> >;
-template class BACKWARD_EULER_EVOLUTION<VECTOR<double,1> >;
 template class BACKWARD_EULER_EVOLUTION<VECTOR<double,2> >;
 template class BACKWARD_EULER_EVOLUTION<VECTOR<double,3> >;
 }

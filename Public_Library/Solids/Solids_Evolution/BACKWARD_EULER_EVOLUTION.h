@@ -38,6 +38,7 @@ class BACKWARD_EULER_EVOLUTION:public SOLIDS_EVOLUTION<TV>
     T coefficient_of_friction;
     bool fail_on_newton_not_converged;
     bool test_diff;
+    bool asymmetric_system=false;
 
     BACKWARD_EULER_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities_input);
     virtual ~BACKWARD_EULER_EVOLUTION();
