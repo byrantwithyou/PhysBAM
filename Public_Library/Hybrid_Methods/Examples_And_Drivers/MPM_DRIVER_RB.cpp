@@ -527,6 +527,8 @@ Apply_Forces()
 
         bool converged=newtons_method.Newtons_Method(objective,objective.system,dv,av);
 
+        if(example.rr_penalty)
+            example.rr_penalty->Update_Attachments_And_Prune_Pairs();
         if(example.rd_penalty)
             example.rd_penalty->Update_Attachments_And_Prune_Pairs();
         if(example.d_io_penalty)
