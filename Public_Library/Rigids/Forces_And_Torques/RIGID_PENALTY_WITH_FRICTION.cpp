@@ -101,7 +101,7 @@ Relax_Attachment(int cp)
     COLLISION_PAIR& c=collision_pairs(cp);
     const RIGID_BODY<TV>& rbs=rigid_body_collection.Rigid_Body(c.bs),
         &rbi=rigid_body_collection.Rigid_Body(c.bi);
-    const IMPLICIT_OBJECT<TV>* io=rbi.implicit_object;
+    const IMPLICIT_OBJECT<TV>* io=rbi.implicit_object->object_space_implicit_object;
 
     MATRIX<T,TV::m> dXdv,dXdLi,dZdv,dUdZ,dUdLi,dndN;
     MATRIX<T,TV::m,TV::SPIN::m> dXdAi,dZdAs,dUdAi,dndAi;
