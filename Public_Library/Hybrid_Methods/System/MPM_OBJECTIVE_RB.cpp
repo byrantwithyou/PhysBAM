@@ -151,9 +151,9 @@ Update_F(const MPM_KRYLOV_VECTOR_RB<TV>& v) const
     RIGID_BODY_PARTICLES<TV>& rbp=rbc.rigid_body_particles;
 #pragma omp parallel
     for(int i=0;i<rbp.number;i++){
-        if(!rbc.Rigid_Body(i).Has_Infinite_Inertia()){
-            system.example.move_rb_diff(i).Compute(frame0(i),system.example.dt*v.twists(i));
-            rbp.frame(i)=system.example.move_rb_diff(i).frame;}}
+        T s=rbc.Rigid_Body(i).Has_Infinite_Inertia()?0:1;
+        system.example.move_rb_diff(i).Compute(frame0(i),s*system.example.dt*v.twists(i));
+        rbp.frame(i)=system.example.move_rb_diff(i).frame;}
 }
 //#####################################################################
 // Function Compute
