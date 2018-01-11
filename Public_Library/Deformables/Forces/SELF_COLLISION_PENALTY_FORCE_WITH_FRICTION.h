@@ -1,0 +1,75 @@
+//#####################################################################
+// Copyright 2017.
+// This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
+//#####################################################################
+// Class SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION
+//#####################################################################
+#ifndef __SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION__
+#define __SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION__
+
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
+#include <Deformables/Forces/DEFORMABLES_FORCES.h>
+#include <functional>
+namespace PhysBAM{
+
+template<class TV>
+class SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION:public DEFORMABLES_FORCES<TV>
+{
+    typedef typename TV::SCALAR T;
+public:
+    typedef DEFORMABLES_FORCES<TV> BASE;
+    typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_SURFACE;
+    using BASE::particles;
+
+    ARRAY<T_SURFACE*> surfaces;
+    T stiffness_coefficient;
+    T friction;
+    T trial_distance;
+    
+    struct COLLISION_PAIR
+    {
+        int p; // colliding particle
+        int s; // surface
+
+        TV w0; // barycentric coords of original attachment point
+        int e0; // element of original attachment point
+
+        TV w; // barycentric coords of relaxed attachment point
+        int e; // element of relaxed attachment point
+        TV Y; // relaxed attachment point
+
+        MATRIX<T,TV::m> dwdZ; // Dependence of w on X(p)
+        VECTOR<MATRIX<T,TV::m>,TV::m> dwdE; // Dependence of w on vertices of element e
+        bool active;
+    };
+    ARRAY<COLLISION_PAIR> collision_pairs;
+    HASHTABLE<PAIR<int,int> > hash; // p,s
+    std::function<void()> get_candidates=0; // Call Add_Pair on collision candidates.
+
+    SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION(DEFORMABLE_PARTICLES<TV>& particles_input,
+        T stiffness_coefficient,T friction);
+    virtual ~SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION();
+
+//#####################################################################
+    void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) override;
+    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const override;
+    void Enforce_Definiteness(const bool enforce_definiteness_input) override;
+    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const override;
+    void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const override;
+    int Velocity_Dependent_Forces_Size() const override;
+    void Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> aggregate,const T time) const override;
+    void Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VIEW<TV> F,const T time) const override;
+    void Add_Raw_Velocity_Dependent_Forces_First_Half(ARRAY<TRIPLE<int,int,T> >& data) const override;
+    void Initialize_CFL(ARRAY_VIEW<typename BASE::FREQUENCY_DATA> frequency) override;
+    T CFL_Strain_Rate() const override;
+    void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const override;
+    void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) override;
+    T Potential_Energy(const T time) const override;
+    void Relax_Attachment(int cp);
+    void Update_Attachments_And_Prune_Pairs();
+    void Add_Pair(int p,int s);
+//#####################################################################
+};
+}
+#endif
