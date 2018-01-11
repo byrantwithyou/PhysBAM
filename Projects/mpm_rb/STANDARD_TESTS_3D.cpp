@@ -26,6 +26,8 @@
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/OPENSUBDIV_SURFACE_CURVATURE_FORCE.h>
 #include <Deformables/Forces/SURFACE_TENSION_FORCE_3D.h>
+#include <Rigids/Forces_And_Torques/RIGID_GRAVITY.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_SPHERE.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
@@ -138,6 +140,23 @@ Initialize()
                 }
                 Add_Debug_Object(VECTOR<TV,2>(c-t,c+t),VECTOR<T,3>(1,0,0));
             };
+        } break;
+
+            // ./mpm_rb -3d 1 -double -rd_stiffness 1e-1 -max_dt .01 -T 0.6 -rd_friction 0.1 -last_frame 200
+        case 1:{
+            T angle=extra_T(0);
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            RIGID_BODY<TV>& ground=tests.Add_Analytic_Box(TV(1,0.2,1));
+            ground.is_static=true;
+            RIGID_BODY<TV>& cy1=tests.Add_Rigid_Body("skinnycyllink",(T).1*m,(T)0);
+            cy1.Frame().t=TV(0,0.11,0)*m;
+            cy1.Frame().r=ROTATION<TV>(pi/2,TV(1,0,0));
+            RIGID_BODY<TV>& cy2=tests.Add_Rigid_Body("skinnycyllink",(T).1*m,(T)0);
+            cy2.Frame().r=ROTATION<TV>(pi/2,TV(1,0,0))*ROTATION<TV>(angle,TV(0,0,1));
+            cy2.Frame().t=(TV(0,0.13,0)+cy2.Frame().r.Rotate(TV(0,0.05,0)))*m;
+            TV g=m/(s*s)*TV(0,-1.8,0);
+            auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
+            solid_body_collection.rigid_body_collection.Add_Force(rg);
         } break;
 
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
