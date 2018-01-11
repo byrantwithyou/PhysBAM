@@ -160,6 +160,23 @@ Initialize()
             solid_body_collection.rigid_body_collection.Add_Force(rg);
         } break;
 
+            //  ./mpm_rb -3d 101 -double -rd_stiffness 1e2 -max_dt .01 -T 0.6 -rd_friction 0.1 -last_frame 200
+        case 101:{
+            T angle=extra_T(0);
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            RIGID_BODY<TV>& ground=tests.Add_Rigid_Body("ground",(T)1,(T)0);
+            ground.Frame().t=TV(0,0.1,0);
+            ground.is_static=true;
+            RIGID_BODY<TV>& cy1=tests.Add_Analytic_Cylinder((T)0.2,(T)0.01,16,32);
+            cy1.Frame().t=TV(0,0.11,0)*m;
+            RIGID_BODY<TV>& cy2=tests.Add_Analytic_Cylinder((T)0.2,(T)0.01,16,32);
+            cy2.Frame().r=ROTATION<TV>(angle,TV(0,1,0));
+            cy2.Frame().t=(TV(0,0.13,0)+cy2.Frame().r.Rotate(TV(0,0,0.05)))*m;
+            TV g=m/(s*s)*TV(0,-1.8,0);
+            auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
+            solid_body_collection.rigid_body_collection.Add_Force(rg);
+        } break;
+
             // SIGGRAPH test 7, Wedging test, Rigid-MPM
             // sticking: ./mpm_rb -3d 71 -double -scale_E .1 -rd_stiffness 1e2 -max_dt .01 -regular_seeding -rd_friction 0.9
             // slipping: ./mpm_rb -3d 71 -double -scale_E .1 -rd_stiffness 1e2 -max_dt .01 -regular_seeding -rd_friction 0.3
