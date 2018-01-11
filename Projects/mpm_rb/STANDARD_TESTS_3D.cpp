@@ -146,7 +146,8 @@ Initialize()
         case 1:{
             T angle=extra_T(0);
             Set_Grid(RANGE<TV>::Unit_Box()*m);
-            RIGID_BODY<TV>& ground=tests.Add_Analytic_Box(TV(1,0.2,1));
+            RIGID_BODY<TV>& ground=tests.Add_Rigid_Body("ground",(T)1,(T)0);
+            ground.Frame().t=TV(0,0.1,0);
             ground.is_static=true;
             RIGID_BODY<TV>& cy1=tests.Add_Rigid_Body("skinnycyllink",(T).1*m,(T)0);
             cy1.Frame().t=TV(0,0.11,0)*m;
