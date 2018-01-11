@@ -204,6 +204,30 @@ Initialize()
             solid_body_collection.rigid_body_collection.Add_Force(rg);
         } break;
 
+            // SIGGRAPH test 12, rolling rigid ball
+            // rolling: ./mpm_rb -3d 12 -double -rd_stiffness 1e1 -max_dt .01 -T .2 -rd_friction 0.3
+            // slipping: ./mpm_rb -3d 12 -double -rd_stiffness 1e1 -max_dt .01 -T .2 -rd_friction 0.1
+        case 12:{
+            T angle=extra_T(0);
+            PHYSBAM_ASSERT(angle>=0 && angle<=pi/2);
+            ROTATION<TV> Q(angle,TV(0,0,1));
+            TV n,t,t1;
+            Q.Get_Rotated_Frame(t,n,t1);
+            TV c(.8,.5,.5);
+
+            RIGID_BODY<TV>& sphere=tests.Add_Rigid_Body("sphere",(T)0.2,(T)0);
+            sphere.Frame().t=c+0.2*n;
+
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            TV g=m/(s*s)*TV(0,-9.8,0);
+            RIGID_BODY<TV>& rigid_body=tests.Add_Analytic_Box(TV(4,2,2));
+            rigid_body.Frame().t=(c-Q.Rotate(TV(0,1,0)))*m;
+            rigid_body.Frame().r=Q;
+            rigid_body.is_static=true;
+            auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
+            solid_body_collection.rigid_body_collection.Add_Force(rg);
+        } break;
+
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     if(forced_collision_type!=-1)
