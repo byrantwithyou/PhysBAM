@@ -430,13 +430,14 @@ public:
             case 68:
             case 69:
             case 77:
-            case 701:
-                // Test rigid-deformable penalty force with friction.
-                // ./be_evolution 701 -no_collisions_in_solve -rd_stiffness 1e2
-                backward_euler_evolution->asymmetric_system=true;
                 solids_parameters.cfl=(T)5;
                 /* solids_parameters.implicit_solve_parameters.cg_iterations=100000; */
                 break;
+            case 701:{
+                // Test rigid-deformable penalty force with friction.
+                // ./be_evolution 701 -no_collisions_in_solve -rd_stiffness 1e2
+                backward_euler_evolution->asymmetric_system=true;
+                break;}
             case 2:
                 last_frame=600;
                 break;
