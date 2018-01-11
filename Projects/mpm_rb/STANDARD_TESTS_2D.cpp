@@ -323,19 +323,25 @@ Initialize()
             solid_body_collection.rigid_body_collection.Add_Force(rg);
         } break;
 
-            // ./mpm_rb 11 -float -scale_E .1 -rd_stiffness 1e1 -max_dt .01 -regular_seeding -rd_friction 0.1
+            // ./mpm_rb 11 -double -scale_E .1 -rd_stiffness 1e2 -max_dt .01 -regular_seeding -rd_friction 0.9 -resolution 96
         case 11:{ // "Wedge" test
-            Set_Grid(RANGE<TV>::Unit_Box()*m);
-            RANGE<TV> box(TV((T).1,(T).3),TV((T).5,(T).7));
-            T density=2*unit_rho*scale_mass;
-            Seed_Particles(box,0,0,density,particles_per_cell);
-            Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
+            Set_Grid(RANGE<TV>::Centered_Box()*2*m);
+            RIGID_BODY<TV>& lw=tests.Add_Analytic_Box(TV(0.4,1));
+            lw.Frame().t=TV(-0.2,0.5);
+            lw.is_static=true;
+            Add_Collision_Object(Make_IO(LINE_2D<T>(TV(-1,0),TV(1,0.5))));
+
             TV g=m/(s*s)*TV(0,-1.8);
+            RIGID_BODY<TV>& cube=tests.Add_Analytic_Box(TV(0.4,0.4));
+            cube.Frame().t=TV(0.2,0.5)*m;
+            auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
+            solid_body_collection.rigid_body_collection.Add_Force(rg);
+
+            SPHERE<TV> sphere(TV(.7,.5)*m,.4*m);
+            T density=2*unit_rho*scale_mass;
+            Seed_Particles(sphere,0,0,density,particles_per_cell);
+            Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
             Add_Gravity(g);
-            Add_Collision_Object(Make_IO(LINE_2D<T>(TV(1,0),TV(0.1,0.5))));
-            RIGID_BODY<TV>& rigid_body=tests.Add_Analytic_Box(TV(0.4,0.8));
-            rigid_body.Frame().t=TV((T)0.65,(T)0.5)*m;
-            rigid_body.is_static=true;
         } break;
 
             // ./mpm_rb -float 12 -rd_stiffness 1e2 -max_dt .01
