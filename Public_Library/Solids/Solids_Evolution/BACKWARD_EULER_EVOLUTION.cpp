@@ -111,7 +111,8 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
         PHYSBAM_ASSERT(converged);}
 // TODO for rigid bodies    R.Normalize(), update angular momentum
 
-    minimization_objective.Adjust_For_Collision(dv);
+    if(minimization_objective.collisions_in_solve)
+        minimization_objective.Adjust_For_Collision(dv);
     solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities(dv.V.array);
     minimization_objective.Compute_Unconstrained(dv,0,&tmp0,0);
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(tmp0.V.array);
