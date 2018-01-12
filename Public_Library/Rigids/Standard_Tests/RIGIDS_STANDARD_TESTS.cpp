@@ -341,7 +341,7 @@ Add_Analytic_Sphere(const T radius,const T density,int levels)
     T r2=radius*radius,m2d=r2*(T)pi*density;
     if(TV::m==2){
         rigid_body.Mass()=m2d;
-        rigid_body.Inertia_Tensor()(1,1)=rigid_body.Mass()*r2*(T).25;}
+        rigid_body.Inertia_Tensor()(0)=rigid_body.Mass()*r2*(T).5;}
     else if(TV::m==3){
         rigid_body.Mass()=m2d*radius*((T)4/3);
         rigid_body.Inertia_Tensor()*=0;
