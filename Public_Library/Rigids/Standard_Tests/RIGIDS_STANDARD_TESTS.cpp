@@ -175,7 +175,7 @@ Add_Analytic_Box(const VECTOR<T,1>& scaling_factor)
 // Function Add_Analytic_Box
 //#####################################################################
 template<class TV> RIGID_BODY<TV>& RIGIDS_STANDARD_TESTS<TV>::
-Add_Analytic_Box(const VECTOR<T,2>& scaling_factor,int segments_per_side)
+Add_Analytic_Box(const VECTOR<T,2>& scaling_factor,int segments_per_side,T density)
 {
     RIGID_BODY<TV>& rigid_body=*new RIGID_BODY<TV>(rigid_body_collection,true);
     RANGE<TV> box((T)-.5*scaling_factor,(T).5*scaling_factor);
@@ -199,58 +199,92 @@ Add_Analytic_Box(const VECTOR<T,2>& scaling_factor,int segments_per_side)
     simplicial_object.Update_Segment_List();
     assert(simplicial_object.segment_list);
     rigid_body_collection.Add_Rigid_Body_And_Geometry(&rigid_body);
+    if(density){
+        rigid_body.Mass()=density*box.Size();
+        rigid_body.Inertia_Tensor()(0)=rigid_body.Mass()/12*box.Edge_Lengths().Magnitude_Squared();}
     return rigid_body;
 }
 //#####################################################################
 // Function Add_Analytic_Box
 //#####################################################################
 template<class TV> RIGID_BODY<TV>& RIGIDS_STANDARD_TESTS<TV>::
-Add_Analytic_Box(const VECTOR<T,3>& scaling_factor)
+Add_Analytic_Box(const VECTOR<T,3>& scaling_factor,typename TV::SCALAR density)
 {
     RIGID_BODY<TV>& rigid_body=*new RIGID_BODY<TV>(rigid_body_collection,true);
     RANGE<TV> box((T)-.5*scaling_factor,(T).5*scaling_factor);
     rigid_body.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(box));
     rigid_body.Add_Structure(*TESSELLATION::Generate_Triangles(box));
     rigid_body_collection.Add_Rigid_Body_And_Geometry(&rigid_body);
+    if(density){
+        rigid_body.Mass()=density*box.Size();
+        TV r2=box.Edge_Lengths()*box.Edge_Lengths();
+        rigid_body.Inertia_Tensor()*=0;
+        rigid_body.Inertia_Tensor()+=rigid_body.Mass()/12*box.Edge_Lengths().Magnitude_Squared();
+        rigid_body.Inertia_Tensor()-=rigid_body.Mass()/12*DIAGONAL_MATRIX<T,3>(r2);}
     return rigid_body;
 }
 //#####################################################################
 // Function Add_Analytic_Torus
 //#####################################################################
 template<class TV> RIGID_BODY<TV>& RIGIDS_STANDARD_TESTS<TV>::
-Add_Analytic_Torus(const T inner_radius,const T outer_radius,int inner_resolution,int outer_resolution)
+Add_Analytic_Torus(const T inner_radius,const T outer_radius,int inner_resolution,int outer_resolution,T density)
 {
     RIGID_BODY<TV>& rigid_body=*new RIGID_BODY<TV>(rigid_body_collection,true);
     TORUS<T> torus(TV(),TV(0,0,1),inner_radius,outer_radius);
     rigid_body.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<TORUS<T> >(torus));
     rigid_body.Add_Structure(*TESSELLATION::Generate_Triangles(torus,inner_resolution,outer_resolution));
     rigid_body_collection.Add_Rigid_Body_And_Geometry(&rigid_body);
+    if(density){
+        if(TV::m==2){
+            rigid_body.Mass()=density*pi*(sqr(outer_radius)-sqr(inner_radius));
+            rigid_body.Inertia_Tensor()(0)=rigid_body.Mass()*.5*(sqr(outer_radius)+sqr(inner_radius));}
+        else if(TV::m==3){
+            T a=0.5*(outer_radius-inner_radius),c=0.5*(outer_radius+inner_radius);
+            rigid_body.Mass()=density*2*sqr(pi*a)*c;
+            rigid_body.Inertia_Tensor()(0)=rigid_body.Inertia_Tensor()(1)=rigid_body.Mass()*(5*sqr(a)/8+.5*sqr(c));
+            rigid_body.Inertia_Tensor()(2)=rigid_body.Mass()*(3*sqr(a)/4+sqr(c));}}
     return rigid_body;
 }
 //#####################################################################
 // Function Add_Analytic_Cylinder
 //#####################################################################
 template<class TV> RIGID_BODY<TV>& RIGIDS_STANDARD_TESTS<TV>::
-Add_Analytic_Cylinder(const T height,const T radius,int resolution_radius,int resolution_height)
+Add_Analytic_Cylinder(const T height,const T radius,int resolution_radius,int resolution_height,T density)
 {
     RIGID_BODY<TV>& rigid_body=*new RIGID_BODY<TV>(rigid_body_collection,true);
     CYLINDER<T> cylinder(TV(0,0,-height/2),TV(0,0,height/2),radius);
     rigid_body.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T> >(cylinder));
     rigid_body.Add_Structure(*TESSELLATION::Generate_Triangles(cylinder,resolution_height,resolution_radius));
     rigid_body_collection.Add_Rigid_Body_And_Geometry(&rigid_body);
+    if(density){
+        if(TV::m==2){
+            rigid_body.Mass()=density*2*radius*height;
+            rigid_body.Inertia_Tensor()(0)=rigid_body.Mass()/12*(sqr(2*radius)+sqr(height));}
+        else if(TV::m==3){
+            rigid_body.Mass()=density*pi*sqr(radius)*height;
+            rigid_body.Inertia_Tensor()(0)=rigid_body.Inertia_Tensor()(1)=rigid_body.Mass()/12*(3*sqr(radius)+sqr(height));
+            rigid_body.Inertia_Tensor()(2)=rigid_body.Mass()/2*sqr(radius);}}
     return rigid_body;
 }
 //#####################################################################
 // Function Add_Analytic_Shell
 //#####################################################################
 template<class TV> RIGID_BODY<TV>& RIGIDS_STANDARD_TESTS<TV>::
-Add_Analytic_Shell(const T height,const T outer_radius,const T inner_radius,int resolution)
+Add_Analytic_Shell(const T height,const T outer_radius,const T inner_radius,int resolution,T density)
 {
     RIGID_BODY<TV>& rigid_body=*new RIGID_BODY<TV>(rigid_body_collection,true);
     RING<T> ring(TV(0,0,-height/2),TV(0,0,height/2),outer_radius,inner_radius);
     rigid_body.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<RING<T> >(ring));
     rigid_body.Add_Structure(*TESSELLATION::Generate_Triangles(ring,resolution));
     rigid_body_collection.Add_Rigid_Body_And_Geometry(&rigid_body);
+    if(TV::m==2){
+        rigid_body.Mass()=density*pi*(sqr(outer_radius)-sqr(inner_radius));
+        rigid_body.Inertia_Tensor()(0)=rigid_body.Mass()*.5*(sqr(outer_radius)+sqr(inner_radius));}
+    else if(TV::m==3){
+        rigid_body.Mass()=density*pi*(sqr(outer_radius)-sqr(inner_radius))*height;
+        rigid_body.Inertia_Tensor()(0)=rigid_body.Inertia_Tensor()(1)=
+            rigid_body.Mass()/12*(3*(sqr(inner_radius)+sqr(outer_radius))+sqr(height));
+        rigid_body.Inertia_Tensor()(2)=rigid_body.Mass()*0.5*(sqr(inner_radius)+sqr(outer_radius));}
     return rigid_body;
 }
 //#####################################################################
@@ -364,16 +398,16 @@ Connect_With_Point_Joint(RIGID_BODY<TV>& parent,RIGID_BODY<TV>& child,const TV& 
 namespace PhysBAM{
 template JOINT_ID RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Connect_With_Point_Joint(RIGID_BODY<VECTOR<double,3> >&,RIGID_BODY<VECTOR<double,3> >&,VECTOR<double,3> const&);
 template RIGID_BODY<VECTOR<double,1> >& RIGIDS_STANDARD_TESTS<VECTOR<double,1> >::Add_Analytic_Box(VECTOR<double,1> const&);
-template RIGID_BODY<VECTOR<double,2> >& RIGIDS_STANDARD_TESTS<VECTOR<double,2> >::Add_Analytic_Box(VECTOR<double,2> const&,int);
+template RIGID_BODY<VECTOR<double,2> >& RIGIDS_STANDARD_TESTS<VECTOR<double,2> >::Add_Analytic_Box(VECTOR<double,2> const&,int,double);
 template RIGID_BODY<VECTOR<double,2> >& RIGIDS_STANDARD_TESTS<VECTOR<double,2> >::Add_Ground(double,double,double,double);
 template RIGID_BODY<VECTOR<double,2> >& RIGIDS_STANDARD_TESTS<VECTOR<double,2> >::Add_Rigid_Body(std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,double,double,bool,bool);
 template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Bowl(double,double,double,int,int);
-template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Box(VECTOR<double,3> const&);
-template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Cylinder(double,double,int,int);
-template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Shell(double,double,double,int);
+template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Box(VECTOR<double,3> const&,double);
+template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Cylinder(double,double,int,int,double);
+template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Shell(double,double,double,int,double);
 template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Smooth_Gear(VECTOR<double,3> const&,int,int);
 template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Sphere(double,double,int);
-template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Torus(double,double,int,int);
+template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Torus(double,double,int,int,double);
 template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Ground(double,double,double,double);
 template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Rigid_Body(std::string const&,double,double,bool,bool);
 template void RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Make_Lathe_Chain(FRAME<VECTOR<double,3> > const&,double,double,double);
@@ -382,16 +416,16 @@ template RIGID_BODY<VECTOR<double,2> >& RIGIDS_STANDARD_TESTS<VECTOR<double,2> >
 template RIGIDS_STANDARD_TESTS<VECTOR<double,2> >::RIGIDS_STANDARD_TESTS(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,RIGID_BODY_COLLECTION<VECTOR<double,2> >&);
 template JOINT_ID RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Connect_With_Point_Joint(RIGID_BODY<VECTOR<float,3> >&,RIGID_BODY<VECTOR<float,3> >&,VECTOR<float,3> const&);
 template RIGID_BODY<VECTOR<float,1> >& RIGIDS_STANDARD_TESTS<VECTOR<float,1> >::Add_Analytic_Box(VECTOR<float,1> const&);
-template RIGID_BODY<VECTOR<float,2> >& RIGIDS_STANDARD_TESTS<VECTOR<float,2> >::Add_Analytic_Box(VECTOR<float,2> const&,int);
+template RIGID_BODY<VECTOR<float,2> >& RIGIDS_STANDARD_TESTS<VECTOR<float,2> >::Add_Analytic_Box(VECTOR<float,2> const&,int,float);
 template RIGID_BODY<VECTOR<float,2> >& RIGIDS_STANDARD_TESTS<VECTOR<float,2> >::Add_Ground(float,float,float,float);
 template RIGID_BODY<VECTOR<float,2> >& RIGIDS_STANDARD_TESTS<VECTOR<float,2> >::Add_Rigid_Body(std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,float,float,bool,bool);
 template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Bowl(float,float,float,int,int);
-template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Box(VECTOR<float,3> const&);
-template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Cylinder(float,float,int,int);
-template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Shell(float,float,float,int);
+template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Box(VECTOR<float,3> const&,float);
+template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Cylinder(float,float,int,int,float);
+template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Shell(float,float,float,int,float);
 template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Smooth_Gear(VECTOR<float,3> const&,int,int);
 template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Sphere(float,float,int);
-template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Torus(float,float,int,int);
+template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Torus(float,float,int,int,float);
 template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Ground(float,float,float,float);
 template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Rigid_Body(std::string const&,float,float,bool,bool);
 template void RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Make_Lathe_Chain(FRAME<VECTOR<float,3> > const&,float,float,float);
