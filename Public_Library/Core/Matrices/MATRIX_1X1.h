@@ -36,7 +36,6 @@ public:
     MATRIX()
         :x00(T())
     {
-        assert(mm==INITIAL_SIZE(1) && nn==INITIAL_SIZE(1));
     }
 
     explicit MATRIX(INITIAL_SIZE mm,INITIAL_SIZE nn=INITIAL_SIZE(1))

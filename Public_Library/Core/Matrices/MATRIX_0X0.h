@@ -21,7 +21,7 @@ public:
     typedef int HAS_UNTYPED_READ_WRITE;
 
     MATRIX()
-    {assert(mm==INITIAL_SIZE() && nn==INITIAL_SIZE());}
+    {}
 
     explicit MATRIX(INITIAL_SIZE mm,INITIAL_SIZE nn=INITIAL_SIZE())
     {assert(mm==INITIAL_SIZE() && nn==INITIAL_SIZE());}
