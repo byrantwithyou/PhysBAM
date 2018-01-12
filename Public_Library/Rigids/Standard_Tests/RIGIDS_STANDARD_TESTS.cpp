@@ -218,9 +218,7 @@ Add_Analytic_Box(const VECTOR<T,3>& scaling_factor,typename TV::SCALAR density)
     if(density){
         rigid_body.Mass()=density*box.Size();
         TV r2=box.Edge_Lengths()*box.Edge_Lengths();
-        rigid_body.Inertia_Tensor()*=0;
-        rigid_body.Inertia_Tensor()+=rigid_body.Mass()/12*box.Edge_Lengths().Magnitude_Squared();
-        rigid_body.Inertia_Tensor()-=rigid_body.Mass()/12*DIAGONAL_MATRIX<T,3>(r2);}
+        rigid_body.Inertia_Tensor()=rigid_body.Mass()/12*(r2.Sum()-DIAGONAL_MATRIX<T,3>(r2));}
     return rigid_body;
 }
 //#####################################################################
