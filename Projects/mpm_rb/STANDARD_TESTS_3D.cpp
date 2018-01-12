@@ -142,34 +142,17 @@ Initialize()
             };
         } break;
 
-            // ./mpm_rb -3d 1 -double -rd_stiffness 1e-1 -max_dt .01 -T 0.6 -rd_friction 0.1 -last_frame 200
-        case 1:{
-            T angle=extra_T(0);
-            Set_Grid(RANGE<TV>::Unit_Box()*m);
-            RIGID_BODY<TV>& ground=tests.Add_Rigid_Body("ground",(T)1,(T)0);
-            ground.Frame().t=TV(0,0.1,0);
-            ground.is_static=true;
-            RIGID_BODY<TV>& cy1=tests.Add_Rigid_Body("skinnycyllink",(T).1*m,(T)0);
-            cy1.Frame().t=TV(0,0.11,0)*m;
-            cy1.Frame().r=ROTATION<TV>(pi/2,TV(1,0,0));
-            RIGID_BODY<TV>& cy2=tests.Add_Rigid_Body("skinnycyllink",(T).1*m,(T)0);
-            cy2.Frame().r=ROTATION<TV>(pi/2,TV(1,0,0))*ROTATION<TV>(angle,TV(0,0,1));
-            cy2.Frame().t=(TV(0,0.13,0)+cy2.Frame().r.Rotate(TV(0,0.05,0)))*m;
-            TV g=m/(s*s)*TV(0,-1.8,0);
-            auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
-            solid_body_collection.rigid_body_collection.Add_Force(rg);
-        } break;
-
-            //  ./mpm_rb -3d 101 -double -rd_stiffness 1e2 -max_dt .01 -T 0.6 -rd_friction 0.1 -last_frame 200
+            //  ./mpm_rb -3d 101 -double -rd_stiffness 1e-1 -max_dt .01 -T 0.6 -rd_friction 0.5 -last_frame 200
         case 101:{
             T angle=extra_T(0);
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             RIGID_BODY<TV>& ground=tests.Add_Rigid_Body("ground",(T)1,(T)0);
             ground.Frame().t=TV(0,0.1,0);
             ground.is_static=true;
-            RIGID_BODY<TV>& cy1=tests.Add_Analytic_Cylinder((T)0.2,(T)0.01,16,32);
+            T density=10;
+            RIGID_BODY<TV>& cy1=tests.Add_Analytic_Cylinder((T)0.2,(T)0.01,16,32,density);
             cy1.Frame().t=TV(0,0.11,0)*m;
-            RIGID_BODY<TV>& cy2=tests.Add_Analytic_Cylinder((T)0.2,(T)0.01,16,32);
+            RIGID_BODY<TV>& cy2=tests.Add_Analytic_Cylinder((T)0.2,(T)0.01,16,32,density);
             cy2.Frame().r=ROTATION<TV>(angle,TV(0,1,0));
             cy2.Frame().t=(TV(0,0.13,0)+cy2.Frame().r.Rotate(TV(0,0,0.05)))*m;
             TV g=m/(s*s)*TV(0,-1.8,0);
@@ -178,31 +161,31 @@ Initialize()
         } break;
 
             // SIGGRAPH test 7, Wedging test, Rigid-MPM
-            // sticking: ./mpm_rb -3d 71 -double -scale_E .1 -rd_stiffness 1e2 -max_dt .01 -regular_seeding -rd_friction 0.9
-            // slipping: ./mpm_rb -3d 71 -double -scale_E .1 -rd_stiffness 1e2 -max_dt .01 -regular_seeding -rd_friction 0.3
+            // sticking: ./mpm_rb -3d 71 -double -scale_E .1 -rd_stiffness 1e2 -max_dt .01 -regular_seeding -rd_friction 0.25
+            // slipping: ./mpm_rb -3d 71 -double -scale_E .1 -rd_stiffness 1e2 -max_dt .01 -regular_seeding -rd_friction 0.1
         case 71:{
             Set_Grid(RANGE<TV>::Centered_Box()*2*m);
+            T density=2*unit_rho*scale_mass;
             RIGID_BODY<TV>& lw=tests.Add_Analytic_Box(TV(0.4,1,1));
             lw.Frame().t=TV(-0.2,0.5,0.5);
             lw.is_static=true;
             Add_Collision_Object(Make_IO(PLANE<T>(TV(-1,0,0),TV(1,0.5,0.5))));
 
             TV g=m/(s*s)*TV(0,-1.8,0);
-            RIGID_BODY<TV>& cube=tests.Add_Analytic_Box(TV(0.4,0.4,0.4));
+            RIGID_BODY<TV>& cube=tests.Add_Analytic_Box(TV(0.4,0.4,0.4),density);
             cube.Frame().t=TV(0.2,0.5,0.5)*m;
             auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
             solid_body_collection.rigid_body_collection.Add_Force(rg);
 
             SPHERE<TV> sphere(TV(.7,.5,0.5)*m,.4*m);
-            T density=2*unit_rho*scale_mass;
             Seed_Particles(sphere,0,0,density,particles_per_cell);
             Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
             Add_Gravity(g);
         } break;
 
             // SIGGRAPH test 7, Wedging test, Rigid-Rigid
-            // sticking: ./mpm_rb -3d 72 -double -rd_stiffness 1e2 -max_dt .01 -rd_friction 0.345
-            // slipping: ./mpm_rb -3d 72 -double -rd_stiffness 1e2 -max_dt .01 -rd_friction 0.3
+            // sticking: ./mpm_rb -3d 72 -double -rd_stiffness 1e1 -max_dt .01 -rd_friction 0.375
+            // slipping: ./mpm_rb -3d 72 -double -rd_stiffness 1e1 -max_dt .01 -rd_friction 0.3
         case 72:{
             Set_Grid(RANGE<TV>::Centered_Box()*2*m);
             RIGID_BODY<TV>& lw=tests.Add_Analytic_Box(TV(0.4,1,1));
@@ -213,9 +196,10 @@ Initialize()
             rw.is_static=true;
 
             TV g=m/(s*s)*TV(0,-1.8,0);
-            RIGID_BODY<TV>& lcube=tests.Add_Analytic_Box(TV(0.52,0.5,0.5));
+            T density=1;
+            RIGID_BODY<TV>& lcube=tests.Add_Analytic_Box(TV(0.52,0.5,0.5),density);
             lcube.Frame().t=TV(0.25,0.5,0.5)*m;
-            RIGID_BODY<TV>& rcube=tests.Add_Analytic_Box(TV(0.52,0.4,0.4));
+            RIGID_BODY<TV>& rcube=tests.Add_Analytic_Box(TV(0.52,0.4,0.4),density);
             rcube.Frame().t=TV(0.75,0.5,0.5)*m;
 
             auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
