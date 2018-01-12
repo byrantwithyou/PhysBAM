@@ -32,7 +32,7 @@ public:
         for(int i=0;i<6;i++) x[i]=T();
     }
 
-    explicit MATRIX(INITIAL_SIZE mm,INITIAL_SIZE nn)
+    MATRIX(INITIAL_SIZE mm,INITIAL_SIZE nn)
     {
         assert(mm==INITIAL_SIZE(3) && nn==INITIAL_SIZE(2));
         for(int i=0;i<6;i++) x[i]=T();

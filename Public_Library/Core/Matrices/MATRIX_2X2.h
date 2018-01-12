@@ -27,7 +27,12 @@ public:
 
     T x[4];
 
-    explicit MATRIX(INITIAL_SIZE mm=INITIAL_SIZE(2),INITIAL_SIZE nn=INITIAL_SIZE(2))
+    MATRIX()
+    {
+        x[0]=T();x[1]=T();x[2]=T();x[3]=T();
+    }
+
+    explicit MATRIX(INITIAL_SIZE mm,INITIAL_SIZE nn=INITIAL_SIZE(2))
     {
         assert(mm==INITIAL_SIZE(2) && nn==INITIAL_SIZE(2));
         x[0]=T();x[1]=T();x[2]=T();x[3]=T();

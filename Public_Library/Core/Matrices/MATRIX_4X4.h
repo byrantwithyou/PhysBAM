@@ -23,7 +23,12 @@ public:
 
     T x[16];
 
-    explicit MATRIX(INITIAL_SIZE m=INITIAL_SIZE(4),INITIAL_SIZE n=INITIAL_SIZE(4))
+    MATRIX()
+    {
+        for(int i=0;i<16;i++) x[i]=T();
+    }
+
+    explicit MATRIX(INITIAL_SIZE m,INITIAL_SIZE n=INITIAL_SIZE(4))
     {
         assert(m==INITIAL_SIZE(4) && n==INITIAL_SIZE(4));for(int i=0;i<16;i++) x[i]=T();
     }

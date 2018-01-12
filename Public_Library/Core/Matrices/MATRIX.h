@@ -31,7 +31,13 @@ public:
 
     T x[m*n+(m*n==0)]; // pointer to the one dimensional data
 
-    explicit MATRIX(INITIAL_SIZE mm=INITIAL_SIZE(m),INITIAL_SIZE nn=INITIAL_SIZE(n))
+    MATRIX()
+    {
+        STATIC_ASSERT(sizeof(MATRIX)==(size+(size==0))*sizeof(T));
+        for(int i=0;i<size;i++) x[i]=T();
+    }
+
+    explicit MATRIX(INITIAL_SIZE mm,INITIAL_SIZE nn=INITIAL_SIZE(n))
     {
         STATIC_ASSERT(sizeof(MATRIX)==(size+(size==0))*sizeof(T));assert(mm==INITIAL_SIZE(m) && nn==INITIAL_SIZE(n));
         for(int i=0;i<size;i++) x[i]=T();
