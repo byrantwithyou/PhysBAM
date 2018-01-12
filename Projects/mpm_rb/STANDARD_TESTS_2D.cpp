@@ -315,10 +315,9 @@ Initialize()
             Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
             TV g=m/(s*s)*TV(0,-1.8);
             Add_Gravity(-g);
-            RIGID_BODY<TV>& rigid_body=tests.Add_Analytic_Box(TV(0.6,0.4));
+            RIGID_BODY<TV>& rigid_body=tests.Add_Analytic_Box(TV(0.6,0.4),1,.75*density);
             rigid_body.Frame().t=TV((T)0.5,(T)0.7)*m;
             rigid_body.Frame().r=ROTATION<TV>(M);
-            rigid_body.Set_Mass(density*0.18*kg);
             auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
             solid_body_collection.rigid_body_collection.Add_Force(rg);
         } break;
@@ -358,8 +357,8 @@ Initialize()
             solid_body_collection.rigid_body_collection.Add_Force(rg);
         } break;
 
-            // sliding: ./mpm_rb 13 -float -rd_stiffness 1e3 -max_dt .01 -T .1 -T .1 -rd_friction .01
-            // sticking: ./mpm_rb 13 -float -rd_stiffness 1e3 -max_dt .01 -T .1 -T .1 -rd_friction 0.12
+            // sliding: ./mpm_rb 13 -float -rd_stiffness 1e2 -max_dt .01 -T .1 -T .1 -rd_friction .01
+            // sticking: ./mpm_rb 13 -float -rd_stiffness 1e2 -max_dt .01 -T .1 -T .1 -rd_friction 0.12
         case 13:{ // Rigid-rigid version of inclined plane.
             T angle=extra_T(0);
             T vel=extra_T(1);
@@ -370,7 +369,7 @@ Initialize()
             TV c(.5,.5);
 
             Set_Grid(RANGE<TV>::Unit_Box()*m);
-            RIGID_BODY<TV>& box=tests.Add_Analytic_Box(TV(.2,.2));
+            RIGID_BODY<TV>& box=tests.Add_Analytic_Box(TV(.2,.2),1,(T)1);
             box.Frame().r=ROTATION<TV>(M);
             box.Frame().t=(M*TV(0,.1)+c)*m;
             box.Twist().linear=-t*vel;
