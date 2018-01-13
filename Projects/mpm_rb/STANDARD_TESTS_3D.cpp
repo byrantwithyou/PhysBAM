@@ -142,6 +142,27 @@ Initialize()
             };
         } break;
 
+            // Diff test for IO-MPM penalty force
+            // ./mpm_rb -3d 201 -double -rd_stiffness 1e2 -test_diff
+        case 201:{
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            Add_Collision_Object(Make_IO(PLANE<T>(TV(0,1,0),TV(0.5,0.5,0.5))));
+
+            write_output_files=[](int frame)
+            {
+                Add_Debug_Object(VECTOR<TV,3>(
+                    TV(0,0.5,0),TV(1,0.5,0),TV(1,0.5,1)),VECTOR<T,3>(1,0,0));
+                Add_Debug_Object(VECTOR<TV,3>(
+                    TV(1,0.5,1),TV(0,0.5,1),TV(0,0.5,0)),VECTOR<T,3>(1,0,0));
+            };
+
+            T density=2*unit_rho*scale_mass;
+            T volume=grid.dX.Product();
+            T mass=density*volume;
+            Add_Particle(TV(0.5,0.6,0.5),0,0,mass,volume);
+            particles.V(0)=TV(0.1,-0.1,0.1);
+        } break;
+
             //  ./mpm_rb -3d 101 -double -rd_stiffness 1e-1 -max_dt .01 -T 0.6 -rd_friction 0.5 -last_frame 200
         case 101:{
             T angle=extra_T(0);
