@@ -163,6 +163,20 @@ Initialize()
             particles.V(0)=TV(0.1,-0.1,0.1);
         } break;
 
+            // Diff test for Rigid-MPM penalty force
+            // ./mpm_rb -3d 202 -double -rd_stiffness 1e2 -test_diff
+        case 202:{
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            T density=2*unit_rho*scale_mass;
+            RIGID_BODY<TV>& cy=tests.Add_Analytic_Cylinder((T)1,(T)0.5,16,32,density);
+            cy.Frame().t=TV(0.5,0,0.5);
+
+            T volume=grid.dX.Product();
+            T mass=density*volume;
+            Add_Particle(TV(0.5,0.6,0.5),0,0,mass,volume);
+            particles.V(0)=TV(0.1,-0.1,0.1);
+        } break;
+
             //  ./mpm_rb -3d 101 -double -rd_stiffness 1e-1 -max_dt .01 -T 0.6 -rd_friction 0.5 -last_frame 200
         case 101:{
             T angle=extra_T(0);
