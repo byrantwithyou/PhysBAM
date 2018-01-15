@@ -62,8 +62,16 @@ namespace PhysBAM{
 //#####################################################################
 template<class T> STANDARD_TESTS<VECTOR<T,2> >::
 STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
-    :STANDARD_TESTS_BASE<TV>(stream_type_input,parse_args)
+    :STANDARD_TESTS_BASE<TV>(stream_type_input,parse_args),
+    foo_int1(0),foo_T1(0),foo_T2(0),foo_T3(0),foo_T4(0),foo_T5(0),
+    use_foo_T1(false),use_foo_T2(false),use_foo_T3(false),use_foo_T4(false),use_foo_T5(false)
 {
+    parse_args.Add("-fooint1",&foo_int1,"int1","a interger");
+    parse_args.Add("-fooT1",&foo_T1,&use_foo_T1,"T1","a scalar");
+    parse_args.Add("-fooT2",&foo_T2,&use_foo_T2,"T2","a scalar");
+    parse_args.Add("-fooT3",&foo_T3,&use_foo_T3,"T3","a scalar");
+    parse_args.Add("-fooT4",&foo_T4,&use_foo_T4,"T4","a scalar");
+    parse_args.Add("-fooT5",&foo_T5,&use_foo_T5,"T5","a scalar");
     parse_args.Parse();
     if(!this->override_output_directory) output_directory=LOG::sprintf("Test_%i",test_number);
 }
@@ -400,6 +408,41 @@ Initialize()
                 }
                 Add_Debug_Object(VECTOR<TV,2>(c-t,c+t),VECTOR<T,3>(1,0,0));
             };
+        } break;
+
+            // ./mpm_rb 42 -rd_stiffness 1e5 -use_exp_F -max_dt 7.5e-4 -scale_E 0.1 -resolution 64
+        case 42:{ // sand column collapse
+            particles.Store_Fp(true);
+            Set_Grid(RANGE<TV>(TV(),TV(3,1))*m,TV_INT(3,1));
+
+            RIGID_BODY<TV>& lw=tests.Add_Analytic_Box(TV(0.1,1));
+            lw.is_static=true;
+            lw.Frame().t=TV(0.05,0.5);
+            RIGID_BODY<TV>& rw=tests.Add_Analytic_Box(TV(0.1,1));
+            rw.is_static=true;
+            rw.Frame().t=TV(2.95,0.5);
+            RIGID_BODY<TV>& bw=tests.Add_Analytic_Box(TV(2.8,0.1));
+            bw.is_static=true;
+            bw.Frame().t=TV(1.5,0.05);
+
+            T density=(T)2200*unit_rho*scale_mass;
+            T E=35.37e6*unit_p*scale_E,nu=.3;
+            RANGE<TV> sandbox(TV(0.1,0.1),TV(2.9,0.3));
+            if(!use_theta_c) theta_c=0.015;
+            if(!use_theta_s) theta_s=.000001;
+            if(!use_hardening_factor) hardening_factor=20;
+            if(!use_max_hardening) max_hardening=FLT_MAX;
+            Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
+            Seed_Particles(sandbox,0,0,density,particles_per_cell);
+            Add_Drucker_Prager_Case(E,nu,2);
+            TV g=m/(s*s)*TV(0,-4.81);
+            Add_Gravity(g);
+            RIGID_BODY<TV>& cube=tests.Add_Analytic_Box(TV(0.2,0.3),1,2210);
+            cube.Frame().t=TV(0.3,0.5);
+            cube.Frame().r=ROTATION<TV>::From_Angle((T).78);
+            cube.Twist().linear=TV(4,0);
+            auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
+            solid_body_collection.rigid_body_collection.Add_Force(rg);
         } break;
 
         default: PHYSBAM_FATAL_ERROR("test number not implemented");

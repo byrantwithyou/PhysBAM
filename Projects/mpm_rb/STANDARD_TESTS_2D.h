@@ -60,6 +60,18 @@ public:
     void Read_Output_Files(const int frame) override;
     void Initialize() override;
 
+    // additional storage
+    int foo_int1;
+    T foo_T1;
+    T foo_T2;
+    T foo_T3;
+    T foo_T4;
+    T foo_T5;
+    bool use_foo_T1;
+    bool use_foo_T2;
+    bool use_foo_T3;
+    bool use_foo_T4;
+    bool use_foo_T5;
 //#####################################################################
 };
 }
