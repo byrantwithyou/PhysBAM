@@ -207,7 +207,7 @@ Initialize()
             Add_Collision_Object(Make_IO(PLANE<T>(TV(-1,0,0),TV(1,0.5,0.5))));
 
             TV g=m/(s*s)*TV(0,-1.8,0);
-            RIGID_BODY<TV>& cube=tests.Add_Analytic_Box(TV(0.4,0.4,0.4),density);
+            RIGID_BODY<TV>& cube=tests.Add_Analytic_Box(TV(0.4,0.4,0.4),TV_INT()+1,density);
             cube.Frame().t=TV(0.2,0.5,0.5)*m;
             auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
             solid_body_collection.rigid_body_collection.Add_Force(rg);
@@ -232,9 +232,9 @@ Initialize()
 
             TV g=m/(s*s)*TV(0,-1.8,0);
             T density=1;
-            RIGID_BODY<TV>& lcube=tests.Add_Analytic_Box(TV(0.52,0.5,0.5),density);
+            RIGID_BODY<TV>& lcube=tests.Add_Analytic_Box(TV(0.52,0.5,0.5),TV_INT()+1,density);
             lcube.Frame().t=TV(0.25,0.5,0.5)*m;
-            RIGID_BODY<TV>& rcube=tests.Add_Analytic_Box(TV(0.52,0.4,0.4),density);
+            RIGID_BODY<TV>& rcube=tests.Add_Analytic_Box(TV(0.52,0.4,0.4),TV_INT()+1,density);
             rcube.Frame().t=TV(0.75,0.5,0.5)*m;
 
             auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);

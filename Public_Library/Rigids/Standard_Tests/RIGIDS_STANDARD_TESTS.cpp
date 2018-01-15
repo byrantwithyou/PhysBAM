@@ -208,12 +208,12 @@ Add_Analytic_Box(const VECTOR<T,2>& scaling_factor,int segments_per_side,T densi
 // Function Add_Analytic_Box
 //#####################################################################
 template<class TV> RIGID_BODY<TV>& RIGIDS_STANDARD_TESTS<TV>::
-Add_Analytic_Box(const VECTOR<T,3>& scaling_factor,typename TV::SCALAR density)
+Add_Analytic_Box(const VECTOR<T,3>& scaling_factor,const VECTOR<int,3>& resolution,typename TV::SCALAR density)
 {
     RIGID_BODY<TV>& rigid_body=*new RIGID_BODY<TV>(rigid_body_collection,true);
     RANGE<TV> box((T)-.5*scaling_factor,(T).5*scaling_factor);
     rigid_body.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(box));
-    rigid_body.Add_Structure(*TESSELLATION::Generate_Triangles(box));
+    rigid_body.Add_Structure(*TESSELLATION::Generate_Triangles(box,resolution));
     rigid_body_collection.Add_Rigid_Body_And_Geometry(&rigid_body);
     if(density){
         rigid_body.Mass()=density*box.Size();
@@ -400,7 +400,7 @@ template RIGID_BODY<VECTOR<double,2> >& RIGIDS_STANDARD_TESTS<VECTOR<double,2> >
 template RIGID_BODY<VECTOR<double,2> >& RIGIDS_STANDARD_TESTS<VECTOR<double,2> >::Add_Ground(double,double,double,double);
 template RIGID_BODY<VECTOR<double,2> >& RIGIDS_STANDARD_TESTS<VECTOR<double,2> >::Add_Rigid_Body(std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,double,double,bool,bool);
 template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Bowl(double,double,double,int,int);
-template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Box(VECTOR<double,3> const&,double);
+template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Box(VECTOR<double,3> const&,VECTOR<int,3> const&,double);
 template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Cylinder(double,double,int,int,double);
 template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Shell(double,double,double,int,double);
 template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Smooth_Gear(VECTOR<double,3> const&,int,int);
@@ -418,7 +418,7 @@ template RIGID_BODY<VECTOR<float,2> >& RIGIDS_STANDARD_TESTS<VECTOR<float,2> >::
 template RIGID_BODY<VECTOR<float,2> >& RIGIDS_STANDARD_TESTS<VECTOR<float,2> >::Add_Ground(float,float,float,float);
 template RIGID_BODY<VECTOR<float,2> >& RIGIDS_STANDARD_TESTS<VECTOR<float,2> >::Add_Rigid_Body(std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,float,float,bool,bool);
 template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Bowl(float,float,float,int,int);
-template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Box(VECTOR<float,3> const&,float);
+template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Box(VECTOR<float,3> const&,VECTOR<int,3> const&,float);
 template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Cylinder(float,float,int,int,float);
 template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Shell(float,float,float,int,float);
 template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Smooth_Gear(VECTOR<float,3> const&,int,int);

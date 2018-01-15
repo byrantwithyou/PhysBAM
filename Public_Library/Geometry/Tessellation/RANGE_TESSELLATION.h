@@ -14,7 +14,8 @@ template<class T,int d> class VECTOR;
 
 namespace TESSELLATION{
 //#####################################################################
-    template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const RANGE<VECTOR<T,3> >& box);
+template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(
+    const RANGE<VECTOR<T,3> >& box,const VECTOR<int,3>& res=(VECTOR<int,3>()+1));
 //#####################################################################
 }
 }

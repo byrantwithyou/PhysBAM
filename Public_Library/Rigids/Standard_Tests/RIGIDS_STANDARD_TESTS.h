@@ -17,7 +17,7 @@ template<class TV> class RIGID_BODY_COLLECTION;
 template<class TV>
 class RIGIDS_STANDARD_TESTS
 {
-    typedef typename TV::SCALAR T;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
 public:
     STREAM_TYPE stream_type;
     std::string data_directory;
@@ -29,7 +29,7 @@ public:
     RIGID_BODY<TV>& Add_Ground(const T friction=(T).3,const T height=0,const T coefficient_of_restitution=(T).5,const T scale=(T)1);
     RIGID_BODY<TV>& Add_Analytic_Box(const VECTOR<T,1>& scaling_factor);
     RIGID_BODY<TV>& Add_Analytic_Box(const VECTOR<T,2>& scaling_factor,int segments_per_side=1,T density=0);
-    RIGID_BODY<TV>& Add_Analytic_Box(const VECTOR<T,3>& scaling_factor,T density=0);
+    RIGID_BODY<TV>& Add_Analytic_Box(const VECTOR<T,3>& scaling_factor,const VECTOR<int,3>& resolution=(VECTOR<int,3>()+1),T density=0);
     RIGID_BODY<TV>& Add_Analytic_Torus(const T inner_radius,const T outer_radius,int inner_resolution=8,int outer_resolution=16,T density=0);
     RIGID_BODY<TV>& Add_Analytic_Cylinder(const T height,const T radius,int resolution_radius=16,int resolution_height=4,T density=0);
     RIGID_BODY<TV>& Add_Analytic_Shell(const T height,const T outer_radius,const T inner_radius,int resolution=40,T density=0);
