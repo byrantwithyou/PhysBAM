@@ -87,6 +87,7 @@
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Forces_And_Torques/MOVE_RIGID_BODY_DIFF.h>
+#include <Rigids/Forces_And_Torques/RIGID_PENALTY_WITH_FRICTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
 #include <Deformables/Bindings/RIGID_BODY_BINDING.h>
@@ -103,7 +104,9 @@
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/ELASTIC_ETHER_DRAG.h>
 #include <Deformables/Forces/FINITE_VOLUME.h>
+#include <Deformables/Forces/IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION.h>
 #include <Deformables/Forces/RALEIGH_DAMPING_FORCE.h>
+#include <Deformables/Forces/SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION.h>
 #include <Solids/Collisions/RIGID_DEFORMABLE_COLLISIONS.h>
 #include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Forces_And_Torques/ETHER_DRAG.h>
@@ -117,6 +120,7 @@
 #include <Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 #include <fstream>
+#include "STANDARD_TESTS_BASE.h"
 #ifdef USE_OPENMP
 #include <omp.h>
 #endif
@@ -124,20 +128,24 @@ namespace PhysBAM{
 
 template<class TV> class STANDARD_TESTS;
 template<class T_input>
-class STANDARD_TESTS<VECTOR<T_input,3> >:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
+class STANDARD_TESTS<VECTOR<T_input,3> >:public STANDARD_TESTS_BASE<VECTOR<T_input,3> >
 {
     typedef T_input T;typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
-    typedef SOLIDS_EXAMPLE<TV> BASE;
-    using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
-    using BASE::stream_type;using BASE::solids_evolution;using BASE::test_number;using BASE::data_directory;using BASE::m;using BASE::s;using BASE::kg;
-
+    typedef STANDARD_TESTS_BASE<TV> BASE;
+    using BASE::solids_parameters;using BASE::output_directory;
+    using BASE::last_frame;using BASE::frame_rate;
+    using BASE::solid_body_collection;using BASE::stream_type;
+    using BASE::solids_evolution;using BASE::test_number;
+    using BASE::data_directory;using BASE::m;using BASE::s;using BASE::kg;
+    using BASE::unit_p;using BASE::unit_J;using BASE::unit_rho;
+    using BASE::backward_euler_evolution;
+    
     std::ofstream svout;
     SOLIDS_STANDARD_TESTS<TV> tests;
 
     GRID<TV> mattress_grid,mattress_grid2,mattress_grid3,mattress_grid1;
     T attachment_velocity;
-    bool test_forces;
     bool with_bunny,with_hand,with_big_arm,gears_of_pain;
     bool override_collisions,override_no_collisions;
     ARRAY<int> kinematic_ids;
@@ -176,16 +184,11 @@ public:
     bool use_rand_seed;
     RANDOM_NUMBERS<T> rand;
     bool use_residuals;
-    bool use_newmark,use_newmark_be;
     bool project_nullspace;
-    BACKWARD_EULER_EVOLUTION<TV>* backward_euler_evolution;
     bool use_penalty_collisions;
     bool use_constraint_collisions;
-    bool no_line_search;
-    bool no_descent;
     T penalty_collisions_stiffness,penalty_collisions_separation,penalty_collisions_length;
     bool enforce_definiteness;
-    T unit_rho,unit_p,unit_N,unit_J;
     T density;
     bool use_penalty_self_collisions;
     bool use_distance_based_self_collisions;
@@ -195,18 +198,19 @@ public:
     ARRAY<TV> initial_positions;
     T save_dt;
     bool self_collide_surface_only;
-    bool use_vanilla_newton;
     T collision_height;
     T collision_speed;
-    int threads;
     T rd_penalty_stiffness=0;
     T rd_penalty_friction=0.3;
     bool use_rd_penalty=false;
     RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>* rd_penalty=0;
+    RIGID_PENALTY_WITH_FRICTION<TV>* rr_penalty=0;
+    IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* di_penalty=0;
+    SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION<TV>* dd_penalty=0;
     ARRAY<MOVE_RIGID_BODY_DIFF<TV> > move_rb_diff;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
-        :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),test_forces(false),
+        :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),
         with_bunny(false),with_hand(false),with_big_arm(false),gears_of_pain(false),override_collisions(false),override_no_collisions(false),
         print_matrix(false),resolution(0),fishes(0),jello_size(20),number_of_jellos(12),stiffness_multiplier(1),damping_multiplier(1),
         degrees_wedge(2),degrees_incline(5),rebound_time((T).2),rebound_stiffness(5),rebound_drop((T)1.5),
@@ -214,33 +218,13 @@ public:
         repulsion_thickness((T)1e-4),hole((T).5),nobind(false),input_cutoff((T).4),input_efc(20),input_poissons_ratio(-1),
         input_youngs_modulus(0),input_friction(.3),stretch_cutoff(300),hand_scale((T).8),
         ether_drag(0),image_size(500),pin_corners(false),tori_stack_width(5),tori_stack_height(5),rand_seed(1234),
-        use_rand_seed(false),use_residuals(false),use_newmark(false),use_newmark_be(false),project_nullspace(false),
-        backward_euler_evolution(new BACKWARD_EULER_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this)),
-        use_penalty_collisions(false),use_constraint_collisions(true),no_line_search(false),no_descent(false),
+        use_rand_seed(false),use_residuals(false),project_nullspace(false),
+        use_penalty_collisions(false),use_constraint_collisions(true),
         penalty_collisions_stiffness((T)1e4),penalty_collisions_separation((T)1e-4),
-        penalty_collisions_length(1),enforce_definiteness(false),unit_rho(1),unit_p(1),unit_N(1),unit_J(1),density(pow<TV::m>(10)),
+        penalty_collisions_length(1),enforce_definiteness(false),density(pow<TV::m>(10)),
         use_penalty_self_collisions(true),use_distance_based_self_collisions(false),rod_length(4),rod_radius(.3),attachment_length(.6),save_dt(0),self_collide_surface_only(false),
-        use_vanilla_newton(false),collision_height(5),collision_speed(4),threads(1)
+        collision_height(5),collision_speed(4)
     {
-        this->fixed_dt=1./240;
-
-        solids_parameters.implicit_solve_parameters.cg_projection_iterations=5;
-        solids_parameters.implicit_solve_parameters.cg_iterations=1000;
-        solids_parameters.implicit_solve_parameters.cg_tolerance=1e-3;
-        backward_euler_evolution->newtons_method.tolerance=1;
-        backward_euler_evolution->newtons_method.max_newton_step_size=1000;
-        backward_euler_evolution->newtons_method.max_krylov_iterations=100;
-        solids_parameters.use_rigid_deformable_contact=false;
-        solids_parameters.rigid_body_collision_parameters.use_push_out=true;
-        solids_parameters.triangle_collision_parameters.use_gauss_jacobi=true;
-        solids_parameters.triangle_collision_parameters.repulsions_limiter_fraction=1;
-        solids_parameters.triangle_collision_parameters.collisions_final_repulsion_limiter_fraction=.1;
-        solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-        solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
-        solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
-        solids_parameters.triangle_collision_parameters.collisions_output_number_checked=false;
-        solids_parameters.deformable_object_collision_parameters.collide_with_interior=true;
-        parse_args.Add("-test_forces",&test_forces,"test force derivatives");
         parse_args.Add("-with_bunny",&with_bunny,"use bunny");
         parse_args.Add("-with_hand",&with_hand,"use hand");
         parse_args.Add("-with_big_arm",&with_big_arm,"use big arm");
@@ -248,15 +232,9 @@ public:
         parse_args.Add("-stiffen",&stiffness_multiplier,"multiplier","stiffness multiplier for various tests");
         parse_args.Add("-dampen",&damping_multiplier,"multiplier","damping multiplier for various tests");
         parse_args.Add("-residuals",&use_residuals,"print residuals during timestepping");
-        parse_args.Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
-        parse_args.Add("-cgsolids",&solids_parameters.implicit_solve_parameters.cg_tolerance,"tolerance","CG tolerance for backward Euler");
-        parse_args.Add("-use_newmark",&use_newmark,"use newmark");
-        parse_args.Add("-use_newmark_be",&use_newmark_be,"use backward euler variant of newmark");
         parse_args.Add("-print_matrix",&print_matrix,"print Krylov matrix");
         parse_args.Add("-project_nullspace",&project_nullspace,"project out nullspace");
-        parse_args.Add("-projection_iterations",&solids_parameters.implicit_solve_parameters.cg_projection_iterations,"iterations","number of iterations used for projection in cg");
         parse_args.Add("-seed",&rand_seed,&use_rand_seed,"seed","random seed to use");
-        parse_args.Add("-test_system",&solids_parameters.implicit_solve_parameters.test_system,"test system");
         parse_args.Add("-collisions",&override_collisions,"Does not yet work in all sims, see code for details");
         parse_args.Add("-no_collisions",&override_no_collisions,"Does not yet work in all sims, see code for details");
         parse_args.Add("-stretch",&stretch,"stretch","stretch");
@@ -282,75 +260,24 @@ public:
         parse_args.Add("-ether_drag",&ether_drag,"drag","Ether drag");
         parse_args.Add("-image_size",&image_size,"size","image size for plots");
         parse_args.Add("-pin_corners",&pin_corners,"pin corners");
-        parse_args.Add("-kry_it",&backward_euler_evolution->newtons_method.max_krylov_iterations,"iter","maximum iterations for Krylov solver");
-        parse_args.Add("-kry_tol",&backward_euler_evolution->newtons_method.krylov_tolerance,"tol","tolerance for Krylov solver");
-        parse_args.Add("-newton_it",&backward_euler_evolution->newtons_method.max_iterations,"iter","maximum iterations for Newton");
-        parse_args.Add("-newton_tol",&backward_euler_evolution->newtons_method.tolerance,"tol","tolerance for Newton");
-        parse_args.Add("-newton_cd_tol",&backward_euler_evolution->newtons_method.countdown_tolerance,"tol","tolerance for Newton");
-        parse_args.Add("-newton_max_step",&backward_euler_evolution->newtons_method.max_newton_step_size,"size","Limit newton step to this size");
-        parse_args.Add("-no_descent",&no_descent,"Don't ensure descent direction");
-        parse_args.Add("-debug_newton",&backward_euler_evolution->newtons_method.debug,"Enable diagnostics in Newton's method");
-        parse_args.Add("-kry_fail",&backward_euler_evolution->newtons_method.fail_on_krylov_not_converged,"terminate if Krylov solver fails to converge");
-        parse_args.Add("-newton_fail",&backward_euler_evolution->fail_on_newton_not_converged,"terminate if Newton solver fails to converge");
-        parse_args.Add("-angle_tol",&backward_euler_evolution->newtons_method.angle_tolerance,"tol","gradient descent tolerance");
-        parse_args.Add_Not("-mr",&backward_euler_evolution->newtons_method.use_cg,"use minres instead of cg");
-        parse_args.Add("-no_line_search",&no_line_search,"disable line search");
-        parse_args.Add("-gss",&backward_euler_evolution->newtons_method.use_golden_section_search,"use golden section search instead of wolfe conditions line search");
-        parse_args.Add("-backtrack",&backward_euler_evolution->newtons_method.use_backtracking,"use backtracking line search instead of wolfe conditions line search");
         parse_args.Add("-use_penalty",&use_penalty_collisions,"use penalty collisions");
         parse_args.Add_Not("-no_constraints",&use_constraint_collisions,"disable constrained optimization for collisions");
-        parse_args.Add_Not("-no_collisions_in_solve",&backward_euler_evolution->minimization_objective.collisions_in_solve,"disable collisions in solve");
         parse_args.Add("-penalty_stiffness",&penalty_collisions_stiffness,"tol","penalty collisions stiffness");
         parse_args.Add("-penalty_separation",&penalty_collisions_separation,"tol","penalty collisions separation");
         parse_args.Add("-penalty_length",&penalty_collisions_length,"tol","penalty collisions length scale");
         parse_args.Add("-enf_def",&enforce_definiteness,"enforce definiteness in system");
         parse_args.Add_Not("-no_self",&use_penalty_self_collisions,"disable penalty self collisions");
         parse_args.Add("-old_self",&use_distance_based_self_collisions,"use distance based penalty self collisions");
-        parse_args.Add("-use_tri_col",&solids_parameters.triangle_collision_parameters.perform_self_collision,"use triangle collisions");
         parse_args.Add("-no_self_interior",&self_collide_surface_only,"do not process penalty self collisions against interior particles");
-        parse_args.Add("-use_vanilla_newton",&use_vanilla_newton,"use triangle collisions");
         parse_args.Add("-collision_height",&collision_height,"height","height of collision body in test 68");
         parse_args.Add("-collision_speed",&collision_speed,"speed","speed of collision body in test 68");
-        parse_args.Add("-threads",&threads,"threads","Number of threads");
-        parse_args.Add("-rd_stiffness",&rd_penalty_stiffness,&use_rd_penalty,"stiffness","rigid-deformable penalty force stiffness");
-        parse_args.Add("-rd_friction",&rd_penalty_friction,"friction","rigid-deformable penalty force friction");
         parse_args.Parse();
 
-#ifdef USE_OPENMP
-        omp_set_num_threads(threads);
-#pragma omp parallel
-#pragma omp single
-        {
-            if(omp_get_num_threads()!=threads) PHYSBAM_FATAL_ERROR();
-            LOG::cout<<"Running on "<<threads<<" threads"<<std::endl;
-        }
-#else
-        PHYSBAM_ASSERT(threads==1);
-#endif
-
-
-        tests.data_directory=data_directory;
         LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
         output_directory=LOG::sprintf("Test_%d",test_number);
         override_no_collisions=override_no_collisions&&!override_collisions;
         if(use_rand_seed) rand.Set_Seed(rand_seed);
         solids_parameters.implicit_solve_parameters.project_nullspace_frequency=project_nullspace;
-        if(use_newmark || use_newmark_be) backward_euler_evolution=0;
-        else{delete solids_evolution;solids_evolution=backward_euler_evolution;}
-        if(backward_euler_evolution && backward_euler_evolution->newtons_method.use_golden_section_search)
-            backward_euler_evolution->newtons_method.use_wolfe_search=false;
-        if(backward_euler_evolution && backward_euler_evolution->newtons_method.use_backtracking)
-            backward_euler_evolution->newtons_method.use_wolfe_search=false;
-        if(backward_euler_evolution && no_line_search)
-            backward_euler_evolution->newtons_method.use_wolfe_search=false;
-        if(backward_euler_evolution && no_descent)
-            backward_euler_evolution->newtons_method.use_gradient_descent_failsafe=false;
-        if(use_vanilla_newton) backward_euler_evolution->newtons_method.Make_Vanilla_Newton();
-
-        unit_rho=kg/pow<TV::m>(m);
-        unit_N=kg*m/(s*s);
-        unit_p=unit_N/(m*m);
-        unit_J=unit_N*m;
         hole*=m;
         rebound_time*=s;
         repulsion_thickness*=m;
@@ -360,11 +287,6 @@ public:
         ether_drag/=s;
         penalty_collisions_stiffness*=unit_J;
         density*=unit_rho;
-        if(backward_euler_evolution){
-            backward_euler_evolution->newtons_method.tolerance*=unit_N*s;
-            backward_euler_evolution->newtons_method.krylov_tolerance/=sqrt(unit_N*s);
-            backward_euler_evolution->minimization_objective.collision_thickness*=m;
-            backward_euler_evolution->test_diff=test_forces;}
 
         switch(test_number){
             case 17: case 18: case 24: case 25: case 27: case 11: case 23: case 57: case 77: case 80: case 8: case 12: case 13: case 67: case 68:
@@ -410,8 +332,6 @@ public:
             }
         }
 
-        solids_parameters.use_trapezoidal_rule_for_velocities=!use_newmark_be;
-
         switch(test_number){
             case 1:
             case 3:
@@ -436,7 +356,6 @@ public:
             case 701:case 720:{
                 // Test rigid-deformable penalty force with friction.
                 // ./be_evolution 701 -no_collisions_in_solve -rd_stiffness 1e2
-                backward_euler_evolution->asymmetric_system=true;
                 break;}
             case 2:
                 last_frame=600;
@@ -676,6 +595,8 @@ public:
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;}
 
         solid_body_collection.Print_Residuals(use_residuals);
+
+        this->After_Construction();
     }
 
     virtual ~STANDARD_TESTS()
@@ -723,8 +644,6 @@ void Get_Initial_Data()
     // deformable bodies
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
-    BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
-    SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
 
     switch(test_number){
@@ -1832,18 +1751,7 @@ void Get_Initial_Data()
         default:
             LOG::cerr<<"Initial Data: Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
-    // add structures and rigid bodies to collisions
-    if(automatically_add_to_collision_structures) deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.structures);
-    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.structures);
-
-    // correct number nodes
-    for(int i=0;i<deformable_body_collection.structures.m;i++) deformable_body_collection.structures(i)->Update_Number_Nodes();
-
-    // correct mass
-    binding_list.Distribute_Mass_To_Parents();
-    binding_list.Clear_Hard_Bound_Particles(particles.mass);
-    particles.Compute_Auxiliary_Attributes(soft_bindings);
-    soft_bindings.Set_Mass_From_Effective_Mass();
+    this->After_Get_Initial_Data(automatically_add_to_collision_structures);
 }
 //#####################################################################
 // Function Initialize_Bodies
@@ -2379,40 +2287,12 @@ void Initialize_Bodies() override
         solid_body_collection.Add_Force(new TRIANGLE_REPULSIONS_PENALTY<TV>(particles,deformable_body_collection.triangle_repulsions.point_face_interaction_pairs));
         solid_body_collection.Add_Force(new TRIANGLE_REPULSIONS_PENALTY<TV>(particles,deformable_body_collection.triangle_repulsions.edge_edge_interaction_pairs));}
 
-    if(use_rd_penalty && rigid_body_collection.rigid_body_particles.number>0){
-        backward_euler_evolution->asymmetric_system=true;
-        move_rb_diff.Resize(rigid_body_collection.rigid_body_particles.number);
-        backward_euler_evolution->minimization_objective.move_rb_diff=&move_rb_diff;
-        rd_penalty=new RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>(
-            solid_body_collection.deformable_body_collection.particles,
-            solid_body_collection.rigid_body_collection,move_rb_diff,
-            rd_penalty_stiffness,rd_penalty_friction);
-        rd_penalty->get_candidates=[this](){Get_RD_Collision_Candidates();};
-        solid_body_collection.Add_Force(rd_penalty);}
-
     if(enforce_definiteness) solid_body_collection.Enforce_Definiteness(true);
-    if(backward_euler_evolution) backward_euler_evolution->minimization_objective.Disable_Current_Colliding_Pairs(0);
-
-    solids_evolution->fully_implicit=true;
     for(int i=0;i<deformable_body_collection.deformables_forces.m;i++)
         if(COLLISION_FORCE<TV>* cf=dynamic_cast<COLLISION_FORCE<TV>*>(solid_body_collection.deformable_body_collection.deformables_forces(i)))
             cf->coefficient_of_friction=input_friction;
-}
 
-//#####################################################################
-// Function Get_RD_Collision_Candidates
-//#####################################################################
-void Get_RD_Collision_Candidates()
-{
-    // TODO use BOX_HIERARCHY
-    DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
-    RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
-    for(int d=0;d<particles.number;d++){
-        TV X=particles.X(d);
-        for(int r=0;r<rigid_body_collection.rigid_body_particles.number;r++){
-            if(rigid_body_collection.Rigid_Body(r).Implicit_Geometry_Extended_Value(X)<0)
-                rd_penalty->Add_Pair(d,r);}}
+    this->After_Initialize_Bodies();
 }
 
 //#####################################################################
@@ -2643,10 +2523,8 @@ bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) overri
 //#####################################################################
 void Preprocess_Substep(const T dt,const T time) override
 {
+    BASE::Preprocess_Substep(dt,time);
     save_dt=dt;
-    if(test_forces){
-        solid_body_collection.deformable_body_collection.Test_Energy(time);
-        solid_body_collection.deformable_body_collection.Test_Force_Derivatives(time);}
     if(test_number==11) solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity=TV(0,-10*time*m/(s*s*s),0);
     if(test_number==33)
     {
@@ -2739,8 +2617,7 @@ void Postprocess_Substep(const T dt,const T time) override
                   if(particles.V(mesh_particles(i)).y<-attachment_velocity)
                     particles.V(mesh_particles(i)).y=-attachment_velocity;}}}
 
-    if(rd_penalty)
-        rd_penalty->Update_Attachments_And_Prune_Pairs();
+    BASE::Postprocess_Substep(dt,time);
 }
 //#####################################################################
 // Function Bind_Intersecting_Particles
