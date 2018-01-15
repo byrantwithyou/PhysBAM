@@ -12,6 +12,8 @@
 #include <functional>
 namespace PhysBAM{
 
+template<class TV> class IMPLICIT_OBJECT;
+
 template<class TV>
 class IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION:public DEFORMABLES_FORCES<TV>
 {

@@ -9,6 +9,7 @@
 
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Data_Structures/TRIPLE.h>
+#include <Core/Matrices/MATRIX.h>
 #include <Rigids/Forces_And_Torques/RIGIDS_FORCES.h>
 #include <functional>
 namespace PhysBAM{
