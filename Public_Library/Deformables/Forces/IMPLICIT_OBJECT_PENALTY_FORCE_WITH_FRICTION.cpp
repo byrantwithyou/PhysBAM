@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Data_Structures/TRIPLE.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
 #include <Core/Matrices/IDENTITY_MATRIX.h>
 #include <Core/Matrices/MATRIX.h>
 #include <Core/Matrices/ZERO_MATRIX.h>
@@ -123,6 +124,20 @@ Relax_Attachment_Helper(const TV& Z,const TV& X,T phi,const TV& n,T mu)
 
     return h;
 }
+// Y = relaxed attachment, W = projected attachment on surface = Y-phi*n
+// phi = phi(Y), n = normal(Y), H = Hessian(Y)
+template<class TV,class T>
+void Project_Attachment_To_Surface(
+    TV& Y,
+    MATRIX<T,TV::m>& dYdZ,
+    T phi,const TV& n,const SYMMETRIC_MATRIX<T,TV::m>& H)
+{
+    Y-=phi*n;
+    TV dWdphi=-n;
+    DIAGONAL_MATRIX<T,TV::m> dWdn(-phi*n);
+    MATRIX<T,TV::m> dWdZ=dYdZ+Outer_Product(dWdphi,n)*dYdZ+dWdn*H*dYdZ;
+    dYdZ=dWdZ;
+}
 }
 //#####################################################################
 // Function Relax_Attachment
@@ -137,9 +152,16 @@ Relax_Attachment(int cp)
     TV n=io->Extended_Normal(Z);
     SYMMETRIC_MATRIX<T,TV::m> H=io->Hessian(Z);
     auto pr=Relax_Attachment_Helper(Z,c.X,phi,n,friction);
+    c.dYdZ=pr.dYdZ+Outer_Product(pr.dYdphi,n)+pr.dYdn*H;
+    if(pr.active)
+        Project_Attachment_To_Surface(
+            pr.Y,
+            c.dYdZ,
+            io->Extended_Phi(pr.Y),
+            io->Extended_Normal(pr.Y),
+            io->Hessian(pr.Y));
     c.Y=pr.Y;
     c.active=pr.active;
-    c.dYdZ=pr.dYdZ+Outer_Product(pr.dYdphi,n)+pr.dYdn*H;
 }
 //#####################################################################
 // Function Update_Attachments_And_Prune_Pairs
@@ -263,4 +285,12 @@ template RELAX_ATTACHMENT_HELPER<VECTOR<float,2> > Relax_Attachment_Helper<VECTO
     VECTOR<float,2> const&,VECTOR<float,2> const&,float,VECTOR<float,2> const&,float);
 template RELAX_ATTACHMENT_HELPER<VECTOR<float,3> > Relax_Attachment_Helper<VECTOR<float,3>,float>(
     VECTOR<float,3> const&,VECTOR<float,3> const&,float,VECTOR<float,3> const&,float);
+template void Project_Attachment_To_Surface<VECTOR<double,2>,double>(
+    VECTOR<double,2>&,MATRIX<double,2>&,double,const VECTOR<double,2>&,const SYMMETRIC_MATRIX<double,2>&);
+template void Project_Attachment_To_Surface<VECTOR<double,3>,double>(
+    VECTOR<double,3>&,MATRIX<double,3>&,double,const VECTOR<double,3>&,const SYMMETRIC_MATRIX<double,3>&);
+template void Project_Attachment_To_Surface<VECTOR<float,2>,float>(
+    VECTOR<float,2>&,MATRIX<float,2>&,float,const VECTOR<float,2>&,const SYMMETRIC_MATRIX<float,2>&);
+template void Project_Attachment_To_Surface<VECTOR<float,3>,float>(
+    VECTOR<float,3>&,MATRIX<float,3>&,float,const VECTOR<float,3>&,const SYMMETRIC_MATRIX<float,3>&);
 }
