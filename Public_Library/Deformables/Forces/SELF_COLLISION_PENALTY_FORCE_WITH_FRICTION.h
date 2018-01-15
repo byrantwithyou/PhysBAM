@@ -17,16 +17,29 @@ template<class TV>
 class SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION:public DEFORMABLES_FORCES<TV>
 {
     typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;
 public:
     typedef DEFORMABLES_FORCES<TV> BASE;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_SURFACE;
     using BASE::particles;
 
+    enum class STATE
+    {
+        triangle,edge,point
+    };
+    
     ARRAY<T_SURFACE*> surfaces;
     T stiffness_coefficient;
     T friction;
     T trial_distance;
     
+    struct DIFF_ENTRY
+    {
+        int e; // element of relaxed attachment point
+        TV Y; // relaxed attachment point
+        VECTOR<MATRIX<T,TV::m>,5> dYdI; // Dependence on X, Z, A, B, C
+    };
+
     struct COLLISION_PAIR
     {
         int p; // colliding particle
@@ -34,15 +47,14 @@ public:
 
         TV w0; // barycentric coords of original attachment point
         int e0; // element of original attachment point
+        TV Y0; // original attachment point
 
+        ARRAY<DIFF_ENTRY> diff_entry;
         TV w; // barycentric coords of relaxed attachment point
-        int e; // element of relaxed attachment point
-        TV Y; // relaxed attachment point
-
-        MATRIX<T,TV::m> dwdZ; // Dependence of w on X(p)
-        VECTOR<MATRIX<T,TV::m>,TV::m> dwdE; // Dependence of w on vertices of element e
+        VECTOR<MATRIX<T,TV::m>,5> dwdI; // Dependence on X, Z, A, B, C
         bool active;
     };
+
     ARRAY<COLLISION_PAIR> collision_pairs;
     HASHTABLE<PAIR<int,int> > hash; // p,s
     std::function<void()> get_candidates=0; // Call Add_Pair on collision candidates.
@@ -69,6 +81,7 @@ public:
     void Relax_Attachment(int cp);
     void Update_Attachments_And_Prune_Pairs();
     void Add_Pair(int p,int s);
+    void Test_Relax(int cp);
 //#####################################################################
 };
 }
