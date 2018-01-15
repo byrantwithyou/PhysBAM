@@ -24,7 +24,7 @@ template<class T_input>
 class TRIANGULATED_SURFACE:public MESH_OBJECT<VECTOR<T_input,3>,TRIANGLE_MESH>
 {
     typedef T_input T;
-    typedef VECTOR<T,3> TV;
+    typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
     typedef TRIANGLE_HIERARCHY<T> T_HIERARCHY;
 public:
     typedef MESH_OBJECT<TV,TRIANGLE_MESH> BASE;
@@ -112,6 +112,7 @@ public:
     void Update_Triangle_List(ARRAY_VIEW<const TV> X);
     void Initialize_Torus_Mesh_And_Particles(const int m,const int n,const T major_radius,const T minor_radius); // TODO(jontg) ...
     void Initialize_Cylinder_Mesh_And_Particles(const int m,const int n,const T length,const T radius,const bool create_caps=true); // TODO(jontg) ...
+    void Initialize_Box_Mesh_And_Particles(const TV_INT& m,const RANGE<TV>& box);
     void Initialize_Segment_Lengths();
     void Update_Vertex_Normals();
     TV Normal(const TV& location,const int aggregate) const;

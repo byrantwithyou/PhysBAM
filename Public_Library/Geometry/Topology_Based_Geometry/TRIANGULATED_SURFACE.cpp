@@ -92,7 +92,6 @@ Initialize_Hierarchy(const bool update_boxes,const int triangles_per_group) // c
 template<class T> void TRIANGULATED_SURFACE<T>::
 Initialize_Particle_Hierarchy(const INDIRECT_ARRAY<ARRAY_VIEW<TV> >& particle_subset_input,const bool update_boxes,const int particles_per_group) // creates and updates the boxes as well
 {
-    typedef VECTOR<T,3> TV;
     delete particle_hierarchy;
     particle_hierarchy=new PARTICLE_HIERARCHY<TV,INDIRECT_ARRAY<ARRAY_VIEW<TV> > >(particle_subset_input,update_boxes,particles_per_group);
 }
@@ -102,7 +101,6 @@ Initialize_Particle_Hierarchy(const INDIRECT_ARRAY<ARRAY_VIEW<TV> >& particle_su
 template<class T> void TRIANGULATED_SURFACE<T>::
 Rescale(const T scaling_x,const T scaling_y,const T scaling_z)
 {
-    typedef VECTOR<T,3> TV;
     if(scaling_x*scaling_y*scaling_z<=0) PHYSBAM_FATAL_ERROR();
     for(int k=0;k<particles.Size();k++) particles.X(k)*=TV(scaling_x,scaling_y,scaling_z);
     if(triangle_list) Update_Triangle_List();
@@ -134,7 +132,6 @@ Update_Triangle_List(ARRAY_VIEW<const TV> X)
 template<class T> void TRIANGULATED_SURFACE<T>::
 Initialize_Torus_Mesh_And_Particles(const int m,const int n,const T major_radius,const T minor_radius)
 {
-    typedef VECTOR<T,3> TV;
     T di=T(2*pi)/m,dj=T(2*pi)/n;
     for(int j=0;j<n;j++){
         T phi=-dj*j,radius=major_radius+minor_radius*cos(phi),z=minor_radius*sin(phi);
@@ -149,13 +146,105 @@ Initialize_Torus_Mesh_And_Particles(const int m,const int n,const T major_radius
 template<class T> void TRIANGULATED_SURFACE<T>::
 Initialize_Cylinder_Mesh_And_Particles(const int m,const int n,const T length,const T radius,const bool create_caps)
 {
-    typedef VECTOR<T,3> TV;
     particles.Delete_All_Elements();T dtheta=(T)pi*2/n;T dlength=length/(m-1);
     for(int i=0;i<m;i++) for(int j=0;j<n;j++){
         int p=particles.Add_Element();T theta=j*dtheta;
         particles.X(p)=TV(dlength*i,radius*sin(theta),radius*cos(theta));}
     if(create_caps){int p_1=particles.Add_Element();int p_2=particles.Add_Element();particles.X(p_1)=TV(0,0,0);particles.X(p_2)=TV(length,0,0);}
     mesh.Initialize_Cylinder_Mesh(m,n,create_caps);
+}
+//#####################################################################
+// Function Initialize_Cylinder_Mesh_And_Particles
+//#####################################################################
+template<class T> void TRIANGULATED_SURFACE<T>::
+Initialize_Box_Mesh_And_Particles(const TV_INT& m,const RANGE<TV>& box)
+{
+    mesh.elements.Resize(4*m.x*m.y+4*m.y*m.z+4*m.x*m.z);
+    particles.Add_Elements(2*m.x*m.y+2*m.x*m.z+2*m.y*m.z+2);
+
+    int s0=0,s1=(m.x+1)*(m.y+1)+s0,s2=(m.x+1)*(m.y+1)+s1;
+    // 0<=i<=m.x; 0<=j<=m.y; P((m.x+1)*j+i+s0)=A+TV(i,j,0)*dx;
+    // 0<=i<=m.x; 0<=j<=m.y; P((m.x+1)*j+i+s1)=A+TV(i,j,m.z)*dx;
+    TV A=box.min_corner,B=box.max_corner,dx=box.Edge_Lengths()/TV(m);
+    for(int j=0;j<=m.y;j++)
+        for(int i=0;i<=m.x;i++){
+            int r=(m.x+1)*j+i;
+            TV X=A+TV(i,j,0)*dx;
+            particles.X(r+s0)=X;
+            X.z=B.z;
+            particles.X(r+s1)=X;}
+
+    int s3=(m.x+1)*(m.z-1)+s2,s4=(m.x+1)*(m.z-1)+s3;
+    // 0<=i<=m.x; 0<k<m.z; P((m.x+1)*(k-1)+i+s2)=A+TV(i,0,k)*dx;
+    // 0<=i<=m.x; 0<k<m.z; P((m.x+1)*(k-1)+i+s3)=A+TV(i,m.y,k)*dx;
+    for(int k=1;k<m.z;k++)
+        for(int i=0;i<=m.x;i++){
+            int r=(m.x+1)*(k-1)+i;
+            TV X=A+TV(i,0,k)*dx;
+            particles.X(r+s2)=X;
+            X.y=B.y;
+            particles.X(r+s3)=X;}
+
+    int s5=(m.y-1)*(m.z-1)+s4;
+    // 0<j<m.y; 0<k<m.z; P((m.y+1)*(k-1)+(j-1)+s4)=A+TV(j,0,k)*dx;
+    // 0<j<m.y; 0<k<m.z; P((m.y+1)*(k-1)+(j-1)+s5)=A+TV(m.x,j,k)*dx;
+    for(int k=1;k<m.z;k++)
+        for(int j=1;j<m.y;j++){
+            int r=(m.y-1)*(k-1)+(j-1);
+            TV X=A+TV(0,j,k)*dx;
+            particles.X(r+s4)=X;
+            X.x=B.x;
+            particles.X(r+s5)=X;}
+
+    auto f=[=](int i,int j,int k)
+        {
+            if(k==0) return (m.x+1)*j+i+s0;
+            if(k==m.z) return (m.x+1)*j+i+s1;
+            if(j==0) return (m.x+1)*(k-1)+i+s2;
+            if(j==m.y) return (m.x+1)*(k-1)+i+s3;
+            if(i==0) return (m.y-1)*(k-1)+(j-1)+s4;
+            assert(i==m.x);
+            return (m.y-1)*(k-1)+(j-1)+s5;
+        };
+
+    int r=0;
+    for(int j=0;j<m.y;j++)
+        for(int i=0;i<m.x;i++){
+            int a=f(i,j,0),b=f(i+1,j,0),c=f(i,j+1,0),d=f(i+1,j+1,0);
+            mesh.elements(r++)=TV_INT(a,c,b);
+            mesh.elements(r++)=TV_INT(b,c,d);}
+
+    for(int j=0;j<m.y;j++)
+        for(int i=0;i<m.x;i++){
+            int a=f(i,j,m.z),b=f(i+1,j,m.z),c=f(i,j+1,m.z),d=f(i+1,j+1,m.z);
+            mesh.elements(r++)=TV_INT(a,b,c);
+            mesh.elements(r++)=TV_INT(b,d,c);}
+
+    for(int k=0;k<m.z;k++)
+        for(int i=0;i<m.x;i++){
+            int a=f(i,0,k),b=f(i+1,0,k),c=f(i,0,k+1),d=f(i+1,0,k+1);
+            mesh.elements(r++)=TV_INT(a,b,c);
+            mesh.elements(r++)=TV_INT(b,d,c);}
+
+    for(int k=0;k<m.z;k++)
+        for(int i=0;i<m.x;i++){
+            int a=f(i,m.y,k),b=f(i+1,m.y,k),c=f(i,m.y,k+1),d=f(i+1,m.y,k+1);
+            mesh.elements(r++)=TV_INT(a,c,b);
+            mesh.elements(r++)=TV_INT(b,c,d);}
+
+    for(int k=0;k<m.z;k++)
+        for(int j=0;j<m.y;j++){
+            int a=f(0,j,k),b=f(0,j+1,k),c=f(0,j,k+1),d=f(0,j+1,k+1);
+            mesh.elements(r++)=TV_INT(a,c,b);
+            mesh.elements(r++)=TV_INT(b,c,d);}
+
+    for(int k=0;k<m.z;k++)
+        for(int j=0;j<m.y;j++){
+            int a=f(m.x,j,k),b=f(m.x,j+1,k),c=f(m.x,j,k+1),d=f(m.x,j+1,k+1);
+            mesh.elements(r++)=TV_INT(a,b,c);
+            mesh.elements(r++)=TV_INT(b,d,c);}
+
+    this->Update_Number_Nodes();
 }
 //#####################################################################
 // Function Initialize_Segment_Lengths
@@ -175,7 +264,6 @@ Initialize_Segment_Lengths()
 template<class T> void TRIANGULATED_SURFACE<T>::
 Update_Vertex_Normals()
 {  
-    typedef VECTOR<T,3> TV;
     bool incident_elements_defined=mesh.incident_elements!=0;if(!incident_elements_defined) mesh.Initialize_Incident_Elements();
     bool triangle_list_defined=triangle_list!=0;if(!triangle_list_defined) Update_Triangle_List();
 
@@ -212,7 +300,6 @@ Update_Vertex_Normals()
 template<class T> VECTOR<T,3> TRIANGULATED_SURFACE<T>::
 Normal(const TV& location,const int aggregate) const 
 {
-    typedef VECTOR<T,3> TV;
     assert(aggregate >= 1);
 
     if(use_vertex_normals){
@@ -230,7 +317,6 @@ Normal(const TV& location,const int aggregate) const
 template<class T> bool TRIANGULATED_SURFACE<T>::
 Inside(const TV& location,const T thickness_over_two) const
 {
-    typedef VECTOR<T,3> TV;
     PHYSBAM_ASSERT(bounding_box && hierarchy);
     if(bounding_box->Outside(location,thickness_over_two)) return false;
     if(hierarchy->box_hierarchy(hierarchy->root).Outside(location,thickness_over_two)) return false;
@@ -254,7 +340,6 @@ Inside_Relative_To_Triangle(const TV& location,const int triangle_index_for_ray_
 template<class T> bool TRIANGULATED_SURFACE<T>::
 Inside_Using_Ray_Test(RAY<TV>& ray,const T thickness_over_two) const
 {
-    typedef VECTOR<T,3> TV;
     PHYSBAM_ASSERT(mesh.adjacent_elements && triangle_list);
     bool inside=false;
     if(INTERSECTION::Intersects(ray,*this,thickness_over_two) && ray.t_max > 0){ // otherwise missed the object or on the boundary
@@ -287,7 +372,6 @@ Inside_Using_Ray_Test(RAY<TV>& ray,const T thickness_over_two) const
 template<class T> bool TRIANGULATED_SURFACE<T>::
 Outside(const TV& location,const T thickness_over_two) const
 {
-    typedef VECTOR<T,3> TV;
     PHYSBAM_ASSERT(bounding_box && hierarchy && mesh.adjacent_elements && triangle_list);
     if(bounding_box->Outside(location,thickness_over_two)) return true;
     if(hierarchy->box_hierarchy(hierarchy->root).Outside(location,thickness_over_two)) return true;
@@ -346,7 +430,6 @@ Inside_Any_Triangle(const TV& location,int& triangle_id,const T thickness_over_t
 template<class T> VECTOR<T,3> TRIANGULATED_SURFACE<T>::
 Surface(const TV& location,const T max_depth,const T thickness_over_2,int* closest_triangle,T* distance) const
 {
-    typedef VECTOR<T,3> TV;
     PHYSBAM_ASSERT(triangle_list);
     TV point;
     
@@ -388,7 +471,6 @@ Surface(const TV& location,const T max_depth,const T thickness_over_2,int* close
 template<class T> VECTOR<T,3> TRIANGULATED_SURFACE<T>::
 Oriented_Surface(const TV& location,const TV& normal,const T max_depth,const T thickness_over_2,int* closest_triangle,T* distance) const
 {
-    typedef VECTOR<T,3> TV;
     PHYSBAM_ASSERT(triangle_list);
     TV point;
     
