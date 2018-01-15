@@ -433,7 +433,7 @@ public:
                 solids_parameters.cfl=(T)5;
                 /* solids_parameters.implicit_solve_parameters.cg_iterations=100000; */
                 break;
-            case 701:{
+            case 701:case 720:{
                 // Test rigid-deformable penalty force with friction.
                 // ./be_evolution 701 -no_collisions_in_solve -rd_stiffness 1e2
                 backward_euler_evolution->asymmetric_system=true;
@@ -1814,6 +1814,17 @@ void Get_Initial_Data()
                 while(fin>>n) stuck_particles.Append(n);
                 LOG::printf("stuck_particles %P\n",stuck_particles.m);}
             break;
+        case 720:{
+            GRID<TV> box_grid(TV_INT()+(resolution+1),RANGE<TV>::Centered_Box()*m);
+            RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,3,0)*m));
+            tests.Create_Mattress(box_grid,true,&initial_state,density);
+            initial_state.frame.t.y=5*m;
+            tests.Create_Mattress(box_grid,true,&initial_state,density);
+            tests.Add_Analytic_Box(TV()+2,TV_INT()+resolution).Frame().t.y=1*m;
+            tests.Add_Analytic_Box(TV()+2,TV_INT()+resolution).Frame().t.y=7*m;
+            tests.Add_Analytic_Box(TV()+2,TV_INT()+resolution).Frame().t.y=9*m;
+            tests.Add_Ground(0);
+            break;}
         case 701:{
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)5,0)*m)),true,true,density,m);
             tests.Add_Ground(0,1.99*m);
@@ -2302,6 +2313,11 @@ void Initialize_Bodies() override
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5*unit_p,(T).45,(T).01*s);
             Add_Gravity();
             break;}
+        case 720:{
+            Add_Constitutive_Model(deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(0),(T)1e5*unit_p,(T).45,(T).01*s);
+            Add_Constitutive_Model(deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1),(T)1e5*unit_p,(T).45,(T).01*s);
+            Add_Gravity();
+            break;}
         default:
             LOG::cerr<<"Missing bodies implementation for test number "<<test_number<<std::endl;exit(1);}
 
@@ -2364,6 +2380,7 @@ void Initialize_Bodies() override
         solid_body_collection.Add_Force(new TRIANGLE_REPULSIONS_PENALTY<TV>(particles,deformable_body_collection.triangle_repulsions.edge_edge_interaction_pairs));}
 
     if(use_rd_penalty && rigid_body_collection.rigid_body_particles.number>0){
+        backward_euler_evolution->asymmetric_system=true;
         move_rb_diff.Resize(rigid_body_collection.rigid_body_particles.number);
         backward_euler_evolution->minimization_objective.move_rb_diff=&move_rb_diff;
         rd_penalty=new RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>(
