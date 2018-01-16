@@ -90,7 +90,6 @@ Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_
         KRYLOV_VECTOR_BASE<T> *v_next=Get_Vector(av,next_vector);
         T ip=sqrt(system.Inner_Product(temp_1,temp_1));
         h_cur.Append(ip);
-        v_next->Copy(1/ip,temp_1);
 
         T r=h_cur(0);
         for(int i=0;i<system_size-1;i++){
@@ -116,6 +115,7 @@ Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_
                 x.Copy(t(i),*av(marker+i),x);}
             if(residual<=local_tolerance){Print_Diagnostics(iterations);return true;}
             if(iterations==max_iterations){Print_Diagnostics(iterations);break;}}
+        v_next->Copy(1/ip,temp_1);
         v_cur=v_next;}
     if(print_diagnostics){LOG::cout<<"gmres has not converged after "<<max_iterations<<" iterations, norm of residual="<<residual<<std::endl;}
     return false;
