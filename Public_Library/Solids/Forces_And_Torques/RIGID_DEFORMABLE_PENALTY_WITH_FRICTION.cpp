@@ -118,11 +118,34 @@ Relax_Attachment(int cp)
 
     auto pr=Relax_Attachment_Helper(Z,X,phi,n,friction);
     MATRIX<T,TV::m> dYdU=Outer_Product(pr.dYdphi,dphidU)+pr.dYdn*dndU;
+
+    if(pr.active){
+        MATRIX<T,TV::m> dVdY,dVdL,dn_VdN;
+        MATRIX<T,TV::m,TV::SPIN::m> dVdA,dn_VdA;
+        TV V=mr.Frame_Inverse_Times(pr.Y,dVdY,dVdL,dVdA);
+        T phi_V=io->Extended_Phi(V);
+        TV dphidV=io->Extended_Normal(V);
+        TV N_V=io->Extended_Normal(V);
+        TV n_V=mr.Rotate(N_V,dn_VdN,dn_VdA);
+        SYMMETRIC_MATRIX<T,TV::m> dNdV=io->Hessian(V);
+        MATRIX<T,TV::m> dn_VdV=dn_VdN*dNdV;
+
+        TV W=-phi_V*n_V;
+        TV dWdphi=-n_V;
+        DIAGONAL_MATRIX<T,TV::m> dWdn(-phi_V*(TV()+1));
+        MATRIX<T,TV::m> dWdV=Outer_Product(dWdphi,dphidV)+dWdn*dn_VdV;
+
+        c.dYdZ=pr.dYdZ+dYdU*dUdZ;
+        c.dYdL=pr.dYdX*dXdL+dYdU*dUdL;
+        c.dYdA=pr.dYdX*dXdA+dYdU*dUdA+pr.dYdn*dndA;
+
+        pr.Y+=W;
+        c.dYdZ+=dWdV*dVdY*c.dYdZ;
+        c.dYdL+=dWdV*dVdL;
+        c.dYdA+=dWdn*dn_VdA+dWdV*dVdA;}
+
     c.Y=pr.Y;
     c.active=pr.active;
-    c.dYdZ=pr.dYdZ+dYdU*dUdZ;
-    c.dYdL=pr.dYdX*dXdL+dYdU*dUdL;
-    c.dYdA=pr.dYdX*dXdA+dYdU*dUdA+pr.dYdn*dndA;
 }
 
 //#####################################################################

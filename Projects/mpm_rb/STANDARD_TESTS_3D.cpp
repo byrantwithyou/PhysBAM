@@ -164,7 +164,7 @@ Initialize()
         } break;
 
             // Diff test for Rigid-MPM penalty force
-            // ./mpm_rb -3d 202 -double -rd_stiffness 1e2 -test_diff
+            // ./mpm_rb -3d 202 -double -rd_stiffness 1e1 -test_diff
         case 202:{
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             T density=2*unit_rho*scale_mass;
