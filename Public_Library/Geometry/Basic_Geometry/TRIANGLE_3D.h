@@ -122,11 +122,13 @@ public:
     {TV edge_lengths((X.z-X.y).Magnitude(),(X.x-X.z).Magnitude(),(X.y-X.x).Magnitude());T perimeter=edge_lengths.x+edge_lengths.y+edge_lengths.z;assert(perimeter>0);
     return Point_From_Barycentric_Coordinates(edge_lengths/perimeter);}
 
-    bool Point_Face_Interaction(const TV& x,const TV& v,const INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,3>&> V_face,const T interaction_distance,T& distance,
+    template<class T_ARRAY>
+    bool Point_Face_Interaction(const TV& x,const TV& v,const ARRAY_BASE<TV,T_ARRAY>& V_face,const T interaction_distance,T& distance,
         TV& interaction_normal,VECTOR<T,TV::m+1>& weights,const bool allow_negative_weights,const bool exit_early) const
     {return Point_Face_Interaction(x,v,V_face(0),V_face(1),V_face(2),interaction_distance,distance,interaction_normal,weights,allow_negative_weights,exit_early);}
 
-    bool Point_Face_Collision(const TV& x,const TV& v,const INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,3>&> V_face,const T dt,const T collision_thickness,
+    template<class T_ARRAY>
+    bool Point_Face_Collision(const TV& x,const TV& v,const ARRAY_BASE<TV,T_ARRAY>& V_face,const T dt,const T collision_thickness,
         T& collision_time,TV& normal,VECTOR<T,TV::m+1>& weights,const bool exit_early) const
     {return Point_Face_Collision(x,v,V_face(0),V_face(1),V_face(2),dt,collision_thickness,collision_time,normal,weights,exit_early);}
 

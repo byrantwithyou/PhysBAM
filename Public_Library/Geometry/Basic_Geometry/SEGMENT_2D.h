@@ -110,11 +110,13 @@ public:
     static TV Point_From_Barycentric_Coordinates(const T alpha,const T_ARRAY& X)
     {STATIC_ASSERT(T_ARRAY::m==2);return Point_From_Barycentric_Coordinates(alpha,X(0),X(1));}
 
-    bool Point_Face_Collision(const TV& x,const TV& v,const INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,2>&> V_face,const T dt,const T collision_thickness,T& collision_time,TV& normal,
+    template<class T_ARRAY>
+    bool Point_Face_Collision(const TV& x,const TV& v,const ARRAY_BASE<TV,T_ARRAY>& V_face,const T dt,const T collision_thickness,T& collision_time,TV& normal,
         VECTOR<T,TV::m+1>& weights,const bool exit_early=false) const
     {return Point_Face_Collision(x,v,V_face(0),V_face(1),dt,collision_thickness,collision_time,normal,weights,exit_early);}
     
-    bool Point_Face_Interaction(const TV& x,const TV& v,const INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,2>&> V_face,const T interaction_distance,T& distance,
+    template<class T_ARRAY>
+    bool Point_Face_Interaction(const TV& x,const TV& v,const ARRAY_BASE<TV,T_ARRAY>& V_face,const T interaction_distance,T& distance,
             TV& interaction_normal,VECTOR<T,TV::m+1>& weights,const bool allow_negative_weights,const bool exit_early) const
     {return Point_Face_Interaction(x,v,V_face(0),V_face(1),interaction_distance,distance,interaction_normal,weights,allow_negative_weights,exit_early);}
 
