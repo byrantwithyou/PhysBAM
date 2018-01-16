@@ -353,7 +353,7 @@ public:
                 solids_parameters.cfl=(T)5;
                 /* solids_parameters.implicit_solve_parameters.cg_iterations=100000; */
                 break;
-            case 701:case 720:{
+            case 701:case 720:case 721:{
                 // Test rigid-deformable penalty force with friction.
                 // ./be_evolution 701 -no_collisions_in_solve -rd_stiffness 1e2
                 break;}
@@ -1744,6 +1744,14 @@ void Get_Initial_Data()
             tests.Add_Analytic_Box(TV()+2,TV_INT()+resolution).Frame().t.y=9*m;
             tests.Add_Ground(0);
             break;}
+        case 721:{
+            GRID<TV> box_grid(TV_INT()+(resolution+1),RANGE<TV>::Centered_Box()*m);
+            RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,1.1,0)*m));
+            tests.Create_Mattress(box_grid,true,&initial_state,density);
+            initial_state.frame.t.y=3.2*m;
+            tests.Create_Mattress(box_grid,true,&initial_state,density);
+            tests.Add_Ground(0);
+            break;}
         case 701:{
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)5,0)*m)),true,true,density,m);
             tests.Add_Ground(0,1.99*m);
@@ -2221,9 +2229,13 @@ void Initialize_Bodies() override
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5*unit_p,(T).45,(T).01*s);
             Add_Gravity();
             break;}
-        case 720:{
-            Add_Constitutive_Model(deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(0),(T)1e5*unit_p,(T).45,(T).01*s);
-            Add_Constitutive_Model(deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1),(T)1e5*unit_p,(T).45,(T).01*s);
+            // ./be_evolution 720 -last_frame 100 -no_self -rd_stiffness 1e5 -kry_tol 1e-4 -no_collisions_in_solve -newton_it 20 -dt .005 -resolution 5
+            // ./be_evolution 721 -last_frame 100 -no_self -rd_stiffness 1e5 -kry_tol 1e-4 -no_collisions_in_solve -newton_it 20 -dt .005 -resolution 3
+        case 720:case 721:{
+            for(int s=0;;s++){
+                auto st=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(s);
+                if(!st) break;
+                Add_Constitutive_Model(*st,(T)1e5*unit_p,(T).45,(T).01*s);}
             Add_Gravity();
             break;}
         default:
