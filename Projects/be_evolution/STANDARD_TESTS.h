@@ -79,6 +79,7 @@
 #include <Geometry/Basic_Geometry/CYLINDER.h>
 #include <Geometry/Constitutive_Models/STRAIN_MEASURE.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UTILITIES.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
@@ -139,7 +140,7 @@ public:
     using BASE::solids_evolution;using BASE::test_number;
     using BASE::data_directory;using BASE::m;using BASE::s;using BASE::kg;
     using BASE::unit_p;using BASE::unit_J;using BASE::unit_rho;
-    using BASE::backward_euler_evolution;
+    using BASE::backward_euler_evolution;using BASE::Add_Collision_Object;
     
     std::ofstream svout;
     SOLIDS_STANDARD_TESTS<TV> tests;
@@ -353,7 +354,7 @@ public:
                 solids_parameters.cfl=(T)5;
                 /* solids_parameters.implicit_solve_parameters.cg_iterations=100000; */
                 break;
-            case 701:case 720:case 721:{
+            case 701:case 720:case 721:case 722:{
                 // Test rigid-deformable penalty force with friction.
                 // ./be_evolution 701 -no_collisions_in_solve -rd_stiffness 1e2
                 break;}
@@ -633,6 +634,9 @@ public:
         DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
         for(int i=0;i<constrained_particles.m;i++) Add_Debug_Particle(particles.X(constrained_particles(i)),TV(1,0,0));
         for(int i=0;i<externally_forced.m;i++) Add_Debug_Particle(particles.X(externally_forced(i)),TV(0,1,0));
+        if(test_number==722)
+            for(int i=0;i<particles.X.m;i++)
+                Add_Debug_Particle(particles.X(i),TV(1,0,0));
     }
 void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
@@ -1752,6 +1756,14 @@ void Get_Initial_Data()
             tests.Create_Mattress(box_grid,true,&initial_state,density);
             tests.Add_Ground(0);
             break;}
+            // ./be_evolution 722 -last_frame 40 -no_self -rd_stiffness 5e6 -kry_tol 1e-12 -no_collisions_in_solve -newton_it 20 -dt .01 -rd_friction .1 -debug_newton -test_forces
+        case 722:{
+            int p=particles.Add_Element();
+            particles.X(p)=TV(0,3,0);
+            particles.mass.Fill(1);
+//            tests.Add_Ground(0);
+            Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<PLANE<T> >(PLANE<T>(TV(0,1,0),TV())));
+            break;}
         case 701:{
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)5,0)*m)),true,true,density,m);
             tests.Add_Ground(0,1.99*m);
@@ -2231,7 +2243,7 @@ void Initialize_Bodies() override
             break;}
             // ./be_evolution 720 -last_frame 100 -no_self -rd_stiffness 1e5 -kry_tol 1e-4 -no_collisions_in_solve -newton_it 20 -dt .005 -resolution 5
             // ./be_evolution 721 -last_frame 100 -no_self -rd_stiffness 1e5 -kry_tol 1e-4 -no_collisions_in_solve -newton_it 20 -dt .005 -resolution 3
-        case 720:case 721:{
+        case 720:case 721:case 722:{
             for(int s=0;;s++){
                 auto st=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(s);
                 if(!st) break;
