@@ -57,6 +57,7 @@ public:
 
     ARRAY<COLLISION_PAIR> collision_pairs;
     HASHTABLE<PAIR<int,int> > hash; // p,s
+    HASHTABLE<TV_INT,VECTOR<int,2> > object_from_element; // face -> (s,e)
     std::function<void()> get_candidates=0; // Call Add_Pair on collision candidates.
 
     SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION(DEFORMABLE_PARTICLES<TV>& particles_input,
@@ -80,8 +81,9 @@ public:
     T Potential_Energy(const T time) const override;
     void Relax_Attachment(int cp);
     void Update_Attachments_And_Prune_Pairs();
-    void Add_Pair(int p,int s);
+    void Add_Pair(int p,int s,const TV& w0,int e0);
     void Test_Relax(int cp);
+    void Add_Surface(T_SURFACE& surface);
 //#####################################################################
 };
 }

@@ -19,11 +19,13 @@ template<class TV> class RIGID_PENALTY_WITH_FRICTION;
 template<class TV> class IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION;
 template<class TV> class SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION;
 template<class TV> class MOVE_RIGID_BODY_DIFF;
+template<class TV> class TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY;
+template<class TV> class TRIANGLE_COLLISIONS;
 
 template<class TV>
 class STANDARD_TESTS_BASE:public SOLIDS_EXAMPLE<TV>
 {
-    typedef typename TV::SCALAR T;typedef VECTOR<int,3> TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
 public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::data_directory;using BASE::solid_body_collection;
@@ -48,6 +50,10 @@ public:
     IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* di_penalty=0;
     SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION<TV>* dd_penalty=0;
     ARRAY<MOVE_RIGID_BODY_DIFF<TV> > move_rb_diff;
+
+    T const_repulsion_thickness=(T).01;
+    ARRAY<T> repulsion_thickness; // must be same size as particles.number
+    ARRAY<bool> recently_modified; // must be same size as particles.number
 
     STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS_BASE();

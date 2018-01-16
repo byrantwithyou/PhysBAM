@@ -532,16 +532,28 @@ Update_Attachments_And_Prune_Pairs()
 // Function Add_Pair
 //#####################################################################
 template<class TV> void SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION<TV>::
-Add_Pair(int p,int s)
+Add_Pair(int p,int s,const TV& w0,int e0)
 {
     // TODO: Interpolate X^n and X^(n+1) to choose surface point.
     if(hash.Contains({p,s})) return;
-    COLLISION_PAIR c={p,s};
-    TV Z=surfaces(s)->Closest_Point_On_Boundary(particles.X(p),trial_distance,0,&c.e0);
-    auto elem=surfaces(s)->Get_Element(c.e0);
-    c.w0=elem.Barycentric_Coordinates(Z);
+    const auto& ts=*surfaces(s);
+    TV Y=ts.particles.X.Subset(ts.mesh.elements(e0)).Weighted_Sum(w0);
+    COLLISION_PAIR c={p,s,w0,e0,Y};
     collision_pairs.Append(c);
     hash.Insert({p,s});
+}
+//#####################################################################
+// Function Add_Surface
+//#####################################################################
+template<class TV> void SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION<TV>::
+Add_Surface(T_SURFACE& surface)
+{
+    surface.mesh.Initialize_Incident_Elements();
+    surface.mesh.Initialize_Neighbor_Nodes();
+    surface.mesh.Initialize_Adjacent_Elements();
+    int si=surfaces.Append(&surface);
+    for(int i=0;i<surface.mesh.elements.m;i++)
+        object_from_element.Set(surface.mesh.elements(i).Sorted(),{si,i});
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces
