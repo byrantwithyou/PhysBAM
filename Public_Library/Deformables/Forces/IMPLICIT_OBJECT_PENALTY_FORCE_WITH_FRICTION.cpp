@@ -134,7 +134,7 @@ void Project_Attachment_To_Surface(
 {
     Y-=phi*n;
     TV dWdphi=-n;
-    DIAGONAL_MATRIX<T,TV::m> dWdn(-phi*n);
+    DIAGONAL_MATRIX<T,TV::m> dWdn(-phi*(TV()+1));
     MATRIX<T,TV::m> dWdZ=dYdZ+Outer_Product(dWdphi,n)*dYdZ+dWdn*H*dYdZ;
     dYdZ=dWdZ;
 }
