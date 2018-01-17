@@ -70,7 +70,7 @@ auto Compute_Total_Diff_Eps(const PACK& a0,const PACK& a1)
 }
 
 template<class T,class ...Args> 
-auto Diff_Test(const char* name,int step,const T& Y,Args&&... args)
+void Diff_Test(const char* name,int step,const T& Y,Args&&... args)
 {
     if(step!=0 && step!=1) return;
     typedef decltype(Make_Holder(args...)) PACK;
