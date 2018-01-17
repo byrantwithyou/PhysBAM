@@ -64,6 +64,7 @@ public:
     void Get_DD_Collision_Candidates();
     void Get_DI_Collision_Candidates();
     void Get_RR_Collision_Candidates();
+    void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io);
     void Preprocess_Substep(const T dt,const T time) override;
     void Postprocess_Substep(const T dt,const T time) override;
 };

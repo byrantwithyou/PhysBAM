@@ -197,12 +197,7 @@ After_Initialize_Bodies()
 
         deformable_body_collection.triangle_repulsions_and_collisions_geometry.Initialize(solids_parameters.triangle_collision_parameters);
         deformable_body_collection.triangle_repulsions.Initialize(solids_parameters.triangle_collision_parameters);
-        deformable_body_collection.triangle_collisions.Initialize(solids_parameters.triangle_collision_parameters);
-
-        di_penalty=new IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>(
-            particles,rd_penalty_stiffness,rd_penalty_friction);
-        di_penalty->get_candidates=[this](){Get_DI_Collision_Candidates();};
-        solid_body_collection.Add_Force(di_penalty);}
+        deformable_body_collection.triangle_collisions.Initialize(solids_parameters.triangle_collision_parameters);}
 
     if(backward_euler_evolution) backward_euler_evolution->minimization_objective.Disable_Current_Colliding_Pairs(0);
 
@@ -317,6 +312,21 @@ Postprocess_Substep(const T dt,const T time)
         dd_penalty->Update_Attachments_And_Prune_Pairs();
     if(rr_penalty)
         rr_penalty->Update_Attachments_And_Prune_Pairs();
+}
+//#####################################################################
+// Function Add_Collision_Object
+//#####################################################################
+template<class TV> void STANDARD_TESTS_BASE<TV>::
+Add_Collision_Object(IMPLICIT_OBJECT<TV>* io)
+{
+    if(!di_penalty){
+        di_penalty=new IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>(
+            solid_body_collection.deformable_body_collection.particles,
+            rd_penalty_stiffness,rd_penalty_friction);
+        di_penalty->get_candidates=[this](){Get_DI_Collision_Candidates();};
+        solid_body_collection.deformable_body_collection.Add_Force(di_penalty);}
+        
+    di_penalty->ios.Append(io);
 }
 template class STANDARD_TESTS_BASE<VECTOR<float,2> >;
 template class STANDARD_TESTS_BASE<VECTOR<float,3> >;
