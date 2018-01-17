@@ -21,6 +21,7 @@
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Fracture/EMBEDDING.h>
+#include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <fstream>
 using namespace PhysBAM;
 
@@ -140,6 +141,25 @@ void Emit_Rigid_Body(std::ofstream& fout,const HASHTABLE<std::string,std::string
     if(const std::string* value=options.Get_Pointer("save"))
         saved_surface.Get_Or_Insert(*value)=ts;
     else Emit_Smooth_Surface(fout,ts,options);
+}
+
+void Emit_MPM_Particles(std::ofstream& fout,const HASHTABLE<std::string,std::string>& options,int frame)
+{
+    MPM_PARTICLES<TV> particles;
+    
+    std::string filename=options.Get("location")+"/%d/mpm_particles";
+    std::string frame_filename=Get_Frame_Filename(filename,frame);
+        
+    std::istream* input_file=Safe_Open_Input(frame_filename);
+    TYPED_ISTREAM typed_input(*input_file,STREAM_TYPE(RW()));
+    Read_Binary(typed_input,particles);
+    delete input_file;
+
+    T radius=atof(options.Get("radius").c_str());
+    for(int p=0;p<particles.number;p++){
+        fout<<"sphere{ ";
+        Emit_Vector(fout,particles.X(p));
+        fout<<", "<<radius<<"\n"<<options.Get("texture")<<" }\n";}
 }
 
 void Emit_Rigid_Body_Frame(std::ofstream& fout,const HASHTABLE<std::string,std::string>& options,int frame)
@@ -436,6 +456,8 @@ int main(int argc, char *argv[])
             Emit_Rigid_Body_Frame(fout,options,frame_number);
         else if(type=="triangulated_surface")
             Emit_Rigid_Body_Frame(fout,options,frame_number);
+        else if(type=="mpm_particles")
+            Emit_MPM_Particles(fout,options,frame_number);
         else if(type=="texture_map")
             Create_Texture_Map(fout,options,frame_number);
         else PHYSBAM_FATAL_ERROR("unexpected replacement type: '"+type+"'.");

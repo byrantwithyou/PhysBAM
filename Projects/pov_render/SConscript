@@ -2,5 +2,5 @@
 import os
 
 Import('env Automatic_Program Automatic_Library variant_build')
-env=env.Copy(USE_DEFORMABLES=1)
+env=env.Copy(USE_DEFORMABLES=1,USE_HYBRID=1)
 Automatic_Program(env,'pov_render',['main.cpp'])
