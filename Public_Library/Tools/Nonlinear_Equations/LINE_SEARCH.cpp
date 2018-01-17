@@ -59,7 +59,7 @@ Dump_Line_Log(NONLINEAR_FUNCTION<T(T)>& F,T a,T b)
 // Function Dump_Line
 //#####################################################################
 template<class T> void
-Dump_Line(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T c1)
+Dump_Line(NONLINEAR_FUNCTION<T(T)>& F,T a,T b)
 {
     static int dump_id=0;
     int n=50,max_r=14;
