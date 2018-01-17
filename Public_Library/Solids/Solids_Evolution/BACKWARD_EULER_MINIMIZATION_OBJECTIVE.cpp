@@ -251,6 +251,7 @@ Initial_Guess(KRYLOV_VECTOR_BASE<T>& Bdv,T tolerance,bool no_test) const
     Compute(dv,0,&tmp0,&e1);
     T norm_grad1=sqrt(minimization_system.Inner_Product(tmp0,tmp0));
     if(e1<max(e0,e0*(T)1.1) || norm_grad1<norm_grad0*(T)1.1 || norm_grad1<tolerance) return true;
+    dv*=0;
     return true;
 }
 //#####################################################################
