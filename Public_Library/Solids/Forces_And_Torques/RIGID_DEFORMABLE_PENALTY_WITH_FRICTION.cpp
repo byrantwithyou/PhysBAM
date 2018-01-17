@@ -128,12 +128,10 @@ Relax_Attachment(int cp)
         TV N_V=io->Extended_Normal(V);
         TV n_V=mr.Rotate(N_V,dn_VdN,dn_VdA);
         SYMMETRIC_MATRIX<T,TV::m> dNdV=io->Hessian(V);
-        MATRIX<T,TV::m> dn_VdV=dn_VdN*dNdV;
 
         TV W=-phi_V*n_V;
-        TV dWdphi=-n_V;
-        DIAGONAL_MATRIX<T,TV::m> dWdn(-phi_V*(TV()+1));
-        MATRIX<T,TV::m> dWdV=Outer_Product(dWdphi,dphidV)+dWdn*dn_VdV;
+        MATRIX<T,TV::m> dWdV=-Outer_Product(n_V,dphidV)-phi_V*dn_VdN*dNdV;
+        MATRIX<T,TV::m,TV::SPIN::m> dWdA=-phi_V*dn_VdA;
 
         c.dYdZ=pr.dYdZ+dYdU*dUdZ;
         c.dYdL=pr.dYdX*dXdL+dYdU*dUdL;
@@ -141,8 +139,8 @@ Relax_Attachment(int cp)
 
         pr.Y+=W;
         c.dYdZ+=dWdV*dVdY*c.dYdZ;
-        c.dYdL+=dWdV*dVdL;
-        c.dYdA+=dWdn*dn_VdA+dWdV*dVdA;}
+        c.dYdL+=dWdV*(dVdL+dVdY*c.dYdL);
+        c.dYdA+=dWdV*(dVdA+dVdY*c.dYdA)+dWdA;}
 
     c.Y=pr.Y;
     c.active=pr.active;
