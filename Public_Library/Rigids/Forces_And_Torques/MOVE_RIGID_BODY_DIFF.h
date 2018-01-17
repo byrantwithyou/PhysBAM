@@ -17,6 +17,7 @@ struct MOVE_RIGID_BODY_DIFF
 {
     typedef typename TV::SCALAR T;
     FRAME<TV> frame;
+    TWIST<TV> twist;
     TENSOR<T,TV::m,TV::m,TV::SPIN::m> tensor;
     MATRIX<T,TV::m> R;
 

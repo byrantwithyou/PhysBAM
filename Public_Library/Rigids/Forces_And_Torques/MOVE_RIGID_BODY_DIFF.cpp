@@ -35,6 +35,7 @@ void Move_Rigid_Body_Diff_Helper(TENSOR<T,2,2,1>& t,VECTOR<T,1> u)
 template<class TV> void MOVE_RIGID_BODY_DIFF<TV>::
 Compute(const FRAME<TV>& frame0,const TWIST<TV>& dt_twist)
 {
+    twist=dt_twist;
     frame.t=frame0.t+dt_twist.linear;
     frame.r=ROTATION<TV>::From_Rotation_Vector(dt_twist.angular)*frame0.r;
     Move_Rigid_Body_Diff_Helper(tensor,dt_twist.angular);
