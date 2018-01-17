@@ -15,6 +15,7 @@
 namespace PhysBAM{
 
 template<class TV> class MOVE_RIGID_BODY_DIFF;
+template<class TV> class IMPLICIT_OBJECT;
 template<class TV>
 class RIGID_PENALTY_WITH_FRICTION:public RIGIDS_FORCES<TV>
 {
@@ -68,5 +69,9 @@ public:
     void Add_Pair(int b1,int v,int b2);
 //#####################################################################
 };
+template<class TV,class T> bool
+Project_Attachment_To_Surface(TV& W,const MOVE_RIGID_BODY_DIFF<TV>& mr,
+    const IMPLICIT_OBJECT<TV>* io,const TV& X,MATRIX<T,TV::m>& dWdX,
+    MATRIX<T,TV::m>& dWdL,MATRIX<T,TV::m,TV::SPIN::m>& dWdA,bool exit_if_sep);
 }
 #endif

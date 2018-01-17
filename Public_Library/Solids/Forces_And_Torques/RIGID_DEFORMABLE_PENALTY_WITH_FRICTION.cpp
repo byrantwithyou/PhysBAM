@@ -8,6 +8,7 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Rigids/Forces_And_Torques/MOVE_RIGID_BODY_DIFF.h>
+#include <Rigids/Forces_And_Torques/RIGID_PENALTY_WITH_FRICTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Deformables/Forces/IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
@@ -100,52 +101,25 @@ Relax_Attachment(int cp)
     COLLISION_PAIR& c=collision_pairs(cp);
     const RIGID_BODY<TV>& rb=rigid_body_collection.Rigid_Body(c.b);
     const IMPLICIT_OBJECT<TV>* io=rb.implicit_object->object_space_implicit_object;
-
-    MATRIX<T,TV::m> dXdv,dXdL,dUdZ,dUdL,dndN;
-    MATRIX<T,TV::m,TV::SPIN::m> dXdA,dUdA,dndA;
     const MOVE_RIGID_BODY_DIFF<TV>& mr=move_rb_diff(c.b);
-    TV X=mr.Frame_Times(c.X,dXdv,dXdL,dXdA);
+    MATRIX<T,TV::m> dXdv,dXdL,dZdv,dWdZ,dWdL,dVdY,dVdL;
+    MATRIX<T,TV::m,TV::SPIN::m> dXdA,dWdA,dVdA;
+
     TV Z=particles.X(c.p);
+    TV X=mr.Frame_Times(c.X,dXdv,dXdL,dXdA),W,V;
 
-    TV U=mr.Frame_Inverse_Times(Z,dUdZ,dUdL,dUdA);
-    T phi=io->Extended_Phi(U);
-    TV dphidU=io->Extended_Normal(U);
+    c.active=Project_Attachment_To_Surface(W,mr,io,Z,dWdZ,dWdL,dWdA,true);
+    if(!c.active) return;
 
-    TV N=io->Extended_Normal(U);
-    TV n=mr.Rotate(N,dndN,dndA);
-    SYMMETRIC_MATRIX<T,TV::m> dNdU=io->Hessian(U);
-    MATRIX<T,TV::m> dndU=dndN*dNdU;
+    auto pr=Relax_Attachment_Helper(Z,X,W,friction);
 
-    auto pr=Relax_Attachment_Helper(Z,X,phi,n,friction);
-    MATRIX<T,TV::m> dYdU=Outer_Product(pr.dYdphi,dphidU)+pr.dYdn*dndU;
-
-    if(pr.active){
-        MATRIX<T,TV::m> dVdY,dVdL,dn_VdN;
-        MATRIX<T,TV::m,TV::SPIN::m> dVdA,dn_VdA;
-        TV V=mr.Frame_Inverse_Times(pr.Y,dVdY,dVdL,dVdA);
-        T phi_V=io->Extended_Phi(V);
-        TV dphidV=io->Extended_Normal(V);
-        TV N_V=io->Extended_Normal(V);
-        TV n_V=mr.Rotate(N_V,dn_VdN,dn_VdA);
-        SYMMETRIC_MATRIX<T,TV::m> dNdV=io->Hessian(V);
-
-        TV W=-phi_V*n_V;
-        MATRIX<T,TV::m> dWdV=-Outer_Product(n_V,dphidV)-phi_V*dn_VdN*dNdV;
-        MATRIX<T,TV::m,TV::SPIN::m> dWdA=-phi_V*dn_VdA;
-
-        c.dYdZ=pr.dYdZ+dYdU*dUdZ;
-        c.dYdL=pr.dYdX*dXdL+dYdU*dUdL;
-        c.dYdA=pr.dYdX*dXdA+dYdU*dUdA+pr.dYdn*dndA;
-
-        pr.Y+=W;
-        c.dYdZ+=dWdV*dVdY*c.dYdZ;
-        c.dYdL+=dWdV*(dVdL+dVdY*c.dYdL);
-        c.dYdA+=dWdV*(dVdA+dVdY*c.dYdA)+dWdA;}
-
-    c.Y=pr.Y;
-    c.active=pr.active;
+    Project_Attachment_To_Surface(V,mr,io,pr.Y,dVdY,dVdL,dVdA,false);
+    c.Y=V;
+    MATRIX<T,TV::m> dVdZ=dVdY*(pr.dYdZ+pr.dYdW*dWdZ);
+    c.dYdZ=dVdZ;
+    c.dYdL=dVdY*(pr.dYdX*dXdL+pr.dYdW*dWdL)+dVdL;
+    c.dYdA=dVdY*(pr.dYdX*dXdA+pr.dYdW*dWdA)+dVdA;
 }
-
 //#####################################################################
 // Function Update_Attachments_And_Prune_Pairs
 //#####################################################################

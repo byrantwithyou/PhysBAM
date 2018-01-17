@@ -92,6 +92,31 @@ Potential_Energy(const T time) const
             pe+=(T).5*stiffness_coefficient*(X-c.Y).Magnitude_Squared();}}
     return pe;
 }
+namespace PhysBAM{
+//#####################################################################
+// Function Project_Attachment_To_Surface
+//#####################################################################
+template<class TV,class T> bool
+Project_Attachment_To_Surface(TV& W,const MOVE_RIGID_BODY_DIFF<TV>& mr,
+    const IMPLICIT_OBJECT<TV>* io,const TV& X,MATRIX<T,TV::m>& dWdX,
+    MATRIX<T,TV::m>& dWdL,MATRIX<T,TV::m,TV::SPIN::m>& dWdA,bool exit_if_sep)
+{
+    MATRIX<T,TV::m> dUdX,dUdL,dndN;
+    MATRIX<T,TV::m,TV::SPIN::m> dUdA,dndA;
+    TV U=mr.Frame_Inverse_Times(X,dUdX,dUdL,dUdA);
+    T phi=io->Extended_Phi(U);
+    if(exit_if_sep && phi>0) return false;
+    TV N=io->Extended_Normal(U);
+    TV n=mr.Rotate(N,dndN,dndA);
+    SYMMETRIC_MATRIX<T,TV::m> dNdU=io->Hessian(U);
+    W=X-phi*n;
+    MATRIX<T,TV::m> dWdU=-phi*dndN*dNdU-Outer_Product(n,N);
+    dWdX=(T)1+dWdU*dUdX;
+    dWdL=dWdU*dUdL;
+    dWdA=dWdU*dUdA-phi*dndA;
+    return phi<=0;
+}
+}
 //#####################################################################
 // Function Relax_Attachment
 //#####################################################################
@@ -102,33 +127,27 @@ Relax_Attachment(int cp)
     const RIGID_BODY<TV>& rbs=rigid_body_collection.Rigid_Body(c.bs),
         &rbi=rigid_body_collection.Rigid_Body(c.bi);
     const IMPLICIT_OBJECT<TV>* io=rbi.implicit_object->object_space_implicit_object;
-
-    MATRIX<T,TV::m> dXdv,dXdLi,dZdv,dUdZ,dUdLi,dndN;
-    MATRIX<T,TV::m,TV::SPIN::m> dXdAi,dZdAs,dUdAi,dndAi;
     const MOVE_RIGID_BODY_DIFF<TV>& mrs=move_rb_diff(c.bs);
     const MOVE_RIGID_BODY_DIFF<TV>& mri=move_rb_diff(c.bi);
+    MATRIX<T,TV::m> dXdv,dXdLi,dZdv,dWdZ,dWdLi,dVdY,dVdLi;
+    MATRIX<T,TV::m,TV::SPIN::m> dXdAi,dZdAs,dWdAi,dVdAi;
+
     TV Xs=rbs.simplicial_object->particles.X(c.v);
     c.Z=mrs.Frame_Times(Xs,dZdv,c.dZdLs,c.dZdAs);
-    TV X=mri.Frame_Times(c.X,dXdv,dXdLi,dXdAi);
+    TV X=mri.Frame_Times(c.X,dXdv,dXdLi,dXdAi),W,V;
 
-    TV U=mri.Frame_Inverse_Times(c.Z,dUdZ,dUdLi,dUdAi);
-    T phi=io->Extended_Phi(U);
-    TV dphidU=io->Extended_Normal(U);
+    c.active=Project_Attachment_To_Surface(W,mri,io,c.Z,dWdZ,dWdLi,dWdAi,true);
+    if(!c.active) return;
 
-    TV N=io->Extended_Normal(U);
-    TV n=mri.Rotate(N,dndN,dndAi);
-    SYMMETRIC_MATRIX<T,TV::m> dNdU=io->Hessian(U);
-    MATRIX<T,TV::m> dndU=dndN*dNdU;
+    auto pr=Relax_Attachment_Helper(c.Z,X,W,friction);
 
-    auto pr=Relax_Attachment_Helper(c.Z,X,phi,n,friction);
-    MATRIX<T,TV::m> dYdU=Outer_Product(pr.dYdphi,dphidU)+pr.dYdn*dndU;
-    MATRIX<T,TV::m> dYdZ=pr.dYdZ+dYdU*dUdZ;
-    c.Y=pr.Y;
-    c.active=pr.active;
-    c.dYdLs=dYdZ*c.dZdLs;
-    c.dYdAs=dYdZ*c.dZdAs;
-    c.dYdLi=pr.dYdX*dXdLi+dYdU*dUdLi;
-    c.dYdAi=pr.dYdX*dXdAi+dYdU*dUdAi+pr.dYdn*dndAi;
+    Project_Attachment_To_Surface(V,mri,io,pr.Y,dVdY,dVdLi,dVdAi,false);
+    c.Y=V;
+    MATRIX<T,TV::m> dVdZ=dVdY*(pr.dYdZ+pr.dYdW*dWdZ);
+    c.dYdLs=dVdZ*c.dZdLs;
+    c.dYdAs=dVdZ*c.dZdAs;
+    c.dYdLi=dVdY*(pr.dYdX*dXdLi+pr.dYdW*dWdLi)+dVdLi;
+    c.dYdAi=dVdY*(pr.dYdX*dXdAi+pr.dYdW*dWdAi)+dVdAi;
 }
 //#####################################################################
 // Function Update_Attachments_And_Prune_Pairs

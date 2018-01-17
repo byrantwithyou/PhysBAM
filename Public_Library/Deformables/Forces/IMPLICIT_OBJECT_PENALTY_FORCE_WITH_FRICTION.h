@@ -68,16 +68,9 @@ template<class TV>
 struct RELAX_ATTACHMENT_HELPER
 {
     TV Y;
-    bool active;
-
-    MATRIX<typename TV::SCALAR,TV::m> dYdZ,dYdX;
-    TV dYdphi;
-    MATRIX<typename TV::SCALAR,TV::m> dYdn;
+    MATRIX<typename TV::SCALAR,TV::m> dYdZ,dYdX,dYdW;
 };
 template<class TV,class T> RELAX_ATTACHMENT_HELPER<TV>
-Relax_Attachment_Helper(const TV& Z,const TV& X,T phi,const TV& n,T mu);
-template<class TV,class T>
-void Project_Attachment_To_Surface(TV& Y,MATRIX<T,TV::m>& dYdZ,
-    T phi,const TV& n,const SYMMETRIC_MATRIX<T,TV::m>& H);
+Relax_Attachment_Helper(const TV& Z,const TV& X,const TV& W,T mu);
 }
 #endif
