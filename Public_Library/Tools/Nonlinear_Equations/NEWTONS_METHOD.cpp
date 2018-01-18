@@ -35,6 +35,7 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
     krylov->relative_tolerance=true;
 
     bool result=false;
+    if(debug) Dump_Parameters();
 
     T last_E=FLT_MAX;
     int local_max_iterations=max_iterations;
@@ -152,6 +153,56 @@ Line_Search(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYSTEM
 
     if(debug) LOG::printf("ALPHA  %g\n",a);
     return a;
+}
+//#####################################################################
+// Function Make_Vanilla_Newton
+//#####################################################################
+template <class T> void NEWTONS_METHOD<T>::
+Make_Vanilla_Newton()
+{
+    use_golden_section_search=false;
+    use_wolfe_search=false;
+    use_backtracking=false;
+    use_gradient_descent_failsafe=false;
+    countdown_tolerance=0;
+    max_newton_step_size=0;
+    fixed_tolerance=true;
+    finish_before_indefiniteness=false;
+}
+//#####################################################################
+// Function Dump_Parameters
+//#####################################################################
+template <class T> void NEWTONS_METHOD<T>::
+Dump_Parameters() const
+{
+    auto db=[](const char* s,bool f){if(f) LOG::cout<<" "<<s;};
+    auto di=[](const char* s,int i){LOG::printf(" %s=%i",s,i);};
+    auto df=[](const char* s,T t){LOG::printf(" %s=%.3g",s,t);};
+    LOG::cout<<"flags:";
+    db("bt",use_backtracking);
+    db("cg",use_cg);
+    db("db",debug);
+    db("fi",finish_before_indefiniteness);
+    db("fk",fail_on_krylov_not_converged);
+    db("ft",fixed_tolerance);
+    db("gd",use_gradient_descent_failsafe);
+    db("gm",use_gmres);
+    db("go",use_gradient_magnitude_objective);
+    db("gs",use_golden_section_search);
+    db("ri",require_one_iteration);
+    db("ws",use_wolfe_search);
+    di("ci",countdown_iterations);
+    di("gi",max_golden_section_iterations);
+    di("iu",iterations_used);
+    di("ki",max_krylov_iterations);
+    di("mi",max_iterations);
+    df("at",angle_tolerance);
+    df("ct",countdown_tolerance);
+    df("kt",krylov_tolerance);
+    df("ns",max_newton_step_size);
+    df("pt",progress_tolerance);
+    df("tl",tolerance);
+    LOG::cout<<std::endl;
 }
 namespace PhysBAM{
 template struct NEWTONS_METHOD<float>;
