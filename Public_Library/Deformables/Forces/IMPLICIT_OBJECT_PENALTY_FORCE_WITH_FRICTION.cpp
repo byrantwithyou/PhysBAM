@@ -86,7 +86,7 @@ Relax_Attachment_Helper(const TV& Z,const TV& X,const TV& W,T mu)
     T zw2=(Z-W).Magnitude_Squared();
     T xw2=(X-W).Magnitude_Squared();
     T q2=sqr(mu)*zw2;
-    if(xw2<=q2){h.Y=X;h.dYdX+=1;LOG::puts("stick");return h;}
+    if(xw2<=q2){h.Y=X;h.dYdX+=1;h.dynamic=false;/*LOG::puts("stick");*/return h;}
     T s=sqrt(q2/xw2);
     h.Y=W+s*(X-W);
 
@@ -99,7 +99,8 @@ Relax_Attachment_Helper(const TV& Z,const TV& X,const TV& W,T mu)
     h.dYdW=(1-s)+Outer_Product(X-W,dsdq2*dq2dW+dsdxw2*dxw2dW);
     h.dYdX=s+Outer_Product(X-W,dsdxw2*dxw2dX);
     h.dYdZ=Outer_Product(X-W,dsdq2*dq2dZ);
-    LOG::puts("dynamic");
+    h.dynamic=true;
+//    LOG::puts("dynamic");
     return h;
 }
 

@@ -242,7 +242,7 @@ void Relax_Attachment(CP& c,const TV& Z,const TRIANGULATED_SURFACE<T>& ts,T fric
 
     while(1)
     {
-        LOG::printf("STATE %i\n",state);
+//        LOG::printf("STATE %i\n",state);
         switch(state)
         {
             case tri_int:
@@ -252,10 +252,10 @@ void Relax_Attachment(CP& c,const TV& Z,const TRIANGULATED_SURFACE<T>& ts,T fric
                 de.e=e0;
                 int ret=Find_Next_Triangle(de.Y,de.dYdI,c.w,c.dwdI,
                     Y,Z,P(0),P(1),P(2),friction,c.active);
-                if(ret==-2){puts("RET U");return;}
+                if(ret==-2){/*puts("RET U");*/return;}
                 Y=de.Y;
                 c.diff_entry.Append(de);
-                if(ret==-1){puts("RET T");return;}
+                if(ret==-1){/*puts("RET T");*/return;}
                 int rem=e(ret),next_e=-1;
                 VECTOR<int,2> new_edge=e.Remove_Index(ret).Sorted();
                 const ARRAY<int>& a=adjacent_elements(e0);
@@ -263,7 +263,7 @@ void Relax_Attachment(CP& c,const TV& Z,const TRIANGULATED_SURFACE<T>& ts,T fric
                     if(!ts.mesh.elements(a(i)).Contains(rem)){
                         e0=next_e=a(i);
                         break;}
-                if(next_e==-1){c.active=false;puts("RET B");return;}
+                if(next_e==-1){c.active=false;/*puts("RET B");*/return;}
                 if(state==tri_edge && new_edge==edge) state=edge_int;
                 else state=tri_edge;
                 edge=new_edge;
@@ -301,7 +301,7 @@ void Relax_Attachment(CP& c,const TV& Z,const TRIANGULATED_SURFACE<T>& ts,T fric
                     TV OP=ts.particles.X(e[1].Sum()-edge.Sum());
                     c.active=n0.Dot(OP-V0.x)>0;} // outside if convex
 
-                if(ret==-2){puts("RET F");return;}
+                if(ret==-2){/*puts("RET F");*/return;}
 
                 PHYSBAM_ASSERT(de.e>=0);
 
@@ -323,7 +323,7 @@ void Relax_Attachment(CP& c,const TV& Z,const TRIANGULATED_SURFACE<T>& ts,T fric
                 c.dwdI(2+miss)=MATRIX<T,3>();
                 c.diff_entry.Append(de);
 
-                if(ret==-1){puts("RET E");return;}
+                if(ret==-1){/*puts("RET E");*/return;}
 
                 // NOTE: This breaks the dependency chain (!!)
 
@@ -335,7 +335,7 @@ void Relax_Attachment(CP& c,const TV& Z,const TRIANGULATED_SURFACE<T>& ts,T fric
                 auto ret=Handle_Vertex(Z,ts,p,friction);
                 if(ret.x==-1){
                     c.active=ts.Signed_Solid_Angle_Of_Triangle_Web(Y,p)>0;
-                    puts("RET V");
+                    //puts("RET V");
                     int e=c.diff_entry.Last().e;
                     int j=ts.mesh.elements(e).Find(p);
                     c.dwdI.Fill(MATRIX<T,3>());

@@ -56,8 +56,13 @@ Update_Position_Based_State(const T time)
 {
     get_candidates();
 
+    num_dynamic=0;
+    num_stick=0;
     for(int i=0;i<collision_pairs.m;i++)
         Relax_Attachment(i);
+
+    LOG::printf("RIGID_DEFORMABLE_PENALTY_WITH_FRICTION %i (sep %i st %i dyn %i)\n",
+        collision_pairs.m,collision_pairs.m-num_stick-num_dynamic,num_stick,num_dynamic);
 }
 //#####################################################################
 // Function Add_Implicit_Velocity_Independent_Forces
@@ -112,7 +117,9 @@ Relax_Attachment(int cp)
     if(!c.active) return;
 
     auto pr=Relax_Attachment_Helper(Z,X,W,friction);
-
+    if(pr.dynamic) num_dynamic++;
+    else num_stick++;
+    
     Project_Attachment_To_Surface(V,mr,io,pr.Y,dVdY,dVdL,dVdA,false);
     c.Y=V;
     MATRIX<T,TV::m> dVdZ=dVdY*(pr.dYdZ+pr.dYdW*dWdZ);

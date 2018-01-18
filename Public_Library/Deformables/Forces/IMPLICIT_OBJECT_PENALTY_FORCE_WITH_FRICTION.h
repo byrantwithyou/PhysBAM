@@ -69,6 +69,7 @@ struct RELAX_ATTACHMENT_HELPER
 {
     TV Y;
     MATRIX<typename TV::SCALAR,TV::m> dYdZ,dYdX,dYdW;
+    bool dynamic;
 };
 template<class TV,class T> RELAX_ATTACHMENT_HELPER<TV>
 Relax_Attachment_Helper(const TV& Z,const TV& X,const TV& W,T mu);

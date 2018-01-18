@@ -22,6 +22,7 @@ public:
 
     T stiffness_coefficient;
     T friction;
+    int num_dynamic=0,num_stick=0;
     
     struct COLLISION_PAIR
     {
