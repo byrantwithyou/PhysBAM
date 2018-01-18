@@ -117,6 +117,10 @@ public:
         std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,T particles_per_cell,const char* name=0)
     {ANALYTIC_IMPLICIT_OBJECT<T_OBJECT> obj(object);Seed_Particles(obj,V,dV,density,particles_per_cell,name);}
 
+    template<class T_OBJECT>
+    void Seed_Particles_With_Marked_Surface(const T_OBJECT& object,std::function<TV(const TV&)> V,
+        std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,T particles_per_cell,int levels,const char* name=0);
+
     template<class T_STRUCTURE>
     T_STRUCTURE& Seed_Lagrangian_Particles(T_STRUCTURE& object,std::function<TV(const TV&)> V,
         std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,bool use_constant_mass,bool destroy_after=true);
