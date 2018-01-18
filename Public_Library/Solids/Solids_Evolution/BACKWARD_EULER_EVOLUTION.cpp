@@ -46,7 +46,6 @@ BACKWARD_EULER_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BO
     newtons_method.fail_on_krylov_not_converged=false;
     newtons_method.tolerance=1e-5;
     newtons_method.angle_tolerance=1e-2;
-    fail_on_newton_not_converged=false;
     minimization_system.tmp=&tmp1;
 }
 //#####################################################################
