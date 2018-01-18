@@ -40,7 +40,7 @@ public:
 
 //#####################################################################
     void Force(const VECTOR_T& V,VECTOR_T& F) const;
-    void Multiply(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& F) const override;
+    void Multiply(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& F,bool transpose=false) const override;
     void Project_Helper(KRYLOV_VECTOR_BASE<T>& V,const bool negate) const;
     void Project(KRYLOV_VECTOR_BASE<T>& V) const override;
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& V0,const KRYLOV_VECTOR_BASE<T>& V1) const override;

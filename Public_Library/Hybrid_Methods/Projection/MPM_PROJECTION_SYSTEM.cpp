@@ -33,7 +33,7 @@ template<class TV> MPM_PROJECTION_SYSTEM<TV>::
 // Function Multiply
 //#####################################################################
 template<class TV> void MPM_PROJECTION_SYSTEM<TV>::
-Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
+Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result,bool transpose) const
 {
     TIMER_SCOPE_FUNC;
     const MPM_PROJECTION_VECTOR<TV>& vx=debug_cast<const MPM_PROJECTION_VECTOR<TV>&>(x);

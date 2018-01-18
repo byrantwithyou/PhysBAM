@@ -62,7 +62,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class T,int gauss_order> void OPENSUBDIV_SURFACE_CURVATURE_FORCE<T,gauss_order>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time,bool transpose) const
 {
 #pragma omp parallel for 
     for(int face=0;face<surf.m;face++){

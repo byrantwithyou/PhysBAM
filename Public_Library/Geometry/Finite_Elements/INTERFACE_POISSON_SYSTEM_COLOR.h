@@ -76,7 +76,7 @@ public:
         std::function<T(const TV& X,int color0,int color1)> j_surface);
     void Set_RHS(VECTOR_T& rhs,std::function<T(const TV& X,int color)> body_force);
     void Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const;
-    void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const;
+    void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result,bool transpose=false) const;
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const;
     T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const;
     void Project(KRYLOV_VECTOR_BASE<T>& x) const;

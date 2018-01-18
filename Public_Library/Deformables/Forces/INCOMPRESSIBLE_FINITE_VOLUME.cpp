@@ -154,7 +154,7 @@ public:
         fvm(fvm),dynamic_particles(fvm.force_dynamic_particles_list)
     {}
 
-    void Multiply(const KRYLOV_VECTOR_BASE<T>& bp,KRYLOV_VECTOR_BASE<T>& bresult) const override
+    void Multiply(const KRYLOV_VECTOR_BASE<T>& bp,KRYLOV_VECTOR_BASE<T>& bresult,bool transpose=false) const override
     {const KRYLOV_VECTOR_T& p=debug_cast<const KRYLOV_VECTOR_T&>(bp);KRYLOV_VECTOR_T& result=debug_cast<KRYLOV_VECTOR_T&>(bresult);
     const KRYLOV_VECTOR_T* use_p=&p;
     INDIRECT_ARRAY<const ARRAY<T> > diagonal_preconditioner(fvm.diagonal_preconditioner_full,dynamic_particles);

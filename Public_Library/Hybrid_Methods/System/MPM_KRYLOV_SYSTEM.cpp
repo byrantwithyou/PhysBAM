@@ -41,7 +41,7 @@ Sanity(const KRYLOV_VECTOR_BASE<T>& v,const char* str) const
 // Function Multiply
 //#####################################################################
 template<class TV> void MPM_KRYLOV_SYSTEM<TV>::
-Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
+Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF,bool transpose) const
 {
     const MPM_KRYLOV_VECTOR<TV>& V=debug_cast<const MPM_KRYLOV_VECTOR<TV>&>(BV);
     MPM_KRYLOV_VECTOR<TV>& F=debug_cast<MPM_KRYLOV_VECTOR<TV>&>(BF);

@@ -33,7 +33,7 @@ template<class TV> BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>::
 // Function Multiply
 //#####################################################################
 template<class TV> void BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>::
-Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
+Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF,bool transpose) const
 {
     const GENERALIZED_VELOCITY<TV>& V=debug_cast<const GENERALIZED_VELOCITY<TV>&>(BV);
     GENERALIZED_VELOCITY<TV>& F=debug_cast<GENERALIZED_VELOCITY<TV>&>(BF);
@@ -49,7 +49,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
 
     F.V.array.Fill(TV());
     F.rigid_V.array.Fill(TWIST<TV>());
-    solid_body_collection.Add_Implicit_Velocity_Independent_Forces(t.V.array,t.rigid_V.array,F.V.array,F.rigid_V.array,time);
+    solid_body_collection.Add_Implicit_Velocity_Independent_Forces(t.V.array,t.rigid_V.array,F.V.array,F.rigid_V.array,time,transpose);
 
 #pragma omp parallel for
     for(int p=0;p<particles.number;p++) F.V.array(p)=particles.mass(p)*t.V.array(p)-dt*dt*F.V.array(p);

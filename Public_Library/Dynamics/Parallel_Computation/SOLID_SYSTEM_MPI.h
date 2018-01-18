@@ -59,7 +59,7 @@ public:
     void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& BV) const override;
     void Send_Generalized_Velocity_To_Fluid(const GENERALIZED_VELOCITY<TV>& V) const;
     void Get_Generalized_Velocity_From_Fluid(GENERALIZED_VELOCITY<TV>& V) const;
-    void Multiply(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& F) const override;
+    void Multiply(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& F,bool transpose=false) const override;
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& V0,const KRYLOV_VECTOR_BASE<T>& V1) const override;
 //#####################################################################
 };

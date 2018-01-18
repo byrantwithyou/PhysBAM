@@ -31,7 +31,7 @@ public:
         remove_null_space_solution_component(pcg.remove_null_space_solution_component),one_over_n(A.n?(double)1/A.n:0.0)
     {}
 
-    void Multiply(const KRYLOV_VECTOR_BASE<T>& bx,KRYLOV_VECTOR_BASE<T>& bresult) const override
+    void Multiply(const KRYLOV_VECTOR_BASE<T>& bx,KRYLOV_VECTOR_BASE<T>& bresult,bool transpose=false) const override
     {const KRYLOV_VECTOR_T& x=debug_cast<const KRYLOV_VECTOR_T&>(bx);KRYLOV_VECTOR_T& result=debug_cast<KRYLOV_VECTOR_T&>(bresult);result.v.Resize(A.n);A.Times(x.v,result.v);}
 
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& bx,const KRYLOV_VECTOR_BASE<T>& by) const override

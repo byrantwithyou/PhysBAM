@@ -161,7 +161,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class T> void AXIAL_BENDING_SPRINGS<T>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time,bool transpose) const
 {
     for(SPRING_ITERATOR iterator(force_springs);iterator.Valid();iterator.Next()){int s=iterator.Data();
         int node1,node2,node3,node4;spring_particles(s).Get(node1,node2,node3,node4);

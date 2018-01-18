@@ -242,7 +242,7 @@ Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const
 // Function Multiply
 //#####################################################################
 template<class TV> void INTERFACE_POISSON_SYSTEM_COLOR<TV>::
-Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
+Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result,bool transpose) const
 {
     const VECTOR_T& xc=debug_cast<const VECTOR_T&>(x);
     VECTOR_T& rc=debug_cast<VECTOR_T&>(result);

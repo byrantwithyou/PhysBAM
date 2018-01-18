@@ -567,7 +567,7 @@ Apply_Massless_Structure_Force_To_Fluid(ARRAY<T>& fluid_velocity,T time) const
 // Function Multiply
 //#####################################################################
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Multiply(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bF) const
+Multiply(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bF,bool transpose) const
 {
     const VECTOR_T& V=debug_cast<const VECTOR_T&>(bV);VECTOR_T& F=debug_cast<VECTOR_T&>(bF);
     GENERALIZED_VELOCITY<TV> temporary_solids_velocity(temporary_velocities,temporary_twists,solid_system->solid_body_collection);

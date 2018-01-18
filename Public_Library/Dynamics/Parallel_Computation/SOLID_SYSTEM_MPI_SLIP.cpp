@@ -60,7 +60,7 @@ Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& BV) const
 // Function Multiply
 //#####################################################################
 template<class TV> void SOLID_SYSTEM_MPI_SLIP<TV>::
-Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
+Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF,bool transpose) const
 {
     const VECTOR_T& V=debug_cast<const VECTOR_T&>(BV);VECTOR_T& F=debug_cast<VECTOR_T&>(BF);
     solid_system.Force(V,F);

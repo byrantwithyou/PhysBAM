@@ -290,7 +290,7 @@ Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VI
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class T> void LINEAR_ALTITUDE_SPRINGS_3D<T>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time,bool transpose) const
 {
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         int total_springs=use_shortest_spring_only?1:4;

@@ -127,7 +127,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV,int d> void LINEAR_FINITE_VOLUME<TV,d>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time,bool transpose) const
 {
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         MATRIX<T,TV::m,d> dG=Stress_Differential(V,t)*Bm(t);

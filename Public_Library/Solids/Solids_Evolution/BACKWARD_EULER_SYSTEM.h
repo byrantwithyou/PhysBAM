@@ -85,7 +85,7 @@ public:
 
 //#####################################################################
     void Force(const VECTOR_T& V,VECTOR_T& F) const;
-    void Multiply(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& F) const override;
+    void Multiply(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& F,bool transpose=false) const override;
     void Set_Global_Boundary_Conditions(VECTOR_T& V,ARRAY<TV>& X_save,ARRAY<FRAME<TV> >& rigid_frame_save,
         ARRAY<TWIST<TV> >& rigid_velocity_save,ARRAY<typename TV::SPIN>& rigid_angular_momentum_save,ARRAY<TV>& V_save,bool test_system,
         bool print_matrix) const;// TODO: The meaning of this function has changed.

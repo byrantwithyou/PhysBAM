@@ -472,7 +472,7 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION<TV>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time,bool transpose) const
 {
     for(int i=0;i<collision_pairs.m;i++){
         const COLLISION_PAIR& c=collision_pairs(i);

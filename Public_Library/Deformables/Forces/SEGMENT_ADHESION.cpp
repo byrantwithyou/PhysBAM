@@ -396,7 +396,7 @@ Read_State(STREAM_TYPE stream_type,const std::string& filename)
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void SEGMENT_ADHESION<TV>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time,bool transpose) const
 {
     PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }

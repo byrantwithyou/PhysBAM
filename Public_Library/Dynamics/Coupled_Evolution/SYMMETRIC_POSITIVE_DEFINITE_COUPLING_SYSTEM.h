@@ -167,7 +167,7 @@ public:
         const bool use_one_sided_face_velocty_interpolation,ARRAY<T,FACE_INDEX<TV::m> >& fluids_velocity,T mu,bool use_second_order_cut_cell,const LEVELSET<TV>* levelset);
     void Set_Up_RHS(VECTOR_T& V,VECTOR_T& F,const GENERALIZED_VELOCITY<TV>& solids_velocity_star,const ARRAY<T,FACE_INDEX<TV::m> >& fluids_velocity_star,
         const ARRAY<T,TV_INT>& p_advected_over_rho_c_squared_dt,const ARRAY<T,TV_INT>& p_advected,const ARRAY<T,TV_INT>& fluid_pressures);
-    virtual void Multiply(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bF) const override;
+    virtual void Multiply(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bF,bool transpose=false) const override;
     virtual double Inner_Product(const KRYLOV_VECTOR_BASE<T>& bV0,const KRYLOV_VECTOR_BASE<T>& bV1) const override;
     virtual void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bR) const override;  // solve MR=V
     T Linf_Norm(const VECTOR_T& bR) const;

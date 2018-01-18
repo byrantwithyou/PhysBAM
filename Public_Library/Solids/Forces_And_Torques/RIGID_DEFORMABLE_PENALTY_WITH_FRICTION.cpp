@@ -65,7 +65,7 @@ Update_Position_Based_State(const T time)
 template<class TV> void RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>::
 Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,
     ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TV> F,
-    ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const
+    ARRAY_VIEW<TWIST<TV> > rigid_F,const T time,bool transpose) const
 {
     for(int i=0;i<collision_pairs.m;i++){
         const COLLISION_PAIR& c=collision_pairs(i);

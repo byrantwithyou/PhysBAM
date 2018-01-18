@@ -28,7 +28,7 @@ template<class T_MATRIX,class T,class VECTOR_T,class T_MATRIX_PRECON> MATRIX_SYS
 // Function Multiply
 //#####################################################################
 template<class T_MATRIX,class T,class VECTOR_T,class T_MATRIX_PRECON> void MATRIX_SYSTEM<T_MATRIX,T,VECTOR_T,T_MATRIX_PRECON>::
-Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
+Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result,bool transpose) const
 {
     const VECTOR_T& vx=dynamic_cast<const VECTOR_T&>(x);
     VECTOR_T& vresult=dynamic_cast<VECTOR_T&>(result);

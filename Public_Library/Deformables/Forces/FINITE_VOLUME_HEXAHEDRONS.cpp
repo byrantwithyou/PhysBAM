@@ -145,7 +145,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class T> void FINITE_VOLUME_HEXAHEDRONS<T>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> VV,ARRAY_VIEW<TV> F,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> VV,ARRAY_VIEW<TV> F,const T time,bool transpose) const
 {
     if(!dPi_dFe && !dP_dFe) PHYSBAM_FATAL_ERROR();
     if(anisotropic_model)

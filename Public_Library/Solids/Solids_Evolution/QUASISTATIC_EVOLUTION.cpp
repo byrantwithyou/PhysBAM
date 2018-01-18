@@ -41,7 +41,7 @@ public:
         :KRYLOV_SYSTEM_BASE<T>(false,true),solid_body_collection(solid_body_collection_input),example_forces_and_velocities(example_forces_and_velocities),time(time_input),mpi_solids(mpi_solids_input)
     {}
 
-    void Multiply(const KRYLOV_VECTOR_BASE<T>& bdX,KRYLOV_VECTOR_BASE<T>& bdF) const override
+    void Multiply(const KRYLOV_VECTOR_BASE<T>& bdX,KRYLOV_VECTOR_BASE<T>& bdF,bool transpose=false) const override
     {const KRYLOV_VECTOR_T& dX=debug_cast<const KRYLOV_VECTOR_T&>(bdX);KRYLOV_VECTOR_T& dF=debug_cast<KRYLOV_VECTOR_T&>(bdF);
     if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data(dX.v.array);
     solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Positions(dX.v.array); // TODO: assumes bindings are linear, consider switching this to clamping velocities

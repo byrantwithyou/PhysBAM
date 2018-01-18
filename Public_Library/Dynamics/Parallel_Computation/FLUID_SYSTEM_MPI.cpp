@@ -35,7 +35,7 @@ FLUID_SYSTEM_MPI(const ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& J_deformable_array_inp
 // Function Multiply
 //#####################################################################
 template<class TV> void FLUID_SYSTEM_MPI<TV>::
-Multiply(const KRYLOV_VECTOR_BASE<T>& bx,KRYLOV_VECTOR_BASE<T>& bresult) const
+Multiply(const KRYLOV_VECTOR_BASE<T>& bx,KRYLOV_VECTOR_BASE<T>& bresult,bool transpose) const
 {
     const KRYLOV_VECTOR_T& x=debug_cast<const KRYLOV_VECTOR_T&>(bx);KRYLOV_VECTOR_T& result=debug_cast<KRYLOV_VECTOR_T&>(bresult);
     // get x values from solid

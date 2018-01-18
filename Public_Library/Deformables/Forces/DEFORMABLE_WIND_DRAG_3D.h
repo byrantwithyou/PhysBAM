@@ -89,7 +89,7 @@ private:
     T Spatially_Varying_Wind_Pressure(const TV& X) const
     {return interpolation.Clamped_To_Array(V_grid,*spatially_varying_wind_pressure,X);}
 
-    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const override
+    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time,bool transpose=false) const override
     {}
 
     void Enforce_Definiteness(const bool enforce_definiteness_input) override

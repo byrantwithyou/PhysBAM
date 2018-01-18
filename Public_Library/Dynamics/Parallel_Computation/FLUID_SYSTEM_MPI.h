@@ -57,7 +57,7 @@ public:
     {Get_Generalized_Velocity_From_Solid(V.V.array.Subset(coupled_deformable_particle_indices),V.rigid_V);}
 
 //#####################################################################
-    void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const override;
+    void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result,bool transpose=false) const override;
     void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const override; // solve MR=V
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& V0,const KRYLOV_VECTOR_BASE<T>& V1) const override;
     T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const override;

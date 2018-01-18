@@ -31,7 +31,7 @@ template<class T> KRYLOV_SYSTEM_BASE<T>::
 // Function Test_System
 //#####################################################################
 template<class T> void KRYLOV_SYSTEM_BASE<T>::
-Test_System(const KRYLOV_VECTOR_BASE<T>& t) const
+Test_System(const KRYLOV_VECTOR_BASE<T>& t,bool assume_symmetry) const
 {
     KRYLOV_VECTOR_BASE<T>& w=*t.Clone_Default();
     KRYLOV_VECTOR_BASE<T>& x=*t.Clone_Default();
@@ -54,10 +54,16 @@ Test_System(const KRYLOV_VECTOR_BASE<T>& t) const
 
     Multiply(x,z);
     a=Inner_Product(y,z);
-    Multiply(y,z);
+    if(assume_symmetry){
+        Multiply(y,z);
+        b=Inner_Product(x,z);
+        r=abs(a-b)/maxabs((T)1e-30,a,b);
+        if(r>tolerance) {pass=false;LOG::cout<<"System Symmetry Test: "<<a<<"  vs  "<<b<<"  relative  "<<r<<std::endl;}}
+
+    Multiply(y,z,true);
     b=Inner_Product(x,z);
     r=abs(a-b)/maxabs((T)1e-30,a,b);
-    if(r>tolerance) {pass=false;LOG::cout<<"System Symmetry Test: "<<a<<"  vs  "<<b<<"  relative  "<<r<<std::endl;}
+    if(r>tolerance) {pass=false;LOG::cout<<"System Transpose Test: "<<a<<"  vs  "<<b<<"  relative  "<<r<<std::endl;}
 
     z=x;
     Project(z);

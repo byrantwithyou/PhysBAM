@@ -61,7 +61,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 // Function Add_Velocity_Dependent_Forces
 //#####################################################################
 template<class TV,int d,int m> void BW_FORCES<TV,d,m>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time,bool transpose) const
 {
     for(SIMPLEX_ITERATOR iterator(force_simplices);iterator.Valid();iterator.Next()){int s=iterator.Data();
         const STATE& state=states(s);

@@ -104,7 +104,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void COLLISION_PENALTY_FORCES<TV>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time,bool transpose) const
 {
     for(int p=0;p<check_collision.m;p++) F(check_collision(p))+=collision_force_derivative(p)*V(check_collision(p));
 }

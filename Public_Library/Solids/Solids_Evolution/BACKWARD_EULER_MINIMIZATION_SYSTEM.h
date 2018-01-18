@@ -42,7 +42,7 @@ public:
 
     virtual ~BACKWARD_EULER_MINIMIZATION_SYSTEM();
 
-    void Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const override;
+    void Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF,bool transpose=false) const override;
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV0,const KRYLOV_VECTOR_BASE<T>& BV1) const override;
     T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& BR) const override;
     void Project(KRYLOV_VECTOR_BASE<T>& V) const override;

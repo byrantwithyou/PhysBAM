@@ -36,7 +36,7 @@ public:
 
     virtual ~ARTICULATED_SYSTEM();
 
-    void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const override;
+    void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result,bool transpose=false) const override;
     void Gather(const ARRAY_VIEW<const TWIST<TV>,JOINT_ID> x,ARRAY_VIEW<TWIST<TV> > y) const;
     void Inverse_Mass(ARRAY_VIEW<TWIST<TV> > x) const;
     void Scatter(const ARRAY_VIEW<const TWIST<TV> > x,ARRAY_VIEW<TWIST<TV>,JOINT_ID> y) const;

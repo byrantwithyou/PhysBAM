@@ -486,7 +486,7 @@ Potential_Energy(const T time) const
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV,int d> void FINITE_VOLUME<TV,d>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> VV,ARRAY_VIEW<TV> F,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> VV,ARRAY_VIEW<TV> F,const T time,bool transpose) const
 {
     if(node_stiffness && edge_stiffness){
         for(FORCE_ITERATOR iterator(force_particles);iterator.Valid();iterator.Next()){int p=iterator.Data();

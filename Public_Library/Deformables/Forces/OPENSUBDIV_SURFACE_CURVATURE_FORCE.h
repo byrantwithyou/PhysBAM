@@ -47,7 +47,7 @@ public:
 //#####################################################################
     void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const override;
     void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const override;
-    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const override;
+    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time,bool transpose=false) const override;
     void Initialize_CFL(ARRAY_VIEW<typename DEFORMABLES_FORCES<TV>::FREQUENCY_DATA> frequency) override;
     T CFL_Strain_Rate() const override;
     void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const override;

@@ -32,7 +32,7 @@ Compute(int axis,T scale_input)
 // Function Multiply
 //#####################################################################
 template<class TV> void LEVELSET_VISCOSITY_UNIFORM_SYSTEM<TV>::
-Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
+Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result,bool transpose) const
 {
     const VECTOR_T& vx=debug_cast<const VECTOR_T&>(x);
     VECTOR_T& vr=debug_cast<VECTOR_T&>(result);

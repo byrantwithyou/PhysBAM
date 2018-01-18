@@ -90,7 +90,7 @@ public:
     void Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> aggregate,const T time) const override;
     void Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VIEW<TV> F,const T time) const override;
     void Enforce_Definiteness(const bool enforce_definiteness_input) override;
-    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const override;
+    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time,bool transpose=false) const override;
     void Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency) override;
     T CFL_Strain_Rate() const override;
     // asynchronous

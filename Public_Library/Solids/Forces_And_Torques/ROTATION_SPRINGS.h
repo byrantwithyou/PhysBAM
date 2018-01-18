@@ -48,7 +48,7 @@ public:
     void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const override {}
     void Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> rigid_frequency)
         override {} // TODO: write correct CFL
-    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const override {PHYSBAM_NOT_IMPLEMENTED();}
+    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time,bool transpose=false) const override {PHYSBAM_NOT_IMPLEMENTED();}
     void Enforce_Definiteness(const bool enforce_definiteness_input) override {}
     T CFL_Strain_Rate() const override {return FLT_MAX;}
 

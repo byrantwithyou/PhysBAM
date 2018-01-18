@@ -601,7 +601,7 @@ Add_Raw_Velocity_Dependent_Forces_First_Half(ARRAY<TRIPLE<int,int,T> >& data) co
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void LEVELSET_VOLUME_COLLISIONS<TV>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time,bool transpose) const
 {
     for(int pp=0;pp<overlapping_particles.m;pp++){
         const VECTOR<int,2*TV::m+2>& n=overlapping_particles(pp);

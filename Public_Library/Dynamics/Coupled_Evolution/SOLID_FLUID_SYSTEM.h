@@ -62,7 +62,7 @@ public:
 
 //#####################################################################
     // void Print_Matrix(VECTOR_T& V,VECTOR_T& F);
-    void Multiply(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& F) const override;
+    void Multiply(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& F,bool transpose=false) const override;
     void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& V) const override;
     void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& R) const override;  // solve MR=V
     void Project(KRYLOV_VECTOR_BASE<T>& V) const override;

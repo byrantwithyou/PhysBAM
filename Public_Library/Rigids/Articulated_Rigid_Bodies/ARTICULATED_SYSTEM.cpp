@@ -102,7 +102,7 @@ Scatter(const ARRAY_VIEW<const TWIST<TV> > x,ARRAY_VIEW<TWIST<TV>,JOINT_ID> y) c
 // Function Multiply
 //#####################################################################
 template<class TV> void ARTICULATED_SYSTEM<TV>::
-Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
+Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result,bool transpose) const
 {
     ARRAY<TWIST<TV>,JOINT_ID>& twist=debug_cast<ARTICULATED_VECTOR<TV>&>(result).v;
     const ARRAY<TWIST<TV>,JOINT_ID>& wrench=debug_cast<const ARTICULATED_VECTOR<TV>&>(x).v;

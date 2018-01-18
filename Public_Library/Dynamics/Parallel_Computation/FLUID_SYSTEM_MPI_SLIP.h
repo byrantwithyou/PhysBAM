@@ -72,7 +72,7 @@ public:
         ARRAY<int>& coupled_deformable_particle_indices_input,
         GENERALIZED_VELOCITY<TV>& solid_velocity_input);
 
-    void Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const override;
+    void Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF,bool transpose=false) const override;
     void Apply(const VECTOR_T& V,ARRAY<T>& result_dual_cells_size_vector) const;
 
     void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& x) const override // only nullspace stuff for fluids - leave out for now

@@ -103,7 +103,7 @@ public:
     virtual void Set_RHS(VECTOR_T& rhs,std::function<TV(const TV& X,int color)> body_force,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >* u,bool analytic_velocity_correction);
     void Add_Polymer_Stress_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> >& polymer_stress,T dt);
     void Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const;
-    void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const;
+    void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result,bool transpose=false) const;
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const;
     T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const;
     void Project(KRYLOV_VECTOR_BASE<T>& x) const;

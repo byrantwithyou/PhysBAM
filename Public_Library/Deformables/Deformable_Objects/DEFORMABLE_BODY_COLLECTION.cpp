@@ -345,11 +345,11 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<TV> F_full,
 // Function Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<TV> F_full,const T time) const
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<TV> F_full,const T time,bool transpose) const
 {
     assert(V_full.Size()==particles.Size() && F_full.Size()==particles.Size());
     for(int k=0;k<deformables_forces.m;k++)
-        deformables_forces(k)->Add_Implicit_Velocity_Independent_Forces(V_full,F_full,time);
+        deformables_forces(k)->Add_Implicit_Velocity_Independent_Forces(V_full,F_full,time,transpose);
 }
 //#####################################################################
 // Function Add_Force

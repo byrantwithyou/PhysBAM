@@ -27,7 +27,7 @@ public:
         PHYSBAM_FATAL_ERROR();
     }
 
-    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const override
+    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time,bool transpose=false) const override
     {
         PHYSBAM_FATAL_ERROR();
     }

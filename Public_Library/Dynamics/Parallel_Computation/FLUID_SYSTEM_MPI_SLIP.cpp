@@ -66,7 +66,7 @@ FLUID_SYSTEM_MPI_SLIP(const bool use_preconditioner_input,const SPARSE_MATRIX_FL
 // Function Multiply
 //#####################################################################
 template<class TV> void FLUID_SYSTEM_MPI_SLIP<TV>::
-Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
+Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF,bool transpose) const
 {
     const KRYLOV_VECTOR_T& V=debug_cast<const KRYLOV_VECTOR_T&>(BV);KRYLOV_VECTOR_T& F=debug_cast<KRYLOV_VECTOR_T&>(BF);
     // get x values from solid

@@ -101,7 +101,7 @@ Print_Matrix(VECTOR_T& V,VECTOR_T& F)
 // Function Multiply
 //#####################################################################
 template<class TV,class T_MATRIX> void SOLID_FLUID_SYSTEM<TV,T_MATRIX>::
-Multiply(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bF) const
+Multiply(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bF,bool transpose) const
 {
     const VECTOR_T& V=debug_cast<const VECTOR_T&>(bV);VECTOR_T& F=debug_cast<VECTOR_T&>(bF);
     solid_system.Force(V.solid_velocity,F.solid_velocity);
