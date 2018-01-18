@@ -75,6 +75,7 @@ public:
     template<int d> void Fill_Uniform(SYMMETRIC_MATRIX<T,d>& m,const T a,const T b);
     template<int d> void Fill_Uniform(UPPER_TRIANGULAR_MATRIX<T,d>& m,const T a,const T b);
     template<class TV> void Fill_Uniform(TWIST<TV>& m,const T a,const T b);
+    template<class TV> void Fill_Uniform(FRAME<TV>& m,const T a,const T b);
     T Get_Gaussian();
     template<class TV> TV Get_Vector_In_Unit_Sphere();
     template<class TV> TV Get_Direction();

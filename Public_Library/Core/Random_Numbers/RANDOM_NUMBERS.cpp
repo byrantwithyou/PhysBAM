@@ -124,6 +124,14 @@ Fill_Uniform(TWIST<TV>& m,const T a,const T b)
     Fill_Uniform(m.angular,a,b);
 }
 //#####################################################################
+// Function Fill_Uniform
+//#####################################################################
+template<class T> template<class TV> void RANDOM_NUMBERS<T>::
+Fill_Uniform(FRAME<TV>& m,const T a,const T b)
+{
+    m=Get_Frame(TV()+a,TV()+b);
+}
+//#####################################################################
 // Function Get_Uniform_Vector
 //#####################################################################
 template<class T> template<class TV> TV RANDOM_NUMBERS<T>::
@@ -213,7 +221,7 @@ template<class T> template<class TV> TWIST<TV> RANDOM_NUMBERS<T>::
 Get_Twist(const T& a)
 {
     TWIST<TV> tw;
-    tw.Set_Vector(Get_Uniform_Vector<T,TWIST<TV>::m>(-a,a));
+    Fill_Uniform(tw,-a,a);
     return tw;
 }
 //#####################################################################
@@ -223,7 +231,8 @@ Get_Twist(const T& a)
     template VECTOR<T,d> RANDOM_NUMBERS<T>::Get_Uniform_Vector<VECTOR<T,d> >(RANGE<VECTOR<T,d> > const&); \
     template VECTOR<T,d> RANDOM_NUMBERS<T>::Get_Vector_In_Unit_Sphere<VECTOR<T,d> >(); \
     template ROTATION<VECTOR<T,d> > RANDOM_NUMBERS<T>::Get_Rotation<VECTOR<T,d> >(); \
-    template void RANDOM_NUMBERS<T>::Fill_Uniform<VECTOR<T,d> >(TWIST<VECTOR<T,d> >&,T,T);
+    template void RANDOM_NUMBERS<T>::Fill_Uniform<VECTOR<T,d> >(TWIST<VECTOR<T,d> >&,T,T);\
+    template void RANDOM_NUMBERS<T>::Fill_Uniform<VECTOR<T,d> >(FRAME<VECTOR<T,d> >&,T,T);
 #define INSTANTIATION_HELPER_V23(T,d) \
     template void RANDOM_NUMBERS<T>::Fill_Uniform<d>(DIAGONAL_MATRIX<T,d>&,T,T); \
     template void RANDOM_NUMBERS<T>::Fill_Uniform<d>(SYMMETRIC_MATRIX<T,d>&,T,T); \
