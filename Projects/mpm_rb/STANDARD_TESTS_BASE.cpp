@@ -180,7 +180,7 @@ template<class TV> STANDARD_TESTS_BASE<TV>::
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Seed_Particles_Poisson(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
-    std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,T particles_per_cell)
+    std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,T particles_per_cell,const char* name)
 {
     POISSON_DISK<TV> poisson_disk(1);
     ARRAY<TV> X;
@@ -189,31 +189,35 @@ Seed_Particles_Poisson(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> 
 
     T volume=grid.dX.Product()/particles_per_cell;
     T mass=density*volume;
+    LOG::printf("MPM OBJECT %s BEGIN %d\n",name,particles.number);
     for(int i=0;i<X.m;i++)
         Add_Particle(X(i),V,dV,mass,volume);
+    LOG::printf("MPM OBJECT %s END %d\n",name,particles.number);
 }
 //#####################################################################
 // Function Seed_Particles
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Seed_Particles_Uniform(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
-    std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,const GRID<TV>& seed_grid)
+    std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,const GRID<TV>& seed_grid,const char* name)
 {
     T volume=seed_grid.dX.Product();
     T mass=density*volume;
+    LOG::printf("MPM OBJECT %s BEGIN %d\n",name,particles.number);
     for(CELL_ITERATOR<TV> it(seed_grid);it.Valid();it.Next()){
         TV X=it.Location();
         if(object.Lazy_Inside(X))
             Add_Particle(X,V,dV,mass,volume);}
+    LOG::printf("MPM OBJECT %s END %d\n",name,particles.number);
 }
 //#####################################################################
 // Function Seed_Particles
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Seed_Particles(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
-    std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,T particles_per_cell)
+    std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,T particles_per_cell,const char* name)
 {
-    if(!regular_seeding) return Seed_Particles_Poisson(object,V,dV,density,particles_per_cell);
+    if(!regular_seeding) return Seed_Particles_Poisson(object,V,dV,density,particles_per_cell,name);
 
     object.Update_Box();
     RANGE<TV_INT> range=grid.Clamp_To_Cell(object.Box(),3).Intersect(grid.Cell_Indices());
@@ -221,7 +225,7 @@ Seed_Particles(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
     TV UB=grid.Node(range.max_corner);
     T scale=pow<1,TV::m>((T)particles_per_cell);
     GRID<TV> seed_grid(range.Edge_Lengths()*scale,RANGE<TV>(LB,UB),true);
-    Seed_Particles_Uniform(object,V,dV,density,seed_grid);
+    Seed_Particles_Uniform(object,V,dV,density,seed_grid,name);
 }
 //#####################################################################
 // Function Perturb

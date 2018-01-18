@@ -30,6 +30,7 @@ typedef double T;
 typedef VECTOR<T,3> TV;
 typedef VECTOR<T,2> TV2;
 
+HASHTABLE<PAIR<std::string,int>,MPM_PARTICLES<TV>*> mpm_particles_cache;
 HASHTABLE<PAIR<std::string,int>,RIGID_BODY_COLLECTION<TV>*> rigid_body_collection_cache;
 HASHTABLE<PAIR<std::string,int>,DEFORMABLE_BODY_COLLECTION<TV>*> deformable_geometry_collection_cache;
 HASHTABLE<std::string,TRIANGULATED_SURFACE<T>*> saved_surface;
@@ -143,20 +144,26 @@ void Emit_Rigid_Body(std::ofstream& fout,const HASHTABLE<std::string,std::string
     else Emit_Smooth_Surface(fout,ts,options);
 }
 
+MPM_PARTICLES<TV>& Load_MPM_Particles(const std::string& location,int frame)
+{
+    MPM_PARTICLES<TV>*& mpm_particles=mpm_particles_cache.Get_Or_Insert(PAIR<std::string,int>(location,frame));
+    if(!mpm_particles){
+        std::string filename=location+"/%d/mpm_particles";
+        std::string frame_filename=Get_Frame_Filename(filename,frame);
+        mpm_particles=new MPM_PARTICLES<TV>();
+        Read_From_File(STREAM_TYPE(RW()),frame_filename,*mpm_particles);}
+    return *mpm_particles;
+}
+
 void Emit_MPM_Particles(std::ofstream& fout,const HASHTABLE<std::string,std::string>& options,int frame)
 {
-    MPM_PARTICLES<TV> particles;
-    
-    std::string filename=options.Get("location")+"/%d/mpm_particles";
-    std::string frame_filename=Get_Frame_Filename(filename,frame);
-        
-    std::istream* input_file=Safe_Open_Input(frame_filename);
-    TYPED_ISTREAM typed_input(*input_file,STREAM_TYPE(RW()));
-    Read_Binary(typed_input,particles);
-    delete input_file;
-
+    MPM_PARTICLES<TV>& particles=Load_MPM_Particles(options.Get("location"),frame);
     T radius=atof(options.Get("radius").c_str());
-    for(int p=0;p<particles.number;p++){
+    int begin=atoi(options.Get("begin").c_str()),end=atoi(options.Get("end").c_str());
+    PHYSBAM_ASSERT(begin>=0 && begin<particles.number);
+    PHYSBAM_ASSERT(end>=0 && end<=particles.number);
+
+    for(int p=begin;p<end;p++){
         fout<<"sphere{ ";
         Emit_Vector(fout,particles.X(p));
         fout<<", "<<radius<<"\n"<<options.Get("texture")<<" }\n";}
