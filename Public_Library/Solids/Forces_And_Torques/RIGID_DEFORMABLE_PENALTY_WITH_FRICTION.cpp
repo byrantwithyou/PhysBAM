@@ -77,12 +77,25 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,
         const RIGID_BODY<TV>& rb=rigid_body_collection.Rigid_Body(c.b);
         if(c.active){
             TV j=stiffness_coefficient*(particles.X(c.p)-c.Y);
-            TV dZ=V(c.p),dL=rigid_V(c.b).linear;
-            auto dA=rigid_V(c.b).angular;
-            TV dY=c.dYdZ*dZ+c.dYdL*dL+c.dYdA*dA;
-            TV dj=stiffness_coefficient*(dZ-dY);
-            F(c.p)-=dj;
-            rigid_F+=rb.Gather(TWIST<TV>(dj,(dY-dL).Cross(j)),c.Y);}}
+            if(rb.Has_Infinite_Inertia()){
+                if(transpose)
+                    F(c.p)+=(c.dYdZ-1).Transpose_Times(stiffness_coefficient*V(c.p));
+                else F(c.p)+=(c.dYdZ-1)*(stiffness_coefficient*V(c.p));}
+            else{
+                if(transpose){
+                    TWIST<TV> tw=rb.Scatter(rigid_V(c.b),c.Y);
+                    TV dj=tw.linear-V(c.p),cp=j.Cross(tw.angular);
+                    TV dZ=stiffness_coefficient*dj,dY=cp-dZ;
+                    rigid_F(c.b).linear+=c.dYdL.Transpose_Times(dY)-cp;
+                    rigid_F(c.b).angular+=c.dYdA.Transpose_Times(dY);
+                    F(c.p)+=dZ+c.dYdZ.Transpose_Times(dY);}
+                else{
+                    TV dZ=V(c.p),dL=rigid_V(c.b).linear;
+                    auto dA=rigid_V(c.b).angular;
+                    TV dY=c.dYdZ*dZ+c.dYdL*dL+c.dYdA*dA;
+                    TV dj=stiffness_coefficient*(dZ-dY);
+                    F(c.p)-=dj;
+                    rigid_F(c.b)+=rb.Gather(TWIST<TV>(dj,(dY-dL).Cross(j)),c.Y);}}}}
 }
 //#####################################################################
 // Function Potential_Energy
