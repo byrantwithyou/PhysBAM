@@ -37,6 +37,7 @@ struct NEWTONS_METHOD
     bool fixed_tolerance;
     bool finish_before_indefiniteness;
     int iterations_used;
+    bool use_gradient_magnitude_objective=false;
 
     NEWTONS_METHOD()
         :use_golden_section_search(false),use_wolfe_search(true),use_backtracking(false),
@@ -52,8 +53,8 @@ struct NEWTONS_METHOD
 
     // Minimize F(x)
     bool Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYSTEM_BASE<T>& sys,KRYLOV_VECTOR_BASE<T>& x,ARRAY<KRYLOV_VECTOR_BASE<T>*>& av);
-    void Make_Downhill_Direction(const KRYLOV_SYSTEM_BASE<T>& sys,KRYLOV_VECTOR_BASE<T>& dx,const KRYLOV_VECTOR_BASE<T>& grad,T norm_grad);
-    T Line_Search(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYSTEM_BASE<T>& sys,const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& dx,KRYLOV_VECTOR_BASE<T>& tmp,KRYLOV_VECTOR_BASE<T>& tmp2);
+    void Make_Downhill_Direction(const KRYLOV_SYSTEM_BASE<T>& sys,KRYLOV_VECTOR_BASE<T>& dx,const KRYLOV_VECTOR_BASE<T>& grad,T norm_grad,KRYLOV_VECTOR_BASE<T>& tmp);
+    T Line_Search(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYSTEM_BASE<T>& sys,const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& dx,KRYLOV_VECTOR_BASE<T>& tmp,KRYLOV_VECTOR_BASE<T>& tmp2,KRYLOV_VECTOR_BASE<T>& tmp3);
     void Make_Vanilla_Newton()
     {
         use_golden_section_search=false;
