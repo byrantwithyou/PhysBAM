@@ -101,7 +101,8 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
     if(asymmetric_system){
         newtons_method.use_gmres=true;
         newtons_method.use_cg=false;
-        newtons_method.Make_Vanilla_Newton();}
+        if(!newtons_method.use_gradient_magnitude_objective)
+            newtons_method.Make_Vanilla_Newton();}
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
     bool converged=newtons_method.Newtons_Method(minimization_objective,minimization_system,dv,av);
     av.Delete_Pointers_And_Clean_Memory();

@@ -79,6 +79,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-threads",&threads,"threads","Number of threads");
     parse_args.Add("-rd_stiffness",&rd_penalty_stiffness,&use_rd_penalty,"stiffness","rigid-deformable penalty force stiffness");
     parse_args.Add("-rd_friction",&rd_penalty_friction,"friction","rigid-deformable penalty force friction");
+    parse_args.Add("-grad_ls",&backward_euler_evolution->newtons_method.use_gradient_magnitude_objective,"do line searches on norm of gradient");
     parse_args.Parse(true);
 
 #ifdef USE_OPENMP
