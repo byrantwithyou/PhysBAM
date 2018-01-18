@@ -213,7 +213,7 @@ Initialize()
             solid_body_collection.rigid_body_collection.Add_Force(rg);
 
             SPHERE<TV> sphere(TV(.7,.5,0.5)*m,.4*m);
-            Seed_Particles(sphere,0,0,density,particles_per_cell);
+            Seed_Particles_With_Marked_Surface(sphere,0,0,density,particles_per_cell,4,"sphere");
             Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
             Add_Gravity(g);
         } break;
