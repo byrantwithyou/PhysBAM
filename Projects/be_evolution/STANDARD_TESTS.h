@@ -223,7 +223,7 @@ public:
         use_penalty_collisions(false),use_constraint_collisions(true),
         penalty_collisions_stiffness((T)1e4),penalty_collisions_separation((T)1e-4),
         penalty_collisions_length(1),enforce_definiteness(false),density(pow<TV::m>(10)),
-        use_penalty_self_collisions(true),use_distance_based_self_collisions(false),rod_length(4),rod_radius(.3),attachment_length(.6),save_dt(0),self_collide_surface_only(false),
+        use_penalty_self_collisions(true),use_distance_based_self_collisions(false),rod_length(4),rod_radius(.3),attachment_length(.6),save_dt(1),self_collide_surface_only(false),
         collision_height(5),collision_speed(4)
     {
         parse_args.Add("-with_bunny",&with_bunny,"use bunny");
