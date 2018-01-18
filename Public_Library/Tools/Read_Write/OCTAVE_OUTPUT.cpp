@@ -58,8 +58,10 @@ Write(const char* name,const MATRIX_BASE<T2,T_MATRIX>& m)
 // Function Write
 //#####################################################################
 template<class T> void OCTAVE_OUTPUT<T>::
-Write(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,KRYLOV_VECTOR_BASE<T>& l,KRYLOV_VECTOR_BASE<T>& r)
+Write(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,const KRYLOV_VECTOR_BASE<T>& x)
 {
+    KRYLOV_VECTOR_BASE<T>& l=*x.Clone_Default();
+    KRYLOV_VECTOR_BASE<T>& r=*x.Clone_Default();
     int b=r.Raw_Size();
     Begin_Sparse_Matrix(name,l.Raw_Size(),b);
     l*=0;
@@ -71,6 +73,8 @@ Write(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,KRYLOV_VECTOR_BASE<T>& l,K
         Append_Sparse_Column(l);}
 
     End_Sparse_Matrix();
+    delete &l;
+    delete &r;
 }
 //#####################################################################
 // Function Write
@@ -86,8 +90,9 @@ Write(const char* name,const KRYLOV_VECTOR_BASE<T>& v)
 // Function Write_Projection
 //#####################################################################
 template<class T> void OCTAVE_OUTPUT<T>::
-Write_Projection(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,KRYLOV_VECTOR_BASE<T>& r)
+Write_Projection(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,const KRYLOV_VECTOR_BASE<T>& x)
 {
+    KRYLOV_VECTOR_BASE<T>& r=*x.Clone_Default();
     int b=r.Raw_Size();
     Begin_Sparse_Matrix(name,r.Raw_Size(),b);
     r*=0;
@@ -98,13 +103,16 @@ Write_Projection(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,KRYLOV_VECTOR_B
         Append_Sparse_Column(r);}
 
     End_Sparse_Matrix();
+    delete &r;
 }
 //#####################################################################
 // Function Write_Preconditioner
 //#####################################################################
 template<class T> void OCTAVE_OUTPUT<T>::
-Write_Preconditioner(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& s)
+Write_Preconditioner(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,const KRYLOV_VECTOR_BASE<T>& x)
 {
+    KRYLOV_VECTOR_BASE<T>& r=*x.Clone_Default();
+    KRYLOV_VECTOR_BASE<T>& s=*x.Clone_Default();
     int b=r.Raw_Size();
     Begin_Sparse_Matrix(name,r.Raw_Size(),b);
     r*=0;
@@ -114,13 +122,17 @@ Write_Preconditioner(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,KRYLOV_VECT
         Append_Sparse_Column(m.Precondition(r,s));}
 
     End_Sparse_Matrix();
+    delete &r;
+    delete &s;
 }
 //#####################################################################
 // Function Write_Preconditioner
 //#####################################################################
 template<class T> void OCTAVE_OUTPUT<T>::
-Write_Inner_Product(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& s)
+Write_Inner_Product(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,const KRYLOV_VECTOR_BASE<T>& x)
 {
+    KRYLOV_VECTOR_BASE<T>& r=*x.Clone_Default();
+    KRYLOV_VECTOR_BASE<T>& s=*x.Clone_Default();
     int b=r.Raw_Size();
     Begin_Sparse_Matrix(name,b,b);
     r*=0;
@@ -138,6 +150,8 @@ Write_Inner_Product(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,KRYLOV_VECTO
         r.Raw_Get(i)=0;}
 
     End_Sparse_Matrix();
+    delete &r;
+    delete &s;
 }
 //#####################################################################
 // Function Write

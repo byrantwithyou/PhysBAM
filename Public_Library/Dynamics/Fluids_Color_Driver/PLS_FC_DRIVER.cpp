@@ -415,10 +415,9 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
 
     if(example.test_system) iss.Test_System(sol);
     if(example.dump_matrix){
-        KRYLOV_SOLVER<T>::Ensure_Size(vectors,rhs,2);
-        OCTAVE_OUTPUT<T>(LOG::sprintf("M-%d.txt",solve_id).c_str()).Write("M",iss,*vectors(0),*vectors(1));
-        OCTAVE_OUTPUT<T>(LOG::sprintf("Z-%d.txt",solve_id).c_str()).Write_Preconditioner("Z",iss,*vectors(0),*vectors(1));
-        OCTAVE_OUTPUT<T>(LOG::sprintf("P-%d.txt",solve_id).c_str()).Write_Projection("P",iss,*vectors(0));
+        OCTAVE_OUTPUT<T>(LOG::sprintf("M-%d.txt",solve_id).c_str()).Write("M",iss,rhs);
+        OCTAVE_OUTPUT<T>(LOG::sprintf("Z-%d.txt",solve_id).c_str()).Write_Preconditioner("Z",iss,rhs);
+        OCTAVE_OUTPUT<T>(LOG::sprintf("P-%d.txt",solve_id).c_str()).Write_Projection("P",iss,rhs);
         OCTAVE_OUTPUT<T>(LOG::sprintf("b-%d.txt",solve_id).c_str()).Write("b",rhs);}
     if(example.sparse_dump_matrix){
         SPARSE_MATRIX_FLAT_MXN<T> M;

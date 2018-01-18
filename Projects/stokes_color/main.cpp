@@ -309,8 +309,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     tr=rhs;
 
     if(dump_matrix){
-        KRYLOV_SOLVER<T>::Ensure_Size(vectors,rhs,2);
-        OCTAVE_OUTPUT<T>("M.txt").Write("M",iss,*vectors(0),*vectors(1));
+        OCTAVE_OUTPUT<T>("M.txt").Write("M",iss,rhs);
         OCTAVE_OUTPUT<T>("b.txt").Write("b",rhs);}
 
 //    solver->print_residuals=true;

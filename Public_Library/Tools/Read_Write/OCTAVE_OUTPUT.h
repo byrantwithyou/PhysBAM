@@ -58,11 +58,11 @@ public:
     template<class T2,class T_VECTOR> void Write(const char* name,const ARRAY_BASE<T2,T_VECTOR>& v);
     template<class T2,class T_MATRIX> void Write(const char* name,const MATRIX_BASE<T2,T_MATRIX>& m);
     void Write(const char* name,T scalar);
-    void Write(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,KRYLOV_VECTOR_BASE<T>& l,KRYLOV_VECTOR_BASE<T>& r);
+    void Write(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,const KRYLOV_VECTOR_BASE<T>& x);
     void Write(const char* name,const KRYLOV_VECTOR_BASE<T>& v);
-    void Write_Projection(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,KRYLOV_VECTOR_BASE<T>& r);
-    void Write_Preconditioner(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& s);
-    void Write_Inner_Product(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& s);
+    void Write_Projection(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,const KRYLOV_VECTOR_BASE<T>& x);
+    void Write_Preconditioner(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,const KRYLOV_VECTOR_BASE<T>& x);
+    void Write_Inner_Product(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,const KRYLOV_VECTOR_BASE<T>& x);
     void Write(const char* name,const SPARSE_MATRIX_FLAT_MXN<T>& m);
     void Write_Transpose(const char* name,const SPARSE_MATRIX_FLAT_MXN<T>& m);
     void Write(const char* name,const MATRIX_MXN<T>& m);

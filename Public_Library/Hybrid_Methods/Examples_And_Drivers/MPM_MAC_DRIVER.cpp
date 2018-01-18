@@ -1060,11 +1060,10 @@ Pressure_Projection()
         example.projection_system.Test();}
     if(example.print_matrix){
         LOG::cout<<"solve id: "<<solve_id<<std::endl;
-        KRYLOV_SOLVER<T>::Ensure_Size(example.av,example.sol,2);
         const MPM_PROJECTION_SYSTEM<TV>& system=example.projection_system;
-        OCTAVE_OUTPUT<T>(LOG::sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,*example.av(0),*example.av(1));
-        OCTAVE_OUTPUT<T>(LOG::sprintf("C-%i.txt",solve_id).c_str()).Write_Preconditioner("C",system,*example.av(0),*example.av(1));
-        OCTAVE_OUTPUT<T>(LOG::sprintf("P-%i.txt",solve_id).c_str()).Write_Projection("P",system,*example.av(0));
+        OCTAVE_OUTPUT<T>(LOG::sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,example.rhs);
+        OCTAVE_OUTPUT<T>(LOG::sprintf("C-%i.txt",solve_id).c_str()).Write_Preconditioner("C",system,example.rhs);
+        OCTAVE_OUTPUT<T>(LOG::sprintf("P-%i.txt",solve_id).c_str()).Write_Projection("P",system,example.rhs);
         OCTAVE_OUTPUT<T>(LOG::sprintf("b-%i.txt",solve_id).c_str()).Write("b",example.rhs);
         OCTAVE_OUTPUT<T>(LOG::sprintf("G-%i.txt",solve_id).c_str()).Write("G",example.projection_system.gradient);}
 
@@ -1557,9 +1556,8 @@ Apply_Viscosity()
         if(example.test_system) sys.Test_System(sol);
         if(example.print_matrix){
             LOG::cout<<"solve id: "<<solve_id<<std::endl;
-            KRYLOV_SOLVER<T>::Ensure_Size(av,sol,2);
-            OCTAVE_OUTPUT<T>(LOG::sprintf("visc-M-%i.txt",solve_id).c_str()).Write("M",sys,*av(0),*av(1));
-            OCTAVE_OUTPUT<T>(LOG::sprintf("visc-C-%i.txt",solve_id).c_str()).Write_Preconditioner("C",sys,*av(0),*av(1));
+            OCTAVE_OUTPUT<T>(LOG::sprintf("visc-M-%i.txt",solve_id).c_str()).Write("M",sys,rhs);
+            OCTAVE_OUTPUT<T>(LOG::sprintf("visc-C-%i.txt",solve_id).c_str()).Write_Preconditioner("C",sys,rhs);
             OCTAVE_OUTPUT<T>(LOG::sprintf("visc-b-%i.txt",solve_id).c_str()).Write("b",rhs);}
         CONJUGATE_GRADIENT<T> cg;
         cg.finish_before_indefiniteness=true;

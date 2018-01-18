@@ -467,10 +467,9 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
             if(print_matrix_rhs_and_solution) OCTAVE_OUTPUT<T>(LOG::sprintf("bo-%i.txt",solve_id).c_str()).Write("bo",B_coupled);
             if(!solver->Solve(solid_fluid_system,V_coupled,B_coupled,coupled_vectors,solids_parameters.implicit_solve_parameters.cg_tolerance,1,solids_parameters.implicit_solve_parameters.cg_iterations))
                 PHYSBAM_DEBUG_WRITE_SUBSTEP("FAILED CONVERGENCE",1);
-            KRYLOV_SOLVER<T>::Ensure_Size(coupled_vectors,V_coupled,2);
             if(print_matrix_rhs_and_solution){
                 OCTAVE_OUTPUT<T>(LOG::sprintf("xo-%i.txt",solve_id).c_str()).Write("xo",V_coupled);
-                OCTAVE_OUTPUT<T>(LOG::sprintf("matrixo-%i.txt",solve_id).c_str()).Write("MO",solid_fluid_system,*coupled_vectors(0),*coupled_vectors(1));}}
+                OCTAVE_OUTPUT<T>(LOG::sprintf("matrixo-%i.txt",solve_id).c_str()).Write("MO",solid_fluid_system,V_coupled);}}
         else{
             static CONJUGATE_GRADIENT<T> cg;
             static CONJUGATE_RESIDUAL<T> cr;

@@ -225,9 +225,8 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
     static int solve_id=-1;solve_id++;
     if(print_matrix){
         LOG::cout<<"solve id "<<solve_id<<std::endl;
-        KRYLOV_SOLVER<T>::Ensure_Size(krylov_vectors,V,2);
-        OCTAVE_OUTPUT<T>(LOG::sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,*krylov_vectors(0),*krylov_vectors(1));
-        OCTAVE_OUTPUT<T>(LOG::sprintf("P-%i.txt",solve_id).c_str()).Write_Projection("P",system,*krylov_vectors(0));
+        OCTAVE_OUTPUT<T>(LOG::sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,V);
+        OCTAVE_OUTPUT<T>(LOG::sprintf("P-%i.txt",solve_id).c_str()).Write_Projection("P",system,V);
         OCTAVE_OUTPUT<T>(LOG::sprintf("b-%i.txt",solve_id).c_str()).Write("b",B);}
 
     if(solids_parameters.implicit_solve_parameters.test_system) system.Test_System(V);

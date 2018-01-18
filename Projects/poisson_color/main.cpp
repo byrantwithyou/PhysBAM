@@ -265,7 +265,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_POISSON_TEST<TV>& at,int max_iter,boo
                 *array(0)*=1/static_cast<INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>*>(array(0))->Max_Abs();
                 Dump_Vector<T,TV>(ips,*static_cast<INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>*>(array(0)),"extra null mode");}}}
     
-    if(dump_matrix) OCTAVE_OUTPUT<T>("M.txt").Write("M",ips,*vectors(0),*vectors(1));
+    if(dump_matrix) OCTAVE_OUTPUT<T>("M.txt").Write("M",ips,*vectors(0));
     vectors.Delete_Pointers_And_Clean_Memory();
 }
 

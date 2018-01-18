@@ -614,20 +614,19 @@ Apply_Poststabilization_With_CG(T dt,bool correct_position,bool test_system,bool
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
     Resize_System_Vector(rhs);
     Resize_System_Vector(x);
-    KRYLOV_SOLVER<T>::Ensure_Size(vectors,x,2);
 
     if(test_system) system.Test_System(x);
     if(print_matrix){
         LOG::cout<<"arb solve id "<<solve_id<<std::endl;
-        OCTAVE_OUTPUT<T>(LOG::sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,*vectors(0),*vectors(1));
-        OCTAVE_OUTPUT<T>(LOG::sprintf("P-%i.txt",solve_id).c_str()).Write_Projection("P",system,*vectors(0));}
+        OCTAVE_OUTPUT<T>(LOG::sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,rhs);
+        OCTAVE_OUTPUT<T>(LOG::sprintf("P-%i.txt",solve_id).c_str()).Write_Projection("P",system,rhs);}
 
     {ARTICULATED_SYSTEM<TV> system(debug_cast<ARTICULATED_RIGID_BODY<TV>&>(*this));
     system.break_loops=true;
     system.Initialize();
     if(print_matrix){
-        OCTAVE_OUTPUT<T>(LOG::sprintf("BM-%i.txt",solve_id).c_str()).Write("BM",system,*vectors(0),*vectors(1));
-        OCTAVE_OUTPUT<T>(LOG::sprintf("BP-%i.txt",solve_id).c_str()).Write_Projection("BP",system,*vectors(0));}}
+        OCTAVE_OUTPUT<T>(LOG::sprintf("BM-%i.txt",solve_id).c_str()).Write("BM",system,rhs);
+        OCTAVE_OUTPUT<T>(LOG::sprintf("BP-%i.txt",solve_id).c_str()).Write_Projection("BP",system,rhs);}}
 
     if(correct_position){for(JOINT_ID j(0);j<joint_mesh.Size();j++) if(joint_mesh.Is_Active(j)) rhs.v(j)=-Joint_Error(j)/dt;}
     else{system.Scatter(rigid_body_collection.rigid_body_particles.twist,rhs.v);rhs*=-(T)1;}

@@ -425,15 +425,15 @@ template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
 Print_Matrix(const VECTOR_T& vec) const
 {
     index_map.Print(solve_id);
-    VECTOR_T V(vec),F(vec);
+    VECTOR_T V(vec);
     LOG::cout<<"Printing matrix: "<<std::endl;
     LOG::cout<<V.pressure.m<<" pressures"<<std::endl;
     LOG::cout<<V.lambda.Size()<<" lambdas"<<std::endl;
     LOG::cout<<V.force_coefficients.Size()<<" force coefficients"<<std::endl;
     LOG::cout<<V.viscous_force_coefficients.Size()<<" viscous force coefficients"<<std::endl;
     LOG::cout<<"Solve id: "<<solve_id<<std::endl;
-    OCTAVE_OUTPUT<T>(LOG::sprintf("matrix-%i.txt",solve_id).c_str()).Write("M",*this,V,F);
-    if(use_preconditioner) OCTAVE_OUTPUT<T>(LOG::sprintf("precond-%i.txt",solve_id).c_str()).Write_Preconditioner("P",*this,V,F);
+    OCTAVE_OUTPUT<T>(LOG::sprintf("matrix-%i.txt",solve_id).c_str()).Write("M",*this,V);
+    if(use_preconditioner) OCTAVE_OUTPUT<T>(LOG::sprintf("precond-%i.txt",solve_id).c_str()).Write_Preconditioner("P",*this,V);
 }
 //#####################################################################
 // Function Print_Matrix
