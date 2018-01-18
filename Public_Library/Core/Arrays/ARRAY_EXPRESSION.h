@@ -33,7 +33,7 @@ public:
     OP op;
     INDEX size;
 
-    ARRAY_EXPRESSION(const OP& op,const INDEX& size)
+    ARRAY_EXPRESSION(OP op,const INDEX& size)
         :op(op),size(size)
     {}
 
@@ -68,11 +68,11 @@ public:
 };
 
 template<class OP,class ID> ARRAY_EXPRESSION<OP,ID>
-Make_Array_Expression(const OP& op,const ID& size)
+Make_Array_Expression(OP op,const ID& size)
 {return ARRAY_EXPRESSION<OP,ID>(op,size);}
 
 template<class T0,class T1,class T_ARRAY0,class T_ARRAY1,class ID,class OP> auto
-Array_Expression_Helper(const ARRAY_BASE<T0,T_ARRAY0,ID>& array0,const ARRAY_BASE<T1,T_ARRAY1,ID>& array1,const OP& op,
+Array_Expression_Helper(const ARRAY_BASE<T0,T_ARRAY0,ID>& array0,const ARRAY_BASE<T1,T_ARRAY1,ID>& array1,OP op,
     typename enable_if<!(FIXED_SIZE_VECTOR<T_ARRAY0>::value || FIXED_SIZE_VECTOR<T_ARRAY1>::value),int>::type)
 {
     std::tuple<SAFE_ARRAY_HOLDER<T_ARRAY0>,SAFE_ARRAY_HOLDER<T_ARRAY1> > t(array0.Derived(),array1.Derived());
@@ -80,7 +80,7 @@ Array_Expression_Helper(const ARRAY_BASE<T0,T_ARRAY0,ID>& array0,const ARRAY_BAS
 }
 
 template<class T0,class T1,class T_ARRAY0,class T_ARRAY1,class OP> auto
-Array_Expression_Helper(const ARRAY_BASE<T0,T_ARRAY0,int>& array0,const ARRAY_BASE<T1,T_ARRAY1,int>& array1,const OP& op,
+Array_Expression_Helper(const ARRAY_BASE<T0,T_ARRAY0,int>& array0,const ARRAY_BASE<T1,T_ARRAY1,int>& array1,OP op,
     typename enable_if<FIXED_SIZE_VECTOR<T_ARRAY0>::value || FIXED_SIZE_VECTOR<T_ARRAY1>::value,int>::type)
 {
     static const int size=FIXED_SIZE_VECTOR<T_ARRAY0>::size & FIXED_SIZE_VECTOR<T_ARRAY1>::size;
@@ -92,7 +92,7 @@ Array_Expression_Helper(const ARRAY_BASE<T0,T_ARRAY0,int>& array0,const ARRAY_BA
 }
 
 template<class T,class T_ARRAY,class ID,class OP> auto
-Array_Expression_Helper(const ARRAY_BASE<T,T_ARRAY,ID>& array,const OP& op)
+Array_Expression_Helper(const ARRAY_BASE<T,T_ARRAY,ID>& array,OP op)
 {
     std::tuple<SAFE_ARRAY_HOLDER<T_ARRAY> > t(array.Derived());
     return Make_Array_Expression([=](ID i){return op(std::get<0>(t)(i));},array.Size());
