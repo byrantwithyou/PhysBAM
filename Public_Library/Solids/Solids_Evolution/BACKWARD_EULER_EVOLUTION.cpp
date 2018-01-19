@@ -95,7 +95,10 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
             lf->Lagged_Update_Position_Based_State(time);
 
     newtons_method.require_one_iteration=!minimization_objective.Initial_Guess(dv,newtons_method.tolerance,asymmetric_system);
+
     if(test_diff) minimization_objective.Test_Diff(dv);
+    if(solids_parameters.implicit_solve_parameters.test_system)
+        minimization_system.Test_System(dv,!asymmetric_system);
 
     newtons_method.tolerance*=dt;
     if(asymmetric_system){
