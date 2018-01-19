@@ -142,6 +142,54 @@ Initialize()
             };
         } break;
 
+        case 9:{ // MPM block and static rigid plane
+            T angle=extra_T(0);
+            T vel=extra_T(1);
+            T angle_t=extra_T(2);
+            PHYSBAM_ASSERT(angle>=0 && angle<=pi/2 && angle_t>=0 && angle_t<=pi/2 && vel>=0);
+            ROTATION<TV> Q(angle,TV(0,0,1)),Qn(angle_t,TV(0,1,0));
+            ROTATION<TV> R=Q*Qn;
+            TV n,t,t1;
+            Q.Get_Rotated_Frame(t,n,t1);
+            TV c(.5,.5,.5);
+
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            RANGE<TV> box(TV((T).4,(T).5,(T).4)*m,TV((T).6,(T).7,(T).6)*m);
+            T density=2*unit_rho*scale_mass;
+            Seed_Particles(box,0,0,density,particles_per_cell);
+            for(int i=0;i<particles.number;i++){
+                particles.X(i)=R.Rotate(particles.X(i)-c)+c;
+                particles.V(i)=-t*vel;}
+
+            Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
+            TV g=m/(s*s)*TV(0,-1.8,0);
+            Add_Gravity(g);
+            RIGID_BODY<TV>& rigid_body=tests.Add_Analytic_Box(TV(2,2,2));
+            rigid_body.Frame().t=(c-R.Rotate(TV(0,1,0)))*m;
+            rigid_body.Frame().r=R;
+            rigid_body.is_static=true;
+
+            // Dump solution to viewer
+            write_output_files=[=](int frame)
+            {
+                T time=frame*frame_dt;
+                T mu=rd_penalty_friction;
+                T acc=g.y*(cos(angle)*mu-sin(angle));
+                if(vel+time*acc>0) // sliding
+                {
+                    T dist=(T).5*acc*sqr(time)+time*vel;
+                    Add_Debug_Particle(c-t*dist,VECTOR<T,3>(0,1,0));
+                }
+                else // stopped
+                {
+                    T stop_time=-vel/acc;
+                    T dist=(T).5*acc*sqr(stop_time)+stop_time*vel;
+                    Add_Debug_Particle(c-t*dist,VECTOR<T,3>(1,1,0));
+                }
+                Add_Debug_Object(VECTOR<TV,2>(c-t,c+t),VECTOR<T,3>(1,0,0));
+            };
+        } break;
+
             // Diff test for IO-MPM penalty force
             // ./mpm_rb -3d 201 -double -rd_stiffness 1e2 -test_diff
         case 201:{
