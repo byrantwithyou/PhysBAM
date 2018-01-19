@@ -255,7 +255,7 @@ Initialize()
             RIGID_BODY<TV>& sphere=tests.Add_Rigid_Body("sphere",(T)0.2,(T)0);
             sphere.Frame().t=c+0.2*n;
 
-            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            Set_Grid(RANGE<TV>(TV(-2,0,0),TV(1,1,1))*m);
             TV g=m/(s*s)*TV(0,-9.8,0);
             RIGID_BODY<TV>& rigid_body=tests.Add_Analytic_Box(TV(4,2,2));
             rigid_body.Frame().t=(c-Q.Rotate(TV(0,1,0)))*m;
