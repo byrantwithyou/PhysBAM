@@ -223,10 +223,10 @@ Initialize()
             // slipping: ./mpm_rb -3d 72 -double -rd_stiffness 1e1 -max_dt .01 -rd_friction 0.3
         case 72:{
             Set_Grid(RANGE<TV>::Centered_Box()*2*m);
-            RIGID_BODY<TV>& lw=tests.Add_Analytic_Box(TV(0.4,1,1));
+            RIGID_BODY<TV>& lw=tests.Add_Analytic_Box(TV(0.4,8,8));
             lw.Frame().t=TV(-0.2,0.5,0.5);
             lw.is_static=true;
-            RIGID_BODY<TV>& rw=tests.Add_Analytic_Box(TV(0.4,1,1));
+            RIGID_BODY<TV>& rw=tests.Add_Analytic_Box(TV(0.4,8,8));
             rw.Frame().t=TV(1.2,0.5,0.5);
             rw.is_static=true;
 
