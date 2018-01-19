@@ -44,7 +44,7 @@ public:
     int threads=1;
     T rd_penalty_stiffness=0;
     T rd_penalty_friction=0.3;
-    bool use_rd_penalty=false;
+    bool use_rd=false,use_rr=false,use_dd=false,use_di=false;
     RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>* rd_penalty=0;
     RIGID_PENALTY_WITH_FRICTION<TV>* rr_penalty=0;
     IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* di_penalty=0;

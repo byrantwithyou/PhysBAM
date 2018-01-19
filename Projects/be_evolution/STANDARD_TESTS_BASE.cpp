@@ -77,9 +77,13 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-use_tri_col",&solids_parameters.triangle_collision_parameters.perform_self_collision,"use triangle collisions");
     parse_args.Add("-use_vanilla_newton",&use_vanilla_newton,"use triangle collisions");
     parse_args.Add("-threads",&threads,"threads","Number of threads");
-    parse_args.Add("-rd_stiffness",&rd_penalty_stiffness,&use_rd_penalty,"stiffness","rigid-deformable penalty force stiffness");
+    parse_args.Add("-rd_stiffness",&rd_penalty_stiffness,"stiffness","rigid-deformable penalty force stiffness");
     parse_args.Add("-rd_friction",&rd_penalty_friction,"friction","rigid-deformable penalty force friction");
     parse_args.Add("-grad_ls",&backward_euler_evolution->newtons_method.use_gradient_magnitude_objective,"do line searches on norm of gradient");
+    parse_args.Add("-rd",&use_rd,"enable rigid-deformable penalty force friction");
+    parse_args.Add("-dd",&use_dd,"enable deformable-deformable penalty force friction");
+    parse_args.Add("-rr",&use_rr,"enable rigid-rigid penalty force friction");
+    parse_args.Add("-di",&use_di,"enable deformable-object penalty force friction");
     parse_args.Parse(true);
 
 #ifdef USE_OPENMP
@@ -163,23 +167,28 @@ After_Initialize_Bodies()
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_SURFACE;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m>::OBJECT T_OBJECT;
 
-    if(use_rd_penalty && rigid_body_collection.rigid_body_particles.number>0){
+    if(use_rd || use_di || use_dd || use_rr)
         backward_euler_evolution->asymmetric_system=true;
-        move_rb_diff.Resize(rigid_body_collection.rigid_body_particles.number);
-        backward_euler_evolution->minimization_objective.move_rb_diff=&move_rb_diff;
 
+    if((use_rd || use_rr) && rigid_body_collection.rigid_body_particles.number>0){
+        move_rb_diff.Resize(rigid_body_collection.rigid_body_particles.number);
+        backward_euler_evolution->minimization_objective.move_rb_diff=&move_rb_diff;}
+
+    if(use_rd && rigid_body_collection.rigid_body_particles.number>0){
         rd_penalty=new RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>(
             particles,rigid_body_collection,move_rb_diff,
             rd_penalty_stiffness,rd_penalty_friction);
         rd_penalty->get_candidates=[this](){Get_RD_Collision_Candidates();};
-        solid_body_collection.Add_Force(rd_penalty);
+        solid_body_collection.Add_Force(rd_penalty);}
 
+    if(use_rr && rigid_body_collection.rigid_body_particles.number>0){
         rr_penalty=new RIGID_PENALTY_WITH_FRICTION<TV>(
             rigid_body_collection,move_rb_diff,
             rd_penalty_stiffness,rd_penalty_friction);
         rr_penalty->get_candidates=[this](){Get_RR_Collision_Candidates();};
-        solid_body_collection.Add_Force(rr_penalty);
+        solid_body_collection.Add_Force(rr_penalty);}
 
+    if(use_dd){
         dd_penalty=new SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION<TV>(
             particles,rd_penalty_stiffness,rd_penalty_friction);
         dd_penalty->get_candidates=[this](){Get_DD_Collision_Candidates();};

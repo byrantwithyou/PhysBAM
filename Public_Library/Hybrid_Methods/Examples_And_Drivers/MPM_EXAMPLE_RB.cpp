@@ -346,14 +346,6 @@ Average_Particle_Mass() const
     return result/(T)particles.number;
 }
 //#####################################################################
-// Function Add_Collision_Object
-//#####################################################################
-template<class TV> void MPM_EXAMPLE_RB<TV>::
-Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction,std::function<FRAME<TV>(T)> func_frame,std::function<TWIST<TV>(T)> func_twist)
-{
-    collision_objects.Append(new MPM_COLLISION_IMPLICIT_OBJECT<TV>(io,type,friction,func_frame,func_twist));
-}
-//#####################################################################
 // Function Update_Lagged_Forces
 //#####################################################################
 template<class TV> void MPM_EXAMPLE_RB<TV>::
@@ -403,58 +395,42 @@ Update_Collision_Detection_Structures()
     rasterized_data.Resize(cell_domain);
     rasterized_data.Remove_All();
 
-    for(int k=0;k<simulated_particles.m;k++){
-        int p=simulated_particles(k);
-        TV_INT index=grid.Clamp_To_Cell(particles.X(p),ghost+1);
-        if(cell_domain.Lazy_Inside_Half_Open(index))
-            cell_particles.Insert(index,p);}
-
-    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
-    T padding=grid.dX.Max()*.5;
-    for(int b=0;b<rigid_body_particles.frame.m;b++){
-        RIGID_BODY<TV>& rigid_body=*rigid_body_particles.rigid_body(b);
-        rigid_body.Update_Bounding_Box_From_Implicit_Geometry();
-        RANGE<TV> box=rigid_body.Axis_Aligned_Bounding_Box().Thickened(padding);
-        RANGE<TV_INT> grid_range=grid.Clamp_To_Cell(box,ghost+1).Intersect(cell_domain);
-        for(RANGE_ITERATOR<TV::m> it(grid_range);it.Valid();it.Next()){
-            TV X=grid.Center(it.index);
-            T phi=rigid_body.Implicit_Geometry_Extended_Value(X);
-            if(phi<padding)
-                rasterized_data.Insert(it.index,{b,phi});}}
-
-    for(int b=0;b<rigid_body_particles.frame.m;b++){
-        RIGID_BODY<TV>& rigid_body=*rigid_body_particles.rigid_body(b);
-        for(int v=0;v<rigid_body.simplicial_object->particles.number;v++){
-            TV X=rigid_body.Frame()*rigid_body.simplicial_object->particles.X(v);
-            TV_INT index=grid.Clamp_To_Cell(X,ghost+1);
+    if(use_di || use_rd)
+        for(int k=0;k<simulated_particles.m;k++){
+            int p=simulated_particles(k);
+            TV_INT index=grid.Clamp_To_Cell(particles.X(p),ghost+1);
             if(cell_domain.Lazy_Inside_Half_Open(index))
-                cell_vertices.Insert(index,{b,v});}}
-}
-//#####################################################################
-// Function Add_Collision_Object
-//#####################################################################
-template<class TV> void MPM_EXAMPLE_RB<TV>::
-Add_Collision_Object(IMPLICIT_OBJECT<TV>* io)
-{
-    if(!d_io_penalty){
-        d_io_penalty=new IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>(
-            solid_body_collection.deformable_body_collection.particles,
-            rd_penalty_stiffness,rd_penalty_friction);
-        d_io_penalty->get_candidates=[this](){Get_IO_Collision_Candidates();};
-        cell_objects.Resize(grid.Domain_Indices(ghost));
-        solid_body_collection.deformable_body_collection.Add_Force(d_io_penalty);}
+                cell_particles.Insert(index,p);}
 
-    T padding=grid.dX.Magnitude()/2;
-    int o=d_io_penalty->ios.Append(io);
-    for(CELL_ITERATOR<TV> it(grid,ghost);it.Valid();it.Next())
-        if(io->Extended_Phi(it.Location())<padding)
-            cell_objects.Insert(it.index,o);
+    
+    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
+    if(use_rd || use_rr){
+        T padding=grid.dX.Max()*.5;
+        for(int b=0;b<rigid_body_particles.frame.m;b++){
+            RIGID_BODY<TV>& rigid_body=*rigid_body_particles.rigid_body(b);
+            rigid_body.Update_Bounding_Box_From_Implicit_Geometry();
+            RANGE<TV> box=rigid_body.Axis_Aligned_Bounding_Box().Thickened(padding);
+            RANGE<TV_INT> grid_range=grid.Clamp_To_Cell(box,ghost+1).Intersect(cell_domain);
+            for(RANGE_ITERATOR<TV::m> it(grid_range);it.Valid();it.Next()){
+                TV X=grid.Center(it.index);
+                T phi=rigid_body.Implicit_Geometry_Extended_Value(X);
+                if(phi<padding)
+                    rasterized_data.Insert(it.index,{b,phi});}}}
+
+    if(use_rr){
+        for(int b=0;b<rigid_body_particles.frame.m;b++){
+            RIGID_BODY<TV>& rigid_body=*rigid_body_particles.rigid_body(b);
+            for(int v=0;v<rigid_body.simplicial_object->particles.number;v++){
+                TV X=rigid_body.Frame()*rigid_body.simplicial_object->particles.X(v);
+                TV_INT index=grid.Clamp_To_Cell(X,ghost+1);
+                if(cell_domain.Lazy_Inside_Half_Open(index))
+                    cell_vertices.Insert(index,{b,v});}}}
 }
 //#####################################################################
-// Function Get_IO_Collision_Candidates
+// Function Get_DI_Collision_Candidates
 //#####################################################################
 template<class TV> void MPM_EXAMPLE_RB<TV>::
-Get_IO_Collision_Candidates()
+Get_DI_Collision_Candidates()
 {
     for(CELL_ITERATOR<TV> it(grid,ghost);it.Valid();it.Next()){
         auto D=cell_particles.Get(it.index);
@@ -463,7 +439,7 @@ Get_IO_Collision_Candidates()
         if(!O.m) continue;
         for(int i=0;i<D.m;i++)
             for(int j=0;j<O.m;j++)
-                d_io_penalty->Add_Pair(D(i),O(j));}
+                di_penalty->Add_Pair(D(i),O(j));}
 }
 //#####################################################################
 // Function Get_RD_Collision_Candidates

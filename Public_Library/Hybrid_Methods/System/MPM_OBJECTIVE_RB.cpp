@@ -84,8 +84,7 @@ Compute_Unconstrained(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,
     Update_F(v1);
     T midpoint_factor=use_midpoint?(T).25:1;
 
-    if(system.example.use_rd_penalty)
-        system.example.Update_Collision_Detection_Structures();
+    system.example.Update_Collision_Detection_Structures();
     system.example.Precompute_Forces(system.example.time,system.example.dt,h);
     if(e){
         T energy=midpoint_factor*system.Inner_Product(dv,dv)/2;

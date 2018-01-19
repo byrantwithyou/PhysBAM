@@ -112,10 +112,6 @@ public:
     T quad_F_coeff=0;
     bool asymmetric_system=false;
 
-    T rd_penalty_stiffness=0;
-    T rd_penalty_friction=0.3;
-    bool use_rd_penalty=false;
-
     CHAINED_ARRAY<int,TV_INT> cell_particles;
     CHAINED_ARRAY<int,TV_INT> cell_objects;
     CHAINED_ARRAY<PAIR<int,int>,TV_INT> cell_vertices; // <rigid_body,vertex>
@@ -138,8 +134,12 @@ public:
     bool projected_collisions=false;
     int collision_iterations=5;
 
+    T rd_penalty_stiffness=0;
+    T rd_penalty_friction=0.3;
+    bool use_rd=false,use_rr=false,use_di=false;
+
     RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>* rd_penalty=0;
-    IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* d_io_penalty=0;
+    IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* di_penalty=0;
     RIGID_PENALTY_WITH_FRICTION<TV>* rr_penalty=0;
     ARRAY<MOVE_RIGID_BODY_DIFF<TV> > move_rb_diff;
     
@@ -166,12 +166,6 @@ public:
     int Add_Force(DEFORMABLES_FORCES<TV>& force);
     int Add_Force(SOLIDS_FORCES<TV>& force);
     void Set_Weights(int order);
-    void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction,
-        std::function<FRAME<TV>(T)> func_frame=0,std::function<TWIST<TV>(T)> func_twist=0);
-    template<class OBJECT> typename enable_if<!is_pointer<OBJECT>::value>::type
-    Add_Collision_Object(const OBJECT& object,COLLISION_TYPE type,T friction,
-        std::function<FRAME<TV>(T)> func_frame=0,std::function<TWIST<TV>(T)> func_twist=0)
-    {Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<OBJECT>(object),type,friction,func_frame,func_twist);}
 
     TV Total_Particle_Linear_Momentum() const;
     TV Total_Grid_Linear_Momentum(const ARRAY<TV,TV_INT>& u) const;
@@ -182,9 +176,8 @@ public:
     T Average_Particle_Mass() const;
     template<class S> void Reflection_Boundary_Condition(ARRAY<S,TV_INT>& u,bool flip_sign) const;
     void Update_Collision_Detection_Structures();
-    void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io);
     void Get_RD_Collision_Candidates();
-    void Get_IO_Collision_Candidates();
+    void Get_DI_Collision_Candidates();
     void Get_RR_Collision_Candidates();
 //#####################################################################
 };

@@ -42,14 +42,14 @@ public:
     using BASE::test_diff;using BASE::threads;using BASE::weights;
     using BASE::lagrangian_forces;using BASE::stream_type;using BASE::test_system;
     using BASE::Add_Force;using BASE::Set_Weights;using BASE::solid_body_collection;
-    using BASE::Add_Collision_Object;using typename BASE::COLLISION_TYPE;
+    using typename BASE::COLLISION_TYPE;using BASE::di_penalty;
     using BASE::data_directory;using BASE::reflection_bc_flags;
     using BASE::quad_F_coeff;using BASE::use_sound_speed_cfl;using BASE::cfl_sound;
     using BASE::pairwise_collisions;using BASE::projected_collisions;
+    using BASE::debug_newton;using BASE::use_gradient_magnitude_objective;
+    using BASE::use_rd;using BASE::use_rr;using BASE::use_di;
     using BASE::rd_penalty_stiffness;using BASE::rd_penalty_friction;
-    using BASE::use_rd_penalty;using BASE::debug_newton;
-    using BASE::use_gradient_magnitude_objective;
-
+    
     int test_number;
     int resolution;
     bool user_resolution;
@@ -84,7 +84,7 @@ public:
     ARRAY<T> extra_T;
     ARRAY<int> extra_int;
     bool dump_collision_objects;
-    
+
     RANDOM_NUMBERS<T> random;
     SOLIDS_STANDARD_TESTS<TV> tests;
 
@@ -131,6 +131,11 @@ public:
     Add_Penalty_Collision_Object(const OBJECT& object,const T coefficient_of_friction=(T)0)
     {Add_Penalty_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<OBJECT>(object),coefficient_of_friction);}
 
+    template<class OBJECT> typename enable_if<!is_pointer<OBJECT>::value>::type
+    Add_Collision_Object(const OBJECT& object,COLLISION_TYPE type,T friction,
+        std::function<FRAME<TV>(T)> func_frame=0,std::function<TWIST<TV>(T)> func_twist=0)
+    {Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<OBJECT>(object),type,friction,func_frame,func_twist);}
+
     void Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)> dV,
         const T mass,const T volume);
     void Add_Lambda_Particles(ARRAY<int>* affected_particles,T E,T nu,T density,bool no_mu=false,T porosity=(T)1,T saturation_level=(T)1);
@@ -151,6 +156,9 @@ public:
     void Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale=TV_INT()+1,int default_resolution=32);
     void Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale,TV_INT resolution_padding,
         int resolution_multiple=1,int default_resolution=32);
+    void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io);
+    void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction,
+        std::function<FRAME<TV>(T)> func_frame,std::function<TWIST<TV>(T)> func_twist);
 //#####################################################################
 };
 }

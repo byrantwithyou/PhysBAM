@@ -119,17 +119,19 @@ Initialize()
     //             cell_soli....
     Update_Simulated_Particles();
 
-    if(example.use_rd_penalty && example.solid_body_collection.rigid_body_collection.rigid_body_particles.number>0){
+    if(example.use_rr && example.solid_body_collection.rigid_body_collection.rigid_body_particles.number>0){
         example.rr_penalty=new RIGID_PENALTY_WITH_FRICTION<TV>(
             example.solid_body_collection.rigid_body_collection,example.move_rb_diff,
             example.rd_penalty_stiffness,example.rd_penalty_friction);
+        example.rr_penalty->get_candidates=[this](){example.Get_RR_Collision_Candidates();};
+        example.solid_body_collection.Add_Force(example.rr_penalty);}
+
+    if(example.use_rd && example.solid_body_collection.rigid_body_collection.rigid_body_particles.number>0){
         example.rd_penalty=new RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>(
             example.solid_body_collection.deformable_body_collection.particles,
             example.solid_body_collection.rigid_body_collection,example.move_rb_diff,
             example.rd_penalty_stiffness,example.rd_penalty_friction);
-        example.rr_penalty->get_candidates=[this](){example.Get_RR_Collision_Candidates();};
         example.rd_penalty->get_candidates=[this](){example.Get_RD_Collision_Candidates();};
-        example.solid_body_collection.Add_Force(example.rr_penalty);
         example.solid_body_collection.Add_Force(example.rd_penalty);}
     
     if(!example.restart) Write_Output_Files(0);
@@ -533,8 +535,8 @@ Apply_Forces()
             example.rr_penalty->Update_Attachments_And_Prune_Pairs();
         if(example.rd_penalty)
             example.rd_penalty->Update_Attachments_And_Prune_Pairs();
-        if(example.d_io_penalty)
-            example.d_io_penalty->Update_Attachments_And_Prune_Pairs();
+        if(example.di_penalty)
+            example.di_penalty->Update_Attachments_And_Prune_Pairs();
         
         if(!converged) LOG::cout<<"WARNING: Newton's method did not converge"<<std::endl;
         Apply_Friction();

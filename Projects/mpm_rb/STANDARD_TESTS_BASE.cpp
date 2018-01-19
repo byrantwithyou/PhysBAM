@@ -19,8 +19,12 @@
 #include <Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
 #include <Deformables/Constitutive_Models/NEO_HOOKEAN.h>
 #include <Deformables/Constitutive_Models/ST_VENANT_KIRCHHOFF_HENCKY_STRAIN.h>
+#include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/DEFORMABLE_GRAVITY.h>
 #include <Deformables/Forces/FINITE_VOLUME.h>
+#include <Deformables/Forces/IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION.h>
+#include <Solids/Solids/SOLID_BODY_COLLECTION.h>
+#include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/MPM_DRUCKER_PRAGER.h>
 #include <Hybrid_Methods/Forces/MPM_FINITE_ELEMENTS.h>
@@ -123,8 +127,11 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-reflection_bc",&reflection_bc_flags,"flags","Flags indicating which walls should be reflection BC");
     parse_args.Add("-coll_pair",&pairwise_collisions,"use pairwise collisions");
     parse_args.Add("-coll_proj",&projected_collisions,"use pairwise collisions");
-    parse_args.Add("-rd_stiffness",&rd_penalty_stiffness,&use_rd_penalty,"stiffness","rigid-deformable penalty force stiffness");
+    parse_args.Add("-rd_stiffness",&rd_penalty_stiffness,"stiffness","rigid-deformable penalty force stiffness");
     parse_args.Add("-rd_friction",&rd_penalty_friction,"friction","rigid-deformable penalty force friction");
+    parse_args.Add("-rd",&use_rd,"enable rigid-deformable penalty force friction");
+    parse_args.Add("-rr",&use_rr,"enable rigid-rigid penalty force friction");
+    parse_args.Add("-di",&use_di,"enable deformable-object penalty force friction");
     parse_args.Add("-grad_ls",&use_gradient_magnitude_objective,"do line searches on norm of gradient");
     parse_args.Add("-debug_newton",&debug_newton,"Enable diagnostics in Newton's method");
     
@@ -244,12 +251,8 @@ Seed_Particles_With_Marked_Surface(const T_OBJECT& object,std::function<TV(const
     TRIANGULATED_SURFACE<T>* mesh=TESSELLATION::Generate_Triangles(object,levels);
     LOG::printf("MPM OBJECT %s BEGIN %d\n",name,particles.number);
     LOG::printf("MPM MESH %s BEGIN %d\n",name,particles.number);
-    ARRAY<TV> X;
-    for(int p=0;p<mesh->particles.number;p++){
-        X.Append(mesh->particles.X(p));
-        Add_Particle(X(p),V,dV,mass,volume);}
-    int surface_end=particles.number;
-    LOG::printf("MPM MESH %s END %d\n",name,particles.number);
+    ARRAY<TV> X(mesh->particles.X);
+    LOG::printf("MPM MESH %s END %d\n",name,particles.number+X.m);
     Write_To_File(stream_type,output_directory+"/common/"+name,*mesh);
     delete mesh;
 
@@ -260,7 +263,7 @@ Seed_Particles_With_Marked_Surface(const T_OBJECT& object,std::function<TV(const
     poisson_disk.Sample(random,io,X);
 
     for(int p=0;p<X.m;p++)
-        Add_Particle(X(surface_end+p),V,dV,mass,volume);
+        Add_Particle(X(p),V,dV,mass,volume);
     LOG::printf("MPM OBJECT %s END %d\n",name,particles.number);
 }
 //#####################################################################
@@ -574,6 +577,35 @@ Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale,TV_INT resolution_paddi
     int scaled_resolution=(resolution+resolution_multiple-1)/resolution_multiple;
     grid.Initialize(resolution_scale*scaled_resolution+resolution_padding,domain,true);
     Set_Weights(order);
+}
+//#####################################################################
+// Function Add_Collision_Object
+//#####################################################################
+template<class TV> void STANDARD_TESTS_BASE<TV>::
+Add_Collision_Object(IMPLICIT_OBJECT<TV>* io)
+{
+    if(!use_di) return;
+    if(!di_penalty){
+        di_penalty=new IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>(
+            solid_body_collection.deformable_body_collection.particles,
+            rd_penalty_stiffness,rd_penalty_friction);
+        di_penalty->get_candidates=[this](){this->Get_DI_Collision_Candidates();};
+        this->cell_objects.Resize(grid.Domain_Indices(ghost));
+        solid_body_collection.deformable_body_collection.Add_Force(di_penalty);}
+
+    T padding=grid.dX.Magnitude()/2;
+    int o=di_penalty->ios.Append(io);
+    for(CELL_ITERATOR<TV> it(grid,ghost);it.Valid();it.Next())
+        if(io->Extended_Phi(it.Location())<padding)
+            this->cell_objects.Insert(it.index,o);
+}
+//#####################################################################
+// Function Add_Collision_Object
+//#####################################################################
+template<class TV> void STANDARD_TESTS_BASE<TV>::
+Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction,std::function<FRAME<TV>(T)> func_frame,std::function<TWIST<TV>(T)> func_twist)
+{
+    collision_objects.Append(new MPM_COLLISION_IMPLICIT_OBJECT<TV>(io,type,friction,func_frame,func_twist));
 }
 template class STANDARD_TESTS_BASE<VECTOR<float,2> >;
 template class STANDARD_TESTS_BASE<VECTOR<float,3> >;
