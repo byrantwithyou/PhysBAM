@@ -85,23 +85,17 @@ Relax_Attachment_Helper(const TV& Z,const TV& X,const TV& W,T mu)
 {
     RELAX_ATTACHMENT_HELPER<TV> h;
 
-    T zw2=(Z-W).Magnitude_Squared();
-    T xw2=(X-W).Magnitude_Squared();
-    T q2=sqr(mu)*zw2;
-    if(xw2<=q2){h.Y=X;h.dYdX+=1;h.dynamic=false;/*LOG::puts("stick");*/return h;}
-    T s=sqrt(q2/xw2);
-    h.Y=W+s*(X-W);
-
-    TV dzw2dZ=(Z-W)*2,dzw2dW=-dzw2dZ;
-    TV dxw2dX=(X-W)*2,dxw2dW=-dxw2dX;
-    TV dq2dZ=sqr(mu)*dzw2dZ;
-    TV dq2dW=sqr(mu)*dzw2dW;
-    T dsdq2=s/(2*q2);
-    T dsdxw2=s/(-2*xw2);
-    h.dYdW=(1-s)+Outer_Product(X-W,dsdq2*dq2dW+dsdxw2*dxw2dW);
-    h.dYdX=s+Outer_Product(X-W,dsdxw2*dxw2dX);
-    h.dYdZ=Outer_Product(X-W,dsdq2*dq2dZ);
+    TV ZW=Z-W,XW=X-W;
+    T zw=ZW.Normalize();
+    T xw=XW.Normalize();
+    T q=mu*zw;
+    if(xw<=q){h.Y=X;h.dYdX+=1;h.dynamic=false;/*LOG::puts("stick");*/return h;}
+    h.Y=W+q*XW;
+    h.dYdX=q/xw*((T)1-Outer_Product(XW,XW));
+    h.dYdZ=Outer_Product(XW,mu*ZW);
+    h.dYdW=(T)1-h.dYdX-h.dYdZ;
     h.dynamic=true;
+
 //    LOG::puts("dynamic");
     return h;
 }
