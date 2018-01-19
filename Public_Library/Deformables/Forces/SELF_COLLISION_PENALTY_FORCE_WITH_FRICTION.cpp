@@ -57,14 +57,37 @@ void Evalute_Derivatives(TV& dY,TV& dw,const CP& c,const TV& dZ,ARRAY_VIEW<const
         dYp=dY;
         const auto& de=c.diff_entry(i);
         dY=de.dYdI(0)*dY+de.dYdI(1)*dZ;
-        for(int i=0;i<TV::m;i++)
-            dY+=de.dYdI(2+i)*dX(elements(de.e)(i));}
+        for(int j=0;j<TV::m;j++)
+            dY+=de.dYdI(2+j)*dX(elements(de.e)(j));}
 
     if(c.diff_entry.m>0){
         dw=c.dwdI(0)*dYp+c.dwdI(1)*dZ;
         for(int i=0;i<TV::m;i++)
             dw+=c.dwdI(2+i)*dX(elements(c.diff_entry.Last().e)(i));}
     else dw=TV();
+}
+
+template<class TV,class CP,class TV_INT>
+void Apply_Derivatives_Transpose(TV dY,const TV& dw,const CP& c,TV& dZ,ARRAY_VIEW<TV> F,const ARRAY<TV_INT>& elements)
+{
+    TV dYp;
+    if(c.diff_entry.m>0){
+        for(int i=0;i<TV::m;i++){
+            F(elements(c.diff_entry.Last().e)(i))+=c.dwdI(2+i).Transpose_Times(dw);}
+        dYp=c.dwdI(0).Transpose_Times(dw);
+        dZ=c.dwdI(1).Transpose_Times(dw);}
+    else dZ=TV();
+
+    for(int i=c.diff_entry.m-1;i>=0;i--){
+        const auto& de=c.diff_entry(i);
+        for(int j=0;j<TV::m;j++)
+            F(elements(de.e)(j))+=de.dYdI(2+j).Transpose_Times(dY);
+        dZ+=de.dYdI(1).Transpose_Times(dY);
+        dY+=de.dYdI(0).Transpose_Times(dY)+dYp;
+        dYp=TV();}
+
+    for(int i=0;i<TV::m;i++)
+        F(elements(c.e0)(i))+=c.w0(i)*dY;
 }
 
 // return:
@@ -480,12 +503,22 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F
             const ARRAY<TV_INT>& elements=surfaces(c.s)->mesh.elements;
             TV_INT e=elements(Element(c));
             TV j=stiffness_coefficient*(particles.X(c.p)-Attachment(c));
-            TV dY,dw,dZ=V(c.p);
-            Evalute_Derivatives(dY,dw,c,dZ,V,elements);
-            TV dj=stiffness_coefficient*(V(c.p)-dY);
-            F(c.p)-=dj;
-            for(int k=0;k<TV::m;k++)
-                F(e(k))+=c.w(k)*dj+dw(k)*j;}}
+            if(transpose){
+                TV dj=-V(c.p),dw,dZ;
+                for(int k=0;k<TV::m;k++){
+                    dj+=V(e(k))*c.w(k);
+                    dw(k)+=j.Dot(V(e(k)));}
+                TV dY=-stiffness_coefficient*dj;
+                F(c.p)-=dY;
+                Apply_Derivatives_Transpose(dY,dw,c,dZ,F,elements);
+                F(c.p)+=dZ;}
+            else{
+                TV dY,dw,dZ=V(c.p);
+                Evalute_Derivatives(dY,dw,c,dZ,V,elements);
+                TV dj=stiffness_coefficient*(V(c.p)-dY);
+                F(c.p)-=dj;
+                for(int k=0;k<TV::m;k++)
+                    F(e(k))+=c.w(k)*dj+dw(k)*j;}}}
 }
 //#####################################################################
 // Function Potential_Energy

@@ -69,13 +69,24 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,
             &rbi=rigid_body_collection.Rigid_Body(c.bi);
         if(c.active){
             TV j=stiffness_coefficient*(c.Z-c.Y);
-            TV dLs=rigid_V(c.bs).linear,dLi=rigid_V(c.bi).linear;
-            auto dAs=rigid_V(c.bs).angular,dAi=rigid_V(c.bi).angular;
-            TV dZ=c.dZdLs*dLs+c.dZdAs*dAs;
-            TV dY=c.dYdLs*dLs+c.dYdAs*dAs+c.dYdLi*dLi+c.dYdAi*dAi;
-            TV dj=stiffness_coefficient*(dZ-dY);
-            rigid_F(c.bs)-=rbs.Gather(TWIST<TV>(j,(dZ-dLs).Cross(j)),c.Z);
-            rigid_F(c.bi)+=rbi.Gather(TWIST<TV>(j,(dY-dLi).Cross(j)),c.Y);}}
+            if(transpose){
+                TV dLs=rigid_V(c.bs).linear,dLi=rigid_V(c.bi).linear;
+                auto dAs=rigid_V(c.bs).angular,dAi=rigid_V(c.bi).angular;
+                TV dZ=c.dZdLs*dLs+c.dZdAs*dAs;
+                TV dY=c.dYdLs*dLs+c.dYdAs*dAs+c.dYdLi*dLi+c.dYdAi*dAi;
+                TV dj=stiffness_coefficient*(dZ-dY);
+                rigid_F(c.bs)-=rbs.Gather(TWIST<TV>(dj,(dZ-dLs).Cross(j)),c.Z);
+                rigid_F(c.bi)+=rbi.Gather(TWIST<TV>(dj,(dY-dLi).Cross(j)),c.Y);}
+            else{
+                TWIST<TV> qs=rbs.Scatter(rigid_V(c.bs),c.Z);
+                TWIST<TV> qi=rbi.Scatter(rigid_V(c.bi),c.Y);
+                TV dj=stiffness_coefficient*(qi.linear-qs.linear);
+                TV cs=j.Cross(qs.angular),ci=j.Cross(qi.angular);
+                TV dY=ci-dj,dZ=dj-cs;
+                rigid_F(c.bi).linear+=c.dYdLi.Transpose_Times(dY)-ci;
+                rigid_F(c.bi).angular+=c.dYdAi.Transpose_Times(dY);
+                rigid_F(c.bs).linear+=cs+c.dYdLs.Transpose_Times(dY)+c.dZdLs.Transpose_Times(dZ);
+                rigid_F(c.bs).angular+=c.dYdAs.Transpose_Times(dY)+c.dZdAs.Transpose_Times(dZ);}}}
 }
 //#####################################################################
 // Function Potential_Energy

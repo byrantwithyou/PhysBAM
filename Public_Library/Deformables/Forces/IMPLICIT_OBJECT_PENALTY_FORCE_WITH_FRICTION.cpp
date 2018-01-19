@@ -59,8 +59,10 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F
 {
     for(int i=0;i<collision_pairs.m;i++){
         const COLLISION_PAIR& c=collision_pairs(i);
-        if(c.active)
-            F(c.p)-=stiffness_coefficient*(V(c.p)-c.dYdZ*V(c.p));}
+        if(c.active){
+            if(transpose)
+                F(c.p)+=(c.dYdZ-1).Transpose_Times(stiffness_coefficient*V(c.p));
+            else F(c.p)+=(c.dYdZ-1)*(stiffness_coefficient*V(c.p));}}
 }
 //#####################################################################
 // Function Potential_Energy
