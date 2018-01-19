@@ -46,7 +46,8 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,
         if(c.active){
             TV j=stiffness_coefficient*(particles.X(c.p)-c.Y);
             F(c.p)-=j;
-            rigid_F(c.b)+=rb.Gather(TWIST<TV>(j,typename TV::SPIN()),c.Y);}}
+            if(!rb.Has_Infinite_Inertia())
+                rigid_F(c.b)+=rb.Gather(TWIST<TV>(j,typename TV::SPIN()),c.Y);}}
 }
 //#####################################################################
 // Function Update_Position_Based_State

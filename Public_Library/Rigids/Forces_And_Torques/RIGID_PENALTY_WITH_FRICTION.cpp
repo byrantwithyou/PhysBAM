@@ -40,10 +40,11 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) con
         const COLLISION_PAIR& c=collision_pairs(i);
         const RIGID_BODY<TV>& rbs=rigid_body_collection.Rigid_Body(c.bs),
             &rbi=rigid_body_collection.Rigid_Body(c.bi);
+        bool ts=!rbs.Has_Infinite_Inertia(),ti=!rbi.Has_Infinite_Inertia();
         if(c.active){
             TV j=stiffness_coefficient*(c.Z-c.Y);
-            rigid_F(c.bs)-=rbs.Gather(TWIST<TV>(j,typename TV::SPIN()),c.Z);
-            rigid_F(c.bi)+=rbi.Gather(TWIST<TV>(j,typename TV::SPIN()),c.Y);}}
+            if(ts) rigid_F(c.bs)-=rbs.Gather(TWIST<TV>(j,typename TV::SPIN()),c.Z);
+            if(ti) rigid_F(c.bi)+=rbi.Gather(TWIST<TV>(j,typename TV::SPIN()),c.Y);}}
 }
 //#####################################################################
 // Function Update_Position_Based_State
@@ -67,26 +68,36 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,
         const COLLISION_PAIR& c=collision_pairs(i);
         const RIGID_BODY<TV>& rbs=rigid_body_collection.Rigid_Body(c.bs),
             &rbi=rigid_body_collection.Rigid_Body(c.bi);
+        bool ts=!rbs.Has_Infinite_Inertia(),ti=!rbi.Has_Infinite_Inertia();
         if(c.active){
             TV j=stiffness_coefficient*(c.Z-c.Y);
             if(transpose){
-                TV dLs=rigid_V(c.bs).linear,dLi=rigid_V(c.bi).linear;
-                auto dAs=rigid_V(c.bs).angular,dAi=rigid_V(c.bi).angular;
+                TV dLs,dLi;
+                typename TV::SPIN dAs,dAi;
+                if(ts){
+                    dLs=rigid_V(c.bs).linear;
+                    dAs=rigid_V(c.bs).angular;}
+                if(ti){
+                    dLi=rigid_V(c.bi).linear;
+                    dAi=rigid_V(c.bi).angular;}
                 TV dZ=c.dZdLs*dLs+c.dZdAs*dAs;
                 TV dY=c.dYdLs*dLs+c.dYdAs*dAs+c.dYdLi*dLi+c.dYdAi*dAi;
                 TV dj=stiffness_coefficient*(dZ-dY);
-                rigid_F(c.bs)-=rbs.Gather(TWIST<TV>(dj,(dZ-dLs).Cross(j)),c.Z);
-                rigid_F(c.bi)+=rbi.Gather(TWIST<TV>(dj,(dY-dLi).Cross(j)),c.Y);}
+                if(ts) rigid_F(c.bs)-=rbs.Gather(TWIST<TV>(dj,(dZ-dLs).Cross(j)),c.Z);
+                if(ti) rigid_F(c.bi)+=rbi.Gather(TWIST<TV>(dj,(dY-dLi).Cross(j)),c.Y);}
             else{
-                TWIST<TV> qs=rbs.Scatter(rigid_V(c.bs),c.Z);
-                TWIST<TV> qi=rbi.Scatter(rigid_V(c.bi),c.Y);
+                TWIST<TV> qs,qi;
+                if(ts) qs=rbs.Scatter(rigid_V(c.bs),c.Z);
+                if(ti) qi=rbi.Scatter(rigid_V(c.bi),c.Y);
                 TV dj=stiffness_coefficient*(qi.linear-qs.linear);
                 TV cs=j.Cross(qs.angular),ci=j.Cross(qi.angular);
                 TV dY=ci-dj,dZ=dj-cs;
-                rigid_F(c.bi).linear+=c.dYdLi.Transpose_Times(dY)-ci;
-                rigid_F(c.bi).angular+=c.dYdAi.Transpose_Times(dY);
-                rigid_F(c.bs).linear+=cs+c.dYdLs.Transpose_Times(dY)+c.dZdLs.Transpose_Times(dZ);
-                rigid_F(c.bs).angular+=c.dYdAs.Transpose_Times(dY)+c.dZdAs.Transpose_Times(dZ);}}}
+                if(ti){
+                    rigid_F(c.bi).linear+=c.dYdLi.Transpose_Times(dY)-ci;
+                    rigid_F(c.bi).angular+=c.dYdAi.Transpose_Times(dY);}
+                if(ts){
+                    rigid_F(c.bs).linear+=cs+c.dYdLs.Transpose_Times(dY)+c.dZdLs.Transpose_Times(dZ);
+                    rigid_F(c.bs).angular+=c.dYdAs.Transpose_Times(dY)+c.dZdAs.Transpose_Times(dZ);}}}}
 }
 //#####################################################################
 // Function Potential_Energy
@@ -186,6 +197,7 @@ Add_Pair(int bs,int v,int bi)
     if(hash.Contains({bs,v,bi})) return;
     const RIGID_BODY<TV>& rbs=rigid_body_collection.Rigid_Body(bs),
         &rbi=rigid_body_collection.Rigid_Body(bi);
+    if(rbs.Has_Infinite_Inertia() && rbi.Has_Infinite_Inertia()) return;
     TV X=rbs.Frame()*rbs.simplicial_object->particles.X(v);
     if(rbi.implicit_object->Extended_Phi(X)>0) return;
     TV W=rbi.implicit_object->Closest_Point_On_Boundary(X);
