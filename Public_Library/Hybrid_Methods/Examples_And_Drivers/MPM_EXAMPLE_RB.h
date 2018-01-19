@@ -101,7 +101,9 @@ public:
     bool test_diff=false;
     bool test_system=false;
     int threads=1;
-
+    bool use_gradient_magnitude_objective=false;
+    bool debug_newton=false;
+    
     TV last_linear_momentum;
     typename TV::SPIN last_angular_momentum;
     T last_te=0;

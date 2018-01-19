@@ -125,7 +125,8 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-coll_proj",&projected_collisions,"use pairwise collisions");
     parse_args.Add("-rd_stiffness",&rd_penalty_stiffness,&use_rd_penalty,"stiffness","rigid-deformable penalty force stiffness");
     parse_args.Add("-rd_friction",&rd_penalty_friction,"friction","rigid-deformable penalty force friction");
-
+    parse_args.Add("-grad_ls",&use_gradient_magnitude_objective,"do line searches on norm of gradient");
+    parse_args.Add("-debug_newton",&debug_newton,"Enable diagnostics in Newton's method");
     
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);

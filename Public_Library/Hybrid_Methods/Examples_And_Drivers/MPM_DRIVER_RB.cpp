@@ -512,12 +512,14 @@ Apply_Forces()
         newtons_method.max_iterations=example.newton_iterations;
         newtons_method.krylov_tolerance=example.solver_tolerance;
         newtons_method.max_krylov_iterations=example.solver_iterations;
+        newtons_method.use_gradient_magnitude_objective=example.use_gradient_magnitude_objective;
         newtons_method.use_cg=true;
-        newtons_method.debug=true;
+        newtons_method.debug=example.debug_newton;
         if(example.asymmetric_system){
             newtons_method.use_gmres=true;
             newtons_method.use_cg=false;
-            newtons_method.Make_Vanilla_Newton();}
+            if(!newtons_method.use_gradient_magnitude_objective)
+                newtons_method.Make_Vanilla_Newton();}
         
         example.Update_Lagged_Forces(example.time);
         newtons_method.require_one_iteration=!objective.Initial_Guess(dv,newtons_method.tolerance,example.asymmetric_system);
