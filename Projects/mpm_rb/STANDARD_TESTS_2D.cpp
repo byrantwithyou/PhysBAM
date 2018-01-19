@@ -445,6 +445,45 @@ Initialize()
             solid_body_collection.rigid_body_collection.Add_Force(rg);
         } break;
 
+            // ./mpm_rb 43 -rd_stiffness 1e5 -use_exp_F -max_dt 7.5e-4 -scale_E 0.1 -resolution 32
+        case 43:{ // Rigid sphere and sand pile
+            particles.Store_Fp(true);
+            Set_Grid(RANGE<TV>(TV(),TV(3,1))*m,TV_INT(3,1));
+
+            RIGID_BODY<TV>& lw=tests.Add_Analytic_Box(TV(0.1,1));
+            lw.is_static=true;
+            lw.Frame().t=TV(0.05,0.5);
+            RIGID_BODY<TV>& rw=tests.Add_Analytic_Box(TV(0.1,1));
+            rw.is_static=true;
+            rw.Frame().t=TV(2.95,0.5);
+            RIGID_BODY<TV>& bw=tests.Add_Analytic_Box(TV(2.8,0.1));
+            bw.is_static=true;
+            bw.Frame().t=TV(1.5,0.05);
+
+            T density=(T)2200*unit_rho*scale_mass;
+            T E=35.37e6*unit_p*scale_E,nu=.3;
+            if(!use_theta_c) theta_c=0.015;
+            if(!use_theta_s) theta_s=.000001;
+            if(!use_hardening_factor) hardening_factor=20;
+            if(!use_max_hardening) max_hardening=FLT_MAX;
+            Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
+            RANGE<TV> sand(TV(1.3,0.1),TV(1.7,0.5));
+            Seed_Particles(sand,0,0,density,particles_per_cell);
+            Add_Drucker_Prager_Case(E,nu,2);
+            TV g=m/(s*s)*TV(0,-4.81);
+            Add_Gravity(g);
+            RIGID_BODY<TV>& sphere=tests.Add_Analytic_Sphere(0.075,density*0.5);
+            sphere.Frame().t=TV(1.55,0.9);
+            begin_frame=[=,&sphere](int frame)
+            {
+                if(frame==45){
+                    sphere.Frame().t=TV(1.55,0.4);
+                    sphere.Twist().angular=typename TV::SPIN(-9);
+                    auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
+                    solid_body_collection.rigid_body_collection.Add_Force(rg);}
+            };
+        } break;
+
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     if(forced_collision_type!=-1)
