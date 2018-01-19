@@ -766,7 +766,7 @@ Move_Rigid_Bodies()
         rigid_body_particles.frame(b)=Move_Rigid_Body(example.dt,rigid_body_particles.frame(b),
             rigid_body_particles.twist(b),rigid_body_particles.rigid_body(b)->World_Space_Inertia_Tensor());
         rigid_body_particles.frame(b).r.Normalize();
-        rigid_body_particles.rigid_body(b)->Update_Angular_Velocity();} // Note that the value of w changes here.
+        rigid_body_particles.rigid_body(b)->Update_Angular_Momentum();} // Note that the value of w changes here.
 }
 //#####################################################################
 // Function Apply_Rigid_Body_Forces
