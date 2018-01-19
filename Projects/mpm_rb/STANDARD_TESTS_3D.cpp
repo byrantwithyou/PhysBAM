@@ -201,7 +201,7 @@ Initialize()
         case 71:{
             Set_Grid(RANGE<TV>::Centered_Box()*2*m);
             T density=2*unit_rho*scale_mass;
-            RIGID_BODY<TV>& lw=tests.Add_Analytic_Box(TV(0.4,1,1));
+            RIGID_BODY<TV>& lw=tests.Add_Analytic_Box(TV(0.4,8,8));
             lw.Frame().t=TV(-0.2,0.5,0.5);
             lw.is_static=true;
             Add_Collision_Object(Make_IO(PLANE<T>(TV(-1,0,0),TV(1,0.5,0.5))));
