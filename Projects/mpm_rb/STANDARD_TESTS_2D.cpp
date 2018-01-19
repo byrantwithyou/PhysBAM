@@ -411,7 +411,7 @@ Initialize()
         } break;
 
             // ./mpm_rb 42 -rd_stiffness 1e5 -use_exp_F -max_dt 7.5e-4 -scale_E 0.1 -resolution 64
-        case 42:{ // sand column collapse
+        case 42:{ // sand and thrown box
             particles.Store_Fp(true);
             Set_Grid(RANGE<TV>(TV(),TV(3,1))*m,TV_INT(3,1));
 
@@ -437,10 +437,10 @@ Initialize()
             Add_Drucker_Prager_Case(E,nu,2);
             TV g=m/(s*s)*TV(0,-4.81);
             Add_Gravity(g);
-            RIGID_BODY<TV>& cube=tests.Add_Analytic_Box(TV(0.2,0.3),1,2210);
+            RIGID_BODY<TV>& cube=tests.Add_Analytic_Box(TV(0.2,0.2),1,density*1.05);
             cube.Frame().t=TV(0.3,0.5);
             cube.Frame().r=ROTATION<TV>::From_Angle((T).78);
-            cube.Twist().linear=TV(4,0);
+            cube.Twist().linear=TV(2,-0.5);
             auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
             solid_body_collection.rigid_body_collection.Add_Force(rg);
         } break;
