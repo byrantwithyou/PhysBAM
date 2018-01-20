@@ -354,7 +354,7 @@ public:
                 solids_parameters.cfl=(T)5;
                 /* solids_parameters.implicit_solve_parameters.cg_iterations=100000; */
                 break;
-            case 701:case 720:case 721:case 722:{
+            case 701:case 720:case 721:case 722:case 730:{
                 // Test rigid-deformable penalty force with friction.
                 // ./be_evolution 701 -no_collisions_in_solve -rd_stiffness 1e2
                 break;}
@@ -1768,6 +1768,31 @@ void Get_Initial_Data()
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)5,0)*m)),true,true,density,m);
             tests.Add_Ground(0,1.99*m);
             break;}
+        case 730:{
+            T gap=0.005;
+            T r=0.15;
+            T R=r+gap;
+            T k=0.8;
+            TV center(0.5-R,r,0.5+tan(pi/6)*R);
+            tests.Create_Tetrahedralized_Volume(
+                data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",
+                RIGID_BODY_STATE<TV>(FRAME<TV>(center)),true,true,density,r*m);
+            center+=TV(2*R,0,0);
+            tests.Create_Tetrahedralized_Volume(
+                data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",
+                RIGID_BODY_STATE<TV>(FRAME<TV>(center)),true,true,density,r*m);
+            center+=TV(-R,0,-sin(pi/3)*2*R);
+            tests.Create_Tetrahedralized_Volume(
+                data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",
+                RIGID_BODY_STATE<TV>(FRAME<TV>(center)),true,true,density,r*m);
+            particles.X.template Project<T,&TV::y>()*=k;
+            particles.X.template Project<T,&TV::y>()+=0.1;
+            RIGID_BODY<TV>& sphere=tests.Add_Analytic_Sphere(r,density);
+            sphere.Frame().t=TV(0.5,r*k+sqrt(6.0)/3*2*r+0.1-0.03,0.5);
+            RIGID_BODY<TV>& ground=tests.Add_Analytic_Box(TV(1,0.1,1));
+            ground.Frame().t=TV(0.5,0.05,0.5);
+            ground.is_static=true;
+            break;}
         default:
             LOG::cerr<<"Initial Data: Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
@@ -2249,6 +2274,16 @@ void Initialize_Bodies() override
                 if(!st) break;
                 Add_Constitutive_Model(*st,(T)1e6*unit_p,(T).45,(T).01*s);}
             Add_Gravity();
+            break;}
+        case 730:{
+            for(int s=0;;s++){
+                auto st=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(s);
+                if(!st) break;
+                Add_Constitutive_Model(*st,(T)1e6*unit_p,(T).45,(T).01*s);}
+            TV gravity=m/(s*s)*TV(0,-1.8,0);
+            DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
+            GRAVITY<TV>* g=new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true,gravity);
+            solid_body_collection.Add_Force(g);
             break;}
         default:
             LOG::cerr<<"Missing bodies implementation for test number "<<test_number<<std::endl;exit(1);}
