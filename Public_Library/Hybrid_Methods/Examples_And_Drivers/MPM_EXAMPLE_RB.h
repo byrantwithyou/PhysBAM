@@ -147,7 +147,9 @@ public:
     void Precompute_Forces(const T time,const T dt,const bool update_hessian);
     T Potential_Energy(const T time) const;
     void Add_Forces(ARRAY<TV,TV_INT>& F,ARRAY<TWIST<TV> >& RF,const T time) const;
-    void Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,ARRAY<TWIST<TV> >& RF,const ARRAY<TWIST<TV> >& RV,const T time) const;
+    void Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,
+        ARRAY<TWIST<TV> >& RF,const ARRAY<TWIST<TV> >& RV,
+        const T time,bool transpose=false) const;
     void Update_Lagged_Forces(const T time) const;
     int Add_Force(PARTICLE_GRID_FORCES<TV>& force);
     int Add_Force(DEFORMABLES_FORCES<TV>& force);

@@ -166,7 +166,7 @@ Add_Forces(ARRAY<TV,TV_INT>& F,ARRAY<TWIST<TV> >& RF,const T time) const
 // Function Add_Hessian_Times
 //#####################################################################
 template<class TV> void MPM_EXAMPLE_RB<TV>::
-Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,ARRAY<TWIST<TV> >& RF,const ARRAY<TWIST<TV> >& RV,const T time) const
+Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,ARRAY<TWIST<TV> >& RF,const ARRAY<TWIST<TV> >& RV,const T time,bool transpose) const
 {
     for(int i=0;i<forces.m;i++)
         forces(i)->Add_Hessian_Times(F,V,time);
@@ -181,7 +181,7 @@ Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,ARRAY<TWIST<TV> 
     gather_scatter.template Gather<int>(false,
         [this,&V](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid){
             lagrangian_forces_V(p)+=it.Weight()*V(it.Index());});
-    solid_body_collection.Add_Implicit_Velocity_Independent_Forces(lagrangian_forces_V,RV,lagrangian_forces_F,RF,time);
+    solid_body_collection.Add_Implicit_Velocity_Independent_Forces(lagrangian_forces_V,RV,lagrangian_forces_F,RF,time,transpose);
     RF=-RF;
     gather_scatter.template Scatter<int>(false,
         [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid){
