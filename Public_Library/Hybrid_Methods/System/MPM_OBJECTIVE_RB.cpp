@@ -65,8 +65,7 @@ Compute(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_
     if(h){
         for(int i=0;i<system.collisions.m;i++){
             const COLLISION& c=system.collisions(i);
-            system.forced_collisions.Get_Or_Insert(c.p,c.object);}
-        if(system.example.test_system) h->Test_System(dv);}
+            system.forced_collisions.Get_Or_Insert(c.p,c.object);}}
 
 //    if(g) system.Sanity(*g,"g");
 }

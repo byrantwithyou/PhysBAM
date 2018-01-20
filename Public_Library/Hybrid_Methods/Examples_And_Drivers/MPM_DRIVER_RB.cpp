@@ -507,6 +507,7 @@ Apply_Forces()
         example.Update_Lagged_Forces(example.time);
         newtons_method.require_one_iteration=!objective.Initial_Guess(dv,newtons_method.tolerance,example.asymmetric_system);
         if(example.test_diff) objective.Test_Diff(dv);
+        if(example.test_system) objective.system.Test_System(dv,!example.asymmetric_system);
 
         objective.system.forced_collisions.Remove_All();
 
