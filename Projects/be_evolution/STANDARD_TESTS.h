@@ -1739,13 +1739,13 @@ void Get_Initial_Data()
             break;
         case 720:{
             GRID<TV> box_grid(TV_INT()+(resolution+1),RANGE<TV>::Centered_Box()*m);
-            RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,3,0)*m));
+            RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,3.02,0)*m));
             tests.Create_Mattress(box_grid,true,&initial_state,density);
-            initial_state.frame.t.y=5*m;
+            initial_state.frame.t=TV(.01,5.03,.02)*m;
             tests.Create_Mattress(box_grid,true,&initial_state,density);
-            tests.Add_Analytic_Box(TV()+2,TV_INT()+resolution).Frame().t.y=1*m;
-            tests.Add_Analytic_Box(TV()+2,TV_INT()+resolution).Frame().t.y=7*m;
-            tests.Add_Analytic_Box(TV()+2,TV_INT()+resolution).Frame().t.y=9*m;
+            tests.Add_Analytic_Box(TV()+2,TV_INT()+resolution,density).Frame().t.y=1.01*m;
+            tests.Add_Analytic_Box(TV()+2,TV_INT()+resolution,density).Frame().t.y=7.04*m;
+            tests.Add_Analytic_Box(TV()+2,TV_INT()+resolution,density).Frame().t.y=9.05*m;
             tests.Add_Ground(0);
             break;}
         case 721:{
@@ -2247,7 +2247,7 @@ void Initialize_Bodies() override
             for(int s=0;;s++){
                 auto st=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(s);
                 if(!st) break;
-                Add_Constitutive_Model(*st,(T)1e5*unit_p,(T).45,(T).01*s);}
+                Add_Constitutive_Model(*st,(T)1e6*unit_p,(T).45,(T).01*s);}
             Add_Gravity();
             break;}
         default:
