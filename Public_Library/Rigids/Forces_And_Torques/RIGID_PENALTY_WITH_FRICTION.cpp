@@ -72,6 +72,19 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,
         if(c.active){
             TV j=stiffness_coefficient*(c.Z-c.Y);
             if(transpose){
+                TWIST<TV> qs,qi;
+                if(ts) qs=rbs.Scatter(rigid_V(c.bs),c.Z);
+                if(ti) qi=rbi.Scatter(rigid_V(c.bi),c.Y);
+                TV dj=stiffness_coefficient*(qi.linear-qs.linear);
+                TV cs=j.Cross(qs.angular),ci=j.Cross(qi.angular);
+                TV dY=ci-dj,dZ=dj-cs;
+                if(ti){
+                    rigid_F(c.bi).linear+=c.dYdLi.Transpose_Times(dY)-ci;
+                    rigid_F(c.bi).angular+=c.dYdAi.Transpose_Times(dY);}
+                if(ts){
+                    rigid_F(c.bs).linear+=cs+c.dYdLs.Transpose_Times(dY)+c.dZdLs.Transpose_Times(dZ);
+                    rigid_F(c.bs).angular+=c.dYdAs.Transpose_Times(dY)+c.dZdAs.Transpose_Times(dZ);}}
+            else{
                 TV dLs,dLi;
                 typename TV::SPIN dAs,dAi;
                 if(ts){
@@ -84,20 +97,7 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,
                 TV dY=c.dYdLs*dLs+c.dYdAs*dAs+c.dYdLi*dLi+c.dYdAi*dAi;
                 TV dj=stiffness_coefficient*(dZ-dY);
                 if(ts) rigid_F(c.bs)-=rbs.Gather(TWIST<TV>(dj,(dZ-dLs).Cross(j)),c.Z);
-                if(ti) rigid_F(c.bi)+=rbi.Gather(TWIST<TV>(dj,(dY-dLi).Cross(j)),c.Y);}
-            else{
-                TWIST<TV> qs,qi;
-                if(ts) qs=rbs.Scatter(rigid_V(c.bs),c.Z);
-                if(ti) qi=rbi.Scatter(rigid_V(c.bi),c.Y);
-                TV dj=stiffness_coefficient*(qi.linear-qs.linear);
-                TV cs=j.Cross(qs.angular),ci=j.Cross(qi.angular);
-                TV dY=ci-dj,dZ=dj-cs;
-                if(ti){
-                    rigid_F(c.bi).linear+=c.dYdLi.Transpose_Times(dY)-ci;
-                    rigid_F(c.bi).angular+=c.dYdAi.Transpose_Times(dY);}
-                if(ts){
-                    rigid_F(c.bs).linear+=cs+c.dYdLs.Transpose_Times(dY)+c.dZdLs.Transpose_Times(dZ);
-                    rigid_F(c.bs).angular+=c.dYdAs.Transpose_Times(dY)+c.dZdAs.Transpose_Times(dZ);}}}}
+                if(ti) rigid_F(c.bi)+=rbi.Gather(TWIST<TV>(dj,(dY-dLi).Cross(j)),c.Y);}}}
 }
 //#####################################################################
 // Function Potential_Energy
