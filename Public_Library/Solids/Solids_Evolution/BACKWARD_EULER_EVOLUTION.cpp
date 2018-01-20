@@ -20,6 +20,7 @@
 #include <Deformables/Forces/COLLISION_FORCE.h>
 #include <Deformables/Forces/LAGGED_FORCE.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
+#include <Solids/Collisions/PENALTY_FORCE_COLLECTION.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_EVOLUTION.h>
@@ -107,6 +108,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
             newtons_method.Make_Vanilla_Newton();}
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
     bool converged=newtons_method.Newtons_Method(minimization_objective,minimization_system,dv,av);
+    if(minimization_objective.pfd) minimization_objective.pfd->Update_Attachments_And_Prune_Pairs();
     av.Delete_Pointers_And_Clean_Memory();
     newtons_method.tolerance/=dt;
     if(converged) siggraph_hack_newton_iterations=newtons_method.iterations_used;

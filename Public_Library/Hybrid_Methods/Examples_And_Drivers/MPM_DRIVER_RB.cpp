@@ -17,6 +17,7 @@
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION.h>
+#include <Solids/Collisions/PENALTY_FORCE_COLLECTION.h>
 #include <Solids/Forces_And_Torques/RIGID_DEFORMABLE_PENALTY_WITH_FRICTION.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_DRIVER_RB.h>
@@ -119,21 +120,13 @@ Initialize()
     //             cell_soli....
     Update_Simulated_Particles();
 
-    if(example.use_rr && example.solid_body_collection.rigid_body_collection.rigid_body_particles.number>0){
-        example.rr_penalty=new RIGID_PENALTY_WITH_FRICTION<TV>(
-            example.solid_body_collection.rigid_body_collection,example.move_rb_diff,
-            example.rd_penalty_stiffness,example.rd_penalty_friction);
-        example.rr_penalty->get_candidates=[this](){example.Get_RR_Collision_Candidates();};
-        example.solid_body_collection.Add_Force(example.rr_penalty);}
+    if((example.use_rr || example.use_rd) && !example.pfd){
+        example.pfd=new PENALTY_FORCE_COLLECTION<TV>(example.grid,example.grid.Domain_Indices(example.ghost),
+            example.solid_body_collection,example.simulated_particles,example.move_rb_diff);
+        example.pfd->Init(example.rd_penalty_stiffness,
+            example.rd_penalty_friction,0,example.use_di,false,example.use_rd,
+            example.use_rr);}
 
-    if(example.use_rd && example.solid_body_collection.rigid_body_collection.rigid_body_particles.number>0){
-        example.rd_penalty=new RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>(
-            example.solid_body_collection.deformable_body_collection.particles,
-            example.solid_body_collection.rigid_body_collection,example.move_rb_diff,
-            example.rd_penalty_stiffness,example.rd_penalty_friction);
-        example.rd_penalty->get_candidates=[this](){example.Get_RD_Collision_Candidates();};
-        example.solid_body_collection.Add_Force(example.rd_penalty);}
-    
     if(!example.restart) Write_Output_Files(0);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",1);
 }
@@ -241,18 +234,6 @@ Update_Particle_Weights()
         example.weights->Dp_Inverse(example.particles.X,example.Dp_inv);}
 }
 //#####################################################################
-// Function Register_Particles
-//#####################################################################
-template<class TV> void MPM_DRIVER_RB<TV>::
-Register_Particles()
-{
-    example.cell_particles.Resize(example.grid.Domain_Indices(example.ghost));
-    for(int i=0;i<example.simulated_particles.m;i++){
-        int p=example.simulated_particles(i);
-        TV_INT cell_index=example.grid.Cell(example.particles.X(p));
-        example.cell_particles.Insert(cell_index,p);}
-}
-//#####################################################################
 // Function Particle_To_Grid
 //#####################################################################
 template<class TV> void MPM_DRIVER_RB<TV>::
@@ -296,8 +277,6 @@ Particle_To_Grid()
             example.velocity.array(i)=v;
             example.velocity_save.array(i)=v;}
         else example.velocity.array(i)=TV();}
-
-    Register_Particles();
 }
 //#####################################################################
 // Function Grid_To_Particle
@@ -533,12 +512,7 @@ Apply_Forces()
 
         bool converged=newtons_method.Newtons_Method(objective,objective.system,dv,av);
 
-        if(example.rr_penalty)
-            example.rr_penalty->Update_Attachments_And_Prune_Pairs();
-        if(example.rd_penalty)
-            example.rd_penalty->Update_Attachments_And_Prune_Pairs();
-        if(example.di_penalty)
-            example.di_penalty->Update_Attachments_And_Prune_Pairs();
+        if(example.pfd) example.pfd->Update_Attachments_And_Prune_Pairs();
         
         if(!converged) LOG::cout<<"WARNING: Newton's method did not converge"<<std::endl;
         Apply_Friction();
@@ -798,44 +772,44 @@ Apply_Rigid_Body_Forces()
 template<class TV> void MPM_DRIVER_RB<TV>::
 Process_Pairwise_Collisions()
 {
-    RIGID_BODY_COLLECTION<TV>& rigid_body_collection=example.solid_body_collection.rigid_body_collection;
-    bool need_another_iteration=true;
-    for(int i=0;i<example.collision_iterations && need_another_iteration;i++){
-        need_another_iteration=false;
-        for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
-            TV X=it.Location();
-            auto collisions=example.rasterized_data.Get(it.index);
-            for(int c1=0;c1<collisions.m-1;c1++)
-                for(int c2=c1+1;c2<collisions.m;c2++){
-                    if(collisions(c1).phi+collisions(c2).phi<=0){
-                        RIGID_BODY<TV>& body1=rigid_body_collection.Rigid_Body(collisions(c1).id);
-                        RIGID_BODY<TV>& body2=rigid_body_collection.Rigid_Body(collisions(c2).id);
-                        if(body1.Has_Infinite_Inertia() && body2.Has_Infinite_Inertia())
-                            continue;
-                        TV normal=(body2.Implicit_Geometry_Normal(X)-body1.Implicit_Geometry_Normal(X)).Normalized();
-                        TV linear_impulse=PhysBAM::Compute_Collision_Impulse(
-                            normal,
-                            RIGID_BODY<TV>::Impulse_Factor(body1,body2,X),
-                            RIGID_BODY<TV>::Relative_Velocity(body1,body2,X),
-                            RIGID_BODY<TV>::Coefficient_Of_Restitution(body1,body2),
-                            RIGID_BODY<TV>::Coefficient_Of_Friction(body1,body2),
-                            0);
-                        RIGID_BODY<TV>::Apply_Impulse(body1,body2,X,linear_impulse);
-                        need_another_iteration=true;}}
-            if(example.mass(it.index)){
-                for(int c=0;c<collisions.m;c++){
-                    if(collisions(c).phi>0) continue;
-                    RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(collisions(c).id);
-                    TV linear_impulse=PhysBAM::Compute_Collision_Impulse(
-                        -body.Implicit_Geometry_Normal(X),
-                        body.Impulse_Factor(X)+1/example.mass(it.index),
-                        body.Pointwise_Object_Velocity(X)-example.velocity(it.index),
-                        body.coefficient_of_restitution,
-                        body.coefficient_of_friction,
-                        0);
-                    body.Apply_Impulse_To_Body(X,linear_impulse);
-                    example.velocity(it.index)-=linear_impulse/example.mass(it.index);
-                    need_another_iteration=true;}}}}
+    // RIGID_BODY_COLLECTION<TV>& rigid_body_collection=example.solid_body_collection.rigid_body_collection;
+    // bool need_another_iteration=true;
+    // for(int i=0;i<example.collision_iterations && need_another_iteration;i++){
+    //     need_another_iteration=false;
+    //     for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
+    //         TV X=it.Location();
+    //         auto collisions=example.rasterized_data.Get(it.index);
+    //         for(int c1=0;c1<collisions.m-1;c1++)
+    //             for(int c2=c1+1;c2<collisions.m;c2++){
+    //                 if(collisions(c1).phi+collisions(c2).phi<=0){
+    //                     RIGID_BODY<TV>& body1=rigid_body_collection.Rigid_Body(collisions(c1).id);
+    //                     RIGID_BODY<TV>& body2=rigid_body_collection.Rigid_Body(collisions(c2).id);
+    //                     if(body1.Has_Infinite_Inertia() && body2.Has_Infinite_Inertia())
+    //                         continue;
+    //                     TV normal=(body2.Implicit_Geometry_Normal(X)-body1.Implicit_Geometry_Normal(X)).Normalized();
+    //                     TV linear_impulse=PhysBAM::Compute_Collision_Impulse(
+    //                         normal,
+    //                         RIGID_BODY<TV>::Impulse_Factor(body1,body2,X),
+    //                         RIGID_BODY<TV>::Relative_Velocity(body1,body2,X),
+    //                         RIGID_BODY<TV>::Coefficient_Of_Restitution(body1,body2),
+    //                         RIGID_BODY<TV>::Coefficient_Of_Friction(body1,body2),
+    //                         0);
+    //                     RIGID_BODY<TV>::Apply_Impulse(body1,body2,X,linear_impulse);
+    //                     need_another_iteration=true;}}
+    //         if(example.mass(it.index)){
+    //             for(int c=0;c<collisions.m;c++){
+    //                 if(collisions(c).phi>0) continue;
+    //                 RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(collisions(c).id);
+    //                 TV linear_impulse=PhysBAM::Compute_Collision_Impulse(
+    //                     -body.Implicit_Geometry_Normal(X),
+    //                     body.Impulse_Factor(X)+1/example.mass(it.index),
+    //                     body.Pointwise_Object_Velocity(X)-example.velocity(it.index),
+    //                     body.coefficient_of_restitution,
+    //                     body.coefficient_of_friction,
+    //                     0);
+    //                 body.Apply_Impulse_To_Body(X,linear_impulse);
+    //                 example.velocity(it.index)-=linear_impulse/example.mass(it.index);
+    //                 need_another_iteration=true;}}}}
 }
 //#####################################################################
 // Function Process_Projected_Collisions
@@ -843,117 +817,117 @@ Process_Pairwise_Collisions()
 template<class TV> void MPM_DRIVER_RB<TV>::
 Process_Projected_Collisions(T dt)
 {
-    struct CONTACT_INFO_RR
-    {
-        RIGID_BODY<TV> *b0,*b1;
-        TV X;
-        T nu;
-        T mu;
-        TV normal;
-        TV impulse;
-        TV const_part;
+    // struct CONTACT_INFO_RR
+    // {
+    //     RIGID_BODY<TV> *b0,*b1;
+    //     TV X;
+    //     T nu;
+    //     T mu;
+    //     TV normal;
+    //     TV impulse;
+    //     TV const_part;
         
-        void Apply(TV j) {RIGID_BODY<TV>::Apply_Impulse(*b0,*b1,X,j);}
-        TV Rel_Vel() const {return RIGID_BODY<TV>::Relative_Velocity(*b0,*b1,X);}
-    };
-    ARRAY<CONTACT_INFO_RR> candidate_contacts_rr;
+    //     void Apply(TV j) {RIGID_BODY<TV>::Apply_Impulse(*b0,*b1,X,j);}
+    //     TV Rel_Vel() const {return RIGID_BODY<TV>::Relative_Velocity(*b0,*b1,X);}
+    // };
+    // ARRAY<CONTACT_INFO_RR> candidate_contacts_rr;
 
-    struct CONTACT_INFO_RM
-    {
-        RIGID_BODY<TV> *b0;
-        TV_INT index;
-        TV X;
-        TV* vp;
-        T mpi;
-        T nu;
-        T mu;
-        TV normal;
-        TV impulse;
-        TV const_part;
+    // struct CONTACT_INFO_RM
+    // {
+    //     RIGID_BODY<TV> *b0;
+    //     TV_INT index;
+    //     TV X;
+    //     TV* vp;
+    //     T mpi;
+    //     T nu;
+    //     T mu;
+    //     TV normal;
+    //     TV impulse;
+    //     TV const_part;
 
-        void Apply(TV j) {b0->Apply_Impulse_To_Body(X,j);*vp-=mpi*j;}
-        TV Rel_Vel() const {return b0->Pointwise_Object_Velocity(X)-*vp;}
-    };
-    ARRAY<CONTACT_INFO_RM> candidate_contacts_rm;
+    //     void Apply(TV j) {b0->Apply_Impulse_To_Body(X,j);*vp-=mpi*j;}
+    //     TV Rel_Vel() const {return b0->Pointwise_Object_Velocity(X)-*vp;}
+    // };
+    // ARRAY<CONTACT_INFO_RM> candidate_contacts_rm;
 
-    auto Project_Cone=[](const TV& j,const TV& n,T mu)
-    {
-        T jn=j.Dot(n);
-        TV jt=j-n*jn;
-        T js=jt.Normalize();
-        if(js<=mu*jn) return j;
-        T zr=js*mu+jn;
-        if(zr<=0) return TV();
-        T alpha=zr/(mu*mu+1);
-        return alpha*n+(mu*alpha)*jt;
-    };
+    // auto Project_Cone=[](const TV& j,const TV& n,T mu)
+    // {
+    //     T jn=j.Dot(n);
+    //     TV jt=j-n*jn;
+    //     T js=jt.Normalize();
+    //     if(js<=mu*jn) return j;
+    //     T zr=js*mu+jn;
+    //     if(zr<=0) return TV();
+    //     T alpha=zr/(mu*mu+1);
+    //     return alpha*n+(mu*alpha)*jt;
+    // };
 
-    T min_impulse_change_squared=sqr(example.min_impulse_change);
-    T lambda=example.impulse_interpolation;
-    auto GS_Iteration=[min_impulse_change_squared,lambda,Project_Cone](auto& ci)
-    {
-        TV delta=ci.impulse-ci.nu*(ci.Rel_Vel()+ci.const_part);
-        TV new_impulse=lambda*Project_Cone(delta,ci.normal,ci.mu)+(1-lambda)*ci.impulse;
-        TV di=new_impulse-ci.impulse;
-        ci.Apply(di);
-        ci.impulse=new_impulse;
-        return di.Magnitude_Squared()>min_impulse_change_squared;
-    };
+    // T min_impulse_change_squared=sqr(example.min_impulse_change);
+    // T lambda=example.impulse_interpolation;
+    // auto GS_Iteration=[min_impulse_change_squared,lambda,Project_Cone](auto& ci)
+    // {
+    //     TV delta=ci.impulse-ci.nu*(ci.Rel_Vel()+ci.const_part);
+    //     TV new_impulse=lambda*Project_Cone(delta,ci.normal,ci.mu)+(1-lambda)*ci.impulse;
+    //     TV di=new_impulse-ci.impulse;
+    //     ci.Apply(di);
+    //     ci.impulse=new_impulse;
+    //     return di.Magnitude_Squared()>min_impulse_change_squared;
+    // };
 
-    RIGID_BODY_COLLECTION<TV>& rigid_body_collection=example.solid_body_collection.rigid_body_collection;
-    for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
-        TV X=it.Location();
-        auto collisions=example.rasterized_data.Get(it.index);
-        for(int c0=0;c0<collisions.m-1;c0++)
-            for(int c1=c0+1;c1<collisions.m;c1++){
-                T ph=collisions(c0).phi+collisions(c1).phi;
-                if(ph<=0){
-                    int i0=collisions(c0).id,i1=collisions(c1).id;
-                    PHYSBAM_ASSERT(i0<i1);
-                    RIGID_BODY<TV>& b0=rigid_body_collection.Rigid_Body(i0);
-                    RIGID_BODY<TV>& b1=rigid_body_collection.Rigid_Body(i1);
-                    if(b0.Has_Infinite_Inertia() && b1.Has_Infinite_Inertia())
-                        continue;
-                    CONTACT_INFO_RR ci={&b0,&b1,X};
-                    ci.nu=TV::m/RIGID_BODY<TV>::Impulse_Factor(b0,b1,X).Trace()*example.contact_factor;
-                    ci.mu=RIGID_BODY<TV>::Coefficient_Of_Friction(b0,b1);
-                    ci.normal=(b1.Implicit_Geometry_Normal(X)-b0.Implicit_Geometry_Normal(X)).Normalized();
-                    ci.const_part=ph/dt*ci.normal*0;
-                    if(example.stored_contacts_rr.Get({i0,i1},ci.impulse))
-                        ci.Apply(ci.impulse);
-                    candidate_contacts_rr.Append(ci);}}
-        if(example.mass(it.index)){
-            for(int c=0;c<collisions.m;c++){
-                if(collisions(c).phi>0) continue;
-                int i0=collisions(c).id;
-                RIGID_BODY<TV>& b0=rigid_body_collection.Rigid_Body(i0);
-                CONTACT_INFO_RM ci={&b0,it.index,X};
-                ci.vp=&example.velocity(it.index);
-                ci.mpi=1/example.mass(it.index);
-                ci.nu=TV::m/(b0.Impulse_Factor(X)+1/example.mass(it.index)).Trace()*example.contact_factor;
-                ci.mu=b0.coefficient_of_friction;
-                ci.normal=-b0.Implicit_Geometry_Normal(X);
-                ci.const_part=collisions(c).phi/dt*ci.normal;
-                if(example.stored_contacts_rm.Get({i0,it.index},ci.impulse))
-                    ci.Apply(ci.impulse);
-                candidate_contacts_rm.Append(ci);}}}
+    // RIGID_BODY_COLLECTION<TV>& rigid_body_collection=example.solid_body_collection.rigid_body_collection;
+    // for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
+    //     TV X=it.Location();
+    //     auto collisions=example.rasterized_data.Get(it.index);
+    //     for(int c0=0;c0<collisions.m-1;c0++)
+    //         for(int c1=c0+1;c1<collisions.m;c1++){
+    //             T ph=collisions(c0).phi+collisions(c1).phi;
+    //             if(ph<=0){
+    //                 int i0=collisions(c0).id,i1=collisions(c1).id;
+    //                 PHYSBAM_ASSERT(i0<i1);
+    //                 RIGID_BODY<TV>& b0=rigid_body_collection.Rigid_Body(i0);
+    //                 RIGID_BODY<TV>& b1=rigid_body_collection.Rigid_Body(i1);
+    //                 if(b0.Has_Infinite_Inertia() && b1.Has_Infinite_Inertia())
+    //                     continue;
+    //                 CONTACT_INFO_RR ci={&b0,&b1,X};
+    //                 ci.nu=TV::m/RIGID_BODY<TV>::Impulse_Factor(b0,b1,X).Trace()*example.contact_factor;
+    //                 ci.mu=RIGID_BODY<TV>::Coefficient_Of_Friction(b0,b1);
+    //                 ci.normal=(b1.Implicit_Geometry_Normal(X)-b0.Implicit_Geometry_Normal(X)).Normalized();
+    //                 ci.const_part=ph/dt*ci.normal*0;
+    //                 if(example.stored_contacts_rr.Get({i0,i1},ci.impulse))
+    //                     ci.Apply(ci.impulse);
+    //                 candidate_contacts_rr.Append(ci);}}
+    //     if(example.mass(it.index)){
+    //         for(int c=0;c<collisions.m;c++){
+    //             if(collisions(c).phi>0) continue;
+    //             int i0=collisions(c).id;
+    //             RIGID_BODY<TV>& b0=rigid_body_collection.Rigid_Body(i0);
+    //             CONTACT_INFO_RM ci={&b0,it.index,X};
+    //             ci.vp=&example.velocity(it.index);
+    //             ci.mpi=1/example.mass(it.index);
+    //             ci.nu=TV::m/(b0.Impulse_Factor(X)+1/example.mass(it.index)).Trace()*example.contact_factor;
+    //             ci.mu=b0.coefficient_of_friction;
+    //             ci.normal=-b0.Implicit_Geometry_Normal(X);
+    //             ci.const_part=collisions(c).phi/dt*ci.normal;
+    //             if(example.stored_contacts_rm.Get({i0,it.index},ci.impulse))
+    //                 ci.Apply(ci.impulse);
+    //             candidate_contacts_rm.Append(ci);}}}
 
-    example.stored_contacts_rr.Remove_All();
-    example.stored_contacts_rm.Remove_All();
+    // example.stored_contacts_rr.Remove_All();
+    // example.stored_contacts_rm.Remove_All();
     
-    bool need_another_iteration=true;
-    for(int i=0;i<example.collision_iterations && need_another_iteration;i++){
-        need_another_iteration=false;
-        for(int i=0;i<candidate_contacts_rr.m;i++)
-            if(GS_Iteration(candidate_contacts_rr(i)))
-                need_another_iteration=true;
-        for(int i=0;i<candidate_contacts_rm.m;i++)
-            if(GS_Iteration(candidate_contacts_rm(i)))
-                need_another_iteration=true;}
+    // bool need_another_iteration=true;
+    // for(int i=0;i<example.collision_iterations && need_another_iteration;i++){
+    //     need_another_iteration=false;
+    //     for(int i=0;i<candidate_contacts_rr.m;i++)
+    //         if(GS_Iteration(candidate_contacts_rr(i)))
+    //             need_another_iteration=true;
+    //     for(int i=0;i<candidate_contacts_rm.m;i++)
+    //         if(GS_Iteration(candidate_contacts_rm(i)))
+    //             need_another_iteration=true;}
 
-    for(int i=0;i<candidate_contacts_rr.m;i++){
-        const CONTACT_INFO_RR& ci=candidate_contacts_rr(i);
-        example.stored_contacts_rr.Set({ci.b0->particle_index,ci.b1->particle_index},ci.impulse);}
+    // for(int i=0;i<candidate_contacts_rr.m;i++){
+    //     const CONTACT_INFO_RR& ci=candidate_contacts_rr(i);
+    //     example.stored_contacts_rr.Set({ci.b0->particle_index,ci.b1->particle_index},ci.impulse);}
 
 
 }

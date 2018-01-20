@@ -23,6 +23,7 @@
 #include <Deformables/Forces/DEFORMABLE_GRAVITY.h>
 #include <Deformables/Forces/FINITE_VOLUME.h>
 #include <Deformables/Forces/IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION.h>
+#include <Solids/Collisions/PENALTY_FORCE_COLLECTION.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
@@ -585,19 +586,11 @@ template<class TV> void STANDARD_TESTS_BASE<TV>::
 Add_Collision_Object(IMPLICIT_OBJECT<TV>* io)
 {
     if(!use_di) return;
-    if(!di_penalty){
-        di_penalty=new IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>(
-            solid_body_collection.deformable_body_collection.particles,
-            rd_penalty_stiffness,rd_penalty_friction);
-        di_penalty->get_candidates=[this](){this->Get_DI_Collision_Candidates();};
-        this->cell_objects.Resize(grid.Domain_Indices(ghost));
-        solid_body_collection.deformable_body_collection.Add_Force(di_penalty);}
-
-    T padding=grid.dX.Magnitude()/2;
-    int o=di_penalty->ios.Append(io);
-    for(CELL_ITERATOR<TV> it(grid,ghost);it.Valid();it.Next())
-        if(io->Extended_Phi(it.Location())<padding)
-            this->cell_objects.Insert(it.index,o);
+    if(use_di && !pfd){
+        pfd=new PENALTY_FORCE_COLLECTION<TV>(grid,grid.Domain_Indices(ghost),
+            solid_body_collection,simulated_particles,this->move_rb_diff);
+        pfd->Init(rd_penalty_stiffness,rd_penalty_friction,0,use_di,false,use_rd,use_rr);}
+    pfd->Rasterize_Implicit_Object(io);
 }
 //#####################################################################
 // Function Add_Collision_Object

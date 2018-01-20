@@ -18,7 +18,7 @@ namespace PhysBAM{
 // Optimized for the case where almost all entries of the array
 // contain zero or one element.
 
-template<class T,class ID=int> // ID=int
+template<class T,class ID>
 class CHAINED_ARRAY
 {
 public:
@@ -31,28 +31,28 @@ public:
         ~DATA() {t.~T();}
     };
 
-    ARRAY<DATA,ID> array;
+    HASHTABLE<ID,DATA> hash;
     ARRAY<ARRAY<T> > extra;
 
     CHAINED_ARRAY()
     {}
 
     void Remove_All()
-    {for(auto& it:array) it.i=-1;}
+    {hash.Remove_All();}
 
     template<class... Args>
     void Resize(Args&&... args)
-    {array.Resize(args...);Remove_All();}
+    {Remove_All();}
 
     template<class U,class CA>
     static ARRAY_VIEW<U> Get_Helper(CA& ca,const ID& i)
     {
-        auto& d=ca.array(i);
-        if(d.i==-1) return ARRAY_VIEW<U>();
-        if(d.i>=0) return ARRAY_VIEW<U>(1,&d.t);
-        return ca.extra(-2-d.i);
+        if(DATA* d=ca.hash.Get_Pointer(i)){
+            if(d->i>=0) return ARRAY_VIEW<U>(1,&d->t);
+            return ca.extra(~d->i);}
+        return ARRAY_VIEW<U>();
     }
-    
+
     ARRAY_VIEW<const T> Get(const ID& i) const
     {return Get_Helper<const T>(*this,i);}
     
@@ -61,19 +61,22 @@ public:
 
     void Insert(const ID& i,const T& data)
     {
-        DATA& d=array(i);
-        if(d.i==-1){d.t=data;assert(d.i>=0);}
-        else if(d.i<0) extra(-2-d.i).Append(data);
+        if(DATA* d=hash.Get_Pointer(i)){
+            if(d->i<0) extra(~d->i).Append(data);
+            else{
+                int j=extra.Append(ARRAY<T>());
+                extra(j).Append(d->t);
+                extra(j).Append(data);
+                d->i=~j;}}
         else{
-            int j=extra.Append(ARRAY<T>());
-            extra(j).Append(d.t);
-            extra(j).Append(data);
-            d.i=-2-j;}
+            DATA e;
+            e.t=data;
+            hash.Set(i,e);}
     }
 
     bool Contains(const ID& i) const
     {return array(i).i!=-1;}
-    
+
 //#####################################################################
 };
 }

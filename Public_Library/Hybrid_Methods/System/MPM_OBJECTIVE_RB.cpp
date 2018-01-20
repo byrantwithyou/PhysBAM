@@ -8,6 +8,7 @@
 #include <Rigids/Particles/RIGID_BODY_PARTICLES.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
+#include <Solids/Collisions/PENALTY_FORCE_COLLECTION.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE_RB.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
@@ -84,7 +85,8 @@ Compute_Unconstrained(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,
     Update_F(v1);
     T midpoint_factor=use_midpoint?(T).25:1;
 
-    system.example.Update_Collision_Detection_Structures();
+    if(system.example.pfd)
+        system.example.pfd->Update_Collision_Detection_Structures();
     system.example.Precompute_Forces(system.example.time,system.example.dt,h);
     if(e){
         T energy=midpoint_factor*system.Inner_Product(dv,dv)/2;

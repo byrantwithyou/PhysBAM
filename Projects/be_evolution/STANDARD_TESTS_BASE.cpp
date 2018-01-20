@@ -24,6 +24,7 @@
 #include <Deformables/Forces/IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION.h>
 #include <Deformables/Forces/SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
+#include <Solids/Collisions/PENALTY_FORCE_COLLECTION.h>
 #include <Solids/Forces_And_Torques/RIGID_DEFORMABLE_PENALTY_WITH_FRICTION.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
@@ -115,7 +116,6 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     unit_N=kg*m/(s*s);
     unit_p=unit_N/(m*m);
     unit_J=unit_N*m;
-    const_repulsion_thickness*=m;
     if(backward_euler_evolution){
         backward_euler_evolution->newtons_method.tolerance*=unit_N*s;
         backward_euler_evolution->newtons_method.krylov_tolerance/=sqrt(unit_N*s);
@@ -161,135 +161,19 @@ After_Get_Initial_Data(bool automatically_add_to_collision_structures)
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 After_Initialize_Bodies()
 {
-    DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
-    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
-    typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_SURFACE;
-    typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m>::OBJECT T_OBJECT;
 
-    if(use_rd || use_di || use_dd || use_rr)
-        backward_euler_evolution->asymmetric_system=true;
+    if(use_rd || use_di || use_dd || use_rr){
+        Init_Penalty_Collection();
+        backward_euler_evolution->asymmetric_system=true;}
 
     if((use_rd || use_rr) && rigid_body_collection.rigid_body_particles.number>0){
         move_rb_diff.Resize(rigid_body_collection.rigid_body_particles.number);
         backward_euler_evolution->minimization_objective.move_rb_diff=&move_rb_diff;}
 
-    if(use_rd && rigid_body_collection.rigid_body_particles.number>0){
-        rd_penalty=new RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>(
-            particles,rigid_body_collection,move_rb_diff,
-            rd_penalty_stiffness,rd_penalty_friction);
-        rd_penalty->get_candidates=[this](){Get_RD_Collision_Candidates();};
-        solid_body_collection.Add_Force(rd_penalty);}
-
-    if(use_rr && rigid_body_collection.rigid_body_particles.number>0){
-        rr_penalty=new RIGID_PENALTY_WITH_FRICTION<TV>(
-            rigid_body_collection,move_rb_diff,
-            rd_penalty_stiffness,rd_penalty_friction);
-        rr_penalty->get_candidates=[this](){Get_RR_Collision_Candidates();};
-        solid_body_collection.Add_Force(rr_penalty);}
-
-    if(use_dd){
-        dd_penalty=new SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION<TV>(
-            particles,rd_penalty_stiffness,rd_penalty_friction);
-        dd_penalty->get_candidates=[this](){Get_DD_Collision_Candidates();};
-        solid_body_collection.Add_Force(dd_penalty);
-        deformable_body_collection.triangle_collisions.compute_edge_edge_collisions=false;
-        for(int i=0;i<deformable_body_collection.structures.m;i++){
-            auto* s=deformable_body_collection.structures(i);
-            if(auto* p=dynamic_cast<T_SURFACE*>(s))
-                dd_penalty->Add_Surface(*p);
-            else if(auto* p=dynamic_cast<T_OBJECT*>(s))
-                dd_penalty->Add_Surface(p->Get_Boundary_Object());}
-        deformable_body_collection.triangle_repulsions_and_collisions_geometry.Build_Collision_Geometry();
-        deformable_body_collection.triangle_repulsions_and_collisions_geometry.X_self_collision_free=particles.X;
-        repulsion_thickness.Resize(particles.number,true,true,const_repulsion_thickness);
-        recently_modified.Resize(particles.number,true,true,true);
-
-        deformable_body_collection.triangle_repulsions_and_collisions_geometry.Initialize(solids_parameters.triangle_collision_parameters);
-        deformable_body_collection.triangle_repulsions.Initialize(solids_parameters.triangle_collision_parameters);
-        deformable_body_collection.triangle_collisions.Initialize(solids_parameters.triangle_collision_parameters);}
-
     if(backward_euler_evolution) backward_euler_evolution->minimization_objective.Disable_Current_Colliding_Pairs(0);
 
     solids_evolution->fully_implicit=true;
-}
-//#####################################################################
-// Function Get_RD_Collision_Candidates
-//#####################################################################
-template<class TV> void STANDARD_TESTS_BASE<TV>::
-Get_RD_Collision_Candidates()
-{
-    // TODO use BOX_HIERARCHY
-    DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
-    RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
-    for(int d=0;d<particles.number;d++){
-        TV X=particles.X(d);
-        for(int r=0;r<rigid_body_collection.rigid_body_particles.number;r++){
-            if(rigid_body_collection.Rigid_Body(r).Implicit_Geometry_Extended_Value(X)<0)
-                rd_penalty->Add_Pair(d,r);}}
-}
-//#####################################################################
-// Function Get_DD_Collision_Candidates
-//#####################################################################
-template<class TV> void STANDARD_TESTS_BASE<TV>::
-Get_DD_Collision_Candidates()
-{
-    typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX_FACE T_FACE;
-    DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
-    ARRAY<TV>& Xn=deformable_body_collection.triangle_repulsions_and_collisions_geometry.X_self_collision_free;
-    deformable_body_collection.triangle_collisions.Update_Swept_Hierachies_And_Compute_Pairs(
-        particles.X,Xn,recently_modified,const_repulsion_thickness);
-
-    LOG::printf("num candidate pairs: %i\n",deformable_body_collection.triangle_collisions.point_face_pairs_internal.m);
-    for(int i=0;i<deformable_body_collection.triangle_collisions.point_face_pairs_internal.m;i++){ // p f
-        VECTOR<int,TV::m+1> pf=deformable_body_collection.triangle_collisions.point_face_pairs_internal(i);
-        int p=pf(0);
-        TV_INT f=pf.Remove_Index(0);
-
-        // Detection is expensive; make sure we are not already known.
-        auto s_e=dd_penalty->object_from_element.Get(f.Sorted());
-        if(dd_penalty->hash.Contains({p,s_e.x})) continue;
-        const auto& ts=*dd_penalty->surfaces(s_e.x);
-        PHYSBAM_ASSERT(f==ts.mesh.elements(s_e.y));
-
-        // Particle must have exited.
-        if(ts.Get_Element(s_e.y).Signed_Distance(particles.X(p))>0) continue;
-
-        // Do the expensive check.
-        T_FACE face(Xn.Subset(f));
-        T collision_time=0;
-        TV normal;
-        VECTOR<T,TV::m+1> weights;
-        VECTOR<TV,TV::m> V_f(particles.X.Subset(f)-Xn.Subset(f));
-        bool in=face.Point_Face_Collision(Xn(p),particles.X(p)-Xn(p),V_f,1,
-            const_repulsion_thickness,collision_time,normal,weights,false);
-        if(!in) continue;
-        
-        dd_penalty->Add_Pair(p,s_e.x,weights.Remove_Index(0),s_e.y);}
-}
-//#####################################################################
-// Function Get_DI_Collision_Candidates
-//#####################################################################
-template<class TV> void STANDARD_TESTS_BASE<TV>::
-Get_DI_Collision_Candidates()
-{
-    // TODO use BOX_HIERARCHY
-    DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
-    for(int b=0;b<di_penalty->ios.m;b++){
-        const IMPLICIT_OBJECT<TV>& io=*di_penalty->ios(b);
-        for(int p=0;p<particles.number;p++){
-            if(io.Extended_Phi(particles.X(p))<0)
-                di_penalty->Add_Pair(p,b);}}
-}
-//#####################################################################
-// Function Get_RR_Collision_Candidates
-//#####################################################################
-template<class TV> void STANDARD_TESTS_BASE<TV>::
-Get_RR_Collision_Candidates()
-{
 }
 //#####################################################################
 // Function Preprocess_Substep
@@ -298,15 +182,10 @@ template<class TV> void STANDARD_TESTS_BASE<TV>::
 Preprocess_Substep(const T dt,const T time)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     if(test_forces){
         deformable_body_collection.Test_Energy(time);
         deformable_body_collection.Test_Force_Derivatives(time);}
-    if(dd_penalty){
-        deformable_body_collection.triangle_repulsions_and_collisions_geometry.X_self_collision_free=particles.X;
-        repulsion_thickness.Resize(particles.number,true,true,const_repulsion_thickness);
-        recently_modified.Resize(particles.number);
-        recently_modified.Fill(true);}
+    if(pfd) pfd->Save_State();
 }
 //#####################################################################
 // Function Postprocess_Substep
@@ -314,14 +193,6 @@ Preprocess_Substep(const T dt,const T time)
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Postprocess_Substep(const T dt,const T time)
 {
-    if(rd_penalty)
-        rd_penalty->Update_Attachments_And_Prune_Pairs();
-    if(di_penalty)
-        di_penalty->Update_Attachments_And_Prune_Pairs();
-    if(dd_penalty)
-        dd_penalty->Update_Attachments_And_Prune_Pairs();
-    if(rr_penalty)
-        rr_penalty->Update_Attachments_And_Prune_Pairs();
 }
 //#####################################################################
 // Function Add_Collision_Object
@@ -329,14 +200,25 @@ Postprocess_Substep(const T dt,const T time)
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Add_Collision_Object(IMPLICIT_OBJECT<TV>* io)
 {
-    if(!di_penalty){
-        di_penalty=new IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>(
-            solid_body_collection.deformable_body_collection.particles,
-            rd_penalty_stiffness,rd_penalty_friction);
-        di_penalty->get_candidates=[this](){Get_DI_Collision_Candidates();};
-        solid_body_collection.deformable_body_collection.Add_Force(di_penalty);}
-        
-    di_penalty->ios.Append(io);
+    if(!use_di) return;
+    Init_Penalty_Collection();
+    pfd->Rasterize_Implicit_Object(io);
+}
+//#####################################################################
+// Function Init_Penalty_Collection
+//#####################################################################
+template<class TV> void STANDARD_TESTS_BASE<TV>::
+Init_Penalty_Collection()
+{
+    if(pfd) return;
+    if(!use_rd && !use_di && !use_dd && !use_rr) return;
+    detection_grid.Initialize(TV_INT()+100,RANGE<TV>::Centered_Box()*10,true);
+    pfd=new PENALTY_FORCE_COLLECTION<TV>(detection_grid,detection_grid.Domain_Indices(),
+        solid_body_collection,solid_body_collection.deformable_body_collection.simulated_particles,this->move_rb_diff);
+    pfd->Init(rd_penalty_stiffness,rd_penalty_friction,
+        &solids_parameters.triangle_collision_parameters,
+        use_di,use_dd,use_rd,use_rr);
+    if(backward_euler_evolution) backward_euler_evolution->minimization_objective.pfd=pfd;
 }
 template class STANDARD_TESTS_BASE<VECTOR<float,2> >;
 template class STANDARD_TESTS_BASE<VECTOR<float,3> >;

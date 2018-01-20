@@ -14,10 +14,7 @@
 namespace PhysBAM{
 
 template<class TV> class BACKWARD_EULER_EVOLUTION;
-template<class TV> class RIGID_DEFORMABLE_PENALTY_WITH_FRICTION;
-template<class TV> class RIGID_PENALTY_WITH_FRICTION;
-template<class TV> class IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION;
-template<class TV> class SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION;
+template<class TV> class PENALTY_FORCE_COLLECTION;
 template<class TV> class MOVE_RIGID_BODY_DIFF;
 template<class TV> class TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY;
 template<class TV> class TRIANGLE_COLLISIONS;
@@ -45,28 +42,19 @@ public:
     T rd_penalty_stiffness=0;
     T rd_penalty_friction=0.3;
     bool use_rd=false,use_rr=false,use_dd=false,use_di=false;
-    RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>* rd_penalty=0;
-    RIGID_PENALTY_WITH_FRICTION<TV>* rr_penalty=0;
-    IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* di_penalty=0;
-    SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION<TV>* dd_penalty=0;
+    PENALTY_FORCE_COLLECTION<TV>* pfd=0;
     ARRAY<MOVE_RIGID_BODY_DIFF<TV> > move_rb_diff;
-
-    T const_repulsion_thickness=(T).01;
-    ARRAY<T> repulsion_thickness; // must be same size as particles.number
-    ARRAY<bool> recently_modified; // must be same size as particles.number
+    GRID<TV> detection_grid;
 
     STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS_BASE();
 
     void After_Get_Initial_Data(bool automatically_add_to_collision_structures);
     void After_Initialize_Bodies();
-    void Get_RD_Collision_Candidates();
-    void Get_DD_Collision_Candidates();
-    void Get_DI_Collision_Candidates();
-    void Get_RR_Collision_Candidates();
     void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io);
     void Preprocess_Substep(const T dt,const T time) override;
     void Postprocess_Substep(const T dt,const T time) override;
+    void Init_Penalty_Collection();
 };
 }
 #endif

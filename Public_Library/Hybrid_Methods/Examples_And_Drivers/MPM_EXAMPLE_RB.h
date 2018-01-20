@@ -33,6 +33,7 @@ template<class TV> class MPM_PLASTICITY_MODEL;
 template<class TV> class IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION;
 template<class T> class RIGID_DEFORMABLE_PENALTY_WITH_FRICTION;
 template<class T> class RIGID_PENALTY_WITH_FRICTION;
+template<class TV> class PENALTY_FORCE_COLLECTION;
 
 template<class TV>
 class MPM_EXAMPLE_RB
@@ -112,17 +113,6 @@ public:
     T quad_F_coeff=0;
     bool asymmetric_system=false;
 
-    CHAINED_ARRAY<int,TV_INT> cell_particles;
-    CHAINED_ARRAY<int,TV_INT> cell_objects;
-    CHAINED_ARRAY<PAIR<int,int>,TV_INT> cell_vertices; // <rigid_body,vertex>
-
-    // First entry MUST be int, and its value MUST be nonnegative.
-    struct RASTERIZED_DATA
-    {
-        int id;
-        T phi;
-    };
-    CHAINED_ARRAY<RASTERIZED_DATA,TV_INT> rasterized_data;
     ARRAY<bool> rigid_body_is_simulated;
     HASHTABLE<PAIR<int,int>,TV> stored_contacts_rr;
     HASHTABLE<PAIR<int,TV_INT>,TV> stored_contacts_rm;
@@ -137,10 +127,7 @@ public:
     T rd_penalty_stiffness=0;
     T rd_penalty_friction=0.3;
     bool use_rd=false,use_rr=false,use_di=false;
-
-    RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>* rd_penalty=0;
-    IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* di_penalty=0;
-    RIGID_PENALTY_WITH_FRICTION<TV>* rr_penalty=0;
+    PENALTY_FORCE_COLLECTION<TV>* pfd;
     ARRAY<MOVE_RIGID_BODY_DIFF<TV> > move_rb_diff;
     
     MPM_EXAMPLE_RB(const STREAM_TYPE stream_type_input);
@@ -175,10 +162,6 @@ public:
     T Total_Particle_Kinetic_Energy() const;
     T Average_Particle_Mass() const;
     template<class S> void Reflection_Boundary_Condition(ARRAY<S,TV_INT>& u,bool flip_sign) const;
-    void Update_Collision_Detection_Structures();
-    void Get_RD_Collision_Candidates();
-    void Get_DI_Collision_Candidates();
-    void Get_RR_Collision_Candidates();
 //#####################################################################
 };
 }

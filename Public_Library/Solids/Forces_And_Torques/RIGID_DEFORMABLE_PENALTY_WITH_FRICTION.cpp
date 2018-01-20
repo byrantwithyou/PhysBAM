@@ -61,9 +61,6 @@ Update_Position_Based_State(const T time)
     num_stick=0;
     for(int i=0;i<collision_pairs.m;i++)
         Relax_Attachment(i);
-
-    LOG::printf("RIGID_DEFORMABLE_PENALTY_WITH_FRICTION %i (sep %i st %i dyn %i)\n",
-        collision_pairs.m,collision_pairs.m-num_stick-num_dynamic,num_stick,num_dynamic);
 }
 //#####################################################################
 // Function Add_Implicit_Velocity_Independent_Forces

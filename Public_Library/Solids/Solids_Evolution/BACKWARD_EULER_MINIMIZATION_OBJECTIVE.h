@@ -20,6 +20,7 @@ template<class TV> class SOLID_BODY_COLLECTION;
 template<class TV> class BACKWARD_EULER_MINIMIZATION_SYSTEM;
 template<class TV> class BACKWARD_EULER_SYSTEM;
 template<class TV> class IMPLICIT_OBJECT;
+template<class TV> class PENALTY_FORCE_COLLECTION;
 
 template<class TV>
 class BACKWARD_EULER_MINIMIZATION_OBJECTIVE:public NONLINEAR_FUNCTION<typename TV::SCALAR(KRYLOV_VECTOR_BASE<typename TV::SCALAR>&)>
@@ -42,6 +43,7 @@ public:
     mutable T last_energy;
     bool collisions_in_solve;
     ARRAY<MOVE_RIGID_BODY_DIFF<TV> >* move_rb_diff=0;
+    PENALTY_FORCE_COLLECTION<TV>* pfd=0;
 
     BACKWARD_EULER_MINIMIZATION_OBJECTIVE(SOLID_BODY_COLLECTION<TV>& solid_body_collection,BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>& minimization_system);
     virtual ~BACKWARD_EULER_MINIMIZATION_OBJECTIVE();
