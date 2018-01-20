@@ -141,6 +141,7 @@ public:
     using BASE::data_directory;using BASE::m;using BASE::s;using BASE::kg;
     using BASE::unit_p;using BASE::unit_J;using BASE::unit_rho;
     using BASE::backward_euler_evolution;using BASE::Add_Collision_Object;
+    using BASE::rd_penalty_stiffness;using BASE::rd_penalty_friction;
     
     std::ofstream svout;
     SOLIDS_STANDARD_TESTS<TV> tests;
@@ -201,14 +202,6 @@ public:
     bool self_collide_surface_only;
     T collision_height;
     T collision_speed;
-    T rd_penalty_stiffness=0;
-    T rd_penalty_friction=0.3;
-    bool use_rd_penalty=false;
-    RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>* rd_penalty=0;
-    RIGID_PENALTY_WITH_FRICTION<TV>* rr_penalty=0;
-    IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* di_penalty=0;
-    SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION<TV>* dd_penalty=0;
-    ARRAY<MOVE_RIGID_BODY_DIFF<TV> > move_rb_diff;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
         :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),
