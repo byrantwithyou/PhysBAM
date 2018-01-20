@@ -38,7 +38,8 @@ def parse_sim(m,k,s):
     s=subprocess.check_output(sys.argv[1:]+['-m',str(m),'-kg',str(k),'-s',str(s)])
     r = []
     for g in tu.findall(s):
-        r.append(entry(g[0],g[1],g[2],vec([float(i) for i in nu.findall(g[3])])))
+        if g[2]=="#EMIT#": r.append(entry(g[0],g[1],g[2],g[3]))
+        else: r.append(entry(g[0],g[1],g[2],vec([float(i) for i in nu.findall(g[3])])))
     return r
 
 X=parse_sim(1,1,1)
@@ -66,10 +67,13 @@ for i in range(N):
     m=M[i].value
     k=K[i].value
     s=S[i].value
+    if X[i].var=="#EMIT#":
+        print x
+        continue
     if(len(x.x)!=len(m.x) or len(x.x)!=len(k.x) or len(x.x)!=len(s.x)):
         print "Different numbers of entries\nfile %s\nfunction %s\nquantity %s"%(X[i].loc,X[i].func,X[i].var)
         exit()
-    if x.norm()<tol*tol:
+    if x.norm()<tol*tol or m.norm()<tol*tol or k.norm()<tol*tol or s.norm()<tol*tol:
         print "%s: 0"%X[i].var
         continue
     (flag_m,pm)=get_pow(x,m,'m')

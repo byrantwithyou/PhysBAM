@@ -8,6 +8,7 @@
 namespace PhysBAM{
 
 #define TEST_UNITS(x) LOG::printf("TEST_UNITS %s:%i %s %s @BEGIN@ %.16P @END@\n",__FILE__,__LINE__,__FUNCTION__,#x,x)
+#define TEST_UNITS_EMIT(x) LOG::printf("TEST_UNITS %s:%i %s #EMIT# @BEGIN@ %.16P @END@\n",__FILE__,__LINE__,__FUNCTION__,x)
 
 }
 #endif
