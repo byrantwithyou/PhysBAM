@@ -58,7 +58,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF,bool transpos
     for(int p=0;p<rigid_body_particles.number;p++){
         RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(p);
         if(rigid_body.Has_Infinite_Inertia()) continue;
-        F.rigid_V.array(p)+=rigid_body.Inertia_Times(t.rigid_V.array(p));}
+        F.rigid_V.array(p)=rigid_body.Inertia_Times(t.rigid_V.array(p))-dt*dt*F.rigid_V.array(p);}
 
     for(int i=0;i<collisions.m;i++){
         const COLLISION& c=collisions(i);
