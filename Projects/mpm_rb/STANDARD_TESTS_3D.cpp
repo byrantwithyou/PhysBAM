@@ -2,6 +2,7 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Arrays/PROJECTED_ARRAY.h>
 #include <Core/Data_Structures/KD_TREE.h>
 #include <Core/Matrices/FRAME.h>
 #include <Core/Matrices/ROTATION.h>
@@ -365,6 +366,33 @@ Initialize()
             RIGID_BODY<TV>& sphere=tests.Add_Analytic_Sphere(0.2,density*0.1);
             sphere.Frame().t=TV(1.35,0.3,1.35);
             auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,gravity);
+            solid_body_collection.rigid_body_collection.Add_Force(rg);
+        } break;
+
+        case 21:{
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            T density=2*unit_rho*scale_mass;
+            T gap=0.005;
+            T r=0.15;
+            T R=r+gap;
+            T k=0.8;
+            SPHERE<TV> el(TV(0.5-R,r,0.5+tan(pi/6)*R),r);
+            Seed_Particles_With_Marked_Surface(el,0,0,density,particles_per_cell,4,"ellipse1");
+            el.center+=TV(2*R,0,0);
+            Seed_Particles_With_Marked_Surface(el,0,0,density,particles_per_cell,4,"ellipse2");
+            el.center+=TV(-R,0,-sin(pi/3)*2*R);
+            Seed_Particles_With_Marked_Surface(el,0,0,density,particles_per_cell,4,"ellipse3");
+            particles.X.template Project<T,&TV::y>()*=k;
+            particles.X.template Project<T,&TV::y>()+=0.1;
+            Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
+            TV g=m/(s*s)*TV(0,-1.8,0);
+            Add_Gravity(g);
+            RIGID_BODY<TV>& sphere=tests.Add_Analytic_Sphere(r,15*density);
+            sphere.Frame().t=TV(0.5,r*k+sqrt(6.0)/3*2*r+0.1-0.03,0.5);
+            RIGID_BODY<TV>& ground=tests.Add_Analytic_Box(TV(1,0.1,1));
+            ground.Frame().t=TV(0.5,0.05,0.5);
+            ground.is_static=true;
+            auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
             solid_body_collection.rigid_body_collection.Add_Force(rg);
         } break;
 
