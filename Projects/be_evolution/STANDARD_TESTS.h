@@ -319,6 +319,9 @@ public:
                 if(!resolution) resolution=10;
                 mattress_grid=GRID<TV>(TV_INT(5*resolution+1,resolution+1,resolution+1),RANGE<TV>(TV((T)-1,(T)-1,(T)-1),TV((T)1,(T)1,(T)1))*m);
                 break;
+            case 740:
+                mattress_grid=GRID<TV>(TV_INT(resolution+1,resolution+1,resolution+1),RANGE<TV>(TV((T)-.1,(T)-.1,(T)-.1),TV((T).1,(T).1,(T).1))*m);
+                break;
             default:{
                 if(!resolution) resolution=10;
 
@@ -347,7 +350,9 @@ public:
                 solids_parameters.cfl=(T)5;
                 /* solids_parameters.implicit_solve_parameters.cg_iterations=100000; */
                 break;
-            case 701:case 720:case 721:case 722:case 730:{
+            case 701:case 720:case 721:case 722:
+            case 730:
+            case 740:{
                 // Test rigid-deformable penalty force with friction.
                 // ./be_evolution 701 -no_collisions_in_solve -rd_stiffness 1e2
                 break;}
@@ -630,6 +635,30 @@ public:
         if(test_number==722)
             for(int i=0;i<particles.X.m;i++)
                 Add_Debug_Particle(particles.X(i),TV(1,0,0));
+        if(test_number==740){
+            T angle=.1;
+            T vel=.1;
+            ROTATION<TV> Q(angle,TV(0,0,1));
+            TV n,t,t1;
+            Q.Get_Rotated_Frame(t,n,t1);
+            TV c(.5,.5,.5);
+            TV g=m/(s*s)*TV(0,-1.8,0);
+            T frame_dt=1/frame_rate;
+            T time=frame*frame_dt;
+            T mu=rd_penalty_friction;
+            T acc=g.y*(cos(angle)*mu-sin(angle));
+            if(vel+time*acc>0) // sliding
+            {
+                T dist=(T).5*acc*sqr(time)+time*vel;
+                Add_Debug_Particle(c-t*dist,VECTOR<T,3>(0,1,0));
+            }
+            else // stopped
+            {
+                T stop_time=-vel/acc;
+                T dist=(T).5*acc*sqr(stop_time)+stop_time*vel;
+                Add_Debug_Particle(c-t*dist,VECTOR<T,3>(1,1,0));
+            }
+            Add_Debug_Object(VECTOR<TV,2>(c-t,c+t),VECTOR<T,3>(1,0,0));}
     }
 void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
@@ -1786,6 +1815,25 @@ void Get_Initial_Data()
             ground.Frame().t=TV(0.5,0.05,0.5);
             ground.is_static=true;
             break;}
+        case 740:{
+            T angle=.1;
+            T vel=.1;
+            T angle_t=.2;
+            ROTATION<TV> Q(angle,TV(0,0,1)),Qn(angle_t,TV(0,1,0));
+            ROTATION<TV> R=Q*Qn;
+            TV n,t,t1;
+            Q.Get_Rotated_Frame(t,n,t1);
+            TV c(.5,.5,.5);
+
+            RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(R.Rotate(TV(0,0.1,0))+c,R));
+            initial_state.twist.linear=-t*vel;
+            tests.Create_Mattress(mattress_grid,true,&initial_state,1);
+            TV g=m/(s*s)*TV(0,-1.8,0);
+            RIGID_BODY<TV>& rigid_body=tests.Add_Analytic_Box(TV(2,2,2));
+            rigid_body.Frame().t=(c-Q.Rotate(TV(0,1,0)))*m;
+            rigid_body.Frame().r=Q;
+            rigid_body.is_static=true;
+            break;}
         default:
             LOG::cerr<<"Initial Data: Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
@@ -2268,7 +2316,8 @@ void Initialize_Bodies() override
                 Add_Constitutive_Model(*st,(T)1e6*unit_p,(T).45,(T).01*s);}
             Add_Gravity();
             break;}
-        case 730:{
+        case 730:
+        case 740:{
             for(int s=0;;s++){
                 auto st=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(s);
                 if(!st) break;
