@@ -441,6 +441,15 @@ Initialize()
             solid_body_collection.rigid_body_collection.Add_Force(rg);
         } break;
 
+        case 720:{
+            Set_Grid(RANGE<TV>::Centered_Box()*10*m);
+            T density=1000;
+            tests.Add_Analytic_Box(TV()+2,TV_INT()+resolution,density).Frame().t.y=7.04*m;
+            tests.Add_Analytic_Box(TV()+2,TV_INT()+resolution,density).Frame().t.y=9.05*m;
+            solid_body_collection.rigid_body_collection.rigid_body_particles.twist(0).linear.y=1;
+            solid_body_collection.rigid_body_collection.rigid_body_particles.twist(1).linear.y=-1;
+            break;}
+            
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     if(forced_collision_type!=-1)
