@@ -88,7 +88,6 @@
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Forces_And_Torques/MOVE_RIGID_BODY_DIFF.h>
-#include <Rigids/Forces_And_Torques/RIGID_PENALTY_WITH_FRICTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
 #include <Deformables/Bindings/RIGID_BODY_BINDING.h>
@@ -353,7 +352,8 @@ public:
             case 701:case 720:case 721:case 722:
             case 730:
             case 740:
-            case 750:case 751:{
+            case 750:case 751:
+            case 130:{
                 // Test rigid-deformable penalty force with friction.
                 // ./be_evolution 701 -no_collisions_in_solve -rd_stiffness 1e2
                 break;}
@@ -1791,6 +1791,16 @@ void Get_Initial_Data()
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)5,0)*m)),true,true,density,m);
             tests.Add_Ground(0,1.99*m);
             break;}
+        case 130:{
+            tests.Create_Tetrahedralized_Volume(
+                data_directory+"/Tetrahedralized_Volumes/adaptive_torus_float.tet",
+                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(4,0.5,4)*m,ROTATION<TV>::From_Euler_Angles((T)-0.1,(T)0,(T)0))),true,true,density,0.1*m);
+            RIGID_BODY<TV>& torus=tests.Add_Analytic_Torus((T)0.05,(T)0.1,16,32,2*density);
+            torus.Frame().t=TV(4,0.45,3.7);
+            RIGID_BODY<TV>& ground=tests.Add_Analytic_Box(TV(8,0.1,8));
+            ground.Frame().t=TV(4,0.05,4);
+            ground.is_static=true;
+            break;}
         case 730:{
             T gap=0.005;
             T r=0.15;
@@ -2348,6 +2358,16 @@ void Initialize_Bodies() override
             GRAVITY<TV>* g=new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true,gravity);
             solid_body_collection.Add_Force(g);
             break;}
+        case 130:{
+            for(int s=0;;s++){
+                auto st=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(s);
+                if(!st) break;
+                Add_Constitutive_Model(*st,(T)1e4*unit_p,(T).45,(T).01*s);}
+            TV gravity=m/(s*s)*TV(0,-1.8,0);
+            DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
+            GRAVITY<TV>* g=new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true,gravity);
+            solid_body_collection.Add_Force(g);
+            break;}
         default:
             LOG::cerr<<"Missing bodies implementation for test number "<<test_number<<std::endl;exit(1);}
 
@@ -2738,6 +2758,11 @@ void Postprocess_Substep(const T dt,const T time) override
                 for(int i=0;i<mesh_particles.m;i++)
                   if(particles.V(mesh_particles(i)).y<-attachment_velocity)
                     particles.V(mesh_particles(i)).y=-attachment_velocity;}}}
+
+    if(test_number==130 && time<4){
+        RIGID_BODY<TV>& torus=solid_body_collection.rigid_body_collection.Rigid_Body(0);
+        torus.Frame().t=TV(4,0.45,3.7);
+        torus.Twist()=TWIST<TV>();}
 
     BASE::Postprocess_Substep(dt,time);
 }
