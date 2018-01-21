@@ -353,7 +353,7 @@ public:
             case 701:case 720:case 721:case 722:
             case 730:
             case 740:
-            case 750:{
+            case 750:case 751:{
                 // Test rigid-deformable penalty force with friction.
                 // ./be_evolution 701 -no_collisions_in_solve -rd_stiffness 1e2
                 break;}
@@ -1835,7 +1835,7 @@ void Get_Initial_Data()
             rigid_body.Frame().r=Q;
             rigid_body.is_static=true;
             break;}
-        case 750:{
+        case 750:case 751:{
             RIGID_BODY<TV>& lw=tests.Add_Analytic_Box(TV(0.4,8,8));
             lw.Frame().t=TV(-0.2,0.5,0.5);
             lw.is_static=true;
@@ -1849,6 +1849,10 @@ void Get_Initial_Data()
             tests.Create_Tetrahedralized_Volume(
                 data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",
                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0.75,0.5,0.5))),true,true,(T)1,0.26*m);
+
+            if(test_number==751){
+                RIGID_BODY<TV>& sphere=tests.Add_Analytic_Sphere(.2,(T)10);
+                sphere.Frame().t=TV(0.25,2,0.5)*m;}
             break;}
         default:
             LOG::cerr<<"Initial Data: Unrecognized test number "<<test_number<<std::endl;exit(1);}
@@ -2334,7 +2338,7 @@ void Initialize_Bodies() override
             break;}
         case 730:
         case 740:
-        case 750:{
+        case 750:case 751:{
             for(int s=0;;s++){
                 auto st=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(s);
                 if(!st) break;
