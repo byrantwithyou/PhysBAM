@@ -49,6 +49,8 @@ Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYS
             sys.Multiply(grad,eff_grad,true);
             norm_eff_grad=sqrt(sys.Inner_Product(eff_grad,eff_grad));}
         T conv_norm=sys.Convergence_Norm(eff_grad);
+        if(use_gradient_magnitude_objective)
+            conv_norm=std::min(conv_norm,sys.Convergence_Norm(grad));
 
         if(debug){
             LOG::printf("GRAD STATS %.16g %.16g %.16g %.16g\n",E,(E-last_E),conv_norm,tolerance);

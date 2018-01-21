@@ -202,7 +202,7 @@ Add_Collision_Object(IMPLICIT_OBJECT<TV>* io)
 {
     if(!use_di) return;
     Init_Penalty_Collection();
-    pfd->Rasterize_Implicit_Object(io);
+    pfd->di_penalty->ios.Append(io);
 }
 //#####################################################################
 // Function Init_Penalty_Collection
@@ -213,8 +213,8 @@ Init_Penalty_Collection()
     if(pfd) return;
     if(!use_rd && !use_di && !use_dd && !use_rr) return;
     detection_grid.Initialize(TV_INT()+100,RANGE<TV>::Centered_Box()*10,true);
-    pfd=new PENALTY_FORCE_COLLECTION<TV>(detection_grid,detection_grid.Domain_Indices(),
-        solid_body_collection,solid_body_collection.deformable_body_collection.simulated_particles,this->move_rb_diff);
+    pfd=new PENALTY_FORCE_COLLECTION<TV>(solid_body_collection,
+        solid_body_collection.deformable_body_collection.simulated_particles,this->move_rb_diff);
     pfd->Init(rd_penalty_stiffness,rd_penalty_friction,
         &solids_parameters.triangle_collision_parameters,
         use_di,use_dd,use_rd,use_rr);

@@ -27,41 +27,86 @@ namespace PhysBAM{
 template<class TV> void PENALTY_FORCE_COLLECTION<TV>::
 Update_Collision_Detection_Structures()
 {
-    cell_particles.Remove_All();
+    bool new_grid=Update_Grid();
+    Update_Cell_Particles(new_grid);
+    Update_Rasterized_Data(new_grid);
+    Update_Cell_Vertices(new_grid);
+    Update_Cell_Objects(new_grid);
+}
+//#####################################################################
+// Function Update_Cell_Vertices
+//#####################################################################
+template<class TV> void PENALTY_FORCE_COLLECTION<TV>::
+Update_Cell_Vertices(bool new_grid)
+{
+    if(!rr_penalty) return;
     cell_vertices.Remove_All();
+    const RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
+    for(int b=0;b<rigid_body_particles.frame.m;b++){
+        if(exclude_rigid_body_simplices.Contains(b)) continue;
+        RIGID_BODY<TV>& rigid_body=*rigid_body_particles.rigid_body(b);
+        for(int v=0;v<rigid_body.simplicial_object->particles.number;v++){
+            TV X=rigid_body.Frame()*rigid_body.simplicial_object->particles.X(v);
+            TV_INT index=grid.Cell(X);
+            if(grid.Domain_Indices().Lazy_Inside_Half_Open(index))
+                cell_vertices.Insert(index,{b,v});}}
+}
+//#####################################################################
+// Function Update_Rasterized_Data
+//#####################################################################
+template<class TV> void PENALTY_FORCE_COLLECTION<TV>::
+Update_Rasterized_Data(bool new_grid)
+{
+    if(!rd_penalty && !rr_penalty) return;
     rasterized_data.Remove_All();
     int clamp_ghost=1000000;
-    
-    const DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-    if(di_penalty || rd_penalty)
-        for(int k=0;k<simulated_particles.m;k++){
-            int p=simulated_particles(k);
-            TV_INT index=grid.Cell(particles.X(p));
-            if(domain_of_interest.Lazy_Inside_Half_Open(index))
-                cell_particles.Insert(index,p);}
-
     const RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
-    if(rd_penalty || rr_penalty){
-        T padding=grid.dX.Max()*.5;
-        for(int b=0;b<rigid_body_particles.frame.m;b++){
-            RIGID_BODY<TV>& rigid_body=*rigid_body_particles.rigid_body(b);
-            rigid_body.Update_Bounding_Box_From_Implicit_Geometry();
-            RANGE<TV> box=rigid_body.Axis_Aligned_Bounding_Box().Thickened(padding);
-            RANGE<TV_INT> grid_range=grid.Clamp_To_Cell(box,clamp_ghost+1).Intersect(domain_of_interest);
-            for(RANGE_ITERATOR<TV::m> it(grid_range);it.Valid();it.Next()){
-                TV X=grid.Center(it.index);
-                T phi=rigid_body.Implicit_Geometry_Extended_Value(X);
-                if(phi<padding)
-                    rasterized_data.Insert(it.index,{b,phi});}}}
-
-    if(rr_penalty)
-        for(int b=0;b<rigid_body_particles.frame.m;b++){
-            RIGID_BODY<TV>& rigid_body=*rigid_body_particles.rigid_body(b);
-            for(int v=0;v<rigid_body.simplicial_object->particles.number;v++){
-                TV X=rigid_body.Frame()*rigid_body.simplicial_object->particles.X(v);
-                TV_INT index=grid.Cell(X);
-                if(domain_of_interest.Lazy_Inside_Half_Open(index))
-                    cell_vertices.Insert(index,{b,v});}}
+    T padding=grid.dX.Max()*.5;
+    for(int b=0;b<rigid_body_particles.frame.m;b++){
+        RIGID_BODY<TV>& rigid_body=*rigid_body_particles.rigid_body(b);
+        rigid_body.Update_Bounding_Box_From_Implicit_Geometry();
+        RANGE<TV> box=rigid_body.Axis_Aligned_Bounding_Box().Thickened(padding);
+        RANGE<TV_INT> grid_range=grid.Clamp_To_Cell(box,clamp_ghost+1).Intersect(grid.Domain_Indices());
+        for(RANGE_ITERATOR<TV::m> it(grid_range);it.Valid();it.Next()){
+            TV X=grid.Center(it.index);
+            T phi=rigid_body.Implicit_Geometry_Extended_Value(X);
+            if(phi<padding)
+                rasterized_data.Insert(it.index,{b,phi});}}
+}
+//#####################################################################
+// Function Update_Cell_Particles
+//#####################################################################
+template<class TV> void PENALTY_FORCE_COLLECTION<TV>::
+Update_Cell_Particles(bool new_grid)
+{
+    if(!di_penalty && !rd_penalty) return;
+    const DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    cell_particles.Remove_All();
+    for(int k=0;k<simulated_particles.m;k++){
+        int p=simulated_particles(k);
+        TV_INT index=grid.Cell(particles.X(p));
+        if(grid.Domain_Indices().Lazy_Inside_Half_Open(index))
+            cell_particles.Insert(index,p);}
+}
+//#####################################################################
+// Function Update_Cell_Objects
+//#####################################################################
+template<class TV> void PENALTY_FORCE_COLLECTION<TV>::
+Update_Cell_Objects(bool new_grid)
+{
+    if(!di_penalty) return;
+    if(!new_grid) return;
+    cell_objects.Remove_All();
+    T padding=grid.dX.Magnitude()/2;
+    int clamp_ghost=1000000;
+    for(int o=0;o<di_penalty->ios.m;o++){
+        IMPLICIT_OBJECT<TV>* io=di_penalty->ios(o);
+        io->Update_Box();
+        RANGE<TV> box=io->Box().Thickened(padding);
+        RANGE<TV_INT> grid_range=grid.Clamp_To_Cell(box,clamp_ghost+1).Intersect(grid.Domain_Indices());
+        for(RANGE_ITERATOR<TV::m> it(grid_range);it.Valid();it.Next())
+            if(io->Extended_Phi(grid.Center(it.index))<padding)
+                cell_objects.Insert(it.index,o);}
 }
 //#####################################################################
 // Function Get_DI_Collision_Candidates
@@ -215,18 +260,6 @@ Init(T stiffness,T friction,TRIANGLE_COLLISION_PARAMETERS<TV>* param,
         deformable_body_collection.triangle_collisions.Initialize(*param);}
 }
 //#####################################################################
-// Function Rasterize_Implicit_Object
-//#####################################################################
-template<class TV> void PENALTY_FORCE_COLLECTION<TV>::
-Rasterize_Implicit_Object(IMPLICIT_OBJECT<TV>* io)
-{
-    T padding=grid.dX.Magnitude()/2;
-    int o=di_penalty->ios.Append(io);
-    for(RANGE_ITERATOR<TV::m> it(domain_of_interest);it.Valid();it.Next())
-        if(io->Extended_Phi(grid.Center(it.index))<padding)
-            cell_objects.Insert(it.index,o);
-}
-//#####################################################################
 // Function Update_Attachments_And_Prune_Pairs
 //#####################################################################
 template<class TV> void PENALTY_FORCE_COLLECTION<TV>::
@@ -236,6 +269,35 @@ Update_Attachments_And_Prune_Pairs()
     if(di_penalty) di_penalty->Update_Attachments_And_Prune_Pairs();
     if(dd_penalty) dd_penalty->Update_Attachments_And_Prune_Pairs();
     if(rr_penalty) rr_penalty->Update_Attachments_And_Prune_Pairs();
+}
+//#####################################################################
+// Function Update_Grid
+//#####################################################################
+template<class TV> bool PENALTY_FORCE_COLLECTION<TV>::
+Update_Grid()
+{
+    DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
+    const RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
+    RANGE<TV> bounding_box=RANGE<TV>::Bounding_Box(particles.X);
+    T max_volume=0;
+    
+    for(int b=0;b<rigid_body_particles.frame.m;b++){
+        if(exclude_rigid_body_simplices.Contains(b)) continue;
+        RIGID_BODY<TV>& rigid_body=*rigid_body_particles.rigid_body(b);
+        rigid_body.Update_Bounding_Box();
+        RANGE<TV> box=rigid_body.Axis_Aligned_Bounding_Box();
+        bounding_box.Enlarge_To_Include_Box(box);
+        max_volume=std::max(max_volume,bounding_box.Size());}
+
+    // Existing box is good enough.
+    if(grid.domain.Contains(bounding_box)) return false;
+
+    T max_dx=bounding_box.Edge_Lengths().Max()/max_resolution;
+    max_dx=std::max(max_dx,pow<1,TV::m>(max_volume/max_cells_per_object));
+    max_dx=std::max(max_dx,pow<1,TV::m>(bounding_box.Size()/max_cells));
+    grid=GRID<TV>::Create_Grid_Given_Cell_Size(bounding_box,max_dx,true,0);
+    return true;
 }
 template class PENALTY_FORCE_COLLECTION<VECTOR<float,2> >;
 template class PENALTY_FORCE_COLLECTION<VECTOR<float,3> >;

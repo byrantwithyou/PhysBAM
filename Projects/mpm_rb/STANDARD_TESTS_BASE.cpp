@@ -587,10 +587,9 @@ Add_Collision_Object(IMPLICIT_OBJECT<TV>* io)
 {
     if(!use_di) return;
     if(use_di && !pfd){
-        pfd=new PENALTY_FORCE_COLLECTION<TV>(grid,grid.Domain_Indices(ghost),
-            solid_body_collection,simulated_particles,this->move_rb_diff);
+        pfd=new PENALTY_FORCE_COLLECTION<TV>(solid_body_collection,simulated_particles,this->move_rb_diff);
         pfd->Init(rd_penalty_stiffness,rd_penalty_friction,0,use_di,false,use_rd,use_rr);}
-    pfd->Rasterize_Implicit_Object(io);
+    pfd->di_penalty->ios.Append(io);
 }
 //#####################################################################
 // Function Add_Collision_Object

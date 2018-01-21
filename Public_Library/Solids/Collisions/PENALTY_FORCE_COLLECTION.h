@@ -22,8 +22,8 @@ class PENALTY_FORCE_COLLECTION
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
 public:
-    const GRID<TV>& grid;
-    RANGE<TV_INT> domain_of_interest;
+    GRID<TV> grid;
+    int max_resolution=20,max_cells=10000,max_cells_per_object=250;
     SOLID_BODY_COLLECTION<TV>& solid_body_collection;
     const ARRAY<int>& simulated_particles;
     const ARRAY<MOVE_RIGID_BODY_DIFF<TV> >& move_rb_diff;
@@ -40,6 +40,9 @@ public:
     };
     CHAINED_ARRAY<RASTERIZED_DATA,TV_INT> rasterized_data;
 
+    // Do not rasterize particles on these rigid bodies (eg, ground)
+    HASHTABLE<int> exclude_rigid_body_simplices;
+
     IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>* di_penalty=0;
     RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>* rd_penalty=0;
     RIGID_PENALTY_WITH_FRICTION<TV>* rr_penalty=0;
@@ -49,15 +52,12 @@ public:
     ARRAY<T> repulsion_thickness; // must be same size as particles.number
     ARRAY<bool> recently_modified; // must be same size as particles.number
 
-    PENALTY_FORCE_COLLECTION(const GRID<TV>& grid,
-        const RANGE<TV_INT>& domain_of_interest,
-        SOLID_BODY_COLLECTION<TV>& solid_body_collection,
+    PENALTY_FORCE_COLLECTION(SOLID_BODY_COLLECTION<TV>& solid_body_collection,
         const ARRAY<int>& simulated_particles,
         const ARRAY<MOVE_RIGID_BODY_DIFF<TV> >& move_rb_diff)
-        :grid(grid),domain_of_interest(domain_of_interest),
-        solid_body_collection(solid_body_collection),
+        :solid_body_collection(solid_body_collection),
         simulated_particles(simulated_particles),move_rb_diff(move_rb_diff)
-    {}
+    {grid.domain=RANGE<TV>::Empty_Box();}
 
     void Init(T stiffness,T friction,TRIANGLE_COLLISION_PARAMETERS<TV>* param,
         bool use_di,bool use_dd,bool use_rd,bool use_rr);
@@ -67,13 +67,17 @@ public:
     ~PENALTY_FORCE_COLLECTION() = default;
 
     void Update_Collision_Detection_Structures();
+    void Update_Cell_Vertices(bool new_grid);
+    void Update_Rasterized_Data(bool new_grid);
+    void Update_Cell_Particles(bool new_grid);
+    void Update_Cell_Objects(bool new_grid);
     void Get_DI_Collision_Candidates();
     void Get_DD_Collision_Candidates();
     void Get_RD_Collision_Candidates();
     void Get_RR_Collision_Candidates();
-    void Rasterize_Implicit_Object(IMPLICIT_OBJECT<TV>* io);
     void Save_State();
     void Update_Attachments_And_Prune_Pairs();
+    bool Update_Grid();
 //#####################################################################
 };
 }

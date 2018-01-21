@@ -121,8 +121,8 @@ Initialize()
     Update_Simulated_Particles();
 
     if((example.use_rr || example.use_rd) && !example.pfd){
-        example.pfd=new PENALTY_FORCE_COLLECTION<TV>(example.grid,example.grid.Domain_Indices(example.ghost),
-            example.solid_body_collection,example.simulated_particles,example.move_rb_diff);
+        example.pfd=new PENALTY_FORCE_COLLECTION<TV>(example.solid_body_collection,
+            example.simulated_particles,example.move_rb_diff);
         example.pfd->Init(example.rd_penalty_stiffness,
             example.rd_penalty_friction,0,example.use_di,false,example.use_rd,
             example.use_rr);}
