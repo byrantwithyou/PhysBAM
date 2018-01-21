@@ -21,6 +21,7 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UNION.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UTILITIES.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Seeding/POISSON_DISK.h>
 #include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
 #include <Deformables/Constitutive_Models/MOONEY_RIVLIN_CURVATURE.h>
@@ -448,6 +449,57 @@ Initialize()
             tests.Add_Analytic_Box(TV()+2,TV_INT()+resolution,density).Frame().t.y=9.05*m;
             solid_body_collection.rigid_body_collection.rigid_body_particles.twist(0).linear.y=1;
             solid_body_collection.rigid_body_collection.rigid_body_particles.twist(1).linear.y=-1;
+            break;}
+
+        case 140:{
+            particles.Store_Fp(true);
+            Set_Grid(RANGE<TV>(TV(-1,-1,-1),TV(1,3,1))*m);
+
+            RANDOM_NUMBERS<T> rng(seed);
+            T density=(T)2200*unit_rho*scale_mass;
+            TV g=m/(s*s)*TV(0,1.8,0);
+            RIGID_BODY<TV>& bowl=tests.Add_Analytic_Bowl((T)0,(T)1,(T)0.05);
+            bowl.is_static=true;
+
+            RANGE<TV> box(TV(-0.6,-2.6,-0.6),TV(0.6,0,0.6));
+            RANGE<TV> R(TV(0,0,0),TV(pi,pi,pi));
+            POISSON_DISK<TV> poisson_disk(1);
+            ARRAY<TV> X;
+            T gap=0.45;
+            poisson_disk.Set_Distance_By_Volume(cube(gap));
+            poisson_disk.Sample(rng,box,X);
+            for(int i=0;i<X.m/2;i++){
+                RIGID_BODY<TV>& ring=tests.Add_Rigid_Body("Rings_Test/ring_revolve",(T)0.05,(T)0);
+                ring.Set_Mass(ring.Volume()*density);
+                TV rotation;
+                rng.Fill_Uniform(rotation,R);
+                ring.Frame().r=ROTATION<TV>::From_Euler_Angles(rotation.x,rotation.y,rotation.z);
+                ring.Frame().t=X(i);}
+
+            for(int i=X.m/2;i<X.m;i++){
+                RIGID_BODY<TV>& torus=tests.Add_Analytic_Torus((T)0.05,(T)0.1,16,32,density);
+                TV rotation;
+                rng.Fill_Uniform(rotation,R);
+                torus.Frame().r=ROTATION<TV>::From_Euler_Angles(rotation.x,rotation.y,rotation.z);
+                torus.Frame().t=X(i);}
+
+            auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
+            solid_body_collection.rigid_body_collection.Add_Force(rg);
+
+            begin_frame=[=](int frame)
+            {
+                if(frame!=45) return;
+                RANGE<TV> sand_cube(TV(-0.4,-0.3,-0.4),TV(0.4,0,0.4));
+                T E=35.37e6*unit_p*scale_E,nu=.3;
+                if(!use_theta_c) theta_c=0.015;
+                if(!use_theta_s) theta_s=.000001;
+                if(!use_hardening_factor) hardening_factor=20;
+                if(!use_max_hardening) max_hardening=FLT_MAX;
+                Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
+                Seed_Particles(sand_cube,0,0,density,particles_per_cell);
+                Add_Drucker_Prager_Case(E,nu,2);
+                Add_Gravity(g);
+            };
             break;}
             
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
