@@ -517,23 +517,52 @@ Initialize()
             RANGE<TV> R(TV(0,0,0),TV(pi,pi,pi));
             POISSON_DISK<TV> poisson_disk(1);
             ARRAY<TV> X;
-            T gap=0.6;
+            T gap=0.5;
             poisson_disk.Set_Distance_By_Volume(cube(gap));
             poisson_disk.Sample(rng,box,X);
+            rng.Random_Shuffle(X);
+            auto intersects=[this](const RIGID_BODY<TV>& a,const RIGID_BODY<TV>& b)
+            {
+//                if(!a.Bounding_Boxes_Intersect(b)) return false;
+                for(int i=0;i<a.simplicial_object->particles.X.m;i++)
+                    if(b.Implicit_Geometry_Lazy_Inside(a.World_Space_Point(a.simplicial_object->particles.X(i)),.02))
+                        return true;
+                for(int i=0;i<b.simplicial_object->particles.X.m;i++)
+                    if(a.Implicit_Geometry_Lazy_Inside(b.World_Space_Point(b.simplicial_object->particles.X(i)),.02))
+                        return true;
+                return false;
+            };
+            auto intersects_any=[this,intersects](const RIGID_BODY<TV>& a)
+            {
+                for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particles.number;i++)
+                    if(i!=a.particle_index)
+                        if(intersects(a,solid_body_collection.rigid_body_collection.Rigid_Body(i)))
+                            return true;
+                return false;
+            };
+            
             for(int i=0;i<X.m/2;i++){
                 RIGID_BODY<TV>& ring=tests.Add_Rigid_Body("Rings_Test/ring_revolve",(T)0.05*1.5,(T)0);
                 ring.Set_Mass(ring.Volume()*density);
                 TV rotation;
-                rng.Fill_Uniform(rotation,R);
-                ring.Frame().r=ROTATION<TV>::From_Euler_Angles(rotation.x,rotation.y,rotation.z);
-                ring.Frame().t=X(i);}
+                for(int j=0;j<20;j++){
+                    LOG::printf("try %i %i\n",i,j);
+                    rng.Fill_Uniform(rotation,R);
+                    ring.Frame().r=ROTATION<TV>::From_Euler_Angles(rotation.x,rotation.y,rotation.z);
+                    ring.Frame().t=X(i);
+                    if(!intersects_any(ring)) break;
+                    PHYSBAM_ASSERT(j!=19);}}
 
             for(int i=X.m/2;i<X.m;i++){
                 RIGID_BODY<TV>& torus=tests.Add_Analytic_Torus((T)0.05*1.5,(T)0.1*1.5,16,32,density);
-                TV rotation;
-                rng.Fill_Uniform(rotation,R);
-                torus.Frame().r=ROTATION<TV>::From_Euler_Angles(rotation.x,rotation.y,rotation.z);
-                torus.Frame().t=X(i);}
+                for(int j=0;j<20;j++){
+                    LOG::printf("try %i %i\n",i,j);
+                    TV rotation;
+                    rng.Fill_Uniform(rotation,R);
+                    torus.Frame().r=ROTATION<TV>::From_Euler_Angles(rotation.x,rotation.y,rotation.z);
+                    torus.Frame().t=X(i);
+                    if(!intersects_any(torus)) break;
+                    PHYSBAM_ASSERT(j!=19);}}
 
             auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
             solid_body_collection.rigid_body_collection.Add_Force(rg);
