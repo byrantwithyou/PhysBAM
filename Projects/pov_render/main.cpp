@@ -167,10 +167,16 @@ void Emit_MPM_Particles(std::ofstream& fout,const HASHTABLE<std::string,std::str
     PHYSBAM_ASSERT(begin>=0 && begin<particles.number);
     PHYSBAM_ASSERT(end>=0 && end<=particles.number);
 
+    ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
+    bool has_texture=options.Contains("texture");
     for(int p=begin;p<end;p++){
         fout<<"sphere{ ";
         Emit_Vector(fout,particles.X(p));
-        fout<<", "<<radius<<"\n"<<options.Get("texture")<<" }\n";}
+        fout<<", "<<radius<<"\n";
+        if(has_texture)
+            fout<<options.Get("texture")<<" }\n";
+        else
+            fout<<"texture{pigment{color rgb <"<<(*colors)(p).x<<","<<(*colors)(p).y<<","<<(*colors)(p).z<<">}finish{phong .5}}}\n";}
 }
 
 void Emit_MPM_Surface(std::ofstream& fout,const HASHTABLE<std::string,std::string>& options,int frame)

@@ -51,7 +51,8 @@ template<class T> STANDARD_TESTS<VECTOR<T,3> >::
 STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     :STANDARD_TESTS_BASE<TV>(stream_type_input,parse_args),
     foo_int1(0),foo_T1(0),foo_T2(0),foo_T3(0),foo_T4(0),foo_T5(0),
-    use_foo_T1(false),use_foo_T2(false),use_foo_T3(false),use_foo_T4(false),use_foo_T5(false)
+    use_foo_T1(false),use_foo_T2(false),use_foo_T3(false),use_foo_T4(false),use_foo_T5(false),
+    sand_color_sampler(3)
 {
     parse_args.Add("-fooint1",&foo_int1,"int1","a interger");
     parse_args.Add("-fooT1",&foo_T1,&use_foo_T1,"T1","a scalar");
@@ -88,12 +89,27 @@ Read_Output_Files(const int frame)
     BASE::Read_Output_Files(frame);
 }
 //#####################################################################
+// Function Colorize_Particles
+//#####################################################################
+template<class T> VECTOR<T,3> STANDARD_TESTS<VECTOR<T,3> >::
+Sand_Color()
+{
+    return sand_colors[sand_color_sampler.Sample(random.Get_Number()).x];
+}
+//#####################################################################
 // Function Initialize
 //#####################################################################
 template<class T> void STANDARD_TESTS<VECTOR<T,3> >::
 Initialize()
 {
     this->asymmetric_system=true;
+    sand_color_sampler.pdf(0)=0.05;
+    sand_color_sampler.pdf(1)=0.1;
+    sand_color_sampler.pdf(2)=0.85;
+    sand_color_sampler.Compute_Cumulative_Distribution_Function();
+    sand_colors[0]=VECTOR<T,3>(1,1,1);
+    sand_colors[1]=VECTOR<T,3>(107.0/255,84.0/255,30.0/255);
+    sand_colors[2]=VECTOR<T,3>(1,169.0/255,95.0/255);
     switch(test_number)
     {
             // sticking: ./mpm_rb -3d 8 -float -scale_E .1 -rd_stiffness 1e-1 -max_dt .01 -T .1 -T .1 -T .2 -regular_seeding
@@ -387,6 +403,7 @@ Initialize()
             destroy=[=](){delete source;};
             write_output_files=[=](int frame){source->Write_Output_Files(frame);};
             read_output_files=[=](int frame){source->Read_Output_Files(frame);};
+            ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
             begin_time_step=[=](T time)
             {
                 ARRAY<int> affected_particles;
@@ -399,6 +416,7 @@ Initialize()
                     particles.mu0(i)=mu;
                     particles.lambda(i)=lambda;
                     particles.lambda0(i)=lambda;
+                    (*colors)(i)=Sand_Color();
                     affected_particles.Append(i);}
                 for(int i=0;i<plasticity_models.m;i++)
                     if(MPM_DRUCKER_PRAGER<TV>* dp=dynamic_cast<MPM_DRUCKER_PRAGER<TV>*>(plasticity_models(i)))
@@ -497,6 +515,8 @@ Initialize()
                 if(!use_max_hardening) max_hardening=FLT_MAX;
                 Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
                 Seed_Particles(sand_cube,0,0,density,particles_per_cell);
+                ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
+                for(int p=0;p<particles.number;p++) (*colors)(p)=Sand_Color();
                 Add_Drucker_Prager_Case(E,nu,2);
                 Add_Gravity(g);
             };
@@ -590,6 +610,7 @@ Initialize()
             read_output_files=[=](int frame){source->Read_Output_Files(frame);};
             T source_start=2;
             T source_end=5;
+            ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
             begin_time_step=[=](T time)
             {
                 if(time<source_start || time>source_end) return;
@@ -603,6 +624,7 @@ Initialize()
                     particles.mu0(i)=mu;
                     particles.lambda(i)=lambda;
                     particles.lambda0(i)=lambda;
+                    (*colors)(i)=Sand_Color();
                     affected_particles.Append(i);}
                 for(int i=0;i<plasticity_models.m;i++)
                     if(MPM_DRUCKER_PRAGER<TV>* dp=dynamic_cast<MPM_DRUCKER_PRAGER<TV>*>(plasticity_models(i)))
@@ -656,6 +678,8 @@ Initialize()
             cube.Twist().linear=TV(2,-0.5,0);
             auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
             solid_body_collection.rigid_body_collection.Add_Force(rg);
+            ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
+            for(int p=0;p<particles.number;p++) (*colors)(p)=Sand_Color();
         } break;
 
         case 43:{ // Rigid sphere and sand pile
@@ -688,6 +712,8 @@ Initialize()
             Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
             RANGE<TV> sand(TV(0.3,0.1,0.3),TV(0.7,0.5,0.7));
             Seed_Particles(sand,0,0,density,particles_per_cell);
+            ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
+            for(int p=0;p<particles.number;p++) (*colors)(p)=Sand_Color();
             Add_Drucker_Prager_Case(E,nu,2);
             TV g=m/(s*s)*TV(0,-4.81,0);
             Add_Gravity(g);

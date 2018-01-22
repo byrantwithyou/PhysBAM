@@ -5,6 +5,7 @@
 #ifndef __STANDARD_TESTS_3D__
 #define __STANDARD_TESTS_3D__
 
+#include <Core/Random_Numbers/PIECEWISE_CONSTANT_PDF.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 #include "STANDARD_TESTS_BASE.h"
@@ -64,6 +65,7 @@ public:
     void Write_Output_Files(const int frame) override;
     void Read_Output_Files(const int frame) override;
     void Initialize() override;
+    VECTOR<T,3> Sand_Color();
 
     // additional storage
     int foo_int1;
@@ -78,6 +80,8 @@ public:
     bool use_foo_T4;
     bool use_foo_T5;
 
+    PIECEWISE_CONSTANT_PDF<T> sand_color_sampler;
+    VECTOR<T,3> sand_colors[3];
 //#####################################################################
 };
 }
