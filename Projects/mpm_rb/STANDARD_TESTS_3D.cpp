@@ -543,7 +543,7 @@ Initialize()
             if(!use_hardening_factor) hardening_factor=20;
             if(!use_max_hardening) max_hardening=FLT_MAX;
             TV spout(0,-0.8,0);
-            T spout_width=.3*m;
+            T spout_width=.1*m;
             T spout_height=.1*m;
             T seed_buffer=grid.dX.y*5;
             T pour_speed=.2*m/s;
@@ -558,12 +558,13 @@ Initialize()
             destroy=[=](){delete source;};
             write_output_files=[=](int frame){source->Write_Output_Files(frame);};
             read_output_files=[=](int frame){source->Read_Output_Files(frame);};
+            T source_start=2;
             begin_time_step=[=](T time)
             {
-                if(time<2) return;
+                if(time<source_start) return;
                 ARRAY<int> affected_particles;
                 int n=particles.number;
-                source->Begin_Time_Step(time);
+                source->Begin_Time_Step(time-source_start);
                 T mu=E/(2*(1+nu));
                 T lambda=E*nu/((1+nu)*(1-2*nu));
                 for(int i=n;i<particles.number;i++){
@@ -577,8 +578,8 @@ Initialize()
                         dp->Initialize_Particles(&affected_particles);
             };
             end_time_step=[=](T time){
-                if(time<2) return;
-                source->End_Time_Step(time);};
+                if(time<source_start) return;
+                source->End_Time_Step(time-source_start);};
 
             Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
             Add_Drucker_Prager_Case(E,nu,2);
