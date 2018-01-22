@@ -23,6 +23,7 @@ class PENALTY_FORCE_COLLECTION
     typedef VECTOR<int,TV::m> TV_INT;
 public:
     GRID<TV> grid;
+    bool restarted=false;
     int max_resolution=20,max_cells=10000,max_cells_per_object=250;
     SOLID_BODY_COLLECTION<TV>& solid_body_collection;
     const ARRAY<int>& simulated_particles;

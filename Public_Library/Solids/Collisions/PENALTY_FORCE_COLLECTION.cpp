@@ -27,7 +27,7 @@ namespace PhysBAM{
 template<class TV> void PENALTY_FORCE_COLLECTION<TV>::
 Update_Collision_Detection_Structures()
 {
-    bool new_grid=Update_Grid();
+    bool new_grid=Update_Grid() || restarted;
     Update_Cell_Particles(new_grid);
     Update_Rasterized_Data(new_grid);
     Update_Cell_Vertices(new_grid);
