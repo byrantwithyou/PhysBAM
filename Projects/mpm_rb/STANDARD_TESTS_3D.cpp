@@ -585,6 +585,47 @@ Initialize()
             Add_Drucker_Prager_Case(E,nu,2);
             Add_Gravity(g);
             break;}
+
+        case 42:{ // sand and thrown box
+            particles.Store_Fp(true);
+            Set_Grid(RANGE<TV>(TV(),TV(3,1,1))*m,TV_INT(3,1,1));
+
+            RIGID_BODY<TV>& bw=tests.Add_Analytic_Box(TV(3,0.1,1));
+            bw.is_static=true;
+            bw.Frame().t=TV(1.5,0.05,0.5);
+            T h=0.3;
+            RIGID_BODY<TV>& w1=tests.Add_Analytic_Box(TV(0.1,h,1));
+            w1.Frame().t=TV(-0.05,h/2,0.5);
+            w1.is_static=true;
+            RIGID_BODY<TV>& w2=tests.Add_Analytic_Box(TV(0.1,h,1));
+            w2.Frame().t=TV(3.05,h/2,0.5);
+            w2.is_static=true;
+            RIGID_BODY<TV>& w3=tests.Add_Analytic_Box(TV(3+0.2,h,0.1));
+            w3.Frame().t=TV(1.5,h/2,-0.05);
+            w3.is_static=true;
+            RIGID_BODY<TV>& w4=tests.Add_Analytic_Box(TV(3+0.2,h,0.1));
+            w4.Frame().t=TV(1.5,h/2,1.05);
+            w4.is_static=true;
+
+            T density=(T)2200*unit_rho*scale_mass;
+            T E=35.37e6*unit_p*scale_E,nu=.3;
+            RANGE<TV> sandbox(TV(0,0.1,0),TV(3,0.2,1));
+            if(!use_theta_c) theta_c=0.015;
+            if(!use_theta_s) theta_s=.000001;
+            if(!use_hardening_factor) hardening_factor=20;
+            if(!use_max_hardening) max_hardening=FLT_MAX;
+            Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
+            Seed_Particles(sandbox,0,0,density,particles_per_cell);
+            Add_Drucker_Prager_Case(E,nu,2);
+            TV g=m/(s*s)*TV(0,-4.81,0);
+            Add_Gravity(g);
+            RIGID_BODY<TV>& cube=tests.Add_Analytic_Box(TV(0.2,0.2,0.2),TV_INT()+1,density*1.05);
+            cube.Frame().t=TV(0.3,0.6,0.5);
+            cube.Frame().r=ROTATION<TV>::From_Euler_Angles((T)0.7,(T)0.7,(T)0.7);
+            cube.Twist().linear=TV(2,-0.5,0);
+            auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
+            solid_body_collection.rigid_body_collection.Add_Force(rg);
+        } break;
             
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
