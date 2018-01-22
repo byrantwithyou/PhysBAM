@@ -240,6 +240,22 @@ template<class TV> void IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>::
 Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 {
 }
+//#####################################################################
+// Function Read
+//#####################################################################
+template<class TV> void IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>::
+Read(TYPED_ISTREAM& input)
+{
+    Read_Binary(input,collision_pairs,hash);
+}
+//#####################################################################
+// Function Write
+//#####################################################################
+template<class TV> void IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>::
+Write(TYPED_OSTREAM& output) const
+{
+    Write_Binary(output,collision_pairs,hash);
+}
 namespace PhysBAM{
 template class IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<VECTOR<float,2> >;
 template class IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<VECTOR<float,3> >;

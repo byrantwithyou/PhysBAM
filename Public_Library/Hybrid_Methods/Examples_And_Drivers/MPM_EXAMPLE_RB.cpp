@@ -12,6 +12,7 @@
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION.h>
 #include <Deformables/Forces/LAGGED_FORCE.h>
+#include <Solids/Collisions/PENALTY_FORCE_COLLECTION.h>
 #include <Solids/Forces_And_Torques/RIGID_DEFORMABLE_PENALTY_WITH_FRICTION.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
@@ -81,7 +82,19 @@ Write_Output_Files(const int frame)
         {
             solid_body_collection.Write(stream_type,output_directory,frame,0,false,true,true,true,false);
         }
-
+        if(pfd)
+        {
+#pragma omp task
+            if(pfd->di_penalty)
+                Write_To_File(stream_type,LOG::sprintf("%s/%d/di_data",output_directory.c_str(),frame),*pfd->di_penalty);
+#pragma omp task
+            if(pfd->rr_penalty)
+                Write_To_File(stream_type,LOG::sprintf("%s/%d/rr_data",output_directory.c_str(),frame),*pfd->rr_penalty);
+#pragma omp task
+            if(pfd->rd_penalty)
+                Write_To_File(stream_type,LOG::sprintf("%s/%d/rd_data",output_directory.c_str(),frame),*pfd->rd_penalty);
+        }
+        
         if(!only_write_particles){
 #pragma omp task
             Write_To_File(stream_type,LOG::sprintf("%s/%d/centered_velocities",output_directory.c_str(),frame),velocity);
@@ -107,6 +120,12 @@ Read_Output_Files(const int frame)
     std::string f=LOG::sprintf("%d",frame);
     Read_From_File(stream_type,LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
     Read_From_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
+    if(pfd->di_penalty)
+        Read_From_File(stream_type,LOG::sprintf("%s/%d/di_data",output_directory.c_str(),frame),*pfd->di_penalty);
+    if(pfd->rr_penalty)
+        Read_From_File(stream_type,LOG::sprintf("%s/%d/rr_data",output_directory.c_str(),frame),*pfd->rr_penalty);
+    if(pfd->rd_penalty)
+        Read_From_File(stream_type,LOG::sprintf("%s/%d/rd_data",output_directory.c_str(),frame),*pfd->rd_penalty);
 }
 //#####################################################################
 // Function Capture_Stress

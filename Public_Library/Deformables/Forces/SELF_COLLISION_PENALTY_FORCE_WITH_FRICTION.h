@@ -20,6 +20,7 @@ class SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION:public DEFORMABLES_FORCES<TV>
     typedef VECTOR<int,TV::m> TV_INT;
 public:
     typedef DEFORMABLES_FORCES<TV> BASE;
+    typedef int HAS_TYPED_READ_WRITE;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_SURFACE;
     using BASE::particles;
 
@@ -53,6 +54,12 @@ public:
         TV w; // barycentric coords of relaxed attachment point
         VECTOR<MATRIX<T,TV::m>,5> dwdI; // Dependence on X, Z, A, B, C
         bool active;
+
+        template<class RW> void Write(std::ostream& output) const
+        {Write_Binary<RW>(output,p,s,w0,e0);}
+
+        template<class RW> void Read(std::istream& input)
+        {Read_Binary<RW>(input,p,s,w0,e0);}
     };
 
     ARRAY<COLLISION_PAIR> collision_pairs;
@@ -84,6 +91,8 @@ public:
     void Add_Pair(int p,int s,const TV& w0,int e0);
     void Test_Relax(int cp);
     void Add_Surface(T_SURFACE& surface);
+    void Read(TYPED_ISTREAM& input);
+    void Write(TYPED_OSTREAM& output) const;
 //#####################################################################
 };
 }

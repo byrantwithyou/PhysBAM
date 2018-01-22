@@ -302,6 +302,22 @@ CFL_Strain_Rate() const
 {
     PHYSBAM_FATAL_ERROR();
 }
+//#####################################################################
+// Function Read
+//#####################################################################
+template<class TV> void RIGID_PENALTY_WITH_FRICTION<TV>::
+Read(TYPED_ISTREAM& input)
+{
+    Read_Binary(input,collision_pairs,hash);
+}
+//#####################################################################
+// Function Write
+//#####################################################################
+template<class TV> void RIGID_PENALTY_WITH_FRICTION<TV>::
+Write(TYPED_OSTREAM& output) const
+{
+    Write_Binary(output,collision_pairs,hash);
+}
 namespace PhysBAM{
 template class RIGID_PENALTY_WITH_FRICTION<VECTOR<float,2> >;
 template class RIGID_PENALTY_WITH_FRICTION<VECTOR<double,2> >;

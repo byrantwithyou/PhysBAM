@@ -22,6 +22,7 @@ class RIGID_PENALTY_WITH_FRICTION:public RIGIDS_FORCES<TV>
     typedef typename TV::SCALAR T;
 public:
     typedef RIGIDS_FORCES<TV> BASE;
+    typedef int HAS_TYPED_READ_WRITE;
     using BASE::rigid_body_collection;
 
     T stiffness_coefficient;
@@ -37,6 +38,12 @@ public:
         MATRIX<T,TV::m> dYdLs,dYdLi,dZdLs; // Dependence on twist.linear
         MATRIX<T,TV::m,TV::SPIN::m> dYdAs,dYdAi,dZdAs; // Dependence on twist.angular
         bool active;
+
+        template<class RW> void Write(std::ostream& output) const
+        {Write_Binary<RW>(output,bs,v,bi,X);}
+
+        template<class RW> void Read(std::istream& input)
+        {Read_Binary<RW>(input,bs,v,bi,X);}
     };
     ARRAY<COLLISION_PAIR> collision_pairs;
     HASHTABLE<TRIPLE<int,int,int> > hash;
@@ -67,6 +74,8 @@ public:
     void Relax_Attachment(int cp);
     void Update_Attachments_And_Prune_Pairs();
     void Add_Pair(int b1,int v,int b2);
+    void Read(TYPED_ISTREAM& input);
+    void Write(TYPED_OSTREAM& output) const;
 //#####################################################################
 };
 template<class TV,class T> bool

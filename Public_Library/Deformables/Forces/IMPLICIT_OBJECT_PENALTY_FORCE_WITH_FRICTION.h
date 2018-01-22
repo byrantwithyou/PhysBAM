@@ -20,6 +20,7 @@ class IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION:public DEFORMABLES_FORCES<TV>
     typedef typename TV::SCALAR T;
 public:
     typedef DEFORMABLES_FORCES<TV> BASE;
+    typedef int HAS_TYPED_READ_WRITE;
     using BASE::particles;
 
     ARRAY<IMPLICIT_OBJECT<TV>*> ios;
@@ -34,6 +35,12 @@ public:
         TV Y; // relaxed attachment point
         MATRIX<T,TV::m> dYdZ; // Dependence of Y on X(p)
         bool active;
+
+        template<class RW> void Write(std::ostream& output) const
+        {Write_Binary<RW>(output,p,o,X);}
+
+        template<class RW> void Read(std::istream& input)
+        {Read_Binary<RW>(input,p,o,X);}
     };
     ARRAY<COLLISION_PAIR> collision_pairs;
     HASHTABLE<PAIR<int,int> > hash;
@@ -61,6 +68,8 @@ public:
     void Relax_Attachment(int cp);
     void Update_Attachments_And_Prune_Pairs();
     void Add_Pair(int p,int b);
+    void Read(TYPED_ISTREAM& input);
+    void Write(TYPED_OSTREAM& output) const;
 //#####################################################################
 };
 
