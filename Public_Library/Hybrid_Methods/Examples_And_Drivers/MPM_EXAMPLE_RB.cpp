@@ -2,6 +2,7 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Log/FINE_TIMER.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
@@ -132,6 +133,7 @@ Precompute_Forces(const T time,const T dt,const bool update_hessian)
 template<class TV> typename TV::SCALAR MPM_EXAMPLE_RB<TV>::
 Potential_Energy(const T time) const
 {
+    TIMER_SCOPE_FUNC;
     typename TV::SCALAR pe=0;
     for(int i=0;i<forces.m;i++)
         pe+=forces(i)->Potential_Energy(time);
@@ -149,6 +151,7 @@ Potential_Energy(const T time) const
 template<class TV> void MPM_EXAMPLE_RB<TV>::
 Add_Forces(ARRAY<TV,TV_INT>& F,ARRAY<TWIST<TV> >& RF,const T time) const
 {
+    TIMER_SCOPE_FUNC;
     for(int i=0;i<forces.m;i++)
         forces(i)->Add_Forces(F,time);
 
@@ -168,6 +171,7 @@ Add_Forces(ARRAY<TV,TV_INT>& F,ARRAY<TWIST<TV> >& RF,const T time) const
 template<class TV> void MPM_EXAMPLE_RB<TV>::
 Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,ARRAY<TWIST<TV> >& RF,const ARRAY<TWIST<TV> >& RV,const T time,bool transpose) const
 {
+    TIMER_SCOPE_FUNC;
     for(int i=0;i<forces.m;i++)
         forces(i)->Add_Hessian_Times(F,V,time);
 

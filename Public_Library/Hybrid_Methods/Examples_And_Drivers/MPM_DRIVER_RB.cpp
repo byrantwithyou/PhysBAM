@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Log/DEBUG_SUBSTEPS.h>
+#include <Core/Log/FINE_TIMER.h>
 #include <Core/Log/LOG.h>
 #include <Core/Log/SCOPE.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
@@ -66,6 +67,7 @@ Execute_Main_Program()
 {
     Initialize();
     Simulate_To_Frame(example.last_frame);
+    FINE_TIMER::Dump_Timing_Info();
 }
 //#####################################################################
 // Initialize
@@ -239,6 +241,7 @@ Update_Particle_Weights()
 template<class TV> void MPM_DRIVER_RB<TV>::
 Particle_To_Grid()
 {
+    TIMER_SCOPE_FUNC;
     MPM_PARTICLES<TV>& particles=example.particles;
 
 #pragma omp parallel for
@@ -284,6 +287,7 @@ Particle_To_Grid()
 template<class TV> void MPM_DRIVER_RB<TV>::
 Grid_To_Particle()
 {
+    TIMER_SCOPE_FUNC;
     struct HELPER
     {
         TV V_pic,V_weight_old,V_pic_fric;
@@ -376,6 +380,7 @@ void Enforce_Limit_Max(T& s,T bound,const MATRIX<T,d>& a,const MATRIX<T,d>& b)
 template<class TV> void MPM_DRIVER_RB<TV>::
 Grid_To_Particle_Limit_Dt()
 {
+    TIMER_SCOPE_FUNC;
     if(!example.use_strong_cfl) return;
     struct HELPER
     {
@@ -427,6 +432,7 @@ Grid_To_Particle_Limit_Dt()
 template<class TV> void MPM_DRIVER_RB<TV>::
 Limit_Dt_Sound_Speed()
 {
+    TIMER_SCOPE_FUNC;
     if(!example.use_sound_speed_cfl) return;
     T dt=example.dt;
     for(int f=0;f<example.forces.m;f++){
@@ -454,6 +460,7 @@ Limit_Dt_Sound_Speed()
 template<class TV> void MPM_DRIVER_RB<TV>::
 Update_Plasticity_And_Hardening()
 {
+    TIMER_SCOPE_FUNC;
     for(int i=0;i<example.plasticity_models.m;i++)
         example.plasticity_models(i)->Update_Particles();
 }
@@ -463,6 +470,7 @@ Update_Plasticity_And_Hardening()
 template<class TV> void MPM_DRIVER_RB<TV>::
 Apply_Forces()
 {
+    TIMER_SCOPE_FUNC;
     example.Capture_Stress();
     objective.Reset();
     LOG::printf("max velocity: %.16P\n",Max_Particle_Speed());

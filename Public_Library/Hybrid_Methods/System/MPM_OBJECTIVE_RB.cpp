@@ -2,6 +2,7 @@
 // Copyright 2013.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Log/FINE_TIMER.h>
 #include <Core/Log/LOG.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
@@ -56,6 +57,7 @@ template<class TV> MPM_OBJECTIVE_RB<TV>::
 template<class TV> void MPM_OBJECTIVE_RB<TV>::
 Compute(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_BASE<T>* g,T* e) const
 {
+    TIMER_SCOPE_FUNC;
     const MPM_KRYLOV_VECTOR_RB<TV>& dv=debug_cast<const MPM_KRYLOV_VECTOR_RB<TV>&>(Bdv);
     tmp1=dv;
     if(h) system.forced_collisions.Clean_Memory();
@@ -75,6 +77,7 @@ Compute(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_
 template<class TV> void MPM_OBJECTIVE_RB<TV>::
 Compute_Unconstrained(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,KRYLOV_VECTOR_BASE<T>* g,T* e) const
 {
+    TIMER_SCOPE_FUNC;
     // TODO: handle static rigid bodies
     bool use_midpoint=system.example.use_midpoint;
     T dt=system.example.dt;
@@ -111,6 +114,7 @@ Compute_Unconstrained(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,
 template<class TV> void MPM_OBJECTIVE_RB<TV>::
 Update_F(const MPM_KRYLOV_VECTOR_RB<TV>& v) const
 {
+    TIMER_SCOPE_FUNC;
     struct HELPER
     {
         MATRIX<T,TV::m> grad_Vp;
@@ -161,6 +165,7 @@ Update_F(const MPM_KRYLOV_VECTOR_RB<TV>& v) const
 template<class TV> void MPM_OBJECTIVE_RB<TV>::
 Restore_F() const
 {
+    TIMER_SCOPE_FUNC;
 #pragma omp parallel for
     for(int k=0;k<system.example.simulated_particles.m;k++){
         int p=system.example.simulated_particles(k);
@@ -179,6 +184,7 @@ Test_Add_Collision(MPM_KRYLOV_VECTOR_RB<TV>& dv,int object,int p,bool prune,
     bool stick,ARRAY<COLLISION>& collisions,ARRAY<int>& stuck_nodes,
     ARRAY<TV>& stuck_velocity) const
 {
+    TIMER_SCOPE_FUNC;
     T midpoint_scale=system.example.use_midpoint?(T).5:1;
     T t0=system.example.time;
     T t1=t0+system.example.dt;
@@ -213,6 +219,7 @@ Test_Add_Collision(MPM_KRYLOV_VECTOR_RB<TV>& dv,int object,int p,bool prune,
 template<class TV> void MPM_OBJECTIVE_RB<TV>::
 Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
 {
+    TIMER_SCOPE_FUNC;
     if(!system.example.collision_objects.m) return;
     MPM_KRYLOV_VECTOR_RB<TV>& dv=debug_cast<MPM_KRYLOV_VECTOR_RB<TV>&>(Bdv);
     system.collisions.Remove_All();
@@ -255,6 +262,7 @@ Adjust_For_Collision(KRYLOV_VECTOR_BASE<T>& Bdv) const
 template<class TV> void MPM_OBJECTIVE_RB<TV>::
 Project_Gradient_And_Prune_Constraints(KRYLOV_VECTOR_BASE<T>& Bg,bool allow_sep) const
 {
+    TIMER_SCOPE_FUNC;
     if(!system.collisions.m && !system.stuck_nodes.m) return;
     MPM_KRYLOV_VECTOR_RB<TV>& g=debug_cast<MPM_KRYLOV_VECTOR_RB<TV>&>(Bg);
 #pragma omp parallel for
@@ -279,6 +287,7 @@ Project_Gradient_And_Prune_Constraints(KRYLOV_VECTOR_BASE<T>& Bg,bool allow_sep)
 template<class TV> void MPM_OBJECTIVE_RB<TV>::
 Make_Feasible(KRYLOV_VECTOR_BASE<T>& dv) const
 {
+    TIMER_SCOPE_FUNC;
 //    system.Sanity(dv,"before make feasible");
 
     tmp2.Copy(0,tmp2,dv);
@@ -294,6 +303,7 @@ Make_Feasible(KRYLOV_VECTOR_BASE<T>& dv) const
 template<class TV> bool MPM_OBJECTIVE_RB<TV>::
 Initial_Guess(KRYLOV_VECTOR_BASE<T>& Bdv,T tolerance,bool no_test) const
 {
+    TIMER_SCOPE_FUNC;
     if(no_test) LOG::printf("NO TEST INITIAL GUESS\n");
     MPM_KRYLOV_VECTOR_RB<TV>& dv=debug_cast<MPM_KRYLOV_VECTOR_RB<TV>&>(Bdv);
     system.forced_collisions.Remove_All();
@@ -317,6 +327,7 @@ Initial_Guess(KRYLOV_VECTOR_BASE<T>& Bdv,T tolerance,bool no_test) const
 template<class TV> void MPM_OBJECTIVE_RB<TV>::
 Reset()
 {
+    TIMER_SCOPE_FUNC;
     F0.Resize(system.example.particles.X.m);
     if(system.example.particles.store_S) S0.Resize(system.example.particles.X.m);
     X0.Resize(system.example.particles.X.m);
@@ -359,6 +370,7 @@ Reset()
 template<class TV> void MPM_OBJECTIVE_RB<TV>::
 Test_Diff(const KRYLOV_VECTOR_BASE<T>& dv)
 {
+    TIMER_SCOPE_FUNC;
     KRYLOV_VECTOR_BASE<T>& ddv=*dv.Clone_Default();
     KRYLOV_VECTOR_BASE<T>& g0=*dv.Clone_Default();
     KRYLOV_VECTOR_BASE<T>& g1=*dv.Clone_Default();

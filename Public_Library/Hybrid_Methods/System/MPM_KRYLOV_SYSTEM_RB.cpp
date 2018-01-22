@@ -2,6 +2,7 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Log/FINE_TIMER.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE_RB.h>
 #include <Hybrid_Methods/System/MPM_KRYLOV_SYSTEM_RB.h>
@@ -43,6 +44,7 @@ Sanity(const KRYLOV_VECTOR_BASE<T>& v,const char* str) const
 template<class TV> void MPM_KRYLOV_SYSTEM_RB<TV>::
 Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF,bool transpose) const
 {
+    TIMER_SCOPE_FUNC;
     const MPM_KRYLOV_VECTOR_RB<TV>& V=debug_cast<const MPM_KRYLOV_VECTOR_RB<TV>&>(BV);
     MPM_KRYLOV_VECTOR_RB<TV>& F=debug_cast<MPM_KRYLOV_VECTOR_RB<TV>&>(BF);
     tmp=V;
@@ -87,6 +89,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF,bool transpos
 template<class TV> double MPM_KRYLOV_SYSTEM_RB<TV>::
 Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const
 {
+    TIMER_SCOPE_FUNC;
     const MPM_KRYLOV_VECTOR_RB<TV>& X=debug_cast<const MPM_KRYLOV_VECTOR_RB<TV>&>(x);
     const MPM_KRYLOV_VECTOR_RB<TV>& Y=debug_cast<const MPM_KRYLOV_VECTOR_RB<TV>&>(y);
     T r=0;
@@ -111,6 +114,7 @@ Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) con
 template<class TV> typename TV::SCALAR MPM_KRYLOV_SYSTEM_RB<TV>::
 Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& BR) const
 {
+    TIMER_SCOPE_FUNC;
     return sqrt(Inner_Product(BR,BR));
 }
 //#####################################################################

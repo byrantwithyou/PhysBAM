@@ -2,6 +2,7 @@
 // Copyright 2010.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Log/FINE_TIMER.h>
 #include <Core/Data_Structures/TRIPLE.h>
 #include <Core/Matrices/MATRIX.h>
 #include <Tools/Polynomials/QUADRATIC.h>
@@ -40,6 +41,7 @@ template<class TV> RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>::
 template<class TV> void RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const
 {
+    TIMER_SCOPE_FUNC;
     for(int i=0;i<collision_pairs.m;i++){
         const COLLISION_PAIR& c=collision_pairs(i);
         const RIGID_BODY<TV>& rb=rigid_body_collection.Rigid_Body(c.b);
@@ -55,6 +57,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,
 template<class TV> void RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>::
 Update_Position_Based_State(const T time)
 {
+    TIMER_SCOPE_FUNC;
     get_candidates();
 
     num_dynamic=0;
@@ -70,6 +73,7 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,
     ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TV> F,
     ARRAY_VIEW<TWIST<TV> > rigid_F,const T time,bool transpose) const
 {
+    TIMER_SCOPE_FUNC;
     for(int i=0;i<collision_pairs.m;i++){
         const COLLISION_PAIR& c=collision_pairs(i);
         const RIGID_BODY<TV>& rb=rigid_body_collection.Rigid_Body(c.b);
@@ -101,6 +105,7 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,
 template<class TV> typename TV::SCALAR RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>::
 Potential_Energy(const T time) const
 {
+    TIMER_SCOPE_FUNC;
     T pe=0;
     for(int i=0;i<collision_pairs.m;i++){
         const COLLISION_PAIR& c=collision_pairs(i);
@@ -114,6 +119,7 @@ Potential_Energy(const T time) const
 template<class TV> void RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>::
 Relax_Attachment(int cp)
 {
+    TIMER_SCOPE_FUNC;
     COLLISION_PAIR& c=collision_pairs(cp);
     const RIGID_BODY<TV>& rb=rigid_body_collection.Rigid_Body(c.b);
     const IMPLICIT_OBJECT<TV>* io=rb.implicit_object->object_space_implicit_object;
@@ -144,6 +150,7 @@ Relax_Attachment(int cp)
 template<class TV> void RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>::
 Update_Attachments_And_Prune_Pairs()
 {
+    TIMER_SCOPE_FUNC;
     int k=0;
     for(int i=0;i<collision_pairs.m;i++){
         COLLISION_PAIR c=collision_pairs(i);
@@ -160,6 +167,7 @@ Update_Attachments_And_Prune_Pairs()
 template<class TV> void RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>::
 Add_Pair(int p,int b)
 {
+    TIMER_SCOPE_FUNC;
     // TODO: Interpolate X^n and X^(n+1) to choose surface point.
     if(hash.Contains({p,b})) return;
     TV X=particles.X(p);
