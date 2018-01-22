@@ -252,8 +252,12 @@ Seed_Particles_With_Marked_Surface(const T_OBJECT& object,std::function<TV(const
     TRIANGULATED_SURFACE<T>* mesh=TESSELLATION::Generate_Triangles(object,levels);
     LOG::printf("MPM OBJECT %s BEGIN %d\n",name,particles.number);
     LOG::printf("MPM MESH %s BEGIN %d\n",name,particles.number);
-    ARRAY<TV> X(mesh->particles.X);
-    LOG::printf("MPM MESH %s END %d\n",name,particles.number+X.m);
+    ARRAY<TV> X;
+    for(int p=0;p<mesh->particles.number;p++){
+        X.Append(mesh->particles.X(p));
+        Add_Particle(X(p),V,dV,mass,volume);}
+    int surface_end=particles.number;
+    LOG::printf("MPM MESH %s END %d\n",name,particles.number);
     Write_To_File(stream_type,output_directory+"/common/"+name,*mesh);
     delete mesh;
 
@@ -264,7 +268,7 @@ Seed_Particles_With_Marked_Surface(const T_OBJECT& object,std::function<TV(const
     poisson_disk.Sample(random,io,X);
 
     for(int p=0;p<X.m;p++)
-        Add_Particle(X(p),V,dV,mass,volume);
+        Add_Particle(X(surface_end+p),V,dV,mass,volume);
     LOG::printf("MPM OBJECT %s END %d\n",name,particles.number);
 }
 //#####################################################################
