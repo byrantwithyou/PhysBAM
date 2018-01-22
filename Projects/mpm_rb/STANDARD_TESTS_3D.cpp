@@ -628,6 +628,54 @@ Initialize()
             auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
             solid_body_collection.rigid_body_collection.Add_Force(rg);
         } break;
+
+        case 43:{ // Rigid sphere and sand pile
+            particles.Store_Fp(true);
+            Set_Grid(RANGE<TV>(TV(),TV(1,1,1))*m);
+
+            RIGID_BODY<TV>& bw=tests.Add_Analytic_Box(TV(1,0.1,1));
+            bw.is_static=true;
+            bw.Frame().t=TV(0.5,0.05,0.5);
+            T h=0.2;
+            RIGID_BODY<TV>& w1=tests.Add_Analytic_Box(TV(0.1,h,1));
+            w1.Frame().t=TV(-0.05,h/2,0.5);
+            w1.is_static=true;
+            RIGID_BODY<TV>& w2=tests.Add_Analytic_Box(TV(0.1,h,1));
+            w2.Frame().t=TV(1.05,h/2,0.5);
+            w2.is_static=true;
+            RIGID_BODY<TV>& w3=tests.Add_Analytic_Box(TV(1+0.2,h,0.1));
+            w3.Frame().t=TV(0.5,h/2,-0.05);
+            w3.is_static=true;
+            RIGID_BODY<TV>& w4=tests.Add_Analytic_Box(TV(1+0.2,h,0.1));
+            w4.Frame().t=TV(0.5,h/2,1.05);
+            w4.is_static=true;
+
+            T density=(T)2200*unit_rho*scale_mass;
+            T E=35.37e6*unit_p*scale_E,nu=.3;
+            if(!use_theta_c) theta_c=0.015;
+            if(!use_theta_s) theta_s=.000001;
+            if(!use_hardening_factor) hardening_factor=20;
+            if(!use_max_hardening) max_hardening=FLT_MAX;
+            Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
+            RANGE<TV> sand(TV(0.3,0.1,0.3),TV(0.7,0.5,0.7));
+            Seed_Particles(sand,0,0,density,particles_per_cell);
+            Add_Drucker_Prager_Case(E,nu,2);
+            TV g=m/(s*s)*TV(0,-4.81,0);
+            Add_Gravity(g);
+            RIGID_BODY<TV>& sphere=tests.Add_Analytic_Sphere(0.075,density*0.5);
+            sphere.Frame().t=TV(0.55,0.9,0.55);
+            begin_frame=[=,&sphere](int frame)
+            {
+                if(frame==45){
+                    sphere.Frame().t=TV(0.55,0.4,0.55);
+                    auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
+                    solid_body_collection.rigid_body_collection.Add_Force(rg);}
+                if(frame==49){
+                    sphere.Twist().angular=sphere.Gather(TWIST<TV>(TV(5,0,5),typename TV::SPIN()),TV(0.55,0.34,0.55)).angular;
+                }
+
+            };
+        } break;
             
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
