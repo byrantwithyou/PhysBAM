@@ -504,12 +504,13 @@ Initialize()
 
         case 150:{
             particles.Store_Fp(true);
-            Set_Grid(RANGE<TV>(TV(-1,-1,-1),TV(1,3,1))*m);
+            Set_Grid(RANGE<TV>(TV(-1,-1,-1),TV(1,1,1))*m);
 
             RANDOM_NUMBERS<T> rng(seed);
             T density=(T)2200*unit_rho*scale_mass;
             TV g=m/(s*s)*TV(0,1.8,0);
             RIGID_BODY<TV>& bowl=tests.Add_Analytic_Bowl((T)0,(T)1,(T)0.05);
+            bowl.Frame().t.y-=0.1;
             bowl.is_static=true;
 
             RANGE<TV> box(TV(-0.6,-2.6,-0.6),TV(0.6,0,0.6));
@@ -559,9 +560,10 @@ Initialize()
             write_output_files=[=](int frame){source->Write_Output_Files(frame);};
             read_output_files=[=](int frame){source->Read_Output_Files(frame);};
             T source_start=2;
+            T source_end=5;
             begin_time_step=[=](T time)
             {
-                if(time<source_start) return;
+                if(time<source_start || time>source_end) return;
                 ARRAY<int> affected_particles;
                 int n=particles.number;
                 source->Begin_Time_Step(time-source_start);
