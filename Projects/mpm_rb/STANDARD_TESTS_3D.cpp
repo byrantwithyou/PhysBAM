@@ -513,15 +513,15 @@ Initialize()
             bowl.Frame().t.y-=0.1;
             bowl.is_static=true;
 
-            RANGE<TV> box(TV(-0.6,-2.6,-0.6),TV(0.6,0,0.6));
+            RANGE<TV> box(TV(-0.6,-5.6,-0.6),TV(0.6,0,0.6));
             RANGE<TV> R(TV(0,0,0),TV(pi,pi,pi));
             POISSON_DISK<TV> poisson_disk(1);
             ARRAY<TV> X;
-            T gap=0.45;
+            T gap=0.6;
             poisson_disk.Set_Distance_By_Volume(cube(gap));
             poisson_disk.Sample(rng,box,X);
             for(int i=0;i<X.m/2;i++){
-                RIGID_BODY<TV>& ring=tests.Add_Rigid_Body("Rings_Test/ring_revolve",(T)0.05,(T)0);
+                RIGID_BODY<TV>& ring=tests.Add_Rigid_Body("Rings_Test/ring_revolve",(T)0.05*1.5,(T)0);
                 ring.Set_Mass(ring.Volume()*density);
                 TV rotation;
                 rng.Fill_Uniform(rotation,R);
@@ -529,7 +529,7 @@ Initialize()
                 ring.Frame().t=X(i);}
 
             for(int i=X.m/2;i<X.m;i++){
-                RIGID_BODY<TV>& torus=tests.Add_Analytic_Torus((T)0.05,(T)0.1,16,32,density);
+                RIGID_BODY<TV>& torus=tests.Add_Analytic_Torus((T)0.05*1.5,(T)0.1*1.5,16,32,density);
                 TV rotation;
                 rng.Fill_Uniform(rotation,R);
                 torus.Frame().r=ROTATION<TV>::From_Euler_Angles(rotation.x,rotation.y,rotation.z);
