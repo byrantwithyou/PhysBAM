@@ -25,7 +25,7 @@
 #include <fstream>
 using namespace PhysBAM;
 
-typedef float RW;
+typedef double RW;
 typedef double T;
 typedef VECTOR<T,3> TV;
 typedef VECTOR<T,2> TV2;
@@ -159,7 +159,11 @@ void Emit_MPM_Particles(std::ofstream& fout,const HASHTABLE<std::string,std::str
 {
     MPM_PARTICLES<TV>& particles=Load_MPM_Particles(options.Get("location"),frame);
     T radius=atof(options.Get("radius").c_str());
-    int begin=atoi(options.Get("begin").c_str()),end=atoi(options.Get("end").c_str());
+    int begin=0,end=particles.number;
+    if(options.Contains("begin"))
+        begin=atoi(options.Get("begin").c_str());
+    if(options.Contains("end"))
+        end=atoi(options.Get("end").c_str());
     PHYSBAM_ASSERT(begin>=0 && begin<particles.number);
     PHYSBAM_ASSERT(end>=0 && end<=particles.number);
 
