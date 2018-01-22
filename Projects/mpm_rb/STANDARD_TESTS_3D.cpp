@@ -590,7 +590,7 @@ Initialize()
 
         case 42:{ // sand and thrown box
             particles.Store_Fp(true);
-            Set_Grid(RANGE<TV>(TV(),TV(3,1,1))*m,TV_INT(3,1,1));
+            Set_Grid(RANGE<TV>(TV(-.1,-.1,-.1),TV(3.1,1.1,1.1))*m,TV_INT(3,1,1));
 
             RIGID_BODY<TV>& bw=tests.Add_Analytic_Box(TV(3,0.1,1));
             bw.is_static=true;
@@ -631,7 +631,7 @@ Initialize()
 
         case 43:{ // Rigid sphere and sand pile
             particles.Store_Fp(true);
-            Set_Grid(RANGE<TV>(TV(),TV(1,1,1))*m);
+            Set_Grid(RANGE<TV>(TV(-.1,-.1,-.1),TV(1.1,1.1,1.1))*m);
 
             RIGID_BODY<TV>& bw=tests.Add_Analytic_Box(TV(1,0.1,1));
             bw.is_static=true;
