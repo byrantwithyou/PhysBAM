@@ -66,7 +66,7 @@ Update_Rasterized_Data(bool new_grid)
         RIGID_BODY<TV>& rigid_body=*rigid_body_particles.rigid_body(b);
         rigid_body.Update_Bounding_Box_From_Implicit_Geometry();
         RANGE<TV> box=rigid_body.Axis_Aligned_Bounding_Box().Thickened(padding);
-        RANGE<TV_INT> grid_range=grid.Clamp_To_Cell(box,clamp_ghost+1).Intersect(grid.Domain_Indices());
+        RANGE<TV_INT> grid_range=grid.Clamp_To_Cell(box.Intersect(grid.domain),clamp_ghost+1);
         for(RANGE_ITERATOR<TV::m> it(grid_range);it.Valid();it.Next()){
             TV X=grid.Center(it.index);
             T phi=rigid_body.Implicit_Geometry_Extended_Value(X);
@@ -103,7 +103,7 @@ Update_Cell_Objects(bool new_grid)
         IMPLICIT_OBJECT<TV>* io=di_penalty->ios(o);
         io->Update_Box();
         RANGE<TV> box=io->Box().Thickened(padding);
-        RANGE<TV_INT> grid_range=grid.Clamp_To_Cell(box,clamp_ghost+1).Intersect(grid.Domain_Indices());
+        RANGE<TV_INT> grid_range=grid.Clamp_To_Cell(box.Intersect(grid.domain),clamp_ghost+1);
         for(RANGE_ITERATOR<TV::m> it(grid_range);it.Valid();it.Next())
             if(io->Extended_Phi(grid.Center(it.index))<padding)
                 cell_objects.Insert(it.index,o);}
