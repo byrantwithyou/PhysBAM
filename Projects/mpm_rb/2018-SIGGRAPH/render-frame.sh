@@ -10,5 +10,5 @@ HEIGHT=$4
 WIDTH=$5
 
 nice ../../pov_render/pov_render $SCRIPT $OUTPUT/$B-$F.pov $FRAME
-nice povray +I$OUTPUT/$B-$F.pov -O$OUTPUT/$B-$F.png Antialias=On Display=Off +H$HEIGHT +W$WIDTH
+nice povray +Q8 +I$OUTPUT/$B-$F.pov -O$OUTPUT/$B-$F.png Antialias=On Display=Off +H$HEIGHT +W$WIDTH
 
