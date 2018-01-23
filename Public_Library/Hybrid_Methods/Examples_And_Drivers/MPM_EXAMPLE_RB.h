@@ -129,9 +129,9 @@ public:
     T rd_penalty_friction=0.3;
     bool use_rd=false,use_rr=false,use_di=false;
     bool use_rd_k=false,use_rr_k=false,use_di_k=false;
-    bool rd_k=0,rr_k=0,di_k=0;
+    T rd_k=0,rr_k=0,di_k=0;
     bool use_rd_mu=false,use_rr_mu=false,use_di_mu=false;
-    bool rd_mu=0,rr_mu=0,di_mu=0;
+    T rd_mu=0,rr_mu=0,di_mu=0;
     PENALTY_FORCE_COLLECTION<TV>* pfd;
     ARRAY<MOVE_RIGID_BODY_DIFF<TV> > move_rb_diff;
     
