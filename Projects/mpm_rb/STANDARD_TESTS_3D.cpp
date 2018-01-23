@@ -710,22 +710,22 @@ Initialize()
             if(!use_hardening_factor) hardening_factor=20;
             if(!use_max_hardening) max_hardening=FLT_MAX;
             Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
-            RANGE<TV> sand(TV(0.4,0.1,0.4),TV(0.6,0.7,0.6));
+            RANGE<TV> sand(TV(0.3,0.1,0.3),TV(0.7,0.7,0.7));
             Seed_Particles(sand,0,0,density*1,particles_per_cell);
             ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
             for(int p=0;p<particles.number;p++) (*colors)(p)=Sand_Color();
             Add_Drucker_Prager_Case(E,nu,2);
             TV g=m/(s*s)*TV(0,-4.81,0);
             Add_Gravity(g);
-            RIGID_BODY<TV>& sphere=tests.Add_Analytic_Sphere(0.075,density*0.5);
-            sphere.Frame().t=TV(0.65,0.9,0.65);
+            RIGID_BODY<TV>& sphere=tests.Add_Analytic_Sphere(0.075,density*10);
+            sphere.Frame().t=TV(0.45,0.9,0.65);
             int sphere_id=sphere.particle_index;
             begin_time_step=[this,sphere_id](T time)
             {
                 if(time<2)
                 {
-                    solid_body_collection.rigid_body_collection.rigid_body_particles.frame(sphere_id).t=TV(0.65,0.9,0.65);
-                    solid_body_collection.rigid_body_collection.rigid_body_particles.twist(sphere_id)*=0;
+                    solid_body_collection.rigid_body_collection.rigid_body_particles.frame(sphere_id).t=TV(0.45,0.9,0.65);
+                    solid_body_collection.rigid_body_collection.rigid_body_particles.twist(sphere_id).linear=TV(.1,0,0);
                 }
             };
                 
