@@ -126,19 +126,28 @@ Initialize()
             Q.Get_Rotated_Frame(t,n,t1);
             TV c(.5,.5,.5);
 
-            Set_Grid(RANGE<TV>::Unit_Box()*m);
-            RANGE<TV> box(TV((T).4,(T).5,(T).4)*m,TV((T).6,(T).7,(T).6)*m);
-            T density=2*unit_rho*scale_mass;
-            Seed_Particles(box,0,0,density,particles_per_cell);
-            for(int i=0;i<particles.number;i++){
-                particles.X(i)=R.Rotate(particles.X(i)-c)+c;
-                particles.V(i)=-t*vel;}
+            Set_Grid(RANGE<TV>(TV(-1,0,0),TV(1,1,1))*m,TV_INT(2,1,1));
 
+            RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(R.Rotate(TV(0,0.1,0))+c,R));
+            initial_state.twist.linear=-t*vel;
+            GRID<TV> mattress_grid(TV_INT(10+1,10+1,10+1),RANGE<TV>(TV((T)-.1,(T)-.1,(T)-.1),TV((T).1,(T).1,(T).1))*m);
+            T density=2*unit_rho*scale_mass;
+            tests.Create_Mattress(mattress_grid,true,&initial_state,density);
+            particles.valid.Fill(true);
+            particles.F.Fill(MATRIX<T,TV::m>()+1);
+            if(particles.store_Fp) particles.Fp.Fill(MATRIX<T,TV::m>()+1);
+            particles.volume.Fill(grid.domain.Size()/particles.number);
+            
+            for(int i=0;i<particles.number;i++){
+                particles.V(i)=-t*vel;}
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
+            color_attribute->Fill(TV(1,1,1));
+            
             Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
             TV g=m/(s*s)*TV(0,-1.8,0);
             Add_Gravity(g);
             Add_Collision_Object(Make_IO(PLANE<T>(n,c)));
-
+            
             // Dump solution to viewer
             write_output_files=[=](int frame)
             {
@@ -171,13 +180,22 @@ Initialize()
             Q.Get_Rotated_Frame(t,n,t1);
             TV c(.5,.5,.5);
 
-            Set_Grid(RANGE<TV>::Unit_Box()*m);
-            RANGE<TV> box(TV((T).4,(T).5,(T).4)*m,TV((T).6,(T).7,(T).6)*m);
+            Set_Grid(RANGE<TV>(TV(-1,0,0),TV(1,1,1))*m,TV_INT(2,1,1));
+
+            RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(R.Rotate(TV(0,0.1,0))+c,R));
+            initial_state.twist.linear=-t*vel;
+            GRID<TV> mattress_grid(TV_INT(10+1,10+1,10+1),RANGE<TV>(TV((T)-.1,(T)-.1,(T)-.1),TV((T).1,(T).1,(T).1))*m);
             T density=2*unit_rho*scale_mass;
-            Seed_Particles(box,0,0,density,particles_per_cell);
+            tests.Create_Mattress(mattress_grid,true,&initial_state,density);
+            particles.valid.Fill(true);
+            particles.F.Fill(MATRIX<T,TV::m>()+1);
+            if(particles.store_Fp) particles.Fp.Fill(MATRIX<T,TV::m>()+1);
+            particles.volume.Fill(grid.domain.Size()/particles.number);
+            
             for(int i=0;i<particles.number;i++){
-                particles.X(i)=R.Rotate(particles.X(i)-c)+c;
                 particles.V(i)=-t*vel;}
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
+            color_attribute->Fill(TV(1,1,1));
 
             Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
             TV g=m/(s*s)*TV(0,-1.8,0);
