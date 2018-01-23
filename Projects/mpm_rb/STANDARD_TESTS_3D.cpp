@@ -672,10 +672,10 @@ Initialize()
             Add_Drucker_Prager_Case(E,nu,2);
             TV g=m/(s*s)*TV(0,-4.81,0);
             Add_Gravity(g);
-            RIGID_BODY<TV>& cube=tests.Add_Analytic_Box(TV(0.2,0.2,0.2),TV_INT()+1,density*1.05);
+            RIGID_BODY<TV>& cube=tests.Add_Analytic_Box(TV(0.2,0.2,0.2),TV_INT()+1,density*2);
             cube.Frame().t=TV(0.3,0.6,0.5);
             cube.Frame().r=ROTATION<TV>::From_Euler_Angles((T)0.7,(T)0.7,(T)0.7);
-            cube.Twist().linear=TV(2,-0.5,0);
+            cube.Twist().linear=TV(4,-0.5,0);
             auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
             solid_body_collection.rigid_body_collection.Add_Force(rg);
             ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
@@ -710,26 +710,17 @@ Initialize()
             if(!use_hardening_factor) hardening_factor=20;
             if(!use_max_hardening) max_hardening=FLT_MAX;
             Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
-            RANGE<TV> sand(TV(0.3,0.1,0.3),TV(0.7,0.5,0.7));
-            Seed_Particles(sand,0,0,density,particles_per_cell);
+            RANGE<TV> sand(TV(0.4,0.1,0.4),TV(0.6,0.7,0.6));
+            Seed_Particles(sand,0,0,density*0.1,particles_per_cell);
             ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
             for(int p=0;p<particles.number;p++) (*colors)(p)=Sand_Color();
             Add_Drucker_Prager_Case(E,nu,2);
             TV g=m/(s*s)*TV(0,-4.81,0);
             Add_Gravity(g);
             RIGID_BODY<TV>& sphere=tests.Add_Analytic_Sphere(0.075,density*0.5);
-            sphere.Frame().t=TV(0.55,0.9,0.55);
-            begin_frame=[=,&sphere](int frame)
-            {
-                if(frame==45){
-                    sphere.Frame().t=TV(0.55,0.4,0.55);
-                    auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
-                    solid_body_collection.rigid_body_collection.Add_Force(rg);}
-                if(frame==49){
-                    sphere.Twist().angular=sphere.Gather(TWIST<TV>(TV(5,0,5),typename TV::SPIN()),TV(0.55,0.34,0.55)).angular;
-                }
-
-            };
+            sphere.Frame().t=TV(0.65,0.9,0.65);
+            auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
+            solid_body_collection.rigid_body_collection.Add_Force(rg);
         } break;
             
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
