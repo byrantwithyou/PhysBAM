@@ -28,6 +28,8 @@ using namespace PhysBAM;
 typedef double T;
 typedef VECTOR<T,3> TV;
 typedef VECTOR<T,2> TV2;
+STREAM_TYPE stream_type_float(.0f);
+STREAM_TYPE stream_type_double(.0);
 STREAM_TYPE* stream_type=0;
 
 HASHTABLE<PAIR<std::string,int>,MPM_PARTICLES<TV>*> mpm_particles_cache;
@@ -447,6 +449,12 @@ void Emit_Camera(std::ofstream& fout,const HASHTABLE<std::string,std::string>& o
     fout<<angle<<" }"<<std::endl;
 }
 
+void Set_Global_Options(std::ofstream& fout,const HASHTABLE<std::string,std::string>& options)
+{
+    if(const std::string* value=options.Get_Pointer("read"))
+        stream_type=*value=="double"?&stream_type_double:&stream_type_float;
+}
+
 int main(int argc, char *argv[]) 
 {  
     PROCESS_UTILITIES::Set_Backtrace(true);
@@ -460,7 +468,7 @@ int main(int argc, char *argv[])
     parse_args.Extra(&output_filename,"output scene file","output scene file");
     parse_args.Extra(&frame_number,"frame number","frame number");
     parse_args.Parse();
-    stream_type=new STREAM_TYPE(use_doubles);
+    stream_type=use_doubles?&stream_type_double:&stream_type_float;
     if(parse_args.unclaimed_arguments){parse_args.Print_Usage();exit(0);}
 
     std::ifstream fin(scene_filename.c_str());
@@ -507,6 +515,8 @@ int main(int argc, char *argv[])
             Emit_MPM_Surface(fout,options,frame_number);
         else if(type=="texture_map")
             Create_Texture_Map(fout,options,frame_number);
+        else if(type=="set_global")
+            Set_Global_Options(fout,options);
         else PHYSBAM_FATAL_ERROR("unexpected replacement type: '"+type+"'.");
     }
 
