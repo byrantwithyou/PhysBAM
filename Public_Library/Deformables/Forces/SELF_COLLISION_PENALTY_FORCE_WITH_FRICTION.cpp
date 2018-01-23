@@ -21,10 +21,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION<TV>::
-SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION(DEFORMABLE_PARTICLES<TV>& particles_input,
-    T stiffness_coefficient,T friction)
-    :BASE(particles_input),stiffness_coefficient(stiffness_coefficient),
-    friction(friction)
+SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION(DEFORMABLE_PARTICLES<TV>& particles_input)
+    :BASE(particles_input)
 {
 }
 //#####################################################################

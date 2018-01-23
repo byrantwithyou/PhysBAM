@@ -30,8 +30,8 @@ public:
     };
     
     ARRAY<T_SURFACE*> surfaces;
-    T stiffness_coefficient;
-    T friction;
+    T stiffness_coefficient=0;
+    T friction=0;
     T trial_distance;
     
     struct DIFF_ENTRY
@@ -67,8 +67,7 @@ public:
     HASHTABLE<TV_INT,VECTOR<int,2> > object_from_element; // face -> (s,e)
     std::function<void()> get_candidates=0; // Call Add_Pair on collision candidates.
 
-    SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION(DEFORMABLE_PARTICLES<TV>& particles_input,
-        T stiffness_coefficient,T friction);
+    SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION(DEFORMABLE_PARTICLES<TV>& particles_input);
     virtual ~SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION();
 
 //#####################################################################

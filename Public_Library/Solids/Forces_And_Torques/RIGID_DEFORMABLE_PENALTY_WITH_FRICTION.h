@@ -21,8 +21,8 @@ public:
     typedef int HAS_TYPED_READ_WRITE;
     using BASE::particles;using BASE::rigid_body_collection;
 
-    T stiffness_coefficient;
-    T friction;
+    T stiffness_coefficient=0;
+    T friction=0;
     int num_dynamic=0,num_stick=0;
     
     struct COLLISION_PAIR
@@ -49,8 +49,7 @@ public:
 
     RIGID_DEFORMABLE_PENALTY_WITH_FRICTION(DEFORMABLE_PARTICLES<TV>& particles_input,
         RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,
-        const ARRAY<MOVE_RIGID_BODY_DIFF<TV> >& move_rb_diff,T stiffness_coefficient,
-        T friction);
+        const ARRAY<MOVE_RIGID_BODY_DIFF<TV> >& move_rb_diff);
     virtual ~RIGID_DEFORMABLE_PENALTY_WITH_FRICTION();
 
 //#####################################################################

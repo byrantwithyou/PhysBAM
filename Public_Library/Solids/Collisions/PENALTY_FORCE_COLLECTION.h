@@ -60,7 +60,7 @@ public:
         simulated_particles(simulated_particles),move_rb_diff(move_rb_diff)
     {grid.domain=RANGE<TV>::Empty_Box();}
 
-    void Init(T stiffness,T friction,TRIANGLE_COLLISION_PARAMETERS<TV>* param,
+    void Init(TRIANGLE_COLLISION_PARAMETERS<TV>* param,
         bool use_di,bool use_dd,bool use_rd,bool use_rr);
     
     PENALTY_FORCE_COLLECTION(const PENALTY_FORCE_COLLECTION&) = delete;

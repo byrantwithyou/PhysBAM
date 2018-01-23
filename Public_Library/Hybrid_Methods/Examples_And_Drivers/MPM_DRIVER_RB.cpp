@@ -125,9 +125,13 @@ Initialize()
     if((example.use_rr || example.use_rd) && !example.pfd){
         example.pfd=new PENALTY_FORCE_COLLECTION<TV>(example.solid_body_collection,
             example.simulated_particles,example.move_rb_diff);
-        example.pfd->Init(example.rd_penalty_stiffness,
-            example.rd_penalty_friction,0,example.use_di,false,example.use_rd,
-            example.use_rr);}
+        example.pfd->Init(0,example.use_di,false,example.use_rd,example.use_rr);}
+    if(example.use_di) example.pfd->di_penalty->stiffness_coefficient=example.use_di_k?example.di_k:example.rd_penalty_stiffness;
+    if(example.use_rd) example.pfd->rd_penalty->stiffness_coefficient=example.use_rd_k?example.rd_k:example.rd_penalty_stiffness;
+    if(example.use_rr) example.pfd->rr_penalty->stiffness_coefficient=example.use_rr_k?example.rr_k:example.rd_penalty_stiffness;
+    if(example.use_di) example.pfd->di_penalty->friction=example.use_di_mu?example.di_mu:example.rd_penalty_friction;
+    if(example.use_rd) example.pfd->rd_penalty->friction=example.use_rd_mu?example.rd_mu:example.rd_penalty_friction;
+    if(example.use_rr) example.pfd->rr_penalty->friction=example.use_rr_mu?example.rr_mu:example.rd_penalty_friction;
 
     if(!example.restart) Write_Output_Files(0);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",1);
@@ -506,6 +510,7 @@ Apply_Forces()
         newtons_method.use_gradient_magnitude_objective=example.use_gradient_magnitude_objective;
         newtons_method.use_cg=true;
         newtons_method.debug=example.debug_newton;
+        newtons_method.angle_tolerance=example.angle_tol;
         if(example.asymmetric_system){
             newtons_method.use_gmres=true;
             newtons_method.use_cg=false;

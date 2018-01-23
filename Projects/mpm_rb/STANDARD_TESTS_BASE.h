@@ -49,8 +49,11 @@ public:
     using BASE::debug_newton;using BASE::use_gradient_magnitude_objective;
     using BASE::use_rd;using BASE::use_rr;using BASE::use_di;
     using BASE::rd_penalty_stiffness;using BASE::rd_penalty_friction;
-    using BASE::simulated_particles;
-    
+    using BASE::simulated_particles;using BASE::angle_tol;
+    using BASE::rd_k;using BASE::use_rd_k;using BASE::rr_k;using BASE::use_rr_k;
+    using BASE::di_k;using BASE::use_di_k;using BASE::rd_mu;using BASE::use_rd_mu;
+    using BASE::rr_mu;using BASE::use_rr_mu;using BASE::di_mu;using BASE::use_di_mu;
+
     int test_number;
     int resolution;
     bool user_resolution;

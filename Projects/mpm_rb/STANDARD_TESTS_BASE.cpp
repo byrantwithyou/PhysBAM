@@ -87,6 +87,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-cfl_c",&cfl_sound,"cfl","CFL number for sound speed");
     parse_args.Add("-newton_tolerance",&newton_tolerance,"tol","Newton tolerance");
     parse_args.Add("-newton_iterations",&newton_iterations,"iter","Newton iterations");
+    parse_args.Add("-angle_tol",&angle_tol,"tol","Newton iterations");
     parse_args.Add("-solver_tolerance",&solver_tolerance,"tol","Solver tolerance");
     parse_args.Add("-solver_iterations",&solver_iterations,"iter","Solver iterations");
     parse_args.Add("-seed",&seed,"seed","Random number seed");
@@ -135,6 +136,12 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-di",&use_di,"enable deformable-object penalty force friction");
     parse_args.Add("-grad_ls",&use_gradient_magnitude_objective,"do line searches on norm of gradient");
     parse_args.Add("-debug_newton",&debug_newton,"Enable diagnostics in Newton's method");
+    parse_args.Add("-rd_k",&rd_k,&use_rd_k,"stiffness","override stiffness for rigid-deformable penalty force friction");
+    parse_args.Add("-rr_k",&rr_k,&use_rr_k,"stiffness","override stiffness for rigid-rigid penalty force friction");
+    parse_args.Add("-di_k",&di_k,&use_di_k,"stiffness","override stiffness for deformable-object penalty force friction");
+    parse_args.Add("-rd_mu",&rd_mu,&use_rd_mu,"friction","override friction for rigid-deformable penalty force friction");
+    parse_args.Add("-rr_mu",&rr_mu,&use_rr_mu,"friction","override friction for rigid-rigid penalty force friction");
+    parse_args.Add("-di_mu",&di_mu,&use_di_mu,"friction","override friction for deformable-object penalty force friction");
     
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);
@@ -592,7 +599,7 @@ Add_Collision_Object(IMPLICIT_OBJECT<TV>* io)
     if(!use_di) return;
     if(use_di && !pfd){
         pfd=new PENALTY_FORCE_COLLECTION<TV>(solid_body_collection,simulated_particles,this->move_rb_diff);
-        pfd->Init(rd_penalty_stiffness,rd_penalty_friction,0,use_di,false,use_rd,use_rr);}
+        pfd->Init(0,use_di,false,use_rd,use_rr);}
     pfd->di_penalty->ios.Append(io);
 }
 //#####################################################################

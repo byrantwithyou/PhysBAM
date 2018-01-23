@@ -208,7 +208,7 @@ Save_State()
 // Function Init
 //#####################################################################
 template<class TV> void PENALTY_FORCE_COLLECTION<TV>::
-Init(T stiffness,T friction,TRIANGLE_COLLISION_PARAMETERS<TV>* param,
+Init(TRIANGLE_COLLISION_PARAMETERS<TV>* param,
     bool use_di,bool use_dd,bool use_rd,bool use_rr)
 {
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_SURFACE;
@@ -217,29 +217,25 @@ Init(T stiffness,T friction,TRIANGLE_COLLISION_PARAMETERS<TV>* param,
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     if(use_rr && !rr_penalty && solid_body_collection.rigid_body_collection.rigid_body_particles.number>0){
         rr_penalty=new RIGID_PENALTY_WITH_FRICTION<TV>(
-            solid_body_collection.rigid_body_collection,move_rb_diff,
-            stiffness,friction);
+            solid_body_collection.rigid_body_collection,move_rb_diff);
         rr_penalty->get_candidates=[this](){Get_RR_Collision_Candidates();};
         solid_body_collection.Add_Force(rr_penalty);}
 
     if(use_rd && !rd_penalty && solid_body_collection.rigid_body_collection.rigid_body_particles.number>0){
         rd_penalty=new RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>(
             solid_body_collection.deformable_body_collection.particles,
-            solid_body_collection.rigid_body_collection,move_rb_diff,
-            stiffness,friction);
+            solid_body_collection.rigid_body_collection,move_rb_diff);
         rd_penalty->get_candidates=[this](){Get_RD_Collision_Candidates();};
         solid_body_collection.Add_Force(rd_penalty);}
 
     if(use_di && !di_penalty){
         di_penalty=new IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<TV>(
-            solid_body_collection.deformable_body_collection.particles,
-            stiffness,friction);
+            solid_body_collection.deformable_body_collection.particles);
         di_penalty->get_candidates=[this](){Get_DI_Collision_Candidates();};
         solid_body_collection.deformable_body_collection.Add_Force(di_penalty);}
 
     if(use_dd){
-        dd_penalty=new SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION<TV>(
-            particles,stiffness,friction);
+        dd_penalty=new SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION<TV>(particles);
         dd_penalty->get_candidates=[this](){Get_DD_Collision_Candidates();};
         solid_body_collection.Add_Force(dd_penalty);
         deformable_body_collection.triangle_collisions.compute_edge_edge_collisions=false;

@@ -85,6 +85,14 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-dd",&use_dd,"enable deformable-deformable penalty force friction");
     parse_args.Add("-rr",&use_rr,"enable rigid-rigid penalty force friction");
     parse_args.Add("-di",&use_di,"enable deformable-object penalty force friction");
+    parse_args.Add("-rd_k",&rd_k,&use_rd_k,"stiffness","override stiffness for rigid-deformable penalty force friction");
+    parse_args.Add("-dd_k",&dd_k,&use_dd_k,"stiffness","override stiffness for deformable-deformable penalty force friction");
+    parse_args.Add("-rr_k",&rr_k,&use_rr_k,"stiffness","override stiffness for rigid-rigid penalty force friction");
+    parse_args.Add("-di_k",&di_k,&use_di_k,"stiffness","override stiffness for deformable-object penalty force friction");
+    parse_args.Add("-rd_mu",&rd_mu,&use_rd_mu,"friction","override friction for rigid-deformable penalty force friction");
+    parse_args.Add("-dd_mu",&dd_mu,&use_dd_mu,"friction","override friction for deformable-deformable penalty force friction");
+    parse_args.Add("-rr_mu",&rr_mu,&use_rr_mu,"friction","override friction for rigid-rigid penalty force friction");
+    parse_args.Add("-di_mu",&di_mu,&use_di_mu,"friction","override friction for deformable-object penalty force friction");
     parse_args.Parse(true);
 
 #ifdef USE_OPENMP
@@ -215,9 +223,17 @@ Init_Penalty_Collection()
     detection_grid.Initialize(TV_INT()+100,RANGE<TV>::Centered_Box()*10,true);
     pfd=new PENALTY_FORCE_COLLECTION<TV>(solid_body_collection,
         solid_body_collection.deformable_body_collection.simulated_particles,this->move_rb_diff);
-    pfd->Init(rd_penalty_stiffness,rd_penalty_friction,
-        &solids_parameters.triangle_collision_parameters,
+    pfd->Init(&solids_parameters.triangle_collision_parameters,
         use_di,use_dd,use_rd,use_rr);
+    if(use_di) pfd->di_penalty->stiffness_coefficient=use_di_k?di_k:rd_penalty_stiffness;
+    if(use_dd) pfd->dd_penalty->stiffness_coefficient=use_dd_k?dd_k:rd_penalty_stiffness;
+    if(use_rd) pfd->rd_penalty->stiffness_coefficient=use_rd_k?rd_k:rd_penalty_stiffness;
+    if(use_rr) pfd->rr_penalty->stiffness_coefficient=use_rr_k?rr_k:rd_penalty_stiffness;
+    if(use_di) pfd->di_penalty->friction=use_di_mu?di_mu:rd_penalty_friction;
+    if(use_dd) pfd->dd_penalty->friction=use_dd_mu?dd_mu:rd_penalty_friction;
+    if(use_rd) pfd->rd_penalty->friction=use_rd_mu?rd_mu:rd_penalty_friction;
+    if(use_rr) pfd->rr_penalty->friction=use_rr_mu?rr_mu:rd_penalty_friction;
+
     if(backward_euler_evolution) backward_euler_evolution->minimization_objective.pfd=pfd;
 }
 template class STANDARD_TESTS_BASE<VECTOR<float,2> >;

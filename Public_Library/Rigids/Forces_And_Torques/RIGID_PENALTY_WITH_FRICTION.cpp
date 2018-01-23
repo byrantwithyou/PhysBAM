@@ -17,10 +17,8 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> RIGID_PENALTY_WITH_FRICTION<TV>::
 RIGID_PENALTY_WITH_FRICTION(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,
-    const ARRAY<MOVE_RIGID_BODY_DIFF<TV> >& move_rb_diff,T stiffness_coefficient,
-    T friction)
+    const ARRAY<MOVE_RIGID_BODY_DIFF<TV> >& move_rb_diff)
     :BASE(rigid_body_collection_input),
-    stiffness_coefficient(stiffness_coefficient),friction(friction),
     move_rb_diff(move_rb_diff)
 {
 }

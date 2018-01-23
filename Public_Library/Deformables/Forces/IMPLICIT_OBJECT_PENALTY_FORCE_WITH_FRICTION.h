@@ -24,8 +24,8 @@ public:
     using BASE::particles;
 
     ARRAY<IMPLICIT_OBJECT<TV>*> ios;
-    T stiffness_coefficient;
-    T friction;
+    T stiffness_coefficient=0;
+    T friction=0;
     
     struct COLLISION_PAIR
     {
@@ -46,8 +46,7 @@ public:
     HASHTABLE<PAIR<int,int> > hash;
     std::function<void()> get_candidates=0; // Call Add_Pair on collision candidates.
 
-    IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION(DEFORMABLE_PARTICLES<TV>& particles_input,
-        T stiffness_coefficient,T friction);
+    IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION(DEFORMABLE_PARTICLES<TV>& particles_input);
     virtual ~IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION();
 
 //#####################################################################
