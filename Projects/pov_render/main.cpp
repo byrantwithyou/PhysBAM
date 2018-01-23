@@ -172,7 +172,7 @@ void Emit_MPM_Particles(std::ofstream& fout,const HASHTABLE<std::string,std::str
         begin=atoi(options.Get("begin").c_str());
     if(options.Contains("end"))
         end=atoi(options.Get("end").c_str());
-    PHYSBAM_ASSERT(begin>=0 && begin<particles.number);
+    PHYSBAM_ASSERT((begin>=0 && begin<particles.number) || (begin==0 && particles.number==0));
     PHYSBAM_ASSERT(end>=0 && end<=particles.number);
 
     ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
