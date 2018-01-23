@@ -625,11 +625,11 @@ Seed_Particles_Volume(T_STRUCTURE& object,std::function<TV(const TV&)> V,
     T total_mass=total_volume*density;
     for(int i=0;i<indices.m;i++){
         int p=indices(i);
-        TV X=particles.X(i);
-        particles.valid(i)=true;
-        particles.F(i)=MATRIX<T,TV::m>()+1;
-        if(particles.store_Fp) particles.Fp(i)=MATRIX<T,TV::m>()+1;
-        if(particles.store_S) particles.S(i)=SYMMETRIC_MATRIX<T,TV::m>()+1;
+        TV X=particles.X(p);
+        particles.valid(p)=true;
+        particles.F(p)=MATRIX<T,TV::m>()+1;
+        if(particles.store_Fp) particles.Fp(p)=MATRIX<T,TV::m>()+1;
+        if(particles.store_S) particles.S(p)=SYMMETRIC_MATRIX<T,TV::m>()+1;
         if(V) particles.V(p)=V(X);
         (*color_attribute)(p)=TV(1,1,1);
         if(particles.store_B && dV){
