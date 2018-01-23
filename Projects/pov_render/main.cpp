@@ -74,6 +74,12 @@ void Apply_Options(TRIANGULATED_SURFACE<T>* ts, const HASHTABLE<std::string,std:
         T s=atof(value->c_str());
         if(s!=1) ts->Rescale(s);}
 
+    if(const std::string* value=options.Get_Pointer("translate")){
+        std::stringstream ss(*value);
+        TV offset;
+        ss>>offset;
+        ts->particles.X+=offset;}
+
     if(const std::string* value=options.Get_Pointer("jitter")){
         T e=atof(value->c_str());
         if(e>0){
@@ -193,6 +199,8 @@ void Emit_MPM_Surface(std::ofstream& fout,const HASHTABLE<std::string,std::strin
     PHYSBAM_ASSERT(end-begin==mesh.particles.number);
     for(int p=0;p<mesh.particles.number;p++)
         mesh.particles.X(p)=particles.X(begin+p);
+
+    Apply_Options(&mesh,options);
     Emit_Smooth_Surface(fout,&mesh,options);
 }
 
