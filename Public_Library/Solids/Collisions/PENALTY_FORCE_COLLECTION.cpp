@@ -188,8 +188,10 @@ Get_DD_Collision_Candidates()
         bool in=face.Point_Face_Collision(Xn(p),particles.X(p)-Xn(p),V_f,1,
             const_repulsion_thickness,collision_time,normal,weights,false);
         if(!in) continue;
-        
-        dd_penalty->Add_Pair(p,s_e.x,weights.Remove_Index(0),s_e.y);}
+
+        TV w=weights.Remove_Index(0);
+        if(w.Min()<0) continue;
+        dd_penalty->Add_Pair(p,s_e.x,w,s_e.y);}
 }
 //#####################################################################
 // Function Save_State

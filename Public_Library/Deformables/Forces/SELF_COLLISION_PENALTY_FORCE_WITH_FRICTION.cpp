@@ -269,6 +269,7 @@ void Relax_Attachment(CP& c,const TV& Z,const TRIANGULATED_SURFACE<T>& ts,T fric
             case tri_int:
             case tri_edge:{
                 TV_INT e=ts.mesh.elements(e0);
+                if(e.Contains(c.p)){c.active=false;return;}
                 VECTOR<TV,TV::m> P(ts.particles.X.Subset(e));
                 de.e=e0;
                 int ret=Find_Next_Triangle(de.Y,de.dYdI,c.w,c.dwdI,
@@ -291,6 +292,7 @@ void Relax_Attachment(CP& c,const TV& Z,const TRIANGULATED_SURFACE<T>& ts,T fric
                 break;}
 
             case edge_int:{
+                if(edge.Contains(c.p)){c.active=false;return;}
                 VECTOR<TV,2> P(ts.particles.X.Subset(edge));
                 VECTOR<MATRIX<T,TV::m>,4> dYdE;
                 T w;
@@ -353,6 +355,7 @@ void Relax_Attachment(CP& c,const TV& Z,const TRIANGULATED_SURFACE<T>& ts,T fric
                 break;}
 
             case point:
+                if(p==c.p){c.active=false;return;}
                 auto ret=Handle_Vertex(Z,ts,p,friction);
                 if(ret.x==-1){
                     c.active=ts.Signed_Solid_Angle_Of_Triangle_Web(Y,p)>0;
@@ -540,6 +543,8 @@ Relax_Attachment(int cp)
     COLLISION_PAIR& c=collision_pairs(cp);
     TV Z=particles.X(c.p);
     ::Relax_Attachment(c,Z,*surfaces(c.s),friction);
+    if(surfaces(c.s)->mesh.elements(Element(c)).Contains(c.p))
+        c.active=false;
 }
 //#####################################################################
 // Function Update_Attachments_And_Prune_Pairs
@@ -568,6 +573,7 @@ Add_Pair(int p,int s,const TV& w0,int e0)
     // TODO: Interpolate X^n and X^(n+1) to choose surface point.
     if(hash.Contains({p,s})) return;
     const auto& ts=*surfaces(s);
+    if(ts.mesh.elements(e0).Contains(p)) return;
     TV Y=ts.particles.X.Subset(ts.mesh.elements(e0)).Weighted_Sum(w0);
     COLLISION_PAIR c={p,s,w0,e0,Y};
     collision_pairs.Append(c);

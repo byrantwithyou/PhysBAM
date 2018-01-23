@@ -49,7 +49,7 @@ public:
     RIGID_PENALTY_WITH_FRICTION<TV>* rr_penalty=0;
     SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION<TV>* dd_penalty=0;
 
-    T const_repulsion_thickness=(T).01;
+    T const_repulsion_thickness=(T)1e-4;
     ARRAY<T> repulsion_thickness; // must be same size as particles.number
     ARRAY<bool> recently_modified; // must be same size as particles.number
 
