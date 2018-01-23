@@ -687,3 +687,5 @@ template OPENSUBDIV_SURFACE<VECTOR<double,3>,3>& DEFORMABLES_STANDARD_TESTS<VECT
 template OPENSUBDIV_SURFACE<VECTOR<float,3>,3>& DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::Copy_And_Add_Structure<OPENSUBDIV_SURFACE<VECTOR<float,3>,3> >(OPENSUBDIV_SURFACE<VECTOR<float,3>,3>&,ARRAY<int,int>*,bool);
 template void DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::Set_Mass_Of_Particles<3>(OPENSUBDIV_SURFACE<VECTOR<double,3>,3> const&,double,bool);
 template void DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::Set_Mass_Of_Particles<3>(OPENSUBDIV_SURFACE<VECTOR<float,3>,3> const&,float,bool);
+template TRIANGULATED_SURFACE<double> const& DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::Copy_And_Add_Structure<TRIANGULATED_SURFACE<double> const>(TRIANGULATED_SURFACE<double> const&,ARRAY<int,int>*,bool);
+template TRIANGULATED_SURFACE<float> const& DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::Copy_And_Add_Structure<TRIANGULATED_SURFACE<float> const>(TRIANGULATED_SURFACE<float> const&,ARRAY<int,int>*,bool);

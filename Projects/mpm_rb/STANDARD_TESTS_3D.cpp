@@ -22,14 +22,16 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UTILITIES.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Seeding/POISSON_DISK.h>
+#include <Geometry/Tessellation/SPHERE_TESSELLATION.h>
+#include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
+#include <Rigids/Forces_And_Torques/RIGID_GRAVITY.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
 #include <Deformables/Constitutive_Models/MOONEY_RIVLIN_CURVATURE.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/OPENSUBDIV_SURFACE_CURVATURE_FORCE.h>
 #include <Deformables/Forces/SURFACE_TENSION_FORCE_3D.h>
-#include <Rigids/Forces_And_Torques/RIGID_GRAVITY.h>
-#include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_SPHERE.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
@@ -459,11 +461,18 @@ Initialize()
             T R=r+gap;
             T k=0.8;
             SPHERE<TV> el(TV(0.5-R,r,0.5+tan(pi/6)*R),r);
-            Seed_Particles_With_Marked_Surface(el,0,0,density,particles_per_cell,4,"ellipse1");
+            TRIANGULATED_SURFACE<T>* ts=TESSELLATION::Generate_Triangles(el,4);
+            Seed_Particles_Surface(*ts,*Make_IO(el),0,0,density,particles_per_cell);
+            ts->particles.X+=TV(2*R,0,0);
             el.center+=TV(2*R,0,0);
-            Seed_Particles_With_Marked_Surface(el,0,0,density,particles_per_cell,4,"ellipse2");
+            Seed_Particles_Surface(*ts,*Make_IO(el),0,0,density,particles_per_cell);
+            ts->particles.X+=TV(-R,0,-sin(pi/3)*2*R);
             el.center+=TV(-R,0,-sin(pi/3)*2*R);
-            Seed_Particles_With_Marked_Surface(el,0,0,density,particles_per_cell,4,"ellipse3");
+            Seed_Particles_Surface(*ts,*Make_IO(el),0,0,density,particles_per_cell);
+
+            for(int i=0;i<solid_body_collection.deformable_body_collection.structures.m;i++)
+                solid_body_collection.deformable_body_collection.structures(i)->Update_Number_Nodes();
+            
             particles.X.template Project<T,&TV::y>()*=k;
             particles.X.template Project<T,&TV::y>()+=0.1;
             Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);

@@ -610,6 +610,72 @@ Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction,std:
 {
     collision_objects.Append(new MPM_COLLISION_IMPLICIT_OBJECT<TV>(io,type,friction,func_frame,func_twist));
 }
+//#####################################################################
+// Function Seed_Particles_Surface
+//#####################################################################
+template<class TV> template<class T_STRUCTURE> void STANDARD_TESTS_BASE<TV>::
+Seed_Particles_Volume(T_STRUCTURE& object,std::function<TV(const TV&)> V,
+    std::function<MATRIX<T,TV::m>(const TV&)> dV,T density)
+{
+    TETRAHEDRALIZED_VOLUME<T>& tv=object;
+    ARRAY<int> indices;
+    tests.Copy_And_Add_Structure(tv.Get_Boundary_Object(),&indices,false);
+    ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
+    T total_volume=tv.Total_Volume();
+    T total_mass=total_volume*density;
+    for(int i=0;i<indices.m;i++){
+        int p=indices(i);
+        TV X=particles.X(i);
+        particles.valid(i)=true;
+        particles.F(i)=MATRIX<T,TV::m>()+1;
+        if(particles.store_Fp) particles.Fp(i)=MATRIX<T,TV::m>()+1;
+        if(particles.store_S) particles.S(i)=SYMMETRIC_MATRIX<T,TV::m>()+1;
+        if(V) particles.V(p)=V(X);
+        (*color_attribute)(p)=TV(1,1,1);
+        if(particles.store_B && dV){
+            if(lag_Dp) particles.B(p)=dV(X);
+            else
+                particles.B(p)=dV(X)*weights->Dp_Inverse(X).Inverse();}
+        particles.mass(p)=total_mass/indices.m;
+        particles.volume(p)=total_volume/indices.m;}
+}
+//#####################################################################
+// Function Seed_Particles_Surface
+//#####################################################################
+template<class TV> template<class T_STRUCTURE> void STANDARD_TESTS_BASE<TV>::
+Seed_Particles_Surface(const T_STRUCTURE& object,IMPLICIT_OBJECT<TV>& io,std::function<TV(const TV&)> V,
+    std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,T particles_per_cell)
+{
+    const TRIANGULATED_SURFACE<T>& ts=object;
+    ARRAY<int> indices;
+    tests.Copy_And_Add_Structure(ts,&indices,false);
+
+    ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
+    T volume=grid.dX.Product()/particles_per_cell;
+    T mass=density*volume;
+    for(int i=0;i<indices.m;i++){
+        int p=indices(i);
+        TV X=particles.X(i);
+        particles.valid(i)=true;
+        particles.F(i)=MATRIX<T,TV::m>()+1;
+        if(particles.store_Fp) particles.Fp(i)=MATRIX<T,TV::m>()+1;
+        if(particles.store_S) particles.S(i)=SYMMETRIC_MATRIX<T,TV::m>()+1;
+        if(V) particles.V(p)=V(X);
+        (*color_attribute)(p)=TV(1,1,1);
+        if(particles.store_B && dV){
+            if(lag_Dp) particles.B(p)=dV(X);
+            else
+                particles.B(p)=dV(X)*weights->Dp_Inverse(X).Inverse();}
+        particles.mass(p)=mass;
+        particles.volume(p)=volume;}
+
+    ARRAY<TV> X(ts.particles.X);
+    POISSON_DISK<TV> poisson_disk(1);
+    poisson_disk.Set_Distance_By_Volume(volume);
+    poisson_disk.Sample(random,io,X);
+    for(int p=ts.particles.X.m;p<X.m;p++)
+        Add_Particle(X(p),V,dV,mass,volume);
+}
 template class STANDARD_TESTS_BASE<VECTOR<float,2> >;
 template class STANDARD_TESTS_BASE<VECTOR<float,3> >;
 template class STANDARD_TESTS_BASE<VECTOR<double,2> >;
@@ -625,4 +691,8 @@ template TRIANGULATED_SURFACE<float>& STANDARD_TESTS_BASE<VECTOR<float,3> >::See
 
 template void STANDARD_TESTS_BASE<VECTOR<double,3> >::Seed_Particles_With_Marked_Surface<SPHERE<VECTOR<double,3> > >(SPHERE<VECTOR<double,3> > const&,std::function<VECTOR<double,3> (VECTOR<double,3> const&)>,std::function<MATRIX<double,3,3> (VECTOR<double,3> const&)>,double,double,int,char const*);
 template void STANDARD_TESTS_BASE<VECTOR<float,3> >::Seed_Particles_With_Marked_Surface<SPHERE<VECTOR<float,3> > >(SPHERE<VECTOR<float,3> > const&,std::function<VECTOR<float,3> (VECTOR<float,3> const&)>,std::function<MATRIX<float,3,3> (VECTOR<float,3> const&)>,float,float,int,char const*);
+template void STANDARD_TESTS_BASE<VECTOR<double,3> >::Seed_Particles_Surface<TRIANGULATED_SURFACE<double> >(TRIANGULATED_SURFACE<double> const&,IMPLICIT_OBJECT<VECTOR<double,3> >&,std::function<VECTOR<double,3> (VECTOR<double,3> const&)>,std::function<MATRIX<double,3,3> (VECTOR<double,3> const&)>,double,double);
+template void STANDARD_TESTS_BASE<VECTOR<double,3> >::Seed_Particles_Volume<TETRAHEDRALIZED_VOLUME<double> >(TETRAHEDRALIZED_VOLUME<double> &,std::function<VECTOR<double,3> (VECTOR<double,3> const&)>,std::function<MATRIX<double,3,3> (VECTOR<double,3> const&)>,double);
+template void STANDARD_TESTS_BASE<VECTOR<float,3> >::Seed_Particles_Surface<TRIANGULATED_SURFACE<float> >(TRIANGULATED_SURFACE<float> const&,IMPLICIT_OBJECT<VECTOR<float,3> >&,std::function<VECTOR<float,3> (VECTOR<float,3> const&)>,std::function<MATRIX<float,3,3> (VECTOR<float,3> const&)>,float,float);
+template void STANDARD_TESTS_BASE<VECTOR<float,3> >::Seed_Particles_Volume<TETRAHEDRALIZED_VOLUME<float> >(TETRAHEDRALIZED_VOLUME<float> &,std::function<VECTOR<float,3> (VECTOR<float,3> const&)>,std::function<MATRIX<float,3,3> (VECTOR<float,3> const&)>,float);
 }

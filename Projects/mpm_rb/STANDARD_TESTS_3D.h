@@ -57,8 +57,8 @@ public:
     using BASE::dump_collision_objects;using BASE::Perturb;using BASE::Uniform;using BASE::extra_T;using BASE::extra_int;
     using BASE::rd_penalty_stiffness;using BASE::rd_penalty_friction;
     using BASE::tests;using BASE::solid_body_collection;
-    using BASE::seed;
-
+    using BASE::seed;using BASE::Seed_Particles_Surface;using BASE::Seed_Particles_Volume;
+    
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();
 

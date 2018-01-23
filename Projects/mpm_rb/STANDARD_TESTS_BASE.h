@@ -126,6 +126,16 @@ public:
     void Seed_Particles_With_Marked_Surface(const T_OBJECT& object,std::function<TV(const TV&)> V,
         std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,T particles_per_cell,int levels,const char* name=0);
 
+    // Takes a tet mesh
+    template<class T_STRUCTURE>
+    void Seed_Particles_Volume(T_STRUCTURE& object,std::function<TV(const TV&)> V,
+        std::function<MATRIX<T,TV::m>(const TV&)> dV,T density);
+
+    // Takes a tri surface
+    template<class T_STRUCTURE>
+    void Seed_Particles_Surface(const T_STRUCTURE& object,IMPLICIT_OBJECT<TV>& io,std::function<TV(const TV&)> V,
+        std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,T particles_per_cell);
+
     template<class T_STRUCTURE>
     T_STRUCTURE& Seed_Lagrangian_Particles(T_STRUCTURE& object,std::function<TV(const TV&)> V,
         std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,bool use_constant_mass,bool destroy_after=true);
