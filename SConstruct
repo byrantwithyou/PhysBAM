@@ -202,7 +202,7 @@ else: # assume g++...
         env.Append(CXXFLAGS=optimization_flags)
         if env['TYPE']=='profile': env.Append(CXXFLAGS=' -pg',LINKFLAGS=' -pg')
     env.Append(CXXFLAGS=' -g3',LINKFLAGS=' -g')
-    env.Append(CXXFLAGS=' -Wall -Werror -Winit-self -Woverloaded-virtual -Wstrict-aliasing=2 -fno-strict-aliasing -std=gnu++14 -Wno-unknown-pragmas -Wno-strict-overflow -Wno-sign-compare')
+    env.Append(CXXFLAGS=' -Wall -Werror -Winit-self -Woverloaded-virtual -Wstrict-aliasing=2 -std=gnu++14 -Wno-unknown-pragmas -Wno-strict-overflow -Wno-sign-compare')
 
 if env['TYPE']=='release' or env['TYPE']=='profile' or env['TYPE']=='optdebug': env.Append(CPPDEFINES=['NDEBUG'])
 else: env['USE_BOOSTIO']=1
