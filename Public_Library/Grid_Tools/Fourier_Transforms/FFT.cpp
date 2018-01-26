@@ -190,6 +190,8 @@ template<class T,int d> void Assert_Zero_Start(const ARRAY<T,VECTOR<int,d> >& a)
     PHYSBAM_ASSERT(a.domain.min_corner==(VECTOR<int,d>()));
 }
 template<class T> void Assert_Zero_Start(const ARRAY<T>& a){}
+int* Size_Helper(int& i){return &i;}
+template<int d> int* Size_Helper(VECTOR<int,d>& i){return i.array;}
 //#####################################################################
 // Function Plan
 //#####################################################################
@@ -203,7 +205,7 @@ Plan(FFT<TV>& fft,const ARRAY<I,INDEX>& in,
     Assert_Zero_Start(out);
     if(fft.counts[c2c][inverse]==size) return;
     fft.counts[c2c][inverse]=size;
-    fft.plan[c2c][inverse]=plan_dft(sizeof(size)/sizeof(int),(int*)&size,
+    fft.plan[c2c][inverse]=plan_dft(sizeof(size)/sizeof(int),Size_Helper(size),
         conv(&in(INDEX())),conv(&out(INDEX())),
         inverse?FFTW_BACKWARD:FFTW_FORWARD,
         FFTW_ESTIMATE | FFTW_UNALIGNED);
