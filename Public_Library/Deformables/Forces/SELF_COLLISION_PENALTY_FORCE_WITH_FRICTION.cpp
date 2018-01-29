@@ -677,7 +677,12 @@ Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 template<class TV> void SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION<TV>::
 Read(TYPED_ISTREAM& input)
 {
-    Read_Binary(input,collision_pairs,hash,object_from_element);
+    ARRAY<PAIR<int,int> > keys;
+    ARRAY<TV_INT> faces;
+    Read_Binary(input,collision_pairs,keys,faces);
+    hash.Set_All(keys);
+    for(int k=0;k<faces.m;k++)
+        Read_Binary(input,object_from_element.Get_Or_Insert(faces(k)));
 }
 //#####################################################################
 // Function Write
@@ -685,7 +690,15 @@ Read(TYPED_ISTREAM& input)
 template<class TV> void SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION<TV>::
 Write(TYPED_OSTREAM& output) const
 {
-    Write_Binary(output,collision_pairs,hash,object_from_element);
+    ARRAY<PAIR<int,int> > keys;
+    hash.Get_Keys(keys);
+    keys.Sort();
+    ARRAY<TV_INT> faces;
+    object_from_element.Get_Keys(faces);
+    faces.Sort(LEXICOGRAPHIC_COMPARE());
+    Write_Binary(output,collision_pairs,keys,faces);
+    for(int k=0;k<faces.m;k++)
+        Write_Binary(output,object_from_element.Get(faces(k)));
 }
 namespace PhysBAM{
 template class SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION<VECTOR<float,2> >;
