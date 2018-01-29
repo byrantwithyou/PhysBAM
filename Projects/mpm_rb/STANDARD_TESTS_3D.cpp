@@ -344,7 +344,10 @@ Initialize()
             solid_body_collection.rigid_body_collection.Add_Force(rg);
 
             SPHERE<TV> sphere(TV(.7,.5,0.5)*m,.4*m);
-            Seed_Particles_With_Marked_Surface(sphere,0,0,density,particles_per_cell,4,"sphere");
+            TRIANGULATED_SURFACE<T>* ts=TESSELLATION::Generate_Triangles(sphere,4);
+            Seed_Particles_Surface(*ts,*Make_IO(sphere),0,0,density,particles_per_cell);
+            for(int i=0;i<solid_body_collection.deformable_body_collection.structures.m;i++)
+                solid_body_collection.deformable_body_collection.structures(i)->Update_Number_Nodes();
             Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
             Add_Gravity(g);
         } break;

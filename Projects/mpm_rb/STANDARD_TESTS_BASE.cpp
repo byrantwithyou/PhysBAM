@@ -247,38 +247,6 @@ Seed_Particles(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
     Seed_Particles_Uniform(object,V,dV,density,seed_grid,name);
 }
 //#####################################################################
-// Function Seed_Particles_With_Marked_Surface
-//#####################################################################
-template<class TV> template<class T_OBJECT> void STANDARD_TESTS_BASE<TV>::
-Seed_Particles_With_Marked_Surface(const T_OBJECT& object,std::function<TV(const TV&)> V,
-    std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,T particles_per_cell,int levels,const char* name)
-{
-    T volume=grid.dX.Product()/particles_per_cell;
-    T mass=density*volume;
-
-    TRIANGULATED_SURFACE<T>* mesh=TESSELLATION::Generate_Triangles(object,levels);
-    LOG::printf("MPM OBJECT %s BEGIN %d\n",name,particles.number);
-    LOG::printf("MPM MESH %s BEGIN %d\n",name,particles.number);
-    ARRAY<TV> X;
-    for(int p=0;p<mesh->particles.number;p++){
-        X.Append(mesh->particles.X(p));
-        Add_Particle(X(p),V,dV,mass,volume);}
-    int surface_end=particles.number;
-    LOG::printf("MPM MESH %s END %d\n",name,particles.number);
-    Write_To_File(stream_type,output_directory+"/common/"+name,*mesh);
-    delete mesh;
-
-    ANALYTIC_IMPLICIT_OBJECT<T_OBJECT> aio(object);
-    POISSON_DISK<TV> poisson_disk(1);
-    poisson_disk.Set_Distance_By_Volume(volume);
-    IMPLICIT_OBJECT<TV>& io=aio;
-    poisson_disk.Sample(random,io,X);
-
-    for(int p=0;p<X.m;p++)
-        Add_Particle(X(surface_end+p),V,dV,mass,volume);
-    LOG::printf("MPM OBJECT %s END %d\n",name,particles.number);
-}
-//#####################################################################
 // Function Perturb
 //#####################################################################
 template<class TV> auto STANDARD_TESTS_BASE<TV>::
@@ -689,8 +657,6 @@ template SEGMENTED_CURVE_2D<float>& STANDARD_TESTS_BASE<VECTOR<float,2> >::Seed_
 template TRIANGULATED_SURFACE<double>& STANDARD_TESTS_BASE<VECTOR<double,3> >::Seed_Lagrangian_Particles<TRIANGULATED_SURFACE<double> >(TRIANGULATED_SURFACE<double>&,std::function<VECTOR<double,3> (VECTOR<double,3> const&)>,std::function<MATRIX<double,3,3> (VECTOR<double,3> const&)>,double,bool,bool);
 template TRIANGULATED_SURFACE<float>& STANDARD_TESTS_BASE<VECTOR<float,3> >::Seed_Lagrangian_Particles<TRIANGULATED_SURFACE<float> >(TRIANGULATED_SURFACE<float>&,std::function<VECTOR<float,3> (VECTOR<float,3> const&)>,std::function<MATRIX<float,3,3> (VECTOR<float,3> const&)>,float,bool,bool);
 
-template void STANDARD_TESTS_BASE<VECTOR<double,3> >::Seed_Particles_With_Marked_Surface<SPHERE<VECTOR<double,3> > >(SPHERE<VECTOR<double,3> > const&,std::function<VECTOR<double,3> (VECTOR<double,3> const&)>,std::function<MATRIX<double,3,3> (VECTOR<double,3> const&)>,double,double,int,char const*);
-template void STANDARD_TESTS_BASE<VECTOR<float,3> >::Seed_Particles_With_Marked_Surface<SPHERE<VECTOR<float,3> > >(SPHERE<VECTOR<float,3> > const&,std::function<VECTOR<float,3> (VECTOR<float,3> const&)>,std::function<MATRIX<float,3,3> (VECTOR<float,3> const&)>,float,float,int,char const*);
 template void STANDARD_TESTS_BASE<VECTOR<double,3> >::Seed_Particles_Surface<TRIANGULATED_SURFACE<double> >(TRIANGULATED_SURFACE<double> const&,IMPLICIT_OBJECT<VECTOR<double,3> >&,std::function<VECTOR<double,3> (VECTOR<double,3> const&)>,std::function<MATRIX<double,3,3> (VECTOR<double,3> const&)>,double,double);
 template void STANDARD_TESTS_BASE<VECTOR<double,3> >::Seed_Particles_Volume<TETRAHEDRALIZED_VOLUME<double> >(TETRAHEDRALIZED_VOLUME<double> &,std::function<VECTOR<double,3> (VECTOR<double,3> const&)>,std::function<MATRIX<double,3,3> (VECTOR<double,3> const&)>,double);
 template void STANDARD_TESTS_BASE<VECTOR<float,3> >::Seed_Particles_Surface<TRIANGULATED_SURFACE<float> >(TRIANGULATED_SURFACE<float> const&,IMPLICIT_OBJECT<VECTOR<float,3> >&,std::function<VECTOR<float,3> (VECTOR<float,3> const&)>,std::function<MATRIX<float,3,3> (VECTOR<float,3> const&)>,float,float);

@@ -187,25 +187,6 @@ void Emit_MPM_Particles(std::ofstream& fout,const HASHTABLE<std::string,std::str
             fout<<"texture{pigment{color rgb <"<<(*colors)(p).x<<","<<(*colors)(p).y<<","<<(*colors)(p).z<<">}finish{phong .5}}}\n";}
 }
 
-void Emit_MPM_Surface(std::ofstream& fout,const HASHTABLE<std::string,std::string>& options,int frame)
-{
-    std::string location=options.Get("location");
-    MPM_PARTICLES<TV>& particles=Load_MPM_Particles(location,frame);
-    int begin=atoi(options.Get("begin").c_str()),end=atoi(options.Get("end").c_str());
-    PHYSBAM_ASSERT(begin>=0 && begin<particles.number);
-    PHYSBAM_ASSERT(end>=0 && end<=particles.number);
-
-    TRIANGULATED_SURFACE<T> mesh;
-    std::string meshfile=location+"/common/"+options.Get("name");
-    Read_From_File(*stream_type,meshfile,mesh);
-    PHYSBAM_ASSERT(end-begin==mesh.particles.number);
-    for(int p=0;p<mesh.particles.number;p++)
-        mesh.particles.X(p)=particles.X(begin+p);
-
-    Apply_Options(&mesh,options);
-    Emit_Smooth_Surface(fout,&mesh,options);
-}
-
 void Emit_Rigid_Body_Frame(std::ofstream& fout,const HASHTABLE<std::string,std::string>& options,int frame)
 {
     RIGID_BODY_COLLECTION<TV>& collection=Load_Rigid_Body_Collection(options.Get("location"),frame);
@@ -511,8 +492,6 @@ int main(int argc, char *argv[])
             Emit_Rigid_Body_Frame(fout,options,frame_number);
         else if(type=="mpm_particles")
             Emit_MPM_Particles(fout,options,frame_number);
-        else if(type=="mpm_surface")
-            Emit_MPM_Surface(fout,options,frame_number);
         else if(type=="texture_map")
             Create_Texture_Map(fout,options,frame_number);
         else if(type=="set_global")
