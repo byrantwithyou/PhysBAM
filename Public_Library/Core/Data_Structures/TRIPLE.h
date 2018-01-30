@@ -38,6 +38,12 @@ public:
     bool operator!=(const TRIPLE& t) const
     {return !(*this==t);}
 
+    bool operator<(const TRIPLE& t) const
+    {return x<t.x || (x==t.x && (y<t.y || (y==t.y && z<t.z)));}
+    
+    bool operator>(const TRIPLE& t) const
+    {return x>t.x || (x==t.x && (y>t.y || (y==t.y && z>t.z)));}
+
     template<class RW> void Read(std::istream& input)
     {Read_Binary<RW>(input,x,y,z);}
 
