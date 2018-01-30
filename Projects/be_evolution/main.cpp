@@ -32,16 +32,22 @@ void Run(PARSE_ARGS& parse_args)
 
 int main(int argc,char* argv[])
 {
-    typedef double T;
-    typedef float RW;
-    
-    PARSE_ARGS parse_args(argc,argv);
+    bool type_double=true;
     bool use_2d=false;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add("-2d",&use_2d,"run 2d sims");
+    parse_args.Add_Not("-float",&type_double,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Parse(true);
 
-    if(use_2d) Run<T,VECTOR<T,2>,RW>(parse_args);
-    else Run<T,VECTOR<T,3>,RW>(parse_args);
+    if(type_double){
+        STREAM_TYPE stream_type((double()));
+        if(use_2d) Run<double,VECTOR<double,2>,double>(parse_args);
+        else Run<double,VECTOR<double,3>,double>(parse_args);}
+    else{
+        STREAM_TYPE stream_type((float()));
+        if(use_2d) Run<float,VECTOR<float,2>,float>(parse_args);
+        else Run<float,VECTOR<float,3>,float>(parse_args);}
     return 0;
 }
 //#####################################################################

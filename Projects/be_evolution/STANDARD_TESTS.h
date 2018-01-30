@@ -203,7 +203,7 @@ public:
     T collision_speed;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
-        :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),
+        :BASE(stream_type_input,parse_args),tests(STREAM_TYPE(.0f),data_directory,solid_body_collection),
         with_bunny(false),with_hand(false),with_big_arm(false),gears_of_pain(false),override_collisions(false),override_no_collisions(false),
         print_matrix(false),resolution(0),fishes(0),jello_size(20),number_of_jellos(12),stiffness_multiplier(1),damping_multiplier(1),
         degrees_wedge(2),degrees_incline(5),rebound_time((T).2),rebound_stiffness(5),rebound_drop((T)1.5),
