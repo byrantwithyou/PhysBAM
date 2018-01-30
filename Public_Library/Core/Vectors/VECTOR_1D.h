@@ -150,12 +150,6 @@ public:
     bool operator!=(const VECTOR& v) const
     {return x!=v.x;}
 
-    bool operator<(const VECTOR& v) const
-    {return x<v.x;}
-
-    bool operator>(const VECTOR& v) const
-    {return x>v.x;}
-
     const VECTOR& operator+() const
     {return *this;};
 

@@ -157,12 +157,6 @@ public:
     bool operator!=(const VECTOR& v) const
     {return x!=v.x || y!=v.y || z!=v.z;}
 
-    bool operator<(const VECTOR& v) const
-    {return x<v.x && y<v.y && z<v.z;}
-
-    bool operator>(const VECTOR& v) const
-    {return x>v.x && y>v.y && z>v.z;}
-
     const VECTOR& operator+() const
     {return *this;};
 
