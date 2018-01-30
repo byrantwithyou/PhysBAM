@@ -67,7 +67,7 @@ CFL()
         TV_DIMENSION UU=U(it.index);
         T h=UU(0),celerity=sqrt(gravity*h);
         TV u=UU.template Slice<1,TV::m>()/h;
-        max_speed=max(max_speed,abs(u)+celerity);}
+        max_speed=max_speed.Componentwise_Max(abs(u)+celerity);}
     T dt_convect=max_speed.Dot(grid.one_over_dX);
     return 1/dt_convect;
 }

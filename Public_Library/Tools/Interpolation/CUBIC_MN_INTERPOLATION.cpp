@@ -44,6 +44,18 @@ Cubic_MN(const T2& u_0,const T2& u_1,const T2& u_2,const T2& u_3,const T alpha,c
     temp=abs(2-alpha);result+=u_3*(((n0*temp+n1)*temp+n2)*temp+n3);
     return result;
 }
+template<class T,int d>
+static void
+sign_check(VECTOR<T,d>& di,const VECTOR<T,d>& dq)
+{
+    for(int i=0;i<d;i++) if(di(i)*dq(i)<0) di(i)=0;
+}
+template<class T>
+static void
+sign_check(T& di,const T& dq)
+{
+    if(di*dq<0) di=0;
+}
 //#####################################################################
 // Cubic_MN_Monotonic
 //#####################################################################
@@ -53,8 +65,8 @@ Cubic_MN_Monotonic(const T2& u_0,const T2& u_1,const T2& u_2,const T2& u_3,const
     T x2=alpha*alpha;
     T x3=x2*alpha;
     T2 dq=u_2-u_1;
-    T2 di=(T).5*(u_2-u_0); if(di*dq<T2()*(T)0) di*=(T)0;
-    T2 dip1=(T).5*(u_3-u_1); if(dip1*dq<T2()*(T)0) dip1*=(T)0;
+    T2 di=(T).5*(u_2-u_0); sign_check(di,dq);
+    T2 dip1=(T).5*(u_3-u_1); sign_check(dip1,dq);
     return u_1+di*alpha+((T)3.*dq-(T)2.*di-dip1)*x2+(-(T)2.*dq+di+dip1)*x3;
 }
 //#####################################################################
