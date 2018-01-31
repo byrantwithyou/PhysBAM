@@ -83,8 +83,6 @@ Initialize()
 
     example.Initialize();
     PHYSBAM_ASSERT(example.grid.Is_MAC_Grid());
-    if(example.restart)
-        example.Read_Output_Files(example.restart);
 
     example.mass.Resize(example.grid.Domain_Indices(example.ghost));
     example.velocity.Resize(example.grid.Domain_Indices(example.ghost));
@@ -133,6 +131,8 @@ Initialize()
     if(example.use_rd) example.pfd->rd_penalty->friction=example.use_rd_mu?example.rd_mu:example.rd_penalty_friction;
     if(example.use_rr) example.pfd->rr_penalty->friction=example.use_rr_mu?example.rr_mu:example.rd_penalty_friction;
 
+    if(example.restart)
+        example.Read_Output_Files(example.restart);
     if(!example.restart) Write_Output_Files(0);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",1);
 }
