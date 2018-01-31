@@ -34,7 +34,7 @@
 namespace PhysBAM{
 template<class TV> STANDARD_TESTS_BASE<TV>::
 STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
-    :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),
+    :BASE(stream_type_input,parse_args),tests(STREAM_TYPE(.0f),data_directory,solid_body_collection),
     backward_euler_evolution(new BACKWARD_EULER_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this))
 {
     this->fixed_dt=1./240;
