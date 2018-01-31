@@ -80,6 +80,10 @@ Read_Output_Files_Solids(const int frame)
     std::string f=LOG::sprintf("%d",frame);
     //if(NEWMARK_EVOLUTION<TV>* newmark=dynamic_cast<NEWMARK_EVOLUTION<TV>*>(solids_evolution))
     //    newmark->Read_Position_Update_Projection_Data(stream_type,output_directory+"/"+f+"/");
+
+    Read_From_File(stream_type,LOG::sprintf("%s/%d/triangle_collision_parameters",output_directory.c_str(),frame),
+        solids_parameters.triangle_collision_parameters.repulsion_pair_update_count,
+        solids_parameters.triangle_collision_parameters.topological_hierarchy_build_count);
 }
 //#####################################################################
 // Function Log_Parameters
@@ -194,6 +198,10 @@ Write_Output_Files(const int frame) const
         solids_parameters.triangle_collision_parameters.output_interaction_pairs);
     if(NEWMARK_EVOLUTION<TV>* newmark=dynamic_cast<NEWMARK_EVOLUTION<TV>*>(solids_evolution))
         newmark->Write_Position_Update_Projection_Data(stream_type,output_directory+"/"+f+"/");
+
+    Write_To_File(stream_type,LOG::sprintf("%s/%d/triangle_collision_parameters",output_directory.c_str(),frame),
+        solids_parameters.triangle_collision_parameters.repulsion_pair_update_count,
+        solids_parameters.triangle_collision_parameters.topological_hierarchy_build_count);
 }
 //#####################################################################
 namespace PhysBAM{
