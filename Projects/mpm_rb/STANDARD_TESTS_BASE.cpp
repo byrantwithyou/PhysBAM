@@ -644,6 +644,24 @@ Seed_Particles_Surface(const T_STRUCTURE& object,IMPLICIT_OBJECT<TV>& io,std::fu
     for(int p=ts.particles.X.m;p<X.m;p++)
         Add_Particle(X(p),V,dV,mass,volume);
 }
+//#####################################################################
+// Function Write_Output_Files
+//#####################################################################
+template<class TV> void STANDARD_TESTS_BASE<TV>::
+Write_Output_Files(const int frame)
+{
+    Write_To_File(stream_type,LOG::sprintf("%s/%d/random_number",output_directory.c_str(),frame),random);
+    BASE::Write_Output_Files(frame);
+}
+//#####################################################################
+// Function Read_Output_Files
+//#####################################################################
+template<class TV> void STANDARD_TESTS_BASE<TV>::
+Read_Output_Files(const int frame)
+{
+    Read_From_File(stream_type,LOG::sprintf("%s/%d/random_number",output_directory.c_str(),frame),random);
+    BASE::Read_Output_Files(frame);
+}
 template class STANDARD_TESTS_BASE<VECTOR<float,2> >;
 template class STANDARD_TESTS_BASE<VECTOR<float,3> >;
 template class STANDARD_TESTS_BASE<VECTOR<double,2> >;

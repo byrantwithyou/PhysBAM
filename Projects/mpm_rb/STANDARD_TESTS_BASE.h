@@ -169,6 +169,8 @@ public:
     void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io);
     void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction,
         std::function<FRAME<TV>(T)> func_frame,std::function<TWIST<TV>(T)> func_twist);
+    void Write_Output_Files(const int frame) override;
+    void Read_Output_Files(const int frame) override;
 //#####################################################################
 };
 }
