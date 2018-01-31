@@ -72,7 +72,7 @@ Advance_One_Time_Step_Position(const T dt,const T time, const bool solids)
 template<class TV> void BACKWARD_EULER_EVOLUTION<TV>::
 Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
 {
-    LOG::SCOPE scope("Advance_One_Time_Step_Position");
+    LOG::SCOPE scope("Advance_One_Time_Step_Velocity");
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     solid_body_collection.Print_Energy(time,0);
 
