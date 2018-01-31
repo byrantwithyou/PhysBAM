@@ -58,7 +58,7 @@ public:
         const ARRAY<MOVE_RIGID_BODY_DIFF<TV> >& move_rb_diff)
         :solid_body_collection(solid_body_collection),
         simulated_particles(simulated_particles),move_rb_diff(move_rb_diff)
-    {grid.domain=RANGE<TV>::Empty_Box();}
+    {grid.domain=RANGE<TV>(TV::All_Ones_Vector(),-TV::All_Ones_Vector());}
 
     void Init(TRIANGLE_COLLISION_PARAMETERS<TV>* param,
         bool use_di,bool use_dd,bool use_rd,bool use_rr);
