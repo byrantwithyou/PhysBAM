@@ -3,3 +3,4 @@
 Import('env Automatic_Program')
 env=env.Copy(USE_GEOMETRY=1)
 Automatic_Program(env,"align_bone",["main.cpp"])
+Automatic_Program(env,"align_bone2",["main2.cpp"])

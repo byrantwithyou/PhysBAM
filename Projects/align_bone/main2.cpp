@@ -6,13 +6,18 @@
 #include <Core/Data_Structures/KD_TREE.h>
 #include <Core/Data_Structures/UNION_FIND.h>
 #include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/ROTATION.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Utilities/PROCESS_UTILITIES.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
+#include <Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>
+#include <Geometry/Grids_Uniform_Computations/TRIANGULATED_SURFACE_SIGNED_DISTANCE_UNIFORM.h>
+#include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Level_Sets/LEVELSET_MAKER.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 
@@ -176,6 +181,7 @@ void Orient_Normals(ARRAY<TV>& normals,ARRAY_VIEW<const TV> X,const KD_TREE<TV>&
 
 int main(int argc, char* argv[])
 {
+    PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
     T min_dist = 8;
     T seed_dist = 1;
     T cent_dist = 16;
@@ -197,143 +203,103 @@ int main(int argc, char* argv[])
         "scans/M70-4443_MaleRight.obj"
     };
 
-    TV base(-15,-72,6);
     T ls_dist=40;
+    int s=0;
+
+    TRIANGULATED_SURFACE<T> tsa;
+    tsa.Read_Obj(scans[s]);
+    TRIANGULATED_SURFACE<T> &ts=*tsa.Create_Compact_Copy();
+    ts.Fill_Holes(true);
+    ts.mesh.Make_Orientations_Consistent();
+    ts.Update_Vertex_Normals();
+
+    KD_TREE<TV> kd_tree;
+    kd_tree.Create_KD_Tree(ts.particles.X);
+
+    ARRAY<TV> normals(ts.particles.X.m);
     
-    for(int s=0;s<sizeof(scans)/sizeof(*scans);s++)
+    ARRAY<int> points_found;
+    ARRAY<T> distance_squared_of_points_found;
+    ARRAY<int> sample_points;
+    Compute_Samples(sample_points,ts.particles.X,kd_tree,seed_dist);
+    Compute_Normals(normals,ts.particles.X,kd_tree,min_dist);
+    Orient_Normals(normals,ts.particles.X,kd_tree,min_dist);
+    printf("ORIENT DONE\n");
+
+    int base_p=sample_points(7837);
+    TV base=ts.particles.X(base_p);
+    TV base_N=normals(base_p);
+    ts.particles.X-=base;
+    ROTATION<TV> base_rot=ROTATION<TV>::From_Rotated_Vector(base_N,TV(0,1,0));
+    for(int i=0;i<ts.particles.X.m;i++){
+        ts.particles.X(i)=base_rot.Rotate(ts.particles.X(i));
+        normals(i)=base_rot.Rotate(normals(i));}
+    kd_tree.Create_KD_Tree(ts.particles.X);
+    Dump_Surface(ts,TV(0,.5,0));
+    
+    ARRAY<T> dists(sample_points.m);
+    for(int i=0;i<sample_points.m;i++)
     {
-        TRIANGULATED_SURFACE<T> tsa;
-        tsa.Read_Obj(scans[s]);
-        TRIANGULATED_SURFACE<T> &ts=*tsa.Create_Compact_Copy();
-        ts.mesh.Make_Orientations_Consistent();
-        ts.Update_Vertex_Normals();
-    
-        KD_TREE<TV> kd_tree;
-        kd_tree.Create_KD_Tree(ts.particles.X);
+        int p=sample_points(i);
+        TV X=ts.particles.X(p);
+        kd_tree.Find_Points_Within_Radius(X,sqr(cent_dist),points_found,
+            distance_squared_of_points_found,ts.particles.X);
 
-        ARRAY<TV> normals(ts.particles.X.m);
-        ARRAY<TV2> curvatures(ts.particles.X.m);
-        ARRAY<TV> eig0(ts.particles.X.m);
-        ARRAY<TV> eig1(ts.particles.X.m);
-    
-        ARRAY<int> points_found;
-        ARRAY<T> distance_squared_of_points_found;
-        ARRAY<int> sample_points;
-        Compute_Samples(sample_points,ts.particles.X,kd_tree,seed_dist);
-        Compute_Normals(normals,ts.particles.X,kd_tree,min_dist);
-        Orient_Normals(normals,ts.particles.X,kd_tree,min_dist);
-        
-        ARRAY<T> dists(sample_points.m);
-        for(int i=0;i<sample_points.m;i++)
-        {
-            int p=sample_points(i);
-            TV X=ts.particles.X(p);
-            kd_tree.Find_Points_Within_Radius(X,sqr(cent_dist),points_found,
-                distance_squared_of_points_found,ts.particles.X);
-
-            TV A=ts.particles.X.Subset(points_found).Average();
-            T dist=(A-X).Dot(normals(p));
-            dists(i)=dist;
+        TV A=ts.particles.X.Subset(points_found).Average();
+        T dist=(A-X).Dot(normals(p));
+        dists(i)=dist;
             
-            points_found.Remove_All();
-            distance_squared_of_points_found.Remove_All();
-        }
-        LOG::printf("%P %P %P\n",dists.Min(),dists.Average(),dists.Max());
-        INTERPOLATED_COLOR_MAP<T> cm;
-        cm.Initialize_Colors(dists.Min(),dists.Max(),false,true,false);
-        for(int i=0;i<sample_points.m;i++)
-        {
-            int p=sample_points(i);
-            TV X=ts.particles.X(p);
-            if((X-base).Magnitude()>ls_dist) continue;
-//            LOG::printf("%P %P\n",dists(i),cm(dists(i)));
-            if((X-base).Magnitude()<1)
-            {
-                LOG::printf("%g %P %P\n",(X-base).Magnitude(),i,X);
-                Add_Debug_Particle(X,TV(1,0,0));
-            }
-            else Add_Debug_Particle(X,cm(dists(i)));
-            Add_Debug_Object(VECTOR<TV,2>(X,X+normals(p)*2),cm(dists(i)));
-
-            
-            points_found.Remove_All();
-            distance_squared_of_points_found.Remove_All();
-        }
-        RANDOM_NUMBERS<T> random;random.Set_Seed(1223);
-        for(int i=0;i<1000;i++)
-            Add_Debug_Particle(random.template Get_Direction<TV>()*ls_dist+base,TV(.5,.5,.5));
-        
-        Flush_Frame<TV>("B");
-        break;
-        continue;
-        
-        TV colors[16]={
-            TV(1,0,0),
-            TV(1,.5,0),
-            TV(1,1,0),
-            TV(0,1,0),
-            TV(0,1,1),
-            TV(0,0,1),
-            TV(1,0,1),
-            TV(.5,0,0),
-            TV(.5,.5,0),
-            TV(0,.5,0),
-            TV(0,.5,.5),
-            TV(0,0,.5),
-            TV(.5,0,.5),
-            TV(.5,.5,.5),
-            TV(1,1,1),
-            TV(.2,.2,.2)
-        };
-
-        auto compute_score =[](TV2 K)
-            {
-                if(K(0)<0) return (T)-1;
-                if(K(1)<.02) return (T)-1;
-//                if(K(1)>3*K(0)) return (T)-1;
-                return K(0);
-
-                if(K(1)>=0) return (T)-1;
-                return -K.Dot(TV2(1,0));
-            };
-
-        ARRAY<T> scores;
-        for(int i=0;i<ts.particles.X.m;i++)
-        {
-            TV2 K=curvatures(i);
-            T s=compute_score(K);
-            if(s>=0) scores.Append(s);
-        }
-        PHYSBAM_ASSERT(scores.m);
-        scores.Sort();
-        T thresh_score=scores(scores.m*.8);
-
-        if(0)
-        for(int i=0;i<ts.particles.X.m;i++)
-        {
-            TV2 K=curvatures(i);
-            TV X=ts.particles.X(i);
-            int i0=(K(0)>-.1)+(K(0)>-.05)+(K(0)>.05);
-            int i1=(K(1)>.05)+(K(1)>.1);
-            int j=i0+i1*4;
-            continue;
-            T s=compute_score(K);
-            if(s>thresh_score) Add_Debug_Particle(ts.particles.X(i),TV(0,0,0));
-            else if(s>0) Add_Debug_Particle(ts.particles.X(i),TV(1,1,1));
-            else Add_Debug_Particle(ts.particles.X(i),colors[j]);
-        }
-        
-        if(0)
-        for(int i=0;i<ts.mesh.elements.m;i++)
-            Add_Debug_Object(ts.Get_Element(i).X,TV(1,0,0));
-
-        Flush_Frame<TV>(scans[s]);
+        points_found.Remove_All();
+        distance_squared_of_points_found.Remove_All();
     }
+    LOG::printf("%P %P %P\n",dists.Min(),dists.Average(),dists.Max());
+    INTERPOLATED_COLOR_MAP<T> cm;
+    cm.Initialize_Colors(dists.Min(),dists.Max(),false,true,false);
+    for(int i=0;i<sample_points.m;i++)
+    {
+        int p=sample_points(i);
+        TV X=ts.particles.X(p);
+        Add_Debug_Particle(X,TV(0,1,0));
+        if(X.Magnitude()>ls_dist) continue;
+        if(X.Magnitude()<1) LOG::printf("found: %i %g\n",i,X.Magnitude());
+            
+        points_found.Remove_All();
+    }
+    RANDOM_NUMBERS<T> random;random.Set_Seed(1223);
+    // for(int i=0;i<1000;i++)
+    //     Add_Debug_Particle(random.template Get_Direction<TV>()*ls_dist,TV(.5,.5,.5));
+
+    GRID<TV> ls_grid(TV_INT()+20,RANGE<TV>::Centered_Box()*ls_dist,true);
+    ARRAY<T,TV_INT> phi(ls_grid.Domain_Indices(3));
+    LEVELSET<TV> levelset(ls_grid,phi,3);
     
+    SIGNED_DISTANCE::Calculate(ts,ls_grid,phi,true);
+
+
+// // LEVELSET_MAKER<T> levelset_maker;
+//     // levelset_maker.verbose=true;
+//     // levelset_maker.only_boundary_region_is_outside=false;
+//     // levelset_maker.keep_only_largest_inside_region=false;
+//     // levelset_maker.compute_unsigned_distance_function=false;
+//     // levelset_maker.compute_signed_distance_function=true;
+//     // levelset_maker.Compute_Level_Set(ts,levelset.grid,levelset.phi);
+
+//     ts.Initialize_Hierarchy();
+//     ts.Update_Bounding_Box();
+//     ts.Update_Triangle_List();
+//     ts.mesh.Initialize_Adjacent_Elements();
+//     LEVELSET_MAKER_UNIFORM<TV>::Compute_Level_Set(ts,ls_grid,3,phi);
+
+
 
     
-
     Flush_Frame<TV>("B");
+
+//    LOG::printf("%P\n",levelset.phi);
+//    levelset.phi-=5;
+    Dump_Levelset(levelset.grid,levelset.phi,TV(1,0,0));
+    
+    Flush_Frame<TV>("C");
     
     return 0;
 }
