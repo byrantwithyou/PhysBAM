@@ -52,6 +52,7 @@ public:
     T const_repulsion_thickness=(T)1e-4;
     ARRAY<T> repulsion_thickness; // must be same size as particles.number
     ARRAY<bool> recently_modified; // must be same size as particles.number
+    bool state_saved=false;
 
     PENALTY_FORCE_COLLECTION(SOLID_BODY_COLLECTION<TV>& solid_body_collection,
         const ARRAY<int>& simulated_particles,

@@ -157,6 +157,7 @@ Get_RR_Collision_Candidates()
 template<class TV> void PENALTY_FORCE_COLLECTION<TV>::
 Get_DD_Collision_Candidates()
 {
+    if(!state_saved) return;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX_FACE T_FACE;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
@@ -201,6 +202,7 @@ Save_State()
 {
     const DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     if(dd_penalty){
+        state_saved=true;
         solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.X_self_collision_free=particles.X;
         repulsion_thickness.Resize(particles.number,true,true,const_repulsion_thickness);
         recently_modified.Resize(particles.number);
