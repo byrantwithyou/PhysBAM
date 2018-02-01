@@ -183,6 +183,13 @@ public:
     {STATIC_ASSERT((is_same<typename T_ARRAY::ELEMENT,TV>::value));
     for(int i=0;i<points.Size();i++) Enlarge_Nonempty_Box_To_Include_Point(points(i));}
 
+    template<class T_ARRAY>
+    void Enlarge_To_Include_Points(const T_ARRAY& points)
+    {STATIC_ASSERT((is_same<typename T_ARRAY::ELEMENT,TV>::value));
+    if(points.Size()) return;
+    Enlarge_To_Include_Point(points(0));
+    for(int i=1;i<points.Size();i++) Enlarge_Nonempty_Box_To_Include_Point(points(i));}
+
     void Enlarge_To_Include_Box(const RANGE<TV>& box)
     {min_corner=TV::Componentwise_Min(min_corner,box.min_corner);max_corner=TV::Componentwise_Max(max_corner,box.max_corner);}
 
