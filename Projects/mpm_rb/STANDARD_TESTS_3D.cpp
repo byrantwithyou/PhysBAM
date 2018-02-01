@@ -554,16 +554,16 @@ Initialize()
 
         case 150:{
             particles.Store_Fp(true);
-            Set_Grid(RANGE<TV>(TV(-1,-1,-1),TV(1,1,1))*m);
+            Set_Grid(RANGE<TV>(TV(-1.2,-1.2,-1.2),TV(1.2,1.2,1.2))*m);
 
             RANDOM_NUMBERS<T> rng(seed);
             T density=(T)2200*unit_rho*scale_mass;
-            TV g=m/(s*s)*TV(0,1.8,0);
+            TV g=m/(s*s)*TV(0,-1.8,0);
             RIGID_BODY<TV>& bowl=tests.Add_Analytic_Bowl((T)0,(T)1,(T)0.05);
-            bowl.Frame().t.y-=0.1;
+            bowl.Frame().r=ROTATION<TV>::From_Euler_Angles(pi,0,0);
             bowl.is_static=true;
 
-            RANGE<TV> box(TV(-0.6,-5.6,-0.6),TV(0.6,0,0.6));
+            RANGE<TV> box(TV(-0.6,0,-0.6),TV(0.6,5.6,0.6));
             RANGE<TV> R(TV(0,0,0),TV(pi,pi,pi));
             POISSON_DISK<TV> poisson_disk(1);
             ARRAY<TV> X;
@@ -622,24 +622,24 @@ Initialize()
             if(!use_theta_s) theta_s=.000001;
             if(!use_hardening_factor) hardening_factor=20;
             if(!use_max_hardening) max_hardening=FLT_MAX;
-            TV spout(0,-0.8,0);
-            T spout_width=.1*m;
-            T spout_height=.1*m;
+            TV spout(0,1,0);
+            T spout_width=.2*m;
+            T spout_height=.2*m;
             T seed_buffer=grid.dX.y*5;
-            T pour_speed=.2*m/s;
-            RANGE<TV> seed_range(spout+TV(-spout_width/2,-seed_buffer,-spout_width/2),
-                spout+TV(spout_width/2,spout_height,spout_width/2));
+            T pour_speed=.3*m/s;
+            RANGE<TV> seed_range(spout+TV(-spout_width/2,-spout_height,-spout_width/2),
+                spout+TV(spout_width/2,seed_buffer,spout_width/2));
 
             T volume=grid.dX.Product()/particles_per_cell;
             T mass=density*volume;
             POUR_SOURCE<TV>* source=new POUR_SOURCE<TV>(*this,
-                *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(seed_range),TV(0,1,0),spout,
-                TV(0,pour_speed,0),g,max_dt*pour_speed+grid.dX.y,seed_buffer,mass,volume);
+                *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(seed_range),TV(0,-1,0),spout,
+                TV(0,-pour_speed,0),g,max_dt*pour_speed+grid.dX.y,seed_buffer,mass,volume);
             destroy=[=](){delete source;};
             write_output_files=[=](int frame){source->Write_Output_Files(frame);};
             read_output_files=[=](int frame){source->Read_Output_Files(frame);};
             T source_start=2;
-            T source_end=5;
+            T source_end=100;
             ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
             begin_time_step=[=](T time)
             {
