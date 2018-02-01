@@ -25,6 +25,8 @@ public:
     using OPENGL_COMPONENT<T>::Slice_Has_Changed;using OPENGL_COMPONENT<T>::World_Space_Box;
     using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
     using OPENGL_COMPONENT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::Set_Slice;
+    enum SELECTION_TYPE {select_none=0,select_particle=1,select_object=2,select_text=3};
+
     OPENGL_COMPONENT_DEBUG_PARTICLES_3D(STREAM_TYPE stream_type,const std::string &filename);
     virtual ~OPENGL_COMPONENT_DEBUG_PARTICLES_3D();
 
@@ -62,16 +64,18 @@ public:
     ARRAY<DEBUG_TEXT<TV> >& debug_text;
     OPENGL_COLOR default_color;
     OPENGL_COLOR velocity_color;
-    bool draw_velocities;
-    bool draw_arrows;
-    T scale_velocities;
+    bool draw_velocities=false;
+    bool draw_arrows=true;
+    T scale_velocities=(T).025;
     bool wireframe_only;
 
 private:
     std::string filename;
-    int frame_loaded;
-    bool valid;
-    int selected_index;
+    int frame_loaded=-1;
+    bool valid=false;
+    int selected_particle=-1;
+    int selected_object=-1;
+    int selected_text=-1;
 };
 
 }
