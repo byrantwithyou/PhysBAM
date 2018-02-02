@@ -154,7 +154,10 @@ public:
     void Remove_Degenerate_Triangles(const T area_threshold=(T)1e-8);
     TRIANGULATED_SURFACE* Create_Compact_Copy() const;
     void Print_Statistics(std::ostream& output,const T thickness_over_2=(T)1e-8);
-private:
+    // polygons have same orientation as triangles
+    void Compute_Holes(ARRAY<ARRAY<int> >& holes);
+    void Fill_Holes(bool connect_to_centroid=false);
+  private:
     void Refresh_Auxiliary_Structures_Helper() override;
 //#####################################################################
 };

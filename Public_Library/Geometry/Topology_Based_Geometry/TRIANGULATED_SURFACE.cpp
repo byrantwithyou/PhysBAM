@@ -22,6 +22,7 @@
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGLE_SUBDIVISION.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <list>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -911,6 +912,102 @@ Print_Statistics(std::ostream& output,const T thickness_over_2)
     output<<"max aspect ratio = "<<Maximum_Aspect_Ratio(&index);output<<" ("<<index<<")"<<std::endl;
     output<<"ave aspect ratio = "<<Average_Aspect_Ratio()<<std::endl;
     if(Check_For_Self_Intersection(thickness_over_2)) output<<"found self intersections"<<std::endl;else output<<"no self intersections"<<std::endl;
+}
+//#####################################################################
+// Function Compute_Holes
+//#####################################################################
+template<class T> void TRIANGULATED_SURFACE<T>::
+Compute_Holes(ARRAY<ARRAY<int> >& holes)
+{
+    typedef VECTOR<int,2> I2;
+    typedef VECTOR<int,3> I3;
+    HASHTABLE<I2> hash;
+    for(int i=0;i<mesh.elements.m;i++){
+        I3 e=mesh.elements(i);
+        if(hash.Contains(I2(e.x,e.y))) hash.Delete(I2(e.x,e.y));
+        else hash.Set(I2(e.y,e.x));
+        if(hash.Contains(I2(e.y,e.z))) hash.Delete(I2(e.y,e.z));
+        else hash.Set(I2(e.z,e.y));
+        if(hash.Contains(I2(e.z,e.x))) hash.Delete(I2(e.z,e.x));
+        else hash.Set(I2(e.x,e.z));}
+
+    ARRAY<ARRAY<I2> > next(particles.X.m),prev(particles.X.m);
+    ARRAY<int> todo;
+    ARRAY<std::list<int> > lists(hash.Size());
+    for(auto it:hash){
+        lists(todo.m).push_back(it.x);
+        next(it.x).Append({it.y,todo.m});
+        prev(it.y).Append({it.x,todo.m});
+        todo.Append(it.x);}
+
+    auto find=[](const ARRAY<I2>& a,int b)
+        {
+            for(int i=0;i<a.m;i++) if(a(i).x==b) return i;
+            return -1;
+        };
+
+    while(todo.m){
+        int p=todo.Pop();
+        if(next(p).m!=1) continue;
+        assert(prev(p).m==1);
+        I2 a=prev(p)(0);
+        I2 b=next(p)(0);
+        int ic=find(next(a.x),p);
+        int id=find(prev(b.x),p);
+        I2&c=next(a.x)(ic);
+        I2&d=prev(b.x)(id);
+
+        lists(a.y).splice(lists(a.y).end(),lists(b.y));
+        assert(c.y==a.y);
+        assert(d.y==b.y);
+        d.y=c.y;
+        c.x=b.x;
+        d.x=a.x;
+
+        next(p).Remove_All();
+        prev(p).Remove_All();
+
+        // Check to see if the loop is effectively closed
+        int r=find(next(b.x),a.x);
+        if(r<0) continue;
+        int s=find(prev(a.x),b.x);
+        assert(s>=0);
+        const std::list<int>& l0=lists(c.y);
+        const std::list<int>& l1=lists(next(b.x)(r).y);
+        ARRAY<int>& h=holes(holes.Append({}));
+        for(auto j:l0) h.Append(j);
+        for(auto j:l1) h.Append(j);
+        next(a.x).Remove_Index_Lazy(ic);
+        prev(a.x).Remove_Index_Lazy(s);
+        next(b.x).Remove_Index_Lazy(r);
+        prev(b.x).Remove_Index_Lazy(id);
+        if(next(a.x).m==1) todo.Append(a.x);
+        if(next(b.x).m==1) todo.Append(b.x);}
+
+    for(int i=0;i<next.m;i++)
+        PHYSBAM_ASSERT(!next(i).m);
+}
+//#####################################################################
+// Function Fill_Holes
+//#####################################################################
+template<class T> void TRIANGULATED_SURFACE<T>::
+Fill_Holes(bool connect_to_centroid)
+{
+    ARRAY<ARRAY<int> > holes;
+    Compute_Holes(holes);
+    for(int i=0;i<holes.m;i++){
+        const ARRAY<int>& h=holes(i);
+        if(connect_to_centroid){
+            TV C=particles.X.Subset(h).Average();
+            int p=particles.Add_Element();
+            particles.X(p)=C;
+            for(int j=1;j<h.m;j++)
+                mesh.elements.Append({p,h(j-1),h(j)});
+            mesh.elements.Append({p,h.Last(),h(0)});}
+        else
+            for(int j=1;j<h.m-1;j++)
+                mesh.elements.Append({h(0),h(j),h(j+1)});}
+    if(connect_to_centroid) this->Update_Number_Nodes();
 }
 //#####################################################################
 namespace PhysBAM{
