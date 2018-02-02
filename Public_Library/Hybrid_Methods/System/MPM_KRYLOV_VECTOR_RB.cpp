@@ -130,7 +130,7 @@ Raw_Get(int i)
     if(i<valid_indices.m*TV::m) return u.array(valid_indices(i/TV::m))(i%TV::m);
     i-=valid_indices.m*TV::m;
     TWIST<TV>& t=twists(i/TWIST<TV>::m);
-    int c=i%TV::m;
+    int c=i%TWIST<TV>::m;
     if(c<TV::m) return t.linear(c);
     return t.angular(c-TV::m);
 }
