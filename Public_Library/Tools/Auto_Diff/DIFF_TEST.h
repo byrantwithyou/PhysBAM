@@ -16,6 +16,8 @@
 namespace PhysBAM{
 using ::std::abs;
 
+extern int diff_test_stage;
+
 template<class A,class B,class NEST> 
 struct DIFF_TEST_HOLDER
 {
