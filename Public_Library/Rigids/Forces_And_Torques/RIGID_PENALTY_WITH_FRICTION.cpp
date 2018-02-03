@@ -117,31 +117,33 @@ Potential_Energy(const T time) const
             pe+=(T).5*stiffness_coefficient*(X-c.Y).Magnitude_Squared();}}
     return pe;
 }
-namespace PhysBAM{
+template<class TV> bool MOVING_LEVEL_SET_HELPER<TV>::
+Init(const MOVE_RIGID_BODY_DIFF<TV>& mr,const IMPLICIT_OBJECT<TV>* io,const TV& X,bool exit_if_sep)
+{
+    U=mr.Frame_Inverse_Times(X,dUdX,dUdL,dUdA);
+    phi=io->Extended_Phi(U);
+    if(exit_if_sep && phi>0) return false;
+    N=io->Extended_Normal(U);
+    MATRIX<T,TV::m> dndN;
+    n=mr.Rotate(N,dndN,dndA);
+    SYMMETRIC_MATRIX<T,TV::m> dNdU=io->Hessian(U);
+    dndU=dndN*dNdU;
+    return true;
+}
 //#####################################################################
 // Function Project_Attachment_To_Surface
 //#####################################################################
-template<class TV,class T> bool
-Project_Attachment_To_Surface(TV& W,const MOVE_RIGID_BODY_DIFF<TV>& mr,
-    const IMPLICIT_OBJECT<TV>* io,const TV& X,MATRIX<T,TV::m>& dWdX,
-    MATRIX<T,TV::m>& dWdL,MATRIX<T,TV::m,TV::SPIN::m>& dWdA,bool exit_if_sep)
+template<class TV,class T> void PhysBAM::
+Project_Attachment_To_Surface(TV& W,MOVING_LEVEL_SET_HELPER<TV>& s,
+    const TV& X,MATRIX<T,TV::m>& dWdX,
+    MATRIX<T,TV::m>& dWdL,MATRIX<T,TV::m,TV::SPIN::m>& dWdA)
 {
     TIMER_SCOPE_FUNC;
-    MATRIX<T,TV::m> dUdX,dUdL,dndN;
-    MATRIX<T,TV::m,TV::SPIN::m> dUdA,dndA;
-    TV U=mr.Frame_Inverse_Times(X,dUdX,dUdL,dUdA);
-    T phi=io->Extended_Phi(U);
-    if(exit_if_sep && phi>0) return false;
-    TV N=io->Extended_Normal(U);
-    TV n=mr.Rotate(N,dndN,dndA);
-    SYMMETRIC_MATRIX<T,TV::m> dNdU=io->Hessian(U);
-    W=X-phi*n;
-    MATRIX<T,TV::m> dWdU=-phi*dndN*dNdU-Outer_Product(n,N);
-    dWdX=(T)1+dWdU*dUdX;
-    dWdL=dWdU*dUdL;
-    dWdA=dWdU*dUdA-phi*dndA;
-    return phi<=0;
-}
+    W=X-s.phi*s.n;
+    MATRIX<T,TV::m> dWdU=-s.phi*s.dndU-Outer_Product(s.n,s.N);
+    dWdX=(T)1+dWdU*s.dUdX;
+    dWdL=dWdU*s.dUdL;
+    dWdA=dWdU*s.dUdA-s.phi*s.dndA;
 }
 //#####################################################################
 // Function Relax_Attachment
@@ -156,25 +158,38 @@ Relax_Attachment(int cp)
     const IMPLICIT_OBJECT<TV>* io=rbi.implicit_object->object_space_implicit_object;
     const MOVE_RIGID_BODY_DIFF<TV>& mrs=move_rb_diff(c.bs);
     const MOVE_RIGID_BODY_DIFF<TV>& mri=move_rb_diff(c.bi);
-    MATRIX<T,TV::m> dXdv,dXdLi,dZdv,dWdZ,dWdLi,dVdY,dVdLi;
-    MATRIX<T,TV::m,TV::SPIN::m> dXdAi,dZdAs,dWdAi,dVdAi;
+    MATRIX<T,TV::m> dXdv,dXdLi,dZdv,dWdZ,dWdLi,dYdK,dYdLi,dKdLi;
+    MATRIX<T,TV::m,TV::SPIN::m> dXdAi,dZdAs,dWdAi,dYdAi,dKdAi;
 
     TV Xs=rbs.simplicial_object->particles.X(c.v);
     c.Z=mrs.Frame_Times(Xs,dZdv,c.dZdLs,c.dZdAs);
-    TV X=mri.Frame_Times(c.X,dXdv,dXdLi,dXdAi),W,V;
+    TV X=mri.Frame_Times(c.X,dXdv,dXdLi,dXdAi),W,Y;
 
-    c.active=Project_Attachment_To_Surface(W,mri,io,c.Z,dWdZ,dWdLi,dWdAi,true);
+    MOVING_LEVEL_SET_HELPER<TV> mZ,mK;
+    c.active=mZ.Init(mri,io,c.Z,true);
     if(!c.active) return;
+    Project_Attachment_To_Surface(W,mZ,c.Z,dWdZ,dWdLi,dWdAi);
 
-    auto pr=Relax_Attachment_Helper(c.Z,X,W,friction);
+    RELAX_ATTACHMENT_HELPER<TV> h;
+    if(use_bisection) Relax_Attachment_Helper_Search(h,c.Z,X,W,rbi.implicit_object,friction);
+    else Relax_Attachment_Helper(h,c.Z,X,W,friction);
 
-    Project_Attachment_To_Surface(V,mri,io,pr.Y,dVdY,dVdLi,dVdAi,false);
-    c.Y=V;
-    MATRIX<T,TV::m> dVdZ=dVdY*(pr.dYdZ+pr.dYdW*dWdZ);
-    c.dYdLs=dVdZ*c.dZdLs;
-    c.dYdAs=dVdZ*c.dZdAs;
-    c.dYdLi=dVdY*(pr.dYdX*dXdLi+pr.dYdW*dWdLi)+dVdLi;
-    c.dYdAi=dVdY*(pr.dYdX*dXdAi+pr.dYdW*dWdAi)+dVdAi;
+    mK.Init(mri,io,h.K,false);
+    Project_Attachment_To_Surface(Y,mK,h.K,dYdK,dYdLi,dYdAi);
+
+    if(use_bisection){
+        MATRIX<T,TV::m> dKdU=h.dKdN*mK.dndU+Outer_Product(h.dKdphi,mK.N);
+        MATRIX<T,TV::m> idKdK=((T)1-dKdU*mK.dUdX).Inverse();
+        dYdK=dYdK*idKdK;
+        dKdLi=dKdU*mK.dUdL;
+        dKdAi=h.dKdN*mK.dndA+dKdU*mK.dUdA;}
+
+    c.Y=Y;
+    MATRIX<T,TV::m> dYdZ=dYdK*(h.dKdZ+h.dKdW*dWdZ);
+    c.dYdLs=dYdZ*c.dZdLs;
+    c.dYdAs=dYdZ*c.dZdAs;
+    c.dYdLi=dYdK*(h.dKdX*dXdLi+h.dKdW*dWdLi+dKdLi)+dYdLi;
+    c.dYdAi=dYdK*(h.dKdX*dXdAi+h.dKdW*dWdAi+dKdAi)+dYdAi;
 }
 //#####################################################################
 // Function Update_Attachments_And_Prune_Pairs

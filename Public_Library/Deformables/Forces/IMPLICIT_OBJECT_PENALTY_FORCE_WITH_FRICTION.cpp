@@ -78,30 +78,70 @@ Potential_Energy(const T time) const
 // Z = colliding point, X = original attachment, Y = computed attachment
 // W = Z projected to surface, mu = friction
 namespace PhysBAM{
-template<class TV,class T> RELAX_ATTACHMENT_HELPER<TV>
-Relax_Attachment_Helper(const TV& Z,const TV& X,const TV& W,T mu)
+template<class TV,class T> void
+Relax_Attachment_Helper(RELAX_ATTACHMENT_HELPER<TV>& h,const TV& Z,const TV& X,const TV& W,T mu)
 {
-    RELAX_ATTACHMENT_HELPER<TV> h;
-
     TV ZW=Z-W,XW=X-W;
     T zw=ZW.Normalize();
     T xw=XW.Normalize();
     T q=mu*zw;
-    if(xw<=q){h.Y=X;h.dYdX+=1;h.dynamic=false;/*LOG::puts("stick");*/return h;}
-    h.Y=W+q*XW;
-    h.dYdX=q/xw*((T)1-Outer_Product(XW,XW));
-    h.dYdZ=Outer_Product(XW,mu*ZW);
-    h.dYdW=(T)1-h.dYdX-h.dYdZ;
+    if(xw<=q){h.K=X;h.dKdX+=1;h.dynamic=false;/*LOG::puts("stick");*/return;}
+    h.K=W+q*XW;
+    h.dKdX=q/xw*((T)1-Outer_Product(XW,XW));
+    h.dKdZ=Outer_Product(XW,mu*ZW);
+    h.dKdW=(T)1-h.dKdX-h.dKdZ;
     h.dynamic=true;
+    //LOG::puts("dynamic");
+}
+template<class TV,class T> void
+Relax_Attachment_Helper_Search(RELAX_ATTACHMENT_HELPER<TV>& h,const TV& Z,const TV& X,const TV& W,const IMPLICIT_OBJECT<TV>* io,T mu)
+{
+    T mu_bar=1/(sqr(mu)+1);
+    auto criterion=[X,W,Z,io,mu_bar](T s)
+        {
+            TV K=W+s*(X-W);
+            T phi=io->Extended_Phi(K);
+            TV N=io->Extended_Normal(K);
+            TV Y=K-phi*N;
+            TV u=Y-Z;
+            return sqr(u.Dot(N))-mu_bar*u.Magnitude_Squared();
+        };
 
-//    LOG::puts("dynamic");
-    return h;
+    if(criterion(1)>=0){h.K=X;h.dKdX+=1;h.dynamic=false;/*puts("stick");*/return;}
+    if(criterion(0)<=0){h.K=W;h.dKdW+=1;h.dynamic=true;/*puts("frictionless");*/return;}
+    T hi=1,lo=0;
+    while(hi-lo>std::numeric_limits<T>::epsilon()*2){
+        T md=lo+(hi-lo)/2;
+        if(criterion(md)>=0) lo=md;
+        else hi=md;}
+
+    T s=lo;
+    TV U=X-W;
+    TV K=W+s*U;
+    T phi=io->Extended_Phi(K);
+    TV N=io->Extended_Normal(K);
+    TV Y=K-phi*N;
+    TV u=Y-Z;
+    T a=u.Dot(N);
+    TV r=a*N-mu_bar*u;
+    TV v=phi*r-a*u;
+    T j=1/(r.Dot(U));
+    
+    h.K=K;
+    h.dKdphi=a*j*(1-mu_bar)*U;
+    h.dKdN=Outer_Product(U,j*v);
+    h.dKdZ=Outer_Product(U,j*r);
+    h.dKdW=(1-s)-(1-s)*h.dKdZ;
+    h.dKdX=s-s*h.dKdZ;
+    
+    //puts("dynamic");
+    h.dynamic=true;
 }
 
 // X = interior point, W = X projected to surface
 template<class TV,class T>
 bool Project_Attachment_To_Surface(TV& W,const IMPLICIT_OBJECT<TV>* io,const TV& X,
-    MATRIX<T,TV::m>& dWdX,bool exit_if_sep)
+    MATRIX<T,TV::m>& dWdX,bool exit_if_sep,TV* nn=0,SYMMETRIC_MATRIX<T,TV::m>* HH=0)
 {
     T phi=io->Extended_Phi(X);
     if(exit_if_sep && phi>0) return false;
@@ -109,6 +149,8 @@ bool Project_Attachment_To_Surface(TV& W,const IMPLICIT_OBJECT<TV>* io,const TV&
     SYMMETRIC_MATRIX<T,TV::m> H=io->Hessian(X);
     W=X-phi*n;
     dWdX=(T)1-Outer_Product(n)-phi*H;
+    if(nn) *nn=n;
+    if(HH) *HH=H;
     return phi<=0;
 }
 }
@@ -120,14 +162,19 @@ Relax_Attachment(int cp)
 {
     COLLISION_PAIR& c=collision_pairs(cp);
     IMPLICIT_OBJECT<TV>* io=ios(c.o);
-    TV Z=particles.X(c.p),W,V;
+    TV Z=particles.X(c.p),W,V,N;
+    SYMMETRIC_MATRIX<T,TV::m> H;
     MATRIX<T,TV::m> dWdZ,dVdY;
     c.active=Project_Attachment_To_Surface(W,io,Z,dWdZ,true);
     if(!c.active) return;
-    auto pr=Relax_Attachment_Helper(Z,c.X,W,friction);
-    Project_Attachment_To_Surface(V,io,pr.Y,dVdY,false);
+    RELAX_ATTACHMENT_HELPER<TV> h;
+    if(use_bisection) Relax_Attachment_Helper_Search(h,Z,c.X,W,io,friction);
+    else Relax_Attachment_Helper(h,Z,c.X,W,friction);
+    Project_Attachment_To_Surface(V,io,h.K,dVdY,false,&N,&H);
+    MATRIX<T,TV::m> dKdZ=h.dKdZ+h.dKdW*dWdZ;
+    if(use_bisection) dKdZ=((T)1-h.dKdN*H-Outer_Product(h.dKdphi,N)).Inverse()*dKdZ;
     c.Y=V;
-    c.dYdZ=dVdY*(pr.dYdZ+pr.dYdW*dWdZ);
+    c.dYdZ=dVdY*dKdZ;
 }
 //#####################################################################
 // Function Update_Attachments_And_Prune_Pairs
@@ -264,16 +311,32 @@ template class IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<VECTOR<float,2> >;
 template class IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<VECTOR<float,3> >;
 template class IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<VECTOR<double,2> >;
 template class IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION<VECTOR<double,3> >;
-template RELAX_ATTACHMENT_HELPER<VECTOR<double,2> >
-    Relax_Attachment_Helper<VECTOR<double,2>,double>(VECTOR<double,2> const&,
-        VECTOR<double,2> const&,VECTOR<double,2> const&,double);
-template RELAX_ATTACHMENT_HELPER<VECTOR<double,3> >
-    Relax_Attachment_Helper<VECTOR<double,3>,double>(VECTOR<double,3> const&,
-        VECTOR<double,3> const&,VECTOR<double,3> const&,double);
-template RELAX_ATTACHMENT_HELPER<VECTOR<float,2> >
-    Relax_Attachment_Helper<VECTOR<float,2>,float>(VECTOR<float,2> const&,
-        VECTOR<float,2> const&,VECTOR<float,2> const&,float);
-template RELAX_ATTACHMENT_HELPER<VECTOR<float,3> >
-    Relax_Attachment_Helper<VECTOR<float,3>,float>(VECTOR<float,3> const&,
-        VECTOR<float,3> const&,VECTOR<float,3> const&,float);
+template void Relax_Attachment_Helper<VECTOR<double,2>,double>(
+    RELAX_ATTACHMENT_HELPER<VECTOR<double,2> >&,VECTOR<double,2> const&,
+    VECTOR<double,2> const&,VECTOR<double,2> const&,double);
+template void Relax_Attachment_Helper<VECTOR<float,2>,float>(
+    RELAX_ATTACHMENT_HELPER<VECTOR<float,2> >&,VECTOR<float,2> const&,
+    VECTOR<float,2> const&,VECTOR<float,2> const&,float);
+template void Relax_Attachment_Helper<VECTOR<double,3>,double>(
+    RELAX_ATTACHMENT_HELPER<VECTOR<double,3> >&,VECTOR<double,3> const&,
+    VECTOR<double,3> const&,VECTOR<double,3> const&,double);
+template void Relax_Attachment_Helper<VECTOR<float,3>,float>(
+    RELAX_ATTACHMENT_HELPER<VECTOR<float,3> >&,VECTOR<float,3> const&,
+    VECTOR<float,3> const&,VECTOR<float,3> const&,float);
+template void Relax_Attachment_Helper_Search<VECTOR<double,2>,double>(
+    RELAX_ATTACHMENT_HELPER<VECTOR<double,2> >&,VECTOR<double,2> const&,
+    VECTOR<double,2> const&,VECTOR<double,2> const&,
+    IMPLICIT_OBJECT<VECTOR<double,2> > const*,double);
+template void Relax_Attachment_Helper_Search<VECTOR<float,2>,float>(
+    RELAX_ATTACHMENT_HELPER<VECTOR<float,2> >&,VECTOR<float,2> const&,
+    VECTOR<float,2> const&,VECTOR<float,2> const&,
+    IMPLICIT_OBJECT<VECTOR<float,2> > const*,float);
+template void Relax_Attachment_Helper_Search<VECTOR<double,3>,double>(
+    RELAX_ATTACHMENT_HELPER<VECTOR<double,3> >&,VECTOR<double,3> const&,
+    VECTOR<double,3> const&,VECTOR<double,3> const&,
+    IMPLICIT_OBJECT<VECTOR<double,3> > const*,double);
+template void Relax_Attachment_Helper_Search<VECTOR<float,3>,float>(
+    RELAX_ATTACHMENT_HELPER<VECTOR<float,3> >&,VECTOR<float,3> const&,
+    VECTOR<float,3> const&,VECTOR<float,3> const&,
+    IMPLICIT_OBJECT<VECTOR<float,3> > const*,float);
 }

@@ -26,6 +26,7 @@ public:
     ARRAY<IMPLICIT_OBJECT<TV>*> ios;
     T stiffness_coefficient=0;
     T friction=0;
+    bool use_bisection=false;
     
     struct COLLISION_PAIR
     {
@@ -75,11 +76,14 @@ public:
 template<class TV>
 struct RELAX_ATTACHMENT_HELPER
 {
-    TV Y;
-    MATRIX<typename TV::SCALAR,TV::m> dYdZ,dYdX,dYdW;
+    TV K;
+    MATRIX<typename TV::SCALAR,TV::m> dKdZ,dKdX,dKdW,dKdN;
+    TV dKdphi;
     bool dynamic;
 };
-template<class TV,class T> RELAX_ATTACHMENT_HELPER<TV>
-Relax_Attachment_Helper(const TV& Z,const TV& X,const TV& W,T mu);
+template<class TV,class T> void
+Relax_Attachment_Helper(RELAX_ATTACHMENT_HELPER<TV>& h,const TV& Z,const TV& X,const TV& W,T mu);
+template<class TV,class T> void
+Relax_Attachment_Helper_Search(RELAX_ATTACHMENT_HELPER<TV>& h,const TV& Z,const TV& X,const TV& W,const IMPLICIT_OBJECT<TV>* io,T mu);
 }
 #endif

@@ -2,8 +2,8 @@
 // Copyright 2010.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Core/Log/FINE_TIMER.h>
 #include <Core/Data_Structures/TRIPLE.h>
+#include <Core/Log/FINE_TIMER.h>
 #include <Core/Matrices/MATRIX.h>
 #include <Tools/Polynomials/QUADRATIC.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
@@ -122,25 +122,38 @@ Relax_Attachment(int cp)
     const RIGID_BODY<TV>& rb=rigid_body_collection.Rigid_Body(c.b);
     const IMPLICIT_OBJECT<TV>* io=rb.implicit_object->object_space_implicit_object;
     const MOVE_RIGID_BODY_DIFF<TV>& mr=move_rb_diff(c.b);
-    MATRIX<T,TV::m> dXdv,dXdL,dZdv,dWdZ,dWdL,dVdY,dVdL;
-    MATRIX<T,TV::m,TV::SPIN::m> dXdA,dWdA,dVdA;
+    MATRIX<T,TV::m> dXdv,dXdL,dZdv,dWdZ,dWdL,dYdK,dYdL,dKdL;
+    MATRIX<T,TV::m,TV::SPIN::m> dXdA,dWdA,dYdA,dKdA;
 
     TV Z=particles.X(c.p);
-    TV X=mr.Frame_Times(c.X,dXdv,dXdL,dXdA),W,V;
+    TV X=mr.Frame_Times(c.X,dXdv,dXdL,dXdA),W;
 
-    c.active=Project_Attachment_To_Surface(W,mr,io,Z,dWdZ,dWdL,dWdA,true);
+    MOVING_LEVEL_SET_HELPER<TV> mZ;
+    c.active=mZ.Init(mr,io,Z,true);
     if(!c.active) return;
+    Project_Attachment_To_Surface(W,mZ,Z,dWdZ,dWdL,dWdA);
 
-    auto pr=Relax_Attachment_Helper(Z,X,W,friction);
-    if(pr.dynamic) num_dynamic++;
+    RELAX_ATTACHMENT_HELPER<TV> h;
+    if(use_bisection) Relax_Attachment_Helper_Search(h,Z,X,W,rb.implicit_object,friction);
+    else Relax_Attachment_Helper(h,Z,X,W,friction);
+    if(h.dynamic) num_dynamic++;
     else num_stick++;
     
-    Project_Attachment_To_Surface(V,mr,io,pr.Y,dVdY,dVdL,dVdA,false);
-    c.Y=V;
-    MATRIX<T,TV::m> dVdZ=dVdY*(pr.dYdZ+pr.dYdW*dWdZ);
-    c.dYdZ=dVdZ;
-    c.dYdL=dVdY*(pr.dYdX*dXdL+pr.dYdW*dWdL)+dVdL;
-    c.dYdA=dVdY*(pr.dYdX*dXdA+pr.dYdW*dWdA)+dVdA;
+    MOVING_LEVEL_SET_HELPER<TV> mK;
+    mK.Init(mr,io,h.K,false);
+    Project_Attachment_To_Surface(c.Y,mK,h.K,dYdK,dYdL,dYdA);
+
+    if(use_bisection){
+        MATRIX<T,TV::m> dKdU=h.dKdN*mK.dndU+Outer_Product(h.dKdphi,mK.N);
+        MATRIX<T,TV::m> idKdK=((T)1-dKdU*mK.dUdX).Inverse();
+        dYdK=dYdK*idKdK;
+        dKdL=dKdU*mK.dUdL;
+        dKdA=h.dKdN*mK.dndA+dKdU*mK.dUdA;}
+    
+    MATRIX<T,TV::m> dYdZ=dYdK*(h.dKdZ+h.dKdW*dWdZ);
+    c.dYdZ=dYdZ;
+    c.dYdL=dYdK*(h.dKdX*dXdL+h.dKdW*dWdL+dKdL)+dYdL;
+    c.dYdA=dYdK*(h.dKdX*dXdA+h.dKdW*dWdA+dKdA)+dYdA;
 }
 //#####################################################################
 // Function Update_Attachments_And_Prune_Pairs

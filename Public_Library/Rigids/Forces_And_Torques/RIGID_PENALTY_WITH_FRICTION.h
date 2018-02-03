@@ -27,6 +27,7 @@ public:
 
     T stiffness_coefficient=0;
     T friction=0;
+    bool use_bisection=false;
     
     struct COLLISION_PAIR
     {
@@ -77,9 +78,20 @@ public:
     void Write(TYPED_OSTREAM& output) const;
 //#####################################################################
 };
-template<class TV,class T> bool
-Project_Attachment_To_Surface(TV& W,const MOVE_RIGID_BODY_DIFF<TV>& mr,
-    const IMPLICIT_OBJECT<TV>* io,const TV& X,MATRIX<T,TV::m>& dWdX,
-    MATRIX<T,TV::m>& dWdL,MATRIX<T,TV::m,TV::SPIN::m>& dWdA,bool exit_if_sep);
+template<class TV>
+struct MOVING_LEVEL_SET_HELPER
+{
+    typedef typename TV::SCALAR T;
+    MATRIX<T,TV::m> dUdX,dUdL,dndU;
+    MATRIX<T,TV::m,TV::SPIN::m> dUdA,dndA;
+    TV U,N,n;
+    T phi;
+
+    bool Init(const MOVE_RIGID_BODY_DIFF<TV>& mr,const IMPLICIT_OBJECT<TV>* io,const TV& X,bool exit_if_sep);
+};
+template<class TV,class T> void
+Project_Attachment_To_Surface(TV& W,MOVING_LEVEL_SET_HELPER<TV>& s,
+    const TV& X,MATRIX<T,TV::m>& dWdX,
+    MATRIX<T,TV::m>& dWdL,MATRIX<T,TV::m,TV::SPIN::m>& dWdA);
 }
 #endif

@@ -24,6 +24,7 @@ public:
     T stiffness_coefficient=0;
     T friction=0;
     int num_dynamic=0,num_stick=0;
+    bool use_bisection=false;
     
     struct COLLISION_PAIR
     {
