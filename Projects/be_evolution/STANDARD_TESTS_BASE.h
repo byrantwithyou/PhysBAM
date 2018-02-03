@@ -50,7 +50,8 @@ public:
     PENALTY_FORCE_COLLECTION<TV>* pfd=0;
     ARRAY<MOVE_RIGID_BODY_DIFF<TV> > move_rb_diff;
     GRID<TV> detection_grid;
-
+    bool use_bisection=false;
+    
     STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS_BASE();
 

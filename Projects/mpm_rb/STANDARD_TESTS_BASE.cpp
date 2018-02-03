@@ -142,6 +142,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-rd_mu",&rd_mu,&use_rd_mu,"friction","override friction for rigid-deformable penalty force friction");
     parse_args.Add("-rr_mu",&rr_mu,&use_rr_mu,"friction","override friction for rigid-rigid penalty force friction");
     parse_args.Add("-di_mu",&di_mu,&use_di_mu,"friction","override friction for deformable-object penalty force friction");
+    parse_args.Add("-bisection",&this->use_bisection,"use bisection relaxation");
     
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);

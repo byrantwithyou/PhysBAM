@@ -130,6 +130,9 @@ Initialize()
     if(example.use_di) example.pfd->di_penalty->friction=example.use_di_mu?example.di_mu:example.rd_penalty_friction;
     if(example.use_rd) example.pfd->rd_penalty->friction=example.use_rd_mu?example.rd_mu:example.rd_penalty_friction;
     if(example.use_rr) example.pfd->rr_penalty->friction=example.use_rr_mu?example.rr_mu:example.rd_penalty_friction;
+    if(example.use_di) example.pfd->di_penalty->use_bisection=example.use_bisection;
+    if(example.use_rd) example.pfd->rd_penalty->use_bisection=example.use_bisection;
+    if(example.use_rr) example.pfd->rr_penalty->use_bisection=example.use_bisection;
 
     if(example.restart)
         example.Read_Output_Files(example.restart);

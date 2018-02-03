@@ -93,6 +93,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-dd_mu",&dd_mu,&use_dd_mu,"friction","override friction for deformable-deformable penalty force friction");
     parse_args.Add("-rr_mu",&rr_mu,&use_rr_mu,"friction","override friction for rigid-rigid penalty force friction");
     parse_args.Add("-di_mu",&di_mu,&use_di_mu,"friction","override friction for deformable-object penalty force friction");
+    parse_args.Add("-bisection",&use_bisection,"use bisection relaxation");
     parse_args.Parse(true);
 
 #ifdef USE_OPENMP
@@ -233,6 +234,9 @@ Init_Penalty_Collection()
     if(use_dd) pfd->dd_penalty->friction=use_dd_mu?dd_mu:rd_penalty_friction;
     if(use_rd) pfd->rd_penalty->friction=use_rd_mu?rd_mu:rd_penalty_friction;
     if(use_rr) pfd->rr_penalty->friction=use_rr_mu?rr_mu:rd_penalty_friction;
+    if(use_di) pfd->di_penalty->use_bisection=use_bisection;
+    if(use_rd) pfd->rd_penalty->use_bisection=use_bisection;
+    if(use_rr) pfd->rr_penalty->use_bisection=use_bisection;
 
     if(backward_euler_evolution) backward_euler_evolution->minimization_objective.pfd=pfd;
 }
