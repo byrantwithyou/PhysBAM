@@ -263,6 +263,9 @@ public:
     T Frobenius_Norm_Squared() const
     {return sqr(x[0])+sqr(x[1])+sqr(x[2])+sqr(x[3]);}
 
+    T Frobenius_Norm() const
+    {return sqrt(Frobenius_Norm_Squared());}
+
     T Max_Abs() const
     {return maxabs(x[0],x[1],x[2],x[3]);}
 
