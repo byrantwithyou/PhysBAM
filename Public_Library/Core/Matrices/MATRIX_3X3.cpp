@@ -34,34 +34,164 @@ Higham_Iterate(const T tolerance,const int max_iterations,const bool exit_on_max
             if(exit_on_max_iterations) PHYSBAM_FATAL_ERROR();
             return X;}}
 }
+namespace{
+template<class T>
+VECTOR<T,2> Givens(T a,T b)
+{
+    return VECTOR<T,2>(a,-b).Normalized();
+}
+// Apply Givens rotation to matrix (on the left)
+template<class T>
+void Apply_L(MATRIX<T,3>& A,VECTOR<T,2> u,int i,int j)
+{
+    auto v=A.Row(i),w=A.Row(j);
+    A.Set_Row(i,u.x*v+u.y*w);
+    A.Set_Row(j,u.x*w-u.y*v);
+}
+// Apply Givens rotation to matrix (on the right)
+template<class T>
+void Apply_R(MATRIX<T,3>& A,VECTOR<T,2> u,int i,int j)
+{
+    auto v=A.Column(i),w=A.Column(j);
+    A.Set_Column(i,u.x*v+u.y*w);
+    A.Set_Column(j,u.x*w-u.y*v);
+}
+// Puts a zero in A(r1,c)
+template<class T>
+void Zero_L(MATRIX<T,3>& U,MATRIX<T,3>& A,int r0,int r1,int c)
+{
+    auto g=Givens(A(r0,c),A(r1,c));
+    Apply_L(A,g,r1,r0);
+    Apply_R(U,g,r1,r0);
+}
+// Puts a zero in A(r,c1)
+template<class T>
+void Zero_R(MATRIX<T,3>& V,MATRIX<T,3>& A,int c0,int c1,int r)
+{
+    auto g=Givens(A(r,c0),A(r,c1));
+    Apply_R(A,g,c1,c0);
+    Apply_R(V,g,c1,c0);
+}
+template<class T>
+void Zero_Chasing(MATRIX<T,3>& U,MATRIX<T,3>& A,MATRIX<T,3>& V)
+{
+    // Initial sparsity:  [ * * * ; * * * ; 0 * * ]
+    Zero_L(U,A,0,1,0); // [ * * * ; 0 * * ; 0 * * ]
+    Zero_R(V,A,1,2,0); // [ * * 0 ; 0 * * ; 0 * * ]
+    Zero_L(U,A,1,2,1); // [ * * 0 ; 0 * * ; 0 0 * ]
+}
+template<class T>
+void Swap_Col(MATRIX<T,3>& U,int i,int j)
+{
+    auto u=U.Column(i),v=U.Column(j);
+    U.Set_Column(i,v);
+    U.Set_Column(j,u);
+}
+template<class T>
+void Swap(MATRIX<T,3>& U,DIAGONAL_MATRIX<T,3>& D,MATRIX<T,3>& V,int i,int j)
+{
+    Swap_Col(U,i,j);
+    Swap_Col(V,i,j);
+    std::swap(D.x(i),D.x(j));
+}
+template<class T>
+void Flip_Sign(MATRIX<T,3>& U,DIAGONAL_MATRIX<T,3>& D,int i,int j)
+{
+    D.x(i)=-D.x(i);
+    D.x(j)=-D.x(j);
+    U.Set_Column(i,-U.Column(i));
+    U.Set_Column(j,-U.Column(j));
+}
+template<class T>
+void Sort_SV(MATRIX<T,3>& U,DIAGONAL_MATRIX<T,3>& D,MATRIX<T,3>& V)
+{
+    int i=abs(D.x).Arg_Max();
+    if(i>0) Swap(U,D,V,0,i);
+    if(abs(D.x.y)<abs(D.x.z)) Swap(U,D,V,1,2);
+    if(D.x.x<0) Flip_Sign(U,D,0,D.x.y<0?1:2);
+    else if(D.x.y<0) Flip_Sign(U,D,1,2);
+}
+template<class T>
+void Top_Block(MATRIX<T,3>& U,MATRIX<T,3>& B,MATRIX<T,3>& V,DIAGONAL_MATRIX<T,3>& D)
+{
+    MATRIX<T,2> u,v,a(B(0,0),B(1,0),B(0,1),B(1,1));
+    DIAGONAL_MATRIX<T,2> d;
+    a.Singular_Value_Decomposition(u,d,v);
+    Apply_R(U,u.Column(0),0,1);
+    Apply_R(V,v.Column(0),0,1);
+    D.x.x=d.x.x;
+    D.x.y=d.x.y;
+    D.x.z=B(2,2);
+    Sort_SV(U,D,V);
+}
+template<class T>
+void Bot_Block(MATRIX<T,3>& U,MATRIX<T,3>& B,MATRIX<T,3>& V,DIAGONAL_MATRIX<T,3>& D)
+{
+    MATRIX<T,2> u,v,a(B(1,1),B(2,1),B(1,2),B(2,2));
+    DIAGONAL_MATRIX<T,2> d;
+    a.Singular_Value_Decomposition(u,d,v);
+    Apply_R(U,u.Column(0),1,2);
+    Apply_R(V,v.Column(0),1,2);
+    D.x.x=B(0,0);
+    D.x.y=d.x.x;
+    D.x.z=d.x.y;
+    Sort_SV(U,D,V);
+}
+}
 //#####################################################################
 // Function Singular_Value_Decomposition
 //#####################################################################
 // U and V rotations, smallest singular value possibly negative
+// @techreport{gast:2016:qrsvd,
+//   title={Implicit-shifted Symmetric QR Singular Value Decomposition of 3x3 Matrices},
+//   author={Gast, T. and Fu, C. and Jiang, C. and Teran, J.},
+//   year={2016},
+//   institution={University of California Los Angeles}
+// }
 template<class T> void MATRIX<T,3>::
-Singular_Value_Decomposition(MATRIX<T,3>& U,DIAGONAL_MATRIX<T,3>& singular_values,MATRIX<T,3>& V) const // 182 mults, 112 adds, 6 divs, 11 sqrts, 1 atan2, 1 sincos
+Singular_Value_Decomposition(MATRIX<T,3>& U,DIAGONAL_MATRIX<T,3>& D,MATRIX<T,3>& V) const
 {
-    if(!is_same<T,double>::value){
-        MATRIX<double,3> U_double,V_double;DIAGONAL_MATRIX<double,3> singular_values_double;
-        MATRIX<double,3>(*this).Singular_Value_Decomposition(U_double,singular_values_double,V_double);
-        U=MATRIX<T,3>(U_double);singular_values=DIAGONAL_MATRIX<T,3>(singular_values_double);V=MATRIX<T,3>(V_double);return;}
-    // now T is double
+    MATRIX<T,3> B=*this;
+    V=U=MATRIX<T,3>()+1;
 
-    // decompose normal equations
-    DIAGONAL_MATRIX<T,3> lambda;
-    Normal_Equations_Matrix().Solve_Eigenproblem(lambda,V); // 18m+12a + 95m+64a+3d+5s+1atan2+1sincos
+    // Bidiagonalize
+    Zero_L(U,B,1,2,0); // [ * * * ; * * * ; 0 * * ]
+    Zero_Chasing(U,B,V); // [ * * 0 ; 0 * * ; 0 0 * ]
 
-    // compute singular values
-    if(lambda.x.z<0) lambda=lambda.Clamp_Min(0);
-    singular_values=lambda.Sqrt(); // 3s
-    if(Determinant()<0) singular_values.x.z=-singular_values.x.z; // 9m+5a
+    T nu=128*std::numeric_limits<T>::epsilon();
+    T tau=nu*std::max((T).5*B.Frobenius_Norm(),(T)1);
+    for(int it=0;;it++)
+    {
+        T al0=B(0,0),al1=B(1,1),al2=B(2,2);
+        T be0=B(0,1),be1=B(1,2);
+        T ga0=al0*be0,ga1=al1*be1;
+        if(abs(be1)<=tau) return Top_Block(U,B,V,D);
+        if(abs(be0)<=tau) return Bot_Block(U,B,V,D);
+        if(abs(al1)<=tau){
+            auto g=Givens(B(1,2),B(2,2)).Orthogonal_Vector();
+            Apply_L(B,g,2,1);
+            Apply_R(U,g,2,1);
+            return Top_Block(U,B,V,D);}
+        if(abs(al2)<=tau){
+            Zero_R(V,B,1,2,1);
+            Zero_R(V,B,0,2,0);
+            return Top_Block(U,B,V,D);}
+        if(abs(al0)<=tau){
+            Zero_L(U,B,1,0,1);
+            Zero_L(U,B,2,0,2);
+            return Bot_Block(U,B,V,D);}
 
-    // compute singular vectors
-    U.Set_Column(0,(*this*V.Column(0)).Normalized()); // 15m+8a+1d+1s
-    VECTOR<T,3> v1_orthogonal=U.Column(0).Unit_Orthogonal_Vector(); // 6m+2a+1d+1s
-    MATRIX<T,3,2> other_v(v1_orthogonal,VECTOR<T,3>::Cross_Product(U.Column(0),v1_orthogonal)); // 6m+3a
-    U.Set_Column(1,other_v*(other_v.Transpose_Times(*this*V.Column(1))).Normalized()); // 6m+3a + 6m+4a + 9m+6a + 6m+2a+1d+1s = 27m+15a+1d+1s
-    U.Set_Column(2,VECTOR<T,3>::Cross_Product(U.Column(0),U.Column(1))); // 6m+3a
+        T a0=al1*al1+be0*be0;
+        T a1=al2*al2+be1*be1;
+        T b0=ga1;
+        T d=(T).5*(a0-a1);
+        T mu=a1-b0*b0/(d+sign_nonzero(d)*sqrt(d*d+b0*b0));
+        
+        auto g=Givens(al0*al0-mu,ga0);
+        Apply_R(B,g,1,0);
+        Apply_R(V,g,1,0);
+
+        Zero_Chasing(U,B,V);}
 }
 //#####################################################################
 // Function Indefinite_Polar_Decomposition
