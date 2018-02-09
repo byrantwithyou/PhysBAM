@@ -35,21 +35,21 @@ Higham_Iterate(const T tolerance,const int max_iterations,const bool exit_on_max
             return X;}}
 }
 //#####################################################################
-// Function Fast_Singular_Value_Decomposition
+// Function Singular_Value_Decomposition
 //#####################################################################
 // U and V rotations, smallest singular value possibly negative
 template<class T> void MATRIX<T,3>::
-Fast_Singular_Value_Decomposition(MATRIX<T,3>& U,DIAGONAL_MATRIX<T,3>& singular_values,MATRIX<T,3>& V) const // 182 mults, 112 adds, 6 divs, 11 sqrts, 1 atan2, 1 sincos
+Singular_Value_Decomposition(MATRIX<T,3>& U,DIAGONAL_MATRIX<T,3>& singular_values,MATRIX<T,3>& V) const // 182 mults, 112 adds, 6 divs, 11 sqrts, 1 atan2, 1 sincos
 {
     if(!is_same<T,double>::value){
         MATRIX<double,3> U_double,V_double;DIAGONAL_MATRIX<double,3> singular_values_double;
-        MATRIX<double,3>(*this).Fast_Singular_Value_Decomposition(U_double,singular_values_double,V_double);
+        MATRIX<double,3>(*this).Singular_Value_Decomposition(U_double,singular_values_double,V_double);
         U=MATRIX<T,3>(U_double);singular_values=DIAGONAL_MATRIX<T,3>(singular_values_double);V=MATRIX<T,3>(V_double);return;}
     // now T is double
 
     // decompose normal equations
     DIAGONAL_MATRIX<T,3> lambda;
-    Normal_Equations_Matrix().Fast_Solve_Eigenproblem(lambda,V); // 18m+12a + 95m+64a+3d+5s+1atan2+1sincos
+    Normal_Equations_Matrix().Solve_Eigenproblem(lambda,V); // 18m+12a + 95m+64a+3d+5s+1atan2+1sincos
 
     // compute singular values
     if(lambda.x.z<0) lambda=lambda.Clamp_Min(0);
@@ -64,12 +64,12 @@ Fast_Singular_Value_Decomposition(MATRIX<T,3>& U,DIAGONAL_MATRIX<T,3>& singular_
     U.Set_Column(2,VECTOR<T,3>::Cross_Product(U.Column(0),U.Column(1))); // 6m+3a
 }
 //#####################################################################
-// Function Fast_Indefinite_Polar_Decomposition
+// Function Indefinite_Polar_Decomposition
 //#####################################################################
 template<class T> void MATRIX<T,3>::
-Fast_Indefinite_Polar_Decomposition(MATRIX<T,3>& Q,SYMMETRIC_MATRIX<T,3>& S) const
+Indefinite_Polar_Decomposition(MATRIX<T,3>& Q,SYMMETRIC_MATRIX<T,3>& S) const
 {
-    MATRIX<T,3> U,V;DIAGONAL_MATRIX<T,3> D;Fast_Singular_Value_Decomposition(U,D,V);
+    MATRIX<T,3> U,V;DIAGONAL_MATRIX<T,3> D;Singular_Value_Decomposition(U,D,V);
     Q=U.Times_Transpose(V);S=SYMMETRIC_MATRIX<T,3>::Conjugate(V,D);
 }
 //#####################################################################

@@ -306,7 +306,7 @@ public:
     {T x03=x[0]+x[3],cosine,sine;if(x03==0){cosine=0;sine=1;}else{T t=(x[1]-x[2])/x03;cosine=1/sqrt(1+t*t);sine=t*cosine;}
     Q=MATRIX(cosine,sine,-sine,cosine);S=SYMMETRIC_MATRIX<T,2>(Q.x[0]*x[0]+Q.x[1]*x[1],Q.x[0]*x[2]+Q.x[1]*x[3],Q.x[2]*x[2]+Q.x[3]*x[3]);}
 
-    void Fast_Singular_Value_Decomposition(MATRIX& U,DIAGONAL_MATRIX<T,2>& singular_values,MATRIX& V) const
+    void Singular_Value_Decomposition(MATRIX& U,DIAGONAL_MATRIX<T,2>& singular_values,MATRIX& V) const
     {MATRIX Q;SYMMETRIC_MATRIX<T,2> S;Indefinite_Polar_Decomposition(Q,S);S.Solve_Eigenproblem(singular_values,V);
     if(singular_values.x.y<0 && abs(singular_values.x.y)>=abs(singular_values.x.x)){
         singular_values=DIAGONAL_MATRIX<T,2>(-singular_values.x.y,-singular_values.x.x);

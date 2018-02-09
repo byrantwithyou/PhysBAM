@@ -234,7 +234,7 @@ public:
     void Fast_Solve_Eigenproblem(MATRIX&,MATRIX&) const
     {}
 
-    void Fast_Singular_Value_Decomposition(MATRIX&,MATRIX&,MATRIX&) const
+    void Singular_Value_Decomposition(MATRIX&,MATRIX&,MATRIX&) const
     {}
 
     MATRIX<T,0,1> Times_Cross_Product_Matrix(const VECTOR<T,1>& v)

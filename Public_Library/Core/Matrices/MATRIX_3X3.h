@@ -374,7 +374,7 @@ public:
     {return Times_Cross_Product_Matrix_With_Symmetric_Result(-v);}
 
     static MATRIX Left_Procrustes_Rotation(const MATRIX& A,const MATRIX& B)
-    {MATRIX U,V;DIAGONAL_MATRIX<T,3> D;A.Times_Transpose(B).Fast_Singular_Value_Decomposition(U,D,V);return U.Times_Transpose(V);}
+    {MATRIX U,V;DIAGONAL_MATRIX<T,3> D;A.Times_Transpose(B).Singular_Value_Decomposition(U,D,V);return U.Times_Transpose(V);}
 
     static MATRIX<T,3> Cross_Product_Matrix(const VECTOR<T,3>& v)
     {return MATRIX<T,3>(0,v.z,-v.y,-v.z,0,v.x,v.y,-v.x,0);}
@@ -390,8 +390,8 @@ public:
 
 //#####################################################################
     MATRIX Higham_Iterate(const T tolerance=1e-5,const int max_iterations=20,const bool exit_on_max_iterations=false) const;
-    void Fast_Singular_Value_Decomposition(MATRIX<T,3>& U,DIAGONAL_MATRIX<T,3>& singular_values,MATRIX<T,3>& V) const;
-    void Fast_Indefinite_Polar_Decomposition(MATRIX<T,3>& Q,SYMMETRIC_MATRIX<T,3>& S) const;
+    void Singular_Value_Decomposition(MATRIX<T,3>& U,DIAGONAL_MATRIX<T,3>& singular_values,MATRIX<T,3>& V) const;
+    void Indefinite_Polar_Decomposition(MATRIX<T,3>& Q,SYMMETRIC_MATRIX<T,3>& S) const;
     T Simplex_Minimum_Altitude() const;
     static MATRIX Componentwise_Min(const MATRIX& v1,const MATRIX& v2);
     static MATRIX Componentwise_Max(const MATRIX& v1,const MATRIX& v2);

@@ -18,14 +18,14 @@
 #include <limits>
 using namespace PhysBAM;
 //#####################################################################
-// Function Fast_Eigenvalues
+// Function Eigenvalues
 //#####################################################################
 // lambda_x > lambda_y > lambda_z
 // reference: Smith, O. "Eigenvalues of a symmetric 3 x 3 matrix". Commun. ACM 4 (4), p. 168, 1961 (thanks, Gene)
 template<class T> DIAGONAL_MATRIX<T,3> SYMMETRIC_MATRIX<T,3>::
-Fast_Eigenvalues() const // 24 mults, 20 adds, 1 atan2, 1 sincos, 2 sqrts
+Eigenvalues() const // 24 mults, 20 adds, 1 atan2, 1 sincos, 2 sqrts
 {
-    if(!is_same<T,double>::value) return DIAGONAL_MATRIX<T,3>(SYMMETRIC_MATRIX<double,3>(*this).Fast_Eigenvalues());
+    if(!is_same<T,double>::value) return DIAGONAL_MATRIX<T,3>(SYMMETRIC_MATRIX<double,3>(*this).Eigenvalues());
     // now T is double
     T m=((T)1/3)*(x00+x11+x22);
     T a00=x00-m,a11=x11-m,a22=x22-m,a12_sqr=x10*x10,a13_sqr=x20*x20,a23_sqr=x21*x21;
@@ -81,7 +81,7 @@ Fast_Solve_Eigenproblem(DIAGONAL_MATRIX<T,3>& eigenvalues,MATRIX<T,3>& eigenvect
         SYMMETRIC_MATRIX<double,3>(*this).Fast_Solve_Eigenproblem(eigenvalues_double,eigenvectors_double);
         eigenvalues=DIAGONAL_MATRIX<T,3>(eigenvalues_double);eigenvectors=MATRIX<T,3>(eigenvectors_double);return;}
     // now T is double
-    eigenvalues=Fast_Eigenvalues();
+    eigenvalues=Eigenvalues();
     eigenvectors=Fast_Eigenvectors(*this,eigenvalues);
 }
 //#####################################################################

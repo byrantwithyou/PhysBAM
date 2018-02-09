@@ -161,8 +161,8 @@ public:
     void Add_Row(const int j,const VECTOR<T,3>& v)
     {transpose.Add_Column(j,v);}
 
-    void Fast_Singular_Value_Decomposition(MATRIX<T,2>& U,DIAGONAL_MATRIX<T,2>& singular_values,MATRIX<T,3,2>& V) const
-    {transpose.Fast_Singular_Value_Decomposition(V,singular_values,U);}
+    void Singular_Value_Decomposition(MATRIX<T,2>& U,DIAGONAL_MATRIX<T,2>& singular_values,MATRIX<T,3,2>& V) const
+    {transpose.Singular_Value_Decomposition(V,singular_values,U);}
 
     template<class RW> void Read(std::istream& input)
     {Read_Binary<RW>(input,transpose);}

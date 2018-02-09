@@ -197,7 +197,7 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
     if(!plasticity_model){
         MATRIX<MATRIX<T,TV::m>,d+1,d+1> dfdx;
         for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
-            strain_measure.F(t).Fast_Singular_Value_Decomposition(U(t),Fe_hat(t),V_local);
+            strain_measure.F(t).Singular_Value_Decomposition(U(t),Fe_hat(t),V_local);
             if(implicit_surface) Set_Inversion_Based_On_Implicit_Surface(*this,*implicit_surface,t);
             if(anisotropic_model) anisotropic_model->Update_State_Dependent_Auxiliary_Variables(Fe_hat(t),V_local,t);
             else isotropic_model->Update_State_Dependent_Auxiliary_Variables(Fe_hat(t),t);
@@ -233,11 +233,11 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
         DIAGONAL_MATRIX<T,d> Fe_project_hat;
         for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
             T_MATRIX F=strain_measure.F(t);
-            (F*plasticity_model->Fp_inverse(t)).Fast_Singular_Value_Decomposition(U(t),Fe_hat(t),V_local);
+            (F*plasticity_model->Fp_inverse(t)).Singular_Value_Decomposition(U(t),Fe_hat(t),V_local);
             if(implicit_surface) Set_Inversion_Based_On_Implicit_Surface(*this,*implicit_surface,t);
             if(plasticity_model->Project_Fe(Fe_hat(t),Fe_project_hat)){
                 plasticity_model->Project_Fp(t,Fe_project_hat.Inverse()*U(t).Transpose_Times(F));
-                (F*plasticity_model->Fp_inverse(t)).Fast_Singular_Value_Decomposition(U(t),Fe_hat(t),V_local);}
+                (F*plasticity_model->Fp_inverse(t)).Singular_Value_Decomposition(U(t),Fe_hat(t),V_local);}
             De_inverse_hat(t)=strain_measure.Dm_inverse(t)*plasticity_model->Fp_inverse(t)*V_local;
             Be_scales(t)=-(T)1/factorial(d)/De_inverse_hat(t).Determinant();}}
 
@@ -397,7 +397,7 @@ Add_Semi_Implicit_Impulse(const int element,const T dt,T* time_plus_dt)
     // diagonalize F
     T_MATRIX U;MATRIX<T,d> V;DIAGONAL_MATRIX<T,d> F_hat;
     T_MATRIX F=STRAIN_MEASURE<TV,d>::Ds(particles.X,data.nodes)*data.Dm_inverse;
-    F.Fast_Singular_Value_Decomposition(U,F_hat,V);
+    F.Singular_Value_Decomposition(U,F_hat,V);
     T_MATRIX Q=U.Times_Transpose(V);
     // compute -s dt P^n
     T dt_scale=dt*data.Bm_scale;

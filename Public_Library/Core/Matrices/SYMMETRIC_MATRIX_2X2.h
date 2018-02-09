@@ -261,7 +261,7 @@ public:
     VECTOR<T,2> Last_Eigenvector_From_Ordered_Eigenvalues(const DIAGONAL_MATRIX<T,2>& eigenvalues) const
     {return (*this-eigenvalues.x.y).Cofactor_Matrix().Largest_Column_Normalized();}
 
-    DIAGONAL_MATRIX<T,2> Fast_Eigenvalues() const // lambda_x > lambda_y
+    DIAGONAL_MATRIX<T,2> Eigenvalues() const // lambda_x > lambda_y
     {T da;
     if(x10==0) da=0;
     else{T theta=(T).5*(x11-x00)/x10,t=1/(abs(theta)+sqrt(1+sqr(theta)));if(theta<0) t=-t;da=t*x10;}

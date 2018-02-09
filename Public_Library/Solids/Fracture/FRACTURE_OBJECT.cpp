@@ -159,7 +159,7 @@ Fracture_Where_High_Stress(ARRAY<SYMMETRIC_MATRIX<T,TV::m> >& sigma,ARRAY<TV>& s
     // make cuts
     assert(max_number_of_cuts<=d);int count=0;
     for(int t=0;t<embedded_object.simplicial_object.mesh.elements.m;t++){
-        DIAGONAL_MATRIX<T,TV::m> eigenvalues=sigma(t).Fast_Eigenvalues();
+        DIAGONAL_MATRIX<T,TV::m> eigenvalues=sigma(t).Eigenvalues();
         int number_of_cuts=embedded_object.Number_Of_Embedded_Cuts(t);
         if(number_of_cuts<max_number_of_cuts){ // room for more cuts
             int cut=number_of_cuts+1;

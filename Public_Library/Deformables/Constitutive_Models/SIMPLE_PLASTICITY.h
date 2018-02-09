@@ -38,7 +38,7 @@ public:
     Fe_project=exp(Fe_deviatoric+dilation);return true;}
     
     void Project_Fp(const int simplex,const MATRIX<T,d>& Fp_trial) override
-    {DIAGONAL_MATRIX<T,d> Fp_hat;MATRIX<T,d> U,V;Fp_trial.Fast_Singular_Value_Decomposition(U,Fp_hat,V);
+    {DIAGONAL_MATRIX<T,d> Fp_hat;MATRIX<T,d> U,V;Fp_trial.Singular_Value_Decomposition(U,Fp_hat,V);
     DIAGONAL_MATRIX<T,d> Fp_log_hat=log(Fp_hat.Clamp_Min((T)1e-4));Fp_log_hat-=Fp_log_hat.Dilational();T sqr_norm=Fp_log_hat.Frobenius_Norm_Squared();
     if(sqr_norm>sqr_log_plastic_clamp_ratio)Fp_log_hat*=sqrt(sqr_log_plastic_clamp_ratio/sqr_norm);
     Fp_inverse(simplex)=SYMMETRIC_MATRIX<T,d>::Conjugate(V,exp(-Fp_log_hat));}

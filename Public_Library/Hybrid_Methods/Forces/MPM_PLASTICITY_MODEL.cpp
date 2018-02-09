@@ -39,7 +39,7 @@ Update_Particles() const
         int p=gather_scatter->simulated_particles(k);
         MATRIX<T,TV::m> Fe=particles.F(p),U,V;
         DIAGONAL_MATRIX<T,TV::m> singular_values;
-        Fe.Fast_Singular_Value_Decomposition(U,singular_values,V);
+        Fe.Singular_Value_Decomposition(U,singular_values,V);
         TV strain;
         if(Compute(strain,0,0,0,singular_values.x,true,p)){
             singular_values.x=strain;

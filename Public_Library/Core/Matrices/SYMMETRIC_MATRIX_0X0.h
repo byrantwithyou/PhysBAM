@@ -219,7 +219,7 @@ public:
     bool Positive_Semidefinite(const T tolerance=(T)1e-7) const
     {return true;}
 
-    DIAGONAL_MATRIX<T,0> Fast_Eigenvalues() const
+    DIAGONAL_MATRIX<T,0> Eigenvalues() const
     {return *this;}
 
     SYMMETRIC_MATRIX Positive_Definite_Part() const

@@ -57,7 +57,7 @@ Precompute(const T time,const T dt,bool want_dE,bool want_ddE)
     for(int k=0;k<gather_scatter.simulated_particles.m;k++){
         int p=gather_scatter.simulated_particles(k);
         MATRIX<T,TV::m> V_local;
-        particles.F(p).Fast_Singular_Value_Decomposition(U(p),sigma(p),V_local);
+        particles.F(p).Singular_Value_Decomposition(U(p),sigma(p),V_local);
         FV(p)=force_helper.Fn(p)*V_local;
         PFT(p)=U(p)*constitutive_model.P_From_Strain(sigma(p),p).Times_Transpose(FV(p));
         constitutive_model.Isotropic_Stress_Derivative(sigma(p),dPi_dF(p),p);}

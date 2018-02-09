@@ -89,7 +89,7 @@ Precompute(const T time,const T dt,bool want_dE,bool want_ddE)
             int p=gather_scatter.simulated_particles(k);
             MATRIX<T,TV::m> V_local;
             DIAGONAL_MATRIX<T,TV::m> sigma;
-            particles.F(p).Fast_Singular_Value_Decomposition(U(p),sigma,V_local);
+            particles.F(p).Singular_Value_Decomposition(U(p),sigma,V_local);
             FV(p)=force_helper.Fn(p)*V_local;
             TV strain;
             MATRIX<T,TV::m> dstrain;

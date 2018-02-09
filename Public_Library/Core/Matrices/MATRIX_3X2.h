@@ -252,8 +252,8 @@ public:
     {Write_Binary_Array<RW>(output,x,m*n);}
 
 //#####################################################################
-    void Fast_Singular_Value_Decomposition(MATRIX& U,DIAGONAL_MATRIX<T,2>& singular_values,MATRIX<T,2>& V) const;
-    void Fast_Indefinite_Polar_Decomposition(MATRIX<T,3,2>& Q,SYMMETRIC_MATRIX<T,2>& S) const;
+    void Singular_Value_Decomposition(MATRIX& U,DIAGONAL_MATRIX<T,2>& singular_values,MATRIX<T,2>& V) const;
+    void Indefinite_Polar_Decomposition(MATRIX<T,3,2>& Q,SYMMETRIC_MATRIX<T,2>& S) const;
 //#####################################################################
 };
 // global functions

@@ -267,7 +267,7 @@ public:
     T Determinant() const
     {return x00;}
 
-    MATRIX<T,1> Fast_Eigenvalues() const
+    MATRIX<T,1> Eigenvalues() const
     {return *this;}
 
     T Max() const
@@ -351,7 +351,7 @@ public:
     void Fast_Solve_Eigenproblem(MATRIX& D,MATRIX& V) const
     {V.x00=1;D=*this;}
     
-    void Fast_Singular_Value_Decomposition(MATRIX& U,DIAGONAL_MATRIX<T,1>& D,MATRIX& V) const
+    void Singular_Value_Decomposition(MATRIX& U,DIAGONAL_MATRIX<T,1>& D,MATRIX& V) const
     {U.x00=V.x00=1;D.x(0)=x00;}
 
     template<class RW> void Read(std::istream& input)

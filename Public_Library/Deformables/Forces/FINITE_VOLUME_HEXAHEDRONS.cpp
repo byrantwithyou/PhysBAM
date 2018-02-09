@@ -100,7 +100,7 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
     MATRIX<T,3> V_local;
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int e=iterator.Data();for(int g=0;g<8;g++){
         int gauss_index=8*(e-1)+g;
-        strain_measure.F(g,e).Fast_Singular_Value_Decomposition(U(e)(g),Fe_hat(e)(g),V_local);
+        strain_measure.F(g,e).Singular_Value_Decomposition(U(e)(g),Fe_hat(e)(g),V_local);
         if(anisotropic_model) anisotropic_model->Update_State_Dependent_Auxiliary_Variables(Fe_hat(e)(g),V_local,gauss_index);
         else isotropic_model->Update_State_Dependent_Auxiliary_Variables(Fe_hat(e)(g),gauss_index);
         if(dPi_dFe) constitutive_model.Isotropic_Stress_Derivative(Fe_hat(e)(g),(*dPi_dFe)(e)(g),gauss_index);

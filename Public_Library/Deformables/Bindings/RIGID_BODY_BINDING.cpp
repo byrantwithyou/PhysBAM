@@ -115,7 +115,7 @@ One_Over_Effective_Mass(const TV& direction) const // assumes direction is norma
 template<class TV> typename TV::SCALAR RIGID_BODY_BINDING<TV>::
 One_Over_Effective_Mass() const // return a lower bound for effective mass over all directions
 {
-    RIGID_BODY<TV>& rigid_body=Rigid_Body();if(rigid_body.Has_Infinite_Inertia()) return 0;return rigid_body.Object_Space_Impulse_Factor(object_space_position).Fast_Eigenvalues().Max();
+    RIGID_BODY<TV>& rigid_body=Rigid_Body();if(rigid_body.Has_Infinite_Inertia()) return 0;return rigid_body.Object_Space_Impulse_Factor(object_space_position).Eigenvalues().Max();
 }
 //#####################################################################
 // Function Apply_Impulse

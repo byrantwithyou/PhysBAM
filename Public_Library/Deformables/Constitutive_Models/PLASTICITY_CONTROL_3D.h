@@ -35,14 +35,14 @@ public:
         for(int t=0;t<strain_measure.Dm_inverse.m;t++){
             MATRIX<T,3> F=strain_measure.Ds(X_goal.array,t)*strain_measure.Dm_inverse(t);
             if(F.Determinant()<=0) PHYSBAM_FATAL_ERROR("Cannot control towards inverting elements");
-            MATRIX<T,3> U,V;DIAGONAL_MATRIX<T,3> Fp_goal_hat;F.Fast_Singular_Value_Decomposition(U,Fp_goal_hat,V);
+            MATRIX<T,3> U,V;DIAGONAL_MATRIX<T,3> Fp_goal_hat;F.Singular_Value_Decomposition(U,Fp_goal_hat,V);
             log_Fp_goal(t)=SYMMETRIC_MATRIX<T,3>::Conjugate(V,log(Fp_goal_hat));}
     }
     
     void Print_Extreme_Deformations()
     {T tension=-1e10,compression=1e10;
     for(int t=0;t<log_Fp_goal.m;t++){
-        DIAGONAL_MATRIX<T,3> eigenvalues=log_Fp_goal(t).Fast_Eigenvalues();
+        DIAGONAL_MATRIX<T,3> eigenvalues=log_Fp_goal(t).Eigenvalues();
         tension=max(tension,eigenvalues.Max());compression=min(compression,eigenvalues.Min());}
     LOG::cout<<"Maximum goal expansion = "<<exp(tension)<<", compression = "<<exp(compression)<<std::endl;}
     
@@ -53,7 +53,7 @@ public:
     Fe_project=exp(Fe_log);return true;}
     
     void Project_Fp(const int id,const MATRIX<T,3>& Fp_trial) override
-    {MATRIX<T,3> U,V;DIAGONAL_MATRIX<T,3> Fp_trial_hat;Fp_trial.Fast_Singular_Value_Decomposition(U,Fp_trial_hat,V);
+    {MATRIX<T,3> U,V;DIAGONAL_MATRIX<T,3> Fp_trial_hat;Fp_trial.Singular_Value_Decomposition(U,Fp_trial_hat,V);
     SYMMETRIC_MATRIX<T,3> log_Fp_trial=SYMMETRIC_MATRIX<T,3>::Conjugate(V,log(Fp_trial_hat.Max((T)1e-5)));
     SYMMETRIC_MATRIX<T,3> log_Fp_trial_minus_log_Fp=log_Fp_trial-log_Fp(id);
     T goal_dot_trial=SYMMETRIC_MATRIX<T,3>::Inner_Product(log_Fp_goal(id)-log_Fp(id),log_Fp_trial_minus_log_Fp);if(goal_dot_trial<=0)return;

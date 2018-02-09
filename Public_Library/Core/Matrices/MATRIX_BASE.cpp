@@ -210,7 +210,7 @@ Jacobi_Singular_Value_Decomposition(ARRAY<VECTOR<int,2> >& left_givens_pairs,ARR
             Update_Max_Off_Diagonal_Element_Of_Row_After_Column_Change(*this,max_off_diagonal_element_of_row,j);}
         else{
             int i=(i_max<j_max)?i_max:j_max,j=(i_max<j_max)?j_max:i_max;
-            MATRIX<T,2> B((*this)(i,i),(*this)(j,i),(*this)(i,j),(*this)(j,j)),U,V;DIAGONAL_MATRIX<T,2> sigma;B.Fast_Singular_Value_Decomposition(U,sigma,V);
+            MATRIX<T,2> B((*this)(i,i),(*this)(j,i),(*this)(i,j),(*this)(j,j)),U,V;DIAGONAL_MATRIX<T,2> sigma;B.Singular_Value_Decomposition(U,sigma,V);
             T c_left,s_left,c_right,s_right;U.Column(1).Get(c_left,s_left);V.Column(1).Get(c_right,s_right);
             Left_Givens_Rotation(i,j,c_left,-s_left);left_givens_pairs.Append(VECTOR<int,2>(i,j));left_givens_coefficients.Append(VECTOR<T,2>(c_left,s_left));
             Right_Givens_Rotation(i,j,c_right,-s_right);right_givens_pairs.Append(VECTOR<int,2>(i,j));right_givens_coefficients.Append(VECTOR<T,2>(c_right,s_right));
