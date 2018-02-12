@@ -32,11 +32,13 @@ template<class TV> bool MPM_PLASTICITY_CLAMP<TV>::
 Compute(TV& strain,MATRIX<T,TV::m>* dstrain,typename TV::SPIN* r_sum,
     typename TV::SPIN* r_diff,const TV& Fe,bool store_hardening,int p) const
 {
+    T soft_limit=1e-8;
     strain=clamp(Fe,1-theta_c,1+theta_s);
     if(strain==Fe) return false;
     if(store_hardening){
         T det=Fe.Product()/strain.Product()*particles.Fp(p).Determinant();
         T hardening_coeff=exp(min(max_hardening,hardening_factor*(1-det)));
+        if(hardening_coeff<soft_limit) hardening_coeff=soft_limit;
         particles.mu(p)=particles.mu0(p)*hardening_coeff;
         particles.lambda(p)=particles.lambda0(p)*hardening_coeff;}
     // NOTE: updating particles.mu and particles.lambda is not enough; the constitutive models do not use these.
