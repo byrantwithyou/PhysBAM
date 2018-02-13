@@ -22,7 +22,7 @@
 
 namespace PhysBAM{
 
-template<class T,class RW=T>
+template<class T>
 class RISING_SPHERE:public WATER_FREE_SURFACE_3D_EXAMPLE<T,RW>
 {
 public:

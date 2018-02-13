@@ -108,7 +108,7 @@ public:
     void Set_Name(const std::string& name_input)
     {name=name_input;}
 
-    void Write_Constrained_Point(TYPED_OSTREAM& output_stream,const ATTACHMENT_POINT<TV>* constrained_point) const
+    void Write_Constrained_Point(TYPED_OSTREAM output_stream,const ATTACHMENT_POINT<TV>* constrained_point) const
     {Write_Binary(output_stream,constrained_point->object_space_position,constrained_point->rigid_body.particle_index);}
 
 //#####################################################################
@@ -122,9 +122,9 @@ public:
     void Update_Segments();
     void Set_Segment_Activations(const T activation);
     void Apply_Fixed_Impulse_At_All_Points(const T impulse);
-    ATTACHMENT_POINT<TV>* Read_Constrained_Point(TYPED_ISTREAM& input_stream,RIGID_BODY_COLLECTION<TV>& rigid_body_collection);
-    virtual void Read(TYPED_ISTREAM& input_stream,RIGID_BODY_COLLECTION<TV>& rigid_body_collection); // Currently assumes attachment points are also constrained point in rigid body!!
-    virtual void Write(TYPED_OSTREAM& output_stream) const;
+    ATTACHMENT_POINT<TV>* Read_Constrained_Point(TYPED_ISTREAM input_stream,RIGID_BODY_COLLECTION<TV>& rigid_body_collection);
+    virtual void Read(TYPED_ISTREAM input_stream,RIGID_BODY_COLLECTION<TV>& rigid_body_collection); // Currently assumes attachment points are also constrained point in rigid body!!
+    virtual void Write(TYPED_OSTREAM output_stream) const;
 //#####################################################################
 };
 }

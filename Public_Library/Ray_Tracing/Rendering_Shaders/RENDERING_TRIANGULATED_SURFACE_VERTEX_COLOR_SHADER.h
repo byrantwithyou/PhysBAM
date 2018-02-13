@@ -10,7 +10,7 @@
 #include <Ray_Tracing/Rendering_Shaders/MATERIAL_SHADER.h>
 namespace PhysBAM{
 
-template<class T,class RW>
+template<class T>
 class RENDERING_TRIANGULATED_SURFACE_VERTEX_COLOR_SHADER:public MATERIAL_SHADER<T>
 {
 public:
@@ -21,7 +21,7 @@ public:
     {}
 
     void Initialize(const std::string& filename)
-    {Read_From_File<RW>(filename,vertex_colors);}
+    {Read_From_File(filename,vertex_colors);}
 
     VECTOR<T,3> Shade_Surface_Using_Direct_Illumination(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& exiting_object,const RENDERING_OBJECT<T>& entering_object,
         const RENDERING_OBJECT<T>& intersection_object,const VECTOR<T,3>& intersection_point,const VECTOR<T,3>& same_side_normal) const

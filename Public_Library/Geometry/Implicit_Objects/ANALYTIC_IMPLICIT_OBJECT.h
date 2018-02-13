@@ -89,10 +89,10 @@ public:
     SYMMETRIC_MATRIX<T,TV::m> Hessian(const TV& X) const override
     {return analytic.Hessian(X);}
 
-    void Read(TYPED_ISTREAM& input) override
+    void Read(TYPED_ISTREAM input) override
     {Read_Binary(input,analytic);Update_Box();}
 
-    void Write(TYPED_OSTREAM& output) const override
+    void Write(TYPED_OSTREAM output) const override
     {Write_Binary(output,analytic);}
 
 //#####################################################################

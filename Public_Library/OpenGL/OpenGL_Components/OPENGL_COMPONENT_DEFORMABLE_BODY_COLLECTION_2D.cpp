@@ -20,11 +20,11 @@ using namespace PhysBAM;
 // Function OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D
 //#####################################################################
 template<class T> OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>::
-OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D(STREAM_TYPE stream_type,const std::string& prefix,const int start_frame)
-    :OPENGL_COMPONENT<T>(stream_type,"Deformable Object List"),prefix(prefix),
+OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D(const std::string& prefix,const int start_frame)
+    :OPENGL_COMPONENT<T>("Deformable Object List"),prefix(prefix),
     frame_loaded(-1),valid(false),display_mode(0),draw_velocities(false),velocity_scale(0.025),
     deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(0,0)),
-    velocity_field(stream_type,deformable_body_collection.particles.V,deformable_body_collection.particles.X),color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map()),
+    velocity_field(deformable_body_collection.particles.V,deformable_body_collection.particles.X),color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map()),
     selected_segmented_curve(-1),selected_triangulated_area(-1),selected_triangles_of_material(-1),
     selected_bezier_spline(-1),selected_embedded_curve(-1),selected_free_particles(-1),
     selected_b_spline(-1),selected_index(-1),selected_object(0)
@@ -69,7 +69,7 @@ Reinitialize(bool force)
     int static_frame=-1;
     if(File_Exists(filename)){static_frame=frame;read_static_variables=true;}
     if(read_static_variables && first_time) LOG::cout << "Deformable bodies static variables will be read each frame" << std::endl;
-    deformable_body_collection.Read(stream_type,prefix,prefix,frame,static_frame,read_static_variables,true); // Currently this will exit if any of the files don't exist... we should
+    deformable_body_collection.Read(prefix,prefix,frame,static_frame,read_static_variables,true); // Currently this will exit if any of the files don't exist... we should
                                                                                                                      // change it to not do that
 
     if(read_static_variables){
@@ -90,32 +90,32 @@ Reinitialize(bool force)
             if(EMBEDDED_MATERIAL_SURFACE<TV,2>* embedding=dynamic_cast<EMBEDDED_MATERIAL_SURFACE<TV,2>*>(structure)){
                 has_embedded_objects=true;
                 if(first_time) LOG::cout<<"object "<<i<<": embedded triangulated area\n";
-                triangles_of_material_objects(i)=new OPENGL_TRIANGULATED_AREA<T>(stream_type,embedding->material_surface,false,OPENGL_COLOR::Red(),OPENGL_COLOR::Blue());
+                triangles_of_material_objects(i)=new OPENGL_TRIANGULATED_AREA<T>(embedding->material_surface,false,OPENGL_COLOR::Red(),OPENGL_COLOR::Blue());
                 embedding->embedded_object.simplicial_object.mesh.Initialize_Segment_Mesh();
-                triangulated_area_objects(i)=new OPENGL_TRIANGULATED_AREA<T>(stream_type,embedding->embedded_object.simplicial_object,true);
+                triangulated_area_objects(i)=new OPENGL_TRIANGULATED_AREA<T>(embedding->embedded_object.simplicial_object,true);
                 if(first_time) LOG::cout<<"object "<<i<<": embedded segmented curve\n";
-                embedded_curve_objects(i)=new OPENGL_SEGMENTED_CURVE_2D<T>(stream_type,embedding->embedded_object.embedded_object);
+                embedded_curve_objects(i)=new OPENGL_SEGMENTED_CURVE_2D<T>(embedding->embedded_object.embedded_object);
                 embedded_curve_objects(i)->draw_velocities=draw_velocities;
                 embedded_curve_objects(i)->velocity_scale=velocity_scale;} // apply current parameters
             else if(SEGMENTED_CURVE_2D<T>* segmented_curve=dynamic_cast<SEGMENTED_CURVE_2D<T>*>(structure)){
                 if(first_time) LOG::cout<<"object "<<i<<": segmented curve\n";
-                segmented_curve_objects(i)=new OPENGL_SEGMENTED_CURVE_2D<T>(stream_type,*segmented_curve,color_map->Lookup(color_map_index--));
+                segmented_curve_objects(i)=new OPENGL_SEGMENTED_CURVE_2D<T>(*segmented_curve,color_map->Lookup(color_map_index--));
                 segmented_curve_objects(i)->draw_velocities=draw_velocities;
                 segmented_curve_objects(i)->velocity_scale=velocity_scale;} // apply current parameters
             else if(BEZIER_SPLINE<TV,3>* bezier_spline=dynamic_cast<BEZIER_SPLINE<TV,3>*>(structure)){
                 if(first_time) LOG::cout<<"object "<<i<<": bezier spline\n";
-                bezier_spline_objects(i)=new OPENGL_BEZIER_SPLINE_2D<T,3>(stream_type,*bezier_spline,color_map->Lookup(color_map_index--));
+                bezier_spline_objects(i)=new OPENGL_BEZIER_SPLINE_2D<T,3>(*bezier_spline,color_map->Lookup(color_map_index--));
                 bezier_spline_objects(i)->draw_velocities=draw_velocities;
                 bezier_spline_objects(i)->velocity_scale=velocity_scale;} // apply current parameters
             else if(B_SPLINE<TV,3>* b_spline=dynamic_cast<B_SPLINE<TV,3>*>(structure)){
                 if(first_time) LOG::cout<<"object "<<i<<": b-spline\n";
-                b_spline_objects(i)=new OPENGL_B_SPLINE_2D<T,3>(stream_type,*b_spline,color_map->Lookup(color_map_index--));
+                b_spline_objects(i)=new OPENGL_B_SPLINE_2D<T,3>(*b_spline,color_map->Lookup(color_map_index--));
                 b_spline_objects(i)->draw_velocities=draw_velocities;
                 b_spline_objects(i)->velocity_scale=velocity_scale;} // apply current parameters
             else if(TRIANGULATED_AREA<T>* triangulated_area=dynamic_cast<TRIANGULATED_AREA<T>*>(structure)){
                 if(first_time) LOG::cout<<"object "<<i<<": triangulated area\n";
                 triangulated_area->mesh.Initialize_Segment_Mesh(); // to enable segment selection
-                triangulated_area_objects(i)=new OPENGL_TRIANGULATED_AREA<T>(stream_type,*triangulated_area,true);}
+                triangulated_area_objects(i)=new OPENGL_TRIANGULATED_AREA<T>(*triangulated_area,true);}
             else PHYSBAM_FATAL_ERROR(LOG::sprintf("Weird object %d",i));}}
     for(int i=0;i<deformable_body_collection.structures.m;i++){
         std::string suffix=LOG::sprintf("_%d",i);
@@ -123,7 +123,7 @@ Reinitialize(bool force)
         if(File_Exists(frame_prefix+"stress_map_of_triangulated_area"+suffix)){
             if(first_time) LOG::cout<<"adding stress map to triangulated area"<<std::endl;
             ARRAY<OPENGL_COLOR > *color_map=new ARRAY<OPENGL_COLOR >;
-            Read_From_File(stream_type,frame_prefix+"stress_map_of_triangulated_area"+suffix,*color_map);
+            Read_From_File(frame_prefix+"stress_map_of_triangulated_area"+suffix,*color_map);
             triangulated_area_objects(i)->Set_Color_Map(color_map);}}
     frame_loaded=frame;
     valid=true;

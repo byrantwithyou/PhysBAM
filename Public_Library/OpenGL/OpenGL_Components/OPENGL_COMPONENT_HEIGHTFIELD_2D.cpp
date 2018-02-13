@@ -10,17 +10,17 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_HEIGHTFIELD_2D<T>::
-OPENGL_COMPONENT_HEIGHTFIELD_2D(STREAM_TYPE stream_type,const GRID<TV2> &grid_input, 
+OPENGL_COMPONENT_HEIGHTFIELD_2D(const GRID<TV2> &grid_input, 
                                 const std::string& height_filename_input,
                                 const std::string& xz_filename_input,
                                 const std::string& uv_filename_input,
                                 int m_start_input,int m_end_input,int n_start_input,int n_end_input)
-    :OPENGL_COMPONENT<T>(stream_type,"Heightfield 2D"), 
+    :OPENGL_COMPONENT<T>("Heightfield 2D"), 
     triangulated_surface(*TRIANGULATED_SURFACE<T>::Create()),
-    opengl_triangulated_surface(stream_type,triangulated_surface,false,OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Cyan())),
+    opengl_triangulated_surface(triangulated_surface,false,OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Cyan())),
     vertical_offset(0), allow_smooth_shading(true), subdivide_surface(false),
     initial_grid(grid_input), grid(grid_input), height(grid.Domain_Indices()), 
-    opengl_vector_field(stream_type,vector_field, vector_locations, OPENGL_COLOR::Green(), 0.025, true, false, true),
+    opengl_vector_field(vector_field, vector_locations, OPENGL_COLOR::Green(), 0.025, true, false, true),
     grid_filename(""), scale(1), displacement_scale(1), valid(false), draw_velocities(true), use_triangle_strip(false)
 {
     viewer_callbacks.Set("increase_scale",{[this](){Increase_Scale();},"Increase scale"});
@@ -183,28 +183,28 @@ Reinitialize(bool force)
             if(success && !grid_filename.empty()){
                 std::string filename=Get_Frame_Filename(grid_filename,frame);
                 if(File_Exists(filename)){
-                    Read_From_File(stream_type,filename,grid);
+                    Read_From_File(filename,grid);
                     PHYSBAM_ASSERT(grid.counts.x==initial_grid.counts.x && grid.counts.y==initial_grid.counts.y);}
                 else success=false;}
 
             if(success){
                 std::string filename=Get_Frame_Filename(height_filename,frame);
                 if(File_Exists(filename)){
-                    Read_From_File(stream_type,filename,height);
+                    Read_From_File(filename,height);
                     if(!height.Size().All_Greater_Equal(counts)) success = false;}
                 else success=false;}
 
             if(success && xz){
                 std::string filename=Get_Frame_Filename(xz_filename,frame);
                 if(File_Exists(filename)){
-                    Read_From_File(stream_type,filename,*xz);
+                    Read_From_File(filename,*xz);
                     if(!xz->Size().All_Greater_Equal(counts)) success = false;}
                 else success=false;}
 
             if(success && draw_velocities && uv_filename.length()){
                 std::string filename=Get_Frame_Filename(uv_filename,frame);
                 if(File_Exists(filename)){
-                    Read_From_File(stream_type,filename,*uv);
+                    Read_From_File(filename,*uv);
                     if(!uv->Size().All_Greater_Equal(counts))
                         success = false;
                     else{

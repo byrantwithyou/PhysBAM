@@ -222,7 +222,7 @@ Weights(ARRAY<T>& weights) const
 // Function Read_Helper
 //#####################################################################
 template<class TV> void RIGID_BODY_BINDING<TV>::
-Read_Helper(TYPED_ISTREAM& input)
+Read_Helper(TYPED_ISTREAM input)
 {
     BINDING<TV>::Read_Helper(input);Read_Binary(input,rigid_body_particles_index);Read_Binary(input,object_space_position);
 }
@@ -230,7 +230,7 @@ Read_Helper(TYPED_ISTREAM& input)
 // Function Write_Helper
 //#####################################################################
 template<class TV> void RIGID_BODY_BINDING<TV>::
-Write_Helper(TYPED_OSTREAM& output) const
+Write_Helper(TYPED_OSTREAM output) const
 {
     BINDING<TV>::Write_Helper(output);Write_Binary(output,rigid_body_particles_index);Write_Binary(output,object_space_position);
 }

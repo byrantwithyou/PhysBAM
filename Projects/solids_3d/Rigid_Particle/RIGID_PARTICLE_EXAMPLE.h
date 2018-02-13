@@ -71,7 +71,7 @@ virtual void Get_Initial_Data()
 
     // rigid bodies
     for(int i=0;i<3;i++){
-        solid_body_collection.rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/subdivided_box",(T)1.0);
+        solid_body_collection.rigid_body_collection.Add_Rigid_Body(data_directory+"/Rigid_Bodies/subdivided_box",(T)1.0);
         rigid_body_collection.rigid_body_particles.frame(i).t=TV((T)5*i+(T).5,initial_height,0);
         rigid_body_collection.rigid_body_particles.frame(i).r=ROTATION<TV>::From_Rotation_Vector(TV());
         rigid_body_collection.Rigid_Body(i).coefficient_of_friction=0;
@@ -83,7 +83,7 @@ virtual void Get_Initial_Data()
 
     segmented_curve.Update_Number_Nodes();
     if(use_ground){
-        ground_id=solid_body_collection.rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/ground",(T).045);
+        ground_id=solid_body_collection.rigid_body_collection.Add_Rigid_Body(data_directory+"/Rigid_Bodies/ground",(T).045);
         solid_body_collection.rigid_body_collection.Rigid_Body(ground_id).coefficient_of_friction=(T).2;
         solid_body_collection.rigid_body_collection.Rigid_Body(ground_id).Set_Coefficient_Of_Restitution((T).5);
         solid_body_collection.rigid_body_collection.Rigid_Body(ground_id).Is_Kinematic()=true;}

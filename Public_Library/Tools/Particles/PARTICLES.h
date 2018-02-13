@@ -146,9 +146,9 @@ public:
     {Append(source);source.Delete_All_Elements();}
 
 //#####################################################################
-    void Legacy_Read(TYPED_ISTREAM& input);
-    void Read(TYPED_ISTREAM& input);
-    void Write(TYPED_OSTREAM& output) const;
+    void Legacy_Read(TYPED_ISTREAM input);
+    void Read(TYPED_ISTREAM input);
+    void Write(TYPED_OSTREAM output) const;
     void Print(std::ostream& output,const int p) const;
     virtual void Clean_Memory();
     bool operator==(const PARTICLES& particles) const;

@@ -304,7 +304,7 @@ Delete_State(const int state_index)
 // Function Read_State
 //#####################################################################
 template<class TV> void RIGID_COLLISION_GEOMETRY_BASE<TV>::
-Read_State(TYPED_ISTREAM& input,const int state_index)
+Read_State(TYPED_ISTREAM input,const int state_index)
 {
     if(saved_states.m<=state_index) saved_states.Resize(state_index+1);
     Read_Binary(input,saved_states(state_index));
@@ -313,7 +313,7 @@ Read_State(TYPED_ISTREAM& input,const int state_index)
 // Function Write_State
 //#####################################################################
 template<class TV> void RIGID_COLLISION_GEOMETRY_BASE<TV>::
-Write_State(TYPED_OSTREAM& output,const int state_index) const
+Write_State(TYPED_OSTREAM output,const int state_index) const
 {
     Write_Binary(output,saved_states(state_index));
 }

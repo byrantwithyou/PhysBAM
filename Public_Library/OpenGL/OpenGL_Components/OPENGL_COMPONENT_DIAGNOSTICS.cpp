@@ -10,8 +10,8 @@ using namespace PhysBAM;
 // OPENGL_COMPONENT_DIAGNOSTICS
 //#####################################################################
 template<class T> OPENGL_COMPONENT_DIAGNOSTICS<T>::
-OPENGL_COMPONENT_DIAGNOSTICS(STREAM_TYPE stream_type,const std::string& filename_input)
-    :OPENGL_COMPONENT<T>(stream_type),filename(filename_input),frame_loaded(INT_MIN),valid(false)
+OPENGL_COMPONENT_DIAGNOSTICS(const std::string& filename_input)
+    :filename(filename_input),frame_loaded(INT_MIN),valid(false)
 {
 }
 //#####################################################################
@@ -59,9 +59,12 @@ Reinitialize()
             valid=false;
             std::string tmp_filename = Get_Frame_Filename(filename, frame);
             if(File_Exists(tmp_filename)){
-                std::istream* input=Safe_Open_Input(tmp_filename,false);
-                std::string line;while(std::getline(*input,line)) lines.Append(line);
-                delete input;frame_loaded=frame;valid=true;}}}
+                std::istream* input=Safe_Open_Input_Raw(tmp_filename,false);
+                std::string line;
+                while(std::getline(*input,line)) lines.Append(line);
+                delete input;
+                frame_loaded=frame;
+                valid=true;}}}
 }
 //#####################################################################
 // Use_Bounding_Box

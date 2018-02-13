@@ -286,7 +286,7 @@ Print_Energy(const T time,const int step) const
 // Function Read
 //#####################################################################
 template<class TV> void SOLID_BODY_COLLECTION<TV>::
-Read(const STREAM_TYPE stream_type,const std::string& prefix,const int frame,const int static_frame,const bool include_static_variables,const bool read_rigid_body,const bool read_deformable_body,const bool read_from_every_process,ARRAY<int>* needs_init,ARRAY<int>* needs_destroy)
+Read(const std::string& prefix,const int frame,const int static_frame,const bool include_static_variables,const bool read_rigid_body,const bool read_deformable_body,const bool read_from_every_process,ARRAY<int>* needs_init,ARRAY<int>* needs_destroy)
 {
     std::string local_prefix=prefix;
     if(deformable_body_collection.mpi_solids && deformable_body_collection.mpi_solids->rank && !read_from_every_process){ // modify prefix to always read from the root's output
@@ -295,9 +295,9 @@ Read(const STREAM_TYPE stream_type,const std::string& prefix,const int frame,con
         PHYSBAM_ASSERT(prefix.substr(position)==old_suffix);
         local_prefix.replace(position,std::string::npos,new_suffix);}
     if(read_deformable_body){
-        deformable_body_collection.Read(stream_type,local_prefix,local_prefix,frame,static_frame,include_static_variables,read_from_every_process);}
+        deformable_body_collection.Read(local_prefix,local_prefix,frame,static_frame,include_static_variables,read_from_every_process);}
     if(read_rigid_body){
-        rigid_body_collection.Read(stream_type,local_prefix,frame,needs_init,needs_destroy);}
+        rigid_body_collection.Read(local_prefix,frame,needs_init,needs_destroy);}
 }
 //#####################################################################
 // Function Write

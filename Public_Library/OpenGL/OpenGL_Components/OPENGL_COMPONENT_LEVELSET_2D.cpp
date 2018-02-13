@@ -13,8 +13,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_LEVELSET_2D<T>::
-OPENGL_COMPONENT_LEVELSET_2D(STREAM_TYPE stream_type,const std::string& levelset_filename_input,const std::string filename_set_input)
-    :OPENGL_COMPONENT<T>(stream_type,"Levelset 2D"),opengl_levelset(0),levelset_filename(levelset_filename_input),filename_set(filename_set_input),
+OPENGL_COMPONENT_LEVELSET_2D(const std::string& levelset_filename_input,const std::string filename_set_input)
+    :OPENGL_COMPONENT<T>("Levelset 2D"),opengl_levelset(0),levelset_filename(levelset_filename_input),filename_set(filename_set_input),
     frame_loaded(-1),set(0),use_sets(true),set_loaded(-1),valid(false),draw_multiple_levelsets(false)
 {
     viewer_callbacks.Set("toggle_color_mode",{[this](){Toggle_Color_Mode();},"Toggle color mode"});
@@ -38,7 +38,7 @@ OPENGL_COMPONENT_LEVELSET_2D(STREAM_TYPE stream_type,const std::string& levelset
     opengl_levelsets.Resize(number_of_sets);
     OPENGL_INDEXED_COLOR_MAP* color_map=OPENGL_INDEXED_COLOR_MAP::Levelset_Multiple_Color_Map();
     for(int j=0;j<opengl_levelsets.m;j++)
-        opengl_levelsets(j)=new OPENGL_LEVELSET_2D<T>(stream_type,*(new LEVELSET<TV>(*(new GRID<TV>),*(new ARRAY<T,VECTOR<int,2> >))),color_map->Lookup(j),OPENGL_COLOR::Transparent());
+        opengl_levelsets(j)=new OPENGL_LEVELSET_2D<T>(*(new LEVELSET<TV>(*(new GRID<TV>),*(new ARRAY<T,VECTOR<int,2> >))),color_map->Lookup(j),OPENGL_COLOR::Transparent());
     opengl_levelset=opengl_levelsets(0);
     delete color_map;
 
@@ -145,12 +145,12 @@ Reinitialize(const bool force_even_if_not_drawn)
             if(use_sets)
                 for(int i=0;i<opengl_levelsets.m;i++){
                     filename=LOG::sprintf(filename_set.c_str(),frame,i);
-                    if(File_Exists(filename)) Read_From_File(stream_type,filename.c_str(),opengl_levelsets(i)->levelset);
+                    if(File_Exists(filename)) Read_From_File(filename.c_str(),opengl_levelsets(i)->levelset);
                     else return;
                     opengl_levelsets(i)->Update();}
             else{
                 filename=Get_Frame_Filename(levelset_filename,frame);
-                if(File_Exists(filename)) Read_From_File(stream_type,filename.c_str(),opengl_levelset->levelset);
+                if(File_Exists(filename)) Read_From_File(filename.c_str(),opengl_levelset->levelset);
                 else return;
                 opengl_levelset->Update();}
             frame_loaded=frame;set_loaded=set;valid=true;}}

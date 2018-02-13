@@ -57,7 +57,7 @@ static int Depth(int triangle_id,const RANGE<VECTOR<T,3> >& box,void* data)
     return helper.default_depth;
 }
 
-template<class T,class RW> void Convert(int boundary_cells,PARSE_ARGS &parse_args)
+template<class T> void Convert(int boundary_cells,PARSE_ARGS &parse_args)
 {
     typedef VECTOR<T,3> TV;
 
@@ -96,7 +96,8 @@ template<class T,class RW> void Convert(int boundary_cells,PARSE_ARGS &parse_arg
 
     parse_args.Parse();
 
-    TRIANGULATED_SURFACE<T>* triangulated_surface=0;Create_From_File<RW>(input_filename,triangulated_surface);
+    TRIANGULATED_SURFACE<T>* triangulated_surface=0;
+    Create_From_File(input_filename,triangulated_surface);
     triangulated_surface->Update_Bounding_Box();
     RANGE<TV> box=*triangulated_surface->bounding_box;
 
@@ -118,7 +119,7 @@ template<class T,class RW> void Convert(int boundary_cells,PARSE_ARGS &parse_arg
         grid=Make_Cube_Grid(original_grid,boundary_cells,use_octree,mac);}
 
     if(!exact_grid.empty()){
-        Read_From_File<RW>(exact_grid,grid);
+        Read_From_File(exact_grid,grid);
         LOG::cout<<"reading grid from "<<exact_grid<<std::endl;}
 
     if(output_filename.empty()){
@@ -172,14 +173,14 @@ template<class T,class RW> void Convert(int boundary_cells,PARSE_ARGS &parse_arg
             levelset_maker.Compute_Level_Set(*triangulated_surface,grid,phi);
             LEVELSET_IMPLICIT_OBJECT<TV> levelset_implicit_surface(grid,phi);
             //phi+=(T)1*grid.dX.Max();
-        Write_To_File<RW>(output_filename,levelset_implicit_surface);}
+        Write_To_File<T>(output_filename,levelset_implicit_surface);}
 }
 
 int main(int argc,char *argv[])
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
 
-    bool type_double=false,compute_using_doubles=false;
+    bool type_double=false;
     VECTOR<double,3> grid_size(50,50,50);
     int boundary_cells=3;
     std::string input_filename;
@@ -188,14 +189,9 @@ int main(int argc,char *argv[])
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add("-b",&boundary_cells,"boundary cells","number of cells outside bounding box");
-    parse_args.Add("-compute_using_doubles",&compute_using_doubles,"perform computations using doubles");
     parse_args.Extra(&input_filename,"filename","input file");
     parse_args.Parse(true);
 
-    if(!type_double){
-        if(compute_using_doubles){
-            std::cout<<"COMPUTING USING DOUBLES!"<<std::endl;
-            Convert<double,float>(boundary_cells,parse_args);
-        }else{Convert<float,float>(boundary_cells,parse_args);}}
-    else Convert<double,double>(boundary_cells,parse_args);
+    if(!type_double) Convert<float>(boundary_cells,parse_args);
+    else Convert<double>(boundary_cells,parse_args);
 }

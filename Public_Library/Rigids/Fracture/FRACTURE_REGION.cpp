@@ -186,7 +186,7 @@ Compute_Inertial_Properties(const T density,TV& com,T& mass,SYMMETRIC_MATRIX<T,T
     inertia=cell_mass*((moments.Trace()+num_inside*sqr(implicit_object->levelset.grid.dX.x)/6)-moments);
 }
 template<class T> void FRACTURE_REGION<T>::
-Read(TYPED_ISTREAM& input)
+Read(TYPED_ISTREAM input)
 {
     Read_Binary(input,fracture_offset);
     triangulated_surface=new TRIANGULATED_SURFACE<T>(*new TRIANGLE_MESH(),*new GEOMETRY_PARTICLES<TV>());
@@ -195,7 +195,7 @@ Read(TYPED_ISTREAM& input)
     Read_Binary(input,*implicit_object);
 }
 template<class T> void FRACTURE_REGION<T>::
-Write(TYPED_OSTREAM& output) const
+Write(TYPED_OSTREAM output) const
 {
     Write_Binary(output,fracture_offset);
     Write_Binary(output,*triangulated_surface);

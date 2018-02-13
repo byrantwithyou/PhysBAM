@@ -181,7 +181,7 @@ TETRAHEDRALIZED_VOLUME<T>& Create_Deformable_Mattress()
 void Create_SCA_Stamp()
 {
     // SCA2007 rigid body
-    int id=solid_body_collection.rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Triangulated_Surfaces/sca2007",3.5,true,true);
+    int id=solid_body_collection.rigid_body_collection.Add_Rigid_Body(data_directory+"/Triangulated_Surfaces/sca2007",3.5,true,true);
     RIGID_BODY<TV>& sca=solid_body_collection.rigid_body_collection.Rigid_Body(id);sca.coefficient_of_friction=0;
     // base
     RIGID_BODY<TV>& base=tests.Add_Rigid_Body("plank",base_scale,0);

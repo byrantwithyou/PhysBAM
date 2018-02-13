@@ -22,11 +22,10 @@ private:
     bool valid;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_COMPONENT<T>::stream_type;
     OPENGL_LEVELSET_1D<T>* opengl_levelset;
 
 //##################################################################### 
-    OPENGL_COMPONENT_LEVELSET_1D(STREAM_TYPE stream_type,GRID<TV> &grid,const std::string& levelset_filename_input,OPENGL_COLOR point_color,OPENGL_COLOR line_color);
+    OPENGL_COMPONENT_LEVELSET_1D(GRID<TV> &grid,const std::string& levelset_filename_input,OPENGL_COLOR point_color,OPENGL_COLOR line_color);
     virtual ~OPENGL_COMPONENT_LEVELSET_1D();
     bool Valid_Frame(int frame_input) const override;
     void Set_Frame(int frame_input) override;

@@ -776,7 +776,7 @@ void Initialize_Bodies() override
             break;}
         case 5:{
             //std::string rigid_directory=data_directory+"/Rigid_Bodies"+(TV::m==3?"":"_2D");
-            //int id=solid_body_collection.rigid_body_collection.Add_Rigid_Body(stream_type,rigid_directory+"/box",(T).4,true,true,false,false);
+            //int id=solid_body_collection.rigid_body_collection.Add_Rigid_Body(rigid_directory+"/box",(T).4,true,true,false,false);
             //RIGID_BODY<TV>& rigid_body_square=solid_body_collection.rigid_body_collection.Rigid_Body(id);
             RIGID_BODY<TV>& rigid_body_square=solids_tests.Add_Rigid_Body("box",(T).4,(T)0);
             rigid_body_square.Frame()=FRAME<TV>(TV((T).4,(T)1.4,(T).4));

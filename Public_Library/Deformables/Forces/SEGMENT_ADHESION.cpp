@@ -291,7 +291,7 @@ Update_Partitions(bool restart,MPI_SOLIDS<TV>* mpi_solids,const std::string outp
 
     // Cull hairs that are close at beginning
     if(restart){
-        Read_From_File<float>(output_directory+"/adhesion_existing",existing_pairs); // TODO: use real output_directory
+        Read_From_File(output_directory+"/adhesion_existing",existing_pairs); // TODO: use real output_directory
         restart=false;}
     else{
         Update_Hierarchy();
@@ -387,9 +387,9 @@ Write_State(STREAM_TYPE stream_type,const std::string& filename)
 // Function Write_To_File
 //#####################################################################
 template<class TV> void SEGMENT_ADHESION<TV>::
-Read_State(STREAM_TYPE stream_type,const std::string& filename)
+Read_State(const std::string& filename)
 {
-    Read_From_File(stream_type,filename,*springs);
+    Read_From_File(filename,*springs);
     LOG::cout<<"READING: Number of springs: "<<springs->Size()<<std::endl;
 }
 //#####################################################################

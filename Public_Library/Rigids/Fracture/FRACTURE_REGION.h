@@ -47,8 +47,8 @@ public:
     ARRAY<FRACTURE_REGION<T>*> Intersect_With_Rigid_Body(const FRACTURE_REGION<T>& body,const bool use_particle_optimization,const bool tessellate_region=false);
     T Compute_Volume() const;
     void Compute_Inertial_Properties(const T density,TV& com,T& mass,SYMMETRIC_MATRIX<T,TV::SPIN::m>& inertia) const; 
-    void Read(TYPED_ISTREAM& input);
-    void Write(TYPED_OSTREAM& output) const;
+    void Read(TYPED_ISTREAM input);
+    void Write(TYPED_OSTREAM output) const;
     void Initialize_Particle_Partition();
 //#####################################################################
 };

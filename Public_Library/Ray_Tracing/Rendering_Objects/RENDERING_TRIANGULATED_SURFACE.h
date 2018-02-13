@@ -67,7 +67,6 @@ public:
     void Get_World_Space_Tangent_And_Bitangent(const TV& world_space_point,const TV& world_space_normal,
         const int aggregate,TV& world_tangent,TV& world_bitangent) const override;
     void Compute_Per_Vertex_Tangent_Vectors();
-    template<class RW>
     void Read_Texture_Coordinates(const std::string& filename);
     void Rescale_Texture_Coordinates(T scale);
     void Initialize_Bump_Map(const std::string& filename);

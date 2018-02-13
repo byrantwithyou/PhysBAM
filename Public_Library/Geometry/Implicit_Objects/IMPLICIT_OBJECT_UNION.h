@@ -77,8 +77,8 @@ public:
     T Integration_Step(const T phi) const override;
     T Minimum_Cell_Size() const override;
     int Active_Levelset(const TV& X) const;
-    void Read(TYPED_ISTREAM& input) override;
-    void Write(TYPED_OSTREAM& output) const override;
+    void Read(TYPED_ISTREAM input) override;
+    void Write(TYPED_OSTREAM output) const override;
 //#####################################################################
 };
 template<class TV,class ...Args>

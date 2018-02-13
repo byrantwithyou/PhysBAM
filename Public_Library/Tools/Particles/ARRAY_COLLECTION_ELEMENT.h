@@ -78,10 +78,10 @@ public:
     virtual const char* Type_Name() const override
     {return typeid(ARRAY_COLLECTION_ELEMENT<T>).name();}
 
-    virtual void Read(TYPED_ISTREAM& input) override
+    virtual void Read(TYPED_ISTREAM input) override
     {Read_Binary(input,*array);}
 
-    virtual void Write(TYPED_OSTREAM& output) const override
+    virtual void Write(TYPED_OSTREAM output) const override
     {Write_Binary(output,*array);}
 
     virtual void Print(std::ostream& output,const int p) const override

@@ -80,7 +80,7 @@ Read_Time(const int frame)
     std::string filename=LOG::sprintf("%s/%d/time",example.output_directory.c_str(),frame);
     if(File_Exists(filename)){
         T corrected_time;
-        Read_From_File(example.stream_type,filename,corrected_time);
+        Read_From_File(filename,corrected_time);
         if(abs(time-corrected_time)>(T)1e-4*abs(time)){ // only adjust time if significantly different from default in order to get deterministic restarts
             time=corrected_time;
             // adjust initial time so that Simulate_To_Frame() returns correct time (essential when writing substeps)

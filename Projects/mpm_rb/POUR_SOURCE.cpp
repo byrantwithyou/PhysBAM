@@ -70,7 +70,7 @@ template<class TV> void POUR_SOURCE<TV>::
 Read_Output_Files(const int frame)
 {
     std::string file=LOG::sprintf("%s/%d/%s",example.output_directory.c_str(),frame,output_file.c_str());
-    Read_From_File(example.stream_type,file,waiting_particles,buffer_left,cur_time,waiting_particle_color,next_color,random);
+    Read_From_File(file,waiting_particles,buffer_left,cur_time,waiting_particle_color,next_color,random);
 }
 //#####################################################################
 // Function Begin_Time_Step

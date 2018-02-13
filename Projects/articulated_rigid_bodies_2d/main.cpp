@@ -29,7 +29,7 @@ int main(int argc,char** argv)
     parse_args.Add("-arb",&opt_arb,"Use arb test");
     parse_args.Parse(true);
 
-    if(opt_arb) example=new ARB_EXAMPLE<float,float>(stream_type,parse_args);
+    if(opt_arb) example=new ARB_EXAMPLE<float>(stream_type,parse_args);
     else example=new STANDARD_TESTS<T>(stream_type,parse_args);
     example->After_Construction();
 

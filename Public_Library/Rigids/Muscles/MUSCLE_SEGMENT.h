@@ -46,8 +46,8 @@ public:
     virtual void Set_Current_Activation(const T activation);
     virtual void Update_Parameters();
     virtual void Initialize();
-    virtual void Read_And_Set_Parameters(TYPED_ISTREAM& input);
-    virtual void Write_Parameters(TYPED_OSTREAM& output) const;
+    virtual void Read_And_Set_Parameters(TYPED_ISTREAM input);
+    virtual void Write_Parameters(TYPED_OSTREAM output) const;
     virtual std::string Name() const {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();return Static_Name();}
     virtual std::string Extension() const {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();return Static_Extension();}
     static std::string Static_Name();
@@ -56,9 +56,9 @@ public:
     virtual TV World_Space_Position(const TV& normalized_local_space_position);
     virtual TV Get_Current_World_Space_Position(const TV& normalized_local_space_point);
     static MUSCLE_SEGMENT* Create();
-    void Write(TYPED_OSTREAM& output) const;
+    void Write(TYPED_OSTREAM output) const;
     void Update_Frame();
-    static MUSCLE_SEGMENT* Create_From_Input(TYPED_ISTREAM& input);
+    static MUSCLE_SEGMENT* Create_From_Input(TYPED_ISTREAM input);
 //#####################################################################
 };
 }

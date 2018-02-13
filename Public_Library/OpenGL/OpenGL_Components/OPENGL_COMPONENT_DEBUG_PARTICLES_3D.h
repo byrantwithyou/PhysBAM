@@ -23,11 +23,11 @@ public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
     using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
     using OPENGL_COMPONENT<T>::Slice_Has_Changed;using OPENGL_COMPONENT<T>::World_Space_Box;
-    using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
+    using OPENGL_OBJECT<T>::viewer_callbacks;
     using OPENGL_COMPONENT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::Set_Slice;
     enum SELECTION_TYPE {select_none=0,select_particle=1,select_object=2,select_text=3};
 
-    OPENGL_COMPONENT_DEBUG_PARTICLES_3D(STREAM_TYPE stream_type,const std::string &filename);
+    OPENGL_COMPONENT_DEBUG_PARTICLES_3D(const std::string &filename);
     virtual ~OPENGL_COMPONENT_DEBUG_PARTICLES_3D();
 
     bool Valid_Frame(int frame_input) const override;

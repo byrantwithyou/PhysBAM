@@ -77,11 +77,11 @@ public:
     void Delete_State(const int state_index) override
     {delete saved_states(state_index).x;saved_states(state_index).x=0;}
 
-    void Read_State(TYPED_ISTREAM& input,const int state_index) override
+    void Read_State(TYPED_ISTREAM input,const int state_index) override
     {if(saved_states.m<=state_index) saved_states.Resize(state_index+1);
     Read_Binary(input,saved_states(state_index));}
 
-    void Write_State(TYPED_OSTREAM& output,const int state_index) const override
+    void Write_State(TYPED_OSTREAM output,const int state_index) const override
     {Write_Binary(output,saved_states(state_index));}
 
 private:

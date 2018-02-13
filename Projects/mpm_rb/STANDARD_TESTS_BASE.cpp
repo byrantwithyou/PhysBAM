@@ -660,7 +660,7 @@ Write_Output_Files(const int frame)
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Read_Output_Files(const int frame)
 {
-    Read_From_File(stream_type,LOG::sprintf("%s/%d/random_number",output_directory.c_str(),frame),random);
+    Read_From_File(LOG::sprintf("%s/%d/random_number",output_directory.c_str(),frame),random);
     BASE::Read_Output_Files(frame);
 }
 template class STANDARD_TESTS_BASE<VECTOR<float,2> >;

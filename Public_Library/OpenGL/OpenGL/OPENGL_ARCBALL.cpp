@@ -12,7 +12,7 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class T> OPENGL_ARCBALL<T>::
-OPENGL_ARCBALL(STREAM_TYPE stream_type,OPENGL_WORLD<T>& opengl_world_input)
+OPENGL_ARCBALL(OPENGL_WORLD<T>& opengl_world_input)
     :opengl_world(opengl_world_input),dragging(false),rotation_axis(-1)
 {
     x_axis=OPENGL_COLOR::Red();

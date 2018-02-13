@@ -16,10 +16,10 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T>::
-OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV> &grid, const std::string &velocity_filename)
-    :OPENGL_COMPONENT<T>(stream_type,"MAC Velocity Field"),
-    opengl_mac_velocity_field(stream_type,*new GRID<TV>(grid)),
-     opengl_vorticity_magnitude(stream_type,opengl_mac_velocity_field.grid,opengl_vorticity_magnitude_array,OPENGL_COLOR_RAMP<T>::Matlab_Jet(0,1)),
+OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D(const GRID<TV> &grid, const std::string &velocity_filename)
+    :OPENGL_COMPONENT<T>("MAC Velocity Field"),
+    opengl_mac_velocity_field(*new GRID<TV>(grid)),
+     opengl_vorticity_magnitude(opengl_mac_velocity_field.grid,opengl_vorticity_magnitude_array,OPENGL_COLOR_RAMP<T>::Matlab_Jet(0,1)),
     draw_vorticity(false),selected_index(-1,-1,-1),velocity_filename(velocity_filename),valid(false),min_vorticity(FLT_MAX),max_vorticity(FLT_MIN)
 {
     viewer_callbacks.Set("toggle_velocity_mode",{[this](){Toggle_Velocity_Mode();},"Toggle velocity mode"});
@@ -103,7 +103,7 @@ Reinitialize()
 
             std::string tmp_filename = Get_Frame_Filename(velocity_filename, frame);
             if(File_Exists(tmp_filename))
-                Read_From_File(stream_type,tmp_filename,opengl_mac_velocity_field.face_velocities);//u,opengl_mac_velocity_field.v,opengl_mac_velocity_field.w);
+                Read_From_File(tmp_filename,opengl_mac_velocity_field.face_velocities);//u,opengl_mac_velocity_field.v,opengl_mac_velocity_field.w);
             else
                 return;
 

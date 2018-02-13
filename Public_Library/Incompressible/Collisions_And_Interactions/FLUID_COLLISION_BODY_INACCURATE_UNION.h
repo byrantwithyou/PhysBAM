@@ -114,8 +114,8 @@ public:
     void Update_Intersection_Acceleration_Structures(const bool use_swept_simplex_hierarchy,const int state1=0,const int state2=0) override;
     void Save_State(const int state_index,const T time=0) override;
     void Restore_State(const int state_index) override;
-    void Read_State(TYPED_ISTREAM& input,const int state_index) override;
-    void Write_State(TYPED_OSTREAM& output,const int state_index) const override;
+    void Read_State(TYPED_ISTREAM input,const int state_index) override;
+    void Write_State(TYPED_OSTREAM output,const int state_index) const override;
     typename TV::SCALAR Implicit_Geometry_Extended_Value(const TV& location) const override;
     void Initialize_Grid_Structures();
 private:

@@ -110,16 +110,16 @@ Add_Rigid_Body_And_Geometry(RIGID_BODY<TV>* rigid_body)
 // Function Add_Rigid_Body
 //#####################################################################
 template<class TV> int RIGID_BODY_COLLECTION<TV>::
-Add_Rigid_Body(const STREAM_TYPE stream_type,const std::string& basename,const T scaling_factor,const bool read_simplicial_boundary,const bool read_implicit_object,
+Add_Rigid_Body(const std::string& basename,const T scaling_factor,const bool read_simplicial_boundary,const bool read_implicit_object,
     const bool read_simplicial_interior,const bool read_rgd_file)
 {
-    return Add_Rigid_Body(stream_type,false,basename,scaling_factor,read_simplicial_boundary,read_implicit_object,read_simplicial_interior,read_rgd_file);
+    return Add_Rigid_Body(false,basename,scaling_factor,read_simplicial_boundary,read_implicit_object,read_simplicial_interior,read_rgd_file);
 }
 //#####################################################################
 // Function Add_Rigid_Body
 //#####################################################################
 template<class TV> int RIGID_BODY_COLLECTION<TV>::
-Add_Rigid_Body(const STREAM_TYPE stream_type,const bool thin_shell,const std::string& basename,const T scaling_factor,const bool read_simplicial_boundary,const bool read_implicit_object,
+Add_Rigid_Body(const bool thin_shell,const std::string& basename,const T scaling_factor,const bool read_simplicial_boundary,const bool read_implicit_object,
     const bool read_simplicial_interior,const bool read_rgd_file)
 {
     RIGID_BODY<TV>* rigid_body=new RIGID_BODY<TV>(*this,true);
@@ -128,19 +128,19 @@ Add_Rigid_Body(const STREAM_TYPE stream_type,const bool thin_shell,const std::st
     // rigid body
     std::string rgd=TV::m==2?"rgd2d":"rgd";
     if(read_rgd_file){
-        try{Read_From_File(stream_type,basename+"."+rgd,rigid_body->Mass(),rigid_body->Inertia_Tensor(),rigid_body->Frame());}
+        try{Read_From_File(basename+"."+rgd,rigid_body->Mass(),rigid_body->Inertia_Tensor(),rigid_body->Frame());}
         catch(FILESYSTEM_ERROR&){LOG::cout<<"Note: No "<<rgd<<" file for "<<basename<<" (using default values)"<<std::endl;}}
     if(scaling_factor!=1) rigid_body->Rescale(scaling_factor);
     rigid_body->Update_Angular_Velocity();
 
-    int id=Add_Rigid_Body(rigid_body,stream_type,basename,scaling_factor,read_simplicial_boundary,read_implicit_object,read_simplicial_interior,read_rgd_file);
+    int id=Add_Rigid_Body(rigid_body,basename,scaling_factor,read_simplicial_boundary,read_implicit_object,read_simplicial_interior,read_rgd_file);
     return id;
 }
 //#####################################################################
 // Function Add_Rigid_Body
 //#####################################################################
 template<class TV> int RIGID_BODY_COLLECTION<TV>::
-Add_Rigid_Body(RIGID_BODY<TV>* rigid_body,STREAM_TYPE stream_type,const std::string& basename,const T scaling_factor,
+Add_Rigid_Body(RIGID_BODY<TV>* rigid_body,const std::string& basename,const T scaling_factor,
     const bool read_simplicial_boundary,const bool read_implicit_object,const bool read_simplicial_interior,const bool read_rgd_file)
 {
     int id=rigid_body->particle_index;
@@ -149,19 +149,19 @@ Add_Rigid_Body(RIGID_BODY<TV>* rigid_body,STREAM_TYPE stream_type,const std::str
     ARRAY<int> structure_ids;
     TV structure_center=rigid_body_particles.frame(id).t;
     if(TV::m==2){
-        if(read_simplicial_boundary && !Find_Or_Read_Structure(stream_type,structure_ids,basename+".curve2d",scaling_factor,structure_center))
+        if(read_simplicial_boundary && !Find_Or_Read_Structure(structure_ids,basename+".curve2d",scaling_factor,structure_center))
             LOG::cout<<"Note: No curve2d file for "<<basename<<std::endl;
-        if(read_implicit_object && !Find_Or_Read_Structure(stream_type,structure_ids,basename+".phi2d",scaling_factor,structure_center))
+        if(read_implicit_object && !Find_Or_Read_Structure(structure_ids,basename+".phi2d",scaling_factor,structure_center))
             LOG::cout<<"Note: No phi2d file for "<<basename<<std::endl;
-        if(read_simplicial_interior && !Find_Or_Read_Structure(stream_type,structure_ids,basename+".tri2d",scaling_factor,structure_center))
+        if(read_simplicial_interior && !Find_Or_Read_Structure(structure_ids,basename+".tri2d",scaling_factor,structure_center))
             LOG::cout<<"Note: No tri2d file for "<<basename<<std::endl;}
     else{
-        if(read_simplicial_boundary && !Find_Or_Read_Structure(stream_type,structure_ids,basename+".tri",scaling_factor,structure_center))
+        if(read_simplicial_boundary && !Find_Or_Read_Structure(structure_ids,basename+".tri",scaling_factor,structure_center))
             LOG::cout<<"Note: No tri file for "<<basename<<std::endl;
-        if(read_implicit_object && !Find_Or_Read_Structure(stream_type,structure_ids,basename+".phi",scaling_factor,structure_center) && 
-            !Find_Or_Read_Structure(stream_type,structure_ids,basename+".oct",scaling_factor,structure_center))
+        if(read_implicit_object && !Find_Or_Read_Structure(structure_ids,basename+".phi",scaling_factor,structure_center) && 
+            !Find_Or_Read_Structure(structure_ids,basename+".oct",scaling_factor,structure_center))
             LOG::cout<<"Note: No phi or oct file for "<<basename<<std::endl;
-        if(read_simplicial_interior && !Find_Or_Read_Structure(stream_type,structure_ids,basename+".tet",scaling_factor,structure_center))
+        if(read_simplicial_interior && !Find_Or_Read_Structure(structure_ids,basename+".tet",scaling_factor,structure_center))
             LOG::cout<<"Note: No tet file for "<<basename<<std::endl;}
     assert(structure_ids.m<=3);
     rigid_body_particles.structure_ids(id)=VECTOR<int,3>(-1,-1,-1);
@@ -374,7 +374,7 @@ Wrap_Structure_Helper(STRUCTURE<TV>*& structure,const TV& center)
 // Function Find_Or_Read_Structure
 //#####################################################################
 template<class TV> bool RIGID_BODY_COLLECTION<TV>::
-Find_Or_Read_Structure(const STREAM_TYPE stream_type,ARRAY<int>& structure_ids,const std::string& filename,const T scaling_factor,const TV& center)
+Find_Or_Read_Structure(ARRAY<int>& structure_ids,const std::string& filename,const T scaling_factor,const TV& center)
 {
     int id;
     if(!File_Exists(filename)) return false;
@@ -383,10 +383,7 @@ Find_Or_Read_Structure(const STREAM_TYPE stream_type,ARRAY<int>& structure_ids,c
         if(!structure_list.Is_Active(id)) PHYSBAM_FATAL_ERROR();} // // only works if the referenced geometry is still in memory
     else{ // read in for the first time
         STRUCTURE<TV>* structure=0;
-        if(!stream_type.use_doubles)
-            structure=STRUCTURE<TV>::template Create_From_File<float>(filename);
-        else
-            structure=STRUCTURE<TV>::template Create_From_File<double>(filename);
+        structure=STRUCTURE<TV>::Create_From_File(filename);
         if(scaling_factor!=1){
             Wrap_Structure_Helper(structure,center);
             structure->Rescale(scaling_factor);}
@@ -429,13 +426,12 @@ Update_Level_Set_Transforms()
 // Function Read
 //#####################################################################
 template<class TV> void RIGID_BODY_COLLECTION<TV>::
-Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,ARRAY<int>* needs_init,ARRAY<int>* needs_destroy)
+Read(const std::string& directory,const int frame,ARRAY<int>* needs_init,ARRAY<int>* needs_destroy)
 {
-    if(stream_type.use_doubles) structure_list.template Read<double>(directory,"rigid_body_structure_",frame);
-    else structure_list.template Read<float>(directory,"rigid_body_structure_",frame);
+    structure_list.Read(directory,"rigid_body_structure_",frame);
     ARRAY<RIGID_BODY<TV>*> bodies(rigid_body_particles.rigid_body);
     rigid_body_particles.rigid_body.Fill(0);
-    Read_From_File(stream_type,LOG::sprintf("%s/%d/rigid_body_particles",directory.c_str(),frame),rigid_body_particles);
+    Read_From_File(LOG::sprintf("%s/%d/rigid_body_particles",directory.c_str(),frame),rigid_body_particles);
     while(rigid_body_particles.rigid_body.m<bodies.m) delete bodies.Pop();
     rigid_body_particles.rigid_body.Prefix(bodies.m)=bodies;
 
@@ -446,10 +442,10 @@ Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,
     std::string active_list_name=LOG::sprintf("%s/common/rigid_body_active_ids_list",directory.c_str(),frame);
     std::string active_name=LOG::sprintf("%s/%d/rigid_body_active_ids",directory.c_str(),frame);
     if(File_Exists(active_list_name)){
-        if(!frame_list_active){frame_list_active=new ARRAY<int>;Read_From_File(stream_type,active_list_name,*frame_list_active);}
+        if(!frame_list_active){frame_list_active=new ARRAY<int>;Read_From_File(active_list_name,*frame_list_active);}
         local_frame=(*frame_list_active)(frame_list_active->Binary_Search(frame));}
     if(last_read_active!=local_frame && File_Exists(active_name)){
-        Read_From_File(stream_type,active_name,version,next_id,active_ids);
+        Read_From_File(active_name,version,next_id,active_ids);
         last_read_active=local_frame;PHYSBAM_ASSERT(version==1);
         if(needs_destroy) for(int i=next_id;i<rigid_body_particles.Size();i++) if(!rigid_body_particles.rigid_body(i)) needs_destroy->Append(i);
         rigid_body_particles.Resize(next_id);}
@@ -461,15 +457,17 @@ Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,
         std::string key_file=LOG::sprintf("%s/%d/rigid_body_key",directory.c_str(),frame);
         char version;
         if(File_Exists(key_file_list)){
-            if(!frame_list_key){frame_list_key=new ARRAY<int>;Read_From_File(stream_type,key_file_list,*frame_list_key);}
+            if(!frame_list_key){frame_list_key=new ARRAY<int>;Read_From_File(key_file_list,*frame_list_key);}
             local_frame=(*frame_list_key)(frame_list_key->Binary_Search(frame));}
         if(last_read_key!=local_frame && File_Exists(key_file)){
-            Read_From_File(stream_type,key_file,version,rigid_body_particles.structure_ids);
+            Read_From_File(key_file,version,rigid_body_particles.structure_ids);
             last_read_active=local_frame;PHYSBAM_ASSERT(version==2 || version==3);}
 
         try{
-            std::istream* input=Safe_Open_Input(directory+"/common/rigid_body_names",false);
-            int num;*input>>num;input->ignore(INT_MAX,'\n');
+            std::istream* input=Safe_Open_Input_Raw(directory+"/common/rigid_body_names",false);
+            int num;
+            *input>>num;
+            input->ignore(INT_MAX,'\n');
             rigid_body_names.Resize(num);
             for(int i=0;i<rigid_body_names.Size();i++) std::getline(*input,rigid_body_names(i));
             delete input;}
@@ -498,8 +496,7 @@ template<class TV> void RIGID_BODY_COLLECTION<TV>::
 Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame) const
 {
     articulated_rigid_body.Write(stream_type,directory,frame);
-    if(stream_type.use_doubles) structure_list.template Write<double>(directory,"rigid_body_structure_",frame);
-    else structure_list.template Write<float>(directory,"rigid_body_structure_",frame);
+    structure_list.Write(stream_type,directory,"rigid_body_structure_",frame);
     Write_To_File(stream_type,LOG::sprintf("%s/%d/rigid_body_particles",directory.c_str(),frame),rigid_body_particles);
 
     // update names
@@ -513,7 +510,7 @@ Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame
             Write_To_File(stream_type,LOG::sprintf("%s/common/rigid_body_active_ids_list",directory.c_str()),*frame_list_active);
             is_stale_active=false;}
         Write_To_File(stream_type,LOG::sprintf("%s/%d/rigid_body_active_ids",directory.c_str(),frame),(char)1,rigid_body_particles.Size(),active_ids);}
-    std::ostream* output=Safe_Open_Output(directory+"/common/rigid_body_names",false);
+    std::ostream* output=Safe_Open_Output_Raw(directory+"/common/rigid_body_names",false);
     *output<<rigid_body_names.Size()<<std::endl;
     for(int i=0;i<rigid_body_names.Size();i++) *output<<rigid_body_names(i)<<std::endl;
     delete output;

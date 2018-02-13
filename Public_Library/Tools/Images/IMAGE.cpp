@@ -26,7 +26,10 @@ Read(const std::string& filename,ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& image)
     else if(extension=="ppm") PPM_FILE<T>::Read(filename,image);
     else if(extension=="rgb") RGB_FILE<T>::Read(filename,image);
     else if(extension=="png") PNG_FILE<T>::Read(filename,image);
-    else if(extension=="pbi") Read_From_File<float>(filename,image);
+    else if(extension=="pbi"){
+        std::istream* in=Safe_Open_Input_Raw(filename);
+        Read_Binary<float>(*in,image);
+        delete in;}
     else PHYSBAM_FATAL_ERROR(LOG::sprintf("Unknown image file extension  from filename '%s' extension '%s'",filename.c_str(),extension.c_str()));
 }
 //#####################################################################

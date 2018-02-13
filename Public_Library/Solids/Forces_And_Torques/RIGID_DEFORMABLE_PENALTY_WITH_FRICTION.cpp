@@ -290,7 +290,7 @@ CFL_Strain_Rate() const
 // Function Read
 //#####################################################################
 template<class TV> void RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>::
-Read(TYPED_ISTREAM& input)
+Read(TYPED_ISTREAM input)
 {
     ARRAY<PAIR<int,int> > keys;
     Read_Binary(input,collision_pairs,keys);
@@ -300,7 +300,7 @@ Read(TYPED_ISTREAM& input)
 // Function Write
 //#####################################################################
 template<class TV> void RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>::
-Write(TYPED_OSTREAM& output) const
+Write(TYPED_OSTREAM output) const
 {
     ARRAY<PAIR<int,int> > keys;
     hash.Get_Keys(keys);

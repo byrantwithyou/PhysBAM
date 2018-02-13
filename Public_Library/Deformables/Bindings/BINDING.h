@@ -72,13 +72,13 @@ public:
     static int Static_Name() {return -1;}
     virtual std::string Extension() const {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();return Static_Extension();}
     static std::string Static_Extension() {return "";}
-    static BINDING* Create(TYPED_ISTREAM& input,DEFORMABLE_PARTICLES<TV>& particles);
-    void Write(TYPED_OSTREAM& output) const;
+    static BINDING* Create(TYPED_ISTREAM input,DEFORMABLE_PARTICLES<TV>& particles);
+    void Write(TYPED_OSTREAM output) const;
 private:
     static BINDING* Create_From_Name(const int name,DEFORMABLE_PARTICLES<TV>& particles);
 protected:    
-    virtual void Read_Helper(TYPED_ISTREAM& input);
-    virtual void Write_Helper(TYPED_OSTREAM& output) const;
+    virtual void Read_Helper(TYPED_ISTREAM input);
+    virtual void Write_Helper(TYPED_OSTREAM output) const;
 //#####################################################################
 };
 

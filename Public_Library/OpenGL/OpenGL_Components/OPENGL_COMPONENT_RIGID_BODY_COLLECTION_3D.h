@@ -81,9 +81,9 @@ protected:
     
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
-    using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
-    OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(STREAM_TYPE stream_type,const std::string& basedir, bool use_display_lists=true);
-    OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(STREAM_TYPE stream_type,RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir, bool use_display_lists=true);
+    using OPENGL_OBJECT<T>::viewer_callbacks;using OPENGL_COMPONENT<T>::is_animation;
+    OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(const std::string& basedir, bool use_display_lists=true);
+    OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir, bool use_display_lists=true);
     virtual ~OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D();
 
     bool Valid_Frame(int frame_input) const override;

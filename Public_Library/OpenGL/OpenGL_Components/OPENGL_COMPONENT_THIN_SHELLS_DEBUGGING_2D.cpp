@@ -11,11 +11,11 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T>::
-OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D(STREAM_TYPE stream_type,GRID<TV> &grid,const std::string& directory)
-    :OPENGL_COMPONENT<T>(stream_type,"Thin Shells Debugging"),grid(grid),
+OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D(GRID<TV> &grid,const std::string& directory)
+    :OPENGL_COMPONENT<T>("Thin Shells Debugging"),grid(grid),
     invalid_color_map(OPENGL_COLOR::Red()),
-    opengl_density_valid_mask(stream_type,grid,density_valid_mask,&invalid_color_map,"density_valid",0,OPENGL_SCALAR_FIELD_2D<T,bool>::DRAW_POINTS),
-    opengl_phi_valid_mask(stream_type,grid,phi_valid_mask,&invalid_color_map,"phi_valid",0,OPENGL_SCALAR_FIELD_2D<T,bool>::DRAW_POINTS),
+    opengl_density_valid_mask(grid,density_valid_mask,&invalid_color_map,"density_valid",0,OPENGL_SCALAR_FIELD_2D<T,bool>::DRAW_POINTS),
+    opengl_phi_valid_mask(grid,phi_valid_mask,&invalid_color_map,"phi_valid",0,OPENGL_SCALAR_FIELD_2D<T,bool>::DRAW_POINTS),
     directory(directory),frame_loaded(-1),valid(false),
     draw_grid_visibility(false),draw_density_valid_mask(false),draw_phi_valid_mask(false)
 {
@@ -109,13 +109,13 @@ Reinitialize(bool force)
         if(draw_grid_visibility){
             std::string tmp_filename = Get_Frame_Filename(directory+"/%d/thin_shells_grid_visibility",frame);
             if(File_Exists(tmp_filename))
-                Read_From_File(stream_type,tmp_filename,node_neighbors_visible,face_corners_visible_from_face_center_u,face_corners_visible_from_face_center_v);
+                Read_From_File(tmp_filename,node_neighbors_visible,face_corners_visible_from_face_center_u,face_corners_visible_from_face_center_v);
         }
 
         if(draw_density_valid_mask){
             std::string tmp_filename = Get_Frame_Filename(directory+"/%d/density_valid_mask",frame);
             if(File_Exists(tmp_filename)){
-                Read_From_File(stream_type,tmp_filename,density_valid_mask);
+                Read_From_File(tmp_filename,density_valid_mask);
                 for(int i=density_valid_mask.domain.min_corner.x;i<density_valid_mask.domain.max_corner.x;i++) for(int j=density_valid_mask.domain.min_corner.y;j<density_valid_mask.domain.max_corner.y;j++) 
                     density_valid_mask(i,j)=!density_valid_mask(i,j); // negate
                 opengl_density_valid_mask.Update();}
@@ -125,7 +125,7 @@ Reinitialize(bool force)
         if(draw_phi_valid_mask){
             std::string tmp_filename = Get_Frame_Filename(directory+"/%d/phi_valid_mask",frame);
             if(File_Exists(tmp_filename)){
-                Read_From_File(stream_type,tmp_filename,phi_valid_mask);
+                Read_From_File(tmp_filename,phi_valid_mask);
                 for(int i=phi_valid_mask.domain.min_corner.x;i<phi_valid_mask.domain.max_corner.x;i++) for(int j=phi_valid_mask.domain.min_corner.y;j<phi_valid_mask.domain.max_corner.y;j++) 
                     phi_valid_mask(i,j)=!phi_valid_mask(i,j); // negate
                 opengl_phi_valid_mask.Update();}

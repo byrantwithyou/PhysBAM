@@ -26,7 +26,7 @@ public:
     TV_INT selected_index;
     
 //#####################################################################
-    OPENGL_FACE_SCALAR_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid_input,ARRAY<T2,FACE_INDEX<2> > &face_values_input,OPENGL_COLOR_MAP<T2> *color_map_input);
+    OPENGL_FACE_SCALAR_FIELD_2D(const GRID<TV> &grid_input,ARRAY<T2,FACE_INDEX<2> > &face_values_input,OPENGL_COLOR_MAP<T2> *color_map_input);
     virtual ~OPENGL_FACE_SCALAR_FIELD_2D();
     void Display() const override;
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;

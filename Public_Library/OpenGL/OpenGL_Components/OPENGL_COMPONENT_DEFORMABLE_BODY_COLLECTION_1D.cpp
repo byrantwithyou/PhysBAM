@@ -18,8 +18,8 @@ using namespace PhysBAM;
 // Function OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D
 //#####################################################################
 template<class T> OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
-OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D(STREAM_TYPE stream_type,const std::string& prefix,const int start_frame)
-    :OPENGL_COMPONENT<T>(stream_type,"Deformable Object List"),prefix(prefix),frame_loaded(-1),valid(false),use_active_list(false),display_mode(0),
+OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D(const std::string& prefix,const int start_frame)
+    :OPENGL_COMPONENT<T>("Deformable Object List"),prefix(prefix),frame_loaded(-1),valid(false),use_active_list(false),display_mode(0),
     incremented_active_object(0),smooth_shading(false),selected_vertex(-1),
     deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(0,0)),
     color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map())
@@ -74,7 +74,7 @@ Reinitialize(bool force,bool read_geometry)
     std::string static_frame_string=frame_string;
     int static_frame=File_Exists(frame_string+"deformable_object_structures")?frame:-1;
     bool read_static_variables=static_frame!=-1 || first_time || !deformable_body_collection.structures.m;
-    if(read_geometry) deformable_body_collection.Read(stream_type,prefix,prefix,frame,static_frame,read_static_variables,true);
+    if(read_geometry) deformable_body_collection.Read(prefix,prefix,frame,static_frame,read_static_variables,true);
     if(read_static_variables){
         int m=deformable_body_collection.structures.m;active_list.Resize(m,true,true,true);
         point_simplices_1d_objects.Delete_Pointers_And_Clean_Memory();point_simplices_1d_objects.Resize(m);
@@ -82,7 +82,7 @@ Reinitialize(bool force,bool read_geometry)
             STRUCTURE<TV>* structure=deformable_body_collection.structures(i);
             if(POINT_SIMPLICES_1D<T>* point_simplices_1d=dynamic_cast<POINT_SIMPLICES_1D<T>*>(structure)){
                 if(first_time) LOG::cout<<"object "<<i<<": point simplices 1d\n";
-                point_simplices_1d_objects(i)=new OPENGL_POINT_SIMPLICES_1D<T>(stream_type,*point_simplices_1d,OPENGL_COLOR((T).5,(T).25,0));
+                point_simplices_1d_objects(i)=new OPENGL_POINT_SIMPLICES_1D<T>(*point_simplices_1d,OPENGL_COLOR((T).5,(T).25,0));
                 point_simplices_1d_objects(i)->draw_vertices=true;}
             else{if(first_time) LOG::cout<<"object "<<i<<": object unrecognized at geometry level\n";}}}
 

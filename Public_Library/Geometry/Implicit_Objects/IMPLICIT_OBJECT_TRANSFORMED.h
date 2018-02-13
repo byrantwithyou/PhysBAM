@@ -76,22 +76,22 @@ public:
     static std::string Name_Helper()
     {return LOG::sprintf("IMPLICIT_OBJECT_TRANSFORMED<VECTOR<T,%d>,%s>",TV::m,FRAME<TV>::Static_Name().c_str());}
 
-    template<class READ_TRANSFORM> void Read_Transform_Helper(TYPED_ISTREAM& input,const READ_TRANSFORM& transform_input)
+    template<class READ_TRANSFORM> void Read_Transform_Helper(TYPED_ISTREAM input,const READ_TRANSFORM& transform_input)
     {PHYSBAM_FATAL_ERROR();}
 
-    void Read_Transform_Helper(TYPED_ISTREAM& input,const FRAME<TV>& transform_input)
+    void Read_Transform_Helper(TYPED_ISTREAM input,const FRAME<TV>& transform_input)
     {transform=new FRAME<TV>();Read_Binary(input,(FRAME<TV>&)*transform);owns_transform=true;}
 
-    void Read_Transform_Helper(TYPED_ISTREAM& input)
+    void Read_Transform_Helper(TYPED_ISTREAM input)
     {Read_Transform_Helper(input,*transform);}
 
-    template<class READ_TRANSFORM> void Write_Transform_Helper(TYPED_OSTREAM& output,const READ_TRANSFORM& transform_input) const
+    template<class READ_TRANSFORM> void Write_Transform_Helper(TYPED_OSTREAM output,const READ_TRANSFORM& transform_input) const
     {PHYSBAM_FATAL_ERROR();}
 
-    void Write_Transform_Helper(TYPED_OSTREAM& output,const FRAME<TV>& transform_input) const
+    void Write_Transform_Helper(TYPED_OSTREAM output,const FRAME<TV>& transform_input) const
     {Write_Binary(output,transform_input);}
 
-    void Write_Transform_Helper(TYPED_OSTREAM& output) const
+    void Write_Transform_Helper(TYPED_OSTREAM output) const
     {Write_Transform_Helper(output,*transform);}
 };
 
@@ -157,10 +157,10 @@ public:
     static std::string Name_Helper()
     {return LOG::sprintf("IMPLICIT_OBJECT_TRANSFORMED<VECTOR<T,%d>,T>",TV::m);}
 
-    void Read_Transform_Helper(TYPED_ISTREAM& input)
+    void Read_Transform_Helper(TYPED_ISTREAM input)
     {Read_Binary(input,center,scale,one_over_scale,center_adjustment);}
 
-    void Write_Transform_Helper(TYPED_OSTREAM& output) const
+    void Write_Transform_Helper(TYPED_OSTREAM output) const
     {Write_Binary(output,center,scale,one_over_scale,center_adjustment);}
 };
 
@@ -212,12 +212,12 @@ public:
     static std::string Static_Name()
     {return Name_Helper();}
 
-    void Read(TYPED_ISTREAM& input) override
+    void Read(TYPED_ISTREAM input) override
     {Read_Transform_Helper(input);std::string name;Read_Binary(input,name);
     object_space_implicit_object=dynamic_cast<IMPLICIT_OBJECT<TV>*>(STRUCTURE<TV>::Create_From_Name(name));
     object_space_implicit_object->Read(input);}
 
-    void Write(TYPED_OSTREAM& output) const override
+    void Write(TYPED_OSTREAM output) const override
     {Write_Transform_Helper(output);Write_Binary(output,object_space_implicit_object->Name(),*object_space_implicit_object);}
 
     bool Intersection(RAY<TV>& ray,const T thickness) const override;

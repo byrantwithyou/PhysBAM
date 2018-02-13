@@ -217,7 +217,7 @@ Add_Rigid_Body_Walls(const T coefficient_of_restitution,const T coefficient_of_f
     int id;
 
     if(fluids_parameters.domain_walls(0)(0)){
-        id=rigid_body_collection.Add_Rigid_Body(this->stream_type,data_directory+"/Rigid_Bodies_2D/ground",size.y*(T).00501);
+        id=rigid_body_collection.Add_Rigid_Body(data_directory+"/Rigid_Bodies_2D/ground",size.y*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).coefficient_of_friction=coefficient_of_friction;
         rigid_body_collection.rigid_body_particles.frame(id).t=VECTOR<T,2>(fluids_parameters.grid->domain.min_corner.x,center.y);
@@ -227,7 +227,7 @@ Add_Rigid_Body_Walls(const T coefficient_of_restitution,const T coefficient_of_f
         if(walls_added) walls_added->Append(id);}
 
     if(fluids_parameters.domain_walls(0)(1)){
-        id=rigid_body_collection.Add_Rigid_Body(this->stream_type,data_directory+"/Rigid_Bodies_2D/ground",size.y*(T).00501);
+        id=rigid_body_collection.Add_Rigid_Body(data_directory+"/Rigid_Bodies_2D/ground",size.y*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).coefficient_of_friction=coefficient_of_friction;
         rigid_body_collection.rigid_body_particles.frame(id).t=VECTOR<T,2>(fluids_parameters.grid->domain.max_corner.x,center.y);
@@ -237,7 +237,7 @@ Add_Rigid_Body_Walls(const T coefficient_of_restitution,const T coefficient_of_f
         if(walls_added) walls_added->Append(id);}
 
     if(fluids_parameters.domain_walls(1)(0)){
-        id=rigid_body_collection.Add_Rigid_Body(this->stream_type,data_directory+"/Rigid_Bodies_2D/ground",size.x*(T).00501);
+        id=rigid_body_collection.Add_Rigid_Body(data_directory+"/Rigid_Bodies_2D/ground",size.x*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).coefficient_of_friction=coefficient_of_friction;
         rigid_body_collection.rigid_body_particles.frame(id).t=VECTOR<T,2>(center.x,fluids_parameters.grid->domain.min_corner.y);
@@ -246,7 +246,7 @@ Add_Rigid_Body_Walls(const T coefficient_of_restitution,const T coefficient_of_f
         if(walls_added) walls_added->Append(id);}
 
     if(fluids_parameters.domain_walls(1)(1)){
-        id=rigid_body_collection.Add_Rigid_Body(this->stream_type,data_directory+"/Rigid_Bodies_2D/ground",size.x*(T).00501);
+        id=rigid_body_collection.Add_Rigid_Body(data_directory+"/Rigid_Bodies_2D/ground",size.x*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).coefficient_of_friction=coefficient_of_friction;
         rigid_body_collection.rigid_body_particles.frame(id).t=VECTOR<T,2>(center.x,fluids_parameters.grid->domain.max_corner.y);

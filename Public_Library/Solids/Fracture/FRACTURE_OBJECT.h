@@ -100,8 +100,7 @@ public:
     {assert(embedded_object.simplicial_object.mesh.Node_In_Simplex(node,simplex));
     return Get_Phi(simplex)[embedded_object.simplicial_object.mesh.elements(simplex).Find(node)];}
 
-    template<class RW>
-    void Read(std::istream& input)
+    template<class RW> void Read(std::istream& input)
     {Read_Binary<RW>(input,number_of_fracture_initiations,corresponding_node_in_reference,corresponding_simplex_in_reference);}
 
     template<class RW>

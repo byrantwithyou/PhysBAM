@@ -246,7 +246,7 @@ void Initialize_Euler_State() override
 void Initialize_Bodies() override
 {   
     if(test_number==1){
-        int sphere=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies_2D/circle",(T).05,true,true,false);
+        int sphere=rigid_body_collection.Add_Rigid_Body(data_directory+"/Rigid_Bodies_2D/circle",(T).05,true,true,false);
         rigid_body_collection.Rigid_Body(sphere).Set_Coefficient_Of_Restitution((T)1);rigid_body_collection.Rigid_Body(sphere).coefficient_of_friction=(T)1;
         rigid_body_collection.Rigid_Body(sphere).Is_Kinematic()=false;rigid_body_collection.rigid_body_particles.frame(sphere).t=TV((T).15,(T).05);
         rigid_body_collection.Rigid_Body(sphere).Set_Mass(pi*.05*.05*10.77);}

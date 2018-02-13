@@ -80,7 +80,7 @@ void Convert(const std::string& input,const std::string& output_filename_pattern
 #pragma omp parallel for
         for(int i=start_at;i<=last_frame;++i){
             MPM_PARTICLES<VECTOR<T,N> > particles;
-            Read_From_File<T>(LOG::sprintf("%s/%d/mpm_particles.gz",input,i),particles);
+            Read_From_File(LOG::sprintf("%s/%d/mpm_particles.gz",input,i),particles);
             writePartio<T,N>(LOG::sprintf(output_filename_pattern.c_str(),i),particles,dump_valid);
             if(attentive)
                 Read_From_Text_File(input+"/common/last_frame",last_frame);}}
@@ -89,7 +89,7 @@ void Convert(const std::string& input,const std::string& output_filename_pattern
             LOG::printf("Format string found in output file name! Did you want to convert a whole sim?\n");
             exit(-1);}
         MPM_PARTICLES<VECTOR<T,N> > particles;
-        Read_From_File<T>(input,particles);
+        Read_From_File(input,particles);
         writePartio<T,N>(output_filename_pattern,particles,dump_valid);}
 }
 

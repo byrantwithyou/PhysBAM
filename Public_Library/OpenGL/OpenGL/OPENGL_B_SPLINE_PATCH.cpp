@@ -15,8 +15,8 @@ using namespace PhysBAM;
 // Constructor from geometry, two-sided
 //#####################################################################
 template<class T> OPENGL_B_SPLINE_PATCH<T>::
-OPENGL_B_SPLINE_PATCH(STREAM_TYPE stream_type,B_SPLINE_PATCH<VECTOR<T,3>>& patch_input,const OPENGL_MATERIAL& front_material_input,const OPENGL_MATERIAL& back_material_input)
-    :OPENGL_OBJECT<T>(stream_type),patch(patch_input),two_sided(true),front_material(front_material_input),
+OPENGL_B_SPLINE_PATCH(B_SPLINE_PATCH<VECTOR<T,3>>& patch_input,const OPENGL_MATERIAL& front_material_input,const OPENGL_MATERIAL& back_material_input)
+    :patch(patch_input),two_sided(true),front_material(front_material_input),
     back_material(back_material_input),use_display_list(false),
     owns_display_list(false),selected_vertex(-1),selected_element(-1),
     current_node(1),highlight_current_node(false),wireframe_only(false), draw_particles(false)

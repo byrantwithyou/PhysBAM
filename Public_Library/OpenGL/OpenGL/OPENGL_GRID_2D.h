@@ -46,7 +46,7 @@ private:
     int frame;
 
 public:
-    OPENGL_GRID_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::White(),
+    OPENGL_GRID_2D(GRID<TV> &grid_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::White(),
         const std::string basedir_input="",const int frame_input=0);
 
     void Display() const override;

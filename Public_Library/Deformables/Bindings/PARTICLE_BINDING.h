@@ -95,10 +95,10 @@ public:
     {weights.Append(1);}
 
 private:
-    void Read_Helper(TYPED_ISTREAM& input) override
+    void Read_Helper(TYPED_ISTREAM input) override
     {BINDING<TV>::Read_Helper(input);Read_Binary(input,parent);}
 
-    void Write_Helper(TYPED_OSTREAM& output) const override
+    void Write_Helper(TYPED_OSTREAM output) const override
     {BINDING<TV>::Write_Helper(output);Write_Binary(output,parent);}
 
 //#####################################################################

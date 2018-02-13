@@ -40,12 +40,11 @@ Add_Joint(JOINT<TV>* new_joint_input)
 //#####################################################################
 // assumes static variables are already read in
 template<class TV> void JOINT_MESH<TV>::
-Read(TYPED_ISTREAM& input,const std::string& directory,const int frame) // assumes static variables are already read in
+Read(TYPED_ISTREAM input,const std::string& directory,const int frame) // assumes static variables are already read in
 {
     std::string prefix=LOG::sprintf("%s/%d/joint_mesh_",directory.c_str(),frame);
     ARRAY<JOINT_ID> needs_init;
-    if(!input.type.use_doubles) dynamic_list.template Read<float>(prefix,needs_init);
-    else dynamic_list.template Read<double>(prefix,needs_init);
+    dynamic_list.Read(prefix,needs_init);
     for(int i=0;i<dynamic_list.core.array.m;i++){JOINT_TYPE joint_type;Read_Binary(input,joint_type);
         void*& joint_ptr=dynamic_list.core.array(i);
         delete (JOINT<TV>*)joint_ptr;
@@ -63,12 +62,10 @@ Read(TYPED_ISTREAM& input,const std::string& directory,const int frame) // assum
 // Function Write
 //#####################################################################
 template<class TV> void JOINT_MESH<TV>::
-Write(TYPED_OSTREAM& output,const std::string& directory,const int frame) const
+Write(TYPED_OSTREAM output,const std::string& directory,const int frame) const
 {
     std::string prefix=LOG::sprintf("%s/%d/joint_mesh_",directory.c_str(),frame);
-    if(!output.type.use_doubles)
-        dynamic_list.template Write<float>(prefix);
-    else dynamic_list.template Write<double>(prefix);
+    dynamic_list.Write(output.type,prefix);
     for(int i=0;i<Num_Joints();i++){
         JOINT_TYPE joint_type;
         const std::type_info& type=typeid(*Joints(i));

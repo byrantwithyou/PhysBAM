@@ -52,7 +52,7 @@ template<class T> LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >*
 Levelset_From_Tri_File(const std::string& filename,int max_resolution)
 {
     TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-    Read_From_File(STREAM_TYPE(0.f),filename,*surface);
+    Read_From_File(filename,*surface);
     LOG::printf("Read mesh: %d triangle, %d particles\n",surface->mesh.elements.m,surface->particles.number);
     surface->mesh.Initialize_Adjacent_Elements();
     surface->mesh.Initialize_Neighbor_Nodes();

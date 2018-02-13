@@ -37,14 +37,14 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
 // Function Read_Output_Files
 //#####################################################################
 template<class TV> void COMPRESSIBLE_FLUID_COLLECTION<TV>::
-Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame)
+Read_Output_Files(const std::string& output_directory,const int frame)
 {
     std::string f=LOG::sprintf("%d",frame);
     if(File_Exists(output_directory+"/"+f+"/psi")){
-        Read_From_File(stream_type,output_directory+"/"+f+"/psi",psi);}
+        Read_From_File(output_directory+"/"+f+"/psi",psi);}
 
     if(File_Exists(output_directory+"/"+f+"/euler_U")){
-        Read_From_File(stream_type,output_directory+"/"+f+"/euler_U",U);}
+        Read_From_File(output_directory+"/"+f+"/euler_U",U);}
 }
 //#####################################################################
 // Function Initialize_Grids

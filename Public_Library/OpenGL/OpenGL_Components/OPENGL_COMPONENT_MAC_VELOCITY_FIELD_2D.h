@@ -22,8 +22,9 @@ class OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D:public OPENGL_COMPONENT<T>,public O
 {
     typedef VECTOR<T,2> TV;typedef VECTOR<int,TV::m> TV_INT;
 public:
-    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_OBJECT<T>::viewer_callbacks;
-    using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::stream_type;
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
+    using OPENGL_OBJECT<T>::viewer_callbacks;using OPENGL_COMPONENT<T>::is_animation;
+    using OPENGL_COMPONENT<T>::component_name;
     typedef LINEAR_INTERPOLATION_UNIFORM<TV,T> T_LINEAR_INTERPOLATION_VECTOR;
     OPENGL_MAC_VELOCITY_FIELD_2D<T>* opengl_mac_velocity_field;
     OPENGL_SCALAR_FIELD_2D<T>* opengl_vorticity_magnitude;
@@ -44,7 +45,7 @@ private:
     unsigned int streamline_seed;
     
 public:
-    OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string &velocity_filename_input);
+    OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(const GRID<TV> &grid,const std::string &velocity_filename_input);
     virtual ~OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D();
 
     bool Valid_Frame(int frame_input) const override;

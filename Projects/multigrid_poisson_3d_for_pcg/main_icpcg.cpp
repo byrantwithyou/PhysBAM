@@ -144,10 +144,10 @@ int main(int argc,char* argv[])
         
         switch(test_number){
             case 1: // Water
-                Read_From_File<T>("/u/gojira/s1/terangroup/amcadams/free_surface_output/medium_pour_512_deep_pool/cell_type.90",multigrid_poisson.cell_type);
+                Read_From_File("/u/gojira/s1/terangroup/amcadams/free_surface_output/medium_pour_512_deep_pool/cell_type.90",multigrid_poisson.cell_type);
                 break;
             case 2: // car
-                Read_From_File<T>("/u/godzilla/s2/jteran/aleka/smoke_output/768_car/cell_type.10",multigrid_poisson.cell_type);
+                Read_From_File("/u/godzilla/s2/jteran/aleka/smoke_output/768_car/cell_type.10",multigrid_poisson.cell_type);
                 break;
             case 3: // sphere 64
             case 4:

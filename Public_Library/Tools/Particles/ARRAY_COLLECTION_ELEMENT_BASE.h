@@ -35,8 +35,8 @@ public:
     virtual void Pack(ARRAY_VIEW<char> buffer,int& position,const int p) const=0;
     virtual void Unpack(ARRAY_VIEW<const char> buffer,int& position,const int p)=0;
     virtual const char* Type_Name() const=0;
-    virtual void Read(TYPED_ISTREAM& input)=0;
-    virtual void Write(TYPED_OSTREAM& output) const=0;
+    virtual void Read(TYPED_ISTREAM input)=0;
+    virtual void Write(TYPED_OSTREAM output) const=0;
     virtual void Print(std::ostream& output,const int p) const=0;
 };
 }

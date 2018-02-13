@@ -88,8 +88,8 @@ public:
     virtual void Angular_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& angular_constraint_matrix,MATRIX_MXN<T>* angular_unconstrained_matrix=0) const;
     MATRIX<typename TV::SCALAR,TV::m> Prismatic_Projection_Matrix(const FRAME<TV>& parent_frame) const;
     MATRIX<typename TV::SCALAR,TV::SPIN::m> Angular_Projection_Matrix(const FRAME<TV>& parent_frame) const;
-    virtual void Read(TYPED_ISTREAM& input);
-    virtual void Write(TYPED_OSTREAM& output) const;
+    virtual void Read(TYPED_ISTREAM input);
+    virtual void Write(TYPED_OSTREAM output) const;
 protected:
     template<int d>
     void Constraint_Matrix_Helper(const ROTATION<TV>& orientation,MATRIX_MXN<T>& constrained_matrix,MATRIX_MXN<T>* unconstrained_matrix,const VECTOR<bool,d>& constrain) const;

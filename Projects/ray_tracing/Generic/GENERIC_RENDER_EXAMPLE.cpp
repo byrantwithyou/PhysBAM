@@ -13,7 +13,7 @@ using namespace PhysBAM;
 //#####################################################################
 // Initialize_Scene
 //#####################################################################
-template<class T,class RW> void GENERIC_RENDER_EXAMPLE<T,RW>::
+template<class T> void GENERIC_RENDER_EXAMPLE<T>::
 Initialize_Scene(RENDER_WORLD<T>& world,const int frame)
 {
     // clear out transformation stack and parser
@@ -50,7 +50,7 @@ Initialize_Scene(RENDER_WORLD<T>& world,const int frame)
 //#####################################################################
 // Camera - Prepare render camera and film
 //#####################################################################
-template<class T,class RW> void GENERIC_RENDER_EXAMPLE<T,RW>::
+template<class T> void GENERIC_RENDER_EXAMPLE<T>::
 Camera(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
 {
     LOG::cout<<"parsing camera"<<std::endl;
@@ -94,7 +94,7 @@ Camera(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
 //#####################################################################
 // Camera - Prepare render camera and film
 //#####################################################################
-template<class T,class RW> void GENERIC_RENDER_EXAMPLE<T,RW>::
+template<class T> void GENERIC_RENDER_EXAMPLE<T>::
 Get_Camera_Frame(const int camera_frame,const std::string& motion_filename,TV& current_location,TV& current_look_at,TV& current_pseudo_up)
 {
     GENERIC_PARSER<T> parser(motion_filename,frame);
@@ -133,7 +133,7 @@ Get_Camera_Frame(const int camera_frame,const std::string& motion_filename,TV& c
 //#####################################################################
 // Camera - Prepare render camera and film
 //#####################################################################
-template<class T,class RW> void GENERIC_RENDER_EXAMPLE<T,RW>::
+template<class T> void GENERIC_RENDER_EXAMPLE<T>::
 Options(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
 {
     world.threads=parameters.Get_Parameter("Threads",(int)1);
@@ -164,7 +164,7 @@ Options(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
 //#####################################################################
 // Transform - Handle a transformation entry
 //#####################################################################
-template<class T,class RW> void GENERIC_RENDER_EXAMPLE<T,RW>::
+template<class T> void GENERIC_RENDER_EXAMPLE<T>::
 Transform(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
 {
     std::string type=parameters.Get_Parameter("Type",std::string("Null"));
@@ -195,7 +195,7 @@ Transform(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
 //#####################################################################
 // Get_New_Render
 //#####################################################################
-template<class T,class RW> RENDERING_TRIANGULATED_SURFACE<T>* GENERIC_RENDER_EXAMPLE<T,RW>::
+template<class T> RENDERING_TRIANGULATED_SURFACE<T>* GENERIC_RENDER_EXAMPLE<T>::
 Get_New_Render_Surface(TRIANGULATED_SURFACE<T>& triangulated_surface,const bool smooth_normals,const bool preserve_creases){
     if(smooth_normals) triangulated_surface.Use_Vertex_Normals();
     if(preserve_creases) triangulated_surface.avoid_normal_interpolation_across_sharp_edges=true;
@@ -204,7 +204,7 @@ Get_New_Render_Surface(TRIANGULATED_SURFACE<T>& triangulated_surface,const bool 
 //#####################################################################
 // Function Add_Solid_Texture
 //#####################################################################
-template<class T,class RW> void GENERIC_RENDER_EXAMPLE<T,RW>::
+template<class T> void GENERIC_RENDER_EXAMPLE<T>::
 Add_Solid_Texture(RENDERING_OBJECT<T>* object,PARAMETER_LIST& parameters)
 {
     MATRIX<T,4> volume_texture_coordinate=MATRIX<T,4>::Identity_Matrix();
@@ -220,14 +220,13 @@ Add_Solid_Texture(RENDERING_OBJECT<T>* object,PARAMETER_LIST& parameters)
     object->solid_texture_transform=volume_texture_coordinate;
 }
 //#####################################################################
-#define INSTANTIATE_HELPER(T,RW) \
-    template void GENERIC_RENDER_EXAMPLE<T,RW>::Initialize_Scene(RENDER_WORLD<T>& world,const int frame); \
-    template void GENERIC_RENDER_EXAMPLE<T,RW>::Camera(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters); \
-    template void GENERIC_RENDER_EXAMPLE<T,RW>::Options(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters); \
-    template void GENERIC_RENDER_EXAMPLE<T,RW>::Transform(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters); \
-    template RENDERING_TRIANGULATED_SURFACE<T>* GENERIC_RENDER_EXAMPLE<T,RW>::Get_New_Render_Surface(TRIANGULATED_SURFACE<T>& triangulated_surface,const bool smooth_normals,const bool preserve_creases); \
-    template void GENERIC_RENDER_EXAMPLE<T,RW>::Add_Solid_Texture(RENDERING_OBJECT<T>* object,PARAMETER_LIST& parameters);
+#define INSTANTIATE_HELPER(T) \
+    template void GENERIC_RENDER_EXAMPLE<T>::Initialize_Scene(RENDER_WORLD<T>& world,const int frame); \
+    template void GENERIC_RENDER_EXAMPLE<T>::Camera(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters); \
+    template void GENERIC_RENDER_EXAMPLE<T>::Options(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters); \
+    template void GENERIC_RENDER_EXAMPLE<T>::Transform(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters); \
+    template RENDERING_TRIANGULATED_SURFACE<T>* GENERIC_RENDER_EXAMPLE<T>::Get_New_Render_Surface(TRIANGULATED_SURFACE<T>& triangulated_surface,const bool smooth_normals,const bool preserve_creases); \
+    template void GENERIC_RENDER_EXAMPLE<T>::Add_Solid_Texture(RENDERING_OBJECT<T>* object,PARAMETER_LIST& parameters);
 
-INSTANTIATE_HELPER(float,float)
-INSTANTIATE_HELPER(double,float)
-INSTANTIATE_HELPER(double,double)
+INSTANTIATE_HELPER(float)
+INSTANTIATE_HELPER(double)

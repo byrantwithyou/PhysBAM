@@ -272,7 +272,7 @@ Minimum_Cell_Size() const
 // Function Read
 //#####################################################################
 template<class TV> void IMPLICIT_OBJECT_INVERT<TV>::
-Read(TYPED_ISTREAM& input)
+Read(TYPED_ISTREAM input)
 {
     io.Read(input);
 }
@@ -280,7 +280,7 @@ Read(TYPED_ISTREAM& input)
 // Function Write
 //#####################################################################
 template<class TV> void IMPLICIT_OBJECT_INVERT<TV>::
-Write(TYPED_OSTREAM& output) const
+Write(TYPED_OSTREAM output) const
 {
     io.Write(output);
 }

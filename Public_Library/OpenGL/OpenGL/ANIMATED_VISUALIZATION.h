@@ -29,7 +29,7 @@ public:
     using BASIC_VISUALIZATION<T>::opengl_world;using BASIC_VISUALIZATION<T>::component_list;
     using BASIC_VISUALIZATION<T>::Set_Current_Selection;using BASIC_VISUALIZATION<T>::selected_object;
 
-    ANIMATED_VISUALIZATION(STREAM_TYPE stream_type);
+    ANIMATED_VISUALIZATION();
     virtual ~ANIMATED_VISUALIZATION(){}
 
 private:

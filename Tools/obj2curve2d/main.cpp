@@ -13,7 +13,7 @@ template<class T,class RW> void Convert(const std::string& input_filename,const 
 {
     typedef VECTOR<T,2> TV;
 
-    std::istream* input=Safe_Open_Input(input_filename,false);
+    std::istream* input=Safe_Open_Input_Raw(input_filename,false);
     char buffer[2048];
     ARRAY<TV> vertices;
     ARRAY<VECTOR<int,2> > segments;

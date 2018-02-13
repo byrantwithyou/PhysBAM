@@ -10,8 +10,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_AXES<T>::
-OPENGL_AXES(STREAM_TYPE stream_type,const FRAME<TV>& frame_input,const RANGE<TV>& box_input)
-    :OPENGL_OBJECT<T>(stream_type),box(box_input),draw_box(false),number_grid_spaces(10)
+OPENGL_AXES(const FRAME<TV>& frame_input,const RANGE<TV>& box_input)
+    :box(box_input),draw_box(false),number_grid_spaces(10)
 {
     *frame=frame_input;
 }

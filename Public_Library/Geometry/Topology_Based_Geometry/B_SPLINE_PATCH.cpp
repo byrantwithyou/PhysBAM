@@ -60,7 +60,7 @@ Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& new_particles,ARRAY<int
 // Function Read
 //#####################################################################
 template<class TV,int d> void B_SPLINE_PATCH<TV,d>::
-Read(TYPED_ISTREAM& input)
+Read(TYPED_ISTREAM input)
 {
     int size;
     Read_Binary(input,m,loop_s,loop_t,control_points,knots_s,knots_t,size);
@@ -73,7 +73,7 @@ Read(TYPED_ISTREAM& input)
 // Function Write
 //#####################################################################
 template<class TV,int d> void B_SPLINE_PATCH<TV,d>::
-Write(TYPED_OSTREAM& output) const
+Write(TYPED_OSTREAM output) const
 {
     Write_Binary(output,m,loop_s,loop_t,control_points,knots_s,knots_t,particles.X);
 }

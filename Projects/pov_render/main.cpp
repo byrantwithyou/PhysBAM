@@ -28,9 +28,6 @@ using namespace PhysBAM;
 typedef double T;
 typedef VECTOR<T,3> TV;
 typedef VECTOR<T,2> TV2;
-STREAM_TYPE stream_type_float(.0f);
-STREAM_TYPE stream_type_double(.0);
-STREAM_TYPE* stream_type=0;
 
 HASHTABLE<PAIR<std::string,int>,MPM_PARTICLES<TV>*> mpm_particles_cache;
 HASHTABLE<PAIR<std::string,int>,RIGID_BODY_COLLECTION<TV>*> rigid_body_collection_cache;
@@ -48,7 +45,7 @@ RIGID_BODY_COLLECTION<TV>& Load_Rigid_Body_Collection(const std::string& locatio
     RIGID_BODY_COLLECTION<TV>*& rigid_body_collection=rigid_body_collection_cache.Get_Or_Insert(PAIR<std::string,int>(location,frame));
     if(rigid_body_collection) return *rigid_body_collection;
     rigid_body_collection=new RIGID_BODY_COLLECTION<TV>(0);
-    rigid_body_collection->Read(*stream_type,location,frame); // TODO: only load implicit surfaces if load_implicit_surfaces
+    rigid_body_collection->Read(location,frame); // TODO: only load implicit surfaces if load_implicit_surfaces
     return *rigid_body_collection;
 }
 
@@ -57,7 +54,7 @@ DEFORMABLE_BODY_COLLECTION<TV>& Load_Deformable_Geometry_Collection(const std::s
     DEFORMABLE_BODY_COLLECTION<TV>*& deformable_geometry_collection=deformable_geometry_collection_cache.Get_Or_Insert(PAIR<std::string,int>(location,frame));
     if(deformable_geometry_collection) return *deformable_geometry_collection;
     deformable_geometry_collection=new DEFORMABLE_BODY_COLLECTION<TV>(0,0);
-    deformable_geometry_collection->Read(*stream_type,location,location,frame,-1,true,true);
+    deformable_geometry_collection->Read(location,location,frame,-1,true,true);
     return *deformable_geometry_collection;
 }
 
@@ -107,7 +104,7 @@ void Emit_Smooth_Surface(std::ofstream& fout,TRIANGULATED_SURFACE<T>* ts, const 
     ARRAY<VECTOR<int,3> > map;
     if(const std::string* texture_map_file=options.Get_Pointer("texture_map")){
         int ignore;
-        Read_From_File(*stream_type,texture_map_file->c_str(),coords,ignore,map);
+        Read_From_File(texture_map_file->c_str(),coords,ignore,map);
         LOG::cout<<"Texture mapping file data:  "<<texture_map_file<<"  "<<coords.m<<"  "<<ignore<<"  "<<map.m<<"  "<<ts->mesh.elements.m<<std::endl;}
     else if(const std::string* str=options.Get_Pointer("saved_texture_map")){
         TEXTURE* tex=saved_texture.Get(*str);
@@ -159,7 +156,7 @@ MPM_PARTICLES<TV>& Load_MPM_Particles(const std::string& location,int frame)
         std::string filename=location+"/%d/mpm_particles";
         std::string frame_filename=Get_Frame_Filename(filename,frame);
         mpm_particles=new MPM_PARTICLES<TV>();
-        Read_From_File(*stream_type,frame_filename,*mpm_particles);}
+        Read_From_File(frame_filename,*mpm_particles);}
     return *mpm_particles;
 }
 
@@ -375,7 +372,7 @@ void Create_Texture_Map(std::ofstream& fout,const HASHTABLE<std::string,std::str
     saved_texture.Get_Or_Insert(options.Get("uv_save"))=tex;
     if(const std::string* str=options.Get_Pointer("uv_file")){
         sprintf(buff,str->c_str(),frame);
-        Write_To_File(*stream_type,buff,tex->coords,0,tex->map);}
+        Write_To_File<float>(buff,tex->coords,0,tex->map);}
 }
 
 bool Parse_Pair(const char*& str,std::string& key,std::string& value)
@@ -432,24 +429,19 @@ void Emit_Camera(std::ofstream& fout,const HASHTABLE<std::string,std::string>& o
 
 void Set_Global_Options(std::ofstream& fout,const HASHTABLE<std::string,std::string>& options)
 {
-    if(const std::string* value=options.Get_Pointer("read"))
-        stream_type=*value=="double"?&stream_type_double:&stream_type_float;
 }
 
 int main(int argc, char *argv[]) 
 {  
     PROCESS_UTILITIES::Set_Backtrace(true);
 
-    bool use_doubles=false;
     std::string scene_filename,output_filename;
     int frame_number=0;
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add("-double",&use_doubles,"read in doubles");
     parse_args.Extra(&scene_filename,"scene file","scene file");
     parse_args.Extra(&output_filename,"output scene file","output scene file");
     parse_args.Extra(&frame_number,"frame number","frame number");
     parse_args.Parse();
-    stream_type=use_doubles?&stream_type_double:&stream_type_float;
     if(parse_args.unclaimed_arguments){parse_args.Print_Usage();exit(0);}
 
     std::ifstream fin(scene_filename.c_str());

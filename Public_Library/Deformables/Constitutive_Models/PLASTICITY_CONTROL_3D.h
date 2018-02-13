@@ -61,7 +61,7 @@ public:
     if(t<1)log_Fp_trial=t*log_Fp_trial_minus_log_Fp+log_Fp(id);
     log_Fp(id)=log_Fp_trial;Fp_inverse(id)=exp(-log_Fp_trial);}
     
-    void Read_State(TYPED_ISTREAM& input) override
+    void Read_State(TYPED_ISTREAM input) override
     {PLASTICITY_MODEL<T,3>::Read_State(input);
     for(int t=0;t<Fp_inverse.m;t++)log_Fp(t)=-log(Fp_inverse(t));}
     

@@ -31,9 +31,9 @@ private:
     bool valid;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_COMPONENT<T>::World_Space_Box;using OPENGL_COMPONENT<T>::stream_type;
+    using OPENGL_COMPONENT<T>::World_Space_Box;
     using OPENGL_OBJECT<T>::viewer_callbacks;
-    OPENGL_COMPONENT_PSEUDO_DIRICHLET_2D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string &filename_input);
+    OPENGL_COMPONENT_PSEUDO_DIRICHLET_2D(const GRID<TV> &grid,const std::string &filename_input);
     
     bool Valid_Frame(int frame_input) const override;
     bool Is_Up_To_Date(int frame) const override { return valid && frame_loaded == frame; }

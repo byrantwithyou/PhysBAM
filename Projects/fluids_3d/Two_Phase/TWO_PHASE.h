@@ -141,7 +141,7 @@ void Initialize_Velocities() override
 void Initialize_Bodies() override
 {
     if(test_number==2||test_number==3){
-        sphere=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/sphere",(T).001,true,true,false);
+        sphere=rigid_body_collection.Add_Rigid_Body(data_directory+"/Rigid_Bodies/sphere",(T).001,true,true,false);
         rigid_body_collection.rigid_body_particles.frame(sphere).t=TV((T).0,(T).005,(T).0);
         rigid_body_collection.Rigid_Body(sphere).Is_Kinematic()=true;}
     if(use_inaccurate_body_collisions){

@@ -13,8 +13,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_GRID_3D<T>::
-OPENGL_GRID_3D(STREAM_TYPE stream_type,GRID<TV> &grid_input,const OPENGL_COLOR &color_input) 
-    :OPENGL_OBJECT<T>(stream_type),select_type(SELECT_TYPE::NONE),grid(grid_input),color(color_input),
+OPENGL_GRID_3D(GRID<TV> &grid_input,const OPENGL_COLOR &color_input) 
+    :select_type(SELECT_TYPE::NONE),grid(grid_input),color(color_input),
     draw_ghost_values(true),hide_non_selected_grid(false),owns_grid(false),scale(1)
 {
     viewer_callbacks.Set("toggle_draw_ghost_values",{[this](){Toggle_Draw_Ghost_Values();},"toggle_draw_ghost_values"});

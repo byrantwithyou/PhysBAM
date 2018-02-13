@@ -39,13 +39,13 @@ template<class T> inline OPENGL_WORLD<T>*& Opengl_World()
 // Constructor OPENGL_WORLD
 //#####################################################################
 template<class T> OPENGL_WORLD<T>::
-OPENGL_WORLD(STREAM_TYPE stream_type)
-    :initialized(false),stream_type(stream_type),smooth_shading(false),ambient_light(OPENGL_COLOR::White()),fovy(50),mode_2d(false),load_names_for_selection(false),
+OPENGL_WORLD()
+    :initialized(false),smooth_shading(false),ambient_light(OPENGL_COLOR::White()),fovy(50),mode_2d(false),load_names_for_selection(false),
     window(0),fill_mode(DRAW_FILLED),enable_lighting_for_wireframe(false),white_background(false),
     display_strings(true),show_object_names(false),display_object_names_in_corner(false),view_auto_help(false),
     timer_id(0),idle_delay(0),idle_timer(0),view_target_timer(0),frame_counter_timer(0),frames_rendered(0),frames_per_second(0),show_frames_per_second(true),
     left_handed_coordinate_system(false),nearclip_factor(.0625),farclip_factor(4),nearclip(nearclip_factor),farclip(farclip_factor),
-    arcball(new OPENGL_ARCBALL<TV>(stream_type,*this)),camera_distance(1),arcball_matrix(arcball->Value()),rotation_matrix(arcball->Value()),
+    arcball(new OPENGL_ARCBALL<TV>(*this)),camera_distance(1),arcball_matrix(arcball->Value()),rotation_matrix(arcball->Value()),
     zoom_direction(1),translation_direction(1),oldmousex(0),oldmousey(0),do_mouse_rotation(false),do_mouse_zoom(false),do_mouse_target_xy(false),
     do_mouse_target_z(false),external_mouse_handler(0),
     current_key_binding_category("User-Defined Keys"),prompt_mode(false),

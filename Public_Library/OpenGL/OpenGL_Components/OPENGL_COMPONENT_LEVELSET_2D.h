@@ -17,9 +17,10 @@ class OPENGL_COMPONENT_LEVELSET_2D:public OPENGL_COMPONENT<T>,public OPENGL_GRID
 {
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
-    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::stream_type;
-    using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;using OPENGL_OBJECT<T>::viewer_callbacks;
-    OPENGL_COMPONENT_LEVELSET_2D(STREAM_TYPE stream_type,const std::string& levelset_filename_input,const std::string filename_set_input="");
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
+    using OPENGL_COMPONENT<T>::component_name;using OPENGL_OBJECT<T>::viewer_callbacks;
+    using OPENGL_COMPONENT<T>::is_animation;
+    OPENGL_COMPONENT_LEVELSET_2D(const std::string& levelset_filename_input,const std::string filename_set_input="");
     virtual ~OPENGL_COMPONENT_LEVELSET_2D();
 
     bool Valid_Frame(int frame_input) const override;

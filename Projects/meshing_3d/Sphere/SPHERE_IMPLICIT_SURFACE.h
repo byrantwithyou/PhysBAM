@@ -69,8 +69,8 @@ public:
     bool Lazy_Outside(const TV& location,const T contour_value=0) const override
     {return Extended_Phi(location)>=contour_value;}
 
-    virtual void Read(TYPED_ISTREAM& input) override {PHYSBAM_FATAL_ERROR();}
-    virtual void Write(TYPED_OSTREAM& output) const override {PHYSBAM_FATAL_ERROR();}
+    virtual void Read(TYPED_ISTREAM input) override {PHYSBAM_FATAL_ERROR();}
+    virtual void Write(TYPED_OSTREAM output) const override {PHYSBAM_FATAL_ERROR();}
 
 //#####################################################################
 };

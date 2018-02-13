@@ -20,9 +20,10 @@ class OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,2> TV;
 public:
-    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::component_name;
-    using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
-    OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string &vector_field_filename_input);
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
+    using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
+    using OPENGL_OBJECT<T>::viewer_callbacks;
+    OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D(const GRID<TV> &grid,const std::string &vector_field_filename_input);
     virtual ~OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D();
 
     bool Valid_Frame(int frame_input) const override;

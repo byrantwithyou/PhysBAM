@@ -24,7 +24,7 @@ class BASIC_VISUALIZATION
 public:
     enum WORKAROUND{OWNED=1,SELECTABLE=2,START_HIDDEN=4};
 
-    BASIC_VISUALIZATION(STREAM_TYPE stream_type);
+    BASIC_VISUALIZATION();
     virtual ~BASIC_VISUALIZATION();
 
     void Initialize(PARSE_ARGS &parse_args);
@@ -60,7 +60,6 @@ private:
     void Toggle_Axes();
     void Draw_All_Objects();
 public:
-    STREAM_TYPE stream_type;
     ARRAY<OPENGL_COMPONENT<T>*> component_list;
     ARRAY<OPENGL_COMPONENT<T>*> owned_components;
     HASHTABLE<std::string,OPENGL_COMPONENT<T>*> component_by_name;

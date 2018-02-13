@@ -208,7 +208,7 @@ Weights(ARRAY<T>& w) const
 // Function Read_Helper
 //#####################################################################
 template<class TV> void LINEAR_BINDING_DYNAMIC<TV>::
-Read_Helper(TYPED_ISTREAM& input)
+Read_Helper(TYPED_ISTREAM input)
 {
     BINDING<TV>::Read_Helper(input);
     Read_Binary(input,parents,weights);
@@ -217,7 +217,7 @@ Read_Helper(TYPED_ISTREAM& input)
 // Function Write_Helper
 //#####################################################################
 template<class TV> void LINEAR_BINDING_DYNAMIC<TV>::
-Write_Helper(TYPED_OSTREAM& output) const
+Write_Helper(TYPED_OSTREAM output) const
 {
     BINDING<TV>::Write_Helper(output);
     Write_Binary(output,parents,weights);

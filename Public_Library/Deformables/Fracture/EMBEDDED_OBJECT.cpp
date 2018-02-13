@@ -324,7 +324,7 @@ Calculate_Boundary_From_Levelset_On_Nodes(ARRAY<T>& phi,const bool discard_eleme
 // Function Read_Helper
 //#####################################################################
 template<class TV,int d> void EMBEDDED_OBJECT<TV,d>::
-Read(TYPED_ISTREAM& input)
+Read(TYPED_ISTREAM input)
 {
     Clean_Memory(); // reads entire simplicial_object instead of just simplicial_mesh
     int backward_compatible;
@@ -335,7 +335,7 @@ Read(TYPED_ISTREAM& input)
 // Function Write
 //#####################################################################
 template<class TV,int d> void EMBEDDED_OBJECT<TV,d>::
-Write(TYPED_OSTREAM& output) const
+Write(TYPED_OSTREAM output) const
 {
     Write_Binary(output,embedded_particles,2,parent_particles,interpolation_fraction,simplicial_object,embedded_mesh,d+1,node_in_simplex_is_material);
     Write_Binary(output,interpolation_fraction_threshold,orientation_index);

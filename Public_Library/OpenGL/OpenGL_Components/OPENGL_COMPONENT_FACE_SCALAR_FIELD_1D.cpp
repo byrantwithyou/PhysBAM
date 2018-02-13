@@ -11,8 +11,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T,class T2> OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<T,T2>::
-OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D(STREAM_TYPE stream_type,const GRID<TV> &grid_input,const std::string &values_filename_input,OPENGL_COLOR point_color,OPENGL_COLOR line_color)
-    :OPENGL_COMPONENT<T>(stream_type,"Face Scalar Field 1D"),opengl_face_scalar_field(stream_type,grid_input,*new ARRAY<T2,FACE_INDEX<1> >,point_color,line_color),
+OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D(const GRID<TV> &grid_input,const std::string &values_filename_input,OPENGL_COLOR point_color,OPENGL_COLOR line_color)
+    :OPENGL_COMPONENT<T>("Face Scalar Field 1D"),opengl_face_scalar_field(grid_input,*new ARRAY<T2,FACE_INDEX<1> >,point_color,line_color),
       values_filename(values_filename_input),frame_loaded(-1),valid(false)
 {
     viewer_callbacks.Set("increase_scale",{[this](){Increase_Scale();},"Increase scale"});
@@ -116,7 +116,7 @@ Reinitialize()
 
         std::string filename=Get_Frame_Filename(values_filename,frame);
         if(File_Exists(filename))
-            Read_From_File(stream_type,filename,opengl_face_scalar_field.face_values);
+            Read_From_File(filename,opengl_face_scalar_field.face_values);
         else return;
         frame_loaded = frame;
         valid = true;}

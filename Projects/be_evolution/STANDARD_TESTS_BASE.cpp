@@ -249,17 +249,17 @@ Read_Output_Files_Solids(const int frame)
     BASE::Read_Output_Files_Solids(frame);
     if(pfd)
     {
-        Read_From_File(stream_type,LOG::sprintf("%s/%d/pfd_data",output_directory.c_str(),frame),pfd->grid);
+        Read_From_File(LOG::sprintf("%s/%d/pfd_data",output_directory.c_str(),frame),pfd->grid);
         pfd->restarted=true;
     }
     if(pfd->di_penalty)
-        Read_From_File(stream_type,LOG::sprintf("%s/%d/di_data",output_directory.c_str(),frame),*pfd->di_penalty);
+        Read_From_File(LOG::sprintf("%s/%d/di_data",output_directory.c_str(),frame),*pfd->di_penalty);
     if(pfd->rr_penalty)
-        Read_From_File(stream_type,LOG::sprintf("%s/%d/rr_data",output_directory.c_str(),frame),*pfd->rr_penalty);
+        Read_From_File(LOG::sprintf("%s/%d/rr_data",output_directory.c_str(),frame),*pfd->rr_penalty);
     if(pfd->rd_penalty)
-        Read_From_File(stream_type,LOG::sprintf("%s/%d/rd_data",output_directory.c_str(),frame),*pfd->rd_penalty);
+        Read_From_File(LOG::sprintf("%s/%d/rd_data",output_directory.c_str(),frame),*pfd->rd_penalty);
     if(pfd->dd_penalty)
-        Read_From_File(stream_type,LOG::sprintf("%s/%d/dd_data",output_directory.c_str(),frame),*pfd->dd_penalty);
+        Read_From_File(LOG::sprintf("%s/%d/dd_data",output_directory.c_str(),frame),*pfd->dd_penalty);
 }
 //#####################################################################
 // Function Write_Output_Files

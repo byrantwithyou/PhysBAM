@@ -118,7 +118,7 @@ Update_Binding_Index_From_Particle_Index()
 // Function Read
 //#####################################################################
 template<class TV> void SOFT_BINDINGS<TV>::
-Read(TYPED_ISTREAM& input)
+Read(TYPED_ISTREAM input)
 {
     SEGMENT_MESH* binding_mesh_save=binding_mesh;binding_mesh=0; // save binding mesh so we don't kill it in Clean_Memory
     Clean_Memory();int backward_compatible;Read_Binary(input,backward_compatible,bindings);
@@ -130,7 +130,7 @@ Read(TYPED_ISTREAM& input)
 // Function Write
 //#####################################################################
 template<class TV> void SOFT_BINDINGS<TV>::
-Write(TYPED_OSTREAM& output) const
+Write(TYPED_OSTREAM output) const
 {
     Write_Binary(output,2,bindings,use_impulses_for_collisions);
 }

@@ -23,7 +23,7 @@
 #include "../RAY_TRACING_EXAMPLE.h"
 namespace PhysBAM{
 
-template<class T,class RW>
+template<class T>
 class GENERIC_RENDER_EXAMPLE:public RAY_TRACING_EXAMPLE<T>
 {
     typedef VECTOR<T,3> TV;

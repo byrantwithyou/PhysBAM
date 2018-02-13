@@ -106,7 +106,7 @@ Extension() const
 // Function Read_Structure
 //#####################################################################
 template<class TV> void STRUCTURE<TV>::
-Read_Structure(TYPED_ISTREAM& input)
+Read_Structure(TYPED_ISTREAM input)
 {
     std::string name;
     Read_Binary(input,name);
@@ -119,7 +119,7 @@ Read_Structure(TYPED_ISTREAM& input)
 // Function Write_Structure
 //#####################################################################
 template<class TV> void STRUCTURE<TV>::
-Write_Structure(TYPED_OSTREAM& output)
+Write_Structure(TYPED_OSTREAM output)
 {
     Write_Binary(output,Name());
     Write(output);
@@ -128,7 +128,7 @@ Write_Structure(TYPED_OSTREAM& output)
 // Function Create_Structure
 //#####################################################################
 template<class TV> STRUCTURE<TV>*  STRUCTURE<TV>::
-Create_Structure(TYPED_ISTREAM& input,GEOMETRY_PARTICLES<TV>& particles)
+Create_Structure(TYPED_ISTREAM input,GEOMETRY_PARTICLES<TV>& particles)
 {
     std::string name;
     Read_Binary(input,name);
@@ -140,7 +140,7 @@ Create_Structure(TYPED_ISTREAM& input,GEOMETRY_PARTICLES<TV>& particles)
 // Function Create_Structure
 //#####################################################################
 template<class TV> STRUCTURE<TV>*  STRUCTURE<TV>::
-Create_Structure(TYPED_ISTREAM& input)
+Create_Structure(TYPED_ISTREAM input)
 {
     std::string name;
     Read_Binary(input,name);
@@ -151,11 +151,11 @@ Create_Structure(TYPED_ISTREAM& input)
 //#####################################################################
 // Function Create_From_File
 //#####################################################################
-template<class TV> template<class RW> STRUCTURE<TV>*  STRUCTURE<TV>::
+template<class TV> STRUCTURE<TV>*  STRUCTURE<TV>::
 Create_From_File(const std::string& filename)
 {
     STRUCTURE<TV>* structure=STRUCTURE<TV>::Create_From_Extension(Get_File_Extension(filename));
-    Read_From_File<RW>(filename,*structure);
+    Read_From_File(filename,*structure);
     return structure;
 }
 //#####################################################################
@@ -166,16 +166,4 @@ template class STRUCTURE<VECTOR<float,3> >;
 template class STRUCTURE<VECTOR<double,1> >;
 template class STRUCTURE<VECTOR<double,2> >;
 template class STRUCTURE<VECTOR<double,3> >;
-template STRUCTURE<VECTOR<double,1> >* STRUCTURE<VECTOR<double,1> >::Create_From_File<double>(std::string const&);
-template STRUCTURE<VECTOR<double,1> >* STRUCTURE<VECTOR<double,1> >::Create_From_File<float>(std::string const&);
-template STRUCTURE<VECTOR<double,2> >* STRUCTURE<VECTOR<double,2> >::Create_From_File<double>(std::string const&);
-template STRUCTURE<VECTOR<double,2> >* STRUCTURE<VECTOR<double,2> >::Create_From_File<float>(std::string const&);
-template STRUCTURE<VECTOR<double,3> >* STRUCTURE<VECTOR<double,3> >::Create_From_File<double>(std::string const&);
-template STRUCTURE<VECTOR<double,3> >* STRUCTURE<VECTOR<double,3> >::Create_From_File<float>(std::string const&);
-template STRUCTURE<VECTOR<float,1> >* STRUCTURE<VECTOR<float,1> >::Create_From_File<double>(std::string const&);
-template STRUCTURE<VECTOR<float,1> >* STRUCTURE<VECTOR<float,1> >::Create_From_File<float>(std::string const&);
-template STRUCTURE<VECTOR<float,2> >* STRUCTURE<VECTOR<float,2> >::Create_From_File<double>(std::string const&);
-template STRUCTURE<VECTOR<float,2> >* STRUCTURE<VECTOR<float,2> >::Create_From_File<float>(std::string const&);
-template STRUCTURE<VECTOR<float,3> >* STRUCTURE<VECTOR<float,3> >::Create_From_File<double>(std::string const&);
-template STRUCTURE<VECTOR<float,3> >* STRUCTURE<VECTOR<float,3> >::Create_From_File<float>(std::string const&);
 }

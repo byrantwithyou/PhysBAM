@@ -43,7 +43,7 @@ protected:
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;
     using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
+    using OPENGL_OBJECT<T>::viewer_callbacks;
     using OPENGL_OBJECT<T>::World_Space_Box;
     DEFORMABLE_BODY_COLLECTION<TV> &deformable_body_collection;
     ARRAY<OPENGL_SEGMENTED_CURVE_3D<T>*> segmented_curve_objects;
@@ -81,7 +81,7 @@ public:
     int selected_index;
     OPENGL_OBJECT<T>* selected_object;
 
-    OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D(STREAM_TYPE stream_type,const std::string& prefix,const int start_frame);
+    OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D(const std::string& prefix,const int start_frame);
     virtual ~OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D();
     
     bool Valid_Frame(int frame_input) const override;

@@ -100,7 +100,7 @@ Intersect_With_Rigid_Body(const RIGID_BODY<VECTOR<T,2> >& body,const VECTOR<T,2>
 // Function Read
 //#####################################################################
 template<class T> void FRACTURE_PATTERN<T>::
-Read(TYPED_ISTREAM& input)
+Read(TYPED_ISTREAM input)
 {
     int region_count;
     Read_Binary(input,region_count);
@@ -114,7 +114,7 @@ Read(TYPED_ISTREAM& input)
 // Function Write
 //#####################################################################
 template<class T> void FRACTURE_PATTERN<T>::
-Write(TYPED_OSTREAM& output) const
+Write(TYPED_OSTREAM output) const
 {
     Write_Binary(output,regions.m);
     for(int r=0;r<regions.m;r++) regions(r)->Write(output);

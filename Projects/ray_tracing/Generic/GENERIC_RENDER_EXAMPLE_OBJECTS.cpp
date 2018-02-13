@@ -33,7 +33,7 @@ using namespace PhysBAM;
 //#####################################################################
 // Object
 //#####################################################################
-template<class T,class RW> void GENERIC_RENDER_EXAMPLE<T,RW>::
+template<class T> void GENERIC_RENDER_EXAMPLE<T>::
 Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
 {
     std::string type=parameters.Get_Parameter("Type",std::string("Null"));
@@ -218,7 +218,7 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         SEGMENTED_CURVE<TV>* curve;
         std::string substituted_filename=Animated_Filename(filename,frame);
         LOG::cout<<"Triangulated Surface Filename="<<filename<<" trying to read "<<substituted_filename<<std::endl;
-        Create_From_File<RW>(substituted_filename, curve);
+        Create_From_File(substituted_filename, curve);
         RENDERING_SEGMENTED_CURVE<T>* rendering_curve=new RENDERING_SEGMENTED_CURVE<T>(*curve, thickness);
         object=rendering_curve;
         object->add_to_spatial_partition=true;}
@@ -244,7 +244,7 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         // substitute the frame in
         std::string substituted_filename=Animated_Filename(filename,frame);
         LOG::cout<<"Triangulated Surface Filename="<<filename<<" trying to read "<<substituted_filename<<std::endl;
-        TRIANGULATED_SURFACE<T>* surface;Create_From_File<RW>(substituted_filename,surface);
+        TRIANGULATED_SURFACE<T>* surface;Create_From_File(substituted_filename,surface);
         std::cout<<"    Contains "<<surface->mesh.number_nodes<<" nodes "<<surface->mesh.elements.m<<" triangles"<<std::endl;
         surface->particles.Resize(surface->mesh.number_nodes);
         surface->Rescale(scale);
@@ -256,7 +256,7 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         std::cout<<"     two_sided="<<two_sided<<std::endl;
         triangulated_object->two_sided=two_sided;
         if(texture_coordinate_filename!="unknown"){
-            triangulated_object->template Read_Texture_Coordinates<float>(texture_coordinate_filename.c_str());
+            triangulated_object->Read_Texture_Coordinates(texture_coordinate_filename.c_str());
             T texture_scaling_factor=parameters.Get_Parameter("Texture_Scaling_Factor",(T)0.0);
             if(texture_scaling_factor>0)triangulated_object->Rescale_Texture_Coordinates(texture_scaling_factor);}
         if(bump_map_filename!="unknown"){
@@ -294,8 +294,8 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         T volume_step=parameters.Get_Parameter("Volume_Step",(T)0.1);
         // always read densities but sometimes read temperatures
         GRID<TV>* grid=new GRID<TV>;ARRAY<T,VECTOR<int,3> >* density_data=new ARRAY<T,VECTOR<int,3> >;
-        Read_From_File<RW>(Animated_Filename(grid_filename,frame),*grid);
-        Read_From_File<RW>(Animated_Filename(density_filename,frame),*density_data);
+        Read_From_File(Animated_Filename(grid_filename,frame),*grid);
+        Read_From_File(Animated_Filename(density_filename,frame),*density_data);
         if(use_density_gradient){
             LOG::cout<<"Using density gradient"<<std::endl;
             ARRAY<T,VECTOR<int,3> >* density_gradient_data=new ARRAY<T,VECTOR<int,3> >(*density_data);
@@ -305,7 +305,7 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         if(density_fraction_filename!="<unknown>"){
             LOG::cout<<"Using density fraction from "<<density_fraction_filename<<std::endl;
             ARRAY<T,VECTOR<int,3> > density_fraction_data;
-            Read_From_File<RW>(Animated_Filename(density_fraction_filename,frame),density_fraction_data);
+            Read_From_File(Animated_Filename(density_fraction_filename,frame),density_fraction_data);
             *density_data*=density_fraction_data;}
         if(use_cubic_for_density){
             LOG::cout<<"Using density cubic"<<std::endl;
@@ -314,7 +314,7 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         RENDERING_UNIFORM_VOXELS<T> *voxels=new RENDERING_UNIFORM_VOXELS<T>(*grid,*density_data,(T)volume_step);
         if(temperature_filename!="<unknown>"){
             ARRAY<T,VECTOR<int,3> >* temperature_data=new ARRAY<T,VECTOR<int,3> >;voxels->data.Append(temperature_data);
-            Read_From_File<RW>(Animated_Filename(temperature_filename,frame),*temperature_data);}
+            Read_From_File(Animated_Filename(temperature_filename,frame),*temperature_data);}
 
         voxels->data_scale.Append(density_scale);
         voxels->data_scale.Append(temperature_scale);
@@ -369,9 +369,9 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         GRID<TV>* grid=new GRID<TV>;
         ARRAY<T,VECTOR<int,3> >* density=new ARRAY<T,VECTOR<int,3> >;
         ARRAY<T,VECTOR<int,3> >* pressure=new ARRAY<T,VECTOR<int,3> >;
-        Read_From_File<RW>(Animated_Filename(grid_filename,frame),*grid);
-        Read_From_File<RW>(Animated_Filename(density_filename,frame),*density);
-        Read_From_File<RW>(Animated_Filename(pressure_filename,frame),*pressure);
+        Read_From_File(Animated_Filename(grid_filename,frame),*grid);
+        Read_From_File(Animated_Filename(density_filename,frame),*density);
+        Read_From_File(Animated_Filename(pressure_filename,frame),*pressure);
         LOG::cout<<"  Read grid " <<*grid <<std::endl;
         RENDERING_SHOCKS<T>* rendering_shocks=new RENDERING_SHOCKS<T>(*grid,*density,*pressure,gradient_threshold,refraction_multiplier,volume_step,fine_volumetric_step,skip_next_intersection_factor,use_pressure_for_intersection,use_pressure_for_rarefaction);
         object=rendering_shocks;}
@@ -382,7 +382,7 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         LEVELSET_IMPLICIT_OBJECT<TV>* implicit_surface=dynamic_cast<LEVELSET_IMPLICIT_OBJECT<TV>*>(rendering_implicit_surface->implicit_surface);
         std::string raw_filename=parameters.Get_Parameter("Filename",std::string("unknown"));
         bool negate=parameters.Get_Parameter("Negate",(bool)false);
-        Read_From_File<RW>(Animated_Filename(raw_filename,frame),*implicit_surface);
+        Read_From_File(Animated_Filename(raw_filename,frame),*implicit_surface);
         LOG::cout<<"Grid "<<(*grid)<<std::endl;
         if(negate) for(int i=0;i<grid->counts.x;i++)for(int j=0;j<grid->counts.y;j++)for(int ij=0;ij<grid->counts.z;ij++)(*phi)(i,j,ij)=-(*phi)(i,j,ij);
         T contour=parameters.Get_Parameter("Contour",(T)0);
@@ -394,7 +394,7 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
             if(raw_removed_particles_filename!="unknown"){ // merge with removed negative particles
                 LOG::cout<<"Reading removed negative particles"<<std::endl;
                 ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,3> > particle_array;
-                Read_From_File<RW>(Animated_Filename(raw_removed_particles_filename,frame),particle_array);
+                Read_From_File(Animated_Filename(raw_removed_particles_filename,frame),particle_array);
                 LOG::cout<<"Initializing particle processing"<<std::endl;
                 UNIFORM_REMOVED_PARTICLES_PROCESSING<T> particle_processing(*grid,*phi,particle_array);
                 particle_processing.blending_parameter=parameters.Get_Parameter("Particle_Blending_Parameter",(T).8);
@@ -501,7 +501,7 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         for(int i=0;i<number_of_regions;i++){
             LOG::cout<<"Reading Region("<<i<<")"<<std::endl;
             std::string raw_filename=parameters.Get_Parameter(LOG::sprintf("Filename%d",i), std::string("unknown"));
-            Read_From_File<RW>(Animated_Filename(raw_filename,frame),*rendering_levelset_multiple_object->levelset_multiple.levelsets(i));
+            Read_From_File(Animated_Filename(raw_filename,frame),*rendering_levelset_multiple_object->levelset_multiple.levelsets(i));
             *grid=rendering_levelset_multiple_object->levelset_multiple.levelsets(i)->grid;}
         for(int i=0;i<number_of_regions;i++){
             // setup shaders before the rendering_multiple_implicit_surface is casted to rendering_object;
@@ -537,12 +537,12 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         ARRAY<T,VECTOR<int,3> >* phi=new ARRAY<T,VECTOR<int,3> >;GRID<TV>* grid=new GRID<TV>;
         LEVELSET_IMPLICIT_OBJECT<TV>* levelset=new LEVELSET_IMPLICIT_OBJECT<TV>(*grid,*phi);
         std::string raw_filename=parameters.Get_Parameter("Filename",std::string("unknown"));
-        Read_From_File<RW>(Animated_Filename(raw_filename,frame),*levelset);
+        Read_From_File(Animated_Filename(raw_filename,frame),*levelset);
         LOG::cout<<"Grid "<<(*grid)<<std::endl;
         std::string raw_removed_particles_filename=parameters.Get_Parameter("Removed_Negative_Particles_Filename",std::string("unknown"));
         LOG::cout<<"Reading removed negative particles"<<std::endl;
         ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,3> > particle_array;
-        Read_From_File<RW>(Animated_Filename(raw_removed_particles_filename,frame),particle_array);
+        Read_From_File(Animated_Filename(raw_removed_particles_filename,frame),particle_array);
         LOG::cout<<"Initializing particle processing"<<std::endl;
         REMOVED_PARTICLES_PROCESSING<T>* particle_processing=new REMOVED_PARTICLES_PROCESSING<T>(*grid,particle_array);
         particle_array.Delete_Pointers_And_Clean_Memory();
@@ -570,7 +570,7 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         if(particle_levelset=="unknown"){LOG::cerr<<"Error: must specify levelset for particle"<<std::endl;exit(1);}
         ARRAY<GEOMETRY_PARTICLES<TV>*,VECTOR<int,3> > particles_array;
         std::string raw_filename(parameters.Get_Parameter("Filename",std::string("unknown")));
-        Read_From_File<RW>(Animated_Filename(raw_filename,frame),particles_array);
+        Read_From_File(Animated_Filename(raw_filename,frame),particles_array);
         RENDERING_OBJECT<T>* particle_levelset_object;
         if(!objects.Get(particle_levelset,particle_levelset_object)){LOG::cerr<<"Error: levelset "<<particle_levelset<<" not defined"<<std::endl;exit(1);}
         RENDERING_IMPLICIT_SURFACE<T>* rendering_levelset=dynamic_cast<RENDERING_IMPLICIT_SURFACE<T>*>(particle_levelset_object);
@@ -619,9 +619,8 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         for(int i=0;i<object_group.m;i++){
             std::string instance_name=LOG::sprintf("%s_%d",name.c_str(),i);
             object_group(i)->name=instance_name;object_group(i)->Update_Transform(current_transform);objects.Set(instance_name,object_group(i));}}
-    if(object) GENERIC_RENDER_EXAMPLE<T,RW>::Add_Solid_Texture(object,parameters);
+    if(object) GENERIC_RENDER_EXAMPLE<T>::Add_Solid_Texture(object,parameters);
 }
 //#####################################################################
-template void GENERIC_RENDER_EXAMPLE<float,float>::Object(RENDER_WORLD<float>& world,const int frame,PARAMETER_LIST& parameters);
-template void GENERIC_RENDER_EXAMPLE<double,float>::Object(RENDER_WORLD<double>& world,const int frame,PARAMETER_LIST& parameters);
-template void GENERIC_RENDER_EXAMPLE<double,double>::Object(RENDER_WORLD<double>& world,const int frame,PARAMETER_LIST& parameters);
+template void GENERIC_RENDER_EXAMPLE<float>::Object(RENDER_WORLD<float>& world,const int frame,PARAMETER_LIST& parameters);
+template void GENERIC_RENDER_EXAMPLE<double>::Object(RENDER_WORLD<double>& world,const int frame,PARAMETER_LIST& parameters);

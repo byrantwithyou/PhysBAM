@@ -69,7 +69,7 @@ void Register_Muscle_Segment()
 // Function Create_From_Input
 //#####################################################################
 template<class TV> MUSCLE_SEGMENT<TV>* MUSCLE_SEGMENT<TV>::
-Create_From_Input(TYPED_ISTREAM& input)
+Create_From_Input(TYPED_ISTREAM input)
 {
     Register_Muscle_Segment();
     std::string name;Read_Binary(input,name);
@@ -80,7 +80,7 @@ Create_From_Input(TYPED_ISTREAM& input)
 // Function Read_And_Set_Parameters
 //#####################################################################
 template<class TV> void MUSCLE_SEGMENT<TV>::
-Read_And_Set_Parameters(TYPED_ISTREAM& input)
+Read_And_Set_Parameters(TYPED_ISTREAM input)
 {
     Read_Binary(input,frame,segment_type);
 }
@@ -88,7 +88,7 @@ Read_And_Set_Parameters(TYPED_ISTREAM& input)
 // Function Write_Parameters
 //#####################################################################
 template<class TV> void MUSCLE_SEGMENT<TV>::
-Write_Parameters(TYPED_OSTREAM& output) const
+Write_Parameters(TYPED_OSTREAM output) const
 {
     Write_Binary(output,frame,segment_type);
 }
@@ -146,7 +146,7 @@ Create()
 // Function Write
 //#####################################################################
 template<class TV> void MUSCLE_SEGMENT<TV>::
-Write(TYPED_OSTREAM& output) const
+Write(TYPED_OSTREAM output) const
 {
     Write_Binary(output,Name());
     Write_Parameters(output);

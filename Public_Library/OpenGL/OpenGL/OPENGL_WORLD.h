@@ -65,7 +65,6 @@ public:
 private:
     bool initialized;
 public:
-    STREAM_TYPE stream_type;
     bool smooth_shading;
 
     // objects
@@ -147,7 +146,7 @@ private:
     TV* current_selection; // pointer to current selection item    
 
 public:
-    OPENGL_WORLD(STREAM_TYPE stream_type);
+    OPENGL_WORLD();
     ~OPENGL_WORLD();
     static OPENGL_WORLD* Singleton();
     void Run_Visualization(const std::string& window_title="OpenGL Visualization");

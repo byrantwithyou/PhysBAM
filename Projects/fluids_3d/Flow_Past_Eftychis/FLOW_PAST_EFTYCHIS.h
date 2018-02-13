@@ -121,7 +121,7 @@ void Initialize_Phi() override
 void Initialize_Bodies() override
 {
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
-    body=rigid_body_collection.Add_Rigid_Body(stream_type,"/solver/vol3/hair1/data/body_recede/Rigid_Bodies/body_recede",(T)1,true,true,false);
+    body=rigid_body_collection.Add_Rigid_Body("/solver/vol3/hair1/data/body_recede/Rigid_Bodies/body_recede",(T)1,true,true,false);
     rigid_body_collection.Rigid_Body(body).Is_Kinematic()=true;
     fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection);
 }

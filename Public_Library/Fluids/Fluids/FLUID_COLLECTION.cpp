@@ -33,10 +33,10 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
 // Function Read_Output_Files
 //#####################################################################
 template<class TV> void FLUID_COLLECTION<TV>::
-Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame)
+Read_Output_Files(const std::string& output_directory,const int frame)
 {
     //compressible_fluid_collection.Read_Output_Files(frame);
-    incompressible_fluid_collection.Read_Output_Files(stream_type,output_directory,frame);
+    incompressible_fluid_collection.Read_Output_Files(output_directory,frame);
 }
 //#####################################################################
 // Function Initialize

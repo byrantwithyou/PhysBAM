@@ -22,7 +22,7 @@ public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
     using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
     using OPENGL_COMPONENT<T>::Is_Up_To_Date;using OPENGL_OBJECT<T>::viewer_callbacks;
-    OPENGL_COMPONENT_LEVELSET_3D(STREAM_TYPE stream_type,const std::string& levelset_filename,
+    OPENGL_COMPONENT_LEVELSET_3D(const std::string& levelset_filename,
                                  const std::string& triangulated_surface_filename = "",
                                  const std::string& filename_set_input = "",
                                  const std::string& filename_triangulated_surface_set_input = "",

@@ -10,7 +10,7 @@
 #include "../WATER_FREE_SURFACE_3D_EXAMPLE.h"
 namespace PhysBAM{
 
-template<class T,class RW=T>
+template<class T>
 class BOUNCING_DROP:public WATER_FREE_SURFACE_3D_EXAMPLE<T,RW>
 {
 public:

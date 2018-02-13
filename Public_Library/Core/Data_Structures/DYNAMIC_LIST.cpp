@@ -153,14 +153,14 @@ Fill_Needs_Write()
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class RW> void DYNAMIC_LIST_CORE::
+void DYNAMIC_LIST_CORE::
 Read(const std::string& prefix,ARRAY<int>& needs_init)
 {
     pointer_to_id_map.Clean_Memory();
     needs_init.Remove_All();
     needs_write.Remove_All();
     ARRAY<int> active_ids;char version;
-    Read_From_File<RW>(LOG::sprintf("%sactive_ids",prefix.c_str()),version,next_unique_id,active_ids);
+    Read_From_File(LOG::sprintf("%sactive_ids",prefix.c_str()),version,next_unique_id,active_ids);
     PHYSBAM_ASSERT(version==1);
     ARRAY<void*> new_array;
     ARRAY<bool> element_copied(array.Size());
@@ -181,15 +181,11 @@ Read(const std::string& prefix,ARRAY<int>& needs_init)
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class RW> void DYNAMIC_LIST_CORE::
-Write(const std::string& prefix) const
+void DYNAMIC_LIST_CORE::
+Write(STREAM_TYPE stream_type,const std::string& prefix) const
 {
     const char version=1;
-    Write_To_File<RW>(LOG::sprintf("%sactive_ids",prefix.c_str()),version,next_unique_id,index_to_id_map);
+    Write_To_File(stream_type,LOG::sprintf("%sactive_ids",prefix.c_str()),version,next_unique_id,index_to_id_map);
     for(int i=needs_write.m-1;i>=0;i--) if(id_to_index_map(needs_write(i))<0) needs_write.Remove_Index_Lazy(i);
     // handle case of new element which was removed without being written
 }
-template void DYNAMIC_LIST_CORE::Read<double>(std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,ARRAY<int,int>&);
-template void DYNAMIC_LIST_CORE::Read<float>(std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,ARRAY<int,int>&);
-template void DYNAMIC_LIST_CORE::Write<double>(std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&) const;
-template void DYNAMIC_LIST_CORE::Write<float>(std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&) const;

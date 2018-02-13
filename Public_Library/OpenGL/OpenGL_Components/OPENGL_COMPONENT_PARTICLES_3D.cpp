@@ -16,9 +16,9 @@ using namespace PhysBAM;
 // Function OPENGL_COMPONENT_PARTICLES_3D
 //#####################################################################
 template<class T> OPENGL_COMPONENT_PARTICLES_3D<T>::
-OPENGL_COMPONENT_PARTICLES_3D(STREAM_TYPE stream_type,const std::string &filename_input, const std::string &filename_set_input, bool use_ids_input, bool particles_stored_per_cell_uniform_input)
-    :OPENGL_COMPONENT<T>(stream_type,"Particles 3D"), particles(new GEOMETRY_PARTICLES<TV>),opengl_points(new OPENGL_POINTS_3D<T>(stream_type,*(new ARRAY<TV>))),
-    opengl_vector_field(stream_type,*(new ARRAY<TV>),opengl_points->points,OPENGL_COLOR::Cyan()),
+OPENGL_COMPONENT_PARTICLES_3D(const std::string &filename_input, const std::string &filename_set_input, bool use_ids_input, bool particles_stored_per_cell_uniform_input)
+    :OPENGL_COMPONENT<T>("Particles 3D"), particles(new GEOMETRY_PARTICLES<TV>),opengl_points(new OPENGL_POINTS_3D<T>(*(new ARRAY<TV>))),
+    opengl_vector_field(*(new ARRAY<TV>),opengl_points->points,OPENGL_COLOR::Cyan()),
     filename(filename_input), filename_set(filename_set_input),frame_loaded(-1), set(0), set_loaded(-1),number_of_sets(0),use_sets(false),valid(false),
     draw_velocities(false),have_velocities(false),use_ids(use_ids_input),
     particles_stored_per_cell_uniform(particles_stored_per_cell_uniform_input),
@@ -49,7 +49,7 @@ OPENGL_COMPONENT_PARTICLES_3D(STREAM_TYPE stream_type,const std::string &filenam
     opengl_points->color=color_map->Lookup(0);
     for(int i=1;i<number_of_sets;i++){
         particles_multiple(i)=new GEOMETRY_PARTICLES<TV>;
-        opengl_points_multiple(i)=new OPENGL_POINTS_3D<T>(stream_type,*(new ARRAY<TV>),color_map->Lookup(i));}
+        opengl_points_multiple(i)=new OPENGL_POINTS_3D<T>(*(new ARRAY<TV>),color_map->Lookup(i));}
     delete color_map;
 
     is_animation=Is_Animated(filename);
@@ -211,11 +211,11 @@ Reinitialize(bool force)
         else frame_filename=Get_Frame_Filename(filename,frame);
         
         try{
-            std::istream* input_file=Safe_Open_Input(frame_filename);
-            TYPED_ISTREAM typed_input(*input_file,stream_type);
+            FILE_ISTREAM input;
+            Safe_Open_Input(input,frame_filename);
             if(particles_stored_per_cell_uniform){
                 ARRAY<GEOMETRY_PARTICLES<TV>*,VECTOR<int,3> > particles_per_cell;
-                Read_Binary(typed_input,particles_per_cell);
+                Read_Binary(input,particles_per_cell);
                 ARRAY<PARTICLES<TV>*> initialization_array(particles_per_cell.array.Size());
                 for(int j=0;j<particles_per_cell.array.Size();j++){
                     if(particles_per_cell.array(j)) initialization_array(j)=particles_per_cell.array(j);
@@ -224,8 +224,7 @@ Reinitialize(bool force)
                 particles_multiple(i)->Initialize(initialization_array_view);
                 particles_per_cell.Delete_Pointers_And_Clean_Memory();}
             else{
-                Read_Binary(typed_input,*particles_multiple(i));}
-            delete input_file;
+                Read_Binary(input,*particles_multiple(i));}
             opengl_points_multiple(i)->Set_Points_From_Particles(*particles_multiple(i),true);}
         catch(FILESYSTEM_ERROR&){valid=false;}}
     frame_loaded=frame;

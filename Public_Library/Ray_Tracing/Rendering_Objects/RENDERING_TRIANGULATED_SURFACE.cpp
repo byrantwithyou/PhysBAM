@@ -226,14 +226,14 @@ Compute_Per_Vertex_Tangent_Vectors()
 //#####################################################################
 // Function Read_Texture_Coordinates
 //#####################################################################
-template<class T> template<class RW> void RENDERING_TRIANGULATED_SURFACE<T>::
+template<class T> void RENDERING_TRIANGULATED_SURFACE<T>::
 Read_Texture_Coordinates(const std::string& filename)
 {
     assert(!texture_coordinates);
     texture_coordinates=new ARRAY<VECTOR<T,2> >;
     triangle_texture_coordinates=new ARRAY<VECTOR<int,3> >;
     int backward_compatible;
-    Read_From_File<RW>(filename,*texture_coordinates,backward_compatible,*triangle_texture_coordinates);
+    Read_From_File(filename,*texture_coordinates,backward_compatible,*triangle_texture_coordinates);
     Compute_Per_Vertex_Tangent_Vectors();
 }
 //#####################################################################
@@ -275,8 +275,4 @@ Do_Displacement_Map_Per_Vertex(const T perturb_factor,const T perturb_power)
 }
 template class RENDERING_TRIANGULATED_SURFACE<double>;
 template class RENDERING_TRIANGULATED_SURFACE<float>;
-template void RENDERING_TRIANGULATED_SURFACE<double>::Read_Texture_Coordinates<double>(std::string const&);
-template void RENDERING_TRIANGULATED_SURFACE<double>::Read_Texture_Coordinates<float>(std::string const&);
-template void RENDERING_TRIANGULATED_SURFACE<float>::Read_Texture_Coordinates<float>(std::string const&);
-template void RENDERING_TRIANGULATED_SURFACE<float>::Read_Texture_Coordinates<double>(std::string const&);
 }

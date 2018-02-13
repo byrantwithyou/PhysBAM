@@ -1254,11 +1254,10 @@ void Energy_Profile_Plot(int frame)
         Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",dual_directory.c_str(),0),energy_particles);
         Write_To_File(this->stream_type,dual_directory+"/0/deformable_object_particles",energy_mesh->particles);
         std::string f="common";
-        std::ostream* output_raw=Safe_Open_Output(dual_directory+"/"+f+"/deformable_object_structures");
-        TYPED_OSTREAM output(*output_raw,this->stream_type);
+        FILE_OSTREAM output;
+        Safe_Open_Output(output,this->stream_type,dual_directory+"/"+f+"/deformable_object_structures");
         Write_Binary(output,1);
-        energy_mesh->Write_Structure(output);
-        delete output_raw;}
+        energy_mesh->Write_Structure(output);}
 
     Write_To_Text_File(dual_directory+"/common/last_frame",frame,"\n");
 }

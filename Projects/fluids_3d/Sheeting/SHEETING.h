@@ -144,7 +144,7 @@ T Initial_Phi_Object(const VECTOR<T,3>& X) const
 void Initialize_Bodies() override
 {        
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
-    bowl=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/anisotropic_bowl",(T).1,true,true,false);
+    bowl=rigid_body_collection.Add_Rigid_Body(data_directory+"/Rigid_Bodies/anisotropic_bowl",(T).1,true,true,false);
     rigid_body_collection.rigid_body_particles.frame(bowl).t=VECTOR<T,3>((T)2.5,2,1);
     rigid_body_collection.Rigid_Body(bowl).Frame().r=ROTATION<VECTOR<T,3> >::From_Euler_Angles((T)pi/4,0,0);
     rigid_body_collection.Rigid_Body(bowl).Is_Kinematic()=true;

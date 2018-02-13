@@ -35,8 +35,8 @@ public:
         ARRAY<MATRIX<VECTOR<T,5>,gauss_order> > A;
         MATRIX<VECTOR<TM,3>,gauss_order> G0_inv;
         MATRIX<VECTOR<T,3>,gauss_order> G0_det;
-        void Read(TYPED_ISTREAM& input);
-        void Write(TYPED_OSTREAM& output) const;
+        void Read(TYPED_ISTREAM input);
+        void Write(TYPED_OSTREAM output) const;
     };
     ARRAY<FACE_DATA> face_data; // one slot per face.
     
@@ -50,8 +50,8 @@ public:
     void Initialize(const std::string& filename,T thickness_in);
     TV Evaluate(T s,T t,VECTOR<TV,2>* tangents=0) const;
     OPENSUBDIV_SURFACE<TV,gauss_order>* Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& new_particles,ARRAY<int>* particle_indices) const override;
-    void Read(TYPED_ISTREAM& input) override;
-    void Write(TYPED_OSTREAM& output) const override;
+    void Read(TYPED_ISTREAM input) override;
+    void Write(TYPED_OSTREAM output) const override;
     void Compute_G0();
     void Set_Mass(T density,bool use_constant_mass=false) const;
     std::string Name() const override;

@@ -85,17 +85,17 @@ public:
     const RIGID_BODY<TV>& Rigid_Body(const int particle_index) const;
     int Add_Rigid_Body(RIGID_BODY<TV>* rigid_body,const int simplicial_boundary_id,const int implicit_object_id,const int simplicial_interior_id);
     int Add_Rigid_Body_And_Geometry(RIGID_BODY<TV>* rigid_body);
-    int Add_Rigid_Body(const STREAM_TYPE stream_type,const std::string& basename,const T scaling_factor=1,const bool read_simplicial_boundary=true,const bool read_implicit_object=true,
+    int Add_Rigid_Body(const std::string& basename,const T scaling_factor=1,const bool read_simplicial_boundary=true,const bool read_implicit_object=true,
         const bool read_simplicial_interior=false,const bool read_rgd_file=true);
-    int Add_Rigid_Body(const STREAM_TYPE stream_type,const bool thin_shell,const std::string& basename,const T scaling_factor=1,const bool read_simplicial_boundary=true,
+    int Add_Rigid_Body(const bool thin_shell,const std::string& basename,const T scaling_factor=1,const bool read_simplicial_boundary=true,
         const bool read_implicit_object=true,const bool read_simplicial_interior=false,const bool read_rgd_file=true);
-    int Add_Rigid_Body(RIGID_BODY<TV>* rigid_body,STREAM_TYPE stream_type,const std::string& basename,const T scaling_factor,
+    int Add_Rigid_Body(RIGID_BODY<TV>* rigid_body,const std::string& basename,const T scaling_factor,
         const bool read_simplicial_boundary,const bool read_implicit_object,const bool read_simplicial_interior,const bool read_rgd_file);
     void Update_Angular_Velocity();
     void Update_Angular_Momentum();
     void Update_Angular_Velocity(const ARRAY<int>& particle_indices);
     void Update_Angular_Momentum(const ARRAY<int>& particle_indices);
-    void Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,ARRAY<int>* needs_init=0,ARRAY<int>* needs_destroy=0);
+    void Read(const std::string& directory,const int frame,ARRAY<int>* needs_init=0,ARRAY<int>* needs_destroy=0);
     void Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame) const; // TODO: optionally skip certain kinds of structures in output
     void Update_Simulated_Particles();
     void Update_Level_Set_Transforms();
@@ -112,7 +112,7 @@ public:
 
     void Update_Kinematic_Particles();
     bool Register_Analytic_Replacement_Structure(const std::string& filename,const T scaling_factor,STRUCTURE<TV>* structure); // passing in zero skips reading
-    bool Find_Or_Read_Structure(const STREAM_TYPE stream_type,ARRAY<int>& structure_id,const std::string& filename,const T scaling_factor,const TV& center);
+    bool Find_Or_Read_Structure(ARRAY<int>& structure_id,const std::string& filename,const T scaling_factor,const TV& center);
     void Destroy_Unreferenced_Geometry();
 };
 }

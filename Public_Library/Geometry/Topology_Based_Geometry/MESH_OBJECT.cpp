@@ -272,7 +272,7 @@ typename TV::SCALAR MESH_OBJECT<TV,T_MESH>::Volumetric_Volume()
 // Function Read
 //#####################################################################
 template<class TV,class T_MESH> void MESH_OBJECT<TV,T_MESH>::
-Read(TYPED_ISTREAM& input)
+Read(TYPED_ISTREAM input)
 {
     int size;
     Read_Binary(input,mesh,size);
@@ -290,7 +290,7 @@ Read(TYPED_ISTREAM& input)
 // Function Write
 //#####################################################################
 template<class TV,class T_MESH> void MESH_OBJECT<TV,T_MESH>::
-Write(TYPED_OSTREAM& output) const
+Write(TYPED_OSTREAM output) const
 {
     if(mesh.number_nodes!=particles.Size()) PHYSBAM_FATAL_ERROR("number_nodes mismatch");
     Write_Binary(output,mesh,particles.X);

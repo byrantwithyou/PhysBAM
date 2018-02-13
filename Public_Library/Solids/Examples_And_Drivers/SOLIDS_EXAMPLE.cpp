@@ -75,13 +75,13 @@ template<class TV> SOLIDS_EXAMPLE<TV>::
 template<class TV> void SOLIDS_EXAMPLE<TV>::
 Read_Output_Files_Solids(const int frame)
 {
-    solid_body_collection.Read(stream_type,output_directory,frame,frame,solids_parameters.write_static_variables_every_frame,solids_parameters.rigid_body_evolution_parameters.write_rigid_bodies,
+    solid_body_collection.Read(output_directory,frame,frame,solids_parameters.write_static_variables_every_frame,solids_parameters.rigid_body_evolution_parameters.write_rigid_bodies,
         solids_parameters.write_deformable_body,solids_parameters.write_from_every_process);
     std::string f=LOG::sprintf("%d",frame);
     //if(NEWMARK_EVOLUTION<TV>* newmark=dynamic_cast<NEWMARK_EVOLUTION<TV>*>(solids_evolution))
     //    newmark->Read_Position_Update_Projection_Data(stream_type,output_directory+"/"+f+"/");
 
-    Read_From_File(stream_type,LOG::sprintf("%s/%d/triangle_collision_parameters",output_directory.c_str(),frame),
+    Read_From_File(LOG::sprintf("%s/%d/triangle_collision_parameters",output_directory.c_str(),frame),
         solids_parameters.triangle_collision_parameters.repulsion_pair_update_count,
         solids_parameters.triangle_collision_parameters.topological_hierarchy_build_count);
 }

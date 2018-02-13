@@ -38,7 +38,7 @@ public:
     TETRAHEDRALIZED_VOLUME_FIELD(const STREAM_TYPE stream_type,const std::string& filename)
         :field_volume(mesh,particles),default_value(0)
     {
-        Read_From_File(stream_type,filename,field_volume,field);
+        Read_From_File(filename,field_volume,field);
         field_volume.Update_Tetrahedron_List();
         field_volume.Initialize_Hierarchy();
         field_volume.Initialize_Triangulated_Surface();
@@ -87,7 +87,7 @@ public:
     TETRAHEDRALIZED_VOLUME_SURFACE_FIELD(const STREAM_TYPE stream_type,const std::string& filename)
         :field_volume(mesh,particles),default_value(0)
     {
-        Read_From_File(stream_type,filename,field_volume,field);
+        Read_From_File(filename,field_volume,field);
         field_volume.Update_Tetrahedron_List();
         //field_volume.Initialize_Hierarchy();
         field_volume.Initialize_Triangulated_Surface();

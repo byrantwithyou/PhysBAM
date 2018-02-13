@@ -34,7 +34,7 @@ public:
     
     //#####################################################################
     void Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const;
-    void Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame);
+    void Read_Output_Files(const std::string& output_directory,const int frame);
     void Initialize_Grids();
     //#####################################################################
 };

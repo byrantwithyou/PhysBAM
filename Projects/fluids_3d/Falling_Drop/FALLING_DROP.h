@@ -10,16 +10,16 @@
 #include <Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_3D.h>
 namespace PhysBAM{
 
-template<class T,class RW=T>
-class FALLING_DROP:public SOLIDS_FLUIDS_EXAMPLE_3D<RW>
+template<class T>
+class FALLING_DROP:public SOLIDS_FLUIDS_EXAMPLE_3D
 {
 public:
-    using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::first_frame;using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::last_frame;using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::frame_rate;
-    using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::restart;using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::restart_frame;using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::output_directory;
-    using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::fluids_parameters;
+    using SOLIDS_FLUIDS_EXAMPLE_3D::first_frame;using SOLIDS_FLUIDS_EXAMPLE_3D::last_frame;using SOLIDS_FLUIDS_EXAMPLE_3D::frame_rate;
+    using SOLIDS_FLUIDS_EXAMPLE_3D::restart;using SOLIDS_FLUIDS_EXAMPLE_3D::restart_frame;using SOLIDS_FLUIDS_EXAMPLE_3D::output_directory;
+    using SOLIDS_FLUIDS_EXAMPLE_3D::fluids_parameters;
 
     FALLING_DROP()
-        :SOLIDS_FLUIDS_EXAMPLE_3D<RW>(fluids_parameters.WATER)
+        :SOLIDS_FLUIDS_EXAMPLE_3D(fluids_parameters.WATER)
     {
         first_frame=0;last_frame=1000;
         frame_rate=24;

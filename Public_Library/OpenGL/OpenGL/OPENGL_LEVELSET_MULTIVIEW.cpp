@@ -118,7 +118,7 @@ Initialize_Levelset()
     if(!levelset){
         if(levelset_filename.length() > 0){
             levelset=new LEVELSET<TV>(*(new GRID<TV>),*(new ARRAY<T,VECTOR<int,3> >));
-            Read_From_File(stream_type,levelset_filename,*levelset);
+            Read_From_File(levelset_filename,*levelset);
             i_own_levelset=true;}}
 }
 //#####################################################################
@@ -140,13 +140,13 @@ Initialize_Triangulated_Surface()
                     (*triangulated_surface->vertex_normals)(p)=levelset->Normal(triangulated_surface->particles.X(p));
                 if(write_generated_triangulated_surface && triangulated_surface_filename.length() > 0){
                     const int vertex_normals_length=1; // needed for backwards compatibility, since vertex_normals used to be ARRAYS<TV,1>
-                    Write_To_File(stream_type,triangulated_surface_filename,*triangulated_surface,vertex_normals_length,*triangulated_surface->vertex_normals);}
+                    Write_To_File(STREAM_TYPE((T)0),triangulated_surface_filename,*triangulated_surface,vertex_normals_length,*triangulated_surface->vertex_normals);}
                 i_own_triangulated_surface=true;}}
         else if(triangulated_surface_filename.length() > 0){
             triangulated_surface=TRIANGULATED_SURFACE<T>::Create();
             triangulated_surface->Use_Vertex_Normals();triangulated_surface->vertex_normals=new ARRAY<TV>;
             int vertex_normals_length; // needed for backwards compatibility, since vertex_normals used to be ARRAYS<TV,1>
-            Read_From_File(stream_type,triangulated_surface_filename,*triangulated_surface,vertex_normals_length,*triangulated_surface->vertex_normals);
+            Read_From_File(triangulated_surface_filename,*triangulated_surface,vertex_normals_length,*triangulated_surface->vertex_normals);
             PHYSBAM_ASSERT(vertex_normals_length==1);
             i_own_triangulated_surface=true;}}
 }
@@ -159,7 +159,7 @@ Initialize_OpenGL_Triangulated_Surface()
     if(!opengl_triangulated_surface){
         Initialize_Triangulated_Surface();
         if(triangulated_surface){
-            opengl_triangulated_surface=new OPENGL_TRIANGULATED_SURFACE<T>(stream_type,*triangulated_surface,smooth_shading,front_surface_material,back_surface_material);
+            opengl_triangulated_surface=new OPENGL_TRIANGULATED_SURFACE<T>(*triangulated_surface,smooth_shading,front_surface_material,back_surface_material);
             if(triangulated_surface->vertex_normals){
                 opengl_triangulated_surface->Initialize_Vertex_Normals();
                 *opengl_triangulated_surface->vertex_normals=*triangulated_surface->vertex_normals;}}}
@@ -174,7 +174,7 @@ Initialize_OpenGL_Scalar_Field()
     if(!levelset) return;
 
     if(!opengl_scalar_field && levelset){
-        opengl_scalar_field=new OPENGL_SCALAR_FIELD_3D<T>(stream_type,levelset->grid,levelset->phi,OPENGL_COLOR_RAMP<T>::Levelset_Color_Constant_Ramp(inside_slice_color,outside_slice_color));
+        opengl_scalar_field=new OPENGL_SCALAR_FIELD_3D<T>(levelset->grid,levelset->phi,OPENGL_COLOR_RAMP<T>::Levelset_Color_Constant_Ramp(inside_slice_color,outside_slice_color));
         opengl_scalar_field->color_maps.Insert(OPENGL_COLOR_RAMP<T>::Levelset_Color_Linear_Ramp(inside_slice_color,outside_slice_color,opengl_scalar_field->grid.dX.x*10),2);}
 }
 //#####################################################################

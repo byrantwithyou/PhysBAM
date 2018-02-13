@@ -167,9 +167,9 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
 // Function Read_Output_Files
 //#####################################################################
 template<class T> void VORTEX_PARTICLE_EVOLUTION_3D<T>::
-Read_Output_Files(const STREAM_TYPE stream_type,const std::string& input_directory,const int frame)
+Read_Output_Files(const std::string& input_directory,const int frame)
 {
-    Read_From_File(stream_type,LOG::sprintf("%s/%d/vorticity_particles",input_directory.c_str(),frame),vorticity_particles);
+    Read_From_File(LOG::sprintf("%s/%d/vorticity_particles",input_directory.c_str(),frame),vorticity_particles);
 }
 //#####################################################################
 namespace PhysBAM{

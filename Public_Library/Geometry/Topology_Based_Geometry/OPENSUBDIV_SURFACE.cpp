@@ -59,7 +59,7 @@ Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& new_particles,ARRAY<int
     return surf;
 }
 template<class TV,int gauss_order> void OPENSUBDIV_SURFACE<TV,gauss_order>::FACE_DATA::
-Read(TYPED_ISTREAM& input)
+Read(TYPED_ISTREAM input)
 {
     int size;
     Read_Binary(input,size);
@@ -84,7 +84,7 @@ Read(TYPED_ISTREAM& input)
     else Read_Binary_Array<float>(input.stream,A.Get_Array_Pointer(),size);
 }
 template<class TV,int gauss_order> void OPENSUBDIV_SURFACE<TV,gauss_order>::FACE_DATA::
-Write(TYPED_OSTREAM& output) const
+Write(TYPED_OSTREAM output) const
 {
     Write_Binary(output,nodes,w,A);
 }
@@ -92,7 +92,7 @@ Write(TYPED_OSTREAM& output) const
 // Function Read
 //#####################################################################
 template<class TV,int gauss_order> void OPENSUBDIV_SURFACE<TV,gauss_order>::
-Read(TYPED_ISTREAM& input)
+Read(TYPED_ISTREAM input)
 {
     int num_verts;
     Read_Binary(input,m,num_verts,gauss_order);
@@ -132,7 +132,7 @@ Read(TYPED_ISTREAM& input)
 // Function Write
 //#####################################################################
 template<class TV,int gauss_order> void OPENSUBDIV_SURFACE<TV,gauss_order>::
-Write(TYPED_OSTREAM& output) const
+Write(TYPED_OSTREAM output) const
 {
     Write_Binary(output,m,control_points.m,gauss_order);
     Write_Binary(output,mesh);
@@ -272,10 +272,9 @@ Create(GEOMETRY_PARTICLES<TV>& particles)
 template<class TV,int gauss_order> void OPENSUBDIV_SURFACE<TV,gauss_order>::
 Initialize(const std::string& filename,T thickness_in)
 {
-    std::istream* input_raw=Safe_Open_Input(filename);
-    TYPED_ISTREAM input(*input_raw,STREAM_TYPE((RW())));
+    FILE_ISTREAM input;
+    Safe_Open_Input(input,filename);
     Read(input);
-    delete input_raw;
     thickness=thickness_in;
     Compute_G0();
 }

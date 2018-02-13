@@ -37,10 +37,9 @@ private:
     FRAME<TV> default_frame;
 
 public:
-    STREAM_TYPE stream_type;
     HASHTABLE<std::string,OPENGL_CALLBACK> viewer_callbacks;
 
-    OPENGL_OBJECT(STREAM_TYPE stream_type);
+    OPENGL_OBJECT();
     OPENGL_OBJECT(const OPENGL_OBJECT&) = delete;
     void operator=(const OPENGL_OBJECT&) = delete;
     virtual ~OPENGL_OBJECT();

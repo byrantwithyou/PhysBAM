@@ -94,8 +94,8 @@ public:
 
 //#####################################################################
     JOINT_ID Add_Joint(JOINT<TV>* new_joint_input);
-    void Read(TYPED_ISTREAM& input,const std::string& output_directory,const int frame);
-    void Write(TYPED_OSTREAM& output,const std::string& output_directory,const int frame) const;
+    void Read(TYPED_ISTREAM input,const std::string& output_directory,const int frame);
+    void Write(TYPED_OSTREAM output,const std::string& output_directory,const int frame) const;
 //#####################################################################
 };
 }

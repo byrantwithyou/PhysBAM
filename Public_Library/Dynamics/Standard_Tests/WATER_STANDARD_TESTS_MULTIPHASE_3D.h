@@ -81,7 +81,7 @@ void Initialize_Bodies()
 {
     WATER_STANDARD_TESTS_MULTIPHASE<TV,WATER_STANDARD_TESTS_3D<TV> >::Initialize_Bodies();
     if(test_number==15){
-        int ground=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies/ground",(T).01,true,true,false);
+        int ground=rigid_body_collection.Add_Rigid_Body(example.data_directory+"/Rigid_Bodies/ground",(T).01,true,true,false);
         rigid_body_collection.rigid_body_particles.frame(ground).t=TV((T).1,0,0);
         rigid_body_collection.rigid_body_particles.frame(ground).r=ROTATION<TV>::From_Rotation_Vector(TV(0,0,(T)pi/8));
         rigid_body_collection.rigid_body_particles.kinematic(ground)=true;

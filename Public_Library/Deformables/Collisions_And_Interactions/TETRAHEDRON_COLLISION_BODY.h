@@ -83,8 +83,8 @@ public:
         ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_body_id,const HASHTABLE<int,T> *thickness_table);
     const RANGE<TV>& Axis_Aligned_Bounding_Box() const override;
     void Update_Bounding_Box() override;
-    void Read_State(TYPED_ISTREAM& input,const int state_index) override;
-    void Write_State(TYPED_OSTREAM& output,const int state_index) const override;
+    void Read_State(TYPED_ISTREAM input,const int state_index) override;
+    void Write_State(TYPED_OSTREAM output,const int state_index) const override;
 //#####################################################################
 };
 }

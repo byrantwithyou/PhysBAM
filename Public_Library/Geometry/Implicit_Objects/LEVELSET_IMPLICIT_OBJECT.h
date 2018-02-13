@@ -37,10 +37,10 @@ public:
     LEVELSET_IMPLICIT_OBJECT(GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input);
     virtual ~LEVELSET_IMPLICIT_OBJECT();
 
-    void Read(TYPED_ISTREAM& input) override
+    void Read(TYPED_ISTREAM input) override
     {Read_Binary(input,levelset);Update_Box();Update_Minimum_Cell_Size();}
 
-    void Write(TYPED_OSTREAM& output) const override
+    void Write(TYPED_OSTREAM output) const override
     {Write_Binary(output,levelset);}
 
 //###########################################################################

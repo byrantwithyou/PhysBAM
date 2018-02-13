@@ -12,8 +12,8 @@
 #include <Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_3D.h>
 namespace PhysBAM{
 
-template<class T,class RW>
-class SNAKE_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_3D<RW>
+template<class T>
+class SNAKE_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_3D
 {
     typedef VECTOR<T,3> TV;
 public:

@@ -36,8 +36,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
-OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(STREAM_TYPE stream_type,const std::string& basedir_input,bool use_display_lists)
-    :OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(stream_type,*new RIGID_BODY_COLLECTION<TV>(0),basedir_input,use_display_lists)
+OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(const std::string& basedir_input,bool use_display_lists)
+    :OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(*new RIGID_BODY_COLLECTION<TV>(0),basedir_input,use_display_lists)
 {
     need_destroy_rigid_body_collection=true;
 }
@@ -45,11 +45,11 @@ OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(STREAM_TYPE stream_type,const std::str
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
-OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(STREAM_TYPE stream_type,RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir_input,bool use_display_lists)
-    :OPENGL_COMPONENT<T>(stream_type,"Rigid Geometry Collection"),basedir(basedir_input),use_display_lists(use_display_lists),frame_loaded(-1),valid(false),
+OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir_input,bool use_display_lists)
+    :OPENGL_COMPONENT<T>("Rigid Geometry Collection"),basedir(basedir_input),use_display_lists(use_display_lists),frame_loaded(-1),valid(false),
     rigid_body_collection(rigid_body_collection),articulated_rigid_body(0),
-    velocity_field(stream_type,velocity_vectors,positions,OPENGL_COLOR::Cyan(),.25,true,true),
-    angular_velocity_field(stream_type,angular_velocity_vectors,positions,OPENGL_COLOR::Magenta(),.25,true,true),need_destroy_rigid_body_collection(false),one_sided(false),
+    velocity_field(velocity_vectors,positions,OPENGL_COLOR::Cyan(),.25,true,true),
+    angular_velocity_field(angular_velocity_vectors,positions,OPENGL_COLOR::Magenta(),.25,true,true),need_destroy_rigid_body_collection(false),one_sided(false),
     front_color_map(0),back_color_map(0),selected_joint_id(-1),selected_surface(-1),selected_volume(-1)
 {
     Initialize();
@@ -161,12 +161,12 @@ Reinitialize(const bool force,const bool read_geometry)
         if(!File_Exists(LOG::sprintf("%s/%d/rigid_body_particles",basedir.c_str(),frame))) return;
 
         // TODO: currently reads in all structures, should only read in certain kinds based on read_triangulated_surface,read_implicit_surface,read_tetrahedralized_volume
-        rigid_body_collection.Read(stream_type,basedir,frame,&needs_init,&needs_destroy);
+        rigid_body_collection.Read(basedir,frame,&needs_init,&needs_destroy);
 
         std::string arb_state_file=LOG::sprintf("%s/%d/arb_state",basedir.c_str(),frame);
         if(File_Exists(arb_state_file)){
             if(!articulated_rigid_body) articulated_rigid_body=new ARTICULATED_RIGID_BODY<TV>(rigid_body_collection); // TODO: read in the actual particles
-            articulated_rigid_body->Read(stream_type,basedir,frame);
+            articulated_rigid_body->Read(basedir,frame);
             Initialize();}
         else{delete articulated_rigid_body;articulated_rigid_body=0;}
 
@@ -178,12 +178,12 @@ Reinitialize(const bool force,const bool read_geometry)
         Resize_Structures(max_number_of_bodies);
 
         std::string filename=LOG::sprintf("%s/%d/rigid_body_forces_and_torques",basedir.c_str(),frame);
-        if(File_Exists(filename)) Read_From_File(stream_type,filename,forces_and_torques);
+        if(File_Exists(filename)) Read_From_File(filename,forces_and_torques);
         else forces_and_torques.Resize(0);
         if(has_init_destroy_information) for(int i=0;i<needs_destroy.m;i++) Destroy_Geometry(needs_destroy(i));
 
         std::string rigid_body_colors_file=LOG::sprintf("%s/%d/rigid_body_colors",basedir.c_str(),frame);
-        if(File_Exists(rigid_body_colors_file)) Read_From_File<T>(rigid_body_colors_file,opengl_colors);
+        if(File_Exists(rigid_body_colors_file)) Read_From_File(rigid_body_colors_file,opengl_colors);
         else{opengl_colors.Resize(max_number_of_bodies);opengl_colors.Fill(OPENGL_COLOR::Cyan());}
 
         // Initialize bodies which have become active
@@ -195,7 +195,7 @@ Reinitialize(const bool force,const bool read_geometry)
         // Only display real bodies (not ghost bodies)
         if(File_Exists(LOG::sprintf("%s/%d/partition",basedir.c_str(),frame))) {
             ARRAY<int> particles_of_this_partition;
-            Read_From_File(stream_type,LOG::sprintf("%s/%d/partition",basedir.c_str(),frame),particles_of_this_partition);
+            Read_From_File(LOG::sprintf("%s/%d/partition",basedir.c_str(),frame),particles_of_this_partition);
             for(int i=0;i<max_number_of_bodies;i++)
                 draw_object(i)=false;
             for(int i=0;i<particles_of_this_partition.Size();i++)
@@ -318,13 +318,13 @@ Create_Geometry(const int id)
     RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(id);
     draw_object(id)=true;use_object_bounding_box(id)=true;
     if(rigid_body.name=="ground") use_object_bounding_box(id)=false; // don't use the ground bounding box
-    if(!opengl_axes(id)){opengl_axes(id)=new OPENGL_AXES<T>(stream_type);}
+    if(!opengl_axes(id)){opengl_axes(id)=new OPENGL_AXES<T>;}
 
     // add tetrahedralized volume
     TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=rigid_body.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>();
     if(tetrahedralized_volume && !opengl_tetrahedralized_volume(id)){
         tetrahedralized_volume->mesh.Initialize_Triangle_Mesh();
-        opengl_tetrahedralized_volume(id)=new OPENGL_TETRAHEDRALIZED_VOLUME<T>(stream_type,&tetrahedralized_volume->mesh,&tetrahedralized_volume->particles,
+        opengl_tetrahedralized_volume(id)=new OPENGL_TETRAHEDRALIZED_VOLUME<T>(&tetrahedralized_volume->mesh,&tetrahedralized_volume->particles,
             OPENGL_MATERIAL::Metal(OPENGL_COLOR::Magenta(1,1)),OPENGL_MATERIAL::Metal(OPENGL_COLOR::Yellow(1,1)),true);
         opengl_tetrahedralized_volume(id)->Enslave_Transform_To(*opengl_axes(id));}
 
@@ -333,14 +333,14 @@ Create_Geometry(const int id)
         IMPLICIT_OBJECT<TV>* object_space_implicit_object=rigid_body.implicit_object->object_space_implicit_object;
         if(LEVELSET_IMPLICIT_OBJECT<TV>* levelset_implicit_object=dynamic_cast<LEVELSET_IMPLICIT_OBJECT<TV>*>(object_space_implicit_object)){
             if(!opengl_levelset(id)){
-                opengl_levelset(id)=new OPENGL_LEVELSET_MULTIVIEW<T>(stream_type);
+                opengl_levelset(id)=new OPENGL_LEVELSET_MULTIVIEW<T>;
                 opengl_levelset(id)->Set_Levelset(levelset_implicit_object->levelset);
                 opengl_levelset(id)->Set_Slice(slice);
                 opengl_levelset(id)->Generate_Triangulated_Surface();
                 opengl_levelset(id)->Enslave_Transform_To(*opengl_axes(id));}}
         if(IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >* implicit_object_transformed=dynamic_cast<IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*>(object_space_implicit_object)){
             if(!opengl_levelset(id)){
-                opengl_levelset(id)=new OPENGL_LEVELSET_MULTIVIEW<T>(stream_type);
+                opengl_levelset(id)=new OPENGL_LEVELSET_MULTIVIEW<T>;
                 opengl_levelset(id)->Set_Levelset(dynamic_cast<LEVELSET_IMPLICIT_OBJECT<TV>*>(implicit_object_transformed->object_space_implicit_object)->levelset);
                 opengl_levelset(id)->Set_Slice(slice);
                 opengl_levelset(id)->Generate_Triangulated_Surface();
@@ -356,7 +356,7 @@ Create_Geometry(const int id)
     if(rigid_body.simplicial_object && !opengl_triangulated_surface(id)){
         LOG::cout<<"name = "<<rigid_body.name<<std::endl;
         OPENGL_COLOR color=opengl_colors(id);
-        opengl_triangulated_surface(id)=new OPENGL_TRIANGULATED_SURFACE<T>(stream_type,*rigid_body.simplicial_object,false,OPENGL_MATERIAL::Plastic(color),
+        opengl_triangulated_surface(id)=new OPENGL_TRIANGULATED_SURFACE<T>(*rigid_body.simplicial_object,false,OPENGL_MATERIAL::Plastic(color),
             OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Green()));
         opengl_triangulated_surface(id)->Enslave_Transform_To(*opengl_axes(id));
         opengl_triangulated_surface(id)->draw_particles=draw_simplicial_object_particles;}
@@ -367,7 +367,7 @@ Create_Geometry(const int id)
         if(Frame_File_Exists(filename_pattern,frame)){
             LOG::cout<<"Adding accumulated impulses to rigid body "<<id<<std::endl;
             OPENGL_COMPONENT_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD<T>* component=
-                new OPENGL_COMPONENT_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD<T>(stream_type,*tetrahedralized_volume,filename_pattern);
+                new OPENGL_COMPONENT_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD<T>(*tetrahedralized_volume,filename_pattern);
             component->opengl_vector_field.Enslave_Transform_To(*opengl_axes(id));
             extra_components(id).Append(component);}}
 }
@@ -382,7 +382,7 @@ Update_Geometry(const int id)
         std::string color_map_filename=LOG::sprintf("%s/%d/stress_map_of_tetrahedralized_volume_%d",basedir.c_str(),frame,id);
         if(File_Exists(color_map_filename)){
             if(!opengl_tetrahedralized_volume(id)->color_map) opengl_tetrahedralized_volume(id)->color_map=new ARRAY<OPENGL_COLOR>;
-            Read_From_File(stream_type,color_map_filename,*opengl_tetrahedralized_volume(id)->color_map);}
+            Read_From_File(color_map_filename,*opengl_tetrahedralized_volume(id)->color_map);}
         else if(opengl_tetrahedralized_volume(id)->color_map){delete opengl_tetrahedralized_volume(id)->color_map;opengl_tetrahedralized_volume(id)->color_map=0;}}
     RIGID_BODY<TV> &rigid_body=rigid_body_collection.Rigid_Body(id);
     if(rigid_body.implicit_object && rigid_body.implicit_object->object_space_implicit_object->update_every_frame)
@@ -397,7 +397,7 @@ Update_Geometry(const int id)
             delete surface;
 
             OPENGL_COLOR color=opengl_colors(id);
-            opengl_triangulated_surface(id)=new OPENGL_TRIANGULATED_SURFACE<T>(stream_type,*rigid_body.simplicial_object,false,OPENGL_MATERIAL::Plastic(color),
+            opengl_triangulated_surface(id)=new OPENGL_TRIANGULATED_SURFACE<T>(*rigid_body.simplicial_object,false,OPENGL_MATERIAL::Plastic(color),
                 OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Green()));
             opengl_triangulated_surface(id)->Enslave_Transform_To(*opengl_axes(id));
             opengl_triangulated_surface(id)->draw_particles=draw_simplicial_object_particles;
@@ -814,12 +814,12 @@ Selection_Bounding_Box() const
 template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Read_Articulated_Information(const std::string& filename)
 {
-    std::istream* input=Safe_Open_Input(filename);
-    TYPED_ISTREAM typed_input(*input,stream_type);
+    FILE_ISTREAM input;
+    Safe_Open_Input(input,filename);
     // this will need to be changed to reflect multiple articulation points per rigid body
-    int numpoints=0;Read_Binary(typed_input,numpoints);articulation_points.Exact_Resize(numpoints);joint_frames.Exact_Resize(numpoints);
-    for(int i=0;i<numpoints;i++) Read_Binary(typed_input,articulation_points(i),joint_frames(i));
-    Read_Binary(typed_input,projected_COM);delete input;
+    int numpoints=0;Read_Binary(input,numpoints);articulation_points.Exact_Resize(numpoints);joint_frames.Exact_Resize(numpoints);
+    for(int i=0;i<numpoints;i++) Read_Binary(input,articulation_points(i),joint_frames(i));
+    Read_Binary(input,projected_COM);
 }
 //#####################################################################
 // Function Update_Articulation_Points
@@ -920,9 +920,9 @@ Display() const
 
     RANGE<TV> axes_box(RANGE<TV>::Unit_Box()*2);
     //RANGE<TV> axes_box(0,velocity_field.size,0,velocity_field.size,0,velocity_field.size);
-    if(draw_joint_frames==1) for(int i=0;i<joint_frames.m;i++)(OPENGL_AXES<T>(stream_type,joint_frames(i),axes_box)).Display();
-    else if(draw_joint_frames==2) for(int i=1;i<joint_frames.m;i+=2)(OPENGL_AXES<T>(stream_type,joint_frames(i),axes_box)).Display();
-    else if(draw_joint_frames==3) for(int i=0;i<joint_frames.m;i+=2)(OPENGL_AXES<T>(stream_type,joint_frames(i),axes_box)).Display();
+    if(draw_joint_frames==1) for(int i=0;i<joint_frames.m;i++)(OPENGL_AXES<T>(joint_frames(i),axes_box)).Display();
+    else if(draw_joint_frames==2) for(int i=1;i<joint_frames.m;i+=2)(OPENGL_AXES<T>(joint_frames(i),axes_box)).Display();
+    else if(draw_joint_frames==3) for(int i=0;i<joint_frames.m;i+=2)(OPENGL_AXES<T>(joint_frames(i),axes_box)).Display();
 
     if(draw_forces_and_torques && forces_and_torques.Size()==rigid_body_collection.rigid_body_particles.Size()){
         glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT);

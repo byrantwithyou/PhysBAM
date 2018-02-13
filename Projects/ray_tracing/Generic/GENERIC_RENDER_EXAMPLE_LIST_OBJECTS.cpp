@@ -26,7 +26,7 @@ using namespace PhysBAM;
 //#####################################################################
 // Function Apply_General_Parameters
 //#####################################################################
-template<class T,class RW> void GENERIC_RENDER_EXAMPLE<T,RW>::
+template<class T> void GENERIC_RENDER_EXAMPLE<T>::
 Apply_General_Parameters(RENDERING_OBJECT<T>& rendering_object,PARAMETER_LIST& parameters)
 {
     const T minimum_surface_roughness=(T)1e-5,surface_roughness_factor=4;
@@ -35,7 +35,7 @@ Apply_General_Parameters(RENDERING_OBJECT<T>& rendering_object,PARAMETER_LIST& p
 //#####################################################################
 // Function Apply_Triangulated_Surface_Parameters
 //#####################################################################
-template<class T,class RW> void GENERIC_RENDER_EXAMPLE<T,RW>::
+template<class T> void GENERIC_RENDER_EXAMPLE<T>::
 Apply_Triangulated_Surface_Parameters(RENDERING_TRIANGULATED_SURFACE<T>& rendering_triangulated_surface,PARAMETER_LIST& parameters)
 {
     const T minimum_surface_roughness=(T)1e-5;
@@ -48,7 +48,7 @@ Apply_Triangulated_Surface_Parameters(RENDERING_TRIANGULATED_SURFACE<T>& renderi
     if(parameters.Get_Parameter("Subdivide_Geometry",false)){triangulated_surface.Loop_Subdivide();triangulated_surface.Refresh_Auxiliary_Structures();}
     std::string texture_coordinate_filename=parameters.Get_Parameter("Texture_Coordinate_File",std::string("unknown"));
     if(texture_coordinate_filename!="unknown"){
-        rendering_triangulated_surface.template Read_Texture_Coordinates<float>(texture_coordinate_filename);
+        rendering_triangulated_surface.Read_Texture_Coordinates(texture_coordinate_filename);
         LOG::cout<<"Reading text file "<<texture_coordinate_filename<<"\n";}
     if(parameters.Get_Parameter("Add_To_Collisions",false)){
         if(!body_list) body_list=new ARRAY<COLLISION_GEOMETRY<TV>*,COLLISION_GEOMETRY_ID>;
@@ -65,7 +65,7 @@ Apply_Triangulated_Surface_Parameters(RENDERING_TRIANGULATED_SURFACE<T>& renderi
 //#####################################################################
 // Function Get_Rigid_Objects
 //#####################################################################
-template<class T,class RW> RIGID_BODY_COLLECTION<VECTOR<T,3> >& GENERIC_RENDER_EXAMPLE<T,RW>::
+template<class T> RIGID_BODY_COLLECTION<VECTOR<T,3> >& GENERIC_RENDER_EXAMPLE<T>::
 Get_Rigid_Objects(PARAMETER_LIST& parameters,int frame,std::string& rigid_body_collection_name)
 {
     RIGID_BODY_COLLECTION<TV>* rigid_body_collection;
@@ -77,7 +77,7 @@ Get_Rigid_Objects(PARAMETER_LIST& parameters,int frame,std::string& rigid_body_c
     if(!rigid_body_collection_cached.Get(prefix,rigid_body_collection)){
         rigid_body_collection=new RIGID_BODY_COLLECTION<TV>(0);
         // bool load_implicit_surfaces;load_implicit_surfaces=parameters.Get_Parameter("Load_Implicit_Surfaces",false); // TODO: this is currently ignored
-        rigid_body_collection->Read(STREAM_TYPE(RW()),prefix,frame); // TODO: only load implicit surfaces if load_implicit_surfaces
+        rigid_body_collection->Read(prefix,frame); // TODO: only load implicit surfaces if load_implicit_surfaces
         rigid_body_collection_cached.Set(prefix,rigid_body_collection);
         rigid_body_collection_list.Set(name,rigid_body_collection);}
     rigid_body_collection_name=name;
@@ -86,7 +86,7 @@ Get_Rigid_Objects(PARAMETER_LIST& parameters,int frame,std::string& rigid_body_c
 //#####################################################################
 // Function List_Object
 //#####################################################################
-template<class T,class RW> void GENERIC_RENDER_EXAMPLE<T,RW>::
+template<class T> void GENERIC_RENDER_EXAMPLE<T>::
 List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
 {
     std::string type=parameters.Get_Parameter("Type",std::string("Rigid_Body_List"));
@@ -115,7 +115,7 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
             std::string rigid_body_particles_file_name=parameters.Get_Parameter("Prefix",std::string("unknown"));
             std::string parents_input=parameters.Get_Parameter("Parents",std::string(""));
             Parse_Integer_List(parents_input,parents);
-            if(parents.m) Read_From_File<RW>(LOG::sprintf("%s/%d/rigid_body_parents",rigid_body_particles_file_name.c_str(),frame),rigid_body_parents);}
+            if(parents.m) Read_From_File(LOG::sprintf("%s/%d/rigid_body_parents",rigid_body_particles_file_name.c_str(),frame),rigid_body_parents);}
         RIGID_BODY_COLLECTION<TV> &rigid_body_collection=Get_Rigid_Objects(parameters,frame,rigid_body_collection_name);
 
         if(range!="<unknown>"){
@@ -165,7 +165,7 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
                 Apply_Triangulated_Surface_Parameters(*rendering_triangulated_surface,parameters);
 
                 shaders.Get(shader_name,object->material_shader);
-                GENERIC_RENDER_EXAMPLE<T,RW>::Add_Solid_Texture(object,parameters);
+                GENERIC_RENDER_EXAMPLE<T>::Add_Solid_Texture(object,parameters);
                 object->Update_Transform(current_transform*rigid_body_collection.Rigid_Body(id).Frame().Matrix());
                 object->two_sided=two_sided;
                 if(sample_locations_filename!="unknown") rendering_triangulated_surface->sample_locations_file=sample_locations_filename;
@@ -187,7 +187,7 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         int static_frame=File_Exists(static_frame_prefix+frame_string+"deformable_object_structures")?frame:-1;
         std::string free_particles_geometry=parameters.Get_Parameter("Free_Particles_Geometry",std::string("Null")); // object to use instead of an extra object
         std::string free_particles_range=parameters.Get_Parameter("Free_Particles_Range",std::string("<unknown>"));
-        deformable_body_collection.Read(STREAM_TYPE(RW()),prefix,static_frame_prefix,local_frame,static_frame,true,true);
+        deformable_body_collection.Read(prefix,static_frame_prefix,local_frame,static_frame,true,true);
         if(range!="<unknown>") Parse_Integer_List(range,integer_list);
         else integer_list=IDENTITY_ARRAY<>(deformable_body_collection.structures.m);
         if(split_object){
@@ -258,13 +258,13 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
                 if(texture_coordinate_file!="unknown"){
                     std::string filename;
                     filename=LOG::sprintf(texture_coordinate_file.c_str(),local_frame);
-                    surface->template Read_Texture_Coordinates<RW>(filename);}
+                    surface->Read_Texture_Coordinates(filename);}
                 object->name=name+"_"+LOG::sprintf("%d",i);
                 object->material_shader=shaders.Get(parameters.Get_Parameter(LOG::sprintf("Shader%d",i),shader_name));
                 object->priority=priority;object->support_transparent_overlapping_objects=support_transparent_overlapping_objects;
                 object->two_sided=two_sided;
                 if(sample_locations_filename!="unknown") dynamic_cast<RENDERING_TRIANGULATED_SURFACE<T>&>(*object).sample_locations_file=sample_locations_filename;
-                GENERIC_RENDER_EXAMPLE<T,RW>::Add_Solid_Texture(object,parameters);
+                GENERIC_RENDER_EXAMPLE<T>::Add_Solid_Texture(object,parameters);
                 objects.Set(object->name,object);object->add_to_spatial_partition=true;}}
         LOG::cout<<"Deformable_Object '"<<name<<"' Number of Structures="<<deformable_body_collection.structures.Size()<<std::endl;}
     else if(type=="Deformable_Object_Instance"){
@@ -288,15 +288,13 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
 //#####################################################################
 // Function List_Object_Compute_Acceleration_Structures
 //#####################################################################
-template<class T,class RW> void GENERIC_RENDER_EXAMPLE<T,RW>::
+template<class T> void GENERIC_RENDER_EXAMPLE<T>::
 List_Object_Compute_Acceleration_Structures()
 {
     //if(collision_body_list) collision_body_list->Update_Intersection_Acceleration_Structures(false);
 }
 //#####################################################################
-template void GENERIC_RENDER_EXAMPLE<float,float>::List_Object(RENDER_WORLD<float>& world,const int frame,PARAMETER_LIST& parameters);
-template void GENERIC_RENDER_EXAMPLE<float,float>::List_Object_Compute_Acceleration_Structures();
-template void GENERIC_RENDER_EXAMPLE<double,float>::List_Object(RENDER_WORLD<double>& world,const int frame,PARAMETER_LIST& parameters);
-template void GENERIC_RENDER_EXAMPLE<double,double>::List_Object(RENDER_WORLD<double>& world,const int frame,PARAMETER_LIST& parameters);
-template void GENERIC_RENDER_EXAMPLE<double,float>::List_Object_Compute_Acceleration_Structures();
-template void GENERIC_RENDER_EXAMPLE<double,double>::List_Object_Compute_Acceleration_Structures();
+template void GENERIC_RENDER_EXAMPLE<float>::List_Object(RENDER_WORLD<float>& world,const int frame,PARAMETER_LIST& parameters);
+template void GENERIC_RENDER_EXAMPLE<float>::List_Object_Compute_Acceleration_Structures();
+template void GENERIC_RENDER_EXAMPLE<double>::List_Object(RENDER_WORLD<double>& world,const int frame,PARAMETER_LIST& parameters);
+template void GENERIC_RENDER_EXAMPLE<double>::List_Object_Compute_Acceleration_Structures();

@@ -201,7 +201,7 @@ Initialize()
 // Function Read_And_Set_Parameters
 //#####################################################################
 template<class T> void ANALYTIC_SURFACE_MUSCLE_SEGMENT<T>::
-Read_And_Set_Parameters(TYPED_ISTREAM& input)
+Read_And_Set_Parameters(TYPED_ISTREAM input)
 {
     BASE::Read_And_Set_Parameters(input);Read_Binary(input,curve_type);
     Read_Binary(input,initial_curve_thickness,initial_curve_offset_thickness,curve_thickness,curve_offset_thickness,initial_volume,initial_length);
@@ -211,7 +211,7 @@ Read_And_Set_Parameters(TYPED_ISTREAM& input)
 // Function Write_Parameters
 //#####################################################################
 template<class T> void ANALYTIC_SURFACE_MUSCLE_SEGMENT<T>::
-Write_Parameters(TYPED_OSTREAM& output) const
+Write_Parameters(TYPED_OSTREAM output) const
 {
     BASE::Write_Parameters(output);Write_Binary(output,curve_type);
     Write_Binary(output,initial_curve_thickness,initial_curve_offset_thickness,curve_thickness,curve_offset_thickness,initial_volume,initial_length);

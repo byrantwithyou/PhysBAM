@@ -28,7 +28,7 @@ public:
     OPENGL_VECTOR_FIELD_3D<T> minus;
     OPENGL_VECTOR_FIELD_3D<T> plus;
 
-    OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D(STREAM_TYPE stream_type,GRID<TV>& grid,ARRAY<TV,TV_INT>& V_minus,ARRAY<TV,TV_INT>& V_plus,LEVELSET<TV>& levelset);
+    OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D(GRID<TV>& grid,ARRAY<TV,TV_INT>& V_minus,ARRAY<TV,TV_INT>& V_plus,LEVELSET<TV>& levelset);
     virtual ~OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D();
 
 //#####################################################################

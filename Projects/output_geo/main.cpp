@@ -9,7 +9,6 @@
 #include <iostream>
 
 using namespace PhysBAM;
-typedef float RW;
 typedef double T;
 typedef VECTOR<T,3> TV;
 
@@ -20,7 +19,7 @@ DEFORMABLE_BODY_COLLECTION<TV>& Load_Deformable_Geometry_Collection(const std::s
     DEFORMABLE_BODY_COLLECTION<TV>*& deformable_geometry_collection=deformable_geometry_collection_cache.Get_Or_Insert(PAIR<std::string,int>(location,frame));
     if(deformable_geometry_collection) return *deformable_geometry_collection;
     deformable_geometry_collection=new DEFORMABLE_BODY_COLLECTION<TV>(0,0);
-    deformable_geometry_collection->Read(STREAM_TYPE(RW()),location,location,frame,-1,true,true);
+    deformable_geometry_collection->Read(location,location,frame,-1,true,true);
     return *deformable_geometry_collection;
 }
 
@@ -112,7 +111,7 @@ int main(int argc,char *argv[])
     parse_args.Parse();
     if(parse_args.unclaimed_arguments){parse_args.Print_Usage();exit(0);}
 
-    std::ostream* output=Safe_Open_Output(output_filename,false);
+    std::ostream* output=Safe_Open_Output_Raw(output_filename,false);
     DEFORMABLE_BODY_COLLECTION<TV>& collection=Load_Deformable_Geometry_Collection(input_folder,frame_number);
     Emit_Deformable_Bodies(*output,collection);
 

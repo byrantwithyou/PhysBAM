@@ -70,7 +70,7 @@ public:
     void Update_Velocity_Using_Stored_Differences(const T dt,const T time,const int p);
     void Initialize_Rigid_Bodies(const T frame_rate, const bool restart) override;
     void Write_Position_Update_Projection_Data(const STREAM_TYPE stream_type,const std::string& prefix);
-    void Read_Position_Update_Projection_Data(const STREAM_TYPE stream_type,const std::string& prefix);
+    void Read_Position_Update_Projection_Data(const std::string& prefix);
 protected:
     void Average_And_Exchange_Position();
     virtual void Process_Collisions(const T dt,const T time,const bool advance_rigid_bodies);

@@ -572,11 +572,11 @@ Write_Particles(const STREAM_TYPE stream_type,const PARTICLES<TV>& template_part
 // Function Read_Particles
 //#####################################################################
 template<class TV> template<class T_PARTICLES,class T_ARRAYS_PARTICLES> void FLUIDS_PARAMETERS_UNIFORM<TV>::
-Read_Particles(const STREAM_TYPE stream_type,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const std::string& output_directory,const std::string& prefix,
+Read_Particles(const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,const std::string& output_directory,const std::string& prefix,
     const int frame)
 {
     STATIC_ASSERT((is_same<T_PARTICLES,typename remove_pointer<typename T_ARRAYS_PARTICLES::ELEMENT>::type>::value)); 
-    Read_From_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,prefix.c_str()),particles);
+    Read_From_File(LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,prefix.c_str()),particles);
     if(typeid(template_particles)!=typeid(T_PARTICLES)) // swap in clones of template_particle for pure T_PARTICLESs
         for(int i=0;i<particles.array.Size();i++) if(particles.array(i)){
             T_PARTICLES* replacement=template_particles.Clone();
@@ -589,65 +589,65 @@ Read_Particles(const STREAM_TYPE stream_type,const T_PARTICLES& template_particl
 // Function Read_Output_Files
 //#####################################################################
 template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
-Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame)
+Read_Output_Files(const std::string& output_directory,const int frame)
 {
     std::string f=LOG::sprintf("%d",frame);
-    Read_From_File(stream_type,output_directory+"/"+f+"/grid",*grid);
-    if(mpi_grid) Read_From_File(stream_type,output_directory+"/"+f+"/global_grid",mpi_grid->global_grid);
+    Read_From_File(output_directory+"/"+f+"/grid",*grid);
+    if(mpi_grid) Read_From_File(output_directory+"/"+f+"/global_grid",mpi_grid->global_grid);
 
-    if(use_soot) Read_From_File(stream_type,output_directory+"/"+f+"/soot",soot_container.density);
-    if(use_soot && use_soot_fuel_combustion) Read_From_File(stream_type,output_directory+"/"+f+"/soot_fuel",soot_fuel_container.density);
+    if(use_soot) Read_From_File(output_directory+"/"+f+"/soot",soot_container.density);
+    if(use_soot && use_soot_fuel_combustion) Read_From_File(output_directory+"/"+f+"/soot_fuel",soot_fuel_container.density);
     if(smoke || fire || water){
         // scalar fields
         if(smoke || fire){
-            if(use_density) Read_From_File(stream_type,output_directory+"/"+f+"/density",density_container.density);
-            if(use_temperature) Read_From_File(stream_type,output_directory+"/"+f+"/temperature",temperature_container.temperature);}
+            if(use_density) Read_From_File(output_directory+"/"+f+"/density",density_container.density);
+            if(use_temperature) Read_From_File(output_directory+"/"+f+"/temperature",temperature_container.temperature);}
         // particle levelset
         if(write_levelset){
             if(number_of_regions==1){
                 PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=particle_levelset_evolution->Particle_Levelset(0);
-                Read_From_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset.levelset);
+                Read_From_File(output_directory+"/"+f+"/levelset",particle_levelset.levelset);
                 if(write_particles && frame%restart_data_write_rate==0){
-                    Read_Particles(stream_type,particle_levelset.template_particles,particle_levelset.positive_particles,output_directory,"positive_particles",frame);
-                    Read_Particles(stream_type,particle_levelset.template_particles,particle_levelset.negative_particles,output_directory,"negative_particles",frame);}
+                    Read_Particles(particle_levelset.template_particles,particle_levelset.positive_particles,output_directory,"positive_particles",frame);
+                    Read_Particles(particle_levelset.template_particles,particle_levelset.negative_particles,output_directory,"negative_particles",frame);}
                 if(write_removed_positive_particles)
-                    Read_Particles(stream_type,particle_levelset.template_removed_particles,particle_levelset.removed_positive_particles,output_directory,
+                    Read_Particles(particle_levelset.template_removed_particles,particle_levelset.removed_positive_particles,output_directory,
                         "removed_positive_particles",frame);
                 if(write_removed_negative_particles)
-                    Read_Particles(stream_type,particle_levelset.template_removed_particles,particle_levelset.removed_negative_particles,output_directory,
+                    Read_Particles(particle_levelset.template_removed_particles,particle_levelset.removed_negative_particles,output_directory,
                         "removed_negative_particles",frame);
                 if(store_particle_ids)
                     Read_From_Text_File(output_directory+"/"+f+"/last_unique_particle_id",particle_levelset.last_unique_particle_id);
-                if(use_strain && write_strain) Read_From_File(stream_type,output_directory+"/"+f+"/strain",incompressible->strain->e);}
+                if(use_strain && write_strain) Read_From_File(output_directory+"/"+f+"/strain",incompressible->strain->e);}
             else if(number_of_regions>=2){
                 for(int i=0;i<number_of_regions;i++){
                     std::string ii=LOG::sprintf("%d",i),i_dot_f=ii+"."+f; // TODO(jontg): This still does .%d.gz
                     PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=*particle_levelset_evolution_multiple->particle_levelset_multiple.particle_levelsets(i);
-                    Read_From_File(stream_type,output_directory+"/levelset_"+i_dot_f,particle_levelset.levelset);
+                    Read_From_File(output_directory+"/levelset_"+i_dot_f,particle_levelset.levelset);
                     if(write_particles && frame%restart_data_write_rate==0){
-                        Read_Particles(stream_type,particle_levelset.template_particles,particle_levelset.positive_particles,output_directory,"positive_particles_"+ii,frame);
-                        Read_Particles(stream_type,particle_levelset.template_particles,particle_levelset.negative_particles,output_directory,"negative_particles_"+ii,frame);}
+                        Read_Particles(particle_levelset.template_particles,particle_levelset.positive_particles,output_directory,"positive_particles_"+ii,frame);
+                        Read_Particles(particle_levelset.template_particles,particle_levelset.negative_particles,output_directory,"negative_particles_"+ii,frame);}
                     if(write_removed_positive_particles)
-                        Read_Particles(stream_type,particle_levelset.template_removed_particles,particle_levelset.removed_positive_particles,output_directory,
+                        Read_Particles(particle_levelset.template_removed_particles,particle_levelset.removed_positive_particles,output_directory,
                             "removed_positive_particles_"+ii,frame);
                     if(write_removed_negative_particles)
-                        Read_Particles(stream_type,particle_levelset.template_removed_particles,particle_levelset.removed_negative_particles,output_directory,
+                        Read_Particles(particle_levelset.template_removed_particles,particle_levelset.removed_negative_particles,output_directory,
                             "removed_negative_particles_"+ii,frame);
                     //if(store_particle_ids)
                     //    Read_From_Text_File(output_directory+"/"+f+"/last_unique_particle_id",particle_levelset.last_unique_particle_id);
                     if(write_strain && use_multiphase_strain.Count_Matches(0)<number_of_regions) if(incompressible_multiphase->strains(i)){
                         if(incompressible_multiphase->strains(i))
-                            Read_From_File(stream_type,output_directory+"/strain_"+i_dot_f,incompressible_multiphase->strains(i)->e);}}}}
+                            Read_From_File(output_directory+"/strain_"+i_dot_f,incompressible_multiphase->strains(i)->e);}}}}
 
         // pressure and velocities
         std::string filename;
         filename=output_directory+"/"+f+"/pressure";
         if(File_Exists(filename)){LOG::cout<<"Reading pressure "<<filename<<std::endl;
-            Read_From_File(stream_type,filename,incompressible->projection.p);}}
+            Read_From_File(filename,incompressible->projection.p);}}
 
     else if(compressible){
-        Read_From_File(stream_type,output_directory+"/"+f+"/euler_U",euler->U);
-        Read_From_File(stream_type,output_directory+"/"+f+"/euler_psi",euler->psi);}
+        Read_From_File(output_directory+"/"+f+"/euler_U",euler->U);
+        Read_From_File(output_directory+"/"+f+"/euler_psi",euler->psi);}
 }
 //#####################################################################
 // Function Write_Output_Files

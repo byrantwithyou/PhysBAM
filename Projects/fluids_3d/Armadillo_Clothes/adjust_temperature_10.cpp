@@ -54,7 +54,7 @@ template<class T> inline T Adjust_Density(const T d,const int frame,const VECTOR
             return (tau+(1-tau)*reduction)*d;}}
 }
 
-template<class T,class RW> void Process(int argc,char* argv[])
+template<class T> void Process(int argc,char* argv[])
 {
     int frame=-10;
     PARSE_ARGS parse_args(argc,argv);
@@ -68,9 +68,9 @@ template<class T,class RW> void Process(int argc,char* argv[])
 
     ARRAY<T,VECTOR<int,3> > temperature,density,phi;
     GRID<TV> grid;LEVELSET<TV> levelset(grid,phi);
-    Read_From_File<RW>("levelset"+f,levelset);
-    Read_From_File<RW>("temperature"+f,temperature);
-    Read_From_File<RW>("density"+f,density);
+    Read_From_File("levelset"+f,levelset);
+    Read_From_File("temperature"+f,temperature);
+    Read_From_File("density"+f,density);
 
     HEAT_3D<T>::Smooth(grid,phi,2);
     for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++)temperature(i,j,ij)=Adjust_Temperature<T>(Blur_Temperature(temperature(i,j,ij),phi(i,j,ij)*grid.one_over_dx),frame,grid.X(i,j,ij));

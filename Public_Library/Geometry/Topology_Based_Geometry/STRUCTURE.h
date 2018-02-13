@@ -38,16 +38,16 @@ public:
     void operator=(const STRUCTURE&) = delete;
     virtual ~STRUCTURE();
 
-    virtual void Read(TYPED_ISTREAM& input)=0;
+    virtual void Read(TYPED_ISTREAM input)=0;
 
-    virtual void Write(TYPED_OSTREAM& output) const=0;
+    virtual void Write(TYPED_OSTREAM output) const=0;
 
 //#####################################################################
-    void Read_Structure(TYPED_ISTREAM& input);
-    void Write_Structure(TYPED_OSTREAM& output);
-    static STRUCTURE<TV>* Create_Structure(TYPED_ISTREAM& input,GEOMETRY_PARTICLES<TV>& particles);
-    static STRUCTURE<TV>* Create_Structure(TYPED_ISTREAM& input);
-    template<class RW> static STRUCTURE<TV>* Create_From_File(const std::string& filename);
+    void Read_Structure(TYPED_ISTREAM input);
+    void Write_Structure(TYPED_OSTREAM output);
+    static STRUCTURE<TV>* Create_Structure(TYPED_ISTREAM input,GEOMETRY_PARTICLES<TV>& particles);
+    static STRUCTURE<TV>* Create_Structure(TYPED_ISTREAM input);
+    static STRUCTURE<TV>* Create_From_File(const std::string& filename);
     virtual std::string Name() const;
     virtual std::string Extension() const;
     static std::string Static_Name() {return "";}

@@ -23,7 +23,7 @@
 #include "../ARB_PARAMETERS.h"
 namespace PhysBAM{
 
-template<class T_input,class RW>
+template<class T_input>
 class ARB_EXAMPLE:public SOLIDS_EXAMPLE<VECTOR<T_input,2> >
 {
     typedef T_input T;

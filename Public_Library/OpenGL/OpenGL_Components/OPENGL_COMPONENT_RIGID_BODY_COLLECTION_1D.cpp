@@ -17,8 +17,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T>::
-OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(STREAM_TYPE stream_type,const std::string& basedir_input)
-    :OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(stream_type,*new RIGID_BODY_COLLECTION<TV>(0),basedir_input)
+OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(const std::string& basedir_input)
+    :OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(*new RIGID_BODY_COLLECTION<TV>(0),basedir_input)
 {
     need_destroy_rigid_body_collection=true;
 }
@@ -26,8 +26,8 @@ OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(STREAM_TYPE stream_type,const std::str
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T>::
-OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(STREAM_TYPE stream_type,RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir_input)
-    :OPENGL_COMPONENT<T>(stream_type,"Rigid Geometry Collection 1D"),basedir(basedir_input),frame_loaded(-1),valid(false),show_object_names(false),output_positions(true),draw_velocity_vectors(false),
+OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir_input)
+    :OPENGL_COMPONENT<T>("Rigid Geometry Collection 1D"),basedir(basedir_input),frame_loaded(-1),valid(false),show_object_names(false),output_positions(true),draw_velocity_vectors(false),
     draw_node_velocity_vectors(false),draw_point_simplices(true),rigid_body_collection(rigid_body_collection),need_destroy_rigid_body_collection(false)
 {
     viewer_callbacks.Set("toggle_output_positions",{[this](){Toggle_Output_Positions();},"Toggle output positions"});
@@ -54,7 +54,7 @@ Reinitialize(const bool force,const bool read_geometry)
     if(draw && (force || (is_animation && (frame_loaded!=frame)) || (!is_animation && (frame_loaded<0)))){
         valid=false;
         if(!File_Exists(LOG::sprintf("%s/%d/rigid_body_particles",basedir.c_str(),frame))) return;
-        rigid_body_collection.Read(stream_type,basedir,frame,&needs_init,&needs_destroy);
+        rigid_body_collection.Read(basedir,frame,&needs_init,&needs_destroy);
 
         if(has_init_destroy_information) for(int i=0;i<needs_destroy.m;i++) Destroy_Geometry(needs_destroy(i));
 
@@ -91,9 +91,9 @@ Create_Geometry(const int id)
 {
     RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(id);
 
-    if(!opengl_axes(id)) opengl_axes(id)=new OPENGL_AXES<T>(stream_type);
+    if(!opengl_axes(id)) opengl_axes(id)=new OPENGL_AXES<T>;
     if(rigid_body.simplicial_object && !opengl_point_simplices(id)){
-        opengl_point_simplices(id)=new OPENGL_POINT_SIMPLICES_1D<T>(stream_type,*rigid_body.simplicial_object);
+        opengl_point_simplices(id)=new OPENGL_POINT_SIMPLICES_1D<T>(*rigid_body.simplicial_object);
         opengl_point_simplices(id)->draw_vertices=true;
         opengl_point_simplices(id)->Enslave_Transform_To(*opengl_axes(id));}
 }

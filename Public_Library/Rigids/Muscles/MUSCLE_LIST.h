@@ -45,7 +45,7 @@ public:
 
 //#####################################################################
     void Initialize_Muscle_Attachments_On_Rigid_Body();
-    void Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame);
+    void Read(const std::string& directory,const int frame);
     void Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame) const;
 //##################################################################### 
 };

@@ -19,7 +19,7 @@ int main(int argc,char *argv[])
     TETRAHEDRON_MESH tet_mesh;
     DEFORMABLE_PARTICLES<VECTOR<float,3> > particles;
     TETRAHEDRALIZED_VOLUME<float> tet_vol(tet_mesh,particles);
-    Read_From_File<float>(argv[1],tet_vol);
+    Read_From_File(argv[1],tet_vol);
     std::cout<<"tet_vol.particles.number="<<tet_vol.particles.Size()<<std::endl;
     std::cout<<"tet_vol.mesh.elements.m="<<tet_vol.mesh.elements.m<<std::endl;
     tet_vol.Update_Bounding_Box();

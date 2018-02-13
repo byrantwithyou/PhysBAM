@@ -73,8 +73,8 @@ public:
     virtual std::string Extension() const override {return Static_Extension();}
     static std::string Static_Name();
     static std::string Static_Extension();
-    void Read(TYPED_ISTREAM& input) override;
-    void Write(TYPED_OSTREAM& output) const override;
+    void Read(TYPED_ISTREAM input) override;
+    void Write(TYPED_OSTREAM output) const override;
 //#####################################################################
 };
 }

@@ -58,8 +58,8 @@ public:
     void Weights(ARRAY<T>& w) const override;
     SYMMETRIC_MATRIX<T,TV::m> Impulse_Factor() const override;
 private:
-    void Read_Helper(TYPED_ISTREAM& input) override;
-    void Write_Helper(TYPED_OSTREAM& output) const override;
+    void Read_Helper(TYPED_ISTREAM input) override;
+    void Write_Helper(TYPED_OSTREAM output) const override;
 //#####################################################################
 }; 
 }

@@ -8,8 +8,8 @@
 using namespace PhysBAM;
 
 template<class T> OPENGL_COMPONENT_VORTICITY_PARTICLES_3D<T>::
-OPENGL_COMPONENT_VORTICITY_PARTICLES_3D(STREAM_TYPE stream_type,const std::string &filename,bool use_ids_input)
-    :OPENGL_COMPONENT_PARTICLES_3D<T>(stream_type,filename,"",use_ids_input,false)
+OPENGL_COMPONENT_VORTICITY_PARTICLES_3D(const std::string &filename,bool use_ids_input)
+    :OPENGL_COMPONENT_PARTICLES_3D<T>(filename,"",use_ids_input,false)
 {}
 
 template<class T> void OPENGL_COMPONENT_VORTICITY_PARTICLES_3D<T>::

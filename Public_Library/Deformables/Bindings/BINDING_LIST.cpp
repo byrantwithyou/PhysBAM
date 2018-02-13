@@ -162,7 +162,7 @@ Distribute_Mass_To_Parents() const
 // Function Read
 //#####################################################################
 template<class TV> void BINDING_LIST<TV>::
-Read(TYPED_ISTREAM& input)
+Read(TYPED_ISTREAM input)
 {
     Clean_Memory();
     int m;Read_Binary(input,m);bindings.Preallocate(m);
@@ -173,7 +173,7 @@ Read(TYPED_ISTREAM& input)
 // Function Write
 //#####################################################################
 template<class TV> void BINDING_LIST<TV>::
-Write(TYPED_OSTREAM& output) const
+Write(TYPED_OSTREAM output) const
 {
     Write_Binary(output,bindings.m);
     for(int k=0;k<bindings.m;k++) bindings(k)->Write(output);

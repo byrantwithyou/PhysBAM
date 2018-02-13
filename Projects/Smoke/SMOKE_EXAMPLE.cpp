@@ -164,16 +164,23 @@ Write_Output_Files(const int frame)
         Debug_Particle_Set_Attribute<TV>("V",particles.V(p));}
     debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
 }
+//#####################################################################
+// Function Read_Output_Files
+//#####################################################################
 template<class TV> void SMOKE_EXAMPLE<TV>::
 Read_Output_Files(const int frame)
 {
     std::string f=LOG::sprintf("%d",frame);
-    Read_From_File(stream_type,output_directory+"/"+f+"/density",density);
+    Read_From_File(output_directory+"/"+f+"/density",density);
     std::string filename;
     filename=output_directory+"/"+f+"/mac_velocities";
-    if(File_Exists(filename)){LOG::cout<<"Reading mac_velocities "<<filename<<std::endl;Read_From_File(stream_type,filename,face_velocities);}
+    if(File_Exists(filename)){
+        LOG::cout<<"Reading mac_velocities "<<filename<<std::endl;
+        Read_From_File(filename,face_velocities);}
     filename=output_directory+"/"+f+"/pressure";
-    if(File_Exists(filename)){LOG::cout<<"Reading pressure "<<filename<<std::endl;Read_From_File(stream_type,filename,projection.p);}
+    if(File_Exists(filename)){
+        LOG::cout<<"Reading pressure "<<filename<<std::endl;
+        Read_From_File(filename,projection.p);}
 }
 //#####################################################################
 namespace PhysBAM{

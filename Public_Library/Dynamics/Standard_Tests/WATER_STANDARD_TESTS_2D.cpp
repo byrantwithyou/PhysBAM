@@ -273,11 +273,11 @@ template<class TV> void WATER_STANDARD_TESTS_2D<TV>::
 Initialize_Bodies()
 {
     if(test_number==4){
-        sphere=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies_2D/circle",(T).1,true,true,false);
+        sphere=rigid_body_collection.Add_Rigid_Body(example.data_directory+"/Rigid_Bodies_2D/circle",(T).1,true,true,false);
         rigid_body_collection.rigid_body_particles.frame(sphere).t=TV((T)1.25,(T).55);
         rigid_body_collection.rigid_body_particles.kinematic(sphere)=true;}
     else if(test_number==20){
-        sphere=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies_2D/circle",(T).1,true,true,false);
+        sphere=rigid_body_collection.Add_Rigid_Body(example.data_directory+"/Rigid_Bodies_2D/circle",(T).1,true,true,false);
         rigid_body_collection.rigid_body_particles.frame(sphere).t=TV((T).8,(T).1);
         rigid_body_collection.rigid_body_particles.kinematic(sphere)=true;}
     if(use_inaccurate_body_collisions){

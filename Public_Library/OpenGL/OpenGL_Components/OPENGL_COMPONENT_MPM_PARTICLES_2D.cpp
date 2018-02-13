@@ -19,8 +19,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_MPM_PARTICLES_2D<T>::
-OPENGL_COMPONENT_MPM_PARTICLES_2D(STREAM_TYPE stream_type,const std::string &filename_input)
-    :OPENGL_COMPONENT<T>(stream_type,"Particles 2D"), color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map()),
+OPENGL_COMPONENT_MPM_PARTICLES_2D(const std::string &filename_input)
+    :OPENGL_COMPONENT<T>("Particles 2D"), color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map()),
     particles(*new MPM_PARTICLES<TV>),
     default_color(OPENGL_COLOR::Yellow()),velocity_color(OPENGL_COLOR(1,(T).078,(T).576)),
     draw_velocities(false),draw_phases(false),draw_arrows(true),draw_B(false),draw_F(false),
@@ -253,10 +253,9 @@ Reinitialize(bool force)
     frame_filename=Get_Frame_Filename(filename,frame);
         
     try{
-        std::istream* input_file=Safe_Open_Input(frame_filename);
-        TYPED_ISTREAM typed_input(*input_file,stream_type);
-        Read_Binary(typed_input,particles);
-        delete input_file;}
+        FILE_ISTREAM input;
+        Safe_Open_Input(input,frame_filename);
+        Read_Binary(input,particles);}
     catch(FILESYSTEM_ERROR&){valid=false;}
     frame_loaded=frame;
 }

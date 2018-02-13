@@ -19,7 +19,7 @@ template<class T> VECTOR<T,3> Translation_Vector(const int frame)
     return VECTOR<T,3>(0,y,0);
 }
 
-template<class T,class RW> void Process(int argc,char* argv[])
+template<class T> void Process(int argc,char* argv[])
 {
     int frame=-10;
     PARSE_ARGS parse_args(argc,argv);

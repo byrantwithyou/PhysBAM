@@ -49,7 +49,7 @@ template<class TV> void SHALLOW_WATER_STATE<TV>::
 Read_Output_Files(const int frame)
 {
     std::string f=LOG::sprintf("%d",frame);
-    Read_From_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
+    Read_From_File(LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
 }
 //#####################################################################
 namespace PhysBAM{

@@ -29,7 +29,7 @@ public:
     int selected_segment;
 
 public:
-    OPENGL_SEGMENTED_CURVE_2D(STREAM_TYPE stream_type,const SEGMENTED_CURVE_2D<T>& curve_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::Cyan());
+    OPENGL_SEGMENTED_CURVE_2D(const SEGMENTED_CURVE_2D<T>& curve_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::Cyan());
 
     void Display() const override;
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;

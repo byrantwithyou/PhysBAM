@@ -15,9 +15,9 @@ using namespace PhysBAM;
 // Constructor from geometry, one-sided
 //#####################################################################
 template<class T> OPENGL_TRIANGULATED_SURFACE<T>::
-OPENGL_TRIANGULATED_SURFACE(STREAM_TYPE stream_type,TRIANGULATED_SURFACE<T>& surface_input,
+OPENGL_TRIANGULATED_SURFACE(TRIANGULATED_SURFACE<T>& surface_input,
     bool smooth_normals_input,const OPENGL_MATERIAL& material_input)
-    :OPENGL_TRIANGULATED_SURFACE(stream_type,surface_input,smooth_normals_input,material_input,material_input)
+    :OPENGL_TRIANGULATED_SURFACE(surface_input,smooth_normals_input,material_input,material_input)
 {
     two_sided=false;
 }
@@ -25,9 +25,9 @@ OPENGL_TRIANGULATED_SURFACE(STREAM_TYPE stream_type,TRIANGULATED_SURFACE<T>& sur
 // Constructor from geometry, two-sided
 //#####################################################################
 template<class T> OPENGL_TRIANGULATED_SURFACE<T>::
-OPENGL_TRIANGULATED_SURFACE(STREAM_TYPE stream_type,TRIANGULATED_SURFACE<T>& surface_input,
+OPENGL_TRIANGULATED_SURFACE(TRIANGULATED_SURFACE<T>& surface_input,
     bool smooth_normals_input,const OPENGL_MATERIAL& front_material_input,const OPENGL_MATERIAL& back_material_input)
-    :OPENGL_OBJECT<T>(stream_type),surface(surface_input),two_sided(true),front_material(front_material_input),
+    :surface(surface_input),two_sided(true),front_material(front_material_input),
     back_material(back_material_input),vertex_normals(0),vertex_colors(0),smooth_normals(smooth_normals_input),
     use_display_list(false),owns_display_list(false),selected_vertex(-1),selected_segment(-1),
     selected_triangle(-1),current_node(1),highlight_current_node(false),highlight_neighbors_of_current_node(true),

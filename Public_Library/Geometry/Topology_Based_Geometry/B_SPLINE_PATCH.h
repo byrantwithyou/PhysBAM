@@ -41,8 +41,8 @@ public:
     VECTOR<int,(d+1)*(d+1)> Control_Points_For_Element(int element) const;
     RANGE<VECTOR<T,2>> Range_For_Element(int element) const;
     B_SPLINE_PATCH<TV,d>* Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& new_particles,ARRAY<int>* particle_indices) const override;
-    void Read(TYPED_ISTREAM& input) override;
-    void Write(TYPED_OSTREAM& output) const override;
+    void Read(TYPED_ISTREAM input) override;
+    void Write(TYPED_OSTREAM output) const override;
     void Wrap(bool new_loop_s,bool new_loop_t);
     std::string Name() const override;
     static std::string Static_Name();

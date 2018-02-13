@@ -19,7 +19,7 @@ class OPENGL_COMPONENT:public OPENGL_OBJECT<T>
 {
 public:
     using OPENGL_OBJECT<T>::viewer_callbacks;
-    OPENGL_COMPONENT(STREAM_TYPE stream_type,const std::string &name = "");
+    OPENGL_COMPONENT(const std::string &name = "");
     virtual ~OPENGL_COMPONENT();
 
     void Set_Name(const std::string &name) { component_name = name; }

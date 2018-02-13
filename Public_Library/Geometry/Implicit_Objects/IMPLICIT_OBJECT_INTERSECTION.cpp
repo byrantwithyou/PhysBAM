@@ -345,7 +345,7 @@ Minimum_Cell_Size() const
 // Function Read
 //#####################################################################
 template<class TV> void IMPLICIT_OBJECT_INTERSECTION<TV>::
-Read(TYPED_ISTREAM& input)
+Read(TYPED_ISTREAM input)
 {
     for(int i=0;i<io.m;i++) io(i)->Read(input);
 }
@@ -353,7 +353,7 @@ Read(TYPED_ISTREAM& input)
 // Function Write
 //#####################################################################
 template<class TV> void IMPLICIT_OBJECT_INTERSECTION<TV>::
-Write(TYPED_OSTREAM& output) const
+Write(TYPED_OSTREAM output) const
 {
     for(int i=0;i<io.m;i++) io(i)->Write(output);
 }

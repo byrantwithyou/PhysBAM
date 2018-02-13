@@ -106,7 +106,7 @@ public:
     T CFL_Strain_Rate() const override;
     void Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency) override;
     void Write_State(STREAM_TYPE type,const std::string& filename);
-    void Read_State(STREAM_TYPE type,const std::string& filename);
+    void Read_State(const std::string& filename);
 //#####################################################################
 };
 }

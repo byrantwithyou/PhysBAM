@@ -276,7 +276,7 @@ Attribute_Id_Lookup() // 0 = actual type, 1 = float version, 2 = double version
 // Function Legacy_Read
 //#####################################################################
 template<class TV> void PARTICLES<TV>::
-Legacy_Read(TYPED_ISTREAM& input)
+Legacy_Read(TYPED_ISTREAM input)
 {
     static const char* attribute_table[]={
         "","X","V","frame","twist","rigid_body","structure_ids","mass",
@@ -320,7 +320,7 @@ Legacy_Read(TYPED_ISTREAM& input)
 // Function Read_Arrays
 //#####################################################################
 template<class TV> void PARTICLES<TV>::
-Read(TYPED_ISTREAM& input)
+Read(TYPED_ISTREAM input)
 {
     // bit 0 => doubles
     int version;
@@ -352,7 +352,8 @@ Read(TYPED_ISTREAM& input)
             index=Add_Array(name,sample_attribute(use_doubles)->Clone_Default());
         int scalar=(coded_id>>16)&0xf;
         bool read_doubles=scalar<2?scalar:input.type.use_doubles;
-        TYPED_ISTREAM actual_input(input.stream,STREAM_TYPE(read_doubles));
+        TYPED_ISTREAM actual_input(input);
+        actual_input.type.use_doubles=read_doubles;
         arrays(index)->Read(actual_input);
         arrays(index)->name=name;}
 }
@@ -360,7 +361,7 @@ Read(TYPED_ISTREAM& input)
 // Function Write
 //#####################################################################
 template<class TV> void PARTICLES<TV>::
-Write(TYPED_OSTREAM& output) const
+Write(TYPED_OSTREAM output) const
 {
     Write_Binary(output,2,number,arrays.m);
     for(ATTRIBUTE_INDEX i(0);i<arrays.m;i++){

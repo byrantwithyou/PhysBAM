@@ -84,8 +84,8 @@ public:
     void Clamp_Particles_To_Embedded_Positions(const bool bindings_using_impulses_for_collisions_only=false) const;
     void Clamp_Particles_To_Embedded_Velocities(const bool bindings_using_impulses_for_collisions_only=false) const;
     void Update_Binding_Index_From_Particle_Index();
-    void Read(TYPED_ISTREAM& input);
-    void Write(TYPED_OSTREAM& output) const;
+    void Read(TYPED_ISTREAM input);
+    void Write(TYPED_OSTREAM output) const;
 //#####################################################################
 };
 }

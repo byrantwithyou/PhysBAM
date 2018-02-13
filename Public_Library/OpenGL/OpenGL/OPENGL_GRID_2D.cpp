@@ -9,9 +9,9 @@
 #include <OpenGL/OpenGL/OPENGL_SELECTION.h>
 using namespace PhysBAM;
 template<class T> OPENGL_GRID_2D<T>::
-OPENGL_GRID_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,const OPENGL_COLOR &color_input,
+OPENGL_GRID_2D(GRID<TV> &grid_input,const OPENGL_COLOR &color_input,
     const std::string basedir_input,const int frame_input)
-    :OPENGL_OBJECT<T>(stream_type),grid(grid_input),active_cell_mask(0),ghost_cell_mask(0),
+    :grid(grid_input),active_cell_mask(0),ghost_cell_mask(0),
     active_face_mask(0),ghost_face_mask(0),active_node_mask(0),ghost_node_mask(0),color(color_input),
     draw(true),draw_ghost_values(true),draw_mask_type(0),select_type(SELECT_TYPE::NONE),selected_cell(-1,-1),selected_node(-1,-1),
     basedir(basedir_input),frame(frame_input)
@@ -234,37 +234,37 @@ Reinitialize()
     if(File_Exists(filename)){
         if(!active_cell_mask) active_cell_mask=new ARRAY<bool,TV_INT>();
         active_cell_mask->Clean_Memory();
-        Read_From_File<bool>(filename,*active_cell_mask);}
+        Read_From_File(filename,*active_cell_mask);}
 
     filename=LOG::sprintf("%s/%d/ghost_cell_mask",basedir.c_str(),frame);
     if(File_Exists(filename)){
         if(!ghost_cell_mask) ghost_cell_mask=new ARRAY<bool,TV_INT>();
         ghost_cell_mask->Clean_Memory();
-        Read_From_File<bool>(filename,*ghost_cell_mask);}
+        Read_From_File(filename,*ghost_cell_mask);}
 
     filename=LOG::sprintf("%s/%d/active_face_mask",basedir.c_str(),frame);
     if(File_Exists(filename)){
         if(!active_face_mask) active_face_mask=new ARRAY<bool,FACE_INDEX<TV::m> >();
         active_face_mask->Clean_Memory();
-        Read_From_File<bool>(filename,*active_face_mask);}
+        Read_From_File(filename,*active_face_mask);}
 
     filename=LOG::sprintf("%s/%d/ghost_face_mask",basedir.c_str(),frame);
     if(File_Exists(filename)){
         if(!ghost_face_mask) ghost_face_mask=new ARRAY<bool,FACE_INDEX<TV::m> >();
         ghost_face_mask->Clean_Memory();
-        Read_From_File<bool>(filename,*ghost_face_mask);}
+        Read_From_File(filename,*ghost_face_mask);}
 
     filename=LOG::sprintf("%s/%d/active_node_mask",basedir.c_str(),frame);
     if(File_Exists(filename)){
         if(!active_node_mask) active_node_mask=new ARRAY<bool,TV_INT>();
         active_node_mask->Clean_Memory();
-        Read_From_File<bool>(filename,*active_node_mask);}
+        Read_From_File(filename,*active_node_mask);}
 
     filename=LOG::sprintf("%s/%d/ghost_node_mask",basedir.c_str(),frame);
     if(File_Exists(filename)){
         if(!ghost_node_mask) ghost_node_mask=new ARRAY<bool,TV_INT>();
         ghost_node_mask->Clean_Memory();
-        Read_From_File<bool>(filename,*ghost_node_mask);}
+        Read_From_File(filename,*ghost_node_mask);}
 }
 //#####################################################################
 // Print_Selection_Info

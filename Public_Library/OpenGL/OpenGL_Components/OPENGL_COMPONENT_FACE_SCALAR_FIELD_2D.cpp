@@ -12,8 +12,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T,class T2> OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D<T,T2>::
-OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid_input,const std::string &values_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input)
-    :OPENGL_COMPONENT<T>(stream_type,"Face Scalar Field 2D"),opengl_scalar_field(stream_type,grid_input,opengl_scalar_field_data,color_map_input),
+OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D(const GRID<TV> &grid_input,const std::string &values_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input)
+    :OPENGL_COMPONENT<T>("Face Scalar Field 2D"),opengl_scalar_field(grid_input,opengl_scalar_field_data,color_map_input),
     values_filename(values_filename_input),frame_loaded(-1),valid(false)
 {
     is_animation = Is_Animated(values_filename);
@@ -94,7 +94,7 @@ Reinitialize()
 
             std::string filename=Get_Frame_Filename(values_filename,frame);
             if(File_Exists(filename))
-                Read_From_File(stream_type,filename,opengl_scalar_field.face_values);
+                Read_From_File(filename,opengl_scalar_field.face_values);
             else return;
 
             opengl_scalar_field.Update();

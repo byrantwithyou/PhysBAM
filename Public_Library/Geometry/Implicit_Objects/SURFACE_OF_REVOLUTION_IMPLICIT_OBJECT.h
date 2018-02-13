@@ -28,8 +28,8 @@ public:
     T Integration_Step(const T phi) const override;
     T operator()(const TV& X) const override;
     TV Normal(const TV& X,const int aggregate=-1) const override;
-    virtual void Read(TYPED_ISTREAM& input) override;
-    virtual void Write(TYPED_OSTREAM& output) const override;
+    virtual void Read(TYPED_ISTREAM input) override;
+    virtual void Write(TYPED_OSTREAM output) const override;
 //#####################################################################
 };
 }

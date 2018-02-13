@@ -134,7 +134,7 @@ public:
     void Poststabilization_Projection(ARRAY_VIEW<TWIST<TV> > twist,const bool symmetric=false);
     void Generate_Process_List_Using_Contact_Graph(const RIGID_BODY_CONTACT_GRAPH<TV>& contact_graph);
     void Apply_Poststabilization(bool test_system,bool print_matrix,const bool target_pd=false,const bool skip_global_post_stabilized_joints=false,const bool angular_damping_only=false);
-    void Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame);
+    void Read(const std::string& directory,const int frame);
     void Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame);
     void Effective_Inertia_Inverse(MATRIX<T,d+s>& inertia_inverse,JOINT_ID joint_id) const;
     void Substitute_Joint_Parent_Body(JOINT_ID joint_id,int new_parent,const FRAME<TV>& frame);

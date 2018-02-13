@@ -48,10 +48,10 @@ public:
 
 public:
 
-    void Read(TYPED_ISTREAM& input) override
+    void Read(TYPED_ISTREAM input) override
     {material_surface.Clean_Memory();Read_Binary(input,material_surface_mesh,previously_perturbed,embedded_object);}
 
-    void Write(TYPED_OSTREAM& output) const override
+    void Write(TYPED_OSTREAM output) const override
     {Write_Binary(output,material_surface_mesh,previously_perturbed,embedded_object);}
 
 //#####################################################################

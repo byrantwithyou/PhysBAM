@@ -28,8 +28,8 @@ public:
     OPENGL_COLOR vertex_color,vertex_position_color;
     bool draw_vertices,use_solid_color,hide_unselected;
 
-    OPENGL_SEGMENTED_CURVE_3D(STREAM_TYPE stream_type,const SEGMENTED_CURVE<TV>& curve_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::Cyan())
-        :OPENGL_OBJECT<T>(stream_type),curve(curve_input),parent_curve(0),color(color_input),vertex_color(OPENGL_COLOR::Green(0.9)),
+    OPENGL_SEGMENTED_CURVE_3D(const SEGMENTED_CURVE<TV>& curve_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::Cyan())
+        :curve(curve_input),parent_curve(0),color(color_input),vertex_color(OPENGL_COLOR::Green(0.9)),
         vertex_position_color(OPENGL_COLOR::Magenta()),draw_vertices(false),use_solid_color(true),smooth_normals(false),selected_vertex(-1),selected_segment(-1),selected_curve(-1)
     {}
 

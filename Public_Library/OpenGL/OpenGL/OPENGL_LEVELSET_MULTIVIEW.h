@@ -28,7 +28,7 @@ class OPENGL_LEVELSET_MULTIVIEW:public OPENGL_OBJECT<T>
     typedef VECTOR<T,3> TV;
 public:
     using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::World_Space_Box;
-    using OPENGL_OBJECT<T>::slice;using OPENGL_OBJECT<T>::stream_type;
+    using OPENGL_OBJECT<T>::slice;
     enum COLOR_MODE {COLOR_SOLID,COLOR_GRADIENT}; // currently only used for slice mode
     COLOR_MODE color_mode;
     OPENGL_MATERIAL front_surface_material, back_surface_material;
@@ -53,8 +53,8 @@ private:
     bool two_sided;
 
 public:
-    OPENGL_LEVELSET_MULTIVIEW(STREAM_TYPE stream_type)
-        :OPENGL_OBJECT<T>(stream_type),color_mode(COLOR_SOLID),implicit_object_transform(0),display_overlay(false),smooth_shading(true),smooth_slice_texture(false),
+    OPENGL_LEVELSET_MULTIVIEW()
+        :color_mode(COLOR_SOLID),implicit_object_transform(0),display_overlay(false),smooth_shading(true),smooth_slice_texture(false),
         levelset(0),levelset_implicit_surface(0),triangulated_surface(0),i_own_levelset(true),i_own_triangulated_surface(true),
         opengl_triangulated_surface(0),opengl_scalar_field(0),two_sided(true)
     {

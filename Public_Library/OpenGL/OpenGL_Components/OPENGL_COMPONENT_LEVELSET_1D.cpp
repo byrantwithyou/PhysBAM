@@ -13,11 +13,11 @@ using namespace PhysBAM;
 // Function OPENGL_COMPONENT_LEVELSET_1D
 //#####################################################################
 template<class T> OPENGL_COMPONENT_LEVELSET_1D<T>::
-OPENGL_COMPONENT_LEVELSET_1D(STREAM_TYPE stream_type,GRID<TV> &grid,const std::string& levelset_filename_input,OPENGL_COLOR point_color,OPENGL_COLOR line_color)
-    :OPENGL_COMPONENT<T>(stream_type,"Levelset 1D"),levelset_filename(levelset_filename_input),opengl_levelset(0)
+OPENGL_COMPONENT_LEVELSET_1D(GRID<TV> &grid,const std::string& levelset_filename_input,OPENGL_COLOR point_color,OPENGL_COLOR line_color)
+    :OPENGL_COMPONENT<T>("Levelset 1D"),levelset_filename(levelset_filename_input),opengl_levelset(0)
 {
     is_animation=Is_Animated(levelset_filename);
-    opengl_levelset=new OPENGL_LEVELSET_1D<T>(stream_type,*(new LEVELSET<TV>(grid,*(new ARRAY<T,TV_INT>))),point_color,line_color);
+    opengl_levelset=new OPENGL_LEVELSET_1D<T>(*(new LEVELSET<TV>(grid,*(new ARRAY<T,TV_INT>))),point_color,line_color);
     Reinitialize();
 }
 //#####################################################################
@@ -81,7 +81,7 @@ Reinitialize()
         valid=false;
         std::string filename=Get_Frame_Filename(levelset_filename,frame);
         if(File_Exists(filename)){
-            Read_From_File(stream_type,filename,opengl_levelset->levelset);
+            Read_From_File(filename,opengl_levelset->levelset);
             frame_loaded=frame;valid=true;}}
 }
 //##################################################################### 

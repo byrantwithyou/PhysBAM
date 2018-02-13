@@ -331,7 +331,7 @@ Static_Extension()
 // Function Read
 //#####################################################################
 template<class TV> void MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>::
-Read(TYPED_ISTREAM& input) // TODO -- fix to read/write levelsets
+Read(TYPED_ISTREAM input) // TODO -- fix to read/write levelsets
 {
     /*Read_Binary(input,levelsets);*/
     Update_Box();
@@ -341,7 +341,7 @@ Read(TYPED_ISTREAM& input) // TODO -- fix to read/write levelsets
 // Function Write
 //#####################################################################
 template<class TV> void MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>::
-Write(TYPED_OSTREAM& output) const
+Write(TYPED_OSTREAM output) const
 {
     Write_Binary(output,*levelsets);
 }

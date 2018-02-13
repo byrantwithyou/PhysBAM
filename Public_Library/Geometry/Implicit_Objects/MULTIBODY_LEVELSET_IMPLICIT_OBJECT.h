@@ -65,8 +65,8 @@ public:
     static std::string Static_Name();
     virtual std::string Extension() const override;
     static std::string Static_Extension();
-    void Read(TYPED_ISTREAM& input) override; // TODO -- fix to read/write levelsets
-    void Write(TYPED_OSTREAM& output) const override;
+    void Read(TYPED_ISTREAM input) override; // TODO -- fix to read/write levelsets
+    void Write(TYPED_OSTREAM output) const override;
 //###########################################################################
 };
 }

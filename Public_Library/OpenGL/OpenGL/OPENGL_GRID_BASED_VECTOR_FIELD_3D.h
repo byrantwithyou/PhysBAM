@@ -30,7 +30,7 @@ public:
     ARRAY<TV,TV_INT>& V;
     int max_vectors_3d;
     
-    OPENGL_GRID_BASED_VECTOR_FIELD_3D(STREAM_TYPE stream_type,GRID<TV>& grid,ARRAY<TV,TV_INT>& V);
+    OPENGL_GRID_BASED_VECTOR_FIELD_3D(GRID<TV>& grid,ARRAY<TV,TV_INT>& V);
     virtual ~OPENGL_GRID_BASED_VECTOR_FIELD_3D();
 
     void Update();  // Call when grid/V change

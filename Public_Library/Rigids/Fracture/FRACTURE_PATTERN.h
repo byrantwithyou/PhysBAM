@@ -30,8 +30,8 @@ public:
     virtual ~FRACTURE_PATTERN();
 
 //#####################################################################
-    void Read(TYPED_ISTREAM& input);
-    void Write(TYPED_OSTREAM& output) const;
+    void Read(TYPED_ISTREAM input);
+    void Write(TYPED_OSTREAM output) const;
     void Intersect_With_Rigid_Body(const RIGID_BODY<VECTOR<T,1> >& body,const VECTOR<T,1>& point_of_impact,ARRAY<int>& added_bodies,const bool allow_refracture,const bool use_particle_optimization,const bool generate_object_tessellation=false);
     void Intersect_With_Rigid_Body(const RIGID_BODY<VECTOR<T,2> >& body,const VECTOR<T,2>& point_of_impact,ARRAY<int>& added_bodies,const bool allow_refracture,const bool use_particle_optimization,const bool generate_object_tessellation=false);
     void Intersect_With_Rigid_Body(const RIGID_BODY<TV>& body,const TV& point_of_impact,ARRAY<int>& added_bodies,const bool allow_refracture,const bool use_particle_optimization,const bool generate_object_tessellation=false);

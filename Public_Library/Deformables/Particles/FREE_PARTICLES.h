@@ -28,10 +28,10 @@ public:
     static FREE_PARTICLES* Create(GEOMETRY_PARTICLES<TV>& particles)
     {return Create();}
 
-    void Read(TYPED_ISTREAM& input) override
+    void Read(TYPED_ISTREAM input) override
     {Read_Binary(input,nodes);}
 
-    void Write(TYPED_OSTREAM& output) const override
+    void Write(TYPED_OSTREAM output) const override
     {Write_Binary(output,nodes);}
 
 //######################################################################

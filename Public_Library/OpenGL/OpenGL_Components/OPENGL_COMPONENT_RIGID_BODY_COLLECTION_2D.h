@@ -74,9 +74,9 @@ protected:
 
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
-    OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(STREAM_TYPE stream_type,const std::string& basedir);
-    OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(STREAM_TYPE stream_type,RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir);
+    using OPENGL_OBJECT<T>::viewer_callbacks;
+    OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(const std::string& basedir);
+    OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir);
     virtual ~OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D();
     
     bool Valid_Frame(int frame_input) const override;

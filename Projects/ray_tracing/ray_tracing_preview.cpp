@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     parse_args.Parse();
     if(parse_args.unclaimed_arguments){parse_args.Print_Usage();exit(0);}
 
-    GENERIC_RENDER_EXAMPLE<double,float> example(scene_filename,frame_number);
+    GENERIC_RENDER_EXAMPLE<double> example(scene_filename,frame_number);
     RAY_TRACING_DRIVER_WITH_PREVIEW<double>(example).Execute_Main_Program();
 
     return 0;

@@ -31,7 +31,7 @@ protected:
     bool invalidate_deformable_objects_selection_each_frame;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
-    using OPENGL_COMPONENT<T>::is_animation;using OPENGL_COMPONENT<T>::stream_type;
+    using OPENGL_COMPONENT<T>::is_animation;
     using OPENGL_OBJECT<T>::viewer_callbacks;using OPENGL_OBJECT<T>::World_Space_Box;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
     ARRAY<OPENGL_POINT_SIMPLICES_1D<T>*> point_simplices_1d_objects;
@@ -42,7 +42,7 @@ public:
     bool draw_velocity_vectors;
     OPENGL_INDEXED_COLOR_MAP *color_map;
 
-    OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D(STREAM_TYPE stream_type,const std::string& prefix,const int start_frame);
+    OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D(const std::string& prefix,const int start_frame);
     virtual ~OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D();
     
     bool Valid_Frame(int frame_input) const override;

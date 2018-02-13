@@ -130,15 +130,14 @@ template<class T> void ARTICULATED_RIGID_BODY<VECTOR<T,2> >::
 Output_Articulation_Points(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const
 {
     if(joint_mesh.Num_Joints()==0) return;
-    std::ostream* output=Safe_Open_Output(LOG::sprintf("%s/%d/arb_info",output_directory.c_str(),frame));
-    TYPED_OSTREAM typed_output(*output,stream_type);
-    Write_Binary(typed_output,joint_mesh.Num_Joints()*2);
+    FILE_OSTREAM output;
+    Safe_Open_Output(output,stream_type,LOG::sprintf("%s/%d/arb_info",output_directory.c_str(),frame));
+    Write_Binary(output,joint_mesh.Num_Joints()*2);
     for(int i=0;i<joint_mesh.Num_Joints();i++){
         JOINT<TV>& joint=*joint_mesh.Joints(i);
         const RIGID_BODY<TV> &parent=*Parent(joint.id_number),&child=*Child(joint.id_number);
         TV ap1=parent.World_Space_Point(joint.F_pj().t),ap2=child.World_Space_Point(joint.F_cj().t);
-        Write_Binary(typed_output,ap1,ap2);}
-    delete output;
+        Write_Binary(output,ap1,ap2);}
 }
 //#####################################################################
 namespace PhysBAM{

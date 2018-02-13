@@ -68,8 +68,8 @@ public:
     void Relax_Attachment(int cp);
     void Update_Attachments_And_Prune_Pairs();
     void Add_Pair(int p,int b);
-    void Read(TYPED_ISTREAM& input);
-    void Write(TYPED_OSTREAM& output) const;
+    void Read(TYPED_ISTREAM input);
+    void Write(TYPED_OSTREAM output) const;
 //#####################################################################
 };
 

@@ -25,7 +25,7 @@ class OPENGL_SCALAR_FIELD_2D:public OPENGL_OBJECT<T>,public OPENGL_GRID_OBJECT<V
 {
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
-    using OPENGL_OBJECT<T>::World_Space_Box;using OPENGL_OBJECT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
+    using OPENGL_OBJECT<T>::World_Space_Box;using OPENGL_OBJECT<T>::viewer_callbacks;
     GRID<TV>& grid;
     ARRAY<T2,VECTOR<int,2> > &values;
     ARRAY<bool,VECTOR<int,2> > *active_cells;
@@ -46,7 +46,7 @@ private:
     const char* info_name;
 
 public:
-    OPENGL_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,2> > &values_input,OPENGL_COLOR_MAP<T2>* color_map_input,const char* info_name,ARRAY<bool,VECTOR<int,2> >* active_cells_input=0,DRAW_MODE draw_mode_input=DRAW_TEXTURE);
+    OPENGL_SCALAR_FIELD_2D(GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,2> > &values_input,OPENGL_COLOR_MAP<T2>* color_map_input,const char* info_name,ARRAY<bool,VECTOR<int,2> >* active_cells_input=0,DRAW_MODE draw_mode_input=DRAW_TEXTURE);
     virtual ~OPENGL_SCALAR_FIELD_2D();
 
     void Set_Scale_Range(const T2 range_min,const T2 range_max);

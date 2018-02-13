@@ -55,8 +55,8 @@ public:
     void Own_Particles()
     {need_destroy_particles=true;}
 
-    void Read(TYPED_ISTREAM& input) override;
-    void Write(TYPED_OSTREAM& output) const override;
+    void Read(TYPED_ISTREAM input) override;
+    void Write(TYPED_OSTREAM output) const override;
     void Read_Obj(const std::string& filename);
     void Write_Obj(const std::string& filename) const;
 

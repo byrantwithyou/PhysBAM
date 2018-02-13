@@ -15,13 +15,12 @@ typedef VECTOR<T,3> TV;
 
 HASHTABLE<PAIR<std::string,int>,DEFORMABLE_BODY_COLLECTION<TV>*> deformable_geometry_collection_cache;
 
-DEFORMABLE_BODY_COLLECTION<TV>& Load_Deformable_Geometry_Collection(const std::string& location,int frame,bool use_doubles)
+DEFORMABLE_BODY_COLLECTION<TV>& Load_Deformable_Geometry_Collection(const std::string& location,int frame)
 {
     DEFORMABLE_BODY_COLLECTION<TV>*& deformable_geometry_collection=deformable_geometry_collection_cache.Get_Or_Insert(PAIR<std::string,int>(location,frame));
     if(deformable_geometry_collection) return *deformable_geometry_collection;
     deformable_geometry_collection=new DEFORMABLE_BODY_COLLECTION<TV>(0,0);
-    if(use_doubles) deformable_geometry_collection->Read(STREAM_TYPE(double()),location,location,frame,-1,true,true);
-    else deformable_geometry_collection->Read(STREAM_TYPE(float()),location,location,frame,-1,true,true);
+    deformable_geometry_collection->Read(location,location,frame,-1,true,true);
     return *deformable_geometry_collection;
 }
 
@@ -50,18 +49,16 @@ int main(int argc,char *argv[])
     int frame_number=0;
     std::string output_filename;
     std::string input_folder;
-    bool use_doubles=false;
 
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Extra(&frame_number,"frame number","frame number");
     parse_args.Extra(&output_filename,"obj file","output obj file name");
     parse_args.Extra(&input_folder,"input_folder","input folder name");
-    parse_args.Add("-double",&use_doubles,"read doubles instead of floats");
     parse_args.Parse();
     if(parse_args.unclaimed_arguments){parse_args.Print_Usage();exit(0);}
 
-    std::ostream* output=Safe_Open_Output(output_filename,false);
-    DEFORMABLE_BODY_COLLECTION<TV>& collection=Load_Deformable_Geometry_Collection(input_folder,frame_number,use_doubles);
+    std::ostream* output=Safe_Open_Output_Raw(output_filename,false);
+    DEFORMABLE_BODY_COLLECTION<TV>& collection=Load_Deformable_Geometry_Collection(input_folder,frame_number);
     Emit_Deformable_Bodies(*output,collection);
 
     delete output;

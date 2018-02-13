@@ -66,7 +66,7 @@ Read_Binary(std::istream& input,std::string& d)
 {int n;Read_Primitive(input,n);char* buffer=new char[n];input.read(buffer,n);d.assign(buffer,buffer+n);delete[] buffer;}
 
 template<class T> inline typename enable_if<!HAS_TYPED_READ<T>::value>::type
-Read_Binary(TYPED_ISTREAM& input,T& d)
+Read_Binary(TYPED_ISTREAM input,T& d)
 {
     if(input.type.use_doubles)
         Read_Binary<double>(input.stream,d);
@@ -75,7 +75,7 @@ Read_Binary(TYPED_ISTREAM& input,T& d)
 }
 
 template<class T> inline typename enable_if<HAS_TYPED_READ<T>::value>::type
-Read_Binary(TYPED_ISTREAM& input,T& d)
+Read_Binary(TYPED_ISTREAM input,T& d)
 {d.Read(input);}
 
 //#####################################################################
@@ -116,7 +116,7 @@ Write_Binary(std::ostream& output,const std::string& d)
 {int n=int(d.size());Write_Primitive(output,n);const char* s=d.c_str();output.write(s,n);}
 
 template<class T> inline typename enable_if<!HAS_TYPED_WRITE<T>::value>::type
-Write_Binary(TYPED_OSTREAM& output,const T& d)
+Write_Binary(TYPED_OSTREAM output,const T& d)
 {
     if(output.type.use_doubles)
         Write_Binary<double>(output.stream,d);
@@ -125,7 +125,7 @@ Write_Binary(TYPED_OSTREAM& output,const T& d)
 }
 
 template<class T> inline typename enable_if<HAS_TYPED_WRITE<T>::value>::type
-Write_Binary(TYPED_OSTREAM& output,const T& d)
+Write_Binary(TYPED_OSTREAM output,const T& d)
 {
     d.Write(output);
 }
@@ -138,7 +138,7 @@ inline void Read_Binary(std::istream& input,T1& d1,T2& d2,Args&& ...args)
 {Read_Binary<RW>(input,d1);Read_Binary<RW>(input,d2,args...);}
 
 template<class T1,class T2,class ...Args>
-inline void Read_Binary(TYPED_ISTREAM& input,T1& d1,T2& d2,Args&& ...args)
+inline void Read_Binary(TYPED_ISTREAM input,T1& d1,T2& d2,Args&& ...args)
 {Read_Binary(input,d1);Read_Binary(input,d2,args...);}
 
 //#####################################################################
@@ -149,7 +149,7 @@ inline void Write_Binary(std::ostream& output,const T1& d1,const T2& d2,Args&& .
 {Write_Binary<RW>(output,d1);Write_Binary<RW>(output,d2,args...);}
 
 template<class T1,class T2,class ...Args>
-inline void Write_Binary(TYPED_OSTREAM& output,const T1& d1,const T2& d2,Args&& ...args)
+inline void Write_Binary(TYPED_OSTREAM output,const T1& d1,const T2& d2,Args&& ...args)
 {Write_Binary(output,d1);Write_Binary(output,d2,args...);}
 
 //#####################################################################

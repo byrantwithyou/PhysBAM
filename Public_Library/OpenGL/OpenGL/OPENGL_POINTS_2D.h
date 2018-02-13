@@ -34,7 +34,7 @@ public:
     int selected_id;
     OPENGL_COLOR selected_old_color;
 
-    OPENGL_POINTS_2D(STREAM_TYPE stream_type,T_ARRAY& points_input,const OPENGL_COLOR &color_input = OPENGL_COLOR::White(),float point_size = 5);
+    OPENGL_POINTS_2D(T_ARRAY& points_input,const OPENGL_COLOR &color_input = OPENGL_COLOR::White(),float point_size = 5);
     virtual ~OPENGL_POINTS_2D();
 
     void Set_Points_From_Particles(const GEOMETRY_PARTICLES<TV>& particles,bool keep_colors=true);

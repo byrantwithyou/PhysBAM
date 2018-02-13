@@ -21,8 +21,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
-OPENGL_COMPONENT_DEBUG_PARTICLES_2D(STREAM_TYPE stream_type,const std::string &filename_input)
-    :OPENGL_COMPONENT<T>(stream_type,"Particles 2D"),particles(*new GEOMETRY_PARTICLES<TV>),
+OPENGL_COMPONENT_DEBUG_PARTICLES_2D(const std::string &filename_input)
+    :OPENGL_COMPONENT<T>("Particles 2D"),particles(*new GEOMETRY_PARTICLES<TV>),
     debug_objects(*new ARRAY<DEBUG_OBJECT<TV> >),
     debug_text(*new ARRAY<DEBUG_TEXT<TV> >),default_color(OPENGL_COLOR::White()),
     velocity_color(OPENGL_COLOR(1,(T).078,(T).576)),
@@ -270,10 +270,9 @@ Reinitialize(bool force)
     frame_filename=Get_Frame_Filename(filename,frame);
         
     try{
-        std::istream* input_file=Safe_Open_Input(frame_filename);
-        TYPED_ISTREAM typed_input(*input_file,stream_type);
-        Read_Binary(typed_input,particles,debug_objects,debug_text);
-        delete input_file;}
+        FILE_ISTREAM input;
+        Safe_Open_Input(input,frame_filename);
+        Read_Binary(input,particles,debug_objects,debug_text);}
     catch(FILESYSTEM_ERROR&){valid=false;}
     frame_loaded=frame;
 }

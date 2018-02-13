@@ -15,10 +15,9 @@
 
 using namespace PhysBAM;
 
-template<class T,class TV,class RW>
-void Run(PARSE_ARGS& parse_args)
+template<class T,class TV>
+void Run(PARSE_ARGS& parse_args,STREAM_TYPE stream_type)
 {
-    RW rw=RW();STREAM_TYPE stream_type(rw); // gcc 3.3.2 workaround
     SOLIDS_EXAMPLE<TV>* example;
     example=new STANDARD_TESTS<TV>(stream_type,parse_args);
     example->mpi_world=new MPI_WORLD(parse_args);
@@ -40,11 +39,11 @@ int main(int argc,char* argv[])
     parse_args.Parse(true);
 
     if(type_double){
-        if(use_2d) Run<double,VECTOR<double,2>,float>(parse_args);
-        else Run<double,VECTOR<double,3>,float>(parse_args);}
+        if(use_2d) Run<double,VECTOR<double,2> >(parse_args,STREAM_TYPE(0.));
+        else Run<double,VECTOR<double,3> >(parse_args,STREAM_TYPE(0.));}
     else{
-        if(use_2d) Run<float,VECTOR<float,2>,float>(parse_args);
-        else Run<float,VECTOR<float,3>,float>(parse_args);}
+        if(use_2d) Run<float,VECTOR<float,2> >(parse_args,STREAM_TYPE(0.f));
+        else Run<float,VECTOR<float,3> >(parse_args,STREAM_TYPE(0.f));}
     return 0;
 }
 //#####################################################################

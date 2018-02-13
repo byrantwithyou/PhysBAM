@@ -17,7 +17,7 @@
 #include "../WATER_FREE_SURFACE_2D_EXAMPLE.h"
 namespace PhysBAM{
 
-template<class T,class RW=T>
+template<class T>
 class IMPLICIT_VISCOSITY:public WATER_FREE_SURFACE_2D_EXAMPLE<T,RW>
 {
 public:

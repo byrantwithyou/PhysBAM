@@ -120,7 +120,7 @@ template<class TV> void MPM_EXAMPLE_RB<TV>::
 Read_Output_Files(const int frame)
 {
     std::string f=LOG::sprintf("%d",frame);
-    solid_body_collection.Read(stream_type,output_directory,frame,0,false,true,true,true);
+    solid_body_collection.Read(output_directory,frame,0,false,true,true,true);
     if(particles.template Get_Array<T>("one_over_mass"))
         particles.Remove_Array_Using_Index(particles.Get_Attribute_Index("one_over_mass"));
     if(particles.template Get_Array<T>("effective_mass"))
@@ -128,18 +128,18 @@ Read_Output_Files(const int frame)
     if(particles.template Get_Array<T>("one_over_effective_mass"))
         particles.Remove_Array_Using_Index(particles.Get_Attribute_Index("one_over_effective_mass"));
 
-    Read_From_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
+    Read_From_File(LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
     if(pfd)
     {
-        Read_From_File(stream_type,LOG::sprintf("%s/%d/pfd_data",output_directory.c_str(),frame),pfd->grid);
+        Read_From_File(LOG::sprintf("%s/%d/pfd_data",output_directory.c_str(),frame),pfd->grid);
         pfd->restarted=true;
     }
     if(pfd->di_penalty)
-        Read_From_File(stream_type,LOG::sprintf("%s/%d/di_data",output_directory.c_str(),frame),*pfd->di_penalty);
+        Read_From_File(LOG::sprintf("%s/%d/di_data",output_directory.c_str(),frame),*pfd->di_penalty);
     if(pfd->rr_penalty)
-        Read_From_File(stream_type,LOG::sprintf("%s/%d/rr_data",output_directory.c_str(),frame),*pfd->rr_penalty);
+        Read_From_File(LOG::sprintf("%s/%d/rr_data",output_directory.c_str(),frame),*pfd->rr_penalty);
     if(pfd->rd_penalty)
-        Read_From_File(stream_type,LOG::sprintf("%s/%d/rd_data",output_directory.c_str(),frame),*pfd->rd_penalty);
+        Read_From_File(LOG::sprintf("%s/%d/rd_data",output_directory.c_str(),frame),*pfd->rd_penalty);
 }
 //#####################################################################
 // Function Capture_Stress

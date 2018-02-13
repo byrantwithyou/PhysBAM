@@ -164,8 +164,8 @@ public:
     static std::string Static_Name()
     {return LOG::sprintf("EMBEDDED_OBJECT<T,VECTOR<T,%d>,%d>",TV::m,d);}
 
-    void Read(TYPED_ISTREAM& input) override;
-    void Write(TYPED_OSTREAM& output) const override;
+    void Read(TYPED_ISTREAM input) override;
+    void Write(TYPED_OSTREAM output) const override;
 
 //#####################################################################
     virtual void Clean_Memory();

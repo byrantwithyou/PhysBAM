@@ -14,13 +14,13 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_LEVELSET_3D<T>::
-OPENGL_COMPONENT_LEVELSET_3D(STREAM_TYPE stream_type,const std::string& levelset_filename_input,
+OPENGL_COMPONENT_LEVELSET_3D(const std::string& levelset_filename_input,
                              const std::string& triangulated_surface_filename_input,
                              const std::string& filename_set_input,
                              const std::string& filename_triangulated_surface_set_input,
                              bool write_generated_triangulated_surface_input,
                              bool check_triangulated_surface_file_time_input)
-    :OPENGL_COMPONENT<T>(stream_type,"Levelset 3D"), opengl_levelset_multiview(0), 
+    :OPENGL_COMPONENT<T>("Levelset 3D"), opengl_levelset_multiview(0), 
       levelset_filename(levelset_filename_input),triangulated_surface_filename(triangulated_surface_filename_input),
       filename_set(filename_set_input),filename_triangulated_surface_set(filename_triangulated_surface_set_input),
       write_generated_triangulated_surface(write_generated_triangulated_surface_input),
@@ -47,7 +47,7 @@ set(0),set_loaded(-1),use_sets(true),draw_multiple_levelsets(true),ghost_cells(3
     opengl_levelset_multiviews.Resize(number_of_sets);
     OPENGL_INDEXED_COLOR_MAP* color_map=OPENGL_INDEXED_COLOR_MAP::Levelset_Multiple_Color_Map();
     for(int i=0;i<opengl_levelset_multiviews.m;i++){
-        opengl_levelset_multiviews(i)=new OPENGL_LEVELSET_MULTIVIEW<T>(stream_type);
+        opengl_levelset_multiviews(i)=new OPENGL_LEVELSET_MULTIVIEW<T>;
         if(use_sets){
             OPENGL_COLOR color=color_map->Lookup(i);
             opengl_levelset_multiviews(i)->Set_Slice_Color(color,OPENGL_COLOR::Transparent());

@@ -310,13 +310,13 @@ Axis_Aligned_Bounding_Box() const
 // Function void Read_State
 //#####################################################################
 template<class T> void TETRAHEDRON_COLLISION_BODY<T>::
-Read_State(TYPED_ISTREAM& input,const int state_index)
+Read_State(TYPED_ISTREAM input,const int state_index)
 {PHYSBAM_NOT_IMPLEMENTED();}
 //#####################################################################
 // Function void Write_State
 //#####################################################################
 template<class T> void TETRAHEDRON_COLLISION_BODY<T>::
-Write_State(TYPED_OSTREAM& output,const int state_index) const
+Write_State(TYPED_OSTREAM output,const int state_index) const
 {PHYSBAM_NOT_IMPLEMENTED();}
 //#####################################################################
 namespace PhysBAM{

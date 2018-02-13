@@ -10,12 +10,12 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
-OPENGL_COMPONENT_HEIGHTFIELD_1D(STREAM_TYPE stream_type,const GRID<TV> &grid_input, 
+OPENGL_COMPONENT_HEIGHTFIELD_1D(const GRID<TV> &grid_input, 
                                 const std::string& height_filename_input,
                                 const std::string& x_filename_input,
                                 const std::string& ground_filename_input,
                                 const std::string& u_filename_input)
-    :OPENGL_COMPONENT<T>(stream_type,"Heightfield 1D"), grid(grid_input), opengl_vector_field(stream_type,vector_field,vector_locations), scale(1), displacement_scale(1), valid(false), 
+    :OPENGL_COMPONENT<T>("Heightfield 1D"), grid(grid_input), opengl_vector_field(vector_field,vector_locations), scale(1), displacement_scale(1), valid(false), 
       draw_velocities(true), draw_points(true), selected_index(0)
 {
     viewer_callbacks.Set("increase_scale",{[this](){Increase_Scale();},"Increase scale"});
@@ -235,21 +235,21 @@ Reinitialize(bool force)
             if(success){
                 std::string filename=Get_Frame_Filename(height_filename,frame);
                 if(File_Exists(filename)){
-                    Read_From_File(stream_type,filename,height);
+                    Read_From_File(filename,height);
                     if(height.Size().x != grid.counts.x) success=false;}
                 else success=false;}
 
             if(success && x){
                 std::string filename=Get_Frame_Filename(x_filename,frame);
                 if(File_Exists(filename)){
-                    Read_From_File(stream_type,filename,*x);
+                    Read_From_File(filename,*x);
                     if(height.Size().x != x->Size().x) success=false;}
                 else success=false;}
     
             if(success && ground){
                 std::string filename=Get_Frame_Filename(ground_filename,frame);
                 if(File_Exists(filename)){
-                    Read_From_File(stream_type,filename,*ground);
+                    Read_From_File(filename,*ground);
                     if(height.Size().x != ground->Size().x) success=false;
                     else height += (*ground);}
                 else success=false;}
@@ -257,7 +257,7 @@ Reinitialize(bool force)
             if(success && draw_velocities && u_filename.length()){
                 std::string filename=Get_Frame_Filename(u_filename,frame);
                 if(File_Exists(filename)){
-                    Read_From_File(stream_type,filename,*u);
+                    Read_From_File(filename,*u);
                     if(height.Size().x != u->Size().x) success=false;
                     else for(int i=0;i<grid.counts.x;i++){
                             vector_field(i)=VECTOR<T,2>((*u)(i),0);

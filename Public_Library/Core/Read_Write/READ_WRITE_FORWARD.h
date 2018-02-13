@@ -9,7 +9,6 @@
 
 namespace PhysBAM{
 
-template<class T,class RW,class ENABLER=void> class Read_Write;
 template<class T,class ENABLER=void> struct PLATFORM_INDEPENDENT_SIZE;
 template<class T,class HAS=void> struct HAS_TYPED_READ;
 template<class T,class HAS=void> struct HAS_TYPED_WRITE;

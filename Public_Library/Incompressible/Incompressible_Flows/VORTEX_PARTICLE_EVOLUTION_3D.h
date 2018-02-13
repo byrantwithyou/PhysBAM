@@ -56,7 +56,7 @@ public:
     void Compute_Body_Force(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,ARRAY<T,FACE_INDEX<TV::m> >& force,const T dt,const T time);
     void Euler_Step(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,const T dt,const T time);
     void Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const;
-    void Read_Output_Files(const STREAM_TYPE stream_type,const std::string& input_directory,const int frame);
+    void Read_Output_Files(const std::string& input_directory,const int frame);
 //#####################################################################
 };
 }

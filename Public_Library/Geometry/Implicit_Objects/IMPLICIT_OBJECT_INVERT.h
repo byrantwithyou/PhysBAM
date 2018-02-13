@@ -69,8 +69,8 @@ public:
     T_CURVATURES Principal_Curvatures(const TV& X) const override;
     T Integration_Step(const T phi) const override;
     T Minimum_Cell_Size() const override;
-    void Read(TYPED_ISTREAM& input) override;
-    void Write(TYPED_OSTREAM& output) const override;
+    void Read(TYPED_ISTREAM input) override;
+    void Write(TYPED_OSTREAM output) const override;
 //#####################################################################
 };
 template<class TV>

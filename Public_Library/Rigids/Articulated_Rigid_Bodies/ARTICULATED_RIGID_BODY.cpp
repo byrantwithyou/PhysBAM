@@ -494,24 +494,24 @@ Apply_Poststabilization(bool test_system,bool print_matrix,const bool target_pd,
 // Function Read
 //#####################################################################
 template<class TV> void ARTICULATED_RIGID_BODY_BASE<TV>::
-Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame)
+Read(const std::string& directory,const int frame)
 {
     int local_frame=frame;
     std::string arb_state_list_name=LOG::sprintf("%s/common/arb_state_list",directory.c_str());
     if(File_Exists(arb_state_list_name)){
-        if(!frame_list){frame_list=new ARRAY<int>;Read_From_File(stream_type,arb_state_list_name,*frame_list);}
+        if(!frame_list){frame_list=new ARRAY<int>;Read_From_File(arb_state_list_name,*frame_list);}
         local_frame=(*frame_list)(frame_list->Binary_Search(frame));}
     if(last_read!=local_frame){
-        std::istream* input=Safe_Open_Input(LOG::sprintf("%s/%d/arb_state",directory.c_str(),frame));
-        TYPED_ISTREAM typed_input(*input,stream_type);
-        joint_mesh.Read(typed_input,directory,frame);
-        last_read=local_frame;delete input;}
+        FILE_ISTREAM input;
+        Safe_Open_Input(input,LOG::sprintf("%s/%d/arb_state",directory.c_str(),frame));
+        joint_mesh.Read(input,directory,frame);
+        last_read=local_frame;}
     std::string muscle_filename=LOG::sprintf("%s/%d/muscle_list",directory.c_str(),frame);
     if(File_Exists(muscle_filename)){
         if(!muscle_list) muscle_list=new MUSCLE_LIST<TV>(rigid_body_collection);
-        muscle_list->Read(stream_type,directory,frame);}
+        muscle_list->Read(directory,frame);}
     std::string muscle_activations_filename=LOG::sprintf("%s/%d/muscle_activations",directory.c_str(),frame);
-    if(File_Exists(muscle_activations_filename)) Read_From_File(stream_type,muscle_activations_filename,muscle_activations);
+    if(File_Exists(muscle_activations_filename)) Read_From_File(muscle_activations_filename,muscle_activations);
 }
 //#####################################################################
 // Function Write
@@ -525,10 +525,9 @@ Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame
             frame_list->Append(frame);
             Write_To_File(stream_type,LOG::sprintf("%s/common/arb_state_list",directory.c_str()),*frame_list);
             is_stale=false;}
-        std::ostream* output=Safe_Open_Output(LOG::sprintf("%s/%d/arb_state",directory.c_str(),frame));
-        TYPED_OSTREAM typed_output(*output,stream_type);
-        joint_mesh.Write(typed_output,directory,frame);
-        delete output;}
+        FILE_OSTREAM output;
+        Safe_Open_Output(output,stream_type,LOG::sprintf("%s/%d/arb_state",directory.c_str(),frame));
+        joint_mesh.Write(output,directory,frame);}
     if(muscle_list) muscle_list->Write(stream_type,directory,frame);
     Output_Articulation_Points(stream_type,directory,frame);
     if(muscle_activations.m>0) Write_To_File(stream_type,LOG::sprintf("%s/%d/muscle_activations",directory.c_str(),frame),muscle_activations);

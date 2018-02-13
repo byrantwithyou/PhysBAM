@@ -242,7 +242,7 @@ void Initialize_Bodies() override
 {   
     if(test_number==1) return;
 
-    sphere=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/sphere",(T).25,true,true,false);
+    sphere=rigid_body_collection.Add_Rigid_Body(data_directory+"/Rigid_Bodies/sphere",(T).25,true,true,false);
     rigid_body_collection.Rigid_Body(sphere).Set_Coefficient_Of_Restitution((T)1);rigid_body_collection.Rigid_Body(sphere).coefficient_of_friction=(T)1;
     rigid_body_collection.rigid_body_particles.frame(sphere).t=solid_initial_position;rigid_body_collection.Rigid_Body(sphere).Set_Mass(solid_mass);
     rigid_body_collection.Rigid_Body(sphere).Is_Kinematic()=false;

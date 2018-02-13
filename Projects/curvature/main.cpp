@@ -15,10 +15,9 @@
 
 using namespace PhysBAM;
 
-template<class T,class TV,class RW>
-void Run(PARSE_ARGS& parse_args)
+template<class T,class TV>
+void Run(PARSE_ARGS& parse_args,STREAM_TYPE stream_type)
 {
-    STREAM_TYPE stream_type((RW()));
     SOLIDS_EXAMPLE<TV>* example=0;
     example=new STANDARD_TESTS<TV>(stream_type,parse_args);
     example->mpi_world=new MPI_WORLD(parse_args);
@@ -40,8 +39,8 @@ int main(int argc,char* argv[])
     parse_args.Add("-2d",&use_2d,"run 2d sims");
     parse_args.Parse(true);
 
-    if(use_2d) Run<T,VECTOR<T,2>,RW>(parse_args);
-    else Run<T,VECTOR<T,3>,RW>(parse_args);
+    if(use_2d) Run<T,VECTOR<T,2> >(parse_args,STREAM_TYPE((T)0));
+    else Run<T,VECTOR<T,3> >(parse_args,STREAM_TYPE((T)0));
     return 0;
 }
 //#####################################################################

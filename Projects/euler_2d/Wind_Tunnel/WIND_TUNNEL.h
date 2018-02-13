@@ -204,7 +204,7 @@ void Initialize_Bodies() override
         rect.Frame().t=TV((T)1.5,(T).35);
         rect.is_static=true;}
     else if(test_number==3){
-        square=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies_2D/square",(T).1,true,true,false);
+        square=rigid_body_collection.Add_Rigid_Body(data_directory+"/Rigid_Bodies_2D/square",(T).1,true,true,false);
         rigid_body_collection.rigid_body_particles.frame(square).t=TV((T)1.25,(T).55);
         rigid_body_collection.Rigid_Body(square).Is_Kinematic()=true;}
     else return;

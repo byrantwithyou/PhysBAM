@@ -26,7 +26,7 @@ public:
     VECTOR<bool,TV::SPIN::m> draw_grid;
     int number_grid_spaces;
 
-    OPENGL_AXES(STREAM_TYPE stream_type,const FRAME<TV>& frame_input=FRAME<TV>(),const RANGE<TV>& box_input=RANGE<TV>::Unit_Box());
+    OPENGL_AXES(const FRAME<TV>& frame_input=FRAME<TV>(),const RANGE<TV>& box_input=RANGE<TV>::Unit_Box());
 
     virtual ~OPENGL_AXES();
 

@@ -289,7 +289,7 @@ T Initial_Phi_Object(const TV& X) const
 void Initialize_Bodies() override
 {
     if(test_number==6){
-        sphere=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies_2D/circle",(T).3,true,true,false);
+        sphere=rigid_body_collection.Add_Rigid_Body(data_directory+"/Rigid_Bodies_2D/circle",(T).3,true,true,false);
         rigid_body_collection.rigid_body_particles.frame(sphere).t=TV((T).75,(T)1.05);
         rigid_body_collection.Rigid_Body(sphere).Is_Kinematic()=true;
 

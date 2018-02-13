@@ -470,34 +470,32 @@ Write_Position_Update_Projection_Data(const STREAM_TYPE stream_type,const std::s
     if(rigid_deformable_collisions->rigid_body_collisions.rigid_body_particles_intersections.Size())
         Write_To_File(stream_type,prefix+"projection_data_rigid_rigid",rigid_deformable_collisions->rigid_body_collisions.rigid_body_particles_intersections);
     if(!rigid_deformable_collisions->precompute_contact_projections.m) return;
-    std::ostream* output=Safe_Open_Output(prefix+"projection_data_rigid_deformable");
-    TYPED_OSTREAM typed_output(*output,stream_type);
-    Write_Binary(typed_output,rigid_deformable_collisions->precompute_contact_projections.m);
+    FILE_OSTREAM output;
+    Safe_Open_Output(output,stream_type,prefix+"projection_data_rigid_deformable");
+    Write_Binary(output,rigid_deformable_collisions->precompute_contact_projections.m);
     for(int i=0;i<rigid_deformable_collisions->precompute_contact_projections.m;i++){
         typename RIGID_DEFORMABLE_COLLISIONS<TV>::PRECOMPUTE_CONTACT_PROJECTION& p=*rigid_deformable_collisions->precompute_contact_projections(i);
-        Write_Binary(typed_output,p.rigid_body.particle_index,p.particles,p.V_rel_target,p.N_over_NT_K_N,p.r,p.N,p.rN,p.A,p.A_inverted);}
-    delete output;
+        Write_Binary(output,p.rigid_body.particle_index,p.particles,p.V_rel_target,p.N_over_NT_K_N,p.r,p.N,p.rN,p.A,p.A_inverted);}
 }
 //#####################################################################
 // Function Read_Position_Update_Projection_Data
 //#####################################################################
 template<class TV> void NEWMARK_EVOLUTION<TV>::
-Read_Position_Update_Projection_Data(const STREAM_TYPE stream_type,const std::string& prefix)
+Read_Position_Update_Projection_Data(const std::string& prefix)
 {
     if(File_Exists(prefix+"projection_data_rigid_rigid"))
-        Read_From_File(stream_type,prefix+"projection_data_rigid_rigid",rigid_deformable_collisions->rigid_body_collisions.rigid_body_particles_intersections);
+        Read_From_File(prefix+"projection_data_rigid_rigid",rigid_deformable_collisions->rigid_body_collisions.rigid_body_particles_intersections);
     if(!File_Exists(prefix+"projection_data_rigid_deformable")) return;
-    std::istream* input=Safe_Open_Input(prefix+"projection_data_rigid_deformable");
-    TYPED_ISTREAM typed_input(*input,stream_type);
+    FILE_ISTREAM input;
+    Safe_Open_Input(input,prefix+"projection_data_rigid_deformable");
     int precompute_contact_projections_size;
-    Read_Binary(typed_input,precompute_contact_projections_size);
+    Read_Binary(input,precompute_contact_projections_size);
     for(int i=0;i<precompute_contact_projections_size;i++){
         int index;
-        Read_Binary(typed_input,index);
+        Read_Binary(input,index);
         typename RIGID_DEFORMABLE_COLLISIONS<TV>::PRECOMPUTE_CONTACT_PROJECTION* p=
             new typename RIGID_DEFORMABLE_COLLISIONS<TV>::PRECOMPUTE_CONTACT_PROJECTION(solid_body_collection.rigid_body_collection.Rigid_Body(index),false);
-        Read_Binary(typed_input,p->particles,p->V_rel_target,p->N_over_NT_K_N,p->r,p->N,p->rN,p->A,p->A_inverted);}
-    delete input;
+        Read_Binary(input,p->particles,p->V_rel_target,p->N_over_NT_K_N,p->r,p->N,p->rN,p->A,p->A_inverted);}
 }
 //#####################################################################
 // Function Process_Collisions

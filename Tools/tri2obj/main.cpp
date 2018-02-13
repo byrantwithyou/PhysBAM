@@ -8,12 +8,13 @@
 
 using namespace PhysBAM;
 
-template<class T,class RW> void Convert(const std::string& input_filename,const std::string& output_filename)
+template<class T> void Convert(const std::string& input_filename,const std::string& output_filename)
 {
 //    typedef VECTOR<T,3> TV;
 
-    TRIANGULATED_SURFACE<T>* triangulated_surface=0;Create_From_File<RW>(input_filename,triangulated_surface);
-    std::ostream* output=Safe_Open_Output(output_filename,false);
+    TRIANGULATED_SURFACE<T>* triangulated_surface=0;
+    Create_From_File(input_filename,triangulated_surface);
+    std::ostream* output=Safe_Open_Output_Raw(output_filename,false);
 
     std::string header("# simple obj file format:\n"
         "#   # vertex at coordinates (x,y,z)\n"
@@ -36,13 +37,12 @@ int main(int argc,char *argv[])
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
 
-    bool type_double=false,compute_using_doubles=false;
+    bool type_double=false;
     std::string input_filename,output_filename;
 
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Add("-double",&type_double,"Use doubles");
-    parse_args.Add("-compute_using_doubles",&compute_using_doubles,"compute_using_doubles");
     parse_args.Extra(&input_filename,"tri file","tri file to convert");
     parse_args.Extra(&output_filename,"obj file","output obj file name");
     parse_args.Parse();
@@ -52,10 +52,6 @@ int main(int argc,char *argv[])
         std::cerr<<"Not a tri file: "<<input_filename<<std::endl;
         return -1;}
 
-    if(!type_double){
-        if(compute_using_doubles){
-            std::cout<<"COMPUTING USING DOUBLES!"<<std::endl;
-            Convert<double,float>(input_filename,output_filename);
-        }else{Convert<float,float>(input_filename,output_filename);}}
-    else Convert<double,double>(input_filename,output_filename);
+    if(!type_double) Convert<float>(input_filename,output_filename);
+    else Convert<double>(input_filename,output_filename);
 }

@@ -90,8 +90,8 @@ public:
     void Add_Pair(int p,int s,const TV& w0,int e0);
     void Test_Relax(int cp);
     void Add_Surface(T_SURFACE& surface);
-    void Read(TYPED_ISTREAM& input);
-    void Write(TYPED_OSTREAM& output) const;
+    void Read(TYPED_ISTREAM input);
+    void Write(TYPED_OSTREAM output) const;
 //#####################################################################
 };
 }

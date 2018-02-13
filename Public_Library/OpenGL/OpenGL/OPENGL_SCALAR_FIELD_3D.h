@@ -24,7 +24,7 @@ class OPENGL_SCALAR_FIELD_3D:public OPENGL_OBJECT<T>,public OPENGL_GRID_OBJECT<V
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::World_Space_Box;
-    using OPENGL_OBJECT<T>::slice;using OPENGL_OBJECT<T>::stream_type;
+    using OPENGL_OBJECT<T>::slice;
     GRID<TV> grid;
     ARRAY<T2,VECTOR<int,3> > &values;
 
@@ -33,7 +33,7 @@ public:
     ARRAY<OPENGL_COLOR_MAP<T2>*> color_maps; // all owned by us
     int current_color_map;
 
-    OPENGL_SCALAR_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV> &grid_input,
+    OPENGL_SCALAR_FIELD_3D(const GRID<TV> &grid_input,
         ARRAY<T2,VECTOR<int,3> > &values_input,OPENGL_COLOR_MAP<T2> *color_map_input,
         DRAW_MODE draw_mode_input=DRAW_TEXTURE);
     virtual ~OPENGL_SCALAR_FIELD_3D();

@@ -10,10 +10,10 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T,class T2> OPENGL_COMPONENT_SCALAR_FIELD_2D<T,T2>::
-OPENGL_COMPONENT_SCALAR_FIELD_2D(STREAM_TYPE stream_type,GRID<TV> &grid_input,
+OPENGL_COMPONENT_SCALAR_FIELD_2D(GRID<TV> &grid_input,
     const std::string &scalar_field_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input,
     const char* info_name,typename OPENGL_SCALAR_FIELD_2D<T,T2>::DRAW_MODE draw_mode_input)
-    :OPENGL_COMPONENT<T>(stream_type,"Scalar Field 2D"),opengl_scalar_field(stream_type,grid_input,*new ARRAY<T2,VECTOR<int,2> >,color_map_input,info_name,0,draw_mode_input),
+    :OPENGL_COMPONENT<T>("Scalar Field 2D"),opengl_scalar_field(grid_input,*new ARRAY<T2,VECTOR<int,2> >,color_map_input,info_name,0,draw_mode_input),
       scalar_field_filename(scalar_field_filename_input),frame_loaded(-1),valid(false)
 {
     viewer_callbacks.Set("toggle_smooth",{[this](){Toggle_Smooth();},"Toggle smooth"});
@@ -98,7 +98,7 @@ Reinitialize()
             valid=false;
             std::string filename=Get_Frame_Filename(scalar_field_filename,frame);
             if(File_Exists(filename))
-                Read_From_File(stream_type,filename,opengl_scalar_field.values);
+                Read_From_File(filename,opengl_scalar_field.values);
             else
                 return;
 

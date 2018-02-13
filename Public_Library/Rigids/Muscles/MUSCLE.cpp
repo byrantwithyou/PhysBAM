@@ -178,7 +178,7 @@ Apply_Fixed_Impulse_At_All_Points(const T impulse)
 // Function Read_Constrained_Point
 //#####################################################################
 template<class TV> ATTACHMENT_POINT<TV>* MUSCLE<TV>::
-Read_Constrained_Point(TYPED_ISTREAM& input_stream,RIGID_BODY_COLLECTION<TV>& rigid_body_collection)
+Read_Constrained_Point(TYPED_ISTREAM input_stream,RIGID_BODY_COLLECTION<TV>& rigid_body_collection)
 {
     TV object_space_position;int id;Read_Binary(input_stream,object_space_position,id);
     // set-up a rigid body binding with a null deformable particle (usable only through the binding callbacks)
@@ -188,7 +188,7 @@ Read_Constrained_Point(TYPED_ISTREAM& input_stream,RIGID_BODY_COLLECTION<TV>& ri
 // Function Read
 //#####################################################################
 template<class TV> void MUSCLE<TV>::
-Read(TYPED_ISTREAM& input_stream,RIGID_BODY_COLLECTION<TV>& rigid_body_collection)
+Read(TYPED_ISTREAM input_stream,RIGID_BODY_COLLECTION<TV>& rigid_body_collection)
 {
     Read_Binary(input_stream,optimal_length,peak_force,pennation_angle,tendon_slack_length,max_shortening_velocity,name);
     Set_Optimal_Length(optimal_length);Set_Peak_Force(peak_force);Set_Pennation_Angle(pennation_angle);Set_Tendon_Slack_Length(tendon_slack_length);Set_Max_Shortening_Velocity(max_shortening_velocity);
@@ -208,7 +208,7 @@ Read(TYPED_ISTREAM& input_stream,RIGID_BODY_COLLECTION<TV>& rigid_body_collectio
 // Function Write
 //#####################################################################
 template<class TV> void MUSCLE<TV>::
-Write(TYPED_OSTREAM& output_stream) const
+Write(TYPED_OSTREAM output_stream) const
 {
     Write_Binary(output_stream,optimal_length,peak_force,pennation_angle,tendon_slack_length,max_shortening_velocity,name);
     Write_Constrained_Point(output_stream,attachment_point_1);

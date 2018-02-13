@@ -504,8 +504,8 @@ Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const
 template<class TV> void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::
 Read_Output_Files_Fluids(const int frame)
 {
-    fluids_parameters.Read_Output_Files(stream_type,output_directory,frame);
-    fluid_collection.Read_Output_Files(stream_type,output_directory,frame);
+    fluids_parameters.Read_Output_Files(output_directory,frame);
+    fluid_collection.Read_Output_Files(output_directory,frame);
     std::string f=LOG::sprintf("%d",frame);
     if(fluids_parameters.smoke||fluids_parameters.fire||fluids_parameters.water){
         if(fluids_parameters.solid_affects_fluid && fluids_parameters.fluid_affects_solid){std::string filename;
@@ -514,22 +514,22 @@ Read_Output_Files_Fluids(const int frame)
                 filename=output_directory+"/density_valid_mask."+f;
                 if(File_Exists(filename)){
                     LOG::cout<<"Reading "<<filename<<std::endl;
-                    Read_From_File(stream_type,filename,fluids_parameters.semi_lagrangian_collidable_density.valid_points_current);}}
+                    Read_From_File(filename,fluids_parameters.semi_lagrangian_collidable_density.valid_points_current);}}
             if(fluids_parameters.smoke && fluids_parameters.use_temperature && fluids_parameters.semi_lagrangian_collidable_temperature.use_valid_mask){
                 filename=output_directory+"/temperature_valid_mask."+f;
                 if(File_Exists(filename)){
                     LOG::cout<<"Reading "<<filename<<std::endl;
-                    Read_From_File(stream_type,filename,fluids_parameters.semi_lagrangian_collidable_temperature.valid_points_current);}}
+                    Read_From_File(filename,fluids_parameters.semi_lagrangian_collidable_temperature.valid_points_current);}}
             if(fluids_parameters.semi_lagrangian_collidable_velocity.use_valid_mask){
                 filename=output_directory+"/velocity_valid_mask."+f;
                 if(File_Exists(filename)){
                     LOG::cout<<"Reading "<<filename<<std::endl;
-                    Read_From_File(stream_type,filename,fluids_parameters.semi_lagrangian_collidable_velocity.valid_points_current);}}
+                    Read_From_File(filename,fluids_parameters.semi_lagrangian_collidable_velocity.valid_points_current);}}
             if((fluids_parameters.water || fluids_parameters.fire) && fluids_parameters.semi_lagrangian_collidable_phi.use_valid_mask){
                 filename=output_directory+"/phi_valid_mask."+f;
                 if(File_Exists(filename)){
                     LOG::cout<<"Reading "<<filename<<std::endl;
-                    Read_From_File(stream_type,filename,fluids_parameters.semi_lagrangian_collidable_phi.valid_points_current);}}*/}}
+                    Read_From_File(filename,fluids_parameters.semi_lagrangian_collidable_phi.valid_points_current);}}*/}}
 }
 //#####################################################################
 // Function Write_Output_Files

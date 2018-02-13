@@ -8,8 +8,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT<T>::
-OPENGL_COMPONENT(STREAM_TYPE stream_type,const std::string &name)
- :OPENGL_OBJECT<T>(stream_type),frame(0),draw(true),is_animation(false),component_name(name)
+OPENGL_COMPONENT(const std::string &name)
+ :frame(0),draw(true),is_animation(false),component_name(name)
 {
     viewer_callbacks.Set("next_frame",{[this](){Set_Frame(frame+1);},"Next frame"});
     viewer_callbacks.Set("prev_frame",{[this](){Set_Frame(frame-1);},"Prev frame"});

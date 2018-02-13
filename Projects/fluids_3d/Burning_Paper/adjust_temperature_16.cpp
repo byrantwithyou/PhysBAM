@@ -49,7 +49,7 @@ template<class T> inline T Adjust_Density(const T d,const int frame,const VECTOR
             return (tau+(1-tau)*reduction)*d;}}
 }
 
-template<class T,class RW> void Process(int argc,char* argv[])
+template<class T> void Process(int argc,char* argv[])
 {
     int frame=-10;
     PARSE_ARGS parse_args(argc,argv);
@@ -61,10 +61,10 @@ template<class T,class RW> void Process(int argc,char* argv[])
     std::string prefix="";
     std::string f=LOG::sprintf(".%d",frame);
 
-    GRID<TV> grid;Read_From_File<RW>("grid",grid);
+    GRID<TV> grid;Read_From_File("grid",grid);
     ARRAY<T,VECTOR<int,3> > temperature,density;
-    Read_From_File<RW>("temperature"+f,temperature);
-    Read_From_File<RW>("density"+f,density);
+    Read_From_File("temperature"+f,temperature);
+    Read_From_File("density"+f,density);
     for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++)temperature(i,j,ij)=Adjust_Temperature<T>(temperature(i,j,ij),frame,grid.X(i,j,ij));
     for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++)density(i,j,ij)=Adjust_Density<T>(density(i,j,ij),frame,grid.X(i,j,ij));
     Write_To_File<RW>("adjusted_temperature"+f,temperature);

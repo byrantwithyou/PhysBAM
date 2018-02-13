@@ -52,10 +52,10 @@ public:
     void Mark_Nodes_Referenced(ARRAY<int>& marks,const int mark) const override
     {material_surface.Mark_Nodes_Referenced(marks,mark);}
 
-    void Read(TYPED_ISTREAM& input) override
+    void Read(TYPED_ISTREAM input) override
     {material_surface.Clean_Memory();Read_Binary(input,material_surface_mesh);}
 
-    void Write(TYPED_OSTREAM& output) const override
+    void Write(TYPED_OSTREAM output) const override
     {Write_Binary(output,material_surface_mesh);}
 
 //#####################################################################

@@ -70,7 +70,7 @@ Normal(const TV& X,const int aggregate) const -> TV
 // Function Read
 //#####################################################################
 template<class T_input> void SURFACE_OF_REVOLUTION_IMPLICIT_OBJECT<T_input>::
-Read(TYPED_ISTREAM& input)
+Read(TYPED_ISTREAM input)
 {
     PHYSBAM_FATAL_ERROR();
 }
@@ -78,7 +78,7 @@ Read(TYPED_ISTREAM& input)
 // Function Write
 //#####################################################################
 template<class T_input> void SURFACE_OF_REVOLUTION_IMPLICIT_OBJECT<T_input>::
-Write(TYPED_OSTREAM& output) const
+Write(TYPED_OSTREAM output) const
 {
     PHYSBAM_FATAL_ERROR();
 }

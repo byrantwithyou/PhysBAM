@@ -241,7 +241,7 @@ Minimum_Cell_Size() const
 // Function Read
 //#####################################################################
 template<class TV> void IMPLICIT_OBJECT_DILATE<TV>::
-Read(TYPED_ISTREAM& input)
+Read(TYPED_ISTREAM input)
 {
     Read_Binary(input,dilation);
     if(io) io->Read_Structure(input);
@@ -251,7 +251,7 @@ Read(TYPED_ISTREAM& input)
 // Function Write
 //#####################################################################
 template<class TV> void IMPLICIT_OBJECT_DILATE<TV>::
-Write(TYPED_OSTREAM& output) const
+Write(TYPED_OSTREAM output) const
 {
     Write_Binary(output,dilation);
     io->Write_Structure(output);

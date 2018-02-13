@@ -64,7 +64,7 @@ public:
             grid.Initialize(TV_INT(10*cells+1,10*cells+1),RANGE<TV>(TV(0,0),TV(1,1)));}
         else if(test_number==6){   
             grid.Initialize(TV_INT(10*cells+1,10*cells+1),RANGE<TV>(TV(0,0),TV(1,1)),true);
-            int rigid_id=solid_body_collection.rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies_2D/square_refined",(T).1,true,true,false);
+            int rigid_id=solid_body_collection.rigid_body_collection.Add_Rigid_Body(data_directory+"/Rigid_Bodies_2D/square_refined",(T).1,true,true,false);
             rigid=&solid_body_collection.rigid_body_collection.Rigid_Body(rigid_id);
             //rigid->is_kinematic=true;
             rigid->Frame().t=TV((T).5,(T).4);
@@ -73,7 +73,7 @@ public:
             //rigid->is_kinematic=true;
             //rigid2->Frame().t=TV((T).1,(T).4);
             //rigid2->is_kinematic=true;
-            int ground_id=solid_body_collection.rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies_2D/ground",(T)1,true,true,false);
+            int ground_id=solid_body_collection.rigid_body_collection.Add_Rigid_Body(data_directory+"/Rigid_Bodies_2D/ground",(T)1,true,true,false);
             solid_body_collection.rigid_body_collection.Rigid_Body(ground_id).is_static=true;
             solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
         }

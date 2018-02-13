@@ -28,8 +28,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
-OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(STREAM_TYPE stream_type,const std::string& basedir_input)
-    :OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(stream_type,*new RIGID_BODY_COLLECTION<TV>(0),basedir_input)
+OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(const std::string& basedir_input)
+    :OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(*new RIGID_BODY_COLLECTION<TV>(0),basedir_input)
 {
     need_destroy_rigid_body_collection=true;
 }
@@ -37,12 +37,12 @@ OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(STREAM_TYPE stream_type,const std::str
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
-OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(STREAM_TYPE stream_type,RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir_input)
-    :OPENGL_COMPONENT<T>(stream_type,"Rigid Geometry Collection 2D"),basedir(basedir_input),frame_loaded(-1),valid(false),show_object_names(false),output_positions(true),draw_velocity_vectors(false),
+OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir_input)
+    :OPENGL_COMPONENT<T>("Rigid Geometry Collection 2D"),basedir(basedir_input),frame_loaded(-1),valid(false),show_object_names(false),output_positions(true),draw_velocity_vectors(false),
     draw_individual_axes(false),draw_node_velocity_vectors(false),draw_segmented_curve(true),draw_triangulated_area(false),draw_implicit_curve(false),
     draw_articulation_points(false),draw_forces_and_torques(false),draw_linear_muscles(false),need_destroy_rigid_body_collection(false),selected_curve(-1),selected_area(-1),selected_joint_id(-1),selected_muscle_id(-1),
     rigid_body_collection(rigid_body_collection),articulated_rigid_body(0),
-    velocity_field(stream_type,velocity_vectors,positions,OPENGL_COLOR::Cyan(),0.25,true,true),node_velocity_field(stream_type,node_velocity_vectors,node_positions,OPENGL_COLOR::Magenta(),0.25,true,true)
+    velocity_field(velocity_vectors,positions,OPENGL_COLOR::Cyan(),0.25,true,true),node_velocity_field(node_velocity_vectors,node_positions,OPENGL_COLOR::Magenta(),0.25,true,true)
 {
     viewer_callbacks.Set("toggle_velocity_vectors",{[this](){Toggle_Velocity_Vectors();},"Toggle velocity vectors"});
     viewer_callbacks.Set("toggle_individual_axes",{[this](){Toggle_Individual_Axes();},"Toggle individual axes"});
@@ -95,20 +95,20 @@ Reinitialize(const bool force,const bool read_geometry)
         valid=false;
         if(!File_Exists(LOG::sprintf("%s/%d/rigid_body_particles",basedir.c_str(),frame))) return;
 
-        rigid_body_collection.Read(stream_type,basedir,frame,&needs_init,&needs_destroy); // TODO: avoiding reading triangulated areas
+        rigid_body_collection.Read(basedir,frame,&needs_init,&needs_destroy); // TODO: avoiding reading triangulated areas
         if(has_init_destroy_information) for(int i=0;i<needs_destroy.m;i++) Destroy_Geometry(needs_destroy(i));
 
         std::string arb_state_file=LOG::sprintf("%s/%d/arb_state",basedir.c_str(),frame);
         if(File_Exists(arb_state_file)){
             if(!articulated_rigid_body) articulated_rigid_body=new ARTICULATED_RIGID_BODY<TV>(rigid_body_collection); // TODO: read in the actual particles
-            articulated_rigid_body->Read(stream_type,basedir,frame);}
+            articulated_rigid_body->Read(basedir,frame);}
         else{delete articulated_rigid_body;articulated_rigid_body=0;}
 
         if(File_Exists(LOG::sprintf("%s/%d/arb_info",basedir.c_str(),frame)))
             Read_Articulated_Information(LOG::sprintf("%s/%d/arb_info",basedir.c_str(),frame));
 
         std::string filename=LOG::sprintf("%s/%d/rigid_body_forces_and_torques",basedir.c_str(),frame);
-        if(File_Exists(filename)) Read_From_File(stream_type,filename,forces_and_torques);
+        if(File_Exists(filename)) Read_From_File(filename,forces_and_torques);
         else forces_and_torques.Resize(0);
 
         int max_number_of_bodies(max(opengl_segmented_curve.Size(),rigid_body_collection.rigid_body_particles.Size()));
@@ -129,7 +129,7 @@ Reinitialize(const bool force,const bool read_geometry)
         // Only display real bodies (not ghost bodies)
         if(File_Exists(LOG::sprintf("%s/%d/partition",basedir.c_str(),frame))) {
             ARRAY<int> particles_of_this_partition;
-            Read_From_File(stream_type,LOG::sprintf("%s/%d/partition",basedir.c_str(),frame),particles_of_this_partition);
+            Read_From_File(LOG::sprintf("%s/%d/partition",basedir.c_str(),frame),particles_of_this_partition);
             for(int i=0;i<max_number_of_bodies;i++)
                 draw_object(i)=false;
             for(int i=0;i<particles_of_this_partition.Size();i++)
@@ -141,7 +141,7 @@ Reinitialize(const bool force,const bool read_geometry)
             else Destroy_Geometry(id);}
         for(int id=rigid_body_collection.rigid_body_particles.Size();id<opengl_segmented_curve.Size();id++) Destroy_Geometry(id);
         if(File_Exists(LOG::sprintf("%s/%d/colors",basedir.c_str(),frame)))
-            Read_From_File(stream_type,LOG::sprintf("%s/%d/colors",basedir.c_str(),frame),colors);
+            Read_From_File(LOG::sprintf("%s/%d/colors",basedir.c_str(),frame),colors);
         for(int id=0;id<colors.m;id++){
             if(colors(id)==0) Set_Object_Color(id,OPENGL_COLOR::Green());
             if(colors(id)==1) Set_Object_Color(id,OPENGL_COLOR::Magenta());}
@@ -159,9 +159,9 @@ Create_Geometry(const int id)
 {
     RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(id);
 
-    if(!opengl_axes(id)){opengl_axes(id)=new OPENGL_AXES<T>(stream_type);}
+    if(!opengl_axes(id)){opengl_axes(id)=new OPENGL_AXES<T>;}
     if(rigid_body.simplicial_object && !opengl_segmented_curve(id)){
-        opengl_segmented_curve(id)=new OPENGL_SEGMENTED_CURVE_2D<T>(stream_type,*rigid_body.simplicial_object);
+        opengl_segmented_curve(id)=new OPENGL_SEGMENTED_CURVE_2D<T>(*rigid_body.simplicial_object);
         opengl_segmented_curve(id)->draw_vertices=true;
         opengl_segmented_curve(id)->Enslave_Transform_To(*opengl_axes(id));}
 
@@ -169,13 +169,13 @@ Create_Geometry(const int id)
     TRIANGULATED_AREA<T>* triangulated_area=rigid_body.template Find_Structure<TRIANGULATED_AREA<T>*>();
     if(triangulated_area && !opengl_triangulated_area(id)){
         triangulated_area->mesh.Initialize_Segment_Mesh();
-        opengl_triangulated_area(id)=new OPENGL_TRIANGULATED_AREA<T>(stream_type,*triangulated_area);
+        opengl_triangulated_area(id)=new OPENGL_TRIANGULATED_AREA<T>(*triangulated_area);
         opengl_triangulated_area(id)->Enslave_Transform_To(*opengl_axes(id));}
 
     if(rigid_body.implicit_object && !opengl_levelset(id)){ // ASSUMES LEVELSET_IMPLICIT_CURVE!
         IMPLICIT_OBJECT<TV>* object_space_implicit_object=rigid_body.implicit_object->object_space_implicit_object;
         if(LEVELSET_IMPLICIT_OBJECT<TV>* levelset_implicit_object=dynamic_cast<LEVELSET_IMPLICIT_OBJECT<TV>*>(object_space_implicit_object)){
-            opengl_levelset(id)=new OPENGL_LEVELSET_2D<T>(stream_type,levelset_implicit_object->levelset);
+            opengl_levelset(id)=new OPENGL_LEVELSET_2D<T>(levelset_implicit_object->levelset);
             // TODO: fix me
             //opengl_levelset(id)->Set_Color_Mode(OPENGL_LEVELSET_2D<T>::COLOR_GRADIENT);
             opengl_levelset(id)->draw_cells=true;opengl_levelset(id)->draw_curve=false;opengl_levelset(id)->draw_area=false;
@@ -187,7 +187,7 @@ Create_Geometry(const int id)
         if(Frame_File_Exists(filename_pattern,frame)){
             LOG::cout<<"Adding accumulated impulses to rigid body "<<id<<std::endl;
             OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>* component=
-                new OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>(stream_type,*triangulated_area,filename_pattern);
+                new OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>(*triangulated_area,filename_pattern);
             component->opengl_vector_field.Enslave_Transform_To(*opengl_axes(id));
             extra_components(id).Append(component);}}
 }
@@ -202,7 +202,7 @@ Update_Geometry(const int id)
         std::string color_map_filename=LOG::sprintf("%s/%d/stress_map_of_triangulated_area_%d",basedir.c_str(),frame,id);
         if(File_Exists(color_map_filename)){
             if(!opengl_triangulated_area(id)->color_map) opengl_triangulated_area(id)->color_map=new ARRAY<OPENGL_COLOR>;
-            Read_From_File(stream_type,color_map_filename,*opengl_triangulated_area(id)->color_map);}
+            Read_From_File(color_map_filename,*opengl_triangulated_area(id)->color_map);}
         else if(opengl_triangulated_area(id)->color_map){delete opengl_triangulated_area(id)->color_map;opengl_triangulated_area(id)->color_map=0;}}
     for(int i=0;i<extra_components(id).m;i++) extra_components(id)(i)->Set_Frame(frame);
 }
@@ -569,12 +569,13 @@ Selection_Bounding_Box() const
 template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
 Read_Articulated_Information(const std::string& filename)
 {
-    std::istream* input=Safe_Open_Input(filename);
-    TYPED_ISTREAM typed_input(*input,stream_type);
+    FILE_ISTREAM input;
+    Safe_Open_Input(input,filename);
     // this will need to be changed to reflect multiple articulation points per rigid body
-    int numpoints=0;Read_Binary(typed_input,numpoints);articulation_points.Exact_Resize(numpoints);
-    for(int i=0;i<numpoints;i++) Read_Binary(typed_input,articulation_points(i));
-    delete input;
+    int numpoints=0;
+    Read_Binary(input,numpoints);
+    articulation_points.Exact_Resize(numpoints);
+    for(int i=0;i<numpoints;i++) Read_Binary(input,articulation_points(i));
 }
 //#####################################################################
 // Function Display

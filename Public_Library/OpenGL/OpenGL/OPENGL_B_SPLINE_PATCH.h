@@ -24,7 +24,7 @@ class OPENGL_B_SPLINE_PATCH:public OPENGL_OBJECT<T>
 public:
     using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::World_Space_Point;
     using OPENGL_OBJECT<T>::World_Space_Box;
-    OPENGL_B_SPLINE_PATCH(STREAM_TYPE stream_type,B_SPLINE_PATCH<VECTOR<T,3>,3>& patch_input,
+    OPENGL_B_SPLINE_PATCH(B_SPLINE_PATCH<VECTOR<T,3>,3>& patch_input,
                                 const OPENGL_MATERIAL& front_material_input,const OPENGL_MATERIAL& back_material_input);
     virtual ~OPENGL_B_SPLINE_PATCH();
 

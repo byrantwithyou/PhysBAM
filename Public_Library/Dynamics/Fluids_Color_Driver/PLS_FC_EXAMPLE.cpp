@@ -96,14 +96,14 @@ Read_Output_Files(const int frame)
     for(int i=0;i<number_of_colors;i++){
         std::string ii=LOG::sprintf("%d",i),i_dot_f=ii+"."+f;
         PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=*particle_levelset_evolution_multiple.particle_levelset_multiple.particle_levelsets(i);
-        Read_From_File(stream_type,LOG::sprintf("%s/%d/levelset_%d",output_directory.c_str(),frame,i),particle_levelset.levelset);
-        Read_From_File(stream_type,LOG::sprintf("%s/%d/positive_particles_%d",output_directory.c_str(),frame,i),particle_levelset.positive_particles);
-        Read_From_File(stream_type,LOG::sprintf("%s/%d/negative_particles_%d",output_directory.c_str(),frame,i),particle_levelset.negative_particles);
-        Read_From_File(stream_type,LOG::sprintf("%s/%d/removed_positive_particles_%d",output_directory.c_str(),frame,i),particle_levelset.removed_positive_particles);
-        Read_From_File(stream_type,LOG::sprintf("%s/%d/removed_negative_particles_%d",output_directory.c_str(),frame,i),particle_levelset.removed_negative_particles);
+        Read_From_File(LOG::sprintf("%s/%d/levelset_%d",output_directory.c_str(),frame,i),particle_levelset.levelset);
+        Read_From_File(LOG::sprintf("%s/%d/positive_particles_%d",output_directory.c_str(),frame,i),particle_levelset.positive_particles);
+        Read_From_File(LOG::sprintf("%s/%d/negative_particles_%d",output_directory.c_str(),frame,i),particle_levelset.negative_particles);
+        Read_From_File(LOG::sprintf("%s/%d/removed_positive_particles_%d",output_directory.c_str(),frame,i),particle_levelset.removed_positive_particles);
+        Read_From_File(LOG::sprintf("%s/%d/removed_negative_particles_%d",output_directory.c_str(),frame,i),particle_levelset.removed_negative_particles);
         Read_From_Text_File(LOG::sprintf("%s/%d/last_unique_particle_id_%d",output_directory.c_str(),frame,i),particle_levelset.last_unique_particle_id);}
-    if(save_pressure) Read_From_File(stream_type,LOG::sprintf("%s/%d/pressure",output_directory.c_str(),frame),pressure);
-    Read_From_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),
+    if(save_pressure) Read_From_File(LOG::sprintf("%s/%d/pressure",output_directory.c_str(),frame),pressure);
+    Read_From_File(LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),
         time,face_color,prev_face_color,face_velocities,prev_face_velocities);
 }
 //#####################################################################

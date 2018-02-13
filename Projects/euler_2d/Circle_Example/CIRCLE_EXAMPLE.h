@@ -431,7 +431,7 @@ void Set_Rigid_Body_Parameters(int rigid_body_index,TV position,T mass,bool is_k
 //#####################################################################
 void Add_Sphere(TV position,bool is_kinematic)
 {
-    sphere=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies_2D/circle",(T).25,true,true,false);
+    sphere=rigid_body_collection.Add_Rigid_Body(data_directory+"/Rigid_Bodies_2D/circle",(T).25,true,true,false);
     Set_Rigid_Body_Parameters(sphere,position,solid_mass,is_kinematic);
 }
 //#####################################################################

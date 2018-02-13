@@ -20,9 +20,8 @@ class OPENGL_COMPONENT_TRIANGULATED_AREA:public OPENGL_COMPONENT<T>
     typedef VECTOR<T,2> TV;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_COMPONENT<T>::stream_type;
-    OPENGL_COMPONENT_TRIANGULATED_AREA(STREAM_TYPE stream_type,const std::string &filename);
-    OPENGL_COMPONENT_TRIANGULATED_AREA(STREAM_TYPE stream_type,const std::string &filename,const std::string &color_map_filename);
+    OPENGL_COMPONENT_TRIANGULATED_AREA(const std::string &filename);
+    OPENGL_COMPONENT_TRIANGULATED_AREA(const std::string &filename,const std::string &color_map_filename);
     virtual ~OPENGL_COMPONENT_TRIANGULATED_AREA();
     
     bool Valid_Frame(int frame_input) const override;

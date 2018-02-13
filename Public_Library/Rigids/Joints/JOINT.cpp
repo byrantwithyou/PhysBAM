@@ -248,7 +248,7 @@ Angular_Projection_Matrix(const FRAME<TV>& parent_frame) const
 // Function Read
 //#####################################################################
 template<class TV> void JOINT<TV>::
-Read(TYPED_ISTREAM& input)
+Read(TYPED_ISTREAM input)
 {
     Read_Binary(input,id_number,frame_pj,frame_jp,frame_cj,frame_jc,J,J_inverse,name);
 }
@@ -256,7 +256,7 @@ Read(TYPED_ISTREAM& input)
 // Function Write
 //#####################################################################
 template<class TV> void JOINT<TV>::
-Write(TYPED_OSTREAM& output) const
+Write(TYPED_OSTREAM output) const
 {
     Write_Binary(output,id_number,frame_pj,frame_jp,frame_cj,frame_jc,J,J_inverse,name);
 }

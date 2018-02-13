@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
     parse_args.Parse();
 
     TETRAHEDRALIZED_VOLUME<T> tet;
-    Read_From_File(STREAM_TYPE(1.0f),"/home/craig/PhysBAM/Public_Data/Tetrahedralized_Volumes/adaptive_torus_float.tet.gz",tet);
+    Read_From_File("/home/craig/PhysBAM/Public_Data/Tetrahedralized_Volumes/adaptive_torus_float.tet.gz",tet);
     tet.Update_Number_Nodes();
     tet.Initialize_Triangulated_Surface();
     TRIANGULATED_SURFACE<T>* ts=tet.triangulated_surface->Create_Compact_Copy();

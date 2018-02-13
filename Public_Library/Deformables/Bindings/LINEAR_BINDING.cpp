@@ -221,7 +221,7 @@ Impulse_Factor() const
 // Function Read_Helper
 //#####################################################################
 template<class TV,int d> void LINEAR_BINDING<TV,d>::
-Read_Helper(TYPED_ISTREAM& input)
+Read_Helper(TYPED_ISTREAM input)
 {
     BINDING<TV>::Read_Helper(input);Read_Binary(input,parents,weights);
 }
@@ -229,7 +229,7 @@ Read_Helper(TYPED_ISTREAM& input)
 // Function Write_Helper
 //#####################################################################
 template<class TV,int d> void LINEAR_BINDING<TV,d>::
-Write_Helper(TYPED_OSTREAM& output) const
+Write_Helper(TYPED_OSTREAM output) const
 {
     BINDING<TV>::Write_Helper(output);Write_Binary(output,parents,weights);
 }

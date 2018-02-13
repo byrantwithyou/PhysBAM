@@ -123,7 +123,7 @@ Add_Rigid_Body(const std::string& name,const T scaling_factor,const T friction,c
                 read_simplicial=false;
             if(!rigid_body_collection.Register_Analytic_Replacement_Structure(basename+(TV::m==3?".phi":".phi2d"),scaling_factor,implicit))
                 delete implicit;}}
-    int id=rigid_body_collection.Add_Rigid_Body(stream_type,basename,scaling_factor,read_simplicial,read_implicit);
+    int id=rigid_body_collection.Add_Rigid_Body(basename,scaling_factor,read_simplicial,read_implicit);
     RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(id);
     rigid_body.coefficient_of_friction=friction;
     rigid_body.name=name;

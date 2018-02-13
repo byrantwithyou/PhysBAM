@@ -718,7 +718,7 @@ Write_Output_Files(const int frame)
         Write_To_File(stream_type,output_directory+"/boundary_mesh",*boundary_mesh);
         Write_To_File(stream_type,output_directory+"/bindings",solid_body_collection.deformable_body_collection.binding_list);}
     // write diagnostics
-    {std::ostream* output(Safe_Open_Output(output_directory+"/diagnostics."+f,false));
+    {std::ostream* output(Safe_Open_Output_Raw(output_directory+"/diagnostics."+f,false));
     tetrahedralized_volume.Print_Statistics(*output);
     int index;
     *output<<"max_phi = "<<tetrahedralized_volume.Maximum_Magnitude_Phi_On_Boundary(*implicit_surface,&index);*output<<" ("<<index<<")"<<std::endl;

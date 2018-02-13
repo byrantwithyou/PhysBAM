@@ -290,7 +290,7 @@ Intersection(RAY<TV>& ray,const T thickness) const
 // Function Read
 //#####################################################################
 template<class TV> void IMPLICIT_OBJECT_COMBINED_EULERIAN<TV>::
-Read(TYPED_ISTREAM& input)
+Read(TYPED_ISTREAM input)
 {
     PHYSBAM_FATAL_ERROR();
 }
@@ -298,7 +298,7 @@ Read(TYPED_ISTREAM& input)
 // Function Write
 //#####################################################################
 template<class TV> void IMPLICIT_OBJECT_COMBINED_EULERIAN<TV>::
-Write(TYPED_OSTREAM& output) const
+Write(TYPED_OSTREAM output) const
 {
     PHYSBAM_FATAL_ERROR();
 }

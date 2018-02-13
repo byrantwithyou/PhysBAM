@@ -64,8 +64,8 @@ public:
     void Restore_State(const int state_index) override;
     void Average_States(const int state1, const int state2, const int result_state,const T interpolation_distance) override;
     void Delete_State(const int state_index) override;
-    void Read_State(TYPED_ISTREAM& input,const int state_index) override;
-    void Write_State(TYPED_OSTREAM& output,const int state_index) const override;
+    void Read_State(TYPED_ISTREAM input,const int state_index) override;
+    void Write_State(TYPED_OSTREAM output,const int state_index) const override;
 //#####################################################################
 };
 }

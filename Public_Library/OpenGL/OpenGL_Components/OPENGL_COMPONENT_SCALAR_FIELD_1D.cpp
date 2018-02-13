@@ -14,8 +14,8 @@ using namespace PhysBAM;
 // Function OPENGL_COMPONENT_SCALAR_FIELD_1D
 //#####################################################################
 template<class T,class T2> OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T2>::
-OPENGL_COMPONENT_SCALAR_FIELD_1D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string &scalar_field_filename,OPENGL_COLOR point_color,OPENGL_COLOR line_color)
-    :OPENGL_COMPONENT<T>(stream_type,"Scalar Field 1D"),scalar_field_filename(scalar_field_filename),frame_loaded(INT_MIN),valid(false),opengl_scalar_field(stream_type,grid,*new ARRAY<T2,VECTOR<int,1> >,point_color,line_color)
+OPENGL_COMPONENT_SCALAR_FIELD_1D(const GRID<TV> &grid,const std::string &scalar_field_filename,OPENGL_COLOR point_color,OPENGL_COLOR line_color)
+    :OPENGL_COMPONENT<T>("Scalar Field 1D"),scalar_field_filename(scalar_field_filename),frame_loaded(INT_MIN),valid(false),opengl_scalar_field(grid,*new ARRAY<T2,VECTOR<int,1> >,point_color,line_color)
 {
     viewer_callbacks.Set("increase_scale",{[this](){Increase_Scale();},"Increase scale"});
     viewer_callbacks.Set("decrease_scale",{[this](){Decrease_Scale();},"Decrease scale"});
@@ -82,7 +82,7 @@ Reinitialize()
         valid=false;
         std::string filename=Get_Frame_Filename(scalar_field_filename,frame);
         if(File_Exists(filename)){
-            Read_From_File(stream_type,filename,opengl_scalar_field.values);
+            Read_From_File(filename,opengl_scalar_field.values);
             frame_loaded=frame;valid=true;}}
 }
 //#####################################################################

@@ -65,8 +65,8 @@ public:
     T Integration_Step(const T phi) const override;
     T Minimum_Cell_Size() const override;
     bool Intersection(RAY<TV>& ray,const T thickness) const override;
-    virtual void Read(TYPED_ISTREAM& input) override;
-    virtual void Write(TYPED_OSTREAM& output) const override;
+    virtual void Read(TYPED_ISTREAM input) override;
+    virtual void Write(TYPED_OSTREAM output) const override;
 //#####################################################################
 };
 }

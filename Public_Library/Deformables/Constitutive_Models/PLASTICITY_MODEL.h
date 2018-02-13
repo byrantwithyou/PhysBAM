@@ -31,10 +31,10 @@ public:
     virtual ~PLASTICITY_MODEL()
     {}
 
-    virtual void Read_State(TYPED_ISTREAM& input)
+    virtual void Read_State(TYPED_ISTREAM input)
     {Read_Binary(input,Fp_inverse);}
 
-    virtual void Write_State(TYPED_OSTREAM& output) const
+    virtual void Write_State(TYPED_OSTREAM output) const
     {Write_Binary(output,Fp_inverse);}
 
 //#####################################################################

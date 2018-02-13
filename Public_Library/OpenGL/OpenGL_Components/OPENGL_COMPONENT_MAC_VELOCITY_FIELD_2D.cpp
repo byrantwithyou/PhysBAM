@@ -20,11 +20,11 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
-OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string &velocity_filename_input)
-    :OPENGL_COMPONENT<T>(stream_type,"MAC Velocity Field 2D"),draw_vorticity(false),
+OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(const GRID<TV> &grid,const std::string &velocity_filename_input)
+    :OPENGL_COMPONENT<T>("MAC Velocity Field 2D"),draw_vorticity(false),
     velocity_filename(velocity_filename_input),valid(false),draw_divergence(false),
     draw_streamlines(false),use_seed_for_streamlines(false),opengl_divergence_field(0),
-    opengl_streamlines(stream_type,streamlines),psi_N_psi_D_basedir(""),
+    opengl_streamlines(streamlines),psi_N_psi_D_basedir(""),
     min_vorticity(FLT_MAX),max_vorticity(FLT_MIN)
 {
     viewer_callbacks.Set("toggle_velocity_mode",{[this](){Toggle_Velocity_Mode();},"Toggle velocity mode"});
@@ -43,9 +43,9 @@ OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &g
     is_animation=Is_Animated(velocity_filename);
     frame_loaded=-1;
 
-    opengl_mac_velocity_field=new OPENGL_MAC_VELOCITY_FIELD_2D<T>(stream_type,grid);
+    opengl_mac_velocity_field=new OPENGL_MAC_VELOCITY_FIELD_2D<T>(grid);
     number_of_steps=2*opengl_mac_velocity_field->grid.counts.x;
-    opengl_vorticity_magnitude=new OPENGL_SCALAR_FIELD_2D<T>(stream_type,opengl_mac_velocity_field->grid,*new ARRAY<T,VECTOR<int,2> >,OPENGL_COLOR_RAMP<T>::Matlab_Jet(0,1),"vorticity_magnitude");
+    opengl_vorticity_magnitude=new OPENGL_SCALAR_FIELD_2D<T>(opengl_mac_velocity_field->grid,*new ARRAY<T,VECTOR<int,2> >,OPENGL_COLOR_RAMP<T>::Matlab_Jet(0,1),"vorticity_magnitude");
 
     OPENGL_COLOR_RAMP<T>* ramp=new OPENGL_COLOR_RAMP<T>;
     ramp->Add_Color(-1e+2,OPENGL_COLOR::Red());
@@ -55,7 +55,7 @@ OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &g
     ramp->Add_Color(1e-2,OPENGL_COLOR::Green());
     ramp->Add_Color(1,OPENGL_COLOR::Yellow());
     ramp->Add_Color(1e+2,OPENGL_COLOR::Red());
-    opengl_divergence_field=new OPENGL_SCALAR_FIELD_2D<T>(stream_type,opengl_mac_velocity_field->grid,divergence,ramp,"divergence");
+    opengl_divergence_field=new OPENGL_SCALAR_FIELD_2D<T>(opengl_mac_velocity_field->grid,divergence,ramp,"divergence");
 
     Reinitialize();
 }
@@ -147,7 +147,7 @@ Reinitialize()
         if((is_animation && frame_loaded!=frame) || (!is_animation && frame_loaded < 0)){
             valid = false;
             std::string tmp_filename=Get_Frame_Filename(velocity_filename.c_str(), frame);
-            if(File_Exists(tmp_filename)) Read_From_File(stream_type,tmp_filename,opengl_mac_velocity_field->face_velocities);
+            if(File_Exists(tmp_filename)) Read_From_File(tmp_filename,opengl_mac_velocity_field->face_velocities);
             else return;
             opengl_mac_velocity_field->Update();
             frame_loaded=frame;
@@ -175,9 +175,9 @@ Update_Divergence()
         if(!psi_N_psi_D_basedir.empty()){
             std::string psi_N_filename=LOG::sprintf("%s/%d/psi_N",psi_N_psi_D_basedir.c_str(),frame);
             std::string psi_D_filename=LOG::sprintf("%s/%d/psi_D",psi_N_psi_D_basedir.c_str(),frame);
-            if(File_Exists(psi_N_filename)) Read_From_File(stream_type,psi_N_filename,psi_N);
+            if(File_Exists(psi_N_filename)) Read_From_File(psi_N_filename,psi_N);
             else got_all_psi=false;
-            if(File_Exists(psi_D_filename)) Read_From_File(stream_type,psi_D_filename,psi_D);
+            if(File_Exists(psi_D_filename)) Read_From_File(psi_D_filename,psi_D);
             else got_all_psi=false;}
         else got_all_psi=false;
         if(!got_all_psi){psi_N.Clean_Memory();psi_D.Clean_Memory();}

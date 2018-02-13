@@ -43,8 +43,8 @@ public:
 
 //#####################################################################
     void Initialize() override;
-    void Read_And_Set_Parameters(TYPED_ISTREAM& input) override;
-    void Write_Parameters(TYPED_OSTREAM& output) const override;
+    void Read_And_Set_Parameters(TYPED_ISTREAM input) override;
+    void Write_Parameters(TYPED_OSTREAM output) const override;
     T Maximum_Radius() const override;
     static ANALYTIC_SURFACE_MUSCLE_SEGMENT* Create();
     virtual std::string Name() const override {return Static_Name();}

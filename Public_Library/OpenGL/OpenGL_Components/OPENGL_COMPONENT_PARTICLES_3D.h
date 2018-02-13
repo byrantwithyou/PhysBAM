@@ -22,8 +22,8 @@ class OPENGL_COMPONENT_PARTICLES_3D:public OPENGL_COMPONENT<T>
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
     using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_COMPONENT<T>::World_Space_Box;using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
-    OPENGL_COMPONENT_PARTICLES_3D(STREAM_TYPE stream_type,const std::string &filename, const std::string &filename_set_input="", bool use_ids_input = true, bool particles_stored_per_cell_input = false);
+    using OPENGL_COMPONENT<T>::World_Space_Box;using OPENGL_OBJECT<T>::viewer_callbacks;
+    OPENGL_COMPONENT_PARTICLES_3D(const std::string &filename, const std::string &filename_set_input="", bool use_ids_input = true, bool particles_stored_per_cell_input = false);
     virtual ~OPENGL_COMPONENT_PARTICLES_3D();
 
     bool Valid_Frame(int frame_input) const override;

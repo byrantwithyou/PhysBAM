@@ -275,8 +275,8 @@ Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const
 template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
 Read_Output_Files_Fluids(const int frame)
 {
-    fluids_parameters.Read_Output_Files(stream_type,output_directory,frame);
-    fluid_collection.Read_Output_Files(stream_type,output_directory,frame);
+    fluids_parameters.Read_Output_Files(output_directory,frame);
+    fluid_collection.Read_Output_Files(output_directory,frame);
     std::string f=LOG::sprintf("%d",frame);
 }
 //#####################################################################
@@ -332,7 +332,7 @@ Log_Parameters() const
 template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
 Read_Output_Files_Solids(const int frame)
 {
-    solid_body_collection.Read(stream_type,output_directory,frame,frame,solids_parameters.write_static_variables_every_frame,solids_parameters.rigid_body_evolution_parameters.write_rigid_bodies,
+    solid_body_collection.Read(output_directory,frame,frame,solids_parameters.write_static_variables_every_frame,solids_parameters.rigid_body_evolution_parameters.write_rigid_bodies,
         solids_parameters.write_deformable_body,solids_parameters.write_from_every_process);
     std::string f=LOG::sprintf("%d",frame);
     //if(NEWMARK_EVOLUTION<TV>* newmark=dynamic_cast<NEWMARK_EVOLUTION<TV>*>(solids_evolution))

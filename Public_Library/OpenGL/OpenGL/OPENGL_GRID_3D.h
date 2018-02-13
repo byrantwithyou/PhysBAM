@@ -42,7 +42,7 @@ public:
     ARRAY<OPENGL_GRID_OBJECT<TV>*> grid_objects;
 
 //##################################################################### 
-    OPENGL_GRID_3D(STREAM_TYPE stream_type,GRID<TV> &grid_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::White());
+    OPENGL_GRID_3D(GRID<TV> &grid_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::White());
     virtual ~OPENGL_GRID_3D();
     void Display() const override;
     virtual RANGE<TV> Bounding_Box() const override;

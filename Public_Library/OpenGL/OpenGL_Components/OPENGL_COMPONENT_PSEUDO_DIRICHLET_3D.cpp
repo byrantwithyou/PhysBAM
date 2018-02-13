@@ -12,8 +12,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>::
-OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string &filename_input)
-    :OPENGL_COMPONENT<T>(stream_type,"Pseudo Dirichlet"),mac_grid(grid.Get_MAC_Grid()),velocity_scale(0.025),filename(filename_input),frame_loaded(-1),valid(false)
+OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D(const GRID<TV> &grid,const std::string &filename_input)
+    :OPENGL_COMPONENT<T>("Pseudo Dirichlet"),mac_grid(grid.Get_MAC_Grid()),velocity_scale(0.025),filename(filename_input),frame_loaded(-1),valid(false)
 {
     viewer_callbacks.Set("increase_vector_size",{[this](){Increase_Vector_Size();},"Increase vector size"});
     viewer_callbacks.Set("decrease_vector_size",{[this](){Decrease_Vector_Size();},"Decrease vector size"});
@@ -95,7 +95,7 @@ Reinitialize(bool force)
 
             std::string tmp_filename = Get_Frame_Filename(filename, frame);
             if(File_Exists(tmp_filename))
-                Read_From_File(stream_type,tmp_filename,pseudo_dirichlet_cells);
+                Read_From_File(tmp_filename,pseudo_dirichlet_cells);
             else
                 return;
 

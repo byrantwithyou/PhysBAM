@@ -15,7 +15,7 @@ using namespace PhysBAM;
 //#####################################################################
 // Light - Prepare lights
 //#####################################################################
-template<class T,class RW> void GENERIC_RENDER_EXAMPLE<T,RW>::
+template<class T> void GENERIC_RENDER_EXAMPLE<T>::
 Light(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
 {
     int light_index=100;
@@ -76,6 +76,5 @@ Light(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
     lights.back()->casts_shadows=casts_shadows;
 }
 //#####################################################################
-template void GENERIC_RENDER_EXAMPLE<float,float>::Light(RENDER_WORLD<float>& world,const int frame,PARAMETER_LIST& parameters);
-template void GENERIC_RENDER_EXAMPLE<double,float>::Light(RENDER_WORLD<double>& world,const int frame,PARAMETER_LIST& parameters);
-template void GENERIC_RENDER_EXAMPLE<double,double>::Light(RENDER_WORLD<double>& world,const int frame,PARAMETER_LIST& parameters);
+template void GENERIC_RENDER_EXAMPLE<float>::Light(RENDER_WORLD<float>& world,const int frame,PARAMETER_LIST& parameters);
+template void GENERIC_RENDER_EXAMPLE<double>::Light(RENDER_WORLD<double>& world,const int frame,PARAMETER_LIST& parameters);

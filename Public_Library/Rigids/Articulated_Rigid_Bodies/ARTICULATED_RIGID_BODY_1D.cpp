@@ -80,7 +80,7 @@ Child(JOINT_ID joint_id) const
 // Function Read
 //#####################################################################
 template<class T> void ARTICULATED_RIGID_BODY<VECTOR<T,1> >::
-Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame)
+Read(const std::string& directory,const int frame)
 {
     PHYSBAM_WARNING("ARTICULATED_RIGID_BODY<VECTOR<T,1> > not implemented");
 }

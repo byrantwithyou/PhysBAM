@@ -46,11 +46,10 @@ Write_Output_Files(const int frame)
     Write_To_File(stream_type,LOG::sprintf("%s/%d/particles",output_directory.c_str(),frame),particles);
     Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
 
-    std::ostream* output_raw=Safe_Open_Output(LOG::sprintf("%s/%d/structures",output_directory.c_str(),frame));
-    TYPED_OSTREAM output(*output_raw,stream_type);
+    FILE_OSTREAM output;
+    Safe_Open_Output(output,stream_type,LOG::sprintf("%s/%d/structures",output_directory.c_str(),frame));
     Write_Binary(output,structures.m);
     for(int k=0;k<structures.m;k++) structures(k)->Write_Structure(output);
-    delete output_raw;
 
     for(int i=0;i<particles.X.m;i++){
         Add_Debug_Particle(particles.X(i),VECTOR<T,3>(1,1,1));
@@ -65,11 +64,11 @@ Read_Output_Files(const int frame)
 {
     std::string f=LOG::sprintf("%d",frame);
 
-    Read_From_File(stream_type,LOG::sprintf("%s/%d/particles",output_directory.c_str(),frame),particles);
-    Read_From_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
+    Read_From_File(LOG::sprintf("%s/%d/particles",output_directory.c_str(),frame),particles);
+    Read_From_File(LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
 
-    std::istream* input_raw=Safe_Open_Input(LOG::sprintf("%s/%d/structures",output_directory.c_str(),frame));
-    TYPED_ISTREAM input(*input_raw,stream_type);
+    FILE_ISTREAM input;
+    Safe_Open_Input(input,LOG::sprintf("%s/%d/structures",output_directory.c_str(),frame));
 
     int m;Read_Binary(input,m);
     if(!structures.m){

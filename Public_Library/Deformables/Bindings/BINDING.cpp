@@ -24,7 +24,7 @@ template<class TV> BINDING<TV>::
 // Function Create_Structure
 //#####################################################################
 template<class TV> BINDING<TV>* BINDING<TV>::
-Create(TYPED_ISTREAM& input,DEFORMABLE_PARTICLES<TV>& particles)
+Create(TYPED_ISTREAM input,DEFORMABLE_PARTICLES<TV>& particles)
 {
     try{
         int name;Read_Binary(input,name);
@@ -47,7 +47,7 @@ Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 // Function Create_From_Name
 //#####################################################################
 template<class TV> void BINDING<TV>::
-Write(TYPED_OSTREAM& output) const
+Write(TYPED_OSTREAM output) const
 {
     Write_Binary(output,Name());
     Write_Helper(output);
@@ -86,7 +86,7 @@ Create_From_Name(const int name,DEFORMABLE_PARTICLES<TV>& particles)
 // Function Read_Helper
 //#####################################################################
 template<class TV> void BINDING<TV>::
-Read_Helper(TYPED_ISTREAM& input)
+Read_Helper(TYPED_ISTREAM input)
 {
     Read_Binary(input,particle_index);
 }
@@ -94,7 +94,7 @@ Read_Helper(TYPED_ISTREAM& input)
 // Function Write_Helper
 //#####################################################################
 template<class TV> void BINDING<TV>::
-Write_Helper(TYPED_OSTREAM& output) const
+Write_Helper(TYPED_OSTREAM output) const
 {
     Write_Binary(output,particle_index);
 }

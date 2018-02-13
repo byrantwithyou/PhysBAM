@@ -132,7 +132,7 @@ void Make_Block_Chain(TV shift,ROTATION<TV> orient,int& num_joints,int& num_bodi
     JOINT<TV>* joints[12];
     TV positions[12]={TV(-2,4,0),TV(0,4,0),TV(2,4,0),TV(4,2,0),TV(4,0,0),TV(4,-2,0),TV(2,-4,0),TV(0,-4,0),TV(-2,-4,0),TV(-4,-2,0),TV(-4,0,0),TV(-4,2,0)};
     for(int i=0;i<12;i++){
-        int id=solid_body_collection.rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/subdivided_box");
+        int id=solid_body_collection.rigid_body_collection.Add_Rigid_Body(data_directory+"/Rigid_Bodies/subdivided_box");
         rigid_bodies[i]=&arb->rigid_body_collection.Rigid_Body(id);
         rigid_bodies[i]->Frame().t=orient.Rotate(positions[i])+shift;
         rigid_bodies[i]->Frame().r=orient;

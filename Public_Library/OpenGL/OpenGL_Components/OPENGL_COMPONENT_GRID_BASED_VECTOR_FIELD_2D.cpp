@@ -10,9 +10,9 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>::
-OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string &vector_field_filename)
-    :OPENGL_COMPONENT<T>(stream_type,"Grid Based Vector Field 2D"),
-    opengl_grid_based_vector_field(*new OPENGL_GRID_BASED_VECTOR_FIELD_2D<T>(stream_type,*new GRID<TV>(grid),*new ARRAY<VECTOR<T,2>,VECTOR<int,2> >)),
+OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D(const GRID<TV> &grid,const std::string &vector_field_filename)
+    :OPENGL_COMPONENT<T>("Grid Based Vector Field 2D"),
+    opengl_grid_based_vector_field(*new OPENGL_GRID_BASED_VECTOR_FIELD_2D<T>(*new GRID<TV>(grid),*new ARRAY<VECTOR<T,2>,VECTOR<int,2> >)),
       vector_field_filename(vector_field_filename), valid(false)
 {
     viewer_callbacks.Set("increase_vector_size",{[this](){Increase_Vector_Size();},"Increase vector size"});
@@ -90,7 +90,7 @@ Reinitialize(bool force_load_even_if_not_drawn)
 
             std::string tmp_filename = Get_Frame_Filename(vector_field_filename, frame);
             if(File_Exists(tmp_filename))
-                Read_From_File(stream_type,tmp_filename,opengl_grid_based_vector_field.V);
+                Read_From_File(tmp_filename,opengl_grid_based_vector_field.V);
             else
                 return;
 

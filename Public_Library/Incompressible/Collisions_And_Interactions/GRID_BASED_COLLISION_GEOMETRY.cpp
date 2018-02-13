@@ -257,7 +257,7 @@ Is_Active(COLLISION_GEOMETRY_ID id) const
 // Function Read_State
 //##################################################################### 
 template<class TV> void GRID_BASED_COLLISION_GEOMETRY<TV>::
-Read_State(TYPED_ISTREAM& input,const int state_index)
+Read_State(TYPED_ISTREAM input,const int state_index)
 {
     for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++) if(Is_Active(i)) collision_geometry_collection.bodies(i)->Read_State(input,state_index);
 }
@@ -265,7 +265,7 @@ Read_State(TYPED_ISTREAM& input,const int state_index)
 // Function Write_State
 //##################################################################### 
 template<class TV> void GRID_BASED_COLLISION_GEOMETRY<TV>::
-Write_State(TYPED_OSTREAM& output,const int state_index) const
+Write_State(TYPED_OSTREAM output,const int state_index) const
 {
     for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++) if(Is_Active(i)) collision_geometry_collection.bodies(i)->Write_State(output,state_index);
 }

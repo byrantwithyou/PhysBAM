@@ -51,7 +51,7 @@ using namespace PhysBAM;
 //#####################################################################
 // Material - Prepare materials
 //#####################################################################
-template<class T,class RW> void GENERIC_RENDER_EXAMPLE<T,RW>::
+template<class T> void GENERIC_RENDER_EXAMPLE<T>::
 Material(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
 {
     std::string type=parameters.Get_Parameter("Type",std::string("Null"));
@@ -63,7 +63,7 @@ Material(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
     else if(type=="Vertex_Color") {
         std::string inputfile=parameters.Get_Parameter("Input_File", std::string("<unknown>"));
         if(inputfile == "<unknown>"){LOG::cerr<<"You have to supply a file of vertex colors (array of colors)!"<<std::endl;exit(1);}
-        RENDERING_TRIANGULATED_SURFACE_VERTEX_COLOR_SHADER<T,RW>* vertex_shader=new RENDERING_TRIANGULATED_SURFACE_VERTEX_COLOR_SHADER<T,RW>(world);
+        RENDERING_TRIANGULATED_SURFACE_VERTEX_COLOR_SHADER<T>* vertex_shader=new RENDERING_TRIANGULATED_SURFACE_VERTEX_COLOR_SHADER<T>(world);
         vertex_shader->Initialize(inputfile);
         shaders.Set(name,vertex_shader);
         LOG::cout<<"Material '"<<name<<"' Source File='"<<inputfile<<"'"<<std::endl;}
@@ -328,7 +328,7 @@ Material(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         std::string raw_field_file=parameters.Get_Parameter("Field",std::string("<unknown>"));
         if(raw_field_file == "<unknown>"){LOG::cerr<<"You have to supply a field file for blending."<<std::endl;exit(1);}
         std::string field_file=Animated_Filename(raw_field_file,frame);
-        ARRAY<T>* field=new ARRAY<T>;Read_From_File<RW>(field_file,*field);
+        ARRAY<T>* field=new ARRAY<T>;Read_From_File(field_file,*field);
         T low_value=parameters.Get_Parameter("Low_Value",(T)0),high_value=parameters.Get_Parameter("High_Value",(T)1);
         shaders.Set(name,new RENDERING_BLEND_TRIANGULATED_SURFACE_SHADER<T>(*field,low_value,high_value,*child_shader1,*child_shader2,direct_shading_only,world));
         LOG::cout<<"Material '"<<name<<"' Field="<<field_file<<" Range=["<<low_value<<","<<high_value<<"] Shader1="<<shader1_name<<" Shader2="<<shader2_name<<std::endl;}
@@ -369,7 +369,7 @@ Material(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
 //#####################################################################
 // Volume_Material - Prepare materials
 //#####################################################################
-template<class T,class RW> void GENERIC_RENDER_EXAMPLE<T,RW>::
+template<class T> void GENERIC_RENDER_EXAMPLE<T>::
 Volume_Material(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
 {
     std::string type=parameters.Get_Parameter("Type",std::string("Null"));
@@ -440,7 +440,7 @@ Volume_Material(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameter
         voxel_shader->Set_Absorption_Shadow(absorption_shadow*TV(1,1,1));
         std::string temperature_remap_filename=parameters.Get_Parameter("Temperature_Remap",std::string("none"));
         if(temperature_remap_filename!="none"){
-            ARRAY<T,VECTOR<int,1> > temperature_remap;Read_From_File<RW>(temperature_remap_filename,temperature_remap);voxel_shader->Use_Temperature_Remap(temperature_remap);}
+            ARRAY<T,VECTOR<int,1> > temperature_remap;Read_From_File(temperature_remap_filename,temperature_remap);voxel_shader->Use_Temperature_Remap(temperature_remap);}
         volume_shaders.Set(name,voxel_shader);
         LOG::cout<<"Volume shader '"<<name<<"' Absorption="<<absorption<<"' Absorption_Shadow="<<absorption_shadow<<" Scattering="<<scattering<<" Inscattering_Amplification="<<inscattering_amplification<<" Emission_Amplification="<<emission_amplification
             <<" Use_LMS_Scaling="<<use_lms_scaling<<" Empty_Levelset="<<empty_levelset_object_name<<std::endl;}
@@ -471,9 +471,7 @@ Volume_Material(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameter
             <<absorption_spectrum2<<" blend shader="<<shader_name<<std::endl;}
 }
 //#####################################################################
-template void GENERIC_RENDER_EXAMPLE<float,float>::Material(RENDER_WORLD<float>& world,const int frame,PARAMETER_LIST& parameters);
-template void GENERIC_RENDER_EXAMPLE<float,float>::Volume_Material(RENDER_WORLD<float>& world,const int frame,PARAMETER_LIST& parameters);
-template void GENERIC_RENDER_EXAMPLE<double,float>::Material(RENDER_WORLD<double>& world,const int frame,PARAMETER_LIST& parameters);
-template void GENERIC_RENDER_EXAMPLE<double,float>::Volume_Material(RENDER_WORLD<double>& world,const int frame,PARAMETER_LIST& parameters);
-template void GENERIC_RENDER_EXAMPLE<double,double>::Material(RENDER_WORLD<double>& world,const int frame,PARAMETER_LIST& parameters);
-template void GENERIC_RENDER_EXAMPLE<double,double>::Volume_Material(RENDER_WORLD<double>& world,const int frame,PARAMETER_LIST& parameters);
+template void GENERIC_RENDER_EXAMPLE<float>::Material(RENDER_WORLD<float>& world,const int frame,PARAMETER_LIST& parameters);
+template void GENERIC_RENDER_EXAMPLE<float>::Volume_Material(RENDER_WORLD<float>& world,const int frame,PARAMETER_LIST& parameters);
+template void GENERIC_RENDER_EXAMPLE<double>::Material(RENDER_WORLD<double>& world,const int frame,PARAMETER_LIST& parameters);
+template void GENERIC_RENDER_EXAMPLE<double>::Volume_Material(RENDER_WORLD<double>& world,const int frame,PARAMETER_LIST& parameters);

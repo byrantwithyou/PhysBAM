@@ -168,7 +168,7 @@ std::string Get_Working_Directory()
 //###################################################################
 // File open with compression capability
 //###################################################################
-std::istream* Safe_Open_Input(const std::string& filename,bool binary)
+std::istream* Safe_Open_Input_Raw(const std::string& filename,bool binary)
 {
     bool compressed=File_Is_Compressed(filename);
     std::ios_base::openmode flags=std::ios::in;if(binary) flags|=std::ios::binary;
@@ -186,8 +186,7 @@ std::istream* Safe_Open_Input(const std::string& filename,bool binary)
     LOG::cerr<<"Can't open "<<filename_compressed<<" for read "<<(binary?"(binary)":"")<<std::endl;
     throw FILESYSTEM_ERROR("Safe_Open_Input failed");
 }
-
-std::ostream* Safe_Open_Output(const std::string& filename,bool binary,bool write_compressed_if_possible)
+std::ostream* Safe_Open_Output_Raw(const std::string& filename,bool binary,bool write_compressed_if_possible)
 {
     bool compressed=File_Is_Compressed(filename);
     std::ios_base::openmode flags=std::ios::out;if(binary) flags|=std::ios::binary; 

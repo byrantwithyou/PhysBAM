@@ -34,7 +34,7 @@ public:
     int rotation_axis;
     OPENGL_COLOR x_axis,y_axis,z_axis,outer_rim,highlight;
 
-    OPENGL_ARCBALL(STREAM_TYPE stream_type,OPENGL_WORLD<T>& opengl_world_input);
+    OPENGL_ARCBALL(OPENGL_WORLD<T>& opengl_world_input);
     void Reinitialize();
     void Update(const VECTOR<T,2> &vNow);
     void Update_World(const VECTOR<T,2> &vNow);

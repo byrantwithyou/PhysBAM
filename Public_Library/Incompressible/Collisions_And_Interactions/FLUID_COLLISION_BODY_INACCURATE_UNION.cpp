@@ -72,7 +72,7 @@ Save_State(const int state_index,const T time)
 // Function Read_State
 //#####################################################################
 template<class TV> void FLUID_COLLISION_BODY_INACCURATE_UNION<TV>::
-Read_State(TYPED_ISTREAM& input,const int state_index)
+Read_State(TYPED_ISTREAM input,const int state_index)
 {
     for(COLLISION_GEOMETRY_ID i(0);i<collision_bodies.collision_geometry_collection.bodies.m;i++) if(collision_bodies.Is_Active(i)) collision_bodies.collision_geometry_collection.bodies(i)->Read_State(input,state_index);
 }
@@ -80,7 +80,7 @@ Read_State(TYPED_ISTREAM& input,const int state_index)
 // Function Write_State
 //#####################################################################
 template<class TV> void FLUID_COLLISION_BODY_INACCURATE_UNION<TV>::
-Write_State(TYPED_OSTREAM& output,const int state_index) const
+Write_State(TYPED_OSTREAM output,const int state_index) const
 {
     for(COLLISION_GEOMETRY_ID i(0);i<collision_bodies.collision_geometry_collection.bodies.m;i++) if(collision_bodies.Is_Active(i)) collision_bodies.collision_geometry_collection.bodies(i)->Write_State(output,state_index);
 }

@@ -219,7 +219,7 @@ T Initial_Phi_Object(const VECTOR<T,3>& X) const
 //#####################################################################
 void Initialize_Bodies() override
 {
-    glass=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/glass_cylinder",(T).03,true,true,false);
+    glass=rigid_body_collection.Add_Rigid_Body(data_directory+"/Rigid_Bodies/glass_cylinder",(T).03,true,true,false);
     rigid_body_collection.rigid_body_particles.frame(glass).t=VECTOR<T,3>(0,(T)0.06,0);
     rigid_body_collection.Rigid_Body(glass).Is_Kinematic()=true;
 

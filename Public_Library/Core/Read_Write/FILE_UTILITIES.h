@@ -18,8 +18,12 @@ bool Directory_Exists(const std::string& dirname);
 bool Create_Directory(const std::string& dirname);
 std::string Real_Path(const std::string& path);
 int Compare_File_Times_Ignoring_Compression_Suffix(const std::string& filename1,const std::string& filename2);
-std::istream* Safe_Open_Input(const std::string& filename,bool binary=true);
-std::ostream* Safe_Open_Output(const std::string& filename,bool binary=true,bool write_compressed_if_possible=true);
+std::istream* Safe_Open_Input_Raw(const std::string& filename,bool binary=true);
+std::ostream* Safe_Open_Output_Raw(const std::string& filename,bool binary=true,bool write_compressed_if_possible=true);
+inline void Safe_Open_Input(FILE_ISTREAM& stream,const std::string& filename,bool binary=true)
+{return stream.Set(Safe_Open_Input_Raw(filename,binary));}
+inline void Safe_Open_Output(FILE_OSTREAM& stream,STREAM_TYPE stream_type,const std::string& filename,bool binary=true,bool write_compressed_if_possible=true)
+{return stream.Set(Safe_Open_Output_Raw(filename,binary,write_compressed_if_possible),stream_type);}
 FILE* Temporary_File();
 //###################################################################
 // Platform Non-Specific Function Declarations
@@ -67,24 +71,21 @@ bool Frame_File_Exists(const std::string &filename,int frame);
 // Read_From_File
 //#####################################################################
 // Convenience functions
-template<class RW,class T1,class ...Args>
-inline void Read_From_File(const std::string& filename,T1& d1,Args&& ...args)
-{std::istream* input=Safe_Open_Input(filename);Read_Binary<RW>(*input,d1,args...);delete input;}
-// runtime float/double versions
 template<class T1,class ...Args>
-inline void Read_From_File(const STREAM_TYPE stream_type,const std::string& filename,T1& d1,Args&& ...args)
-{std::istream* input=Safe_Open_Input(filename);TYPED_ISTREAM typed_input(*input,stream_type);Read_Binary(typed_input,d1,args...);delete input;}
+inline void Read_From_File(const std::string& filename,T1& d1,Args&& ...args)
+{FILE_ISTREAM input;Safe_Open_Input(input,filename);Read_Binary(input,d1,args...);}
+// runtime float/double versions
 //#####################################################################
 // Write_To_File
 //#####################################################################
 // Convenience functions
-template<class RW,class T1,class ...Args>
-inline void Write_To_File(const std::string& filename,const T1& d1,Args&& ...args)
-{std::ostream* output=Safe_Open_Output(filename);Write_Binary<RW>(*output,d1,args...);delete output;}
 // runtime float/double versions
 template<class T1,class ...Args>
 inline void Write_To_File(const STREAM_TYPE stream_type,const std::string& filename,const T1& d1,Args&& ...args)
-{std::ostream* output=Safe_Open_Output(filename);TYPED_OSTREAM typed_output(*output,stream_type);Write_Binary(typed_output,d1,args...);delete output;}
+{FILE_OSTREAM output;Safe_Open_Output(output,stream_type,filename);Write_Binary(output,d1,args...);}
+template<class RW,class T1,class ...Args>
+inline void Write_To_File(const std::string& filename,const T1& d1,Args&& ...args)
+{Write_To_File(STREAM_TYPE((RW)0),filename,d1,args...);}
 //#####################################################################
 // Read_From_Text_File
 //#####################################################################
@@ -95,7 +96,7 @@ inline void Read_From_Text_File_Helper(std::istream& in,T1& d1,Args&& ...args)
 {in>>d1;Read_From_Text_File_Helper(in,args...);}
 template<class ...Args>
 inline void Read_From_Text_File(const std::string& filename,Args&& ...args)
-{std::istream* input=Safe_Open_Input(filename,false);Read_From_Text_File_Helper(*input,args...);delete input;}
+{std::istream* input=Safe_Open_Input_Raw(filename,false);Read_From_Text_File_Helper(*input,args...);delete input;}
 //#####################################################################
 // Write_To_Text_File
 //#####################################################################
@@ -106,21 +107,17 @@ inline void Write_To_Text_File_Helper(std::ostream& out,T1& d1,Args&& ...args)
 {out<<d1;Write_To_Text_File_Helper(out,args...);}
 template<class ...Args>
 inline void Write_To_Text_File(const std::string& filename,Args&& ...args)
-{std::ostream* output=Safe_Open_Output(filename,false);Write_To_Text_File_Helper(*output,args...);delete output;}
+{std::ostream* output=Safe_Open_Output_Raw(filename,false);Write_To_Text_File_Helper(*output,args...);delete output;}
 //#####################################################################
 // Create_From_File
 //#####################################################################
 template<class T>
-inline void Create_From_File(const STREAM_TYPE stream_type,const std::string& filename,T*& d)
-{typename remove_const<T>::type* read=T::Create();Read_From_File(stream_type,filename,*read);d=read;}
-
-template<class RW,class T>
 inline void Create_From_File(const std::string& filename,T*& d)
-{Create_From_File(STREAM_TYPE(RW()),filename,d);}
+{typename remove_const<T>::type* read=T::Create();Read_From_File(filename,*read);d=read;}
 
 template<class T>
-inline T* Create_From_File(const STREAM_TYPE stream_type,const std::string& filename)
-{typename remove_const<T>::type* d=T::Create();Read_From_File(stream_type,filename,*d);return d;}
+inline T* Create_From_File(const std::string& filename)
+{typename remove_const<T>::type* d=T::Create();Read_From_File(filename,*d);return d;}
 
 void Ignore(std::istream& input,char c);
 //#####################################################################

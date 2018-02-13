@@ -11,10 +11,10 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D<T>::
-OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string& directory)
-    :OPENGL_COMPONENT<T>(stream_type,"Thin Shells Debugging"),grid(grid),
+OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D(const GRID<TV> &grid,const std::string& directory)
+    :OPENGL_COMPONENT<T>("Thin Shells Debugging"),grid(grid),
     invalid_color_map(OPENGL_COLOR::Red()),
-    opengl_density_valid_mask(stream_type,grid,density_valid_mask,&invalid_color_map,OPENGL_SCALAR_FIELD_3D<T,bool>::DRAW_POINTS),
+    opengl_density_valid_mask(grid,density_valid_mask,&invalid_color_map,OPENGL_SCALAR_FIELD_3D<T,bool>::DRAW_POINTS),
     directory(directory),frame_loaded(-1),valid(false),
     draw_density_valid_mask(false),draw_node_neighbors_visible(false),draw_face_corners_visible(false)
 {
@@ -127,13 +127,13 @@ Reinitialize(bool force)
         if(draw_node_neighbors_visible || draw_face_corners_visible){
             std::string tmp_filename = Get_Frame_Filename(directory+"/%d/thin_shells_grid_visibility",frame);
             if(File_Exists(tmp_filename))
-                Read_From_File(stream_type,tmp_filename,node_neighbors_visible,face_corners_visible_from_face_center_u,face_corners_visible_from_face_center_v,face_corners_visible_from_face_center_w);
+                Read_From_File(tmp_filename,node_neighbors_visible,face_corners_visible_from_face_center_u,face_corners_visible_from_face_center_v,face_corners_visible_from_face_center_w);
         }
 
         if(draw_density_valid_mask){
             std::string tmp_filename = Get_Frame_Filename(directory+"/%d/density_valid_mask",frame);
             if(File_Exists(tmp_filename)){
-                Read_From_File(stream_type,tmp_filename,density_valid_mask);
+                Read_From_File(tmp_filename,density_valid_mask);
                 for(RANGE_ITERATOR<TV::m> it(density_valid_mask.domain);it.Valid();it.Next())
                     density_valid_mask(it.index)=!density_valid_mask(it.index); // negate
                 opengl_density_valid_mask.Update();}

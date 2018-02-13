@@ -95,8 +95,8 @@ public:
     virtual void Restore_State(const int state_index);
     virtual void Average_States(const int state1, const int state2, const int result_state,const T interpolation_distance);
     virtual void Delete_State(const int state_index);
-    virtual void Read_State(TYPED_ISTREAM& input,const int state_index);
-    virtual void Write_State(TYPED_OSTREAM& output,const int state_index) const;
+    virtual void Read_State(TYPED_ISTREAM input,const int state_index);
+    virtual void Write_State(TYPED_OSTREAM output,const int state_index) const;
 //#####################################################################
 };
 }

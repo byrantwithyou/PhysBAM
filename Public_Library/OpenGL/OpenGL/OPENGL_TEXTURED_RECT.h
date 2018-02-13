@@ -21,7 +21,7 @@ public:
     double width, height;
     OPENGL_TEXTURE *texture;
 
-    OPENGL_TEXTURED_RECT(STREAM_TYPE stream_type);
+    OPENGL_TEXTURED_RECT();
 
     void Display() const override;
     RANGE<VECTOR<T,3> > Bounding_Box() const override;

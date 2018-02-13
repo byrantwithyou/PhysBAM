@@ -48,7 +48,7 @@ public:
     {return use_muscle_actuators || use_pd_actuators;}
 
 //#####################################################################
-    void Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame);
+    void Read(const std::string& directory,const int frame);
     void Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame) const;
     int Parent_Id(JOINT_ID joint_id) const;
     int Child_Id(JOINT_ID joint_id) const;

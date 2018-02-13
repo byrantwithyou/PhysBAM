@@ -9,7 +9,7 @@
 #include <Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_3D.h>
 namespace PhysBAM{
 
-template<class T,class RW=T>
+template<class T>
 class FILLING_BOX:public SOLIDS_FLUIDS_EXAMPLE_3D<RW>
 {
 public:

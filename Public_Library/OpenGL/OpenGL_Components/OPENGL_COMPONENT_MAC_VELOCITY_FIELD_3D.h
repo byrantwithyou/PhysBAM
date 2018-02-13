@@ -22,8 +22,8 @@ class OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D:public OPENGL_COMPONENT<T>
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
     using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_COMPONENT<T>::stream_type;using OPENGL_OBJECT<T>::viewer_callbacks;
-    OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D(STREAM_TYPE stream_type,const GRID<TV> &grid,const std::string &velocity_filename_input);
+    using OPENGL_OBJECT<T>::viewer_callbacks;
+    OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D(const GRID<TV> &grid,const std::string &velocity_filename_input);
     virtual ~OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D();
 
     bool Valid_Frame(int frame_input) const override;

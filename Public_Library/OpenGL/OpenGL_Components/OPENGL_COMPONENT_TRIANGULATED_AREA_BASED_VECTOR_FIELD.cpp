@@ -9,8 +9,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>::
-OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD(STREAM_TYPE stream_type,TRIANGULATED_AREA<T>& triangulated_area,const std::string &vector_field_filename)
-    :OPENGL_COMPONENT<T>(stream_type,"Triangulated Area Based Vector Field 2D"),opengl_vector_field(stream_type,triangulated_area,*new ARRAY<VECTOR<T,2> >), 
+OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD(TRIANGULATED_AREA<T>& triangulated_area,const std::string &vector_field_filename)
+    :OPENGL_COMPONENT<T>("Triangulated Area Based Vector Field 2D"),opengl_vector_field(triangulated_area,*new ARRAY<VECTOR<T,2> >), 
     vector_field_filename(vector_field_filename),frame_loaded(-1),valid(false)
 {
     viewer_callbacks.Set("increase_vector_size",{[this](){Increase_Vector_Size();},"Increase vector size"});
@@ -86,7 +86,7 @@ Reinitialize(bool force_load_even_if_not_drawn)
 
             std::string tmp_filename = Get_Frame_Filename(vector_field_filename, frame);
             if(File_Exists(tmp_filename))
-                Read_From_File(stream_type,tmp_filename,opengl_vector_field.V);
+                Read_From_File(tmp_filename,opengl_vector_field.V);
             else
                 return;
 
