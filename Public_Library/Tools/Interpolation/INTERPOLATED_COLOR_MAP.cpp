@@ -27,6 +27,7 @@ template<class T> INTERPOLATED_COLOR_MAP<T>::
 template<class T> void INTERPOLATED_COLOR_MAP<T>::
 Initialize_Colors(T min_value,T max_value,bool log_scale,bool reverse,bool two_sets)
 {
+    colors.control_points.Remove_All();
     mn=min_value;
     mx=max_value;
     use_log=log_scale;
