@@ -390,7 +390,7 @@ public:
 
 //#####################################################################
     MATRIX Higham_Iterate(const T tolerance=1e-5,const int max_iterations=20,const bool exit_on_max_iterations=false) const;
-    void Singular_Value_Decomposition(MATRIX<T,3>& U,DIAGONAL_MATRIX<T,3>& singular_values,MATRIX<T,3>& V) const;
+    int Singular_Value_Decomposition(MATRIX<T,3>& U,DIAGONAL_MATRIX<T,3>& singular_values,MATRIX<T,3>& V) const;
     void Indefinite_Polar_Decomposition(MATRIX<T,3>& Q,SYMMETRIC_MATRIX<T,3>& S) const;
     T Simplex_Minimum_Altitude() const;
     static MATRIX Componentwise_Min(const MATRIX& v1,const MATRIX& v2);

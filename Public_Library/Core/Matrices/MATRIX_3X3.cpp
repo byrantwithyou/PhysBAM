@@ -63,6 +63,7 @@ void Zero_L(MATRIX<T,3>& U,MATRIX<T,3>& A,int r0,int r1,int c)
     auto g=Givens(A(r0,c),A(r1,c));
     Apply_L(A,g,r1,r0);
     Apply_R(U,g,r1,r0);
+    A(r1,c)=0;
 }
 // Puts a zero in A(r,c1)
 template<class T>
@@ -71,6 +72,7 @@ void Zero_R(MATRIX<T,3>& V,MATRIX<T,3>& A,int c0,int c1,int r)
     auto g=Givens(A(r,c0),A(r,c1));
     Apply_R(A,g,c1,c0);
     Apply_R(V,g,c1,c0);
+    A(r,c1)=0;
 }
 template<class T>
 void Zero_Chasing(MATRIX<T,3>& U,MATRIX<T,3>& A,MATRIX<T,3>& V)
@@ -85,7 +87,14 @@ void Swap_Col(MATRIX<T,3>& U,int i,int j)
 {
     auto u=U.Column(i),v=U.Column(j);
     U.Set_Column(i,v);
-    U.Set_Column(j,u);
+    U.Set_Column(j,-u);
+}
+template<class T>
+void Swap_Row(MATRIX<T,3>& U,int i,int j)
+{
+    auto u=U.Row(i),v=U.Row(j);
+    U.Set_Row(i,v);
+    U.Set_Row(j,-u);
 }
 template<class T>
 void Swap(MATRIX<T,3>& U,DIAGONAL_MATRIX<T,3>& D,MATRIX<T,3>& V,int i,int j)
@@ -137,6 +146,52 @@ void Bot_Block(MATRIX<T,3>& U,MATRIX<T,3>& B,MATRIX<T,3>& V,DIAGONAL_MATRIX<T,3>
     D.x.z=d.x.y;
     Sort_SV(U,D,V);
 }
+template<class T>
+bool Check_Tolerances(MATRIX<T,3>& B,MATRIX<T,3>& U,DIAGONAL_MATRIX<T,3>& D,MATRIX<T,3>& V,T tau)
+{
+    if(abs(B(1,2))<=tau){
+        Top_Block(U,B,V,D);
+        return true;}
+    if(abs(B(0,1))<=tau){
+        Bot_Block(U,B,V,D);
+        return true;}
+    if(abs(B(1,1))<=tau){
+        auto g=Givens(B(1,2),B(2,2)).Orthogonal_Vector();
+        Apply_L(B,g,2,1);
+        Apply_R(U,g,2,1);
+        Top_Block(U,B,V,D);
+        return true;}
+    if(abs(B(2,2))<=tau){
+        Zero_R(V,B,1,2,1);
+        Zero_R(V,B,0,2,0);
+        Top_Block(U,B,V,D);
+        return true;}
+    if(abs(B(0,0))<=tau){
+        Zero_L(U,B,1,0,1);
+        Zero_L(U,B,2,0,2);
+        Bot_Block(U,B,V,D);
+        return true;}
+    return false;
+}
+
+template<class T> bool
+Lazy_Sort(MATRIX<T,3>& U,MATRIX<T,3>& B,MATRIX<T,3>& V,int i,int j)
+{
+    T flip_ratio=100;
+    if(abs(B(i,i))*flip_ratio>=abs(B(j,j))) return false;
+    Swap_Row(B,i,j);
+    Swap_Col(U,i,j);
+    Swap_Col(B,i,j);
+    Swap_Col(V,i,j);
+    return true;
+}
+
+template<class T> void
+Bidiagonalize(MATRIX<T,3>& U,MATRIX<T,3>& B,MATRIX<T,3>& V)
+{
+    Zero_L(U,B,1,2,0); // [ * * * ; * * * ; 0 * * ]
+    Zero_Chasing(U,B,V); // [ * * 0 ; 0 * * ; 0 0 * ]
+}
 }
 //#####################################################################
 // Function Singular_Value_Decomposition
@@ -148,50 +203,36 @@ void Bot_Block(MATRIX<T,3>& U,MATRIX<T,3>& B,MATRIX<T,3>& V,DIAGONAL_MATRIX<T,3>
 //   year={2016},
 //   institution={University of California Los Angeles}
 // }
-template<class T> void MATRIX<T,3>::
+template<class T> int MATRIX<T,3>::
 Singular_Value_Decomposition(MATRIX<T,3>& U,DIAGONAL_MATRIX<T,3>& D,MATRIX<T,3>& V) const
 {
     MATRIX<T,3> B=*this;
     V=U=MATRIX<T,3>()+1;
+    Bidiagonalize(U,B,V);
 
-    // Bidiagonalize
-    Zero_L(U,B,1,2,0); // [ * * * ; * * * ; 0 * * ]
-    Zero_Chasing(U,B,V); // [ * * 0 ; 0 * * ; 0 0 * ]
-
-    T nu=128*std::numeric_limits<T>::epsilon();
+    T nu=16*std::numeric_limits<T>::epsilon();
     T tau=nu*std::max((T).5*B.Frobenius_Norm(),(T)1);
     for(int it=0;;it++)
     {
+        if(Check_Tolerances(B,U,D,V,tau)) return it;
+        if(Lazy_Sort(U,B,V,0,1) | Lazy_Sort(U,B,V,0,2) | Lazy_Sort(U,B,V,1,2)){
+            Bidiagonalize(U,B,V);
+            if(Check_Tolerances(B,U,D,V,tau)) return it;}
+
         T al0=B(0,0),al1=B(1,1),al2=B(2,2);
         T be0=B(0,1),be1=B(1,2);
         T ga0=al0*be0,ga1=al1*be1;
-        if(abs(be1)<=tau) return Top_Block(U,B,V,D);
-        if(abs(be0)<=tau) return Bot_Block(U,B,V,D);
-        if(abs(al1)<=tau){
-            auto g=Givens(B(1,2),B(2,2)).Orthogonal_Vector();
-            Apply_L(B,g,2,1);
-            Apply_R(U,g,2,1);
-            return Top_Block(U,B,V,D);}
-        if(abs(al2)<=tau){
-            Zero_R(V,B,1,2,1);
-            Zero_R(V,B,0,2,0);
-            return Top_Block(U,B,V,D);}
-        if(abs(al0)<=tau){
-            Zero_L(U,B,1,0,1);
-            Zero_L(U,B,2,0,2);
-            return Bot_Block(U,B,V,D);}
-
         T a0=al1*al1+be0*be0;
         T a1=al2*al2+be1*be1;
         T b0=ga1;
         T d=(T).5*(a0-a1);
         T mu=a1-b0*b0/(d+sign_nonzero(d)*sqrt(d*d+b0*b0));
-        
+
         auto g=Givens(al0*al0-mu,ga0);
         Apply_R(B,g,1,0);
         Apply_R(V,g,1,0);
-
-        Zero_Chasing(U,B,V);}
+        Zero_Chasing(U,B,V);
+    }
 }
 //#####################################################################
 // Function Indefinite_Polar_Decomposition
