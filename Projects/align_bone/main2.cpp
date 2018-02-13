@@ -269,12 +269,11 @@ int main(int argc, char* argv[])
     // for(int i=0;i<1000;i++)
     //     Add_Debug_Particle(random.template Get_Direction<TV>()*ls_dist,TV(.5,.5,.5));
 
-    GRID<TV> ls_grid(TV_INT()+20,RANGE<TV>::Centered_Box()*ls_dist,true);
+    GRID<TV> ls_grid(TV_INT()+10,RANGE<TV>::Centered_Box()*ls_dist,true);
     ARRAY<T,TV_INT> phi(ls_grid.Domain_Indices(3));
     LEVELSET<TV> levelset(ls_grid,phi,3);
     
     SIGNED_DISTANCE::Calculate(ts,ls_grid,phi,true);
-
 
 // // LEVELSET_MAKER<T> levelset_maker;
 //     // levelset_maker.verbose=true;
@@ -290,9 +289,6 @@ int main(int argc, char* argv[])
 //     ts.mesh.Initialize_Adjacent_Elements();
 //     LEVELSET_MAKER_UNIFORM<TV>::Compute_Level_Set(ts,ls_grid,3,phi);
 
-
-
-    
     Flush_Frame<TV>("B");
 
 //    LOG::printf("%P\n",levelset.phi);
