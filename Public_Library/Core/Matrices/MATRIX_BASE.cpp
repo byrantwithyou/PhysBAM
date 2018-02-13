@@ -82,13 +82,18 @@ In_Place_Gram_Schmidt_QR_Factorization(MATRIX_BASE<T,T_MATRIX1>& R)
 template<class T,class T_MATRIX> template<class T_MATRIX1,class T_MATRIX2> void MATRIX_BASE<T,T_MATRIX>::
 Householder_QR_Factorization(MATRIX_BASE<T,T_MATRIX1>& V,MATRIX_BASE<T,T_MATRIX2>& R)
 {
-    V.Derived()=T_MATRIX1((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());R.Derived()=T_MATRIX2(Columns(),Columns());T_MATRIX temp(*this);LEFT_VECTOR a(Rows()),v,new_a;
+    V.Derived()=T_MATRIX1((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
+    R.Derived()=T_MATRIX2((INITIAL_SIZE)Columns(),(INITIAL_SIZE)Columns());
+    T_MATRIX temp(*this);
+    LEFT_VECTOR a((INITIAL_SIZE)Rows()),v,new_a;
     for(int j=0;j<Columns();j++){ // for each column
         for(int i=0;i<Rows();i++) a(i)=temp(i,j);
-        v=a.Householder_Vector(j);for(int i=0;i<Rows();i++) V(i,j)=v(i); // store the v's in V
+        v=a.Householder_Vector(j);
+        for(int i=0;i<Rows();i++) V(i,j)=v(i); // store the v's in V
         for(int k=j;k<Columns();k++){ // Householder transform each column
             for(int i=0;i<Rows();i++) a(i)=temp(i,k);
-            new_a=a.Householder_Transform(v);for(int i=0;i<Rows();i++) temp(i,k)=new_a(i);}}
+            new_a=a.Householder_Transform(v);
+            for(int i=0;i<Rows();i++) temp(i,k)=new_a(i);}}
     for(int i=0;i<Columns();i++) for(int j=0;j<Columns();j++) R(i,j)=temp(i,j); // store R
 }
 //#####################################################################
@@ -98,18 +103,39 @@ template<class T,class T_MATRIX> template<class T_VECTOR0,class T_VECTOR1> void 
 In_Place_Robust_Householder_QR_Solve(ARRAY_BASE<T,T_VECTOR0>& b,ARRAY_BASE<int,T_VECTOR1>& p)
 {
     assert(Rows()==b.Size() && Columns()==p.Size());
-    ARRAY<T> a((INITIAL_SIZE)Rows());for(int i=0;i<Columns();i++) p(i)=i; // TODO: This should not assume ARRAY.
-    ARRAY<T> column_norm(Columns());for(int j=0;j<Columns();j++) for(int i=0;i<Rows();i++) column_norm(j)+=sqr((*this)(i,j));
+    LEFT_VECTOR a((INITIAL_SIZE)Rows());
+    for(int i=0;i<Columns();i++) p(i)=i;
+    RIGHT_VECTOR column_norm((INITIAL_SIZE)Columns());
+    for(int j=0;j<Columns();j++) for(int i=0;i<Rows();i++) column_norm(j)+=sqr((*this)(i,j));
     for(int j=0;j<Columns();j++){
-        int max_column=0;T max_column_norm=0;for(int k=j;k<Columns();k++) if(column_norm(k)>max_column_norm){max_column_norm=column_norm(k);max_column=k;}
+        int max_column=0;
+        T max_column_norm=0;
+        for(int k=j;k<Columns();k++)
+            if(column_norm(k)>max_column_norm){
+                max_column_norm=column_norm(k);
+                max_column=k;}
         if(max_column_norm<FLT_MIN) return;
-        if(max_column!=j){exchange(column_norm(j),column_norm(max_column));exchange(p(j),p(max_column));for(int i=0;i<Rows();i++) exchange((*this)(i,j),(*this)(i,max_column));}
+        if(max_column!=j){
+            exchange(column_norm(j),column_norm(max_column));
+            exchange(p(j),p(max_column));
+            for(int i=0;i<Rows();i++)
+                exchange((*this)(i,j),(*this)(i,max_column));}
         if(j==Rows()) return;
-        Get_Column(j,a);ARRAY<T> v=a.Householder_Vector(j);T two_over_v_dot_v=(T)2/v.Magnitude_Squared();
-        if((*this)(j,j)>=0)(*this)(j,j)=-sqrt(max_column_norm);else (*this)(j,j)=sqrt(max_column_norm);for(int i=j+1;i<Rows();i++)(*this)(i,j)=(T)0;
+        Get_Column(j,a);
+        LEFT_VECTOR v=a.Householder_Vector(j);
+        T two_over_v_dot_v=(T)2/v.Magnitude_Squared();
+        if((*this)(j,j)>=0)(*this)(j,j)=-sqrt(max_column_norm);
+        else (*this)(j,j)=sqrt(max_column_norm);
+        for(int i=j+1;i<Rows();i++)(*this)(i,j)=(T)0;
         for(int k=j+1;k<Columns();k++){
-            T v_dot_a=0;for(int i=j;i<Rows();i++) v_dot_a+=v(i)*(*this)(i,k);T coefficient=v_dot_a*two_over_v_dot_v;for(int i=j;i<Rows();i++) (*this)(i,k)-=coefficient*v(i);}
-        T v_dot_b=0;for(int i=j;i<Rows();i++) v_dot_b+=v(i)*b(i);T coefficient=v_dot_b*two_over_v_dot_v;for(int i=j;i<Rows();i++) b(i)-=coefficient*v(i);
+            T v_dot_a=0;
+            for(int i=j;i<Rows();i++) v_dot_a+=v(i)*(*this)(i,k);
+            T coefficient=v_dot_a*two_over_v_dot_v;
+            for(int i=j;i<Rows();i++) (*this)(i,k)-=coefficient*v(i);}
+        T v_dot_b=0;
+        for(int i=j;i<Rows();i++) v_dot_b+=v(i)*b(i);
+        T coefficient=v_dot_b*two_over_v_dot_v;
+        for(int i=j;i<Rows();i++) b(i)-=coefficient*v(i);
         for(int k=j+1;k<Columns();k++) column_norm(k)-=sqr((*this)(j,k));}
 }
 //#####################################################################
@@ -120,18 +146,28 @@ In_Place_PLU_Factorization(MATRIX_BASE<T,T_MATRIX1>& L,COLUMN_PERMUTATION& p)
 {
     assert((INITIAL_SIZE)Rows()==(INITIAL_SIZE)Columns());
     L.Derived()=T_MATRIX1((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
-    p=COLUMN_PERMUTATION(INITIAL_SIZE(Columns()));for(int i=0;i<Columns();i++) p(i)=i; // initialize p
+    p=COLUMN_PERMUTATION(INITIAL_SIZE(Columns()));
+    for(int i=0;i<Columns();i++) p(i)=i; // initialize p
     for(int j=0;j<Columns();j++){ // for each column
         // find the largest element and switch rows
-        int row=j;T value=abs((*this)(j,j));
-        for(int i=j+1;i<Columns();i++) if(abs((*this)(i,j))>value){row=i;value=abs((*this)(i,j));}
+        int row=j;
+        T value=abs((*this)(j,j));
+        for(int i=j+1;i<Columns();i++)
+            if(abs((*this)(i,j))>value){
+                row=i;
+                value=abs((*this)(i,j));}
         if(row!=j){ // need to switch rows
             exchange(p(j),p(row)); // update permutation matrix
             for(int k=0;k<j;k++) exchange(L(j,k),L(row,k)); // update L
             for(int k=j;k<Columns();k++) exchange((*this)(j,k),(*this)(row,k));} // update U
         // standard LU factorization steps
-        T diagonal_inverse=1/(*this)(j,j);for(int i=j;i<Columns();i++) L(i,j)=(*this)(i,j)*diagonal_inverse; // fill in the column for L
-        for(int i=j+1;i<Columns();i++) for(int k=j;k<Columns();k++) (*this)(i,k)-=L(i,j)*(*this)(j,k);} // sweep across each row below row j  TODO: can order be changed?
+        T diagonal_inverse=1/(*this)(j,j);
+        // fill in the column for L
+        for(int i=j;i<Columns();i++) L(i,j)=(*this)(i,j)*diagonal_inverse;
+        // sweep across each row below row j  TODO: can order be changed?
+        for(int i=j+1;i<Columns();i++)
+            for(int k=j;k<Columns();k++)
+                (*this)(i,k)-=L(i,j)*(*this)(j,k);}
 }
 //#####################################################################
 // Function In_Place_Cholesky_Factorization
@@ -141,9 +177,18 @@ In_Place_Cholesky_Factorization()
 {
     assert(Rows()==Columns());
     for(int j=0;j<Columns();j++){ // for each column
-        for(int k=0;k<j;k++) for(int i=j;i<Rows();i++) (*this)(i,j)-=(*this)(j,k)*(*this)(i,k); // subtract off the known stuff in previous columns
-        (*this)(j,j)=sqrt((*this)(j,j));T diagonal_inverse=1/(*this)(j,j);for(int i=j+1;i<Columns();i++) (*this)(i,j)*=diagonal_inverse;} // update L
-    for(int i=0;i<Rows();i++) for(int j=i+1;j<Columns();j++) (*this)(i,j)=0; // zero out upper triangular part  TODO: Loop the other way around
+        // subtract off the known stuff in previous columns
+        for(int k=0;k<j;k++)
+            for(int i=j;i<Rows();i++)
+                (*this)(i,j)-=(*this)(j,k)*(*this)(i,k);
+        (*this)(j,j)=sqrt((*this)(j,j));
+        T diagonal_inverse=1/(*this)(j,j);
+        for(int i=j+1;i<Columns();i++)
+            (*this)(i,j)*=diagonal_inverse;} // update L
+    // zero out upper triangular part  TODO: Loop the other way around
+    for(int i=0;i<Rows();i++)
+        for(int j=i+1;j<Columns();j++)
+            (*this)(i,j)=0;
 }
 //#####################################################################
 // Function In_Place_Cholesky_Factorization
@@ -154,8 +199,14 @@ In_Place_LU_Factorization(MATRIX_BASE<T,T_MATRIX1>& L)
     assert(Rows()==Columns());
     L.Derived()=T_MATRIX1((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
     for(int j=0;j<Columns();j++){ // for each column
-        T diagonal_inverse=1/(*this)(j,j);for(int i=j;i<Columns();i++) L(i,j)=(*this)(i,j)*diagonal_inverse; // fill in the column for L
-        for(int i=j+1;i<Columns();i++) for(int k=j;k<Columns();k++) (*this)(i,k)-=L(i,j)*(*this)(j,k);} // sweep across each row below row j  TODO: can the order of these loops be swapped?
+        T diagonal_inverse=1/(*this)(j,j);
+        // fill in the column for L
+        for(int i=j;i<Columns();i++)
+            L(i,j)=(*this)(i,j)*diagonal_inverse;
+        // sweep across each row below row j  TODO: can the order of these loops be swapped?
+        for(int i=j+1;i<Columns();i++)
+            for(int k=j;k<Columns();k++)
+                (*this)(i,k)-=L(i,j)*(*this)(j,k);}
 }
 //####################################################################################
 // Function Number_Of_Nonzero_Rows
@@ -163,57 +214,97 @@ In_Place_LU_Factorization(MATRIX_BASE<T,T_MATRIX1>& L)
 template<class T,class T_MATRIX> int MATRIX_BASE<T,T_MATRIX>::
 Number_Of_Nonzero_Rows(const T threshold) const
 {
-    T threshold_squared=sqr(threshold);int nonzero_rows=0;
+    T threshold_squared=sqr(threshold);
+    int nonzero_rows=0;
     for(int i=0;i<Rows();i++){
-        T row_norm_squared=0;for(int j=0;j<Columns();j++) row_norm_squared+=sqr((*this)(i,j));
+        T row_norm_squared=0;
+        for(int j=0;j<Columns();j++) row_norm_squared+=sqr((*this)(i,j));
         if(row_norm_squared>threshold_squared) nonzero_rows++;}
     return nonzero_rows;
 }
 namespace{
 template<class T> static void 
-Update_Max_Off_Diagonal_Element_Of_Row_After_Row_Change(const MATRIX_MXN<T>& A,ARRAY<PAIR<int,T> >& max_off_diagonal_element_of_row,const int i)
-{max_off_diagonal_element_of_row(i)=PAIR<int,T>();
-for(int j=0;j<A.n;j++) if(i!=j) 
-    if(abs(A(i,j))>max_off_diagonal_element_of_row(i).y){max_off_diagonal_element_of_row(i).y=abs(A(i,j));max_off_diagonal_element_of_row(i).x=j;}}
+Update_Max_Off_Diagonal_Element_Of_Row_After_Row_Change(const MATRIX_MXN<T>& A,
+    ARRAY<PAIR<int,T> >& max_off_diagonal_element_of_row,const int i)
+{
+    max_off_diagonal_element_of_row(i)=PAIR<int,T>();
+    for(int j=0;j<A.n;j++)
+        if(i!=j)
+            if(abs(A(i,j))>max_off_diagonal_element_of_row(i).y){
+                max_off_diagonal_element_of_row(i).y=abs(A(i,j));
+                max_off_diagonal_element_of_row(i).x=j;}
+}
 template<class T> static void 
-Update_Max_Off_Diagonal_Element_Of_Row_After_Column_Change(const MATRIX_MXN<T>& A,ARRAY<PAIR<int,T> >& max_off_diagonal_element_of_row,const int j)
-{for(int i=0;i<A.m;i++) if(i!=j){
-    if(abs(A(i,j))>max_off_diagonal_element_of_row(i).y){max_off_diagonal_element_of_row(i).y=abs(A(i,j));max_off_diagonal_element_of_row(i).x=j;}
-    else if(max_off_diagonal_element_of_row(i).x==j) Update_Max_Off_Diagonal_Element_Of_Row_After_Row_Change(A,max_off_diagonal_element_of_row,i);}}
+Update_Max_Off_Diagonal_Element_Of_Row_After_Column_Change(const MATRIX_MXN<T>& A,
+    ARRAY<PAIR<int,T> >& max_off_diagonal_element_of_row,const int j)
+{
+    for(int i=0;i<A.m;i++)
+        if(i!=j){
+            if(abs(A(i,j))>max_off_diagonal_element_of_row(i).y){
+                max_off_diagonal_element_of_row(i).y=abs(A(i,j));
+                max_off_diagonal_element_of_row(i).x=j;}
+            else if(max_off_diagonal_element_of_row(i).x==j)
+                Update_Max_Off_Diagonal_Element_Of_Row_After_Row_Change(A,max_off_diagonal_element_of_row,i);}
+}
 }
 //#####################################################################
 // Function Jacobi_Singular_Value_Decomposition
 //#####################################################################
 template<class T,class T_MATRIX> void MATRIX_BASE<T,T_MATRIX>::
-Jacobi_Singular_Value_Decomposition(ARRAY<VECTOR<int,2> >& left_givens_pairs,ARRAY<VECTOR<T,2> >& left_givens_coefficients,
-    ARRAY<VECTOR<int,2> >& right_givens_pairs,ARRAY<VECTOR<T,2> >& right_givens_coefficients,const T tolerance,const int max_iterations)
+Jacobi_Singular_Value_Decomposition(ARRAY<VECTOR<int,2> >& left_givens_pairs,
+    ARRAY<VECTOR<T,2> >& left_givens_coefficients,
+    ARRAY<VECTOR<int,2> >& right_givens_pairs,
+    ARRAY<VECTOR<T,2> >& right_givens_coefficients,const T tolerance,
+    const int max_iterations)
 {
     assert(Rows()>=2 && Columns()>=2);
     ARRAY<PAIR<int,T> > max_off_diagonal_element_of_row(Rows());
     for(int i=0;i<Rows();i++) Update_Max_Off_Diagonal_Element_Of_Row_After_Row_Change(*this,max_off_diagonal_element_of_row,i);
-    left_givens_pairs.Remove_All();left_givens_coefficients.Remove_All();
-    right_givens_pairs.Remove_All();right_givens_coefficients.Remove_All();
+    left_givens_pairs.Remove_All();
+    left_givens_coefficients.Remove_All();
+    right_givens_pairs.Remove_All();
+    right_givens_coefficients.Remove_All();
     for(int iteration=0;iteration<max_iterations;iteration++){
-        T max_off_diagonal_element=0;int i_max=0,j_max=0;
+        T max_off_diagonal_element=0;
+        int i_max=0,j_max=0;
         for(int i=0;i<Rows();i++)
-            if(max_off_diagonal_element_of_row(i).y>max_off_diagonal_element){max_off_diagonal_element=max_off_diagonal_element_of_row(i).y;i_max=i;j_max=max_off_diagonal_element_of_row(i).x;}
+            if(max_off_diagonal_element_of_row(i).y>max_off_diagonal_element){
+                max_off_diagonal_element=max_off_diagonal_element_of_row(i).y;
+                i_max=i;
+                j_max=max_off_diagonal_element_of_row(i).x;}
         if(max_off_diagonal_element<tolerance) return;
         if(i_max>Columns()){
-            int i=j_max,j=i_max;T c,s;VECTOR<T,2>((*this)(i,i),(*this)(j,i)).Normalized().Get(c,s);
-            Left_Givens_Rotation(i,j,c,-s);left_givens_pairs.Append(VECTOR<int,2>(i,j));left_givens_coefficients.Append(VECTOR<T,2>(c,s));
+            int i=j_max,j=i_max;
+            T c,s;
+            VECTOR<T,2>((*this)(i,i),(*this)(j,i)).Normalized().Get(c,s);
+            Left_Givens_Rotation(i,j,c,-s);
+            left_givens_pairs.Append(VECTOR<int,2>(i,j));
+            left_givens_coefficients.Append(VECTOR<T,2>(c,s));
             Update_Max_Off_Diagonal_Element_Of_Row_After_Row_Change(*this,max_off_diagonal_element_of_row,i);
             Update_Max_Off_Diagonal_Element_Of_Row_After_Row_Change(*this,max_off_diagonal_element_of_row,j);}
         else if(j_max>Rows()){
-            int i=i_max,j=j_max;T c,s;VECTOR<T,2>((*this)(i,i),(*this)(i,j)).Normalized().Get(c,s);
-            Right_Givens_Rotation(i,j,c,-s);right_givens_pairs.Append(VECTOR<int,2>(i,j));right_givens_coefficients.Append(VECTOR<T,2>(c,s));
+            int i=i_max,j=j_max;
+            T c,s;
+            VECTOR<T,2>((*this)(i,i),(*this)(i,j)).Normalized().Get(c,s);
+            Right_Givens_Rotation(i,j,c,-s);
+            right_givens_pairs.Append(VECTOR<int,2>(i,j));
+            right_givens_coefficients.Append(VECTOR<T,2>(c,s));
             Update_Max_Off_Diagonal_Element_Of_Row_After_Column_Change(*this,max_off_diagonal_element_of_row,i);
             Update_Max_Off_Diagonal_Element_Of_Row_After_Column_Change(*this,max_off_diagonal_element_of_row,j);}
         else{
             int i=(i_max<j_max)?i_max:j_max,j=(i_max<j_max)?j_max:i_max;
-            MATRIX<T,2> B((*this)(i,i),(*this)(j,i),(*this)(i,j),(*this)(j,j)),U,V;DIAGONAL_MATRIX<T,2> sigma;B.Singular_Value_Decomposition(U,sigma,V);
-            T c_left,s_left,c_right,s_right;U.Column(1).Get(c_left,s_left);V.Column(1).Get(c_right,s_right);
-            Left_Givens_Rotation(i,j,c_left,-s_left);left_givens_pairs.Append(VECTOR<int,2>(i,j));left_givens_coefficients.Append(VECTOR<T,2>(c_left,s_left));
-            Right_Givens_Rotation(i,j,c_right,-s_right);right_givens_pairs.Append(VECTOR<int,2>(i,j));right_givens_coefficients.Append(VECTOR<T,2>(c_right,s_right));
+            MATRIX<T,2> B((*this)(i,i),(*this)(j,i),(*this)(i,j),(*this)(j,j)),U,V;
+            DIAGONAL_MATRIX<T,2> sigma;
+            B.Singular_Value_Decomposition(U,sigma,V);
+            T c_left,s_left,c_right,s_right;
+            U.Column(1).Get(c_left,s_left);
+            V.Column(1).Get(c_right,s_right);
+            Left_Givens_Rotation(i,j,c_left,-s_left);
+            left_givens_pairs.Append(VECTOR<int,2>(i,j));
+            left_givens_coefficients.Append(VECTOR<T,2>(c_left,s_left));
+            Right_Givens_Rotation(i,j,c_right,-s_right);
+            right_givens_pairs.Append(VECTOR<int,2>(i,j));
+            right_givens_coefficients.Append(VECTOR<T,2>(c_right,s_right));
             Update_Max_Off_Diagonal_Element_Of_Row_After_Row_Change(*this,max_off_diagonal_element_of_row,i);
             Update_Max_Off_Diagonal_Element_Of_Row_After_Row_Change(*this,max_off_diagonal_element_of_row,j);
             Update_Max_Off_Diagonal_Element_Of_Row_After_Column_Change(*this,max_off_diagonal_element_of_row,i);
@@ -311,4 +402,6 @@ template MATRIX<float,4,4> exp<float,MATRIX<float,4,4> >(MATRIX_BASE<float,MATRI
 template MATRIX<float,5,5> exp<float,MATRIX<float,5,5> >(MATRIX_BASE<float,MATRIX<float,5,5> > const&);
 template MATRIX<float,6,6> exp<float,MATRIX<float,6,6> >(MATRIX_BASE<float,MATRIX<float,6,6> > const&);
 template MATRIX_MXN<float> exp<float,MATRIX_MXN<float> >(MATRIX_BASE<float,MATRIX_MXN<float> > const&);
+template void MATRIX_BASE<double,MATRIX<double,6,6> >::Householder_QR_Factorization<MATRIX<double,6,6>,MATRIX<double,6,6> >(MATRIX_BASE<double,MATRIX<double,6,6> >&,MATRIX_BASE<double,MATRIX<double,6,6> >&);
+template void MATRIX_BASE<float,MATRIX<float,6,6> >::Householder_QR_Factorization<MATRIX<float,6,6>,MATRIX<float,6,6> >(MATRIX_BASE<float,MATRIX<float,6,6> >&,MATRIX_BASE<float,MATRIX<float,6,6> >&);
 }

@@ -597,13 +597,13 @@ public:
 
     template<class T_VECTOR,class T_MATRIX1>
     static typename T_MATRIX1::LEFT_VECTOR Householder_Transform(const ARRAY_BASE<T,T_VECTOR>& b,const MATRIX_BASE<T,T_MATRIX1>& V)
-    {assert(V.Rows()==b.Size());typename T_MATRIX1::LEFT_VECTOR result(b),v(V.Rows());
+    {assert(V.Rows()==b.Size());typename T_MATRIX1::LEFT_VECTOR result(b),v((INITIAL_SIZE)V.Rows());
     for(int j=0;j<V.Columns();j++){V.Get_Column(j,v);result=result.Householder_Transform(v);}
     return result;}
 
     template<class T_VECTOR>
     LEFT_VECTOR Householder_QR_Solve(const ARRAY_BASE<T,T_VECTOR>& b)
-    {T_MATRIX V,R;Householder_QR_Factorization(V,R);LEFT_VECTOR c=Householder_Transform(b,V),c_short(Columns());
+    {T_MATRIX V,R;Householder_QR_Factorization(V,R);LEFT_VECTOR c=Householder_Transform(b,V),c_short((INITIAL_SIZE)Columns());
     for(int i=0;i<Columns();i++) c_short(i)=c(i);
     return R.Upper_Triangular_Solve(c_short);}
 
