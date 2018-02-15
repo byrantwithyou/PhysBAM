@@ -81,7 +81,7 @@ void Apply_Derivatives_Transpose(TV dY,const TV& dw,const CP& c,TV& dZ,ARRAY_VIE
         for(int j=0;j<TV::m;j++)
             F(elements(de.e)(j))+=de.dYdI(2+j).Transpose_Times(dY);
         dZ+=de.dYdI(1).Transpose_Times(dY);
-        dY+=de.dYdI(0).Transpose_Times(dY)+dYp;
+        dY=de.dYdI(0).Transpose_Times(dY)+dYp;
         dYp=TV();}
 
     for(int i=0;i<TV::m;i++)
