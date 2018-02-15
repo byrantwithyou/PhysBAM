@@ -94,7 +94,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
         if(LAGGED_FORCE<TV>* lf=dynamic_cast<LAGGED_FORCE<TV>*>(solid_body_collection.deformable_body_collection.deformables_forces(i)))
             lf->Lagged_Update_Position_Based_State(time);
 
-    newtons_method.require_one_iteration=!minimization_objective.Initial_Guess(dv,newtons_method.tolerance,asymmetric_system);
+    newtons_method.require_one_iteration=!minimization_objective.Initial_Guess(dv,newtons_method.tolerance,asymmetric_system && !newtons_method.use_gradient_magnitude_objective,newtons_method.use_gradient_magnitude_objective);
 
     if(test_diff) minimization_objective.Test_Diff(dv);
     if(solids_parameters.implicit_solve_parameters.test_system)

@@ -233,7 +233,7 @@ Make_Feasible(KRYLOV_VECTOR_BASE<T>& dv) const
 // Function Initial_Guess
 //#####################################################################
 template<class TV> bool BACKWARD_EULER_MINIMIZATION_OBJECTIVE<TV>::
-Initial_Guess(KRYLOV_VECTOR_BASE<T>& Bdv,T tolerance,bool no_test) const
+Initial_Guess(KRYLOV_VECTOR_BASE<T>& Bdv,T tolerance,bool no_test,bool norm_grad_objective) const
 {
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
@@ -253,7 +253,8 @@ Initial_Guess(KRYLOV_VECTOR_BASE<T>& Bdv,T tolerance,bool no_test) const
     T norm_grad0=sqrt(minimization_system.Inner_Product(tmp0,tmp0));
     Compute(dv,0,&tmp0,&e1);
     T norm_grad1=sqrt(minimization_system.Inner_Product(tmp0,tmp0));
-    if(e1<max(e0,e0*(T)1.1) || norm_grad1<norm_grad0*(T)1.1 || norm_grad1<tolerance) return true;
+    if(!norm_grad_objective && e1<max(e0,e0*(T)1.1)) return true;
+    if(norm_grad1<norm_grad0*(T)1.1 || norm_grad1<tolerance) return true;
     dv*=0;
     return true;
 }

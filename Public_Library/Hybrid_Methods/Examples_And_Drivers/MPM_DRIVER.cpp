@@ -472,7 +472,7 @@ Apply_Forces()
             newtons_method.Make_Vanilla_Newton();}
         
         example.Update_Lagged_Forces(example.time);
-        newtons_method.require_one_iteration=!objective.Initial_Guess(dv,newtons_method.tolerance,example.asymmetric_system);
+        newtons_method.require_one_iteration=!objective.Initial_Guess(dv,newtons_method.tolerance,example.asymmetric_system && !newtons_method.use_gradient_magnitude_objective,newtons_method.use_gradient_magnitude_objective);
         if(example.test_diff) objective.Test_Diff(dv);
 
         objective.system.forced_collisions.Remove_All();
