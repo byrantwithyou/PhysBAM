@@ -42,7 +42,6 @@ public:
 
     // unused callbacks
     void Update_Solids_Parameters(const T time) override {}
-    void Limit_Solids_Dt(T& dt,const T time) override {}
     void Postprocess_Solids_Substep(const T time,const int substep) override {}
     void Apply_Constraints(const T dt,const T time) override {}
     void Preprocess_Frame(const int frame) override {}

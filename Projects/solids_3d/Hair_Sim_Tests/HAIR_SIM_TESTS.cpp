@@ -123,20 +123,17 @@ HAIR_SIM_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
 
     // frame rates and level set sampling rate
     levelset_frequency=(T)1/levelset_frame_rate;
-}
-//#####################################################################
-// Function Limit_Solids_Dt
-//#####################################################################
-template<class T_input> void HAIR_SIM_TESTS<T_input>::
-Limit_Solids_Dt(T& dt,const T time)
-{
-    if(use_deforming_levelsets) Update_Keyframed_Parameters_For_Time_Update(time);
-    T max_binding_speed=sqrt(max_binding_speed_squared);
-    T max_displacement=dt*max_binding_speed;
-    const T max_displacement_allowed=(T).01;
-    T old_dt=dt;
-    if(max_displacement>max_displacement_allowed) dt=max_displacement_allowed/max_binding_speed;
-    LOG::cout<<"Clamping to allowed displacement of "<<max_displacement_allowed<<" displacement was "<<max_displacement<<" with dt="<<old_dt<<" and now dt="<<dt<<std::endl;
+
+    this->limit_dt=[this](T& dt,T time)
+        {
+            if(use_deforming_levelsets) Update_Keyframed_Parameters_For_Time_Update(time);
+            T max_binding_speed=sqrt(max_binding_speed_squared);
+            T max_displacement=dt*max_binding_speed;
+            const T max_displacement_allowed=(T).01;
+            T old_dt=dt;
+            if(max_displacement>max_displacement_allowed) dt=max_displacement_allowed/max_binding_speed;
+            LOG::cout<<"Clamping to allowed displacement of "<<max_displacement_allowed<<" displacement was "<<max_displacement<<" with dt="<<old_dt<<" and now dt="<<dt<<std::endl;
+        };
 }
 //#####################################################################
 // Function Compute_Binding_Velocities

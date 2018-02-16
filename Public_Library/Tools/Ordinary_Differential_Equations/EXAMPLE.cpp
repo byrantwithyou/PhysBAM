@@ -18,7 +18,7 @@ EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     write_substeps_level(-1),write_first_frame(true),write_last_frame(true),write_time(true),
     output_directory("output"),data_directory("../../Public_Data"),auto_restart(false),restart(false),
     restart_frame(0),write_output_files(true),write_frame_title(true),abort_when_dt_below(0),
-    mpi_world(0),need_finish_logging(true),test_number(0),fixed_dt(0),max_dt(0),
+    mpi_world(0),need_finish_logging(true),test_number(0),
     substeps_delay_frame(-1),substeps_delay_level(-1),use_test_output(false),test_output_prefix(""),
     stored_data_directory(data_directory),stored_output_directory(output_directory),opt_all_verbose(false),user_dt(false),
     user_frame_rate(false),user_max_dt(false),user_first_frame(false),user_last_frame(false),user_data_directory(false),
@@ -72,12 +72,16 @@ Time_At_Frame(const int frame) const
 {
     return initial_time+(frame-first_frame)/frame_rate;
 }
-template<class TV> void EXAMPLE<TV>::
-Clamp_Time_Step_With_Target_Time(const T time,const T target_time,T& dt,bool& done,const T min_dt,bool* min_dt_failed)
+template<class TV> bool EXAMPLE<TV>::
+Clamp_Time_Step_With_Target_Time(const T time,const T target_time,T& dt)
 {
-    if(dt<min_dt){dt=min_dt;if(min_dt_failed) *min_dt_failed=true;}
-    if(time+dt>=target_time){dt=target_time-time;done=true;}
+    if(limit_dt) limit_dt(dt,time);
+    if(max_dt && dt>max_dt) dt=max_dt;
+    if(min_dt && dt<min_dt) dt=min_dt;
+    if(fixed_dt) dt=fixed_dt;
+    if(time+dt>=target_time){dt=target_time-time;return true;}
     else if(time+2*dt>=target_time) dt=min(dt,(T).51*(target_time-time));
+    return false;
 }
 template<class TV> void EXAMPLE<TV>::
 Set_Write_Substeps_Level(const int level)
@@ -89,11 +93,6 @@ template<class TV> void EXAMPLE<TV>::
 Write_Frame_Title(const int frame) const
 {
     if(write_frame_title) Write_To_Text_File(LOG::sprintf("%s/%d/frame_title",output_directory.c_str(),frame),frame_title);
-}
-template<class TV> void EXAMPLE<TV>::
-Limit_Dt(T& dt,const T time)
-{
-    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
 }
 //#####################################################################
 // Function Log_Parameters

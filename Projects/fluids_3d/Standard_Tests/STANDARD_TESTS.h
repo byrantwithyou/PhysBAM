@@ -34,6 +34,7 @@ public:
         parse_args.Parse();
         tests.Initialize(test_number,resolution);
         *fluids_parameters.grid=tests.grid;
+        this->limit_dt=[this](T& dt,T time){tests.Limit_Dt(dt,time);};
     }
 
     ~STANDARD_TESTS()
@@ -48,7 +49,6 @@ public:
     void Preprocess_Solids_Substep(const T time,const int substep) override {}
     void Postprocess_Solids_Substep(const T time,const int substep) override {}
     void Extrapolate_Phi_Into_Objects(const T time) override {}
-    void Limit_Solids_Dt(T& dt,const T time) override {}
     void Initialize_Euler_State() override {}
     void Align_Deformable_Bodies_With_Rigid_Bodies() override {}
 
@@ -135,13 +135,6 @@ void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) overrid
 bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) override
 {
     return tests.Set_Kinematic_Velocities(twist,time,id);
-}
-//#####################################################################
-// Function Limit_Dt
-//#####################################################################
-void Limit_Dt(T& dt,const T time) override
-{
-    tests.Limit_Dt(dt,time);
 }
 //#####################################################################
 // Function Initialize_SPH_Particles

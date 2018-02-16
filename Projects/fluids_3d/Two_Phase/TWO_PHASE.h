@@ -98,7 +98,6 @@ public:
     bool Adjust_Phi_With_Sources(const T time) override {return false;}
     void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,3> >*& cell_centered_mask,const T time) override {}
     void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) override {}
-    void Limit_Dt(T& dt,const T time) override {}
 
 void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################

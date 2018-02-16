@@ -71,14 +71,6 @@ Constraints_CFL()
     return FLT_MAX;
 }
 //#####################################################################
-// Function Limit_Solids_Dt
-//#####################################################################
-template<class TV> void SOLIDS_EVOLUTION_CALLBACKS<TV>::
-Limit_Solids_Dt(T& dt,const T time)
-{
-    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
-}
-//#####################################################################
 // Function Pre_Advance_Cluster_Fracture
 //#####################################################################
 template<class TV> void SOLIDS_EVOLUTION_CALLBACKS<TV>::

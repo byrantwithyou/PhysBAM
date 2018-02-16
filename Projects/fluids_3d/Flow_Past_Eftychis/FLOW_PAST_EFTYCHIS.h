@@ -88,7 +88,6 @@ public:
     void Preprocess_Solids_Substep(const T time,const int substep) override {}
     void Postprocess_Solids_Substep(const T time,const int substep) override {}
     void Extrapolate_Phi_Into_Objects(const T time) override {}
-    void Limit_Solids_Dt(T& dt,const T time) override {}
     void Initialize_Euler_State() override {}
     void Align_Deformable_Bodies_With_Rigid_Bodies() override {}
 
@@ -204,12 +203,6 @@ bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) overri
 {
     twist=TWIST<TV>();
     return false;
-}
-//#####################################################################
-// Function Limit_Dt
-//#####################################################################
-void Limit_Dt(T& dt,const T time) override
-{
 }
 //#####################################################################
 // Function Initialize_SPH_Particles

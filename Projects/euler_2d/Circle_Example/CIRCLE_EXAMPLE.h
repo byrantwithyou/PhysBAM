@@ -487,6 +487,13 @@ void Initialize_Bodies() override
                    break;
             case 3:is_kinematic=true;
                    Add_Sphere(position,is_kinematic);
+                   this->limit_dt=[this](T& dt,T time)
+                       {
+                           GRID<TV>& grid=fluids_parameters.euler->grid;
+                           TV velocity=rigid_body_collection.rigid_body_particles.twist(sphere).linear;
+                           T rigid_dt_denominator=abs(velocity.x)/grid.dX.x+abs(velocity.y)/grid.dX.y;
+                           if(rigid_dt_denominator>(T)1e-8) dt=min(dt,1/rigid_dt_denominator);
+                       };
                    break;
             case 4:Add_Sphere(position,is_kinematic);
                    break;
@@ -528,17 +535,6 @@ bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) overri
 {
     if(test_number==3 && id==sphere){twist.linear=motion_curve.Derivative(time);return true;}
     return false;
-}
-//#####################################################################
-// Function Limit_Dt
-//#####################################################################
-void Limit_Dt(T& dt,const T time) override
-{
-    if(test_number==3){
-        GRID<TV>& grid=fluids_parameters.euler->grid;
-        TV velocity=rigid_body_collection.rigid_body_particles.twist(sphere).linear;
-        T rigid_dt_denominator=abs(velocity.x)/grid.dX.x+abs(velocity.y)/grid.dX.y;
-        if(rigid_dt_denominator>(T)1e-8) dt=min(dt,1/rigid_dt_denominator);}
 }
 //#####################################################################
 // Function Add_External_Forces

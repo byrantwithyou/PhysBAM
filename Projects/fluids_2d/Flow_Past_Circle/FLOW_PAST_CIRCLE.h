@@ -97,8 +97,6 @@ public:
     void Initialize_Euler_State() override {}
     void Initialize_SPH_Particles() override {}
     void Initialize_Velocities() override {}
-    void Limit_Dt(T& dt,const T time) override {}
-    void Limit_Solids_Dt(T& dt,const T time) override {}
     void Post_Initialization() override {}
     void Postprocess_Phi(const T time) override {}
     void Postprocess_Solids_Substep(const T time,const int substep) override {}

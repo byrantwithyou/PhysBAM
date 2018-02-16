@@ -37,6 +37,7 @@ public:
         *fluids_parameters.grid=tests.grid;
         fluids_parameters.write_ghost_values=true;
         fluids_parameters.store_particle_ids=true;
+        this->limit_dt=[this](T& dt,T time){tests.Limit_Dt(dt,time);};
     }
 
     ~STANDARD_TESTS()
@@ -143,13 +144,6 @@ void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) overrid
 bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) override
 {
     return BASE::Set_Kinematic_Velocities(twist,time,id) || tests.Set_Kinematic_Velocities(twist,time,id);
-}
-//#####################################################################
-// Function Limit_Dt
-//#####################################################################
-void Limit_Dt(T& dt,const T time) override
-{
-    tests.Limit_Dt(dt,time);
 }
 //#####################################################################
 // Function Initialize_SPH_Particles

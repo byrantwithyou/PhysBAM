@@ -73,7 +73,6 @@ public:
     void Update_Time_Varying_Material_Properties(const T time) override {}
     void Update_Solids_Parameters(const T time) override {}
     void Align_Deformable_Bodies_With_Rigid_Bodies() override {}
-    void Limit_Solids_Dt(T& dt,const T time) override {dt=1;}
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) override {}
     void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) override {}
     void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override {}

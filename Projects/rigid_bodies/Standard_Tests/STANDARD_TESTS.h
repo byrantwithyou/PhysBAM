@@ -150,7 +150,6 @@ public:
     void Preprocess_Solids_Substep(const T time,const int substep) override {}
     void Postprocess_Solids_Substep(const T time,const int substep) override {}
     void Apply_Constraints(const T dt,const T time) override {}
-    void Limit_Solids_Dt(T& dt,const T time) override {}
     
     void After_Initialization() override {BASE::After_Initialization();}
 

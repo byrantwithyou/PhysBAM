@@ -193,11 +193,6 @@ void Get_Object_Velocities(LAPLACE_UNIFORM<TV>* elliptic_solver,ARRAY<T,FACE_IND
             fluid_collection.incompressible_fluid_collection.face_velocities(iterator.Axis(),iterator.Face_Index())=rigid->Pointwise_Object_Velocity(iterator.Location())[iterator.Axis()];}}   
 }
 //#####################################################################
-// Function Limit_Dt
-//#####################################################################
-void Limit_Dt(T& dt,const T time) override
-{}
-//#####################################################################
 // Function Adjust_SPH_Particle_For_Domain_Boundaries
 //#####################################################################
 void Adjust_SPH_Particle_For_Domain_Boundaries(SPH_PARTICLES<TV>& particles,const int index,TV& V,const T dt,const T time)const override

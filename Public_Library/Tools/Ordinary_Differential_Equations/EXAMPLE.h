@@ -40,8 +40,9 @@ public:
     bool need_finish_logging;
     int test_number;
     bool use_default_test;
-    T fixed_dt;
-    T max_dt;
+    T fixed_dt=0;
+    T min_dt=0;
+    T max_dt=0;
     int substeps_delay_frame;
     int substeps_delay_level;
     bool use_test_output;
@@ -55,13 +56,14 @@ public:
     
     EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~EXAMPLE();
-    
+
+    std::function<void(T& dt,T time)> limit_dt;
+
 //#####################################################################
     virtual T Time_At_Frame(const int frame) const;
-    static void Clamp_Time_Step_With_Target_Time(const T time,const T target_time,T& dt,bool& done,const T min_dt=0,bool* min_dt_failed=0);
+    bool Clamp_Time_Step_With_Target_Time(const T time,const T target_time,T& dt);
     void Set_Write_Substeps_Level(const int level);
     void Write_Frame_Title(const int frame) const;
-    virtual void Limit_Dt(T& dt,const T time);
     virtual void Write_Output_Files(const int frame) const=0;
     virtual void Log_Parameters() const;
     virtual void After_Construction(); // Call parent first

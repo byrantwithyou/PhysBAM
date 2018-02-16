@@ -96,7 +96,6 @@ public:
     void Postprocess_Frame(const int frame) override {}
     void Get_Source_Reseed_Mask(ARRAY<bool,TV_INT>*& cell_centered_mask,const T time) override {}
     void Postprocess_Phi(const T time) override {}
-    void Limit_Dt(T& dt,const T time) override {}
     bool Adjust_Phi_With_Sources(const T time) override {return false;}
     void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) override {}
 

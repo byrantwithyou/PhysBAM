@@ -171,8 +171,6 @@ public:
 
     void Initialize_Velocities() override {}
     void Post_Initialization() override {}
-    void Limit_Dt(T& dt,const T time) override {}
-    void Limit_Solids_Dt(T& dt,const T time) override {}
     void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
     void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
     void Apply_Constraints(const T dt,const T time) override {}

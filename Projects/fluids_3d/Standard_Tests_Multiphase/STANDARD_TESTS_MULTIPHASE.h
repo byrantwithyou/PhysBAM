@@ -45,6 +45,14 @@ public:
   fluids_parameters.elastic_moduli(0)=10000;
   fluids_parameters.plasticity_alphas(0)=1;
   fluids_parameters.cfl/=4;*/
+        this->limit_dt=[this](T& dt,T time)
+            {
+                T cfl_number=(T).8;
+                for(int i=0;i<fluids_parameters.incompressible_multiphase->strains.m;i++)
+                    if(fluids_parameters.incompressible_multiphase->strains(i))
+                        dt=min(cfl_number*fluids_parameters.incompressible_multiphase->strains(i)->CFL(fluids_parameters.densities(i)),dt);
+                tests.Limit_Dt(dt,time);
+            };
     }
 
     ~STANDARD_TESTS_MULTIPHASE()
@@ -177,16 +185,6 @@ bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) overri
 {         
     return BASE::Set_Kinematic_Velocities(twist,time,id) || tests.Set_Kinematic_Velocities(twist,time,id);
 }         
-//#####################################################################
-// Function Limit_Dt
-//#####################################################################
-void Limit_Dt(T& dt,const T time) override
-{
-    T cfl_number=(T).8;
-    for(int i=0;i<fluids_parameters.incompressible_multiphase->strains.m;i++)if(fluids_parameters.incompressible_multiphase->strains(i))
-        dt=min(cfl_number*fluids_parameters.incompressible_multiphase->strains(i)->CFL(fluids_parameters.densities(i)),dt);
-    tests.Limit_Dt(dt,time);
-}
 //#####################################################################
 };
 }

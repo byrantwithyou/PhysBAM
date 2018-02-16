@@ -213,9 +213,7 @@ template<class TV> typename TV::SCALAR COMPRESSIBLE_DRIVER<TV>::
 Compute_Dt(const T time,const T target_time,bool& done)
 {
     T dt=example.cfl*example.euler.CFL(time);
-    example.Limit_Dt(dt,time);
-    done=false;
-    example.Clamp_Time_Step_With_Target_Time(time,target_time,dt,done,0);
+    done=example.Clamp_Time_Step_With_Target_Time(time,target_time,dt);
     return dt;
 }
 //#####################################################################

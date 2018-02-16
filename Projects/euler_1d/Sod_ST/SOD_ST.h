@@ -159,8 +159,6 @@ public:
     virtual ~SOD_ST() {}
 
     // Unused Callbacks
-    void Limit_Dt(T& dt,const T time) override {}
-    void Limit_Solids_Dt(T& dt,const T time) override {}
     void Initialize_Velocities() override {}
     void Post_Initialization() override {}
     void Preprocess_Frame(const int frame) override {}

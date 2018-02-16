@@ -283,7 +283,6 @@ Compute_Dt(const T time,const T target_time,bool& done)
     solids_dt=min(solids_dt,solids_evolution_callbacks->Constraints_CFL());
     if(solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies)
         solids_dt=min(solids_dt,example.solid_body_collection.rigid_body_collection.CFL_Rigid(solids_parameters.rigid_body_evolution_parameters,solids_parameters.verbose_dt));
-    solids_evolution_callbacks->Limit_Solids_Dt(solids_dt,time);
     if(example.solid_body_collection.deformable_body_collection.mpi_solids)
         solids_dt=example.solid_body_collection.deformable_body_collection.mpi_solids->Reduce_Min_Global(solids_dt);
 
@@ -291,9 +290,9 @@ Compute_Dt(const T time,const T target_time,bool& done)
     if(example.max_dt){fluids_dt=min(fluids_dt,example.max_dt);solids_dt=min(solids_dt,example.max_dt);}
     T dt=min(fluids_dt,solids_dt);
     LOG::cout<<"dt = solids_dt = "<<dt<<std::endl;
-    if(example.abort_when_dt_below && dt<example.abort_when_dt_below) PHYSBAM_FATAL_ERROR(LOG::sprintf("dt too small (%g < %g)",dt,example.abort_when_dt_below));
-    done=false;
-    SOLIDS_EXAMPLE<TV>::Clamp_Time_Step_With_Target_Time(time,target_time,dt,done,solids_parameters.min_dt);
+    if(example.abort_when_dt_below && dt<example.abort_when_dt_below)
+        PHYSBAM_FATAL_ERROR(LOG::sprintf("dt too small (%g < %g)",dt,example.abort_when_dt_below));
+    done=example.Clamp_Time_Step_With_Target_Time(time,target_time,dt);
     return dt;
 }
 //#####################################################################

@@ -72,7 +72,6 @@ public:
     void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
     void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) override {}
     void Update_Time_Varying_Material_Properties(const T time) override {}
-    void Limit_Solids_Dt(T& dt,const T time) override {}
     void Postprocess_Frame(const int frame) override {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) override {}
     void Preprocess_Frame(const int frame) override {}    

@@ -153,6 +153,12 @@ public:
             sph_sources_velocity.Append(source2_velocity);
             sources.Append(source3);
             sources_velocity.Append(source3_velocity);}
+
+        this->limit_dt=[this](T& dt,T time)
+            {
+                for(int s=0;s<sources.m;s++)
+                    dt=min(dt,fluids_parameters.cfl*fluids_parameters.grid->dX.Min()/sources_velocity(s).Magnitude());
+            };
     }
 
     ~GLASS()
@@ -225,13 +231,6 @@ void Initialize_Bodies() override
 
     inaccurate_union.collision_bodies.Add_Bodies(rigid_body_collection);
     fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.Add_Body(&inaccurate_union,0,false);
-}
-//#####################################################################
-// Function Limit_Dt
-//#####################################################################
-void Limit_Dt(T& dt,const T time) override
-{
-    for(int s=0;s<sources.m;s++) dt=min(dt,fluids_parameters.cfl*fluids_parameters.grid->dX.Min()/sources_velocity(s).Magnitude());
 }
 //#####################################################################
 // Function Update_Fluid_Parameters

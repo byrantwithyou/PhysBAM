@@ -35,6 +35,7 @@ public:
         *fluids_parameters.grid=tests.grid;
         fluids_parameters.number_particles_per_cell=16;
         fluids_parameters.solve_neumann_regions=true;
+        this->limit_dt=[this](T& dt,T time){tests.Limit_Dt(dt,time);};
     }
 
     ~STANDARD_TESTS_MULTIPHASE()
@@ -120,13 +121,6 @@ void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bo
                 if(psi_N_u.Valid_Index(cell+VECTOR<int,2>(1,1)))psi_N_u(cell+VECTOR<int,2>(1,1))=true;}}}
 
     for(int s=0;s<tests.sources.m;s++)Get_Source_Velocities(tests.sources(s),tests.world_to_source(s),tests.source_velocity(s));
-}
-//#####################################################################
-// Function Limit_Dt
-//#####################################################################
-void Limit_Dt(T& dt,const T time) override
-{
-    tests.Limit_Dt(dt,time);
 }
 //#####################################################################
 };

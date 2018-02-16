@@ -28,7 +28,6 @@ public:
     bool write_deformable_body;
     bool verbose,verbose_dt;
     T cfl;
-    T min_dt;
     bool fracture;
     bool write_static_variables_every_frame;
     T newton_tolerance;

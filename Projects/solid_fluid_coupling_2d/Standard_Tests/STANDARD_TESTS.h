@@ -1683,20 +1683,6 @@ void Sanity_Test_Stokes_No_Viscosity()
     Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particles.Size()));
 }
 //#####################################################################
-// Function Limit_Dt
-//#####################################################################
-void Limit_Dt(T& dt,const T time) override
-{
-    if(max_dt && dt>max_dt) dt=max_dt;
-}
-//#####################################################################
-// Function Limit_Dt
-//#####################################################################
-void Limit_Solids_Dt(T& dt,const T time) override
-{
-    if(max_dt && dt>max_dt) dt=max_dt;
-}
-//#####################################################################
 };
 }
 #endif

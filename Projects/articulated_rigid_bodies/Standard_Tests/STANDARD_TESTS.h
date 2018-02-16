@@ -127,6 +127,7 @@ public:
         parse_args.Add("-prestab_iterations",&arb.max_iterations,&use_prestab_iterations,"iterations","prestabilization iterations");
         parse_args.Parse();
 
+        if(!this->fixed_dt && !this->max_dt && !this->min_dt) this->fixed_dt=1;
         tests.data_directory=data_directory;
         output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
         if(arb.use_krylov_poststab) arb.use_poststab_in_cg=false;
@@ -150,7 +151,6 @@ public:
     void Update_Time_Varying_Material_Properties(const T time) override {}
     void Update_Solids_Parameters(const T time) override {}
     void Align_Deformable_Bodies_With_Rigid_Bodies() override {}
-    void Limit_Solids_Dt(T& dt,const T time) override {dt=1;}
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) override {}
     void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) override {}
     void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override {}

@@ -30,7 +30,6 @@ public:
     virtual void Align_Deformable_Bodies_With_Rigid_Bodies();
     virtual void Apply_Constraints(const T dt,const T time);
     virtual T Constraints_CFL();
-    virtual void Limit_Solids_Dt(T& dt,const T time);
     virtual void Pre_Advance_Cluster_Fracture(const T& dt, const T& time);
     virtual void Post_Advance_Cluster_Fracture(const T& dt, const T& time);
     virtual void Filter_Velocities(const T dt,const T time,const bool velocity_update);

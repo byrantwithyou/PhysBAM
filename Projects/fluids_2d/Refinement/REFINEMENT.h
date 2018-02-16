@@ -40,7 +40,6 @@ public:
     {}
 
     // Unused callbacks
-    void Limit_Dt(T& dt,const T time) override {}
     void Postprocess_Solids_Substep(const T time,const int substep) override {}
     void Preprocess_Frame(const int frame) override {}
     void Apply_Constraints(const T dt,const T time) override {}

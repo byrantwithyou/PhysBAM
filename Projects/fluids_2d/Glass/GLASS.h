@@ -175,6 +175,12 @@ public:
             world_to_source.Append(world_to_source4);
             sources_velocity.Append(source4_velocity);
             sources_bounding_box.Append(source4_bounding_box);}
+
+        this->limit_dt=[this](T& dt,T time)
+            {
+                for(int s=0;s<sources.m;s++)
+                    dt=min(dt,fluids_parameters.cfl*fluids_parameters.grid->dX.Min()/sources_velocity(s).Magnitude());
+            };
     }
 
     ~GLASS()
@@ -288,13 +294,6 @@ void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) overrid
 bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) override
 {
     return BASE::Set_Kinematic_Velocities(twist,time,id);
-}
-//#####################################################################
-// Function Limit_Dt
-//#####################################################################
-void Limit_Dt(T& dt,const T time) override
-{
-    for(int s=0;s<sources.m;s++) dt=min(dt,fluids_parameters.cfl*fluids_parameters.grid->dX.Min()/sources_velocity(s).Magnitude());
 }
 //#####################################################################
 // Function Initialize_SPH_Particles

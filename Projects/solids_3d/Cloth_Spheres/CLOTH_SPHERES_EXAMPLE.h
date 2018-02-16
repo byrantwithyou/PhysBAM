@@ -54,7 +54,6 @@ public:
     void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) override {}
     void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) override {}
     void Update_Time_Varying_Material_Properties(const T time) override {}
-    void Limit_Solids_Dt(T& dt,const T time) override {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) override {}
     void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}

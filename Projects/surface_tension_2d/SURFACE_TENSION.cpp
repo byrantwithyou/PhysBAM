@@ -482,7 +482,15 @@ Kang_Circle(bool use_surface)
         // this is dynamic viscosity=kinematic viscosity * density
         if(laplace_number) fluids_parameters.viscosity=sqrt(surface_tension*D*density/laplace_number)*kg/s;
         // this is for infinite La
-        else fluids_parameters.viscosity=0*kg/s;}
+        else fluids_parameters.viscosity=0*kg/s;
+
+        this->limit_dt=[this](T& dt,T time)
+            {
+                T dx=fluids_parameters.grid->dX.Min();
+                T dt_surface=(T)(sqrt(dx*fluids_parameters.density/(pi*surface_tension))*dx);
+                dt=min(dt,dt_surface);
+            };
+    }
     if(fluids_parameters.viscosity) fluids_parameters.implicit_viscosity=true;
     fluids_parameters.cfl=(T).9;
 //    solids_parameters.write_static_variables_every_frame=true;
@@ -870,28 +878,6 @@ Copy_Front_Tracked_Velocity_From_Fluid()
 
     ARRAY_VIEW<TV>& X=front_tracked_structure->particles.X,&V=front_tracked_structure->particles.V;
     for(int i=0;i<particle_segments.m;i++) V(i)=interp.Clamped_To_Array(face_velocities,X(i));
-}
-//#####################################################################
-// Function Limit_Dt
-//#####################################################################
-template<class T> void SURFACE_TENSION<T>::
-Limit_Dt(T& dt,const T time)
-{
-    if(max_dt && dt>max_dt) dt=max_dt;
-    if(exact_dt) dt=exact_dt;
-    if(test_number==12){
-        T dx=fluids_parameters.grid->dX.Min();
-        T dt_surface=(T)(sqrt(dx*fluids_parameters.density/(pi*surface_tension))*dx);
-        dt=min(dt,dt_surface);}
-}
-//#####################################################################
-// Function Limit_Solids_Dt
-//#####################################################################
-template<class T> void SURFACE_TENSION<T>::
-Limit_Solids_Dt(T& dt,const T time)
-{
-    if(max_dt && dt>max_dt) dt=max_dt;
-    if(exact_dt) dt=exact_dt;
 }
 //#####################################################################
 // Function Write_Output_Files

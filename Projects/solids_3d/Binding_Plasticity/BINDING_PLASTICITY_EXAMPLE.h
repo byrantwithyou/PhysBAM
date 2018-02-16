@@ -68,7 +68,6 @@ public:
     // unused callbacks
     void Align_Deformable_Bodies_With_Rigid_Bodies() override {}
     void Update_Solids_Parameters(const T time) override {}
-    void Limit_Solids_Dt(T& dt,const T time) override {}
     void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) override {}
     void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) override {}
     void Apply_Constraints(const T dt,const T time) override {}

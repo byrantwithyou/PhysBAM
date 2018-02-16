@@ -541,7 +541,6 @@ public:
     void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
     void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
     void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) override {}
-    void Limit_Solids_Dt(T& dt,const T time) override {if((test_number==60 || test_number==17 || test_number==18) && time<1e-5) dt=std::min(dt,3e-7);}
     void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
     void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) override {}
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
@@ -1632,11 +1631,13 @@ void Initialize_Bodies() override
             ARRAY<TV> OX(particles.X.Subset(stuck_particles));
             rand.Fill_Uniform(particles.X,-1,1);
             particles.X.Subset(stuck_particles)=OX;
+            this->limit_dt=[](T& dt,T time){if(time<1e-5) dt=std::min(dt,3e-7);};
             break;}
         case 18:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
             rand.Fill_Uniform(particles.X,-0,0);
+            this->limit_dt=[](T& dt,T time){if(time<1e-5) dt=std::min(dt,3e-7);};
             break;}
         case 23:
         case 24:
@@ -1721,6 +1722,7 @@ void Initialize_Bodies() override
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e4,(T).3,(T).001);
             rand.Fill_Uniform(particles.X,-0.3,.3);
+            this->limit_dt=[](T& dt,T time){if(time<1e-5) dt=std::min(dt,3e-7);};
             break;} 
         case 32:{
             T youngs_modulus=7e5;

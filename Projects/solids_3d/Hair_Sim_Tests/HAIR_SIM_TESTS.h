@@ -152,7 +152,6 @@ public:
     void Mass_Revert(const VECTOR<int,4>& nodes,ARRAY_VIEW<T>& one_over_mass);
     void Reorder_Pairs(ARRAY<VECTOR<int,4> >& edge_edge_pairs,ARRAY<VECTOR<int,4> >& point_face_pairs) override;
     void Compute_Binding_Velocities();
-    void Limit_Solids_Dt(T& dt,const T time) override;
     void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 };

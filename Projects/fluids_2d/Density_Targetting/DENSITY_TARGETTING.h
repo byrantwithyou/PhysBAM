@@ -345,12 +345,6 @@ bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) overri
     return BASE::Set_Kinematic_Velocities(twist,time,id);
 }
 //#####################################################################
-// Function Limit_Dt
-//#####################################################################
-void Limit_Dt(T& dt,const T time) override
-{
-}
-//#####################################################################
 // Function Initialize_SPH_Particles
 //#####################################################################
 void Initialize_SPH_Particles() override

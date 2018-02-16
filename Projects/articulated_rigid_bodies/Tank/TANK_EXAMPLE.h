@@ -71,7 +71,6 @@ public:
     void Postprocess_Frame(const int frame) override {}
     void Update_Time_Varying_Material_Properties(const T time) override {}
     void Align_Deformable_Bodies_With_Rigid_Bodies() override {}
-    void Limit_Solids_Dt(T& dt,const T time) override {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) override {}
     void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) override {}
     void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) override {}

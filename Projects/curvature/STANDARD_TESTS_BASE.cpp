@@ -234,14 +234,6 @@ Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt)
 {
 }
 //#####################################################################
-// Function Limit_Solids_Dt
-//#####################################################################
-template<class TV> void STANDARD_TESTS_BASE<TV>::
-Limit_Solids_Dt(T& dt,const T time)
-{
-    dt=this->fixed_dt;
-}
-//#####################################################################
 // Function Set_External_Velocities
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::

@@ -1315,7 +1315,6 @@ Compute_Dt(const T time,const T target_time,bool& done)
         if(number_of_regions>=1){T dt_levelset=fluids_parameters.particle_levelset_evolution->CFL(true,fluids_parameters.analytic_test);fluids_dt=min(fluids_dt,dt_levelset);}
         if(fluids_parameters.sph || fluids_parameters.use_sph_for_removed_negative_particles) fluids_dt=min(fluids_dt,fluids_parameters.cfl*fluids_parameters.sph_evolution->CFL());
         LOG::cout<<"before example cfl clamping:  "<<fluids_dt<<std::endl;
-        example.Limit_Dt(fluids_dt,time);
         if(fluids_parameters.mpi_grid && !solids_fluids_parameters.mpi_solid_fluid) fluids_parameters.mpi_grid->Synchronize_Dt(fluids_dt);}
 
     // solids dt
@@ -1323,7 +1322,6 @@ Compute_Dt(const T time,const T target_time,bool& done)
     if(solids_evolution.Use_CFL()) solids_dt=min(solids_dt,example.solid_body_collection.CFL(solids_parameters.verbose_dt));
     solids_dt=min(solids_dt,solids_evolution_callbacks->Constraints_CFL());
     if(solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies) solids_dt=min(solids_dt,example.solid_body_collection.rigid_body_collection.CFL_Rigid(solids_parameters.rigid_body_evolution_parameters,solids_parameters.verbose_dt));
-    solids_evolution_callbacks->Limit_Solids_Dt(solids_dt,time);
     if(example.solid_body_collection.deformable_body_collection.mpi_solids)
         solids_dt=example.solid_body_collection.deformable_body_collection.mpi_solids->Reduce_Min_Global(solids_dt);
     if(solids_fluids_parameters.mpi_solid_fluid){
@@ -1338,8 +1336,7 @@ Compute_Dt(const T time,const T target_time,bool& done)
     else
         LOG::cout<<"dt = solids_dt = "<<dt<<std::endl;
     if(example.abort_when_dt_below && dt<example.abort_when_dt_below) PHYSBAM_FATAL_ERROR(LOG::sprintf("dt too small (%g < %g)",dt,example.abort_when_dt_below));
-    done=false;
-    SOLIDS_FLUIDS_EXAMPLE<TV>::Clamp_Time_Step_With_Target_Time(time,target_time,dt,done,solids_parameters.min_dt);
+    done=example.Clamp_Time_Step_With_Target_Time(time,target_time,dt);
     return dt;
 }
 //#####################################################################

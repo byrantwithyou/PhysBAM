@@ -116,11 +116,9 @@ public:
 
     // Unused callbacks
     void Preprocess_Frame(const int frame) override {}
-    void Limit_Dt(T& dt,const T time) override {}
     void Postprocess_Phi(const T time) override {}
     void Apply_Constraints(const T dt,const T time) override {}
     void Postprocess_Solids_Substep(const T time,const int substep) override {}
-    void Limit_Solids_Dt(T& dt,const T time) override {}
     void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,3> >*& cell_centered_mask,const T time) override {}
     void Get_Source_Velocities(ARRAY<T,FACE_INDEX<3> >& face_velocities,ARRAY<bool,FACE_INDEX<3> >& psi_N,const T time) override {}
 

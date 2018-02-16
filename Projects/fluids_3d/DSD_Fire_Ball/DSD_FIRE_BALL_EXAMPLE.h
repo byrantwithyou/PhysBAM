@@ -74,7 +74,6 @@ public:
     {}
 
     // unused callbacks
-    void Limit_Solids_Dt(T& dt,const T time) override {}
     void Postprocess_Solids_Substep(const T time,const int substep) override {}
     void Apply_Constraints(const T dt,const T time) override {}
     void Preprocess_Frame(const int frame) override {}
@@ -83,7 +82,6 @@ public:
     void Postprocess_Phi(const T time) override {}
     void Postprocess_Frame(const int frame) override {}
     void Adjust_Density_And_Temperature_With_Sources(const T time) override {}
-    void Limit_Dt(T& dt,const T time) override {}
 
 void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################

@@ -65,7 +65,6 @@ public:
     void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) override {}
     void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) override {}
     void Preprocess_Solids_Substep(const T time,const int substep) override {}
-    void Limit_Solids_Dt(T& dt,const T time) override {}
     void Update_Time_Varying_Material_Properties(const T time) override {}
     void Preprocess_Frame(const int frame) override {}
     void Update_Solids_Parameters(const T time) override {}

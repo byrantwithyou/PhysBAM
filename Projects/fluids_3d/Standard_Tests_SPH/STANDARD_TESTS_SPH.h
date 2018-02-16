@@ -97,6 +97,8 @@ void Initialize_SPH_Particles() override
             TV X=random.Get_Uniform_Vector(TV((T).5*(grid.domain.max_corner.x-grid.domain.min_corner.x),grid.domain.min_corner.y,grid.domain.min_corner.z),grid.domain.max_corner);
             int id=sph_particles.Add_Element();
             sph_particles.X(id)=X;}}
+
+    this->limit_dt=[this](T& dt,T time){tests.Limit_Dt(dt,time);};
 }
 //#####################################################################
 // Function Update_Fluid_Parameters
@@ -114,13 +116,6 @@ void Get_Object_Velocities(const bool set_densities_for_coupling,const T dt,cons
         for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) if(iterator.Location().x<(T).7){
             fluids_parameters.incompressible->projection.elliptic_solver->psi_N(iterator.Axis(),iterator.Face_Index())=true;
             fluids_parameters.incompressible->projection.face_velocities(iterator.Axis(),iterator.Face_Index())=0;}
-}
-//#####################################################################
-// Function Limit_Dt
-//#####################################################################
-void Limit_Dt(T& dt,const T time) override
-{
-    tests.Limit_Dt(dt,time);
 }
 //#####################################################################
 // Function Adjust_SPH_Particle_For_Domain_Boundaries

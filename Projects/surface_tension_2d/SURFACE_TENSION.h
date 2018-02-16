@@ -188,8 +188,6 @@ public:
     void Remove_Particle(int p);
     T Compute_New_Mass(int p);
     void Copy_Front_Tracked_Velocity_From_Fluid();
-    void Limit_Dt(T& dt,const T time) override;
-    void Limit_Solids_Dt(T& dt,const T time) override;
     void Write_Output_Files(const int frame) const override;
     void Initialize_Surface_Particles(int number);
     void Rebuild_Surface();
