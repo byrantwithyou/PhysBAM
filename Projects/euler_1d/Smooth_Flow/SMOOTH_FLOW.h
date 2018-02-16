@@ -32,7 +32,7 @@ public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;
-    using BASE::resolution;
+    using BASE::resolution;using BASE::user_last_frame;
 
     int eno_scheme;
     int eno_order;
@@ -69,7 +69,7 @@ public:
         *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
         fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
         //time
-        initial_time=(T)0.;last_frame=50;frame_rate=(T)1000000.;
+        initial_time=(T)0.;if(!user_last_frame) last_frame=50;if(!this->user_frame_rate) frame_rate=(T)1000000.;
         fluids_parameters.cfl=cfl_number;
         //custom stuff . . . 
         fluids_parameters.compressible_eos = new EOS_GAMMA<T>;
@@ -90,15 +90,15 @@ public:
         fluids_parameters.compressible_monitor_conservation_error=true;
 
         solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-        if(timesplit) output_directory=LOG::sprintf("Smooth_Flow/Test_1__Resolution_%d_semiimplicit",(fluids_parameters.grid->counts.x));
-        else output_directory=LOG::sprintf("Smooth_Flow/Test_1__Resolution_%d_explicit",(fluids_parameters.grid->counts.x));
-        if(eno_scheme==2) output_directory+="_density_weighted";
-        else if(eno_scheme==3) output_directory+="_velocity_weighted";
+        if(!this->user_output_directory){
+            if(timesplit) output_directory=LOG::sprintf("Smooth_Flow/Test_1__Resolution_%d_semiimplicit",(fluids_parameters.grid->counts.x));
+            else output_directory=LOG::sprintf("Smooth_Flow/Test_1__Resolution_%d_explicit",(fluids_parameters.grid->counts.x));
+            if(eno_scheme==2) output_directory+="_density_weighted";
+            else if(eno_scheme==3) output_directory+="_velocity_weighted";}
     }
     
     virtual ~SMOOTH_FLOW() {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Intialize_Advection
 //#####################################################################

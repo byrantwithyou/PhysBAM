@@ -52,7 +52,6 @@ public:
     void Postprocess_Solids_Substep(const T time,const int substep) override {}
     void Extrapolate_Phi_Into_Objects(const T time) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

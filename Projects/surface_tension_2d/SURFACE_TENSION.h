@@ -85,7 +85,8 @@ public:
     using BASE::Add_Volumetric_Body_To_Fluid_Simulation;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::two_phase;
     using BASE::test_number;using BASE::resolution;using BASE::data_directory;using BASE::convection_order;using BASE::use_pls_evolution_for_structure;
     using BASE::Mark_Outside;using BASE::Add_Thin_Shell_To_Fluid_Simulation;using BASE::Add_To_Fluid_Simulation;
-
+    using BASE::user_last_frame;
+    
     SOLIDS_STANDARD_TESTS<TV> solids_tests;
 
     bool run_self_tests;
@@ -165,7 +166,6 @@ public:
     void Postprocess_Substep(const T dt,const T time) override;
     void Postprocess_Frame(const int frame) override;
     void Add_Rigid_Body_Walls(const T coefficient_of_restitution=(T).5,const T coefficient_of_friction=(T).5,ARRAY<int>* walls_added=0);
-    void After_Initialization() override;
     void Initialize_Advection() override;
     void Initialize_Phi() override;
     void Preprocess_Substep(const T dt,const T time) override;

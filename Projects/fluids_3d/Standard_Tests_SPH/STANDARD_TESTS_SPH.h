@@ -24,7 +24,7 @@ public:
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::data_directory;using BASE::solid_body_collection;using BASE::test_number;
     using BASE::Adjust_Phi_With_Sources;using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::Get_Object_Velocities; // silence -Woverloaded-virtual
-    using BASE::resolution;
+    using BASE::resolution;using BASE::user_last_frame;
 
     WATER_STANDARD_TESTS_3D<TV> tests;
     int number_of_particles;
@@ -40,13 +40,14 @@ public:
         fluids_parameters.number_particles_per_cell=16;
         fluids_parameters.write_ghost_values=true;
         fluids_parameters.store_particle_ids=true;
-        last_frame=1000;
+        if(!user_last_frame) last_frame=1000;
 
         if(tests.test_number==1) number_of_particles=100000;
         else if(tests.test_number==2) number_of_particles=15000;
         else{LOG::cerr<<"unrecognzed SPH test number"<<std::endl;exit(1);}
 
-        output_directory=LOG::sprintf("Standard_Tests_SPH/Test_%d__Resolution_%d_%d",test_number,(tests.grid.counts.x-1),(tests.grid.counts.y-1));
+        if(!this->user_output_directory)
+            output_directory=LOG::sprintf("Standard_Tests_SPH/Test_%d__Resolution_%d_%d",test_number,(tests.grid.counts.x-1),(tests.grid.counts.y-1));
         LOG::cout<<"Running SPH simulation to "<<output_directory<<std::endl;
     }
 
@@ -66,7 +67,6 @@ public:
     void Postprocess_Frame(const int frame) override {}
     void Postprocess_Phi(const T time) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Phi
 //#####################################################################

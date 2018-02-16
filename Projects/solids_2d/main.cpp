@@ -37,7 +37,6 @@ int main(int argc,char* argv[])
     //RIGID_PARTICLE_EXAMPLE<T> example(stream_type,parse_args);
     //CUTTING_EXAMPLE<T> example(stream_type,parse_args);
     example.mpi_world=new MPI_WORLD(parse_args);
-    example.After_Construction();
 
     if(example.mpi_world->initialized) example.solid_body_collection.deformable_body_collection.Set_Mpi_Solids(new MPI_SOLIDS<TV>);
     example.Adjust_Output_Directory_For_MPI(example.solid_body_collection.deformable_body_collection.mpi_solids);

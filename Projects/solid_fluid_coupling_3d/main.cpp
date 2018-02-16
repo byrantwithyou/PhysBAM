@@ -35,7 +35,6 @@ int main(int argc,char* argv[])
     if(opt_water) example=new STANDARD_TESTS_WATER<T>(stream_type,parse_args);
     else example=new STANDARD_TESTS<T>(stream_type,parse_args);
     example->mpi_world=new MPI_WORLD(parse_args);
-    example->After_Construction();
 
     std::cout<<"mpi world "<<example->mpi_world->initialized<<std::endl;
 #if 0

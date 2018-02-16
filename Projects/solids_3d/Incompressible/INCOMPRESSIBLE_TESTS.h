@@ -67,7 +67,8 @@ public:
     using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
     using BASE::Time_At_Frame;using BASE::stream_type;using BASE::solid_body_collection;using BASE::test_number;using BASE::mpi_world;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
-
+    using BASE::user_last_frame;
+    
     SOLIDS_STANDARD_TESTS<TV> tests;
     T test_poissons_ratio;
     T hittime;
@@ -125,21 +126,22 @@ public:
 
         tests.data_directory=data_directory;
         LOG::cout<<"Running Incompressible Test Number "<<test_number<<std::endl;
-        output_directory=LOG::sprintf("Incompressible/Test_%d",test_number);
-        if(frame_rate!=24) output_directory+=LOG::sprintf("_fr%g",frame_rate);
-        if(minimum_volume_recovery_time_scale) output_directory+=LOG::sprintf("_mvrts%g",minimum_volume_recovery_time_scale);
-    
-        if(test_poissons_ratio!=(T).5) output_directory+=LOG::sprintf("_p%g",test_poissons_ratio);
-        if(hittime!=1) output_directory+=LOG::sprintf("_ht%g",hittime);
-        if(high_resolution) output_directory+="_hires";
         LOG::Stat("stiffen",stiffen);
-        if(stiffen!=1) output_directory+=LOG::sprintf("_stiff%g",stiffen);
-        if(max_cg_iterations!=20) output_directory+=LOG::sprintf("_cgi%d",max_cg_iterations);
-        if(abs(solids_cg_tolerance-(T)1e-3)>(T)1e-7) output_directory+=LOG::sprintf("_cgs%g",solids_cg_tolerance);
         if(abs(solids_cg_tolerance-(T)1e-3)>(T)1e-7 && (test_number==7 || test_number==8 || test_number==10)) solids_cg_tolerance=(T)1e-2;
-        if(merge_at_boundary) output_directory+="_bound";
-        if(!use_neumann) output_directory+="_noneumann";
-        if(ground_friction) output_directory+=LOG::sprintf("_fric%g",ground_friction);
+        if(!this->user_output_directory){
+            output_directory=LOG::sprintf("Incompressible/Test_%d",test_number);
+            if(frame_rate!=24) output_directory+=LOG::sprintf("_fr%g",frame_rate);
+            if(minimum_volume_recovery_time_scale) output_directory+=LOG::sprintf("_mvrts%g",minimum_volume_recovery_time_scale);
+    
+            if(test_poissons_ratio!=(T).5) output_directory+=LOG::sprintf("_p%g",test_poissons_ratio);
+            if(hittime!=1) output_directory+=LOG::sprintf("_ht%g",hittime);
+            if(high_resolution) output_directory+="_hires";
+            if(stiffen!=1) output_directory+=LOG::sprintf("_stiff%g",stiffen);
+            if(max_cg_iterations!=20) output_directory+=LOG::sprintf("_cgi%d",max_cg_iterations);
+            if(abs(solids_cg_tolerance-(T)1e-3)>(T)1e-7) output_directory+=LOG::sprintf("_cgs%g",solids_cg_tolerance);
+            if(merge_at_boundary) output_directory+="_bound";
+            if(!use_neumann) output_directory+="_noneumann";
+            if(ground_friction) output_directory+=LOG::sprintf("_fric%g",ground_friction);}
     
         if(hittime!=1) tori_n=(int)hittime;
 
@@ -164,7 +166,6 @@ public:
     void Align_Deformable_Bodies_With_Rigid_Bodies() override {}
     void Preprocess_Solids_Substep(const T time,const int substep) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Collide_With_Soft_Bound_Copy
 //#####################################################################
@@ -246,7 +247,7 @@ void Initialize_Bodies() override
 
     switch(test_number){
         case 1:{
-            last_frame=(int)(8*frame_rate);
+            if(!user_last_frame) last_frame=(int)(8*frame_rate);
             body=&tests.Add_Rigid_Body("box",(T)2,(T)0);body->Frame().t.z=4;
             rigid_body_collection.rigid_body_particles.kinematic(body->particle_index)=true;
             body=&tests.Add_Rigid_Body("box",(T)2,(T)0);body->Frame().t.z=-4;
@@ -275,7 +276,7 @@ void Initialize_Bodies() override
             curve2.Add_Control_Point((T)8,TV(0,0,(T)-12));
             break;}
         case 2:{
-            last_frame=(int)(8*frame_rate);
+            if(!user_last_frame) last_frame=(int)(8*frame_rate);
             body=&tests.Add_Rigid_Body("box",(T)10,(T)0);body->Frame().t.z=11;
             rigid_body_collection.rigid_body_particles.kinematic(body->particle_index)=true;
             body=&tests.Add_Rigid_Body("box",(T)10,(T)0);body->Frame().t.z=-11;
@@ -291,7 +292,7 @@ void Initialize_Bodies() override
             curve2.Add_Control_Point((T)10,TV(0,0,(T)-11));
             break;}
         case 3:{
-            last_frame=(int)(8*frame_rate);
+            if(!user_last_frame) last_frame=(int)(8*frame_rate);
             body=&tests.Add_Rigid_Body("box",(T)10,(T)0);body->Frame().t.z=11;
             rigid_body_collection.rigid_body_particles.kinematic(body->particle_index)=true;
             body=&tests.Add_Rigid_Body("box",(T)10,(T)0);body->Frame().t.z=-11;
@@ -307,7 +308,7 @@ void Initialize_Bodies() override
             curve2.Add_Control_Point((T)8,TV(0,0,(T)-3));
             break;}
         case 4:{
-            last_frame=(int)(2*frame_rate);
+            if(!user_last_frame) last_frame=(int)(2*frame_rate);
             body=&tests.Add_Rigid_Body("box",(T)1,(T)0);body->Frame().t.z=11;
             rigid_body_collection.rigid_body_particles.kinematic(body->particle_index)=true;
             body=&tests.Add_Rigid_Body("box",(T)1,(T)0);body->Frame().t.z=-11;
@@ -321,7 +322,7 @@ void Initialize_Bodies() override
             curve2.Add_Control_Point((T)2,TV(0,0,(T)-1));
             break;}
         case 5:{
-            last_frame=(int)(5*frame_rate);
+            if(!user_last_frame) last_frame=(int)(5*frame_rate);
             tests.Create_Tetrahedralized_Volume(sphere_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,false,1000);
             tests.Add_Ground(0);
 
@@ -331,7 +332,7 @@ void Initialize_Bodies() override
             hardening_strength=(T).25;
             break;}
         case 6:{
-            last_frame=(int)(8*frame_rate);
+            if(!user_last_frame) last_frame=(int)(8*frame_rate);
             body=&tests.Add_Rigid_Body("box",(T)3,(T)0);body->Frame().t.z=5;
             rigid_body_collection.rigid_body_particles.kinematic(body->particle_index)=true;
             body=&tests.Add_Rigid_Body("box",(T)3,(T)0);body->Frame().t.z=-5;
@@ -347,7 +348,7 @@ void Initialize_Bodies() override
             curve2.Add_Control_Point((T)8,TV(0,0,(T)-5));
             break;}
         case 7:{
-            last_frame=(int)(10*frame_rate);
+            if(!user_last_frame) last_frame=(int)(10*frame_rate);
             solids_parameters.cfl=(T)10.0;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             initial_orientation=ROTATION<TV>((T)pi/2,TV(0,0,1));
@@ -389,7 +390,7 @@ void Initialize_Bodies() override
             youngs_modulus=(T)50000*stiffen;
             break;}
         case 8:{
-            last_frame=(int)(5*frame_rate);
+            if(!user_last_frame) last_frame=(int)(5*frame_rate);
             solids_parameters.cfl=(T)10.0;
             RIGID_BODY<TV>& box=tests.Add_Rigid_Body("cutout_box",(T)0.708855526,0);
             box.Frame().r=ROTATION<TV>(-(T)pi/2,TV(1,0,0));
@@ -404,7 +405,7 @@ void Initialize_Bodies() override
             youngs_modulus=(T)1000*stiffen;
             break;}
         case 9:{
-            last_frame=(int)(2*frame_rate);
+            if(!user_last_frame) last_frame=(int)(2*frame_rate);
             RIGID_BODY<TV>& box=tests.Add_Rigid_Body("cutout_box",(T)1.611991954,0);
             box.Frame().r=ROTATION<TV>(-(T)pi/2,TV(1,0,0));
             tests.Create_Tetrahedralized_Volume(sphere_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)1.2,0))),true,false,1000);
@@ -413,7 +414,7 @@ void Initialize_Bodies() override
             youngs_modulus=(T)10000*stiffen;
             break;}
         case 10:{
-            last_frame=(int)(5*frame_rate);
+            if(!user_last_frame) last_frame=(int)(5*frame_rate);
             solids_parameters.cfl=(T)2;
             initial_orientation=ROTATION<TV>((T)pi/2,TV(0,0,1));
             tests.Create_Tetrahedralized_Volume(armadillo_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)2.234,0)),TWIST<TV>(TV(),TV(0,0,1))),true,false,1000,armadillo_scale);
@@ -426,7 +427,7 @@ void Initialize_Bodies() override
             binding_stiffness=(T)1e4;
             break;}
         case 11:{
-            last_frame=(int)(10*frame_rate);
+            if(!user_last_frame) last_frame=(int)(10*frame_rate);
             solids_parameters.cfl=(T)10.0;
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             GRID<TV> mattress_grid(TV_INT(5,10,5),RANGE<TV>(TV((T)-.25,(T).8,(T)-.30),TV((T).25,(T)5.10,(T).30)));
@@ -439,7 +440,7 @@ void Initialize_Bodies() override
             use_gravity=true;
             break;}
         case 12:{
-            last_frame=(int)(8*frame_rate);
+            if(!user_last_frame) last_frame=(int)(8*frame_rate);
             body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->Frame().t=TV((T)1.5,1,0);body->is_static=true;
             body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->Frame().t=TV((T)-.5,0,0);body->is_static=true;
             body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->Frame().t=TV((T)-2.5,-1,0);body->is_static=true;
@@ -454,7 +455,7 @@ void Initialize_Bodies() override
             use_neohookean=true;
             break;}
         case 13:{
-            last_frame=(int)(5*frame_rate);
+            if(!user_last_frame) last_frame=(int)(5*frame_rate);
             tests.Create_Tetrahedralized_Volume(sphere_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,false,1000);
             tests.Create_Tetrahedralized_Volume(sphere_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)5.1,0))),true,false,1000);
             tests.Create_Tetrahedralized_Volume(sphere_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)7.2,0))),true,false,1000);
@@ -470,7 +471,7 @@ void Initialize_Bodies() override
             hardening_strength=(T).25;
             break;}
         case 14:{
-            last_frame=(int)(10*frame_rate);
+            if(!user_last_frame) last_frame=(int)(10*frame_rate);
             solids_parameters.cfl=(T)10.0;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
             initial_orientation=ROTATION<TV>((T)pi/2,TV(0,0,1))*ROTATION<TV>(-(T)pi/2,TV(0,1,0));
@@ -504,7 +505,7 @@ void Initialize_Bodies() override
             youngs_modulus=(T)1e6*stiffen;
             break;}
         case 15:{
-            last_frame=(int)(10*frame_rate);
+            if(!user_last_frame) last_frame=(int)(10*frame_rate);
             initial_orientation=ROTATION<TV>((T)pi/2,TV(0,0,1))*ROTATION<TV>(-(T)pi/2,TV(0,1,0));
             initial_velocity=TV();
             initial_angular_velocity=TV();
@@ -536,7 +537,7 @@ void Initialize_Bodies() override
             youngs_modulus=(T)2e4*stiffen;
             break;}
         case 16:{
-            last_frame=(int)(8*frame_rate);
+            if(!user_last_frame) last_frame=(int)(8*frame_rate);
             body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->Frame().t=TV((T)1.5,1,0);body->is_static=true;
             body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->Frame().t=TV((T)-.5,0,0);body->is_static=true;
             body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->Frame().t=TV((T)-2.5,-1,0);body->is_static=true;
@@ -552,7 +553,7 @@ void Initialize_Bodies() override
             break;}
         case 17:
         case 18:{
-            last_frame=(int)(10*frame_rate);
+            if(!user_last_frame) last_frame=(int)(10*frame_rate);
             solids_parameters.cfl=(T)10;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
             if(test_number==18) max_cg_iterations=200;
@@ -583,7 +584,7 @@ void Initialize_Bodies() override
             use_gravity=true;
             break;}
         case 19:{
-            last_frame=(int)(5*frame_rate);
+            if(!user_last_frame) last_frame=(int)(5*frame_rate);
             tests.Create_Tetrahedralized_Volume(torus_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,false,1000);
             tests.Add_Ground(0);
             use_gravity=true;
@@ -592,7 +593,7 @@ void Initialize_Bodies() override
             hardening_strength=(T).25;
             break;}
         case 20:{
-            frame_rate=24;last_frame=(int)(10*frame_rate);
+            if(!this->user_frame_rate) frame_rate=24;if(!user_last_frame) last_frame=(int)(10*frame_rate);
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
             solids_parameters.triangle_collision_parameters.perform_self_collision=false;

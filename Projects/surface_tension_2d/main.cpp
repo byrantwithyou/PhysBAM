@@ -49,7 +49,6 @@ int main(int argc,char* argv[])
         PLS_FSI_EXAMPLE<TV>* example=0;
         PARSE_ARGS parse_args(argc,argv);
         example=new SURFACE_TENSION<T>(stream_type,parse_args);
-        example->After_Construction();
         PLS_FSI_DRIVER<TV> driver(*example);
         driver.Execute_Main_Program();
         delete example;}

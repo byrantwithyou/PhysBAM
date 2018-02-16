@@ -35,7 +35,7 @@ public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;
-    using BASE::test_number;using BASE::resolution;
+    using BASE::test_number;using BASE::resolution;using BASE::user_last_frame;
 
     /* 1: Shock impinging on rho=1000kg/m^3 drop
        2: Shock impinging on rho=10kg/m^3 drop
@@ -82,7 +82,7 @@ public:
         *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
         fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
         //time
-        initial_time=0.;last_frame=500;frame_rate=133333;
+        initial_time=0.;if(!user_last_frame) last_frame=500;if(!this->user_frame_rate) frame_rate=133333;
         fluids_parameters.cfl=cfl_number;;
         //custom stuff . . . 
         fluids_parameters.compressible_eos = new EOS_GAMMA<T>;
@@ -102,15 +102,15 @@ public:
         if(test_number==1||test_number==3) fluids_parameters.density=(T)1e3;
         else if(test_number==2||test_number==4) fluids_parameters.density=(T)10;
         
-        if(timesplit) output_directory=LOG::sprintf("Sod_ST_Drop/Test_%d__Resolution_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x));
-        else output_directory=LOG::sprintf("Sod_ST_Drop/Test_%d__Resolution_%d_explicit",test_number,(fluids_parameters.grid->counts.x));
-        if(eno_scheme==2) output_directory+="_density_weighted";
-        else if(eno_scheme==3) output_directory+="_velocity_weighted";
+        if(!this->user_output_directory){
+            if(timesplit) output_directory=LOG::sprintf("Sod_ST_Drop/Test_%d__Resolution_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x));
+            else output_directory=LOG::sprintf("Sod_ST_Drop/Test_%d__Resolution_%d_explicit",test_number,(fluids_parameters.grid->counts.x));
+            if(eno_scheme==2) output_directory+="_density_weighted";
+            else if(eno_scheme==3) output_directory+="_velocity_weighted";}
     }
     
     virtual ~SOD_ST_DROP() {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

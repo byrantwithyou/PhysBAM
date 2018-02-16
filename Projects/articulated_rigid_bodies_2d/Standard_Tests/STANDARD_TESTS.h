@@ -44,7 +44,8 @@ public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
     using BASE::test_number;using BASE::Set_External_Positions;using BASE::data_directory; // silence -Woverloaded-virtual
-
+    using BASE::user_last_frame;
+    
     ARTICULATED_RIGID_BODY<TV>* arb;
     SOLIDS_STANDARD_TESTS<TV> tests;
     int njoints;
@@ -60,7 +61,8 @@ public:
         parse_args.Parse();
 
         tests.data_directory=data_directory;
-        output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+        if(!this->user_output_directory)
+            output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
         LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
     }
 
@@ -95,7 +97,6 @@ public:
     void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) override {}
     bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) override {return false;}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################
@@ -143,7 +144,7 @@ void Initialize_Bodies() override
 //#####################################################################
 void Point_Joint()
 {
-    last_frame=96;
+    if(!user_last_frame) last_frame=96;
     JOINT<TV>* joint=0;
     RIGID_BODY<TV>& rigid_body0=tests.Add_Rigid_Body("square_refined",1,(T).5);
     RIGID_BODY<TV>& rigid_body1=tests.Add_Rigid_Body("square_refined",1,(T).5);
@@ -161,7 +162,7 @@ void Point_Joint()
 //#####################################################################
 void Rigid_Joint()
 {
-    last_frame=96;
+    if(!user_last_frame) last_frame=96;
     RIGID_BODY<TV>& rigid_body0=tests.Add_Rigid_Body("square_refined",1,(T).5);
     RIGID_BODY<TV>& rigid_body1=tests.Add_Rigid_Body("square_refined",1,(T).5);
     rigid_body0.Frame().t=TV(0,2);
@@ -179,7 +180,7 @@ void Rigid_Joint()
 //#####################################################################
 void Multiple_Rigid_Joints()
 {
-    last_frame=480;
+    if(!user_last_frame) last_frame=480;
     JOINT<TV>* joint=0;
     for(int i=0;i<8;i++){
         RIGID_BODY<TV>&rigid_body=tests.Add_Rigid_Body("square_refined",1,(T)0);
@@ -195,7 +196,7 @@ void Multiple_Rigid_Joints()
 //#####################################################################
 void PD_Example()
 {
-    last_frame=480;
+    if(!user_last_frame) last_frame=480;
     JOINT<TV>*joint=0;
     RIGID_BODY<TV>*parent_body=NULL,*child_body=NULL;
     T cheight=(T)0;
@@ -239,7 +240,7 @@ void PD_Example()
 int Large_Cluster_Square(FRAME<TV>shift_frame,T scale=1)
 {
 #if 0
-    last_frame=480;
+    if(!user_last_frame) last_frame=480;
     // CLUSTER 1
     ARRAY<RIGID_BODY<TV>*>& bodies=*new ARRAY<RIGID_BODY<TV>*>(4);
     int count=0;

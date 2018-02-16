@@ -80,7 +80,6 @@ Initialize()
     example.Initialize_Bodies();
 
     if(fluids) example.fluids_parameters.Initialize_Fluid_Evolution(example.fluid_collection.incompressible_fluid_collection.face_velocities);
-    example.After_Initialization();
 
     int number_of_regions=example.fluids_parameters.number_of_regions;
     GRID<TV>& grid=*example.fluids_parameters.grid;
@@ -1328,15 +1327,13 @@ Compute_Dt(const T time,const T target_time,bool& done)
         solids_dt=solids_fluids_parameters.mpi_solid_fluid->Reduce_Min(solids_dt);
         fluids_dt=solids_fluids_parameters.mpi_solid_fluid->Reduce_Min(fluids_dt);}
 
-    if(example.fixed_dt){fluids_dt=example.fixed_dt;solids_dt=example.fixed_dt;}
-    if(example.max_dt){fluids_dt=min(fluids_dt,example.max_dt);solids_dt=min(solids_dt,example.max_dt);}
     T dt=min(fluids_dt,solids_dt);
+    done=example.Clamp_Time_Step_With_Target_Time(time,target_time,dt);
     if(Simulate_Fluids())
         LOG::cout<<"fluids_dt = "<<fluids_dt<<", solids_dt = "<<solids_dt<<" dt="<<dt<<std::endl;
     else
         LOG::cout<<"dt = solids_dt = "<<dt<<std::endl;
     if(example.abort_when_dt_below && dt<example.abort_when_dt_below) PHYSBAM_FATAL_ERROR(LOG::sprintf("dt too small (%g < %g)",dt,example.abort_when_dt_below));
-    done=example.Clamp_Time_Step_With_Target_Time(time,target_time,dt);
     return dt;
 }
 //#####################################################################

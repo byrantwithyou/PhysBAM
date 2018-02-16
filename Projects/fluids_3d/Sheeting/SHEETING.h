@@ -28,7 +28,8 @@ public:
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::data_directory;
     using BASE::solid_body_collection;using BASE::stream_type;using BASE::test_number;using BASE::resolution;using BASE::Adjust_Phi_With_Source;
-
+    using BASE::user_last_frame;
+    
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
     FLUID_COLLISION_BODY_INACCURATE_UNION<TV> inaccurate_union;
     bool use_variable_density_for_sph,use_two_way_coupling_for_sph,convert_sph_particles_to_fluid,use_analytic_divergence;
@@ -48,7 +49,7 @@ public:
     {
         parse_args.Parse();
         // set up the standard fluid environment
-        frame_rate=96;
+        if(!this->user_frame_rate) frame_rate=96;
         restart=false;restart_frame=0;
         fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
         fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
@@ -74,13 +75,14 @@ public:
         ballistic_particles_as_percentage_of_target=(T).1;
 
         // set up the domain
-        first_frame=0;last_frame=5000;
+        first_frame=0;if(!user_last_frame) last_frame=5000;
         int cells=1*resolution;
         fluids_parameters.grid->Initialize(TV_INT(3*cells+1,4*cells+1,4*cells+1),RANGE<TV>(TV(1,0,0),TV(4,4,4)));
 
         if(test_number>2){LOG::cerr<<"unrecognized test number "<<test_number<<std::endl;exit(1);}
 
-        output_directory=LOG::sprintf("Sheeting/Test_Sheeting_%d_Resolution_%d_%d_%d",test_number,
+        if(!this->user_output_directory)
+            output_directory=LOG::sprintf("Sheeting/Test_Sheeting_%d_Resolution_%d_%d_%d",test_number,
             (fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),(fluids_parameters.grid->counts.z-1));
 
         // set up sources for each test case
@@ -105,7 +107,6 @@ public:
     void Postprocess_Frame(const int frame) override {}
     void Postprocess_Phi(const T time) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

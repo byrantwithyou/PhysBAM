@@ -24,7 +24,7 @@ public:
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_SURFACE;
     using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
     using BASE::stream_type;using BASE::solids_evolution;using BASE::test_number;using BASE::data_directory;using BASE::m;using BASE::s;using BASE::kg;
-
+    
     SOLIDS_STANDARD_TESTS<TV> tests;
 
     bool test_forces;

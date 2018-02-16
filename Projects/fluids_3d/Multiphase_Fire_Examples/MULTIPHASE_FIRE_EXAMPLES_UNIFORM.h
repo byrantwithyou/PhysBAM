@@ -25,6 +25,7 @@ public:
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::first_frame;using BASE::data_directory;using BASE::Adjust_Phi_With_Source;
     using BASE::last_frame;using BASE::frame_rate;using BASE::write_output_files;using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;
     using BASE::output_directory;using BASE::restart;using BASE::restart_frame;using BASE::solid_body_collection;using BASE::test_number;
+    using BASE::user_last_frame;
     
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
 
@@ -51,7 +52,7 @@ public:
         fluids_parameters.use_reacting_flow=true;
         fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][0]=true;
         fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
-        last_frame=512;frame_rate=96;
+        if(!user_last_frame) last_frame=512;if(!this->user_frame_rate) frame_rate=96;
         fluids_parameters.temperature_container.Set_Ambient_Temperature(T(283.15));fluids_parameters.temperature_container.Set_Cooling_Constant((T)4000);
         fluids_parameters.density_container.Set_Ambient_Density(0);
         fluids_parameters.temperature_products=3000;fluids_parameters.temperature_fuel=298;
@@ -89,7 +90,7 @@ public:
         else if(test_number==3){
             fluids_parameters.implicit_viscosity_iterations=50;
             fluids_parameters.implicit_viscosity=true;
-            frame_rate=48;
+            if(!this->user_frame_rate) frame_rate=48;
             fluids_parameters.densities(1)=(T)2000;
             fluids_parameters.viscosities(1)=(T)200;           
             fluids_parameters.densities(2)=(T)2000;

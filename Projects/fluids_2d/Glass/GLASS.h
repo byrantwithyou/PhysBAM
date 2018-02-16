@@ -28,7 +28,8 @@ public:
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::data_directory;using BASE::fluid_collection;
     using BASE::solid_body_collection;using BASE::test_number;using BASE::resolution;using BASE::Adjust_Phi_With_Source;
-
+    using BASE::user_last_frame;
+    
     ARRAY<VECTOR<T,3> ,VECTOR<int,2> > target_image;
     GRID<TV> grid_image;
 
@@ -65,7 +66,7 @@ public:
     {
         parse_args.Parse();
         int cells=1*resolution;
-        frame_rate=24;
+        if(!this->user_frame_rate) frame_rate=24;
         restart=false;restart_frame=0;
         fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
         fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[3][0]=true;fluids_parameters.domain_walls[3][1]=true;
@@ -82,13 +83,14 @@ public:
         fluids_parameters.use_vorticity_confinement_fuel=false;
         fluids_parameters.write_ghost_values=true;
         fluids_parameters.store_particle_ids=true;
-        first_frame=0;last_frame=1000;
+        first_frame=0;if(!user_last_frame) last_frame=1000;
         GRID<TV>& grid=*fluids_parameters.grid;
 
         grid.Initialize(TV_INT(10*cells+1,20*cells+1),RANGE<TV>(TV((T)-.05,0),TV((T).05,(T).2)));
         //grid.Initialize(TV_INT(15*cells+1,20*cells+1),RANGE<TV>(TV((T)-.075,0),TV((T).075,(T).2)));
 
-        output_directory=LOG::sprintf("Glass/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
+        if(!this->user_output_directory)
+            output_directory=LOG::sprintf("Glass/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
         
         random.Set_Seed(1);
         particle_id=0;
@@ -162,7 +164,7 @@ public:
             sph_sources_velocity.Append(source2_velocity);
             sph_sources_bounding_box.Append(source2_bounding_box);}
         else if(test_number==3){
-            frame_rate=192;
+            if(!this->user_frame_rate) frame_rate=192;
             time_pour_end_pls=(T)1.6;
             time_pour_end_sph=(T)1.6;
             time_pour_end_pls=(T)1.12;
@@ -195,7 +197,6 @@ public:
     void Postprocess_Solids_Substep(const T time,const int substep) override {}
     void Extrapolate_Phi_Into_Objects(const T time) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

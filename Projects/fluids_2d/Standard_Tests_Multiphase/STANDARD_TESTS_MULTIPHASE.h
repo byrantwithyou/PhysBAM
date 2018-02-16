@@ -48,7 +48,6 @@ public:
     void Postprocess_Frame(const int frame) override {}
     void Postprocess_Phi(const T time) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initial_Phi
 //#####################################################################

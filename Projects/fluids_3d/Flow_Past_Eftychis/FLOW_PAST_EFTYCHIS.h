@@ -26,7 +26,8 @@ public:
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::data_directory;
     using BASE::solid_body_collection;using BASE::stream_type;using BASE::test_number;
-
+    using BASE::user_last_frame;
+    
     T flow_speed;
     int body;
     SPHERE<TV> source_sphere;
@@ -43,7 +44,8 @@ public:
         fluids_parameters.use_vorticity_confinement=true;fluids_parameters.confinement_parameter=(T).5;
         fluids_parameters.write_debug_data=true;
 
-        output_directory=LOG::sprintf("Flow_Past_Eftychis/Test_%d",test_number);
+        if(!this->user_output_directory)
+            output_directory=LOG::sprintf("Flow_Past_Eftychis/Test_%d",test_number);
 
         if(test_number==1){
             fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
@@ -70,8 +72,8 @@ public:
             fluids_parameters.confinement_parameter=(T).15;
         }
  
-        last_frame=600;
-        frame_rate=120;
+        if(!user_last_frame) last_frame=600;
+        if(!this->user_frame_rate) frame_rate=120;
         
         flow_speed=(T)1;
     }
@@ -91,7 +93,6 @@ public:
     void Initialize_Euler_State() override {}
     void Align_Deformable_Bodies_With_Rigid_Bodies() override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

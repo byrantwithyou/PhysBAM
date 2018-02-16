@@ -34,7 +34,7 @@ public:
     using BASE::dump_largest_eigenvector;using BASE::save_pressure;using BASE::use_polymer_stress;using BASE::pressure;
     using BASE::polymer_stress;using BASE::polymer_stress_coefficient;using BASE::inv_Wi;using BASE::max_iter;
     using BASE::test_system;using BASE::use_preconditioner;using BASE::solver_tolerance;
-
+    
     enum WORKAROUND{SLIP=-3,DIRICHLET=-2,NEUMANN=-1}; // From CELL_DOMAIN_INTERFACE_COLOR
 
     int test_number;

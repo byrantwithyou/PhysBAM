@@ -81,7 +81,7 @@ public:
         fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
         if(test_number==1 || test_number==2) fluids_parameters.domain_walls[0][1]=true;
         //time
-        initial_time=(T)0.;last_frame=1500;frame_rate=(T)100.;
+        initial_time=(T)0.;if(!user_last_frame) last_frame=1500;if(!this->user_frame_rate) frame_rate=(T)100.;
         fluids_parameters.cfl=cfl_number;
         fluids_parameters.compressible_use_sound_speed_for_cfl=use_sound_speed_based_cfl;
         if(multiplication_factor_for_sound_speed_based_dt>0){
@@ -100,10 +100,11 @@ public:
         fluids_parameters.compressible_timesplit=timesplit;
         fluids_parameters.compressible_perform_rungekutta_for_implicit_part=implicit_rk;
 
-        if(timesplit) output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x));
-        else output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_explicit",test_number,(fluids_parameters.grid->counts.x));
-        if(eno_scheme==2) output_directory+="_density_weighted";
-        else if(eno_scheme==3) output_directory+="_velocity_weighted";
+        if(!this->user_output_directory){
+            if(timesplit) output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x));
+            else output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_explicit",test_number,(fluids_parameters.grid->counts.x));
+            if(eno_scheme==2) output_directory+="_density_weighted";
+            else if(eno_scheme==3) output_directory+="_velocity_weighted";}
 
         state_in_conserved_variabbles=false;
         middle_state_start_point=0.5;right_state_start_point=0;
@@ -147,7 +148,6 @@ public:
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override {}
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Intialize_Advection
 //#####################################################################

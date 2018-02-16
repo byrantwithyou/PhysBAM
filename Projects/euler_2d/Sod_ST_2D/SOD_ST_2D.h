@@ -39,8 +39,11 @@ public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
 
-    using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::stream_type;
-    using BASE::data_directory;using BASE::solid_body_collection;using BASE::test_number;using BASE::resolution;
+    using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;
+    using BASE::output_directory;using BASE::fluids_parameters;
+    using BASE::solids_parameters;using BASE::stream_type;
+    using BASE::data_directory;using BASE::solid_body_collection;
+    using BASE::test_number;using BASE::resolution;using BASE::user_last_frame;
 
     SOLIDS_STANDARD_TESTS<TV> tests;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
@@ -83,7 +86,7 @@ public:
         fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
         if(test_number==3) fluids_parameters.domain_walls[0][1]=false;
         //time
-        initial_time=(T)0.;last_frame=1000;frame_rate=(T)80.;
+        initial_time=(T)0.;if(!user_last_frame) last_frame=1000;if(!this->user_frame_rate) frame_rate=(T)80.;
         fluids_parameters.cfl=cfl_number;
         //custom stuff . . . 
         fluids_parameters.compressible_eos=new EOS_GAMMA<T>;
@@ -110,15 +113,15 @@ public:
             solids_parameters.implicit_solve_parameters.cg_projection_iterations=0; // TODO: check this
             solids_parameters.implicit_solve_parameters.cg_iterations=400;}
 
-        if(timesplit) output_directory=LOG::sprintf("Sod_ST_2D/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-        else output_directory=LOG::sprintf("Sod_ST_2D/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-        if(eno_scheme==2) output_directory+="_density_weighted";
-        else if(eno_scheme==3) output_directory+="_velocity_weighted";
+        if(!this->user_output_directory){
+            if(timesplit) output_directory=LOG::sprintf("Sod_ST_2D/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+            else output_directory=LOG::sprintf("Sod_ST_2D/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+            if(eno_scheme==2) output_directory+="_density_weighted";
+            else if(eno_scheme==3) output_directory+="_velocity_weighted";}
     }
     
     virtual ~SOD_ST_2D() {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Intialize_Advection
 //#####################################################################

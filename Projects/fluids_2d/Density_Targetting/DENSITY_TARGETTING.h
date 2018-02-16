@@ -28,7 +28,8 @@ public:
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::data_directory;using BASE::fluid_collection;
     using BASE::solid_body_collection;using BASE::stream_type;using BASE::test_number;using BASE::resolution;
-
+    using BASE::user_last_frame;
+    
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
     FLUID_COLLISION_BODY_INACCURATE_UNION<TV> inaccurate_union;
     int sphere;
@@ -70,7 +71,7 @@ public:
     {
         parse_args.Parse();
         int cells=1*resolution;
-        frame_rate=24;
+        if(!this->user_frame_rate) frame_rate=24;
         restart=false;restart_frame=0;
         fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
         fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
@@ -87,11 +88,11 @@ public:
         fluids_parameters.use_vorticity_confinement_fuel=false;
         fluids_parameters.write_ghost_values=true;
         fluids_parameters.store_particle_ids=true;
-        first_frame=0;last_frame=1000;
+        first_frame=0;if(!user_last_frame) last_frame=1000;
 
         if(test_number==1 || test_number==4 || test_number==5 || test_number==6 || test_number==7) fluids_parameters.grid->Initialize(TV_INT(6*cells+1,12*cells+1),RANGE<TV>(TV(0,0),TV(1.5,3)));
         else if(test_number==2 || test_number==3){
-            frame_rate=100;
+            if(!this->user_frame_rate) frame_rate=100;
             fluids_parameters.number_particles_per_cell=16;
             fluids_parameters.grid->Initialize(TV_INT(12*cells+1,6*cells+1),RANGE<TV>(TV(0,0),TV(6,3)));}
         else{
@@ -99,7 +100,8 @@ public:
 
         GRID<TV>& grid=*fluids_parameters.grid;
 
-        output_directory=LOG::sprintf("Density_Targetting/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
+        if(!this->user_output_directory)
+            output_directory=LOG::sprintf("Density_Targetting/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
         
         fluids_parameters.use_sph_for_removed_negative_particles=true;
         particle_id=0;
@@ -249,7 +251,6 @@ public:
     void Postprocess_Solids_Substep(const T time,const int substep) override {}
     void Extrapolate_Phi_Into_Objects(const T time) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

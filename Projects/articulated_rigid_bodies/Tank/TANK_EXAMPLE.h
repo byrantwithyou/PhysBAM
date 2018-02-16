@@ -30,7 +30,8 @@ class TANK_EXAMPLE:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 public:
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::solids_parameters;using BASE::data_directory;using BASE::stream_type;
     using BASE::test_number;using BASE::solid_body_collection;using BASE::Set_External_Velocities; // silence -Woverloaded-virtual
-
+    using BASE::user_last_frame;
+    
     ARTICULATED_RIGID_BODY<TV>* arb;
     SOLIDS_STANDARD_TESTS<TV> tests;
     ARRAY<RIGID_BODY<TV>*> treads[2];
@@ -49,8 +50,8 @@ public:
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
         solids_parameters.cfl=(T).1;
         solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-        last_frame=2000;
-        frame_rate=24;
+        if(!user_last_frame) last_frame=2000;
+        if(!this->user_frame_rate) frame_rate=24;
         LOG::cout<<"Frame rate: "<<frame_rate<<std::endl;
         start_rolling=(T).8;
         accelerate_time=(T).8;
@@ -60,7 +61,8 @@ public:
         parse_args.Add("-tank_turn",&turn_in_place,"For the tank example, turn in place instead of move forward");
         parse_args.Parse();
         tests.data_directory=data_directory;
-        output_directory="Tank/output";
+        if(!this->user_output_directory)
+            output_directory="Tank/output";
     }
 
     virtual ~TANK_EXAMPLE()
@@ -81,7 +83,6 @@ public:
     void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
     void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Rigid_Bodies
 //#####################################################################

@@ -57,7 +57,8 @@ public:
         sample_points.Append(TV(3,2.25));
         sample_points.Append(TV(2,3));
 
-        output_directory="Flow_Past_Circle/output";
+        if(!this->user_output_directory)
+            output_directory="Flow_Past_Circle/output";
         debug_particles.template Add_Array<VECTOR<T,3> >("color");
 
         parse_args.Add("-viscosity",&fluids_parameters.viscosity,"value","viscosity");
@@ -119,7 +120,6 @@ public:
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override {}
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################

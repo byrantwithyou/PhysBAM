@@ -28,7 +28,8 @@ class RISING_SPHERE:public WATER_FREE_SURFACE_3D_EXAMPLE<T,RW>
 public:
     RISING_SPHERE() {
         initial_time=0.;
-        frame_rate=3*24;last_frame=12*frame_rate;
+        if(!this->user_frame_rate) frame_rate=3*24;
+        if(!user_last_frame) last_frame=12*frame_rate;
         restart_frame=0;
         m=30;n=60;mn=30;//m=84;n=60;mn=84;//105,75,105
         xmin=(T)0;xmax=(T)1;ymin=(T)0;ymax=(T)2;zmin=(T)0;zmax=(T)1;
@@ -38,7 +39,9 @@ public:
         use_removed_positive_particles=false;use_removed_negative_particles=false;
         second_order_pressure=true;
         write_levelset=true;write_velocity=true;write_removed_positive_particles=true;write_removed_negative_particles=true;write_particles=true;
-        matlab_directory="RISING_SPHERE/matlab"; output_directory="RISING_SPHERE/output";
+        matlab_directory="RISING_SPHERE/matlab";
+        if(!this->user_output_directory)
+            output_directory="RISING_SPHERE/output";
     }
 
     ~RISING_SPHERE() 

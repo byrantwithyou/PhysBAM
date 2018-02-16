@@ -41,22 +41,30 @@ void Initialize(const int test_number_input,const int resolution,const int resta
     int cells=1*resolution;
     if(test_number==11){
         fluids_parameters.domain_walls[2][2]=true;
-        example.first_frame=0;example.last_frame=500;example.frame_rate=250;
+        example.first_frame=0;
+        if(!example.user_last_frame) example.last_frame=500;
+        if(!example.user_frame_rate) example.frame_rate=250;
         grid.Initialize(TV_INT(10*cells+1,10*cells+1),RANGE<TV>(TV(0,0),TV((T).1,(T).1)));}
     if(test_number==12){
         fluids_parameters.domain_walls[2][2]=false;
         grid.Initialize(TV_INT(20*cells+1,15*cells+1),RANGE<TV>(TV((T)-.5,(T)-.5),TV((T)1.5,1)));}
     if(test_number==13){
         fluids_parameters.domain_walls[2][2]=true;
-        example.first_frame=0;example.last_frame=500;example.frame_rate=100;
+        example.first_frame=0;
+        if(!example.user_last_frame) example.last_frame=500;
+        if(!example.user_frame_rate) example.frame_rate=100;
         grid.Initialize(TV_INT(10*cells+1,10*cells+1),RANGE<TV>(TV(0,0),TV(2,2)));}
     if(test_number==14){
         fluids_parameters.domain_walls[2][2]=true;
-        example.first_frame=0;example.last_frame=20;example.frame_rate=400;
+        example.first_frame=0;
+        if(!example.user_last_frame) example.last_frame=20;
+        if(!example.user_frame_rate) example.frame_rate=400;
         grid.Initialize(TV_INT(20*cells+1,30*cells+1),RANGE<TV>(TV((T)-.01,(T)-.01),TV((T).01,(T).02)));}
     if(test_number==15){
         fluids_parameters.domain_walls[2][2]=true;
-        example.first_frame=0;example.last_frame=500;example.frame_rate=60;
+        example.first_frame=0;
+        if(!example.user_last_frame) example.last_frame=500;
+        if(!example.user_frame_rate) example.frame_rate=60;
         grid.Initialize(TV_INT(20*cells+1,10*cells+1),RANGE<TV>(TV(0,0),TV(1,(T).5)));
         world_to_source.Append(MATRIX<T,3>::Identity_Matrix());
         sources.Append(RANGE<TV>(TV((T).75,(T).45),TV((T).875,(T).6)));
@@ -67,12 +75,17 @@ void Initialize(const int test_number_input,const int resolution,const int resta
         source_velocity.Append(TV(0,0));
         source_region.Append(4);}
     if(test_number==16){
-        example.first_frame=0;example.last_frame=500;example.frame_rate=120;
+        example.first_frame=0;
+        if(!example.user_last_frame) example.last_frame=500;
+        if(!example.user_frame_rate) example.frame_rate=120;
         grid.Initialize(TV_INT(10*cells+1,11*cells+1),RANGE<TV>(TV(0,0),TV(1,(T)1.1)));}
     if(test_number==17){
-        example.first_frame=0;example.last_frame=500;example.frame_rate=250;
+        example.first_frame=0;
+        if(!example.user_last_frame) example.last_frame=500;
+        if(!example.user_frame_rate) example.frame_rate=250;
         grid.Initialize(TV_INT(10*cells+1,10*cells+1),RANGE<TV>(TV(0,0),TV((T).1,(T).1)));}
-    example.output_directory=LOG::sprintf("Standard_Tests_Multiphase/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
+    if(!example.user_output_directory)
+        example.output_directory=LOG::sprintf("Standard_Tests_Multiphase/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
     LOG::cout<<"output directory="<<example.output_directory<<std::endl;
 }
 //#####################################################################

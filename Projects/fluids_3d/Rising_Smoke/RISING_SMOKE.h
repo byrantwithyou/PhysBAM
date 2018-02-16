@@ -23,7 +23,7 @@ public:
     {
         start_frame=0;
         end_frame=200;
-        frame_rate=24;
+        if(!this->user_frame_rate) frame_rate=24;
         m=20;n=50;mn=50;
         xmin=(T)0;xmax=(T).8;ymin=(T)0;ymax=(T)2;zmin=(T)0;zmax=(T)2;
         use_vorticity_confinement=true;confinement_parameter=(T).3;
@@ -35,7 +35,8 @@ public:
         write_matlab_files=true;
         write_output_files=true;
         matlab_directory="Rising_Smoke/matlab";
-        output_directory="Rising_Smoke/output";
+        if(!this->user_output_directory)
+            output_directory="Rising_Smoke/output";
     }
 
     ~RISING_SMOKE()

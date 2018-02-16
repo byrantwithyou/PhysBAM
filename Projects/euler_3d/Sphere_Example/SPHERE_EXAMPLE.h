@@ -49,6 +49,7 @@ public:
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::solid_body_collection;using BASE::stream_type;
     using BASE::data_directory;using BASE::test_number;using BASE::resolution;using BASE::solids_evolution;
+    using BASE::user_last_frame;
     
     TV_DIMENSION state_inside,state_outside; // // (density,velocity_x,velocity_y,velocity_z,pressure)
     T shock_radius;
@@ -133,7 +134,7 @@ public:
         fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=false;
         fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=false;fluids_parameters.domain_walls[2][1]=false;
         //time
-        initial_time=(T)0.;last_frame=1000;frame_rate=(T)100.;
+        initial_time=(T)0.;if(!user_last_frame) last_frame=1000;if(!this->user_frame_rate) frame_rate=(T)100.;
         fluids_parameters.cfl=cfl_number;
         //custom stuff . . . 
         if(transition_to_incompressible){
@@ -171,16 +172,17 @@ public:
 
             solid_initial_position=TV((T).65,(T).11,(T)0);}
 
-        if(timesplit) output_directory=LOG::sprintf("Sphere_Example/Test_%d__Resolution_%d_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),
-            (fluids_parameters.grid->counts.y),(fluids_parameters.grid->counts.z));
-        else output_directory=LOG::sprintf("Sphere_Example/Test_%d__Resolution_%d_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y),
-            (fluids_parameters.grid->counts.z));
-        if(eno_scheme==2) output_directory+="_density_weighted";
-        else if(eno_scheme==3) output_directory+="_velocity_weighted";
-        if(use_slip) output_directory+="_slip";
-        if(transition_to_incompressible) output_directory+="_transition_incompressible";
-        if(use_fixed_farfield_boundary) output_directory+="_fixedFF";
-        output_directory+=LOG::sprintf("_mass_%f",solid_mass);
+        if(!this->user_output_directory){
+            if(timesplit) output_directory=LOG::sprintf("Sphere_Example/Test_%d__Resolution_%d_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),
+                (fluids_parameters.grid->counts.y),(fluids_parameters.grid->counts.z));
+            else output_directory=LOG::sprintf("Sphere_Example/Test_%d__Resolution_%d_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y),
+                (fluids_parameters.grid->counts.z));
+            if(eno_scheme==2) output_directory+="_density_weighted";
+            else if(eno_scheme==3) output_directory+="_velocity_weighted";
+            if(use_slip) output_directory+="_slip";
+            if(transition_to_incompressible) output_directory+="_transition_incompressible";
+            if(use_fixed_farfield_boundary) output_directory+="_fixedFF";
+            output_directory+=LOG::sprintf("_mass_%f",solid_mass);}
 
         state_inside=TV_DIMENSION((T)1,(T)0,(T)0,(T)0,(T)1);
         state_outside=TV_DIMENSION((T).125,(T)0,(T)0,(T)0,(T).1);
@@ -189,7 +191,6 @@ public:
     
     virtual ~SPHERE_EXAMPLE() {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Intialize_Advection
 //#####################################################################

@@ -141,7 +141,8 @@ public:
     using BASE::unit_p;using BASE::unit_J;using BASE::unit_rho;
     using BASE::backward_euler_evolution;using BASE::Add_Collision_Object;
     using BASE::rd_penalty_stiffness;using BASE::rd_penalty_friction;
-    
+    using BASE::user_last_frame;
+
     std::ofstream svout;
     SOLIDS_STANDARD_TESTS<TV> tests;
 
@@ -267,7 +268,8 @@ public:
         parse_args.Parse();
 
         LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
-        output_directory=LOG::sprintf("Test_%d",test_number);
+        if(!this->user_output_directory)
+            output_directory=LOG::sprintf("Test_%d",test_number);
         override_no_collisions=override_no_collisions&&!override_collisions;
         if(use_rand_seed) rand.Set_Seed(rand_seed);
         solids_parameters.implicit_solve_parameters.project_nullspace_frequency=project_nullspace;
@@ -280,6 +282,7 @@ public:
         ether_drag/=s;
         penalty_collisions_stiffness*=unit_J;
         density*=unit_rho;
+        if(!this->fixed_dt && !this->max_dt && !this->min_dt) this->fixed_dt=1;
 
         switch(test_number){
             case 17: case 18: case 24: case 25: case 27: case 11: case 23: case 57: case 77: case 80: case 8: case 12: case 13: case 67: case 68:
@@ -358,16 +361,16 @@ public:
                 // ./be_evolution 701 -no_collisions_in_solve -rd_stiffness 1e2
                 break;}
             case 2:
-                last_frame=600;
+                if(!user_last_frame) last_frame=600;
                 break;
             case 10:
                 attachment_velocity=6;
-                last_frame=330;
+                if(!user_last_frame) last_frame=330;
                 break;
             case 5:
             case 6:
             case 9:
-                last_frame=72;
+                if(!user_last_frame) last_frame=72;
                 solids_parameters.cfl=(T)5.9;
                 /* solids_parameters.implicit_solve_parameters.cg_iterations=100000; */
                 solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
@@ -377,7 +380,7 @@ public:
                 solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
                 solids_parameters.implicit_solve_parameters.cg_iterations=100000;
                 solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
-                last_frame=2000;
+                if(!user_last_frame) last_frame=2000;
                 break;
             case 24:
             case 25:
@@ -387,32 +390,32 @@ public:
                 solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
                 solids_parameters.implicit_solve_parameters.cg_iterations=100000;
                 solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
-                last_frame=2000;
+                if(!user_last_frame) last_frame=2000;
                 break;
             case 61:
                 solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
                 solids_parameters.implicit_solve_parameters.cg_iterations=100000;
                 solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
-                last_frame=360;
+                if(!user_last_frame) last_frame=360;
                 break;
             case 62: case 63:
                 solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
                 solids_parameters.implicit_solve_parameters.cg_iterations=100000;
                 solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
-                last_frame=2000;
+                if(!user_last_frame) last_frame=2000;
                 break;
             case 64: case 65:
                 solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
                 solids_parameters.implicit_solve_parameters.cg_iterations=100000;
                 solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
-                last_frame=120;
+                if(!user_last_frame) last_frame=120;
                 break;
             case 28:
                 attachment_velocity=0.4;
                 solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
                 solids_parameters.implicit_solve_parameters.cg_iterations=100000;
                 //solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
-                last_frame=1000;
+                if(!user_last_frame) last_frame=1000;
             case 29: case 4:
                 solids_parameters.cfl=(T)5;
                 solids_parameters.implicit_solve_parameters.cg_iterations=100000;
@@ -424,7 +427,7 @@ public:
                 solids_parameters.triangle_collision_parameters.perform_self_collision=override_collisions;//This gets turned off later then back on
                 //std::cout << "rame collisions are " << override_collisions << std::endl;
                 //}
-                last_frame=84;
+                if(!user_last_frame) last_frame=84;
                 break;
             case 30:
                 solids_parameters.cfl=(T)5;
@@ -436,7 +439,7 @@ public:
                 solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
                 solids_parameters.implicit_solve_parameters.cg_iterations=100000;
                 /* solids_parameters.triangle_collision_parameters.perform_self_collision=true; */
-                last_frame=500;
+                if(!user_last_frame) last_frame=500;
                 break;
             case 59:
             case 60:
@@ -444,7 +447,7 @@ public:
                 solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
                 solids_parameters.implicit_solve_parameters.cg_iterations=100000;
                 solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
-                last_frame=300;
+                if(!user_last_frame) last_frame=300;
                 break;
             case 32:
                 // solids_parameters.cfl=(T)5;
@@ -453,7 +456,7 @@ public:
                 solids_parameters.triangle_collision_parameters.perform_self_collision=true;
                 solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
                 solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
-                last_frame=4000;
+                if(!user_last_frame) last_frame=4000;
                 break;
             case 33:
                 solids_parameters.cfl=(T)10;
@@ -464,7 +467,7 @@ public:
                 solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
                 solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
                 solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
-                last_frame=600;
+                if(!user_last_frame) last_frame=600;
                 break;
             case 43:
             case 58:
@@ -476,13 +479,13 @@ public:
                 solids_parameters.triangle_collision_parameters.perform_self_collision=override_collisions;
                 solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=override_collisions;
                 solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=override_collisions;
-                last_frame=300;
+                if(!user_last_frame) last_frame=300;
                 break;
             case 34:
                 solids_parameters.cfl=(T)5;
                 solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
                 solids_parameters.implicit_solve_parameters.cg_iterations=100000;
-                last_frame=400;
+                if(!user_last_frame) last_frame=400;
                 break;
             case 35: case 36: //case 41:
                 solids_parameters.cfl=(T)5;
@@ -491,7 +494,7 @@ public:
                 solids_parameters.triangle_collision_parameters.perform_self_collision=true;
                 // solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
                 // solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
-                last_frame=1000;
+                if(!user_last_frame) last_frame=1000;
                 break;
             case 37:
             case 38:
@@ -504,7 +507,7 @@ public:
                 solids_parameters.implicit_solve_parameters.cg_iterations=100000;
                 solids_parameters.triangle_collision_parameters.perform_self_collision=true;
                 if (override_no_collisions) solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-                last_frame=250;
+                if(!user_last_frame) last_frame=250;
                 break;
             case 41:
                 solids_parameters.cfl=(T)5;
@@ -520,7 +523,7 @@ public:
                     solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
                     solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
                 }
-                last_frame=40;
+                if(!user_last_frame) last_frame=40;
                 break;
             case 52:
                 solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness=2e-4;
@@ -535,10 +538,10 @@ public:
                     solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
                     solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
                 }
-                last_frame=250;
+                if(!user_last_frame) last_frame=250;
                 break;
             case 47:
-                last_frame=480;
+                if(!user_last_frame) last_frame=480;
                 solids_parameters.triangle_collision_parameters.perform_self_collision=true;
                 //solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
                 //solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
@@ -546,7 +549,7 @@ public:
                 solids_parameters.implicit_solve_parameters.cg_iterations=100000;
                 break;
             case 49:
-                last_frame=480;
+                if(!user_last_frame) last_frame=480;
                 solids_parameters.triangle_collision_parameters.perform_self_collision=true;
                 //solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
                 //solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
@@ -571,7 +574,7 @@ public:
                 // solids_parameters.cfl=(T)5;
                 solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
                 solids_parameters.implicit_solve_parameters.cg_iterations=100000;
-                last_frame=120;
+                if(!user_last_frame) last_frame=120;
                 break;
             case 200:
             case 201:
@@ -579,7 +582,7 @@ public:
                 // solids_parameters.cfl=(T)5;
                 solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
                 solids_parameters.implicit_solve_parameters.cg_iterations=10;
-                last_frame=120;
+                if(!user_last_frame) last_frame=120;
                 break;
             default:
                 LOG::cerr<<"Parsing: Unrecognized test number "<<test_number<<std::endl;exit(1);}
@@ -595,8 +598,6 @@ public:
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;}
 
         solid_body_collection.Print_Residuals(use_residuals);
-
-        this->After_Construction();
     }
 
     virtual ~STANDARD_TESTS()
@@ -660,7 +661,6 @@ public:
             }
             Add_Debug_Object(VECTOR<TV,2>(c-t,c+t),VECTOR<T,3>(1,0,0));}
     }
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Get_Initial_Data
 //#####################################################################
@@ -761,7 +761,7 @@ void Get_Initial_Data()
             tests.Add_Ground();
             break;}
         case 11:{
-            last_frame=1200;
+            if(!user_last_frame) last_frame=1200;
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,1,0)*m));
             tests.Create_Mattress(mattress_grid,true,&initial_state,density);
             tests.Add_Ground();
@@ -795,7 +795,7 @@ void Get_Initial_Data()
             curves(0).Add_Control_Point(5,FRAME<TV>(TV(0,8,0)));
             curves(0).Add_Control_Point(6,FRAME<TV>(TV(0,8,0)));
             curves(0).Add_Control_Point(11,FRAME<TV>(TV(0,11,0)));
-            last_frame=250;
+            if(!user_last_frame) last_frame=250;
             break;}
         case 17:
         case 18:
@@ -826,7 +826,7 @@ void Get_Initial_Data()
                 curves(0).Add_Control_Point(start+freq*ind,FRAME<TV>(TV(radius*sin(2.0*pi*freq*ind/period),radius*cos(2.0*pi*freq*ind/period),0)));
                 curves(1).Add_Control_Point(start+freq*ind,FRAME<TV>(TV(-radius*sin(2.0*pi*freq*ind/period),-radius*cos(2.0*pi*freq*ind/period),0)));
             }
-            last_frame=1000;
+            if(!user_last_frame) last_frame=1000;
             break;}
         case 30: {
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)-90,(T)6,(T)11)*m)),true,true,density,1.0*m);
@@ -834,7 +834,7 @@ void Get_Initial_Data()
             box1.Frame().t=TV(19,10,10)*m;
             box1.is_static=true;
             tests.Add_Ground(1.0);
-            last_frame=480;
+            if(!user_last_frame) last_frame=480;
             break;}
         case 31: {
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_110K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)0.373,(T)0)*m)),true,true,density,.005*m);
@@ -1331,7 +1331,7 @@ void Get_Initial_Data()
             torus1.coefficient_of_friction=0.00;
             torus1.Frame().t=TV(10,10,0)*m;
             torus1.Frame().r=ROTATION<TV>((T)pi/2.0,TV(0,1,0));
-            last_frame=240;
+            if(!user_last_frame) last_frame=240;
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",
                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,10,0)*m,ROTATION<TV>(T(pi),TV(0,1,0)))),true,true,density,m);
             tests.Add_Ground(1);
@@ -1370,7 +1370,7 @@ void Get_Initial_Data()
             torus1.coefficient_of_friction=0.05;
             torus1.Frame().t=start;
             torus1.Frame().r=ROTATION<TV>((T)pi/2.0,TV(0,1,0));
-            last_frame=240;
+            if(!user_last_frame) last_frame=240;
             RIGID_BODY<TV>& torus2=tests.Add_Analytic_Torus((outer-inner)/2,(outer+inner)/2,32,64);
             //torus2.is_static=true;
             torus2.coefficient_of_friction=0.05;
@@ -1378,7 +1378,7 @@ void Get_Initial_Data()
             torus2.Frame().r=ROTATION<TV>((T)pi/2.0,TV(0,1,0));
            // Add_Joint(1,2,new POINT_JOINT<TV>,FRAME<TV>(TV(15,10,0)));// ropes
 
-            /*last_frame=240;
+            /*if(!user_last_frame) last_frame=240;
             RIGID_BODY<TV>& shell=tests.Add_Analytic_Shell(length,outer,inner,64);
             shell.is_static=true;
             shell.coefficient_of_friction=0.05;
@@ -1400,13 +1400,13 @@ void Get_Initial_Data()
             torus1.coefficient_of_friction=0.05;
             torus1.Frame().t=start;
             torus1.Frame().r=ROTATION<TV>((T)pi/2.0,TV(0,1,0));
-            last_frame=240;
+            if(!user_last_frame) last_frame=240;
             RIGID_BODY<TV>& torus2=tests.Add_Analytic_Torus((outer-inner)/2,(outer+inner)/2,32,64);
             torus2.is_static=true;
             torus2.coefficient_of_friction=0.05;
             torus2.Frame().t=start+TV(length,0,0);
             torus2.Frame().r=ROTATION<TV>((T)pi/2.0,TV(0,1,0));
-            last_frame=240;
+            if(!user_last_frame) last_frame=240;
             RIGID_BODY<TV>& shell=tests.Add_Analytic_Shell(length,outer,inner,64);
             shell.is_static=true;
             shell.coefficient_of_friction=0.05;
@@ -1727,7 +1727,7 @@ void Get_Initial_Data()
             curves.Resize(1);
             curves(0).Add_Control_Point(0,FRAME<TV>(TV(0,2,0)));
             curves(0).Add_Control_Point(10,FRAME<TV>(TV(0,0,0)));
-            last_frame=300;
+            if(!user_last_frame) last_frame=300;
             break;}
         case 80:{
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,4,0)*m));

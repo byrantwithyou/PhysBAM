@@ -28,7 +28,8 @@ public:
     using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
     using BASE::stream_type;using BASE::write_substeps_level;using BASE::solid_body_collection;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Set_External_Positions;using BASE::Zero_Out_Enslaved_Velocity_Nodes; // silence -Woverloaded-virtual
-
+    using BASE::user_last_frame;
+    
     ARRAY<TV> init_positions_start,init_positions_end;
     ARRAY<int> active_particles;
     ARRAY<int> fixed_nodes_start,fixed_nodes_end;
@@ -75,7 +76,6 @@ public:
     void Preprocess_Solids_Substep(const T time,const int substep) override;    
     void Postprocess_Frame(const int frame) override;
     void Write_Output_Files(const int frame) const override;
-    void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 };
 }

@@ -29,7 +29,8 @@ public:
     using BASE::restart_frame;using BASE::output_directory;using BASE::solids_parameters;using BASE::write_last_frame;
     using BASE::solid_body_collection;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
-
+    using BASE::user_last_frame;
+    
     SOLIDS_STANDARD_TESTS<TV> tests;
     SEGMENT_MESH segment_mesh;
 
@@ -53,7 +54,6 @@ public:
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) override {}
     void Postprocess_Frame(const int frame) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Initialize_Bodies
 //#####################################################################
@@ -64,9 +64,10 @@ void Initialize_Bodies() override
 
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-    last_frame=1000;
-    frame_rate=24;
-    output_directory="Rigid_Particle_Spheres/output";
+    if(!user_last_frame) last_frame=1000;
+    if(!this->user_frame_rate) frame_rate=24;
+    if(!this->user_output_directory)
+        output_directory="Rigid_Particle_Spheres/output";
     solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-6;
     solids_parameters.implicit_solve_parameters.cg_iterations=500;
     segment_mesh.elements.Resize(1);

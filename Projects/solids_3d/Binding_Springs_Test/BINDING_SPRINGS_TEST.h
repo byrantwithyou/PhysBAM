@@ -30,7 +30,8 @@ public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions;using BASE::solid_body_collection; // silence -Woverloaded-virtual
-
+    using BASE::user_last_frame;
+    
     SOLIDS_STANDARD_TESTS<TV> tests;
 
     SEGMENT_MESH spring_segment_mesh;
@@ -65,7 +66,6 @@ public:
     void Preprocess_Solids_Substep(const T time,const int substep) override {}
     void Postprocess_Solids_Substep(const T time,const int substep) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Get_Initial_Data
 //#####################################################################
@@ -105,10 +105,11 @@ void Initialize_Bodies() override
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
-    output_directory=LOG::sprintf("Binding_Springs_Test/Test_%d",test_number);
-    frame_rate=24;
+    if(!this->user_output_directory)
+        output_directory=LOG::sprintf("Binding_Springs_Test/Test_%d",test_number);
+    if(!this->user_frame_rate) frame_rate=24;
     solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-6;
-    last_frame=200;
+    if(!user_last_frame) last_frame=200;
     solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
     solids_parameters.cfl=1;
 

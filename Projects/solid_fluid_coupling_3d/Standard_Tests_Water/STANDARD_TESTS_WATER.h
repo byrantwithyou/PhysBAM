@@ -69,7 +69,8 @@ public:
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
     using BASE::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization;using BASE::test_number;using BASE::mpi_world;using BASE::resolution;
     using BASE::Add_Volumetric_Body_To_Fluid_Simulation;using BASE::Add_To_Fluid_Simulation;using BASE::Add_Thin_Shell_To_Fluid_Simulation;using BASE::solids_evolution;
-
+    using BASE::user_last_frame;
+    
     WATER_STANDARD_TESTS_3D<TV> water_tests;
     SOLIDS_STANDARD_TESTS<TV> solids_tests;
     GRID<TV> mattress_grid;
@@ -134,7 +135,7 @@ public:
         water_tests.Initialize(Water_Test_Number(test_number),resolution);
 
         LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
-        last_frame=1000;
+        if(!user_last_frame) last_frame=1000;
 
         solids_parameters.triangle_collision_parameters.perform_self_collision=false;
         solids_parameters.rigid_body_collision_parameters.use_push_out=false;
@@ -151,7 +152,8 @@ public:
         solids_parameters.rigid_body_evolution_parameters.maximum_rigid_body_time_step_fraction=(T)1;
 
         if(solid_node || !mpi) solids_parameters.use_rigid_deformable_contact=true;
-        output_directory=LOG::sprintf("Standard_Tests_Water/Test_%d_Resolution_%d_Stiffness_%d_Suboption_%d",test_number,resolution,stiffness_ratio,sub_test);
+        if(!this->user_output_directory)
+            output_directory=LOG::sprintf("Standard_Tests_Water/Test_%d_Resolution_%d_Stiffness_%d_Suboption_%d",test_number,resolution,stiffness_ratio,sub_test);
         
         fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][0]=false;
         fluids_parameters.density=(T)1000;
@@ -160,7 +162,7 @@ public:
         switch(test_number){
             case 15:
             case 1:
-                last_frame=240;
+                if(!user_last_frame) last_frame=240;
                 fluids_parameters.density=(T)1000;
                 solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
                 mattress_grid=GRID<TV>(TV_INT(sub_test*20,sub_test*5,sub_test*20),RANGE<TV>(TV((T).3,(T).6,(T).3),TV((T).7,(T).72,(T).7)));
@@ -171,7 +173,7 @@ public:
                 break;
             case 2:
                 fluids_parameters.density=(T)10;
-                last_frame=100;
+                if(!user_last_frame) last_frame=100;
                 fluids_parameters.reseeding_frame_rate=5;
                 fluids_parameters.domain_walls[1][1]=false;
                 /* 
@@ -287,7 +289,7 @@ public:
                 PHYSBAM_ASSERT(fluids_parameters.grid->dX.x==fluids_parameters.grid->dX.y && fluids_parameters.grid->dX.y==fluids_parameters.grid->dX.z);
                 break;
             case 10:
-                last_frame=500;
+                if(!user_last_frame) last_frame=500;
                 fluids_parameters.density=(T)1000;
                 solids_parameters.implicit_solve_parameters.cg_iterations=400;
                 fluids_parameters.grid->Initialize(TV_INT(40*resolution+1,15*resolution+1,10*resolution+1),RANGE<TV>(TV((T)-2,(T)0,(T)-.5),TV((T)2,(T)1.5,(T).5)));
@@ -311,10 +313,10 @@ public:
                 bag_curve.Add_Control_Point(0,(T)0);bag_curve.Add_Control_Point((T)1.79,(T)1.3425);bag_curve.Add_Control_Point((T)10.,(T)1.3425);
                 break;
             case 12:
-                frame_rate=96;
+                if(!this->user_frame_rate) frame_rate=96;
                 fluids_parameters.reincorporate_removed_particle_velocity=true;
                 fluids_parameters.removed_particle_mass_scaling=60;
-                last_frame=2000;
+                if(!user_last_frame) last_frame=2000;
                 fluids_parameters.reseeding_frame_rate=3;
                 solids_parameters.implicit_solve_parameters.cg_iterations=200;
                 fluids_parameters.grid->Initialize(TV_INT(15*resolution+1,15*resolution+1,10*resolution+1),RANGE<TV>(TV((T)0,(T)0,(T)0),TV((T)1.5,(T)1.5,(T)1)));
@@ -334,7 +336,7 @@ public:
                 solids_parameters.implicit_solve_parameters.cg_projection_iterations=0;
                 solids_parameters.implicit_solve_parameters.cg_iterations=500;
                 solid_density=(T)1200;
-                frame_rate=48;
+                if(!this->user_frame_rate) frame_rate=48;
                 fluids_parameters.grid->Initialize(TV_INT(20*resolution+1,25*resolution+1,20*resolution+1),RANGE<TV>(TV((T)-1,(T)0,(T)-1),TV((T)1,(T)2.5,(T)1)));
                 fluids_parameters.domain_walls[1][1]=false;
                 initial_fluid_height=(T).45*(T)2.5;
@@ -349,20 +351,20 @@ public:
                 solids_parameters.implicit_solve_parameters.cg_iterations=500;
                 //solid_density=(T)1200;
                 solid_density=(T)1900;
-                frame_rate=48;
+                if(!this->user_frame_rate) frame_rate=48;
                 fluids_parameters.grid->Initialize(TV_INT(20*resolution+1,25*resolution+1,20*resolution+1),RANGE<TV>(TV((T)-1,(T)0,(T)-1),TV((T)1,(T)2.5,(T)1)));
                 fluids_parameters.domain_walls[1][1]=false;
                 initial_fluid_height=(T).45*(T)2.5;
                 break;
             case 21:
-                last_frame=500;
+                if(!user_last_frame) last_frame=500;
                 initial_fluid_height=(T).4;
                 light_sphere_initial_height=(T).8;
                 fluids_parameters.grid->Initialize(TV_INT(15*resolution+1,20*resolution+1,10*resolution+1),RANGE<TV>(TV((T)0,(T)0,(T)0),TV((T)1.5,(T)2,(T)1)));
                 break;
             case 18:
-                frame_rate=48;
-                last_frame=250;
+                if(!this->user_frame_rate) frame_rate=48;
+                if(!user_last_frame) last_frame=250;
                 fluids_parameters.density=(T)100;
 //                solid_density=(T)6;                // This appears to be close to buoyancy; a little on the heavy side...
                 solid_density=(T)1;
@@ -385,8 +387,8 @@ public:
                 fountain_source_velocity.Append(TV((T).5,(T)0,(T)0));
                 break;
             case 19:
-                frame_rate=48;
-                last_frame=250;
+                if(!this->user_frame_rate) frame_rate=48;
+                if(!user_last_frame) last_frame=250;
                 solid_density=(T)35;                // This appears to be close to buoyancy; a little on the heavy side...
                 fluids_parameters.grid->Initialize(TV_INT(20*resolution+1,20*resolution+1,20*resolution+1),RANGE<TV>(TV((T)-1,(T)0,(T)-1),TV((T)1,(T)2,(T)1)));
                 solids_parameters.use_rigid_deformable_contact=false;
@@ -404,8 +406,8 @@ public:
                 fountain_source_velocity.Append(TV((T)1,(T)0,(T)0));
                 break;
             case 20:
-                frame_rate=48;
-                last_frame=250;
+                if(!this->user_frame_rate) frame_rate=48;
+                if(!user_last_frame) last_frame=250;
                 solid_density=(T)35;                // This appears to be close to buoyancy; a little on the heavy side...
                 fluids_parameters.grid->Initialize(TV_INT(20*resolution+1,20*resolution+1,10*resolution+1),RANGE<TV>(TV((T)-1,(T)0,(T)-.5),TV((T)1,(T)2,(T).5)));
                 solids_parameters.use_rigid_deformable_contact=false;
@@ -453,7 +455,6 @@ public:
     void Extrapolate_Phi_Into_Objects(const T time) override {}
     void Get_Source_Reseed_Mask(ARRAY<bool,TV_INT>*& cell_centered_mask,const T time) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Update_Solids_Parameters
 //#####################################################################

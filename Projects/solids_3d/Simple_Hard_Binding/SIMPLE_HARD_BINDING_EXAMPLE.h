@@ -37,7 +37,8 @@ public:
     using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
     using BASE::stream_type;using BASE::solid_body_collection;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
-
+    using BASE::user_last_frame;
+    
     SOLIDS_STANDARD_TESTS<TV> tests;
     TRIANGULATED_SURFACE<T>* surface;
     RED_GREEN_TRIANGLES<TV>* redgreen;
@@ -78,7 +79,6 @@ public:
     void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
     
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Redgreen
 //#####################################################################
@@ -87,9 +87,10 @@ void Initialize_Redgreen()
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
-    output_directory="Simple_Hard_Binding/output";
-    last_frame=120;
-    frame_rate=24;
+    if(!this->user_output_directory)
+        output_directory="Simple_Hard_Binding/output";
+    if(!user_last_frame) last_frame=120;
+    if(!this->user_frame_rate) frame_rate=24;
     solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-5;
     solids_parameters.implicit_solve_parameters.cg_iterations=1000;
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;

@@ -28,7 +28,7 @@ public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::data_directory;
-    using BASE::test_number;using BASE::resolution;
+    using BASE::test_number;using BASE::resolution;using BASE::user_last_frame;
 
     ARRAY<SPHERE<TV> > sources;
     T source_end_time;
@@ -41,7 +41,7 @@ public:
         parse_args.Parse();
 
         // set up the standard fluid environment
-        frame_rate=30;
+        if(!this->user_frame_rate) frame_rate=30;
         restart=false;restart_frame=0;
         fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
         fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
@@ -65,13 +65,14 @@ public:
         fluids_parameters.use_dsd=true;
 
         int cells=1*resolution;
-        first_frame=0;last_frame=10;
+        first_frame=0;if(!user_last_frame) last_frame=10;
         GRID<TV>& grid=*fluids_parameters.grid;
         grid.Initialize(TV_INT(10*cells+1,10*cells+1,10*cells+1),RANGE<TV>(TV(0,0,0),TV(8,8,8)));
 
-        last_frame=1000;
+        if(!user_last_frame) last_frame=1000;
         
-        output_directory=LOG::sprintf("DSD_No_Navier_Stokes/DSD_No_Navier_Stokes_%d__Resolution_%d_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1),(grid.counts.z-1));
+        if(!this->user_output_directory)
+            output_directory=LOG::sprintf("DSD_No_Navier_Stokes/DSD_No_Navier_Stokes_%d__Resolution_%d_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1),(grid.counts.z-1));
         LOG::cout<<"Running DSD simulation to "<<output_directory<<std::endl;
 
         //sources
@@ -99,7 +100,6 @@ public:
     bool Adjust_Phi_With_Sources(const T time) override {return false;}
     void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

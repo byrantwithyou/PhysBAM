@@ -25,6 +25,7 @@ public:
     using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
     using BASE::stream_type;using BASE::solid_body_collection;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes; // silence -Woverloaded-virtual
+    using BASE::user_last_frame;
     
     std::ofstream volume_output_file;
     SOLIDS_STANDARD_TESTS<TV> tests;
@@ -46,7 +47,6 @@ public:
         volume_output_file.close();
     }
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################
@@ -58,23 +58,25 @@ void Initialize_Bodies() override
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
-    frame_rate=24;
-    last_frame=240;
+    if(!this->user_frame_rate) frame_rate=24;
+    if(!user_last_frame) last_frame=240;
     solids_parameters.verbose_dt=true;
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
     
     switch(test_number){
         case 1:
             solids_parameters.cfl=(T)10;
-            last_frame=(int)(10*frame_rate);
+            if(!user_last_frame) last_frame=(int)(10*frame_rate);
             break;
         case 2:
             solids_parameters.cfl=(T)10;
             solids_parameters.deformable_object_collision_parameters.collide_with_interior=true;
-            last_frame=(int)(5*frame_rate);
+            if(!    
+user_last_frame) last_frame=(int)(5*frame_rate);
             break;
     }
-    output_directory=LOG::sprintf("Hair_Tests/Test_%d",test_number);
+    if(!this->user_output_directory)
+        output_directory=LOG::sprintf("Hair_Tests/Test_%d",test_number);
     LOG::cout<<"output_directory="<<output_directory<<std::endl;
     volume_output_file.open("/home/mlentine/volumes.txt");
     

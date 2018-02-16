@@ -53,7 +53,8 @@ public:
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::solids_fluids_parameters;
     using BASE::stream_type;using BASE::data_directory;using BASE::solid_body_collection;using BASE::test_number;using BASE::resolution;
     using BASE::solids_evolution;using BASE::Add_To_Fluid_Simulation;
-
+    using BASE::user_last_frame;
+    
     SOLIDS_STANDARD_TESTS<TV> tests;
 
     TV_DIMENSION state_inside,state_outside; // // (density,velocity_x,velocity_y,pressure)
@@ -188,10 +189,10 @@ public:
             fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
             fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;}
         //time
-        initial_time=(T)0.;last_frame=1000;frame_rate=(T)32.;
+        initial_time=(T)0.;if(!user_last_frame) last_frame=1000;if(!this->user_frame_rate) frame_rate=(T)32.;
         if(strong_shock) frame_rate=2e4;
         if(test_number==10){
-            last_frame=1000;frame_rate=1.25e5;}
+            if(!user_last_frame) last_frame=1000;if(!this->user_frame_rate) frame_rate=1.25e5;}
         fluids_parameters.cfl=cfl_number;
         //custom stuff . . . 
         e_min_for_clamping=1e-6;
@@ -312,23 +313,23 @@ public:
             fluids_parameters.temperature_boundary=new BOUNDARY_REFLECTION_ATTENUATION<TV,T>(Complement(fluids_parameters.domain_walls),fluids_parameters.ambient_temperature,(T).1);}
 
         // Set output directory
-        if(timesplit) output_directory=LOG::sprintf("Circle_Example/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-        else output_directory=LOG::sprintf("Circle_Example/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-        if(eno_scheme==2) output_directory+="_density_weighted";
-        else if(eno_scheme==3) output_directory+="_velocity_weighted";
-        if(use_slip) output_directory+="_slip";
-        if(transition_to_incompressible)  output_directory+="_transition_incompressible";
-        if(use_soot) output_directory+="_soot";
-        if(use_fixed_farfield_boundary) output_directory+="_fixedFF";
-        if(strong_shock) output_directory+="_strong";
-        output_directory+=LOG::sprintf("_mass_%f",solid_mass);
+        if(!this->user_output_directory){
+            if(timesplit) output_directory=LOG::sprintf("Circle_Example/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+            else output_directory=LOG::sprintf("Circle_Example/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+            if(eno_scheme==2) output_directory+="_density_weighted";
+            else if(eno_scheme==3) output_directory+="_velocity_weighted";
+            if(use_slip) output_directory+="_slip";
+            if(transition_to_incompressible)  output_directory+="_transition_incompressible";
+            if(use_soot) output_directory+="_soot";
+            if(use_fixed_farfield_boundary) output_directory+="_fixedFF";
+            if(strong_shock) output_directory+="_strong";
+            output_directory+=LOG::sprintf("_mass_%f",solid_mass);}
     }
 
     virtual ~CIRCLE_EXAMPLE() {}
 
     void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Intialize_Advection
 //#####################################################################

@@ -21,14 +21,13 @@ MAGNETS_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
 {
     parse_args.Parse();
     tests.data_directory=data_directory;
-    output_directory="Magnets/output";
+    if(!this->user_output_directory)
+        output_directory="Magnets/output";
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
-    last_frame=500;
-    frame_rate=24*4;
+    if(!user_last_frame) last_frame=500;
+    if(!this->user_frame_rate) frame_rate=24*4;
     std::cout<<"Frame rate: "<<frame_rate<<std::endl;
-
-    write_last_frame=true;
 
     rg.Set_Seed(2118);
 }

@@ -51,7 +51,6 @@ int main(int argc,char* argv[])
     else if(opt_drop) example=new INCOMPRESSIBLE_DROP<T>(stream_type,parse_args);
     else example=new STANDARD_TESTS<T>(stream_type,parse_args); //default
     example->mpi_world=new MPI_WORLD(parse_args);
-    example->After_Construction();
 
     if(example->mpi_world->initialized){
         example->solids_fluids_parameters.mpi_solid_fluid=new MPI_SOLID_FLUID<TV>();

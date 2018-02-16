@@ -31,7 +31,7 @@ public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::data_directory;
-    using BASE::solid_body_collection;using BASE::stream_type;using BASE::test_number;using BASE::resolution;
+    using BASE::solid_body_collection;using BASE::stream_type;using BASE::test_number;using BASE::resolution;using BASE::user_last_frame;
 
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
     FLUID_COLLISION_BODY_INACCURATE_UNION<TV> inaccurate_union;
@@ -46,9 +46,9 @@ public:
 
         int cells=1*resolution;
         // set up the standard fluid environment
-        frame_rate=24;
+        if(!this->user_frame_rate) frame_rate=24;
         restart=false;restart_frame=0;
-        first_frame=0;last_frame=300;frame_rate=400;
+        first_frame=0;if(!user_last_frame) last_frame=300;if(!this->user_frame_rate) frame_rate=400;
         fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
         fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
         fluids_parameters.number_particles_per_cell=16;
@@ -79,7 +79,8 @@ public:
         GRID<TV>& grid=*fluids_parameters.grid;
         grid.Initialize(TV_INT(10*cells+1,20*cells+1,10*cells+1),RANGE<TV>(TV((T)-.01,(T)-.01,(T)-.01),TV((T).01,(T).02,(T).01)));
 
-        output_directory=LOG::sprintf("Two_Phase/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
+        if(!this->user_output_directory)
+            output_directory=LOG::sprintf("Two_Phase/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
         LOG::cout<<"output directory="<<output_directory<<std::endl;
 
         // set example-specific parameters
@@ -99,7 +100,6 @@ public:
     void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,3> >*& cell_centered_mask,const T time) override {}
     void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initial_Phi
 //#####################################################################

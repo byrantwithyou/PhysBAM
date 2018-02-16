@@ -64,8 +64,8 @@ STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-rand",&rand,"rand","rand");
     parse_args.Parse();
     solids_tests.data_directory=data_directory;
-    last_frame=100;
-    frame_rate=24;
+    if(!user_last_frame) last_frame=100;
+    if(!this->user_frame_rate) frame_rate=24;
 
     frame_rate/=s;
 
@@ -153,7 +153,8 @@ STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
         
     THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Rigid_Body_Walls(*this);
-    output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d",test_number,resolution);
+    if(!this->user_output_directory)
+        output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d",test_number,resolution);
 }
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -163,8 +164,6 @@ template<class T> STANDARD_TESTS<T>::
 {
     delete deformable_collisions;
 }
-template<class T> void STANDARD_TESTS<T>::
-After_Initialization() {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

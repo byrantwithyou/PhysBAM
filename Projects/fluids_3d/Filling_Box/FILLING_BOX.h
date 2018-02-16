@@ -22,7 +22,7 @@ CYLINDER<T> source;VECTOR<T,3> source_velocity;
     FILLING_BOX() 
         :SOLIDS_FLUIDS_EXAMPLE_3D<RW>(fluids_parameters.WATER),source(VECTOR<T,3>(0,(T).75,(T).5),VECTOR<T,3>((T).05,(T).75,(T).5),(T).1),source_velocity((T)2,0,0)
     {
-        first_frame=0;last_frame=1000;frame_rate=24;
+        first_frame=0;if(!user_last_frame) last_frame=1000;if(!this->user_frame_rate) frame_rate=24;
         restart=false;restart_frame=0;
         fluids_parameters.grid.Initialize(TV_INT(76,51,51),RANGE<TV>(TV(0,0,0),TV(1.5,1,1)));
         fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
@@ -33,7 +33,8 @@ CYLINDER<T> source;VECTOR<T,3> source_velocity;
         fluids_parameters.write_levelset=true;fluids_parameters.write_velocity=true;fluids_parameters.write_particles=true;
         fluids_parameters.write_removed_positive_particles=false;fluids_parameters.write_removed_negative_particles=false;
         fluids_parameters.write_debug_data=true;
-        output_directory="Filling_Box/output";
+        if(!this->user_output_directory)
+            output_directory="Filling_Box/output";
         fluids_parameters.delete_fluid_inside_objects=true;
         fluids_parameters.enforce_divergence_free_extrapolation=false;
     }

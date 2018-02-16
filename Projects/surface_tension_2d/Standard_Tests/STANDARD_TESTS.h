@@ -146,7 +146,6 @@ public:
 //#####################################################################
     void Postprocess_Substep(const T dt,const T time) override;
     void Postprocess_Frame(const int frame) override;
-    void After_Initialization() override;
     void Initialize_Advection() override;
     void Initialize_Phi() override;
     void Preprocess_Substep(const T dt,const T time) override;

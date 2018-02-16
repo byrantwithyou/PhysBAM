@@ -71,7 +71,6 @@ public:
     void Initialize_Euler_State() override {}
     void Align_Deformable_Bodies_With_Rigid_Bodies() override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initial_Advection
 //#####################################################################

@@ -46,7 +46,8 @@ public:
     typedef BOUNDARY<TV,TV_DIMENSION> BASE_BOUNDARY;
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::stream_type;
     using BASE::data_directory;using BASE::solid_body_collection;using BASE_BOUNDARY::Boundary;using BASE::test_number;using BASE::resolution;
-
+    using BASE::user_last_frame;
+    
     SOLIDS_STANDARD_TESTS<TV> tests;
     T rho_initial,u_vel_initial,v_vel_initial,p_initial,velocity_uniform;
     T wall_thickness;
@@ -104,9 +105,9 @@ public:
         if(test_number==4){fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;}
         if(test_number==7){fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;}
         //time
-        initial_time=(T)0.;last_frame=1000;frame_rate=(T)80.;
-        if(test_number==1) last_frame=320;
-        if(test_number==7) last_frame=16;
+        initial_time=(T)0.;if(!user_last_frame) last_frame=1000;if(!this->user_frame_rate) frame_rate=(T)80.;
+        if(test_number==1) if(!user_last_frame) last_frame=320;
+        if(test_number==7) if(!user_last_frame) last_frame=16;
         fluids_parameters.cfl=cfl_number;
         //custom stuff . . . 
         fluids_parameters.compressible_eos = new EOS_GAMMA<T>;
@@ -125,17 +126,17 @@ public:
         fluids_parameters.compressible_timesplit=timesplit;
 
         wall_thickness=(T).1;
-        if(timesplit)
-            output_directory=LOG::sprintf("Wind_Tunnel/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-        else
-            output_directory=LOG::sprintf("Wind_Tunnel/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-        if(eno_scheme==2) output_directory+="_density_weighted";
-        else if(eno_scheme==3) output_directory+="_velocity_weighted";
+        if(!this->user_output_directory){
+            if(timesplit)
+                output_directory=LOG::sprintf("Wind_Tunnel/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+            else
+                output_directory=LOG::sprintf("Wind_Tunnel/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+            if(eno_scheme==2) output_directory+="_density_weighted";
+            else if(eno_scheme==3) output_directory+="_velocity_weighted";}
     }
     
     virtual ~WIND_TUNNEL() {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Intialize_Advection
 //#####################################################################

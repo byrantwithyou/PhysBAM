@@ -94,7 +94,6 @@ public:
     void Write_Output_Files(const int frame) const override;
     void Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time) override;
     void Log_Parameters() const override;
-    void After_Construction() override;
     void Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,
         const T time) override;
     virtual void Update_Fluid_Parameters(const T dt,const T time);
@@ -120,7 +119,6 @@ public:
     virtual void Melting_Substep(const T dt,const T time){}
     virtual void Modify_Fluid_For_Melting(const T dt,const T time){}
     virtual void Update_Melting_Substep_Parameters(const T dt,const T time){}
-    void After_Initialization() override;
     template<class T_MPI> void Adjust_Output_Directory_For_MPI(const T_MPI mpi);
     virtual void Set_Boundary_Conditions_Callback(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,ARRAY<T,TV_INT>& psi_D_value,
         ARRAY<T,FACE_INDEX<TV::m> >& psi_N_value) const {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}

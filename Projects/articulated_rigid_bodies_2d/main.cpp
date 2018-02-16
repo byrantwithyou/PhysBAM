@@ -31,7 +31,6 @@ int main(int argc,char** argv)
 
     if(opt_arb) example=new ARB_EXAMPLE<float>(stream_type,parse_args);
     else example=new STANDARD_TESTS<T>(stream_type,parse_args);
-    example->After_Construction();
 
     SOLIDS_DRIVER<TV> driver(*example);
     driver.Execute_Main_Program();

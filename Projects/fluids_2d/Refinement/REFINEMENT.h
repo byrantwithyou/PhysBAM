@@ -20,7 +20,8 @@ public:
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::write_output_files;
     using BASE::output_directory;using BASE::restart;using BASE::restart_frame;using BASE::data_directory;using BASE::fluid_collection;using BASE::solid_body_collection;
     using BASE::resolution;using BASE::test_number;using BASE::Get_Object_Velocities; // silence -Woverloaded-virtual
-
+    using BASE::user_last_frame;
+    
     SMOKE_STANDARD_TESTS_2D<TV> tests;
     T angle_fraction;
 
@@ -31,9 +32,10 @@ public:
         parse_args.Add("-angle_fraction",&angle_fraction,"fraction","Angle fraction");
         parse_args.Parse();
         tests.Initialize(test_number,resolution,angle_fraction);
-        output_directory="Refinement/output";
+        if(!this->user_output_directory)
+            output_directory="Refinement/output";
         *fluids_parameters.grid=tests.grid;
-        last_frame=100;
+        if(!user_last_frame) last_frame=100;
     }
 
     virtual ~REFINEMENT()
@@ -45,7 +47,6 @@ public:
     void Apply_Constraints(const T dt,const T time) override {}
     void Postprocess_Frame(const int frame) override {}
 
-void After_Initialization() override {}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

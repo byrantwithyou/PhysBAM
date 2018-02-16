@@ -16,15 +16,16 @@ class BOUNCING_DROP:public WATER_FREE_SURFACE_3D_EXAMPLE<T,RW>
 public:
     BOUNCING_DROP()
     {
-        first_frame=0;last_frame=300;
-        frame_rate=24;
+        first_frame=0;if(!user_last_frame) last_frame=300;
+        if(!this->user_frame_rate) frame_rate=24;
         restart=false;restart_frame=100;
         grid.Initialize(TV_INT(50,50,50),RANGE<TV>(TV(0,0,0),TV(1,1,1)));
         domain_walls[0][0]=true;domain_walls[0][1]=true;domain_walls[1][0]=true;domain_walls[1][1]=false;domain_walls[2][0]=true;domain_walls[2][1]=true;
         number_particles_per_cell=16;
         write_levelset=true;write_velocity=true;write_particles=true;write_removed_positive_particles=false;write_removed_negative_particles=false;
         write_debug_data=true;
-        output_directory="Bouncing_Drop/output2";
+        if(!this->user_output_directory)
+            output_directory="Bouncing_Drop/output2";
         delete_fluid_inside_objects=true;
         enforce_divergence_free_extrapolation=false;
 

@@ -49,7 +49,6 @@ public:
     SOLIDS_PARAMETERS<TV>& solids_parameters;
     SOLID_BODY_COLLECTION<TV>& solid_body_collection;
     SOLIDS_EVOLUTION<TV>* solids_evolution; // defaults to newmark
-    bool opt_solidssymmqmr,opt_solidscr,opt_solidscg;
     DEBUG_PARTICLES<TV>& debug_particles;
     bool opt_skip_debug_data;
 
@@ -71,7 +70,6 @@ public:
     // solids
     virtual void Initialize_Bodies();
     virtual void Read_Output_Files_Solids(const int frame);
-    void After_Initialization() override;
     void Post_Velocity_Advection_Callback(const T dt,const T time){}
     virtual void Write_Output_Files(const int frame) const override;
     void Adjust_Output_Directory_For_MPI(const MPI_SOLIDS<TV>* mpi);

@@ -36,13 +36,13 @@ BRIDGE_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     solids_parameters.rigid_body_collision_parameters.rigid_collisions_particle_partition_size=7;
 
     restart=false;
-    frame_rate=24*4;
-    last_frame=4000;
-    write_last_frame=true;
+    if(!this->user_frame_rate) frame_rate=24*4;
+    if(!user_last_frame) last_frame=4000;
     parse_args.Add("-selection",&selection,"value","selection");
     parse_args.Parse();
     tests.data_directory=data_directory;
-    output_directory=LOG::sprintf("Bridge/%s%s",output_directory.c_str(),(selection==0?"_blocks":"_lathe_chains"));
+    if(!this->user_output_directory)
+        output_directory=LOG::sprintf("Bridge/%s%s",output_directory.c_str(),(selection==0?"_blocks":"_lathe_chains"));
 }
 //#####################################################################
 // Destructor

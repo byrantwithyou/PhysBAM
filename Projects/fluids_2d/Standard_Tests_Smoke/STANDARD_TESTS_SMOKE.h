@@ -41,7 +41,6 @@ public:
     void Apply_Constraints(const T dt,const T time) override {}
     void Postprocess_Frame(const int frame) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

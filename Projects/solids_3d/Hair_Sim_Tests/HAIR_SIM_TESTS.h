@@ -28,6 +28,7 @@ public:
     using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
     using BASE::stream_type;using BASE::restart;using BASE::restart_frame;using BASE::solid_body_collection;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Set_External_Positions;using BASE::Zero_Out_Enslaved_Velocity_Nodes; // silence -Woverloaded-virtual
+    using BASE::user_last_frame;
 protected:
     using BASE::write_substeps_level;
 public:
@@ -152,7 +153,6 @@ public:
     void Mass_Revert(const VECTOR<int,4>& nodes,ARRAY_VIEW<T>& one_over_mass);
     void Reorder_Pairs(ARRAY<VECTOR<int,4> >& edge_edge_pairs,ARRAY<VECTOR<int,4> >& point_face_pairs) override;
     void Compute_Binding_Velocities();
-    void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 };
 }

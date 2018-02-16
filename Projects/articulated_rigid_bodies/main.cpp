@@ -54,7 +54,6 @@ int main(int argc,char** argv)
     else if(opt_magnets) example=new MAGNETS_EXAMPLE<T>(stream_type,parse_args);
     else if(opt_curl) example=new CURL_EXAMPLE<T>(stream_type,parse_args);
     else example=new STANDARD_TESTS<T>(stream_type,parse_args);
-    example->After_Construction();
 
     SOLIDS_EXAMPLE<TV>* solid_fluid_example=dynamic_cast<SOLIDS_EXAMPLE<TV>*>(example);
     SOLIDS_DRIVER<TV> driver(*solid_fluid_example);

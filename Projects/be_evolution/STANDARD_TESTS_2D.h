@@ -74,7 +74,7 @@ public:
     using BASE::solids_evolution;using BASE::test_number;
     using BASE::data_directory;using BASE::m;using BASE::s;using BASE::kg;
     using BASE::unit_J;using BASE::unit_rho;using BASE::unit_p;
-    using BASE::backward_euler_evolution;
+    using BASE::backward_euler_evolution;using BASE::user_last_frame;
     
     std::ofstream svout;
     SOLIDS_STANDARD_TESTS<TV> tests;
@@ -145,7 +145,8 @@ public:
         parse_args.Parse();
 
         LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
-        output_directory=LOG::sprintf("Test_%d",test_number);
+        if(!this->user_output_directory)
+            output_directory=LOG::sprintf("Test_%d",test_number);
         if(use_rand_seed) rand.Set_Seed(rand_seed);
         solids_parameters.implicit_solve_parameters.project_nullspace_frequency=project_nullspace;
         penalty_collisions_length*=m;
@@ -161,8 +162,6 @@ public:
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;}
 
         solid_body_collection.Print_Residuals(use_residuals);
-
-        this->After_Construction();
     }
 
     virtual ~STANDARD_TESTS()
@@ -192,7 +191,6 @@ public:
   //  bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) override {return true;}
    // void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Get_Initial_Data
 //#####################################################################
@@ -216,8 +214,8 @@ void Get_Initial_Data()
             image.Resize(image_grid.Cell_Indices());
             raw_image.Resize(image_grid.Cell_Indices());
             this->fixed_dt=1./24;
-            frame_rate=1/(this->fixed_dt*image_size.Product());
-            last_frame=1;
+            if(!this->user_frame_rate) frame_rate=1/(this->fixed_dt*image_size.Product());
+            if(!user_last_frame) last_frame=1;
             for(int i=0;i<9;i++) if(i!=4) constrained_particles.Append(i);
             constrained_velocities.Resize(constrained_particles.m,true,true,TV());
             tests.Create_Mattress(GRID<TV>(TV_INT(3,2),RANGE<TV>(TV(),TV(2,1))),true,0,density);
@@ -246,8 +244,8 @@ void Get_Initial_Data()
             cell_iterator=new CELL_ITERATOR<TV>(image_grid);
             image.Resize(image_grid.Cell_Indices());
             raw_image.Resize(image_grid.Cell_Indices());
-            frame_rate=1/(this->fixed_dt*image_size.Product());
-            last_frame=1;
+            if(!this->user_frame_rate) frame_rate=1/(this->fixed_dt*image_size.Product());
+            if(!user_last_frame) last_frame=1;
             initial_positions=particles.X;
             break;}
         case 103:{

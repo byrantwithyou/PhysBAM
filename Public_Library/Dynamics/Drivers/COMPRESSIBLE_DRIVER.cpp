@@ -70,8 +70,6 @@ Initialize()
     // initialize state variables
     example.Initialize_Euler_State();
 
-    example.After_Initialization();
-
     // Boundary conditions
     example.Set_Boundary_Conditions(time); // get so CFL is correct
     euler_solid_fluid_coupling_utilities.Fill_Solid_Cells();

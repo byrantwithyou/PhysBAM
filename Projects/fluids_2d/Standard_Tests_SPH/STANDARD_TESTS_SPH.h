@@ -31,7 +31,8 @@ public:
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::data_directory;using BASE::fluid_collection;using BASE::solid_body_collection;
     using BASE::Adjust_Phi_With_Sources;using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::Get_Object_Velocities; // silence -Woverloaded-virtual
     using BASE::stream_type;using BASE::resolution;
-
+    using BASE::user_last_frame;
+    
     int number_of_particles;
     T wall_damping;
     GRID<TV> grid;
@@ -48,17 +49,17 @@ public:
         fluids_parameters.number_particles_per_cell=16;
         fluids_parameters.write_ghost_values=true;
         fluids_parameters.store_particle_ids=true;
-        last_frame=1000;
+        if(!user_last_frame) last_frame=1000;
 
         int cells=1*resolution;
         if(test_number==1){
-            first_frame=0;last_frame=200;
+            first_frame=0;if(!user_last_frame) last_frame=200;
             grid.Initialize(TV_INT(15*cells+1,10*cells+1),RANGE<TV>(TV(0,0),TV((T)1.5,1)));}
         else if(test_number==2){
-            first_frame=0;last_frame=100;
+            first_frame=0;if(!user_last_frame) last_frame=100;
             grid.Initialize(TV_INT(10*cells+1,15*cells+1),RANGE<TV>(TV(0,0),TV(1,(T)1.5)));}
         else if(test_number==3){
-            first_frame=0;last_frame=150;
+            first_frame=0;if(!user_last_frame) last_frame=150;
             grid.Initialize(TV_INT(10*cells+1,15*cells+1),RANGE<TV>(TV(0,0),TV(1,(T)1.5)));}
         else if(test_number==5){
             grid.Initialize(TV_INT(10*cells+1,10*cells+1),RANGE<TV>(TV(0,0),TV(1,1)));}
@@ -80,7 +81,8 @@ public:
         else{LOG::cerr<<"unrecognzed SPH test number"<<std::endl;exit(1);}
         *fluids_parameters.grid=grid;
 
-        output_directory=LOG::sprintf("Standard_Tests_SPH/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
+        if(!this->user_output_directory)
+            output_directory=LOG::sprintf("Standard_Tests_SPH/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
         LOG::cout<<"Running SPH simulation to "<<output_directory<<std::endl;
     }
 
@@ -104,7 +106,6 @@ public:
     void Postprocess_Frame(const int frame) override {}
     void Postprocess_Phi(const T time) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_SPH_Particles
 //#####################################################################

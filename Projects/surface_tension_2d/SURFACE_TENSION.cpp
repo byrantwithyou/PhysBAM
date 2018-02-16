@@ -72,8 +72,8 @@ SURFACE_TENSION(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Parse();
 
     solids_tests.data_directory=data_directory;
-    last_frame=100;
-    frame_rate=24;
+    if(!user_last_frame) last_frame=100;
+    if(!this->user_frame_rate) frame_rate=24;
 
     fluids_parameters.incompressible_iterations=solids_parameters.implicit_solve_parameters.cg_iterations;
     frame_rate/=s;
@@ -192,7 +192,8 @@ SURFACE_TENSION(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
     Add_Rigid_Body_Walls();
-    output_directory=LOG::sprintf("Test_%d",test_number,resolution);
+    if(!this->user_output_directory)
+        output_directory=LOG::sprintf("Test_%d",test_number,resolution);
 }
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -255,8 +256,6 @@ Add_Rigid_Body_Walls(const T coefficient_of_restitution,const T coefficient_of_f
         rigid_body_collection.Rigid_Body(id).is_static=true;
         if(walls_added) walls_added->Append(id);}
 }
-template<class T> void SURFACE_TENSION<T>::
-After_Initialization() {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################
@@ -467,14 +466,15 @@ Kang_Circle(bool use_surface)
         /* Fig. 7 rescaled by T_nu & U_sig; maximum time length: T_nu
            Fig. 8 rescaled by T_sig & U_sig; maximum time length: 3*T_sig
         */
-        last_frame=1000;
+        if(!user_last_frame) last_frame=1000;
         surface_tension=fluids_parameters.surface_tension;
         T density=1000,D=(T).8;
         T T_sig=D*sqrt(density*D/surface_tension),
             T_nu=T_sig*sqrt(laplace_number);
         LOG::cout<<"T_sig="<<T_sig<<", T_nu="<<T_nu<<std::endl;
-        if(use_T_nu) frame_rate=(T)last_frame/T_nu;
-        else frame_rate=(T)last_frame/(3*T_sig);
+        if(!this->user_frame_rate){
+            if(use_T_nu) frame_rate=(T)last_frame/T_nu;
+            else frame_rate=(T)last_frame/(3*T_sig);}
         two_phase=true;
         fluids_parameters.gravity.y=-(T)0*m/(s*s);
         fluids_parameters.density=density*kg/(m*m);

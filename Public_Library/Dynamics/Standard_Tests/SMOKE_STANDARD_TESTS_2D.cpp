@@ -24,7 +24,7 @@ SMOKE_STANDARD_TESTS_2D(SOLIDS_FLUIDS_EXAMPLE<TV>& example,FLUIDS_PARAMETERS_UNI
     
     // set up the standard fluid environment
     // TODO: *REALLY* need to pick sensible constants and settings
-    example.frame_rate=24;
+    if(!example.user_frame_rate) example.frame_rate=24;
     fluids_parameters.cfl=(T).9;
     fluids_parameters.domain_walls=VECTOR<VECTOR<bool,2>,TV::m>::Constant_Vector(VECTOR<bool,2>::Constant_Vector(false));
     fluids_parameters.domain_walls(1)(0)=true;
@@ -48,7 +48,8 @@ Initialize(const int test_number_input,const int resolution,const T angle_fracti
     // set up the domain
     int cells=resolution;
     if(test_number==1 || test_number==2 || test_number==3){
-        example.first_frame=0;example.last_frame=3840;
+        example.first_frame=0;
+        if(!example.user_last_frame) example.last_frame=3840;
         grid.Initialize(TV_INT(10,15)*cells+1,RANGE<TV>(TV(),TV(1,1.5)));}
     else if(test_number==4){
         fluids_parameters.domain_walls=VECTOR<VECTOR<bool,2>,TV::m>::Constant_Vector(VECTOR<bool,2>::Constant_Vector(true));
@@ -57,11 +58,13 @@ Initialize(const int test_number_input,const int resolution,const T angle_fracti
         fluids_parameters.use_poisson=true;  // TODO This is a hack to tell Projection to use poisson rather than laplace
         // TODO: need to call use_variable_beta on the poisson solver if we ACTUALLY want to use variable beta
         fluids_parameters.second_order_cut_cell_method=false;
-        example.first_frame=0;example.last_frame=1000;
+        example.first_frame=0;
+        if(!example.user_last_frame) example.last_frame=1000;
         grid.Initialize(TV_INT()+10*cells+1,RANGE<TV>::Centered_Box());}
     else{LOG::cerr<<"unrecognized test number "<<test_number<<std::endl;exit(1);}
 
-    example.output_directory=LOG::sprintf("Standard_Tests_Smoke/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
+    if(!example.user_output_directory)
+        example.output_directory=LOG::sprintf("Standard_Tests_Smoke/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
 
     // set up the source domain
     if(test_number==1 || test_number==2 || test_number==3){

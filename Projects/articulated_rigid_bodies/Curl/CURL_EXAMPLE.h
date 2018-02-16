@@ -33,7 +33,8 @@ public:
     using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::solid_body_collection;
     using BASE::solids_parameters;using BASE::write_last_frame;using BASE::data_directory;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Position_Nodes; // silence -Woverloaded-virtual
-
+    using BASE::user_last_frame;
+    
     ARTICULATED_RIGID_BODY<TV>* arb;
     SOLIDS_STANDARD_TESTS<TV> tests;
     RIGID_BODY<TV>* shelf00,*shelf01,*shelf10,*shelf11;
@@ -56,17 +57,17 @@ public:
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
         solids_parameters.cfl=(T).1;
 
-        last_frame=2000;
-        frame_rate=60;
+        if(!user_last_frame) last_frame=2000;
+        if(!this->user_frame_rate) frame_rate=60;
         LOG::cout<<"Frame rate: "<<frame_rate<<std::endl;
 
         current_frame=0;
         increment=(T).05;
         start_move=5;end_move=40;
         shelf00=shelf01=shelf10=shelf11=0;
-        write_last_frame=true;
         tests.data_directory=data_directory;
-        output_directory="Curl/output";
+        if(!this->user_output_directory)
+            output_directory="Curl/output";
     }
 
     virtual ~CURL_EXAMPLE()
@@ -90,7 +91,6 @@ public:
     void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) override {}
     bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) override {return false;}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################
@@ -112,7 +112,7 @@ void Initialize_Bodies() override
     if(parameter_file.empty()) parameter_file="Curl/example.param";
     ARB_PARAMETERS::Read_Common_Parameters(parameter_file,*this,parameter_list);
     selection=parameter_list.Get_Parameter("selection",5);
-    output_directory+=LOG::sprintf("_%d",selection);
+    if(!this->user_output_directory) output_directory+=LOG::sprintf("_%d",selection);
     traditional_pd=parameter_list.Get_Parameter("traditional_pd",false);
     if(traditional_pd) arb->Use_No_Actuators();
     half_acceleration=parameter_list.Get_Parameter("half_acceleration",true);

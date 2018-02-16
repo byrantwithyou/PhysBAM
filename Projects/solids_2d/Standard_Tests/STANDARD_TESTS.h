@@ -78,7 +78,7 @@ public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions;using BASE::solids_evolution; // silence -Woverloaded-virtual
-    using BASE::test_number;using BASE::data_directory;
+    using BASE::test_number;using BASE::data_directory;using BASE::user_last_frame;
 
     std::ofstream svout;
 
@@ -136,8 +136,9 @@ public:
 
         tests.data_directory=data_directory;
         LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
-        output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
-        last_frame=1000;
+        if(!this->user_output_directory)
+            output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+        if(!user_last_frame) last_frame=1000;
 
         switch(test_number){
             case 20: case 21: case 26:
@@ -169,7 +170,7 @@ public:
                 solids_parameters.use_partially_converged_result=true;
                 solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
                 attachment_velocity=TV((T).1,0);
-                last_frame=120;
+                if(!user_last_frame) last_frame=120;
                 break;
             case 4:
             case 5:
@@ -182,12 +183,12 @@ public:
                 solids_parameters.implicit_solve_parameters.cg_iterations=900;
                 solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
                 attachment_velocity=TV((T).1,0);
-                last_frame=1500;
+                if(!user_last_frame) last_frame=1500;
                 break;
             case 7:
                 solids_parameters.cfl=(T).5;
                 solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
-                last_frame=120;
+                if(!user_last_frame) last_frame=120;
                 break;
             case 8: 
             case 13:
@@ -199,17 +200,17 @@ public:
             case 18:
             case 19:
                 solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
-                last_frame=200;
+                if(!user_last_frame) last_frame=200;
                 break;
             case 23: 
                 solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
-                last_frame=500;
+                if(!user_last_frame) last_frame=500;
                 break;
             case 9:
                 solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
                 solids_parameters.cfl=1;
                 solids_parameters.deformable_object_collision_parameters.collide_with_interior=true;
-                last_frame=120;
+                if(!user_last_frame) last_frame=120;
                 break;
             case 10:
             case 11:
@@ -217,8 +218,8 @@ public:
                 solids_parameters.triangle_collision_parameters.perform_self_collision=true;
                 solids_parameters.cfl=(T)4.9;
                 solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
-                last_frame=500;
-                frame_rate=120;
+                if(!user_last_frame) last_frame=500;
+                if(!this->user_frame_rate) frame_rate=120;
                 break;
             case 20:
                 solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
@@ -226,12 +227,13 @@ public:
                 solids_parameters.deformable_object_collision_parameters.collide_with_interior=true;
                 //solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
                 attachment_velocity=TV((T).8,0);
-                last_frame=400;
+                if(!user_last_frame) last_frame=400;
                 break;            
             default:
                 LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
-        output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+        if(!this->user_output_directory)
+            output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
     }
 
     // Unused callbacks
@@ -268,7 +270,6 @@ public:
     void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
     void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################
@@ -393,7 +394,7 @@ void Initialize_Bodies() override
             curve.Add_Control_Point(5,FRAME<TV>(TV(0,10)));
             curve.Add_Control_Point(6,FRAME<TV>(TV(0,10)));
             curve.Add_Control_Point(11,FRAME<TV>(TV(0,12)));
-            last_frame=250;
+            if(!user_last_frame) last_frame=250;
             break;}
         case 22: {
             tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0))),100);
@@ -409,7 +410,7 @@ void Initialize_Bodies() override
             curve.Add_Control_Point(5,FRAME<TV>(TV(0,0)));
             curve.Add_Control_Point(6,FRAME<TV>(TV(0,0)));
             curve.Add_Control_Point(11,FRAME<TV>(TV(0,2)));
-            last_frame=250;
+            if(!user_last_frame) last_frame=250;
             break;}
         case 17:
         case 18:

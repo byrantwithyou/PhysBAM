@@ -95,7 +95,6 @@ public:
     virtual void Write_Output_Files(const int frame) const override;
     void Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time) override;
     void Log_Parameters() const override;
-    void After_Construction() override;
 //#####################################################################
 };
 }

@@ -46,7 +46,9 @@ public:
 
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;
     using BASE::solids_fluids_parameters;using BASE::Add_To_Fluid_Simulation;
-    using BASE::stream_type;using BASE::data_directory;using BASE::solid_body_collection;using BASE::test_number;using BASE::resolution;
+    using BASE::stream_type;using BASE::data_directory;
+    using BASE::solid_body_collection;using BASE::test_number;using BASE::resolution;
+    using BASE::user_last_frame;
 
     SOLIDS_STANDARD_TESTS<TV> tests;
     SEGMENTED_CURVE_2D<T>* boundary;
@@ -101,14 +103,14 @@ public:
             fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
             fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
     
-            initial_time=(T)0.;last_frame=350;frame_rate=(T)1000.;}
+            initial_time=(T)0.;if(!user_last_frame) last_frame=350;if(!this->user_frame_rate) frame_rate=(T)1000.;}
         else{
             fluids_parameters.grid->Initialize(TV_INT(4,3)*cells+1,RANGE<VECTOR<T,2> >(VECTOR<T,2>((T)0,(T)0), VECTOR<T,2>((T)1,(T).75)));
             *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid();
             fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=true;
             fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
 
-            initial_time=(T)0.;last_frame=10;frame_rate=(T)10000.;}
+            initial_time=(T)0.;if(!user_last_frame) last_frame=10;if(!this->user_frame_rate) frame_rate=(T)10000.;}
 
         fluids_parameters.cfl=cfl_number;
         //custom stuff . . . 
@@ -151,19 +153,18 @@ public:
             state_right=TV_DIMENSION((T)1,(T)0,(T)0,(T)1.5e5);}
 
 
-        if(timesplit) output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-        else output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-        if(eno_scheme==2) output_directory+="_density_weighted";
-        else if(eno_scheme==3) output_directory+="_velocity_weighted";
-        if(spring_factor!=(T)1) output_directory=LOG::sprintf("%s_spring_factor_%lf",output_directory.c_str(),spring_factor);
-    }
-    void After_Initialization() override {
-        BASE::After_Initialization();
+        if(!this->user_output_directory){
+            if(timesplit) output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+            else output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+            if(eno_scheme==2) output_directory+="_density_weighted";
+            else if(eno_scheme==3) output_directory+="_velocity_weighted";
+            if(spring_factor!=(T)1) output_directory=LOG::sprintf("%s_spring_factor_%lf",output_directory.c_str(),spring_factor);}
+
         std::string gnuplot_file=output_directory+"/common/gnuplot_data.dat";
         gnuplot_file_stream.open(gnuplot_file.c_str());
         LOG::cout<<"writing to file "<<gnuplot_file<<std::endl;
     }
-    
+
     virtual ~STANDARD_TESTS()
     {
         gnuplot_file_stream.close();

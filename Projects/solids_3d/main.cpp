@@ -80,7 +80,6 @@ int main(int argc,char* argv[])
     else example=new STANDARD_TESTS<T>(stream_type,parse_args);
 
     example->mpi_world=new MPI_WORLD(parse_args);
-    example->After_Construction();
 
     if(example->mpi_world->initialized) example->solid_body_collection.deformable_body_collection.Set_Mpi_Solids(new MPI_SOLIDS<TV>);
     example->Adjust_Output_Directory_For_MPI(example->solid_body_collection.deformable_body_collection.mpi_solids);

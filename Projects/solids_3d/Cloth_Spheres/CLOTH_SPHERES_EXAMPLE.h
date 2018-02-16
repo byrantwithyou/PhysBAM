@@ -27,7 +27,8 @@ public:
     using BASE::frame_rate;using BASE::last_frame;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::solids_parameters;
     using BASE::data_directory;using BASE::solid_body_collection;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
-
+    using BASE::user_last_frame;
+    
     SOLIDS_STANDARD_TESTS<TV> tests;
     T sphere_scale,sphere_x_position,aspect_ratio,side_length;
     int number_side_panels;
@@ -60,7 +61,6 @@ public:
     void Align_Deformable_Bodies_With_Rigid_Bodies() override {}
     void Preprocess_Solids_Substep(const T time,const int substep) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Get_Initial_Data
 //#####################################################################
@@ -115,11 +115,12 @@ void Initialize_Bodies() override
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
-    last_frame=240;
+    if(!user_last_frame) last_frame=240;
     restart=false;restart_frame=0;  
     solids_parameters.cfl=(T)5;
     solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
-    output_directory="Cloth_Spheres/output_hires_new";
+    if(!this->user_output_directory)
+        output_directory="Cloth_Spheres/output_hires_new";
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
     solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
     solids_parameters.triangle_collision_parameters.perform_self_collision=true;

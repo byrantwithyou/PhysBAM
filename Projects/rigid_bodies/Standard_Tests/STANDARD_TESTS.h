@@ -99,6 +99,7 @@ public:
     typedef SOLIDS_EXAMPLE<VECTOR<T_input,3> > BASE;
     using BASE::solids_parameters;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::test_number;
     using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::stream_type;
+    using BASE::user_last_frame;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
         :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),small_block_mass(1),
@@ -112,10 +113,11 @@ public:
         parse_args.Parse();
 
         tests.data_directory=data_directory;
-        output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+        if(!this->user_output_directory){
+            output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
 
-        if(small_block_mass!=1) output_directory+=LOG::sprintf("_m%g",small_block_mass);
-        if(parameter) output_directory+=LOG::sprintf("_param%i",parameter);
+            if(small_block_mass!=1) output_directory+=LOG::sprintf("_m%g",small_block_mass);
+            if(parameter) output_directory+=LOG::sprintf("_param%i",parameter);}
     }
 
     ~STANDARD_TESTS()
@@ -151,8 +153,7 @@ public:
     void Postprocess_Solids_Substep(const T time,const int substep) override {}
     void Apply_Constraints(const T dt,const T time) override {}
     
-    void After_Initialization() override {BASE::After_Initialization();}
-
+    
 //#####################################################################
 // Function Post_Initialization
 //#####################################################################
@@ -275,7 +276,7 @@ void Initialize_Bodies() override
 //#####################################################################
 void Bounce(const T angle)
 {
-    last_frame=240;
+    if(!user_last_frame) last_frame=240;
     //T x_pos[]={-3,0,3},cor[]={(T)1.0,(T).5,0};
     for(int i=0;i<100;i++){
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("sphere",1,(T).5);
@@ -290,7 +291,7 @@ void Bounce(const T angle)
 //#####################################################################
 void Nonconvex_Bounce()
 {
-    last_frame=240;
+    if(!user_last_frame) last_frame=240;
     T x_pos[]={-3,0,3},cor[]={(T)1.0,(T).6,0},z_angle[]={(T).05,(T).02,0};
     for(int i=0;i<3;i++){
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("New_Bones/Pelvis_1",20,(T).5);
@@ -307,7 +308,7 @@ void Nonconvex_Bounce()
 //#####################################################################
 void Billiard_Balls()
 {
-    last_frame=240;
+    if(!user_last_frame) last_frame=240;
     T mu=(T)0.3,cor=(T)1.0;
     int number=5;
     for (int k=0;k<=number;k++){
@@ -324,7 +325,7 @@ void Billiard_Balls()
 //#####################################################################
 void Bounce_Friction()
 {
-    last_frame=360;
+    if(!user_last_frame) last_frame=360;
     RIGID_BODY<TV>& sphere=tests.Add_Rigid_Body("sphere",(T)1,(T).8);
     sphere.Frame().t=TV(-4,10,0);
     sphere.Twist().angular=TV(-10,0,0);
@@ -340,7 +341,7 @@ void Bounce_Friction()
 //#####################################################################
 void Rolling_Friction()
 {
-    last_frame=240;
+    if(!user_last_frame) last_frame=240;
     RIGID_BODY<TV>* rigid_body=0;
 
     if(parameter==0){
@@ -392,7 +393,7 @@ void Rolling_Friction()
 //#####################################################################
 void Seesaw()
 {
-    last_frame=480;
+    if(!user_last_frame) last_frame=480;
     RIGID_BODY<TV>* rigid_body=0;
     T mu=(T)0.2;
     bool fromrest=true;
@@ -430,7 +431,7 @@ void Seesaw()
 //#####################################################################
 void Plank()
 {
-    last_frame=480;
+    if(!user_last_frame) last_frame=480;
     RIGID_BODY<TV>* rigid_body=0;
     T baseboxsize=2;
     T dropboxsize=(T)1.2;
@@ -484,7 +485,7 @@ void Plank()
 //#####################################################################
 void Ring_Test()
 {
-    last_frame=720;
+    if(!user_last_frame) last_frame=720;
     T mu=(T)0.6;
     T epsilon=(T)0.3;
     int poles=5;
@@ -526,7 +527,7 @@ void Ring_Test()
 //#####################################################################
 void Bone_Test()
 {
-    last_frame=240;
+    if(!user_last_frame) last_frame=240;
     RIGID_BODY<TV>* rigid_body=0;
 
     ARRAY<std::string>filenames;
@@ -608,7 +609,7 @@ void Bone_Test()
 //#####################################################################
 void Suspended_Cubes()
 {
-    last_frame=240;
+    if(!user_last_frame) last_frame=240;
     T mu=(T)0.4,height=5,cor=(T).5;
     RIGID_BODY<TV>& ram1=tests.Add_Rigid_Body("subdivided_box",1,mu);
     ram1.Set_Coefficient_Of_Restitution(cor);
@@ -658,7 +659,7 @@ void Suspended_Cubes()
 //#####################################################################
 void Ether_Test()
 {
-    last_frame=240;
+    if(!user_last_frame) last_frame=240;
     RIGID_BODY<TV>& box1=tests.Add_Rigid_Body("box",(T)1,(T)1);
     box1.Frame().t=TV(-2,20,0);
     box1.Twist().angular=TV(4,4,4);
@@ -676,7 +677,7 @@ void Ether_Test()
 //#####################################################################
 void Wind_Test()
 {
-    last_frame=240;
+    if(!user_last_frame) last_frame=240;
     RIGID_BODY<TV>& plank1=tests.Add_Rigid_Body("plank",(T)1,(T)1);
     plank1.Frame().t=TV(-8,20,0);
     plank1.Twist().angular=TV(4,0,0);
@@ -701,7 +702,7 @@ void Wind_Test()
 //#####################################################################
 void Force_Propogation()
 {
-    last_frame=240;
+    if(!user_last_frame) last_frame=240;
     RIGID_BODY<TV>* rigid_body=0;
     T ground_mu=(T)0.5;
     T sliding_block_mu=(T)0.5;
@@ -733,7 +734,7 @@ void Force_Propogation()
 //#####################################################################
 void Suspended_Cube()
 {
-    last_frame=240;
+    if(!user_last_frame) last_frame=240;
     // parameters
     T cylinder_radius=4,cube_scale=1,theta=(T)pi/3,m=tan(theta);
     T x=cube_scale+cylinder_radius,y=m*(cylinder_radius+cube_scale)+cylinder_radius*sqrt(m*m+1);
@@ -759,7 +760,7 @@ void Suspended_Cube()
 //#####################################################################
 void Sphere_Incline()
 {
-    last_frame=120;
+    if(!user_last_frame) last_frame=120;
     T angle=parameter*(T)pi/40;
     RIGID_BODY<TV>& sphere=tests.Add_Rigid_Body("sphere",1,(T)1e10);
     sphere.Set_Coefficient_Of_Restitution(0);
@@ -774,7 +775,7 @@ void Sphere_Incline()
 //#####################################################################
 void Spinning_Top()
 {
-    last_frame=240;
+    if(!user_last_frame) last_frame=240;
     RIGID_BODY<TV>* rigid_body=0;
 
     rigid_body=&tests.Add_Rigid_Body("cone",(T)1,(T).5);
@@ -816,7 +817,7 @@ void Spinning_Top()
 //#####################################################################
 void Spinning_Cylinder()
 {
-    last_frame=7200;
+    if(!user_last_frame) last_frame=7200;
     RIGID_BODY<TV>* rigid_body=0;
     rigid_body=&tests.Add_Rigid_Body("Rings_Test/medium_cylinder",(T)1,(T).5);
     rigid_body->Twist().angular=TV(1,1,1);
@@ -827,7 +828,7 @@ void Spinning_Cylinder()
 //#####################################################################
 void Cluster_Cluster_Interaction()
 {
-    last_frame=240;
+    if(!user_last_frame) last_frame=240;
     RIGID_BODY_CLUSTER_BINDINGS<TV>& rigid_bindings=solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings;
     rigid_bindings.collide_constituent_bodies=true;
     collision_manager=new RIGID_BODY_COLLISION_MANAGER_HASH;
@@ -918,7 +919,7 @@ void Cluster_Cluster_Interaction()
 //#####################################################################
 void Cluster_Cluster_Interaction_Kinematic()
 {
-    last_frame=240;
+    if(!user_last_frame) last_frame=240;
     RIGID_BODY_CLUSTER_BINDINGS<TV>& rigid_bindings=solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings;
     rigid_bindings.collide_constituent_bodies=true;
     collision_manager=new RIGID_BODY_COLLISION_MANAGER_HASH;
@@ -987,7 +988,7 @@ void Cluster_Cluster_Interaction_Kinematic()
 //#####################################################################
 void Push_Out()
 {
-    last_frame=240;
+    if(!user_last_frame) last_frame=240;
     solids_parameters.rigid_body_collision_parameters.use_push_out_rotation=false;
 
     tests.Add_Ground(1,-1,1);
@@ -1022,7 +1023,7 @@ void Push_Out()
 //#####################################################################
 void Removed_Bodies()
 {
-    last_frame=240;
+    if(!user_last_frame) last_frame=240;
     ARRAY<RIGID_BODY<TV>*> bodies;
     for(int i=0;i<20;i++){
         bodies.Append(&tests.Add_Rigid_Body("subdivided_box",(T)1,(T).5));
@@ -1037,7 +1038,7 @@ void Removed_Bodies()
 //#####################################################################
 void Kinematic_Collision()
 {
-    last_frame=240;
+    if(!user_last_frame) last_frame=240;
     ARRAY<RIGID_BODY<TV>*> bodies;
     for(int i=0;i<2;i++){
         bodies.Append(&tests.Add_Rigid_Body("subdivided_box",(T)1,(T).5));
@@ -1060,7 +1061,7 @@ void Kinematic_Collision()
 //#####################################################################
 void Drop_Cubes()
 {
-    last_frame=240;
+    if(!user_last_frame) last_frame=240;
     RIGID_BODY_CLUSTER_BINDINGS<TV>& rigid_bindings=solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings;
 
     tests.Add_Ground(1,-1,1);
@@ -1118,7 +1119,7 @@ void Build_Deforming_Sphere(KINEMATIC_COLLISION_BODY<TV>* sphere,FRAME<TV>& fram
 //#####################################################################
 void Deforming_Sphere()
 {
-    last_frame=240;
+    if(!user_last_frame) last_frame=240;
     deforming_sphere=new KINEMATIC_COLLISION_BODY<TV>(solid_body_collection.rigid_body_collection,true,new GRID<TV>,new ARRAY<TV,TV_INT>);
     Build_Deforming_Sphere(deforming_sphere,deforming_sphere->Frame(),0,true,true);
     solid_body_collection.rigid_body_collection.Add_Rigid_Body_And_Geometry(deforming_sphere);
@@ -1180,7 +1181,7 @@ void Cluster_Fracture()
 //#####################################################################
 void Sphere_Sanity_Tests()
 {
-    last_frame=24;
+    if(!user_last_frame) last_frame=24;
     int n=3;
     if(parameter==2) n=0;
     for(int i=0;i<n;i++) tests.Add_Rigid_Body("sphere",1,1).Frame().t.x=(T)3*i;

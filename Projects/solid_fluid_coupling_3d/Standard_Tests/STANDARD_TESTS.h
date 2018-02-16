@@ -52,7 +52,8 @@ public:
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
     using BASE::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization;using BASE::Add_Volumetric_Body_To_Fluid_Simulation;using BASE::solids_evolution;
     using BASE::Add_To_Fluid_Simulation;using BASE::Add_Thin_Shell_To_Fluid_Simulation;
-
+    using BASE::user_last_frame;
+    
     SMOKE_STANDARD_TESTS_3D<TV> smoke_tests;
     SOLIDS_STANDARD_TESTS<TV> solids_tests;
     int deformable_circle_id;
@@ -102,7 +103,7 @@ public:
         solids_tests.data_directory=data_directory;
         smoke_tests.Initialize(Smoke_Test_Number(test_number),resolution);
         LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
-        last_frame=1000;
+        if(!user_last_frame) last_frame=1000;
 
         solids_parameters.triangle_collision_parameters.perform_self_collision=false;
         solids_parameters.rigid_body_collision_parameters.use_push_out=false;
@@ -124,7 +125,7 @@ public:
 
         switch(test_number){
             case 1:
-                last_frame=1000;
+                if(!user_last_frame) last_frame=1000;
                 solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
                 solids_parameters.implicit_solve_parameters.cg_iterations=400;
                 fluids_parameters.density=(T)1000;
@@ -134,14 +135,14 @@ public:
                 source_cylinder=CYLINDER<T>(TV((T).5,(T)0,(T).5),TV((T).5,(T).05,(T).5),(T).15);
                 break;
             case 2:
-                last_frame=1000;
+                if(!user_last_frame) last_frame=1000;
                 solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
                 fluids_parameters.density=(T)1000;
                 velocity_multiplier=(T)4;
                 fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
                 break;
             case 3:
-                last_frame=1000;
+                if(!user_last_frame) last_frame=1000;
                 solids_parameters.implicit_solve_parameters.cg_iterations=400;
                 solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
                 fluids_parameters.density=(T)10;
@@ -149,7 +150,7 @@ public:
                 fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
                 break;
             case 4:
-                last_frame=1000;
+                if(!user_last_frame) last_frame=1000;
                 //solids_parameters.implicit_solve_parameters.cg_iterations=400;
                 solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
                 fluids_parameters.density=(T)1;
@@ -165,7 +166,7 @@ public:
                 solids_parameters.implicit_solve_parameters.cg_iterations=1500;
                 break;
             case 5:
-                last_frame=1000;
+                if(!user_last_frame) last_frame=1000;
                 solids_parameters.implicit_solve_parameters.cg_iterations=400;
                 solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
                 fluids_parameters.density=(T)1;
@@ -199,10 +200,11 @@ public:
                 LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
 
-        if(fluids_parameters.use_slip)
-            output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d_slip",test_number,resolution);
-        else
-            output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d",test_number,resolution);
+        if(!this->user_output_directory){
+            if(fluids_parameters.use_slip)
+                output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d_slip",test_number,resolution);
+            else
+                output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d",test_number,resolution);}
     }
 
     // Unused callbacks
@@ -223,7 +225,6 @@ public:
     void Postprocess_Substep(const T dt,const T time) override {}
     void Post_Initialization() override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Set_External_Positions
 //#####################################################################

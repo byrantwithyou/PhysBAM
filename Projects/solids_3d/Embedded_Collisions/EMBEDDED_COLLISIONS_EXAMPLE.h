@@ -31,7 +31,8 @@ public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
     using BASE::solid_body_collection;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
-
+    using BASE::user_last_frame;
+    
     SOLIDS_STANDARD_TESTS<TV> tests;
     RED_GREEN_TRIANGLES<TV>* redgreen;
 
@@ -62,7 +63,6 @@ public:
     void Postprocess_Frame(const int frame) override {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) override {}
     
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Get_Initial_Data
 //#####################################################################
@@ -110,9 +110,10 @@ void Initialize_Bodies() override
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
 
-    output_directory="Embedded_Collisions/output";
-    last_frame=180;
-    frame_rate=24;
+    if(!this->user_output_directory)
+        output_directory="Embedded_Collisions/output";
+    if(!user_last_frame) last_frame=180;
+    if(!this->user_frame_rate) frame_rate=24;
     
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
     solids_parameters.implicit_solve_parameters.cg_iterations=500;

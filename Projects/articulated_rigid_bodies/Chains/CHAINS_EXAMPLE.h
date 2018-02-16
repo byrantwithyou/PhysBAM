@@ -30,6 +30,7 @@ public:
     using BASE::output_directory;using BASE::solids_parameters;using BASE::write_last_frame;using BASE::data_directory;using BASE::stream_type;
     using BASE::restart;using BASE::initial_time;using BASE::first_frame;using BASE::last_frame;using BASE::restart_frame;using BASE::frame_rate;using BASE::solid_body_collection;
     using BASE::test_number;using BASE::Set_External_Velocities; // silence -Woverloaded-virtual
+    using BASE::user_last_frame;
     
     ARTICULATED_RIGID_BODY<TV>* arb;
     SOLIDS_STANDARD_TESTS<TV> tests;
@@ -48,16 +49,16 @@ public:
         //solids_parameters.perform_collision_body_collisions=false;
 
 
-        last_frame=500;
-        frame_rate=24*2;
-        write_last_frame=true;
+        if(!user_last_frame) last_frame=500;
+        if(!this->user_frame_rate) frame_rate=24*2;
 
         //artificial_maximum_speed=30;
         std::cout<<"Frame rate: "<<frame_rate<<std::endl;
         parse_args.Add("-selection",&selection,"value","selection");
         parse_args.Parse();
         tests.data_directory=data_directory;
-        output_directory="Chains/output";output_directory+=selection==0?"_blocks_chain":"_lathe_chains";
+        if(!this->user_output_directory)
+            output_directory="Chains/output";output_directory+=selection==0?"_blocks_chain":"_lathe_chains";
     }
     
     virtual ~CHAINS_EXAMPLE()
@@ -82,7 +83,6 @@ public:
     void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
     void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Rigid_Bodies
 //#####################################################################

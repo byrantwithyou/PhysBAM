@@ -42,7 +42,7 @@ public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::restart;
     using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::test_number;
-    
+    using BASE::user_last_frame;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
         :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),parameter(0)
@@ -53,7 +53,8 @@ public:
         parse_args.Parse();
 
         tests.data_directory=data_directory;
-        output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+        if(!this->user_output_directory)
+            output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
     }
 
     ~STANDARD_TESTS()
@@ -85,7 +86,6 @@ public:
     bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) override {return false;}
     void Filter_Velocities(const T dt,const T time,const bool velocity_update) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################
@@ -115,7 +115,7 @@ void Initialize_Bodies() override
 //#####################################################################
 void Ring_Test()
 {
-    last_frame=720;
+    if(!user_last_frame) last_frame=720;
     T mu=(T)0.6;
     T epsilon=(T)0.3;
     int poles=5;
@@ -149,7 +149,7 @@ void Ring_Test()
 //#####################################################################
 void Bone_Test()
 {
-    last_frame=720;
+    if(!user_last_frame) last_frame=720;
     T mu=(T)0.6;
     T epsilon=(T)0.3;
     int poles=5;
@@ -184,7 +184,7 @@ void Bone_Test()
 //#####################################################################
 void Sphere_Test()
 {
-    last_frame=720;
+    if(!user_last_frame) last_frame=720;
 
     TV lower_corner(0,0,0);
     TV upper_corner(10,10,10);
@@ -235,7 +235,7 @@ void Sphere_Test()
 //#####################################################################
 void Bounce(const T angle)
 {
-    last_frame=240;
+    if(!user_last_frame) last_frame=240;
 
     T x_pos[]={-3,0,3},cor[]={(T)1.0,(T).5,0};
     for(int i=0;i<3;i++){
@@ -257,7 +257,7 @@ void Bricks()
 {
     solids_parameters.rigid_body_collision_parameters.use_projected_gauss_seidel=true;
 
-    last_frame=240;
+    if(!user_last_frame) last_frame=240;
 
     int width=1;
     int height=1;

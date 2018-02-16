@@ -42,7 +42,8 @@ public:
     using BASE::fluid_collection;
     using BASE::solids_parameters;using BASE::write_time;using BASE::write_frame_title;using BASE::data_directory;using BASE::abort_when_dt_below;using BASE::Set_External_Velocities;
     using BASE::resolution;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::test_number; // silence -Woverloaded-virtual
-
+    using BASE::user_last_frame;
+    
     SPHERE<TV> source,other_source;
     RANGE<TV> box;
     MATRIX<T,3> world_to_source;
@@ -65,8 +66,9 @@ public:
         random.Set_Seed(7411);
 
         // Common parameters
-        output_directory=LOG::sprintf("Mass_Conservation/example_%d_resolution_%d",test_number%resolution);
-        first_frame=0;restart=false;restart_frame=0;frame_rate=300;
+        if(!this->user_output_directory)
+            output_directory=LOG::sprintf("Mass_Conservation/example_%d_resolution_%d",test_number%resolution);
+        first_frame=0;restart=false;restart_frame=0;if(!this->user_frame_rate) frame_rate=300;
 
         // Fluids parameters
         fluids_parameters.number_particles_per_cell=16;
@@ -92,7 +94,7 @@ public:
 
         period=8;
         T final_time=period;
-        last_frame=628;
+        if(!user_last_frame) last_frame=628;
         world_to_source=MATRIX<T,3>::Identity_Matrix();
 
         if(test_number==1 || test_number==2){
@@ -100,12 +102,12 @@ public:
             box=RANGE<TV>((T).4,(T).6,(T).4,(T).6);
             fluids_parameters.grid->Initialize(TV_INT()+10*resolution+1,RANGE<TV>::Unit_Box());}
         else if(test_number==3){
-            final_time=15;frame_rate=(T).5;
+            final_time=15;if(!this->user_frame_rate) frame_rate=(T).5;
             zalesak_center=TV(50,75);
             zalesak_velocity_center=TV(50,50);
             fluids_parameters.grid->Initialize(TV_INT(10*resolution+1,10*resolution+1),RANGE<TV>(TV(0,0),TV(100,100)));}
         else if(test_number==4){
-            final_time=628;frame_rate=(T).5;
+            final_time=628;if(!this->user_frame_rate) frame_rate=(T).5;
             zalesak_center=TV(25,25);
             zalesak_velocity_center=TV(50,75);
             fluids_parameters.grid->Initialize(TV_INT(10*resolution+1,10*resolution+1),RANGE<TV>(TV(0,0),TV(100,100)));}
@@ -113,8 +115,8 @@ public:
             fluids_parameters.grid->Initialize(TV_INT()+(1<<resolution)+1,RANGE<TV>::Unit_Box());
             initial_water_level=-1;
             fluids_parameters.cfl=(T).5;
-            last_frame=100;
-            frame_rate=(T)last_frame/final_time;
+            if(!user_last_frame) last_frame=100;
+            if(!this->user_frame_rate) frame_rate=(T)last_frame/final_time;
             source=SPHERE<TV>(TV((T).5,(T).75),(T).15);}
         else if(test_number==6){
             fluids_parameters.number_particles_per_cell=128;
@@ -122,18 +124,18 @@ public:
             fluids_parameters.grid->Initialize(TV_INT((1<<resolution)+1,3*(1<<resolution)+1),RANGE<TV>(TV((T)0,(T)-1),TV((T)1,(T)2)));
             initial_water_level=-2;
             fluids_parameters.cfl=(T).5;
-            last_frame=100;
-            frame_rate=(T)last_frame/final_time;
+            if(!user_last_frame) last_frame=100;
+            if(!this->user_frame_rate) frame_rate=(T)last_frame/final_time;
             source=SPHERE<TV>(TV((T).5,(T).75),(T).15);}
         else if(test_number==7){
-            frame_rate=500;
+            if(!this->user_frame_rate) frame_rate=500;
             fluids_parameters.grid->Initialize(TV_INT(10*resolution,(int)(7.5*resolution)),RANGE<TV>(TV((T)0,(T)0),TV((T)2,(T)1.5)));
             source_velocity=TV(0,-40);
             initial_water_level=(T).02;
             source=SPHERE<TV>(TV(1,initial_water_level+(T).15),(T).05);
             fluids_parameters.surface_tension=(T)5e-6;}
         else if(test_number==8){
-            frame_rate=100;
+            if(!this->user_frame_rate) frame_rate=100;
             fluids_parameters.grid->Initialize(TV_INT()+10*resolution+1,RANGE<TV>::Unit_Box());
             fluids_parameters.gravity=TV();
             source=SPHERE<TV>(TV((T).1,(T).5),(T).08);
@@ -147,7 +149,7 @@ public:
         else if(test_number==10){
             fluids_parameters.grid->Initialize(TV_INT()+10*resolution+1,RANGE<TV>::Unit_Box());}
         else if(test_number==11 || test_number==12){
-            final_time=628;frame_rate=(T).5;
+            final_time=628;if(!this->user_frame_rate) frame_rate=(T).5;
             zalesak_center=TV(25,25);
             zalesak_velocity_center=TV(50,50);
             fluids_parameters.grid->Initialize(TV_INT(10*resolution+1,10*resolution+1),RANGE<TV>(TV(0,0),TV(100,100)));}
@@ -182,7 +184,6 @@ public:
     void Extrapolate_Phi_Into_Objects(const T time) override {}
     void Postprocess_Phi(const T time) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

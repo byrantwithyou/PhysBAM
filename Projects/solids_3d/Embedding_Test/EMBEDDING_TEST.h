@@ -25,7 +25,8 @@ public:
     using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
     using BASE::stream_type;using BASE::solid_body_collection;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes; // silence -Woverloaded-virtual
-
+    using BASE::user_last_frame;
+    
     bool target_position;
     bool use_zero_length_springs;
     int constrained_point;
@@ -40,7 +41,6 @@ public:
         parse_args.Parse();
     }
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Get_Initial_Data
 //#####################################################################
@@ -247,13 +247,14 @@ void Initialize_Bodies() override
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
 
-    frame_rate=24;
-    last_frame=(int)(64*frame_rate);
+    if(!this->user_frame_rate) frame_rate=24;
+    if(!user_last_frame) last_frame=(int)(64*frame_rate);
     solids_parameters.cfl=(T)1;
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
     target_position=true;
     use_zero_length_springs=true;
-    output_directory="Embedding_Test/output";
+    if(!this->user_output_directory)
+        output_directory="Embedding_Test/output";
 
     Get_Initial_Data();
     

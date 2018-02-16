@@ -40,7 +40,8 @@ public:
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::solids_parameters;
     using BASE::write_last_frame;using BASE::data_directory;using BASE::stream_type;using BASE::solid_body_collection;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
-
+    using BASE::user_last_frame;
+    
     SOLIDS_STANDARD_TESTS<TV> tests;
     RED_GREEN_TRIANGLES<TV>* redgreen;
     int refinement_level;
@@ -79,7 +80,6 @@ public:
     void Update_Time_Varying_Material_Properties(const T time) override {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Get_Intersecting_Tetrahedron
 //#####################################################################
@@ -254,10 +254,11 @@ void Initialize_Bodies() override
 
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=false;
     solids_parameters.cfl=(T)5;
-    last_frame=10000;
-    frame_rate=24;
-    output_directory="Binding_Plasticity/output";
-    output_directory+=(version==1)?"_siggraph":"_sca2007";
+    if(!user_last_frame) last_frame=10000;
+    if(!this->user_frame_rate) frame_rate=24;
+    if(!this->user_output_directory){
+        output_directory="Binding_Plasticity/output";
+        output_directory+=(version==1)?"_siggraph":"_sca2007";}
     std::cout<<"Frame rate: "<<frame_rate<<std::endl;
     solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-6;
     solids_parameters.implicit_solve_parameters.cg_iterations=500;

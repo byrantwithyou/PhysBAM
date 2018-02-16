@@ -27,6 +27,7 @@ public:
     using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
     using BASE::stream_type;using BASE::solid_body_collection;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes; // silence -Woverloaded-virtual
+    using BASE::user_last_frame;
 
     GRID<TV> hair_layout_grid;
     bool unite_fragments;
@@ -93,7 +94,6 @@ void Get_Initial_Data()
     particles.Compute_Auxiliary_Attributes(soft_bindings);
     soft_bindings.Set_Mass_From_Effective_Mass();
 }
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################
@@ -104,15 +104,15 @@ void Initialize_Bodies() override
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
 
-    frame_rate=24;
-    last_frame=(int)(64*frame_rate);
+    if(!this->user_frame_rate) frame_rate=24;
+    if(!user_last_frame) last_frame=(int)(64*frame_rate);
     solids_parameters.verbose_dt=true;
     solids_parameters.cfl=(T)4;
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
     if(test_number==4 || test_number==2) unite_fragments=true;
     if(test_number==1 || test_number==2 || test_number==6) use_single_mesh=true;
     if(test_number==5 || test_number==6) unite_some_fragments=true;
-    last_frame=20;
+    if(!user_last_frame) last_frame=20;
     
     // geometry
     Get_Initial_Data();

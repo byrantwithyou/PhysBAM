@@ -72,7 +72,8 @@ public:
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::solids_fluids_parameters;
     using BASE::solid_body_collection; using BASE::data_directory;using BASE::test_number;using BASE::resolution;
     using BASE::solids_evolution; using BASE::stream_type;using BASE::Add_To_Fluid_Simulation;
-
+    using BASE::user_last_frame;
+    
     enum SHOCK_TYPE {SPHERICAL,VERTICAL};
 
     SOLIDS_STANDARD_TESTS<TV> solid_tests;
@@ -282,20 +283,20 @@ public:
 
 
             //time
-            initial_time=(T)0.;last_frame=1000;frame_rate=(T)1e4;
+            initial_time=(T)0.;if(!user_last_frame) last_frame=1000;if(!this->user_frame_rate) frame_rate=(T)1e4;
 
             switch(test_number){
-                case 3: last_frame=1;
-                    frame_rate=(T)75;
+                case 3: if(!user_last_frame) last_frame=1;
+                    if(!this->user_frame_rate) frame_rate=(T)75;
                     break;
-                case 7: frame_rate=(T)5e4;
+                case 7: if(!this->user_frame_rate) frame_rate=(T)5e4;
                     break;
                 case 14:
-                case 15: frame_rate=(T)1e4;
+                case 15: if(!this->user_frame_rate) frame_rate=(T)1e4;
                     break;
-                case 17: frame_rate=(T)1e5;
+                case 17: if(!this->user_frame_rate) frame_rate=(T)1e5;
                     break;
-                case 18:last_frame=200;frame_rate=(T)2.5e4;
+                case 18:if(!user_last_frame) last_frame=200;if(!this->user_frame_rate) frame_rate=(T)2.5e4;
                     break;
                 case 19:frame_rate=(T)1e4;
                     break;
@@ -303,9 +304,9 @@ public:
                     break;
                 case 21:frame_rate=(T)6e5;
                     break;
-                default:frame_rate=(T)1e4;last_frame=1000;}
+                default:frame_rate=(T)1e4;if(!user_last_frame) last_frame=1000;}
 
-            if(faster_frame_rate) frame_rate=96;
+            if(faster_frame_rate) if(!this->user_frame_rate) frame_rate=96;
             fluids_parameters.cfl=cfl_number;
             //custom stuff . . . 
             if(transition_to_incompressible){
@@ -437,7 +438,9 @@ public:
             if(test_number==8){inside_shock_box=grid.Domain()-TV(1.2,0,0);}
             if(test_number==9||test_number==10){inside_shock_box=grid.Domain()-TV(1.5,0,0);}
             if(test_number==19) inside_shock_box=RANGE<TV>(TV(36,-2,-2),TV(42,2,2));
-    
+            if(!(test_number==13 || test_number==19))
+                fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection);
+
             // shock strength
             state_inside=TV_DIMENSION((T)1,(T)0,(T)0,(T)0,(T)1);
             state_outside=TV_DIMENSION((T).125,(T)0,(T)0,(T)0,(T).1);
@@ -499,27 +502,24 @@ public:
                     soot_source.Set_Endpoints(endpoint1,endpoint2);}}
 
             // output directory
-            if(timesplit) output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_%d_semiimplicit",
-                test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y),(fluids_parameters.grid->counts.z));
-            else output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_%d_explicit",test_number,
-                (fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y),(fluids_parameters.grid->counts.z));
-            if(eno_scheme==2) output_directory+="_density_weighted";
-            else if(eno_scheme==3) output_directory+="_velocity_weighted";
-            if(use_slip) output_directory+="_slip";
-            if(transition_to_incompressible) output_directory+="_transition_incompressible";
-            if(use_soot) output_directory+="_soot";
-            if(use_fixed_farfield_boundary) output_directory+="_fixedFF";
-            if(strong_shock) output_directory+="_strong";
-            if(fracture_walls) output_directory+="_fracture";
-            output_directory+=LOG::sprintf("_mass_%f",solid_mass);
-            output_directory+=LOG::sprintf("_fp_%d",fp);
+            if(!this->user_output_directory){
+                if(timesplit) output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_%d_semiimplicit",
+                    test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y),(fluids_parameters.grid->counts.z));
+                else output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_%d_explicit",test_number,
+                    (fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y),(fluids_parameters.grid->counts.z));
+                if(eno_scheme==2) output_directory+="_density_weighted";
+                else if(eno_scheme==3) output_directory+="_velocity_weighted";
+                if(use_slip) output_directory+="_slip";
+                if(transition_to_incompressible) output_directory+="_transition_incompressible";
+                if(use_soot) output_directory+="_soot";
+                if(use_fixed_farfield_boundary) output_directory+="_fixedFF";
+                if(strong_shock) output_directory+="_strong";
+                if(fracture_walls) output_directory+="_fracture";
+                output_directory+=LOG::sprintf("_mass_%f",solid_mass);
+                output_directory+=LOG::sprintf("_fp_%d",fp);}
         }
     virtual ~STANDARD_TESTS() {}
 
-void After_Initialization() override {BASE::After_Initialization();
-    if(!(test_number==13 || test_number==19))
-        fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection);
-}
 //#####################################################################
 // Function Intialize_Advection
 //#####################################################################

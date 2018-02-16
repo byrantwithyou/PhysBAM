@@ -25,7 +25,8 @@ public:
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::solids_parameters;
     using BASE::write_last_frame;using BASE::data_directory;using BASE::stream_type;using BASE::solid_body_collection;
     using BASE::Set_External_Velocities; // silence -Woverloaded-virtual
-
+    using BASE::user_last_frame;
+    
     ARTICULATED_RIGID_BODY<TV>* arb;
     RIGID_BODY<TV> *handle[4];
     TV pos[4];
@@ -40,19 +41,19 @@ public:
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
         solids_parameters.cfl=(T).1;
 
-        last_frame=1000;
-        frame_rate=24;
+        if(!user_last_frame) last_frame=1000;
+        if(!this->user_frame_rate) frame_rate=24;
         std::cout<<"Frame rate: "<<frame_rate<<std::endl;
         increment=0;
         tests.data_directory=data_directory;
-        output_directory="Mesh/output";
+        if(!this->user_output_directory)
+            output_directory="Mesh/output";
     }
 
     virtual ~MESH_EXAMPLE()
     {
         delete arb;
     }
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
     void Update_Time_Varying_Material_Properties(const T time) override {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) override {}

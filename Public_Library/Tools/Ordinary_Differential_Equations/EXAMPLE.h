@@ -46,12 +46,12 @@ public:
     int substeps_delay_frame;
     int substeps_delay_level;
     bool use_test_output;
-    std::string test_output_prefix,stored_data_directory,stored_output_directory;
-    bool opt_all_verbose,user_dt,user_frame_rate,user_max_dt,user_first_frame,user_last_frame,user_data_directory,user_output_directory;
+    std::string test_output_prefix;
+    bool opt_all_verbose,user_last_frame=false,user_output_directory=false;
+    bool user_frame_rate=false;
     bool opt_query_output,opt_nolog;
-    int opt_verbosity,stored_first_frame,stored_last_frame;
-    T stored_dt,stored_frame_rate,stored_max_dt;
-    T m,s,kg;
+    int opt_verbosity;
+    T m=1,s=1,kg=1;
     std::string stored_args;
     
     EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
@@ -64,10 +64,9 @@ public:
     bool Clamp_Time_Step_With_Target_Time(const T time,const T target_time,T& dt);
     void Set_Write_Substeps_Level(const int level);
     void Write_Frame_Title(const int frame) const;
+    void Setup_Log() const;
     virtual void Write_Output_Files(const int frame) const=0;
     virtual void Log_Parameters() const;
-    virtual void After_Construction(); // Call parent first
-    virtual void After_Initialization(); // Call parent last
 //#####################################################################
 };
 }

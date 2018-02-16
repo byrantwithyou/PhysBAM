@@ -26,6 +26,7 @@ public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::data_directory;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::stream_type;using BASE::solid_body_collection;using BASE::test_number;using BASE::resolution;
+    using BASE::user_last_frame;
 
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
     int waterfall;
@@ -42,8 +43,9 @@ public:
     {
         parse_args.Parse();
 
-        first_frame=0;last_frame=1000;
-        frame_rate=36;
+        first_frame=0;
+        if(!user_last_frame) last_frame=1000;
+        if(!this->user_frame_rate) frame_rate=36;
         restart=false;restart_frame=18;
         int cells=1*resolution;
         fluids_parameters.grid->Initialize(TV_INT(2*cells+1,3*cells+1,2*cells+1),RANGE<TV>(TV(-4,-8,0),TV(4,4,8)));
@@ -55,7 +57,8 @@ public:
         fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
         fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
         fluids_parameters.write_debug_data=true;
-        output_directory=LOG::sprintf("Waterfall/Test_%d_Waterfall_Resolution_%d_%d_%d",test_number,(fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),
+        if(!this->user_output_directory)
+            output_directory=LOG::sprintf("Waterfall/Test_%d_Waterfall_Resolution_%d_%d_%d",test_number,(fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),
             (fluids_parameters.grid->counts.z-1));
         fluids_parameters.delete_fluid_inside_objects=true;
         fluids_parameters.enforce_divergence_free_extrapolation=false;
@@ -87,7 +90,6 @@ public:
     void Postprocess_Solids_Substep(const T time,const int substep) override {}
     void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,3> >*& cell_centered_mask,const T time) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Get_Source_Velocities
 //#####################################################################

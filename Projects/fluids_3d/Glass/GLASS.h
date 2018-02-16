@@ -29,7 +29,8 @@ public:
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::data_directory;using BASE::solid_body_collection;
     using BASE::stream_type;using BASE::test_number;using BASE::resolution;using BASE::Adjust_Phi_With_Source;
-
+    using BASE::user_last_frame;
+    
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
     FLUID_COLLISION_BODY_INACCURATE_UNION<TV> inaccurate_union;
     int glass;
@@ -64,7 +65,7 @@ public:
         parse_args.Parse();
         random.Set_Seed(1);
         // set up the standard fluid environment
-        frame_rate=96;
+        if(!this->user_frame_rate) frame_rate=96;
         restart=false;restart_frame=0;
         fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
         fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
@@ -88,11 +89,11 @@ public:
         fluids_parameters.bandwidth_without_maccormack_near_interface=1;
 
         int cells=1*resolution;
-        first_frame=0;last_frame=10;
+        first_frame=0;if(!user_last_frame) last_frame=10;
         GRID<TV>& grid=*fluids_parameters.grid;
         grid.Initialize(TV_INT(10*cells+1,20*cells+1,10*cells+1),RANGE<TV>(TV(-(T).05,0,-(T).05),TV((T).05,(T).2,(T).05)));
 
-        last_frame=1000;
+        if(!user_last_frame) last_frame=1000;
         
         // SPH paramters
         fluids_parameters.use_sph_for_removed_negative_particles=true;
@@ -123,7 +124,8 @@ public:
 
         time_pour=4;
         
-        output_directory=LOG::sprintf("Glass/Glass_%d__Resolution_%d_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1),(grid.counts.z-1));
+        if(!this->user_output_directory)
+            output_directory=LOG::sprintf("Glass/Glass_%d__Resolution_%d_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1),(grid.counts.z-1));
         LOG::cout<<"Running SPH simulation to "<<output_directory<<std::endl;
 
         CYLINDER<T> source1;
@@ -173,7 +175,6 @@ public:
     void Postprocess_Frame(const int frame) override {}
     void Postprocess_Phi(const T time) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

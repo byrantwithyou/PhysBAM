@@ -86,7 +86,8 @@ public:
 
     using BASE::output_directory;using BASE::solids_parameters;using BASE::write_last_frame;using BASE::data_directory;using BASE::last_frame;
     using BASE::stream_type;using BASE::frame_rate;using BASE::solid_body_collection;using BASE::test_number;
-
+    using BASE::user_last_frame;
+    
     SOLIDS_STANDARD_TESTS<TV> tests;
     int cluster_id;
     int kinematic_id;
@@ -129,7 +130,8 @@ public:
 
         if(!this->fixed_dt && !this->max_dt && !this->min_dt) this->fixed_dt=1;
         tests.data_directory=data_directory;
-        output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+        if(!this->user_output_directory)
+            output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
         if(arb.use_krylov_poststab) arb.use_poststab_in_cg=false;
         if(use_prestab_iterations) solids_parameters.rigid_body_collision_parameters.contact_iterations=arb.max_iterations;
     }
@@ -163,7 +165,6 @@ public:
     bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) override {return false;}
     void Filter_Velocities(const T dt,const T time,const bool velocity_update) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Get_Initial_Data
 //#####################################################################
@@ -183,7 +184,7 @@ void Get_Initial_Data()
     // poststabilization settings
     arb.Set_Poststabilization_Iterations(5);
     arb.poststabilization_projection_iterations=2;
-    last_frame=96;
+    if(!user_last_frame) last_frame=96;
 
     if(test_number<=4 || test_number==10 || test_number==11 || (test_number>=13 && test_number<=16) || test_number==18 || test_number==29){
         rigid_body0=&tests.Add_Rigid_Body("subdivided_box",1,(T).5);
@@ -199,7 +200,7 @@ void Get_Initial_Data()
             joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(1,1,1)));
             joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(1,-1,-1)));
             break;
-        case 14:last_frame=1;
+        case 14:if(!user_last_frame) last_frame=1;
         case 2: // rigid with prismatic translation
             rigid_body1->Frame().t=TV((T)2.5,2,0);
             joint=new RIGID_JOINT<TV>();((RIGID_JOINT<TV>*)joint)->Set_Prismatic_Component_Translation(TV((T).5,0,0));
@@ -213,7 +214,7 @@ void Get_Initial_Data()
             joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(1,1,1),ROTATION<TV>(-(T)pi/2,TV(0,1,0))));
             joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-1,-1,1),ROTATION<TV>((T)pi/2,TV(0,0,1))*ROTATION<TV>(-(T)pi/2,TV(0,1,0))));
             break;
-        case 29:last_frame=240;
+        case 29:if(!user_last_frame) last_frame=240;
         case 4: // twist
             rigid_body1->Frame().t=TV((T)2.1,2,0);
             joint=new ANGLE_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body0->particle_index,rigid_body1->particle_index,joint);
@@ -231,7 +232,7 @@ void Get_Initial_Data()
             break;
         case 20:
         case 5: // multiple rigid contraints
-            last_frame=240;
+            if(!user_last_frame) last_frame=240;
             for(int i=0;i<8;i++){
                 RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("subdivided_box",1,(T).5);
                 rigid_body.Frame().t=TV((T)2*i,(T)2*i,(T)2*i);
@@ -242,7 +243,7 @@ void Get_Initial_Data()
                     joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-1,-1,-1)));}}
             break;
         case 6: // closed loop
-            last_frame=240;
+            if(!user_last_frame) last_frame=240;
             tests.Make_Lathe_Chain(FRAME<TV>(TV(0,10,0)));
             break;
         case 7: // pd control
@@ -251,7 +252,7 @@ void Get_Initial_Data()
             arb.global_post_stabilization=true;
             break;
         case 8:{ // cluster with rigid block of same size
-            last_frame=132;
+            if(!user_last_frame) last_frame=132;
             Large_Cluster_Cube(FRAME<TV>(TV(0,2,0),rotation),(T)1,(T)0);
             RIGID_BODY<TV>*rigid_body=&tests.Add_Rigid_Body("subdivided_box",2,(T)0);
             rigid_body->Frame()=FRAME<TV>(TV(10,2,0),rotation);
@@ -355,7 +356,7 @@ void Get_Initial_Data()
             break;}
         case 25:
         case 26:{
-            last_frame=480;
+            if(!user_last_frame) last_frame=480;
             RIGID_BODY<TV>& box=tests.Add_Rigid_Body("subdivided_box",1,(T)0);
             box.Frame().t.y=20;box.is_static=true;
             RIGID_BODY<TV>& sphere=tests.Add_Rigid_Body("sphere",(T)1,(T)0);
@@ -373,7 +374,7 @@ void Get_Initial_Data()
         case 27: Normal_Joint_Test();break;
         case 28: Kinematic_Angle_Joint_Test();break;
         case 30:{
-            last_frame=240;
+            if(!user_last_frame) last_frame=240;
             RIGID_BODY<TV>* box=&tests.Add_Rigid_Body("subdivided_box",5,(T)0);
             box->Frame().t=TV(0,3,0);
             box=&tests.Add_Rigid_Body("subdivided_box",5,(T)0);
@@ -621,7 +622,7 @@ int Spring_Cluster_Test(FRAME<TV> shift_frame,bool fracture)
 //#####################################################################
 void Heavy_Bottom_Link_Test()
 {
-    last_frame=240;
+    if(!user_last_frame) last_frame=240;
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
     JOINT<TV> *joint;
     RIGID_BODY<TV>* rigid_body[3];
@@ -884,7 +885,7 @@ void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) overrid
 //#####################################################################
 void Normal_Joint_Test()
 {
-    last_frame=240;
+    if(!user_last_frame) last_frame=240;
     solids_parameters.rigid_body_collision_parameters.contact_iterations=0;
     solids_parameters.rigid_body_collision_parameters.use_push_out=false;
 
@@ -936,7 +937,7 @@ void Normal_Joint_Test()
 //#####################################################################
 void Kinematic_Angle_Joint_Test()
 {
-    last_frame=240;
+    if(!user_last_frame) last_frame=240;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
 

@@ -105,7 +105,6 @@ int main(int argc,char* argv[])
     //example=new ELASTIC_DRIP<T>(stream_type,parse_args);
     //example=new FLUID_CONTROL<T>(stream_type,parse_args);
     example->mpi_world=new MPI_WORLD(parse_args);
-    example->After_Construction();
     
     FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example->fluids_parameters;
     if(example->mpi_world->initialized)

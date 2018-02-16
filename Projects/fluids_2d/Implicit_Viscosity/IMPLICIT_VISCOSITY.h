@@ -23,8 +23,8 @@ class IMPLICIT_VISCOSITY:public WATER_FREE_SURFACE_2D_EXAMPLE<T,RW>
 public:
     IMPLICIT_VISCOSITY()
     {
-        frame_rate=200;
-        last_frame=1000;//(int)(10*frame_rate);
+        if(!this->user_frame_rate) frame_rate=200;
+        if(!user_last_frame) last_frame=1000;//(int)(10*frame_rate);
         m=100;
         n=100;
         domain_walls[0][0]=true;domain_walls[0][1]=true;domain_walls[1][0]=true;domain_walls[1][1]=false;

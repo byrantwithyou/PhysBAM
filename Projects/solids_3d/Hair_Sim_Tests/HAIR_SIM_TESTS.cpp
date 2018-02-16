@@ -68,7 +68,8 @@ HAIR_SIM_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     LOG::cout<<"PARAM FILE is "<<parameter_file<<std::endl;
     parameter_list.Begin_Parse(parameter_file);
     std::string test_name=parameter_list.Get_Parameter("test_name",(std::string)"Test");
-    output_directory=LOG::sprintf("Hair_Sim_Tests/%s_%d",test_name.c_str(),test_number);
+    if(!this->user_output_directory)
+            output_directory=LOG::sprintf("Hair_Sim_Tests/%s_%d",test_name.c_str(),test_number);
     use_wind=parameter_list.Get_Parameter("use_wind",(bool)false);
     use_drag=parameter_list.Get_Parameter("use_drag",(bool)false);
     drag_viscosity=parameter_list.Get_Parameter("drag_viscosity",(T)5);
@@ -111,7 +112,7 @@ HAIR_SIM_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     project_second_node_to_surface=parameter_list.Get_Parameter("project_second_node_to_surface",(bool)false);
     head_friction=parameter_list.Get_Parameter("head_friction",(T)0);
     use_eulerian_level_set_interpolation=parameter_list.Get_Parameter("use_eulerian_level_set_interpolation",(bool)false);
-    frame_rate=parameter_list.Get_Parameter("frame_rate",(T)30);
+    if(!this->user_frame_rate) frame_rate=parameter_list.Get_Parameter("frame_rate",(T)30);
 
     T levelset_frame_rate=parameter_list.Get_Parameter("levelset_frame_rate",(T)60); // twice the sampling rate as 
     use_implicit=parameter_list.Get_Parameter("use_implicit",(bool)false);
@@ -164,10 +165,10 @@ Initialize_Bodies()
     // compute last frame
     if(use_deforming_levelsets){
         int levelset_frames;Read_From_Text_File(LOG::sprintf("%s/%s/motion/last_frame",data_directory.c_str(),sim_folder.c_str()),levelset_frames);
-        last_frame=(int)((T)levelset_frames*levelset_frequency*(T)frame_rate)+round_number(start_time*frame_rate);
+        if(!user_last_frame) last_frame=(int)((T)levelset_frames*levelset_frequency*(T)frame_rate)+round_number(start_time*frame_rate);
         last_frame-=1;}
     else{
-        last_frame=1000;}
+        if(!user_last_frame) last_frame=1000;}
 
     // give mon hints
     LOG::cout<<"MONITOR begin_frame="<<this->first_frame<<std::endl;

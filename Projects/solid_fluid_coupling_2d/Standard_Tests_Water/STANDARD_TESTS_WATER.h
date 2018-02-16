@@ -52,7 +52,7 @@ public:
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions;using BASE::mpi_world; // silence -Woverloaded-virtual
     using BASE::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization;using BASE::solid_body_collection;using BASE::test_number;using BASE::resolution;
     using BASE::Add_To_Fluid_Simulation;using BASE::Add_Volumetric_Body_To_Fluid_Simulation;using BASE::Add_Thin_Shell_To_Fluid_Simulation;using BASE::Adjust_Phi_With_Source;
-    using BASE::data_directory;
+    using BASE::data_directory;using BASE::user_last_frame;
 
     WATER_STANDARD_TESTS_2D<TV> water_tests;
     SOLIDS_STANDARD_TESTS<TV> solids_tests;
@@ -98,7 +98,7 @@ public:
         solids_tests.data_directory=data_directory;
         water_tests.Initialize(Water_Test_Number(test_number),resolution);
         LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
-        last_frame=1000;
+        if(!user_last_frame) last_frame=1000;
 
         //mattress_grid=GRID_2D<T>(4,2,(T).1,(T).49,(T).4,(T).6);
         solids_parameters.triangle_collision_parameters.perform_self_collision=false;
@@ -134,7 +134,7 @@ public:
                 solid_density=(T)1200;
                 break;
             case 2:
-                last_frame=1000;
+                if(!user_last_frame) last_frame=1000;
                 fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
                 break;
             case 3:
@@ -197,13 +197,13 @@ public:
                 fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=false;
                 break;
             case 9:
-                last_frame=200;
+                if(!user_last_frame) last_frame=200;
                 (*fluids_parameters.grid).Initialize(TV_INT(15*resolution+1,10*resolution+1),RANGE<TV>(TV(0,0),TV((T)1.5,1)));
                 heavy_sphere_drop_time=(T).05;
                 light_sphere_drop_time=(T).2;
                 break;
             case 10:
-                last_frame=200;
+                if(!user_last_frame) last_frame=200;
                 fluids_parameters.density=(T)1000;
                 (*fluids_parameters.grid).Initialize(TV_INT(40*resolution+1,20*resolution+1),RANGE<TV>(TV((T)-2,(T)0),TV((T)2,(T)2)));
                 fluids_parameters.domain_walls[1][1]=false;
@@ -229,11 +229,12 @@ public:
                 LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
         THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Rigid_Body_Walls(*this);
-        // output_directory=LOG::sprintf("Standard_Tests_Water/Test_%d_Resolution_%d_density_%d",test_number,resolution,solid_density);
-        if(fluids_parameters.use_slip)
-            output_directory=LOG::sprintf("Standard_Tests_Water/Test_%d_Resolution_%d_slip",test_number,resolution);
-        else
-            output_directory=LOG::sprintf("Standard_Tests_Water/Test_%d_Resolution_%d",test_number,resolution);
+        if(!this->user_output_directory){
+            // output_directory=LOG::sprintf("Standard_Tests_Water/Test_%d_Resolution_%d_density_%d",test_number,resolution,solid_density);
+            if(fluids_parameters.use_slip)
+                output_directory=LOG::sprintf("Standard_Tests_Water/Test_%d_Resolution_%d_slip",test_number,resolution);
+            else
+                output_directory=LOG::sprintf("Standard_Tests_Water/Test_%d_Resolution_%d",test_number,resolution);}
     }
 
     // Unused callbacks
@@ -263,7 +264,6 @@ public:
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override {}
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Water_Test_Number
 //#####################################################################

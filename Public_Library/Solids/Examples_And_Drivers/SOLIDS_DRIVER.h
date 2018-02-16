@@ -23,9 +23,9 @@ class SOLIDS_DRIVER:public DRIVER<TV>
 public:
     using BASE::output_number;using BASE::time;using BASE::Read_Time;using BASE::Write_Substep;
     using BASE::Write_Time;using BASE::Write_First_Frame;using BASE::Write_Last_Frame;
+    using BASE::current_frame;
     SOLIDS_EXAMPLE<TV>& example;
     bool project_at_frame_boundaries;
-    int current_frame;
     T next_dt; // for fluid time stepping
     bool next_done; // for fluid time stepping
     T last_dt;

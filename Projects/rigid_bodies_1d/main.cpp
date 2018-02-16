@@ -24,7 +24,6 @@ int main(int argc,char *argv[])
     //KINEMATIC_EXAMPLE<float> example(stream_type,example_number);
     //ARB_EXAMPLE<float> example(stream_type,example_number);
     example.mpi_world=new MPI_WORLD(parse_args);
-    example.After_Construction();
 
     if(example.mpi_world->initialized) example.solid_body_collection.deformable_body_collection.Set_Mpi_Solids(new MPI_SOLIDS<TV>);
     example.Adjust_Output_Directory_For_MPI(example.solid_body_collection.deformable_body_collection.mpi_solids);

@@ -57,7 +57,8 @@ int main(int argc,char *argv[])
 
     parse_args.Parse();
 
-    output_directory=directory+"/mpm_particle_obj";
+    if(!this->user_output_directory)
+        output_directory=directory+"/mpm_particle_obj";
     Create_Directory(output_directory);
 
     if(type_double) Run<VECTOR<double,3> >(parse_args,STREAM_TYPE(0.0));

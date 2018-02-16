@@ -40,10 +40,11 @@ Initialize_Bodies()
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
     ARRAY<float> masses;
 
-    output_directory=LOG::sprintf("Mass_Weighted_Self_Collisions/Test_%d",test_number);
+    if(!this->user_output_directory)
+        output_directory=LOG::sprintf("Mass_Weighted_Self_Collisions/Test_%d",test_number);
     
-    last_frame=1000;
-    frame_rate=24;
+    if(!user_last_frame) last_frame=1000;
+    if(!this->user_frame_rate) frame_rate=24;
     solids_parameters.enforce_repulsions_in_cg=false;
     solids_parameters.triangle_collision_parameters.perform_self_collision=true;
     solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness=(T)1e-4;

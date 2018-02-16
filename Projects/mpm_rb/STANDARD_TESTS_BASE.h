@@ -53,7 +53,7 @@ public:
     using BASE::rd_k;using BASE::use_rd_k;using BASE::rr_k;using BASE::use_rr_k;
     using BASE::di_k;using BASE::use_di_k;using BASE::rd_mu;using BASE::use_rd_mu;
     using BASE::rr_mu;using BASE::use_rr_mu;using BASE::di_mu;using BASE::use_di_mu;
-
+    
     int test_number;
     int resolution;
     bool user_resolution;

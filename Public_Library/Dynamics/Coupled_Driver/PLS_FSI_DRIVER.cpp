@@ -159,8 +159,6 @@ Initialize()
     PARTICLE_LEVELSET_EVOLUTION_UNIFORM<TV>* particle_levelset_evolution=example.fluids_parameters.particle_levelset_evolution;
     INCOMPRESSIBLE_UNIFORM<TV>* incompressible=example.fluids_parameters.incompressible;
 
-    example.After_Initialization();
-
     Initialize_Fluids_Grids(); // this needs to be here because the arrays have to be resized for multiphase
 
     example.fluids_parameters.collision_bodies_affecting_fluid->Initialize_Grids();
@@ -587,10 +585,9 @@ Compute_Dt(const T time,const T target_time,bool& done)
     solids_dt=min(solids_dt,solids_evolution_callbacks->Constraints_CFL());
     solids_dt=min(solids_dt,example.solid_body_collection.rigid_body_collection.CFL_Rigid(solids_parameters.rigid_body_evolution_parameters,solids_parameters.verbose_dt));
 
-    if(example.fixed_dt){fluids_dt=example.fixed_dt;solids_dt=example.fixed_dt;}
     T dt=min(fluids_dt,solids_dt);
-    LOG::cout<<"fluids_dt = "<<fluids_dt<<", solids_dt = "<<solids_dt<<" dt="<<dt<<std::endl;
     done=example.Clamp_Time_Step_With_Target_Time(time,target_time,dt);
+    LOG::cout<<"fluids_dt = "<<fluids_dt<<", solids_dt = "<<solids_dt<<" dt="<<dt<<std::endl;
     return dt;
 }
 //#####################################################################

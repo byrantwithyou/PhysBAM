@@ -41,6 +41,7 @@ template<class TV> void DRIVER<TV>::
 Initialize()
 {
     // setup time
+    example.Setup_Log();
     if(example.auto_restart){Read_Last_Frame();example.restart=true;}
     if(example.restart){current_frame=example.restart_frame;Read_Time(current_frame);}
     else current_frame=example.first_frame;

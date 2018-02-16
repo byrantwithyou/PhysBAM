@@ -38,7 +38,7 @@ public:
     typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
 
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;
-    using BASE::resolution;
+    using BASE::resolution;using BASE::user_last_frame;
 
     BANG_BANG_ST(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
         :BASE(stream_type_input,parse_args,0,fluids_parameters.COMPRESSIBLE),eno_scheme(1),eno_order(2),rk_order(3),cfl_number((T).5),timesplit(false),
@@ -61,7 +61,9 @@ public:
         *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
         fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;
         //time
-        initial_time=(T)0.;last_frame=10;frame_rate=(T)263;
+        initial_time=(T)0.;
+        if(!user_last_frame) last_frame=10;
+        if(!this->user_frame_rate) frame_rate=(T)263;
         fluids_parameters.cfl=cfl_number;
         //custom stuff . . .
         fluids_parameters.compressible_eos = new EOS_GAMMA<T>;
@@ -77,10 +79,11 @@ public:
 
         solids_parameters.triangle_collision_parameters.perform_self_collision=false;
 
-        if(timesplit) output_directory=LOG::sprintf("Bang_Bang_ST/Test_1__Resolution_%d_semiimplicit",(fluids_parameters.grid->counts.x));
-        else output_directory=LOG::sprintf("Bang_Bang_ST/Test_1__Resolution_%d_explicit",(fluids_parameters.grid->counts.x));
-        if(eno_scheme==2) output_directory+="_density_weighted";
-        else if(eno_scheme==3) output_directory+="_velocity_weighted";
+        if(!this->user_output_directory){
+            if(timesplit) output_directory=LOG::sprintf("Bang_Bang_ST/Test_1__Resolution_%d_semiimplicit",(fluids_parameters.grid->counts.x));
+            else output_directory=LOG::sprintf("Bang_Bang_ST/Test_1__Resolution_%d_explicit",(fluids_parameters.grid->counts.x));
+            if(eno_scheme==2) output_directory+="_density_weighted";
+            else if(eno_scheme==3) output_directory+="_velocity_weighted";}
     }
 
     int eno_scheme;
@@ -93,7 +96,6 @@ public:
         
     virtual ~BANG_BANG_ST() {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Intialize_Advection
 //#####################################################################

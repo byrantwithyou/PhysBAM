@@ -34,7 +34,7 @@ public:
     typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::stream_type;
-    using BASE::resolution;
+    using BASE::resolution;using BASE::user_last_frame;
 
     T angle;
     int eno_scheme;
@@ -65,7 +65,7 @@ public:
         fluids_parameters.grid->Initialize(TV_INT(cells_m+1,cells_n+1),RANGE<TV>(TV(),TV(L,H)/sin(angle)));
         *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
         //time
-        initial_time=(T)0.;last_frame=400;frame_rate=(T)80.;
+        initial_time=(T)0.;if(!user_last_frame) last_frame=400;if(!this->user_frame_rate) frame_rate=(T)80.;
         fluids_parameters.cfl=cfl_number;
         //custom stuff . . . 
         fluids_parameters.compressible_eos=new EOS_GAMMA<T>;
@@ -81,16 +81,16 @@ public:
         fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_OBLIQUE_ST_2D<TV>(angle,true,true);
         fluids_parameters.compressible_timesplit=timesplit;
 
-        output_directory="Oblique_Sod_ST/matlab";        
-        if(timesplit) output_directory=LOG::sprintf("Oblique_Sod_ST/Resolution_%d_%d_semiimplicit",(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-        else output_directory=LOG::sprintf("Oblique_Sod_ST/Resolution_%d_%d_explicit",(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-        if(eno_scheme==2) output_directory+="_density_weighted";
-        else if(eno_scheme==3) output_directory+="_velocity_weighted";
+        if(!this->user_output_directory){
+            output_directory="Oblique_Sod_ST/matlab";        
+            if(timesplit) output_directory=LOG::sprintf("Oblique_Sod_ST/Resolution_%d_%d_semiimplicit",(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+            else output_directory=LOG::sprintf("Oblique_Sod_ST/Resolution_%d_%d_explicit",(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+            if(eno_scheme==2) output_directory+="_density_weighted";
+            else if(eno_scheme==3) output_directory+="_velocity_weighted";}
     }
     
     virtual ~OBLIQUE_SOD_ST() {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Intialize_Euler_State
 //#####################################################################

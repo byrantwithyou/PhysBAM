@@ -20,13 +20,12 @@ class PLS_FSI_DRIVER:public DRIVER<TV>
     typedef DRIVER<TV> BASE;
     typedef VECTOR<T,TV::m+2> TV_DIMENSION;
     typedef ARRAY<TV_DIMENSION,TV_INT> T_ARRAYS_DIMENSION_SCALAR;
-    using BASE::time;
+    using BASE::time;using BASE::current_frame;
 public:
     using BASE::output_number;using BASE::Write_Output_Files;using BASE::Read_Time;using BASE::Write_Time;
     using BASE::Write_First_Frame;using BASE::Write_Last_Frame;using BASE::Write_Substep;
 
     PLS_FSI_EXAMPLE<TV>& example;
-    int current_frame;
     ARRAY<T,TV_INT> old_phi;
     ARRAY<T,FACE_INDEX<TV::m> > face_velocities_scratch;
 

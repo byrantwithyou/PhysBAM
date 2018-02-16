@@ -54,7 +54,8 @@ HAIR_STRAND_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     LOG::cout<<"PARAM FILE is "<<parameter_file<<std::endl;
     parameter_list.Begin_Parse(parameter_file);
     std::string test_name=parameter_list.Get_Parameter("test_name",(std::string)"Test");
-    output_directory=LOG::sprintf("Hair_Sim_Tests/%s_%d",test_name.c_str(),test_number);
+    if(!this->user_output_directory)
+        output_directory=LOG::sprintf("Hair_Sim_Tests/%s_%d",test_name.c_str(),test_number);
     solids_parameters.cfl=parameter_list.Get_Parameter("cfl",(T)10);
     cfl_strain_rate=parameter_list.Get_Parameter("cfl_strain_rate",(T)0.1);
     solids_parameters.implicit_solve_parameters.cg_iterations=parameter_list.Get_Parameter("cg_iterations",(int)200);
@@ -101,8 +102,8 @@ Initialize_Bodies()
         adhesion_start_radius=(T).003;
         adhesion_stop_radius=(T).02;}
     
-    last_frame=1000;
-    frame_rate=30;
+    if(!user_last_frame) last_frame=1000;
+    if(!this->user_frame_rate) frame_rate=30;
 
     solids_parameters.use_trapezoidal_rule_for_velocities=false;
     solids_parameters.enforce_repulsions_in_cg=false;

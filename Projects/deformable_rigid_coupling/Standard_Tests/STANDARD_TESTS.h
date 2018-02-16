@@ -137,6 +137,7 @@ public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::restart;
     using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::test_number;
+    using BASE::user_last_frame;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
         :BASE(stream_type_input,parse_args),tests(stream_type_input,data_directory,solid_body_collection),parameter(1),
@@ -157,7 +158,8 @@ public:
         parse_args.Parse();
 
         tests.data_directory=data_directory;
-        output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+        if(!this->user_output_directory)
+            output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
         if(project_nullspace) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
     }
 
@@ -200,7 +202,6 @@ TV Sidewinding_Position(const T time,const T segment)
     T x=bend_amplitude*sin(theta);
     return TV(x,y,segment);
 }
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Self_Collisions_Begin_Callback
 //#####################################################################
@@ -445,7 +446,7 @@ bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) overri
 //#####################################################################
 void Push_Out_Test()
 {
-    last_frame=120;
+    if(!user_last_frame) last_frame=120;
     // set up two blocks to be interpenetrating
     int num_blocks=4;
     for(int i=0;i<num_blocks;i++){
@@ -471,7 +472,7 @@ void Push_Out_Test()
 //#####################################################################
 void Coupled_Stack()
 {
-    last_frame=240;
+    if(!user_last_frame) last_frame=240;
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
     dynamic_subsampling=true;
     for(int i=0;i<6;i++){
@@ -516,7 +517,7 @@ FRAME<TV> Find_Placement(RANDOM_NUMBERS<T>& random,const RANGE<TV>& bounding_box
 //#####################################################################
 void Trampoline()
 {
-    last_frame=120;
+    if(!user_last_frame) last_frame=120;
     RANDOM_NUMBERS<T> random;
     random.Set_Seed(1234);
     solids_parameters.cfl=(T)1;
@@ -586,7 +587,7 @@ void Trampoline()
 //#####################################################################
 void Sliding_Test()
 {
-    last_frame=96;
+    if(!user_last_frame) last_frame=96;
     RIGID_BODY<TV>* rigid_body=0;
 
     const char* boxfile="box";
@@ -636,7 +637,7 @@ void Sliding_Test()
 //#####################################################################
 void Point_Joint_Coupled_Drop(bool make_body_static)
 {
-    last_frame=120;
+    if(!user_last_frame) last_frame=120;
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
     RIGID_BODY<TV>& rigid_body0=tests.Add_Rigid_Body("subdivided_box",1,(T).5);
     rigid_body0.Frame().t=TV(0,2,0);
@@ -663,7 +664,7 @@ void Point_Joint_Coupled_Drop(bool make_body_static)
 //#####################################################################
 void Torsion_Spring()
 {
-    last_frame=120;
+    if(!user_last_frame) last_frame=120;
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
 
     solids_parameters.implicit_solve_parameters.cg_projection_iterations=3;
@@ -728,7 +729,7 @@ void Initialize_Joint_Between(JOINT<TV>* joint,const RIGID_BODY<TV>& parent,cons
 //#####################################################################
 void Floppy_Fish()
 {
-    last_frame=240;
+    if(!user_last_frame) last_frame=240;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
 
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
@@ -808,8 +809,8 @@ void Floppy_Fish()
 //#####################################################################
 void Twisting_Chain(bool apply_twist)
 {
-    last_frame=120;
-    if(apply_twist) last_frame=1200;
+    if(!user_last_frame) last_frame=120;
+    if(apply_twist) if(!user_last_frame) last_frame=1200;
 //    dynamic_subsampling=true;
 
     solids_parameters.implicit_solve_parameters.cg_projection_iterations=5;
@@ -839,7 +840,7 @@ void Twisting_Chain(bool apply_twist)
 //#####################################################################
 void Brush_And_Wheel()
 {
-    last_frame=120;
+    if(!user_last_frame) last_frame=120;
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
 
     solids_parameters.implicit_solve_parameters.cg_projection_iterations=5;
@@ -882,7 +883,7 @@ void Ring_Drop()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
 
-    last_frame=30+(int)(450*num_objects_multiplier);
+    if(!user_last_frame) last_frame=30+(int)(450*num_objects_multiplier);
     solids_parameters.cfl=5;
     solids_parameters.deformable_object_collision_parameters.collide_with_interior=true;
     solids_parameters.triangle_collision_parameters.check_mesh_for_self_intersection=false;
@@ -1015,7 +1016,7 @@ void Ring_Drop()
 //#####################################################################
 void Cubes_Friction()
 {
-    last_frame=96;
+    if(!user_last_frame) last_frame=96;
     RIGID_BODY<TV>* rigid_body=0;
 
     const char* boxfile="box";
@@ -1102,7 +1103,7 @@ void PD_Snake(const T scale,const TV shift,const ROTATION<TV> orient,const T k_p
 //#####################################################################
 void Sidewinding()
 {
-    last_frame=1200;
+    if(!user_last_frame) last_frame=1200;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
 
@@ -1173,7 +1174,7 @@ void Sidewinding()
 //#####################################################################
 void Row_Of_Spheres()
 {
-    last_frame=120;
+    if(!user_last_frame) last_frame=120;
     RIGID_BODY<TV>* rigid_body=0;
     TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=0;
     INCOMPRESSIBLE_FINITE_VOLUME<TV,3>* fvm=0;
@@ -1249,7 +1250,7 @@ void Add_Maggot(const T scale,const RIGID_BODY_STATE<TV>& state,const std::strin
 //#####################################################################
 void Maggot()
 {
-    last_frame=360;
+    if(!user_last_frame) last_frame=360;
     solids_parameters.cfl=(T)1;
 
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
@@ -1282,7 +1283,7 @@ void Maggot()
 //#####################################################################
 void Bowl_Of_Maggots(bool use_blocks)
 {
-    last_frame=360;
+    if(!user_last_frame) last_frame=360;
     solids_parameters.cfl=use_blocks?(T).5:(T)1;
     solids_parameters.triangle_collision_parameters.perform_self_collision=true;
     solids_parameters.implicit_solve_parameters.cg_projection_iterations=15;
@@ -1350,7 +1351,7 @@ void Bowl_Of_Maggots(bool use_blocks)
 //#####################################################################
 void Trapped_Maggot()
 {
-    last_frame=360;
+    if(!user_last_frame) last_frame=360;
     solids_parameters.cfl=(T).5;
 
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
@@ -1550,7 +1551,7 @@ void Update_Subsamples()
 //#####################################################################
 void Push_Out_Test2()
 {
-    last_frame=360;
+    if(!user_last_frame) last_frame=360;
     RIGID_BODY<TV>& rigid_body0=tests.Add_Rigid_Body("subdivided_box",1,(T)0);
     RIGID_BODY<TV>& rigid_body1=tests.Add_Rigid_Body("subdivided_box",1,(T)0);
     rigid_body0.Frame().t=TV((T).5,10,0);
@@ -1561,7 +1562,7 @@ void Push_Out_Test2()
 //#####################################################################
 void Sphere_Fall()
 {
-    last_frame=360;
+    if(!user_last_frame) last_frame=360;
     solids_parameters.triangle_collision_parameters.total_collision_loops=1;
     solids_parameters.implicit_solve_parameters.cg_projection_iterations=20;
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
@@ -1596,7 +1597,7 @@ void Sphere_Fall()
 //#####################################################################
 void Sphere_Block(bool deformable_on_top)
 {
-    last_frame=120;
+    if(!user_last_frame) last_frame=120;
     solids_parameters.cfl=2;
     solids_parameters.triangle_collision_parameters.perform_self_collision=true;
     const char* sphere="/Tetrahedralized_Volumes/sphere_coarse.tet";
@@ -1615,7 +1616,7 @@ void Sphere_Block(bool deformable_on_top)
 void Two_Way_Tori()
 {
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
-    last_frame=240;
+    if(!user_last_frame) last_frame=240;
     solids_parameters.cfl=2;
     EMBEDDED_MATERIAL_SURFACE<TV,3>& embedding=tests.Create_Embedded_Tetrahedralized_Volume(TORUS<T>(TV(),TV(0,0,1),(T).3,(T).6),RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true);
     embedding.Update_Binding_List_From_Embedding(solid_body_collection.deformable_body_collection,false);

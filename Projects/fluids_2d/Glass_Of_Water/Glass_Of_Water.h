@@ -31,7 +31,7 @@ public:
         xmin=0;xmax=1;ymin=0;ymax=1;
         // time
         start_time=0;final_time=10;
-        frame_rate=3*24;
+        if(!this->user_frame_rate) frame_rate=3*24;
         // particle
         use_deep_particles=0;
         //output

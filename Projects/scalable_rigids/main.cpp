@@ -314,7 +314,6 @@ int main(int argc,char* argv[])
 #else
     PARSE_ARGS parse_args(argc,argv);
     EXAMPLE<TV>* example=new STANDARD_TESTS<T>(stream_type,parse_args);
-    example->After_Construction();
 
     SOLIDS_EXAMPLE<TV>* solid_fluid_example=dynamic_cast<SOLIDS_EXAMPLE<TV>*>(example);
     LOG::Instance()->Copy_Log_To_File(example->output_directory+"/common/log.txt",solid_fluid_example->restart);

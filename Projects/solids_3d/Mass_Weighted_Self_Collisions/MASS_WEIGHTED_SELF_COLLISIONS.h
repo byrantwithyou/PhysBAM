@@ -26,7 +26,8 @@ public:
     using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
     using BASE::stream_type;using BASE::solid_body_collection;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Set_External_Positions;using BASE::Zero_Out_Enslaved_Velocity_Nodes; // silence -Woverloaded-virtual
-
+    using BASE::user_last_frame;
+    
     struct COLLISION_PAIR_COMPARATOR{
         COLLISION_PAIR_COMPARATOR(TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<TV>* parameter) {
             geometry=parameter;
@@ -60,7 +61,6 @@ public:
     void Edge_Edge_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,2>& weights,ARRAY_VIEW<T>& one_over_mass) override;
     void Edge_Edge_Mass_Revert(const VECTOR<int,4>& nodes,ARRAY_VIEW<T>& one_over_mass) override;
     void Reorder_Pairs(ARRAY<VECTOR<int,4> >& edge_edge_pairs,ARRAY<VECTOR<int,4> >& point_face_pairs) override;
-    void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 };
 }

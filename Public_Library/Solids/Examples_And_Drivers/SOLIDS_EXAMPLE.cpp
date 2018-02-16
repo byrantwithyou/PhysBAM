@@ -45,18 +45,23 @@ using namespace PhysBAM;
 template<class TV> SOLIDS_EXAMPLE<TV>::
 SOLIDS_EXAMPLE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
     :BASE(stream_type,parse_args),use_melting(false),solids_parameters(*new SOLIDS_PARAMETERS<TV>),solid_body_collection(*new SOLID_BODY_COLLECTION<TV>),
-    solids_evolution(new NEWMARK_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this)),opt_solidssymmqmr(false),opt_solidscr(false),
-    opt_solidscg(false),debug_particles(*new DEBUG_PARTICLES<TV>),opt_skip_debug_data(false)
+    solids_evolution(new NEWMARK_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this)),
+    debug_particles(*new DEBUG_PARTICLES<TV>),opt_skip_debug_data(false)
 {
     Set_Minimum_Collision_Thickness();
     Set_Write_Substeps_Level(-1);
 
+    bool opt_solidssymmqmr=false,opt_solidscr=false,opt_solidscg=false;
     parse_args.Add("-solidscfl",&solids_parameters.cfl,"cfl","solids CFL");
     parse_args.Add("-solidscg",&opt_solidscg,"Use CG for time integration");
     parse_args.Add("-solidscr",&opt_solidscr,"Use CONJUGATE_RESIDUAL for time integration");
     parse_args.Add("-solidssymmqmr",&opt_solidssymmqmr,"Use SYMMQMR for time integration");
     parse_args.Add("-rigidcfl",&solids_parameters.rigid_body_evolution_parameters.rigid_cfl,"cfl","rigid CFL");
     parse_args.Add("-skip_debug_data",&opt_skip_debug_data,"turn off file io for debug data");
+
+    if(opt_solidscg) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cg;
+    if(opt_solidscr) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cr;
+    if(opt_solidssymmqmr) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_symmqmr;
 }
 //#####################################################################
 // Destructor
@@ -95,18 +100,6 @@ Log_Parameters() const
     BASE::Log_Parameters();
     LOG::cout<<"minimum_collision_thickness="<<minimum_collision_thickness<<std::endl;
     LOG::cout<<"use_melting="<<use_melting<<std::endl;
-}
-//#####################################################################
-// Function After_Initialization
-//#####################################################################
-template<class TV> void SOLIDS_EXAMPLE<TV>::
-After_Initialization()
-{
-    BASE::After_Initialization();
-
-    if(opt_solidscg) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cg;
-    if(opt_solidscr) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cr;
-    if(opt_solidssymmqmr) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_symmqmr;
 }
 //#####################################################################
 // Function Adjust_Output_Directory_For_MPI
@@ -174,6 +167,7 @@ Initialize_Bodies()
 template<class TV> void SOLIDS_EXAMPLE<TV>::
 Write_Output_Files(const int frame) const
 {
+    Create_Directory(output_directory);
     if(this->use_test_output){
         std::string file=LOG::sprintf("%s/%s-%03d.txt",output_directory.c_str(),this->test_output_prefix.c_str(),frame);
         OCTAVE_OUTPUT<T> oo(file.c_str());
@@ -187,7 +181,6 @@ Write_Output_Files(const int frame) const
             ARRAY_VIEW<T> t(particle.twist.m*TWIST<TV>::m,(T*)particle.twist.Get_Array_Pointer());
             oo.Write("rb_twist",t);}}
 
-    Create_Directory(output_directory);
     std::string f=LOG::sprintf("%d",frame);
     Create_Directory(output_directory+"/"+f);
     Create_Directory(output_directory+"/common");

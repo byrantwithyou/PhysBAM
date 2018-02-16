@@ -41,7 +41,7 @@ FLUIDS_COLOR_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     analytic_initial_only(false),number_of_threads(1),override_output_directory(false),use_u0(false),
     use_u1(false),use_p0(false),use_p1(false),use_S0(false),use_S1(false)
 {
-    last_frame=16;
+    if(!user_last_frame) last_frame=16;
     parse_args.Extra(&test_number,"example number","example number to run");
     parse_args.Add("-restart",&restart,"frame","restart frame");
     parse_args.Add("-resolution",&resolution,"resolution","grid resolution");

@@ -50,7 +50,8 @@ public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::solids_parameters;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::test_number;using BASE::frame_rate;
     using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::stream_type;
-
+    using BASE::user_last_frame;
+    
     SOLIDS_STANDARD_TESTS<TV> tests;
 
     int kinematic_body_id;
@@ -70,7 +71,8 @@ public:
         parse_args.Parse();
 
         tests.data_directory=data_directory;
-        output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+        if(!this->user_output_directory)
+            output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
     }
 
     ~STANDARD_TESTS()
@@ -122,7 +124,6 @@ void Update_Solids_Parameters(const T time) override
         solids_parameters.rigid_body_collision_parameters.contact_iterations=0;
         collisions.Set_Shock_Propagation_Iterations(0);}
 }
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################
@@ -187,7 +188,7 @@ void Kinematic()
 
     tests.Add_Ground((T).3,0,1);
 
-    last_frame=(int)(15*frame_rate);
+    if(!user_last_frame) last_frame=(int)(15*frame_rate);
 
     // add forces
     solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection));
@@ -213,8 +214,8 @@ void Test_Example()
     rigid_body1->name="circle";
 
     tests.Add_Ground(1,-20);
-    //last_frame=(int)(10*frame_rate);
-    last_frame=200;
+    //if(!user_last_frame) last_frame=(int)(10*frame_rate);
+    if(!user_last_frame) last_frame=200;
 
     // add forces
     solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection));
@@ -224,14 +225,14 @@ void Test_Example()
 //#####################################################################
 void Pyramid_Of_Boxes()
 {
-    int height = 21;
+    int height=21;
 
     T current_x;
-    T first_x = 0;
-    for (int i = 1; i < height; i++) {
-        current_x = first_x;
-        for (int j =  1; j <= i ; j++) {
-            RIGID_BODY<TV>* rigid_body = &tests.Add_Rigid_Body("square_refined",(T)2, (T).1);
+    T first_x=0;
+    for (int i=1; i < height; i++) {
+        current_x=first_x;
+        for (int j= 1; j <= i ; j++) {
+            RIGID_BODY<TV>* rigid_body=&tests.Add_Rigid_Body("square_refined",(T)2, (T).1);
             rigid_body->Frame().t=TV((T)current_x, (height+1-i)*5+80);
             rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
             current_x += 5;}
@@ -240,58 +241,58 @@ void Pyramid_Of_Boxes()
     for(int i=0;i<2;i++){
         RIGID_BODY<TV>* rigid_body0=&tests.Add_Rigid_Body("square_refined",(T)10,(T).1);
         rigid_body0->Frame().t=TV(first_x-10,i*20);
-        rigid_body0->is_static = true;
+        rigid_body0->is_static=true;
         rigid_body0->name="left_square";
 
         RIGID_BODY<TV>* rigid_body1=&tests.Add_Rigid_Body("square_refined",(T)10,(T).1);
         rigid_body1->Frame().t=TV(current_x+7.5,i*20);
-        rigid_body1->is_static = true;
+        rigid_body1->is_static=true;
         rigid_body1->name="right_square";}
 
     tests.Add_Ground(1, -10);
-    last_frame = 400;
+    if(!user_last_frame) last_frame=400;
     solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection));
 }
 //#####################################################################
 // Function Stacked_Boxes
 //#####################################################################
 void Stacked_Boxes() {
-    int height = 50;
+    int height=50;
 
-    for (int i = 1; i <= height; i++) {
-        for (int j =  1; j < 20 ; j++) {
-            RIGID_BODY<TV>* rigid_body = &tests.Add_Rigid_Body("square_refined",(T)2, (T).1);
+    for (int i=1; i <= height; i++) {
+        for (int j= 1; j < 20 ; j++) {
+            RIGID_BODY<TV>* rigid_body=&tests.Add_Rigid_Body("square_refined",(T)2, (T).1);
             rigid_body->Frame().t=TV(5*j - 50, 5*i+10);
             rigid_body->Set_Coefficient_Of_Restitution((T)0.5);}}
 
-    for (int i = 0; i < height/4; i++) {
+    for (int i=0; i < height/4; i++) {
         RIGID_BODY<TV>* rigid_body0=&tests.Add_Rigid_Body("square_refined",(T)10,(T).1);
         rigid_body0->Frame().t=TV(-58,i*20);
-        rigid_body0->is_static = true;
+        rigid_body0->is_static=true;
         rigid_body0->name="left_square";
     
         RIGID_BODY<TV>* rigid_body1=&tests.Add_Rigid_Body("square_refined",(T)10,(T).1);
         rigid_body1->Frame().t=TV(58,i*20);
-        rigid_body1->is_static = true;
+        rigid_body1->is_static=true;
         rigid_body1->name="right_square";}
 
     tests.Add_Ground(1, -10);
-    last_frame = 250;
+    if(!user_last_frame) last_frame=250;
     solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection));
 }
 //#####################################################################
 // Function Partition_Test
 //#####################################################################
 void Partition_Test() {
-    RIGID_BODY<TV>* rigid_body = &tests.Add_Rigid_Body("square", (T)1, (T).1);
-    rigid_body->Frame().t = TV(0,0);
-    rigid_body->Twist().linear = TV(1,0);
+    RIGID_BODY<TV>* rigid_body=&tests.Add_Rigid_Body("square", (T)1, (T).1);
+    rigid_body->Frame().t=TV(0,0);
+    rigid_body->Twist().linear=TV(1,0);
 
-    RIGID_BODY<TV>* rigid_body1 = &tests.Add_Rigid_Body("square", (T)1, (T).1);
-    rigid_body1->Frame().t = TV(10,3);
-    rigid_body1->Twist().linear = TV(-1,0);
+    RIGID_BODY<TV>* rigid_body1=&tests.Add_Rigid_Body("square", (T)1, (T).1);
+    rigid_body1->Frame().t=TV(10,3);
+    rigid_body1->Twist().linear=TV(-1,0);
 
-    last_frame = 200;
+    if(!user_last_frame) last_frame=200;
 }
 //#####################################################################
 // Function Cluster
@@ -387,8 +388,8 @@ void Cluster()
 void Contact_Test_1() {
     for (int i=0;i<width;i++) {
         for (int j=0;j<height;j++) {
-            RIGID_BODY<TV>* rigid_body = &tests.Add_Rigid_Body("square_refined",(T)1,(T).1);
-            rigid_body->Frame().t = TV(i*4,j*2);}}
+            RIGID_BODY<TV>* rigid_body=&tests.Add_Rigid_Body("square_refined",(T)1,(T).1);
+            rigid_body->Frame().t=TV(i*4,j*2);}}
 
     tests.Add_Ground(1, -1);
     solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection));
@@ -402,8 +403,8 @@ void Contact_Test_2() {
 
     for (int i=0;i<height;i++) {
         for (int j=0;j<width;j++) {
-            RIGID_BODY<TV>* rigid_body = &tests.Add_Rigid_Body("square_refined",(T)1,(T).1);
-            rigid_body->Frame().t = TV((T)j*2+i*0.5,i*2);}
+            RIGID_BODY<TV>* rigid_body=&tests.Add_Rigid_Body("square_refined",(T)1,(T).1);
+            rigid_body->Frame().t=TV((T)j*2+i*0.5,i*2);}
         width--;}
 
     tests.Add_Ground(1, -1);
@@ -413,49 +414,49 @@ void Contact_Test_2() {
 // Function Simple_Collision_Test
 //#####################################################################
 void Simple_Collision_Test() {
-    RIGID_BODY<TV>* rigid_body = &tests.Add_Rigid_Body("square", (T)1, (T).1);
-    rigid_body->Frame().t = TV(0,0);
-    rigid_body->Twist().linear = TV(2,0);
+    RIGID_BODY<TV>* rigid_body=&tests.Add_Rigid_Body("square", (T)1, (T).1);
+    rigid_body->Frame().t=TV(0,0);
+    rigid_body->Twist().linear=TV(2,0);
 
-    RIGID_BODY<TV>* rigid_body1 = &tests.Add_Rigid_Body("square", (T)1, (T).1);
-    rigid_body1->Frame().t = TV(10,3);
-    rigid_body1->Twist().linear = TV(-1,0);
+    RIGID_BODY<TV>* rigid_body1=&tests.Add_Rigid_Body("square", (T)1, (T).1);
+    rigid_body1->Frame().t=TV(10,3);
+    rigid_body1->Twist().linear=TV(-1,0);
 
-    RIGID_BODY<TV>* rigid_body2 = &tests.Add_Rigid_Body("square", (T)1, (T).1);
-    rigid_body2->Frame().t = TV(10,0);
-    rigid_body2->Twist().linear = TV(-1,0);
+    RIGID_BODY<TV>* rigid_body2=&tests.Add_Rigid_Body("square", (T)1, (T).1);
+    rigid_body2->Frame().t=TV(10,0);
+    rigid_body2->Twist().linear=TV(-1,0);
 
-    last_frame = 200;
+    if(!user_last_frame) last_frame=200;
 }
 //#####################################################################
 // Function Collision_Test
 //#####################################################################
 void Collision_Test() {
     for (int i=0;i<height;i++) {
-        RIGID_BODY<TV>* left_body = &tests.Add_Rigid_Body("square_refined",(T)1,(T).1);
-        RIGID_BODY<TV>* right_body = &tests.Add_Rigid_Body("square_refined",(T)1,(T).1);
-        left_body->Frame().t = TV(0,i*3);
-        right_body->Frame().t = TV((width+1)*3,i*3);
+        RIGID_BODY<TV>* left_body=&tests.Add_Rigid_Body("square_refined",(T)1,(T).1);
+        RIGID_BODY<TV>* right_body=&tests.Add_Rigid_Body("square_refined",(T)1,(T).1);
+        left_body->Frame().t=TV(0,i*3);
+        right_body->Frame().t=TV((width+1)*3,i*3);
         left_body->Set_Coefficient_Of_Restitution((T)1.0);
         right_body->Set_Coefficient_Of_Restitution((T)1.0);
         left_body->is_static=true;
         right_body->is_static=true;
 
         for (int j=1;j<=width;j++) {
-            RIGID_BODY<TV>* rigid_body = &tests.Add_Rigid_Body("square_refined",(T)1,(T).1);
-            rigid_body->Frame().t = TV(j*3,i*3);
-            rigid_body->Twist().linear = TV(4*(.5-j%2),0);
+            RIGID_BODY<TV>* rigid_body=&tests.Add_Rigid_Body("square_refined",(T)1,(T).1);
+            rigid_body->Frame().t=TV(j*3,i*3);
+            rigid_body->Twist().linear=TV(4*(.5-j%2),0);
             rigid_body->Set_Coefficient_Of_Restitution((T)1.0);}}
 
-    last_frame = 300;
+    if(!user_last_frame) last_frame=300;
 }
 //#####################################################################
 // Function Pushout_Test
 //#####################################################################
 void Pushout_Test() {
     for (int i=0;i<num_bodies;i++) {
-        RIGID_BODY<TV>* rigid_body =  &tests.Add_Rigid_Body("square_refined",(T)1,(T).1);
-        rigid_body->Frame().t = TV((T)1.75*i,(T)1.75*i);}
+        RIGID_BODY<TV>* rigid_body= &tests.Add_Rigid_Body("square_refined",(T)1,(T).1);
+        rigid_body->Frame().t=TV((T)1.75*i,(T)1.75*i);}
 }
 //#####################################################################
 // Function Postprocess_Frame

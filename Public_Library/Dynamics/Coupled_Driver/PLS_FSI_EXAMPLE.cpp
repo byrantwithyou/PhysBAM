@@ -68,6 +68,7 @@ PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args,const int n
     Set_Minimum_Collision_Thickness();
     Set_Write_Substeps_Level(-1);
 
+    bool opt_solidssymmqmr=false,opt_solidscr=false,opt_solidscg=false;
     parse_args.Add("-solidscfl",&solids_parameters.cfl,"cfl","solids CFL");
     parse_args.Add("-solidscg",&opt_solidscg,"Use CG for time integration");
     parse_args.Add("-solidscr",&opt_solidscr,"Use CONJUGATE_RESIDUAL for time integration");
@@ -75,6 +76,12 @@ PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args,const int n
     parse_args.Add("-rigidcfl",&solids_parameters.rigid_body_evolution_parameters.rigid_cfl,"cfl","rigid CFL");
     parse_args.Add("-skip_debug_data",&opt_skip_debug_data,"turn off file io for debug data");
     parse_args.Add("-resolution",&resolution,"resolution","simulation resolution");
+    parse_args.Parse(true);
+    
+    if(opt_solidscg) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cg;
+    if(opt_solidscr) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cr;
+    if(opt_solidssymmqmr) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_symmqmr;
+    fluids_parameters.write_debug_data=!opt_skip_debug_data;
 }
 //#####################################################################
 // Destructor
@@ -87,15 +94,6 @@ template<class TV_input> PLS_FSI_EXAMPLE<TV_input>::
     delete &solid_body_collection;
     delete &solids_parameters;
     delete &solids_fluids_parameters;
-}
-//#####################################################################
-// Function After_Construction
-//#####################################################################
-template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
-After_Construction()
-{
-    BASE::After_Construction();
-    fluids_parameters.write_debug_data=!opt_skip_debug_data;
 }
 //#####################################################################
 // Function Add_Volumetric_Body_To_Fluid_Simulation
@@ -337,17 +335,6 @@ Read_Output_Files_Solids(const int frame)
     std::string f=LOG::sprintf("%d",frame);
     //if(NEWMARK_EVOLUTION<TV>* newmark=dynamic_cast<NEWMARK_EVOLUTION<TV>*>(solids_evolution))
     //    newmark->Read_Position_Update_Projection_Data(stream_type,output_directory+"/"+f+"/");
-}
-//#####################################################################
-// Function After_Initialization
-//#####################################################################
-template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
-After_Initialization()
-{
-    BASE::After_Initialization();
-    if(opt_solidscg) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cg;
-    if(opt_solidscr) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cr;
-    if(opt_solidssymmqmr) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_symmqmr;
 }
 //#####################################################################
 // Function Adjust_Particle_For_Domain_Boundaries

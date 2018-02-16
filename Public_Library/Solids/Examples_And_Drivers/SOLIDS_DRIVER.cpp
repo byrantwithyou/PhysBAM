@@ -82,22 +82,14 @@ Simulate_To_Frame(const int frame_input)
 template<class TV> void SOLIDS_DRIVER<TV>::
 Initialize()
 {
-    if(example.auto_restart){
-        std::string last_frame_file=example.output_directory+"/common/last_frame";
-        int last_frame;Read_From_Text_File(last_frame_file,last_frame);
-        example.restart=true;example.restart_frame=last_frame;
-        LOG::cout<<"Auto Restart from frame "<<last_frame<<" (from file "<<last_frame_file<<")"<<std::endl;}
-    if(example.restart){current_frame=example.restart_frame;Read_Time(current_frame);}else current_frame=example.first_frame;
-    output_number=current_frame;
-    time=example.Time_At_Frame(current_frame);
+    BASE::Initialize();
+    
     example.solid_body_collection.deformable_body_collection.mpi_solids=example.solid_body_collection.deformable_body_collection.mpi_solids;
     SOLIDS_PARAMETERS<TV>& solids_parameters=example.solids_parameters;
 
     SOLIDS_EVOLUTION<TV>& solids_evolution=*example.solids_evolution;
     solids_evolution.Set_Solids_Evolution_Callbacks(example);
     example.Initialize_Bodies();
-
-    example.After_Initialization();
 
     solids_evolution.time=time;
 
@@ -286,8 +278,6 @@ Compute_Dt(const T time,const T target_time,bool& done)
     if(example.solid_body_collection.deformable_body_collection.mpi_solids)
         solids_dt=example.solid_body_collection.deformable_body_collection.mpi_solids->Reduce_Min_Global(solids_dt);
 
-    if(example.fixed_dt){fluids_dt=example.fixed_dt;solids_dt=example.fixed_dt;}
-    if(example.max_dt){fluids_dt=min(fluids_dt,example.max_dt);solids_dt=min(solids_dt,example.max_dt);}
     T dt=min(fluids_dt,solids_dt);
     LOG::cout<<"dt = solids_dt = "<<dt<<std::endl;
     if(example.abort_when_dt_below && dt<example.abort_when_dt_below)

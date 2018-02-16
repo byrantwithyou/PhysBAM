@@ -35,11 +35,16 @@ SOLIDS_FLUIDS_EXAMPLE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
     Set_Minimum_Collision_Thickness();
     Set_Write_Substeps_Level(-1);
 
+    bool opt_solidssymmqmr=false,opt_solidscr=false,opt_solidscg=false;
     parse_args.Add("-solidscfl",&solids_parameters.cfl,"cfl","solids CFL");
     parse_args.Add("-solidscg",&opt_solidscg,"Use CG for time integration");
     parse_args.Add("-solidscr",&opt_solidscr,"Use CONJUGATE_RESIDUAL for time integration");
     parse_args.Add("-solidssymmqmr",&opt_solidssymmqmr,"Use SYMMQMR for time integration");
     parse_args.Add("-rigidcfl",&solids_parameters.rigid_body_evolution_parameters.rigid_cfl,"cfl","rigid CFL");
+
+    if(opt_solidscg) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cg;
+    if(opt_solidscr) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cr;
+    if(opt_solidssymmqmr) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_symmqmr;
 }
 //#####################################################################
 // Destructor
@@ -74,18 +79,6 @@ Log_Parameters() const
     BASE::Log_Parameters();
     LOG::cout<<"minimum_collision_thickness="<<minimum_collision_thickness<<std::endl;
     LOG::cout<<"use_melting="<<use_melting<<std::endl;
-}
-//#####################################################################
-// Function After_Initialization
-//#####################################################################
-template<class TV> void SOLIDS_FLUIDS_EXAMPLE<TV>::
-After_Initialization()
-{
-    BASE::After_Initialization();
-
-    if(opt_solidscg) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cg;
-    if(opt_solidscr) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cr;
-    if(opt_solidssymmqmr) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_symmqmr;
 }
 //#####################################################################
 // Function Adjust_Output_Directory_For_MPI

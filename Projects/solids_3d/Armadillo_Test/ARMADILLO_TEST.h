@@ -30,7 +30,8 @@ public:
     using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
     using BASE::stream_type;using BASE::solid_body_collection;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes; // silence -Woverloaded-virtual
-
+    using BASE::user_last_frame;
+    
     SOLIDS_STANDARD_TESTS<TV> tests;
     HASHTABLE<int> constrained_nodes;
     bool use_bindings;
@@ -138,7 +139,6 @@ void Get_Initial_Data()
     particles.Compute_Auxiliary_Attributes(soft_bindings);
     soft_bindings.Set_Mass_From_Effective_Mass();
 }
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################
@@ -148,12 +148,12 @@ void Initialize_Bodies() override
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
-    frame_rate=24;
-    last_frame=(int)(64*frame_rate);
+    if(!this->user_frame_rate) frame_rate=24;
+    if(!user_last_frame) last_frame=(int)(64*frame_rate);
     solids_parameters.verbose_dt=true;
     solids_parameters.cfl=(T)4;
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-    last_frame=20;
+    if(!user_last_frame) last_frame=20;
     switch(test_number){
         case 1: break;
         case 2: use_bindings=true;break;

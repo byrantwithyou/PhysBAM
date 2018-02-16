@@ -25,7 +25,8 @@ public:
     using BASE::last_frame;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::solids_parameters;using BASE::data_directory;
     using BASE::stream_type;using BASE::solid_body_collection;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes; // silence -Woverloaded-virtual
-
+    using BASE::user_last_frame;
+    
     T initial_height;
     bool use_ground;
     int ground_id;
@@ -49,7 +50,6 @@ public:
     void Update_Time_Varying_Material_Properties(const T time) override {}
     bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) override {return false;}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Get_Initial_Data
 //#####################################################################
@@ -98,11 +98,12 @@ virtual void Get_Initial_Data()
 //#####################################################################
 void Initialize_Bodies() override
 {
-    last_frame=2400;
+    if(!user_last_frame) last_frame=2400;
     restart=false;restart_frame=0;  
     solids_parameters.cfl=(T)1;
     solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
-    output_directory="Rigid_Particle/output";
+    if(!this->user_output_directory)
+        output_directory="Rigid_Particle/output";
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
 
     Get_Initial_Data();

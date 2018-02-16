@@ -21,7 +21,8 @@ public:
     using BASE::output_directory;using BASE::solids_parameters;using BASE::write_last_frame;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;
     using BASE::stream_type;using BASE::solid_body_collection;
     using BASE::Set_External_Velocities; // silence -Woverloaded-virtual
-
+    using BASE::user_last_frame;
+    
     RIGID_BODY<TV>* shelf00,*shelf01,*shelf10,*shelf11;
     int current_frame,start_move,end_move;
     T increment;
@@ -51,8 +52,7 @@ public:
     void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
     void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) override {}
 
-    void After_Initialization() override {BASE::After_Initialization();}
-//#####################################################################
+    //#####################################################################
     void Initialize_Bodies() override;
     void Drop_Letter(std::string letter,int parent_id,TV start,ROTATION<TV> orient,bool stop_in_middle);
     void Random_Letters(int levels,T up_shift);

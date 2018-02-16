@@ -23,7 +23,6 @@ int main(int argc,char *argv[])
     //KINEMATIC_EXAMPLE<float> example(stream_type,example_number);
     //ARB_EXAMPLE<float> example(stream_type,example_number);
     example.mpi_world=new MPI_WORLD(parse_args);
-    example.After_Construction();
 
     SOLIDS_DRIVER<TV> driver(example);
     driver.Execute_Main_Program();

@@ -25,7 +25,8 @@ public:
     using BASE::output_directory;using BASE::solids_parameters;using BASE::solid_body_collection;using BASE::write_last_frame;using BASE::data_directory;
     using BASE::stream_type;using BASE::restart;using BASE::initial_time;using BASE::first_frame;using BASE::last_frame;using BASE::restart_frame;using BASE::frame_rate;
     using BASE::test_number;using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Position_Nodes; // silence -Woverloaded-virtual
-
+    using BASE::user_last_frame;
+    
     SOLIDS_STANDARD_TESTS<TV> tests;
     RIGID_BODY<TV> *box1,*box2;
     int start_rolling,num_rolling_frames,start_drop; // allow the bridge to settle until start_drop
@@ -51,8 +52,7 @@ public:
     void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
     void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) override {}
 
-    void After_Initialization() override {BASE::After_Initialization();}
-//#####################################################################
+    //#####################################################################
     void Initialize_Bodies() override;
     void Update_Solids_Parameters(const T time) override;
     void Preprocess_Frame(const int frame) override;

@@ -25,6 +25,8 @@ public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::write_output_files;
     using BASE::output_directory;using BASE::restart;using BASE::restart_frame;using BASE::data_directory;
+    using BASE::user_last_frame;
+
 
     SPHERE<TV> source_sphere;
     T source_end_time;
@@ -34,10 +36,10 @@ public:
     DSD_FIRE_BALL_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
         :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type_input,parse_args,2,fluids_parameters.FIRE),source_sphere(TV(1,(T)0.5,1),(T)0.2),source_end_time((T)3),normal_velocity(4),Dn_initial((T)0.1)
     {
-        frame_rate=96;
+        if(!this->user_frame_rate) frame_rate=96;
         fluids_parameters.grid->Initialize(TV_INT(151,226,151),RANGE<TV>(TV(),TV(2,3,2)));
         fluids_parameters.domain_walls[2][1]=fluids_parameters.domain_walls[2][0]=fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][0]=true;
-        last_frame=int(T(20)*frame_rate);
+        if(!user_last_frame) last_frame=int(T(20)*frame_rate);
         fluids_parameters.incompressible_iterations=200;
         fluids_parameters.gravity=TV();
         fluids_parameters.density_container.Set_Ambient_Density(0);
@@ -63,7 +65,8 @@ public:
         fluids_parameters.write_velocity=true;
         fluids_parameters.write_particles=true;
         fluids_parameters.number_particles_per_cell=0;
-        output_directory="DSD_Fire_Ball/output";
+        if(!this->user_output_directory)
+            output_directory="DSD_Fire_Ball/output";
         fluids_parameters.use_maccormack_semi_lagrangian_advection=true;
         fluids_parameters.use_maccormack_for_level_set=true;
         fluids_parameters.use_maccormack_compute_mask=true;
@@ -83,7 +86,6 @@ public:
     void Postprocess_Frame(const int frame) override {}
     void Adjust_Density_And_Temperature_With_Sources(const T time) override {}
 
-void After_Initialization() override {BASE::After_Initialization();}
 //#####################################################################
 // Function Get_Flame_Speed_Multiplier
 //#####################################################################
