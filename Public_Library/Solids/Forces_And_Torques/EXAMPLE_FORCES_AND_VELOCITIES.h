@@ -31,13 +31,9 @@ public:
 
 //#####################################################################
     // solids
-    virtual void Advance_One_Time_Step_Begin_Callback(const T dt,const T time);
-    virtual void Advance_One_Time_Step_End_Callback(const T dt,const T time);
-    virtual void Set_PD_Targets(const T dt,const T time);
     virtual void Update_Time_Varying_Material_Properties(const T time);
     virtual void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt); // adjust velocity with external impulses
     virtual void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt); // adjust velocity with external impulses
-    virtual void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt); // adjust velocity of single node with external impulse
 //#####################################################################
 };
 }

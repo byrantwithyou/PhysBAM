@@ -405,7 +405,6 @@ Advance_To_Target_Time(const T target_time)
 
         First_Order_Time_Step(substep,dt);
 
-        example.solids_evolution->example_forces_and_velocities.Advance_One_Time_Step_End_Callback(dt,time);
         solids_evolution_callbacks->Postprocess_Solids_Substep(example.solids_evolution->time,substep);
         example.Postprocess_Substep(dt,time);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("END Substep %d",0,substep);}

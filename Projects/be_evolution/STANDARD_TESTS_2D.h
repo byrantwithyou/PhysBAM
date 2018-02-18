@@ -167,30 +167,6 @@ public:
     virtual ~STANDARD_TESTS()
     {}
 
-    // Unused callbacks
-    void Post_Initialization() override {}
-    void Postprocess_Solids_Substep(const T time,const int substep) override {}
-    void Apply_Constraints(const T dt,const T time) override {}
-    void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) override {}
-    void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) override {}
-    void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
-    void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
-    void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) override {}
-    void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
-    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) override {}
-    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
-    void Align_Deformable_Bodies_With_Rigid_Bodies() override {}
-    void Preprocess_Solids_Substep(const T time,const int substep) override {}
-    void Update_Solids_Parameters(const T time) override {}
-    void Self_Collisions_Begin_Callback(const T time,const int substep) override {}
-    void Filter_Velocities(const T dt,const T time,const bool velocity_update) override {}
-    void Update_Time_Varying_Material_Properties(const T time) override {}
-    // void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override {}
-    // void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override {}
-    void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) override {}
-  //  bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) override {return true;}
-   // void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) override {}
-
 //#####################################################################
 // Function Get_Initial_Data
 //#####################################################################
@@ -373,6 +349,7 @@ void Initialize_Bodies() override
     this->After_Initialize_Bodies();
 }
 
+void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
 //#####################################################################
 // Function Set_External_Velocities
 //#####################################################################
@@ -382,6 +359,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
     for(int i=0;i<kinematic_particle_ids.m;i++)
         V(kinematic_particle_ids(i))=kinematic_particle_positions(i).Derivative(velocity_time);
 }
+void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > rotation,const T time) override {}
 //#####################################################################
 // Function Set_External_Positions
 //#####################################################################
@@ -390,6 +368,7 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) override
     for(int i=0;i<kinematic_particle_ids.m;i++)
         X(kinematic_particle_ids(i))=kinematic_particle_positions(i).Value(time);
 }
+void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
 //#####################################################################

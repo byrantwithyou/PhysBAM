@@ -81,18 +81,6 @@ public:
     ~FLOW_PAST_EFTYCHIS()
     {}
 
-    // Unused callbacks
-    void Preprocess_Frame(const int frame) override {}
-    void Adjust_Velocity_With_Objects(const T time){}
-    void Postprocess_Frame(const int frame) override {}
-    void Postprocess_Phi(const T time) override {}
-    void Apply_Constraints(const T dt,const T time) override {}
-    void Preprocess_Solids_Substep(const T time,const int substep) override {}
-    void Postprocess_Solids_Substep(const T time,const int substep) override {}
-    void Extrapolate_Phi_Into_Objects(const T time) override {}
-    void Initialize_Euler_State() override {}
-    void Align_Deformable_Bodies_With_Rigid_Bodies() override {}
-
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################
@@ -108,12 +96,6 @@ void Initialize_Velocities() override
     if(test_number==1){
         for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) 
             fluid_collection.incompressible_fluid_collection.face_velocities.Component(iterator.Axis())(iterator.Face_Index())=(iterator.Axis()==3?-flow_speed:(T)0);}
-}
-//#####################################################################
-// Function Initialize_Phi
-//#####################################################################
-void Initialize_Phi() override
-{
 }
 //#####################################################################
 // Function Initialize_Bodies

@@ -47,14 +47,6 @@ Postprocess_Solids_Substep(const T time,const int substep)
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
 }
 //#####################################################################
-// Function Align_Deformable_Bodies_With_Rigid_Bodies
-//#####################################################################
-template<class TV> void SOLIDS_EVOLUTION_CALLBACKS<TV>::
-Align_Deformable_Bodies_With_Rigid_Bodies()
-{
-    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
-}
-//#####################################################################
 // Function Apply_Constraints
 //#####################################################################
 template<class TV> void SOLIDS_EVOLUTION_CALLBACKS<TV>::

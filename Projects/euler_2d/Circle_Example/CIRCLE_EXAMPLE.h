@@ -328,8 +328,6 @@ public:
 
     virtual ~CIRCLE_EXAMPLE() {}
 
-    void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) override {}
-
 //#####################################################################
 // Function Intialize_Advection
 //#####################################################################
@@ -537,6 +535,7 @@ bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) overri
     if(test_number==3 && id==sphere){twist.linear=motion_curve.Derivative(time);return true;}
     return false;
 }
+void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) override {}
 //#####################################################################
 // Function Add_External_Forces
 //#####################################################################

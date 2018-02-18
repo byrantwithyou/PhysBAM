@@ -54,19 +54,6 @@ public:
     virtual ~STANDARD_TESTS_SPH()
     {}
 
-    // Unused callbacks
-    void Initialize_Advection() override {}
-    void Initialize_Velocities() override {}
-    void Initialize_Bodies() override {}
-    void Construct_Levelsets_For_Objects(const T time){}
-    bool Adjust_Phi_With_Sources(const T time) override {return false;}
-    void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,3> >*& cell_centered_mask,const T time) override {}
-    void Preprocess_Frame(const int frame) override {}
-    void Adjust_Velocity_With_Objects(const T time){}
-    void Postprocess_Solids_Substep(const T time,const int substep) override {}
-    void Postprocess_Frame(const int frame) override {}
-    void Postprocess_Phi(const T time) override {}
-
 //#####################################################################
 // Function Initialize_Phi
 //#####################################################################

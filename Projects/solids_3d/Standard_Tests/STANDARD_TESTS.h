@@ -607,31 +607,12 @@ public:
 
     ~STANDARD_TESTS()
     {}
-
-    // Unused callbacks
-    void Post_Initialization() override {}
-    void Postprocess_Solids_Substep(const T time,const int substep) override {}
-    void Apply_Constraints(const T dt,const T time) override {}
-    void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) override {}
-    void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) override {}
-    void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
-    void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
-    void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) override {}
-    void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
-    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) override {}
-    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
-    void Align_Deformable_Bodies_With_Rigid_Bodies() override {}
-    void Preprocess_Solids_Substep(const T time,const int substep) override {}
-    void Update_Solids_Parameters(const T time) override {}
     void Preprocess_Substep(const T dt,const T time) override
     {
         if(test_forces){
             solid_body_collection.deformable_body_collection.Test_Energy(time);
             solid_body_collection.deformable_body_collection.Test_Force_Derivatives(time);}
     }
-    void Postprocess_Substep(const T dt,const T time) override {}
-    void Self_Collisions_Begin_Callback(const T time,const int substep) override {}
-    void Filter_Velocities(const T dt,const T time,const bool velocity_update) override {}
 
 //#####################################################################
 // Function Test_32_Arc_Length
@@ -1683,6 +1664,7 @@ void Update_Time_Varying_Material_Properties(const T time) override
             ETHER_DRAG<TV>& drag=solid_body_collection.template Find_Force<ETHER_DRAG<TV>&>();
             drag.Use_Constant_Wind(wind_viscosity.Value(time));}}
 }
+void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
 //#####################################################################
 // Function Set_External_Velocities
 //#####################################################################
@@ -1751,6 +1733,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
             V(index)=TV();}}
     else if(test_number==44) for(int i=0;i<fixed_particles.m;i++) V(fixed_particles(i))=TV();
 }
+void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
 //#####################################################################
@@ -1804,6 +1787,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
             V(index)=TV();}}
     else if(test_number==44) for(int i=0;i<fixed_particles.m;i++) V(fixed_particles(i))=TV();
 }
+void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > rotation,const T time) override {}
 //#####################################################################
 // Function Set_External_Positions
 //#####################################################################

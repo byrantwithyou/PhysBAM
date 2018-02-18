@@ -350,6 +350,7 @@ Preprocess_Frame(const int frame)
         dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>&>(*solids_evolution).print_poisson_matrix=print_poisson_matrix;
         dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>&>(*solids_evolution).use_viscous_forces=!use_decoupled_viscosity;
         dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>&>(*solids_evolution).print_index_map=print_index_map;}
+    if(rebuild_curve) Rebuild_Surface();
 }
 //#####################################################################
 // Function Initialize_Velocities
@@ -1017,14 +1018,6 @@ Substitute_Coupling_Matrices(KRYLOV_SYSTEM_BASE<T>& coupled_system,T dt,T curren
         force->Update_Position_Based_State(current_position_time,true,true);
 
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after particle rebuild",0);}
-}
-//#####################################################################
-// Function Advance_One_Time_Step_Begin_Callback
-//#####################################################################
-template<class T> void SURFACE_TENSION<T>::
-Advance_One_Time_Step_Begin_Callback(const T dt,const T time)
-{
-    if(rebuild_curve) Rebuild_Surface();
 }
 //#####################################################################
 // Function Update_Time_Varying_Material_Properties

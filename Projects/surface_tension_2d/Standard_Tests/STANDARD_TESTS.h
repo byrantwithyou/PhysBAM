@@ -118,31 +118,6 @@ public:
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();
 
-    // Unused callbacks
-    void Postprocess_Solids_Substep(const T time,const int substep) override {}
-    void Apply_Constraints(const T dt,const T time) override {}
-    void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) override {}
-    void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) override {}
-    void Initialize_Euler_State() override {}
-    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) override {}
-    void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
-    void Update_Solids_Parameters(const T time) override {}
-    void Preprocess_Solids_Substep(const T time,const int substep) override {}
-    void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) override {}
-    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
-    void Filter_Velocities(const T dt,const T time,const bool velocity_update) override {}
-    void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
-    void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
-    void Post_Initialization() override {}
-    void Adjust_Density_And_Temperature_With_Sources(const T time) override {}
-    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override {}
-    void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) override {}
-    void Postprocess_Phi(const T time) override {}
-    void Get_Source_Reseed_Mask(ARRAY<bool,TV_INT>*& cell_centered_mask,const T time) override {}
-    void Extrapolate_Phi_Into_Objects(const T time) override {}
-    bool Adjust_Phi_With_Sources(const T time) override {return false;}
-
 //#####################################################################
     void Postprocess_Substep(const T dt,const T time) override;
     void Postprocess_Frame(const int frame) override;
@@ -172,7 +147,6 @@ public:
     void Initialize_Surface_Particles(int number);
     void Rebuild_Surface();
     void Substitute_Coupling_Matrices(KRYLOV_SYSTEM_BASE<T>& coupled_system,T dt,T current_velocity_time,T current_position_time,bool velocity_update,bool leakproof_solve) override;
-    void Advance_One_Time_Step_Begin_Callback(const T dt,const T time) override;
     void Update_Time_Varying_Material_Properties(const T time) override;
     static GEOMETRY_PARTICLES<TV>*  Store_Debug_Particles(GEOMETRY_PARTICLES<TV>* particle=0);
     void FSI_Analytic_Test();

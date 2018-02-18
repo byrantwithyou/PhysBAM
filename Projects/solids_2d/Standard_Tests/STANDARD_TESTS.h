@@ -236,14 +236,6 @@ public:
             output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
     }
 
-    // Unused callbacks
-    void Postprocess_Frame(const int frame) override {if(dump_sv)svout.close();}
-    void Postprocess_Solids_Substep(const T time,const int substep) override {}
-    void Apply_Constraints(const T dt,const T time) override {}
-    void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) override {}
-    void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) override {}
-    void Update_Time_Varying_Material_Properties(const T time) override {}
-    void Post_Initialization() override {}
     void Preprocess_Substep(const T dt,const T time) override
     {
         if(test_forces){
@@ -263,12 +255,6 @@ public:
             }
         }
     }
-    void Align_Deformable_Bodies_With_Rigid_Bodies() override {}
-    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) override {}
-    void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
-    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
-    void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
-    void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
 
 //#####################################################################
 // Function Initialize_Bodies

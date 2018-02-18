@@ -102,16 +102,6 @@ public:
     ~TWO_PHASE()
     {}
 
-    // Unused callbacks
-    void Preprocess_Frame(const int frame) override {}
-    void Adjust_Velocity_With_Objects(const T time){}
-    void Postprocess_Solids_Substep(const T time,const int substep) override {}
-    void Postprocess_Frame(const int frame) override {}
-    void Postprocess_Phi(const T time) override {}
-    bool Adjust_Phi_With_Sources(const T time) override {return false;}
-    void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,2> >*& cell_centered_mask,const T time) override {}
-    void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) override {}
-
 //#####################################################################
 // Function Initial_Phi
 //#####################################################################

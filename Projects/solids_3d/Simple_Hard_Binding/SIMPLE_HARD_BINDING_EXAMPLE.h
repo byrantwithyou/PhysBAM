@@ -65,19 +65,6 @@ public:
 
     virtual ~SIMPLE_HARD_BINDING_EXAMPLE()
     {delete surface;delete redgreen;}
-
-    // Unused callbacks
-    void Apply_Constraints(const T dt,const T time) override {}
-    void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) override {}
-    void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) override {}
-    void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
-    void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) override {}
-    void Update_Time_Varying_Material_Properties(const T time) override {}
-    void Postprocess_Frame(const int frame) override {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) override {}
-    void Preprocess_Frame(const int frame) override {}    
-    void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
-    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
     
 //#####################################################################
 // Function Initialize_Redgreen

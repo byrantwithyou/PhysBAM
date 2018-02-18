@@ -76,22 +76,6 @@ public:
     virtual ~DSD_FIRE_BALL_EXAMPLE()
     {}
 
-    // unused callbacks
-    void Postprocess_Solids_Substep(const T time,const int substep) override {}
-    void Apply_Constraints(const T dt,const T time) override {}
-    void Preprocess_Frame(const int frame) override {}
-    void Extrapolate_Phi_Into_Objects(const T time) override {}
-    void Get_Source_Reseed_Mask(ARRAY<bool,TV_INT>*& cell_centered_mask,const T time) override {}
-    void Postprocess_Phi(const T time) override {}
-    void Postprocess_Frame(const int frame) override {}
-    void Adjust_Density_And_Temperature_With_Sources(const T time) override {}
-
-//#####################################################################
-// Function Get_Flame_Speed_Multiplier
-//#####################################################################
-void Get_Flame_Speed_Multiplier(const T dt,const T time) override
-{
-}
 //#####################################################################
 // Function Update_Fluid_Parameters
 //#####################################################################

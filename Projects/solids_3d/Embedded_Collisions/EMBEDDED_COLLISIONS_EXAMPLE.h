@@ -51,17 +51,6 @@ public:
 
     virtual ~EMBEDDED_COLLISIONS_EXAMPLE()
     {}
-
-    // Unused callbacks
-    void Postprocess_Solids_Substep(const T time,const int substep) override {}
-    void Apply_Constraints(const T dt,const T time) override {}
-    void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) override {}
-    void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) override {}
-    void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
-    void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) override {}
-    void Update_Time_Varying_Material_Properties(const T time) override {}
-    void Postprocess_Frame(const int frame) override {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) override {}
     
 //#####################################################################
 // Function Get_Initial_Data

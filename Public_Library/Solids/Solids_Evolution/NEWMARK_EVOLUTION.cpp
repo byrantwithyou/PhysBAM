@@ -347,7 +347,6 @@ Advance_One_Time_Step_Position(const T dt,const T time, const bool solids)
         repulsions=&solid_body_collection.deformable_body_collection.triangle_repulsions;
 
     Diagnostics(dt,time,0,0,1,"begin integration");
-    example_forces_and_velocities.Advance_One_Time_Step_Begin_Callback(dt,time);
 
     solids_evolution_callbacks->Update_Solids_Parameters(time);
     if(solids){
@@ -363,8 +362,6 @@ Advance_One_Time_Step_Position(const T dt,const T time, const bool solids)
     solid_body_collection.Update_Position_Based_State(time+dt,true,true);
 
     // get momentum difference for v^n -> v^{n+1/2} udpate
-    if(articulated_rigid_body.Has_Actuators()) example_forces_and_velocities.Set_PD_Targets(dt,time);
-
     Backward_Euler_Step_Velocity_Helper(dt/2,time,time,false); // update V implicitly to time+dt/2
 
     Diagnostics(dt,time,1,0,5,"backward Euler");
@@ -542,7 +539,6 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
         if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data_Global(solid_body_collection.deformable_body_collection.particles.X);
         solid_body_collection.Update_Position_Based_State(time+dt/2,(solids_parameters.allow_altitude_spring_change_between_updates?true:false),true);
         Make_Incompressible(dt,false); // make velocity divergence free
-        if(articulated_rigid_body.Has_Actuators()) example_forces_and_velocities.Set_PD_Targets(dt,time);
         Trapezoidal_Step_Velocity(dt,time);
         solids_evolution_callbacks->Filter_Velocities(dt,time+dt,true);
         Diagnostics(dt,time,2,1,29,"trazepoid rule");
@@ -559,7 +555,6 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
         if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data_Global(solid_body_collection.deformable_body_collection.particles.X);
         solid_body_collection.Update_Position_Based_State(time+dt,(solids_parameters.allow_altitude_spring_change_between_updates?true:false),true);
         Make_Incompressible(dt,false); // make velocity divergence free
-        if(articulated_rigid_body.Has_Actuators()) example_forces_and_velocities.Set_PD_Targets(dt,time);
         Backward_Euler_Step_Velocity(dt,time); // TODO: Tamar & Craig, do you need post stab?
         Diagnostics(dt,time,2,2,29,"backward Euler");
         solids_evolution_callbacks->Filter_Velocities(dt,time+dt,true);}
@@ -577,8 +572,6 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
             Clamp_Velocities(); // TODO: Examples should do this during the Advance_One_Time_Step_End_Callback example callback
             Diagnostics(dt,time,2,2,41,"clamp velocities");}
         if(solids_parameters.verbose) Print_Maximum_Velocities(time);}
-
-    example_forces_and_velocities.Advance_One_Time_Step_End_Callback(dt,time);
 
     PHYSBAM_DEBUG_WRITE_SUBSTEP("Advance_One_Time_Step_Velocity End dt=%f time=%f",2,dt,time);
 }

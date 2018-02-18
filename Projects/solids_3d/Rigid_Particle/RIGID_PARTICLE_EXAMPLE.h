@@ -40,16 +40,6 @@ public:
     ~RIGID_PARTICLE_EXAMPLE()
     {}
 
-    // Unused callbacks
-    void Preprocess_Frame(const int frame) override {}
-    void Postprocess_Frame(const int frame) override {}
-    void Postprocess_Solids_Substep(const T time,const int substep) override {}
-    void Apply_Constraints(const T dt,const T time) override {}
-    void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) override {}
-    void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) override {}
-    void Update_Time_Varying_Material_Properties(const T time) override {}
-    bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) override {return false;}
-
 //#####################################################################
 // Function Get_Initial_Data
 //#####################################################################

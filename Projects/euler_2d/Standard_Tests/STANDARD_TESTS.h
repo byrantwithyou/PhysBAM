@@ -170,31 +170,6 @@ public:
         gnuplot_file_stream.close();
     }
 
-    void Initialize_Velocities() override {}
-    void Post_Initialization() override {}
-    void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
-    void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
-    void Apply_Constraints(const T dt,const T time) override {}
-    void Preprocess_Frame(const int frame) override {}
-    void Preprocess_Substep(const T dt,const T time) override {}
-    void Preprocess_Solids_Substep(const T time,const int substep) override {}
-    void Postprocess_Solids_Substep(const T time,const int substep) override {}
-    void Filter_Velocities(const T dt,const T time,const bool velocity_update) override {}
-    void Update_Time_Varying_Material_Properties(const T time) override {}
-    void Update_Solids_Parameters(const T time) override {}
-    void Adjust_Density_And_Temperature_With_Sources(const T time) override {}
-    void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) override {}
-    void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) override {}
-    void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) override {}
-    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) override {}
-    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
-    void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) override {}
-    bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) override {return false;}
-    void Get_Source_Velocities(ARRAY<T,FACE_INDEX<2> >& face_velocities,ARRAY<bool,FACE_INDEX<2> >& psi_N,const T time) override {}
-    bool Get_Solid_Source_Velocities(ARRAY<int>& deformable_simplices,ARRAY<T>& deformable_simplex_forces,ARRAY<PAIR<int,int> >& rigid_simplices,ARRAY<T>& rigid_simplex_forces,
-        TV& orientation,const T time) override {return false;}
-
 //#####################################################################
 // Function Intialize_Advection
 //#####################################################################
@@ -348,6 +323,7 @@ void Initialize_Bodies() override
         gnuplot_surface_stream.flush();
         gnuplot_surface_stream.close();}
 }
+void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
 //#####################################################################
 // Function Set_External_Velocities
 //#####################################################################
@@ -355,6 +331,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
 {
     V.Subset(bound_particles).Fill(TV());
 }
+void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
 //#####################################################################

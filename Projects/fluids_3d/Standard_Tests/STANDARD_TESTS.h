@@ -40,18 +40,6 @@ public:
     ~STANDARD_TESTS()
     {}
 
-    // Unused callbacks
-    void Preprocess_Frame(const int frame) override {}
-    void Adjust_Velocity_With_Objects(const T time){}
-    void Postprocess_Frame(const int frame) override {}
-    void Postprocess_Phi(const T time) override {}
-    void Apply_Constraints(const T dt,const T time) override {}
-    void Preprocess_Solids_Substep(const T time,const int substep) override {}
-    void Postprocess_Solids_Substep(const T time,const int substep) override {}
-    void Extrapolate_Phi_Into_Objects(const T time) override {}
-    void Initialize_Euler_State() override {}
-    void Align_Deformable_Bodies_With_Rigid_Bodies() override {}
-
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

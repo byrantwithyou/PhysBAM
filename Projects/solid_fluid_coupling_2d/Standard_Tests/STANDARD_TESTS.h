@@ -466,25 +466,6 @@ public:
         }
     }
 
-    // Unused callbacks
-    void Postprocess_Solids_Substep(const T time,const int substep) override {}
-    void Apply_Constraints(const T dt,const T time) override {}
-    void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) override {}
-    void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) override {}
-    void Update_Time_Varying_Material_Properties(const T time) override {}
-    void Initialize_Euler_State() override {}
-    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) override {}
-    void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
-    void Update_Solids_Parameters(const T time) override {}
-    void Preprocess_Solids_Substep(const T time,const int substep) override {}
-    void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) override {}
-    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
-    void Filter_Velocities(const T dt,const T time,const bool velocity_update) override {}
-    void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
-    void Preprocess_Substep(const T dt,const T time) override {}
-    void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
-    void Post_Initialization() override {}
-
 //#####################################################################
 // Function Set_External_Velocities
 //#####################################################################

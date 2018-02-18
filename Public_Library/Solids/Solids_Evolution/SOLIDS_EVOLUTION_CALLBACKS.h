@@ -27,7 +27,6 @@ public:
     virtual void Self_Collisions_Begin_Callback(const T time,const int substep);
     virtual void Preprocess_Solids_Substep(const T time,const int substep);
     virtual void Postprocess_Solids_Substep(const T time,const int substep);
-    virtual void Align_Deformable_Bodies_With_Rigid_Bodies();
     virtual void Apply_Constraints(const T dt,const T time);
     virtual T Constraints_CFL();
     virtual void Pre_Advance_Cluster_Fracture(const T& dt, const T& time);

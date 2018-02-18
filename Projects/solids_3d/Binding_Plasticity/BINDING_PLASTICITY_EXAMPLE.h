@@ -66,20 +66,6 @@ public:
         tests.data_directory=data_directory;
     }
 
-    // unused callbacks
-    void Align_Deformable_Bodies_With_Rigid_Bodies() override {}
-    void Update_Solids_Parameters(const T time) override {}
-    void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) override {}
-    void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) override {}
-    void Apply_Constraints(const T dt,const T time) override {}
-    void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
-    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
-    void Preprocess_Solids_Substep(const T time,const int substep) override {}
-    void Preprocess_Frame(const int frame) override {}
-    void Postprocess_Frame(const int frame) override {}
-    void Update_Time_Varying_Material_Properties(const T time) override {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) override {}
-
 //#####################################################################
 // Get_Intersecting_Tetrahedron
 //#####################################################################

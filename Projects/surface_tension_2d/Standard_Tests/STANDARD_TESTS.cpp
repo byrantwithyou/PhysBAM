@@ -215,6 +215,7 @@ Preprocess_Substep(const T dt,const T time)
     current_dt=dt;
     if(SURFACE_TENSION_FORCE<TV>* force=solid_body_collection.deformable_body_collection.template Find_Force<SURFACE_TENSION_FORCE<TV>*>()) force->dt=dt;
     if(LINEAR_POINT_ATTRACTION<TV>* force=solid_body_collection.deformable_body_collection.template Find_Force<LINEAR_POINT_ATTRACTION<TV>*>()) force->dt=dt;
+    if(rebuild_curve) Rebuild_Surface();
 }
 //#####################################################################
 // Function Preprocess_Frame
@@ -687,14 +688,6 @@ Substitute_Coupling_Matrices(KRYLOV_SYSTEM_BASE<T>& coupled_system,T dt,T curren
         force->Update_Position_Based_State(current_position_time,true);
 
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after particle rebuild",0,0);}
-}
-//#####################################################################
-// Function Advance_One_Time_Step_Begin_Callback
-//#####################################################################
-template<class T> void STANDARD_TESTS<T>::
-Advance_One_Time_Step_Begin_Callback(const T dt,const T time)
-{
-    if(rebuild_curve) Rebuild_Surface();
 }
 //#####################################################################
 // Function Update_Time_Varying_Material_Properties

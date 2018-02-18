@@ -36,12 +36,6 @@ public:
     ~STANDARD_TESTS_SMOKE()
     {}
 
-    // Unused callbacks
-    void Postprocess_Solids_Substep(const T time,const int substep) override {}
-    void Preprocess_Frame(const int frame) override {}
-    void Apply_Constraints(const T dt,const T time) override {}
-    void Postprocess_Frame(const int frame) override {}
-
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

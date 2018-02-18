@@ -166,15 +166,6 @@ public:
     ~GLASS()
     {}
 
-    // Unused callbacks
-    void Initialize_Velocities() override {}
-    void Construct_Levelsets_For_Objects(const T time){}
-    void Preprocess_Frame(const int frame) override {}
-    void Adjust_Velocity_With_Objects(const T time){}
-    void Postprocess_Solids_Substep(const T time,const int substep) override {}
-    void Postprocess_Frame(const int frame) override {}
-    void Postprocess_Phi(const T time) override {}
-
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

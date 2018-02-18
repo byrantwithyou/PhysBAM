@@ -89,17 +89,6 @@ public:
     ~DSD_NO_NAVIER_STOKES()
     {}
 
-    // Unused callbacks
-    void Construct_Levelsets_For_Objects(const T time){}
-    void Preprocess_Frame(const int frame) override {}
-    void Adjust_Velocity_With_Objects(const T time){}
-    void Postprocess_Solids_Substep(const T time,const int substep) override {}
-    void Postprocess_Frame(const int frame) override {}
-    void Get_Source_Reseed_Mask(ARRAY<bool,TV_INT>*& cell_centered_mask,const T time) override {}
-    void Postprocess_Phi(const T time) override {}
-    bool Adjust_Phi_With_Sources(const T time) override {return false;}
-    void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time) override {}
-
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

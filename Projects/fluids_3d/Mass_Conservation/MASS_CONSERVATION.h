@@ -159,27 +159,6 @@ public:
     virtual ~MASS_CONSERVATION()
     {}
 
-    // Unused callbacks
-    void Initialize_Bodies() override {}
-    void Update_Solids_Parameters(const T time) override {}
-    void Update_Rigid_Bodies(const T time) {}
-    void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override {}
-    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override {}
-    void Update_Time_Varying_Material_Properties(const T time) override {}
-    void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) override {}
-    bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) override {return true;}
-    void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,3> >*& cell_centered_mask,const T time) override {}
-    void Initialize_Velocities() override {}
-    void Initialize_Euler_State() override {}
-    void Align_Deformable_Bodies_With_Rigid_Bodies() override {}
-    void Preprocess_Solids_Substep(const T time,const int substep) override {}
-    void Postprocess_Solids_Substep(const T time,const int substep) override {}
-    void Apply_Constraints(const T dt,const T time) override {}
-    void Preprocess_Frame(const int frame) override {}
-    void Extrapolate_Phi_Into_Objects(const T time) override {}
-    void Postprocess_Phi(const T time) override {}
-    void Postprocess_Frame(const int frame) override {}
-
 //#####################################################################
 // Function Initialize_Advection
 //#####################################################################

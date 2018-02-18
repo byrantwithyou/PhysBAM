@@ -166,28 +166,20 @@ public:
     ~STANDARD_TESTS()
     {}
 
-    // Unused callbacks
-    void Post_Initialization() override {}
-    void Postprocess_Solids_Substep(const T time,const int substep) override {}
-    void Apply_Constraints(const T dt,const T time) override {}
-    void Preprocess_Frame(const int frame) override {}
-    void Postprocess_Frame(const int frame) override {}
-    void Preprocess_Substep(const T dt,const T time) override {}
-    void Postprocess_Substep(const T dt,const T time) override {}
-    void Align_Deformable_Bodies_With_Rigid_Bodies() override {}
-    void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) override {}
-    void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > F,const T time) override {}
-    void Update_Time_Varying_Material_Properties(const T time) override {}
-    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) override {}
-    void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
-    void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) override {}
-    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
-    void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
-    void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
-    void Filter_Velocities(const T dt,const T time,const bool velocity_update) override {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) override {}
-    void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override {}
-    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override {}
+    void Postprocess_Substep(const T dt,const T time) override
+    {
+        DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
+        if(test_number==12){
+            for(int i=0;i<rigid_body_clamp_time.m;i++) if(rigid_body_clamp_time(i).y>=time){RIGID_BODY<TV>& rigid_body=*rigid_body_clamp_time(i).x;
+                    T speed=rigid_body.Twist().linear.Magnitude();
+                    if(speed>maximum_fall_speed) rigid_body.Twist().linear*=maximum_fall_speed/speed;}
+
+            for(int i=0;i<structure_clamp_time.m;i++) if(structure_clamp_time(i).y>=time){TETRAHEDRALIZED_VOLUME<T>& volume=*structure_clamp_time(i).x;
+                    for(int j=0;j<volume.mesh.elements.m;j++){const VECTOR<int,4>& e=volume.mesh.elements(j);
+                        for(int k=0;k<e.Size();k++){
+                            T speed=deformable_body_collection.particles.V(e(k)).Magnitude();
+                            if(speed>maximum_fall_speed) deformable_body_collection.particles.V(e(k))*=maximum_fall_speed/speed;}}}}
+    }
 
 ROTATION<TV> Upright_Orientation(const TV& x,const TV& y)
 {
@@ -392,23 +384,6 @@ void Initialize_Bodies() override
     for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->limit_time_step_by_strain_rate=false;
 
     solids_evolution->fully_implicit=fully_implicit;
-}
-//#####################################################################
-// Function Advance_One_Time_Step_End_Callback
-//#####################################################################
-void Advance_One_Time_Step_End_Callback(const T dt,const T time) override
-{
-    DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    if(test_number==12){
-        for(int i=0;i<rigid_body_clamp_time.m;i++) if(rigid_body_clamp_time(i).y>=time){RIGID_BODY<TV>& rigid_body=*rigid_body_clamp_time(i).x;
-            T speed=rigid_body.Twist().linear.Magnitude();
-            if(speed>maximum_fall_speed) rigid_body.Twist().linear*=maximum_fall_speed/speed;}
-
-        for(int i=0;i<structure_clamp_time.m;i++) if(structure_clamp_time(i).y>=time){TETRAHEDRALIZED_VOLUME<T>& volume=*structure_clamp_time(i).x;
-            for(int j=0;j<volume.mesh.elements.m;j++){const VECTOR<int,4>& e=volume.mesh.elements(j);
-                for(int k=0;k<e.Size();k++){
-                    T speed=deformable_body_collection.particles.V(e(k)).Magnitude();
-                    if(speed>maximum_fall_speed) deformable_body_collection.particles.V(e(k))*=maximum_fall_speed/speed;}}}}
 }
 //#####################################################################
 // Function Set_Kinematic_Positions

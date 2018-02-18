@@ -55,15 +55,6 @@ public:
         delete arb;
     }
 //#####################################################################
-    void Update_Time_Varying_Material_Properties(const T time) override {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) override {}
-    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) override {}
-    void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) override {}
-    void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) override {}
-    void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) override {}
-    void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) override {}
-    void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) override {}
-//#####################################################################
 // Initialize_Bodies
 //#####################################################################
 void Initialize_Bodies() override

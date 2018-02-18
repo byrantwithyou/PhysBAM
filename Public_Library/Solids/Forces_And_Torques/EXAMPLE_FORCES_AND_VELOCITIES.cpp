@@ -14,24 +14,6 @@ template<class TV> EXAMPLE_FORCES_AND_VELOCITIES<TV>::
 ~EXAMPLE_FORCES_AND_VELOCITIES()
 {}
 //#####################################################################
-// Function Advance_One_Time_Step_Begin_Callback
-//#####################################################################
-template<class TV> void EXAMPLE_FORCES_AND_VELOCITIES<TV>::
-Advance_One_Time_Step_Begin_Callback(const T dt,const T time)
-{}
-//#####################################################################
-// Function Advance_One_Time_Step_End_Callback
-//#####################################################################
-template<class TV> void EXAMPLE_FORCES_AND_VELOCITIES<TV>::
-Advance_One_Time_Step_End_Callback(const T dt,const T time)
-{}
-//#####################################################################
-// Function Set_PD_Targets
-//#####################################################################
-template<class TV> void EXAMPLE_FORCES_AND_VELOCITIES<TV>::
-Set_PD_Targets(const T dt,const T time)
-{}
-//#####################################################################
 // Function Update_Time_Varying_Material_Properties
 //#####################################################################
 template<class TV> void EXAMPLE_FORCES_AND_VELOCITIES<TV>::
@@ -55,14 +37,6 @@ Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt)
 {
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
 }
-//#####################################################################
-// Function Add_External_Impulse
-//#####################################################################
-template<class TV> void EXAMPLE_FORCES_AND_VELOCITIES<TV>::
-Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt)
-{
-    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
-}   
 //#####################################################################
 namespace PhysBAM{
 template class EXAMPLE_FORCES_AND_VELOCITIES<VECTOR<float,1> >;
