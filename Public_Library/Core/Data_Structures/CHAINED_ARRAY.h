@@ -38,7 +38,7 @@ public:
     {}
 
     void Remove_All()
-    {hash.Remove_All();}
+    {hash.Remove_All();extra.Remove_All();}
 
     template<class... Args>
     void Resize(Args&&... args)
