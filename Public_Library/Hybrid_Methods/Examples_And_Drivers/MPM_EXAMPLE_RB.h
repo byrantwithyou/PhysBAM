@@ -58,7 +58,6 @@ public:
     ARRAY<PARTICLE_GRID_FORCES<TV>*> forces;
     ARRAY<MPM_PLASTICITY_MODEL<TV>*> plasticity_models;
     ARRAY<DEFORMABLES_FORCES<TV>*>& lagrangian_forces;
-    ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
     PARTICLE_GRID_WEIGHTS<TV>* weights=0;
     GATHER_SCATTER<TV>& gather_scatter;
     ARRAY<MPM_COLLISION_OBJECT<TV>*> collision_objects;

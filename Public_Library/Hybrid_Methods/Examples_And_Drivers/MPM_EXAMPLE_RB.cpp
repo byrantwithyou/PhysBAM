@@ -54,7 +54,6 @@ template<class TV> MPM_EXAMPLE_RB<TV>::
     plasticity_models.Delete_Pointers_And_Clean_Memory();
     collision_objects.Delete_Pointers_And_Clean_Memory();
     forces.Delete_Pointers_And_Clean_Memory();
-    av.Delete_Pointers_And_Clean_Memory();
 }
 //#####################################################################
 // Function Write_Output_Files
