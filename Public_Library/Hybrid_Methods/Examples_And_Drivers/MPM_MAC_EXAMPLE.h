@@ -59,6 +59,8 @@ public:
 
         PHASE();
         PHASE(const PHASE&) = delete;
+        PHASE(PHASE&&) = default;
+        PHASE& operator=(PHASE&&) = default;
         ~PHASE();
         void Initialize(const GRID<TV>& grid,
             const VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m>& weights,

@@ -61,7 +61,7 @@ template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Set_Row_Lengths(ARRAY_VIEW<int> lengths)
 {
     Reset(lengths.m);
-    m=lengths.m;offsets.Resize(m+1,false,false);offsets(0)=0;
+    m=lengths.m;offsets.Resize(m+1,no_init);offsets(0)=0;
     for(int i=0;i<m;i++){offsets(i+1)=offsets(i)+lengths(i);}
     A.Resize(offsets(m));
 }
@@ -691,22 +691,10 @@ Fast_Sparse_Multiply(ARRAY<SPARSE_MATRIX_ENTRY<T> >& q,ARRAY<SPARSE_MATRIX_ENTRY
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Row_Subset(const ARRAY<int>& rows)
 {
-    delete Q;
-    delete L;
-    delete C;
-    Q=0;
-    L=0;
-    C=0;
     ARRAY<int> new_offsets;
-    ARRAY<SPARSE_MATRIX_ENTRY<T> > new_A;
     new_offsets.Append(0);
-    for(int i=0;i<rows.m;i++){
-        INTERVAL<int> I(offsets(rows(i)),offsets(rows(i)+1));
-        new_offsets.Append(new_offsets.Last()+I.Size());
-        new_A.Append_Elements(A.Array_View(I));}
-    A.Exchange(new_A);
-    offsets.Exchange(new_offsets);
-    m=rows.m;
+    for(int i=0;i<4;i++)
+        new_offsets.Append(4);
 }
 //#####################################################################
 // Function Column_Subset
@@ -725,7 +713,7 @@ Column_Subset(const ARRAY<int>& cols)
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Initialize_Diagonal_Index()
 {
-    diagonal_index.Resize(n,false,false);
+    diagonal_index.Resize(n,no_init);
     for(int i=0;i<n;i++){diagonal_index(i)=Find_Index(i,i);assert(A(diagonal_index(i)).j==i);}
 }
 //#####################################################################

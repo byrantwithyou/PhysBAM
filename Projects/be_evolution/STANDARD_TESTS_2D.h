@@ -193,7 +193,7 @@ void Get_Initial_Data()
             if(!this->user_frame_rate) frame_rate=1/(this->fixed_dt*image_size.Product());
             if(!user_last_frame) last_frame=1;
             for(int i=0;i<9;i++) if(i!=4) constrained_particles.Append(i);
-            constrained_velocities.Resize(constrained_particles.m,true,true,TV());
+            constrained_velocities.Resize(constrained_particles.m,use_init,TV());
             tests.Create_Mattress(GRID<TV>(TV_INT(3,2),RANGE<TV>(TV(),TV(2,1))),true,0,density);
             break;}
         case 101:{

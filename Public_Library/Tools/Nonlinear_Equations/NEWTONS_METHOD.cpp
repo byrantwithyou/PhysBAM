@@ -21,10 +21,10 @@ template <class T> bool NEWTONS_METHOD<T>::
 Newtons_Method(const NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>& F,KRYLOV_SYSTEM_BASE<T>& sys,KRYLOV_VECTOR_BASE<T>& x,ARRAY<KRYLOV_VECTOR_BASE<T>*>& av)
 {
     KRYLOV_SOLVER<T>::Ensure_Size(av,x,3+use_gradient_magnitude_objective);
-    KRYLOV_VECTOR_BASE<T>& grad=*av.Pop();
-    KRYLOV_VECTOR_BASE<T>& dx=*av.Pop();
-    KRYLOV_VECTOR_BASE<T>& tm=*av.Pop();
-    KRYLOV_VECTOR_BASE<T>& eff_grad=use_gradient_magnitude_objective?*av.Pop():grad;
+    KRYLOV_VECTOR_BASE<T>& grad=*av.Pop_Value();
+    KRYLOV_VECTOR_BASE<T>& dx=*av.Pop_Value();
+    KRYLOV_VECTOR_BASE<T>& tm=*av.Pop_Value();
+    KRYLOV_VECTOR_BASE<T>& eff_grad=use_gradient_magnitude_objective?*av.Pop_Value():grad;
     GMRES<T> gmres;
     MINRES<T> minres;
     CONJUGATE_GRADIENT<T> cg;

@@ -25,7 +25,7 @@ public:
     {
         this->initial_guess=j0;
         tolerance=1e-7;
-        dof_range.Resize(2,true,true,INTERVAL<T>::Full_Box());
+        dof_range.Resize(2,use_init,INTERVAL<T>::Full_Box());
         constraint_range=VECTOR<INTERVAL<T>,2>({0,FLT_MAX},{0,FLT_MAX});
         Compute_Hessian(initial_guess);
         Compute_Constraint_Jacobian(initial_guess);

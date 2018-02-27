@@ -99,8 +99,7 @@ Compute_Candidate_Nodes_For_Collision_Body_Collisions(const ARRAY<COLLISION_GEOM
 {
     deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Positions();
     deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities();
-    collision_body_candidate_nodes.Resize(collision_body_list.Size(),false);
-    for(COLLISION_GEOMETRY_ID id(0);id<collision_body_list.Size();id++) collision_body_candidate_nodes(id).Remove_All();
+    collision_body_candidate_nodes.Resize(collision_body_list.Size(),init_all);
     if(!bodies.m) return;
     if(use_spatial_partition){
         ARRAY<COLLISION_GEOMETRY_ID> collision_body_indices;
@@ -269,8 +268,7 @@ Add_Collision_Mesh(T_MESH& mesh,const bool collide_with_interior)
 template<class TV> void DEFORMABLE_OBJECT_COLLISIONS<TV>::
 Update_Simulated_Particles()
 {
-    particle_to_structure.Resize(particles.Size(),false,false);
-    particle_to_structure.Fill(0);
+    particle_to_structure.Resize(particles.Size(),init_all,0);
     for(int s=0;s<deformable_object_structures.m;s++) deformable_object_structures(s)->Mark_Nodes_Referenced(particle_to_structure,s);
 }
 //#####################################################################

@@ -102,7 +102,7 @@ Refill(bool init)
         for(int i=waiting_particles.m-1;i>=waiting_particle_color.m;i--)
             if((waiting_particles(i)-p).Dot(normal)>=-max_shift/2)
                 waiting_particles.Remove_Index_Lazy(i);
-    waiting_particle_color.Resize(waiting_particles.m,true,true,VECTOR<T,3>(next_color&1,(next_color>>1)&1,next_color>>2));
+    waiting_particle_color.Resize(waiting_particles.m,use_init,VECTOR<T,3>(next_color&1,(next_color>>1)&1,next_color>>2));
     next_color=next_color%6+1;
 }
 //#####################################################################

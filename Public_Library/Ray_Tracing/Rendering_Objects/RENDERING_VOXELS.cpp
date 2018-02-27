@@ -23,8 +23,11 @@ Precompute_Light_Data(bool use_fast_precomputation,RENDER_WORLD<T>& world)
     RENDERING_RAY<T> parent_ray;
     ARRAY<VECTOR<T,3> > location_list;
     Get_Node_Locations(location_list);
-    ARRAY<int> node_indirection(location_list.m,false);for(int i=0;i<location_list.m;i++)node_indirection(i)=i;
-    ARRAY<T> distance_squared_to_light;if(use_fast_precomputation) distance_squared_to_light.Resize(location_list.m,false,false);
+    ARRAY<int> node_indirection(location_list.m,no_init);
+    for(int i=0;i<location_list.m;i++) node_indirection(i)=i;
+    ARRAY<T> distance_squared_to_light;
+    if(use_fast_precomputation)
+        distance_squared_to_light.Resize(location_list.m,no_init);
     const ARRAY<RENDERING_LIGHT<T> *>& lights=world.Lights();
     LOG::cout<<"have "<<lights.m<<" lights and "<<location_list.m<<" locations"<<std::endl;
     for(int light_index=0;light_index<lights.m;light_index++){

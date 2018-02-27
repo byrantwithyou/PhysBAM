@@ -95,24 +95,25 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
 {
     BASE::Update_Position_Based_State(time,is_position_update,update_hessian);
     if(MPI_WORLD::Initialized() && !mpi_solids) PHYSBAM_FATAL_ERROR();
-    ARRAY<T> element_volumes(strain_measure.mesh.elements.m,false); // TODO: this is not efficient.
+    ARRAY<T> element_volumes(strain_measure.mesh.elements.m,no_init); // TODO: this is not efficient.
 
-    Bs_per_node.Resize(strain_measure.mesh.elements.m,false,false);
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    Bs_per_node.Resize(strain_measure.mesh.elements.m,no_init);
+    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){
+        int t=iterator.Data();
         T_MATRIX Ds=strain_measure.Ds(particles.X,t);
         element_volumes(t)=(T)1/factorial(d)*Ds.Parallelepiped_Measure();
         Bs_per_node(t)=(T)1/factorial(d+1)*Ds.Cofactor_Matrix();}
 
-    boundary_normals.Resize(strain_measure.mesh.boundary_mesh->elements.m,false,false);
+    boundary_normals.Resize(strain_measure.mesh.boundary_mesh->elements.m,no_init);
 
-    for(ELEMENT_ITERATOR iterator(force_boundary_elements);iterator.Valid();iterator.Next()){int b=iterator.Data();
+    for(ELEMENT_ITERATOR iterator(force_boundary_elements);iterator.Valid();iterator.Next()){
+        int b=iterator.Data();
         int interior,i;boundary_to_element(b).Get(interior,i);
         if(i>1) boundary_normals(b)=-Bs_per_node(interior).Column(i-1);
         else boundary_normals(b)=Bs_per_node(interior)*VECTOR<T,d>::All_Ones_Vector();}
 
-    volumes_full.Resize(particles.Size(),false,false);
-    INDIRECT_ARRAY<ARRAY<T>,ARRAY_VIEW<int>&> volumes_subset=volumes_full.Subset(strain_measure.mesh.elements.Flattened());
-    volumes_subset.Fill((T)0);
+    volumes_full.Resize(particles.Size(),no_init);
+    volumes_full.Subset(strain_measure.mesh.elements.Flattened()).Fill((T)0);;
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         volumes_full.Subset(strain_measure.mesh.elements(t))+=element_volumes(t);}
 
@@ -211,9 +212,8 @@ Make_Incompressible(const T dt,const bool correct_volume)
 
     if(boundary_pressures.m){
         if(TV::m!=d) PHYSBAM_FATAL_ERROR();
-        gradient_full.Resize(particles.Size(),false,false);
-        INDIRECT_ARRAY<ARRAY<TV>,ARRAY<int>&> gradient_subset=gradient_full.Subset(force_dynamic_particles_list);
-        gradient_subset.Fill(TV());
+        gradient_full.Resize(particles.Size(),no_init);
+        gradient_full.Subset(force_dynamic_particles_list).Fill(TV());
         T_BOUNDARY_MESH& boundary_mesh=*strain_measure.mesh.boundary_mesh;
         for(ELEMENT_ITERATOR iterator(force_boundary_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
             VECTOR<int,d>& element=boundary_mesh.elements(t);
@@ -236,7 +236,7 @@ Make_Incompressible(const T dt,const bool correct_volume)
     system.Project(divergence);
     LOG::cout<<"divergence magnitude = "<<system.Magnitude(divergence)<<std::endl;
 
-    pressure_full.Resize(particles.Size(),false,false);
+    pressure_full.Resize(particles.Size(),no_init);
     KRYLOV_VECTOR_T pressure(pressure_full,force_dynamic_particles_list);
     pressure.v.Fill((T)0);
 
@@ -265,7 +265,8 @@ Test_System()
     RANDOM_NUMBERS<T> random;random.Set_Seed(1823);
     Update_Position_Based_State(0,true,true);
 
-    pressure_full.Resize(particles.Size(),false,false);divergence_full.Resize(particles.Size(),false,false);
+    pressure_full.Resize(particles.Size(),no_init);
+    divergence_full.Resize(particles.Size(),no_init);
     const ARRAY<int> &fragment_dynamic_particles=force_dynamic_particles_list,
         &fragment_particles=force_dynamic_particles_list;
     INDIRECT_ARRAY<ARRAY<T> > volumes(volumes_full,fragment_dynamic_particles);
@@ -337,7 +338,7 @@ Gradient(ARRAY_VIEW<const T> p,ARRAY<TV>& gradient) const
 {
     ARRAY_VIEW<T> modifiable_p(p.Const_Cast());
     if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data(modifiable_p);
-    gradient.Resize(particles.Size(),false,false);
+    gradient.Resize(particles.Size(),no_init);
     gradient.Subset(force_dynamic_particles_list).Fill(TV());
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         VECTOR<int,d+1>& element=strain_measure.mesh.elements(t);
@@ -351,7 +352,7 @@ template<class TV,int d> void INCOMPRESSIBLE_FINITE_VOLUME<TV,d>::
 Negative_Divergence(ARRAY_VIEW<const TV> V,ARRAY<T>& divergence) const
 {
     if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data(V.Const_Cast());
-    divergence.Resize(particles.Size(),false,false);
+    divergence.Resize(particles.Size(),no_init);
     INDIRECT_ARRAY<ARRAY<T>,ARRAY<int>&> divergence_subset=divergence.Subset(force_dynamic_particles_list);
     divergence_subset.Fill(T());
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
@@ -369,8 +370,7 @@ Diagonal_Elements(ARRAY<T>& D) const
     ARRAY<ARRAY<int> >& incident_elements=*strain_measure.mesh.incident_elements;
     for(ELEMENT_ITERATOR iterator(force_dynamic_particles);iterator.Valid();iterator.Next()){int p=iterator.Data();
         D(p)=T();
-        INDIRECT_ARRAY<ARRAY<TV>,ARRAY<int>&> forces_subset=forces.Subset(node_regions(p));
-        forces_subset.Fill(TV());
+        forces.Subset(node_regions(p)).Fill(TV());
         for(int j=0;j<incident_elements(p).m;j++){int t=incident_elements(p)(j);
             strain_measure.Distribute_Force(forces,strain_measure.mesh.elements(t),-Bs_per_node(t));}
         forces.Subset(node_regions(p))*=particles.one_over_mass.Subset(node_regions(p));
@@ -384,7 +384,7 @@ template<class TV,int d> void INCOMPRESSIBLE_FINITE_VOLUME<TV,d>::
 Update_Preconditioner()
 {
     if(!use_diagonal_preconditioner) return;
-    diagonal_preconditioner_full.Resize(particles.Size(),false,false);
+    diagonal_preconditioner_full.Resize(particles.Size(),no_init);
     Diagonal_Elements(diagonal_preconditioner_full);
     for(ELEMENT_ITERATOR iterator(force_dynamic_particles);iterator.Valid();iterator.Next()){int p=iterator.Data();
         diagonal_preconditioner_full(p)=1/sqrt(diagonal_preconditioner_full(p));}

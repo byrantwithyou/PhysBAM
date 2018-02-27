@@ -127,7 +127,7 @@ Use_Stiffness_Matrix()
 template<class TV,int d> void FINITE_VOLUME<TV,d>::
 Update_Be_Scales()
 {
-    Be_scales.Resize(strain_measure.Dm_inverse.m,false,false);
+    Be_scales.Resize(strain_measure.Dm_inverse.m,no_init);
     for(int t=0;t<Be_scales.m;t++) Be_scales(t)=-(T)1/factorial(d)/strain_measure.Dm_inverse(t).Determinant();
 }
 //#####################################################################
@@ -183,16 +183,16 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
     Save_Stress_Derivative();
     if(anisotropic_model && !V) PHYSBAM_FATAL_ERROR();
     int elements=strain_measure.Dm_inverse.m;
-    U.Resize(elements,false,false);De_inverse_hat.Resize(elements,false,false);Fe_hat.Resize(elements,false,false);
-    if(dPi_dFe) dPi_dFe->Resize(elements,false,false);
-    if(dP_dFe) dP_dFe->Resize(elements,false,false);
-    if(V) V->Resize(elements,false,false);
-    if(node_stiffness){
-        node_stiffness->Resize(strain_measure.mesh_object.particles.Size(),false,false);
-        node_stiffness->Fill(SYMMETRIC_MATRIX<T,TV::m>());}
-    if(edge_stiffness){
-        edge_stiffness->Resize(strain_measure.mesh.segment_mesh->elements.m,false,false);
-        edge_stiffness->Fill(MATRIX<T,TV::m>());}
+    U.Resize(elements,no_init);
+    De_inverse_hat.Resize(elements,no_init);
+    Fe_hat.Resize(elements,no_init);
+    if(dPi_dFe) dPi_dFe->Resize(elements,no_init);
+    if(dP_dFe) dP_dFe->Resize(elements,no_init);
+    if(V) V->Resize(elements,no_init);
+    if(node_stiffness)
+        node_stiffness->Resize(strain_measure.mesh_object.particles.Size(),init_all);
+    if(edge_stiffness)
+        edge_stiffness->Resize(strain_measure.mesh.segment_mesh->elements.m,init_all);
     MATRIX<T,d> V_local;
     if(!plasticity_model){
         MATRIX<MATRIX<T,TV::m>,d+1,d+1> dfdx;
@@ -332,8 +332,8 @@ Semi_Implicit_Impulse_Precomputation(const T time,const T max_dt,ARRAY<T>* time_
 {
     assert(!plasticity_model && isotropic_model);
     int elements=strain_measure.Dm_inverse.m;
-    if(!semi_implicit_data) semi_implicit_data=new ARRAY<DIAGONALIZED_SEMI_IMPLICIT_ELEMENT<TV,d> >(elements,false);
-    else semi_implicit_data->Resize(elements,false,false);
+    if(!semi_implicit_data) semi_implicit_data=new ARRAY<DIAGONALIZED_SEMI_IMPLICIT_ELEMENT<TV,d> >(elements,no_init);
+    else semi_implicit_data->Resize(elements,no_init);
     twice_max_strain_per_time_step=2*max_strain_per_time_step;
     for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         DIAGONALIZED_SEMI_IMPLICIT_ELEMENT<TV,d>& data=(*semi_implicit_data)(t);

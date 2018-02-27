@@ -224,7 +224,7 @@ template<class TV> void RIGID_LINEAR_SPRINGS<TV>::
 Print_Deformation_Statistics() const
 {
     LOG::SCOPE scope("linear spring deformation","linear spring deformation");
-    ARRAY<T> deformation(segment_mesh.elements.m,false);
+    ARRAY<T> deformation(segment_mesh.elements.m,no_init);
     for(int s=0;s<segment_mesh.elements.m;s++){
         int i,j;segment_mesh.elements(s).Get(i,j);
         T length=Spring_Length(i),rl=visual_restlength(s);

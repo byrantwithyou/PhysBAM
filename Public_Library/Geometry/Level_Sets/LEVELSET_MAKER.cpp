@@ -175,7 +175,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
             if(verbose && color_touches_boundary.Number_True()>1) LOG::cerr<<"Warning: Got "<<color_touches_boundary.Number_True()<<" colors touching boundary"<<std::endl;
             for(int i=0;i<number_of_colors;i++) color_is_inside(i)=!color_touches_boundary(i);}
         else{
-            ARRAY<T> color_maximum_distance(number_of_colors,false);color_maximum_distance.Fill(-1);
+            ARRAY<T> color_maximum_distance(number_of_colors,use_init,-1);
             ARRAY<TV_INT> color_representatives(number_of_colors);
             for(int i=0;i<grid.counts.x;i++)
                 for(int j=0;j<grid.counts.y;j++)

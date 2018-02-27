@@ -56,7 +56,7 @@ void All_Flags_Tests(RF flags)
             for(FACE_RANGE_ITERATOR<d> it(ro,ri,flags,s,i);it.Valid();it.Next())
                 a.Append(it.face);
             for(FACE_RANGE_ITERATOR<d> it(ro,ri,flags|RF::reverse,s,i);it.Prev_Valid();it.Prev()){
-                if(a.Pop()!=it.face){
+                if(a.Pop_Value()!=it.face){
                     fr_test_ok=false;
                     LOG::printf("reverse test failed; side=%i axis=%i flags=%i\n",s,i,(int)flags);
                     break;}}}

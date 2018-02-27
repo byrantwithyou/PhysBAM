@@ -204,7 +204,7 @@ Save_State()
     if(dd_penalty){
         state_saved=true;
         solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.X_self_collision_free=particles.X;
-        repulsion_thickness.Resize(particles.number,true,true,const_repulsion_thickness);
+        repulsion_thickness.Resize(particles.number,use_init,const_repulsion_thickness);
         recently_modified.Resize(particles.number);
         recently_modified.Fill(true);}
 }
@@ -251,8 +251,8 @@ Init(TRIANGLE_COLLISION_PARAMETERS<TV>* param,
                 dd_penalty->Add_Surface(p->Get_Boundary_Object());}
         deformable_body_collection.triangle_repulsions_and_collisions_geometry.Build_Collision_Geometry();
         deformable_body_collection.triangle_repulsions_and_collisions_geometry.X_self_collision_free=particles.X;
-        repulsion_thickness.Resize(particles.number,true,true,const_repulsion_thickness);
-        recently_modified.Resize(particles.number,true,true,true);
+        repulsion_thickness.Resize(particles.number,use_init,const_repulsion_thickness);
+        recently_modified.Resize(particles.number,use_init,true);
 
         PHYSBAM_ASSERT(param);
         deformable_body_collection.triangle_repulsions_and_collisions_geometry.Initialize(*param);

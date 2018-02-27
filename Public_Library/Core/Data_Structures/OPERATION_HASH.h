@@ -23,7 +23,7 @@ public:
 
     void Initialize(const ID m)
     {if(m==operations.Size()){Next_Operation();return;}
-    operations.Resize(m,false,false);operations.Fill((unsigned int)0);current_operation=1;}
+    operations.Resize(m,init_all,0);current_operation=1;}
     
     void Mark(const ID i)
     {operations(i)=current_operation;}

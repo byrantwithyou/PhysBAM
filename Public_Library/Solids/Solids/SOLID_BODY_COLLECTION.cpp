@@ -160,10 +160,10 @@ Update_CFL()
         for(int i=0;i<deformable_body_collection.deformables_forces.m;i++){if(!deformable_body_collection.deformables_forces(i)->CFL_Valid()){cfl_valid=false;break;}}}
     else cfl_valid=false;
     if(!cfl_valid){
-        frequency.Resize(deformable_body_collection.particles.Size(),false,false);
+        frequency.Resize(deformable_body_collection.particles.Size(),no_init);
         frequency.Subset(deformable_body_collection.simulated_particles).Fill(T_FREQUENCY_DEFORMABLE());
 
-        rigid_frequency.Resize(rigid_body_collection.rigid_body_particles.Size(),false,false);
+        rigid_frequency.Resize(rigid_body_collection.rigid_body_particles.Size(),no_init);
         rigid_frequency.Subset(rigid_body_collection.simulated_rigid_body_particles).Fill(T_FREQUENCY_RIGID());
 
         for(int i=0;i<solids_forces.m;i++){solids_forces(i)->Initialize_CFL(frequency,rigid_frequency);solids_forces(i)->Validate_CFL();}

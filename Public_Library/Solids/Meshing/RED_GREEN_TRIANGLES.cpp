@@ -81,9 +81,12 @@ Resolve_Stack()
 {
     while(stack.m){
         int level,tri;
-        stack.Pop().Get(level,tri);
-        if(level>=0){assert(tri);(*index_in_stack(level))(tri)=0;
-            if(!Regularly_Refined(level,tri)) Refine_If_Necessary(level,tri);}}
+        stack.Pop_Value().Get(level,tri);
+        if(level>=0){
+            assert(tri);
+            (*index_in_stack(level))(tri)=0;
+            if(!Regularly_Refined(level,tri))
+                Refine_If_Necessary(level,tri);}}
 }
 //#####################################################################
 // Function Refine_If_Necessary
@@ -330,7 +333,7 @@ Add_Segment(ARRAY<int>& free_edge_indices,const int node1,const int node2)
         index=segment_mesh.elements.Append(VECTOR<int,2>(node1,node2));
         segment_midpoints.Append(0);}
     else{
-        index=free_edge_indices.Pop();
+        index=free_edge_indices.Pop_Value();
         assert(segment_midpoints(index)<0);
         segment_mesh.elements(index).Set(node1,node2);}
     (*segment_mesh.incident_elements)(node1).Append(index);(*segment_mesh.incident_elements)(node2).Append(index);
@@ -351,7 +354,7 @@ Add_Triangle(ARRAY<int>& free_triangle_indices,const int level,const int i,const
         children(level)->Resize(index+1);
         index_in_stack(level)->Resize(index+1);}
     else{
-        index=free_triangle_indices.Pop();
+        index=free_triangle_indices.Pop_Value();
         triangle_mesh.elements(index).Set(i,j,k);
         (*parent(level))(index)=parent_index;
         for(int a=0;a<4;a++) (*children(level))(index)(a)=0;

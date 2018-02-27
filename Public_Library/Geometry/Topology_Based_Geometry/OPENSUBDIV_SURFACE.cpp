@@ -237,7 +237,7 @@ Create_Triangulated_Surface(const OPENSUBDIV_SURFACE<TV,gauss_order>& surf,bool 
         tri_patch->mesh.elements.Append(VECTOR<int,3>(a00,a11,a10));}
 
     if(!same_particles){
-        ARRAY<int> map(surf.particles.X.m,true,-1);
+        ARRAY<int> map(surf.particles.X.m,use_init,-1);
         ARRAY_VIEW<int> av=tri_patch->mesh.elements.Flattened();
         int next=0;
         LOG::printf("av.m = %P\n",av.m);

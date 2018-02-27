@@ -15,7 +15,7 @@ namespace PhysBAM{
 //#####################################################################
 template<class TV> BOUNDARY_PHI_WATER<TV>::
 BOUNDARY_PHI_WATER(const TV_SIDES& constant_extrapolation)
-    :sign(1),use_open_boundary_mode(false),open_boundary(6,true),V(0)
+    :sign(1),use_open_boundary_mode(false),open_boundary(6),V(0)
 {
     Set_Constant_Extrapolation(constant_extrapolation);
     Set_Open_Boundary(false,false,false,false,false,false);

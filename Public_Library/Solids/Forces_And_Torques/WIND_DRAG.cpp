@@ -62,7 +62,7 @@ Update_Position_Based_State(const T time)
     T_SIMPLICIAL_OBJECT& simplicial_object=deformable_simplicial_object?*deformable_simplicial_object:*rigid_body->simplicial_object;
     T wind_viscosity=use_constant_wind?constant_wind_viscosity:spatially_varying_wind_viscosity;
     if(wind_viscosity || spatially_varying_wind_pressure || wind_density || spatially_varying_wind_density){
-        optimization.Resize(simplicial_object.mesh.elements.m,false,false);
+        optimization.Resize(simplicial_object.mesh.elements.m,no_init);
         if(deformable_simplicial_object) for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
             const TV_INT& nodes=simplicial_object.mesh.elements(t);
             optimization(t).center=particles.X.Subset(nodes).Sum()/TV::m;
@@ -76,8 +76,7 @@ Update_Position_Based_State(const T time)
             optimization(t).area_over_m=world_space_simplex.Size()/TV::m;
             if(use_spatially_varying_wind) optimization(t).wind_velocity=Spatially_Varying_Wind_Velocity(optimization(t).center);}}
     if(linear_normal_viscosity && deformable_simplicial_object){ // compute vertex normals for fragment
-        vertex_normals.Resize(particles.Size(),false,false);
-        for(ELEMENT_ITERATOR iterator(force_particles);iterator.Valid();iterator.Next()) vertex_normals(iterator.Data())=TV();
+        vertex_normals.Resize(particles.Size(),init_all);
         for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
             const TV_INT& nodes=simplicial_object.mesh.elements(t);
             vertex_normals.Subset(nodes)+=T_SIMPLEX::Normal(particles.X.Subset(nodes));}

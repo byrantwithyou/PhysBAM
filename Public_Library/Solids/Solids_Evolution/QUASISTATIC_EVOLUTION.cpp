@@ -126,7 +126,7 @@ Advance_One_Time_Step_Position(const T dt,const T time,const bool solids)
 
     // iterate to steady state
     T supnorm=0;int iteration;
-    dX_full.Resize(particles.Size(),false,false);
+    dX_full.Resize(particles.Size(),no_init);
     for(iteration=0;iteration<solids_parameters.newton_iterations;iteration++){
         INDIRECT_ARRAY<ARRAY<TV>,ARRAY<int>&> dX_subset=dX_full.Subset(simulated_particles);
         dX_subset.Fill(TV()); // initial guess is zero

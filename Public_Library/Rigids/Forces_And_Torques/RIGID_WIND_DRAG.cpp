@@ -38,7 +38,7 @@ Update_Position_Based_State(const T time)
     T_SIMPLICIAL_OBJECT& simplicial_object=*rigid_body->simplicial_object;
     T wind_viscosity=use_constant_wind?constant_wind_viscosity:spatially_varying_wind_viscosity;
     if(wind_viscosity || spatially_varying_wind_pressure || wind_density || spatially_varying_wind_density){
-        optimization.Resize(simplicial_object.mesh.elements.m,false,false);
+        optimization.Resize(simplicial_object.mesh.elements.m,no_init);
         for(int t=0;t<rigid_body->simplicial_object->mesh.elements.m;t++){
             if(rigid_body->Has_Infinite_Inertia() || rigid_body->particle_index<0) return;
             T_SIMPLEX world_space_simplex=rigid_body->World_Space_Simplex(t);

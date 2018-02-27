@@ -17,9 +17,8 @@ public:
     ARRAY<bool> valid_nodes;
 
     GRAPH(const int number_of_nodes)
+        :edges(number_of_nodes),valid_nodes(number_of_nodes,use_init,true)
     {
-        edges.Resize(number_of_nodes);
-        valid_nodes.Resize(number_of_nodes,false);valid_nodes.Fill(true);
     }
 
     void Add_Directed_Edge(const int from,const int to)

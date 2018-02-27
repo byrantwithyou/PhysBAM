@@ -151,7 +151,7 @@ Reinitialize(bool force,bool read_geometry)
 
     if(read_static_variables){
         int m=deformable_body_collection.structures.m;
-        active_list.Resize(m,true,true,true);
+        active_list.Resize(m,use_init,true);
         segmented_curve_objects.Delete_Pointers_And_Clean_Memory();
         segmented_curve_objects.Resize(m);
         triangulated_surface_objects.Delete_Pointers_And_Clean_Memory();
@@ -806,7 +806,7 @@ Toggle_Active_Value_Response()
         std::istringstream sstream(OPENGL_WORLD<T>::Singleton()->prompt_response);
         sstream>>index;
         if(index>=0) {
-            if(active_list.m<=index) active_list.Resize(index+1,true,true,start_val);
+            if(active_list.m<=index) active_list.Resize(index+1,use_init,start_val);
             active_list(index)=!active_list(index);
             Update_Velocity_Field();}}
 }

@@ -42,9 +42,6 @@ template<class TA0,class TA1> struct SAME_ARRAY:public SAME_ARRAY_CANONICAL<type
 template<class TV> struct ELEMENT_OF_VECTOR {private:struct UNUSABLE;public:typedef UNUSABLE TYPE;};
 template<class T,int d> struct ELEMENT_OF_VECTOR<VECTOR<T,d> > {typedef T TYPE;};
 
-template<class T> struct CAN_REFERENCE_ELEMENTS {static const int value=true;};
-template<class OP,class ID> struct CAN_REFERENCE_ELEMENTS<ARRAY_EXPRESSION<OP,ID> > {static const int value=false;};
-
 template<class T_ARRAY0,class enabler=void> struct EQUIVALENT_ARRAY;
 template<class T> struct EQUIVALENT_ARRAY<T,typename enable_if<!IS_ARRAY<T>::value>::type> {typedef T TYPE;};
 template<class T> struct EQUIVALENT_ARRAY<T,typename enable_if<IS_ARRAY<T>::value>::type> {typedef ARRAY<typename EQUIVALENT_ARRAY<typename T::ELEMENT>::TYPE> TYPE;};
@@ -59,8 +56,6 @@ public:
     typedef T value_type; // for stl
     typedef int difference_type; // for stl
 
-    typedef typename conditional<CAN_REFERENCE_ELEMENTS<T_ARRAY>::value,T&,T>::type T_REF_IF_POSSIBLE;
-    typedef typename conditional<CAN_REFERENCE_ELEMENTS<T_ARRAY>::value,const T&,const T>::type CONST_T_REF_IF_POSSIBLE;
     typedef T& RESULT_TYPE;
     typedef const T& CONST_RESULT_TYPE;
     typedef typename SCALAR_POLICY<T>::TYPE SCALAR;
@@ -161,10 +156,10 @@ public:
     PROJECTED_ARRAY<const T_ARRAY,INDEX_PROJECTOR> Project(const ID index) const
     {return PROJECTED_ARRAY<const T_ARRAY,INDEX_PROJECTOR>(Derived(),INDEX_PROJECTOR(index));}
 
-    T_REF_IF_POSSIBLE operator()(const ID i)
+    decltype(auto) operator()(const ID i)
     {return Derived()(i);}
 
-    CONST_T_REF_IF_POSSIBLE operator()(const ID i) const
+    decltype(auto) operator()(const ID i) const
     {return Derived()(i);}
 
     bool Valid_Index(const ID i) const

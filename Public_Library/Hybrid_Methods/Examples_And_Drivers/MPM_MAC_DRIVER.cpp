@@ -532,7 +532,7 @@ Reseeding()
             for(PHASE_ID i(0);i<particles_by_phase.m;i++){
                 if(particles_by_phase(i).m>2*target){
                     example.random.Random_Shuffle(particles_by_phase(i));
-                    int p=particles_by_phase(i).Pop();
+                    int p=particles_by_phase(i).Pop_Value();
                     Invalidate_Particle(p);}
                 particles_by_phase(i).Remove_All();}}}
     Update_Simulated_Particles();

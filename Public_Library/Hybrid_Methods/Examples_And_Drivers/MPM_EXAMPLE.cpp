@@ -142,7 +142,7 @@ Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const
         forces(i)->Add_Forces(F,time);
 
     if(!lagrangian_forces.m) return;
-    lagrangian_forces_F.Resize(particles.X.m,false,false);
+    lagrangian_forces_F.Resize(particles.X.m,no_init);
 #pragma omp parallel for
     for(int i=0;i<lagrangian_forces_F.m;i++)
         lagrangian_forces_F(i)=TV();
@@ -161,8 +161,8 @@ Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,const T time) co
         forces(i)->Add_Hessian_Times(F,V,time);
 
     if(!lagrangian_forces.m) return;
-    lagrangian_forces_F.Resize(particles.X.m,false,false);
-    lagrangian_forces_V.Resize(particles.X.m,false,false);
+    lagrangian_forces_F.Resize(particles.X.m,no_init);
+    lagrangian_forces_V.Resize(particles.X.m,no_init);
 #pragma omp parallel for
     for(int i=0;i<lagrangian_forces_F.m;i++){
         lagrangian_forces_F(i)=TV();

@@ -48,8 +48,8 @@ Finish()
         shared_num_rows.Last()=last_row;
         shared_num_entries.Last()=last_entries;
         M.m=last_row;
-        M.offsets.Resize(last_row+1,false);
-        M.A.Resize(last_entries,false);
+        M.offsets.Resize(last_row+1,no_init);
+        M.A.Resize(last_entries,no_init);
     }
 #pragma omp barrier
     int first_row=shared_num_rows(tid),last=shared_num_entries(tid);

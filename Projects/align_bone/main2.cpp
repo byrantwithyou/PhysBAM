@@ -165,7 +165,7 @@ void Orient_Normals(ARRAY<TV>& normals,ARRAY_VIEW<const TV> X,const KD_TREE<TV>&
             done(i)=true;
             while(todo.m)
             {
-                int a=todo.Pop();
+                int a=todo.Pop_Value();
                 for(int j=0;j<adj(a).m;j++)
                 {
                     int b=adj(a)(j);

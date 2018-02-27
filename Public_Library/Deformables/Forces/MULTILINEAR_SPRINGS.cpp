@@ -39,8 +39,9 @@ Set_Spring_Phases(const ARRAY<VECTOR<T,2> >& compression_intervals_input,const A
 template<class TV> void MULTILINEAR_SPRINGS<TV>::
 Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
-    states.Resize(segment_mesh.elements.m,false,false);current_lengths.Resize(segment_mesh.elements.m,false,false);
-    correction_force.Resize(segment_mesh.elements.m,false,false);
+    states.Resize(segment_mesh.elements.m,no_init);
+    current_lengths.Resize(segment_mesh.elements.m,no_init);
+    correction_force.Resize(segment_mesh.elements.m,no_init);
     spring_count.Resize(intervals.domain.min_corner.x,intervals.domain.max_corner.x,false,false);
     ARRAY_VIEW<const TV> X(particles.X);
     Invalidate_CFL();
@@ -92,7 +93,7 @@ Set_Damping(const T constant_damping_input)
 {
     springs_damping.Resize(intervals.domain.min_corner.x,intervals.domain.max_corner.x,false,false);
     for(int i=springs_damping.domain.min_corner.x;i<springs_damping.domain.max_corner.x;i++){
-        springs_damping(i).Resize(segment_mesh.elements.m,false,false);
+        springs_damping(i).Resize(segment_mesh.elements.m,no_init);
         springs_damping(i).Fill(constant_damping_input);}
 }
 //#####################################################################

@@ -35,7 +35,7 @@ Multiply(const ARRAY<T>& x,ARRAY<T>& result) const
 template<class T,int bandwidth> bool BANDED_SYMMETRIC_MATRIX<T,bandwidth>::
 Power_Iterate_Shifted(ARRAY<T>& x,const T shift,T& eigenvalue,const T tolerance,const int max_iterations) const
 {
-    ARRAY<T> y(Size(),false);
+    ARRAY<T> y(Size(),no_init);
     T tolerance_squared_over_2=sqr(tolerance)/2;
     for(int iteration=0;iteration<max_iterations;iteration++){
         T magnitude=x.Magnitude();
@@ -111,7 +111,7 @@ Eigenvalues(ARRAY<T>& eigenvalues) const
 {
     BANDED_SYMMETRIC_MATRIX D(*this);
     D.Diagonalize();
-    eigenvalues.Resize(Size(),false,false);
+    eigenvalues.Resize(Size(),no_init);
     for(int i=0;i<Size();i++) eigenvalues(i)=D.A(i)[0];
 }
 //#####################################################################

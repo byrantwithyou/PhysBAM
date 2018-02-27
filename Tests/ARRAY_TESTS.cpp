@@ -87,7 +87,7 @@ public:
         TEST(ar2(5)==6);
         TEST(ar2.Size()==6);
 
-        TEST(ar2.Pop()==6);
+        TEST(ar2.Pop_Value()==6);
         TEST(ar2.Size()==5);
 
         ar1.Clean_Memory();

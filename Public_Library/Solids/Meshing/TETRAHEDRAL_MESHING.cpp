@@ -417,7 +417,7 @@ void Discard_Valence_Zero_Particles_And_Renumber(DEFORMABLE_PARTICLES<TV>& parti
         node_is_used.Subset(mesh2.elements(t)).Fill(true);}
 
     // make condensation mapping
-    condensation_mapping.Resize(mesh1.number_nodes,false,false);condensation_mapping.Fill(0);
+    condensation_mapping.Resize(mesh1.number_nodes,init_all);
     for(int t=0,counter=0;t<mesh1.number_nodes;t++) if(node_is_used(t)) condensation_mapping(t)=++counter;
 
     // make new triangle mesh
@@ -601,7 +601,7 @@ Discard_To_Get_Nice_Topology(RED_GREEN_TETRAHEDRA<T>& redgreen,ARRAY<bool>& keep
 {
     TETRAHEDRON_MESH& mesh=solid_body_collection.deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-    keep_tet_flag.Resize(mesh.elements.m,false,false);keep_tet_flag.Fill(false);
+    keep_tet_flag.Resize(mesh.elements.m,init_all);
     Envelope_Interior_Nodes(keep_tet_flag);
 
     TRIANGLE_MESH boundary_mesh;mesh.Initialize_Boundary_Mesh_Of_Subset(boundary_mesh,keep_tet_flag);

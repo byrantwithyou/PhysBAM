@@ -146,10 +146,12 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
     MPI_SOLIDS<TV>* mpi_solids=solid_body_collection.deformable_body_collection.mpi_solids;
 
     if(solids){
-        B_full.Resize(particles.Size(),false,false);rigid_B_full.Resize(rigid_body_particles.Size(),false,false);}
+        B_full.Resize(particles.Size(),no_init);
+        rigid_B_full.Resize(rigid_body_particles.Size(),no_init);}
     else{
         if(fluids && solids_fluids_parameters.mpi_solid_fluid){ // Gather the fluid terms for the RHS of the solid here
-            B_full.Resize(particles.Size(),false,false);rigid_B_full.Resize(rigid_body_particles.Size(),false,false);}}
+            B_full.Resize(particles.Size(),no_init);
+            rigid_B_full.Resize(rigid_body_particles.Size(),no_init);}}
 
     GENERALIZED_VELOCITY<TV> V(particles.V,rigid_body_particles.twist,solid_body_collection),
         B(B_full,rigid_B_full,solid_body_collection);
@@ -457,8 +459,10 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
                 A_array(i).Construct_Incomplete_Cholesky_Factorization(poisson.pcg.modified_incomplete_cholesky,poisson.pcg.modified_incomplete_cholesky_coefficient,
                     poisson.pcg.preconditioner_zero_tolerance,poisson.pcg.preconditioner_zero_replacement); // check to see if the blocks can be preconditioned even though the whole
 
-            ar_full.Resize(particles.Size(),false,false);rigid_ar_full.Resize(rigid_body_particles.Size(),false,false);
-            z_full.Resize(particles.Size(),false,false);rigid_z_full.Resize(rigid_body_particles.Size(),false,false);
+            ar_full.Resize(particles.Size(),no_init);
+            rigid_ar_full.Resize(rigid_body_particles.Size(),no_init);
+            z_full.Resize(particles.Size(),no_init);
+            rigid_z_full.Resize(rigid_body_particles.Size(),no_init);
             GENERALIZED_VELOCITY<TV> ar_V(ar_full,rigid_ar_full,solid_body_collection),z_V(z_full,rigid_z_full,solid_body_collection);
             PRESSURE_VELOCITY_VECTOR<TV> V_coupled(V,x_array.v),B_coupled(B,b_array);
             LOG::Time(solver_name);

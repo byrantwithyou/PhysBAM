@@ -60,8 +60,11 @@ Initialize()
 
     int number_quadruples=0;
     for(int t=0;t<triangle_mesh.elements.m;t++) for(int a=0;a<(*triangle_mesh.adjacent_elements)(t).m;a++) if((*triangle_mesh.adjacent_elements)(t)(a)>t) number_quadruples++;
-    spring_particles.Resize(number_quadruples,false);youngs_modulus.Resize(number_quadruples);restlength.Resize(number_quadruples);
-    visual_restlength.Resize(number_quadruples);damping.Resize(number_quadruples);attached_edge_length.Resize(number_quadruples);attached_edge_restlength.Resize(number_quadruples);
+    spring_particles.Resize(number_quadruples,no_init);
+    youngs_modulus.Resize(number_quadruples);
+    restlength.Resize(number_quadruples);
+    visual_restlength.Resize(number_quadruples);
+    damping.Resize(number_quadruples);attached_edge_length.Resize(number_quadruples);attached_edge_restlength.Resize(number_quadruples);
     int index=0; // reset number
     for(int t=0;t<triangle_mesh.elements.m;t++){
         int t1,t2,t3;triangle_mesh.elements(t).Get(t1,t2,t3);
@@ -123,8 +126,10 @@ Ensure_Minimum_Overdamping_Fraction(const T overdamping_fraction) // 1 is critic
 template<class T> void AXIAL_BENDING_SPRINGS<T>::
 Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
-    optimization_current_length.Resize(spring_particles.m,false,false);optimization_direction.Resize(spring_particles.m,false,false);
-    optimization_weights.Resize(spring_particles.m,false,false);optimization_coefficient.Resize(spring_particles.m,false,false);
+    optimization_current_length.Resize(spring_particles.m,no_init);
+    optimization_direction.Resize(spring_particles.m,no_init);
+    optimization_weights.Resize(spring_particles.m,no_init);
+    optimization_coefficient.Resize(spring_particles.m,no_init);
 
     for(SPRING_ITERATOR iterator(force_springs);iterator.Valid();iterator.Next()){int s=iterator.Data();
         const VECTOR<int,4>& nodes=spring_particles(s);

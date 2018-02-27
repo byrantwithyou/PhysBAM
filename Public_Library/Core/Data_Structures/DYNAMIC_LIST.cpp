@@ -71,7 +71,7 @@ Add_Element(void* element)
     int id;
     if(pointer_to_id_map.Get(element,id)){assert(array(id_to_index_map(id))==element);return id;}
     int index=array.Append(element);
-    if(deletion_list.m){id=deletion_list.Pop();assert(id_to_index_map(id)<0);id_to_index_map(id)=index;}
+    if(deletion_list.m){id=deletion_list.Pop_Value();assert(id_to_index_map(id)<0);id_to_index_map(id)=index;}
     else{id=next_unique_id++;id_to_index_map.Append(index);assert(id_to_index_map.Size()==id+1);}
     index_to_id_map.Append(id);
     needs_write.Append(id);
@@ -164,7 +164,7 @@ Read(const std::string& prefix,ARRAY<int>& needs_init)
     PHYSBAM_ASSERT(version==1);
     ARRAY<void*> new_array;
     ARRAY<bool> element_copied(array.Size());
-    id_to_index_map.Resize(next_unique_id,true,true,-1);
+    id_to_index_map.Resize(next_unique_id,use_init,-1);
     for(int i=0;i<active_ids.Size();i++){
         int index=id_to_index_map(active_ids(i));
         if(index>=0){new_array.Append(array(index));element_copied(index)=true;}

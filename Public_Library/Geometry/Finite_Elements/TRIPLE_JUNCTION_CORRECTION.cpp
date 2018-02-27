@@ -380,7 +380,7 @@ Update_Color_Level_Sets()
         combined_color(it.index)=-1;}
 
     while(todo.m){
-        TV_INT index(todo.Pop());
+        TV_INT index(todo.Pop_Value());
         int mask=pairwise_data(index).valid_flags;
         int color=combined_color(index);
 

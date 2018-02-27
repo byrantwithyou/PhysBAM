@@ -44,7 +44,7 @@ struct NUMBER_COMP_HELPER
     void Start_Test()
     {
         comparisions.Remove_All();
-        number_tests=number_tests_todo.Pop();
+        number_tests=number_tests_todo.Pop_Value();
         number_tests_used=0;
     }
 };

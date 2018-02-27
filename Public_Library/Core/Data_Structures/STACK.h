@@ -36,7 +36,7 @@ public:
     {array.Append(element);}
 
     T Pop()
-    {return array.Pop();}
+    {return array.Pop_Value();}
  
     const T& Peek() const
     {return array.Last();}

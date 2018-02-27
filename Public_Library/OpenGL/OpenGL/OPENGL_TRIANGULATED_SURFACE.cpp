@@ -383,7 +383,7 @@ Use_Display_List(int input_display_list_id)
 template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
 Use_Vertex_Colors()
 {
-    if(!vertex_colors) vertex_colors=new ARRAY<OPENGL_COLOR>(surface.particles.Size(),false); // TODO: if using big particle pool not efficient
+    if(!vertex_colors) vertex_colors=new ARRAY<OPENGL_COLOR>(surface.particles.Size(),no_init); // TODO: if using big particle pool not efficient
 }
 //#####################################################################
 // Function Set_Vertex_Color

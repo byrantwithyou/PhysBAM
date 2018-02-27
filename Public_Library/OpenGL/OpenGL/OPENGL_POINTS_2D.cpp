@@ -130,7 +130,7 @@ Store_Point_Colors(bool store_point_colors)
 {
     if(store_point_colors){
         if(!point_colors){
-            point_colors=new ARRAY<OPENGL_COLOR>(points.Size(),false);
+            point_colors=new ARRAY<OPENGL_COLOR>(points.Size(),no_init);
             point_colors->Fill(color);}
         else if(point_colors->m!=points.Size()){
             point_colors->Resize(points.Size());
@@ -156,7 +156,7 @@ Store_Point_Radii(bool store_point_radii)
 {
     if(store_point_radii){
         if(!point_radii){
-            point_radii=new ARRAY<T>(points.Size(),false);
+            point_radii=new ARRAY<T>(points.Size(),no_init);
             point_radii->Fill((T)0);}
         else if(point_radii->m!=points.Size()){
             point_radii->Resize(points.Size());

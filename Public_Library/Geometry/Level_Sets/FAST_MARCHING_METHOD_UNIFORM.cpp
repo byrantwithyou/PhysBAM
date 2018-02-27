@@ -72,7 +72,7 @@ Pop_Heap(ARRAY<HEAP_ENTRY<T,d> >& heap)
 {
     int ia=0,ie=heap.m-1;
     Exchange(heap,ia,ie);
-    HEAP_ENTRY<T,d> heap_entry=heap.Pop();
+    HEAP_ENTRY<T,d> heap_entry=heap.Pop_Value();
     Down_Heap(heap,0);
     return heap_entry;
 }

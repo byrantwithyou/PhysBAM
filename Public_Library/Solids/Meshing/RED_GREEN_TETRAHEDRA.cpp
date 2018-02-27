@@ -150,8 +150,13 @@ template<class T> void RED_GREEN_TETRAHEDRA<T>::
 Resolve_Stack()
 {
     while(stack.m){
-        int level,tet;stack.Pop().Get(level,tet);
-        if(level>=0){PHYSBAM_ASSERT(tet>=0);(*index_in_stack(level))(tet)=-1;if(!Regularly_Refined(level,tet)) Refine_If_Necessary(level,tet);}}
+        int level,tet;
+        stack.Pop_Value().Get(level,tet);
+        if(level>=0){
+            PHYSBAM_ASSERT(tet>=0);
+            (*index_in_stack(level))(tet)=-1;
+            if(!Regularly_Refined(level,tet))
+                Refine_If_Necessary(level,tet);}}
 }
 //#####################################################################
 // Function Refine_If_Necessary
@@ -490,8 +495,9 @@ Delete_Children(const int level,const int tet,ARRAY<int>& deleted_tet_indices,AR
     // get a list of edges to delete (begin by finding all children edges, then filter the red ones out)
     ARRAY<int> children_edges;
     children_edges.Preallocate(25);
-    for(p=0;p<deleted_tet_indices.m;p++) for(int q=0;q<6;q++) // get a list of all children edges
-                                             children_edges.Append_Unique((*meshes(level+1)->element_edges)(deleted_tet_indices(p))(q));
+    for(p=0;p<deleted_tet_indices.m;p++)
+        for(int q=0;q<6;q++) // get a list of all children edges
+            children_edges.Append_Unique((*meshes(level+1)->element_edges)(deleted_tet_indices(p))(q));
     for(p=0;p<children_edges.m;p++){
         int q,r;
         segment_mesh.elements(children_edges(p)).Get(q,r);
@@ -590,7 +596,7 @@ Add_Segment(ARRAY<int>& free_edge_indices,const int node1,const int node2)
         index=segment_mesh.elements.Append(VECTOR<int,2>(node1,node2));
         segment_midpoints.Append(0);}
     else{
-        index=free_edge_indices.Pop();
+        index=free_edge_indices.Pop_Value();
         assert(segment_midpoints(index)<0);
         segment_mesh.elements(index).Set(node1,node2);}
     (*segment_mesh.incident_elements)(node1).Append(index);(*segment_mesh.incident_elements)(node2).Append(index);
@@ -611,7 +617,7 @@ Add_Tetrahedron(ARRAY<int>& free_tet_indices,const int level,const int i,const i
         children(level)->Resize(index+1);
         index_in_stack(level)->Resize(index+1);}
     else{
-        index=free_tet_indices.Pop();
+        index=free_tet_indices.Pop_Value();
         tet_mesh.elements(index).Set(i,j,k,l);
         (*parent(level))(index)=parent_index;
         for(int a=0;a<8;a++) (*children(level))(index)(a)=-1;

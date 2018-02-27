@@ -199,8 +199,8 @@ template<class TV> GENERALIZED_MASS<TV>::
 template<class TV> void GENERALIZED_MASS<TV>::
 Initialize_World_Space_Masses(const SOLID_BODY_COLLECTION<TV>& solid_body_collection)
 {
-    world_space_rigid_mass.Resize(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m,false,false);
-    world_space_rigid_mass_inverse_full.Resize(rigid_mass.array.m,false,false);
+    world_space_rigid_mass.Resize(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m,no_init);
+    world_space_rigid_mass_inverse_full.Resize(rigid_mass.array.m,no_init);
 
     for(int i=0;i<solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i);
         RIGID_BODY_MASS<TV> rm(rigid_mass.array(i),rigid_inertia_tensor.array(i));

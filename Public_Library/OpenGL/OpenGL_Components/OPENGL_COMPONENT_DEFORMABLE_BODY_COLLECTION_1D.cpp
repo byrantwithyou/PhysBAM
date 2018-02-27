@@ -76,7 +76,7 @@ Reinitialize(bool force,bool read_geometry)
     bool read_static_variables=static_frame!=-1 || first_time || !deformable_body_collection.structures.m;
     if(read_geometry) deformable_body_collection.Read(prefix,prefix,frame,static_frame,read_static_variables,true);
     if(read_static_variables){
-        int m=deformable_body_collection.structures.m;active_list.Resize(m,true,true,true);
+        int m=deformable_body_collection.structures.m;active_list.Resize(m,use_init,true);
         point_simplices_1d_objects.Delete_Pointers_And_Clean_Memory();point_simplices_1d_objects.Resize(m);
         for(int i=0;i<m;i++){
             STRUCTURE<TV>* structure=deformable_body_collection.structures(i);
@@ -281,7 +281,7 @@ Toggle_Active_Value_Response()
         std::istringstream sstream(OPENGL_WORLD<T>::Singleton()->prompt_response);
         sstream>>index;
         if(index>=0) {
-            if(active_list.m<=index) active_list.Resize(index+1,true,true,start_val);
+            if(active_list.m<=index) active_list.Resize(index+1,use_init,start_val);
             active_list(index)=!active_list(index);}}
 }
 //#####################################################################

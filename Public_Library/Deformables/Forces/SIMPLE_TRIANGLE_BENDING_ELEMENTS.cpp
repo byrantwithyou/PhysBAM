@@ -131,8 +131,9 @@ Set_Constants_From_Particles(const T material_stiffness,const T material_damping
 template<class T> void SIMPLE_TRIANGLE_BENDING_ELEMENTS<T>::
 Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
-    damping_coefficient.Resize(bending_quadruples.m,false,false);
-    states.Resize(spring_connectivity.elements.m,false,false);current_lengths.Resize(spring_connectivity.elements.m,false,false);
+    damping_coefficient.Resize(bending_quadruples.m,no_init);
+    states.Resize(spring_connectivity.elements.m,no_init);
+    current_lengths.Resize(spring_connectivity.elements.m,no_init);
     //BASE::Set_Stiffness(material_stiffness);
 
     int ignored_elements=0,total_elements=0;

@@ -160,7 +160,7 @@ Update_Surface_Triangles()
 template<class TV> void DEFORMABLE_OBJECT_COLLISION_PENALTY_FORCES<TV>::
 Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
-    closest_surface_triangle.Resize(particles.X.m,true,true,-1);
+    closest_surface_triangle.Resize(particles.X.m,use_init,-1);
     if(extra_surface_triangles.m!=particles.X.m){
         extra_surface_triangles.Resize(particles.X.m);
         ARRAY<bool> surface_node(particles.X.m);

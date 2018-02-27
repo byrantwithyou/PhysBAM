@@ -56,8 +56,8 @@ public:
     {Clean_Memory();number_nodes=number_nodes_input;elements=hexahedron_list;}
 
     void Initialize_Mesh_With_Particle_Offset(const HEXAHEDRON_MESH& mesh,const int particle_offset)
-    {elements.Resize(mesh.elements.m,false,false);VECTOR<int,8> shift=particle_offset*VECTOR<int,8>::All_Ones_Vector();
-    for(int t=0;t<elements.m;t++) elements(t)=mesh.elements(t)+shift;
+    {elements.Resize(mesh.elements.m,no_init);
+    for(int t=0;t<elements.m;t++) elements(t)=mesh.elements(t)+particle_offset;
     number_nodes=0;} // TODO: currently leaves number_nodes uninitialized
 
     bool Node_In_Hexahedron(const int node,const int hexahedron) const

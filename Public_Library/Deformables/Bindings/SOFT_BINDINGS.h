@@ -46,7 +46,7 @@ public:
 
     int Add_Binding(const VECTOR<int,2>& binding,const bool use_impulses_for_collisions_input)
     {int id=bindings.Append(binding);use_impulses_for_collisions.Append(use_impulses_for_collisions_input);
-    if(binding_index_from_particle_index.m<=binding.x) binding_index_from_particle_index.Resize(binding.x+1,true,true,-1);
+    if(binding_index_from_particle_index.m<=binding.x) binding_index_from_particle_index.Resize(binding.x+1,use_init,-1);
     binding_index_from_particle_index(binding.x)=id;
     return id;}
 

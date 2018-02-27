@@ -44,13 +44,6 @@ namespace ARRAYS_COMPUTATIONS
     void Heapify(ARRAY<T,ID>& a,const ID max_index) // largest on top, only does from 0 to max_index-1
     {for(ID i=max_index/2-1;i>=ID(0);i--) Heapify(a,i,max_index);}
 
-    template<class T,class ID>
-    void Compact_Array_Using_Compaction_Array(ARRAY<T,ID>& array,const ARRAY<ID,ID>& compaction_array,ARRAY<T,ID>* temporary_array=0)
-    {ID compaction_array_m=compaction_array.Size();
-    bool temporary_array_defined=temporary_array!=0;if(!temporary_array_defined) temporary_array=new ARRAY<T,ID>(compaction_array_m,false);
-    ARRAY<T,ID>::Put(array,*temporary_array);for(ID i(0);i<compaction_array_m;i++) if(compaction_array(i)>0) array(compaction_array(i))=(*temporary_array)(i);
-    if(!temporary_array_defined){delete temporary_array;temporary_array=0;}}
-
 //#####################################################################
 }
 }

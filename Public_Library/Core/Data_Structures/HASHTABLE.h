@@ -78,7 +78,7 @@ public:
     {next_resize=max(5,estimated_max_number_of_entries_input);
     int estimated_table_entries=(unsigned int)(next_resize*4/3+1); // choose so load is .75
     int number_of_lists=next_power_of_two(estimated_table_entries);
-    table.Resize(number_of_lists,false,false); // TODO: only resize if significantly reducing the size
+    table.Resize(number_of_lists,no_init); // TODO: only resize if significantly reducing the size
     Remove_All();}
 
     void Resize_Table(const int estimated_max_number_of_entries_input=0)

@@ -113,7 +113,7 @@ Store_Point_Colors(const bool store_point_colors)
 {
     if(store_point_colors){
         if(!point_colors){
-            point_colors=new ARRAY<OPENGL_COLOR>(points.Size(),false);
+            point_colors=new ARRAY<OPENGL_COLOR>(points.Size(),no_init);
             point_colors->Fill(color);}
         else if(point_colors->m!=points.Size()){
             point_colors->Resize(points.Size());

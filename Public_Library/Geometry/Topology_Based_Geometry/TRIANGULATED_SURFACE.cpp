@@ -947,7 +947,7 @@ Compute_Holes(ARRAY<ARRAY<int> >& holes)
         };
 
     while(todo.m){
-        int p=todo.Pop();
+        int p=todo.Pop_Value();
         if(next(p).m!=1) continue;
         assert(prev(p).m==1);
         I2 a=prev(p)(0);

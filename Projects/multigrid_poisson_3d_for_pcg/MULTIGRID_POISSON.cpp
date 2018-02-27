@@ -97,8 +97,8 @@ Initialize_Boundary_Region(){
     ARRAY<unsigned char,TV_INT> index_is_boundary(grid.Domain_Indices());
     ARRAY<unsigned char,TV_INT> index_is_extended_boundary(grid.Domain_Indices());
     for(int v=0;v<d;v++) PHYSBAM_ASSERT(n(v)%boundary_block_size==0);
-    ARRAY<int> boundary_nodes_in_block(n(1)*n(2)*n(3)/(boundary_block_size*boundary_block_size*boundary_block_size),false);
-    ARRAY<int> extended_boundary_nodes_in_block(n(1)*n(2)*n(3)/(boundary_block_size*boundary_block_size*boundary_block_size),false);
+    ARRAY<int> boundary_nodes_in_block(n(1)*n(2)*n(3)/(boundary_block_size*boundary_block_size*boundary_block_size),no_init);
+    ARRAY<int> extended_boundary_nodes_in_block(n(1)*n(2)*n(3)/(boundary_block_size*boundary_block_size*boundary_block_size),no_init);
 
     LOG::Time("Boundary_Initialization");
     Boundary_Initialization_Helper<void> boundary_initialization(n(1),n(2),n(3),&cell_type(1,1,1),&index_is_interior_coarse_bitmask(1,1,1),&index_is_boundary(1,1,1),&index_is_extended_boundary(1,1,1));
@@ -115,9 +115,9 @@ Initialize_Boundary_Region(){
     LOG::cout<<"Found "<<total_black_boundary_indices<<" black boundary indices"<<std::endl;
 
     LOG::Time("Allocate boundary block arrays");
-    boundary_block_start.Resize(total_red_boundary_blocks+total_black_boundary_blocks,false,false);
-    boundary_block_end.Resize(boundary_block_start.m,false,false);
-    boundary_indices.Resize(total_red_boundary_indices+total_black_boundary_indices,false,false);
+    boundary_block_start.Resize(total_red_boundary_blocks+total_black_boundary_blocks,no_init);
+    boundary_block_end.Resize(boundary_block_start.m,no_init);
+    boundary_indices.Resize(total_red_boundary_indices+total_black_boundary_indices,no_init);
     extended_boundary_indices.Resize(total_extended_boundary_indices);
 
     LOG::Time("Block Enumeration");

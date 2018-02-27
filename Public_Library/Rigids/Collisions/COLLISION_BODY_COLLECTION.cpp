@@ -35,7 +35,7 @@ Add_Body(COLLISION_GEOMETRY<TV>* body,const int geometry_id,bool owns_collision_
 {
     COLLISION_GEOMETRY_ID id;
     if(deletion_list.m){
-        id=deletion_list.Pop();bodies(id)=body;
+        id=deletion_list.Pop_Value();bodies(id)=body;
         owns_collision_geometry(id)=owns_collision_geometry_input;}
     else{
         id=bodies.Append(body);

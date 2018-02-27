@@ -79,7 +79,7 @@ Update_Swept_Hierachies_And_Compute_Pairs(ARRAY_VIEW<TV> X,ARRAY_VIEW<TV> X_self
         STRUCTURE_INTERACTION_GEOMETRY<TV>& structure=*geometry.structure_geometries(structure_index);
         if(d==3 && structure.triangulated_surface){
             BOX_HIERARCHY<TV>& hierarchy=structure.Face_Hierarchy();
-            structure.triangulated_surface_modified.Resize(hierarchy.box_hierarchy.m,false,false);
+            structure.triangulated_surface_modified.Resize(hierarchy.box_hierarchy.m,no_init);
             for(int kk=0;kk<structure.triangulated_surface->mesh.elements.m;kk++){
                 const VECTOR<int,3>& nodes=structure.triangulated_surface->mesh.elements(kk);
                 structure.triangulated_surface_modified(kk)=VECTOR<bool,3>(recently_modified.Subset(nodes)).Contains(true); // TODO: hacking around compiler bug
@@ -89,7 +89,7 @@ Update_Swept_Hierachies_And_Compute_Pairs(ARRAY_VIEW<TV> X,ARRAY_VIEW<TV> X_self
 
         if(structure.segmented_curve){
             SEGMENT_HIERARCHY<TV>& hierarchy=*structure.segmented_curve->hierarchy;
-            structure.segmented_curve_modified.Resize(hierarchy.box_hierarchy.m,false,false);
+            structure.segmented_curve_modified.Resize(hierarchy.box_hierarchy.m,no_init);
             for(int kk=0;kk<structure.segmented_curve->mesh.elements.m;kk++){
                 const VECTOR<int,2>& nodes=structure.segmented_curve->mesh.elements(kk);
                 structure.segmented_curve_modified(kk)=VECTOR<bool,2>(recently_modified.Subset(nodes)).Contains(true); // TODO: hacking around compiler bug
@@ -98,7 +98,7 @@ Update_Swept_Hierachies_And_Compute_Pairs(ARRAY_VIEW<TV> X,ARRAY_VIEW<TV> X_self
             hierarchy.Update_Modified_Nonleaf_Boxes(structure.segmented_curve_modified);}
 
         {PARTICLE_HIERARCHY<TV,INDIRECT_ARRAY<ARRAY_VIEW<TV> > >& hierarchy=structure.particle_hierarchy;
-            structure.point_modified.Resize(hierarchy.box_hierarchy.m,false,false);
+            structure.point_modified.Resize(hierarchy.box_hierarchy.m,no_init);
             for(int kk=0;kk<hierarchy.leaves;kk++){
                 int p=structure.active_indices(kk);
                 structure.point_modified(kk)=recently_modified(p);
@@ -173,8 +173,7 @@ Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_earl
         point_face_collisions=0,edge_edge_collisions=0;
     SPARSE_UNION_FIND<> union_find(full_particles.Size());
 
-    recently_modified_full.Resize(full_particles.Size(),false,false);
-    recently_modified_full.Fill(true);
+    recently_modified_full.Resize(full_particles.Size(),init_all,true);
     ARRAY<TV> X_save;
     // input velocities are average V.  Also want original velocities?  Delta may be sufficient.
     geometry.deformable_body_collection.binding_list.Update_Neighbor_Bindings();

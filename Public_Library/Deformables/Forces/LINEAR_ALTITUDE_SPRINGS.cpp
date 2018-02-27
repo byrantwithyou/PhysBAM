@@ -67,7 +67,7 @@ template<class TV,int d> void LINEAR_ALTITUDE_SPRINGS<TV,d>::
 Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 {
     force_elements.Update(mesh.elements,particle_is_simulated);
-    if(cache_strain) strains_of_spring.Resize(mesh.elements.m,false,false);
+    if(cache_strain) strains_of_spring.Resize(mesh.elements.m,no_init);
 }
 //#####################################################################
 // Function Compute_Plasticity
@@ -89,7 +89,8 @@ Compute_Plasticity(const int h,const int t,const T current_length)
 template<class TV,int d> void LINEAR_ALTITUDE_SPRINGS<TV,d>::
 Clamp_Restlength_With_Fraction_Of_Springs(const T fraction)
 {
-    ARRAY<T> length((d+1)*parameters.m,false);for(int s=0;s<parameters.m;s++) for(int k=0;k<d+1;k++) length((d+1)*(s-1)+k)=parameters(s)(k).restlength;
+    ARRAY<T> length((d+1)*parameters.m,no_init);
+    for(int s=0;s<parameters.m;s++) for(int k=0;k<d+1;k++) length((d+1)*(s-1)+k)=parameters(s)(k).restlength;
     length.Sort();
     T minimum_restlength=length(min((int)(fraction*length.m)+1,length.m));LOG::cout<<"Enlarging the restlength of all altitude springs below "<<minimum_restlength<<std::endl;
     for(int i=0;i<parameters.m;i++) for(int k=0;k<d+1;k++) parameters(i)(k).restlength=max(minimum_restlength,parameters(i)(k).restlength);
@@ -101,9 +102,15 @@ template<class TV,int d> void LINEAR_ALTITUDE_SPRINGS<TV,d>::
 Print_Restlength_Statistics() const
 {
     LOG::cout<<"Altitude Springs - Total Springs = "<<(d+1)*parameters.m<<std::endl;
-    ARRAY<T> length((d+1)*parameters.m,false);for(int s=0;s<parameters.m;s++) for(int k=0;k<d+1;k++) length((d+1)*s+k)=parameters(s)(k).restlength;
+    ARRAY<T> length((d+1)*parameters.m,no_init);
+    for(int s=0;s<parameters.m;s++)
+        for(int k=0;k<d+1;k++)
+            length((d+1)*s+k)=parameters(s)(k).restlength;
     length.Sort();
-    ARRAY<T> visual_length((d+1)*parameters.m,false);for(int s=0;s<parameters.m;s++) for(int k=0;k<d+1;k++)visual_length((d+1)*s+k)=parameters(s)(k).visual_restlength;
+    ARRAY<T> visual_length((d+1)*parameters.m,no_init);
+    for(int s=0;s<parameters.m;s++)
+        for(int k=0;k<d+1;k++)
+            visual_length((d+1)*s+k)=parameters(s)(k).visual_restlength;
     visual_length.Sort();
     int one_percent=(int)(.01*length.m)+1,ten_percent=(int)(.1*length.m)+1,median=(int)(.5*length.m)+1;
     LOG::cout<<"Altitude Springs - Smallest Restlength = "<<length(1)<<", Visual Restlength = "<<visual_length(1)<<std::endl;
@@ -118,7 +125,7 @@ template<class TV,int d> void LINEAR_ALTITUDE_SPRINGS<TV,d>::
 Enable_Plasticity(const ARRAY<VECTOR<T,d+1> >& plastic_yield_strain_input,const ARRAY<VECTOR<T,d+1> >& plastic_hardening_input,const T plasticity_clamp_ratio_input)
 {
     use_plasticity=true;plasticity_clamp_ratio=plasticity_clamp_ratio_input;
-    plastic_parameters.Resize(parameters.m,false,false);
+    plastic_parameters.Resize(parameters.m,no_init);
     for(int i=0;i<parameters.m;i++) for(int k=0;k<d+1;k++){PLASTIC_PARAMETER& plastic_parameter=plastic_parameters(i)(k);
         plastic_parameter.visual_restlength=parameters(i)(k).visual_restlength;
         plastic_parameter.yield_strain=plastic_yield_strain_input(i)(k);
@@ -131,7 +138,7 @@ template<class TV,int d> void LINEAR_ALTITUDE_SPRINGS<TV,d>::
 Enable_Plasticity(const T plastic_yield_strain_input,const T plastic_hardening_input,const T plasticity_clamp_ratio_input)
 {
     use_plasticity=true;plasticity_clamp_ratio=plasticity_clamp_ratio_input;
-    plastic_parameters.Resize(parameters.m,false,false);
+    plastic_parameters.Resize(parameters.m,no_init);
     for(int i=0;i<parameters.m;i++) for(int k=0;k<d+1;k++){PLASTIC_PARAMETER& plastic_parameter=plastic_parameters(i)(k);
         plastic_parameter.visual_restlength=parameters(i)(k).visual_restlength;
         plastic_parameter.yield_strain=plastic_yield_strain_input;

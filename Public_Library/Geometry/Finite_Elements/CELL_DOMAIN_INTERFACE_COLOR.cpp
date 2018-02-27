@@ -49,8 +49,8 @@ template<class TV> void CELL_DOMAIN_INTERFACE_COLOR<TV>::
 Set_Flat_Base_And_Resize(int extra_constraints_n,int extra_constraints_t,const TV_INT& index)
 {
     int flat_index=Flatten(index);
-    flat_base_n.Resize(constraint_base_n+extra_constraints_n,true,true,flat_index);
-    flat_base_t.Resize(constraint_base_t+extra_constraints_t,true,true,flat_index);
+    flat_base_n.Resize(constraint_base_n+extra_constraints_n,use_init,flat_index);
+    flat_base_t.Resize(constraint_base_t+extra_constraints_t,use_init,flat_index);
 }
 //#####################################################################
 // Function Set_Flat_Base_And_Resize_Scalar
@@ -58,7 +58,7 @@ Set_Flat_Base_And_Resize(int extra_constraints_n,int extra_constraints_t,const T
 template<class TV> void CELL_DOMAIN_INTERFACE_COLOR<TV>::
 Set_Flat_Base_And_Resize_Scalar(int extra_constraints_scalar,const TV_INT& index)
 {
-    flat_base_scalar.Resize(constraint_base_scalar+extra_constraints_scalar,true,true,Flatten(index));
+    flat_base_scalar.Resize(constraint_base_scalar+extra_constraints_scalar,use_init,Flatten(index));
 }
 //#####################################################################
 // Function Update_Constraint_Count

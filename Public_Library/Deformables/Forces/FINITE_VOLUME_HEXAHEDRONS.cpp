@@ -93,10 +93,12 @@ template<class T> void FINITE_VOLUME_HEXAHEDRONS<T>::
 Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
     int elements=strain_measure.H_DmH_inverse.m;
-    U.Resize(elements,false,false);De_inverse_hat.Resize(elements,false,false);Fe_hat.Resize(elements,false,false);
-    if(dPi_dFe) dPi_dFe->Resize(elements,false,false);
-    if(dP_dFe) dP_dFe->Resize(elements,false,false);
-    if(V) V->Resize(elements,false,false);
+    U.Resize(elements,no_init);
+    De_inverse_hat.Resize(elements,no_init);
+    Fe_hat.Resize(elements,no_init);
+    if(dPi_dFe) dPi_dFe->Resize(elements,no_init);
+    if(dP_dFe) dP_dFe->Resize(elements,no_init);
+    if(V) V->Resize(elements,no_init);
     MATRIX<T,3> V_local;
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int e=iterator.Data();for(int g=0;g<8;g++){
         int gauss_index=8*(e-1)+g;

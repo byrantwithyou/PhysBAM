@@ -90,7 +90,7 @@ void Initialize_Redgreen()
     redgreen->Initialize();
     for(int i=0;i<refinement_level;i++) redgreen->Refine_Simplex_List(ARRAY<int>(IDENTITY_ARRAY<>(surface->mesh.elements.m)));
     redgreen->Initialize_Segment_Index_From_Midpoint_Index();
-    triangle_free_particles.Resize(surface->mesh.elements.m,true);
+    triangle_free_particles.Resize(surface->mesh.elements.m);
 
     ARRAY<int> surface_particles;
     Get_Unique(surface_particles,surface->mesh.elements.Flattened());

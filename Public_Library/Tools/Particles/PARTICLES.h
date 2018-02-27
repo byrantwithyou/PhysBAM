@@ -79,7 +79,7 @@ public:
     {int old_number=number;Resize(number+new_element);return old_number;}
 
     int Add_Element_From_Deletion_List()
-    {return deletion_list.m?deletion_list.Pop():Add_Element();}
+    {return deletion_list.m?deletion_list.Pop_Value():Add_Element();}
 
     void Delete_Element(const int p)
     {Copy_Element_Helper(number-1,p);Resize(number-1);}

@@ -124,13 +124,13 @@ FILE* Temporary_File()
 
 std::string Get_Working_Directory()
 {
-    ARRAY<char> buffer(128,false);
+    ARRAY<char> buffer(128,no_init);
     for(;;){
         if(getcwd(buffer.Get_Array_Pointer(),buffer.m-1))
             return std::string(buffer.Get_Array_Pointer());
         else if(errno==ERANGE){
             if(buffer.m>=4096) PHYSBAM_FATAL_ERROR("refusing to allocate more than 4k to return working directory");
-            buffer.Resize(2*buffer.m,false,false);}
+            buffer.Resize(2*buffer.m,no_init);}
         else PHYSBAM_FATAL_ERROR();}
 }
 

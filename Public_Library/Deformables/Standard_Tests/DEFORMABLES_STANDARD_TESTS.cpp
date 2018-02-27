@@ -529,7 +529,7 @@ Embed_Surface_In_Tetrahedralized_Volume(BINDING_LIST<TV>& binding_list,SOFT_BIND
         tet_color(i)=color;
         todo.Append(i);
         while(todo.m){
-            int j=todo.Pop();
+            int j=todo.Pop_Value();
             ARRAY<int>& list=(*volume.mesh.adjacent_elements)(j);
             for(int k=0;k<list.m;k++){
                 int e=list(k);

@@ -23,8 +23,8 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> LINEAR_TET_SPRINGS<T>::
 LINEAR_TET_SPRINGS(DEFORMABLE_PARTICLES<TV>& particles,TETRAHEDRON_MESH& mesh)
-    :DEFORMABLES_FORCES<TV>(particles),mesh(mesh),spring_parameters(mesh.elements.Size(),false),
-    edge_restlength_squared(mesh.elements.Size(),false),minimum_edge_compression_squared((T)1e-6),minimum_sin((T)pi/(T)180)
+    :DEFORMABLES_FORCES<TV>(particles),mesh(mesh),spring_parameters(mesh.elements.Size(),no_init),
+    edge_restlength_squared(mesh.elements.Size(),no_init),minimum_edge_compression_squared((T)1e-6),minimum_sin((T)pi/(T)180)
 {
     Use_Springs_Compressed_Beyond_Threshold_Only(false);
 }
@@ -255,12 +255,12 @@ Set_Overdamping_Fraction(const T overdamping_fraction) // 1 is critically damped
 template<class T> void LINEAR_TET_SPRINGS<T>::
 Clamp_Restlength_With_Fraction_Of_Springs(const T fraction)
 {
-    {ARRAY<T> length(spring_count*spring_parameters.m,false);
+    {ARRAY<T> length(spring_count*spring_parameters.m,no_init);
     for(int s=0;s<spring_parameters.m;s++) for(int k=0;k<spring_count;k++) length(spring_count*(s-1)+k)=spring_parameters(s)(k).restlength;
     length.Sort();
     T minimum_restlength=length(min((int)(fraction*length.m)+1,length.m));LOG::cout<<"Enlarging the restlength of all altitude springs below "<<minimum_restlength<<std::endl;
     for(int i=0;i<spring_parameters.m;i++) for(int k=0;k<spring_count;k++) spring_parameters(i)(k).restlength=max(minimum_restlength,spring_parameters(i)(k).restlength);}
-    {ARRAY<T> edge_length(6*edge_restlength_squared.m,false);
+    {ARRAY<T> edge_length(6*edge_restlength_squared.m,no_init);
     for(int s=0;s<edge_restlength_squared.m;s++) for(int k=0;k<6;k++) edge_length(6*(s-1)+k)=edge_restlength_squared(s)(k);
     edge_length.Sort();
     T minimum_edge_restlength=edge_length(min((int)(fraction*edge_length.m)+1,edge_length.m));
@@ -274,7 +274,7 @@ template<class T> void LINEAR_TET_SPRINGS<T>::
 Print_Restlength_Statistics()
 {
     LOG::cout<<"Tetrahedron Springs - Total Springs = "<<spring_count*spring_parameters.m<<std::endl;
-    ARRAY<T> length(spring_count*spring_parameters.m,false),visual_restlength(spring_count*spring_parameters.m,false);
+    ARRAY<T> length(spring_count*spring_parameters.m,no_init),visual_restlength(spring_count*spring_parameters.m,no_init);
     for(int s=0;s<spring_parameters.m;s++) for(int k=0;k<spring_count;k++){
             length(spring_count*(s-1)+k)=spring_parameters(s)(k).restlength;visual_restlength(spring_count*(s-1)+k)=spring_parameters(s)(k).visual_restlength;}
     length.Sort();

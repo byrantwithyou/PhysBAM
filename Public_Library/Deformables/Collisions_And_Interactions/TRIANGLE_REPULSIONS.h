@@ -111,10 +111,10 @@ public:
 
     // Note that if repulsion thickness is not constant, repulsion will be discontinuous since we pick the min repulsion among repelling elements.
     void Set_Repulsion_Thickness(const T thickness=(T)1e-3)
-    {repulsion_thickness.Resize(geometry.deformable_body_collection.particles.Size(),false,false);repulsion_thickness.Fill(thickness);}
+    {repulsion_thickness.Resize(geometry.deformable_body_collection.particles.Size(),init_all,thickness);}
 
     void Set_Repulsion_Thickness(ARRAY_VIEW<const T> thickness)
-    {repulsion_thickness.Resize(geometry.deformable_body_collection.particles.Size(),false,false);repulsion_thickness.Copy(thickness);}
+    {repulsion_thickness.Resize(geometry.deformable_body_collection.particles.Size(),no_init);repulsion_thickness.Copy(thickness);}
 
     void Clamp_Repulsion_Thickness(ARRAY_VIEW<const T> max_value)
     {repulsion_thickness.Resize(geometry.deformable_body_collection.particles.Size());

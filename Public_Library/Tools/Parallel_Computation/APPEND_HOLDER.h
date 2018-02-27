@@ -62,7 +62,7 @@ public:
         for(int i=0;i<threads;i++){
             thread_array(i).offset=size;
             size+=thread_array(i).array.m;}
-        orig_array.Resize(size,false,false);
+        orig_array.Resize(size,no_init);
 #pragma omp parallel
         {
 #ifdef USE_OPENMP

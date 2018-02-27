@@ -211,7 +211,8 @@ Intersections_Using_Hierarchy_And_Edges_Helper(RIGID_BODY<VECTOR<T,3> >& body0,R
                 TV p1=body0.simplicial_object->particles.X(node1),p2=body0.simplicial_object->particles.X(node2),
                     x0=Transform_From_Body1_To_Body2_Coordinates(p1,rotation,translation),x1=Transform_From_Body1_To_Body2_Coordinates(p2,rotation,translation);
                 RAY<VECTOR<T,3> > ray(SEGMENT_3D<T>(x0,x1));T t_max=ray.t_max,one_over_t_max=1/t_max;
-                ARRAY<PAIR<T,bool> > intersections;intersections.Preallocate(10); // pair is (t_intersect, going_in)
+                ARRAY<PAIR<T,bool> > intersections;
+                intersections.Preallocate(10); // pair is (t_intersect, going_in)
                 for(int k=0;k<triangle_list2.m;k++){ray.t_max=t_max;
                     if(INTERSECTION::Lazy_Intersects(ray,(*body1.simplicial_object->triangle_list)(triangle_list2(k)))){
                         bool going_in=TV::Dot_Product((*body1.simplicial_object->triangle_list)(triangle_list2(k)).Normal(),ray.direction) < 0;

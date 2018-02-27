@@ -40,7 +40,7 @@ template<class TV,int d> STRAIN_MEASURE<TV,d>::
 template<class TV,int d> void STRAIN_MEASURE<TV,d>::
 Initialize_Dm_Inverse(ARRAY_VIEW<const TV> X)
 {
-    Dm_inverse.Resize(mesh.elements.m,false,false);
+    Dm_inverse.Resize(mesh.elements.m,no_init);
     for(int t=0;t<mesh.elements.m;t++){
         UPPER_TRIANGULAR_MATRIX<T,d> R=Ds(X,t).R_From_QR_Factorization();
         if(R.Determinant()<=0) PHYSBAM_FATAL_ERROR("Inverted or degenerate rest state");
@@ -61,7 +61,6 @@ Initialize_Dm_Inverse_Save()
 template<class TV,int d> void STRAIN_MEASURE<TV,d>::
 Copy_Dm_Inverse_Save_Into_Dm_Inverse(const ARRAY<int>& map)
 {
-    Dm_inverse.Resize(map.m,false,false);
     Dm_inverse=Dm_inverse_save->Subset(map);
 }
 //#####################################################################
@@ -80,9 +79,8 @@ template<class T> UPPER_TRIANGULAR_MATRIX<T,3> Equilateral_Dm(const VECTOR<T,3>&
 template<class TV,int d> void STRAIN_MEASURE<TV,d>::
 Initialize_Rest_State_To_Equilateral(const T side_length)
 {
-    Dm_inverse.Resize(mesh.elements.m,false,false);
     UPPER_TRIANGULAR_MATRIX<T,d> Dm=side_length*Equilateral_Dm(VECTOR<T,d>());
-    Dm_inverse.Fill(Dm.Inverse());
+    Dm_inverse.Resize(mesh.elements.m,init_all,Dm.Inverse());
 }
 //#####################################################################
 // Function Print_Altitude_Statistics
@@ -91,7 +89,7 @@ template<class TV,int d> void STRAIN_MEASURE<TV,d>::
 Print_Altitude_Statistics()
 {   
     if(!Dm_inverse.m) return;
-    ARRAY<T> altitude(Dm_inverse.m,false);
+    ARRAY<T> altitude(Dm_inverse.m,no_init);
     for(int t=0;t<altitude.m;t++) altitude(t)=Rest_Altitude(t);
     altitude.Sort();
     LOG::cout<<"strain measure - total elements = "<<altitude.m<<std::endl;

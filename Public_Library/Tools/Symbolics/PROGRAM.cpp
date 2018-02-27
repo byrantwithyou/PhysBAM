@@ -715,7 +715,7 @@ Finalize()
     ARRAY<bool> done(code_blocks.m);
     done(0)=true;
     while(worklist.m){
-        CODE_BLOCK* B=worklist.Pop();
+        CODE_BLOCK* B=worklist.Pop_Value();
         labels(B->id)=flat_code.m;
         for(CODE_BLOCK_NODE* N=B->head;N;N=N->next){
             INSTRUCTION o=N->inst;
@@ -816,7 +816,7 @@ Make_SSA()
         HA.Get_Or_Insert(v).Get_Keys(W);
         work.Subset(W).Fill(vi);
         while(W.m){
-            int x=W.Pop();
+            int x=W.Pop_Value();
             for(int i=0;i<dom.frontier(x).m;i++){
                 int y=dom.frontier(x)(i);
                 if(has_already(y)<vi){
@@ -1093,13 +1093,13 @@ Sparse_Conditional_Constant_Propagation()
 
     while(block_worklist.m || op_worklist.m){
         while(op_worklist.m){
-            CODE_BLOCK_NODE* N=op_worklist.Pop();
+            CODE_BLOCK_NODE* N=op_worklist.Pop_Value();
             for(typename HASHTABLE<CODE_BLOCK_NODE*>::CONST_ITERATOR it(Get_Uses(N));it.Valid();it.Next()){
                 if(block_exec(it.Key()->block->id))
                     SCCP_Visit_Instruction(it.Key(),variable_state,block_worklist,op_worklist,block_exec);}}
 
         while(block_worklist.m){
-            CODE_BLOCK* block=block_worklist.Pop();
+            CODE_BLOCK* block=block_worklist.Pop_Value();
             for(CODE_BLOCK_NODE* N=block->head;N;N=N->next)
                 SCCP_Visit_Instruction(N,variable_state,block_worklist,op_worklist,block_exec);
             if(block->next[0] && (!block->tail || (block->tail->inst.type!=op_jmp && block->tail->inst.type!=op_br_nz && block->tail->inst.type!=op_br_z)))
@@ -1263,7 +1263,7 @@ Remove_Dead_Code()
                 worklist2.Append(N);
 
     while(worklist2.m){
-        CODE_BLOCK_NODE* N=worklist2.Pop();
+        CODE_BLOCK_NODE* N=worklist2.Pop_Value();
         int flags=op_flags_table[N->inst.type],r0=N->inst.src0,r1=N->inst.src1;
         if(flags&flag_reg_src0 && (r0&mem_mask)==mem_reg && Get_Uses(r0).Size()==1) worklist2.Append(Get_Def(r0));
         if(flags&flag_reg_src1 && (r1&mem_mask)==mem_reg && r1!=r0 && Get_Uses(r1).Size()==1) worklist2.Append(Get_Def(r1));
@@ -1494,7 +1494,7 @@ Simplify_With_Distributive_Law_Emit_Prod(DISTRIBUTE_HELPER<T>& prod,CODE_BLOCK_N
     if(prod.product.m==0) return Add_Constant(prod.coeff);
 
     while(prod.product.m>1){
-        int new_reg=num_tmp++,src1=prod.product.Pop();
+        int new_reg=num_tmp++,src1=prod.product.Pop_Value();
         Add_Raw_Instruction_To_Block_Before(before->block,before,op_mul,new_reg,prod.product.Last(),src1);
         prod.product.Last()=new_reg;}
 

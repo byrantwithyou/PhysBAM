@@ -33,8 +33,8 @@ Reset()
 void DIRECTED_GRAPH_CORE::
 Initialize(const int number_nodes)
 {
-    parents.Resize(number_nodes,false,false);
-    children.Resize(number_nodes,false,false);
+    parents.Resize(number_nodes,no_init);
+    children.Resize(number_nodes,no_init);
     Reset();
 }
 //#####################################################################
@@ -86,7 +86,7 @@ void DIRECTED_GRAPH_CORE::
 Topological_Sort_Assuming_Cycle_Free(ARRAY<int>& finish_time,ARRAY<int>& node_index)
 {
     finish_time=CONSTANT_ARRAY<int>(parents.m,-1);
-    node_index.Resize(parents.m,false,false);
+    node_index.Resize(parents.m,no_init);
     int time=0;
     for(int i=0;i<parents.m;i++)if(finish_time(i)<0) Visit_Assuming_Cycle_Free(i,finish_time,node_index,time);
 }

@@ -54,7 +54,7 @@ Register_Timer()
 {
     if(!free_timers.Size()){LOG::cerr<<"No more timers available, timing information may be incorrect"<<std::endl;return 0;}
     
-    int id=free_timers.Pop();
+    int id=free_timers.Pop_Value();
 
     double time=Get_Current_Time();
     timers(id).start=time;

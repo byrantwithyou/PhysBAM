@@ -77,8 +77,9 @@ template<class T> inline MATRIX<T,2,3> Pseudoinverse(const MATRIX<T,3,2>& A)
 template<class TV,int d> void LINEAR_FINITE_VOLUME<TV,d>::
 Initialize_Material_State(ARRAY_VIEW<const TV> X)
 {
-    Dm_inverse.Resize(mesh.elements.m,false,false);Bm.Resize(mesh.elements.m,false,false);
-    if(TV::m>d) normals.Resize(mesh.elements.m,false,false);
+    Dm_inverse.Resize(mesh.elements.m,no_init);
+    Bm.Resize(mesh.elements.m,no_init);
+    if(TV::m>d) normals.Resize(mesh.elements.m,no_init);
     for(int t=0;t<mesh.elements.m;t++){
         MATRIX<T,TV::m,d> Dm=Ds(X,t);
         if(TV::m>d) normals(t)=Normal(Dm);

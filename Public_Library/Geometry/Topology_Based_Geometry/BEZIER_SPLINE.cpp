@@ -151,7 +151,7 @@ Create_Segmented_Curve(const BEZIER_SPLINE<TV,d>& spline,bool same_particles)
         segmented_curve->mesh.elements.Append(VECTOR<int,2>(elem(0),elem.Last()));}
 
     if(!same_particles){
-        ARRAY<int> map(spline.particles.X.m,true,-1);
+        ARRAY<int> map(spline.particles.X.m,use_init,-1);
         ARRAY_VIEW<int> av=segmented_curve->mesh.elements.Flattened();
         int next=0;
         for(int i=0;i<av.m;i++)

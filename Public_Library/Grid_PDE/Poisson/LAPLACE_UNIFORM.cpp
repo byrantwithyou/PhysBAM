@@ -64,9 +64,9 @@ Solve(const T time,const bool solution_regions_already_computed)
 template<class TV> void LAPLACE_UNIFORM<TV>::
 Find_A(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,const ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index)
 {
-    ARRAY<ARRAY<int> > row_counts(A_array.m,false);
+    ARRAY<ARRAY<int> > row_counts(A_array.m,no_init);
     for(int i=0;i<A_array.m;i++){
-        row_counts(i).Resize(filled_region_cell_count(i),false,false);
+        row_counts(i).Resize(filled_region_cell_count(i),no_init);
         b_array(i).Resize(filled_region_cell_count(i));}
     Find_A_Part_One(cell_index_to_matrix_index,row_counts);
     for(int i=0;i<A_array.m;i++) A_array(i).Set_Row_Lengths(row_counts(i));

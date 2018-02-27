@@ -45,7 +45,7 @@ public:
     {Initialize_Mesh(mesh.number_nodes,mesh.elements);}
 
     void Initialize_Mesh_With_Particle_Offset(const SIMPLEX_MESH& mesh,const int particle_offset)
-    {elements.Resize(mesh.elements.m,false,false);
+    {elements.Resize(mesh.elements.m,no_init);
     for(int t=0;t<elements.m;t++) elements(t)=mesh.elements(t)+particle_offset;
     number_nodes=0;} // TODO: currently leaves number_nodes uninitialized
 

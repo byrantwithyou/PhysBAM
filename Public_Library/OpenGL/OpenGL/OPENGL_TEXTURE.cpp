@@ -55,7 +55,7 @@ OPENGL_TEXTURE::Initialize(int width_input, int height_input, double border)
 
     Set_Smooth_Shading(false);
 
-    ARRAY<OPENGL_COLOR> initial_bitmap(padded_width*padded_height,true,OPENGL_COLOR(0,0,0,0));
+    ARRAY<OPENGL_COLOR> initial_bitmap(padded_width*padded_height,use_init,OPENGL_COLOR(0,0,0,0));
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, padded_width, padded_height, 0, GL_RGBA, GL_FLOAT, initial_bitmap.Get_Array_Pointer());
 }
 

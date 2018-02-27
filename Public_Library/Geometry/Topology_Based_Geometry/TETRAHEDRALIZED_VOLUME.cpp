@@ -90,7 +90,7 @@ template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Update_Tetrahedron_List()
 {
     if(!tetrahedron_list) tetrahedron_list=new ARRAY<TETRAHEDRON<T> >;
-    tetrahedron_list->Resize(mesh.elements.m,false,false);
+    tetrahedron_list->Resize(mesh.elements.m,no_init);
     for(int t=0;t<mesh.elements.m;t++){
         (*tetrahedron_list)(t).X=particles.X.Subset(mesh.elements(t));
         (*tetrahedron_list)(t).Create_Triangles();}
@@ -826,7 +826,7 @@ template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Compute_Tetrahedron_Volumes()
 {
     if(!tetrahedron_volumes) tetrahedron_volumes=new ARRAY<T>;
-    tetrahedron_volumes->Resize(mesh.elements.m,false,false);
+    tetrahedron_volumes->Resize(mesh.elements.m,no_init);
     for(int t=0;t<mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         (*tetrahedron_volumes)(t)=TETRAHEDRON<T>::Signed_Volume(particles.X(i),particles.X(j),particles.X(k),particles.X(l));}
 }

@@ -253,7 +253,7 @@ Initialize_Components_And_Key_Bindings()
         deformable_objects_component=new OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>(basedir+"/",start_frame);
         deformable_objects_component->Set_All_Materials(front_material,front_material,back_material);
         if(deformable_no_draw_list.m){
-            deformable_objects_component->active_list.Resize(PhysBAM::max(deformable_objects_component->active_list.m,deformable_no_draw_list.Last()),true,true,true);
+            deformable_objects_component->active_list.Resize(PhysBAM::max(deformable_objects_component->active_list.m,deformable_no_draw_list.Last()),use_init,true);
             deformable_objects_component->active_list.Subset(deformable_no_draw_list).Fill(false);}
         opengl_world.Set_Key_Binding_Category("Deformable Objects");
         Add_Component(deformable_objects_component,"Deformable Objects",'8',BASIC_VISUALIZATION<T>::OWNED|BASIC_VISUALIZATION<T>::SELECTABLE);

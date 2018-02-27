@@ -194,7 +194,7 @@ Copy_Log_To_File(const std::string& filename,const bool append)
             LOG_ENTRY::log_file_start_on_separate_line=LOG_ENTRY::log_file_needs_indent=Instance()->current_entry->log_file_end_on_separate_line=true;}
         else{
             ::std::fflush(temporary_file);fseek(temporary_file,0,SEEK_SET);
-            ARRAY<char> buffer(4096,false);
+            ARRAY<char> buffer(4096,no_init);
             for(;;){
                 int n=(int)fread(buffer.Get_Array_Pointer(),sizeof(char),buffer.m,temporary_file);
                 fwrite(buffer.Get_Array_Pointer(),sizeof(char),n,log_file);

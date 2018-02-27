@@ -136,7 +136,7 @@ Discard_Valence_Zero_Particles_And_Renumber(ARRAY<int>& condensation_mapping)
     node_is_used.Subset(mesh.elements.Flattened()).Fill(true);
     
     // make condensation mapping
-    condensation_mapping.Resize(mesh.number_nodes,false,false);condensation_mapping.Fill(-1);
+    condensation_mapping.Resize(mesh.number_nodes,init_all,-1);
     int counter=0;
     for(int t=0;t<mesh.number_nodes;t++) if(node_is_used(t)) condensation_mapping(t)=counter++;
     
@@ -148,7 +148,8 @@ Discard_Valence_Zero_Particles_And_Renumber(ARRAY<int>& condensation_mapping)
     // do particles same way
     for(int p=0;p<condensation_mapping.m;p++) if(condensation_mapping(p)<0) particles.Add_To_Deletion_List(p);
     for(int p=condensation_mapping.m;p<particles.Size();p++) particles.Add_To_Deletion_List(p);
-    particles.Delete_Elements_On_Deletion_List(true);particles.Compact();
+    particles.Delete_Elements_On_Deletion_List(true);
+    particles.Compact();
 
     Refresh_Auxiliary_Structures();
 }
@@ -169,8 +170,7 @@ Merge_Overlapping_Particles_And_Renumber(ARRAY<int>& condensation_mapping,T tol)
                 uf.Union(i,intersection_list(j));}
 
     int next=0;
-    condensation_mapping.Remove_All();
-    condensation_mapping.Resize(particles.X.m,true,true,-1);
+    condensation_mapping.Resize(particles.X.m,init_all,-1);
     for(int i=0;i<particles.X.m;i++)
         if(condensation_mapping(i)==-1){
             int p=uf.Find(i);

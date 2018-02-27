@@ -34,8 +34,11 @@ BW_BENDING_FORCES(DEFORMABLE_PARTICLES<TV>& particles,TRIANGLE_MESH& triangle_me
 
     bool adjacent_triangles_defined=(triangle_mesh.adjacent_elements!=0);if(!adjacent_triangles_defined) triangle_mesh.Initialize_Adjacent_Elements();
     int number_quadruples=0;
-    for(int t=0;t<triangle_mesh.elements.m;t++) for(int a=0;a<(*triangle_mesh.adjacent_elements)(t).m;a++) if((*triangle_mesh.adjacent_elements)(t)(a)>t) number_quadruples++;
-    constraint_particles.Resize(number_quadruples,false);
+    for(int t=0;t<triangle_mesh.elements.m;t++)
+        for(int a=0;a<(*triangle_mesh.adjacent_elements)(t).m;a++)
+            if((*triangle_mesh.adjacent_elements)(t)(a)>t)
+                number_quadruples++;
+    constraint_particles.Resize(number_quadruples,no_init);
     int index=0; // reset number
     for(int t=0;t<triangle_mesh.elements.m;t++){
         int t1,t2,t3;triangle_mesh.elements(t).Get(t1,t2,t3);
@@ -47,11 +50,12 @@ BW_BENDING_FORCES(DEFORMABLE_PARTICLES<TV>& particles,TRIANGLE_MESH& triangle_me
                 constraint_particles(index++).Set(t2,t3,t1,triangle_mesh.Other_Node(t2,t3,s));}}}
     if(!adjacent_triangles_defined){delete triangle_mesh.adjacent_elements;triangle_mesh.adjacent_elements=0;}
 
-    states.Resize(number_quadruples,false,false);
-    bending_states.Resize(number_quadruples,false,false);
+    states.Resize(number_quadruples);
+    bending_states.Resize(number_quadruples);
     ARRAY<bool> particle_is_simulated(particles.Size());particle_is_simulated.Fill(true);
     Update_Mpi(particle_is_simulated,0);
-    for(CONSTRAINT_ITERATOR iterator(force_simplices);iterator.Valid();iterator.Next()){int q=iterator.Data();
+    for(CONSTRAINT_ITERATOR iterator(force_simplices);iterator.Valid();iterator.Next()){
+        int q=iterator.Data();
         int x2,x1,x0,x3;constraint_particles(q).Get(x2,x1,x0,x3);
         typename BASE::STATE& state=states(q);
         state.nodes=VECTOR<int,4>(x0,x1,x2,x3);

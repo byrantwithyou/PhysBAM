@@ -23,6 +23,13 @@ template<class T,class ID> struct IS_ARRAY_VIEW<ARRAY<T,ID> > {static const bool
 
 template<class T,class ID> struct CANONICALIZE_CONST_ARRAY<ARRAY<T,ID> >:public FIRST<ARRAY_VIEW<const T,ID> >{};
 
+struct NO_INIT{};
+struct USE_INIT{};
+struct INIT_ALL{};
+static const NO_INIT no_init;
+static const USE_INIT use_init;
+static const INIT_ALL init_all;
+
 template<class T,class ID>
 class ARRAY:public ARRAY_BASE<T,ARRAY<T,ID>,ID>
 {
@@ -43,25 +50,50 @@ public:
         :base_pointer(0),buffer_size(0),m(0)
     {}
 
-    explicit ARRAY(const ID m_input,const bool initialize_new_elements=true,const T& initialization_value=T())
+    explicit ARRAY(ID m_input)
         :base_pointer(0),buffer_size(m_input),m(m_input)
     {
-        assert(m>=ID());base_pointer=new T[Value(m)];
-        if(!is_class<T>::value && initialize_new_elements){ID m=Size();for(ID i(0);i<m;i++) (*this)(i)=initialization_value;}
+        assert(m>=ID());
+        base_pointer=(T*)new unsigned char[sizeof(T)*Value(m)];
+        for(int i=0,j=Value(m);i<j;i++) new(base_pointer+i)T();
     }
 
-    explicit ARRAY(const INITIAL_SIZE m_input,const bool initialize_new_elements=true,const T& initialization_value=T())
-        :base_pointer(0),buffer_size(Value(m_input)),m(Value(m_input))
+    ARRAY(ID m_input,NO_INIT)
+        :base_pointer(0),buffer_size(m_input),m(m_input)
     {
-        assert(Value(m)>=0);base_pointer=new T[Value(m)];
-        if(!is_class<T>::value && initialize_new_elements){ID m=Size();for(ID i(0);i<m;i++) (*this)(i)=initialization_value;}
+        assert(m>=ID());
+        base_pointer=(T*)new unsigned char[sizeof(T)*Value(m)];
+        for(int i=0,j=Value(m);i<j;i++) new(base_pointer+i)T;
+    }
+
+    ARRAY(ID m_input,USE_INIT,const T& __restrict__ initialization_value)
+        :buffer_size(m_input),m(m_input)
+    {
+        assert(m>=ID());
+        base_pointer=(T*)new unsigned char[sizeof(T)*Value(m)];
+        for(int i=0,j=Value(m);i<j;i++) new(base_pointer+i)T(initialization_value);
+    }
+
+    explicit ARRAY(const INITIAL_SIZE m_input)
+        :ARRAY(ID(Value(m_input)))
+    {
+    }
+
+    ARRAY(const INITIAL_SIZE m_input,NO_INIT)
+        :ARRAY(ID(Value(m_input)),no_init)
+    {
+    }
+
+    ARRAY(const INITIAL_SIZE m_input,USE_INIT,const T& __restrict__ initialization_value)
+        :ARRAY(ID(Value(m_input)),use_init,initialization_value)
+    {
     }
 
     ARRAY(const ARRAY& array)
-        :base_pointer(0),buffer_size(array.m),m(array.m)
+        :buffer_size(array.m),m(array.m)
     {
-        base_pointer=new T[Value(m)];
-        for(int i=0;i<Value(m);i++) base_pointer[i]=array.base_pointer[i];
+        base_pointer=(T*)new unsigned char[sizeof(T)*Value(array.m)];
+        for(int i=0,j=Value(m);i<j;i++) new(base_pointer+i)T(array.base_pointer[i]);
     }
 
     ARRAY(ARRAY&& array)
@@ -71,57 +103,74 @@ public:
     }
 
     template<class T_ARRAY>
-    explicit ARRAY(const T_ARRAY& array,typename enable_if<is_same<T,typename T_ARRAY::ELEMENT>::value,UNUSABLE>::type unused=UNUSABLE())
+    explicit ARRAY(const ARRAY_BASE<T,T_ARRAY,ID>& array)
         :base_pointer(0),buffer_size(array.Size()),m(array.Size())
     {
-        base_pointer=new T[Value(m)];
-        for(ID i(0);i<m;i++) (*this)(i)=array(i);
+        base_pointer=(T*)new unsigned char[sizeof(T)*Value(m)];
+        for(int i=0,j=Value(m);i<j;i++) new(base_pointer+i)T(array(ID(i)));
     }
 
     ARRAY(std::initializer_list<T> init)
-        :base_pointer(0),buffer_size(init.size()),m(init.size())
+        :buffer_size(init.size()),m(init.size())
     {
-        base_pointer=new T[Value(m)];
-        std::copy(init.begin(),init.end(),begin());
+        base_pointer=(T*)new unsigned char[sizeof(T)*Value(m)];
+        T* p=base_pointer;
+        for(const auto& a:init) new(p++)T(a);
     }
 
     ~ARRAY()
     {
-        delete[] base_pointer;
+        Call_Destructors_And_Free();
     }
-
-    ARRAY& operator=(const ARRAY& source)
-    {ID source_m=source.m;
-    if(buffer_size<source_m) Resize_Helper(source_m,false,false);
-    else if(Same_Array(*this,source)) return *this;
-    m=source_m;
-    for(ID i(0);i<source_m;i++) (*this)(i)=source(i);
-    return *this;}
-
-    ARRAY& operator=(ARRAY&& array)
-    {delete[] base_pointer;base_pointer=array.base_pointer;buffer_size=array.buffer_size;
-    m=array.m;array.base_pointer=0;return *this;}
-
-    template<class T_ARRAY>
-    ARRAY& operator=(const T_ARRAY& source)
-    {STATIC_ASSERT(CAN_ASSIGN<T,typename T_ARRAY::ELEMENT>::value);
-    ID source_m=source.Size();
-    if(buffer_size<source_m) Resize_Helper(source_m,false,false);
-    else if(Same_Array(*this,source)) return *this;
-    m=source_m;
-    for(ID i(0);i<source_m;i++) (*this)(i)=source(i);
-    return *this;}
 
     ID Size() const
     {return m;}
 
-    T& operator()(const ID i)
+    T& operator()(ID i)
     {assert((unsigned)Value(i)<(unsigned)Value(m));return base_pointer[Value(i)];}
 
-    const T& operator()(const ID i) const
+    const T& operator()(ID i) const
     {assert((unsigned)Value(i)<(unsigned)Value(m));return base_pointer[Value(i)];}
 
-    bool Valid_Index(const ID i) const
+    ARRAY& operator=(const ARRAY& source)
+    {
+        if(buffer_size<source.m){
+            Call_Destructors_And_Free();
+            new(this)ARRAY(source);
+            return *this;}
+        if(Same_Array(*this,source)) return *this;
+        int n=Value(m),p=Value(source.m);
+        for(int i=0,j=std::min(n,p);i<j;i++) base_pointer[i]=source.base_pointer[i];
+        for(int i=n;i<p;i++) new(base_pointer+i)T(source.base_pointer[i]);
+        for(int i=p;i<n;i++) base_pointer[i].~T();
+        m=source.m;
+        return *this;
+    }
+
+    ARRAY& operator=(ARRAY&& array)
+    {
+        Call_Destructors_And_Free();
+        new(this)ARRAY(array);
+        return *this;
+    }
+
+    template<class T_ARRAY>
+    ARRAY& operator=(const ARRAY_BASE<T,T_ARRAY,ID>& source)
+    {
+        ID source_m=source.Size();
+        if(buffer_size<source_m){
+            Call_Destructors_And_Free();
+            new(this)ARRAY(source);
+            return *this;}
+        int n=Value(m),p=Value(source_m);
+        for(int i=0,j=std::min(n,p);i<j;i++) base_pointer[i]=source(ID(i));
+        for(int i=n;i<p;i++) new(base_pointer+i)T(source(ID(i)));
+        for(int i=p;i<n;i++) base_pointer[i].~T();
+        m=source_m;
+        return *this;
+    }
+
+    bool Valid_Index(ID i) const
     {return (unsigned)Value(i)<(unsigned)Value(m);}
 
     T* Get_Array_Pointer()
@@ -134,89 +183,146 @@ public:
     {return buffer_size;}
 
     void Compact()
-    {if(m<buffer_size) Exact_Resize(m);}
+    {Exact_Resize(m);}
 
 private:
-    void Resize_Helper(const ID buffer_new,const bool initialize_new_elements=true,const bool copy_existing_elements=true,const T& initialization_value=T())
-    {if(buffer_size==buffer_new) return;assert(m<=buffer_size);
-    T* p=new T[Value(buffer_new)];
-    int m_end=Value(PhysBAM::min(m,buffer_new));
-    if(copy_existing_elements) for(int i=0;i<m_end;i++) p[i]=base_pointer[i];
-    if(!is_class<T>::value && initialize_new_elements) for(int i=m_end;i<Value(buffer_new);i++) p[i]=initialization_value;
-    delete[] base_pointer;
-    base_pointer=p;
-    buffer_size=buffer_new;}
+    void Call_Destructors_And_Free()
+    {
+        for(int i=Value(m)-1;i>=0;i--) base_pointer[i].~T();
+        delete[] (unsigned char*)base_pointer;
+    }
 
-    void Ensure_Enough_Space(const ID m_new,const bool copy_existing_elements=true) PHYSBAM_ALWAYS_INLINE
-    {if(buffer_size<m_new) Resize_Helper(ID(4*Value(m_new)/3+2),false,copy_existing_elements);}
+    template<bool exact,bool copy,bool init,bool fill,class... Args>
+    void Resize_Helper(ID m_new,Args&&... initialization_value)
+    {
+        int n=Value(m),p=Value(m_new);
+        if(buffer_size<m_new){
+            int new_buffer_size=exact?p:p+p/3+2;
+            T* new_buffer=(T*)new unsigned char[sizeof(T)*new_buffer_size];
+            if(init) for(int i=(fill?0:n);i<p;i++) new(new_buffer+i)T(initialization_value...);
+            if(copy) for(int i=0;i<n;i++) new(new_buffer+i)T(std::move(base_pointer[i]));
+            if(!init) for(int i=(copy?n:0);i<p;i++) new(new_buffer+i)T;
+            Call_Destructors_And_Free();
+            base_pointer=new_buffer;
+            buffer_size=ID(new_buffer_size);}
+        else{
+            if(fill) for(int i=0,j=std::min(n,p);i<j;i++) base_pointer[i]=T(initialization_value...);
+            if(init) for(int i=n;i<p;i++) new(base_pointer+i)T(initialization_value...);
+            else for(int i=n;i<p;i++) new(base_pointer+i)T;
+            for(int i=p;i<n;i++) base_pointer[i].~T();}
+        m=m_new;
+    }
+
+    template<class... Args>
+    void Append_Helper(Args&&... initialization_value)
+    {
+        int n=Value(m);
+        int new_buffer_size=n+n/3+2;
+        T* new_buffer=(T*)new unsigned char[sizeof(T)*new_buffer_size];
+        new(new_buffer+n)T(initialization_value...);
+        for(int i=0;i<n;i++) new(new_buffer+i)T(std::move(base_pointer[i]));
+        Call_Destructors_And_Free();
+        base_pointer=new_buffer;
+        buffer_size=ID(new_buffer_size);
+    }
 
 public:
-    void Preallocate(const ID max_size)
-    {if(buffer_size<max_size) Resize_Helper(max_size,false);}
+    void Preallocate(ID max_size)
+    {
+        if(buffer_size<max_size){
+            int n=Value(m);
+            T* new_buffer=(T*)new unsigned char[sizeof(T)*Value(max_size)];
+            for(int i=0;i<n;i++) new(new_buffer+i)T(std::move(base_pointer[i]));
+            Call_Destructors_And_Free();
+            base_pointer=new_buffer;
+            buffer_size=max_size;}
+    }
 
-    void Resize(const ID m_new,const bool initialize_new_elements=true,const bool copy_existing_elements=true,const T& initialization_value=T())
-    {Ensure_Enough_Space(m_new,copy_existing_elements);
-    if(initialize_new_elements && m_new>m) for(int i=Value(m);i<Value(m_new);i++) base_pointer[i]=initialization_value;
-    m=m_new;}
+    void Resize(ID m_new)
+    {Resize_Helper<false,true,true,false>(m_new);}
+    
+    void Resize(ID m_new,NO_INIT)
+    {Resize_Helper<false,false,false,false>(m_new);}
 
-    void Exact_Resize(const ID m_new,const bool initialize_new_elements=true) // zero elbow room
-    {Resize_Helper(m_new,initialize_new_elements);m=buffer_size;}
+    // Aliasing with initialization_value is okay.
+    void Resize(ID m_new,USE_INIT,const T& initialization_value)
+    {Resize_Helper<false,true,true,false>(m_new,initialization_value);}
 
+    void Resize(ID m_new,INIT_ALL)
+    {Resize_Helper<false,false,true,true>(m_new);}
+
+    // Aliasing with initialization_value is okay.
+    void Resize(ID m_new,INIT_ALL,const T& initialization_value)
+    {Resize_Helper<false,false,true,true>(m_new,initialization_value);}
+
+    void Exact_Resize(ID m_new)
+    {Resize_Helper<true,true,true,false>(m_new);}
+    
+    void Exact_Resize(ID m_new,NO_INIT)
+    {Resize_Helper<true,false,false,false>(m_new);}
+
+    // Aliasing with initialization_value is okay.
+    void Exact_Resize(ID m_new,USE_INIT,const T& initialization_value)
+    {Resize_Helper<true,true,true,false>(m_new,initialization_value);}
+
+    void Exact_Resize(ID m_new,INIT_ALL)
+    {Resize_Helper<true,false,true,true>(m_new);}
+
+    // Aliasing with initialization_value is okay.
+    void Exact_Resize(ID m_new,INIT_ALL,const T& initialization_value)
+    {Resize_Helper<true,false,true,true>(m_new,initialization_value);}
+
+    // Aliasing with element is okay.
     ID Append(const T& element) PHYSBAM_ALWAYS_INLINE
-    {Ensure_Enough_Space(m+1);ID s=m++;(*this)(s)=element;return s;}
+    {if(buffer_size<=m) Append_Helper(element);else new(base_pointer+Value(m))T(element);return m++;}
 
+    // Aliasing is not allowed
     template<class T_ARRAY>
-    void Append_Elements(const T_ARRAY& append_array)
-    {STATIC_ASSERT_SAME(ELEMENT,typename T_ARRAY::ELEMENT);ID m_new=m+Value(append_array.Size());Ensure_Enough_Space(m_new);m=m_new;
-    for(typename T_ARRAY::INDEX i(0);i<append_array.Size();i++) (*this)(m-Value(append_array.Size())+Value(i))=append_array(i);}
+    void Append_Elements(const ARRAY_BASE<T,T_ARRAY,ID>& append_array)
+    {ID n=append_array.Size(),p=Value(m);Resize_Helper<false,true,false,false>(m+n);for(ID i(0);i<n;i++) (*this)(i+p)=append_array(i);}
 
+    // Note: not very efficient
     void Append_Unique(const T& element)
     {for(ID i(0);i<m;i++) if((*this)(i)==element) return;Append(element);}
 
+    // Note: not efficient
     template<class T_ARRAY>
-    void Append_Unique_Elements(const T_ARRAY& append_array)
-    {STATIC_ASSERT_SAME(T,typename T_ARRAY::ELEMENT);
-    typename T_ARRAY::INDEX append_m=append_array.Size();for(typename T_ARRAY::INDEX i(0);i<append_m;i++) Append_Unique(append_array(i));}
+    void Append_Unique_Elements(const ARRAY_BASE<T,T_ARRAY,ID>& append_array)
+    {ID n=append_array.Size();for(ID i(0);i<n;i++) Append_Unique(append_array(i));}
 
     ID Add_End() PHYSBAM_ALWAYS_INLINE
-    {return Append(T());}
+    {if(buffer_size<=m) Append_Helper();else new(base_pointer+Value(m))T();return m++;}
 
     void Remove_End()
-    {assert(m>ID());m--;}
+    {assert(m>ID());base_pointer[Value(--m)].~T();}
 
-    void Remove_Index(const ID index) // preserves ordering of remaining elements
-    {assert((unsigned)Value(index)<(unsigned)Value(m));for(ID i=index;i<m-1;i++) (*this)(i)=(*this)(i+1);Remove_End();}
+    void Remove_Index(ID index) // preserves ordering of remaining elements
+    {assert((unsigned)Value(index)<(unsigned)Value(m));for(ID i=index;i<m-1;i++) (*this)(i)=std::move((*this)(i+1));Remove_End();}
 
-    void Remove_Index_Lazy(const ID index)
-    {assert((unsigned)Value(index)<(unsigned)Value(m));
-    if(index<m) (*this)(index)=(*this)(m-1);
-    Remove_End();}
+    void Remove_Index_Lazy(ID index)
+    {assert((unsigned)Value(index)<(unsigned)Value(m));if(index<m-1) (*this)(index)=std::move((*this)(m-1));Remove_End();}
 
     void Remove_All() // if elements are non-primitive this may waste memory
-    {m=ID();}
+    {for(int i=Value(m)-1;i>=0;i--) base_pointer[i].~T();m=ID();}
 
     void Clean_Memory()
-    {Exact_Resize(ID());}
+    {Call_Destructors_And_Free();new(this)ARRAY();}
 
     void Delete_Pointers_And_Clean_Memory() // only valid if T is a pointer type
     {for(ID i(0);i<m;i++) delete (*this)(i);Clean_Memory();}
 
-    void Insert(const T& element,const ID index)
-    {Ensure_Enough_Space(m+1);m++;for(ID i=m-1;i>index;i--) (*this)(i)=(*this)(i-1);(*this)(index)=element;}
+    // Aliasing is not allowed
+    void Insert(const T& element,ID index)
+    {Add_End();for(ID i=m-1;i>index;i--) (*this)(i)=std::move((*this)(i-1));(*this)(index)=element;}
 
-    T Pop()
-    {Remove_End();return base_pointer[Value(m)];}
+    T Pop_Value()
+    {T copy=base_pointer[Value(m)-1];Remove_End();return copy;}
 
-    ARRAY_VIEW<const T> Pop_Elements(const int count) // return value should be copied immediately, not kept around
-    {STATIC_ASSERT(HAS_TRIVIAL_DESTRUCTOR<T>::value);
-    assert(m-count>=ID());m-=count;
-    return ARRAY_VIEW<const T>(count,base_pointer+m);}
+    void Pop()
+    {Remove_End();}
 
-    static void Compact_Array_Using_Compaction_Array(ARRAY<T,ID>& array,const ARRAY<ID,ID>& compaction_array,ARRAY<T,ID>* temporary_array=0)
-    {ID compaction_array_m=compaction_array.Size();
-    bool temporary_array_defined=temporary_array!=0;if(!temporary_array_defined) temporary_array=new ARRAY<T,ID>(compaction_array_m,false);
-    ARRAY<T,ID>::Put(array,*temporary_array);for(ID i(0);i<compaction_array_m;i++) if(compaction_array(i)>0) array(compaction_array(i))=(*temporary_array)(i);
-    if(!temporary_array_defined){delete temporary_array;temporary_array=0;}}
+    void Pop_Elements(const int count) // return value should be copied immediately, not kept around
+    {int n=Value(m);assert(n-count>=0);for(int i=n-1;i>=n-count;i--) base_pointer[i].~T();m-=count;}
 
     T* begin() // for stl
     {return Get_Array_Pointer();}
@@ -231,8 +337,7 @@ public:
     {return Get_Array_Pointer()+m;}
 
     void Exchange(ARRAY<T,ID>& other)
-    {STATIC_ASSERT(!is_const<T>::value); // make ARRAY_VIEW<const T> equivalent to const ARRAY_VIEW<const T>
-    exchange(m,other.m);exchange(base_pointer,other.base_pointer);exchange(buffer_size,other.buffer_size);}
+    {exchange(m,other.m);exchange(base_pointer,other.base_pointer);exchange(buffer_size,other.buffer_size);}
 
     template<class RW> void Read(std::istream& input)
     {Clean_Memory();ID m;Read_Binary<RW>(input,m);
@@ -247,16 +352,10 @@ public:
     template<class RW> void Write(std::ostream& output) const
     {Write_Prefix<RW>(output,m);}
 
-    template<class RW> void Write_Prefix(std::ostream& output,const ID prefix) const
+    template<class RW> void Write_Prefix(std::ostream& output,ID prefix) const
     {PHYSBAM_ASSERT(ID(0)<=prefix && prefix<=Size());
     Write_Binary<RW>(output,Value(prefix));Write_Binary_Array<RW>(output,Get_Array_Pointer(),Value(prefix));}
 //#####################################################################
 };
-extern template ARRAY<int>::~ARRAY();
-extern template ARRAY<float>::~ARRAY();
-extern template ARRAY<double>::~ARRAY();
-extern template void ARRAY<int>::Resize_Helper(int, bool, bool, const int&);
-extern template void ARRAY<float>::Resize_Helper(int, bool, bool, const float&);
-extern template void ARRAY<double>::Resize_Helper(int, bool, bool, const double&);
 }
 #endif

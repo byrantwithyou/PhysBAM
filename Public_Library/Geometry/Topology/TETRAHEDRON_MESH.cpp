@@ -589,11 +589,14 @@ Tetrahedrons_Across_Face(const int tetrahedron,const int node1,const int node2,c
 void TETRAHEDRON_MESH::
 Identify_Face_Connected_Components(ARRAY<int>& label)
 {
-    STACK<int> flood_fill_stack;flood_fill_stack.Preallocate(elements.m);
-    bool adjacent_elements_defined=adjacent_elements!=0;if(!adjacent_elements_defined)Initialize_Adjacent_Elements();
-    label.Resize(elements.m,false,false);label.Fill(0);
+    STACK<int> flood_fill_stack;
+    flood_fill_stack.Preallocate(elements.m);
+    bool adjacent_elements_defined=adjacent_elements!=0;
+    if(!adjacent_elements_defined)Initialize_Adjacent_Elements();
+    label.Resize(elements.m,init_all,0);
     int id=0;for(int t=0;t<elements.m;t++) if(!label(t)){
-        id++;label(t)=id;flood_fill_stack.Push(t);
+        id++;label(t)=id;
+        flood_fill_stack.Push(t);
         while(!flood_fill_stack.Empty()){
             int top=flood_fill_stack.Pop();
             for(int i=0;i<(*adjacent_elements)(top).m;i++){
@@ -610,7 +613,7 @@ Identify_Edge_Connected_Components(ARRAY<int>& label)
 {
     STACK<int> flood_fill_stack;flood_fill_stack.Preallocate(elements.m);
     bool neighbor_nodes_defined=neighbor_nodes!=0;if(!neighbor_nodes_defined)Initialize_Neighbor_Nodes();
-    label.Resize(number_nodes,false,false);label.Fill(0);
+    label.Resize(number_nodes,init_all,0);
     int id=0;for(int p=0;p<number_nodes;p++) if(!label(p)){
         id++;label(p)=id;flood_fill_stack.Push(p);
         while(!flood_fill_stack.Empty()){

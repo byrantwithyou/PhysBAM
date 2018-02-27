@@ -85,10 +85,11 @@ Breadth_First_Directed_Graph(const int root_node,DIRECTED_GRAPH_CORE& directed_g
 int UNDIRECTED_GRAPH_CORE::
 Connected_Components(ARRAY<int,int>& component_id) // returns total number of components
 {
-    component_id.Resize(adjacent_edges.Size(),false,false);component_id.Fill(0);
+    component_id.Resize(adjacent_edges.Size());
     int component=0;
     for(int seed=0;seed<component_id.Size();seed++) if(component_id(seed)<0){
-        STACK<int> stack;stack.Push(seed);
+        STACK<int> stack;
+        stack.Push(seed);
         component_id(seed)=++component;
         while(!stack.Empty()){
             int current=stack.Pop();
@@ -146,7 +147,7 @@ Read(std::istream& input)
     ARRAY<int,int> parent_node_index,child_node_index;
     Read_Binary<RW>(input,parent_node_index,child_node_index,adjacent_edges);
     if(parent_node_index.Size()!=child_node_index.Size()) PHYSBAM_FATAL_ERROR();
-    edges.Resize(parent_node_index.Size(),false,false);
+    edges.Resize(parent_node_index.Size(),no_init);
     for(int e=0;e<edges.m;e++){edges(e).x=parent_node_index(e);edges(e).y=child_node_index(e);}
 }
 //#####################################################################
@@ -155,7 +156,7 @@ Read(std::istream& input)
 template<class RW> void UNDIRECTED_GRAPH_CORE::
 Write(std::ostream& output) const
 {
-    ARRAY<int,int> parent_node_index(edges.m,false),child_node_index(edges.m,false);
+    ARRAY<int,int> parent_node_index(edges.m,no_init),child_node_index(edges.m,no_init);
     for(int e=0;e<edges.m;e++){parent_node_index(e)=edges(e).x;child_node_index(e)=edges(e).y;}
     Write_Binary<RW>(output,parent_node_index,child_node_index,adjacent_edges);
 }

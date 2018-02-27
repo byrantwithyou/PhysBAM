@@ -107,7 +107,9 @@ Set_Constants_From_Particles(const T material_stiffness,const T material_damping
 template<class T> void TRIANGLE_BENDING_ELEMENTS<T>::
 Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
-    elastic_s.Resize(bending_quadruples.m,false,false);damping_coefficient.Resize(bending_quadruples.m,false,false);force_directions.Resize(bending_quadruples.m,false,false);
+    elastic_s.Resize(bending_quadruples.m,no_init);
+    damping_coefficient.Resize(bending_quadruples.m,no_init);
+    force_directions.Resize(bending_quadruples.m,no_init);
 
     int ignored_elements=0,total_elements=0;
     ARRAY_VIEW<const TV> X(particles.X);
@@ -218,9 +220,9 @@ Initialize_Reference_Quantities(const int hash_multiple)
 template<class T> void TRIANGLE_BENDING_ELEMENTS<T>::
 Copy_Back_Reference_Quantities(const ARRAY<int>& node_map_to_reference)
 {
-    sine_half_rest_angle.Resize(bending_quadruples.m,false,false);
-    damping.Resize(bending_quadruples.m,false,false);
-    if(plastic_hardening) plastic_hardening->Resize(bending_quadruples.m,false,false);
+    sine_half_rest_angle.Resize(bending_quadruples.m,no_init);
+    damping.Resize(bending_quadruples.m,no_init);
+    if(plastic_hardening) plastic_hardening->Resize(bending_quadruples.m,no_init);
     for(int q=0;q<bending_quadruples.m;q++){
         int reference_j=node_map_to_reference(bending_quadruples(q)(1));
         int reference_k=node_map_to_reference(bending_quadruples(q)(2));
@@ -248,8 +250,8 @@ Copy_Back_Save_Quantities(const ARRAY<int>& node_map_to_saved)
 {
     HASHTABLE<VECTOR<int,2>,int> save_bending_quadruples_hashtable(2*bending_quadruples_save->m);
     for(int q=0;q<bending_quadruples_save->m;q++) save_bending_quadruples_hashtable.Insert(VECTOR<int,2>((*bending_quadruples_save)(q)(1),(*bending_quadruples_save)(q)(2)),q);
-    plastic_yield->Resize(bending_quadruples.m,false,false);
-    sine_half_elastic_angle->Resize(bending_quadruples.m,false,false);
+    plastic_yield->Resize(bending_quadruples.m,no_init);
+    sine_half_elastic_angle->Resize(bending_quadruples.m,no_init);
     for(int q=0;q<bending_quadruples.m;q++){
         int save_j=node_map_to_saved(bending_quadruples(q)(2)),save_k=node_map_to_saved(bending_quadruples(q)(3));
         int q_save=0;save_bending_quadruples_hashtable.Get(VECTOR<int,2>(save_j,save_k),q_save);assert(q_save);

@@ -33,14 +33,14 @@ public:
 
     void Initialize(const int number_of_rigid_bodies,const bool reset)
     {if(reset){
-        pair_last_checked.Resize(number_of_rigid_bodies,false,false);
-        rigid_body_last_moved.Resize(number_of_rigid_bodies,false,false);
+        pair_last_checked.Resize(number_of_rigid_bodies,no_init);
+        rigid_body_last_moved.Resize(number_of_rigid_bodies,no_init);
         Reset();}
     else{
         for(int i=0;i<pair_last_checked.m;i++) pair_last_checked(i).Remove_All();
-        pair_last_checked.Resize(number_of_rigid_bodies,false,true);
+        pair_last_checked.Resize(number_of_rigid_bodies);
         int old_size=rigid_body_last_moved.m;
-        rigid_body_last_moved.Resize(number_of_rigid_bodies,false,true);
+        rigid_body_last_moved.Resize(number_of_rigid_bodies);
         for(int i=old_size;i<number_of_rigid_bodies;i++) rigid_body_last_moved(i)=1;}}
 
     void Set_Last_Checked(const int id_1,const int id_2)

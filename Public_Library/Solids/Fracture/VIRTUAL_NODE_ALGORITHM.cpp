@@ -112,7 +112,7 @@ Construct_Virtual_Nodes(EMBEDDED_OBJECT<TV,d>& embedded_object,ARRAY<int>& map_t
     SIMPLEX_MESH<d>& mesh=embedded_object.simplicial_object.mesh;
 
     // construct new virtual nodes
-    ARRAY<short> marked(mesh.number_nodes,false);
+    ARRAY<short> marked(mesh.number_nodes,no_init);
     for(int node=0;node<mesh.number_nodes;node++){
         int components=Mark_Disconnected_Components_In_One_Ring(embedded_object,node,marked);
         // make a virtual_node for each component disconnected from the center node
@@ -208,7 +208,7 @@ Rebuild_Embedded_Object(EMBEDDED_OBJECT<TV,d>& embedded_object,ARRAY<int>& map_t
     embedded_object.simplicial_object.mesh.Initialize_Adjacent_Elements();// we want this for biasing and stress smoothing
 
     // make a map from the new elements to the old ones
-    map_to_old_simplices.Resize(mesh.elements.m,false,false);
+    map_to_old_simplices.Resize(mesh.elements.m,no_init);
     for(int t=0;t<mesh.elements.m;t++) map_to_old_simplices(t)=old_mesh.Simplex(VECTOR<int,d+1>::Map(map_to_old_particles,mesh.elements(t)));
 
     // add surface particles to current embedded_object, and copy state from old embedded particles

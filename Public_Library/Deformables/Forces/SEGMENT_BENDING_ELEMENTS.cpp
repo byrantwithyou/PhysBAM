@@ -74,7 +74,9 @@ Set_Constants_From_Particles(const T material_stiffness,const T material_damping
 template<class T> void SEGMENT_BENDING_ELEMENTS<T>::
 Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
-    elastic_s.Resize(bending_triples.m,false,false);damping_coefficient.Resize(bending_triples.m,false,false);force_directions.Resize(bending_triples.m,false,false);
+    elastic_s.Resize(bending_triples.m,no_init);
+    damping_coefficient.Resize(bending_triples.m,no_init);
+    force_directions.Resize(bending_triples.m,no_init);
     for(TRIPLE_ITERATOR iterator(force_triples);iterator.Valid();iterator.Next()){int q=iterator.Data();
         int i,j,k;bending_triples(q).Get(i,j,k);
         TV n1=(particles.X(j)-particles.X(i)).Rotate_Clockwise_90(),n2=(particles.X(k)-particles.X(j)).Rotate_Clockwise_90();

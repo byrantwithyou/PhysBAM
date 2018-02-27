@@ -321,7 +321,8 @@ Non_Manifold_Nodes(ARRAY<int>& node_list)
     for(int i=0;i<number_nodes;i++){
         if((*neighbor_nodes)(i).m!=(*incident_elements)(i).m) node_list.Append(i);
         else if((*neighbor_nodes)(i).m>0){
-            ARRAY<int> ordered_neighbors;ordered_neighbors.Preallocate((*neighbor_nodes)(i).m);
+            ARRAY<int> ordered_neighbors;
+            ordered_neighbors.Preallocate((*neighbor_nodes)(i).m);
             ordered_neighbors.Append((*neighbor_nodes)(i)(0));
             bool found_neighbor=true;
             while(found_neighbor){found_neighbor=false;

@@ -506,7 +506,7 @@ Update_Position_Based_State_Pair(const OBJECT& o0,OBJECT& o1)
         if(intersecting)
             worklist.Append_Elements((*o0.mesh.adjacent_elements)(e));}
     while(worklist.m>0){
-        int e=worklist.Pop();
+        int e=worklist.Pop_Value();
         if(visited0.Contains(e))
             continue;
         visited0.Insert(e);

@@ -46,7 +46,8 @@ Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 template<class TV> void IMPLICIT_ZERO_LENGTH_SPRINGS<TV>::
 Set_Stiffness_Based_On_Reduced_Mass(const T scaling_coefficient) // assumes mass is already defined
 {
-    constant_stiffness=0;stiffness.Resize(segment_mesh.elements.m,false);
+    constant_stiffness=0;
+    stiffness.Resize(segment_mesh.elements.m,no_init);
     for(int i=0;i<segment_mesh.elements.m;i++){
         int end1,end2;segment_mesh.elements(i).Get(end1,end2);
         T reduced_mass=Pseudo_Inverse(particles.one_over_effective_mass(end1)+particles.one_over_effective_mass(end2));
@@ -58,7 +59,8 @@ Set_Stiffness_Based_On_Reduced_Mass(const T scaling_coefficient) // assumes mass
 template<class TV> void IMPLICIT_ZERO_LENGTH_SPRINGS<TV>::
 Set_Overdamping_Fraction(const T overdamping_fraction) // 1 is critically damped
 {
-    constant_damping=0;damping.Resize(segment_mesh.elements.m,false,false);
+    constant_damping=0;
+    damping.Resize(segment_mesh.elements.m,no_init);
     for(int i=0;i<segment_mesh.elements.m;i++){
         T harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(segment_mesh.elements(i)(0))+particles.one_over_effective_mass(segment_mesh.elements(i)(1)));
         T ym;if(!stiffness.m) ym=constant_stiffness;else ym=stiffness(i);
@@ -70,7 +72,8 @@ Set_Overdamping_Fraction(const T overdamping_fraction) // 1 is critically damped
 template<class TV> void IMPLICIT_ZERO_LENGTH_SPRINGS<TV>::
 Set_Overdamping_Fraction(ARRAY_VIEW<const T> overdamping_fraction) // 1 is critically damped
 {
-    constant_damping=0;damping.Resize(segment_mesh.elements.m,false,false);
+    constant_damping=0;
+    damping.Resize(segment_mesh.elements.m,no_init);
     for(int i=0;i<segment_mesh.elements.m;i++){
         T harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(segment_mesh.elements(i)(0))+particles.one_over_effective_mass(segment_mesh.elements(i)(1)));
         T ym;if(!stiffness.m) ym=constant_stiffness;else ym=stiffness(i);

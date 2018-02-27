@@ -249,9 +249,8 @@ Update_CFL()
         for(int i=0;i<deformables_forces.m;i++){if(!deformables_forces(i)->CFL_Valid()){cfl_valid=false;break;}}}
     else cfl_valid=false;
     if(!cfl_valid){
-        frequency.Resize(particles.Size(),false,false);
-        INDIRECT_ARRAY<ARRAY<T_FREQUENCY_DEFORMABLE>,ARRAY<int>&> frequency_subset=frequency.Subset(simulated_particles);
-        frequency_subset.Fill(T_FREQUENCY_DEFORMABLE());
+        frequency.Resize(particles.Size(),no_init);
+        frequency.Subset(simulated_particles).Fill(T_FREQUENCY_DEFORMABLE());
 
         for(int i=0;i<deformables_forces.m;i++){deformables_forces(i)->Initialize_CFL(frequency);deformables_forces(i)->Validate_CFL();}
         cfl_elastic=FLT_MAX;cfl_damping=FLT_MAX;

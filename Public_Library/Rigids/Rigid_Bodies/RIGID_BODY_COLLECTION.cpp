@@ -432,7 +432,7 @@ Read(const std::string& directory,const int frame,ARRAY<int>* needs_init,ARRAY<i
     ARRAY<RIGID_BODY<TV>*> bodies(rigid_body_particles.rigid_body);
     rigid_body_particles.rigid_body.Fill(0);
     Read_From_File(LOG::sprintf("%s/%d/rigid_body_particles",directory.c_str(),frame),rigid_body_particles);
-    while(rigid_body_particles.rigid_body.m<bodies.m) delete bodies.Pop();
+    while(rigid_body_particles.rigid_body.m<bodies.m) delete bodies.Pop_Value();
     rigid_body_particles.rigid_body.Prefix(bodies.m)=bodies;
 
     ARRAY<int> needs_init_default;

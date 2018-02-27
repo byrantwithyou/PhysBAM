@@ -23,8 +23,8 @@ BW_MATERIAL_SPACE_FORCES(DEFORMABLE_PARTICLES<TV>& particles,TRIANGLE_MESH& tria
     :BW_FORCES<TV,d,3>(particles,triangle_mesh_input,stiffness_coefficient_input,damping_coefficient_input)
 {
     // Save initial state
-    states.Resize(triangle_mesh.elements.m,false,false);
-    material_force_states.Resize(triangle_mesh.elements.m,false,false);
+    states.Resize(triangle_mesh.elements.m,no_init);
+    material_force_states.Resize(triangle_mesh.elements.m,no_init);
     ARRAY<bool> particle_is_simulated(particles.Size());particle_is_simulated.Fill(true);
     Update_Mpi(particle_is_simulated,0);
     for(TRIANGLE_ITERATOR iterator(force_simplices);iterator.Valid();iterator.Next()){int s=iterator.Data();
