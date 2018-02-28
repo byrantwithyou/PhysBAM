@@ -100,6 +100,7 @@ public:
         :base_pointer(array.base_pointer),buffer_size(array.buffer_size),m(array.m)
     {
         array.base_pointer=0;
+        array.buffer_size=0;
         array.m=0;
     }
 
@@ -157,6 +158,7 @@ public:
         buffer_size=array.buffer_size;
         m=array.m;
         array.base_pointer=0;
+        array.buffer_size=0;
         array.m=0;
         return *this;
     }
@@ -195,10 +197,20 @@ public:
     {Exact_Resize(m);}
 
 private:
-    void Call_Destructors_And_Free()
+    void Call_Destructors_And_Free() PHYSBAM_ALWAYS_INLINE
     {
         for(int i=Value(m)-1;i>=0;i--) base_pointer[i].~T();
         delete[] (unsigned char*)base_pointer;
+    }
+
+    void Resize_Helper_Fill(int n) PHYSBAM_ALWAYS_INLINE
+    {
+        for(int i=0;i<n;i++) base_pointer[i]=T();
+    }
+
+    void Resize_Helper_Fill(int n,const T& initialization_value) PHYSBAM_ALWAYS_INLINE
+    {
+        for(int i=0;i<n;i++) base_pointer[i]=initialization_value;
     }
 
     template<bool exact,bool copy,bool init,bool fill,class... Args>
@@ -206,16 +218,16 @@ private:
     {
         int n=Value(m),p=Value(m_new);
         if(buffer_size<m_new){
-            int new_buffer_size=exact?p:p+p/3+2;
+            int new_buffer_size=exact?p:(p?2*p:2);
             T* new_buffer=(T*)new unsigned char[sizeof(T)*new_buffer_size];
             if(init) for(int i=(fill?0:n);i<p;i++) new(new_buffer+i)T(initialization_value...);
             if(copy) for(int i=0;i<n;i++) new(new_buffer+i)T(std::move(base_pointer[i]));
             if(!init) for(int i=(copy?n:0);i<p;i++) new(new_buffer+i)T;
-            delete[] (unsigned char*)base_pointer;
+            Call_Destructors_And_Free();
             base_pointer=new_buffer;
             buffer_size=ID(new_buffer_size);}
         else{
-            if(fill) for(int i=0,j=std::min(n,p);i<j;i++) base_pointer[i]=T(initialization_value...);
+            if(fill) Resize_Helper_Fill(std::min(n,p),initialization_value...);
             if(init) for(int i=n;i<p;i++) new(base_pointer+i)T(initialization_value...);
             else for(int i=n;i<p;i++) new(base_pointer+i)T;
             for(int i=p;i<n;i++) base_pointer[i].~T();}
@@ -226,11 +238,11 @@ private:
     void Append_Helper(Args&&... initialization_value)
     {
         int n=Value(m);
-        int new_buffer_size=n+n/3+2;
+        int new_buffer_size=(n?2*n:2);
         T* new_buffer=(T*)new unsigned char[sizeof(T)*new_buffer_size];
-        new(new_buffer+n)T(initialization_value...);
         for(int i=0;i<n;i++) new(new_buffer+i)T(std::move(base_pointer[i]));
-        delete[] (unsigned char*)base_pointer;
+        new(new_buffer+n)T(std::forward<Args>(initialization_value)...);
+        Call_Destructors_And_Free();
         base_pointer=new_buffer;
         buffer_size=ID(new_buffer_size);
     }
@@ -242,7 +254,7 @@ public:
             int n=Value(m);
             T* new_buffer=(T*)new unsigned char[sizeof(T)*Value(max_size)];
             for(int i=0;i<n;i++) new(new_buffer+i)T(std::move(base_pointer[i]));
-            delete[] (unsigned char*)base_pointer;
+            Call_Destructors_And_Free();
             base_pointer=new_buffer;
             buffer_size=max_size;}
     }
@@ -283,7 +295,11 @@ public:
 
     // Aliasing with element is okay.
     ID Append(const T& element) PHYSBAM_ALWAYS_INLINE
-    {if(buffer_size<=m) Append_Helper(element);else new(base_pointer+Value(m))T(element);return m++;}
+    {if(buffer_size<=m) Append_Helper(T(element));else new(base_pointer+Value(m))T(element);return m++;}
+
+    // Aliasing with element is okay.
+    ID Append(T&& element) PHYSBAM_ALWAYS_INLINE
+    {if(buffer_size<=m) Append_Helper(std::move(element));else new(base_pointer+Value(m))T(std::move(element));return m++;}
 
     // Aliasing is not allowed
     template<class T_ARRAY>
