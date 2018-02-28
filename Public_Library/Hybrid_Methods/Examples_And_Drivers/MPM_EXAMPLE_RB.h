@@ -132,7 +132,7 @@ public:
     T rd_k=0,rr_k=0,di_k=0;
     bool use_rd_mu=false,use_rr_mu=false,use_di_mu=false;
     T rd_mu=0,rr_mu=0,di_mu=0;
-    PENALTY_FORCE_COLLECTION<TV>* pfd;
+    PENALTY_FORCE_COLLECTION<TV>* pfd=0;
     ARRAY<MOVE_RIGID_BODY_DIFF<TV> > move_rb_diff;
     bool use_bisection=false;
     
