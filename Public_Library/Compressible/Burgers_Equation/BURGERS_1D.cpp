@@ -14,14 +14,14 @@ namespace PhysBAM{
 template<class T> void BURGERS_1D<T>::
 Euler_Step(const T dt,const T time)
 {
-    int m=grid.counts.x;
     int ghost_cells=3;
 
-    ARRAY<TV,VECTOR<int,1> > U_ghost(-ghost_cells,m+ghost_cells);
+    ARRAY<TV,VECTOR<int,1> > U_ghost(grid.Domain_Indices(ghost_cells));
     boundary->Fill_Ghost_Cells(grid,U,U_ghost,dt,time,ghost_cells);
 
     // doesn't  support cut out grids
-    ARRAY<bool,VECTOR<int,1> > psi(0,m);psi.Fill(true);
+    ARRAY<bool,VECTOR<int,1> > psi(grid.Domain_Indices());
+    psi.Fill(true);
     ARRAY<bool,FACE_INDEX<TV::m> > psi_N(grid.Get_MAC_Grid_At_Regular_Positions());
     ARRAY<T,FACE_INDEX<TV::m> > face_velocities(grid.Get_MAC_Grid_At_Regular_Positions());
     VECTOR<EIGENSYSTEM<T,TV::m>*,1> eigensystem(&eigensystem_F);
@@ -37,7 +37,7 @@ CFL()
 {
     int m=grid.counts.x;T dx=grid.dX.x;
 
-    ARRAY<T,VECTOR<int,1> > u(0,m);
+    ARRAY<T,VECTOR<int,1> > u(grid.Domain_Indices());
     for(int i=0;i<m;i++) u(i)=U(i)(0);
     T dt_convect=u.Max_Abs()/dx;
 

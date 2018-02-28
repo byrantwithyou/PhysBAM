@@ -30,7 +30,7 @@ public:
     CIE_XYZ()
         :tablesize(81),starting_wavelength((T)380e-9),ending_wavelength((T)780e-9),
         grid(TV_INT(tablesize),RANGE<TV>(TV(starting_wavelength),TV(ending_wavelength))),
-        X_spectrum(1,grid.counts.x),Y_spectrum(1,grid.counts.x),Z_spectrum(1,grid.counts.x)
+        X_spectrum(grid.counts),Y_spectrum(grid.counts),Z_spectrum(grid.counts)
     {      
         Initialize_XYZ_From_CIE_Tables();
         Set_Display_Adaption_Luminance();

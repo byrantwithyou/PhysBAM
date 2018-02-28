@@ -960,7 +960,7 @@ void Test_Model(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
 //#####################################################################
 void Primary_Contour(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
 {
-    ARRAY<VECTOR<T,3>,VECTOR<int,2> > img(1,image_size,1,image_size);
+    ARRAY<VECTOR<T,3>,VECTOR<int,2> > img(VECTOR<int,2>()+image_size);
     for(int i=0;i<image_size;i++)
         for(int j=0;j<image_size;j++){
             T x=(2*i-image_size)*sigma_range/image_size+1e-5;
@@ -1051,8 +1051,8 @@ T Contour_Crossing(const TV& g0,const TV& v0,const TV& g1,const TV& v1)
 //#####################################################################
 void Add_Primary_Contour_Segments(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
 {
-    ARRAY<TV,VECTOR<int,2> > evec(1,image_size,1,image_size);
-    ARRAY<TV,VECTOR<int,2> > grad(1,image_size,1,image_size);
+    ARRAY<TV,VECTOR<int,2> > evec(VECTOR<int,2>()+image_size);
+    ARRAY<TV,VECTOR<int,2> > grad(VECTOR<int,2>()+image_size);
     for(int i=0;i<image_size;i++)
         for(int j=0;j<image_size;j++){
             T x=(2*i-image_size)*sigma_range/image_size+1e-5;

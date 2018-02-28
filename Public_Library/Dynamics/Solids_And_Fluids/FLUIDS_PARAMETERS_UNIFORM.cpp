@@ -65,20 +65,39 @@ FLUIDS_PARAMETERS_UNIFORM(const int number_of_regions_input,const typename FLUID
 template<class TV> FLUIDS_PARAMETERS_UNIFORM<TV>::
 ~FLUIDS_PARAMETERS_UNIFORM()
 {
-    delete mpi_grid;delete &maccormack_semi_lagrangian;
-    delete &maccormack_node_mask;delete &maccormack_cell_mask;delete &maccormack_face_mask;
-    delete particle_levelset_evolution;delete incompressible;incompressible_multiphase=0; // if incompressible_multiphase!=0 it is the sasme as incompressible
-    delete sph_evolution;delete projection;
-    delete euler;delete euler_solid_fluid_coupling_utilities;delete compressible_incompressible_coupling_utilities;
+    delete mpi_grid;
+    delete &maccormack_semi_lagrangian;
+    delete &maccormack_node_mask;
+    delete &maccormack_cell_mask;
+    delete &maccormack_face_mask;
+    delete particle_levelset_evolution;
+    delete incompressible;
+    // if incompressible_multiphase!=0 it is the sasme as incompressible
+    incompressible_multiphase=0;
+    delete sph_evolution;
+    delete projection;
+    delete euler;
+    delete euler_solid_fluid_coupling_utilities;
+    delete compressible_incompressible_coupling_utilities;
 }
 template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Initialize_Number_Of_Regions(const int number_of_regions_input)
 {
-    number_of_regions=number_of_regions_input;masses.Resize(number_of_regions);densities.Resize(number_of_regions);viscosities.Resize(number_of_regions);
-    surface_tensions.Resize(0,number_of_regions,0,number_of_regions);dirichlet_regions.Resize(number_of_regions);pseudo_dirichlet_regions.Resize(number_of_regions);
-    fuel_region.Resize(number_of_regions);normal_flame_speeds.Resize(0,number_of_regions,0,number_of_regions);confinement_parameters.Resize(number_of_regions);
-    curvature_flame_speeds.Resize(0,number_of_regions,0,number_of_regions);use_multiphase_strain.Resize(number_of_regions);elastic_moduli.Resize(number_of_regions);
-    plasticity_alphas.Resize(number_of_regions);plasticity_gammas.Resize(number_of_regions);
+    number_of_regions=number_of_regions_input;
+    masses.Resize(number_of_regions);
+    densities.Resize(number_of_regions);
+    viscosities.Resize(number_of_regions);
+    surface_tensions.Resize(VECTOR<int,2>()+number_of_regions);
+    dirichlet_regions.Resize(number_of_regions);
+    pseudo_dirichlet_regions.Resize(number_of_regions);
+    fuel_region.Resize(number_of_regions);
+    normal_flame_speeds.Resize(VECTOR<int,2>()+number_of_regions);
+    confinement_parameters.Resize(number_of_regions);
+    curvature_flame_speeds.Resize(VECTOR<int,2>()+number_of_regions);
+    use_multiphase_strain.Resize(number_of_regions);
+    elastic_moduli.Resize(number_of_regions);
+    plasticity_alphas.Resize(number_of_regions);
+    plasticity_gammas.Resize(number_of_regions);
 }
 //#####################################################################
 // Function Initialize_Fluid_Evolution

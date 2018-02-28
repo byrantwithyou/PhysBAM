@@ -38,12 +38,6 @@ public:
     ARRAY(const TV_INT& size_input,const bool initialize_using_initialization_value=true,const T& initialization_value=T())
     {Initialize(RANGE<TV_INT>(TV_INT(),size_input),initialize_using_initialization_value,initialization_value);}
 
-    ARRAY(const int m_start_input,const int m_end_input,const int n_start_input,const int n_end_input,const bool initialize_using_initialization_value=true,const T& initialization_value=T())
-    {Initialize(RANGE<TV_INT>(TV_INT(m_start_input,n_start_input),TV_INT(m_end_input,n_end_input)),initialize_using_initialization_value,initialization_value);}
-
-    ARRAY(const int m_start_input,const int m_end_input,const bool initialize_using_initialization_value=true,const T& initialization_value=T())
-    {Initialize(RANGE<TV_INT>(TV_INT(m_start_input),TV_INT(m_end_input)),initialize_using_initialization_value,initialization_value);}
-
     ARRAY(const ARRAY& old_array,const bool initialize_with_old_array=true)
     {Initialize(old_array.domain,false,T());if(initialize_with_old_array) array=old_array.array;}
 
@@ -81,14 +75,6 @@ public:
     {STATIC_ASSERT(is_same<ELEMENT,typename T_ARRAY1::ELEMENT>::value);
     Resize_In_Place(source.Domain_Indices());
     ARRAY_BASE<T,BASE,TV_INT>::operator=(source);return *this;}
-
-    void Resize(int m_start_new,int m_end_new,int n_start_new,int n_end_new,const bool initialize_new_elements=true,
-        const bool copy_existing_elements=true,const T& initialization_value=T())
-    {STATIC_ASSERT(d==2);RANGE<TV_INT> box(TV_INT(m_start_new,n_start_new),TV_INT(m_end_new,n_end_new));Resize(box,initialize_new_elements,copy_existing_elements,initialization_value);}
-
-    void Resize(int m_start_new,int m_end_new,const bool initialize_new_elements=true,
-        const bool copy_existing_elements=true,const T& initialization_value=T())
-    {STATIC_ASSERT(d==1);RANGE<TV_INT> box((TV_INT(m_start_new)),TV_INT(m_end_new));Resize(box,initialize_new_elements,copy_existing_elements,initialization_value);}
 
     void Resize(const RANGE<TV_INT>& box,const bool initialize_new_elements=true,const bool copy_existing_elements=true,const T& initialization_value=T())
     {if(box==domain) return;

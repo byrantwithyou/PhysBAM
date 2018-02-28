@@ -42,7 +42,7 @@ Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& imag
     ARRAY<VECTOR<T,d> ,VECTOR<int,2> > *corrected_image=0; // may need to shift image to be (0,0) based, or to gamma correct it
     VECTOR<int,2> counts=image.domain.Edge_Lengths();
     if(gamma!=1 || image.domain.min_corner.x!=0 || image.domain.min_corner.y!=0 || dither_amplitude>0){
-        corrected_image=new ARRAY<VECTOR<T,d> ,VECTOR<int,2> >(0,counts.x,0,counts.y,false);
+        corrected_image=new ARRAY<VECTOR<T,d> ,VECTOR<int,2> >(counts,false);
         ARRAY<VECTOR<T,d> ,VECTOR<int,2> >::Shifted_Get(*corrected_image,image,VECTOR<int,2>(image.domain.min_corner.x,image.domain.min_corner.y));
         T one_over_gamma=1/gamma;
         for(int t=0;t<corrected_image->array.Size();t++){

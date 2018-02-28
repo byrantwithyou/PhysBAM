@@ -270,9 +270,11 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         matrix_index_to_cell_index_array.Resize(number_of_regions);
         cell_index_to_matrix_index.Resize(grid.Domain_Indices(1));
         cell_index_to_matrix_index.Fill(-1);
-        ARRAY<int,VECTOR<int,1> > filled_region_cell_count(-2,number_of_regions);
-        A_array.Resize(number_of_regions);b_array.Resize(number_of_regions);
-        for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()) filled_region_cell_count(poisson.filled_region_colors(iterator.Cell_Index()))++;
+        ARRAY<int,VECTOR<int,1> > filled_region_cell_count(RANGE<VECTOR<int,1> >(VECTOR<int,1>(-2),VECTOR<int,1>(number_of_regions)));
+        A_array.Resize(number_of_regions);
+        b_array.Resize(number_of_regions);
+        for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next())
+            filled_region_cell_count(poisson.filled_region_colors(iterator.Cell_Index()))++;
         for(int color=0;color<number_of_regions;color++) if(poisson.filled_region_touches_dirichlet(color)||poisson.solve_neumann_regions){
             matrix_index_to_cell_index_array(color).Resize(filled_region_cell_count(color));}
         filled_region_cell_count.Fill(0); // reusing this array in order to make the indirection arrays

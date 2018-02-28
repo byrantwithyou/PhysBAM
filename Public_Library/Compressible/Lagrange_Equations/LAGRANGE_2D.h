@@ -27,6 +27,8 @@ namespace PhysBAM{
 template<class T>
 class LAGRANGE_2D:public LAGRANGE<T>
 {
+    typedef VECTOR<int,2> TV_INT;
+    typedef VECTOR<T,2> TV;
 public:
     using LAGRANGE<T>::eos;
 
@@ -48,8 +50,8 @@ public:
 
 public:
     LAGRANGE_2D(EOS<T>& eos_input,GRID_LAGRANGE_2D<T>& grid_input,ARRAY<T,VECTOR<int,2> >& mass_input,ARRAY<T,VECTOR<int,2> >& u_input,ARRAY<T,VECTOR<int,2> >& v_input,ARRAY<T,VECTOR<int,2> >& energy_input)
-        :LAGRANGE<T>(eos_input),grid(grid_input),mass(mass_input),u(u_input),v(v_input),energy(energy_input),external_force_x(1,grid.m,1,grid.n),external_force_y(1,grid.m,1,grid.n),
-        fixed_velocity(1,grid.m,1,grid.n),external_u(1,grid.m,1,grid.n),external_v(1,grid.m,1,grid.n),L1_not(1,grid.m-1,1,grid.n),L2_not(1,grid.m,1,grid.n-1)
+        :LAGRANGE<T>(eos_input),grid(grid_input),mass(mass_input),u(u_input),v(v_input),energy(energy_input),external_force_x(TV_INT(grid.m,grid.n)),external_force_y(TV_INT(grid.m,grid.n)),
+        fixed_velocity(TV_INT(grid.m,grid.n)),external_u(TV_INT(grid.m,grid.n)),external_v(TV_INT(grid.m,grid.n)),L1_not(TV_INT(grid.m-1,grid.n)),L2_not(TV_INT(grid.m,grid.n-1))
     {
         material_strength=0;
         artificial_viscosity=&artificial_viscosity_default;

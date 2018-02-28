@@ -39,7 +39,7 @@ Initialize(const std::string& filename,const T max_phi)
 {
     ARRAY<VECTOR<T,3> ,VECTOR<int,2> > pixels;
     IMAGE<T>::Read(filename,pixels);grid.Initialize(pixels.Size(),RANGE<VECTOR<T,2> >::Unit_Box());
-    normals.Resize(pixels.domain.min_corner.x,pixels.domain.max_corner.x,pixels.domain.min_corner.y,pixels.domain.max_corner.y);
+    normals.Resize(pixels.domain);
     // convert each RGB value to its corresponding normal value
     for(int i=normals.domain.min_corner.x;i<normals.domain.max_corner.x;++i)
         for(int j=normals.domain.min_corner.y;j<normals.domain.max_corner.y;++j)

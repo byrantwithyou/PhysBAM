@@ -23,7 +23,7 @@ Read(const std::string& filename,ARRAY<VECTOR<T,3> ,VECTOR<int,2> >& image)
 {
     std::istream* input=Safe_Open_Input_Raw(filename);
     BMP_HEADER header;Read_Binary<T>(*input,header);
-    image.Resize(0,header.w,0,header.h,false,false);
+    image.Resize(VECTOR<int,2>(header.w,header.h),false,false);
     int line_width=header.w*3,line_padding=((line_width+3)&~3)-line_width;
     input->seekg(header.offset,std::ios::beg);
     VECTOR<unsigned char,3> color_byte;

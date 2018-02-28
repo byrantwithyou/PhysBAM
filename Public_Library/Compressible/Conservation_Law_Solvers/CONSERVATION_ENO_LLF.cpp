@@ -38,8 +38,8 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
     int number_ghost_cells=3;
     int start_index_ghost=U.domain.min_corner.x,end_index_ghost=U.domain.max_corner.x;
     // divided differences    
-    ARRAY<TV_DIMENSION,VECTOR<int,2> > DU(start_index_ghost,end_index_ghost,0,eno_order),DF(start_index_ghost,end_index_ghost,0,eno_order);
-    ARRAY<TV_DIMENSION,VECTOR<int,1> > F(start_index_ghost,end_index_ghost);
+    ARRAY<TV_DIMENSION,VECTOR<int,2> > DU(RANGE<VECTOR<int,2> >(VECTOR<int,2>(start_index_ghost,0),VECTOR<int,2>(end_index_ghost,eno_order))),DF(DU.domain);
+    ARRAY<TV_DIMENSION,VECTOR<int,1> > F(U.domain);
     if(use_face_velocity_for_fluxes) eigensystem.Flux_Divided_By_Velocity(m,U,F,U_flux);
     else eigensystem.Flux(m,U,F,U_flux);
     for(int i=start_index_ghost;i<end_index_ghost;i++){DU(i,0)=U(i);DF(i,0)=F(i);}
@@ -47,7 +47,8 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
         DU(i,j)=(DU(i+1,j-1)-DU(i,j-1))/((j+1)*dx);DF(i,j)=(DF(i+1,j-1)-DF(i,j-1))/((j+1)*dx);}
 
     int start_index=U.domain.min_corner.x+number_ghost_cells,end_index=U.domain.max_corner.x-number_ghost_cells;
-    ARRAY<bool,VECTOR<int,1> > psi_ghost(start_index-1,end_index+1);ARRAY<bool,VECTOR<int,1> >::Put(psi,psi_ghost);
+    ARRAY<bool,VECTOR<int,1> > psi_ghost(U.domain.Thickened(number_ghost_cells+1));
+    ARRAY<bool,VECTOR<int,1> >::Put(psi,psi_ghost);
     VECTOR<T,d> lambda,lambda_left,lambda_right;
 
     // get globally max alpha
@@ -59,9 +60,9 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
             T alpha=Alpha(lambda_left,lambda_right,k,d);
             max_alpha[k]=max(max_alpha[k],alpha);}}
 
-    ARRAY<TV_DIMENSION,VECTOR<int,1> > flux(U.domain.min_corner.x+2,U.domain.max_corner.x-3); // fluxes to the right of each point
+    ARRAY<TV_DIMENSION,VECTOR<int,1> > flux(U.domain.Thickened(3)); // fluxes to the right of each point
     MATRIX<T,d,d> L,R;
-    ARRAY<TV_DIMENSION,VECTOR<int,2> > LDU(start_index_ghost,end_index_ghost,0,eno_order),LDF(start_index_ghost,end_index_ghost,0,eno_order);
+    ARRAY<TV_DIMENSION,VECTOR<int,2> > LDU(DU.domain),LDF(DU.domain);
     const bool all_eigenvalues_same=eigensystem.All_Eigenvalues_Same();
     for(int i=start_index-1;i<end_index;i++) if(psi_ghost(i) || psi_ghost(i+1)){ // compute flux
         // transfer the divided differences into the characteristic fields

@@ -28,7 +28,7 @@ Calculate_Radiance_Spectrum(const T temperature,const GRID<VECTOR<T,1> >& grid,A
 template<class T> VECTOR<T,3> BLACKBODY<T>::
 Calculate_XYZ(const T temperature) const
 {
-    ARRAY<T,VECTOR<int,1> > radiance_spectrum(0,cie.grid.counts.x);
+    ARRAY<T,VECTOR<int,1> > radiance_spectrum(cie.grid.counts);
     Calculate_Radiance_Spectrum(temperature,cie.grid,radiance_spectrum);
     return cie.Calculate_XYZ(radiance_spectrum);
 }

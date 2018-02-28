@@ -17,6 +17,8 @@ namespace PhysBAM{
 template<class T>
 class ARTIFICIAL_VISCOSITY_VNR_2D:public ARTIFICIAL_VISCOSITY_2D<T>
 {
+    typedef VECTOR<int,2> TV_INT;
+    typedef VECTOR<T,2> TV;
 private:
     using ARTIFICIAL_VISCOSITY_2D<T>::limiter;
 

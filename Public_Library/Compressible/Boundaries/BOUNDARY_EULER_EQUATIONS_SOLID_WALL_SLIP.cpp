@@ -91,7 +91,7 @@ Attenuate_To_Far_Field_Values_Using_Characteristics(const T_ARRAYS_DIMENSION_BAS
     // extract a 1d array
     int min_index=u_ghost.Domain_Indices().min_corner[axis],max_index=u_ghost.Domain_Indices().max_corner[axis];
     TV_INT current_index=node_index;
-    ARRAY<TV_DIMENSION,VECTOR<int,1> > U_1d(min_index,max_index);
+    ARRAY<TV_DIMENSION,VECTOR<int,1> > U_1d(u_ghost.Domain_Indices().Dimension_Range(axis));
     for(int i=min_index;i<max_index;i++){current_index[axis]=i;U_1d(i)=u_ghost(current_index);}
 
     // apply L

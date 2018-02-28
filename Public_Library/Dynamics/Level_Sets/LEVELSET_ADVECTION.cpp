@@ -63,7 +63,8 @@ HJ_WENO(const int m,const T dx,const ARRAY<T,VECTOR<int,1> >& phi,ARRAY<T,VECTOR
 {
     T epsilon=(T)1e-6; // works only because phi is a distance function
     T one_over_dx=1/dx;
-    ARRAY<T,VECTOR<int,1> > D0(-2,m+2);for(int i=-3;i<m+2;i++) D0(i)=(phi(i+1)-phi(i))*one_over_dx; // 1st divided difference
+    ARRAY<T,VECTOR<int,1> > D0(RANGE<VECTOR<int,1> >(VECTOR<int,1>(-2),VECTOR<int,1>(m+2)));
+    for(int i=-3;i<m+2;i++) D0(i)=(phi(i+1)-phi(i))*one_over_dx; // 1st divided difference
     for(int i=0;i<m;i++){
         phix_minus(i)=ADVECTION_SEPARABLE_UNIFORM<TV,T>::WENO(D0(i-3),D0(i-2),D0(i-1),D0(i),D0(i+1),epsilon);
         phix_plus(i)=ADVECTION_SEPARABLE_UNIFORM<TV,T>::WENO(D0(i+2),D0(i+1),D0(i),D0(i-1),D0(i-2),epsilon);}
@@ -76,7 +77,9 @@ template<class TV> void LEVELSET_ADVECTION<TV>::
 HJ_ENO(const int order,const int m,const T dx,const ARRAY<T,VECTOR<int,1> >& phi,ARRAY<T,VECTOR<int,1> >& phix_minus,ARRAY<T,VECTOR<int,1> >& phix_plus) const
 {
     T one_over_dx=1/dx,one_over_two_dx=(T).5*one_over_dx,one_over_three_dx=((T)1/3)*one_over_dx;
-    ARRAY<T,VECTOR<int,1> > D0(-2,m+2),D1(-2,m+1),D2(-2,m); // divided differences
+    ARRAY<T,VECTOR<int,1> > D0(RANGE<VECTOR<int,1> >(VECTOR<int,1>(-2),VECTOR<int,1>(m+2)));
+    ARRAY<T,VECTOR<int,1> > D1(RANGE<VECTOR<int,1> >(VECTOR<int,1>(-2),VECTOR<int,1>(m+1)));
+    ARRAY<T,VECTOR<int,1> > D2(RANGE<VECTOR<int,1> >(VECTOR<int,1>(-2),VECTOR<int,1>(m)));
     for(int i=-3;i<m+2;i++) D0(i)=(phi(i+1)-phi(i))*one_over_dx;
     if(order >= 2) for(int i=-3;i<m+1;i++) D1(i)=(D0(i+1)-D0(i))*one_over_two_dx;
     if(order == 3) for(int i=-3;i<m;i++) D2(i)=(D1(i+1)-D1(i))*one_over_three_dx;
@@ -186,7 +189,9 @@ Euler_Step_High_Order(const GRID<TV>& grid,const ARRAY<TV,TV_INT>& V,const ARRAY
 {
     int ghost_cells=3;
     for(int d=0;d<TV::m;d++){
-        ARRAY<T,VECTOR<int,1> > phi_1d(-ghost_cells,grid.counts(d)+ghost_cells),u_1d(0,grid.counts(d)),distance_1d(0,grid.counts(d)),u_phix_1d(0,grid.counts(d));
+        ARRAY<T,VECTOR<int,1> > phi_1d(grid.Domain_Indices(ghost_cells).Dimension_Range(d));
+        ARRAY<T,VECTOR<int,1> > u_1d(grid.Domain_Indices().Dimension_Range(d));
+        ARRAY<T,VECTOR<int,1> > distance_1d(u_1d.domain),u_phix_1d(u_1d.domain);
         for(RANGE_ITERATOR<TV::m-1> it(grid.Domain_Indices().Remove_Dimension(d));it.Valid();it.Next()){
             for(int i=-ghost_cells;i<grid.counts(d)+ghost_cells;i++) phi_1d(i)=phi_ghost(it.index.Insert(i,d));
             for(int i=0;i<grid.counts(d);i++){TV_INT ind(it.index.Insert(i,d));u_1d(i)=V(ind).x;distance_1d(i)=phi(ind);}

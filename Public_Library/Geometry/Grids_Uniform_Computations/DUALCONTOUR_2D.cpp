@@ -18,7 +18,7 @@ Generate_Topology()
 {
     int m=levelset.grid.counts.x,n=levelset.grid.counts.y;
     topology.Preallocate(5000);
-    vertices.Resize(0,m-1,0,n-1);
+    vertices.Resize(levelset.grid.counts-1);
     TV_INT i;
     for(i.x=0;i.x<m-1;i.x++)for(i.y=1;i.y<n-1;i.y++){ // generate one segment per x edge
         T phi1=levelset.phi(i),phi2=levelset.phi(i.x+1,i.y);

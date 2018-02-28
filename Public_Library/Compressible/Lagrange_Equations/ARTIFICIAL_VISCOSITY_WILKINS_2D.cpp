@@ -12,22 +12,23 @@ using namespace PhysBAM;
 // Function Artificial_Viscosity
 //#####################################################################
 template<class T> void ARTIFICIAL_VISCOSITY_WILKINS_2D<T>::
-Get_Artificial_Viscosity(EOS<T>& eos,GRID_LAGRANGE_2D<T>& grid,const ARRAY<T,VECTOR<int,2> >& mass,
-                                      const ARRAY<T,VECTOR<int,2> >& u,const ARRAY<T,VECTOR<int,2> >& v,const ARRAY<T,VECTOR<int,2> >& energy,
-                                      ARRAY<T,VECTOR<int,2> >& Q0,ARRAY<T,VECTOR<int,2> >& Q1,ARRAY<T,VECTOR<int,2> >& Q2,ARRAY<T,VECTOR<int,2> >& Q3)
+Get_Artificial_Viscosity(EOS<T>& eos,GRID_LAGRANGE_2D<T>& grid,const ARRAY<T,TV_INT>& mass,
+    const ARRAY<T,TV_INT>& u,const ARRAY<T,TV_INT>& v,const ARRAY<T,TV_INT>& energy,
+    ARRAY<T,TV_INT>& Q0,ARRAY<T,TV_INT>& Q1,ARRAY<T,TV_INT>& Q2,ARRAY<T,TV_INT>& Q3)
 {
     int i,j;
     int m=grid.m,n=grid.n; 
+    TV_INT size(m,n);
     
     // get grid information
-    ARRAY<T,VECTOR<int,2> > AA0(0,m-1,0,n-1),AA1(0,m-1,0,n-1),AA2(0,m-1,0,n-1),AA3(0,m-1,0,n-1);
+    ARRAY<T,TV_INT> AA0(size-1),AA1(size-1),AA2(size-1),AA3(size-1);
     grid.Get_Sub_Zone_Areas(AA0,AA1,AA2,AA3);
-    ARRAY<T,VECTOR<int,2> > NN1_x(0,m-1,0,n-1),NN1_y(0,m-1,0,n-1),NN2_x(0,m-1,0,n-1),NN2_y(0,m-1,0,n-1),
-                      NN3_x(0,m-1,0,n-1),NN3_y(0,m-1,0,n-1),NN4_x(0,m-1,0,n-1),NN4_y(0,m-1,0,n-1);
+    ARRAY<T,TV_INT> NN1_x(size-1),NN1_y(size-1),NN2_x(size-1),NN2_y(size-1),
+                      NN3_x(size-1),NN3_y(size-1),NN4_x(size-1),NN4_y(size-1);
     grid.Get_Sub_Zone_Normals(NN1_x,NN1_y,NN2_x,NN2_y,NN3_x,NN3_y,NN4_x,NN4_y);                  
 
     // find the density at each node
-    ARRAY<T,VECTOR<int,2> > density(0,m,0,n),M_node(0,m,0,n),A_node(0,m,0,n);
+    ARRAY<T,TV_INT> density(size),M_node(size),A_node(size);
     for(i=0;i<m-1;i++) for(j=0;j<n-1;j++){
         T mass_over_4=mass(i,j)/4;
         M_node(i,j)+=mass_over_4;M_node(i+1,j)+=mass_over_4;M_node(i,j+1)+=mass_over_4;M_node(i+1,j+1)+=mass_over_4;
@@ -35,19 +36,19 @@ Get_Artificial_Viscosity(EOS<T>& eos,GRID_LAGRANGE_2D<T>& grid,const ARRAY<T,VEC
     for(i=0;i<m;i++) for(j=0;j<n;j++) density(i,j)=M_node(i,j)/A_node(i,j);
     
     // find the sound speed at each node
-    ARRAY<T,VECTOR<int,2> > sound_speed(0,m,0,n),e_node(0,m,0,n);
+    ARRAY<T,TV_INT> sound_speed(size),e_node(size);
     for(i=0;i<m-1;i++) for(j=0;j<n-1;j++){
         T e_corner=energy(i,j)*mass(i,j)/4;
         e_node(i,j)+=e_corner;e_node(i+1,j)+=e_corner;e_node(i,j+1)+=e_corner;e_node(i+1,j+1)+=e_corner;}
     for(i=0;i<m;i++) for(j=0;j<n;j++) sound_speed(i,j)=eos.c(density(i,j),e_node(i,j)/M_node(i,j));
     
     // find jumps in the velocity
-    ARRAY<T,VECTOR<int,2> > u_jump1(0,m-1,0,n),v_jump1(0,m-1,0,n),velocity_jump1(0,m-1,0,n),V1_x(0,m-1,0,n),V1_y(0,m-1,0,n);
+    ARRAY<T,TV_INT> u_jump1(TV_INT(m-1,n)),v_jump1(TV_INT(m-1,n)),velocity_jump1(TV_INT(m-1,n)),V1_x(TV_INT(m-1,n)),V1_y(TV_INT(m-1,n));
     for(i=0;i<m-1;i++) for(j=0;j<n;j++){
         u_jump1(i,j)=u(i+1,j)-u(i,j);v_jump1(i,j)=v(i+1,j)-v(i,j);velocity_jump1(i,j)=sqrt(sqr(u_jump1(i,j))+sqr(v_jump1(i,j)));
         if(abs(velocity_jump1(i,j)) <= 1e-8*maxabs(u(i,j),v(i,j),u(i+1,j),v(i+1,j))){V1_x(i,j)=0;V1_y(i,j)=0;}
         else{V1_x(i,j)=u_jump1(i,j)/velocity_jump1(i,j);V1_y(i,j)=v_jump1(i,j)/velocity_jump1(i,j);}}
-    ARRAY<T,VECTOR<int,2> > u_jump2(0,m,0,n-1),v_jump2(0,m,0,n-1),velocity_jump2(0,m,0,n-1),V2_x(0,m,0,n-1),V2_y(0,m,0,n-1);
+    ARRAY<T,TV_INT> u_jump2(TV_INT(m,n-1)),v_jump2(TV_INT(m,n-1)),velocity_jump2(TV_INT(m,n-1)),V2_x(TV_INT(m,n-1)),V2_y(TV_INT(m,n-1));
     for(i=0;i<m;i++) for(j=0;j<n-1;j++){
         u_jump2(i,j)=u(i,j+1)-u(i,j);v_jump2(i,j)=v(i,j+1)-v(i,j);velocity_jump2(i,j)=sqrt(sqr(u_jump2(i,j))+sqr(v_jump2(i,j)));
         if(abs(velocity_jump2(i,j)) <= 1e-8*maxabs(u(i,j),v(i,j),u(i,j+1),v(i,j+1))){V2_x(i,j)=0;V2_y(i,j)=0;}

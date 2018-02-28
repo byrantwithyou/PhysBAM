@@ -38,7 +38,7 @@ Euler_Step(const T dt,const T time)
     VECTOR<EIGENSYSTEM<T,4>*,2> eigensystem(&eigensystem_F,&eigensystem_G);
     if(cut_out_grid) conservation->Update_Conservation_Law(grid,U,U_ghost,*psi_pointer,dt,eigensystem,eigensystem,psi_N,face_velocities);
     else{ // not a cut out grid
-        ARRAY<bool,VECTOR<int,2> > psi(0,m,0,n);psi.Fill(1);
+        ARRAY<bool,VECTOR<int,2> > psi(TV_INT(m,n));psi.Fill(1);
         conservation->Update_Conservation_Law(grid,U,U_ghost,psi,dt,eigensystem,eigensystem,psi_N,face_velocities);}
 
     // add source terms

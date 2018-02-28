@@ -20,7 +20,7 @@ Read(const std::string& filename,ARRAY<VECTOR<T,3> ,VECTOR<int,2> >& image)
     std::istream* input(Safe_Open_Input_Raw(filename,true));
     RGB_HEADER header;
     Read_Binary<T>(*input,header);
-    image.Resize(0,header.width,0,header.height);unsigned char byte;
+    image.Resize(VECTOR<int,2>(header.width,header.height));unsigned char byte;
     VECTOR<int,2> counts=image.domain.Edge_Lengths();
     if(!header.compression){
         VECTOR<unsigned char,3> color_byte;

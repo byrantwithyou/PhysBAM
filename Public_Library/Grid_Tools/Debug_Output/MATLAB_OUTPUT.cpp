@@ -49,7 +49,8 @@ template<class T> void MATLAB_OUTPUT::
 Write_Header_File(const std::string& file_name,const GRID<VECTOR<T,1> >& grid,const int stepnumber)
 {
     int m=grid.counts.x;
-    ARRAY<T,VECTOR<int,1> > x(0,m);for(int i=0;i<m;i++) x(i)=grid.X(VECTOR<int,1>(i)).x;
+    ARRAY<T,VECTOR<int,1> > x(grid.counts);
+    for(int i=0;i<m;i++) x(i)=grid.X(VECTOR<int,1>(i)).x;
     Write_Header_File(file_name,x,stepnumber);
 }
 //#####################################################################
@@ -72,7 +73,8 @@ template<class T> void MATLAB_OUTPUT::
 Write_Header_File(const std::string& file_name,const GRID<VECTOR<T,2> >& grid,const int stepnumber)
 {
     int m=grid.counts.x,n=grid.counts.y;
-    ARRAY<T,VECTOR<int,2> > x(0,m,0,n),y(0,m,0,n);for(int i=0;i<m;i++) for(int j=0;j<n;j++){x(i,j)=grid.X(VECTOR<int,2>(i,j)).x;y(i,j)=grid.X(VECTOR<int,2>(i,j)).y;}
+    ARRAY<T,VECTOR<int,2> > x(grid.counts),y(grid.counts);
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++){x(i,j)=grid.X(VECTOR<int,2>(i,j)).x;y(i,j)=grid.X(VECTOR<int,2>(i,j)).y;}
     Write_Header_File(file_name,x,y,stepnumber);
 }
 //#####################################################################

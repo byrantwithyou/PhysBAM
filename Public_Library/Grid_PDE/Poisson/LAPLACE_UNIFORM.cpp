@@ -43,8 +43,9 @@ Solve(const T time,const bool solution_regions_already_computed)
     ARRAY<ARRAY<TV_INT> > matrix_index_to_cell_index_array(number_of_regions);
     T_ARRAYS_INT cell_index_to_matrix_index(grid.Domain_Indices(1));
     cell_index_to_matrix_index.Fill(-1);
-    ARRAY<int,VECTOR<int,1> > filled_region_cell_count(-2,number_of_regions);
-    ARRAY<SPARSE_MATRIX_FLAT_MXN<T> > A_array(number_of_regions);ARRAY<ARRAY<T> > b_array(number_of_regions);
+    ARRAY<int,VECTOR<int,1> > filled_region_cell_count(RANGE<VECTOR<int,1> >(VECTOR<int,1>(-2),VECTOR<int,1>(number_of_regions)));
+    ARRAY<SPARSE_MATRIX_FLAT_MXN<T> > A_array(number_of_regions);
+    ARRAY<ARRAY<T> > b_array(number_of_regions);
     for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()) filled_region_cell_count(filled_region_colors(iterator.Cell_Index()))++;
     for(int color=0;color<number_of_regions;color++) if(filled_region_touches_dirichlet(color)||solve_neumann_regions){
         matrix_index_to_cell_index_array(color).Resize(filled_region_cell_count(color));}

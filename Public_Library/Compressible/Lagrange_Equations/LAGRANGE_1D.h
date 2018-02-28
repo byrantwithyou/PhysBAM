@@ -46,8 +46,8 @@ public:
 
 public:
     LAGRANGE_1D(EOS<T>& eos_input,GRID_LAGRANGE_1D<T>& grid_input,ARRAY<T,VECTOR<int,1> >& mass_input,ARRAY<T,VECTOR<int,1> >& velocity_input,ARRAY<T,VECTOR<int,1> >& energy_input)
-        :LAGRANGE<T>(eos_input),grid(grid_input),mass(mass_input),velocity(velocity_input),energy(energy_input),external_force(1,grid.m),
-        fixed_velocity(1,grid.m),external_velocity(1,grid.m),L_not(1,grid.m-1)
+        :LAGRANGE<T>(eos_input),grid(grid_input),mass(mass_input),velocity(velocity_input),energy(energy_input),external_force(VECTOR<int,1>(grid.m)),
+        fixed_velocity(VECTOR<int,1>(grid.m)),external_velocity(VECTOR<int,1>(grid.m)),L_not(VECTOR<int,1>(grid.m-1))
     {
         material_strength=0;
         artificial_viscosity=&artificial_viscosity_default;

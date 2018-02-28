@@ -103,15 +103,21 @@ Compute_Flux_Without_Clamping(const GRID<TV>& grid,const T_ARRAYS_DIMENSION_SCAL
     FLOOD_FILL<1> find_connected_components;
 
     for(int axis=0;axis<TV::m;axis++){
+        RANGE<VECTOR<int,1> > U_range=U_domain_indices.Dimension_Range(axis);
+        RANGE<VECTOR<int,1> > U_range_ext=U_range;
+        RANGE<VECTOR<int,1> > U_range_less=U_range;
+        U_range_ext.max_corner.x++;
+        U_range_less.min_corner.x--;
+        RANGE<VECTOR<int,1> > U_ghost_range=U_ghost_domain_indices.Dimension_Range(axis);
         U_start=U_domain_indices.min_corner(axis);U_end=U_domain_indices.max_corner(axis);
         U_ghost_start=U_ghost_domain_indices.min_corner(axis);U_ghost_end=U_ghost_domain_indices.max_corner(axis);
-        ARRAY<TV_DIMENSION,VECTOR<int,1> > U_1d_axis(U_ghost_start,U_ghost_end),flux_axis_1d(U_start,U_end);
-        if(U_ghost_clamped) U_flux_1d_axis.Resize(U_ghost_start,U_ghost_end);
-        ARRAY<bool,VECTOR<int,1> > psi_axis(U_start,U_end),psi_N_axis(U_start,U_end+1);
+        ARRAY<TV_DIMENSION,VECTOR<int,1> > U_1d_axis(U_ghost_range),flux_axis_1d(U_range);
+        if(U_ghost_clamped) U_flux_1d_axis.Resize(U_ghost_range);
+        ARRAY<bool,VECTOR<int,1> > psi_axis(U_range),psi_N_axis(U_range_ext);
         VECTOR<bool,2> outflow_boundaries_axis(outflow_boundaries(2*axis),outflow_boundaries(2*axis+1));
-        ARRAY<int,VECTOR<int,1> > filled_region_colors(U_start,U_end);filled_region_colors.Fill(-1);
-        ARRAY<bool,VECTOR<int,1> > psi_axis_current_component(U_start,U_end);
-        if(save_fluxes) flux_temp.Resize(U_start-1,U_end,true,false);
+        ARRAY<int,VECTOR<int,1> > filled_region_colors(U_range);filled_region_colors.Fill(-1);
+        ARRAY<bool,VECTOR<int,1> > psi_axis_current_component(U_range);
+        if(save_fluxes) flux_temp.Resize(U_range_less,true,false);
         GRID<TV_LOWER_DIM> lower_dimension_grid=grid.Remove_Dimension(axis);
         for(CELL_ITERATOR<TV_LOWER_DIM> iterator(lower_dimension_grid);iterator.Valid();iterator.Next()){VECTOR<int,TV::m-1> cell_index=iterator.Cell_Index();
             VECTOR<int,3> slice_index;TV_INT cell_index_full_dimension=cell_index.Insert(0,axis);
@@ -130,11 +136,10 @@ Compute_Flux_Without_Clamping(const GRID<TV>& grid,const T_ARRAYS_DIMENSION_SCAL
                 for(int i=U_start;i<U_end;i++) psi_axis_current_component(i)=(filled_region_colors(i)==color);
                 VECTOR<int,2> region_boundary=find_connected_components.region_boundaries(color);
                 VECTOR<bool,2> psi_N_boundary(psi_N_axis(region_boundary.x),psi_N_axis(region_boundary.y+1));
-                if(thinshell) object_boundary->Fill_Ghost_Cells_Neumann(grid.Get_1D_Grid(axis),U_1d_axis,face_velocities,cell_index,axis,order,use_exact_neumann_face_location,
-                    VECTOR<int,2>(U_start,U_end),find_connected_components.region_boundaries(color),psi_N_boundary,callbacks);
+                if(thinshell) object_boundary->Fill_Ghost_Cells_Neumann(grid.Get_1D_Grid(axis),U_1d_axis,face_velocities,cell_index,axis,order,use_exact_neumann_face_location,VECTOR<int,2>(U_range.min_corner.x,U_range.max_corner.x),find_connected_components.region_boundaries(color),psi_N_boundary,callbacks);
                 if(U_ghost_clamped)
                     if(thinshell) object_boundary->Fill_Ghost_Cells_Neumann(grid.Get_1D_Grid(axis),U_flux_1d_axis,face_velocities,cell_index,axis,order,use_exact_neumann_face_location,
-                        VECTOR<int,2>(U_start,U_end),find_connected_components.region_boundaries(color),psi_N_boundary,callbacks);
+                        VECTOR<int,2>(U_range.min_corner.x,U_range.max_corner.x),find_connected_components.region_boundaries(color),psi_N_boundary,callbacks);
                 VECTOR<bool,2> outflow_boundaries_current_component;
                 outflow_boundaries_current_component(0)=outflow_boundaries_axis(0)&&(!psi_N_boundary(0));outflow_boundaries_current_component(0)=outflow_boundaries_axis(0)&&(!psi_N_boundary(0));
                 (eigensystems[axis])->slice_index=slice_index;(eigensystems_explicit[axis])->slice_index=slice_index;

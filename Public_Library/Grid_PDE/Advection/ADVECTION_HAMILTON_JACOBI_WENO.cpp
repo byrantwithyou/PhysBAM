@@ -14,7 +14,11 @@ template<class TV,class T2> void ADVECTION_HAMILTON_JACOBI_WENO<TV,T2>::
 Advection_Solver(const int m,const T dx,const ARRAY<T2,VECTOR<int,1> >& Z,const ARRAY<T,VECTOR<int,1> >& u,ARRAY<T2,VECTOR<int,1> >& u_Zx)
 {      
     int i;T one_over_dx=1/dx;
-    ARRAY<T2,VECTOR<int,1> > D0(-2,m+2);for(i=-3;i<m+2;i++) D0(i)=(Z(i+1)-Z(i))*one_over_dx;
+    RANGE<VECTOR<int,1> > R;
+    R.min_corner.x=-2;
+    R.max_corner.x=m+2;
+    ARRAY<T2,VECTOR<int,1> > D0(R);
+    for(i=-3;i<m+2;i++) D0(i)=(Z(i+1)-Z(i))*one_over_dx;
 
     if(compute_epsilon){
         epsilon=(T)1e-6*sqr(D0.Max_Abs());

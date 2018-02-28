@@ -17,6 +17,8 @@ namespace PhysBAM{
 template<class T>
 class ARTIFICIAL_VISCOSITY_WILKINS_2D:public ARTIFICIAL_VISCOSITY_2D<T>
 {
+    typedef VECTOR<int,2> TV_INT;
+    typedef VECTOR<T,2> TV;
 private:
     using ARTIFICIAL_VISCOSITY_2D<T>::limiter;
 
@@ -37,8 +39,8 @@ public:
     {quadratic_constant=quadratic_constant_input;}
 
 //#####################################################################
-    void Get_Artificial_Viscosity(EOS<T>& eos,GRID_LAGRANGE_2D<T>& grid,const ARRAY<T,VECTOR<int,2> >& mass,const ARRAY<T,VECTOR<int,2> >& u,const ARRAY<T,VECTOR<int,2> >& v,const ARRAY<T,VECTOR<int,2> >& energy,ARRAY<T,VECTOR<int,2> >& Q0,
-        ARRAY<T,VECTOR<int,2> >& Q1,ARRAY<T,VECTOR<int,2> >& Q2,ARRAY<T,VECTOR<int,2> >& Q3);
+    void Get_Artificial_Viscosity(EOS<T>& eos,GRID_LAGRANGE_2D<T>& grid,const ARRAY<T,TV_INT>& mass,const ARRAY<T,TV_INT>& u,const ARRAY<T,TV_INT>& v,const ARRAY<T,TV_INT>& energy,ARRAY<T,TV_INT>& Q0,
+        ARRAY<T,TV_INT>& Q1,ARRAY<T,TV_INT>& Q2,ARRAY<T,TV_INT>& Q3);
 //#####################################################################
 };
 }    

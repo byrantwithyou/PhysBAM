@@ -14,10 +14,9 @@ namespace PhysBAM{
 template<class T> void REACTIVE_EULER_1D<T>::
 Euler_Step(const T dt,const T time)
 {  
-    int m=grid.counts.x;
     int ghost_cells=3;
     
-    ARRAY<TV_DIMENSION,VECTOR<int,1> > U_ghost(-ghost_cells,m+ghost_cells);
+    ARRAY<TV_DIMENSION,VECTOR<int,1> > U_ghost(grid.Domain_Indices(ghost_cells));
     boundary->Fill_Ghost_Cells(grid,U,U_ghost,dt,time,ghost_cells);
     
     ARRAY<bool,FACE_INDEX<TV::m> > psi_N(grid.Get_MAC_Grid_At_Regular_Positions());
@@ -25,7 +24,8 @@ Euler_Step(const T dt,const T time)
     VECTOR<EIGENSYSTEM<T,4>*,1> eigensystem(&eigensystem_F);
     if(cut_out_grid) conservation->Update_Conservation_Law(grid,U,U_ghost,*psi_pointer,dt,eigensystem,eigensystem,psi_N,face_velocities);
     else{ // not a cut out grid
-        ARRAY<bool,VECTOR<int,1> > psi(0,m);psi.Fill(1);
+        ARRAY<bool,VECTOR<int,1> > psi(grid.counts);
+        psi.Fill(1);
         conservation->Update_Conservation_Law(grid,U,U_ghost,psi,dt,eigensystem,eigensystem,psi_N,face_velocities);}
 
     boundary->Apply_Boundary_Condition(grid,U,time+dt); 
@@ -38,7 +38,7 @@ CFL()
 {
     int m=grid.counts.x;T dx=grid.dX.x;
     
-    ARRAY<T,VECTOR<int,1> > u_minus_c(0,m),u_plus_c(0,m);
+    ARRAY<T,VECTOR<int,1> > u_minus_c(grid.counts),u_plus_c(grid.counts);
     for(int i=0;i<m;i++){
         if(!cut_out_grid || (cut_out_grid && (*psi_pointer)(i)==1)){
             T u=U(i)(1)/U(i)(0);

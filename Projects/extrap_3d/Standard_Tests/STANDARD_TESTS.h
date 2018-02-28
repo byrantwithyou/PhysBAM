@@ -2617,8 +2617,8 @@ T Contour_Crossing(const TV& g0,const TV& v0,const TV& g1,const TV& v1)
 void Add_Primary_Contour_Segments(ISOTROPIC_CONSTITUTIVE_MODEL<T,3>& icm)
 {
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-    ARRAY<TV,VECTOR<int,2> > evec(1,image_size,1,image_size);
-    ARRAY<TV,VECTOR<int,2> > grad(1,image_size,1,image_size);
+    ARRAY<TV,VECTOR<int,2> > evec(VECTOR<int,2>()+image_size);
+    ARRAY<TV,VECTOR<int,2> > grad(VECTOR<int,2>()+image_size);
     for(int i=0;i<image_size;i++)
         for(int j=0;j<image_size;j++){
             T x=(2*i-image_size)*sigma_range/image_size+1e-5;

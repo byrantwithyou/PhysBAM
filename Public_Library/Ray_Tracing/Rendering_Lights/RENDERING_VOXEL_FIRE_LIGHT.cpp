@@ -42,7 +42,7 @@ RENDERING_VOXEL_FIRE_LIGHT(RENDERING_UNIFORM_VOXELS<T>& fire_voxels_input,RENDER
     // generate cdf for Pr(z|x,y)
     PROGRESS_INDICATOR progress(grid.counts.x);
     LOG::cout<<"    Generating CDF for Pr(z|x,y)";
-    z_cdf.Resize(0,grid.counts.x,0,grid.counts.y);
+    z_cdf.Resize(grid.counts.Remove_Index(2));
     for(int i=0;i<grid.counts.x;i++){
         progress.Progress();
         for(int j=0;j<grid.counts.y;j++){
@@ -52,7 +52,7 @@ RENDERING_VOXEL_FIRE_LIGHT(RENDERING_UNIFORM_VOXELS<T>& fire_voxels_input,RENDER
     // generate cdf for Pr(y|x)
     progress.Initialize(grid.counts.x);
     LOG::cout<<"    Generating CDF for Pr(y|x)";
-    y_cdf.Resize(0,grid.counts.x);
+    y_cdf.Resize(VECTOR<int,1>()+grid.counts.x);
     for(int i=0;i<grid.counts.x;i++){
         progress.Progress();
         y_cdf(i).Initialize(grid.counts.y);

@@ -620,7 +620,7 @@ Set_Resolution(const int pixels_width,const int pixels_height)
 template<class T> void FILM<T>::
 Print_Film_Clipped(const std::string& filename,const T gamma,const RANGE<VECTOR<int,2> >& box) const
 {
-    ARRAY<VECTOR<T,4> ,VECTOR<int,2> > clipped(box.min_corner.x,box.max_corner.x,box.min_corner.y,box.max_corner.y);
+    ARRAY<VECTOR<T,4> ,VECTOR<int,2> > clipped(box);
         for(int i=box.min_corner.x;i<box.max_corner.x;i++) for(int j=box.min_corner.y;j<box.max_corner.y;j++) clipped(i,j)=colors(i,j).Append(alphas(i,j))/weights(i,j);
     IMAGE<T>::Write(filename,clipped,gamma,dither_amplitude);
 }

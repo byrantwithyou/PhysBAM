@@ -326,6 +326,9 @@ public:
     RANGE<VECTOR<T,d-1> > Remove_Dimension(int dimension) const
     {return RANGE<VECTOR<T,d-1> >(min_corner.Remove_Index(dimension),max_corner.Remove_Index(dimension));}
 
+    RANGE<VECTOR<T,1> > Dimension_Range(int dimension) const
+    {return RANGE<VECTOR<T,1> >(VECTOR<T,1>(min_corner(dimension)),VECTOR<T,1>(max_corner(dimension)));}
+
     VECTOR<T,TV::m-1> Principal_Curvatures(const TV& X) const
     {return VECTOR<T,TV::m-1>();}
 

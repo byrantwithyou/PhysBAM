@@ -63,7 +63,10 @@ Euler_Step_Of_Reinitialization(LEVELSET<TV>& levelset,const ARRAY<T,TV_INT>& sig
 
     for(int d=0;d<TV::m;d++){
         int m=grid.counts(d);
-        ARRAY<T,VECTOR<int,1> > phi_1d(-ghost_cells,m+3),distance_1d(0,m),phi_minus(0,m),phi_plus(0,m);
+        RANGE<VECTOR<int,1> > R;
+        R.min_corner.x=-ghost_cells;
+        R.max_corner.x=m+3;
+        ARRAY<T,VECTOR<int,1> > phi_1d(R),distance_1d(VECTOR<int,1>()+m),phi_minus(VECTOR<int,1>()+m),phi_plus(VECTOR<int,1>()+m);
         RANGE<TV_INT> range(TV_INT(),grid.counts);
         range.max_corner(d)=1;
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){

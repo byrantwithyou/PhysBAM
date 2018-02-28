@@ -54,7 +54,7 @@ OPENGL_WORLD()
     if(Opengl_World<T>()!=0) PHYSBAM_FATAL_ERROR(); 
     Opengl_World<T>()=this;
 
-    key_bindings.Resize(0,OPENGL_KEY::MAX_KEY_INDEX,0,OPENGL_KEY::MAX_MODIFIER_INDEX);
+    key_bindings.Resize(VECTOR<int,2>(OPENGL_KEY::MAX_KEY_INDEX,OPENGL_KEY::MAX_MODIFIER_INDEX));
 
     Set_Key_Binding_Category("Default Keys (OPENGL_WORLD)");
     Bind_Key("^q",{[this](){exit(0);},"Quit"});
@@ -1206,8 +1206,8 @@ Get_Image(ARRAY<VECTOR<T,d>,VECTOR<int,2> > &image,const bool use_back_buffer)
     glGetIntegerv(GL_VIEWPORT,vp);
     PHYSBAM_ASSERT(window->Width()==vp[2] && window->Height()==vp[3]);
 
-    ARRAY<VECTOR<float,d>,VECTOR<int,2> > temporary_image(0,window->Height(),0,window->Width());
-    image.Resize(0,window->Width(),0,window->Height()); // temporary is row major
+    ARRAY<VECTOR<float,d>,VECTOR<int,2> > temporary_image(VECTOR<int,2>(window->Height(),window->Width()));
+    image.Resize(VECTOR<int,2>(window->Width(),window->Height())); // temporary is row major
     glReadBuffer(use_back_buffer?GL_BACK:GL_FRONT);
     glReadPixels(0,0,window->Width(),window->Height(),d==3?GL_RGB:GL_RGBA,GL_FLOAT,temporary_image.array.Get_Array_Pointer());
     for(int i=0;i<window->Width();i++)

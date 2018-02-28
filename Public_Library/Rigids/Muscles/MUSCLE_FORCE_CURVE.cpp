@@ -71,7 +71,7 @@ Compute_Slopes(const GRID<VECTOR<T,1> >& grid,const ARRAY<T,VECTOR<int,1> >& val
 {
     assert(!grid.Is_MAC_Grid());
     slope_grid=grid.Get_MAC_Grid();
-    slopes.Resize(0,slope_grid.counts.x);
+    slopes.Resize(slope_grid.counts);
     for(int i=0;i<slopes.array.m;i++) slopes.array(i)=(values.array(i+1)-values.array(i))*grid.one_over_dX.x;
 }
 namespace PhysBAM{
