@@ -100,11 +100,12 @@ public:
         :base_pointer(array.base_pointer),buffer_size(array.buffer_size),m(array.m)
     {
         array.base_pointer=0;
+        array.m=0;
     }
 
     template<class T_ARRAY>
     explicit ARRAY(const ARRAY_BASE<T,T_ARRAY,ID>& array)
-        :base_pointer(0),buffer_size(array.Size()),m(array.Size())
+        :buffer_size(array.Size()),m(array.Size())
     {
         base_pointer=(T*)new unsigned char[sizeof(T)*Value(m)];
         for(int i=0,j=Value(m);i<j;i++) new(base_pointer+i)T(array(ID(i)));
@@ -132,41 +133,49 @@ public:
     const T& operator()(ID i) const
     {assert((unsigned)Value(i)<(unsigned)Value(m));return base_pointer[Value(i)];}
 
-    ARRAY& operator=(const ARRAY& source)
+    ARRAY& operator=(const ARRAY& array)
     {
-        if(buffer_size<source.m){
+        if(buffer_size<array.m){
             Call_Destructors_And_Free();
-            new(this)ARRAY(source);
+            buffer_size=m=array.m;
+            base_pointer=(T*)new unsigned char[sizeof(T)*Value(array.m)];
+            for(int i=0,j=Value(m);i<j;i++) new(base_pointer+i)T(array.base_pointer[i]);
             return *this;}
-        if(Same_Array(*this,source)) return *this;
-        int n=Value(m),p=Value(source.m);
-        for(int i=0,j=std::min(n,p);i<j;i++) base_pointer[i]=source.base_pointer[i];
-        for(int i=n;i<p;i++) new(base_pointer+i)T(source.base_pointer[i]);
+        if(Same_Array(*this,array)) return *this;
+        int n=Value(m),p=Value(array.m);
+        for(int i=0,j=std::min(n,p);i<j;i++) base_pointer[i]=array.base_pointer[i];
+        for(int i=n;i<p;i++) new(base_pointer+i)T(array.base_pointer[i]);
         for(int i=p;i<n;i++) base_pointer[i].~T();
-        m=source.m;
+        m=array.m;
         return *this;
     }
 
     ARRAY& operator=(ARRAY&& array)
     {
         Call_Destructors_And_Free();
-        new(this)ARRAY(array);
+        base_pointer=array.base_pointer;
+        buffer_size=array.buffer_size;
+        m=array.m;
+        array.base_pointer=0;
+        array.m=0;
         return *this;
     }
 
     template<class T_ARRAY>
-    ARRAY& operator=(const ARRAY_BASE<T,T_ARRAY,ID>& source)
+    ARRAY& operator=(const ARRAY_BASE<T,T_ARRAY,ID>& array)
     {
-        ID source_m=source.Size();
-        if(buffer_size<source_m){
+        ID array_m=array.Size();
+        if(buffer_size<array_m){
             Call_Destructors_And_Free();
-            new(this)ARRAY(source);
+            buffer_size=m=array.Size();
+            base_pointer=(T*)new unsigned char[sizeof(T)*Value(m)];
+            for(int i=0,j=Value(m);i<j;i++) new(base_pointer+i)T(array(ID(i)));
             return *this;}
-        int n=Value(m),p=Value(source_m);
-        for(int i=0,j=std::min(n,p);i<j;i++) base_pointer[i]=source(ID(i));
-        for(int i=n;i<p;i++) new(base_pointer+i)T(source(ID(i)));
+        int n=Value(m),p=Value(array_m);
+        for(int i=0,j=std::min(n,p);i<j;i++) base_pointer[i]=array(ID(i));
+        for(int i=n;i<p;i++) new(base_pointer+i)T(array(ID(i)));
         for(int i=p;i<n;i++) base_pointer[i].~T();
-        m=source_m;
+        m=array_m;
         return *this;
     }
 
@@ -306,7 +315,7 @@ public:
     {for(int i=Value(m)-1;i>=0;i--) base_pointer[i].~T();m=ID();}
 
     void Clean_Memory()
-    {Call_Destructors_And_Free();new(this)ARRAY();}
+    {Call_Destructors_And_Free();base_pointer=0;buffer_size=m=ID();}
 
     void Delete_Pointers_And_Clean_Memory() // only valid if T is a pointer type
     {for(ID i(0);i<m;i++) delete (*this)(i);Clean_Memory();}
