@@ -24,7 +24,8 @@ template<> struct UPDATE_ADVECTION_EQUATION_HELPER<1>
     {
         int i;int m=grid.counts.x;T dx=grid.dX.x;ARRAY<T2,VECTOR<int,1> > rhs(0,m);
 
-        ARRAY<T2,VECTOR<int,1> > Z_1d_x(-3,m+3);ARRAY<T,VECTOR<int,1> > u_1d(V.domain.min_corner.x,V.domain.max_corner.x);
+        ARRAY<T2,VECTOR<int,1> > Z_1d_x(-3,m+3);
+        ARRAY<T,VECTOR<int,1> > u_1d(V.domain.min_corner.x,V.domain.max_corner.x);
         for(i=-3;i<m+3;i++) Z_1d_x(i)=Z_ghost(i);
         for(i=V.domain.min_corner.x;i<V.domain.max_corner.x;i++) u_1d(i)=V(i).x;
         advection.Advection_Solver(m,dx,Z_1d_x,u_1d,rhs);
@@ -69,7 +70,10 @@ template<> struct UPDATE_ADVECTION_EQUATION_HELPER<3>
     static void Apply(T_ADVECTION_SEPARABLE_UNIFORM& advection,const GRID<VECTOR<T,3> >& grid,ARRAYS_ND_BASE<T2,VECTOR<int,3> >& Z,
         const ARRAYS_ND_BASE<T2,VECTOR<int,3> >& Z_ghost,const ARRAYS_ND_BASE<VECTOR<T,3>,VECTOR<int,3> >& V,const T dt,const T time)
     {
-        int i,j,ij;int m=grid.counts.x,n=grid.counts.y,mn=grid.counts.z;T dx=grid.dX.x,dy=grid.dX.y,dz=grid.dX.z;ARRAY<T2,VECTOR<int,3> > rhs(0,m,0,n,0,mn);
+        int i,j,ij;
+        int m=grid.counts.x,n=grid.counts.y,mn=grid.counts.z;
+        T dx=grid.dX.x,dy=grid.dX.y,dz=grid.dX.z;
+        ARRAY<T2,VECTOR<int,3> > rhs(grid.counts);
 
         {ARRAY<T2,VECTOR<int,1> > Z_1d_x(-3,m+3),u_Zx_1d(0,m);ARRAY<T,VECTOR<int,1> > u_1d(V.domain.min_corner.x,V.domain.max_corner.x);
         for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){

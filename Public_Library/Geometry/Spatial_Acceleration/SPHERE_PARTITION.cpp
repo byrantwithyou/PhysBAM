@@ -63,7 +63,7 @@ Set_Up_Grid(const TV_INT& size)
     for(int i=0;i<voxel_sphere_list.array.m;i++){
         delete voxel_sphere_list.array(i);
         voxel_sphere_list.array(i)=0;}
-    voxel_sphere_list.Resize(0,grid.counts.x-1,0,grid.counts.y-1,0,grid.counts.z-1);
+    voxel_sphere_list.Resize(grid.counts-1);
     for(int k=0;k<spheres.m;k++){
         // find the grid cell that contains the sphere - left borders
         int i_left,j_bottom,ij_front;Find_Voxel(spheres(k).center,i_left,j_bottom,ij_front);

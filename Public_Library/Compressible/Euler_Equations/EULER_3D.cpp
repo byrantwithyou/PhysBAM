@@ -14,10 +14,9 @@ using namespace PhysBAM;
 template<class T> void EULER_3D<T>::
 Euler_Step(const T dt,const T time)
 {  
-    int m=grid.counts.x,n=grid.counts.y,mn=grid.counts.z;
     int ghost_cells=3;
     
-    ARRAY<TV_DIMENSION,TV_INT> U_ghost(-ghost_cells,m+ghost_cells,-ghost_cells,n+ghost_cells,1-ghost_cells,mn+ghost_cells);
+    ARRAY<TV_DIMENSION,TV_INT> U_ghost(grid.Domain_Indices(ghost_cells));
     boundary->Fill_Ghost_Cells(grid,U,U_ghost,dt,time,ghost_cells);
     
     ARRAY<bool,FACE_INDEX<TV::m> > psi_N(grid.Get_MAC_Grid_At_Regular_Positions());

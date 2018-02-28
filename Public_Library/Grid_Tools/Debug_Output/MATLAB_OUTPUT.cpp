@@ -96,8 +96,7 @@ Write_Header_File(const std::string& file_name,const ARRAY<T,VECTOR<int,2> >& x,
 template<class T> void MATLAB_OUTPUT::
 Write_Header_File(const std::string& file_name,const GRID<VECTOR<T,3> >& grid,const int stepnumber)
 {
-    int m=grid.counts.x,n=grid.counts.y,mn=grid.counts.z;
-    ARRAY<T,VECTOR<int,3> > x(0,m,0,n,0,mn),y(0,m,0,n,0,mn),z(0,m,0,n,0,mn);
+    ARRAY<T,VECTOR<int,3> > x(grid.counts),y(grid.counts),z(grid.counts);
     for(RANGE_ITERATOR<3> it(grid.Domain_Indices());it.Valid();it.Next()){x(it.index)=grid.X(it.index).x;y(it.index)=grid.X(it.index).y;z(it.index)=grid.X(it.index).z;}
     for(RANGE_ITERATOR<3> it(grid.Domain_Indices());it.Valid();it.Next()){x(it.index)=grid.X(it.index).x;y(it.index)=grid.X(it.index).y;z(it.index)=grid.X(it.index).z;}
     Write_Header_File(file_name,x,y,z,stepnumber);

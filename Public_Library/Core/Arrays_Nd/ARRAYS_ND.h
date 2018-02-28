@@ -38,10 +38,6 @@ public:
     ARRAY(const TV_INT& size_input,const bool initialize_using_initialization_value=true,const T& initialization_value=T())
     {Initialize(RANGE<TV_INT>(TV_INT(),size_input),initialize_using_initialization_value,initialization_value);}
 
-    ARRAY(const int m_start_input,const int m_end_input,const int n_start_input,const int n_end_input,const int p_start_input,const int p_end_input,
-        const bool initialize_using_initialization_value=true,const T& initialization_value=T())
-    {Initialize(RANGE<TV_INT>(TV_INT(m_start_input,n_start_input,p_start_input),TV_INT(m_end_input,n_end_input,p_end_input)),initialize_using_initialization_value,initialization_value);}
-
     ARRAY(const int m_start_input,const int m_end_input,const int n_start_input,const int n_end_input,const bool initialize_using_initialization_value=true,const T& initialization_value=T())
     {Initialize(RANGE<TV_INT>(TV_INT(m_start_input,n_start_input),TV_INT(m_end_input,n_end_input)),initialize_using_initialization_value,initialization_value);}
 
@@ -86,11 +82,6 @@ public:
     Resize_In_Place(source.Domain_Indices());
     ARRAY_BASE<T,BASE,TV_INT>::operator=(source);return *this;}
 
-    void Resize(int m_start_new,int m_end_new,int n_start_new,int n_end_new,int p_start_new,int p_end_new,const bool initialize_new_elements=true,
-        const bool copy_existing_elements=true,const T& initialization_value=T())
-    {STATIC_ASSERT(d==3);RANGE<TV_INT> box(TV_INT(m_start_new,n_start_new,p_start_new),TV_INT(m_end_new,n_end_new,p_end_new));
-    Resize(box,initialize_new_elements,copy_existing_elements,initialization_value);}
-
     void Resize(int m_start_new,int m_end_new,int n_start_new,int n_end_new,const bool initialize_new_elements=true,
         const bool copy_existing_elements=true,const T& initialization_value=T())
     {STATIC_ASSERT(d==2);RANGE<TV_INT> box(TV_INT(m_start_new,n_start_new),TV_INT(m_end_new,n_end_new));Resize(box,initialize_new_elements,copy_existing_elements,initialization_value);}
@@ -104,6 +95,9 @@ public:
     ARRAY new_array(box,initialize_new_elements,initialization_value);
     if(copy_existing_elements) this->Put(*this,new_array,domain.Intersect(box));
     Exchange(new_array);}
+
+    void Resize(const TV_INT& corner,const bool initialize_new_elements=true,const bool copy_existing_elements=true,const T& initialization_value=T())
+    {Resize(RANGE<TV_INT>(TV_INT(),corner),initialize_new_elements,copy_existing_elements,initialization_value);}
 
     void Reallocate_In_Place(const RANGE<TV_INT>& box)
     {TV_INT counts_new(box.Edge_Lengths());int size_new=counts_new.Product();Calculate_Acceleration_Constants(box);delete [] array.Get_Array_Pointer();array.Set(size_new,new T[size_new]);}

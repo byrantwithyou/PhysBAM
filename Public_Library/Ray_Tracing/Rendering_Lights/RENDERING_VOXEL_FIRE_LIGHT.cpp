@@ -25,7 +25,7 @@ RENDERING_VOXEL_FIRE_LIGHT(RENDERING_UNIFORM_VOXELS<T>& fire_voxels_input,RENDER
     // build pdf
     LOG::SCOPE scope("building fire light pdf","Building Fire_Light PDF");
     GRID<TV>& grid=fire_voxels.grid;
-    pdf.Resize(0,fire_voxels.grid.counts.x,0,fire_voxels.grid.counts.y,0,fire_voxels.grid.counts.z);
+    pdf.Resize(fire_voxels.grid.counts);
     T cell_volume=fire_voxels.grid.dX.x*fire_voxels.grid.dX.y*fire_voxels.grid.dX.z;
     total_average_power=0;total_power=VECTOR<T,3>();
     for(int i=0;i<fire_voxels.grid.counts.x;i++)for(int j=0;j<fire_voxels.grid.counts.y;j++)for(int ij=0;ij<fire_voxels.grid.counts.z;ij++){

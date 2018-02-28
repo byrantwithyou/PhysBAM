@@ -16,7 +16,7 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class T> RENDERING_UNIFORM_VOXELS<T>::
-RENDERING_UNIFORM_VOXELS(GRID<TV>& grid_input,ARRAY<T,VECTOR<int,3> >& data_input,const T volumetric_step)
+RENDERING_UNIFORM_VOXELS(GRID<TV>& grid_input,ARRAY<T,TV_INT>& data_input,const T volumetric_step)
     :RENDERING_UNIFORM_VOXELS(grid_input,grid_input,data_input,volumetric_step)
 {
 }
@@ -24,7 +24,7 @@ RENDERING_UNIFORM_VOXELS(GRID<TV>& grid_input,ARRAY<T,VECTOR<int,3> >& data_inpu
 // Constructor
 //#####################################################################
 template<class T> RENDERING_UNIFORM_VOXELS<T>::
-RENDERING_UNIFORM_VOXELS(GRID<TV>& grid_input,GRID<TV>& coarse_grid_input,ARRAY<T,VECTOR<int,3> >& data_input,
+RENDERING_UNIFORM_VOXELS(GRID<TV>& grid_input,GRID<TV>& coarse_grid_input,ARRAY<T,TV_INT>& data_input,
     const T volumetric_step)
     :grid(grid_input),coarse_grid(coarse_grid_input),volumetric_step(volumetric_step),number_of_smoothing_steps(0)
 {
@@ -75,7 +75,7 @@ Get_Node_Locations(ARRAY<VECTOR<T,3> >& locations)
     for(int i=0;i<coarse_grid.counts.x;i++)
         for(int j=0;j<coarse_grid.counts.y;j++)
             for(int ij=0;ij<coarse_grid.counts.z;ij++){
-                map_from_accessor_index_to_my_index(index)=VECTOR<int,3>(i,j,ij);
+                map_from_accessor_index_to_my_index(index)=TV_INT(i,j,ij);
                 locations(index)=coarse_grid.X(TV_INT(i,j,ij));index++;}
 }
 //#####################################################################
@@ -85,7 +85,7 @@ template<class T> bool RENDERING_UNIFORM_VOXELS<T>::
 Use_Precomputed_Light_Data(const VECTOR<T,3>& location,const int light_index) const
 {
     if(!precompute_single_scattering)return false;
-    VECTOR<int,3> index=INTERPOLATION_UNIFORM<TV,VECTOR<T,3> >::Clamped_Index_End_Minus_One(coarse_grid,*precomputed_light(light_index),location);
+    TV_INT index=INTERPOLATION_UNIFORM<TV,VECTOR<T,3> >::Clamped_Index_End_Minus_One(coarse_grid,*precomputed_light(light_index),location);
     int i=index.x,j=index.y,ij=index.z;
     if(coarse_grid.Outside(location))return false;
     bool i_j_ij=(*precomputed_light_valid(light_index))(i,j,ij),i_j_ij1=(*precomputed_light_valid(light_index))(i,j,ij+1),i_j1_ij=(*precomputed_light_valid(light_index))(i,j+1,ij),
@@ -107,7 +107,7 @@ Set_Precomputed_Light_Data(const int location_index,const int light_index,const 
 template<class T> void RENDERING_UNIFORM_VOXELS<T>::
 Set_Precomputed_Light_Valid(const int location_index,const int light_index,const bool value)
 {
-    VECTOR<int,3> index=map_from_accessor_index_to_my_index(location_index);
+    TV_INT index=map_from_accessor_index_to_my_index(location_index);
     (*precomputed_light_valid(light_index))(index)=value;
 }
 //#####################################################################
@@ -142,9 +142,9 @@ Prepare_For_Precomputation(RENDER_WORLD<T>& world)
 {
     precomputed_light.Resize(world.Lights().m);precomputed_light_valid.Resize(world.Lights().m);
     for(int i=0;i<precomputed_light.m;i++)
-        precomputed_light(i)=new ARRAY<VECTOR<T,3> ,VECTOR<int,3> >(0,coarse_grid.counts.x,0,coarse_grid.counts.y,0,coarse_grid.counts.z);
+        precomputed_light(i)=new ARRAY<VECTOR<T,3>,TV_INT>(coarse_grid.counts);
     for(int i=0;i<precomputed_light.m;i++){
-        precomputed_light_valid(i)=new ARRAY<bool,VECTOR<int,3> >(0,coarse_grid.counts.x,0,coarse_grid.counts.y,0,coarse_grid.counts.z);
+        precomputed_light_valid(i)=new ARRAY<bool,TV_INT>(coarse_grid.counts);
         precomputed_light_valid(i)->Fill(false);}
 }
 //#####################################################################

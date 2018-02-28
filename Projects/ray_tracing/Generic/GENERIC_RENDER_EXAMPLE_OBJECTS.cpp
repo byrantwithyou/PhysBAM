@@ -436,7 +436,7 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
             // remove ghost values (will get crash otherwise)
             if(phi->Size() != grid->counts){
                 LOG::cout<<"Removing phi ghost values"<<std::endl;
-                phi->Resize(1,grid->counts.x,1,grid->counts.y,1,grid->counts.z);}
+                phi->Resize(grid->counts);}
             LOG::cout<<"Using collidable thin shell interpolation..."<<std::endl;
             GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>* fluid_collision_body_list=new GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>(*grid);
             for(COLLISION_GEOMETRY_ID i(0);i<body_list->m;i++) if((*body_list)(i)) fluid_collision_body_list->collision_geometry_collection.Add_Body((*body_list)(i),0,false);
