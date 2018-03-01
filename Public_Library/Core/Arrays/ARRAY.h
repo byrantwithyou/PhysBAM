@@ -211,7 +211,7 @@ private:
             if(init) for(int i=(fill?0:n);i<p;i++) new(new_buffer+i)T(initialization_value...);
             if(copy) for(int i=0;i<n;i++) new(new_buffer+i)T(std::move(base_pointer[i]));
             if(!init) for(int i=(copy?n:0);i<p;i++) new(new_buffer+i)T;
-            Call_Destructors_And_Free();
+            delete[] (unsigned char*)base_pointer;
             base_pointer=new_buffer;
             buffer_size=ID(new_buffer_size);}
         else{
@@ -230,7 +230,7 @@ private:
         T* new_buffer=(T*)new unsigned char[sizeof(T)*new_buffer_size];
         new(new_buffer+n)T(initialization_value...);
         for(int i=0;i<n;i++) new(new_buffer+i)T(std::move(base_pointer[i]));
-        Call_Destructors_And_Free();
+        delete[] (unsigned char*)base_pointer;
         base_pointer=new_buffer;
         buffer_size=ID(new_buffer_size);
     }
@@ -242,7 +242,7 @@ public:
             int n=Value(m);
             T* new_buffer=(T*)new unsigned char[sizeof(T)*Value(max_size)];
             for(int i=0;i<n;i++) new(new_buffer+i)T(std::move(base_pointer[i]));
-            Call_Destructors_And_Free();
+            delete[] (unsigned char*)base_pointer;
             base_pointer=new_buffer;
             buffer_size=max_size;}
     }
