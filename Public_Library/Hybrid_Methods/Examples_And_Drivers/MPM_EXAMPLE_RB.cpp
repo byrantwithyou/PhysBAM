@@ -50,7 +50,7 @@ template<class TV> MPM_EXAMPLE_RB<TV>::
     delete weights;
     delete &gather_scatter;
     delete &force_helper;
-    delete &pfd;
+    delete pfd;
     plasticity_models.Delete_Pointers_And_Clean_Memory();
     collision_objects.Delete_Pointers_And_Clean_Memory();
     forces.Delete_Pointers_And_Clean_Memory();
