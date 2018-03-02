@@ -30,11 +30,11 @@ Update_Advection_Equation_Node(const GRID<TV>& grid,ARRAY<T2,TV_INT>& Z,const AR
     const ARRAY<T2,TV_INT>* Z_min_ghost_input,const ARRAY<T2,TV_INT>* Z_max_ghost_input,ARRAY<T2,TV_INT>* Z_min_input,ARRAY<T2,TV_INT>* Z_max_input)
 {
     assert(node_mask && !Z_min_input && !Z_max_input);
-    ARRAY<TV,TV_INT> negative_V(grid.Domain_Indices(0),false);negative_V.Copy((T)-1,V);
-    ARRAY<T2,TV_INT> Z_temp=Z,Z_min_ghost=Z_ghost,Z_max_ghost=Z_ghost,Z_min(grid.Domain_Indices(),false),Z_max(grid.Domain_Indices(),false);
+    ARRAY<TV,TV_INT> negative_V(grid.Domain_Indices(0),no_init);negative_V.Copy((T)-1,V);
+    ARRAY<T2,TV_INT> Z_temp=Z,Z_min_ghost=Z_ghost,Z_max_ghost=Z_ghost,Z_min(grid.Domain_Indices(),no_init),Z_max(grid.Domain_Indices(),no_init);
     int number_of_ghost_cells=Z.Domain_Indices().Minimum_Corner()(1)-Z_ghost.Domain_Indices().Minimum_Corner()(1);
     nested_advection.Update_Advection_Equation_Node(grid,Z_temp,Z_ghost,V,boundary,dt,time,&Z_min_ghost,&Z_max_ghost,&Z_min,&Z_max); // Z_temp now has time n+1 data
-    ARRAY<T2,TV_INT> Z_forward_ghost(grid.Domain_Indices(number_of_ghost_cells),false);boundary.Fill_Ghost_Cells(grid,Z_temp,Z_forward_ghost,dt,time+dt,number_of_ghost_cells);
+    ARRAY<T2,TV_INT> Z_forward_ghost(grid.Domain_Indices(number_of_ghost_cells),no_init);boundary.Fill_Ghost_Cells(grid,Z_temp,Z_forward_ghost,dt,time+dt,number_of_ghost_cells);
     boundary.Fill_Ghost_Cells(grid,Z_min,Z_min_ghost,dt,time+dt,number_of_ghost_cells);boundary.Fill_Ghost_Cells(grid,Z_max,Z_max_ghost,dt,time+dt,number_of_ghost_cells);
     nested_advection.Update_Advection_Equation_Node(grid,Z_temp,Z_forward_ghost,negative_V,boundary,dt,time+dt,&Z_min_ghost,&Z_max_ghost,&Z_min,&Z_max); // Z_temp has time n data
     RANGE<TV_INT> domain=grid.Domain_Indices();domain.max_corner+=TV_INT::All_Ones_Vector();
@@ -55,10 +55,10 @@ Update_Advection_Equation_Cell_Lookup(const GRID<TV>& grid,ARRAY<T2,TV_INT>& Z,c
 {
     assert(cell_mask && !Z_min_input && !Z_max_input);
     ARRAY<T,FACE_INDEX<TV::m> > negative_V(face_velocities.V_face.Domain_Indices());negative_V.Copy(-1,face_velocities.V_face);
-    ARRAY<T2,TV_INT> Z_temp=Z,Z_min_ghost=Z_ghost,Z_max_ghost=Z_ghost,Z_min(grid.Domain_Indices(),false),Z_max(grid.Domain_Indices(),false);
+    ARRAY<T2,TV_INT> Z_temp=Z,Z_min_ghost=Z_ghost,Z_max_ghost=Z_ghost,Z_min(grid.Domain_Indices(),no_init),Z_max(grid.Domain_Indices(),no_init);
     int number_of_ghost_cells=Z.Domain_Indices().Minimum_Corner()(1)-Z_ghost.Domain_Indices().Minimum_Corner()(1);
     nested_advection.Update_Advection_Equation_Cell(grid,Z_temp,Z_ghost,face_velocities.V_face,boundary,dt,time,&Z_min_ghost,&Z_max_ghost,&Z_min,&Z_max); // Z_temp now has time n+1 data
-    ARRAY<T2,TV_INT> Z_forward_ghost(grid.Domain_Indices(number_of_ghost_cells),false);boundary.Fill_Ghost_Cells(grid,Z_temp,Z_forward_ghost,dt,time+dt,number_of_ghost_cells);
+    ARRAY<T2,TV_INT> Z_forward_ghost(grid.Domain_Indices(number_of_ghost_cells),no_init);boundary.Fill_Ghost_Cells(grid,Z_temp,Z_forward_ghost,dt,time+dt,number_of_ghost_cells);
     boundary.Fill_Ghost_Cells(grid,Z_min,Z_min_ghost,dt,time+dt,number_of_ghost_cells);boundary.Fill_Ghost_Cells(grid,Z_max,Z_max_ghost,dt,time+dt,number_of_ghost_cells);
     nested_advection.Update_Advection_Equation_Cell(grid,Z_temp,Z_forward_ghost,negative_V,boundary,dt,time+dt,&Z_min_ghost,&Z_max_ghost,&Z_min,&Z_max); // Z_temp has time n data
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){

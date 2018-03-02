@@ -53,7 +53,9 @@ Compute_beta_And_Add_Jumps_To_b(const T dt,const T time)
     if(!multiphase){
         ARRAY<T,TV_INT> phi_ghost;
         if((!use_variable_beta && !beta_given_on_faces) || u_jumps || beta_un_jumps){
-            assert(levelset);phi_ghost.Resize(grid.Domain_Indices(ghost_cells),false);levelset->boundary->Fill_Ghost_Cells(grid,levelset->phi,phi_ghost,dt,time,ghost_cells);}
+            assert(levelset);
+            phi_ghost.Resize(grid.Domain_Indices(ghost_cells),no_init);
+            levelset->boundary->Fill_Ghost_Cells(grid,levelset->phi,phi_ghost,dt,time,ghost_cells);}
         if(!beta_given_on_faces){if(use_variable_beta) Find_Variable_beta();else Find_Constant_beta(phi_ghost);}
         if(u_jumps) Add_Jump_To_b(phi_ghost);
         if(beta_un_jumps) Add_Derivative_Jump_To_b(phi_ghost);}
@@ -61,7 +63,7 @@ Compute_beta_And_Add_Jumps_To_b(const T dt,const T time)
         ARRAY<ARRAY<T,TV_INT>> phis_ghost;
         if((!use_variable_beta && !beta_given_on_faces) || u_jumps || beta_un_jumps){assert(levelset_multiple);
             phis_ghost.Resize(levelset_multiple->phis.m);
-            for(int i=0;i<phis_ghost.m;i++){phis_ghost(i).Resize(grid.Domain_Indices(ghost_cells),false);
+            for(int i=0;i<phis_ghost.m;i++){phis_ghost(i).Resize(grid.Domain_Indices(ghost_cells),no_init);
                 levelset_multiple->levelsets(i)->boundary->Fill_Ghost_Cells(grid,levelset_multiple->phis(i),phis_ghost(i),dt,time,ghost_cells);}}
         if(!beta_given_on_faces){if(use_variable_beta) Find_Variable_beta();else Find_Constant_beta_Multiphase(phis_ghost);}
         if(u_jumps) Add_Jump_To_b_Multiphase(phis_ghost);

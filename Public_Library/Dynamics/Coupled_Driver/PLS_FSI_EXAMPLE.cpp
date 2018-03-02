@@ -393,9 +393,9 @@ Set_Boundary_Conditions(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::m> >
 {
     void Resize(const RANGE<TV_INT>& box,const bool initialize_new_elements=true,const bool copy_existing_elements=true,const T& initialization_value=T());
 
-    psi_D.Resize(fluids_parameters.grid->Domain_Indices(3),false,false);
+    psi_D.Resize(fluids_parameters.grid->Domain_Indices(3),no_init);
     psi_N.Resize(fluids_parameters.grid->Domain_Indices(3),false,false);
-    psi_D_value.Resize(fluids_parameters.grid->Domain_Indices(3),false,false);
+    psi_D_value.Resize(fluids_parameters.grid->Domain_Indices(3),no_init);
     psi_N_value.Resize(fluids_parameters.grid->Domain_Indices(3),false,false);
     psi_D.Fill(false);
     psi_N.Fill(false);

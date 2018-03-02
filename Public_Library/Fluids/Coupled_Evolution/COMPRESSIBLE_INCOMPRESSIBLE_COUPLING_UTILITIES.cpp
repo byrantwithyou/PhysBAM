@@ -30,7 +30,7 @@ template<class TV> void COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES<TV>::
 Extrapolate_Compressible_State_Into_Incompressible_Region(const T dt,const T time,const T bandwidth,const int ghost_cells,const EOS<T>& eos,
     const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi_ghost,const ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velocities,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,T_ARRAYS_DIMENSION_SCALAR& U)
 {
-    ARRAY<T,TV_INT> phi_ghost_negated(phi_ghost),entropy(phi_ghost,false),pressure(phi_ghost,false);ARRAY<TV,TV_INT> velocity(phi_ghost.Domain_Indices());
+    ARRAY<T,TV_INT> phi_ghost_negated(phi_ghost),entropy(phi_ghost,no_init),pressure(phi_ghost,no_init);ARRAY<TV,TV_INT> velocity(phi_ghost.Domain_Indices());
 
     for(CELL_ITERATOR<TV> iterator(grid,ghost_cells);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();T density=U_ghost(cell_index)(0);TV vel=EULER<TV>::Get_Velocity(U_ghost(cell_index));

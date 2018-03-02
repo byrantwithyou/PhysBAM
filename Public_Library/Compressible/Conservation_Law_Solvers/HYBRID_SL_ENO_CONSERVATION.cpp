@@ -34,7 +34,7 @@ Update_Conservation_Law(GRID<TV>& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRA
     ARRAY<bool,TV_INT> regular_cell(psi);
     ARRAY<bool,TV_INT> cell_near_interface(psi),cell_near_interface_tmp(psi);
     T_FACE_ARRAYS_DIMENSION_SCALAR& face_fluxes(conservation->fluxes);
-    T_ARRAYS_DIMENSION_SCALAR rhs(U.Domain_Indices(),true);
+    T_ARRAYS_DIMENSION_SCALAR rhs(U.Domain_Indices());
 
     {
         LOG::SCOPE scope("Regular Update for Hybrid scheme.");

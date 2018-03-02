@@ -60,7 +60,7 @@ template<class TV,class T,class TV_INT,class T_VALID_MASK> static void
 Compute_Vorticity_Confinement_Force_Helper(const GRID<TV>& grid,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,ARRAY<TV,TV_INT>& F,const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>* collision_body_list,const T_VALID_MASK* valid_mask)
 {
     typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;
-    ARRAY<typename TV::SPIN,TV_INT> vorticity(grid.Cell_Indices(2),false);
+    ARRAY<typename TV::SPIN,TV_INT> vorticity(grid.Cell_Indices(2),no_init);
     ARRAY<T,TV_INT> vorticity_magnitude(grid.Cell_Indices(2));
     if(collision_body_list){
         FACE_LOOKUP_UNIFORM<TV> face_velocities_lookup_uniform(face_velocities_ghost);
@@ -87,7 +87,7 @@ Compute_Vorticity_Confinement_Force(const GRID<TV>& grid,const ARRAY<T,FACE_INDE
 template<class TV> void VORTICITY_CONFINEMENT<TV>::
 Add_Explicit_Forces(const GRID<TV>& grid,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time)
 {
-    ARRAY<TV,TV_INT> F(grid.Cell_Indices(1),false);
+    ARRAY<TV,TV_INT> F(grid.Cell_Indices(1),no_init);
     Compute_Vorticity_Confinement_Force(grid,face_velocities_ghost,valid_mask,F);
     if(collision_body_list){
         if(use_variable_vorticity_confinement){F*=dt;F*=variable_vorticity_confinement;}else F*=dt*vorticity_confinement;}

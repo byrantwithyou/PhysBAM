@@ -194,7 +194,7 @@ Clear(const int ghost_cells)
         cell_indices(indexed_cells(i))=0;
     indexed_cells.Remove_All();
     real_cell_indices.Remove_All();
-    cell_indices.Resize(grid.Domain_Indices(ghost_cells+1),true,false,-1);
+    cell_indices.Resize(grid.Domain_Indices(ghost_cells+1),use_init,-1);
     face_indices.Resize(grid,ghost_cells+1,true,false,-1);
 }
 //#####################################################################

@@ -300,7 +300,7 @@ template<class TV> void LEVELSET<TV>::
 Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,const T time,const T stopping_distance,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells,int process_sign)
 {
     const int ghost_cells=2*number_of_ghost_cells+1;
-    ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells),false);
+    ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells),no_init);
     boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
     FAST_MARCHING_METHOD_UNIFORM<TV> fmm;
     fmm.seed_indices=seed_indices;

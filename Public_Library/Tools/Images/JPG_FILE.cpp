@@ -48,7 +48,7 @@ Read(const std::string& filename,ARRAY<VECTOR<T,3> ,VECTOR<int,2> >& image)
     JSAMPLE* row=new unsigned char[row_stride];JSAMPROW row_pointer[]={row};
     LOG::cout<<"reading "<<filename<<": "<<row_stride/3<<" x "<<cinfo.output_height<<std::endl;
 
-    image.Resize(VECTOR<int,2>(cinfo.output_width,cinfo.output_height),false,false);
+    image.Resize(VECTOR<int,2>(cinfo.output_width,cinfo.output_height),no_init);
     VECTOR<int,2> counts=image.domain.Edge_Lengths();
     while(cinfo.output_scanline<cinfo.output_height){
         jpeg_read_scanlines(&cinfo,row_pointer,1);int index=0;

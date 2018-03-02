@@ -83,7 +83,9 @@ Advance_One_Time_Step_Forces(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const 
         ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(number_of_ghost_cells));projection.poisson_collidable->levelset_multiple->levelsets(i)->boundary->Fill_Ghost_Cells(grid,projection.poisson_collidable->levelset_multiple->phis(i),phi_ghost,dt,time,number_of_ghost_cells);
         ARRAY<T,FACE_INDEX<TV::m> > face_velocities_temp=face_velocities_ghost;
         for(int axis=0;axis<TV::m;axis++){
-            GRID<TV> face_grid=grid.Get_Face_Grid(axis);ARRAY<T,TV_INT> phi_face(face_grid.Domain_Indices(),false);T_ARRAYS_BASE& face_velocity=face_velocities_temp.Component(axis);
+            GRID<TV> face_grid=grid.Get_Face_Grid(axis);
+            ARRAY<T,TV_INT> phi_face(face_grid.Domain_Indices(),no_init);
+            T_ARRAYS_BASE& face_velocity=face_velocities_temp.Component(axis);
             for(FACE_ITERATOR<TV> iterator(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next())
                 phi_face(iterator.Face_Index())=(T).5*(phi_ghost(iterator.First_Cell_Index())+phi_ghost(iterator.Second_Cell_Index()));
             int extrapolation_bandwidth=3;
@@ -116,14 +118,14 @@ Advance_One_Time_Step_Forces(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const 
                 twice_curvature*twice_face_normal_component/LEVELSET_UTILITIES<T>::Heaviside(phi_face,projection.densities(region_1),projection.densities(region_2),half_width);}}
 
     if(use_variable_vorticity_confinement){
-        ARRAY<TV,TV_INT> F(grid.Cell_Indices(1),false);
+        ARRAY<TV,TV_INT> F(grid.Cell_Indices(1),no_init);
         Compute_Vorticity_Confinement_Force(grid,face_velocities_ghost,F);
         F*=dt*(T).5;F*=variable_vorticity_confinement;
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();
             face_velocities.Component(axis)(iterator.Face_Index())+=F(iterator.First_Cell_Index())[axis]+F(iterator.Second_Cell_Index())[axis];}}
 
     if(vorticity_confinements.Count_Matches(0)!=vorticity_confinements.m){
-        ARRAY<TV,TV_INT> F(grid.Cell_Indices(1),false);
+        ARRAY<TV,TV_INT> F(grid.Cell_Indices(1),no_init);
         Compute_Vorticity_Confinement_Force(grid,face_velocities_ghost,F);
         T half_dt=(T).5*dt;
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
@@ -313,7 +315,8 @@ Implicit_Viscous_Update(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,
 template<class TV> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>::
 Compute_Vorticity_Confinement_Force(const GRID<TV>& grid,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,ARRAY<TV,TV_INT>& F)
 {
-    T_ARRAYS_SPIN vorticity(grid.Cell_Indices(2),false);ARRAY<T,TV_INT> vorticity_magnitude(grid.Cell_Indices(2));
+    T_ARRAYS_SPIN vorticity(grid.Cell_Indices(2),no_init);
+    ARRAY<T,TV_INT> vorticity_magnitude(grid.Cell_Indices(2));
     if(projection.flame){FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<TV> face_velocities_lookup(face_velocities_ghost,projection,projection.poisson_collidable->levelset_multiple);
         VORTICITY_UNIFORM<TV>::Vorticity(grid,face_velocities_lookup,vorticity,vorticity_magnitude);}
     else VORTICITY_UNIFORM<TV>::Vorticity(grid,FACE_LOOKUP_UNIFORM<TV>(face_velocities_ghost),vorticity,vorticity_magnitude);

@@ -28,7 +28,7 @@ template <class TV,class ID> OBJECTS_IN_CELL<TV,ID>::
 template <class TV,class ID> void OBJECTS_IN_CELL<TV,ID>::
 Reset(const GRID<TV>& grid,const int number_of_ghost_cells)
 {
-    object_in_cell.Resize(grid.Cell_Indices(number_of_ghost_cells),false,false);
+    object_in_cell.Resize(grid.Cell_Indices(number_of_ghost_cells),no_init);
     object_in_cell.Fill(ID(INT_MAX));
     object_list.Clean_Memory();
 }

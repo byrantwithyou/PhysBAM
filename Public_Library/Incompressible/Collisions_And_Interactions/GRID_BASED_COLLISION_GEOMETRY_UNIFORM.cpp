@@ -46,8 +46,10 @@ Initialize_Grids()
     collision_geometry_collection.Set_Collision_Body_Thickness(collision_thickness);
 
     assert(grid.Is_MAC_Grid());
-    VECTOR<bool,TV::m> all_true;all_true.Fill(true);
-    cell_neighbors_visible.Resize(grid.Domain_Indices(3),false);cell_neighbors_visible.Fill(all_true); // initialize here so collision aware redistancing works in Initialize
+    VECTOR<bool,TV::m> all_true;
+    all_true.Fill(true);
+    cell_neighbors_visible.Resize(grid.Domain_Indices(3),no_init);
+    cell_neighbors_visible.Fill(all_true); // initialize here so collision aware redistancing works in Initialize
     face_neighbors_visible.Resize(grid,1,false);face_neighbors_visible.Fill(all_true);
 }
 //##################################################################### 
@@ -57,7 +59,7 @@ template<class TV> void GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>::
 Compute_Occupied_Blocks(const bool with_body_motion,const T extra_thickness,const T body_thickness_factor)
 {
     ARRAY<bool,TV_INT>& occupied=with_body_motion?swept_occupied_blocks:occupied_blocks;
-    occupied.Resize(grid.Block_Indices(3),false,false);occupied.Fill(false);
+    occupied.Resize(grid.Block_Indices(3),no_init);occupied.Fill(false);
     for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++)
         if(collision_geometry_collection.bodies(i) && collision_geometry_collection.bodies(i)->active)
             RASTERIZATION::Compute_Occupied_Blocks(*collision_geometry_collection.bodies(i),grid,occupied,with_body_motion,extra_thickness,body_thickness_factor);

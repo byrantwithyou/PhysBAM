@@ -42,10 +42,12 @@ Use_Semi_Lagrangian_Collidable_Advection(const GRID_BASED_COLLISION_GEOMETRY_UNI
 // Function Initialize_Array
 //#####################################################################
 template<class TV> void DENSITY_CONTAINER<TV>::
-Initialize_Array(const int ghost_cells,const bool initialize_new_elements,const bool copy_existing_elements)
+Initialize_Array(const int ghost_cells)
 {
-    GRID_AND_ARRAY_CONTAINER<TV,T>::Initialize_Array(ghost_cells,initialize_new_elements,copy_existing_elements);
-    if(semi_lagrangian_collidable){valid_mask_current.Resize(grid.Cell_Indices(3),true,true,true);valid_mask_next.Resize(grid.Cell_Indices(3),false);}
+    GRID_AND_ARRAY_CONTAINER<TV,T>::Initialize_Array(ghost_cells);
+    if(semi_lagrangian_collidable){
+        valid_mask_current.Resize(grid.Cell_Indices(3),use_init,true);
+        valid_mask_next.Resize(grid.Cell_Indices(3),no_init);}
 }
 //#####################################################################
 // Function Fill_Beta_At_Faces
@@ -53,7 +55,7 @@ Initialize_Array(const int ghost_cells,const bool initialize_new_elements,const 
 template<class TV> void DENSITY_CONTAINER<TV>::
 Fill_Beta_At_Faces(const T dt,const T time,ARRAY<T,FACE_INDEX<TV::m> >& beta_face) const
 {
-    ARRAY<T,TV_INT> density_ghost(grid.Cell_Indices(1),false);
+    ARRAY<T,TV_INT> density_ghost(grid.Cell_Indices(1),no_init);
     boundary->Fill_Ghost_Cells(grid,density,density_ghost,dt,time,1);
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();
         TV_INT face_index=iterator.Face_Index();

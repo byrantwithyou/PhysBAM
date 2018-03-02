@@ -96,7 +96,7 @@ Advance_One_Time_Step_Forces(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const 
     ARRAY<T,FACE_INDEX<TV::m> > face_velocities_old=face_velocities;
     if(vorticity_confinement || use_variable_vorticity_confinement){
         T tolerance=0; //TODO (mlentine): Look into what are good values here
-        ARRAY<TV,TV_INT> F(grid.Cell_Indices(1),false);
+        ARRAY<TV,TV_INT> F(grid.Cell_Indices(1),no_init);
         Compute_Vorticity_Confinement_Force(grid,face_velocities_ghost,F);
         if(collision_body_list){
             if(use_variable_vorticity_confinement){F*=dt;F*=variable_vorticity_confinement;}else F*=dt*vorticity_confinement;}
@@ -265,7 +265,8 @@ Extrapolate_Velocity_Across_Interface(ARRAY<T,FACE_INDEX<TV::m> >& face_velociti
                 if(!fixed_face(index) && phi_face(index)<delta) face_velocity(index)=(1-damping)*face_velocity(index)+damping*air_speed[axis];}}}
     else{
         for(int axis=0;axis<TV::m;axis++){
-            GRID<TV> face_grid=grid.Get_Face_Grid(axis);ARRAY<T,TV_INT> phi_face(face_grid.Domain_Indices(),false);T_ARRAYS_BASE& face_velocity=face_velocities.Component(axis);
+            GRID<TV> face_grid=grid.Get_Face_Grid(axis);ARRAY<T,TV_INT> phi_face(face_grid.Domain_Indices(),no_init);
+            T_ARRAYS_BASE& face_velocity=face_velocities.Component(axis);
             ARRAY<bool,TV_INT> fixed_face;
             if(fixed_faces_input) fixed_face=fixed_faces_input->Component(axis); else fixed_face=ARRAY<bool,TV_INT>(face_grid.Domain_Indices());
             for(FACE_ITERATOR<TV> iterator(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next()){
@@ -383,7 +384,7 @@ template<class TV,class T,class TV_INT> static void
 Compute_Vorticity_Confinement_Force_Helper(const GRID<TV>& grid,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,ARRAY<TV,TV_INT>& F,const INCOMPRESSIBLE_UNIFORM<TV>& incompressible)
 {
     typedef ARRAY<typename TV::SPIN,TV_INT> T_ARRAYS_SPIN;typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;
-    T_ARRAYS_SPIN vorticity(grid.Cell_Indices(2),false);
+    T_ARRAYS_SPIN vorticity(grid.Cell_Indices(2),no_init);
     ARRAY<T,TV_INT> vorticity_magnitude(grid.Cell_Indices(2));
     if(incompressible.collision_body_list){
         FACE_LOOKUP_UNIFORM<TV> face_velocities_lookup_uniform(face_velocities_ghost);

@@ -71,8 +71,8 @@ void Draw_Bubble(PARSE_ARGS& parse_args)
 
 
     T max_phi=grid.domain.Edge_Lengths().Magnitude();
-    ARRAY<T,TV_INT> best_phi(grid.Domain_Indices(),true,max_phi);
-    ARRAY<int,TV_INT> best_color(grid.Domain_Indices(),true,-1);
+    ARRAY<T,TV_INT> best_phi(grid.Domain_Indices(),use_init,max_phi);
+    ARRAY<int,TV_INT> best_color(grid.Domain_Indices(),use_init,-1);
     ARRAY<LEVELSET<TV>*> levelsets;
     ARRAY<ARRAY<T,TV_INT>*> phis;
 

@@ -50,7 +50,7 @@ Euler_Step(const T dt,const T time)
     ARRAY<TV_DIMENSION,TV_INT> U_ghost(grid.Node_Indices(ghost_cells));
     boundary->Fill_Ghost_Cells(grid,U,U_ghost,dt,time,ghost_cells);
 
-    ARRAY<bool,TV_INT> psi(grid.Node_Indices(ghost_cells),true,true); // no cut out grids
+    ARRAY<bool,TV_INT> psi(grid.Node_Indices(ghost_cells)); // no cut out grids
     ARRAY<bool,FACE_INDEX<TV::m> > psi_N(grid.Get_MAC_Grid_At_Regular_Positions());
     ARRAY<T,FACE_INDEX<TV::m> > face_velocities(grid.Get_MAC_Grid_At_Regular_Positions());
     conservation->Update_Conservation_Law(grid,U,U_ghost,psi,dt,eigensystems,eigensystems,psi_N,face_velocities);

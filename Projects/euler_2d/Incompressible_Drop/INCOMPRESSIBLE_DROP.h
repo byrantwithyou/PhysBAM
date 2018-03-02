@@ -143,7 +143,7 @@ void Initialize_Phi() override
 {
     GRID<TV>& grid=*fluids_parameters.grid;
     ARRAY<T,VECTOR<int,2> >& phi=fluids_parameters.particle_levelset_evolution->phi;
-    ARRAY<bool,VECTOR<int,2> > psi_cut_out(grid.Domain_Indices(),true);
+    ARRAY<bool,VECTOR<int,2> > psi_cut_out(grid.Domain_Indices());
     TV drop_center((T)0,(T)0);T drop_radius=(T).2;
     for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         VECTOR<int,2> cell_index=iterator.Cell_Index();VECTOR<T,2> X=iterator.Location();

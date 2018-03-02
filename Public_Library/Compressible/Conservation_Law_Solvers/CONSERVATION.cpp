@@ -117,7 +117,7 @@ Compute_Flux_Without_Clamping(const GRID<TV>& grid,const T_ARRAYS_DIMENSION_SCAL
         VECTOR<bool,2> outflow_boundaries_axis(outflow_boundaries(2*axis),outflow_boundaries(2*axis+1));
         ARRAY<int,VECTOR<int,1> > filled_region_colors(U_range);filled_region_colors.Fill(-1);
         ARRAY<bool,VECTOR<int,1> > psi_axis_current_component(U_range);
-        if(save_fluxes) flux_temp.Resize(U_range_less,true,false);
+        if(save_fluxes) flux_temp.Resize(U_range_less);
         GRID<TV_LOWER_DIM> lower_dimension_grid=grid.Remove_Dimension(axis);
         for(CELL_ITERATOR<TV_LOWER_DIM> iterator(lower_dimension_grid);iterator.Valid();iterator.Next()){VECTOR<int,TV::m-1> cell_index=iterator.Cell_Index();
             VECTOR<int,3> slice_index;TV_INT cell_index_full_dimension=cell_index.Insert(0,axis);
@@ -163,19 +163,19 @@ Compute_Flux_With_Clamping(const GRID<TV>& grid,const T_ARRAYS_DIMENSION_SCALAR&
     Compute_Flux_Without_Clamping(grid,U,U_ghost,psi,dt,eigensystems,eigensystems_explicit,psi_N,face_velocities,outflow_boundaries,rhs,thinshell); // After this call, we should have rhs for clamped variable
     // Use this rhs to update the fluxes for the clamped variable
     T_FACE_ARRAYS_DIMENSION_SCALAR delta_flux(grid);
-    T_ARRAYS_DIMENSION_SCALAR delta_rhs(U_domain_indices,true);
+    T_ARRAYS_DIMENSION_SCALAR delta_rhs(U_domain_indices);
     ARRAY<T,TV_INT> overshoot_percentages(grid.Domain_Indices());
 
     Compute_Delta_Flux_For_Clamping_Variable(grid,U_domain_indices.max_corner.x-grid.Domain_Indices().max_corner.x,dt,clamped_variable_index,clamped_value,psi_N,U,fluxes,delta_flux,rhs,
         overshoot_percentages);
     ARRAYS_UTILITIES<TV,TV_DIMENSION>::Compute_Divergence_At_Cells_From_Face_Data(grid,delta_rhs,delta_flux,0);
     rhs+=delta_rhs;
-    T_ARRAYS_DIMENSION_SCALAR U_ghost_clamped(U_ghost,true);
+    T_ARRAYS_DIMENSION_SCALAR U_ghost_clamped(U_ghost);
     for(CELL_ITERATOR<TV> iterator(grid,U_domain_indices.max_corner.x-grid.Domain_Indices().max_corner.x);iterator.Valid();iterator.Next())
         U_ghost_clamped(iterator.Cell_Index())=(1-overshoot_percentages(iterator.Cell_Index()))*U_ghost(iterator.Cell_Index());
     // Compute the flux for the other variables
     if(fluxes_auxiliary){
-        T_ARRAYS_DIMENSION_SCALAR rhs_auxiliary(U_domain_indices,true);
+        T_ARRAYS_DIMENSION_SCALAR rhs_auxiliary(U_domain_indices);
         Compute_Flux_Without_Clamping(grid,U,U_ghost,psi,dt,*eigensystems_auxiliary,eigensystems_explicit,psi_N,face_velocities,outflow_boundaries,rhs_auxiliary,thinshell,&U_ghost_clamped);
         *fluxes_auxiliary=fluxes;}
     Compute_Flux_Without_Clamping(grid,U,U_ghost,psi,dt,eigensystems,eigensystems_explicit,psi_N,face_velocities,outflow_boundaries,rhs,thinshell,&U_ghost_clamped);
@@ -190,7 +190,8 @@ Compute_Flux(const GRID<TV>& grid,const T_ARRAYS_DIMENSION_SCALAR& U,const T_ARR
         eigensystems_auxiliary,fluxes_auxiliary);
     else{
         if(fluxes_auxiliary){
-            RANGE<TV_INT> U_domain_indices=U.Domain_Indices();T_ARRAYS_DIMENSION_SCALAR rhs_auxiliary(U_domain_indices,true);
+            RANGE<TV_INT> U_domain_indices=U.Domain_Indices();
+            T_ARRAYS_DIMENSION_SCALAR rhs_auxiliary(U_domain_indices);
             Compute_Flux_Without_Clamping(grid,U,U_ghost,psi,dt,*eigensystems_auxiliary,eigensystems_explicit,psi_N,face_velocities,outflow_boundaries,rhs_auxiliary,thinshell);
             *fluxes_auxiliary=fluxes;}
         Compute_Flux_Without_Clamping(grid,U,U_ghost,psi,dt,eigensystems,eigensystems_explicit,psi_N,face_velocities,outflow_boundaries,rhs,thinshell);}
@@ -205,7 +206,7 @@ Update_Conservation_Law(GRID<TV>& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRA
     T_FACE_ARRAYS_DIMENSION_SCALAR* fluxes_auxiliary)
 {
     RANGE<TV_INT> U_domain_indices=U.Domain_Indices();
-    T_ARRAYS_DIMENSION_SCALAR rhs(U_domain_indices,true);
+    T_ARRAYS_DIMENSION_SCALAR rhs(U_domain_indices);
 
     if(fluxes_auxiliary) save_fluxes=true;
     if(save_fluxes) fluxes.Resize(grid.Domain_Indices(),true,false);

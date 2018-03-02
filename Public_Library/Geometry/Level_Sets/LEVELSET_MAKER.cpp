@@ -57,7 +57,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
     bool compute_velocity=velocity && triangulated_surface.particles.store_velocity;
     if(compute_velocity) velocity->Resize(grid.Domain_Indices());
 
-    phi.Resize(grid.Domain_Indices(),false);phi.Fill(FLT_MAX);
+    phi.Resize(grid.Domain_Indices(),no_init);phi.Fill(FLT_MAX);
    
     if(use_fmm && compute_velocity && extrapolate_velocity && fmm_one_sided_band_width && fmm_one_sided_band_width<velocity_extrapolation_one_sided_band_width+1){
         LOG::cerr<<"Extending FMM band width to one more than velocity extrapolation band width"<<std::endl;

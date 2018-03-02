@@ -41,12 +41,13 @@ Set_Radius(const T radius_input)
 template<class T> void VORTEX_PARTICLE_EVOLUTION_3D<T>::
 Compute_Body_Force(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,ARRAY<TV,TV_INT>& force,const T dt,const T time)
 {
-    ARRAY<T,TV_INT> grid_vorticity_magnitude(grid.Domain_Indices(2),false);
+    ARRAY<T,TV_INT> grid_vorticity_magnitude(grid.Domain_Indices(2),no_init);
     VORTICITY_UNIFORM<TV>::Vorticity(grid,FACE_LOOKUP_UNIFORM<TV>(face_velocities_ghost),grid_vorticity,grid_vorticity_magnitude);
 
     if(apply_individual_particle_forces){
         // compute missing vorticity per particle
-        VORTICITY_PARTICLES<TV> missing_vorticity_particles;missing_vorticity_particles.Add_Elements(vorticity_particles.Size());
+        VORTICITY_PARTICLES<TV> missing_vorticity_particles;
+        missing_vorticity_particles.Add_Elements(vorticity_particles.Size());
         LINEAR_INTERPOLATION_UNIFORM<TV,TV> vorticity_interpolation;
 
         for(int p=0;p<vorticity_particles.Size();p++){
@@ -79,7 +80,7 @@ Compute_Body_Force(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,ARRA
                     force(it.index)-=(T)(force_scaling*Gaussian_Kernel(sqr(distance/radius))/distance)*TV::Cross_Product(X_minus_Xp,missing_vorticity_particles.vorticity(p));}}}}
     else{
         if(mpi_grid) PHYSBAM_NOT_IMPLEMENTED(); // this has not been mpi'd yet
-        ARRAY<T,TV_INT> grid_vorticity_particles_magnitude(grid.Domain_Indices(2),false);
+        ARRAY<T,TV_INT> grid_vorticity_particles_magnitude(grid.Domain_Indices(2),no_init);
     
         // form grid vorticity from vortex particles
         scattered_interpolation.Transfer_To_Grid(vorticity_particles.X,vorticity_particles.vorticity,grid,grid_vorticity_particles);
@@ -113,7 +114,7 @@ Compute_Body_Force(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,ARRA
 template<class T> void VORTEX_PARTICLE_EVOLUTION_3D<T>::
 Compute_Body_Force(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,ARRAY<T,FACE_INDEX<TV::m> >& force,const T dt,const T time)
 {
-    ARRAY<TV,TV_INT> cell_force(grid.Domain_Indices(1),false);
+    ARRAY<TV,TV_INT> cell_force(grid.Domain_Indices(1),no_init);
     Compute_Body_Force(face_velocities_ghost,cell_force,dt,time);
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();
         force.Component(axis)(iterator.Face_Index())+=(T).5*(cell_force(iterator.First_Cell_Index())[axis]+cell_force(iterator.Second_Cell_Index())[axis]);}
@@ -134,7 +135,8 @@ Euler_Step(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,const T dt,c
             two_times_V_ghost(it.index)(d)=face_velocities_ghost.Component(d)(it.index)+face_velocities_ghost.Component(d)(next);}
 
     // vortex stretching/tilting term  - omega dot grad V
-    ARRAY<MATRIX<T,3> ,TV_INT> VX(grid.Domain_Indices(1),false);LINEAR_INTERPOLATION_UNIFORM<TV,MATRIX<T,3> > VX_interpolation;
+    ARRAY<MATRIX<T,3> ,TV_INT> VX(grid.Domain_Indices(1),no_init);
+    LINEAR_INTERPOLATION_UNIFORM<TV,MATRIX<T,3> > VX_interpolation;
     T one_over_four_dx=1/(4*grid.dX.x),one_over_four_dy=1/(4*grid.dX.y),one_over_four_dz=1/(4*grid.dX.z);
     for(int i=0;i<grid.counts.x+1;i++) for(int j=0;j<grid.counts.y+1;j++) for(int ij=0;ij<grid.counts.z+1;ij++)
         VX(TV_INT(i,j,ij))=MATRIX<T,3>(one_over_four_dx*(two_times_V_ghost(i+1,j,ij)-two_times_V_ghost(i-1,j,ij)),

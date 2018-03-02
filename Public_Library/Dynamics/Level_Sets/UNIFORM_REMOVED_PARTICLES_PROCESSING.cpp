@@ -21,8 +21,8 @@ Refine_Grid_To_Particle_Size(const LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* water
     GRID<TV> temp_grid(TV_INT(scale_factor*TV(grid.counts)),grid.domain,true);
     ARRAY<T,VECTOR<int,3> > temp_phi(temp_grid.Domain_Indices(3));
     for(CELL_ITERATOR<TV> iterator(temp_grid,3);iterator.Valid();iterator.Next()) temp_phi(iterator.Cell_Index())=(*water_levelset)(iterator.Location());
-    grid=temp_grid;water_phi.Resize(grid.Domain_Indices(3),false,false);water_phi.Copy(temp_phi);
-    particle_phi.Resize(grid.Domain_Indices(3),false,false);particle_phi.Fill(0);
+    grid=temp_grid;water_phi.Resize(grid.Domain_Indices(3),no_init);water_phi.Copy(temp_phi);
+    particle_phi.Resize(grid.Domain_Indices(3),no_init);particle_phi.Fill(0);
 }
 //#####################################################################
 // Function Get_Ellipsoid
@@ -70,7 +70,7 @@ template<class T> void UNIFORM_REMOVED_PARTICLES_PROCESSING<T>::
 Merge_Phi(ARRAY<T,VECTOR<int,3> >& result) const
 {
     assert((ARRAY<T,VECTOR<int,3> >::Equal_Dimensions(water_phi,particle_phi)));
-    result.Resize(grid.Domain_Indices(3),false);
+    result.Resize(grid.Domain_Indices(3),no_init);
     result.array=water_phi.array+particle_phi.array;
 }
 //#####################################################################
@@ -80,7 +80,7 @@ template<class T> void UNIFORM_REMOVED_PARTICLES_PROCESSING<T>::
 Union_Phi(ARRAY<T,VECTOR<int,3> >& result) const
 {
     assert((ARRAY<T,VECTOR<int,3> >::Equal_Dimensions(water_phi,particle_phi)));
-    result.Resize(grid.Domain_Indices(3),false);
+    result.Resize(grid.Domain_Indices(3),no_init);
     T offset=grid.dX.Max()*blending_parameter*particle_power;
     for(int i=0;i<water_phi.array.Size();i++) result.array(i)=min(particle_phi.array(i)+offset,water_phi.array(i));
 }
@@ -91,7 +91,7 @@ template<class T> void UNIFORM_REMOVED_PARTICLES_PROCESSING<T>::
 Blend_Phi(ARRAY<T,VECTOR<int,3> >& result,const T blend_cells) const
 {
     assert((ARRAY<T,VECTOR<int,3> >::Equal_Dimensions(water_phi,particle_phi)));
-    result.Resize(grid.Domain_Indices(3),false);
+    result.Resize(grid.Domain_Indices(3),no_init);
     T offset=grid.dX.Max()*blending_parameter*particle_power;
     T scale=1/(blend_cells*grid.dX.Max());
     for(int i=0;i<water_phi.array.Size();i++){

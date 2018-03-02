@@ -46,7 +46,8 @@ template<class TV> void FLUID_STRAIN_UNIFORM<TV>::
 Update_Strain_Equation_Helper_Cell_Centered(const T dt,const T time,const T density,const T heaviside_bandwidth,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,ARRAY<TV,TV_INT>& V,
     const ARRAY<T,TV_INT>& phi_ghost,const int number_of_ghost_cells)
 {
-    T_ARRAYS_SYMMETRIC_MATRIX e_ghost(grid.Domain_Indices(number_of_ghost_cells),false);e_boundary->Fill_Ghost_Cells(grid,e,e_ghost,dt,time,number_of_ghost_cells);
+    T_ARRAYS_SYMMETRIC_MATRIX e_ghost(grid.Domain_Indices(number_of_ghost_cells),no_init);
+    e_boundary->Fill_Ghost_Cells(grid,e,e_ghost,dt,time,number_of_ghost_cells);
 
     // update the strain to time n+1
     e_advection->Update_Advection_Equation_Cell(grid,e,e_ghost,face_velocities_ghost,*e_boundary,dt,time);

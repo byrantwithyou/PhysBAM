@@ -82,8 +82,8 @@ public:
 
     void Initialize_Valid_Masks(const GRID<TV>& grid_input)
     {
-        valid_mask_current.Resize(grid_input.Cell_Indices(3),true,true,true);
-        valid_mask_next.Resize(grid_input.Cell_Indices(3),false);
+        valid_mask_current.Resize(grid_input.Cell_Indices(3),use_init,true);
+        valid_mask_next.Resize(grid_input.Cell_Indices(3),no_init);
     }
 
     void Set_Custom_Boundary(BOUNDARY<TV,T>& boundary_input)

@@ -78,7 +78,7 @@ Initialize()
     example.particles.Store_C(example.use_affine);
 
     RANGE<TV_INT> range(example.grid.Cell_Indices(example.ghost));
-    example.location.Resize(range,false,false);
+    example.location.Resize(range,no_init);
 #pragma omp parallel for
     for(int t=0;t<example.threads;t++){
         int a=(range.max_corner.x-range.min_corner.x)*t/example.threads+range.min_corner.x;

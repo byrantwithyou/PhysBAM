@@ -60,10 +60,10 @@ public:
     {dt=dt_in;dt_is_set=true;}
 
     void Set_Jump()
-    {u_jump.Resize(grid.Domain_Indices(1),false,false);u_jump.Fill(0);u_jumps=true;}
+    {u_jump.Resize(grid.Domain_Indices(1),no_init);u_jump.Fill(0);u_jumps=true;}
 
     void Set_Jump_Multiphase()
-    {u_jump_face.Resize(grid,1,false,false);u_jump_face.Fill(0);u_jumps=true;}
+    {u_jump_face.Resize(grid,1,false);u_jump_face.Fill(0);u_jumps=true;}
 
     void Set_Derivative_Jump()
     {beta_un_jump.Resize(grid.Domain_Indices(1));beta_un_jumps=true;}

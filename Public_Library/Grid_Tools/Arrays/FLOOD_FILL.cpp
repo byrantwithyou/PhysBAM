@@ -133,7 +133,7 @@ Identify_Colors_Touching_Color(const int color,const int number_of_colors,const 
 template<int d> bool FLOOD_FILL<d>::
 Path_Between_Nodes(const RANGE<TV_INT>& domain,const TV_INT& start_node,const TV_INT& end_node,const VECTOR<ARRAY_VIEW<bool,TV_INT>,TV_INT::m>& edge_is_blocked,ARRAY<TV_INT>* path)
 {
-    ARRAY<TV_INT,TV_INT> parents(domain,false);
+    ARRAY<TV_INT,TV_INT> parents(domain,no_init);
     parents.Fill(TV_INT()+INT_MAX);
     flood_fill_stack.Remove_All();
     flood_fill_stack.Preallocate(parents.domain.Size());

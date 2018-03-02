@@ -449,7 +449,7 @@ Initialize_Swept_Occupied_Blocks_For_Advection(const T dt,const T time,T maximum
 
     if(fluids_parameters.use_maccormack_semi_lagrangian_advection && fluids_parameters.use_maccormack_compute_mask){
         typedef VECTOR<int,TV::m> TV_INT;
-        fluids_parameters.maccormack_cell_mask.Resize(grid.Domain_Indices(fluids_parameters.number_of_ghost_cells),false,false);
+        fluids_parameters.maccormack_cell_mask.Resize(grid.Domain_Indices(fluids_parameters.number_of_ghost_cells),no_init);
         fluids_parameters.maccormack_face_mask.Resize(grid,fluids_parameters.number_of_ghost_cells);
         // don't use maccormack near domain boundary conditions
         for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())

@@ -269,7 +269,7 @@ Fast_Marching_Method(const GRID<TV>& grid_input,int ghost,ARRAY<T,TV_INT>& phi,c
     RANGE<TV_INT> domain=grid.Domain_Indices(ghost);
 
     // -1=unvisited, -2=done, -3=sentinal, (>=0)=index in heap
-    ARRAY<int,TV_INT> close_k(domain.Thickened(1),true,-1);
+    ARRAY<int,TV_INT> close_k(domain.Thickened(1),use_init,-1);
 
     // Pad with a band of invalid cells; this avoids the need to bounds check.
     for(int a=0;a<TV::m;a++)

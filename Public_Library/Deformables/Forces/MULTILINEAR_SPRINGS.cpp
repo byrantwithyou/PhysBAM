@@ -17,9 +17,9 @@ using namespace PhysBAM;
 template<class TV> void MULTILINEAR_SPRINGS<TV>::
 Set_Spring_Phases(const ARRAY<VECTOR<T,2> >& compression_intervals_input,const ARRAY<VECTOR<T,2> >& stretching_intervals_input)
 {
-    intervals.Resize(RANGE<VECTOR<int,1> >(VECTOR<int,1>(-compression_intervals_input.m),VECTOR<int,1>(stretching_intervals_input.m)),false,false);
-    youngs_modulus_scaling.Resize(intervals.domain,false,false);
-    correction_force_over_youngs_modulus.Resize(intervals.domain,false,false);
+    intervals.Resize(RANGE<VECTOR<int,1> >(VECTOR<int,1>(-compression_intervals_input.m),VECTOR<int,1>(stretching_intervals_input.m)),no_init);
+    youngs_modulus_scaling.Resize(intervals.domain,no_init);
+    correction_force_over_youngs_modulus.Resize(intervals.domain,no_init);
     intervals(0)=0;youngs_modulus_scaling(0)=1;correction_force_over_youngs_modulus(0)=0;
     for(int i=0;i<stretching_intervals_input.m;i++){ // stretching phases
         intervals(i)=stretching_intervals_input(i)[0];youngs_modulus_scaling(i)=stretching_intervals_input(i)[1];
@@ -42,7 +42,7 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
     states.Resize(segment_mesh.elements.m,no_init);
     current_lengths.Resize(segment_mesh.elements.m,no_init);
     correction_force.Resize(segment_mesh.elements.m,no_init);
-    spring_count.Resize(intervals.domain,false,false);
+    spring_count.Resize(intervals.domain,no_init);
     ARRAY_VIEW<const TV> X(particles.X);
     Invalidate_CFL();
     spring_count.Fill(0);
@@ -79,7 +79,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 template<class TV> void MULTILINEAR_SPRINGS<TV>::
 Set_Overdamping_Fraction(const T overdamping_fraction) // 1 is critically damped
 {
-    springs_damping.Resize(intervals.domain,false,false);
+    springs_damping.Resize(intervals.domain,no_init);
     for(int i=springs_damping.domain.min_corner.x;i<springs_damping.domain.max_corner.x;i++){
         Set_All_Springs_To_Phase(i);
         LINEAR_SPRINGS<TV>::Set_Overdamping_Fraction(overdamping_fraction);
@@ -91,7 +91,7 @@ Set_Overdamping_Fraction(const T overdamping_fraction) // 1 is critically damped
 template<class TV> void MULTILINEAR_SPRINGS<TV>::
 Set_Damping(const T constant_damping_input)
 {
-    springs_damping.Resize(intervals.domain,false,false);
+    springs_damping.Resize(intervals.domain,no_init);
     for(int i=springs_damping.domain.min_corner.x;i<springs_damping.domain.max_corner.x;i++){
         springs_damping(i).Resize(segment_mesh.elements.m,no_init);
         springs_damping(i).Fill(constant_damping_input);}
@@ -102,7 +102,7 @@ Set_Damping(const T constant_damping_input)
 template<class TV> void MULTILINEAR_SPRINGS<TV>::
 Set_Damping(ARRAY_VIEW<const T> damping_input)
 {
-    springs_damping.Resize(intervals.domain,false,false);
+    springs_damping.Resize(intervals.domain,no_init);
     for(int i=springs_damping.domain.min_corner.x;i<springs_damping.domain.max_corner.x;i++) springs_damping(i)=damping_input;
 }
 //#####################################################################
@@ -111,7 +111,7 @@ Set_Damping(ARRAY_VIEW<const T> damping_input)
 template<class TV> void MULTILINEAR_SPRINGS<TV>::
 Set_Overdamping_Fraction(ARRAY_VIEW<const T> overdamping_fraction) // 1 is critically damped
 {
-    springs_damping.Resize(intervals.domain,false,false);
+    springs_damping.Resize(intervals.domain,no_init);
     for(int i=springs_damping.domain.min_corner.x;i<springs_damping.domain.max_corner.x;i++){
         Set_All_Springs_To_Phase(i);
         LINEAR_SPRINGS<TV>::Set_Overdamping_Fraction(overdamping_fraction);

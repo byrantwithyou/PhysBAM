@@ -47,7 +47,7 @@ public:
     dimensions=clamp_min(dimensions,VECTOR<int,3>(1,1,1));
     grid.Initialize(dimensions+1,bounding_box);
     if(initialized) for(int i=0;i<cells.array.m;i++) delete cells.array(i);
-    cells.Resize(grid.Get_MAC_Grid().Domain_Indices(),false,false);cells.Fill(0);initialized=true;
+    cells.Resize(grid.Get_MAC_Grid().Domain_Indices(),no_init);cells.Fill(0);initialized=true;
     for(int k=0;k<boxes_input.m;k++){
         RANGE<TV_INT> domain(grid.Cell(boxes_input(k).x.min_corner),grid.Cell(boxes_input(k).x.max_corner));
         domain.max_corner=TV_INT::Componentwise_Min(domain.max_corner,grid.numbers_of_cells);

@@ -341,7 +341,7 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
             LOG::cout<<"Using collidable thin shell interpolation..."<<std::endl;
             GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>* fluid_collision_body_list=new GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>(*grid);
             for(COLLISION_GEOMETRY_ID i(0);i<body_list->m;i++) if((*body_list)(i)) fluid_collision_body_list->collision_geometry_collection.Add_Body((*body_list)(i),0,false);
-            ARRAY<bool,VECTOR<int,3> >* cell_valid_mask=new ARRAY<bool,VECTOR<int,3> >(grid->Domain_Indices(3),false);cell_valid_mask->Fill(true);
+            ARRAY<bool,VECTOR<int,3> >* cell_valid_mask=new ARRAY<bool,VECTOR<int,3> >(grid->Domain_Indices(3),no_init);cell_valid_mask->Fill(true);
             LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<TV,T>* linear=new LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<TV,T>(*fluid_collision_body_list,cell_valid_mask,0);
             LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<TV,TV>* linear_vector=
                 new LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<TV,TV>(*fluid_collision_body_list,cell_valid_mask,TV());
@@ -478,7 +478,7 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
                 fluid_collision_body_list->Update_Intersection_Acceleration_Structures(true,COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_NEW_STATE,
                     COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE);}
 
-            ARRAY<bool,VECTOR<int,3> >* cell_valid_mask=new ARRAY<bool,VECTOR<int,3> >(grid->Domain_Indices(3),false);cell_valid_mask->Fill(true);
+            ARRAY<bool,VECTOR<int,3> >* cell_valid_mask=new ARRAY<bool,VECTOR<int,3> >(grid->Domain_Indices(3),no_init);cell_valid_mask->Fill(true);
             LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<TV,T>* linear=new LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<TV,T>(*fluid_collision_body_list,cell_valid_mask,(T)1e-5);
             GRID<TV> occupied_grid=grid->Get_MAC_Grid();
             fluid_collision_body_list->Rasterize_Objects();

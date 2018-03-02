@@ -73,7 +73,7 @@ Sample(RANDOM_NUMBERS<T>& random,const RANGE<TV>& box,ARRAY<TV>& X)
     RANGE<TV> bounding_box=box.Thickened(min_distance*2);
     TV_INT cell_counts=TV_INT(bounding_box.Edge_Lengths()/h)+1;
     GRID<TV> grid(cell_counts+1,RANGE<TV>(bounding_box.min_corner,bounding_box.min_corner+(TV)cell_counts*h));
-    ARRAY<int,TV_INT> grid_array(grid.Cell_Indices(ghost),true,-1);
+    ARRAY<int,TV_INT> grid_array(grid.Cell_Indices(ghost),use_init,-1);
     if(X.m){
         for(int i=0;i<X.m;i++)
             Insert_In_Array(grid_array,grid.Cell(X(i)),i,grid.numbers_of_cells,

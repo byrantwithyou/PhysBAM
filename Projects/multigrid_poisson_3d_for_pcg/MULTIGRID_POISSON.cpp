@@ -39,10 +39,10 @@ MULTIGRID_POISSON(const T_INDEX& n_input,const T h_input,const int& number_of_th
     ,padded_coarse_domain(T_INDEX::All_Ones_Vector(),n_input/2+2),unpadded_coarse_domain(2*T_INDEX::All_Ones_Vector(),n_input/2+1)
     
 {
-    cell_type.Resize(grid.Domain_Indices(),false,false);
-    u.Resize(grid.Domain_Indices(),true,false);
-    b.Resize(grid.Domain_Indices(),true,false);
-    delta.Resize(grid.Domain_Indices(),true,false);
+    cell_type.Resize(grid.Domain_Indices(),no_init);
+    u.Resize(grid.Domain_Indices());
+    b.Resize(grid.Domain_Indices());
+    delta.Resize(grid.Domain_Indices());
 }
 //#####################################################################
 // Function Initialize 
@@ -51,9 +51,9 @@ template<class T,int d> void MULTIGRID_POISSON<T,d>::
 Initialize()
 {
     // Initialize state variables
-    index_has_full_diagonal_coarse_bitmask.Resize(coarse_grid.Domain_Indices(),false,false);
-    index_is_interior_coarse_bitmask.Resize(coarse_grid.Domain_Indices(),false,false);
-     diagonal_entries.Resize(grid.Domain_Indices(),false,false);
+    index_has_full_diagonal_coarse_bitmask.Resize(coarse_grid.Domain_Indices(),no_init);
+    index_is_interior_coarse_bitmask.Resize(coarse_grid.Domain_Indices(),no_init);
+     diagonal_entries.Resize(grid.Domain_Indices(),no_init);
 
     Initialize_Interior_Bitmaps_And_Diagonal_Entries();
 

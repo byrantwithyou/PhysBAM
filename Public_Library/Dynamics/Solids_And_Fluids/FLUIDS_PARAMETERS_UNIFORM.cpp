@@ -390,7 +390,7 @@ template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Get_Body_Force(ARRAY<T,FACE_INDEX<TV::m> >& force,const T dt,const T time)
 {
     if(smoke){
-        ARRAY<T,TV_INT> density_ghost(grid->Domain_Indices(number_of_ghost_cells),false),temperature_ghost(grid->Domain_Indices(number_of_ghost_cells),false);
+        ARRAY<T,TV_INT> density_ghost(grid->Domain_Indices(number_of_ghost_cells),no_init),temperature_ghost(grid->Domain_Indices(number_of_ghost_cells),no_init);
         density_container.boundary->Fill_Ghost_Cells_Cell(*grid,density_container.density,density_ghost,time,number_of_ghost_cells);
         temperature_container.boundary->Fill_Ghost_Cells_Cell(*grid,temperature_container.temperature,temperature_ghost,time,number_of_ghost_cells);
         for(FACE_ITERATOR<TV> iterator(*grid,0,GRID<TV>::WHOLE_REGION,-1,1);iterator.Valid();iterator.Next()){ // y-direction forces only
@@ -402,7 +402,7 @@ Get_Body_Force(ARRAY<T,FACE_INDEX<TV::m> >& force,const T dt,const T time)
                 if(density_difference>0 || temperature_difference>0)
                     force.Component(1)(iterator.Face_Index())=temperature_buoyancy_constant*temperature_difference-density_buoyancy_constant*density_difference;}}}
     else if(use_reacting_flow){
-        ARRAY<T,TV_INT> temperature_ghost(grid->Domain_Indices(number_of_ghost_cells),false);
+        ARRAY<T,TV_INT> temperature_ghost(grid->Domain_Indices(number_of_ghost_cells),no_init);
         temperature_container.boundary->Fill_Ghost_Cells_Cell(*grid,temperature_container.temperature,temperature_ghost,time,number_of_ghost_cells);
         LEVELSET_MULTIPLE<TV>& levelset_multiple=particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple;
         ARRAY<T> one_over_densities(number_of_regions);for(int i=0;i<number_of_regions;i++) one_over_densities(i)=(T)1/densities(i);
@@ -473,12 +473,15 @@ Move_Grid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const TV_INT& shift_domai
             global_grid.Initialize(global_grid.counts,new_domain,global_grid.Is_MAC_Grid());}
 
 
-        {ARRAY<T,TV_INT> phi_ghost(grid->Domain_Indices(number_of_ghost_cells),false);phi_boundary->Fill_Ghost_Cells(*grid,particle_levelset_evolution->phi,phi_ghost,0,time,number_of_ghost_cells);
+        {ARRAY<T,TV_INT> phi_ghost(grid->Domain_Indices(number_of_ghost_cells),no_init);
+            phi_boundary->Fill_Ghost_Cells(*grid,particle_levelset_evolution->phi,phi_ghost,0,time,number_of_ghost_cells);
         ARRAY<T,TV_INT>::Limited_Shifted_Get(particle_levelset_evolution->phi,phi_ghost,temp_shift);}
-        {ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(*grid,number_of_ghost_cells,false);fluid_boundary->Fill_Ghost_Faces(*grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
+        {ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(*grid,number_of_ghost_cells,false);
+            fluid_boundary->Fill_Ghost_Faces(*grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
         for(int axis=0;axis<TV::m;axis++)
             ARRAY<T,TV_INT>::Limited_Shifted_Get(face_velocities.Component(axis),face_velocities_ghost.Component(axis),temp_shift);}
-        {ARRAY<T,TV_INT> p_ghost(p_grid.Domain_Indices(number_of_ghost_cells),false);BOUNDARY<TV,T>().Fill_Ghost_Cells(p_grid,incompressible->projection.p,p_ghost,0,time,number_of_ghost_cells);
+        {ARRAY<T,TV_INT> p_ghost(p_grid.Domain_Indices(number_of_ghost_cells),no_init);
+            BOUNDARY<TV,T>().Fill_Ghost_Cells(p_grid,incompressible->projection.p,p_ghost,0,time,number_of_ghost_cells);
         ARRAY<T,TV_INT>::Limited_Shifted_Get(incompressible->projection.p,p_ghost,temp_shift);}
 
         for(int i=0;i<number_of_regions;i++){
@@ -677,8 +680,8 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
     std::string f=LOG::sprintf("%d",frame);
     if(!simulate) return;
     if(use_soot){
-        ARRAY<T,TV_INT> soot_ghost(grid->Cell_Indices(number_of_ghost_cells),false);
-        ARRAY<T,TV_INT> soot_fuel_ghost(grid->Cell_Indices(number_of_ghost_cells),false);
+        ARRAY<T,TV_INT> soot_ghost(grid->Cell_Indices(number_of_ghost_cells),no_init);
+        ARRAY<T,TV_INT> soot_fuel_ghost(grid->Cell_Indices(number_of_ghost_cells),no_init);
         soot_container.boundary->Fill_Ghost_Cells(*grid,soot_container.density,soot_ghost,0,0,number_of_ghost_cells);
         soot_fuel_container.boundary->Fill_Ghost_Cells(*grid,soot_fuel_container.density,soot_fuel_ghost,0,0,number_of_ghost_cells);
         Write_To_File(stream_type,output_directory+"/"+f+"/soot",soot_ghost);
@@ -695,11 +698,11 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
         // scalar fields
         if(smoke || fire){
             if(use_density){
-                ARRAY<T,TV_INT> density_ghost(grid->Cell_Indices(number_of_ghost_cells),false);
+                ARRAY<T,TV_INT> density_ghost(grid->Cell_Indices(number_of_ghost_cells),no_init);
                 density_container.boundary->Fill_Ghost_Cells(*grid,density_container.density,density_ghost,0,0,number_of_ghost_cells);
                 Write_To_File(stream_type,output_directory+"/"+f+"/density",density_ghost);}
             if(use_temperature){
-                ARRAY<T,TV_INT> temperature_ghost(grid->Cell_Indices(number_of_ghost_cells),false);
+                ARRAY<T,TV_INT> temperature_ghost(grid->Cell_Indices(number_of_ghost_cells),no_init);
                 temperature_container.boundary->Fill_Ghost_Cells(*grid,temperature_container.temperature,temperature_ghost,0,0,number_of_ghost_cells);
                 Write_To_File(stream_type,output_directory+"/"+f+"/temperature",temperature_ghost);}}
         // sph particles
@@ -747,7 +750,7 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
                     for(int i=0;i<number_of_regions;i++){
                         if(incompressible_multiphase->strains(i)){
                             std::string i_dot_f=LOG::sprintf("%d.%s",i,f.c_str()); // TODO(jontg): ...
-                            ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> e_ghost(grid->Domain_Indices(number_of_ghost_cells),false);
+                            ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> e_ghost(grid->Domain_Indices(number_of_ghost_cells),no_init);
                             incompressible_multiphase->strains(i)->e_boundary->Fill_Ghost_Cells(*grid,incompressible_multiphase->strains(i)->e,e_ghost,0,0,number_of_ghost_cells); // TODO: use real dt/time
                             Write_To_File(stream_type,output_directory+"/strain_"+i_dot_f,e_ghost);}}}}
 

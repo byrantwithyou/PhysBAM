@@ -15,7 +15,7 @@ namespace PhysBAM {
 template<class T> RENDERING_PARTICLES<T>::
 RENDERING_PARTICLES(const ARRAY<GEOMETRY_PARTICLES<TV>*,VECTOR<int,3> >& p,const GRID<TV>& g,T s)
     :particles_array(p),grid(g),scale(s),
-    particle_to_aggregate_id(particles_array.domain,true),
+    particle_to_aggregate_id(particles_array.domain),
     aggregate_id_to_particle()
 {
     Create_Aggregate_Ids();

@@ -44,7 +44,7 @@ public:
     void operator=(const VORTEX_PARTICLE_EVOLUTION_3D&) = delete;
 
     void Initialize(const GRID<TV>& grid_input)
-    {grid=grid_input.Get_MAC_Grid();grid_vorticity.Resize(grid.Domain_Indices(2),false,false);grid_vorticity_particles.Resize(grid.Domain_Indices(2),false,false);
+    {grid=grid_input.Get_MAC_Grid();grid_vorticity.Resize(grid.Domain_Indices(2),no_init);grid_vorticity_particles.Resize(grid.Domain_Indices(2),no_init);
     /*scattered_interpolation.Set_Radius_Of_Influence(radius);*/}
 
 //#####################################################################

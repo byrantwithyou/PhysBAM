@@ -871,7 +871,7 @@ template<class TV> int MPM_MAC_DRIVER<TV>::
 Allocate_Projection_System_Variable()
 {
     int ghost=2;
-    example.cell_index.Resize(example.grid.Domain_Indices(ghost),false,false);
+    example.cell_index.Resize(example.grid.Domain_Indices(ghost),no_init);
     for(int s=0;s<2*TV::m;s++){
         int value=pressure_uninit;
         typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.bc_type(s);
@@ -1476,7 +1476,7 @@ Apply_Viscosity()
     // Based on logic from IMPLICIT_VISCOSITY_UNIFORM::Setup_Boundary_Conditions
     for(int axis=0;axis<TV::m;axis++){
         GRID<TV> face_grid(example.grid.Get_Face_MAC_Grid(axis));
-        ARRAY<int,TV_INT> velocity_index(face_grid.Domain_Indices(1),true,-1);
+        ARRAY<int,TV_INT> velocity_index(face_grid.Domain_Indices(1),use_init,-1);
         VEC rhs,sol,tmp_vector;
 
         // Allocate velocities that will be corrected; copy over initial guess

@@ -126,7 +126,8 @@ Apply_Pressure(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T t
         int ghost_cells=1;
         if(poisson->multiphase){
             ARRAY<ARRAY<T,TV_INT>> phis_ghost;phis_ghost.Resize(poisson_collidable->levelset_multiple->levelsets.m);
-            for(int i=0;i<poisson_collidable->levelset_multiple->levelsets.m;i++){phis_ghost(i).Resize(p_grid.Domain_Indices(ghost_cells),false);
+            for(int i=0;i<poisson_collidable->levelset_multiple->levelsets.m;i++){
+                phis_ghost(i).Resize(p_grid.Domain_Indices(ghost_cells),no_init);
                 poisson_collidable->levelset_multiple->levelsets(i)->boundary->Fill_Ghost_Cells(p_grid,poisson_collidable->levelset_multiple->levelsets(i)->phi,phis_ghost(i),dt,time,ghost_cells);}
             LEVELSET_MULTIPLE<TV> levelset_multiple(p_grid,phis_ghost);
             for(FACE_ITERATOR<TV> iterator(p_grid);iterator.Valid();iterator.Next()){

@@ -44,7 +44,7 @@ public:
 
     void Initialize()
     {
-        particle_phi.Resize(grid.Domain_Indices(3),false,false);particle_phi.Fill(0);
+        particle_phi.Resize(grid.Domain_Indices(3),no_init);particle_phi.Fill(0);
     }
 
 //#####################################################################

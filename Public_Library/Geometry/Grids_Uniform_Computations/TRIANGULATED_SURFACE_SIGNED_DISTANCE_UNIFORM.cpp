@@ -27,7 +27,7 @@ template<class T> void Calculate(TRIANGULATED_SURFACE<T>& surface,const GRID<VEC
     bool incident_elements_defined=surface.mesh.incident_elements!=0;if(!incident_elements_defined) surface.mesh.Initialize_Incident_Elements();
 
     // ensure the phi array size matches the grid
-    phi.Resize(grid.Domain_Indices(),false,false);
+    phi.Resize(grid.Domain_Indices(),no_init);
 
     T epsilon=(T)1e-8*grid.dX.Min();
     int total_cells=grid.counts.x*grid.counts.y*grid.counts.z,cells_done=0,progress=-1;

@@ -44,8 +44,8 @@ public:
     void Clean_Memory()
     {array.Clean_Memory();}
     
-    virtual void Initialize_Array(const int ghost_cells=0,const bool initialize_new_elements=true,const bool copy_existing_elements=true)
-    {array.Resize(grid.Cell_Indices(ghost_cells),initialize_new_elements,copy_existing_elements);}
+    virtual void Initialize_Array(const int ghost_cells=0)
+    {array.Resize(grid.Cell_Indices(ghost_cells));}
   
     void Initialize_Domain_Boundary_Conditions(const TV_SIDES& domain_walls=TV_SIDES::Constant_Vector(TV_BOOL2::Constant_Vector(true)))
     {boundary->Set_Constant_Extrapolation(Complement(domain_walls));}

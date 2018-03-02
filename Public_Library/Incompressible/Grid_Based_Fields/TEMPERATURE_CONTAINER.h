@@ -39,9 +39,9 @@ public:
     TEMPERATURE_CONTAINER(GRID<TV>& grid_input);
     ~TEMPERATURE_CONTAINER();
 
-    void Initialize_Array(const int ghost_cells=0,const bool initialize_new_elements=true,const bool copy_existing_elements=true) override
-    {GRID_AND_ARRAY_CONTAINER<TV,T>::Initialize_Array(ghost_cells,initialize_new_elements,copy_existing_elements);
-    if(semi_lagrangian_collidable){valid_mask_current.Resize(grid.Cell_Indices(3),true,true,true);valid_mask_next.Resize(grid.Cell_Indices(3),false);}}
+    void Initialize_Array(const int ghost_cells=0) override
+    {GRID_AND_ARRAY_CONTAINER<TV,T>::Initialize_Array(ghost_cells);
+    if(semi_lagrangian_collidable){valid_mask_current.Resize(grid.Cell_Indices(3),use_init,true);valid_mask_next.Resize(grid.Cell_Indices(3),no_init);}}
   
     void Set_Ambient_Temperature(const T temperature_input=298)
     {ambient_temperature=temperature_input;boundary->Set_Fixed_Boundary(true,ambient_temperature);}

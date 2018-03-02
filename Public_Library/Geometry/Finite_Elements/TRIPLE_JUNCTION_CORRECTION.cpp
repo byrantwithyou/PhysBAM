@@ -137,7 +137,7 @@ Initialize_Pairwise_Level_Set()
     for(int i=0;i<phi.m;i++){
         pairwise_phi(i).Resize(phi.m);
         for(int j=i+1;j<phi.m;j++){
-            pairwise_phi(i)(j).Resize(grid.Node_Indices(extrap_width),false);
+            pairwise_phi(i)(j).Resize(grid.Node_Indices(extrap_width),no_init);
             pairwise_phi(i)(j).Fill(default_phi);}}
 
     for(NODE_ITERATOR<TV> it(grid,ghost);it.Valid();it.Next()){

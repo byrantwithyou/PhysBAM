@@ -106,13 +106,13 @@ public:
         fft_range.max_corner(TV::m-1)/=2;
         fft_range.max_corner(TV::m-1)++;
 
-        u.Resize(grid.Node_Indices(),false);
-        fft.Resize(fft_range,false);
-        fft_index.Resize(fft_range,false);
-        force.Resize(grid.Node_Indices(),false);
-        source.Resize(grid.Node_Indices(),false);
-        location.Resize(grid.Node_Indices(),false);
-        index.Resize(grid.Node_Indices(),false);
+        u.Resize(grid.Node_Indices(),no_init);
+        fft.Resize(fft_range,no_init);
+        fft_index.Resize(fft_range,no_init);
+        force.Resize(grid.Node_Indices(),no_init);
+        source.Resize(grid.Node_Indices(),no_init);
+        location.Resize(grid.Node_Indices(),no_init);
+        index.Resize(grid.Node_Indices(),no_init);
         array_m=location.array.m;
 
         transform=new FFT<TV>;

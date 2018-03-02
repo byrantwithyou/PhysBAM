@@ -28,18 +28,35 @@ public:
     using BASE::array; // one-dimensional data storage
     using BASE::domain;using BASE::Exchange;using BASE::stride;using BASE::offset;
     using BASE::Calculate_Acceleration_Constants;
-public:
 
     ARRAY() = default;
 
-    ARRAY(const RANGE<TV_INT>& domain_input,const bool initialize_using_initialization_value=true,const T& initialization_value=T())
-    {Initialize(domain_input,initialize_using_initialization_value,initialization_value);}
+    ARRAY(const RANGE<TV_INT>& domain_input)
+    {Initialize(domain_input,true,T());}
 
-    ARRAY(const TV_INT& size_input,const bool initialize_using_initialization_value=true,const T& initialization_value=T())
-    {Initialize(RANGE<TV_INT>(TV_INT(),size_input),initialize_using_initialization_value,initialization_value);}
+    ARRAY(const RANGE<TV_INT>& domain_input,NO_INIT)
+    {Initialize(domain_input,false,T());}
 
-    ARRAY(const ARRAY& old_array,const bool initialize_with_old_array=true)
-    {Initialize(old_array.domain,false,T());if(initialize_with_old_array) array=old_array.array;}
+    ARRAY(const RANGE<TV_INT>& domain_input,USE_INIT,const T& initialization_value=T())
+    {Initialize(domain_input,true,initialization_value);}
+
+    ARRAY(const TV_INT& size_input)
+        :ARRAY(RANGE<TV_INT>(TV_INT(),size_input))
+    {}
+
+    ARRAY(const TV_INT& size_input,NO_INIT)
+        :ARRAY(RANGE<TV_INT>(TV_INT(),size_input),no_init)
+    {}
+
+    ARRAY(const TV_INT& size_input,USE_INIT,const T& initialization_value=T())
+        :ARRAY(RANGE<TV_INT>(TV_INT(),size_input),use_init,initialization_value)
+    {}
+
+    ARRAY(const ARRAY& old_array)
+    {Initialize(old_array.domain,false,T());array=old_array.array;}
+
+    ARRAY(const ARRAY& old_array,NO_INIT)
+    {Initialize(old_array.domain,false,T());}
 
     ARRAY(ARRAY&&) = default;
 
@@ -57,7 +74,7 @@ protected:
 public:
 
     void Clean_Memory()
-    {Resize(RANGE<TV_INT>::Empty_Box(),false,false);}
+    {Resize(RANGE<TV_INT>::Empty_Box(),no_init);}
 
     void Delete_Pointers_And_Clean_Memory() // only valid if T is a pointer type
     {for(int i=0;i<array.Size();i++) delete array(i);Clean_Memory();}
@@ -76,14 +93,31 @@ public:
     Resize_In_Place(source.Domain_Indices());
     ARRAY_BASE<T,BASE,TV_INT>::operator=(source);return *this;}
 
-    void Resize(const RANGE<TV_INT>& box,const bool initialize_new_elements=true,const bool copy_existing_elements=true,const T& initialization_value=T())
+    void Resize(const RANGE<TV_INT>& box)
     {if(box==domain) return;
-    ARRAY new_array(box,initialize_new_elements,initialization_value);
-    if(copy_existing_elements) this->Put(*this,new_array,domain.Intersect(box));
+    ARRAY new_array(box);
+    this->Put(*this,new_array,domain.Intersect(box));
     Exchange(new_array);}
 
-    void Resize(const TV_INT& corner,const bool initialize_new_elements=true,const bool copy_existing_elements=true,const T& initialization_value=T())
-    {Resize(RANGE<TV_INT>(TV_INT(),corner),initialize_new_elements,copy_existing_elements,initialization_value);}
+    void Resize(const RANGE<TV_INT>& box,NO_INIT)
+    {if(box==domain) return;
+    ARRAY new_array(box,no_init);
+    Exchange(new_array);}
+
+    void Resize(const RANGE<TV_INT>& box,USE_INIT,const T& initialization_value)
+    {if(box==domain) return;
+    ARRAY new_array(box,use_init,initialization_value);
+    this->Put(*this,new_array,domain.Intersect(box));
+    Exchange(new_array);}
+
+    void Resize(const TV_INT& corner)
+    {Resize(RANGE<TV_INT>(TV_INT(),corner));}
+
+    void Resize(const TV_INT& corner,NO_INIT)
+    {Resize(RANGE<TV_INT>(TV_INT(),corner),no_init);}
+
+    void Resize(const TV_INT& corner,USE_INIT,const T& initialization_value)
+    {Resize(RANGE<TV_INT>(TV_INT(),corner),use_init,initialization_value);}
 
     void Reallocate_In_Place(const RANGE<TV_INT>& box)
     {TV_INT counts_new(box.Edge_Lengths());int size_new=counts_new.Product();Calculate_Acceleration_Constants(box);delete [] array.Get_Array_Pointer();array.Set(size_new,new T[size_new]);}
@@ -105,7 +139,7 @@ protected:
     template<class RW>
     void Read_With_Length(std::istream& input,const int length2)
     {int read_length;RANGE<TV_INT> domain_temp;Read_Binary<RW>(input,read_length,domain_temp);
-    Resize(domain_temp,false);
+    Resize(domain_temp,no_init);
     Read_Binary_Array<RW>(input,array.Get_Array_Pointer(),array.Size());}
 
     template<class RW>

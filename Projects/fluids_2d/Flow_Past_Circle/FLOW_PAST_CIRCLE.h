@@ -202,8 +202,8 @@ void Write_Output_Files(const int frame) const override
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Write_Output_Files(frame);
     ARRAY<T,FACE_INDEX<2> > face_velocities_ghost(*fluids_parameters.grid,3,false);
     fluids_parameters.incompressible->boundary->Fill_Ghost_Faces(*fluids_parameters.grid,fluid_collection.incompressible_fluid_collection.face_velocities,face_velocities_ghost,0,3);
-    ARRAY<VECTOR<T,1>,TV_INT> grid_vorticity(fluids_parameters.grid->Domain_Indices(3),false);
-    ARRAY<T,TV_INT> grid_vorticity_magnitude(fluids_parameters.grid->Domain_Indices(3),false);
+    ARRAY<VECTOR<T,1>,TV_INT> grid_vorticity(fluids_parameters.grid->Domain_Indices(3),no_init);
+    ARRAY<T,TV_INT> grid_vorticity_magnitude(fluids_parameters.grid->Domain_Indices(3),no_init);
     VORTICITY_UNIFORM<TV>::Vorticity(*fluids_parameters.grid,FACE_LOOKUP_UNIFORM<TV>(face_velocities_ghost),grid_vorticity,grid_vorticity_magnitude);
     //CELL_ITERATOR<TV> fuckyou(*fluids_parameters.grid,3,GRID<TV>::GHOST_REGION);
     for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid,3,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next()) grid_vorticity(iterator.Cell_Index())=VECTOR<T,1>();

@@ -101,7 +101,7 @@ public:
 
         // initialize right hand side
         MULTIGRID_POISSON<T,d>& multigrid_poisson=multigrid_poisson_solver->Discretization();
-        b.Resize(multigrid_poisson.grid.Domain_Indices(),false,false);
+        b.Resize(multigrid_poisson.grid.Domain_Indices(),no_init);
         switch(test_number){
             case 1:
             case 2:
@@ -135,8 +135,8 @@ public:
         }
 
         // Initialize initial guess
-        x.Resize(multigrid_poisson.grid.Domain_Indices(),false,false);
-        tmp.Resize(multigrid_poisson.grid.Domain_Indices(),false,false);
+        x.Resize(multigrid_poisson.grid.Domain_Indices(),no_init);
+        tmp.Resize(multigrid_poisson.grid.Domain_Indices(),no_init);
         switch(test_number){
             case 1:
             case 2:

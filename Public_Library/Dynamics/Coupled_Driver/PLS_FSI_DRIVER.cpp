@@ -358,7 +358,7 @@ Extrapolate_Velocity_Across_Interface(T time,T dt)
     T delta=band_width*grid.dX.Max();
     for(int axis=0;axis<TV::m;axis++){
         GRID<TV> face_grid=grid.Get_Face_Grid(axis);
-        ARRAY<T,TV_INT> phi_face(face_grid.Domain_Indices(),false);
+        ARRAY<T,TV_INT> phi_face(face_grid.Domain_Indices(),no_init);
         ARRAYS_ND_BASE<T,TV_INT>& face_velocity=example.fluid_collection.incompressible_fluid_collection.face_velocities.Component(axis);
         ARRAYS_ND_BASE<bool,TV_INT>& fixed_face=valid_faces.Component(axis);
         for(FACE_ITERATOR<TV> iterator(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next()){
