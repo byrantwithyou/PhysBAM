@@ -6,6 +6,7 @@
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Log/SCOPE.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
 #include <Tools/Particles/PARTICLES_FORWARD.h>
 #include <Geometry/Grids_Uniform_Computations/DUALCONTOUR_2D.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
@@ -14,6 +15,7 @@
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
+#include <OpenGL/OpenGL/BASIC_VISUALIZATION.h>
 #include <OpenGL/OpenGL/OPENGL_AXES.h>
 #include <OpenGL/OpenGL/OPENGL_BOX_3D.h>
 #include <OpenGL/OpenGL/OPENGL_CALLBACK.h>
@@ -31,7 +33,7 @@
 #include <cstring>
 #include <fstream>
 using namespace PhysBAM;
-template<class T> void Add_File(const std::string& filename,int number);
+template<class T> void Add_File(OPENGL_WORLD<T>& opengl_world,const std::string& filename,int number);
 template<class T> void Add_Tri2D_File(const std::string& filename,OPENGL_WORLD<T>& world,int number);
 template<class T> void Add_Tri_File(const std::string& filename,OPENGL_WORLD<T>& world,int number);
 template<class T> void Add_Obj_File(const std::string& filename,OPENGL_WORLD<T>& world,int number);
@@ -48,40 +50,38 @@ static bool print_statistics=true;
 //#################################################################
 // Function main
 //#################################################################
-int main(int argc,char *argv[])
-{
-    bool type_double=false;    
 
+template<class T>
+class VIEW_GEOMETRY_VISUALIZATION:public BASIC_VISUALIZATION<T>
+{
+  public:
     ARRAY<std::string> files;
-    for(int i=1;i<argc;i++){
-        if(!strcmp(argv[i],"-float")) type_double=false;
-        else if (!strcmp(argv[i],"-double")) type_double=true;
-        else if (!strcmp(argv[i],"-show_boundary")) triangulated_surface_highlight_boundary = true;
-        else if (!strcmp(argv[i],"-nostat")) print_statistics = false;
-        else files.Append(argv[i]);}
 
-    for(int i=0;i<files.m;i++){
-        if(!type_double) Add_File<float>(files(i),i);
-        else Add_File<double>(files(i),i);}
-    return 0;
-}
-//#################################################################
-// Function Add_File
-//#################################################################
-template<class T> void Add_File(const std::string& filename,int number)
-{
-    OPENGL_WORLD<T> world;
-    world.Add_Light(new OPENGL_LIGHT(VECTOR<double,3>(1,1,1),.8));
-    world.Add_Light(new OPENGL_LIGHT(VECTOR<double,3>(.3,-2,.1),.4));
-    world.Add_Light(new OPENGL_LIGHT(VECTOR<double,3>(-2,.1,.5),.2));
-    world.Set_Ambient_Light(.2);
-    world.Initialize("PhysBAM geometry viewer");
+    VIEW_GEOMETRY_VISUALIZATION()
+    {
+    }
 
-    world.Bind_Key("^c",{[&world](){world.Save_View("camera_script",true);},"Save view"});
-    world.Bind_Key('c',{[&world](){world.Load_View("camera_script",true);},"Load view"});
+    void Setup_And_Run(PARSE_ARGS &parse_args)
+    {
+        parse_args.Extra_Optional(&files,0,"files","Files to be viewed");
+        this->Initialize(parse_args);
+        this->opengl_window_title="PhysBAM geometry viewer";
+        this->Run();
+        
+        // world.Add_Light(new OPENGL_LIGHT(VECTOR<double,3>(1,1,1),.8));
+        // world.Add_Light(new OPENGL_LIGHT(VECTOR<double,3>(.3,-2,.1),.4));
+        // world.Add_Light(new OPENGL_LIGHT(VECTOR<double,3>(-2,.1,.5),.2));
+        // world.Set_Ambient_Light(.2);
+        // world.Initialize("PhysBAM geometry viewer");
 
-    static std::map<std::string,std::function<void(const std::string&,OPENGL_WORLD<T>&,int)> > func_map;
-    if(func_map.empty()){
+        // world.Bind_Key("^c",{[&world](){world.Save_View("camera_script",true);},"Save view"});
+        // world.Bind_Key('c',{[&world](){world.Load_View("camera_script",true);},"Load view"});
+    }
+
+    virtual void Initialize_Components_And_Key_Bindings()
+    {
+        BASIC_VISUALIZATION<T>::Initialize_Components_And_Key_Bindings();
+        std::map<std::string,std::function<void(const std::string&,OPENGL_WORLD<T>&,int)> > func_map;
         func_map["tri"]=Add_Tri_File<T>;
         func_map["obj"]=Add_Obj_File<T>;
         func_map["tri2d"]=Add_Tri2D_File<T>;
@@ -91,14 +91,36 @@ template<class T> void Add_File(const std::string& filename,int number)
         func_map["curve2d"]=Add_Curve2D_File<T>;
         func_map["tet"]=Add_Tet_File<T>;
         func_map["hex"]=Add_Hex_File<T>;
-        func_map["box"]=Add_Box_File<T>;}
+        func_map["box"]=Add_Box_File<T>;
 
-    auto it=func_map.find(Get_File_Extension(filename));
-    if(it!=func_map.end()) it->second(filename,world,number);
-    else LOG::cerr<<"Unrecognized file "<<filename<<std::endl;
-    LOG::cout<<std::flush;
-    world.Center_Camera_On_Scene();
-    world.window->Main_Loop();
+        for(int i=0;i<files.m;i++)
+        {
+            auto it=func_map.find(Get_File_Extension(files(i)));
+            if(it!=func_map.end()) it->second(files(i),this->opengl_world,i);
+            else LOG::cerr<<"Unrecognized file "<<files(i)<<std::endl;
+        }
+        LOG::cout<<std::flush;
+    }
+};
+
+int main(int argc,char *argv[])
+{
+    bool type_double=false;    
+    PARSE_ARGS parse_args(argc,argv);
+    parse_args.Add_Not("-float",&type_double,"Compute in floats");
+    parse_args.Add("-double",&type_double,"Compute in doubles");
+    parse_args.Add("-show_boundary",&triangulated_surface_highlight_boundary,"Highlight boundary");
+    parse_args.Add_Not("-nostat",&print_statistics,"Disable statistics");
+    parse_args.Parse(true);
+    
+    if(type_double){
+        VIEW_GEOMETRY_VISUALIZATION<double> v;
+        v.Setup_And_Run(parse_args);}
+    else{
+        VIEW_GEOMETRY_VISUALIZATION<float> v;
+        v.Setup_And_Run(parse_args);}
+    
+    return 0;
 }
 //#################################################################
 // Function Add_Box_File
@@ -123,6 +145,7 @@ template<class T> void Add_Hex_File(const std::string& filename,OPENGL_WORLD<T>&
         HEXAHEDRALIZED_VOLUME<T>* hex_vol;
         Create_From_File(filename,hex_vol);
         OPENGL_HEXAHEDRALIZED_VOLUME<T>* ohv=new OPENGL_HEXAHEDRALIZED_VOLUME<T>(&hex_vol->mesh,&hex_vol->particles,OPENGL_MATERIAL::Matte(OPENGL_COLOR(float(.7),float(1),float(.8))),OPENGL_MATERIAL::Matte(OPENGL_COLOR(float(.7),float(8),float(.1))));
+        ohv->selectable=true;
         world.Add_Object(ohv,true,true);}
     catch(FILESYSTEM_ERROR&){}
 }
@@ -141,7 +164,7 @@ template<class T> void Add_Tri2D_File(const std::string& filename,OPENGL_WORLD<T
         LOG::cout<<"bounding box: "<<*area->bounding_box<<std::endl;
         OPENGL_TRIANGULATED_SURFACE<T>* opengl_triangulated_surface=new OPENGL_TRIANGULATED_SURFACE<T>(*surface,false,OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Cyan()));
         world.Bind_Key('0'+number,{[opengl_triangulated_surface](){static bool is_two_sided=false;is_two_sided=!is_two_sided;opengl_triangulated_surface->Set_Two_Sided(is_two_sided);},"Toggle Two Sided"});
-
+        opengl_triangulated_surface->selectable=true;
         world.Add_Object(opengl_triangulated_surface,true,true);}
     catch(FILESYSTEM_ERROR&){}
 }
@@ -154,12 +177,13 @@ template<class T> void Add_Tri_File(const std::string& filename,OPENGL_WORLD<T>&
         TRIANGULATED_SURFACE<T>* surface;
         Create_From_File(filename,surface);
         {LOG::SCOPE scope("mesh statistics","mesh statistics");
-        LOG::cout<<"filename = "<<filename<<std::endl;
-        if(print_statistics) surface->Print_Statistics(LOG::cout);}
+            LOG::cout<<"filename = "<<filename<<std::endl;
+            if(print_statistics) surface->Print_Statistics(LOG::cout);}
         OPENGL_TRIANGULATED_SURFACE<T>* opengl_triangulated_surface=new OPENGL_TRIANGULATED_SURFACE<T>(*surface,false,
             OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Red()),OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Blue()));
         if(triangulated_surface_highlight_boundary) opengl_triangulated_surface->highlight_boundary=true;
         world.Bind_Key('0'+number,{[opengl_triangulated_surface](){static bool is_two_sided=false;is_two_sided=!is_two_sided;opengl_triangulated_surface->Set_Two_Sided(is_two_sided);},"Toggle Two Sided"});
+        opengl_triangulated_surface->selectable=true;
         world.Add_Object(opengl_triangulated_surface,true,true);}
     catch(FILESYSTEM_ERROR&){}
 }
@@ -172,12 +196,13 @@ template<class T> void Add_Obj_File(const std::string& filename,OPENGL_WORLD<T>&
         TRIANGULATED_SURFACE<T>* surface=new TRIANGULATED_SURFACE<T>;
         surface->Read_Obj(filename);
         {LOG::SCOPE scope("mesh statistics","mesh statistics");
-        LOG::cout<<"filename = "<<filename<<std::endl;
-        if(print_statistics) surface->Print_Statistics(LOG::cout);}
+            LOG::cout<<"filename = "<<filename<<std::endl;
+            if(print_statistics) surface->Print_Statistics(LOG::cout);}
         OPENGL_TRIANGULATED_SURFACE<T>* opengl_triangulated_surface=new OPENGL_TRIANGULATED_SURFACE<T>(*surface,false,
             OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Red()),OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Blue()));
         if(triangulated_surface_highlight_boundary) opengl_triangulated_surface->highlight_boundary=true;
         world.Bind_Key('0'+number,{[opengl_triangulated_surface](){static bool is_two_sided=false;is_two_sided=!is_two_sided;opengl_triangulated_surface->Set_Two_Sided(is_two_sided);},"Toggle Two Sided"});
+        opengl_triangulated_surface->selectable=true;
         world.Add_Object(opengl_triangulated_surface,true,true);}
     catch(FILESYSTEM_ERROR&){}
 }
@@ -233,6 +258,7 @@ template<class T> void Add_Phi_File(const std::string& filename,OPENGL_WORLD<T>&
         opengl_surface->Set_Levelset(surface->levelset);
         opengl_surface->Generate_Triangulated_Surface(false,"");
         opengl_surface->Set_Surface_Material(OPENGL_MATERIAL::Matte(OPENGL_COLOR(float(.8),float(.7),float(1))),OPENGL_MATERIAL::Matte(OPENGL_COLOR(float(.8),float(.8),float(.1))));
+        opengl_surface->selectable=true;
         world.Add_Object(opengl_surface);}
     catch(FILESYSTEM_ERROR&){}
 }
@@ -272,6 +298,7 @@ template<class T> void Add_Phi2D_File(const std::string& filename,OPENGL_WORLD<T
         curve->Update_Bounding_Box();
         LOG::cout<<"bounding box: "<<*curve->bounding_box<<std::endl;
         OPENGL_SEGMENTED_CURVE_2D<T>* og_curve=new OPENGL_SEGMENTED_CURVE_2D<T>(*curve,OPENGL_COLOR::Yellow());
+        og_curve->selectable=true;
         world.Add_Object(og_curve);}
     catch(FILESYSTEM_ERROR&){}
 }
@@ -286,6 +313,7 @@ template<class T> void Add_Curve_File(const std::string& filename,OPENGL_WORLD<T
         curve->Update_Bounding_Box();
         LOG::cout<<"bounding box: "<<*curve->bounding_box<<std::endl;
         OPENGL_SEGMENTED_CURVE_3D<T>* og_curve=new OPENGL_SEGMENTED_CURVE_3D<T>(*curve,OPENGL_COLOR::Yellow());
+        og_curve->selectable=true;
         world.Add_Object(og_curve);}
     catch(FILESYSTEM_ERROR&){}
 }
@@ -300,6 +328,7 @@ template<class T> void Add_Curve2D_File(const std::string& filename,OPENGL_WORLD
         curve->Update_Bounding_Box();
         LOG::cout<<"bounding box: "<<*curve->bounding_box<<std::endl;
         OPENGL_SEGMENTED_CURVE_2D<T>* og_curve=new OPENGL_SEGMENTED_CURVE_2D<T>(*curve,OPENGL_COLOR::Yellow());
+        og_curve->selectable=true;
         world.Add_Object(og_curve);}
     catch(FILESYSTEM_ERROR&){}
 }
@@ -312,8 +341,8 @@ template<class T> void Add_Tet_File(const std::string& filename,OPENGL_WORLD<T>&
         TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume;
         Create_From_File(filename,tetrahedralized_volume);
         {LOG::SCOPE scope("mesh statistics","mesh statistics");
-        LOG::cout<<"filename = "<<filename<<std::endl;
-        if(print_statistics) tetrahedralized_volume->Print_Statistics(LOG::cout);}
+            LOG::cout<<"filename = "<<filename<<std::endl;
+            if(print_statistics) tetrahedralized_volume->Print_Statistics(LOG::cout);}
         OPENGL_TETRAHEDRALIZED_VOLUME<T>* tets=new OPENGL_TETRAHEDRALIZED_VOLUME<T>(&(tetrahedralized_volume->mesh),&(tetrahedralized_volume->particles),
             OPENGL_MATERIAL::Plastic(OPENGL_COLOR(float(.9),float(.1),float(.1))),OPENGL_MATERIAL::Plastic(OPENGL_COLOR(float(.1),float(.9),float(.1))));
         T ymin,ymax;
@@ -324,18 +353,19 @@ template<class T> void Add_Tet_File(const std::string& filename,OPENGL_WORLD<T>&
             ymin=PhysBAM::min(ymin,tets->particles->X(p).y);
             ymax=PhysBAM::max(ymax,tets->particles->X(p).y);}
         world.Bind_Key('c',{[tets,ymin,ymax,range](){
-            static int cut=range;
-            tets->boundary_only=false;
-            tets->subset.Remove_All();
-            cut--;
-            if(cut<0)cut=range;
-            T y=ymin+(ymax-ymin)*cut/range;
-            for(int t=0;t<tets->mesh->elements.m;t++){
-                int i,j,k,l;
-                tets->mesh->elements(t).Get(i,j,k,l);
-                if(tets->particles->X(i).y<y || tets->particles->X(j).y<y || tets->particles->X(k).y<y || tets->particles->X(l).y<y)
-                    tets->subset.Append(t);}
+                    static int cut=range;
+                    tets->boundary_only=false;
+                    tets->subset.Remove_All();
+                    cut--;
+                    if(cut<0)cut=range;
+                    T y=ymin+(ymax-ymin)*cut/range;
+                    for(int t=0;t<tets->mesh->elements.m;t++){
+                        int i,j,k,l;
+                        tets->mesh->elements(t).Get(i,j,k,l);
+                        if(tets->particles->X(i).y<y || tets->particles->X(j).y<y || tets->particles->X(k).y<y || tets->particles->X(l).y<y)
+                            tets->subset.Append(t);}
                 },"Cross section"});
+        tets->selectable=true;
         world.Add_Object(tets,true,true);}
     catch(FILESYSTEM_ERROR&){}
 }

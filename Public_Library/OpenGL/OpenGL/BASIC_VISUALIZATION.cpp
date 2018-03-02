@@ -18,8 +18,8 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> BASIC_VISUALIZATION<T>::
 BASIC_VISUALIZATION() 
-    :opengl_axes(0),set_window_position(false),opengl_window_title("OpenGL Visualization"),add_axes(true),render_offscreen(false),
-    opt_left_handed(false),opt_smooth(false),selection_enabled(true),selected_object(0)
+    :opengl_axes(new OPENGL_AXES<T>),set_window_position(false),opengl_window_title("OpenGL Visualization"),render_offscreen(false),
+    opt_left_handed(false),opt_smooth(false),selected_object(0)
 {
     reset_view_cb={[this](){Reset_View();},"Center view on selection (or reset if none)"};
     reset_up_cb={[this](){Reset_Up();},"Reset up vector for view"};
@@ -195,12 +195,10 @@ template<class T> void BASIC_VISUALIZATION<T>::
 PostInitialize_OpenGL_World()
 {
     Add_OpenGL_Initialization();
-    Reset_Objects_In_World();
+    Add_Objects_In_World();
     Initialize_Scene();
     
-    if(selection_enabled){
-        opengl_world.load_names_for_selection=true;
-        opengl_world.process_hits_cb=[=](GLint hits,GLuint buffer[],int modifiers){Process_Hits(hits,buffer,modifiers);};}
+    opengl_world.process_hits_cb=[=](GLint hits,GLuint buffer[],int modifiers){Process_Hits(hits,buffer,modifiers);};
 }
 //#####################################################################
 // Function Initialize_Scene
@@ -227,17 +225,14 @@ Update_OpenGL_Strings()
     opengl_world.Add_String(output_stream.str());
 }
 //#####################################################################
-// Function Reset_Objects_In_World
+// Function Add_Objects_In_World
 //#####################################################################
 template<class T> void BASIC_VISUALIZATION<T>::
-Reset_Objects_In_World()
+Add_Objects_In_World()
 {
-    opengl_world.Clear_All_Objects();
     // Add components
     for(int i=0;i<component_list.m;i++) opengl_world.Add_Object(component_list(i),true,true);
-    if(add_axes){
-        if(!opengl_axes) opengl_axes=new OPENGL_AXES<T>;
-        opengl_world.Add_Object(opengl_axes,false);}
+    opengl_world.Add_Object(opengl_axes,false);
 }
 //#####################################################################
 // Function Reset_View
@@ -264,8 +259,7 @@ Reset_Up()
 template<class T> void BASIC_VISUALIZATION<T>::
 Toggle_Axes()
 {
-    add_axes=!add_axes;
-    Reset_Objects_In_World();
+    opengl_axes->visible=!opengl_axes->visible;
 }
 //#####################################################################
 // Function Draw_All_Objects
@@ -293,12 +287,13 @@ Process_Hits(GLint hits,GLuint buffer[],int modifiers)
         GLint names=buffer[idx];
         int object_id=buffer[idx+3];
         ARRAY_VIEW<GLuint> name_buffer(names-1,&buffer[idx+4]);
-        PHYSBAM_ASSERT(0<=object_id && object_id<opengl_world.object_list.m && opengl_world.object_list(object_id)->selectable);
+        PHYSBAM_ASSERT(0<=object_id && object_id<opengl_world.object_list.m);
         unsigned int denom=0xffffffff;
         T min_depth=(T)buffer[idx+1]/denom;
-        int this_priority=opengl_world.object_list(object_id)->Get_Selection_Priority(name_buffer);
         int this_idx=idx;
         idx +=names+3;
+        if(!opengl_world.object_list(object_id)->selectable) continue;
+        int this_priority=opengl_world.object_list(object_id)->Get_Selection_Priority(name_buffer);
         if(this_priority<0) continue;
 
         // Ties and roundoff are likely, so be careful about it.

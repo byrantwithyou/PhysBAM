@@ -52,7 +52,7 @@ private:
     void Parse_Args(PARSE_ARGS &parse_args);
     void PreInitialize_OpenGL_World();
     void PostInitialize_OpenGL_World();
-    void Reset_Objects_In_World();
+    void Add_Objects_In_World();
 
 private:
     void Reset_View();
@@ -73,14 +73,12 @@ public:
     VECTOR<int,2> window_position;
     T fovy;
     std::string opengl_window_title;
-    bool add_axes;
     bool render_offscreen;
     std::string camera_script_filename;
     std::string initialization_key_sequence;
     bool opt_left_handed,opt_smooth;
 
     // Selection stuff
-    bool selection_enabled;
     OPENGL_OBJECT<T>* selected_object;
 };
 

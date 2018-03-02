@@ -40,7 +40,7 @@ template<class T> inline OPENGL_WORLD<T>*& Opengl_World()
 //#####################################################################
 template<class T> OPENGL_WORLD<T>::
 OPENGL_WORLD()
-    :initialized(false),smooth_shading(false),ambient_light(OPENGL_COLOR::White()),fovy(50),mode_2d(false),load_names_for_selection(false),
+    :initialized(false),smooth_shading(false),ambient_light(OPENGL_COLOR::White()),fovy(50),mode_2d(false),
     window(0),fill_mode(DRAW_FILLED),enable_lighting_for_wireframe(false),white_background(false),
     display_strings(true),show_object_names(false),display_object_names_in_corner(false),view_auto_help(false),
     timer_id(0),idle_delay(0),idle_timer(0),view_target_timer(0),frame_counter_timer(0),frames_rendered(0),frames_per_second(0),show_frames_per_second(true),
@@ -419,15 +419,17 @@ template<class T> void OPENGL_WORLD<T>::Render_World(bool selecting,bool swap_bu
         glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
         glEnable(GL_POLYGON_OFFSET_FILL);
         glPolygonOffset(1.0,1.0);
-        for(int i=0;i<object_list.m;i++) if((!selecting && object_list(i)->visible) || object_list(i)->selectable) object_list(i)->Display();
+        for(int i=0;i<object_list.m;i++)
+            if(object_list(i)->visible)
+                object_list(i)->Display();
         glDisable(GL_POLYGON_OFFSET_FILL);
         glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
         if(!enable_lighting_for_wireframe){
             glDisable(GL_LIGHTING);wireframe_color.Send_To_GL_Pipeline();}}
 
     for(int i=0;i<object_list.m;i++)
-        if((!selecting && object_list(i)->visible) || object_list(i)->selectable){
-            if(load_names_for_selection) glLoadName(i);
+        if(object_list(i)->visible){
+            glLoadName(i);
             object_list(i)->Display();}
     if(view_target_timer>0) Display_Target();
     glEnable(GL_LIGHTING);
@@ -610,6 +612,7 @@ Handle_Click_Main(int button,int state,int x,int y,int modifiers)
                               5.0,5.0,viewport);
                 // glOrtho(0.0,10.0,0.0,10.0,0.0,10.0);
                 Render_World(true,false);
+                glPopName();
                 glMatrixMode(GL_PROJECTION);
                 glPopMatrix();
                 glFlush();

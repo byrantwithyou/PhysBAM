@@ -10,6 +10,7 @@
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 #include <OpenGL/OpenGL/ANIMATED_VISUALIZATION.h>
+#include <OpenGL/OpenGL/OPENGL_AXES.h>
 #include <OpenGL/OpenGL/OPENGL_CONSTANT_COLOR_MAP.h>
 #include <OpenGL/OpenGL/OPENGL_GRID_1D.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_BASIC.h>
@@ -31,7 +32,7 @@ class OPENGL_1D_VISUALIZATION:public ANIMATED_VISUALIZATION<T>
 {
     typedef VECTOR<T,1> TV;
 public:
-    using ANIMATED_VISUALIZATION<T>::add_axes;using ANIMATED_VISUALIZATION<T>::opengl_window_title;
+    using ANIMATED_VISUALIZATION<T>::opengl_window_title;
     using ANIMATED_VISUALIZATION<T>::start_frame;using ANIMATED_VISUALIZATION<T>::last_frame_filename;
     using ANIMATED_VISUALIZATION<T>::opengl_world;using ANIMATED_VISUALIZATION<T>::camera_script_filename;
     using ANIMATED_VISUALIZATION<T>::frame;using ANIMATED_VISUALIZATION<T>::component_list;
@@ -67,7 +68,7 @@ template<class T> OPENGL_1D_VISUALIZATION<T>::
 OPENGL_1D_VISUALIZATION()
     :grid_component(0)
 {
-    add_axes=false;
+    this->opengl_axes->visible=false;
 }
 //#####################################################################
 // Function OPENGL_1D_VISUALIZATION

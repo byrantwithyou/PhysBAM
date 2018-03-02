@@ -13,6 +13,7 @@
 #include <Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
 #include <Dynamics/Particles/SPH_PARTICLES.h>
 #include <OpenGL/OpenGL/ANIMATED_VISUALIZATION.h>
+#include <OpenGL/OpenGL/OPENGL_AXES.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR_RAMP.h>
 #include <OpenGL/OpenGL/OPENGL_CONSTANT_COLOR_MAP.h>
 #include <OpenGL/OpenGL/OPENGL_GRID_2D.h>
@@ -52,7 +53,7 @@ class OPENGL_2D_VISUALIZATION:public ANIMATED_VISUALIZATION<T>
     typedef VECTOR<T,2> TV;
     typedef VECTOR<int,2> TV_INT;
 public:
-    using ANIMATED_VISUALIZATION<T>::add_axes;using ANIMATED_VISUALIZATION<T>::start_frame;
+    using ANIMATED_VISUALIZATION<T>::start_frame;
     using ANIMATED_VISUALIZATION<T>::opengl_world;using ANIMATED_VISUALIZATION<T>::opengl_window_title;
     using ANIMATED_VISUALIZATION<T>::last_frame_filename;using ANIMATED_VISUALIZATION<T>::frame;
     using ANIMATED_VISUALIZATION<T>::frame_increment;using ANIMATED_VISUALIZATION<T>::frame_title;
@@ -107,7 +108,7 @@ OPENGL_2D_VISUALIZATION()
     removed_positive_particles_component(0),removed_negative_particles_component(0),
     grid_component(0)
 {
-    add_axes=false;
+    this->opengl_axes->visible=false;
 }
 //#####################################################################
 // OPENGL_2D_VISUALIZATION

@@ -79,7 +79,6 @@ public:
     // window parameters
     T fovy;
     bool mode_2d;
-    bool load_names_for_selection;
     OPENGL_WINDOW<T>* window;
 private:
 
