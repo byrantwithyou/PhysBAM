@@ -174,6 +174,7 @@ Simulate_To_Frame(const int frame)
 {
     for(;current_frame<frame;current_frame++){
         LOG::SCOPE scope("FRAME","frame %d",current_frame+1);
+        if(example.pfd) example.pfd->Reset_Hash_Table();
         if(example.begin_frame) example.begin_frame(current_frame);
         if(example.substeps_delay_frame==current_frame)
             DEBUG_SUBSTEPS::write_substeps_level=example.write_substeps_level;

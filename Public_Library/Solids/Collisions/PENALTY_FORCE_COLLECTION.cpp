@@ -34,6 +34,17 @@ Update_Collision_Detection_Structures()
     Update_Cell_Objects(new_grid);
 }
 //#####################################################################
+// Function Reset_Hash_Table
+//#####################################################################
+template<class TV> void PENALTY_FORCE_COLLECTION<TV>::
+Reset_Hash_Table()
+{
+    cell_particles.hash.Clean_Memory();
+    cell_objects.hash.Clean_Memory();
+    cell_vertices.hash.Clean_Memory();
+    rasterized_data.hash.Clean_Memory();
+}
+//#####################################################################
 // Function Update_Cell_Vertices
 //#####################################################################
 template<class TV> void PENALTY_FORCE_COLLECTION<TV>::

@@ -68,6 +68,7 @@ public:
     void operator=(const PENALTY_FORCE_COLLECTION&) = delete;
     ~PENALTY_FORCE_COLLECTION() = default;
 
+    void Reset_Hash_Table();
     void Update_Collision_Detection_Structures();
     void Update_Cell_Vertices(bool new_grid);
     void Update_Rasterized_Data(bool new_grid);
