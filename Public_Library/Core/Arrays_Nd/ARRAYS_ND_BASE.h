@@ -92,7 +92,6 @@ protected:
     for(int i=TV_INT::m-1;i>0;i--) stride(i-1)=stride(i)*counts(i);
     offset=-domain.min_corner.Dot(stride);}
 
-public:
     template<class T_ARRAY1>
     ARRAYS_ND_BASE& operator=(const T_ARRAY1& source)
     {assert(Equal_Dimensions(*this,source));array=source.array;return *this;}
@@ -102,6 +101,7 @@ public:
 
     ARRAYS_ND_BASE& operator=(ARRAYS_ND_BASE&& source)
     {assert(Equal_Dimensions(*this,source));array=std::move(source.array);return *this;}
+public:
 
     const RANGE<TV_INT>& Domain_Indices() const
     {return domain;}
