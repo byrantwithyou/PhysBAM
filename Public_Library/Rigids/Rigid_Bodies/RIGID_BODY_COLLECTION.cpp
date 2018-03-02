@@ -488,6 +488,7 @@ Read(const std::string& directory,const int frame,ARRAY<int>* needs_init,ARRAY<i
                     if(rigid_body_particles.structure_ids(p)(s)>=0)
                         rigid_body->Add_Structure(*structure_list.Element(rigid_body_particles.structure_ids(p)(s)));}
             if(Is_Active(p) && rigid_body_particles.structure_ids(p)==VECTOR<int,3>(-1,-1,-1)) Deactivate_Body(p);}}
+    Update_Level_Set_Transforms();
 }
 //#####################################################################
 // Function Write
