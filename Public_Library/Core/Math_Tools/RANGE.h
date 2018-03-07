@@ -186,7 +186,7 @@ public:
     template<class T_ARRAY>
     void Enlarge_To_Include_Points(const T_ARRAY& points)
     {STATIC_ASSERT((is_same<typename T_ARRAY::ELEMENT,TV>::value));
-    if(points.Size()) return;
+    if(!points.Size()) return;
     Enlarge_To_Include_Point(points(0));
     for(int i=1;i<points.Size();i++) Enlarge_Nonempty_Box_To_Include_Point(points(i));}
 
