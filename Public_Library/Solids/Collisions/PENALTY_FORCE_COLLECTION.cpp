@@ -3,16 +3,13 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
+#include <Geometry/Spatial_Acceleration/CONTINUOUS_COLLISION_DETECTION.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Rigids/Forces_And_Torques/RIGID_PENALTY_WITH_FRICTION.h>
 #include <Rigids/Particles/RIGID_BODY_PARTICLES.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
-#include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
-#include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISIONS.h>
-#include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS.h>
-#include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION.h>
 #include <Deformables/Forces/SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION.h>
@@ -172,13 +169,13 @@ Get_DD_Collision_Candidates()
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX_FACE T_FACE;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
-    ARRAY<TV>& Xn=deformable_body_collection.triangle_repulsions_and_collisions_geometry.X_self_collision_free;
-    deformable_body_collection.triangle_collisions.Update_Swept_Hierachies_And_Compute_Pairs(
-        particles.X,Xn,recently_modified,const_repulsion_thickness);
 
-    LOG::printf("num candidate pairs: %i\n",deformable_body_collection.triangle_collisions.point_face_pairs_internal.m);
-    for(int i=0;i<deformable_body_collection.triangle_collisions.point_face_pairs_internal.m;i++){ // p f
-        VECTOR<int,TV::m+1> pf=deformable_body_collection.triangle_collisions.point_face_pairs_internal(i);
+    ARRAY<CCD_PAIR<TV::m> > point_face;
+    Continuous_Collision_Detection<TV>(X0,particles.X,
+        deformable_body_collection.structures,&point_face,0,const_repulsion_thickness);
+    
+    for(int i=0;i<point_face.m;i++){ // p f
+        VECTOR<int,TV::m+1> pf=point_face(i).f;
         int p=pf(0);
         TV_INT f=pf.Remove_Index(0);
 
@@ -192,12 +189,12 @@ Get_DD_Collision_Candidates()
         if(ts.Get_Element(s_e.y).Signed_Distance(particles.X(p))>0) continue;
 
         // Do the expensive check.
-        T_FACE face(Xn.Subset(f));
+        T_FACE face(X0.Subset(f));
         T collision_time=0;
         TV normal;
         VECTOR<T,TV::m+1> weights;
-        VECTOR<TV,TV::m> V_f(particles.X.Subset(f)-Xn.Subset(f));
-        bool in=face.Point_Face_Collision(Xn(p),particles.X(p)-Xn(p),V_f,1,
+        VECTOR<TV,TV::m> V_f(particles.X.Subset(f)-X0.Subset(f));
+        bool in=face.Point_Face_Collision(X0(p),particles.X(p)-X0(p),V_f,1,
             const_repulsion_thickness,collision_time,normal,weights,false);
         if(!in) continue;
 
@@ -214,17 +211,13 @@ Save_State()
     const DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     if(dd_penalty){
         state_saved=true;
-        solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.X_self_collision_free=particles.X;
-        repulsion_thickness.Resize(particles.number,use_init,const_repulsion_thickness);
-        recently_modified.Resize(particles.number);
-        recently_modified.Fill(true);}
+        X0=particles.X;}
 }
 //#####################################################################
 // Function Init
 //#####################################################################
 template<class TV> void PENALTY_FORCE_COLLECTION<TV>::
-Init(TRIANGLE_COLLISION_PARAMETERS<TV>* param,
-    bool use_di,bool use_dd,bool use_rd,bool use_rr)
+Init(bool use_di,bool use_dd,bool use_rd,bool use_rr)
 {
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_SURFACE;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m>::OBJECT T_OBJECT;
@@ -253,22 +246,12 @@ Init(TRIANGLE_COLLISION_PARAMETERS<TV>* param,
         dd_penalty=new SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION<TV>(particles);
         dd_penalty->get_candidates=[this](){Get_DD_Collision_Candidates();};
         solid_body_collection.Add_Force(dd_penalty);
-        deformable_body_collection.triangle_collisions.compute_edge_edge_collisions=false;
         for(int i=0;i<deformable_body_collection.structures.m;i++){
             auto* s=deformable_body_collection.structures(i);
             if(auto* p=dynamic_cast<T_SURFACE*>(s))
                 dd_penalty->Add_Surface(*p);
             else if(auto* p=dynamic_cast<T_OBJECT*>(s))
-                dd_penalty->Add_Surface(p->Get_Boundary_Object());}
-        deformable_body_collection.triangle_repulsions_and_collisions_geometry.Build_Collision_Geometry();
-        deformable_body_collection.triangle_repulsions_and_collisions_geometry.X_self_collision_free=particles.X;
-        repulsion_thickness.Resize(particles.number,use_init,const_repulsion_thickness);
-        recently_modified.Resize(particles.number,use_init,true);
-
-        PHYSBAM_ASSERT(param);
-        deformable_body_collection.triangle_repulsions_and_collisions_geometry.Initialize(*param);
-        deformable_body_collection.triangle_repulsions.Initialize(*param);
-        deformable_body_collection.triangle_collisions.Initialize(*param);}
+                dd_penalty->Add_Surface(p->Get_Boundary_Object());}}
 }
 //#####################################################################
 // Function Update_Attachments_And_Prune_Pairs

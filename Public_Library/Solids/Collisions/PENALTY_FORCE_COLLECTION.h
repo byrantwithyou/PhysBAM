@@ -14,7 +14,6 @@ template<class TV> class SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION;
 template<class TV> class SOLID_BODY_COLLECTION;
 template<class TV> class MOVE_RIGID_BODY_DIFF;
 template<class TV> class IMPLICIT_OBJECT;
-template<class TV> class TRIANGLE_COLLISION_PARAMETERS;
 
 template<class TV>
 class PENALTY_FORCE_COLLECTION
@@ -48,10 +47,9 @@ public:
     RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>* rd_penalty=0;
     RIGID_PENALTY_WITH_FRICTION<TV>* rr_penalty=0;
     SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION<TV>* dd_penalty=0;
-
+    ARRAY<TV> X0;
+    
     T const_repulsion_thickness=(T)1e-4;
-    ARRAY<T> repulsion_thickness; // must be same size as particles.number
-    ARRAY<bool> recently_modified; // must be same size as particles.number
     bool state_saved=false;
 
     PENALTY_FORCE_COLLECTION(SOLID_BODY_COLLECTION<TV>& solid_body_collection,
@@ -61,8 +59,7 @@ public:
         simulated_particles(simulated_particles),move_rb_diff(move_rb_diff)
     {grid.domain=RANGE<TV>(TV::All_Ones_Vector(),-TV::All_Ones_Vector());}
 
-    void Init(TRIANGLE_COLLISION_PARAMETERS<TV>* param,
-        bool use_di,bool use_dd,bool use_rd,bool use_rr);
+    void Init(bool use_di,bool use_dd,bool use_rd,bool use_rr);
     
     PENALTY_FORCE_COLLECTION(const PENALTY_FORCE_COLLECTION&) = delete;
     void operator=(const PENALTY_FORCE_COLLECTION&) = delete;

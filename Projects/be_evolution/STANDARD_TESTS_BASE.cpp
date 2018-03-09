@@ -223,8 +223,7 @@ Init_Penalty_Collection()
     detection_grid.Initialize(TV_INT()+100,RANGE<TV>::Centered_Box()*10,true);
     pfd=new PENALTY_FORCE_COLLECTION<TV>(solid_body_collection,
         solid_body_collection.deformable_body_collection.simulated_particles,this->move_rb_diff);
-    pfd->Init(&solids_parameters.triangle_collision_parameters,
-        use_di,use_dd,use_rd,use_rr);
+    pfd->Init(use_di,use_dd,use_rd,use_rr);
     if(use_di) pfd->di_penalty->stiffness_coefficient=use_di_k?di_k:rd_penalty_stiffness;
     if(use_dd) pfd->dd_penalty->stiffness_coefficient=use_dd_k?dd_k:rd_penalty_stiffness;
     if(use_rd) pfd->rd_penalty->stiffness_coefficient=use_rd_k?rd_k:rd_penalty_stiffness;

@@ -123,7 +123,7 @@ Initialize()
     if((example.use_rr || example.use_rd) && !example.pfd){
         example.pfd=new PENALTY_FORCE_COLLECTION<TV>(example.solid_body_collection,
             example.simulated_particles,example.move_rb_diff);
-        example.pfd->Init(0,example.use_di,false,example.use_rd,example.use_rr);}
+        example.pfd->Init(example.use_di,false,example.use_rd,example.use_rr);}
     if(example.use_di) example.pfd->di_penalty->stiffness_coefficient=example.use_di_k?example.di_k:example.rd_penalty_stiffness;
     if(example.use_rd) example.pfd->rd_penalty->stiffness_coefficient=example.use_rd_k?example.rd_k:example.rd_penalty_stiffness;
     if(example.use_rr) example.pfd->rr_penalty->stiffness_coefficient=example.use_rr_k?example.rr_k:example.rd_penalty_stiffness;

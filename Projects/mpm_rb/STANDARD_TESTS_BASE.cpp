@@ -568,7 +568,7 @@ Add_Collision_Object(IMPLICIT_OBJECT<TV>* io)
     if(!use_di) return;
     if(use_di && !pfd){
         pfd=new PENALTY_FORCE_COLLECTION<TV>(solid_body_collection,simulated_particles,this->move_rb_diff);
-        pfd->Init(0,use_di,false,use_rd,use_rr);}
+        pfd->Init(use_di,false,use_rd,use_rr);}
     pfd->di_penalty->ios.Append(io);
 }
 //#####################################################################
