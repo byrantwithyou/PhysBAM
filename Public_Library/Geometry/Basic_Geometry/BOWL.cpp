@@ -32,7 +32,10 @@ Signed_Distance(const TV& X) const
 
     if((dX_x>=0 && dX_y>=0) || (dX_x<=0 && dX_y<=0)){
         T dr=dX_mag*((dX_x>=0 && dX_y>=0)?(T)1:(T)(-1))-(depth+height)*0.5;
-        return abs(dr)-thickness*(T)0.5;}
+        T dshell=abs(dr)-thickness*(T)0.5;
+        if(dshell<=0 && abs(dX_y)<abs(dshell)) return -abs(dX_y);
+        else return dshell;
+    }
     T max_value=max(dX_x,dX_y);
     T min_value=min(dX_x,dX_y);
     if(max_value<depth) return ::std::hypot(min_value,max_value-depth);
@@ -52,7 +55,9 @@ Compute_Diff_Helper(const BOWL<T>& b,const TV& X)
 
     if((dX_x.x>=0 && dX_y.x>=0) || (dX_x.x<=0 && dX_y.x<=0)){
         AUTO_DIFF<T,TV> dr=dX_mag*((dX_x.x>=0 && dX_y.x>=0)?(T)1:(T)(-1))-(b.depth+b.height)*0.5;
-        return (abs(dr)-b.thickness*(T)0.5);}
+        AUTO_DIFF<T,TV> dshell=abs(dr)-b.thickness*(T)0.5;
+        if(dshell.x<=0 && abs(dX_y.x)<abs(dshell.x)) return -abs(dX_y);
+        else return dshell;}
     AUTO_DIFF<T,TV> max_value=max(dX_x,dX_y);
     AUTO_DIFF<T,TV> min_value=min(dX_x,dX_y);
     if(max_value.x<b.depth) return hypot(min_value,max_value-b.depth);
@@ -72,7 +77,9 @@ Compute_Hess_Helper(const BOWL<T>& b,const TV& X)
 
     if((dX_x.x>=0 && dX_y.x>=0) || (dX_x.x<=0 && dX_y.x<=0)){
         AUTO_HESS<T,TV> dr=dX_mag*((dX_x.x>=0 && dX_y.x>=0)?(T)1:(T)(-1))-(b.depth+b.height)*0.5;
-        return (abs(dr)-b.thickness*(T)0.5);}
+        AUTO_HESS<T,TV> dshell=abs(dr)-b.thickness*(T)0.5;
+        if(dshell.x<=0 && abs(dX_y.x)<abs(dshell.x)) return -abs(dX_y);
+        else return dshell;}
     AUTO_HESS<T,TV> max_value=max(dX_x,dX_y);
     AUTO_HESS<T,TV> min_value=min(dX_x,dX_y);
     if(max_value.x<b.depth) return hypot(min_value,max_value-b.depth);
