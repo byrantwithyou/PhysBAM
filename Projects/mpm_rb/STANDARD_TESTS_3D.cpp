@@ -441,6 +441,7 @@ Initialize()
                     particles.lambda0(i)=lambda;
                     (*colors)(i)=Sand_Color();
                     affected_particles.Append(i);}
+                LOG::printf("Particles: %d %d\n",particles.number,particles.number-n);
                 for(int i=0;i<plasticity_models.m;i++)
                     if(MPM_DRUCKER_PRAGER<TV>* dp=dynamic_cast<MPM_DRUCKER_PRAGER<TV>*>(plasticity_models(i)))
                         dp->Initialize_Particles(&affected_particles);
@@ -656,6 +657,7 @@ Initialize()
                     particles.lambda0(i)=lambda;
                     (*colors)(i)=Sand_Color();
                     affected_particles.Append(i);}
+                LOG::printf("Particles: %d %d\n",particles.number,particles.number-n);
                 for(int i=0;i<plasticity_models.m;i++)
                     if(MPM_DRUCKER_PRAGER<TV>* dp=dynamic_cast<MPM_DRUCKER_PRAGER<TV>*>(plasticity_models(i)))
                         dp->Initialize_Particles(&affected_particles);
@@ -700,6 +702,7 @@ Initialize()
             if(!use_max_hardening) max_hardening=FLT_MAX;
             Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
             Seed_Particles(sandbox,0,0,density,particles_per_cell);
+            LOG::printf("Particles: %d\n",particles.number);
             Add_Drucker_Prager_Case(E,nu,2);
             TV g=m/(s*s)*TV(0,-4.81,0);
             Add_Gravity(g);
@@ -744,6 +747,7 @@ Initialize()
             Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
             RANGE<TV> sand(TV(0.3,0.1,0.3),TV(0.7,0.7,0.7));
             Seed_Particles(sand,0,0,density*1,particles_per_cell);
+            LOG::printf("Particles: %d\n",particles.number);
             ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
             for(int p=0;p<particles.number;p++) (*colors)(p)=Sand_Color();
             Add_Drucker_Prager_Case(E,nu,2);
