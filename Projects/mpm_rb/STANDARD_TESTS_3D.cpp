@@ -675,27 +675,26 @@ Initialize()
             particles.Store_Fp(true);
             Set_Grid(RANGE<TV>(TV(-.1,-.1,-.1),TV(3.1,1.1,1.1))*m,TV_INT(3,1,1));
 
-            T s=1.01;
-            RIGID_BODY<TV>& bw=tests.Add_Analytic_Box(s*TV(3,0.1,1));
+            RIGID_BODY<TV>& bw=tests.Add_Analytic_Box(TV(3.2,0.1,1.2));
             bw.is_static=true;
             bw.Frame().t=TV(1.5,0.05,0.5);
             T h=0.3;
-            RIGID_BODY<TV>& w1=tests.Add_Analytic_Box(s*TV(0.1,h,1));
+            RIGID_BODY<TV>& w1=tests.Add_Analytic_Box(TV(0.1,h,1.2));
             w1.Frame().t=TV(-0.05,h/2,0.5);
             w1.is_static=true;
-            RIGID_BODY<TV>& w2=tests.Add_Analytic_Box(s*TV(0.1,h,1));
+            RIGID_BODY<TV>& w2=tests.Add_Analytic_Box(TV(0.1,h,1.2));
             w2.Frame().t=TV(3.05,h/2,0.5);
             w2.is_static=true;
-            RIGID_BODY<TV>& w3=tests.Add_Analytic_Box(s*TV(3+0.2,h,0.1));
+            RIGID_BODY<TV>& w3=tests.Add_Analytic_Box(TV(3+0.2,h,0.1));
             w3.Frame().t=TV(1.5,h/2,-0.05);
             w3.is_static=true;
-            RIGID_BODY<TV>& w4=tests.Add_Analytic_Box(s*TV(3+0.2,h,0.1));
+            RIGID_BODY<TV>& w4=tests.Add_Analytic_Box(TV(3+0.2,h,0.1));
             w4.Frame().t=TV(1.5,h/2,1.05);
             w4.is_static=true;
 
             T density=(T)2200*unit_rho*scale_mass;
             T E=35.37e6*unit_p*scale_E,nu=.3;
-            RANGE<TV> sandbox(TV(0,0.1*s,0),TV(3,0.2,1));
+            RANGE<TV> sandbox(TV(0,0.1,0),TV(3,0.2,1));
             if(!use_theta_c) theta_c=0.015;
             if(!use_theta_s) theta_s=.000001;
             if(!use_hardening_factor) hardening_factor=20;
@@ -720,21 +719,20 @@ Initialize()
             particles.Store_Fp(true);
             Set_Grid(RANGE<TV>(TV(-.1,-.1,-.1),TV(1.1,1.1,1.1))*m);
 
-            T s=1.01;
-            RIGID_BODY<TV>& bw=tests.Add_Analytic_Box(s*TV(1,0.1,1));
+            RIGID_BODY<TV>& bw=tests.Add_Analytic_Box(TV(1.2,0.1,1.2));
             bw.is_static=true;
             bw.Frame().t=TV(0.5,0.05,0.5);
             T h=0.2;
-            RIGID_BODY<TV>& w1=tests.Add_Analytic_Box(s*TV(0.1,h,1));
+            RIGID_BODY<TV>& w1=tests.Add_Analytic_Box(TV(0.1,h,1.2));
             w1.Frame().t=TV(-0.05,h/2,0.5);
             w1.is_static=true;
-            RIGID_BODY<TV>& w2=tests.Add_Analytic_Box(s*TV(0.1,h,1));
+            RIGID_BODY<TV>& w2=tests.Add_Analytic_Box(TV(0.1,h,1.2));
             w2.Frame().t=TV(1.05,h/2,0.5);
             w2.is_static=true;
-            RIGID_BODY<TV>& w3=tests.Add_Analytic_Box(s*TV(1+0.2,h,0.1));
+            RIGID_BODY<TV>& w3=tests.Add_Analytic_Box(TV(1+0.2,h,0.1));
             w3.Frame().t=TV(0.5,h/2,-0.05);
             w3.is_static=true;
-            RIGID_BODY<TV>& w4=tests.Add_Analytic_Box(s*TV(1+0.2,h,0.1));
+            RIGID_BODY<TV>& w4=tests.Add_Analytic_Box(TV(1+0.2,h,0.1));
             w4.Frame().t=TV(0.5,h/2,1.05);
             w4.is_static=true;
 
