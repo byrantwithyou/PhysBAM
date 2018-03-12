@@ -38,6 +38,7 @@
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/MPM_DRUCKER_PRAGER.h>
 #include <Hybrid_Methods/Forces/MPM_OLDROYD_FINITE_ELEMENTS.h>
+#include <Hybrid_Methods/Forces/MPM_PLASTICITY_CLAMP.h>
 #include <Hybrid_Methods/Forces/MPM_VISCOSITY.h>
 #include <Hybrid_Methods/Forces/VOLUME_PRESERVING_OB_NEO_HOOKEAN.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
@@ -399,7 +400,7 @@ Initialize()
             solid_body_collection.rigid_body_collection.Add_Force(rg);
         } break;
 
-        case 60:{ // goo on obj
+        case 60:{ // sand on obj
             particles.Store_Fp(true);
             Set_Grid(RANGE<TV>(TV(),TV(3,1,3))*m,TV_INT(3,1,3));
 
@@ -449,6 +450,68 @@ Initialize()
             end_time_step=[=](T time){source->End_Time_Step(time);};
 
             Add_Drucker_Prager_Case(E,nu,2);
+            Add_Gravity(gravity);
+
+            RIGID_BODY<TV>& sphere=tests.Add_Analytic_Sphere(0.2,density*0.1);
+            sphere.Frame().t=TV(1.35,0.3,1.35);
+            auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,gravity);
+            solid_body_collection.rigid_body_collection.Add_Force(rg);
+        } break;
+
+        case 61:{ // goo on obj
+            particles.Store_Fp(true);
+            particles.Store_Lame(true);
+            particles.Store_Lame0(true);
+            Set_Grid(RANGE<TV>(TV(),TV(3,1,3))*m,TV_INT(3,1,3));
+
+            RIGID_BODY<TV>& bw=tests.Add_Analytic_Box(TV(3,0.1,3));
+            bw.is_static=true;
+            bw.Frame().t=TV(1.5,0.05,1.5);
+
+            T density=(T)2200*unit_rho*scale_mass;
+            T E=1e4*unit_p*scale_E,nu=.3;
+            TV spout(1.5,0.8,1.5);
+            T spout_width=.1*m;
+            T spout_height=.05*m;
+            T seed_buffer=grid.dX.y*5;
+            T pour_speed=.2*m/s;
+            TV gravity=TV(0,-9.8*m/(s*s),0);
+            RANGE<TV> seed_range(spout+TV(-spout_width/2,-spout_height,-spout_width/2),
+                spout+TV(spout_width/2,seed_buffer,spout_width/2));
+
+            T volume=grid.dX.Product()/particles_per_cell;
+            T mass=density*volume;
+            POUR_SOURCE<TV>* source=new POUR_SOURCE<TV>(*this,
+                *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(seed_range),TV(0,-1,0),spout,
+                TV(0,-pour_speed,0),gravity,max_dt*pour_speed+grid.dX.y,seed_buffer,mass,volume);
+            destroy=[=](){delete source;};
+            write_output_files=[=](int frame){source->Write_Output_Files(frame);};
+            read_output_files=[=](int frame){source->Read_Output_Files(frame);};
+            begin_time_step=[=](T time)
+            {
+                ARRAY<int> affected_particles;
+                int n=particles.number;
+                source->Begin_Time_Step(time);
+                T mu=E/(2*(1+nu));
+                T lambda=E*nu/((1+nu)*(1-2*nu));
+                for(int i=n;i<particles.number;i++){
+                    particles.mu(i)=mu;
+                    particles.mu0(i)=mu;
+                    particles.lambda(i)=lambda;
+                    particles.lambda0(i)=lambda;
+                    affected_particles.Append(i);}
+                LOG::printf("Particles: %d %d\n",particles.number,particles.number-n);
+                for(int i=0;i<plasticity_models.m;i++)
+                    if(MPM_PLASTICITY_CLAMP<TV>* pc=dynamic_cast<MPM_PLASTICITY_CLAMP<TV>*>(plasticity_models(i)))
+                        pc->Initialize_Particles(&affected_particles);
+            };
+            end_time_step=[=](T time){source->End_Time_Step(time);};
+
+            if(!use_theta_c) theta_c=0.015;
+            if(!use_theta_s) theta_s=.000001;
+            if(!use_hardening_factor) hardening_factor=20;
+            if(!use_max_hardening) max_hardening=FLT_MAX;
+            Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
             Add_Gravity(gravity);
 
             RIGID_BODY<TV>& sphere=tests.Add_Analytic_Sphere(0.2,density*0.1);
