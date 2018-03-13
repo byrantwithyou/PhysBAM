@@ -107,6 +107,7 @@
 #include <Deformables/Forces/IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION.h>
 #include <Deformables/Forces/RALEIGH_DAMPING_FORCE.h>
 #include <Deformables/Forces/SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION.h>
+#include <Deformables/Forces/TRIANGLE_BENDING_SPRINGS.h>
 #include <Solids/Collisions/RIGID_DEFORMABLE_COLLISIONS.h>
 #include <Solids/Examples_And_Drivers/SOLIDS_EXAMPLE.h>
 #include <Solids/Forces_And_Torques/ETHER_DRAG.h>
@@ -359,6 +360,9 @@ public:
             case 130:{
                 // Test rigid-deformable penalty force with friction.
                 // ./be_evolution 701 -no_collisions_in_solve -rd_stiffness 1e2
+                break;}
+            case 140:{
+                // Cloth, rigid and deformable tori
                 break;}
             case 2:
                 if(!user_last_frame) last_frame=600;
@@ -1776,6 +1780,33 @@ void Get_Initial_Data()
             ground.Frame().t=TV(4,0.05,4);
             ground.is_static=true;
             break;}
+        case 140:{
+            int number_side_panels=64;
+            TRIANGULATED_SURFACE<T>& cloth=tests.Create_Cloth_Panel(number_side_panels,2,1,
+                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(),ROTATION<TV>::From_Euler_Angles(pi,(T)0,(T)0))));
+            SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(cloth,1);
+            int n=number_side_panels+1;
+            for(int i=0;i<n;i++)
+                stuck_particles.Append(i);
+            for(int i=0;i<n;i++)
+                stuck_particles.Append(n*(n-1)+i);
+            for(int i=1;i<n-1;i++){
+                stuck_particles.Append(i*n);
+                stuck_particles.Append(i*n+n-1);}
+            tests.Create_Tetrahedralized_Volume(
+                data_directory+"/Tetrahedralized_Volumes/adaptive_torus_float.tet",
+                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(-0.4,0.16,0)*m,ROTATION<TV>())),true,true,density,0.1*m);
+            tests.Create_Tetrahedralized_Volume(
+                data_directory+"/Tetrahedralized_Volumes/adaptive_torus_float.tet",
+                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0.4,0.16,0.2)*m,ROTATION<TV>())),true,true,density,0.1*m);
+            RIGID_BODY<TV>& rt0=tests.Add_Analytic_Torus((T)0.05,(T)0.1,16,32,2*density);
+            rt0.Frame().t=TV(0,0.16,0.3);
+            RIGID_BODY<TV>& rt1=tests.Add_Analytic_Torus((T)0.05,(T)0.1,16,32,2*density);
+            rt1.Frame().t=TV(0.3,0.16,0);
+            RIGID_BODY<TV>& ground=tests.Add_Analytic_Box(TV(8,0.1,8));
+            ground.Frame().t=TV(0,-1,0);
+            ground.is_static=true;
+            break;}
         case 730:{
             T gap=0.005;
             T r=0.15;
@@ -2343,6 +2374,20 @@ void Initialize_Bodies() override
             GRAVITY<TV>* g=new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true,gravity);
             solid_body_collection.Add_Force(g);
             break;}
+        case 140:{
+            TRIANGULATED_SURFACE<T>& cloth=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,
+                solid_body_collection.rigid_body_collection,true,true));
+            T linear_stiffness=stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
+            solid_body_collection.Add_Force(Create_Edge_Springs(cloth,linear_stiffness,linear_damping));
+            T bending_stiffness_multiplier=1,bending_damping_multiplier=1;
+            T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
+            solid_body_collection.Add_Force(Create_Bending_Springs(cloth,bending_stiffness,bending_damping));
+            for(int s=0;;s++){
+                auto st=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(s);
+                if(!st) break;
+                Add_Constitutive_Model(*st,(T)1e4*unit_p,(T).45,(T).01*s);}
+            break;}
         default:
             LOG::cerr<<"Missing bodies implementation for test number "<<test_number<<std::endl;exit(1);}
 
@@ -2741,6 +2786,10 @@ void Postprocess_Substep(const T dt,const T time) override
         RIGID_BODY<TV>& torus=solid_body_collection.rigid_body_collection.Rigid_Body(0);
         torus.Frame().t=TV(4,0.45,3.7);
         torus.Twist()=TWIST<TV>();}
+    if(test_number==140 && time>2){
+        int n=64+1;
+        if(stuck_particles.m>n)
+            stuck_particles.Resize(n);}
 
     BASE::Postprocess_Substep(dt,time);
 }
