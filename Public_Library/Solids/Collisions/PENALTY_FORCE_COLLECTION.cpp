@@ -69,7 +69,7 @@ Update_Rasterized_Data(bool new_grid)
     rasterized_data.Remove_All();
     int clamp_ghost=1000000;
     const RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
-    T padding=grid.dX.Max()*.5;
+    T padding=grid.dX.Magnitude()*.5;
     for(int b=0;b<rigid_body_particles.frame.m;b++){
         RIGID_BODY<TV>& rigid_body=*rigid_body_particles.rigid_body(b);
         rigid_body.Update_Bounding_Box_From_Implicit_Geometry();
