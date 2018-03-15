@@ -2,6 +2,7 @@
 // Copyright 2009, Nipun Kwatra.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Log/DEBUG_UTILITIES.h>
 #include <Core/Log/SCOPE.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Core/Utilities/PROCESS_UTILITIES.h>
@@ -55,8 +56,8 @@ EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     frame_rate/=s;
     max_dt*=s;
 
-    if(substeps_delay_frame==-1 && substeps_delay_level!=-1)
-        Set_Write_Substeps_Level(substeps_delay_level);
+    if(substeps_delay_frame==-1) Set_Write_Substeps_Level(substeps_delay_level);
+    else Set_Write_Substeps_Level(-1);
 }
 //#####################################################################
 // ~EXAMPLE

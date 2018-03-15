@@ -49,7 +49,6 @@ SOLIDS_EXAMPLE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
     debug_particles(*new DEBUG_PARTICLES<TV>),opt_skip_debug_data(false)
 {
     Set_Minimum_Collision_Thickness();
-    Set_Write_Substeps_Level(-1);
 
     bool opt_solidssymmqmr=false,opt_solidscr=false,opt_solidscg=false;
     parse_args.Add("-solidscfl",&solids_parameters.cfl,"cfl","solids CFL");
