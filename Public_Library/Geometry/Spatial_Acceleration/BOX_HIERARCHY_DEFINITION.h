@@ -10,6 +10,7 @@ namespace PhysBAM{
 template<class TV> template<class T_VISITOR> void BOX_HIERARCHY<TV>::
 Intersection_List(const BOX_HIERARCHY<TV>& other_hierarchy,T_VISITOR& visitor,const int self_box,const int other_box,const T extra_thickness) const
 {
+    if(!box_hierarchy.m || !other_hierarchy.box_hierarchy.m) return;
     // borrow stack ownership to improve aliasing semantics
     STACK<VECTOR<int,2> > stack;stack.Exchange(dual_traversal_stack); // borrow stack ownership to improve aliasing semantics
     assert(stack.Empty());stack.Push(VECTOR<int,2>(self_box,other_box));
@@ -40,6 +41,7 @@ Intersection_List(const BOX_HIERARCHY<TV>& other_hierarchy,T_VISITOR& visitor,co
 template<class TV> template<class T_VISITOR> void BOX_HIERARCHY<TV>::
 Intersection_List(const BOX_HIERARCHY<TV>& other_hierarchy,T_VISITOR& visitor,const T extra_thickness) const
 {
+    if(!box_hierarchy.m || !other_hierarchy.box_hierarchy.m) return;
     if(&other_hierarchy != this) return Intersection_List(other_hierarchy,visitor,root,other_hierarchy.root,extra_thickness);
 
     // borrow stack ownership to improve aliasing semantics
@@ -65,6 +67,7 @@ Intersection_List(const BOX_HIERARCHY<TV>& other_hierarchy,T_VISITOR& visitor,co
 template<class TV> template<class T_VISITOR> void BOX_HIERARCHY<TV>::
 Intersection_List(T_VISITOR& visitor) const
 {
+    if(!box_hierarchy.m) return;
     STACK<int> stack;stack.Exchange(traversal_stack); // borrow stack ownership to improve aliasing semantics
     stack.Remove_All();stack.Push(root);
     while(!stack.Empty()){int box=stack.Pop();

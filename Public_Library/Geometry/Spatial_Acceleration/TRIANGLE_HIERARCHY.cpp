@@ -47,6 +47,7 @@ template<class T> TRIANGLE_HIERARCHY<T>::
 template<class T> void TRIANGLE_HIERARCHY<T>::
 Intersection_List(const VECTOR<T,3>& point,ARRAY<int>& intersection_list,const T thickness_over_two) const
 {
+    if(!box_hierarchy.m) return;
     if(triangles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         Intersection_List(root,point,group_list,thickness_over_two);
@@ -59,6 +60,7 @@ Intersection_List(const VECTOR<T,3>& point,ARRAY<int>& intersection_list,const T
 template<class T> void TRIANGLE_HIERARCHY<T>::
 Intersection_List(const RANGE<TV>& test_box,ARRAY<int>& intersection_list,const T thickness_over_two) const
 {
+    if(!box_hierarchy.m) return;
     if(triangles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         Intersection_List(root,test_box,group_list,thickness_over_two);
@@ -71,6 +73,7 @@ Intersection_List(const RANGE<TV>& test_box,ARRAY<int>& intersection_list,const 
 template<class T> void TRIANGLE_HIERARCHY<T>::
 Intersection_List(const ORIENTED_BOX<TV>& test_box,ARRAY<int>& intersection_list) const
 {
+    if(!box_hierarchy.m) return;
     if(triangles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         Intersection_List(root,test_box,group_list);
@@ -83,6 +86,7 @@ Intersection_List(const ORIENTED_BOX<TV>& test_box,ARRAY<int>& intersection_list
 template<class T> void TRIANGLE_HIERARCHY<T>::
 Intersection_List(const PLANE<T>& test_plane,ARRAY<int>& intersection_list,const T thickness_over_two) const
 {
+    if(!box_hierarchy.m) return;
     if(triangles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         Intersection_List(root,test_plane,group_list,thickness_over_two);
@@ -96,6 +100,7 @@ template<class T> void TRIANGLE_HIERARCHY<T>::
 Intersection_List(const IMPLICIT_OBJECT<VECTOR<T,3> >& implicit_surface,const MATRIX<T,3>& rotation,
     const VECTOR<T,3>& translation,ARRAY<int>& intersection_list,const T contour_value) const
 {
+    if(!box_hierarchy.m) return;
     if(triangles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         Intersection_List(root,implicit_surface,rotation,translation,group_list,contour_value);

@@ -53,6 +53,7 @@ Update_Leaf_Boxes(const T extra_thickness)
 template<class TV,class T_ARRAY> void PARTICLE_HIERARCHY<TV,T_ARRAY>::
 Intersection_List(const TV& point,ARRAY<int>& intersection_list,const T thickness_over_two) const
 {
+    if(!box_hierarchy.m) return;
     if(particles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         BASE::Intersection_List(root,point,group_list,thickness_over_two);
@@ -65,6 +66,7 @@ Intersection_List(const TV& point,ARRAY<int>& intersection_list,const T thicknes
 template<class TV,class T_ARRAY> void PARTICLE_HIERARCHY<TV,T_ARRAY>::
 Intersection_List(const RANGE<TV>& test_box,ARRAY<int>& intersection_list,const T thickness_over_two) const
 {
+    if(!box_hierarchy.m) return;
     if(particles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         BASE::Intersection_List(root,test_box,group_list,thickness_over_two);
@@ -77,6 +79,7 @@ Intersection_List(const RANGE<TV>& test_box,ARRAY<int>& intersection_list,const 
 template<class TV,class T_ARRAY> void PARTICLE_HIERARCHY<TV,T_ARRAY>::
 Intersection_List(const ORIENTED_BOX<TV>& test_box,ARRAY<int>& intersection_list) const
 {
+    if(!box_hierarchy.m) return;
     if(particles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         BASE::Intersection_List(root,test_box,group_list);
@@ -89,6 +92,7 @@ Intersection_List(const ORIENTED_BOX<TV>& test_box,ARRAY<int>& intersection_list
 template<class TV,class T_ARRAY> void PARTICLE_HIERARCHY<TV,T_ARRAY>::
 Intersection_List(const T_HYPERPLANE& test_plane,ARRAY<int>& intersection_list,const T thickness_over_two) const
 {
+    if(!box_hierarchy.m) return;
     if(particles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         BASE::Intersection_List(root,test_plane,group_list,thickness_over_two);
@@ -101,6 +105,7 @@ Intersection_List(const T_HYPERPLANE& test_plane,ARRAY<int>& intersection_list,c
 template<class TV,class T_ARRAY> void PARTICLE_HIERARCHY<TV,T_ARRAY>::
 Intersection_List(const IMPLICIT_OBJECT<TV>& implicit_object,const MATRIX<T,TV::m>& rotation,const TV& translation,ARRAY<int>& intersection_list,const T contour_value) const
 {
+    if(!box_hierarchy.m) return;
     if(particles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         BASE::Intersection_List(root,implicit_object,rotation,translation,group_list,contour_value);

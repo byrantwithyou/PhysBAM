@@ -132,6 +132,7 @@ Update_Nonleaf_Box_Radii()
 template<class TV> void BOX_HIERARCHY<TV>::
 Intersection_List(const int box,const TV& point,ARRAY<int>& intersection_list,const T thickness_over_two) const
 {
+    if(!box_hierarchy.m) return;
     if(box<0) return;
     traversal_stack.Remove_All();traversal_stack.Push(box);
     while(!traversal_stack.Empty()){int current=traversal_stack.Pop();
@@ -144,6 +145,7 @@ Intersection_List(const int box,const TV& point,ARRAY<int>& intersection_list,co
 template<class TV> void BOX_HIERARCHY<TV>::
 Intersection_List(const int box,const RANGE<TV>& test_box,ARRAY<int>& intersection_list,const T thickness_over_two) const
 {
+    if(!box_hierarchy.m) return;
     if(box<0) return;
     traversal_stack.Remove_All();traversal_stack.Push(box);
     
@@ -157,6 +159,7 @@ Intersection_List(const int box,const RANGE<TV>& test_box,ARRAY<int>& intersecti
 template<class TV> void BOX_HIERARCHY<TV>::
 Intersection_List(const int box,const ORIENTED_BOX<TV>& test_box,ARRAY<int>& intersection_list) const
 {
+    if(!box_hierarchy.m) return;
     traversal_stack.Remove_All();traversal_stack.Push(box);
     while(!traversal_stack.Empty()){int current=traversal_stack.Pop();
         if(!test_box.Intersection(box_hierarchy(current))) continue;
@@ -168,6 +171,7 @@ Intersection_List(const int box,const ORIENTED_BOX<TV>& test_box,ARRAY<int>& int
 template<class TV> void BOX_HIERARCHY<TV>::
 Intersection_List(const int box,const T_HYPERPLANE& test_plane,ARRAY<int>& intersection_list,const T thickness_over_two) const
 {
+    if(!box_hierarchy.m) return;
     traversal_stack.Remove_All();traversal_stack.Push(box);
     while(!traversal_stack.Empty()){int current=traversal_stack.Pop();
         if(!INTERSECTION::Intersects(box_hierarchy(current),test_plane,thickness_over_two)) continue;
@@ -179,6 +183,7 @@ Intersection_List(const int box,const T_HYPERPLANE& test_plane,ARRAY<int>& inter
 template<class TV> void BOX_HIERARCHY<TV>::
 Intersection_List(const int box,const IMPLICIT_OBJECT<TV>& implicit_object,const MATRIX<T,TV::m>& rotation,const TV& translation,ARRAY<int>& intersection_list,const T contour_value) const
 {
+    if(!box_hierarchy.m) return;
     PHYSBAM_ASSERT(box_radius.m==box_hierarchy.m);
     traversal_stack.Remove_All();traversal_stack.Push(box);
     while(!traversal_stack.Empty()){int current=traversal_stack.Pop();
