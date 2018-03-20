@@ -14,6 +14,7 @@ template<class TV> class SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION;
 template<class TV> class SOLID_BODY_COLLECTION;
 template<class TV> class MOVE_RIGID_BODY_DIFF;
 template<class TV> class IMPLICIT_OBJECT;
+template<class TV> class CONTINUOUS_COLLISION_DETECTION;
 
 template<class TV>
 class PENALTY_FORCE_COLLECTION
@@ -48,9 +49,18 @@ public:
     RIGID_PENALTY_WITH_FRICTION<TV>* rr_penalty=0;
     SELF_COLLISION_PENALTY_FORCE_WITH_FRICTION<TV>* dd_penalty=0;
     ARRAY<TV> X0;
+    ARRAY<FRAME<TV> > F0;
     
     T const_repulsion_thickness=(T)1e-4;
     bool state_saved=false;
+
+    CONTINUOUS_COLLISION_DETECTION<TV> *ccd_i=0,*ccd_r=0,*ccd_d=0;
+    bool use_di_ccd=false;
+    bool use_rd_ccd=false;
+    bool use_rr_ccd=false;
+    bool ccd_i_stale=false;
+    bool ccd_d_stale=false;
+    bool ccd_r_stale=false;
 
     PENALTY_FORCE_COLLECTION(SOLID_BODY_COLLECTION<TV>& solid_body_collection,
         const ARRAY<int>& simulated_particles,
@@ -63,7 +73,7 @@ public:
     
     PENALTY_FORCE_COLLECTION(const PENALTY_FORCE_COLLECTION&) = delete;
     void operator=(const PENALTY_FORCE_COLLECTION&) = delete;
-    ~PENALTY_FORCE_COLLECTION() = default;
+    ~PENALTY_FORCE_COLLECTION();
 
     void Reset_Hash_Table();
     void Update_Collision_Detection_Structures();
@@ -71,6 +81,8 @@ public:
     void Update_Rasterized_Data(bool new_grid);
     void Update_Cell_Particles(bool new_grid);
     void Update_Cell_Objects(bool new_grid);
+    void Update_CCD_Topology();
+    void Update_CCD_Positions();
     void Get_DI_Collision_Candidates();
     void Get_DD_Collision_Candidates();
     void Get_RD_Collision_Candidates();

@@ -92,6 +92,9 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-dd_mu",&dd_mu,&use_dd_mu,"friction","override friction for deformable-deformable penalty force friction");
     parse_args.Add("-rr_mu",&rr_mu,&use_rr_mu,"friction","override friction for rigid-rigid penalty force friction");
     parse_args.Add("-di_mu",&di_mu,&use_di_mu,"friction","override friction for deformable-object penalty force friction");
+    parse_args.Add("-rd_ccd",&use_rd_ccd,"enable rigid-deformable penalty force friction");
+    parse_args.Add("-rr_ccd",&use_rr_ccd,"enable rigid-rigid penalty force friction");
+    parse_args.Add("-di_ccd",&use_di_ccd,"enable deformable-object penalty force friction");
     parse_args.Add("-bisection",&use_bisection,"use bisection relaxation");
     parse_args.Parse(true);
 
@@ -223,6 +226,9 @@ Init_Penalty_Collection()
     detection_grid.Initialize(TV_INT()+100,RANGE<TV>::Centered_Box()*10,true);
     pfd=new PENALTY_FORCE_COLLECTION<TV>(solid_body_collection,
         solid_body_collection.deformable_body_collection.simulated_particles,this->move_rb_diff);
+    if(use_di) pfd->use_di_ccd=use_di_ccd;
+    if(use_rd) pfd->use_rd_ccd=use_rd_ccd;
+    if(use_rr) pfd->use_rr_ccd=use_rr_ccd;
     pfd->Init(use_di,use_dd,use_rd,use_rr);
     if(use_di) pfd->di_penalty->stiffness_coefficient=use_di_k?di_k:rd_penalty_stiffness;
     if(use_dd) pfd->dd_penalty->stiffness_coefficient=use_dd_k?dd_k:rd_penalty_stiffness;

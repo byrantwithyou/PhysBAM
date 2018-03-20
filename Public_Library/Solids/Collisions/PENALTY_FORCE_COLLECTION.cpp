@@ -19,6 +19,16 @@
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 namespace PhysBAM{
 //#####################################################################
+// Destructor
+//#####################################################################
+template<class TV> PENALTY_FORCE_COLLECTION<TV>::
+~PENALTY_FORCE_COLLECTION()
+{
+    delete ccd_i;
+    delete ccd_d;
+    delete ccd_r;
+}
+//#####################################################################
 // Function Update_Collision_Detection_Structures
 //#####################################################################
 template<class TV> void PENALTY_FORCE_COLLECTION<TV>::
@@ -29,6 +39,7 @@ Update_Collision_Detection_Structures()
     Update_Rasterized_Data(new_grid);
     Update_Cell_Vertices(new_grid);
     Update_Cell_Objects(new_grid);
+    Update_CCD_Positions();
 }
 //#####################################################################
 // Function Reset_Hash_Table
@@ -47,7 +58,7 @@ Reset_Hash_Table()
 template<class TV> void PENALTY_FORCE_COLLECTION<TV>::
 Update_Cell_Vertices(bool new_grid)
 {
-    if(!rr_penalty) return;
+    if(!rr_penalty || use_rr_ccd) return;
     cell_vertices.Remove_All();
     const RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
     for(int b=0;b<rigid_body_particles.frame.m;b++){
@@ -65,7 +76,7 @@ Update_Cell_Vertices(bool new_grid)
 template<class TV> void PENALTY_FORCE_COLLECTION<TV>::
 Update_Rasterized_Data(bool new_grid)
 {
-    if(!rd_penalty && !rr_penalty) return;
+    if((!rd_penalty || use_rd_ccd) && (!rr_penalty || use_rr_ccd)) return;
     rasterized_data.Remove_All();
     int clamp_ghost=1000000;
     const RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
@@ -87,7 +98,7 @@ Update_Rasterized_Data(bool new_grid)
 template<class TV> void PENALTY_FORCE_COLLECTION<TV>::
 Update_Cell_Particles(bool new_grid)
 {
-    if(!di_penalty && !rd_penalty) return;
+    if((!di_penalty || use_di_ccd) && (!rd_penalty || use_rd_ccd)) return;
     const DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     cell_particles.Remove_All();
     for(int k=0;k<simulated_particles.m;k++){
@@ -102,7 +113,7 @@ Update_Cell_Particles(bool new_grid)
 template<class TV> void PENALTY_FORCE_COLLECTION<TV>::
 Update_Cell_Objects(bool new_grid)
 {
-    if(!di_penalty) return;
+    if(!di_penalty || use_di_ccd) return;
     if(!new_grid) return;
     cell_objects.Remove_All();
     T padding=grid.dX.Magnitude()/2;
@@ -122,13 +133,19 @@ Update_Cell_Objects(bool new_grid)
 template<class TV> void PENALTY_FORCE_COLLECTION<TV>::
 Get_DI_Collision_Candidates()
 {
-    for(const auto& k:cell_objects.hash){
-        auto D=cell_particles.Get(k.key);
-        if(!D.m) continue;
-        auto O=cell_objects.Get(k.key);
-        for(int i=0;i<D.m;i++)
-            for(int j=0;j<O.m;j++)
-                di_penalty->Add_Pair(D(i),O(j));}
+    if(use_di_ccd){
+        ARRAY<CCD_PAIR<TV::m> > point_face;
+        ccd_d->Compute_Pairs_PF(point_face,*ccd_i,const_repulsion_thickness);
+        for(const auto& a:point_face)
+            di_penalty->Add_Pair(a.f(0),a.s1);}
+    else
+        for(const auto& k:cell_objects.hash){
+            auto D=cell_particles.Get(k.key);
+            if(!D.m) continue;
+            auto O=cell_objects.Get(k.key);
+            for(int i=0;i<D.m;i++)
+                for(int j=0;j<O.m;j++)
+                    di_penalty->Add_Pair(D(i),O(j));}
 }
 //#####################################################################
 // Function Get_RD_Collision_Candidates
@@ -136,13 +153,19 @@ Get_DI_Collision_Candidates()
 template<class TV> void PENALTY_FORCE_COLLECTION<TV>::
 Get_RD_Collision_Candidates()
 {
-    for(const auto& k:rasterized_data.hash){
-        auto D=cell_particles.Get(k.key);
-        if(!D.m) continue;
-        auto R=rasterized_data.Get(k.key);
-        for(int i=0;i<D.m;i++)
-            for(int j=0;j<R.m;j++)
-                rd_penalty->Add_Pair(D(i),R(j).id);}
+    if(use_rd_ccd){
+        ARRAY<CCD_PAIR<TV::m> > point_face;
+        ccd_d->Compute_Pairs_PF(point_face,*ccd_r,const_repulsion_thickness);
+        for(const auto& a:point_face)
+            rd_penalty->Add_Pair(a.f(0),a.s1);}
+    else
+        for(const auto& k:rasterized_data.hash){
+            auto D=cell_particles.Get(k.key);
+            if(!D.m) continue;
+            auto R=rasterized_data.Get(k.key);
+            for(int i=0;i<D.m;i++)
+                for(int j=0;j<R.m;j++)
+                    rd_penalty->Add_Pair(D(i),R(j).id);}
 }
 //#####################################################################
 // Function Get_RR_Collision_Candidates
@@ -150,14 +173,20 @@ Get_RD_Collision_Candidates()
 template<class TV> void PENALTY_FORCE_COLLECTION<TV>::
 Get_RR_Collision_Candidates()
 {
-    for(const auto& k:rasterized_data.hash){
-        auto V=cell_vertices.Get(k.key);
-        if(!V.m) continue;
-        auto R=rasterized_data.Get(k.key);
-        for(int i=0;i<V.m;i++)
-            for(int j=0;j<R.m;j++)
-                if(V(i).x!=R(j).id)
-                    rr_penalty->Add_Pair(V(i).x,V(i).y,R(j).id);}
+    if(use_rr_ccd){
+        ARRAY<CCD_PAIR<TV::m> > point_face;
+        ccd_r->Compute_Pairs_PF(point_face,const_repulsion_thickness);
+        for(const auto& a:point_face)
+            rr_penalty->Add_Pair(a.s0,a.f(0),a.s1);}
+   else
+        for(const auto& k:rasterized_data.hash){
+            auto V=cell_vertices.Get(k.key);
+            if(!V.m) continue;
+            auto R=rasterized_data.Get(k.key);
+            for(int i=0;i<V.m;i++)
+                for(int j=0;j<R.m;j++)
+                    if(V(i).x!=R(j).id)
+                        rr_penalty->Add_Pair(V(i).x,V(i).y,R(j).id);}
 }
 //#####################################################################
 // Function Get_DD_Collision_Candidates
@@ -171,8 +200,7 @@ Get_DD_Collision_Candidates()
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     ARRAY<CCD_PAIR<TV::m> > point_face;
-    Continuous_Collision_Detection<TV>(X0,particles.X,
-        deformable_body_collection.structures,&point_face,0,const_repulsion_thickness);
+    ccd_d->Compute_Pairs_PF(point_face,const_repulsion_thickness);
     
     for(int i=0;i<point_face.m;i++){ // p f
         VECTOR<int,TV::m+1> pf=point_face(i).f;
@@ -209,9 +237,11 @@ template<class TV> void PENALTY_FORCE_COLLECTION<TV>::
 Save_State()
 {
     const DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-    if(dd_penalty){
+    Update_CCD_Topology();
+    if(dd_penalty || ccd_r){
         state_saved=true;
-        X0=particles.X;}
+        X0=particles.X;
+        F0=solid_body_collection.rigid_body_collection.rigid_body_particles.frame;}
 }
 //#####################################################################
 // Function Init
@@ -252,6 +282,8 @@ Init(bool use_di,bool use_dd,bool use_rd,bool use_rr)
                 dd_penalty->Add_Surface(*p);
             else if(auto* p=dynamic_cast<T_OBJECT*>(s))
                 dd_penalty->Add_Surface(p->Get_Boundary_Object());}}
+
+    Update_CCD_Topology();
 }
 //#####################################################################
 // Function Update_Attachments_And_Prune_Pairs
@@ -292,6 +324,61 @@ Update_Grid()
     max_dx=std::max(max_dx,pow<1,TV::m>(bounding_box.Size()/max_cells));
     grid=GRID<TV>::Create_Grid_Given_Cell_Size(bounding_box,max_dx,true,0);
     return true;
+}
+//#####################################################################
+// Function Update_CCD_Topology
+//#####################################################################
+template<class TV> void PENALTY_FORCE_COLLECTION<TV>::
+Update_CCD_Topology()
+{
+    if(use_di_ccd)
+        if(!ccd_i || ccd_i_stale){
+            if(!ccd_i) ccd_i=new CONTINUOUS_COLLISION_DETECTION<TV>;
+            else ccd_i->Clean_Memory();
+            for(int i=0;i<di_penalty->meshes.m;i++)
+                ccd_i->Add_Structure(di_penalty->meshes(i),4); // face only
+            ccd_i_stale=false;}
+
+    if(use_di_ccd || use_rd_ccd || dd_penalty)
+        if(!ccd_d || ccd_d_stale){
+            const auto& st=solid_body_collection.deformable_body_collection.structures;
+            const DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+            if(!ccd_d) ccd_d=new CONTINUOUS_COLLISION_DETECTION<TV>;
+            else ccd_d->Clean_Memory();
+            for(int i=0;i<st.m;i++)
+                ccd_d->Add_Structure(st(i),4); // face only
+            ccd_d->Add_Particles(particles.number);
+            ccd_d_stale=false;}
+
+    if(use_rr_ccd || use_rd_ccd)
+        if(!ccd_r || ccd_r_stale){
+            const auto& rbp=solid_body_collection.rigid_body_collection.rigid_body_particles;
+            if(!ccd_r) ccd_r=new CONTINUOUS_COLLISION_DETECTION<TV>;
+            else ccd_r->Clean_Memory();
+            for(int b=0;b<rbp.frame.m;b++){
+                if(exclude_rigid_body_simplices.Contains(b)) continue;
+                // face+vertex only
+                ccd_r->Add_Structure(rbp.rigid_body(b)->simplicial_object,5);}
+            ccd_r_stale=false;}
+}
+//#####################################################################
+// Function Update_CCD_Positions
+//#####################################################################
+template<class TV> void PENALTY_FORCE_COLLECTION<TV>::
+Update_CCD_Positions()
+{
+    if(ccd_i)
+        for(int i=0;i<di_penalty->meshes.m;i++)
+            ccd_i->Update_Positions(di_penalty->meshes(i)->particles.X,i);
+
+    if(ccd_d)
+        ccd_d->Update_Positions(X0,solid_body_collection.deformable_body_collection.particles.X);
+
+    if(ccd_r){
+        const auto& rbp=solid_body_collection.rigid_body_collection.rigid_body_particles;
+        for(int b=0;b<rbp.frame.m;b++)
+            ccd_r->Update_Positions(rbp.rigid_body(b)->simplicial_object->particles.X,
+                F0(b),rbp.frame(b),b);}
 }
 template class PENALTY_FORCE_COLLECTION<VECTOR<float,2> >;
 template class PENALTY_FORCE_COLLECTION<VECTOR<float,3> >;

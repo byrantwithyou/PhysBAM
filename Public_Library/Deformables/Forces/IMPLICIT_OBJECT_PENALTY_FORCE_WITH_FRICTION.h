@@ -8,6 +8,7 @@
 #define __IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION__
 
 #include <Core/Data_Structures/HASHTABLE.h>
+#include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 #include <functional>
 namespace PhysBAM{
@@ -19,11 +20,13 @@ class IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION:public DEFORMABLES_FORCES<TV>
 {
     typedef typename TV::SCALAR T;
 public:
+    typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_SURFACE;
     typedef DEFORMABLES_FORCES<TV> BASE;
     typedef int HAS_TYPED_READ_WRITE;
     using BASE::particles;
 
     ARRAY<IMPLICIT_OBJECT<TV>*> ios;
+    ARRAY<T_SURFACE*> meshes;
     T stiffness_coefficient=0;
     T friction=0;
     bool use_bisection=false;

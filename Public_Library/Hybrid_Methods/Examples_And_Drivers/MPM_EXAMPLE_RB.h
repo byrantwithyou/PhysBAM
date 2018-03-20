@@ -134,6 +134,7 @@ public:
     PENALTY_FORCE_COLLECTION<TV>* pfd=0;
     ARRAY<MOVE_RIGID_BODY_DIFF<TV> > move_rb_diff;
     bool use_bisection=false;
+    bool use_rd_ccd=false,use_rr_ccd=false,use_di_ccd=false;
     
     MPM_EXAMPLE_RB(const STREAM_TYPE stream_type_input);
     MPM_EXAMPLE_RB(const MPM_EXAMPLE_RB&) = delete;

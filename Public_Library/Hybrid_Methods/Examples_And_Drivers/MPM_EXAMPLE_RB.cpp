@@ -149,6 +149,7 @@ Capture_Stress()
 {
     force_helper.Fn=particles.F;
     if(particles.store_S) force_helper.Sn=particles.S;
+    if(pfd) pfd->Save_State();
 }
 //#####################################################################
 // Function Precompute_Forces
