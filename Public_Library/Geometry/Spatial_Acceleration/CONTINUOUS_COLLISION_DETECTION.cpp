@@ -20,11 +20,11 @@ Compute_Pairs_Helper(ARRAY<CCD_PAIR<TV::m> >& pairs,
     struct VISITOR
     {
         ARRAY<CCD_PAIR<TV::m> >& pairs;
-        const ARRAY<PAIR<int,VECTOR<int,d> > >& p0;
-        const ARRAY<PAIR<int,VECTOR<int,e> > >& p1;
+        const ARRAY<TRIPLE<int,VECTOR<int,d>,int> >& p0;
+        const ARRAY<TRIPLE<int,VECTOR<int,e>,int> >& p1;
         VISITOR(ARRAY<CCD_PAIR<TV::m> >& pairs,
-            const ARRAY<PAIR<int,VECTOR<int,d> > >& p0,
-            const ARRAY<PAIR<int,VECTOR<int,e> > >& p1)
+            const ARRAY<TRIPLE<int,VECTOR<int,d>,int> >& p0,
+            const ARRAY<TRIPLE<int,VECTOR<int,e>,int> >& p1)
             :pairs(pairs),p0(p0),p1(p1)
         {}
 
@@ -35,7 +35,7 @@ Compute_Pairs_Helper(ARRAY<CCD_PAIR<TV::m> >& pairs,
         {return false;}
 
         void Store(const int i,const int j) const
-        {pairs.Append({p0(i).x,p1(j).x,p0(i).y.Append_Elements(p1(j).y)});}
+        {pairs.Append({p0(i).x,p1(j).x,p0(i).y.Append_Elements(p1(j).y),p0(i).z,p1(j).z});}
     } visitor(pairs,d0.p,d1.p); 
 
     d0.h.Intersection_List(d1.h,visitor,thickness);
@@ -211,12 +211,13 @@ Add_Structure_Helper(CONTINUOUS_COLLISION_DETECTION<TV>& ccd,
     u.a[2]=ccd.c3.p.m;
     if(flags&1){
         HASHTABLE<int> hash;
-        for(auto i:a2->Flattened())
+        for(int i:a2->Flattened())
             if(hash.Set(i))
-                ccd.c1.p.Append({b,VECTOR<int,1>(i)});}
+                ccd.c1.p.Append({b,VECTOR<int,1>(i),i});}
     if(flags&4)
-        for(auto i:*a2)
-            ccd.c2.p.Append({b,i});
+        for(int e=0;e<a2->m;e++){
+            auto i=(*a2)(e);
+            ccd.c2.p.Append({b,i,e});}
     u.b[0]=ccd.c1.p.m;
     u.b[1]=ccd.c2.p.m;
     u.b[2]=ccd.c3.p.m;
@@ -247,15 +248,17 @@ Add_Structure_Helper(CONTINUOUS_COLLISION_DETECTION<TV>& ccd,
     u.a[2]=ccd.c3.p.m;
     if(flags&1){
         HASHTABLE<int> hash;
-        for(auto i:(a3?a3->Flattened():a2->Flattened()))
+        for(int i:(a3?a3->Flattened():a2->Flattened()))
             if(hash.Set(i))
-                ccd.c1.p.Append({b,VECTOR<int,1>(i)});}
+                ccd.c1.p.Append({b,VECTOR<int,1>(i),i});}
     if(flags&2)
-        for(auto i:*a2)
-            ccd.c2.p.Append({b,i});
+        for(int e=0;e<a2->m;e++){
+            auto i=(*a2)(e);
+            ccd.c2.p.Append({b,i,e});}
     if(flags&4)
-        for(auto i:*a3)
-            ccd.c3.p.Append({b,i});
+        for(int e=0;e<a3->m;e++){
+            auto i=(*a3)(e);
+            ccd.c3.p.Append({b,i,e});}
     u.b[0]=ccd.c1.p.m;
     u.b[1]=ccd.c2.p.m;
     u.b[2]=ccd.c3.p.m;
@@ -281,7 +284,7 @@ Add_Particles(int n)
     u.a[1]=c2.p.m;
     u.a[2]=c3.p.m;
     for(int i=0;i<n;i++)
-        c1.p.Append({b,VECTOR<int,1>(i)});
+        c1.p.Append({b,VECTOR<int,1>(i),i});
     u.b[0]=c1.p.m;
     u.b[1]=c2.p.m;
     u.b[2]=c3.p.m;

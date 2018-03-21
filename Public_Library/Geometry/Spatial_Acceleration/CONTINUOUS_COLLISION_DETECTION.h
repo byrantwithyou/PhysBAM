@@ -6,6 +6,7 @@
 #define __CONTINUOUS_COLLISION_DETECTION__
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Arrays/ARRAY_VIEW.h>
+#include <Core/Data_Structures/TRIPLE.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Geometry/Spatial_Acceleration/BOX_HIERARCHY.h>
 namespace PhysBAM{
@@ -15,12 +16,13 @@ struct CCD_PAIR
 {
     int s0,s1;
     VECTOR<int,d+1> f; // pf: 0 1 1 1, ee: 0 0 1 1
+    int e0,e1; // element index for face or edge; particle index for particle.
 };
 template<class TV,int d>
 struct CCD_DATA
 {
     BOX_HIERARCHY<TV> h;
-    ARRAY<PAIR<int,VECTOR<int,d> > > p;
+    ARRAY<TRIPLE<int,VECTOR<int,d>,int> > p; // object index, simplex vertex indices, element index
 };
 template<class TV>
 class CONTINUOUS_COLLISION_DETECTION
