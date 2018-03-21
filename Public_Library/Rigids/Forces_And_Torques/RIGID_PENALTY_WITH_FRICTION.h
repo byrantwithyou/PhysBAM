@@ -49,7 +49,7 @@ public:
         {Read_Binary<RW>(input,bs,v,bi,X);}
     };
     ARRAY<COLLISION_PAIR> collision_pairs;
-    HASHTABLE<VECTOR<int,4> > hash;
+    HASHTABLE<TRIPLE<int,int,int> > hash; // bs,v,bi
     std::function<void()> get_candidates=0; // Call Add_Pair on collision candidates.
     const ARRAY<MOVE_RIGID_BODY_DIFF<TV> >& move_rb_diff;
 

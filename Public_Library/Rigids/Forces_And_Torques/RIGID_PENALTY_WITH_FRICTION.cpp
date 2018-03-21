@@ -259,7 +259,7 @@ Update_Attachments_And_Prune_Pairs()
             c.e0=c.e;
             c.w0=c.w;
             collision_pairs(k++)=c;}
-        else hash.Delete({c.bs,c.v,c.bi,c.e});}
+        else hash.Delete({c.bs,c.v,c.bi});}
     collision_pairs.Resize(k);
 }
 //#####################################################################
@@ -270,7 +270,7 @@ Add_Pair(int bs,int v,int bi)
 {
     TIMER_SCOPE_FUNC;
     // TODO: Interpolate X^n and X^(n+1) to choose surface point.
-    if(hash.Contains({bs,v,bi,-1})) return;
+    if(hash.Contains({bs,v,bi})) return;
     const RIGID_BODY<TV>& rbs=rigid_body_collection.Rigid_Body(bs),
         &rbi=rigid_body_collection.Rigid_Body(bi);
     if(rbs.Has_Infinite_Inertia() && rbi.Has_Infinite_Inertia()) return;
@@ -280,7 +280,7 @@ Add_Pair(int bs,int v,int bi)
     COLLISION_PAIR c={bs,v,bi,rbi.Frame().Inverse_Times(W)};
     c.e0=c.e=-1;
     collision_pairs.Append(c);
-    hash.Insert({bs,v,bi,-1});
+    hash.Insert({bs,v,bi});
 }
 //#####################################################################
 // Function Add_Pair
@@ -291,7 +291,7 @@ Add_Pair(int bs,int v,int bi,int e,const FRAME<TV>& fs,const FRAME<TV>& fi,T thi
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX_FACE T_FACE;
     TIMER_SCOPE_FUNC;
     // TODO: Interpolate X^n and X^(n+1) to choose surface point.
-    if(hash.Contains({bs,v,bi,e})) return;
+    if(hash.Contains({bs,v,bi})) return;
     const RIGID_BODY<TV>& rbs=rigid_body_collection.Rigid_Body(bs),
         &rbi=rigid_body_collection.Rigid_Body(bi);
     if(rbs.Has_Infinite_Inertia() && rbi.Has_Infinite_Inertia()) return;
@@ -324,7 +324,7 @@ Add_Pair(int bs,int v,int bi,int e,const FRAME<TV>& fs,const FRAME<TV>& fi,T thi
     c.w0=w;
     c.e0=e;
     collision_pairs.Append(c);
-    hash.Insert({bs,v,bi,e});
+    hash.Insert({bs,v,bi});
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces
@@ -420,7 +420,7 @@ CFL_Strain_Rate() const
 template<class TV> void RIGID_PENALTY_WITH_FRICTION<TV>::
 Read(TYPED_ISTREAM input)
 {
-    ARRAY<VECTOR<int,4> > keys;
+    ARRAY<TRIPLE<int,int,int> > keys;
     Read_Binary(input,collision_pairs,keys);
     hash.Set_All(keys);
 }
@@ -430,9 +430,9 @@ Read(TYPED_ISTREAM input)
 template<class TV> void RIGID_PENALTY_WITH_FRICTION<TV>::
 Write(TYPED_OSTREAM output) const
 {
-    ARRAY<VECTOR<int,4> > keys;
+    ARRAY<TRIPLE<int,int,int> > keys;
     hash.Get_Keys(keys);
-    keys.Sort(LEXICOGRAPHIC_COMPARE());
+    keys.Sort();
     Write_Binary(output,collision_pairs,keys);
 }
 namespace PhysBAM{
