@@ -9,6 +9,7 @@
 
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
+#include <Rigids/Collisions/RELAX_ATTACHMENT_MESH.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 #include <functional>
 namespace PhysBAM{
@@ -33,13 +34,6 @@ public:
     T stiffness_coefficient=0;
     T friction=0;
     T trial_distance;
-    
-    struct DIFF_ENTRY
-    {
-        int e; // element of relaxed attachment point
-        TV Y; // relaxed attachment point
-        VECTOR<MATRIX<T,TV::m>,5> dYdI; // Dependence on X, Z, A, B, C
-    };
 
     struct COLLISION_PAIR
     {
@@ -48,12 +42,10 @@ public:
 
         TV w0; // barycentric coords of original attachment point
         int e0; // element of original attachment point
+
         TV Y0; // original attachment point
 
-        ARRAY<DIFF_ENTRY> diff_entry;
-        TV w; // barycentric coords of relaxed attachment point
-        VECTOR<MATRIX<T,TV::m>,5> dwdI; // Dependence on X, Z, A, B, C
-        bool active;
+        RELAX_ATTACHMENT_MESH<TV> ram;
 
         template<class RW> void Write(std::ostream& output) const
         {Write_Binary<RW>(output,p,s,w0,e0);}

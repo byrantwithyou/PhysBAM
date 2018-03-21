@@ -32,10 +32,12 @@ public:
     struct COLLISION_PAIR
     {
         int bs,v; // colliding vertex (simplicial mesh)
-        int bi; // colliding rigid body (implicit object)
+        int bi; // colliding rigid body (implicit object or surface mesh)
         TV X; // original attachment point (object space)
         TV Y; // relaxed attachment point (world space)
         TV Z; // simplicial point
+        int e,e0;
+        TV w,w0; // barycentric coords of X, for CCD
         MATRIX<T,TV::m> dYdLs,dYdLi,dZdLs; // Dependence on twist.linear
         MATRIX<T,TV::m,TV::SPIN::m> dYdAs,dYdAi,dZdAs; // Dependence on twist.angular
         bool active;
@@ -47,7 +49,7 @@ public:
         {Read_Binary<RW>(input,bs,v,bi,X);}
     };
     ARRAY<COLLISION_PAIR> collision_pairs;
-    HASHTABLE<TRIPLE<int,int,int> > hash;
+    HASHTABLE<VECTOR<int,4> > hash;
     std::function<void()> get_candidates=0; // Call Add_Pair on collision candidates.
     const ARRAY<MOVE_RIGID_BODY_DIFF<TV> >& move_rb_diff;
 
@@ -72,8 +74,11 @@ public:
     void Update_Mpi(const ARRAY<bool>& particle_is_simulated) override;
     T Potential_Energy(const T time) const override;
     void Relax_Attachment(int cp);
+    void Relax_Attachment_Implicit(int cp);
+    void Relax_Attachment_Mesh(int cp);
     void Update_Attachments_And_Prune_Pairs();
     void Add_Pair(int b1,int v,int b2);
+    void Add_Pair(int b1,int v,int b2,int e,const FRAME<TV>& fs,const FRAME<TV>& fi,T thickness); // CCD
     void Read(TYPED_ISTREAM input);
     void Write(TYPED_OSTREAM output) const;
 //#####################################################################

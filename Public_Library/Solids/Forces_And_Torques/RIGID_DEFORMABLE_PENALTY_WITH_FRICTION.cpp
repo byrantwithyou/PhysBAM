@@ -8,10 +8,10 @@
 #include <Tools/Polynomials/QUADRATIC.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
+#include <Rigids/Collisions/RELAX_ATTACHMENT_IMPLICIT.h>
 #include <Rigids/Forces_And_Torques/MOVE_RIGID_BODY_DIFF.h>
 #include <Rigids/Forces_And_Torques/RIGID_PENALTY_WITH_FRICTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
-#include <Deformables/Forces/IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Solids/Forces_And_Torques/RIGID_DEFORMABLE_PENALTY_WITH_FRICTION.h>
 using namespace PhysBAM;
@@ -133,9 +133,9 @@ Relax_Attachment(int cp)
     if(!c.active) return;
     Project_Attachment_To_Surface(W,mZ,Z,dWdZ,dWdL,dWdA);
 
-    RELAX_ATTACHMENT_HELPER<TV> h;
-    if(use_bisection) Relax_Attachment_Helper_Search(h,Z,X,W,rb.implicit_object,friction);
-    else Relax_Attachment_Helper(h,Z,X,W,friction);
+    RELAX_ATTACHMENT_IMPLICIT<TV> h;
+    if(use_bisection) h.Relax_Search(Z,X,W,rb.implicit_object,friction);
+    else h.Relax(Z,X,W,friction);
     if(h.dynamic) num_dynamic++;
     else num_stick++;
     
