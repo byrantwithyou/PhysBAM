@@ -177,7 +177,8 @@ Get_RR_Collision_Candidates()
         ARRAY<CCD_PAIR<TV::m> > point_face;
         ccd_r->Compute_Pairs_PF(point_face,const_repulsion_thickness);
         for(const auto& a:point_face)
-            rr_penalty->Add_Pair(a.s0,a.f(0),a.s1);}
+            if(a.s0!=a.s1)
+                rr_penalty->Add_Pair(a.s0,a.f(0),a.s1,a.e1,F0(a.s0),F0(a.s1),const_repulsion_thickness);}
    else
         for(const auto& k:rasterized_data.hash){
             auto V=cell_vertices.Get(k.key);
@@ -253,16 +254,15 @@ Init(bool use_di,bool use_dd,bool use_rd,bool use_rr)
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m>::OBJECT T_OBJECT;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
-    if(use_rr && !rr_penalty && solid_body_collection.rigid_body_collection.rigid_body_particles.number>0){
-        rr_penalty=new RIGID_PENALTY_WITH_FRICTION<TV>(
-            solid_body_collection.rigid_body_collection,move_rb_diff);
+    RIGID_BODY_COLLECTION<TV>& rbc=solid_body_collection.rigid_body_collection;
+    if(use_rr && !rr_penalty && rbc.rigid_body_particles.number>0){
+        rr_penalty=new RIGID_PENALTY_WITH_FRICTION<TV>(rbc,move_rb_diff);
         rr_penalty->get_candidates=[this](){Get_RR_Collision_Candidates();};
         solid_body_collection.Add_Force(rr_penalty);}
 
-    if(use_rd && !rd_penalty && solid_body_collection.rigid_body_collection.rigid_body_particles.number>0){
+    if(use_rd && !rd_penalty && rbc.rigid_body_particles.number>0){
         rd_penalty=new RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>(
-            solid_body_collection.deformable_body_collection.particles,
-            solid_body_collection.rigid_body_collection,move_rb_diff);
+            solid_body_collection.deformable_body_collection.particles,rbc,move_rb_diff);
         rd_penalty->get_candidates=[this](){Get_RD_Collision_Candidates();};
         solid_body_collection.Add_Force(rd_penalty);}
 
@@ -282,6 +282,11 @@ Init(bool use_di,bool use_dd,bool use_rd,bool use_rr)
                 dd_penalty->Add_Surface(*p);
             else if(auto* p=dynamic_cast<T_OBJECT*>(s))
                 dd_penalty->Add_Surface(p->Get_Boundary_Object());}}
+
+    if(use_rr_ccd || use_rd_ccd)
+        for(int p=0;p<rbc.rigid_body_particles.number;p++)
+            if(!rbc.Rigid_Body(p).simplicial_object->mesh.adjacent_elements)
+                rbc.Rigid_Body(p).simplicial_object->mesh.Initialize_Adjacent_Elements();
 
     Update_CCD_Topology();
 }
