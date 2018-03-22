@@ -32,6 +32,8 @@ public:
         int b; // colliding rigid body
         TV X; // original attachment point (object space)
         TV Y; // relaxed attachment point (world space)
+        int e,e0;
+        TV w,w0; // barycentric coords of X, for CCD
         MATRIX<T,TV::m> dYdZ; // Dependence of Y on X(p)
         MATRIX<T,TV::m> dYdL; // Dependence of Y on twist.linear
         MATRIX<T,TV::m,TV::SPIN::m> dYdA; // Dependence of Y on twist.angular
@@ -71,8 +73,11 @@ public:
     T Potential_Energy(const T time) const override;
     void Add_Force_Data(ARRAY<FORCE_DATA<TV> >& force_data_list,const std::string& force_name="") const override;
     void Relax_Attachment(int cp);
+    void Relax_Attachment_Implicit(int cp);
+    void Relax_Attachment_Mesh(int cp);
     void Update_Attachments_And_Prune_Pairs();
     void Add_Pair(int p,int b);
+    void Add_Pair(int p,int b,int e,const TV& X0,const FRAME<TV>& f,T thickness); // CCD
     void Read(TYPED_ISTREAM input);
     void Write(TYPED_OSTREAM output) const;
 //#####################################################################

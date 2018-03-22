@@ -157,7 +157,7 @@ Get_RD_Collision_Candidates()
         ARRAY<CCD_PAIR<TV::m> > point_face;
         ccd_d->Compute_Pairs_PF(point_face,*ccd_r,const_repulsion_thickness);
         for(const auto& a:point_face)
-            rd_penalty->Add_Pair(a.f(0),a.s1);}
+            rd_penalty->Add_Pair(a.f(0),a.s1,a.e1,X0(a.f(0)),F0(a.s1),const_repulsion_thickness);}
     else
         for(const auto& k:rasterized_data.hash){
             auto D=cell_particles.Get(k.key);

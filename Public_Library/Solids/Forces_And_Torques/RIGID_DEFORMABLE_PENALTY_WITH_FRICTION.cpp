@@ -8,7 +8,9 @@
 #include <Tools/Polynomials/QUADRATIC.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Rigids/Collisions/RELAX_ATTACHMENT_IMPLICIT.h>
+#include <Rigids/Collisions/RELAX_ATTACHMENT_MESH.h>
 #include <Rigids/Forces_And_Torques/MOVE_RIGID_BODY_DIFF.h>
 #include <Rigids/Forces_And_Torques/RIGID_PENALTY_WITH_FRICTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
@@ -117,6 +119,15 @@ Potential_Energy(const T time) const
 template<class TV> void RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>::
 Relax_Attachment(int cp)
 {
+    if(collision_pairs(cp).e0>=0) Relax_Attachment_Mesh(cp);
+    else Relax_Attachment_Implicit(cp);
+}
+//#####################################################################
+// Function Relax_Attachment_Implicit
+//#####################################################################
+template<class TV> void RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>::
+Relax_Attachment_Implicit(int cp)
+{
     TIMER_SCOPE_FUNC;
     COLLISION_PAIR& c=collision_pairs(cp);
     const RIGID_BODY<TV>& rb=rigid_body_collection.Rigid_Body(c.b);
@@ -156,6 +167,44 @@ Relax_Attachment(int cp)
     c.dYdA=dYdK*(h.dKdX*dXdA+h.dKdW*dWdA+dKdA)+dYdA;
 }
 //#####################################################################
+// Function Relax_Attachment_Mesh
+//#####################################################################
+template<class TV> void RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>::
+Relax_Attachment_Mesh(int cp)
+{
+    TIMER_SCOPE_FUNC;
+    COLLISION_PAIR& c=collision_pairs(cp);
+    const RIGID_BODY<TV>& rb=rigid_body_collection.Rigid_Body(c.b);
+    const MOVE_RIGID_BODY_DIFF<TV>& mr=move_rb_diff(c.b);
+
+    MATRIX<T,TV::m> dZidZ,dZidL,dYdYi,dYdL;
+    MATRIX<T,TV::m,TV::SPIN::m> dZidA,dYdA;
+
+    TV Z=particles.X(c.p);
+    TV Zi=mr.Frame_Inverse_Times(Z,dZidZ,dZidL,dZidA);
+    RELAX_ATTACHMENT_MESH<TV> ram;
+    ram.Relax(c.e0,c.w0,Zi,*rb.simplicial_object,-1,friction);
+    c.active=ram.active;
+    if(!c.active) return;
+
+    c.Y=mr.Frame_Times(ram.Y,dYdYi,dYdL,dYdA);
+    c.e=ram.e;
+    c.w=ram.w;
+
+    MATRIX<T,TV::m> dYidL,dYidZ;
+    MATRIX<T,TV::m,TV::SPIN::m> dYidA;
+
+    for(int i=0;i<ram.diff_entry.m;i++){
+        const auto& de=ram.diff_entry(i);
+        dYidZ=de.dYdI(0)*dYidZ+de.dYdI(1)*dZidZ;
+        dYidL=de.dYdI(0)*dYidL+de.dYdI(1)*dZidL;
+        dYidA=de.dYdI(0)*dYidA+de.dYdI(1)*dZidA;}
+
+    c.dYdZ=dYdYi*dYidZ;
+    c.dYdL=dYdYi*dYidL+dYdL;
+    c.dYdA=dYdYi*dYidA+dYdA;
+}
+//#####################################################################
 // Function Update_Attachments_And_Prune_Pairs
 //#####################################################################
 template<class TV> void RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>::
@@ -186,6 +235,46 @@ Add_Pair(int p,int b)
     if(rb.implicit_object->Extended_Phi(X)>0) return;
     TV W=rb.implicit_object->Closest_Point_On_Boundary(X);
     COLLISION_PAIR c={p,b,rb.Frame().Inverse_Times(W)};
+    collision_pairs.Append(c);
+    hash.Insert({p,b});
+}
+//#####################################################################
+// Function Add_Pair
+//#####################################################################
+template<class TV> void RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>::
+Add_Pair(int p,int b,int e,const TV& X0,const FRAME<TV>& f,T thickness)
+{
+    typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX_FACE T_FACE;
+    TIMER_SCOPE_FUNC;
+    // TODO: Interpolate X^n and X^(n+1) to choose surface point.
+    if(hash.Contains({p,b})) return;
+    TV X1=particles.X(p);
+    const RIGID_BODY<TV>& rb=rigid_body_collection.Rigid_Body(b);
+    const auto& ts=*rb.simplicial_object;
+    TV Xb1=rb.Frame().Inverse_Times(X1);
+    if(ts.Get_Element(e).Signed_Distance(Xb1)>0) return;
+    VECTOR<TV,TV::m> E(ts.particles.X.Subset(ts.mesh.elements(e))),E0,E1;
+    for(int i=0;i<TV::m;i++){
+        E0(i)=f*E(i);
+        E1(i)=rb.Frame()*E(i);}
+
+    // Do the expensive check.
+    T_FACE face(E0);
+    T collision_time=0;
+    TV normal;
+    VECTOR<T,TV::m+1> weights;
+    VECTOR<TV,TV::m> V_f(E1-E0);
+    bool in=face.Point_Face_Collision(X0,X1-X0,V_f,1,
+        thickness,collision_time,normal,weights,false);
+    if(!in) return;
+
+    TV w=weights.Remove_Index(0);
+    if(w.Min()<0) return;
+    TV W=E.Weighted_Sum(w);
+
+    COLLISION_PAIR c={p,b,W};
+    c.w0=w;
+    c.e0=e;
     collision_pairs.Append(c);
     hash.Insert({p,b});
 }
