@@ -12,135 +12,154 @@
 #include <cstdio>
 #include <cstring>
 #include <stdexcept>
+#include <iomanip>
+#include <type_traits>
 namespace PhysBAM{
 namespace LOG{
+using std::enable_if;
+using std::is_integral;
 
-struct PRINTF_FORMAT_FLAGS
+struct OUT_STATE
 {
-    int width,precision;
-    bool just_right;
+    int width,precision,opts;
+    std::ios::fmtflags flags;
+    char fill;
+    std::ostream::pos_type pos;
+    std::ostream& out;
+    
+    OUT_STATE(std::ostream& out)
+        :out(out)
+    {
+        width=out.width();
+        precision=out.precision();
+        opts=0;
+        fill=out.fill();
+        flags=out.flags();
+        pos=out.tellp();
+    }
+
+    void Restore()
+    {
+        out.width(width);
+        out.precision(precision);
+        out.fill(fill);
+        out.flags(flags);
+    }
+
+    int Number_Output()
+    {
+        return out.tellp()-pos;
+    }
 };
 
-template<typename T>
-int fprintf_formatted_item_builtin(std::ostream& out,const char *format,int len,T value);
-int fprintf_formatted_item(std::ostream& out,char *format,int len,const PRINTF_FORMAT_FLAGS& flags,int value);
-int fprintf_formatted_item(std::ostream& out,char *format,int len,const PRINTF_FORMAT_FLAGS& flags,unsigned int value);
-int fprintf_formatted_item(std::ostream& out,char *format,int len,const PRINTF_FORMAT_FLAGS& flags,long value);
-int fprintf_formatted_item(std::ostream& out,char *format,int len,const PRINTF_FORMAT_FLAGS& flags,unsigned long value);
-int fprintf_formatted_item(std::ostream& out,char *format,int len,const PRINTF_FORMAT_FLAGS& flags,long long value);
-int fprintf_formatted_item(std::ostream& out,char *format,int len,const PRINTF_FORMAT_FLAGS& flags,unsigned long long value);
-int fprintf_formatted_item(std::ostream& out,char *format,int len,const PRINTF_FORMAT_FLAGS& flags,short value);
-int fprintf_formatted_item(std::ostream& out,char *format,int len,const PRINTF_FORMAT_FLAGS& flags,unsigned short value);
-int fprintf_formatted_item(std::ostream& out,char *format,int len,const PRINTF_FORMAT_FLAGS& flags,char value);
-int fprintf_formatted_item(std::ostream& out,char *format,int len,const PRINTF_FORMAT_FLAGS& flags,unsigned char value);
-int fprintf_formatted_item(std::ostream& out,char *format,int len,const PRINTF_FORMAT_FLAGS& flags,double value);
-int fprintf_formatted_item(std::ostream& out,char *format,int len,const PRINTF_FORMAT_FLAGS& flags,long double value);
-int fprintf_formatted_item(std::ostream& out,char *format,int len,const PRINTF_FORMAT_FLAGS& flags,const char* value);
-int fprintf_formatted_item(std::ostream& out,char *format,int len,const PRINTF_FORMAT_FLAGS& flags,const void* value);
+extern int fprintf_parse_flags(std::ostream& out,const char *format,int len);
 
-template<typename T>
-int fprintf_formatted_item(std::ostream& out,char *format,int len,const PRINTF_FORMAT_FLAGS& flags,const T* value)
+void fprintf_rec(const char *format,OUT_STATE& state);
+template<typename T,typename... Args> void fprintf_rec(const char *format,OUT_STATE& state,T&& value,Args&&... args);
+
+template<typename T> typename enable_if<is_integral<T>::value && !is_const<T>::value>::type
+capture_num_written(int num,T* value)
 {
-    return fprintf_formatted_item(out,format,len,flags,(const void*)value);
+    *value=num;
 }
 
-template<typename T>
-int fprintf_formatted_item(std::ostream& out,char *format,int len,const PRINTF_FORMAT_FLAGS& flags,T* value)
-{
-    return fprintf_formatted_item(out,format,len,flags,(const void*)value);
-}
-
-extern int fprintf_formatted_item_string(std::ostream& out,const PRINTF_FORMAT_FLAGS& flags,const std::string& str);
-
-template<typename T> typename enable_if<!is_fundamental<typename remove_reference<T>::type>::value,int>::type
-fprintf_formatted_item(std::ostream& out,char *format,int len,const PRINTF_FORMAT_FLAGS& flags,T&& value)
-{
-    std::ostringstream stream;
-    if(flags.precision!=INT_MAX){
-        int old_prec=stream.precision(flags.precision);
-        stream<<value;
-        stream.precision(old_prec);}
-    else stream<<value;
-    return fprintf_formatted_item_string(out,flags,stream.str());
-}
-
-extern void fprintf_parse_flags(const char *format,int len,PRINTF_FORMAT_FLAGS& flags);
-extern int fprintf_rewrite_flags(const char *format,char* new_format,int len,const PRINTF_FORMAT_FLAGS& flags);
-
-int fprintf(std::ostream& out,const char *format);
-template<typename T,typename... Args> int fprintf(std::ostream& out,const char *format,T&& value,Args&&... args);
-
-template<typename T> typename enable_if<!is_fundamental<typename remove_reference<T>::type>::value,int>::type
-fprintf_with_format(std::ostream& out,char *format,int len,const PRINTF_FORMAT_FLAGS& flags,T&& value)
-{
-    return fprintf_formatted_item(out,format,len,flags,value);
-}
-
-template<typename T> typename enable_if<is_fundamental<typename remove_reference<T>::type>::value,int>::type
-fprintf_with_format(std::ostream& out,char *format,int len,const PRINTF_FORMAT_FLAGS& flags,T&& value)
-{
-    if(format[len-1]!='P')
-        return fprintf_formatted_item_builtin(out,format,len,value);
-    return fprintf_formatted_item(out,format,len,flags,value);
-}
-
-template<typename T,typename... Args> int
-fprintf_fill_format(std::ostream& out,const char *format,int len,PRINTF_FORMAT_FLAGS& flags)
+template<typename T> void
+capture_num_written(int num,T&& value)
 {
     throw std::runtime_error("invalid format string.");
 }
 
-template<typename T,typename... Args> int
-fprintf_fill_format(std::ostream& out,const char *format,int len,PRINTF_FORMAT_FLAGS& flags,T&& param)
+inline void
+fprintf_fill_format_p(const char *format,OUT_STATE& state)
 {
     throw std::runtime_error("invalid format string.");
 }
 
-template<typename T,typename U,typename... Args> typename enable_if<!is_integral<typename remove_reference<T>::type>::value,int>::type
-fprintf_fill_format(std::ostream& out,const char *format,int len,PRINTF_FORMAT_FLAGS& flags,T&& param,
+template<typename T> void
+fprintf_fill_format_p(const char *format,OUT_STATE& state,T&& param)
+{
+    throw std::runtime_error("invalid format string.");
+}
+
+template<typename T,typename U,typename... Args> typename enable_if<!is_integral<typename remove_reference<T>::type>::value>::type
+fprintf_fill_format_p(const char *format,OUT_STATE& state,T&& param,
     U&& value,Args&&... args)
 {
     throw std::runtime_error("invalid format string.");
 }
 
-template<typename T,typename... Args> int
-fprintf_fill_format(std::ostream& out,const char *format,int len,PRINTF_FORMAT_FLAGS& flags,int param,
+template<typename T,typename... Args> void
+fprintf_fill_format_p(const char *format,OUT_STATE& state,int param,
     T&& value,Args&&... args)
 {
-    if(flags.width<0){
-        flags.width=param;
-        if(flags.precision<0)
-            return fprintf_fill_format(out,format,len,flags,value,args...);}
-    else flags.precision=param;
-    char new_format[len+50];
-    int new_len=fprintf_rewrite_flags(format,new_format,len,flags);
-    int n=fprintf_with_format(out,new_format,new_len,flags,value);
-    return n+fprintf(out,format+len,args...);
+    if(state.opts&4){
+        state.out<<std::setw(std::max((int)state.out.width(),param));
+        state.out<<std::setfill('0');}
+    else state.out<<std::setprecision(param);
+    int n=0;
+    if(state.opts&8) capture_num_written(n,value);
+    else state.out<<value;
+    state.Restore();
+    fprintf_rec(format,state,args...);
+}
+
+inline void
+fprintf_fill_format_w(const char *format,OUT_STATE& state)
+{
+    throw std::runtime_error("invalid format string.");
+}
+
+template<typename T> void
+fprintf_fill_format_w(const char *format,OUT_STATE& state,T&& param)
+{
+    throw std::runtime_error("invalid format string.");
+}
+
+template<typename T,typename U,typename... Args> typename enable_if<!is_integral<typename remove_reference<T>::type>::value>::type
+fprintf_fill_format_w(const char *format,OUT_STATE& state,T&& param,
+    U&& value,Args&&... args)
+{
+    throw std::runtime_error("invalid format string.");
+}
+
+template<typename T,typename... Args> void
+fprintf_fill_format_w(const char *format,OUT_STATE& state,int param,
+    T&& value,Args&&... args)
+{
+    if(state.opts&32) state.out<<std::setw(std::max(param,(int)state.out.width()));
+    else state.out<<std::setw(param);
+    if(state.opts&6) return fprintf_fill_format_p(format,state,value,args...);
+    int n=0;
+    if(state.opts&8) capture_num_written(n,value);
+    else state.out<<value;
+    state.Restore();
+    fprintf_rec(format,state,args...);
 }
 
 template<typename T,typename... Args>
-int fprintf(std::ostream& out,const char *format,T&& value,Args&&... args)
+void fprintf_rec(const char *format,OUT_STATE& state,T&& value,Args&&... args)
 {
-    int n=0;
     while(*format){
         if(*format=='%'){
             if(format[1]=='%') format++;
             else{
                 int option_len=strspn(format+1,"0123456789#-+ 'I*.hlLqjzt")+2;
-                PRINTF_FORMAT_FLAGS flags;
-                fprintf_parse_flags(format,option_len,flags);
-                if(flags.width>=0 && flags.precision>=0){
-                    char* term_format=new char[option_len+3];
-                    memcpy(term_format,format,option_len);
-                    term_format[option_len]=0;
-                    n+=fprintf_with_format(out,term_format,option_len,flags,value);
-                    delete [] term_format;
-                    return n+fprintf(out,format+option_len,args...);}
-                else
-                    return n+fprintf_fill_format(out,format,option_len,flags,value,args...);}}
-        n++;
-        out<<*format++;}
-    return n;
+                state.opts=fprintf_parse_flags(state.out,format,option_len);
+                if(state.opts&1) return fprintf_fill_format_w(format+option_len,state,value,args...);
+                if(state.opts&6) return fprintf_fill_format_p(format+option_len,state,value,args...);
+                if(state.opts&8) capture_num_written(state.Number_Output(),value);
+                else state.out<<value;
+                state.Restore();
+                return fprintf_rec(format+option_len,state,args...);}}
+        state.out<<*format++;}
+}
+
+template<typename... Args>
+int fprintf(std::ostream& out,const char *format,Args&&... args)
+{
+    OUT_STATE state(out);
+    fprintf_rec(format,state,args...);
+    return state.Number_Output();
 }
 
 template<typename... Args>
