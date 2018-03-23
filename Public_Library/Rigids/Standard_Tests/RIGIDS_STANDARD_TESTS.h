@@ -33,7 +33,7 @@ public:
     RIGID_BODY<TV>& Add_Analytic_Torus(const T inner_radius,const T outer_radius,int inner_resolution=8,int outer_resolution=16,T density=0);
     RIGID_BODY<TV>& Add_Analytic_Cylinder(const T height,const T radius,int resolution_radius=16,int resolution_height=4,T density=0);
     RIGID_BODY<TV>& Add_Analytic_Shell(const T height,const T outer_radius,const T inner_radius,int resolution=40,T density=0);
-    RIGID_BODY<TV>& Add_Analytic_Bowl(const T height,const T outer_radius,const T inner_radius,int res_radial=32,int res_vertical=8);
+    RIGID_BODY<TV>& Add_Analytic_Bowl(const T hole_radius,const T depth,const T thickness,int res_radial=32,int res_vertical=8);
     RIGID_BODY<TV>& Add_Analytic_Sphere(const T radius,const T density,int levels=4);
     RIGID_BODY<TV>& Add_Analytic_Smooth_Gear(const TV& dimensions,int cogs,int levels=4);
     RIGID_BODY<TV>& Add_Analytic_Plane(const TV& normal,const TV& X,T surface_size=1000,int elements_per_side=1);
