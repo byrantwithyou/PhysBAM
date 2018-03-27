@@ -155,7 +155,7 @@ Initialize_Cylinder_Mesh_And_Particles(const int m,const int n,const T length,co
     mesh.Initialize_Cylinder_Mesh(m,n,create_caps);
 }
 //#####################################################################
-// Function Initialize_Cylinder_Mesh_And_Particles
+// Function Initialize_Box_Mesh_And_Particles
 //#####################################################################
 template<class T> void TRIANGULATED_SURFACE<T>::
 Initialize_Box_Mesh_And_Particles(const TV_INT& m,const RANGE<TV>& box)
