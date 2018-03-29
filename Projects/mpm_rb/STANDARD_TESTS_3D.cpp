@@ -700,7 +700,7 @@ Initialize()
             destroy=[=](){delete source;};
             write_output_files=[=](int frame){source->Write_Output_Files(frame);};
             read_output_files=[=](int frame){source->Read_Output_Files(frame);};
-            T source_start=2;
+            T source_start=4;
             T source_end=100;
             ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
             begin_time_step=[=](T time)
