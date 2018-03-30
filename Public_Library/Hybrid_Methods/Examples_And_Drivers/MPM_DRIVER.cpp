@@ -211,7 +211,9 @@ template<class TV> void MPM_DRIVER<TV>::
 Update_Particle_Weights()
 {
     example.weights->Update(example.particles.X);
-    if(example.particles.store_B) example.weights->Dp_Inverse(example.particles.X,example.Dp_inv);
+    if(example.particles.store_B){
+        example.Dp_inv.Resize(example.particles.X.m);
+        example.weights->Dp_Inverse(example.particles.X,example.Dp_inv);}
 }
 //#####################################################################
 // Function Particle_To_Grid
