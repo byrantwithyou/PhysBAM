@@ -1415,6 +1415,7 @@ Initialize()
             Add_Gravity(m/(s*s)*TV(0,-9.8,0));
         } break;
 
+        // ./mpm -3d 44 -last_frame 20 -fooT3 1 -resolution 10 -fooT2 35 -use_exp_F -max_dt 2e-4 -symplectic_euler 
         case 44:{ // sand falling into a pile.
             particles.Store_Fp(true);
             Set_Grid(RANGE<TV>(TV(-.1,-0.02,-0.1),TV(0.1,0.06,0.1))*m,TV_INT(5,2,5));
