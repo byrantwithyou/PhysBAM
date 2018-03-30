@@ -159,6 +159,7 @@ int fprintf(std::ostream& out,const char *format,Args&&... args)
 {
     OUT_STATE state(out);
     fprintf_rec(format,state,args...);
+    out<<std::flush;
     return state.Number_Output();
 }
 
