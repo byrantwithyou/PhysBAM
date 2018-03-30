@@ -88,6 +88,19 @@ fprintf_fill_format_p(const char *format,OUT_STATE& state,T&& param,
     throw std::runtime_error("invalid format string.");
 }
 
+template<typename T> void
+fprintf_fill_format_p_safe(std::ostream& out,const T& value)
+{
+    out<<value;
+}
+
+inline void
+fprintf_fill_format_p_safe(std::ostream& out,const char* value)
+{
+    if(value) out<<value;
+    else out<<"(null)";
+}
+
 template<typename T,typename... Args> void
 fprintf_fill_format_p(const char *format,OUT_STATE& state,int param,
     T&& value,Args&&... args)
@@ -98,7 +111,7 @@ fprintf_fill_format_p(const char *format,OUT_STATE& state,int param,
     else state.out<<std::setprecision(param);
     int n=0;
     if(state.opts&8) capture_num_written(n,value);
-    else state.out<<value;
+    fprintf_fill_format_p_safe(state.out,value);
     state.Restore();
     fprintf_rec(format,state,args...);
 }
@@ -131,7 +144,7 @@ fprintf_fill_format_w(const char *format,OUT_STATE& state,int param,
     if(state.opts&6) return fprintf_fill_format_p(format,state,value,args...);
     int n=0;
     if(state.opts&8) capture_num_written(n,value);
-    else state.out<<value;
+    else fprintf_fill_format_p_safe(state.out,value);
     state.Restore();
     fprintf_rec(format,state,args...);
 }
@@ -148,7 +161,7 @@ void fprintf_rec(const char *format,OUT_STATE& state,T&& value,Args&&... args)
                 if(state.opts&1) return fprintf_fill_format_w(format+option_len,state,value,args...);
                 if(state.opts&6) return fprintf_fill_format_p(format+option_len,state,value,args...);
                 if(state.opts&8) capture_num_written(state.Number_Output(),value);
-                else state.out<<value;
+                else fprintf_fill_format_p_safe(state.out,value);
                 state.Restore();
                 return fprintf_rec(format+option_len,state,args...);}}
         state.out<<*format++;}
