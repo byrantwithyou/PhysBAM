@@ -224,7 +224,7 @@ void Update_Solids_Parameters(const T time) override
         collisions.Set_Push_Out_Level_Iterations(1);
         collisions.Set_Push_Out_Pair_Iterations(1);
         collisions.Use_Freezing_With_Push_Out(false);}
-    if(test_number==2){collisions.Set_Shock_Propagation_Iterations(0);collisions.Use_Freezing_With_Push_Out(false);}
+    if(test_number==2 || test_number==26){collisions.Set_Shock_Propagation_Iterations(0);collisions.Use_Freezing_With_Push_Out(false);}
     if(test_number==8){
         T desired_x=(T)pi*2/16;
         ROTATION<TV> desired_rotation=ROTATION<TV>(desired_x*sin(4*time),TV(0,1,0));
@@ -312,6 +312,7 @@ void Initialize_Bodies() override
         case 23: Sphere_Block(false);break;
         case 24: Two_Way_Tori();break;
         case 25: Pyramid();break;
+        case 26: Coupled_Stack2();break;
       default: PHYSBAM_FATAL_ERROR(LOG::sprintf("Unrecognized test number %d",test_number));}
 
     if(dynamic_subsampling) Initialize_Dynamic_Subsampling();
@@ -468,6 +469,35 @@ void Coupled_Stack()
     sphere.Set_Mass(6000);
 
     tests.Add_Ground((T).4);
+}
+//#####################################################################
+// Function Coupled_Stack2
+//#####################################################################
+void Coupled_Stack2()
+{
+    if(!user_last_frame) last_frame=240;
+    solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+    solids_parameters.triangle_collision_parameters.self_collision_friction_coefficient=0.3;
+    solids_parameters.triangle_collision_parameters.perform_self_collision=true;
+    dynamic_subsampling=true;
+    int resolution=10;
+    T density=1000;
+    GRID<TV> box_grid(TV_INT()+(resolution+1),RANGE<TV>::Centered_Box());
+    RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,3.02,0)));
+    tests.Create_Mattress(box_grid,true,&initial_state,density);
+    initial_state.frame.t=TV(.01,5.03,.02);
+    tests.Create_Mattress(box_grid,true,&initial_state,density);
+    auto& b0=tests.Add_Analytic_Box(TV()+2,TV_INT()+resolution,density);
+    b0.Frame().t.y=1.01;
+    b0.coefficient_of_friction=0.3;
+    auto& b1=tests.Add_Analytic_Box(TV()+2,TV_INT()+resolution,density);
+    b1.Frame().t.y=7.04;
+    b1.coefficient_of_friction=0.3;
+    auto& b2=tests.Add_Analytic_Box(TV()+2,TV_INT()+resolution,density);
+    b2.Frame().t.y=9.05;
+    b2.coefficient_of_friction=0.3;
+    auto& g=tests.Add_Ground(0);
+    g.coefficient_of_friction=0.3;
 }
 //#####################################################################
 // Function Find_Placement
