@@ -311,6 +311,7 @@ void Initialize_Bodies() override
         case 22: Sphere_Block(true);break;
         case 23: Sphere_Block(false);break;
         case 24: Two_Way_Tori();break;
+        case 25: Pyramid();break;
       default: PHYSBAM_FATAL_ERROR(LOG::sprintf("Unrecognized test number %d",test_number));}
 
     if(dynamic_subsampling) Initialize_Dynamic_Subsampling();
@@ -1584,6 +1585,45 @@ void Sphere_Block(bool deformable_on_top)
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     rigid_body->name="box";
     tests.Add_Ground();
+}
+//#####################################################################
+// Function Sphere_Block
+//#####################################################################
+void Pyramid()
+{
+    DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
+    if(!user_last_frame) last_frame=120;
+    solids_parameters.cfl=2;
+    solids_parameters.triangle_collision_parameters.perform_self_collision=true;
+
+    T density=1000;
+    T gap=0.005;
+    T r=0.15;
+    T R=r+gap;
+    T k=0.8;
+    TV center(0.5-R,r,0.5+tan(pi/6)*R);
+
+    tests.Create_Tetrahedralized_Volume(
+        data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",
+        RIGID_BODY_STATE<TV>(FRAME<TV>(center)),true,true,density,r);
+    center+=TV(2*R,0,0);
+    tests.Create_Tetrahedralized_Volume(
+        data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",
+        RIGID_BODY_STATE<TV>(FRAME<TV>(center)),true,true,density,r);
+    center+=TV(-R,0,-sin(pi/3)*2*R);
+    tests.Create_Tetrahedralized_Volume(
+        data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",
+        RIGID_BODY_STATE<TV>(FRAME<TV>(center)),true,true,density,r);
+    for(auto& X:particles.X) X.y=X.y*k+0.1;
+
+    RIGID_BODY<TV>& sphere=tests.Add_Analytic_Sphere(r,density);
+    sphere.Frame().t=TV(0.5,r*k+sqrt(6.0)/3*2*r+0.1-0.03,0.5);
+    sphere.coefficient_of_friction=0.3;
+    RIGID_BODY<TV>& ground=tests.Add_Analytic_Box(TV(1,0.1,1));
+    ground.Frame().t=TV(0.5,0.05,0.5);
+    ground.is_static=true;
+    ground.coefficient_of_friction=0.3;
 }
 //#####################################################################
 // Function Two_Way_Tori
