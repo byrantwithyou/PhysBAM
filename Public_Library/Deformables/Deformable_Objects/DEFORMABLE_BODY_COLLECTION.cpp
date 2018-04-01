@@ -34,7 +34,7 @@ DEFORMABLE_BODY_COLLECTION(DEFORMABLE_PARTICLES<TV>* particles_input,COLLISION_B
     triangle_collisions(*new TRIANGLE_COLLISIONS<TV>(triangle_repulsions_and_collisions_geometry,triangle_repulsions.repulsion_thickness)),
     collisions(*new DEFORMABLE_OBJECT_COLLISIONS<TV>(particles,*this,structures,collision_body_list?*collision_body_list:*new COLLISION_BODY_COLLECTION<TV>)),
     use_embedded_collisions(false),use_nonembedded_self_collision(false),
-    check_stale(false),own_particles(!particles_input),own_collision_body_collection(!collision_body_list)
+    own_particles(!particles_input),own_collision_body_collection(!collision_body_list)
 {
     particles.Store_Velocity();
     particles.Store_Mass();
@@ -91,24 +91,14 @@ Read_Dynamic_Variables(const std::string& prefix,const int frame)
     particles.Store_Velocity();
     std::string frame_string=Number_To_String(frame);
     // read in bindings
-    int local_frame=frame;
-    std::string binding_state_list_name=prefix+"/common/bindings_list";
     std::string binding_state_name=prefix+"/"+frame_string+"/bindings";
-    if(File_Exists(binding_state_list_name)){
-        if(!binding_list.frame_list){
-            binding_list.frame_list=new ARRAY<int>;
-            Read_From_File(binding_state_list_name,*binding_list.frame_list);}
-        local_frame=(*binding_list.frame_list)(binding_list.frame_list->Binary_Search(frame));}
-    if(binding_list.last_read!=local_frame && File_Exists(binding_state_name)){
-        Read_From_File(binding_state_name,binding_list);binding_list.last_read=local_frame;}
-    local_frame=frame;
-    std::string soft_binding_state_list_name=prefix+"/common/soft_bindings_list";
+    if(File_Exists(binding_state_name))
+        Read_From_File(binding_state_name,binding_list);
+    else binding_list.Clean_Memory();
     std::string soft_binding_state_name=prefix+"/"+frame_string+"/soft_bindings";
-    if(File_Exists(soft_binding_state_list_name)){
-        if(!soft_bindings.frame_list){soft_bindings.frame_list=new ARRAY<int>;Read_From_File(soft_binding_state_list_name,*soft_bindings.frame_list);}
-        local_frame=(*soft_bindings.frame_list)(soft_bindings.frame_list->Binary_Search(frame));}
-    if(soft_bindings.last_read!=local_frame && File_Exists(soft_binding_state_name)){
-        Read_From_File(soft_binding_state_name,soft_bindings);soft_bindings.last_read=local_frame;}
+    if(File_Exists(soft_binding_state_name))
+        Read_From_File(soft_binding_state_name,soft_bindings);
+    else soft_bindings.Clean_Memory();
     // recompute auxiliary mass data (this data is destroyed when particles and read, and mass might have changed)
     particles.Compute_Auxiliary_Attributes(soft_bindings);
     soft_bindings.Set_Mass_From_Effective_Mass();
@@ -121,20 +111,10 @@ Write_Dynamic_Variables(const STREAM_TYPE stream_type,const std::string& prefix,
 {
     Write_To_File(stream_type,prefix+"/"+Number_To_String(frame)+"/deformable_object_particles",particles);
     std::string f=Number_To_String(frame);
-    if(binding_list.bindings.m>0 && !(check_stale && !binding_list.is_stale)){
-        if(check_stale){
-            if(!binding_list.frame_list) binding_list.frame_list=new ARRAY<int>;
-            binding_list.frame_list->Append(frame);
-            Write_To_File(stream_type,prefix+"/common/bindings_list",*binding_list.frame_list);
-            binding_list.is_stale=false;}
-        Write_To_File(stream_type,prefix+"/"+f+"/bindings",binding_list);}
-    if(soft_bindings.bindings.m>0 && !(check_stale && !soft_bindings.is_stale)){
-        if(check_stale){
-            if(!soft_bindings.frame_list) soft_bindings.frame_list=new ARRAY<int>;
-            soft_bindings.frame_list->Append(frame);
-            Write_To_File(stream_type,prefix+"/common/soft_bindings_list",*soft_bindings.frame_list);
-            soft_bindings.is_stale=false;}
-        Write_To_File(stream_type,prefix+"/"+f+"/soft_bindings",soft_bindings);}
+    if(binding_list.bindings.m>0)
+        Write_To_File(stream_type,prefix+"/"+f+"/bindings",binding_list);
+    if(soft_bindings.bindings.m>0)
+        Write_To_File(stream_type,prefix+"/"+f+"/soft_bindings",soft_bindings);
 }
 //#####################################################################
 // Function Read

@@ -77,7 +77,6 @@ public:
     ARRAY<COLLISION_PENALTY_FORCES<TV>*> collision_penalty_forces;
     bool use_embedded_collisions;
     bool use_nonembedded_self_collision;
-    bool check_stale;
     bool own_particles,own_collision_body_collection;
 
     DEFORMABLE_BODY_COLLECTION(DEFORMABLE_PARTICLES<TV>* particles,COLLISION_BODY_COLLECTION<TV>* collision_body_list);

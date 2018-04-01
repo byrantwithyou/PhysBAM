@@ -29,9 +29,6 @@ public:
     ARRAY<int> bindings_using_forces_for_collisions;
     ARRAY<int> binding_index_from_particle_index;
     SEGMENT_MESH* binding_mesh;
-    int last_read;
-    mutable bool is_stale;
-    mutable ARRAY<int>* frame_list;
 public:
     SOFT_BINDINGS(BINDING_LIST<TV>& binding_list_input);
     SOFT_BINDINGS(const SOFT_BINDINGS&) = delete;

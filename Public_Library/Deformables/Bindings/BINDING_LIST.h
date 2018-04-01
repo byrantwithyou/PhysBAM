@@ -26,9 +26,6 @@ public:
     ARRAY<BINDING<TV>*> bindings;
     ARRAY<int> binding_index_from_particle_index;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
-    int last_read;
-    mutable bool is_stale;
-    mutable ARRAY<int>* frame_list;
     ARRAY<ARRAY<int> > neighbor_bindings;
 
     BINDING_LIST(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection);

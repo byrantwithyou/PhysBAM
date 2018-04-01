@@ -35,11 +35,7 @@ public:
     STRUCTURE_LIST<TV,int>& structure_list;
     bool always_create_structure;
     HASHTABLE<std::string,int>& structure_hash; // maps to id
-    mutable bool is_stale_key,is_stale_active;
-    mutable ARRAY<int> *frame_list_key,*frame_list_active;
     mutable ARRAY<std::string,int> rigid_body_names;
-    bool check_stale;
-    int last_read_key,last_read_active;
     ALLOCATE_HELPER<TV>* allocate_helper;
     bool owns_collision_body_list;
 

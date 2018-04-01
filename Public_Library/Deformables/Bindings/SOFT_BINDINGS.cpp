@@ -14,7 +14,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> SOFT_BINDINGS<TV>::
 SOFT_BINDINGS(BINDING_LIST<TV>& binding_list_input)
-    :binding_list(binding_list_input),particles(binding_list_input.particles),binding_mesh(0),last_read(-1),is_stale(true),frame_list(0)
+    :binding_list(binding_list_input),particles(binding_list_input.particles),binding_mesh(0)
 {}
 //#####################################################################
 // Destructor

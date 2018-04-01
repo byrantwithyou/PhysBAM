@@ -53,10 +53,6 @@ public:
     bool use_prestab;
     bool use_poststab;
 
-    bool check_stale,is_stale;
-    int last_read;
-    ARRAY<int>* frame_list;
-
     ARTICULATED_RIGID_BODY_BASE(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input);
     ARTICULATED_RIGID_BODY_BASE(const ARTICULATED_RIGID_BODY_BASE&) = delete;
     void operator=(const ARTICULATED_RIGID_BODY_BASE&) = delete;

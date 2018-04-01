@@ -41,7 +41,7 @@ ARTICULATED_RIGID_BODY_BASE(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_inp
     actuation_iterations(50),line_search_interval_tolerance((T)1e-6),max_line_search_iterations(100),use_shock_propagation(true),do_final_pass(true),use_pd_actuators(false),
     use_muscle_actuators(false),enforce_nonnegative_activations(true),clamp_negative_activations(true),activation_optimization_iterations(50),global_post_stabilization(false),
     constrain_pd_directions(false),verbose(false),use_angular_damping(false),zero_row_tolerance((T)1e-6),use_krylov_poststab(false),use_krylov_prestab(false),use_poststab_in_cg(true),
-    use_prestab(true),use_poststab(true),check_stale(false),is_stale(true),last_read(-1)
+    use_prestab(true),use_poststab(true)
 {}
 //#####################################################################
 // Destructor
@@ -496,16 +496,9 @@ Apply_Poststabilization(bool test_system,bool print_matrix,const bool target_pd,
 template<class TV> void ARTICULATED_RIGID_BODY_BASE<TV>::
 Read(const std::string& directory,const int frame)
 {
-    int local_frame=frame;
-    std::string arb_state_list_name=LOG::sprintf("%s/common/arb_state_list",directory.c_str());
-    if(File_Exists(arb_state_list_name)){
-        if(!frame_list){frame_list=new ARRAY<int>;Read_From_File(arb_state_list_name,*frame_list);}
-        local_frame=(*frame_list)(frame_list->Binary_Search(frame));}
-    if(last_read!=local_frame){
-        FILE_ISTREAM input;
-        Safe_Open_Input(input,LOG::sprintf("%s/%d/arb_state",directory.c_str(),frame));
-        joint_mesh.Read(input,directory,frame);
-        last_read=local_frame;}
+    FILE_ISTREAM input;
+    Safe_Open_Input(input,LOG::sprintf("%s/%d/arb_state",directory.c_str(),frame));
+    joint_mesh.Read(input,directory,frame);
     std::string muscle_filename=LOG::sprintf("%s/%d/muscle_list",directory.c_str(),frame);
     if(File_Exists(muscle_filename)){
         if(!muscle_list) muscle_list=new MUSCLE_LIST<TV>(rigid_body_collection);
@@ -519,12 +512,7 @@ Read(const std::string& directory,const int frame)
 template<class TV> void ARTICULATED_RIGID_BODY_BASE<TV>::
 Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame)
 {
-    if(joint_mesh.Num_Joints()>0 && !(check_stale && !is_stale)){
-        if(check_stale){
-            if(!frame_list) frame_list=new ARRAY<int>;
-            frame_list->Append(frame);
-            Write_To_File(stream_type,LOG::sprintf("%s/common/arb_state_list",directory.c_str()),*frame_list);
-            is_stale=false;}
+    if(joint_mesh.Num_Joints()>0){
         FILE_OSTREAM output;
         Safe_Open_Output(output,stream_type,LOG::sprintf("%s/%d/arb_state",directory.c_str(),frame));
         joint_mesh.Write(output,directory,frame);}

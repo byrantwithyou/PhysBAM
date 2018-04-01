@@ -17,7 +17,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> BINDING_LIST<TV>::
 BINDING_LIST(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection)
-    :particles(deformable_body_collection.particles),deformable_body_collection(deformable_body_collection),last_read(-1),is_stale(true),frame_list(0)
+    :particles(deformable_body_collection.particles),deformable_body_collection(deformable_body_collection)
 {}
 //#####################################################################
 // Destructor
@@ -33,7 +33,8 @@ template<class TV> BINDING_LIST<TV>::
 template<class TV> void BINDING_LIST<TV>::
 Clean_Memory()
 {
-    bindings.Delete_Pointers_And_Clean_Memory();binding_index_from_particle_index.Clean_Memory();
+    bindings.Delete_Pointers_And_Clean_Memory();
+    binding_index_from_particle_index.Clean_Memory();
 }
 //#####################################################################
 // Function Add_Binding
