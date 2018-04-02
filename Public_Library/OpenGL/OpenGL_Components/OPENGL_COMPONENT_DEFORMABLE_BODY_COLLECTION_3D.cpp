@@ -704,6 +704,7 @@ Increment_Active_Object()
 template<class T> int OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Get_Selection_Priority(ARRAY_VIEW<GLuint> indices)
 {
+    if(indices.m==0) return -1;
     switch(indices(0)){
         case 0:return segmented_curve_objects(indices(1))->Get_Selection_Priority(indices.Array_View(2,indices.m-2));
         case 1:return triangulated_surface_objects(indices(1))->Get_Selection_Priority(indices.Array_View(2,indices.m-2));
