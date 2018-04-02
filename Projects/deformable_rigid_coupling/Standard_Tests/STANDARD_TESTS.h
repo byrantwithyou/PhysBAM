@@ -313,6 +313,7 @@ void Initialize_Bodies() override
         case 24: Two_Way_Tori();break;
         case 25: Pyramid();break;
         case 26: Coupled_Stack2();break;
+        case 27: Wedge_Test();break;
       default: PHYSBAM_FATAL_ERROR(LOG::sprintf("Unrecognized test number %d",test_number));}
 
     if(dynamic_subsampling) Initialize_Dynamic_Subsampling();
@@ -498,6 +499,32 @@ void Coupled_Stack2()
     b2.coefficient_of_friction=0.3;
     auto& g=tests.Add_Ground(0);
     g.coefficient_of_friction=0.3;
+}
+//#####################################################################
+// Function Wedge_Test
+//#####################################################################
+void Wedge_Test()
+{
+    if(!user_last_frame) last_frame=240;
+    solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+    solids_parameters.triangle_collision_parameters.self_collision_friction_coefficient=0.3;
+
+    RIGID_BODY<TV>& lw=tests.Add_Analytic_Box(TV(0.4,8,8));
+    lw.Frame().t=TV(-0.2,0.5,0.5);
+    lw.is_static=true;
+    lw.coefficient_of_friction=0.3;
+    RIGID_BODY<TV>& rw=tests.Add_Analytic_Box(TV(0.4,8,8));
+    rw.Frame().t=TV(1.2,0.5,0.5);
+    rw.is_static=true;
+    rw.coefficient_of_friction=0.3;
+
+    TV g=TV(0,-1.8,0);
+    RIGID_BODY<TV>& lcube=tests.Add_Analytic_Box(TV(0.52,0.5,0.5),TV_INT()+5,(T)1);
+    lcube.Frame().t=TV(0.25,0.5,0.5);
+    lcube.coefficient_of_friction=0.3;
+    tests.Create_Tetrahedralized_Volume(
+        data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",
+        RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0.75,0.5,0.5))),true,true,(T)1,0.26);
 }
 //#####################################################################
 // Function Find_Placement
