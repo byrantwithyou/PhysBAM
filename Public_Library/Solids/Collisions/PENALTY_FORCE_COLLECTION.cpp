@@ -285,6 +285,7 @@ Init(bool use_di,bool use_dd,bool use_rd,bool use_rr)
 
     if(use_rr_ccd || use_rd_ccd)
         for(int p=0;p<rbc.rigid_body_particles.number;p++){
+            rbc.Rigid_Body(p).simplicial_object->mesh.Initialize_Neighbor_Nodes();
             rbc.Rigid_Body(p).simplicial_object->mesh.Initialize_Incident_Elements();
             rbc.Rigid_Body(p).simplicial_object->mesh.Initialize_Adjacent_Elements();}
 
