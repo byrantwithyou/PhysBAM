@@ -25,6 +25,7 @@
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE_RB.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/MPM_FINITE_ELEMENTS.h>
+#include <Hybrid_Methods/Forces/MPM_FORCE_HELPER.h>
 #include <Hybrid_Methods/Forces/MPM_PLASTIC_FINITE_ELEMENTS.h>
 #include <Hybrid_Methods/Forces/MPM_PLASTICITY_MODEL.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
@@ -486,6 +487,8 @@ Apply_Forces()
     objective.Reset();
     LOG::printf("max velocity: %.16P\n",Max_Particle_Speed());
     if(example.use_symplectic_euler){
+        example.force_helper.B.Resize(example.particles.number);
+        example.force_helper.B.Fill(MATRIX<T,TV::m>());
         example.Precompute_Forces(example.time,example.dt,0);
         objective.tmp2.u*=0;
         example.Add_Forces(objective.tmp2.u,objective.tmp2.twists,example.time);
