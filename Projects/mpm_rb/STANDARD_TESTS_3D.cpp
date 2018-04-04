@@ -409,7 +409,7 @@ Initialize()
             bw.Frame().t=TV(1.5,0.05,1.5);
 
             T density=(T)2200*unit_rho*scale_mass;
-            T E=1e4*unit_p*scale_E,nu=.3;
+            T E=35.37e4*unit_p*scale_E,nu=.3;
             TV spout(1.5,0.8,1.5);
             T spout_width=.1*m;
             T spout_height=.05*m;
@@ -449,7 +449,9 @@ Initialize()
             };
             end_time_step=[=](T time){source->End_Time_Step(time);};
 
-            Add_Drucker_Prager_Case(E,nu,2);
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            Add_Drucker_Prager(E,nu,foo_T2);
+            Set_Lame_On_Particles(E,nu);
             Add_Gravity(gravity);
 
             RIGID_BODY<TV>& sphere=tests.Add_Analytic_Sphere(0.2,density*0.1);
@@ -682,10 +684,6 @@ Initialize()
             solid_body_collection.rigid_body_collection.Add_Force(rg);
 
             T E=35.37e6*unit_p*scale_E,nu=.3;
-            if(!use_theta_c) theta_c=0.015;
-            if(!use_theta_s) theta_s=.000001;
-            if(!use_hardening_factor) hardening_factor=20;
-            if(!use_max_hardening) max_hardening=FLT_MAX;
             TV spout(0,1,0);
             T spout_width=.2*m;
             T spout_height=.2*m;
@@ -729,8 +727,9 @@ Initialize()
                 if(time<source_start) return;
                 source->End_Time_Step(time-source_start);};
 
-            Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
-            Add_Drucker_Prager_Case(E,nu,2);
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            Add_Drucker_Prager(E,nu,foo_T2);
+            Set_Lame_On_Particles(E,nu);
             Add_Gravity(g);
             break;}
 
@@ -758,15 +757,12 @@ Initialize()
             T density=(T)2200*unit_rho*scale_mass;
             T E=35.37e6*unit_p*scale_E,nu=.3;
             RANGE<TV> sandbox(TV(0,0.1,0),TV(3,0.2,1));
-            if(!use_theta_c) theta_c=0.015;
-            if(!use_theta_s) theta_s=.000001;
-            if(!use_hardening_factor) hardening_factor=20;
-            if(!use_max_hardening) max_hardening=FLT_MAX;
-            Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
             Seed_Particles(sandbox,0,0,density,particles_per_cell);
             LOG::printf("Particles: %d\n",particles.number);
-            Add_Drucker_Prager_Case(E,nu,2);
-            TV g=m/(s*s)*TV(0,-4.81,0);
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            Add_Drucker_Prager(E,nu,foo_T2);
+            Set_Lame_On_Particles(E,nu);
+            TV g=m/(s*s)*TV(0,-9.81,0);
             Add_Gravity(g);
             RIGID_BODY<TV>& cube=tests.Add_Analytic_Box(TV(0.2,0.2,0.2),TV_INT()+1,density*2);
             cube.Frame().t=TV(0.3,0.6,0.5);
@@ -801,18 +797,15 @@ Initialize()
 
             T density=(T)2200*unit_rho*scale_mass;
             T E=35.37e6*unit_p*scale_E,nu=.3;
-            if(!use_theta_c) theta_c=0.015;
-            if(!use_theta_s) theta_s=.000001;
-            if(!use_hardening_factor) hardening_factor=20;
-            if(!use_max_hardening) max_hardening=FLT_MAX;
-            Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
             RANGE<TV> sand(TV(0.3,0.1,0.3),TV(0.7,0.7,0.7));
             Seed_Particles(sand,0,0,density*1,particles_per_cell);
             LOG::printf("Particles: %d\n",particles.number);
             ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
             for(int p=0;p<particles.number;p++) (*colors)(p)=Sand_Color();
-            Add_Drucker_Prager_Case(E,nu,2);
-            TV g=m/(s*s)*TV(0,-4.81,0);
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            Add_Drucker_Prager(E,nu,foo_T2);
+            Set_Lame_On_Particles(E,nu);
+            TV g=m/(s*s)*TV(0,-9.81,0);
             Add_Gravity(g);
             RIGID_BODY<TV>& sphere=tests.Add_Analytic_Sphere(0.075,density*10);
             sphere.Frame().t=TV(0.45,0.9,0.65);
