@@ -1781,9 +1781,10 @@ void Get_Initial_Data()
             ground.is_static=true;
             break;}
         case 140:{
-            int number_side_panels=64;
+            int number_side_panels=32;
             TRIANGULATED_SURFACE<T>& cloth=tests.Create_Cloth_Panel(number_side_panels,2,1,
                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(),ROTATION<TV>::From_Euler_Angles(pi,(T)0,(T)0))));
+            cloth.particles.X*=(T).5;
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(cloth,1);
             int n=number_side_panels+1;
             for(int i=0;i<n;i++)
@@ -1794,15 +1795,15 @@ void Get_Initial_Data()
                 stuck_particles.Append(i*n);
                 stuck_particles.Append(i*n+n-1);}
             tests.Create_Tetrahedralized_Volume(
-                data_directory+"/Tetrahedralized_Volumes/adaptive_torus_float.tet",
-                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(-0.4,0.16,0)*m,ROTATION<TV>())),true,true,density,0.1*m);
+                data_directory+"/Tetrahedralized_Volumes/torus.tet",
+                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(-0.3,0.16,0)*m,ROTATION<TV>())),true,true,density,0.4*m);
             tests.Create_Tetrahedralized_Volume(
-                data_directory+"/Tetrahedralized_Volumes/adaptive_torus_float.tet",
-                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0.4,0.16,0.2)*m,ROTATION<TV>())),true,true,density,0.1*m);
+                data_directory+"/Tetrahedralized_Volumes/torus.tet",
+                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0.3,0.16,0.2)*m,ROTATION<TV>())),true,true,density,0.4*m);
             RIGID_BODY<TV>& rt0=tests.Add_Analytic_Torus((T)0.05,(T)0.1,16,32,2*density);
             rt0.Frame().t=TV(0,0.16,0.3);
             RIGID_BODY<TV>& rt1=tests.Add_Analytic_Torus((T)0.05,(T)0.1,16,32,2*density);
-            rt1.Frame().t=TV(0.3,0.16,0);
+            rt1.Frame().t=TV(0.2,0.16,0);
             RIGID_BODY<TV>& ground=tests.Add_Analytic_Box(TV(8,0.1,8));
             ground.Frame().t=TV(0,-1,0);
             ground.is_static=true;
@@ -2378,15 +2379,15 @@ void Initialize_Bodies() override
             TRIANGULATED_SURFACE<T>& cloth=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,
                 solid_body_collection.rigid_body_collection,true,true));
-            T linear_stiffness=10*stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
+            T linear_stiffness=100*stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
             solid_body_collection.Add_Force(Create_Edge_Springs(cloth,linear_stiffness,linear_damping));
-            T bending_stiffness_multiplier=1,bending_damping_multiplier=1;
+            T bending_stiffness_multiplier=100,bending_damping_multiplier=1;
             T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
             solid_body_collection.Add_Force(Create_Bending_Springs(cloth,bending_stiffness,bending_damping));
             for(int s=0;;s++){
                 auto st=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(s);
                 if(!st) break;
-                Add_Constitutive_Model(*st,(T)1e4*unit_p,(T).45,(T)0);}
+                Add_Constitutive_Model(*st,(T)5e4*unit_p,(T).45,(T)0.01*s);}
             break;}
         default:
             LOG::cerr<<"Missing bodies implementation for test number "<<test_number<<std::endl;exit(1);}
@@ -2787,7 +2788,7 @@ void Postprocess_Substep(const T dt,const T time) override
         torus.Frame().t=TV(4,0.45,3.7);
         torus.Twist()=TWIST<TV>();}
     if(test_number==140 && time>2){
-        int n=64+1;
+        int n=32+1;
         if(stuck_particles.m>n)
             stuck_particles.Resize(n);}
 
