@@ -2378,7 +2378,7 @@ void Initialize_Bodies() override
             TRIANGULATED_SURFACE<T>& cloth=deformable_body_collection.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,
                 solid_body_collection.rigid_body_collection,true,true));
-            T linear_stiffness=stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
+            T linear_stiffness=10*stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
             solid_body_collection.Add_Force(Create_Edge_Springs(cloth,linear_stiffness,linear_damping));
             T bending_stiffness_multiplier=1,bending_damping_multiplier=1;
             T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
@@ -2386,7 +2386,7 @@ void Initialize_Bodies() override
             for(int s=0;;s++){
                 auto st=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(s);
                 if(!st) break;
-                Add_Constitutive_Model(*st,(T)1e4*unit_p,(T).45,(T).01*s);}
+                Add_Constitutive_Model(*st,(T)1e4*unit_p,(T).45,(T)0);}
             break;}
         default:
             LOG::cerr<<"Missing bodies implementation for test number "<<test_number<<std::endl;exit(1);}
