@@ -224,10 +224,14 @@ Project_Gradient_And_Prune_Constraints(KRYLOV_VECTOR_BASE<T>& Bg,bool allow_sep)
 // Function Make_Feasible
 //#####################################################################
 template<class TV> void BACKWARD_EULER_MINIMIZATION_OBJECTIVE<TV>::
-Make_Feasible(KRYLOV_VECTOR_BASE<T>& dv) const
+Make_Feasible(KRYLOV_VECTOR_BASE<T>& Bdv) const
 {
     if(collisions_in_solve)
-        Adjust_For_Collision(dv);
+        Adjust_For_Collision(Bdv);
+
+    GENERALIZED_VELOCITY<TV>& dv=debug_cast<GENERALIZED_VELOCITY<TV>&>(Bdv);
+    if(minimization_system.example_forces_and_velocities)
+        minimization_system.example_forces_and_velocities->Zero_Out_Enslaved_Velocity_Nodes(dv.V.array,time,time);
 }
 //#####################################################################
 // Function Initial_Guess
