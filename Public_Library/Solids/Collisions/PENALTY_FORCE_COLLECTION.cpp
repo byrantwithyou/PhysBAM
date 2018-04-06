@@ -354,6 +354,7 @@ Update_CCD_Topology()
             for(int i=0;i<st.m;i++)
                 ccd_d->Add_Structure(st(i),4); // face only
             ccd_d->Add_Particles(particles.number);
+            ccd_d->Update_Hierarchy();
             ccd_d_stale=false;}
 
     if(use_rr_ccd || use_rd_ccd)

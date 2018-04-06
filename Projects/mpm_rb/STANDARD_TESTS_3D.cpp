@@ -32,6 +32,7 @@
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/OPENSUBDIV_SURFACE_CURVATURE_FORCE.h>
 #include <Deformables/Forces/SURFACE_TENSION_FORCE_3D.h>
+#include <Solids/Collisions/PENALTY_FORCE_COLLECTION.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_SPHERE.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
@@ -706,6 +707,7 @@ Initialize()
             begin_time_step=[=](T time)
             {
                 if(time<source_start || time>source_end) return;
+                if(this->pfd->ccd_d) this->pfd->ccd_d_stale=true;
                 ARRAY<int> affected_particles;
                 int n=particles.number;
                 source->Begin_Time_Step(time-source_start);
@@ -914,6 +916,7 @@ Initialize()
             begin_time_step=[=](T time)
                 {
                     if(time<0.08||time>=foo_T3) return;
+                    if(this->pfd) this->pfd->ccd_d_stale=true;
                     ARRAY<int> affected_particles;
                     int n=particles.number;
                     source->Begin_Time_Step(time);
