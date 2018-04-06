@@ -870,7 +870,7 @@ Initialize()
                 };
             end_time_step=[=](T time){
                 if(time<=foo_T3)
-                    source->End_Time_Step(time);
+                    source->End_Time_Step(time-0.08);
             };
 
 
@@ -935,7 +935,7 @@ Initialize()
                 };
             end_time_step=[=](T time){
                 if(time<=foo_T3)
-                    source->End_Time_Step(time);
+                    source->End_Time_Step(time-0.08);
             };
 
 
