@@ -66,9 +66,13 @@ int Find_Next_Triangle(TV& Y,VECTOR<MATRIX<T,TV::m>,5>& dYdI,
         cs=2;
         auto sw=r0+r1;
         auto sq=q0+q1;
-        auto a=(1-sw)/(sq-sw);
-        q0=r0+(q0-r0)*a;
-        q1=r1+(q1-r1)*a;
+        if(sw.x<=1){
+            auto a=(1-sw)/(sq-sw);
+            q0=r0+(q0-r0)*a;
+            q1=r1+(q1-r1)*a;}
+        else{
+            q0=q0/sq;
+            q1=q1/sq;}
         YY=q0*u+q1*v+CC;}
     Y=YY.x;
     Extract<0>(dYdI,YY.dx);
@@ -130,6 +134,7 @@ int Stuck_On_Edge(TV& Y,VECTOR<MATRIX<T,TV::m>,4>& dYdI,T& w,VECTOR<TV,4>& dwdI,
 template<class T,class TV>
 VECTOR<int,2> Handle_Vertex(const TV& Z,const TRIANGULATED_SURFACE<T>& ts,int p,T friction)
 {
+    static const T small_number=std::numeric_limits<T>::epsilon()*128;
     // Try leaving vertex via one of the neighboring triangles
     const ARRAY<int>& ie=(*ts.mesh.incident_elements)(p);
     TV O=ts.particles.X(p),z=Z-O;
@@ -146,14 +151,14 @@ VECTOR<int,2> Handle_Vertex(const TV& Z,const TRIANGULATED_SURFACE<T>& ts,int p,
         T n2=n.Magnitude_Squared();
         T a=z.Dot(vn)/n2;
         T b=-z.Dot(un)/n2;
-        if(a>=0 && b>=0) // can exit via this triangle.
+        if(a>=small_number && b>=small_number) // can exit via this triangle.
             return {ie(i),e.y};}
 
     // Try leaving vertex via one of the neighboring edges
     const ARRAY<int>& nn=(*ts.mesh.neighbor_nodes)(p);
     for(int i=0;i<nn.m;i++){
         TV A=ts.particles.X(nn(i)),u=A-O;
-        if(u.Dot(z)>0)
+        if(u.Dot(z)>small_number)
             return {nn(i),-1};}
 
     return {-1,-1};
@@ -167,6 +172,7 @@ bool Relax_Attachment(RELAX_ATTACHMENT_MESH<TV>& c,int e0,const TV& w0,const TV&
     typedef VECTOR<int,TV::m> TV_INT;
     enum STATE {tri_int,tri_edge,edge_int,point} state=tri_int;
     const ARRAY<ARRAY<int> >& adjacent_elements=*ts.mesh.adjacent_elements;
+    static const T small_number=std::numeric_limits<T>::epsilon()*128;
 
     c.diff_entry.Remove_All();
     TV Y=ts.particles.X.Subset(ts.mesh.elements(e0)).Weighted_Sum(w0);
@@ -197,6 +203,15 @@ bool Relax_Attachment(RELAX_ATTACHMENT_MESH<TV>& c,int e0,const TV& w0,const TV&
                 Y=de.Y;
                 c.diff_entry.Append(de);
                 if(ret==-1){/*puts("RET T");*/done=true;break;}
+                bool use_vertex=false;
+                for(int i=0;i<TV::m;i++)
+                    if(c.w(i)>1-small_number){
+                        p=e(i);
+                        state=point;
+                        use_vertex=true;
+                        LOG::printf("CLAMP TO VERTEX\n");
+                        break;}
+                if(use_vertex) break;
                 int rem=e(ret),next_e=-1;
                 VECTOR<int,2> new_edge=e.Remove_Index(ret).Sorted();
                 const ARRAY<int>& a=adjacent_elements(e0);
