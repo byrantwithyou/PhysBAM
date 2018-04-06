@@ -250,7 +250,7 @@ Initialize()
             auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
             solid_body_collection.rigid_body_collection.Add_Force(rg);
             RIGID_BODY<TV>& rigid_body=tests.Add_Analytic_Box(TV(2,2,2));
-            rigid_body.Frame().t=(c-Q.Rotate(TV(0,1,0)))*m;
+            rigid_body.Frame().t=(c-TV(0,1e-4,0)-Q.Rotate(TV(0,1,0)))*m;
             rigid_body.Frame().r=Q;
             rigid_body.is_static=true;
 
