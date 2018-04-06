@@ -1805,7 +1805,7 @@ void Get_Initial_Data()
             RIGID_BODY<TV>& rt1=tests.Add_Analytic_Torus((T)0.05,(T)0.1,16,32,2*density);
             rt1.Frame().t=TV(0.2,0.16,0);
             RIGID_BODY<TV>& ground=tests.Add_Analytic_Box(TV(8,0.1,8));
-            ground.Frame().t=TV(0,-1,0);
+            ground.Frame().t=TV(0,-(T)0.5,0);
             ground.is_static=true;
             break;}
         case 730:{
@@ -2387,7 +2387,7 @@ void Initialize_Bodies() override
             for(int s=0;;s++){
                 auto st=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(s);
                 if(!st) break;
-                Add_Constitutive_Model(*st,(T)5e4*unit_p,(T).45,(T)0.01*s);}
+                Add_Constitutive_Model(*st,(T)1e4*unit_p,(T).45,(T)0.01*s);}
             break;}
         default:
             LOG::cerr<<"Missing bodies implementation for test number "<<test_number<<std::endl;exit(1);}
