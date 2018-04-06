@@ -137,16 +137,21 @@ void Emit_Smooth_Surface(std::ofstream& fout,TRIANGULATED_SURFACE<T>* ts, const 
 
 void Emit_Rigid_Body(std::ofstream& fout,const HASHTABLE<std::string,std::string>& options,int frame)
 {
+    int begin=0,end=0;
+    if(options.Contains("begin")) begin=atoi(options.Get("begin").c_str());
+    if(options.Contains("end")) end=atoi(options.Get("end").c_str());
+    if(options.Contains("index")){
+        begin=atoi(options.Get("index").c_str());
+        end=begin+1;}
     RIGID_BODY_COLLECTION<TV>& collection=Load_Rigid_Body_Collection(options.Get("location"),frame);
-    RIGID_BODY<TV>& rigid_body=collection.Rigid_Body(atoi(options.Get("index").c_str()));
-
-    TRIANGULATED_SURFACE<T>* ts=rigid_body.simplicial_object->Create_Compact_Copy();
-    for(int i=0;i<ts->particles.X.m;i++) ts->particles.X(i)=rigid_body.Frame()*ts->particles.X(i);
-
-    Apply_Options(ts,options);
-    if(const std::string* value=options.Get_Pointer("save"))
-        saved_surface.Get_Or_Insert(*value)=ts;
-    else Emit_Smooth_Surface(fout,ts,options);
+    for(int i=begin;i<end;i++){
+        RIGID_BODY<TV>& rigid_body=collection.Rigid_Body(i);
+        TRIANGULATED_SURFACE<T>* ts=rigid_body.simplicial_object->Create_Compact_Copy();
+        for(int i=0;i<ts->particles.X.m;i++) ts->particles.X(i)=rigid_body.Frame()*ts->particles.X(i);
+        Apply_Options(ts,options);
+        if(const std::string* value=options.Get_Pointer("save"))
+            saved_surface.Get_Or_Insert(*value)=ts;
+        else Emit_Smooth_Surface(fout,ts,options);}
 }
 
 MPM_PARTICLES<TV>& Load_MPM_Particles(const std::string& location,int frame)
@@ -186,15 +191,22 @@ void Emit_MPM_Particles(std::ofstream& fout,const HASHTABLE<std::string,std::str
 
 void Emit_Rigid_Body_Frame(std::ofstream& fout,const HASHTABLE<std::string,std::string>& options,int frame)
 {
+    int begin=0,end=0;
+    if(options.Contains("begin")) begin=atoi(options.Get("begin").c_str());
+    if(options.Contains("end")) end=atoi(options.Get("end").c_str());
+    if(options.Contains("index")){
+        begin=atoi(options.Get("index").c_str());
+        end=begin+1;}
     RIGID_BODY_COLLECTION<TV>& collection=Load_Rigid_Body_Collection(options.Get("location"),frame);
-    RIGID_BODY<TV>& rigid_body=collection.Rigid_Body(atoi(options.Get("index").c_str()));
-    MATRIX<T,3> rot=rigid_body.Frame().r.Rotation_Matrix();
-    TV X=rigid_body.Frame().t;
-    fout<<"matrix < ";
-    for(int i=0;i<3;i++)
-        for(int j=0;j<3;j++)
-            fout<<rot(j,i)<<" , ";
-    fout<<X.x<<" , "<<X.y<<" , "<<X.z<<" >\n";
+    for(int i=begin;i<end;i++){
+        RIGID_BODY<TV>& rigid_body=collection.Rigid_Body(i);
+        MATRIX<T,3> rot=rigid_body.Frame().r.Rotation_Matrix();
+        TV X=rigid_body.Frame().t;
+        fout<<"matrix < ";
+        for(int i=0;i<3;i++)
+            for(int j=0;j<3;j++)
+                fout<<rot(j,i)<<" , ";
+        fout<<X.x<<" , "<<X.y<<" , "<<X.z<<" >\n";}
 }
 
 void Emit_Deformable_Body(std::ofstream& fout,const HASHTABLE<std::string,std::string>& options,int frame)
