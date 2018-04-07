@@ -71,8 +71,8 @@ int Find_Next_Triangle(TV& Y,VECTOR<MATRIX<T,TV::m>,5>& dYdI,
             q0=r0+(q0-r0)*a;
             q1=r1+(q1-r1)*a;}
         else{
-            q0=q0/sq;
-            q1=q1/sq;}
+            q0=q0*0+r0;
+            q1=q1*0+r1;}
         YY=q0*u+q1*v+CC;}
     Y=YY.x;
     Extract<0>(dYdI,YY.dx);
