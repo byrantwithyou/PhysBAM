@@ -237,7 +237,7 @@ Add_Pair(int p,int b)
     if(rb.implicit_object->Extended_Phi(X)>0) return;
     TV W=rb.implicit_object->Closest_Point_On_Boundary(X);
     COLLISION_PAIR c={p,b,rb.Frame().Inverse_Times(W)};
-    c.e0=-1;
+    c.e0=c.e=-1;
     collision_pairs.Append(c);
     hash.Insert({p,b});
 }
