@@ -217,6 +217,8 @@ Update_Attachments_And_Prune_Pairs()
         if(c.active){
             const RIGID_BODY<TV>& rb=rigid_body_collection.Rigid_Body(c.b);
             c.X=rb.Frame().Inverse_Times(c.Y);
+            c.e0=c.e;
+            c.w0=c.w;
             collision_pairs(k++)=c;}
         else hash.Delete({c.p,c.b});}
     collision_pairs.Resize(k);
