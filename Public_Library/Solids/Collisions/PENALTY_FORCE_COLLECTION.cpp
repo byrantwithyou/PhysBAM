@@ -34,7 +34,7 @@ template<class TV> PENALTY_FORCE_COLLECTION<TV>::
 template<class TV> void PENALTY_FORCE_COLLECTION<TV>::
 Update_Collision_Detection_Structures()
 {
-    bool new_grid=Update_Grid() || restarted;
+    bool new_grid=Update_Grid();
     Update_Cell_Particles(new_grid);
     Update_Rasterized_Data(new_grid);
     Update_Cell_Vertices(new_grid);
@@ -51,6 +51,7 @@ Reset_Hash_Table()
     cell_objects.hash.Clean_Memory();
     cell_vertices.hash.Clean_Memory();
     rasterized_data.hash.Clean_Memory();
+    restarted=true;
 }
 //#####################################################################
 // Function Update_Cell_Vertices
@@ -323,7 +324,7 @@ Update_Grid()
         max_volume=std::max(max_volume,bounding_box.Size());}
 
     // Existing box is good enough.
-    if(grid.domain.Contains(bounding_box)) return false;
+    if(!restarted && grid.domain.Contains(bounding_box)) return false;
 
     T max_dx=bounding_box.Edge_Lengths().Max()/max_resolution;
     max_dx=std::max(max_dx,pow<1,TV::m>(max_volume/max_cells_per_object));
