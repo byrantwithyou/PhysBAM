@@ -493,6 +493,7 @@ Initialize()
             read_output_files=[=](int frame){source->Read_Output_Files(frame);};
             begin_time_step=[=](T time)
             {
+                if(this->pfd) this->pfd->ccd_d_stale=true;
                 ARRAY<int> affected_particles;
                 int n=particles.number;
                 source->Begin_Time_Step(time);
@@ -515,7 +516,9 @@ Initialize()
             if(!use_theta_s) theta_s=.000001;
             if(!use_hardening_factor) hardening_factor=20;
             if(!use_max_hardening) max_hardening=FLT_MAX;
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
             Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
+            Set_Lame_On_Particles(E,nu);
             Add_Gravity(gravity);
 
             RIGID_BODY<TV>& sphere=tests.Add_Analytic_Sphere(0.2,density*0.1);
