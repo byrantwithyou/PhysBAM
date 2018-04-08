@@ -2172,7 +2172,6 @@ Initialize()
             if(!use_theta_c) theta_c=0.025;
             if(!use_theta_s) theta_s=.005;
             if(!use_hardening_factor) hardening_factor=10;
-            if(!use_max_hardening) max_hardening=FLT_MAX;
             Add_Fixed_Corotated(E*unit_p*scale_E,nu);
             Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,NULL); 
         } break;

@@ -50,7 +50,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     penalty_collisions_stiffness((T)1e4),penalty_collisions_separation((T)1e-4),penalty_collisions_length(1),
     penalty_damping_stiffness(0),use_penalty_collisions(false),use_plasticity(true),
     use_theta_c(false),use_theta_s(false),use_hardening_factor(false),use_max_hardening(false),
-    theta_c(0),theta_s(0),hardening_factor(0),max_hardening(0),use_implicit_plasticity(false),no_implicit_plasticity(false),
+    theta_c(0),theta_s(0),hardening_factor(0),max_hardening(7),use_implicit_plasticity(false),no_implicit_plasticity(false),
     hardening_mast_case(0),use_hardening_mast_case(false),override_output_directory(false),
     m(1),s(1),kg(1),forced_collision_type(-1),friction(0),friction_is_set(false),sigma_Y(0),use_cohesion(false),write_output_files(0),read_output_files(0),
     dump_collision_objects(false),tests(STREAM_TYPE(0.f),data_directory,solid_body_collection)

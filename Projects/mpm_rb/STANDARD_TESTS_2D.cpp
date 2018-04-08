@@ -431,7 +431,6 @@ Initialize()
             if(!use_theta_c) theta_c=0.015;
             if(!use_theta_s) theta_s=.000001;
             if(!use_hardening_factor) hardening_factor=20;
-            if(!use_max_hardening) max_hardening=FLT_MAX;
             Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
             Seed_Particles(sandbox,0,0,density,particles_per_cell);
             Add_Drucker_Prager_Case(E,nu,2);
@@ -465,7 +464,6 @@ Initialize()
             if(!use_theta_c) theta_c=0.015;
             if(!use_theta_s) theta_s=.000001;
             if(!use_hardening_factor) hardening_factor=20;
-            if(!use_max_hardening) max_hardening=FLT_MAX;
             Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
             RANGE<TV> sand(TV(1.3,0.1),TV(1.7,0.5));
             Seed_Particles(sand,0,0,density,particles_per_cell);

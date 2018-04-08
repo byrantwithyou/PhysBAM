@@ -590,7 +590,6 @@ Initialize()
             if(!use_theta_c) theta_c=0.015;
             if(!use_theta_s) theta_s=.005;
             if(!use_hardening_factor) hardening_factor=7;
-            if(!use_max_hardening) max_hardening=FLT_MAX;
             Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
             RANGE<TV> box(TV(.3,.7)*m,TV(.7,.9)*m);
             std::ifstream ifs("particles.dat");
@@ -755,7 +754,6 @@ Initialize()
                 if(!use_theta_c) theta_c=0.015;
                 if(!use_theta_s) theta_s=.000001;
                 if(!use_hardening_factor) hardening_factor=20;
-                if(!use_max_hardening) max_hardening=FLT_MAX;
                 Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
                 Seed_Particles(box,0,0,density,particles_per_cell);}
             Seed_Particles(box,0,0,density,particles_per_cell);

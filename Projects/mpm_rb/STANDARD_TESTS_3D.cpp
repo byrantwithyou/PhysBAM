@@ -515,9 +515,8 @@ Initialize()
             if(!use_theta_c) theta_c=0.015;
             if(!use_theta_s) theta_s=.000001;
             if(!use_hardening_factor) hardening_factor=20;
-            if(!use_max_hardening) max_hardening=FLT_MAX;
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
-            Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
+            Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,0,hardening_factor,0);
             Set_Lame_On_Particles(E,nu);
             Add_Gravity(gravity);
 
@@ -613,7 +612,6 @@ Initialize()
                 if(!use_theta_c) theta_c=0.015;
                 if(!use_theta_s) theta_s=.000001;
                 if(!use_hardening_factor) hardening_factor=20;
-                if(!use_max_hardening) max_hardening=FLT_MAX;
                 Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,0);
                 Seed_Particles(sand_cube,0,0,density,particles_per_cell);
                 ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
