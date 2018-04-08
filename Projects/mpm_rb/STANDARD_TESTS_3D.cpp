@@ -431,6 +431,7 @@ Initialize()
             ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
             begin_time_step=[=](T time)
             {
+                if(this->pfd) this->pfd->ccd_d_stale=true;
                 ARRAY<int> affected_particles;
                 int n=particles.number;
                 source->Begin_Time_Step(time);
