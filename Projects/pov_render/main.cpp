@@ -209,6 +209,32 @@ void Emit_Rigid_Body_Frame(std::ofstream& fout,const HASHTABLE<std::string,std::
         fout<<X.x<<" , "<<X.y<<" , "<<X.z<<" >\n";}
 }
 
+void Emit_Rigid_Body_Proxy(std::ofstream& fout,const HASHTABLE<std::string,std::string>& options,int frame)
+{
+    int begin=0,end=0;
+    if(options.Contains("begin")) begin=atoi(options.Get("begin").c_str());
+    if(options.Contains("end")) end=atoi(options.Get("end").c_str());
+    if(options.Contains("index")){
+        begin=atoi(options.Get("index").c_str());
+        end=begin+1;}
+    RIGID_BODY_COLLECTION<TV>& collection=Load_Rigid_Body_Collection(options.Get("location"),frame);
+    for(int i=begin;i<end;i++){
+        fout<<options.Get("geometry")<<"\n";
+        if(options.Contains("transform"))
+            fout<<options.Get("transform")<<"\n";
+        RIGID_BODY<TV>& rigid_body=collection.Rigid_Body(i);
+        MATRIX<T,3> rot=rigid_body.Frame().r.Rotation_Matrix();
+        TV X=rigid_body.Frame().t;
+        fout<<"matrix < ";
+        for(int i=0;i<3;i++)
+            for(int j=0;j<3;j++)
+                fout<<rot(j,i)<<" , ";
+        fout<<X.x<<" , "<<X.y<<" , "<<X.z<<" >\n";
+        if(options.Contains("texture"))
+            fout<<options.Get("texture")<<"\n";
+        fout<<"}\n";}
+}
+
 void Emit_Deformable_Body(std::ofstream& fout,const HASHTABLE<std::string,std::string>& options,int frame)
 {
     if(const std::string* value=options.Get_Pointer("frame")) frame=atoi(value->c_str());
@@ -500,6 +526,8 @@ int main(int argc, char *argv[])
             Create_Texture_Map(fout,options,frame_number);
         else if(type=="set_global")
             Set_Global_Options(fout,options);
+        else if(type=="rigid_body_proxy")
+            Emit_Rigid_Body_Proxy(fout,options,frame_number);
         else PHYSBAM_FATAL_ERROR("unexpected replacement type: '"+type+"'.");
     }
 
