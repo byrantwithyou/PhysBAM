@@ -40,7 +40,7 @@ In_Place_PLU_Inverse(MATRIX_BASE<T,T_MATRIX1>& inverse)
     In_Place_PLU_Factorization(L,p);
     RIGHT_VECTOR b((INITIAL_SIZE)Columns()); // used for piece of the identity matrix
     for(int j=0;j<Columns();j++){
-        b(j)=0;
+        b(j)=1;
         inverse.Set_Column(j,Upper_Triangular_Solve(L.Lower_Triangular_Solve(b.Permute(p))));
         b(j)=0;}
 }
