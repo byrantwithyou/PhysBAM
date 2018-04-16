@@ -9,10 +9,14 @@
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
 #include <Tools/Krylov_Solvers/MATRIX_SYSTEM.h>
+#include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
 #include <Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Grid_Tools/Grids/GRID.h>
+#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <Geometry/Grids_Uniform_Computations/TRIANGULATED_SURFACE_SIGNED_DISTANCE_UNIFORM.h>
+#include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/SMOOTH_LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
@@ -86,10 +90,10 @@ struct KM:public KRYLOV_SYSTEM_BASE<T>
     const ARRAY<TV>& X;
     IMPLICIT_OBJECT<TV>& io;
     T k;
-            
-    KM(const ARRAY<TV>& X,IMPLICIT_OBJECT<TV>& io,
-        T k,const bool use_preconditioner,
-        const bool preconditioner_commutes_with_projection)
+    MV M;
+    TV V;
+
+    KM(const ARRAY<TV>& X,IMPLICIT_OBJECT<TV>& io,T k)
         :KRYLOV_SYSTEM_BASE<T>(false,true),X(X),io(io),k(k)
     {}
 
@@ -97,36 +101,41 @@ struct KM:public KRYLOV_SYSTEM_BASE<T>
 
     virtual void Multiply(const KRYLOV_VECTOR_BASE<T>& bx,KRYLOV_VECTOR_BASE<T>& result,bool transpose=false) const
     {
-        const KV& x=(const KV&)bx;
+        const KV& u=(const KV&)bx;
         KV& r=(KV&)result;
-        MV M,dM;
-        TV V,dV;
+        MV dM,dM_;
+        TV dV,dV_;
+        MV M_=u.M;
+        TV V_=u.V;
+
         for(int i=0;i<X.m;i++)
         {
             TV Y=M*X(i)+V;
-            TV dY=x.M*X(i)+x.V;
+            TV Y_=M_*X(i)+V_;
             T p=io(Y);
             TV N=io.Normal(Y);
-            T dp=N.Dot(dY);
+            T p_=N.Dot(Y_);
             SYMMETRIC_MATRIX<T,3> H=io.Hessian(Y);
-            TV dN=H*dY;
-            TV dU=dp*N+p*dN;
-            dV+=dU;
-            dM+=Outer_Product(dU,X(i));
+            TV N_=H*Y_;
+            dV+=p*N;
+            dV_+=p_*N+p*N_;
+            dM+=Outer_Product(p*N,X(i));
+            dM_+=Outer_Product(p_*N+p*N_,X(i));
         }
-        auto A=M.Normal_Equations_Matrix();
-        auto dA=dM.Transpose_Times(M).Twice_Symmetric_Part();
-        A=A-A.Trace()/3;
-        dA=dA-dA.Trace()/3;
-        T norm=A.Frobenius_Norm_Squared();
-        T dnorm=A.Inner_Product(A,dA)*2;
-        auto B=A.Twice_Symmetric_Part()-2./3*A.Trace();
-        auto dB=dA.Twice_Symmetric_Part()-2./3*dA.Trace();
-        auto C=M*B;
-        auto dC=dM*B+M*dB;
-        dM+=k*(dnorm*C+norm*dC);
-        r.M=dM;
-        r.V=dV;
+        dV/=2*X.m;
+        dV_/=2*X.m;
+        dM/=2*X.m;
+        dM_/=2*X.m;
+        MV A=M.Transpose_Times(M);
+        MV A_=M_.Transpose_Times(M)+M.Transpose_Times(M_);
+        MV B=A-A.Trace()/3;
+        MV B_=A_-A_.Trace()/3;
+        MV C=B.Twice_Symmetric_Part()-2./3*B.Trace();
+        MV C_=B_.Twice_Symmetric_Part()-2./3*B_.Trace();
+        dM+=k*M*C;
+        dM_+=k*M_*C+k*M*C_;
+        r.M=dM_;
+        r.V=dV_;
     }
 
     virtual double Inner_Product(const KRYLOV_VECTOR_BASE<T>& bx,const KRYLOV_VECTOR_BASE<T>& by) const
@@ -143,7 +152,7 @@ struct KM:public KRYLOV_SYSTEM_BASE<T>
     virtual void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& x) const{}
     virtual void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const{}
 };
-        
+
 struct OBJECTIVE: public NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>
 {
     ARRAY<TV>& X;
@@ -152,16 +161,17 @@ struct OBJECTIVE: public NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>
     OBJECTIVE(ARRAY<TV>& X,int k,GRID<TV>& grid,ARRAY<T,TV_INT>& phi)
         :X(X),k(k),io(grid,phi)
     {}
-            
+
     virtual ~OBJECTIVE(){}
 
     void Compute(const KRYLOV_VECTOR_BASE<T>& xx,KRYLOV_SYSTEM_BASE<T>* hh,KRYLOV_VECTOR_BASE<T>* gg,T* e) const override
     {
         const KV& x=dynamic_cast<const KV&>(xx);
         KV* g=dynamic_cast<KV*>(gg);
+        KM* h=dynamic_cast<KM*>(hh);
         MV dM;
         TV dV;
-                
+
         T en=0;
         for(int i=0;i<X.m;i++)
         {
@@ -174,18 +184,22 @@ struct OBJECTIVE: public NONLINEAR_FUNCTION<T(KRYLOV_VECTOR_BASE<T>&)>
             dM+=Outer_Product(p*N,X(i));
         }
         en/=2*X.m;
+        dV/=2*X.m;
+        dM/=2*X.m;
         MV A=x.M.Transpose_Times(x.M);
         // A_{ij} = M_{ki} M_{kj}
         // A_{ij,rs} = delta_{is} M_{rj} + M_{ri} delta_{js}
-        A=A-A.Trace()/3;
-        // A_{ij,rs} = delta_{is} M_{rj} + M_{ri} delta_{js} - M_{rs}  delta_{ij}/3 - M_{rs} delta_{ij}/3
-        // A_{ij,rs} = delta_{is} M_{rj} + M_{ri} delta_{js} - 2 M_{rs}  delta_{ij}/3
-        // A_{ij} A_{ij,rs} = A_{si} M_{ri} + M_{ri} A_{is} - 2 A_{ii} M_{rs}/3
-        T norm=A.Frobenius_Norm_Squared();
-        en+=k*sqr(norm)/4;
-        dM+=k*norm*x.M*(A.Twice_Symmetric_Part()-2./3*A.Trace());
+        MV B=A-A.Trace()/3;
+        // B_{ij,rs} = delta_{is} M_{rj} + M_{ri} delta_{js} - 2 M_{rs} delta_{ij}/3
+        // B_{ij} B_{ij,rs} = B_{sj} M_{rj} + B_{is} M_{ri} - 2 B_{ii} M_{rs}/3
+        // B_{ij} B_{ij,rs} = M_{rk} (B_{sk} + B_{ks}) - 2 B_{ii} M_{rs}/3
+        T norm=B.Frobenius_Norm_Squared();
+        en+=k*norm/2;
+        MV C=B.Twice_Symmetric_Part()-2./3*B.Trace();
+        dM+=k*x.M*C;
         if(e) *e=en;
         if(g){g->M=dM;g->V=dV;}
+        if(h){h->M=x.M;h->V=x.V;}
     }
 };
 
@@ -214,19 +228,21 @@ int main(int argc, char* argv[])
     parse_args.Add_Not("-right",&is_left,"is left leg");
     parse_args.Add("-reg",&regularity_parameter,"param","regularization parameter");
     parse_args.Parse();
+    LOG::Initialize_Logging(false,false,1<<30,true);
 
     PHYSBAM_ASSERT(inside_vertex>=0);
     PHYSBAM_ASSERT(outside_vertex>=0);
     PHYSBAM_ASSERT(front_vertex>=0);
 
-    TRIANGULATED_SURFACE<T> ts;
-    ts.Read_Obj(filename);
+    TRIANGULATED_SURFACE<T> tsa;
+    tsa.Read_Obj(filename);
+    TRIANGULATED_SURFACE<T> &ts=*tsa.Create_Compact_Copy();
     ts.Fill_Holes();
     ts.mesh.Make_Orientations_Consistent();
 
-    TV X_i=ts.particles.X(inside_vertex);
-    TV X_o=ts.particles.X(outside_vertex);
-    TV X_f=ts.particles.X(front_vertex);
+    TV X_i=tsa.particles.X(inside_vertex);
+    TV X_o=tsa.particles.X(outside_vertex);
+    TV X_f=tsa.particles.X(front_vertex);
 
     TV C=(X_i+X_o+X_f)/3;
     TV A_i=X_f-C;
@@ -240,7 +256,7 @@ int main(int argc, char* argv[])
         ts.particles.X(i)=R.Transpose_Times(ts.particles.X(i)-C);
 
     ts.Write_Obj("orient.obj");
-    
+
     if(compute_levelset)
     {
         GRID<TV> ls_grid(TV_INT()+levelset_res,RANGE<TV>::Centered_Box()*levelset_radius,true);
@@ -264,29 +280,44 @@ int main(int argc, char* argv[])
 
         OBJECTIVE obj(X,regularity_parameter,ls_grid,phi);
 
-        
-//        NONLINEAR_FUNCTION
-        
-/*
-  
-  Choose M, S;
+        NEWTONS_METHOD<T> nm;
+        nm.tolerance=(T)1e-4;
+        nm.max_iterations=100;
+        nm.krylov_tolerance=(T)1e-10;
+        nm.angle_tolerance=(T)1e-4;
+        nm.debug=true;
+        nm.require_one_iteration=true;
 
-  1/num_pts * sum[i] phi(M * X(i) + S)^2/2 + k * Frobenius_Norm_Squared(M^T*M - Trace(M^T*M)/3)^4
+        KV x;
+        x.M+=1;
+        SMOOTH_LEVELSET_IMPLICIT_OBJECT<TV> lio(ls_grid,phi);
+        KM sys(X,lio,regularity_parameter);
 
-  
+        ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
+        obj.Test(x,sys);
+        bool conv=nm.Newtons_Method(obj,sys,x,av);
+        obj.Test(x,sys);
+        LOG::printf("converged: %i\n",conv);
 
-
- */        
-
-
+        VIEWER_OUTPUT<TV> vo(STREAM_TYPE(0.),ls_grid,"output");
+        Dump_Levelset(ls_grid,lio,TV(1,0,0));
+        Flush_Frame<TV>("A");
+        Dump_Levelset(ls_grid,lio,TV(1,0,0));
+        Dump_Surface(ts,TV(0,1,0));
+        Flush_Frame<TV>("B");
+        Dump_Levelset(ls_grid,lio,TV(1,0,0));
+        for(int i=0;i<X.m;i++)
+            Add_Debug_Particle(X(i),TV(0,1,0));
+        Flush_Frame<TV>("C");
         
     }
-    
+
+    LOG::Finish_Logging();
     return 0;
 }
 
 void Compute_Levelset(TRIANGULATED_SURFACE<T>& ts)
 {
-    
+
 }
 
