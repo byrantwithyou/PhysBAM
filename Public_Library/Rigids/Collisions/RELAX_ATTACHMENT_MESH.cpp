@@ -209,6 +209,7 @@ bool Relax_Attachment(RELAX_ATTACHMENT_MESH<TV>& c,int e0,const TV& w0,const TV&
                         p=e(i);
                         state=point;
                         use_vertex=true;
+                        // BUG: what about de.dYdI and c.dwdI?
                         LOG::printf("CLAMP TO VERTEX\n");
                         break;}
                 if(use_vertex) break;
