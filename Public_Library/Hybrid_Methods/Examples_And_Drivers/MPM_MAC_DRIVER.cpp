@@ -580,7 +580,6 @@ Grid_To_Particle(const PHASE& ph)
     T dt=example.dt;
     bool use_flip=example.flip;
 
-    LINEAR_INTERPOLATION_MAC<TV,T> li(example.grid);
     ph.gather_scatter->template Gather<HELPER>(true,
         [](int p,HELPER& h){h=HELPER();},
         [this,dt,&particles,use_flip,&ph](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,HELPER& h)
@@ -594,7 +593,7 @@ Grid_To_Particle(const PHASE& ph)
                 TV Z=example.grid.Face(index);
                 h.B.Add_Row(index.axis,w*V*(Z-particles.X(p)));}
         },
-        [this,dt,&particles,use_flip,&li,&ph](int p,HELPER& h)
+        [this,dt,&particles,use_flip,&ph](int p,HELPER& h)
         {
             if(particles.store_B) particles.B(p)=h.B;
             if(use_flip) particles.V(p)=(1-example.flip)*h.V+example.flip*(particles.V(p)+h.flip_V);
