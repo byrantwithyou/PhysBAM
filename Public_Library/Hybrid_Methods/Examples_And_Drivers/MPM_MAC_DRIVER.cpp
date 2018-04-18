@@ -118,12 +118,17 @@ Initialize()
     for(FACE_ITERATOR<TV> it(example.grid,example.ghost);it.Valid();it.Next())
         example.location(it.Full_Index())=it.Location();
 
+    if(example.xpic){
+        example.particles.template Add_Array<TV>("effective_v",&example.effective_v);}
+
     Update_Simulated_Particles();
     // Need grid velocities for initial advection step
-    if(example.flip || example.rk_particle_order){
+    if(example.flip || example.rk_particle_order || example.xpic){
         Update_Particle_Weights();
         Prepare_Scatter();
-        Particle_To_Grid();}
+        Particle_To_Grid();
+        if(example.xpic)
+            Compute_Effective_Velocity();}
 
     example.force.Resize(example.grid.Domain_Indices(example.ghost));
 
@@ -149,6 +154,7 @@ Advance_One_Time_Step()
     Step([=](){Pressure_Projection();},"projection");
     Step([=](){Apply_Viscosity();},"viscosity",true,example.use_viscosity);
     Step([=](){Extrapolate_Velocity(!example.flip,false);},"velocity-extrapolation",true);
+    Step([=](){Compute_Effective_Velocity();},"compute effective velocity",false);
     Step([=](){Grid_To_Particle();},"g2p");
 }
 //#####################################################################
@@ -324,7 +330,7 @@ Particle_To_Grid(PHASE& ph) const
     Fix_Periodic(ph.mass);
     Fix_Periodic(ph.velocity);
     Fix_Periodic(ph.volume);
-    if(example.flip){
+    if(example.flip||example.xpic){
         if(example.extrap_type!='p')
             Extrapolate_Velocity(ph,false,true);
         ph.velocity_save=ph.velocity;}
@@ -597,6 +603,7 @@ Grid_To_Particle(const PHASE& ph)
         {
             if(particles.store_B) particles.B(p)=h.B;
             if(use_flip) particles.V(p)=(1-example.flip)*h.V+example.flip*(particles.V(p)+h.flip_V);
+            if(example.xpic) particles.V(p)+=example.effective_v(p);
             else particles.V(p)=h.V;
         });
 }
@@ -608,6 +615,84 @@ Grid_To_Particle()
 {
     for(PHASE_ID i(0);i<example.phases.m;i++)
         Grid_To_Particle(example.phases(i));
+}
+//#####################################################################
+// Function Compute_Effective_Velocity
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Compute_Effective_Velocity(PHASE& ph)
+{
+    // example.effective_v;
+    example.xpic_v0=ph.velocity_save;
+    example.xpic_v1.Resize(ph.velocity.Domain_Indices());
+    example.xpic_v_star.Resize(ph.velocity.Domain_Indices());
+
+    MPM_PARTICLES<TV>& particles=example.particles;
+    T s=1;
+    example.xpic_v_star.Fill(0);
+    for(int r=2;r<=example.xpic;r++,s*=-1){
+        example.xpic_v1.Fill(0);
+        T f=((T)example.xpic-r+1)/r;
+
+        example.effective_v.Fill(TV());
+        ph.gather_scatter->template Gather<int>(false,
+            [this](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,int data)
+            {
+                T w=it.Weight();
+                FACE_INDEX<TV::m> index=it.Index();
+                T V=example.xpic_v0(index);
+                example.effective_v(p)(index.axis)+=w*V;
+            });
+
+        ph.gather_scatter->template Scatter<int>(false,
+            [this,&particles,f](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,int data)
+            {
+                T w=it.Weight();
+                FACE_INDEX<TV::m> index=it.Index();
+                T V=w*example.effective_v(p)(index.axis);
+                example.xpic_v1(index)+=f*particles.mass(p)*V;
+            });
+        Fix_Periodic_Accum(example.xpic_v1);
+
+        /*
+        if(example.extrap_type=='p')
+            Reflect_Boundary_Mass_Momentum(ph);
+        */
+
+#pragma omp parallel
+        for(FACE_ITERATOR_THREADED<TV> it(example.grid,example.ghost);it.Valid();it.Next()){
+            int i=ph.mass.Standard_Index(it.Full_Index());
+            if(ph.mass.array(i)){
+                example.xpic_v1.array(i)/=ph.mass.array(i);}
+            else example.xpic_v1.array(i)=0;}
+        Fix_Periodic(example.xpic_v1);
+
+        example.xpic_v_star.array+=s*example.xpic_v1.array;
+        example.xpic_v0=example.xpic_v1;}
+
+    example.effective_v.Fill(TV());
+    ph.gather_scatter->template Gather<int>(false,
+        [this,&ph](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,int data)
+        {
+            T w=it.Weight();
+            FACE_INDEX<TV::m> index=it.Index();
+            T V=ph.velocity(index)+(example.xpic-1)*ph.velocity_save(index)-example.xpic*example.xpic_v_star(index);
+            example.effective_v(p)(index.axis)+=w*V;
+        },
+        [this,&particles](int p,int data)
+        {
+            example.effective_v(p)-=particles.V(p);
+        });
+}
+//#####################################################################
+// Function Compute_Effective_Velocity
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+ Compute_Effective_Velocity()
+{
+    if(!example.xpic) return;
+    for(PHASE_ID i(0);i<example.phases.m;i++)
+         Compute_Effective_Velocity(example.phases(i));
 }
 //#####################################################################
 // Function Move_Mass_Momentum_Inside
@@ -1647,6 +1732,17 @@ Move_Particles()
                 ph.gather_scatter->template Gather_Parallel<int>(false,
                     [this,&ph](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,int data)
                     {example.particles.X(p)(it.Index().axis)+=example.dt*it.Weight()*ph.velocity(it.Index());},
+                    Clip);}}
+        else if(example.xpic){
+            for(PHASE_ID i(0);i<example.phases.m;i++){
+                PHASE& ph=example.phases(i);
+#pragma omp for
+                for(int p=0;p<example.particles.X.m;p++)
+                    if(example.particles.valid(p)){
+                        example.particles.X(p)+=example.dt*example.effective_v(p)*0.5;}
+                ph.gather_scatter->template Gather_Parallel<int>(false,
+                    [this,&ph](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,int data)
+                    {example.particles.X(p)(it.Index().axis)+=example.dt*it.Weight()*ph.velocity_save(it.Index());},
                     Clip);}}
         else{
 #pragma omp for

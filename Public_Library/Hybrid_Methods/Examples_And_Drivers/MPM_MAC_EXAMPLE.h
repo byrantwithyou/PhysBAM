@@ -69,6 +69,11 @@ public:
 
     ARRAY<PHASE,PHASE_ID> phases;
 
+    // XPIC stuff
+    int xpic=0;
+    ARRAY<T,FACE_INDEX<TV::m> > xpic_v0,xpic_v1,xpic_v_star;
+    ARRAY_VIEW<TV> effective_v;
+
     // particle stuff
     MPM_PARTICLES<TV>& particles;
     VECTOR<ARRAY<SYMMETRIC_MATRIX<T,TV::m> >,TV::m> Dp_inv;

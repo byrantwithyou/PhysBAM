@@ -48,6 +48,8 @@ public:
     void Particle_To_Grid(PHASE& ph) const;
     void Grid_To_Particle();
     void Grid_To_Particle(const PHASE& ph);
+    void Compute_Effective_Velocity();
+    void Compute_Effective_Velocity(PHASE& ph);
     void Build_Level_Sets();
     void Build_Level_Sets(PHASE& ph);
     void Pressure_Projection();
