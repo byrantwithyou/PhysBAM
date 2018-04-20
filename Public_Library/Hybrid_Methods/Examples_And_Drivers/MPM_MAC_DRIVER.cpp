@@ -154,7 +154,7 @@ Advance_One_Time_Step()
     Step([=](){Pressure_Projection();},"projection");
     Step([=](){Apply_Viscosity();},"viscosity",true,example.use_viscosity);
     Step([=](){Extrapolate_Velocity(!example.flip,false);},"velocity-extrapolation",true);
-    Step([=](){Compute_Effective_Velocity();},"compute effective velocity",false);
+    Step([=](){Compute_Effective_Velocity();},"compute effective velocity",false,example.xpic);
     Step([=](){Grid_To_Particle();},"g2p");
 }
 //#####################################################################
@@ -622,37 +622,38 @@ Grid_To_Particle()
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Compute_Effective_Velocity(PHASE& ph)
 {
-    // example.effective_v;
-    example.xpic_v0=ph.velocity_save;
-    example.xpic_v1.Resize(ph.velocity.Domain_Indices());
+    example.xpic_v=ph.velocity_save;
     example.xpic_v_star.Resize(ph.velocity.Domain_Indices());
 
     MPM_PARTICLES<TV>& particles=example.particles;
     T s=1;
     example.xpic_v_star.Fill(0);
     for(int r=2;r<=example.xpic;r++,s*=-1){
-        example.xpic_v1.Fill(0);
         T f=((T)example.xpic-r+1)/r;
 
-        example.effective_v.Fill(TV());
         ph.gather_scatter->template Gather<int>(false,
+            [this,&particles](int p,int data)
+            {
+                example.effective_v(p)=TV();
+            },
             [this](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,int data)
             {
                 T w=it.Weight();
                 FACE_INDEX<TV::m> index=it.Index();
-                T V=example.xpic_v0(index);
+                T V=example.xpic_v(index);
                 example.effective_v(p)(index.axis)+=w*V;
             });
 
+        example.xpic_v.Fill(0);
         ph.gather_scatter->template Scatter<int>(false,
             [this,&particles,f](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,int data)
             {
                 T w=it.Weight();
                 FACE_INDEX<TV::m> index=it.Index();
                 T V=w*example.effective_v(p)(index.axis);
-                example.xpic_v1(index)+=f*particles.mass(p)*V;
+                example.xpic_v(index)+=f*particles.mass(p)*V;
             });
-        Fix_Periodic_Accum(example.xpic_v1);
+        Fix_Periodic_Accum(example.xpic_v);
 
         /*
         if(example.extrap_type=='p')
@@ -663,25 +664,21 @@ Compute_Effective_Velocity(PHASE& ph)
         for(FACE_ITERATOR_THREADED<TV> it(example.grid,example.ghost);it.Valid();it.Next()){
             int i=ph.mass.Standard_Index(it.Full_Index());
             if(ph.mass.array(i)){
-                example.xpic_v1.array(i)/=ph.mass.array(i);}
-            else example.xpic_v1.array(i)=0;}
-        Fix_Periodic(example.xpic_v1);
+                example.xpic_v.array(i)/=ph.mass.array(i);
+                example.xpic_v_star.array(i)+=s*example.xpic_v.array(i);}
+            else example.xpic_v.array(i)=0;}}
 
-        example.xpic_v_star.array+=s*example.xpic_v1.array;
-        example.xpic_v0=example.xpic_v1;}
-
-    example.effective_v.Fill(TV());
     ph.gather_scatter->template Gather<int>(false,
+        [this,&particles](int p,int data)
+        {
+            example.effective_v(p)=-particles.V(p);
+        },
         [this,&ph](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,int data)
         {
             T w=it.Weight();
             FACE_INDEX<TV::m> index=it.Index();
             T V=ph.velocity(index)+(example.xpic-1)*ph.velocity_save(index)-example.xpic*example.xpic_v_star(index);
             example.effective_v(p)(index.axis)+=w*V;
-        },
-        [this,&particles](int p,int data)
-        {
-            example.effective_v(p)-=particles.V(p);
         });
 }
 //#####################################################################
@@ -690,7 +687,6 @@ Compute_Effective_Velocity(PHASE& ph)
 template<class TV> void MPM_MAC_DRIVER<TV>::
  Compute_Effective_Velocity()
 {
-    if(!example.xpic) return;
     for(PHASE_ID i(0);i<example.phases.m;i++)
          Compute_Effective_Velocity(example.phases(i));
 }

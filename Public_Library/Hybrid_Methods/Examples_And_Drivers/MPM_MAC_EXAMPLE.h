@@ -71,7 +71,7 @@ public:
 
     // XPIC stuff
     int xpic=0;
-    ARRAY<T,FACE_INDEX<TV::m> > xpic_v0,xpic_v1,xpic_v_star;
+    ARRAY<T,FACE_INDEX<TV::m> > xpic_v,xpic_v_star;
     ARRAY_VIEW<TV> effective_v;
 
     // particle stuff
