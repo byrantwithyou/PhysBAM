@@ -327,9 +327,6 @@ Particle_To_Grid(PHASE& ph) const
     }
     flat_h.Combine();
     indices_h.Combine();
-    Fix_Periodic(ph.mass);
-    Fix_Periodic(ph.velocity);
-    Fix_Periodic(ph.volume);
     if(example.flip||example.xpic){
         if(example.extrap_type!='p')
             Extrapolate_Velocity(ph,false,true);
