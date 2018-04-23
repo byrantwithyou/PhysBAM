@@ -600,7 +600,7 @@ Grid_To_Particle(const PHASE& ph)
         {
             if(particles.store_B) particles.B(p)=h.B;
             if(use_flip) particles.V(p)=(1-example.flip)*h.V+example.flip*(particles.V(p)+h.flip_V);
-            if(example.xpic) particles.V(p)+=example.effective_v(p);
+            else if(example.xpic) particles.V(p)+=example.effective_v(p);
             else particles.V(p)=h.V;
         });
 }
