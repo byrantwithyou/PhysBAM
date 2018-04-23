@@ -81,6 +81,7 @@ int main(int argc, char* argv[])
 
     bool use_affine=false;
     T flip=0;
+    int xpic=0;
     int order=3;
     int resolution=16;
     int size=256;
@@ -97,6 +98,7 @@ int main(int argc, char* argv[])
     parse_args.Add("-size",&size,"num","analyze transfer as though this resolution");
     parse_args.Add("-affine",&use_affine,"use affine transfers");
     parse_args.Add("-flip",&flip,"num","flip ratio");
+    parse_args.Add("-xpic",&xpic,"num","xpic order");
     parse_args.Add("-order",&order,"order","interpolation order");
     parse_args.Add("-ppd",&particles_per_dim,"num","particles per cell per dimension");
     parse_args.Add("-o",&output_filename,"file.png","filename for output image");
@@ -129,6 +131,7 @@ int main(int argc, char* argv[])
     example.dt=example.grid.dX.Min();
     example.flip=flip;
     example.use_affine=use_affine;
+    example.xpic=xpic;
     if(example.use_affine)
         for(int i=0;i<TV::m;i++)
             example.Dp_inv(i).Resize(example.particles.X.m);
@@ -145,6 +148,7 @@ int main(int argc, char* argv[])
     example.periodic_boundary.is_periodic.Fill(true);
     example.bc_type.Fill(example.BC_PERIODIC);
     example.particles.Store_B(example.use_affine);
+    if(example.xpic) example.particles.template Add_Array<TV>("effective_v",&example.effective_v);
     ph.velocity(FACE_INDEX<TV::m>(0,center))=1;
     driver.Update_Simulated_Particles();
     driver.Update_Particle_Weights();
@@ -188,6 +192,7 @@ int main(int argc, char* argv[])
                 driver.Compute_Boundary_Conditions();
             if(use_pressure) driver.Pressure_Projection();
             if(mu) driver.Apply_Viscosity();
+            if(example.xpic) driver.Compute_Effective_Velocity();
             driver.Grid_To_Particle();
             example.particles.X=store_X;
             if(dump_particles){
