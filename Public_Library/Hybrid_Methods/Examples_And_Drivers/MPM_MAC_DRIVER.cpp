@@ -1735,7 +1735,11 @@ Move_Particles()
                         example.particles.X(p)+=example.dt*example.effective_v(p)*0.5;}
                 ph.gather_scatter->template Gather_Parallel<int>(false,
                     [this,&ph](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,int data)
-                    {example.particles.X(p)(it.Index().axis)+=example.dt*it.Weight()*ph.velocity_save(it.Index());},
+                    {
+                        T v=ph.velocity_save(it.Index());
+                        if(example.use_flip_xupdate) v=ph.velocity(it.Index());
+                        example.particles.X(p)(it.Index().axis)+=example.dt*it.Weight()*v;
+                    },
                     Clip);}}
         else{
 #pragma omp for

@@ -53,7 +53,7 @@ public:
     using BASE::extrap_type;
     using BASE::clamp_particles;
     using BASE::particle_vort;
-    using BASE::xpic;
+    using BASE::xpic;using BASE::use_flip_xupdate;
 
     int test_number;
     int resolution;

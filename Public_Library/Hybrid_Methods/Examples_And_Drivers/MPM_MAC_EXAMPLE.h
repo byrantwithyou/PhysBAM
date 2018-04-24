@@ -73,6 +73,7 @@ public:
     int xpic=0;
     ARRAY<T,FACE_INDEX<TV::m> > xpic_v,xpic_v_star;
     ARRAY_VIEW<TV> effective_v;
+    bool use_flip_xupdate=false;
 
     // particle stuff
     MPM_PARTICLES<TV>& particles;

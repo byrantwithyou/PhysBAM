@@ -104,6 +104,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-clamp",&clamp_particles,"clamp particles on wall");
     parse_args.Add("-particle_vort",&particle_vort,"output particle vorticity");
     parse_args.Add("-xpic",&xpic,"int","XPIC order");
+    parse_args.Add("-use_flip_xupdate",&use_flip_xupdate,"use FLIP position update in XPIC");
 
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);
