@@ -264,12 +264,13 @@ int main(int argc, char* argv[])
         thi_abs_eig(it.index)=icm(abs_eig(abs_eig.m-3));
         vis_abs_eig(it.index)=icm(1/(1+k.Magnitude_Squared()*example.dt*mu));}
 
-    PNG_FILE<T>::Write("max-"+output_filename,max_abs_eig);
-    PNG_FILE<T>::Write("sec-"+output_filename,sec_abs_eig);
-    PNG_FILE<T>::Write("thi-"+output_filename,thi_abs_eig);
-    PNG_FILE<T>::Write("vis-"+output_filename,vis_abs_eig);
+    PNG_FILE<T>::Write(viewer_directory+"/max-"+output_filename,max_abs_eig);
+    PNG_FILE<T>::Write(viewer_directory+"/sec-"+output_filename,sec_abs_eig);
+    PNG_FILE<T>::Write(viewer_directory+"/thi-"+output_filename,thi_abs_eig);
+    PNG_FILE<T>::Write(viewer_directory+"/vis-"+output_filename,vis_abs_eig);
 
-    for(int i=0;i<dofs_per_cell;i++) PNG_FILE<T>::Write(LOG::sprintf("all-%i-%s",i,output_filename),all_images(i));
+    for(int i=0;i<dofs_per_cell;i++)
+        PNG_FILE<T>::Write(viewer_directory+"/"+LOG::sprintf("all-%i-%s",i,output_filename),all_images(i));
     
     return 0;
 }
