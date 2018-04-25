@@ -153,7 +153,7 @@ Advance_One_Time_Step()
     Step([=](){Compute_Boundary_Conditions();},"compute boundary conditions",false);
     Step([=](){Pressure_Projection();},"projection");
     Step([=](){Apply_Viscosity();},"viscosity",true,example.use_viscosity);
-    Step([=](){Extrapolate_Velocity(!example.flip,false);},"velocity-extrapolation",true);
+    Step([=](){Extrapolate_Velocity(!(example.flip||example.xpic),false);},"velocity-extrapolation",true);
     Step([=](){Compute_Effective_Velocity();},"compute effective velocity",false,example.xpic);
     Step([=](){Grid_To_Particle();},"g2p");
 }
