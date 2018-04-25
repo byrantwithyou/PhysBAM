@@ -60,11 +60,12 @@ public:
     template <class D,class N>
     void Reflect_Boundary(D func_d,N func_n,RF flag) const;
     void Reflect_Boundary_Mass_Momentum(PHASE& ph) const;
+    void Reflect_Boundary_Momentum(PHASE& ph,ARRAY<T,FACE_INDEX<TV::m> >& p) const;
     void Reflect_Boundary_Particle_Force(ARRAY<T,FACE_INDEX<TV::m> >& force) const;
     void Reflect_Boundary_Grid_Force(ARRAY<T,FACE_INDEX<TV::m> >& force) const;
     void Reflect_Boundary_Velocity_Copy_Only(PHASE& ph) const;
-    void Extrapolate_Velocity(PHASE& ph,bool use_bc,bool extrapolate_boundary) const;
-    void Extrapolate_Boundary(PHASE& ph) const;
+    void Extrapolate_Velocity(PHASE& ph,ARRAY<T,FACE_INDEX<TV::m> >& velocity,bool use_bc,bool extrapolate_boundary) const;
+    void Extrapolate_Boundary(ARRAY<T,FACE_INDEX<TV::m> >& velocity) const;
     T Compute_Dt() const;
     T Max_Particle_Speed() const;
     T Grid_V_Upper_Bound() const;

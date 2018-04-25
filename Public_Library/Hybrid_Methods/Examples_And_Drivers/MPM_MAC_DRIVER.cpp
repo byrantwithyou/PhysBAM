@@ -239,7 +239,7 @@ Update_Particle_Weights()
 // Function Extrapolate_Boundary
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Extrapolate_Boundary(PHASE& ph) const
+Extrapolate_Boundary(ARRAY<T,FACE_INDEX<TV::m> >& velocity) const
 {
     int d=1;
     for(int n=example.weights[0]->stencil_width-2;n>0;--n) // assume all dimensions use the same interpolation order
@@ -252,7 +252,7 @@ Extrapolate_Boundary(PHASE& ph) const
             FACE_INDEX<TV::m> f0=it.face;
             for(int j=d;j>0;--j) f0=further(f0);
             FACE_INDEX<TV::m> f1=further(f0);
-            ph.velocity(it.face)=(d+1)*ph.velocity(f0)-d*ph.velocity(f1);}
+            velocity(it.face)=(d+1)*velocity(f0)-d*velocity(f1);}
 }
 //#####################################################################
 // Function Particle_To_Grid
@@ -329,7 +329,7 @@ Particle_To_Grid(PHASE& ph) const
     indices_h.Combine();
     if(example.flip||example.xpic){
         if(example.extrap_type!='p')
-            Extrapolate_Velocity(ph,false,true);
+            Extrapolate_Velocity(ph,ph.velocity,false,true);
         ph.velocity_save=ph.velocity;}
 }
 //#####################################################################
@@ -652,10 +652,8 @@ Compute_Effective_Velocity(PHASE& ph)
             });
         Fix_Periodic_Accum(example.xpic_v);
 
-        /*
         if(example.extrap_type=='p')
-            Reflect_Boundary_Mass_Momentum(ph);
-        */
+            Reflect_Boundary_Momentum(ph,example.xpic_v);
 
 #pragma omp parallel
         for(FACE_ITERATOR_THREADED<TV> it(example.grid,example.ghost);it.Valid();it.Next()){
@@ -663,7 +661,10 @@ Compute_Effective_Velocity(PHASE& ph)
             if(ph.mass.array(i)){
                 example.xpic_v.array(i)/=ph.mass.array(i);
                 example.xpic_v_star.array(i)+=s*example.xpic_v.array(i);}
-            else example.xpic_v.array(i)=0;}}
+            else example.xpic_v.array(i)=0;}
+
+        if(example.extrap_type!='p')
+            Extrapolate_Velocity(ph,example.xpic_v,false,true);}
 
     ph.gather_scatter->template Gather<int>(false,
         [this,&particles](int p,int data)
@@ -1332,8 +1333,11 @@ Fix_Periodic_Accum(ARRAY<T2,FACE_INDEX<TV::m> >& u,int ghost) const
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Extrapolate_Velocity(bool use_bc,bool extrapolate_boundary)
 {
-    for(PHASE_ID i(0);i<example.phases.m;i++)
-        Extrapolate_Velocity(example.phases(i),use_bc,extrapolate_boundary);
+    for(PHASE_ID i(0);i<example.phases.m;i++){
+        PHASE& ph=example.phases(i);
+        if(example.extrap_type=='p')
+            Reflect_Boundary_Velocity_Copy_Only(ph);
+        else Extrapolate_Velocity(ph,ph.velocity,use_bc,extrapolate_boundary);}
 }
 //#####################################################################
 // Function Reflect_Boundary_Particle_Force
@@ -1400,6 +1404,33 @@ Reflect_Boundary_Mass_Momentum(PHASE& ph) const
         RF::ghost|RF::duplicate_corners);
 }
 //#####################################################################
+// Function Reflect_Boundary_Momentum
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Reflect_Boundary_Momentum(PHASE& ph,ARRAY<T,FACE_INDEX<TV::m> >& p) const
+{
+    Reflect_Boundary(
+        [&](const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side)
+        {
+            T bc=0;
+            if(example.bc_velocity(side)){
+                TV nearest_point=example.grid.Clamp(example.grid.Face(out));
+                bc=example.bc_velocity(side)(nearest_point,out.axis,ph.id,example.time);}
+            T& moment_in=p(in),&moment_out=p(out);
+            T mv_in_old=moment_in,mv_out_old=moment_out;
+            T m_in=ph.mass(in),m_out=ph.mass(out);
+            moment_in+=2*bc*m_out-moment_out;
+            moment_out=mv_out_old+2*bc*m_in-mv_in_old;
+        },
+        [&](const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side)
+        {
+            T& moment_in=p(in),&moment_out=p(out);
+            moment_in+=moment_out;
+            moment_out=moment_in;
+        },
+        RF::ghost|RF::duplicate_corners);
+}
+//#####################################################################
 // Function Reflect_Boundary_Copy_Only
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
@@ -1443,13 +1474,9 @@ Reflect_Boundary(D func_d,N func_n,RF flag) const
 // Function Extrapolate_Velocity
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Extrapolate_Velocity(PHASE& ph,bool use_bc,bool extrapolate_boundary) const
+Extrapolate_Velocity(PHASE& ph,ARRAY<T,FACE_INDEX<TV::m> >& velocity,bool use_bc,bool extrapolate_boundary) const
 {
-    if(example.extrap_type=='p'){
-        Reflect_Boundary_Velocity_Copy_Only(ph);
-        return;}
-
-    if(extrapolate_boundary) Extrapolate_Boundary(ph);
+    if(extrapolate_boundary) Extrapolate_Boundary(velocity);
     RANGE<TV_INT> domain=example.grid.Domain_Indices(0);
     RANGE<TV_INT> ghost_domain=example.grid.Domain_Indices(example.ghost);
     TV_INT bound[TV::m];
@@ -1485,21 +1512,21 @@ Extrapolate_Velocity(PHASE& ph,bool use_bc,bool extrapolate_boundary) const
         if(it.side%2) nearest_face[0]=further(nearest_face[0]);
         TV nearest_point=example.grid.Face(it.face);
         nearest_point(side_axis)=example.grid.Face(nearest_face[1])(side_axis);
-        T& u=ph.velocity(it.face);
+        T& u=velocity(it.face);
         switch(extrap_type){
             case 'r':{
                 FACE_INDEX<TV::m> f=it.face;
                 f.index(side_axis)=2*corner(side_axis)-it.face.index(side_axis);
                 if(!normal) f.index(side_axis)-=1;
-                u=ph.velocity(f);
+                u=velocity(f);
                 if(has_bc){
                     T v=0;
                     if(use_bc) v=bc(nearest_point,it.face.axis,ph.id,example.time);
-                    else if(normal) v=ph.velocity(nearest_face[normal]);
+                    else if(normal) v=velocity(nearest_face[normal]);
                     else{
                         FACE_INDEX<TV::m> f0=nearest_face[false];
                         FACE_INDEX<TV::m> f1=further(f0);
-                        v=1.5*ph.velocity(f0)-0.5*ph.velocity(f1);}
+                        v=1.5*velocity(f0)-0.5*velocity(f1);}
                     u=2*v-u;}
                 break;}
             case 'a': u=bc(example.grid.Face(it.face),it.face.axis,ph.id,example.time);break;
@@ -1508,13 +1535,13 @@ Extrapolate_Velocity(PHASE& ph,bool use_bc,bool extrapolate_boundary) const
             case 'C':{
                 FACE_INDEX<TV::m> f=nearest_face[normal];
                 if(is_normal_bc) f=further(f);
-                u=ph.velocity(f);
+                u=velocity(f);
                 break;}
             case 'l':{
                 T u0=bc(nearest_point,it.face.axis,ph.id,example.time);
                 FACE_INDEX<TV::m> f=nearest_face[normal];
                 if(is_normal_bc) f=further(f);
-                T u1=ph.velocity(f);
+                T u1=velocity(f);
                 // compute how far from u to u0(given by bc), measured in number of |u0-u1|
                 int n=normal?
                     abs(it.face.index(side_axis)-nearest_face[normal].index(side_axis)):
@@ -1529,8 +1556,8 @@ Extrapolate_Velocity(PHASE& ph,bool use_bc,bool extrapolate_boundary) const
                     f0=f1;
                     f1=further(f0);
                     n+=1;}
-                T u0=ph.velocity(f0);
-                T u1=ph.velocity(f1);
+                T u0=velocity(f0);
+                T u1=velocity(f1);
                 u=u0+n*(u0-u1);
                 break;}
             default: PHYSBAM_FATAL_ERROR("Unrecognized extrapolation type");}}
