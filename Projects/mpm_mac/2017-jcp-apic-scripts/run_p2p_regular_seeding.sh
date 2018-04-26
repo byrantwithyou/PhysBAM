@@ -8,13 +8,13 @@ FULL=1 # Set to 1 for a full rebuild; 0 to skip rerunning the simulations
 
 ARGS="../../fourier-apic/fourier_mac_p -pressure -dump_particles >&/dev/null"
 
-np=("-ppd 4")
-np_name=("ppc16")
+np=("-ppd 2")
+np_name=("ppc4")
 
 order=("-order 1" "-order 2" "-order 3")
 order_name=("linear" "quadratic" "cubic")
 
-xpic_order=(1 2 5 10 15 20 25)
+xpic_order=(1 2 3 4 5 10 15 20 25)
 
 if [ "X$FULL" = "X1" ] ; then
     rm -rf $NAME
@@ -22,6 +22,10 @@ if [ "X$FULL" = "X1" ] ; then
     for r in $RES $LOWRES ; do
         for p in `seq 0 $((${#np[@]}-1))` ; do
             for o in `seq 0 $((${#order[@]}-1))` ; do
+                apic_folder=$NAME/apic-${np_name[$p]}-${order_name[$o]}-$r
+                echo $ARGS -affine ${np[$p]} ${order[$o]} -v $apic_folder -resolution $r -size $r
+                pic_folder=$NAME/pic-${np_name[$p]}-${order_name[$o]}-$r
+                echo $ARGS ${np[$p]} ${order[$o]} -v $pic_folder -resolution $r -size $r
                 flip_folder=$NAME/flip-${np_name[$p]}-${order_name[$o]}-$r
                 echo $ARGS -flip 1 ${np[$p]} ${order[$o]} -v $flip_folder -resolution $r -size $r
                 for x in ${xpic_order[@]} ; do
