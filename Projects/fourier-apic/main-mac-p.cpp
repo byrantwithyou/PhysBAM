@@ -92,6 +92,7 @@ int main(int argc, char* argv[])
     std::string viewer_directory="output";
     bool dump_particles=false;
     bool use_pressure=false;
+    bool dump_eigenvalues=false;
     T mu=0;
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Add("-resolution",&resolution,"num","transfer resolution");
@@ -108,6 +109,7 @@ int main(int argc, char* argv[])
     parse_args.Add("-dump_particles",&dump_particles,"Output particle distribution");
     parse_args.Add("-pressure",&use_pressure,"Use pressure projection");
     parse_args.Add("-mu",&mu,"mu","Viscosity amount");
+    parse_args.Add("-dump_eigenvalues",&dump_eigenvalues,"Output eigenvalues");
     parse_args.Parse();
 
     PHYSBAM_ASSERT(resolution<=size);
@@ -247,6 +249,8 @@ int main(int argc, char* argv[])
     ARRAY<VECTOR<T,3>,TV_INT> vis_abs_eig(A(0)(0).domain);
     ARRAY<ARRAY<VECTOR<T,3>,TV_INT> > all_images(dofs_per_cell);
     for(int i=0;i<dofs_per_cell;i++) all_images(i).Resize(A(0)(0).domain);
+    ARRAY<ARRAY<std::complex<T>,TV_INT> > all_eigs(dofs_per_cell);
+    for(int i=0;i<dofs_per_cell;i++) all_eigs(i).Resize(A(0)(0).domain);
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>::Unit_Box()*size);it.Valid();it.Next()){
         TV k=coefficients*TV(wrap(it.index,lo,hi));
         MATRIX_MXN<std::complex<T> > M(dofs_per_cell,dofs_per_cell);
@@ -258,7 +262,9 @@ int main(int argc, char* argv[])
         ARRAY<T> abs_eig(dofs_per_cell);
         for(int i=0;i<dofs_per_cell;i++) abs_eig(i)=abs(eig(i));
         abs_eig.Sort();
-        for(int i=0;i<dofs_per_cell;i++) all_images(i)(it.index)=icm(abs_eig(i));
+        for(int i=0;i<dofs_per_cell;i++){
+            all_eigs(i)(it.index)=abs_eig(i);
+            all_images(i)(it.index)=icm(abs_eig(i));}
         max_abs_eig(it.index)=icm(abs_eig.Last());
         sec_abs_eig(it.index)=icm(abs_eig(abs_eig.m-2));
         thi_abs_eig(it.index)=icm(abs_eig(abs_eig.m-3));
@@ -271,6 +277,20 @@ int main(int argc, char* argv[])
 
     for(int i=0;i<dofs_per_cell;i++)
         PNG_FILE<T>::Write(viewer_directory+"/"+LOG::sprintf("all-%i-%s",i,output_filename),all_images(i));
+
+    if(dump_eigenvalues){
+        for(int dof=0;dof<dofs_per_cell;dof++){
+            std::ofstream eig_x((viewer_directory+"/"+LOG::sprintf("all-%i-eig-x.txt",dof)).c_str());
+            std::ofstream eig_y((viewer_directory+"/"+LOG::sprintf("all-%i-eig-y.txt",dof)).c_str());
+            std::ofstream eig_xy((viewer_directory+"/"+LOG::sprintf("all-%i-eig-xy.txt",dof)).c_str());
+            eig_x<<"waven x eig\n";
+            eig_y<<"waven x eig\n";
+            eig_xy<<"waven x eig\n";
+            int shift=size/2;
+            for(int i=0;i<size;++i){
+                eig_x<<i-shift<<" "<<(T)(i-shift)/size<<" "<<all_eigs(dof)(TV_INT(i,shift)).real()<<"\n";
+                eig_y<<i-shift<<" "<<(T)(i-shift)/size<<" "<<all_eigs(dof)(TV_INT(shift,i)).real()<<"\n";
+                eig_xy<<i-shift<<" "<<(T)(i-shift)/size<<" "<<all_eigs(dof)(TV_INT(i,i)).real()<<"\n";}}}
     
     return 0;
 }
