@@ -12,6 +12,8 @@ ARGS="../mpm_mac 16 -last_frame 10 -frame_dt 1 -mu 0 -scale_mass 3 -resolution $
 opt=("" "-regular_seeding" "-order 3" "-regular_seeding -order 3")
 opt_name=("default" "regular" "default-cubic" "regular-cubic")
 
+xpic_orders=(2 5)
+
 if [ "X$FULL" = "X1" ] ; then
     rm -rf $NAME
     mkdir -p $NAME
@@ -19,10 +21,13 @@ if [ "X$FULL" = "X1" ] ; then
         echo $ARGS $DT -no_affine ${opt[$o]} -o $NAME/pic-${opt_name[$o]}
         echo $ARGS $DT -affine ${opt[$o]} -o $NAME/apic-${opt_name[$o]}
         echo $ARGS $DT -no_affine ${opt[$o]} -flip 1 -o $NAME/flip-${opt_name[$o]}
-    done | xargs -P 8 -n 1 -d '\n' bash -c
+        for xo in "${xpic_orders[@]}" ; do
+            echo $ARGS $DT -no_affine ${opt[$o]} -xpic $xo -o $NAME/xpic$xo-${opt_name[$o]}
+        done
+    done | xargs -P 16 -n 1 -d '\n' bash -c
 fi
 
-for s in pic apic flip ; do
+for s in pic apic flip ${xpic_orders[@]/#/xpic} ; do
     for o in `seq 0 $((${#opt[@]}-1))` ; do
         ./vort_parse_data.pl < $NAME/$s-${opt_name[$o]}/common/log.txt > $NAME/$s-${opt_name[$o]}-norms.txt
     done
@@ -32,10 +37,13 @@ for o in ${opt_name[@]} ; do
     sed -e "s/xxx/$o/" vort_taylor_plot.tex  > $NAME/plot-taylor-vort-$o.tex
 done
 
-for i in {apic,flip}-{default,regular} ; do
-    for j in {0..10} ; do
-        convert -scale 512 $NAME/$i/modes-$(($j*$RES))-x.png `printf $NAME/$i-taylor-vort-%02d.png $j`
-        convert -scale 512 $NAME/$i/modes-$(($j*$RES))-x.png `printf $NAME/$i-taylor-vort-%02d.eps $j`
+for a in apic flip ${xpic_orders[@]/#/xpic} ; do
+    for s in default regular ; do
+        i=$a-$s
+        for j in {0..10} ; do
+            convert -scale 512 $NAME/$i/modes-$(($j*$RES))-x.png `printf $NAME/$i-taylor-vort-%02d.png $j`
+            convert -scale 512 $NAME/$i/modes-$(($j*$RES))-x.png `printf $NAME/$i-taylor-vort-%02d.eps $j`
+        done
     done
 done
 
