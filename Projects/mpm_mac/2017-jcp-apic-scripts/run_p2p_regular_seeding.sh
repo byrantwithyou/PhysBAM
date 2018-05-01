@@ -6,7 +6,7 @@ RES=128
 LOWRES=32
 FULL=1 # Set to 1 for a full rebuild; 0 to skip rerunning the simulations
 
-ARGS="../../fourier-apic/fourier_mac_p -pressure -dump_particles >&/dev/null"
+ARGS="../../fourier-apic/fourier_mac_p -pressure -dump_particles -dump_eigenvalues >&/dev/null"
 
 np=("-ppd 2")
 np_name=("ppc4")
