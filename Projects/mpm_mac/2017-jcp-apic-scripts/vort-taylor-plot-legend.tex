@@ -1,0 +1,36 @@
+\documentclass[class=minimal,border=0pt]{standalone}
+\usepackage{pgfplots}
+
+\begin{document}
+\pgfplotsset{width=10cm,height=8cm,compat=1.13}
+\begin{tikzpicture}
+\begin{axis}[
+    legend columns=6,
+    hide axis,
+    legend cell align=left,
+    legend entries={%PIC $E_{vel}$,PIC $E_{vort}$,PIC $E_{taylor}$,
+      APIC $E_{vel}$,APIC $E_{vort}$,APIC $E_{taylor}$,FLIP $E_{vel}$,FLIP $E_{vort}$,FLIP $E_{taylor}$,
+      XPIC(2) $E_{vel}$,XPIC(2) $E_{vort}$,XPIC(2) $E_{taylor}$,
+      XPIC(5) $E_{vel}$,XPIC(5) $E_{vort}$,XPIC(5) $E_{taylor}$},
+    legend pos=south west,
+    ymin=0.8,
+    ymax=1,
+    xmin=0,
+    xmax=1,
+    legend style={fill=none,draw=none},
+]
+\addlegendimage{mark=none,solid,color=red}
+\addlegendimage{mark=none,dashed,color=red}
+\addlegendimage{mark=none,dotted,color=red,very thick}
+\addlegendimage{mark=none,solid,color=blue}
+\addlegendimage{mark=none,dashed,color=blue}
+\addlegendimage{mark=none,dotted,color=blue,very thick}
+\addlegendimage{mark=none,solid,color=green}
+\addlegendimage{mark=none,dashed,color=green}
+\addlegendimage{mark=none,dotted,color=green,very thick}
+\addlegendimage{mark=none,solid,color=cyan}
+\addlegendimage{mark=none,dashed,color=cyan}
+\addlegendimage{mark=none,dotted,color=cyan,very thick}
+\end{axis}
+\end{tikzpicture}
+\end{document}

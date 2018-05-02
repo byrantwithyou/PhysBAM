@@ -6,16 +6,11 @@
 \begin{tikzpicture}
 \begin{axis}[
     enlargelimits=false,
-    legend cell align=left,
     xlabel={Time},
     ylabel={Relative velocity or vorticity},
-    legend entries={%PIC $E_{vel}$,PIC $E_{vort}$,PIC $E_{taylor}$,
-      APIC $E_{vel}$,APIC $E_{vort}$,APIC $E_{taylor}$,FLIP $E_{vel}$,FLIP $E_{vort}$,FLIP $E_{taylor}$},
-    legend pos=south west,
-    ymin=0.92,
+    ymin=0.8,
     ymax=1,
 %    xmax=16,
-    legend style={fill=none,draw=none},
     tick scale binop=\times,
     scale ticks above exponent=2,
     y tick label style={
@@ -36,6 +31,12 @@
 \addplot[mark=none,solid,color=blue] table[x=time,y=vel]{flip-xxx-norms.txt};
 \addplot[mark=none,dashed,color=blue] table[x=time,y=vort]{flip-xxx-norms.txt};
 \addplot[mark=none,dotted,color=blue,very thick] table[x=time,y=tay]{flip-xxx-norms.txt};
+\addplot[mark=none,solid,color=green] table[x=time,y=vel]{xpic2-xxx-norms.txt};
+\addplot[mark=none,dashed,color=green] table[x=time,y=vort]{xpic2-xxx-norms.txt};
+\addplot[mark=none,dotted,color=green,very thick] table[x=time,y=tay]{xpic2-xxx-norms.txt};
+\addplot[mark=none,solid,color=cyan] table[x=time,y=vel]{xpic5-xxx-norms.txt};
+\addplot[mark=none,dashed,color=cyan] table[x=time,y=vort]{xpic5-xxx-norms.txt};
+\addplot[mark=none,dotted,color=cyan,very thick] table[x=time,y=tay]{xpic5-xxx-norms.txt};
 \end{axis}
 \end{tikzpicture}
 \end{document}

@@ -37,6 +37,8 @@ for o in ${opt_name[@]} ; do
     sed -e "s/xxx/$o/" vort_taylor_plot.tex  > $NAME/plot-taylor-vort-$o.tex
 done
 
+cp vort-taylor-plot-legend.tex $NAME/
+
 for a in apic flip ${xpic_orders[@]/#/xpic} ; do
     for s in default regular ; do
         i=$a-$s
