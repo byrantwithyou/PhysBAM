@@ -88,7 +88,8 @@ public:
         fluids_parameters.use_vorticity_confinement_fuel=false;
         fluids_parameters.write_ghost_values=true;
         fluids_parameters.store_particle_ids=true;
-        first_frame=0;if(!user_last_frame) last_frame=1000;
+        first_frame=0;
+        if(!user_last_frame) last_frame=1000;
 
         if(test_number==1 || test_number==4 || test_number==5 || test_number==6 || test_number==7) fluids_parameters.grid->Initialize(TV_INT(6*cells+1,12*cells+1),RANGE<TV>(TV(0,0),TV(1.5,3)));
         else if(test_number==2 || test_number==3){

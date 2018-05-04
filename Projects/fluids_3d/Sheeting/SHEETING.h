@@ -75,7 +75,8 @@ public:
         ballistic_particles_as_percentage_of_target=(T).1;
 
         // set up the domain
-        first_frame=0;if(!user_last_frame) last_frame=5000;
+        first_frame=0;
+        if(!user_last_frame) last_frame=5000;
         int cells=1*resolution;
         fluids_parameters.grid->Initialize(TV_INT(3*cells+1,4*cells+1,4*cells+1),RANGE<TV>(TV(1,0,0),TV(4,4,4)));
 

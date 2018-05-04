@@ -57,8 +57,9 @@ public:
         parse_args.Add("-selection",&selection,"value","selection");
         parse_args.Parse();
         tests.data_directory=data_directory;
-        if(!this->user_output_directory)
-            output_directory="Chains/output";output_directory+=selection==0?"_blocks_chain":"_lathe_chains";
+        if(!this->user_output_directory){
+            output_directory="Chains/output";
+            output_directory+=selection==0?"_blocks_chain":"_lathe_chains";}
     }
     
     virtual ~CHAINS_EXAMPLE()

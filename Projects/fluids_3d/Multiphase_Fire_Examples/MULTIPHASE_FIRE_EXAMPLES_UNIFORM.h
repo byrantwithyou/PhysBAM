@@ -52,7 +52,8 @@ public:
         fluids_parameters.use_reacting_flow=true;
         fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][0]=true;
         fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
-        if(!user_last_frame) last_frame=512;if(!this->user_frame_rate) frame_rate=96;
+        if(!user_last_frame) last_frame=512;
+        if(!this->user_frame_rate) frame_rate=96;
         fluids_parameters.temperature_container.Set_Ambient_Temperature(T(283.15));fluids_parameters.temperature_container.Set_Cooling_Constant((T)4000);
         fluids_parameters.density_container.Set_Ambient_Density(0);
         fluids_parameters.temperature_products=3000;fluids_parameters.temperature_fuel=298;

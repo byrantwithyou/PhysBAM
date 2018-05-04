@@ -134,7 +134,9 @@ public:
         fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=false;
         fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=false;fluids_parameters.domain_walls[2][1]=false;
         //time
-        initial_time=(T)0.;if(!user_last_frame) last_frame=1000;if(!this->user_frame_rate) frame_rate=(T)100.;
+        initial_time=(T)0.;
+        if(!user_last_frame) last_frame=1000;
+        if(!this->user_frame_rate) frame_rate=(T)100.;
         fluids_parameters.cfl=cfl_number;
         //custom stuff . . . 
         if(transition_to_incompressible){

@@ -283,7 +283,9 @@ public:
 
 
             //time
-            initial_time=(T)0.;if(!user_last_frame) last_frame=1000;if(!this->user_frame_rate) frame_rate=(T)1e4;
+            initial_time=(T)0.;
+            if(!user_last_frame) last_frame=1000;
+            if(!this->user_frame_rate) frame_rate=(T)1e4;
 
             switch(test_number){
                 case 3: if(!user_last_frame) last_frame=1;
@@ -304,7 +306,8 @@ public:
                     break;
                 case 21:frame_rate=(T)6e5;
                     break;
-                default:frame_rate=(T)1e4;if(!user_last_frame) last_frame=1000;}
+                default:frame_rate=(T)1e4;
+                    if(!user_last_frame) last_frame=1000;}
 
             if(faster_frame_rate) if(!this->user_frame_rate) frame_rate=96;
             fluids_parameters.cfl=cfl_number;

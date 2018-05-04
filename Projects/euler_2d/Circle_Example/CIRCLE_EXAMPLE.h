@@ -189,10 +189,13 @@ public:
             fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
             fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;}
         //time
-        initial_time=(T)0.;if(!user_last_frame) last_frame=1000;if(!this->user_frame_rate) frame_rate=(T)32.;
+        initial_time=(T)0.;
+        if(!user_last_frame) last_frame=1000;
+        if(!this->user_frame_rate) frame_rate=(T)32.;
         if(strong_shock) frame_rate=2e4;
         if(test_number==10){
-            if(!user_last_frame) last_frame=1000;if(!this->user_frame_rate) frame_rate=1.25e5;}
+            if(!user_last_frame) last_frame=1000;
+            if(!this->user_frame_rate) frame_rate=1.25e5;}
         fluids_parameters.cfl=cfl_number;
         //custom stuff . . . 
         e_min_for_clamping=1e-6;

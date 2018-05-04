@@ -325,7 +325,8 @@ public:
                 solids_parameters.cfl=(T)50;
                 if(!this->user_frame_rate) frame_rate=60;
                 if(!user_last_frame) last_frame=(int)(7*frame_rate);
-                if(test_number==30){frame_rate=120;if(!user_last_frame) last_frame=(int)(20*frame_rate);}
+                if(test_number==30){frame_rate=120;
+                if(!user_last_frame) last_frame=(int)(20*frame_rate);}
                 if(test_number==31) aspect_ratio=(T)1;
                 if(test_number==32){if(!user_last_frame) last_frame=(int)(15*frame_rate);aspect_ratio=(T)4;}
                 solids_parameters.implicit_solve_parameters.throw_exception_on_backward_euler_failure=false;
@@ -466,7 +467,8 @@ public:
                 break;
             case 28:
                 solids_parameters.use_trapezoidal_rule_for_velocities=true;
-                if(!this->user_frame_rate) frame_rate=30;if(!user_last_frame) last_frame=(int)(120*frame_rate);
+                if(!this->user_frame_rate) frame_rate=30;
+                if(!user_last_frame) last_frame=(int)(120*frame_rate);
                 solids_parameters.cfl=(T)1;
                 solids_parameters.triangle_collision_parameters.perform_self_collision=false;
                 solids_parameters.triangle_collision_parameters.collisions_repulsion_clamp_fraction=cloth_clamp_fraction;

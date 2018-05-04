@@ -48,7 +48,9 @@ public:
         // set up the standard fluid environment
         if(!this->user_frame_rate) frame_rate=24;
         restart=false;restart_frame=0;
-        first_frame=0;if(!user_last_frame) last_frame=300;if(!this->user_frame_rate) frame_rate=400;
+        first_frame=0;
+        if(!user_last_frame) last_frame=300;
+        if(!this->user_frame_rate) frame_rate=400;
         fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
         fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
         fluids_parameters.number_particles_per_cell=16;

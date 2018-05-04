@@ -65,7 +65,9 @@ public:
         fluids_parameters.grid->Initialize(TV_INT(cells_m+1,cells_n+1),RANGE<TV>(TV(),TV(L,H)/sin(angle)));
         *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
         //time
-        initial_time=(T)0.;if(!user_last_frame) last_frame=400;if(!this->user_frame_rate) frame_rate=(T)80.;
+        initial_time=(T)0.;
+        if(!user_last_frame) last_frame=400;
+        if(!this->user_frame_rate) frame_rate=(T)80.;
         fluids_parameters.cfl=cfl_number;
         //custom stuff . . . 
         fluids_parameters.compressible_eos=new EOS_GAMMA<T>;

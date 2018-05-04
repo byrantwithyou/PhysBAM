@@ -89,7 +89,8 @@ public:
         fluids_parameters.bandwidth_without_maccormack_near_interface=1;
 
         int cells=1*resolution;
-        first_frame=0;if(!user_last_frame) last_frame=10;
+        first_frame=0;
+        if(!user_last_frame) last_frame=10;
         GRID<TV>& grid=*fluids_parameters.grid;
         grid.Initialize(TV_INT(10*cells+1,20*cells+1,10*cells+1),RANGE<TV>(TV(-(T).05,0,-(T).05),TV((T).05,(T).2,(T).05)));
 

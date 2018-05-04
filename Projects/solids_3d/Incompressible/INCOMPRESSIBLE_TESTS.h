@@ -579,7 +579,8 @@ void Initialize_Bodies() override
             hardening_strength=(T).25;
             break;}
         case 20:{
-            if(!this->user_frame_rate) frame_rate=24;if(!user_last_frame) last_frame=(int)(10*frame_rate);
+            if(!this->user_frame_rate) frame_rate=24;
+            if(!user_last_frame) last_frame=(int)(10*frame_rate);
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
             solids_parameters.triangle_collision_parameters.perform_self_collision=false;

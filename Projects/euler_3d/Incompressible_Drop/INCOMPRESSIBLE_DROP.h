@@ -77,7 +77,9 @@ public:
         fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;
         fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
         //time
-        initial_time=(T)0.;if(!user_last_frame) last_frame=400;if(!this->user_frame_rate) frame_rate=(T)80.;
+        initial_time=(T)0.;
+        if(!user_last_frame) last_frame=400;
+        if(!this->user_frame_rate) frame_rate=(T)80.;
         fluids_parameters.cfl=cfl_number;
         //custom stuff . . . 
         fluids_parameters.compressible_eos = new EOS_GAMMA<T>;

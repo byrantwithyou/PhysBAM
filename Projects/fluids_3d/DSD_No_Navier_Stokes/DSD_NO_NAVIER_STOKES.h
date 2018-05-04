@@ -65,7 +65,8 @@ public:
         fluids_parameters.use_dsd=true;
 
         int cells=1*resolution;
-        first_frame=0;if(!user_last_frame) last_frame=10;
+        first_frame=0;
+        if(!user_last_frame) last_frame=10;
         GRID<TV>& grid=*fluids_parameters.grid;
         grid.Initialize(TV_INT(10*cells+1,10*cells+1,10*cells+1),RANGE<TV>(TV(0,0,0),TV(8,8,8)));
 

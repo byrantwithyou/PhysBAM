@@ -83,7 +83,8 @@ public:
         fluids_parameters.use_vorticity_confinement_fuel=false;
         fluids_parameters.write_ghost_values=true;
         fluids_parameters.store_particle_ids=true;
-        first_frame=0;if(!user_last_frame) last_frame=1000;
+        first_frame=0;
+        if(!user_last_frame) last_frame=1000;
         GRID<TV>& grid=*fluids_parameters.grid;
 
         grid.Initialize(TV_INT(10*cells+1,20*cells+1),RANGE<TV>(TV((T)-.05,0),TV((T).05,(T).2)));

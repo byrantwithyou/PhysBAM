@@ -29,7 +29,8 @@ public:
     {
         parse_args.Parse();
         fluids_parameters.grid->Initialize(TV_INT(resolution*20,resolution*20),RANGE<TV>(TV(0,0),TV(1,1)));
-        first_frame=0;if(!user_last_frame) last_frame=2000;
+        first_frame=0;
+        if(!user_last_frame) last_frame=2000;
         if(!this->user_frame_rate) frame_rate=24;
         restart=false;restart_frame=18;
         if(!this->user_output_directory)

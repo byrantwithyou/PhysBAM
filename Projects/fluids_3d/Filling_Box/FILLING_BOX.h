@@ -22,7 +22,9 @@ CYLINDER<T> source;VECTOR<T,3> source_velocity;
     FILLING_BOX() 
         :SOLIDS_FLUIDS_EXAMPLE_3D<RW>(fluids_parameters.WATER),source(VECTOR<T,3>(0,(T).75,(T).5),VECTOR<T,3>((T).05,(T).75,(T).5),(T).1),source_velocity((T)2,0,0)
     {
-        first_frame=0;if(!user_last_frame) last_frame=1000;if(!this->user_frame_rate) frame_rate=24;
+        first_frame=0;
+        if(!user_last_frame) last_frame=1000;
+        if(!this->user_frame_rate) frame_rate=24;
         restart=false;restart_frame=0;
         fluids_parameters.grid.Initialize(TV_INT(76,51,51),RANGE<TV>(TV(0,0,0),TV(1.5,1,1)));
         fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;

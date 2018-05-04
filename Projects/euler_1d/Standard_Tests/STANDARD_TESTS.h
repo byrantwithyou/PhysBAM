@@ -81,7 +81,9 @@ public:
         fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
         if(test_number==1 || test_number==2) fluids_parameters.domain_walls[0][1]=true;
         //time
-        initial_time=(T)0.;if(!user_last_frame) last_frame=1500;if(!this->user_frame_rate) frame_rate=(T)100.;
+        initial_time=(T)0.;
+        if(!user_last_frame) last_frame=1500;
+        if(!this->user_frame_rate) frame_rate=(T)100.;
         fluids_parameters.cfl=cfl_number;
         fluids_parameters.compressible_use_sound_speed_for_cfl=use_sound_speed_based_cfl;
         if(multiplication_factor_for_sound_speed_based_dt>0){

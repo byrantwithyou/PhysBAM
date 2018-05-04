@@ -55,7 +55,8 @@ public:
         rigid_body_collection(solid_body_collection.rigid_body_collection),inaccurate_union(*fluids_parameters.grid)
     {
         parse_args.Parse();
-        first_frame=0;if(!user_last_frame) last_frame=1000;
+        first_frame=0;
+        if(!user_last_frame) last_frame=1000;
         if(!this->user_frame_rate) frame_rate=36;
         restart=false;restart_frame=18;
         int cells=1*resolution;

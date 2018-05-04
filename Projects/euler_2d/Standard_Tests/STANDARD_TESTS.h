@@ -103,14 +103,18 @@ public:
             fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
             fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
     
-            initial_time=(T)0.;if(!user_last_frame) last_frame=350;if(!this->user_frame_rate) frame_rate=(T)1000.;}
+            initial_time=(T)0.;
+            if(!user_last_frame) last_frame=350;
+if(!this->user_frame_rate) frame_rate=(T)1000.;}
         else{
             fluids_parameters.grid->Initialize(TV_INT(4,3)*cells+1,RANGE<VECTOR<T,2> >(VECTOR<T,2>((T)0,(T)0), VECTOR<T,2>((T)1,(T).75)));
             *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid();
             fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=true;
             fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
 
-            initial_time=(T)0.;if(!user_last_frame) last_frame=10;if(!this->user_frame_rate) frame_rate=(T)10000.;}
+            initial_time=(T)0.;
+            if(!user_last_frame) last_frame=10;
+            if(!this->user_frame_rate) frame_rate=(T)10000.;}
 
         fluids_parameters.cfl=cfl_number;
         //custom stuff . . . 

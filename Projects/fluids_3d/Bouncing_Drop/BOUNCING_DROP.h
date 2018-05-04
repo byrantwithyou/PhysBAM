@@ -16,7 +16,8 @@ class BOUNCING_DROP:public WATER_FREE_SURFACE_3D_EXAMPLE<T,RW>
 public:
     BOUNCING_DROP()
     {
-        first_frame=0;if(!user_last_frame) last_frame=300;
+        first_frame=0;
+        if(!user_last_frame) last_frame=300;
         if(!this->user_frame_rate) frame_rate=24;
         restart=false;restart_frame=100;
         grid.Initialize(TV_INT(50,50,50),RANGE<TV>(TV(0,0,0),TV(1,1,1)));

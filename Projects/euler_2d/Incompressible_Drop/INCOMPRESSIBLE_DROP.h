@@ -81,7 +81,9 @@ public:
         *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
         fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;
         //time
-        initial_time=0.;if(!user_last_frame) last_frame=500;if(!this->user_frame_rate) frame_rate=10000;
+        initial_time=0.;
+        if(!user_last_frame) last_frame=500;
+        if(!this->user_frame_rate) frame_rate=10000;
         fluids_parameters.cfl=cfl_number;
         //custom stuff . . . 
         fluids_parameters.compressible_eos=new EOS_GAMMA<T>;

@@ -91,11 +91,19 @@ public:
         if(test_number==1 || test_number==2) fluids_parameters.domain_walls[0][1]=true;
         if(test_number==10){fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;}
         //time
-        initial_time=(T)0.;if(!user_last_frame) last_frame=1500;if(!this->user_frame_rate) frame_rate=(T)100.;
+        initial_time=(T)0.;
+        if(!user_last_frame) last_frame=1500;
+        if(!this->user_frame_rate) frame_rate=(T)100.;
         if(test_number==9) if(!user_last_frame) last_frame=4000;
-        if(test_number==5){frame_rate=(T)5/(T)2.5e-6;if(!user_last_frame) last_frame=500;}
-        else if(test_number==8){frame_rate=(T)10/(T)1.75e-4;if(!user_last_frame) last_frame=1000;}
-        else if(test_number==10){frame_rate=(T)10/(T).038;if(!user_last_frame) last_frame=500;}
+        if(test_number==5){
+            frame_rate=(T)5/(T)2.5e-6;
+            if(!user_last_frame) last_frame=500;}
+        else if(test_number==8){
+            frame_rate=(T)10/(T)1.75e-4;
+            if(!user_last_frame) last_frame=1000;}
+        else if(test_number==10){
+            frame_rate=(T)10/(T).038;
+            if(!user_last_frame) last_frame=500;}
         fluids_parameters.cfl=cfl_number;
         fluids_parameters.compressible_use_sound_speed_for_cfl=use_sound_speed_based_cfl;
         if(multiplication_factor_for_sound_speed_based_dt>0){

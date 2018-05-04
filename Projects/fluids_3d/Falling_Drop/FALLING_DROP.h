@@ -21,7 +21,8 @@ public:
     FALLING_DROP()
         :SOLIDS_FLUIDS_EXAMPLE_3D(fluids_parameters.WATER)
     {
-        first_frame=0;if(!user_last_frame) last_frame=1000;
+        first_frame=0;
+        if(!user_last_frame) last_frame=1000;
         if(!this->user_frame_rate) frame_rate=24;
         restart=false;restart_frame=18;
         fluids_parameters.grid.Initialize(TV_INT(101,101,101),RANGE<TV>(TV(0,0,0),TV(1,1,1)));

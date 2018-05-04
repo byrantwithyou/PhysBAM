@@ -53,13 +53,16 @@ public:
 
         int cells=1*resolution;
         if(test_number==1){
-            first_frame=0;if(!user_last_frame) last_frame=200;
+            first_frame=0;
+            if(!user_last_frame) last_frame=200;
             grid.Initialize(TV_INT(15*cells+1,10*cells+1),RANGE<TV>(TV(0,0),TV((T)1.5,1)));}
         else if(test_number==2){
-            first_frame=0;if(!user_last_frame) last_frame=100;
+            first_frame=0;
+            if(!user_last_frame) last_frame=100;
             grid.Initialize(TV_INT(10*cells+1,15*cells+1),RANGE<TV>(TV(0,0),TV(1,(T)1.5)));}
         else if(test_number==3){
-            first_frame=0;if(!user_last_frame) last_frame=150;
+            first_frame=0;
+            if(!user_last_frame) last_frame=150;
             grid.Initialize(TV_INT(10*cells+1,15*cells+1),RANGE<TV>(TV(0,0),TV(1,(T)1.5)));}
         else if(test_number==5){
             grid.Initialize(TV_INT(10*cells+1,10*cells+1),RANGE<TV>(TV(0,0),TV(1,1)));}
