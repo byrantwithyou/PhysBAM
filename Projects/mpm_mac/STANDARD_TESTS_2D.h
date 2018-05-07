@@ -26,7 +26,7 @@ public:
     using BASE::particles;using BASE::frame_title;
     using BASE::write_substeps_level;using BASE::particles_per_cell;
     using BASE::substeps_delay_frame;using BASE::scale_mass;using BASE::data_directory;
-    using BASE::output_directory;using BASE::restart;using BASE::dt;
+    using BASE::output_directory;using BASE::restart;using BASE::dt;using BASE::stream_type;
     using BASE::time;using BASE::frame_dt;using BASE::min_dt;using BASE::max_dt;
     using BASE::order;using BASE::ghost;using BASE::use_affine;
     using BASE::cfl;using BASE::solver_tolerance;using BASE::Add_Source;
@@ -46,6 +46,7 @@ public:
     using BASE::mu;using BASE::use_viscosity;
     using BASE::BC_SLIP;using BASE::BC_NOSLIP;using BASE::bc_velocity;using BASE::bc_pressure;
     using BASE::Setup_Analytic_Boundary_Conditions;
+    using BASE::Add_Callbacks;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();
