@@ -1725,8 +1725,9 @@ Move_Particles()
 
         auto Clip=[this,wall,&invalidate_list](int p,int data=0)
             {
+                TV X=example.particles.X(p);
                 for(int i=0;i<TV::m;i++){
-                    T& x=example.particles.X(p)(i);
+                    T& x=X(i);
                     int side;
                     if(x<wall[0](i)) side=0;
                     else if(x>wall[1](i)) side=1;
@@ -1735,6 +1736,12 @@ Move_Particles()
                     if(bc_type==example.BC_PERIODIC) x=wrap(x,wall[0](i),wall[1](i));
                     else if(bc_type==example.BC_FREE) invalidate_list.Append(p);
                     else if(example.clamp_particles) x=wall[side](i);}
+
+                for(int i=0;i<example.collision_objects.m;i++){
+                    MPM_COLLISION_OBJECT<TV>* o=example.collision_objects(i);
+                    if(o->Phi(X,example.time)<0){
+                        example.particles.X(p)=o->Get_Implicit_Object(example.time)->Closest_Point_On_Boundary(X);
+                        break;}}
             };
         
         if(example.rk_particle_order){
