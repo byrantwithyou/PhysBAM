@@ -18,10 +18,9 @@ if [ "X$FULL" = "X1" ] ; then
     done | xargs -P 2 -n 1 -d '\n' bash -c
 fi
 
-while true ; do
-    echo ../../fourier-apic/region-vort $NAME/apic 7 -2 8.8 2 > $NAME/apic.log
-    echo ../../fourier-apic/region-vort $NAME/flip 4.6 -2 6.4 2 > $NAME/flip.log
-done | xargs -P 2 -n 1 -d '\n' bash -c
+../../fourier-apic/region-vort $NAME/apic 4.6 -2 6.4 2 > $NAME/apic.log &
+../../fourier-apic/region-vort $NAME/flip 4.6 -2 6.4 2 > $NAME/flip.log &
+wait
 
 for a in apic flip ; do
     grep -o "window vorticity:[^<]\+" $NAME/$a.log | sed "s/.\+(\(.\+\))/\1/g" > $NAME/$a-vort
