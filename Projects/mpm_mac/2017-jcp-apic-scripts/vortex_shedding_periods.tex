@@ -1,0 +1,23 @@
+\documentclass[class=minimal,border=0pt]{standalone}
+\usepackage{pgfplots}
+
+\begin{document}
+\pgfplotsset{width=10cm,height=8cm,compat=1.13}
+\begin{tikzpicture}
+\begin{axis}[
+    enlargelimits=false,
+    legend cell align=left,
+    xlabel={Interval index},
+    ylabel={Period (seconds)},
+    xmax=90,
+    legend entries={APIC, FLIP},
+    legend pos=south east,
+    legend style={fill=none,draw=none}
+]
+\draw [thick,dotted, draw=red] (axis cs: -1,AAAAAA) -- (axis cs: 1000,AAAAAA);
+\addplot[solid,color=red] table[x expr=\coordindex, y index=0]{apic-period};
+\draw [thick,dotted, draw=green] (axis cs: -1,FFFFFF) -- (axis cs: 1000,FFFFFF);
+\addplot[solid,color=green] table[x expr=\coordindex, y index=0]{flip-period};
+\end{axis}
+\end{tikzpicture}
+\end{document}

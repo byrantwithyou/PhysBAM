@@ -1,0 +1,13 @@
+\documentclass[class=minimal,border=0pt]{standalone}
+\usepackage{pgfplots}
+
+\begin{document}
+\pgfplotsset{width=10cm,height=8cm,compat=1.13}
+\begin{tikzpicture}
+\node[anchor=south west,inner sep=0] (image) at (0,0) {\includegraphics[width=\textwidth]{XXXXXX}};
+\begin{scope}[x={(image.south east)},y={(image.north west)}]
+    \draw[red,ultra thick,fill=red] (0.2875,-0.01) rectangle (0.375,0);
+    \draw[red,ultra thick,fill=red] (0.2875,1) rectangle (0.375,1.01);
+\end{scope}
+\end{tikzpicture}
+\end{document}
