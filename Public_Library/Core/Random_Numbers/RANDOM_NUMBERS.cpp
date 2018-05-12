@@ -241,6 +241,7 @@ Get_Twist(const T& a)
 #define IHm(T,m) IHmn(T,m,1);IHmn(T,m,2);IHmn(T,m,3);IHmn(T,m,4);IHmn(T,m,5);IHmn(T,m,6)
 #define IH(T) IHm(T,1);IHm(T,2);IHm(T,3);IHm(T,4);IHm(T,5);IHm(T,6)
 #define INST(T,d) \
+    template VECTOR<T,d> RANDOM_NUMBERS<T>::Get_Uniform_Vector<d>(const T,const T); \
     template VECTOR<T,d> RANDOM_NUMBERS<T>::Get_Uniform_Vector<d>(VECTOR<T,d> const&,VECTOR<T,d> const&); \
     template void RANDOM_NUMBERS<T>::Fill_Uniform<VECTOR<T,d> >(ARRAY_BASE<T,VECTOR<T,d> >&,T,T);
 
