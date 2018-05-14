@@ -530,7 +530,7 @@ Add_Source(const TV& X0,const TV& n,IMPLICIT_OBJECT<TV>* io,
     T mass=density*volume;
     // NOTE: assumes initial particles are already added.
     source->Seed_Points(particles.X);
-    Add_Callbacks(false,"time-step",[=](){
+    Add_Callbacks(false,"move-particles",[=](){
             ARRAY<TV> X,V;
             ARRAY<MATRIX<T,TV::m> > dV;
             source->Seed(time,dt,X,V,&dV);
