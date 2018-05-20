@@ -3,4 +3,6 @@
 Import('env Automatic_Program')
 env=env.Copy(USE_GEOMETRY=1)
 env.Append(LIBS=['quadmath']);
-Automatic_Program(env,"ccd",["main.cpp"])
+Automatic_Program(env,"VertexFaceError2D",["VERTEX_FACE_ERROR_2D.cpp"])
+Automatic_Program(env,"PrefixReader",["PREFIX_READER.cpp"])
+Automatic_Program(env,"BinaryOperatorError",["BINARY_OPERATOR_ERROR.cpp"])
