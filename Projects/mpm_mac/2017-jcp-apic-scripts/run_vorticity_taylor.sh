@@ -2,6 +2,12 @@
 
 NAME=vort-taylor
 
+POSUPDATE=""
+if [ ! -z $1 ]; then
+    NAME=$NAME-$1
+    POSUPDATE="-pos_update $1"
+fi
+
 RES=64
 FULL=1 # Set to 1 for a full rebuild; 0 to skip rerunning the simulations
 
@@ -22,7 +28,7 @@ if [ "X$FULL" = "X1" ] ; then
         echo $ARGS $DT -affine ${opt[$o]} -o $NAME/apic-${opt_name[$o]}
         echo $ARGS $DT -no_affine ${opt[$o]} -flip 1 -o $NAME/flip-${opt_name[$o]}
         for xo in "${xpic_orders[@]}" ; do
-            echo $ARGS $DT -no_affine ${opt[$o]} -xpic $xo -o $NAME/xpic$xo-${opt_name[$o]}
+            echo $ARGS $DT $POSUPDATE -no_affine ${opt[$o]} -xpic $xo -o $NAME/xpic$xo-${opt_name[$o]}
         done
     done | xargs -P 16 -n 1 -d '\n' bash -c
 fi

@@ -54,6 +54,7 @@ public:
     using BASE::clamp_particles;
     using BASE::particle_vort;
     using BASE::xpic;
+    using BASE::position_update;
 
     int test_number;
     int resolution;

@@ -154,6 +154,8 @@ public:
     bool use_periodic_test_shift;
     TV_INT periodic_test_shift;
     bool use_viscosity;
+    // d: default; c: always use pic update; p: use pic in the first step only
+    char position_update;
     
     // debugging
     DEBUG_PARTICLES<TV>& debug_particles;

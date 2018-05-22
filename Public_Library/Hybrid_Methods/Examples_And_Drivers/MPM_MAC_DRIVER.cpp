@@ -1744,7 +1744,7 @@ Move_Particles()
                         break;}}
             };
         
-        if(example.rk_particle_order){
+        if(example.rk_particle_order && example.position_update=='d'){
             LINEAR_INTERPOLATION_MAC<TV,T> li(example.grid);
 #pragma omp for
             for(int p=0;p<example.particles.X.m;p++)
@@ -1753,14 +1753,14 @@ Move_Particles()
                     for(RUNGEKUTTA<TV> rk(example.particles.X(p),example.rk_particle_order,example.dt,0);rk.Valid();rk.Next())
                         example.particles.X(p)+=example.dt*li.Clamped_To_Array(ph.velocity,example.particles.X(p));
                     Clip(p);}}
-        else if(example.flip){
+        else if(example.flip && example.position_update=='d'){
             for(PHASE_ID i(0);i<example.phases.m;i++){
                 PHASE& ph=example.phases(i);
                 ph.gather_scatter->template Gather_Parallel<int>(false,
                     [this,&ph](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,int data)
                     {example.particles.X(p)(it.Index().axis)+=example.dt*it.Weight()*ph.velocity(it.Index());},
                     Clip);}}
-        else if(example.xpic){
+        else if(example.xpic && example.position_update=='d'){
             for(PHASE_ID i(0);i<example.phases.m;i++){
                 PHASE& ph=example.phases(i);
 #pragma omp for
@@ -1777,6 +1777,8 @@ Move_Particles()
                 if(example.particles.valid(p)){
                     example.particles.X(p)+=example.dt*example.particles.V(p);
                     Clip(p);}}
+        if(example.position_update=='p')
+            example.position_update='d';
 
 #ifdef USE_OPENMP
         invalidate_lists(omp_get_thread_num()).Exchange(invalidate_list);
