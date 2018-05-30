@@ -2,9 +2,11 @@
 // Copyright 2010.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Data_Structures/HASHTABLE.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>
+#include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <Geometry/Intersections/RAY_POINT_SIMPLEX_1D_INTERSECTION.h>
 #include <Geometry/Intersections/RAY_SEGMENT_2D_INTERSECTION.h>
@@ -80,7 +82,9 @@ Initialize_Collision_Aware_Face_Iterator(const ARRAY<bool,TV_INT>& outside_fluid
         cfi.face=iterator.Full_Index();
 
         bool ray_intersection=false;
-        RAY<TV> ray(grid.X(second_cell_index),-TV::Axis_Vector(cfi.face.axis),true);ray.t_max=grid.dX(cfi.face.axis);ray.semi_infinite=false;
+        RAY<TV> ray(grid.X(second_cell_index),-TV::Axis_Vector(cfi.face.axis),true);
+        ray.t_max=grid.dX(cfi.face.axis);
+        ray.semi_infinite=false;
         for(int i=cfi.simplices.m-1;i>=0;i--){
             COLLISION_GEOMETRY<TV>* body=coupling_bodies(cfi.simplices(i).x);
             typename BASIC_SIMPLEX_POLICY<TV,TV::m-1>::SIMPLEX simplex=body->World_Space_Simplex(cfi.simplices(i).y);

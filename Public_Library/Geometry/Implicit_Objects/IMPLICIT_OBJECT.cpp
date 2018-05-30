@@ -2,9 +2,6 @@
 // Copyright 2002-2006, Ronald Fedkiw, Sergey Koltakov, Eran Guendelman, Geoffrey Irving, Neil Molino, Andrew Selle, Rachel Weinstein.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Core/Math_Tools/RANGE.h>
-#include <Core/Matrices/MATRIX_3X3.h>
-#include <Core/Matrices/SYMMETRIC_MATRIX.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
 #include <Geometry/Basic_Geometry/RAY.h>

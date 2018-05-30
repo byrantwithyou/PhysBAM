@@ -7,17 +7,13 @@
 #ifndef __GRID_BASED_COLLISION_GEOMETRY_UNIFORM__
 #define __GRID_BASED_COLLISION_GEOMETRY_UNIFORM__
 
-#include <Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
-#include <Geometry/Basic_Geometry/RAY.h>
-#include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
-#include <Geometry/Level_Sets/LEVELSET.h>
-#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_MAC_HELPER.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY.h>
-#include <Incompressible/Collisions_And_Interactions/OBJECTS_IN_CELL.h>
 namespace PhysBAM{
 
 template<class TV> class COLLISION_GEOMETRY;
+template<class TV> class RAY;
 
 template <class TV>
 class GRID_BASED_COLLISION_GEOMETRY_UNIFORM:public GRID_BASED_COLLISION_GEOMETRY<TV>

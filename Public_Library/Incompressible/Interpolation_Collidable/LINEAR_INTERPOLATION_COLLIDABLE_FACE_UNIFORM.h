@@ -9,6 +9,7 @@
 
 #include <Tools/Interpolation/LINEAR_INTERPOLATION.h>
 #include <Grid_PDE/Interpolation/INTERPOLATION_UNIFORM.h>
+#include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Incompressible/Interpolation_Collidable/FACE_LOOKUP_COLLIDABLE_UNIFORM.h>
 namespace PhysBAM{
 

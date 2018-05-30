@@ -8,6 +8,7 @@
 #include <Core/Matrices/SYMMETRIC_MATRIX.h>
 #include <Tools/Auto_Diff/AUTO_HESS_EXT.h>
 #include <Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
+#include <Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_2D.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>

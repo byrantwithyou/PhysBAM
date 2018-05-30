@@ -7,13 +7,10 @@
 #ifndef __IMPLICIT_OBJECT_DILATE__
 #define __IMPLICIT_OBJECT_DILATE__
 
-#include <Core/Math_Tools/RANGE.h>
-#include <Core/Matrices/MATRIX_POLICY.h>
-#include <Core/Utilities/TYPE_UTILITIES.h>
-#include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
-#include <Geometry/Topology_Based_Geometry/STRUCTURE.h>
 namespace PhysBAM{
+
+template<class TV> class RANGE;
 
 template<class TV>
 class IMPLICIT_OBJECT_DILATE:public IMPLICIT_OBJECT<TV>

@@ -8,11 +8,10 @@
 #define __IMPLICIT_OBJECT__
 
 #include <Core/Math_Tools/RANGE.h>
-#include <Core/Matrices/MATRIX_POLICY.h>
-#include <Core/Utilities/TYPE_UTILITIES.h>
-#include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Topology_Based_Geometry/STRUCTURE.h>
 namespace PhysBAM{
+
+template<class TV> class RAY;
 
 template<class TV>
 class IMPLICIT_OBJECT:public STRUCTURE<TV>

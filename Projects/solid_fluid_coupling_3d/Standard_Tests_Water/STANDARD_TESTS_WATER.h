@@ -32,6 +32,7 @@
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Joints/JOINT_FUNCTION.h>
 #include <Rigids/Joints/POINT_JOINT.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>

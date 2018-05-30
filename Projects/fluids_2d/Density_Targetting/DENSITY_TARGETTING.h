@@ -11,6 +11,7 @@
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/NODE_ITERATOR.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.h>
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include <Dynamics/Solids_And_Fluids/SPH_CALLBACKS.h>

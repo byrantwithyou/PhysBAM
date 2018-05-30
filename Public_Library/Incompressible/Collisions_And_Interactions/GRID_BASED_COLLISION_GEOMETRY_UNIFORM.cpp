@@ -9,6 +9,7 @@
 #include <Grid_PDE/Interpolation/FACE_LOOKUP_UNIFORM.h>
 #include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>
+#include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <Geometry/Intersections/BOX_POINT_SIMPLEX_1D_INTERSECTION.h>
@@ -21,6 +22,7 @@
 #include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
+#include <Incompressible/Collisions_And_Interactions/OBJECTS_IN_CELL.h>
 #include <Incompressible/Collisions_And_Interactions/RIGID_BODY_RASTERIZATION_UNIFORM.h>
 using namespace PhysBAM;
 //#####################################################################

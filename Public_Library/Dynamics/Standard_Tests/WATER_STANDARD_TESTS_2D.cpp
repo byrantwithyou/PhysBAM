@@ -8,6 +8,7 @@
 #include <Core/Matrices/FRAME.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_PDE/Boundaries/BOUNDARY.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>

@@ -11,6 +11,7 @@
 #include <Grid_PDE/Advection/ADVECTION.h>
 #include <Grid_PDE/Interpolation/AVERAGING_UNIFORM.h>
 #include <Geometry/Basic_Geometry/RAY.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Incompressible/Advection_Collidable/Grids_Uniform_Advection_Collidable/ADVECTION_COLLIDABLE_UNIFORM_FORWARD.h>
 #include <Incompressible/Interpolation_Collidable/AVERAGING_COLLIDABLE_UNIFORM.h>
 #include <Incompressible/Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM.h>

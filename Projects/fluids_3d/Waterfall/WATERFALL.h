@@ -11,6 +11,7 @@
 #include <Core/Random_Numbers/NOISE.h>
 #include <Grid_Tools/Grids/NODE_ITERATOR.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Incompressible/Boundaries/BOUNDARY_OPEN_CALLBACKS.h>
 #include <Dynamics/Incompressible_Flows/SPH_EVOLUTION_UNIFORM.h>
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>

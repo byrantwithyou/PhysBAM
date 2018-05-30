@@ -14,6 +14,7 @@
 #include <Geometry/Intersections/BOX_POLYGON_INTERSECTION_AREA.h>
 #include <Geometry/Level_Sets/FAST_MARCHING_METHOD_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 #include <Incompressible/Advection_Collidable/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_UNIFORM.h>
 #include <Incompressible/Collisions_And_Interactions/CUT_CELL_COMPUTATIONS.h>
@@ -102,7 +103,8 @@ template<class TV> void SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<TV>::
 Get_Neumann_Data(const TV& location,const T max_distance,TV& normal_direction,T& object_velocity_normal_component,TV& reflected_point) const
 {
     assert(!euler.timesplit || !thinshell);
-    T distance;TV boundary_point;COLLISION_GEOMETRY_ID body_id;int simplex_id;
+    T distance;TV boundary_point;
+    COLLISION_GEOMETRY_ID body_id;int simplex_id;
     boundary_point=collision_bodies_affecting_fluid->collision_geometry_collection.Closest_Boundary_Point(location,max_distance,distance,body_id,simplex_id);
     const COLLISION_GEOMETRY<TV>& collision_body=collision_bodies_affecting_fluid->collision_geometry_collection(body_id);
     reflected_point=location+((T)2*(boundary_point-location));

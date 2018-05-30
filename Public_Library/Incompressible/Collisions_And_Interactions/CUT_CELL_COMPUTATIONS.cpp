@@ -7,6 +7,8 @@
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/GRID.h>
+#include <Geometry/Basic_Geometry/RAY.h>
+#include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Incompressible/Collisions_And_Interactions/CUT_CELL.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Incompressible/Collisions_And_Interactions/OBJECTS_IN_CELL.h>

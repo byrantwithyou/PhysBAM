@@ -4,6 +4,7 @@
 //#####################################################################
 // Class FLUID_COLLISION_BODY_INACCURATE_UNION
 //##################################################################### 
+#include <Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>
@@ -91,16 +92,21 @@ Initialize_Grid_Structures()
 {
     collision_bodies.collision_geometry_collection.Update_Bounding_Boxes();
     // phi and velocity
-    phi.Resize(grid.Cell_Indices(3),no_init);phi.Fill(10*grid.dX.Min());
-    face_velocities.Resize(grid,3,false,false);face_velocities.Fill((T)0);
-    face_velocities_set.Resize(grid,3,false,false);face_velocities_set.Fill(false);
+    phi.Resize(grid.Cell_Indices(3),no_init);
+    phi.Fill(10*grid.dX.Min());
+    face_velocities.Resize(grid,3,false,false);
+    face_velocities.Fill((T)0);
+    face_velocities_set.Resize(grid,3,false,false);
+    face_velocities_set.Fill(false);
     T_FACE_ARRAYS_INT face_velocities_count(grid,3);
     T_FACE_ARRAYS_COLLISION_GEOMETRY_ID face_operations(grid,3);
-    for(COLLISION_GEOMETRY_ID i(0);i<collision_bodies.collision_geometry_collection.bodies.m;i++)if(collision_bodies.Is_Active(i) && collision_bodies.collision_geometry_collection.bodies(i)->active)
-        Initialize_Grid_Structures_Subobject(face_velocities_count,face_operations,i,typename GRID<TV>::GRID_TAG());
-    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) if(face_velocities_count.Component(iterator.Axis())(iterator.Face_Index())){
-        face_velocities.Component(iterator.Axis())(iterator.Face_Index())/=face_velocities_count.Component(iterator.Axis())(iterator.Face_Index());
-        face_velocities_set.Component(iterator.Axis())(iterator.Face_Index())=true;}
+    for(COLLISION_GEOMETRY_ID i(0);i<collision_bodies.collision_geometry_collection.bodies.m;i++)
+        if(collision_bodies.Is_Active(i) && collision_bodies.collision_geometry_collection.bodies(i)->active)
+            Initialize_Grid_Structures_Subobject(face_velocities_count,face_operations,i,typename GRID<TV>::GRID_TAG());
+    for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next())
+        if(face_velocities_count.Component(iterator.Axis())(iterator.Face_Index())){
+            face_velocities.Component(iterator.Axis())(iterator.Face_Index())/=face_velocities_count.Component(iterator.Axis())(iterator.Face_Index());
+            face_velocities_set.Component(iterator.Axis())(iterator.Face_Index())=true;}
 }
 //#####################################################################
 // Function Initialize_Grid_Structures_Subobject
@@ -115,11 +121,142 @@ Initialize_Grid_Structures_Subobject(T_FACE_ARRAYS_INT& face_velocities_count,T_
         T phi_value=collision_body.Implicit_Geometry_Extended_Value(iterator.Location());
         phi(iterator.Cell_Index())=min(phi_value,phi(iterator.Cell_Index()));
         if(phi_value<0) for(int axis=0;axis<TV::m;axis++){
-            TV_INT face1=iterator.First_Face_Index(axis),face2=iterator.Second_Face_Index(axis);
-            if(face_operations.Component(axis)(face1)!=subobject){face_operations.Component(axis)(face1)=subobject;
-                face_velocities.Component(axis)(face1)=collision_body.Pointwise_Object_Velocity(grid.Face(FACE_INDEX<TV::m>(axis,face1)))[axis];face_velocities_count.Component(axis)(face1)++;}
-            if(face_operations.Component(axis)(face2)!=subobject){face_operations.Component(axis)(face2)=subobject;
-                face_velocities.Component(axis)(face2)=collision_body.Pointwise_Object_Velocity(grid.Face(FACE_INDEX<TV::m>(axis,face2)))[axis];face_velocities_count.Component(axis)(face2)++;}}}
+                TV_INT face1=iterator.First_Face_Index(axis),face2=iterator.Second_Face_Index(axis);
+                if(face_operations.Component(axis)(face1)!=subobject){face_operations.Component(axis)(face1)=subobject;
+                    face_velocities.Component(axis)(face1)=collision_body.Pointwise_Object_Velocity(grid.Face(FACE_INDEX<TV::m>(axis,face1)))[axis];
+                    face_velocities_count.Component(axis)(face1)++;}
+                if(face_operations.Component(axis)(face2)!=subobject){face_operations.Component(axis)(face2)=subobject;
+                    face_velocities.Component(axis)(face2)=collision_body.Pointwise_Object_Velocity(grid.Face(FACE_INDEX<TV::m>(axis,face2)))[axis];
+                    face_velocities_count.Component(axis)(face2)++;}}}
+}
+//#####################################################################
+// Function Pointwise_Object_Velocity
+//#####################################################################
+template<class TV> TV FLUID_COLLISION_BODY_INACCURATE_UNION<TV>::
+Pointwise_Object_Velocity(const int aggregate_id,const TV& X) const
+{
+    T_BLOCK block(grid,X);
+    if(!Block_Valid(block,typename GRID<TV>::GRID_TAG())) return TV();
+    return T_LINEAR_INTERPOLATION_MAC_HELPER::Interpolate_Face_Normalized(block,face_velocities,face_velocities_set,X);
+}
+//#####################################################################
+// Function Pointwise_Object_Velocity
+//#####################################################################
+template<class TV> TV FLUID_COLLISION_BODY_INACCURATE_UNION<TV>::
+Pointwise_Object_Velocity(const TV& X) const
+{
+    return Pointwise_Object_Velocity(0,X);
+}
+//#####################################################################
+// Function Pointwise_Object_Pseudo_Velocity
+//#####################################################################
+template<class TV> TV FLUID_COLLISION_BODY_INACCURATE_UNION<TV>::
+Pointwise_Object_Pseudo_Velocity(const int aggregate_id,const TV& X,const int state1,const int state2) const
+{
+    return Pointwise_Object_Velocity(0,X);
+}
+//#####################################################################
+// Function Latest_Simplex_Crossover
+//#####################################################################
+template<class TV> bool FLUID_COLLISION_BODY_INACCURATE_UNION<TV>::
+Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,
+    TV& weights,int& simplex_id,POINT_SIMPLEX_COLLISION_TYPE& returned_collision_type) const
+{
+    return false;
+}
+//#####################################################################
+// Function Any_Simplex_Crossover
+//#####################################################################
+template<class TV> bool FLUID_COLLISION_BODY_INACCURATE_UNION<TV>::
+Any_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt) const
+{
+    return levelset(end_X)<=0;
+}
+//#####################################################################
+// Function Get_Body_Penetration
+//#####################################################################
+template<class TV> bool FLUID_COLLISION_BODY_INACCURATE_UNION<TV>::
+Get_Body_Penetration(const TV& start_X,const TV& end_X,const T contour_value,const T dt,T& hit_time,int& simplex_id,T& start_phi,T& end_phi,TV& end_body_normal,
+    TV& body_velocity) const
+{
+    end_phi=levelset(end_X);
+    if(end_phi>contour_value) return false;
+    start_phi=levelset(start_X);
+    end_body_normal=levelset.Normal(end_X);
+    body_velocity=Pointwise_Object_Velocity(0,end_X);
+    hit_time=dt;
+    return true;
+}
+//#####################################################################
+// Function Number_Of_Simplices
+//#####################################################################
+template<class TV> int FLUID_COLLISION_BODY_INACCURATE_UNION<TV>::
+Number_Of_Simplices() const
+{
+    return 0;
+}
+//#####################################################################
+// Function Push_Out_Point
+//#####################################################################
+template<class TV> bool FLUID_COLLISION_BODY_INACCURATE_UNION<TV>::
+Push_Out_Point(TV& X,const T collision_distance,T& distance) const
+{
+    T current_distance=levelset(X);
+    if(current_distance<collision_distance){
+        X+=(collision_distance-current_distance)*levelset.Normal(X);
+        distance=current_distance;
+        return true;}
+    return false;
+}
+//#####################################################################
+// Function Inside_Any_Simplex
+//#####################################################################
+template<class TV> bool FLUID_COLLISION_BODY_INACCURATE_UNION<TV>::
+Inside_Any_Simplex(const TV& location,int& simplex_id) const
+{
+    return levelset(location)<=contour_value;
+}
+//#####################################################################
+// Function Simplex_Closest_Non_Intersecting_Point
+//#####################################################################
+template<class TV> bool FLUID_COLLISION_BODY_INACCURATE_UNION<TV>::
+Simplex_Closest_Non_Intersecting_Point(RAY<TV>& ray) const
+{
+    auto implicit_object_on_a_ray=[this,&ray](T x){return levelset(ray.Point(x));};
+
+    if(implicit_object_on_a_ray(0)<=0){
+        ray.t_max=0;
+        return true;}
+    if(implicit_object_on_a_ray(ray.t_max)>0) return false;
+    ray.t_max=Bisection_Secant_Root(implicit_object_on_a_ray,(T)0,ray.t_max,(T).001*grid.dX.Min());
+    ray.t_max=max((T)0,ray.t_max-(T).01*grid.dX.Min()); // TODO: probably make this shift a parameter, or find an entirely different cleaner way
+    return true;
+}
+//#####################################################################
+// Function Simplex_Intersection
+//#####################################################################
+template<class TV> bool FLUID_COLLISION_BODY_INACCURATE_UNION<TV>::
+Simplex_Intersection(RAY<TV>& ray) const
+{
+    auto implicit_object_on_a_ray=[this,&ray](T x){return levelset(ray.Point(x));};
+
+    if(implicit_object_on_a_ray(0)<=0){
+        ray.t_max=0;
+        return true;}
+    if(implicit_object_on_a_ray(ray.t_max)>0) return false;
+    ray.t_max=Bisection_Secant_Root(implicit_object_on_a_ray,(T)0,ray.t_max,(T).001*grid.dX.Min());
+    return true;
+}
+//#####################################################################
+// Function Simplex_Closest_Point_On_Boundary
+//#####################################################################
+template<class TV> TV FLUID_COLLISION_BODY_INACCURATE_UNION<TV>::
+Simplex_Closest_Point_On_Boundary(const TV& location,const T max_distance,
+    const T thickness_over_2,int* simplex_id,T* returned_distance) const
+{
+    T distance=levelset(location);
+    if(returned_distance) *returned_distance=distance;
+    return location-distance*levelset.Normal(location);
 }
 //##################################################################### 
 namespace PhysBAM
