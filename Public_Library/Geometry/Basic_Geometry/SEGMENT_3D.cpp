@@ -182,15 +182,16 @@ Edge_Edge_Collision(const SEGMENT_3D<T>& segment,const TV& v1,const TV& v2,const
     CUBIC<double> cubic((double)TV::Dot_Product(Na,APv),(double)TV::Dot_Product(Nv,APv)+TV::Dot_Product(Na,APo),
                                        (double)TV::Dot_Product(No,APv)+TV::Dot_Product(Nv,APo),(double)TV::Dot_Product(No,APo));
     double xmin=0,xmax=1.000001;
-    int num_intervals=0;VECTOR<INTERVAL<double>,3> intervals;
-    cubic.Compute_Intervals(xmin,xmax,num_intervals,intervals(0),intervals(1),intervals(2));
+    int num_intervals=0;
+    INTERVAL<double> intervals[3];
+    cubic.Compute_Intervals(xmin,xmax,num_intervals,intervals);
     if(!num_intervals) return false;
 
     // find and check roots
     T distance;
     ITERATIVE_SOLVER<double> iterative_solver;iterative_solver.tolerance=1e-14;
     for(int k=0;k<num_intervals;k++){
-        collision_time=dt*(T)iterative_solver.Bisection_Secant_Root(cubic,intervals(k).min_corner,intervals(k).max_corner);
+        collision_time=dt*(T)iterative_solver.Bisection_Secant_Root(cubic,intervals[k].min_corner,intervals[k].max_corner);
         SEGMENT_3D<T> segment2(X.x+collision_time*v1,X.y+collision_time*v2);
         if(segment2.Edge_Edge_Interaction(SEGMENT_3D<T>(segment.X.x+collision_time*v3,segment.X.y+collision_time*v4),v1,v2,v3,v4,collision_thickness,distance,normal,weights,
                 false,small_number,exit_early)) return true;}

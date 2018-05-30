@@ -52,8 +52,8 @@ public:
         else if(quadratic.roots==-1){
             LOG::cout<<"VERY SINGULAR ON QUADRATIC SOLVE"<<std::endl;
             collision_time=0;}
-        else if(quadratic.roots==1)collision_time=(T)quadratic.root1;
-        else collision_time=min((T)quadratic.root1,(T)quadratic.root2);
+        else if(quadratic.roots==1)collision_time=(T)quadratic.root[0];
+        else collision_time=min((T)quadratic.root[0],(T)quadratic.root[1]);
         POINT_2D<T> new_point(*this+collision_time*V_edges(0));
         T distance;
         return new_point.Edge_Edge_Interaction(POINT_2D<T>(point+collision_time*V_edges(1)),V_edges,collision_thickness,distance,normal,weights,true,small_number,exit_early);

@@ -342,8 +342,8 @@ template<class T> inline VECTOR<T,2> Principal_Curvatures_Helper(const VECTOR<T,
     QUADRATIC<T> quadratic(-1,trace,sqr(M(1,1))-M(0,1)*M(1,2)+sqr(M(2,1))-M(0,1)*M(2,3)+sqr(M(2,2))-M(1,2)*M(2,3));
     quadratic.Compute_Roots();
     if(quadratic.roots == 0) (T).5*VECTOR<T,2>(trace,trace);
-    else if(quadratic.roots == 1) return VECTOR<T,2>(quadratic.root1,quadratic.root1);
-    return VECTOR<T,2>(quadratic.root1,quadratic.root2);
+    else if(quadratic.roots == 1) return VECTOR<T,2>(quadratic.root[0],quadratic.root[0]);
+    return VECTOR<T,2>(quadratic.root[0],quadratic.root[1]);
 }
 //#####################################################################
 // Function Principal_Curvatures

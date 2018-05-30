@@ -42,8 +42,8 @@ Principal_Curvatures_Helper(VECTOR<T,2>& c,const AH& h)
     QUADRATIC<T> quadratic(-1,trace,sqr(M(0,2))+sqr(M(0,1))+sqr(M(1,2))-M(1,1)*M(0,0)-M(2,2)*M(0,0)-M(2,2)*M(1,1));
     quadratic.Compute_Roots();
     if(quadratic.roots == 0) c=(T).5*VECTOR<T,2>(trace,trace);
-    else if(quadratic.roots == 1) c=VECTOR<T,2>(quadratic.root1,quadratic.root1);
-    else c=VECTOR<T,2>(quadratic.root1,quadratic.root2);
+    else if(quadratic.roots == 1) c=VECTOR<T,2>(quadratic.root[0],quadratic.root[0]);
+    else c=VECTOR<T,2>(quadratic.root[0],quadratic.root[1]);
 }
 
 template<class TV,class HELPER>

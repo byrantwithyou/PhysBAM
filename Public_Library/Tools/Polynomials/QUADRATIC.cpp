@@ -10,7 +10,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> QUADRATIC<T>::
 QUADRATIC()
-    :a(1),b(0),c(0),roots(1),root1(0),root2(0)
+    :a(1),b(0),c(0),roots(1),root{}
 {
 }
 //#####################################################################
@@ -18,7 +18,7 @@ QUADRATIC()
 //#####################################################################
 template<class T> QUADRATIC<T>::
 QUADRATIC(const T a_input,const T b_input,const T c_input)
-    :a(a_input),b(b_input),c(c_input),roots(0),root1(0),root2(0)
+    :a(a_input),b(b_input),c(c_input),roots(0),root{}
 {
 }
 //#####################################################################
@@ -60,14 +60,18 @@ Compute_Roots()
         if(b==0){
             if(c==0){roots=-1;return;} // function is identically zero - a=b=c=0 - always a root!
             else{roots=0;return;}} // when a=b=0 and c != 0, there are no roots
-        else{roots=1;root1=-c/b;return;}} // when a=0 and b != 0, there is one root
+        else{roots=1;root[0]=-c/b;return;}} // when a=0 and b != 0, there is one root
     else{ // a != 0
         T d=Discriminant();
         if(d<0){roots=0;return;} // no real roots
-        else if(d==0){roots=1;root1=-b/(2*a);return;} // one root
+        else if(d==0){roots=1;root[0]=-b/(2*a);return;} // one root
         else{ // d > 0 - two real roots
-            T radical;if(b>0) radical=-b-sqrt(d);else radical=-b+sqrt(d);
-            roots=2;root1=radical/(2*a);root2=2*c/radical;if(root1>root2) exchange(root1,root2);return;}}
+            T radical;
+            if(b>0) radical=-b-sqrt(d);
+            else radical=-b+sqrt(d);
+            roots=2;root[0]=radical/(2*a);root[1]=2*c/radical;
+            if(root[0]>root[1]) exchange(root[0],root[1]);
+            return;}}
 }
 //#####################################################################
 // Function Compute_Roots_In_Interval
@@ -76,11 +80,11 @@ template<class T> void QUADRATIC<T>::
 Compute_Roots_In_Interval(const T xmin,const T xmax)
 {
     Compute_Roots();
-    if(roots==1){if(root1<xmin || root1>xmax) roots=0;}
+    if(roots==1){if(root[0]<xmin || root[0]>xmax) roots=0;}
     else if(roots==2){
-        if(root2<xmin || root2>xmax) roots--;
-        if(root1<xmin || root1>xmax){
-            root1=root2;
+        if(root[1]<xmin || root[1]>xmax) roots--;
+        if(root[0]<xmin || root[0]>xmax){
+            root[0]=root[1];
             roots--;}}
 }
 namespace PhysBAM{

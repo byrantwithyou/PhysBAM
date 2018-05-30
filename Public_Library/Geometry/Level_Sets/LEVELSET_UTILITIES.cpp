@@ -18,7 +18,7 @@ Theta_Quadratic(const T phi_left_left,const T phi_left,const T phi_right,const T
 {
     T one_over_dx=1/dx;
     QUADRATIC<T> quadratic((T)-.5*(2*phi_left-phi_right-phi_left_left)*sqr(one_over_dx),(T)-.5*(-phi_right+phi_left_left)*one_over_dx,phi_left);
-    quadratic.Compute_Roots_In_Interval(0,dx);assert(quadratic.roots==1);return quadratic.root1*one_over_dx;
+    quadratic.Compute_Roots_In_Interval(0,dx);assert(quadratic.roots==1);return quadratic.root[0]*one_over_dx;
 }
 //#####################################################################
 // Function Theta_Cubic
@@ -29,7 +29,7 @@ Theta_Cubic(const T phi_left_left,const T phi_left,const T phi_right,const T phi
     T one_over_dx=1/dx,one_over_dx_squared=sqr(one_over_dx);
     CUBIC<T> cubic(((T)1/6)*(3*(phi_left-phi_right)-phi_left_left+phi_right_right)*one_over_dx_squared*one_over_dx,(T).5*(-2*phi_left+phi_right+phi_left_left)*one_over_dx_squared,
         ((T)-.5*phi_left+phi_right-((T)1/3)*phi_left_left-((T)1/6)*phi_right_right)*one_over_dx,phi_left);
-    cubic.Compute_Roots_In_Interval(0,dx);assert(cubic.roots==1);return cubic.root1*one_over_dx;
+    cubic.Compute_Roots_In_Interval(0,dx);assert(cubic.roots==1);return cubic.root[0]*one_over_dx;
 }
 //#####################################################################
 // Function Negative_Cell_Fraction

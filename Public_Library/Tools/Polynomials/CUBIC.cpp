@@ -24,7 +24,7 @@ using ::std::sqrt;
 //#####################################################################
 template<class T> CUBIC<T>::
 CUBIC(const T c3_input,const T c2_input,const T c1_input,const T c0_input)
-    :c3(c3_input),c2(c2_input),c1(c1_input),c0(c0_input),roots(0),error_tolerance((T)1e-14),number_of_extrema(0)
+    :c3(c3_input),c2(c2_input),c1(c1_input),c0(c0_input),roots(0),error_tolerance((T)1e-14)
 {}
 //#####################################################################
 // Function Compute
@@ -51,13 +51,13 @@ template<class T> void CUBIC<T>::
 Compute_Roots_Noniterative_In_Interval(const T xmin,const T xmax)
 {
     Compute_Roots_Noniterative();
-    if(roots == 1){if(root1 < xmin || root1 > xmax) roots=0;}
+    if(roots == 1){if(root[0] < xmin || root[0] > xmax) roots=0;}
     else{ // roots=3
-        if(root3 < xmin || root1 > xmax){roots=0;return;}
-        if(root2 < xmin){if(root3 > xmax){roots=0;return;}else{roots=1;root1=root3;return;}}
-        if(root2 > xmax){if(root1 < xmin){roots=0;return;}else{roots=1;return;}}
-        if(root3 < xmax){if(root1 > xmin) return;else{roots=2;root1=root2;root2=root3;}}
-        if(root1 > xmin){roots=2;return;}else{roots=1;root1=root2;}}
+        if(root[2] < xmin || root[0] > xmax){roots=0;return;}
+        if(root[1] < xmin){if(root[2] > xmax){roots=0;return;}else{roots=1;root[0]=root[2];return;}}
+        if(root[1] > xmax){if(root[0] < xmin){roots=0;return;}else{roots=1;return;}}
+        if(root[2] < xmax){if(root[0] > xmin) return;else{roots=2;root[0]=root[1];root[1]=root[2];}}
+        if(root[0] > xmin){roots=2;return;}else{roots=1;root[0]=root[1];}}
 }
 //#####################################################################
 // Function Compute_Roots_Noniterative
@@ -65,7 +65,12 @@ Compute_Roots_Noniterative_In_Interval(const T xmin,const T xmax)
 template<class T> void CUBIC<T>::
 Compute_Roots_Noniterative()
 {
-    if(c3 == 0){QUADRATIC<T> quadratic(c2,c1,c0);quadratic.Compute_Roots();roots=quadratic.roots;root1=quadratic.root1;root2=quadratic.root2;return;}
+    if(c3 == 0){
+        QUADRATIC<T> quadratic(c2,c1,c0);
+        quadratic.Compute_Roots();
+        roots=quadratic.roots;
+        root[0]=quadratic.root[0];
+        root[1]=quadratic.root[1];}
     else{
         T one_over_c3=1/c3,a1=c2*one_over_c3,a2=c1*one_over_c3,a3=c0*one_over_c3;
         T Q=((T)1/9)*a1*a1-((T)1/3)*a2,R=a1*((T)1/27*a1*a1-((T)1/6)*a2)+(T).5*a3;
@@ -73,16 +78,16 @@ Compute_Roots_Noniterative()
         if(R2_minus_Q3 <= 0){ // three real roots
             roots=3;
             T theta=acos(R/sqrt(Q_Q_Q)),theta_over_3=((T)1/3)*theta,minus_two_sqrt_Q=(T)(-2)*sqrt(Q),minus_a1_over_3=(-(T)1/3)*a1;
-            root1=minus_two_sqrt_Q*cos(theta_over_3)+minus_a1_over_3;
-            root2=minus_two_sqrt_Q*cos(theta_over_3+(T)pi*2/3)+minus_a1_over_3;
-            root3=minus_two_sqrt_Q*cos(theta_over_3+(T)pi*4/3)+minus_a1_over_3;
-            exchange_sort(root1,root2,root3);}      
+            root[0]=minus_two_sqrt_Q*cos(theta_over_3)+minus_a1_over_3;
+            root[1]=minus_two_sqrt_Q*cos(theta_over_3+(T)pi*2/3)+minus_a1_over_3;
+            root[2]=minus_two_sqrt_Q*cos(theta_over_3+(T)pi*4/3)+minus_a1_over_3;
+            exchange_sort(root[0],root[1],root[2]);}      
         else{ // one real root
             roots=1;
-            root1=pow(sqrt(R2_minus_Q3)+abs(R),((T)1/3));
-            root1+=(T)Q/root1;
-            root1*=(R<(T)0)?(T)1:(T)-1;
-            root1-=((T)1/3)*a1;}}
+            root[0]=pow(sqrt(R2_minus_Q3)+abs(R),((T)1/3));
+            root[0]+=(T)Q/root[0];
+            root[0]*=(R<(T)0)?(T)1:(T)-1;
+            root[0]-=((T)1/3)*a1;}}
 }
 //#####################################################################
 // Function Compute_Roots
@@ -90,8 +95,8 @@ Compute_Roots_Noniterative()
 template<class T> void CUBIC<T>::
 Compute_Roots()
 {
-    root1=0;root2=0;root3=0; // initialize
-    if(c3 == 0){QUADRATIC<T> quadratic(c2,c1,c0);quadratic.Compute_Roots();roots=quadratic.roots;root1=quadratic.root1;root2=quadratic.root2;return;}
+    root[0]=0;root[1]=0;root[2]=0; // initialize
+    if(c3 == 0){QUADRATIC<T> quadratic(c2,c1,c0);quadratic.Compute_Roots();roots=quadratic.roots;root[0]=quadratic.root[0];root[1]=quadratic.root[1];return;}
     else{ // c3 != 0 - cubic - bound the sign changes, i.e. roots
         T bound=(T)1.01*max((T)3*abs(c2/c3),sqrt((T)3*abs(c1/c3)),pow((T)3*abs(c0/c3),(T)1/3));
         Compute_Roots_In_Interval(-bound,bound);}
@@ -100,25 +105,15 @@ Compute_Roots()
 // Function Compute_Roots_In_Interval
 //#####################################################################
 template<class T> void CUBIC<T>::
-Insert_Root(const T r)
-{
-    if(roots==0){roots=1;root1=r;}
-    else if(roots==1){roots=2;root2=r;}
-    else{roots=3;root3=r;}
-}
-//#####################################################################
-// Function Compute_Roots_In_Interval
-//#####################################################################
-template<class T> void CUBIC<T>::
 Insert_Root_In_Extrema_Interval(const T xmin,const T xmax)
 {
     T y0=Value(xmin),y1=Value(xmax);
-    if(!y0) Insert_Root(xmin);
-    else if(!y1) Insert_Root(xmax);
+    if(!y0) root[roots++]=xmin;
+    else if(!y1) root[roots++]=xmax;
     else if((y0>0)!=(y1>0)){
         ITERATIVE_SOLVER<T> iterative_solver;
         iterative_solver.tolerance=error_tolerance;
-        Insert_Root(iterative_solver.Bisection_Secant_Root(*this,xmin,xmax));}
+        root[roots++]=iterative_solver.Bisection_Secant_Root(*this,xmin,xmax);}
 }
 //#####################################################################
 // Function Compute_Roots_In_Interval
@@ -130,70 +125,35 @@ Compute_Roots_In_Interval(const T xmin,const T xmax)
         QUADRATIC<T> quadratic(c2,c1,c0);
         quadratic.Compute_Roots_In_Interval(xmin,xmax);
         roots=quadratic.roots;
-        root1=quadratic.root1;
-        root2=quadratic.root2;
+        root[0]=quadratic.root[0];
+        root[1]=quadratic.root[1];
         return;}
 
-    INTERVAL<T> i1,i2,i3;
-    int intervals(0);
-    Compute_Intervals(xmin,xmax,intervals,i1,i2,i3);
-    if(intervals==0){roots=0;return;}
-    Insert_Root_In_Extrema_Interval(i1.min_corner,i1.max_corner);
-    if(intervals==1) return;
-    Insert_Root_In_Extrema_Interval(i2.min_corner,i2.max_corner);
-    if(intervals==2) return;
-    Insert_Root_In_Extrema_Interval(i3.min_corner,i3.max_corner);
-}
-//#####################################################################
-// Function Compute_Relative_Extrema
-//#####################################################################
-template<class T> void CUBIC<T>::
-Compute_Relative_Extrema()
-{
-    QUADRATIC<T> quadratic(3*c3,2*c2,c1);quadratic.Compute_Roots(); // quadratic roots are the extrema of the cubic
-    number_of_extrema=quadratic.roots;extrema1=quadratic.root1;extrema2=quadratic.root2;
-}
-//#####################################################################
-// Function Compute_Relative_Extrema_In_Interval
-//#####################################################################
-template<class T> void CUBIC<T>::
-Compute_Relative_Extrema_In_Interval(const T& xmin,const T& xmax)
-{
-    QUADRATIC<T> quadratic(3*c3,2*c2,c1);quadratic.Compute_Roots_In_Interval(xmin,xmax); // quadratic roots are the extrema of the cubic
-    number_of_extrema=quadratic.roots;extrema1=quadratic.root1;extrema2=quadratic.root2;
-}
-//#####################################################################
-// Function Compute_Relative_Extrema_Bounding_Sign_Changes_In_Interval
-//#####################################################################
-template<class T> void CUBIC<T>::
-Compute_Relative_Extrema_Bounding_Sign_Changes_In_Interval(const T& xmin,const T& xmax)
-{
-    QUADRATIC<T> quadratic(3*c3,2*c2,c1);quadratic.Compute_Roots_In_Interval(xmin,xmax); // quadratic roots are the extrema of the cubic
-    number_of_extrema=quadratic.roots;extrema1=quadratic.root1;extrema2=quadratic.root2;
-    if(number_of_extrema == 2 && ((*this)(extrema1)*(*this)(extrema2) > 0 || (*this)(extrema2)*(*this)(xmax) > 0)) number_of_extrema=1;
-    if(number_of_extrema >= 1 && (*this)(xmin)*(*this)(extrema1) > 0){extrema1=extrema2;number_of_extrema--;}
+    INTERVAL<T> ivals[3];
+    int intervals=0;
+    Compute_Intervals(xmin,xmax,intervals,ivals);
+    roots=0;
+    for(int i=0;i<intervals;i++)
+        Insert_Root_In_Extrema_Interval(ivals[i].min_corner,ivals[i].max_corner);
 }
 //#####################################################################
 // Function Compute_Intervals
 //#####################################################################
 template<class T> void CUBIC<T>::
-Compute_Intervals(const T& a,const T& b,int& intervals,INTERVAL<T>& interval1,INTERVAL<T>& interval2,INTERVAL<T>& interval3)
+Compute_Intervals(const T& a,const T& b,int& intervals,INTERVAL<T> interval[3])
 {
     T ba=b-a,ba2=ba*ba,ba3=ba2*ba;
     T a2=a*a,a3=a2*a;
     CUBIC<T> new_cubic(c3*ba3,(3*c3*a+c2)*ba2,(3*c3*a2+2*c2*a+c1)*ba,c3*a3+c2*a2+c1*a+c0);
-    new_cubic.Compute_Intervals(intervals,interval1,interval2,interval3);
-    if(intervals){
-        interval1=interval1*(b-a)+a;
-        if(intervals>1){
-            interval2=interval2*(b-a)+a;
-            if(intervals>2) interval3=interval3*(b-a)+a;}}
+    new_cubic.Compute_Intervals(intervals,interval);
+    for(int i=0;i<intervals;i++)
+        interval[i]=interval[i]*(b-a)+a;
 }
 //#####################################################################
 // Function Compute_Intervals
 //#####################################################################
 template<class T> void CUBIC<T>::
-Compute_Intervals(int& intervals,INTERVAL<T>& interval1,INTERVAL<T>& interval2,INTERVAL<T>& interval3)
+Compute_Intervals(int& intervals,INTERVAL<T> interval[3])
 {
     // Assume [a,b] are [0,1] and scale appropriately before calling this function
     T g2=c2,g1=c1,g0=c0;
@@ -211,18 +171,18 @@ Compute_Intervals(int& intervals,INTERVAL<T>& interval1,INTERVAL<T>& interval2,I
             break;
         case 1:
             intervals=1;
-            interval1=INTERVAL<T>(0,1);
+            interval[0]=INTERVAL<T>(0,1);
             break;
         case 2:
         case 6:
             {QUADRATIC<T> quadratic(3*c3,2*c2,c1);
             quadratic.Compute_Roots_In_Interval(0,1); // quadratic roots are the extrema of the cubic
             if(quadratic.roots!=1){LOG::cout << "2/6 more than one root" << std::endl;return;}
-            if((Value(quadratic.root1)>=0)==(g0>=0)) intervals=0;
+            if((Value(quadratic.root[0])>=0)==(g0>=0)) intervals=0;
             else{
                 intervals=2;
-                interval1=INTERVAL<T>(0,quadratic.root1);
-                interval2=INTERVAL<T>(quadratic.root1,1);}
+                interval[0]=INTERVAL<T>(0,quadratic.root[0]);
+                interval[1]=INTERVAL<T>(quadratic.root[0],1);}
             break;}
         case 3:
         case 7:
@@ -230,56 +190,56 @@ Compute_Intervals(int& intervals,INTERVAL<T>& interval1,INTERVAL<T>& interval2,I
             quadratic.Compute_Roots_In_Interval(0,1); // quadratic roots are the extrema of the cubic
             if(quadratic.roots!=1){LOG::cout << "3/7 more than one root" << std::endl;return;}
             intervals=1;
-            if((Value(quadratic.root1)>=0)==(g0>=0)) interval1=INTERVAL<T>(quadratic.root1,1);
-            else interval1=INTERVAL<T>(0,quadratic.root1);
+            if((Value(quadratic.root[0])>=0)==(g0>=0)) interval[0]=INTERVAL<T>(quadratic.root[0],1);
+            else interval[0]=INTERVAL<T>(0,quadratic.root[0]);
             break;}
         case 4:
             {T inflection_point=-c2/(3*c3);
             QUADRATIC<T> quadratic(3*c3,2*c2,c1);
-            if((quadratic(inflection_point)>=0)==(g1>=0)) intervals=0;
+            if((quadratic.Value(inflection_point)>=0)==(g1>=0)) intervals=0;
             else{
                 quadratic.Compute_Roots_In_Interval(0,1); // quadratic roots are the extrema of the cubic
                 if(quadratic.roots!=2){LOG::cout << "4 should be two roots" << std::endl;return;}
-                else if((Value(quadratic.root2)>=0)!=(h0>=0)){
+                else if((Value(quadratic.root[1])>=0)!=(h0>=0)){
                     intervals=2;
-                    interval1=INTERVAL<T>(quadratic.root1,quadratic.root2);
-                    interval2=INTERVAL<T>(quadratic.root2,1);}
-                else if((Value(quadratic.root1)>=0)!=(g0>=0)){
+                    interval[0]=INTERVAL<T>(quadratic.root[0],quadratic.root[1]);
+                    interval[1]=INTERVAL<T>(quadratic.root[1],1);}
+                else if((Value(quadratic.root[0])>=0)!=(g0>=0)){
                     intervals=2;
-                    interval1=INTERVAL<T>(0,quadratic.root1);
-                    interval2=INTERVAL<T>(quadratic.root1,quadratic.root2);}
+                    interval[0]=INTERVAL<T>(0,quadratic.root[0]);
+                    interval[1]=INTERVAL<T>(quadratic.root[0],quadratic.root[1]);}
                 else intervals=0;}
             break;}
         case 5:
             {T inflection_point=-c2/(3*c3);
             QUADRATIC<T> quadratic(3*c3,2*c2,c1);
-            if((quadratic(inflection_point)>=0)==(g1>=0)){
+            if((quadratic.Value(inflection_point)>=0)==(g1>=0)){
                 intervals=1;
-                interval1=INTERVAL<T>(0,1);}
+                interval[0]=INTERVAL<T>(0,1);}
             else{
                 quadratic.Compute_Roots_In_Interval(0,1); // quadratic roots are the extrema of the cubic
-                T e=Value(quadratic.root1);
-                T f=Value(quadratic.root2);
+                T e=Value(quadratic.root[0]);
+                T f=Value(quadratic.root[1]);
                 if(quadratic.roots!=2){
                     intervals=1;
-                    interval1=INTERVAL<T>(0,1);}
+                    interval[0]=INTERVAL<T>(0,1);}
                 else if((e>=0)!=(g0>=0)){
                     if((e>=0)!=(f>=0)){
                         assert((f>=0)!=(h0>=0));
                         intervals=3;
-                        interval1=INTERVAL<T>(0,quadratic.root1);
-                        interval2=INTERVAL<T>(quadratic.root1,quadratic.root2);
-                        interval3=INTERVAL<T>(quadratic.root2,1);}
+                        interval[0]=INTERVAL<T>(0,quadratic.root[0]);
+                        interval[1]=INTERVAL<T>(quadratic.root[0],quadratic.root[1]);
+                        interval[2]=INTERVAL<T>(quadratic.root[1],1);}
                     else{
                         intervals=1;
-                        interval1=INTERVAL<T>(0,quadratic.root1);}}
+                        interval[0]=INTERVAL<T>(0,quadratic.root[0]);}}
                 else if((f>=0)!=(h0>=0)){
                     intervals=1;
-                    interval1=INTERVAL<T>(quadratic.root2,1);}
+                    interval[0]=INTERVAL<T>(quadratic.root[1],1);}
                 else{
                     assert((e>=0)!=(f>=0));
                     intervals=1;
-                    interval1=INTERVAL<T>(quadratic.root1,quadratic.root2);}}
+                    interval[0]=INTERVAL<T>(quadratic.root[0],quadratic.root[1]);}}
             break;}}
 }
 //#####################################################################

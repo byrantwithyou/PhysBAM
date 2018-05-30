@@ -573,26 +573,26 @@ Compute(COEDGE* ce,T radius,bool clipped)
 
     QUADRATIC<T> quad((B-C).Magnitude_Squared(),-2*B.Dot(B-C),B_mag2_min_r2);
     quad.Compute_Roots();
-    if(quad.roots==1){quad.roots=2;quad.root2=quad.root1;}
-    if(quad.roots==0 || quad.root1>=1 || quad.root2<=0){
+    if(quad.roots==1){quad.roots=2;quad.root[1]=quad.root[0];}
+    if(quad.roots==0 || quad.root[0]>=1 || quad.root[1]<=0){
         type=full_disc;
         return area=Disk_Inside_Triangle(B,C,radius);} // case C
 
-    if(quad.root1<=0 && quad.root2>=1){
+    if(quad.root[0]<=0 && quad.root[1]>=1){
         type=empty;
         return area=0;} // case B (numerical error)
 
-    if(quad.root1>0 && quad.root2<1){ // case E
+    if(quad.root[0]>0 && quad.root[1]<1){ // case E
         type=both_out;
-        TV P=B+quad.root1*(C-B),Q=B+quad.root2*(C-B);
-        aux0=quad.root1;
-        aux1=quad.root2;
+        TV P=B+quad.root[0]*(C-B),Q=B+quad.root[1]*(C-B);
+        aux0=quad.root[0];
+        aux1=quad.root[1];
         T A0=Disk_Inside_Triangle(B,P,radius);
         T A1=Disk_Inside_Triangle(Q,C,radius);
         aux2=A0/(A0+A1);
         return area=A0+A1;}
 
-    aux0=quad.root1>0?quad.root1:quad.root2;
+    aux0=quad.root[0]>0?quad.root[0]:quad.root[1];
     TV P=B+aux0*(C-B);
     if(B_in_disk){
         type=out1;

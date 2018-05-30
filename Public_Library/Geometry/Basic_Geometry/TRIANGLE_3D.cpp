@@ -257,8 +257,9 @@ Point_Face_Collision(const TV& x,const TV& v,const TV& v1,const TV& v2,const TV&
     CUBIC<double> cubic((double)TV::Dot_Product(Na,APv),(double)TV::Dot_Product(Nv,APv)+TV::Dot_Product(Na,APo),
                                        (double)TV::Dot_Product(No,APv)+TV::Dot_Product(Nv,APo),(double)TV::Dot_Product(No,APo));
     double xmin=0,xmax=1.000001;
-    int num_intervals=0;VECTOR<INTERVAL<double>,3> intervals;
-    cubic.Compute_Intervals(xmin,xmax,num_intervals,intervals(0),intervals(1),intervals(2));
+    int num_intervals=0;
+    INTERVAL<double> intervals[3];
+    cubic.Compute_Intervals(xmin,xmax,num_intervals,intervals);
     if(!num_intervals) return false;
   
     // find and check roots
@@ -266,7 +267,7 @@ Point_Face_Collision(const TV& x,const TV& v,const TV& v1,const TV& v2,const TV&
     ITERATIVE_SOLVER<double> iterative_solver;
     iterative_solver.tolerance=1e-14;
     for(int k=0;k<num_intervals;k++){
-        collision_time=dt*(T)iterative_solver.Bisection_Secant_Root(cubic,intervals(k).min_corner,intervals(k).max_corner);
+        collision_time=dt*(T)iterative_solver.Bisection_Secant_Root(cubic,intervals[k].min_corner,intervals[k].max_corner);
         TRIANGLE_3D<T> triangle(X.x+collision_time*v1,X.y+collision_time*v2,X.z+collision_time*v3);
         if(triangle.Point_Face_Interaction(x+collision_time*v,v,v1,v2,v3,collision_thickness,distance,normal,weights,true,exit_early)) return true;}
 

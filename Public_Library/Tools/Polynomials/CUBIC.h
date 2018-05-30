@@ -17,10 +17,8 @@ class CUBIC:public NONLINEAR_FUNCTION<T(T)>
 public:
     T c3,c2,c1,c0; // coefficients 
     int roots; // number of roots, -1 indicates a=b=c=0 - always a root!
-    T root1,root2,root3; // root1 < root2 < root3
+    T root[3]; // root[0] < root[1] < root[2]
     T error_tolerance; // there will be errors in the iterative solver
-    int number_of_extrema;
-    T extrema1,extrema2; // extrema1 < extrema 2
 
     T Value(const T x) const
     {return ((c3*x+c2)*x+c1)*x+c0;}
@@ -33,13 +31,9 @@ public:
     void Compute_Roots_Noniterative();
     void Compute_Roots();
     void Compute_Roots_In_Interval(const T xmin,const T xmax);
-    void Compute_Relative_Extrema();
-    void Compute_Relative_Extrema_In_Interval(const T& xmin,const T& xmax);
-    void Compute_Relative_Extrema_Bounding_Sign_Changes_In_Interval(const T& xmin,const T& xmax);
-    void Compute_Intervals(const T& a,const T& b,int& intervals,INTERVAL<T>& interval1,INTERVAL<T>& interval2,INTERVAL<T>& interval3);
-    void Compute_Intervals(int& intervals,INTERVAL<T>& interval1,INTERVAL<T>& interval2,INTERVAL<T>& interval3);
+    void Compute_Intervals(const T& a,const T& b,int& intervals,INTERVAL<T> interval[3]);
+    void Compute_Intervals(int& intervals,INTERVAL<T> interval[3]);
     void Insert_Root_In_Extrema_Interval(const T xmin,const T xmax);
-    void Insert_Root(const T r);
 //#####################################################################
 };   
 }

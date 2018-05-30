@@ -229,7 +229,7 @@ Compute_s(const VECTOR<T,2>& f,const int id,T extrapolation_cutoff)
     quadratic.Compute_Roots_In_Interval(0,1);
     if(quadratic.roots==0) return -1;
     PHYSBAM_ASSERT(quadratic.roots==1);
-    return quadratic.root1;
+    return quadratic.root[0];
 }
 //#####################################################################
 // Function Compute_s
@@ -242,7 +242,7 @@ Compute_s(const VECTOR<T,3>& f,const int id,T extrapolation_cutoff)
     cubic.Compute_Roots_In_Interval(0,1);
     if(cubic.roots==0) return -1;
     PHYSBAM_ASSERT(cubic.roots==1);
-    return cubic.root1;
+    return cubic.root[0];
 }
 //#####################################################################
 // Function Compute_E

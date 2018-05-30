@@ -18,9 +18,9 @@ REMOVED_PARTICLES_BLENDER_3D(T blending_parameter_input)
 {
     blending_parameter=clamp(blending_parameter,small_number,1-small_number);
     kernel.c0-=blending_parameter;
-    kernel.Compute_Roots_Noniterative_In_Interval(0,1);R=1/kernel.root1;
+    kernel.Compute_Roots_Noniterative_In_Interval(0,1);R=1/kernel.root[0];
     LOG::cout<<"roots = "<<kernel.roots<<std::endl;
-    LOG::cout<<"root1 = "<<kernel.root1<<std::endl;
+    LOG::cout<<"root[0] = "<<kernel.root[0]<<std::endl;
     if(kernel.roots<1){LOG::cerr<<"Error: kernel.roots=="<<kernel.roots<<std::endl;PHYSBAM_FATAL_ERROR();}
     kernel.c0=1;
 }

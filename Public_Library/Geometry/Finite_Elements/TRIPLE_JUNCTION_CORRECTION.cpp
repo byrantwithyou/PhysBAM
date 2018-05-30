@@ -198,8 +198,8 @@ Meet_Phi(const VECTOR<VECTOR<T,4> ,2>& phi)
         return TV()+1e20;
 //        printf("XXX   %.15g %.15g %.15g\n", quad.a, quad.b, quad.c);
         quad.roots=1;
-        quad.root1=-quad.b/(2*quad.a);}
-    T ya[2]={quad.root1,quad.root2},ph[2]={FLT_MAX,FLT_MAX},ps[2]={FLT_MAX,FLT_MAX};(void)ps;
+        quad.root[0]=-quad.b/(2*quad.a);}
+    T ya[2]={quad.root[0],quad.root[1]},ph[2]={FLT_MAX,FLT_MAX},ps[2]={FLT_MAX,FLT_MAX};(void)ps;
     TV X[2];
     for(int i=0;i<quad.roots;i++){
         if(abs(ya[i])>10) continue;

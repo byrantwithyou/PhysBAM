@@ -271,7 +271,7 @@ Compute_Constraint_Correcting_Impulse(T_CONSTRAINT_FUNCTION& constraint_error_fu
             constraint_error_function.Magnitude_Squared(j)-sqr(impulse_bound));
         z_quadratic.Compute_Roots();
         if(z_quadratic.roots==0) break;
-        T z_largest_root=z_quadratic.roots==1?z_quadratic.root1:z_quadratic.root2;
+        T z_largest_root=z_quadratic.roots==1?z_quadratic.root[0]:z_quadratic.root[1];
         if(z_largest_root<0) break;
         T z=min(z_largest_root,(T)1);
 

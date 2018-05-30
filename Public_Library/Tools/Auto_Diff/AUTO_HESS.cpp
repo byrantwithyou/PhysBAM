@@ -15,8 +15,8 @@ Principal_Curvatures(const AUTO_HESS<T,VECTOR<T,3> >& h)
     QUADRATIC<T> quadratic(-1,trace,sqr(M(0,2))+sqr(M(0,1))+sqr(M(1,2))-M(1,1)*M(0,0)-M(2,2)*M(0,0)-M(2,2)*M(1,1));
     quadratic.Compute_Roots();
     if(quadratic.roots == 0) (T).5*VECTOR<T,2>(trace,trace);
-    else if(quadratic.roots == 1) return VECTOR<T,2>(quadratic.root1,quadratic.root1);
-    return VECTOR<T,2>(quadratic.root1,quadratic.root2);
+    else if(quadratic.roots == 1) return VECTOR<T,2>(quadratic.root[0],quadratic.root[0]);
+    return VECTOR<T,2>(quadratic.root[0],quadratic.root[1]);
 }
 template VECTOR<double,2> Principal_Curvatures<double>(AUTO_HESS<double,VECTOR<double,3> > const&);
 template VECTOR<float,2> Principal_Curvatures<float>(AUTO_HESS<float,VECTOR<float,3> > const&);

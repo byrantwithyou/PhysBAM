@@ -150,7 +150,7 @@ Segment_Segment_Collision(const SEGMENT_2D<T>& segment,const TV& v1,const TV& v2
     // check the collision times
     T distance;
     for(int roots=0;roots<cubic.roots;roots++){
-        if(roots == 1) collision_time=dt*cubic.root1;else if(roots == 2) collision_time=dt*cubic.root2;else collision_time=dt*cubic.root3;
+        collision_time=dt*cubic.root[roots-1];
         SEGMENT_2D segment2(X.x+collision_time*v1,X.y+collision_time*v2);
         if(segment2.Segment_Segment_Interaction(SEGMENT_2D(segment.X.x+collision_time*v3,segment.X.y+collision_time*v4),v1,v2,v3,v4,collision_thickness,distance,normal,a,b,
             small_number)) return 1;}
@@ -258,8 +258,8 @@ Point_Face_Collision(const TV& x,const TV& v,const TV& v1,const TV& v2,const T d
         quadratic.Compute_Roots_In_Interval(0,dt);
         if(quadratic.roots==0)return false;
         else if(quadratic.roots==-1){LOG::cout<<"VERY SINGULAR ON QUADRATIC SOLVE"<<std::endl;collision_time_temp=0;}
-        else if(quadratic.roots==1)collision_time_temp=quadratic.root1;
-        else collision_time_temp=quadratic.root1;}
+        else if(quadratic.roots==1)collision_time_temp=quadratic.root[0];
+        else collision_time_temp=quadratic.root[0];}
     SEGMENT_2D<double> segment((VECTOR<double,2>)X.x+collision_time_temp*(VECTOR<double,2>)v1,(VECTOR<double,2>)X.y+collision_time_temp*(VECTOR<double,2>)v2);
     bool interaction=segment.Point_Face_Interaction((VECTOR<double,2>)x+collision_time_temp*(VECTOR<double,2>)v,(VECTOR<double,2>)v,(VECTOR<double,2>)v1,(VECTOR<double,2>)v2,
         (double)collision_thickness,distance,normal_temp,weights_temp,true,exit_early);

@@ -18,7 +18,7 @@ class QUADRATIC:public NONLINEAR_FUNCTION<T(T)>
 public:
     T a,b,c; // coefficients
     int roots; // number of roots, -1 indicates a=b=c=0 - always a root!
-    T root1,root2; // root1 < root2
+    T root[2]; // root[0] < root[1]
 
     QUADRATIC();
     QUADRATIC(const T a_input,const T b_input,const T c_input);
