@@ -229,13 +229,12 @@ Compute_s(const VECTOR<T,2>& f,const int id,T extrapolation_cutoff)
 {
     VECTOR<T,2> fm1=f-1;
     QUADRATIC<T> quadratic(fm1.Product(),fm1.Sum(),1-extrapolation_cutoff);
-    T a=quadratic(0);
-    T b=quadratic(1);
+    T a=quadratic.Value(0);
+    T b=quadratic.Value(1);
     PHYSBAM_ASSERT(a>0);
     if(b==0) return 1;
     if((a>0)==(b>0)) return -1;
-    ITERATIVE_SOLVER<T> iterative_solver;
-    return iterative_solver.Bisection_Secant_Root(quadratic,0,1);
+    return Bisection_Secant_Root(quadratic,(T)0,(T)1);
 }
 //#####################################################################
 // Function Compute_s
@@ -245,13 +244,12 @@ Compute_s(const VECTOR<T,3>& f,const int id,T extrapolation_cutoff)
 {
     VECTOR<T,3> fm1=f-1;
     CUBIC<T> cubic(fm1.Product(),DIAGONAL_MATRIX<T,3>(fm1).Cofactor_Matrix().Trace(),fm1.Sum(),1-extrapolation_cutoff);
-    T a=cubic(0);
-    T b=cubic(1);
+    T a=cubic.Value(0);
+    T b=cubic.Value(1);
     PHYSBAM_ASSERT(a>0);
     if(b==0) return 1;
     if((a>0)==(b>0)) return -1;
-    ITERATIVE_SOLVER<T> iterative_solver;
-    return iterative_solver.Bisection_Secant_Root(cubic,0,1);
+    return Bisection_Secant_Root(cubic,(T)0,(T)1);
 }
 //#####################################################################
 // Function Compute_E

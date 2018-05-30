@@ -29,16 +29,6 @@ template<class T> QUADRATIC<T>::
 {
 }
 //#####################################################################
-// Function Compute
-//#####################################################################
-template<class T> void QUADRATIC<T>::
-Compute(const T x,T* ddf,T* df,T* f) const
-{
-    if(f) *f=(a*x+b)*x+c;
-    if(df) *df=2*a*x+b;
-    if(ddf) *ddf=2*a;
-}
-//#####################################################################
 // Function Coefficients_From_Interpolation
 //#####################################################################
 template<class T> void QUADRATIC<T>::

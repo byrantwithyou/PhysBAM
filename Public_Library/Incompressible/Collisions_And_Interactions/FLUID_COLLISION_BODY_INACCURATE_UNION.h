@@ -10,7 +10,6 @@
 #include <Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
-#include <Geometry/Level_Sets/IMPLICIT_OBJECT_ON_A_RAY.h>
 #include <Geometry/Level_Sets/LEVELSET_POLICY.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY.h>
@@ -78,20 +77,18 @@ public:
     {return levelset(location)<=contour_value;}
 
     bool Simplex_Closest_Non_Intersecting_Point(RAY<TV>& ray) const override
-    {IMPLICIT_OBJECT_ON_A_RAY<LEVELSET_IMPLICIT_OBJECT<TV> > implicit_object_on_a_ray(levelset,ray);
+    {auto implicit_object_on_a_ray=[this,&ray](T x){return levelset(ray.Point(x));};
     if(implicit_object_on_a_ray(0)<=0){ray.t_max=0;return true;}
     if(implicit_object_on_a_ray(ray.t_max)>0) return false;
-    ITERATIVE_SOLVER<T> solver;solver.tolerance=(T).001*grid.dX.Min();
-    ray.t_max=solver.Bisection_Secant_Root(implicit_object_on_a_ray,0,ray.t_max);
+    ray.t_max=Bisection_Secant_Root(implicit_object_on_a_ray,(T)0,ray.t_max,(T).001*grid.dX.Min());
     ray.t_max=max((T)0,ray.t_max-(T).01*grid.dX.Min()); // TODO: probably make this shift a parameter, or find an entirely different cleaner way
     return true;}
 
     bool Simplex_Intersection(RAY<TV>& ray) const override
-    {IMPLICIT_OBJECT_ON_A_RAY<LEVELSET_IMPLICIT_OBJECT<TV> > implicit_object_on_a_ray(levelset,ray);
+    {auto implicit_object_on_a_ray=[this,&ray](T x){return levelset(ray.Point(x));};
     if(implicit_object_on_a_ray(0)<=0){ray.t_max=0;return true;}
     if(implicit_object_on_a_ray(ray.t_max)>0) return false;
-    ITERATIVE_SOLVER<T> solver;solver.tolerance=(T).001*grid.dX.Min();
-    ray.t_max=solver.Bisection_Secant_Root(implicit_object_on_a_ray,0,ray.t_max);
+    ray.t_max=Bisection_Secant_Root(implicit_object_on_a_ray,(T)0,ray.t_max,(T).001*grid.dX.Min());
     return true;}
 
     TV Simplex_Closest_Point_On_Boundary(const TV& location,const T max_distance,const T thickness_over_2=0,int* simplex_id=0,T* returned_distance=0) const override

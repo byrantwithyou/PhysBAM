@@ -264,10 +264,8 @@ Point_Face_Collision(const TV& x,const TV& v,const TV& v1,const TV& v2,const TV&
   
     // find and check roots
     T distance;
-    ITERATIVE_SOLVER<double> iterative_solver;
-    iterative_solver.tolerance=1e-14;
     for(int k=0;k<num_intervals;k++){
-        collision_time=dt*(T)iterative_solver.Bisection_Secant_Root(cubic,intervals[k].min_corner,intervals[k].max_corner);
+        collision_time=dt*(T)Bisection_Secant_Root<double>(cubic,intervals[k].min_corner,intervals[k].max_corner);
         TRIANGLE_3D<T> triangle(X.x+collision_time*v1,X.y+collision_time*v2,X.z+collision_time*v3);
         if(triangle.Point_Face_Interaction(x+collision_time*v,v,v1,v2,v3,collision_thickness,distance,normal,weights,true,exit_early)) return true;}
 

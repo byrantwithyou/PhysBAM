@@ -1,3 +1,4 @@
+#include <Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
 #include <Grid_PDE/Advection/ADVECTION_HAMILTON_JACOBI_ENO.h>
 #include <Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
@@ -622,19 +623,6 @@ Sine_Wave()
     deformable_collisions->object.Initialize_Hierarchy();
     Add_To_Fluid_Simulation(*deformable_collisions,false,true);
 }
-template<class T>
-struct SINE_DIST:public NONLINEAR_FUNCTION<T(T)>
-{
-    T X,Y;
-    virtual ~SINE_DIST(){}
-    virtual void Compute(const T x,T* ddf,T* df,T* f) const override
-    {
-        T s=sin(x),c=cos(x);
-        if(f) *f=(x-X)+(s-Y)*c;
-        if(df) *df=1+c*c-(s-Y)*s;
-        if(ddf) *ddf=(Y-4*s)*c;
-    }
-};
 //#####################################################################
 // Function Initialize_Sine_Phi
 //#####################################################################
@@ -643,12 +631,11 @@ Initialize_Sine_Phi()
 {
     const GRID<TV>& grid=*fluids_parameters.grid;
     ARRAY<T,VECTOR<int,2> >& phi=fluids_parameters.particle_levelset_evolution->phi;
-    SINE_DIST<T> sd;
+
     for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         TV X=it.Location();
-        sd.X=X.x;
-        sd.Y=X.y;
-        T mx=ITERATIVE_SOLVER<T>().Bisection_Secant_Root(sd,-2,10);
+        auto sd=[X](T x){T s=sin(x),c=cos(x);return (x-X.x)+(s-X.y)*c;};
+        T mx=Bisection_Secant_Root(sd,-(T)2,(T)10);
         T dist=(X-TV(mx,sin(mx))).Magnitude();
         T sy=sin(X.x);
         if(X.y<sy) phi(it.index)=dist;

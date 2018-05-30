@@ -12,7 +12,7 @@ namespace PhysBAM{
 
 template<class T> class INTERVAL;
 template<class T>
-class CUBIC:public NONLINEAR_FUNCTION<T(T)>
+class CUBIC
 {
 public:
     T c3,c2,c1,c0; // coefficients 
@@ -23,10 +23,14 @@ public:
     T Value(const T x) const
     {return ((c3*x+c2)*x+c1)*x+c0;}
 
+    T operator()(const T x) const
+    {return Value(x);}
+
+    T Prime(const T x) const
+    {return (3*c3*x+2*c2)*x+c1;}
+    
     CUBIC(const T c3_input,const T c2_input,const T c1_input,const T c0_input);
     void Coefficients_From_Interpolation(T x0,T y1,T x1,T y2,T x2,T y3,T x3,T y4);
-    void Compute(const T x,T* ddf,T* df,T* f) const;
-    T Prime(const T x) const;
     void Compute_Roots_Noniterative_In_Interval(const T xmin,const T xmax);
     void Compute_Roots_Noniterative();
     void Compute_Roots();

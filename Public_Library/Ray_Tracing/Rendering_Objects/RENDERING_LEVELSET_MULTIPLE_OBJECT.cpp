@@ -8,7 +8,6 @@
 #include <Geometry/Intersections/RAY_BOX_INTERSECTION.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Incompressible/Level_Sets/LEVELSET_MULTIPLE.h>
-#include <Incompressible/Level_Sets/LEVELSET_MULTIPLE_ON_A_RAY.h>
 #include <Ray_Tracing/Rendering_Objects/RENDERING_LEVELSET_MULTIPLE_OBJECT.h>
 namespace PhysBAM{
 //#####################################################################
@@ -151,14 +150,21 @@ Intersection(RAY<VECTOR<T,3> >& ray,int &region_start,int &region_end,const T th
     T phi1;region_start=levelset_multiple.Inside_Region(ray.Point(t1),phi1);
     T t2=t1+Integration_Step(phi1);
     // march through the line segment
+
+    auto levelset_multiple_on_a_ray=[this,&ray,region_start](T x)
+    {
+        VECTOR<T,3> X=ray.Point(x);
+        int minimum_region,second_minimum_region;
+        T minimum_phi,second_minimum_phi;
+        levelset_multiple.Two_Minimum_Regions(X,minimum_region,second_minimum_region,minimum_phi,second_minimum_phi);
+        return levelset_multiple.Phi(region_start,X)-(T).5*(minimum_phi+second_minimum_phi);
+    };
+
     while(t2 <= t_end){
         T phi2;region_end=levelset_multiple.Inside_Region(ray.Point(t2),phi2);
         if(region_start != region_end){
-            LEVELSET_MULTIPLE_ON_A_RAY<T_LEVELSET_MULTIPLE> levelset_multiple_on_a_ray(levelset_multiple,ray,region_start);
-            ITERATIVE_SOLVER<T> iterative_solver;
-            iterative_solver.tolerance=Iterative_Solver_Tolerance<T>()*thickness;
             ray.semi_infinite=false;
-            ray.t_max=iterative_solver.Bisection_Secant_Root(levelset_multiple_on_a_ray,t1,t2);
+            ray.t_max=Bisection_Secant_Root(levelset_multiple_on_a_ray,t1,t2,Iterative_Solver_Tolerance<T>()*thickness);
             ray.aggregate_id=-1;
             return true;}
         else{
@@ -167,11 +173,8 @@ Intersection(RAY<VECTOR<T,3> >& ray,int &region_start,int &region_end,const T th
     t2=t_end;
     T phi2;region_end=levelset_multiple.Inside_Region(ray.Point(t_end),phi2);
     if(region_start != region_end){
-        LEVELSET_MULTIPLE_ON_A_RAY<T_LEVELSET_MULTIPLE> levelset_multiple_on_a_ray(levelset_multiple,ray,region_start);
-        ITERATIVE_SOLVER<T> iterative_solver;
-        iterative_solver.tolerance=Iterative_Solver_Tolerance<T>()*thickness;
         ray.semi_infinite=false;
-        ray.t_max=iterative_solver.Bisection_Secant_Root(levelset_multiple_on_a_ray,t1,t2);
+        ray.t_max=Bisection_Secant_Root(levelset_multiple_on_a_ray,t1,t2,Iterative_Solver_Tolerance<T>()*thickness);
         ray.aggregate_id=-1;
         return true;}
     else if(exit_intersection){

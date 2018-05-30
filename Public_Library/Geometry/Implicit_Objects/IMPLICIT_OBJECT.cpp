@@ -10,7 +10,6 @@
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Intersections/RAY_BOX_INTERSECTION.h>
-#include <Geometry/Level_Sets/IMPLICIT_OBJECT_ON_A_RAY.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -73,26 +72,32 @@ Intersection(RAY<TV>& ray,const T thickness) const
         exit_intersection=true;exit_t_max=ray.t_max;exit_aggregate=ray.aggregate_id; // save for exiting rays
         ray.semi_infinite=save_semi_infinite;ray.t_max=save_t_max;ray.aggregate_id=save_aggregate;} // box intersection doesn't count
 
+    T tolerance=Iterative_Solver_Tolerance<T>()*thickness;
+    auto implicit_surface_on_a_ray=[this,&ray](T x){return (*this)(ray.Point(x));};
     if(!use_secondary_interpolation){
         // set up marching
-        IMPLICIT_OBJECT_ON_A_RAY<IMPLICIT_OBJECT> implicit_surface_on_a_ray(*this,ray);
-        ITERATIVE_SOLVER<T> iterative_solver;iterative_solver.tolerance=Iterative_Solver_Tolerance<T>()*thickness;
         // start marching
         T t1=t_start+thickness,phi1=(*this)(ray.Point(t1)),t2=t1+Integration_Step(phi1);
         // march through the line segment
         while(t2 <= t_end){
             T phi2=(*this)(ray.Point(t2));
-            if(LEVELSET_UTILITIES<T>::Interface(phi1,phi2)){ray.semi_infinite=false;ray.t_max=iterative_solver.Bisection_Secant_Root(implicit_surface_on_a_ray,t1,t2);ray.aggregate_id=-1;return true;}
+            if(LEVELSET_UTILITIES<T>::Interface(phi1,phi2)){
+                ray.semi_infinite=false;
+                ray.t_max=Bisection_Secant_Root(implicit_surface_on_a_ray,t1,t2,tolerance);
+                ray.aggregate_id=-1;
+                return true;}
             else{t1=t2;phi1=phi2;t2=t1+Integration_Step(phi1);}}
         // check the last piece of the line segment
         t2=t_end;T phi2=(*this)(ray.Point(t_end));
-        if(LEVELSET_UTILITIES<T>::Interface(phi1,phi2)){ray.semi_infinite=false;ray.t_max=iterative_solver.Bisection_Secant_Root(implicit_surface_on_a_ray,t1,t2);ray.aggregate_id=-1;return true;}
+        if(LEVELSET_UTILITIES<T>::Interface(phi1,phi2)){
+            ray.semi_infinite=false;
+            ray.t_max=Bisection_Secant_Root(implicit_surface_on_a_ray,t1,t2,tolerance);
+            ray.aggregate_id=-1;
+            return true;}
         else if(exit_intersection && phi2 <= 0){ray.semi_infinite=false;ray.t_max=exit_t_max;ray.aggregate_id=exit_aggregate;return true;} // exiting ray
         else return false;}
     else{ // use_secondary_interpolation
         // set up marching
-        IMPLICIT_OBJECT_ON_A_RAY<IMPLICIT_OBJECT> implicit_surface_on_a_ray(*this,ray);
-        ITERATIVE_SOLVER<T> iterative_solver;iterative_solver.tolerance=Iterative_Solver_Tolerance<T>()*thickness;
         // start marching
         T t1=t_start+thickness,phi1=(*this)(ray.Point(t1)),t2=t1+Integration_Step(phi1);
         // march through the line segment
@@ -104,7 +109,7 @@ Intersection(RAY<TV>& ray,const T thickness) const
                 phi2=this->Phi_Secondary(ray.Point(t2));
                 if(LEVELSET_UTILITIES<T>::Interface(phi1,phi2)){
                     ray.semi_infinite=false;
-                    ray.t_max=iterative_solver.Bisection_Secant_Root(implicit_surface_on_a_ray,t1,t2);
+                    ray.t_max=Bisection_Secant_Root(implicit_surface_on_a_ray,t1,t2,tolerance);
                     ray.aggregate_id=-1;return true;}
                 else{t1=t2;phi1=phi2;t2=t1+Integration_Step(phi1);}}
             else{t1=t2;phi1=phi2;t2=t1+Integration_Step(phi1);}}
@@ -116,7 +121,7 @@ Intersection(RAY<TV>& ray,const T thickness) const
             phi2=this->Phi_Secondary(ray.Point(t2));
             if(LEVELSET_UTILITIES<T>::Interface(phi1,phi2)){
                 ray.semi_infinite=false;
-                ray.t_max=iterative_solver.Bisection_Secant_Root(implicit_surface_on_a_ray,t1,t2);
+                ray.t_max=Bisection_Secant_Root(implicit_surface_on_a_ray,t1,t2,tolerance);
                 ray.aggregate_id=-1;return true;}}
         if(exit_intersection && phi2 <= 0){ray.semi_infinite=false;ray.t_max=exit_t_max;ray.aggregate_id=exit_aggregate;return true;} // exiting ray
         else return false;}

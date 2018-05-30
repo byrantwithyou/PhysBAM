@@ -13,6 +13,7 @@
 #include <Tools/Polynomials/QUADRATIC.h>
 #include <cassert>
 #include <cmath>
+#include <limits>
 using namespace PhysBAM;
 
 using ::std::abs;
@@ -24,26 +25,8 @@ using ::std::sqrt;
 //#####################################################################
 template<class T> CUBIC<T>::
 CUBIC(const T c3_input,const T c2_input,const T c1_input,const T c0_input)
-    :c3(c3_input),c2(c2_input),c1(c1_input),c0(c0_input),roots(0),error_tolerance((T)1e-14)
+    :c3(c3_input),c2(c2_input),c1(c1_input),c0(c0_input),roots(0),error_tolerance(45*std::numeric_limits<T>::epsilon())
 {}
-//#####################################################################
-// Function Compute
-//#####################################################################
-template<class T> void CUBIC<T>::
-Compute(const T x,T* ddf,T* df,T* f) const
-{
-    if(f) *f=((c3*x+c2)*x+c1)*x+c0;
-    if(df) *df=(3*c3*x+2*c2)*x+c1;
-    if(ddf) *ddf=6*c3*x+2*c2;
-}
-//#####################################################################
-// Function Prime
-//#####################################################################
-template<class T> T CUBIC<T>::
-Prime(const T x) const
-{
-    return (3*c3*x+2*c2)*x+c1;
-}
 //#####################################################################
 // Function Compute_Roots_Noniterative_In_Interval
 //#####################################################################
@@ -110,10 +93,7 @@ Insert_Root_In_Extrema_Interval(const T xmin,const T xmax)
     T y0=Value(xmin),y1=Value(xmax);
     if(!y0) root[roots++]=xmin;
     else if(!y1) root[roots++]=xmax;
-    else if((y0>0)!=(y1>0)){
-        ITERATIVE_SOLVER<T> iterative_solver;
-        iterative_solver.tolerance=error_tolerance;
-        root[roots++]=iterative_solver.Bisection_Secant_Root(*this,xmin,xmax);}
+    else if((y0>0)!=(y1>0)) root[roots++]=Bisection_Secant_Root(*this,xmin,xmax,error_tolerance);
 }
 //#####################################################################
 // Function Compute_Roots_In_Interval

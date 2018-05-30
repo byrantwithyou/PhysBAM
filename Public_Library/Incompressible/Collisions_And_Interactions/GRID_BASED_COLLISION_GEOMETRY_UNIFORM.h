@@ -10,7 +10,6 @@
 #include <Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
-#include <Geometry/Level_Sets/IMPLICIT_OBJECT_ON_A_RAY.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Collisions/COLLISION_GEOMETRY_ID.h>

@@ -153,7 +153,7 @@ Compute_Cut3(const FACE_INDEX<TV::m>& face,T phi0,T phi1)
     phia/=mxabs;
     phi1/=mxabs;
     q.Coefficients_From_Interpolation(0,phi0,(T).5,phia,1,phi1);
-    return ITERATIVE_SOLVER<T>().Bisection_Secant_Root(q,0,1);
+    return Bisection_Secant_Root(q,(T)0,(T)1);
 }
 //#####################################################################
 // Function Compute_Cut4
@@ -173,7 +173,7 @@ Compute_Cut4(const FACE_INDEX<TV::m>& face,T phi0,T phi1)
     phi1/=mxabs;
     phib/=mxabs;
     c.Coefficients_From_Interpolation(-(T).5,phia,0,phi0,1,phi1,(T)1.5,phib);
-    return ITERATIVE_SOLVER<T>().Bisection_Secant_Root(c,0,1);
+    return Bisection_Secant_Root(c,(T)0,(T)1);
 }
 //#####################################################################
 // Function Setup_Before_Compute

@@ -189,9 +189,8 @@ Edge_Edge_Collision(const SEGMENT_3D<T>& segment,const TV& v1,const TV& v2,const
 
     // find and check roots
     T distance;
-    ITERATIVE_SOLVER<double> iterative_solver;iterative_solver.tolerance=1e-14;
     for(int k=0;k<num_intervals;k++){
-        collision_time=dt*(T)iterative_solver.Bisection_Secant_Root(cubic,intervals[k].min_corner,intervals[k].max_corner);
+        collision_time=dt*(T)Bisection_Secant_Root<double>(cubic,intervals[k].min_corner,intervals[k].max_corner);
         SEGMENT_3D<T> segment2(X.x+collision_time*v1,X.y+collision_time*v2);
         if(segment2.Edge_Edge_Interaction(SEGMENT_3D<T>(segment.X.x+collision_time*v3,segment.X.y+collision_time*v4),v1,v2,v3,v4,collision_thickness,distance,normal,weights,
                 false,small_number,exit_early)) return true;}
