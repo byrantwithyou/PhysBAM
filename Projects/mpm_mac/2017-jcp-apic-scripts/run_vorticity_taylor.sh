@@ -51,6 +51,8 @@ for a in apic flip ${xpic_orders[@]/#/xpic} ; do
         for j in {0..10} ; do
             convert -scale 512 $NAME/$i/modes-$(($j*$RES))-x.png `printf $NAME/$i-taylor-vort-%02d.png $j`
             convert -scale 512 $NAME/$i/modes-$(($j*$RES))-x.png `printf $NAME/$i-taylor-vort-%02d.eps $j`
+            convert -scale 512 -crop 256x256+0+0 $NAME/$i/modes-$(($j*$RES))-x.png `printf $NAME/$i-taylor-vort-%02d-c.png $j`
+            convert -scale 512 -crop 256x256+0+0 $NAME/$i/modes-$(($j*$RES))-x.png `printf $NAME/$i-taylor-vort-%02d-c.eps $j`
         done
     done
 done
