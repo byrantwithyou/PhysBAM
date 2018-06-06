@@ -14,7 +14,7 @@ np_name=("ppc4")
 order=("-order 1" "-order 2" "-order 3")
 order_name=("linear" "quadratic" "cubic")
 
-xpic_order=(1 2 3 4 5 10 15 20 25)
+xpic_order=(1 2 3 4 5 10 15 20 25 35)
 
 if [ "X$FULL" = "X1" ] ; then
     rm -rf $NAME
@@ -36,6 +36,18 @@ if [ "X$FULL" = "X1" ] ; then
         done
     done | xargs -P 16 -n 1 -d '\n' bash -c
 fi
+
+(
+    cd $NAME
+    for d in *quadratic-128 ; do
+        (
+            cd $d
+            for f in *.png ; do
+                convert -crop 64x64+0+0 $f ${f%.*}-c.png
+            done
+        )
+    done
+)
 
 cat <<EOF > $NAME/SConstruct
 import os
