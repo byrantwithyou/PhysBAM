@@ -37,9 +37,9 @@ for s in pic apic flip ; do
 done
 
 for o in ${opt_name[@]} ; do
-    sed -e "s/xxx/$o/; s/rrr/$RES/; s/LLL/Vorticity/; s/DDD/vort/" vort_dambreak3_plot.tex  > $NAME/plot-dambreak-vort-$o.tex
-    sed -e "s/xxx/$o/; s/rrr/$RES/; s/LLL/Kinetic energy/; s/DDD/ke/" dambreak_plot.tex  > $NAME/plot-dambreak-ke-$o.tex
-    sed -e "s/xxx/$o/; s/rrr/$RES/; s/LLL/Total energy/; s/DDD/te/" te_dambreak_plot.tex  > $NAME/plot-dambreak-te-$o.tex
+    sed -e "s/xxx/$o/; s/rrr/$RES/; s/LLL/Vorticity/; s/DDD/vort/; s/XMAX/10/; s/YMAX/31/;" vort_dambreak3_plot.tex  > $NAME/plot-dambreak-vort-$o.tex
+    sed -e "s/xxx/$o/; s/rrr/$RES/; s/LLL/Kinetic energy/; s/DDD/ke/; s/XMAX/10/; s/YMAX/0.12/;" dambreak_plot.tex  > $NAME/plot-dambreak-ke-$o.tex
+    sed -e "s/xxx/$o/; s/rrr/$RES/; s/LLL/Total energy/; s/DDD/te/; s/XMAX/10/; s/YMAX/0.3/;" te_dambreak_plot.tex  > $NAME/plot-dambreak-te-$o.tex
 done
 
 cat <<EOF > $NAME/SConstruct
