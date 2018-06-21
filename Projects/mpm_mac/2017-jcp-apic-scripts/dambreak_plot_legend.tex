@@ -1,0 +1,52 @@
+\documentclass[class=minimal,border=0pt]{standalone}
+\usepackage{pgfplots}
+
+\begin{document}
+\pgfplotsset{width=10cm,height=8cm,compat=1.13}
+\begin{tikzpicture}
+\begin{axis}[
+    legend columns=6,
+    hide axis,
+    legend cell align=left,
+    legend entries={
+      PIC grid,
+      PIC particle,
+      APIC grid,
+      APIC particle,
+      FLIP grid,
+      FLIP particle,
+    },
+    legend pos=south west,
+    ymin=0.8,
+    ymax=1,
+    xmin=0,
+    xmax=1,
+    legend style={fill=none,draw=none},
+]
+%\begin{axis}[
+%    legend columns=6,
+%    legend cell align=left,
+%    legend pos=south west,
+%    enlargelimits=false,
+%    legend entries={
+%      PIC grid,
+%      PIC particle,
+%      APIC grid,
+%      APIC particle,
+%      FLIP grid,
+%      FLIP particle,
+%    },
+%    hide axis,
+%    legend style={fill=none,draw=none},
+%    tick scale binop=\times,
+%    scale ticks above exponent=2,
+%]
+\addlegendimage{mark=none,dashed,color=blue}
+\addlegendimage{mark=none,solid,color=blue}
+\addlegendimage{mark=none,dashed,color=red}
+\addlegendimage{mark=none,solid,color=red}
+\addlegendimage{mark=none,dashed,color=green}
+\addlegendimage{mark=none,solid,color=green}
+\end{axis}
+\end{tikzpicture}
+\end{document}

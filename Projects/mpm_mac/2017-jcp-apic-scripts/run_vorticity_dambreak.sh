@@ -111,9 +111,9 @@ done
 cp dambreak_movie_colorbar.tex $NAME/movie-colorbar.tex
 
 for o in ${opt_name[@]} ; do
-    sed -e "s/xxx/$o/; s/rrr/$RES/; s/LLL/Vorticity/; s/DDD/vort/" vort_dambreak_plot.tex  > $NAME/plot-dambreak-vort-$o.tex
-    sed -e "s/xxx/$o/; s/rrr/$RES/; s/LLL/Kinetic energy/; s/DDD/ke/" dambreak_plot.tex  > $NAME/plot-dambreak-ke-$o.tex
-    sed -e "s/xxx/$o/; s/rrr/$RES/; s/LLL/Total energy/; s/DDD/te/" te_dambreak_plot.tex  > $NAME/plot-dambreak-te-$o.tex
+    sed -e "s/xxx/$o/; s/rrr/$RES/; s/LLL/Vorticity/; s/DDD/vort/; s/XMAX/10/; s/YMAX/7.5/;" vort_dambreak_plot.tex  > $NAME/plot-dambreak-vort-$o.tex
+    sed -e "s/xxx/$o/; s/rrr/$RES/; s/LLL/Kinetic energy/; s/DDD/ke/; s/XMAX/10/; s/YMAX/0.12/;" dambreak_plot.tex  > $NAME/plot-dambreak-ke-$o.tex
+    sed -e "s/xxx/$o/; s/rrr/$RES/; s/LLL/Total energy/; s/DDD/te/; s/XMAX/10/; s/YMAX/0.24/;" te_dambreak_plot.tex  > $NAME/plot-dambreak-te-$o.tex
 done
 
 cat <<EOF > $NAME/SConstruct
