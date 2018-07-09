@@ -23,7 +23,10 @@ public:
 
     GRID<TV> grid;
     ARRAY<TV_INT> vertices;
-    HASHTABLE<PAIR<int,int> > edges;
+    ARRAY<PAIR<int,int> > edges;
+
+    ARRAY<TV_INT> domain_cells;
+    HASHTABLE<FACE_INDEX<TV::m> > boundary_faces;
     
     T density=1;
     T viscosity=0.1;
@@ -31,9 +34,8 @@ public:
     std::string output_directory;
     std::string data_directory;
     int test_number=0;
-    int resolution=8;
+    int resolution=8,ghost=3;
     ARRAY<TV_INT> iverts;
-    ARRAY<PAIR<int,int> > iedges;
 
     // debugging
     std::unique_ptr<DEBUG_PARTICLES<TV> > debug_particles;

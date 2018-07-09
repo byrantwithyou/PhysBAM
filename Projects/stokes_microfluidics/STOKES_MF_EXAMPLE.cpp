@@ -66,7 +66,7 @@ Add_Edge(int v,int dir,int len)
 {
     iverts.Append(iverts(v));
     iverts.Last()(dir)+=len;
-    iedges.Append(PAIR<int,int>(v,iverts.m-1));
+    edges.Append(PAIR<int,int>(v,iverts.m-1));
     return iverts.m-1;
 }
 //#####################################################################
@@ -75,7 +75,7 @@ Add_Edge(int v,int dir,int len)
 template<class TV> void STOKES_MF_EXAMPLE<TV>::
 Add_Edge(int v0,int v1)
 {
-    iedges.Append(PAIR<int,int>(v0,v1));
+    edges.Append(PAIR<int,int>(v0,v1));
 }
 //#####################################################################
 // Function Build_Grid
@@ -96,17 +96,65 @@ Build_Grid(T len_scale,int cross_section_radius)
     int d=gcd(cross_section_radius,extent(0));
     for(int i=1;i<TV_INT::m;i++) d=gcd(d,extent(i));
     TV_INT aspect=extent/=d;
-    RANGE<TV> domain=RANGE<TV>(TV(),TV(extent)*len_scale);
-    grid.Initialize(aspect*resolution,domain,true);
-
+    RANGE<TV> domain=RANGE<TV>(TV(),TV(extent)*len_scale).Thickened(cross_section_radius*len_scale);
+    grid.Initialize((aspect+2)*resolution,domain,true);
     for(int i=0;i<iverts.m;i++){
-        vertices.Append(resolution*(iverts(i)-min_corner)/d);
-        Add_Debug_Particle(grid.Node(vertices(i)),VECTOR<T,3>(1,0,0));
-    }
-    for(int i=0;i<iedges.m;i++){
-        edges.Insert(iedges(i));
-        Add_Debug_Object(VECTOR<TV,2>(grid.Node(vertices(iedges(i).x)),grid.Node(vertices(iedges(i).y))),VECTOR<T,3>(0,1,0));
-    }
+        vertices.Append(resolution*((iverts(i)-min_corner)/d+1));
+        Add_Debug_Particle(grid.Node(vertices(i)),VECTOR<T,3>(1,0,0));}
+
+    domain_cells.Remove_All();
+    boundary_faces.Remove_All();
+    ARRAY<VECTOR<bool,2*TV::m> > vert_connect(vertices.m); // -x +x -y +y -z +z
+    for(int i=0;i<edges.m;i++){
+        Add_Debug_Object(VECTOR<TV,2>(grid.Node(vertices(edges(i).x)),grid.Node(vertices(edges(i).y))),VECTOR<T,3>(0,1,0));
+        int v0=edges(i).x,v1=edges(i).y;
+        TV_INT first=vertices(v0),second=vertices(v1);
+        int d;
+        for(d=0;d<TV::m;d++)
+            if(first(d)!=second(d)){
+                if(first(d)>second(d)){
+                    std::swap(first,second);
+                    std::swap(v0,v1);}
+                first(d)+=resolution;
+                second(d)-=resolution;
+                break;}
+        for(int j=0;j<TV::m;j++)
+            if(d!=j){
+                first(j)-=resolution;
+                second(j)+=resolution;}
+        vert_connect(v0)(2*d+1)=true;
+        vert_connect(v1)(2*d)=true;
+        RANGE<TV_INT> tube(first,second);
+        for(RANGE_ITERATOR<TV::m> it(tube);it.Valid();it.Next()){
+            bool strict_inside=it.index.All_Greater(first) && it.index.All_Less(second-1);
+            if(tube.Lazy_Inside_Half_Open(it.index) && !strict_inside){
+                for(int j=0;j<TV::m;j++){
+                    if(j==d) continue;
+                    TV_INT cell=it.index;
+                    cell(j)+=1;
+                    if(tube.Lazy_Outside_Half_Open(cell))
+                        boundary_faces.Insert(FACE_INDEX<TV::m>(j,cell));
+                    cell(j)-=2;
+                    if(tube.Lazy_Outside_Half_Open(cell))
+                        boundary_faces.Insert(FACE_INDEX<TV::m>(j,it.index));}}
+            domain_cells.Append(it.index);}}
+    for(int i=0;i<vertices.m;i++){
+        TV_INT v=vertices(i);
+        RANGE<TV_INT> cube(v-resolution,v+resolution);
+        for(RANGE_ITERATOR<TV::m> it(cube);it.Valid();it.Next()){
+            bool strict_inside=it.index.All_Greater(v-resolution) && it.index.All_Less(v+resolution-1);
+            if(cube.Lazy_Inside_Half_Open(it.index) && !strict_inside){
+                for(int j=0;j<TV::m;j++){
+                    TV_INT cell=it.index;
+                    cell(j)+=1;
+                    if(cube.Lazy_Outside_Half_Open(cell) && !vert_connect(i)(2*j+1))
+                        boundary_faces.Insert(FACE_INDEX<TV::m>(j,cell));
+                    cell(j)-=2;
+                    if(cube.Lazy_Outside_Half_Open(cell) && !vert_connect(i)(2*j))
+                        boundary_faces.Insert(FACE_INDEX<TV::m>(j,it.index));}}
+            domain_cells.Append(it.index);}}
+    for(typename HASHTABLE<FACE_INDEX<TV::m> >::ITERATOR it(boundary_faces);it.Valid();it.Next()){
+        Add_Debug_Particle(grid.Face(it.Key()),VECTOR<T,3>(1,1,0));}
 }
 //#####################################################################
 namespace PhysBAM{
