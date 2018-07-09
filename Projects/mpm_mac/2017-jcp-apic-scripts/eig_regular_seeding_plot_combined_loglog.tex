@@ -1,0 +1,35 @@
+\documentclass[class=minimal,border=0pt]{standalone}
+\usepackage{pgfplots}
+
+\begin{document}
+\pgfplotsset{width=10cm,height=8cm,compat=1.13}
+\begin{tikzpicture}
+\begin{loglogaxis}[
+    enlargelimits=false,
+    legend cell align=left,
+    xlabel={$x$},
+    ylabel={$1-\lambda(bbb)$},
+    %legend entries={PL4, PL9, PL64, PQ4, PC4, AL4, AL9, AL64, AQ4, AC4},
+    legend pos=south east,
+    x tick label style={/pgf/number format/.cd,fixed,fixed zerofill,precision=2},
+    y tick label style={/pgf/number format/.cd,fixed,fixed zerofill,precision=2},
+    xmin=0,
+    xmax=.5,
+    ymin=1e-6,
+    ymax=1,
+    legend style={fill=none,draw=none}
+]
+\addplot[mark=none,solid,color=red] table[x=x,y expr=1-\thisrow{eig}]{pic-ppc4-linear/eig-aaa.txt};
+\addplot[mark=none,dashed,color=red] table[x=x,y expr={1-\thisrow{eig}}]{pic-ppc9-linear/eig-aaa.txt};
+\addplot[mark=none,dotted,color=red,very thick] table[x=x,y expr={1-\thisrow{eig}}]{pic-ppc64-linear/eig-aaa.txt};
+\addplot[mark=none,solid,color=orange] table[x=x,y expr={1-\thisrow{eig}}]{pic-ppc4-quadratic/eig-aaa.txt};
+\addplot[mark=none,solid,color=gray] table[x=x,y expr={1-\thisrow{eig}}]{pic-ppc4-cubic/eig-aaa.txt};
+FORGET\addplot[mark=none,solid,color=green] table[x=x,y expr={1-\thisrow{eig}}]{apic-ppc4-linear/eig-aaa.txt};
+FORGET\addplot[mark=none,dashed,color=green] table[x=x,y expr={1-\thisrow{eig}}]{apic-ppc9-linear/eig-aaa.txt};
+FORGET\addplot[mark=none,dotted,color=green,very thick] table[x=x,y expr={1-\thisrow{eig}}]{apic-ppc64-linear/eig-aaa.txt};
+\addplot[mark=none,dashed,color=blue] table[x=x,y expr={1-\thisrow{eig}}]{apic-ppc4-quadratic/eig-aaa.txt};
+\addplot[mark=none,solid,color=violet] table[x=x,y expr={1-\thisrow{eig}}]{apic-ppc4-cubic/eig-aaa.txt};
+\addplot[mark=none,dotted,very thick] {x};
+\end{loglogaxis}
+\end{tikzpicture}
+\end{document}

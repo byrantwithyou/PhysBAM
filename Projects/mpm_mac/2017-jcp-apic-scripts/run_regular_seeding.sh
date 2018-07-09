@@ -36,12 +36,14 @@ Y=(x,0 0,x x,x)
 A=(x y xy)
 XM=(.5 .125)
 YN=(-.04 .8)
+FORGET=('%' '%' '')
 for a in 0 1 2 ; do
-    for b in 0 1 ; do
-        sed -e "s/aaa/${A[$a]}/g;s/bbb/${Y[$a]}/;s/XM/${XM[$b]}/;s/YN/${YN[$b]}/" eig_regular_seeding_plot_combined.tex  > $NAME/eig-regular-seeding-combined-${A[$a]}-$b.tex
-    done
+    sed -e "s/aaa/${A[$a]}/g;s/bbb/${Y[$a]}/;s/XM/${XM[0]}/;s/YN/${YN[0]}/" eig_regular_seeding_plot_combined.tex  > $NAME/eig-regular-seeding-combined-${A[$a]}-0.tex
+    sed -e "s/aaa/${A[$a]}/g;s/bbb/${Y[$a]}/;s/XM/${XM[1]}/;s/YN/${YN[1]}/;s/FORGET/${FORGET[$a]}/" eig_regular_seeding_plot_combined_loglog.tex  > $NAME/eig-regular-seeding-combined-${A[$a]}-1.tex
 done
-    
+
+cp eig_regular_seeding_plot_legends.tex $NAME/eig-regular-seeding-plot-legends.tex
+
 cat <<EOF > $NAME/SConstruct
 import os
 import re

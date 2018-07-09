@@ -1,0 +1,32 @@
+\documentclass[class=minimal,border=0pt]{standalone}
+\usepackage{pgfplots}
+
+\begin{document}
+\pgfplotsset{width=10cm,height=8cm,compat=1.13}
+\begin{tikzpicture}
+\begin{axis}[
+    legend cell align=left,
+    legend columns=10,
+    hide axis,
+    legend entries={PL4, PL9, PL64, PQ4, PC4, AL4, AL9, AL64, AQ4, AC4},
+    legend pos=south east,
+    xmin=0,
+    xmax=1,
+    ymin=0.8,
+    ymax=1,
+    legend style={fill=none,draw=none}
+]
+\addlegendimage{mark=none,solid,color=red}
+\addlegendimage{mark=none,dashed,color=red}
+\addlegendimage{mark=none,dotted,color=red,very thick}
+\addlegendimage{mark=none,solid,color=orange}
+\addlegendimage{mark=none,solid,color=gray}
+\addlegendimage{mark=none,solid,color=green}
+\addlegendimage{mark=none,dashed,color=green}
+\addlegendimage{mark=none,dotted,color=green,very thick}
+\addlegendimage{mark=none,dashed,color=blue}
+\addlegendimage{mark=none,solid,color=violet}
+\addlegendimage{mark=none,dotted,very thick}
+\end{axis}
+\end{tikzpicture}
+\end{document}
