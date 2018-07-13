@@ -6,9 +6,9 @@
 \begin{tikzpicture}
 \begin{axis}[
     legend cell align=left,
-    legend columns=10,
+    legend columns=12,
     hide axis,
-    legend entries={PL4, PL9, PL64, PQ4, PC4, AL4, AL9, AL64, AQ4, AC4},
+    legend entries={PL4, PL9, PL64, PQ4, PC4, AL4, AL9, AL64, AQ4, AC4, slope=2, slope=4},
     legend pos=south east,
     xmin=0,
     xmax=1,
@@ -26,7 +26,8 @@
 \addlegendimage{mark=none,dotted,color=green,very thick}
 \addlegendimage{mark=none,dashed,color=blue}
 \addlegendimage{mark=none,solid,color=violet}
-\addlegendimage{mark=none,dotted,very thick}
+\addlegendimage{mark=none,dotted,very thick,color=brown}
+\addlegendimage{mark=none,dotted,very thick,color=cyan}
 \end{axis}
 \end{tikzpicture}
 \end{document}
