@@ -41,7 +41,7 @@ In_Place_PLU_Inverse(MATRIX_BASE<T,T_MATRIX1>& inverse)
     RIGHT_VECTOR b((INITIAL_SIZE)Columns()); // used for piece of the identity matrix
     for(int j=0;j<Columns();j++){
         b(j)=1;
-        inverse.Set_Column(j,Upper_Triangular_Solve(L.Lower_Triangular_Solve(b.Permute(p))));
+        inverse.Set_Column(j,Upper_Triangular_Solve(L.Lower_Triangular_Solve(b.Subset(p))));
         b(j)=0;}
 }
 //#####################################################################
@@ -404,4 +404,6 @@ template MATRIX<float,6,6> exp<float,MATRIX<float,6,6> >(MATRIX_BASE<float,MATRI
 template MATRIX_MXN<float> exp<float,MATRIX_MXN<float> >(MATRIX_BASE<float,MATRIX_MXN<float> > const&);
 template void MATRIX_BASE<double,MATRIX<double,6,6> >::Householder_QR_Factorization<MATRIX<double,6,6>,MATRIX<double,6,6> >(MATRIX_BASE<double,MATRIX<double,6,6> >&,MATRIX_BASE<double,MATRIX<double,6,6> >&);
 template void MATRIX_BASE<float,MATRIX<float,6,6> >::Householder_QR_Factorization<MATRIX<float,6,6>,MATRIX<float,6,6> >(MATRIX_BASE<float,MATRIX<float,6,6> >&,MATRIX_BASE<float,MATRIX<float,6,6> >&);
+template void MATRIX_BASE<double,MATRIX_MXN<double> >::In_Place_PLU_Inverse<MATRIX_MXN<double> >(MATRIX_BASE<double,MATRIX_MXN<double> >&);
+template void MATRIX_BASE<float,MATRIX_MXN<float> >::In_Place_PLU_Inverse<MATRIX_MXN<float> >(MATRIX_BASE<float,MATRIX_MXN<float> >&);
 }
