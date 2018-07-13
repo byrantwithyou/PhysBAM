@@ -436,4 +436,6 @@ template void OCTAVE_OUTPUT<double>::Write<int,ARRAY_VIEW<int const,int> >(char 
 template void OCTAVE_OUTPUT<double>::Write<double,ARRAY_VIEW<double,int> >(char const*,ARRAY_BASE<double,ARRAY_VIEW<double,int>,int> const&,int);
 template void OCTAVE_OUTPUT<double>::Write<double>(char const*,ARRAY<double,VECTOR<int,2> > const&);
 template void OCTAVE_OUTPUT<double>::Write<int>(char const*,ARRAY<int,VECTOR<int,2> > const&);
+template void OCTAVE_OUTPUT<double>::Append_Sparse_Column<double,ARRAY<double,int> >(ARRAY_BASE<double,ARRAY<double,int>,int> const&);
+template void OCTAVE_OUTPUT<float>::Append_Sparse_Column<float,ARRAY<float,int> >(ARRAY_BASE<float,ARRAY<float,int>,int> const&);
 }
