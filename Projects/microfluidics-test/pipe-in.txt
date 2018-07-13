@@ -1,0 +1,13 @@
+w 3
+v A 10 10
+v B 20 10
+v C 20 0
+v D 20 25
+v E 0 25
+p A B
+p B C
+p B D
+p D E
+s A 0 1
+d C 2 0
+d E 3 10
