@@ -12,54 +12,6 @@
 #include "FLUID_LAYOUT.h"
 
 namespace PhysBAM{
-//#####################################################################
-// Function Get_Orig_By_Blocks
-//#####################################################################
-template<class T> MATRIX_MXN<T>& CACHED_ELIMINATION_MATRIX<T>::
-Get_Orig_By_Blocks(int b0,int b1)
-{
-    return *block_list(blocks_to_canonical_block_id.Get({b0,b1}));
-}
-template<class T,class TV>
-void Setup_Block_Map(CACHED_ELIMINATION_MATRIX<T>& cem,const FLUID_LAYOUT<TV>& fl)
-{
-    HASHTABLE<VECTOR<int,3>,int> H;
-
-    // matrix_id 0 is identity matrix
-    // matrix_id 1 is zero matrix
-    cem.block_list.Append(0);
-    cem.block_list.Append(0);
-
-    auto func=[&cem,&H,&fl](auto& a,auto& b,int s)
-        {
-            VECTOR<int,2> k(a.block_id,b.block_id);
-            if(cem.blocks_to_canonical_block_id.Contains(k)) return;
-            VECTOR<int,3> m(fl.blocks(a.block_id).block_type,fl.blocks(b.block_id).block_type,s);
-            if(m.x==6 && m.y==6) assert(m.z);
-            int i=-1;
-            if(!H.Get(m,i)){
-                i=cem.block_list.m;
-                H.Set(m,cem.block_list.m);
-                cem.block_list.Append(new MATRIX_MXN<T>(cem.orig_sizes(a.block_id),cem.orig_sizes(b.block_id)));}
-            cem.blocks_to_canonical_block_id.Set(k,i);
-        };
-
-    for(FACE_RANGE_ITERATOR<TV::m> it(fl.used_faces.domain_indices,RF::skip_outer);it.Valid();it.Next())
-    {
-        auto& c0=fl.used_cells(it.face.First_Cell_Index());
-        auto& c1=fl.used_cells(it.face.Second_Cell_Index());
-        if(c0.global_id<0 || c1.global_id<0) continue;
-        assert(c0.block_id>=0);
-        assert(c1.block_id>=0);
-        assert(c0.block_dof>=0);
-        assert(c1.block_dof>=0);
-        if(c0.block_id==c1.block_id)
-            func(c0,c1,-1);
-        else{
-            func(c0,c1,it.face.axis*2);
-            func(c1,c0,it.face.axis*2+1);}
-    }
-}
 
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::
 Fill_Orig_Rows()
@@ -80,7 +32,7 @@ Eliminate_Row(int r)
     int diag_matrix=Get_Block_Lazy(r,r);
     int inv=Compute_Inv(diag_matrix);
     ARRAY<MATRIX_BLOCK>& row=rows(r);
-    if(rhs(r)) *rhs(r)=*block_list(inv)**rhs(r);
+    if(rhs(r)) *rhs(r)=*block_list(inv).M**rhs(r);
     for(int i=0;i<row.m;i++){
         if(row(i).c==r)
             row(i).matrix_id=id_block;
@@ -92,7 +44,9 @@ Eliminate_Row(int r)
         if(s==r) continue;
         int elim_mat=Get_Block_Lazy(s,r);
         if(rhs(r)){
-            ARRAY<T> a=*block_list(elim_mat)**rhs(r);
+            ARRAY<T> a;
+            if(elim_mat&use_trans) a=block_list(elim_mat&~use_trans).M->Transpose_Times(*rhs(r));
+            else a=*block_list(elim_mat).M**rhs(r);
             if(!rhs(s)) rhs(s)=new ARRAY<T>(-a);
             else *rhs(s)-=a;}
         for(int j=0;j<row.m;j++){
@@ -131,6 +85,23 @@ Get_Block_Lazy(int r,int c) const
     return zero_block;
 }
 //#####################################################################
+// Function Transposed
+//#####################################################################
+template<class T> int CACHED_ELIMINATION_MATRIX<T>::
+Transposed(int a) const
+{
+    if(Symmetric(a)) return a;
+    return a^use_trans;
+}
+//#####################################################################
+// Function Transposed
+//#####################################################################
+template<class T> bool CACHED_ELIMINATION_MATRIX<T>::
+Symmetric(int a) const
+{
+    return block_list(a&~use_trans).sym;
+}
+//#####################################################################
 // Function Compute_Inv
 //#####################################################################
 template<class T> int CACHED_ELIMINATION_MATRIX<T>::
@@ -140,9 +111,18 @@ Compute_Inv(int a)
     int& r=cached_ops.Get_Or_Insert({op_inv,a,0},invalid_block);
     if(r==invalid_block){
         auto* M=new MATRIX_MXN<T>;
-        block_list(a)->PLU_Inverse(*M);
-        int n=block_list.Append(M);
-        r=n;}
+        PHYSBAM_ASSERT(block_list(a).sym);
+        block_list(a).M->PLU_Inverse(*M);
+        int n=block_list.Append({M,true,{block_list.m}});
+        r=n;
+
+        auto ch=[this](int a){if(a&use_trans) return 't';if(Symmetric(a)) return 's';return ' ';};
+
+        printf("inv %i%c -> %i%c\n",
+            a&~use_trans,ch(a),
+            r&~use_trans,ch(r)
+        );
+    }
     return r;
 }
 //#####################################################################
@@ -153,10 +133,40 @@ Compute_Mul(int a,int b)
 {
     if(a==id_block) return b;
     if(b==id_block) return a;
+    if(a==zero_block || b==zero_block) return zero_block;
+    if((a&b&use_trans) || (!Symmetric(a) && Symmetric(b)))
+        return Transposed(Compute_Mul(Transposed(b),Transposed(a)));
+
     int& r=cached_ops.Get_Or_Insert({op_mul,a,b},invalid_block);
     if(r==invalid_block){
-        int n=block_list.Append(new MATRIX_MXN<T>(*block_list(a)**block_list(b)));
-        r=n;}
+        ARRAY<int> prod_list=Prod_List(a);
+        prod_list.Append_Elements(Prod_List(b));
+        if(int* p=prod_lookup.Get_Pointer(prod_list))
+            return *p;
+
+        auto& A=*block_list(a&~use_trans).M;
+        auto& B=*block_list(b&~use_trans).M;
+        MATRIX_MXN<T>& M=*new MATRIX_MXN<T>;
+        if(b&use_trans) M=A.Times_Transpose(B);
+        else if(a&use_trans) M=A.Transpose_Times(B);
+        else M=A*B;
+        ARRAY<int> prod_list_trans=Transposed(prod_list);
+        bool sym=prod_list==prod_list_trans;
+
+        int n=block_list.Append({&M,sym,prod_list});
+        if(!sym) cached_ops.Set({op_mul,Transposed(b),Transposed(a)},n^use_trans);
+        prod_lookup.Set(prod_list,n);
+        if(!sym) prod_lookup.Set(prod_list_trans,Transposed(n));
+        r=n;
+
+        auto ch=[this](int a){if(a&use_trans) return 't';if(Symmetric(a)) return 's';return ' ';};
+
+        printf("mul %i%c * %i%c -> %i%c\n",
+            a&~use_trans,ch(a),
+            b&~use_trans,ch(b),
+            r&~use_trans,ch(r)
+        );
+    }
     return r;
 }
 //#####################################################################
@@ -166,15 +176,28 @@ template<class T> int CACHED_ELIMINATION_MATRIX<T>::
 Compute_Sub(int a,int b)
 {
     if(b==zero_block) return a;
+    if((a&use_trans) || (Symmetric(a) && (b&use_trans)))
+        return Transposed(Compute_Sub(Transposed(a),Transposed(b)));
+
     int& r=cached_ops.Get_Or_Insert({op_sub,a,b},invalid_block);
     if(r==invalid_block){
-        auto* A=block_list(a);
-        auto* B=block_list(b);
-        auto* C=new MATRIX_MXN<T>(B->m,B->n);
-        if(A) *C=*A-*B;
-        else *C=-*B;
-        int n=block_list.Append(C);
-        r=n;}
+        auto& A=*block_list(a&~use_trans).M;
+        auto& B=*block_list(b&~use_trans).M;
+        auto& C=*new MATRIX_MXN<T>;
+        if(a==zero_block) C=-B;
+        else if(Symmetric(a) || Symmetric(b) || !(b&use_trans)) C=A-B;
+        else C=A-B.Transposed();
+        int n=block_list.Append({&C,Symmetric(a)&&Symmetric(b),{block_list.m}});
+        r=n;
+
+        auto ch=[this](int a){if(a&use_trans) return 't';if(Symmetric(a)) return 's';return ' ';};
+    
+        printf("sub %i%c - %i%c -> %i%c\n",
+            a&~use_trans,ch(a),
+            b&~use_trans,ch(b),
+            r&~use_trans,ch(r)
+        );
+    }
     return r;
 }
 //#####################################################################
@@ -195,8 +218,9 @@ Print_Full() const
     for(int i=0;i<rows.m;i++){
         for(int j=0;j<rows.m;j++){
             int m=Get_Block_Lazy(i,j);
-            if(m!=zero_block) printf("%4i",m);
-            else printf("    ");}
+            if(m==zero_block) printf("    ");
+            else if(m&use_trans) printf("%3it",m&~use_trans);
+            else printf("%4i",m);}
         printf("\n");}
 }
 //#####################################################################
@@ -210,19 +234,44 @@ Print_Current() const
         for(int j=0;j<rows.m;j++){
             if(!valid_row(j)) continue;
             int m=Get_Block_Lazy(i,j);
-            if(m!=zero_block) printf("%4i",m);
-            else printf("    ");}
+            if(m==zero_block) printf("    ");
+            else if(m&use_trans) printf("%3it",m&~use_trans);
+            else printf("%4i",m);}
         printf("\n");}
 }
 //#####################################################################
 // Function Fill_Blocks
 //#####################################################################
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::
-Fill_Blocks(ARRAY<VECTOR<int,2> >& dof_map,const ARRAY<TRIPLE<int,int,T> >& data,const ARRAY<T>& rhs_vector)
+Fill_Blocks(ARRAY<VECTOR<int,2> >& dof_map,const ARRAY<VECTOR<int,3> >& coded_entries,
+    const ARRAY<T>& code_values,const ARRAY<T>& rhs_vector)
 {
-    for(auto t:data){
-        auto& M=Get_Orig_By_Blocks(dof_map(t.x).x,dof_map(t.y).x);
-        M(dof_map(t.x).y,dof_map(t.y).y)=t.z;}
+    HASHTABLE<VECTOR<int,2>,ARRAY<VECTOR<int,3> > > coded_blocks;
+    for(auto t:coded_entries){
+        ARRAY<VECTOR<int,3> >& a=coded_blocks.Get_Or_Insert({dof_map(t.x).x,dof_map(t.y).x});
+        a.Append({dof_map(t.x).y,dof_map(t.y).y,t.z});}
+    
+    block_list.Append({0,true,{zero_block}});
+    block_list.Append({0,true,{id_block}});
+    HASHTABLE<int,int> hash_to_id;
+    for(auto& t:coded_blocks){
+        t.data.Sort(LEXICOGRAPHIC_COMPARE());
+        LOG::printf("%P\n",t.data);
+        int h=Hash(t.data),id=-1;
+        if(!hash_to_id.Get(h,id)){
+            LOG::printf("NEW\n");
+            id=block_list.m;
+            hash_to_id.Set(h,id);
+            MATRIX_MXN<T>* M=new MATRIX_MXN<T>(orig_sizes(t.key.x),orig_sizes(t.key.y));
+            block_list.Append({M,t.key.x==t.key.y,{block_list.m}});
+            for(auto& s:t.data){
+                (*M)(s.x,s.y)=code_values(s.z);
+                std::swap(s.x,s.y);}
+            t.data.Sort(LEXICOGRAPHIC_COMPARE());
+            int th=Hash(t.data);
+            if(th!=h)
+                hash_to_id.Set(th,id|use_trans);}
+        blocks_to_canonical_block_id.Set(t.key,id);}
 
     Unpack_Vector(dof_map,rhs,rhs_vector);
 }
@@ -237,8 +286,9 @@ Back_Solve()
         if(!rhs(r))
             rhs(r)=new ARRAY<T>(orig_sizes(r));
         for(auto e:rows(r))
-            if(e.c!=r && rhs(e.c))
-                *rhs(r)-=*block_list(e.matrix_id)**rhs(e.c);}
+            if(e.c!=r && rhs(e.c)){
+                if(e.matrix_id&use_trans) *rhs(r)-=block_list(e.matrix_id).M->Transpose_Times(*rhs(e.c));
+                else *rhs(r)-=*block_list(e.matrix_id).M**rhs(e.c);}}
 }
 //#####################################################################
 // Function Test_State
@@ -250,7 +300,8 @@ Add_Times(ARRAY<ARRAY<T>*>& out,const ARRAY<ARRAY<T>*>& in)
         for(auto e:rows(r))
             if(in(e.c)){
                 if(!out(r)) out(r)=new ARRAY<T>(orig_sizes(r));
-                *out(r)+=*block_list(e.matrix_id)**in(e.c);}
+                if(e.matrix_id&use_trans) *out(r)+=block_list(e.matrix_id&~use_trans).M->Transpose_Times(*in(e.c));
+                else *out(r)+=*block_list(e.matrix_id).M**in(e.c);}
 }
 //#####################################################################
 // Function Test_State
@@ -299,7 +350,26 @@ Pack_Vector(ARRAY<VECTOR<int,2> >& dof_map,ARRAY<T>& v,const ARRAY<ARRAY<T>*>& u
         int b=dof_map(i).x;
         if(u(b)) v(i)=(*u(b))(dof_map(i).y);}
 }
+//#####################################################################
+// Function Transposed
+//#####################################################################
+template<class T> ARRAY<int> CACHED_ELIMINATION_MATRIX<T>::
+Transposed(const ARRAY<int>& a) const
+{
+    ARRAY<int> r;
+    for(int i=a.m-1;i>=0;i--)
+        r.Append(Transposed(a(i)));
+    return r;
+}
+//#####################################################################
+// Function Prod_List
+//#####################################################################
+template<class T> ARRAY<int> CACHED_ELIMINATION_MATRIX<T>::
+Prod_List(int a) const
+{
+    const ARRAY<int>& ar=block_list(a&~use_trans).prod_list;
+    if(a&use_trans) return Transposed(ar);
+    return ar;
+}
 template struct CACHED_ELIMINATION_MATRIX<double>;
-template void Setup_Block_Map<double,VECTOR<double,2> >(
-    CACHED_ELIMINATION_MATRIX<double>&,FLUID_LAYOUT<VECTOR<double,2> > const&);
 }

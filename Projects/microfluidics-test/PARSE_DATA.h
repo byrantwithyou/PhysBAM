@@ -9,7 +9,7 @@
 #include <functional>
 
 namespace PhysBAM{
-enum INDEX_TYPE {fluid, noslip, source, dirichlet};
+enum INDEX_TYPE {fluid, wall, dirichlet, nodof};
 
 template<class TV>
 struct PARSE_DATA

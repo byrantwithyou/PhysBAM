@@ -26,9 +26,18 @@ Compute(const PARSE_DATA<TV>& pd)
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    used_faces.Resize(grid,1,true,true,{noslip,-1,-1,0});
-    used_cells.Resize(grid.Domain_Indices(1),use_init,{dirichlet,-1,-1,0,-1});
+    used_faces.Resize(grid,1,true,true,{nodof,-1,-1,0});
+    used_cells.Resize(grid.Domain_Indices(1),use_init,{nodof,-1,-1,0,-1});
     
+    for(auto& i:pd.pipes)
+    {
+        RANGE<TV_INT> box=RANGE<TV_INT>::Combine(pd.pts(i.x).box,pd.pts(i.y).box);
+        for(FACE_RANGE_ITERATOR<TV::m> it(box,RF::ghost);it.Valid();it.Next())
+            used_faces(it.face).type=wall;
+        for(RANGE_ITERATOR<TV::m> it(box,RI::ghost);it.Valid();it.Next())
+            used_cells(it.index).type=wall;
+    }
+
     for(auto& i:pd.pts)
     {
         for(FACE_RANGE_ITERATOR<TV::m> it(i.box,RF::skip_outer);it.Valid();it.Next())
@@ -52,7 +61,7 @@ Compute(const PARSE_DATA<TV>& pd)
         RANGE<TV_INT> box=i.box;
         if(i.bc_type==dirichlet)
         {
-            for(RANGE_ITERATOR<TV::m> it(box,1,0,RI::ghost,i.bc_side);it.Valid();it.Next())
+            for(RANGE_ITERATOR<TV::m> it(box,1,0,RI::ghost|RI::partial_single_side,i.bc_side);it.Valid();it.Next())
             {
                 used_cells(it.index)={i.bc_type,next_block,-1,i.bc_value,-1};
             }
@@ -61,7 +70,7 @@ Compute(const PARSE_DATA<TV>& pd)
                 used_faces(it.face).type=fluid;
             }
         }
-        if(i.bc_type==source)
+        if(i.bc_type==wall)
         {
             for(FACE_RANGE_ITERATOR<TV::m> it(box,0,0,RF::ghost,i.bc_side);it.Valid();it.Next())
             {
@@ -150,16 +159,15 @@ Dump_Layout() const
     {
         auto& f=used_faces(it.face);
         if(f.type==fluid) Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));
-        else if(f.type==noslip) Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,1,1));
-        else if(f.type==source) Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,1,0));
-        else Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
+        else if(f.type==wall) Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,1,1));
+        else PHYSBAM_ASSERT(f.type==nodof);
     }
     for(CELL_ITERATOR<TV> it(grid,1);it.Valid();it.Next())
     {
         auto& c=used_cells(it.index);
         if(c.type==fluid) Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));
         else if(c.type==dirichlet) Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,1));
-        else Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
+        else PHYSBAM_ASSERT(c.type==nodof);
     }
 }
 //#####################################################################
@@ -176,8 +184,7 @@ Dump_Dofs() const
         auto& f=used_faces(it.face);
         std::string s=LOG::sprintf("%i",f.global_id);
         if(f.type==fluid) Add_Debug_Text(it.Location(),s,VECTOR<T,3>(1,1,1));
-        else if(f.type==noslip) Add_Debug_Text(it.Location(),s,VECTOR<T,3>(0,1,1));
-        else if(f.type==source) Add_Debug_Text(it.Location(),s,VECTOR<T,3>(0,1,0));
+        else if(f.type==wall) Add_Debug_Text(it.Location(),s,VECTOR<T,3>(0,1,1));
         else Add_Debug_Text(it.Location(),s,VECTOR<T,3>(1,0,0));
     }
     for(CELL_ITERATOR<TV> it(grid,1);it.Valid();it.Next())

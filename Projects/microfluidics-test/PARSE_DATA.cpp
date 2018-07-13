@@ -114,7 +114,7 @@ Parse_Input(const std::string& pipe_file)
                     char* end=0;
                     ss>>name1>>a>>name2;
                     int i0=pts_index[name1];
-                    pts(i0).bc_type=source;
+                    pts(i0).bc_type=wall;
                     pts(i0).bc_side=a;
                     pts(i0).bc_value=strtod(name2.c_str(),&end);
                     if(*end)

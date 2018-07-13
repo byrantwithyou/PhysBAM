@@ -83,16 +83,19 @@ int main(int argc, char* argv[])
     Flush_Frame<TV>("block types");
 
     SYSTEM_MATRIX_HELPER<T> MH;
+    ARRAY<VECTOR<int,3> > coded_entries;
+    ARRAY<T> code_values;
     ARRAY<T> rhs_vector,sol_vector;
-    Compute_Full_Matrix(grid,MH,rhs_vector,fl,mu);
+    Compute_Full_Matrix(grid,coded_entries,code_values,rhs_vector,fl,mu);
+    for(auto e:coded_entries) MH.data.Append({e.x,e.y,code_values(e.z)});
     Solve_And_Display_Solution(grid,fl,MH,rhs_vector,&sol_vector);
 
     CACHED_ELIMINATION_MATRIX<T> elim_mat;
     elim_mat.orig_sizes.Resize(fl.blocks.m);
     for(int i=0;i<fl.blocks.m;i++) elim_mat.orig_sizes(i)=fl.blocks(i).num_dofs;
-    Setup_Block_Map(elim_mat,fl);
+//    Setup_Block_Map(elim_mat,fl);
 
-    elim_mat.Fill_Blocks(fl.dof_map,MH.data,rhs_vector);
+    elim_mat.Fill_Blocks(fl.dof_map,coded_entries,code_values,rhs_vector);
 
     elim_mat.Unpack_Vector(fl.dof_map,elim_mat.test_sol,sol_vector);
 
@@ -100,7 +103,7 @@ int main(int argc, char* argv[])
     elim_mat.Test_State();
 
     for(int i=2;i<elim_mat.block_list.m;i++)
-        OCTAVE_OUTPUT<T>(LOG::sprintf("M-%i.txt",i).c_str()).Write("M",*elim_mat.block_list(i));
+        OCTAVE_OUTPUT<T>(LOG::sprintf("M-%i.txt",i).c_str()).Write("M",*elim_mat.block_list(i).M);
 
     {
         OCTAVE_OUTPUT<T> oo("block.txt");
@@ -123,8 +126,10 @@ int main(int argc, char* argv[])
         oo.End_Sparse_Matrix();
     }
 
+    elim_mat.Print_Full();
     for(int i=0;i<pd.pts.m;i++)
         elim_mat.Eliminate_Row(i);
+    elim_mat.Print_Current();
 
     while(1)
     {
@@ -145,6 +150,7 @@ int main(int argc, char* argv[])
             if(elim_mat.valid_row(i) && elim_mat.rows(i).m<=3)
                 if(elim_mat.Get_Block_Lazy(i,i)==best_mat)
                     elim_mat.Eliminate_Row(i);
+        elim_mat.Print_Current();
     }
 
     PHYSBAM_ASSERT(elim_mat.elimination_order.m==elim_mat.orig_sizes.m);

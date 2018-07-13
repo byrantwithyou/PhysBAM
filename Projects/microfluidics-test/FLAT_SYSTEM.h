@@ -14,8 +14,8 @@ template<class T> class SYSTEM_MATRIX_HELPER;
 template<class TV> class FLUID_LAYOUT;
 
 template<class T,class TV>
-void Compute_Full_Matrix(const GRID<TV>& grid,SYSTEM_MATRIX_HELPER<T>& MH,
-    ARRAY<T>& rhs_vector,const FLUID_LAYOUT<TV>& fl,T mu);
+void Compute_Full_Matrix(const GRID<TV>& grid,ARRAY<VECTOR<int,3> >& coded_entries,
+    ARRAY<T>& code_values,ARRAY<T>& rhs_vector,const FLUID_LAYOUT<TV>& fl,T mu);
 
 template<class T,class TV>
 void Solve_And_Display_Solution(const GRID<TV>& grid,const FLUID_LAYOUT<TV>& fl,

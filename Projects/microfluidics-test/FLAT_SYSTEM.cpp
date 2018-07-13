@@ -21,37 +21,73 @@
 namespace PhysBAM{
 
 template<class T,class TV>
-void Compute_Full_Matrix(const GRID<TV>& grid,SYSTEM_MATRIX_HELPER<T>& MH,
-    ARRAY<T>& rhs_vector,const FLUID_LAYOUT<TV>& fl,T mu)
+void Compute_Full_Matrix(const GRID<TV>& grid,ARRAY<VECTOR<int,3> >& coded_entries,
+    ARRAY<T>& code_values,ARRAY<T>& rhs_vector,const FLUID_LAYOUT<TV>& fl,T mu)
 {
     typedef VECTOR<int,TV::m> TV_INT;
 
     rhs_vector.Resize(fl.Total_Dofs(),init_all,0);
-    auto face_func=[&fl](const FACE_INDEX<TV::m>& face, T& rhs)
-        {
-            auto& uf=fl.used_faces(face);
-            if(uf.type==fluid) return uf.global_id;
-            rhs=uf.bc_value;
-            return -1;
-        };
-    auto face_func_beta=[mu,face_func](const FACE_INDEX<TV::m>& face, T& beta, T& rhs)
-        {
-            beta=mu;
-            return face_func(face,rhs);
-        };
-    auto cell_func=[&fl](const VECTOR<int,TV::m>& cell, T& rhs)
-        {
-            auto& uc=fl.used_cells(cell);
-            if(uc.type==fluid) return uc.global_id;
-            rhs=uc.bc_value;
-            return -1;
-        };
 
-    Compute_Vector_Laplacian_Matrix(MH,grid,0,face_func_beta,cell_func,&rhs_vector);
-    MH.New_Block();
-    Compute_Gradient_Matrix(MH,grid,0,face_func,cell_func,&rhs_vector,&rhs_vector);
-    MH.Add_Transpose();
-    MH.Compact(fl.Total_Dofs());
+    TV de=mu*grid.one_over_dX*grid.one_over_dX;
+    code_values.Append_Elements(grid.one_over_dX);
+    code_values.Append_Elements(-grid.one_over_dX);
+    code_values.Append_Elements(-de);
+    for(int i=0;i<(1<<2*TV::m);i++){
+        T x=0;
+        for(int a=0;a<TV::m;a++)
+            x+=((i>>2*a)&3)*de(a);
+        code_values.Append(x);}
+    
+    for(FACE_RANGE_ITERATOR<TV::m> it(grid.Domain_Indices());it.Valid();it.Next()){
+        int diag_code=3*TV::m;
+        auto& uf=fl.used_faces(it.face);
+        if(uf.type!=fluid) continue;
+
+        for(int a=0;a<TV::m;a++){
+            for(int s=0,sn=-1;s<2;s++,sn+=2){
+                FACE_INDEX<TV::m> n(it.face);
+                n.index(a)+=sn;
+                auto& un=fl.used_faces(n);
+
+                if(un.type==nodof){
+                    if(it.face.axis==a) continue;
+                    FACE_INDEX<TV::m> g(it.face);
+                    g.index(a)+=s;
+                    if(fl.used_faces(g).type!=wall){
+                        FACE_INDEX<TV::m> h(g);
+                        h.index(it.face.axis)--;
+                        if(fl.used_faces(h).type!=wall)
+                            continue;}}
+
+                FACE_INDEX<TV::m> face=it.face;
+                face.index(a)+=sn;
+                diag_code+=1<<2*a;
+                if(un.type==fluid) coded_entries.Append({uf.global_id,un.global_id,2*TV::m+a});
+                else if(un.type==wall) rhs_vector(uf.global_id)=de(a)*un.bc_value;}}
+        coded_entries.Append({uf.global_id,uf.global_id,diag_code});}
+
+    for(FACE_RANGE_ITERATOR<TV::m> it(grid.Domain_Indices());it.Valid();it.Next()){
+        auto& uf=fl.used_faces(it.face);
+        auto& uc0=fl.used_cells(it.face.First_Cell_Index());
+        auto& uc1=fl.used_cells(it.face.Second_Cell_Index());
+        T e=grid.one_over_dX(it.face.axis);
+
+        if(uf.type!=fluid){
+            if(uf.type!=wall) continue;
+            if(uc0.type==fluid) rhs_vector(uc0.global_id)-=e*uf.bc_value;
+            if(uc1.type==fluid) rhs_vector(uc1.global_id)+=e*uf.bc_value;
+            continue;}
+
+        if(uc0.type==fluid){
+            coded_entries.Append({uf.global_id,uc0.global_id,TV::m+it.face.axis});
+            coded_entries.Append({uc0.global_id,uf.global_id,TV::m+it.face.axis});}
+        else if(uc0.type==dirichlet) rhs_vector(uf.global_id)-=e*uc0.bc_value;
+        
+        if(uc1.type==fluid){
+            coded_entries.Append({uf.global_id,uc1.global_id,it.face.axis});
+            coded_entries.Append({uc1.global_id,uf.global_id,it.face.axis});}
+        else if(uc1.type==dirichlet) rhs_vector(uf.global_id)+=e*uc1.bc_value;}
+
     rhs_vector=-rhs_vector;
 }
 
@@ -91,9 +127,9 @@ void Solve_And_Display_Solution(const GRID<TV>& grid,const FLUID_LAYOUT<TV>& fl,
     Flush_Frame(face_velocity,"solve");
 }
 
-template void Compute_Full_Matrix<double,VECTOR<double,2> >(
-    GRID<VECTOR<double,2> > const&,SYSTEM_MATRIX_HELPER<double>&,
-    ARRAY<double,int>&,FLUID_LAYOUT<VECTOR<double,2> > const&,double);
+template void Compute_Full_Matrix<double,VECTOR<double,2> >(GRID<VECTOR<double,2> > const&,
+    ARRAY<VECTOR<int,3>,int>&,ARRAY<double,int>&,ARRAY<double,int>&,
+    FLUID_LAYOUT<VECTOR<double,2> > const&,double);
 template void Solve_And_Display_Solution<double,VECTOR<double,2> >(
     GRID<VECTOR<double,2> > const&,FLUID_LAYOUT<VECTOR<double,2> > const&,
     SYSTEM_MATRIX_HELPER<double> const&,ARRAY<double,int> const&,ARRAY<double,int>*);
