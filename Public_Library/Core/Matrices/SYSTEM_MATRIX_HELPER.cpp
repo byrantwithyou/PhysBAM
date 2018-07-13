@@ -62,7 +62,7 @@ Shift(int dr,int dc,INTERVAL<int> range)
 // Function Compact
 //#####################################################################
 template<class T> void SYSTEM_MATRIX_HELPER<T>::
-Compact(int rows,ARRAY<T>* zero_me,int bound,T tol)
+Compact(int rows)
 {
     ARRAY<std::map<int,T> > maps(rows);
     for(int i=0;i<data.m;i++)
@@ -70,15 +70,8 @@ Compact(int rows,ARRAY<T>* zero_me,int bound,T tol)
 
     int k=0;
     for(int i=0;i<maps.m;i++)
-        for(typename std::map<int,T>::iterator it=maps(i).begin();it!=maps(i).end();it++)
-            if((i==it->first)&&(i<bound)&&(abs(it->second)<tol))
-                (*zero_me)(i)=true;
-                
-    k=0;
-    for(int i=0;i<maps.m;i++)
-        for(typename std::map<int,T>::iterator it=maps(i).begin();it!=maps(i).end();it++)
-            if(!((i<bound)&&(*zero_me)(i))&&!((it->first<bound)&&(*zero_me)(it->first))&&(abs(it->second)>=tol))
-                data(k++)=TRIPLE<int,int,T>(i,it->first,it->second);
+        for(auto it:maps(i))
+            data(k++)=TRIPLE<int,int,T>(i,it.first,it.second);
     data.Resize(k);
     compacted=true;
 }
@@ -86,30 +79,21 @@ Compact(int rows,ARRAY<T>* zero_me,int bound,T tol)
 // Function Set_Matrix
 //#####################################################################
 template<class T> void SYSTEM_MATRIX_HELPER<T>::
-Set_Matrix(int m,int n,SPARSE_MATRIX_FLAT_MXN<T>& M,ARRAY<T>* zero_me,int bound,T tol)
+Set_Matrix(int m,int n,SPARSE_MATRIX_FLAT_MXN<T>& M,bool sorted) const
 {
-    if(!compacted&&zero_me) Compact(m,zero_me,bound,tol);
     M.Reset(n);
     M.m=m;
-    M.A.Remove_All();
-    M.offsets.Resize(m+1);
-    for(int i=0;i<data.m;i++) M.offsets(data(i).x+1)++;
-    for(int i=0;i<M.offsets.m-1;i++) M.offsets(i+1)+=M.offsets(i);
-    for(int i=0;i<data.m;i++) M.A.Append(SPARSE_MATRIX_ENTRY<T>(data(i).y,data(i).z));
-}
-//#####################################################################
-// Function Set_Matrix
-//#####################################################################
-template<class T> void SYSTEM_MATRIX_HELPER<T>::
-Set_Matrix(int n,SPARSE_MATRIX_FLAT_MXN<T>& M,ARRAY<T>* zero_me,int bound,T tol)
-{
-    if(!compacted&&zero_me) Compact(n,zero_me,bound,tol);
-    M.Reset(n);
-    M.A.Remove_All();
-    M.offsets.Resize(n+1);
-    for(int i=0;i<data.m;i++) M.offsets(data(i).x+1)++;
-    for(int i=0;i<M.offsets.m-1;i++) M.offsets(i+1)+=M.offsets(i);
-    for(int i=0;i<data.m;i++) M.A.Append(SPARSE_MATRIX_ENTRY<T>(data(i).y,data(i).z));
+    M.A.Resize(data.m);
+    M.offsets.Resize(m+1,init_all,0);
+    for(auto i:data) M.offsets(i.x+1)++;
+    int start=0;
+    for(int i=0;i<M.offsets.m;i++){
+        int k=M.offsets(i);
+        M.offsets(i)=start;
+        start+=k;}
+    for(auto i:data)
+        M.A(M.offsets(i.x+1)++)={i.y,i.z};
+    if(!sorted) M.Sort_Entries();
 }
 //#####################################################################
 // Function Add

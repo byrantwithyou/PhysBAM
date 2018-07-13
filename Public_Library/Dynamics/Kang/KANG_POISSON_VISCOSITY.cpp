@@ -193,7 +193,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
 
     LOG::cout<<"pressure jump range: "<<mn<<"  "<<mx<<std::endl;
     SPARSE_MATRIX_FLAT_MXN<T> matrix;
-    helper.Set_Matrix(num_cells,matrix);
+    helper.Set_Matrix(num_cells,num_cells,matrix);
     typedef MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_MXN<T>,T,KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > > SYSTEM;
     matrix.Construct_Incomplete_Cholesky_Factorization();
     SYSTEM system(matrix);
@@ -328,7 +328,7 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
     if(implicit) for(int i=0;i<r.v.m;i++) helper.data.Append(TRIPLE<int,int,T>(i,i,r.v(i)));
 
     SPARSE_MATRIX_FLAT_MXN<T> matrix;
-    helper.Set_Matrix(num_dual_cells,matrix);
+    helper.Set_Matrix(num_dual_cells,num_dual_cells,matrix);
 
     static int solve_id=-1;solve_id++;
     if(print_matrix){
