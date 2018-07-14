@@ -28,6 +28,7 @@
 #include "CACHED_ELIMINATION_MATRIX.h"
 #include "FLAT_SYSTEM.h"
 #include "FLUID_LAYOUT.h"
+#include <suitesparse/colamd.h>
 
 using namespace PhysBAM;
 
@@ -88,7 +89,7 @@ int main(int argc, char* argv[])
     ARRAY<T> rhs_vector,sol_vector;
     Compute_Full_Matrix(grid,coded_entries,code_values,rhs_vector,fl,mu);
     for(auto e:coded_entries) MH.data.Append({e.x,e.y,code_values(e.z)});
-    Solve_And_Display_Solution(grid,fl,MH,rhs_vector,&sol_vector);
+//    Solve_And_Display_Solution(grid,fl,MH,rhs_vector,&sol_vector);
 
     CACHED_ELIMINATION_MATRIX<T> elim_mat;
     elim_mat.orig_sizes.Resize(fl.blocks.m);
@@ -126,13 +127,13 @@ int main(int argc, char* argv[])
         oo.End_Sparse_Matrix();
     }
 
-    elim_mat.Print_Full();
+//    elim_mat.Print_Full();
     for(int i=0;i<pd.pts.m;i++)
         elim_mat.Eliminate_Row(i);
-    elim_mat.Print_Current();
 
     while(1)
     {
+        printf("start elim\n");
         std::map<int,int> counts;
         for(int i=0;i<elim_mat.rows.m;i++)
             if(elim_mat.valid_row(i) && elim_mat.rows(i).m<=3)
@@ -150,8 +151,36 @@ int main(int argc, char* argv[])
             if(elim_mat.valid_row(i) && elim_mat.rows(i).m<=3)
                 if(elim_mat.Get_Block_Lazy(i,i)==best_mat)
                     elim_mat.Eliminate_Row(i);
-        elim_mat.Print_Current();
+        printf("end elim\n");
     }
+//    elim_mat.Print_Current();
+
+    ARRAY<int> reduce(elim_mat.rows.m,use_init,-1),remaining_dofs;
+    for(int i=0;i<reduce.m;i++)
+        if(elim_mat.valid_row(i))
+            reduce(i)=remaining_dofs.Append(i);
+    ARRAY<int> indices,offsets;
+    offsets.Append(indices.m);
+    for(int i=0;i<remaining_dofs.m;i++){
+        for(const auto& r:elim_mat.rows(remaining_dofs(i)))
+            indices.Append(reduce(r.c));
+        std::sort(&indices(offsets.Last()),&indices(0)+indices.m);
+        offsets.Append(indices.m);}
+
+    printf("start colamd\n");
+    int stats[COLAMD_STATS];
+    ARRAY<int> perm(remaining_dofs.m);
+    LOG::printf("size %P\n",remaining_dofs.m);
+    LOG::printf("indices %P\n",indices);
+    LOG::printf("offsets %P\n",offsets);
+    int ret=symamd(remaining_dofs.m,indices.Get_Array_Pointer(),
+        offsets.Get_Array_Pointer(),perm.Get_Array_Pointer(),
+        0,stats,calloc,free);
+    printf("symamd %i\n",ret);
+    colamd_report(stats);
+    LOG::printf("perm %P\n",perm);
+    for(int i=0;i<perm.m;i++)
+        elim_mat.Eliminate_Row(remaining_dofs(perm(i)));
 
     PHYSBAM_ASSERT(elim_mat.elimination_order.m==elim_mat.orig_sizes.m);
     elim_mat.Back_Solve();

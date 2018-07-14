@@ -37,7 +37,12 @@ Eliminate_Row(int r)
         if(row(i).c==r)
             row(i).matrix_id=id_block;
         else
-            row(i).matrix_id=Compute_Mul(inv,row(i).matrix_id);}
+            row(i).matrix_id=Compute_Mul(inv,row(i).matrix_id);
+        auto M=block_list(row(i).matrix_id&~use_trans).M;
+        if(!M) continue;
+        if(row(i).matrix_id&use_trans){PHYSBAM_ASSERT(M->Columns()==orig_sizes(r));}
+        else{PHYSBAM_ASSERT(M->Rows()==orig_sizes(r));}
+    }
 
     for(int i=0;i<row.m;i++){
         int s=row(i).c;
@@ -52,7 +57,11 @@ Eliminate_Row(int r)
         for(int j=0;j<row.m;j++){
             int t=row(j).c;
             int& m=Get_Block(s,t);
-            m=Compute_Elim(m,elim_mat,row(j).matrix_id);}
+            m=Compute_Elim(m,elim_mat,row(j).matrix_id);
+            auto M=block_list(m&~use_trans).M;
+            if(!M) continue;
+            if(m&use_trans){PHYSBAM_ASSERT(M->Columns()==orig_sizes(s));}
+            else{PHYSBAM_ASSERT(M->Rows()==orig_sizes(s));}}
         for(int j=rows(s).m-1;j>=0;j--)
             if(rows(s)(j).matrix_id==zero_block)
                 rows(s).Remove_Index_Lazy(j);}
@@ -256,10 +265,8 @@ Fill_Blocks(ARRAY<VECTOR<int,2> >& dof_map,const ARRAY<VECTOR<int,3> >& coded_en
     HASHTABLE<int,int> hash_to_id;
     for(auto& t:coded_blocks){
         t.data.Sort(LEXICOGRAPHIC_COMPARE());
-        LOG::printf("%P\n",t.data);
         int h=Hash(t.data),id=-1;
         if(!hash_to_id.Get(h,id)){
-            LOG::printf("NEW\n");
             id=block_list.m;
             hash_to_id.Set(h,id);
             MATRIX_MXN<T>* M=new MATRIX_MXN<T>(orig_sizes(t.key.x),orig_sizes(t.key.y));
