@@ -32,36 +32,36 @@ Eliminate_Row(int r)
     int diag_matrix=Get_Block_Lazy(r,r);
     int inv=Compute_Inv(diag_matrix);
     ARRAY<MATRIX_BLOCK>& row=rows(r);
-    if(rhs(r)) *rhs(r)=*block_list(inv).M**rhs(r);
+    if(rhs(r).m) rhs(r)=block_list(inv).M*rhs(r);
     for(int i=0;i<row.m;i++){
         if(row(i).c==r)
             row(i).matrix_id=id_block;
         else
             row(i).matrix_id=Compute_Mul(inv,row(i).matrix_id);
         auto M=block_list(row(i).matrix_id&~use_trans).M;
-        if(!M) continue;
-        if(row(i).matrix_id&use_trans){PHYSBAM_ASSERT(M->Columns()==orig_sizes(r));}
-        else{PHYSBAM_ASSERT(M->Rows()==orig_sizes(r));}
+        if(!M.m) continue;
+        if(row(i).matrix_id&use_trans){PHYSBAM_ASSERT(M.Columns()==orig_sizes(r));}
+        else{PHYSBAM_ASSERT(M.Rows()==orig_sizes(r));}
     }
 
     for(int i=0;i<row.m;i++){
         int s=row(i).c;
         if(s==r) continue;
         int elim_mat=Get_Block_Lazy(s,r);
-        if(rhs(r)){
+        if(rhs(r).m){
             ARRAY<T> a;
-            if(elim_mat&use_trans) a=block_list(elim_mat&~use_trans).M->Transpose_Times(*rhs(r));
-            else a=*block_list(elim_mat).M**rhs(r);
-            if(!rhs(s)) rhs(s)=new ARRAY<T>(-a);
-            else *rhs(s)-=a;}
+            if(elim_mat&use_trans) a=block_list(elim_mat&~use_trans).M.Transpose_Times(rhs(r));
+            else a=block_list(elim_mat).M*rhs(r);
+            if(!rhs(s).m) rhs(s)=-a;
+            else rhs(s)-=a;}
         for(int j=0;j<row.m;j++){
             int t=row(j).c;
             int& m=Get_Block(s,t);
             m=Compute_Elim(m,elim_mat,row(j).matrix_id);
             auto M=block_list(m&~use_trans).M;
-            if(!M) continue;
-            if(m&use_trans){PHYSBAM_ASSERT(M->Columns()==orig_sizes(s));}
-            else{PHYSBAM_ASSERT(M->Rows()==orig_sizes(s));}}
+            if(!M.m) continue;
+            if(m&use_trans){PHYSBAM_ASSERT(M.Columns()==orig_sizes(s));}
+            else{PHYSBAM_ASSERT(M.Rows()==orig_sizes(s));}}
         for(int j=rows(s).m-1;j>=0;j--)
             if(rows(s)(j).matrix_id==zero_block)
                 rows(s).Remove_Index_Lazy(j);}
@@ -119,10 +119,9 @@ Compute_Inv(int a)
     if(a==id_block) return id_block;
     int& r=cached_ops.Get_Or_Insert({op_inv,a,0},invalid_block);
     if(r==invalid_block){
-        auto* M=new MATRIX_MXN<T>;
         PHYSBAM_ASSERT(block_list(a).sym);
-        block_list(a).M->PLU_Inverse(*M);
-        int n=block_list.Append({M,true,{block_list.m}});
+        int n=block_list.Append({{},true,{block_list.m}});
+        block_list(a).M.PLU_Inverse(block_list.Last().M);
         r=n;
 
         auto ch=[this](int a){if(a&use_trans) return 't';if(Symmetric(a)) return 's';return ' ';};
@@ -152,17 +151,16 @@ Compute_Mul(int a,int b)
         prod_list.Append_Elements(Prod_List(b));
         if(int* p=prod_lookup.Get_Pointer(prod_list))
             return *p;
+        ARRAY<int> prod_list_trans=Transposed(prod_list);
+        bool sym=prod_list==prod_list_trans;
+        int n=block_list.Append({{},sym,prod_list});
+        MATRIX_MXN<T>& M=block_list.Last().M;
 
-        auto& A=*block_list(a&~use_trans).M;
-        auto& B=*block_list(b&~use_trans).M;
-        MATRIX_MXN<T>& M=*new MATRIX_MXN<T>;
+        auto& A=block_list(a&~use_trans).M;
+        auto& B=block_list(b&~use_trans).M;
         if(b&use_trans) M=A.Times_Transpose(B);
         else if(a&use_trans) M=A.Transpose_Times(B);
         else M=A*B;
-        ARRAY<int> prod_list_trans=Transposed(prod_list);
-        bool sym=prod_list==prod_list_trans;
-
-        int n=block_list.Append({&M,sym,prod_list});
         if(!sym) cached_ops.Set({op_mul,Transposed(b),Transposed(a)},n^use_trans);
         prod_lookup.Set(prod_list,n);
         if(!sym) prod_lookup.Set(prod_list_trans,Transposed(n));
@@ -190,13 +188,13 @@ Compute_Sub(int a,int b)
 
     int& r=cached_ops.Get_Or_Insert({op_sub,a,b},invalid_block);
     if(r==invalid_block){
-        auto& A=*block_list(a&~use_trans).M;
-        auto& B=*block_list(b&~use_trans).M;
-        auto& C=*new MATRIX_MXN<T>;
+        auto& A=block_list(a&~use_trans).M;
+        auto& B=block_list(b&~use_trans).M;
+        int n=block_list.Append({{},Symmetric(a)&&Symmetric(b),{block_list.m}});
+        auto& C=block_list.Last().M;
         if(a==zero_block) C=-B;
         else if(Symmetric(a) || Symmetric(b) || !(b&use_trans)) C=A-B;
         else C=A-B.Transposed();
-        int n=block_list.Append({&C,Symmetric(a)&&Symmetric(b),{block_list.m}});
         r=n;
 
         auto ch=[this](int a){if(a&use_trans) return 't';if(Symmetric(a)) return 's';return ' ';};
@@ -260,8 +258,8 @@ Fill_Blocks(ARRAY<VECTOR<int,2> >& dof_map,const ARRAY<VECTOR<int,3> >& coded_en
         ARRAY<VECTOR<int,3> >& a=coded_blocks.Get_Or_Insert({dof_map(t.x).x,dof_map(t.y).x});
         a.Append({dof_map(t.x).y,dof_map(t.y).y,t.z});}
     
-    block_list.Append({0,true,{zero_block}});
-    block_list.Append({0,true,{id_block}});
+    block_list.Append({{},true,{zero_block}});
+    block_list.Append({{},true,{id_block}});
     HASHTABLE<int,int> hash_to_id;
     for(auto& t:coded_blocks){
         t.data.Sort(LEXICOGRAPHIC_COMPARE());
@@ -269,10 +267,10 @@ Fill_Blocks(ARRAY<VECTOR<int,2> >& dof_map,const ARRAY<VECTOR<int,3> >& coded_en
         if(!hash_to_id.Get(h,id)){
             id=block_list.m;
             hash_to_id.Set(h,id);
-            MATRIX_MXN<T>* M=new MATRIX_MXN<T>(orig_sizes(t.key.x),orig_sizes(t.key.y));
-            block_list.Append({M,t.key.x==t.key.y,{block_list.m}});
+            block_list.Append({{orig_sizes(t.key.x),orig_sizes(t.key.y)},t.key.x==t.key.y,{block_list.m}});
+            MATRIX_MXN<T>& M=block_list.Last().M;
             for(auto& s:t.data){
-                (*M)(s.x,s.y)=code_values(s.z);
+                M(s.x,s.y)=code_values(s.z);
                 std::swap(s.x,s.y);}
             t.data.Sort(LEXICOGRAPHIC_COMPARE());
             int th=Hash(t.data);
@@ -290,25 +288,24 @@ Back_Solve()
 {
     for(int j=elimination_order.m-1;j>=0;j--){
         int r=elimination_order(j);
-        if(!rhs(r))
-            rhs(r)=new ARRAY<T>(orig_sizes(r));
+        if(!rhs(r).m) rhs(r).Resize(orig_sizes(r));
         for(auto e:rows(r))
-            if(e.c!=r && rhs(e.c)){
-                if(e.matrix_id&use_trans) *rhs(r)-=block_list(e.matrix_id).M->Transpose_Times(*rhs(e.c));
-                else *rhs(r)-=*block_list(e.matrix_id).M**rhs(e.c);}}
+            if(e.c!=r && rhs(e.c).m){
+                if(e.matrix_id&use_trans) rhs(r)-=block_list(e.matrix_id).M.Transpose_Times(rhs(e.c));
+                else rhs(r)-=block_list(e.matrix_id).M*rhs(e.c);}}
 }
 //#####################################################################
 // Function Test_State
 //#####################################################################
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::
-Add_Times(ARRAY<ARRAY<T>*>& out,const ARRAY<ARRAY<T>*>& in)
+Add_Times(ARRAY<ARRAY<T> >& out,const ARRAY<ARRAY<T> >& in)
 {
     for(int r=0;r<rows.m;r++)
         for(auto e:rows(r))
-            if(in(e.c)){
-                if(!out(r)) out(r)=new ARRAY<T>(orig_sizes(r));
-                if(e.matrix_id&use_trans) *out(r)+=block_list(e.matrix_id&~use_trans).M->Transpose_Times(*in(e.c));
-                else *out(r)+=*block_list(e.matrix_id).M**in(e.c);}
+            if(in(e.c).m){
+                if(!out(r).m) out(r).Resize(orig_sizes(r));
+                if(e.matrix_id&use_trans) out(r)+=block_list(e.matrix_id&~use_trans).M.Transpose_Times(in(e.c));
+                else out(r)+=block_list(e.matrix_id).M*in(e.c);}
 }
 //#####################################################################
 // Function Test_State
@@ -316,46 +313,43 @@ Add_Times(ARRAY<ARRAY<T>*>& out,const ARRAY<ARRAY<T>*>& in)
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::
 Test_State()
 {
-    LOG::printf("BEGIN TEST\n");
-    ARRAY<ARRAY<T>*> residual(test_sol.m);
+    ARRAY<ARRAY<T> > residual(test_sol.m);
     for(int i=0;i<test_sol.m;i++){
-        if(rhs(i)) residual(i)=new ARRAY<T>(-*rhs(i));
-        else residual(i)=new ARRAY<T>(orig_sizes(i));}
+        if(rhs(i).m) residual(i)=-rhs(i);
+        else residual(i).Resize(orig_sizes(i));}
 
     Add_Times(residual,test_sol);
 
+    T sum=0;
     for(int r=0;r<rows.m;r++)
-    {
-        LOG::printf("A %P\n",*residual(r));
-        if(rhs(r)) LOG::printf("B %P\n",*rhs(r));
-    }
-    LOG::printf("END TEST\n");
+        sum+=residual(r).Magnitude_Squared();
+    LOG::printf("TEST ERROR %P\n",sqrt(sum));
 }
 //#####################################################################
 // Function Unpack_Vector
 //#####################################################################
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::
-Unpack_Vector(ARRAY<VECTOR<int,2> >& dof_map,ARRAY<ARRAY<T>*>& u,const ARRAY<T>& v)
+Unpack_Vector(ARRAY<VECTOR<int,2> >& dof_map,ARRAY<ARRAY<T> >& u,const ARRAY<T>& v)
 {
-    u.Delete_Pointers_And_Clean_Memory();
+    for(auto& i:u) i.Clean_Memory();
     u.Resize(orig_sizes.m);
     for(int i=0;i<v.m;i++)
         if(v(i)){
             int b=dof_map(i).x;
-            ARRAY<T>*& a=u(b);
-            if(!a) a=new ARRAY<T>(orig_sizes(b));
-            (*a)(dof_map(i).y)=v(i);}
+            ARRAY<T>& a=u(b);
+            if(!a.m) a.Resize(orig_sizes(b));
+            a(dof_map(i).y)=v(i);}
 }
 //#####################################################################
 // Function Pack_Vector
 //#####################################################################
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::
-Pack_Vector(ARRAY<VECTOR<int,2> >& dof_map,ARRAY<T>& v,const ARRAY<ARRAY<T>*>& u)
+Pack_Vector(ARRAY<VECTOR<int,2> >& dof_map,ARRAY<T>& v,const ARRAY<ARRAY<T> >& u)
 {
     v.Resize(dof_map.m,init_all,0);
     for(int i=0;i<v.m;i++){
         int b=dof_map(i).x;
-        if(u(b)) v(i)=(*u(b))(dof_map(i).y);}
+        if(u(b).m) v(i)=u(b)(dof_map(i).y);}
 }
 //#####################################################################
 // Function Transposed

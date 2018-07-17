@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
     ARRAY<T> rhs_vector,sol_vector;
     Compute_Full_Matrix(grid,coded_entries,code_values,rhs_vector,fl,mu);
     for(auto e:coded_entries) MH.data.Append({e.x,e.y,code_values(e.z)});
-//    Solve_And_Display_Solution(grid,fl,MH,rhs_vector,&sol_vector);
+    Solve_And_Display_Solution(grid,fl,MH,rhs_vector,&sol_vector);
 
     CACHED_ELIMINATION_MATRIX<T> elim_mat;
     elim_mat.orig_sizes.Resize(fl.blocks.m);
@@ -104,12 +104,12 @@ int main(int argc, char* argv[])
     elim_mat.Test_State();
 
     for(int i=2;i<elim_mat.block_list.m;i++)
-        OCTAVE_OUTPUT<T>(LOG::sprintf("M-%i.txt",i).c_str()).Write("M",*elim_mat.block_list(i).M);
+        OCTAVE_OUTPUT<T>(LOG::sprintf("M-%i.txt",i).c_str()).Write("M",elim_mat.block_list(i).M);
 
     {
         OCTAVE_OUTPUT<T> oo("block.txt");
         ARRAY<T> l(sol_vector.m),r(sol_vector.m);
-        ARRAY<ARRAY<T>*> ll,rr;
+        ARRAY<ARRAY<T> > ll,rr;
         int b=l.m;
         oo.Begin_Sparse_Matrix("N",l.m,b);
         l*=0;
@@ -130,6 +130,7 @@ int main(int argc, char* argv[])
 //    elim_mat.Print_Full();
     for(int i=0;i<pd.pts.m;i++)
         elim_mat.Eliminate_Row(i);
+    elim_mat.Test_State();
 
     while(1)
     {
@@ -159,28 +160,29 @@ int main(int argc, char* argv[])
     for(int i=0;i<reduce.m;i++)
         if(elim_mat.valid_row(i))
             reduce(i)=remaining_dofs.Append(i);
-    ARRAY<int> indices,offsets;
-    offsets.Append(indices.m);
-    for(int i=0;i<remaining_dofs.m;i++){
-        for(const auto& r:elim_mat.rows(remaining_dofs(i)))
-            indices.Append(reduce(r.c));
-        std::sort(&indices(offsets.Last()),&indices(0)+indices.m);
-        offsets.Append(indices.m);}
+    if(remaining_dofs.m){
+        ARRAY<int> indices,offsets;
+        offsets.Append(indices.m);
+        for(int i=0;i<remaining_dofs.m;i++){
+            for(const auto& r:elim_mat.rows(remaining_dofs(i)))
+                indices.Append(reduce(r.c));
+            std::sort(&indices(offsets.Last()),&indices(0)+indices.m);
+            offsets.Append(indices.m);}
 
-    printf("start colamd\n");
-    int stats[COLAMD_STATS];
-    ARRAY<int> perm(remaining_dofs.m);
-    LOG::printf("size %P\n",remaining_dofs.m);
-    LOG::printf("indices %P\n",indices);
-    LOG::printf("offsets %P\n",offsets);
-    int ret=symamd(remaining_dofs.m,indices.Get_Array_Pointer(),
-        offsets.Get_Array_Pointer(),perm.Get_Array_Pointer(),
-        0,stats,calloc,free);
-    printf("symamd %i\n",ret);
-    colamd_report(stats);
-    LOG::printf("perm %P\n",perm);
-    for(int i=0;i<perm.m;i++)
-        elim_mat.Eliminate_Row(remaining_dofs(perm(i)));
+        printf("start colamd\n");
+        int stats[COLAMD_STATS];
+        ARRAY<int> perm(remaining_dofs.m);
+        LOG::printf("size %P\n",remaining_dofs.m);
+        LOG::printf("indices %P\n",indices);
+        LOG::printf("offsets %P\n",offsets);
+        int ret=symamd(remaining_dofs.m,indices.Get_Array_Pointer(),
+            offsets.Get_Array_Pointer(),perm.Get_Array_Pointer(),
+            0,stats,calloc,free);
+        printf("symamd %i\n",ret);
+        colamd_report(stats);
+        LOG::printf("perm %P\n",perm);
+        for(int i=0;i<perm.m;i++)
+            elim_mat.Eliminate_Row(remaining_dofs(perm(i)));}
 
     PHYSBAM_ASSERT(elim_mat.elimination_order.m==elim_mat.orig_sizes.m);
     elim_mat.Back_Solve();
@@ -189,7 +191,7 @@ int main(int argc, char* argv[])
     for(FACE_ITERATOR<TV> it(grid,1);it.Valid();it.Next()){
         auto& uf=fl.used_faces(it.Full_Index());
         if(uf.type!=fluid) continue;
-        face_velocity(it.Full_Index())=(*elim_mat.rhs(uf.block_id))(uf.block_dof);}
+        face_velocity(it.Full_Index())=elim_mat.rhs(uf.block_id)(uf.block_dof);}
     Flush_Frame(face_velocity,"elim solve");
     
     return 0;

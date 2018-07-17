@@ -19,7 +19,7 @@ struct CACHED_ELIMINATION_MATRIX
 
     struct MATRIX_INFO
     {
-        MATRIX_MXN<T>* M;
+        MATRIX_MXN<T> M;
         // symmetric if left-multiplied by this matrix
         // id_block if symmetric
         // zero_block if no special properties
@@ -43,8 +43,8 @@ struct CACHED_ELIMINATION_MATRIX
     };
 
     ARRAY<ARRAY<MATRIX_BLOCK> > rows;
-    ARRAY<ARRAY<T>*> rhs;
-    ARRAY<ARRAY<T>*> test_sol;
+    ARRAY<ARRAY<T> > rhs;
+    ARRAY<ARRAY<T> > test_sol;
 
     ARRAY<bool> valid_row;
     ARRAY<int> elimination_order;
@@ -65,9 +65,9 @@ struct CACHED_ELIMINATION_MATRIX
     void Print_Current() const;
     void Back_Solve();
     void Test_State();
-    void Unpack_Vector(ARRAY<VECTOR<int,2> >& dof_map,ARRAY<ARRAY<T>*>& u,const ARRAY<T>& v);
-    void Pack_Vector(ARRAY<VECTOR<int,2> >& dof_map,ARRAY<T>& v,const ARRAY<ARRAY<T>*>& u);
-    void Add_Times(ARRAY<ARRAY<T>*>& out,const ARRAY<ARRAY<T>*>& in);
+    void Unpack_Vector(ARRAY<VECTOR<int,2> >& dof_map,ARRAY<ARRAY<T> >& u,const ARRAY<T>& v);
+    void Pack_Vector(ARRAY<VECTOR<int,2> >& dof_map,ARRAY<T>& v,const ARRAY<ARRAY<T> >& u);
+    void Add_Times(ARRAY<ARRAY<T> >& out,const ARRAY<ARRAY<T> >& in);
     int Transposed(int a) const;
     bool Symmetric(int a) const;
     ARRAY<int> Transposed(const ARRAY<int>& a) const;
