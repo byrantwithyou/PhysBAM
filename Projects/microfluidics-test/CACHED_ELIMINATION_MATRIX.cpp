@@ -31,6 +31,7 @@ Eliminate_Row(int r)
 {
     LOG::printf("elim %i\n",r);
     Test_State("ER a");
+    Print_Full();
     int diag_matrix=Get_Block_Lazy(r,r);
     int inv=Compute_Inv(diag_matrix);
     ARRAY<MATRIX_BLOCK>& row=rows(r);
@@ -46,7 +47,7 @@ Eliminate_Row(int r)
         else{PHYSBAM_ASSERT(M.Rows()==orig_sizes(r));}
     }
     Test_State("ER b");
-
+    Print_Full();
     for(int i=0;i<row.m;i++){
         int s=row(i).c;
         if(s==r) continue;
@@ -64,6 +65,7 @@ Eliminate_Row(int r)
             if(rows(s)(j).matrix_id==zero_block)
                 rows(s).Remove_Index_Lazy(j);}
     Test_State("ER c");
+    Print_Full();
     valid_row(r)=false;
     elimination_order.Append(r);
 }
@@ -116,22 +118,22 @@ template<class T> int CACHED_ELIMINATION_MATRIX<T>::
 Compute_Inv(int a)
 {
     if(a==id_block) return id_block;
-    int& r=cached_ops.Get_Or_Insert({op_inv,a,0},invalid_block);
-    if(r==invalid_block){
-        PHYSBAM_ASSERT(block_list(a).sym);
-        int n=block_list.Append({{},true,{block_list.m}});
-        block_list(a).M.PLU_Inverse(block_list.Last().M);
-        LOG::printf("inv: %P\n",block_list(a).M);
-        r=n;
+    if(int* r=cached_ops.Get_Pointer({op_inv,a,0})) return *r;
+    PHYSBAM_ASSERT(block_list(a).sym);
+    int n=block_list.Append({{},true,{block_list.m}});
+    block_list(a).M.PLU_Inverse(block_list.Last().M);
+    LOG::printf("mat stats: %g -> %g  err %g\n",
+        block_list(a).M.Max_Abs(),block_list.Last().M.Max_Abs(),
+        (block_list(a).M*block_list.Last().M-(T)1).Max_Abs());
+    cached_ops.Set({op_inv,a,0},n);
 
-        auto ch=[this](int a){if(a&use_trans) return 't';if(Symmetric(a)) return 's';return ' ';};
+    auto ch=[this](int a){if(a&use_trans) return 't';if(Symmetric(a)) return 's';return ' ';};
 
-        printf("inv %i%c -> %i%c\n",
-            a&~use_trans,ch(a),
-            r&~use_trans,ch(r)
-        );
-    }
-    return r;
+    printf("inv %i%c -> %i%c\n",
+        a&~use_trans,ch(a),
+        n&~use_trans,ch(n)
+    );
+    return n;
 }
 //#####################################################################
 // Function Compute_Mul
@@ -145,36 +147,34 @@ Compute_Mul(int a,int b)
     if((a&b&use_trans) || (!Symmetric(a) && Symmetric(b)))
         return Transposed(Compute_Mul(Transposed(b),Transposed(a)));
 
-    int& r=cached_ops.Get_Or_Insert({op_mul,a,b},invalid_block);
-    if(r==invalid_block){
-        ARRAY<int> prod_list=Prod_List(a);
-        prod_list.Append_Elements(Prod_List(b));
-        if(int* p=prod_lookup.Get_Pointer(prod_list))
-            return *p;
-        ARRAY<int> prod_list_trans=Transposed(prod_list);
-        bool sym=prod_list==prod_list_trans;
-        int n=block_list.Append({{},sym,prod_list});
-        MATRIX_MXN<T>& M=block_list.Last().M;
+    if(int* r=cached_ops.Get_Pointer({op_mul,a,b})) return *r;
+    ARRAY<int> prod_list=Prod_List(a);
+    prod_list.Append_Elements(Prod_List(b));
+    if(int* p=prod_lookup.Get_Pointer(prod_list))
+        return *p;
+    ARRAY<int> prod_list_trans=Transposed(prod_list);
+    bool sym=prod_list==prod_list_trans;
+    int n=block_list.Append({{},sym,prod_list});
+    MATRIX_MXN<T>& M=block_list.Last().M;
 
-        auto& A=block_list(a&~use_trans).M;
-        auto& B=block_list(b&~use_trans).M;
-        if(b&use_trans) M=A.Times_Transpose(B);
-        else if(a&use_trans) M=A.Transpose_Times(B);
-        else M=A*B;
-        if(!sym) cached_ops.Set({op_mul,Transposed(b),Transposed(a)},n^use_trans);
-        prod_lookup.Set(prod_list,n);
-        if(!sym) prod_lookup.Set(prod_list_trans,Transposed(n));
-        r=n;
+    auto& A=block_list(a&~use_trans).M;
+    auto& B=block_list(b&~use_trans).M;
+    if(b&use_trans) M=A.Times_Transpose(B);
+    else if(a&use_trans) M=A.Transpose_Times(B);
+    else M=A*B;
+    if(!sym) cached_ops.Set({op_mul,Transposed(b),Transposed(a)},n^use_trans);
+    prod_lookup.Set(prod_list,n);
+    if(!sym) prod_lookup.Set(prod_list_trans,Transposed(n));
+    cached_ops.Set({op_mul,a,b},n);
 
-        auto ch=[this](int a){if(a&use_trans) return 't';if(Symmetric(a)) return 's';return ' ';};
+    auto ch=[this](int a){if(a&use_trans) return 't';if(Symmetric(a)) return 's';return ' ';};
 
-        printf("mul %i%c * %i%c -> %i%c\n",
-            a&~use_trans,ch(a),
-            b&~use_trans,ch(b),
-            r&~use_trans,ch(r)
-        );
-    }
-    return r;
+    printf("mul %i%c * %i%c -> %i%c\n",
+        a&~use_trans,ch(a),
+        b&~use_trans,ch(b),
+        n&~use_trans,ch(n)
+    );
+    return n;
 }
 //#####################################################################
 // Function Compute_Sub
@@ -186,26 +186,24 @@ Compute_Sub(int a,int b)
     if((a&use_trans) || (Symmetric(a) && (b&use_trans)))
         return Transposed(Compute_Sub(Transposed(a),Transposed(b)));
 
-    int& r=cached_ops.Get_Or_Insert({op_sub,a,b},invalid_block);
-    if(r==invalid_block){
-        auto& A=block_list(a&~use_trans).M;
-        auto& B=block_list(b&~use_trans).M;
-        int n=block_list.Append({{},Symmetric(a)&&Symmetric(b),{block_list.m}});
-        auto& C=block_list.Last().M;
-        if(a==zero_block) C=-B;
-        else if(Symmetric(a) || Symmetric(b) || !(b&use_trans)) C=A-B;
-        else C=A-B.Transposed();
-        r=n;
+    if(int* r=cached_ops.Get_Pointer({op_sub,a,b})) return *r;
+    int n=block_list.Append({{},Symmetric(a)&&Symmetric(b),{block_list.m}});
+    auto& A=block_list(a&~use_trans).M;
+    auto& B=block_list(b&~use_trans).M;
+    auto& C=block_list.Last().M;
+    if(a==zero_block) C=-B,puts("S-A");
+    else if(Symmetric(a) || Symmetric(b) || !(b&use_trans)) C=A-B,LOG::printf("SUB A=%P; B=%P; C=%P;\n",A,B,C);
+    else C=A-B.Transposed(),puts("S-C");
+    cached_ops.Set({op_sub,a,b},n);
 
-        auto ch=[this](int a){if(a&use_trans) return 't';if(Symmetric(a)) return 's';return ' ';};
+    auto ch=[this](int a){if(a&use_trans) return 't';if(Symmetric(a)) return 's';return ' ';};
     
-        printf("sub %i%c - %i%c -> %i%c\n",
-            a&~use_trans,ch(a),
-            b&~use_trans,ch(b),
-            r&~use_trans,ch(r)
-        );
-    }
-    return r;
+    printf("sub %i%c - %i%c -> %i%c\n",
+        a&~use_trans,ch(a),
+        b&~use_trans,ch(b),
+        n&~use_trans,ch(n)
+    );
+    return n;
 }
 //#####################################################################
 // Function Compute_Elim

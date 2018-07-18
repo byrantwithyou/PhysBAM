@@ -193,7 +193,10 @@ int main(int argc, char* argv[])
         if(uf.type!=fluid) continue;
         face_velocity(it.Full_Index())=elim_mat.rhs(uf.block_id)(uf.block_dof);}
     Flush_Frame(face_velocity,"elim solve");
-    
+
+    for(int i=2;i<elim_mat.block_list.m;i++)
+        OCTAVE_OUTPUT<T>(LOG::sprintf("b-%i.txt",i).c_str()).Write("b",elim_mat.block_list(i).M);
+
     return 0;
 }
 
