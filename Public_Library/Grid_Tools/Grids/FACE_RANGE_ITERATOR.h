@@ -91,7 +91,8 @@ enum class RF
     reverse=0x40,
     end=0x80,
     axis_mask=0x100,
-    side_mask=0x200
+    side_mask=0x200,
+    omit_corners=0x400
 };
 inline RF operator|(RF a,RF b){return RF((int)a|(int)b);}
 inline RF operator&(RF a,RF b){return RF((int)a&(int)b);}

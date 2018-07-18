@@ -148,9 +148,13 @@ Encode(RF flags,int side_input,int axis)
     if(any(flags&RF::skip_outer)) offsets[1]+=face_range_lookup[mode][3]-0x888888;
     if(any(flags&RF::skip_inner)) offsets[1]+=face_range_lookup[mode][4]-0x888888;
 
-    if(one_side && !(flags&RF::partial_single_side))
+    if(one_side && !(flags&(RF::partial_single_side|RF::omit_corners)))
         for(int i=0;i<3;i++)
             offsets[i]=((offsets[i]&0xF00F00)>>8)|(offsets[i]&0xFF0FF0);
+
+    if(one_side && any(flags&RF::omit_corners))
+        for(int i=0;i<3;i++)
+            offsets[i]=((offsets[i]&0x00F00F)<<8)|(offsets[i]&0x0FF0FF);
 
     if(any(flags&RF::delay_corners))
         for(int i=0;i<3;i++)

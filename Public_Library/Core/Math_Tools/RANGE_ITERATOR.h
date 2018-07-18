@@ -40,6 +40,11 @@ namespace PhysBAM{
 //                         included.  This flag suppresses this.  Iterating
 //                         one side covers the same cells as would be
 //                         covered with that side when covering all sides.
+//   omit_corners          This flag only affects the behavior when one
+//                         side is being iterated.  Normally, when one
+//                         side is being iterated, all corners are
+//                         included.  This flag causes all corners to be
+//                         excluded.
 // 
 // Other flags:
 //   reverse               Reverses the order in which cells are visited.
@@ -62,7 +67,8 @@ enum class RI
     partial_single_side=0x20,
     reverse=0x40,
     end=0x80,
-    side_mask=0x200
+    side_mask=0x200,
+    omit_corners=0x400
 };
 inline RI operator|(RI a,RI b){return RI((int)a|(int)b);}
 inline RI operator&(RI a,RI b){return RI((int)a&(int)b);}

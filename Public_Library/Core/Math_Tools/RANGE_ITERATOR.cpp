@@ -140,9 +140,13 @@ Encode(RI flags,int side_input)
     int mode=(int)(flags&RI::ghost);
     for(int i=0;i<2;i++) offsets[i]=range_lookup[mode][i];
 
-    if(one_side && !(flags&RI::partial_single_side))
+    if(one_side && !(flags&(RI::partial_single_side|RI::omit_corners)))
         for(int i=0;i<2;i++)
             offsets[i]=((offsets[i]&0xF00F00)>>8)|(offsets[i]&0xFF0FF0);
+
+    if(one_side && any(flags&RI::omit_corners))
+        for(int i=0;i<2;i++)
+            offsets[i]=((offsets[i]&0x00F00F)<<8)|(offsets[i]&0x0FF0FF);
 
     if(any(flags&RI::delay_corners))
         for(int i=0;i<2;i++)
