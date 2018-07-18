@@ -64,10 +64,11 @@ struct CACHED_ELIMINATION_MATRIX
     void Print_Full() const;
     void Print_Current() const;
     void Back_Solve();
-    void Test_State();
+    void Test_State(const char* str) const;
     void Unpack_Vector(ARRAY<VECTOR<int,2> >& dof_map,ARRAY<ARRAY<T> >& u,const ARRAY<T>& v);
     void Pack_Vector(ARRAY<VECTOR<int,2> >& dof_map,ARRAY<T>& v,const ARRAY<ARRAY<T> >& u);
-    void Add_Times(ARRAY<ARRAY<T> >& out,const ARRAY<ARRAY<T> >& in);
+    void Add_Times(ARRAY<ARRAY<T> >& out,const ARRAY<ARRAY<T> >& in) const;
+    void Add_Times(ARRAY<T>& out,T a,int m,const ARRAY<T>& in,T b) const;
     int Transposed(int a) const;
     bool Symmetric(int a) const;
     ARRAY<int> Transposed(const ARRAY<int>& a) const;

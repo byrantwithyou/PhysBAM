@@ -26,8 +26,8 @@ struct FLUID_LAYOUT
         // vertex: 1+2*dirichlet_side+16*(1<<each_connected_side);
         // pipe: 2*direction
         // 
-        int block_type;
-        bool is_rep;
+//        int block_type;
+//        bool is_rep;
     };
 
     struct GRID_DATA
@@ -50,7 +50,7 @@ struct FLUID_LAYOUT
     void Dump_Layout() const;
     void Dump_Dofs() const;
     void Dump_Blocks() const;
-    void Dump_Block_Types() const;
+//    void Dump_Block_Types() const;
     int Total_Dofs() const {return dof_map.m;}
 };
 

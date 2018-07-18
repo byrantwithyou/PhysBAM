@@ -25,7 +25,7 @@ struct PARSE_DATA
         int bc_side;
         typename TV::SCALAR bc_value;
         RANGE<VECTOR<int,TV::m> > box;
-        int connected_sides;
+//        int connected_sides;
         // std::function<T(VECTOR<T,TV::m-1>)> bc_func_value;
 
         // T Value(const VECTOR<int,TV::m>& c) const;
@@ -38,6 +38,9 @@ struct PARSE_DATA
     int half_width;
 
     void Parse_Input(const std::string& pipe_file);    
+    RANGE<TV_INT> Pipe_Full_Range(const VECTOR<int,2>& p) const;
+    RANGE<TV_INT> Pipe_Inner_Range(const VECTOR<int,2>& p) const;
+    int Pipe_Dir(const VECTOR<int,2>& p) const;
 };
 
 }

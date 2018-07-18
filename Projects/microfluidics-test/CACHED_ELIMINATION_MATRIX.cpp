@@ -29,10 +29,12 @@ Fill_Orig_Rows()
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::
 Eliminate_Row(int r)
 {
+    LOG::printf("elim %i\n",r);
+    Test_State("ER a");
     int diag_matrix=Get_Block_Lazy(r,r);
     int inv=Compute_Inv(diag_matrix);
     ARRAY<MATRIX_BLOCK>& row=rows(r);
-    if(rhs(r).m) rhs(r)=block_list(inv).M*rhs(r);
+    Add_Times(rhs(r),0,inv,rhs(r),1);
     for(int i=0;i<row.m;i++){
         if(row(i).c==r)
             row(i).matrix_id=id_block;
@@ -43,17 +45,13 @@ Eliminate_Row(int r)
         if(row(i).matrix_id&use_trans){PHYSBAM_ASSERT(M.Columns()==orig_sizes(r));}
         else{PHYSBAM_ASSERT(M.Rows()==orig_sizes(r));}
     }
+    Test_State("ER b");
 
     for(int i=0;i<row.m;i++){
         int s=row(i).c;
         if(s==r) continue;
         int elim_mat=Get_Block_Lazy(s,r);
-        if(rhs(r).m){
-            ARRAY<T> a;
-            if(elim_mat&use_trans) a=block_list(elim_mat&~use_trans).M.Transpose_Times(rhs(r));
-            else a=block_list(elim_mat).M*rhs(r);
-            if(!rhs(s).m) rhs(s)=-a;
-            else rhs(s)-=a;}
+        Add_Times(rhs(s),1,elim_mat,rhs(r),-1);
         for(int j=0;j<row.m;j++){
             int t=row(j).c;
             int& m=Get_Block(s,t);
@@ -65,6 +63,7 @@ Eliminate_Row(int r)
         for(int j=rows(s).m-1;j>=0;j--)
             if(rows(s)(j).matrix_id==zero_block)
                 rows(s).Remove_Index_Lazy(j);}
+    Test_State("ER c");
     valid_row(r)=false;
     elimination_order.Append(r);
 }
@@ -122,6 +121,7 @@ Compute_Inv(int a)
         PHYSBAM_ASSERT(block_list(a).sym);
         int n=block_list.Append({{},true,{block_list.m}});
         block_list(a).M.PLU_Inverse(block_list.Last().M);
+        LOG::printf("inv: %P\n",block_list(a).M);
         r=n;
 
         auto ch=[this](int a){if(a&use_trans) return 't';if(Symmetric(a)) return 's';return ' ';};
@@ -290,28 +290,43 @@ Back_Solve()
         int r=elimination_order(j);
         if(!rhs(r).m) rhs(r).Resize(orig_sizes(r));
         for(auto e:rows(r))
-            if(e.c!=r && rhs(e.c).m){
-                if(e.matrix_id&use_trans) rhs(r)-=block_list(e.matrix_id).M.Transpose_Times(rhs(e.c));
-                else rhs(r)-=block_list(e.matrix_id).M*rhs(e.c);}}
+            if(e.c!=r)
+                Add_Times(rhs(r),1,e.matrix_id,rhs(e.c),-1);}
 }
 //#####################################################################
-// Function Test_State
+// Function Add_Times
 //#####################################################################
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::
-Add_Times(ARRAY<ARRAY<T> >& out,const ARRAY<ARRAY<T> >& in)
+Add_Times(ARRAY<ARRAY<T> >& out,const ARRAY<ARRAY<T> >& in) const
 {
     for(int r=0;r<rows.m;r++)
         for(auto e:rows(r))
-            if(in(e.c).m){
-                if(!out(r).m) out(r).Resize(orig_sizes(r));
-                if(e.matrix_id&use_trans) out(r)+=block_list(e.matrix_id&~use_trans).M.Transpose_Times(in(e.c));
-                else out(r)+=block_list(e.matrix_id).M*in(e.c);}
+            Add_Times(out(r),1,e.matrix_id,in(e.c),1);
+}
+//#####################################################################
+// Function Add_Times
+//#####################################################################
+template<class T> void CACHED_ELIMINATION_MATRIX<T>::
+Add_Times(ARRAY<T>& out,T a,int m,const ARRAY<T>& in,T b) const
+{
+    if(!in.m || m==zero_block){
+        if(out.m && a!=1) out*=a;
+        return;}
+    if(m==id_block){
+        if(out.m) out=out*a+in*b;
+        else out=in*b;
+        return;}
+
+    auto& M=block_list(m&~use_trans).M;
+    if(!out.m) out.Resize(m&use_trans?M.n:M.m);
+    if(m&use_trans) out=a*out+M.Transpose_Times(in)*b;
+    else out=a*out+M*in*b;
 }
 //#####################################################################
 // Function Test_State
 //#####################################################################
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::
-Test_State()
+Test_State(const char* str) const
 {
     ARRAY<ARRAY<T> > residual(test_sol.m);
     for(int i=0;i<test_sol.m;i++){
@@ -323,7 +338,7 @@ Test_State()
     T sum=0;
     for(int r=0;r<rows.m;r++)
         sum+=residual(r).Magnitude_Squared();
-    LOG::printf("TEST ERROR %P\n",sqrt(sum));
+    LOG::printf("TEST ERROR %s %P\n",str,sqrt(sum));
 }
 //#####################################################################
 // Function Unpack_Vector

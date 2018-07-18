@@ -90,20 +90,8 @@ Parse_Input(const std::string& pipe_file)
                     ss>>name1>>name2;
                     int i0=pts_index[name1];
                     int i1=pts_index[name2];
-                    TV_INT d=pts(i0).pt-pts(i1).pt;
-                    for(int i=0;i<TV::m;i++)
-                    {
-                        if(d(i)<0)
-                        {
-                            pts(i0).connected_sides|=1<<(2*i+1);
-                            pts(i1).connected_sides|=1<<(2*i);
-                        }
-                        if(d(i)>0)
-                        {
-                            pts(i0).connected_sides|=1<<(2*i);
-                            pts(i1).connected_sides|=1<<(2*i+1);
-                        }
-                    }
+                    TV_INT d=pts(i1).pt-pts(i0).pt;
+                    if(d.Sum()<0) std::swap(i0,i1);
                     TV_INT size=abs(d).Sorted();
                     assert(size.x==0 && size.y>half_width*2);
                     pipes.Append({i0,i1});
@@ -144,6 +132,36 @@ Parse_Input(const std::string& pipe_file)
         i.box-=pts_box.min_corner;
     }
     box_size=pts_box.Edge_Lengths();
+}
+//#####################################################################
+// Function Pipe_Full_Range
+//#####################################################################
+template<class TV> auto PARSE_DATA<TV>::
+Pipe_Full_Range(const VECTOR<int,2>& p) const -> RANGE<TV_INT>
+{
+    return RANGE<TV_INT>(pts(p.x).box.min_corner,pts(p.y).box.max_corner);
+}
+//#####################################################################
+// Function Pipe_Inner_Range
+//#####################################################################
+template<class TV> auto PARSE_DATA<TV>::
+Pipe_Inner_Range(const VECTOR<int,2>& p) const -> RANGE<TV_INT>
+{
+    int dir=Pipe_Dir(p);
+    RANGE<TV_INT> A=pts(p.x).box;
+    RANGE<TV_INT> B=pts(p.y).box;
+    RANGE<TV_INT> box(A.min_corner,B.max_corner);
+    box.min_corner(dir)=A.max_corner(dir);
+    box.max_corner(dir)=B.min_corner(dir);
+    return box;
+}
+//#####################################################################
+// Function Pipe_Dir
+//#####################################################################
+template<class TV> int PARSE_DATA<TV>::
+Pipe_Dir(const VECTOR<int,2>& p) const
+{
+    return (pts(p.y).pt-pts(p.x).pt).Arg_Max();
 }
 template struct PARSE_DATA<VECTOR<double,2> >;
 }

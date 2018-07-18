@@ -80,8 +80,8 @@ int main(int argc, char* argv[])
     Flush_Frame<TV>("grid dofs");
     fl.Dump_Blocks();
     Flush_Frame<TV>("grid blocks");
-    fl.Dump_Block_Types();
-    Flush_Frame<TV>("block types");
+    // fl.Dump_Block_Types();
+    // Flush_Frame<TV>("block types");
 
     SYSTEM_MATRIX_HELPER<T> MH;
     ARRAY<VECTOR<int,3> > coded_entries;
@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
     elim_mat.Unpack_Vector(fl.dof_map,elim_mat.test_sol,sol_vector);
 
     elim_mat.Fill_Orig_Rows();
-    elim_mat.Test_State();
+    elim_mat.Test_State("begin");
 
     for(int i=2;i<elim_mat.block_list.m;i++)
         OCTAVE_OUTPUT<T>(LOG::sprintf("M-%i.txt",i).c_str()).Write("M",elim_mat.block_list(i).M);
@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
 //    elim_mat.Print_Full();
     for(int i=0;i<pd.pts.m;i++)
         elim_mat.Eliminate_Row(i);
-    elim_mat.Test_State();
+    elim_mat.Test_State("after big");
 
     while(1)
     {
