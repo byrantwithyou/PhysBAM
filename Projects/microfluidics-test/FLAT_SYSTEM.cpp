@@ -111,7 +111,7 @@ void Solve_And_Display_Solution(const GRID<TV>& grid,const FLUID_LAYOUT<TV>& fl,
     OCTAVE_OUTPUT<T>("b.txt").Write("b",rhs);
 
     MINRES<T> mr;
-    bool converged=mr.Solve(sys,sol,rhs,av,1e-6,0,1000);
+    bool converged=mr.Solve(sys,sol,rhs,av,1e-8,0,100000);
     if(!converged) LOG::printf("SOLVER DID NOT CONVERGE.\n");
 
     OCTAVE_OUTPUT<T>("x.txt").Write("x",sol);

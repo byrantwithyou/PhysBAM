@@ -48,6 +48,7 @@ struct CACHED_ELIMINATION_MATRIX
 
     ARRAY<bool> valid_row;
     ARRAY<int> elimination_order;
+    bool quiet;
     
     MATRIX_MXN<T>& Get_Orig_By_Blocks(int b0,int b1);
 

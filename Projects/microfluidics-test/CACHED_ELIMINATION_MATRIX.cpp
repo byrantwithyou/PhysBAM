@@ -29,9 +29,8 @@ Fill_Orig_Rows()
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::
 Eliminate_Row(int r)
 {
-    LOG::printf("elim %i\n",r);
+    if(!quiet) LOG::printf("elim %i\n",r);
     Test_State("ER a");
-    Print_Full();
     int diag_matrix=Get_Block_Lazy(r,r);
     int inv=Compute_Inv(diag_matrix);
     ARRAY<MATRIX_BLOCK>& row=rows(r);
@@ -47,7 +46,6 @@ Eliminate_Row(int r)
         else{PHYSBAM_ASSERT(M.Rows()==orig_sizes(r));}
     }
     Test_State("ER b");
-    Print_Full();
     for(int i=0;i<row.m;i++){
         int s=row(i).c;
         if(s==r) continue;
@@ -65,7 +63,6 @@ Eliminate_Row(int r)
             if(rows(s)(j).matrix_id==zero_block)
                 rows(s).Remove_Index_Lazy(j);}
     Test_State("ER c");
-    Print_Full();
     valid_row(r)=false;
     elimination_order.Append(r);
 }
@@ -122,17 +119,18 @@ Compute_Inv(int a)
     PHYSBAM_ASSERT(block_list(a).sym);
     int n=block_list.Append({{},true,{block_list.m}});
     block_list(a).M.PLU_Inverse(block_list.Last().M);
-    LOG::printf("mat stats: %g -> %g  err %g\n",
-        block_list(a).M.Max_Abs(),block_list.Last().M.Max_Abs(),
-        (block_list(a).M*block_list.Last().M-(T)1).Max_Abs());
     cached_ops.Set({op_inv,a,0},n);
+    if(!quiet){
+        LOG::printf("mat stats: %g -> %g  err %g\n",
+            block_list(a).M.Max_Abs(),block_list.Last().M.Max_Abs(),
+            (block_list(a).M*block_list.Last().M-(T)1).Max_Abs());
 
-    auto ch=[this](int a){if(a&use_trans) return 't';if(Symmetric(a)) return 's';return ' ';};
+        auto ch=[this](int a){if(a&use_trans) return 't';if(Symmetric(a)) return 's';return ' ';};
 
-    printf("inv %i%c -> %i%c\n",
-        a&~use_trans,ch(a),
-        n&~use_trans,ch(n)
-    );
+        printf("inv %i%c -> %i%c\n",
+            a&~use_trans,ch(a),
+            n&~use_trans,ch(n)
+        );}
     return n;
 }
 //#####################################################################
@@ -167,13 +165,14 @@ Compute_Mul(int a,int b)
     if(!sym) prod_lookup.Set(prod_list_trans,Transposed(n));
     cached_ops.Set({op_mul,a,b},n);
 
-    auto ch=[this](int a){if(a&use_trans) return 't';if(Symmetric(a)) return 's';return ' ';};
+    if(!quiet){
+        auto ch=[this](int a){if(a&use_trans) return 't';if(Symmetric(a)) return 's';return ' ';};
 
-    printf("mul %i%c * %i%c -> %i%c\n",
-        a&~use_trans,ch(a),
-        b&~use_trans,ch(b),
-        n&~use_trans,ch(n)
-    );
+        printf("mul %i%c * %i%c -> %i%c\n",
+            a&~use_trans,ch(a),
+            b&~use_trans,ch(b),
+            n&~use_trans,ch(n)
+        );}
     return n;
 }
 //#####################################################################
@@ -191,18 +190,19 @@ Compute_Sub(int a,int b)
     auto& A=block_list(a&~use_trans).M;
     auto& B=block_list(b&~use_trans).M;
     auto& C=block_list.Last().M;
-    if(a==zero_block) C=-B,puts("S-A");
-    else if(Symmetric(a) || Symmetric(b) || !(b&use_trans)) C=A-B,LOG::printf("SUB A=%P; B=%P; C=%P;\n",A,B,C);
-    else C=A-B.Transposed(),puts("S-C");
+    if(a==zero_block) C=-B;
+    else if(Symmetric(a) || Symmetric(b) || !(b&use_trans)) C=A-B;
+    else C=A-B.Transposed();
     cached_ops.Set({op_sub,a,b},n);
 
-    auto ch=[this](int a){if(a&use_trans) return 't';if(Symmetric(a)) return 's';return ' ';};
+    if(!quiet){
+        auto ch=[this](int a){if(a&use_trans) return 't';if(Symmetric(a)) return 's';return ' ';};
     
-    printf("sub %i%c - %i%c -> %i%c\n",
-        a&~use_trans,ch(a),
-        b&~use_trans,ch(b),
-        n&~use_trans,ch(n)
-    );
+        printf("sub %i%c - %i%c -> %i%c\n",
+            a&~use_trans,ch(a),
+            b&~use_trans,ch(b),
+            n&~use_trans,ch(n)
+        );}
     return n;
 }
 //#####################################################################
@@ -220,6 +220,7 @@ Compute_Elim(int a,int b,int c)
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::
 Print_Full() const
 {
+    if(quiet) return;
     for(int i=0;i<rows.m;i++){
         for(int j=0;j<rows.m;j++){
             int m=Get_Block_Lazy(i,j);
@@ -234,6 +235,7 @@ Print_Full() const
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::
 Print_Current() const
 {
+    if(quiet) return;
     for(int i=0;i<rows.m;i++){
         if(!valid_row(i)) continue;
         for(int j=0;j<rows.m;j++){
@@ -326,6 +328,7 @@ Add_Times(ARRAY<T>& out,T a,int m,const ARRAY<T>& in,T b) const
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::
 Test_State(const char* str) const
 {
+    if(quiet) return;
     ARRAY<ARRAY<T> > residual(test_sol.m);
     for(int i=0;i<test_sol.m;i++){
         if(rhs(i).m) residual(i)=-rhs(i);

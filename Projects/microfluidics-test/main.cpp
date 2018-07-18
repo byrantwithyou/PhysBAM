@@ -58,9 +58,11 @@ int main(int argc, char* argv[])
     T mu=1;
     T dx=.1;
 
+    bool quiet=false;
     std::string pipe_file;
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Add("-mu",&mu,"mu","viscosity");
+    parse_args.Add("-q",&quiet,"disable diagnostics; useful for timing");
     parse_args.Extra(&pipe_file,"file","file describing pipes");
     parse_args.Parse();
 
@@ -69,17 +71,18 @@ int main(int argc, char* argv[])
     
     GRID<TV> grid(pd.box_size,RANGE<TV>(TV(),TV(pd.box_size)*dx),true);
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE(0.f),grid,"output");
-    Flush_Frame<TV>("init");
+    if(!quiet) Flush_Frame<TV>("init");
 
     FLUID_LAYOUT<TV> fl(grid);
     
     fl.Compute(pd);
-    fl.Dump_Layout();
-    Flush_Frame<TV>("grid setup");
-    fl.Dump_Dofs();
-    Flush_Frame<TV>("grid dofs");
-    fl.Dump_Blocks();
-    Flush_Frame<TV>("grid blocks");
+    if(!quiet){
+        fl.Dump_Layout();
+        Flush_Frame<TV>("grid setup");
+        fl.Dump_Dofs();
+        Flush_Frame<TV>("grid dofs");
+        fl.Dump_Blocks();
+        Flush_Frame<TV>("grid blocks");}
     // fl.Dump_Block_Types();
     // Flush_Frame<TV>("block types");
 
@@ -89,9 +92,10 @@ int main(int argc, char* argv[])
     ARRAY<T> rhs_vector,sol_vector;
     Compute_Full_Matrix(grid,coded_entries,code_values,rhs_vector,fl,mu);
     for(auto e:coded_entries) MH.data.Append({e.x,e.y,code_values(e.z)});
-    Solve_And_Display_Solution(grid,fl,MH,rhs_vector,&sol_vector);
+    if(!quiet) Solve_And_Display_Solution(grid,fl,MH,rhs_vector,&sol_vector);
 
     CACHED_ELIMINATION_MATRIX<T> elim_mat;
+    elim_mat.quiet=quiet;
     elim_mat.orig_sizes.Resize(fl.blocks.m);
     for(int i=0;i<fl.blocks.m;i++) elim_mat.orig_sizes(i)=fl.blocks(i).num_dofs;
 //    Setup_Block_Map(elim_mat,fl);
@@ -101,40 +105,42 @@ int main(int argc, char* argv[])
     elim_mat.Unpack_Vector(fl.dof_map,elim_mat.test_sol,sol_vector);
 
     elim_mat.Fill_Orig_Rows();
-    elim_mat.Test_State("begin");
 
-    for(int i=2;i<elim_mat.block_list.m;i++)
-        OCTAVE_OUTPUT<T>(LOG::sprintf("M-%i.txt",i).c_str()).Write("M",elim_mat.block_list(i).M);
+    if(!quiet){
+        elim_mat.Test_State("begin");
 
-    {
-        OCTAVE_OUTPUT<T> oo("block.txt");
-        ARRAY<T> l(sol_vector.m),r(sol_vector.m);
-        ARRAY<ARRAY<T> > ll,rr;
-        int b=l.m;
-        oo.Begin_Sparse_Matrix("N",l.m,b);
-        l*=0;
-        r*=0;
-        for(int i=0;i<b;i++){
-            r(i)=1;
+        for(int i=2;i<elim_mat.block_list.m;i++)
+            OCTAVE_OUTPUT<T>(LOG::sprintf("M-%i.txt",i).c_str()).Write("M",elim_mat.block_list(i).M);
+
+        {
+            OCTAVE_OUTPUT<T> oo("block.txt");
+            ARRAY<T> l(sol_vector.m),r(sol_vector.m);
+            ARRAY<ARRAY<T> > ll,rr;
+            int b=l.m;
+            oo.Begin_Sparse_Matrix("N",l.m,b);
             l*=0;
-            elim_mat.Unpack_Vector(fl.dof_map,ll,l);
-            elim_mat.Unpack_Vector(fl.dof_map,rr,r);
-            elim_mat.Add_Times(ll,rr);
-            elim_mat.Pack_Vector(fl.dof_map,l,ll);
-            r(i)=0;
-            oo.Append_Sparse_Column(l);}
+            r*=0;
+            for(int i=0;i<b;i++){
+                r(i)=1;
+                l*=0;
+                elim_mat.Unpack_Vector(fl.dof_map,ll,l);
+                elim_mat.Unpack_Vector(fl.dof_map,rr,r);
+                elim_mat.Add_Times(ll,rr);
+                elim_mat.Pack_Vector(fl.dof_map,l,ll);
+                r(i)=0;
+                oo.Append_Sparse_Column(l);}
 
-        oo.End_Sparse_Matrix();
-    }
+            oo.End_Sparse_Matrix();
+        }}
 
 //    elim_mat.Print_Full();
     for(int i=0;i<pd.pts.m;i++)
         elim_mat.Eliminate_Row(i);
-    elim_mat.Test_State("after big");
+    if(!quiet) elim_mat.Test_State("after big");
 
     while(1)
     {
-        printf("start elim\n");
+        if(!quiet) printf("start elim\n");
         std::map<int,int> counts;
         for(int i=0;i<elim_mat.rows.m;i++)
             if(elim_mat.valid_row(i) && elim_mat.rows(i).m<=3)
@@ -147,12 +153,12 @@ int main(int argc, char* argv[])
 
         if(best<=0) break;
 
-        printf("Eliminate: %i  (%i)\n",best_mat,best);
+        if(!quiet) printf("Eliminate: %i  (%i)\n",best_mat,best);
         for(int i=0;i<elim_mat.rows.m;i++)
             if(elim_mat.valid_row(i) && elim_mat.rows(i).m<=3)
                 if(elim_mat.Get_Block_Lazy(i,i)==best_mat)
                     elim_mat.Eliminate_Row(i);
-        printf("end elim\n");
+        if(!quiet) printf("end elim\n");
     }
 //    elim_mat.Print_Current();
 
@@ -169,18 +175,19 @@ int main(int argc, char* argv[])
             std::sort(&indices(offsets.Last()),&indices(0)+indices.m);
             offsets.Append(indices.m);}
 
-        printf("start colamd\n");
+        if(!quiet) printf("start colamd\n");
         int stats[COLAMD_STATS];
         ARRAY<int> perm(remaining_dofs.m);
-        LOG::printf("size %P\n",remaining_dofs.m);
-        LOG::printf("indices %P\n",indices);
-        LOG::printf("offsets %P\n",offsets);
+        if(!quiet) LOG::printf("size %P\n",remaining_dofs.m);
+        if(!quiet) LOG::printf("indices %P\n",indices);
+        if(!quiet) LOG::printf("offsets %P\n",offsets);
         int ret=symamd(remaining_dofs.m,indices.Get_Array_Pointer(),
             offsets.Get_Array_Pointer(),perm.Get_Array_Pointer(),
             0,stats,calloc,free);
-        printf("symamd %i\n",ret);
-        colamd_report(stats);
-        LOG::printf("perm %P\n",perm);
+        if(!quiet){
+            printf("symamd %i\n",ret);
+            colamd_report(stats);
+            LOG::printf("perm %P\n",perm);}
         for(int i=0;i<perm.m;i++)
             elim_mat.Eliminate_Row(remaining_dofs(perm(i)));}
 
@@ -192,7 +199,7 @@ int main(int argc, char* argv[])
         auto& uf=fl.used_faces(it.Full_Index());
         if(uf.type!=fluid) continue;
         face_velocity(it.Full_Index())=elim_mat.rhs(uf.block_id)(uf.block_dof);}
-    Flush_Frame(face_velocity,"elim solve");
+    if(!quiet) Flush_Frame(face_velocity,"elim solve");
 
     for(int i=2;i<elim_mat.block_list.m;i++)
         OCTAVE_OUTPUT<T>(LOG::sprintf("b-%i.txt",i).c_str()).Write("b",elim_mat.block_list(i).M);
