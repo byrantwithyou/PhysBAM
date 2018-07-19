@@ -11,7 +11,6 @@
 namespace PhysBAM{
 
 template<class T> class MATRIX_MXN;
-template<class TV> struct FLUID_LAYOUT;
 template<class T>
 struct CACHED_ELIMINATION_MATRIX
 {
@@ -75,6 +74,7 @@ struct CACHED_ELIMINATION_MATRIX
     ARRAY<int> Transposed(const ARRAY<int>& a) const;
     ARRAY<int> Prod_List(int a) const;
     void Reduce_Rows_By_Frequency(int begin,int end,int fill_limit);
+    void Full_Reordered_Elimination();
 };
 }
 #endif

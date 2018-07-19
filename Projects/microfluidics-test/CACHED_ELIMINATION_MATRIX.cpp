@@ -13,6 +13,7 @@
 #include "FREQUENCY_TRACKER.h"
 #include <cblas.h>
 #include <lapacke.h>
+#include <suitesparse/colamd.h>
 
 namespace PhysBAM{
 
@@ -484,6 +485,36 @@ Reduce_Rows_By_Frequency(int begin,int end,int fill_limit)
             if(r>=begin && r<end && rows(r).m<=fill_limit)
                 ft.Add(Get_Block_Lazy(r,r),r);
     }
+}
+//#####################################################################
+// Function Full_Reordered_Elimination
+//#####################################################################
+template<class T> void CACHED_ELIMINATION_MATRIX<T>::
+Full_Reordered_Elimination()
+{
+    ARRAY<int> reduce(rows.m,use_init,-1),remaining_dofs;
+    for(int i=0;i<reduce.m;i++)
+        if(valid_row(i))
+            reduce(i)=remaining_dofs.Append(i);
+    if(remaining_dofs.m){
+        ARRAY<int> indices,offsets;
+        offsets.Append(indices.m);
+        for(int i=0;i<remaining_dofs.m;i++){
+            for(const auto& r:rows(remaining_dofs(i)))
+                indices.Append(reduce(r.c));
+            std::sort(&indices(offsets.Last()),&indices(0)+indices.m);
+            offsets.Append(indices.m);}
+
+        int stats[COLAMD_STATS];
+        ARRAY<int> perm(remaining_dofs.m+1);
+        int ret=symamd(remaining_dofs.m,indices.Get_Array_Pointer(),
+            offsets.Get_Array_Pointer(),perm.Get_Array_Pointer(),
+            0,stats,calloc,free);
+        PHYSBAM_ASSERT(ret);
+        perm.Pop();
+        for(int i=0;i<perm.m;i++)
+            Eliminate_Row(remaining_dofs(perm(i)));}
+
 }
 template struct CACHED_ELIMINATION_MATRIX<double>;
 }
