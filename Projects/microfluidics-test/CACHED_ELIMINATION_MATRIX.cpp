@@ -10,8 +10,9 @@
 #include <Grid_Tools/Grids/FACE_RANGE_ITERATOR.h>
 #include "CACHED_ELIMINATION_MATRIX.h"
 #include "FLUID_LAYOUT.h"
-#include <lapacke.h>
+#include "FREQUENCY_TRACKER.h"
 #include <cblas.h>
+#include <lapacke.h>
 
 namespace PhysBAM{
 
@@ -95,6 +96,7 @@ Fill_Orig_Rows()
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::
 Eliminate_Row(int r)
 {
+    PHYSBAM_ASSERT(valid_row(r));
     if(!quiet) LOG::printf("elim %i\n",r);
     Test_State("ER a");
     int diag_matrix=Get_Block_Lazy(r,r);
@@ -187,10 +189,6 @@ Compute_Inv(int a)
     Inverse(block_list.Last().M);
     cached_ops.Set({op_inv,a,0},n);
     if(!quiet){
-        LOG::printf("mat stats: %g -> %g  err %g\n",
-            block_list(a).M.Max_Abs(),block_list.Last().M.Max_Abs(),
-            (block_list(a).M*block_list.Last().M-(T)1).Max_Abs());
-
         auto ch=[this](int a){if(a&use_trans) return 't';if(Symmetric(a)) return 's';return ' ';};
 
         printf("inv %i%c -> %i%c\n",
@@ -451,6 +449,41 @@ Prod_List(int a) const
     const ARRAY<int>& ar=block_list(a&~use_trans).prod_list;
     if(a&use_trans) return Transposed(ar);
     return ar;
+}
+//#####################################################################
+// Function Reduce_Rows_By_Frequency
+//#####################################################################
+template<class T> void CACHED_ELIMINATION_MATRIX<T>::
+Reduce_Rows_By_Frequency(int begin,int end,int fill_limit)
+{
+    FREQUENCY_TRACKER ft;
+    for(int i=begin;i<end;i++)
+        if(rows(i).m<=fill_limit)
+            ft.Add(Get_Block_Lazy(i,i),i);
+
+    while(!ft.Empty())
+    {
+        std::vector<int> candidates,eliminated;
+        std::set<int> modified;
+        int id=ft.Most_Frequent(candidates);
+        for(auto r:candidates)
+            if(modified.find(r)==modified.end()){
+                eliminated.push_back(r);
+                ft.Remove(id,r);
+                for(auto a:rows(r))
+                    if(a.c!=r)
+                        modified.insert(a.c);}
+
+        for(auto r:modified)
+            ft.Remove(Get_Block_Lazy(r,r),r);
+
+        for(auto r:eliminated)
+            Eliminate_Row(r);
+
+        for(auto r:modified)
+            if(r>=begin && r<end && rows(r).m<=fill_limit)
+                ft.Add(Get_Block_Lazy(r,r),r);
+    }
 }
 template struct CACHED_ELIMINATION_MATRIX<double>;
 }

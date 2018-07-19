@@ -43,7 +43,8 @@ struct FLUID_LAYOUT
     ARRAY<GRID_DATA,TV_INT> used_cells;
     ARRAY<BLOCK> blocks;
     ARRAY<VECTOR<int,2> > dof_map;
-
+    int num_vertex_blocks;
+    
     FLUID_LAYOUT(const GRID<TV>& grid): grid(grid) {}
     
     void Compute(const PARSE_DATA<TV>& pd);
@@ -52,6 +53,9 @@ struct FLUID_LAYOUT
     void Dump_Blocks() const;
 //    void Dump_Block_Types() const;
     int Total_Dofs() const {return dof_map.m;}
+    void Allocate_Cross_Section_Blocks_Cells(const RANGE<TV_INT>& box,int dir);
+    void Allocate_Cross_Section_Blocks_Faces(const RANGE<TV_INT>& box,int dir);
+
 };
 
 }

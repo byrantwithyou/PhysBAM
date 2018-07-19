@@ -1,5 +1,4 @@
-* Use BLAS/LAPACK for dense operations.
+* Get 3D up and running
 
-* Break up big blocks (vertices) into cross sections and eliminate them one by one.
-
+* Threading
 

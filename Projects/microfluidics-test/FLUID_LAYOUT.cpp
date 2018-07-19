@@ -14,6 +14,7 @@
 #include <Grid_Tools/Grids/FACE_RANGE_ITERATOR.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <map>
 #include "FLUID_LAYOUT.h"
 
@@ -57,72 +58,54 @@ Compute(const PARSE_DATA<TV>& pd)
             used_cells(it.index).type=fluid;
     }
 
-    int next_block=0;
     for(auto& i:pd.pts)
     {
-        RANGE<TV_INT> box=i.box;
         if(i.bc_type==dirichlet)
         {
-            for(RANGE_ITERATOR<TV::m> it(box,1,0,RI::ghost|RI::omit_corners,i.bc_side);it.Valid();it.Next())
+            for(RANGE_ITERATOR<TV::m> it(i.box,1,0,RI::ghost|RI::omit_corners,i.bc_side);it.Valid();it.Next())
             {
-                used_cells(it.index)={dirichlet,next_block,-1,i.bc_value,-1};
+                used_cells(it.index)={dirichlet,-1,-1,i.bc_value,-1};
             }
-            for(FACE_RANGE_ITERATOR<TV::m> it(box,0,0,RF::ghost,i.bc_side);it.Valid();it.Next())
+            for(FACE_RANGE_ITERATOR<TV::m> it(i.box,0,0,RF::ghost,i.bc_side);it.Valid();it.Next())
             {
-                used_faces(it.face)={fluid,next_block,-1,0,-1};
+                used_faces(it.face)={fluid,-1,-1,0,-1};
             }
         }
         if(i.bc_type==wall)
         {
-            for(FACE_RANGE_ITERATOR<TV::m> it(box,0,0,RF::ghost,i.bc_side);it.Valid();it.Next())
+            for(FACE_RANGE_ITERATOR<TV::m> it(i.box,0,0,RF::ghost,i.bc_side);it.Valid();it.Next())
             {
                 used_faces(it.face).type=i.bc_type;
                 used_faces(it.face).bc_value=i.bc_value;
             }
         }
-        for(RANGE_ITERATOR<TV::m> it(box);it.Valid();it.Next())
-        {
-            used_cells(it.index).block_id=next_block;
-        }
-        for(FACE_RANGE_ITERATOR<TV::m> it(box);it.Valid();it.Next())
-        {
-            auto& uf=used_faces(it.face);
-            if(uf.type==fluid) uf.block_id=next_block;
-        }
-        next_block++;
-        blocks.Append({0});
+        Allocate_Cross_Section_Blocks_Cells(i.box,0);
+        // for(FACE_RANGE_ITERATOR<TV::m> it(box);it.Valid();it.Next())
+        // {
+        //     auto& uf=used_faces(it.face);
+        //     if(uf.type==fluid) uf.block_id=next_block;
+        // }
     }
+    num_vertex_blocks=blocks.m;
+    Dump_Blocks();
+    Flush_Frame<TV>("vertex cells");
     for(auto& i:pd.pipes)
     {
         int dir=pd.Pipe_Dir(i);
-        TV_INT dpt=pd.pts(i.y).pt-pd.pts(i.x).pt;
-        int num_blocks=dpt.Max()-2*pd.half_width;
-        TV_INT pt=pd.pts(i.x).pt;
         RANGE<TV_INT> box=pd.Pipe_Inner_Range(i);
-        for(RANGE_ITERATOR<TV::m> it(box);it.Valid();it.Next())
-        {
-            TV_INT da=it.index-pd.pts(i.x).pt;
-            int diff=-1;
-            for(int i=0;i<TV::m;i++)
-                if(da(i)>=pd.half_width)
-                    diff=da(i)-pd.half_width;
-            PHYSBAM_ASSERT(diff>=0);
-            used_cells(it.index).block_id=diff+next_block;
-        }
-        for(FACE_RANGE_ITERATOR<TV::m> it(box);it.Valid();it.Next())
-        {
-            TV_INT cell=it.face.index;
-            TV_INT da=cell-pd.pts(i.x).pt;
-            if(it.face.axis==dir)
-                for(int i=0;i<TV::m;i++)
-                    if(da(i)>=0 && da(i)<pd.half_width){
-                        cell(dir)--;
-                        break;}
-            used_faces(it.face).block_id=used_cells(cell).block_id;
-        }
-        for(int i=0;i<num_blocks;i++) blocks.Append({0});
-        next_block+=num_blocks;
+        Allocate_Cross_Section_Blocks_Cells(box,dir);
+        Allocate_Cross_Section_Blocks_Faces(box,dir);
     }
+    Dump_Blocks();
+    Flush_Frame<TV>("pipes");
+
+    for(auto& i:pd.pts)
+    {
+        Allocate_Cross_Section_Blocks_Faces(i.box,0);
+    }
+    Dump_Blocks();
+    Flush_Frame<TV>("vertex faces");
+
     for(FACE_RANGE_ITERATOR<TV::m> it(used_faces.domain_indices);it.Valid();it.Next())
     {
         auto& f=used_faces(it.face);
@@ -216,5 +199,39 @@ Dump_Blocks() const
         Add_Debug_Text(it.Location(),s,VECTOR<T,3>(1,1,1));
     }
 }
+//#####################################################################
+// Function Assign_Cross_Section_Blocks
+//#####################################################################
+template<class TV> void FLUID_LAYOUT<TV>::
+Allocate_Cross_Section_Blocks_Cells(const RANGE<TV_INT>& box,int dir)
+{
+    int next_block=blocks.m;
+    for(RANGE_ITERATOR<TV::m> it(box);it.Valid();it.Next())
+        used_cells(it.index).block_id=it.index(dir)-box.min_corner(dir)+next_block;
+    int num_blocks=box.Edge_Lengths()(dir);
+    for(int i=0;i<num_blocks;i++) blocks.Append({0});
+}
+//#####################################################################
+// Function Assign_Cross_Section_Blocks
+//#####################################################################
+template<class TV> void FLUID_LAYOUT<TV>::
+Allocate_Cross_Section_Blocks_Faces(const RANGE<TV_INT>& box,int dir)
+{
+    TV_INT base=box.Center();
+    base(dir)=box.min_corner(dir);
+    for(FACE_RANGE_ITERATOR<TV::m> it(box);it.Valid();it.Next())
+    {
+        if(used_faces(it.face).type!=fluid) continue;
+        int b0=used_cells(it.face.index).block_id;
+        TV_INT cell=it.face.index;
+        cell(it.face.axis)--;
+        int b1=used_cells(cell).block_id;
+        if(b1>=0)
+            if(b0<0 || (it.face.axis==dir && cell(!dir)>=base(!dir)))
+                b0=b1;
+        used_faces(it.face).block_id=b0;
+    }
+}
+
 template struct FLUID_LAYOUT<VECTOR<double,2> >;
 }

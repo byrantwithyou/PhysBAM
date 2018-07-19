@@ -49,7 +49,7 @@ struct CACHED_ELIMINATION_MATRIX
     ARRAY<bool> valid_row;
     ARRAY<int> elimination_order;
     bool quiet;
-    
+
     MATRIX_MXN<T>& Get_Orig_By_Blocks(int b0,int b1);
 
     void Fill_Blocks(ARRAY<VECTOR<int,2> >& dof_map,const ARRAY<VECTOR<int,3> >& coded_entries,
@@ -74,9 +74,7 @@ struct CACHED_ELIMINATION_MATRIX
     bool Symmetric(int a) const;
     ARRAY<int> Transposed(const ARRAY<int>& a) const;
     ARRAY<int> Prod_List(int a) const;
+    void Reduce_Rows_By_Frequency(int begin,int end,int fill_limit);
 };
-
-template<class T,class TV>
-void Setup_Block_Map(CACHED_ELIMINATION_MATRIX<T>& cem,const FLUID_LAYOUT<TV>& fl);
 }
 #endif
