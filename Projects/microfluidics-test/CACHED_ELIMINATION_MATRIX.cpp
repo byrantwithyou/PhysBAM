@@ -10,8 +10,74 @@
 #include <Grid_Tools/Grids/FACE_RANGE_ITERATOR.h>
 #include "CACHED_ELIMINATION_MATRIX.h"
 #include "FLUID_LAYOUT.h"
+#include <lapacke.h>
+#include <cblas.h>
 
 namespace PhysBAM{
+
+void Inverse(MATRIX_MXN<float>& A)
+{
+    ARRAY<int> idiv(A.m);
+    int ret_f = LAPACKE_ssytrf( LAPACK_ROW_MAJOR, 'U', A.m, A.x.Get_Array_Pointer(), A.m, idiv.Get_Array_Pointer() );
+    PHYSBAM_ASSERT(!ret_f);
+    int ret_i = LAPACKE_ssytri( LAPACK_ROW_MAJOR, 'U', A.m, A.x.Get_Array_Pointer(), A.m, idiv.Get_Array_Pointer() );
+    PHYSBAM_ASSERT(!ret_i);
+    for(int r=0;r<A.m;r++)
+        for(int c=0;c<r;c++)
+            A(r,c)=A(c,r);
+}
+
+void Inverse(MATRIX_MXN<double>& A)
+{
+    ARRAY<int> idiv(A.m);
+    int ret_f = LAPACKE_dsytrf( LAPACK_ROW_MAJOR, 'U', A.m, A.x.Get_Array_Pointer(), A.m, idiv.Get_Array_Pointer() );
+    PHYSBAM_ASSERT(!ret_f);
+    int ret_i = LAPACKE_dsytri( LAPACK_ROW_MAJOR, 'U', A.m, A.x.Get_Array_Pointer(), A.m, idiv.Get_Array_Pointer() );
+    PHYSBAM_ASSERT(!ret_i);
+    for(int r=0;r<A.m;r++)
+        for(int c=0;c<r;c++)
+            A(r,c)=A(c,r);
+}
+
+void Times_MM(MATRIX_MXN<float>& A,const MATRIX_MXN<float>& B,bool bt,const MATRIX_MXN<float>& C,bool ct)
+{
+    int m=bt?B.n:B.m;
+    int k=bt?B.m:B.n;
+    int n=ct?C.m:C.n;
+    if(A.m!=m || A.n!=n) A.Resize(m,n);
+    
+    cblas_sgemm( CblasRowMajor, bt?CblasTrans:CblasNoTrans, ct?CblasTrans:CblasNoTrans,
+        m,n,k,1,B.x.Get_Array_Pointer(),
+        B.n, C.x.Get_Array_Pointer(), C.n,
+        0, A.x.Get_Array_Pointer(), A.n);
+}
+
+void Times_MM(MATRIX_MXN<double>& A,const MATRIX_MXN<double>& B,bool bt,const MATRIX_MXN<double>& C,bool ct)
+{
+    int m=bt?B.n:B.m;
+    int k=bt?B.m:B.n;
+    int n=ct?C.m:C.n;
+    if(A.m!=m || A.n!=n) A.Resize(m,n);
+    
+    cblas_dgemm( CblasRowMajor, bt?CblasTrans:CblasNoTrans, ct?CblasTrans:CblasNoTrans,
+        m,n,k,1,B.x.Get_Array_Pointer(),
+        B.n, C.x.Get_Array_Pointer(), C.n,
+        0, A.x.Get_Array_Pointer(), A.n);
+}
+
+void Times_MV(ARRAY<float>& v,float a,const MATRIX_MXN<float>& M,bool t,const ARRAY<float>& u,float b)
+{
+    cblas_sgemv(CblasRowMajor,t?CblasTrans:CblasNoTrans,M.m,M.n,
+        a, M.x.Get_Array_Pointer(), M.n, u.Get_Array_Pointer(), 1, b,
+        v.Get_Array_Pointer(), 1);
+}
+
+void Times_MV(ARRAY<double>& v,double a,const MATRIX_MXN<double>& M,bool t,const ARRAY<double>& u,double b)
+{
+    cblas_dgemv(CblasRowMajor,t?CblasTrans:CblasNoTrans,M.m,M.n,
+        a, M.x.Get_Array_Pointer(), M.n, u.Get_Array_Pointer(), 1, b,
+        v.Get_Array_Pointer(), 1);
+}
 
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::
 Fill_Orig_Rows()
@@ -117,8 +183,8 @@ Compute_Inv(int a)
     if(a==id_block) return id_block;
     if(int* r=cached_ops.Get_Pointer({op_inv,a,0})) return *r;
     PHYSBAM_ASSERT(block_list(a).sym);
-    int n=block_list.Append({{},true,{block_list.m}});
-    block_list(a).M.PLU_Inverse(block_list.Last().M);
+    int n=block_list.Append({block_list(a).M,true,{block_list.m}});
+    Inverse(block_list.Last().M);
     cached_ops.Set({op_inv,a,0},n);
     if(!quiet){
         LOG::printf("mat stats: %g -> %g  err %g\n",
@@ -157,9 +223,7 @@ Compute_Mul(int a,int b)
 
     auto& A=block_list(a&~use_trans).M;
     auto& B=block_list(b&~use_trans).M;
-    if(b&use_trans) M=A.Times_Transpose(B);
-    else if(a&use_trans) M=A.Transpose_Times(B);
-    else M=A*B;
+    Times_MM(M,A,a&use_trans,B,b&use_trans);
     if(!sym) cached_ops.Set({op_mul,Transposed(b),Transposed(a)},n^use_trans);
     prod_lookup.Set(prod_list,n);
     if(!sym) prod_lookup.Set(prod_list_trans,Transposed(n));
@@ -319,8 +383,8 @@ Add_Times(ARRAY<T>& out,T a,int m,const ARRAY<T>& in,T b) const
 
     auto& M=block_list(m&~use_trans).M;
     if(!out.m) out.Resize(m&use_trans?M.n:M.m);
-    if(m&use_trans) out=a*out+M.Transpose_Times(in)*b;
-    else out=a*out+M*in*b;
+    if(&out==&in) return Add_Times(out,a,m,ARRAY<T>(in),b);
+    Times_MV(out,b,M,m&use_trans,in,a);
 }
 //#####################################################################
 // Function Test_State

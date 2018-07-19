@@ -560,10 +560,6 @@ public:
     void Copy(const SCALAR c1,const T_ARRAY0& v1,const SCALAR c2,const T_ARRAY1& v2)
     {*this=c1*v1+c2*v2;}
 
-    template<class T_ARRAY0,class T_ARRAY1,class T_ARRAY2>
-    void Copy(const SCALAR c1,const T_ARRAY0& v1,const SCALAR c2,const T_ARRAY1& v2,const SCALAR c3,const T_ARRAY2& v3)
-    {*this=c1*v1+c2*v2+c3*v3;}
-
     static void Get(T_ARRAY& new_copy,const T_ARRAY& old_copy)
     {if(&old_copy!=&new_copy) new_copy=old_copy.Prefix(new_copy.Size());}
 
