@@ -194,15 +194,16 @@ int main(int argc, char* argv[])
     PHYSBAM_ASSERT(elim_mat.elimination_order.m==elim_mat.orig_sizes.m);
     elim_mat.Back_Solve();
 
-    ARRAY<T,FACE_INDEX<TV::m> > face_velocity(grid,1);
-    for(FACE_ITERATOR<TV> it(grid,1);it.Valid();it.Next()){
-        auto& uf=fl.used_faces(it.Full_Index());
-        if(uf.type!=fluid) continue;
-        face_velocity(it.Full_Index())=elim_mat.rhs(uf.block_id)(uf.block_dof);}
-    if(!quiet) Flush_Frame(face_velocity,"elim solve");
+    if(!quiet){
+        ARRAY<T,FACE_INDEX<TV::m> > face_velocity(grid,1);
+        for(FACE_ITERATOR<TV> it(grid,1);it.Valid();it.Next()){
+            auto& uf=fl.used_faces(it.Full_Index());
+            if(uf.type!=fluid) continue;
+            face_velocity(it.Full_Index())=elim_mat.rhs(uf.block_id)(uf.block_dof);}
+        Flush_Frame(face_velocity,"elim solve");
 
-    for(int i=2;i<elim_mat.block_list.m;i++)
-        OCTAVE_OUTPUT<T>(LOG::sprintf("b-%i.txt",i).c_str()).Write("b",elim_mat.block_list(i).M);
+        for(int i=2;i<elim_mat.block_list.m;i++)
+            OCTAVE_OUTPUT<T>(LOG::sprintf("b-%i.txt",i).c_str()).Write("b",elim_mat.block_list(i).M);}
 
     return 0;
 }
