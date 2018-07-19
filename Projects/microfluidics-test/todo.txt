@@ -1,0 +1,5 @@
+* Use BLAS/LAPACK for dense operations.
+
+* Break up big blocks (vertices) into cross sections and eliminate them one by one.
+
+
