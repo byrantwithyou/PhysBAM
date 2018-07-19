@@ -96,6 +96,10 @@ int main(int argc, char* argv[])
     elim_mat.Full_Reordered_Elimination();
     elim_mat.Back_Solve();
 
+    ARRAY<T> elim_sol;
+    elim_mat.Pack_Vector(fl.dof_map,elim_sol,elim_mat.rhs);
+    LOG::printf("ANS DIFF: %g\n",(elim_sol-sol_vector).Max_Abs());
+    
     if(!quiet){
         ARRAY<T,FACE_INDEX<TV::m> > face_velocity(grid,1);
         for(FACE_ITERATOR<TV> it(grid,1);it.Valid();it.Next()){
