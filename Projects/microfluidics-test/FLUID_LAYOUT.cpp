@@ -234,4 +234,5 @@ Allocate_Cross_Section_Blocks_Faces(const RANGE<TV_INT>& box,int dir)
 }
 
 template struct FLUID_LAYOUT<VECTOR<double,2> >;
+template struct FLUID_LAYOUT<VECTOR<double,3> >;
 }

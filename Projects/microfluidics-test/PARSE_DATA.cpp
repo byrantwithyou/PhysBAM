@@ -164,4 +164,5 @@ Pipe_Dir(const VECTOR<int,2>& p) const
     return (pts(p.y).pt-pts(p.x).pt).Arg_Max();
 }
 template struct PARSE_DATA<VECTOR<double,2> >;
+template struct PARSE_DATA<VECTOR<double,3> >;
 }

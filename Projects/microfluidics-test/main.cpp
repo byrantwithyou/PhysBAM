@@ -37,7 +37,7 @@ typedef double T;
 template<int d>
 void Run(PARSE_ARGS& parse_args)
 {
-    typedef VECTOR<T,2> TV;
+    typedef VECTOR<T,d> TV;
     typedef VECTOR<int,TV::m> TV_INT;
 
     T mu=1;
@@ -48,6 +48,7 @@ void Run(PARSE_ARGS& parse_args)
     parse_args.Add("-mu",&mu,"mu","viscosity");
     parse_args.Add("-q",&quiet,"disable diagnostics; useful for timing");
     parse_args.Extra(&pipe_file,"file","file describing pipes");
+    parse_args.Parse();
 
     PARSE_DATA<TV> pd;
     pd.Parse_Input(pipe_file);
@@ -118,7 +119,6 @@ int main(int argc, char* argv[])
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Add("-3d",&use_3d,"use 3D");
     parse_args.Parse(true);
-    parse_args.Parse();
 
     if(use_3d) Run<3>(parse_args);
     else Run<2>(parse_args);

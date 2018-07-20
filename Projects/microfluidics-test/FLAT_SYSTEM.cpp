@@ -133,4 +133,10 @@ template void Compute_Full_Matrix<double,VECTOR<double,2> >(GRID<VECTOR<double,2
 template void Solve_And_Display_Solution<double,VECTOR<double,2> >(
     GRID<VECTOR<double,2> > const&,FLUID_LAYOUT<VECTOR<double,2> > const&,
     SYSTEM_MATRIX_HELPER<double> const&,ARRAY<double,int> const&,ARRAY<double,int>*);
+template void Compute_Full_Matrix<double,VECTOR<double,3> >(GRID<VECTOR<double,3> > const&,
+    ARRAY<VECTOR<int,3>,int>&,ARRAY<double,int>&,ARRAY<double,int>&,
+    FLUID_LAYOUT<VECTOR<double,3> > const&,double);
+template void Solve_And_Display_Solution<double,VECTOR<double,3> >(
+    GRID<VECTOR<double,3> > const&,FLUID_LAYOUT<VECTOR<double,3> > const&,
+    SYSTEM_MATRIX_HELPER<double> const&,ARRAY<double,int> const&,ARRAY<double,int>*);
 }
