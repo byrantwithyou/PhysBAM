@@ -43,10 +43,12 @@ void Run(PARSE_ARGS& parse_args)
     T mu=1;
     T dx=.1;
 
+    int threads=1;
     bool quiet=false;
     std::string pipe_file;
     parse_args.Add("-mu",&mu,"mu","viscosity");
     parse_args.Add("-q",&quiet,"disable diagnostics; useful for timing");
+    parse_args.Add("-threads",&threads,"num","number of threads to use");
     parse_args.Extra(&pipe_file,"file","file describing pipes");
     parse_args.Parse();
 
@@ -96,10 +98,11 @@ void Run(PARSE_ARGS& parse_args)
     elim_mat.Reduce_Rows_By_Frequency(fl.num_vertex_blocks,fl.blocks.m,3);
     elim_mat.Full_Reordered_Elimination();
     elim_mat.Back_Solve();
+    elim_mat.Execute_Jobs(threads);
 
     ARRAY<T> elim_sol;
     elim_mat.Pack_Vector(fl.dof_map,elim_sol,elim_mat.rhs);
-    LOG::printf("ANS DIFF: %g\n",(elim_sol-sol_vector).Max_Abs());
+    if(!quiet) LOG::printf("ANS DIFF: %g\n",(elim_sol-sol_vector).Max_Abs());
     
     if(!quiet){
         ARRAY<T,FACE_INDEX<TV::m> > face_velocity(grid,1);
@@ -107,10 +110,7 @@ void Run(PARSE_ARGS& parse_args)
             auto& uf=fl.used_faces(it.Full_Index());
             if(uf.type!=fluid) continue;
             face_velocity(it.Full_Index())=elim_mat.vector_list(elim_mat.rhs(uf.block_id))(uf.block_dof);}
-        Flush_Frame(face_velocity,"elim solve");
-
-        for(int i=2;i<elim_mat.block_list.m;i++)
-            OCTAVE_OUTPUT<T>(LOG::sprintf("b-%i.txt",i).c_str()).Write("b",elim_mat.block_list(i).M);}
+        Flush_Frame(face_velocity,"elim solve");}
 }
 
 int main(int argc, char* argv[])
