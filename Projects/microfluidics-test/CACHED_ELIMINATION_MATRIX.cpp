@@ -98,8 +98,6 @@ template<class T> void CACHED_ELIMINATION_MATRIX<T>::
 Eliminate_Row(int r)
 {
     PHYSBAM_ASSERT(valid_row(r));
-    if(!quiet) LOG::printf("elim %i\n",r);
-    Test_State("ER a");
     int diag_matrix=Get_Block_Lazy(r,r);
     int inv=Compute_Inv(diag_matrix);
     ARRAY<MATRIX_BLOCK>& row=rows(r);
@@ -114,7 +112,6 @@ Eliminate_Row(int r)
         if(row(i).matrix_id&use_trans){PHYSBAM_ASSERT(M.Columns()==orig_sizes(r));}
         else{PHYSBAM_ASSERT(M.Rows()==orig_sizes(r));}
     }
-    Test_State("ER b");
     for(int i=0;i<row.m;i++){
         int s=row(i).c;
         if(s==r) continue;
@@ -131,7 +128,6 @@ Eliminate_Row(int r)
         for(int j=rows(s).m-1;j>=0;j--)
             if(rows(s)(j).matrix_id==zero_block)
                 rows(s).Remove_Index_Lazy(j);}
-    Test_State("ER c");
     valid_row(r)=false;
     elimination_order.Append(r);
 }
@@ -341,7 +337,12 @@ Fill_Blocks(ARRAY<VECTOR<int,2> >& dof_map,const ARRAY<VECTOR<int,3> >& coded_en
                 hash_to_id.Set(th,id|use_trans);}
         blocks_to_canonical_block_id.Set(t.key,id);}
 
-    Unpack_Vector(dof_map,rhs,rhs_vector);
+    Unpack_Vector(dof_map,orig_rhs,rhs_vector);
+
+    rhs.Resize(orig_rhs.m,init_all,-1);
+    for(int i=0;i<orig_rhs.m;i++)
+        if(orig_rhs(i).m)
+            rhs(i)=vector_list.Append(orig_rhs(i));
 }
 //#####################################################################
 // Function Back_Solve
@@ -351,7 +352,11 @@ Back_Solve()
 {
     for(int j=elimination_order.m-1;j>=0;j--){
         int r=elimination_order(j);
-        if(!rhs(r).m) rhs(r).Resize(orig_sizes(r));
+        if(rhs(r)<0)
+        {
+            rhs(r)=vector_list.Append(ARRAY<T>(orig_sizes(r)));
+            printf("op_zero %i\n",rhs(r));
+        }
         for(auto e:rows(r))
             if(e.c!=r)
                 Add_Times(rhs(r),1,e.matrix_id,rhs(e.c),-1);}
@@ -359,31 +364,51 @@ Back_Solve()
 //#####################################################################
 // Function Add_Times
 //#####################################################################
-template<class T> void CACHED_ELIMINATION_MATRIX<T>::
-Add_Times(ARRAY<ARRAY<T> >& out,const ARRAY<ARRAY<T> >& in) const
-{
-    for(int r=0;r<rows.m;r++)
-        for(auto e:rows(r))
-            Add_Times(out(r),1,e.matrix_id,in(e.c),1);
-}
+// template<class T> void CACHED_ELIMINATION_MATRIX<T>::
+// Add_Times(ARRAY<ARRAY<T> >& out,const ARRAY<ARRAY<T> >& in) const
+// {
+//     for(int r=0;r<rows.m;r++)
+//         for(auto e:rows(r))
+//             Add_Times(out(r),1,e.matrix_id,in(e.c),1);
+// }
 //#####################################################################
 // Function Add_Times
 //#####################################################################
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::
-Add_Times(ARRAY<T>& out,T a,int m,const ARRAY<T>& in,T b) const
+Add_Times(int& out,T a,int m,int in,T b)
 {
-    if(!in.m || m==zero_block){
-        if(out.m && a!=1) out*=a;
+    if(in<0 || m==zero_block){
+        if(out>=0 && a!=1)
+        {
+            int o=vector_list.Add_End();
+            printf("op_av %i %g -> %i\n",out,a,o);
+            vector_list(o)=vector_list(out)*a;
+            out=o;
+        }
         return;}
     if(m==id_block){
-        if(out.m) out=out*a+in*b;
-        else out=in*b;
+        if(out>=0)
+        {
+            int o=vector_list.Add_End();
+            printf("op_av %i %g %i %g -> %i\n",out,a,in,b,o);
+            vector_list(o)=vector_list(out)*a+vector_list(in)*b;
+            out=o;
+        }
+        else
+        {
+            out=vector_list.Add_End();
+            printf("op_av %i %g -> %i\n",in,b,out);
+            vector_list(out)=vector_list(in)*b;
+        }
         return;}
 
+    int o=vector_list.Add_End();
     auto& M=block_list(m&~use_trans).M;
-    if(!out.m) out.Resize(m&use_trans?M.n:M.m);
-    if(&out==&in) return Add_Times(out,a,m,ARRAY<T>(in),b);
-    Times_MV(out,b,M,m&use_trans,in,a);
+    if(out<0) vector_list(o).Resize(m&use_trans?M.n:M.m);
+    else vector_list(o)=vector_list(out);
+    Times_MV(vector_list(o),b,M,m&use_trans,vector_list(in),a);
+    printf("op_au_bAv %i %g %i %i %g -> %i\n",out,a,m,in,b,o);
+    out=o;
 }
 //#####################################################################
 // Function Test_State
@@ -394,10 +419,11 @@ Test_State(const char* str) const
     if(quiet) return;
     ARRAY<ARRAY<T> > residual(test_sol.m);
     for(int i=0;i<test_sol.m;i++){
-        if(rhs(i).m) residual(i)=-rhs(i);
+        if(rhs(i)>=0) residual(i)=-vector_list(rhs(i));
         else residual(i).Resize(orig_sizes(i));}
 
-    Add_Times(residual,test_sol);
+    PHYSBAM_FATAL_ERROR();
+//    Add_Times(residual,test_sol);
 
     T sum=0;
     for(int r=0;r<rows.m;r++)
@@ -429,6 +455,17 @@ Pack_Vector(ARRAY<VECTOR<int,2> >& dof_map,ARRAY<T>& v,const ARRAY<ARRAY<T> >& u
     for(int i=0;i<v.m;i++){
         int b=dof_map(i).x;
         if(u(b).m) v(i)=u(b)(dof_map(i).y);}
+}
+//#####################################################################
+// Function Pack_Vector
+//#####################################################################
+template<class T> void CACHED_ELIMINATION_MATRIX<T>::
+Pack_Vector(ARRAY<VECTOR<int,2> >& dof_map,ARRAY<T>& v,const ARRAY<int>& u)
+{
+    v.Resize(dof_map.m,init_all,0);
+    for(int i=0;i<v.m;i++){
+        int b=dof_map(i).x;
+        if(u(b)>=0) v(i)=vector_list(u(b))(dof_map(i).y);}
 }
 //#####################################################################
 // Function Transposed

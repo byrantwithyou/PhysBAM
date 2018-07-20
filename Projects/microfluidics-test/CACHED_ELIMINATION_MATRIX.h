@@ -27,6 +27,7 @@ struct CACHED_ELIMINATION_MATRIX
     };
 
     ARRAY<MATRIX_INFO> block_list;
+    ARRAY<ARRAY<T> > vector_list;
     ARRAY<int> orig_sizes;
     HASHTABLE<VECTOR<int,2>,int> blocks_to_canonical_block_id;
     
@@ -42,7 +43,8 @@ struct CACHED_ELIMINATION_MATRIX
     };
 
     ARRAY<ARRAY<MATRIX_BLOCK> > rows;
-    ARRAY<ARRAY<T> > rhs;
+    ARRAY<ARRAY<T> > orig_rhs;
+    ARRAY<int> rhs;
     ARRAY<ARRAY<T> > test_sol;
 
     ARRAY<bool> valid_row;
@@ -67,8 +69,9 @@ struct CACHED_ELIMINATION_MATRIX
     void Test_State(const char* str) const;
     void Unpack_Vector(ARRAY<VECTOR<int,2> >& dof_map,ARRAY<ARRAY<T> >& u,const ARRAY<T>& v);
     void Pack_Vector(ARRAY<VECTOR<int,2> >& dof_map,ARRAY<T>& v,const ARRAY<ARRAY<T> >& u);
-    void Add_Times(ARRAY<ARRAY<T> >& out,const ARRAY<ARRAY<T> >& in) const;
-    void Add_Times(ARRAY<T>& out,T a,int m,const ARRAY<T>& in,T b) const;
+    void Pack_Vector(ARRAY<VECTOR<int,2> >& dof_map,ARRAY<T>& v,const ARRAY<int>& u);
+//    void Add_Times(ARRAY<ARRAY<T> >& out,const ARRAY<ARRAY<T> >& in) const;
+    void Add_Times(int& out,T a,int m,int in,T b);
     int Transposed(int a) const;
     bool Symmetric(int a) const;
     ARRAY<int> Transposed(const ARRAY<int>& a) const;

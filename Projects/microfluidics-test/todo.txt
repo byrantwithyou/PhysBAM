@@ -1,4 +1,2 @@
-* Get 3D up and running
-
 * Threading
 

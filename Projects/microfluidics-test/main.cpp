@@ -33,21 +33,21 @@ using namespace PhysBAM;
 
 typedef float RW;
 typedef double T;
-typedef VECTOR<T,2> TV;
-typedef VECTOR<int,TV::m> TV_INT;
 
-int main(int argc, char* argv[])
+template<int d>
+void Run(PARSE_ARGS& parse_args)
 {
+    typedef VECTOR<T,2> TV;
+    typedef VECTOR<int,TV::m> TV_INT;
+
     T mu=1;
     T dx=.1;
 
     bool quiet=false;
     std::string pipe_file;
-    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add("-mu",&mu,"mu","viscosity");
     parse_args.Add("-q",&quiet,"disable diagnostics; useful for timing");
     parse_args.Extra(&pipe_file,"file","file describing pipes");
-    parse_args.Parse();
 
     PARSE_DATA<TV> pd;
     pd.Parse_Input(pipe_file);
@@ -105,11 +105,23 @@ int main(int argc, char* argv[])
         for(FACE_ITERATOR<TV> it(grid,1);it.Valid();it.Next()){
             auto& uf=fl.used_faces(it.Full_Index());
             if(uf.type!=fluid) continue;
-            face_velocity(it.Full_Index())=elim_mat.rhs(uf.block_id)(uf.block_dof);}
+            face_velocity(it.Full_Index())=elim_mat.vector_list(elim_mat.rhs(uf.block_id))(uf.block_dof);}
         Flush_Frame(face_velocity,"elim solve");
 
         for(int i=2;i<elim_mat.block_list.m;i++)
             OCTAVE_OUTPUT<T>(LOG::sprintf("b-%i.txt",i).c_str()).Write("b",elim_mat.block_list(i).M);}
+}
+
+int main(int argc, char* argv[])
+{
+    bool use_3d=false;
+    PARSE_ARGS parse_args(argc,argv);
+    parse_args.Add("-3d",&use_3d,"use 3D");
+    parse_args.Parse(true);
+    parse_args.Parse();
+
+    if(use_3d) Run<3>(parse_args);
+    else Run<2>(parse_args);
 
     return 0;
 }
