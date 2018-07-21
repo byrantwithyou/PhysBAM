@@ -80,11 +80,6 @@ Compute(const PARSE_DATA<TV>& pd)
             }
         }
         Allocate_Cross_Section_Blocks_Cells(i.box,0);
-        // for(FACE_RANGE_ITERATOR<TV::m> it(box);it.Valid();it.Next())
-        // {
-        //     auto& uf=used_faces(it.face);
-        //     if(uf.type==fluid) uf.block_id=next_block;
-        // }
     }
     num_vertex_blocks=blocks.m;
     Dump_Blocks();

@@ -93,27 +93,4 @@ void JOB_SCHEDULER_CORE::Compute_Priority_By_Paths()
         Compute_Priority_By_Paths_Rec(i);
 }
 
-// //#####################################################################
-// // Function Queue_Users
-// //#####################################################################
-// template<class T> void CACHED_ELIMINATION_MATRIX<T>::
-// Queue_Users(int j)
-// {
-// #pragma omp critical
-// }
-// //#####################################################################
-// // Function Get_Job
-// //#####################################################################
-// template<class T> int CACHED_ELIMINATION_MATRIX<T>::
-// Get_Job()
-// {
-// #pragma omp critical
-//     int j=priority_queue(0);
-//     std::pop_heap(priority_queue.begin(),priority_queue.end(),[this](int r,int s){return jobs(r).priority<jobs(s).priority;});
-//     priority_queue.Pop();
-//     return j;
-// }
-
-
-
 }

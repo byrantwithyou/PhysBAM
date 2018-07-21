@@ -23,11 +23,6 @@ struct FLUID_LAYOUT
     struct BLOCK
     {
         int num_dofs;
-        // vertex: 1+2*dirichlet_side+16*(1<<each_connected_side);
-        // pipe: 2*direction
-        // 
-//        int block_type;
-//        bool is_rep;
     };
 
     struct GRID_DATA
@@ -51,7 +46,6 @@ struct FLUID_LAYOUT
     void Dump_Layout() const;
     void Dump_Dofs() const;
     void Dump_Blocks() const;
-//    void Dump_Block_Types() const;
     int Total_Dofs() const {return dof_map.m;}
     void Allocate_Cross_Section_Blocks_Cells(const RANGE<TV_INT>& box,int dir);
     void Allocate_Cross_Section_Blocks_Faces(const RANGE<TV_INT>& box,int dir);

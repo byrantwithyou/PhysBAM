@@ -12,45 +12,6 @@
 #include <string>
 #include "PARSE_DATA.h"
 namespace PhysBAM{
-
-// template<class TV>
-// void Set_BC_Func(const std::string& expr,PARSE_DATA<TV>& pd,typename PARSE_DATA<TV>::VERTEX_DATA& vd)
-// {
-//     typedef typename TV::SCALAR T;
-//     PROGRAM<T> prog;
-//     PROGRAM_CONTEXT<T> context;
-//     for(int i=0;i<TV::m-1;i++) prog.var_in.Append("rs"[i]);
-//     prog.var_out.Append("v");
-//     prog.Parse(expr.c_str(),false);
-//     prog.Optimize();
-//     prog.Finalize();
-//     context.Initialize(prog);
-    
-//     vd.bc_func_value=[prog,context,&pd](VECTOR<T,TV::m-1> x)
-//         {
-//             for(int i=0;i<TV::m-1;i++) context.data_in(i)=x(i)/(2*pd.half_width)+(T).5;
-//             prog.Execute(context);
-//             return context.data_out(0);
-//         };
-// }
-// //#####################################################################
-// // Function Value
-// //#####################################################################
-// template<class TV> auto PARSE_DATA<TV>::VERTEX_DATA::
-// Value(const VECTOR<int,TV::m>& c) const -> T
-// {
-//     if(bc_func_value) return bc_func_value(c.Remove_Index(bc_side/2)-pt.Remove_Index(bc_side/2)+(T).5);
-//     return bc_value;
-// }
-// //#####################################################################
-// // Function Value
-// //#####################################################################
-// template<class TV> auto PARSE_DATA<TV>::VERTEX_DATA::
-// Value(const FACE_INDEX<TV::m>& f) const -> T
-// {
-//     if(bc_func_value) return bc_func_value(f.index.Remove_Index(bc_side/2)-pt.Remove_Index(bc_side/2)+(T).5);
-//     return bc_value;
-// }
 //#####################################################################
 // Function Parse_Input
 //#####################################################################

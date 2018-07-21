@@ -69,8 +69,6 @@ void Run(PARSE_ARGS& parse_args)
         Flush_Frame<TV>("grid dofs");
         fl.Dump_Blocks();
         Flush_Frame<TV>("grid blocks");}
-    // fl.Dump_Block_Types();
-    // Flush_Frame<TV>("block types");
 
     SYSTEM_MATRIX_HELPER<T> MH;
     ARRAY<VECTOR<int,3> > coded_entries;
@@ -86,7 +84,6 @@ void Run(PARSE_ARGS& parse_args)
     elim_mat.quiet=quiet;
     elim_mat.orig_sizes.Resize(fl.blocks.m);
     for(int i=0;i<fl.blocks.m;i++) elim_mat.orig_sizes(i)=fl.blocks(i).num_dofs;
-//    Setup_Block_Map(elim_mat,fl);
 
     elim_mat.Fill_Blocks(fl.dof_map,coded_entries,code_values,rhs_vector);
 

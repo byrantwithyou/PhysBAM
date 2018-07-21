@@ -186,13 +186,6 @@ Compute_Inv(int a)
     int n=block_list.Append({{},true,{block_list.m}});
     jobs.Append({op_inv,a,-1,-1,n,0});
     cached_ops.Set({op_inv,a,0},n);
-    // if(!quiet){
-    //     auto ch=[this](int a){if(a&use_trans) return 't';if(Symmetric(a)) return 's';return ' ';};
-
-    //     printf("inv %i%c -> %i%c\n",
-    //         a&~use_trans,ch(a),
-    //         n&~use_trans,ch(n)
-    //     );}
     return n;
 }
 //#####################################################################
@@ -221,15 +214,6 @@ Compute_Mul(int a,int b)
     prod_lookup.Set(prod_list,n);
     if(!sym) prod_lookup.Set(prod_list_trans,Transposed(n));
     cached_ops.Set({op_mul,a,b},n);
-
-    // if(!quiet){
-    //     auto ch=[this](int a){if(a&use_trans) return 't';if(Symmetric(a)) return 's';return ' ';};
-
-    //     printf("mul %i%c * %i%c -> %i%c\n",
-    //         a&~use_trans,ch(a),
-    //         b&~use_trans,ch(b),
-    //         n&~use_trans,ch(n)
-    //     );}
     return n;
 }
 //#####################################################################
@@ -247,15 +231,6 @@ Compute_Sub(int a,int b)
     jobs.Append({op_sub,a,b,-1,n,0});
 
     cached_ops.Set({op_sub,a,b},n);
-
-    // if(!quiet){
-    //     auto ch=[this](int a){if(a&use_trans) return 't';if(Symmetric(a)) return 's';return ' ';};
-    
-    //     printf("sub %i%c - %i%c -> %i%c\n",
-    //         a&~use_trans,ch(a),
-    //         b&~use_trans,ch(b),
-    //         n&~use_trans,ch(n)
-    //     );}
     return n;
 }
 //#####################################################################
@@ -353,16 +328,6 @@ Back_Solve()
 //#####################################################################
 // Function Add_Times
 //#####################################################################
-// template<class T> void CACHED_ELIMINATION_MATRIX<T>::
-// Add_Times(ARRAY<ARRAY<T> >& out,const ARRAY<ARRAY<T> >& in) const
-// {
-//     for(int r=0;r<rows.m;r++)
-//         for(auto e:rows(r))
-//             Add_Times(out(r),1,e.matrix_id,in(e.c),1);
-// }
-//#####################################################################
-// Function Add_Times
-//#####################################################################
 template<class T> int CACHED_ELIMINATION_MATRIX<T>::
 Matrix_Times(int m,int v)
 {
@@ -371,7 +336,6 @@ Matrix_Times(int m,int v)
 
     int o=vector_list.Add_End();
     jobs.Append({op_Av,m,v,-1,o,10});
-//    printf("op_Av %i %i -> %i\n",m,v,o);
     return o;
 }
 //#####################################################################
@@ -383,41 +347,12 @@ Sub_Times(int out,int m,int v)
     if(v<0 || m==zero_block) return out;
     int o=vector_list.Add_End();
     if(m==id_block){
-        if(out>=0)
-        {
-//            printf("op_vec_sub %i %i -> %i\n",out,v,o);
-            jobs.Append({op_vec_sub,out,v,-1,o,11});
-        }
-        else
-        {
-//            printf("op_vec_neg %i -> %i\n",v,o);
-            jobs.Append({op_vec_neg,v,-1,-1,o,9});
-        }
+        if(out>=0) jobs.Append({op_vec_sub,out,v,-1,o,11});
+        else jobs.Append({op_vec_neg,v,-1,-1,o,9});
         return o;}
 
     jobs.Append({op_u_sub_Av,out,m,v,o,13});
-//    printf("op_u_sub_Av %i %i %i -> %i\n",out,m,v,o);
     return o;
-}
-//#####################################################################
-// Function Test_State
-//#####################################################################
-template<class T> void CACHED_ELIMINATION_MATRIX<T>::
-Test_State(const char* str) const
-{
-    if(quiet) return;
-    ARRAY<ARRAY<T> > residual(test_sol.m);
-    for(int i=0;i<test_sol.m;i++){
-        if(rhs(i)>=0) residual(i)=-vector_list(rhs(i));
-        else residual(i).Resize(orig_sizes(i));}
-
-    PHYSBAM_FATAL_ERROR();
-//    Add_Times(residual,test_sol);
-
-    T sum=0;
-    for(int r=0;r<rows.m;r++)
-        sum+=residual(r).Magnitude_Squared();
-    LOG::printf("TEST ERROR %s %P\n",str,sqrt(sum));
 }
 //#####################################################################
 // Function Unpack_Vector
@@ -574,7 +509,6 @@ Execute_Jobs(int num_threads)
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::JOB::
 Execute(CACHED_ELIMINATION_MATRIX<T>* cem)
 {
-//    LOG::printf("exec %i (%i %i %i) -> %i\n",op,a,b,c,o);
     auto& bl=cem->block_list;
     auto& vl=cem->vector_list;
     switch(op)

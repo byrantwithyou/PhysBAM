@@ -25,11 +25,6 @@ struct PARSE_DATA
         int bc_side;
         typename TV::SCALAR bc_value;
         RANGE<VECTOR<int,TV::m> > box;
-//        int connected_sides;
-        // std::function<T(VECTOR<T,TV::m-1>)> bc_func_value;
-
-        // T Value(const VECTOR<int,TV::m>& c) const;
-        // T Value(const FACE_INDEX<TV::m>& f) const;
     };
 
     ARRAY<VERTEX_DATA> pts;
