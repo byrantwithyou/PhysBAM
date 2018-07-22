@@ -17,6 +17,39 @@
 #include <suitesparse/colamd.h>
 
 namespace PhysBAM{
+namespace
+{
+// const char* op_names[]={
+//     "op_nop",
+//     "op_mat_inv","op_mat_mul","op_mat_add",
+//     "op_vec_mul","op_vec_add",
+//     "free_mat","free_vec"};
+
+enum op_type
+{
+    op_nop,
+    op_mat_inv,op_mat_mul,op_mat_add,
+    op_vec_mul,op_vec_add,
+    free_mat,free_vec,
+    op_last
+};
+
+enum {zero_block=0,id_block=1,invalid_block=-1,
+      use_trans=1<<30,use_neg=1<<29,is_vec=1<<28,
+      raw_mask=~(use_trans|use_neg)};
+
+int arg_type[op_last][4] =
+{
+    [op_nop]={0,0,0,0},
+    [op_mat_inv]={1,0,0,1},
+    [op_mat_mul]={1,1,1,1},
+    [op_mat_add]={1,1,0,1},
+    [op_vec_mul]={2,1,2,2},
+    [op_vec_add]={2,2,0,2},
+    [free_mat]={1,0,0,0},
+    [free_vec]={2,0,0,0}
+};
+}
 
 void Inverse(MATRIX_MXN<float>& A)
 {
@@ -42,7 +75,8 @@ void Inverse(MATRIX_MXN<double>& A)
             A(r,c)=A(c,r);
 }
 
-void Times_MM(MATRIX_MXN<float>& A,const MATRIX_MXN<float>& B,bool bt,const MATRIX_MXN<float>& C,bool ct)
+// A = sa*A+sbc*op(B,bt)*op(C,ct)
+void Times_MM(MATRIX_MXN<float>& A,float sa,const MATRIX_MXN<float>& B,bool bt,const MATRIX_MXN<float>& C,bool ct,float sbc)
 {
     int m=bt?B.n:B.m;
     int k=bt?B.m:B.n;
@@ -50,12 +84,12 @@ void Times_MM(MATRIX_MXN<float>& A,const MATRIX_MXN<float>& B,bool bt,const MATR
     if(A.m!=m || A.n!=n) A.Resize(m,n);
     
     cblas_sgemm( CblasRowMajor, bt?CblasTrans:CblasNoTrans, ct?CblasTrans:CblasNoTrans,
-        m,n,k,1,B.x.Get_Array_Pointer(),
+        m,n,k,sbc,B.x.Get_Array_Pointer(),
         B.n, C.x.Get_Array_Pointer(), C.n,
-        0, A.x.Get_Array_Pointer(), A.n);
+        sa, A.x.Get_Array_Pointer(), A.n);
 }
 
-void Times_MM(MATRIX_MXN<double>& A,const MATRIX_MXN<double>& B,bool bt,const MATRIX_MXN<double>& C,bool ct)
+void Times_MM(MATRIX_MXN<double>& A,double sa,const MATRIX_MXN<double>& B,bool bt,const MATRIX_MXN<double>& C,bool ct,double sbc)
 {
     int m=bt?B.n:B.m;
     int k=bt?B.m:B.n;
@@ -63,11 +97,12 @@ void Times_MM(MATRIX_MXN<double>& A,const MATRIX_MXN<double>& B,bool bt,const MA
     if(A.m!=m || A.n!=n) A.Resize(m,n);
     
     cblas_dgemm( CblasRowMajor, bt?CblasTrans:CblasNoTrans, ct?CblasTrans:CblasNoTrans,
-        m,n,k,1,B.x.Get_Array_Pointer(),
+        m,n,k,sbc,B.x.Get_Array_Pointer(),
         B.n, C.x.Get_Array_Pointer(), C.n,
-        0, A.x.Get_Array_Pointer(), A.n);
+        sa, A.x.Get_Array_Pointer(), A.n);
 }
 
+// v = b*v + a*M*u
 void Times_MV(ARRAY<float>& v,float a,const MATRIX_MXN<float>& M,bool t,const ARRAY<float>& u,float b)
 {
     cblas_sgemv(CblasRowMajor,t?CblasTrans:CblasNoTrans,M.m,M.n,
@@ -107,12 +142,7 @@ Eliminate_Row(int r)
         if(row(i).c==r)
             row(i).matrix_id=id_block;
         else
-            row(i).matrix_id=Compute_Mul(inv,row(i).matrix_id);
-        auto M=block_list(row(i).matrix_id&~use_trans).M;
-        if(!M.m) continue;
-        if(row(i).matrix_id&use_trans){PHYSBAM_ASSERT(M.Columns()==orig_sizes(r));}
-        else{PHYSBAM_ASSERT(M.Rows()==orig_sizes(r));}
-    }
+            row(i).matrix_id=Compute_Mul(inv,row(i).matrix_id);}
     for(int i=0;i<row.m;i++){
         int s=row(i).c;
         if(s==r) continue;
@@ -121,11 +151,7 @@ Eliminate_Row(int r)
         for(int j=0;j<row.m;j++){
             int t=row(j).c;
             int& m=Get_Block(s,t);
-            m=Compute_Elim(m,elim_mat,row(j).matrix_id);
-            auto M=block_list(m&~use_trans).M;
-            if(!M.m) continue;
-            if(m&use_trans){PHYSBAM_ASSERT(M.Columns()==orig_sizes(s));}
-            else{PHYSBAM_ASSERT(M.Rows()==orig_sizes(s));}}
+            m=Compute_Elim(m,elim_mat,row(j).matrix_id);}
         for(int j=rows(s).m-1;j>=0;j--)
             if(rows(s)(j).matrix_id==zero_block)
                 rows(s).Remove_Index_Lazy(j);}
@@ -169,10 +195,19 @@ Transposed(int a) const
 //#####################################################################
 // Function Transposed
 //#####################################################################
+template<class T> int CACHED_ELIMINATION_MATRIX<T>::
+Negate(int a) const
+{
+    if(a==zero_block) return a;
+    return a^use_neg;
+}
+//#####################################################################
+// Function Transposed
+//#####################################################################
 template<class T> bool CACHED_ELIMINATION_MATRIX<T>::
 Symmetric(int a) const
 {
-    return block_list(a&~use_trans).sym;
+    return block_list(a&raw_mask).sym;
 }
 //#####################################################################
 // Function Compute_Inv
@@ -181,11 +216,12 @@ template<class T> int CACHED_ELIMINATION_MATRIX<T>::
 Compute_Inv(int a)
 {
     if(a==id_block) return id_block;
-    if(int* r=cached_ops.Get_Pointer({op_inv,a,0})) return *r;
+    if(a&use_neg) return Negate(Compute_Inv(Negate(a)));
+    if(int* r=cached_ops.Get_Pointer({op_mat_inv,a,0})) return *r;
     PHYSBAM_ASSERT(block_list(a).sym);
     int n=block_list.Append({{},true,{block_list.m}});
-    jobs.Append({op_inv,a,-1,-1,n,0});
-    cached_ops.Set({op_inv,a,0},n);
+    jobs.Append({op_mat_inv,{a},n});
+    cached_ops.Set({op_mat_inv,a,0},n);
     return n;
 }
 //#####################################################################
@@ -199,8 +235,10 @@ Compute_Mul(int a,int b)
     if(a==zero_block || b==zero_block) return zero_block;
     if((a&b&use_trans) || (!Symmetric(a) && Symmetric(b)))
         return Transposed(Compute_Mul(Transposed(b),Transposed(a)));
+    if(a&use_neg) return Negate(Compute_Mul(Negate(a),b));
+    if(b&use_neg) return Negate(Compute_Mul(a,Negate(b)));
 
-    if(int* r=cached_ops.Get_Pointer({op_mul,a,b})) return *r;
+    if(int* r=cached_ops.Get_Pointer({op_mat_mul,a,b})) return *r;
     ARRAY<int> prod_list=Prod_List(a);
     prod_list.Append_Elements(Prod_List(b));
     if(int* p=prod_lookup.Get_Pointer(prod_list))
@@ -208,29 +246,34 @@ Compute_Mul(int a,int b)
     ARRAY<int> prod_list_trans=Transposed(prod_list);
     bool sym=prod_list==prod_list_trans;
     int n=block_list.Append({{},sym,prod_list});
-    jobs.Append({op_mul,a,b,-1,n,0});
+    jobs.Append({op_mat_mul,{-1,a,b},n,{0,1}});
 
-    if(!sym) cached_ops.Set({op_mul,Transposed(b),Transposed(a)},n^use_trans);
+    if(!sym) cached_ops.Set({op_mat_mul,Transposed(b),Transposed(a)},n^use_trans);
     prod_lookup.Set(prod_list,n);
     if(!sym) prod_lookup.Set(prod_list_trans,Transposed(n));
-    cached_ops.Set({op_mul,a,b},n);
+    cached_ops.Set({op_mat_mul,a,b},n);
     return n;
 }
 //#####################################################################
-// Function Compute_Sub
+// Function Compute_Add
 //#####################################################################
 template<class T> int CACHED_ELIMINATION_MATRIX<T>::
-Compute_Sub(int a,int b)
+Compute_Add(int a,int b)
 {
     if(b==zero_block) return a;
+    if(a==zero_block) return b;
+    if(a==Negate(b)) return zero_block;
+    int ra=a&raw_mask,rb=b&raw_mask;
+    if(ra>rb) return Compute_Add(b,a);
     if((a&use_trans) || (Symmetric(a) && (b&use_trans)))
-        return Transposed(Compute_Sub(Transposed(a),Transposed(b)));
+        return Transposed(Compute_Add(Transposed(a),Transposed(b)));
+    if(a&use_neg) return Negate(Compute_Add(Negate(a),Negate(b)));
 
-    if(int* r=cached_ops.Get_Pointer({op_sub,a,b})) return *r;
+    if(int* r=cached_ops.Get_Pointer({op_mat_add,a,b})) return *r;
     int n=block_list.Append({{},Symmetric(a)&&Symmetric(b),{block_list.m}});
-    jobs.Append({op_sub,a,b,-1,n,0});
 
-    cached_ops.Set({op_sub,a,b},n);
+    jobs.Append({op_mat_add,{a,b},n});
+    cached_ops.Set({op_mat_add,a,b},n);
     return n;
 }
 //#####################################################################
@@ -240,7 +283,7 @@ template<class T> int CACHED_ELIMINATION_MATRIX<T>::
 Compute_Elim(int a,int b,int c)
 {
     if(a==b && c==id_block) return zero_block;
-    return Compute_Sub(a,Compute_Mul(b,c));
+    return Compute_Add(a,Negate(Compute_Mul(b,c)));
 }
 //#####################################################################
 // Function Print_Full
@@ -335,7 +378,7 @@ Matrix_Times(int m,int v)
     if(m==id_block) return v;
 
     int o=vector_list.Add_End();
-    jobs.Append({op_Av,m,v,-1,o,10});
+    jobs.Append({op_vec_mul,{-1,m,v},o,{0,1}});
     return o;
 }
 //#####################################################################
@@ -345,13 +388,10 @@ template<class T> int CACHED_ELIMINATION_MATRIX<T>::
 Sub_Times(int out,int m,int v)
 {
     if(v<0 || m==zero_block) return out;
+    if(m==id_block && out<0) return Negate(v);
     int o=vector_list.Add_End();
-    if(m==id_block){
-        if(out>=0) jobs.Append({op_vec_sub,out,v,-1,o,11});
-        else jobs.Append({op_vec_neg,v,-1,-1,o,9});
-        return o;}
-
-    jobs.Append({op_u_sub_Av,out,m,v,o,13});
+    if(m==id_block) jobs.Append({op_vec_add,{out,v},o});
+    else jobs.Append({op_vec_mul,{out,m,v},o,{1,-1}});
     return o;
 }
 //#####################################################################
@@ -482,23 +522,33 @@ Full_Reordered_Elimination()
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::
 Execute_Jobs(int num_threads)
 {
+    Compute_Job_Deps();
+    Simplify_Jobs();
+    
     JOB_SCHEDULER<JOB,CACHED_ELIMINATION_MATRIX<T> > scheduler(this);
-    ARRAY<int> provides_mat(block_list.m,use_init,-1);
-    ARRAY<int> provides_vec(vector_list.m,use_init,-1);
-    for(auto& j:jobs){
-        j.job_id=scheduler.Add_Job(&j,j.priority);
-        j.priority=0;
-        if(j.o>=0){
-            if(j.is_vec_mask&8) provides_vec(j.o)=j.job_id;
-            else provides_mat(j.o)=j.job_id;}}
-    for(auto j:jobs){
-        int x[3]={j.a&~use_trans,j.b&~use_trans,j.c&~use_trans};
-        for(int i=0;i<3;i++)
-            if(x[i]>=0){
-                int k=(j.is_vec_mask&(1<<i))?provides_vec(x[i]):provides_mat(x[i]);
-                PHYSBAM_ASSERT(k<jobs.m);
-                if(k>=0)
-                    scheduler.Register_Dependency(k,j.job_id);}}
+    for(int i=0;i<jobs.m;i++){
+        auto& j=jobs(i);
+        PHYSBAM_ASSERT(i==scheduler.Add_Job(&j,0));
+        for(int l=0;l<3;l++)
+            if(j.dep_jobs[l]>=0)
+                scheduler.Register_Dependency(j.dep_jobs[l],i);}
+    
+    // for(int i=0;i<jobs.m;i++)
+    // {
+    //     if(job_next(i)==-1){PHYSBAM_ASSERT(arg_type[jobs(i).op][3]==2);}
+    //     if(job_next(i)>=0)
+    //     {
+    //         int k=job_next(i);
+    //         const char* ni=op_names[jobs(i).op];
+    //         const char* nk=op_names[jobs(k).op];
+    //         printf("next %i (%s %i %i %i %i) -> %i (%s %i %i %i %i)\n",
+    //             i,ni,jobs(i).a[0],jobs(i).a[1],jobs(i).a[2],jobs(i).o,
+    //             k,nk,jobs(k).a[0],jobs(k).a[1],jobs(k).a[2],jobs(k).o);
+
+
+
+    //     }
+    // }
     
     scheduler.Compute_Priority_By_Paths();
     scheduler.Execute_Jobs(num_threads);
@@ -513,53 +563,150 @@ Execute(CACHED_ELIMINATION_MATRIX<T>* cem)
     auto& vl=cem->vector_list;
     switch(op)
     {
-        case op_inv:
-            bl(o).M=bl(a).M;
+        case op_mat_inv:
+            bl(o).M=bl(a[0]).M;
             Inverse(bl(o).M);
             break;
-        case op_mul:
-            Times_MM(bl(o).M,bl(a&~use_trans).M,a&use_trans,bl(b&~use_trans).M,b&use_trans);
-            break;
-        case op_sub:
+        case op_mat_mul:
             {
-                auto& A=bl(a&~use_trans).M;
-                auto& B=bl(b&~use_trans).M;
+                auto& A=bl(a[1]&raw_mask).M;
+                auto& B=bl(a[2]&raw_mask).M;
                 auto& C=bl(o).M;
-                if(a==zero_block) C=-B;
-                else if(cem->Symmetric(a) || cem->Symmetric(b) || !(b&use_trans)) C=A-B;
-                else C=A-B.Transposed();
+                if(a[0]>=0) C=bl(a[0]).M;
+                else C.Resize(a[1]&use_trans?A.n:A.m,a[2]&use_trans?B.m:B.n);
+                Times_MM(C,s[0],A,a[1]&use_trans,B,a[2]&use_trans,s[1]);
             }
             break;
-        case op_Av:
+        case op_mat_add:
             {
-                auto& M=bl(a&~use_trans).M;
-                vl(o).Resize(a&use_trans?M.n:M.m);
-                Times_MV(vl(o),1,M,a&use_trans,vl(b),0);
+                auto& A=bl(a[0]&raw_mask).M;
+                auto& B=bl(a[1]&raw_mask).M;
+                auto& C=bl(o).M;
+                if(a[1]&use_trans)
+                {
+                    if(a[1]&use_neg) C=A-B.Transposed();
+                    else C=A+B.Transposed();
+                }
+                else
+                {
+                    if(a[1]&use_neg) C=A-B;
+                    else C=A+B;
+                }
             }
             break;
-        case op_vec_neg:
-            vl(o)=-vl(a);
-            break;
-        case op_vec_sub:
-            vl(o)=vl(a)-vl(b);
-            break;
-        case op_u_sub_Av:
+        case op_vec_mul:
             {
-                auto& M=bl(b&~use_trans).M;
-                if(a<0) vl(o).Resize(b&use_trans?M.n:M.m);
-                else vl(o)=vl(a);
-                Times_MV(vl(o),-1,M,b&use_trans,vl(c),1);
+                auto& M=bl(a[1]&raw_mask).M;
+                if(a[0]>=0) vl(o)=vl(a[0]);
+                else vl(o).Resize(a[1]&use_trans?M.n:M.m);
+                Times_MV(vl(o),s[1],M,a[1]&use_trans,vl(a[2]),s[0]);
             }
+            break;
+        case op_vec_add:
+            if(a[1]&use_neg) vl(o)=vl(a[0])-vl(a[1]);
+            else vl(o)=vl(a[0])+vl(a[1]);
             break;
         case free_mat:
-            bl(a).M.x.Clean_Memory();
+            bl(a[0]).M.x.Clean_Memory();
             break;
         case free_vec:
-            vl(a).Clean_Memory();
+            vl(a[0]).Clean_Memory();
             break;
         default: PHYSBAM_FATAL_ERROR();
     }
 }
+//#####################################################################
+// Function Compute_Job_Deps
+//#####################################################################
+template<class T> void CACHED_ELIMINATION_MATRIX<T>::
+Compute_Job_Deps()
+{
+    ARRAY<int> provides_mat(block_list.m,use_init,-1);
+    ARRAY<int> provides_vec(vector_list.m,use_init,-1);
+    for(int i=0;i<jobs.m;i++){
+        auto& j=jobs(i);
+        if(j.o>=0){
+            if(arg_type[j.op][3]==2) provides_vec(j.o)=i;
+            else if(arg_type[j.op][3]==1) provides_mat(j.o)=i;}}
+    for(int i=0;i<jobs.m;i++){
+        auto& j=jobs(i);
+        for(int l=0;l<3;l++){
+            j.dep_jobs[l]=-1;
+            if(arg_type[j.op][l]==0) continue;
+            if(j.a[l]<0) continue;
+            int k=-1;
+            int a=j.a[l]&raw_mask;
+            if(arg_type[j.op][l]==1) k=provides_mat(a);
+            else k=provides_vec(a);
+            if(k<0) continue;
+            PHYSBAM_ASSERT(k<jobs.m);
+            jobs(k).users.Append(i);
+            j.dep_jobs[l]=k;}}
+}
+//#####################################################################
+// Function Eliminate_Trans
+//#####################################################################
+template<class T> void CACHED_ELIMINATION_MATRIX<T>::
+Eliminate_Trans()
+{
 
+// // trans 0-3 neg 4-7
+    // ARRAY<bool> can_trans(jobs.m);
+    // for(int i=0;i<jobs.m;i++)
+    // {
+    //     auto& j=jobs(i);
+    //     bool& r=can_trans(i);
+    //     switch(jobs(i).op)
+    //     {
+    //         case op_mat_inv:
+    //         case op_mat_mul: r=true; break;
+    //         case op_mat_add:
+    //             r=true;
+    //             if(j.dep_jobs[0]>=0 && j.dep_jobs[1]>=0)
+    //                 if(can_trans(j.dep_jobs[0]).r)
+    //                     r=can_trans(j.dep_jobs[1]).r;
+    //             break;
+    //     }
+    // }
+    // for(int i=jobs.m-1;i>=0;i--)
+    // {
+    //     auto& j=jobs(i);
+    //     auto& r=can_trans(i);
+    //     if(jobs(i).op==op_mat_add){}
+    // }
+    
+    
+}
+//#####################################################################
+// Function Compute_Job_Deps
+//#####################################################################
+template<class T> void CACHED_ELIMINATION_MATRIX<T>::
+Simplify_Jobs()
+{
+    for(auto& j:jobs)
+    {
+        switch(j.op)
+        {
+            case op_mat_mul:
+            case op_vec_mul:
+                if(j.a[0]&use_neg)
+                {
+                    j.a[0]&=~use_neg;
+                    j.s[0]=-j.s[0];
+                }
+                if(j.a[1]&use_neg)
+                {
+                    j.a[1]&=~use_neg;
+                    j.s[1]=-j.s[1];
+                }
+                if(j.a[2]&use_neg)
+                {
+                    j.a[2]&=~use_neg;
+                    j.s[1]=-j.s[1];
+                }
+                break;
+        }
+    }
+}
 template struct CACHED_ELIMINATION_MATRIX<double>;
 }

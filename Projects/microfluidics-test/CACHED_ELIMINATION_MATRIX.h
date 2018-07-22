@@ -14,8 +14,6 @@ template<class T> class MATRIX_MXN;
 template<class T>
 struct CACHED_ELIMINATION_MATRIX
 {
-    enum {zero_block=0,id_block=1,invalid_block=-1,use_trans=1<<30,is_vec=1<<29};
-
     struct MATRIX_INFO
     {
         MATRIX_MXN<T> M;
@@ -27,8 +25,6 @@ struct CACHED_ELIMINATION_MATRIX
     ARRAY<ARRAY<T> > vector_list;
     ARRAY<int> orig_sizes;
     HASHTABLE<VECTOR<int,2>,int> blocks_to_canonical_block_id;
-    
-    enum {op_inv,op_mul,op_sub,op_Av,op_vec_neg,op_vec_sub,op_u_sub_Av,free_mat,free_vec};
 
     HASHTABLE<VECTOR<int,3>,int> cached_ops;
     HASHTABLE<ARRAY<int>,int> prod_lookup;
@@ -47,15 +43,15 @@ struct CACHED_ELIMINATION_MATRIX
     ARRAY<bool> valid_row;
     ARRAY<int> elimination_order;
     bool quiet;
-    
+
+    // Note: Jobs are constructed in SSA form
     struct JOB
     {
         int op;
-        int a,b,c,o;
-        int is_vec_mask;
-        int priority;
-        int job_id;
-        ARRAY<int> users;
+        int a[3],o,s[2];
+
+        int dep_jobs[3]; // jobs creating a
+        ARRAY<int> users; // jobs using o
 
         void Execute(CACHED_ELIMINATION_MATRIX<T>* cem);
     };
@@ -69,7 +65,7 @@ struct CACHED_ELIMINATION_MATRIX
     int Get_Block_Lazy(int r,int c) const;
     int Compute_Inv(int m);
     int Compute_Mul(int a,int b);
-    int Compute_Sub(int a,int b);
+    int Compute_Add(int a,int b);
     int Compute_Elim(int a,int b,int c);
     void Print_Full() const;
     void Print_Current() const;
@@ -80,12 +76,16 @@ struct CACHED_ELIMINATION_MATRIX
     int Matrix_Times(int m,int in);
     int Sub_Times(int out,int m,int in);
     int Transposed(int a) const;
+    int Negate(int a) const;
     bool Symmetric(int a) const;
     ARRAY<int> Transposed(const ARRAY<int>& a) const;
     ARRAY<int> Prod_List(int a) const;
     void Reduce_Rows_By_Frequency(int begin,int end,int fill_limit);
     void Full_Reordered_Elimination();
     void Execute_Jobs(int num_threads);
+    void Compute_Job_Deps();
+    void Eliminate_Trans();
+    void Simplify_Jobs();
 };
 }
 #endif
