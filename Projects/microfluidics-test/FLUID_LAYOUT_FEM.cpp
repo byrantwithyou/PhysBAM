@@ -30,7 +30,8 @@ template<class TV> FLUID_LAYOUT_FEM<TV>::
 // Function Generate_Pipe
 //#####################################################################
 template<class TV> PAIR<ARRAY<int>,ARRAY<int> > FLUID_LAYOUT_FEM<TV>::
-Generate_Pipe(const TV& v0,const TV& v1,int half_width,T unit_length)
+Generate_Pipe(const TV& v0,const TV& v1,int half_width,T unit_length,
+    const HASHTABLE<PAIR<int,int>,int>& shared_point)
 {
     typedef VECTOR<int,3> E;
     GEOMETRY_PARTICLES<TV>& particles=area->particles;
@@ -47,7 +48,13 @@ Generate_Pipe(const TV& v0,const TV& v1,int half_width,T unit_length)
         avg_step=(rem+unit_length)*0.5;
         height++;}
     particles.Add_Elements(width*height);
-    auto pid=[base,width,half_width](int i,int j){return base+i*width+j+half_width;};
+    auto pid=[base,width,half_width,height,shared_point](int i,int j)
+    {
+        int ri=i==height-1?-1:i;
+        if(const int* r=shared_point.Get_Pointer(PAIR<int,int>(ri,j)))
+            return *r;
+        return base+i*width+j+half_width;
+    };
     TV next;
     int block=-1;
     bool regular=true;
