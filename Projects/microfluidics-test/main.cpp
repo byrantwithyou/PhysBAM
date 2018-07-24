@@ -28,11 +28,37 @@
 #include "CACHED_ELIMINATION_MATRIX.h"
 #include "FLAT_SYSTEM.h"
 #include "FLUID_LAYOUT.h"
+#include "FLUID_LAYOUT_FEM.h"
 
 using namespace PhysBAM;
 
 typedef float RW;
 typedef double T;
+
+void Run_FEM(PARSE_ARGS& parse_args)
+{
+    typedef VECTOR<T,2> TV;
+    typedef VECTOR<int,TV::m> TV_INT;
+    T mu=1;
+
+    std::string pipe_file;
+    parse_args.Add("-mu",&mu,"mu","viscosity");
+    parse_args.Extra(&pipe_file,"file","file describing pipes");
+    parse_args.Parse();
+    GRID<TV> grid;
+    VIEWER_OUTPUT<TV> vo(STREAM_TYPE(0.f),grid,"output");
+
+    PARSE_DATA_FEM<TV> pd;
+    pd.Parse_Input(pipe_file);
+
+    FLUID_LAYOUT_FEM<TV> fl;
+    fl.Compute(pd);
+    Flush_Frame<TV>("init");
+    fl.Dump_Mesh();
+    Flush_Frame<TV>("meshing");
+    fl.Dump_Layout();
+    Flush_Frame<TV>("blocks");
+}
 
 template<int d>
 void Run(PARSE_ARGS& parse_args)
@@ -113,12 +139,16 @@ void Run(PARSE_ARGS& parse_args)
 int main(int argc, char* argv[])
 {
     bool use_3d=false;
+    bool use_fem=false;
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Add("-3d",&use_3d,"use 3D");
+    parse_args.Add("-fem",&use_fem,"use FEM");
     parse_args.Parse(true);
 
     if(use_3d) Run<3>(parse_args);
-    else Run<2>(parse_args);
+    else{
+        if(use_fem) Run_FEM(parse_args);
+        else Run<2>(parse_args);}
 
     return 0;
 }

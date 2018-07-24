@@ -1,0 +1,8 @@
+w 2
+h 0.5
+v A 0 0
+v B 3 4
+v C 6 0
+v D 9 6
+p A B
+p C D

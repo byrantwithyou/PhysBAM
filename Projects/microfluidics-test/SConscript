@@ -6,4 +6,5 @@ env.Append(LIBS=["colamd"]);
 Automatic_Program(env,"micro",["main.cpp","PARSE_DATA.cpp","FLUID_LAYOUT.cpp",
                                "CACHED_ELIMINATION_MATRIX.cpp",
                                "FLAT_SYSTEM.cpp","FREQUENCY_TRACKER.cpp",
-                               "JOB_SCHEDULER.cpp"])
+                               "JOB_SCHEDULER.cpp",
+                               "FLUID_LAYOUT_FEM.cpp","PARSE_DATA_FEM.cpp"])
