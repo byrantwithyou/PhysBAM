@@ -4,11 +4,12 @@
 //#####################################################################
 #ifndef __PARSE_DATA_FEM__
 #define __PARSE_DATA_FEM__
+#include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Vectors/VECTOR.h>
-#include <functional>
 
 namespace PhysBAM{
 enum BC_TYPE {nobc,dirichlet_v,traction};
+enum JOINT_TYPE {default_joint,end_vertex,arc};
 
 template<class TV>
 struct PARSE_DATA_FEM
@@ -20,10 +21,12 @@ struct PARSE_DATA_FEM
     {
         TV pt;
         BC_TYPE bc_type;
+        JOINT_TYPE joint_type;
     };
 
     ARRAY<VERTEX_DATA> pts;
     ARRAY<VECTOR<int,2> > pipes;
+    HASHTABLE<int,ARRAY<int> > joints; // vertex index -> array of pipe indices
     int half_width;
     T unit_length;
 

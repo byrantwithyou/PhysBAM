@@ -96,11 +96,12 @@ template<class TV> void FLUID_LAYOUT_FEM<TV>::
 Compute(const PARSE_DATA_FEM<TV>& pd)
 {
     for(auto& i:pd.pipes){
-        auto f=Generate_Pipe(pd.pts(i.x).pt,pd.pts(i.y).pt,pd.half_width,pd.unit_length);
-        if(pd.pts(i.x).bc_type!=nobc)
-            Mark_BC(f.x,pd.pts(i.x).bc_type);
-        if(pd.pts(i.y).bc_type!=nobc)
-            Mark_BC(f.y,pd.pts(i.y).bc_type);}
+        if(pd.pts(i.x).joint_type==end_vertex && pd.pts(i.y).joint_type==end_vertex){
+            auto f=Generate_Pipe(pd.pts(i.x).pt,pd.pts(i.y).pt,pd.half_width,pd.unit_length);
+            if(pd.pts(i.x).bc_type!=nobc)
+                Mark_BC(f.x,pd.pts(i.x).bc_type);
+            if(pd.pts(i.y).bc_type!=nobc)
+                Mark_BC(f.y,pd.pts(i.y).bc_type);}}
     Dump_Input(pd);
 }
 //#####################################################################

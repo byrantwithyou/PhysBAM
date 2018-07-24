@@ -38,14 +38,21 @@ Parse_Input(const std::string& pipe_file)
             case 'v':
                 ss>>name1>>pt;
                 pts_index[name1]=pts.m;
-                pts.Append({pt,nobc});
+                joints.Set(pts.m,ARRAY<int>());
+                pts.Append({pt,nobc,default_joint});
                 break;
             case 'p':
                 {
                     ss>>name1>>name2;
                     int i0=pts_index[name1];
                     int i1=pts_index[name2];
-                    pipes.Append({i0,i1});
+                    int p=pipes.Append({i0,i1});
+                    if(ARRAY<int>* r=joints.Get_Pointer(i0))
+                        r->Append(p);
+                    else PHYSBAM_ASSERT(false);
+                    if(ARRAY<int>* r=joints.Get_Pointer(i1))
+                        r->Append(p);
+                    else PHYSBAM_ASSERT(false);
                 }
                 break;
             case 's':
@@ -63,6 +70,14 @@ Parse_Input(const std::string& pipe_file)
             default:
                 LOG::printf("PARSE FAIL: %c %s\n",c,ss.str());
         }
+    }
+
+    for(auto& i:joints)
+    {
+        if(i.data.m==1)
+            pts(i.key).joint_type=end_vertex;
+        else if(i.data.m==2 && pts(i.key).joint_type==default_joint)
+            pts(i.key).joint_type=arc;
     }
 }
 template struct PARSE_DATA_FEM<VECTOR<double,2> >;
