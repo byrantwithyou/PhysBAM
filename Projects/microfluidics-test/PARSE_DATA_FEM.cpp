@@ -2,11 +2,7 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Core/Arrays/ARRAY.h>
 #include <Core/Log/LOG.h>
-#include <Core/Math_Tools/RANGE.h>
-#include <Tools/Symbolics/PROGRAM.h>
-#include <Tools/Symbolics/PROGRAM_CONTEXT.h>
 #include <fstream>
 #include <map>
 #include <string>
@@ -42,7 +38,7 @@ Parse_Input(const std::string& pipe_file)
             case 'v':
                 ss>>name1>>pt;
                 pts_index[name1]=pts.m;
-                pts.Append({pt});
+                pts.Append({pt,nobc});
                 break;
             case 'p':
                 {
@@ -50,6 +46,18 @@ Parse_Input(const std::string& pipe_file)
                     int i0=pts_index[name1];
                     int i1=pts_index[name2];
                     pipes.Append({i0,i1});
+                }
+                break;
+            case 's':
+                {
+                    ss>>name1;
+                    pts(pts_index[name1]).bc_type=dirichlet_v;
+                }
+                break;
+            case 't':
+                {
+                    ss>>name1;
+                    pts(pts_index[name1]).bc_type=traction;
                 }
                 break;
             default:

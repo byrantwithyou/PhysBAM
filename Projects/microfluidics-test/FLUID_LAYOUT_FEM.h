@@ -4,7 +4,7 @@
 //#####################################################################
 #ifndef __FLUID_LAYOUT_FEM__
 #define __FLUID_LAYOUT_FEM__
-#include <Core/Math_Tools/RANGE.h>
+#include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Vectors/VECTOR.h>
 #include "PARSE_DATA_FEM.h"
 
@@ -24,8 +24,14 @@ struct FLUID_LAYOUT_FEM
         bool regular;
     };
 
+    struct BC_DATA
+    {
+        BC_TYPE bc_type;
+    };
+
     std::unique_ptr<TRIANGULATED_AREA<T> > area;
     ARRAY<BLOCK_DATA> blocks; // element index -> block
+    HASHTABLE<PAIR<int,int>,BC_DATA> bc; // edge -> bc
 
     FLUID_LAYOUT_FEM();
     ~FLUID_LAYOUT_FEM();
@@ -33,7 +39,8 @@ struct FLUID_LAYOUT_FEM
     void Dump_Mesh() const;
     void Dump_Layout() const;
     void Dump_Input(const PARSE_DATA_FEM<TV>& pd) const;
-    void Generate_Pipe(const TV& v0,const TV& v1,int half_width,T unit_length);
+    PAIR<ARRAY<int>,ARRAY<int> > Generate_Pipe(const TV& v0,const TV& v1,int half_width,T unit_length);
+    void Mark_BC(const ARRAY<int>& pindices,BC_TYPE bc_type);
 };
 
 }

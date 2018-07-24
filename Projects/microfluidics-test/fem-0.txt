@@ -6,3 +6,8 @@ v C 6 0
 v D 9 6
 p A B
 p C D
+s A
+s D
+t B
+t C
+

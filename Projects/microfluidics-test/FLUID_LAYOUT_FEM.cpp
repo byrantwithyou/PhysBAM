@@ -3,16 +3,8 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Arrays/ARRAY.h>
-#include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Log/LOG.h>
-#include <Core/Math_Tools/RANGE.h>
-#include <Core/Math_Tools/RANGE_ITERATOR.h>
 #include <Core/Vectors/VECTOR.h>
-#include <Grid_Tools/Arrays/FACE_ARRAYS.h>
-#include <Grid_Tools/Grids/CELL_ITERATOR.h>
-#include <Grid_Tools/Grids/FACE_ITERATOR.h>
-#include <Grid_Tools/Grids/FACE_RANGE_ITERATOR.h>
-#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
@@ -37,7 +29,7 @@ template<class TV> FLUID_LAYOUT_FEM<TV>::
 //#####################################################################
 // Function Generate_Pipe
 //#####################################################################
-template<class TV> void FLUID_LAYOUT_FEM<TV>::
+template<class TV> PAIR<ARRAY<int>,ARRAY<int> > FLUID_LAYOUT_FEM<TV>::
 Generate_Pipe(const TV& v0,const TV& v1,int half_width,T unit_length)
 {
     typedef VECTOR<int,3> E;
@@ -68,14 +60,27 @@ Generate_Pipe(const TV& v0,const TV& v1,int half_width,T unit_length)
                 blocks.Append({block,regular});}
             if(j!=-half_width){
                 area->mesh.elements.Append(E(pid(i,j),pid(i-1,j),pid(i,j-1)));
-                blocks.Append({block,regular});}
-        }
+                blocks.Append({block,regular});}}
         if(avg_step && i==height-3)
             regular=false;
         if(regular) next=(i+1)*unit_length*d;
         else next=next+avg_step*d;
-        block++;
-    }
+        block++;}
+    PAIR<ARRAY<int>,ARRAY<int> > f;
+    for(int j=-half_width;j<=half_width;j++){
+        f.x.Append(pid(0,j));
+        f.y.Append(pid(height-1,j));}
+    return f;
+}
+//#####################################################################
+// Function Mark_BC
+//#####################################################################
+template<class TV> void FLUID_LAYOUT_FEM<TV>::
+Mark_BC(const ARRAY<int>& pindices,BC_TYPE bc_type)
+{
+    for(int i=1;i<pindices.m;i++){
+        bc.Set(PAIR<int,int>(pindices(i),pindices(i-1)),{bc_type});
+        bc.Set(PAIR<int,int>(pindices(i-1),pindices(i)),{bc_type});}
 }
 //#####################################################################
 // Function Compute
@@ -83,10 +88,12 @@ Generate_Pipe(const TV& v0,const TV& v1,int half_width,T unit_length)
 template<class TV> void FLUID_LAYOUT_FEM<TV>::
 Compute(const PARSE_DATA_FEM<TV>& pd)
 {
-    for(auto& i:pd.pipes)
-    {
-        Generate_Pipe(pd.pts(i.x).pt,pd.pts(i.y).pt,pd.half_width,pd.unit_length);
-    }
+    for(auto& i:pd.pipes){
+        auto f=Generate_Pipe(pd.pts(i.x).pt,pd.pts(i.y).pt,pd.half_width,pd.unit_length);
+        if(pd.pts(i.x).bc_type!=nobc)
+            Mark_BC(f.x,pd.pts(i.x).bc_type);
+        if(pd.pts(i.y).bc_type!=nobc)
+            Mark_BC(f.y,pd.pts(i.y).bc_type);}
     Dump_Input(pd);
 }
 //#####################################################################
@@ -98,8 +105,19 @@ Dump_Mesh() const
     const GEOMETRY_PARTICLES<TV>& particles=area->particles;
     //for(int i=0;i<particles.number;i++)
     //    Add_Debug_Particle(particles.X(i),VECTOR<T,3>(1,1,1));
-    for(int i=0;i<area->mesh.elements.m;i++)
-        Add_Debug_Object(VECTOR<TV,3>(particles.X.Subset(area->mesh.elements(i))),VECTOR<T,3>(1,1,1));
+    VECTOR<T,3> white(1,1,1),dirichlet_bc(1,0,1),traction_bc(0,1,1);
+    for(int i=0;i<area->mesh.elements.m;i++){
+        //Add_Debug_Object(VECTOR<TV,3>(particles.X.Subset(area->mesh.elements(i))),VECTOR<T,3>(1,1,1));
+        for(int j=0;j<3;j++){
+            VECTOR<T,3> color=white;
+            int v0=area->mesh.elements(i)(j),v1=area->mesh.elements(i)((j+1)%3);
+            if(const BC_DATA* bc_data=bc.Get_Pointer(PAIR<int,int>(v0,v1))){
+                if(bc_data->bc_type==dirichlet_v)
+                    color=dirichlet_bc;
+                else if(bc_data->bc_type==traction)
+                    color=traction_bc;}
+            Add_Debug_Object<TV,2>(VECTOR<TV,2>(particles.X(v0),particles.X(v1)),color);}
+    }
 }
 //#####################################################################
 // Function Dump_Layout
@@ -107,11 +125,12 @@ Dump_Mesh() const
 template<class TV> void FLUID_LAYOUT_FEM<TV>::
 Dump_Layout() const
 {
+    const GEOMETRY_PARTICLES<TV>& particles=area->particles;
     Dump_Mesh();
     VECTOR<T,3> reg(0,1,0),irreg(1,0,0);
     for(int i=0;i<area->mesh.elements.m;i++){
         std::string s=LOG::sprintf("%i",blocks(i).block_id);
-        Add_Debug_Text(area->particles.X.Subset(area->mesh.elements(i)).Average(),s,
+        Add_Debug_Text(particles.X.Subset(area->mesh.elements(i)).Average(),s,
             blocks(i).regular?reg:irreg);}
 }
 //#####################################################################

@@ -4,11 +4,11 @@
 //#####################################################################
 #ifndef __PARSE_DATA_FEM__
 #define __PARSE_DATA_FEM__
-#include <Core/Math_Tools/RANGE.h>
 #include <Core/Vectors/VECTOR.h>
 #include <functional>
 
 namespace PhysBAM{
+enum BC_TYPE {nobc,dirichlet_v,traction};
 
 template<class TV>
 struct PARSE_DATA_FEM
@@ -19,6 +19,7 @@ struct PARSE_DATA_FEM
     struct VERTEX_DATA
     {
         TV pt;
+        BC_TYPE bc_type;
     };
 
     ARRAY<VERTEX_DATA> pts;
