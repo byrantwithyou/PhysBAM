@@ -50,13 +50,24 @@ struct CACHED_ELIMINATION_MATRIX
         int op;
         int a[3],o,s[2];
 
-        int dep_jobs[3]; // jobs creating a
-        ARRAY<int> users; // jobs using o
-
         void Execute(CACHED_ELIMINATION_MATRIX<T>* cem);
     };
     ARRAY<JOB> jobs;
+    ARRAY<int> provider[2];
+    ARRAY<ARRAY<int> > user[2];
+    int num_orig_blocks;
+    int num_orig_vectors;
+    ARRAY<VECTOR<int,2> > dep_list;
 
+    template<class F>
+    void Foreach_Single_User_Pair(F f)
+    {
+        for(int i=0;i<2;i++)
+            for(int j=0;j<user[i].m;j++)
+                if(user[i](j).m==1 && provider[i](j)>=0)
+                    f(provider[i](j),user[i](j)(0));
+    }
+    
     void Fill_Blocks(ARRAY<VECTOR<int,2> >& dof_map,const ARRAY<VECTOR<int,3> >& coded_entries,
         const ARRAY<T>& code_values,const ARRAY<T>& rhs_vector);
     void Fill_Orig_Rows();
@@ -87,7 +98,12 @@ struct CACHED_ELIMINATION_MATRIX
     void Eliminate_Trans();
     void Simplify_Jobs();
     void Combine_Ops();
+    void Relabel();
     void Combine_With_Next_Job(int j);
+    int Provides_Argument(const JOB& j,int a) const;
+    const ARRAY<int>& Uses_Output(const JOB& j) const;
+    void Remove_Job_Deps(int j);
+    void Add_Job_Deps(int j);
 };
 }
 #endif

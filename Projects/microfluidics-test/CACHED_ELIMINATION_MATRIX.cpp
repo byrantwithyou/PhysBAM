@@ -355,6 +355,8 @@ Fill_Blocks(ARRAY<VECTOR<int,2> >& dof_map,const ARRAY<VECTOR<int,3> >& coded_en
     for(int i=0;i<orig_rhs.m;i++)
         if(orig_rhs(i).m)
             rhs(i)=vector_list.Append(orig_rhs(i));
+    num_orig_blocks=block_list.m;
+    num_orig_vectors=vector_list.m;
 }
 //#####################################################################
 // Function Back_Solve
@@ -528,17 +530,15 @@ Execute_Jobs(int num_threads)
     Eliminate_Trans();
     Combine_Ops();
     Simplify_Jobs();
+    Relabel();
 
     JOB_SCHEDULER<JOB,CACHED_ELIMINATION_MATRIX<T> > scheduler(this);
     for(int i=0;i<jobs.m;i++){
-        auto& j=jobs(i);
-        PHYSBAM_ASSERT(i==scheduler.Add_Job(&j,0));}
-    for(int i=0;i<jobs.m;i++){
-        auto& j=jobs(i);
-        for(int l=0;l<3;l++)
-            if(j.dep_jobs[l]>=0)
-                scheduler.Register_Dependency(j.dep_jobs[l],i);}
-    
+        int id=scheduler.Add_Job(&jobs(i),0);
+        PHYSBAM_ASSERT(i==id);}
+    for(auto a:dep_list)
+        scheduler.Register_Dependency(a.x,a.y);
+
     scheduler.Compute_Priority_By_Paths();
     scheduler.Execute_Jobs(num_threads);
 }
@@ -562,8 +562,8 @@ Execute(CACHED_ELIMINATION_MATRIX<T>* cem)
                 auto& A=bl(a[1]&raw_mask).M;
                 auto& B=bl(a[2]&raw_mask).M;
                 auto& C=bl(o).M;
-                if(a[0]>=0) C=bl(a[0]).M;
-                else C.Resize(a[1]&use_trans?A.n:A.m,a[2]&use_trans?B.m:B.n);
+                if(a[0]<0) C.Resize(a[1]&use_trans?A.n:A.m,a[2]&use_trans?B.m:B.n);
+                else if(a[0]!=o) C=bl(a[0]).M;
                 Times_MM(C,s[0],A,a[1]&use_trans,B,a[2]&use_trans,s[1]);
             }
             break;
@@ -587,8 +587,8 @@ Execute(CACHED_ELIMINATION_MATRIX<T>* cem)
         case op_vec_mul:
             {
                 auto& M=bl(a[1]&raw_mask).M;
-                if(a[0]>=0) vl(o)=vl(a[0]);
-                else vl(o).Resize(a[1]&use_trans?M.n:M.m);
+                if(a[0]<0) vl(o).Resize(a[1]&use_trans?M.n:M.m);
+                else if(a[0]!=o) vl(o)=vl(a[0]);
                 Times_MV(vl(o),s[1],M,a[1]&use_trans,vl(a[2]),s[0]);
             }
             break;
@@ -611,27 +611,19 @@ Execute(CACHED_ELIMINATION_MATRIX<T>* cem)
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::
 Compute_Job_Deps()
 {
-    ARRAY<int> provides_mat(block_list.m,use_init,-1);
-    ARRAY<int> provides_vec(vector_list.m,use_init,-1);
-    for(int i=0;i<jobs.m;i++){
+    provider[0].Resize(block_list.m,init_all,-1);
+    provider[1].Resize(vector_list.m,init_all,-1);
+    user[0].Resize(block_list.m);
+    user[1].Resize(vector_list.m);
+    for(int i=0;i<jobs.m;i++)
+    {
         auto& j=jobs(i);
-        if(j.o>=0){
-            if(arg_type[j.op][3]==2) provides_vec(j.o)=i;
-            else if(arg_type[j.op][3]==1) provides_mat(j.o)=i;}}
-    for(int i=0;i<jobs.m;i++){
-        auto& j=jobs(i);
-        for(int l=0;l<3;l++){
-            j.dep_jobs[l]=-1;
-            if(arg_type[j.op][l]==0) continue;
-            if(j.a[l]<0) continue;
-            int k=-1;
-            int a=j.a[l]&raw_mask;
-            if(arg_type[j.op][l]==1) k=provides_mat(a);
-            else k=provides_vec(a);
-            if(k<0) continue;
-            PHYSBAM_ASSERT(k<jobs.m);
-            jobs(k).users.Append(i);
-            j.dep_jobs[l]=k;}}
+        if(arg_type[j.op][3]>0)
+            provider[arg_type[j.op][3]-1](j.o)=i;
+        for(int l=0;l<3;l++)
+            if(arg_type[j.op][l]>0 && j.a[l]>=0)
+                user[arg_type[j.op][l]-1](j.a[l]&raw_mask).Append(i);
+    }
 }
 //#####################################################################
 // Function Eliminate_Trans
@@ -639,29 +631,18 @@ Compute_Job_Deps()
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::
 Eliminate_Trans()
 {
-    for(int i=0;i<jobs.m;i++)
-    {
-        auto& j=jobs(i);
-        if(j.op==op_mat_add && (j.a[1]&use_trans))
+    Foreach_Single_User_Pair([this](int p,int u)
         {
-            if(j.dep_jobs[1]>=0)
+            auto& j=jobs(p);
+            auto& k=jobs(u);
+            if(j.op==op_mat_mul && k.op==op_mat_add && (k.a[1]&use_trans) && j.o==(k.a[1]&raw_mask))
             {
-                auto& k=jobs(j.dep_jobs[1]);
-                if(k.users.m==1)
-                {
-                    if(k.op==op_mat_mul)
-                    {
-                        std::swap(k.a[1],k.a[2]);
-                        std::swap(k.dep_jobs[1],k.dep_jobs[2]);
-                        k.a[1]=Transposed(k.a[1]);
-                        k.a[2]=Transposed(k.a[2]);
-                        j.a[1]=Transposed(j.a[1]);
-                        continue;
-                    }
-                }
+                std::swap(j.a[1],j.a[2]);
+                j.a[1]=Transposed(j.a[1]);
+                j.a[2]=Transposed(j.a[2]);
+                k.a[1]=Transposed(k.a[1]);
             }
-        }
-    }
+        });
 }
 //#####################################################################
 // Function Compute_Job_Deps
@@ -700,59 +681,138 @@ Simplify_Jobs()
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::
 Combine_Ops()
 {
+    Foreach_Single_User_Pair([this](int p,int u)
+        {
+            auto j=jobs(p);
+            auto k=jobs(u);
+            if(j.op==op_mat_mul && k.op==op_mat_add && j.a[0]<0 && !(k.a[1]&use_trans))
+            {
+                if((k.a[1]&raw_mask)==j.o) std::swap(k.a[0],k.a[1]);
+                PHYSBAM_ASSERT((k.a[0]&raw_mask)==j.o);
+                j.a[0]=k.a[1];
+                j.s[0]=1;
+                j.o=k.o;
+                if(k.a[0]&use_neg) j.s[1]=-j.s[1];
+                Remove_Job_Deps(p);
+                Remove_Job_Deps(u);
+                jobs(u)=j;
+                jobs(p)={op_nop,{-1,-1,-1},-1};
+                Add_Job_Deps(u);
+            }
+        });
+}
+//#####################################################################
+// Function Provides_Argument
+//#####################################################################
+template<class T> int CACHED_ELIMINATION_MATRIX<T>::
+Provides_Argument(const JOB& j,int a) const
+{
+    if(arg_type[j.op][a]==0) return -1;
+    return provider[arg_type[j.op][a]-1](j.a[a]&raw_mask);
+}
+//#####################################################################
+// Function Uses_Output
+//#####################################################################
+template<class T> const ARRAY<int>& CACHED_ELIMINATION_MATRIX<T>::
+Uses_Output(const JOB& j) const
+{
+    static const ARRAY<int> empty;
+    if(arg_type[j.op][3]==0) return empty;
+    return user[arg_type[j.op][3]-1](j.o);
+}
+//#####################################################################
+// Function Remove_Job_Deps
+//#####################################################################
+template<class T> void CACHED_ELIMINATION_MATRIX<T>::
+Remove_Job_Deps(int j)
+{
+    const auto& k=jobs(j);
+    if(arg_type[k.op][3]>0)
+        provider[arg_type[k.op][3]-1](k.o)=-1;
+    for(int i=0;i<3;i++)
+        if(arg_type[k.op][i]>0 && k.a[i]>=0){
+            auto& a=user[arg_type[k.op][i]-1](k.a[i]&raw_mask);
+            int m=a.Find(j);
+            PHYSBAM_ASSERT(m>=0);
+            a.Remove_Index_Lazy(m);}
+}
+//#####################################################################
+// Function Add_Job_Deps
+//#####################################################################
+template<class T> void CACHED_ELIMINATION_MATRIX<T>::
+Add_Job_Deps(int j)
+{
+    const auto& k=jobs(j);
+    if(arg_type[k.op][3]>0)
+        provider[arg_type[k.op][3]-1](k.o)=j;
+    for(int i=0;i<3;i++)
+        if(arg_type[k.op][i]>0)
+            user[arg_type[k.op][i]-1](k.a[i]&raw_mask).Append(j);
+}
+//#####################################################################
+// Function Relabel
+//#####################################################################
+template<class T> void CACHED_ELIMINATION_MATRIX<T>::
+Relabel()
+{
+    ARRAY<int> new_data[2],new_job(jobs.m,use_init,-1);
+    int next[2]={num_orig_blocks,num_orig_vectors},next_job=0;
+    for(int i=0;i<2;i++)
+    {
+        new_data[i].Resize(provider[i].m,use_init,-1);
+        for(int j=0;j<next[i];j++)
+            new_data[i](j)=j;
+    }
     for(int i=0;i<jobs.m;i++)
     {
         auto& j=jobs(i);
-        if(j.op==op_mat_mul && j.a[0]<0 && j.users.m==1)
+        if(j.op!=op_nop) new_job(i)=next_job++;
+    }
+
+    for(int t=0;t<2;t++)
+        for(int i=next[t];i<provider[t].m;i++)
         {
-            auto& k=jobs(j.users(0));
-            if(k.op==op_mat_add)
+            int p=provider[t](i);
+            if(p<0) continue;
+            auto& j=jobs(p);
+            if(j.op!=op_nop && j.op!=op_mat_inv && j.a[0]>=0)
             {
-                if(k.a[1]&use_trans)
+                if(user[t](j.a[0]&raw_mask).m==1)
                 {
-                    printf("trans discard %i -> %i\n",i,j.users(0));
+                    new_data[t](i)=new_data[t](j.a[0]&raw_mask);
                     continue;
                 }
-                if(k.a[0]==j.o)
-                {
-                    j.s[0]=(k.a[1]&use_neg)?-1:1;
-                    j.a[0]=k.a[1]&raw_mask;
-                    j.dep_jobs[0]=k.dep_jobs[1];
-                }
-                else
-                {
-                    if(k.a[1]&use_neg) j.s[1]=-j.s[1];
-                    j.s[0]=1;
-                    j.a[0]=k.a[0];
-                    j.dep_jobs[0]=k.dep_jobs[0];
-                }
-                Combine_With_Next_Job(i);
             }
+            new_data[t](i)=next[t]++;
         }
-    }
-}
-//#####################################################################
-// Function Combine_With_Next_Job
-//#####################################################################
-template<class T> void CACHED_ELIMINATION_MATRIX<T>::
-Combine_With_Next_Job(int j)
-{
-    auto& k=jobs(j);
-    int l=k.users(0);
-    auto& m=jobs(l);
-    k.o=m.o;
-    k.users=m.users;
-    for(auto& u:m.users)
+
+    for(auto& a:rhs) if(a>=0) a=new_data[1](a);
+    for(int i=0;i<jobs.m;i++)
     {
-        for(auto&r:jobs(u).dep_jobs)
-            if(r==l)
-                r=j;
+        if(new_job(i)<0) continue;
+        JOB j=jobs(i);
+        if(j.o>=0 && arg_type[j.op][3]>0)
+            j.o=new_data[arg_type[j.op][3]-1](j.o);
+        for(int i=0;i<3;i++)
+            if(j.a[i]>=0 && arg_type[j.op][i]>0)
+                j.a[i]=(j.a[i]&~raw_mask)|new_data[arg_type[j.op][i]-1](j.a[i]&raw_mask);
+        jobs(new_job(i))=j;
     }
-    m.op=op_nop;
-    for(auto& i:m.a) i=-1;
-    for(auto& i:m.dep_jobs) i=-1;
-    m.o=-1;
-    m.users.Clean_Memory();
+    jobs.Resize(next_job);
+
+    for(int t=0;t<2;t++)
+    {
+        for(int i=0;i<provider[t].m;i++)
+        {
+            int p=provider[t](i);
+            if(p<0) continue;
+            p=new_job(p);
+            for(auto u:user[t](i))
+                dep_list.Append({p,new_job(u)});
+        }
+        provider[t].Clean_Memory();
+        user[t].Clean_Memory();
+    }
 }
 template struct CACHED_ELIMINATION_MATRIX<double>;
 }
