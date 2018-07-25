@@ -90,6 +90,18 @@ Mark_BC(const ARRAY<int>& pindices,BC_TYPE bc_type)
         bc.Set(PAIR<int,int>(pindices(i-1),pindices(i)),{bc_type});}
 }
 //#####################################################################
+// Function Pipe_Joint_Connection
+//#####################################################################
+template<class TV> void FLUID_LAYOUT_FEM<TV>::
+Pipe_Joint_Connection(const TV& joint,const TV& p0,const TV& p1,int half_width,T unit_length,TV& q0,TV& q1) const
+{
+    TV e0=(p0-joint).Normalized(),e1=(p1-joint).Normalized();
+    TV m=(e0+e1).Normalized();
+    T s=half_width/abs(e0.Cross(m)(0));
+    q0=joint+s*m.Dot(e0)*e0;
+    q1=joint+s*m.Dot(e1)*e1;
+}
+//#####################################################################
 // Function Compute
 //#####################################################################
 template<class TV> void FLUID_LAYOUT_FEM<TV>::
@@ -102,6 +114,35 @@ Compute(const PARSE_DATA_FEM<TV>& pd)
                 Mark_BC(f.x,pd.pts(i.x).bc_type);
             if(pd.pts(i.y).bc_type!=nobc)
                 Mark_BC(f.y,pd.pts(i.y).bc_type);}}
+
+    for(int i=0;i<pd.pts.m;i++){
+        if(pd.pts(i).joint_type==arc){
+            const ARRAY<int>* pipes=pd.joints.Get_Pointer(i);
+            PHYSBAM_ASSERT(pipes);
+            PHYSBAM_ASSERT(pipes->m==2);
+            int p0=(*pipes)(0),p1=(*pipes)(1);
+            int j0=pd.pipes(p0)(0),j1=pd.pipes(p1)(0);
+            if(j0==i) j0=pd.pipes(p0)(1);
+            if(j1==i) j1=pd.pipes(p1)(1);
+            if(pd.pts(j0).joint_type!=end_vertex || pd.pts(j1).joint_type!=end_vertex) continue;
+            TV joint=pd.pts(i).pt;
+            if((pd.pts(j0).pt-joint).Cross(pd.pts(j1).pt-joint)(0)<0){
+                std::swap(p0,p1);
+                std::swap(j0,j1);}
+            TV q0,q1;
+            Pipe_Joint_Connection(joint,pd.pts(j0).pt,pd.pts(j1).pt,pd.half_width,pd.unit_length,q0,q1);
+            //Add_Debug_Particle(q0,VECTOR<T,3>(1,0,0));
+            //Add_Debug_Particle(q1,VECTOR<T,3>(1,0,0));
+            auto f0=Generate_Pipe(q0,pd.pts(j0).pt,pd.half_width,pd.unit_length);
+            HASHTABLE<PAIR<int,int>,int> shared_point;
+            shared_point.Set({0,-pd.half_width},f0.x(2*pd.half_width));
+            auto f1=Generate_Pipe(q1,pd.pts(j1).pt,pd.half_width,pd.unit_length,shared_point);
+            if(pd.pts(j0).bc_type!=nobc)
+                Mark_BC(f0.y,pd.pts(j0).bc_type);
+            if(pd.pts(j1).bc_type!=nobc)
+                Mark_BC(f1.y,pd.pts(j1).bc_type);
+        }
+    }
     Dump_Input(pd);
 }
 //#####################################################################

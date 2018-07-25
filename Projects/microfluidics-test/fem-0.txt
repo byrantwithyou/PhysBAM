@@ -4,10 +4,17 @@ v A 0 0
 v B 3 4
 v C 6 0
 v D 9 6
+v E 15 0
+v F 15 -10
+v G 0 -10
 p A B
 p C D
+p G F
+p E G
 s A
 s D
+s E
 t B
 t C
+t F
 
