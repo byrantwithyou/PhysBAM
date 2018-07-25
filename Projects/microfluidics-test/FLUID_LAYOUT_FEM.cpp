@@ -42,11 +42,13 @@ Generate_Pipe(const TV& v0,const TV& v1,int half_num_cells,T unit_length,
     TV t(-d.y,d.x);
     int width=2*half_num_cells+1;
     int height=(int)(l/unit_length)+1;
-    T avg_step=0;
+    T min_percent=0.5;
+    bool irregular_last=false;
     T rem=l-(height-1)*unit_length;
     if(rem>1e-2*unit_length){
-        avg_step=(rem+unit_length)*0.5;
-        height++;}
+        irregular_last=true;
+        if(rem>min_percent*unit_length)
+            height++;}
     particles.Add_Elements(width*height);
     auto pid=[base,width,half_num_cells,height,shared_point](int i,int j)
     {
@@ -67,10 +69,10 @@ Generate_Pipe(const TV& v0,const TV& v1,int half_num_cells,T unit_length,
             if(j!=-half_num_cells){
                 area->mesh.elements.Append(E(pid(i,j),pid(i-1,j),pid(i,j-1)));
                 blocks.Append({last_block_id,regular});}}
-        if(avg_step && i==height-3)
-            regular=false;
-        if(regular) next=(i+1)*unit_length*d;
-        else next=next+avg_step*d;
+        if(i==height-2){
+            if(irregular_last) regular=false;
+            next=l*d;}
+        else next=(i+1)*unit_length*d;
         if(i!=0) last_block_id++;}
     PAIR<ARRAY<int>,ARRAY<int> > f;
     for(int j=-half_num_cells;j<=half_num_cells;j++){
