@@ -56,7 +56,6 @@ Generate_Pipe(const TV& v0,const TV& v1,int half_width,T unit_length,
         return base+i*width+j+half_width;
     };
     TV next;
-    int block=-1;
     bool regular=true;
     for(int i=0;i<height;i++){
         for(int j=-half_width;j<=half_width;j++){
@@ -64,15 +63,15 @@ Generate_Pipe(const TV& v0,const TV& v1,int half_width,T unit_length,
             if(i==0) continue;
             if(j!=half_width){
                 area->mesh.elements.Append(E(pid(i,j),pid(i-1,j+1),pid(i-1,j)));
-                blocks.Append({block,regular});}
+                blocks.Append({last_block_id,regular});}
             if(j!=-half_width){
                 area->mesh.elements.Append(E(pid(i,j),pid(i-1,j),pid(i,j-1)));
-                blocks.Append({block,regular});}}
+                blocks.Append({last_block_id,regular});}}
         if(avg_step && i==height-3)
             regular=false;
         if(regular) next=(i+1)*unit_length*d;
         else next=next+avg_step*d;
-        block++;}
+        if(i!=0) last_block_id++;}
     PAIR<ARRAY<int>,ARRAY<int> > f;
     for(int j=-half_width;j<=half_width;j++){
         f.x.Append(pid(0,j));
