@@ -1,2 +1,5 @@
 NOTE: I needed to set the variable "OPENBLAS_NUM_THREADS=1" to avoid openblas doing its own threading.
 
+* Reuse storage, renumber items.
+
+* Free old storage.
