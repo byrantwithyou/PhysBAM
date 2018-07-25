@@ -30,7 +30,7 @@ template<class TV> FLUID_LAYOUT_FEM<TV>::
 // Function Generate_Pipe
 //#####################################################################
 template<class TV> PAIR<ARRAY<int>,ARRAY<int> > FLUID_LAYOUT_FEM<TV>::
-Generate_Pipe(const TV& v0,const TV& v1,int half_width,T unit_length,
+Generate_Pipe(const TV& v0,const TV& v1,int half_num_cells,T unit_length,
     const HASHTABLE<PAIR<int,int>,int>& shared_point)
 {
     typedef VECTOR<int,3> E;
@@ -40,7 +40,7 @@ Generate_Pipe(const TV& v0,const TV& v1,int half_width,T unit_length,
     TV d=v1-v0;
     T l=d.Normalize();
     TV t(-d.y,d.x);
-    int width=2*half_width+1;
+    int width=2*half_num_cells+1;
     int height=(int)(l/unit_length)+1;
     T avg_step=0;
     T rem=l-(height-1)*unit_length;
@@ -48,23 +48,23 @@ Generate_Pipe(const TV& v0,const TV& v1,int half_width,T unit_length,
         avg_step=(rem+unit_length)*0.5;
         height++;}
     particles.Add_Elements(width*height);
-    auto pid=[base,width,half_width,height,shared_point](int i,int j)
+    auto pid=[base,width,half_num_cells,height,shared_point](int i,int j)
     {
         int ri=i==height-1?-1:i;
-        if(const int* r=shared_point.Get_Pointer(PAIR<int,int>(ri,j)))
+        if(const int* r=shared_point.Get_Pointer({ri,j}))
             return *r;
-        return base+i*width+j+half_width;
+        return base+i*width+j+half_num_cells;
     };
     TV next;
     bool regular=true;
     for(int i=0;i<height;i++){
-        for(int j=-half_width;j<=half_width;j++){
-            particles.X(pid(i,j))=v0+next+j*t;
+        for(int j=-half_num_cells;j<=half_num_cells;j++){
+            particles.X(pid(i,j))=v0+next+j*unit_length*t;
             if(i==0) continue;
-            if(j!=half_width){
+            if(j!=half_num_cells){
                 area->mesh.elements.Append(E(pid(i,j),pid(i-1,j+1),pid(i-1,j)));
                 blocks.Append({last_block_id,regular});}
-            if(j!=-half_width){
+            if(j!=-half_num_cells){
                 area->mesh.elements.Append(E(pid(i,j),pid(i-1,j),pid(i,j-1)));
                 blocks.Append({last_block_id,regular});}}
         if(avg_step && i==height-3)
@@ -73,7 +73,7 @@ Generate_Pipe(const TV& v0,const TV& v1,int half_width,T unit_length,
         else next=next+avg_step*d;
         if(i!=0) last_block_id++;}
     PAIR<ARRAY<int>,ARRAY<int> > f;
-    for(int j=-half_width;j<=half_width;j++){
+    for(int j=-half_num_cells;j<=half_num_cells;j++){
         f.x.Append(pid(0,j));
         f.y.Append(pid(height-1,j));}
     return f;
@@ -85,8 +85,8 @@ template<class TV> void FLUID_LAYOUT_FEM<TV>::
 Mark_BC(const ARRAY<int>& pindices,BC_TYPE bc_type)
 {
     for(int i=1;i<pindices.m;i++){
-        bc.Set(PAIR<int,int>(pindices(i),pindices(i-1)),{bc_type});
-        bc.Set(PAIR<int,int>(pindices(i-1),pindices(i)),{bc_type});}
+        bc.Set({pindices(i),pindices(i-1)},{bc_type});
+        bc.Set({pindices(i-1),pindices(i)},{bc_type});}
 }
 //#####################################################################
 // Function Pipe_Joint_Connection
@@ -108,7 +108,7 @@ Compute(const PARSE_DATA_FEM<TV>& pd)
 {
     for(auto& i:pd.pipes){
         if(pd.pts(i.x).joint_type==end_vertex && pd.pts(i.y).joint_type==end_vertex){
-            auto f=Generate_Pipe(pd.pts(i.x).pt,pd.pts(i.y).pt,pd.half_width,pd.unit_length);
+            auto f=Generate_Pipe(pd.pts(i.x).pt,pd.pts(i.y).pt,pd.half_num_cells,pd.unit_length);
             if(pd.pts(i.x).bc_type!=nobc)
                 Mark_BC(f.x,pd.pts(i.x).bc_type);
             if(pd.pts(i.y).bc_type!=nobc)
@@ -132,10 +132,10 @@ Compute(const PARSE_DATA_FEM<TV>& pd)
             Pipe_Joint_Connection(joint,pd.pts(j0).pt,pd.pts(j1).pt,pd.half_width,pd.unit_length,q0,q1);
             //Add_Debug_Particle(q0,VECTOR<T,3>(1,0,0));
             //Add_Debug_Particle(q1,VECTOR<T,3>(1,0,0));
-            auto f0=Generate_Pipe(q0,pd.pts(j0).pt,pd.half_width,pd.unit_length);
+            auto f0=Generate_Pipe(q0,pd.pts(j0).pt,pd.half_num_cells,pd.unit_length);
             HASHTABLE<PAIR<int,int>,int> shared_point;
-            shared_point.Set({0,-pd.half_width},f0.x(2*pd.half_width));
-            auto f1=Generate_Pipe(q1,pd.pts(j1).pt,pd.half_width,pd.unit_length,shared_point);
+            shared_point.Set({0,-pd.half_num_cells},f0.x(2*pd.half_num_cells));
+            auto f1=Generate_Pipe(q1,pd.pts(j1).pt,pd.half_num_cells,pd.unit_length,shared_point);
             if(pd.pts(j0).bc_type!=nobc)
                 Mark_BC(f0.y,pd.pts(j0).bc_type);
             if(pd.pts(j1).bc_type!=nobc)
@@ -159,7 +159,7 @@ Dump_Mesh() const
         for(int j=0;j<3;j++){
             VECTOR<T,3> color=white;
             int v0=area->mesh.elements(i)(j),v1=area->mesh.elements(i)((j+1)%3);
-            if(const BC_DATA* bc_data=bc.Get_Pointer(PAIR<int,int>(v0,v1))){
+            if(const BC_DATA* bc_data=bc.Get_Pointer({v0,v1})){
                 if(bc_data->bc_type==dirichlet_v)
                     color=dirichlet_bc;
                 else if(bc_data->bc_type==traction)

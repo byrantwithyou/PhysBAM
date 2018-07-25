@@ -29,6 +29,7 @@ struct PARSE_DATA_FEM
     HASHTABLE<int,ARRAY<int> > joints; // vertex index -> array of pipe indices
     int half_width;
     T unit_length;
+    int half_num_cells;
 
     void Parse_Input(const std::string& pipe_file);    
 };

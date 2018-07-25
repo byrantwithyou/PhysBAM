@@ -41,7 +41,7 @@ struct FLUID_LAYOUT_FEM
     void Dump_Layout() const;
     void Dump_Input(const PARSE_DATA_FEM<TV>& pd) const;
     // shared_point: (local i, local j) -> particle index; i==-1 means the last edge
-    PAIR<ARRAY<int>,ARRAY<int> > Generate_Pipe(const TV& v0,const TV& v1,int half_width,T unit_length,
+    PAIR<ARRAY<int>,ARRAY<int> > Generate_Pipe(const TV& v0,const TV& v1,int half_num_cells,T unit_length,
         const HASHTABLE<PAIR<int,int>,int>& shared_point={});
     void Mark_BC(const ARRAY<int>& pindices,BC_TYPE bc_type);
     void Pipe_Joint_Connection(const TV& joint,const TV& p0,const TV& p1,int half_width,T unit_length,
