@@ -429,7 +429,9 @@ Pack_Vector(ARRAY<VECTOR<int,2> >& dof_map,ARRAY<T>& v,const ARRAY<int>& u)
     v.Resize(dof_map.m,init_all,0);
     for(int i=0;i<v.m;i++){
         int b=dof_map(i).x;
-        if(u(b)>=0) v(i)=vector_list(u(b))(dof_map(i).y);}
+        if(u(b)>=0){
+            v(i)=vector_list(u(b)&raw_mask)(dof_map(i).y);
+            if(u(b)&use_neg) v(i)=-v(i);}}
 }
 //#####################################################################
 // Function Transposed
@@ -523,32 +525,19 @@ template<class T> void CACHED_ELIMINATION_MATRIX<T>::
 Execute_Jobs(int num_threads)
 {
     Compute_Job_Deps();
+    Eliminate_Trans();
+    Combine_Ops();
     Simplify_Jobs();
-    
+
     JOB_SCHEDULER<JOB,CACHED_ELIMINATION_MATRIX<T> > scheduler(this);
     for(int i=0;i<jobs.m;i++){
         auto& j=jobs(i);
-        PHYSBAM_ASSERT(i==scheduler.Add_Job(&j,0));
+        PHYSBAM_ASSERT(i==scheduler.Add_Job(&j,0));}
+    for(int i=0;i<jobs.m;i++){
+        auto& j=jobs(i);
         for(int l=0;l<3;l++)
             if(j.dep_jobs[l]>=0)
                 scheduler.Register_Dependency(j.dep_jobs[l],i);}
-    
-    // for(int i=0;i<jobs.m;i++)
-    // {
-    //     if(job_next(i)==-1){PHYSBAM_ASSERT(arg_type[jobs(i).op][3]==2);}
-    //     if(job_next(i)>=0)
-    //     {
-    //         int k=job_next(i);
-    //         const char* ni=op_names[jobs(i).op];
-    //         const char* nk=op_names[jobs(k).op];
-    //         printf("next %i (%s %i %i %i %i) -> %i (%s %i %i %i %i)\n",
-    //             i,ni,jobs(i).a[0],jobs(i).a[1],jobs(i).a[2],jobs(i).o,
-    //             k,nk,jobs(k).a[0],jobs(k).a[1],jobs(k).a[2],jobs(k).o);
-
-
-
-    //     }
-    // }
     
     scheduler.Compute_Priority_By_Paths();
     scheduler.Execute_Jobs(num_threads);
@@ -563,6 +552,7 @@ Execute(CACHED_ELIMINATION_MATRIX<T>* cem)
     auto& vl=cem->vector_list;
     switch(op)
     {
+        case op_nop: break;
         case op_mat_inv:
             bl(o).M=bl(a[0]).M;
             Inverse(bl(o).M);
@@ -649,33 +639,29 @@ Compute_Job_Deps()
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::
 Eliminate_Trans()
 {
-
-// // trans 0-3 neg 4-7
-    // ARRAY<bool> can_trans(jobs.m);
-    // for(int i=0;i<jobs.m;i++)
-    // {
-    //     auto& j=jobs(i);
-    //     bool& r=can_trans(i);
-    //     switch(jobs(i).op)
-    //     {
-    //         case op_mat_inv:
-    //         case op_mat_mul: r=true; break;
-    //         case op_mat_add:
-    //             r=true;
-    //             if(j.dep_jobs[0]>=0 && j.dep_jobs[1]>=0)
-    //                 if(can_trans(j.dep_jobs[0]).r)
-    //                     r=can_trans(j.dep_jobs[1]).r;
-    //             break;
-    //     }
-    // }
-    // for(int i=jobs.m-1;i>=0;i--)
-    // {
-    //     auto& j=jobs(i);
-    //     auto& r=can_trans(i);
-    //     if(jobs(i).op==op_mat_add){}
-    // }
-    
-    
+    for(int i=0;i<jobs.m;i++)
+    {
+        auto& j=jobs(i);
+        if(j.op==op_mat_add && (j.a[1]&use_trans))
+        {
+            if(j.dep_jobs[1]>=0)
+            {
+                auto& k=jobs(j.dep_jobs[1]);
+                if(k.users.m==1)
+                {
+                    if(k.op==op_mat_mul)
+                    {
+                        std::swap(k.a[1],k.a[2]);
+                        std::swap(k.dep_jobs[1],k.dep_jobs[2]);
+                        k.a[1]=Transposed(k.a[1]);
+                        k.a[2]=Transposed(k.a[2]);
+                        j.a[1]=Transposed(j.a[1]);
+                        continue;
+                    }
+                }
+            }
+        }
+    }
 }
 //#####################################################################
 // Function Compute_Job_Deps
@@ -689,7 +675,7 @@ Simplify_Jobs()
         {
             case op_mat_mul:
             case op_vec_mul:
-                if(j.a[0]&use_neg)
+                if(j.a[0]>=0 && (j.a[0]&use_neg))
                 {
                     j.a[0]&=~use_neg;
                     j.s[0]=-j.s[0];
@@ -707,6 +693,66 @@ Simplify_Jobs()
                 break;
         }
     }
+}
+//#####################################################################
+// Function Combine_Ops
+//#####################################################################
+template<class T> void CACHED_ELIMINATION_MATRIX<T>::
+Combine_Ops()
+{
+    for(int i=0;i<jobs.m;i++)
+    {
+        auto& j=jobs(i);
+        if(j.op==op_mat_mul && j.a[0]<0 && j.users.m==1)
+        {
+            auto& k=jobs(j.users(0));
+            if(k.op==op_mat_add)
+            {
+                if(k.a[1]&use_trans)
+                {
+                    printf("trans discard %i -> %i\n",i,j.users(0));
+                    continue;
+                }
+                if(k.a[0]==j.o)
+                {
+                    j.s[0]=(k.a[1]&use_neg)?-1:1;
+                    j.a[0]=k.a[1]&raw_mask;
+                    j.dep_jobs[0]=k.dep_jobs[1];
+                }
+                else
+                {
+                    if(k.a[1]&use_neg) j.s[1]=-j.s[1];
+                    j.s[0]=1;
+                    j.a[0]=k.a[0];
+                    j.dep_jobs[0]=k.dep_jobs[0];
+                }
+                Combine_With_Next_Job(i);
+            }
+        }
+    }
+}
+//#####################################################################
+// Function Combine_With_Next_Job
+//#####################################################################
+template<class T> void CACHED_ELIMINATION_MATRIX<T>::
+Combine_With_Next_Job(int j)
+{
+    auto& k=jobs(j);
+    int l=k.users(0);
+    auto& m=jobs(l);
+    k.o=m.o;
+    k.users=m.users;
+    for(auto& u:m.users)
+    {
+        for(auto&r:jobs(u).dep_jobs)
+            if(r==l)
+                r=j;
+    }
+    m.op=op_nop;
+    for(auto& i:m.a) i=-1;
+    for(auto& i:m.dep_jobs) i=-1;
+    m.o=-1;
+    m.users.Clean_Memory();
 }
 template struct CACHED_ELIMINATION_MATRIX<double>;
 }

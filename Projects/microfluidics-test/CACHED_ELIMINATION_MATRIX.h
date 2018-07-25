@@ -86,6 +86,8 @@ struct CACHED_ELIMINATION_MATRIX
     void Compute_Job_Deps();
     void Eliminate_Trans();
     void Simplify_Jobs();
+    void Combine_Ops();
+    void Combine_With_Next_Job(int j);
 };
 }
 #endif
