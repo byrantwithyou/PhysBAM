@@ -18,9 +18,13 @@ struct FLUID_LAYOUT_FEM
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
 
-    struct BLOCK_DATA
+    struct ELEMENT_DATA
     {
         int block_id;
+    };
+
+    struct BLOCK_DATA
+    {
         bool regular;
     };
 
@@ -30,9 +34,9 @@ struct FLUID_LAYOUT_FEM
     };
 
     std::unique_ptr<TRIANGULATED_AREA<T> > area;
-    ARRAY<BLOCK_DATA> blocks; // element index -> block
+    ARRAY<BLOCK_DATA> blocks;
+    ARRAY<ELEMENT_DATA> elem_data;
     HASHTABLE<PAIR<int,int>,BC_DATA> bc; // edge -> bc
-    int last_block_id=0;
 
     FLUID_LAYOUT_FEM();
     ~FLUID_LAYOUT_FEM();

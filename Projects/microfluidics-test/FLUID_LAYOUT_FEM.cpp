@@ -65,15 +65,15 @@ Generate_Pipe(const TV& v0,const TV& v1,int half_num_cells,T unit_length,
             if(i==0) continue;
             if(j!=half_num_cells){
                 area->mesh.elements.Append(E(pid(i,j),pid(i-1,j+1),pid(i-1,j)));
-                blocks.Append({last_block_id,regular});}
+                elem_data.Append({blocks.m});}
             if(j!=-half_num_cells){
                 area->mesh.elements.Append(E(pid(i,j),pid(i-1,j),pid(i,j-1)));
-                blocks.Append({last_block_id,regular});}}
+                elem_data.Append({blocks.m});}}
+        if(i!=0) blocks.Append({regular});
         if(i==height-2){
             if(irregular_last) regular=false;
             next=l*d;}
-        else next=(i+1)*unit_length*d;
-        if(i!=0) last_block_id++;}
+        else next=(i+1)*unit_length*d;}
     PAIR<ARRAY<int>,ARRAY<int> > f;
     for(int j=-half_num_cells;j<=half_num_cells;j++){
         f.x.Append(pid(0,j));
@@ -125,18 +125,17 @@ Weld_Arc(int p0,int p1,const ARRAY<int>& side,const TV& c,T unit_length)
     while(p!=p1){
         if(j==side.m-1 || u.Normalized().Dot(v)>(particles.X(side(j+1))-c).Normalized().Dot(v)){
             area->mesh.elements.Append(E(pnext,p,side(j)));
-            blocks.Append({last_block_id,false});
             p=pnext;
             if(i<num_segs) pnext=next(i,u);
             i++;}
         else{
             area->mesh.elements.Append(E(side(j+1),p,side(j)));
-            blocks.Append({last_block_id,false});
-            j++;}}
+            j++;}
+        elem_data.Append({blocks.m});}
     if(j==side.m-2){
         area->mesh.elements.Append(E(side(j+1),p,side(j)));
-        blocks.Append({last_block_id,false});}
-    last_block_id++;
+        elem_data.Append({blocks.m});}
+    blocks.Append({false});
     return new_side;
 }
 //#####################################################################
@@ -248,9 +247,9 @@ Dump_Layout() const
     Dump_Mesh();
     VECTOR<T,3> reg(0,1,0),irreg(1,0,0);
     for(int i=0;i<area->mesh.elements.m;i++){
-        std::string s=LOG::sprintf("%i",blocks(i).block_id);
+        std::string s=LOG::sprintf("%i",elem_data(i).block_id);
         Add_Debug_Text(particles.X.Subset(area->mesh.elements(i)).Average(),s,
-            blocks(i).regular?reg:irreg);}
+            blocks(elem_data(i).block_id).regular?reg:irreg);}
 }
 //#####################################################################
 // Function Dump_Input
