@@ -81,6 +81,65 @@ Generate_Pipe(const TV& v0,const TV& v1,int half_num_cells,T unit_length,
     return f;
 }
 //#####################################################################
+// Function Weld_Arc
+//#####################################################################
+template<class TV> ARRAY<int> FLUID_LAYOUT_FEM<TV>::
+Weld_Arc(int p0,int p1,const ARRAY<int>& side,const TV& c,T unit_length)
+{
+    typedef VECTOR<int,3> E;
+    GEOMETRY_PARTICLES<TV>& particles=area->particles;
+    T polyline_arc_ratio=0.999;
+    TV v0=particles.X(p0)-c,v1=particles.X(p1)-c;
+    TV v=v0.Normalized();
+    T r=v0.Magnitude();
+    T unit_rad=unit_length/polyline_arc_ratio/r;
+    T total_rad=acos(v1.Normalized().Dot(v));
+    int num_segs=(int)(total_rad/unit_rad);
+    T min_percent=0.5;
+    T rem=total_rad-num_segs*unit_rad;
+    int base=particles.number;
+    if(rem>min_percent*unit_rad)
+        num_segs++;
+    particles.Add_Elements(num_segs-1);
+
+    ARRAY<int> new_side;
+    auto next=[v1,num_segs,p1,unit_rad,v0,&particles,base,c,&new_side](int i,TV& g)
+    {
+        int next_p;
+        if(i==num_segs-1){
+            g=v1;
+            next_p=p1;}
+        else{
+            T rad=-(i+1)*unit_rad;
+            g=TV(cos(rad)*v0(0)-sin(rad)*v0(1),sin(rad)*v0(0)+cos(rad)*v0(1));
+            particles.X(base+i)=c+g;
+            next_p=base+i;}
+        new_side.Append(next_p);
+        return next_p;
+    };
+
+    int p=p0,j=0,i=1,pnext;
+    new_side.Append(p0);
+    TV u;
+    pnext=next(0,u);
+    while(p!=p1){
+        if(j==side.m-1 || u.Normalized().Dot(v)>(particles.X(side(j+1))-c).Normalized().Dot(v)){
+            area->mesh.elements.Append(E(pnext,p,side(j)));
+            blocks.Append({last_block_id,false});
+            p=pnext;
+            if(i<num_segs) pnext=next(i,u);
+            i++;}
+        else{
+            area->mesh.elements.Append(E(side(j+1),p,side(j)));
+            blocks.Append({last_block_id,false});
+            j++;}}
+    if(j==side.m-2){
+        area->mesh.elements.Append(E(side(j+1),p,side(j)));
+        blocks.Append({last_block_id,false});}
+    last_block_id++;
+    return new_side;
+}
+//#####################################################################
 // Function Mark_BC
 //#####################################################################
 template<class TV> void FLUID_LAYOUT_FEM<TV>::
@@ -108,6 +167,7 @@ Pipe_Joint_Connection(const TV& joint,const TV& p0,const TV& p1,int half_width,T
 template<class TV> void FLUID_LAYOUT_FEM<TV>::
 Compute(const PARSE_DATA_FEM<TV>& pd)
 {
+    GEOMETRY_PARTICLES<TV>& particles=area->particles;
     for(auto& i:pd.pipes){
         if(pd.pts(i.x).joint_type==end_vertex && pd.pts(i.y).joint_type==end_vertex){
             auto f=Generate_Pipe(pd.pts(i.x).pt,pd.pts(i.y).pt,pd.half_num_cells,pd.unit_length);
@@ -135,9 +195,18 @@ Compute(const PARSE_DATA_FEM<TV>& pd)
             //Add_Debug_Particle(q0,VECTOR<T,3>(1,0,0));
             //Add_Debug_Particle(q1,VECTOR<T,3>(1,0,0));
             auto f0=Generate_Pipe(q0,pd.pts(j0).pt,pd.half_num_cells,pd.unit_length);
+            int center_pid=f0.x(2*pd.half_num_cells);
             HASHTABLE<PAIR<int,int>,int> shared_point;
-            shared_point.Set({0,-pd.half_num_cells},f0.x(2*pd.half_num_cells));
+            shared_point.Set({0,-pd.half_num_cells},center_pid);
             auto f1=Generate_Pipe(q1,pd.pts(j1).pt,pd.half_num_cells,pd.unit_length,shared_point);
+
+            TV center=particles.X(center_pid);
+            ARRAY<int> side;
+            side.Append(center_pid);
+            for(int j=1;j<=2*pd.half_num_cells;j++){
+                ARRAY<int> new_side=Weld_Arc(f0.x(2*pd.half_num_cells-j),f1.x(j),side,center,pd.unit_length);
+                side=new_side;}
+
             if(pd.pts(j0).bc_type!=nobc)
                 Mark_BC(f0.y,pd.pts(j0).bc_type);
             if(pd.pts(j1).bc_type!=nobc)

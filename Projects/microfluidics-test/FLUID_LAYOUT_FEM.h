@@ -43,6 +43,7 @@ struct FLUID_LAYOUT_FEM
     // shared_point: (local i, local j) -> particle index; i==-1 means the last edge
     PAIR<ARRAY<int>,ARRAY<int> > Generate_Pipe(const TV& v0,const TV& v1,int half_num_cells,T unit_length,
         const HASHTABLE<PAIR<int,int>,int>& shared_point={});
+    ARRAY<int> Weld_Arc(int p0,int p1,const ARRAY<int>& side,const TV& c,T unit_length);
     void Mark_BC(const ARRAY<int>& pindices,BC_TYPE bc_type);
     void Pipe_Joint_Connection(const TV& joint,const TV& p0,const TV& p1,int half_width,T unit_length,
         TV& q0,TV& q1) const;
