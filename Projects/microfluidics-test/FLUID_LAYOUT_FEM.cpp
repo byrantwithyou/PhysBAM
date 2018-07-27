@@ -29,62 +29,58 @@ template<class TV> FLUID_LAYOUT_FEM<TV>::
 //#####################################################################
 // Function Generate_Pipe
 //#####################################################################
-template<class TV> PAIR<ARRAY<int>,ARRAY<int> > FLUID_LAYOUT_FEM<TV>::
-Generate_Pipe(const TV& v0,const TV& v1,int half_num_cells,T unit_length,
-    const HASHTABLE<PAIR<int,int>,int>& shared_point)
+template<class TV> void FLUID_LAYOUT_FEM<TV>::
+Generate_Pipe(int pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con)
 {
     typedef VECTOR<int,3> E;
     GEOMETRY_PARTICLES<TV>& particles=area->particles;
     int base=particles.number;
-    //el_base=area->mesh.elements.m;
+    const ARRAY<int>* f0=con.Get_Pointer({pd.pipes(pipe).x,pipe}),*f1=con.Get_Pointer({pd.pipes(pipe).y,pipe});
+    PHYSBAM_ASSERT(f0 && f1);
+    TV v0=particles.X((*f0)(pd.half_width)),v1=particles.X((*f1)(pd.half_width));
     TV d=v1-v0;
     T l=d.Normalize();
     TV t(-d.y,d.x);
-    int width=2*half_num_cells+1;
-    int height=(int)(l/unit_length)+1;
+    int width=2*pd.half_width+1;
+    int height=(int)(l/pd.unit_length)+1;
     T min_percent=0.5;
     bool irregular_last=false;
-    T rem=l-(height-1)*unit_length;
-    if(rem>1e-2*unit_length){
+    T rem=l-(height-1)*pd.unit_length;
+    if(rem>1e-2*pd.unit_length){
         irregular_last=true;
-        if(rem>min_percent*unit_length)
+        if(rem>min_percent*pd.unit_length)
             height++;}
-    particles.Add_Elements(width*height);
-    auto pid=[base,width,half_num_cells,height,shared_point](int i,int j)
+    if(height>2)
+        particles.Add_Elements(width*(height-2));
+    auto pid=[base,width,height,&pd,f0,f1](int i,int j)
     {
-        int ri=i==height-1?-1:i;
-        if(const int* r=shared_point.Get_Pointer({ri,j}))
-            return *r;
-        return base+i*width+j+half_num_cells;
+        if(i==0) return (*f0)(pd.half_width+j);
+        else if(i==height-1) return (*f1)(pd.half_width+j);
+        else return base+(i-1)*width+j+pd.half_width;
     };
-    TV next;
+    TV next=pd.unit_length*d;;
     bool regular=true;
-    for(int i=0;i<height;i++){
-        for(int j=-half_num_cells;j<=half_num_cells;j++){
-            particles.X(pid(i,j))=v0+next+j*unit_length*t;
-            if(i==0) continue;
-            if(j!=half_num_cells){
+    for(int i=1;i<height;i++){
+        for(int j=-pd.half_width;j<=pd.half_width;j++){
+            if(i!=height-1)
+                particles.X(pid(i,j))=v0+next+j*pd.unit_length*t;
+            if(j!=pd.half_width){
                 area->mesh.elements.Append(E(pid(i,j),pid(i-1,j+1),pid(i-1,j)));
                 elem_data.Append({blocks.m});}
-            if(j!=-half_num_cells){
+            if(j!=-pd.half_width){
                 area->mesh.elements.Append(E(pid(i,j),pid(i-1,j),pid(i,j-1)));
                 elem_data.Append({blocks.m});}}
         if(i!=0) blocks.Append({regular});
         if(i==height-2){
             if(irregular_last) regular=false;
             next=l*d;}
-        else next=(i+1)*unit_length*d;}
-    PAIR<ARRAY<int>,ARRAY<int> > f;
-    for(int j=-half_num_cells;j<=half_num_cells;j++){
-        f.x.Append(pid(0,j));
-        f.y.Append(pid(height-1,j));}
-    return f;
+        else next=(i+1)*pd.unit_length*d;}
 }
 //#####################################################################
-// Function Weld_Arc
+// Function March_Arc
 //#####################################################################
 template<class TV> ARRAY<int> FLUID_LAYOUT_FEM<TV>::
-Weld_Arc(int p0,int p1,const ARRAY<int>& side,const TV& c,T unit_length)
+March_Arc(int p0,int p1,const ARRAY<int>& side,const TV& c,T unit_length)
 {
     typedef VECTOR<int,3> E;
     GEOMETRY_PARTICLES<TV>& particles=area->particles;
@@ -98,7 +94,7 @@ Weld_Arc(int p0,int p1,const ARRAY<int>& side,const TV& c,T unit_length)
     T min_percent=0.5;
     T rem=total_rad-num_segs*unit_rad;
     int base=particles.number;
-    if(rem>min_percent*unit_rad)
+    if(rem>min_percent*unit_rad || num_segs==0)
         num_segs++;
     particles.Add_Elements(num_segs-1);
 
@@ -123,7 +119,7 @@ Weld_Arc(int p0,int p1,const ARRAY<int>& side,const TV& c,T unit_length)
     TV u;
     pnext=next(0,u);
     while(p!=p1){
-        if(j==side.m-1 || u.Normalized().Dot(v)>(particles.X(side(j+1))-c).Normalized().Dot(v)){
+        if(j==side.m-1 || u.Normalized().Dot(v)>=(particles.X(side(j+1))-c).Normalized().Dot(v)){
             area->mesh.elements.Append(E(pnext,p,side(j)));
             p=pnext;
             if(i<num_segs) pnext=next(i,u);
@@ -149,16 +145,93 @@ Mark_BC(const ARRAY<int>& pindices,BC_TYPE bc_type)
         bc_map.Set(pindices(i),bc_index);
 }
 //#####################################################################
-// Function Pipe_Joint_Connection
+// Function Generate_End
 //#####################################################################
 template<class TV> void FLUID_LAYOUT_FEM<TV>::
-Pipe_Joint_Connection(const TV& joint,const TV& p0,const TV& p1,int half_width,T unit_length,TV& q0,TV& q1) const
+Generate_End(int i,int pipe,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
+{
+    int j=pd.pipes(pipe).x;
+    if(j==i) j=pd.pipes(pipe).y;
+    TV p=pd.pts(i).pt;
+    TV v=pd.pts(j).pt-pd.pts(i).pt;
+    TV u=TV(-v.y,v.x).Normalized();
+    GEOMETRY_PARTICLES<TV>& particles=area->particles;
+    int base=particles.Add_Elements(2*pd.half_width+1);
+    ARRAY<int>& indices=con.Get_Or_Insert({i,pipe});
+    for(int k=-pd.half_width;k<=pd.half_width;k++){
+        int pid=base+k+pd.half_width;
+        indices.Append(pid);
+        particles.X(pid)=p+k*pd.unit_length*u;}
+    if(pd.pipes(pipe).x!=i) indices.Reverse();
+    if(pd.pts(i).bc_type!=nobc) Mark_BC(indices,pd.pts(i).bc_type);
+}
+//#####################################################################
+// Function Arc
+//#####################################################################
+template<class TV> VECTOR<TV,3> FLUID_LAYOUT_FEM<TV>::
+Arc(const TV& joint,const TV& p0,const TV& p1,int half_width,T unit_length) const
 {
     TV e0=(p0-joint).Normalized(),e1=(p1-joint).Normalized();
     TV m=(e0+e1).Normalized();
-    T s=half_width/abs(e0.Cross(m)(0));
-    q0=joint+s*m.Dot(e0)*e0;
-    q1=joint+s*m.Dot(e1)*e1;
+    T s=half_width*unit_length/abs(e0.Cross(m)(0));
+    return VECTOR<TV,3>(joint+s*m,(s*m.Dot(e0)*e0-s*m).Normalized(),(s*m.Dot(e1)*e1-s*m).Normalized());
+}
+//#####################################################################
+// Function Generate_Arc
+//#####################################################################
+template<class TV> void FLUID_LAYOUT_FEM<TV>::
+Generate_Arc(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
+{
+    GEOMETRY_PARTICLES<TV>& particles=area->particles;
+    const ARRAY<int>* pipes=pd.joints.Get_Pointer(i);
+    PHYSBAM_ASSERT(pipes);
+    PHYSBAM_ASSERT(pipes->m==2);
+    int p0=(*pipes)(0),p1=(*pipes)(1);
+    int j0=pd.pipes(p0)(0),j1=pd.pipes(p1)(0);
+    if(j0==i) j0=pd.pipes(p0)(1);
+    if(j1==i) j1=pd.pipes(p1)(1);
+    TV joint=pd.pts(i).pt;
+    if((pd.pts(j0).pt-joint).Cross(pd.pts(j1).pt-joint)(0)<0){
+        std::swap(p0,p1);
+        std::swap(j0,j1);}
+    VECTOR<TV,3> arc=Arc(joint,pd.pts(j0).pt,pd.pts(j1).pt,pd.half_width,pd.unit_length);
+    int center_pid=particles.Add_Element();
+    particles.X(center_pid)=arc(0);
+    ARRAY<int>& f0=con.Get_Or_Insert({i,p0}),&f1=con.Get_Or_Insert({i,p1});
+    f0.Append(center_pid);
+    f1.Append(center_pid);
+    ARRAY<int> side;
+    side.Append(center_pid);
+    for(int j=0;j<2*pd.half_width;j++){
+        int s0=particles.Add_Element();
+        f0.Append(s0);
+        particles.X(s0)=arc(0)+arc(1)*pd.unit_length*(j+1);
+        int s1=particles.Add_Element();
+        f1.Append(s1);
+        particles.X(s1)=arc(0)+arc(2)*pd.unit_length*(j+1);
+        ARRAY<int> new_side=March_Arc(s0,s1,side,arc(0),pd.unit_length);
+        side=new_side;}
+    if(pd.pipes(p0).x==i) f0.Reverse();
+    if(pd.pipes(p1).x!=i) f1.Reverse();
+}
+//#####################################################################
+// Function Generate_Joint
+//#####################################################################
+template<class TV> void FLUID_LAYOUT_FEM<TV>::
+Generate_Joint(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
+{
+    if(pd.pts(i).joint_type==end_vertex){
+        const ARRAY<int>* p=pd.joints.Get_Pointer(i);
+        PHYSBAM_ASSERT(p);
+        PHYSBAM_ASSERT(p->m==1);
+        Generate_End(i,(*p)(0),pd,con);
+        return;}
+
+    if(pd.pts(i).joint_type==arc_joint){
+        Generate_Arc(i,pd,con);
+        return;}
+
+    PHYSBAM_FATAL_ERROR("joint type not handled");
 }
 //#####################################################################
 // Function Compute
@@ -166,52 +239,11 @@ Pipe_Joint_Connection(const TV& joint,const TV& p0,const TV& p1,int half_width,T
 template<class TV> void FLUID_LAYOUT_FEM<TV>::
 Compute(const PARSE_DATA_FEM<TV>& pd)
 {
-    GEOMETRY_PARTICLES<TV>& particles=area->particles;
-    for(auto& i:pd.pipes){
-        if(pd.pts(i.x).joint_type==end_vertex && pd.pts(i.y).joint_type==end_vertex){
-            auto f=Generate_Pipe(pd.pts(i.x).pt,pd.pts(i.y).pt,pd.half_num_cells,pd.unit_length);
-            if(pd.pts(i.x).bc_type!=nobc)
-                Mark_BC(f.x,pd.pts(i.x).bc_type);
-            if(pd.pts(i.y).bc_type!=nobc)
-                Mark_BC(f.y,pd.pts(i.y).bc_type);}}
-
+    CONNECTION con;
     for(int i=0;i<pd.pts.m;i++){
-        if(pd.pts(i).joint_type==arc){
-            const ARRAY<int>* pipes=pd.joints.Get_Pointer(i);
-            PHYSBAM_ASSERT(pipes);
-            PHYSBAM_ASSERT(pipes->m==2);
-            int p0=(*pipes)(0),p1=(*pipes)(1);
-            int j0=pd.pipes(p0)(0),j1=pd.pipes(p1)(0);
-            if(j0==i) j0=pd.pipes(p0)(1);
-            if(j1==i) j1=pd.pipes(p1)(1);
-            if(pd.pts(j0).joint_type!=end_vertex || pd.pts(j1).joint_type!=end_vertex) continue;
-            TV joint=pd.pts(i).pt;
-            if((pd.pts(j0).pt-joint).Cross(pd.pts(j1).pt-joint)(0)<0){
-                std::swap(p0,p1);
-                std::swap(j0,j1);}
-            TV q0,q1;
-            Pipe_Joint_Connection(joint,pd.pts(j0).pt,pd.pts(j1).pt,pd.half_width,pd.unit_length,q0,q1);
-            //Add_Debug_Particle(q0,VECTOR<T,3>(1,0,0));
-            //Add_Debug_Particle(q1,VECTOR<T,3>(1,0,0));
-            auto f0=Generate_Pipe(q0,pd.pts(j0).pt,pd.half_num_cells,pd.unit_length);
-            int center_pid=f0.x(2*pd.half_num_cells);
-            HASHTABLE<PAIR<int,int>,int> shared_point;
-            shared_point.Set({0,-pd.half_num_cells},center_pid);
-            auto f1=Generate_Pipe(q1,pd.pts(j1).pt,pd.half_num_cells,pd.unit_length,shared_point);
-
-            TV center=particles.X(center_pid);
-            ARRAY<int> side;
-            side.Append(center_pid);
-            for(int j=1;j<=2*pd.half_num_cells;j++){
-                ARRAY<int> new_side=Weld_Arc(f0.x(2*pd.half_num_cells-j),f1.x(j),side,center,pd.unit_length);
-                side=new_side;}
-
-            if(pd.pts(j0).bc_type!=nobc)
-                Mark_BC(f0.y,pd.pts(j0).bc_type);
-            if(pd.pts(j1).bc_type!=nobc)
-                Mark_BC(f1.y,pd.pts(j1).bc_type);
-        }
-    }
+        Generate_Joint(i,pd,con);}
+    for(int i=0;i<pd.pipes.m;i++){
+        Generate_Pipe(i,pd,con);}
     Dump_Input(pd);
 }
 //#####################################################################

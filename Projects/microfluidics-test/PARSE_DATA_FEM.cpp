@@ -77,10 +77,8 @@ Parse_Input(const std::string& pipe_file)
         if(i.data.m==1)
             pts(i.key).joint_type=end_vertex;
         else if(i.data.m==2 && pts(i.key).joint_type==default_joint)
-            pts(i.key).joint_type=arc;
+            pts(i.key).joint_type=arc_joint;
     }
-    half_num_cells=half_width/unit_length;
-    PHYSBAM_ASSERT(abs(half_num_cells*unit_length-half_width)<1e-6);
 }
 template struct PARSE_DATA_FEM<VECTOR<double,2> >;
 template struct PARSE_DATA_FEM<VECTOR<double,3> >;

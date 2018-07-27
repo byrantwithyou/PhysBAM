@@ -9,7 +9,7 @@
 
 namespace PhysBAM{
 enum BC_TYPE {nobc,dirichlet_v,traction};
-enum JOINT_TYPE {default_joint,end_vertex,arc};
+enum JOINT_TYPE {default_joint,end_vertex,arc_joint};
 
 template<class TV>
 struct PARSE_DATA_FEM
@@ -29,7 +29,6 @@ struct PARSE_DATA_FEM
     HASHTABLE<int,ARRAY<int> > joints; // vertex index -> array of pipe indices
     int half_width;
     T unit_length;
-    int half_num_cells;
 
     void Parse_Input(const std::string& pipe_file);    
 };
