@@ -48,7 +48,7 @@ struct CACHED_ELIMINATION_MATRIX
     struct JOB
     {
         int op;
-        int a[3],o,s[2];
+        int a[3],o;
 
         void Execute(CACHED_ELIMINATION_MATRIX<T>* cem);
     };

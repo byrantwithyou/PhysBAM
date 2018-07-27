@@ -246,7 +246,7 @@ Compute_Mul(int a,int b)
     ARRAY<int> prod_list_trans=Transposed(prod_list);
     bool sym=prod_list==prod_list_trans;
     int n=block_list.Append({{},sym,prod_list});
-    jobs.Append({op_mat_mul,{-1,a,b},n,{0,1}});
+    jobs.Append({op_mat_mul,{-1,a,b},n});
 
     if(!sym) cached_ops.Set({op_mat_mul,Transposed(b),Transposed(a)},n^use_trans);
     prod_lookup.Set(prod_list,n);
@@ -380,7 +380,7 @@ Matrix_Times(int m,int v)
     if(m==id_block) return v;
 
     int o=vector_list.Add_End();
-    jobs.Append({op_vec_mul,{-1,m,v},o,{0,1}});
+    jobs.Append({op_vec_mul,{-1,m,v},o});
     return o;
 }
 //#####################################################################
@@ -393,7 +393,7 @@ Sub_Times(int out,int m,int v)
     if(m==id_block && out<0) return Negate(v);
     int o=vector_list.Add_End();
     if(m==id_block) jobs.Append({op_vec_add,{out,v},o});
-    else jobs.Append({op_vec_mul,{out,m,v},o,{1,-1}});
+    else jobs.Append({op_vec_mul,{out,m,Negate(v)},o});
     return o;
 }
 //#####################################################################
@@ -559,12 +559,14 @@ Execute(CACHED_ELIMINATION_MATRIX<T>* cem)
             break;
         case op_mat_mul:
             {
+                int s0=0,s1=((a[1]^a[2])&use_neg)?-1:1;
+                if(a[0]>=0) s0=(a[0]&use_neg)?-1:1;
                 auto& A=bl(a[1]&raw_mask).M;
                 auto& B=bl(a[2]&raw_mask).M;
                 auto& C=bl(o).M;
                 if(a[0]<0) C.Resize(a[1]&use_trans?A.n:A.m,a[2]&use_trans?B.m:B.n);
-                else if(a[0]!=o) C=bl(a[0]).M;
-                Times_MM(C,s[0],A,a[1]&use_trans,B,a[2]&use_trans,s[1]);
+                else if((a[0]&raw_mask)!=o) C=bl(a[0]&raw_mask).M;
+                Times_MM(C,s0,A,a[1]&use_trans,B,a[2]&use_trans,s1);
             }
             break;
         case op_mat_add:
@@ -586,10 +588,12 @@ Execute(CACHED_ELIMINATION_MATRIX<T>* cem)
             break;
         case op_vec_mul:
             {
+                int s0=0,s1=((a[1]^a[2])&use_neg)?-1:1;
+                if(a[0]>=0) s0=(a[0]&use_neg)?-1:1;
                 auto& M=bl(a[1]&raw_mask).M;
                 if(a[0]<0) vl(o).Resize(a[1]&use_trans?M.n:M.m);
-                else if(a[0]!=o) vl(o)=vl(a[0]);
-                Times_MV(vl(o),s[1],M,a[1]&use_trans,vl(a[2]),s[0]);
+                else if(a[0]!=o) vl(o)=vl(a[0]&raw_mask);
+                Times_MV(vl(o),s1,M,a[1]&use_trans,vl(a[2]&raw_mask),s0);
             }
             break;
         case op_vec_add:
@@ -656,21 +660,6 @@ Simplify_Jobs()
         {
             case op_mat_mul:
             case op_vec_mul:
-                if(j.a[0]>=0 && (j.a[0]&use_neg))
-                {
-                    j.a[0]&=~use_neg;
-                    j.s[0]=-j.s[0];
-                }
-                if(j.a[1]&use_neg)
-                {
-                    j.a[1]&=~use_neg;
-                    j.s[1]=-j.s[1];
-                }
-                if(j.a[2]&use_neg)
-                {
-                    j.a[2]&=~use_neg;
-                    j.s[1]=-j.s[1];
-                }
                 break;
         }
     }
@@ -690,9 +679,8 @@ Combine_Ops()
                 if((k.a[1]&raw_mask)==j.o) std::swap(k.a[0],k.a[1]);
                 PHYSBAM_ASSERT((k.a[0]&raw_mask)==j.o);
                 j.a[0]=k.a[1];
-                j.s[0]=1;
                 j.o=k.o;
-                if(k.a[0]&use_neg) j.s[1]=-j.s[1];
+                if(k.a[0]&use_neg) j.a[2]=Negate(j.a[2]);
                 Remove_Job_Deps(p);
                 Remove_Job_Deps(u);
                 jobs(u)=j;
