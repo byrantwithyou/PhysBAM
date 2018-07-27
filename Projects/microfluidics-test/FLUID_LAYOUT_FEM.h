@@ -36,7 +36,8 @@ struct FLUID_LAYOUT_FEM
     std::unique_ptr<TRIANGULATED_AREA<T> > area;
     ARRAY<BLOCK_DATA> blocks;
     ARRAY<ELEMENT_DATA> elem_data;
-    HASHTABLE<PAIR<int,int>,BC_DATA> bc; // edge -> bc
+    ARRAY<BC_DATA> bc;
+    HASHTABLE<int,int> bc_map; // particle index -> bc index
 
     FLUID_LAYOUT_FEM();
     ~FLUID_LAYOUT_FEM();

@@ -144,9 +144,9 @@ Weld_Arc(int p0,int p1,const ARRAY<int>& side,const TV& c,T unit_length)
 template<class TV> void FLUID_LAYOUT_FEM<TV>::
 Mark_BC(const ARRAY<int>& pindices,BC_TYPE bc_type)
 {
-    for(int i=1;i<pindices.m;i++){
-        bc.Set({pindices(i),pindices(i-1)},{bc_type});
-        bc.Set({pindices(i-1),pindices(i)},{bc_type});}
+    int bc_index=bc.Append({bc_type});
+    for(int i=0;i<pindices.m;i++)
+        bc_map.Set(pindices(i),bc_index);
 }
 //#####################################################################
 // Function Pipe_Joint_Connection
@@ -229,11 +229,10 @@ Dump_Mesh() const
         for(int j=0;j<3;j++){
             VECTOR<T,3> color=white;
             int v0=area->mesh.elements(i)(j),v1=area->mesh.elements(i)((j+1)%3);
-            if(const BC_DATA* bc_data=bc.Get_Pointer({v0,v1})){
-                if(bc_data->bc_type==dirichlet_v)
-                    color=dirichlet_bc;
-                else if(bc_data->bc_type==traction)
-                    color=traction_bc;}
+            if(const int* bc0=bc_map.Get_Pointer(v0)){
+                const int* bc1=bc_map.Get_Pointer(v1);
+                if(bc1 && *bc1==*bc0)
+                    color=bc(*bc0).bc_type==dirichlet_v?dirichlet_bc:traction_bc;}
             Add_Debug_Object<TV,2>(VECTOR<TV,2>(particles.X(v0),particles.X(v1)),color);}
     }
 }
