@@ -25,6 +25,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include <chrono>
 #include "CACHED_ELIMINATION_MATRIX.h"
 #include "FLAT_SYSTEM.h"
 #include "FLUID_LAYOUT.h"
@@ -68,6 +69,7 @@ void Run(PARSE_ARGS& parse_args)
 
     T mu=1;
     T dx=.1;
+    std::chrono::steady_clock::time_point t0 = std::chrono::steady_clock::now();
 
     int threads=1;
     bool quiet=false;
@@ -102,7 +104,9 @@ void Run(PARSE_ARGS& parse_args)
     ARRAY<T> rhs_vector,sol_vector;
     Compute_Full_Matrix(grid,coded_entries,code_values,rhs_vector,fl,mu);
     for(auto e:coded_entries) MH.data.Append({e.x,e.y,code_values(e.z)});
+    std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
     if(!quiet) Solve_And_Display_Solution(grid,fl,MH,rhs_vector,&sol_vector);
+    std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
     LOG::printf("total dofs: %i\n",rhs_vector.m);
     LOG::printf("blocks: %i\n",fl.blocks.m);
     
@@ -117,11 +121,14 @@ void Run(PARSE_ARGS& parse_args)
 
     elim_mat.Fill_Orig_Rows();
 
+    std::chrono::steady_clock::time_point t3 = std::chrono::steady_clock::now();
     elim_mat.Reduce_Rows_By_Frequency(0,fl.num_vertex_blocks,fl.blocks.m);
     elim_mat.Reduce_Rows_By_Frequency(fl.num_vertex_blocks,fl.blocks.m,3);
     elim_mat.Full_Reordered_Elimination();
     elim_mat.Back_Solve();
+    std::chrono::steady_clock::time_point t4 = std::chrono::steady_clock::now();
     elim_mat.Execute_Jobs(threads);
+    std::chrono::steady_clock::time_point t5 = std::chrono::steady_clock::now();
 
     ARRAY<T> elim_sol;
     elim_mat.Pack_Vector(fl.dof_map,elim_sol,elim_mat.rhs);
@@ -134,6 +141,20 @@ void Run(PARSE_ARGS& parse_args)
             if(uf.type!=fluid) continue;
             face_velocity(it.Full_Index())=elim_mat.vector_list(elim_mat.rhs(uf.block_id))(uf.block_dof);}
         Flush_Frame(face_velocity,"elim solve");}
+    std::chrono::steady_clock::time_point t6 = std::chrono::steady_clock::now();
+
+    printf("grid setup    %5.0f ms\n",
+        std::chrono::duration_cast<std::chrono::duration<double> >(t1-t0).count()*1000);
+    printf("minres solve  %5.0f ms\n",
+        std::chrono::duration_cast<std::chrono::duration<double> >(t2-t1).count()*1000);
+    printf("setup blocks  %5.0f ms\n",
+        std::chrono::duration_cast<std::chrono::duration<double> >(t3-t2).count()*1000);
+    printf("elimination   %5.0f ms\n",
+        std::chrono::duration_cast<std::chrono::duration<double> >(t4-t3).count()*1000);
+    printf("execute jobs  %5.0f ms\n",
+        std::chrono::duration_cast<std::chrono::duration<double> >(t5-t4).count()*1000);
+    printf("finish        %5.0f ms\n",
+        std::chrono::duration_cast<std::chrono::duration<double> >(t6-t5).count()*1000);
 }
 
 int main(int argc, char* argv[])
