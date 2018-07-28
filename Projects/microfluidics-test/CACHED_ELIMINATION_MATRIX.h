@@ -7,6 +7,7 @@
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Vectors/VECTOR.h>
+#include <mutex>
 
 namespace PhysBAM{
 
@@ -58,6 +59,8 @@ struct CACHED_ELIMINATION_MATRIX
     int num_orig_blocks;
     int num_orig_vectors;
     ARRAY<VECTOR<int,2> > dep_list;
+    std::mutex mtx;
+    ARRAY<int> data_refs[2];
 
     template<class F>
     void Foreach_Single_User_Pair(F f)
