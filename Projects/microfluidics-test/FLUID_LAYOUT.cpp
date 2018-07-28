@@ -82,8 +82,8 @@ Compute(const PARSE_DATA<TV>& pd)
         Allocate_Cross_Section_Blocks_Cells(i.box,0);
     }
     num_vertex_blocks=blocks.m;
-    Dump_Blocks();
-    Flush_Frame<TV>("vertex cells");
+    if(!quiet) Dump_Blocks();
+    if(!quiet) Flush_Frame<TV>("vertex cells");
     for(auto& i:pd.pipes)
     {
         int dir=pd.Pipe_Dir(i);
@@ -91,15 +91,15 @@ Compute(const PARSE_DATA<TV>& pd)
         Allocate_Cross_Section_Blocks_Cells(box,dir);
         Allocate_Cross_Section_Blocks_Faces(box,dir);
     }
-    Dump_Blocks();
-    Flush_Frame<TV>("pipes");
+    if(!quiet) Dump_Blocks();
+    if(!quiet) Flush_Frame<TV>("pipes");
 
     for(auto& i:pd.pts)
     {
         Allocate_Cross_Section_Blocks_Faces(i.box,0);
     }
-    Dump_Blocks();
-    Flush_Frame<TV>("vertex faces");
+    if(!quiet) Dump_Blocks();
+    if(!quiet) Flush_Frame<TV>("vertex faces");
 
     for(FACE_RANGE_ITERATOR<TV::m> it(used_faces.domain_indices);it.Valid();it.Next())
     {

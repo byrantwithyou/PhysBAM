@@ -88,6 +88,7 @@ void Run(PARSE_ARGS& parse_args)
     if(!quiet) Flush_Frame<TV>("init");
 
     FLUID_LAYOUT<TV> fl(grid);
+    fl.quiet=quiet;
     
     fl.Compute(pd);
     if(!quiet){

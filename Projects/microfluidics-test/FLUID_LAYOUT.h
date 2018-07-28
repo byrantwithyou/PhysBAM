@@ -39,6 +39,7 @@ struct FLUID_LAYOUT
     ARRAY<BLOCK> blocks;
     ARRAY<VECTOR<int,2> > dof_map;
     int num_vertex_blocks;
+    bool quiet;
     
     FLUID_LAYOUT(const GRID<TV>& grid): grid(grid) {}
     
