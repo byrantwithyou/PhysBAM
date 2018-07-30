@@ -3,10 +3,12 @@ h 0.5
 v A -7.3 9.5
 v B 0 10
 v C -3.2 -9.7
-v D 8 -10
+v D 4 -20
+v E 10 -20
 p A B
 p B C
 p C D
+p D E
 s A
-t D
-
+t E
+j D corner

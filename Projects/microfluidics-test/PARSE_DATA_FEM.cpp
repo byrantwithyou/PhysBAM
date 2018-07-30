@@ -67,17 +67,17 @@ Parse_Input(const std::string& pipe_file)
                     pts(pts_index[name1]).bc_type=traction;
                 }
                 break;
+            case 'j':
+                {
+                    ss>>name1>>name2;
+                    int i=pts_index[name1];
+                    if(name2=="corner")
+                        pts(i).joint_type=corner_joint;
+                }
+                break;
             default:
                 LOG::printf("PARSE FAIL: %c %s\n",c,ss.str());
         }
-    }
-
-    for(auto& i:joints)
-    {
-        if(i.data.m==1)
-            pts(i.key).joint_type=end_vertex;
-        else if(i.data.m==2 && pts(i.key).joint_type==default_joint)
-            pts(i.key).joint_type=arc_joint;
     }
 }
 template struct PARSE_DATA_FEM<VECTOR<double,2> >;

@@ -46,11 +46,13 @@ struct FLUID_LAYOUT_FEM
     void Generate_End(int i,int pipe,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
     void Generate_Joint(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
     void Generate_Arc(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
+    void Generate_Corner(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
     void Generate_Pipe(int pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con);
     void Dump_Mesh() const;
     void Dump_Layout() const;
     void Dump_Input(const PARSE_DATA_FEM<TV>& pd) const;
 
+    ARRAY<int> March_Corner(int p0,int p1,const ARRAY<int>& side,T unit_length);
     ARRAY<int> March_Arc(int p0,int p1,const ARRAY<int>& side,const TV& c,T unit_length);
     void Mark_BC(const ARRAY<int>& pindices,BC_TYPE bc_type);
     // return (center, normalized start vec, normalied end vec)

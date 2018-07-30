@@ -9,7 +9,7 @@
 
 namespace PhysBAM{
 enum BC_TYPE {nobc,dirichlet_v,traction};
-enum JOINT_TYPE {default_joint,end_vertex,arc_joint};
+enum JOINT_TYPE {default_joint,corner_joint};
 
 template<class TV>
 struct PARSE_DATA_FEM

@@ -53,8 +53,9 @@ void Run_FEM(PARSE_ARGS& parse_args)
     pd.Parse_Input(pipe_file);
 
     FLUID_LAYOUT_FEM<TV> fl;
-    fl.Compute(pd);
+    fl.Dump_Input(pd);
     Flush_Frame<TV>("init");
+    fl.Compute(pd);
     fl.Dump_Mesh();
     Flush_Frame<TV>("meshing");
     fl.Dump_Layout();
