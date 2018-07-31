@@ -30,24 +30,40 @@
 #include "FLAT_SYSTEM.h"
 #include "FLUID_LAYOUT.h"
 #include "FLUID_LAYOUT_FEM.h"
+#include "FEM_MESHING_TESTS.h"
 
 using namespace PhysBAM;
 
 typedef float RW;
 typedef double T;
 
+void Run_Meshing_Tests()
+{
+    typedef VECTOR<T,2> TV;
+    Test_Degree2_Joint<TV>(default_joint);
+    Test_Degree2_Joint<TV>(corner_joint);
+}
+
 void Run_FEM(PARSE_ARGS& parse_args)
 {
     typedef VECTOR<T,2> TV;
     typedef VECTOR<int,TV::m> TV_INT;
     T mu=1;
-
     std::string pipe_file;
+    bool run_tests=false;
     parse_args.Add("-mu",&mu,"mu","viscosity");
-    parse_args.Extra(&pipe_file,"file","file describing pipes");
+    parse_args.Add("-tests",&run_tests,"run FEM tests");
+    parse_args.Parse(true);
+    if(!run_tests)
+        parse_args.Extra(&pipe_file,"file","file describing pipes");
     parse_args.Parse();
+
     GRID<TV> grid;
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE(0.f),grid,"output");
+
+    if(run_tests){
+        Run_Meshing_Tests();
+        return;}
 
     PARSE_DATA_FEM<TV> pd;
     pd.Parse_Input(pipe_file);
