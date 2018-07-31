@@ -17,7 +17,14 @@ struct FLUID_LAYOUT_FEM
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef HASHTABLE<PAIR<int,int>,ARRAY<int> > CONNECTION; // (vert index,pipe index) -> particle indices
+
+    struct CONNECTION_DATA
+    {
+        int pid;
+        bool collapsed;
+    };
+    // (vert index,pipe index) -> connection data
+    typedef HASHTABLE<PAIR<int,int>,ARRAY<CONNECTION_DATA> > CONNECTION;
 
     struct ELEMENT_DATA
     {
@@ -52,9 +59,9 @@ struct FLUID_LAYOUT_FEM
     void Dump_Layout() const;
     void Dump_Input(const PARSE_DATA_FEM<TV>& pd) const;
 
-    ARRAY<int> March_Corner(int p0,int p1,const ARRAY<int>& side,T unit_length);
-    ARRAY<int> March_Arc(int p0,int p1,const ARRAY<int>& side,const TV& c,T unit_length);
-    void Mark_BC(const ARRAY<int>& pindices,BC_TYPE bc_type);
+    ARRAY<int> March_Corner(const TV& start_point,int p1,const ARRAY<int>& side,T unit_length);
+    ARRAY<int> March_Arc(int p0,const TV& end_point,const ARRAY<int>& side,const TV& c,T unit_length);
+    void Mark_BC(const ARRAY<CONNECTION_DATA>& pindices,BC_TYPE bc_type);
     // return (center, normalized start vec, normalied end vec)
     VECTOR<TV,3> Arc(const TV& joint,const TV& p0,const TV& p1,int half_width,T unit_length) const;
 };

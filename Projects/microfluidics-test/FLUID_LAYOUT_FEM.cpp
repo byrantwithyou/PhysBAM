@@ -35,9 +35,9 @@ Generate_Pipe(int pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con)
     typedef VECTOR<int,3> E;
     GEOMETRY_PARTICLES<TV>& particles=area->particles;
     int base=particles.number;
-    const ARRAY<int>* f0=con.Get_Pointer({pd.pipes(pipe).x,pipe}),*f1=con.Get_Pointer({pd.pipes(pipe).y,pipe});
+    const ARRAY<CONNECTION_DATA>* f0=con.Get_Pointer({pd.pipes(pipe).x,pipe}),*f1=con.Get_Pointer({pd.pipes(pipe).y,pipe});
     PHYSBAM_ASSERT(f0 && f1);
-    TV v0=particles.X((*f0)(pd.half_width)),v1=particles.X((*f1)(pd.half_width));
+    TV v0=particles.X((*f0)(pd.half_width).pid),v1=particles.X((*f1)(pd.half_width).pid);
     TV d=v1-v0;
     T l=d.Normalize();
     TV t(-d.y,d.x);
@@ -46,7 +46,7 @@ Generate_Pipe(int pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con)
     T min_percent=0.5;
     bool irregular_last=false;
     T rem=l-(height-1)*pd.unit_length;
-    if(rem>1e-2*pd.unit_length){
+    if(rem>0){
         irregular_last=true;
         if(rem>min_percent*pd.unit_length)
             height++;}
@@ -54,9 +54,15 @@ Generate_Pipe(int pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con)
         particles.Add_Elements(width*(height-2));
     auto pid=[base,width,height,&pd,f0,f1](int i,int j)
     {
-        if(i==0) return (*f0)(pd.half_width+j);
-        else if(i==height-1) return (*f1)(pd.half_width+j);
+        if(i==0) return (*f0)(pd.half_width+j).pid;
+        else if(i==height-1) return (*f1)(pd.half_width+j).pid;
         else return base+(i-1)*width+j+pd.half_width;
+    };
+    auto is_collapsed=[&pd,height,f0,f1](int i,int j)
+    {
+        if(i==0) return (*f0)(pd.half_width+j).collapsed;
+        else if(i==height-1) return (*f1)(pd.half_width+j).collapsed;
+        else return false;
     };
     TV next=pd.unit_length*d;;
     bool regular=true;
@@ -65,26 +71,30 @@ Generate_Pipe(int pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con)
             if(i!=height-1)
                 particles.X(pid(i,j))=v0+next+j*pd.unit_length*t;
             if(j!=pd.half_width){
+                regular=regular && !is_collapsed(i,j) && !is_collapsed(i-1,j+1) && !is_collapsed(i-1,j);
                 area->mesh.elements.Append(E(pid(i,j),pid(i-1,j+1),pid(i-1,j)));
                 elem_data.Append({blocks.m});}
             if(j!=-pd.half_width){
+                regular=regular && !is_collapsed(i,j) && !is_collapsed(i-1,j) && !is_collapsed(i,j-1);
                 area->mesh.elements.Append(E(pid(i,j),pid(i-1,j),pid(i,j-1)));
                 elem_data.Append({blocks.m});}}
         if(i!=0) blocks.Append({regular});
         if(i==height-2){
             if(irregular_last) regular=false;
             next=l*d;}
-        else next=(i+1)*pd.unit_length*d;}
+        else {
+            regular=true;
+            next=(i+1)*pd.unit_length*d;}}
 }
 //#####################################################################
 // Function Mark_BC
 //#####################################################################
 template<class TV> void FLUID_LAYOUT_FEM<TV>::
-Mark_BC(const ARRAY<int>& pindices,BC_TYPE bc_type)
+Mark_BC(const ARRAY<CONNECTION_DATA>& pindices,BC_TYPE bc_type)
 {
     int bc_index=bc.Append({bc_type});
     for(int i=0;i<pindices.m;i++)
-        bc_map.Set(pindices(i),bc_index);
+        bc_map.Set(pindices(i).pid,bc_index);
 }
 //#####################################################################
 // Function Generate_End
@@ -99,10 +109,10 @@ Generate_End(int i,int pipe,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
     TV u=TV(-v.y,v.x).Normalized();
     GEOMETRY_PARTICLES<TV>& particles=area->particles;
     int base=particles.Add_Elements(2*pd.half_width+1);
-    ARRAY<int>& indices=con.Get_Or_Insert({i,pipe});
+    ARRAY<CONNECTION_DATA>& indices=con.Get_Or_Insert({i,pipe});
     for(int k=-pd.half_width;k<=pd.half_width;k++){
         int pid=base+k+pd.half_width;
-        indices.Append(pid);
+        indices.Append({pid,false});
         particles.X(pid)=p+k*pd.unit_length*u;}
     if(pd.pipes(pipe).x!=i) indices.Reverse();
     if(pd.pts(i).bc_type!=nobc) Mark_BC(indices,pd.pts(i).bc_type);
@@ -122,44 +132,49 @@ Arc(const TV& joint,const TV& p0,const TV& p1,int half_width,T unit_length) cons
 // Function March_Arc
 //#####################################################################
 template<class TV> ARRAY<int> FLUID_LAYOUT_FEM<TV>::
-March_Arc(int p0,int p1,const ARRAY<int>& side,const TV& c,T unit_length)
+March_Arc(int p0,const TV& end_point,const ARRAY<int>& side,const TV& c,T unit_length)
 {
     typedef VECTOR<int,3> E;
     GEOMETRY_PARTICLES<TV>& particles=area->particles;
     T polyline_arc_ratio=0.999;
-    TV v0=particles.X(p0)-c,v1=particles.X(p1)-c;
+    TV v0=particles.X(p0)-c,v1=end_point-c;
     TV v=v0.Normalized();
     T r=v0.Magnitude();
     T unit_rad=unit_length/polyline_arc_ratio/r;
     T total_rad=acos(v1.Normalized().Dot(v));
     int height=(int)(total_rad/unit_rad)+1;
-    T min_percent=0.5;
+    T min_percent=0.3;
     T rem=total_rad-(height-1)*unit_rad;
-    if(rem>min_percent*unit_rad || height==1)
+    bool collapse_last=true;
+    T rem_segment_len=sin(rem/2)*r*2;
+    if(rem_segment_len>0){
         height++;
-    int base=particles.Add_Elements(height-2);
+        if(rem_segment_len>min_percent*unit_length)
+            collapse_last=false;}
 
-    ARRAY<int> new_side;
-    new_side.Append(p0);
+    ARRAY<TV> points;
     for(int k=1;k<height-1;k++){
-        int pid=base+k-1;
         T rad=-k*unit_rad;
         TV g=TV(cos(rad)*v0(0)-sin(rad)*v0(1),sin(rad)*v0(0)+cos(rad)*v0(1));
-        particles.X(pid)=c+g;
+        points.Append(c+g);}
+    if(!collapse_last) points.Append(end_point);
+
+    int base=particles.Add_Elements(points.m);
+    ARRAY<int> new_side;
+    new_side.Append(p0);
+    for(int i=0;i<points.m;i++){
+        int pid=base+i;
+        particles.X(pid)=points(i);
         new_side.Append(pid);}
-    new_side.Append(p1);
-    auto next=[v1,p1,c,height,&particles,base](int i,TV& g)
+    int p1=new_side.Last();
+
+    auto next=[c,p1,&particles,base](int i,TV& g)
     {
-        if(i==height-2){
-            g=v1.Normalized();
-            return p1;}
-        else{
-            g=(particles.X(base+i)-c).Normalized();
-            return base+i;}
+        g=(particles.X(base+i)-c).Normalized();
+        return base+i;
     };
 
-    TV u;
-    int p=p0,j=0,i=1,pnext=next(0,u);
+    int p=p0,j=0,i=0;
     int alt=0;
     auto order=[v,&particles,side,c](const TV& a, int si)
     {
@@ -168,10 +183,12 @@ March_Arc(int p0,int p1,const ARRAY<int>& side,const TV& c,T unit_length)
         else return d;
     };
     while(p!=p1){
+        TV u;
+        int pnext=next(i,u);
         if(j==side.m-1 || order(u,j+1)<0 || (order(u,j+1)==0 && alt==0)){
             area->mesh.elements.Append(E(pnext,p,side(j)));
             p=pnext;
-            pnext=next(i++,u);
+            i++;
             alt=1;}
         else{
             area->mesh.elements.Append(E(side(j+1),p,side(j)));
@@ -204,20 +221,21 @@ Generate_Arc(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
     VECTOR<TV,3> arc=Arc(joint,pd.pts(j0).pt,pd.pts(j1).pt,pd.half_width,pd.unit_length);
     int center_pid=particles.Add_Element();
     particles.X(center_pid)=arc(0);
-    ARRAY<int> f0,f1;
-    f0.Append(center_pid);
-    f1.Append(center_pid);
+    ARRAY<CONNECTION_DATA> f0,f1;
+    f0.Append({center_pid,false});
+    f1.Append({center_pid,false});
     ARRAY<int> side;
     side.Append(center_pid);
     for(int j=0;j<2*pd.half_width;j++){
         int s0=particles.Add_Element();
-        f0.Append(s0);
+        f0.Append({s0,false});
         particles.X(s0)=arc(0)+arc(1)*pd.unit_length*(j+1);
-        int s1=particles.Add_Element();
-        f1.Append(s1);
-        particles.X(s1)=arc(0)+arc(2)*pd.unit_length*(j+1);
-        side=March_Arc(s0,s1,side,arc(0),pd.unit_length);
-        blocks.Append({false});}
+        TV end_point=arc(0)+arc(2)*pd.unit_length*(j+1);
+        int elem_num=area->mesh.elements.m;
+        side=March_Arc(s0,end_point,side,arc(0),pd.unit_length);
+        f1.Append({side.Last(),particles.X(side.Last())!=end_point});
+        if(area->mesh.elements.m>elem_num)
+            blocks.Append({false});}
     if(pd.pipes(p0).x==i) f0.Reverse();
     if(pd.pipes(p1).x!=i) f1.Reverse();
     con.Set({i,p0},f0);
@@ -227,35 +245,50 @@ Generate_Arc(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
 // Function March_Corner
 //#####################################################################
 template<class TV> ARRAY<int> FLUID_LAYOUT_FEM<TV>::
-March_Corner(int p0,int p1,const ARRAY<int>& side,T unit_length)
+March_Corner(const TV& start_point,int p1,const ARRAY<int>& side,T unit_length)
 {
     typedef VECTOR<int,3> E;
     GEOMETRY_PARTICLES<TV>& particles=area->particles;
-    TV d=particles.X(p1)-particles.X(p0);
+    TV d=particles.X(p1)-start_point;
     T l=d.Normalize();
     int height=(int)(l/unit_length)+1;
-    T min_percent=0.5;
+    T min_percent=0.3;
+    T min_edge_ratio=0.3;
+    T edge=(particles.X(side.Last())-particles.X(p1)).Magnitude();
     T rem=l-(height-1)*unit_length;
-    if(rem>min_percent*unit_length || height==1)
+    bool collapse_last=true;
+    if(rem>0){
         height++;
-    int base=particles.Add_Elements(height-2);
+        if(rem>min_percent*unit_length && rem/edge>min_edge_ratio)
+            collapse_last=false;}
 
+    ARRAY<TV> points;
+    for(int k=height-2;k>=0;k--){
+        if(k==height-2 && collapse_last) continue;
+        points.Append(start_point+k*unit_length*d);}
+    points.Reverse();
+
+    int base=particles.Add_Elements(points.m);
     ARRAY<int> new_side;
-    new_side.Append(p0);
-    for(int k=1;k<height-1;k++){
-        int pid=base+k-1;
-        particles.X(pid)=particles.X(p0)+k*unit_length*d;
+    for(int i=0;i<points.m;i++){
+        int pid=base+i;
+        particles.X(pid)=points(i);
         new_side.Append(pid);}
     new_side.Append(p1);
 
-    auto next=[height,p1,base](int i){if(i==height-2) return p1;else return base+i;};
-    int p=p0,j=0,i=1,pnext=next(0);
+    auto next=[height,p1,base,collapse_last](int i)
+    {
+        int last=collapse_last?height-3:height-2;
+        if(i==last) return p1;else return base+i+1;
+    };
+    int p=new_side(0),j=0,i=0;
     while(p!=p1){
-        TV w=particles.X(pnext)-particles.X(p0);
+        int pnext=next(i);
+        TV w=particles.X(pnext)-start_point;
         if(j==side.m-1 || w.Dot(d)<=(particles.X(side(j+1))-particles.X(side(0))).Dot(d)){
             area->mesh.elements.Append(E(pnext,p,side(j)));
             p=pnext;
-            pnext=next(i++);}
+            i++;}
         else{
             area->mesh.elements.Append(E(side(j+1),p,side(j)));
             j++;}
@@ -286,28 +319,29 @@ Generate_Corner(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
     VECTOR<TV,3> arc=Arc(joint,pd.pts(j0).pt,pd.pts(j1).pt,pd.half_width,pd.unit_length);
     int center_pid=particles.Add_Element();
     particles.X(center_pid)=arc(0);
-    ARRAY<int> f0,f1;
-    f0.Append(center_pid);
-    f1.Append(center_pid);
+    ARRAY<CONNECTION_DATA> f0,f1;
+    f0.Append({center_pid,false});
+    f1.Append({center_pid,false});
     ARRAY<int> side0,side1;
     side0.Append(center_pid);
     side1.Append(center_pid);
     TV m=(joint-arc(0))/pd.half_width;
     for(int j=0;j<2*pd.half_width;j++){
-        int s0=particles.Add_Element();
-        f0.Append(s0);
-        particles.X(s0)=arc(0)+arc(1)*pd.unit_length*(j+1);
+        TV mp=arc(0)+m*(j+1);
+        TV start_point=arc(0)+arc(1)*pd.unit_length*(j+1);
         int s1=particles.Add_Element();
-        particles.X(s1)=arc(0)+m*(j+1);
-        side0=March_Corner(s0,s1,side0,pd.unit_length);
+        particles.X(s1)=mp;
+        int elem_num=area->mesh.elements.m;
+        side0=March_Corner(start_point,s1,side0,pd.unit_length);
+        f0.Append({side0(0),particles.X(side0(0))==start_point});
 
-        s0=particles.Add_Element();
-        f1.Append(s0);
-        particles.X(s0)=arc(0)+arc(2)*pd.unit_length*(j+1);
+        start_point=arc(0)+arc(2)*pd.unit_length*(j+1);
         s1=particles.Add_Element();
-        particles.X(s1)=arc(0)+m*(j+1);
-        side1=March_Corner(s0,s1,side1,pd.unit_length);
-        blocks.Append({false});}
+        particles.X(s1)=mp;
+        side1=March_Corner(start_point,s1,side1,pd.unit_length);
+        f1.Append({side1(0),particles.X(side1(0))==start_point});
+        if(area->mesh.elements.m>elem_num)
+            blocks.Append({false});}
     if(pd.pipes(p0).x==i) f0.Reverse();
     if(pd.pipes(p1).x!=i) f1.Reverse();
     con.Set({i,p0},f0);

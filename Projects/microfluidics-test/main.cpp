@@ -40,8 +40,8 @@ typedef double T;
 void Run_Meshing_Tests()
 {
     typedef VECTOR<T,2> TV;
-    Test_Degree2_Joint<TV>(default_joint);
-    Test_Degree2_Joint<TV>(corner_joint);
+    Test_Degree2_Joint<TV>(default_joint,-pi+pi/20,pi-pi/20,pi/40);
+    Test_Degree2_Joint<TV>(corner_joint,-pi+pi/20,pi-pi/20,pi/40);
 }
 
 void Run_FEM(PARSE_ARGS& parse_args)

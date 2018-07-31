@@ -9,12 +9,11 @@
 namespace PhysBAM{
 
 template<typename TV>
-void Test_Degree2_Joint(JOINT_TYPE jt)
+void Test_Degree2_Joint(JOINT_TYPE jt,typename TV::SCALAR a0,typename TV::SCALAR a1,typename TV::SCALAR da)
 {
     typedef typename TV::SCALAR T;
 
-    T d=pi/10;
-    for(T rad=-pi+d;rad<pi-d;rad+=d){
+    for(T rad=a0;rad<a1;rad+=da){
         PARSE_DATA_FEM<TV> pd;
         pd.half_width=4;
         pd.unit_length=0.5;
@@ -36,5 +35,5 @@ void Test_Degree2_Joint(JOINT_TYPE jt)
         fl.Dump_Layout();
         Flush_Frame<TV>("blocks");}
 }
-template void Test_Degree2_Joint<VECTOR<double,2> >(JOINT_TYPE);
+template void Test_Degree2_Joint<VECTOR<double,2> >(JOINT_TYPE,double,double,double);
 }
