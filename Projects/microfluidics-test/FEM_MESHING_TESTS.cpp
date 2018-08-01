@@ -2,12 +2,15 @@
 // Copyright 2018.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include "FEM_MESHING_TESTS.h"
 #include "FLUID_LAYOUT_FEM.h"
 
 namespace PhysBAM{
-
+//#####################################################################
+// Function Test_Degree2_Joint
+//#####################################################################
 template<typename TV>
 void Test_Degree2_Joint(JOINT_TYPE jt,typename TV::SCALAR a0,typename TV::SCALAR a1,typename TV::SCALAR da)
 {
@@ -35,6 +38,9 @@ void Test_Degree2_Joint(JOINT_TYPE jt,typename TV::SCALAR a0,typename TV::SCALAR
         fl.Dump_Layout();
         Flush_Frame<TV>("blocks");}
 }
+//#####################################################################
+// Function Test_Degree2_Circle
+//#####################################################################
 template<typename TV>
 void Test_Degree2_Circle(JOINT_TYPE jt,typename TV::SCALAR h0,typename TV::SCALAR h1,typename TV::SCALAR dh)
 {
@@ -64,7 +70,36 @@ void Test_Degree2_Circle(JOINT_TYPE jt,typename TV::SCALAR h0,typename TV::SCALA
         fl.Dump_Layout();
         Flush_Frame<TV>("blocks");}
 }
+//#####################################################################
+// Function Test_Degree3_Joint
+//#####################################################################
+template<typename TV>
+void Test_Degree3_Joint(JOINT_TYPE jt,typename TV::SCALAR h,int n,int seed)
+{
+    typedef typename TV::SCALAR T;
+
+    RANDOM_NUMBERS<T> random(seed);
+    for(int i=0;i<n;i++){
+        PARSE_DATA_FEM<TV> pd;
+        pd.half_width=4;
+        pd.unit_length=h;
+        pd.pts.Append({TV(),nobc,jt});
+        for(int k=0;k<3;k++){
+            T a=random.Get_Uniform_Number(0,2*pi);
+            TV coord=TV(cos(a),sin(a))*5;
+            pd.pts.Append({coord,traction,jt});
+            pd.pipes.Append({0,k+1});
+            pd.joints.Set(k+1,{k});}
+        pd.joints.Set(0,{0,1,2});
+        FLUID_LAYOUT_FEM<TV> fl;
+        fl.Dump_Input(pd);
+        Flush_Frame<TV>("init");
+        fl.Compute(pd);
+        fl.Dump_Layout();
+        Flush_Frame<TV>("blocks");}
+}
 
 template void Test_Degree2_Joint<VECTOR<double,2> >(JOINT_TYPE,double,double,double);
 template void Test_Degree2_Circle<VECTOR<double,2> >(JOINT_TYPE,double,double,double);
+template void Test_Degree3_Joint<VECTOR<double,2> >(JOINT_TYPE,double,int,int);
 }

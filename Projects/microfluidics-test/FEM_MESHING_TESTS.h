@@ -13,6 +13,9 @@ void Test_Degree2_Joint(JOINT_TYPE jt,typename TV::SCALAR a0,typename TV::SCALAR
 
 template<typename TV>
 void Test_Degree2_Circle(JOINT_TYPE jt,typename TV::SCALAR h0,typename TV::SCALAR h1,typename TV::SCALAR dh);
+
+template<typename TV>
+void Test_Degree3_Joint(JOINT_TYPE jt,typename TV::SCALAR h,int n,int seed);
 }
 #endif
 

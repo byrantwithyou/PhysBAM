@@ -37,9 +37,11 @@ using namespace PhysBAM;
 typedef float RW;
 typedef double T;
 
-void Run_Meshing_Tests()
+void Run_Meshing_Tests(int seed)
 {
     typedef VECTOR<T,2> TV;
+    LOG::printf("seed: %d\n",seed);
+    Test_Degree3_Joint<TV>(default_joint,0.2,20,seed);
     Test_Degree2_Joint<TV>(default_joint,-pi+pi/20,pi-pi/20,pi/40);
     Test_Degree2_Joint<TV>(corner_joint,-pi+pi/20,pi-pi/20,pi/40);
     Test_Degree2_Circle<TV>(default_joint,0.2,0.9,0.1);
@@ -53,18 +55,20 @@ void Run_FEM(PARSE_ARGS& parse_args)
     T mu=1;
     std::string pipe_file;
     bool run_tests=false;
+    int seed=time(0);
     parse_args.Add("-mu",&mu,"mu","viscosity");
     parse_args.Add("-tests",&run_tests,"run FEM tests");
     parse_args.Parse(true);
     if(!run_tests)
         parse_args.Extra(&pipe_file,"file","file describing pipes");
+    else parse_args.Add("-seed",&seed,"seed","random seed");
     parse_args.Parse();
 
     GRID<TV> grid;
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE(0.f),grid,"output");
 
     if(run_tests){
-        Run_Meshing_Tests();
+        Run_Meshing_Tests(seed);
         return;}
 
     PARSE_DATA_FEM<TV> pd;
