@@ -147,10 +147,11 @@ March_Arc(int p0,const TV& end_point,const ARRAY<int>& side,const TV& c,T unit_l
     T rem=total_rad-(height-1)*unit_rad;
     bool collapse_last=true;
     T rem_segment_len=sin(rem/2)*r*2;
-    if(rem_segment_len>0){
+    if(rem_segment_len>1e-2*unit_length){
         height++;
         if(rem_segment_len>min_percent*unit_length)
             collapse_last=false;}
+    else collapse_last=false;
 
     ARRAY<TV> points;
     for(int k=1;k<height-1;k++){
@@ -257,10 +258,11 @@ March_Corner(const TV& start_point,int p1,const ARRAY<int>& side,T unit_length)
     T edge=(particles.X(side.Last())-particles.X(p1)).Magnitude();
     T rem=l-(height-1)*unit_length;
     bool collapse_last=true;
-    if(rem>0){
+    if(rem>1e-2*unit_length){
         height++;
         if(rem>min_percent*unit_length && rem/edge>min_edge_ratio)
             collapse_last=false;}
+    else collapse_last=false;
 
     ARRAY<TV> points;
     for(int k=height-2;k>=0;k--){
@@ -281,17 +283,25 @@ March_Corner(const TV& start_point,int p1,const ARRAY<int>& side,T unit_length)
         int last=collapse_last?height-3:height-2;
         if(i==last) return p1;else return base+i+1;
     };
-    int p=new_side(0),j=0,i=0;
+    auto order=[d,&particles,side](const TV& a,int si)
+    {
+        T l=a.Dot(d)-(particles.X(side(si))-particles.X(side(0))).Dot(d);
+        if(abs(l)<1e-6) return (T)0;
+        else return l;
+    };
+    int p=new_side(0),j=0,i=0,alt=0;
     while(p!=p1){
         int pnext=next(i);
         TV w=particles.X(pnext)-start_point;
-        if(j==side.m-1 || w.Dot(d)<=(particles.X(side(j+1))-particles.X(side(0))).Dot(d)){
+        if(j==side.m-1 || order(w,j+1)<0 || (order(w,j+1)==0 && alt==0)){
             area->mesh.elements.Append(E(pnext,p,side(j)));
             p=pnext;
-            i++;}
+            i++;
+            alt=1;}
         else{
             area->mesh.elements.Append(E(side(j+1),p,side(j)));
-            j++;}
+            j++;
+            alt=0;}
         elem_data.Append({blocks.m});}
     if(j==side.m-2){
         area->mesh.elements.Append(E(side(j+1),p,side(j)));
