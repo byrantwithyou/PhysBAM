@@ -42,6 +42,8 @@ void Run_Meshing_Tests()
     typedef VECTOR<T,2> TV;
     Test_Degree2_Joint<TV>(default_joint,-pi+pi/20,pi-pi/20,pi/40);
     Test_Degree2_Joint<TV>(corner_joint,-pi+pi/20,pi-pi/20,pi/40);
+    Test_Degree2_Circle<TV>(default_joint,0.2,0.9,0.1);
+    Test_Degree2_Circle<TV>(corner_joint,0.2,0.9,0.1);
 }
 
 void Run_FEM(PARSE_ARGS& parse_args)

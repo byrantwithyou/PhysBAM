@@ -10,6 +10,9 @@ namespace PhysBAM{
 
 template<typename TV>
 void Test_Degree2_Joint(JOINT_TYPE jt,typename TV::SCALAR a0,typename TV::SCALAR a1,typename TV::SCALAR da);
+
+template<typename TV>
+void Test_Degree2_Circle(JOINT_TYPE jt,typename TV::SCALAR h0,typename TV::SCALAR h1,typename TV::SCALAR dh);
 }
 #endif
 
