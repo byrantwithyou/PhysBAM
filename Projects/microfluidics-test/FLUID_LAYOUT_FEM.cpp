@@ -118,15 +118,20 @@ Generate_End(int i,int pipe,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
     if(pd.pts(i).bc_type!=nobc) Mark_BC(indices,pd.pts(i).bc_type);
 }
 //#####################################################################
-// Function Arc
+// Function Wedge
 //#####################################################################
 template<class TV> VECTOR<TV,3> FLUID_LAYOUT_FEM<TV>::
-Arc(const TV& joint,const TV& p0,const TV& p1,int half_width,T unit_length) const
+Wedge(const TV& joint,const TV& p0,const TV& p1,int half_width,T unit_length) const
 {
     TV e0=(p0-joint).Normalized(),e1=(p1-joint).Normalized();
     TV m=(e0+e1).Normalized();
-    T s=half_width*unit_length/abs(e0.Cross(m)(0));
-    return VECTOR<TV,3>(joint+s*m,(s*m.Dot(e0)*e0-s*m).Normalized(),(s*m.Dot(e1)*e1-s*m).Normalized());
+    T a=e0.Cross(m)(0);
+    if(abs(a)<1e-6){
+        TV v(-e0(1),e0(0));
+        return VECTOR<TV,3>(joint+unit_length*v,e0,e1);}
+    else{
+        T s=half_width*unit_length/a;
+        return VECTOR<TV,3>(joint+s*m,(s*m.Dot(e0)*e0-s*m).Normalized(),(s*m.Dot(e1)*e1-s*m).Normalized());}
 }
 //#####################################################################
 // Function March_Arc
@@ -219,7 +224,7 @@ Generate_Arc(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
     if((pd.pts(j0).pt-joint).Cross(pd.pts(j1).pt-joint)(0)<0){
         std::swap(p0,p1);
         std::swap(j0,j1);}
-    VECTOR<TV,3> arc=Arc(joint,pd.pts(j0).pt,pd.pts(j1).pt,pd.half_width,pd.unit_length);
+    VECTOR<TV,3> arc=Wedge(joint,pd.pts(j0).pt,pd.pts(j1).pt,pd.half_width,pd.unit_length);
     int center_pid=particles.Add_Element();
     particles.X(center_pid)=arc(0);
     ARRAY<CONNECTION_DATA> f0,f1;
@@ -326,7 +331,7 @@ Generate_Corner(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
     if((pd.pts(j0).pt-joint).Cross(pd.pts(j1).pt-joint)(0)<0){
         std::swap(p0,p1);
         std::swap(j0,j1);}
-    VECTOR<TV,3> arc=Arc(joint,pd.pts(j0).pt,pd.pts(j1).pt,pd.half_width,pd.unit_length);
+    VECTOR<TV,3> arc=Wedge(joint,pd.pts(j0).pt,pd.pts(j1).pt,pd.half_width,pd.unit_length);
     int center_pid=particles.Add_Element();
     particles.X(center_pid)=arc(0);
     ARRAY<CONNECTION_DATA> f0,f1;

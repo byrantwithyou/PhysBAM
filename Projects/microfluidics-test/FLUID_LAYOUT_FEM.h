@@ -63,7 +63,7 @@ struct FLUID_LAYOUT_FEM
     ARRAY<int> March_Arc(int p0,const TV& end_point,const ARRAY<int>& side,const TV& c,T unit_length);
     void Mark_BC(const ARRAY<CONNECTION_DATA>& pindices,BC_TYPE bc_type);
     // return (center, normalized start vec, normalied end vec)
-    VECTOR<TV,3> Arc(const TV& joint,const TV& p0,const TV& p1,int half_width,T unit_length) const;
+    VECTOR<TV,3> Wedge(const TV& joint,const TV& p0,const TV& p1,int half_width,T unit_length) const;
 };
 
 }
