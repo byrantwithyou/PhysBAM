@@ -55,6 +55,9 @@ struct FLUID_LAYOUT_FEM
     void Generate_Arc(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
     void Generate_Corner(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
     void Generate_Pipe(int pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con);
+    bool Generate_3_Joint(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
+    void Generate_Triangle_Junction(int i,const VECTOR<int,3>& ends,const VECTOR<int,3>& pipes,
+        const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
     void Dump_Mesh() const;
     void Dump_Layout() const;
     void Dump_Input(const PARSE_DATA_FEM<TV>& pd) const;

@@ -363,6 +363,112 @@ Generate_Corner(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
     con.Set({i,p1},f1);
 }
 //#####################################################################
+// Function Generate_Triangle_Junction
+//#####################################################################
+template<class TV> void FLUID_LAYOUT_FEM<TV>::
+Generate_Triangle_Junction(int i,const VECTOR<int,3>& ends,const VECTOR<int,3>& pipes,
+    const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
+{
+    typedef VECTOR<int,3> E;
+    GEOMETRY_PARTICLES<TV>& particles=area->particles;
+    TV c=pd.pts(i).pt;
+    VECTOR<TV,3> tri;
+    for(int j=0;j<3;j++){
+        int j1=(j+1)%3;
+        tri(j)=Wedge(c,pd.pts(ends(j)).pt,pd.pts(ends(j1)).pt,pd.half_width,pd.unit_length)(0);}
+    VECTOR<int,3> tri_ids;
+    int base=particles.Add_Elements(3);
+    for(int j=0;j<3;j++){
+        particles.X(base+j)=tri(j);
+        tri_ids(j)=base+j;}
+
+    ARRAY<int> tri_f[3];
+    for(int j=0;j<3;j++){
+        int j0=(j+2)%3;
+        TV pipe_dir=(pd.pts(ends(j)).pt-c).Normalized();
+        int start=tri_ids(j);
+        TV edge_dir=tri(j0)-tri(j);
+        TV proj_dir=edge_dir-edge_dir.Dot(pipe_dir)*pipe_dir;
+        if(proj_dir.Cross(edge_dir)(0)>0){
+            start=tri_ids(j0);
+            proj_dir=-proj_dir;
+            edge_dir=-edge_dir;}
+        int last=start==tri_ids(j0)?tri_ids(j):tri_ids(j0);
+
+        ARRAY<CONNECTION_DATA> f;
+        f.Append({start,false});
+        tri_f[j].Append(start);
+        ARRAY<int> side;
+        side.Append(start);
+        edge_dir/=(2*pd.half_width);
+        proj_dir.Normalize();
+        for(int k=0;k<2*pd.half_width;k++){
+            TV start_point=particles.X(start)+proj_dir*pd.unit_length*(k+1);
+            int s;
+            if(k!=2*pd.half_width-1){
+                s=particles.Add_Element();
+                particles.X(s)=particles.X(start)+edge_dir*(k+1);}
+            else s=last;
+            tri_f[j].Append(s);
+            int elem_num=area->mesh.elements.m;
+            side=March_Corner(start_point,s,side,pd.unit_length);
+            f.Append({side(0),particles.X(side(0))==start_point});
+            if(area->mesh.elements.m>elem_num)
+                blocks.Append({false});}
+        if((pd.pipes(pipes(j)).x==i && start==tri_ids(j)) ||
+            (pd.pipes(pipes(j)).x!=i && start==tri_ids(j0)))
+            f.Reverse();
+        if(start==j) tri_f[j].Reverse();
+        con.Set({i,pipes(j)},f);}
+
+    ARRAY<int> bottom=tri_f[2];
+    TV bottom_dir=particles.X(bottom(1))-particles.X(bottom(0));
+    for(int k=2*pd.half_width;k>0;k--){
+        int left_index=tri_f[1](k-1);
+        TV left=particles.X(left_index);
+        ARRAY<int> top;
+        top.Append(left_index);
+        int base=particles.number;
+        if(k>2)
+            base=particles.Add_Elements(k-2);
+        for(int l=0;l<k-2;++l){
+            particles.X(base+l)=left+bottom_dir*(l+1);
+            top.Append(base+l);}
+        int right_index=tri_f[0](2*pd.half_width-k+1);
+        if(right_index!=left_index)
+            top.Append(right_index);
+        for(int l=1;l<bottom.m;l++){
+            area->mesh.elements.Append(E(bottom(l-1),bottom(l),top(l-1)));
+            elem_data.Append({blocks.m});}
+        for(int l=1;l<top.m;l++){
+            area->mesh.elements.Append(E(top(l),top(l-1),bottom(l)));
+            elem_data.Append({blocks.m});}
+        bottom=top;
+        blocks.Append({false});}
+}
+//#####################################################################
+// Function Generate_3_Joint
+//#####################################################################
+template<class TV> bool FLUID_LAYOUT_FEM<TV>::
+Generate_3_Joint(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
+{
+    const ARRAY<int>* pipes=pd.joints.Get_Pointer(i);
+    PHYSBAM_ASSERT(pipes && pipes->m==3);
+    VECTOR<int,3> ends,ccw_pipes;
+    for(int j=0;j<3;j++){
+        ccw_pipes(j)=(*pipes)(j);
+        ends(j)=pd.pipes((*pipes)(j)).x;
+        if(ends(j)==i)
+            ends(j)=pd.pipes((*pipes)(j)).y;}
+    T signed_area=(pd.pts(ends(1)).pt-pd.pts(ends(0)).pt).Cross(pd.pts(ends(2)).pt-pd.pts(ends(1)).pt)(0);
+    if(signed_area<0){
+        std::swap(ccw_pipes(1),ccw_pipes(2));
+        std::swap(ends(1),ends(2));}
+
+    Generate_Triangle_Junction(i,ends,ccw_pipes,pd,con);
+    return true;
+}
+//#####################################################################
 // Function Generate_Joint
 //#####################################################################
 template<class TV> void FLUID_LAYOUT_FEM<TV>::
@@ -376,7 +482,9 @@ Generate_Joint(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
             return;}
         if(p->m==2){
             Generate_Arc(i,pd,con);
-            return;}}
+            return;}
+        if(p->m==3){
+            if(Generate_3_Joint(i,pd,con)) return;}}
     if(pd.pts(i).joint_type==corner_joint){
         Generate_Corner(i,pd,con);
         return;}
