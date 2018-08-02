@@ -418,7 +418,7 @@ Generate_Triangle_Junction(int i,const VECTOR<int,3>& ends,const VECTOR<int,3>& 
         if((pd.pipes(pipes(j)).x==i && start==tri_ids(j)) ||
             (pd.pipes(pipes(j)).x!=i && start==tri_ids(j0)))
             f.Reverse();
-        if(start==j) tri_f[j].Reverse();
+        if(start==tri_ids(j)) tri_f[j].Reverse();
         con.Set({i,pipes(j)},f);}
 
     ARRAY<int> bottom=tri_f[2];
