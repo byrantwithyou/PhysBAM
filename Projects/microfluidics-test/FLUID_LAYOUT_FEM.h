@@ -41,7 +41,7 @@ struct FLUID_LAYOUT_FEM
         BC_TYPE bc_type;
     };
 
-    std::unique_ptr<TRIANGULATED_AREA<T> > area;
+    TRIANGULATED_AREA<T>& area;
     ARRAY<BLOCK_DATA> blocks;
     ARRAY<ELEMENT_DATA> elem_data;
     ARRAY<BC_DATA> bc;

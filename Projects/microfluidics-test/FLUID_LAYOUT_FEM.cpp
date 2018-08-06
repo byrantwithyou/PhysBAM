@@ -16,7 +16,7 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class TV> FLUID_LAYOUT_FEM<TV>::
-FLUID_LAYOUT_FEM(): area(TRIANGULATED_AREA<T>::Create())
+FLUID_LAYOUT_FEM(): area(*new TRIANGULATED_AREA<T>)
 {
 }
 //#####################################################################
@@ -25,6 +25,7 @@ FLUID_LAYOUT_FEM(): area(TRIANGULATED_AREA<T>::Create())
 template<class TV> FLUID_LAYOUT_FEM<TV>::
 ~FLUID_LAYOUT_FEM()
 {
+    delete &area;
 }
 //#####################################################################
 // Function Generate_Pipe
@@ -33,7 +34,7 @@ template<class TV> void FLUID_LAYOUT_FEM<TV>::
 Generate_Pipe(int pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con)
 {
     typedef VECTOR<int,3> E;
-    GEOMETRY_PARTICLES<TV>& particles=area->particles;
+    GEOMETRY_PARTICLES<TV>& particles=area.particles;
     int base=particles.number;
     const ARRAY<CONNECTION_DATA>* f0=con.Get_Pointer({pd.pipes(pipe).x,pipe}),*f1=con.Get_Pointer({pd.pipes(pipe).y,pipe});
     PHYSBAM_ASSERT(f0 && f1);
@@ -72,11 +73,11 @@ Generate_Pipe(int pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con)
                 particles.X(pid(i,j))=v0+next+j*pd.unit_length*t;
             if(j!=pd.half_width){
                 regular=regular && !is_collapsed(i,j) && !is_collapsed(i-1,j+1) && !is_collapsed(i-1,j);
-                area->mesh.elements.Append(E(pid(i,j),pid(i-1,j+1),pid(i-1,j)));
+                area.mesh.elements.Append(E(pid(i,j),pid(i-1,j+1),pid(i-1,j)));
                 elem_data.Append({blocks.m});}
             if(j!=-pd.half_width){
                 regular=regular && !is_collapsed(i,j) && !is_collapsed(i-1,j) && !is_collapsed(i,j-1);
-                area->mesh.elements.Append(E(pid(i,j),pid(i-1,j),pid(i,j-1)));
+                area.mesh.elements.Append(E(pid(i,j),pid(i-1,j),pid(i,j-1)));
                 elem_data.Append({blocks.m});}}
         if(i!=0) blocks.Append({regular});
         if(i==height-2){
@@ -107,7 +108,7 @@ Generate_End(int i,int pipe,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
     TV p=pd.pts(i).pt;
     TV v=pd.pts(j).pt-pd.pts(i).pt;
     TV u=TV(-v.y,v.x).Normalized();
-    GEOMETRY_PARTICLES<TV>& particles=area->particles;
+    GEOMETRY_PARTICLES<TV>& particles=area.particles;
     int base=particles.Add_Elements(2*pd.half_width+1);
     ARRAY<CONNECTION_DATA>& indices=con.Get_Or_Insert({i,pipe});
     for(int k=-pd.half_width;k<=pd.half_width;k++){
@@ -140,7 +141,7 @@ template<class TV> ARRAY<int> FLUID_LAYOUT_FEM<TV>::
 March_Arc(int p0,const TV& end_point,const ARRAY<int>& side,const TV& c,T unit_length)
 {
     typedef VECTOR<int,3> E;
-    GEOMETRY_PARTICLES<TV>& particles=area->particles;
+    GEOMETRY_PARTICLES<TV>& particles=area.particles;
     T polyline_arc_ratio=0.999;
     TV v0=particles.X(p0)-c,v1=end_point-c;
     TV v=v0.Normalized();
@@ -192,17 +193,17 @@ March_Arc(int p0,const TV& end_point,const ARRAY<int>& side,const TV& c,T unit_l
         TV u;
         int pnext=next(i,u);
         if(j==side.m-1 || order(u,j+1)<0 || (order(u,j+1)==0 && alt==0)){
-            area->mesh.elements.Append(E(pnext,p,side(j)));
+            area.mesh.elements.Append(E(pnext,p,side(j)));
             p=pnext;
             i++;
             alt=1;}
         else{
-            area->mesh.elements.Append(E(side(j+1),p,side(j)));
+            area.mesh.elements.Append(E(side(j+1),p,side(j)));
             j++;
             alt=0;}
         elem_data.Append({blocks.m});}
     if(j==side.m-2){
-        area->mesh.elements.Append(E(side(j+1),p,side(j)));
+        area.mesh.elements.Append(E(side(j+1),p,side(j)));
         elem_data.Append({blocks.m});}
     return new_side;
 }
@@ -212,7 +213,7 @@ March_Arc(int p0,const TV& end_point,const ARRAY<int>& side,const TV& c,T unit_l
 template<class TV> void FLUID_LAYOUT_FEM<TV>::
 Generate_Arc(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
 {
-    GEOMETRY_PARTICLES<TV>& particles=area->particles;
+    GEOMETRY_PARTICLES<TV>& particles=area.particles;
     const ARRAY<int>* pipes=pd.joints.Get_Pointer(i);
     PHYSBAM_ASSERT(pipes);
     PHYSBAM_ASSERT(pipes->m==2);
@@ -237,10 +238,10 @@ Generate_Arc(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
         f0.Append({s0,false});
         particles.X(s0)=arc(0)+arc(1)*pd.unit_length*(j+1);
         TV end_point=arc(0)+arc(2)*pd.unit_length*(j+1);
-        int elem_num=area->mesh.elements.m;
+        int elem_num=area.mesh.elements.m;
         side=March_Arc(s0,end_point,side,arc(0),pd.unit_length);
         f1.Append({side.Last(),particles.X(side.Last())!=end_point});
-        if(area->mesh.elements.m>elem_num)
+        if(area.mesh.elements.m>elem_num)
             blocks.Append({false});}
     if(pd.pipes(p0).x==i) f0.Reverse();
     if(pd.pipes(p1).x!=i) f1.Reverse();
@@ -254,7 +255,7 @@ template<class TV> ARRAY<int> FLUID_LAYOUT_FEM<TV>::
 March_Corner(const TV& start_point,int p1,const ARRAY<int>& side,T unit_length)
 {
     typedef VECTOR<int,3> E;
-    GEOMETRY_PARTICLES<TV>& particles=area->particles;
+    GEOMETRY_PARTICLES<TV>& particles=area.particles;
     TV d=particles.X(p1)-start_point;
     T l=d.Normalize();
     int height=(int)(l/unit_length)+1;
@@ -299,17 +300,17 @@ March_Corner(const TV& start_point,int p1,const ARRAY<int>& side,T unit_length)
         int pnext=next(i);
         TV w=particles.X(pnext)-start_point;
         if(j==side.m-1 || order(w,j+1)<0 || (order(w,j+1)==0 && alt==0)){
-            area->mesh.elements.Append(E(pnext,p,side(j)));
+            area.mesh.elements.Append(E(pnext,p,side(j)));
             p=pnext;
             i++;
             alt=1;}
         else{
-            area->mesh.elements.Append(E(side(j+1),p,side(j)));
+            area.mesh.elements.Append(E(side(j+1),p,side(j)));
             j++;
             alt=0;}
         elem_data.Append({blocks.m});}
     if(j==side.m-2){
-        area->mesh.elements.Append(E(side(j+1),p,side(j)));
+        area.mesh.elements.Append(E(side(j+1),p,side(j)));
         elem_data.Append({blocks.m});}
     return new_side;
 }
@@ -319,7 +320,7 @@ March_Corner(const TV& start_point,int p1,const ARRAY<int>& side,T unit_length)
 template<class TV> void FLUID_LAYOUT_FEM<TV>::
 Generate_Corner(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
 {
-    GEOMETRY_PARTICLES<TV>& particles=area->particles;
+    GEOMETRY_PARTICLES<TV>& particles=area.particles;
     const ARRAY<int>* pipes=pd.joints.Get_Pointer(i);
     PHYSBAM_ASSERT(pipes);
     PHYSBAM_ASSERT(pipes->m==2);
@@ -346,7 +347,7 @@ Generate_Corner(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
         TV start_point=arc(0)+arc(1)*pd.unit_length*(j+1);
         int s1=particles.Add_Element();
         particles.X(s1)=mp;
-        int elem_num=area->mesh.elements.m;
+        int elem_num=area.mesh.elements.m;
         side0=March_Corner(start_point,s1,side0,pd.unit_length);
         f0.Append({side0(0),particles.X(side0(0))==start_point});
 
@@ -355,7 +356,7 @@ Generate_Corner(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
         particles.X(s1)=mp;
         side1=March_Corner(start_point,s1,side1,pd.unit_length);
         f1.Append({side1(0),particles.X(side1(0))==start_point});
-        if(area->mesh.elements.m>elem_num)
+        if(area.mesh.elements.m>elem_num)
             blocks.Append({false});}
     if(pd.pipes(p0).x==i) f0.Reverse();
     if(pd.pipes(p1).x!=i) f1.Reverse();
@@ -370,7 +371,7 @@ Generate_Triangle_Junction(int i,const VECTOR<int,3>& ends,const VECTOR<int,3>& 
     const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
 {
     typedef VECTOR<int,3> E;
-    GEOMETRY_PARTICLES<TV>& particles=area->particles;
+    GEOMETRY_PARTICLES<TV>& particles=area.particles;
     TV c=pd.pts(i).pt;
     VECTOR<TV,3> tri;
     for(int j=0;j<3;j++){
@@ -410,10 +411,10 @@ Generate_Triangle_Junction(int i,const VECTOR<int,3>& ends,const VECTOR<int,3>& 
                 particles.X(s)=particles.X(start)+edge_dir*(k+1);}
             else s=last;
             tri_f[j].Append(s);
-            int elem_num=area->mesh.elements.m;
+            int elem_num=area.mesh.elements.m;
             side=March_Corner(start_point,s,side,pd.unit_length);
             f.Append({side(0),particles.X(side(0))==start_point});
-            if(area->mesh.elements.m>elem_num)
+            if(area.mesh.elements.m>elem_num)
                 blocks.Append({false});}
         if((pd.pipes(pipes(j)).x==i && start==tri_ids(j)) ||
             (pd.pipes(pipes(j)).x!=i && start==tri_ids(j0)))
@@ -438,10 +439,10 @@ Generate_Triangle_Junction(int i,const VECTOR<int,3>& ends,const VECTOR<int,3>& 
         if(right_index!=left_index)
             top.Append(right_index);
         for(int l=1;l<bottom.m;l++){
-            area->mesh.elements.Append(E(bottom(l-1),bottom(l),top(l-1)));
+            area.mesh.elements.Append(E(bottom(l-1),bottom(l),top(l-1)));
             elem_data.Append({blocks.m});}
         for(int l=1;l<top.m;l++){
-            area->mesh.elements.Append(E(top(l),top(l-1),bottom(l)));
+            area.mesh.elements.Append(E(top(l),top(l-1),bottom(l)));
             elem_data.Append({blocks.m});}
         bottom=top;
         blocks.Append({false});}
@@ -509,15 +510,15 @@ Compute(const PARSE_DATA_FEM<TV>& pd)
 template<class TV> void FLUID_LAYOUT_FEM<TV>::
 Dump_Mesh() const
 {
-    const GEOMETRY_PARTICLES<TV>& particles=area->particles;
+    const GEOMETRY_PARTICLES<TV>& particles=area.particles;
     //for(int i=0;i<particles.number;i++)
     //    Add_Debug_Particle(particles.X(i),VECTOR<T,3>(1,1,1));
     VECTOR<T,3> white(1,1,1),dirichlet_bc(1,0,1),traction_bc(0,1,1);
-    for(int i=0;i<area->mesh.elements.m;i++){
-        //Add_Debug_Object(VECTOR<TV,3>(particles.X.Subset(area->mesh.elements(i))),VECTOR<T,3>(1,1,1));
+    for(int i=0;i<area.mesh.elements.m;i++){
+        //Add_Debug_Object(VECTOR<TV,3>(particles.X.Subset(area.mesh.elements(i))),VECTOR<T,3>(1,1,1));
         for(int j=0;j<3;j++){
             VECTOR<T,3> color=white;
-            int v0=area->mesh.elements(i)(j),v1=area->mesh.elements(i)((j+1)%3);
+            int v0=area.mesh.elements(i)(j),v1=area.mesh.elements(i)((j+1)%3);
             if(const int* bc0=bc_map.Get_Pointer(v0)){
                 const int* bc1=bc_map.Get_Pointer(v1);
                 if(bc1 && *bc1==*bc0)
@@ -531,12 +532,12 @@ Dump_Mesh() const
 template<class TV> void FLUID_LAYOUT_FEM<TV>::
 Dump_Layout() const
 {
-    const GEOMETRY_PARTICLES<TV>& particles=area->particles;
+    const GEOMETRY_PARTICLES<TV>& particles=area.particles;
     Dump_Mesh();
     VECTOR<T,3> reg(0,1,0),irreg(1,0,0);
-    for(int i=0;i<area->mesh.elements.m;i++){
+    for(int i=0;i<area.mesh.elements.m;i++){
         std::string s=LOG::sprintf("%i",elem_data(i).block_id);
-        Add_Debug_Text(particles.X.Subset(area->mesh.elements(i)).Average(),s,
+        Add_Debug_Text(particles.X.Subset(area.mesh.elements(i)).Average(),s,
             blocks(elem_data(i).block_id).regular?reg:irreg);}
 }
 //#####################################################################
