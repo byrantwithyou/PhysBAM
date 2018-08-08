@@ -52,24 +52,24 @@ struct FLUID_LAYOUT_FEM
     void Compute(const PARSE_DATA_FEM<TV>& pd);
     void Generate_End(int i,int pipe,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
     void Generate_Joint(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
-    void Generate_Arc(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
-    void Generate_Corner(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
-    void Generate_Pipe(int pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con);
-
+    void Generate_2_Joint(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con,JOINT_TYPE jt);
     void Generate_3_Joint(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
-    void Generate_Triangle_Junction(int i,const VECTOR<int,3>& ends,const VECTOR<int,3>& pipes,
-        const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
+    void Generate_Pipe(int pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con);
 
     void Dump_Mesh() const;
     void Dump_Layout() const;
     void Dump_Input(const PARSE_DATA_FEM<TV>& pd) const;
 
-    ARRAY<int> March_Corner(const TV& start_point,int p1,const ARRAY<int>& side,T unit_length);
-    ARRAY<int> Sample_Interpolated(T s,const ARRAY<int>& side0,const ARRAY<int>& side1,T unit_length);
-    void Merge_Interpolated(const ARRAY<int>& left,const ARRAY<int>& right);
     void Mark_BC(const ARRAY<CONNECTION_DATA>& pindices,BC_TYPE bc_type);
     // return (center, normalized start vec, normalied end vec)
     VECTOR<TV,3> Wedge(const TV& joint,const TV& p0,const TV& p1,int half_width,T unit_length) const;
+    ARRAY<int> Sample_Interpolated(T s,const ARRAY<int>& side0,const ARRAY<int>& side1,T unit_length);
+    void Merge_Interpolated(const ARRAY<int>& left,const ARRAY<int>& right);
+    PAIR<ARRAY<int>,ARRAY<int> > Arc(const TV& c,const TV& p0,const TV& p1,int half_width,T unit_length,
+        bool extend,const TV& dir0,const TV& dir1);
+    PAIR<ARRAY<int>,ARRAY<int> > Corner(const TV& c,const TV& joint,const TV& p0,const TV& p1,T unit_length,
+        bool extend,const TV& dir0,const TV& dir1);
+    void Weld(int n,const ARRAY<int>& side0,const ARRAY<int>& side1,T unit_length,ARRAY<int>& f0,ARRAY<int>& f1);
 };
 
 }
