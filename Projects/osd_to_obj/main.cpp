@@ -28,13 +28,13 @@ void Emit_OpenSubdiv_Surface(std::ostream& output,OPENSUBDIV_SURFACE<TV,3>& surf
 {
     output<<"g\n";
     for(int i=0;i<surf.m;i++)
-        output<<LOG::sprintf("f %d %d %d %d\n",surf.control_points(surf.mesh(i)(0))+1,surf.control_points(surf.mesh(i)(1))+1,surf.control_points(surf.mesh(i)(2))+1,surf.control_points(surf.mesh(i)(3))+1);
+        LOG::fprintf(output,"f %d %d %d %d\n",surf.control_points(surf.mesh(i)(0))+1,surf.control_points(surf.mesh(i)(1))+1,surf.control_points(surf.mesh(i)(2))+1,surf.control_points(surf.mesh(i)(3))+1);
 }
 
 void Emit_Deformable_Bodies(std::ostream& output,DEFORMABLE_BODY_COLLECTION<TV>& collection)
 {
     for(int p=0;p<collection.particles.Size();p++)
-        output<<LOG::sprintf("v %lg %lg %lg\n",collection.particles.X(p)[0],collection.particles.X(p)[1],collection.particles.X(p)[2]);
+        LOG::fprintf(output,"v %lg %lg %lg\n",collection.particles.X(p)[0],collection.particles.X(p)[1],collection.particles.X(p)[2]);
     
     for(int i=0;i<collection.structures.m;i++){
         if(OPENSUBDIV_SURFACE<TV,3>* surf=dynamic_cast<OPENSUBDIV_SURFACE<TV,3>*>(collection.structures(i)))

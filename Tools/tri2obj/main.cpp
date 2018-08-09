@@ -26,10 +26,10 @@ template<class T> void Convert(const std::string& input_filename,const std::stri
     (*output)<<header;
 
     for(int p=0;p<triangulated_surface->particles.Size();p++)
-        (*output)<<LOG::sprintf("v %lg %lg %lg\n",triangulated_surface->particles.X(p)[0],triangulated_surface->particles.X(p)[1],triangulated_surface->particles.X(p)[2]);
+        LOG::fprintf(*output,"v %g %g %g\n",triangulated_surface->particles.X(p)[0],triangulated_surface->particles.X(p)[1],triangulated_surface->particles.X(p)[2]);
 
     for(int e=0;e<triangulated_surface->mesh.elements.m;e++)
-        (*output)<<LOG::sprintf("f %d %d %d\n",triangulated_surface->mesh.elements(e)[0]+1,triangulated_surface->mesh.elements(e)[1]+1,triangulated_surface->mesh.elements(e)[2]+1);
+        LOG::fprintf(*output,"f %d %d %d\n",triangulated_surface->mesh.elements(e)[0]+1,triangulated_surface->mesh.elements(e)[1]+1,triangulated_surface->mesh.elements(e)[2]+1);
     delete output;
 }
 
@@ -48,7 +48,7 @@ int main(int argc,char *argv[])
     parse_args.Parse();
 
 
-    if(!File_Extension_Matches_Ignoring_Compression_Suffix(output_filename,"tri",false)){
+    if(!File_Extension_Matches_Ignoring_Compression_Suffix(input_filename,"tri",false)){
         std::cerr<<"Not a tri file: "<<input_filename<<std::endl;
         return -1;}
 

@@ -26,10 +26,10 @@ template<class T> void Convert(const std::string& input_filename,const std::stri
     (*output)<<header;
 
     for(int p=0;p<tetrahedralized_volume->particles.Size();p++)
-        (*output)<<LOG::sprintf("v %lg %lg %lg\n",tetrahedralized_volume->particles.X(p)[0],tetrahedralized_volume->particles.X(p)[1],tetrahedralized_volume->particles.X(p)[2]);
+        LOG::fprintf(*output,"v %lg %lg %lg\n",tetrahedralized_volume->particles.X(p)[0],tetrahedralized_volume->particles.X(p)[1],tetrahedralized_volume->particles.X(p)[2]);
 
     for(int e=0;e<tetrahedralized_volume->mesh.elements.m;e++)
-        (*output)<<LOG::sprintf("f %d %d %d %d\n",tetrahedralized_volume->mesh.elements(e)[0],tetrahedralized_volume->mesh.elements(e)[1],tetrahedralized_volume->mesh.elements(e)[2],tetrahedralized_volume->mesh.elements(e)[3]);
+        LOG::fprintf(*output,"f %d %d %d %d\n",tetrahedralized_volume->mesh.elements(e)[0],tetrahedralized_volume->mesh.elements(e)[1],tetrahedralized_volume->mesh.elements(e)[2],tetrahedralized_volume->mesh.elements(e)[3]);
     delete output;
 }
 

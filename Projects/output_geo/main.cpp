@@ -66,7 +66,7 @@ void Emit_Deformable_Bodies(std::ostream& output,DEFORMABLE_BODY_COLLECTION<TV>&
     output<<"\"pointref\",[\n";
     output<<"\"indices\",[\n";
     for(int p=0;p<collection.particles.Size();p++)
-        output<<LOG::sprintf("%d,",p);
+        LOG::fprintf(output,"%d,",p);
     output<<"]]],";
     output<<"\"attributes\",[\n";
     output<<"\"pointattributes\",[\n";
@@ -85,7 +85,7 @@ void Emit_Deformable_Bodies(std::ostream& output,DEFORMABLE_BODY_COLLECTION<TV>&
     output<<"\"tuples\",["<<std::endl;
 
     for(int p=0;p<collection.particles.Size();p++)
-        output<<LOG::sprintf("[%lg,%lg,%lg,1],\n",collection.particles.X(p)[0],collection.particles.X(p)[1],collection.particles.X(p)[2]);
+        LOG::fprintf(output,"[%lg,%lg,%lg,1],\n",collection.particles.X(p)[0],collection.particles.X(p)[1],collection.particles.X(p)[2]);
 
     output<<"] ] ] ] ] ],"<<std::endl;
     output<<"\"primitives\","<<std::endl;
