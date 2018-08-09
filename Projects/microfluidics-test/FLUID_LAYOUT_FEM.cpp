@@ -604,6 +604,16 @@ Compute(const PARSE_DATA_FEM<TV>& pd)
         Generate_Joint(i,pd,con);}
     for(int i=0;i<pd.pipes.m;i++){
         Generate_Pipe(i,pd,con);}
+    area.mesh.Set_Number_Nodes(area.particles.number);
+}
+//#####################################################################
+// Function Print_Statistics
+//#####################################################################
+template<class TV> void FLUID_LAYOUT_FEM<TV>::
+Print_Statistics() const
+{
+    area.mesh.Initialize_Adjacent_Elements();
+    LOG::printf("orientation consistent: %d\n",area.mesh.Orientations_Consistent());
 }
 //#####################################################################
 // Function Dump_Mesh

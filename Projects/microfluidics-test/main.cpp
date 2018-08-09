@@ -81,6 +81,7 @@ void Run_FEM(PARSE_ARGS& parse_args)
     fl.Dump_Input(pd);
     Flush_Frame<TV>("init");
     fl.Compute(pd);
+    fl.Print_Statistics();
     fl.Dump_Mesh();
     Flush_Frame<TV>("meshing");
     fl.Dump_Layout();

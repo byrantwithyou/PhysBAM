@@ -50,6 +50,7 @@ struct FLUID_LAYOUT_FEM
     FLUID_LAYOUT_FEM();
     ~FLUID_LAYOUT_FEM();
     void Compute(const PARSE_DATA_FEM<TV>& pd);
+    void Print_Statistics() const;
     void Generate_End(int i,int pipe,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
     void Generate_Joint(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
     void Generate_2_Joint(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con,JOINT_TYPE jt);
