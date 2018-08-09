@@ -54,6 +54,12 @@ struct FLUID_LAYOUT_FEM
     void Generate_Joint(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
     void Generate_2_Joint(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con,JOINT_TYPE jt);
     void Generate_3_Joint(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
+    void Generate_3_Joint_SmallMin(int i,const VECTOR<int,3>& ends,const VECTOR<int,3>& pipes,
+        const VECTOR<T,3>& angles,const VECTOR<VECTOR<TV,3>,3>& tri,
+        const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
+    void Generate_3_Joint_LargeMin(int i,const VECTOR<int,3>& ends,const VECTOR<int,3>& pipes,
+        const VECTOR<T,3>& angles,const VECTOR<VECTOR<TV,3>,3>& tri,
+        const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
     void Generate_Pipe(int pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con);
 
     void Dump_Mesh() const;
@@ -65,6 +71,7 @@ struct FLUID_LAYOUT_FEM
     VECTOR<TV,3> Wedge(const TV& joint,const TV& p0,const TV& p1,int half_width,T unit_length) const;
     ARRAY<int> Sample_Interpolated(T s,const ARRAY<int>& side0,const ARRAY<int>& side1,T unit_length);
     void Merge_Interpolated(const ARRAY<int>& left,const ARRAY<int>& right);
+    ARRAY<int> Polyline(const ARRAY<TV>& points,T unit_length);
     PAIR<ARRAY<int>,ARRAY<int> > Arc(const TV& c,const TV& p0,const TV& p1,int half_width,T unit_length,
         bool extend,const TV& dir0,const TV& dir1);
     PAIR<ARRAY<int>,ARRAY<int> > Corner(const TV& c,const TV& joint,const TV& p0,const TV& p1,T unit_length,
