@@ -912,6 +912,7 @@ Print_Statistics(std::ostream& output,const T thickness_over_2)
     output<<"max aspect ratio = "<<Maximum_Aspect_Ratio(&index);output<<" ("<<index<<")"<<std::endl;
     output<<"ave aspect ratio = "<<Average_Aspect_Ratio()<<std::endl;
     if(Check_For_Self_Intersection(thickness_over_2)) output<<"found self intersections"<<std::endl;else output<<"no self intersections"<<std::endl;
+    output<<"orientations consistent = "<<(mesh.Orientations_Consistent()?"true":"false")<<std::endl;
 }
 //#####################################################################
 // Function Compute_Holes
