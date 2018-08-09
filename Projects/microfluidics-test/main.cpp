@@ -56,8 +56,10 @@ void Run_FEM(PARSE_ARGS& parse_args)
     std::string pipe_file;
     bool run_tests=false;
     int seed=time(0);
+    std::string output_dir="output";
     parse_args.Add("-mu",&mu,"mu","viscosity");
     parse_args.Add("-tests",&run_tests,"run FEM tests");
+    parse_args.Add("-o",&output_dir,"dir","output dir");
     parse_args.Parse(true);
     if(!run_tests)
         parse_args.Extra(&pipe_file,"file","file describing pipes");
@@ -65,7 +67,8 @@ void Run_FEM(PARSE_ARGS& parse_args)
     parse_args.Parse();
 
     GRID<TV> grid;
-    VIEWER_OUTPUT<TV> vo(STREAM_TYPE(0.f),grid,"output");
+    VIEWER_OUTPUT<TV> vo(STREAM_TYPE(0.f),grid,output_dir);
+    Create_Directory(output_dir+"/common");
 
     if(run_tests){
         Run_Meshing_Tests(seed);
@@ -82,6 +85,8 @@ void Run_FEM(PARSE_ARGS& parse_args)
     Flush_Frame<TV>("meshing");
     fl.Dump_Layout();
     Flush_Frame<TV>("blocks");
+
+    LOG::Instance()->Copy_Log_To_File(output_dir+"/common/log.txt",false);
 }
 
 template<int d>
@@ -189,12 +194,13 @@ int main(int argc, char* argv[])
     parse_args.Add("-3d",&use_3d,"use 3D");
     parse_args.Add("-fem",&use_fem,"use FEM");
     parse_args.Parse(true);
-
+    LOG::Initialize_Logging(false,false,1<<30,true);
     if(use_3d) Run<3>(parse_args);
     else{
         if(use_fem) Run_FEM(parse_args);
         else Run<2>(parse_args);}
 
+    LOG::Finish_Logging();
     return 0;
 }
 
