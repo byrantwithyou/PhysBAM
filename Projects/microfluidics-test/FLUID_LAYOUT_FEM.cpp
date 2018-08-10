@@ -254,15 +254,15 @@ Polyline(const ARRAY<TV>& points,T unit_length)
 //#####################################################################
 template<class TV> PAIR<ARRAY<int>,ARRAY<int> > FLUID_LAYOUT_FEM<TV>::
 Arc(const TV& c,const TV& p0,const TV& p1,int half_width,T unit_length,
-    bool extend,const TV& dir0,const TV& dir1)
+    const TV& dir0,T n0,const TV& dir1,T n1)
 {
     GEOMETRY_PARTICLES<TV>& particles=area.particles;
     ARRAY<int> side0,side1;
     int base;
-    if(extend){
+    if(n0){
         base=particles.Add_Elements(2);
-        particles.X(base)=c+dir0*unit_length*0.5;
-        particles.X(base+1)=p0+dir0*unit_length*0.5;
+        particles.X(base)=c+dir0*unit_length*n0;
+        particles.X(base+1)=p0+dir0*unit_length*n0;
         side0.Append(base);
         side1.Append(base+1);}
     base=particles.Add_Element();
@@ -280,10 +280,10 @@ Arc(const TV& c,const TV& p0,const TV& p1,int half_width,T unit_length,
     base=particles.Add_Element();
     particles.X(base)=p1;
     side1.Append(base);
-    if(extend){
+    if(n1){
         base=particles.Add_Elements(2);
-        particles.X(base)=c+dir1*unit_length*0.5;
-        particles.X(base+1)=p1+dir1*unit_length*0.5;
+        particles.X(base)=c+dir1*unit_length*n1;
+        particles.X(base+1)=p1+dir1*unit_length*n1;
         side0.Append(base);
         side1.Append(base+1);}
     return {side0,side1};
@@ -293,15 +293,15 @@ Arc(const TV& c,const TV& p0,const TV& p1,int half_width,T unit_length,
 //#####################################################################
 template<class TV> PAIR<ARRAY<int>,ARRAY<int> > FLUID_LAYOUT_FEM<TV>::
 Corner(const TV& c,const TV& elbow,const TV& p0,const TV& p1,T unit_length,
-    bool extend,const TV& dir0,const TV& dir1)
+    const TV& dir0,T n0,const TV& dir1,T n1)
 {
     GEOMETRY_PARTICLES<TV>& particles=area.particles;
     ARRAY<int> side0,side1;
     int base;
-    if(extend){
+    if(n0){
         base=particles.Add_Elements(2);
-        particles.X(base)=c+dir0*unit_length*0.5;
-        particles.X(base+1)=p0+dir0*unit_length*0.5;
+        particles.X(base)=c+dir0*unit_length*n0;
+        particles.X(base+1)=p0+dir0*unit_length*n0;
         side0.Append(base);
         side1.Append(base+1);}
     base=particles.Add_Element();
@@ -324,10 +324,10 @@ Corner(const TV& c,const TV& elbow,const TV& p0,const TV& p1,T unit_length,
     base=particles.Add_Element();
     particles.X(base)=end;
     side1.Append(base);
-    if(extend){
+    if(n1){
         base=particles.Add_Elements(2);
-        particles.X(base)=c+dir1*unit_length*0.5;
-        particles.X(base+1)=p1+dir1*unit_length*0.5;
+        particles.X(base)=c+dir1*unit_length*n1;
+        particles.X(base+1)=p1+dir1*unit_length*n1;
         side0.Append(base);
         side1.Append(base+1);}
     return {side0,side1};
@@ -380,10 +380,10 @@ Generate_2_Joint(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con,JOINT_TYPE j
     PAIR<ARRAY<int>,ARRAY<int> > sides;
     if(jt==corner_joint)
         sides=Corner(w(0),w(0)+2*(joint-w(0)),w(0)+w(1)*edge,w(0)+w(2)*edge,pd.unit_length,
-            true,pipe_dir[0],pipe_dir[1]);
+            pipe_dir[0],0.5,pipe_dir[1],0.5);
     else
         sides=Arc(w(0),w(0)+w(1)*edge,w(0)+w(2)*edge,pd.half_width,pd.unit_length,
-            true,pipe_dir[0],pipe_dir[1]);
+            pipe_dir[0],0.5,pipe_dir[1],0.5);
     ARRAY<int> g0,g1;
     Weld(2*pd.half_width,sides.x,sides.y,pd.unit_length,g0,g1);
 
@@ -416,39 +416,35 @@ Generate_3_Joint_SmallMin(int i,const VECTOR<int,3>& ends,const VECTOR<int,3>& p
             min_angle_idx=j;}}
 
     int end0=(min_angle_idx+1)%3,end1=(min_angle_idx+2)%3,end2=min_angle_idx;
-    int merging_end=end0;
-    T edge=2*pd.half_width*pd.unit_length;
-    VECTOR<TV,3> w=tri(min_angle_idx);
-    ARRAY<TV> merging_points={w(0)+w(2)*edge,w(0),w(0)+w(1)*edge};
-    bool reverse[3];
-    reverse[end0]=pd.pipes(pipes(end0)).x==i;
-    reverse[end1]=pd.pipes(pipes(end1)).x!=i;
-    reverse[end2]=pd.pipes(pipes(end2)).x==i;
-    ARRAY<int> f[3];
+    int merging_end[2]={end1,end0};
     if(angles(end0)>angles(end1)){
         end2=end0;
         end0=end1;
         end1=min_angle_idx;
-        merging_end=end1;
-        merging_points.Reverse();
-        reverse[end0]=pd.pipes(pipes(end0)).x==i;
-        reverse[end1]=pd.pipes(pipes(end1)).x!=i;
-        reverse[end2]=pd.pipes(pipes(end2)).x!=i;}
+        merging_end[true]=end1;
+        merging_end[false]=end0;}
+    bool reverse[3];
+    reverse[end2]=pd.pipes(pipes(end2)).x!=i;
+    reverse[merging_end[true]]=pd.pipes(pipes(merging_end[true])).x!=i;
+    reverse[merging_end[false]]=pd.pipes(pipes(merging_end[false])).x==i;
+    T edge=2*pd.half_width*pd.unit_length;
+    VECTOR<TV,3> w=tri(min_angle_idx);
+    ARRAY<TV> merging_points={w(0)+w(1)*edge,w(0),w(0)+w(2)*edge};
 
-    TV v=(tri(min_angle_idx)(0)-c).Normalized();
     TV u=tri(end0)(0)-c;
+    TV v=(tri(min_angle_idx)(0)-c).Normalized();
     TV q=c+(v.Dot(u)*2*v-u);
-    v=end0!=merging_end?(pd.pts(ends(end0)).pt-c).Normalized():(pd.pts(ends(end1)).pt-c).Normalized();
-    u=tri(end0)(0)-c;
+    v=(pd.pts(ends(merging_end[false])).pt-c).Normalized();
     TV p=c+(v.Dot(u)*2*v-u);
-    if(merging_end==end1) std::swap(q,p);
 
-    PAIR<ARRAY<int>,ARRAY<int> > sides=Corner(tri(end0)(0),tri((merging_end+1)%3)(0),q,p,pd.unit_length,
-        true,end0==merging_end?TV():pipe_dir[end0],end1==merging_end?TV():pipe_dir[end1]);
-    Weld(2*pd.half_width,sides.x,sides.y,pd.unit_length,f[end0],f[end1]);
+    TV elbow=tri((merging_end[true]+1)%3)(0);
+    PAIR<ARRAY<int>,ARRAY<int> > sides=Corner(tri(end0)(0),elbow,p,q,pd.unit_length,
+        pipe_dir[merging_end[false]],0.5,TV(),0);
+    if(merging_end[true]==end0) std::swap(sides.x,sides.y);
+    ARRAY<int> f[3],left;
+    Weld(2*pd.half_width,sides.x,sides.y,pd.unit_length,f[merging_end[false]],left);
 
-    ARRAY<int> merging_side1,merging_side0=f[merging_end];
-    ARRAY<int> g[2];
+    ARRAY<int> merging_side,g[2];
     for(int k=1;k<3;k++){
         v=merging_points(k)-merging_points(k-1);
         T h=v.Normalize()/(2*pd.half_width);
@@ -456,18 +452,18 @@ Generate_3_Joint_SmallMin(int i,const VECTOR<int,3>& ends,const VECTOR<int,3>& p
             int base=particles.Add_Element();
             particles.X(base)=merging_points(k-1)+v*j*pd.unit_length;
             g[k-1].Append(base);
-            merging_side1.Append(base);}}
+            merging_side.Append(base);}}
     g[0].Append(g[1](0));
     int base=particles.Add_Element();
     particles.X(base)=merging_points(2);
     g[1].Append(base);
-    merging_side1.Append(base);
-    f[merging_end]=g[0];
-    f[end2]=g[1];
+    merging_side.Append(base);
+    f[(merging_end[false]+1)%3]=g[0];
+    f[(merging_end[false]+2)%3]=g[1];
 
-    int res=(particles.X(merging_side1(0))-particles.X(merging_side0(0))).Magnitude()/pd.unit_length;
+    int res=(particles.X(merging_side(0))-particles.X(left(0))).Magnitude()/pd.unit_length;
     ARRAY<int> dummy;
-    Weld(res+1,merging_side0,merging_side1,pd.unit_length,dummy,dummy);
+    Weld(res+1,merging_side,left,pd.unit_length,dummy,dummy);
 
     if(reverse[end0]) f[end0].Reverse();
     if(reverse[end1]) f[end1].Reverse();
@@ -517,23 +513,23 @@ Generate_3_Joint_LargeMin(int i,const VECTOR<int,3>& ends,const VECTOR<int,3>& p
     if(proj>=0) r[0]+=pipe_dir[end2]*proj;
     else r[1]-=pipe_dir[end2]*proj;
 
-    ARRAY<int> side0=Polyline({p[1],r[0]},pd.unit_length);
-    ARRAY<int> side1=Polyline({q[1],r[1]},pd.unit_length);
+    ARRAY<int> side0=Polyline({r[0],p[1]},pd.unit_length);
+    ARRAY<int> side1=Polyline({r[1],q[1]},pd.unit_length);
     ARRAY<int> f0,f1;
     Weld(2*pd.half_width,side0,side1,pd.unit_length,f0,f1);
 
     ARRAY<int> bottom=Polyline({p[0],tri(end0)(0),q[0]},pd.unit_length);
     ARRAY<int> g0,g1;
-    Weld(2*pd.half_width,bottom,f0,pd.unit_length,g0,g1);
+    Weld(2*pd.half_width,bottom,f1,pd.unit_length,g0,g1);
 
     if(pd.pipes(pipes(end0)).x==i) g0.Reverse();
     if(pd.pipes(pipes(end1)).x!=i) g1.Reverse();
-    if(pd.pipes(pipes(end2)).x==i) f1.Reverse();
+    if(pd.pipes(pipes(end2)).x==i) f0.Reverse();
     ARRAY<CONNECTION_DATA> tmp[3];
     for(int j=0;j<2*pd.half_width+1;j++){
         tmp[end0].Append({g0(j),false});
         tmp[end1].Append({g1(j),false});
-        tmp[end2].Append({f1(j),false});}
+        tmp[end2].Append({f0(j),false});}
     con.Set({i,pipes(end0)},tmp[end0]);
     con.Set({i,pipes(end1)},tmp[end1]);
     con.Set({i,pipes(end2)},tmp[end2]);
@@ -627,6 +623,9 @@ Dump_Mesh() const
     VECTOR<T,3> default_edge(0.5,0.5,0.5),dirichlet_bc(1,0,1),traction_bc(0,1,1);
     for(int i=0;i<area.mesh.elements.m;i++){
         //Add_Debug_Object(VECTOR<TV,3>(particles.X.Subset(area.mesh.elements(i))),VECTOR<T,3>(1,1,1));
+        //VECTOR<TV,3> tri(particles.X.Subset(area.mesh.elements(i)));
+        //T a=(tri(2)-tri(1)).Cross(tri(0)-tri(1))(0);
+        //Add_Debug_Object(tri,a<0?VECTOR<T,3>(0,1,1):default_edge);
         for(int j=0;j<3;j++){
             VECTOR<T,3> color=default_edge;
             int v0=area.mesh.elements(i)(j),v1=area.mesh.elements(i)((j+1)%3);

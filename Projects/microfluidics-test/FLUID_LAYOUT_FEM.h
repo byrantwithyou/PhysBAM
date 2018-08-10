@@ -74,9 +74,9 @@ struct FLUID_LAYOUT_FEM
     void Merge_Interpolated(const ARRAY<int>& left,const ARRAY<int>& right);
     ARRAY<int> Polyline(const ARRAY<TV>& points,T unit_length);
     PAIR<ARRAY<int>,ARRAY<int> > Arc(const TV& c,const TV& p0,const TV& p1,int half_width,T unit_length,
-        bool extend,const TV& dir0,const TV& dir1);
+        const TV& dir0,T n0,const TV& dir1,T n1);
     PAIR<ARRAY<int>,ARRAY<int> > Corner(const TV& c,const TV& joint,const TV& p0,const TV& p1,T unit_length,
-        bool extend,const TV& dir0,const TV& dir1);
+        const TV& dir0,T n0,const TV& dir1,T n1);
     void Weld(int n,const ARRAY<int>& side0,const ARRAY<int>& side1,T unit_length,ARRAY<int>& f0,ARRAY<int>& f1);
 };
 

@@ -35,6 +35,7 @@ void Test_Degree2_Joint(JOINT_TYPE jt,typename TV::SCALAR a0,typename TV::SCALAR
         fl.Dump_Input(pd);
         Flush_Frame<TV>("init");
         fl.Compute(pd);
+        fl.Print_Statistics();
         fl.Dump_Layout();
         Flush_Frame<TV>("blocks");}
 }
@@ -67,6 +68,7 @@ void Test_Degree2_Circle(JOINT_TYPE jt,typename TV::SCALAR h0,typename TV::SCALA
         fl.Dump_Input(pd);
         Flush_Frame<TV>("init");
         fl.Compute(pd);
+        fl.Print_Statistics();
         fl.Dump_Layout();
         Flush_Frame<TV>("blocks");}
 }
@@ -95,6 +97,7 @@ void Test_Degree3_Joint(JOINT_TYPE jt,typename TV::SCALAR h,int n,int seed)
         fl.Dump_Input(pd);
         Flush_Frame<TV>("init");
         fl.Compute(pd);
+        fl.Print_Statistics();
         fl.Dump_Layout();
         Flush_Frame<TV>("blocks");}
 }
