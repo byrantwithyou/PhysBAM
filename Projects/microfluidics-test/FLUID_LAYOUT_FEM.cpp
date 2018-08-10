@@ -7,6 +7,7 @@
 #include <Core/Vectors/VECTOR.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
+#include <Geometry/Spatial_Acceleration/PARTICLE_HIERARCHY.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <list>
 #include <map>
@@ -610,6 +611,22 @@ Print_Statistics() const
 {
     area.mesh.Initialize_Adjacent_Elements();
     LOG::printf("orientation consistent: %d\n",area.mesh.Orientations_Consistent());
+
+    const GEOMETRY_PARTICLES<TV>& particles=area.particles;
+    PARTICLE_HIERARCHY<TV> ph(particles.X);
+    PAIR<int,int> pair(area.mesh.elements(0)(0),area.mesh.elements(0)(1));
+    T min_dist=(particles.X(pair.x)-particles.X(pair.y)).Magnitude();
+    for(int j=0;j<particles.number;j++){
+        ARRAY<int> q;
+        ph.Intersection_List(particles.X(j),q,min_dist);
+        for(int i=0;i<q.m;i++){
+            if(q(i)==j) continue;
+            T d=(particles.X(q(i))-particles.X(j)).Magnitude();
+            if(d<min_dist){
+                pair.x=j;
+                pair.y=q(i);
+                min_dist=d;}}}
+    LOG::printf("min dist: %f\n",min_dist);
 }
 //#####################################################################
 // Function Dump_Mesh
