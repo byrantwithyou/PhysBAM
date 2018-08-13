@@ -86,6 +86,10 @@ void Run_FEM(PARSE_ARGS& parse_args)
     Flush_Frame<TV>("meshing");
     fl.Dump_Layout();
     Flush_Frame<TV>("blocks");
+    fl.Dump_Node_Blocks();
+    Flush_Frame<TV>("nodes");
+    fl.Dump_Edge_Blocks();
+    Flush_Frame<TV>("edges");
 
     LOG::Instance()->Copy_Log_To_File(output_dir+"/common/log.txt",false);
 }

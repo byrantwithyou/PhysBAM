@@ -47,6 +47,10 @@ struct FLUID_LAYOUT_FEM
     ARRAY<BC_DATA> bc;
     HASHTABLE<int,int> bc_map; // particle index -> bc index
 
+    HASHTABLE<VECTOR<int,2>,int> edge_blocks; // unordered (particle index, particle index) -> block
+    ARRAY_VIEW<bool> node_blocks_assigned; // FIXME: I want each new element of node_blocks is initialized with -1 rather than T().
+    ARRAY_VIEW<int> node_blocks;
+
     FLUID_LAYOUT_FEM();
     ~FLUID_LAYOUT_FEM();
     void Compute(const PARSE_DATA_FEM<TV>& pd);
@@ -66,6 +70,8 @@ struct FLUID_LAYOUT_FEM
     void Dump_Mesh() const;
     void Dump_Layout() const;
     void Dump_Input(const PARSE_DATA_FEM<TV>& pd) const;
+    void Dump_Edge_Blocks() const;
+    void Dump_Node_Blocks() const;
 
     void Mark_BC(const ARRAY<CONNECTION_DATA>& pindices,BC_TYPE bc_type);
     // return (center, normalized start vec, normalied end vec)

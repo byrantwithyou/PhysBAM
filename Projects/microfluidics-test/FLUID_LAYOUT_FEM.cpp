@@ -67,19 +67,42 @@ Generate_Pipe(int pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con)
         else if(i==height-1) return (*f1)(pd.half_width+j).collapsed;
         else return false;
     };
+    auto assign_edge=[this](int n0,int n1,int bid,bool overwrite)
+    {
+        if(n0>n1) std::swap(n0,n1);
+        int* b=edge_blocks.Get_Pointer({n0,n1});
+        if(b && overwrite) *b=bid;
+        else edge_blocks.Set({n0,n1},bid);
+    };
+    auto assign_node=[this](int n,int bid,bool overwrite)
+    {
+        if(node_blocks_assigned(n)==false || overwrite){
+            node_blocks(n)=bid;
+            node_blocks_assigned(n)=true;}
+    };
     TV next=pd.unit_length*d;;
     bool regular=true;
     for(int i=1;i<height;i++){
+        int num_left_node=pd.half_width+1,num_right_node=pd.half_width+1;
+        int num_left_edge=pd.half_width,num_right_edge=pd.half_width;
         for(int j=-pd.half_width;j<=pd.half_width;j++){
             if(i!=height-1)
                 particles.X(pid(i,j))=v0+next+j*pd.unit_length*t;
+            assign_node(pid(i-1,j),blocks.m,num_left_node--<=0);
+            assign_node(pid(i,j),blocks.m,num_right_node-->0);
             if(j!=pd.half_width){
                 regular=regular && !is_collapsed(i,j) && !is_collapsed(i-1,j+1) && !is_collapsed(i-1,j);
                 area.mesh.elements.Append(E(pid(i,j),pid(i-1,j+1),pid(i-1,j)));
+                assign_edge(pid(i-1,j),pid(i,j),blocks.m,false);
+                assign_edge(pid(i-1,j+1),pid(i,j),blocks.m,false);
+                assign_edge(pid(i-1,j+1),pid(i-1,j),blocks.m,num_left_edge--<=0);
                 elem_data.Append({blocks.m});}
             if(j!=-pd.half_width){
                 regular=regular && !is_collapsed(i,j) && !is_collapsed(i-1,j) && !is_collapsed(i,j-1);
                 area.mesh.elements.Append(E(pid(i,j),pid(i-1,j),pid(i,j-1)));
+                assign_edge(pid(i-1,j),pid(i,j),blocks.m,false);
+                assign_edge(pid(i-1,j),pid(i,j-1),blocks.m,false);
+                assign_edge(pid(i,j),pid(i,j-1),blocks.m,num_right_edge-->0);
                 elem_data.Append({blocks.m});}}
         if(i!=0) blocks.Append({regular});
         if(i==height-2){
@@ -214,17 +237,41 @@ Merge_Interpolated(const ARRAY<int>& left,const ARRAY<int>& right)
         return acos(u.Dot(v));
     };
     ARRAY<E> elems;
+    auto assign_edge=[this](int n0,int n1,int bid,bool overwrite)
+    {
+        if(n0>n1) std::swap(n0,n1);
+        int* b=edge_blocks.Get_Pointer({n0,n1});
+        if(b && overwrite) *b=bid;
+        else edge_blocks.Set({n0,n1},bid);
+    };
+    auto assign_node=[this](int n,int bid,bool overwrite)
+    {
+        if(node_blocks_assigned(n)==false || overwrite){
+            node_blocks(n)=bid;
+            node_blocks_assigned(n)=true;}
+    };
+    int num_left_edge=(left.m-1)/2,num_right_edge=(right.m-1)/2;
+    int num_left_node=left.m/2,num_right_node=right.m/2;
+    assign_node(left(i),blocks.m,num_left_node--<=0);
+    assign_node(right(j),blocks.m,num_right_node-->0);
     while(i<left.m-1 || j<right.m-1){
         T a0=0;
         if(i+1<left.m) a0=angle(right(j),left(i+1),left(i));
         T a1=0;
         if(j+1<right.m) a1=angle(right(j),right(j+1),left(i));
+        assign_edge(left(i),right(j),blocks.m,false);
         if(j+1>=right.m || (i+1<left.m && abs(a0-a1)<1e-6 && alt==0) || (i+1<left.m && a0>a1)){
             area.mesh.elements.Append(E(left(i+1),left(i),right(j)));
+            assign_edge(left(i+1),right(j),blocks.m,false);
+            assign_edge(left(i+1),left(i),blocks.m,num_left_edge--<=0);
+            assign_node(left(i+1),blocks.m,num_left_node--<=0);
             i++;
             alt=1;}
         else{
             area.mesh.elements.Append(E(right(j+1),left(i),right(j)));
+            assign_edge(right(j+1),left(i),blocks.m,false);
+            assign_edge(right(j+1),right(j),blocks.m,num_right_edge-->0);
+            assign_node(right(j+1),blocks.m,num_right_node-->0);
             j++;
             alt=0;}
         elem_data.Append({blocks.m});}
@@ -596,6 +643,8 @@ Generate_Joint(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
 template<class TV> void FLUID_LAYOUT_FEM<TV>::
 Compute(const PARSE_DATA_FEM<TV>& pd)
 {
+    area.particles.Add_Array("node_blocks",&node_blocks);
+    area.particles.Add_Array("node_blocks_assigned",&node_blocks_assigned);
     CONNECTION con;
     for(int i=0;i<pd.pts.m;i++){
         Generate_Joint(i,pd,con);}
@@ -651,6 +700,38 @@ Dump_Mesh() const
                 if(bc1 && *bc1==*bc0)
                     color=bc(*bc0).bc_type==dirichlet_v?dirichlet_bc:traction_bc;}
             Add_Debug_Object<TV,2>(VECTOR<TV,2>(particles.X(v0),particles.X(v1)),color);}}
+}
+//#####################################################################
+// Function Dump_Edge_Blocks
+//#####################################################################
+template<class TV> void FLUID_LAYOUT_FEM<TV>::
+Dump_Edge_Blocks() const
+{
+    const GEOMETRY_PARTICLES<TV>& particles=area.particles;
+    Dump_Mesh();
+    ARRAY<VECTOR<int,2> > keys;
+    ARRAY<int> data;
+    edge_blocks.Get_Keys(keys);
+    edge_blocks.Get_Data(data);
+    VECTOR<T,3> colors[]={VECTOR<T,3>(1,0,1),VECTOR<T,3>(0,1,1)};
+    for(int i=0;i<keys.m;i++){
+        VECTOR<TV,2> edge(particles.X.Subset(keys(i)));
+        TV p=0.5*(edge(0)+edge(1));
+        std::string s=LOG::sprintf("%i",data(i));
+        Add_Debug_Text(p,s,colors[data(i)%2]);}
+}
+//#####################################################################
+// Function Dump_Node_Blocks
+//#####################################################################
+template<class TV> void FLUID_LAYOUT_FEM<TV>::
+Dump_Node_Blocks() const
+{
+    Dump_Mesh();
+    VECTOR<T,3> colors[]={VECTOR<T,3>(1,0,1),VECTOR<T,3>(0,1,1)};
+    for(int i=0;i<node_blocks.m;i++){
+        if(node_blocks(i)<0) continue;
+        std::string s=LOG::sprintf("%i",node_blocks(i));
+        Add_Debug_Text(area.particles.X(i),s,colors[node_blocks(i)%2]);}
 }
 //#####################################################################
 // Function Dump_Layout
