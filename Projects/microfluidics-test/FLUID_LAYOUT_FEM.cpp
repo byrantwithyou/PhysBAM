@@ -38,9 +38,9 @@ Generate_Pipe(int pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con)
     typedef VECTOR<int,3> E;
     GEOMETRY_PARTICLES<TV>& particles=area.particles;
     int base=particles.number;
-    const ARRAY<CONNECTION_DATA>* f0=con.Get_Pointer({pd.pipes(pipe).x,pipe}),*f1=con.Get_Pointer({pd.pipes(pipe).y,pipe});
+    const ARRAY<int>* f0=con.Get_Pointer({pd.pipes(pipe).x,pipe}),*f1=con.Get_Pointer({pd.pipes(pipe).y,pipe});
     if(!f0 || !f1) return;
-    TV v0=particles.X((*f0)(pd.half_width).pid),v1=particles.X((*f1)(pd.half_width).pid);
+    TV v0=particles.X((*f0)(pd.half_width)),v1=particles.X((*f1)(pd.half_width));
     TV d=v1-v0;
     T l=d.Normalize();
     TV t(-d.y,d.x);
@@ -57,15 +57,9 @@ Generate_Pipe(int pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con)
         particles.Add_Elements(width*(height-2));
     auto pid=[base,width,height,&pd,f0,f1](int i,int j)
     {
-        if(i==0) return (*f0)(pd.half_width+j).pid;
-        else if(i==height-1) return (*f1)(pd.half_width+j).pid;
+        if(i==0) return (*f0)(pd.half_width+j);
+        else if(i==height-1) return (*f1)(pd.half_width+j);
         else return base+(i-1)*width+j+pd.half_width;
-    };
-    auto is_collapsed=[&pd,height,f0,f1](int i,int j)
-    {
-        if(i==0) return (*f0)(pd.half_width+j).collapsed;
-        else if(i==height-1) return (*f1)(pd.half_width+j).collapsed;
-        else return false;
     };
     auto assign_edge=[this](int n0,int n1,int bid,bool overwrite)
     {
@@ -91,14 +85,12 @@ Generate_Pipe(int pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con)
             assign_node(pid(i-1,j),blocks.m,num_left_node--<=0);
             assign_node(pid(i,j),blocks.m,num_right_node-->0);
             if(j!=pd.half_width){
-                regular=regular && !is_collapsed(i,j) && !is_collapsed(i-1,j+1) && !is_collapsed(i-1,j);
                 area.mesh.elements.Append(E(pid(i,j),pid(i-1,j+1),pid(i-1,j)));
                 assign_edge(pid(i-1,j),pid(i,j),blocks.m,false);
                 assign_edge(pid(i-1,j+1),pid(i,j),blocks.m,false);
                 assign_edge(pid(i-1,j+1),pid(i-1,j),blocks.m,num_left_edge--<=0);
                 elem_data.Append({blocks.m});}
             if(j!=-pd.half_width){
-                regular=regular && !is_collapsed(i,j) && !is_collapsed(i-1,j) && !is_collapsed(i,j-1);
                 area.mesh.elements.Append(E(pid(i,j),pid(i-1,j),pid(i,j-1)));
                 assign_edge(pid(i-1,j),pid(i,j),blocks.m,false);
                 assign_edge(pid(i-1,j),pid(i,j-1),blocks.m,false);
@@ -116,11 +108,11 @@ Generate_Pipe(int pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con)
 // Function Mark_BC
 //#####################################################################
 template<class TV> void FLUID_LAYOUT_FEM<TV>::
-Mark_BC(const ARRAY<CONNECTION_DATA>& pindices,BC_TYPE bc_type)
+Mark_BC(const ARRAY<int>& pindices,BC_TYPE bc_type)
 {
     int bc_index=bc.Append({bc_type});
     for(int i=0;i<pindices.m;i++)
-        bc_map.Set(pindices(i).pid,bc_index);
+        bc_map.Set(pindices(i),bc_index);
 }
 //#####################################################################
 // Function Generate_End
@@ -135,10 +127,10 @@ Generate_End(int i,int pipe,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
     TV u=TV(-v.y,v.x).Normalized();
     GEOMETRY_PARTICLES<TV>& particles=area.particles;
     int base=particles.Add_Elements(2*pd.half_width+1);
-    ARRAY<CONNECTION_DATA>& indices=con.Get_Or_Insert({i,pipe});
+    ARRAY<int>& indices=con.Get_Or_Insert({i,pipe});
     for(int k=-pd.half_width;k<=pd.half_width;k++){
         int pid=base+k+pd.half_width;
-        indices.Append({pid,false});
+        indices.Append(pid);
         particles.X(pid)=p+k*pd.unit_length*u;}
     if(pd.pipes(pipe).x!=i) indices.Reverse();
     if(pd.pts(i).bc_type!=nobc) Mark_BC(indices,pd.pts(i).bc_type);
@@ -435,14 +427,10 @@ Generate_2_Joint(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con,JOINT_TYPE j
     ARRAY<int> g0,g1;
     Weld(2*pd.half_width,sides.x,sides.y,pd.unit_length,g0,g1);
 
-    ARRAY<CONNECTION_DATA> f0,f1;
-    for(int j=0;j<g0.m;j++){
-        f0.Append({g0(j),false});
-        f1.Append({g1(j),false});}
-    if(pd.pipes(p0).x==i) f0.Reverse();
-    if(pd.pipes(p1).x!=i) f1.Reverse();
-    con.Set({i,p0},f0);
-    con.Set({i,p1},f1);
+    if(pd.pipes(p0).x==i) g0.Reverse();
+    if(pd.pipes(p1).x!=i) g1.Reverse();
+    con.Set({i,p0},g0);
+    con.Set({i,p1},g1);
 }
 //#####################################################################
 // Function Generate_3_Joint_SmallMin
@@ -516,14 +504,9 @@ Generate_3_Joint_SmallMin(int i,const VECTOR<int,3>& ends,const VECTOR<int,3>& p
     if(reverse[end0]) f[end0].Reverse();
     if(reverse[end1]) f[end1].Reverse();
     if(reverse[end2]) f[end2].Reverse();
-    ARRAY<CONNECTION_DATA> tmp[3];
-    for(int j=0;j<2*pd.half_width+1;j++){
-        tmp[end0].Append({f[end0](j),false});
-        tmp[end1].Append({f[end1](j),false});
-        tmp[end2].Append({f[end2](j),false});}
-    con.Set({i,pipes(end0)},tmp[end0]);
-    con.Set({i,pipes(end1)},tmp[end1]);
-    con.Set({i,pipes(end2)},tmp[end2]);
+    con.Set({i,pipes(end0)},f[end0]);
+    con.Set({i,pipes(end1)},f[end1]);
+    con.Set({i,pipes(end2)},f[end2]);
 }
 //#####################################################################
 // Function Generate_3_Joint_LargeMin
@@ -573,14 +556,9 @@ Generate_3_Joint_LargeMin(int i,const VECTOR<int,3>& ends,const VECTOR<int,3>& p
     if(pd.pipes(pipes(end0)).x==i) g0.Reverse();
     if(pd.pipes(pipes(end1)).x!=i) g1.Reverse();
     if(pd.pipes(pipes(end2)).x==i) f0.Reverse();
-    ARRAY<CONNECTION_DATA> tmp[3];
-    for(int j=0;j<2*pd.half_width+1;j++){
-        tmp[end0].Append({g0(j),false});
-        tmp[end1].Append({g1(j),false});
-        tmp[end2].Append({f0(j),false});}
-    con.Set({i,pipes(end0)},tmp[end0]);
-    con.Set({i,pipes(end1)},tmp[end1]);
-    con.Set({i,pipes(end2)},tmp[end2]);
+    con.Set({i,pipes(end0)},g0);
+    con.Set({i,pipes(end1)},g1);
+    con.Set({i,pipes(end2)},f0);
 }
 //#####################################################################
 // Function Generate_3_Joint

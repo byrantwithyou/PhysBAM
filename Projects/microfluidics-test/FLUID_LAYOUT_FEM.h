@@ -18,13 +18,8 @@ struct FLUID_LAYOUT_FEM
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
 
-    struct CONNECTION_DATA
-    {
-        int pid;
-        bool collapsed;
-    };
-    // (vert index,pipe index) -> connection data
-    typedef HASHTABLE<PAIR<int,int>,ARRAY<CONNECTION_DATA> > CONNECTION;
+    // (vert index,pipe index) -> array of particle id
+    typedef HASHTABLE<PAIR<int,int>,ARRAY<int> > CONNECTION;
 
     struct ELEMENT_DATA
     {
@@ -73,7 +68,7 @@ struct FLUID_LAYOUT_FEM
     void Dump_Edge_Blocks() const;
     void Dump_Node_Blocks() const;
 
-    void Mark_BC(const ARRAY<CONNECTION_DATA>& pindices,BC_TYPE bc_type);
+    void Mark_BC(const ARRAY<int>& pindices,BC_TYPE bc_type);
     // return (center, normalized start vec, normalied end vec)
     VECTOR<TV,3> Wedge(const TV& joint,const TV& p0,const TV& p1,int half_width,T unit_length) const;
     ARRAY<int> Sample_Interpolated(T s,const ARRAY<int>& side0,const ARRAY<int>& side1,T unit_length);
