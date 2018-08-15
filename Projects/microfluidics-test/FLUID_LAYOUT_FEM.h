@@ -29,6 +29,8 @@ struct FLUID_LAYOUT_FEM
     struct BLOCK_DATA
     {
         bool regular;
+        int block_dof=0;
+        int num_dof=0;
     };
 
     struct BC_DATA
@@ -40,15 +42,20 @@ struct FLUID_LAYOUT_FEM
     ARRAY<BLOCK_DATA> blocks;
     ARRAY<ELEMENT_DATA> elem_data;
     ARRAY<BC_DATA> bc;
-    HASHTABLE<int,int> bc_map; // particle index -> bc index
+    // unordered (particle index, particle index) -> bc index
+    HASHTABLE<PAIR<int,int>,int> bc_map;
 
-    HASHTABLE<VECTOR<int,2>,int> edge_blocks; // unordered (particle index, particle index) -> block
+    // unordered (particle index, particle index) -> (block id,velocity edge dof)
+    HASHTABLE<PAIR<int,int>,PAIR<int,int> > edge_dofs;
+    // unordered (particle index, particle index) -> number of neighbors
+    HASHTABLE<PAIR<int,int>,int> edge_neighbors;
     ARRAY_VIEW<bool> node_blocks_assigned; // FIXME: I want each new element of node_blocks is initialized with -1 rather than T().
-    ARRAY_VIEW<int> node_blocks;
+    ARRAY_VIEW<int> node_blocks,pressure_dofs,vel_node_dofs;
 
     FLUID_LAYOUT_FEM();
     ~FLUID_LAYOUT_FEM();
     void Compute(const PARSE_DATA_FEM<TV>& pd);
+    void Allocate_Dofs();
     void Print_Statistics() const;
     void Generate_End(int i,int pipe,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
     void Generate_Joint(int i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
@@ -67,6 +74,7 @@ struct FLUID_LAYOUT_FEM
     void Dump_Input(const PARSE_DATA_FEM<TV>& pd) const;
     void Dump_Edge_Blocks() const;
     void Dump_Node_Blocks() const;
+    void Dump_Dofs() const;
 
     void Mark_BC(const ARRAY<int>& pindices,BC_TYPE bc_type);
     // return (center, normalized start vec, normalied end vec)

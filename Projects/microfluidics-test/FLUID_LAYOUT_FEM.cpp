@@ -64,9 +64,9 @@ Generate_Pipe(int pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con)
     auto assign_edge=[this](int n0,int n1,int bid,bool overwrite)
     {
         if(n0>n1) std::swap(n0,n1);
-        int* b=edge_blocks.Get_Pointer({n0,n1});
-        if(b && overwrite) *b=bid;
-        else edge_blocks.Set({n0,n1},bid);
+        PAIR<int,int>* b=edge_dofs.Get_Pointer({n0,n1});
+        if(b && overwrite) b->x=bid;
+        else edge_dofs.Set({n0,n1},{bid,-1});
     };
     auto assign_node=[this](int n,int bid,bool overwrite)
     {
@@ -111,8 +111,10 @@ template<class TV> void FLUID_LAYOUT_FEM<TV>::
 Mark_BC(const ARRAY<int>& pindices,BC_TYPE bc_type)
 {
     int bc_index=bc.Append({bc_type});
-    for(int i=0;i<pindices.m;i++)
-        bc_map.Set(pindices(i),bc_index);
+    for(int i=1;i<pindices.m;i++){
+        int p0=pindices(i),p1=pindices(i-1);
+        if(p0>p1) std::swap(p0,p1);
+        bc_map.Set({p0,p1},bc_index);}
 }
 //#####################################################################
 // Function Generate_End
@@ -232,9 +234,9 @@ Merge_Interpolated(const ARRAY<int>& left,const ARRAY<int>& right)
     auto assign_edge=[this](int n0,int n1,int bid,bool overwrite)
     {
         if(n0>n1) std::swap(n0,n1);
-        int* b=edge_blocks.Get_Pointer({n0,n1});
-        if(b && overwrite) *b=bid;
-        else edge_blocks.Set({n0,n1},bid);
+        PAIR<int,int>* b=edge_dofs.Get_Pointer({n0,n1});
+        if(b && overwrite) b->x=bid;
+        else edge_dofs.Set({n0,n1},{bid,-1});
     };
     auto assign_node=[this](int n,int bid,bool overwrite)
     {
@@ -629,6 +631,60 @@ Compute(const PARSE_DATA_FEM<TV>& pd)
     for(int i=0;i<pd.pipes.m;i++){
         Generate_Pipe(i,pd,con);}
     area.mesh.Set_Number_Nodes(area.particles.number);
+    Allocate_Dofs();
+}
+//#####################################################################
+// Function Allocate_Dofs
+//#####################################################################
+template<class TV> void FLUID_LAYOUT_FEM<TV>::
+Allocate_Dofs()
+{
+    for(int i=0;i<area.mesh.elements.m;i++){
+        for(int j=0;j<3;j++){
+            int j1=(j+1)%3;
+            int p0=area.mesh.elements(i)(j),p1=area.mesh.elements(i)(j1);
+            if(p0>p1) std::swap(p0,p1);
+            int* num=edge_neighbors.Get_Pointer({p0,p1});
+            if(num) (*num)++;
+            else edge_neighbors.Set({p0,p1},1);}}
+    int wall_bc=bc.Append({dirichlet_v});
+    HASHTABLE<int> pbc;
+    for(auto& iter:edge_neighbors)
+        if(iter.data==1){
+            pbc.Set(iter.key.x);
+            pbc.Set(iter.key.y);
+            bc_map.Set({iter.key.x,iter.key.y},wall_bc);}
+
+    for(int i=0;i<node_blocks.m;i++)
+        if(!pbc.Contains(i))
+            blocks(node_blocks(i)).num_dof+=2;
+    for(auto& iter:edge_dofs)
+        if(!bc_map.Contains({iter.data.x,iter.data.y}))
+            blocks(iter.data.x).num_dof++;
+    for(int i=1;i<blocks.m;i++)
+        blocks(i).num_dof+=blocks(i-1).num_dof;
+
+    area.particles.Add_Array("vel_node_dofs",&vel_node_dofs);
+    area.particles.Add_Array("pressure_dofs",&pressure_dofs);
+    for(int i=0;i<area.particles.number;i++){
+        if(pbc.Contains(i)){
+            pressure_dofs(i)=vel_node_dofs(i)=-1;
+            continue;}
+        int bid=node_blocks(i);
+        pressure_dofs(i)=blocks(bid).num_dof-1-blocks(bid).block_dof++;
+        vel_node_dofs(i)=blocks(bid).num_dof-1-blocks(bid).block_dof++;}
+    for(int i=0;i<area.mesh.elements.m;i++){
+        for(int j=0;j<3;j++){
+            int j1=(j+1)%3;
+            int p0=area.mesh.elements(i)(j),p1=area.mesh.elements(i)(j1);
+            if(p0>p1) std::swap(p0,p1);
+            PAIR<int,int>* edge=edge_dofs.Get_Pointer({p0,p1});
+            PHYSBAM_ASSERT(edge);
+            if(bc_map.Contains({p0,p1})) continue;
+            if(edge->y!=-1) continue;
+            int bid=edge->x;
+            edge->y=blocks(bid).num_dof-blocks(bid).block_dof-1;
+            blocks(bid).block_dof++;}}
 }
 //#####################################################################
 // Function Print_Statistics
@@ -664,19 +720,18 @@ Dump_Mesh() const
     const GEOMETRY_PARTICLES<TV>& particles=area.particles;
     //for(int i=0;i<particles.number;i++)
     //    Add_Debug_Particle(particles.X(i),VECTOR<T,3>(1,1,1));
-    VECTOR<T,3> default_edge(0.5,0.5,0.5),dirichlet_bc(1,0,1),traction_bc(0,1,1);
+    VECTOR<T,3> ncolor=VECTOR<T,3>(1,0,1),dcolor=VECTOR<T,3>(0,1,1);
     for(int i=0;i<area.mesh.elements.m;i++){
         //Add_Debug_Object(VECTOR<TV,3>(particles.X.Subset(area.mesh.elements(i))),VECTOR<T,3>(1,1,1));
         //VECTOR<TV,3> tri(particles.X.Subset(area.mesh.elements(i)));
         //T a=(tri(2)-tri(1)).Cross(tri(0)-tri(1))(0);
         //Add_Debug_Object(tri,a<0?VECTOR<T,3>(0,1,1):default_edge);
         for(int j=0;j<3;j++){
-            VECTOR<T,3> color=default_edge;
             int v0=area.mesh.elements(i)(j),v1=area.mesh.elements(i)((j+1)%3);
-            if(const int* bc0=bc_map.Get_Pointer(v0)){
-                const int* bc1=bc_map.Get_Pointer(v1);
-                if(bc1 && *bc1==*bc0)
-                    color=bc(*bc0).bc_type==dirichlet_v?dirichlet_bc:traction_bc;}
+            if(v0>v1) std::swap(v0,v1);
+            VECTOR<T,3> color=VECTOR<T,3>(0.5,0.5,0.5);
+            const int* bc_index=bc_map.Get_Pointer({v0,v1});
+            if(bc_index) color=bc(*bc_index).bc_type==dirichlet_v?dcolor:ncolor;
             Add_Debug_Object<TV,2>(VECTOR<TV,2>(particles.X(v0),particles.X(v1)),color);}}
 }
 //#####################################################################
@@ -687,16 +742,16 @@ Dump_Edge_Blocks() const
 {
     const GEOMETRY_PARTICLES<TV>& particles=area.particles;
     Dump_Mesh();
-    ARRAY<VECTOR<int,2> > keys;
-    ARRAY<int> data;
-    edge_blocks.Get_Keys(keys);
-    edge_blocks.Get_Data(data);
+    ARRAY<PAIR<int,int> > keys;
+    ARRAY<PAIR<int,int> > data;
+    edge_dofs.Get_Keys(keys);
+    edge_dofs.Get_Data(data);
     VECTOR<T,3> colors[]={VECTOR<T,3>(1,0,1),VECTOR<T,3>(0,1,1)};
     for(int i=0;i<keys.m;i++){
-        VECTOR<TV,2> edge(particles.X.Subset(keys(i)));
+        VECTOR<TV,2> edge{particles.X(keys(i).x),particles.X(keys(i).y)};
         TV p=0.5*(edge(0)+edge(1));
-        std::string s=LOG::sprintf("%i",data(i));
-        Add_Debug_Text(p,s,colors[data(i)%2]);}
+        std::string s=LOG::sprintf("%i",data(i).x);
+        Add_Debug_Text(p,s,colors[data(i).x%2]);}
 }
 //#####################################################################
 // Function Dump_Node_Blocks
@@ -710,6 +765,37 @@ Dump_Node_Blocks() const
         if(node_blocks(i)<0) continue;
         std::string s=LOG::sprintf("%i",node_blocks(i));
         Add_Debug_Text(area.particles.X(i),s,colors[node_blocks(i)%2]);}
+}
+//#####################################################################
+// Function Dump_Dofs
+//#####################################################################
+template<class TV> void FLUID_LAYOUT_FEM<TV>::
+Dump_Dofs() const
+{
+    VECTOR<T,3> colors[]={VECTOR<T,3>(1,0,1),VECTOR<T,3>(0,1,1)};
+    Dump_Mesh();
+    for(int i=0;i<area.particles.number;i++){
+        if(vel_node_dofs(i)<0) continue;
+        std::string s=LOG::sprintf("%i",blocks(node_blocks(i)).num_dof-vel_node_dofs(i));
+        Add_Debug_Text(area.particles.X(i),s,colors[node_blocks(i)%2]);}
+    ARRAY<PAIR<int,int> > keys;
+    ARRAY<PAIR<int,int> > data;
+    edge_dofs.Get_Keys(keys);
+    edge_dofs.Get_Data(data);
+    for(int i=0;i<keys.m;i++){
+        if(data(i).y<0) continue;
+        VECTOR<TV,2> edge{area.particles.X(keys(i).x),area.particles.X(keys(i).y)};
+        TV p=0.5*(edge(0)+edge(1));
+        std::string s=LOG::sprintf("%i",blocks(data(i).x).num_dof-data(i).y);
+        Add_Debug_Text(p,s,colors[data(i).x%2]);}
+    Flush_Frame<TV>("vel dofs (local to block)");
+
+    Dump_Mesh();
+    for(int i=0;i<area.particles.number;i++){
+        if(pressure_dofs(i)<0) continue;
+        std::string s=LOG::sprintf("%i",blocks(node_blocks(i)).num_dof-pressure_dofs(i));
+        Add_Debug_Text(area.particles.X(i),s,colors[node_blocks(i)%2]);}
+    Flush_Frame<TV>("pressure dofs (local to block)");
 }
 //#####################################################################
 // Function Dump_Layout

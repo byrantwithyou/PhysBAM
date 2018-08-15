@@ -90,6 +90,8 @@ void Run_FEM(PARSE_ARGS& parse_args)
     Flush_Frame<TV>("nodes");
     fl.Dump_Edge_Blocks();
     Flush_Frame<TV>("edges");
+    fl.Dump_Dofs();
+    Flush_Frame<TV>("dofs");
 
     LOG::Instance()->Copy_Log_To_File(output_dir+"/common/log.txt",false);
 }
