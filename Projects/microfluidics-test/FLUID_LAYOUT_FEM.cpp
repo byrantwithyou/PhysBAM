@@ -668,10 +668,15 @@ Allocate_Dofs()
     area.particles.Add_Array("pressure_dofs",&pressure_dofs);
     for(int i=0;i<area.particles.number;i++){
         if(pbc.Contains(i)){
-            pressure_dofs(i)=vel_node_dofs(i)=-1;
+            pressure_dofs(i)=-1;
             continue;}
         int bid=node_blocks(i);
-        pressure_dofs(i)=blocks(bid).num_dof-1-blocks(bid).block_dof++;
+        pressure_dofs(i)=blocks(bid).num_dof-1-blocks(bid).block_dof++;}
+    for(int i=0;i<area.particles.number;i++){
+        if(pbc.Contains(i)){
+            vel_node_dofs(i)=-1;
+            continue;}
+        int bid=node_blocks(i);
         vel_node_dofs(i)=blocks(bid).num_dof-1-blocks(bid).block_dof++;}
     for(int i=0;i<area.mesh.elements.m;i++){
         for(int j=0;j<3;j++){
