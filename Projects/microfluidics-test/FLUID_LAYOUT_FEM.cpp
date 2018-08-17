@@ -655,29 +655,35 @@ Allocate_Dofs()
             pbc.Set(iter.key.y);
             bc_map.Set({iter.key.x,iter.key.y},wall_bc);}
 
+    ARRAY<int> block_vel_dofs(blocks.m),block_pressure_dofs(blocks.m);
     for(int i=0;i<node_blocks.m;i++)
-        if(!pbc.Contains(i))
-            blocks(node_blocks(i)).num_dof+=2;
+        if(!pbc.Contains(i)){
+            block_vel_dofs(node_blocks(i))++;
+            block_pressure_dofs(node_blocks(i))++;}
     for(auto& iter:edge_dofs)
         if(!bc_map.Contains({iter.data.x,iter.data.y}))
-            blocks(iter.data.x).num_dof++;
-    for(int i=1;i<blocks.m;i++)
-        blocks(i).num_dof+=blocks(i-1).num_dof;
+            block_vel_dofs(iter.data.x)++;
+    for(int i=1;i<blocks.m;i++){
+        block_vel_dofs(i)+=block_vel_dofs(i-1);
+        block_pressure_dofs(i)+=block_pressure_dofs(i-1);}
+    num_pressure_dofs=block_pressure_dofs.Last();
+    num_vel_dofs=block_vel_dofs.Last();
 
-    area.particles.Add_Array("vel_node_dofs",&vel_node_dofs);
     area.particles.Add_Array("pressure_dofs",&pressure_dofs);
     for(int i=0;i<area.particles.number;i++){
         if(pbc.Contains(i)){
             pressure_dofs(i)=-1;
             continue;}
         int bid=node_blocks(i);
-        pressure_dofs(i)=blocks(bid).num_dof-1-blocks(bid).block_dof++;}
+        pressure_dofs(i)=num_vel_dofs+--block_pressure_dofs(bid);}
+
+    area.particles.Add_Array("vel_node_dofs",&vel_node_dofs);
     for(int i=0;i<area.particles.number;i++){
         if(pbc.Contains(i)){
             vel_node_dofs(i)=-1;
             continue;}
         int bid=node_blocks(i);
-        vel_node_dofs(i)=blocks(bid).num_dof-1-blocks(bid).block_dof++;}
+        vel_node_dofs(i)=--block_vel_dofs(bid);}
     for(int i=0;i<area.mesh.elements.m;i++){
         for(int j=0;j<3;j++){
             int j1=(j+1)%3;
@@ -688,8 +694,7 @@ Allocate_Dofs()
             if(bc_map.Contains({p0,p1})) continue;
             if(edge->y!=-1) continue;
             int bid=edge->x;
-            edge->y=blocks(bid).num_dof-blocks(bid).block_dof-1;
-            blocks(bid).block_dof++;}}
+            edge->y=--block_vel_dofs(bid);}}
 }
 //#####################################################################
 // Function Print_Statistics
@@ -781,7 +786,7 @@ Dump_Dofs() const
     Dump_Mesh();
     for(int i=0;i<area.particles.number;i++){
         if(vel_node_dofs(i)<0) continue;
-        std::string s=LOG::sprintf("%i",blocks(node_blocks(i)).num_dof-vel_node_dofs(i));
+        std::string s=LOG::sprintf("%i",vel_node_dofs(i));
         Add_Debug_Text(area.particles.X(i),s,colors[node_blocks(i)%2]);}
     ARRAY<PAIR<int,int> > keys;
     ARRAY<PAIR<int,int> > data;
@@ -791,16 +796,16 @@ Dump_Dofs() const
         if(data(i).y<0) continue;
         VECTOR<TV,2> edge{area.particles.X(keys(i).x),area.particles.X(keys(i).y)};
         TV p=0.5*(edge(0)+edge(1));
-        std::string s=LOG::sprintf("%i",blocks(data(i).x).num_dof-data(i).y);
+        std::string s=LOG::sprintf("%i",data(i).y);
         Add_Debug_Text(p,s,colors[data(i).x%2]);}
-    Flush_Frame<TV>("vel dofs (local to block)");
+    Flush_Frame<TV>("vel dofs");
 
     Dump_Mesh();
     for(int i=0;i<area.particles.number;i++){
         if(pressure_dofs(i)<0) continue;
-        std::string s=LOG::sprintf("%i",blocks(node_blocks(i)).num_dof-pressure_dofs(i));
+        std::string s=LOG::sprintf("%i",pressure_dofs(i));
         Add_Debug_Text(area.particles.X(i),s,colors[node_blocks(i)%2]);}
-    Flush_Frame<TV>("pressure dofs (local to block)");
+    Flush_Frame<TV>("pressure dofs");
 }
 //#####################################################################
 // Function Dump_Layout

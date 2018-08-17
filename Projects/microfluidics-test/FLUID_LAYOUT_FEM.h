@@ -29,8 +29,6 @@ struct FLUID_LAYOUT_FEM
     struct BLOCK_DATA
     {
         bool regular;
-        int block_dof=0;
-        int num_dof=0;
     };
 
     struct BC_DATA
@@ -51,6 +49,7 @@ struct FLUID_LAYOUT_FEM
     HASHTABLE<PAIR<int,int>,int> edge_neighbors;
     ARRAY_VIEW<bool> node_blocks_assigned; // FIXME: I want each new element of node_blocks is initialized with -1 rather than T().
     ARRAY_VIEW<int> node_blocks,pressure_dofs,vel_node_dofs;
+    int num_vel_dofs,num_pressure_dofs;
 
     FLUID_LAYOUT_FEM();
     ~FLUID_LAYOUT_FEM();
