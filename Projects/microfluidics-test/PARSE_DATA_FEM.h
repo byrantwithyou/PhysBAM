@@ -21,6 +21,7 @@ struct PARSE_DATA_FEM
     {
         TV pt;
         BC_TYPE bc_type;
+        TV bc;
         JOINT_TYPE joint_type;
     };
 

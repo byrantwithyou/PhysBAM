@@ -20,11 +20,11 @@ void Test_Degree2_Joint(JOINT_TYPE jt,typename TV::SCALAR a0,typename TV::SCALAR
         PARSE_DATA_FEM<TV> pd;
         pd.half_width=4;
         pd.unit_length=0.5;
-        pd.pts.Append({TV(-10,1),dirichlet_v,default_joint});
-        pd.pts.Append({TV(),nobc,jt});
+        pd.pts.Append({TV(-10,1),dirichlet_v,TV(),default_joint});
+        pd.pts.Append({TV(),nobc,TV(),jt});
         TV p=TV(10,0);
         p={cos(rad)*p(0)-sin(rad)*p(1),sin(rad)*p(0)+cos(rad)*p(1)};
-        pd.pts.Append({p,traction,default_joint});
+        pd.pts.Append({p,traction,TV(),default_joint});
         pd.pipes.Append({0,1});
         pd.pipes.Append({1,2});
         pd.joints.Set(0,{0});
@@ -51,10 +51,10 @@ void Test_Degree2_Circle(JOINT_TYPE jt,typename TV::SCALAR h0,typename TV::SCALA
         PARSE_DATA_FEM<TV> pd;
         pd.half_width=4;
         pd.unit_length=h;
-        pd.pts.Append({TV(-4,-4),nobc,jt});
-        pd.pts.Append({TV(4,-4),nobc,jt});
-        pd.pts.Append({TV(4,4),nobc,jt});
-        pd.pts.Append({TV(-4,4),nobc,jt});
+        pd.pts.Append({TV(-4,-4),nobc,TV(),jt});
+        pd.pts.Append({TV(4,-4),nobc,TV(),jt});
+        pd.pts.Append({TV(4,4),nobc,TV(),jt});
+        pd.pts.Append({TV(-4,4),nobc,TV(),jt});
         pd.pipes.Append({0,1});
         pd.pipes.Append({1,2});
         pd.pipes.Append({3,2});
@@ -85,11 +85,11 @@ void Test_Degree3_Joint(JOINT_TYPE jt,typename TV::SCALAR h,int n,int seed)
         PARSE_DATA_FEM<TV> pd;
         pd.half_width=4;
         pd.unit_length=h;
-        pd.pts.Append({TV(),nobc,jt});
+        pd.pts.Append({TV(),nobc,TV(),jt});
         for(int k=0;k<3;k++){
             T a=random.Get_Uniform_Number(0,2*pi);
             TV coord=TV(cos(a),sin(a))*5;
-            pd.pts.Append({coord,traction,jt});
+            pd.pts.Append({coord,traction,TV(),jt});
             pd.pipes.Append({0,k+1});
             pd.joints.Set(k+1,{k});}
         pd.joints.Set(0,{0,1,2});

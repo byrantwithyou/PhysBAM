@@ -39,7 +39,7 @@ Parse_Input(const std::string& pipe_file)
                 ss>>name1>>pt;
                 pts_index[name1]=pts.m;
                 joints.Set(pts.m,ARRAY<int>());
-                pts.Append({pt,nobc,default_joint});
+                pts.Append({pt,nobc,TV(),default_joint});
                 break;
             case 'p':
                 {
@@ -57,13 +57,13 @@ Parse_Input(const std::string& pipe_file)
                 break;
             case 's':
                 {
-                    ss>>name1;
+                    ss>>name1>>pts(pts_index[name1]).bc;
                     pts(pts_index[name1]).bc_type=dirichlet_v;
                 }
                 break;
             case 't':
                 {
-                    ss>>name1;
+                    ss>>name1>>pts(pts_index[name1]).bc;
                     pts(pts_index[name1]).bc_type=traction;
                 }
                 break;
