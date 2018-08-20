@@ -85,7 +85,7 @@ Generate_Pipe(int pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con)
             assign_node(pid(i-1,j),blocks.m,num_left_node--<=0);
             assign_node(pid(i,j),blocks.m,num_right_node-->0);
             if(j!=pd.half_width){
-                area.mesh.elements.Append(E(pid(i,j),pid(i-1,j+1),pid(i-1,j)));
+                area.mesh.elements.Append(E(pid(i-1,j),pid(i,j),pid(i-1,j+1)));
                 assign_edge(pid(i-1,j),pid(i,j),blocks.m,false);
                 assign_edge(pid(i-1,j+1),pid(i,j),blocks.m,false);
                 assign_edge(pid(i-1,j+1),pid(i-1,j),blocks.m,num_left_edge--<=0);
@@ -244,6 +244,17 @@ Merge_Interpolated(const ARRAY<int>& left,const ARRAY<int>& right)
             node_blocks(n)=bid;
             node_blocks_assigned(n)=true;}
     };
+    auto max_angle_index=[this,angle](int* p)
+    {
+        T max_angle=-1;
+        int max_index=-1;
+        for(int j=0;j<3;j++){
+            T a=angle(p[(j+2)%3],p[j],p[(j+1)%3]);
+            if(a>max_angle){
+                max_angle=a;
+                max_index=j;}}
+        return max_index;
+    };
     int num_left_edge=(left.m-1)/2,num_right_edge=(right.m-1)/2;
     int num_left_node=left.m/2,num_right_node=right.m/2;
     assign_node(left(i),blocks.m,num_left_node--<=0);
@@ -255,14 +266,18 @@ Merge_Interpolated(const ARRAY<int>& left,const ARRAY<int>& right)
         if(j+1<right.m) a1=angle(right(j),right(j+1),left(i));
         assign_edge(left(i),right(j),blocks.m,false);
         if(j+1>=right.m || (i+1<left.m && abs(a0-a1)<1e-6 && alt==0) || (i+1<left.m && a0>a1)){
-            area.mesh.elements.Append(E(left(i+1),left(i),right(j)));
+            int p[]={left(i+1),left(i),right(j)};
+            int k=max_angle_index(p);
+            area.mesh.elements.Append(E(p[k],p[(k+1)%3],p[(k+2)%3]));
             assign_edge(left(i+1),right(j),blocks.m,false);
             assign_edge(left(i+1),left(i),blocks.m,num_left_edge--<=0);
             assign_node(left(i+1),blocks.m,num_left_node--<=0);
             i++;
             alt=1;}
         else{
-            area.mesh.elements.Append(E(right(j+1),left(i),right(j)));
+            int p[]={right(j+1),left(i),right(j)};
+            int k=max_angle_index(p);
+            area.mesh.elements.Append(E(p[k],p[(k+1)%3],p[(k+2)%3]));
             assign_edge(right(j+1),left(i),blocks.m,false);
             assign_edge(right(j+1),right(j),blocks.m,num_right_edge-->0);
             assign_node(right(j+1),blocks.m,num_right_node-->0);
@@ -738,6 +753,8 @@ Dump_Mesh() const
         //Add_Debug_Object(tri,a<0?VECTOR<T,3>(0,1,1):default_edge);
         for(int j=0;j<3;j++){
             int v0=area.mesh.elements(i)(j),v1=area.mesh.elements(i)((j+1)%3);
+            //std::string s=LOG::sprintf("%i",j);
+            //Add_Debug_Text(particles.X(v0)+0.3*(particles.X(v1)-particles.X(v0)),s,VECTOR<T,3>(0,1,1));
             if(v0>v1) std::swap(v0,v1);
             VECTOR<T,3> color=VECTOR<T,3>(0.5,0.5,0.5);
             const int* bc_index=bc_map.Get_Pointer({v0,v1});
