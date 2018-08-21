@@ -8,6 +8,7 @@
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <Geometry/Spatial_Acceleration/PARTICLE_HIERARCHY.h>
+#include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <list>
 #include <map>
@@ -64,9 +65,9 @@ Generate_Pipe(int pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con)
     auto assign_edge=[this](int n0,int n1,int bid,bool overwrite)
     {
         if(n0>n1) std::swap(n0,n1);
-        PAIR<int,int>* b=edge_dofs.Get_Pointer({n0,n1});
-        if(b && overwrite) b->x=bid;
-        else edge_dofs.Set({n0,n1},{bid,-1});
+        int* b=edge_blocks.Get_Pointer({n0,n1});
+        if(b && overwrite) *b=bid;
+        else edge_blocks.Set({n0,n1},bid);
     };
     auto assign_node=[this](int n,int bid,bool overwrite)
     {
@@ -236,9 +237,9 @@ Merge_Interpolated(const ARRAY<int>& left,const ARRAY<int>& right)
     auto assign_edge=[this](int n0,int n1,int bid,bool overwrite)
     {
         if(n0>n1) std::swap(n0,n1);
-        PAIR<int,int>* b=edge_dofs.Get_Pointer({n0,n1});
-        if(b && overwrite) b->x=bid;
-        else edge_dofs.Set({n0,n1},{bid,-1});
+        int* b=edge_blocks.Get_Pointer({n0,n1});
+        if(b && overwrite) *b=bid;
+        else edge_blocks.Set({n0,n1},bid);
     };
     auto assign_node=[this](int n,int bid,bool overwrite)
     {
@@ -656,30 +657,30 @@ Compute(const PARSE_DATA_FEM<TV>& pd)
 template<class TV> void FLUID_LAYOUT_FEM<TV>::
 Allocate_Dofs()
 {
-    for(int i=0;i<area.mesh.elements.m;i++){
-        for(int j=0;j<3;j++){
-            int j1=(j+1)%3;
-            int p0=area.mesh.elements(i)(j),p1=area.mesh.elements(i)(j1);
-            if(p0>p1) std::swap(p0,p1);
-            int* num=edge_neighbors.Get_Pointer({p0,p1});
-            if(num) (*num)++;
-            else edge_neighbors.Set({p0,p1},1);}}
-    int wall_bc=bc.Append({dirichlet_v});
-    for(auto& iter:edge_neighbors)
-        if(iter.data==1){
-            if(!bc_map.Contains(iter.key)){
-                particle_bc_map.Set(iter.key.x,wall_bc);
-                particle_bc_map.Set(iter.key.y,wall_bc);
-                bc_map.Set({iter.key.x,iter.key.y},wall_bc);}}
+    area.mesh.Initialize_Segment_Mesh();
+    area.mesh.Initialize_Edge_Triangles();
+    SEGMENT_MESH& segment_mesh=*area.mesh.segment_mesh;
+    ARRAY<ARRAY<int> >& edge_tri=*area.mesh.edge_triangles;
+    vel_edge_dofs.Resize(segment_mesh.elements.m);
+
+    int wall_bc=bc.Append({dirichlet_v,TV()});
+    for(int i=0;i<segment_mesh.elements.m;i++)
+        if(edge_tri(i).m==1){
+            PAIR<int,int> key(segment_mesh.elements(i)(0),segment_mesh.elements(i)(1));
+            if(key.x>key.y) std::swap(key.x,key.y);
+            if(!bc_map.Contains(key)){
+                particle_bc_map.Set(key.x,wall_bc);
+                particle_bc_map.Set(key.y,wall_bc);
+                bc_map.Set({key.x,key.y},wall_bc);}}
 
     ARRAY<int> block_vel_dofs(blocks.m),block_pressure_dofs(blocks.m);
     for(int i=0;i<node_blocks.m;i++)
         if(!particle_bc_map.Contains(i)){
             block_vel_dofs(node_blocks(i))++;
             block_pressure_dofs(node_blocks(i))++;}
-    for(auto& iter:edge_dofs)
-        if(!bc_map.Contains({iter.data.x,iter.data.y}))
-            block_vel_dofs(iter.data.x)++;
+    for(auto& iter:edge_blocks)
+        if(!bc_map.Contains({iter.key.x,iter.key.y}))
+            block_vel_dofs(iter.data)++;
     for(int i=1;i<blocks.m;i++){
         block_vel_dofs(i)+=block_vel_dofs(i-1);
         block_pressure_dofs(i)+=block_pressure_dofs(i-1);}
@@ -701,17 +702,15 @@ Allocate_Dofs()
             continue;}
         int bid=node_blocks(i);
         vel_node_dofs(i)=--block_vel_dofs(bid);}
-    for(int i=0;i<area.mesh.elements.m;i++){
-        for(int j=0;j<3;j++){
-            int j1=(j+1)%3;
-            int p0=area.mesh.elements(i)(j),p1=area.mesh.elements(i)(j1);
-            if(p0>p1) std::swap(p0,p1);
-            PAIR<int,int>* edge=edge_dofs.Get_Pointer({p0,p1});
-            PHYSBAM_ASSERT(edge);
-            if(bc_map.Contains({p0,p1})) continue;
-            if(edge->y!=-1) continue;
-            int bid=edge->x;
-            edge->y=--block_vel_dofs(bid);}}
+    for(int i=0;i<segment_mesh.elements.m;i++){
+        int p0=segment_mesh.elements(i)(0),p1=segment_mesh.elements(i)(1);
+        if(p0>p1) std::swap(p0,p1);
+        int* bid=edge_blocks.Get_Pointer({p0,p1});
+        PHYSBAM_ASSERT(bid);
+        if(bc_map.Contains({p0,p1})){
+            vel_edge_dofs(i)=-1;
+            continue;}
+        vel_edge_dofs(i)=--block_vel_dofs(*bid);}
 }
 //#####################################################################
 // Function Print_Statistics
@@ -772,15 +771,15 @@ Dump_Edge_Blocks() const
     const GEOMETRY_PARTICLES<TV>& particles=area.particles;
     Dump_Mesh();
     ARRAY<PAIR<int,int> > keys;
-    ARRAY<PAIR<int,int> > data;
-    edge_dofs.Get_Keys(keys);
-    edge_dofs.Get_Data(data);
+    ARRAY<int> data;
+    edge_blocks.Get_Keys(keys);
+    edge_blocks.Get_Data(data);
     VECTOR<T,3> colors[]={VECTOR<T,3>(1,0,1),VECTOR<T,3>(0,1,1)};
     for(int i=0;i<keys.m;i++){
         VECTOR<TV,2> edge{particles.X(keys(i).x),particles.X(keys(i).y)};
         TV p=0.5*(edge(0)+edge(1));
-        std::string s=LOG::sprintf("%i",data(i).x);
-        Add_Debug_Text(p,s,colors[data(i).x%2]);}
+        std::string s=LOG::sprintf("%i",data(i));
+        Add_Debug_Text(p,s,colors[data(i)%2]);}
 }
 //#####################################################################
 // Function Dump_Node_Blocks
@@ -807,16 +806,16 @@ Dump_Dofs() const
         if(vel_node_dofs(i)<0) continue;
         std::string s=LOG::sprintf("%i",vel_node_dofs(i));
         Add_Debug_Text(area.particles.X(i),s,colors[node_blocks(i)%2]);}
-    ARRAY<PAIR<int,int> > keys;
-    ARRAY<PAIR<int,int> > data;
-    edge_dofs.Get_Keys(keys);
-    edge_dofs.Get_Data(data);
-    for(int i=0;i<keys.m;i++){
-        if(data(i).y<0) continue;
-        VECTOR<TV,2> edge{area.particles.X(keys(i).x),area.particles.X(keys(i).y)};
+    SEGMENT_MESH& segment_mesh=*area.mesh.segment_mesh;
+    for(int i=0;i<segment_mesh.elements.m;i++){
+        if(vel_edge_dofs(i)<0) continue;
+        int p0=segment_mesh.elements(i)(0),p1=segment_mesh.elements(i)(1);
+        if(p0>p1) std::swap(p0,p1);
+        VECTOR<TV,2> edge(area.particles.X(p0),area.particles.X(p1));
         TV p=0.5*(edge(0)+edge(1));
-        std::string s=LOG::sprintf("%i",data(i).y);
-        Add_Debug_Text(p,s,colors[data(i).x%2]);}
+        std::string s=LOG::sprintf("%i",vel_edge_dofs(i));
+        int bid=edge_blocks.Get({p0,p1});
+        Add_Debug_Text(p,s,colors[bid%2]);}
     Flush_Frame<TV>("vel dofs");
 
     Dump_Mesh();

@@ -45,12 +45,11 @@ struct FLUID_LAYOUT_FEM
     HASHTABLE<PAIR<int,int>,int> bc_map;
     HASHTABLE<int,int> particle_bc_map;
 
-    // unordered (particle index, particle index) -> (block id,velocity edge dof)
-    HASHTABLE<PAIR<int,int>,PAIR<int,int> > edge_dofs;
-    // unordered (particle index, particle index) -> number of neighbors
-    HASHTABLE<PAIR<int,int>,int> edge_neighbors;
+    // unordered (particle index, particle index) -> block id
+    HASHTABLE<PAIR<int,int>,int> edge_blocks;
     ARRAY_VIEW<bool> node_blocks_assigned; // FIXME: I want each new element of node_blocks is initialized with -1 rather than T().
     ARRAY_VIEW<int> node_blocks,pressure_dofs,vel_node_dofs;
+    ARRAY<int> vel_edge_dofs;
     int num_vel_dofs,num_pressure_dofs;
 
     FLUID_LAYOUT_FEM();
