@@ -108,12 +108,14 @@ Generate_Pipe(int pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con)
 // Function Mark_BC
 //#####################################################################
 template<class TV> void FLUID_LAYOUT_FEM<TV>::
-Mark_BC(const ARRAY<int>& pindices,BC_TYPE bc_type)
+Mark_BC(const ARRAY<int>& pindices,BC_TYPE bc_type,const TV& value)
 {
-    int bc_index=bc.Append({bc_type});
+    int bc_index=bc.Append({bc_type,value});
+    particle_bc_map.Set(pindices(0),bc_index);
     for(int i=1;i<pindices.m;i++){
         int p0=pindices(i),p1=pindices(i-1);
         if(p0>p1) std::swap(p0,p1);
+        particle_bc_map.Set(pindices(i),bc_index);
         bc_map.Set({p0,p1},bc_index);}
 }
 //#####################################################################
@@ -135,7 +137,7 @@ Generate_End(int i,int pipe,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
         indices.Append(pid);
         particles.X(pid)=p+k*pd.unit_length*u;}
     if(pd.pipes(pipe).x!=i) indices.Reverse();
-    if(pd.pts(i).bc_type!=nobc) Mark_BC(indices,pd.pts(i).bc_type);
+    if(pd.pts(i).bc_type!=nobc) Mark_BC(indices,pd.pts(i).bc_type,pd.pts(i).bc);
 }
 //#####################################################################
 // Function Wedge
@@ -663,16 +665,16 @@ Allocate_Dofs()
             if(num) (*num)++;
             else edge_neighbors.Set({p0,p1},1);}}
     int wall_bc=bc.Append({dirichlet_v});
-    HASHTABLE<int> pbc;
     for(auto& iter:edge_neighbors)
         if(iter.data==1){
-            pbc.Set(iter.key.x);
-            pbc.Set(iter.key.y);
-            bc_map.Set({iter.key.x,iter.key.y},wall_bc);}
+            if(!bc_map.Contains(iter.key)){
+                particle_bc_map.Set(iter.key.x,wall_bc);
+                particle_bc_map.Set(iter.key.y,wall_bc);
+                bc_map.Set({iter.key.x,iter.key.y},wall_bc);}}
 
     ARRAY<int> block_vel_dofs(blocks.m),block_pressure_dofs(blocks.m);
     for(int i=0;i<node_blocks.m;i++)
-        if(!pbc.Contains(i)){
+        if(!particle_bc_map.Contains(i)){
             block_vel_dofs(node_blocks(i))++;
             block_pressure_dofs(node_blocks(i))++;}
     for(auto& iter:edge_dofs)
@@ -686,7 +688,7 @@ Allocate_Dofs()
 
     area.particles.Add_Array("pressure_dofs",&pressure_dofs);
     for(int i=0;i<area.particles.number;i++){
-        if(pbc.Contains(i)){
+        if(particle_bc_map.Contains(i)){
             pressure_dofs(i)=-1;
             continue;}
         int bid=node_blocks(i);
@@ -694,7 +696,7 @@ Allocate_Dofs()
 
     area.particles.Add_Array("vel_node_dofs",&vel_node_dofs);
     for(int i=0;i<area.particles.number;i++){
-        if(pbc.Contains(i)){
+        if(particle_bc_map.Contains(i)){
             vel_node_dofs(i)=-1;
             continue;}
         int bid=node_blocks(i);

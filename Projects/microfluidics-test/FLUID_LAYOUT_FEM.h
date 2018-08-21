@@ -34,6 +34,7 @@ struct FLUID_LAYOUT_FEM
     struct BC_DATA
     {
         BC_TYPE bc_type;
+        TV bc;
     };
 
     TRIANGULATED_AREA<T>& area;
@@ -42,6 +43,7 @@ struct FLUID_LAYOUT_FEM
     ARRAY<BC_DATA> bc;
     // unordered (particle index, particle index) -> bc index
     HASHTABLE<PAIR<int,int>,int> bc_map;
+    HASHTABLE<int,int> particle_bc_map;
 
     // unordered (particle index, particle index) -> (block id,velocity edge dof)
     HASHTABLE<PAIR<int,int>,PAIR<int,int> > edge_dofs;
@@ -75,7 +77,7 @@ struct FLUID_LAYOUT_FEM
     void Dump_Node_Blocks() const;
     void Dump_Dofs() const;
 
-    void Mark_BC(const ARRAY<int>& pindices,BC_TYPE bc_type);
+    void Mark_BC(const ARRAY<int>& pindices,BC_TYPE bc_type,const TV& value);
     // return (center, normalized start vec, normalied end vec)
     VECTOR<TV,3> Wedge(const TV& joint,const TV& p0,const TV& p1,int half_width,T unit_length) const;
     ARRAY<int> Sample_Interpolated(T s,const ARRAY<int>& side0,const ARRAY<int>& side1,T unit_length);
