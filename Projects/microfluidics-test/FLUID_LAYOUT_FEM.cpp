@@ -685,7 +685,7 @@ Allocate_Dofs()
         block_vel_dofs(i)+=block_vel_dofs(i-1);
         block_pressure_dofs(i)+=block_pressure_dofs(i-1);}
     num_pressure_dofs=block_pressure_dofs.Last();
-    num_vel_dofs=block_vel_dofs.Last();
+    num_vel_dofs=block_vel_dofs.Last()*TV::m;
 
     area.particles.Add_Array("pressure_dofs",&pressure_dofs);
     for(int i=0;i<area.particles.number;i++){
@@ -701,7 +701,8 @@ Allocate_Dofs()
             vel_node_dofs(i)=-1;
             continue;}
         int bid=node_blocks(i);
-        vel_node_dofs(i)=--block_vel_dofs(bid);}
+        block_vel_dofs(bid)--;
+        vel_node_dofs(i)=block_vel_dofs(bid)*TV::m;}
     for(int i=0;i<segment_mesh.elements.m;i++){
         int p0=segment_mesh.elements(i)(0),p1=segment_mesh.elements(i)(1);
         if(p0>p1) std::swap(p0,p1);
@@ -710,7 +711,8 @@ Allocate_Dofs()
         if(bc_map.Contains({p0,p1})){
             vel_edge_dofs(i)=-1;
             continue;}
-        vel_edge_dofs(i)=--block_vel_dofs(*bid);}
+        block_vel_dofs(*bid)--;
+        vel_edge_dofs(i)=block_vel_dofs(*bid)*TV::m;}
 }
 //#####################################################################
 // Function Print_Statistics
