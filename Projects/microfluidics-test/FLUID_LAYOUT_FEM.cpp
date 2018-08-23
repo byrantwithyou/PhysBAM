@@ -669,18 +669,22 @@ Allocate_Dofs()
             PAIR<int,int> key(segment_mesh.elements(i)(0),segment_mesh.elements(i)(1));
             if(key.x>key.y) std::swap(key.x,key.y);
             if(!bc_map.Contains(key)){
-                particle_bc_map.Set(key.x,wall_bc);
-                particle_bc_map.Set(key.y,wall_bc);
+                if(int* pbc=particle_bc_map.Get_Pointer(key.x)) *pbc=wall_bc;
+                else particle_bc_map.Set(key.x,wall_bc);
+                if(int* pbc=particle_bc_map.Get_Pointer(key.y)) *pbc=wall_bc;
+                else particle_bc_map.Set(key.y,wall_bc);
                 bc_map.Set({key.x,key.y},wall_bc);}}
 
     ARRAY<int> block_vel_dofs(blocks.m),block_pressure_dofs(blocks.m);
-    for(int i=0;i<node_blocks.m;i++)
-        if(!particle_bc_map.Contains(i)){
-            block_vel_dofs(node_blocks(i))++;
-            block_pressure_dofs(node_blocks(i))++;}
-    for(auto& iter:edge_blocks)
-        if(!bc_map.Contains({iter.key.x,iter.key.y}))
-            block_vel_dofs(iter.data)++;
+    for(int i=0;i<node_blocks.m;i++){
+        block_pressure_dofs(node_blocks(i))++;
+        int* bc_idx=particle_bc_map.Get_Pointer(i);
+        if(!bc_idx || bc(*bc_idx).bc_type!=dirichlet_v)
+            block_vel_dofs(node_blocks(i))++;}
+    for(auto& iter:edge_blocks){
+        int* bc_idx=bc_map.Get_Pointer({iter.key.x,iter.key.y});
+        if(!bc_idx || bc(*bc_idx).bc_type!=dirichlet_v)
+            block_vel_dofs(iter.data)++;}
     for(int i=1;i<blocks.m;i++){
         block_vel_dofs(i)+=block_vel_dofs(i-1);
         block_pressure_dofs(i)+=block_pressure_dofs(i-1);}
@@ -689,15 +693,13 @@ Allocate_Dofs()
 
     area.particles.Add_Array("pressure_dofs",&pressure_dofs);
     for(int i=0;i<area.particles.number;i++){
-        if(particle_bc_map.Contains(i)){
-            pressure_dofs(i)=-1;
-            continue;}
         int bid=node_blocks(i);
         pressure_dofs(i)=num_vel_dofs+--block_pressure_dofs(bid);}
 
     area.particles.Add_Array("vel_node_dofs",&vel_node_dofs);
     for(int i=0;i<area.particles.number;i++){
-        if(particle_bc_map.Contains(i)){
+        int* bc_idx=particle_bc_map.Get_Pointer(i);
+        if(bc_idx && bc(*bc_idx).bc_type==dirichlet_v){
             vel_node_dofs(i)=-1;
             continue;}
         int bid=node_blocks(i);
@@ -708,7 +710,8 @@ Allocate_Dofs()
         if(p0>p1) std::swap(p0,p1);
         int* bid=edge_blocks.Get_Pointer({p0,p1});
         PHYSBAM_ASSERT(bid);
-        if(bc_map.Contains({p0,p1})){
+        int* bc_idx=bc_map.Get_Pointer({p0,p1});
+        if(bc_idx && bc(*bc_idx).bc_type==dirichlet_v){
             vel_edge_dofs(i)=-1;
             continue;}
         block_vel_dofs(*bid)--;
