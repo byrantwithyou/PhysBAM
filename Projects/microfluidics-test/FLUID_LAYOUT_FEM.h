@@ -24,11 +24,12 @@ struct FLUID_LAYOUT_FEM
     struct ELEMENT_DATA
     {
         int block_id;
+        int greed;
     };
 
     struct BLOCK_DATA
     {
-        bool regular;
+        int pipe_id;
     };
 
     struct BC_DATA
@@ -37,19 +38,24 @@ struct FLUID_LAYOUT_FEM
         TV bc;
     };
 
+    struct PIPE_DATA
+    {
+        TV u,v; // u = x1-x0, v=x2-x0
+        int first_element;
+    };
+    
     TRIANGULATED_AREA<T>& area;
     ARRAY<BLOCK_DATA> blocks;
-    ARRAY<ELEMENT_DATA> elem_data;
+    ARRAY<ELEMENT_DATA> elem_data; // per element
     ARRAY<BC_DATA> bc;
     // unordered (particle index, particle index) -> bc index
     HASHTABLE<PAIR<int,int>,int> bc_map;
     HASHTABLE<int,int> particle_bc_map;
-
-    // unordered (particle index, particle index) -> block id
-    HASHTABLE<PAIR<int,int>,int> edge_blocks;
+    ARRAY<PIPE_DATA> pipes; // per pipe
+    
     ARRAY_VIEW<bool> node_blocks_assigned; // FIXME: I want each new element of node_blocks is initialized with -1 rather than T().
     ARRAY_VIEW<int> node_blocks,pressure_dofs,vel_node_dofs;
-    ARRAY<int> vel_edge_dofs;
+    ARRAY<int> edge_blocks,vel_edge_dofs;
     int num_vel_dofs,num_pressure_dofs;
 
     FLUID_LAYOUT_FEM();

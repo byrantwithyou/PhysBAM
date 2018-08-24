@@ -62,48 +62,36 @@ Generate_Pipe(int pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con)
         else if(i==height-1) return (*f1)(pd.half_width+j);
         else return base+(i-1)*width+j+pd.half_width;
     };
-    auto assign_edge=[this](int n0,int n1,int bid,bool overwrite)
-    {
-        if(n0>n1) std::swap(n0,n1);
-        int* b=edge_blocks.Get_Pointer({n0,n1});
-        if(b && overwrite) *b=bid;
-        else edge_blocks.Set({n0,n1},bid);
-    };
-    auto assign_node=[this](int n,int bid,bool overwrite)
-    {
-        if(node_blocks_assigned(n)==false || overwrite){
-            node_blocks(n)=bid;
-            node_blocks_assigned(n)=true;}
-    };
-    TV next=pd.unit_length*d;;
-    bool regular=true;
-    for(int i=1;i<height;i++){
-        int num_left_node=pd.half_width+1,num_right_node=pd.half_width+1;
-        int num_left_edge=pd.half_width,num_right_edge=pd.half_width;
+
+    TV inc_i=pd.unit_length*d,inc_j=pd.unit_length*t;
+    TV next=v0+inc_i-pd.half_width*inc_j;
+    for(int i=1,k=base;i<height-1;i++){
+        TV pt=next;
         for(int j=-pd.half_width;j<=pd.half_width;j++){
-            if(i!=height-1)
-                particles.X(pid(i,j))=v0+next+j*pd.unit_length*t;
-            assign_node(pid(i-1,j),blocks.m,num_left_node--<=0);
-            assign_node(pid(i,j),blocks.m,num_right_node-->0);
-            if(j!=pd.half_width){
-                area.mesh.elements.Append(E(pid(i-1,j),pid(i,j),pid(i-1,j+1)));
-                assign_edge(pid(i-1,j),pid(i,j),blocks.m,false);
-                assign_edge(pid(i-1,j+1),pid(i,j),blocks.m,false);
-                assign_edge(pid(i-1,j+1),pid(i-1,j),blocks.m,num_left_edge--<=0);
-                elem_data.Append({blocks.m});}
-            if(j!=-pd.half_width){
-                area.mesh.elements.Append(E(pid(i,j),pid(i-1,j),pid(i,j-1)));
-                assign_edge(pid(i-1,j),pid(i,j),blocks.m,false);
-                assign_edge(pid(i-1,j),pid(i,j-1),blocks.m,false);
-                assign_edge(pid(i,j),pid(i,j-1),blocks.m,num_right_edge-->0);
-                elem_data.Append({blocks.m});}}
-        if(i!=0) blocks.Append({regular});
-        if(i==height-2){
-            if(irregular_last) regular=false;
-            next=l*d;}
-        else {
-            regular=true;
-            next=(i+1)*pd.unit_length*d;}}
+            particles.X(k++)=pt;
+            pt+=inc_j;}
+        next+=inc_i;}
+
+    int canonical_element=area.mesh.elements.m;
+    for(int i=0;i<height-1;i++){
+        for(int j=-pd.half_width+1;j<=pd.half_width;j++){
+            int a=pid(i,j),b=pid(i+1,j),c=pid(i,j-1),d=pid(i+1,j-1);
+            area.mesh.elements.Append(E(a,c,b));
+            area.mesh.elements.Append(E(d,b,c));
+            elem_data.Append({blocks.m,j>0?3:0});
+            elem_data.Append({blocks.m,j>0?0:3});}
+        for(int j=-pd.half_width;j<=pd.half_width;j++){
+            int p=pid(i+(j<0),j);
+            node_blocks(p)=blocks.m;
+            int cp=pid(i+(j>=0),j);
+            if((i==0 || i==height-2) && !node_blocks_assigned(cp)){
+                node_blocks(cp)=blocks.m;
+                node_blocks_assigned(cp)=true;}
+            node_blocks_assigned(p)=true;}
+        blocks.Append({pipe});}
+    if(irregular_last) blocks.Last().pipe_id=-1;
+
+    pipes(pipe)={inc_j,inc_i,canonical_element};
 }
 //#####################################################################
 // Function Mark_BC
@@ -234,16 +222,9 @@ Merge_Interpolated(const ARRAY<int>& left,const ARRAY<int>& right)
         return acos(u.Dot(v));
     };
     ARRAY<E> elems;
-    auto assign_edge=[this](int n0,int n1,int bid,bool overwrite)
+    auto assign_node=[this](int n,int bid,bool greedy)
     {
-        if(n0>n1) std::swap(n0,n1);
-        int* b=edge_blocks.Get_Pointer({n0,n1});
-        if(b && overwrite) *b=bid;
-        else edge_blocks.Set({n0,n1},bid);
-    };
-    auto assign_node=[this](int n,int bid,bool overwrite)
-    {
-        if(node_blocks_assigned(n)==false || overwrite){
+        if(node_blocks_assigned(n)==false || greedy){
             node_blocks(n)=bid;
             node_blocks_assigned(n)=true;}
     };
@@ -258,35 +239,31 @@ Merge_Interpolated(const ARRAY<int>& left,const ARRAY<int>& right)
                 max_index=j;}}
         return max_index;
     };
-    int num_left_edge=(left.m-1)/2,num_right_edge=(right.m-1)/2;
-    int num_left_node=left.m/2,num_right_node=right.m/2;
-    assign_node(left(i),blocks.m,num_left_node--<=0);
-    assign_node(right(j),blocks.m,num_right_node-->0);
+    assign_node(left(i),blocks.m,false);
+    assign_node(right(j),blocks.m,true);
     while(i<left.m-1 || j<right.m-1){
         T a0=0;
         if(i+1<left.m) a0=angle(right(j),left(i+1),left(i));
         T a1=0;
         if(j+1<right.m) a1=angle(right(j),right(j+1),left(i));
-        assign_edge(left(i),right(j),blocks.m,false);
+        int greed;
         if(j+1>=right.m || (i+1<left.m && abs(a0-a1)<1e-6 && alt==0) || (i+1<left.m && a0>a1)){
             int p[]={left(i+1),left(i),right(j)};
             int k=max_angle_index(p);
             area.mesh.elements.Append(E(p[k],p[(k+1)%3],p[(k+2)%3]));
-            assign_edge(left(i+1),right(j),blocks.m,false);
-            assign_edge(left(i+1),left(i),blocks.m,num_left_edge--<=0);
-            assign_node(left(i+1),blocks.m,num_left_node--<=0);
+            greed=i<(left.m-1)/2?1:2;
+            assign_node(left(i+1),blocks.m,i>=left.m/2);
             i++;
             alt=1;}
         else{
             int p[]={right(j+1),left(i),right(j)};
             int k=max_angle_index(p);
             area.mesh.elements.Append(E(p[k],p[(k+1)%3],p[(k+2)%3]));
-            assign_edge(right(j+1),left(i),blocks.m,false);
-            assign_edge(right(j+1),right(j),blocks.m,num_right_edge-->0);
-            assign_node(right(j+1),blocks.m,num_right_node-->0);
+            greed=j<(right.m-1)/2?2:1;
+            assign_node(right(j+1),blocks.m,j<right.m/2);
             j++;
             alt=0;}
-        elem_data.Append({blocks.m});}
+        elem_data.Append({blocks.m,greed});}
 }
 //#####################################################################
 // Function Polyline
@@ -646,6 +623,7 @@ Compute(const PARSE_DATA_FEM<TV>& pd)
     CONNECTION con;
     for(int i=0;i<pd.pts.m;i++){
         Generate_Joint(i,pd,con);}
+    pipes.Resize(pd.pipes.m);
     for(int i=0;i<pd.pipes.m;i++){
         Generate_Pipe(i,pd,con);}
     area.mesh.Set_Number_Nodes(area.particles.number);
@@ -661,7 +639,8 @@ Allocate_Dofs()
     area.mesh.Initialize_Edge_Triangles();
     SEGMENT_MESH& segment_mesh=*area.mesh.segment_mesh;
     ARRAY<ARRAY<int> >& edge_tri=*area.mesh.edge_triangles;
-    vel_edge_dofs.Resize(segment_mesh.elements.m);
+    vel_edge_dofs.Resize(segment_mesh.elements.m,init_all,-1);
+    edge_blocks.Resize(segment_mesh.elements.m,init_all,-1);
 
     int wall_bc=bc.Append({dirichlet_v,TV()});
     for(int i=0;i<segment_mesh.elements.m;i++)
@@ -681,10 +660,18 @@ Allocate_Dofs()
         int* bc_idx=particle_bc_map.Get_Pointer(i);
         if(!bc_idx || bc(*bc_idx).bc_type!=dirichlet_v)
             block_vel_dofs(node_blocks(i))++;}
-    for(auto& iter:edge_blocks){
-        int* bc_idx=bc_map.Get_Pointer({iter.key.x,iter.key.y});
-        if(!bc_idx || bc(*bc_idx).bc_type!=dirichlet_v)
-            block_vel_dofs(iter.data)++;}
+    for(int ei=0;ei<segment_mesh.elements.m;ei++){
+        int p0=segment_mesh.elements(ei)(0),p1=segment_mesh.elements(ei)(1);
+        if(p0>p1) std::swap(p0,p1);
+        int* bc_idx=bc_map.Get_Pointer({p0,p1});
+        if(!bc_idx || bc(*bc_idx).bc_type!=dirichlet_v){
+            ARRAY<int>& neighbor_tris=edge_tri(ei);
+            PHYSBAM_ASSERT(neighbor_tris.m==1 || neighbor_tris.m==2);
+            int bid=elem_data(neighbor_tris(0)).block_id;
+            if(neighbor_tris.m==2 && elem_data(neighbor_tris(1)).greed>elem_data(neighbor_tris(0)).greed)
+                bid=elem_data(neighbor_tris(1)).block_id;
+            edge_blocks(ei)=bid;
+            block_vel_dofs(bid)++;}}
     for(int i=1;i<blocks.m;i++){
         block_vel_dofs(i)+=block_vel_dofs(i-1);
         block_pressure_dofs(i)+=block_pressure_dofs(i-1);}
@@ -708,14 +695,11 @@ Allocate_Dofs()
     for(int i=0;i<segment_mesh.elements.m;i++){
         int p0=segment_mesh.elements(i)(0),p1=segment_mesh.elements(i)(1);
         if(p0>p1) std::swap(p0,p1);
-        int* bid=edge_blocks.Get_Pointer({p0,p1});
-        PHYSBAM_ASSERT(bid);
         int* bc_idx=bc_map.Get_Pointer({p0,p1});
-        if(bc_idx && bc(*bc_idx).bc_type==dirichlet_v){
-            vel_edge_dofs(i)=-1;
-            continue;}
-        block_vel_dofs(*bid)--;
-        vel_edge_dofs(i)=block_vel_dofs(*bid)*TV::m;}
+        if(bc_idx && bc(*bc_idx).bc_type==dirichlet_v) continue;
+        int bid=edge_blocks(i);
+        block_vel_dofs(bid)--;
+        vel_edge_dofs(i)=block_vel_dofs(bid)*TV::m;}
 }
 //#####################################################################
 // Function Print_Statistics
@@ -775,16 +759,13 @@ Dump_Edge_Blocks() const
 {
     const GEOMETRY_PARTICLES<TV>& particles=area.particles;
     Dump_Mesh();
-    ARRAY<PAIR<int,int> > keys;
-    ARRAY<int> data;
-    edge_blocks.Get_Keys(keys);
-    edge_blocks.Get_Data(data);
     VECTOR<T,3> colors[]={VECTOR<T,3>(1,0,1),VECTOR<T,3>(0,1,1)};
-    for(int i=0;i<keys.m;i++){
-        VECTOR<TV,2> edge{particles.X(keys(i).x),particles.X(keys(i).y)};
+    SEGMENT_MESH& segment_mesh=*area.mesh.segment_mesh;
+    for(int i=0;i<segment_mesh.elements.m;i++){
+        VECTOR<TV,2> edge(particles.X.Subset(segment_mesh.elements(i)));
         TV p=0.5*(edge(0)+edge(1));
-        std::string s=LOG::sprintf("%i",data(i));
-        Add_Debug_Text(p,s,colors[data(i)%2]);}
+        std::string s=LOG::sprintf("%i",edge_blocks(i));
+        Add_Debug_Text(p,s,colors[edge_blocks(i)%2]);}
 }
 //#####################################################################
 // Function Dump_Node_Blocks
@@ -815,11 +796,10 @@ Dump_Dofs() const
     for(int i=0;i<segment_mesh.elements.m;i++){
         if(vel_edge_dofs(i)<0) continue;
         int p0=segment_mesh.elements(i)(0),p1=segment_mesh.elements(i)(1);
-        if(p0>p1) std::swap(p0,p1);
         VECTOR<TV,2> edge(area.particles.X(p0),area.particles.X(p1));
         TV p=0.5*(edge(0)+edge(1));
         std::string s=LOG::sprintf("%i",vel_edge_dofs(i));
-        int bid=edge_blocks.Get({p0,p1});
+        int bid=edge_blocks(i);
         Add_Debug_Text(p,s,colors[bid%2]);}
     Flush_Frame<TV>("vel dofs");
 
@@ -842,7 +822,7 @@ Dump_Layout() const
     for(int i=0;i<area.mesh.elements.m;i++){
         std::string s=LOG::sprintf("%i",elem_data(i).block_id);
         Add_Debug_Text(particles.X.Subset(area.mesh.elements(i)).Average(),s,
-            blocks(elem_data(i).block_id).regular?reg:irreg);}
+            blocks(elem_data(i).block_id).pipe_id>=0?reg:irreg);}
 }
 //#####################################################################
 // Function Dump_Input
