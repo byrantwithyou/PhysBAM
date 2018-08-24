@@ -93,10 +93,10 @@ void Run_FEM(PARSE_ARGS& parse_args)
     Flush_Frame<TV>("edges");
     fl.Dump_Dofs();
     Flush_Frame<TV>("dofs");
-
+    
     ARRAY<VECTOR<int,3> > coded_entries;
     ARRAY<T> rhs_vector,code_values;
-    Compute_Full_Matrix(coded_entries,code_values,rhs_vector,fl,mu,pd.unit_length);
+//    Compute_Full_Matrix(coded_entries,code_values,rhs_vector,fl,mu,pd.unit_length);
     SYSTEM_MATRIX_HELPER<T> MH;
     for(auto& e:coded_entries) MH.data.Append({e(0),e(1),code_values(e(2))});
 
