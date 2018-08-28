@@ -26,9 +26,9 @@ template<class T,class ID> struct CANONICALIZE_CONST_ARRAY<ARRAY<T,ID> >:public 
 struct NO_INIT{};
 struct USE_INIT{};
 struct INIT_ALL{};
-static const NO_INIT no_init;
-static const USE_INIT use_init;
-static const INIT_ALL init_all;
+static const NO_INIT no_init={};
+static const USE_INIT use_init={};
+static const INIT_ALL init_all={};
 
 template<class T,class ID>
 class ARRAY:public ARRAY_BASE<T,ARRAY<T,ID>,ID>
