@@ -14,7 +14,8 @@
 namespace PhysBAM{
 
 namespace ELEMENT_ID_HELPER{
-enum {none=0,equality=1,compare=2,increment=4,add_T=8,to_bool=16,negate=32,for_loop=compare|increment,logical=equality|to_bool};
+enum {none=0,equality=1,compare=2,increment=4,add_T=8,to_bool=16,negate=32,
+      for_loop=compare|increment,logical=equality|to_bool};
 }
 
 template<class ID,class T,int flags>
@@ -79,13 +80,11 @@ public:
     ID& operator-=(T i)
     {STATIC_ASSERT(flags&ELEMENT_ID_HELPER::add_T);id_value-=i;return (ID&)*this;}
 
-private:
-    struct UNUSABLE{void F(){}};
-    typedef void (UNUSABLE::*SAFE_BOOL)();
-public:
+    T operator-(ID i) const
+    {STATIC_ASSERT(flags&ELEMENT_ID_HELPER::add_T);return Value()-i.Value();}
 
-    operator SAFE_BOOL() const // allow conversion to bool without allowing conversion to T
-    {STATIC_ASSERT(flags&ELEMENT_ID_HELPER::to_bool);return id_value?&UNUSABLE::F:0;}
+    explicit operator bool() const
+    {STATIC_ASSERT(flags&ELEMENT_ID_HELPER::to_bool);return id_value;}
 
     ID operator-() const
     {STATIC_ASSERT(flags&ELEMENT_ID_HELPER::negate);return ID(-id_value);}
