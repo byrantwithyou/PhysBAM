@@ -18,7 +18,7 @@ public:
 
     T1 x;T2 y;T3 z;
 
-    TRIPLE(int input=0) 
+    TRIPLE() 
         :x(T1()),y(T2()),z(T3())
     {}
 
