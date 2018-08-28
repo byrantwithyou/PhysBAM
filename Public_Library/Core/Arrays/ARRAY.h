@@ -356,10 +356,10 @@ public:
     {return Get_Array_Pointer();}
 
     T* end() // for stl
-    {return Get_Array_Pointer()+m;}
+    {return Get_Array_Pointer()+Value(m);}
 
     const T* end() const // for stl
-    {return Get_Array_Pointer()+m;}
+    {return Get_Array_Pointer()+Value(m);}
 
     void Exchange(ARRAY<T,ID>& other)
     {exchange(m,other.m);exchange(base_pointer,other.base_pointer);exchange(buffer_size,other.buffer_size);}
