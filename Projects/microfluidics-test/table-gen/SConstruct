@@ -1,0 +1,5 @@
+import os
+env=Environment(ENV=os.environ)
+env.Append(CXXFLAGS=["-std=c++14","-g"])
+env.Program("generate-table.cpp")
+
