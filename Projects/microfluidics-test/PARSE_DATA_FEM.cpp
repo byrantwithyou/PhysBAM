@@ -18,7 +18,7 @@ Parse_Input(const std::string& pipe_file)
     std::string line;
     half_width=1;
 
-    std::map<std::string,int> pts_index;
+    std::map<std::string,VERTEX_ID> pts_index;
     TV pt;
     std::string name1,name2;
     char c;
@@ -38,21 +38,16 @@ Parse_Input(const std::string& pipe_file)
             case 'v':
                 ss>>name1>>pt;
                 pts_index[name1]=pts.m;
-                joints.Set(pts.m,ARRAY<int>());
-                pts.Append({pt,nobc,TV(),default_joint});
+                pts.Append({pt,nobc,TV(),default_joint,{}});
                 break;
             case 'p':
                 {
                     ss>>name1>>name2;
-                    int i0=pts_index[name1];
-                    int i1=pts_index[name2];
-                    int p=pipes.Append({i0,i1});
-                    if(ARRAY<int>* r=joints.Get_Pointer(i0))
-                        r->Append(p);
-                    else PHYSBAM_ASSERT(false);
-                    if(ARRAY<int>* r=joints.Get_Pointer(i1))
-                        r->Append(p);
-                    else PHYSBAM_ASSERT(false);
+                    VERTEX_ID i0=pts_index[name1];
+                    VERTEX_ID i1=pts_index[name2];
+                    PIPE_ID p=pipes.Append({i0,i1});
+                    pts(i0).joints.Append(p);
+                    pts(i1).joints.Append(p);
                 }
                 break;
             case 's':
@@ -70,7 +65,7 @@ Parse_Input(const std::string& pipe_file)
             case 'j':
                 {
                     ss>>name1>>name2;
-                    int i=pts_index[name1];
+                    VERTEX_ID i=pts_index[name1];
                     if(name2=="corner")
                         pts(i).joint_type=corner_joint;
                 }

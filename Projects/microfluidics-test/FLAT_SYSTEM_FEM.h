@@ -4,13 +4,23 @@
 //#####################################################################
 #ifndef __FLAT_SYSTEM_FEM__
 #define __FLAT_SYSTEM_FEM__
+#include <Core/Matrices/MATRIX.h>
 #include <Core/Vectors/VECTOR.h>
 
 namespace PhysBAM{
 
-template<class TV> class FLUID_LAYOUT_FEM;
+template<class TV> struct FLUID_LAYOUT_FEM;
+template<class TV> struct PARSE_DATA_FEM;
+
+template<class TV, class T>
+VECTOR<TV,3> Times_BC_NdotN(VECTOR<TV,3>& bc, T edge_length);
+
+template<class TV, class T>
+VECTOR<TV,6> Times_force_NdotN(VECTOR<TV,6>& f, T tri_area);
+
 template<class T,class TV>
-void Compute_Full_Matrix(ARRAY<VECTOR<int,3> >& coded_entries,
-    ARRAY<T>& code_values,ARRAY<T>& rhs_vector,FLUID_LAYOUT_FEM<TV>& fl,T mu,T unit_length);
+void Generate_Discretization(ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entries,
+    ARRAY<T,CODE_ID>& code_values,const FLUID_LAYOUT_FEM<TV>& fl,
+    const PARSE_DATA_FEM<TV>& pd,T mu);
 }
 #endif

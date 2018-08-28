@@ -14,12 +14,12 @@ template<class T> class SYSTEM_MATRIX_HELPER;
 template<class TV> class FLUID_LAYOUT;
 
 template<class T,class TV>
-void Compute_Full_Matrix(const GRID<TV>& grid,ARRAY<VECTOR<int,3> >& coded_entries,
-    ARRAY<T>& code_values,ARRAY<T>& rhs_vector,const FLUID_LAYOUT<TV>& fl,T mu);
+void Compute_Full_Matrix(const GRID<TV>& grid,ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entries,
+    ARRAY<T,CODE_ID>& code_values,ARRAY<T,DOF_ID>& rhs_vector,const FLUID_LAYOUT<TV>& fl,T mu);
 
 template<class T,class TV>
 void Solve_And_Display_Solution(const GRID<TV>& grid,const FLUID_LAYOUT<TV>& fl,
-    const SYSTEM_MATRIX_HELPER<T>& MH,const ARRAY<T>& rhs_vector,ARRAY<T>* sol_vector=0);
+    const SYSTEM_MATRIX_HELPER<T>& MH,const ARRAY<T,DOF_ID>& rhs_vector,ARRAY<T,DOF_ID>* sol_vector=0);
 
 }
 #endif

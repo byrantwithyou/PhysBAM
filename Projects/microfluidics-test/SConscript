@@ -8,4 +8,4 @@ Automatic_Program(env,"micro",["main.cpp","PARSE_DATA.cpp","FLUID_LAYOUT.cpp",
                                "FLAT_SYSTEM.cpp","FREQUENCY_TRACKER.cpp",
                                "JOB_SCHEDULER.cpp",
                                "FLUID_LAYOUT_FEM.cpp","PARSE_DATA_FEM.cpp","FLAT_SYSTEM_FEM.cpp",
-                               "FEM_MESHING_TESTS.cpp"])
+                               "FEM_MESHING_TESTS.cpp","FEM_TABLE.cpp"])

@@ -28,7 +28,7 @@ Compute(const PARSE_DATA<TV>& pd)
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
     used_faces.Resize(grid,1,true,true,{nodof,-1,-1,0});
-    used_cells.Resize(grid.Domain_Indices(1),use_init,{nodof,-1,-1,0,-1});
+    used_cells.Resize(grid.Domain_Indices(1),use_init,{nodof,-1,-1,0,DOF_ID(-1)});
     
     for(auto& i:pd.pipes)
     {
@@ -64,11 +64,11 @@ Compute(const PARSE_DATA<TV>& pd)
         {
             for(RANGE_ITERATOR<TV::m> it(i.box,1,0,RI::ghost|RI::omit_corners,i.bc_side);it.Valid();it.Next())
             {
-                used_cells(it.index)={dirichlet,-1,-1,i.bc_value,-1};
+                used_cells(it.index)={dirichlet,-1,-1,i.bc_value,DOF_ID(-1)};
             }
             for(FACE_RANGE_ITERATOR<TV::m> it(i.box,0,0,RF::ghost,i.bc_side);it.Valid();it.Next())
             {
-                used_faces(it.face)={fluid,-1,-1,0,-1};
+                used_faces(it.face)={fluid,-1,-1,0,DOF_ID(-1)};
             }
         }
         if(i.bc_type==wall)

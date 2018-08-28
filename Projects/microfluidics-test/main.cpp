@@ -32,6 +32,7 @@
 #include "FLUID_LAYOUT.h"
 #include "FLUID_LAYOUT_FEM.h"
 #include "FEM_MESHING_TESTS.h"
+#include "FEM_TABLE.h"
 
 using namespace PhysBAM;
 
@@ -94,11 +95,14 @@ void Run_FEM(PARSE_ARGS& parse_args)
     fl.Dump_Dofs();
     Flush_Frame<TV>("dofs");
     
-    ARRAY<VECTOR<int,3> > coded_entries;
-    ARRAY<T> rhs_vector,code_values;
+    ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> > coded_entries;
+    ARRAY<T,CODE_ID> rhs_vector,code_values;
+    Generate_Discretization(coded_entries,code_values,fl,pd,mu);
+
+    
 //    Compute_Full_Matrix(coded_entries,code_values,rhs_vector,fl,mu,pd.unit_length);
     SYSTEM_MATRIX_HELPER<T> MH;
-    for(auto& e:coded_entries) MH.data.Append({e(0),e(1),code_values(e(2))});
+    for(auto& e:coded_entries) MH.data.Append({Value(e.x),Value(e.y),code_values(e.z)});
 
     LOG::Instance()->Copy_Log_To_File(output_dir+"/common/log.txt",false);
 }
@@ -142,11 +146,11 @@ void Run(PARSE_ARGS& parse_args)
         Flush_Frame<TV>("grid blocks");}
 
     SYSTEM_MATRIX_HELPER<T> MH;
-    ARRAY<VECTOR<int,3> > coded_entries;
-    ARRAY<T> code_values;
-    ARRAY<T> rhs_vector,sol_vector;
+    ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> > coded_entries;
+    ARRAY<T,CODE_ID> code_values;
+    ARRAY<T,DOF_ID> rhs_vector,sol_vector;
     Compute_Full_Matrix(grid,coded_entries,code_values,rhs_vector,fl,mu);
-    for(auto e:coded_entries) MH.data.Append({e.x,e.y,code_values(e.z)});
+    for(auto e:coded_entries) MH.data.Append({Value(e.x),Value(e.y),code_values(e.z)});
     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
     if(!quiet) Solve_And_Display_Solution(grid,fl,MH,rhs_vector,&sol_vector);
     std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
@@ -173,7 +177,7 @@ void Run(PARSE_ARGS& parse_args)
     elim_mat.Execute_Jobs(threads);
     std::chrono::steady_clock::time_point t5 = std::chrono::steady_clock::now();
 
-    ARRAY<T> elim_sol;
+    ARRAY<T,DOF_ID> elim_sol;
     elim_mat.Pack_Vector(fl.dof_map,elim_sol,elim_mat.rhs);
     if(!quiet) LOG::printf("ANS DIFF: %g\n",(elim_sol-sol_vector).Max_Abs());
     

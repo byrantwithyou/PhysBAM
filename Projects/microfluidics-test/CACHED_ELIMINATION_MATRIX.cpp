@@ -321,19 +321,19 @@ Print_Current() const
 // Function Fill_Blocks
 //#####################################################################
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::
-Fill_Blocks(ARRAY<VECTOR<int,2> >& dof_map,const ARRAY<VECTOR<int,3> >& coded_entries,
-    const ARRAY<T>& code_values,const ARRAY<T>& rhs_vector)
+Fill_Blocks(ARRAY<VECTOR<int,2>,DOF_ID>& dof_map,const ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entries,
+    const ARRAY<T,CODE_ID>& code_values,const ARRAY<T,DOF_ID>& rhs_vector)
 {
-    HASHTABLE<VECTOR<int,2>,ARRAY<VECTOR<int,3> > > coded_blocks;
+    HASHTABLE<VECTOR<int,2>,ARRAY<TRIPLE<int,int,CODE_ID> > > coded_blocks;
     for(auto t:coded_entries){
-        ARRAY<VECTOR<int,3> >& a=coded_blocks.Get_Or_Insert({dof_map(t.x).x,dof_map(t.y).x});
+        auto& a=coded_blocks.Get_Or_Insert({dof_map(t.x).x,dof_map(t.y).x});
         a.Append({dof_map(t.x).y,dof_map(t.y).y,t.z});}
     
     block_list.Append({{},true,{zero_block}});
     block_list.Append({{},true,{id_block}});
     HASHTABLE<int,int> hash_to_id;
     for(auto& t:coded_blocks){
-        t.data.Sort(LEXICOGRAPHIC_COMPARE());
+        t.data.Sort();
         int h=Hash(t.data),id=-1;
         if(!hash_to_id.Get(h,id)){
             id=block_list.m;
@@ -343,7 +343,7 @@ Fill_Blocks(ARRAY<VECTOR<int,2> >& dof_map,const ARRAY<VECTOR<int,3> >& coded_en
             for(auto& s:t.data){
                 M(s.x,s.y)=code_values(s.z);
                 std::swap(s.x,s.y);}
-            t.data.Sort(LEXICOGRAPHIC_COMPARE());
+            t.data.Sort();
             int th=Hash(t.data);
             if(th!=h)
                 hash_to_id.Set(th,id|use_trans);}
@@ -400,11 +400,11 @@ Sub_Times(int out,int m,int v)
 // Function Unpack_Vector
 //#####################################################################
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::
-Unpack_Vector(ARRAY<VECTOR<int,2> >& dof_map,ARRAY<ARRAY<T> >& u,const ARRAY<T>& v)
+Unpack_Vector(ARRAY<VECTOR<int,2>,DOF_ID>& dof_map,ARRAY<ARRAY<T> >& u,const ARRAY<T,DOF_ID>& v)
 {
     for(auto& i:u) i.Clean_Memory();
     u.Resize(orig_sizes.m);
-    for(int i=0;i<v.m;i++)
+    for(DOF_ID i(0);i<v.m;i++)
         if(v(i)){
             int b=dof_map(i).x;
             ARRAY<T>& a=u(b);
@@ -415,10 +415,10 @@ Unpack_Vector(ARRAY<VECTOR<int,2> >& dof_map,ARRAY<ARRAY<T> >& u,const ARRAY<T>&
 // Function Pack_Vector
 //#####################################################################
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::
-Pack_Vector(ARRAY<VECTOR<int,2> >& dof_map,ARRAY<T>& v,const ARRAY<ARRAY<T> >& u)
+Pack_Vector(ARRAY<VECTOR<int,2>,DOF_ID>& dof_map,ARRAY<T,DOF_ID>& v,const ARRAY<ARRAY<T> >& u)
 {
     v.Resize(dof_map.m,init_all,0);
-    for(int i=0;i<v.m;i++){
+    for(DOF_ID i(0);i<v.m;i++){
         int b=dof_map(i).x;
         if(u(b).m) v(i)=u(b)(dof_map(i).y);}
 }
@@ -426,10 +426,10 @@ Pack_Vector(ARRAY<VECTOR<int,2> >& dof_map,ARRAY<T>& v,const ARRAY<ARRAY<T> >& u
 // Function Pack_Vector
 //#####################################################################
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::
-Pack_Vector(ARRAY<VECTOR<int,2> >& dof_map,ARRAY<T>& v,const ARRAY<int>& u)
+Pack_Vector(ARRAY<VECTOR<int,2>,DOF_ID>& dof_map,ARRAY<T,DOF_ID>& v,const ARRAY<int>& u)
 {
     v.Resize(dof_map.m,init_all,0);
-    for(int i=0;i<v.m;i++){
+    for(DOF_ID i(0);i<v.m;i++){
         int b=dof_map(i).x;
         if(u(b)>=0){
             v(i)=vector_list(u(b)&raw_mask)(dof_map(i).y);

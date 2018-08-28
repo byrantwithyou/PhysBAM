@@ -7,6 +7,7 @@
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Vectors/VECTOR.h>
+#include "COMMON.h"
 #include <mutex>
 
 namespace PhysBAM{
@@ -71,8 +72,8 @@ struct CACHED_ELIMINATION_MATRIX
                     f(provider[i](j),user[i](j)(0));
     }
     
-    void Fill_Blocks(ARRAY<VECTOR<int,2> >& dof_map,const ARRAY<VECTOR<int,3> >& coded_entries,
-        const ARRAY<T>& code_values,const ARRAY<T>& rhs_vector);
+    void Fill_Blocks(ARRAY<VECTOR<int,2>,DOF_ID>& dof_map,const ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entries,
+        const ARRAY<T,CODE_ID>& code_values,const ARRAY<T,DOF_ID>& rhs_vector);
     void Fill_Orig_Rows();
     void Eliminate_Row(int r);
     int& Get_Block(int r,int c);
@@ -84,9 +85,9 @@ struct CACHED_ELIMINATION_MATRIX
     void Print_Full() const;
     void Print_Current() const;
     void Back_Solve();
-    void Unpack_Vector(ARRAY<VECTOR<int,2> >& dof_map,ARRAY<ARRAY<T> >& u,const ARRAY<T>& v);
-    void Pack_Vector(ARRAY<VECTOR<int,2> >& dof_map,ARRAY<T>& v,const ARRAY<ARRAY<T> >& u);
-    void Pack_Vector(ARRAY<VECTOR<int,2> >& dof_map,ARRAY<T>& v,const ARRAY<int>& u);
+    void Unpack_Vector(ARRAY<VECTOR<int,2>,DOF_ID>& dof_map,ARRAY<ARRAY<T> >& u,const ARRAY<T,DOF_ID>& v);
+    void Pack_Vector(ARRAY<VECTOR<int,2>,DOF_ID>& dof_map,ARRAY<T,DOF_ID>& v,const ARRAY<ARRAY<T> >& u);
+    void Pack_Vector(ARRAY<VECTOR<int,2>,DOF_ID>& dof_map,ARRAY<T,DOF_ID>& v,const ARRAY<int>& u);
     int Matrix_Times(int m,int in);
     int Sub_Times(int out,int m,int in);
     int Transposed(int a) const;

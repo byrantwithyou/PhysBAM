@@ -6,6 +6,7 @@
 #define __PARSE_DATA_FEM__
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Vectors/VECTOR.h>
+#include "COMMON.h"
 
 namespace PhysBAM{
 enum BC_TYPE {nobc,dirichlet_v,traction};
@@ -23,11 +24,11 @@ struct PARSE_DATA_FEM
         BC_TYPE bc_type;
         TV bc;
         JOINT_TYPE joint_type;
+        ARRAY<PIPE_ID> joints;
     };
 
-    ARRAY<VERTEX_DATA> pts;
-    ARRAY<VECTOR<int,2> > pipes;
-    HASHTABLE<int,ARRAY<int> > joints; // vertex index -> array of pipe indices
+    ARRAY<VERTEX_DATA,VERTEX_ID> pts;
+    ARRAY<VECTOR<VERTEX_ID,2>,PIPE_ID> pipes;
     int half_width;
     T unit_length;
 

@@ -17,21 +17,22 @@
 #include <fstream>
 #include <map>
 #include <string>
+#include "COMMON.h"
 #include "FLUID_LAYOUT.h"
 namespace PhysBAM{
 
 template<class T,class TV>
-void Compute_Full_Matrix(const GRID<TV>& grid,ARRAY<VECTOR<int,3> >& coded_entries,
-    ARRAY<T>& code_values,ARRAY<T>& rhs_vector,const FLUID_LAYOUT<TV>& fl,T mu)
+void Compute_Full_Matrix(const GRID<TV>& grid,ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entries,
+    ARRAY<T,CODE_ID>& code_values,ARRAY<T,DOF_ID>& rhs_vector,const FLUID_LAYOUT<TV>& fl,T mu)
 {
     typedef VECTOR<int,TV::m> TV_INT;
 
     rhs_vector.Resize(fl.Total_Dofs(),init_all,0);
 
     TV de=mu*grid.one_over_dX*grid.one_over_dX;
-    code_values.Append_Elements(grid.one_over_dX);
-    code_values.Append_Elements(-grid.one_over_dX);
-    code_values.Append_Elements(-de);
+    for(auto t:grid.one_over_dX) code_values.Append(t);
+    for(auto t:-grid.one_over_dX) code_values.Append(t);
+    for(auto t:-de) code_values.Append(t);
     for(int i=0;i<(1<<2*TV::m);i++){
         T x=0;
         for(int a=0;a<TV::m;a++)
@@ -62,9 +63,9 @@ void Compute_Full_Matrix(const GRID<TV>& grid,ARRAY<VECTOR<int,3> >& coded_entri
                 FACE_INDEX<TV::m> face=it.face;
                 face.index(a)+=sn;
                 diag_code+=1<<2*a;
-                if(un.type==fluid) coded_entries.Append({uf.global_id,un.global_id,2*TV::m+a});
+                if(un.type==fluid) coded_entries.Append({uf.global_id,un.global_id,CODE_ID(2*TV::m+a)});
                 else if(un.type==wall) rhs_vector(uf.global_id)=de(a)*un.bc_value;}}
-        coded_entries.Append({uf.global_id,uf.global_id,diag_code});}
+        coded_entries.Append({uf.global_id,uf.global_id,CODE_ID(diag_code)});}
 
     for(FACE_RANGE_ITERATOR<TV::m> it(grid.Domain_Indices());it.Valid();it.Next()){
         auto& uf=fl.used_faces(it.face);
@@ -79,13 +80,13 @@ void Compute_Full_Matrix(const GRID<TV>& grid,ARRAY<VECTOR<int,3> >& coded_entri
             continue;}
 
         if(uc0.type==fluid){
-            coded_entries.Append({uf.global_id,uc0.global_id,TV::m+it.face.axis});
-            coded_entries.Append({uc0.global_id,uf.global_id,TV::m+it.face.axis});}
+            coded_entries.Append({uf.global_id,uc0.global_id,CODE_ID(TV::m+it.face.axis)});
+            coded_entries.Append({uc0.global_id,uf.global_id,CODE_ID(TV::m+it.face.axis)});}
         else if(uc0.type==dirichlet) rhs_vector(uf.global_id)-=e*uc0.bc_value;
         
         if(uc1.type==fluid){
-            coded_entries.Append({uf.global_id,uc1.global_id,it.face.axis});
-            coded_entries.Append({uc1.global_id,uf.global_id,it.face.axis});}
+            coded_entries.Append({uf.global_id,uc1.global_id,CODE_ID(it.face.axis)});
+            coded_entries.Append({uc1.global_id,uf.global_id,CODE_ID(it.face.axis)});}
         else if(uc1.type==dirichlet) rhs_vector(uf.global_id)+=e*uc1.bc_value;}
 
     rhs_vector=-rhs_vector;
@@ -93,17 +94,18 @@ void Compute_Full_Matrix(const GRID<TV>& grid,ARRAY<VECTOR<int,3> >& coded_entri
 
 template<class T,class TV>
 void Solve_And_Display_Solution(const GRID<TV>& grid,const FLUID_LAYOUT<TV>& fl,
-    const SYSTEM_MATRIX_HELPER<T>& MH,const ARRAY<T>& rhs_vector,ARRAY<T>* sol_out)
+    const SYSTEM_MATRIX_HELPER<T>& MH,const ARRAY<T,DOF_ID>& rhs_vector,
+    ARRAY<T,DOF_ID>* sol_out)
 {
     SPARSE_MATRIX_FLAT_MXN<T> M;
-    MH.Set_Matrix(fl.Total_Dofs(),fl.Total_Dofs(),M);
+    MH.Set_Matrix(Value(fl.Total_Dofs()),Value(fl.Total_Dofs()),M);
     
     typedef KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > KRY_VEC;
     typedef MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_MXN<T>,T,KRY_VEC> KRY_MAT;
     KRY_MAT sys(M);
     KRY_VEC rhs,sol;
-    rhs.v=rhs_vector;
-    sol.v.Resize(fl.Total_Dofs());
+    rhs.v=reinterpret_cast<const ARRAY<T>&>(rhs_vector);
+    sol.v.Resize(Value(fl.Total_Dofs()));
 
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
     sys.Test_System(sol);
@@ -115,28 +117,19 @@ void Solve_And_Display_Solution(const GRID<TV>& grid,const FLUID_LAYOUT<TV>& fl,
     if(!converged) LOG::printf("SOLVER DID NOT CONVERGE.\n");
 
     OCTAVE_OUTPUT<T>("x.txt").Write("x",sol);
-    if(sol_out) *sol_out=sol.v;
+    if(sol_out) reinterpret_cast<ARRAY<T>&>(*sol_out)=sol.v;
     
     ARRAY<T,FACE_INDEX<TV::m> > face_velocity(grid,1);
     for(FACE_ITERATOR<TV> it(grid,1);it.Valid();it.Next())
     {
         auto& uf=fl.used_faces(it.Full_Index());
         if(uf.type!=fluid) continue;
-        face_velocity(it.Full_Index())=sol.v(uf.global_id);
+        face_velocity(it.Full_Index())=sol.v(Value(uf.global_id));
     }
     Flush_Frame(face_velocity,"solve");
 }
-
-template void Compute_Full_Matrix<double,VECTOR<double,2> >(GRID<VECTOR<double,2> > const&,
-    ARRAY<VECTOR<int,3>,int>&,ARRAY<double,int>&,ARRAY<double,int>&,
-    FLUID_LAYOUT<VECTOR<double,2> > const&,double);
-template void Solve_And_Display_Solution<double,VECTOR<double,2> >(
-    GRID<VECTOR<double,2> > const&,FLUID_LAYOUT<VECTOR<double,2> > const&,
-    SYSTEM_MATRIX_HELPER<double> const&,ARRAY<double,int> const&,ARRAY<double,int>*);
-template void Compute_Full_Matrix<double,VECTOR<double,3> >(GRID<VECTOR<double,3> > const&,
-    ARRAY<VECTOR<int,3>,int>&,ARRAY<double,int>&,ARRAY<double,int>&,
-    FLUID_LAYOUT<VECTOR<double,3> > const&,double);
-template void Solve_And_Display_Solution<double,VECTOR<double,3> >(
-    GRID<VECTOR<double,3> > const&,FLUID_LAYOUT<VECTOR<double,3> > const&,
-    SYSTEM_MATRIX_HELPER<double> const&,ARRAY<double,int> const&,ARRAY<double,int>*);
+template void Compute_Full_Matrix<double,VECTOR<double,2> >(GRID<VECTOR<double,2> > const&,ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID>,int>&,ARRAY<double,CODE_ID>&,ARRAY<double,DOF_ID>&,FLUID_LAYOUT<VECTOR<double,2> > const&,double);
+template void Compute_Full_Matrix<double,VECTOR<double,3> >(GRID<VECTOR<double,3> > const&,ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID>,int>&,ARRAY<double,CODE_ID>&,ARRAY<double,DOF_ID>&,FLUID_LAYOUT<VECTOR<double,3> > const&,double);
+template void Solve_And_Display_Solution<double,VECTOR<double,2> >(GRID<VECTOR<double,2> > const&,FLUID_LAYOUT<VECTOR<double,2> > const&,SYSTEM_MATRIX_HELPER<double> const&,ARRAY<double,DOF_ID> const&,ARRAY<double,DOF_ID>*);
+template void Solve_And_Display_Solution<double,VECTOR<double,3> >(GRID<VECTOR<double,3> > const&,FLUID_LAYOUT<VECTOR<double,3> > const&,SYSTEM_MATRIX_HELPER<double> const&,ARRAY<double,DOF_ID> const&,ARRAY<double,DOF_ID>*);
 }
