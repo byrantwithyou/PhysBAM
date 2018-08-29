@@ -615,6 +615,8 @@ Compute(const PARSE_DATA_FEM<TV>& pd)
         Generate_Pipe(i,pd,con);}
     area_hidden.mesh.Set_Number_Nodes(area_hidden.particles.number);
     Allocate_Dofs();
+    area_hidden.mesh.Initialize_Incident_Elements();
+    area_hidden.mesh.Initialize_Element_Edges();
 }
 //#####################################################################
 // Function Allocate_Dofs
@@ -661,6 +663,7 @@ Allocate_Dofs()
     int num_vel_dofs=block_vel_dofs.Last()*TV::m;
     num_dofs=DOF_ID(num_pressure_dofs+num_vel_dofs);
 
+    pressure_dofs.Resize(Number_Particles(),use_init,DOF_ID(-1));
     for(PARTICLE_ID i(0);i<Number_Particles();i++){
         BLOCK_ID bid=node_blocks(i);
         pressure_dofs(i)=DOF_ID(num_vel_dofs+--block_pressure_dofs(bid));}
