@@ -12,6 +12,9 @@ namespace PhysBAM{
 enum BC_TYPE {nobc,dirichlet_v,traction};
 enum JOINT_TYPE {default_joint,corner_joint};
 
+template<class TV> struct ANALYTIC_VECTOR;
+template<class TV> struct ANALYTIC_SCALAR;
+
 template<class TV>
 struct PARSE_DATA_FEM
 {
@@ -32,6 +35,11 @@ struct PARSE_DATA_FEM
     int half_width;
     T unit_length;
 
+    ANALYTIC_VECTOR<TV> * analytic_velocity = 0;
+    ANALYTIC_SCALAR<TV> * analytic_pressure = 0;
+
+    ~PARSE_DATA_FEM();
+    
     void Parse_Input(const std::string& pipe_file);    
 };
 

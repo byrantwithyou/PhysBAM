@@ -6,6 +6,7 @@
 #define __FLUID_LAYOUT_FEM__
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Vectors/VECTOR.h>
+#include <Geometry/Topology/SEGMENT_MESH.h>
 #include "COMMON.h"
 #include "PARSE_DATA_FEM.h"
 
@@ -60,7 +61,7 @@ struct FLUID_LAYOUT_FEM
     ARRAY<BLOCK_ID,EDGE_ID> edge_blocks;
     ARRAY<DOF_ID,EDGE_ID> vel_edge_dofs;
     DOF_ID num_dofs;
-
+    
     FLUID_LAYOUT_FEM();
     ~FLUID_LAYOUT_FEM();
     void Compute(const PARSE_DATA_FEM<TV>& pd);
@@ -143,6 +144,10 @@ struct FLUID_LAYOUT_FEM
     {
         auto& a=(*area_hidden.mesh.element_edges)(Value(t));
         return {EDGE_ID(a(0)),EDGE_ID(a(1)),EDGE_ID(a(2))};
+    }
+    T Area(TRIANGLE_ID t) const
+    {
+        return area_hidden.Area(Value(t));
     }
 };
 

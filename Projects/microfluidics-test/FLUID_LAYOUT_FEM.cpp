@@ -43,29 +43,24 @@ Generate_Pipe(PIPE_ID pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con)
     TV v0=X((*f0)(pd.half_width)),v1=X((*f1)(pd.half_width));
     TV d=v1-v0;
     T l=d.Normalize();
+    if(!l) return;
     TV t(-d.y,d.x);
-    int width=2*pd.half_width+1;
-    int height=(int)(l/pd.unit_length)+1;
-    T min_percent=0.5;
-    bool irregular_last=false;
-    T rem=l-(height-1)*pd.unit_length;
-    if(rem>0){
-        irregular_last=true;
-        if(rem>min_percent*pd.unit_length)
-            height++;}
-    if(height>2)
-        Add_Particles(width*(height-2));
+    int width=2*pd.half_width;
+    int height=rint(l/pd.unit_length);
+    if(height==0) height=1;
+    if(height>1)
+        Add_Particles((width+1)*(height-1));
     auto pid=[base,width,height,&pd,f0,f1](int i,int j)
     {
         if(i==0) return (*f0)(pd.half_width+j);
-        else if(i==height-1) return (*f1)(pd.half_width+j);
-        else return base+(i-1)*width+j+pd.half_width;
+        else if(i==height) return (*f1)(pd.half_width+j);
+        else return base+(i-1)*(width+1)+j+pd.half_width;
     };
 
     TV inc_i=pd.unit_length*d,inc_j=pd.unit_length*t;
     TV next=v0+inc_i-pd.half_width*inc_j;
     PARTICLE_ID k=base;
-    for(int i=1;i<height-1;i++){
+    for(int i=1;i<height;i++){
         TV pt=next;
         for(int j=-pd.half_width;j<=pd.half_width;j++){
             X(k++)=pt;
@@ -73,7 +68,7 @@ Generate_Pipe(PIPE_ID pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con)
         next+=inc_i;}
 
     TRIANGLE_ID canonical_element=Number_Triangles();
-    for(int i=0;i<height-1;i++){
+    for(int i=0;i<height;i++){
         for(int j=-pd.half_width+1;j<=pd.half_width;j++){
             PARTICLE_ID a=pid(i,j),b=pid(i+1,j),c=pid(i,j-1),d=pid(i+1,j-1);
             Append_Triangle(E(a,c,b));
@@ -83,12 +78,14 @@ Generate_Pipe(PIPE_ID pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con)
         for(int j=-pd.half_width;j<=pd.half_width;j++){
             node_blocks(pid(i+(j<0),j))=blocks.m;
             PARTICLE_ID cp=pid(i+(j>=0),j);
-            if((i==0 || i==height-2) && node_blocks(cp)<BLOCK_ID())
+            if((i==0 || i==height-1) && node_blocks(cp)<BLOCK_ID())
                 node_blocks(cp)=blocks.m;}
         blocks.Append({pipe});}
+
+    bool irregular_last=abs(l-height*pd.unit_length)>(T)1e-6*l;
     if(irregular_last) blocks.Last().pipe_id=PIPE_ID(-1);
 
-    pipes(pipe)={inc_j,inc_i,canonical_element};
+    pipes(pipe)={-inc_j,inc_i,canonical_element};
 }
 //#####################################################################
 // Function Mark_BC
@@ -626,7 +623,7 @@ Allocate_Dofs()
 {
     area_hidden.mesh.Initialize_Segment_Mesh();
     area_hidden.mesh.Initialize_Edge_Triangles();
-    vel_edge_dofs.Resize(Number_Edges(),init_all,DOF_ID(-1));
+    vel_edge_dofs.Resize(Number_Edges(),init_all,DOF_ID(-2));
     edge_blocks.Resize(Number_Edges(),init_all,BLOCK_ID(-1));
 
     BC_ID wall_bc=bc.Append({dirichlet_v,TV()});
@@ -668,13 +665,13 @@ Allocate_Dofs()
         BLOCK_ID bid=node_blocks(i);
         pressure_dofs(i)=DOF_ID(num_vel_dofs+--block_pressure_dofs(bid));}
 
-    vel_node_dofs.Resize(Number_Particles(),use_init,DOF_ID(-1));
+    vel_node_dofs.Resize(Number_Particles(),use_init,DOF_ID(-2));
     for(PARTICLE_ID i(0);i<Number_Particles();i++){
         BC_ID* bc_idx=particle_bc_map.Get_Pointer(i);
         if(bc_idx && bc(*bc_idx).bc_type==dirichlet_v) continue;
         vel_node_dofs(i)=DOF_ID(--block_vel_dofs(node_blocks(i))*TV::m);}
 
-    vel_edge_dofs.Resize(Number_Edges(),use_init,DOF_ID(-1));
+    vel_edge_dofs.Resize(Number_Edges(),use_init,DOF_ID(-2));
     for(EDGE_ID i(0);i<Number_Edges();i++){
         BC_ID* bc_idx=bc_map.Get_Pointer(Edge(i).Sorted());
         if(bc_idx && bc(*bc_idx).bc_type==dirichlet_v) continue;

@@ -19,20 +19,23 @@
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_RANGE_ITERATOR.h>
 #include <Grid_Tools/Grids/GRID.h>
+#include <Geometry/Analytic_Tests/ANALYTIC_SCALAR.h>
+#include <Geometry/Analytic_Tests/ANALYTIC_VECTOR.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <fstream>
 #include <map>
 #include <set>
 #include <string>
-#include <chrono>
 #include "CACHED_ELIMINATION_MATRIX.h"
+#include "FEM_MESHING_TESTS.h"
+#include "FEM_TABLE.h"
 #include "FLAT_SYSTEM.h"
 #include "FLAT_SYSTEM_FEM.h"
 #include "FLUID_LAYOUT.h"
 #include "FLUID_LAYOUT_FEM.h"
-#include "FEM_MESHING_TESTS.h"
-#include "FEM_TABLE.h"
+#include <chrono>
 
 using namespace PhysBAM;
 
@@ -96,14 +99,65 @@ void Run_FEM(PARSE_ARGS& parse_args)
     Flush_Frame<TV>("dofs");
     
     ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> > coded_entries;
-    ARRAY<T,CODE_ID> rhs_vector,code_values;
-    Generate_Discretization(coded_entries,code_values,fl,pd,mu);
+    ARRAY<T,CODE_ID> code_values;
+    ARRAY<T,DOF_ID> rhs_vector(fl.num_dofs);
+    Generate_Discretization(coded_entries,code_values,fl,pd,mu,
+        rhs_vector,pd.analytic_velocity,pd.analytic_pressure);
+
+    if(pd.analytic_velocity && pd.analytic_pressure)
+    {
+        ARRAY<T,DOF_ID> sol(rhs_vector.m),res(rhs_vector);
+        for(PARTICLE_ID p(0);p<fl.Number_Particles();p++)
+        {
+            TV X=fl.X(p),U=pd.analytic_velocity->v(X,0);
+            sol(fl.pressure_dofs(p))=pd.analytic_pressure->f(X,0);
+            DOF_ID d=fl.vel_node_dofs(p);
+            if(d<DOF_ID()) continue;
+            for(int i=0;i<2;i++)
+                sol(d+i)=U(i);
+        }
+        for(EDGE_ID e(0);e<fl.Number_Edges();e++)
+        {
+            DOF_ID d=fl.vel_edge_dofs(e);
+            if(d<DOF_ID()) continue;
+            auto ed=fl.Edge(e);
+            TV X=(T).5*(fl.X(ed.x)+fl.X(ed.y));
+            TV U=pd.analytic_velocity->v(X,0);
+            for(int i=0;i<2;i++)
+                sol(d+i)=U(i);
+        }
+        LOG::printf("sol: %P\n",sol);
+        LOG::printf("rhs: %P\n",rhs_vector);
+        for(auto t:coded_entries)
+            res(t.x)-=code_values(t.z)*sol(t.y);
+        LOG::printf("res: %P\n",res);
+        LOG::printf("error: %P\n",res.Max_Abs());
+    }
+
 
     
 //    Compute_Full_Matrix(coded_entries,code_values,rhs_vector,fl,mu,pd.unit_length);
     SYSTEM_MATRIX_HELPER<T> MH;
     for(auto& e:coded_entries) MH.data.Append({Value(e.x),Value(e.y),code_values(e.z)});
+    
+    SPARSE_MATRIX_FLAT_MXN<T> M;
+    MH.Set_Matrix(Value(fl.num_dofs),Value(fl.num_dofs),M);
+    OCTAVE_OUTPUT<T>("M.txt").Write("M",M);
+    
+    // typedef KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > KRY_VEC;
+    // typedef MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_MXN<T>,T,KRY_VEC> KRY_MAT;
+    // KRY_MAT sys(M);
+    // KRY_VEC rhs,sol;
+    // rhs.v=reinterpret_cast<const ARRAY<T>&>(rhs_vector);
+    // sol.v.Resize(Value(fl.Total_Dofs()));
 
+    // ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
+    // sys.Test_System(sol);
+    // OCTAVE_OUTPUT<T>("M.txt").Write("M",sys,rhs);
+    // OCTAVE_OUTPUT<T>("b.txt").Write("b",rhs);
+
+    
+    
     LOG::Instance()->Copy_Log_To_File(output_dir+"/common/log.txt",false);
 }
 

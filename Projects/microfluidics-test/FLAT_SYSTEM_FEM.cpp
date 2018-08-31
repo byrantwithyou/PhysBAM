@@ -3,6 +3,8 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Data_Structures/TRIPLE.h>
+#include <Geometry/Analytic_Tests/ANALYTIC_SCALAR.h>
+#include <Geometry/Analytic_Tests/ANALYTIC_VECTOR.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include "FEM_TABLE.h"
@@ -24,9 +26,11 @@ void Generate_Hash_FEM_Entries(ARRAY<T,LOCAL_V_CODE_ID>& viscosity_hash,
     const TV& u,const TV& v,T mu)
 {
     T S[4] = {u.x, v.x, u.y, v.y}, R[10], scale=mu/(6*u.Cross(v).x);
+    assert(scale>=0);
     for(int i=0,k=0;i<4;i++)
         for(int j=i;j<4;j++)
             R[k++]=scale*S[i]*S[j];
+    for(auto& s:S) s/=6;
 
     LOCAL_V_CODE_ID num_hashes_visc=Number_Unique_Visc_Codes();
     viscosity_hash.Resize(num_hashes_visc,no_init);
@@ -56,35 +60,20 @@ void Generate_FEM_Entries(general_fem_coefficients<T>& out,
 {
     for(int i=0;i<6;i++)
         for(int j=0;j<6;j++)
+        {
+            auto M=Main_Table_Visc(i,j);
             for(int k=0;k<2;k++)
                 for(int l=0;l<2;l++)
-                    out.viscosity[i][j](k,l)=viscosity_hash(Main_Table_Visc(i,k,j,l));
+                    out.viscosity[i][j](k,l)=viscosity_hash(M(k,l));
+        }
 
     for(int i=0;i<3;i++)
         for(int j=0;j<6;j++)
+        {
+            auto V=Main_Table_Pres(i,j);
             for(int k=0;k<2;k++)
-                out.pressure[i][j](k)=pressure_hash(Main_Table_Pres(i,j,k));
-}
-
-static int bc_table[3][3]={{4,-1,2},{-1,4,2},{2,2,16}};
-template<class TV, class T>
-VECTOR<TV,3> Times_BC_NdotN(VECTOR<TV,3>& bc, T edge_length)
-{
-    VECTOR<TV,3> out;
-    for(int i=0;i<3;i++)
-        for(int j=0;j<3;j++)
-            out(i)+=bc_table[i][j]*bc(j);
-    return edge_length/30*out;
-}
-
-template<class T,class TV>
-VECTOR<TV,6> Times_force_NdotN(VECTOR<TV,6>& f, T tri_area)
-{
-    VECTOR<TV,6> out;
-    for(int i=0;i<6;i++)
-        for(int j=0;j<6;j++)
-            out(i)+=force_table[i][j]*f(j);
-    return tri_area/360*out;
+                out.pressure[i][j](k)=pressure_hash(V(k));
+        }
 }
 
 static const auto num_v_codes=Number_Unique_Visc_Codes();
@@ -98,13 +87,15 @@ inline CODE_ID Code(PIPE_ID p,LOCAL_P_CODE_ID c)
 {
     return CODE_ID(Value(p)*(Value(num_v_codes)+Value(num_p_codes))+Value(c));
 };
-inline LOCAL_P_CODE_ID Neg(LOCAL_P_CODE_ID c)
+inline VECTOR<LOCAL_P_CODE_ID,2> Neg(VECTOR<LOCAL_P_CODE_ID,2> c)
 {
-    return LOCAL_P_CODE_ID(1^Value(c));
+    for(auto&i:c) if(i) i=LOCAL_P_CODE_ID(Value(i)^1);
+    return c;
 }
-inline LOCAL_P_CODE_ID Cond_Neg(LOCAL_P_CODE_ID c,int neg)
+inline VECTOR<LOCAL_P_CODE_ID,2> Cond_Neg(VECTOR<LOCAL_P_CODE_ID,2> c,int neg)
 {
-    return LOCAL_P_CODE_ID(neg^Value(c));
+    for(auto&i:c) if(i) i=LOCAL_P_CODE_ID(Value(i)^neg);
+    return c;
 }
 
 int Missing_Vertex(VECTOR<PARTICLE_ID,3> t, VECTOR<PARTICLE_ID,2> e)
@@ -116,9 +107,159 @@ int Missing_Vertex(VECTOR<PARTICLE_ID,3> t, VECTOR<PARTICLE_ID,2> e)
 }
 
 template<class T,class TV>
+void Apply_Analytic_BC(ANALYTIC_VECTOR<TV> * analytic_velocity,
+    ARRAY<T,DOF_ID>& rhs,const MATRIX<T,TV::m>& visc, DOF_ID dof_u[2], const TV& X)
+{
+    TV V=analytic_velocity->v(X,0),MV=visc*V;
+    for(int i=0;i<2;i++) rhs(dof_u[i])-=MV(i);
+}
+
+template<class T,class TV>
+void Apply_Analytic_BC(ANALYTIC_VECTOR<TV> * analytic_velocity,
+    ARRAY<T,DOF_ID>& rhs, const TV& pres, DOF_ID dof_p, const TV& X)
+{
+    rhs(dof_p)+=pres.Dot(analytic_velocity->v(X,0));
+}
+
+template<class T,class TV>
+void Apply_Analytic_BC(ANALYTIC_VECTOR<TV> * analytic_velocity,
+    ARRAY<T,DOF_ID>& rhs,MATRIX<LOCAL_V_CODE_ID,TV::m> visc, 
+    DOF_ID dof_u[2], const TV& X, PIPE_ID pipe,
+    const ARRAY<T,CODE_ID>& code_values)
+{
+    MATRIX<T,TV::m> visc_mat;
+    for(int i=0;i<2;i++)
+        for(int j=0;j<2;j++)
+            visc_mat(i,j)=code_values(Code(pipe,visc(i,j)));
+    Apply_Analytic_BC(analytic_velocity,rhs,visc_mat,dof_u,X);
+}
+
+template<class T,class TV>
+void Apply_Analytic_BC(ANALYTIC_VECTOR<TV> * analytic_velocity,
+    ARRAY<T,DOF_ID>& rhs,VECTOR<LOCAL_P_CODE_ID,TV::m> pres,
+    DOF_ID dof_p, const TV& X, PIPE_ID pipe,
+    const ARRAY<T,CODE_ID>& code_values)
+{
+    TV pres_vec;
+    for(int i=0;i<2;i++)
+        pres_vec(i)=-code_values(Code(pipe,pres[i]));
+    Apply_Analytic_BC(analytic_velocity,rhs,pres_vec,dof_p,X);
+}
+
+template<class T,class TV>
+void Add_To_Matrix(ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entries,
+    const ARRAY<T,CODE_ID>& code_values, MATRIX<LOCAL_V_CODE_ID,TV::m> visc, 
+    DOF_ID dof_u[2], DOF_ID dof_v[2], ANALYTIC_VECTOR<TV> * analytic_velocity,
+    ARRAY<T,DOF_ID>& rhs, const TV& Xu, const TV& Xv, PIPE_ID pipe, bool diag)
+{
+    if(dof_u[0]>=DOF_ID() && dof_v[0]>=DOF_ID())
+    {
+        for(int a=0;a<2;a++)
+            for(int b=0;b<2;b++)
+            {
+                DOF_ID d0=dof_u[a];
+                DOF_ID d1=dof_v[b];
+                if(visc(a,b))
+                {
+                    CODE_ID code=Code(pipe,visc(a,b));
+                    coded_entries.Append({d0,d1,code});
+                    if(!diag) coded_entries.Append({d1,d0,code});
+                }
+            }
+    }
+    else if(dof_u[0]>=DOF_ID() && analytic_velocity)
+    {
+        Apply_Analytic_BC(analytic_velocity,rhs,visc,dof_u,Xv,pipe,code_values);
+    }
+    else if(dof_v[0]>=DOF_ID() && analytic_velocity && !diag)
+    {
+        Apply_Analytic_BC(analytic_velocity,rhs,visc.Transposed(),dof_v,Xu,pipe,code_values);
+    }
+}
+
+template<class T,class TV>
+void Add_To_Matrix(ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entries,
+    ARRAY<T,CODE_ID>& code_values, const MATRIX<T,TV::m>& visc,
+    DOF_ID dof_u[2], DOF_ID dof_v[2], ANALYTIC_VECTOR<TV> * analytic_velocity,
+    ARRAY<T,DOF_ID>& rhs, const TV& Xu, const TV& Xv, bool diag)
+{
+    if(dof_u[0]>=DOF_ID() && dof_v[0]>=DOF_ID())
+    {
+        for(int a=0;a<2;a++)
+            for(int b=(diag?a:0);b<2;b++)
+            {
+                DOF_ID d0=dof_u[a];
+                DOF_ID d1=dof_v[b];
+                CODE_ID code=code_values.Append(visc(a,b));
+                coded_entries.Append({d0,d1,code});
+                if(!diag || a!=b) coded_entries.Append({d1,d0,code});
+            }
+    }
+    else if(dof_u[0]>=DOF_ID() && analytic_velocity)
+    {
+        Apply_Analytic_BC(analytic_velocity,rhs,visc,dof_u,Xv);
+    }
+    else if(dof_v[0]>=DOF_ID() && analytic_velocity && !diag)
+    {
+        Apply_Analytic_BC(analytic_velocity,rhs,visc.Transposed(),dof_v,Xu);
+    }
+}
+
+template<class T,class TV>
+void Add_To_Matrix(ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entries,
+    const ARRAY<T,CODE_ID>& code_values, VECTOR<LOCAL_P_CODE_ID,TV::m> pres,
+    DOF_ID dof_u[2], DOF_ID dof_p, ANALYTIC_VECTOR<TV> * analytic_velocity,
+    ARRAY<T,DOF_ID>& rhs, const TV& Xu, PIPE_ID pipe)
+{
+    pres=Neg(pres);
+    if(dof_u[0]>=DOF_ID())
+    {
+        for(int b=0;b<2;b++)
+        {
+            DOF_ID d0=dof_p;
+            DOF_ID d1=dof_u[b];
+            if(pres(b))
+            {
+                CODE_ID code=Code(pipe,pres(b));
+                coded_entries.Append({d0,d1,code});
+                coded_entries.Append({d1,d0,code});
+            }
+        }
+    }
+    else if(analytic_velocity)
+    {
+        Apply_Analytic_BC(analytic_velocity,rhs,pres,dof_p,Xu,pipe,code_values);
+    }
+}
+
+template<class T,class TV>
+void Add_To_Matrix(ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entries,
+    ARRAY<T,CODE_ID>& code_values, const TV& pres,
+    DOF_ID dof_u[2], DOF_ID dof_p, ANALYTIC_VECTOR<TV> * analytic_velocity,
+    ARRAY<T,DOF_ID>& rhs, const TV& Xu)
+{
+    if(dof_u[0]>=DOF_ID())
+    {
+        for(int b=0;b<2;b++)
+        {
+            DOF_ID d0=dof_p;
+            DOF_ID d1=dof_u[b];
+            CODE_ID code=code_values.Append(-pres(b));
+            coded_entries.Append({d0,d1,code});
+            coded_entries.Append({d1,d0,code});
+        }
+    }
+    else if(analytic_velocity)
+    {
+        Apply_Analytic_BC(analytic_velocity,rhs,pres,dof_p,Xu);
+    }
+}
+
+template<class T,class TV>
 void Generate_Discretization(ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entries,
     ARRAY<T,CODE_ID>& code_values,const FLUID_LAYOUT_FEM<TV>& fl,
-    const PARSE_DATA_FEM<TV>& pd,T mu)
+    const PARSE_DATA_FEM<TV>& pd,T mu,ARRAY<T,DOF_ID>& rhs,
+    ANALYTIC_VECTOR<TV> * analytic_velocity,ANALYTIC_SCALAR<TV> * analytic_pressure)
 {
 
     PIPE_ID unknown_pipe(-2);
@@ -162,7 +303,8 @@ void Generate_Discretization(ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entrie
 
         DOF_ID dof_p=fl.pressure_dofs(p);
         DOF_ID dof_u[2]={fl.vel_node_dofs(p),fl.vel_node_dofs(p)+1};
-
+        TV X=fl.X(p);
+        
         if(regular<PIPE_ID())
         {
             MATRIX<T,TV::m> visc;
@@ -173,32 +315,17 @@ void Generate_Discretization(ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entrie
                 int k=fl.Triangle(t).Find(p);
                 const general_fem_coefficients<T>& fem=pipe<PIPE_ID()?irregular_data(t):pipe_data(pipe);
                 visc+=fem.viscosity[k][k];
-                int sign=(pipe>=PIPE_ID() && (t-fl.pipes(regular).first_element)%2)?-1:1;
+                int sign=(pipe>=PIPE_ID() && (t-fl.pipes(pipe).first_element)%2)?-1:1;
                 pres+=fem.pressure[k][k]*sign;
             }
-            CODE_ID codes_u[3];
-            CODE_ID codes_p[2];
-            for(int i=0;i<2;i++)
-                for(int j=i;j<2;j++)
-                    codes_u[i+j]=code_values.Append(visc(i,j));
-            for(int i=0;i<2;i++)
-                codes_p[i]=code_values.Append(-pres(i));
 
-            for(int i=0;i<2;i++)
-                for(int j=0;j<2;j++)
-                    coded_entries.Append({dof_u[i],dof_u[j],codes_u[i+j]});
-
-            for(int i=0;i<2;i++){
-                coded_entries.Append({dof_p,dof_u[i],codes_p[i]});
-                coded_entries.Append({dof_u[i],dof_p,codes_p[i]});}
+            Add_To_Matrix(coded_entries,code_values,visc,dof_u,dof_u,analytic_velocity,rhs,X,X,true);
+            Add_To_Matrix(coded_entries,code_values,pres,dof_u,dof_p,analytic_velocity,rhs,X);
         }
         else
         {
-            LOCAL_V_CODE_ID visc[2][2]={};
-            LOCAL_P_CODE_ID pres[2]={};
-            for(int i=0;i<2;i++)
-                for(int j=0;j<2;j++)
-                    visc[i][j]=Vertex_Table_Visc(i,j,elems.m);
+            Add_To_Matrix(coded_entries,code_values,Vertex_Table_Visc(elems.m),
+                dof_u,dof_u,analytic_velocity,rhs,X,X,regular,true);
 
             if(elems.m<6)
             {
@@ -211,18 +338,10 @@ void Generate_Discretization(ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entrie
                     if(k==0) z+=n+1;
                     if(k==1) x+=n+1;
                 }
-                for(int i=0;i<2;i++)
-                    pres[i]=Vertex_Table_Pres(i,x,z);
+
+                Add_To_Matrix(coded_entries,code_values,Vertex_Table_Pres(x,z),
+                    dof_u,dof_p,analytic_velocity,rhs,X,regular);
             }
-
-            for(int i=0;i<2;i++)
-                for(int j=0;j<2;j++)
-                    coded_entries.Append({dof_u[i],dof_u[j],Code(regular,visc[i][j])});
-
-            for(int i=0;i<2;i++){
-                CODE_ID code=Code(regular,Neg(pres[i]));
-                coded_entries.Append({dof_p,dof_u[i],code});
-                coded_entries.Append({dof_u[i],dof_p,code});}
         }
     }
 
@@ -254,6 +373,11 @@ void Generate_Discretization(ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entrie
         dof_u[2][0]=fl.vel_edge_dofs(e);
         dof_u[2][1]=fl.vel_edge_dofs(e)+1;
 
+        assert(dof_p[0]>=DOF_ID());
+        assert(dof_p[1]>=DOF_ID());
+        TV X[3]={fl.X(v0[0]),fl.X(v0[1])};
+        X[2]=(T).5*(X[0]+X[1]);
+
         if(regular<PIPE_ID())
         {
             MATRIX<T,TV::m> visc[3][3];
@@ -267,7 +391,7 @@ void Generate_Discretization(ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entrie
                 auto tri=fl.Triangle(t);
                 int c=Missing_Vertex(tri,fl.Edge(e));
                 int di[3]={(c+1+i)%3,(c+2-i)%3,c+3};
-                int sign=(pipe>=PIPE_ID() && (t-fl.pipes(regular).first_element)%2)?-1:1;
+                int sign=(pipe>=PIPE_ID() && (t-fl.pipes(pipe).first_element)%2)?-1:1;
                 for(int m=0;m<3;m++)
                     for(int n=0;n<3;n++)
                     {
@@ -275,35 +399,20 @@ void Generate_Discretization(ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entrie
                         visc[m][n]+=fem.viscosity[di[m]][di[n]];
                     }
                 for(int m=0;m<2;m++)
-                    for(int n=0;n<3;n++)
-                        pres[m][n]+=fem.pressure[di[m]][di[n]]*sign;
+                    for(int n=0;n<3;n++){
+                        if(m==n) continue;
+                        pres[m][n]+=fem.pressure[di[m]][di[n]]*sign;}
             }
 
             for(int m=0;m<3;m++)
-                for(int n=0;n<3;n++)
-                    for(int a=0;a<2;a++)
-                        for(int b=0;b<2;b++)
-                        {
-                            if(m<2 && m==n) continue;
-                            DOF_ID d0=dof_u[m][a];
-                            DOF_ID d1=dof_u[n][b];
-                            if(d1<d0) continue;
-                            CODE_ID code=code_values.Append(visc[m][n](a,b));
-                            coded_entries.Append({d0,d1,code});
-                            coded_entries.Append({d1,d0,code});
-                        }
+                for(int n=m;n<3;n++)
+                    if(m>=2 || m!=n)
+                        Add_To_Matrix(coded_entries,code_values,visc[m][n],dof_u[m],dof_u[n],analytic_velocity,rhs,X[m],X[n],m==n);
 
             for(int m=0;m<2;m++)
                 for(int n=0;n<3;n++)
-                    for(int b=0;b<2;b++)
-                    {
-                        DOF_ID d0=dof_p[m];
-                        DOF_ID d1=dof_u[n][b];
-                        CODE_ID code=code_values.Append(-pres[m][n](b));
-                        coded_entries.Append({d0,d1,code});
-                        coded_entries.Append({d1,d0,code});
-                    }
-
+                    if(m!=n)
+                        Add_To_Matrix(coded_entries,code_values,pres[m][n],dof_u[n],dof_p[m],analytic_velocity,rhs,X[n]);
         }
         else
         {
@@ -312,8 +421,8 @@ void Generate_Discretization(ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entrie
             int c0=Missing_Vertex(tri0,fl.Edge(e));
             int di[3]={(c0+1)%3,(c0+2)%3,c0+3};
             int sign=(regular>=PIPE_ID() && Value(t0-fl.pipes(regular).first_element)%2);
-            LOCAL_V_CODE_ID visc[3][3][2][2];
-            LOCAL_P_CODE_ID pres[2][3][2];
+            MATRIX<LOCAL_V_CODE_ID,TV::m> visc[3][3];
+            VECTOR<LOCAL_P_CODE_ID,TV::m> pres[2][3];
             memset(visc,-1,sizeof(visc));
             memset(pres,-1,sizeof(pres));
 
@@ -321,17 +430,17 @@ void Generate_Discretization(ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entrie
             {
                 for(int m=0;m<3;m++)
                     for(int n=0;n<3;n++)
-                        for(int a=0;a<2;a++)
-                            for(int b=0;b<2;b++)
-                            {
-                                if(m<2 && m==n) continue;
-                                visc[m][n][a][b]=Main_Table_Visc(di[m],a,di[n],b);
-                            }
+                    {
+                        if(m<2 && m==n) continue;
+                        visc[m][n]=Main_Table_Visc(di[m],di[n]);
+                    }
 
                 for(int m=0;m<2;m++)
                     for(int n=0;n<3;n++)
-                        for(int b=0;b<2;b++)
-                            pres[m][n][b]=Cond_Neg(Main_Table_Pres(di[m],di[n],b),sign);
+                    {
+                        if(m==n) continue;
+                        pres[m][n]=Cond_Neg(Main_Table_Pres(di[m],di[n]),sign);
+                    }
             }
             else
             {
@@ -342,43 +451,51 @@ void Generate_Discretization(ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entrie
 
                 for(int m=0;m<3;m++)
                     for(int n=0;n<3;n++)
-                        for(int a=0;a<2;a++)
-                            for(int b=0;b<2;b++)
-                            {
-                                if(m<2 && m==n) continue;
-                                visc[m][n][a][b]=Edge_Table_Visc(c0,c1,m,a,n,b);
-                            }
-
+                    {
+                        if(m<2 && m==n) continue;
+                        visc[m][n]=Edge_Table_Visc(c0,c1,m,n);
+                    }
+                
                 for(int m=0;m<2;m++)
                     for(int n=0;n<3;n++)
-                        for(int b=0;b<2;b++)
-                            pres[m][n][b]=Cond_Neg(Edge_Table_Pres(c0,c1,m,n,b),sign);
+                    {
+                        if(m==n) continue;
+                        pres[m][n]=Cond_Neg(Edge_Table_Pres(c0,c1,m,n),sign);
+                    }
             }
 
             for(int m=0;m<3;m++)
-                for(int n=0;n<3;n++)
-                    for(int a=0;a<2;a++)
-                        for(int b=0;b<2;b++)
-                        {
-                            if(m<2 && m==n) continue;
-                            DOF_ID d0=dof_u[m][a];
-                            DOF_ID d1=dof_u[n][b];
-                            if(d1<d0) continue;
-                            CODE_ID code=Code(regular,visc[m][n][a][b]);
-                            coded_entries.Append({d0,d1,code});
-                            coded_entries.Append({d1,d0,code});
-                        }
+                for(int n=m;n<3;n++)
+                    if(m>=2 || m!=n)
+                        Add_To_Matrix(coded_entries,code_values,visc[m][n],dof_u[m],dof_u[n],analytic_velocity,rhs,X[m],X[n],regular,m==n);
 
             for(int m=0;m<2;m++)
                 for(int n=0;n<3;n++)
-                    for(int b=0;b<2;b++)
-                    {
-                        DOF_ID d0=dof_p[m];
-                        DOF_ID d1=dof_u[n][b];
-                        CODE_ID code=Code(regular,Neg(pres[m][n][b]));
-                        coded_entries.Append({d0,d1,code});
-                        coded_entries.Append({d1,d0,code});
-                    }
+                    if(m!=n)
+                        Add_To_Matrix(coded_entries,code_values,pres[m][n],dof_u[n],dof_p[m],analytic_velocity,rhs,X[n],regular);
+        }
+
+        if(tris.m==1)
+        {
+            BC_ID bc_id(-1);
+            if(fl.bc_map.Get(fl.Edge(e).Sorted(),bc_id) && fl.bc(bc_id).bc_type==traction)
+            {
+                VECTOR<TV,3> bc;
+                TV YA=fl.X(tri0((c0+1)%3));
+                TV YB=fl.X(tri0((c0+2)%3));
+                TV N=(YB-YA).Rotate_Clockwise_90();
+                for(int i=0;i<3;i++)
+                {
+                    SYMMETRIC_MATRIX<T,2> stress=analytic_velocity->dX(X[i],0).Twice_Symmetric_Part()*mu;
+                    stress-=analytic_pressure->f(X[i],0);
+                    bc(i)=stress*N;
+                }
+                VECTOR<TV,3> B=Times_BC_NdotN(bc);
+                for(int i=0;i<3;i++)
+                    for(int j=0;j<2;j++)
+                        if(dof_u[i][j]>=DOF_ID())
+                            rhs(dof_u[i][j])+=B(i)(j);
+            }
         }
     }
 
@@ -389,11 +506,13 @@ void Generate_Discretization(ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entrie
 
         DOF_ID dof_p[3];
         DOF_ID dof_u[6][2];
+        TV X[6];
         for(int i=0;i<3;i++)
         {
             dof_p[i]=fl.pressure_dofs(tri(i));
             dof_u[i][0]=fl.vel_node_dofs(tri(i));
             dof_u[i][1]=fl.vel_node_dofs(tri(i))+1;
+            X[i]=fl.X(tri(i));
         }
         for(auto e:fl.Triangle_Edges(t))
         {
@@ -401,84 +520,67 @@ void Generate_Discretization(ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entrie
             dof_u[c+3][0]=fl.vel_edge_dofs(e);
             dof_u[c+3][1]=fl.vel_edge_dofs(e)+1;
         }
+        for(int i=0;i<3;i++)
+            X[i+3]=(T).5*(X[(i+1)%3]+X[(i+2)%3]);
 
         if(regular<PIPE_ID())
         {
-            MATRIX<T,TV::m> visc_ee[3]; // i+3 -> (i+1)%3+3
-            MATRIX<T,TV::m> visc_ve[3]; // i -> i+3
-            TV pres_ve[3]; // i -> i+3
-
             const general_fem_coefficients<T>& fem=irregular_data(t);
-
             for(int m=0;m<3;m++)
             {
-                visc_ee[m]=fem.viscosity[m+3][(m+1)%3+3];
-                visc_ve[m]=fem.viscosity[m][m+3];
+                Add_To_Matrix(coded_entries,code_values,fem.viscosity[m+3][(m+1)%3+3],
+                    dof_u[m+3],dof_u[(m+1)%3+3],analytic_velocity,rhs,X[m+3],X[(m+1)%3+3],false);
+                Add_To_Matrix(coded_entries,code_values,fem.viscosity[m][m+3],
+                    dof_u[m],dof_u[m+3],analytic_velocity,rhs,X[m],X[m+3],false);
             }
-            for(int m=0;m<2;m++)
-                pres_ve[m]=fem.pressure[m][m+3];
 
             for(int m=0;m<3;m++)
-                for(int a=0;a<2;a++)
-                    for(int b=0;b<2;b++)
-                    {
-                        DOF_ID d0=dof_u[m+3][a];
-                        DOF_ID d1=dof_u[(m+1)%3+3][b];
-                        CODE_ID code=code_values.Append(visc_ee[m](a,b));
-                        coded_entries.Append({d0,d1,code});
-                        coded_entries.Append({d1,d0,code});
-                        d0=dof_u[m][a];
-                        d1=dof_u[m+3][b];
-                        code=code_values.Append(visc_ve[m](a,b));
-                        coded_entries.Append({d0,d1,code});
-                        coded_entries.Append({d1,d0,code});
-                    }
-
-            for(int m=0;m<3;m++)
-                for(int b=0;b<2;b++)
-                {
-                    DOF_ID d0=dof_p[m];
-                    DOF_ID d1=dof_u[m+3][b];
-                    CODE_ID code=code_values.Append(-pres_ve[m](b));
-                    coded_entries.Append({d0,d1,code});
-                    coded_entries.Append({d1,d0,code});
-                }
+                Add_To_Matrix(coded_entries,code_values,fem.pressure[m][m+3],
+                    dof_u[m+3],dof_p[m],analytic_velocity,rhs,X[m+3]);
         }
         else
         {
             int sign=(t-fl.pipes(regular).first_element)%2;
 
             for(int m=0;m<3;m++)
-                for(int a=0;a<2;a++)
-                    for(int b=0;b<2;b++)
-                    {
-                        LOCAL_V_CODE_ID visc_ee=Main_Table_Visc(m+3,a,(m+1)%3+3,b);
-                        LOCAL_V_CODE_ID visc_ve=Main_Table_Visc(m,a,m+3,b);
-                        DOF_ID d0=dof_u[m+3][a];
-                        DOF_ID d1=dof_u[(m+1)%3+3][b];
-                        CODE_ID code=Code(regular,visc_ee);
-                        coded_entries.Append({d0,d1,code});
-                        coded_entries.Append({d1,d0,code});
-                        d0=dof_u[m][a];
-                        d1=dof_u[m+3][b];
-                        code=Code(regular,visc_ve);
-                        coded_entries.Append({d0,d1,code});
-                        coded_entries.Append({d1,d0,code});
-                    }
+            {
+                Add_To_Matrix(coded_entries,code_values,Main_Table_Visc(m+3,(m+1)%3+3),
+                    dof_u[m+3],dof_u[(m+1)%3+3],analytic_velocity,rhs,X[m+3],X[(m+1)%3+3],regular,false);
+                Add_To_Matrix(coded_entries,code_values,Main_Table_Visc(m,m+3),
+                    dof_u[m],dof_u[m+3],analytic_velocity,rhs,X[m],X[m+3],regular,false);
+                Add_To_Matrix(coded_entries,code_values,Cond_Neg(Main_Table_Pres(m,m+3),sign),
+                    dof_u[m+3],dof_p[m],analytic_velocity,rhs,X[m+3],regular);
+            }
+        }
 
-            for(int m=0;m<2;m++)
-                for(int b=0;b<2;b++)
-                {
-                    LOCAL_P_CODE_ID pres_ve=Cond_Neg(Main_Table_Pres(m,m+3,b),sign);
-                    DOF_ID d0=dof_p[m];
-                    DOF_ID d1=dof_u[m+3][b];
-                    CODE_ID code=Code(regular,Neg(pres_ve));
-                    coded_entries.Append({d0,d1,code});
-                    coded_entries.Append({d1,d0,code});
-                }
+        if(analytic_velocity && analytic_pressure)
+        {
+            VECTOR<TV,6> f;
+            for(int i=0;i<6;i++)
+            {
+                SYMMETRIC_TENSOR<T,0,TV::m> ddU=analytic_velocity->ddX(X[i],0);
+                f(i) = analytic_pressure->dX(X[i],0);
+                f(i) -= mu * (Contract<1,2>(ddU)+Contract<0,2>(ddU));
+            }
+            T area=fl.Area(t);
+            VECTOR<TV,6> F=Times_force_NdotN(f, area);
+            for(int i=0;i<6;i++)
+                for(int j=0;j<2;j++)
+                    if(dof_u[i][j]>=DOF_ID())
+                        rhs(dof_u[i][j])+=F(i)(j);
+
+            VECTOR<T,6> div;
+            for(int i=0;i<6;i++)
+                div(i)=analytic_velocity->dX(X[i],0).Trace();
+            VECTOR<T,3> D=Times_div_PdotN(div, area);
+            for(int i=0;i<3;i++)
+                rhs(dof_p[i])-=D[i];
         }
     }
 }
-template void Generate_Discretization<double,VECTOR<double,2> >(ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID>,int>&,ARRAY<double,CODE_ID>&,FLUID_LAYOUT_FEM<VECTOR<double,2> > const&,PARSE_DATA_FEM<VECTOR<double,2> > const&,double);
-
+template void Generate_Discretization<double,VECTOR<double,2> >(
+    ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID>,int>&,ARRAY<double,CODE_ID>&,
+    FLUID_LAYOUT_FEM<VECTOR<double,2> > const&,PARSE_DATA_FEM<VECTOR<double,2> > const&,double,
+    ARRAY<double,DOF_ID>&,
+    ANALYTIC_VECTOR<VECTOR<double,2> >*,ANALYTIC_SCALAR<VECTOR<double,2> >*);
 }

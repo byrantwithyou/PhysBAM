@@ -3,11 +3,22 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Log/LOG.h>
+#include <Geometry/Analytic_Tests/ANALYTIC_SCALAR.h>
+#include <Geometry/Analytic_Tests/ANALYTIC_VECTOR.h>
 #include <fstream>
 #include <map>
 #include <string>
 #include "PARSE_DATA_FEM.h"
 namespace PhysBAM{
+//#####################################################################
+// Destructor
+//#####################################################################
+template<class TV> PARSE_DATA_FEM<TV>::
+~PARSE_DATA_FEM()
+{
+    delete analytic_velocity;
+    delete analytic_pressure;
+}
 //#####################################################################
 // Function Parse_Input
 //#####################################################################
@@ -69,6 +80,12 @@ Parse_Input(const std::string& pipe_file)
                     if(name2=="corner")
                         pts(i).joint_type=corner_joint;
                 }
+                break;
+            case 'U':
+                analytic_velocity=new ANALYTIC_VECTOR_PROGRAM<TV>(ss.str().c_str()+2);
+                break;
+            case 'P':
+                analytic_pressure=new ANALYTIC_SCALAR_PROGRAM<TV>(ss.str().c_str()+2);
                 break;
             default:
                 LOG::printf("PARSE FAIL: %c %s\n",c,ss.str());

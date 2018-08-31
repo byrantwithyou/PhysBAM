@@ -12,7 +12,7 @@ namespace PhysBAM{
 // Order[10]: u.x^2, v.x*u.x, u.y*u.x, u.x*v.y, v.x^2, u.y*v.x, v.y*v.x, u.y^2, v.y*u.y, v.y^2
 // u = x1 - x0, v = x2 - x0
 
-int main_table_visc[12][12]=
+static const int main_table_visc[12][12]=
 {
     {1,2,3,0,4,5,6,7,8,0,9,10},
     {2,11,12,13,0,5,14,15,16,17,0,18},
@@ -28,7 +28,7 @@ int main_table_visc[12][12]=
     {10,18,0,30,32,28,37,37,0,44,45,42}
 };
 
-static int unique_entries_visc[85][10]=
+static const int unique_entries_visc[85][10]=
 {
     {0,0,0,0,0,0,0,0,0,0},
     {3,-6,0,0,3,0,0,6,-12,6},
@@ -117,7 +117,7 @@ static int unique_entries_visc[85][10]=
     {0,-4,0,0,4,0,0,0,-2,2}
 };
 
-int vertex_table_visc[2][2][7]=
+static const int vertex_table_visc[2][2][7]=
 {
     {
         {-1,1,46,47,-1,-1,48},
@@ -129,7 +129,7 @@ int vertex_table_visc[2][2][7]=
     }
 };
 
-int edge_table_visc[3][3][3][2][3][2]=
+static const int edge_table_visc[3][3][3][2][3][2]=
 {
     {
         {
@@ -184,14 +184,14 @@ int edge_table_visc[3][3][3][2][3][2]=
     }
 };
 
-int main_table_pres[3][12]=
+static const int main_table_pres[3][12]=
 {
     {2,0,0,3,4,5,6,0,0,7,8,9},
     {0,10,0,12,11,13,0,14,0,16,15,17},
     {0,0,18,20,21,19,0,0,22,24,25,23}
 };
 
-static int unique_entries_pres[46][4]=
+static const int unique_entries_pres[46][4]=
 {
     {0,0,0,0},
     {0,0,0,0},
@@ -241,7 +241,7 @@ static int unique_entries_pres[46][4]=
     {-2,-2,0,0}
 };
 
-int vertex_table_pres[2][3][3]=
+static const int vertex_table_pres[2][3][3]=
 {
     {
         {-1,2,3},
@@ -255,7 +255,7 @@ int vertex_table_pres[2][3][3]=
     }
 };
 
-int edge_table_pres[3][3][2][3][2]=
+static const int edge_table_pres[3][3][2][3][2]=
 {
     {
         {{{5,9},{0,0},{4,8}},{{0,0},{4,8},{5,9}}},
@@ -274,7 +274,9 @@ int edge_table_pres[3][3][2][3][2]=
     }
 };
 
-int force_table[6][6]=
+static const int bc_table[3][3]={{4,-1,2},{-1,4,2},{2,2,16}};
+
+static const int force_table[6][6]=
 {
     {6, -1, -1, -4, 0, 0},
     {-1, 6, -1, 0, -4, 0},
@@ -284,6 +286,12 @@ int force_table[6][6]=
     {0, 0, -4, 16, 16, 32}
 };
 
+static const int divergence_table[3][6]=
+{
+    {2, -1, -1, 4, 8, 8},
+    {-1, 2, -1, 8, 4, 8},
+    {-1, -1, 2, 8, 8, 4}
+};
 
 int Unique_Entries_Visc(LOCAL_V_CODE_ID i,int b)
 {
@@ -303,28 +311,95 @@ LOCAL_P_CODE_ID Number_Unique_Pres_Codes()
     return LOCAL_P_CODE_ID(sizeof(unique_entries_pres)/sizeof(*unique_entries_pres));
 }
 
-LOCAL_V_CODE_ID Main_Table_Visc(int dof_u,int dim_u,int dof_v,int dim_v)
+MATRIX<LOCAL_V_CODE_ID,2> Main_Table_Visc(int dof_u,int dof_v)
 {
-    return LOCAL_V_CODE_ID(main_table_visc[dof_u+6*dim_u][dof_v+6*dim_v]);
+    MATRIX<LOCAL_V_CODE_ID,2> M;
+    for(int i=0;i<2;i++)
+        for(int j=0;j<2;j++)
+            M(i,j)=LOCAL_V_CODE_ID(main_table_visc[dof_u+6*i][dof_v+6*j]);
+    return M;
 }
-LOCAL_V_CODE_ID Vertex_Table_Visc(int dim_u,int dim_v,int num_tri)
+MATRIX<LOCAL_V_CODE_ID,2> Vertex_Table_Visc(int num_tri)
 {
-    return LOCAL_V_CODE_ID(vertex_table_visc[dim_u][dim_v][num_tri]);
+    MATRIX<LOCAL_V_CODE_ID,2> M;
+    for(int i=0;i<2;i++)
+        for(int j=0;j<2;j++)
+            M(i,j)=LOCAL_V_CODE_ID(vertex_table_visc[i][j][num_tri]);
+    return M;
 }
-LOCAL_V_CODE_ID Edge_Table_Visc(int can_u,int can_v,int dof_u,int dim_u,int dof_v,int dim_v)
+MATRIX<LOCAL_V_CODE_ID,2> Edge_Table_Visc(int can_u,int can_v,int dof_u,int dof_v)
 {
-    return LOCAL_V_CODE_ID(edge_table_visc[can_u][can_v][dof_u][dim_u][dof_v][dim_v]);
+    MATRIX<LOCAL_V_CODE_ID,2> M;
+    for(int i=0;i<2;i++)
+        for(int j=0;j<2;j++)
+            M(i,j)=LOCAL_V_CODE_ID(edge_table_visc[can_u][can_v][dof_u][i][dof_v][j]);
+    return M;
 }
-LOCAL_P_CODE_ID Main_Table_Pres(int dof_p,int dof_u,int dim_u)
+VECTOR<LOCAL_P_CODE_ID,2> Main_Table_Pres(int dof_p,int dof_u)
 {
-    return LOCAL_P_CODE_ID(main_table_pres[dof_p][dof_u+6*dim_u]);
+    VECTOR<LOCAL_P_CODE_ID,2> V;
+    for(int i=0;i<2;i++)
+        V(i)=LOCAL_P_CODE_ID(main_table_pres[dof_p][dof_u+6*i]);
+    return V;
 }
-LOCAL_P_CODE_ID Vertex_Table_Pres(int dim_u,int neg_x,int neg_z)
+VECTOR<LOCAL_P_CODE_ID,2> Vertex_Table_Pres(int neg_x,int neg_z)
 {
-    return LOCAL_P_CODE_ID(vertex_table_pres[dim_u][neg_x][neg_z]);
+    VECTOR<LOCAL_P_CODE_ID,2> V;
+    for(int i=0;i<2;i++)
+        V(i)=LOCAL_P_CODE_ID(vertex_table_pres[i][neg_x][neg_z]);
+    return V;
 }
-LOCAL_P_CODE_ID Edge_Table_Pres(int can_p,int can_u,int dof_p,int dof_u,int dim_u)
+VECTOR<LOCAL_P_CODE_ID,2> Edge_Table_Pres(int can_p,int can_u,int dof_p,int dof_u)
 {
-    return LOCAL_P_CODE_ID(edge_table_pres[can_p][can_u][dof_p][dof_u][dim_u]);
+    VECTOR<LOCAL_P_CODE_ID,2> V;
+    for(int i=0;i<2;i++)
+        V(i)=LOCAL_P_CODE_ID(edge_table_pres[can_p][can_u][dof_p][dof_u][i]);
+    return V;
 }
+
+template<class TV>
+VECTOR<TV,3> Times_BC_NdotN(const VECTOR<TV,3>& bc)
+{
+    VECTOR<TV,3> out;
+    for(int i=0;i<3;i++)
+    {
+        for(int j=0;j<3;j++)
+            out(i)+=bc(j)*bc_table[i][j];
+        out(i)/=30;
+    }
+    return out;
 }
+
+template<class T,class TV>
+VECTOR<TV,6> Times_force_NdotN(const VECTOR<TV,6>& f, T tri_area)
+{
+    VECTOR<TV,6> out;
+    T scale=tri_area/180;
+    for(int i=0;i<6;i++)
+    {
+        for(int j=0;j<6;j++)
+            out(i)+=f(j)*force_table[i][j];
+        out(i)*=scale;
+    }
+    return out;
+}
+
+template<class T>
+VECTOR<T,3> Times_div_PdotN(const VECTOR<T,6>& div, T tri_area)
+{
+    VECTOR<T,3> out;
+    for(int i=0;i<3;i++)
+        for(int j=0;j<6;j++)
+            out(i)+=div(j)*divergence_table[i][j];
+    return out*(tri_area/60);
+}
+
+template VECTOR<VECTOR<double,2>,6> Times_force_NdotN<double,VECTOR<double,2> >(const VECTOR<VECTOR<double,2>,6>&,double);
+template VECTOR<VECTOR<float,2>,6> Times_force_NdotN<float,VECTOR<float,2> >(const VECTOR<VECTOR<float,2>,6>&,float);
+template VECTOR<VECTOR<double,2>,3> Times_BC_NdotN<VECTOR<double,2> >(VECTOR<VECTOR<double,2>,3> const&);
+template VECTOR<VECTOR<float,2>,3> Times_BC_NdotN<VECTOR<float,2> >(VECTOR<VECTOR<float,2>,3> const&);
+template VECTOR<double,3> Times_div_PdotN<double>(VECTOR<double,6> const&,double);
+template VECTOR<float,3> Times_div_PdotN<float>(VECTOR<float,6> const&,float);
+
+}
+
