@@ -61,8 +61,10 @@ template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Set_Row_Lengths(ARRAY_VIEW<int> lengths)
 {
     Reset(lengths.m);
-    m=lengths.m;offsets.Resize(m+1,no_init);offsets(0)=0;
-    for(int i=0;i<m;i++){offsets(i+1)=offsets(i)+lengths(i);}
+    m=lengths.m;
+    offsets.Resize(m+1,no_init);
+    offsets(0)=0;
+    for(int i=0;i<m;i++) offsets(i+1)=offsets(i)+lengths(i);
     A.Resize(offsets(m));
 }
 //#####################################################################
@@ -295,11 +297,26 @@ Compress(SPARSE_MATRIX_FLAT_MXN<T>& compressed)
 // Function Transpose
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
-Transpose(SPARSE_MATRIX_FLAT_MXN<T>& A_transpose) const
+Transpose(SPARSE_MATRIX_FLAT_MXN<T>& At) const
 {
-    ARRAY<int> row_lengths(n);for(int index=0;index<A.m;index++) row_lengths(A(index).j)++;
-    A_transpose.Set_Row_Lengths(row_lengths);A_transpose.n=m;
-    for(int i=0;i<m;i++) for(int index=offsets(i);index<offsets(i+1);index++) A_transpose(A(index).j,i)=A(index).a;
+    ARRAY<int> row_lengths(n);
+    for(int i=0;i<A.m;i++) row_lengths(A(i).j)++;
+
+    At.Reset(0);
+    At.m=n;
+    At.n=m;
+    At.offsets.Resize(m+1,no_init);
+    At.offsets(0)=0;
+    int o=0;
+    for(int i=0;i<m;i++)
+    {
+        At.offsets(i+1)=o;
+        o+=row_lengths(i);
+    }
+    At.A.Resize(o);
+    for(int i=0;i<m;i++)
+        for(int j=offsets(i);j<offsets(i+1);j++)
+            At.A(At.offsets(A(j).j+1)++)={i,A(j).a};
 }
 //#####################################################################
 // Function Times_Transpose
