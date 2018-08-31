@@ -80,7 +80,10 @@ struct ANALYTIC_VECTOR_PROGRAM:public ANALYTIC_VECTOR<TV>
     PROGRAM<T> prog;
     mutable PROGRAM_CONTEXT<T> context;
 
-    ANALYTIC_VECTOR_PROGRAM(std::string& str)
+    ANALYTIC_VECTOR_PROGRAM(const std::string& str)
+        :ANALYTIC_VECTOR_PROGRAM(str.c_str()) {}
+
+    ANALYTIC_VECTOR_PROGRAM(const char* str)
     {
         const char* axes[]={"x","y","z"};
         const char* vel[]={"u","v","w"};
@@ -88,7 +91,7 @@ struct ANALYTIC_VECTOR_PROGRAM:public ANALYTIC_VECTOR<TV>
             prog.var_in.Append(axes[i]);
             prog.var_out.Append(vel[i]);}
         prog.var_in.Append("t");
-        prog.Parse(str.c_str(),false);
+        prog.Parse(str,false);
         ARRAY<int> out{IDENTITY_ARRAY<>{TV::m}};
         for(int j=0;j<prog.var_in.m;j++)
             prog.Diff(out,j);

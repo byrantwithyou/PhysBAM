@@ -77,13 +77,16 @@ struct ANALYTIC_SCALAR_PROGRAM:public ANALYTIC_SCALAR<TV>
     PROGRAM<T> prog;
     mutable PROGRAM_CONTEXT<T> context;
 
-    ANALYTIC_SCALAR_PROGRAM(std::string& str)
+    ANALYTIC_SCALAR_PROGRAM(const std::string& str)
+        :ANALYTIC_SCALAR_PROGRAM(str.c_str()) {}
+
+    ANALYTIC_SCALAR_PROGRAM(const char* str)
     {
         const char* axes[]={"x","y","z"};
         for(int i=0;i<TV::m;i++) prog.var_in.Append(axes[i]);
         prog.var_out.Append("p");
         prog.var_in.Append("t");
-        prog.Parse(str.c_str(),false);
+        prog.Parse(str,false);
         ARRAY<int> out(1);
         out(0)=0;
         for(int j=0;j<TV::m+1;j++)
