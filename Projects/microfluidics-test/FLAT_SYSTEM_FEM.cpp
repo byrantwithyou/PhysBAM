@@ -3,8 +3,16 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Data_Structures/TRIPLE.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Core/Matrices/SYSTEM_MATRIX_HELPER.h>
+#include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
+#include <Tools/Krylov_Solvers/MATRIX_SYSTEM.h>
+#include <Tools/Krylov_Solvers/MINRES.h>
+#include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_SCALAR.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_VECTOR.h>
+#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include "FEM_TABLE.h"
@@ -578,9 +586,55 @@ void Generate_Discretization(ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entrie
         }
     }
 }
+
+template<class T,class TV>
+void Solve_And_Display_Solution(const FLUID_LAYOUT_FEM<TV>& fl,const PARSE_DATA_FEM<TV>& pd,
+    const SYSTEM_MATRIX_HELPER<T>& MH,const ARRAY<T,DOF_ID>& rhs_vector,
+    ARRAY<T,DOF_ID>* sol_out)
+{
+    SPARSE_MATRIX_FLAT_MXN<T> M;
+    MH.Set_Matrix(Value(fl.num_dofs),Value(fl.num_dofs),M);
+    
+    typedef KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > KRY_VEC;
+    typedef MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_MXN<T>,T,KRY_VEC> KRY_MAT;
+    KRY_MAT sys(M);
+    KRY_VEC rhs,sol;
+    rhs.v=reinterpret_cast<const ARRAY<T>&>(rhs_vector);
+    sol.v.Resize(Value(fl.num_dofs));
+
+    ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
+    sys.Test_System(sol);
+    OCTAVE_OUTPUT<T>("M.txt").Write("M",sys,rhs);
+    OCTAVE_OUTPUT<T>("b.txt").Write("b",rhs);
+
+    MINRES<T> mr;
+    bool converged=mr.Solve(sys,sol,rhs,av,1e-8,0,100000);
+    if(!converged) LOG::printf("SOLVER DID NOT CONVERGE.\n");
+
+    OCTAVE_OUTPUT<T>("x.txt").Write("x",sol);
+    if(sol_out) reinterpret_cast<ARRAY<T>&>(*sol_out)=sol.v;
+    
+    for(PARTICLE_ID i(0);i<fl.Number_Particles();i++){
+        int dof=Value(fl.vel_node_dofs(i));
+        TV v=dof<0?pd.analytic_velocity->v(fl.X(i),0):TV(sol.v(dof),sol.v(dof+1));
+        Add_Debug_Particle(fl.X(i),VECTOR<T,3>(1,0,0));
+        Debug_Particle_Set_Attribute<TV>("V",v);}
+    for(EDGE_ID i(0);i<fl.Number_Edges();i++){
+        auto X=.5*(fl.X(fl.Edge(i)(0))+fl.X(fl.Edge(i)(1)));
+        int dof=Value(fl.vel_edge_dofs(i));
+        TV v=dof<0?pd.analytic_velocity->v(X,0):TV(sol.v(dof),sol.v(dof+1));
+        Add_Debug_Particle(X,VECTOR<T,3>(1,0,0));
+        Debug_Particle_Set_Attribute<TV>("V",v);}
+    fl.Dump_Mesh();
+    Flush_Frame<TV>("minrs solve");
+}
+
 template void Generate_Discretization<double,VECTOR<double,2> >(
     ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID>,int>&,ARRAY<double,CODE_ID>&,
     FLUID_LAYOUT_FEM<VECTOR<double,2> > const&,PARSE_DATA_FEM<VECTOR<double,2> > const&,double,
     ARRAY<double,DOF_ID>&,
     ANALYTIC_VECTOR<VECTOR<double,2> >*,ANALYTIC_SCALAR<VECTOR<double,2> >*);
+template void Solve_And_Display_Solution<double,VECTOR<double,2> >(FLUID_LAYOUT_FEM<VECTOR<double,2> > const&,
+    PARSE_DATA_FEM<VECTOR<double,2> > const&,
+    SYSTEM_MATRIX_HELPER<double> const&,ARRAY<double,DOF_ID> const&,ARRAY<double,DOF_ID>*);
 }

@@ -104,9 +104,11 @@ void Run_FEM(PARSE_ARGS& parse_args)
     Generate_Discretization(coded_entries,code_values,fl,pd,mu,
         rhs_vector,pd.analytic_velocity,pd.analytic_pressure);
 
+    ARRAY<T,DOF_ID> sol;
     if(pd.analytic_velocity && pd.analytic_pressure)
     {
-        ARRAY<T,DOF_ID> sol(rhs_vector.m),res(rhs_vector);
+        ARRAY<T,DOF_ID> res(rhs_vector);
+        sol.Resize(rhs_vector.m);
         for(PARTICLE_ID p(0);p<fl.Number_Particles();p++)
         {
             TV X=fl.X(p),U=pd.analytic_velocity->v(X,0);
@@ -126,38 +128,23 @@ void Run_FEM(PARSE_ARGS& parse_args)
             for(int i=0;i<2;i++)
                 sol(d+i)=U(i);
         }
-        LOG::printf("sol: %P\n",sol);
-        LOG::printf("rhs: %P\n",rhs_vector);
+        //LOG::printf("sol: %P\n",sol);
+        //LOG::printf("rhs: %P\n",rhs_vector);
         for(auto t:coded_entries)
             res(t.x)-=code_values(t.z)*sol(t.y);
-        LOG::printf("res: %P\n",res);
-        LOG::printf("error: %P\n",res.Max_Abs());
+        //LOG::printf("res: %P\n",res);
+        LOG::printf("rhs error: %P\n",res.Max_Abs());
     }
 
-
-    
-//    Compute_Full_Matrix(coded_entries,code_values,rhs_vector,fl,mu,pd.unit_length);
     SYSTEM_MATRIX_HELPER<T> MH;
     for(auto& e:coded_entries) MH.data.Append({Value(e.x),Value(e.y),code_values(e.z)});
-    
-    SPARSE_MATRIX_FLAT_MXN<T> M;
-    MH.Set_Matrix(Value(fl.num_dofs),Value(fl.num_dofs),M);
-    OCTAVE_OUTPUT<T>("M.txt").Write("M",M);
-    
-    // typedef KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > KRY_VEC;
-    // typedef MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_MXN<T>,T,KRY_VEC> KRY_MAT;
-    // KRY_MAT sys(M);
-    // KRY_VEC rhs,sol;
-    // rhs.v=reinterpret_cast<const ARRAY<T>&>(rhs_vector);
-    // sol.v.Resize(Value(fl.Total_Dofs()));
-
-    // ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
-    // sys.Test_System(sol);
-    // OCTAVE_OUTPUT<T>("M.txt").Write("M",sys,rhs);
-    // OCTAVE_OUTPUT<T>("b.txt").Write("b",rhs);
-
-    
-    
+    ARRAY<T,DOF_ID> sol_vector;
+    Solve_And_Display_Solution(fl,pd,MH,rhs_vector,&sol_vector);
+    if(pd.analytic_velocity && pd.analytic_pressure){
+        ARRAY<T,DOF_ID> sol_error(sol_vector);
+        sol_error-=sol;
+        //LOG::printf("sol: %P\n",sol);
+        LOG::printf("sol error: %P\n",sol_error.Max_Abs());}
     LOG::Instance()->Copy_Log_To_File(output_dir+"/common/log.txt",false);
 }
 
