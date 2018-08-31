@@ -1,0 +1,7 @@
+w 1
+h 1
+v A 0 0
+v B 1 0
+p A B
+s A
+s B
