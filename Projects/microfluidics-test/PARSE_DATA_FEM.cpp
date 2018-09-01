@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Log/LOG.h>
+#include <Core/Matrices/MATRIX_FORWARD.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_SCALAR.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_VECTOR.h>
 #include <fstream>
@@ -11,13 +12,78 @@
 #include "PARSE_DATA_FEM.h"
 namespace PhysBAM{
 //#####################################################################
+// Constructor
+//#####################################################################
+template<class TV> PARSE_DATA_FEM<TV>::
+PARSE_DATA_FEM()
+{
+    bc.Append({dirichlet_v,0,0,0});
+}
+//#####################################################################
 // Destructor
 //#####################################################################
 template<class TV> PARSE_DATA_FEM<TV>::
 ~PARSE_DATA_FEM()
 {
-    delete analytic_velocity;
-    delete analytic_pressure;
+    delete force;
+    for(BC_ID i(0);i<bc.m;i++){
+        delete bc(i).velocity;
+        delete bc(i).pressure;
+        delete bc(i).traction;}
+}
+//#####################################################################
+// Function Velocity
+//#####################################################################
+template<class TV> TV PARSE_DATA_FEM<TV>::
+Velocity(const TV& X,BC_ID bc_id) const
+{
+    BC_ID id=analytic_bc!=BC_ID(-1)?analytic_bc:bc_id;
+    PHYSBAM_ASSERT(id!=BC_ID(-1));
+    if(bc(id).velocity) return bc(id).velocity->v(X,0);
+    else return TV();
+}
+//#####################################################################
+// Function Traction
+//#####################################################################
+template<class TV> TV PARSE_DATA_FEM<TV>::
+Traction(const TV& X,const TV& N,T mu,BC_ID bc_id) const
+{
+    if(analytic_bc!=BC_ID(-1)){
+        SYMMETRIC_MATRIX<T,2> stress=bc(analytic_bc).velocity->dX(X,0).Twice_Symmetric_Part()*mu;
+        stress-=bc(analytic_bc).pressure->f(X,0);
+        return stress*N;}
+    else return bc(bc_id).traction->v(X,0);
+}
+//#####################################################################
+// Function Force
+//#####################################################################
+template<class TV> TV PARSE_DATA_FEM<TV>::
+Force(const TV& X,T mu) const
+{
+    if(analytic_bc!=BC_ID(-1)){
+        SYMMETRIC_TENSOR<T,0,TV::m> ddU=bc(analytic_bc).velocity->ddX(X,0);
+        TV f=bc(analytic_bc).pressure->dX(X,0);
+        f-=mu*(Contract<1,2>(ddU)+Contract<0,2>(ddU));
+        return f;}
+    else return force?force->v(X,0):TV();
+}
+//#####################################################################
+// Function Divergence
+//#####################################################################
+template<class TV> typename TV::SCALAR PARSE_DATA_FEM<TV>::
+Divergence(const TV& X) const
+{
+    PHYSBAM_ASSERT(analytic_bc!=BC_ID(-1));
+    return bc(analytic_bc).velocity->dX(X,0).Trace();
+}
+//#####################################################################
+// Function Pressure
+//#####################################################################
+template<class TV> typename TV::SCALAR PARSE_DATA_FEM<TV>::
+Pressure(const TV& X) const
+{
+    PHYSBAM_ASSERT(analytic_bc!=BC_ID(-1));
+    return bc(analytic_bc).pressure->f(X,0);
 }
 //#####################################################################
 // Function Parse_Input
@@ -47,9 +113,12 @@ Parse_Input(const std::string& pipe_file)
                 ss>>unit_length;
                 break;
             case 'v':
-                ss>>name1>>pt;
-                pts_index[name1]=pts.m;
-                pts.Append({pt,nobc,TV(),default_joint,{}});
+                {
+                    VERTEX_DATA vd;
+                    ss>>name1>>vd.pt;
+                    pts_index[name1]=pts.m;
+                    pts.Append(vd);
+                }
                 break;
             case 'p':
                 {
@@ -63,14 +132,22 @@ Parse_Input(const std::string& pipe_file)
                 break;
             case 's':
                 {
-                    ss>>name1>>pts(pts_index[name1]).bc;
-                    pts(pts_index[name1]).bc_type=dirichlet_v;
+                    std::string expr;
+                    ss>>name1>>expr;
+                    BC_FUNC bcf;
+                    bcf.type=dirichlet_v;
+                    bcf.velocity=new ANALYTIC_VECTOR_PROGRAM<TV>(expr.c_str());
+                    pts(pts_index[name1]).bc_id=bc.Append(bcf);
                 }
                 break;
             case 't':
                 {
-                    ss>>name1>>pts(pts_index[name1]).bc;
-                    pts(pts_index[name1]).bc_type=traction;
+                    std::string expr;
+                    ss>>name1>>expr;
+                    BC_FUNC bcf;
+                    bcf.type=traction;
+                    bcf.traction=new ANALYTIC_VECTOR_PROGRAM<TV>(expr.c_str());
+                    pts(pts_index[name1]).bc_id=bc.Append(bcf);
                 }
                 break;
             case 'j':
@@ -82,10 +159,20 @@ Parse_Input(const std::string& pipe_file)
                 }
                 break;
             case 'U':
-                analytic_velocity=new ANALYTIC_VECTOR_PROGRAM<TV>(ss.str().c_str()+2);
+                if(analytic_bc==BC_ID(-1))
+                    analytic_bc=bc.Append({analytic,0,0,0});
+                else delete bc(analytic_bc).velocity;
+                bc(analytic_bc).velocity=new ANALYTIC_VECTOR_PROGRAM<TV>(ss.str().c_str()+2);
                 break;
             case 'P':
-                analytic_pressure=new ANALYTIC_SCALAR_PROGRAM<TV>(ss.str().c_str()+2);
+                if(analytic_bc==BC_ID(-1))
+                    analytic_bc=bc.Append({analytic,0,0,0});
+                else delete bc(analytic_bc).pressure;
+                bc(analytic_bc).pressure=new ANALYTIC_SCALAR_PROGRAM<TV>(ss.str().c_str()+2);
+                break;
+            case 'F':
+                delete force;
+                force=new ANALYTIC_VECTOR_PROGRAM<TV>(ss.str().c_str()+2);
                 break;
             default:
                 LOG::printf("PARSE FAIL: %c %s\n",c,ss.str());
@@ -93,5 +180,4 @@ Parse_Input(const std::string& pipe_file)
     }
 }
 template struct PARSE_DATA_FEM<VECTOR<double,2> >;
-template struct PARSE_DATA_FEM<VECTOR<double,3> >;
 }

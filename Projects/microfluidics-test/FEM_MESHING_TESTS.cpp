@@ -20,11 +20,11 @@ void Test_Degree2_Joint(JOINT_TYPE jt,typename TV::SCALAR a0,typename TV::SCALAR
         PARSE_DATA_FEM<TV> pd;
         pd.half_width=4;
         pd.unit_length=0.5;
-        pd.pts.Append({TV(-10,1),dirichlet_v,TV(),default_joint,{PIPE_ID(0)}});
-        pd.pts.Append({TV(),nobc,TV(),jt,{PIPE_ID(0),PIPE_ID(1)}});
+        pd.pts.Append({TV(-10,1),BC_ID(0),default_joint,{PIPE_ID(0)}});
+        pd.pts.Append({TV(),BC_ID(0),jt,{PIPE_ID(0),PIPE_ID(1)}});
         TV p=TV(10,0);
         p={cos(rad)*p(0)-sin(rad)*p(1),sin(rad)*p(0)+cos(rad)*p(1)};
-        pd.pts.Append({p,traction,TV(),default_joint,{PIPE_ID(1)}});
+        pd.pts.Append({p,BC_ID(0),default_joint,{PIPE_ID(1)}});
         pd.pipes.Append({VERTEX_ID(0),VERTEX_ID(1)});
         pd.pipes.Append({VERTEX_ID(1),VERTEX_ID(2)});
 
@@ -48,10 +48,10 @@ void Test_Degree2_Circle(JOINT_TYPE jt,typename TV::SCALAR h0,typename TV::SCALA
         PARSE_DATA_FEM<TV> pd;
         pd.half_width=4;
         pd.unit_length=h;
-        pd.pts.Append({TV(-4,-4),nobc,TV(),jt,{PIPE_ID(0),PIPE_ID(3)}});
-        pd.pts.Append({TV(4,-4),nobc,TV(),jt,{PIPE_ID(0),PIPE_ID(1)}});
-        pd.pts.Append({TV(4,4),nobc,TV(),jt,{PIPE_ID(1),PIPE_ID(2)}});
-        pd.pts.Append({TV(-4,4),nobc,TV(),jt,{PIPE_ID(3),PIPE_ID(2)}});
+        pd.pts.Append({TV(-4,-4),BC_ID(0),jt,{PIPE_ID(0),PIPE_ID(3)}});
+        pd.pts.Append({TV(4,-4),BC_ID(0),jt,{PIPE_ID(0),PIPE_ID(1)}});
+        pd.pts.Append({TV(4,4),BC_ID(0),jt,{PIPE_ID(1),PIPE_ID(2)}});
+        pd.pts.Append({TV(-4,4),BC_ID(0),jt,{PIPE_ID(3),PIPE_ID(2)}});
         pd.pipes.Append({VERTEX_ID(0),VERTEX_ID(1)});
         pd.pipes.Append({VERTEX_ID(1),VERTEX_ID(2)});
         pd.pipes.Append({VERTEX_ID(3),VERTEX_ID(2)});
@@ -78,11 +78,11 @@ void Test_Degree3_Joint(JOINT_TYPE jt,typename TV::SCALAR h,int n,int seed)
         PARSE_DATA_FEM<TV> pd;
         pd.half_width=4;
         pd.unit_length=h;
-        pd.pts.Append({TV(),nobc,TV(),jt,{PIPE_ID(0),PIPE_ID(1),PIPE_ID(2)}});
+        pd.pts.Append({TV(),BC_ID(0),jt,{PIPE_ID(0),PIPE_ID(1),PIPE_ID(2)}});
         for(int k=0;k<3;k++){
             T a=random.Get_Uniform_Number(0,2*pi);
             TV coord=TV(cos(a),sin(a))*5;
-            pd.pts.Append({coord,traction,TV(),jt,{PIPE_ID(k)}});
+            pd.pts.Append({coord,BC_ID(0),jt,{PIPE_ID(k)}});
             pd.pipes.Append({VERTEX_ID(0),VERTEX_ID(k+1)});}
         
         FLUID_LAYOUT_FEM<TV> fl;

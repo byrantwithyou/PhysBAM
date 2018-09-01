@@ -11,14 +11,11 @@ namespace PhysBAM{
 
 template<class TV> struct FLUID_LAYOUT_FEM;
 template<class TV> struct PARSE_DATA_FEM;
-template<class TV> struct ANALYTIC_VECTOR;
-template<class TV> struct ANALYTIC_SCALAR;
 
 template<class T,class TV>
 void Generate_Discretization(ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entries,
     ARRAY<T,CODE_ID>& code_values,const FLUID_LAYOUT_FEM<TV>& fl,
-    const PARSE_DATA_FEM<TV>& pd,T mu,ARRAY<T,DOF_ID>& rhs,
-    ANALYTIC_VECTOR<TV> * analytic_velocity,ANALYTIC_SCALAR<TV> * analytic_pressure);
+    const PARSE_DATA_FEM<TV>& pd,T mu,ARRAY<T,DOF_ID>& rhs);
 template<class T,class TV>
 void Solve_And_Display_Solution(const FLUID_LAYOUT_FEM<TV>& fl,const PARSE_DATA_FEM<TV>& pd,
     const SYSTEM_MATRIX_HELPER<T>& MH,const ARRAY<T,DOF_ID>& rhs_vector,

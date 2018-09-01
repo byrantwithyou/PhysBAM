@@ -101,18 +101,17 @@ void Run_FEM(PARSE_ARGS& parse_args)
     ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> > coded_entries;
     ARRAY<T,CODE_ID> code_values;
     ARRAY<T,DOF_ID> rhs_vector(fl.num_dofs);
-    Generate_Discretization(coded_entries,code_values,fl,pd,mu,
-        rhs_vector,pd.analytic_velocity,pd.analytic_pressure);
+    Generate_Discretization(coded_entries,code_values,fl,pd,mu,rhs_vector);
 
     ARRAY<T,DOF_ID> sol;
-    if(pd.analytic_velocity && pd.analytic_pressure)
+    if(pd.analytic_bc!=BC_ID(-1))
     {
         ARRAY<T,DOF_ID> res(rhs_vector);
         sol.Resize(rhs_vector.m);
         for(PARTICLE_ID p(0);p<fl.Number_Particles();p++)
         {
-            TV X=fl.X(p),U=pd.analytic_velocity->v(X,0);
-            sol(fl.pressure_dofs(p))=pd.analytic_pressure->f(X,0);
+            TV X=fl.X(p),U=pd.Velocity(X,BC_ID());
+            sol(fl.pressure_dofs(p))=pd.Pressure(X);
             DOF_ID d=fl.vel_node_dofs(p);
             if(d<DOF_ID()) continue;
             for(int i=0;i<2;i++)
@@ -124,7 +123,7 @@ void Run_FEM(PARSE_ARGS& parse_args)
             if(d<DOF_ID()) continue;
             auto ed=fl.Edge(e);
             TV X=(T).5*(fl.X(ed.x)+fl.X(ed.y));
-            TV U=pd.analytic_velocity->v(X,0);
+            TV U=pd.Velocity(X,BC_ID());
             for(int i=0;i<2;i++)
                 sol(d+i)=U(i);
         }
@@ -140,10 +139,10 @@ void Run_FEM(PARSE_ARGS& parse_args)
     for(auto& e:coded_entries) MH.data.Append({Value(e.x),Value(e.y),code_values(e.z)});
     ARRAY<T,DOF_ID> sol_vector;
     Solve_And_Display_Solution(fl,pd,MH,rhs_vector,&sol_vector);
-    if(pd.analytic_velocity && pd.analytic_pressure){
+    if(pd.analytic_bc!=BC_ID(-1)){
         ARRAY<T,DOF_ID> sol_error(sol_vector);
         sol_error-=sol;
-        //LOG::printf("sol: %P\n",sol);
+        //LOG::printf("sol: %P\n",sol_vector);
         LOG::printf("sol error: %P\n",sol_error.Max_Abs());}
     LOG::Instance()->Copy_Log_To_File(output_dir+"/common/log.txt",false);
 }

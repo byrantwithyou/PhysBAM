@@ -91,15 +91,14 @@ Generate_Pipe(PIPE_ID pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con)
 // Function Mark_BC
 //#####################################################################
 template<class TV> void FLUID_LAYOUT_FEM<TV>::
-Mark_BC(const ARRAY<PARTICLE_ID>& pindices,BC_TYPE bc_type,const TV& value)
+Mark_BC(const ARRAY<PARTICLE_ID>& pindices,BC_ID bc_id)
 {
-    BC_ID bc_index=bc.Append({bc_type,value});
-    particle_bc_map.Set(pindices(0),bc_index);
+    particle_bc_map.Set(pindices(0),bc_id);
     for(int i=1;i<pindices.m;i++){
         PARTICLE_ID p0=pindices(i),p1=pindices(i-1);
         if(p0>p1) std::swap(p0,p1);
-        particle_bc_map.Set(pindices(i),bc_index);
-        bc_map.Set({p0,p1},bc_index);}
+        particle_bc_map.Set(pindices(i),bc_id);
+        bc_map.Set({p0,p1},bc_id);}
 }
 //#####################################################################
 // Function Generate_End
@@ -119,7 +118,7 @@ Generate_End(VERTEX_ID i,PIPE_ID pipe,const PARSE_DATA_FEM<TV>& pd,CONNECTION& c
         indices.Append(pid);
         X(pid)=p+k*pd.unit_length*u;}
     if(pd.pipes(pipe).x!=i) indices.Reverse();
-    if(pd.pts(i).bc_type!=nobc) Mark_BC(indices,pd.pts(i).bc_type,pd.pts(i).bc);
+    Mark_BC(indices,pd.pts(i).bc_id);
 }
 //#####################################################################
 // Function Wedge
@@ -611,7 +610,7 @@ Compute(const PARSE_DATA_FEM<TV>& pd)
     for(PIPE_ID i(0);i<pd.pipes.m;i++){
         Generate_Pipe(i,pd,con);}
     area_hidden.mesh.Set_Number_Nodes(area_hidden.particles.number);
-    Allocate_Dofs();
+    Allocate_Dofs(pd);
     area_hidden.mesh.Initialize_Incident_Elements();
     area_hidden.mesh.Initialize_Element_Edges();
 }
@@ -619,33 +618,32 @@ Compute(const PARSE_DATA_FEM<TV>& pd)
 // Function Allocate_Dofs
 //#####################################################################
 template<class TV> void FLUID_LAYOUT_FEM<TV>::
-Allocate_Dofs()
+Allocate_Dofs(const PARSE_DATA_FEM<TV>& pd)
 {
     area_hidden.mesh.Initialize_Segment_Mesh();
     area_hidden.mesh.Initialize_Edge_Triangles();
     vel_edge_dofs.Resize(Number_Edges(),init_all,DOF_ID(-2));
     edge_blocks.Resize(Number_Edges(),init_all,BLOCK_ID(-1));
 
-    BC_ID wall_bc=bc.Append({dirichlet_v,TV()});
     for(EDGE_ID i(0);i<Number_Edges();i++)
         if(Edge_Triangles(i).m==1){
             auto key=Edge(i).Sorted();
             if(!bc_map.Contains(key)){
-                if(BC_ID* pbc=particle_bc_map.Get_Pointer(key.x)) *pbc=wall_bc;
-                else particle_bc_map.Set(key.x,wall_bc);
-                if(BC_ID* pbc=particle_bc_map.Get_Pointer(key.y)) *pbc=wall_bc;
-                else particle_bc_map.Set(key.y,wall_bc);
-                bc_map.Set({key.x,key.y},wall_bc);}}
+                if(BC_ID* pbc=particle_bc_map.Get_Pointer(key.x)) *pbc=pd.wall_bc;
+                else particle_bc_map.Set(key.x,pd.wall_bc);
+                if(BC_ID* pbc=particle_bc_map.Get_Pointer(key.y)) *pbc=pd.wall_bc;
+                else particle_bc_map.Set(key.y,pd.wall_bc);
+                bc_map.Set({key.x,key.y},pd.wall_bc);}}
 
     ARRAY<int,BLOCK_ID> block_vel_dofs(blocks.m),block_pressure_dofs(blocks.m);
     for(PARTICLE_ID i(0);i<node_blocks.m;i++){
         block_pressure_dofs(node_blocks(i))++;
         BC_ID* bc_idx=particle_bc_map.Get_Pointer(i);
-        if(!bc_idx || bc(*bc_idx).bc_type!=dirichlet_v)
+        if(!bc_idx || pd.bc(*bc_idx).type!=dirichlet_v)
             block_vel_dofs(node_blocks(i))++;}
     for(EDGE_ID ei(0);ei<Number_Edges();ei++){
         BC_ID* bc_idx=bc_map.Get_Pointer(Edge(ei).Sorted());
-        if(!bc_idx || bc(*bc_idx).bc_type!=dirichlet_v){
+        if(!bc_idx || pd.bc(*bc_idx).type!=dirichlet_v){
             auto neighbor_tris=Edge_Triangles(ei);
             PHYSBAM_ASSERT(neighbor_tris.m==1 || neighbor_tris.m==2);
             BLOCK_ID bid=elem_data(neighbor_tris(0)).block_id;
@@ -668,13 +666,13 @@ Allocate_Dofs()
     vel_node_dofs.Resize(Number_Particles(),use_init,DOF_ID(-2));
     for(PARTICLE_ID i(0);i<Number_Particles();i++){
         BC_ID* bc_idx=particle_bc_map.Get_Pointer(i);
-        if(bc_idx && bc(*bc_idx).bc_type==dirichlet_v) continue;
+        if(bc_idx && pd.bc(*bc_idx).type==dirichlet_v) continue;
         vel_node_dofs(i)=DOF_ID(--block_vel_dofs(node_blocks(i))*TV::m);}
 
     vel_edge_dofs.Resize(Number_Edges(),use_init,DOF_ID(-2));
     for(EDGE_ID i(0);i<Number_Edges();i++){
         BC_ID* bc_idx=bc_map.Get_Pointer(Edge(i).Sorted());
-        if(bc_idx && bc(*bc_idx).bc_type==dirichlet_v) continue;
+        if(bc_idx && pd.bc(*bc_idx).type==dirichlet_v) continue;
         BLOCK_ID bid=edge_blocks(i);
         vel_edge_dofs(i)=DOF_ID(--block_vel_dofs(bid)*TV::m);}
 }
@@ -708,24 +706,11 @@ Print_Statistics() const
 template<class TV> void FLUID_LAYOUT_FEM<TV>::
 Dump_Mesh() const
 {
-    //for(int i=0;i<Number_Particles();i++)
-    //    Add_Debug_Particle(X(i),VECTOR<T,3>(1,1,1));
-    VECTOR<T,3> ncolor=VECTOR<T,3>(1,0,1),dcolor=VECTOR<T,3>(0,1,1);
     for(TRIANGLE_ID i(0);i<Number_Triangles();i++){
-        //Add_Debug_Object(VECTOR<TV,3>(X.Subset(area.mesh.elements(i))),VECTOR<T,3>(1,1,1));
-        //VECTOR<TV,3> tri(X.Subset(area.mesh.elements(i)));
-        //T a=(tri(2)-tri(1)).Cross(tri(0)-tri(1))(0);
-        //Add_Debug_Object(tri,a<0?VECTOR<T,3>(0,1,1):default_edge);
         auto tri=Triangle(i);
         for(int j=0;j<3;j++){
             PARTICLE_ID v0=tri(j),v1=tri((j+1)%3);
-            //std::string s=LOG::sprintf("%i",j);
-            //Add_Debug_Text(X(v0)+0.3*(X(v1)-X(v0)),s,VECTOR<T,3>(0,1,1));
-            if(v0>v1) std::swap(v0,v1);
-            VECTOR<T,3> color=VECTOR<T,3>(0.5,0.5,0.5);
-            const BC_ID* bc_index=bc_map.Get_Pointer({v0,v1});
-            if(bc_index) color=bc(*bc_index).bc_type==dirichlet_v?dcolor:ncolor;
-            Add_Debug_Object<TV,2>(VECTOR<TV,2>(X(v0),X(v1)),color);}}
+            Add_Debug_Object<TV,2>(VECTOR<TV,2>(X(v0),X(v1)),VECTOR<T,3>(0.5,0.5,0.5));}}
 }
 //#####################################################################
 // Function Dump_Edge_Blocks

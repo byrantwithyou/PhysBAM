@@ -34,12 +34,6 @@ struct FLUID_LAYOUT_FEM
         PIPE_ID pipe_id;
     };
 
-    struct BC_DATA
-    {
-        BC_TYPE bc_type;
-        TV bc;
-    };
-
     struct PIPE_DATA
     {
         TV u,v; // u = x1-x0, v=x2-x0
@@ -50,8 +44,6 @@ struct FLUID_LAYOUT_FEM
 
     ARRAY<BLOCK_DATA,BLOCK_ID> blocks;
     ARRAY<ELEMENT_DATA,TRIANGLE_ID> elem_data; // per element
-    ARRAY<BC_DATA,BC_ID> bc;
-    // unordered (particle index, particle index) -> bc index
     HASHTABLE<VECTOR<PARTICLE_ID,2>,BC_ID> bc_map;
     HASHTABLE<PARTICLE_ID,BC_ID> particle_bc_map;
     ARRAY<PIPE_DATA,PIPE_ID> pipes; // per pipe
@@ -65,7 +57,7 @@ struct FLUID_LAYOUT_FEM
     FLUID_LAYOUT_FEM();
     ~FLUID_LAYOUT_FEM();
     void Compute(const PARSE_DATA_FEM<TV>& pd);
-    void Allocate_Dofs();
+    void Allocate_Dofs(const PARSE_DATA_FEM<TV>& pd);
     void Print_Statistics() const;
     void Generate_End(VERTEX_ID i,PIPE_ID pipe,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
     void Generate_Joint(VERTEX_ID i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
@@ -86,7 +78,7 @@ struct FLUID_LAYOUT_FEM
     void Dump_Node_Blocks() const;
     void Dump_Dofs() const;
 
-    void Mark_BC(const ARRAY<PARTICLE_ID>& pindices,BC_TYPE bc_type,const TV& value);
+    void Mark_BC(const ARRAY<PARTICLE_ID>& pindices,BC_ID bc_id);
     // return (center, normalized start vec, normalied end vec)
     VECTOR<TV,3> Wedge(const TV& joint,const TV& p0,const TV& p1,int half_width,T unit_length) const;
     ARRAY<PARTICLE_ID> Sample_Interpolated(T s,const ARRAY<PARTICLE_ID>& side0,
