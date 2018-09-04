@@ -224,7 +224,8 @@ Allocate_Cross_Section_Blocks_Faces(const RANGE<TV_INT>& box,int dir)
         if(b1>=0)
             if(b0<0 || (it.face.axis==dir && cell(!dir)>=base(!dir)))
                 b0=b1;
-        used_faces(it.face).block_id=b0;
+        if(used_faces(it.face).block_id<0)
+            used_faces(it.face).block_id=b0;
     }
 }
 
