@@ -9,7 +9,7 @@
 #include "COMMON.h"
 
 namespace PhysBAM{
-enum BC_TYPE {analytic,dirichlet_v,traction};
+enum BC_TYPE {dirichlet_v,traction};
 enum JOINT_TYPE {default_joint,corner_joint};
 
 template<class TV> struct ANALYTIC_VECTOR;
@@ -32,13 +32,15 @@ struct PARSE_DATA_FEM
     struct BC_FUNC
     {
         BC_TYPE type=dirichlet_v;
-        ANALYTIC_VECTOR<TV>* velocity=0;
-        ANALYTIC_SCALAR<TV>* pressure=0;
-        ANALYTIC_VECTOR<TV>* traction=0;
+        T flowrate;
+        TV pt,dir;
+        TV traction;
     };
     ANALYTIC_VECTOR<TV>* force=0;
-    BC_ID analytic_bc=BC_ID(-1),wall_bc=BC_ID(0);
+    BC_ID wall_bc=BC_ID(0);
     ARRAY<BC_FUNC,BC_ID> bc;
+    ANALYTIC_VECTOR<TV>* analytic_velocity=0;
+    ANALYTIC_SCALAR<TV>* analytic_pressure=0;
 
     TV Velocity(const TV& X,BC_ID bc_id) const;
     TV Traction(const TV& X,const TV& N,T mu,BC_ID bc_id) const;

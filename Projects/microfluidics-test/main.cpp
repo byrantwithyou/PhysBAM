@@ -104,7 +104,7 @@ void Run_FEM(PARSE_ARGS& parse_args)
     Generate_Discretization(coded_entries,code_values,fl,pd,mu,rhs_vector);
 
     ARRAY<T,DOF_ID> sol;
-    if(pd.analytic_bc!=BC_ID(-1))
+    if(pd.analytic_velocity && pd.analytic_pressure)
     {
         ARRAY<T,DOF_ID> res(rhs_vector);
         sol.Resize(rhs_vector.m);
@@ -139,7 +139,7 @@ void Run_FEM(PARSE_ARGS& parse_args)
     for(auto& e:coded_entries) MH.data.Append({Value(e.x),Value(e.y),code_values(e.z)});
     ARRAY<T,DOF_ID> sol_vector;
     Solve_And_Display_Solution(fl,pd,MH,rhs_vector,&sol_vector);
-    if(pd.analytic_bc!=BC_ID(-1)){
+    if(pd.analytic_velocity && pd.analytic_pressure){
         ARRAY<T,DOF_ID> sol_error(sol_vector);
         sol_error-=sol;
         //LOG::printf("sol: %P\n",sol_vector);

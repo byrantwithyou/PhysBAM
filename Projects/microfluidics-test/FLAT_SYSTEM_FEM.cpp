@@ -580,7 +580,7 @@ void Generate_Discretization(ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entrie
             for(int j=0;j<2;j++)
                 if(dof_u[i][j]>=DOF_ID())
                     rhs(dof_u[i][j])+=F(i)(j);
-        if(pd.analytic_bc!=BC_ID(-1))
+        if(pd.analytic_velocity && pd.analytic_pressure)
         {
             VECTOR<T,6> div;
             for(int i=0;i<6;i++)
@@ -631,7 +631,7 @@ void Solve_And_Display_Solution(const FLUID_LAYOUT_FEM<TV>& fl,const PARSE_DATA_
         Add_Debug_Particle(X,VECTOR<T,3>(1,0,0));
         Debug_Particle_Set_Attribute<TV>("V",v);}
     fl.Dump_Mesh();
-    Flush_Frame<TV>("minrs solve");
+    Flush_Frame<TV>("minres solve");
 }
 
 template void Generate_Discretization<double,VECTOR<double,2> >(
