@@ -7,11 +7,26 @@
 #include <Core/Math_Tools/RANGE.h>
 #include <Tools/Symbolics/PROGRAM.h>
 #include <Tools/Symbolics/PROGRAM_CONTEXT.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <fstream>
 #include <map>
 #include <string>
 #include "PARSE_DATA.h"
 namespace PhysBAM{
+//#####################################################################
+// Function Inflow_BC_Value
+//#####################################################################
+template<class TV> typename TV::SCALAR PARSE_DATA<TV>::
+Inflow_BC_Value(const TV& X,const typename PARSE_DATA<TV>::VERTEX_DATA& vd,const GRID<TV>& grid) const
+{
+    T a=half_width*grid.dX(1-vd.bc_side/2);
+    TV center=grid.Node(vd.pt);
+    T sign=vd.bc_side%2?1:-1;
+    center(vd.bc_side/2)=center(vd.bc_side/2)+sign*a;
+    T r=(X-center).Magnitude();
+    T v=-3.0/4*vd.bc_value/(a*a*a)*(r*r-a*a);
+    return v;
+}
 //#####################################################################
 // Function Parse_Input
 //#####################################################################

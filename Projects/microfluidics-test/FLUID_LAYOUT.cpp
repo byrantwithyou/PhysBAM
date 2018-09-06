@@ -76,7 +76,7 @@ Compute(const PARSE_DATA<TV>& pd)
             for(FACE_RANGE_ITERATOR<TV::m> it(i.box,0,0,RF::ghost,i.bc_side);it.Valid();it.Next())
             {
                 used_faces(it.face).type=i.bc_type;
-                used_faces(it.face).bc_value=i.bc_value;
+                used_faces(it.face).bc_value=pd.Inflow_BC_Value(grid.Face(it.face),i,grid);
             }
         }
         Allocate_Cross_Section_Blocks_Cells(i.box,0);

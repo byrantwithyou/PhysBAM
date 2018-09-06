@@ -10,6 +10,7 @@
 
 namespace PhysBAM{
 enum INDEX_TYPE {fluid, wall, dirichlet, nodof};
+template<class TV> class GRID;
 
 template<class TV>
 struct PARSE_DATA
@@ -32,6 +33,7 @@ struct PARSE_DATA
     TV_INT box_size;
     int half_width;
 
+    T Inflow_BC_Value(const TV& X,const VERTEX_DATA& vd,const GRID<TV>& grid) const;
     void Parse_Input(const std::string& pipe_file);    
     RANGE<TV_INT> Pipe_Full_Range(const VECTOR<int,2>& p) const;
     RANGE<TV_INT> Pipe_Inner_Range(const VECTOR<int,2>& p) const;
