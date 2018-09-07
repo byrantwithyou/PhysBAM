@@ -52,7 +52,7 @@ void Compute_Full_Matrix(const GRID<TV>& grid,ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID
 
                 if(un.type==nodof){
                     if(it.face.axis==a) continue;
-                    FACE_INDEX<TV::m> g(it.face);
+                    FACE_INDEX<TV::m> g(a,it.face.index);
                     g.index(a)+=s;
                     if(fl.used_faces(g).type!=wall){
                         FACE_INDEX<TV::m> h(g);
@@ -63,6 +63,7 @@ void Compute_Full_Matrix(const GRID<TV>& grid,ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID
                 FACE_INDEX<TV::m> face=it.face;
                 face.index(a)+=sn;
                 diag_code+=1<<2*a;
+                if(un.type==nodof) diag_code+=1<<2*a;
                 if(un.type==fluid) coded_entries.Append({uf.global_id,un.global_id,CODE_ID(2*TV::m+a)});
                 else if(un.type==wall) rhs_vector(uf.global_id)=de(a)*un.bc_value;}}
         coded_entries.Append({uf.global_id,uf.global_id,CODE_ID(diag_code)});}
