@@ -16,6 +16,7 @@ int Find_Next_Triangle(TV& Y,VECTOR<MATRIX<T,TV::m>,5>& dYdI,
     TV& w,VECTOR<MATRIX<T,TV::m>,5>& dwdI,
     const TV& X,const TV& Z,const TV& A,const TV& B,const TV& C,T friction,bool& inside)
 {
+    static const T small_number=std::numeric_limits<T>::epsilon()*128;
     typedef DIFF_LAYOUT<T,TV::m,TV::m,TV::m,TV::m,TV::m> LAYOUT;
     auto XX=Diff_From_Var<LAYOUT,0>(X);
     auto ZZ=Diff_From_Var<LAYOUT,1>(Z);
@@ -34,7 +35,7 @@ int Find_Next_Triangle(TV& Y,VECTOR<MATRIX<T,TV::m>,5>& dYdI,
     auto p=z+d*n;
     auto td=abs(d)*friction; // max dist from solution to projection point
     auto xy2=(x-p).Magnitude_Squared();
-    if(xy2.x<sqr(td.x)) return -2; // Input is feasible
+    if(xy2.x<sqr(td.x)+small_number) return -2; // Input is feasible
     auto a=td/sqrt(xy2);
     auto y=(x-p)*a+p; // y = a * u + b * v;
     auto M00=u.Dot(u);
@@ -90,6 +91,7 @@ template<class T,class TV>
 int Stuck_On_Edge(TV& Y,VECTOR<MATRIX<T,TV::m>,4>& dYdI,T& w,VECTOR<TV,4>& dwdI,
     const TV& X,const TV& Z,const TV& A,const TV& B,T friction)
 {
+    static const T small_number=std::numeric_limits<T>::epsilon()*128;
     typedef DIFF_LAYOUT<T,TV::m,TV::m,TV::m,TV::m> LAYOUT;
     auto XX=Diff_From_Var<LAYOUT,0>(X);
     auto ZZ=Diff_From_Var<LAYOUT,1>(Z);
@@ -103,7 +105,7 @@ int Stuck_On_Edge(TV& Y,VECTOR<MATRIX<T,TV::m>,4>& dYdI,T& w,VECTOR<TV,4>& dwdI,
     auto d2=(z-p).Magnitude_Squared();
     auto td2=d2*sqr(friction); // max dist from solution to projection point
     auto xy2=(x-p).Magnitude_Squared();
-    if(xy2.x<td2.x) return -2; // Input is feasible
+    if(xy2.x<td2.x+small_number) return -2; // Input is feasible
     auto a=sqrt(td2/xy2);
     auto y=(x-p)*a+p;
     auto q=u.Dot(y)/u2;
