@@ -515,16 +515,12 @@ Signed_Solid_Angle_Of_Triangle_Web(const TV& location,int web_root_node) const
 {
     assert(mesh.incident_elements);
     T signed_solid_angle=0;
-    for(int i=0;i<(*mesh.incident_elements)(web_root_node).m;i++){
-        int t=(*mesh.incident_elements)(web_root_node)(i);
-        int node1,node2,node3;mesh.elements(t).Get(node1,node2,node3);
-        TV x0=particles.X(node1),x1=particles.X(node2),x2=particles.X(node3);
-        SPHERE<TV> sphere(location,1);
-        // extend two of the triangle edges so their farther endpoints are on the unit sphere
-        if(web_root_node == node1){RAY<TV> ray0(x0,x1-x0);INTERSECTION::Intersects(ray0,sphere,(T)0);x1=ray0.Point(ray0.t_max);RAY<TV> ray1(x0,x2-x0);INTERSECTION::Intersects(ray1,sphere,(T)0);x2=ray1.Point(ray1.t_max);} 
-        else if(web_root_node == node2){RAY<TV> ray0(x1,x0-x1);INTERSECTION::Intersects(ray0,sphere,(T)0);x0=ray0.Point(ray0.t_max);RAY<TV> ray1(x1,x2-x1);INTERSECTION::Intersects(ray1,sphere,(T)0);x2=ray1.Point(ray1.t_max);} 
-        else{RAY<TV> ray0(x2,x0-x2);INTERSECTION::Intersects(ray0,sphere,(T)0);x0=ray0.Point(ray0.t_max);RAY<TV> ray1(x2,x1-x2);INTERSECTION::Intersects(ray1,sphere,(T)0);x1=ray1.Point(ray1.t_max);}
-        signed_solid_angle+=TRIANGLE_3D<T>(x0,x1,x2).Signed_Solid_Angle(location);} 
+    for(int t:(*mesh.incident_elements)(web_root_node)){
+        auto e=mesh.elements(t);
+        int k=e.Find(web_root_node);
+        TV x0=particles.X(e(k)),x1=particles.X(e((k+1)%3)),x2=particles.X(e((k+2)%3));
+        TRIANGLE_3D<T> tri(x0-location,x1-x0,x2-x0);
+        signed_solid_angle+=tri.Signed_Solid_Angle(TV());}
     return signed_solid_angle;
 }
 //#####################################################################

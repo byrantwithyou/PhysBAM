@@ -179,15 +179,11 @@ Maximum_Angle() const
 template<class T> T TRIANGLE_3D<T>::
 Signed_Solid_Angle(const TV& center) const
 {
-    TV r=(X.x-center).Normalized(),u=X.y-X.x,v=X.z-X.x;u-=TV::Dot_Product(u,r)*r;v-=TV::Dot_Product(v,r)*r;
-    T solid_angle=-(T)pi+TV::Angle_Between(u,v);
-    r=(X.y-center).Normalized();u=X.x-X.y,v=X.z-X.y;u-=TV::Dot_Product(u,r)*r;v-=TV::Dot_Product(v,r)*r;
-    solid_angle+=TV::Angle_Between(u,v);
-    r=(X.z-center).Normalized();u=X.x-X.z,v=X.y-X.z;u-=TV::Dot_Product(u,r)*r;v-=TV::Dot_Product(v,r)*r;
-    solid_angle+=TV::Angle_Between(u,v);
-    solid_angle=max(T(0),min((T)(2*pi),solid_angle));
-    if(TV::Dot_Product(r,Normal()) < 0) solid_angle*=(-1);
-    return solid_angle;
+    VECTOR<TV,3> Y=X-center;
+    T t=TV::Triple_Product(Y.x,Y.y,Y.z);
+    T a=Y.x.Magnitude(),b=Y.y.Magnitude(),c=Y.z.Magnitude();
+    T ab=Y.x.Dot(Y.y),bc=Y.y.Dot(Y.z),ca=Y.z.Dot(Y.x);
+    return 2*atan2(t,a*b*c+a*bc+b*ca+c*ab);
 }
 //#####################################################################
 // Function Point_Face_Interaction
