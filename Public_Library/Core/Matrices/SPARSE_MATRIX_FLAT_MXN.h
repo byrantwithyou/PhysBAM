@@ -68,6 +68,44 @@ public:
     template<class RW> void Write(std::ostream& output)
     {Write_Binary<RW>(output,m,n,offsets,A);}
 
+    template<class F>
+    void For_Each(F f) const
+    {
+        for(int i=0,b=offsets(0);i<m;i++)
+        {
+            int e=offsets(i+1);
+            for(int j=b;j<e;j++)
+                f(i,A(j).j,A(j).a);
+            b=e;
+        }
+    }
+
+    template<class F>
+    void For_Each(F f)
+    {
+        for(int i=0,b=offsets(0);i<m;i++)
+        {
+            int e=offsets(i+1);
+            for(int j=b;j<e;j++)
+                f(i,A(j).j,A(j).a);
+            b=e;
+        }
+    }
+
+    template<class B,class F,class E>
+    void For_Each(B begin_row,F f,E end_row) const
+    {
+        for(int i=0,b=offsets(0);i<m;i++)
+        {
+            int e=offsets(i+1);
+            begin_row(i);
+            for(int j=b;j<e;j++)
+                f(i,A(j).j,A(j).a);
+            end_row(i);
+            b=e;
+        }
+    }
+    
 //#####################################################################
     SPARSE_MATRIX_FLAT_MXN<T>* Create_Submatrix(const INTERVAL<int>& rows);
     void Set_Row_Lengths(ARRAY_VIEW<int> lengths);
@@ -89,7 +127,7 @@ public:
     SPARSE_MATRIX_FLAT_MXN<T>& operator/=(const T a);
     SPARSE_MATRIX_FLAT_MXN<T>& operator+=(const T a);
     SPARSE_MATRIX_FLAT_MXN<T>& operator-=(const T a);
-    void Compress(SPARSE_MATRIX_FLAT_MXN<T>& compressed);
+    void Compress(SPARSE_MATRIX_FLAT_MXN<T>& compressed) const;
     void Transpose(SPARSE_MATRIX_FLAT_MXN<T>& A_transpose) const;
     SPARSE_MATRIX_FLAT_MXN<T> Times_Transpose(const SPARSE_MATRIX_FLAT_MXN<T>& rhs);
     SPARSE_MATRIX_FLAT_MXN<T> Times_Diagonal_Times(ARRAY_VIEW<const T> diagonal,const SPARSE_MATRIX_FLAT_MXN<T>& rhs); // (*this) * diagonal * (rhs)

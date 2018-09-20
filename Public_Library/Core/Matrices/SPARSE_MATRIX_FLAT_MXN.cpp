@@ -41,7 +41,10 @@ template<class T> SPARSE_MATRIX_FLAT_MXN<T>* SPARSE_MATRIX_FLAT_MXN<T>::
 Create_Submatrix(const INTERVAL<int>& rows)
 {
     assert(rows.Size()==m);
-    int entries=0;for(int index=offsets(0);index<offsets(m);index++)if(rows.Lazy_Inside_Half_Open(A(index).j)) entries++;
+    int entries=0;
+    for(int index=offsets(0);index<offsets(m);index++)
+        if(rows.Lazy_Inside_Half_Open(A(index).j))
+            entries++;
     SPARSE_MATRIX_FLAT_MXN<T>* submatrix=new SPARSE_MATRIX_FLAT_MXN<T>();
     submatrix->n=rows.Size();
     submatrix->offsets.Resize(submatrix->n+1);
@@ -64,7 +67,8 @@ Set_Row_Lengths(ARRAY_VIEW<int> lengths)
     m=lengths.m;
     offsets.Resize(m+1,no_init);
     offsets(0)=0;
-    for(int i=0;i<m;i++) offsets(i+1)=offsets(i)+lengths(i);
+    std::partial_sum(lengths.begin(),lengths.end(),offsets.begin()+1);
+    std::copy(offsets.begin(),offsets.end()-1,lengths.begin());
     A.Resize(offsets(m));
 }
 //#####################################################################
@@ -275,23 +279,16 @@ operator-=(const T a)
 // Function Compress
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
-Compress(SPARSE_MATRIX_FLAT_MXN<T>& compressed)
+Compress(SPARSE_MATRIX_FLAT_MXN<T>& compressed) const
 {
-    ARRAY<int> row_lengths(m);
-    int index=offsets(0);
-    for(int i=0;i<m;i++){
-        int end=offsets(i+1);
-        while(index<end){if(A(index).j<0) break;
-            index++;row_lengths(i)++;}
-        index=end;}
-    compressed.Set_Row_Lengths(row_lengths);
-    index=offsets(0);
-    int compressed_index=0;
-    for(int i=0;i<m;i++){
-        int end=offsets(i+1);
-        while(index<end){if(A(index).j<0) break;
-            compressed.A(compressed_index++)=A(index);index++;}
-        index=end;}
+    compressed.Reset(n);
+    compressed.m=m;
+    compressed.offsets.Resize(m+1,no_init);
+    compressed.offsets(0)=0;
+    For_Each(
+        [](int i){},
+        [&](int i,int j,T a){compressed.A.Append({j,a});},
+        [&](int i){compressed.offsets(i+1)=compressed.A.m;});
 }
 //#####################################################################
 // Function Transpose
@@ -300,23 +297,9 @@ template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Transpose(SPARSE_MATRIX_FLAT_MXN<T>& At) const
 {
     ARRAY<int> row_lengths(n);
-    for(int i=0;i<A.m;i++) row_lengths(A(i).j)++;
-
-    At.Reset(0);
-    At.m=n;
-    At.n=m;
-    At.offsets.Resize(m+1,no_init);
-    At.offsets(0)=0;
-    int o=0;
-    for(int i=0;i<m;i++)
-    {
-        At.offsets(i+1)=o;
-        o+=row_lengths(i);
-    }
-    At.A.Resize(o);
-    for(int i=0;i<m;i++)
-        for(int j=offsets(i);j<offsets(i+1);j++)
-            At.A(At.offsets(A(j).j+1)++)={i,A(j).a};
+    for(auto a:A) row_lengths(a.j)++;
+    At.Set_Row_Lengths(row_lengths);
+    For_Each([&](int i,int j,T a){At.A(row_lengths(j)++)={i,a};});
 }
 //#####################################################################
 // Function Times_Transpose
