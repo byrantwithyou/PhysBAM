@@ -9,7 +9,6 @@
 
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Data_Structures/DATA_STRUCTURES_FORWARD.h>
-#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <Tools/Parallel_Computation/MPI_UTILITIES.h>
 #include <Tools/Parallel_Computation/SPARSE_MATRIX_PARTITION.h>
@@ -18,6 +17,7 @@ namespace PhysBAM{
 
 template<class T> class PCG_SPARSE;
 template<class T> class MPI_UNIFORM_GRID;
+template<class T> class SPARSE_MATRIX_FLAT_MXN;
 template<class TV> struct GRID_ARRAYS_POLICY;
 class SPARSE_MATRIX_PARTITION;
 template<class TV> class LAPLACE_UNIFORM;

@@ -7,8 +7,10 @@
 #ifndef __SPARSE_MATRIX_THREADED_CONSTRUCTION__
 #define __SPARSE_MATRIX_THREADED_CONSTRUCTION__
 
-#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <Core/Arrays/ARRAY.h>
 namespace PhysBAM{
+template<class T> class SPARSE_MATRIX_FLAT_MXN;
+template<class T> struct SPARSE_MATRIX_ENTRY;
 
 // User should fill in M.n; this class does not touch it.
 template<class T> class SPARSE_MATRIX_THREADED_CONSTRUCTION

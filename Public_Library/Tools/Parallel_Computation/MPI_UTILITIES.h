@@ -17,7 +17,6 @@
 #include <Core/Log/DEBUG_UTILITIES.h>
 #include <Core/Log/LOG.h>
 #include <Core/Matrices/MATRIX_FORWARD.h>
-#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Core/Vectors/VECTOR_FORWARD.h>
 #include <Tools/Particles/PARTICLES.h>
 #include <mpi.h>
@@ -25,6 +24,7 @@ namespace PhysBAM{
 
 class SPARSE_MATRIX_PARTITION;
 template<class T> class SPARSE_MATRIX_ENTRY;
+template<class T> class SPARSE_MATRIX_FLAT_MXN;
 
 namespace MPI_UTILITIES{
 

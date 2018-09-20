@@ -9,7 +9,6 @@
 
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Arrays/ARRAYS_FORWARD.h>
-#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Parallel_Computation/MPI_UTILITIES.h>
 #include <Tools/Parallel_Computation/SPARSE_MATRIX_PARTITION.h>
 #include <Grid_Tools/Arrays/FACE_ARRAYS_BINARY_UNIFORM.h>

@@ -2,6 +2,7 @@
 // Copyright 2002-2010, Ronald Fedkiw, Jon Gretarsson, Geoffrey Irving, Nipun Kwatra, Michael Lentine, Frank Losasso, Andrew Selle, Tamar Shinar, Jonathan Su, Jerry Talton.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Dynamics/Incompressible_Flows/FAST_PROJECTION_DYNAMICS_UNIFORM.h>
 using namespace PhysBAM;
@@ -10,7 +11,8 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> FAST_PROJECTION_DYNAMICS_UNIFORM<TV>::
 FAST_PROJECTION_DYNAMICS_UNIFORM(const int scale,const bool flame_input,const bool multiphase,const bool use_variable_beta,const bool use_poisson)
-    :PROJECTION_DYNAMICS_UNIFORM<TV>(GRID<TV>(TV_INT::All_Ones_Vector()*scale,RANGE<TV>(TV(),TV::All_Ones_Vector()),true),flame_input,multiphase,use_variable_beta,use_poisson)
+    :PROJECTION_DYNAMICS_UNIFORM<TV>(GRID<TV>(TV_INT::All_Ones_Vector()*scale,RANGE<TV>(TV(),TV::All_Ones_Vector()),true),flame_input,multiphase,use_variable_beta,use_poisson),
+    A(*new SPARSE_MATRIX_FLAT_MXN<T>)
 {
 }
 //#####################################################################
@@ -18,7 +20,8 @@ FAST_PROJECTION_DYNAMICS_UNIFORM(const int scale,const bool flame_input,const bo
 //#####################################################################
 template<class TV> FAST_PROJECTION_DYNAMICS_UNIFORM<TV>::
 FAST_PROJECTION_DYNAMICS_UNIFORM(const int scale,LEVELSET<TV>& levelset_input)
-    :PROJECTION_DYNAMICS_UNIFORM<TV>(GRID<TV>(TV_INT::All_Ones_Vector()*scale,RANGE<TV>(TV(),TV::All_Ones_Vector()),true),levelset_input)
+    :PROJECTION_DYNAMICS_UNIFORM<TV>(GRID<TV>(TV_INT::All_Ones_Vector()*scale,RANGE<TV>(TV(),TV::All_Ones_Vector()),true),levelset_input),
+    A(*new SPARSE_MATRIX_FLAT_MXN<T>)
 {
 }
 //#####################################################################
@@ -27,6 +30,7 @@ FAST_PROJECTION_DYNAMICS_UNIFORM(const int scale,LEVELSET<TV>& levelset_input)
 template<class TV> FAST_PROJECTION_DYNAMICS_UNIFORM<TV>::
 ~FAST_PROJECTION_DYNAMICS_UNIFORM()
 {
+    delete &A;
 }
 //#####################################################################
 // Function Initialize_Grid

@@ -9,12 +9,12 @@
 
 #include <Core/Log/DEBUG_UTILITIES.h>
 #include <Core/Math_Tools/RANGE.h>
-#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Grid_Tools/Arrays/ARRAYS_UNIFORM_FORWARD.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 namespace PhysBAM{
 
 template<class TV> struct GRID_ARRAYS_POLICY;
+template<class T> class SPARSE_MATRIX_FLAT_MXN;
 
 template<class T_LAPLACE>
 class EULER_LAPLACE:public T_LAPLACE

@@ -8,7 +8,6 @@
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Data_Structures/PAIR.h>
 #include <Core/Matrices/MATRIX.h>
-#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Rigids/Forces_And_Torques/MOVE_RIGID_BODY_DIFF.h>

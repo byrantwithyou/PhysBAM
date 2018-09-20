@@ -7,7 +7,6 @@
 #ifndef __INTERFACE_STOKES_SYSTEM_COLOR__
 #define __INTERFACE_STOKES_SYSTEM_COLOR__
 #include <Core/Matrices/MATRIX.h>
-#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Grid_Tools/Grids/FACE_INDEX.h>
 #include <Grid_Tools/Grids/GRID.h>
@@ -21,6 +20,7 @@ template<class TV> class GRID;
 template<class TV> class CELL_MANAGER_COLOR;
 template<class TV> class CELL_DOMAIN_INTERFACE_COLOR;
 template<class TV> struct VOLUME_FORCE_COLOR;
+template<class T> class SPARSE_MATRIX_FLAT_MXN;
 
 template<class TV>
 class INTERFACE_STOKES_SYSTEM_COLOR:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>

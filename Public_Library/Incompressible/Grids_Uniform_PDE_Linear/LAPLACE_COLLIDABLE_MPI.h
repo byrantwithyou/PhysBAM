@@ -9,7 +9,6 @@
 
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Data_Structures/DATA_STRUCTURES_FORWARD.h>
-#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Parallel_Computation/SPARSE_MATRIX_PARTITION.h>
 #include <Grid_Tools/Parallel_Computation/MPI_GRID.h>
 namespace PhysBAM{
@@ -18,6 +17,7 @@ template<class T> class PCG_SPARSE;
 template<class TV> struct GRID_ARRAYS_POLICY;
 template<class T> class MPI_UNIFORM_GRID;
 template<class TV> class LAPLACE_COLLIDABLE_UNIFORM;
+template<class T> class SPARSE_MATRIX_FLAT_MXN;
 
 template<class TV>
 class LAPLACE_COLLIDABLE_MPI

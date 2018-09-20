@@ -5,6 +5,7 @@
 #include <Core/Arrays/CONSTANT_ARRAY.h>
 #include <Core/Math_Tools/RANGE.h>
 #include <Core/Math_Tools/RANGE_ITERATOR.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Core/Utilities/DEBUG_CAST.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>

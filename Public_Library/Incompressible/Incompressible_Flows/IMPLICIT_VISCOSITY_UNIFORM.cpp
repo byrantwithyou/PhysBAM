@@ -2,6 +2,7 @@
 // Copyright 2005-2007, Geoffrey Irving, Frank Losasso, Nick Rasmussen, Andrew Selle, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>

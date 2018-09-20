@@ -12,7 +12,6 @@
 #include <Core/Data_Structures/ELEMENT_ID.h>
 #include <Core/Data_Structures/FORCE_ELEMENTS.h>
 #include <Core/Log/DEBUG_UTILITIES.h>
-#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 namespace PhysBAM{
 
 template<class TV> class MPI_SOLIDS;

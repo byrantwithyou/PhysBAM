@@ -5,7 +5,6 @@
 #ifndef __MPM_EXAMPLE__
 #define __MPM_EXAMPLE__
 #include <Core/Matrices/MATRIX.h>
-#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>

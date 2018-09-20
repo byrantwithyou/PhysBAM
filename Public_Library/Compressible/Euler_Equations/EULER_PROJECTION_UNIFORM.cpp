@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Log/SCOPE.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Grid_Tools/Arrays/ARRAYS_UTILITIES.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>

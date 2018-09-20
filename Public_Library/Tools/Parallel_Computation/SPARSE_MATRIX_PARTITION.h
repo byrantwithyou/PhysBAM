@@ -7,9 +7,10 @@
 #ifndef __SPARSE_MATRIX_PARTITION__
 #define __SPARSE_MATRIX_PARTITION__
 
+#include <Core/Arrays/ARRAY.h>
 #include <Core/Math_Tools/INTERVAL.h>
-#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 namespace PhysBAM{
+template<class T> class SPARSE_MATRIX_FLAT_MXN;
 
 class SPARSE_MATRIX_PARTITION
 {

@@ -11,12 +11,12 @@
 #include <Core/Data_Structures/PAIR.h>
 #include <Core/Log/SCOPE.h>
 #include <Core/Matrices/MATRIX.h>
-#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Rigids/Collisions/SOLVE_CONTACT.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 
 namespace PhysBAM{;
+template<class T> class SPARSE_MATRIX_FLAT_MXN;
 
 namespace PROJECTED_GAUSS_SEIDEL
 {

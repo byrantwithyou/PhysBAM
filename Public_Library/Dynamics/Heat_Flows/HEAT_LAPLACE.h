@@ -18,12 +18,12 @@
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Log/DEBUG_UTILITIES.h>
 #include <Core/Math_Tools/RANGE.h>
-#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Grid_Tools/Arrays/ARRAYS_UNIFORM_FORWARD.h>
 namespace PhysBAM{
 
 template<class TV> struct GRID_ARRAYS_POLICY;
 template<class TV> class GRID;
+template<class T> class SPARSE_MATRIX_FLAT_MXN;
 
 template<class T_LAPLACE>
 class HEAT_LAPLACE:public T_LAPLACE

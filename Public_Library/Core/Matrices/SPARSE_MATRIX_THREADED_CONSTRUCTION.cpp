@@ -2,6 +2,7 @@
 // Copyright 2017 Craig Schroeder
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Core/Matrices/SPARSE_MATRIX_THREADED_CONSTRUCTION.h>
 #ifdef USE_OPENMP
 #include <omp.h>
