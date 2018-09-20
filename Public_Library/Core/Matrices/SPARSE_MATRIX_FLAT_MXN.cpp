@@ -686,35 +686,15 @@ Fast_Sparse_Multiply(ARRAY<SPARSE_MATRIX_ENTRY<T> >& q,ARRAY<SPARSE_MATRIX_ENTRY
         Subtract_C_Times(l,-q(i).a,transpose.A.Array_View(transpose.offsets(q(i).j),transpose.offsets(q(i).j+1)-transpose.offsets(q(i).j)));
 }
 //#####################################################################
-// Function Row_Subset
-//#####################################################################
-template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
-Row_Subset(const ARRAY<int>& rows)
-{
-    ARRAY<int> new_offsets;
-    new_offsets.Append(0);
-    for(int i=0;i<4;i++)
-        new_offsets.Append(4);
-}
-//#####################################################################
-// Function Column_Subset
-//#####################################################################
-template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
-Column_Subset(const ARRAY<int>& cols)
-{
-    SPARSE_MATRIX_FLAT_MXN<T> tmp;
-    Transpose(tmp);
-    tmp.Row_Subset(cols);
-    tmp.Transpose(*this);
-}
-//#####################################################################
 // Function Initialize_Diagonal_Index
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Initialize_Diagonal_Index()
 {
     diagonal_index.Resize(n,no_init);
-    for(int i=0;i<n;i++){diagonal_index(i)=Find_Index(i,i);assert(A(diagonal_index(i)).j==i);}
+    for(int i=0;i<n;i++){
+        diagonal_index(i)=Find_Index(i,i);
+        assert(A(diagonal_index(i)).j==i);}
 }
 //#####################################################################
 // Function Solve_Forward_Substitution
@@ -722,14 +702,22 @@ Initialize_Diagonal_Index()
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Solve_Forward_Substitution(ARRAY_VIEW<const T> b,ARRAY_VIEW<T> x,const bool diagonal_is_identity,const bool diagonal_is_inverted) const
 {
-    if(diagonal_is_identity) for(int i=0;i<n;i++){
-        T sum=0;for(int index=offsets(i);index<diagonal_index(i);index++)sum+=A(index).a*x(A(index).j);
-        x(i)=b(i)-sum;}
-    else if(!diagonal_is_inverted) for(int i=0;i<n;i++){
-        T sum=0;for(int index=offsets(i);index<diagonal_index(i);index++)sum+=A(index).a*x(A(index).j);
-        x(i)=(b(i)-sum)/A(diagonal_index(i)).a;}
+    if(diagonal_is_identity)
+        for(int i=0;i<n;i++){
+            T sum=0;
+            for(int index=offsets(i);index<diagonal_index(i);index++)
+                sum+=A(index).a*x(A(index).j);
+            x(i)=b(i)-sum;}
+    else if(!diagonal_is_inverted)
+        for(int i=0;i<n;i++){
+            T sum=0;
+            for(int index=offsets(i);index<diagonal_index(i);index++)
+                sum+=A(index).a*x(A(index).j);
+            x(i)=(b(i)-sum)/A(diagonal_index(i)).a;}
     else for(int i=0;i<n;i++){
-        T sum=0;for(int index=offsets(i);index<diagonal_index(i);index++)sum+=A(index).a*x(A(index).j);
+        T sum=0;
+        for(int index=offsets(i);index<diagonal_index(i);index++)
+            sum+=A(index).a*x(A(index).j);
         x(i)=(b(i)-sum)*A(diagonal_index(i)).a;}
 }
 //#####################################################################
@@ -755,7 +743,8 @@ Solve_Backward_Substitution(ARRAY_VIEW<const T> b,ARRAY_VIEW<T> x,const bool dia
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Construct_Incomplete_Cholesky_Factorization(const bool modified_version,const T modified_coefficient,const T zero_tolerance,const T zero_replacement)
 {
-    delete C;C=new SPARSE_MATRIX_FLAT_MXN<T>(*this);
+    delete C;
+    C=new SPARSE_MATRIX_FLAT_MXN<T>(*this);
     C->In_Place_Incomplete_Cholesky_Factorization(modified_version,modified_coefficient,zero_tolerance,zero_replacement);
 }
 //#####################################################################
@@ -787,12 +776,11 @@ template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Gauss_Seidel_Single_Iteration(ARRAY_VIEW<T> x,ARRAY_VIEW<const T> b)
 {
     assert(x.m==b.m && x.m==n);
-    for(int i=0;i<n;i++){
-        T rho=0;T diagonal_entry=0;
-        for(int index=offsets(i);index<offsets(i+1);index++){
-            if(A(index).j==i) diagonal_entry=A(index).a;
-            else rho+=A(index).a*x(A(index).j);}
-        x(i)=(b(i)-rho)/diagonal_entry;}
+    T rho=0,diagonal_entry=0;
+    For_Each(
+        [&](int i){rho=0;diagonal_entry=0;},
+        [&](int i,int j,T a){if(j==i) diagonal_entry=a;else rho+=a*x(j);},
+        [&](int i){x(i)=(b(i)-rho)/diagonal_entry;});
 }
 //#####################################################################
 // Function Gauss_Seidel_Solve
@@ -804,7 +792,12 @@ Gauss_Seidel_Solve(ARRAY_VIEW<T> x,ARRAY_VIEW<const T> b,const T tolerance,const
     ARRAY<T> last_x(x);
     for(int k=0;k<max_iterations;k++){
         Gauss_Seidel_Single_Iteration(x,b);
-        T residual=0;for(int j=0;j<n;j++){residual+=sqr(last_x(j)-x(j));last_x(j)=x(j);}if(residual < tolerance) return;}
+        T residual=0;
+        for(int j=0;j<n;j++){
+            residual+=sqr(last_x(j)-x(j));
+            last_x(j)=x(j);}
+        if(residual < tolerance)
+            return;}
 }
 //#####################################################################
 // Function Positive_Diagonal_And_Nonnegative_Row_Sum
@@ -829,10 +822,7 @@ Positive_Diagonal_And_Nonnegative_Row_Sum(const T tolerance) const
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Conjugate_With_Diagonal_Matrix(ARRAY_VIEW<T> x)
 {
-    int index=offsets(0);
-    for(int i=0;i<n;i++){
-        int end=offsets(i+1);
-        for(;index<end;index++) A(index).a*=x(i)*x(A(index).j);}
+    For_Each([&](int i,int j,T& a){a*=x(i)*x(j);});
 }
 //#####################################################################
 template class SPARSE_MATRIX_FLAT_MXN<float>;

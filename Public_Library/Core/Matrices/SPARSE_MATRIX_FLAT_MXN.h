@@ -146,8 +146,6 @@ public:
     void Get_Row(ARRAY<SPARSE_MATRIX_ENTRY<T> >& q_i,int row);
     void Construct_Incomplete_LQ_Factorization(const int p_l=10,const int p_q=10,const T zero_tolerance=1e-8,const T zero_replacement=1e-8);
     void Fast_Sparse_Multiply(ARRAY<SPARSE_MATRIX_ENTRY<T> >& q,ARRAY<SPARSE_MATRIX_ENTRY<T> >& l);
-    void Row_Subset(const ARRAY<int>& rows);
-    void Column_Subset(const ARRAY<int>& cols);
     void Initialize_Diagonal_Index();
     void Solve_Forward_Substitution(ARRAY_VIEW<const T> b,ARRAY_VIEW<T> x,const bool diagonal_is_identity=false,const bool diagonal_is_inverted=false) const;
     void Solve_Backward_Substitution(ARRAY_VIEW<const T> b,ARRAY_VIEW<T> x,const bool diagonal_is_identity=false,const bool diagonal_is_inverted=false) const;
