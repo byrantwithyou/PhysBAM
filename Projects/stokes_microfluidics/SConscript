@@ -1,6 +1,0 @@
-# SConscript
-
-Import('env Automatic_Program')
-#env=env.Copy(USE_GEOMETRY=1)
-env=env.Copy(USE_HYBRID=1)
-Automatic_Program(env,"stokes_mf",["main.cpp","STOKES_MF_DRIVER.cpp","STOKES_MF_EXAMPLE.cpp","STANDARD_TESTS_2D.cpp","STANDARD_TESTS_3D.cpp"])
