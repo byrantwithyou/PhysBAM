@@ -63,10 +63,7 @@ template<class TV> void MATRIX_FLUID_GRADIENT_BASE<TV>::
 Collect_Maxabs_Velocity(const ARRAY<T>& faces,ARRAY<T>& cells) const
 {
     cells.Fill(0);
-    int index=gradient.offsets(0);
-    for(int i=0;i<gradient.m;i++){
-        int end=gradient.offsets(i+1);T y=faces(i);
-        for(;index<end;index++) cells(gradient.A(index).j)=max(cells(gradient.A(index).j),abs(y*gradient.A(index).a));}
+    gradient.For_Each([&](int i,int j,T a){cells(j)=max(cells(j),abs(faces(i)*a));});
 }
 //#####################################################################
 // Function Test_Matrix
@@ -100,10 +97,7 @@ Print_Each_Matrix(int n) const
 template<class TV> void MATRIX_FLUID_GRADIENT_BASE<TV>::
 Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
 {
-    for(int i=0;i<gradient.m;i++){
-        int s=gradient.offsets(i),e=gradient.offsets(i+1);
-        for(int j=s;j<e;j++)
-            data.Append(TRIPLE<int,int,T>(i,gradient.A(j).j,gradient.A(j).a));}
+    gradient.For_Each([&](int i,int j,T a){data.Append({i,j,a});});
 }
 namespace PhysBAM{
 template class MATRIX_FLUID_GRADIENT_BASE<VECTOR<float,1> >;

@@ -147,14 +147,11 @@ Add_Force(const T scale,ARRAY_VIEW<const TV> X,ARRAY_VIEW<TV> F) const
     // diagonal
     for(int p=0;p<X.Size();p++) F(p)-=twice_scale*stiffness_matrix_diagonal(p)*X(p);
     // offdiagonal
-    const ARRAY<int>& offsets=stiffness_matrix_upper.offsets;
-    const ARRAY<SPARSE_MATRIX_ENTRY<T> >& A=stiffness_matrix_upper.A;
-    int index=offsets(0);
-    for(int i=1;i<offsets.Size();i++){
-        int end=offsets(i+1);
-        for(;index<end;index++){
-            int j=A(index).j;T twice_entry=twice_scale*A(index).a;
-            F(i)-=twice_entry*X(j);F(j)-=twice_entry*X(i);}}
+    stiffness_matrix_upper.For_Each(
+        [&](int i,int j,T a){
+            T twice_entry=twice_scale*a;
+            F(i)-=twice_entry*X(j);
+            F(j)-=twice_entry*X(i);});
 }
 //#####################################################################
 // Function Add_Velocity_Independent_Forces
@@ -186,14 +183,10 @@ Compute_Energy() const
     // diagonal
     for(int p=0;p<X.Size();p++) energy+=stiffness*stiffness_matrix_diagonal(p)*X(p).Magnitude_Squared();
     // offdiagonal
-    const ARRAY<int>& offsets=stiffness_matrix_upper.offsets;
-    const ARRAY<SPARSE_MATRIX_ENTRY<T> >& A=stiffness_matrix_upper.A;
-    int index=offsets(0);
-    for(int i=1;i<offsets.Size();i++){
-        int end=offsets(i+1);
-        for(;index<end;index++){
-            int j=A(index).j;T entry=stiffness*A(index).a;
-            energy+=2*entry*TV::Dot_Product(X(i),X(j));}}
+    stiffness_matrix_upper.For_Each(
+        [&](int i,int j,T a){
+            T entry=stiffness*a;
+            energy+=2*entry*X(i).Dot(X(j));});
     return energy;
 }
 //#####################################################################

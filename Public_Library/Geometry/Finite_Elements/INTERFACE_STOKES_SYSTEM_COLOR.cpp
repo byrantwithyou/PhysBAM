@@ -622,39 +622,39 @@ Get_Sparse_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& M) const
             const SPARSE_MATRIX_FLAT_MXN<T>& mat=matrix_uu(i)(i)(k);
             int first_row=first_row_u(i)(k);
             int first_col=first_row_u(i)(k);
-            for(int r=0;r<mat.m;r++)
-                for(int e=mat.offsets(r),end=mat.offsets(r+1);e<end;e++)
-                    M.A(next_entry(first_row+r)++)=SPARSE_MATRIX_ENTRY<T>(first_col+mat.A(e).j,mat.A(e).a);}
+            mat.For_Each(
+                [&](int i,int j,T a){
+                    M.A(next_entry(first_row+i)++)={first_col+j,a};});}
 
         for(int j=i+1;j<TV::m;j++)
             for(int k=0;k<matrix_uu(i)(j).m;k++){
                 const SPARSE_MATRIX_FLAT_MXN<T>& mat=matrix_uu(i)(j)(k);
                 int first_row=first_row_u(i)(k);
                 int first_col=first_row_u(j)(k);
-                for(int r=0;r<mat.m;r++)
-                    for(int e=mat.offsets(r),end=mat.offsets(r+1);e<end;e++){
-                        M.A(next_entry(first_row+r)++)=SPARSE_MATRIX_ENTRY<T>(first_col+mat.A(e).j,mat.A(e).a);
-                        M.A(next_entry(first_col+mat.A(e).j)++)=SPARSE_MATRIX_ENTRY<T>(first_row+r,mat.A(e).a);}}}
+                mat.For_Each(
+                    [&](int i,int j,T a){
+                        M.A(next_entry(first_row+i)++)={first_col+j,a};
+                        M.A(next_entry(first_col+j)++)={first_row+i,a};});}}
 
     for(int i=0;i<TV::m;i++)
         for(int k=0;k<matrix_pu(i).m;k++){
             const SPARSE_MATRIX_FLAT_MXN<T>& mat=matrix_pu(i)(k);
             int first_row=first_row_p(k);
             int first_col=first_row_u(i)(k);
-            for(int r=0;r<mat.m;r++)
-                for(int e=mat.offsets(r),end=mat.offsets(r+1);e<end;e++){
-                    M.A(next_entry(first_row+r)++)=SPARSE_MATRIX_ENTRY<T>(first_col+mat.A(e).j,mat.A(e).a);
-                    M.A(next_entry(first_col+mat.A(e).j)++)=SPARSE_MATRIX_ENTRY<T>(first_row+r,mat.A(e).a);}}
+            mat.For_Each(
+                [&](int i,int j,T a){
+                    M.A(next_entry(first_row+i)++)={first_col+j,a};
+                    M.A(next_entry(first_col+j)++)={first_row+i,a};});}
 
     for(int i=0;i<TV::m;i++)
         for(int k=0;k<matrix_qu(i).m;k++){
             const SPARSE_MATRIX_FLAT_MXN<T>& mat=matrix_qu(i)(k);
             int first_row=first_row_q;
             int first_col=first_row_u(i)(k);
-            for(int r=0;r<mat.m;r++)
-                for(int e=mat.offsets(r),end=mat.offsets(r+1);e<end;e++){
-                    M.A(next_entry(first_row+r)++)=SPARSE_MATRIX_ENTRY<T>(first_col+mat.A(e).j,mat.A(e).a);
-                    M.A(next_entry(first_col+mat.A(e).j)++)=SPARSE_MATRIX_ENTRY<T>(first_row+r,mat.A(e).a);}}
+            mat.For_Each(
+                [&](int i,int j,T a){
+                    M.A(next_entry(first_row+i)++)={first_col+j,a};
+                    M.A(next_entry(first_col+j)++)={first_row+i,a};});}
 }
 //#####################################################################
 // Function Normalize

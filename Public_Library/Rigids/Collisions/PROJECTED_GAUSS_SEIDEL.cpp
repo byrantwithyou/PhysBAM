@@ -23,29 +23,18 @@ void Solve(SPARSE_MATRIX_FLAT_MXN<T>& A,ARRAY<T>& a,ARRAY<T>& x,T tolerance)
     while(maximum_residual>tolerance)
     {
         maximum_residual=0;
-        for(int i=0;i<n;i++)
-        {
-            T row_sum=0;
-            T diagonal=1;
-            
-            for(int j=A.offsets(i);j<A.offsets(i+1);j++)
+        T row_sum=0;
+        T diagonal=1;
+        A.For_Each(
+            [&](int i){row_sum=0;diagonal=1;},
+            [&](int i,int j,T a){if(j==i) diagonal=a;else row_sum+=a*x(j);},
+            [&](int i)
             {
-                int index=A.A(j).j;
-                if(index==i)
-                    diagonal=A.A(j).a;
-                else
-                    row_sum+=A.A(j).a*x(index);
-            }
-
-            T residual=row_sum+diagonal*x(i)-a(i);
-            if(-residual>maximum_residual)
-                maximum_residual=-residual;
-
-            x(i)=(a(i)-row_sum)/diagonal;
-            if(x(i)<0)
-                x(i)=0;
-        }
-
+                T residual=row_sum+diagonal*x(i)-a(i);
+                if(-residual>maximum_residual) maximum_residual=-residual;
+                x(i)=(a(i)-row_sum)/diagonal;
+                if(x(i)<0) x(i)=0;
+            });
         iteration++;
     }
 
@@ -56,13 +45,12 @@ template<class T,int D>
 void Multiply(SPARSE_MATRIX_FLAT_MXN<VECTOR<T,D> >& A,ARRAY<VECTOR<T,D> >& x,ARRAY<T>& result)
 {
     assert(A.n==x.Size()&&A.m==result.Size());
-    for(int i=0;i<A.m;i++)
-    {
-        T r=0;
-        for(int j=A.offsets(i);j<A.offsets(i+1);j++)
-            r+=VECTOR<T,D>::Dot_Product(A.A(j).a,x(A.A(j).j));
-        result(i)=r;
-    }
+
+    T r=0;
+    A.For_Each(
+        [&](int i){r=0;},
+        [&](int i,int j,const VECTOR<T,D>& a){r+=a.Dot(x(j));},
+        [&](int i){result(i)=r;});
 }
 
 template<class T,int D>

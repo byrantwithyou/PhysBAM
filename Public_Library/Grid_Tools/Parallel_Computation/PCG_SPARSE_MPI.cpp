@@ -253,11 +253,7 @@ Find_Ghost_Regions(SPARSE_MATRIX_FLAT_MXN<T>& A,const ARRAY<VECTOR<int,2> >& pro
     columns_to_receive.Resize(proc_column_index_boundaries.m);
     columns_to_send.Resize(proc_column_index_boundaries.m);
     ARRAY<bool> column_needed(A.n);
-    int row_index=A.offsets(0);
-    for(int row=0;row<A.n;row++){ // First out which columns of A we actually have stuff in
-        const int end=A.offsets(row+1);
-        for(;row_index<end;row_index++){
-            column_needed(A.A(row_index).j)=true;}}
+    A.For_Each([&](int i,int j,T a){column_needed(j)=true;});
     int my_rank=comm.Get_rank();ARRAY<int> temp_indices;temp_indices.Preallocate(proc_column_index_boundaries(0).y-proc_column_index_boundaries(0).x);
     for(int node_rank=0;node_rank<proc_column_index_boundaries.m;node_rank++){
         if(node_rank!=my_rank){

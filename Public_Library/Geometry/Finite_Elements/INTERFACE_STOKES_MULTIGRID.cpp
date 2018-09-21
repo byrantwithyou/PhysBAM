@@ -219,9 +219,7 @@ Exact_Solve(T_VECTOR& z,const T_VECTOR& rhs) const
     ARRAY<int> Mi;
     ARRAY<double> Mx;
 
-    for(int r=0;r<M.m;r++)
-        for(int e=M.offsets(r);e<M.offsets(r+1);e++){
-            Mx.Append(M.A(e).a);Mi.Append(M.A(e).j);}
+    M.For_Each([&](int i,int j,T a){Mx.Append(a);Mi.Append(j);});
 
         //for(int i=0;i<M.m;i++){
         //  for(int j=0;j<M.n;j++){
@@ -457,18 +455,18 @@ Get_Change_Of_Variables_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& M) const
             const SPARSE_MATRIX_FLAT_MXN<T>& mat=iss->matrix_pu(i)(k);
             int first_row=first_row_p(k);
             int first_col=first_row_u(i)(k);
-            for(int r=0;r<mat.m;r++)
-                for(int e=mat.offsets(r),end=mat.offsets(r+1);e<end;e++){
-                    M.A(next_entry(first_row+r)++)=SPARSE_MATRIX_ENTRY<T>(first_col+mat.A(e).j,mat.A(e).a);
-                    M.A(next_entry(first_col+mat.A(e).j)++)=SPARSE_MATRIX_ENTRY<T>(first_row+r,mat.A(e).a);}}
+            mat.For_Each(
+                [&](int i,int j,T a){
+                    M.A(next_entry(first_row+i)++)={first_col+j,a};
+                    M.A(next_entry(first_col+j)++)={first_row+i,a};});}
 
     int p_offset=0;
     for(int k=0;k<colors;k++){
         const SPARSE_MATRIX_FLAT_MXN<T>& mat=gtg_poisson(k);
         int first_row=first_row_p(k);
-        for(int r=0;r<mat.m;r++)
-            for(int e=mat.offsets(r),end=mat.offsets(r+1);e<end;e++)
-                M.A(next_entry(first_row+r)++)=SPARSE_MATRIX_ENTRY<T>(u_size+p_offset+mat.A(e).j,mat.A(e).a);
+        mat.For_Each(
+            [&](int i,int j,T a){
+                M.A(next_entry(first_row+i)++)={u_size+p_offset+j,a};});
         p_offset+=mat.m;}
 }
 //#####################################################################

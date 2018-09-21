@@ -102,10 +102,7 @@ template<class T> void SYSTEM_MATRIX_HELPER<T>::
 Add_Matrix(const SPARSE_MATRIX_FLAT_MXN<T>& M,bool trans,int dr,int dc)
 {
     New_Block();
-    for(int i=0;i<M.m;i++){
-        int s=M.offsets(i),e=M.offsets(i+1);
-        for(int j=s;j<e;j++)
-            data.Append(TRIPLE<int,int,T>(i,M.A(j).j,M.A(j).a));}
+    M.For_Each([&](int i,int j,T a){data.Append({i,j,a});});
     if(trans) Transpose();
     if(dr || dc) Shift(dr,dc);
 }
