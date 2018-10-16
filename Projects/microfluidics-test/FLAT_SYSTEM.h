@@ -19,7 +19,8 @@ void Compute_Full_Matrix(const GRID<TV>& grid,ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID
 
 template<class T,class TV>
 void Solve_And_Display_Solution(const GRID<TV>& grid,const FLUID_LAYOUT<TV>& fl,
-    const SYSTEM_MATRIX_HELPER<T>& MH,const ARRAY<T,DOF_ID>& rhs_vector,ARRAY<T,DOF_ID>* sol_vector=0);
+    const SYSTEM_MATRIX_HELPER<T>& MH,const ARRAY<T,DOF_ID>& rhs_vector,ARRAY<T,DOF_ID>* sol_vector,
+    bool use_krylov,bool print_system,bool quiet);
 
 }
 #endif

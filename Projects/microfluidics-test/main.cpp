@@ -158,10 +158,12 @@ void Run(PARSE_ARGS& parse_args)
     std::chrono::steady_clock::time_point t0 = std::chrono::steady_clock::now();
 
     int threads=1;
-    bool quiet=false;
+    bool quiet=false,use_krylov=false,print_system=false;
     std::string pipe_file;
     parse_args.Add("-mu",&mu,"mu","viscosity");
     parse_args.Add("-q",&quiet,"disable diagnostics; useful for timing");
+    parse_args.Add("-k",&use_krylov,"solve with Krylov method");
+    parse_args.Add("-p",&print_system,"dump the system to be solved");
     parse_args.Add("-threads",&threads,"num","number of threads to use");
     parse_args.Extra(&pipe_file,"file","file describing pipes");
     parse_args.Parse();
@@ -192,7 +194,9 @@ void Run(PARSE_ARGS& parse_args)
     Compute_Full_Matrix(grid,coded_entries,code_values,rhs_vector,fl,mu);
     for(auto e:coded_entries) MH.data.Append({Value(e.x),Value(e.y),code_values(e.z)});
     std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
-    if(!quiet) Solve_And_Display_Solution(grid,fl,MH,rhs_vector,&sol_vector);
+    if(use_krylov || print_system)
+        Solve_And_Display_Solution(grid,fl,MH,rhs_vector,&sol_vector,
+            use_krylov,print_system,quiet);
     std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
     LOG::printf("total dofs: %i\n",rhs_vector.m);
     LOG::printf("blocks: %i\n",fl.blocks.m);

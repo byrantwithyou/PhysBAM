@@ -96,7 +96,7 @@ void Compute_Full_Matrix(const GRID<TV>& grid,ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID
 template<class T,class TV>
 void Solve_And_Display_Solution(const GRID<TV>& grid,const FLUID_LAYOUT<TV>& fl,
     const SYSTEM_MATRIX_HELPER<T>& MH,const ARRAY<T,DOF_ID>& rhs_vector,
-    ARRAY<T,DOF_ID>* sol_out)
+    ARRAY<T,DOF_ID>* sol_out,bool use_krylov,bool print_system,bool quiet)
 {
     SPARSE_MATRIX_FLAT_MXN<T> M;
     MH.Set_Matrix(Value(fl.Total_Dofs()),Value(fl.Total_Dofs()),M);
@@ -109,28 +109,34 @@ void Solve_And_Display_Solution(const GRID<TV>& grid,const FLUID_LAYOUT<TV>& fl,
     sol.v.Resize(Value(fl.Total_Dofs()));
 
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
-    sys.Test_System(sol);
-    OCTAVE_OUTPUT<T>("M.txt").Write("M",sys,rhs);
-    OCTAVE_OUTPUT<T>("b.txt").Write("b",rhs);
+    if(!quiet) sys.Test_System(sol);
+    if(print_system){
+        OCTAVE_OUTPUT<T>("M.txt").Write("M",sys,rhs);
+        OCTAVE_OUTPUT<T>("b.txt").Write("b",rhs);}
 
     MINRES<T> mr;
+    mr.print_residuals=true;
+    LOG::printf("Start minres.\n");
+    if(!use_krylov) return;
     bool converged=mr.Solve(sys,sol,rhs,av,1e-8,0,100000);
     if(!converged) LOG::printf("SOLVER DID NOT CONVERGE.\n");
+    LOG::printf("end minres.\n");
 
-    OCTAVE_OUTPUT<T>("x.txt").Write("x",sol);
+    if(print_system) OCTAVE_OUTPUT<T>("x.txt").Write("x",sol);
     if(sol_out) reinterpret_cast<ARRAY<T>&>(*sol_out)=sol.v;
-    
-    ARRAY<T,FACE_INDEX<TV::m> > face_velocity(grid,1);
-    for(FACE_ITERATOR<TV> it(grid,1);it.Valid();it.Next())
-    {
-        auto& uf=fl.used_faces(it.Full_Index());
-        if(uf.type!=fluid) continue;
-        face_velocity(it.Full_Index())=sol.v(Value(uf.global_id));
-    }
-    Flush_Frame(face_velocity,"solve");
+
+    if(!quiet){
+        ARRAY<T,FACE_INDEX<TV::m> > face_velocity(grid,1);
+        for(FACE_ITERATOR<TV> it(grid,1);it.Valid();it.Next())
+        {
+            auto& uf=fl.used_faces(it.Full_Index());
+            if(uf.type!=fluid) continue;
+            face_velocity(it.Full_Index())=sol.v(Value(uf.global_id));
+        }
+        Flush_Frame(face_velocity,"solve");}
 }
 template void Compute_Full_Matrix<double,VECTOR<double,2> >(GRID<VECTOR<double,2> > const&,ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID>,int>&,ARRAY<double,CODE_ID>&,ARRAY<double,DOF_ID>&,FLUID_LAYOUT<VECTOR<double,2> > const&,double);
 template void Compute_Full_Matrix<double,VECTOR<double,3> >(GRID<VECTOR<double,3> > const&,ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID>,int>&,ARRAY<double,CODE_ID>&,ARRAY<double,DOF_ID>&,FLUID_LAYOUT<VECTOR<double,3> > const&,double);
-template void Solve_And_Display_Solution<double,VECTOR<double,2> >(GRID<VECTOR<double,2> > const&,FLUID_LAYOUT<VECTOR<double,2> > const&,SYSTEM_MATRIX_HELPER<double> const&,ARRAY<double,DOF_ID> const&,ARRAY<double,DOF_ID>*);
-template void Solve_And_Display_Solution<double,VECTOR<double,3> >(GRID<VECTOR<double,3> > const&,FLUID_LAYOUT<VECTOR<double,3> > const&,SYSTEM_MATRIX_HELPER<double> const&,ARRAY<double,DOF_ID> const&,ARRAY<double,DOF_ID>*);
+template void Solve_And_Display_Solution<double,VECTOR<double,2> >(GRID<VECTOR<double,2> > const&,FLUID_LAYOUT<VECTOR<double,2> > const&,SYSTEM_MATRIX_HELPER<double> const&,ARRAY<double,DOF_ID> const&,ARRAY<double,DOF_ID>*,bool,bool,bool);
+template void Solve_And_Display_Solution<double,VECTOR<double,3> >(GRID<VECTOR<double,3> > const&,FLUID_LAYOUT<VECTOR<double,3> > const&,SYSTEM_MATRIX_HELPER<double> const&,ARRAY<double,DOF_ID> const&,ARRAY<double,DOF_ID>*,bool,bool,bool);
 }
