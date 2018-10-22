@@ -4,6 +4,7 @@
 //#####################################################################
 
 #include <Core/Arrays/PROJECTED_ARRAY.h>
+#include <Core/Matrices/MATRIX_MXN.h>
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Core/Matrices/SYSTEM_MATRIX_HELPER.h>
 #include <Core/Vectors/VECTOR.h>
@@ -30,7 +31,7 @@ void Step(SOLID_BODY_COLLECTION<TV>& sbc,T time,T dt,T alpha,const std::string& 
     sbc.Update_Simulated_Particles();
     sbc.Update_Position_Based_State(time,false,false);
     DEFORMABLE_PARTICLES<TV>& particles=sbc.deformable_body_collection.particles;
-    SYSTEM_MATRIX_HELPER<T> AH,MH;
+    MATRIX_MXN<T> A(particles.number*TV::m,particles.number*TV::m),M(particles.number*TV::m*2,particles.number*TV::m*2);
     ARRAY<TV> V(particles.number),col(particles.number);
     auto idx=[](int p,int dim){return p*TV::m+dim;};
     int base=particles.number*TV::m;
@@ -39,33 +40,23 @@ void Step(SOLID_BODY_COLLECTION<TV>& sbc,T time,T dt,T alpha,const std::string& 
             V*=0;
             V(i)(j)=1;
             col*=0;
-            sbc.Force_Differential(V,col,time);
+            sbc.deformable_body_collection.Add_Implicit_Velocity_Independent_Forces(V,col,time);
             for(int k=0;k<particles.number;k++){
                 for(int l=0;l<TV::m;l++){
                     T a=col(k)(l)/particles.mass(k);
-                    T m00=idx(k,l)==idx(i,j)?1:0;
-                    m00+=dt*dt*alpha*a;
-                    T m10=dt*a;
-                    if(m00)
-                        MH.data.Append({idx(k,l),idx(i,j),m00});
-                    if(m10)
-                        MH.data.Append({base+idx(k,l),idx(i,j),m10});
+                    M(idx(k,l),idx(i,j))=(idx(k,l)==idx(i,j)?1:0)+dt*dt*alpha*a;
+                    M(base+idx(k,l),idx(i,j))=dt*a;
                     if(idx(k,l)==idx(i,j)){
-                        MH.data.Append({idx(k,l),base+idx(i,j),dt});
-                        MH.data.Append({base+idx(k,l),base+idx(i,j),1});}
+                        M(idx(k,l),base+idx(i,j))=dt;
+                        M(base+idx(k,l),base+idx(i,j))=1;}
 
-                    if(col(k)(l))
-                        AH.data.Append({idx(k,l),idx(i,j),col(k)(l)});}}}}
+                    A(idx(k,l),idx(i,j))=col(k)(l);}}}}
         
-    SPARSE_MATRIX_FLAT_MXN<T> A,M;
-    AH.Set_Matrix(col.m*TV::m,col.m*TV::m,A);
-    MH.Set_Matrix(2*col.m*TV::m,2*col.m*TV::m,M);
     OCTAVE_OUTPUT<T>(LOG::sprintf("%s/A%d.txt",out_dir,step).c_str()).Write("A",A);
     OCTAVE_OUTPUT<T>(LOG::sprintf("%s/M%d.txt",out_dir,step).c_str()).Write("M",M);
-    
+
     col*=0;
     sbc.Add_Velocity_Independent_Forces(col,ARRAY_VIEW<TWIST<TV> >(),time);
-    LOG::printf("%P\n",col);
     for(int i=0;i<particles.number;i++){
         particles.X(i)+=dt*dt*alpha/particles.mass(i)*col(i)+dt*particles.V(i);
         particles.V(i)+=dt/particles.mass(i)*col(i);}
@@ -96,7 +87,7 @@ void Run(PARSE_ARGS& parse_args,STREAM_TYPE stream_type,const std::string& outpu
         initial_state,true,true,density,1);
 
     // stiffness, poissons_ratio, damping
-    FINITE_VOLUME<TV,TV::m>* force=Create_Finite_Volume(st,new COROTATED_FIXED<T,TV::m>(1e6,.45,0));
+    FINITE_VOLUME<TV,TV::m>* force=Create_Finite_Volume(st,new COROTATED_FIXED<T,TV::m>(1e5,.45,0));
     sbc.Add_Force(force);
 
     sbc.deformable_body_collection.particles.X.template Project<T,&TV::y>()*=0.9;
@@ -108,14 +99,12 @@ void Run(PARSE_ARGS& parse_args,STREAM_TYPE stream_type,const std::string& outpu
     for(int frame=0;frame<last_frame;frame++){
         T frame_end=(frame+1)*frame_dt;
         while(time<frame_end){
-            LOG::printf("step %d\n",step);
             T step_dt=dt;
             T end_time=time+dt;
             if(end_time>=frame_end){
                 step_dt=frame_end-time;
                 end_time=frame_end;}
             Step(sbc,time,step_dt,alpha,output_dir,frame,step);
-            LOG::printf("potential energy: %f\n",force->Potential_Energy(time));
             time=end_time;
             step++;}
         Flush_Frame<TV>("Frame");
@@ -132,12 +121,16 @@ int main(int argc, char* argv[])
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Parse(true);
 
+    Create_Directory(output_dir+"/common");
+    LOG::Initialize_Logging(false,false,1<<30,true);
+    LOG::printf("%s\n",parse_args.Print_Arguments());
     if(type_double){
         STREAM_TYPE stream_type((double()));
         Run<VECTOR<double,3> >(parse_args,stream_type,output_dir);}
     else{
         STREAM_TYPE stream_type((float()));
         Run<VECTOR<float,3> >(parse_args,stream_type,output_dir);}
+    LOG::Finish_Logging();
     return 0;
 }
 
