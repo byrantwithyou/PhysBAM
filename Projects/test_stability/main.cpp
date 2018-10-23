@@ -51,15 +51,32 @@ void Step(SOLID_BODY_COLLECTION<TV>& sbc,T time,T dt,T alpha,const std::string& 
                         M(base+idx(k,l),base+idx(i,j))=1;}
 
                     A(idx(k,l),idx(i,j))=col(k)(l);}}}}
-        
+
+    ARRAY<T> U(particles.number*TV::m*2),U1(particles.number*TV::m*2);
+    for(int i=0;i<particles.number;i++){
+        for(int j=0;j<TV::m;j++){
+            U(idx(i,j))=particles.X(i)(j);
+            U(base+idx(i,j))=particles.V(i)(j);}}
+    U1=M*U;
+
     OCTAVE_OUTPUT<T>(LOG::sprintf("%s/A%d.txt",out_dir,step).c_str()).Write("A",A);
     OCTAVE_OUTPUT<T>(LOG::sprintf("%s/M%d.txt",out_dir,step).c_str()).Write("M",M);
+
 
     col*=0;
     sbc.Add_Velocity_Independent_Forces(col,ARRAY_VIEW<TWIST<TV> >(),time);
     for(int i=0;i<particles.number;i++){
         particles.X(i)+=dt*dt*alpha/particles.mass(i)*col(i)+dt*particles.V(i);
         particles.V(i)+=dt/particles.mass(i)*col(i);}
+
+    T x_error=-1,v_error=-1;
+    for(int i=0;i<particles.number;i++){
+        for(int j=0;j<TV::m;j++){
+            x_error=max(x_error,abs(U1(idx(i,j))-particles.X(i)(j)));
+            v_error=max(v_error,abs(U1(base+idx(i,j))-particles.V(i)(j)));
+        }
+    }
+    LOG::printf("L-inf error x: %P v: %P\n",x_error,v_error);
 }
 
 template<class TV>
