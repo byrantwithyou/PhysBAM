@@ -23,7 +23,33 @@
 #include <Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 
+#define lapack_complex_double std::complex<double>
+#include <lapacke.h>
+
 using namespace PhysBAM;
+
+void Compute_Eigenvalues(MATRIX_MXN<std::complex<double> > M,ARRAY<std::complex<double> >& eig)
+{
+    typedef double T;
+    PHYSBAM_ASSERT(M.m==M.n);
+    char jobvl = 'N';
+    char jobvr = 'N';
+    int n = M.m, size_work=10*n;
+    ARRAY<std::complex<T> > work(size_work);
+    ARRAY<T> rwork(2*n);
+    int info = 0;
+
+    LAPACK_zgeev(&jobvl, &jobvr, &n, &M(0,0), &n, &eig(0), 0, &n, 0, &n,
+        &work(0), &size_work, &rwork(0), &info);
+
+    if(info) printf("ZGEEV FAILED: %i\n",info);
+    PHYSBAM_ASSERT(info==0);
+}
+void Compute_Eigenvalues(MATRIX_MXN<std::complex<float> > M,ARRAY<std::complex<float> >& eig)
+{
+    PHYSBAM_FATAL_ERROR();
+}
+
 
 template<class TV,class T>
 void Step(SOLID_BODY_COLLECTION<TV>& sbc,T time,T dt,T alpha,const std::string& out_dir,int frame,int step)
@@ -61,7 +87,11 @@ void Step(SOLID_BODY_COLLECTION<TV>& sbc,T time,T dt,T alpha,const std::string& 
 
     OCTAVE_OUTPUT<T>(LOG::sprintf("%s/A%d.txt",out_dir,step).c_str()).Write("A",A);
     OCTAVE_OUTPUT<T>(LOG::sprintf("%s/M%d.txt",out_dir,step).c_str()).Write("M",M);
-
+    ARRAY<std::complex<T> > eig(M.m);
+    MATRIX_MXN<std::complex<T> > cM(M.m);
+    for(int i=0;i<M.x.m;i++) cM.x(i)=(std::complex<T>)M.x(i);
+    Compute_Eigenvalues(cM,eig);
+    LOG::printf("eigenvalues: %P\n",eig);
 
     col*=0;
     sbc.Add_Velocity_Independent_Forces(col,ARRAY_VIEW<TWIST<TV> >(),time);
