@@ -29,24 +29,27 @@
 
 using namespace PhysBAM;
 
-void Compute_Eigenvalues(MATRIX_MXN<std::complex<double> > M,ARRAY<std::complex<double> >& eig)
+void Compute_Eigenvalues(MATRIX_MXN<std::complex<double> > M,
+    ARRAY<std::complex<double> >& eig,MATRIX_MXN<std::complex<double> >& W)
 {
     typedef double T;
     PHYSBAM_ASSERT(M.m==M.n);
     char jobvl = 'N';
-    char jobvr = 'N';
+    char jobvr = 'V';
     int n = M.m, size_work=10*n;
     ARRAY<std::complex<T> > work(size_work);
     ARRAY<T> rwork(2*n);
     int info = 0;
+    M.Transpose();
 
-    LAPACK_zgeev(&jobvl, &jobvr, &n, &M(0,0), &n, &eig(0), 0, &n, 0, &n,
+    LAPACK_zgeev(&jobvl, &jobvr, &n, &M(0,0), &n, &eig(0), 0, &n, &W(0,0), &n,
         &work(0), &size_work, &rwork(0), &info);
 
     if(info) printf("ZGEEV FAILED: %i\n",info);
     PHYSBAM_ASSERT(info==0);
 }
-void Compute_Eigenvalues(MATRIX_MXN<std::complex<float> > M,ARRAY<std::complex<float> >& eig)
+void Compute_Eigenvalues(MATRIX_MXN<std::complex<float> > M,
+    ARRAY<std::complex<float> >& eig,MATRIX_MXN<std::complex<float> >& W)
 {
     PHYSBAM_FATAL_ERROR();
 }
@@ -99,10 +102,22 @@ void Step(SOLID_BODY_COLLECTION<TV>& sbc,EXPLICIT_EXAMPLE<TV>& example)
         OCTAVE_OUTPUT<T>(LOG::sprintf("%s/A%d.txt",example.out_dir,example.step).c_str()).Write("A",A);
         OCTAVE_OUTPUT<T>(LOG::sprintf("%s/M%d.txt",example.out_dir,example.step).c_str()).Write("M",M);
         ARRAY<std::complex<T> > eig(M.m);
-        MATRIX_MXN<std::complex<T> > cM(M.m);
+        MATRIX_MXN<std::complex<T> > cM(M.m),W(M.m),P(M.m);
         for(int i=0;i<M.x.m;i++) cM.x(i)=(std::complex<T>)M.x(i);
-        Compute_Eigenvalues(cM,eig);
-        LOG::printf("eigenvalues: %P\n",eig);}
+        Compute_Eigenvalues(cM,eig,W);
+        eig.Sort([](const auto& a,const auto& b){return std::abs(a)>std::abs(b);});
+        P=cM-eig(0);
+        ARRAY<std::complex<T> > v(M.m),v1(M.m);
+        int n=0;
+        for(int i=0;i<W.m;i++){
+            for(int j=0;j<W.m;j++) v(j)=W(i,j);
+            v1=P*v;
+            T r=0;
+            for(int j=0;j<v1.m;j++) r=max(r,abs(v1(j)));
+            if(r<1e-12){
+                ++n;
+                LOG::printf("limiting eigenvector: %P\n",v);}}
+        LOG::printf("largest eigenvalue: %P magnitude: %f multiplicity: %d\n",eig(0),abs(eig(0)),n);}
 
     ARRAY<T> U,U1;
     if(example.test_matrix){
