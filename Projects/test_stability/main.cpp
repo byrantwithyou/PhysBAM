@@ -19,6 +19,7 @@
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/FINITE_VOLUME.h>
+#include <Deformables/Forces/RALEIGH_DAMPING_FORCE.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
@@ -63,9 +64,11 @@ struct EXPLICIT_EXAMPLE
     int last_frame,frame,step;
     T time,default_dt,frame_dt,dt;
     T alpha;
+    T damping,poissons_ratio,stiffness;
     bool test_matrix,dump_matrix;
 
     EXPLICIT_EXAMPLE():stream_type((T())),last_frame(100),default_dt(1e-3),frame_dt(1.0/24),alpha(1),
+        damping(0),poissons_ratio(0.45),stiffness(1e4),
         test_matrix(false),dump_matrix(false)
     {}
 };
@@ -80,6 +83,11 @@ void Step(SOLID_BODY_COLLECTION<TV>& sbc,EXPLICIT_EXAMPLE<TV>& example)
     auto idx=[](int p,int dim){return p*TV::m+dim;};
     int base=particles.number*TV::m;
     MATRIX_MXN<T> M;
+
+    for(int i=0;i<sbc.deformable_body_collection.deformables_forces.m;i++)
+        if(LAGGED_FORCE<TV>* lf=dynamic_cast<LAGGED_FORCE<TV>*>(sbc.deformable_body_collection.deformables_forces(i)))
+            lf->Lagged_Update_Position_Based_State(example.time);
+
     if(example.dump_matrix || example.test_matrix){
         MATRIX_MXN<T> A(particles.number*TV::m,particles.number*TV::m);
         M.Resize(particles.number*TV::m*2,particles.number*TV::m*2);
@@ -146,8 +154,20 @@ void Step(SOLID_BODY_COLLECTION<TV>& sbc,EXPLICIT_EXAMPLE<TV>& example)
         LOG::printf("L-inf error x: %P v: %P\n",x_error,v_error);}
 }
 
+template<class TV,class T>
+void Add_Constitutive_Model(SOLID_BODY_COLLECTION<TV>& sbc,EXPLICIT_EXAMPLE<TV>& example,TETRAHEDRALIZED_VOLUME<T>& st)
+{
+    sbc.Add_Force(Create_Finite_Volume(st,new COROTATED_FIXED<T,3>(example.stiffness,example.poissons_ratio,example.damping)));
+    DEFORMABLE_PARTICLES<TV>& particles=sbc.deformable_body_collection.particles;
+    if(example.damping){
+        DEFORMABLES_FORCES<TV>* force=Create_Finite_Volume(st,new COROTATED_FIXED<T,3>(
+            example.stiffness,example.poissons_ratio,example.damping));
+        force->Update_Position_Based_State(0,true,true);
+        sbc.Add_Force(new RALEIGH_DAMPING_FORCE<TV>(particles,force,example.damping,1,example.dt));}
+}
+
 template<class TV>
-void Setup(SOLID_BODY_COLLECTION<TV>& sbc,SOLIDS_STANDARD_TESTS<TV>& tests,int test_case)
+void Setup(SOLID_BODY_COLLECTION<TV>& sbc,EXPLICIT_EXAMPLE<TV>& example,SOLIDS_STANDARD_TESTS<TV>& tests,int test_case)
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -159,17 +179,13 @@ void Setup(SOLID_BODY_COLLECTION<TV>& sbc,SOLIDS_STANDARD_TESTS<TV>& tests,int t
             TETRAHEDRALIZED_VOLUME<T>& st=tests.Create_Tetrahedralized_Volume(
                 data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",
                 initial_state,true,true,density,1);
-            // stiffness, poissons_ratio, damping
-            FINITE_VOLUME<TV,TV::m>* force=Create_Finite_Volume(st,new COROTATED_FIXED<T,TV::m>(1e5,.45,0));
-            sbc.Add_Force(force);
+            Add_Constitutive_Model(sbc,example,st);
             sbc.deformable_body_collection.particles.X.template Project<T,&TV::y>()*=0.9;}
         break;
     case 1:{
-            GRID<TV> mattress_grid(TV_INT()+2,RANGE<TV>(TV(),TV()+1),true);
+            GRID<TV> mattress_grid(TV_INT()+8,RANGE<TV>(TV(),TV()+1),true);
             TETRAHEDRALIZED_VOLUME<T>& st=tests.Create_Mattress(mattress_grid,true,&initial_state,density);
-            // stiffness, poissons_ratio, damping
-            FINITE_VOLUME<TV,TV::m>* force=Create_Finite_Volume(st,new COROTATED_FIXED<T,TV::m>(1e5,.45,0));
-            sbc.Add_Force(force);
+            Add_Constitutive_Model(sbc,example,st);
             sbc.deformable_body_collection.particles.X.template Project<T,&TV::y>()*=0.9;}
         break;
     default:PHYSBAM_FATAL_ERROR();}
@@ -190,6 +206,9 @@ void Run(PARSE_ARGS& parse_args,STREAM_TYPE stream_type,const std::string& outpu
     parse_args.Add("-dt",&example.default_dt,"time","dt");
     parse_args.Add("-last_frame",&example.last_frame,"frame","number of frames to simulate");
     parse_args.Add("-a",&example.alpha,"alpha","alpha");
+    parse_args.Add("-damping",&example.damping,"damping","damping");
+    parse_args.Add("-stiffness",&example.stiffness,"stiffness","stiffness");
+    parse_args.Add("-poissons_ratio",&example.poissons_ratio,"poissons_ratio","poissons_ratio");
     parse_args.Extra(&test_number,"example number","example number to run");
     parse_args.Parse();
 
@@ -197,7 +216,7 @@ void Run(PARSE_ARGS& parse_args,STREAM_TYPE stream_type,const std::string& outpu
     VIEWER_OUTPUT<TV> vo(stream_type,GRID<TV>(),output_dir);
     SOLID_BODY_COLLECTION<TV> sbc;
     SOLIDS_STANDARD_TESTS<TV> tests(stream_type,data_directory,sbc);
-    Setup(sbc,tests,test_number);
+    Setup(sbc,example,tests,test_number);
     Flush_Frame<TV>("init");
     sbc.Write(stream_type,output_dir,vo.frame-1,0,true,true,true,true,true);
 
