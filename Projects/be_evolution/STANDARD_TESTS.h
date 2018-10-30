@@ -2347,8 +2347,8 @@ void Initialize_Bodies() override
             // ./be_evolution 720 -last_frame 100 -no_self -rd_stiffness 1e5 -kry_tol 1e-4 -no_collisions_in_solve -newton_it 20 -dt .005 -resolution 5
             // ./be_evolution 721 -last_frame 100 -no_self -rd_stiffness 1e5 -kry_tol 1e-4 -no_collisions_in_solve -newton_it 20 -dt .005 -resolution 3
         case 720:case 721:case 722:{
-            for(int s=0;;s++){
-                auto st=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(s);
+            for(int i=0;;i++){
+                auto st=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(i);
                 if(!st) break;
                 Add_Constitutive_Model(*st,(T)1e6*unit_p,(T).45,(T).01*s);}
             Add_Gravity();
@@ -2356,8 +2356,8 @@ void Initialize_Bodies() override
         case 730:
         case 740:
         case 750:case 751:{
-            for(int s=0;;s++){
-                auto st=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(s);
+            for(int i=0;;i++){
+                auto st=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(i);
                 if(!st) break;
                 Add_Constitutive_Model(*st,(T)1e6*unit_p,(T).45,(T).01*s);}
             TV gravity=m/(s*s)*TV(0,-1.8,0);
@@ -2366,8 +2366,8 @@ void Initialize_Bodies() override
             solid_body_collection.Add_Force(g);
             break;}
         case 130:{
-            for(int s=0;;s++){
-                auto st=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(s);
+            for(int i=0;;i++){
+                auto st=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(i);
                 if(!st) break;
                 Add_Constitutive_Model(*st,(T)1e4*unit_p,(T).45,(T).01*s);}
             TV gravity=m/(s*s)*TV(0,-1.8,0);
@@ -2384,8 +2384,8 @@ void Initialize_Bodies() override
             T bending_stiffness_multiplier=100,bending_damping_multiplier=1;
             T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
             solid_body_collection.Add_Force(Create_Bending_Springs(cloth,bending_stiffness,bending_damping));
-            for(int s=0;;s++){
-                auto st=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(s);
+            for(int i=0;;i++){
+                auto st=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(i);
                 if(!st) break;
                 Add_Constitutive_Model(*st,(T)1e4*unit_p,(T).45,(T)0.01*s);}
             break;}
