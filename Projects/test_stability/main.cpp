@@ -14,9 +14,11 @@
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
+#include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
+#include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Forces/FINITE_VOLUME.h>
 #include <Deformables/Forces/RALEIGH_DAMPING_FORCE.h>
@@ -73,11 +75,41 @@ struct EXPLICIT_EXAMPLE
     {}
 };
 
+template<class T,int d>
+T Max_Sound_Speed(const FINITE_VOLUME<VECTOR<T,d>,d>& fvm)
+{
+    typedef VECTOR<T,d> TV;
+    typedef typename FORCE_ELEMENTS::ITERATOR FORCE_ITERATOR;
+    T max_c=0;
+    //SYMMETRIC_MATRIX<T,TV::m> H; // H(i,k) = x_iikk
+    //typename TV::SPIN B,C; // B = x_ikik; C = x_ikki; order: (1D: none; 2D: 01; 3D: 12 20 01)
+    for(FORCE_ITERATOR iterator(fvm.force_elements);iterator.Valid();iterator.Next()){
+        int t=iterator.Data();
+        const DIAGONAL_MATRIX<T,d>& F=fvm.Fe_hat(t);
+        const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dPdF=(*fvm.dPi_dFe)(t);
+        T rho=fvm.use_uniform_density?fvm.density:(*fvm.density_list)(t),J=F.Determinant();
+        SYMMETRIC_MATRIX<T,d> A=SYMMETRIC_MATRIX<T,d>::Conjugate(F,dPdF.H);
+        T k=A.Eigenvalues().x.Max_Abs();
+        for(int j=0;j<TV::SPIN::m;j++){
+            int i=(j+1)%d,l=(j+2)%d;
+            SYMMETRIC_MATRIX<T,2> B;
+            B(0,0)=dPdF.B(j)*sqr(F(i));
+            B(1,1)=dPdF.B(j)*sqr(F(l));
+            B(0,1)=dPdF.C(j)*F(i)*F(l);
+            k=max(k,B.Eigenvalues().x.Max_Abs());}
+        max_c=max(max_c,sqrt(k/(J*rho)));
+    }
+    return max_c;
+}
+
 template<class TV>
 void Step(SOLID_BODY_COLLECTION<TV>& sbc,EXPLICIT_EXAMPLE<TV>& example)
 {
     typedef typename TV::SCALAR T;
     sbc.Update_Position_Based_State(example.time,false,false);
+    for(int i=0;i<sbc.deformable_body_collection.deformables_forces.m;i++){
+        FINITE_VOLUME<TV,TV::m>* fvm=dynamic_cast<FINITE_VOLUME<TV,TV::m>*>(sbc.deformable_body_collection.deformables_forces(i));
+        if(fvm) LOG::printf("Max c: %f\n",Max_Sound_Speed(*fvm));}
     DEFORMABLE_PARTICLES<TV>& particles=sbc.deformable_body_collection.particles;
     ARRAY<TV> col(particles.number);
     auto idx=[](int p,int dim){return p*TV::m+dim;};
@@ -166,6 +198,16 @@ void Add_Constitutive_Model(SOLID_BODY_COLLECTION<TV>& sbc,EXPLICIT_EXAMPLE<TV>&
         sbc.Add_Force(new RALEIGH_DAMPING_FORCE<TV>(particles,force,example.damping,1,example.dt));}
 }
 
+template<class T,class TV>
+T Min_Edge(const TETRAHEDRALIZED_VOLUME<T>& st,ARRAY_VIEW<TV> X)
+{
+    SEGMENT_MESH& segment_mesh=st.mesh.Get_Segment_Mesh();
+    T len=1e6;
+    for(int i=0;i<segment_mesh.elements.m;i++)
+        len=min(len,(X(segment_mesh.elements(i)(0))-X(segment_mesh.elements(i)(1))).Magnitude());
+    return len;
+}
+
 template<class TV>
 void Setup(SOLID_BODY_COLLECTION<TV>& sbc,EXPLICIT_EXAMPLE<TV>& example,SOLIDS_STANDARD_TESTS<TV>& tests,int test_case)
 {
@@ -180,13 +222,15 @@ void Setup(SOLID_BODY_COLLECTION<TV>& sbc,EXPLICIT_EXAMPLE<TV>& example,SOLIDS_S
                 data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",
                 initial_state,true,true,density,1);
             Add_Constitutive_Model(sbc,example,st);
-            sbc.deformable_body_collection.particles.X.template Project<T,&TV::y>()*=0.9;}
+            sbc.deformable_body_collection.particles.X.template Project<T,&TV::y>()*=0.9;
+            LOG::printf("Min edge: %f\n",Min_Edge(st,sbc.deformable_body_collection.particles.X));}
         break;
     case 1:{
             GRID<TV> mattress_grid(TV_INT()+8,RANGE<TV>(TV(),TV()+1),true);
             TETRAHEDRALIZED_VOLUME<T>& st=tests.Create_Mattress(mattress_grid,true,&initial_state,density);
             Add_Constitutive_Model(sbc,example,st);
-            sbc.deformable_body_collection.particles.X.template Project<T,&TV::y>()*=0.9;}
+            sbc.deformable_body_collection.particles.X.template Project<T,&TV::y>()*=0.9;
+            LOG::printf("Min edge: %f\n",Min_Edge(st,sbc.deformable_body_collection.particles.X));}
         break;
     default:PHYSBAM_FATAL_ERROR();}
 }
