@@ -397,7 +397,7 @@ Conjugate(const MATRIX<T,2>& A,const SYMMETRIC_MATRIX<T,2>& B) // 12 mults, 7 ad
 template<class T> inline SYMMETRIC_MATRIX<T,2> SYMMETRIC_MATRIX<T,2>::
 Conjugate(const DIAGONAL_MATRIX<T,2>& A,const SYMMETRIC_MATRIX<T,2>& B) // 6 mults
 {
-    return SYMMETRIC_MATRIX<T,2>(sqr(A.x00)*B.x00,A.x00*A.x11*B.x10,sqr(A.x11)*B.x11);
+    return SYMMETRIC_MATRIX<T,2>(sqr(A.x.x)*B.x00,A.x.x*A.x.y*B.x10,sqr(A.x.y)*B.x11);
 }
 //#####################################################################
 // Function Conjugate
