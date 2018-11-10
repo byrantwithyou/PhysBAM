@@ -268,6 +268,13 @@ void Setup(SOLID_BODY_COLLECTION<VECTOR<T,2> >& sbc,EXPLICIT_EXAMPLE<VECTOR<T,2>
             sbc.deformable_body_collection.particles.X.template Project<T,&TV::y>()*=0.9;
             LOG::printf("Min edge: %f\n",Min_Edge(st,sbc.deformable_body_collection.particles.X));}
         break;
+    case 2:{
+            GRID<TV> mattress_grid(TV_INT(8,1)*example.resolution,RANGE<TV>(TV(0,0),TV(8,1)),true);
+            TRIANGULATED_AREA<T>& st=tests.Create_Mattress(mattress_grid,true,&initial_state,density);
+            Add_Constitutive_Model(sbc,example,st);
+            sbc.deformable_body_collection.particles.X.template Project<T,&TV::x>()*=1.1;
+            LOG::printf("Min edge: %f\n",Min_Edge(st,sbc.deformable_body_collection.particles.X));}
+        break;
     default:PHYSBAM_FATAL_ERROR();}
 }
 
@@ -323,7 +330,7 @@ void Run(PARSE_ARGS& parse_args,STREAM_TYPE stream_type,const std::string& outpu
                 sbc.Write(stream_type,output_dir,vo.frame-1,0,true,true,true,true,true);}
             example.time=end_time;
             example.step++;}
-        Flush_Frame<TV>("Frame");
+        if(!write_substep) Flush_Frame<TV>("Frame");
         sbc.Write(stream_type,output_dir,vo.frame-1,0,true,true,true,true,true);}
 }
 
