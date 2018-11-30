@@ -105,7 +105,8 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-particle_vort",&particle_vort,"output particle vorticity");
     parse_args.Add("-xpic",&xpic,"int","XPIC order");
     parse_args.Add("-pos_update",&position_update,"char","position update");
-    parse_args.Add("-obj_extrap",&use_object_extrap,"extrapolate velocities inside objects");    
+    parse_args.Add("-obj_extrap",&use_object_extrap,"extrapolate velocities inside objects");
+    parse_args.Add("-rk",&rk_particle_order,"order","rk order");
 
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);

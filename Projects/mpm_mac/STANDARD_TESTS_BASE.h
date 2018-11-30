@@ -55,6 +55,7 @@ public:
     using BASE::particle_vort;
     using BASE::xpic;
     using BASE::position_update;
+    using BASE::rk_particle_order;
 
     int test_number;
     int resolution;
