@@ -25,6 +25,7 @@
 #include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_MAC.h>
 #include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Grid_PDE/Interpolation/WENO_INTERPOLATION.h>
+#include <Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
 #include <Geometry/Level_Sets/FAST_MARCHING_METHOD_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_MAC_DRIVER.h>
@@ -152,6 +153,7 @@ Advance_One_Time_Step()
     Step([=](){Apply_Forces();},"forces");
     Step([=](){Compute_Boundary_Conditions();},"compute boundary conditions",false);
     Step([=](){Pressure_Projection();},"projection");
+    Step([=](){Extrapolate_Inside_Object();},"extrapolate",true,example.use_object_extrap);
     Step([=](){Apply_Viscosity();},"viscosity",true,example.use_viscosity);
     Step([=](){Extrapolate_Velocity(!(example.flip||example.xpic),false);},"velocity-extrapolation",true);
     Step([=](){Compute_Effective_Velocity();},"compute effective velocity",false,example.xpic);
@@ -1790,6 +1792,37 @@ Move_Particles()
     for(int t=0;t<invalidate_lists.m;t++)
         for(int i=0;i<invalidate_lists(t).m;i++)
             Invalidate_Particle(invalidate_lists(t)(i));
+}
+//#####################################################################
+// Function Extrapolate_Inside_Object
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Extrapolate_Inside_Object()
+{
+    ARRAY<T,TV_INT> phi_data(example.grid.Domain_Indices(3));
+    LEVELSET<TV> phi(example.grid,phi_data,3);
+    RANGE<TV> box=example.grid.domain;
+    ARRAY<bool,FACE_INDEX<TV::m> > face_inside(example.grid,3);
+    T def_dep=-3*example.grid.dX.Max();
+    for(RANGE_ITERATOR<TV::m> it(example.grid.Domain_Indices(),3,0);it.Valid();it.Next()){
+        TV X=example.grid.Center(it.index);
+        T dep=def_dep;//example.grid.domain.Signed_Distance(X);
+        for(int i=0;i<example.collision_objects.m;i++)
+            dep=std::max(dep,-example.collision_objects(i)->Phi(X,example.time));
+        phi_data(it.index)=dep;}
+    for(FACE_RANGE_ITERATOR<TV::m> it(example.grid.Domain_Indices(),3,0);it.Valid();it.Next()){
+        TV X=example.grid.Face(it.face);
+        T dep=def_dep;//example.grid.domain.Signed_Distance(X);
+        for(int i=0;i<example.collision_objects.m;i++)
+            dep=std::max(dep,-example.collision_objects(i)->Phi(X,example.time));
+        face_inside(it.face)=dep<0;}
+    EXTRAPOLATION_HIGHER_ORDER<TV,T> eho(example.grid,phi,20,3,3);
+    for(PHASE_ID p(0);p<example.phases.m;p++){
+        eho.Extrapolate_Face([&face_inside,this](const FACE_INDEX<TV::m>& index){return face_inside(index);},
+            example.phases(p).velocity);
+        if(example.flip) 
+            eho.Extrapolate_Face([&face_inside,this](const FACE_INDEX<TV::m>& index){return face_inside(index);},
+                example.phases(p).velocity_save);}
 }
 //#####################################################################
 namespace PhysBAM{

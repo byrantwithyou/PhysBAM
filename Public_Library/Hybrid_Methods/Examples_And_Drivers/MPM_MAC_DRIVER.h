@@ -96,6 +96,7 @@ public:
     void Step(std::function<void()> func,const char* name,bool dump_substep=true,bool do_step=true);
     void Invalidate_Particle(int p);
     bool Neumann_Boundary_Condition(const FACE_INDEX<TV::m>& face,ARRAY<T,PHASE_ID>& bc) const;
+    void Extrapolate_Inside_Object();
 //#####################################################################
 };
 }
