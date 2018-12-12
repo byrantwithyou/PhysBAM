@@ -1762,6 +1762,14 @@ Move_Particles()
                     [this,&ph](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,int data)
                     {example.particles.X(p)(it.Index().axis)+=example.dt*it.Weight()*ph.velocity(it.Index());},
                     Clip);}}
+        else if(example.flip && example.position_update=='x'){
+            for(PHASE_ID i(0);i<example.phases.m;i++){
+                PHASE& ph=example.phases(i);
+                ph.gather_scatter->template Gather_Parallel<int>(false,
+                    [this,&ph](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,int data)
+                    {example.particles.X(p)(it.Index().axis)+=example.dt*it.Weight()*
+                        (ph.velocity(it.Index())+ph.velocity_save(it.Index()))/2;},
+                    Clip);}}
         else if(example.xpic && example.position_update=='d'){
             for(PHASE_ID i(0);i<example.phases.m;i++){
                 PHASE& ph=example.phases(i);
