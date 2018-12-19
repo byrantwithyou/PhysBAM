@@ -65,8 +65,6 @@ public:
     T Grid_V_Upper_Bound() const;
     void Update_Simulated_Particles();
     void Compute_Poisson_Matrix();
-    void Move_Mass_Momentum_Inside() const;
-    void Move_Mass_Momentum_Inside_Nearest() const;
     template<class T2> void Fix_Periodic(ARRAY<T2,TV_INT>& u,int ghost=INT_MAX) const;
     template<class T2> void Fix_Periodic(ARRAY<T2,FACE_INDEX<TV::m> >& u,int ghost=INT_MAX) const;
     template<class T2> void Fix_Periodic_Accum(ARRAY<T2,TV_INT>& u,int ghost=INT_MAX) const;

@@ -299,12 +299,6 @@ Particle_To_Grid()
         PHYSBAM_DEBUG_WRITE_SUBSTEP("before reflect",1);
         Reflect_Boundary_Mass_Momentum();}
 
-    // TODO: move mass, momentum, volume inside
-    if(example.move_mass_inside)
-        Move_Mass_Momentum_Inside();
-    else if(example.move_mass_inside_nearest)
-        Move_Mass_Momentum_Inside_Nearest();
-
     example.valid_indices.Remove_All();
     example.valid_flat_indices.Remove_All();
 
@@ -627,117 +621,6 @@ Compute_Effective_Velocity()
             T V=example.velocity(index)+(example.xpic-1)*example.velocity_save(index)-example.xpic*example.xpic_v_star(index);
             example.effective_v(p)(index.axis)+=w*V;
         });
-}
-//#####################################################################
-// Function Move_Mass_Momentum_Inside
-//#####################################################################
-template<class TV> void MPM_MAC_DRIVER<TV>::
-Move_Mass_Momentum_Inside() const
-{
-    for(FACE_ITERATOR<TV> fit(example.grid,2);fit.Valid();fit.Next()){
-        TV loc=fit.Location();
-        T mass=example.mass(fit.Full_Index());
-        if(!mass) continue;
-        T momentum=example.velocity(fit.Full_Index());
-        T volume=0;
-        if(example.use_particle_volumes)
-            volume=example.volume(fit.Full_Index());
-        for(int i=0;i<example.collision_objects.m;i++){
-            MPM_COLLISION_OBJECT<TV>* o=example.collision_objects(i);
-            if(o->Phi(loc,example.time)>=0) continue; // outside collision object
-            Add_Debug_Particle(loc,VECTOR<T,3>(0,0,1)); // DEBUG: the point mass will be moved out from
-            IMPLICIT_OBJECT<TV>* io=o->Get_Implicit_Object(example.time);
-            TV loc_bd=io->Closest_Point_On_Boundary(loc);
-            TV loc_reflect=loc+2*(loc_bd-loc);
-            Add_Debug_Particle(loc_reflect,VECTOR<T,3>(1,0,0)); // DEBUG: reflection across boundary
-            FACE_INDEX<TV::m> first_face_index=example.grid.Face(loc_reflect,fit.face.axis); // get the smallest face index
-            TV first_face_loc=example.grid.Face(first_face_index);
-            TV offset=(loc_reflect-first_face_loc)*example.grid.one_over_dX;
-            VECTOR<T,1<<TV::m> weights;
-            for(int j=0;j<1<<TV::m;j++){
-                TV w=offset,loc=first_face_loc;
-                for(int k=0;k<TV::m;k++)
-                    if(j&(1<<k)){
-                        w(k)=1-w(k);
-                        loc(k)+=example.grid.dX(k);}
-                weights(j)=w.Product();
-                if(o->Phi(loc,example.time)>0){
-                    Add_Debug_Particle(loc,VECTOR<T,3>(1,1,0));/* DEBUG: mass moved to*/}
-                else{
-                    weights(j)=0;
-                    Add_Debug_Particle(loc,VECTOR<T,3>(0,1,1));/* DEBUG: mass won't be moved to*/}}
-            // scale weights if not all nodes are inside
-            weights/=weights.Sum();
-            for(int j=0;j<1<<TV::m;j++){
-                if(weights(j)){
-                    FACE_INDEX<TV::m> face(first_face_index);
-                    for(int k=0;k<TV::m;k++)
-                        if(j&(1<<k))
-                            face.index(k)++;
-                    // move mass momentum, inside
-                    example.mass(face)+=weights(j)*mass;
-                    example.velocity(face)+=weights(j)*momentum;
-                    if(example.use_particle_volumes)
-                        example.volume(face)+=weights(j)*volume;}}
-            PHYSBAM_DEBUG_WRITE_SUBSTEP("faces mass moved to",1);
-            // clear mass,momentum outside
-            example.mass(fit.Full_Index())=0;
-            example.velocity(fit.Full_Index())=0;
-            if(example.use_particle_volumes)
-                example.volume(fit.Full_Index())=0;
-            break;}}
-}
-//#####################################################################
-// Function Move_Mass_Momentum_Inside
-//#####################################################################
-template<class TV> void MPM_MAC_DRIVER<TV>::
-Move_Mass_Momentum_Inside_Nearest() const
-{
-    INTERPOLATED_COLOR_MAP<T> color_map;
-    color_map.Initialize_Colors(0,example.mass.array.Max(),false,true,false);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("purge",1);
-    for(FACE_ITERATOR<TV> it(example.grid,2);it.Valid();it.Next())
-        if(example.mass(it.Full_Index()))
-            Add_Debug_Particle(it.Location(),color_map(example.mass(it.Full_Index())));
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("masses before ",1);
-
-    for(FACE_ITERATOR<TV> fit(example.grid,2);fit.Valid();fit.Next()){
-        TV loc=fit.Location();
-        T mass=example.mass(fit.Full_Index());
-        if(!mass) continue;
-        for(int i=0;i<example.collision_objects.m;i++){
-            MPM_COLLISION_OBJECT<TV>* o=example.collision_objects(i);
-            if(o->Phi(loc,example.time)>=0) continue; // outside collision object
-            IMPLICIT_OBJECT<TV>* io=o->Get_Implicit_Object(example.time);
-            TV loc_bd=io->Closest_Point_On_Boundary(loc);
-            TV loc_reflect=loc+2*(loc_bd-loc);
-            T closest_distance=FLT_MAX;
-            FACE_INDEX<TV::m> first_face_index=example.grid.Face(loc_reflect,fit.face.axis); // get the smallest face index
-            FACE_INDEX<TV::m> closest_face(first_face_index);
-            for(int j=0;j<1<<TV::m;j++){
-                FACE_INDEX<TV::m> f(first_face_index);
-                for(int k=0;k<TV::m;k++)
-                    if(j&(1<<k))
-                        f.index(k)++;
-                T dist2=(example.grid.Face(f)-loc).Magnitude_Squared();
-                if(example.mass(f) && dist2<closest_distance){
-                    closest_distance=dist2;
-                    closest_face=f;}}
-            Add_Debug_Object(VECTOR<TV,2>(loc,example.grid.Face(closest_face)),VECTOR<T,3>(1,1,0));
-            example.mass(closest_face)+=example.mass(fit.Full_Index());
-            example.mass(fit.Full_Index())=0;
-            example.velocity(closest_face)+=example.velocity(fit.Full_Index());
-            example.velocity(fit.Full_Index())=0;
-            if(example.use_particle_volumes){
-                example.volume(closest_face)+=example.volume(fit.Full_Index());
-                example.volume(fit.Full_Index())=0;}
-            break;}}
-
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("purge",1);
-    for(FACE_ITERATOR<TV> it(example.grid,2);it.Valid();it.Next())
-        if(example.mass(it.Full_Index()))
-            Add_Debug_Particle(it.Location(),color_map(example.mass(it.Full_Index())));
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("masses after",1);
 }
 //#####################################################################
 // Function Face_Fraction

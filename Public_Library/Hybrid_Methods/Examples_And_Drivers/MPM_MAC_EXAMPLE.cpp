@@ -32,7 +32,6 @@ MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type)
     only_write_particles(false),only_log(false),cfl(1),
     solver_tolerance(std::numeric_limits<T>::epsilon()*10),solver_iterations(1000),
     threads(1),use_particle_volumes(false),use_constant_density(true),
-    move_mass_inside(false),move_mass_inside_nearest(false),
     use_phi(false),rk_particle_order(0),
     use_massless_particles(false),use_multiphase_projection(false),use_bump(false),use_reseeding(false),
     use_periodic_test_shift(false),
