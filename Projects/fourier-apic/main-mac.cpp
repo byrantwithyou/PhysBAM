@@ -135,18 +135,15 @@ int main(int argc, char* argv[])
         for(int i=0;i<TV::m;i++)
             example.Dp_inv(i).Resize(example.particles.X.m);
     example.Set_Weights(order);
-    example.phases.Resize(PHASE_ID(1));
-    auto& ph=example.phases(PHASE_ID());
-    ph.density=1;
-    ph.viscosity=0;
-    ph.Initialize(example.grid,example.weights,example.ghost,example.threads,PHASE_ID(0));
-    ph.velocity.Resize(example.grid.Cell_Indices(3));
-    ph.mass.Resize(example.grid.Cell_Indices(3));
-    ph.gather_scatter->Prepare_Scatter(example.particles);
+    example.density=1;
+    example.viscosity=0;
+    example.velocity.Resize(example.grid.Cell_Indices(3));
+    example.mass.Resize(example.grid.Cell_Indices(3));
+    example.gather_scatter->Prepare_Scatter(example.particles);
     example.periodic_boundary.is_periodic.Fill(true);
     example.bc_type.Fill(example.BC_PERIODIC);
     example.particles.Store_B(example.use_affine);
-    ph.velocity(FACE_INDEX<TV::m>(0,center))=1;
+    example.velocity(FACE_INDEX<TV::m>(0,center))=1;
     driver.Update_Simulated_Particles();
     driver.Update_Particle_Weights();
     driver.Grid_To_Particle();
@@ -156,11 +153,11 @@ int main(int argc, char* argv[])
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>::Unit_Box()*resolution);it.Valid();it.Next()){
         TV_INT index=it.index-center;
         for(int i=0;i<TV::m;i++) if(index(i)<0) index(i)+=size;
-        row(index)=ph.velocity(FACE_INDEX<TV::m>(0,it.index));
-        PHYSBAM_ASSERT(!ph.velocity(FACE_INDEX<TV::m>(1,it.index)));}
+        row(index)=example.velocity(FACE_INDEX<TV::m>(0,it.index));
+        PHYSBAM_ASSERT(!example.velocity(FACE_INDEX<TV::m>(1,it.index)));}
     T max_diff=0;
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>::Centered_Box()*4);it.Valid();it.Next())
-        max_diff=std::max(max_diff,std::abs(ph.velocity(FACE_INDEX<TV::m>(0,center+it.index))-ph.velocity(FACE_INDEX<TV::m>(0,center-it.index))));
+        max_diff=std::max(max_diff,std::abs(example.velocity(FACE_INDEX<TV::m>(0,center+it.index))-example.velocity(FACE_INDEX<TV::m>(0,center-it.index))));
     LOG::printf("symmetric error: %g\n",max_diff);
     ARRAY<std::complex<T>,TV_INT> out(row.domain);
 

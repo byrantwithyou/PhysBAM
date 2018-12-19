@@ -11,7 +11,6 @@
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
-#include <Hybrid_Methods/Examples_And_Drivers/PHASE_ID.h>
 #include <functional>
 namespace PhysBAM{
 
@@ -40,34 +39,19 @@ public:
     STREAM_TYPE stream_type;
     enum BC_TYPE {BC_FREE, BC_SLIP, BC_NOSLIP, BC_PERIODIC};
     
-    struct PHASE
-    {
-        PHASE_ID id=PHASE_ID();
-        ARRAY<T,FACE_INDEX<TV::m> > mass,volume;
-        ARRAY<T,FACE_INDEX<TV::m> > velocity,velocity_save;
+    ARRAY<T,FACE_INDEX<TV::m> > mass,volume;
+    ARRAY<T,FACE_INDEX<TV::m> > velocity,velocity_save;
 
-        ARRAY<int> valid_flat_indices;
-        ARRAY<FACE_INDEX<TV::m> > valid_indices;
-        ARRAY<int> simulated_particles;
-        GATHER_SCATTER<TV>* gather_scatter=0;
-        T density=0; // if not using per-particle mass
-        T viscosity=0;
+    ARRAY<int> valid_flat_indices;
+    ARRAY<FACE_INDEX<TV::m> > valid_indices;
+    ARRAY<int> simulated_particles;
+    GATHER_SCATTER<TV>* gather_scatter=0;
+    T density=0; // if not using per-particle mass
+    T viscosity=0;
 
-        // signed distance field & level sets
-        ARRAY<T,TV_INT> phi;
-        LEVELSET<TV>* levelset=0;
-
-        PHASE();
-        PHASE(const PHASE&) = delete;
-        PHASE(PHASE&&) = default;
-        PHASE& operator=(PHASE&&) = default;
-        ~PHASE();
-        void Initialize(const GRID<TV>& grid,
-            const VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m>& weights,
-            int ghost,int threads,PHASE_ID pid);
-    };
-
-    ARRAY<PHASE,PHASE_ID> phases;
+    // signed distance field & level sets
+    ARRAY<T,TV_INT> phi;
+    LEVELSET<TV>* levelset=0;
 
     // XPIC stuff
     int xpic=0;
@@ -87,9 +71,9 @@ public:
     int ghost;
     VECTOR<BC_TYPE,TV::m*2> bc_type; // -x, +x, -y, +y, -z, +z
     // Valid if BC_SLIP or BC_NOSLIP; velocity at face. null=0
-    VECTOR<std::function<T(const TV& X,int axis,PHASE_ID,T)>,TV::m*2> bc_velocity;
+    VECTOR<std::function<T(const TV& X,int axis,T)>,TV::m*2> bc_velocity;
     // Valid if BC_FREE; pressure at ghost cell. null=0
-    std::function<T(TV_INT,PHASE_ID,T)> bc_pressure;
+    std::function<T(TV_INT,T)> bc_pressure;
     BOUNDARY_MAC_GRID_PERIODIC<TV,T>& periodic_boundary;
     ARRAY<int,TV_INT> cell_index;
     int dof;
@@ -153,7 +137,6 @@ public:
     T radius_sphere,radius_escape;
     bool use_periodic_test_shift;
     TV_INT periodic_test_shift;
-    bool use_viscosity;
     // d: default; c: always use pic update; p: use pic in the first step only
     char position_update;
     
@@ -188,7 +171,7 @@ public:
     T Potential_Energy(const T time) const;
     T Total_Particle_Vorticity() const;
     void Apply_Forces(const T time);
-    virtual TV Compute_Analytic_Force(PHASE_ID p,const TV& X,const T time) const;
+    virtual TV Compute_Analytic_Force(const TV& X,const T time) const;
     void Set_Weights(int order);
     void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction,
         std::function<FRAME<TV>(T)> func_frame=0,std::function<TWIST<TV>(T)> func_twist=0);

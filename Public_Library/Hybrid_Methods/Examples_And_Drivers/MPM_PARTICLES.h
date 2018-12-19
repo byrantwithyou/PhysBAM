@@ -11,7 +11,6 @@
 #include <Core/Matrices/MATRIX.h>
 #include <Tools/Particles/PARTICLES.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
-#include <Hybrid_Methods/Examples_And_Drivers/PHASE_ID.h>
 
 namespace PhysBAM{
 
@@ -23,13 +22,12 @@ class MPM_PARTICLES:public CLONEABLE<MPM_PARTICLES<TV>,DEFORMABLE_PARTICLES<TV> 
 public:
     using BASE::Add_Array;using BASE::Remove_Array;
 
-    bool store_Fp,store_B,store_C,store_S,store_lame,store_lame0,store_plastic_def,store_phase,store_vort;
+    bool store_Fp,store_B,store_C,store_S,store_lame,store_lame0,store_plastic_def,store_vort;
     ARRAY_VIEW<T> volume;
     ARRAY_VIEW<MATRIX<T,TV::m> > F,Fp,B,C;
     ARRAY_VIEW<SYMMETRIC_MATRIX<T,TV::m> > S;
     ARRAY_VIEW<bool> valid;
     ARRAY_VIEW<T> mu,lambda,mu0,lambda0;
-    ARRAY_VIEW<PHASE_ID> phase;
     ARRAY_VIEW<T> vort;
 
     MPM_PARTICLES();
@@ -40,7 +38,6 @@ public:
     void Store_S(bool store);
     void Store_Lame(bool store);
     void Store_Lame0(bool store);
-    void Store_Phase(bool store);
     void Store_Vort(bool store);
 
 //#####################################################################

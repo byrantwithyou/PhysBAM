@@ -118,18 +118,16 @@ int main(int argc, char* argv[])
     example.flip=flip;
     example.use_affine=use_affine;
     example.Set_Weights(order);
-    example.phases.Resize(PHASE_ID(1));
-    auto& ph=example.phases(PHASE_ID());
-    ph.density=1;
-    ph.viscosity=0;
-    ph.Initialize(example.grid,example.weights,example.ghost,example.threads);
-    ph.velocity.Resize(example.grid.Cell_Indices(3));
-    ph.mass.Resize(example.grid.Cell_Indices(3));
-    ph.gather_scatter->Prepare_Scatter(example.particles);
+    example.density=1;
+    example.viscosity=0;
+    example.Initialize(example.grid,example.weights,example.ghost,example.threads);
+    example.velocity.Resize(example.grid.Cell_Indices(3));
+    example.mass.Resize(example.grid.Cell_Indices(3));
+    example.gather_scatter->Prepare_Scatter(example.particles);
     example.periodic_boundary.is_periodic.Fill(true);
     example.bc_type.Fill(example.BC_PERIODIC);
     example.particles.Store_B(example.use_affine);
-    ph.velocity(FACE_INDEX<TV::m>(0,center))=1;
+    example.velocity(FACE_INDEX<TV::m>(0,center))=1;
     driver.Update_Simulated_Particles();
     driver.Update_Particle_Weights();
 
@@ -220,8 +218,8 @@ int main(int argc, char* argv[])
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>::Unit_Box()*resolution);it.Valid();it.Next()){
         TV_INT index=it.index-center;
         for(int i=0;i<TV::m;i++) if(index(i)<0) index(i)+=size;
-        row(index)=ph.velocity(it.index).x;
-        PHYSBAM_ASSERT(!ph.velocity(it.index).y);}
+        row(index)=example.velocity(it.index).x;
+        PHYSBAM_ASSERT(!example.velocity(it.index).y);}
 
     ARRAY<std::complex<T>,TV_INT> out(row.domain);
 

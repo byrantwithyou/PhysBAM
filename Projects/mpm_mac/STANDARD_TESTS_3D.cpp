@@ -40,8 +40,7 @@ Initialize()
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             SPHERE<TV> sphere(TV(.5,.5,.5)*m,.3*m);
             VECTOR<T,3> angular_velocity(TV(0.4,0,0)/s);
-            T density=2*unit_rho*scale_mass;
-            Set_Phases({density});
+            density=2*unit_rho*scale_mass;
             Seed_Particles(sphere,[=](const TV& X){return angular_velocity.Cross(X-sphere.center);},
                 [=](const TV&){return MATRIX<T,3>::Cross_Product_Matrix(angular_velocity);}
                 ,density,particles_per_cell);
@@ -53,31 +52,25 @@ Initialize()
         case 2:{ // Oscillating sphere
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             SPHERE<TV> sphere(TV(.5,.5,.5)*m,.3*m);
-            T density=2*unit_rho*scale_mass;
-            Set_Phases({density});
+            density=2*unit_rho*scale_mass;
             Seed_Particles(sphere,0,[=](const TV&){return MATRIX<T,3>();},
                 density,particles_per_cell);
         } break;
         case 3:{ // Freefall sphere
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             SPHERE<TV> sphere(TV(.5,.5,.5)*m,.3*m);
-            T density=2*unit_rho*scale_mass;
-            Set_Phases({density});
+            density=2*unit_rho*scale_mass;
             Seed_Particles(sphere,0,[=](const TV&){return MATRIX<T,3>();},
                 density,particles_per_cell);
         } break;
         case 4:{ // Dam break
             Set_Grid(RANGE<TV>::Unit_Box()*m);
-            T density=unit_rho*scale_mass;
-            Set_Phases({density});
+            density=unit_rho*scale_mass;
             Seed_Particles(RANGE<TV>(TV(.0,.0,.0),TV(m/3,2*m/3,m)),0,0,density,particles_per_cell);
             gravity=TV(0,-1,0)*m/sqr(s);
         } break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
-    if(mu){
-        phases(PHASE_ID()).viscosity=mu;
-        use_viscosity=true;}
     if(forced_collision_type!=-1)
         for(int i=0;i<collision_objects.m;i++)
             collision_objects(i)->type=(COLLISION_TYPE)forced_collision_type;

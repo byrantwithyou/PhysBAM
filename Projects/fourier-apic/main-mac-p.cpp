@@ -143,20 +143,16 @@ int main(int argc, char* argv[])
         for(int i=0;i<TV::m;i++)
             example.Dp_inv(i).Resize(example.particles.X.m);
     example.Set_Weights(order);
-    example.use_viscosity=mu>0;
-    example.phases.Resize(PHASE_ID(1));
-    auto& ph=example.phases(PHASE_ID());
-    ph.density=1;
-    ph.viscosity=mu;
-    ph.Initialize(example.grid,example.weights,example.ghost,example.threads,PHASE_ID(0));
-    ph.velocity.Resize(example.grid.Cell_Indices(3));
-    ph.mass.Resize(example.grid.Cell_Indices(3));
-    ph.gather_scatter->Prepare_Scatter(example.particles);
+    example.density=1;
+    example.viscosity=mu;
+    example.velocity.Resize(example.grid.Cell_Indices(3));
+    example.mass.Resize(example.grid.Cell_Indices(3));
+    example.gather_scatter->Prepare_Scatter(example.particles);
     example.periodic_boundary.is_periodic.Fill(true);
     example.bc_type.Fill(example.BC_PERIODIC);
     example.particles.Store_B(example.use_affine);
     if(example.xpic) example.particles.template Add_Array<TV>("effective_v",&example.effective_v);
-    ph.velocity(FACE_INDEX<TV::m>(0,center))=1;
+    example.velocity(FACE_INDEX<TV::m>(0,center))=1;
     driver.Update_Simulated_Particles();
     driver.Update_Particle_Weights();
 
@@ -194,7 +190,7 @@ int main(int argc, char* argv[])
                 for(int i=0;i<example.particles.X.m;i++){
                     Add_Debug_Particle(example.particles.X(i),VECTOR<T,3>(1,0,0));
                     Debug_Particle_Set_Attribute<TV,TV>("V",example.particles.V(i));}
-                Flush_Frame(ph.velocity,"p2g");}
+                Flush_Frame(example.velocity,"p2g");}
             if(use_pressure || mu)
                 driver.Compute_Boundary_Conditions();
             if(use_pressure) driver.Pressure_Projection();
@@ -206,7 +202,7 @@ int main(int argc, char* argv[])
                 for(int i=0;i<example.particles.X.m;i++){
                     Add_Debug_Particle(example.particles.X(i),VECTOR<T,3>(1,0,0));
                     Debug_Particle_Set_Attribute<TV,TV>("V",example.particles.V(i));}
-                Flush_Frame(ph.velocity,"particle dof");}
+                Flush_Frame(example.velocity,"particle dof");}
             for(int q=0;q<example.particles.V.m;q++)
             {
                 for(int j=0;j<dofs_per_particle;j++)

@@ -39,7 +39,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     user_last_frame(false),order(2),seed(1234),particles_per_cell(1<<TV::m),regular_seeding(false),
     no_regular_seeding(false),scale_mass(1),override_output_directory(false),
     m(1),s(1),kg(1),forced_collision_type(-1),dump_collision_objects(false),
-    test_diff(false),bc_periodic(false),use_analytic_field(false),mu(0),poisson_disk(*new POISSON_DISK<TV>(1))
+    test_diff(false),bc_periodic(false),use_analytic_field(false),poisson_disk(*new POISSON_DISK<TV>(1))
 
 {
     T framerate=0;
@@ -95,7 +95,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-test_diff",&test_diff,"test analytic derivatives");
     parse_args.Add("-bc_periodic",&bc_periodic,"set boundary condition periodic");
     parse_args.Add("-test_periodic",&use_periodic_test_shift,"test periodic bc");
-    parse_args.Add("-mu",&mu,"mu","viscosity");
+    parse_args.Add("-mu",&viscosity,"mu","viscosity");
     parse_args.Add("-analyze_u_modes",&analyze_u_modes,"Perform FFT analysis on velocity");
     parse_args.Add("-analyze_energy_vort",&analyze_energy_vort,"Analyze energy and vorticity");
     parse_args.Add("-dump_modes_freq",&dump_modes_freq,"num","Dump FFT modes every num time steps");
@@ -121,7 +121,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     unit_mu=kg*pow<2-TV::m>(m)/s;
     min_dt*=s;
     max_dt*=s;
-    mu*=unit_mu;
+    viscosity*=unit_mu;
 
     if(framerate) frame_dt=1/framerate;
     frame_dt*=s;
@@ -188,8 +188,6 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
 template<class TV> STANDARD_TESTS_BASE<TV>::
 ~STANDARD_TESTS_BASE()
 {
-    analytic_velocity.Delete_Pointers_And_Clean_Memory();
-    analytic_pressure.Delete_Pointers_And_Clean_Memory();
     for(int i=0;i<destroy.m;i++) destroy(i)();
     delete &poisson_disk;
 }
@@ -317,16 +315,6 @@ Test_dV(std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)>
     LOG::printf("dV %g %g %g  rel %g\n",ma,mb,mc,mc/max(ma,mb,(T)1e-30));
 }
 //#####################################################################
-// Function Set_Phases
-//#####################################################################
-template<class TV> void STANDARD_TESTS_BASE<TV>::
-Set_Phases(const ARRAY<T,PHASE_ID>& phase_densities)
-{
-    phases.Resize(phase_densities.m);
-    for(PHASE_ID i(0);i<phase_densities.m;i++)
-        phases(i).density=phase_densities(i);
-}
-//#####################################################################
 // Function Check_Analytic_Velocity
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
@@ -335,19 +323,17 @@ Check_Analytic_Velocity(std::function<bool(const FACE_INDEX<TV::m>&)> valid_face
     if(!use_analytic_field) return;
     T max_error=0,l2_error=0;
     int num_l2_samples=0;
-    for(PHASE_ID i(0);i<phases.m;i++){
-        const PHASE& ph=phases(i);
-        for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
-            if(ph.mass(it.Full_Index())){
-                if(!valid_face(it.Full_Index())) continue;
-                T u=ph.velocity(it.Full_Index());
-                TV v=analytic_velocity(i)->v(it.Location(),time);
-                T e=abs(u-v(it.face.axis));
-                max_error=std::max(max_error,e);
-                l2_error+=sqr(e);
-                num_l2_samples++;
-                Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
-                Debug_Particle_Set_Attribute<TV>("display_size",e);}}}
+    for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
+        if(mass(it.Full_Index())){
+            if(!valid_face(it.Full_Index())) continue;
+            T u=velocity(it.Full_Index());
+            TV v=analytic_velocity->v(it.Location(),time);
+            T e=abs(u-v(it.face.axis));
+            max_error=std::max(max_error,e);
+            l2_error+=sqr(e);
+            num_l2_samples++;
+            Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
+            Debug_Particle_Set_Attribute<TV>("display_size",e);}}
     PHYSBAM_DEBUG_WRITE_SUBSTEP("grid error",1);
     if(num_l2_samples) l2_error/=num_l2_samples;
     l2_error=sqrt(l2_error);
@@ -357,9 +343,7 @@ Check_Analytic_Velocity(std::function<bool(const FACE_INDEX<TV::m>&)> valid_face
     num_l2_samples=0;
     for(int p=0;p<particles.X.m;p++){
         if(!particles.valid(p)) continue;
-        PHASE_ID pid(0);
-        if(particles.store_phase) pid=particles.phase(p);
-        TV e=particles.V(p)-analytic_velocity(pid)->v(particles.X(p),time);
+        TV e=particles.V(p)-analytic_velocity->v(particles.X(p),time);
         max_error=std::max(max_error,e.Max_Abs());
         l2_error+=e.Magnitude_Squared();
         num_l2_samples+=TV::m;
@@ -376,14 +360,12 @@ Check_Analytic_Velocity(std::function<bool(const FACE_INDEX<TV::m>&)> valid_face
 // Function Compute_Analytic_Force
 //#####################################################################
 template<class TV> TV STANDARD_TESTS_BASE<TV>::
-Compute_Analytic_Force(PHASE_ID p,const TV& X,T time) const
+Compute_Analytic_Force(const TV& X,T time) const
 {
     if(!use_analytic_field) return TV();
-    const ANALYTIC_VECTOR<TV>* av=analytic_velocity(p);
-    const ANALYTIC_SCALAR<TV>* ap=analytic_pressure(p);
-    T mu=phases(p).viscosity;
-    T density=phases(p).density;
-    return av->dt(X,time)+av->dX(X,time)*av->v(X,time)-mu/density*av->L(X,time)+1/density*ap->dX(X,time);
+    const ANALYTIC_VECTOR<TV>* av=analytic_velocity;
+    const ANALYTIC_SCALAR<TV>* ap=analytic_pressure;
+    return av->dt(X,time)+av->dX(X,time)*av->v(X,time)-viscosity/density*av->L(X,time)+1/density*ap->dX(X,time);
 }
 //#####################################################################
 // Function Dump_Image
@@ -451,7 +433,6 @@ Velocity_Fourier_Analysis() const
     FFT<TV> fft;
     ARRAY<T,TV_INT> ua(grid.Domain_Indices()),ke(ua.domain);
     ARRAY<std::complex<T>,TV_INT> out(ua.domain);
-    const PHASE& ph=phases(PHASE_ID());
     
     TV coefficients=(T)(2*pi)/grid.domain.Edge_Lengths();
     TV_INT counts=grid.numbers_of_cells,hi=counts/2,lo=hi-counts;
@@ -459,7 +440,7 @@ Velocity_Fourier_Analysis() const
     int taylor_modes=extra_int.m>=1?extra_int(0):1;
     T total_taylor=0;
     for(int a=0;a<TV::m;a++){
-        ua.Put(ph.velocity.Component(a),ua);
+        ua.Put(velocity.Component(a),ua);
         fft.Transform(ua,out);
         out/=sqrt((T)ke.domain.Size());
         for(RANGE_ITERATOR<TV::m> it(ke.domain);it.Valid();it.Next()){
@@ -478,13 +459,13 @@ Velocity_Fourier_Analysis() const
 
     T l2_u=0;
     int num_l2_u=0;
-    auto valid=[&](FACE_INDEX<TV::m> face){return ph.mass(face) && (this->psi_N.domain_indices.Empty() || !this->psi_N(face));};
+    auto valid=[&](FACE_INDEX<TV::m> face){return mass(face) && (this->psi_N.domain_indices.Empty() || !this->psi_N(face));};
     for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         if(bc_type(2*it.face.axis)==BC_PERIODIC)
             if(it.face.index(it.face.axis)==grid.numbers_of_cells(it.face.axis))
                 continue;
         if(!valid(it.face)) continue;
-        l2_u+=sqr(ph.velocity(it.face));
+        l2_u+=sqr(velocity(it.face));
         num_l2_u++;}
     if(num_l2_u) l2_u/=num_l2_u;
     if(num_l2_u) total_taylor/=num_l2_u;
@@ -507,8 +488,8 @@ Velocity_Fourier_Analysis() const
                 D.index(j)--;
                 if(valid(A) && valid(B) && valid(C) && valid(D))
                     dV(i,j)=(T).25*grid.one_over_dX(j)*(
-                        ph.velocity(A)-ph.velocity(B)+
-                        ph.velocity(C)-ph.velocity(D));
+                        velocity(A)-velocity(B)+
+                        velocity(C)-velocity(D));
                 else ok=false;}
         if(!ok) continue;
         vort(it.index)=dV.Contract_Permutation_Tensor().Magnitude_Squared();
@@ -547,13 +528,13 @@ Add_Source(const TV& X0,const TV& n,IMPLICIT_OBJECT<TV>* io,
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Setup_Analytic_Boundary_Conditions()
 {
-    auto bc_v=[this](const TV& X,int axis,PHASE_ID p,T t)
-        {return analytic_velocity(p)->v(X,t)(axis);};
+    auto bc_v=[this](const TV& X,int axis,T t)
+        {return analytic_velocity->v(X,t)(axis);};
     for(int i=0;i<bc_velocity.m;i++)
         if(bc_type(i)==BC_SLIP || bc_type(i)==BC_NOSLIP)
             bc_velocity(i)=bc_v;
-    bc_pressure=[this](TV_INT c,PHASE_ID p,T t)
-        {return analytic_pressure(p)->f(grid.Center(c),t);};
+    bc_pressure=[this](TV_INT c,T t)
+        {return analytic_pressure->f(grid.Center(c),t);};
 }
 template class STANDARD_TESTS_BASE<VECTOR<float,2> >;
 template class STANDARD_TESTS_BASE<VECTOR<float,3> >;

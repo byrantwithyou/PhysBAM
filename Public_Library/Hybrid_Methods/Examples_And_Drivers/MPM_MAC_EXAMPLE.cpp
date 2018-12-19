@@ -35,7 +35,7 @@ MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type)
     move_mass_inside(false),move_mass_inside_nearest(false),
     use_phi(false),rk_particle_order(0),
     use_massless_particles(false),use_multiphase_projection(false),use_bump(false),use_reseeding(false),
-    use_periodic_test_shift(false),use_viscosity(false),
+    use_periodic_test_shift(false),
     position_update('d'),
     debug_particles(*new DEBUG_PARTICLES<TV>),
     test_system(false),print_matrix(false),
@@ -61,39 +61,6 @@ template<class TV> MPM_MAC_EXAMPLE<TV>::
     fluid_walls.Delete_Pointers_And_Clean_Memory();
 }
 //#####################################################################
-// Constructor
-//#####################################################################
-template<class TV> MPM_MAC_EXAMPLE<TV>::PHASE::
-PHASE()
-{
-}
-//#####################################################################
-// Destructor
-//#####################################################################
-template<class TV> MPM_MAC_EXAMPLE<TV>::PHASE::
-~PHASE()
-{
-    delete gather_scatter;
-    delete levelset;
-}
-//#####################################################################
-// Function Initialize
-//#####################################################################
-template<class TV> void MPM_MAC_EXAMPLE<TV>::PHASE::
-Initialize(const GRID<TV>& grid,const VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m>& weights,
-    int ghost,int threads,PHASE_ID pid)
-{
-    id=pid;
-    gather_scatter=new GATHER_SCATTER<TV>(grid,simulated_particles);
-    gather_scatter->threads=threads;
-    gather_scatter->face_weights=weights;
-    gather_scatter->weights=weights(0);
-    
-    mass.Resize(grid.Domain_Indices(ghost));
-    volume.Resize(grid.Domain_Indices(ghost));
-    velocity.Resize(grid.Domain_Indices(ghost));
-}
-//#####################################################################
 // Function Write_Output_Files
 //#####################################################################
 template<class TV> void MPM_MAC_EXAMPLE<TV>::
@@ -108,8 +75,7 @@ Write_Output_Files(const int frame)
         OCTAVE_OUTPUT<T> oo(file.c_str());
         oo.Write("X",particles.X.Flattened());
         oo.Write("V",particles.V.Flattened());
-        for(PHASE_ID i(0);i<phases.m;i++)
-            oo.Write("u",phases(i).velocity.array);}
+        oo.Write("u",velocity.array);}
 
 #pragma omp parallel
 #pragma omp single
@@ -121,12 +87,12 @@ Write_Output_Files(const int frame)
 #pragma omp task
         Write_To_File(stream_type,LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
 #pragma omp task
-        if(phases(PHASE_ID(0)).levelset)
-            Write_To_File(stream_type,LOG::sprintf("%s/%d/levelset",output_directory.c_str(),frame),*phases(PHASE_ID(0)).levelset);
+        if(levelset)
+            Write_To_File(stream_type,LOG::sprintf("%s/%d/levelset",output_directory.c_str(),frame),*levelset);
 
         if(!only_write_particles){
 #pragma omp task
-            Write_To_File(stream_type,LOG::sprintf("%s/%d/mac_velocities",output_directory.c_str(),frame),phases(PHASE_ID()).velocity);
+            Write_To_File(stream_type,LOG::sprintf("%s/%d/mac_velocities",output_directory.c_str(),frame),velocity);
 #pragma omp task
             {
                 GRID<TV> ghost_grid(grid.numbers_of_cells+2*ghost,grid.Ghost_Domain(ghost),true);
@@ -157,11 +123,9 @@ template<class TV> typename TV::SCALAR MPM_MAC_EXAMPLE<TV>::
 Potential_Energy(const T time) const
 {
     T potential=0;
-    for(PHASE_ID p(0);p<phases.m;p++){
-        const PHASE& ph=phases(p);
-        for(int i=0;i<ph.valid_flat_indices.m;i++){
-            FACE_INDEX<TV::m> f=ph.valid_indices(i);
-            potential-=ph.mass(f)*gravity(f.axis)*grid.Face(f)(f.axis);}}
+    for(int i=0;i<valid_flat_indices.m;i++){
+        FACE_INDEX<TV::m> f=valid_indices(i);
+        potential-=mass(f)*gravity(f.axis)*grid.Face(f)(f.axis);}
     return potential;
 }
 //#####################################################################
@@ -176,19 +140,17 @@ Total_Particle_Vorticity() const
     };
 
     T l2_vort=0;
-    for(PHASE_ID p(0);p<phases.m;p++){
-        const PHASE& ph=phases(p);
-        ph.gather_scatter->template Gather<HELPER>(true,
-            [](int p,HELPER& h){h=HELPER();},
-            [this,&ph](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,HELPER& h)
-            {
-                h.vort+=it.Gradient().Cross(TV::Axis_Vector(it.axis)*ph.velocity(it.Index()));
-            },
-            [this,&l2_vort](int p,HELPER& h)
-            {
-                if(particle_vort) particles.vort(p)=h.vort(0);
-                l2_vort+=0.5*particles.mass(p)*h.vort.Magnitude_Squared();
-            });}
+    gather_scatter->template Gather<HELPER>(true,
+        [](int p,HELPER& h){h=HELPER();},
+        [this](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,HELPER& h)
+        {
+            h.vort+=it.Gradient().Cross(TV::Axis_Vector(it.axis)*velocity(it.Index()));
+        },
+        [this,&l2_vort](int p,HELPER& h)
+        {
+            if(particle_vort) particles.vort(p)=h.vort(0);
+            l2_vort+=0.5*particles.mass(p)*h.vort.Magnitude_Squared();
+        });
     return l2_vort;
 }
 //#####################################################################
@@ -197,20 +159,18 @@ Total_Particle_Vorticity() const
 template<class TV> void MPM_MAC_EXAMPLE<TV>::
 Apply_Forces(const T time)
 {
-    for(PHASE_ID p(0);p<phases.m;p++){
-        PHASE& ph=phases(p);
-        for(int i=0;i<ph.valid_flat_indices.m;i++){
-            int k=ph.valid_flat_indices(i);
-            FACE_INDEX<TV::m> f=ph.valid_indices(i);
-            TV af=Compute_Analytic_Force(p,grid.Face(f),time);
-            ph.velocity.array(k)+=dt*af(f.axis);
-            ph.velocity.array(k)+=dt*gravity(f.axis);}}
+    for(int i=0;i<valid_flat_indices.m;i++){
+        int k=valid_flat_indices(i);
+        FACE_INDEX<TV::m> f=valid_indices(i);
+        TV af=Compute_Analytic_Force(grid.Face(f),time);
+        velocity.array(k)+=dt*af(f.axis);
+        velocity.array(k)+=dt*gravity(f.axis);}
 }
 //#####################################################################
 // Function Compute_Analytic_Force
 //#####################################################################
 template<class TV> TV MPM_MAC_EXAMPLE<TV>::
-Compute_Analytic_Force(PHASE_ID p,const TV& X,T time) const
+Compute_Analytic_Force(const TV& X,T time) const
 {
     return TV();
 }
@@ -237,17 +197,16 @@ template<class TV> TV MPM_MAC_EXAMPLE<TV>::
 Total_Particle_Linear_Momentum() const
 {
     TV result;
-    for(PHASE_ID i(0);i<phases.m;i++)
 #pragma omp parallel for
-        for(int t=0;t<threads;t++){
-            int a=t*phases(i).simulated_particles.m/threads;
-            int b=(t+1)*phases(i).simulated_particles.m/threads;
-            TV result_local;
-            for(int k=a;k<b;k++){
-                int p=phases(i).simulated_particles(k);
-                result_local+=particles.mass(p)*particles.V(p);}
+    for(int t=0;t<threads;t++){
+        int a=t*simulated_particles.m/threads;
+        int b=(t+1)*simulated_particles.m/threads;
+        TV result_local;
+        for(int k=a;k<b;k++){
+            int p=simulated_particles(k);
+            result_local+=particles.mass(p)*particles.V(p);}
 #pragma omp critical
-            result+=result_local;}
+        result+=result_local;}
     return result;
 }
 //#####################################################################
@@ -257,18 +216,16 @@ template<class TV> TV MPM_MAC_EXAMPLE<TV>::
 Total_Grid_Linear_Momentum() const
 {
     TV result;
-    for(PHASE_ID i(0);i<phases.m;i++){
-        const PHASE& ph=phases(i);
 #pragma omp parallel for
-        for(int t=0;t<threads;t++){
-            int a=t*ph.valid_flat_indices.m/threads;
-            int b=(t+1)*ph.valid_flat_indices.m/threads;
-            TV result_local;
-            for(int k=a;k<b;k++){
-                int j=ph.valid_flat_indices(k);
-                result_local(ph.valid_indices(k).axis)+=ph.mass.array(j)*ph.velocity.array(j);}
+    for(int t=0;t<threads;t++){
+        int a=t*valid_flat_indices.m/threads;
+        int b=(t+1)*valid_flat_indices.m/threads;
+        TV result_local;
+        for(int k=a;k<b;k++){
+            int j=valid_flat_indices(k);
+            result_local(valid_indices(k).axis)+=mass.array(j)*velocity.array(j);}
 #pragma omp critical
-            result+=result_local;}}
+        result+=result_local;}
     return result;
 }
 //#####################################################################
@@ -278,19 +235,17 @@ template<class TV> typename TV::SPIN MPM_MAC_EXAMPLE<TV>::
 Total_Particle_Angular_Momentum() const
 {
     typename TV::SPIN result;
-    for(PHASE_ID i(0);i<phases.m;i++){
-        const PHASE& ph=phases(i);
 #pragma omp parallel for
-        for(int t=0;t<threads;t++){
-            int a=t*ph.simulated_particles.m/threads;
-            int b=(t+1)*ph.simulated_particles.m/threads;
-            typename TV::SPIN result_local;
-            for(int k=a;k<b;k++){
-                int p=ph.simulated_particles(k);
-                result_local+=particles.mass(p)*particles.X(p).Cross(particles.V(p));
-                if(particles.store_B) result_local-=particles.mass(p)*particles.B(p).Contract_Permutation_Tensor();}
+    for(int t=0;t<threads;t++){
+        int a=t*simulated_particles.m/threads;
+        int b=(t+1)*simulated_particles.m/threads;
+        typename TV::SPIN result_local;
+        for(int k=a;k<b;k++){
+            int p=simulated_particles(k);
+            result_local+=particles.mass(p)*particles.X(p).Cross(particles.V(p));
+            if(particles.store_B) result_local-=particles.mass(p)*particles.B(p).Contract_Permutation_Tensor();}
 #pragma omp critical
-            result+=result_local;}}
+        result+=result_local;}
     return result;
 }
 //#####################################################################
@@ -300,19 +255,17 @@ template<class TV> typename TV::SPIN MPM_MAC_EXAMPLE<TV>::
 Total_Grid_Angular_Momentum(T dt) const
 {
     typename TV::SPIN result;
-    for(PHASE_ID i(0);i<phases.m;i++){
-        const PHASE& ph=phases(i);
 #pragma omp parallel for
-        for(int t=0;t<threads;t++){
-            int a=t*ph.valid_flat_indices.m/threads;
-            int b=(t+1)*ph.valid_flat_indices.m/threads;
-            typename TV::SPIN result_local;
-            for(int k=a;k<b;k++){
-                int i=ph.valid_flat_indices(k);
-                TV X=location.array(i);
-                result_local+=ph.mass.array(i)*TV::Cross_Product(X,ph.velocity.array(i)*TV::Axis_Vector(ph.valid_indices(k).axis));}
+    for(int t=0;t<threads;t++){
+        int a=t*valid_flat_indices.m/threads;
+        int b=(t+1)*valid_flat_indices.m/threads;
+        typename TV::SPIN result_local;
+        for(int k=a;k<b;k++){
+            int i=valid_flat_indices(k);
+            TV X=location.array(i);
+            result_local+=mass.array(i)*TV::Cross_Product(X,velocity.array(i)*TV::Axis_Vector(valid_indices(k).axis));}
 #pragma omp critical
-            result+=result_local;}}
+        result+=result_local;}
     return result;
 }
 //#####################################################################
@@ -322,12 +275,10 @@ template<class TV> typename TV::SCALAR MPM_MAC_EXAMPLE<TV>::
 Total_Grid_Kinetic_Energy() const
 {
     T result=0;
-    for(PHASE_ID i(0);i<phases.m;i++){
-        const PHASE& ph=phases(i);
 #pragma omp parallel for reduction(+:result)
-        for(int i=0;i<ph.valid_flat_indices.m;i++){
-            int j=ph.valid_flat_indices(i);
-            result+=(T).5*ph.mass.array(j)*sqr(ph.velocity.array(j));}}
+    for(int i=0;i<valid_flat_indices.m;i++){
+        int j=valid_flat_indices(i);
+        result+=(T).5*mass.array(j)*sqr(velocity.array(j));}
     return result;
 }
 //#####################################################################
@@ -337,17 +288,16 @@ template<class TV> typename TV::SCALAR MPM_MAC_EXAMPLE<TV>::
 Total_Particle_Kinetic_Energy() const
 {
     T result=0;
-    for(PHASE_ID i(0);i<phases.m;i++)
 #pragma omp parallel for reduction(+:result)
-        for(int k=0;k<phases(i).simulated_particles.m;k++){
-            int p=phases(i).simulated_particles(k);
-            T result_local=particles.mass(p)/2*particles.V(p).Magnitude_Squared();
-            if(particles.store_B)
-                for(int a=0;a<TV::m;a++){
-                    SYMMETRIC_MATRIX<T,TV::m> D=lag_Dp?Dp_inv(a)(p).Inverse():Dp_inv(a)(p);
-                    TV b=particles.B(p).Row(a);
-                    result_local+=particles.mass(p)/2*b.Dot(D*b);}
-            result+=result_local;}
+    for(int k=0;k<simulated_particles.m;k++){
+        int p=simulated_particles(k);
+        T result_local=particles.mass(p)/2*particles.V(p).Magnitude_Squared();
+        if(particles.store_B)
+            for(int a=0;a<TV::m;a++){
+                SYMMETRIC_MATRIX<T,TV::m> D=lag_Dp?Dp_inv(a)(p).Inverse():Dp_inv(a)(p);
+                TV b=particles.B(p).Row(a);
+                result_local+=particles.mass(p)/2*b.Dot(D*b);}
+        result+=result_local;}
     return result;
 }
 //#####################################################################
@@ -357,10 +307,9 @@ template<class TV> typename TV::SCALAR MPM_MAC_EXAMPLE<TV>::
 Average_Particle_Mass() const
 {
     T result=0;
-    for(PHASE_ID i(0);i<phases.m;i++)
 #pragma omp parallel for reduction(+:result)
-        for(int k=0;k<phases(i).simulated_particles.m;k++)
-            result+=particles.mass(phases(i).simulated_particles(k));
+    for(int k=0;k<simulated_particles.m;k++)
+        result+=particles.mass(simulated_particles(k));
     return result/(T)particles.number;
 }
 //#####################################################################

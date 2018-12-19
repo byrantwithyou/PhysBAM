@@ -32,21 +32,21 @@ public:
     using BASE::cfl;using BASE::solver_tolerance;using BASE::Add_Source;
     using BASE::solver_iterations;using BASE::threads;using BASE::test_number;
     using BASE::resolution;using BASE::Seed_Particles;using BASE::Add_Particle;
-    using BASE::regular_seeding;using BASE::Set_Grid;using BASE::Set_Phases;
+    using BASE::regular_seeding;using BASE::Set_Grid;
     using BASE::random;using BASE::collision_objects;using BASE::user_resolution;
     using BASE::Add_Collision_Object;using BASE::Add_Fluid_Wall;using BASE::no_regular_seeding;
     using BASE::m;using BASE::s;using BASE::kg;using BASE::unit_p;using BASE::unit_mu;using BASE::unit_rho;
     using BASE::forced_collision_type;using BASE::destroy;using BASE::write_output_files;using BASE::read_output_files;
-    using BASE::begin_frame;using BASE::end_frame;
-    using BASE::extra_T;using BASE::extra_int;using BASE::gravity;using BASE::phases;
+    using BASE::begin_frame;using BASE::end_frame;using BASE::density;
+    using BASE::extra_T;using BASE::extra_int;using BASE::gravity;
     using BASE::bc_type;using BASE::BC_PERIODIC;using BASE::BC_FREE;using BASE::Test_dV;using BASE::bc_periodic;
     using BASE::use_analytic_field;using BASE::Seed_Particles_Analytic;
     using BASE::analytic_pressure;using BASE::Add_Pressure;
     using BASE::analytic_velocity;using BASE::Add_Velocity;using BASE::Check_Analytic_Velocity;
-    using BASE::mu;using BASE::use_viscosity;
     using BASE::BC_SLIP;using BASE::BC_NOSLIP;using BASE::bc_velocity;using BASE::bc_pressure;
     using BASE::Setup_Analytic_Boundary_Conditions;
-    using BASE::Add_Callbacks;
+    using BASE::Add_Callbacks;using BASE::velocity;using BASE::mass;
+    using BASE::viscosity;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();

@@ -10,7 +10,6 @@
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Grid_Tools/Grids/FACE_INDEX.h>
-#include <Hybrid_Methods/Examples_And_Drivers/PHASE_ID.h>
 #include <Hybrid_Methods/Projection/MPM_PROJECTION_VECTOR.h>
 
 namespace PhysBAM{
@@ -30,7 +29,6 @@ public:
     ARRAY<T> mass;
     ARRAY<FACE_INDEX<TV::m> > faces;
     ARRAY<T> gradp_bc;
-    ARRAY<PHASE_ID> phases;
     bool dc_present;
     MPM_PROJECTION_VECTOR<TV> null_u;
     

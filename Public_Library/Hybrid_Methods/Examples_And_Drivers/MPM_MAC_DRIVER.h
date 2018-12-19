@@ -7,7 +7,6 @@
 #include <Core/Vectors/VECTOR.h>
 #include <Grid_Tools/Grids/FACE_INDEX.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
-#include <Hybrid_Methods/Examples_And_Drivers/PHASE_ID.h>
 #include <climits>
 #include <functional>
 namespace PhysBAM{
@@ -23,7 +22,6 @@ class MPM_MAC_DRIVER
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
     typedef typename MPM_COLLISION_OBJECT<TV>::COLLISION_TYPE COLLISION_TYPE;
-    typedef typename MPM_MAC_EXAMPLE<TV>::PHASE PHASE;
 public:
     enum {pressure_D=-1,pressure_N=-2,pressure_uninit=-3};
 
@@ -45,13 +43,9 @@ public:
     void Update_Particle_Weights();
     void Prepare_Scatter();
     void Particle_To_Grid();
-    void Particle_To_Grid(PHASE& ph) const;
     void Grid_To_Particle();
-    void Grid_To_Particle(const PHASE& ph);
     void Compute_Effective_Velocity();
-    void Compute_Effective_Velocity(PHASE& ph);
     void Build_Level_Sets();
-    void Build_Level_Sets(PHASE& ph);
     void Pressure_Projection();
     void Apply_Forces();
     void Apply_Viscosity();
@@ -59,31 +53,29 @@ public:
     void Extrapolate_Velocity(bool use_bc,bool extrapolate_boundary);
     template <class D,class N>
     void Reflect_Boundary(D func_d,N func_n,RF flag) const;
-    void Reflect_Boundary_Mass_Momentum(PHASE& ph) const;
-    void Reflect_Boundary_Momentum(PHASE& ph,ARRAY<T,FACE_INDEX<TV::m> >& p) const;
+    void Reflect_Boundary_Mass_Momentum() const;
+    void Reflect_Boundary_Momentum(ARRAY<T,FACE_INDEX<TV::m> >& p) const;
     void Reflect_Boundary_Particle_Force(ARRAY<T,FACE_INDEX<TV::m> >& force) const;
     void Reflect_Boundary_Grid_Force(ARRAY<T,FACE_INDEX<TV::m> >& force) const;
-    void Reflect_Boundary_Velocity_Copy_Only(PHASE& ph) const;
-    void Extrapolate_Velocity(PHASE& ph,ARRAY<T,FACE_INDEX<TV::m> >& velocity,bool use_bc,bool extrapolate_boundary) const;
+    void Reflect_Boundary_Velocity_Copy_Only() const;
+    void Extrapolate_Velocity(ARRAY<T,FACE_INDEX<TV::m> >& velocity,bool use_bc,bool extrapolate_boundary) const;
     void Extrapolate_Boundary(ARRAY<T,FACE_INDEX<TV::m> >& velocity) const;
     T Compute_Dt() const;
     T Max_Particle_Speed() const;
     T Grid_V_Upper_Bound() const;
     void Update_Simulated_Particles();
     void Compute_Poisson_Matrix();
-    void Move_Mass_Momentum_Inside(PHASE& ph) const;
-    void Move_Mass_Momentum_Inside_Nearest(PHASE& ph) const;
+    void Move_Mass_Momentum_Inside() const;
+    void Move_Mass_Momentum_Inside_Nearest() const;
     template<class T2> void Fix_Periodic(ARRAY<T2,TV_INT>& u,int ghost=INT_MAX) const;
     template<class T2> void Fix_Periodic(ARRAY<T2,FACE_INDEX<TV::m> >& u,int ghost=INT_MAX) const;
     template<class T2> void Fix_Periodic_Accum(ARRAY<T2,TV_INT>& u,int ghost=INT_MAX) const;
     template<class T2> void Fix_Periodic_Accum(ARRAY<T2,FACE_INDEX<TV::m> >& u,int ghost=INT_MAX) const;
-    T Face_Fraction(const FACE_INDEX<TV::m>& face_index,const ARRAY<T,TV_INT>& phi) const;
-    void Face_Fraction(const FACE_INDEX<TV::m>& face_index,ARRAY<PAIR<PHASE_ID,T> >& face_fractions) const;
-    PAIR<PHASE_ID,typename TV::SCALAR> Phase_Of_Cell(const TV_INT& cell_index) const;
+    T Face_Fraction(const FACE_INDEX<TV::m>& face_index) const;
     T Density(const FACE_INDEX<TV::m>& face_index) const;
 
     void Bump_Particles();
-    TV Nearest_Point_On_Surface(const TV& p,const PHASE& ph,
+    TV Nearest_Point_On_Surface(const TV& p,
         const ARRAY<TV,TV_INT>& gradient,
         const ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT>& Hessian) const;
 
@@ -92,10 +84,9 @@ public:
     void Compute_Laplacian(int var);
     void Compute_Gradient(int nvar);
     void Reseeding();
-    T Phase_And_Phi(const TV& X,PHASE_ID& phase) const;
     void Step(std::function<void()> func,const char* name,bool dump_substep=true,bool do_step=true);
     void Invalidate_Particle(int p);
-    bool Neumann_Boundary_Condition(const FACE_INDEX<TV::m>& face,ARRAY<T,PHASE_ID>& bc) const;
+    bool Neumann_Boundary_Condition(const FACE_INDEX<TV::m>& face,T& bc) const;
     void Extrapolate_Inside_Object();
 //#####################################################################
 };

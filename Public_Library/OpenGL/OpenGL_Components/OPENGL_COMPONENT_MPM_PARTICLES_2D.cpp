@@ -109,8 +109,6 @@ Display() const
     if(!B) B=particles.template Get_Array<MATRIX<T,TV::m> >("C");
     ARRAY_VIEW<bool>* valid_p=particles.template Get_Array<bool>("valid");
 
-    ARRAY_VIEW<PHASE_ID>* phase=particles.template Get_Array<PHASE_ID>("phase");
-
     if(draw_velocities && mode!=GL_SELECT){
         glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_CURRENT_BIT);
         glDisable(GL_LIGHTING);
@@ -154,8 +152,7 @@ Display() const
         if(valid_p && !(*valid_p)(i)) continue;
         if(mode==GL_SELECT) glLoadName(i);
 
-        if(draw_phases && phase) color_map->Lookup(Value((*phase)(i))).Send_To_GL_Pipeline();
-        else if(colors) OPENGL_COLOR((*colors)(i)).Send_To_GL_Pipeline();
+        if(colors) OPENGL_COLOR((*colors)(i)).Send_To_GL_Pipeline();
         else default_color.Send_To_GL_Pipeline();
 
         OpenGL_Begin(GL_POINTS);
