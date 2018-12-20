@@ -93,7 +93,6 @@ private:
 
     GRID<TV> grid,mac_grid,regular_grid;
     bool has_valid_grid;
-    bool has_valid_sub_grids;
     bool node_based;
 
     ARRAY<int> rigid_bodies_no_draw_list;
@@ -161,23 +160,8 @@ template<class T> void OPENGL_2D_VISUALIZATION<T>::
 Read_Grid()
 {
     has_valid_grid=false;
-    has_valid_sub_grids=false;
-    std::string filename,coarse_filename,sub_filename;
-
-    sub_filename=LOG::sprintf("%s/%d/sub_grids",basedir.c_str(),start_frame);
-    filename=LOG::sprintf("%s/%d/levelset",basedir.c_str(),start_frame);
-    // For backwards compatibility
-    if(!File_Exists(filename)) filename=LOG::sprintf("%s/%d/levelset.phi",basedir.c_str(),start_frame);
-    if(!File_Exists(filename)) filename=LOG::sprintf("%s/%d/levelset_0",basedir.c_str(),start_frame);
-
+    std::string filename=basedir+"/common/grid";
     if(File_Exists(filename)){
-        LOG::cout<<"Reading grid from '"<<filename<<"'..."<<std::endl;
-        ARRAY<T,VECTOR<int,2> > phi;
-        LEVELSET<TV> levelset(grid,phi);
-        Read_From_File(filename,levelset);
-        has_valid_grid=true;}
-    else if(File_Exists(basedir+"/common/grid")){
-        filename=basedir+"/common/grid";
         LOG::cout<<"Reading grid from '"<<filename<<"'..."<<std::endl;
         Read_From_File(filename,grid);
         has_valid_grid=true;}
@@ -186,7 +170,6 @@ Read_Grid()
         node_based=!grid.Is_MAC_Grid();
         mac_grid=grid.Get_MAC_Grid();regular_grid=grid.Get_Regular_Grid();}
 }
-
 //#####################################################################
 // Initialize_Components_And_Key_Bindings
 //#####################################################################

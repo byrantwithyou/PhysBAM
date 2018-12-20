@@ -175,21 +175,8 @@ template<class T> void VISUALIZATION<T>::
 Read_Grid()
 {
     has_valid_grid=false;
-    std::string filename,coarse_filename;
-
-    filename=LOG::sprintf("%s/%d/levelset",basedir.c_str(),start_frame);
-    coarse_filename=LOG::sprintf("%s/%d/coarse_levelset",basedir.c_str(),start_frame);
-    // For backwards compatibility
-    if(!File_Exists(filename)) filename=LOG::sprintf("%s/%d/levelset.phi",basedir.c_str(),start_frame);
-
-    if(File_Exists(filename)){
-        std::cout<<"Reading grid from '"<<filename<<"'..."<<std::endl;
-        ARRAY<T,VECTOR<int,3> > phi;
-        LEVELSET<TV> levelset(grid,phi);
-        Read_From_File(filename,levelset);
-        has_valid_grid=true;}
-    else if(File_Exists(basedir+"/common/grid")){
-        filename=basedir+"/common/grid";
+    std::string filename=basedir+"/common/grid";
+    if(File_Exists(basedir+"/common/grid")){
         std::cout<<"Reading grid from '"<<filename<<"'..."<<std::endl;
         Read_From_File(filename,grid);
         has_valid_grid=true;}
@@ -198,7 +185,6 @@ Read_Grid()
         node_based=!grid.Is_MAC_Grid();
         mac_grid=grid.Get_MAC_Grid();regular_grid=grid.Get_Regular_Grid();}
 }
-
 //#####################################################################
 // Initialize_Components_And_Key_Bindings
 //#####################################################################
