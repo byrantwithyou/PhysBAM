@@ -6,7 +6,10 @@
 #include <Core/Log/DEBUG_SUBSTEPS.h>
 #include <Core/Log/FINE_TIMER.h>
 #include <Core/Log/SCOPE.h>
+#include <Core/Matrices/DIAGONAL_MATRIX.h>
+#include <Core/Matrices/LAPACK.h>
 #include <Core/Matrices/SPARSE_MATRIX_THREADED_CONSTRUCTION.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
@@ -119,6 +122,9 @@ Initialize()
     if(example.use_phi){
         example.levelset=new LEVELSET<TV>(example.grid,example.phi,example.ghost);
         example.levelset->boundary=&example.periodic_boundary;}
+
+    if(example.use_mls_xfers)
+        example.valid_xfer_data.Resize(example.grid.Domain_Indices(example.ghost));
 
     RANGE<TV_INT> range(example.grid.Cell_Indices(example.ghost));
     example.location.Resize(example.grid,example.ghost);
@@ -306,8 +312,13 @@ Particle_To_Grid()
     for(FACE_ITERATOR_THREADED<TV> it(example.grid,example.ghost);it.Valid();it.Next()){
         int i=example.mass.Standard_Index(it.Full_Index());
         if(example.mass.array(i)){
-            example.velocity.array(i)/=example.mass.array(i);}
-        else example.velocity.array(i)=0;}
+            example.velocity.array(i)/=example.mass.array(i);
+            if(example.use_mls_xfers)
+                example.valid_xfer_data.array(i)=true;}
+        else{
+            example.velocity.array(i)=0;
+            if(example.use_mls_xfers)
+                example.valid_xfer_data.array(i)=false;}}
 
     APPEND_HOLDER<int> flat_h(example.valid_flat_indices);
     APPEND_HOLDER<FACE_INDEX<TV::m> > indices_h(example.valid_indices);
@@ -529,6 +540,10 @@ Grid_To_Particle()
         TV V;
         TV flip_V;
         MATRIX<T,TV::m> B;
+        T a[TV::m]={};
+        TV b[TV::m];
+        SYMMETRIC_MATRIX<T,TV::m> G[TV::m];
+        bool partial[TV::m]={};
     };
 
     MPM_PARTICLES<TV>& particles=example.particles;
@@ -541,15 +556,46 @@ Grid_To_Particle()
         {
             T w=it.Weight();
             FACE_INDEX<TV::m> index=it.Index();
+            if(example.use_mls_xfers && !example.valid_xfer_data(index)){
+                h.partial[index.axis]=true;
+                h.a[index.axis]+=w;
+                if(example.use_affine){
+                    TV Z=example.grid.Face(index),dX=Z-particles.X(p);
+                    h.b[index.axis]+=w*dX;
+                    h.G[index.axis]+=w*Outer_Product(dX);}
+                return;}
             T V=example.velocity(index);
             h.V(index.axis)+=w*V;
             if(use_flip) h.flip_V(index.axis)+=w*(V-example.velocity_save(index));
             if(example.use_affine){
-                TV Z=example.grid.Face(index);
-                h.B.Add_Row(index.axis,w*V*(Z-particles.X(p)));}
+                TV Z=example.grid.Face(index),dX=Z-particles.X(p);
+                h.B.Add_Row(index.axis,w*V*dX);}
         },
         [this,dt,&particles,use_flip](int p,HELPER& h)
         {
+            if(example.use_mls_xfers)
+                for(int d=0;d<TV::m;d++)
+                    if(h.partial[d]){
+                        T a=1-h.a[d];
+                        if(!example.use_affine){
+                            if(a) h.V(d)/=a;
+                            else h.V(d)=0;
+                            continue;}
+                        TV b=-h.b[d];
+                        SYMMETRIC_MATRIX<T,TV::m> D=example.Dp_inv(d)(p).Inverse();
+                        MATRIX<T,TV::m> G(D-h.G[d]);
+                        MATRIX<T,TV::m+1> A;
+                        A(TV::m,TV::m)=a;
+                        for(int i=0;i<TV::m;i++)
+                            A(TV::m,i)=A(i,TV::m)=b(i);
+                        for(int i=0;i<TV::m;i++)
+                            for(int j=0;j<TV::m;j++)
+                                A(i,j)=G(i,j);
+                        VECTOR<T,TV::m+1> rhs=h.B.Row(d).Append(h.V(d)),sol;
+                        Least_Squares_Solve(A,rhs,sol);
+                        h.V(d)=sol(TV::m);
+                        h.B.Set_Row(d,D*sol.Remove_Index(TV::m));}
+            
             if(particles.store_B) particles.B(p)=h.B;
             if(use_flip) particles.V(p)=(1-example.flip)*h.V+example.flip*(particles.V(p)+h.flip_V);
             else if(example.xpic) particles.V(p)+=example.effective_v(p);

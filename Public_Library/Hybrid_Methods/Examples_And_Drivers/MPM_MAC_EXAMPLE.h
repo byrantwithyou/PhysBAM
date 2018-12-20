@@ -41,6 +41,7 @@ public:
     
     ARRAY<T,FACE_INDEX<TV::m> > mass,volume;
     ARRAY<T,FACE_INDEX<TV::m> > velocity,velocity_save;
+    ARRAY<bool,FACE_INDEX<TV::m> > valid_xfer_data;
 
     ARRAY<int> valid_flat_indices;
     ARRAY<FACE_INDEX<TV::m> > valid_indices;
@@ -149,7 +150,8 @@ public:
     bool print_matrix;
     bool particle_vort;
     bool use_object_extrap=false;
-
+    bool use_mls_xfers=false;
+    
     MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type_input);
     MPM_MAC_EXAMPLE(const MPM_MAC_EXAMPLE&) = delete;
     void operator=(const MPM_MAC_EXAMPLE&) = delete;
