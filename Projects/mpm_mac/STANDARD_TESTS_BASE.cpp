@@ -72,7 +72,6 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-scale_mass",&scale_mass,"scale","Scale mass of particles");
     parse_args.Add("-regular_seeding",&regular_seeding,"use regular particle seeding");
     parse_args.Add_Not("-no_regular_seeding",&no_regular_seeding,"use regular particle seeding");
-    parse_args.Add("-lag_Dp",&lag_Dp,"use early gradient transfer for Cp");
     parse_args.Add("-use_exp_F",&use_quasi_exp_F_update,"Use an approximation of the F update that prevents inversion");
     parse_args.Add("-m",&m,"scale","meter scale");
     parse_args.Add("-s",&s,"scale","second scale");
@@ -260,11 +259,9 @@ Add_Particle(const TV& X,const TV& V,const MATRIX<T,TV::m>& dV,const T mass,cons
     particles.V(p)=V;
     particles.F(p)=MATRIX<T,TV::m>()+1;
     if(particles.store_Fp) particles.Fp(p).Set_Identity_Matrix();
-    if(particles.store_B){
-        if(lag_Dp) particles.B(p)=dV;
-        else
-            for(int a=0;a<TV::m;a++)
-                particles.B(p).Set_Row(a,weights(a)->Dp_Inverse(X).Inverse_Times(dV.Row(a)));}
+    if(particles.store_B)
+        for(int a=0;a<TV::m;a++)
+            particles.B(p).Set_Row(a,weights(a)->Dp_Inverse(X).Inverse_Times(dV.Row(a)));
     if(particles.store_S) particles.S(p)=SYMMETRIC_MATRIX<T,TV::m>()+1;
     particles.mass(p)=mass;
     particles.volume(p)=volume;

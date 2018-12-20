@@ -94,7 +94,6 @@ public:
     // transfer stuff
     VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m> weights;
     bool use_affine;
-    bool lag_Dp;
     T flip;
 
     // objects

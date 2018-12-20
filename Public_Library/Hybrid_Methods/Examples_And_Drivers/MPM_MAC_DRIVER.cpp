@@ -287,7 +287,7 @@ Particle_To_Grid()
             T V=w*particles.V(p)(index.axis);
             if(example.use_affine){
                 TV Y=example.grid.Face(index)-particles.X(p);
-                if(!example.lag_Dp) Y=example.Dp_inv(index.axis)(p)*Y;
+                Y=example.Dp_inv(index.axis)(p)*Y;
                 V+=particles.B(p).Row(index.axis).Dot(Y)*w;}
             example.velocity(index)+=particles.mass(p)*V;
         });

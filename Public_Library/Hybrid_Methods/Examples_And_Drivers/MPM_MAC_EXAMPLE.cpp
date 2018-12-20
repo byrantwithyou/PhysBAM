@@ -25,7 +25,7 @@ MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type)
     sol(*new MPM_PROJECTION_VECTOR<TV>),rhs(*new MPM_PROJECTION_VECTOR<TV>),
     ghost(3),periodic_boundary(*new BOUNDARY_MAC_GRID_PERIODIC<TV,T>),extrap_type('p'),
     clamp_particles(false),
-    use_affine(true),lag_Dp(false),flip(0),initial_time(0),
+    use_affine(true),flip(0),initial_time(0),
     last_frame(100),write_substeps_level(-1),substeps_delay_frame(-1),
     output_directory("output"),data_directory("../../Public_Data"),use_test_output(false),
     restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),
@@ -293,7 +293,7 @@ Total_Particle_Kinetic_Energy() const
         T result_local=particles.mass(p)/2*particles.V(p).Magnitude_Squared();
         if(particles.store_B)
             for(int a=0;a<TV::m;a++){
-                SYMMETRIC_MATRIX<T,TV::m> D=lag_Dp?Dp_inv(a)(p).Inverse():Dp_inv(a)(p);
+                SYMMETRIC_MATRIX<T,TV::m> D=Dp_inv(a)(p);
                 TV b=particles.B(p).Row(a);
                 result_local+=particles.mass(p)/2*b.Dot(D*b);}
         result+=result_local;}
