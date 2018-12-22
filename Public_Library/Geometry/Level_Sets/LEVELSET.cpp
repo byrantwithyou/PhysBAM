@@ -8,6 +8,7 @@
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Grid_Tools/Grids/NODE_ITERATOR.h>
 #include <Grid_PDE/Boundaries/BOUNDARY.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Level_Sets/FAST_MARCHING_METHOD_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
@@ -326,25 +327,6 @@ Approximate_Surface_Size(const T interface_thickness,const T time) const
         surface_size+=LEVELSET_UTILITIES<T>::Delta(phi_ghost(it.index),interface_half_width)*Gradient(phi,it.index).Magnitude();
     return surface_size*grid.dX.Size();
 }
-template<class T> inline VECTOR<T,0> Principal_Curvatures_Helper(const VECTOR<T,1>& N,T norm,const SYMMETRIC_MATRIX<T,1>& H)
-{
-    return VECTOR<T,0>();
-}
-template<class T> inline VECTOR<T,1> Principal_Curvatures_Helper(const VECTOR<T,2>& N,T norm,const SYMMETRIC_MATRIX<T,2>& H)
-{
-    VECTOR<T,2> tangent=N.Perpendicular();
-    return VECTOR<T,1>(tangent.Dot(H*tangent)/norm);
-}
-template<class T> inline VECTOR<T,2> Principal_Curvatures_Helper(const VECTOR<T,3>& N,T norm,const SYMMETRIC_MATRIX<T,3>& H)
-{
-    SYMMETRIC_MATRIX<T,3> P=(T)1-SYMMETRIC_MATRIX<T,3>::Outer_Product(N),M=SYMMETRIC_MATRIX<T,3>::Conjugate(P,H)/norm;
-    T trace=M.Trace();
-    QUADRATIC<T> quadratic(-1,trace,sqr(M(1,1))-M(0,1)*M(1,2)+sqr(M(2,1))-M(0,1)*M(2,3)+sqr(M(2,2))-M(1,2)*M(2,3));
-    quadratic.Compute_Roots();
-    if(quadratic.roots == 0) (T).5*VECTOR<T,2>(trace,trace);
-    else if(quadratic.roots == 1) return VECTOR<T,2>(quadratic.root[0],quadratic.root[0]);
-    return VECTOR<T,2>(quadratic.root[0],quadratic.root[1]);
-}
 //#####################################################################
 // Function Principal_Curvatures
 //#####################################################################
@@ -353,7 +335,7 @@ Principal_Curvatures(const TV& X) const
 {
     TV N=Gradient(X);
     T grad_phi_magnitude=N.Normalize();
-    return Principal_Curvatures_Helper(N,grad_phi_magnitude,Hessian(X));
+    return Compute_Principal_Curvatures(N,Hessian(X)/grad_phi_magnitude);
 }
 namespace PhysBAM{
 template class LEVELSET<VECTOR<float,1> >;
