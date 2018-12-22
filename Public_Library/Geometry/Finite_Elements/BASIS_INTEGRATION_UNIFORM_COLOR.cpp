@@ -71,7 +71,7 @@ Compute_Averaged_Orientation_Helper(const VECTOR<CELL_ELEMENTS,8>& cell_elements
             int color_pair_index=-1;
             bool found=ht_color_pairs.Get(VECTOR<int,2>(V.color_pair.x,V.color_pair.y),color_pair_index);
             PHYSBAM_ASSERT(found);
-            normal(color_pair_index)+=V.face.Raw_Normal();}}
+            normal(color_pair_index)+=V.face.Area_Weighted_Normal();}}
 
     for(int i=0;i<normal.m;i++){
         normal(i).Normalize();

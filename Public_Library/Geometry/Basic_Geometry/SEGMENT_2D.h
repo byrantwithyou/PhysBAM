@@ -54,6 +54,16 @@ public:
     TV Center() const
     {return (T).5*(X.x+X.y);}
 
+    TV Area_Weighted_Normal() const
+    {return Area_Weighted_Normal(X);}
+
+    static TV Area_Weighted_Normal(const TV& x0,const TV& x1)
+    {return (x1-x0).Rotate_Clockwise_90();}
+
+    template<class T_ARRAY>
+    static TV Area_Weighted_Normal(const T_ARRAY& X)
+    {STATIC_ASSERT(T_ARRAY::m==2);return (X(1)-X(0)).Rotate_Clockwise_90();}
+
     static TV Normal(const TV& x0,const TV& x1) 
     {return (x1-x0).Normalized().Rotate_Clockwise_90();}
 

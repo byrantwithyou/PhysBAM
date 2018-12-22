@@ -109,8 +109,15 @@ public:
     TV Normal() const
     {return Normal(X);}
 
-    TV Raw_Normal() const
-    {return TV::Cross_Product(X.y-X.x,X.z-X.x);}
+    TV Area_Weighted_Normal() const
+    {return Area_Weighted_Normal(X);}
+
+    template<class T_ARRAY>
+    static TV Area_Weighted_Normal(const T_ARRAY& X)
+    {STATIC_ASSERT(T_ARRAY::m==3);return Area_Weighted_Normal(X(0),X(1),X(2));}
+    
+    static TV Area_Weighted_Normal(const TV& x0,const TV& x1,const TV& x2)
+    {return TV::Cross_Product(x1-x0,x2-x0);}
 
     static TV Center(const TV& x0,const TV& x1,const TV& x2) // centroid
     {return ((T)1/3)*(x0+x1+x2);}
@@ -139,7 +146,7 @@ public:
     {return Normal().Dot(location-X.x);}
 
     bool Lazy_Inside_Plane(const TV& location) const
-    {return Raw_Normal().Dot(location-X.x)<=0;}  
+    {return Area_Weighted_Normal().Dot(location-X.x)<=0;}  
 
     bool Lazy_Outside_Plane(const TV& location) const
     {return !Lazy_Inside_Plane(location);}
