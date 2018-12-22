@@ -69,6 +69,7 @@ Initialize()
             Seed_Particles(RANGE<TV>(TV(.0,.0,.0),TV(m/3,2*m/3,m)),0,0,density,particles_per_cell);
             gravity=TV(0,-1,0)*m/sqr(s);
         } break;
+        case 100: this->Commandline_Analytic_test(); break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     if(forced_collision_type!=-1)

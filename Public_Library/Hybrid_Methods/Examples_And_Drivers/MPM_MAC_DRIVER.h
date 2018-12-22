@@ -66,16 +66,12 @@ public:
     void Update_Simulated_Particles();
     void Compute_Poisson_Matrix();
     template<class T2> void Fix_Periodic(ARRAY<T2,TV_INT>& u,int ghost=INT_MAX) const;
+    template<class T2> void Fix_Periodic_Node(ARRAY<T2,TV_INT>& u,int ghost=INT_MAX) const;
     template<class T2> void Fix_Periodic(ARRAY<T2,FACE_INDEX<TV::m> >& u,int ghost=INT_MAX) const;
     template<class T2> void Fix_Periodic_Accum(ARRAY<T2,TV_INT>& u,int ghost=INT_MAX) const;
     template<class T2> void Fix_Periodic_Accum(ARRAY<T2,FACE_INDEX<TV::m> >& u,int ghost=INT_MAX) const;
     T Face_Fraction(const FACE_INDEX<TV::m>& face_index) const;
     T Density(const FACE_INDEX<TV::m>& face_index) const;
-
-    void Bump_Particles();
-    TV Nearest_Point_On_Surface(const TV& p,
-        const ARRAY<TV,TV_INT>& gradient,
-        const ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT>& Hessian) const;
 
     void Compute_Boundary_Conditions();
     int Allocate_Projection_System_Variable();
@@ -86,6 +82,7 @@ public:
     void Invalidate_Particle(int p);
     bool Neumann_Boundary_Condition(const FACE_INDEX<TV::m>& face,T& bc) const;
     void Extrapolate_Inside_Object();
+    void Level_Set_Pressure_Projection();
 //#####################################################################
 };
 }

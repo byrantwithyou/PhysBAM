@@ -10,6 +10,7 @@
 #include <Core/Matrices/LAPACK.h>
 #include <Core/Matrices/SPARSE_MATRIX_THREADED_CONSTRUCTION.h>
 #include <Core/Matrices/SYMMETRIC_MATRIX.h>
+#include <Core/Matrices/SYSTEM_MATRIX_HELPER.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
@@ -28,6 +29,9 @@
 #include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_MAC.h>
 #include <Grid_PDE/Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <Grid_PDE/Interpolation/WENO_INTERPOLATION.h>
+#include <Geometry/Basic_Geometry/SEGMENT_2D.h>
+#include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
+#include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include <Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
 #include <Geometry/Level_Sets/FAST_MARCHING_METHOD_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
@@ -94,16 +98,11 @@ Initialize()
         PHYSBAM_ASSERT(a==b);
         example.periodic_boundary.is_periodic(i)=a;}
 
-    example.radius_sphere=(T)0.36*example.grid.dX.Max();
-    example.radius_escape=TV::m==2?(T)1.5*example.grid.dX.Max():(T)1.1*example.grid.dX.Max();
-
-    // must have level sets in order to use multiphase projection
-    if(example.use_multiphase_projection){
-        PHYSBAM_ASSERT(example.use_phi);}
+    // must have level sets in order to use level set projection
+    if(example.use_level_set_projection) example.use_phi=true;
 
     PHYSBAM_ASSERT(example.grid.Is_MAC_Grid());
-    if(example.restart)
-        example.Read_Output_Files(example.restart);
+    if(example.restart) example.Read_Output_Files(example.restart);
 
     example.particles.Store_B(example.use_affine);
 
@@ -118,10 +117,10 @@ Initialize()
     example.volume.Resize(example.grid.Domain_Indices(example.ghost));
     example.velocity.Resize(example.grid.Domain_Indices(example.ghost));
 
-    example.phi.Resize(example.grid.Domain_Indices(example.ghost));
     if(example.use_phi){
-        example.levelset=new LEVELSET<TV>(example.grid,example.phi,example.ghost);
-        example.levelset->boundary=&example.periodic_boundary;}
+        example.levelset_grid=example.grid.Get_Regular_Grid().Get_MAC_Grid_At_Regular_Positions();
+        example.phi.Resize(example.grid.Node_Indices(example.ghost));
+        example.levelset.boundary=&example.periodic_boundary;}
 
     if(example.use_mls_xfers)
         example.valid_xfer_data.Resize(example.grid.Domain_Indices(example.ghost));
@@ -160,11 +159,11 @@ Advance_One_Time_Step()
     Step([=](){Prepare_Scatter();},"prepare-scatter",false);
     Step([=](){Particle_To_Grid();},"p2g");
     Step([=](){Build_Level_Sets();},"build-level-sets",false,example.use_phi);
-    Step([=](){Bump_Particles();},"bump-particles",true,example.use_bump);
     Step([=](){Reseeding();},"reseeding",true,example.use_reseeding);
     Step([=](){Apply_Forces();},"forces");
-    Step([=](){Compute_Boundary_Conditions();},"compute boundary conditions",false);
-    Step([=](){Pressure_Projection();},"projection");
+    Step([=](){Compute_Boundary_Conditions();},"compute boundary conditions",false,!example.use_level_set_projection);
+    Step([=](){Pressure_Projection();},"projection",true,!example.use_level_set_projection);
+    Step([=](){Level_Set_Pressure_Projection();},"level set projection",true,example.use_level_set_projection);
     Step([=](){Extrapolate_Inside_Object();},"extrapolate",true,example.use_object_extrap);
     Step([=](){Apply_Viscosity();},"viscosity",true,example.viscosity!=0);
     Step([=](){Extrapolate_Velocity(!(example.flip||example.xpic),false);},"velocity-extrapolation",true);
@@ -351,139 +350,39 @@ Particle_To_Grid()
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Build_Level_Sets()
 {
-    PHYSBAM_ASSERT(example.levelset);
+    PHYSBAM_ASSERT(example.use_phi);
     T dx=example.grid.dX.Max();
-    example.phi.array.Fill(3*dx);
-    RANGE<TV_INT> grid_domain=example.grid.Domain_Indices(example.ghost);
+    T fmm_offset=3*dx;
+    T fill_radius_cells=5;
+    T particle_radius=(T)0.55*sqrt((T)TV::m)*dx;
+    example.phi.array.Fill(fill_radius_cells*dx-fmm_offset);
+    RANGE<TV_INT> grid_domain=example.levelset_grid.Domain_Indices(example.ghost);
     for(int k=0;k<example.simulated_particles.m;k++){
         int p=example.simulated_particles(k);
-        T influence_bound=example.radius_sphere+dx*(T)1.1;
         TV X=example.particles.X(p);
-        RANGE<TV> bound(X-influence_bound,X+influence_bound);
-        RANGE<TV_INT> range=example.grid.Clamp_To_Cell(bound,example.ghost).Intersect(grid_domain);
+        TV_INT cell=example.levelset_grid.Clamp_To_Cell(X,example.ghost);
+        RANGE<TV_INT> range=RANGE<TV_INT>(cell).Thickened(fill_radius_cells).Intersect(grid_domain);
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
-            T d=(X-example.grid.Center(it.index)).Magnitude();
-            example.phi(it.index)=min(example.phi(it.index),d-example.radius_sphere);}}
+            T d=(X-example.levelset_grid.Center(it.index)).Magnitude()-fmm_offset;
+            example.phi(it.index)=min(example.phi(it.index),d);}}
+    Fix_Periodic(example.phi);
 
     ARRAY<TV_INT> seed_indices;
-    for(FACE_ITERATOR<TV> it(example.grid,example.ghost,GRID<TV>::INTERIOR_REGION);it.Valid();it.Next()){
-        TV_INT a=it.First_Cell_Index(),b=it.Second_Cell_Index();
-        if(example.phi(a)<0){if(example.phi(b)>=0) seed_indices.Append(b);}
-        else if(example.phi(b)<0) seed_indices.Append(a);}
+    for(FACE_RANGE_ITERATOR<TV::m> it(example.levelset_grid.Domain_Indices(example.ghost),RF::skip_outer);it.Valid();it.Next()){
+        TV_INT a=it.face.First_Cell_Index(),b=it.face.Second_Cell_Index();
+        bool pa=example.phi(a)<0,pb=example.phi(b)<0;
+        if(pa!=pb){
+            seed_indices.Append(a);
+            seed_indices.Append(b);}}
     Prune_Duplicates(seed_indices);
 
     FAST_MARCHING_METHOD_UNIFORM<TV> fmm;
     fmm.seed_indices=&seed_indices;
     fmm.correct_interface_phi=false;
-    fmm.process_sign=1;
-    fmm.Fast_Marching_Method(example.grid,example.ghost,example.phi,3*dx);
-
-    T shift=10*dx;
-    for(int i=0;i<seed_indices.m;i++)
-        example.phi(seed_indices(i))-=shift;
-
-    fmm.process_sign=-1;
-    fmm.Fast_Marching_Method(example.grid,example.ghost,example.phi,shift+3*dx);
-
-    for(CELL_ITERATOR<TV> it(example.grid,example.ghost);it.Valid();it.Next())
-        if(example.phi(it.index)<=0) example.phi(it.index)+=shift;
-}
-//#####################################################################
-// Function Bump_Particles
-//#####################################################################
-template<class TV> void MPM_MAC_DRIVER<TV>::
-Bump_Particles()
-{
-    T weno_eps=(T)1e-6;
-    T dx=example.grid.dX.Max();
-    T one_over_dx=(T)1/dx;
-    TV halfdx=(T).5*example.grid.dX;
-    ARRAY<T,TV_INT> curvature(example.grid.Cell_Indices(example.ghost-1));
-    ARRAY<TV,TV_INT> gradient(example.grid.Cell_Indices(example.ghost-1));
-    ARRAY<SYMMETRIC_MATRIX<T,TV::m>,TV_INT> Hessian(example.grid.Cell_Indices(example.ghost-1));
-    for(CELL_ITERATOR<TV> it(example.grid,example.ghost-1);it.Valid();it.Next()){
-        curvature(it.index)=example.levelset->Compute_Curvature(example.phi,it.index);
-        gradient(it.index)=example.levelset->Gradient(example.phi,it.index);
-        Hessian(it.index)=example.levelset->Hessian(example.phi,it.index);}
-
-    for(int j=0;j<example.simulated_particles.m;j++){
-        int p=example.simulated_particles(j);
-        TV X=example.particles.X(p);
-        TV_INT index=example.grid.Cell(X-halfdx);
-        TV c=(X-example.grid.Center(index))*example.grid.One_Over_DX();
-        T phi=WENO_Interpolation(c,example.phi,index,weno_eps);
-        if(phi>-example.radius_sphere && phi<example.radius_escape){
-            T cell_k[1<<TV::m];
-            for(int l=0;l<(1<<TV::m);l++){
-                TV_INT cell(index);
-                for(int d=0;d<TV::m;d++)
-                    if(l&(1<<d))
-                        cell(d)++;
-                cell_k[l]=curvature(cell);}
-            T absk=abs(LINEAR_INTERPOLATION<T,T>::Linear(cell_k,c));
-
-            T target=(T)0;
-            if(absk>(T)0.5*one_over_dx)
-                continue;
-            if(absk<(T)0.25*one_over_dx)
-                target=example.radius_sphere;
-
-            TV nearest=Nearest_Point_On_Surface(X,gradient,Hessian);
-            T norm_grad=WENO_Interpolation(c,gradient,index,weno_eps).Magnitude();
-            T d=phi/norm_grad;
-
-            TV nq=nearest-X;
-            nq.Normalize();
-            if(d>=0)
-                example.particles.X(p)=nearest+target*nq;
-            else if(d>-target)
-                example.particles.X(p)=nearest-target*nq;}}
-}
-//#####################################################################
-// Function Nearest_Point_On_Surface
-//#####################################################################
-template<class TV> TV MPM_MAC_DRIVER<TV>::
-Nearest_Point_On_Surface(const TV& p,const ARRAY<TV,TV_INT>& gradient,
-    const ARRAY<SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m>,TV_INT>& Hessian) const
-{
-    typedef VECTOR<T,TV::m+1> ETV;
-
-    int max_iterations=20;
-    T phi_tolerance=(T)0.01*example.grid.dX.Min(),dir_tolerance=(T)0.02;
-    auto Compute=[this,&gradient,&Hessian](const TV& X,TV& n,SYMMETRIC_MATRIX<T,TV::m>* h)
-    {
-        T weno_eps=(T)1e-6;
-        TV_INT index=example.grid.Cell(X-(T)0.5*example.grid.dX);
-        TV c=(X-example.grid.Center(index))*example.grid.one_over_dX;
-        n=WENO_Interpolation(c,gradient,index,weno_eps).Normalized();
-        if(h) *h=WENO_Interpolation(c,Hessian,index,weno_eps);
-        return WENO_Interpolation(c,example.phi,index,weno_eps);
-    };
-
-    TV n;
-    T phi=Compute(p,n,0);
-    TV x=p-phi*n;
-    T lambda=-2*phi;
-    for(int i=0;i<max_iterations;i++){
-        SYMMETRIC_MATRIX<T,TV::m> h;
-        T phi=Compute(x,n,&h);
-        TV xp=x-p;
-        if(abs(phi)<=phi_tolerance){
-            T dist2=xp.Magnitude_Squared();
-            if(xp.Projected_Orthogonal_To_Unit_Direction(n).Magnitude_Squared()<=sqr(dir_tolerance)*dist2) break;
-            if(dist2<=sqr(phi_tolerance)){
-                x=p-sign(xp.Dot(n))*phi*n;
-                break;}}
-        ETV g=(xp*2-lambda*n).Append(-phi);
-        MATRIX<T,TV::m+1,TV::m+1> H;
-        H.Set_Submatrix(0,0,(T)2-lambda*h);
-        ETV en=(-n).Append(0);
-        H.Set_Column(TV::m,en);
-        H.Set_Row(TV::m,en);
-        ETV dx=H.PLU_Solve(-g);
-        x+=dx.Remove_Index(TV::m);
-        lambda+=dx(TV::m);}
-    return x;
+    fmm.Fast_Marching_Method(example.levelset_grid,example.ghost,example.phi,
+        fmm_offset+example.ghost*dx);
+    example.phi.array+=fmm_offset-particle_radius;
+    Fix_Periodic(example.phi);
 }
 //#####################################################################
 // Function Reseeding
@@ -491,6 +390,7 @@ Nearest_Point_On_Surface(const TV& p,const ARRAY<TV,TV_INT>& gradient,
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Reseeding()
 {
+    T dx=example.grid.dX.Max();
     LINEAR_INTERPOLATION_MAC<TV,T> li(example.grid);
     int target_ppc=1<<TV::m;
     ARRAY<ARRAY<int>,TV_INT> particle_counts(example.grid.Domain_Indices());
@@ -503,14 +403,14 @@ Reseeding()
     for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
         ARRAY<int>& a=particle_counts(it.index);
         int target=target_ppc;
-        if(abs(example.phi(it.index))<example.grid.dX.Max()) target*=4;
+        if(abs(example.phi(it.index))<dx) target*=4;
         if(a.m<target){
             RANGE<TV> range=example.grid.Cell_Domain(it.index);
             for(int i=0;i<target-a.m;i++){
                 TV X;
                 example.random.Fill_Uniform(X,range);
-                T phi=example.levelset->Phi(X);
-                if(abs(phi)>=example.radius_sphere){
+                T phi=example.levelset.Phi(X);
+                if(abs(phi)>=(T).3*dx){
                     int p=example.particles.Add_Element_From_Deletion_List();
                     example.particles.valid(p)=true;
                     example.particles.mass(p)=1;
@@ -674,7 +574,7 @@ Compute_Effective_Velocity()
 template<class TV> auto MPM_MAC_DRIVER<TV>::
 Face_Fraction(const FACE_INDEX<TV::m>& face_index) const -> T
 {
-    if(!example.use_multiphase_projection)
+    if(!example.use_level_set_projection)
         return example.mass(face_index)!=0;
 
     LINEAR_INTERPOLATION_UNIFORM<TV,T> li;
@@ -704,7 +604,7 @@ Face_Fraction(const FACE_INDEX<TV::m>& face_index) const -> T
 template<class TV> typename TV::SCALAR MPM_MAC_DRIVER<TV>::
 Density(const FACE_INDEX<TV::m>& face_index) const
 {
-    if(!example.use_multiphase_projection){
+    if(!example.use_level_set_projection){
         if(T m=example.mass(face_index)){
             if(example.use_constant_density)
                 return example.density;
@@ -729,17 +629,17 @@ Neumann_Boundary_Condition(const FACE_INDEX<TV::m>& face,T& bc) const
         if(face.index(i)<domains(face.axis).min_corner(i) && wall){
             if(example.mass(face)){
                 bc=0;
-                if(example.bc_velocity(2*i)){
+                if(example.bc_velocity){
                     TV X=example.grid.domain.Clamp(example.grid.Face(face));
-                    bc=example.bc_velocity(2*i)(X,face.axis,example.time);}}
+                    bc=example.bc_velocity(X,example.time)(face.axis);}}
             return true;}
         wall=example.bc_type(2*i+1)==example.BC_SLIP||example.bc_type(2*i+1)==example.BC_NOSLIP;
         if(face.index(i)>=domains(face.axis).max_corner(i) && wall){
             if(example.mass(face)){
                 bc=0;
-                if(example.bc_velocity(2*i+1)){
+                if(example.bc_velocity){
                     TV X=example.grid.domain.Clamp(example.grid.Face(face));
-                    bc=example.bc_velocity(2*i+1)(X,face.axis,example.time);}}
+                    bc=example.bc_velocity(X,example.time)(face.axis);}}
             return true;}}
     TV X=example.grid.Face(face);
     for(int i=0;i<example.collision_objects.m;i++){
@@ -791,7 +691,7 @@ Allocate_Projection_System_Variable()
             for(int s=0;s<2;s++){
                 if(!example.psi_N(face)){
                     all_N=false;
-                    if(!example.use_multiphase_projection){
+                    if(!example.use_level_set_projection){
                         if(!example.mass(face))
                             dirichlet=true;}}
                 face.index(a)++;}}
@@ -811,6 +711,7 @@ Compute_Laplacian(int nvar)
 {
     example.projection_system.A.Reset(nvar);
     ARRAY<int> tmp0,tmp1;
+    TV base_entry=example.grid.one_over_dX*example.grid.one_over_dX/example.density;
 #pragma omp parallel
     {
         bool has_dirichlet=false;
@@ -822,24 +723,20 @@ Compute_Laplacian(int nvar)
             T diag=0;
             helper.Start_Row();
             for(int a=0;a<TV::m;a++){
-                FACE_INDEX<TV::m> face(a,it.index);
                 for(int s=0;s<2;s++){
                     TV_INT cell=it.index;
                     cell(a)+=2*s-1;
-                    PHYSBAM_ASSERT(face.Cell_Index(s)==cell);
-
-                    if(!example.psi_N(face)){
-                        T entry=sqr(example.grid.one_over_dX(a))/Density(face);
-                        diag+=entry;
-                        int ci=example.cell_index(cell);
-                        if(ci>=0) helper.Add_Entry(ci,-entry);
-                        else{
-                            has_dirichlet=true;
-                            T rhs=0;
-                            if(example.bc_pressure)
-                                rhs=entry*example.dt*example.bc_pressure(cell,example.time);
-                            example.rhs.v(center_index)+=rhs;}}
-                    face.index(a)++;}}
+                    FACE_INDEX<TV::m> face(a,it.index);
+                    face.index(a)+=s;
+                    if(example.psi_N(face)) continue;
+                    T entry=base_entry(a);
+                    diag+=entry;
+                    int ci=example.cell_index(cell);
+                    if(ci>=0) helper.Add_Entry(ci,-entry);
+                    else{
+                        has_dirichlet=true;
+                        if(example.bc_pressure)
+                            example.rhs.v(center_index)+=entry*example.dt*example.bc_pressure(example.grid.Center(cell),example.time);}}}
             helper.Add_Entry(center_index,diag);}
         helper.Finish();
         if(has_dirichlet)
@@ -899,12 +796,12 @@ Compute_Gradient(int nvar)
             G_helper.Start_Row();
             T gradp_bc=0;
             if(c0>=0) G_helper.Add_Entry(c0,-example.grid.one_over_dX(it.axis));
-            else if(c0==pressure_D){
-                T pr=example.bc_pressure?example.bc_pressure(it.First_Cell_Index(),example.time):0;
+            else if(c0==pressure_D && example.bc_pressure){
+                T pr=example.bc_pressure(example.grid.Center(it.First_Cell_Index()),example.time);
                 gradp_bc+=-example.dt*example.grid.one_over_dX(it.axis)*pr;}
             if(c1>=0) G_helper.Add_Entry(c1,example.grid.one_over_dX(it.axis));
-            else if(c1==pressure_D){
-                T pr=example.bc_pressure?example.bc_pressure(it.Second_Cell_Index(),example.time):0;
+            else if(c1==pressure_D && example.bc_pressure){
+                T pr=example.bc_pressure(example.grid.Center(it.Second_Cell_Index()),example.time);
                 gradp_bc+=example.dt*example.grid.one_over_dX(it.axis)*pr;}
             gradp_bc_t.Append(gradp_bc);
             faces_t.Append(face);
@@ -1165,9 +1062,9 @@ Reflect_Boundary_Mass_Momentum() const
         [&](const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side)
         {
             T bc=0;
-            if(example.bc_velocity(side)){
+            if(example.bc_velocity){
                 TV nearest_point=example.grid.Clamp(example.grid.Face(out));
-                bc=example.bc_velocity(side)(nearest_point,out.axis,example.time);}
+                bc=example.bc_velocity(nearest_point,example.time)(out.axis);}
             T& moment_in=example.velocity(in),&moment_out=example.velocity(out);
             T mv_in_old=moment_in,mv_out_old=moment_out;
             T& m_in=example.mass(in),&m_out=example.mass(out);
@@ -1203,9 +1100,9 @@ Reflect_Boundary_Momentum(ARRAY<T,FACE_INDEX<TV::m> >& p) const
         [&](const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side)
         {
             T bc=0;
-            if(example.bc_velocity(side)){
+            if(example.bc_velocity){
                 TV nearest_point=example.grid.Clamp(example.grid.Face(out));
-                bc=example.bc_velocity(side)(nearest_point,out.axis,example.time);}
+                bc=example.bc_velocity(nearest_point,example.time)(out.axis);}
             T& moment_in=p(in),&moment_out=p(out);
             T mv_in_old=moment_in,mv_out_old=moment_out;
             T m_in=example.mass(in),m_out=example.mass(out);
@@ -1230,9 +1127,9 @@ Reflect_Boundary_Velocity_Copy_Only() const
         [&](const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side)
         {
             T bc=0;
-            if(example.bc_velocity(side)){
+            if(example.bc_velocity){
                 TV nearest_point=example.grid.Clamp(example.grid.Face(out));
-                bc=example.bc_velocity(side)(nearest_point,out.axis,example.time);}
+                bc=example.bc_velocity(nearest_point,example.time)(out.axis);}
             example.velocity(out)=(2*bc-example.velocity(in));
         },
         [&](const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side)
@@ -1293,7 +1190,7 @@ Extrapolate_Velocity(ARRAY<T,FACE_INDEX<TV::m> >& velocity,bool use_bc,bool extr
                 else if(extrap_type=='l') extrap_type='L';}}
         int sign_out=it.side%2?1:-1;
         auto bc=[this,it](const TV& X,int axis,T t){
-            if(example.bc_velocity(it.side)) return example.bc_velocity(it.side)(X,axis,t);
+            if(example.bc_velocity) return example.bc_velocity(X,t)(axis);
             else return (T)0;};
         auto further=[=](FACE_INDEX<TV::m> f){f.index(side_axis)-=sign_out;return f;};
         FACE_INDEX<TV::m> nearest_face[2]={it.face,it.face};
@@ -1609,6 +1506,221 @@ Extrapolate_Inside_Object()
     if(example.flip) 
         eho.Extrapolate_Face([&face_inside,this](const FACE_INDEX<TV::m>& index){return face_inside(index);},
             example.velocity_save);
+}
+//#####################################################################
+// Function Pressure_Projection
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Level_Set_Pressure_Projection()
+{
+    typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX_FACE FACE;
+
+    // TODO: how much mass does the surface velocity edge get?  mass -> 0?
+    
+    // TODO: fill in valid xfer data flags.
+
+    static const int num_corners=1<<TV::m;
+    TIMER_SCOPE_FUNC;
+    ARRAY<T,TV_INT> object_phi(example.grid.Node_Indices(example.ghost));
+    T def_dep=3*example.grid.dX.Max();
+    for(RANGE_ITERATOR<TV::m> it(object_phi.domain);it.Valid();it.Next()){
+        TV X=example.grid.Node(it.index);
+        T dep=def_dep;//example.grid.domain.Signed_Distance(X);
+        for(int i=0;i<example.collision_objects.m;i++)
+            dep=std::min(dep,example.collision_objects(i)->Phi(X,example.time));
+        object_phi(it.index)=-dep;}
+
+    static const int partial_object_flag=1<<29;
+    static const int partial_surface_flag=1<<30;
+    static const int index_mask=partial_object_flag-1;
+    
+    // nonnegative = valid
+    // -1 = air
+    // -2 = object
+    // -3 = domain boundary air
+    // -4 = domain boundary object
+    // -9 = uninitialized
+    example.rhs.v.Remove_All();
+    example.cell_index.Resize(example.grid.Domain_Indices(example.ghost),init_all,-9);
+    int next_cell_index=0;
+    for(RANGE_ITERATOR<TV::m> it(example.grid.Domain_Indices());it.Valid();it.Next())
+    {
+        int& ci=example.cell_index(it.index);
+        VECTOR<T,num_corners> surface_phis,object_phis;
+        MARCHING_CUBES<TV>::Compute_Phis_For_Cell(surface_phis,example.phi,it.index);
+        if(surface_phis.Min()>=0)
+        {
+            ci=-1;
+            continue; // all air
+        }
+        bool has_surface=surface_phis.Max()>0;
+
+        MARCHING_CUBES<TV>::Compute_Phis_For_Cell(object_phis,object_phi,it.index);
+        if(object_phis.Min()>=0)
+        {
+            ci=-2;
+            continue; // in object
+        }
+        bool has_object=object_phis.Max()>0;
+
+        PHYSBAM_ASSERT(!has_object || !has_surface);
+
+        ci=next_cell_index++;
+        if(has_surface) ci|=partial_surface_flag;
+        if(has_object) ci|=partial_object_flag;
+    }
+    example.rhs.v.Resize(next_cell_index,init_all,0);
+
+    for(int s=0;s<2*TV::m;s++){
+        int value=0;
+        switch(example.bc_type(s)){
+            case MPM_MAC_EXAMPLE<TV>::BC_FREE:value=-3;break;
+            case MPM_MAC_EXAMPLE<TV>::BC_SLIP:case MPM_MAC_EXAMPLE<TV>::BC_NOSLIP:value=-4;break;
+            case MPM_MAC_EXAMPLE<TV>::BC_PERIODIC:continue;}
+        for(RANGE_ITERATOR<TV::m> it(example.grid.Domain_Indices(),example.ghost,0,RI::ghost,s);it.Valid();it.Next())
+            example.cell_index(it.index)=value;}
+
+    Fix_Periodic(example.cell_index);
+    
+    example.projection_system.dc_present=false;
+
+    ARRAY<VECTOR<TV,TV::m> > surface;
+    VECTOR<ARRAY<VECTOR<TV,TV::m> >,2*TV::m> boundary;
+    VECTOR<VECTOR<ARRAY<VECTOR<TV,TV::m> >*,2>,2*TV::m> pboundary;
+    for(int s=0;s<2*TV::m;s++) pboundary(s)(1)=&boundary(s);
+    LOG::printf("bc %P\n",example.bc_type);
+    
+    // Assumes square cells
+    T one_over_dx=example.grid.one_over_dX(0);
+    TV base_entry=example.grid.one_over_dX*example.grid.one_over_dX/example.density;
+    T base_d_entry=one_over_dx*one_over_dx/example.density;
+    TV sc=example.grid.one_over_dX/example.density;
+
+    auto& A=example.projection_system.A;
+    A.Reset(next_cell_index);
+    for(RANGE_ITERATOR<TV::m> it(example.grid.Domain_Indices());it.Valid();it.Next())
+    {
+        int cell_index=example.cell_index(it.index);
+        if(cell_index<0) continue;
+        bool has_surface=cell_index&partial_surface_flag;
+        bool has_object=cell_index&partial_object_flag;
+        cell_index&=index_mask;
+        
+
+        VECTOR<T,TV::m*2> face_fraction;
+        TV surface_area_weighted_normal;
+        T surface_fraction=0;
+//        int surface_index=-1;
+        
+        T diag_entry=0;
+        if(has_surface || has_object){
+            VECTOR<T,num_corners> phis;
+            if(has_surface)
+                MARCHING_CUBES<TV>::Compute_Phis_For_Cell(phis,example.phi,it.index);
+            if(has_object)
+                MARCHING_CUBES<TV>::Compute_Phis_For_Cell(phis,object_phi,it.index);
+            surface.Remove_All();
+            for(int s=0;s<2*TV::m;s++) boundary(s).Remove_All();
+            MARCHING_CUBES<TV>::Get_Elements_For_Cell(surface,pboundary,phis);
+            for(int s=0;s<2*TV::m;s++)
+                for(const auto& t:boundary(s))
+                    face_fraction(s)+=FACE::Size(t);
+            for(const auto& t:surface)
+                surface_area_weighted_normal+=FACE::Area_Weighted_Normal(t);
+            if(has_surface)
+            {
+                T p=example.bc_pressure(example.grid.Center(it.index),example.time)*example.dt;
+                example.rhs.v(cell_index)-=base_d_entry*p*surface_area_weighted_normal.Magnitude();
+                // TODO: need rhs velocity at surface edge
+                example.projection_system.dc_present=true;
+                diag_entry+=base_d_entry*surface_area_weighted_normal.Magnitude();
+            }
+            else
+            {
+                TV v=example.bc_velocity(example.grid.Center(it.index),example.time);
+                example.rhs.v(cell_index)+=one_over_dx*surface_area_weighted_normal.Dot(v);
+            }
+        }
+        else face_fraction.Fill(1);
+        
+        for(int s=0;s<2*TV::m;s++)
+        {
+            if(!face_fraction(s)) continue;
+            FACE_INDEX<TV::m> face(s/2,it.index);
+            face.index(s/2)+=s%2;
+            T sign=s%2?1:-1;
+            TV_INT cell(it.index);
+            cell(s/2)+=sign;
+            int ci=example.cell_index(cell);
+            PHYSBAM_ASSERT(ci>=0 || ci==-4 || ci==-3 || !face_fraction(s));
+            T entry=base_entry(s/2)*face_fraction(s);
+            T div_entry=-sign*example.grid.one_over_dX(s/2)*face_fraction(s);
+            if(ci==-4)
+            {
+                T v=example.bc_velocity(example.grid.Face(face),example.time)(s/2);
+                if(!has_surface) example.rhs.v(cell_index)-=div_entry*v;
+                example.velocity(face)=v;
+                continue;
+            }
+            if(!has_surface) example.rhs.v(cell_index)-=div_entry*example.velocity(face);
+            if(ci==-3)
+            {
+                T p=example.bc_pressure(example.grid.Face(face),example.time)*example.dt;
+                example.rhs.v(cell_index)+=entry*p;
+                example.velocity(face)-=sign*sc(s/2)*p;
+                example.projection_system.dc_present=true;
+            }
+            else
+            {
+                A.Append_Entry_To_Current_Row(ci&index_mask,-entry);
+            }
+            diag_entry+=entry;
+        }
+
+        A.Append_Entry_To_Current_Row(cell_index,diag_entry);
+        A.Finish_Row();
+    }
+    A.Sort_Entries();
+    example.sol.v.Resize(example.rhs.v.m,init_all,0);
+
+    if(example.projection_system.use_preconditioner)
+        example.projection_system.A.Construct_Incomplete_Cholesky_Factorization();
+
+    static int solve_id=-1;
+    solve_id++;
+    if(example.test_system)
+        example.projection_system.Test_System(example.sol);
+    if(example.print_matrix){
+        LOG::cout<<"solve id: "<<solve_id<<std::endl;
+        const MPM_PROJECTION_SYSTEM<TV>& system=example.projection_system;
+        OCTAVE_OUTPUT<T>(LOG::sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,example.rhs);
+        OCTAVE_OUTPUT<T>(LOG::sprintf("C-%i.txt",solve_id).c_str()).Write_Preconditioner("C",system,example.rhs);
+        OCTAVE_OUTPUT<T>(LOG::sprintf("P-%i.txt",solve_id).c_str()).Write_Projection("P",system,example.rhs);
+        OCTAVE_OUTPUT<T>(LOG::sprintf("b-%i.txt",solve_id).c_str()).Write("b",example.rhs);}
+
+    CONJUGATE_GRADIENT<T> cg;
+    cg.finish_before_indefiniteness=true;
+    cg.relative_tolerance=true;
+    bool converged=cg.Solve(example.projection_system,example.sol,example.rhs,
+        example.av,example.solver_tolerance,0,example.solver_iterations);
+    if(!converged) LOG::printf("SOLVER DID NOT CONVERGE.\n");
+
+    if(example.print_matrix)
+        OCTAVE_OUTPUT<T>(LOG::sprintf("x-%i.txt",solve_id).c_str()).Write("x",example.sol);
+
+    if(example.test_system){
+        example.projection_system.Multiply(example.sol,*example.av(0));
+        *example.av(0)-=example.rhs;
+        T r=example.projection_system.Convergence_Norm(*example.av(0));
+        LOG::cout<<"residual: "<<r<<std::endl;}
+
+    for(FACE_RANGE_ITERATOR<TV::m> it(example.grid.Domain_Indices(),RF::skip_outer);it.Valid();it.Next()){
+        int ca=example.cell_index(it.face.First_Cell_Index());
+        int cb=example.cell_index(it.face.Second_Cell_Index());
+        if(ca<0 || cb<0) continue;
+        example.velocity(it.face)-=(example.sol.v(cb&index_mask)-example.sol.v(ca&index_mask))*sc(it.face.axis);}
+
+    Fix_Periodic(example.velocity);
 }
 //#####################################################################
 namespace PhysBAM{

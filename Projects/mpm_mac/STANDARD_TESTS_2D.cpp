@@ -88,6 +88,7 @@ Initialize()
             Seed_Particles(RANGE<TV>(TV(.2*m,.2*m),TV(.5*m,.8*m)),0,0,density,particles_per_cell);
             gravity=TV(0,-1)*m/sqr(s);
         } break;
+        case 100: this->Commandline_Analytic_test(); break;
         case 8:{ // concave shape
             this->use_phi=true;
             Set_Grid(RANGE<TV>::Unit_Box()*m);
@@ -178,7 +179,7 @@ Initialize()
             Seed_Particles(*shape,[=](const TV& X){return TV(velocity,0);},0,density,particles_per_cell);
             delete shape;
             bc_type(1)=BC_FREE;
-            bc_velocity(0)=[=](const TV& X,int axis,T time){return axis==0?velocity:0;};
+            bc_velocity=[=](const TV& X,T time){return TV(velocity,0);};
             Add_Collision_Object(sphere,COLLISION_TYPE::slip,0,0,0);
             RANGE<TV> source_range=grid.domain;
             source_range.min_corner.x-=grid.dX.x;

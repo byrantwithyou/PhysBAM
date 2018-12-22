@@ -20,10 +20,11 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> MPM_MAC_EXAMPLE<TV>::
 MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type)
-    :stream_type(stream_type),particles(*new MPM_PARTICLES<TV>),
+    :stream_type(stream_type),ghost(3),levelset(*new LEVELSET<TV>(levelset_grid,phi,ghost)),
+    particles(*new MPM_PARTICLES<TV>),
     projection_system(*new MPM_PROJECTION_SYSTEM<TV>),
     sol(*new MPM_PROJECTION_VECTOR<TV>),rhs(*new MPM_PROJECTION_VECTOR<TV>),
-    ghost(3),periodic_boundary(*new BOUNDARY_MAC_GRID_PERIODIC<TV,T>),extrap_type('p'),
+    periodic_boundary(*new BOUNDARY_MAC_GRID_PERIODIC<TV,T>),extrap_type('p'),
     clamp_particles(false),
     use_affine(true),flip(0),initial_time(0),
     last_frame(100),write_substeps_level(-1),substeps_delay_frame(-1),
@@ -33,7 +34,7 @@ MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type)
     solver_tolerance(std::numeric_limits<T>::epsilon()*10),solver_iterations(1000),
     threads(1),use_particle_volumes(false),use_constant_density(true),
     use_phi(false),rk_particle_order(0),
-    use_massless_particles(false),use_multiphase_projection(false),use_bump(false),use_reseeding(false),
+    use_massless_particles(false),use_reseeding(false),
     use_periodic_test_shift(false),
     position_update('d'),
     debug_particles(*new DEBUG_PARTICLES<TV>),
@@ -54,6 +55,7 @@ template<class TV> MPM_MAC_EXAMPLE<TV>::
     delete &sol;
     delete &rhs;
     delete &periodic_boundary;
+    delete &levelset;
     for(int i=0;i<TV::m;i++) delete weights(i);
     collision_objects.Delete_Pointers_And_Clean_Memory();
     av.Delete_Pointers_And_Clean_Memory();
@@ -86,8 +88,8 @@ Write_Output_Files(const int frame)
 #pragma omp task
         Write_To_File(stream_type,LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
 #pragma omp task
-        if(levelset)
-            Write_To_File(stream_type,LOG::sprintf("%s/%d/levelset",output_directory.c_str(),frame),*levelset);
+        if(use_phi)
+            Write_To_File(stream_type,LOG::sprintf("%s/%d/levelset",output_directory.c_str(),frame),levelset);
 
         if(!only_write_particles){
 #pragma omp task

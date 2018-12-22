@@ -35,8 +35,10 @@ class MPM_MAC_EXAMPLE
     typedef VECTOR<int,TV::m> TV_INT;
 public:
     typedef typename MPM_COLLISION_OBJECT<TV>::COLLISION_TYPE COLLISION_TYPE;
-    GRID<TV> grid;
+
     STREAM_TYPE stream_type;
+    int ghost;
+    GRID<TV> grid;
     enum BC_TYPE {BC_FREE, BC_SLIP, BC_NOSLIP, BC_PERIODIC};
     
     ARRAY<T,FACE_INDEX<TV::m> > mass,volume;
@@ -51,8 +53,9 @@ public:
     T viscosity=0;
 
     // signed distance field & level sets
+    GRID<TV> levelset_grid;
     ARRAY<T,TV_INT> phi;
-    LEVELSET<TV>* levelset=0;
+    LEVELSET<TV>& levelset;
 
     // XPIC stuff
     int xpic=0;
@@ -69,12 +72,11 @@ public:
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
     MPM_PROJECTION_VECTOR<TV>& sol;
     MPM_PROJECTION_VECTOR<TV>& rhs;
-    int ghost;
     VECTOR<BC_TYPE,TV::m*2> bc_type; // -x, +x, -y, +y, -z, +z
     // Valid if BC_SLIP or BC_NOSLIP; velocity at face. null=0
-    VECTOR<std::function<T(const TV& X,int axis,T)>,TV::m*2> bc_velocity;
+    std::function<TV(const TV& X,T)> bc_velocity;
     // Valid if BC_FREE; pressure at ghost cell. null=0
-    std::function<T(TV_INT,T)> bc_pressure;
+    std::function<T(TV,T)> bc_pressure;
     BOUNDARY_MAC_GRID_PERIODIC<TV,T>& periodic_boundary;
     ARRAY<int,TV_INT> cell_index;
     int dof;
@@ -129,10 +131,8 @@ public:
     bool use_phi;
     int rk_particle_order;
     bool use_massless_particles;
-    bool use_multiphase_projection;
-    bool use_bump;
+    bool use_level_set_projection=false;
     bool use_reseeding;
-    T radius_sphere,radius_escape;
     bool use_periodic_test_shift;
     TV_INT periodic_test_shift;
     // d: default; c: always use pic update; p: use pic in the first step only

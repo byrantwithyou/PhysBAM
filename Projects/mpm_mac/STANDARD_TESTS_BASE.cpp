@@ -12,6 +12,7 @@
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Grid_Tools/Grids/NODE_ITERATOR.h>
+#include <Geometry/Analytic_Tests/ANALYTIC_SCALAR_IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Seeding/POISSON_DISK.h>
@@ -105,6 +106,13 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-obj_extrap",&use_object_extrap,"extrapolate velocities inside objects");
     parse_args.Add("-rk",&rk_particle_order,"order","rk order");
     parse_args.Add("-mls",&this->use_mls_xfers,"Use moving least squares transfers");
+    parse_args.Add("-phi",&this->use_level_set_projection,"Use level sets for projection");
+    parse_args.Add("-analytic_u",&analytic_u_expr,"expr","Analytic velocity expression");
+    parse_args.Add("-analytic_p",&analytic_p_expr,"expr","Analytic pressure expression");
+    parse_args.Add("-analytic_phi",&analytic_phi_expr,"expr","Analytic level set expression");
+    parse_args.Add("-grid_min",&analytic_grid_range.min_corner,"vec","Min corner of grid domain");
+    parse_args.Add("-grid_max",&analytic_grid_range.max_corner,"vec","Max corner of grid domain");
+    parse_args.Add("-analytic_bc",&analytic_bc_types,"expr","BC types [fsnp], 2*d entries");
 
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);
@@ -188,6 +196,9 @@ template<class TV> STANDARD_TESTS_BASE<TV>::
 {
     for(int i=0;i<destroy.m;i++) destroy(i)();
     delete &poisson_disk;
+    delete analytic_velocity;
+    delete analytic_pressure;
+    delete analytic_level_set;
 }
 //#####################################################################
 // Function Seed_Particles
@@ -524,13 +535,41 @@ Add_Source(const TV& X0,const TV& n,IMPLICIT_OBJECT<TV>* io,
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Setup_Analytic_Boundary_Conditions()
 {
-    auto bc_v=[this](const TV& X,int axis,T t)
-        {return analytic_velocity->v(X,t)(axis);};
-    for(int i=0;i<bc_velocity.m;i++)
-        if(bc_type(i)==BC_SLIP || bc_type(i)==BC_NOSLIP)
-            bc_velocity(i)=bc_v;
-    bc_pressure=[this](TV_INT c,T t)
-        {return analytic_pressure->f(grid.Center(c),t);};
+    bc_velocity=[this](const TV& X,T t){return analytic_velocity->v(X,t);};
+    bc_pressure=[this](const TV& X,T t){return analytic_pressure->f(X,t);};
+}
+//#####################################################################
+// Function Commandline_Analytic_test
+//#####################################################################
+template<class TV> void STANDARD_TESTS_BASE<TV>::
+Commandline_Analytic_test()
+{
+    Set_Grid(analytic_grid_range*m);
+    LOG::printf("domain %P\n",grid.domain);
+    density=unit_rho*scale_mass;
+    use_analytic_field=true;
+    analytic_velocity=new ANALYTIC_VECTOR_PROGRAM<TV>(analytic_u_expr);
+    analytic_pressure=new ANALYTIC_SCALAR_PROGRAM<TV>(analytic_p_expr);
+    auto V=[=](const TV& X){return analytic_velocity->v(X,0);};
+    auto dV=[=](const TV& X){return analytic_velocity->dX(X,0);};
+    if(analytic_phi_expr.size()){
+        analytic_level_set=new ANALYTIC_SCALAR_PROGRAM<TV>(analytic_phi_expr);
+        auto io=Make_IO(analytic_level_set);
+        io->box=grid.domain;
+        Seed_Particles(*io,V,dV,density,particles_per_cell);
+        delete io;}
+    else Seed_Particles(grid.domain,V,dV,density,particles_per_cell);
+    Setup_Analytic_Boundary_Conditions();
+    if(analytic_bc_types.size()){
+        PHYSBAM_ASSERT(analytic_bc_types.size()==2*TV::m);
+        for(int i=0;i<2*TV::m;i++){
+            switch(analytic_bc_types[i]){
+                case 'p':this->bc_type(i)=BASE::BC_PERIODIC;break;
+                case 'f':this->bc_type(i)=BASE::BC_FREE;break;
+                case 'n':this->bc_type(i)=BASE::BC_NOSLIP;break;
+                case 's':this->bc_type(i)=BASE::BC_SLIP;break;
+                default: PHYSBAM_FATAL_ERROR();break;}}}
+    end_frame.Append([=](int frame){Check_Analytic_Velocity();});
 }
 template class STANDARD_TESTS_BASE<VECTOR<float,2> >;
 template class STANDARD_TESTS_BASE<VECTOR<float,3> >;

@@ -78,14 +78,18 @@ public:
     bool test_diff;
     bool bc_periodic;
     bool use_analytic_field;
-    ANALYTIC_VECTOR<TV>* analytic_velocity;
-    ANALYTIC_SCALAR<TV>* analytic_pressure;
+    ANALYTIC_VECTOR<TV>* analytic_velocity=0;
+    ANALYTIC_SCALAR<TV>* analytic_pressure=0;
+    ANALYTIC_SCALAR<TV>* analytic_level_set=0;
     bool analyze_u_modes=false;
     bool analyze_energy_vort=false;
     int dump_modes_freq=1;
     T max_ke=0;
     POISSON_DISK<TV>& poisson_disk;
-
+    std::string analytic_u_expr,analytic_p_expr,analytic_phi_expr;
+    std::string analytic_bc_types;
+    RANGE<TV> analytic_grid_range=RANGE<TV>::Unit_Box();
+    
     STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS_BASE();
 
@@ -151,6 +155,7 @@ public:
     void Add_Source(const TV& X0,const TV& n,IMPLICIT_OBJECT<TV>* io,
         std::function<void(TV X,T ts,T t,SOURCE_PATH<TV>& p)> path,T density,
         T particles_per_cell,bool owns_io);
+    void Commandline_Analytic_test();
 //#####################################################################
 };
 }
