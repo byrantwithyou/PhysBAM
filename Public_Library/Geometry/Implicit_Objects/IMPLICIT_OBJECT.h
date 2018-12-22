@@ -17,8 +17,6 @@ template<class TV>
 class IMPLICIT_OBJECT:public STRUCTURE<TV>
 {
     typedef typename TV::SCALAR T;
-    enum WORKAROUND {d=TV::m};
-    typedef VECTOR<T,d-1> T_CURVATURES;
 public:
     typedef int HAS_TYPED_READ_WRITE;
     typedef TV VECTOR_T;
@@ -63,11 +61,14 @@ public:
     virtual TV Velocity(const TV& location) const;
     // the following only exist in 3d
     virtual SYMMETRIC_MATRIX<T,TV::m> Hessian(const TV& X) const;
-    virtual T_CURVATURES Principal_Curvatures(const TV& X) const;
+    virtual VECTOR<T,TV::m-1> Principal_Curvatures(const TV& X) const;
     virtual T Integration_Step(const T phi) const;
     virtual T Minimum_Cell_Size() const;
     void Test_Diff(const RANGE<TV>& range,bool test_hess=true) const;
 //#####################################################################
 };
+template<class T,int d> VECTOR<T,d-1>
+Compute_Principal_Curvatures(const VECTOR<T,d>& n,const SYMMETRIC_MATRIX<T,d>& H);
+
 }
 #endif

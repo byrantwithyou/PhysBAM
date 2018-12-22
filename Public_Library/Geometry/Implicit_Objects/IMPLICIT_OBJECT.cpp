@@ -4,11 +4,12 @@
 //#####################################################################
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
+#include <Tools/Polynomials/QUADRATIC.h>
 #include <Geometry/Basic_Geometry/RAY.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Intersections/RAY_BOX_INTERSECTION.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
-using namespace PhysBAM;
+namespace PhysBAM{
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -197,6 +198,53 @@ Test_Diff(const RANGE<TV>& range,bool test_hess) const
         LOG::printf("IMPLICIT_OBJECT hess test %g   (%g %g)\n", (hess_pa-hess_pb).Magnitude()/maxabs(mag_pa,mag_pb,(T)1e-30),mag_pa,mag_pb);}
 }
 //#####################################################################
+// Function Principal_Curvatures_Helper
+//#####################################################################
+template<class T> VECTOR<T,0> inline
+Principal_Curvatures_Helper(const VECTOR<T,1>& n,const SYMMETRIC_MATRIX<T,1>& H)
+{
+    return VECTOR<T,0>();
+}
+//#####################################################################
+// Function Principal_Curvatures_Helper
+//#####################################################################
+template<class T> VECTOR<T,1> inline
+Principal_Curvatures_Helper(const VECTOR<T,2>& n,const SYMMETRIC_MATRIX<T,2>& H)
+{
+    VECTOR<T,2> t=n.Perpendicular();
+    return VECTOR<T,1>(t.Dot(H*t));
+}
+//#####################################################################
+// Function Principal_Curvatures_Helper
+//#####################################################################
+template<class T> VECTOR<T,2> inline
+Principal_Curvatures_Helper(const VECTOR<T,3>& n,const SYMMETRIC_MATRIX<T,3>& H)
+{
+    SYMMETRIC_MATRIX<T,3> P=(T)1-SYMMETRIC_MATRIX<T,3>::Outer_Product(n),M=SYMMETRIC_MATRIX<T,3>::Conjugate(P,H);
+    T trace=M.Trace();
+    QUADRATIC<T> quadratic(-1,trace,sqr(M(0,2))+sqr(M(0,1))+sqr(M(1,2))-M(1,1)*M(0,0)-M(2,2)*M(0,0)-M(2,2)*M(1,1));
+    quadratic.Compute_Roots();
+    if(quadratic.roots == 0) return (T).5*VECTOR<T,2>(trace,trace);
+    if(quadratic.roots == 1) return VECTOR<T,2>(quadratic.root[0],quadratic.root[0]);
+    return VECTOR<T,2>(quadratic.root[0],quadratic.root[1]);
+}
+//#####################################################################
+// Function Compute_Principal_Curvatures
+//#####################################################################
+template<class T,int d> VECTOR<T,d-1>
+Compute_Principal_Curvatures(const VECTOR<T,d>& n,const SYMMETRIC_MATRIX<T,d>& H)
+{
+    return Principal_Curvatures_Helper(n,H);
+}
+//#####################################################################
+// Function Principal_Curvatures
+//#####################################################################
+template<class TV> auto IMPLICIT_OBJECT<TV>::
+Principal_Curvatures(const TV& X) const -> VECTOR<T,TV::m-1>
+{
+    return Compute_Principal_Curvatures(Normal(X),Hessian(X));
+}
+//#####################################################################
 // Undefined Functions
 //#####################################################################
 template<class TV> void IMPLICIT_OBJECT<TV>::Update_Box(){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
@@ -221,7 +269,6 @@ template<class TV> bool IMPLICIT_OBJECT<TV>::Lazy_Outside_Extended_Levelset(cons
 template<class TV> bool IMPLICIT_OBJECT<TV>::Lazy_Outside_Extended_Levelset_And_Value(const TV& unclamped_X,T& phi_value,const T contour_value) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> TV IMPLICIT_OBJECT<TV>::Velocity(const TV& location) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> IMPLICIT_OBJECT<TV>::Hessian(const TV& X) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-template<class TV> typename IMPLICIT_OBJECT<TV>::T_CURVATURES IMPLICIT_OBJECT<TV>::Principal_Curvatures(const TV& X) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> typename TV::SCALAR IMPLICIT_OBJECT<TV>::Integration_Step(const T phi) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> typename TV::SCALAR IMPLICIT_OBJECT<TV>::Minimum_Cell_Size() const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();} 
 //#####################################################################
@@ -269,3 +316,10 @@ template bool IMPLICIT_OBJECT<VECTOR<double,3> >::Intersection(RAY<VECTOR<double
 template void IMPLICIT_OBJECT<VECTOR<double,1> >::Test_Diff(RANGE<VECTOR<double,1> > const&,bool) const;
 template void IMPLICIT_OBJECT<VECTOR<double,2> >::Test_Diff(RANGE<VECTOR<double,2> > const&,bool) const;
 template void IMPLICIT_OBJECT<VECTOR<double,3> >::Test_Diff(RANGE<VECTOR<double,3> > const&,bool) const;
+template VECTOR<double,0> Compute_Principal_Curvatures<double,1>(VECTOR<double,1> const&,SYMMETRIC_MATRIX<double,1> const&);
+template VECTOR<double,1> Compute_Principal_Curvatures<double,2>(VECTOR<double,2> const&,SYMMETRIC_MATRIX<double,2> const&);
+template VECTOR<double,2> Compute_Principal_Curvatures<double,3>(VECTOR<double,3> const&,SYMMETRIC_MATRIX<double,3> const&);
+template VECTOR<float,0> Compute_Principal_Curvatures<float,1>(VECTOR<float,1> const&,SYMMETRIC_MATRIX<float,1> const&);
+template VECTOR<float,1> Compute_Principal_Curvatures<float,2>(VECTOR<float,2> const&,SYMMETRIC_MATRIX<float,2> const&);
+template VECTOR<float,2> Compute_Principal_Curvatures<float,3>(VECTOR<float,3> const&,SYMMETRIC_MATRIX<float,3> const&);
+}
