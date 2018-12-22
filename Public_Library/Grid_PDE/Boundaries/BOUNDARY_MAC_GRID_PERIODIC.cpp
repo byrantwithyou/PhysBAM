@@ -235,4 +235,16 @@ template void Fill_Ghost_Cells_Periodic<int,VECTOR<float,3> >(
     GRID<VECTOR<float,3> > const&,ARRAYS_ND_BASE<int,VECTOR<int,VECTOR<float,3>::m> > const&,
     ARRAYS_ND_BASE<int,VECTOR<int,VECTOR<float,3>::m> >&,VECTOR<bool,VECTOR<float,3>::m> const&,
     int);
+template void Fill_Ghost_Cells_Periodic<double,VECTOR<double,2> >(GRID<VECTOR<double,2> > const&,
+    ARRAYS_ND_BASE<double,VECTOR<int,VECTOR<double,2>::m> > const&,
+    ARRAYS_ND_BASE<double,VECTOR<int,VECTOR<double,2>::m> >&,VECTOR<bool,VECTOR<double,2>::m> const&,int);
+template void Fill_Ghost_Cells_Periodic<double,VECTOR<double,3> >(GRID<VECTOR<double,3> > const&,
+    ARRAYS_ND_BASE<double,VECTOR<int,VECTOR<double,3>::m> > const&,
+    ARRAYS_ND_BASE<double,VECTOR<int,VECTOR<double,3>::m> >&,VECTOR<bool,VECTOR<double,3>::m> const&,int);
+template void Fill_Ghost_Cells_Periodic<float,VECTOR<float,2> >(GRID<VECTOR<float,2> > const&,
+    ARRAYS_ND_BASE<float,VECTOR<int,VECTOR<float,2>::m> > const&,
+    ARRAYS_ND_BASE<float,VECTOR<int,VECTOR<float,2>::m> >&,VECTOR<bool,VECTOR<float,2>::m> const&,int);
+template void Fill_Ghost_Cells_Periodic<float,VECTOR<float,3> >(GRID<VECTOR<float,3> > const&,
+    ARRAYS_ND_BASE<float,VECTOR<int,VECTOR<float,3>::m> > const&,
+    ARRAYS_ND_BASE<float,VECTOR<int,VECTOR<float,3>::m> >&,VECTOR<bool,VECTOR<float,3>::m> const&,int);
 }
