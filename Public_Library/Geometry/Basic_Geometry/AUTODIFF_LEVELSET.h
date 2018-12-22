@@ -13,38 +13,8 @@
 #include <Core/Vectors/VECTOR.h>
 #include <Tools/Auto_Diff/AUTO_HESS_EXT.h>
 #include <Tools/Polynomials/QUADRATIC.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 namespace PhysBAM{
-
-template<class T,class AH> void inline
-Principal_Curvatures_Helper(VECTOR<T,0>& c,const AH& h)
-{
-    c=VECTOR<T,0>();
-}
-template<class T,class AH> void inline
-Principal_Curvatures_Helper(VECTOR<T,1>& c,const AH& h)
-{
-    VECTOR<T,2> n;
-    SYMMETRIC_MATRIX<T,2> sm;
-    Get<0>(n,h.dx);
-    Get<0,0>(sm,h.ddx);
-    VECTOR<T,2> t=n.Perpendicular();
-    c=VECTOR<T,1>(t.Dot(sm*t));
-}
-template<class T,class AH> void inline
-Principal_Curvatures_Helper(VECTOR<T,2>& c,const AH& h)
-{
-    VECTOR<T,3> n;
-    SYMMETRIC_MATRIX<T,3> sm;
-    Get<0>(n,h.dx);
-    Get<0,0>(sm,h.ddx);
-    SYMMETRIC_MATRIX<T,3> P=(T)1-SYMMETRIC_MATRIX<T,3>::Outer_Product(n),M=SYMMETRIC_MATRIX<T,3>::Conjugate(P,sm);
-    T trace=M.Trace();
-    QUADRATIC<T> quadratic(-1,trace,sqr(M(0,2))+sqr(M(0,1))+sqr(M(1,2))-M(1,1)*M(0,0)-M(2,2)*M(0,0)-M(2,2)*M(1,1));
-    quadratic.Compute_Roots();
-    if(quadratic.roots == 0) c=(T).5*VECTOR<T,2>(trace,trace);
-    else if(quadratic.roots == 1) c=VECTOR<T,2>(quadratic.root[0],quadratic.root[0]);
-    else c=VECTOR<T,2>(quadratic.root[0],quadratic.root[1]);
-}
 
 template<class TV,class HELPER>
 class AUTODIFF_LEVELSET
@@ -73,7 +43,14 @@ public:
     {SYMMETRIC_MATRIX<T,TV::m> H;Get<0,0>(H,Derived().Raw_Phi(Hess_From_Var<LAYOUT,0>(X)).ddx);return H;}
 
     VECTOR<T,TV::m-1> Principal_Curvatures(const TV& X) const
-    {VECTOR<T,TV::m-1> c;Principal_Curvatures_Helper(c,Derived().Raw_Phi(Hess_From_Var<LAYOUT,0>(X)));return c;}
+    {
+        auto h=Derived().Raw_Phi(Hess_From_Var<LAYOUT,0>(X));
+        TV n;
+        SYMMETRIC_MATRIX<T,TV::m> sm;
+        Get<0>(n,h.dx);
+        Get<0,0>(sm,h.ddx);
+        return Compute_Principal_Curvatures(n,sm);
+    }
 
     bool Lazy_Inside(const TV& X) const
     {return Signed_Distance(X)<0;}
