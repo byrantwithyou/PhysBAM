@@ -26,7 +26,7 @@ public:
     {return new ANALYTIC_IMPLICIT_OBJECT(T_ANALYTIC());}
 
     void Update_Box() override
-    {box=analytic.Bounding_Box();if(box!=RANGE<TV>::Empty_Box() && box!=RANGE<TV>::Full_Box()) box.Scale_About_Center((T)1.1);}
+    {box=analytic.Bounding_Box();}
 
     void Update_Minimum_Cell_Size(const int maximum_depth) override
     {}
