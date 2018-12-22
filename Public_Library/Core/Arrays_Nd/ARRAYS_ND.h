@@ -110,6 +110,9 @@ public:
     this->Put(*this,new_array,domain.Intersect(box));
     Exchange(new_array);}
 
+    void Resize(const RANGE<TV_INT>& box,INIT_ALL,const T& initialization_value)
+    {Resize(box,no_init);array.Fill(initialization_value);}
+
     void Resize(const TV_INT& corner)
     {Resize(RANGE<TV_INT>(TV_INT(),corner));}
 
@@ -118,6 +121,9 @@ public:
 
     void Resize(const TV_INT& corner,USE_INIT,const T& initialization_value)
     {Resize(RANGE<TV_INT>(TV_INT(),corner),use_init,initialization_value);}
+
+    void Resize(const TV_INT& corner,INIT_ALL,const T& initialization_value)
+    {Resize(RANGE<TV_INT>(TV_INT(),corner),init_all,initialization_value);}
 
     void Reallocate_In_Place(const RANGE<TV_INT>& box)
     {TV_INT counts_new(box.Edge_Lengths());int size_new=counts_new.Product();Calculate_Acceleration_Constants(box);delete [] array.Get_Array_Pointer();array.Set(size_new,new T[size_new]);}
