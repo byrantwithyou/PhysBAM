@@ -97,8 +97,10 @@ public:
 
 //#####################################################################
 };
+
 template<class OBJ>
-inline ANALYTIC_IMPLICIT_OBJECT<OBJ>* Make_IO(const OBJ& obj)
+inline typename enable_if<sizeof(&OBJ::Name),ANALYTIC_IMPLICIT_OBJECT<OBJ>*>::type
+Make_IO(const OBJ& obj)
 {
     return new ANALYTIC_IMPLICIT_OBJECT<OBJ>(obj);
 }
