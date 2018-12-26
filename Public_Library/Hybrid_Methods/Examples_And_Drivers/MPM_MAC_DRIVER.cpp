@@ -100,8 +100,11 @@ Initialize()
         example.periodic_boundary.is_periodic(i)=a;}
 
     // must have level sets in order to use level set projection
-    if(example.use_level_set_projection) example.use_phi=true;
-
+    if(example.use_level_set_projection){
+        example.use_phi=true;
+        example.use_mls_xfers=true;}
+    if(example.use_mls_xfers) example.use_object_extrap=false;
+    
     PHYSBAM_ASSERT(example.grid.Is_MAC_Grid());
     if(example.restart) example.Read_Output_Files(example.restart);
 
@@ -167,7 +170,7 @@ Advance_One_Time_Step()
     Step([=](){Level_Set_Pressure_Projection();},"level set projection",true,example.use_level_set_projection);
     Step([=](){Extrapolate_Inside_Object();},"extrapolate",true,example.use_object_extrap);
     Step([=](){Apply_Viscosity();},"viscosity",true,example.viscosity!=0);
-    Step([=](){Extrapolate_Velocity(!(example.flip||example.xpic),false);},"velocity-extrapolation",true);
+    Step([=](){Extrapolate_Velocity(!example.flip,false);},"velocity-extrapolation",true,!example.use_mls_xfers);
     Step([=](){Compute_Effective_Velocity();},"compute effective velocity",false,example.xpic);
     Step([=](){Grid_To_Particle();},"g2p");
 }
@@ -340,8 +343,8 @@ Particle_To_Grid()
     }
     flat_h.Combine();
     indices_h.Combine();
-    if(example.flip||example.xpic){
-        if(example.extrap_type!='p')
+    if(example.flip){
+        if(example.extrap_type!='p' && !example.use_mls_xfers)
             Extrapolate_Velocity(example.velocity,false,true);
         example.velocity_save=example.velocity;}
 }
@@ -542,19 +545,13 @@ Compute_Effective_Velocity()
             });
         Fix_Periodic_Accum(example.xpic_v);
 
-        if(example.extrap_type=='p')
-            Reflect_Boundary_Momentum(example.xpic_v);
-
 #pragma omp parallel
         for(FACE_ITERATOR_THREADED<TV> it(example.grid,example.ghost);it.Valid();it.Next()){
             int i=example.mass.Standard_Index(it.Full_Index());
             if(example.mass.array(i)){
                 example.xpic_v.array(i)/=example.mass.array(i);
                 example.xpic_v_star.array(i)+=s*example.xpic_v.array(i);}
-            else example.xpic_v.array(i)=0;}
-
-        if(example.extrap_type!='p')
-            Extrapolate_Velocity(example.xpic_v,false,true);}
+            else example.xpic_v.array(i)=0;}}
 
     example.gather_scatter->template Gather<int>(false,
         [this,&particles](int p,int data)
