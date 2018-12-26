@@ -22,7 +22,8 @@ struct MATRIX_SYSTEM:public KRYLOV_SYSTEM_BASE<T>
     const T_MATRIX& A;
     const T_MATRIX_PRECON* P;
     mutable VECTOR_T* temp_vector;
-
+    ARRAY<VECTOR_T*> nullspace_vectors; // must be orthogonal and normalized
+    
     MATRIX_SYSTEM(const T_MATRIX& A_input);
     virtual ~MATRIX_SYSTEM();
 

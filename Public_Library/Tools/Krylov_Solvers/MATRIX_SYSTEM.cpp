@@ -58,6 +58,8 @@ Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const
 template<class T_MATRIX,class T,class VECTOR_T,class T_MATRIX_PRECON> void MATRIX_SYSTEM<T_MATRIX,T,VECTOR_T,T_MATRIX_PRECON>::
 Project(KRYLOV_VECTOR_BASE<T>& x) const
 {
+    for(auto p:nullspace_vectors)
+        x.Copy(-Inner_Product(x,*p),*p,x);
 }
 //#####################################################################
 // Function Set_Boundary_Conditions
@@ -72,6 +74,7 @@ Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& x) const
 template<class T_MATRIX,class T,class VECTOR_T,class T_MATRIX_PRECON> void MATRIX_SYSTEM<T_MATRIX,T,VECTOR_T,T_MATRIX_PRECON>::
 Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const
 {
+    Project(x);
 } 
 //#####################################################################
 // Function Initialize_Preconditioner

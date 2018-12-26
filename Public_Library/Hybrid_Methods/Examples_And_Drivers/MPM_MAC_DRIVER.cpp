@@ -35,6 +35,7 @@
 #include <Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
 #include <Geometry/Level_Sets/FAST_MARCHING_METHOD_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
+#include <Geometry/Projection/CUT_CELL_PROJECTION.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_MAC_DRIVER.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_MAC_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
@@ -1513,13 +1514,6 @@ Extrapolate_Inside_Object()
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Level_Set_Pressure_Projection()
 {
-    typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX_FACE FACE;
-
-    // TODO: how much mass does the surface velocity edge get?  mass -> 0?
-    
-    // TODO: fill in valid xfer data flags.
-
-    static const int num_corners=1<<TV::m;
     TIMER_SCOPE_FUNC;
     ARRAY<T,TV_INT> object_phi(example.grid.Node_Indices(example.ghost));
     T def_dep=3*example.grid.dX.Max();
@@ -1530,197 +1524,24 @@ Level_Set_Pressure_Projection()
             dep=std::min(dep,example.collision_objects(i)->Phi(X,example.time));
         object_phi(it.index)=-dep;}
 
-    static const int partial_object_flag=1<<29;
-    static const int partial_surface_flag=1<<30;
-    static const int index_mask=partial_object_flag-1;
-    
-    // nonnegative = valid
-    // -1 = air
-    // -2 = object
-    // -3 = domain boundary air
-    // -4 = domain boundary object
-    // -9 = uninitialized
-    example.rhs.v.Remove_All();
-    example.cell_index.Resize(example.grid.Domain_Indices(example.ghost),init_all,-9);
-    int next_cell_index=0;
-    for(RANGE_ITERATOR<TV::m> it(example.grid.Domain_Indices());it.Valid();it.Next())
-    {
-        int& ci=example.cell_index(it.index);
-        VECTOR<T,num_corners> surface_phis,object_phis;
-        MARCHING_CUBES<TV>::Compute_Phis_For_Cell(surface_phis,example.phi,it.index);
-        if(surface_phis.Min()>=0)
-        {
-            ci=-1;
-            continue; // all air
-        }
-        bool has_surface=surface_phis.Max()>0;
-
-        MARCHING_CUBES<TV>::Compute_Phis_For_Cell(object_phis,object_phi,it.index);
-        if(object_phis.Min()>=0)
-        {
-            ci=-2;
-            continue; // in object
-        }
-        bool has_object=object_phis.Max()>0;
-
-        PHYSBAM_ASSERT(!has_object || !has_surface);
-
-        ci=next_cell_index++;
-        if(has_surface) ci|=partial_surface_flag;
-        if(has_object) ci|=partial_object_flag;
-    }
-    example.rhs.v.Resize(next_cell_index,init_all,0);
-
-    for(int s=0;s<2*TV::m;s++){
-        int value=0;
+    CUT_CELL_PROJECTION<TV> proj;
+    proj.object_phi=&object_phi;
+    proj.surface_phi=&example.phi;
+    proj.valid_u=&example.valid_xfer_data;
+    for(int s=0;s<2*TV::m;s++)
         switch(example.bc_type(s)){
-            case MPM_MAC_EXAMPLE<TV>::BC_FREE:value=-3;break;
-            case MPM_MAC_EXAMPLE<TV>::BC_SLIP:case MPM_MAC_EXAMPLE<TV>::BC_NOSLIP:value=-4;break;
-            case MPM_MAC_EXAMPLE<TV>::BC_PERIODIC:continue;}
-        for(RANGE_ITERATOR<TV::m> it(example.grid.Domain_Indices(),example.ghost,0,RI::ghost,s);it.Valid();it.Next())
-            example.cell_index(it.index)=value;}
+            case MPM_MAC_EXAMPLE<TV>::BC_FREE:proj.bc_type(s)=1;break;
+            case MPM_MAC_EXAMPLE<TV>::BC_SLIP:case MPM_MAC_EXAMPLE<TV>::BC_NOSLIP:proj.bc_type(s)=2;break;
+            case MPM_MAC_EXAMPLE<TV>::BC_PERIODIC:proj.bc_type(s)=0;continue;}
+    proj.use_preconditioner=example.use_preconditioner;
+    proj.print_matrix=example.print_matrix;
+    proj.print_residual=example.test_system;
+    proj.solver_tolerance=example.solver_tolerance;
+    proj.solver_iterations=example.solver_iterations;
+    proj.bc_v=[this](const TV& X){return example.bc_velocity(X,example.time);};
+    proj.bc_p=[this](const TV& X){return example.bc_pressure(X,example.time);};
 
-    Fix_Periodic(example.cell_index);
-    
-    example.projection_system.dc_present=false;
-
-    ARRAY<VECTOR<TV,TV::m> > surface;
-    VECTOR<ARRAY<VECTOR<TV,TV::m> >,2*TV::m> boundary;
-    VECTOR<VECTOR<ARRAY<VECTOR<TV,TV::m> >*,2>,2*TV::m> pboundary;
-    for(int s=0;s<2*TV::m;s++) pboundary(s)(1)=&boundary(s);
-    LOG::printf("bc %P\n",example.bc_type);
-    
-    // Assumes square cells
-    T one_over_dx=example.grid.one_over_dX(0);
-    TV base_entry=example.grid.one_over_dX*example.grid.one_over_dX/example.density;
-    T base_d_entry=one_over_dx*one_over_dx/example.density;
-    TV sc=example.grid.one_over_dX/example.density;
-
-    auto& A=example.projection_system.A;
-    A.Reset(next_cell_index);
-    for(RANGE_ITERATOR<TV::m> it(example.grid.Domain_Indices());it.Valid();it.Next())
-    {
-        int cell_index=example.cell_index(it.index);
-        if(cell_index<0) continue;
-        bool has_surface=cell_index&partial_surface_flag;
-        bool has_object=cell_index&partial_object_flag;
-        cell_index&=index_mask;
-        
-
-        VECTOR<T,TV::m*2> face_fraction;
-        TV surface_area_weighted_normal;
-        T surface_fraction=0;
-//        int surface_index=-1;
-        
-        T diag_entry=0;
-        if(has_surface || has_object){
-            VECTOR<T,num_corners> phis;
-            if(has_surface)
-                MARCHING_CUBES<TV>::Compute_Phis_For_Cell(phis,example.phi,it.index);
-            if(has_object)
-                MARCHING_CUBES<TV>::Compute_Phis_For_Cell(phis,object_phi,it.index);
-            surface.Remove_All();
-            for(int s=0;s<2*TV::m;s++) boundary(s).Remove_All();
-            MARCHING_CUBES<TV>::Get_Elements_For_Cell(surface,pboundary,phis);
-            for(int s=0;s<2*TV::m;s++)
-                for(const auto& t:boundary(s))
-                    face_fraction(s)+=FACE::Size(t);
-            for(const auto& t:surface)
-                surface_area_weighted_normal+=FACE::Area_Weighted_Normal(t);
-            if(has_surface)
-            {
-                T p=example.bc_pressure(example.grid.Center(it.index),example.time)*example.dt;
-                example.rhs.v(cell_index)-=base_d_entry*p*surface_area_weighted_normal.Magnitude();
-                // TODO: need rhs velocity at surface edge
-                example.projection_system.dc_present=true;
-                diag_entry+=base_d_entry*surface_area_weighted_normal.Magnitude();
-            }
-            else
-            {
-                TV v=example.bc_velocity(example.grid.Center(it.index),example.time);
-                example.rhs.v(cell_index)+=one_over_dx*surface_area_weighted_normal.Dot(v);
-            }
-        }
-        else face_fraction.Fill(1);
-        
-        for(int s=0;s<2*TV::m;s++)
-        {
-            if(!face_fraction(s)) continue;
-            FACE_INDEX<TV::m> face(s/2,it.index);
-            face.index(s/2)+=s%2;
-            T sign=s%2?1:-1;
-            TV_INT cell(it.index);
-            cell(s/2)+=sign;
-            int ci=example.cell_index(cell);
-            PHYSBAM_ASSERT(ci>=0 || ci==-4 || ci==-3 || !face_fraction(s));
-            T entry=base_entry(s/2)*face_fraction(s);
-            T div_entry=-sign*example.grid.one_over_dX(s/2)*face_fraction(s);
-            if(ci==-4)
-            {
-                T v=example.bc_velocity(example.grid.Face(face),example.time)(s/2);
-                if(!has_surface) example.rhs.v(cell_index)-=div_entry*v;
-                example.velocity(face)=v;
-                continue;
-            }
-            if(!has_surface) example.rhs.v(cell_index)-=div_entry*example.velocity(face);
-            if(ci==-3)
-            {
-                T p=example.bc_pressure(example.grid.Face(face),example.time)*example.dt;
-                example.rhs.v(cell_index)+=entry*p;
-                example.velocity(face)-=sign*sc(s/2)*p;
-                example.projection_system.dc_present=true;
-            }
-            else
-            {
-                A.Append_Entry_To_Current_Row(ci&index_mask,-entry);
-            }
-            diag_entry+=entry;
-        }
-
-        A.Append_Entry_To_Current_Row(cell_index,diag_entry);
-        A.Finish_Row();
-    }
-    A.Sort_Entries();
-    example.sol.v.Resize(example.rhs.v.m,init_all,0);
-
-    if(example.projection_system.use_preconditioner)
-        example.projection_system.A.Construct_Incomplete_Cholesky_Factorization();
-
-    static int solve_id=-1;
-    solve_id++;
-    if(example.test_system)
-        example.projection_system.Test_System(example.sol);
-    if(example.print_matrix){
-        LOG::cout<<"solve id: "<<solve_id<<std::endl;
-        const MPM_PROJECTION_SYSTEM<TV>& system=example.projection_system;
-        OCTAVE_OUTPUT<T>(LOG::sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,example.rhs);
-        OCTAVE_OUTPUT<T>(LOG::sprintf("C-%i.txt",solve_id).c_str()).Write_Preconditioner("C",system,example.rhs);
-        OCTAVE_OUTPUT<T>(LOG::sprintf("P-%i.txt",solve_id).c_str()).Write_Projection("P",system,example.rhs);
-        OCTAVE_OUTPUT<T>(LOG::sprintf("b-%i.txt",solve_id).c_str()).Write("b",example.rhs);}
-
-    CONJUGATE_GRADIENT<T> cg;
-    cg.finish_before_indefiniteness=true;
-    cg.relative_tolerance=true;
-    bool converged=cg.Solve(example.projection_system,example.sol,example.rhs,
-        example.av,example.solver_tolerance,0,example.solver_iterations);
-    if(!converged) LOG::printf("SOLVER DID NOT CONVERGE.\n");
-
-    if(example.print_matrix)
-        OCTAVE_OUTPUT<T>(LOG::sprintf("x-%i.txt",solve_id).c_str()).Write("x",example.sol);
-
-    if(example.test_system){
-        example.projection_system.Multiply(example.sol,*example.av(0));
-        *example.av(0)-=example.rhs;
-        T r=example.projection_system.Convergence_Norm(*example.av(0));
-        LOG::cout<<"residual: "<<r<<std::endl;}
-
-    for(FACE_RANGE_ITERATOR<TV::m> it(example.grid.Domain_Indices(),RF::skip_outer);it.Valid();it.Next()){
-        int ca=example.cell_index(it.face.First_Cell_Index());
-        int cb=example.cell_index(it.face.Second_Cell_Index());
-        if(ca<0 || cb<0) continue;
-        example.velocity(it.face)-=(example.sol.v(cb&index_mask)-example.sol.v(ca&index_mask))*sc(it.face.axis);}
-
-    Fix_Periodic(example.velocity);
+    proj.Cut_Cell_Projection(example.grid,example.ghost,example.velocity,example.density,example.dt);
 }
 //#####################################################################
 namespace PhysBAM{
