@@ -87,7 +87,8 @@ Cut_Cell_Projection(const GRID<TV>& grid,int ghost,
     // Assumes square cells
     T one_over_dx=grid.one_over_dX(0);
     TV base_entry=grid.one_over_dX*grid.one_over_dX/density;
-    T base_d_entry=one_over_dx*one_over_dx/density;
+    // times 2 to compensate for pressure at face
+    T base_d_entry=one_over_dx*one_over_dx/density*2;
     TV sc=grid.one_over_dX/density;
     bool has_nullspace=true;
 
@@ -102,6 +103,8 @@ Cut_Cell_Projection(const GRID<TV>& grid,int ghost,
         
         VECTOR<T,TV::m*2> face_fraction;
         TV surface_area_weighted_normal;
+        TV centroid;
+        T total_area=0;
         T surface_fraction=0;
         
         T diag_entry=0;
@@ -118,11 +121,20 @@ Cut_Cell_Projection(const GRID<TV>& grid,int ghost,
                 for(const auto& t:boundary(s))
                     face_fraction(s)+=FACE::Size(t);
             for(const auto& t:surface)
-                surface_area_weighted_normal+=FACE::Area_Weighted_Normal(t);
+            {
+                TV an=FACE::Area_Weighted_Normal(t);
+                T area=an.Magnitude();
+                surface_area_weighted_normal+=an;
+                centroid+=t.Sum()/t.m*area;
+                total_area+=area;
+            }
+            centroid/=total_area;
+            centroid=grid.Cell_Domain(it.index).Point_From_Normalized_Coordinates(centroid);
+            PHYSBAM_ASSERT(grid.Cell_Domain(it.index).Lazy_Inside(centroid));
             if(has_surface)
             {
                 if(bc_p){
-                    T p=bc_p(grid.Center(it.index))*dt;
+                    T p=bc_p(centroid)*dt;
                     rhs.v(this_index)+=base_d_entry*p*surface_area_weighted_normal.Magnitude();}
                 // TODO: need rhs velocity at surface edge
                 has_nullspace=false;
@@ -131,7 +143,7 @@ Cut_Cell_Projection(const GRID<TV>& grid,int ghost,
             else
             {
                 if(bc_v){
-                    TV v=bc_v(grid.Center(it.index));
+                    TV v=bc_v(centroid);
                     rhs.v(this_index)-=one_over_dx*surface_area_weighted_normal.Dot(v);}
             }
         }
@@ -159,6 +171,7 @@ Cut_Cell_Projection(const GRID<TV>& grid,int ghost,
             if(!has_surface) rhs.v(this_index)-=div_entry*u(face);
             if(ci==-3)
             {
+                entry*=2; // compensate for pressure at face
                 if(bc_p){
                     T p=bc_p(grid.Face(face))*dt;
                     rhs.v(this_index)+=entry*p;
