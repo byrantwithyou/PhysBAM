@@ -121,16 +121,18 @@ Cut_Cell_Projection(const GRID<TV>& grid,int ghost,
                 surface_area_weighted_normal+=FACE::Area_Weighted_Normal(t);
             if(has_surface)
             {
-                T p=bc_p(grid.Center(it.index))*dt;
-                rhs.v(this_index)+=base_d_entry*p*surface_area_weighted_normal.Magnitude();
+                if(bc_p){
+                    T p=bc_p(grid.Center(it.index))*dt;
+                    rhs.v(this_index)+=base_d_entry*p*surface_area_weighted_normal.Magnitude();}
                 // TODO: need rhs velocity at surface edge
                 has_nullspace=false;
                 diag_entry+=base_d_entry*surface_area_weighted_normal.Magnitude();
             }
             else
             {
-                TV v=bc_v(grid.Center(it.index));
-                rhs.v(this_index)-=one_over_dx*surface_area_weighted_normal.Dot(v);
+                if(bc_v){
+                    TV v=bc_v(grid.Center(it.index));
+                    rhs.v(this_index)-=one_over_dx*surface_area_weighted_normal.Dot(v);}
             }
         }
         else face_fraction.Fill(1);
@@ -149,7 +151,7 @@ Cut_Cell_Projection(const GRID<TV>& grid,int ghost,
             T div_entry=sign*grid.one_over_dX(s/2)*face_fraction(s);
             if(ci==-4)
             {
-                T v=bc_v(grid.Face(face))(s/2);
+                T v=bc_v?bc_v(grid.Face(face))(s/2):0;
                 if(!has_surface) rhs.v(this_index)-=div_entry*v;
                 u(face)=v;
                 continue;
@@ -157,9 +159,10 @@ Cut_Cell_Projection(const GRID<TV>& grid,int ghost,
             if(!has_surface) rhs.v(this_index)-=div_entry*u(face);
             if(ci==-3)
             {
-                T p=bc_p(grid.Face(face))*dt;
-                rhs.v(this_index)+=entry*p;
-                u(face)-=sign*sc(s/2)*p;
+                if(bc_p){
+                    T p=bc_p(grid.Face(face))*dt;
+                    rhs.v(this_index)+=entry*p;
+                    u(face)-=sign*sc(s/2)*p;}
                 has_nullspace=false;
             }
             else

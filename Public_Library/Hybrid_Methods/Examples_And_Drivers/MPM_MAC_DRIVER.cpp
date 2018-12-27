@@ -1501,8 +1501,10 @@ Level_Set_Pressure_Projection()
     proj.print_residual=example.test_system;
     proj.solver_tolerance=example.solver_tolerance;
     proj.solver_iterations=example.solver_iterations;
-    proj.bc_v=[this](const TV& X){return example.bc_velocity(X,example.time);};
-    proj.bc_p=[this](const TV& X){return example.bc_pressure(X,example.time);};
+    if(example.bc_velocity)
+        proj.bc_v=[this](const TV& X){return example.bc_velocity(X,example.time);};
+    if(example.bc_pressure)
+        proj.bc_p=[this](const TV& X){return example.bc_pressure(X,example.time);};
 
     proj.Cut_Cell_Projection(example.grid,example.ghost,example.velocity,example.density,example.dt);
 }
