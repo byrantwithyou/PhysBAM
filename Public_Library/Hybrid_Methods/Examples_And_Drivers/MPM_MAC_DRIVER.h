@@ -54,7 +54,6 @@ public:
     template <class D,class N>
     void Reflect_Boundary(D func_d,N func_n,RF flag) const;
     void Reflect_Boundary_Mass_Momentum() const;
-    void Reflect_Boundary_Momentum(ARRAY<T,FACE_INDEX<TV::m> >& p) const;
     void Reflect_Boundary_Particle_Force(ARRAY<T,FACE_INDEX<TV::m> >& force) const;
     void Reflect_Boundary_Grid_Force(ARRAY<T,FACE_INDEX<TV::m> >& force) const;
     void Reflect_Boundary_Velocity_Copy_Only() const;

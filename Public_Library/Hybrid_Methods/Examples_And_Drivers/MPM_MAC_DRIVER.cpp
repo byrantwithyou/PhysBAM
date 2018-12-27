@@ -1055,33 +1055,6 @@ Reflect_Boundary_Mass_Momentum() const
         RF::ghost|RF::duplicate_corners);
 }
 //#####################################################################
-// Function Reflect_Boundary_Momentum
-//#####################################################################
-template<class TV> void MPM_MAC_DRIVER<TV>::
-Reflect_Boundary_Momentum(ARRAY<T,FACE_INDEX<TV::m> >& p) const
-{
-    Reflect_Boundary(
-        [&](const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side)
-        {
-            T bc=0;
-            if(example.bc_velocity){
-                TV nearest_point=example.grid.Clamp(example.grid.Face(out));
-                bc=example.bc_velocity(nearest_point,example.time)(out.axis);}
-            T& moment_in=p(in),&moment_out=p(out);
-            T mv_in_old=moment_in,mv_out_old=moment_out;
-            T m_in=example.mass(in),m_out=example.mass(out);
-            moment_in+=2*bc*m_out-moment_out;
-            moment_out=mv_out_old+2*bc*m_in-mv_in_old;
-        },
-        [&](const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side)
-        {
-            T& moment_in=p(in),&moment_out=p(out);
-            moment_in+=moment_out;
-            moment_out=moment_in;
-        },
-        RF::ghost|RF::duplicate_corners);
-}
-//#####################################################################
 // Function Reflect_Boundary_Copy_Only
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
