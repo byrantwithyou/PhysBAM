@@ -570,36 +570,6 @@ Compute_Effective_Velocity()
         });
 }
 //#####################################################################
-// Function Face_Fraction
-//#####################################################################
-template<class TV> auto MPM_MAC_DRIVER<TV>::
-Face_Fraction(const FACE_INDEX<TV::m>& face_index) const -> T
-{
-    if(!example.use_level_set_projection)
-        return example.mass(face_index)!=0;
-
-    LINEAR_INTERPOLATION_UNIFORM<TV,T> li;
-    GRID<TV> center_grid=example.grid.Get_Center_Grid();
-
-    bool has_in=false,has_out=false;
-    for(int i=0;i<GRID<TV>::number_of_nodes_per_face;i++){
-        TV X=example.grid.Node(example.grid.Face_Node_Index(face_index.axis,face_index.index,i));
-        T x=li.Clamped_To_Array(center_grid,example.phi,X);
-        if(x<=0) has_in=true;
-        else has_out=true;}
-    if(!has_in) return 0;
-    if(!has_out) return 1;
-
-    T phi0=example.phi(face_index.First_Cell_Index());
-    T phi1=example.phi(face_index.Second_Cell_Index());
-    T dx=example.grid.dX(face_index.axis);
-    T m=sqr(dx)-sqr(phi1-phi0);
-    T s=phi0+phi1;
-    if(s*s<m) return 0.5-s/(2*sqrt(m));
-    else if(s>=0) return 0;
-    else return 1;
-}
-//#####################################################################
 // Function Density
 //#####################################################################
 template<class TV> typename TV::SCALAR MPM_MAC_DRIVER<TV>::
@@ -780,9 +750,8 @@ Compute_Gradient(int nvar)
             int c0=example.cell_index(it.First_Cell_Index());
             int c1=example.cell_index(it.Second_Cell_Index());
             if(example.psi_N(face)){
-                T fraction=Face_Fraction(face);
                 T u_star=0;
-                if(fraction) u_star+=fraction*example.velocity(face);
+                if(example.mass(face)) u_star+=example.velocity(face);
                 T rhs=example.grid.one_over_dX(it.axis)*u_star;
                 if(c0>=0) example.rhs.v(c0)-=rhs;
                 if(c1>=0) example.rhs.v(c1)+=rhs;
@@ -838,9 +807,7 @@ Pressure_Projection()
     ARRAY<T> tmp(example.projection_system.gradient.m);
     for(int i=0;i<tmp.m;i++){
         FACE_INDEX<TV::m> face(example.projection_system.faces(i));
-        T fraction=Face_Fraction(face);
-        if(fraction)
-            tmp(i)+=fraction*example.velocity(face);}
+        if(example.mass(face)) tmp(i)+=example.velocity(face);}
     example.projection_system.gradient.Transpose_Times_Add(tmp,example.rhs.v);
 
     if(!example.projection_system.dc_present)
@@ -879,7 +846,6 @@ Pressure_Projection()
     example.projection_system.gradient.Times(example.sol.v,tmp);
     for(int i=0;i<tmp.m;i++){
         FACE_INDEX<TV::m> face(example.projection_system.faces(i));
-        T fraction=Face_Fraction(face);
         T dv=(tmp(i)+example.projection_system.gradp_bc(i))/example.projection_system.mass(i);
         example.velocity(face)-=dv;}
 

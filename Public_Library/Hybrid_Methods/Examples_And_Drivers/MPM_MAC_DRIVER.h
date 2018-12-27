@@ -70,7 +70,6 @@ public:
     template<class T2> void Fix_Periodic(ARRAY<T2,FACE_INDEX<TV::m> >& u,int ghost=INT_MAX) const;
     template<class T2> void Fix_Periodic_Accum(ARRAY<T2,TV_INT>& u,int ghost=INT_MAX) const;
     template<class T2> void Fix_Periodic_Accum(ARRAY<T2,FACE_INDEX<TV::m> >& u,int ghost=INT_MAX) const;
-    T Face_Fraction(const FACE_INDEX<TV::m>& face_index) const;
     T Density(const FACE_INDEX<TV::m>& face_index) const;
 
     void Compute_Boundary_Conditions();
