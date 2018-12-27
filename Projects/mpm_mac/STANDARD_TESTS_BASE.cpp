@@ -107,6 +107,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-rk",&rk_particle_order,"order","rk order");
     parse_args.Add("-mls",&this->use_mls_xfers,"Use moving least squares transfers");
     parse_args.Add("-phi",&this->use_level_set_projection,"Use level sets for projection");
+    parse_args.Add("-reseed",&this->use_reseeding,"Reseed particles");
     parse_args.Add("-analytic_u",&analytic_u_expr,"expr","Analytic velocity expression");
     parse_args.Add("-analytic_p",&analytic_p_expr,"expr","Analytic pressure expression");
     parse_args.Add("-analytic_phi",&analytic_phi_expr,"expr","Analytic level set expression");
