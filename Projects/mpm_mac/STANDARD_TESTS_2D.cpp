@@ -179,7 +179,7 @@ Initialize()
             Seed_Particles(*shape,0,0,density,particles_per_cell);
             delete shape;
             bc_type(1)=BC_FREE;
-            bc_velocity=[=](const TV& X,T time){return TV(velocity,0);};
+            bc_velocity=[=](const TV& X,T time){return TV(X.x<-1.999?velocity:0,0);};
             Add_Collision_Object(sphere,COLLISION_TYPE::slip,0,0,0);
             RANGE<TV> source_range=grid.domain;
             source_range.min_corner.x-=grid.dX.x;
