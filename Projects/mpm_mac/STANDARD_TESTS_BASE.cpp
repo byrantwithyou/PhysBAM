@@ -333,6 +333,7 @@ Check_Analytic_Velocity(std::function<bool(const FACE_INDEX<TV::m>&)> valid_face
     for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
         if(mass(it.Full_Index())){
             if(!valid_face(it.Full_Index())) continue;
+            if(this->use_mls_xfers && !this->valid_xfer_data(it.Full_Index())) continue;
             T u=velocity(it.Full_Index());
             TV v=analytic_velocity->v(it.Location(),time);
             T e=abs(u-v(it.face.axis));
