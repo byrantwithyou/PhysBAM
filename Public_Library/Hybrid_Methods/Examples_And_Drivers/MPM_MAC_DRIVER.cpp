@@ -304,7 +304,7 @@ Particle_To_Grid()
     Fix_Periodic_Accum(example.velocity);
     Fix_Periodic_Accum(example.volume);
 
-    if(example.extrap_type=='p'){
+    if(example.extrap_type=='p' && !example.use_mls_xfers){
         PHYSBAM_DEBUG_WRITE_SUBSTEP("before reflect",1);
         Reflect_Boundary_Mass_Momentum();}
 
