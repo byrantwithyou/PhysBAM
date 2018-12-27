@@ -57,6 +57,7 @@ public:
     void Reflect_Boundary_Particle_Force(ARRAY<T,FACE_INDEX<TV::m> >& force) const;
     void Reflect_Boundary_Grid_Force(ARRAY<T,FACE_INDEX<TV::m> >& force) const;
     void Reflect_Boundary_Velocity_Copy_Only() const;
+    void Reflect_Boundary_Valid_Flag_Copy_Only() const;
     void Extrapolate_Velocity(ARRAY<T,FACE_INDEX<TV::m> >& velocity,bool use_bc,bool extrapolate_boundary) const;
     void Extrapolate_Boundary(ARRAY<T,FACE_INDEX<TV::m> >& velocity) const;
     T Compute_Dt() const;

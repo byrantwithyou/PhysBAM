@@ -170,7 +170,7 @@ Advance_One_Time_Step()
     Step([=](){Level_Set_Pressure_Projection();},"level set projection",true,example.use_level_set_projection);
     Step([=](){Extrapolate_Inside_Object();},"extrapolate",true,example.use_object_extrap);
     Step([=](){Apply_Viscosity();},"viscosity",true,example.viscosity!=0);
-    Step([=](){Extrapolate_Velocity(!example.flip,false);},"velocity-extrapolation",true,!example.use_mls_xfers);
+    Step([=](){Extrapolate_Velocity(!example.flip,false);},"velocity-extrapolation",true);
     Step([=](){Compute_Effective_Velocity();},"compute effective velocity",false,example.xpic);
     Step([=](){Grid_To_Particle();},"g2p");
 }
@@ -304,7 +304,7 @@ Particle_To_Grid()
     Fix_Periodic_Accum(example.velocity);
     Fix_Periodic_Accum(example.volume);
 
-    if(example.extrap_type=='p' && !example.use_mls_xfers){
+    if(example.extrap_type=='p'){
         PHYSBAM_DEBUG_WRITE_SUBSTEP("before reflect",1);
         Reflect_Boundary_Mass_Momentum();}
 
@@ -344,7 +344,7 @@ Particle_To_Grid()
     flat_h.Combine();
     indices_h.Combine();
     if(example.flip){
-        if(example.extrap_type!='p' && !example.use_mls_xfers)
+        if(example.extrap_type!='p')
             Extrapolate_Velocity(example.velocity,false,true);
         example.velocity_save=example.velocity;}
 }
@@ -986,8 +986,10 @@ Fix_Periodic_Accum(ARRAY<T2,FACE_INDEX<TV::m> >& u,int ghost) const
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Extrapolate_Velocity(bool use_bc,bool extrapolate_boundary)
 {
-    if(example.extrap_type=='p')
+    if(example.extrap_type=='p'){
         Reflect_Boundary_Velocity_Copy_Only();
+        if(example.use_mls_xfers && example.use_level_set_projection)
+            Reflect_Boundary_Valid_Flag_Copy_Only();}
     else Extrapolate_Velocity(example.velocity,use_bc,extrapolate_boundary);
 }
 //#####################################################################
@@ -1072,6 +1074,23 @@ Reflect_Boundary_Velocity_Copy_Only() const
         [&](const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side)
         {
             example.velocity(out)=example.velocity(in);
+        },
+        RF::ghost|RF::delay_corners);
+}
+//#####################################################################
+// Function Reflect_Valid_Flag_Copy_Only
+//#####################################################################
+template<class TV> void MPM_MAC_DRIVER<TV>::
+Reflect_Boundary_Valid_Flag_Copy_Only() const
+{
+    Reflect_Boundary(
+        [&](const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side)
+        {
+            example.valid_xfer_data(out)=example.valid_xfer_data(in);
+        },
+        [&](const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side)
+        {
+            example.valid_xfer_data(out)=example.valid_xfer_data(in);
         },
         RF::ghost|RF::delay_corners);
 }
