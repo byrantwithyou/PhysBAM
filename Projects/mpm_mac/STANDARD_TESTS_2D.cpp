@@ -176,7 +176,7 @@ Initialize()
             Set_Grid(RANGE<TV>(TV(-2,-4),TV(14,4))*m,TV_INT(2,1));
             SPHERE<TV> sphere(TV(),.25*m);
             auto shape=Intersect(Make_IO(grid.domain),Invert(Make_IO(sphere)));
-            Seed_Particles(*shape,[=](const TV& X){return TV(velocity,0);},0,density,particles_per_cell);
+            Seed_Particles(*shape,0,0,density,particles_per_cell);
             delete shape;
             bc_type(1)=BC_FREE;
             bc_velocity=[=](const TV& X,T time){return TV(velocity,0);};
