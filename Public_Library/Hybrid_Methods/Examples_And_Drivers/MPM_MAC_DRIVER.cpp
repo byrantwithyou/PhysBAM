@@ -139,12 +139,15 @@ Initialize()
 
     Update_Simulated_Particles();
     // Need grid velocities for initial advection step
-    if(example.flip || example.rk_particle_order || example.xpic){
+    if(example.rk_particle_order || example.xpic){
         Update_Particle_Weights();
         Prepare_Scatter();
         Particle_To_Grid();
         if(example.xpic)
             Compute_Effective_Velocity();}
+    if(example.flip){
+        example.particles.template Add_Array<TV>("flip_adv_velocity",&example.flip_adv_velocity);
+        example.flip_adv_velocity=example.particles.V;}
 
     example.force.Resize(example.grid.Domain_Indices(example.ghost));
 
@@ -482,8 +485,12 @@ Grid_To_Particle()
                     if(h.partial[d]){
                         T a=1-h.a[d];
                         if(!example.use_affine){
-                            if(a) h.V(d)/=a;
-                            else h.V(d)=0;
+                            if(a){
+                                h.V(d)/=a;
+                                if(use_flip) h.flip_V(d)/=a;}
+                            else{
+                                h.V(d)=0;
+                                if(use_flip) h.flip_V(d)=0;}
                             continue;}
                         TV b=-h.b[d];
                         SYMMETRIC_MATRIX<T,TV::m> D=example.Dp_inv(d)(p).Inverse();
@@ -501,7 +508,9 @@ Grid_To_Particle()
                         h.B.Set_Row(d,D*sol.Remove_Index(TV::m));}
             
             if(particles.store_B) particles.B(p)=h.B;
-            if(use_flip) particles.V(p)=(1-example.flip)*h.V+example.flip*(particles.V(p)+h.flip_V);
+            if(use_flip){
+                particles.V(p)=(1-example.flip)*h.V+example.flip*(particles.V(p)+h.flip_V);
+                example.flip_adv_velocity(p)=h.V;}
             else if(example.xpic) particles.V(p)+=example.effective_v(p);
             else particles.V(p)=h.V;
         });
@@ -1394,10 +1403,11 @@ Move_Particles()
                         example.particles.X(p)+=example.dt*li.Clamped_To_Array(example.velocity,example.particles.X(p));
                     Clip(p);}}
         else if(example.flip && example.position_update=='d'){
-            example.gather_scatter->template Gather_Parallel<int>(false,
-                [this](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,int data)
-                {example.particles.X(p)(it.Index().axis)+=example.dt*it.Weight()*example.velocity(it.Index());},
-                Clip);}
+#pragma omp for
+            for(int p=0;p<example.particles.X.m;p++)
+                if(example.particles.valid(p)){
+                    example.particles.X(p)+=example.dt*example.flip_adv_velocity(p);
+                    Clip(p);}}
         else if(example.flip && example.position_update=='x'){
             example.gather_scatter->template Gather_Parallel<int>(false,
                 [this](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,int data)

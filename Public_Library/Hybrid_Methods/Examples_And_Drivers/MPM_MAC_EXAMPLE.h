@@ -98,6 +98,7 @@ public:
     VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m> weights;
     bool use_affine;
     T flip;
+    ARRAY_VIEW<TV> flip_adv_velocity;
 
     // objects
     ARRAY<MPM_COLLISION_OBJECT<TV>*> collision_objects;
