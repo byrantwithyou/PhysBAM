@@ -201,16 +201,27 @@ Cut_Cell_Projection(const GRID<TV>& grid,int ghost,
         sys.P=A.C;
         precon_tmp.v.Resize(next_cell_index,init_all,0);
         sys.temp_vector=&precon_tmp;}
-    
+
+    if(use_warm_start && pressure){
+        if(valid_p) LOG::printf("%P\n",*valid_p);
+        for(RANGE_ITERATOR<TV::m> it(valid_p->domain);it.Valid();it.Next()){
+            int c=cell_index(it.index);
+            if(c<0) continue;
+            if(!valid_p || (*valid_p)(it.index))
+                sol.v(c&index_mask)=(*pressure)(it.index)*dt;}}
+
     static int solve_id=-1;
     solve_id++;
     if(test_system) sys.Test_System(sol);
+    OCTAVE_OUTPUT<T>* oo=0;
     if(print_matrix){
+        oo=new OCTAVE_OUTPUT<T>(LOG::sprintf("M-%i.txt",solve_id).c_str());
         LOG::cout<<"solve id: "<<solve_id<<std::endl;
-        OCTAVE_OUTPUT<T>(LOG::sprintf("M-%i.txt",solve_id).c_str()).Write("M",sys,rhs);
-        OCTAVE_OUTPUT<T>(LOG::sprintf("C-%i.txt",solve_id).c_str()).Write_Preconditioner("C",sys,rhs);
-        OCTAVE_OUTPUT<T>(LOG::sprintf("P-%i.txt",solve_id).c_str()).Write_Projection("P",sys,rhs);
-        OCTAVE_OUTPUT<T>(LOG::sprintf("b-%i.txt",solve_id).c_str()).Write("b",rhs);}
+        oo->Write("M",sys,rhs);
+        oo->Write("y",sol);
+        oo->Write_Preconditioner("C",sys,rhs);
+        oo->Write_Projection("P",sys,rhs);
+        oo->Write("b",rhs);}
 
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
     CONJUGATE_GRADIENT<T> cg;
@@ -219,8 +230,9 @@ Cut_Cell_Projection(const GRID<TV>& grid,int ghost,
     bool converged=cg.Solve(sys,sol,rhs,av,solver_tolerance,0,solver_iterations);
     if(!converged) LOG::printf("SOLVER DID NOT CONVERGE.\n");
 
-    if(print_matrix)
-        OCTAVE_OUTPUT<T>(LOG::sprintf("x-%i.txt",solve_id).c_str()).Write("x",sol);
+    if(print_matrix){
+        oo->Write("x",sol);
+        delete oo;}
 
     if(print_residual){
         sys.Multiply(sol,*av(0));

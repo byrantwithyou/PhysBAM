@@ -124,6 +124,10 @@ Initialize()
         example.phi.Resize(example.grid.Node_Indices(example.ghost));
         example.levelset.boundary=&example.periodic_boundary;}
 
+    if(example.use_warm_start){
+        example.pressure_save.Resize(example.grid.Domain_Indices(example.ghost));
+        example.pressure_valid.Resize(example.grid.Domain_Indices(example.ghost));}
+
     if(example.use_mls_xfers)
         example.valid_xfer_data.Resize(example.grid.Domain_Indices(example.ghost));
 
@@ -1484,6 +1488,11 @@ Level_Set_Pressure_Projection()
     if(example.bc_pressure)
         proj.bc_p=[this](const TV& X){return example.bc_pressure(X,example.time);};
 
+    proj.use_warm_start=example.use_warm_start;
+    if(example.use_warm_start){
+        proj.pressure=&example.pressure_save;
+        proj.valid_p=&example.pressure_valid;}
+    
     proj.Cut_Cell_Projection(example.grid,example.ghost,example.velocity,example.density,example.dt);
 }
 //#####################################################################

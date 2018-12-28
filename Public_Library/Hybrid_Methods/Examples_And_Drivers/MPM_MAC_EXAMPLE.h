@@ -45,6 +45,10 @@ public:
     ARRAY<T,FACE_INDEX<TV::m> > velocity,velocity_save;
     ARRAY<bool,FACE_INDEX<TV::m> > valid_xfer_data;
 
+    ARRAY<T,TV_INT> pressure_save;
+    ARRAY<bool,TV_INT> pressure_valid;
+    bool use_warm_start=false;
+    
     ARRAY<int> valid_flat_indices;
     ARRAY<FACE_INDEX<TV::m> > valid_indices;
     ARRAY<int> simulated_particles;

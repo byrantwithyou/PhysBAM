@@ -116,7 +116,8 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-grid_min",&analytic_grid_range.min_corner,"vec","Min corner of grid domain");
     parse_args.Add("-grid_max",&analytic_grid_range.max_corner,"vec","Max corner of grid domain");
     parse_args.Add("-analytic_bc",&analytic_bc_types,"expr","BC types [fsnp], 2*d entries");
-
+    parse_args.Add("-warm_start",&this->use_warm_start,"use warm starts for pressure projection");
+    
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);
     if(use_slip) forced_collision_type=COLLISION_TYPE::slip;

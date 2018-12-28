@@ -30,7 +30,8 @@ struct CUT_CELL_PROJECTION
     int solver_iterations=INT_MAX;
     std::function<TV(const TV& X)> bc_v=0;
     std::function<T(const TV& X)> bc_p=0;
-
+    bool use_warm_start=false;
+    
     void Cut_Cell_Projection(const GRID<TV>& grid,int ghost,
         ARRAY<T,FACE_INDEX<TV::m> >& u,T density,T dt);
 };
