@@ -13,6 +13,7 @@
 #include <Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
+#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include <Geometry/Projection/CUT_CELL_PROJECTION.h>
 namespace PhysBAM
@@ -38,7 +39,7 @@ Cut_Cell_Projection(const GRID<TV>& grid,int ghost,
     static const int index_mask=partial_object_flag-1;
 
     ARRAY<int,TV_INT> cell_index(grid.Domain_Indices(ghost),use_init,-9);
-    VEC rhs,sol,null;
+    VEC rhs,sol,null,precon_tmp;
     SPARSE_MATRIX_FLAT_MXN<T> A;
     MAT sys(A);
     
@@ -192,10 +193,15 @@ Cut_Cell_Projection(const GRID<TV>& grid,int ghost,
     if(has_nullspace){
         null.v.Resize(rhs.v.m,init_all,sqrt((T)1/rhs.v.m));
         sys.nullspace_vectors.Append(&null);}
-    
-    if(use_preconditioner)
-        A.Construct_Incomplete_Cholesky_Factorization();
 
+    sys.use_preconditioner=use_preconditioner;
+    sys.preconditioner_commutes_with_projection=(!has_nullspace||!use_preconditioner);
+    if(use_preconditioner){
+        A.Construct_Incomplete_Cholesky_Factorization();
+        sys.P=A.C;
+        precon_tmp.v.Resize(next_cell_index,init_all,0);
+        sys.temp_vector=&precon_tmp;}
+    
     static int solve_id=-1;
     solve_id++;
     if(test_system) sys.Test_System(sol);

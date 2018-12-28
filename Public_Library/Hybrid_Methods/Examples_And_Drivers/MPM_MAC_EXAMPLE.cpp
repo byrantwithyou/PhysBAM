@@ -20,26 +20,12 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> MPM_MAC_EXAMPLE<TV>::
 MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type)
-    :stream_type(stream_type),ghost(3),levelset(*new LEVELSET<TV>(levelset_grid,phi,ghost)),
+    :stream_type(stream_type),levelset(*new LEVELSET<TV>(levelset_grid,phi,ghost)),
     particles(*new MPM_PARTICLES<TV>),
     projection_system(*new MPM_PROJECTION_SYSTEM<TV>),
     sol(*new MPM_PROJECTION_VECTOR<TV>),rhs(*new MPM_PROJECTION_VECTOR<TV>),
-    periodic_boundary(*new BOUNDARY_MAC_GRID_PERIODIC<TV,T>),extrap_type('p'),
-    clamp_particles(false),
-    use_affine(true),flip(0),initial_time(0),
-    last_frame(100),write_substeps_level(-1),substeps_delay_frame(-1),
-    output_directory("output"),data_directory("../../Public_Data"),use_test_output(false),
-    restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),
-    only_write_particles(false),only_log(false),cfl(1),
-    solver_tolerance(std::numeric_limits<T>::epsilon()*10),solver_iterations(1000),
-    threads(1),use_particle_volumes(false),use_constant_density(true),
-    use_phi(false),rk_particle_order(0),
-    use_massless_particles(false),use_reseeding(false),
-    use_periodic_test_shift(false),
-    position_update('d'),
-    debug_particles(*new DEBUG_PARTICLES<TV>),
-    test_system(false),print_matrix(false),
-    particle_vort(false)
+    periodic_boundary(*new BOUNDARY_MAC_GRID_PERIODIC<TV,T>),
+    debug_particles(*new DEBUG_PARTICLES<TV>)
 {
     bc_type.Fill(BC_SLIP);
 }

@@ -100,9 +100,7 @@ Initialize()
         example.periodic_boundary.is_periodic(i)=a;}
 
     // must have level sets in order to use level set projection
-    if(example.use_level_set_projection){
-        example.use_phi=true;
-        example.use_mls_xfers=true;}
+    if(example.use_level_set_projection) example.use_mls_xfers=true;
     if(example.use_mls_xfers) example.use_object_extrap=false;
     
     PHYSBAM_ASSERT(example.grid.Is_MAC_Grid());
@@ -359,10 +357,10 @@ Build_Level_Sets()
 {
     PHYSBAM_ASSERT(example.use_phi);
     T dx=example.grid.dX.Max();
-    T fmm_offset=3*dx;
+//    T fmm_offset=3*dx;
     T fill_radius_cells=5;
-    T particle_radius=(T)0.55*sqrt((T)TV::m)*dx;
-    example.phi.array.Fill(fill_radius_cells*dx-fmm_offset);
+    T particle_radius=(T)0.55*sqrt(3+TV::m)*dx;
+    example.phi.array.Fill(fill_radius_cells*dx-particle_radius);
     RANGE<TV_INT> grid_domain=example.levelset_grid.Domain_Indices(example.ghost);
     for(int k=0;k<example.simulated_particles.m;k++){
         int p=example.simulated_particles(k);
@@ -370,26 +368,26 @@ Build_Level_Sets()
         TV_INT cell=example.levelset_grid.Clamp_To_Cell(X,example.ghost);
         RANGE<TV_INT> range=RANGE<TV_INT>(cell).Thickened(fill_radius_cells).Intersect(grid_domain);
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next()){
-            T d=(X-example.levelset_grid.Center(it.index)).Magnitude()-fmm_offset;
+            T d=(X-example.levelset_grid.Center(it.index)).Magnitude()-particle_radius;
             example.phi(it.index)=min(example.phi(it.index),d);}}
     Fix_Periodic(example.phi);
 
-    ARRAY<TV_INT> seed_indices;
-    for(FACE_RANGE_ITERATOR<TV::m> it(example.levelset_grid.Domain_Indices(example.ghost),RF::skip_outer);it.Valid();it.Next()){
-        TV_INT a=it.face.First_Cell_Index(),b=it.face.Second_Cell_Index();
-        bool pa=example.phi(a)<0,pb=example.phi(b)<0;
-        if(pa!=pb){
-            seed_indices.Append(a);
-            seed_indices.Append(b);}}
-    Prune_Duplicates(seed_indices);
+    // ARRAY<TV_INT> seed_indices;
+    // for(FACE_RANGE_ITERATOR<TV::m> it(example.levelset_grid.Domain_Indices(example.ghost),RF::skip_outer);it.Valid();it.Next()){
+    //     TV_INT a=it.face.First_Cell_Index(),b=it.face.Second_Cell_Index();
+    //     bool pa=example.phi(a)<0,pb=example.phi(b)<0;
+    //     if(pa!=pb){
+    //         seed_indices.Append(a);
+    //         seed_indices.Append(b);}}
+    // Prune_Duplicates(seed_indices);
 
-    FAST_MARCHING_METHOD_UNIFORM<TV> fmm;
-    fmm.seed_indices=&seed_indices;
-    fmm.correct_interface_phi=false;
-    fmm.Fast_Marching_Method(example.levelset_grid,example.ghost,example.phi,
-        fmm_offset+example.ghost*dx);
-    example.phi.array+=fmm_offset-particle_radius;
-    Fix_Periodic(example.phi);
+    // FAST_MARCHING_METHOD_UNIFORM<TV> fmm;
+    // fmm.seed_indices=&seed_indices;
+    // fmm.correct_interface_phi=false;
+    // fmm.Fast_Marching_Method(example.levelset_grid,example.ghost,example.phi,
+    //     fmm_offset+example.ghost*dx);
+    // example.phi.array+=fmm_offset-particle_radius;
+    // Fix_Periodic(example.phi);
 }
 //#####################################################################
 // Function Reseeding
@@ -581,15 +579,13 @@ Compute_Effective_Velocity()
 template<class TV> typename TV::SCALAR MPM_MAC_DRIVER<TV>::
 Density(const FACE_INDEX<TV::m>& face_index) const
 {
-    if(!example.use_level_set_projection){
-        if(T m=example.mass(face_index)){
-            if(example.use_constant_density)
-                return example.density;
-            if(example.use_particle_volumes)
-                m/=example.volume(face_index);
-            return m;}
-        return 0;}
-    return example.density;
+    if(T m=example.mass(face_index)){
+        if(example.use_constant_density)
+            return example.density;
+        if(example.use_particle_volumes)
+            m/=example.volume(face_index);
+        return m;}
+    return 0;
 }
 //#####################################################################
 // Function Neumann_Boundary_Condition
@@ -668,9 +664,8 @@ Allocate_Projection_System_Variable()
             for(int s=0;s<2;s++){
                 if(!example.psi_N(face)){
                     all_N=false;
-                    if(!example.use_level_set_projection){
-                        if(!example.mass(face))
-                            dirichlet=true;}}
+                    if(!example.mass(face))
+                        dirichlet=true;}
                 face.index(a)++;}}
         if(all_N) example.cell_index(it.index)=pressure_N;
         else if(dirichlet) example.cell_index(it.index)=pressure_D;
@@ -871,14 +866,14 @@ Apply_Forces()
             FACE_INDEX<TV::m> index=it.Index();
             example.force(index)+=w*example.gravity(index.axis)*example.particles.mass(p);
         });
-    if(example.extrap_type=='p') Reflect_Boundary_Particle_Force(example.force);
+    if(example.extrap_type=='p' && !example.use_mls_xfers) Reflect_Boundary_Particle_Force(example.force);
 #pragma omp parallel for
     for(int i=0;i<example.valid_flat_indices.m;i++){
         int k=example.valid_flat_indices(i);
         FACE_INDEX<TV::m> f=example.valid_indices(i);
         TV af=example.Compute_Analytic_Force(example.grid.Face(f),example.time);
         example.force.array(k)+=af(f.axis)*example.mass(f);}
-    if(example.extrap_type=='p') Reflect_Boundary_Grid_Force(example.force);
+    if(example.extrap_type=='p' && !example.use_mls_xfers) Reflect_Boundary_Grid_Force(example.force);
 #pragma omp parallel for
     for(int i=0;i<example.velocity.array.m;i++){
         T acc=0;
@@ -1472,7 +1467,7 @@ Level_Set_Pressure_Projection()
 
     CUT_CELL_PROJECTION<TV> proj;
     proj.object_phi=&object_phi;
-    proj.surface_phi=&example.phi;
+    if(example.use_phi) proj.surface_phi=&example.phi;
     proj.valid_u=&example.valid_xfer_data;
     for(int s=0;s<2*TV::m;s++)
         switch(example.bc_type(s)){

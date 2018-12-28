@@ -37,7 +37,7 @@ public:
     typedef typename MPM_COLLISION_OBJECT<TV>::COLLISION_TYPE COLLISION_TYPE;
 
     STREAM_TYPE stream_type;
-    int ghost;
+    int ghost=3;
     GRID<TV> grid;
     enum BC_TYPE {BC_FREE, BC_SLIP, BC_NOSLIP, BC_PERIODIC};
     
@@ -74,12 +74,12 @@ public:
     MPM_PROJECTION_VECTOR<TV>& rhs;
     VECTOR<BC_TYPE,TV::m*2> bc_type; // -x, +x, -y, +y, -z, +z
     // Valid if BC_SLIP or BC_NOSLIP; velocity at face. null=0
-    std::function<TV(const TV& X,T)> bc_velocity;
+    std::function<TV(const TV& X,T)> bc_velocity=0;
     // Valid if BC_FREE; pressure at ghost cell. null=0
-    std::function<T(TV,T)> bc_pressure;
+    std::function<T(TV,T)> bc_pressure=0;
     BOUNDARY_MAC_GRID_PERIODIC<TV,T>& periodic_boundary;
     ARRAY<int,TV_INT> cell_index;
-    int dof;
+    int dof=0;
     ARRAY<bool,FACE_INDEX<TV::m> > psi_N;
     ARRAY<T,FACE_INDEX<TV::m> > force;
     // Extrapolation functions.
@@ -91,13 +91,13 @@ public:
     // l: linearly extrapolate from interior (use BC values if any)
     // a: extrpolate using analytic function
     // r: reflect the interior for tangential directions; reflect with negation for normal directions
-    char extrap_type;
-    bool clamp_particles;
+    char extrap_type='p';
+    bool clamp_particles=false;
 
     // transfer stuff
     VECTOR<PARTICLE_GRID_WEIGHTS<TV>*,TV::m> weights;
-    bool use_affine;
-    T flip;
+    bool use_affine=true;
+    T flip=0;
     ARRAY_VIEW<TV> flip_adv_velocity;
 
     // objects
@@ -106,38 +106,38 @@ public:
     RANDOM_NUMBERS<T> random;
 
     // initialization & output
-    T initial_time;
-    int last_frame;
+    T initial_time=0;
+    int last_frame=100;
     std::string frame_title;
-    int write_substeps_level;
-    int substeps_delay_frame;
-    std::string output_directory;
-    std::string data_directory;
+    int write_substeps_level=-1;
+    int substeps_delay_frame=-1;
+    std::string output_directory="output";
+    std::string data_directory="../../Public_Data";
     std::string test_output_prefix;
-    bool use_test_output;
-    int restart;
-    T dt,time,frame_dt,min_dt,max_dt;
-    bool only_write_particles;
-    bool only_log;
+    bool use_test_output=false;
+    int restart=0;
+    T dt=0,time=0,frame_dt=(T)1/24,min_dt=0,max_dt=(T)1/24;
+    bool only_write_particles=false;
+    bool only_log=false;
 
     // parameters
     TV gravity;
-    T cfl;
-    T solver_tolerance;
-    int solver_iterations;
-    int threads;
-    bool use_particle_volumes;
-    bool use_constant_density;
-    bool use_preconditioner;
-    bool use_phi;
-    int rk_particle_order;
-    bool use_massless_particles;
+    T cfl=1;
+    T solver_tolerance=std::numeric_limits<T>::epsilon()*10;
+    int solver_iterations=1000;
+    int threads=1;
+    bool use_particle_volumes=false;
+    bool use_constant_density=false;
+    bool use_preconditioner=true;
+    bool use_phi=false;
+    int rk_particle_order=0;
+    bool use_massless_particles=false;
     bool use_level_set_projection=false;
-    bool use_reseeding;
-    bool use_periodic_test_shift;
+    bool use_reseeding=false;
+    bool use_periodic_test_shift=false;
     TV_INT periodic_test_shift;
     // d: default; c: always use pic update; p: use pic in the first step only
-    char position_update;
+    char position_update='d';
     
     // debugging
     DEBUG_PARTICLES<TV>& debug_particles;
@@ -147,9 +147,9 @@ public:
     T last_grid_ke=0;
     T last_part_te=0;
     T last_part_ke=0;
-    bool test_system;
-    bool print_matrix;
-    bool particle_vort;
+    bool test_system=false;
+    bool print_matrix=false;
+    bool particle_vort=false;
     bool use_object_extrap=false;
     bool use_mls_xfers=false;
     
