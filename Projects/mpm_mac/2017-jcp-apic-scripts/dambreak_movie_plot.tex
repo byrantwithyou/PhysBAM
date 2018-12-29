@@ -25,7 +25,7 @@
 ]
     \addplot[
         scatter,scatter src=explicit,
-        scatter/use mapped color={draw opacity=0,fill=mapped color}, % remove boundary
+        scatter/use mapped color={draw=mapped color,fill=mapped color}, % remove boundary
         point meta min=-2,point meta max=2,
         only marks,mark options={mark size=0.5pt}] table[x=x,y=y,meta=vort]{#1.txt};
 \end{axis}
