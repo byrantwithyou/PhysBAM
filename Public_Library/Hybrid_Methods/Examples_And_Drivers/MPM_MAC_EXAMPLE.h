@@ -131,7 +131,7 @@ public:
     int solver_iterations=1000;
     int threads=1;
     bool use_particle_volumes=false;
-    bool use_constant_density=false;
+    bool use_constant_density=true;
     bool use_preconditioner=true;
     bool use_phi=false;
     int rk_particle_order=0;
