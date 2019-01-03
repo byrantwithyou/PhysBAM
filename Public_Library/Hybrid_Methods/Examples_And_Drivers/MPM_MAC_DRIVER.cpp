@@ -403,36 +403,47 @@ Reseeding()
     LINEAR_INTERPOLATION_MAC<TV,T> li(example.grid);
     int target_ppc=1<<TV::m;
     ARRAY<ARRAY<int>,TV_INT> particle_counts(example.grid.Domain_Indices());
+    ARRAY_VIEW<VECTOR<T,3> >* color=example.particles.template Get_Array<VECTOR<T,3> >("color");
     for(int i=0;i<example.particles.X.m;i++){
         if(!example.particles.valid(i)) continue;
         TV X=example.particles.X(i);
-        TV_INT index=example.grid.Cell(X);
+        TV_INT index=example.grid.Clamp_To_Cell(X);
         particle_counts(index).Append(i);}
-    ARRAY<int> particles_in_phase;
+    T uniform_mass=example.particles.mass(0);
     for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
         ARRAY<int>& a=particle_counts(it.index);
         int target=target_ppc;
-        if(abs(example.phi(it.index))<dx) target*=4;
+        // if(abs(example.phi(it.index))<dx) target*=4;
         if(a.m<target){
+            bool broad_phase_inside=false;
+            for(int j=0;j<example.collision_objects.m;j++){
+                MPM_COLLISION_OBJECT<TV>* o=example.collision_objects(j);
+                RANGE<TV> box=example.grid.Cell_Domain(example.grid.Clamp_To_Cell(o->Get_Implicit_Object(example.time)->box));
+                if(box.Lazy_Inside(example.grid.Center(it.index))){
+                    broad_phase_inside=true;
+                    break;}}
             RANGE<TV> range=example.grid.Cell_Domain(it.index);
-            for(int i=0;i<target-a.m;i++){
+            for(int i=0,c=target-a.m;i<c;i++){
                 TV X;
                 example.random.Fill_Uniform(X,range);
                 T phi=example.levelset.Phi(X);
-                if(abs(phi)>=(T).3*dx){
+                bool inside_obj=false;
+                for(int j=0;broad_phase_inside && j<example.collision_objects.m;j++){
+                    MPM_COLLISION_OBJECT<TV>* o=example.collision_objects(j);
+                    if(o->Phi(X,example.time)<=0){
+                        inside_obj=true;
+                        break;}}
+                if(!inside_obj && abs(phi)>=(T).3*dx){
                     int p=example.particles.Add_Element_From_Deletion_List();
                     example.particles.valid(p)=true;
-                    example.particles.mass(p)=1;
+                    (*color)(p)=VECTOR<T,3>(0,1,0);
+                    example.particles.mass(p)=uniform_mass;
                     example.particles.V(p)=li.Clamped_To_Array(example.velocity,X);
                     example.particles.X(p)=X;}}}
         if(a.m>2*target){
-            for(int i=0;i<a.m;i++)
-                particles_in_phase.Append(a(i));
-            if(particles_in_phase.m>2*target){
-                example.random.Random_Shuffle(particles_in_phase);
-                int p=particles_in_phase.Pop_Value();
-                Invalidate_Particle(p);}
-            particles_in_phase.Remove_All();}}
+            example.random.Random_Shuffle(a);
+            while(a.m>2*target)
+                Invalidate_Particle(a.Pop_Value());}}
     Update_Simulated_Particles();
     Update_Particle_Weights();
     Prepare_Scatter();
