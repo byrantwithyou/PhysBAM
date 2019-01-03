@@ -3,8 +3,9 @@
 NAME=vortex-shedding
 
 RES=192
-FRAME=1600
-ARGS="../mpm_mac 21 -last_frame 3000 -mu 0 -resolution $RES"
+DT=0.01
+PPC=4
+ARGS="../mpm_mac 21 -last_frame 3000 -mu 0 -resolution $RES -lsproj -no_surface -mls_zero_invalid -reseed -min_dt $DT -max_dt $DT -particles_per_cell $PPC"
 
 FULL=1 # Set to 1 for a full rebuild; 0 to skip rerunning the simulations
 
@@ -12,48 +13,52 @@ if [ "X$FULL" = "X1" ] ; then
     rm -rf $NAME
     mkdir -p $NAME
     while true ; do
-        #echo $ARGS -no_affine -o $NAME/pic
+        echo $ARGS -no_affine -xpic 2 -o $NAME/xpic2
+        echo $ARGS -no_affine -xpic 3 -o $NAME/xpic3
+        echo $ARGS -no_affine -xpic 5 -o $NAME/xpic5
         echo $ARGS -affine -o $NAME/apic
-        echo $ARGS -no_affine -flip 1 -o $NAME/flip
         break
     done | xargs -P 2 -n 1 -d '\n' bash -c
 fi
 
-../../fourier-apic/region-vort $NAME/apic 4.6 -2 6 2 > $NAME/apic.log &
-../../fourier-apic/region-vort $NAME/flip 4.6 -2 6 2 > $NAME/flip.log &
-wait
+../../fourier-apic/region-vort $NAME/apic 4.6 -2 6 2 > $NAME/apic.log
+../../fourier-apic/region-vort $NAME/xpic2 4.6 -2 6 2 > $NAME/xpic2.log
+../../fourier-apic/region-vort $NAME/xpic3 4.6 -2 6 2 > $NAME/xpic3.log
+../../fourier-apic/region-vort $NAME/xpic5 4.6 -2 6 2 > $NAME/xpic5.log
 
-for a in apic flip ; do
+for a in apic xpic2 xpic3 xpic5 ; do
     grep -o "window vorticity:[^<]\+" $NAME/$a.log | sed "s/.\+(\(.\+\))/\1/g" > $NAME/$a-vort
     grep -o "window vorticity:[^<]\+" $NAME/$a.log | sed "s/.\+: \([^ (]\+\).\+/\1/g" > $NAME/$a-time
 done
 
-# MATLAB code to extract the frequency.
+# Octave code to extract the frequency.
 cp freq.m $NAME
-cp data_zeros.m $NAME
-cp gen_period.m $NAME
 (
     cd $NAME
-    matlab -nosplash -nodesktop -r "freq('flip',1000);exit" > flip-fft
-    matlab -nosplash -nojvm -r "gen_period('flip',1000);exit"
-    matlab -nosplash -nodesktop -r "freq('apic',1000);exit" > apic-fft
-    matlab -nosplash -nojvm -r "gen_period('apic',1000);exit"
+    octave --eval "freq('apic',2000);exit" > apic-fft
+    octave --eval "freq('xpic2',2000);exit" > xpic2-fft
+    octave --eval "freq('xpic3',2000);exit" > xpic3-fft
+    octave --eval "freq('xpic5',2000);exit" > xpic5-fft
 )
 
-flip_freq=`grep 'Period' $NAME/flip-fft | sed "s/Period: \(.\+\)./\1/g"`
-apic_freq=`grep 'Period' $NAME/apic-fft | sed "s/Period: \(.\+\)./\1/g"`
-sed -e "s/AAAAAA/$apic_freq/g; s/FFFFFF/$flip_freq/g" vortex_shedding_periods.tex  > $NAME/vortex-shedding-periods.tex
-
+MAXVORT=8
+frames=(1700 1706 1708 1691)
+algos=(apic xpic2 xpic3 xpic5)
+O=$(readlink -m '../dump_vort')
 (
 cd $NAME
-for a in apic flip ; do
-    ../../../opengl_2d/opengl_2d $a -offscreen -start_frame $FRAME -stop_frame $FRAME -so vortex-shedding-$a-$FRAME.png -keys "m6sVvsNs"
-    convert -crop 1024x512+0+128 vortex-shedding-$a-$FRAME.png vortex-shedding-$a-$FRAME.png
+for a in `seq 0 $((${#algos[@]}-1))` ; do
+    x=${algos[$a]}
+    f=${frames[$a]}
+    $O $NAME/$x -frame $f -vmin 0 -vmax $MAXVORT -o vortex-shedding-$x-$f;
 done
 )
 
-sed -e "s/XXXXXX/vortex-shedding-apic-1600.png/g" vortex_shedding_window_vorticity.tex > $NAME/vortex-shedding-apic.tex
-sed -e "s/XXXXXX/vortex-shedding-flip-1600.png/g" vortex_shedding_window_vorticity.tex > $NAME/vortex-shedding-flip.tex
+for a in `seq 0 $((${#algos[@]}-1))` ; do
+    x=${algos[$a]}
+    f=${frames[$a]}
+    sed -e "s/XXXXXX/vortex-shedding-$x-$f.png/g" vortex_shedding_window_vorticity.tex > $NAME/vortex-shedding-$x.tex
+done
 
 cat <<EOF > $NAME/SConstruct
 import os
