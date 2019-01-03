@@ -1471,7 +1471,7 @@ Level_Set_Pressure_Projection()
 
     CUT_CELL_PROJECTION<TV> proj;
     proj.object_phi=&object_phi;
-    if(example.use_phi) proj.surface_phi=&example.phi;
+    if(!example.disable_free_surface) proj.surface_phi=&example.phi;
     proj.valid_u=&example.valid_xfer_data;
     for(int s=0;s<2*TV::m;s++)
         switch(example.bc_type(s)){

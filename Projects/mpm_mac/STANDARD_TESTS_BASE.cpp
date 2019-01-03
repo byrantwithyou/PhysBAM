@@ -47,7 +47,6 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     bool use_quasi_exp_F_update=false;
     bool use_separate=false,use_slip=false,use_stick=false;
     bool print_stats=false;
-    bool disable_free_surface=false;
     parse_args.Extra(&test_number,"example number","example number to run");
     parse_args.Add("-restart",&restart,"frame","restart frame");
     parse_args.Add("-resolution",&resolution,&user_resolution,"resolution","grid resolution");
@@ -107,8 +106,8 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-obj_extrap",&use_object_extrap,"extrapolate velocities inside objects");
     parse_args.Add("-rk",&rk_particle_order,"order","rk order");
     parse_args.Add("-mls",&this->use_mls_xfers,"Use moving least squares transfers");
-    parse_args.Add("-phi",&this->use_level_set_projection,"Use level sets for projection");
-    parse_args.Add("-no_surface",&disable_free_surface,"Do not construct free surface level set");
+    parse_args.Add("-lsproj",&this->use_level_set_projection,"Use level sets for projection");
+    parse_args.Add("-no_surface",&this->disable_free_surface,"Do not construct free surface level set");
     parse_args.Add("-reseed",&this->use_reseeding,"Reseed particles");
     parse_args.Add("-analytic_u",&analytic_u_expr,"expr","Analytic velocity expression");
     parse_args.Add("-analytic_p",&analytic_p_expr,"expr","Analytic pressure expression");
@@ -124,7 +123,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     if(use_stick) forced_collision_type=COLLISION_TYPE::stick;
     if(use_separate) forced_collision_type=COLLISION_TYPE::separate;
 
-    if(this->use_level_set_projection && !disable_free_surface)
+    if((this->use_level_set_projection && !this->disable_free_surface) || this->use_reseeding)
         this->use_phi=true;
 
     this->debug_particles.debug_particles.template Add_Array<T>("display_size");

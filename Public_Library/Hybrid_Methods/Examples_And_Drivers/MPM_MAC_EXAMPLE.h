@@ -60,6 +60,7 @@ public:
     GRID<TV> levelset_grid;
     ARRAY<T,TV_INT> phi;
     LEVELSET<TV>& levelset;
+    bool disable_free_surface=false;
 
     // XPIC stuff
     int xpic=0;
