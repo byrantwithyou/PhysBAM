@@ -61,7 +61,7 @@ public:
     {X=Get_Uniform_Vector<TV>(box);}
 
     template<class T2,class T_ARRAY,class ID> void Random_Shuffle(ARRAY_BASE<T2,T_ARRAY,ID>& array)
-    {T_ARRAY& derived=array.Derived();for(ID i(derived.Size()-1);i>=ID(0);i--) exchange(array(i),array(Get_Uniform_Integer(0,i+1)));}
+    {T_ARRAY& derived=array.Derived();for(ID i(derived.Size()-1);i>=ID(0);i--) exchange(array(i),array(Get_Uniform_Integer(0,i)));}
 
 //#####################################################################
     void Set_Seed(const unsigned int seed_input=time(0));
