@@ -350,8 +350,9 @@ Particle_To_Grid()
     indices_h.Combine();
     if(example.flip){
         if(example.extrap_type!='p' && !example.use_mls_xfers)
-            Extrapolate_Velocity(example.velocity,false,true);
-        example.velocity_save=example.velocity;}
+            Extrapolate_Velocity(example.velocity,false,true);}
+    if(example.flip || example.xpic)
+        example.velocity_save=example.velocity;
 }
 //#####################################################################
 // Function Build_Level_Sets
