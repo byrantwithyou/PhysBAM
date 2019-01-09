@@ -414,6 +414,7 @@ Reseeding()
     for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
         ARRAY<int>& a=particle_counts(it.index);
         int target=target_ppc;
+        target=2;
         // if(abs(example.phi(it.index))<dx) target*=4;
         if(a.m<target){
             bool broad_phase_inside=false;
@@ -441,9 +442,9 @@ Reseeding()
                     example.particles.mass(p)=uniform_mass;
                     example.particles.V(p)=li.Clamped_To_Array(example.velocity,X);
                     example.particles.X(p)=X;}}}
-        if(a.m>2*target){
+        if(a.m>2*(1<<TV::m)){
             example.random.Random_Shuffle(a);
-            while(a.m>2*target)
+            while(a.m>2*(1<<TV::m))
                 Invalidate_Particle(a.Pop_Value());}}
     Update_Simulated_Particles();
     Update_Particle_Weights();
