@@ -157,6 +157,7 @@ public:
     bool particle_vort=false;
     bool use_object_extrap=false;
     bool use_mls_xfers=false;
+    bool zero_invalid=false;
     
     MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type_input);
     MPM_MAC_EXAMPLE(const MPM_MAC_EXAMPLE&) = delete;

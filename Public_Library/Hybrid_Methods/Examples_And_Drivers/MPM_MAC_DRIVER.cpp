@@ -1507,6 +1507,13 @@ Level_Set_Pressure_Projection()
         proj.valid_p=&example.pressure_valid;}
     
     proj.Cut_Cell_Projection(example.grid,example.ghost,example.velocity,example.density,example.dt);
+
+    if(example.use_mls_xfers && example.zero_invalid){
+    for(FACE_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
+        for(int i=0;i<example.collision_objects.m;i++){
+            if(example.collision_objects(i)->Phi(it.Location(),example.time)<0 && !example.valid_xfer_data(it.face)){
+                example.valid_xfer_data(it.face)=true;
+                example.velocity(it.face)=0;}}}}
 }
 //#####################################################################
 namespace PhysBAM{
