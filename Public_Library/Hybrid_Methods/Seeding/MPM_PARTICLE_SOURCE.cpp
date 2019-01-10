@@ -69,7 +69,12 @@ Seed_Points(ARRAY_VIEW<const TV> X)
     for(int i=0;i<X.m;i++){
         TV Y=frame.Inverse_Times(X(i));
         Y.x=-Y.x;
-        if(Y.x>=-2*poisson_disk.h)
+        bool inside=true;
+        for(int j=1;j<TV::m;j++){
+            if(Y(j)<sample_box.min_corner(j) || Y(j)>sample_box.max_corner(j)){
+                inside=false;
+                break;}}
+        if(Y.x>=-2*poisson_disk.h && inside)
             seed_X.Append(Y);}
 }
 namespace PhysBAM{
