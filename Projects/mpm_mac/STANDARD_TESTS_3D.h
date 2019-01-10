@@ -41,6 +41,9 @@ public:
     using BASE::extra_T;using BASE::extra_int;
     using BASE::Set_Grid;
     using BASE::gravity;using BASE::density;
+    using BASE::BC_FREE;using BASE::BC_SLIP;
+    using BASE::bc_type;
+    using BASE::bc_velocity;using BASE::Add_Source;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();
