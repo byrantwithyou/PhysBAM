@@ -27,7 +27,7 @@ MPM_MAC_EXAMPLE(const STREAM_TYPE stream_type)
     periodic_boundary(*new BOUNDARY_MAC_GRID_PERIODIC<TV,T>),
     debug_particles(*new DEBUG_PARTICLES<TV>)
 {
-    bc_type.Fill(BC_SLIP);
+    side_bc_type.Fill(BC_SLIP);
 }
 //#####################################################################
 // Destructor

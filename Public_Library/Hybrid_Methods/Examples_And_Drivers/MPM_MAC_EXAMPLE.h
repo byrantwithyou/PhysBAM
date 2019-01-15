@@ -77,7 +77,7 @@ public:
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
     MPM_PROJECTION_VECTOR<TV>& sol;
     MPM_PROJECTION_VECTOR<TV>& rhs;
-    VECTOR<BC_TYPE,TV::m*2> bc_type; // -x, +x, -y, +y, -z, +z
+    VECTOR<BC_TYPE,TV::m*2> side_bc_type; // -x, +x, -y, +y, -z, +z
     // Valid if BC_SLIP or BC_NOSLIP; velocity at face. null=0
     std::function<TV(const TV& X,T)> bc_velocity=0;
     // Valid if BC_FREE; pressure at ghost cell. null=0

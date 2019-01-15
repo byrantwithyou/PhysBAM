@@ -215,7 +215,7 @@ Seed_Particles_Poisson(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> 
     std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,T particles_per_cell)
 {
     ARRAY<TV> X;
-    for(int i=0;i<TV::m;i++) poisson_disk.is_periodic(i)=(bc_type(i)==BC_PERIODIC);
+    for(int i=0;i<TV::m;i++) poisson_disk.is_periodic(i)=(side_bc_type(i)==BC_PERIODIC);
     poisson_disk.Set_Distance_By_Volume(grid.dX.Product()/particles_per_cell);
     poisson_disk.Sample(random,object,X);
 
@@ -476,7 +476,7 @@ Velocity_Fourier_Analysis() const
     int num_l2_u=0;
     auto valid=[&](FACE_INDEX<TV::m> face){return mass(face) && (this->psi_N.domain_indices.Empty() || !this->psi_N(face));};
     for(FACE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
-        if(bc_type(2*it.face.axis)==BC_PERIODIC)
+        if(side_bc_type(2*it.face.axis)==BC_PERIODIC)
             if(it.face.index(it.face.axis)==grid.numbers_of_cells(it.face.axis))
                 continue;
         if(!valid(it.face)) continue;
@@ -572,10 +572,10 @@ Commandline_Analytic_test()
         PHYSBAM_ASSERT(analytic_bc_types.size()==2*TV::m);
         for(int i=0;i<2*TV::m;i++){
             switch(analytic_bc_types[i]){
-                case 'p':this->bc_type(i)=BASE::BC_PERIODIC;break;
-                case 'f':this->bc_type(i)=BASE::BC_FREE;break;
-                case 'n':this->bc_type(i)=BASE::BC_NOSLIP;break;
-                case 's':this->bc_type(i)=BASE::BC_SLIP;break;
+                case 'p':this->side_bc_type(i)=BASE::BC_PERIODIC;break;
+                case 'f':this->side_bc_type(i)=BASE::BC_FREE;break;
+                case 'n':this->side_bc_type(i)=BASE::BC_NOSLIP;break;
+                case 's':this->side_bc_type(i)=BASE::BC_SLIP;break;
                 default: PHYSBAM_FATAL_ERROR();break;}}}
     end_frame.Append([=](int frame){Check_Analytic_Velocity();});
 }

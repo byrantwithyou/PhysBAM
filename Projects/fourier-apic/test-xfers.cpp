@@ -145,7 +145,7 @@ int main(int argc, char* argv[])
     example.gather_scatter->weights=example.weights(0);
     example.gather_scatter->Prepare_Scatter(example.particles);
     example.periodic_boundary.is_periodic.Fill(true);
-    example.bc_type.Fill(example.BC_PERIODIC);
+    example.side_bc_type.Fill(example.BC_PERIODIC);
     example.particles.Store_B(example.use_affine);
     driver.Update_Simulated_Particles();
     driver.Update_Particle_Weights();

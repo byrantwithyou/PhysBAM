@@ -149,7 +149,7 @@ int main(int argc, char* argv[])
     example.mass.Resize(example.grid.Cell_Indices(3));
     example.gather_scatter->Prepare_Scatter(example.particles);
     example.periodic_boundary.is_periodic.Fill(true);
-    example.bc_type.Fill(example.BC_PERIODIC);
+    example.side_bc_type.Fill(example.BC_PERIODIC);
     example.particles.Store_B(example.use_affine);
     if(example.xpic) example.particles.template Add_Array<TV>("effective_v",&example.effective_v);
     example.velocity(FACE_INDEX<TV::m>(0,center))=1;

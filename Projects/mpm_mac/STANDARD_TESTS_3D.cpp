@@ -75,11 +75,11 @@ Initialize()
             T velocity=extra_T.m>=1?extra_T(0):0.25,stop_time=extra_T.m>=2?extra_T(1):2;
             Set_Grid(RANGE<TV>::Unit_Box());
             Seed_Particles(grid.domain,0,0,density,particles_per_cell);
-            bc_type(3)=BC_FREE;
+            side_bc_type(3)=BC_FREE;
             bc_velocity=[=](const TV& X,T time)
             {
                 if(time>=stop_time+2*dt)
-                    bc_type(3)=BC_SLIP;
+                    side_bc_type(3)=BC_SLIP;
                 return TV(0,(time<stop_time+2*dt&&abs(X.x-0.5)<=.125&&abs(X.z-0.5)<=.125&&X.y<0.001)?velocity:0,0);
             };
             RANGE<TV> source_range=grid.domain;

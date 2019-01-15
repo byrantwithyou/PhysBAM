@@ -141,7 +141,7 @@ int main(int argc, char* argv[])
     example.mass.Resize(example.grid.Cell_Indices(3));
     example.gather_scatter->Prepare_Scatter(example.particles);
     example.periodic_boundary.is_periodic.Fill(true);
-    example.bc_type.Fill(example.BC_PERIODIC);
+    example.side_bc_type.Fill(example.BC_PERIODIC);
     example.particles.Store_B(example.use_affine);
     example.velocity(FACE_INDEX<TV::m>(0,center))=1;
     driver.Update_Simulated_Particles();

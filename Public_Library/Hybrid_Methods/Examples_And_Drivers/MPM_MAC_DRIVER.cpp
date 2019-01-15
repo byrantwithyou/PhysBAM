@@ -94,8 +94,8 @@ Initialize()
 
     example.Initialize();
     for(int i=0;i<TV::m;i++){
-        bool a=example.bc_type(i*2)==example.BC_PERIODIC;
-        bool b=example.bc_type(i*2+1)==example.BC_PERIODIC;
+        bool a=example.side_bc_type(i*2)==example.BC_PERIODIC;
+        bool b=example.side_bc_type(i*2+1)==example.BC_PERIODIC;
         PHYSBAM_ASSERT(a==b);
         example.periodic_boundary.is_periodic(i)=a;}
 
@@ -267,7 +267,7 @@ Extrapolate_Boundary(ARRAY<T,FACE_INDEX<TV::m> >& velocity) const
     for(int n=example.weights[0]->stencil_width-2;n>0;--n) // assume all dimensions use the same interpolation order
         for(FACE_RANGE_ITERATOR<TV::m> it(example.grid.Domain_Indices(),1-n,-n,
                 RF::ghost|RF::skip_inner|RF::delay_corners);it.Valid();it.Next()){
-            if(example.bc_type(it.side)==example.BC_PERIODIC) return;
+            if(example.side_bc_type(it.side)==example.BC_PERIODIC) return;
             int side_axis=it.side/2;
             int sign_out=it.side%2?1:-1;
             auto further=[=](FACE_INDEX<TV::m> f){f.index(side_axis)-=sign_out;return f;};
@@ -615,7 +615,7 @@ Neumann_Boundary_Condition(const FACE_INDEX<TV::m>& face,T& bc) const
         domains(i)=example.grid.Domain_Indices();
         domains(i).min_corner(i)++;}
     for(int i=0;i<TV::m;i++){
-        bool wall=example.bc_type(2*i)==example.BC_SLIP||example.bc_type(2*i)==example.BC_NOSLIP;
+        bool wall=example.side_bc_type(2*i)==example.BC_SLIP||example.side_bc_type(2*i)==example.BC_NOSLIP;
         if(face.index(i)<domains(face.axis).min_corner(i) && wall){
             if(example.mass(face)){
                 bc=0;
@@ -623,7 +623,7 @@ Neumann_Boundary_Condition(const FACE_INDEX<TV::m>& face,T& bc) const
                     TV X=example.grid.domain.Clamp(example.grid.Face(face));
                     bc=example.bc_velocity(X,example.time)(face.axis);}}
             return true;}
-        wall=example.bc_type(2*i+1)==example.BC_SLIP||example.bc_type(2*i+1)==example.BC_NOSLIP;
+        wall=example.side_bc_type(2*i+1)==example.BC_SLIP||example.side_bc_type(2*i+1)==example.BC_NOSLIP;
         if(face.index(i)>=domains(face.axis).max_corner(i) && wall){
             if(example.mass(face)){
                 bc=0;
@@ -667,9 +667,9 @@ Allocate_Projection_System_Variable()
     example.cell_index.Resize(example.grid.Domain_Indices(ghost),no_init);
     for(int s=0;s<2*TV::m;s++){
         int value=pressure_uninit;
-        typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.bc_type(s);
+        typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.side_bc_type(s);
         if(bc_type==example.BC_SLIP || bc_type==example.BC_NOSLIP) value=pressure_N;
-        else if(example.bc_type(s)==example.BC_FREE) value=pressure_D;
+        else if(example.side_bc_type(s)==example.BC_FREE) value=pressure_D;
         for(CELL_ITERATOR<TV> it(example.grid,ghost,GRID<TV>::GHOST_REGION,s);it.Valid();it.Next())
             example.cell_index(it.index)=value;}
 
@@ -774,7 +774,7 @@ Compute_Gradient(int nvar)
                 if(c0>=0) example.rhs.v(c0)-=rhs;
                 if(c1>=0) example.rhs.v(c1)+=rhs;
                 continue;}
-            if(example.bc_type(it.axis)==example.BC_PERIODIC)
+            if(example.side_bc_type(it.axis)==example.BC_PERIODIC)
                 if(it.index(it.axis)==example.grid.numbers_of_cells(it.axis))
                     continue;
 
@@ -966,7 +966,7 @@ Prepare_Scatter()
 template<class TV> template<class T2> void MPM_MAC_DRIVER<TV>::
 Fix_Periodic(ARRAY<T2,TV_INT>& u,int ghost) const
 {
-    if(!example.bc_type.Contains(example.BC_PERIODIC)) return;
+    if(!example.side_bc_type.Contains(example.BC_PERIODIC)) return;
     if(ghost==INT_MAX) ghost=example.ghost;
     Fill_Ghost_Cells_Periodic(example.grid,u,u,example.periodic_boundary.is_periodic,ghost);
 }
@@ -976,7 +976,7 @@ Fix_Periodic(ARRAY<T2,TV_INT>& u,int ghost) const
 template<class TV> template<class T2> void MPM_MAC_DRIVER<TV>::
 Fix_Periodic(ARRAY<T2,FACE_INDEX<TV::m> >& u,int ghost) const
 {
-    if(!example.bc_type.Contains(example.BC_PERIODIC)) return;
+    if(!example.side_bc_type.Contains(example.BC_PERIODIC)) return;
     if(ghost==INT_MAX) ghost=example.ghost;
     Apply_Boundary_Condition_Face_Periodic(example.grid,u,example.periodic_boundary.is_periodic);
     Fill_Ghost_Faces_Periodic(example.grid,u,u,example.periodic_boundary.is_periodic,ghost);
@@ -987,7 +987,7 @@ Fix_Periodic(ARRAY<T2,FACE_INDEX<TV::m> >& u,int ghost) const
 template<class TV> template<class T2> void MPM_MAC_DRIVER<TV>::
 Fix_Periodic_Accum(ARRAY<T2,TV_INT>& u,int ghost) const
 {
-    if(!example.bc_type.Contains(example.BC_PERIODIC)) return;
+    if(!example.side_bc_type.Contains(example.BC_PERIODIC)) return;
     if(ghost==INT_MAX) ghost=example.ghost;
     Fill_Ghost_Cells_Periodic_Accum(example.grid,u,u,example.periodic_boundary.is_periodic,ghost);
 }
@@ -997,7 +997,7 @@ Fix_Periodic_Accum(ARRAY<T2,TV_INT>& u,int ghost) const
 template<class TV> template<class T2> void MPM_MAC_DRIVER<TV>::
 Fix_Periodic_Accum(ARRAY<T2,FACE_INDEX<TV::m> >& u,int ghost) const
 {
-    if(!example.bc_type.Contains(example.BC_PERIODIC)) return;
+    if(!example.side_bc_type.Contains(example.BC_PERIODIC)) return;
     if(ghost==INT_MAX) ghost=example.ghost;
     Fill_Ghost_Faces_Periodic_Accum(example.grid,u,u,example.periodic_boundary.is_periodic,ghost);
 }
@@ -1105,7 +1105,7 @@ Reflect_Boundary(D func_d,N func_n,RF flag) const
     RANGE<TV_INT> domain=example.grid.Domain_Indices(0);
     TV_INT corner[2]={domain.min_corner,domain.max_corner};
     for(FACE_RANGE_ITERATOR<TV::m> it(domain,example.ghost,0,flag);it.Valid();it.Next()){
-        typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.bc_type(it.side);
+        typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.side_bc_type(it.side);
         if(bc_type==example.BC_PERIODIC) continue;
         int side_axis=it.side/2;
         FACE_INDEX<TV::m> f=it.face;
@@ -1130,7 +1130,7 @@ Extrapolate_Velocity(ARRAY<T,FACE_INDEX<TV::m> >& velocity,bool use_bc,bool extr
         for(int j=0;j<TV::m;j++) if(i!=j)
             bound[i](j)++;}
     for(FACE_RANGE_ITERATOR<TV::m> it(ghost_domain,domain,RF::ghost|RF::skip_inner|RF::delay_corners);it.Valid();it.Next()){
-        typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.bc_type(it.side);
+        typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.side_bc_type(it.side);
         if(bc_type==example.BC_PERIODIC) continue;
         int side_axis=it.side/2;
         bool normal=side_axis==it.face.axis;
@@ -1229,7 +1229,7 @@ Apply_Viscosity()
         // Allocate velocities that will be corrected; copy over initial guess
         for(CELL_ITERATOR<TV> it(face_grid);it.Valid();it.Next()){
             FACE_INDEX<TV::m> face(axis,it.index);
-            if(example.bc_type(axis)==example.BC_PERIODIC)
+            if(example.side_bc_type(axis)==example.BC_PERIODIC)
                 if(it.index(axis)==example.grid.numbers_of_cells(axis))
                     continue;
             if(p_psi_D(face.First_Cell_Index()) && p_psi_D(face.Second_Cell_Index()))
@@ -1247,7 +1247,7 @@ Apply_Viscosity()
             int index=face.index(face.axis);
             bool boundary=index==example.grid.Domain_Indices().min_corner(face.axis)||
                 index==example.grid.Domain_Indices().max_corner(face.axis);
-            if(boundary && example.bc_type(2*face.axis+s)==example.BC_SLIP) return true;
+            if(boundary && example.side_bc_type(2*face.axis+s)==example.BC_SLIP) return true;
             if(p_psi_D(a) && p_psi_D(b)) return true;
             a(face.axis)--;
             b(face.axis)--;
@@ -1269,7 +1269,7 @@ Apply_Viscosity()
             for(CELL_ITERATOR_THREADED<TV> it(face_grid,0);it.Valid();it.Next()){
                 int center_index=velocity_index(it.index);
                 if(center_index<0) continue;
-                if(example.bc_type(axis)==example.BC_PERIODIC)
+                if(example.side_bc_type(axis)==example.BC_PERIODIC)
                     if(it.index(axis)==example.grid.numbers_of_cells(axis))
                         continue;
 
@@ -1374,7 +1374,7 @@ Move_Particles()
                     if(x<wall[0](i)) side=0;
                     else if(x>wall[1](i)) side=1;
                     else continue;
-                    typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.bc_type(2*i+side);
+                    typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.side_bc_type(2*i+side);
                     if(bc_type==example.BC_PERIODIC) x=wrap(x,wall[0](i),wall[1](i));
                     else if(bc_type==example.BC_FREE) invalidate_list.Append(p);
                     else if(example.clamp_particles) x=wall[side](i);}
@@ -1487,7 +1487,7 @@ Level_Set_Pressure_Projection()
     if(!example.disable_free_surface) proj.surface_phi=&example.phi;
     proj.valid_u=&example.valid_xfer_data;
     for(int s=0;s<2*TV::m;s++)
-        switch(example.bc_type(s)){
+        switch(example.side_bc_type(s)){
             case MPM_MAC_EXAMPLE<TV>::BC_FREE:proj.bc_type(s)=1;break;
             case MPM_MAC_EXAMPLE<TV>::BC_SLIP:case MPM_MAC_EXAMPLE<TV>::BC_NOSLIP:proj.bc_type(s)=2;break;
             case MPM_MAC_EXAMPLE<TV>::BC_PERIODIC:proj.bc_type(s)=0;continue;}
