@@ -78,6 +78,7 @@ public:
     MPM_PROJECTION_VECTOR<TV>& sol;
     MPM_PROJECTION_VECTOR<TV>& rhs;
     VECTOR<BC_TYPE,TV::m*2> side_bc_type; // -x, +x, -y, +y, -z, +z
+    std::function<BC_TYPE(const TV& X,T)> bc_type=0;
     // Valid if BC_SLIP or BC_NOSLIP; velocity at face. null=0
     std::function<TV(const TV& X,T)> bc_velocity=0;
     // Valid if BC_FREE; pressure at ghost cell. null=0

@@ -615,22 +615,24 @@ Neumann_Boundary_Condition(const FACE_INDEX<TV::m>& face,T& bc) const
         domains(i)=example.grid.Domain_Indices();
         domains(i).min_corner(i)++;}
     for(int i=0;i<TV::m;i++){
-        bool wall=example.side_bc_type(2*i)==example.BC_SLIP||example.side_bc_type(2*i)==example.BC_NOSLIP;
-        if(face.index(i)<domains(face.axis).min_corner(i) && wall){
-            if(example.mass(face)){
-                bc=0;
-                if(example.bc_velocity){
-                    TV X=example.grid.domain.Clamp(example.grid.Face(face));
-                    bc=example.bc_velocity(X,example.time)(face.axis);}}
-            return true;}
-        wall=example.side_bc_type(2*i+1)==example.BC_SLIP||example.side_bc_type(2*i+1)==example.BC_NOSLIP;
-        if(face.index(i)>=domains(face.axis).max_corner(i) && wall){
-            if(example.mass(face)){
-                bc=0;
-                if(example.bc_velocity){
-                    TV X=example.grid.domain.Clamp(example.grid.Face(face));
-                    bc=example.bc_velocity(X,example.time)(face.axis);}}
-            return true;}}
+        bool wall=false;
+        TV Y=example.grid.domain.Clamp(example.grid.Face(face));
+        if(face.index(i)<domains(face.axis).min_corner(i)){
+            wall=example.side_bc_type(2*i)==example.BC_SLIP||example.side_bc_type(2*i)==example.BC_NOSLIP;
+            if(example.bc_type){
+                auto bc_type=example.bc_type(Y,example.time);
+                wall=bc_type==example.BC_SLIP||bc_type==example.BC_NOSLIP;}}
+        else if(face.index(i)>=domains(face.axis).max_corner(i)){
+            wall=example.side_bc_type(2*i+1)==example.BC_SLIP||example.side_bc_type(2*i+1)==example.BC_NOSLIP;
+            if(example.bc_type){
+                auto bc_type=example.bc_type(Y,example.time);
+                wall=bc_type==example.BC_SLIP||bc_type==example.BC_NOSLIP;}}
+        if(!wall) continue;
+        if(example.mass(face)){
+            bc=0;
+            if(example.bc_velocity)
+                bc=example.bc_velocity(Y,example.time)(face.axis);}
+        return true;}
     TV X=example.grid.Face(face);
     for(int i=0;i<example.collision_objects.m;i++){
         MPM_COLLISION_OBJECT<TV>* o=example.collision_objects(i);
@@ -666,12 +668,15 @@ Allocate_Projection_System_Variable()
     int ghost=2;
     example.cell_index.Resize(example.grid.Domain_Indices(ghost),no_init);
     for(int s=0;s<2*TV::m;s++){
-        int value=pressure_uninit;
-        typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.side_bc_type(s);
-        if(bc_type==example.BC_SLIP || bc_type==example.BC_NOSLIP) value=pressure_N;
-        else if(example.side_bc_type(s)==example.BC_FREE) value=pressure_D;
-        for(CELL_ITERATOR<TV> it(example.grid,ghost,GRID<TV>::GHOST_REGION,s);it.Valid();it.Next())
-            example.cell_index(it.index)=value;}
+        for(CELL_ITERATOR<TV> it(example.grid,ghost,GRID<TV>::GHOST_REGION,s);it.Valid();it.Next()){
+            auto bc_type=example.side_bc_type(s);
+            if(example.bc_type){
+                TV Y=example.grid.domain.Clamp(example.grid.Center(it.index));
+                bc_type=example.bc_type(Y,example.time);}
+            int value=pressure_uninit;
+            if(bc_type==example.BC_SLIP || bc_type==example.BC_NOSLIP) value=pressure_N;
+            else if(example.side_bc_type(s)==example.BC_FREE) value=pressure_D;
+            example.cell_index(it.index)=value;}}
 
     int nvar=0;
     for(CELL_ITERATOR<TV> it(example.grid);it.Valid();it.Next()){
@@ -1105,12 +1110,15 @@ Reflect_Boundary(D func_d,N func_n,RF flag) const
     RANGE<TV_INT> domain=example.grid.Domain_Indices(0);
     TV_INT corner[2]={domain.min_corner,domain.max_corner};
     for(FACE_RANGE_ITERATOR<TV::m> it(domain,example.ghost,0,flag);it.Valid();it.Next()){
-        typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.side_bc_type(it.side);
+        auto bc_type=example.side_bc_type(it.side);
         if(bc_type==example.BC_PERIODIC) continue;
         int side_axis=it.side/2;
         FACE_INDEX<TV::m> f=it.face;
         f.index(side_axis)=2*corner[it.side%2](side_axis)-it.face.index(side_axis);
         if(side_axis!=it.face.axis) f.index(side_axis)-=1;
+        if(example.bc_type){
+            TV Y=example.grid.domain.Clamp(example.grid.Face(it.face));
+            bc_type=example.bc_type(Y,example.time);}
         if((bc_type==example.BC_SLIP && it.side/2==it.face.axis) || bc_type==example.BC_NOSLIP)
             func_d(f,it.face,it.side);
         else func_n(f,it.face,it.side);}
@@ -1121,6 +1129,7 @@ Reflect_Boundary(D func_d,N func_n,RF flag) const
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Extrapolate_Velocity(ARRAY<T,FACE_INDEX<TV::m> >& velocity,bool use_bc,bool extrapolate_boundary) const
 {
+    PHYSBAM_ASSERT(!example.bc_type);
     if(extrapolate_boundary) Extrapolate_Boundary(velocity);
     RANGE<TV_INT> domain=example.grid.Domain_Indices(0);
     RANGE<TV_INT> ghost_domain=example.grid.Domain_Indices(example.ghost);
@@ -1214,6 +1223,7 @@ template<class TV> void MPM_MAC_DRIVER<TV>::
 Apply_Viscosity()
 {
     TIMER_SCOPE_FUNC;
+    PHYSBAM_ASSERT(!example.bc_type);
     typedef KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > VEC;
     typedef MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_MXN<T>,T,VEC> MAT;
     if(!example.viscosity) return;
@@ -1374,9 +1384,14 @@ Move_Particles()
                     if(x<wall[0](i)) side=0;
                     else if(x>wall[1](i)) side=1;
                     else continue;
-                    typename MPM_MAC_EXAMPLE<TV>::BC_TYPE bc_type=example.side_bc_type(2*i+side);
-                    if(bc_type==example.BC_PERIODIC) x=wrap(x,wall[0](i),wall[1](i));
-                    else if(bc_type==example.BC_FREE) invalidate_list.Append(p);
+                    auto bc_type=example.side_bc_type(2*i+side);
+                    if(bc_type==example.BC_PERIODIC){
+                        x=wrap(x,wall[0](i),wall[1](i));
+                        continue;}
+                    if(example.bc_type){
+                        TV Y=example.grid.domain.Clamp(example.particles.X(p));
+                        bc_type=example.bc_type(Y,example.time);}
+                    if(bc_type==example.BC_FREE) invalidate_list.Append(p);
                     else if(example.clamp_particles) x=wall[side](i);}
 
                 TV X=example.particles.X(p);
@@ -1473,6 +1488,7 @@ template<class TV> void MPM_MAC_DRIVER<TV>::
 Level_Set_Pressure_Projection()
 {
     TIMER_SCOPE_FUNC;
+    PHYSBAM_ASSERT(!example.bc_type);
     ARRAY<T,TV_INT> object_phi(example.grid.Node_Indices(example.ghost));
     T def_dep=3*example.grid.dX.Max();
     for(RANGE_ITERATOR<TV::m> it(object_phi.domain);it.Valid();it.Next()){
