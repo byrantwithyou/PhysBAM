@@ -35,6 +35,7 @@ class MPM_PARTICLE_SOURCE
 {
 public:
     typedef typename TV::SCALAR T;
+    typedef int HAS_TYPED_READ_WRITE;
     
     TV X0,n; // Seed on plane containing point X0, normal direction n.
     IMPLICIT_OBJECT<TV>* io; // Only this part of the plane
@@ -60,6 +61,9 @@ public:
 
     // World space locations of seed points; try to fit new points to this.
     void Seed_Points(ARRAY_VIEW<const TV> X);
+
+    void Write(TYPED_OSTREAM output) const;
+    void Read(TYPED_ISTREAM input);
 };
 //#####################################################################
 }

@@ -70,9 +70,15 @@ Write_Output_Files(const int frame)
 #pragma omp task
         Write_To_File(stream_type,output_directory+"/common/grid",grid);
 #pragma omp task
-        Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
+        Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),
+            time,random,last_linear_momentum,last_angular_momentum,last_grid_te,last_grid_ke,
+            last_part_te,last_part_ke);
 #pragma omp task
-        Write_To_File(stream_type,LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
+        if(use_warm_start)
+            Write_To_File(stream_type,LOG::sprintf("%s/%d/pressure",output_directory.c_str(),frame),
+                pressure_save,pressure_valid);
+#pragma omp task
+        Write_To_File(stream_type,LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles,particles.deletion_list);
 #pragma omp task
         if(use_phi)
             Write_To_File(stream_type,LOG::sprintf("%s/%d/levelset",output_directory.c_str(),frame),levelset);
@@ -80,6 +86,9 @@ Write_Output_Files(const int frame)
         if(!only_write_particles){
 #pragma omp task
             Write_To_File(stream_type,LOG::sprintf("%s/%d/mac_velocities",output_directory.c_str(),frame),velocity);
+            if(xpic){
+#pragma omp task
+                Write_To_File(stream_type,LOG::sprintf("%s/%d/velocity_save",output_directory.c_str(),frame),velocity_save);}
 #pragma omp task
             {
                 GRID<TV> ghost_grid(grid.numbers_of_cells+2*ghost,grid.Ghost_Domain(ghost),true);
@@ -99,8 +108,15 @@ template<class TV> void MPM_MAC_EXAMPLE<TV>::
 Read_Output_Files(const int frame)
 {
     std::string f=LOG::sprintf("%d",frame);
-    Read_From_File(LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
-    Read_From_File(LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
+    Read_From_File(LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles,particles.deletion_list);
+    Read_From_File(LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),
+        time,random,last_linear_momentum,last_angular_momentum,last_grid_te,last_grid_ke,
+        last_part_te,last_part_ke);
+    if(xpic)
+        Read_From_File(LOG::sprintf("%s/%d/velocity_save",output_directory.c_str(),frame),velocity_save);
+    if(use_warm_start)
+        Read_From_File(LOG::sprintf("%s/%d/pressure",output_directory.c_str(),frame),
+            pressure_save,pressure_valid);
     for(int i=0;i<read_output_files.m;i++) read_output_files(i)(frame);
 }
 //#####################################################################

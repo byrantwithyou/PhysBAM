@@ -102,6 +102,11 @@ Initialize()
     // must have level sets in order to use level set projection
     if(example.use_level_set_projection) example.use_mls_xfers=true;
     if(example.use_mls_xfers) example.use_object_extrap=false;
+
+    if(example.xpic)
+        example.particles.template Add_Array<TV>("effective_v",&example.effective_v);
+    if(example.flip)
+        example.particles.template Add_Array<TV>("flip_adv_velocity",&example.flip_adv_velocity);
     
     PHYSBAM_ASSERT(example.grid.Is_MAC_Grid());
     if(example.restart) example.Read_Output_Files(example.restart);
@@ -136,20 +141,15 @@ Initialize()
     for(FACE_ITERATOR<TV> it(example.grid,example.ghost);it.Valid();it.Next())
         example.location(it.Full_Index())=it.Location();
 
-    if(example.xpic){
-        example.particles.template Add_Array<TV>("effective_v",&example.effective_v);}
-
     Update_Simulated_Particles();
     // Need grid velocities for initial advection step
     if(example.rk_particle_order || example.xpic){
         Update_Particle_Weights();
         Prepare_Scatter();
-        Particle_To_Grid();
-        if(example.xpic)
+        if(!example.restart) Particle_To_Grid();
+        if(example.xpic && !example.restart)
             Compute_Effective_Velocity();}
-    if(example.flip){
-        example.particles.template Add_Array<TV>("flip_adv_velocity",&example.flip_adv_velocity);
-        example.flip_adv_velocity=example.particles.V;}
+    if(example.flip && !example.restart) example.flip_adv_velocity=example.particles.V;
 
     example.force.Resize(example.grid.Domain_Indices(example.ghost));
 
@@ -1401,7 +1401,7 @@ Move_Particles()
                         example.particles.X(p)=o->Get_Implicit_Object(example.time)->Closest_Point_On_Boundary(X);
                         break;}}
             };
-        
+
         if(example.rk_particle_order && example.position_update=='d'){
             LINEAR_INTERPOLATION_MAC<TV,T> li(example.grid);
 #pragma omp for

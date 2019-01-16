@@ -77,6 +77,22 @@ Seed_Points(ARRAY_VIEW<const TV> X)
         if(Y.x>=-2*poisson_disk.h && inside)
             seed_X.Append(Y);}
 }
+//#####################################################################
+// Function Write
+//#####################################################################
+template<class TV> void MPM_PARTICLE_SOURCE<TV>::
+Write(TYPED_OSTREAM output) const
+{
+    Write_Binary(output,seed_X);
+}
+//#####################################################################
+// Function Read
+//#####################################################################
+template<class TV> void MPM_PARTICLE_SOURCE<TV>::
+Read(TYPED_ISTREAM input)
+{
+    Read_Binary(input,seed_X);
+}
 namespace PhysBAM{
 template class MPM_PARTICLE_SOURCE<VECTOR<float,3> >;
 template class MPM_PARTICLE_SOURCE<VECTOR<float,2> >;

@@ -536,6 +536,13 @@ Add_Source(const TV& X0,const TV& n,IMPLICIT_OBJECT<TV>* io,
             for(int i=0;i<X.m;i++)
                 Add_Particle(X(i),V(i),dV(i),mass,volume);});
     if(owns_io) destroy.Append([io](){delete io;});
+
+    static int source_id=0;
+    this->write_output_files.Append([=](int frame){
+            Write_To_File(stream_type,output_directory+LOG::sprintf("/%d/source-%d",frame,source_id),*source);});
+    this->read_output_files.Append([=](int frame){
+            Read_From_File(output_directory+LOG::sprintf("/%d/source-%d",frame,source_id),*source);});
+    source_id++;
 }
 //#####################################################################
 // Function Setup_Analytic_Boundary_Conditions
