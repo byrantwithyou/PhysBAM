@@ -706,6 +706,7 @@ template<class TV> void MPM_MAC_DRIVER<TV>::
 Compute_Laplacian(int nvar)
 {
     example.projection_system.A.Reset(nvar);
+    example.projection_system.dc_present=false;
     ARRAY<int> tmp0,tmp1;
     TV base_entry=example.grid.one_over_dX*example.grid.one_over_dX/example.density;
 #pragma omp parallel
