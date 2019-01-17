@@ -559,11 +559,13 @@ Compute_Effective_Velocity()
             });
 
         example.xpic_v.Fill(0);
+        example.mass.Fill(0);
         example.gather_scatter->template Scatter<int>(false,
             [this,&particles,f](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,int data)
             {
                 T w=it.Weight();
                 FACE_INDEX<TV::m> index=it.Index();
+                example.mass(index)+=w*particles.mass(p);
                 T V=w*example.effective_v(p)(index.axis);
                 example.xpic_v(index)+=f*particles.mass(p)*V;
             });
