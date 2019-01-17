@@ -90,7 +90,7 @@ template<class TV> void MPM_PROJECTION_SYSTEM<TV>::
 Compute_Ones_Nullspace()
 {
     null_u.v.Resize(A.m);
-    null_u.v.Fill(1/sqrt(A.m));
+    if(A.m!=0) null_u.v.Fill(1/sqrt(A.m));
 }
 //#####################################################################
 // Function Project_Nullspace
