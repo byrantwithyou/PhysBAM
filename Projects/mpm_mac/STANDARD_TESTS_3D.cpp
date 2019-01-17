@@ -72,32 +72,38 @@ Initialize()
         } break;
         case 28:{ // inlet-cube
             density=unit_rho*scale_mass;
-            T velocity=extra_T.m>=1?extra_T(0):0.25,stop_time=extra_T.m>=2?extra_T(1):2;
+            T velocity=extra_T.m>=1?extra_T(0):0.25,stop_time=extra_T.m>=2?extra_T(1):200*frame_dt;
             Set_Grid(RANGE<TV>::Unit_Box());
             Seed_Particles(grid.domain,0,0,density,particles_per_cell);
-            side_bc_type(3)=BC_FREE;
+            T inlet_center=0.625,inlet_half_width=0.125;
+            this->bc_type=[=](const TV& X,T time)
+            {
+                if(X.y>0.001*grid.dX(1) || time>stop_time) return BC_SLIP;
+                else if(abs(X.x-0.2)<=0.125/2 && abs(X.z-0.2)<=0.125/2) return BC_FREE;
+                else if(abs(X.x-0.9)<=0.125/2 && abs(X.z-0.9)<=0.125/2) return BC_FREE;
+                else return BC_SLIP;
+            };
             bc_velocity=[=](const TV& X,T time)
             {
-                if(time>=stop_time+2*dt)
-                    side_bc_type(3)=BC_SLIP;
-                return TV(0,(time<stop_time+2*dt&&abs(X.x-0.5)<=.125&&abs(X.z-0.5)<=.125&&X.y<0.001)?velocity:0,0);
+                return TV(0,(time<=stop_time &&
+                    abs(X.x-inlet_center)<=inlet_half_width &&
+                    abs(X.z-inlet_center)<=inlet_half_width && X.y<0.001)?velocity:0,0);
             };
             RANGE<TV> source_range=grid.domain;
             source_range.min_corner.y-=.5*grid.dX.y;
-            source_range.min_corner.x+=(T)3/8;
-            source_range.max_corner.x-=(T)3/8;
-            source_range.min_corner.z+=(T)3/8;
-            source_range.max_corner.z-=(T)3/8;
+            source_range.min_corner.x=inlet_center-inlet_half_width;
+            source_range.max_corner.x=inlet_center+inlet_half_width;
+            source_range.min_corner.z=inlet_center-inlet_half_width;
+            source_range.max_corner.z=inlet_center+inlet_half_width;
             source_range.max_corner.y=0;
             TV X0=source_range.min_corner;
-            X0.x+=(T)1/4;
-            X0.z+=(T)1/4;
+            X0.x+=2*inlet_half_width;
+            X0.z+=2*inlet_half_width;
             Add_Source(X0,TV(0,1,0),Make_IO(source_range),
                 [=](TV X,T ts,T t,SOURCE_PATH<TV>& p)
                 {
-                    p.vp=TV();
-                    if(time+dt<stop_time)
-                        p.vp=TV(0,velocity,0);
+                    p.vp=TV(0,velocity,0);
+                    if(time>stop_time) p.vp=TV();
                     p.xp=X+(t-ts)*p.vp;
                     p.xp_ts=-p.vp;
                     p.vp_ts=TV();
