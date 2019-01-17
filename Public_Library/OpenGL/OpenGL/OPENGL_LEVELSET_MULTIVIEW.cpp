@@ -320,8 +320,9 @@ Bounding_Box() const
     if(levelset) return World_Space_Box(levelset->grid.domain);
     else if(triangulated_surface){
         triangulated_surface->Update_Bounding_Box();
-        return World_Space_Box(*triangulated_surface->bounding_box);}
-    else return RANGE<VECTOR<T,3> >::Centered_Box();
+        if(!triangulated_surface->bounding_box->Empty())
+            return World_Space_Box(*triangulated_surface->bounding_box);}
+    return RANGE<VECTOR<T,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Turn_Smooth_Shading_On
