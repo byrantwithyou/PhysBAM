@@ -110,22 +110,6 @@ Initialize()
                     p.xp_x=MATRIX<T,TV::m>()+1;
                     p.vp_x=MATRIX<T,TV::m>();
                 },density,particles_per_cell,true);
-//            auto write=[this]()
-//            {
-//                static int id=0;
-//                Create_Directory(output_directory+LOG::sprintf("/v%d",id));
-//                Write_To_File(stream_type,LOG::sprintf("%s/v%d/mac_velocities",output_directory.c_str(),id),this->velocity);
-//                Write_To_File(stream_type,LOG::sprintf("%s/v%d/mass",output_directory.c_str(),id),mass);
-//                Write_To_File(stream_type,LOG::sprintf("%s/v%d/psi_N",output_directory.c_str(),id),this->psi_N);
-//                Write_To_Text_File(LOG::sprintf("%s/v%d/time",output_directory.c_str(),id),time,"\n");
-//                Write_To_Text_File(output_directory+"/common/last_grid_data",id,"\n");
-//                id++;
-//            };
-//            Add_Callbacks(false,"p2g",[write](){
-//                    static bool done=false;
-//                    if(!done) write();
-//                    done=true;});
-//            Add_Callbacks(false,"time-step",write);
         } break;
         case 100: this->Commandline_Analytic_test(); break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
