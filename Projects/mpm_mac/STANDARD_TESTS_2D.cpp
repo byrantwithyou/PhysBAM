@@ -169,7 +169,6 @@ Initialize()
                 return TV(rand.Get_Uniform_Number(a,b),rand.Get_Uniform_Number(a,b))*m/s;};
             Seed_Particles(grid.domain,V_func,0,density,particles_per_cell);
         } break;
-        default: PHYSBAM_FATAL_ERROR("test number not implemented");
         case 21:{ // vortex shedding test
             density=unit_rho*scale_mass;
             T velocity=1;
@@ -358,6 +357,44 @@ Initialize()
                     p.vp_x=MATRIX<T,TV::m>();
                 },density,particles_per_cell,true);
         } break;
+        case 29:{
+            Set_Grid(RANGE<TV>::Centered_Box()*2);
+            side_bc_type.Fill(BC_SLIP);
+            //side_bc_type(1)=BC_FREE;
+            density=unit_rho*scale_mass;
+            use_analytic_field=true;
+            Add_Velocity([=](auto X,auto t)
+            {
+                auto x=X(0),y=X(1);
+                auto x2=x*x;
+                auto y2=y*y;
+                auto x4=x2*x2;
+                auto y4=y2*y2;
+                auto x6=x2*x4;
+                auto y6=y2*y4;
+                //auto x8=x4*x4;
+                //auto y8=y4*y4;
+                return Make_Vector<T>(
+                    -(T)4/39*y*(x-2)*(x+2)*(39*x6*y2+117*x4*y4+78*x2*y6-468*x6-
+                        970*x4*y2-1221*x2*y4-1560*y6+2280*x4+4767*x2*y2+7572*y4+5532*x2+11892*y2-49584),
+                (T)4/39*x*(y-2)*(y+2)*(78*x6*y2+117*x4*y4+39*x2*y6-1560*x6-1221*x4*y2-
+                    970*x2*y4-468*y6+7572*x4+4767*x2*y2+2280*y4+11892*x2+5532*y2-49584))/(T)100000;
+            });
+            Add_Pressure([=](auto X,auto t)
+            {
+                auto x=X(0),y=X(1);
+                return x-x*y+y*y+t;
+            });
+            Setup_Analytic_Boundary_Conditions();
+            SPHERE<TV> sphere(TV(),1);
+            auto shape=Intersect(Make_IO(grid.domain),Invert(Make_IO(sphere)));
+            Seed_Particles_Analytic(*shape,density,particles_per_cell);
+            //Seed_Particles_Analytic(grid.domain,density,particles_per_cell);
+            delete shape;
+            Add_Collision_Object(sphere,COLLISION_TYPE::slip,0,0,0);
+            end_frame.Append([=](int frame){Check_Analytic_Velocity();});
+        } break;
+        default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     if(forced_collision_type!=-1)
         for(int i=0;i<collision_objects.m;i++)

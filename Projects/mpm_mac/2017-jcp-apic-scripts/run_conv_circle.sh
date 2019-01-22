@@ -2,7 +2,7 @@
 
 NAME=conv-circle
 
-ARGS="../mpm_mac 23 -last_frame 1 -frame_dt 0.4 -mu 0 -scale_mass 3 -clamp -only_log"
+ARGS="../mpm_mac 29 -last_frame 1 -frame_dt 1 -mu 0 -scale_mass 3 -clamp -reseed -lsproj -no_surface"
 
 if [ ! -z $1 ]; then
     NAME=$NAME-$1
@@ -23,7 +23,7 @@ if [ "X$FULL" = "X1" ] ; then
     rm -rf $NAME
     mkdir -p $NAME
     for r in `seq $HI -$SKIP $LO` ; do
-        dt=`perl -e "print (1.0/$r)"`
+        dt=`perl -e "print (4.0/$r)"`
         DT="-max_dt $dt -min_dt $dt"
         echo $ARGS $DT -no_affine -o $NAME/pic-$r -resolution $r
         echo $ARGS $DT -affine -o $NAME/apic-$r -resolution $r

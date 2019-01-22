@@ -134,7 +134,7 @@ public:
     {ANALYTIC_IMPLICIT_OBJECT<T_OBJECT> obj(object);Seed_Particles(obj,V,dV,density,particles_per_cell);}
 
     template<class T_OBJECT> auto
-    Seed_Particles_Analytic(const T_OBJECT& object,T density,T particles_per_cell)
+    Seed_Particles_Analytic(T_OBJECT& object,T density,T particles_per_cell)
     {return Seed_Particles(object,
             [this](const TV& X){return analytic_velocity->v(X,0);},
             [this](const TV& X){return analytic_velocity->dX(X,0);},
