@@ -400,6 +400,7 @@ Build_Level_Sets()
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Reseeding()
 {
+    bool added_particle=false;
     T dx=example.grid.dX.Max();
     LINEAR_INTERPOLATION_MAC<TV,T> li(example.grid);
     int target_ppc=1<<TV::m;
@@ -439,6 +440,7 @@ Reseeding()
                     int p=example.particles.Add_Element_From_Deletion_List();
                     example.particles.valid(p)=true;
                     (*color)(p)=VECTOR<T,3>(0,1,0);
+                    added_particle=true;
                     example.particles.mass(p)=uniform_mass;
                     example.particles.V(p)=li.Clamped_To_Array(example.velocity,X);
                     example.particles.X(p)=X;}}}
@@ -446,9 +448,12 @@ Reseeding()
             example.random.Random_Shuffle(a);
             while(a.m>2*(1<<TV::m))
                 Invalidate_Particle(a.Pop_Value());}}
-    Update_Simulated_Particles();
-    Update_Particle_Weights();
-    Prepare_Scatter();
+
+    if(added_particle){
+        Update_Simulated_Particles();
+        Update_Particle_Weights();
+        Prepare_Scatter();
+        Particle_To_Grid();}
 }
 //#####################################################################
 // Function Grid_To_Particle
@@ -559,13 +564,11 @@ Compute_Effective_Velocity()
             });
 
         example.xpic_v.Fill(0);
-        example.mass.Fill(0);
         example.gather_scatter->template Scatter<int>(false,
             [this,&particles,f](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,int data)
             {
                 T w=it.Weight();
                 FACE_INDEX<TV::m> index=it.Index();
-                example.mass(index)+=w*particles.mass(p);
                 T V=w*example.effective_v(p)(index.axis);
                 example.xpic_v(index)+=f*particles.mass(p)*V;
             });
