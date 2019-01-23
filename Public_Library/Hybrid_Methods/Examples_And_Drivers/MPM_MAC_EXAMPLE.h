@@ -41,7 +41,7 @@ public:
     GRID<TV> grid;
     enum BC_TYPE {BC_FREE, BC_SLIP, BC_NOSLIP, BC_PERIODIC};
     
-    ARRAY<T,FACE_INDEX<TV::m> > mass,volume;
+    ARRAY<T,FACE_INDEX<TV::m> > mass,mass_save,volume;
     ARRAY<T,FACE_INDEX<TV::m> > velocity,velocity_save;
     ARRAY<bool,FACE_INDEX<TV::m> > valid_xfer_data;
 

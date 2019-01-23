@@ -309,7 +309,9 @@ Particle_To_Grid()
     Fix_Periodic_Accum(example.velocity);
     Fix_Periodic_Accum(example.volume);
 
-    if(example.extrap_type=='p' && !example.use_mls_xfers && !example.xpic){
+    if(example.xpic) example.mass_save=example.mass;
+
+    if(example.extrap_type=='p' && !example.use_mls_xfers){
         PHYSBAM_DEBUG_WRITE_SUBSTEP("before reflect",1);
         Reflect_Boundary_Mass_Momentum();}
 
@@ -573,6 +575,11 @@ Compute_Effective_Velocity()
                 example.xpic_v(index)+=f*particles.mass(p)*V;
             });
         Fix_Periodic_Accum(example.xpic_v);
+
+        if(example.extrap_type=='p' && !example.use_mls_xfers){
+            example.mass=example.mass_save;
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("before reflect xpic",1);
+            Reflect_Boundary_Mass_Momentum();}
 
 #pragma omp parallel
         for(FACE_ITERATOR_THREADED<TV> it(example.grid,example.ghost);it.Valid();it.Next()){
