@@ -313,7 +313,7 @@ Particle_To_Grid()
 
     if(example.extrap_type=='p' && !example.use_mls_xfers){
         PHYSBAM_DEBUG_WRITE_SUBSTEP("before reflect",1);
-        Reflect_Boundary_Mass_Momentum();}
+        Reflect_Boundary_Mass_Momentum(example.velocity);}
 
     example.valid_indices.Remove_All();
     example.valid_flat_indices.Remove_All();
@@ -579,7 +579,7 @@ Compute_Effective_Velocity()
         if(example.extrap_type=='p' && !example.use_mls_xfers){
             example.mass=example.mass_save;
             PHYSBAM_DEBUG_WRITE_SUBSTEP("before reflect xpic",1);
-            Reflect_Boundary_Mass_Momentum();}
+            Reflect_Boundary_Mass_Momentum(example.xpic_v);}
 
 #pragma omp parallel
         for(FACE_ITERATOR_THREADED<TV> it(example.grid,example.ghost);it.Valid();it.Next()){
@@ -1059,7 +1059,7 @@ Reflect_Boundary_Grid_Force(ARRAY<T,FACE_INDEX<TV::m> >& force) const
 // Function Reflect_Boundary_Mass_Momentum
 //#####################################################################
 template<class TV> void MPM_MAC_DRIVER<TV>::
-Reflect_Boundary_Mass_Momentum() const
+Reflect_Boundary_Mass_Momentum(ARRAY<T,FACE_INDEX<TV::m> >& P) const
 {
     Reflect_Boundary(
         [&](const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side)
@@ -1068,7 +1068,7 @@ Reflect_Boundary_Mass_Momentum() const
             if(example.bc_velocity){
                 TV nearest_point=example.grid.Clamp(example.grid.Face(out));
                 bc=example.bc_velocity(nearest_point,example.time)(out.axis);}
-            T& moment_in=example.velocity(in),&moment_out=example.velocity(out);
+            T& moment_in=P(in),&moment_out=P(out);
             T mv_in_old=moment_in,mv_out_old=moment_out;
             T& m_in=example.mass(in),&m_out=example.mass(out);
             moment_in+=2*bc*m_out-moment_out;
@@ -1081,7 +1081,7 @@ Reflect_Boundary_Mass_Momentum() const
         },
         [&](const FACE_INDEX<TV::m>& in,const FACE_INDEX<TV::m>& out,int side)
         {
-            T& moment_in=example.velocity(in),&moment_out=example.velocity(out);
+            T& moment_in=P(in),&moment_out=P(out);
             moment_in+=moment_out;
             moment_out=moment_in;
             T& m_in=example.mass(in),&m_out=example.mass(out);

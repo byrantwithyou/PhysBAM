@@ -53,7 +53,7 @@ public:
     void Extrapolate_Velocity(bool use_bc,bool extrapolate_boundary);
     template <class D,class N>
     void Reflect_Boundary(D func_d,N func_n,RF flag) const;
-    void Reflect_Boundary_Mass_Momentum() const;
+    void Reflect_Boundary_Mass_Momentum(ARRAY<T,FACE_INDEX<TV::m> >& P) const;
     void Reflect_Boundary_Particle_Force(ARRAY<T,FACE_INDEX<TV::m> >& force) const;
     void Reflect_Boundary_Grid_Force(ARRAY<T,FACE_INDEX<TV::m> >& force) const;
     void Reflect_Boundary_Velocity_Copy_Only() const;
