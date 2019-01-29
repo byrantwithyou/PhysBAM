@@ -1287,7 +1287,6 @@ Apply_Viscosity()
         ARRAY<int> tmp0,tmp1;
 #pragma omp parallel
         {
-            T u_bc=0;
             SPARSE_MATRIX_THREADED_CONSTRUCTION<T> helper(A,tmp0,tmp1);
             for(CELL_ITERATOR_THREADED<TV> it(face_grid,0);it.Valid();it.Next()){
                 int center_index=velocity_index(it.index);

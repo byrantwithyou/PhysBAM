@@ -106,7 +106,6 @@ Cut_Cell_Projection(const GRID<TV>& grid,int ghost,
         TV surface_area_weighted_normal;
         TV centroid;
         T total_area=0;
-        T surface_fraction=0;
         
         T diag_entry=0;
         if(has_surface || has_object){

@@ -7,6 +7,7 @@
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Grid_Tools/Grids/GRID.h>
+#include <functional>
 namespace PhysBAM
 {
 // bc_type: 0=periodic, 1=free, 2=slip

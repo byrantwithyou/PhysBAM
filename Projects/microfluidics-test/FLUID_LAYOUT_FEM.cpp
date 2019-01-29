@@ -465,7 +465,6 @@ Generate_3_Joint_SmallMin(VERTEX_ID i,const VECTOR<VERTEX_ID,3>& ends,const VECT
     ARRAY<PARTICLE_ID> merging_side,g[2];
     for(int k=1;k<3;k++){
         v=merging_points(k)-merging_points(k-1);
-        T h=v.Normalize()/(2*pd.half_width);
         for(int j=0;j<2*pd.half_width;j++){
             PARTICLE_ID base=Add_Particle();
             X(base)=merging_points(k-1)+v*j*pd.unit_length;

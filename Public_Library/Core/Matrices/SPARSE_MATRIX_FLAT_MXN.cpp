@@ -9,6 +9,7 @@
 #include <Core/Math_Tools/Inverse.h>
 #include <Core/Math_Tools/sqr.h>
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <numeric>
 namespace PhysBAM{
 //#####################################################################
 // Constructor
