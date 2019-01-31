@@ -43,7 +43,7 @@ done
 
 for o in ${opt_name[@]} ; do
     sed -e "s/xxx/$o/; s/rrr/$RES/; s/LLL/Vorticity/; s/DDD/vort/; s/XMAX/$T/; s/YMAX/9.0/;" vort_dambreak3_plot.tex  > $NAME/plot-inlet-vort-$o.tex
-    sed -e "s/xxx/$o/; s/rrr/$RES/; s/LLL/Kinetic energy/; s/DDD/ke/; s/XMAX/$T/; s/YMAX/0.03/;" dambreak_plot.tex  > $NAME/plot-inlet-ke-$o.tex
+    sed -e "s/xxx/$o/; s/rrr/$RES/; s/LLL/Kinetic energy/; s/DDD/ke/; s/XMAX/$T/; s/YMAX/0.02/;" dambreak_plot.tex  > $NAME/plot-inlet-ke-$o.tex
     #sed -e "s/xxx/$o/; s/rrr/$RES/; s/LLL/Total energy/; s/DDD/te/; s/XMAX/10/; s/YMAX/0.3/;" te_dambreak_plot.tex  > $NAME/plot-inlet-te-$o.tex
 done
 
