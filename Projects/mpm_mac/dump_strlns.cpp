@@ -2,7 +2,10 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Arrays/SORT.h>
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/UNION_FIND.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Core/Utilities/PROCESS_UTILITIES.h>
 #include <Core/Vectors/VECTOR.h>
@@ -18,7 +21,9 @@
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
+#include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <limits>
+#include <map>
 #include <string>
 using namespace PhysBAM;
 
@@ -196,24 +201,45 @@ VECTOR<typename TV::SCALAR,2> Compute_Streamline(FRAME_DATA<TV>& fd)
     return VECTOR<T,2>(smin,smax);
 }
 
-template<typename T>
+template<typename TV>
 struct STYLE
 {
-    T dir_scale=1,width_scale=0.3; // times dx
+    typedef typename TV::SCALAR T;
+    T dir_scale=1,width_scale=0.3,arrow_sep=8,radius=5; // times dx
     VECTOR<T,3> contour_color=VECTOR<T,3>(0,1,1);
     VECTOR<T,3> arrow_color=VECTOR<T,3>(1,0,0);
+    RANGE<TV> domain=RANGE<TV>::Unit_Box();
 };
 
-template<typename T,typename TV>
-void Dump_Streamline(FRAME_DATA<TV>& fd,T c,const STYLE<T>& style)
+template<typename T,typename TV,typename TV_INT>
+void Cover(FRAME_DATA<TV>& fd,const TV_INT& cell,
+    std::map<TV_INT,T,LEXICOGRAPHIC_COMPARE>& q,HASHTABLE<TV_INT>& covered,const STYLE<TV>& style)
 {
-    typedef VECTOR<int,TV::m> TV_INT;
-    static const int num_corners=1<<TV::m;
+    RANGE<TV_INT> box=RANGE<TV_INT>(cell).Thickened(style.radius).Intersect(fd.grid.Domain_Indices());
+    for(RANGE_ITERATOR<TV::m> it(box);it.Valid();it.Next()){
+        auto qitem=q.find(it.index);
+        if(qitem!=q.end())
+            q.erase(qitem);
+        if(!covered.Contains(it.index))
+            covered.Set(it.index);}
+    for(RANGE_ITERATOR<TV::m> it(box,1,0,RI::ghost);it.Valid();it.Next()){
+        if(fd.grid.Domain_Indices().Lazy_Inside_Half_Open(it.index)){
+            if(covered.Contains(it.index) || q.find(it.index)!=q.end()) continue;
+            TV_INT nodes[1<<TV::m];
+            fd.grid.Nodes_In_Cell_From_Minimum_Corner_Node(it.index,nodes);
+            T s=0;
+            for(int j=0;j<(1<<TV::m);j++)
+                s+=fd.s(nodes[j]);
+            s/=(1<<TV::m);
+            q.insert(std::make_pair(it.index,s));}}
+}
+
+template<typename T,typename TV,typename TV_INT>
+void Dump_Streamline(FRAME_DATA<TV>& fd,T c,
+    std::map<TV_INT,T,LEXICOGRAPHIC_COMPARE>& q,HASHTABLE<TV_INT>& covered,const STYLE<TV>& style)
+{
+    typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_SURFACE;
     T dx=fd.grid.dX.Max();
-    auto l2g=[&fd](const auto& X,const TV_INT& cell)
-    {
-        return fd.grid.Center(cell)-fd.grid.dX/2+X*fd.grid.dX;
-    };
     auto arrow=[&style,dx](const TV& x,const TV& v)
     {
         TV vn=v.Normalized();
@@ -224,35 +250,90 @@ void Dump_Streamline(FRAME_DATA<TV>& fd,T c,const STYLE<T>& style)
         u*=style.width_scale*dx;
         return VECTOR<TV,3>(x+vn,x+u,x-u);
     };
+    auto finish_contour=[&fd,&style](TV x,T mag)
+    {
+        x=fd.grid.Clamp(x);
+        LOG::printf("COORD %.16P %.16P %P\n",x(0),x(1),mag);
+        LOG::printf("COORD \n",x(0),x(1));
+    };
+    auto emit_segment=[&fd,&style](const TV& x0,const TV& x1,T mag)
+    {
+        if(!style.domain.Lazy_Inside(x0) && !style.domain.Lazy_Inside(x1)){
+            LOG::printf("COORD \n");
+            return;}
+        TV y0=fd.grid.Clamp(x0);
+        TV y1=fd.grid.Clamp(x1);
+        Add_Debug_Object(VECTOR<TV,2>(y0,y1),style.contour_color);
+        LOG::printf("COORD %.16P %.16P %P\n",y0(0),y0(1),mag);
+        if(y0!=x0 || y1!=x1)
+            LOG::printf("COORD \n");
+    };
+    auto emit_arrow=[&fd,&style,arrow](const TV& x,const TV& d)
+    {
+        if(!style.domain.Lazy_Inside(x)) return;
+        TV dn=d.Normalized();
+        LOG::printf("ARROW %.16P %.16P %.16P %.16P\n",x(0),x(1),dn(0),dn(1));
+        Add_Debug_Object(arrow(x,d),style.arrow_color);
+    };
 
+    T_SURFACE surface;
+    MARCHING_CUBES<TV>::Create_Surface(surface,fd.grid,fd.s,c);
+    ARRAY_VIEW<TV> X=surface.particles.X;
+    ARRAY<VECTOR<int,2> >& E=surface.mesh.elements;
+    HASHTABLE<int,int> next;
+    UNION_FIND<int> contours(X.m+1);
+    ARRAY<bool> indegree0(X.m,use_init,true);
     LINEAR_INTERPOLATION_MAC<TV,T> li(fd.grid);
-    VECTOR<T,num_corners> phis;
-    ARRAY<VECTOR<TV,TV::m> > surface;
-    VECTOR<ARRAY<VECTOR<TV,TV::m> >,2*TV::m> boundary;
-    VECTOR<VECTOR<ARRAY<VECTOR<TV,TV::m> >*,2>,2*TV::m> pboundary;
-    for(int s=0;s<2*TV::m;s++) pboundary(s)(1)=&boundary(s);
-    int cnt=0;
-    for(CELL_ITERATOR<TV> it(fd.grid);it.Valid();it.Next()){
-        MARCHING_CUBES<TV>::Compute_Phis_For_Cell(phis,fd.s,it.index);
-        phis+=c;
-        surface.Remove_All();
-        for(int s=0;s<2*TV::m;s++) boundary(s).Remove_All();
-        MARCHING_CUBES<TV>::Get_Elements_For_Cell(surface,pboundary,phis);
-        for(const auto& t:surface){
-            TV X=l2g(.5*(t(0)+t(1)),it.index);
-            TV v=li.Clamped_To_Array(fd.velocity,X);
-            if(cnt==0)
-                Add_Debug_Object(arrow(X,v),style.arrow_color);
-            Add_Debug_Object(l2g(t,it.index),style.contour_color);
-            cnt=(cnt+1)%5;}}
+    for(int i=0;i<E.m;i++){
+        TV u=X(E(i)(1))-X(E(i)(0));
+        TV y=0.5*(X(E(i)(0))+X(E(i)(1)));
+        TV v=li.Clamped_To_Array(fd.velocity,y);
+        if(u.Dot(v)<0) std::swap(E(i)(0),E(i)(1));
+        PHYSBAM_ASSERT(!next.Contains(E(i)(0)));
+        next.Set(E(i)(0),E(i)(1));
+        contours.Union(E(i)(0),E(i)(1));
+        indegree0(E(i)(1))=false;}
+    HASHTABLE<int,int> head;
+    for(int i=0;i<X.m;i++){
+        if(indegree0(i))
+            head.Set(contours.Find(i),i);}
+
+    for(int i=0;i<E.m;i++){
+        int start=head.Get_Default(contours.Find(E(i)(0)),E(i)(0));
+        if(contours.Find(start)==contours.Find(X.m)) continue;
+        contours.Union(start,X.m);
+        int it=start,n=next.Get(start);
+        T len=0;
+        do{
+            TV y=0.5*(X(it)+X(n));
+            TV d=X(n)-X(it);
+            T l=d.Normalize();
+            if(len+l>=style.arrow_sep*dx){
+                TV z=X(it)+d*(style.arrow_sep*dx-len);
+                TV v=li.Clamped_To_Array(fd.velocity,z);
+                len-=style.arrow_sep*dx;
+                emit_arrow(z,v);}
+            len+=l;
+            Cover(fd,fd.grid.Clamp_To_Cell(y),q,covered,style);
+            emit_segment(X(it),X(n),li.Clamped_To_Array(fd.velocity,X(it)).Magnitude());
+            it=n;
+            if(next.Contains(it))
+                n=next.Get(it);
+            else break;
+        }while(it!=start);
+        finish_contour(X(it),li.Clamped_To_Array(fd.velocity,X(it)).Magnitude());}
 }
 
 template<typename T,typename TV>
-void Dump_Streamlines(FRAME_DATA<TV>& fd,T smin,T smax,int n,const STYLE<T>& style)
+void Dump_Streamlines(FRAME_DATA<TV>& fd,T sc,const STYLE<TV>& style)
 {
-    T ds=(smax-smin)/(n-1);
-    for(int i=0;i<n;i++)
-        Dump_Streamline(fd,smin+ds*i,style);
+    typedef VECTOR<int,TV::m> TV_INT;
+    std::map<TV_INT,T,LEXICOGRAPHIC_COMPARE> q; // cell index -> contour value
+    HASHTABLE<TV_INT> covered;
+    Dump_Streamline(fd,sc,q,covered,style);
+    while(!q.empty()){
+        T c=q.begin()->second;
+        Dump_Streamline(fd,c,q,covered,style);}
     Flush_Frame<TV>("surface");
 }
 
@@ -264,19 +345,19 @@ int main(int argc, char* argv[])
     PROCESS_UTILITIES::Set_Backtrace(true);
 
     PARSE_ARGS parse_args(argc,argv);
-    int frame=0,ncontours=2;
-    bool bw=false;
-    STYLE<T> style;
+    int frame=0;
+    T seed_contour=0;
+    STYLE<TV> style;
     std::string input="input",output="output";
     parse_args.Extra(&input,"input","Input directory");
     parse_args.Add("-o",&output,"output","Output directory");
     parse_args.Add("-frame",&frame,"frame","Frame");
-    parse_args.Add("-nc",&ncontours,"contour","Contours");
-    parse_args.Add("-bw",&bw,"Blackwhite");
+    parse_args.Add("-c",&seed_contour,"contour","Starting contour value");
+    parse_args.Add("-r",&style.radius,"scale","Contour span radius");
     parse_args.Add("-arrow_d",&style.dir_scale,"scale","Arrow scale");
     parse_args.Add("-arrow_w",&style.width_scale,"scale","Arrow width scale");
+    parse_args.Add("-arrow_sep",&style.arrow_sep,"scale","Arrow separation");
     parse_args.Parse();
-    if(bw) style.contour_color=style.arrow_color=VECTOR<T,3>(0,0,0);
 
     FRAME_DATA<TV> fd;
     Read_Output_Files(fd,input,frame);
@@ -284,6 +365,6 @@ int main(int argc, char* argv[])
     Create_Directory(output+"/common");
     Flush_Frame(fd.velocity,"init");
     VECTOR<T,2> r=Compute_Streamline(fd);
-    Dump_Streamlines(fd,r(0),r(1),ncontours,style);
+    Dump_Streamlines(fd,seed_contour,style);
     return 0;
 }

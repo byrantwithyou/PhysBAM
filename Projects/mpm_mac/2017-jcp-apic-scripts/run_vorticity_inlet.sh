@@ -52,19 +52,24 @@ for s in pic apic flip ; do
     done
 done
 
-DS=$(readlink -m '../dump_strlns')
-O=$(readlink -m '../../opengl_2d/opengl_2d')
-(
-cd $NAME
+DS=../dump_strlns
+cp plot.gplt $NAME
+cp plot_open.gplt $NAME
 for a in pic apic flip ; do
     for f in `seq 80 10 200` ; do
-        $DS $a-default-$RES/ -frame $f -nc 25 -bw -o sl-$a-default-$RES-$f;
-        cp ../inlet_camera_script sl-$a-default-$RES-$f/camera_script;
-        $O sl-$a-default-$RES-$f -offscreen -start_frame 1 -stop_frame 1 -so sl-$a-default-$RES-$f.png -keys "<F1>6sc";
-        convert sl-$a-default-$RES-$f.png -crop 768x768+128+0 sl-$a-default-$RES-$f.png
+        $DS $NAME/$a-default-$RES/ -frame $f -o $NAME/dump-$a-default-$RES-$f -arrow_sep 18;
+        grep COORD $NAME/dump-$a-default-$RES-$f/common/log.txt | sed 's/.*COORD \([^<]*\).*/\1/g' > $NAME/coord-$a-default-$RES-$f;
+        grep ARROW $NAME/dump-$a-default-$RES-$f/common/log.txt | sed 's/.*ARROW \([^<]*\).*/\1/g' > $NAME/arrow-$a-default-$RES-$f;
+        (
+            cd $NAME
+            if [ $f = 80 ] ; then
+                gnuplot -e "fn='$a-default-$RES-$f'" plot_open.gplt
+            else
+                gnuplot -e "fn='$a-default-$RES-$f'" plot.gplt
+            fi
+        )
     done
 done
-)
 
 for o in ${opt_name[@]} ; do
     sed -e "s/xxx/$o/; s/rrr/$RES/; s/LLL/Vorticity/; s/DDD/vort/; s/XMAX/$T/; s/YMAX/2.5/;" vort_dambreak_plot.tex  > $NAME/plot-inlet-vort-$o.tex

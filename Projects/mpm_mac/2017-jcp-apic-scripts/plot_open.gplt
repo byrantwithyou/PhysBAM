@@ -1,0 +1,19 @@
+set terminal pdf size 1,1
+set output 'sl-'.fn.'.pdf'
+unset key
+unset xtic
+unset ytic
+unset colorbox
+set border lw 0.01
+set lmargin 0.1
+set rmargin 0.1
+set tmargin 0.1
+set bmargin 0.1
+set cbrange [0:0.28]
+set palette rgb 34,35,36
+set style arrow 1 head size 0.024,25,45 fixed filled lw 0.8 linecolor rgb 'black'
+set object 1 rect from 0.5,0 to 0.75,0.02 front fc rgb 'blue' fs solid border lc rgb 'blue'
+set arrow nohead from 0.13750,0 to 0.26250,0 front dt (1,2) linecolor rgb 'red' lw 5
+set arrow nohead from 0.83750,0 to 0.96250,0 front dt (1,2) linecolor rgb 'red' lw 5
+plot 'coord-'.fn using 1:2:3 with lines lc palette lw 0.8,\
+    'arrow-'.fn using 1:2:(0.02*$3):(0.02*$4) with vectors arrowstyle 1
