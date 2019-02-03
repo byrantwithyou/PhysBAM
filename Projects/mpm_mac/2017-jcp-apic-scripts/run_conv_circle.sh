@@ -55,6 +55,8 @@ for t in grid particle ; do
     done
 done
 
+cp conv-circle-illus.tex $NAME/
+
 cat <<EOF > $NAME/SConstruct
 import os
 import re

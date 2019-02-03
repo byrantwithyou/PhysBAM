@@ -1,0 +1,19 @@
+\documentclass[tikz,crop,border=0pt]{standalone}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.5.1}
+
+\begin{document}
+    \begin{tikzpicture}
+      \begin{axis}[view={0}{90},width=7cm,height=7cm]
+      \addplot3[
+          domain=-2:2,
+          y domain=-2:2,
+          quiver={u={-2/17750000*(x-2)*(x+2)*y*(5325*x^8*y^4+14200*x^6*y^6+8875*x^4*y^8-43370*x^8*y^2-185367*x^6*y^4-218756*x^4*y^6-72925*x^2*y^8+94440*x^8+799054*x^6*y^2+1615671*x^4*y^4+1070044*x^2*y^6+180500*y^8-1120888*x^6-4676038*x^4*y^2-5345697*x^2*y^4-1714416*y^6+4413464*x^4+10176970*x^2*y^2+5308260
+*y^4-5828392*x^2-6256616*y^2+2604960)
+          },v={2/17750000*(y-2)*(y+2)*x*(8875*x^8*y^4+14200*x^6*y^6+5325*x^4*y^8-72925*x^8*y^2-218756*x^6*y^4-185367*x^4*y^6-43370*x^2*y^8+180500*x^8+1070044*x^6*y^2+1615671*x^4*y^4+799054*x^2*y^6+94440*y^8-1714416*x^6-5345697*x^4*y^2-4676038*x^2*y^4-1120888*y^6+5308260*x^4+10176970*x^2*y^2+4413464*
+y^4-6256616*x^2-5828392*y^2+2604960)
+          },scale arrows=0.3},-stealth,samples=20] (x,y,0);
+      \draw[fill=white] (axis cs:0,0) circle (1);
+      \end{axis}
+    \end{tikzpicture}
+\end{document}
