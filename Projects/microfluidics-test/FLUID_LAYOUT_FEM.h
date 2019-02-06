@@ -32,6 +32,7 @@ struct FLUID_LAYOUT_FEM
     struct BLOCK_DATA
     {
         PIPE_ID pipe_id;
+        int num_dofs;
     };
 
     struct PIPE_DATA
@@ -52,6 +53,7 @@ struct FLUID_LAYOUT_FEM
     ARRAY<DOF_ID,PARTICLE_ID> pressure_dofs,vel_node_dofs;
     ARRAY<BLOCK_ID,EDGE_ID> edge_blocks;
     ARRAY<DOF_ID,EDGE_ID> vel_edge_dofs;
+    ARRAY<VECTOR<int,2>,DOF_ID> dof_map;
     DOF_ID num_dofs;
     
     FLUID_LAYOUT_FEM();

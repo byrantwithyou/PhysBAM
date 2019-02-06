@@ -657,23 +657,31 @@ Allocate_Dofs(const PARSE_DATA_FEM<TV>& pd)
     int num_vel_dofs=block_vel_dofs.Last()*TV::m;
     num_dofs=DOF_ID(num_pressure_dofs+num_vel_dofs);
 
+    for(BLOCK_ID i(0);i<blocks.m;i++) blocks(i).num_dofs=0;
+    dof_map.Resize(num_dofs,use_init,{-1,-1});
     pressure_dofs.Resize(Number_Particles(),use_init,DOF_ID(-1));
     for(PARTICLE_ID i(0);i<Number_Particles();i++){
         BLOCK_ID bid=node_blocks(i);
-        pressure_dofs(i)=DOF_ID(num_vel_dofs+--block_pressure_dofs(bid));}
+        pressure_dofs(i)=DOF_ID(num_vel_dofs+--block_pressure_dofs(bid));
+        dof_map(pressure_dofs(i))={Value(bid),blocks(bid).num_dofs++};}
 
     vel_node_dofs.Resize(Number_Particles(),use_init,DOF_ID(-2));
     for(PARTICLE_ID i(0);i<Number_Particles();i++){
         BC_ID* bc_idx=particle_bc_map.Get_Pointer(i);
         if(bc_idx && pd.bc(*bc_idx).type==dirichlet_v) continue;
-        vel_node_dofs(i)=DOF_ID(--block_vel_dofs(node_blocks(i))*TV::m);}
+        BLOCK_ID bid=node_blocks(i);
+        vel_node_dofs(i)=DOF_ID(--block_vel_dofs(bid)*TV::m);
+        for(int a=0;a<TV::m;a++)
+            dof_map(vel_node_dofs(i)+a)={Value(bid),blocks(bid).num_dofs++};}
 
     vel_edge_dofs.Resize(Number_Edges(),use_init,DOF_ID(-2));
     for(EDGE_ID i(0);i<Number_Edges();i++){
         BC_ID* bc_idx=bc_map.Get_Pointer(Edge(i).Sorted());
         if(bc_idx && pd.bc(*bc_idx).type==dirichlet_v) continue;
         BLOCK_ID bid=edge_blocks(i);
-        vel_edge_dofs(i)=DOF_ID(--block_vel_dofs(bid)*TV::m);}
+        vel_edge_dofs(i)=DOF_ID(--block_vel_dofs(bid)*TV::m);
+        for(int a=0;a<TV::m;a++)
+            dof_map(vel_edge_dofs(i)+a)={Value(bid),blocks(bid).num_dofs++};}
 }
 //#####################################################################
 // Function Print_Statistics

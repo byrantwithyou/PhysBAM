@@ -59,12 +59,14 @@ void Run_FEM(PARSE_ARGS& parse_args)
     typedef VECTOR<int,TV::m> TV_INT;
     T mu=1;
     std::string pipe_file;
-    bool run_tests=false;
-    int seed=time(0);
+    bool run_tests=false,use_krylov=false;
+    int seed=time(0),threads=1;
     std::string output_dir="output";
     parse_args.Add("-mu",&mu,"mu","viscosity");
     parse_args.Add("-tests",&run_tests,"run FEM tests");
+    parse_args.Add("-k",&use_krylov,"solve with Krylov method");
     parse_args.Add("-o",&output_dir,"dir","output dir");
+    parse_args.Add("-threads",&threads,"num","number of threads to use");
     parse_args.Parse(true);
     if(!run_tests)
         parse_args.Extra(&pipe_file,"file","file describing pipes");
@@ -138,12 +140,31 @@ void Run_FEM(PARSE_ARGS& parse_args)
     SYSTEM_MATRIX_HELPER<T> MH;
     for(auto& e:coded_entries) MH.data.Append({Value(e.x),Value(e.y),code_values(e.z)});
     ARRAY<T,DOF_ID> sol_vector;
-    Solve_And_Display_Solution(fl,pd,MH,rhs_vector,&sol_vector);
+    if(use_krylov)
+        Solve_And_Display_Solution(fl,pd,MH,rhs_vector,&sol_vector);
+
+    CACHED_ELIMINATION_MATRIX<T> elim_mat;
+    elim_mat.orig_sizes.Resize(Value(fl.blocks.m));
+    for(BLOCK_ID i(0);i<fl.blocks.m;i++) elim_mat.orig_sizes(Value(i))=fl.blocks(i).num_dofs;
+    elim_mat.Fill_Blocks(fl.dof_map,coded_entries,code_values,rhs_vector);
+    elim_mat.Unpack_Vector(fl.dof_map,elim_mat.test_sol,sol_vector);
+    elim_mat.Fill_Orig_Rows();
+    elim_mat.Reduce_Rows_By_Frequency(0,Value(fl.blocks.m)-Value(fl.pipes.m),Value(fl.blocks.m));
+    elim_mat.Reduce_Rows_By_Frequency(Value(fl.blocks.m)-Value(fl.pipes.m),Value(fl.blocks.m),3);
+    elim_mat.Full_Reordered_Elimination();
+    elim_mat.Back_Solve();
+    elim_mat.Execute_Jobs(threads);
+    ARRAY<T,DOF_ID> elim_sol;
+    elim_mat.Pack_Vector(fl.dof_map,elim_sol,elim_mat.rhs);
+    if(use_krylov) LOG::printf("ANS DIFF: %g\n",(elim_sol-sol_vector).Max_Abs());
+
     if(pd.analytic_velocity && pd.analytic_pressure){
-        ARRAY<T,DOF_ID> sol_error(sol_vector);
-        sol_error-=sol;
+        ARRAY<T,DOF_ID> ksol_error(sol_vector),elim_sol_error(elim_sol);
+        ksol_error-=sol;
+        elim_sol_error-=sol;
         //LOG::printf("sol: %P\n",sol_vector);
-        LOG::printf("sol error: %P\n",sol_error.Max_Abs());}
+        LOG::printf("elim sol error: %P\n",elim_sol_error.Max_Abs());
+        if(use_krylov) LOG::printf("krylov sol error: %P\n",ksol_error.Max_Abs());}
     LOG::Instance()->Copy_Log_To_File(output_dir+"/common/log.txt",false);
 }
 
