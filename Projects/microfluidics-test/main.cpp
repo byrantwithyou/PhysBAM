@@ -223,7 +223,7 @@ void Run(PARSE_ARGS& parse_args)
 
     ARRAY<T,DOF_ID> elim_sol;
     elim_mat.Pack_Vector(fl.dof_map,elim_sol,elim_mat.rhs);
-    if(!quiet) LOG::printf("ANS DIFF: %g\n",(elim_sol-sol_vector).Max_Abs());
+    if(!quiet && use_krylov) LOG::printf("ANS DIFF: %g\n",(elim_sol-sol_vector).Max_Abs());
     
     if(!quiet){
         ARRAY<T,FACE_INDEX<TV::m> > face_velocity(grid,1);
