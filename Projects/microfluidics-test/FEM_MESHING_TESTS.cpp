@@ -17,7 +17,7 @@ void Test_Degree2_Joint(JOINT_TYPE jt,typename TV::SCALAR a0,typename TV::SCALAR
     typedef typename TV::SCALAR T;
 
     for(T rad=a0;rad<a1;rad+=da){
-        PARSE_DATA_FEM<TV> pd;
+        PARSE_DATA_FEM<TV,TV> pd;
         pd.half_width=4;
         pd.unit_length=0.5;
         pd.pts.Append({TV(-10,1),BC_ID(0),default_joint,{PIPE_ID(0)}});
@@ -45,7 +45,7 @@ void Test_Degree2_Circle(JOINT_TYPE jt,typename TV::SCALAR h0,typename TV::SCALA
     typedef typename TV::SCALAR T;
 
     for(T h=h0;h<h1;h+=dh){
-        PARSE_DATA_FEM<TV> pd;
+        PARSE_DATA_FEM<TV,TV> pd;
         pd.half_width=4;
         pd.unit_length=h;
         pd.pts.Append({TV(-4,-4),BC_ID(0),jt,{PIPE_ID(0),PIPE_ID(3)}});
@@ -75,7 +75,7 @@ void Test_Degree3_Joint(JOINT_TYPE jt,typename TV::SCALAR h,int n,int seed)
 
     RANDOM_NUMBERS<T> random(seed);
     for(int i=0;i<n;i++){
-        PARSE_DATA_FEM<TV> pd;
+        PARSE_DATA_FEM<TV,TV> pd;
         pd.half_width=4;
         pd.unit_length=h;
         pd.pts.Append({TV(),BC_ID(0),jt,{PIPE_ID(0),PIPE_ID(1),PIPE_ID(2)}});

@@ -33,8 +33,10 @@
 #include "FEM_TABLE.h"
 #include "FLAT_SYSTEM.h"
 #include "FLAT_SYSTEM_FEM.h"
+#include "FLAT_SYSTEM_FEM_EXTRUDED.h"
 #include "FLUID_LAYOUT.h"
 #include "FLUID_LAYOUT_FEM.h"
+#include "FLUID_LAYOUT_FEM_EXTRUDED.h"
 #include <chrono>
 
 using namespace PhysBAM;
@@ -53,10 +55,11 @@ void Run_Meshing_Tests(int seed)
     Test_Degree2_Circle<TV>(corner_joint,0.2,0.9,0.1);
 }
 
+template<int d>
 void Run_FEM(PARSE_ARGS& parse_args)
 {
-    typedef VECTOR<T,2> TV;
-    typedef VECTOR<int,TV::m> TV_INT;
+    typedef VECTOR<T,2> TV2;
+    typedef VECTOR<T,d> TV;
     T mu=1;
     std::string pipe_file;
     bool run_tests=false,use_krylov=false;
@@ -77,11 +80,11 @@ void Run_FEM(PARSE_ARGS& parse_args)
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE(0.f),grid,output_dir);
     Create_Directory(output_dir+"/common");
 
-    if(run_tests){
+    if(d==2 && run_tests){
         Run_Meshing_Tests(seed);
         return;}
 
-    PARSE_DATA_FEM<TV> pd;
+    PARSE_DATA_FEM<TV2,TV> pd;
     pd.Parse_Input(pipe_file);
 
     FLUID_LAYOUT_FEM<TV> fl;
@@ -100,6 +103,7 @@ void Run_FEM(PARSE_ARGS& parse_args)
     fl.Dump_Dofs();
     Flush_Frame<TV>("dofs");
     
+    if(d==3) return;
     ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> > coded_entries;
     ARRAY<T,CODE_ID> code_values;
     ARRAY<T,DOF_ID> rhs_vector(fl.num_dofs);
@@ -114,20 +118,20 @@ void Run_FEM(PARSE_ARGS& parse_args)
         {
             TV X=fl.X(p),U=pd.Velocity(X,BC_ID());
             sol(fl.pressure_dofs(p))=pd.Pressure(X);
-            DOF_ID d=fl.vel_node_dofs(p);
-            if(d<DOF_ID()) continue;
+            DOF_ID dof=fl.vel_node_dofs(p);
+            if(dof<DOF_ID()) continue;
             for(int i=0;i<2;i++)
-                sol(d+i)=U(i);
+                sol(dof+i)=U(i);
         }
         for(EDGE_ID e(0);e<fl.Number_Edges();e++)
         {
-            DOF_ID d=fl.vel_edge_dofs(e);
-            if(d<DOF_ID()) continue;
+            DOF_ID dof=fl.vel_edge_dofs(e);
+            if(dof<DOF_ID()) continue;
             auto ed=fl.Edge(e);
             TV X=(T).5*(fl.X(ed.x)+fl.X(ed.y));
             TV U=pd.Velocity(X,BC_ID());
             for(int i=0;i<2;i++)
-                sol(d+i)=U(i);
+                sol(dof+i)=U(i);
         }
         //LOG::printf("sol: %P\n",sol);
         //LOG::printf("rhs: %P\n",rhs_vector);
@@ -278,9 +282,11 @@ int main(int argc, char* argv[])
     parse_args.Add("-fem",&use_fem,"use FEM");
     parse_args.Parse(true);
     LOG::Initialize_Logging(false,false,1<<30,true);
-    if(use_3d) Run<3>(parse_args);
+    if(use_fem){
+        if(use_3d) Run_FEM<3>(parse_args);
+        else Run_FEM<2>(parse_args);}
     else{
-        if(use_fem) Run_FEM(parse_args);
+        if(use_3d) Run<3>(parse_args);
         else Run<2>(parse_args);}
 
     LOG::Finish_Logging();

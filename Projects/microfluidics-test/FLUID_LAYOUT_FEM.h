@@ -13,11 +13,12 @@
 namespace PhysBAM{
 
 template<class T> class TRIANGULATED_AREA;
+template<class TV> struct FLUID_LAYOUT_FEM;
 
-template<class TV>
-struct FLUID_LAYOUT_FEM
+template<class T>
+struct FLUID_LAYOUT_FEM<VECTOR<T,2> >
 {
-    typedef typename TV::SCALAR T;
+    typedef VECTOR<T,2> TV;
     typedef VECTOR<int,TV::m> TV_INT;
 
     // (vert index,pipe index) -> array of particle id
@@ -58,24 +59,34 @@ struct FLUID_LAYOUT_FEM
     
     FLUID_LAYOUT_FEM();
     ~FLUID_LAYOUT_FEM();
-    void Compute(const PARSE_DATA_FEM<TV>& pd);
-    void Allocate_Dofs(const PARSE_DATA_FEM<TV>& pd);
+    template<class TW>
+    void Compute(const PARSE_DATA_FEM<TV,TW>& pd);
+    template<class TW>
+    void Allocate_Dofs(const PARSE_DATA_FEM<TV,TW>& pd);
     void Print_Statistics() const;
-    void Generate_End(VERTEX_ID i,PIPE_ID pipe,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
-    void Generate_Joint(VERTEX_ID i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
-    void Generate_2_Joint(VERTEX_ID i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con,JOINT_TYPE jt);
-    void Generate_3_Joint(VERTEX_ID i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
+    template<class TW>
+    void Generate_End(VERTEX_ID i,PIPE_ID pipe,const PARSE_DATA_FEM<TV,TW>& pd,CONNECTION& con);
+    template<class TW>
+    void Generate_Joint(VERTEX_ID i,const PARSE_DATA_FEM<TV,TW>& pd,CONNECTION& con);
+    template<class TW>
+    void Generate_2_Joint(VERTEX_ID i,const PARSE_DATA_FEM<TV,TW>& pd,CONNECTION& con,JOINT_TYPE jt);
+    template<class TW>
+    void Generate_3_Joint(VERTEX_ID i,const PARSE_DATA_FEM<TV,TW>& pd,CONNECTION& con);
+    template<class TW>
     void Generate_3_Joint_SmallMin(VERTEX_ID i,const VECTOR<VERTEX_ID,3>& ends,const VECTOR<PIPE_ID,3>& pipes,
         const VECTOR<T,3>& angles,const VECTOR<VECTOR<TV,3>,3>& tri,
-        const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
+        const PARSE_DATA_FEM<TV,TW>& pd,CONNECTION& con);
+    template<class TW>
     void Generate_3_Joint_LargeMin(VERTEX_ID i,const VECTOR<VERTEX_ID,3>& ends,const VECTOR<PIPE_ID,3>& pipes,
         const VECTOR<T,3>& angles,const VECTOR<VECTOR<TV,3>,3>& tri,
-        const PARSE_DATA_FEM<TV>& pd,CONNECTION& con);
-    void Generate_Pipe(PIPE_ID pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con);
+        const PARSE_DATA_FEM<TV,TW>& pd,CONNECTION& con);
+    template<class TW>
+    void Generate_Pipe(PIPE_ID pipe,const PARSE_DATA_FEM<TV,TW>& pd,const CONNECTION& con);
 
     void Dump_Mesh() const;
     void Dump_Layout() const;
-    void Dump_Input(const PARSE_DATA_FEM<TV>& pd) const;
+    template<class TW>
+    void Dump_Input(const PARSE_DATA_FEM<TV,TW>& pd) const;
     void Dump_Edge_Blocks() const;
     void Dump_Node_Blocks() const;
     void Dump_Dofs() const;

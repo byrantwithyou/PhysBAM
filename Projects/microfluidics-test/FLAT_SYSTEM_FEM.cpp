@@ -115,7 +115,7 @@ int Missing_Vertex(VECTOR<PARTICLE_ID,3> t, VECTOR<PARTICLE_ID,2> e)
 }
 
 template<class T,class TV>
-void Apply_Analytic_BC(const PARSE_DATA_FEM<TV>& pd,BC_ID bc_id,
+void Apply_Analytic_BC(const PARSE_DATA_FEM<TV,TV>& pd,BC_ID bc_id,
     ARRAY<T,DOF_ID>& rhs,const MATRIX<T,TV::m>& visc, DOF_ID dof_u[2], const TV& X)
 {
     TV V=pd.Velocity(X,bc_id),MV=visc*V;
@@ -123,14 +123,14 @@ void Apply_Analytic_BC(const PARSE_DATA_FEM<TV>& pd,BC_ID bc_id,
 }
 
 template<class T,class TV>
-void Apply_Analytic_BC(const PARSE_DATA_FEM<TV>& pd,BC_ID bc_id,
+void Apply_Analytic_BC(const PARSE_DATA_FEM<TV,TV>& pd,BC_ID bc_id,
     ARRAY<T,DOF_ID>& rhs, const TV& pres, DOF_ID dof_p, const TV& X)
 {
     rhs(dof_p)+=pres.Dot(pd.Velocity(X,bc_id));
 }
 
 template<class T,class TV>
-void Apply_Analytic_BC(const PARSE_DATA_FEM<TV>& pd,BC_ID bc_id,
+void Apply_Analytic_BC(const PARSE_DATA_FEM<TV,TV>& pd,BC_ID bc_id,
     ARRAY<T,DOF_ID>& rhs,MATRIX<LOCAL_V_CODE_ID,TV::m> visc, 
     DOF_ID dof_u[2], const TV& X, PIPE_ID pipe,
     const ARRAY<T,CODE_ID>& code_values)
@@ -143,7 +143,7 @@ void Apply_Analytic_BC(const PARSE_DATA_FEM<TV>& pd,BC_ID bc_id,
 }
 
 template<class T,class TV>
-void Apply_Analytic_BC(const PARSE_DATA_FEM<TV>& pd,BC_ID bc_id,
+void Apply_Analytic_BC(const PARSE_DATA_FEM<TV,TV>& pd,BC_ID bc_id,
     ARRAY<T,DOF_ID>& rhs,VECTOR<LOCAL_P_CODE_ID,TV::m> pres,
     DOF_ID dof_p, const TV& X, PIPE_ID pipe,
     const ARRAY<T,CODE_ID>& code_values)
@@ -155,7 +155,7 @@ void Apply_Analytic_BC(const PARSE_DATA_FEM<TV>& pd,BC_ID bc_id,
 }
 
 template<class T,class TV>
-void Add_To_Matrix(const PARSE_DATA_FEM<TV>& pd,
+void Add_To_Matrix(const PARSE_DATA_FEM<TV,TV>& pd,
     ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entries,
     const ARRAY<T,CODE_ID>& code_values, MATRIX<LOCAL_V_CODE_ID,TV::m> visc, 
     DOF_ID dof_u[2], DOF_ID dof_v[2], BC_ID bc_u, BC_ID bc_v,
@@ -187,7 +187,7 @@ void Add_To_Matrix(const PARSE_DATA_FEM<TV>& pd,
 }
 
 template<class T,class TV>
-void Add_To_Matrix(const PARSE_DATA_FEM<TV>& pd,
+void Add_To_Matrix(const PARSE_DATA_FEM<TV,TV>& pd,
     ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entries,
     ARRAY<T,CODE_ID>& code_values, const MATRIX<T,TV::m>& visc,
     DOF_ID dof_u[2], DOF_ID dof_v[2], BC_ID bc_u, BC_ID bc_v,
@@ -216,7 +216,7 @@ void Add_To_Matrix(const PARSE_DATA_FEM<TV>& pd,
 }
 
 template<class T,class TV>
-void Add_To_Matrix(const PARSE_DATA_FEM<TV>& pd,
+void Add_To_Matrix(const PARSE_DATA_FEM<TV,TV>& pd,
     ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entries,
     const ARRAY<T,CODE_ID>& code_values, VECTOR<LOCAL_P_CODE_ID,TV::m> pres,
     DOF_ID dof_u[2], DOF_ID dof_p, BC_ID bc_id,
@@ -244,7 +244,7 @@ void Add_To_Matrix(const PARSE_DATA_FEM<TV>& pd,
 }
 
 template<class T,class TV>
-void Add_To_Matrix(const PARSE_DATA_FEM<TV>& pd,
+void Add_To_Matrix(const PARSE_DATA_FEM<TV,TV>& pd,
     ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entries,
     ARRAY<T,CODE_ID>& code_values, const TV& pres,
     DOF_ID dof_u[2], DOF_ID dof_p, BC_ID bc_id,
@@ -270,7 +270,7 @@ void Add_To_Matrix(const PARSE_DATA_FEM<TV>& pd,
 template<class T,class TV>
 void Generate_Discretization(ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entries,
     ARRAY<T,CODE_ID>& code_values,const FLUID_LAYOUT_FEM<TV>& fl,
-    const PARSE_DATA_FEM<TV>& pd,T mu,ARRAY<T,DOF_ID>& rhs)
+    const PARSE_DATA_FEM<TV,TV>& pd,T mu,ARRAY<T,DOF_ID>& rhs)
 {
 
     PIPE_ID unknown_pipe(-2);
@@ -593,7 +593,7 @@ void Generate_Discretization(ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entrie
 }
 
 template<class T,class TV>
-void Solve_And_Display_Solution(const FLUID_LAYOUT_FEM<TV>& fl,const PARSE_DATA_FEM<TV>& pd,
+void Solve_And_Display_Solution(const FLUID_LAYOUT_FEM<TV>& fl,const PARSE_DATA_FEM<TV,TV>& pd,
     const SYSTEM_MATRIX_HELPER<T>& MH,const ARRAY<T,DOF_ID>& rhs_vector,
     ARRAY<T,DOF_ID>* sol_out)
 {
@@ -636,9 +636,9 @@ void Solve_And_Display_Solution(const FLUID_LAYOUT_FEM<TV>& fl,const PARSE_DATA_
 
 template void Generate_Discretization<double,VECTOR<double,2> >(
     ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID>,int>&,ARRAY<double,CODE_ID>&,
-    FLUID_LAYOUT_FEM<VECTOR<double,2> > const&,PARSE_DATA_FEM<VECTOR<double,2> > const&,double,
+    FLUID_LAYOUT_FEM<VECTOR<double,2> > const&,PARSE_DATA_FEM<VECTOR<double,2>,VECTOR<double,2> > const&,double,
     ARRAY<double,DOF_ID>&);
 template void Solve_And_Display_Solution<double,VECTOR<double,2> >(FLUID_LAYOUT_FEM<VECTOR<double,2> > const&,
-    PARSE_DATA_FEM<VECTOR<double,2> > const&,
+    PARSE_DATA_FEM<VECTOR<double,2>,VECTOR<double,2> > const&,
     SYSTEM_MATRIX_HELPER<double> const&,ARRAY<double,DOF_ID> const&,ARRAY<double,DOF_ID>*);
 }

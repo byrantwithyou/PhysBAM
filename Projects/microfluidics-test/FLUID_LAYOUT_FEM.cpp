@@ -18,14 +18,14 @@ namespace PhysBAM{
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class TV> FLUID_LAYOUT_FEM<TV>::
+template<class T> FLUID_LAYOUT_FEM<VECTOR<T,2> >::
 FLUID_LAYOUT_FEM(): area_hidden(*new TRIANGULATED_AREA<T>)
 {
 }
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class TV> FLUID_LAYOUT_FEM<TV>::
+template<class T> FLUID_LAYOUT_FEM<VECTOR<T,2> >::
 ~FLUID_LAYOUT_FEM()
 {
     delete &area_hidden;
@@ -33,8 +33,8 @@ template<class TV> FLUID_LAYOUT_FEM<TV>::
 //#####################################################################
 // Function Generate_Pipe
 //#####################################################################
-template<class TV> void FLUID_LAYOUT_FEM<TV>::
-Generate_Pipe(PIPE_ID pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con)
+template<class T> template<class TW> void FLUID_LAYOUT_FEM<VECTOR<T,2> >::
+Generate_Pipe(PIPE_ID pipe,const PARSE_DATA_FEM<TV,TW>& pd,const CONNECTION& con)
 {
     typedef VECTOR<PARTICLE_ID,3> E;
     PARTICLE_ID base=Number_Particles();
@@ -90,7 +90,7 @@ Generate_Pipe(PIPE_ID pipe,const PARSE_DATA_FEM<TV>& pd,const CONNECTION& con)
 //#####################################################################
 // Function Mark_BC
 //#####################################################################
-template<class TV> void FLUID_LAYOUT_FEM<TV>::
+template<class T> void FLUID_LAYOUT_FEM<VECTOR<T,2> >::
 Mark_BC(const ARRAY<PARTICLE_ID>& pindices,BC_ID bc_id)
 {
     particle_bc_map.Set(pindices(0),bc_id);
@@ -103,8 +103,8 @@ Mark_BC(const ARRAY<PARTICLE_ID>& pindices,BC_ID bc_id)
 //#####################################################################
 // Function Generate_End
 //#####################################################################
-template<class TV> void FLUID_LAYOUT_FEM<TV>::
-Generate_End(VERTEX_ID i,PIPE_ID pipe,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
+template<class T> template<class TW> void FLUID_LAYOUT_FEM<VECTOR<T,2> >::
+Generate_End(VERTEX_ID i,PIPE_ID pipe,const PARSE_DATA_FEM<TV,TW>& pd,CONNECTION& con)
 {
     VERTEX_ID j=pd.pipes(pipe).x;
     if(j==i) j=pd.pipes(pipe).y;
@@ -123,7 +123,7 @@ Generate_End(VERTEX_ID i,PIPE_ID pipe,const PARSE_DATA_FEM<TV>& pd,CONNECTION& c
 //#####################################################################
 // Function Wedge
 //#####################################################################
-template<class TV> VECTOR<TV,3> FLUID_LAYOUT_FEM<TV>::
+template<class T> VECTOR<VECTOR<T,2>,3> FLUID_LAYOUT_FEM<VECTOR<T,2> >::
 Wedge(const TV& joint,const TV& p0,const TV& p1,int half_width,T unit_length) const
 {
     TV e0=(p0-joint).Normalized(),e1=(p1-joint).Normalized();
@@ -139,7 +139,7 @@ Wedge(const TV& joint,const TV& p0,const TV& p1,int half_width,T unit_length) co
 //#####################################################################
 // Function Sample_Interpolated
 //#####################################################################
-template<class TV> ARRAY<PARTICLE_ID> FLUID_LAYOUT_FEM<TV>::
+template<class T> ARRAY<PARTICLE_ID> FLUID_LAYOUT_FEM<VECTOR<T,2> >::
 Sample_Interpolated(T s,const ARRAY<PARTICLE_ID>& side0,const ARRAY<PARTICLE_ID>& side1,T unit_length)
 {
     ARRAY<T> l0(side0.m),l1(side1.m);
@@ -200,7 +200,7 @@ Sample_Interpolated(T s,const ARRAY<PARTICLE_ID>& side0,const ARRAY<PARTICLE_ID>
 //#####################################################################
 // Function Merge_Interpolated
 //#####################################################################
-template<class TV> void FLUID_LAYOUT_FEM<TV>::
+template<class T> void FLUID_LAYOUT_FEM<VECTOR<T,2> >::
 Merge_Interpolated(const ARRAY<PARTICLE_ID>& left,const ARRAY<PARTICLE_ID>& right)
 {
     typedef VECTOR<PARTICLE_ID,3> E;
@@ -258,7 +258,7 @@ Merge_Interpolated(const ARRAY<PARTICLE_ID>& left,const ARRAY<PARTICLE_ID>& righ
 //#####################################################################
 // Function Polyline
 //#####################################################################
-template<class TV> ARRAY<PARTICLE_ID> FLUID_LAYOUT_FEM<TV>::
+template<class T> ARRAY<PARTICLE_ID> FLUID_LAYOUT_FEM<VECTOR<T,2> >::
 Polyline(const ARRAY<TV>& points,T unit_length)
 {
     ARRAY<PARTICLE_ID> verts;
@@ -278,7 +278,7 @@ Polyline(const ARRAY<TV>& points,T unit_length)
 //#####################################################################
 // Function Arc
 //#####################################################################
-template<class TV> PAIR<ARRAY<PARTICLE_ID>,ARRAY<PARTICLE_ID> > FLUID_LAYOUT_FEM<TV>::
+template<class T> PAIR<ARRAY<PARTICLE_ID>,ARRAY<PARTICLE_ID> > FLUID_LAYOUT_FEM<VECTOR<T,2> >::
 Arc(const TV& c,const TV& p0,const TV& p1,int half_width,T unit_length,
     const TV& dir0,T n0,const TV& dir1,T n1)
 {
@@ -316,7 +316,7 @@ Arc(const TV& c,const TV& p0,const TV& p1,int half_width,T unit_length,
 //#####################################################################
 // Function Corner
 //#####################################################################
-template<class TV> PAIR<ARRAY<PARTICLE_ID>,ARRAY<PARTICLE_ID> > FLUID_LAYOUT_FEM<TV>::
+template<class T> PAIR<ARRAY<PARTICLE_ID>,ARRAY<PARTICLE_ID> > FLUID_LAYOUT_FEM<VECTOR<T,2> >::
 Corner(const TV& c,const TV& elbow,const TV& p0,const TV& p1,T unit_length,
     const TV& dir0,T n0,const TV& dir1,T n1)
 {
@@ -359,7 +359,7 @@ Corner(const TV& c,const TV& elbow,const TV& p0,const TV& p1,T unit_length,
 //#####################################################################
 // Function Weld
 //#####################################################################
-template<class TV> void FLUID_LAYOUT_FEM<TV>::
+template<class T> void FLUID_LAYOUT_FEM<VECTOR<T,2> >::
 Weld(int n,const ARRAY<PARTICLE_ID>& side0,const ARRAY<PARTICLE_ID>& side1,T unit_length,ARRAY<PARTICLE_ID>& f0,ARRAY<PARTICLE_ID>& f1)
 {
     f0.Append(side0(0));
@@ -381,8 +381,8 @@ Weld(int n,const ARRAY<PARTICLE_ID>& side0,const ARRAY<PARTICLE_ID>& side1,T uni
 //#####################################################################
 // Function Generate_2_Joint
 //#####################################################################
-template<class TV> void FLUID_LAYOUT_FEM<TV>::
-Generate_2_Joint(VERTEX_ID i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con,JOINT_TYPE jt)
+template<class T> template<class TW> void FLUID_LAYOUT_FEM<VECTOR<T,2> >::
+Generate_2_Joint(VERTEX_ID i,const PARSE_DATA_FEM<TV,TW>& pd,CONNECTION& con,JOINT_TYPE jt)
 {
     typedef VECTOR<PARTICLE_ID,3> E;
     const ARRAY<PIPE_ID>& pipes=pd.pts(i).joints;
@@ -418,10 +418,10 @@ Generate_2_Joint(VERTEX_ID i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con,JOINT_
 //#####################################################################
 // Function Generate_3_Joint_SmallMin
 //#####################################################################
-template<class TV> void FLUID_LAYOUT_FEM<TV>::
+template<class T> template<class TW> void FLUID_LAYOUT_FEM<VECTOR<T,2> >::
 Generate_3_Joint_SmallMin(VERTEX_ID i,const VECTOR<VERTEX_ID,3>& ends,const VECTOR<PIPE_ID,3>& pipes,
     const VECTOR<T,3>& angles,const VECTOR<VECTOR<TV,3>,3>& tri,
-    const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
+    const PARSE_DATA_FEM<TV,TW>& pd,CONNECTION& con)
 {
     TV pipe_dir[3];
     T min_angle=2*pi;
@@ -492,10 +492,10 @@ Generate_3_Joint_SmallMin(VERTEX_ID i,const VECTOR<VERTEX_ID,3>& ends,const VECT
 //#####################################################################
 // Function Generate_3_Joint_LargeMin
 //#####################################################################
-template<class TV> void FLUID_LAYOUT_FEM<TV>::
+template<class T> template<class TW> void FLUID_LAYOUT_FEM<VECTOR<T,2> >::
 Generate_3_Joint_LargeMin(VERTEX_ID i,const VECTOR<VERTEX_ID,3>& ends,const VECTOR<PIPE_ID,3>& pipes,
     const VECTOR<T,3>& angles,const VECTOR<VECTOR<TV,3>,3>& tri,
-    const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
+    const PARSE_DATA_FEM<TV,TW>& pd,CONNECTION& con)
 {
     TV c=pd.pts(i).pt;
     TV pipe_dir[3];
@@ -544,8 +544,8 @@ Generate_3_Joint_LargeMin(VERTEX_ID i,const VECTOR<VERTEX_ID,3>& ends,const VECT
 //#####################################################################
 // Function Generate_3_Joint
 //#####################################################################
-template<class TV> void FLUID_LAYOUT_FEM<TV>::
-Generate_3_Joint(VERTEX_ID i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
+template<class T> template<class TW> void FLUID_LAYOUT_FEM<VECTOR<T,2> >::
+Generate_3_Joint(VERTEX_ID i,const PARSE_DATA_FEM<TV,TW>& pd,CONNECTION& con)
 {
     Dump_Input(pd);
     const ARRAY<PIPE_ID>& pipes=pd.pts(i).joints;
@@ -584,8 +584,8 @@ Generate_3_Joint(VERTEX_ID i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
 //#####################################################################
 // Function Generate_Joint
 //#####################################################################
-template<class TV> void FLUID_LAYOUT_FEM<TV>::
-Generate_Joint(VERTEX_ID i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
+template<class T> template<class TW> void FLUID_LAYOUT_FEM<VECTOR<T,2> >::
+Generate_Joint(VERTEX_ID i,const PARSE_DATA_FEM<TV,TW>& pd,CONNECTION& con)
 {
     const ARRAY<PIPE_ID>& p=pd.pts(i).joints;
     if(p.m==1)
@@ -599,8 +599,8 @@ Generate_Joint(VERTEX_ID i,const PARSE_DATA_FEM<TV>& pd,CONNECTION& con)
 //#####################################################################
 // Function Compute
 //#####################################################################
-template<class TV> void FLUID_LAYOUT_FEM<TV>::
-Compute(const PARSE_DATA_FEM<TV>& pd)
+template<class T> template<class TW> void FLUID_LAYOUT_FEM<VECTOR<T,2> >::
+Compute(const PARSE_DATA_FEM<TV,TW>& pd)
 {
     CONNECTION con;
     for(VERTEX_ID i(0);i<pd.pts.m;i++){
@@ -616,8 +616,8 @@ Compute(const PARSE_DATA_FEM<TV>& pd)
 //#####################################################################
 // Function Allocate_Dofs
 //#####################################################################
-template<class TV> void FLUID_LAYOUT_FEM<TV>::
-Allocate_Dofs(const PARSE_DATA_FEM<TV>& pd)
+template<class T> template<class TW> void FLUID_LAYOUT_FEM<VECTOR<T,2> >::
+Allocate_Dofs(const PARSE_DATA_FEM<TV,TW>& pd)
 {
     area_hidden.mesh.Initialize_Segment_Mesh();
     area_hidden.mesh.Initialize_Edge_Triangles();
@@ -686,7 +686,7 @@ Allocate_Dofs(const PARSE_DATA_FEM<TV>& pd)
 //#####################################################################
 // Function Print_Statistics
 //#####################################################################
-template<class TV> void FLUID_LAYOUT_FEM<TV>::
+template<class T> void FLUID_LAYOUT_FEM<VECTOR<T,2> >::
 Print_Statistics() const
 {
     area_hidden.mesh.Initialize_Adjacent_Elements();
@@ -710,7 +710,7 @@ Print_Statistics() const
 //#####################################################################
 // Function Dump_Mesh
 //#####################################################################
-template<class TV> void FLUID_LAYOUT_FEM<TV>::
+template<class T> void FLUID_LAYOUT_FEM<VECTOR<T,2> >::
 Dump_Mesh() const
 {
     for(TRIANGLE_ID i(0);i<Number_Triangles();i++){
@@ -722,7 +722,7 @@ Dump_Mesh() const
 //#####################################################################
 // Function Dump_Edge_Blocks
 //#####################################################################
-template<class TV> void FLUID_LAYOUT_FEM<TV>::
+template<class T> void FLUID_LAYOUT_FEM<VECTOR<T,2> >::
 Dump_Edge_Blocks() const
 {
     Dump_Mesh();
@@ -736,7 +736,7 @@ Dump_Edge_Blocks() const
 //#####################################################################
 // Function Dump_Node_Blocks
 //#####################################################################
-template<class TV> void FLUID_LAYOUT_FEM<TV>::
+template<class T> void FLUID_LAYOUT_FEM<VECTOR<T,2> >::
 Dump_Node_Blocks() const
 {
     Dump_Mesh();
@@ -749,7 +749,7 @@ Dump_Node_Blocks() const
 //#####################################################################
 // Function Dump_Dofs
 //#####################################################################
-template<class TV> void FLUID_LAYOUT_FEM<TV>::
+template<class T> void FLUID_LAYOUT_FEM<VECTOR<T,2> >::
 Dump_Dofs() const
 {
     VECTOR<T,3> colors[]={VECTOR<T,3>(1,0,1),VECTOR<T,3>(0,1,1)};
@@ -777,7 +777,7 @@ Dump_Dofs() const
 //#####################################################################
 // Function Dump_Layout
 //#####################################################################
-template<class TV> void FLUID_LAYOUT_FEM<TV>::
+template<class T> void FLUID_LAYOUT_FEM<VECTOR<T,2> >::
 Dump_Layout() const
 {
     Dump_Mesh();
@@ -790,8 +790,8 @@ Dump_Layout() const
 //#####################################################################
 // Function Dump_Input
 //#####################################################################
-template<class TV> void FLUID_LAYOUT_FEM<TV>::
-Dump_Input(const PARSE_DATA_FEM<TV>& pd) const
+template<class T> template<class TW> void FLUID_LAYOUT_FEM<VECTOR<T,2> >::
+Dump_Input(const PARSE_DATA_FEM<TV,TW>& pd) const
 {
     for(auto& i:pd.pts)
         Add_Debug_Particle(i.pt,VECTOR<T,3>(0,0,1));
@@ -799,4 +799,10 @@ Dump_Input(const PARSE_DATA_FEM<TV>& pd) const
         Add_Debug_Object<TV,2>(VECTOR<TV,2>(pd.pts(i.x).pt,pd.pts(i.y).pt),VECTOR<T,3>(0,0,1));
 }
 template struct FLUID_LAYOUT_FEM<VECTOR<double,2> >;
+template void FLUID_LAYOUT_FEM<VECTOR<double,2> >::Compute<VECTOR<double,2> >(PARSE_DATA_FEM<VECTOR<double,2>,VECTOR<double,2> > const&);
+template void FLUID_LAYOUT_FEM<VECTOR<double,2> >::Dump_Input<VECTOR<double,2> >(PARSE_DATA_FEM<VECTOR<double,2>,VECTOR<double,2> > const&) const;
+template void FLUID_LAYOUT_FEM<VECTOR<double,2> >::Generate_Joint<VECTOR<double,3> >(VERTEX_ID,
+    PARSE_DATA_FEM<VECTOR<double,2>,VECTOR<double,3> > const&,HASHTABLE<PAIR<VERTEX_ID,PIPE_ID>,ARRAY<PARTICLE_ID,int> >&);
+template void FLUID_LAYOUT_FEM<VECTOR<double,2> >::Generate_Pipe<VECTOR<double,3> >(PIPE_ID,
+    PARSE_DATA_FEM<VECTOR<double,2>,VECTOR<double,3> > const&,HASHTABLE<PAIR<VERTEX_ID,PIPE_ID>,ARRAY<PARTICLE_ID,int> > const&);
 }
