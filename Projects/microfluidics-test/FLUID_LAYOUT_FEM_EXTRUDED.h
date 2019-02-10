@@ -41,6 +41,7 @@ struct FLUID_LAYOUT_FEM<VECTOR<T,3> >
     void Dump_Node_Blocks() const;
     void Dump_Edge_Blocks() const;
     void Dump_Dofs() const;
+    void Dump_Blocks() const;
     void Print_Statistics() const;
     void Extrude(int layers,T dz);
     void Update_BC_Planar(const PARSE_DATA_FEM<TV,TV3>& pd);

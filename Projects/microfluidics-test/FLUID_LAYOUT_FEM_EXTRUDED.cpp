@@ -199,7 +199,7 @@ Dump_Mesh() const
 template<typename T> void FLUID_LAYOUT_FEM<VECTOR<T,3> >::
 Dump_Layout() const
 {
-    for(BLOCK_ID b(0);b<fl2.blocks.m;b++){
+    for(BLOCK_ID b(0);b<blocks.m;b++){
         for(TRIANGLE_ID e(0);e<Number_Tetrahedrons();e++){
             if(elem_blocks(e)!=b) continue;
             auto tet=TETRAHEDRON<T>(vol_hidden.particles.X.Subset(Tetrahedron(e)));
@@ -215,7 +215,7 @@ Dump_Layout() const
 template<typename T> void FLUID_LAYOUT_FEM<VECTOR<T,3> >::
 Dump_Node_Blocks() const
 {
-    for(BLOCK_ID b(0);b<fl2.blocks.m;b++){
+    for(BLOCK_ID b(0);b<blocks.m;b++){
         for(TRIANGLE_ID e(0);e<Number_Tetrahedrons();e++){
             if(elem_blocks(e)!=b) continue;
             auto indices=Tetrahedron(e);
@@ -234,7 +234,7 @@ Dump_Node_Blocks() const
 template<typename T> void FLUID_LAYOUT_FEM<VECTOR<T,3> >::
 Dump_Edge_Blocks() const
 {
-    for(BLOCK_ID b(0);b<fl2.blocks.m;b++){
+    for(BLOCK_ID b(0);b<blocks.m;b++){
         for(TRIANGLE_ID e(0);e<Number_Tetrahedrons();e++){
             if(elem_blocks(e)!=b) continue;
             auto indices=Tetrahedron(e);
@@ -252,7 +252,7 @@ Dump_Edge_Blocks() const
 template<typename T> void FLUID_LAYOUT_FEM<VECTOR<T,3> >::
 Dump_Dofs() const
 {
-    for(BLOCK_ID b(0);b<fl2.blocks.m;b++){
+    for(BLOCK_ID b(0);b<blocks.m;b++){
         for(TRIANGLE_ID e(0);e<Number_Tetrahedrons();e++){
             if(elem_blocks(e)!=b) continue;
             auto indices=Tetrahedron(e);
@@ -267,7 +267,7 @@ Dump_Dofs() const
                 Add_Debug_Text(tet(j),s,VECTOR<T,3>(1,1,1));}}
         Flush_Frame<TV3>("vel node dof");}
 
-    for(BLOCK_ID b(0);b<fl2.blocks.m;b++){
+    for(BLOCK_ID b(0);b<blocks.m;b++){
         for(TRIANGLE_ID e(0);e<Number_Tetrahedrons();e++){
             if(elem_blocks(e)!=b) continue;
             auto indices=Tetrahedron(e);
@@ -283,7 +283,7 @@ Dump_Dofs() const
         Flush_Frame<TV3>("pressure dof");}
 
     vol_hidden.mesh.segment_mesh->Initialize_Incident_Elements();
-    for(BLOCK_ID b(0);b<fl2.blocks.m;b++){
+    for(BLOCK_ID b(0);b<blocks.m;b++){
         for(TRIANGLE_ID e(0);e<Number_Tetrahedrons();e++){
             if(elem_blocks(e)!=b) continue;
             auto indices=Tetrahedron(e);
@@ -297,6 +297,59 @@ Dump_Dofs() const
                 std::string s=LOG::sprintf("%i",dof);
                 Add_Debug_Text(0.5*(tet(j)+tet(k%4)),s,VECTOR<T,3>(1,1,1));}}
         Flush_Frame<TV3>("vel edge dof");}
+
+    Dump_Blocks();
+}
+//#####################################################################
+// Function Dump_Blocks
+//#####################################################################
+template<typename T> void FLUID_LAYOUT_FEM<VECTOR<T,3> >::
+Dump_Blocks() const
+{
+    ARRAY<ARRAY<int>,BLOCK_ID> block_dofs(blocks.m);
+    for(BLOCK_ID b(0);b<blocks.m;b++)
+        block_dofs(b).Resize(blocks(b).num_dofs,use_init,-1);
+    for(PARTICLE_ID i(0);i<pressure_dofs.m;i++){
+        DOF_ID dof=pressure_dofs(i);
+        VECTOR<int,2> b=dof_map(dof);
+        block_dofs(BLOCK_ID(b(0)))(b(1))=Value(i);
+        dof=vel_node_dofs(i);
+        if(dof<DOF_ID(0)) continue;
+        b=dof_map(dof);
+        for(int a=0;a<TV3::m;a++)
+            block_dofs(BLOCK_ID(b(0)))(b(1)+a)=Value(i);}
+    for(int i=0;i<vol_hidden.mesh.segment_mesh->elements.m;i++){
+        VECTOR<int,2> p=vol_hidden.mesh.segment_mesh->elements(i).Sorted();
+        DOF_ID dof=vel_edge_dofs(EDGE_ID(i));
+        if(dof<DOF_ID(0)) continue;
+        VECTOR<int,2> b=dof_map(dof);
+        block_dofs(BLOCK_ID(b(0)))(b(1))=p(0);
+        block_dofs(BLOCK_ID(b(0)))(b(1)+1)=p(1);}
+
+    for(BLOCK_ID b(0);b<blocks.m;b++){
+        int m=Value(Number_Particles());
+        for(int i=0;i<block_dofs(b).m;i++)
+            if(block_dofs(b)(i)!=-1)
+                m=std::min(m,block_dofs(b)(i));
+        for(int i=0;i<block_dofs(b).m;i++)
+            if(block_dofs(b)(i)!=-1)
+                block_dofs(b)(i)-=m;}
+    ARRAY<bool,BLOCK_ID> visited(blocks.m,use_init,false);
+    for(BLOCK_ID b(0);b<blocks.m;b++){
+        if(visited(b)) continue;
+        for(BLOCK_ID b1(Value(b)+1);b1<blocks.m;b1++){
+            if(visited(b1)) continue;
+            for(TRIANGLE_ID e(0);e<Number_Tetrahedrons();e++){
+                if(elem_blocks(e)!=b && elem_blocks(e)!=b1) continue;
+                if(elem_blocks(e)==b1 && block_dofs(b1)!=block_dofs(b)) continue;
+                auto indices=Tetrahedron(e);
+                auto tet=vol_hidden.particles.X.Subset(indices);
+                auto tet_tri=TETRAHEDRON<T>(tet);
+                for(int j=0;j<4;j++){
+                    Add_Debug_Object<TV3,3>(tet_tri.triangle(j).X,VECTOR<T,3>(1,1,1));}
+                if(elem_blocks(e)==b1) visited(b1)=true;}}
+        visited(b)=true;
+        Flush_Frame<TV3>("check regular blocks");}
 }
 //#####################################################################
 // Function Print_Statistics
