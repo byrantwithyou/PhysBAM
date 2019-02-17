@@ -95,26 +95,26 @@ private:
 
     // pair.x = location in hash where this entry is/should be be placed.
     // pair.y = true if the key is already present at pair.x
-    // If check_exists=false, don't check for the key being present
-    template<bool check_exists>
     PAIR<int,bool> Search(const TK& v) const
     {
         for(int h=Hash_Index(v);;h=Next_Index(h)){
             if(table(h).state==ENTRY_FREE) return PAIR<int,bool>(h,false);
-            if(check_exists && table(h).state==ENTRY_ACTIVE && table(h).key==v) return PAIR<int,bool>(h,true);}
+            if(table(h).state==ENTRY_ACTIVE && table(h).key==v)
+                return PAIR<int,bool>(h,true);}
     }
 
     // pair.x = location in hash where this entry is
-    // pair.y = true if the key was already present at pair.x
-    // If check_exists=false, don't check for the key being present
-    // In debug mode, checks anyway so it can assert.
-    template<bool check_exists>
+    // pair.y = true if the key was inserted at pair.x
     PAIR<int,bool> Insert_Helper(const TK& v)
     {
         if(number_of_entries>next_resize) Resize_Table();
-        auto pr=Search<check_exists||is_debug>(v);
-        if(!check_exists && is_debug) assert(!pr.y);
-        if(!check_exists || !pr.y){number_of_entries++;ENTRY& entry=table(pr.x);entry.key=v;entry.state=ENTRY_ACTIVE;}
+        auto pr=Search(v);
+        if(!pr.y){
+            number_of_entries++;
+            ENTRY& entry=table(pr.x);
+            entry.key=v;
+            entry.state=ENTRY_ACTIVE;}
+        pr.y=!pr.y;
         return pr;
     }
 
@@ -126,42 +126,51 @@ private:
     {Insert(entry.key,entry.data);}
 public:
 
-    void Insert(const TK& v) // assumes no entry with v exists
-    {STATIC_ASSERT((is_same<T,void>::value));Insert_Helper<false>(v);}
+    bool Insert(const TK& v)
+    {STATIC_ASSERT((is_same<T,void>::value));return Insert_Helper(v).y;}
 
-    T_UNLESS_VOID& Insert(const TK& v,const T_UNLESS_VOID& value) // assumes no entry with v exists
-    {STATIC_ASSERT((!is_same<T,void>::value));return table(Insert_Helper<false>(v).x).data=value;}
+    // If v not already present, inserts {v,value}; returns {&data, true}
+    // If already present, just return {&data, false}
+    PAIR<T_UNLESS_VOID*,bool> Insert(const TK& v,const T_UNLESS_VOID& value) // assumes no entry with v exists
+    {
+        STATIC_ASSERT((!is_same<T,void>::value));
+        auto pr=Insert_Helper(v);
+        if(pr.y) table(pr.x).data=value;
+        return {&table(pr.x).data,pr.y};
+    }
 
     // inserts the default if key not found
     T_UNLESS_VOID& Get_Or_Insert(const TK& v,const T_UNLESS_VOID& default_value=T_UNLESS_VOID())
-    {auto pr=Insert_Helper<true>(v);T_UNLESS_VOID& data=table(pr.x).data;if(!pr.y) data=default_value;return data;}
+    {return *Insert(v,default_value).x;}
 
     T* Get_Pointer(const TK& v) // returns NULL if key not found
-    {auto pr=Search<true>(v);return pr.y?&table(pr.x).data:0;}
+    {auto pr=Search(v);return pr.y?&table(pr.x).data:0;}
 
     const T* Get_Pointer(const TK& v) const // returns NULL if key not found
-    {auto pr=Search<true>(v);return pr.y?&table(pr.x).data:0;}
+    {auto pr=Search(v);return pr.y?&table(pr.x).data:0;}
 
     T_UNLESS_VOID& Get(const TK& v) // fails if key not found
-    {auto pr=Search<true>(v);if(pr.y) return table(pr.x).data;throw KEY_ERROR("HASHTABLE::Get");}
+    {auto pr=Search(v);if(pr.y) return table(pr.x).data;throw KEY_ERROR("HASHTABLE::Get");}
 
     const T_UNLESS_VOID& Get(const TK& v) const // fails if key not found
-    {auto pr=Search<true>(v);if(pr.y) return table(pr.x).data;throw KEY_ERROR("HASHTABLE::Get");}
+    {auto pr=Search(v);if(pr.y) return table(pr.x).data;throw KEY_ERROR("HASHTABLE::Get");}
 
     T Get_Default(const TK& v,const T_UNLESS_VOID& default_value=T_UNLESS_VOID()) const // returns default_value if key not found
-    {auto pr=Search<true>(v);if(pr.y) return table(pr.x).data;return default_value;}
+    {auto pr=Search(v);if(pr.y) return table(pr.x).data;return default_value;}
 
     bool Contains(const TK& v) const
-    {return Search<true>(v).y;}
+    {return Search(v).y;}
 
     bool Get(const TK& v,T_UNLESS_VOID& value) const
-    {auto pr=Search<true>(v);if(pr.y) value=table(pr.x).data;return pr.y;}
+    {auto pr=Search(v);if(pr.y) value=table(pr.x).data;return pr.y;}
 
-    bool Set(const TK& v) // insert entry if doesn't already exists, returns whether it added a new entry
-    {STATIC_ASSERT((is_same<T,void>::value));return !Insert_Helper<true>(v).y;}
+    // insert entry if doesn't already exists, returns whether it added a new entry
+    bool Set(const TK& v)
+    {return Insert(v);}
 
-    bool Set(const TK& v,const T_UNLESS_VOID& value) // if v doesn't exist insert value, else sets its value, returns whether it added a new entry
-    {STATIC_ASSERT((!is_same<T,void>::value));auto pr=Insert_Helper<true>(v);if(!pr.y) table(pr.x).data=value;return !pr.y;}
+    // if v doesn't exist insert it.  Always sets value.  Returns whether it added a new entry
+    bool Set(const TK& v,const T_UNLESS_VOID& value)
+    {STATIC_ASSERT((!is_same<T,void>::value));auto pr=Insert_Helper(v);table(pr.x).data=value;return pr.y;}
 
     template<class T_ARRAY>
     void Set_All(const T_ARRAY& array)
@@ -175,7 +184,7 @@ public:
     for(typename T_ARRAY::INDEX i(0);i<array.Size();i++) Set(key(i),array(i));}
 
     bool Delete_If_Present(const TK& v)
-    {auto pr=Search<true>(v);if(pr.y){table(pr.x).state=ENTRY_DELETED;number_of_entries--;next_resize--;}return pr.y;}
+    {auto pr=Search(v);if(pr.y){table(pr.x).state=ENTRY_DELETED;number_of_entries--;next_resize--;}return pr.y;}
 
     void Delete(const TK& v)
     {if(!Delete_If_Present(v)) throw KEY_ERROR("HASHTABLE::Delete");}
