@@ -94,19 +94,23 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     };
     ARRAY<CANONICAL_BLOCK,CANONICAL_BLOCK_ID> canonical_blocks;
 
+    // first is master, second is slave
+    struct BLOCK_CONNECTION
+    {
+        BLOCK_ID id;
+        int con_id; // if irregular, ~con_id is index into irregular_connections
+        bool master;
+    };
+
     struct BLOCK
     {
         CANONICAL_BLOCK_ID block;
         XFORM xform;
-        int master_mask; // which cross connectors am I master on
+        ARRAY<BLOCK_CONNECTION> connections;
+        ARRAY<int> edge_on; // for edge-on (index in irregular_connections)
     };
 
-    struct BLOCK_CONNECTION
-    {
-        BLOCK_ID id[2];
-        int con_id[2];
-    };
-
+    // regular is master
     struct IRREGULAR_CONNECTION
     {
         BLOCK_ID regular;
@@ -123,9 +127,8 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     };
 
     ARRAY<BLOCK,BLOCK_ID> blocks;
-    ARRAY<BLOCK_CONNECTION> connections; // first is master
     ARRAY<IRREGULAR_CONNECTION> irregular_connections;
-
+    
     struct PIPE_KEY
     {
         CROSS_SECTION_TYPE_ID type;
@@ -188,6 +191,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     CANONICAL_BLOCK_ID Make_Canonical_Change_Block(const PIPE_CHANGE_KEY& key);
     CROSS_SECTION_TYPE_ID Get_Cross_Section_ID(const CROSS_SECTION_TYPE& cs);
     void Compute();
+    void Update_Masters();
 
     struct VERTEX_DATA
     {
@@ -197,6 +201,16 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
 
     void Emit_Component_Blocks(CANONICAL_COMPONENT* cc,const XFORM& xf,ARRAY<VERTEX_DATA>& vd);
     void Set_Cornector(VERTEX_DATA& vd,BLOCK_ID id,int con_id);
+
+    // return: flags indicating which connections interact
+    // pair: block + master mask
+    HASHTABLE<PAIR<CANONICAL_BLOCK_ID,int>,int> separates_dofs;
+    int Separates_Dofs(BLOCK_ID b);
+
+    HASHTABLE<std::tuple<CANONICAL_BLOCK_ID,int,CANONICAL_BLOCK_ID,int>,CANONICAL_BLOCK_ID> merge_canonical_blocks;
+    void Merge_Blocks(BLOCK_ID id,int con_id);
+    CANONICAL_BLOCK_ID Merge_Canonical_Blocks(CANONICAL_BLOCK_ID id0,int con_id0,
+        XFORM xf0,CANONICAL_BLOCK_ID id1,int con_id1,XFORM xf1);
 };
 
 }

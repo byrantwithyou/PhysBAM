@@ -6,7 +6,18 @@
 #include <Core/Log/LOG.h>
 #include <fstream>
 #include "COMPONENT_LAYOUT_FEM.h"
+#include <tuple>
 namespace PhysBAM{
+
+template<class T>
+bool Canonical_Direction(VECTOR<T,2> u)
+{
+    auto tol=COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::comp_tol;
+    if(u.x>tol) return true;
+    if(u.x<-tol) return false;
+    if(u.x>tol) return true;
+    return false;
+}
 
 // c <cross-section-name> <num-elements> <width>
 // v <vertex-name> <vertex-location-2d>
@@ -91,6 +102,11 @@ Parse_Input(const std::string& pipe_file)
                     PIPE_KEY key;
                     key.type=cross_section_hash.Get(name);
                     TV dir=vd(1).X-vd(0).X;
+                    if(!Canonical_Direction(dir))
+                    {
+                        dir=-dir;
+                        std::swap(vd(0),vd(1));
+                    }
                     key.length=dir.Normalize();
                     XFORM xf={Compute_Xform(dir),vd(0).X};
                     auto cc=Make_Canonical_Pipe(key);
@@ -107,12 +123,17 @@ Parse_Input(const std::string& pipe_file)
                     ss>>name>>name2>>t0>>t1;
                     TV A=vertices.Get(name);
                     TV B=vertices.Get(name2);
-                    TV u=(B-A).Normalized();
-                    TV C=A+u*t0;
-                    TV D=C+u*t1;
+                    TV dir=(B-A).Normalized();
+                    if(!Canonical_Direction(dir))
+                    {
+                        dir=-dir;
+                        std::swap(A,B);
+                    }
+                    TV C=A+dir*t0;
+                    TV D=C+dir*t1;
                     key.length=t1;
                     auto cc=Make_Canonical_Pipe_Change(key);
-                    XFORM xf={Compute_Xform((B-A).Normalized()),A};
+                    XFORM xf={Compute_Xform(dir),A};
                     ss>>name>>name2;
 
                     ARRAY<VERTEX_DATA> vd(i0);
@@ -136,7 +157,8 @@ Set_Cornector(VERTEX_DATA& vd,BLOCK_ID id,int con_id)
 {
     if(vd.con.regular>=BLOCK_ID())
     {
-        connections.Append({{vd.con.regular,id},{vd.con.con_id,con_id}});
+        blocks(vd.con.regular).connections.Append({id,con_id});
+        blocks(id).connections.Append({vd.con.regular,vd.con.con_id});
     }
     else
     {
@@ -153,16 +175,17 @@ template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Emit_Component_Blocks(CANONICAL_COMPONENT* cc,const XFORM& xf,ARRAY<VERTEX_DATA>& vd)
 {
     int offset=Value(blocks.m);
-    for(BLOCK_ID i(0);i<cc->blocks.m;i++)
-        blocks.Append({cc->blocks(i).block,Compose_Xform(xf,cc->blocks(i).xform)});
-
-    for(auto a:cc->connections)
+    for(BLOCK_ID b(0);b<cc->blocks.m;b++)
     {
-        if(a.id[0]>=BLOCK_ID()) a.id[0]+=offset;
-        if(a.id[1]>=BLOCK_ID()) a.id[1]+=offset;
-        if(a.id[0]<BLOCK_ID()) Set_Cornector(vd(~Value(a.id[0])),a.id[1],a.con_id[1]);
-        else if(a.id[1]<BLOCK_ID()) Set_Cornector(vd(~Value(a.id[1])),a.id[0],a.con_id[0]);
-        else connections.Append(a);
+        auto& bb=cc->blocks(b);
+        for(int c=0;c<bb.connections.m;c++)
+        {
+            auto& cc=bb.connections(c);
+            if(cc.id>=BLOCK_ID()) cc.id+=offset;
+            else Set_Cornector(vd(~Value(cc.id)),b,c);
+        }
+        bb.xform=Compose_Xform(xf,bb.xform);
+        blocks.Append(bb);
     }
 
     for(auto a:cc->irregular_connections)
@@ -200,15 +223,13 @@ Compose_Xform(const XFORM& a,const XFORM& b) -> XFORM
     if(a.id==XFORM_ID()) return {b.id,a.b+b.b};
     if(b.id==XFORM_ID()) return {a.id,a.b+xforms(a.id)*b.b};
 
-    XFORM_ID id;
-    if(XFORM_ID* pid=xform_comp_table.Get_Pointer({a.id,b.id}))
-        id=*pid;
-    else
+    auto pr=xform_comp_table.Insert({a.id,b.id},XFORM_ID());
+    if(pr.y)
     {
-        id=xforms.Append(xforms(a.id)*xforms(b.id));
-        xform_comp_table.Set({a.id,b.id},id);
+        *pr.x=xforms.Append(xforms(a.id)*xforms(b.id));
+        xform_comp_table.Set({a.id,b.id},*pr.x);
     }
-    return {id,a.b+xforms(a.id)*b.b};
+    return {*pr.x,a.b+xforms(a.id)*b.b};
 }
 //#####################################################################
 // Function Make_Canonical_Pipe_Block
@@ -260,20 +281,26 @@ Make_Canonical_Pipe(const PIPE_KEY& key) -> CANONICAL_COMPONENT*
     T offset=0;
     if(length>target_length*(T)1.5)
     {
-        CANONICAL_BLOCK_ID target_id=Make_Canonical_Pipe_Block({key.type,target_length});
+        CANONICAL_BLOCK_ID id=Make_Canonical_Pipe_Block({key.type,target_length});
         while(length>target_length*(T)1.5)
         {
-            cc->blocks.Append({target_id,{XFORM_ID(),TV(offset,0)},1});
+            cc->blocks.Append(
+                {
+                    id,
+                    {XFORM_ID(),TV(offset,0)},
+                    {{cc->blocks.m-1,1},{cc->blocks.m+1,0}}
+                });
             length-=target_length;
             offset+=target_length;
         }
     }
-    CANONICAL_BLOCK_ID extra_id=Make_Canonical_Pipe_Block({key.type,length});
-    cc->blocks.Append({extra_id,{XFORM_ID(),TV(offset,0)},1});
-    for(BLOCK_ID i(0);i<cc->blocks.m;i++)
-        cc->connections.Append({{i-1,i},{1,0}});
-    cc->connections(0).id[0]=BLOCK_ID(~0);
-    cc->connections.Last().id[1]=BLOCK_ID(~1);
+    CANONICAL_BLOCK_ID id=Make_Canonical_Pipe_Block({key.type,length});
+    cc->blocks.Append(
+        {
+            id,
+            {XFORM_ID(),TV(offset,0)},
+            {{cc->blocks.m-1,1},{BLOCK_ID(~1),0}}
+        });
     return cc;
 }
 //#####################################################################
@@ -318,21 +345,26 @@ Make_Canonical_Pipe_Change(const PIPE_CHANGE_KEY& key) -> CANONICAL_COMPONENT*
         auto nid=Get_Cross_Section_ID({nd,nw});
         PIPE_CHANGE_KEY k={{oid,nid},wid};
         CANONICAL_BLOCK_ID id=Make_Canonical_Change_Block(k);
-        cc->blocks.Append({id,{XFORM_ID(),TV(i*wid,0)},1});
+        cc->blocks.Append(
+            {
+                id,
+                {XFORM_ID(),TV(i*wid,0)},
+                {{cc->blocks.m-1,1},{cc->blocks.m+1,0}}
+            });
     }
-    for(BLOCK_ID i(0);i<cc->blocks.m;i++)
-        cc->connections.Append({{i-1,i},{1,0}});
-    cc->connections(0).id[0]=BLOCK_ID(~0);
-    cc->connections.Last().id[1]=BLOCK_ID(~1);
+    cc->blocks.Last().connections(1).id=BLOCK_ID(~1);
     return cc;
 }
 template<class F> // func(a,b) means val(a)<val(b)
 void Cross_Section_Topology(ARRAY<VECTOR<int,3> >& E,F func,int n0,int n1)
 {
-    int a=0,b=n0,c=n0+n1;
+    int a=0,b=n0,c=n0+n1,ma=a+n0/2,mb=b+n1/2;
     while(a<n0 || b<c)
     {
-        if(b>=c || (a<b && func(a+1,b+1)))
+        // Ensure that the midpoints are topologically connected.
+        bool need_a=(b>=c || (a==ma && b<mb));
+        bool need_b=(a>=b || (b==mb && a<ma));
+        if(need_a || (!need_b && func(a+1,b+1)))
         {
             E.Append({a,b,a+1});
             a++;
@@ -392,40 +424,206 @@ Get_Cross_Section_ID(const CROSS_SECTION_TYPE& cs) -> CROSS_SECTION_TYPE_ID
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Compute()
 {
+    Update_Masters();
     // BLOCK::master_mask
-    // COMPONENT::master_mask
-
-
-
-
-
-
-
-
-
-
-
+}
+//#####################################################################
+// Function Compute
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Update_Masters()
+{
+    for(BLOCK_ID b0(0);b0<blocks.m;b0++)
+    {
+        for(int c0=0;c0<blocks(b0).connections.m;c0++)
+        {
+            auto& n0=blocks(b0).connections(c0);
+            BLOCK_ID b1=n0.id;
+            int c1=n0.con_id;
+            if(c1<0) // irregular
+            {
+                n0.master=true;
+                continue;
+            }
+            if(b0>b1) continue; // smaller index does the logic
+            auto& n1=blocks(b1).connections(c1);
+            bool m=true;
+            if(c0==0)
+            {
+                if(c1!=0) m=true;
+                else
+                {
+                    if(blocks(b0).connections.m==2) m=true;
+                    else if(blocks(b1).connections.m==2) m=false;
+                }
+            }
+            else
+            {
+                if(!c1) m=false;
+                else if(blocks(b0).connections.m==2) m=true;
+                else if(blocks(b1).connections.m==2) m=false;
+            }
+            n0.master=m;
+            n1.master=!m;
+        }
+    }
+}
+//#####################################################################
+// Function Separates_Dofs
+//#####################################################################
+template<class T> int COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Separates_Dofs(BLOCK_ID b)
+{
+    CANONICAL_BLOCK_ID id=blocks(b).block;
+    int mask=0;
+    for(int c=0;c<blocks(b).connections.m;c++)
+        if(blocks(b).connections(c).master)
+            mask|=1<<c;
+    auto pr=separates_dofs.Insert({id,mask},0);
+    if(!pr.y) return *pr.x;
     
+    int valid=0;
+    const CANONICAL_BLOCK& cb=canonical_blocks(id);
+    ARRAY<int> owner(cb.X.m,use_init,-1);
+    for(int i=0;i<cb.cross_sections.m;i++)
+    {
+        const auto& cs=cb.cross_sections(i);
+        for(int j=cs.used.min_corner;j<cs.used.max_corner;j++)
+            owner(j)=i;
+        if(!(mask&(1<<i)) && cb.cross_sections(i).master_index>=0)
+            owner(cb.cross_sections(i).master_index)=i;
+    }
+    for(auto e:cb.E)
+    {
+        IV3 f(owner.Subset(e));
+        int o=-1;
+        for(auto i:f)
+        {
+            if(i==-1 || i==o) continue;
+            if(o==-1)
+            {
+                o=i;
+                continue;
+            }
+            valid|=1<<o;
+            valid|=1<<i;
+        }
+    }
+    *pr.x=valid;
+    return valid;
+}
+//#####################################################################
+// Function Merge_Blocks
+//#####################################################################
+template<class T> CANONICAL_BLOCK_ID COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Merge_Canonical_Blocks(CANONICAL_BLOCK_ID id0,int con_id0,XFORM xf0,
+    CANONICAL_BLOCK_ID id1,int con_id1,XFORM xf1)
+{
+    auto pr=merge_canonical_blocks.Insert(std::make_tuple(id0,con_id0,id1,con_id1),{});
+    if(pr.y) return *pr.x;
 
+    const CANONICAL_BLOCK& cb0=canonical_blocks(id0);
+    const CANONICAL_BLOCK& cb1=canonical_blocks(id1);
     
+    ARRAY<int> index_map(cb1.X.m,use_init,-1);
+    const CROSS_SECTION& cs0=cb0.cross_sections(con_id0);
+    const CROSS_SECTION& cs1=cb1.cross_sections(con_id1);
+    for(int i=cs1.used.min_corner;i<cs1.used.max_corner;i++)
+        index_map(i)=i-cs1.used.min_corner+cs0.owned.max_corner;
+    for(int i=cs1.owned.min_corner;i<cs1.owned.max_corner;i++)
+        index_map(i)=i-cs1.owned.min_corner+cs0.used.max_corner;
+    if(cs1.master_index>=0)
+        index_map(cs1.master_index)=cs0.master_index;
 
+    int k=cb0.X.m;
+    for(int i=0;i<index_map.m;i++)
+        if(index_map(i)<0)
+            index_map(i)=k++;
 
+    *pr.x=canonical_blocks.Add_End();
+    CANONICAL_BLOCK& cb=canonical_blocks(*pr.x);
+    for(int i=0;i<cb0.cross_sections.m;i++)
+        if(i!=con_id0)
+            cb.cross_sections.Append(cb0.cross_sections(i));
+    for(int i=0;i<cb1.cross_sections.m;i++)
+        if(i!=con_id1)
+        {
+            CROSS_SECTION cs=cb1.cross_sections(i);
+            cs.owned.min_corner=index_map(cs.owned.min_corner);
+            cs.owned.max_corner=index_map(cs.owned.max_corner);
+            cs.used.min_corner=index_map(cs.used.min_corner);
+            cs.used.max_corner=index_map(cs.used.max_corner);
+            if(cs.master_index>=0) cs.master_index=index_map(cs.master_index);
+            cb.cross_sections.Append(cs);
+        }
 
+    const MATRIX<T,TV::m>& M0=xforms(xf0.id);
+    const MATRIX<T,TV::m>& M1=xforms(xf1.id);
+    MATRIX<T,TV::m> M=M0*M1.Inverse();
+    TV B=xf0.b-M*xf1.b;
 
+    cb.X=cb0.X;
+    cb.X.Resize(k);
+    for(int i=0;i<cb1.X.m;i++)
+    {
+        TV X=M*cb1.X(i)+B;
+        int j=index_map(i);
+        if(j>=cb0.X.m) cb.X(j)=X;
+        else assert((cb.X(j)-X).Magnitude()<(T)1e-6);
+    }
 
+    cb.E=cb0.E;
+    ARRAY<IV3> E=cb1.E;
+    E.Flattened()=index_map.Subset(E.Flattened());
+    cb.E.Append_Elements(E);
 
+    return *pr.x;
+}
+//#####################################################################
+// Function Merge_Blocks
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Merge_Blocks(BLOCK_ID id,int con_id)
+{
+    PHYSBAM_ASSERT(con_id>=0);
+    PHYSBAM_ASSERT(id>=BLOCK_ID());
+    BLOCK& bl=blocks(id);
+    BLOCK_ID id2=bl.connections(con_id).id;
+    int con_id2=bl.connections(con_id).con_id;
+    BLOCK& bl2=blocks(id2);
 
-
-
-
-
-
-
-
-
-
-
+    bl.block=Merge_Canonical_Blocks(bl.block,con_id,bl.xform,bl2.block,con_id2,bl2.xform);
     
+    for(int c=con_id;c<bl.connections.m;c++)
+    {
+        BLOCK_ID b=bl.connections(c).id;
+        int d=bl.connections(c).con_id;
+        if(d<0) // edge-on
+            irregular_connections(~d).con_id=c-1;
+        else
+            blocks(b).connections(d).con_id=c-1;
+    }
+    bl.connections.Pop();
+
+    for(int c=0;c<bl2.connections.m;c++)
+    {
+        if(c==con_id2) continue;
+        BLOCK_ID b=bl2.connections(c).id;
+        int d=bl2.connections(c).con_id;
+        if(d<0) // edge-on
+        {
+            irregular_connections(~d).regular;
+            irregular_connections(~d).con_id=bl.connections.m;
+        }
+        else
+        {
+            blocks(b).connections(d).id=id;
+            blocks(b).connections(d).con_id=bl.connections.m;
+        }
+        bl.connections.Append(bl2.connections(c));
+    }
+
+    bl2={CANONICAL_BLOCK_ID(-1)};
 }
 template class COMPONENT_LAYOUT_FEM<VECTOR<float,2> >;
 template class COMPONENT_LAYOUT_FEM<VECTOR<double,2> >;
