@@ -11,6 +11,7 @@
 #include <Core/Utilities/TYPE_UTILITIES.h>
 #include <cstring>
 #include <string>
+#include <tuple>
 namespace PhysBAM{
 
 static const int missing_element_hash=32138912;
@@ -81,6 +82,60 @@ template<int s> inline int Hash_Reduce_Helper(const void* key);
 template<> inline int Hash_Reduce_Helper<1>(const void* key){union {const void* p;int i;} raw;raw.p=key;return raw.i;}
 template<> inline int Hash_Reduce_Helper<2>(const void* key){union {const void* p;int i[2];} raw;raw.p=key;return int_hash(raw.i[0],raw.i[1]);}
 template<class T> struct HASH_REDUCE<T*>{static int H(const T* key){STATIC_ASSERT((!is_same<T,char>::value && !is_same<T,const char>::value));return Hash_Reduce_Helper<sizeof(T*)/sizeof(int)>(key);}};
+
+template<class T>
+int Hash_Reduce(const T& t){return HASH_REDUCE<T>::H(t);}
+
+template<class... Args> struct HASH_REDUCE<std::tuple<Args...> >
+{
+    template<int n>
+    static typename std::enable_if<(n>=3),int>::type
+    F(const std::tuple<Args...>& key)
+    {
+        return int_hash(F<n-2>(key),
+            Hash_Reduce(std::get<n-2>(key)),
+            Hash_Reduce(std::get<n-1>(key)));
+    }
+
+    template<int n>
+    static typename std::enable_if<(n==3),int>::type
+    F(const std::tuple<Args...>& key)
+    {
+        return int_hash(
+            Hash_Reduce(std::get<0>(key)),
+            Hash_Reduce(std::get<1>(key)),
+            Hash_Reduce(std::get<2>(key)));
+    }
+
+    template<int n>
+    static typename std::enable_if<(n==2),int>::type
+    F(const std::tuple<Args...>& key)
+    {
+        return int_hash(
+            Hash_Reduce(std::get<0>(key)),
+            Hash_Reduce(std::get<1>(key)));
+    }
+
+    template<int n>
+    static typename std::enable_if<(n==1),int>::type
+    F(const std::tuple<Args...>& key)
+    {
+        return int_hash(Hash_Reduce(std::get<0>(key)));
+    }
+
+    template<int n>
+    static typename std::enable_if<(n==0),int>::type
+    F(const std::tuple<Args...>& key)
+    {
+        return missing_element_hash;
+    }
+
+    static int H(const std::tuple<Args...>& key)
+    {
+        return F<std::tuple_size<std::tuple<Args...> >::value>(key);
+    }
+};
+
 
 //#####################################################################
 // Function Hash
