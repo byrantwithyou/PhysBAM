@@ -176,9 +176,6 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     };
     std::map<PIPE_CHANGE_KEY,CANONICAL_COMPONENT*> canonical_changes;
     std::map<PIPE_CHANGE_KEY,CANONICAL_BLOCK_ID> canonical_change_blocks;
-    
-    COMPONENT_LAYOUT_FEM();
-    ~COMPONENT_LAYOUT_FEM();
 
     void Parse_Input(const std::string& pipe_file);
 
