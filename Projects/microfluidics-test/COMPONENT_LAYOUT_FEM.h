@@ -108,6 +108,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
         XFORM xform;
         ARRAY<BLOCK_CONNECTION> connections;
         ARRAY<int> edge_on; // for edge-on (index in irregular_connections)
+        int num_dofs;
     };
 
     // regular is master
@@ -208,6 +209,8 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     void Merge_Blocks(BLOCK_ID id,int con_id);
     CANONICAL_BLOCK_ID Merge_Canonical_Blocks(CANONICAL_BLOCK_ID id0,int con_id0,
         XFORM xf0,CANONICAL_BLOCK_ID id1,int con_id1,XFORM xf1);
+    int Approx_Dof_Count(BLOCK_ID b);
+    void Merge_Blocks();
 };
 
 }

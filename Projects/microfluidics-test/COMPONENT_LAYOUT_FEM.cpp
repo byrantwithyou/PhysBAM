@@ -625,6 +625,43 @@ Merge_Blocks(BLOCK_ID id,int con_id)
 
     bl2={CANONICAL_BLOCK_ID(-1)};
 }
+//#####################################################################
+// Function Merge_Blocks
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Merge_Blocks()
+{
+    for(BLOCK_ID b(0);b<blocks.m;b++)
+        if(int mask=Separates_Dofs(b))
+        {
+            int besti=-1,best=INT_MAX;
+            for(int i=0;i<blocks(b).connections.m;i++)
+            {
+                if(!(mask&(1<<i))) continue;
+                int c=Approx_Dof_Count(blocks(b).connections(i).id);
+                if(c<best) // keep blocks small
+                {
+                    best=c;
+                    besti=i;
+                }
+            }
+            Merge_Blocks(b,besti);
+            b--; // repeat the check on this block
+        }
+}
+//#####################################################################
+// Function Approx_Dof_Count
+//#####################################################################
+template<class T> int COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Approx_Dof_Count(BLOCK_ID b)
+{
+    const auto& bl=blocks(b);
+    const auto& cb=canonical_blocks(bl.block);
+    int num=cb.X.m;
+    for(auto& cs:cb.cross_sections)
+        num-=cs.used.Size();
+    return num;
+}
 template class COMPONENT_LAYOUT_FEM<VECTOR<float,2> >;
 template class COMPONENT_LAYOUT_FEM<VECTOR<double,2> >;
 }
