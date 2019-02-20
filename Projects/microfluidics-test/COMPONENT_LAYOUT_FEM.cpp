@@ -3,8 +3,11 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/TRIPLE.h>
 #include <Core/Log/LOG.h>
+#include <Core/Matrices/MATRIX_MXN.h>
 #include <fstream>
+#include "CACHED_ELIMINATION_MATRIX.h"
 #include "COMPONENT_LAYOUT_FEM.h"
 #include <tuple>
 namespace PhysBAM{
@@ -153,7 +156,7 @@ Parse_Input(const std::string& pipe_file)
 // Function Compute_Xform
 //#####################################################################
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Set_Cornector(VERTEX_DATA& vd,BLOCK_ID id,int con_id)
+Set_Connector(VERTEX_DATA& vd,BLOCK_ID id,int con_id)
 {
     if(vd.con.regular>=BLOCK_ID())
     {
@@ -182,7 +185,7 @@ Emit_Component_Blocks(CANONICAL_COMPONENT* cc,const XFORM& xf,ARRAY<VERTEX_DATA>
         {
             auto& cc=bb.connections(c);
             if(cc.id>=BLOCK_ID()) cc.id+=offset;
-            else Set_Cornector(vd(~Value(cc.id)),b,c);
+            else Set_Connector(vd(~Value(cc.id)),b,c);
         }
         bb.xform=Compose_Xform(xf,bb.xform);
         blocks.Append(bb);
@@ -425,7 +428,11 @@ template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Compute()
 {
     Update_Masters();
-    // BLOCK::master_mask
+    Merge_Blocks();
+
+    canonical_block_matrices.Resize(canonical_blocks.m);
+    for(CANONICAL_BLOCK_ID i(0);i<canonical_blocks.m;i++)
+        Fill_Canonical_Block_Matrix(canonical_block_matrices(i),canonical_blocks(i));
 }
 //#####################################################################
 // Function Compute
@@ -515,12 +522,12 @@ Separates_Dofs(BLOCK_ID b)
 //#####################################################################
 // Function Merge_Blocks
 //#####################################################################
-template<class T> CANONICAL_BLOCK_ID COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Merge_Canonical_Blocks(CANONICAL_BLOCK_ID id0,int con_id0,XFORM xf0,
-    CANONICAL_BLOCK_ID id1,int con_id1,XFORM xf1)
+    CANONICAL_BLOCK_ID id1,int con_id1,XFORM xf1) -> PAIR<CANONICAL_BLOCK_ID,ARRAY<int> >*
 {
     auto pr=merge_canonical_blocks.Insert(std::make_tuple(id0,con_id0,id1,con_id1),{});
-    if(pr.y) return *pr.x;
+    if(pr.y) return pr.x;
 
     const CANONICAL_BLOCK& cb0=canonical_blocks(id0);
     const CANONICAL_BLOCK& cb1=canonical_blocks(id1);
@@ -540,8 +547,8 @@ Merge_Canonical_Blocks(CANONICAL_BLOCK_ID id0,int con_id0,XFORM xf0,
         if(index_map(i)<0)
             index_map(i)=k++;
 
-    *pr.x=canonical_blocks.Add_End();
-    CANONICAL_BLOCK& cb=canonical_blocks(*pr.x);
+    pr.x->x=canonical_blocks.Add_End();
+    CANONICAL_BLOCK& cb=canonical_blocks(pr.x->x);
     for(int i=0;i<cb0.cross_sections.m;i++)
         if(i!=con_id0)
             cb.cross_sections.Append(cb0.cross_sections(i));
@@ -577,7 +584,7 @@ Merge_Canonical_Blocks(CANONICAL_BLOCK_ID id0,int con_id0,XFORM xf0,
     E.Flattened()=index_map.Subset(E.Flattened());
     cb.E.Append_Elements(E);
 
-    return *pr.x;
+    return pr.x;
 }
 //#####################################################################
 // Function Merge_Blocks
@@ -592,7 +599,8 @@ Merge_Blocks(BLOCK_ID id,int con_id)
     int con_id2=bl.connections(con_id).con_id;
     BLOCK& bl2=blocks(id2);
 
-    bl.block=Merge_Canonical_Blocks(bl.block,con_id,bl.xform,bl2.block,con_id2,bl2.xform);
+    auto pr=Merge_Canonical_Blocks(bl.block,con_id,bl.xform,bl2.block,con_id2,bl2.xform);
+    bl.block=pr->x;
     
     for(int c=con_id;c<bl.connections.m;c++)
     {
@@ -612,7 +620,7 @@ Merge_Blocks(BLOCK_ID id,int con_id)
         int d=bl2.connections(c).con_id;
         if(d<0) // edge-on
         {
-            irregular_connections(~d).regular;
+            irregular_connections(~d).regular=id;
             irregular_connections(~d).con_id=bl.connections.m;
         }
         else
@@ -621,6 +629,17 @@ Merge_Blocks(BLOCK_ID id,int con_id)
             blocks(b).connections(d).con_id=bl.connections.m;
         }
         bl.connections.Append(bl2.connections(c));
+    }
+
+    for(int i:bl2.edge_on)
+    {
+        auto& ic=irregular_connections(i);
+        for(auto& j:ic.edge_on)
+            if(j.x==id2)
+            {
+                j.x=id;
+                j.y=pr->y(j.y);
+            }
     }
 
     bl2={CANONICAL_BLOCK_ID(-1)};
@@ -662,6 +681,136 @@ Approx_Dof_Count(BLOCK_ID b)
         num-=cs.used.Size();
     return num;
 }
-template class COMPONENT_LAYOUT_FEM<VECTOR<float,2> >;
+//#####################################################################
+// Function Fill_Canonical_Block_Matrix
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Fill_Canonical_Block_Matrix(MATRIX_MXN<T>& mat,const CANONICAL_BLOCK& cb)
+{
+    // TODO
+}
+//#####################################################################
+// Function Fill_Canonical_Block_Matrix
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Fill_Block_Matrix(MATRIX_MXN<T>& mat,BLOCK_ID b)
+{
+    // TODO
+}
+//#####################################################################
+// Function Fill_Canonical_Block_Matrix
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Fill_Connection_Matrix(MATRIX_MXN<T>& mat,BLOCK_ID b0,int con_id0,BLOCK_ID b1,int con_id1)
+{
+    // TODO
+}
+//#####################################################################
+// Function Compute_Matrix_Blocks
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
+{
+    cem.Begin_Fill_Blocks();
+    cem.rows.Resize(Value(blocks.m));
+    
+    HASHTABLE<int,int> lookup_matrix_by_hash;
+
+    // Diagonal blocks
+    for(BLOCK_ID b(0);b<blocks.m;b++)
+    {
+        auto& bl=blocks(b);
+        int h=Compute_Block_Hash(b);
+        auto pr=lookup_matrix_by_hash.Insert(h,{});
+        if(pr.y)
+        {
+            *pr.x=cem.block_list.Append({{},true,{cem.block_list.m}});
+            Fill_Block_Matrix(cem.block_list(*pr.x).M,b);
+            // TODO: transforms
+        }
+        cem.Add_Block_Matrix_Entry(Value(b),Value(b),*pr.x);
+
+        // regular connections
+        for(int c=0;c<bl.connections.m;c++)
+        {
+            if(bl.connections(c).con_id>=0)
+            {
+                if(bl.connections(c).master)
+                {
+                    BLOCK_ID b2=bl.connections(c).id;
+                    int c2=bl.connections(c).con_id;
+                    int h=Compute_Connection_Hash(b,c,b2,c2);
+                    auto pr=lookup_matrix_by_hash.Insert(h,{});
+                    if(pr.y)
+                    {
+                        *pr.x=cem.block_list.Append({{},false,{cem.block_list.m}});
+                        Fill_Connection_Matrix(cem.block_list(*pr.x).M,b,c,b2,c2);
+                        // TODO: transforms
+                    }
+                    cem.Add_Block_Matrix_Entry(Value(b),Value(b2),*pr.x);
+                }
+            }
+        }
+    }
+
+
+    // TODO: irregular connections
+
+    // TODO: rhs
+
+    cem.End_Fill_Blocks();
+}
+//#####################################################################
+// Function Compute_Block_Hash
+//#####################################################################
+template<class T> int COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Compute_Block_Hash(BLOCK_ID b)
+{
+    auto& bl=blocks(b);
+    int h=Hash_Reduce(bl.block);
+    for(int cc=0;cc<bl.connections.m;cc++)
+    {
+        auto& c=bl.connections(cc);
+        if(c.con_id>=0)
+        {
+            int t=Hash_Reduce(blocks(c.id).block);
+            h=int_hash(h,int_hash(t,Hash_Reduce(c.con_id),Hash_Reduce(c.master)));
+        }
+        else
+        {
+            auto& ic=irregular_connections(~c.con_id);
+            CROSS_SECTION& cs=canonical_blocks(blocks(c.id).block).cross_sections(cc);
+            ARRAY<PAIR<int,CANONICAL_BLOCK_ID> > a;
+            // Only visit owned and, if necessary, master.
+            for(int i=0,n=cs.used.Size()+c.master;i<n;i++)
+                a.Append({ic.edge_on(i).y,blocks(ic.edge_on(i).x).block});
+            a.Sort();
+            h=int_hash(h,Hash(a));
+        }
+    }
+    if(bl.edge_on.m)
+    {
+        ARRAY<TRIPLE<int,CANONICAL_BLOCK_ID,int> > edge_ons;
+        for(int i:bl.edge_on)
+        {
+            auto& ic=irregular_connections(i);
+            for(auto p:ic.edge_on)
+                if(p.x==b)
+                    edge_ons.Append({p.y,blocks(ic.regular).block,ic.con_id});
+        }
+        edge_ons.Sort();
+        h=int_hash(h,Hash(edge_ons));
+    }
+    return h;
+}
+//#####################################################################
+// Function Compute_Connection_Hash
+//#####################################################################
+template<class T> int COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Compute_Connection_Hash(BLOCK_ID b0,int con_id0,BLOCK_ID b1,int con_id1)
+{
+    auto id0=blocks(b0).block,id1=blocks(b1).block;
+    return Hash(std::make_tuple(id0,con_id0,id1,con_id1));
+}
 template class COMPONENT_LAYOUT_FEM<VECTOR<double,2> >;
 }

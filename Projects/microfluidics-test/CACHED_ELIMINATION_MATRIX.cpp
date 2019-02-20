@@ -219,7 +219,7 @@ Compute_Inv(int a)
     if(a&use_neg) return Negate(Compute_Inv(Negate(a)));
     if(int* r=cached_ops.Get_Pointer({op_mat_inv,a,0})) return *r;
     PHYSBAM_ASSERT(block_list(a).sym);
-    int n=block_list.Append({{},true,{block_list.m}});
+    int n=Create_Matrix_Block(true);
     jobs.Append({op_mat_inv,{a},n});
     cached_ops.Set({op_mat_inv,a,0},n);
     return n;
@@ -270,7 +270,7 @@ Compute_Add(int a,int b)
     if(a&use_neg) return Negate(Compute_Add(Negate(a),Negate(b)));
 
     if(int* r=cached_ops.Get_Pointer({op_mat_add,a,b})) return *r;
-    int n=block_list.Append({{},Symmetric(a)&&Symmetric(b),{block_list.m}});
+    int n=Create_Matrix_Block(Symmetric(a)&&Symmetric(b));
 
     jobs.Append({op_mat_add,{a,b},n});
     cached_ops.Set({op_mat_add,a,b},n);
@@ -318,19 +318,36 @@ Print_Current() const
         printf("\n");}
 }
 //#####################################################################
+// Function Begin_Fill_Blocks
+//#####################################################################
+template<class T> void CACHED_ELIMINATION_MATRIX<T>::
+Begin_Fill_Blocks()
+{
+    block_list.Append({{},true,{zero_block}});
+    block_list.Append({{},true,{id_block}});
+}
+//#####################################################################
+// Function End_Fill_Blocks
+//#####################################################################
+template<class T> void CACHED_ELIMINATION_MATRIX<T>::
+End_Fill_Blocks()
+{
+    num_orig_blocks=block_list.m;
+    num_orig_vectors=vector_list.m;
+}
+//#####################################################################
 // Function Fill_Blocks
 //#####################################################################
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::
 Fill_Blocks(ARRAY<VECTOR<int,2>,DOF_ID>& dof_map,const ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entries,
     const ARRAY<T,CODE_ID>& code_values,const ARRAY<T,DOF_ID>& rhs_vector)
 {
+    Begin_Fill_Blocks();
     HASHTABLE<VECTOR<int,2>,ARRAY<TRIPLE<int,int,CODE_ID> > > coded_blocks;
     for(auto t:coded_entries){
         auto& a=coded_blocks.Get_Or_Insert({dof_map(t.x).x,dof_map(t.y).x});
         a.Append({dof_map(t.x).y,dof_map(t.y).y,t.z});}
     
-    block_list.Append({{},true,{zero_block}});
-    block_list.Append({{},true,{id_block}});
     HASHTABLE<int,int> hash_to_id;
     for(auto& t:coded_blocks){
         t.data.Sort();
@@ -338,8 +355,9 @@ Fill_Blocks(ARRAY<VECTOR<int,2>,DOF_ID>& dof_map,const ARRAY<TRIPLE<DOF_ID,DOF_I
         if(!hash_to_id.Get(h,id)){
             id=block_list.m;
             hash_to_id.Set(h,id);
-            block_list.Append({{orig_sizes(t.key.x),orig_sizes(t.key.y)},t.key.x==t.key.y,{block_list.m}});
-            MATRIX_MXN<T>& M=block_list.Last().M;
+            int n=Create_Matrix_Block(t.key.x==t.key.y);
+            MATRIX_MXN<T>& M=block_list(n).M;
+            M.Resize(orig_sizes(t.key.x),orig_sizes(t.key.y));
             for(auto& s:t.data){
                 M(s.x,s.y)=code_values(s.z);
                 std::swap(s.x,s.y);}
@@ -355,8 +373,7 @@ Fill_Blocks(ARRAY<VECTOR<int,2>,DOF_ID>& dof_map,const ARRAY<TRIPLE<DOF_ID,DOF_I
     for(int i=0;i<orig_rhs.m;i++)
         if(orig_rhs(i).m)
             rhs(i)=vector_list.Append(orig_rhs(i));
-    num_orig_blocks=block_list.m;
-    num_orig_vectors=vector_list.m;
+    End_Fill_Blocks();
 }
 //#####################################################################
 // Function Back_Solve
@@ -827,6 +844,23 @@ Relabel()
                 data_refs[arg_type[j.op][l]-1](j.a[l]&raw_mask)++;
     }
     for(auto& a:rhs) if(a>=0) data_refs[1](a)++;
+}
+//#####################################################################
+// Function Register_Matrix_Block
+//#####################################################################
+template<class T> int CACHED_ELIMINATION_MATRIX<T>::
+Create_Matrix_Block(bool sym)
+{
+    return block_list.Append({{},sym,{block_list.m}});
+}
+//#####################################################################
+// Function Add_Block_Matrix_Entry
+//#####################################################################
+template<class T> void CACHED_ELIMINATION_MATRIX<T>::
+Add_Block_Matrix_Entry(int r,int c,int matrix_id)
+{
+    rows(r).Append({c,matrix_id});
+    if(r!=c) rows(c).Append({r,Transposed(matrix_id)});
 }
 template struct CACHED_ELIMINATION_MATRIX<double>;
 }

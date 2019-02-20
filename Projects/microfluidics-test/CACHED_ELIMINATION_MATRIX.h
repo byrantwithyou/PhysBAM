@@ -74,6 +74,8 @@ struct CACHED_ELIMINATION_MATRIX
     
     void Fill_Blocks(ARRAY<VECTOR<int,2>,DOF_ID>& dof_map,const ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> >& coded_entries,
         const ARRAY<T,CODE_ID>& code_values,const ARRAY<T,DOF_ID>& rhs_vector);
+    void Begin_Fill_Blocks();
+    void End_Fill_Blocks();
     void Fill_Orig_Rows();
     void Eliminate_Row(int r);
     int& Get_Block(int r,int c);
@@ -108,6 +110,8 @@ struct CACHED_ELIMINATION_MATRIX
     const ARRAY<int>& Uses_Output(const JOB& j) const;
     void Remove_Job_Deps(int j);
     void Add_Job_Deps(int j);
+    int Create_Matrix_Block(bool sym);
+    void Add_Block_Matrix_Entry(int r,int c,int matrix_id);
 };
 }
 #endif

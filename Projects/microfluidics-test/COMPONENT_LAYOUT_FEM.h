@@ -15,6 +15,7 @@
 namespace PhysBAM{
 
 template<class TV> struct COMPONENT_LAYOUT_FEM;
+template<class T> struct CACHED_ELIMINATION_MATRIX;
 
 PHYSBAM_DECLARE_ELEMENT_ID(XFORM_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
 PHYSBAM_DECLARE_ELEMENT_ID(COMPONENT_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
@@ -93,6 +94,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
         ARRAY<IV3> E;
     };
     ARRAY<CANONICAL_BLOCK,CANONICAL_BLOCK_ID> canonical_blocks;
+    ARRAY<MATRIX_MXN<T>,CANONICAL_BLOCK_ID> canonical_block_matrices;
 
     // first is master, second is slave
     struct BLOCK_CONNECTION
@@ -108,7 +110,6 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
         XFORM xform;
         ARRAY<BLOCK_CONNECTION> connections;
         ARRAY<int> edge_on; // for edge-on (index in irregular_connections)
-        int num_dofs;
     };
 
     // regular is master
@@ -198,19 +199,26 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     };
 
     void Emit_Component_Blocks(CANONICAL_COMPONENT* cc,const XFORM& xf,ARRAY<VERTEX_DATA>& vd);
-    void Set_Cornector(VERTEX_DATA& vd,BLOCK_ID id,int con_id);
+    void Set_Connector(VERTEX_DATA& vd,BLOCK_ID id,int con_id);
 
     // return: flags indicating which connections interact
     // pair: block + master mask
     HASHTABLE<PAIR<CANONICAL_BLOCK_ID,int>,int> separates_dofs;
     int Separates_Dofs(BLOCK_ID b);
 
-    HASHTABLE<std::tuple<CANONICAL_BLOCK_ID,int,CANONICAL_BLOCK_ID,int>,CANONICAL_BLOCK_ID> merge_canonical_blocks;
+    HASHTABLE<std::tuple<CANONICAL_BLOCK_ID,int,CANONICAL_BLOCK_ID,int>,PAIR<CANONICAL_BLOCK_ID,ARRAY<int> > > merge_canonical_blocks;
     void Merge_Blocks(BLOCK_ID id,int con_id);
-    CANONICAL_BLOCK_ID Merge_Canonical_Blocks(CANONICAL_BLOCK_ID id0,int con_id0,
-        XFORM xf0,CANONICAL_BLOCK_ID id1,int con_id1,XFORM xf1);
+    PAIR<CANONICAL_BLOCK_ID,ARRAY<int> >*
+        Merge_Canonical_Blocks(CANONICAL_BLOCK_ID id0,int con_id0,
+            XFORM xf0,CANONICAL_BLOCK_ID id1,int con_id1,XFORM xf1);
     int Approx_Dof_Count(BLOCK_ID b);
     void Merge_Blocks();
+    void Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem);
+    void Fill_Canonical_Block_Matrix(MATRIX_MXN<T>& mat,const CANONICAL_BLOCK& cb);
+    void Fill_Block_Matrix(MATRIX_MXN<T>& mat,BLOCK_ID b);
+    void Fill_Connection_Matrix(MATRIX_MXN<T>& mat,BLOCK_ID b0,int con_id0,BLOCK_ID b1,int con_id1);
+    int Compute_Block_Hash(BLOCK_ID b);
+    int Compute_Connection_Hash(BLOCK_ID b0,int con_id0,BLOCK_ID b1,int con_id1);
 };
 
 }
