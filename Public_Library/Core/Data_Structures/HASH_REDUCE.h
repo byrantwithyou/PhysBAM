@@ -89,7 +89,7 @@ int Hash_Reduce(const T& t){return HASH_REDUCE<T>::H(t);}
 template<class... Args> struct HASH_REDUCE<std::tuple<Args...> >
 {
     template<int n>
-    static typename std::enable_if<(n>=3),int>::type
+    static typename std::enable_if<(n>3),int>::type
     F(const std::tuple<Args...>& key)
     {
         return int_hash(F<n-2>(key),
