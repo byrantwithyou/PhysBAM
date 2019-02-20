@@ -184,6 +184,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     XFORM_ID Compute_Xform(const TV& dir); // dir is normalized
     XFORM Compose_Xform(const XFORM& a,const XFORM& b);
     PAIR<CANONICAL_COMPONENT*,ARRAY<T> > Make_Canonical_Joint(const JOINT_KEY& key);
+    PAIR<CANONICAL_COMPONENT*,ARRAY<T> > Make_Canonical_Joint_2(const JOINT_KEY& key);
     CANONICAL_COMPONENT* Make_Canonical_Pipe(const PIPE_KEY& key);
     CANONICAL_BLOCK_ID Make_Canonical_Pipe_Block(const PIPE_KEY& key);
     CANONICAL_COMPONENT* Make_Canonical_Pipe_Change(const PIPE_CHANGE_KEY& key);
@@ -219,6 +220,13 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     void Fill_Connection_Matrix(MATRIX_MXN<T>& mat,BLOCK_ID b0,int con_id0,BLOCK_ID b1,int con_id1);
     int Compute_Block_Hash(BLOCK_ID b);
     int Compute_Connection_Hash(BLOCK_ID b0,int con_id0,BLOCK_ID b1,int con_id1);
+
+private:
+    std::tuple<TV,T,T> Vertex(T angle,T width) const;
+    PAIR<ARRAY<TV>,ARRAY<TV> > Arc(const TV& c,T angle,T len_arm,T ext0,T ext1) const;
+    ARRAY<IV3> Merge_Interpolated(const ARRAY<TV>& X,int n0,int n1) const;
+    ARRAY<TV> Interpolated(T s,const ARRAY<TV>& side0,const ARRAY<TV>& side1) const;
+    ARRAY<PAIR<ARRAY<TV>,ARRAY<IV3> > > Fill(int nseg,const ARRAY<TV>& inner,const ARRAY<TV>& outer) const;
 };
 
 }

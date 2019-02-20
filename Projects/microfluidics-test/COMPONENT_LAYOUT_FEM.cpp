@@ -6,7 +6,9 @@
 #include <Core/Data_Structures/TRIPLE.h>
 #include <Core/Log/LOG.h>
 #include <Core/Matrices/MATRIX_MXN.h>
+#include <Core/Matrices/ROTATION.h>
 #include <fstream>
+#include <list>
 #include "CACHED_ELIMINATION_MATRIX.h"
 #include "COMPONENT_LAYOUT_FEM.h"
 #include <tuple>
@@ -307,6 +309,209 @@ Make_Canonical_Pipe(const PIPE_KEY& key) -> CANONICAL_COMPONENT*
     return cc;
 }
 //#####################################################################
+// Function Vertex
+//#####################################################################
+template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Vertex(T angle,T width) const -> std::tuple<TV,T,T>
+{
+    PHYSBAM_ASSERT(abs(angle)<2*pi);
+    if(angle>pi) angle-=2*pi;
+    else if(angle<-pi) angle+=2*pi;
+    TV m=ROTATION<TV>::From_Angle(angle/2).Rotated_X_Axis();
+    T l=1/sin(abs(angle/2))*width/2;
+    T w=tan(pi/2-abs(angle/2))*width/2;
+    return std::make_tuple(l*m,w,angle);
+}
+//#####################################################################
+// Function Arc
+//#####################################################################
+template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Arc(const TV& c,T angle,T len_arm,T ext0,T ext1) const -> PAIR<ARRAY<TV>,ARRAY<TV> >
+{
+    PHYSBAM_ASSERT(abs(angle)<=pi);
+    T arc_angle=angle>0?angle-pi:angle+pi;
+    TV arm0(c(0),-c(1));
+    TV arm1=c+ROTATION<TV>::From_Angle(arc_angle).Rotate(arm0-c);
+    ARRAY<TV> inner,outer;
+    if(ext0)
+    {
+        inner.Append(c+TV(ext0,0));
+        outer.Append(arm0+TV(ext0,0));
+    }
+    inner.Append(c);
+
+    T da=sign(arc_angle)*2*asin(target_length/2*len_arm),offset=0;
+    TV v=(arm0-c).Normalized();
+    while(abs(arc_angle)>abs(da)*1.5)
+    {
+        outer.Append(c+ROTATION<TV>::From_Angle(offset).Rotate(v)*len_arm);
+        arc_angle-=da;
+        offset+=da;
+    }
+
+    if(ext1)
+    {
+        TV d=ROTATION<TV>::From_Angle(angle).Rotated_X_Axis();
+        inner.Append(c+d*ext1);
+        outer.Append(arm1+d*ext1);
+    }
+    return {inner,outer};
+}
+//#####################################################################
+// Function Merge_Interpolated
+//#####################################################################
+template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Merge_Interpolated(const ARRAY<TV>& X,int n0,int n1) const -> ARRAY<IV3>
+{
+    auto angle=[X](int v0,int v1,int v2)
+    {
+        TV u=(X(v2)-X(v1)).Normalized();
+        TV v=(X(v0)-X(v1)).Normalized();
+        return TV::Angle_Between(u,v);
+    };
+    auto max_angle_index=[angle](int* p)
+    {
+        T max_angle=-1;
+        int max_index=-1;
+        for(int j=0;j<3;j++){
+            T a=angle(p[(j+2)%3],p[j],p[(j+1)%3]);
+            if(a>max_angle){
+                max_angle=a;
+                max_index=j;}}
+        return max_index;
+    };
+
+    ARRAY<IV3> elems;
+    int i=0,j=n0,alt=0;
+    while(i<n0-1 || j<n0+n1-1){
+        T a0=0;
+        if(i+1<n0) a0=angle(j,i+1,i);
+        T a1=0;
+        if(j+1<n0+n1) a1=angle(j,j+1,i);
+        if(j+1>=n0+n1 || (i+1<n0 && abs(a0-a1)<1e-6 && alt==0) || (i+1<n0 && a0>a1))
+        {
+            int p[]={i+1,i,j};
+            int k=max_angle_index(p);
+            elems.Append(IV3(p[k],p[(k+1)%3],p[(k+2)%3]));
+            i++;
+            alt=1;
+        }
+        else
+        {
+            int p[]={j+1,i,j};
+            int k=max_angle_index(p);
+            elems.Append(IV3(p[k],p[(k+1)%3],p[(k+2)%3]));
+            j++;
+            alt=0;
+        }
+    }
+    return elems;
+}
+//#####################################################################
+// Function Fill
+//#####################################################################
+template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Fill(int nseg,const ARRAY<TV>& inner,const ARRAY<TV>& outer) const
+    -> ARRAY<PAIR<ARRAY<TV>,ARRAY<IV3> > >
+{
+    ARRAY<PAIR<ARRAY<TV>,ARRAY<IV3> > > ret(nseg);
+    ret(0).x=inner;
+    for(int j=1;j<nseg;j++)
+    {
+        T s=(T)j/nseg;
+        ARRAY<TV> inter=Interpolated(s,inner,outer);
+        int n0=ret(j-1).x.m,n1=inter.m;
+        ret(j-1).x.Append_Elements(inter);
+        ret(j).x.Append_Elements(inter);
+        ret(j-1).y=Merge_Interpolated(ret(j-1).x,n0,n1);
+    }
+    int n0=ret(nseg-1).x.m;
+    ret(nseg-1).x.Append_Elements(outer);
+    ret(nseg-1).y=Merge_Interpolated(ret(nseg-1).x,n0,outer.m);
+    return ret;
+}
+//#####################################################################
+// Function Interpolate
+//#####################################################################
+template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Interpolated(T s,const ARRAY<TV>& side0,const ARRAY<TV>& side1) const -> ARRAY<TV>
+{
+    ARRAY<T> l0(side0.m),l1(side1.m);
+    l0(0)=0;
+    for(int j=1;j<side0.m;j++)
+        l0(j)=l0(j-1)+(side0(j)-side0(j-1)).Magnitude();
+    l1(0)=0;
+    for(int j=1;j<side1.m;j++)
+        l1(j)=l1(j-1)+(side1(j)-side1(j-1)).Magnitude();
+    auto point=[](int j,T t,const ARRAY<TV>& side)
+    {
+        if(j>=side.m-1) return side(j);
+        TV p=side(j);
+        return p+t*(side(j+1)-p);
+    };
+    auto loc=[point](T u,const ARRAY<TV>& side,const ARRAY<T>& l)
+    {
+        T dist=u*l.Last();
+        auto iter=std::lower_bound(l.begin(),l.end(),dist);
+        PHYSBAM_ASSERT(iter!=l.end());
+        int j=iter-l.begin();
+        if(*iter==dist) return point(j,0,side);
+        else
+        {
+            T cur=*iter,prev=*(iter-1);
+            return point(j-1,(dist-prev)/(cur-prev),side);
+        }
+    };
+
+    std::list<PAIR<T,TV> > verts;
+    TV p0=(1-s)*loc(0,side0,l0)+s*loc(0,side1,l1);
+    TV p1=(1-s)*loc(1,side0,l0)+s*loc(1,side1,l1);
+    auto begin=verts.insert(verts.end(),{0,p0});
+    auto end=verts.insert(verts.end(),{1,p1});
+    T max_len=(p1-p0).Magnitude();
+    while(max_len>1.5*target_length)
+    {
+        T u=(begin->x+end->x)*0.5;
+        TV v=(1-s)*loc(u,side0,l0)+s*loc(u,side1,l1);
+        verts.insert(end,{u,v});
+        max_len=0;
+        for(auto k=verts.begin();k!=verts.end();k++)
+        {
+            if(k==verts.begin()) continue;
+            auto prev=k;
+            prev--;
+            T d=(k->y-prev->y).Magnitude();
+            if(d>max_len)
+            {
+                begin=prev;
+                end=k;
+                max_len=d;
+            }
+        }
+    }
+    ARRAY<PARTICLE_ID> indices(verts.size());
+    ARRAY<TV> ret;
+    for(auto iter=verts.begin();iter!=verts.end();iter++)
+        ret.Append(iter->y);
+    return ret;
+}
+//#####################################################################
+// Function Make_Canonical_Joint_2
+//#####################################################################
+template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Make_Canonical_Joint_2(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,ARRAY<T> >
+{
+    const CROSS_SECTION_TYPE& cst=cross_section_types(key.type);
+    T width=cst.width;
+    TV vert;
+    T ext,angle;
+    std::tie(vert,ext,angle)=Vertex(key.angles(0),width);
+    PAIR<ARRAY<TV>,ARRAY<TV> > sides=Arc(vert,angle,width,0,0);
+    Fill(cst.num_dofs-1,sides.x,sides.y);
+    CANONICAL_COMPONENT* cc=new CANONICAL_COMPONENT;
+    return {cc,{ext,ext}};
+}
+//#####################################################################
 // Function Make_Canonical_Joint
 //#####################################################################
 template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
@@ -326,6 +531,10 @@ Make_Canonical_Joint(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,ARRAY<T>
                 {XFORM_ID(),TV()},
                 {{BLOCK_ID(),1}}
             });
+    }
+    else if(key.angles.m==1)
+    {
+        it.first->second=Make_Canonical_Joint_2(key);
     }
     else PHYSBAM_FATAL_ERROR("joint type not supported");
 
