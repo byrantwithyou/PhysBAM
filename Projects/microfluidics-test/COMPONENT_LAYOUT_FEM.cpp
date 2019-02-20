@@ -94,7 +94,7 @@ Parse_Input(const std::string& pipe_file)
             case 'p':
                 {
                     ss>>name>>name2>>name3;
-                    ARRAY<VERTEX_DATA> vd;
+                    ARRAY<VERTEX_DATA> vd(2);
                     vd(0)=connection_points.Get(name2);
                     vd(1)=connection_points.Get(name3);
                     connection_points.Delete(name2);
