@@ -249,7 +249,7 @@ Make_Canonical_Pipe_Block(const PIPE_KEY& key) -> CANONICAL_BLOCK_ID
     cb.X.Resize(2*n);
     for(int i=0;i<n;i++)
     {
-        T y=cst.width/n*i-cst.width/2;
+        T y=cst.width/(n-1)*i-cst.width/2;
         cb.X(i)=TV(0,y);
         cb.X(i+n)=TV(key.length,y);
     }
