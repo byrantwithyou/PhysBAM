@@ -265,7 +265,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     PAIR<ARRAY<TV>,ARRAY<TV> > Arc(const TV& c,T angle,T len_arm,T ext0,T ext1) const;
     ARRAY<IV3> Merge_Interpolated(const ARRAY<TV>& X,int n0,int n1) const;
     ARRAY<TV> Interpolated(T s,const ARRAY<TV>& side0,const ARRAY<TV>& side1) const;
-    ARRAY<PAIR<ARRAY<TV>,ARRAY<IV3> > > Fill(int nseg,const ARRAY<TV>& inner,const ARRAY<TV>& outer) const;
+    ARRAY<std::tuple<ARRAY<TV>,ARRAY<IV3>,int> > Fill(int nseg,const ARRAY<TV>& inner,const ARRAY<TV>& outer) const;
 };
 
 }

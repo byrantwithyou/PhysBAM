@@ -345,14 +345,15 @@ Arc(const TV& c,T angle,T len_arm,T ext0,T ext1) const -> PAIR<ARRAY<TV>,ARRAY<T
     }
     inner.Append(c);
 
-    T da=sign(arc_angle)*2*asin(target_length/2*len_arm),offset=0;
+    T da=sign(arc_angle)*2*asin(target_length/2*len_arm),offset=0,a=arc_angle;
     TV v=(arm0-c).Normalized();
-    while(abs(arc_angle)>abs(da)*1.5)
+    while(abs(a)>abs(da)*1.5)
     {
         outer.Append(c+ROTATION<TV>::From_Angle(offset).Rotate(v)*len_arm);
-        arc_angle-=da;
+        a-=da;
         offset+=da;
     }
+    outer.Append(c+ROTATION<TV>::From_Angle(arc_angle).Rotate(v)*len_arm);
 
     if(ext1)
     {
@@ -417,22 +418,22 @@ Merge_Interpolated(const ARRAY<TV>& X,int n0,int n1) const -> ARRAY<IV3>
 //#####################################################################
 template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Fill(int nseg,const ARRAY<TV>& inner,const ARRAY<TV>& outer) const
-    -> ARRAY<PAIR<ARRAY<TV>,ARRAY<IV3> > >
+    -> ARRAY<std::tuple<ARRAY<TV>,ARRAY<IV3>,int> >
 {
-    ARRAY<PAIR<ARRAY<TV>,ARRAY<IV3> > > ret(nseg);
-    ret(0).x=inner;
+    ARRAY<std::tuple<ARRAY<TV>,ARRAY<IV3>,int> > ret(nseg); // X,E,#verts in the first layer
+    std::get<0>(ret(0))=inner;
     for(int j=1;j<nseg;j++)
     {
         T s=(T)j/nseg;
         ARRAY<TV> inter=Interpolated(s,inner,outer);
-        int n0=ret(j-1).x.m,n1=inter.m;
-        ret(j-1).x.Append_Elements(inter);
-        ret(j).x.Append_Elements(inter);
-        ret(j-1).y=Merge_Interpolated(ret(j-1).x,n0,n1);
+        int n0=std::get<0>(ret(j-1)).m,n1=inter.m;
+        std::get<0>(ret(j-1)).Append_Elements(inter);
+        std::get<1>(ret(j-1))=Merge_Interpolated(std::get<0>(ret(j-1)),n0,n1);
+        std::get<0>(ret(j)).Append_Elements(inter);
     }
-    int n0=ret(nseg-1).x.m;
-    ret(nseg-1).x.Append_Elements(outer);
-    ret(nseg-1).y=Merge_Interpolated(ret(nseg-1).x,n0,outer.m);
+    int n0=std::get<0>(ret(nseg-1)).m;
+    std::get<0>(ret(nseg-1)).Append_Elements(outer);
+    std::get<1>(ret(nseg-1))=Merge_Interpolated(std::get<0>(ret(nseg-1)),n0,outer.m);
     return ret;
 }
 //#####################################################################
@@ -512,8 +513,21 @@ Make_Canonical_Joint_2(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,ARRAY<
     T ext,angle;
     std::tie(vert,ext,angle)=Vertex(key.angles(0),width);
     PAIR<ARRAY<TV>,ARRAY<TV> > sides=Arc(vert,angle,width,0,0);
-    Fill(cst.num_dofs-1,sides.x,sides.y);
+    // TODO fill in edge dofs S
+    auto g=Fill(cst.num_dofs-1,sides.x,sides.y);
+
     CANONICAL_COMPONENT* cc=new CANONICAL_COMPONENT;
+    cc->blocks.Resize(BLOCK_ID(g.m));
+    for(int i=0;i<g.m;i++)
+    {
+        CANONICAL_BLOCK_ID id=canonical_blocks.Add_End();
+        CANONICAL_BLOCK& cb=canonical_blocks.Last();
+        cb.X=std::move(std::get<0>(g(i)));
+        cb.E=std::move(std::get<1>(g(i)));
+        // TODO create cross sections, and build connections here.
+        // int n0=std::get<2>(g(i)),n1=cb.X.m;
+        cc->blocks.Append({id,{XFORM_ID(),TV()},{},{}});
+    }
     return {cc,{ext,ext}};
 }
 //#####################################################################
