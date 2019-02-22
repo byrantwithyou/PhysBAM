@@ -200,7 +200,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
         IRREGULAR_CONNECTION con;
     };
 
-    void Emit_Component_Blocks(CANONICAL_COMPONENT* cc,const XFORM& xf,ARRAY<VERTEX_DATA>& vd);
+    void Emit_Component_Blocks(const CANONICAL_COMPONENT* cc,const XFORM& xf,ARRAY<VERTEX_DATA>& vd);
     void Set_Connector(VERTEX_DATA& vd,BLOCK_ID id,int con_id);
 
     // return: flags indicating which connections interact

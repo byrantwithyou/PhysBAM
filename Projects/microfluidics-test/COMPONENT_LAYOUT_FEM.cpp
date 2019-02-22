@@ -155,7 +155,7 @@ Parse_Input(const std::string& pipe_file)
     }
 }
 //#####################################################################
-// Function Compute_Xform
+// Function Set_Connector
 //#####################################################################
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Set_Connector(VERTEX_DATA& vd,BLOCK_ID id,int con_id)
@@ -174,15 +174,15 @@ Set_Connector(VERTEX_DATA& vd,BLOCK_ID id,int con_id)
     }
 }
 //#####################################################################
-// Function Compute_Xform
+// Function Emit_Component_Blocks
 //#####################################################################
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Emit_Component_Blocks(CANONICAL_COMPONENT* cc,const XFORM& xf,ARRAY<VERTEX_DATA>& vd)
+Emit_Component_Blocks(const CANONICAL_COMPONENT* cc,const XFORM& xf,ARRAY<VERTEX_DATA>& vd)
 {
     int offset=Value(blocks.m);
     for(BLOCK_ID b(0);b<cc->blocks.m;b++)
     {
-        auto& bb=cc->blocks(b);
+        auto bb=cc->blocks(b);
         for(int c=0;c<bb.connections.m;c++)
         {
             auto& cc=bb.connections(c);
