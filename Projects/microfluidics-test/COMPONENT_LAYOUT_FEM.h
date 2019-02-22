@@ -219,6 +219,8 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     void Fill_Canonical_Block_Matrix(MATRIX_MXN<T>& mat,const CANONICAL_BLOCK& cb);
     void Fill_Block_Matrix(MATRIX_MXN<T>& mat,BLOCK_ID b);
     void Fill_Connection_Matrix(MATRIX_MXN<T>& mat,BLOCK_ID b0,int con_id0,BLOCK_ID b1,int con_id1);
+    void Fill_Irregular_Connection_Matrix(MATRIX_MXN<T>& mat,BLOCK_ID b0,int con_id0,BLOCK_ID b1,
+        const ARRAY<TRIPLE<int,int,bool> >& t);
     int Compute_Block_Hash(BLOCK_ID b);
     int Compute_Connection_Hash(BLOCK_ID b0,int con_id0,BLOCK_ID b1,int con_id1);
 

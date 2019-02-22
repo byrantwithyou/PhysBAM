@@ -934,7 +934,8 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
 {
     cem.Begin_Fill_Blocks();
     cem.rows.Resize(Value(blocks.m));
-    
+    cem.rhs.Resize(Value(blocks.m));
+
     HASHTABLE<int,int> lookup_matrix_by_hash;
 
     // Diagonal blocks
@@ -945,7 +946,7 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
         auto pr=lookup_matrix_by_hash.Insert(h,{});
         if(pr.y)
         {
-            *pr.x=cem.block_list.Append({{},true,{cem.block_list.m}});
+            *pr.x=cem.Create_Matrix_Block(true);
             Fill_Block_Matrix(cem.block_list(*pr.x).M,b);
             // TODO: transforms
         }
@@ -964,7 +965,7 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
                     auto pr=lookup_matrix_by_hash.Insert(h,{});
                     if(pr.y)
                     {
-                        *pr.x=cem.block_list.Append({{},false,{cem.block_list.m}});
+                        *pr.x=cem.Create_Matrix_Block(false);
                         Fill_Connection_Matrix(cem.block_list(*pr.x).M,b,c,b2,c2);
                         // TODO: transforms
                     }
@@ -974,8 +975,36 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
         }
     }
 
+    // regular block, con_id, irregular block, {regular-dof,irregular-dof,regular-owns-id}
+    HASHTABLE<std::tuple<CANONICAL_BLOCK_ID,int,CANONICAL_BLOCK_ID,ARRAY<TRIPLE<int,int,bool> > >,int> irregular_matrix_blocks;
 
-    // TODO: irregular connections
+    for(auto& ic:irregular_connections)
+    {
+        HASHTABLE<BLOCK_ID,ARRAY<TRIPLE<int,int,bool> > > h;
+        CANONICAL_BLOCK_ID id=blocks(ic.regular).block;
+        CROSS_SECTION& cs=canonical_blocks(id).cross_sections(ic.con_id);
+        int o=cs.owned.Size();
+        int u=cs.used.Size();
+        for(int i=0;i<o;i++)
+            h.Get_Or_Insert(ic.edge_on(i).x).Append({cs.owned.min_corner+i,ic.edge_on(i).y,true});
+        if(cs.master_index>=0)
+            h.Get_Or_Insert(ic.edge_on(o).x).Append({cs.master_index,ic.edge_on(o).y,true});
+        for(int i=0;i<u;i++)
+            h.Get_Or_Insert(ic.edge_on(o+1+i).x).Append({cs.used.min_corner+i,ic.edge_on(o+1+i).y,false});
+        for(auto& i:h)
+        {
+            i.data.Sort();
+            auto pr=irregular_matrix_blocks.Insert(std::make_tuple(id,ic.con_id,blocks(i.key).block,i.data),{});
+            if(pr.y)
+            {
+                *pr.x=cem.Create_Matrix_Block(false);
+                Fill_Irregular_Connection_Matrix(cem.block_list(*pr.x).M,ic.regular,ic.con_id,i.key,i.data);
+                // TODO
+            }
+            // TODO: transforms
+            cem.Add_Block_Matrix_Entry(Value(ic.regular),Value(i.key),*pr.x);
+        }
+    }
 
     // TODO: rhs
 
@@ -1032,6 +1061,15 @@ Compute_Connection_Hash(BLOCK_ID b0,int con_id0,BLOCK_ID b1,int con_id1)
 {
     auto id0=blocks(b0).block,id1=blocks(b1).block;
     return Hash(std::make_tuple(id0,con_id0,id1,con_id1));
+}
+//#####################################################################
+// Function Fill_Irregular_Connection_Matrix
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Fill_Irregular_Connection_Matrix(MATRIX_MXN<T>& mat,BLOCK_ID b0,int con_id0,BLOCK_ID b1,
+    const ARRAY<TRIPLE<int,int,bool> >& t)
+{
+    // TODO:
 }
 template class COMPONENT_LAYOUT_FEM<VECTOR<double,2> >;
 }
