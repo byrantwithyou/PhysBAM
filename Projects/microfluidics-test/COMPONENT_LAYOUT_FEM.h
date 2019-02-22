@@ -152,6 +152,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
         bool operator<(const JOINT_KEY& p) const
         {
             if(type!=p.type) return type<p.type;
+            if(angles.m!=p.angles.m) return angles.m<p.angles.m;
             for(int i=0;i<angles.m;i++)
             {
                 if(angles(i)<p.angles(i)-comp_tol) return true;
