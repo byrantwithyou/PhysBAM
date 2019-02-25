@@ -10,6 +10,7 @@
 #include <Core/Vectors/VECTOR.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <map>
+#include "BLOCK_MATRIX.h"
 #include "COMMON.h"
 
 namespace PhysBAM{
@@ -29,6 +30,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     typedef VECTOR<T,2> TV;
     typedef VECTOR<int,TV::m> TV_INT;
     typedef VECTOR<int,3> IV3;
+    typedef VECTOR<int,2> IV;
 
     static constexpr T comp_tol=(T)1e-10;
     T target_length;
@@ -78,13 +80,14 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     ARRAY<CROSS_SECTION_TYPE,CROSS_SECTION_TYPE_ID> cross_section_types;
     std::map<CROSS_SECTION_TYPE,CROSS_SECTION_TYPE_ID> cross_section_type_lookup;
     
-    // ranges of shared dof indices owned by this component and used from
-    // neigboring component.
+    // v = range of vertex indices in cross section
+    // e = range of edge indices in cross section
+    // if own_first, first half of v and e is owned by this block
+    // if v or e has odd size; middle is master
     struct CROSS_SECTION
     {
-        INTERVAL<int> owned,used;
-        int master_index;
-        CROSS_SECTION_TYPE_ID type;
+        INTERVAL<int> v,e;
+        bool own_first;
     };
 
     struct CANONICAL_BLOCK
@@ -92,10 +95,17 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
         ARRAY<CROSS_SECTION> cross_sections;
         ARRAY<TV> X;
         ARRAY<IV3> E;
+        ARRAY<IV> S;
     };
     ARRAY<CANONICAL_BLOCK,CANONICAL_BLOCK_ID> canonical_blocks;
-    ARRAY<MATRIX_MXN<T>,CANONICAL_BLOCK_ID> canonical_block_matrices;
 
+    ARRAY<BLOCK_MATRIX<T>,CANONICAL_BLOCK_ID> canonical_block_matrices;
+
+    ARRAY<BLOCK_MATRIX<T> > matrix_block_list;
+
+    typedef std::tuple<CANONICAL_BLOCK_ID,int,CANONICAL_BLOCK_ID,int> REGULAR_CON_KEY;
+    HASHTABLE<REGULAR_CON_KEY,int> regular_connection_matrix_blocks;
+    
     // first is master, second is slave
     struct BLOCK_CONNECTION
     {
@@ -117,7 +127,10 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     {
         BLOCK_ID regular;
         int con_id;
-        ARRAY<PAIR<BLOCK_ID,int> > edge_on; // one for each dof on cross section, order: owned,master_index,used
+        // one for each dof on cross section, starting from owned side of cross section
+        ARRAY<PAIR<BLOCK_ID,int> > edge_on_v,edge_on_e;
+        int ref_ic;
+        int block_data;
     };
 
     // neighbor block i is given index ~i and con_id=-1.
@@ -180,6 +193,24 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     std::map<PIPE_CHANGE_KEY,CANONICAL_COMPONENT*> canonical_changes;
     std::map<PIPE_CHANGE_KEY,CANONICAL_BLOCK_ID> canonical_change_blocks;
 
+    ARRAY<PAIR<BLOCK_ID,int>,BLOCK_ID> reference_block; // block, index
+
+    struct REFERENCE_BLOCK_DATA
+    {
+        int num_dofs_v,num_dofs_e;
+        ARRAY<int> dof_map_v,dof_map_e;
+    };
+
+    ARRAY<REFERENCE_BLOCK_DATA> reference_block_data;
+
+    struct IRREGULAR_REFERENCE_BLOCK_DATA
+    {
+        ARRAY<int> add_block;
+    };
+
+    ARRAY<IRREGULAR_REFERENCE_BLOCK_DATA> irregular_reference_block_data;
+
+    
     void Parse_Input(const std::string& pipe_file);
 
     XFORM_ID Compute_Xform(const TV& dir); // dir is normalized
@@ -216,15 +247,20 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     int Approx_Dof_Count(BLOCK_ID b);
     void Merge_Blocks();
     void Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem);
-    void Fill_Canonical_Block_Matrix(MATRIX_MXN<T>& mat,const CANONICAL_BLOCK& cb);
-    void Fill_Block_Matrix(MATRIX_MXN<T>& mat,BLOCK_ID b);
-    void Fill_Connection_Matrix(MATRIX_MXN<T>& mat,BLOCK_ID b0,int con_id0,BLOCK_ID b1,int con_id1);
-    void Fill_Irregular_Connection_Matrix(MATRIX_MXN<T>& mat,BLOCK_ID b0,int con_id0,BLOCK_ID b1,
-        const ARRAY<TRIPLE<int,int,bool> >& t);
-    int Compute_Block_Hash(BLOCK_ID b);
+    void Fill_Canonical_Block_Matrix(BLOCK_MATRIX<T>& mat,const CANONICAL_BLOCK& cb);
+    void Fill_Block_Matrix(BLOCK_ID b);
+    int Fill_Connection_Matrix(BLOCK_ID b0,int con_id0,BLOCK_ID b1,int con_id1);
+    void Fill_Irregular_Connection_Matrix(IRREGULAR_CONNECTION& ic);
+    void Compute_Reference_Blocks();
     int Compute_Connection_Hash(BLOCK_ID b0,int con_id0,BLOCK_ID b1,int con_id1);
-
-private:
+    PAIR<int,int> Remap_Owned_Dofs(ARRAY<int>& map_v,ARRAY<int>& map_e,BLOCK_ID b);
+    void Compute_Dof_Remapping(BLOCK_ID b);
+    void Copy_Matrix_Data(BLOCK_MATRIX<T>& A,const BLOCK_MATRIX<T>& B,
+        const ARRAY<IV>& va,const ARRAY<IV>& ea,
+        const ARRAY<IV>& vb,const ARRAY<IV>& eb) const;
+    void Init_Block_Matrix(BLOCK_MATRIX<T>& M,BLOCK_ID a,BLOCK_ID b) const;
+    void Compute_Reference_Irregular_Connections();
+  private:
     std::tuple<TV,T,T> Vertex(T angle,T width) const;
     PAIR<ARRAY<TV>,ARRAY<TV> > Arc(const TV& c,T angle,T len_arm,T ext0,T ext1) const;
     ARRAY<IV3> Merge_Interpolated(const ARRAY<TV>& X,int n0,int n1) const;
