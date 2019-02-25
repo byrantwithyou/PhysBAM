@@ -324,7 +324,7 @@ Vertex(T angle,T width) const -> std::tuple<TV,T,T>
     else if(angle<-pi) angle+=2*pi;
     TV m=ROTATION<TV>::From_Angle(angle/2).Rotated_X_Axis();
     T l=1/sin(abs(angle/2))*width/2;
-    T w=tan(pi/2-abs(angle/2))*width/2;
+    T w=std::tan(pi/2-abs(angle/2))*width/2;
     return std::make_tuple(l*m,w,angle);
 }
 //#####################################################################
