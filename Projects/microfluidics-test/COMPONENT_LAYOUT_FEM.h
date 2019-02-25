@@ -7,6 +7,7 @@
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Math_Tools/INTERVAL.h>
 #include <Core/Matrices/MATRIX.h>
+#include <Core/Matrices/SYMMETRIC_MATRIX.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_SCALAR.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_VECTOR.h>
@@ -98,17 +99,51 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     {
         CROSS_SECTION_TYPE_ID type;
         BC_TYPE bc_type;
+        TV X,normal;
         T flowrate;
-        TV normal,traction;
-        ANALYTIC_VECTOR<TV>* analytic_velocity=0,*force=0;
-        ANALYTIC_SCALAR<TV>* analytic_pressure=0;
-
-        TV Velocity(const TV& X) const;
-        TV Traction(const TV& X,const TV& N,T mu) const;
-        TV Force(const TV& X,T mu) const;
-        T Divergence(const TV& X) const;
-        T Pressure(const TV& X) const;
+        TV traction;
     };
+    ANALYTIC_VECTOR<TV>* force=0,*analytic_velocity=0;
+    ANALYTIC_SCALAR<TV>* analytic_pressure=0;
+    ARRAY<BOUNDARY_CONDITION,BC_ID> boundary_conditions;
+
+    TV Velocity(BC_ID id,const TV& X) const
+    {
+        if(analytic_velocity) return analytic_velocity->v(X,0);
+        else
+        {
+            const BOUNDARY_CONDITION& bc=boundary_conditions(id);
+            const auto& cst=cross_section_types(bc.type);
+            T a=cst.width/2;
+            T r=(X-bc.X).Magnitude();
+            T v=-3.0/4*bc.flowrate/(a*a*a)*(r*r-a*a);
+            return v*bc.normal;
+        }
+    }
+
+    TV Traction(BC_ID id,const TV& X) const
+    {
+        const BOUNDARY_CONDITION& bc=boundary_conditions(id);
+        if(analytic_velocity && analytic_pressure)
+        {
+            SYMMETRIC_MATRIX<T,TV::m> stress=analytic_velocity->dX(X,0).Twice_Symmetric_Part()*mu;
+            stress-=analytic_pressure->f(X,0);
+            return stress*bc.normal;
+        }
+        else return bc.traction;
+    }
+
+    TV Force(const TV& X) const
+    {
+        if(analytic_velocity && analytic_pressure)
+        {
+            SYMMETRIC_TENSOR<T,0,TV::m> ddU=analytic_velocity->ddX(X,0);
+            TV f=analytic_pressure->dX(X,0);
+            f-=mu*(Contract<1,2>(ddU)+Contract<0,2>(ddU));
+            return f;
+        }
+        else return force?force->v(X,0):TV();
+    }
 
     struct CANONICAL_BLOCK
     {
@@ -230,7 +265,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
 
     ARRAY<IRREGULAR_REFERENCE_BLOCK_DATA> irregular_reference_block_data;
 
-    
+    ~COMPONENT_LAYOUT_FEM();
     void Parse_Input(const std::string& pipe_file);
 
     XFORM_ID Compute_Xform(const TV& dir); // dir is normalized
@@ -249,6 +284,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     {
         TV X;
         IRREGULAR_CONNECTION con;
+        BC_ID bc_id=BC_ID(-1);
     };
 
     void Emit_Component_Blocks(const CANONICAL_COMPONENT* cc,const XFORM& xf,ARRAY<VERTEX_DATA>& vd);

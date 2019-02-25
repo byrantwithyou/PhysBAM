@@ -29,11 +29,22 @@ bool Canonical_Direction(VECTOR<T,2> u)
 // j <cross-section-name> <num-pipes> <origin-vertex> [<vertex-name> <connection-name>]*
 // p <cross-section-name> <connection-name> <connection-name>
 // g <cross-section-name> <cross-section-name> <vertex-name> <vertex-name> <distance> <length> <connection-name> <connection-name>
-// u f <cross-section-name> <connection-name> <origin-vertex> <vertex-name> <flow-rate>
-// u a <cross-section-name> <connection-name> <analytic-velocity>
-// t v <cross-section-name> <connection-name> <traction-2d>
-// q a <cross-section-name> <connection-name> <analytic-pressure>
-// f <analytic-force>
+// u <cross-section-name> <connection-name> <origin-vertex> <vertex-name> <flow-rate>
+// U <analytic-velocity>
+// t <cross-section-name> <connection-name> <origin-vertex> <vertex-name> <traction-2d>
+// T <cross-section-name> <connection-name> <origin-vertex> <vertex-name>
+// P <analytic-pressure>
+// F <analytic-force>
+//#####################################################################
+// Function Destructor
+//#####################################################################
+template<class T> COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+~COMPONENT_LAYOUT_FEM()
+{
+    delete force;
+    delete analytic_velocity;
+    delete analytic_pressure;
+}
 //#####################################################################
 // Function Parse_Input
 //#####################################################################
@@ -153,6 +164,51 @@ Parse_Input(const std::string& pipe_file)
                     connection_points.Set(name,vd(0));
                     connection_points.Set(name2,vd(1));
                 }
+                break;
+            case 'u':
+                {
+                    BOUNDARY_CONDITION bc;
+                    bc.bc_type=BC_TYPE::dirichlet_v;
+                    ss>>name>>name2;
+                    bc.type=cross_section_hash.Get(name);
+                    VERTEX_DATA& vd=connection_points.Get(name2);
+                    ss>>name2>>name3>>t0;
+                    TV A=vertices.Get(name2);
+                    TV B=vertices.Get(name3);
+                    bc.normal=(B-A).Normalized();
+                    bc.flowrate=t0;
+                    vd.bc_id=boundary_conditions.Append(bc);
+                }
+                break;
+            case 't':
+            case 'T':
+                {
+                    BOUNDARY_CONDITION bc;
+                    bc.bc_type=BC_TYPE::traction;
+                    if(c=='T') bc.bc_type=BC_TYPE::analytic;
+                    ss>>name>>name2;
+                    bc.type=cross_section_hash.Get(name);
+                    VERTEX_DATA& vd=connection_points.Get(name2);
+                    ss>>name2>>name3;
+                    TV A=vertices.Get(name2);
+                    TV B=vertices.Get(name3);
+                    bc.normal=(B-A).Normalized();
+                    if(c=='t') ss>>bc.traction;
+                    vd.bc_id=boundary_conditions.Append(bc);
+                }
+                break;
+            case 'U':
+                delete analytic_velocity;
+                analytic_velocity=new ANALYTIC_VECTOR_PROGRAM<TV>(ss.str().c_str()+2);
+                break;
+                break;
+            case 'F':
+                delete force;
+                force=new ANALYTIC_VECTOR_PROGRAM<TV>(ss.str().c_str()+2);
+                break;
+            case 'P':
+                delete analytic_pressure;
+                analytic_pressure=new ANALYTIC_SCALAR_PROGRAM<TV>(ss.str().c_str()+2);
                 break;
             default:
                 LOG::printf("PARSE FAIL: %c %s\n",c,ss.str());
