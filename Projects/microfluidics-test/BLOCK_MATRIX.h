@@ -47,19 +47,25 @@ struct BLOCK_MATRIX
     MATRIX<T,2> Get_ve(int r,int c) const {return Get_M(2*r,2*(c+nv_c));}
     MATRIX<T,2> Get_ev(int r,int c) const {return Get_M(2*(r+nv_r),2*c);}
     MATRIX<T,2> Get_ee(int r,int c) const {return Get_M(2*(r+nv_r),2*(c+nv_c));}
+    MATRIX<T,2> Get_uu(int r,int er,int c,int ec) const {return Get_M(2*(r+er*nv_r),2*(c+ec*nv_c));}
     TV Get_vp(int r,int c) const {return Get_C(2*r,2*(nv_c+ne_c)+c);}
     TV Get_pv(int r,int c) const {return Get_R(2*(nv_r+ne_r)+r,2*c);}
     TV Get_ep(int r,int c) const {return Get_C(2*(r+nv_r),2*(nv_c+ne_c)+c);}
     TV Get_pe(int r,int c) const {return Get_R(2*(nv_r+ne_r)+r,2*(c+nv_c));}
+    TV Get_up(int r,int er,int c) const {return Get_C(2*(r+er*nv_r),2*(nv_c+ne_c)+c);}
+    TV Get_pu(int r,int c,int ec) const {return Get_R(2*(nv_r+ne_r)+r,2*(c+ec*nv_c));}
 
     void Add_vv(int r,int c,MATRIX<T,2> m) {Add_M(2*r,2*c,m);}
     void Add_ve(int r,int c,MATRIX<T,2> m) {Add_M(2*r,2*(c+nv_c),m);}
     void Add_ev(int r,int c,MATRIX<T,2> m) {Add_M(2*(r+nv_r),2*c,m);}
     void Add_ee(int r,int c,MATRIX<T,2> m) {Add_M(2*(r+nv_r),2*(c+nv_c),m);}
+    void Add_uu(int r,int er,int c,int ec,MATRIX<T,2> m) {Add_M(2*(r+er*nv_r),2*(c+ec*nv_c),m);}
     void Add_vp(int r,int c,TV u) {Add_C(2*r,2*(nv_c+ne_c)+c,u);}
     void Add_pv(int r,int c,TV u) {Add_R(2*(nv_r+ne_r)+r,2*c,u);}
     void Add_ep(int r,int c,TV u) {Add_C(2*(r+nv_r),2*(nv_c+ne_c)+c,u);}
     void Add_pe(int r,int c,TV u) {Add_R(2*(nv_r+ne_r)+r,2*(c+nv_c),u);}
+    void Add_up(int r,int er,int c,TV u) {Add_C(2*(r+er*nv_r),2*(nv_c+ne_c)+c,u);}
+    void Add_pu(int r,int c,int ec,TV u) {Add_R(2*(nv_r+ne_r)+r,2*(c+ec*nv_c),u);}
 };
 
 }

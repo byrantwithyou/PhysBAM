@@ -36,7 +36,8 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
 
     static constexpr T comp_tol=(T)1e-10;
     T target_length;
-
+    T mu=1;
+    
     ARRAY<MATRIX<T,TV::m>,XFORM_ID> xforms;
     HASHTABLE<PAIR<XFORM_ID,XFORM_ID>,XFORM_ID> xform_comp_table;
     

@@ -1023,13 +1023,79 @@ Approx_Dof_Count(BLOCK_ID b)
         num-=cs.v.Size()/2;
     return num;
 }
+
+
+int fem_visc_table[12][12]=
+{
+    {3,1,0,0,0,-4,3,1,0,0,0,-4},
+    {1,3,0,0,0,-4,0,0,0,0,0,0},
+    {0,0,0,0,0,0,1,-1,0,4,-4,0},
+    {0,0,0,8,-8,0,0,4,0,4,-4,-4},
+    {0,0,0,-8,8,0,-4,0,0,-4,4,4},
+    {-4,-4,0,0,0,8,0,-4,0,-4,4,4},
+    {3,0,1,0,-4,0,3,0,1,0,-4,0},
+    {1,0,-1,4,0,-4,0,0,0,0,0,0},
+    {0,0,0,0,0,0,1,0,3,0,-4,0},
+    {0,0,4,4,-4,-4,0,0,0,8,0,-8},
+    {0,0,-4,-4,4,4,-4,0,-4,0,8,0},
+    {-4,0,0,-4,4,4,0,0,0,-8,0,8}
+};
+
+int fem_pres_table[3][12]=
+{
+    {-1,0,0,1,-1,1,-1,0,0,1,1,-1},
+    {0,1,0,1,-1,-1,0,0,0,2,0,-2},
+    {0,0,0,2,-2,0,0,0,1,1,-1,-1}
+};
+
 //#####################################################################
 // Function Fill_Canonical_Block_Matrix
 //#####################################################################
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Fill_Canonical_Block_Matrix(BLOCK_MATRIX<T>& mat,const CANONICAL_BLOCK& cb)
 {
-    // TODO
+    mat.nv_r=mat.nv_c=cb.X.m;
+    mat.ne_r=mat.ne_c=cb.S.m;
+    mat.Resize();
+
+    HASHTABLE<IV,int> edge_lookup;
+    for(int i=0;i<cb.S.m;i++)
+        edge_lookup.Set(cb.S(i).Sorted(),i);
+
+    for(IV3 v:cb.E)
+    {
+        IV3 dof[2]={v};
+        for(int i=0;i<3;i++)
+            dof[1](i)=edge_lookup.Get(v.Remove_Index(i).Sorted());
+        MATRIX<T,2> F(cb.X(v.y)-cb.X(v.x),cb.X(v.z)-cb.X(v.x)),G=F.Inverse();
+        T scale=mu*F.Determinant()/6;
+        T p_scale=F.Determinant()/6;
+
+        for(int r=0;r<1;r++)
+            for(int s=0;s<1;s++)
+                for(int i=0;i<3;i++)
+                    for(int j=0;j<3;j++)
+                    {
+                        MATRIX<T,2> M;
+                        for(int a=0;a<2;a++)
+                            for(int b=0;b<2;b++)
+                                M(a,b)=fem_visc_table[6*a+3*r+i][6*b+3*s+j];
+                        M=scale*G.Transpose_Times(M*G);
+                        mat.Add_uu(dof[r](i),r,dof[s](j),s,M+M.Trace());
+                    }
+
+        for(int s=0;s<1;s++)
+            for(int i=0;i<3;i++)
+                for(int j=0;j<3;j++)
+                {
+                    TV u;
+                    for(int b=0;b<2;b++)
+                        u(b)=fem_pres_table[i][6*b+3*s+j];
+                    u=p_scale*G.Transpose_Times(u);
+                    mat.Add_pu(v(i),dof[s](j),s,u);
+                    mat.Add_up(dof[s](j),s,v(i),u);
+                }
+    }
 }
 //#####################################################################
 // Function Copy_Matrix_Data
