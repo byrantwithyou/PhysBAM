@@ -209,6 +209,23 @@ public:
 //#####################################################################
 };
 
+struct INTERVAL_ITERATOR
+{
+    int i;
+    bool operator<(const INTERVAL_ITERATOR& a) const {return i<a.i;}
+    bool operator==(const INTERVAL_ITERATOR& a) const {return i==a.i;}
+    bool operator!=(const INTERVAL_ITERATOR& a) const {return i!=a.i;}
+    INTERVAL_ITERATOR& operator++() {i++;return *this;};
+    INTERVAL_ITERATOR operator++(int) {return {i++};};
+    int operator*() const {return i;}
+};
+
+inline INTERVAL_ITERATOR begin(const INTERVAL<int>& range)
+{return {range.min_corner};}
+
+inline INTERVAL_ITERATOR end(const INTERVAL<int>& range)
+{return {range.max_corner};}
+
 template<class T>
 inline INTERVAL<T> operator+(const T& a,const INTERVAL<T>& b)
 {return INTERVAL<T>(a+b.min_corner,a+b.max_corner);}
