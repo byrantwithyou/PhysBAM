@@ -8,6 +8,8 @@
 #include <Core/Math_Tools/INTERVAL.h>
 #include <Core/Matrices/MATRIX.h>
 #include <Core/Vectors/VECTOR.h>
+#include <Geometry/Analytic_Tests/ANALYTIC_SCALAR.h>
+#include <Geometry/Analytic_Tests/ANALYTIC_VECTOR.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <map>
 #include "BLOCK_MATRIX.h"
@@ -88,6 +90,23 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     {
         INTERVAL<int> v,e;
         bool own_first;
+    };
+
+    enum class BC_TYPE {dirichlet_v,traction,analytic};
+    struct BOUNDARY_CONDITION
+    {
+        CROSS_SECTION_TYPE_ID type;
+        BC_TYPE bc_type;
+        T flowrate;
+        TV normal,traction;
+        ANALYTIC_VECTOR<TV>* analytic_velocity=0,*force=0;
+        ANALYTIC_SCALAR<TV>* analytic_pressure=0;
+
+        TV Velocity(const TV& X) const;
+        TV Traction(const TV& X,const TV& N,T mu) const;
+        TV Force(const TV& X,T mu) const;
+        T Divergence(const TV& X) const;
+        T Pressure(const TV& X) const;
     };
 
     struct CANONICAL_BLOCK

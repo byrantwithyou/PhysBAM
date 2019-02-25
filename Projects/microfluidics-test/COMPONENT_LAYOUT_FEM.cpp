@@ -29,6 +29,11 @@ bool Canonical_Direction(VECTOR<T,2> u)
 // j <cross-section-name> <num-pipes> <origin-vertex> [<vertex-name> <connection-name>]*
 // p <cross-section-name> <connection-name> <connection-name>
 // g <cross-section-name> <cross-section-name> <vertex-name> <vertex-name> <distance> <length> <connection-name> <connection-name>
+// u f <cross-section-name> <connection-name> <origin-vertex> <vertex-name> <flow-rate>
+// u a <cross-section-name> <connection-name> <analytic-velocity>
+// t v <cross-section-name> <connection-name> <traction-2d>
+// q a <cross-section-name> <connection-name> <analytic-pressure>
+// f <analytic-force>
 //#####################################################################
 // Function Parse_Input
 //#####################################################################
