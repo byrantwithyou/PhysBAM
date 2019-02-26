@@ -151,6 +151,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
         ARRAY<TV> X;
         ARRAY<IV3> E;
         ARRAY<IV> S;
+        ARRAY<int> bc_v,bc_e;
     };
     ARRAY<CANONICAL_BLOCK,CANONICAL_BLOCK_ID> canonical_blocks;
 
