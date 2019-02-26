@@ -12,12 +12,12 @@ template<class T>
 struct BLOCK_MATRIX
 {
     typedef VECTOR<T,2> TV;
-    int nv_r,ne_r,nv_c,ne_c;
+    int nv_r,ne_r,np_r,nv_c,ne_c,np_c;
     MATRIX_MXN<T> M;
 
     void Resize()
     {
-        M.Resize(3*nv_r+2*ne_r,3*nv_c+2*ne_c);
+        M.Resize(2*nv_r+2*ne_r+np_r,2*nv_c+2*ne_c+np_c);
     }
 
     MATRIX<T,2> Get_M(int r,int c) const
