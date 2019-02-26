@@ -65,7 +65,7 @@ Parse_Input(const std::string& pipe_file)
     HASHTABLE<std::string,TV> vertices;
     HASHTABLE<std::string,VERTEX_DATA> connection_points;
     xforms.Append(MATRIX<T,2>()+1);
-    
+
     while(getline(fin,line))
     {
         std::stringstream ss(line);
@@ -334,6 +334,8 @@ Make_Canonical_Pipe_Block(const PIPE_KEY& key) -> CANONICAL_BLOCK_ID
 
     cb.cross_sections.Append({{0,n},{0,n-1},false});
     cb.cross_sections.Append({{n,2*n},{n-1,2*(n-1)},true});
+    cb.bc_v={0,n-1,n,2*n-1};
+    cb.bc_e={3*(n-1),4*(n-1)};
     return it.first->second;
 }
 //#####################################################################
@@ -661,11 +663,12 @@ Make_Canonical_Pipe_Change(const PIPE_CHANGE_KEY& key) -> CANONICAL_COMPONENT*
 }
 template<class F> // func(a,b) means val(a)<val(b)
 void Cross_Section_Topology(ARRAY<VECTOR<int,3> >& E,ARRAY<VECTOR<int,2> >& S,
-    F func,int n0,int n1)
+    F func,int n0,int n1,ARRAY<int>& bc_e)
 {
     for(int i=0;i<n0;i++) S.Append({i,i+1});
     for(int i=0;i<n1;i++) S.Append({i+n0,i+n0+1});
     int a=0,b=n0,c=n0+n1,ma=a+n0/2,mb=b+n1/2;
+    bc_e.Append(S.m);
     while(a<n0 || b<c)
     {
         S.Append({a,b});
@@ -683,6 +686,7 @@ void Cross_Section_Topology(ARRAY<VECTOR<int,3> >& E,ARRAY<VECTOR<int,2> >& S,
             b++;
         }
     }
+    bc_e.Append(S.m);
     S.Append({a,b});
 }
 //#####################################################################
@@ -710,7 +714,8 @@ Make_Canonical_Change_Block(const PIPE_CHANGE_KEY& key) -> CANONICAL_BLOCK_ID
         cb.X(i+n0)=TV(key.length,cst1.width/n1*i-cst1.width/2);
 
     Cross_Section_Topology(cb.E,cb.S,
-        [&cb](int a,int b){return cb.X(a+1).y<=cb.X(b+1).y;},n0,n1);
+        [&cb](int a,int b){return cb.X(a+1).y<=cb.X(b+1).y;},n0,n1,cb.bc_e);
+    cb.bc_v={0,n0-1,n0,n0+n1-1};
 
     cb.cross_sections.Append({{0,n0},{0,n0-1},false});
     cb.cross_sections.Append({{n0,2*n0},{n0-1,n0+n1-2},true});
@@ -856,7 +861,7 @@ Separates_Dofs(BLOCK_ID b)
             mask|=1<<c;
     auto pr=separates_dofs.Insert({id,mask},0);
     if(!pr.y) return *pr.x;
-    
+
     int valid=0;
     const CANONICAL_BLOCK& cb=canonical_blocks(id);
     ARRAY<int> owner(cb.X.m,use_init,-1);
@@ -934,7 +939,7 @@ Merge_Canonical_Blocks(CANONICAL_BLOCK_ID id0,int con_id0,XFORM xf0,
     const CANONICAL_BLOCK& cb1=canonical_blocks(id1);
     const CROSS_SECTION& cs0=cb0.cross_sections(con_id0);
     const CROSS_SECTION& cs1=cb1.cross_sections(con_id1);
-    
+
     ARRAY<int> index_v_map,index_e_map;
     int num_v_dofs=Merge_Dofs(index_v_map,cb0.X.m,cb1.X.m,cs0.v,cs1.v,
         cs0.own_first,cs1.own_first);
@@ -968,6 +973,8 @@ Merge_Canonical_Blocks(CANONICAL_BLOCK_ID id0,int con_id0,XFORM xf0,
 
     cb.S=cb0.S;
     cb.S.Resize(num_e_dofs);
+    cb.bc_v=cb0.bc_v;
+    cb.bc_e=cb0.bc_e;
     for(int i=0;i<cb1.E.m;i++)
     {
         int j=index_e_map(i);
@@ -976,6 +983,9 @@ Merge_Canonical_Blocks(CANONICAL_BLOCK_ID id0,int con_id0,XFORM xf0,
         if(j>=cb0.S.m) cb.S(j)=s;
         else assert(cb.S(j)==s);
     }
+
+    cb.bc_v.Append_Elements(index_v_map.Subset(cb1.bc_v));
+    cb.bc_e.Append_Elements(index_e_map.Subset(cb1.bc_e));
 
     cb.E=cb0.E;
     ARRAY<IV3> E=cb1.E;
@@ -999,7 +1009,7 @@ Merge_Blocks(BLOCK_ID id,int con_id)
 
     auto pr=Merge_Canonical_Blocks(bl.block,con_id,bl.xform,bl2.block,con_id2,bl2.xform);
     bl.block=pr->x;
-    
+
     for(int c=con_id;c<bl.connections.m;c++)
     {
         BLOCK_ID b=bl.connections(c).id;
@@ -1419,7 +1429,7 @@ Fill_Irregular_Connection_Matrix(IRREGULAR_CONNECTION& ic)
         });
 
     HASHTABLE<BLOCK_ID,int> h;
-    
+
     for(auto&p:prs)
     {
         auto& z=p.data;
@@ -1430,7 +1440,7 @@ Fill_Irregular_Connection_Matrix(IRREGULAR_CONNECTION& ic)
         Copy_Matrix_Data(M,ic.regular,z(0),z(1),z(2),z(3),z(4),z(5),ic.regular,p.key);
         Copy_Matrix_Data(M,p.key,z(6),z(7),z(8),z(9),z(10),z(11),ic.regular,p.key);
     }
-    
+
     int ir=irregular_reference_block_data.Add_End();
     ic.block_data=ir;
     auto& d=irregular_reference_block_data(ir);
@@ -1528,7 +1538,7 @@ Compute_Reference_Blocks()
         REG_CON reg_con;
         IRREG_CON_V irreg_con_v;
         IRREG_CON_E irreg_con_e;
-        
+
         auto& bl=blocks(b);
         for(int cc=0;cc<bl.connections.m;cc++)
         {
@@ -1538,7 +1548,7 @@ Compute_Reference_Blocks()
             else
             {
                 reg_con.Append(std::make_tuple(CANONICAL_BLOCK_ID(-1),-1,true));
-                
+
                 auto& ic=irregular_connections(~c.con_id);
                 Visit_Irregular_Cross_Section_Dofs(ic,
                     canonical_blocks(blocks(ic.regular).block).cross_sections(ic.con_id),
