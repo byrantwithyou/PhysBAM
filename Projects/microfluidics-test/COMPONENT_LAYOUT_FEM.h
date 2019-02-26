@@ -311,9 +311,10 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     int Compute_Connection_Hash(BLOCK_ID b0,int con_id0,BLOCK_ID b1,int con_id1);
     PAIR<int,int> Remap_Owned_Dofs(ARRAY<int>& map_v,ARRAY<int>& map_e,BLOCK_ID b);
     void Compute_Dof_Remapping(BLOCK_ID b);
-    void Copy_Matrix_Data(BLOCK_MATRIX<T>& A,const BLOCK_MATRIX<T>& B,
+    void Copy_Matrix_Data(BLOCK_MATRIX<T>& A,BLOCK_ID b,
         const ARRAY<IV>& va,const ARRAY<IV>& ea,
-        const ARRAY<IV>& vb,const ARRAY<IV>& eb) const;
+        const ARRAY<IV>& vb,const ARRAY<IV>& eb,
+        BLOCK_ID ar,BLOCK_ID ac) const;
     void Init_Block_Matrix(BLOCK_MATRIX<T>& M,BLOCK_ID a,BLOCK_ID b) const;
     void Compute_Reference_Irregular_Connections();
   private:

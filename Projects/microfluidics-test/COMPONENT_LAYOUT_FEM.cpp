@@ -1157,35 +1157,44 @@ Fill_Canonical_Block_Matrix(BLOCK_MATRIX<T>& mat,const CANONICAL_BLOCK& cb)
 // Function Copy_Matrix_Data
 //#####################################################################
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Copy_Matrix_Data(BLOCK_MATRIX<T>& A,const BLOCK_MATRIX<T>& B,
+Copy_Matrix_Data(BLOCK_MATRIX<T>& A,BLOCK_ID b,
     const ARRAY<IV>& va,const ARRAY<IV>& ea,
-    const ARRAY<IV>& vb,const ARRAY<IV>& eb) const
+    const ARRAY<IV>& vb,const ARRAY<IV>& eb,
+    BLOCK_ID ar,BLOCK_ID ac) const
 {
-    // TODO transforms
+    const BLOCK_MATRIX<T>& B=canonical_block_matrices(blocks(b).block);
+    MATRIX<T,2> G=xforms(blocks(b).xform.id).Inverse();
+    MATRIX<T,2> Ma=G*xforms(blocks(ar).xform.id);
+    MATRIX<T,2> Mb=G*xforms(blocks(ac).xform.id);
+    T sa=sqrt(Ma.Determinant());
+    T sb=sqrt(Mb.Determinant());
+    Ma/=sa;
+    Mb/=sb;
+
     for(auto p:va)
     {
         for(auto r:vb)
         {
-            A.Add_vv(p.x,r.x,B.Get_vv(p.y,r.y));
-            A.Add_vp(p.x,r.x,B.Get_vp(p.y,r.y));
-            A.Add_pv(p.x,r.x,B.Get_pv(p.y,r.y));
+            A.Add_vv(p.x,r.x,Ma.Transpose_Times(B.Get_vv(p.y,r.y)*Mb));
+            A.Add_vp(p.x,r.x,Ma.Transpose_Times(B.Get_vp(p.y,r.y)*sb));
+            A.Add_pv(p.x,r.x,Mb.Transpose_Times(B.Get_pv(p.y,r.y)*sa));
         }
         for(auto r:eb)
         {
-            A.Add_ve(p.x,r.x,B.Get_ve(p.y,r.y));
-            A.Add_pe(p.x,r.x,B.Get_pe(p.y,r.y));
+            A.Add_ve(p.x,r.x,Ma.Transpose_Times(B.Get_ve(p.y,r.y)*Mb));
+            A.Add_pe(p.x,r.x,Mb.Transpose_Times(B.Get_pe(p.y,r.y)*sa));
         }
     }
     for(auto p:ea)
     {
         for(auto r:vb)
         {
-            A.Add_ev(p.x,r.x,B.Get_ev(p.y,r.y));
-            A.Add_ep(p.x,r.x,B.Get_ep(p.y,r.y));
+            A.Add_ev(p.x,r.x,Ma.Transpose_Times(B.Get_ev(p.y,r.y)*Mb));
+            A.Add_ep(p.x,r.x,Ma.Transpose_Times(B.Get_ep(p.y,r.y)*sb));
         }
         for(auto r:eb)
         {
-            A.Add_ee(p.x,r.x,B.Get_ee(p.y,r.y));
+            A.Add_ee(p.x,r.x,Ma.Transpose_Times(B.Get_ee(p.y,r.y)*Mb));
         }
     }
 }
@@ -1211,7 +1220,7 @@ Fill_Block_Matrix(BLOCK_ID b)
     for(int i=0;i<rd.dof_map_e.m;i++)
         if(rd.dof_map_e(i)>=0)
             e.Append({rd.dof_map_e(i),i});
-    Copy_Matrix_Data(mat,canonical_block_matrices(bl.block),v,e,v,e);
+    Copy_Matrix_Data(mat,b,v,e,v,e,b,b);
 
     for(int cc=0;cc<bl.connections.m;cc++)
     {
@@ -1235,7 +1244,8 @@ Fill_Block_Matrix(BLOCK_ID b)
                     assert((a>=0)==o);
                     if(o) e.Append({a,b});
                 });
-            Copy_Matrix_Data(mat,canonical_block_matrices(blocks(c.id).block),v,e,v,e);
+
+            Copy_Matrix_Data(mat,c.id,v,e,v,e,b,b);
         }
         else
         {
@@ -1257,9 +1267,7 @@ Fill_Block_Matrix(BLOCK_ID b)
                     if(o) prs.Get_Or_Insert(b).y.Append({a,c});
                 });
             for(auto&p:prs)
-                Copy_Matrix_Data(mat,
-                    canonical_block_matrices(blocks(p.key).block),
-                    p.data.x,p.data.y,p.data.x,p.data.y);
+                Copy_Matrix_Data(mat,p.key,p.data.x,p.data.y,p.data.x,p.data.y,b,b);
         }
     }
 }
@@ -1311,8 +1319,8 @@ Fill_Connection_Matrix(BLOCK_ID b0,int con_id0,BLOCK_ID b1,int con_id1)
                 eb1.Append({rd1.dof_map_e(b),b});
             }
         });
-    Copy_Matrix_Data(mat,canonical_block_matrices(blocks(b0).block),va0,ea0,vb0,eb0);
-    Copy_Matrix_Data(mat,canonical_block_matrices(blocks(b1).block),va1,ea1,vb1,eb1);
+    Copy_Matrix_Data(mat,b0,va0,ea0,vb0,eb0,b0,b1);
+    Copy_Matrix_Data(mat,b1,va1,ea1,vb1,eb1,b0,b1);
     return *pr.x;
 }
 //#####################################################################
@@ -1362,14 +1370,12 @@ Fill_Irregular_Connection_Matrix(IRREGULAR_CONNECTION& ic)
     for(auto&p:prs)
     {
         auto& z=p.data;
-        auto& A=canonical_block_matrices(blocks(ic.regular).block);
-        auto& B=canonical_block_matrices(blocks(p.key).block);
         int m_id=matrix_block_list.Add_End();
         h.Set(p.key,m_id);
         auto& M=matrix_block_list(m_id);
         Init_Block_Matrix(M,ic.regular,p.key);
-        Copy_Matrix_Data(M,A,z(0),z(4),z(2),z(6));
-        Copy_Matrix_Data(M,B,z(1),z(5),z(3),z(7));
+        Copy_Matrix_Data(M,ic.regular,z(0),z(4),z(2),z(6),ic.regular,p.key);
+        Copy_Matrix_Data(M,p.key,z(1),z(5),z(3),z(7),ic.regular,p.key);
     }
     
     int ir=irregular_reference_block_data.Add_End();
@@ -1438,6 +1444,13 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
             if(d.add_block(j)>=0)
                 cem.Add_Block_Matrix_Entry(Value(ic.regular),Value(ic.edge_on_v(j).x),d.add_block(j));
     }
+
+    // TODO: rhs
+    // multiply rhs(b) by F.Transpose(), where
+    // A = xforms(blocks(b).xform.id);
+    // F = A/sqrt(A.Determinant())
+    //
+    // Multiply solution sol(b) by F when done.
 
     cem.End_Fill_Blocks();
 }
