@@ -29,10 +29,10 @@ bool Canonical_Direction(VECTOR<T,2> u)
 // j <cross-section-name> <num-pipes> <origin-vertex> [<vertex-name> <connection-name>]*
 // p <cross-section-name> <connection-name> <connection-name>
 // g <cross-section-name> <cross-section-name> <vertex-name> <vertex-name> <distance> <length> <connection-name> <connection-name>
-// u <cross-section-name> <connection-name> <origin-vertex> <vertex-name> <flow-rate>
+// u <cross-section-name> <origin-vertex> <vertex-name> <connection-name> <flow-rate>
+// t <cross-section-name> <origin-vertex> <vertex-name> <connection-name> <traction-2d>
+// T <cross-section-name> <origin-vertex> <vertex-name> <connection-name>
 // U <analytic-velocity>
-// t <cross-section-name> <connection-name> <origin-vertex> <vertex-name> <traction-2d>
-// T <cross-section-name> <connection-name> <origin-vertex> <vertex-name>
 // P <analytic-pressure>
 // F <analytic-force>
 //#####################################################################
@@ -166,35 +166,79 @@ Parse_Input(const std::string& pipe_file)
                 }
                 break;
             case 'u':
+            case 't':
                 {
+                    PIPE_KEY key;
+                    key.length=target_length;
+                    ss>>name>>name2>>name3;
+                    if(c=='u') ss>>t0;
+                    else ss>>v0;
+                    TV A=vertices.Get(name);
+                    TV B=vertices.Get(name2);
+                    TV dir=(B-A).Normalized();
+                    TV C=A+dir*key.length;
+                    auto pr=Make_BC_Block(key,c=='u');
+                    CANONICAL_BLOCK& cb=canonical_blocks(pr.x);
+
+                    BLOCK_ID b=blocks.Add_End();
+                    BLOCK& bl=blocks(b);
+                    bl.block=pr.x;
+                    bl.xform={Compute_Xform(dir),A};
+                    bl.connections.Append({BLOCK_ID(-1)});
+
+                    VERTEX_DATA vd;
+                    vd.X=C;
+                    vd.con.regular=b;
+                    vd.con.con_id=0;
+                    connection_points.Set(name3,vd);
+
                     BOUNDARY_CONDITION bc;
-                    bc.bc_type=BC_TYPE::dirichlet_v;
-                    ss>>name>>name2;
-                    bc.type=cross_section_hash.Get(name);
-                    VERTEX_DATA& vd=connection_points.Get(name2);
-                    ss>>name2>>name3>>t0;
-                    TV A=vertices.Get(name2);
-                    TV B=vertices.Get(name3);
-                    bc.normal=(B-A).Normalized();
-                    bc.flowrate=t0;
-                    vd.bc_id=boundary_conditions.Append(bc);
+                    bc.b=b;
+                    bc.bc_v=pr.y;
+                    bc.bc_e=pr.z;
+                    bc.normal=-dir;
+                    bc.data_v.Resize(bc.bc_v.Size());
+                    bc.data_e.Resize(bc.bc_e.Size());
+
+                    if(c=='u')
+                    {
+                        T y0=cb.X(bc.bc_v.min_corner).y;
+                        T y1=cb.X(bc.bc_v.max_corner).y-1;
+                        T a=6*t0/cube(y1-y0);
+                        for(int i:bc.bc_v)
+                        {
+                            T y=cb.X(i).y;
+                            bc.data_v(i)=a*(y-y0)*(y-y1)*dir;
+                        }
+                        for(int i:bc.bc_e)
+                        {
+                            T y=cb.X.Subset(cb.S(i)).Sum().y/2;
+                            bc.data_e(i)=a*(y-y0)*(y-y1)*dir;
+                        }
+                        bc_v.Append(bc);
+                    }
+                    else
+                    {
+                        bc.data_v.Fill(v0);
+                        bc.data_e.Fill(v0);
+                        bc_t.Append(bc);
+                    }
                 }
                 break;
-            case 't':
             case 'T':
                 {
-                    BOUNDARY_CONDITION bc;
-                    bc.bc_type=BC_TYPE::traction;
-                    if(c=='T') bc.bc_type=BC_TYPE::analytic;
-                    ss>>name>>name2;
-                    bc.type=cross_section_hash.Get(name);
-                    VERTEX_DATA& vd=connection_points.Get(name2);
-                    ss>>name2>>name3;
-                    TV A=vertices.Get(name2);
-                    TV B=vertices.Get(name3);
-                    bc.normal=(B-A).Normalized();
-                    if(c=='t') ss>>bc.traction;
-                    vd.bc_id=boundary_conditions.Append(bc);
+                    // BOUNDARY_CONDITION bc;
+                    // bc.bc_type=BC_TYPE::traction;
+                    // if(c=='T') bc.bc_type=BC_TYPE::analytic;
+                    // ss>>name>>name2;
+                    // bc.type=cross_section_hash.Get(name);
+                    // VERTEX_DATA& vd=connection_points.Get(name2);
+                    // ss>>name2>>name3;
+                    // TV A=vertices.Get(name2);
+                    // TV B=vertices.Get(name3);
+                    // bc.normal=(B-A).Normalized();
+                    // if(c=='t') ss>>bc.traction;
+                    // vd.bc_id=boundary_conditions.Append(bc);
                 }
                 break;
             case 'U':
@@ -1684,6 +1728,51 @@ Init_Block_Matrix(BLOCK_MATRIX<T>& M,BLOCK_ID a,BLOCK_ID b) const
     M.ne_c=d.num_dofs_e;
     M.np_c=d.num_dofs_p;
     M.Resize();
+}
+//#####################################################################
+// Function Make_BC_V_Block
+//#####################################################################
+template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Make_BC_Block(const PIPE_KEY& key,bool is_v) -> BC_KEY
+{
+    auto it=canonical_bc_blocks[is_v].insert({key,{}});
+    if(!it.second) return it.first->second;
+
+    it.first->second.x=canonical_blocks.Add_End();
+    auto& cb=canonical_blocks(it.first->second.x);
+    const auto& cst=cross_section_types(key.type);
+
+    int n=cst.num_dofs;
+    PHYSBAM_ASSERT(n%2);
+    cb.X.Resize(2*n);
+    cb.S.Resize(4*(n-1)+1);
+    for(int i=0;i<n;i++)
+    {
+        T y=cst.width/(n-1)*i-cst.width/2;
+        cb.X(i)=TV(0,y);
+        cb.X(i+n)=TV(key.length,y);
+    }
+
+    for(int i=0;i<n-1;i++)
+    {
+        cb.E.Append({i,i+n,i+1});
+        cb.E.Append({i+n,i+n+1,i+1});
+        cb.S(i)={i,i+1};
+        cb.S(i+(n-1))={i+n,i+n+1};
+        cb.S(i+2*(n-1))={i+n,i+1};
+        cb.S(i+3*(n-1))={i,i+n};
+    }
+    cb.S(4*(n-1))={n-1,2*n-1};
+
+    cb.cross_sections.Append({{n,2*n},{n-1,2*(n-1)},true});
+    for(int i=0;i<=n;i++) cb.bc_v.Append(i);
+    cb.bc_v.Append(2*n-1);
+    if(is_v) for(int i=0;i<n-1;i++) cb.bc_e.Append(i);
+    cb.bc_e.Append(3*(n-1));
+    cb.bc_e.Append(4*(n-1));
+    it.first->second.y={0,n};
+    it.first->second.z={0,n-1};
+    return it.first->second;
 }
 template class COMPONENT_LAYOUT_FEM<VECTOR<double,2> >;
 }
