@@ -322,7 +322,8 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     void Init_Block_Matrix(BLOCK_MATRIX<T>& M,BLOCK_ID a,BLOCK_ID b) const;
     void Compute_Reference_Irregular_Connections();
     void Times_U_Dot_V(CANONICAL_BLOCK& cb,BLOCK_VECTOR<T>& v,const BLOCK_VECTOR<T>& u) const;
-
+    void Times_P_U(CANONICAL_BLOCK& cb,BLOCK_VECTOR<T>& w,const ARRAY<T>& div_v,const ARRAY<T>& div_e) const;
+    void Times_Line_Integral_U_Dot_V(CANONICAL_BLOCK& cb,BLOCK_VECTOR<T>& w,const BLOCK_VECTOR<T>& u) const;
 
   private:
     std::tuple<TV,T,T> Vertex(T angle,T width) const;

@@ -1242,7 +1242,7 @@ int fem_u_dot_v_table[6][6]=
 };
 
 //#####################################################################
-// Function Copy_Matrix_Data
+// Function Times_U_Dot_V
 //#####################################################################
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Times_U_Dot_V(CANONICAL_BLOCK& cb,BLOCK_VECTOR<T>& w,const BLOCK_VECTOR<T>& u) const
@@ -1266,6 +1266,66 @@ Times_U_Dot_V(CANONICAL_BLOCK& cb,BLOCK_VECTOR<T>& w,const BLOCK_VECTOR<T>& u) c
                 s(i)+=r(j)*fem_u_dot_v_table[i][j];
         s*=scale;
         for(int a=0;a<2;a++) for(int i=0;i<3;i++) w.Add_u(dof[a](i),a,s(i+3*a));
+    }
+}
+
+int fem_p_u_table[3][6]=
+{
+    {2, -1, -1, 4, 8, 8},
+    {-1, 2, -1, 8, 4, 8},
+    {-1, -1, 2, 8, 8, 4}
+};
+
+//#####################################################################
+// Function Times_U_Dot_V
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Times_P_U(CANONICAL_BLOCK& cb,BLOCK_VECTOR<T>& w,const ARRAY<T>& div_v,const ARRAY<T>& div_e) const
+{
+    HASHTABLE<IV,int> edge_lookup;
+    for(int i=0;i<cb.S.m;i++)
+        edge_lookup.Set(cb.S(i).Sorted(),i);
+
+    for(IV3 v:cb.E)
+    {
+        IV3 dof[2]={v};
+        for(int i=0;i<3;i++)
+            dof[1](i)=edge_lookup.Get(v.Remove_Index(i).Sorted());
+        MATRIX<T,2> F(cb.X(v.y)-cb.X(v.x),cb.X(v.z)-cb.X(v.x));
+        T scale=F.Determinant()/120;
+
+        VECTOR<T,6> r;
+        VECTOR<T,3> s;
+        for(int i=0;i<3;i++) r(i)=div_v(dof[0](i));
+        for(int i=0;i<3;i++) r(i+3)=div_e(dof[1](i));
+        for(int i=0;i<3;i++)
+            for(int j=0;j<6;j++)
+                s(i)+=r(j)*fem_p_u_table[i][j];
+        s*=scale;
+        for(int i=0;i<3;i++) w.Add_p(v(i),s(i));
+    }
+}
+
+int fem_line_int_u_dot_v_table[3][3] = {{4, -1, 2}, {-1, 4, 2}, {2, 2, 16}};
+
+//#####################################################################
+// Function Times_U_Dot_V
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Times_Line_Integral_U_Dot_V(CANONICAL_BLOCK& cb,BLOCK_VECTOR<T>& w,const BLOCK_VECTOR<T>& u) const
+{
+    for(int e:cb.bc_e)
+    {
+        VECTOR<TV,3> r(u.Get_v(cb.S(e).x),u.Get_v(cb.S(e).y),u.Get_e(e)),s;
+        for(int i=0;i<3;i++)
+            for(int j=0;j<3;j++)
+                s(i)+=r(j)*fem_line_int_u_dot_v_table[i][j];
+
+        VECTOR<TV,2> X(cb.X.Subset(cb.S(e)));
+        T scale=(X.x-X.y).Magnitude()/30;
+        w.Add_v(cb.S(e).x,s.x*scale);
+        w.Add_v(cb.S(e).y,s.y*scale);
+        w.Add_e(e,s.z*scale);
     }
 }
 
