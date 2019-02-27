@@ -104,7 +104,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     };
     ARRAY<BOUNDARY_CONDITION> bc_v,bc_t;
 
-    ANALYTIC_VECTOR<TV>* force=0,*analytic_velocity=0;
+    ANALYTIC_VECTOR<TV>* analytic_velocity=0;
     ANALYTIC_SCALAR<TV>* analytic_pressure=0;
 
     // TV Velocity(BC_ID id,const TV& X) const

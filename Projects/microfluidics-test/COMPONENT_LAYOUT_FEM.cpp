@@ -34,14 +34,12 @@ bool Canonical_Direction(VECTOR<T,2> u)
 // T <cross-section-name> <origin-vertex> <vertex-name> <connection-name>
 // U <analytic-velocity>
 // P <analytic-pressure>
-// F <analytic-force>
 //#####################################################################
 // Function Destructor
 //#####################################################################
 template<class T> COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 ~COMPONENT_LAYOUT_FEM()
 {
-    delete force;
     delete analytic_velocity;
     delete analytic_pressure;
 }
@@ -245,10 +243,6 @@ Parse_Input(const std::string& pipe_file)
                 delete analytic_velocity;
                 analytic_velocity=new ANALYTIC_VECTOR_PROGRAM<TV>(ss.str().c_str()+2);
                 break;
-                break;
-            case 'F':
-                delete force;
-                force=new ANALYTIC_VECTOR_PROGRAM<TV>(ss.str().c_str()+2);
                 break;
             case 'P':
                 delete analytic_pressure;
@@ -1673,20 +1667,52 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
                 cem.Add_Block_Matrix_Entry(Value(ic.regular),Value(ic.edge_on_v(j).x),d.add_block(j));
     }
 
+    if(analytic_velocity && analytic_pressure)
+    {
 
-    // boundary integral rhs terms
+        // boundary integral rhs terms
 
-    // volume integral rhs terms for missing velocity dofs
+        // volume integral rhs terms for missing velocity dofs
 
-    // volume integral rhs terms for interior body forces
+        // volume integral rhs terms for interior body forces
 
-    // volume integral rhs terms for divergent velocities
+        // volume integral rhs terms for divergent velocities
 
+    }
+    else
+    {
+        for(auto& bc:bc_v)
+        {
+            BLOCK& bl=blocks(bc.b);
+            CANONICAL_BLOCK& cb=canonical_blocks(bl.block);
 
+            BLOCK_VECTOR<T> w,u;
 
+            // TODO: set up w,u....
 
+            for(int i=0;i<bc.bc_v.Size();i++) u.Add_v(bc.bc_v.min_corner+i,bc.data_v(i));
+            for(int i=0;i<bc.bc_e.Size();i++) u.Add_e(bc.bc_e.min_corner+i,bc.data_e(i));
+            Times_U_Dot_V(cb,w,u);
 
+            // TODO: Apply_To_RHS(w);
+        }
 
+        for(auto& bc:bc_t)
+        {
+            BLOCK& bl=blocks(bc.b);
+            CANONICAL_BLOCK& cb=canonical_blocks(bl.block);
+
+            BLOCK_VECTOR<T> w,u;
+
+            // TODO: set up w,u....
+
+            for(int i=0;i<bc.bc_v.Size();i++) u.Add_v(bc.bc_v.min_corner+i,bc.data_v(i));
+            for(int i=0;i<bc.bc_e.Size();i++) u.Add_e(bc.bc_e.min_corner+i,bc.data_e(i));
+            Times_Line_Integral_U_Dot_V(cb,w,u);
+            
+            // TODO: Apply_To_RHS(w);
+        }
+    }
     
     // TODO: rhs
     // multiply rhs(b) by F.Transpose(), where
