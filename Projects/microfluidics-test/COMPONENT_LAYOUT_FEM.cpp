@@ -642,6 +642,16 @@ Make_Canonical_Joint_2(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,ARRAY<
         int n0=std::get<3>(g(i));
         cb.cross_sections.Append({{0,n0},{0,n0-1},false});
         cb.cross_sections.Append({{n0,cb.X.m},{n0+cb.X.m-2,cb.E.m},true});
+        if(i==0)
+        {
+            for(int j=0;j<n0;j++) cb.bc_v.Append(j);
+            for(int j=0;j<n0-1;j++) cb.bc_e.Append(j);
+        }
+        if(i==g.m-1)
+        {
+            for(int j=n0;j<cb.X.m;j++) cb.bc_v.Append(j);
+            for(int j=n0+cb.X.m-2;j<cb.S.m;j++) cb.bc_e.Append(j);
+        }
         // TODO build irregular connections
         cc->blocks.Append({id,{XFORM_ID(),TV()},{},{}});
     }
