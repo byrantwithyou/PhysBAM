@@ -14,6 +14,7 @@
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <map>
 #include "BLOCK_MATRIX.h"
+#include "BLOCK_VECTOR.h"
 #include "COMMON.h"
 
 namespace PhysBAM{
@@ -320,6 +321,9 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
         BLOCK_ID ar,BLOCK_ID ac) const;
     void Init_Block_Matrix(BLOCK_MATRIX<T>& M,BLOCK_ID a,BLOCK_ID b) const;
     void Compute_Reference_Irregular_Connections();
+    void Times_U_Dot_V(CANONICAL_BLOCK& cb,BLOCK_VECTOR<T>& v,const BLOCK_VECTOR<T>& u) const;
+
+
   private:
     std::tuple<TV,T,T> Vertex(T angle,T width) const;
     PAIR<ARRAY<TV>,ARRAY<TV> > Arc(const TV& c,T angle,T len_arm,T ext0,T ext1) const;

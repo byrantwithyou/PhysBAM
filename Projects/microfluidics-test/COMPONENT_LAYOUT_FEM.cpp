@@ -1228,6 +1228,47 @@ Fill_Canonical_Block_Matrix(BLOCK_MATRIX<T>& mat,const CANONICAL_BLOCK& cb)
                 }
     }
 }
+
+
+// entry * J / 360
+int fem_u_dot_v_table[6][6]=
+{
+    {6,-1,-1,-4,0,0},
+    {-1,6,-1,0,-4,0},
+    {-1,-1,6,0,0,-4},
+    {-4,0,0,32,16,16},
+    {0,-4,0,16,32,16},
+    {0,0,-4,16,16,32}
+};
+
+//#####################################################################
+// Function Copy_Matrix_Data
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Times_U_Dot_V(CANONICAL_BLOCK& cb,BLOCK_VECTOR<T>& w,const BLOCK_VECTOR<T>& u) const
+{
+    HASHTABLE<IV,int> edge_lookup;
+    for(int i=0;i<cb.S.m;i++)
+        edge_lookup.Set(cb.S(i).Sorted(),i);
+
+    for(IV3 v:cb.E)
+    {
+        IV3 dof[2]={v};
+        for(int i=0;i<3;i++)
+            dof[1](i)=edge_lookup.Get(v.Remove_Index(i).Sorted());
+        MATRIX<T,2> F(cb.X(v.y)-cb.X(v.x),cb.X(v.z)-cb.X(v.x));
+        T scale=F.Determinant()/360;
+
+        VECTOR<TV,6> r,s;
+        for(int a=0;a<2;a++) for(int i=0;i<3;i++) r(i+3*a)=u.Get_u(dof[a](i),a);
+        for(int i=0;i<6;i++)
+            for(int j=0;j<6;j++)
+                s(i)+=r(j)*fem_u_dot_v_table[i][j];
+        s*=scale;
+        for(int a=0;a<2;a++) for(int i=0;i<3;i++) w.Add_u(dof[a](i),a,s(i+3*a));
+    }
+}
+
 //#####################################################################
 // Function Copy_Matrix_Data
 //#####################################################################
@@ -1572,6 +1613,21 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
                 cem.Add_Block_Matrix_Entry(Value(ic.regular),Value(ic.edge_on_v(j).x),d.add_block(j));
     }
 
+
+    // boundary integral rhs terms
+
+    // volume integral rhs terms for missing velocity dofs
+
+    // volume integral rhs terms for interior body forces
+
+    // volume integral rhs terms for divergent velocities
+
+
+
+
+
+
+    
     // TODO: rhs
     // multiply rhs(b) by F.Transpose(), where
     // A = xforms(blocks(b).xform.id);
