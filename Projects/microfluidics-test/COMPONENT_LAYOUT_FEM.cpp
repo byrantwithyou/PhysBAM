@@ -1687,9 +1687,8 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
             CANONICAL_BLOCK& cb=canonical_blocks(bl.block);
 
             BLOCK_VECTOR<T> w,u;
-
-            // TODO: set up w,u....
-
+            Init_Block_Vector(w,cb);
+            Init_Block_Vector(u,cb);
             for(int i=0;i<bc.bc_v.Size();i++) u.Add_v(bc.bc_v.min_corner+i,bc.data_v(i));
             for(int i=0;i<bc.bc_e.Size();i++) u.Add_e(bc.bc_e.min_corner+i,bc.data_e(i));
             Times_U_Dot_V(cb,w,u);
@@ -1703,9 +1702,8 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
             CANONICAL_BLOCK& cb=canonical_blocks(bl.block);
 
             BLOCK_VECTOR<T> w,u;
-
-            // TODO: set up w,u....
-
+            Init_Block_Vector(w,cb);
+            Init_Block_Vector(u,cb);
             for(int i=0;i<bc.bc_v.Size();i++) u.Add_v(bc.bc_v.min_corner+i,bc.data_v(i));
             for(int i=0;i<bc.bc_e.Size();i++) u.Add_e(bc.bc_e.min_corner+i,bc.data_e(i));
             Times_Line_Integral_U_Dot_V(cb,w,u);
@@ -1880,6 +1878,29 @@ Init_Block_Matrix(BLOCK_MATRIX<T>& M,BLOCK_ID a,BLOCK_ID b) const
     M.ne_c=d.num_dofs_e;
     M.np_c=d.num_dofs_p;
     M.Resize();
+}
+//#####################################################################
+// Function Init_Block_Matrix
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Init_Block_Vector(BLOCK_VECTOR<T>& V,BLOCK_ID b) const
+{
+    const auto& c=reference_block_data(reference_block(b).y);
+    V.nv=c.num_dofs_v;
+    V.ne=c.num_dofs_e;
+    V.np=c.num_dofs_p;
+    V.Resize();
+}
+//#####################################################################
+// Function Init_Block_Matrix
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Init_Block_Vector(BLOCK_VECTOR<T>& V,const CANONICAL_BLOCK& cb) const
+{
+    V.nv=cb.X.m;
+    V.ne=cb.S.m;
+    V.np=cb.X.m;
+    V.Resize();
 }
 //#####################################################################
 // Function Make_BC_V_Block

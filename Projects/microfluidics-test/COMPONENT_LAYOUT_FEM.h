@@ -193,7 +193,6 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     struct CANONICAL_COMPONENT
     {
         ARRAY<BLOCK,BLOCK_ID> blocks;
-        ARRAY<BLOCK_CONNECTION> connections;
         ARRAY<IRREGULAR_CONNECTION> irregular_connections;
     };
 
@@ -320,6 +319,8 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
         const ARRAY<IV>& vb,const ARRAY<IV>& eb,const ARRAY<IV>& pb,
         BLOCK_ID ar,BLOCK_ID ac) const;
     void Init_Block_Matrix(BLOCK_MATRIX<T>& M,BLOCK_ID a,BLOCK_ID b) const;
+    void Init_Block_Vector(BLOCK_VECTOR<T>& M,BLOCK_ID b) const;
+    void Init_Block_Vector(BLOCK_VECTOR<T>& M,const CANONICAL_BLOCK& cb) const;
     void Compute_Reference_Irregular_Connections();
     void Times_U_Dot_V(CANONICAL_BLOCK& cb,BLOCK_VECTOR<T>& v,const BLOCK_VECTOR<T>& u) const;
     void Times_P_U(CANONICAL_BLOCK& cb,BLOCK_VECTOR<T>& w,const ARRAY<T>& div_v,const ARRAY<T>& div_e) const;
