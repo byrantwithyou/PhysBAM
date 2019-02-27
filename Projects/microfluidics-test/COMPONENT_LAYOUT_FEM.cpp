@@ -429,8 +429,9 @@ Arc(const TV& c,T angle,T len_arm,T ext0,T ext1) const -> PAIR<ARRAY<TV>,ARRAY<T
 //#####################################################################
 // Function Merge_Interpolated
 //#####################################################################
-template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Merge_Interpolated(const ARRAY<TV>& X,int n0,int n1) const -> ARRAY<IV3>
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Merge_Interpolated(const ARRAY<TV>& X,int n0,int n1,
+    ARRAY<IV3>& elems,ARRAY<IV>& edges) const
 {
     auto angle=[X](int v0,int v1,int v2)
     {
@@ -450,8 +451,10 @@ Merge_Interpolated(const ARRAY<TV>& X,int n0,int n1) const -> ARRAY<IV3>
         return max_index;
     };
 
-    ARRAY<IV3> elems;
+    elems.Resize(n0+n1-2);
+    edges.Resize(2*(n0+n1-2)+1);
     int i=0,j=n0,alt=0;
+    edges(n0-1)=IV(i,j);
     while(i<n0-1 || j<n0+n1-1){
         T a0=0;
         if(i+1<n0) a0=angle(j,i+1,i);
@@ -461,7 +464,9 @@ Merge_Interpolated(const ARRAY<TV>& X,int n0,int n1) const -> ARRAY<IV3>
         {
             int p[]={i+1,i,j};
             int k=max_angle_index(p);
-            elems.Append(IV3(p[k],p[(k+1)%3],p[(k+2)%3]));
+            elems(i+j-n0)=IV3(p[k],p[(k+1)%3],p[(k+2)%3]);
+            edges(i)=IV(i+1,i);
+            edges(i+j)=IV(i+1,j);
             i++;
             alt=1;
         }
@@ -469,34 +474,37 @@ Merge_Interpolated(const ARRAY<TV>& X,int n0,int n1) const -> ARRAY<IV3>
         {
             int p[]={j+1,i,j};
             int k=max_angle_index(p);
-            elems.Append(IV3(p[k],p[(k+1)%3],p[(k+2)%3]));
+            elems(i+j-n0)=IV3(p[k],p[(k+1)%3],p[(k+2)%3]);
+            edges(i+j)=IV(j+1,i);
+            edges(n0+n1-2+j)=IV(j+1,j);
             j++;
             alt=0;
         }
     }
-    return elems;
 }
 //#####################################################################
 // Function Fill
 //#####################################################################
 template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Fill(int nseg,const ARRAY<TV>& inner,const ARRAY<TV>& outer) const
-    -> ARRAY<std::tuple<ARRAY<TV>,ARRAY<IV3>,int> >
+    -> ARRAY<std::tuple<ARRAY<TV>,ARRAY<IV3>,ARRAY<IV>,int> >
 {
-    ARRAY<std::tuple<ARRAY<TV>,ARRAY<IV3>,int> > ret(nseg); // X,E,#verts in the first layer
+    ARRAY<std::tuple<ARRAY<TV>,ARRAY<IV3>,ARRAY<IV>,int> > ret(nseg); // X,E,S,#verts in the first layer
     std::get<0>(ret(0))=inner;
     for(int j=1;j<nseg;j++)
     {
         T s=(T)j/nseg;
         ARRAY<TV> inter=Interpolated(s,inner,outer);
         int n0=std::get<0>(ret(j-1)).m,n1=inter.m;
+        std::get<3>(ret(j-1))=n0;
         std::get<0>(ret(j-1)).Append_Elements(inter);
-        std::get<1>(ret(j-1))=Merge_Interpolated(std::get<0>(ret(j-1)),n0,n1);
+        Merge_Interpolated(std::get<0>(ret(j-1)),n0,n1,std::get<1>(ret(j-1)),std::get<2>(ret(j-1)));
         std::get<0>(ret(j)).Append_Elements(inter);
     }
     int n0=std::get<0>(ret(nseg-1)).m;
+    std::get<3>(ret(nseg-1))=n0;
     std::get<0>(ret(nseg-1)).Append_Elements(outer);
-    std::get<1>(ret(nseg-1))=Merge_Interpolated(std::get<0>(ret(nseg-1)),n0,outer.m);
+    Merge_Interpolated(std::get<0>(ret(nseg-1)),n0,outer.m,std::get<1>(ret(nseg-1)),std::get<2>(ret(nseg-1)));
     return ret;
 }
 //#####################################################################
@@ -575,8 +583,7 @@ Make_Canonical_Joint_2(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,ARRAY<
     TV vert;
     T ext,angle;
     std::tie(vert,ext,angle)=Vertex(key.angles(0),width);
-    PAIR<ARRAY<TV>,ARRAY<TV> > sides=Arc(vert,angle,width,0,0);
-    // TODO fill in edge dofs S
+    PAIR<ARRAY<TV>,ARRAY<TV> > sides=Arc(vert,angle,width,target_length,target_length);
     auto g=Fill(cst.num_dofs-1,sides.x,sides.y);
 
     CANONICAL_COMPONENT* cc=new CANONICAL_COMPONENT;
@@ -587,8 +594,11 @@ Make_Canonical_Joint_2(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,ARRAY<
         CANONICAL_BLOCK& cb=canonical_blocks.Last();
         cb.X=std::move(std::get<0>(g(i)));
         cb.E=std::move(std::get<1>(g(i)));
-        // TODO create cross sections, and build connections here.
-        // int n0=std::get<2>(g(i)),n1=cb.X.m;
+        cb.S=std::move(std::get<2>(g(i)));
+        int n0=std::get<3>(g(i));
+        cb.cross_sections.Append({{0,n0},{0,n0-1},false});
+        cb.cross_sections.Append({{n0,cb.X.m},{n0+cb.X.m-2,cb.E.m},true});
+        // TODO build irregular connections
         cc->blocks.Append({id,{XFORM_ID(),TV()},{},{}});
     }
     return {cc,{ext,ext}};
