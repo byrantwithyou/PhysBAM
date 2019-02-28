@@ -5,6 +5,7 @@
 #ifndef __COMPONENT_LAYOUT_FEM__
 #define __COMPONENT_LAYOUT_FEM__
 #include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/TRIPLE.h>
 #include <Core/Math_Tools/INTERVAL.h>
 #include <Core/Matrices/MATRIX.h>
 #include <Core/Matrices/SYMMETRIC_MATRIX.h>
@@ -155,6 +156,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
         XFORM xform;
         ARRAY<BLOCK_CONNECTION> connections;
         ARRAY<int> edge_on; // for edge-on (index in irregular_connections)
+        int flags=0; // 1=separator, 2=separator-eligible
     };
 
     // regular is master
@@ -318,6 +320,11 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     void Times_P_U(BLOCK_ID b,BLOCK_VECTOR<T>& w,const ARRAY<T>& div_v,const ARRAY<T>& div_e) const;
     void Times_Line_Integral_U_Dot_V(BLOCK_ID b,BLOCK_VECTOR<T>& w,const BLOCK_VECTOR<T>& u) const;
     void Apply_To_RHS(BLOCK_ID b,const BLOCK_VECTOR<T>& w);
+    RANGE<TV> Compute_Bounding_Box() const;
+    void Eliminate_Irregular_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem);
+    void Eliminate_Non_Seperators(CACHED_ELIMINATION_MATRIX<T>& cem);
+    void Eliminate_Strip(CACHED_ELIMINATION_MATRIX<T>& cem,const ARRAY<BLOCK_ID>& a);
+    void Eliminate_Simple(CACHED_ELIMINATION_MATRIX<T>& cem,BLOCK_ID first,int con_id_source);
     
   private:
     std::tuple<TV,T,T> Vertex(T angle,T width) const;

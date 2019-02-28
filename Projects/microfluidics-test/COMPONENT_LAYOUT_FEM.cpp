@@ -5,6 +5,7 @@
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Data_Structures/TRIPLE.h>
 #include <Core/Log/LOG.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <Core/Matrices/MATRIX_MXN.h>
 #include <Core/Matrices/ROTATION.h>
 #include <fstream>
@@ -412,6 +413,9 @@ Make_Canonical_Pipe(const PIPE_KEY& key) -> CANONICAL_COMPONENT*
             {XFORM_ID(),TV(offset,0)},
             {{cc->blocks.m-1,1},{BLOCK_ID(~1),0}}
         });
+    for(auto&bl:cc->blocks) bl.flags|=2;
+    cc->blocks(BLOCK_ID()).flags|=1;
+    cc->blocks.Last().flags|=1;
     return cc;
 }
 //#####################################################################
@@ -1119,17 +1123,21 @@ Merge_Blocks()
     for(BLOCK_ID b(0);b<blocks.m;b++)
         if(int mask=Separates_Dofs(b))
         {
+            PHYSBAM_ASSERT(!(blocks(b).flags&1));
             int besti=-1,best=INT_MAX;
             for(int i=0;i<blocks(b).connections.m;i++)
             {
                 if(!(mask&(1<<i))) continue;
-                int c=Approx_Dof_Count(blocks(b).connections(i).id);
+                BLOCK_ID d=blocks(b).connections(i).id;
+                if(blocks(d).flags&1) continue;
+                int c=Approx_Dof_Count(d);
                 if(c<best) // keep blocks small
                 {
                     best=c;
                     besti=i;
                 }
             }
+            PHYSBAM_ASSERT(besti>=0);
             Merge_Blocks(b,besti);
             b--; // repeat the check on this block
         }
@@ -1952,6 +1960,94 @@ Apply_To_RHS(BLOCK_ID b,const BLOCK_VECTOR<T>& w)
                 Copy_Vector_Data(w,b,h.dof[0][1],ic.regular);
     }
 }
-
+//#####################################################################
+// Function Compute_Bounding_Box
+//#####################################################################
+template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Compute_Bounding_Box() const -> RANGE<TV>
+{
+    RANGE<TV> box=RANGE<TV>::Empty_Box();
+    for(auto&bl:blocks)
+    {
+        const CANONICAL_BLOCK& cb=canonical_blocks(bl.block);
+        for(auto i:cb.bc_v)
+            box.Enlarge_To_Include_Point(xforms(bl.xform.id)*cb.X(i)+bl.xform.b);
+    }
+    return box;
+}
+//#####################################################################
+// Function Eliminate_Strip
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Eliminate_Strip(CACHED_ELIMINATION_MATRIX<T>& cem,const ARRAY<BLOCK_ID>& a)
+{
+    for(int sep=1;sep-1<a.m;sep*=2)
+        for(int i=sep-1;i<a.m;i+=sep*2)
+            if(cem.valid_row(Value(a(i))))
+                cem.Eliminate_Row(Value(a(i)));
+}
+//#####################################################################
+// Function Eliminate_Strip
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Eliminate_Simple(CACHED_ELIMINATION_MATRIX<T>& cem,BLOCK_ID first,int con_id_source)
+{
+    ARRAY<BLOCK_ID> list;
+    BLOCK_ID b=first;
+    int con_id=con_id_source;
+    while(1)
+    {
+        auto& bl=blocks(b);
+        if(bl.connections.m>2) break;
+        if(bl.flags&1) break;
+        list.Append(b);
+        if(bl.connections.m==1) break;
+        b=bl.connections(1-con_id).id;
+        con_id=bl.connections(1-con_id).con_id;
+    }
+}
+//#####################################################################
+// Function Eliminate_Rows
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Eliminate_Irregular_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
+{
+    // Get rid of irregular connections first.
+    for(auto& ic:irregular_connections)
+    {
+        BLOCK_ID prev(-1);
+        ARRAY<BLOCK_ID> found;
+        for(auto& p:ic.edge_on_v)
+        {
+            if(p.x!=prev)
+            {
+                found.Append(p.x);
+                prev=p.x;
+            }
+        }
+        Eliminate_Strip(cem,found);
+    }
+}
+//#####################################################################
+// Function Eliminate_Irregular_Blocks
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Eliminate_Non_Seperators(CACHED_ELIMINATION_MATRIX<T>& cem)
+{
+    for(BLOCK_ID b(0);b<blocks.m;b++)
+    {
+        if(!cem.valid_row(Value(b))) continue;
+        auto& bl=blocks(b);
+        if(bl.connections.m>2 || bl.flags&1)
+        {
+            for(auto& c:bl.connections)
+                Eliminate_Simple(cem,c.id,c.con_id);
+            if(bl.connections.m>2)
+                cem.Eliminate_Row(Value(b));
+        }
+    }
+    for(BLOCK_ID b(0);b<blocks.m;b++)
+        assert(!cem.valid_row(Value(b)) || blocks(b).flags&1);
+}
 template class COMPONENT_LAYOUT_FEM<VECTOR<double,2> >;
 }
