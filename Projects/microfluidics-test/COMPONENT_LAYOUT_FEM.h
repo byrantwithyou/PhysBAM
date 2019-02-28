@@ -159,6 +159,8 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
 
     ARRAY<BLOCK_MATRIX<T> > matrix_block_list;
 
+    ARRAY<BLOCK_VECTOR<T>,BLOCK_ID> rhs_block_list;
+    
     typedef std::tuple<CANONICAL_BLOCK_ID,int,CANONICAL_BLOCK_ID,int> REGULAR_CON_KEY;
     HASHTABLE<REGULAR_CON_KEY,int> regular_connection_matrix_blocks;
     
@@ -250,17 +252,31 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
 
     ARRAY<PAIR<BLOCK_ID,int>,BLOCK_ID> reference_block; // block, index
 
+    struct DOF_PAIRS
+    {
+        ARRAY<IV> v,e,p;
+    };
+    
     struct REFERENCE_BLOCK_DATA
     {
         int num_dofs_v,num_dofs_e,num_dofs_p;
         ARRAY<int> dof_map_v,dof_map_e,dof_map_p;
+        DOF_PAIRS pairs;
+        ARRAY<DOF_PAIRS> regular_pairs; // this block is the source, the connection is the destination
     };
 
     ARRAY<REFERENCE_BLOCK_DATA> reference_block_data;
 
+    struct IRREGULAR_REFERENCE_BLOCK_DATA_HELPER
+    {
+        BLOCK_ID b;
+        int mat_id;
+        DOF_PAIRS dof[2][2]; // dof[to][from]; 0=regular, 1=irregular
+    };
+
     struct IRREGULAR_REFERENCE_BLOCK_DATA
     {
-        ARRAY<int> add_block;
+        ARRAY<IRREGULAR_REFERENCE_BLOCK_DATA_HELPER> pairs;
     };
 
     ARRAY<IRREGULAR_REFERENCE_BLOCK_DATA> irregular_reference_block_data;
@@ -315,17 +331,17 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     PAIR<int,int> Remap_Owned_Dofs(ARRAY<int>& map_v,ARRAY<int>& map_e,BLOCK_ID b);
     void Compute_Dof_Remapping(BLOCK_ID b);
     void Copy_Matrix_Data(BLOCK_MATRIX<T>& A,BLOCK_ID b,
-        const ARRAY<IV>& va,const ARRAY<IV>& ea,const ARRAY<IV>& pa,
-        const ARRAY<IV>& vb,const ARRAY<IV>& eb,const ARRAY<IV>& pb,
-        BLOCK_ID ar,BLOCK_ID ac) const;
+        const DOF_PAIRS& dpa,const DOF_PAIRS& dpb,BLOCK_ID ar,BLOCK_ID ac) const;
+    void Copy_Vector_Data(const BLOCK_VECTOR<T>& B,BLOCK_ID b,const DOF_PAIRS& dp,BLOCK_ID a);
     void Init_Block_Matrix(BLOCK_MATRIX<T>& M,BLOCK_ID a,BLOCK_ID b) const;
     void Init_Block_Vector(BLOCK_VECTOR<T>& M,BLOCK_ID b) const;
     void Init_Block_Vector(BLOCK_VECTOR<T>& M,const CANONICAL_BLOCK& cb) const;
     void Compute_Reference_Irregular_Connections();
-    void Times_U_Dot_V(CANONICAL_BLOCK& cb,BLOCK_VECTOR<T>& v,const BLOCK_VECTOR<T>& u) const;
-    void Times_P_U(CANONICAL_BLOCK& cb,BLOCK_VECTOR<T>& w,const ARRAY<T>& div_v,const ARRAY<T>& div_e) const;
-    void Times_Line_Integral_U_Dot_V(CANONICAL_BLOCK& cb,BLOCK_VECTOR<T>& w,const BLOCK_VECTOR<T>& u) const;
-
+    void Times_U_Dot_V(BLOCK_ID b,BLOCK_VECTOR<T>& v,const BLOCK_VECTOR<T>& u) const;
+    void Times_P_U(BLOCK_ID b,BLOCK_VECTOR<T>& w,const ARRAY<T>& div_v,const ARRAY<T>& div_e) const;
+    void Times_Line_Integral_U_Dot_V(BLOCK_ID b,BLOCK_VECTOR<T>& w,const BLOCK_VECTOR<T>& u) const;
+    void Apply_To_RHS(BLOCK_ID b,const BLOCK_VECTOR<T>& w);
+    
   private:
     std::tuple<TV,T,T> Vertex(T angle,T width) const;
     PAIR<ARRAY<TV>,ARRAY<TV> > Arc(const TV& c,T angle,T len_arm,T ext0,T ext1) const;
