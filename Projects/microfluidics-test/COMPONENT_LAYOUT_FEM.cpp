@@ -436,18 +436,38 @@ Make_Canonical_Pipe(const PIPE_KEY& key) -> CANONICAL_COMPONENT*
     return cc;
 }
 //#####################################################################
-// Function Vertex
+// Function Extrude
 //#####################################################################
 template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Vertex(T angle,T width) const -> std::tuple<TV,T,T>
+Extrude(const TV& v0,const TV& v1,const TV& n) const -> VECTOR<TV,2>
 {
-    PHYSBAM_ASSERT(abs(angle)<2*pi);
+    VECTOR<TV,2> e(v0,v1);
+    T d=(e(1)-e(0)).Dot(n);
+    if(d>=0) e(0)+=n*d;
+    else e(1)-=n*d;
+    return e;
+}
+//#####################################################################
+// Function Elbow_Pit
+//#####################################################################
+template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Elbow_Pit(T angle,T width) const -> std::tuple<TV,T,T>
+{
     if(angle>pi) angle-=2*pi;
-    else if(angle<-pi) angle+=2*pi;
     TV m=ROTATION<TV>::From_Angle(angle/2).Rotated_X_Axis();
     T l=1/sin(abs(angle/2))*width/2;
     T w=std::tan(pi/2-abs(angle/2))*width/2;
     return std::make_tuple(l*m,w,angle);
+}
+//#####################################################################
+// Function Elbow_Pit_Oriented
+//#####################################################################
+template<class T> VECTOR<T,2> COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Elbow_Pit_Oriented(T angle,T width) const
+{
+    TV m=ROTATION<TV>::From_Angle(angle/2).Rotated_X_Axis();
+    T s=width/2/sin(angle/2);
+    return s*m;
 }
 //#####################################################################
 // Function Arc
@@ -486,150 +506,285 @@ Arc(const TV& c,T angle,T len_arm,T ext0,T ext1) const -> PAIR<ARRAY<TV>,ARRAY<T
     return {inner,outer};
 }
 //#####################################################################
-// Function Merge_Interpolated
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Merge_Interpolated(const ARRAY<TV>& X,int n0,int n1,
-    ARRAY<IV3>& elems,ARRAY<IV>& edges) const
-{
-    auto angle=[X](int v0,int v1,int v2)
-    {
-        TV u=(X(v2)-X(v1)).Normalized();
-        TV v=(X(v0)-X(v1)).Normalized();
-        return TV::Angle_Between(u,v);
-    };
-    auto max_angle_index=[angle](int* p)
-    {
-        T max_angle=-1;
-        int max_index=-1;
-        for(int j=0;j<3;j++){
-            T a=angle(p[(j+2)%3],p[j],p[(j+1)%3]);
-            if(a>max_angle){
-                max_angle=a;
-                max_index=j;}}
-        return max_index;
-    };
-
-    elems.Resize(n0+n1-2);
-    edges.Resize(2*(n0+n1-2)+1);
-    int i=0,j=n0,alt=0;
-    edges(n0-1)=IV(i,j);
-    while(i<n0-1 || j<n0+n1-1){
-        T a0=0;
-        if(i+1<n0) a0=angle(j,i+1,i);
-        T a1=0;
-        if(j+1<n0+n1) a1=angle(j,j+1,i);
-        if(j+1>=n0+n1 || (i+1<n0 && abs(a0-a1)<1e-6 && alt==0) || (i+1<n0 && a0>a1))
-        {
-            int p[]={i+1,i,j};
-            int k=max_angle_index(p);
-            elems(i+j-n0)=IV3(p[k],p[(k+1)%3],p[(k+2)%3]);
-            edges(i)=IV(i+1,i);
-            edges(i+j)=IV(i+1,j);
-            i++;
-            alt=1;
-        }
-        else
-        {
-            int p[]={j+1,i,j};
-            int k=max_angle_index(p);
-            elems(i+j-n0)=IV3(p[k],p[(k+1)%3],p[(k+2)%3]);
-            edges(i+j)=IV(j+1,i);
-            edges(n0+n1-2+j)=IV(j+1,j);
-            j++;
-            alt=0;
-        }
-    }
-}
-//#####################################################################
-// Function Fill
+// Function Polyline
 //#####################################################################
 template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Fill(int nseg,const ARRAY<TV>& inner,const ARRAY<TV>& outer) const
-    -> ARRAY<std::tuple<ARRAY<TV>,ARRAY<IV3>,ARRAY<IV>,int> >
+Polyline(const ARRAY<TV>& points,T dx) const -> ARRAY<TV>
 {
-    ARRAY<std::tuple<ARRAY<TV>,ARRAY<IV3>,ARRAY<IV>,int> > ret(nseg); // X,E,S,#verts in the first layer
-    std::get<0>(ret(0))=inner;
-    for(int j=1;j<nseg;j++)
+    ARRAY<TV> verts;
+    for(int j=1;j<points.m;j++)
     {
-        T s=(T)j/nseg;
-        ARRAY<TV> inter=Interpolated(s,inner,outer);
-        int n0=std::get<0>(ret(j-1)).m,n1=inter.m;
-        std::get<3>(ret(j-1))=n0;
-        std::get<0>(ret(j-1)).Append_Elements(inter);
-        Merge_Interpolated(std::get<0>(ret(j-1)),n0,n1,std::get<1>(ret(j-1)),std::get<2>(ret(j-1)));
-        std::get<0>(ret(j)).Append_Elements(inter);
+        TV v=points(j)-points(j-1);
+        T l=v.Normalize();
+        int n=std::round(l/dx);
+        T dx=l/n;
+        for(int k=0;k<n;k++) verts.Append(points(j-1)+v*k*dx);
     }
-    int n0=std::get<0>(ret(nseg-1)).m;
-    std::get<3>(ret(nseg-1))=n0;
-    std::get<0>(ret(nseg-1)).Append_Elements(outer);
-    Merge_Interpolated(std::get<0>(ret(nseg-1)),n0,outer.m,std::get<1>(ret(nseg-1)),std::get<2>(ret(nseg-1)));
-    return ret;
+    verts.Append(points.Last());
+    return verts;
 }
-//#####################################################################
-// Function Interpolate
-//#####################################################################
-template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Interpolated(T s,const ARRAY<TV>& side0,const ARRAY<TV>& side1) const -> ARRAY<TV>
-{
-    ARRAY<T> l0(side0.m),l1(side1.m);
-    l0(0)=0;
-    for(int j=1;j<side0.m;j++)
-        l0(j)=l0(j-1)+(side0(j)-side0(j-1)).Magnitude();
-    l1(0)=0;
-    for(int j=1;j<side1.m;j++)
-        l1(j)=l1(j-1)+(side1(j)-side1(j-1)).Magnitude();
-    auto point=[](int j,T t,const ARRAY<TV>& side)
-    {
-        if(j>=side.m-1) return side(j);
-        TV p=side(j);
-        return p+t*(side(j+1)-p);
-    };
-    auto loc=[point](T u,const ARRAY<TV>& side,const ARRAY<T>& l)
-    {
-        T dist=u*l.Last();
-        auto iter=std::lower_bound(l.begin(),l.end(),dist);
-        PHYSBAM_ASSERT(iter!=l.end());
-        int j=iter-l.begin();
-        if(*iter==dist) return point(j,0,side);
-        else
-        {
-            T cur=*iter,prev=*(iter-1);
-            return point(j-1,(dist-prev)/(cur-prev),side);
-        }
-    };
 
-    std::list<PAIR<T,TV> > verts;
-    TV p0=(1-s)*loc(0,side0,l0)+s*loc(0,side1,l1);
-    TV p1=(1-s)*loc(1,side0,l0)+s*loc(1,side1,l1);
-    auto begin=verts.insert(verts.end(),{0,p0});
-    auto end=verts.insert(verts.end(),{1,p1});
-    T max_len=(p1-p0).Magnitude();
-    while(max_len>1.5*target_length)
+template<class TV> struct BLOCK_MESHING_ITERATOR;
+template<class T>
+struct BLOCK_MESHING_ITERATOR<VECTOR<T,2> >
+{
+    typedef VECTOR<T,2> TV;
+    typedef VECTOR<int,2> IV;
+    typedef VECTOR<int,3> IV3;
+
+    const ARRAY<TV> side0,side1;
+    ARRAY<T> l0,l1;
+    ARRAY<TV> X0,X1;
+    T h;
+    int nseg,k;
+
+    BLOCK_MESHING_ITERATOR(const ARRAY<TV>& s0,const ARRAY<TV>& s1,int n,T dx):
+        side0(s0),side1(s1),l0(s0.m),l1(s1.m),X0(s0),h(dx),nseg(n),k(0)
     {
-        T u=(begin->x+end->x)*0.5;
-        TV v=(1-s)*loc(u,side0,l0)+s*loc(u,side1,l1);
-        verts.insert(end,{u,v});
-        max_len=0;
-        for(auto k=verts.begin();k!=verts.end();k++)
+        Init();
+        X1=Sample((T)1/nseg);
+    }
+
+    void Next()
+    {
+        k++;
+        if(!Valid()) return;
+        if(k==nseg-1) X0=side1;
+        else X0=Sample((T)(k+1)/nseg);
+        X0.Exchange(X1);
+    }
+
+    bool Valid() const {return k<nseg;}
+    int First_Diagonal_Edge() const {return X0.m-1;}
+    int Last_Diagonal_Edge() const {return 2*X0.m+X1.m-3;}
+
+    void Build(ARRAY<TV>& X,ARRAY<IV3>& E,ARRAY<IV>& S) const
+    {
+        X.Append_Elements(X0);
+        X.Append_Elements(X1);
+        auto angle=[X](int v0,int v1,int v2)
         {
-            if(k==verts.begin()) continue;
-            auto prev=k;
-            prev--;
-            T d=(k->y-prev->y).Magnitude();
-            if(d>max_len)
+            TV u=(X(v2)-X(v1)).Normalized();
+            TV v=(X(v0)-X(v1)).Normalized();
+            return TV::Angle_Between(u,v);
+        };
+
+        int n0=X0.m,n1=X1.m;
+        E.Resize(n0+n1-2);
+        S.Resize(2*(n0+n1-2)+1);
+        int i=0,j=n0,alt=0;
+        S(n0-1)=IV(i,j);
+        while(i<n0-1 || j<n0+n1-1){
+            T a0=0;
+            if(i+1<n0) a0=angle(j,i+1,i);
+            T a1=0;
+            if(j+1<n0+n1) a1=angle(j,j+1,i);
+            if(j+1>=n0+n1 || (i+1<n0 && abs(a0-a1)<1e-6 && alt==0) || (i+1<n0 && a0>a1))
             {
-                begin=prev;
-                end=k;
-                max_len=d;
+                E(i+j-n0)=IV3(i+1,i,j);
+                S(i)=IV(i+1,i);
+                S(i+j)=IV(i+1,j);
+                i++;
+                alt=1;
+            }
+            else
+            {
+                E(i+j-n0)=IV3(j+1,i,j);
+                S(i+j)=IV(j+1,i);
+                S(n0+n1-2+j)=IV(j+1,j);
+                j++;
+                alt=0;
             }
         }
     }
-    ARRAY<PARTICLE_ID> indices(verts.size());
-    ARRAY<TV> ret;
-    for(auto iter=verts.begin();iter!=verts.end();iter++)
-        ret.Append(iter->y);
-    return ret;
+
+private:
+    void Init()
+    {
+        l0(0)=0;
+        for(int j=1;j<side0.m;j++)
+            l0(j)=l0(j-1)+(side0(j)-side0(j-1)).Magnitude();
+        l1(0)=0;
+        for(int j=1;j<side1.m;j++)
+            l1(j)=l1(j-1)+(side1(j)-side1(j-1)).Magnitude();
+    }
+
+    ARRAY<TV> Sample(T s) const
+    {
+        auto point=[](int j,T t,const ARRAY<TV>& side)
+        {
+            if(j>=side.m-1) return side(j);
+            TV p=side(j);
+            return p+t*(side(j+1)-p);
+        };
+        auto loc=[point](T u,const ARRAY<TV>& side,const ARRAY<T>& l)
+        {
+            T dist=u*l.Last();
+            auto iter=std::lower_bound(l.begin(),l.end(),dist);
+            PHYSBAM_ASSERT(iter!=l.end());
+            int j=iter-l.begin();
+            if(*iter==dist) return point(j,0,side);
+            else
+            {
+                T cur=*iter,prev=*(iter-1);
+                return point(j-1,(dist-prev)/(cur-prev),side);
+            }
+        };
+
+        std::list<PAIR<T,TV> > verts;
+        TV p0=(1-s)*loc(0,side0,l0)+s*loc(0,side1,l1);
+        TV p1=(1-s)*loc(1,side0,l0)+s*loc(1,side1,l1);
+        auto begin=verts.insert(verts.end(),{0,p0});
+        auto end=verts.insert(verts.end(),{1,p1});
+        T max_len=(p1-p0).Magnitude();
+        while(max_len>1.5*h)
+        {
+            T u=(begin->x+end->x)*0.5;
+            TV v=(1-s)*loc(u,side0,l0)+s*loc(u,side1,l1);
+            verts.insert(end,{u,v});
+            max_len=0;
+            for(auto k=verts.begin();k!=verts.end();k++)
+            {
+                if(k==verts.begin()) continue;
+                auto prev=k;
+                prev--;
+                T d=(k->y-prev->y).Magnitude();
+                if(d>max_len)
+                {
+                    begin=prev;
+                    end=k;
+                    max_len=d;
+                }
+            }
+        }
+        ARRAY<TV> ret;
+        for(auto iter=verts.begin();iter!=verts.end();iter++)
+            ret.Append(iter->y);
+        return ret;
+    }
+};
+
+//#####################################################################
+// Function Make_Canonical_Joint_3_Small
+//#####################################################################
+template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Make_Canonical_Joint_3_Small(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,ARRAY<T> >
+{
+    T sep=target_length;
+    const CROSS_SECTION_TYPE& cst=cross_section_types(key.type);
+    ARRAY<T> angles(key.angles);
+    angles.Append(2*pi-key.angles.Sum());
+    int k=0;
+    T min_abs_angle=angles(k),tot=0;
+    VECTOR<TV,3> dirs,w;
+    for(int i=0;i<3;i++)
+    {
+        if(angles(i)<min_abs_angle)
+        {
+            k=i;
+            min_abs_angle=angles(i);
+        }
+        dirs(i)=ROTATION<TV>::From_Angle(tot).Rotated_X_Axis();
+        w(i)=ROTATION<TV>::From_Angle(tot).Rotate(Elbow_Pit_Oriented(angles(i),cst.width));
+        tot+=angles(i);
+    }
+
+    VECTOR<TV,2> e=Extrude(w((k+1)%3),w((k+2)%3),dirs((k+2)%3));
+    e+=dirs((k+2)%3)*sep;
+    ARRAY<TV> l0={e(0),w((k+1)%3)},l1={e(1),w((k+2)%3)};
+    if(angles((k+1)%3)>angles((k+2)%3)+pi/10)
+        l0.Append(w((k+1)%3)+dirs((k+1)%3)*sep);
+    if(angles((k+2)%3)>angles((k+1)%3)+pi/10)
+        l1.Append(w((k+2)%3)+dirs(k)*sep);
+    ARRAY<TV> s0=Polyline(l0,target_length),s1=Polyline(l1,target_length);
+    CANONICAL_COMPONENT* cc=new CANONICAL_COMPONENT;
+    ARRAY<TV> t0;
+    t0.Append(s0.Last());
+    for(BLOCK_MESHING_ITERATOR<TV> it(s0,s1,cst.num_dofs-1,target_length);it.Valid();it.Next())
+    {
+        CANONICAL_BLOCK_ID id=canonical_blocks.Add_End();
+        CANONICAL_BLOCK& cb=canonical_blocks.Last();
+        it.Build(cb.X,cb.E,cb.S);
+        cc->blocks.Append({id,{XFORM_ID(),TV()}});
+        t0.Append(it.X1.Last());
+    }
+    VECTOR<TV,2> g0=Extrude(w((k+1)%3),w(k),dirs((k+1)%3)),g1=Extrude(w((k+2)%3),w(k),dirs(k));
+    ARRAY<TV> t1=Polyline({g0(0),w(k),g1(0)},cst.width/(cst.num_dofs-1));
+    int nseg=rint(w(k).Magnitude()/target_length);
+    for(BLOCK_MESHING_ITERATOR<TV> it(t0,t1,nseg,target_length);it.Valid();it.Next())
+    {
+        CANONICAL_BLOCK_ID id=canonical_blocks.Add_End();
+        CANONICAL_BLOCK& cb=canonical_blocks.Last();
+        it.Build(cb.X,cb.E,cb.S);
+        cc->blocks.Append({id,{XFORM_ID(),TV()}});
+    }
+    ARRAY<T> ext={g1.Average().Magnitude(),g0.Average().Magnitude(),e.Average().Magnitude()};
+    return {cc,{ext((3-k)%3),ext((4-k)%3),ext((5-k)%3)}};
+}
+//#####################################################################
+// Function Make_Canonical_Joint_3_Average
+//#####################################################################
+template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Make_Canonical_Joint_3_Average(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,ARRAY<T> >
+{
+    T sep=2*target_length;
+    const CROSS_SECTION_TYPE& cst=cross_section_types(key.type);
+    ARRAY<T> angles(key.angles);
+    angles.Append(2*pi-key.angles.Sum());
+    int k=0;
+    T max_abs_angle=angles(k),tot=0;
+    VECTOR<TV,3> dirs,w;
+    for(int i=0;i<3;i++)
+    {
+        if(angles(i)>max_abs_angle)
+        {
+            k=i;
+            max_abs_angle=angles(i);
+        }
+        dirs(i)=ROTATION<TV>::From_Angle(tot).Rotated_X_Axis();
+        w(i)=ROTATION<TV>::From_Angle(tot).Rotate(Elbow_Pit_Oriented(angles(i),cst.width));
+        tot+=key.angles(i);
+    }
+
+    CANONICAL_COMPONENT* cc=new CANONICAL_COMPONENT;
+    VECTOR<TV,2> e=Extrude(w((k+1)%3),w((k+2)%3),dirs((k+2)%3));
+    e+=dirs((k+2)%3)*sep;
+    ARRAY<TV> s0=Polyline({w((k+1)%3),e(0)},target_length),s1=Polyline({w((k+2)%3),e(1)},target_length),b;
+    for(BLOCK_MESHING_ITERATOR<TV> it(s0,s1,cst.num_dofs-1,target_length);it.Valid();it.Next())
+    {
+        CANONICAL_BLOCK_ID id=canonical_blocks.Add_End();
+        CANONICAL_BLOCK& cb=canonical_blocks.Last();
+        it.Build(cb.X,cb.E,cb.S);
+        cc->blocks.Append({id,{XFORM_ID(),TV()}});
+        b.Append(it.X1(0));
+    }
+    VECTOR<TV,2> e0=Extrude(w(k),w((k+1)%3),dirs((k+1)%3)),e1=Extrude(w(k),w((k+2)%3),dirs(k));
+    e0+=dirs((k+1)%3)*sep;
+    e1+=dirs(k)*sep;
+    ARRAY<TV> t1=Polyline({e0(0),w(k),e1(0)},target_length);
+    ARRAY<TV> t0;
+    t0.Append_Elements(Polyline({e0(1),w((k+1)%3)},target_length));
+    t0.Append_Elements(b);
+    t0.Append_Elements(Polyline({t0.Pop_Value(),e1(1)},target_length));
+    for(BLOCK_MESHING_ITERATOR<TV> it(t0,t1,cst.num_dofs-1,target_length);it.Valid();it.Next())
+    {
+        CANONICAL_BLOCK_ID id=canonical_blocks.Add_End();
+        CANONICAL_BLOCK& cb=canonical_blocks.Last();
+        it.Build(cb.X,cb.E,cb.S);
+        cc->blocks.Append({id,{XFORM_ID(),TV()}});
+    }
+    ARRAY<T> ext={e1.Average().Magnitude(),e0.Average().Magnitude(),e.Average().Magnitude()};
+    return {cc,{ext((3-k)%3),ext((4-k)%3),ext((5-k)%3)}};
+}
+//#####################################################################
+// Function Make_Canonical_Joint_3
+//#####################################################################
+template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Make_Canonical_Joint_3(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,ARRAY<T> >
+{
+    T minimum_angle=min(2*pi-key.angles.Sum(),key.angles.Min());
+    if(minimum_angle<pi/4) return Make_Canonical_Joint_3_Small(key);
+    else return Make_Canonical_Joint_3_Average(key);
 }
 //#####################################################################
 // Function Make_Canonical_Joint_2
@@ -638,39 +793,40 @@ template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Make_Canonical_Joint_2(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,ARRAY<T> >
 {
     const CROSS_SECTION_TYPE& cst=cross_section_types(key.type);
-    T width=cst.width;
+    T width=cst.width,sep=target_length;
     TV vert;
     T ext,angle;
-    std::tie(vert,ext,angle)=Vertex(key.angles(0),width);
-    PAIR<ARRAY<TV>,ARRAY<TV> > sides=Arc(vert,angle,width,target_length,target_length);
-    auto g=Fill(cst.num_dofs-1,sides.x,sides.y);
+    std::tie(vert,ext,angle)=Elbow_Pit(key.angles(0),width);
+    PAIR<ARRAY<TV>,ARRAY<TV> > sides=Arc(vert,angle,width,sep,sep);
 
     CANONICAL_COMPONENT* cc=new CANONICAL_COMPONENT;
-    cc->blocks.Resize(BLOCK_ID(g.m));
-    for(int i=0;i<g.m;i++)
+    cc->blocks.Resize(BLOCK_ID(cst.num_dofs-1));
+    for(BLOCK_MESHING_ITERATOR<TV> it(sides.x,sides.y,cst.num_dofs-1,target_length);it.Valid();it.Next())
     {
         CANONICAL_BLOCK_ID id=canonical_blocks.Add_End();
         CANONICAL_BLOCK& cb=canonical_blocks.Last();
-        cb.X=std::move(std::get<0>(g(i)));
-        cb.E=std::move(std::get<1>(g(i)));
-        cb.S=std::move(std::get<2>(g(i)));
-        int n0=std::get<3>(g(i));
-        cb.cross_sections.Append({{0,n0},{0,n0-1},false});
-        cb.cross_sections.Append({{n0,cb.X.m},{n0+cb.X.m-2,cb.E.m},true});
-        if(i==0)
+        it.Build(cb.X,cb.E,cb.S);
+        cb.cross_sections.Append({{0,it.X0.m},{0,it.First_Diagonal_Edge()},false});
+        cb.cross_sections.Append({{it.X0.m,cb.X.m},{it.Last_Diagonal_Edge()+1,cb.E.m},true});
+        if(it.k==0)
         {
-            for(int j=0;j<n0;j++) cb.bc_v.Append(j);
-            for(int j=0;j<n0-1;j++) cb.bc_e.Append(j);
+            for(int j=0;j<it.X0.m;j++) cb.bc_v.Append(j);
+            for(int j=0;j<it.First_Diagonal_Edge();j++) cb.bc_e.Append(j);
         }
-        if(i==g.m-1)
+        if(it.k==it.nseg-1)
         {
-            for(int j=n0;j<cb.X.m;j++) cb.bc_v.Append(j);
-            for(int j=n0+cb.X.m-2;j<cb.S.m;j++) cb.bc_e.Append(j);
+            for(int j=it.X0.m;j<cb.X.m;j++) cb.bc_v.Append(j);
+            for(int j=it.Last_Diagonal_Edge()+1;j<cb.S.m;j++) cb.bc_e.Append(j);
         }
         // TODO build irregular connections
-        cc->blocks.Append({id,{XFORM_ID(),TV()},{},{}});
+        ARRAY<BLOCK_CONNECTION> con;
+        if(it.k!=0) con.Append({BLOCK_ID(it.k-1),1});
+        if(it.k!=it.nseg-1) con.Append({BLOCK_ID(it.k+1),0});
+        cc->blocks.Append({id,{XFORM_ID(),TV()},con,{0,1}});
     }
-    return {cc,{ext,ext}};
+    cc->irregular_connections.Append({BLOCK_ID(~0)});
+    cc->irregular_connections.Append({BLOCK_ID(~1)});
+    return {cc,{ext+sep,ext+sep}};
 }
 //#####################################################################
 // Function Make_Canonical_Joint
@@ -696,6 +852,10 @@ Make_Canonical_Joint(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,ARRAY<T>
     else if(key.angles.m==1)
     {
         it.first->second=Make_Canonical_Joint_2(key);
+    }
+    else if(key.angles.m==2)
+    {
+        it.first->second=Make_Canonical_Joint_3(key);
     }
     else PHYSBAM_FATAL_ERROR("joint type not supported");
 

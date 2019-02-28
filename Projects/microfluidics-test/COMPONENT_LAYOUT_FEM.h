@@ -267,6 +267,9 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     XFORM Compose_Xform(const XFORM& a,const XFORM& b);
     PAIR<CANONICAL_COMPONENT*,ARRAY<T> > Make_Canonical_Joint(const JOINT_KEY& key);
     PAIR<CANONICAL_COMPONENT*,ARRAY<T> > Make_Canonical_Joint_2(const JOINT_KEY& key);
+    PAIR<CANONICAL_COMPONENT*,ARRAY<T> > Make_Canonical_Joint_3_Small(const JOINT_KEY& key);
+    PAIR<CANONICAL_COMPONENT*,ARRAY<T> > Make_Canonical_Joint_3_Average(const JOINT_KEY& key);
+    PAIR<CANONICAL_COMPONENT*,ARRAY<T> > Make_Canonical_Joint_3(const JOINT_KEY& key);
     CANONICAL_COMPONENT* Make_Canonical_Pipe(const PIPE_KEY& key);
     CANONICAL_BLOCK_ID Make_Canonical_Pipe_Block(const PIPE_KEY& key);
     CANONICAL_COMPONENT* Make_Canonical_Pipe_Change(const PIPE_CHANGE_KEY& key);
@@ -328,11 +331,11 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     void Visualize_Block_State(BLOCK_ID b);
 
   private:
-    std::tuple<TV,T,T> Vertex(T angle,T width) const;
+    std::tuple<TV,T,T> Elbow_Pit(T angle,T width) const;
+    TV Elbow_Pit_Oriented(T angle,T width) const;
+    VECTOR<TV,2> Extrude(const TV& v0,const TV& v1,const TV& n) const;
     PAIR<ARRAY<TV>,ARRAY<TV> > Arc(const TV& c,T angle,T len_arm,T ext0,T ext1) const;
-    void Merge_Interpolated(const ARRAY<TV>& X,int n0,int n1,ARRAY<IV3>& elems,ARRAY<IV>& edges) const;
-    ARRAY<TV> Interpolated(T s,const ARRAY<TV>& side0,const ARRAY<TV>& side1) const;
-    ARRAY<std::tuple<ARRAY<TV>,ARRAY<IV3>,ARRAY<IV>,int> > Fill(int nseg,const ARRAY<TV>& inner,const ARRAY<TV>& outer) const;
+    ARRAY<TV> Polyline(const ARRAY<TV>& points,T dx) const;
 };
 
 }
