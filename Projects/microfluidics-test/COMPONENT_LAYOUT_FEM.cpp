@@ -1583,15 +1583,60 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
     
     if(analytic_velocity && analytic_pressure)
     {
+        for(BLOCK_ID b(0);b<blocks.m;b++)
+        {
+            BLOCK& bl=blocks(b);
+            CANONICAL_BLOCK& cb=canonical_blocks(bl.block);
 
-        // boundary integral rhs terms
+            BLOCK_VECTOR<T> w,u;
+            Init_Block_Vector(w,cb);
+            Init_Block_Vector(u,cb);
+            for(auto i:cb.bc_v)
+                u.Add_v(i,analytic_velocity->v(cb.X(i),0));
+            for(auto i:cb.bc_e)
+                u.Add_e(i,analytic_velocity->v(cb.X.Subset(cb.S(i)).Average(),0));
+            w.V=canonical_block_matrices(bl.block).M*u.V;
 
-        // volume integral rhs terms for missing velocity dofs
+            u.V.Fill(0);
+            ARRAY<T> div_v(cb.X.m),div_e(cb.S.m);
+            for(int i=0;i<cb.X.m;i++)
+            {
+                TV Z=cb.X(i);
+                u.Add_v(i,Force(Z));
+                div_v(i)=analytic_velocity->dX(Z,0).Trace();
+            }
+            for(int i=0;i<cb.S.m;i++)
+            {
+                TV Z=cb.X.Subset(cb.S(i)).Average();
+                u.Add_e(i,Force(Z));
+                div_e(i)=analytic_velocity->dX(Z,0).Trace();
+            }
+            Times_U_Dot_V(b,w,u);
+            Times_P_U(b,w,div_v,div_e);
+            Apply_To_RHS(b,w);
+        }
 
-        // volume integral rhs terms for interior body forces
+        for(auto& bc:bc_t)
+        {
+            BLOCK& bl=blocks(bc.b);
+            CANONICAL_BLOCK& cb=canonical_blocks(bl.block);
 
-        // volume integral rhs terms for divergent velocities
-
+            BLOCK_VECTOR<T> w,u;
+            Init_Block_Vector(w,cb);
+            Init_Block_Vector(u,cb);
+            for(auto i:cb.bc_v)
+            {
+                TV Z=cb.X(i);
+                u.Add_v(i,Traction(bc.normal,Z));
+            }
+            for(auto i:cb.bc_e)
+            {
+                TV Z=cb.X.Subset(cb.S(i)).Average();
+                u.Add_e(i,Traction(bc.normal,Z));
+            }
+            Times_Line_Integral_U_Dot_V(bc.b,w,u);
+            Apply_To_RHS(bc.b,w);
+        }
     }
     else
     {
@@ -1605,7 +1650,7 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
             Init_Block_Vector(u,cb);
             for(int i=0;i<bc.bc_v.Size();i++) u.Add_v(bc.bc_v.min_corner+i,bc.data_v(i));
             for(int i=0;i<bc.bc_e.Size();i++) u.Add_e(bc.bc_e.min_corner+i,bc.data_e(i));
-            Times_U_Dot_V(bc.b,w,u);
+            w.V=canonical_block_matrices(bl.block).M*u.V;
             Apply_To_RHS(bc.b,w);
         }
 
@@ -1861,7 +1906,10 @@ Make_BC_Block(const PIPE_KEY& key,bool is_v) -> BC_KEY
     cb.S(4*(n-1))={n-1,2*n-1};
 
     cb.cross_sections.Append({{n,2*n},{n-1,2*(n-1)},true});
-    for(int i=0;i<=n;i++) cb.bc_v.Append(i);
+    cb.bc_v.Append(0);
+    if(is_v) for(int i=1;i<n-1;i++) cb.bc_v.Append(i);
+    cb.bc_v.Append(n-1);
+    cb.bc_v.Append(n);
     cb.bc_v.Append(2*n-1);
     if(is_v) for(int i=0;i<n-1;i++) cb.bc_e.Append(i);
     cb.bc_e.Append(3*(n-1));

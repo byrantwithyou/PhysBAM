@@ -107,43 +107,20 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     ANALYTIC_VECTOR<TV>* analytic_velocity=0;
     ANALYTIC_SCALAR<TV>* analytic_pressure=0;
 
-    // TV Velocity(BC_ID id,const TV& X) const
-    // {
-    //     if(analytic_velocity) return analytic_velocity->v(X,0);
-    //     else
-    //     {
-    //         const BOUNDARY_CONDITION& bc=boundary_conditions(id);
-    //         const auto& cst=cross_section_types(bc.type);
-    //         T a=cst.width/2;
-    //         T r=(X-bc.X).Magnitude();
-    //         T v=-3.0/4*bc.flowrate/(a*a*a)*(r*r-a*a);
-    //         return v*bc.normal;
-    //     }
-    // }
+    TV Traction(const TV& N,const TV& X) const
+    {
+        SYMMETRIC_MATRIX<T,TV::m> stress=analytic_velocity->dX(X,0).Twice_Symmetric_Part()*mu;
+        stress-=analytic_pressure->f(X,0);
+        return stress*N;
+    }
 
-    // TV Traction(BC_ID id,const TV& X) const
-    // {
-    //     const BOUNDARY_CONDITION& bc=boundary_conditions(id);
-    //     if(analytic_velocity && analytic_pressure)
-    //     {
-    //         SYMMETRIC_MATRIX<T,TV::m> stress=analytic_velocity->dX(X,0).Twice_Symmetric_Part()*mu;
-    //         stress-=analytic_pressure->f(X,0);
-    //         return stress*bc.normal;
-    //     }
-    //     else return bc.traction;
-    // }
-
-    // TV Force(const TV& X) const
-    // {
-    //     if(analytic_velocity && analytic_pressure)
-    //     {
-    //         SYMMETRIC_TENSOR<T,0,TV::m> ddU=analytic_velocity->ddX(X,0);
-    //         TV f=analytic_pressure->dX(X,0);
-    //         f-=mu*(Contract<1,2>(ddU)+Contract<0,2>(ddU));
-    //         return f;
-    //     }
-    //     else return force?force->v(X,0):TV();
-    // }
+    TV Force(const TV& X) const
+    {
+        SYMMETRIC_TENSOR<T,0,TV::m> ddU=analytic_velocity->ddX(X,0);
+        TV f=analytic_pressure->dX(X,0);
+        f-=mu*(Contract<1,2>(ddU)+Contract<0,2>(ddU));
+        return f;
+    }
 
     struct CANONICAL_BLOCK
     {
