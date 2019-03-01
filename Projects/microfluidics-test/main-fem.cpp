@@ -53,7 +53,18 @@ void Run(PARSE_ARGS& parse_args)
 
     GRID<TV> grid(TV_INT()+1,cl.Compute_Bounding_Box(),true);
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE(0.f),grid,"output");
-    if(!quiet) Flush_Frame<TV>("init");
+    if(!quiet)
+    {
+        Flush_Frame<TV>("init");
+        for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+            cl.Visualize_Block_State(b);
+        Flush_Frame<TV>("blocks");
+        for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+        {
+            cl.Visualize_Block_State(b);
+            Flush_Frame<TV>(LOG::sprintf("block %P (%P)",b,cl.blocks(b).block).c_str());
+        }
+    }
 
     timer("setup viewing");
 

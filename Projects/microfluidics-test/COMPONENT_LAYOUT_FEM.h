@@ -325,7 +325,8 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     void Eliminate_Non_Seperators(CACHED_ELIMINATION_MATRIX<T>& cem);
     void Eliminate_Strip(CACHED_ELIMINATION_MATRIX<T>& cem,const ARRAY<BLOCK_ID>& a);
     void Eliminate_Simple(CACHED_ELIMINATION_MATRIX<T>& cem,BLOCK_ID first,int con_id_source);
-    
+    void Visualize_Block_State(BLOCK_ID b);
+
   private:
     std::tuple<TV,T,T> Vertex(T angle,T width) const;
     PAIR<ARRAY<TV>,ARRAY<TV> > Arc(const TV& c,T angle,T len_arm,T ext0,T ext1) const;

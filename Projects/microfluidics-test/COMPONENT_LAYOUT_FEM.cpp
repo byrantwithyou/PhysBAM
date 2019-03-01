@@ -8,6 +8,7 @@
 #include <Core/Math_Tools/RANGE.h>
 #include <Core/Matrices/MATRIX_MXN.h>
 #include <Core/Matrices/ROTATION.h>
+#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <fstream>
 #include <list>
 #include "CACHED_ELIMINATION_MATRIX.h"
@@ -1129,7 +1130,7 @@ Merge_Blocks()
 {
     for(BLOCK_ID b(0);b<blocks.m;b++)
     {
-        if(blocks(b).block<BLOCK_ID()) continue;
+        if(blocks(b).block<CANONICAL_BLOCK_ID()) continue;
         if(int mask=Separates_Dofs(b))
         {
             PHYSBAM_ASSERT(!(blocks(b).flags&1));
@@ -2060,5 +2061,43 @@ Eliminate_Non_Seperators(CACHED_ELIMINATION_MATRIX<T>& cem)
     for(BLOCK_ID b(0);b<blocks.m;b++)
         assert(!cem.valid_row(Value(b)) || blocks(b).flags&1);
 }
+//#####################################################################
+// Function Visualize_Block_State
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Visualize_Block_State(BLOCK_ID b)
+{
+    auto& bl=blocks(b);
+    MATRIX<T,TV::m> M=xforms(bl.xform.id);
+    TV B=bl.xform.b;
+    auto& cb=canonical_blocks(bl.block);
+    for(auto t:cb.E)
+    {
+        TV A=M*cb.X(t.x)+bl.xform.b;
+        TV B=M*cb.X(t.y)+bl.xform.b;
+        TV C=M*cb.X(t.z)+bl.xform.b;
+        Add_Debug_Object(VECTOR<TV,3>(A,B,C),VECTOR<T,3>(.5,.5,.5));
+    }
+
+    //     struct BLOCK
+    // {
+    //     CANONICAL_BLOCK_ID block;
+    //     XFORM xform;
+    //     ARRAY<BLOCK_CONNECTION> connections;
+    //     ARRAY<int> edge_on; // for edge-on (index in irregular_connections)
+    //     int flags=0; // 1=separator, 2=separator-eligible
+    // };
+
+    // struct CANONICAL_BLOCK
+    // {
+    //     ARRAY<CROSS_SECTION> cross_sections;
+    //     ARRAY<TV> X;
+    //     ARRAY<IV3> E;
+    //     ARRAY<IV> S;
+    //     ARRAY<int> bc_v,bc_e;
+    // };
+    
+}
+    
 template class COMPONENT_LAYOUT_FEM<VECTOR<double,2> >;
 }
