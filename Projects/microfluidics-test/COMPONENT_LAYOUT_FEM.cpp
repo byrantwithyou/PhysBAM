@@ -25,6 +25,7 @@ bool Canonical_Direction(VECTOR<T,2> u)
     return false;
 }
 
+// l <target-length>
 // c <cross-section-name> <num-elements> <width>
 // v <vertex-name> <vertex-location-2d>
 // j <cross-section-name> <num-pipes> <origin-vertex> [<vertex-name> <connection-name>]*
@@ -72,6 +73,10 @@ Parse_Input(const std::string& pipe_file)
         if(isspace(c) || c=='#') continue;
         switch(c)
         {
+            case 'l':
+                ss>>target_length;
+                break;
+
             case 'c':
                 ss>>name>>i0>>t0;
                 cross_section_hash.Set(name,Get_Cross_Section_ID({i0,t0}));
