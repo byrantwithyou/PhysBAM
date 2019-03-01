@@ -2073,10 +2073,8 @@ Visualize_Block_State(BLOCK_ID b)
     auto& cb=canonical_blocks(bl.block);
     for(auto t:cb.E)
     {
-        TV A=M*cb.X(t.x)+bl.xform.b;
-        TV B=M*cb.X(t.y)+bl.xform.b;
-        TV C=M*cb.X(t.z)+bl.xform.b;
-        Add_Debug_Object(VECTOR<TV,3>(A,B,C),VECTOR<T,3>(.5,.5,.5));
+        VECTOR<TV,3> P(t.Map([=](int i){return M*cb.X(i)+bl.xform.b;}));
+        for(auto p:P) Add_Debug_Object(VECTOR<TV,2>(p,P.Average()),VECTOR<T,3>(.5,.5,.5));
     }
 
     //     struct BLOCK

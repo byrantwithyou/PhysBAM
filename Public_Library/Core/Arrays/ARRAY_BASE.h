@@ -336,7 +336,7 @@ public:
     
     T Average() const
     {const T_ARRAY& self=Derived();
-    return self.Size()?Sum()/typename ARRAY_BASE<T,T_ARRAY,ID>::SCALAR(self.Size()):T();}
+    return self.Size()?Sum()/self.Size():T();}
 
     T Lp_Norm(const T& p) const
     {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();

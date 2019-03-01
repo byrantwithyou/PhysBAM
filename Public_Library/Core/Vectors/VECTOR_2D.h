@@ -347,7 +347,7 @@ public:
     {return x+y;}
 
     T Average() const
-    {return (T).5*Sum();}
+    {return Sum()/2;}
 
     T Product() const
     {return x*y;}
@@ -374,8 +374,8 @@ public:
     {x=element1;y=element2;}
 
     template<class T_FUNCTION>
-    static VECTOR Map(const T_FUNCTION& f,const VECTOR& v)
-    {return VECTOR(f(v.x),f(v.y));}
+    auto Map(const T_FUNCTION& f) const
+    {return VECTOR<decltype(f(T())),m>(f(x),f(y));}
 
     int Find(const T& element) const
     {return x==element?0:y==element?1:-1;}

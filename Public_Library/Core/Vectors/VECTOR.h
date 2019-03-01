@@ -270,9 +270,9 @@ public:
     {STATIC_ASSERT(d==sizeof...(Args));Set_Helper(args...);}
 
     template<class T_FUNCTION>
-    static VECTOR Map(const T_FUNCTION& f,const VECTOR& v)
-    {VECTOR r;
-    for(int i=0;i<d;i++) r.array[i]=f(v.array[i]);
+    auto Map(const T_FUNCTION& f) const
+    {VECTOR<decltype(f(T())),m> r;
+    for(int i=0;i<d;i++) r.array[i]=f(array[i]);
     return r;}
 
     int Find(const T& element) const

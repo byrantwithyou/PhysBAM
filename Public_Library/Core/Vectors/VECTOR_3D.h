@@ -331,7 +331,7 @@ public:
     {return x+y+z;}
 
     T Average() const
-    {return ((T)1/3)*Sum();}
+    {return Sum()/3;}
 
     T Product() const
     {return x*y*z;}
@@ -358,8 +358,8 @@ public:
     {x=element1;y=element2;z=element3;}
 
     template<class T_FUNCTION>
-    static VECTOR Map(const T_FUNCTION& f,const VECTOR& v)
-    {return VECTOR(f(v.x),f(v.y),f(v.z));}
+    auto Map(const T_FUNCTION& f) const
+    {return VECTOR<decltype(f(T())),m>(f(x),f(y),f(z));}
 
     int Find(const T& element) const
     {return x==element?0:y==element?1:z==element?2:-1;}

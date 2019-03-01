@@ -289,8 +289,8 @@ public:
     {PHYSBAM_FATAL_ERROR();}
 
     template<class T_FUNCTION>
-    static VECTOR Map(const T_FUNCTION& f,const VECTOR& v)
-    {return VECTOR();}
+    auto Map(const T_FUNCTION& f) const
+    {return VECTOR<decltype(f(T())),m>();}
 
     void Split(VECTOR& v1,VECTOR& v2) const
     {}
