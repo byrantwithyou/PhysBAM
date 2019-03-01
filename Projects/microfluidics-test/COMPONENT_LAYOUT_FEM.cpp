@@ -1074,6 +1074,7 @@ Merge_Blocks(BLOCK_ID id,int con_id)
     BLOCK_ID id2=bl.connections(con_id).id;
     int con_id2=bl.connections(con_id).con_id;
     BLOCK& bl2=blocks(id2);
+    LOG::printf("merge: %P %P\n",id,id2);
 
     auto pr=Merge_Canonical_Blocks(bl.block,con_id,bl.xform,bl2.block,con_id2,bl2.xform);
     bl.block=pr->x;
@@ -1127,6 +1128,8 @@ template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Merge_Blocks()
 {
     for(BLOCK_ID b(0);b<blocks.m;b++)
+    {
+        if(blocks(b).block<BLOCK_ID()) continue;
         if(int mask=Separates_Dofs(b))
         {
             PHYSBAM_ASSERT(!(blocks(b).flags&1));
@@ -1147,6 +1150,8 @@ Merge_Blocks()
             Merge_Blocks(b,besti);
             b--; // repeat the check on this block
         }
+    }
+    // TODO: renumber the BLOCK_ID's
 }
 //#####################################################################
 // Function Approx_Dof_Count
