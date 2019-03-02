@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Data_Structures/PAIR.h>
+#include <Core/Utilities/PROCESS_UTILITIES.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
@@ -126,6 +127,7 @@ void Run(PARSE_ARGS& parse_args)
 
 int main(int argc, char* argv[])
 {
+    PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
     bool use_3d=false;
     bool use_fem=false;
     PARSE_ARGS parse_args(argc,argv);
