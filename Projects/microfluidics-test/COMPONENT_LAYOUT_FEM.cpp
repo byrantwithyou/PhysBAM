@@ -94,25 +94,36 @@ Parse_Input(const std::string& pipe_file)
                     JOINT_KEY key;
                     key.type=cross_section_hash.Get(name2);
                     TV O=vertices.Get(name3);
-                    ARRAY<TV> dirs;
-                    ARRAY<std::string> names;
+                    ARRAY<PAIR<TV,std::string> > verts;
                     for(int i=0;i<i0;i++)
                     {
                         ss>>name>>name2;
-                        TV dir=(vertices.Get(name)-O).Normalized();
-                        if(i) key.angles.Append(TV::Oriented_Angle_Between(dirs.Last(),dir));
-                        dirs.Append(dir);
-                        names.Append(name2);
+                        verts.Append({(vertices.Get(name)-O).Normalized(),name2});
                     }
-
+                    TV first=verts(0).x;
+                    auto comp=[&first](const auto& a,const auto& b)
+                    {
+                        T xa=TV::Oriented_Angle_Between(first,a.x);
+                        if(xa<0) xa+=2*pi;
+                        T xb=TV::Oriented_Angle_Between(first,b.x);
+                        if(xb<0) xb+=2*pi;
+                        return xa<xb;
+                    };
+                    std::sort(verts.begin()+1,verts.end(),comp);
+                    for(int i=1;i<i0;i++)
+                    {
+                        T a=TV::Oriented_Angle_Between(verts(i-1).x,verts(i).x);
+                        if(a<0) a+=2*pi;
+                        key.angles.Append(a);
+                    }
                     auto cj=Make_Canonical_Joint(key);
-                    XFORM xf={Compute_Xform(dirs(0)),O};
+                    XFORM xf={Compute_Xform(verts(0).x),O};
                     ARRAY<VERTEX_DATA> vd(i0);
                     Emit_Component_Blocks(cj.x,xf,vd);
                     for(int i=0;i<i0;i++)
                     {
-                        vd(i).X=O+dirs(i)*cj.y(i);
-                        connection_points.Set(names(i),vd(i));
+                        vd(i).X=O+verts(i).x*cj.y(i);
+                        connection_points.Set(verts(i).y,vd(i));
                     }
                 }
                 break;
