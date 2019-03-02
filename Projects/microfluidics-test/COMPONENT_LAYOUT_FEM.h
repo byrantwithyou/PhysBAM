@@ -98,7 +98,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
 
     struct BOUNDARY_CONDITION
     {
-        BLOCK_ID b;
+        BLOCK_ID b=BLOCK_ID(-7);
         INTERVAL<int> bc_v,bc_e;
         ARRAY<TV> data_v,data_e;
         TV normal;
@@ -145,7 +145,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     // first is master, second is slave
     struct BLOCK_CONNECTION
     {
-        BLOCK_ID id;
+        BLOCK_ID id=BLOCK_ID(-7);;
         int con_id; // if irregular, ~con_id is index into irregular_connections
         bool master;
     };
@@ -162,12 +162,12 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     // regular is master
     struct IRREGULAR_CONNECTION
     {
-        BLOCK_ID regular;
+        BLOCK_ID regular=BLOCK_ID(-7);;
         int con_id;
         // one for each dof on cross section, starting from owned side of cross section
         ARRAY<PAIR<BLOCK_ID,int> > edge_on_v,edge_on_e;
-        int ref_ic;
-        int block_data;
+        int ref_ic=-7;
+        int block_data=-7;
     };
 
     // neighbor block i is given index ~i and con_id=-1.
@@ -238,7 +238,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     
     struct REFERENCE_BLOCK_DATA
     {
-        int num_dofs_v,num_dofs_e,num_dofs_p;
+        int num_dofs_v=-7,num_dofs_e=-7,num_dofs_p=-7;
         ARRAY<int> dof_map_v,dof_map_e,dof_map_p;
         DOF_PAIRS pairs;
         ARRAY<DOF_PAIRS> regular_pairs; // this block is the source, the connection is the destination
@@ -248,8 +248,8 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
 
     struct IRREGULAR_REFERENCE_BLOCK_DATA_HELPER
     {
-        BLOCK_ID b;
-        int mat_id;
+        BLOCK_ID b=BLOCK_ID(-7);;
+        int mat_id=-7;
         DOF_PAIRS dof[2][2]; // dof[to][from]; 0=regular, 1=irregular
     };
 

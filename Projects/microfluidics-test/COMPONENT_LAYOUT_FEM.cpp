@@ -269,8 +269,8 @@ Set_Connector(VERTEX_DATA& vd,BLOCK_ID id,int con_id)
 {
     if(vd.con.regular>=BLOCK_ID())
     {
-        blocks(vd.con.regular).connections.Append({id,con_id});
-        blocks(id).connections.Append({vd.con.regular,vd.con.con_id});
+        blocks(vd.con.regular).connections(vd.con.con_id)={id,con_id};
+        blocks(id).connections(con_id)={vd.con.regular,vd.con.con_id};
     }
     else
     {
@@ -289,15 +289,14 @@ Emit_Component_Blocks(const CANONICAL_COMPONENT* cc,const XFORM& xf,ARRAY<VERTEX
     int offset=Value(blocks.m);
     for(BLOCK_ID b(0);b<cc->blocks.m;b++)
     {
-        auto bb=cc->blocks(b);
+        auto& bb=blocks(blocks.Append(cc->blocks(b)));
         for(int c=0;c<bb.connections.m;c++)
         {
             auto& con=bb.connections(c);
             if(con.id>=BLOCK_ID()) con.id+=offset;
-            else Set_Connector(vd(~Value(con.id)),b,c);
+            else Set_Connector(vd(~Value(con.id)),b+offset,c);
         }
         bb.xform=Compose_Xform(xf,bb.xform);
-        blocks.Append(bb);
     }
 
     for(auto a:cc->irregular_connections)
@@ -854,24 +853,6 @@ Update_Masters()
         }
     }
 }
-// F(dof,first_owns)
-template<class F>
-void Visit_Cross_Section_Dofs(INTERVAL<int> iv,bool uf,bool mast,F func)
-{
-    int c=iv.min_corner,n=iv.Size();
-    if(uf)
-    {
-        int m=(iv.min_corner+iv.max_corner)/2+(n&mast);
-        for(int i=0;i<m;i++) func(c+i,true);
-        for(int i=m;i<n;i++) func(c+i,false);
-    }
-    else
-    {
-        int m=(iv.min_corner+iv.max_corner)/2+(n&(1-mast));
-        for(int i=0;i<m;i++) func(c+i,false);
-        for(int i=m;i<n;i++) func(c+i,true);
-    }
-}
 // F(dof0,dof1,first_owns)
 template<class F>
 void Visit_Cross_Section_Dofs(INTERVAL<int> i0,INTERVAL<int> i1,bool uf0,bool uf1,bool m0,F func)
@@ -884,13 +865,13 @@ void Visit_Cross_Section_Dofs(INTERVAL<int> i0,INTERVAL<int> i1,bool uf0,bool uf
     }
     if(uf0)
     {
-        int m=(i0.min_corner+i0.max_corner)/2+(n&m0);
+        int m=n/2+(n&m0);
         for(int i=0;i<m;i++) func(c+i,a+b*i,true);
         for(int i=m;i<n;i++) func(c+i,a+b*i,false);
     }
     else
     {
-        int m=(i0.min_corner+i0.max_corner)/2+(n&(1-m0));
+        int m=n/2+(n&(1-m0));
         for(int i=0;i<m;i++) func(c+i,a+b*i,false);
         for(int i=m;i<n;i++) func(c+i,a+b*i,true);
     }
@@ -1107,6 +1088,7 @@ Merge_Blocks(BLOCK_ID id,int con_id)
             blocks(b).connections(d).con_id=bl.connections.m;
         }
         bl.connections.Append(bl2.connections(c));
+        LOG::printf("A %P\n",id);
     }
 
     for(int i:bl2.edge_on)
@@ -2071,30 +2053,86 @@ Visualize_Block_State(BLOCK_ID b)
     MATRIX<T,TV::m> M=xforms(bl.xform.id);
     TV B=bl.xform.b;
     auto& cb=canonical_blocks(bl.block);
+    auto Z=[=](int i){return M*cb.X(i)+bl.xform.b;};
     for(auto t:cb.E)
     {
         VECTOR<TV,3> P(t.Map([=](int i){return M*cb.X(i)+bl.xform.b;}));
         for(auto p:P) Add_Debug_Object(VECTOR<TV,2>(p,P.Average()),VECTOR<T,3>(.5,.5,.5));
     }
+    HASHTABLE<int> he,hv;
+    he.Set_All(cb.bc_e);
+    hv.Set_All(cb.bc_v);
+    for(int i=0;i<cb.S.m;i++)
+    {
+        TV X=Z(cb.S(i).x);
+        TV Y=Z(cb.S(i).y);
+        Add_Debug_Object(VECTOR<TV,2>(X,Y),he.Contains(i)?VECTOR<T,3>(0,1,1):VECTOR<T,3>(0,0,1));
+    }
+    for(int i=0;i<cb.X.m;i++)
+    {
+        Add_Debug_Particle(Z(i),hv.Contains(i)?VECTOR<T,3>(1,1,0):VECTOR<T,3>(1,0,0));
+        Debug_Particle_Set_Attribute<TV>("display_size",.1);
+    }
 
-    //     struct BLOCK
-    // {
-    //     CANONICAL_BLOCK_ID block;
-    //     XFORM xform;
-    //     ARRAY<BLOCK_CONNECTION> connections;
-    //     ARRAY<int> edge_on; // for edge-on (index in irregular_connections)
-    //     int flags=0; // 1=separator, 2=separator-eligible
-    // };
+    for(int cc=0;cc<bl.connections.m;cc++)
+    {
+        const auto& c=bl.connections(cc);
+        if(c.con_id>=0)
+        {
+            const auto& cb2=canonical_blocks(blocks(c.id).block);
+            Visit_Regular_Cross_Section_Dofs(cb.cross_sections(cc),
+                cb2.cross_sections(c.con_id),c.master,
+                [&](int a,int b,bool o)
+                {
+                    Add_Debug_Particle(Z(a),o?VECTOR<T,3>(1,0,0):VECTOR<T,3>(0,1,0));
+                    Debug_Particle_Set_Attribute<TV>("display_size",.2);
+                },
+                [&](int a,int b,bool o)
+                {
+                    Add_Debug_Particle((Z(cb.S(a).x)+Z(cb.S(a).y))/2,o?VECTOR<T,3>(1,0,0):VECTOR<T,3>(0,1,0));
+                    Debug_Particle_Set_Attribute<TV>("display_size",.2);
+                });
+        }
+        else
+        {
+            const auto& ic=irregular_connections(~c.con_id);
+            Visit_Irregular_Cross_Section_Dofs(ic,
+                canonical_blocks(blocks(ic.regular).block).cross_sections(ic.con_id),
+                [&](int a,BLOCK_ID b,int c,bool o)
+                {
+                    Add_Debug_Particle(Z(a),o?VECTOR<T,3>(1,0,1):VECTOR<T,3>(0,0,1));
+                    Debug_Particle_Set_Attribute<TV>("display_size",.2);
+                },
+                [&](int a,BLOCK_ID b,int c,bool o)
+                {
+                    Add_Debug_Particle((Z(cb.S(a).x)+Z(cb.S(a).y))/2,o?VECTOR<T,3>(1,0,1):VECTOR<T,3>(0,0,1));
+                    Debug_Particle_Set_Attribute<TV>("display_size",.2);
+                });
+        }
+    }
 
-    // struct CANONICAL_BLOCK
-    // {
-    //     ARRAY<CROSS_SECTION> cross_sections;
-    //     ARRAY<TV> X;
-    //     ARRAY<IV3> E;
-    //     ARRAY<IV> S;
-    //     ARRAY<int> bc_v,bc_e;
-    // };
-    
+    for(int i:bl.edge_on)
+    {
+        auto& ic=irregular_connections(i);
+        Visit_Irregular_Cross_Section_Dofs(ic,
+            canonical_blocks(blocks(ic.regular).block).cross_sections(ic.con_id),
+            [&](int a,BLOCK_ID b2,int c,bool o)
+            {
+                if(b==b2)
+                {
+                    Add_Debug_Particle(Z(a),o?VECTOR<T,3>(1,1,1):VECTOR<T,3>(.5,.5,.5));
+                    Debug_Particle_Set_Attribute<TV>("display_size",.05);
+                }
+            },
+            [&](int a,BLOCK_ID b2,int c,bool o)
+            {
+                if(b==b2)
+                {
+                    Add_Debug_Particle((Z(cb.S(a).x)+Z(cb.S(a).y))/2,o?VECTOR<T,3>(1,1,1):VECTOR<T,3>(.5,.5,.5));
+                    Debug_Particle_Set_Attribute<TV>("display_size",.05);
+                }
+            });
+    }
 }
     
 template class COMPONENT_LAYOUT_FEM<VECTOR<double,2> >;

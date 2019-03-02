@@ -5,6 +5,8 @@
 #include <Core/Data_Structures/PAIR.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Grid_Tools/Grids/GRID.h>
+#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <fstream>
 #include <map>
@@ -53,6 +55,8 @@ void Run(PARSE_ARGS& parse_args)
 
     GRID<TV> grid(TV_INT()+1,cl.Compute_Bounding_Box(),true);
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE(0.f),grid,"output");
+    vo.debug_particles.debug_particles.template Add_Array<T>("display_size");
+
     if(!quiet)
     {
         Flush_Frame<TV>("init");
@@ -67,7 +71,8 @@ void Run(PARSE_ARGS& parse_args)
     }
 
     timer("setup viewing");
-
+    return;
+    
     cl.Compute();
 
     timer("compute");
