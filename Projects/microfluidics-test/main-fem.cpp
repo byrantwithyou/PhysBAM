@@ -71,7 +71,23 @@ void Run(PARSE_ARGS& parse_args)
     }
 
     timer("setup viewing");
-    return;
+
+    cl.Update_Masters();
+
+    if(!quiet)
+    {
+        Flush_Frame<TV>("init");
+        for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+            cl.Visualize_Block_State(b);
+        Flush_Frame<TV>("blocks");
+        for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+        {
+            cl.Visualize_Block_State(b);
+            Flush_Frame<TV>(LOG::sprintf("block %P (%P)",b,cl.blocks(b).block).c_str());
+        }
+    }
+
+    timer("masters");
     
     cl.Compute();
 

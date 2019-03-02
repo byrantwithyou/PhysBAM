@@ -805,7 +805,6 @@ Get_Cross_Section_ID(const CROSS_SECTION_TYPE& cs) -> CROSS_SECTION_TYPE_ID
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Compute()
 {
-    Update_Masters();
     Merge_Blocks();
 
     canonical_block_matrices.Resize(canonical_blocks.m);
