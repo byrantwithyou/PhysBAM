@@ -834,22 +834,11 @@ Make_Canonical_Joint_2(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,ARRAY<
 template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Make_Canonical_Joint(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,ARRAY<T> >
 {
+    PHYSBAM_ASSERT(key.angles.m>=1);
     auto it=canonical_joints.insert({key,{}});
     if(!it.second) return it.first->second;
 
-    if(key.angles.m==0)
-    {
-        CANONICAL_BLOCK_ID id=canonical_blocks.Add_End();
-        CANONICAL_COMPONENT* cc=new CANONICAL_COMPONENT;
-        it.first->second={cc,{0}};
-        cc->blocks.Append(
-            {
-                id,
-                {XFORM_ID(),TV()},
-                {{BLOCK_ID(),1}}
-            });
-    }
-    else if(key.angles.m==1)
+    if(key.angles.m==1)
     {
         it.first->second=Make_Canonical_Joint_2(key);
     }
