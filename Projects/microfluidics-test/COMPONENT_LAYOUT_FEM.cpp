@@ -705,6 +705,10 @@ Make_Canonical_Joint_3_Small(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,
         CANONICAL_BLOCK_ID id=canonical_blocks.Add_End();
         CANONICAL_BLOCK& cb=canonical_blocks.Last();
         it.Build(cb.X,cb.E,cb.S);
+        for(int i=0;it.k==0 && i<it.X0.m;i++) cb.bc_v.Append(i);
+        for(int i=0;it.k==0 && i<it.First_Diagonal_Edge();i++) cb.bc_e.Append(i);
+        for(int i=it.X0.m;it.k==it.nseg-1 && i<cb.X.m;i++) cb.bc_v.Append(i);
+        for(int i=it.Last_Diagonal_Edge()+1;it.k==it.nseg-1 && i<cb.S.m;i++) cb.bc_e.Append(i);
         cc->blocks.Append({id,{XFORM_ID(),TV()}});
         t0.Append(it.X1.Last());
     }
@@ -716,6 +720,8 @@ Make_Canonical_Joint_3_Small(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,
         CANONICAL_BLOCK_ID id=canonical_blocks.Add_End();
         CANONICAL_BLOCK& cb=canonical_blocks.Last();
         it.Build(cb.X,cb.E,cb.S);
+        cb.bc_v={0,it.X0.m-1,it.X0.m,cb.X.m-1};
+        cb.bc_e={it.First_Diagonal_Edge(),it.Last_Diagonal_Edge()};
         cc->blocks.Append({id,{XFORM_ID(),TV()}});
     }
     ARRAY<T> ext={g1.Average().Magnitude(),g0.Average().Magnitude(),e.Average().Magnitude()};
@@ -755,6 +761,10 @@ Make_Canonical_Joint_3_Average(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT
         CANONICAL_BLOCK_ID id=canonical_blocks.Add_End();
         CANONICAL_BLOCK& cb=canonical_blocks.Last();
         it.Build(cb.X,cb.E,cb.S);
+        for(int i=0;it.k==0 && i<it.X0.m;i++) cb.bc_v.Append(i);
+        for(int i=0;it.k==0 && i<it.First_Diagonal_Edge();i++) cb.bc_e.Append(i);
+        for(int i=it.X0.m;it.k==it.nseg-1 && i<cb.X.m;i++) cb.bc_v.Append(i);
+        for(int i=it.Last_Diagonal_Edge()+1;it.k==it.nseg-1 && i<cb.S.m;i++) cb.bc_e.Append(i);
         cc->blocks.Append({id,{XFORM_ID(),TV()}});
         b.Append(it.X1(0));
     }
@@ -764,6 +774,7 @@ Make_Canonical_Joint_3_Average(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT
     ARRAY<TV> t1=Polyline({e0(0),w(k),e1(0)},target_length);
     ARRAY<TV> t0;
     t0.Append_Elements(Polyline({e0(1),w((k+1)%3)},target_length));
+    int n0=t0.m;
     t0.Append_Elements(b);
     t0.Append_Elements(Polyline({t0.Pop_Value(),e1(1)},target_length));
     for(BLOCK_MESHING_ITERATOR<TV> it(t0,t1,cst.num_dofs-1,target_length);it.Valid();it.Next())
@@ -771,6 +782,13 @@ Make_Canonical_Joint_3_Average(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT
         CANONICAL_BLOCK_ID id=canonical_blocks.Add_End();
         CANONICAL_BLOCK& cb=canonical_blocks.Last();
         it.Build(cb.X,cb.E,cb.S);
+        for(int i=0;it.k==0 && i<it.X0.m;i++)
+        {
+            if(i<n0 || i>=n0+b.m-1) cb.bc_v.Append(i);
+            if((i>0 && i<n0) || i>(n0+b.m-1)) cb.bc_e.Append(i-1);
+        }
+        for(int i=it.X0.m;it.k==it.nseg-1 && i<cb.X.m;i++) cb.bc_v.Append(i);
+        for(int i=it.Last_Diagonal_Edge()+1;it.k==it.nseg-1 && i<cb.S.m;i++) cb.bc_e.Append(i);
         cc->blocks.Append({id,{XFORM_ID(),TV()}});
     }
     ARRAY<T> ext={e1.Average().Magnitude(),e0.Average().Magnitude(),e.Average().Magnitude()};
