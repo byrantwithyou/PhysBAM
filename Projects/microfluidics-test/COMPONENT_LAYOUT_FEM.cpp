@@ -1099,8 +1099,8 @@ Separates_Dofs(BLOCK_ID b)
         int master=(mask>>i)&1;
         INTERVAL<int> iv=cs.v;
         int m=(iv.min_corner+iv.max_corner)/2;
-        if(cs.own_first) iv.max_corner=m+(iv.Size()&master);
-        else iv.min_corner=m+(iv.Size()&(1-master));
+        if(cs.own_first) iv.min_corner=m+(iv.Size()&master);
+        else iv.max_corner=m+(iv.Size()&(1-master));
         for(int j:iv) owner(j)=i;
     }
     for(auto e:cb.E)
@@ -1635,18 +1635,14 @@ Fill_Connection_Matrix(BLOCK_ID b0,int con_id0,BLOCK_ID b1,int con_id1)
         {
             int f[2]={a,b};
             int i=!o,r=rd[i]->dof_map_v(f[i]),s=rd[i]->dof_map_p(f[i]);
-            for(int j=0;j<2;j++)
-            {
-                if(r>=0) pairs[j]->v.Append({r,f[j]});
-                if(s>=0) pairs[j]->p.Append({s,f[j]});
-            }
+            if(r>=0) pairs[o]->v.Append({r,f[o]});
+            if(s>=0) pairs[o]->p.Append({s,f[o]});
         },
         [&](int a,int b,bool o)
         {
             int f[2]={a,b};
             int i=!o,r=rd[i]->dof_map_e(f[i]);
-            for(int j=0;j<2;j++)
-                if(r>=0) pairs[j]->e.Append({r,f[j]});
+            if(r>=0) pairs[o]->e.Append({r,f[o]});
         });
     Copy_Matrix_Data(mat,b0,rd[0]->pairs,*pairs[0],b0,b1);
     Copy_Matrix_Data(mat,b1,*pairs[1],rd[1]->pairs,b0,b1);
@@ -1717,7 +1713,8 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
 
     Compute_Reference_Blocks();
     Compute_Reference_Irregular_Connections();
-
+    matrix_block_list.Resize(reference_block_data.m);
+    
     for(BLOCK_ID b(0);b<blocks.m;b++)
     {
         int i=reference_block(b).y;
@@ -1726,9 +1723,10 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
             Compute_Dof_Remapping(b);
             Fill_Block_Matrix(b);
         }
-        cem.Add_Block_Matrix_Entry(Value(b),Value(b),i);
+        cem.Add_Block_Matrix_Entry(Value(b),Value(b),i+2);
     }
-
+    int num_sym=matrix_block_list.m;
+    
     for(BLOCK_ID b(0);b<blocks.m;b++)
     {
         const auto& bl=blocks(b);
@@ -1742,7 +1740,7 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
                 {
                     BLOCK_ID b2=bl.connections(c).id;
                     int i=Fill_Connection_Matrix(b,c,b2,con_id);
-                    cem.Add_Block_Matrix_Entry(Value(b),Value(b2),i);
+                    cem.Add_Block_Matrix_Entry(Value(b),Value(b2),i+2);
                 }
             }
         }
@@ -1756,9 +1754,15 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
         int bd=irregular_connections(ref).block_data;
         const auto& d=irregular_reference_block_data(bd);
         for(const auto& p:d.pairs)
-            cem.Add_Block_Matrix_Entry(Value(ic.regular),Value(p.b),p.mat_id);
+            cem.Add_Block_Matrix_Entry(Value(ic.regular),Value(p.b),p.mat_id+2);
     }
 
+    for(int i=0;i<matrix_block_list.m;i++)
+    {
+        int j=cem.Create_Matrix_Block(i<num_sym);
+        cem.block_list(j).M=matrix_block_list(i).M;
+    }
+    
     rhs_block_list.Resize(blocks.m);
     
     if(analytic_velocity && analytic_pressure)
@@ -1873,7 +1877,6 @@ Compute_Reference_Blocks()
 
     HASHTABLE<KEY,BLOCK_ID> h;
 
-    int index=0;
     for(BLOCK_ID b(0);b<blocks.m;b++)
     {
         REG_CON reg_con;
@@ -1906,13 +1909,17 @@ Compute_Reference_Blocks()
         irreg_con_v.Sort();
         irreg_con_e.Sort();
 
+        LOG::printf("%P -> %P\n",b,std::make_tuple(bl.block,reg_con,irreg_con_v,irreg_con_e));
         auto pr=h.Insert(std::make_tuple(bl.block,reg_con,irreg_con_v,irreg_con_e),{});
         if(pr.y)
-            reference_block(b)={b,index++};
+        {
+            int i=reference_block_data.Add_End();
+            reference_block_data(i).regular_pairs.Resize(bl.connections.m);
+            reference_block(b)={b,i};
+            *pr.x=b;
+        }
         else reference_block(b)=reference_block(*pr.x);
     }
-
-    reference_block_data.Resize(index);
 }
 //#####################################################################
 // Function Compute_Block_Hash
@@ -1948,22 +1955,13 @@ Compute_Connection_Hash(BLOCK_ID b0,int con_id0,BLOCK_ID b1,int con_id1)
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Compute_Dof_Remapping(BLOCK_ID b)
 {
+    LOG::printf("block: %P\n",b);
     auto& rd=reference_block_data(reference_block(b).y);
     const auto& bl=blocks(b);
     const auto& cb=canonical_blocks(bl.block);
     rd.dof_map_v.Resize(cb.X.m,use_init,1);
     rd.dof_map_e.Resize(cb.S.m,use_init,1);
-
-    // Copy from self
-    for(int i=0;i<rd.dof_map_v.m;i++)
-        if(rd.dof_map_v(i)>=0)
-            rd.pairs.v.Append({rd.dof_map_v(i),i});
-    for(int i=0;i<rd.dof_map_e.m;i++)
-        if(rd.dof_map_e(i)>=0)
-            rd.pairs.e.Append({rd.dof_map_e(i),i});
-    for(int i=0;i<rd.dof_map_p.m;i++)
-        if(rd.dof_map_p(i)>=0)
-            rd.pairs.p.Append({rd.dof_map_p(i),i});
+    LOG::printf("A: %P %P\n",rd.dof_map_v,rd.dof_map_e);
     
     for(int cc=0;cc<bl.connections.m;cc++)
     {
@@ -1997,10 +1995,13 @@ Compute_Dof_Remapping(BLOCK_ID b)
                 });
         }
     }
+    LOG::printf("B: %P %P\n",rd.dof_map_v,rd.dof_map_e);
+
     int iv=0,ie=0,ip=0;
     rd.dof_map_p=rd.dof_map_v;
     rd.dof_map_v.Subset(cb.bc_v).Fill(0);
     rd.dof_map_e.Subset(cb.bc_e).Fill(0);
+    LOG::printf("C: %P %P %P\n",rd.dof_map_v,rd.dof_map_e,rd.dof_map_p);
     for(int i=0;i<rd.dof_map_v.m;i++)
         rd.dof_map_v(i)=rd.dof_map_v(i)?iv++:-1;
     for(int i=0;i<rd.dof_map_e.m;i++)
@@ -2010,6 +2011,21 @@ Compute_Dof_Remapping(BLOCK_ID b)
     rd.num_dofs_v=iv;
     rd.num_dofs_e=ie;
     rd.num_dofs_p=ip;
+    LOG::printf("D: %P %P %P\n",rd.dof_map_v,rd.dof_map_e,rd.dof_map_p);
+    LOG::printf("E: %P %P %P\n",rd.num_dofs_v,rd.num_dofs_e,rd.num_dofs_p);
+
+    
+    // Copy from self
+    for(int i=0;i<rd.dof_map_v.m;i++)
+        if(rd.dof_map_v(i)>=0)
+            rd.pairs.v.Append({rd.dof_map_v(i),i});
+    for(int i=0;i<rd.dof_map_e.m;i++)
+        if(rd.dof_map_e(i)>=0)
+            rd.pairs.e.Append({rd.dof_map_e(i),i});
+    for(int i=0;i<rd.dof_map_p.m;i++)
+        if(rd.dof_map_p(i)>=0)
+            rd.pairs.p.Append({rd.dof_map_p(i),i});
+    LOG::printf("F: %P %P %P\n",rd.pairs.v,rd.pairs.e,rd.pairs.p);
 }
 //#####################################################################
 // Function Init_Block_Matrix
