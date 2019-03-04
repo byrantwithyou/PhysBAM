@@ -87,7 +87,7 @@ CONTACT(RIGID_BODY<TV>& body_1,RIGID_BODY<TV>& body_2,TV& _location,TV& _normal,
 
     Compute_Tangent_Helper(*this);
         
-    for(int i=1;i<d;i++)
+    for(int i=0;i<d-1;i++)
     {
         tangent_constraint(0)(i).linear=-tangent(i);
         tangent_constraint(0)(i).angular=TV::Cross_Product(tangent(i),r_1);
