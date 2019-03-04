@@ -28,7 +28,7 @@ template<class TV> class GRID;
 template<int d>
 struct MARCHING_CUBES_CASE
 {
-    enum WORKAROUND {max_elements=(d==3?5:2),num_corners=1<<d,num_edges=d<<(d-1),num_pts=num_corners+num_edges};
+    enum WORKAROUND {max_elements=(d==3?5:d),num_corners=1<<d,num_edges=d<<(d-1),num_pts=num_corners+num_edges};
     unsigned short elements[max_elements];
 
     static int edge_lookup[num_corners][num_corners];
