@@ -6,24 +6,55 @@
 //##################################################################### 
 #include <Core/Math_Tools/RANGE.h>
 #include <Core/Vectors/VECTOR.h>
-#include <Tools/Auto_Diff/AUTO_DIFF.h>
-#include <Tools/Auto_Diff/AUTO_HESS.h>
-#include <Tools/Auto_Diff/AUTO_HESS_EXT.h>
-#include <Tools/Auto_Diff/AUTO_NO_DIFF.h>
-#include <Tools/Polynomials/QUADRATIC.h>
 #include <Geometry/Basic_Geometry/CONE.h>
+#include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 namespace PhysBAM{
-template<class DT,class DTV,class T,class TV>
-inline DT Signed_Distance_Helper(const CONE<T>& cone,const TV& X)
-{
-    DTV u=DTV::From_Var(X)-cone.base;
-    DT x=u.Dot(cone.dir);
-    DT y=(u-cone.dir*x).Magnitude();
 
-    if(x.x<=0 && y.x<=cone.radius) return -x;
-    if((y.x-cone.radius)*cone.radius>cone.height*x.x) return sqrt(sqr(x)+sqr(y-cone.radius));
-    if((x.x-cone.height)*cone.height>cone.radius*y.x) return sqrt(sqr(x-cone.height)+sqr(y));
-    return max(-x,((x-cone.height)*cone.radius+y*cone.height)/sqrt(sqr(cone.radius)+sqr(cone.height)));
+namespace{
+template<class T,class TV>
+struct HELPER
+{
+    T p,cr,ch,x,y,yy;
+    TV dy,d;
+    int cs;
+
+    HELPER(const CONE<T>& cone,const TV& X)
+    {
+        d=cone.dir;
+        TV u=X-cone.base;
+        x=u.Dot(d);
+        TV w=u-d*x;
+        dy=w;
+        yy=y=dy.Normalize();
+        if(x<=0 && y<=cone.radius){p=-x;cs=0;return;}
+        T yc=y-cone.radius;
+        if(yc*cone.radius>cone.height*x){y=yc;p=hypot(x,y);cs=1;return;}
+        T xc=x-cone.height;
+        if(xc*cone.height>cone.radius*y){x=xc;p=hypot(x,y);cs=1;return;}
+        T h=hypot(cone.radius,cone.height);
+        cr=cone.radius/h;
+        ch=cone.height/h;
+        T z=xc*cr+y*ch;
+        if(-x>=z){p=-x;cs=0;return;}
+        p=z;
+        cs=2;
+    }
+
+    TV N() const
+    {
+        if(cs==0) return -d;
+        if(cs==1) return x/p*d+y/p*dy;
+        return d*cr+dy*ch;
+    }
+
+    SYMMETRIC_MATRIX<T,3> H() const
+    {
+        if(cs==0) return {};
+        SYMMETRIC_MATRIX<T,3> ddy=((T)1-Outer_Product(d)-Outer_Product(dy))/yy;
+        if(cs==1) return y/p*ddy+Outer_Product(x/p*dy-y/p*d)/p;
+        return ddy*ch;
+    }
+};
 }
 //#####################################################################
 // Function Bounding_Box
@@ -42,7 +73,8 @@ Bounding_Box() const
 template<class T> T CONE<T>::
 Signed_Distance(const TV& X) const
 {
-    return Signed_Distance_Helper<AUTO_NO_DIFF<T,TV>,AUTO_NO_DIFF<TV,TV> >(*this,X).x;
+    HELPER<T,TV> h(*this,X);
+    return h.p;
 }
 //#####################################################################
 // Function Suface
@@ -50,8 +82,8 @@ Signed_Distance(const TV& X) const
 template<class T> VECTOR<T,3> CONE<T>::
 Surface(const TV& X) const 
 {
-    AUTO_DIFF<T,TV> phi=Signed_Distance_Helper<AUTO_DIFF<T,TV>,AUTO_DIFF<TV,TV> >(*this,X);
-    return X-phi.x*phi.dx;
+    HELPER<T,TV> h(*this,X);
+    return X-h.p*h.N();
 }
 //#####################################################################
 // Function Normal
@@ -59,7 +91,8 @@ Surface(const TV& X) const
 template<class T> VECTOR<T,3> CONE<T>::
 Normal(const TV& X) const 
 {
-    return Signed_Distance_Helper<AUTO_DIFF<T,TV>,AUTO_DIFF<TV,TV> >(*this,X).dx;
+    HELPER<T,TV> h(*this,X);
+    return h.N();
 }
 //#####################################################################
 // Function Normal
@@ -75,7 +108,8 @@ Normal(const TV& X,const int aggregate) const
 template<class T> SYMMETRIC_MATRIX<T,3> CONE<T>::
 Hessian(const TV& X) const
 {
-    return Signed_Distance_Helper<AUTO_HESS<T,TV>,AUTO_HESS<TV,TV> >(*this,X).ddx;
+    HELPER<T,TV> h(*this,X);
+    return h.H();
 }
 //#####################################################################
 // Function Principal_Curvatures
@@ -83,7 +117,8 @@ Hessian(const TV& X) const
 template<class T> VECTOR<T,2> CONE<T>::
 Principal_Curvatures(const TV& X) const
 {
-    return ::PhysBAM::Principal_Curvatures(Signed_Distance_Helper<AUTO_HESS<T,TV>,AUTO_HESS<TV,TV> >(*this,X));
+    HELPER<T,TV> h(*this,X);
+    return Compute_Principal_Curvatures(h.N(),h.H());
 }
 //#####################################################################
 // Function Lazy_Inside
