@@ -2233,7 +2233,8 @@ Visualize_Block_State(BLOCK_ID b)
     auto Z=[=](int i){return M*cb.X(i)+bl.xform.b;};
     for(auto t:cb.E)
     {
-        VECTOR<TV,3> P(t.Map([=](int i){return M*cb.X(i)+bl.xform.b;}));
+        VECTOR<TV,3> P;
+        for(int i=0;i<3;i++) P(i)=M*cb.X(t(i))+bl.xform.b;
         for(auto p:P) Add_Debug_Object(VECTOR<TV,2>(p,P.Average()),VECTOR<T,3>(.5,.5,.5));
     }
     HASHTABLE<int> he,hv;

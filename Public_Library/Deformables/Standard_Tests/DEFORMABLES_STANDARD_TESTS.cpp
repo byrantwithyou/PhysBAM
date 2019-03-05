@@ -346,7 +346,8 @@ Create_Drifted_Surface(const TRIANGULATED_SURFACE<T>& triangulated_surface,SOFT_
         child_particles(p)=particles.Append(particles,p);
         soft_bindings.Add_Binding(VECTOR<int,2>(child_particles(p),p),use_impulses_for_collisions);}
     TRIANGULATED_SURFACE<T>& drifted_surface=*TRIANGULATED_SURFACE<T>::Create(particles);
-    for(int i=0;i<triangulated_surface.mesh.elements.m;i++) drifted_surface.mesh.elements.Append(VECTOR<int,3>::Map(child_particles,triangulated_surface.mesh.elements(i)));
+    for(int i=0;i<triangulated_surface.mesh.elements.m;i++)
+        drifted_surface.mesh.elements.Append(VECTOR<int,3>(child_particles.Subset(triangulated_surface.mesh.elements(i))));
     return drifted_surface;
 }
 //#####################################################################

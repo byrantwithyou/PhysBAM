@@ -929,7 +929,8 @@ Create_Hard_Bound_Boundary_Surface(TRIANGULATED_SURFACE<T>& boundary_surface)
     for(int b=0;b<deformable_body_collection.soft_bindings.bindings.m;b++){VECTOR<int,2>& binding=deformable_body_collection.soft_bindings.bindings(b);
         particle_map(binding.x)=binding.y;}
 #endif
-    for(int t=0;t<boundary_surface.mesh.elements.m;t++) hard_bound_boundary_surface.mesh.elements.Append(VECTOR<int,3>::Map(particle_map,boundary_surface.mesh.elements(t)));
+    for(int t=0;t<boundary_surface.mesh.elements.m;t++)
+        hard_bound_boundary_surface.mesh.elements.Append(VECTOR<int,3>(particle_map.Subset(boundary_surface.mesh.elements(t))));
     return hard_bound_boundary_surface;
 }
 //#####################################################################

@@ -206,10 +206,6 @@ public:
     for(int h=0;h<table.m;h++)
          output<<h<<":"<<(table(h).state==ENTRY_ACTIVE?"ACTIVE":(table(h).state==ENTRY_DELETED?"DELETED":"FREE"))<<" key="<<table(h).key<<" value="<<table(h).data<<std::endl;}
 
-    template<class FUNC>
-    void Map(FUNC function) // function(key,data)
-    {for(int h=0;h<table.m;h++) if(table(h).state==ENTRY_ACTIVE) function(table(h).key,table(h).data);}
-
     void Append_Keys(ARRAY<TK>& keys) const
     {keys.Preallocate(Size());for(int h=0;h<table.m;h++) if(table(h).state==ENTRY_ACTIVE) keys.Append(table(h).key);}
 

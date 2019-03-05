@@ -145,8 +145,7 @@ Construct_Virtual_Nodes(EMBEDDED_OBJECT<TV,d>& embedded_object,ARRAY<int>& map_t
 template<class TV,int d> void
 Add_Embedded_Subelement(EMBEDDED_OBJECT<TV,d>& embedded_object,const EMBEDDED_OBJECT<TV,d>& old_embedded_object,const int old_emb_subelement,const int current_element,const int old_element)
 {
-    VECTOR<int,d> old_emb_nodes=VECTOR<int,d>::Map(old_embedded_object.embedded_particles.subset_index_from_point_cloud_index,
-        old_embedded_object.embedded_mesh.elements(old_emb_subelement));
+    VECTOR<int,d> old_emb_nodes(old_embedded_object.embedded_particles.subset_index_from_point_cloud_index.Subset(old_embedded_object.embedded_mesh.elements(old_emb_subelement)));
     VECTOR<int,d+1> current_nodes=embedded_object.simplicial_object.mesh.elements(current_element),
         old_nodes=old_embedded_object.simplicial_object.mesh.elements(old_element);
 
@@ -209,7 +208,8 @@ Rebuild_Embedded_Object(EMBEDDED_OBJECT<TV,d>& embedded_object,ARRAY<int>& map_t
 
     // make a map from the new elements to the old ones
     map_to_old_simplices.Resize(mesh.elements.m,no_init);
-    for(int t=0;t<mesh.elements.m;t++) map_to_old_simplices(t)=old_mesh.Simplex(VECTOR<int,d+1>::Map(map_to_old_particles,mesh.elements(t)));
+    for(int t=0;t<mesh.elements.m;t++)
+        map_to_old_simplices(t)=old_mesh.Simplex(VECTOR<int,d+1>(map_to_old_particles.Subset(mesh.elements(t))));
 
     // add surface particles to current embedded_object, and copy state from old embedded particles
     // make a map from the new embedded particles to the old ones - map to 0, if it doesn't exist

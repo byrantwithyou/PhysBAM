@@ -88,7 +88,8 @@ void Create_Duplicate_Mesh(const TRIANGLE_MESH& mesh,TRIANGLE_MESH& duplicate_me
     ARRAY<int> child_map(particles.Size());
     for(int i=0;i<mesh_nodes.m;i++){int p=mesh_nodes(i);
         child_map(p)=particles.Append(particles,p);}
-    for(int i=0;i<mesh.elements.m;i++) duplicate_mesh.elements.Append(VECTOR<int,3>::Map(child_map,mesh.elements(i)));
+    for(int i=0;i<mesh.elements.m;i++)
+        duplicate_mesh.elements.Append(VECTOR<int,3>(child_map.Subset(mesh.elements(i))));
     duplicate_mesh.Set_Number_Nodes(particles.Size());
 
     parent_map.Resize(particles.Size());for(int p=0;p<child_map.m;p++) if(child_map(p)) parent_map(child_map(p))=p;

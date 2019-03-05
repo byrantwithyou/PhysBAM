@@ -26,7 +26,7 @@ COLLISION_GEOMETRY_SPATIAL_PARTITION(T_ARRAY& collision_bodies_input,T collision
 template<class TV,class T_ARRAY,class ID> COLLISION_GEOMETRY_SPATIAL_PARTITION<TV,T_ARRAY,ID>::
 ~COLLISION_GEOMETRY_SPATIAL_PARTITION()
 {
-    hashtable.Map([](auto&k,auto&v){delete v;v=0;});
+    for(auto&v:hashtable){delete v.data;v.data=0;}
 }
 //#####################################################################
 // Function Scene_Bounding_Box_Size
@@ -105,8 +105,10 @@ template<class TV,class T_ARRAY,class ID> void COLLISION_GEOMETRY_SPATIAL_PARTIT
 Reinitialize()
 {
     assert(reinitialize_counter>=0);
-    if(reinitialize_counter%10 == 0){hashtable.Map([](auto&k,auto&v){delete v;v=0;});hashtable.Remove_All();}
-    else hashtable.Map([](auto&k,auto&v){v->Remove_All();});
+    if(reinitialize_counter%10 == 0){
+        for(auto&v:hashtable){delete v.data;v.data=0;}
+        hashtable.Remove_All();}
+    else for(auto&v:hashtable){v.data->Remove_All();}
     reinitialize_counter++;
     voxel_range.Resize(collision_bodies.Size());
     bodies_not_in_partition.Remove_All();

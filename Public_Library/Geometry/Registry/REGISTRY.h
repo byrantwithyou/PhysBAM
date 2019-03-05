@@ -71,7 +71,7 @@ protected:
     {}
 
     ~REGISTRY()
-    {name_registry.Map([](auto&k,auto&v){delete v;v=0;});}
+    {for(auto&v:name_registry){delete v.data;v.data=0;}}
 
     template<class T_OBJECT> static T_OBJECT* Create_Representative()
     {return T_OBJECT::Create();}

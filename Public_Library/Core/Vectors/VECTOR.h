@@ -269,12 +269,6 @@ public:
     void Set(Args&&... args)
     {STATIC_ASSERT(d==sizeof...(Args));Set_Helper(args...);}
 
-    template<class T_FUNCTION>
-    auto Map(const T_FUNCTION& f) const
-    {VECTOR<decltype(f(T())),m> r;
-    for(int i=0;i<d;i++) r.array[i]=f(array[i]);
-    return r;}
-
     int Find(const T& element) const
     {for(int i=0;i<d;i++) if(array[i]==element) return i;
     return -1;}

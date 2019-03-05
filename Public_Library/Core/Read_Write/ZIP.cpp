@@ -417,7 +417,7 @@ ZIP_FILE_READER(const std::string& filename)
 ZIP_FILE_READER::
 ~ZIP_FILE_READER()
 {
-    filename_to_header.Map([](auto&k,auto&v){delete v;v=0;});
+    for(auto&v:filename_to_header){delete v.data;v.data=0;}
 }
 //#####################################################################
 // Function Find_And_Read_Central_Header

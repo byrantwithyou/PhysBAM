@@ -373,10 +373,6 @@ public:
     void Set(const T& element1,const T& element2)
     {x=element1;y=element2;}
 
-    template<class T_FUNCTION>
-    auto Map(const T_FUNCTION& f) const
-    {return VECTOR<decltype(f(T())),m>(f(x),f(y));}
-
     int Find(const T& element) const
     {return x==element?0:y==element?1:-1;}
 

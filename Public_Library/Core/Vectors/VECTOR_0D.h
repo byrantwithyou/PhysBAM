@@ -288,10 +288,6 @@ public:
     static VECTOR Axis_Vector(const int axis)
     {PHYSBAM_FATAL_ERROR();}
 
-    template<class T_FUNCTION>
-    auto Map(const T_FUNCTION& f) const
-    {return VECTOR<decltype(f(T())),m>();}
-
     void Split(VECTOR& v1,VECTOR& v2) const
     {}
 

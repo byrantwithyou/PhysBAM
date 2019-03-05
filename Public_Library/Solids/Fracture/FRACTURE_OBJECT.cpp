@@ -73,7 +73,8 @@ template<class TV> static TV
 Embedded_Segment_Vector(const EMBEDDED_OBJECT<TV,2>& embedded_object,const int emb_seg,const int current_triangle)
 {
     assert(embedded_object.Element_Containing_Subelement(emb_seg)==current_triangle);
-    int a,b;VECTOR<int,2>::Map(embedded_object.embedded_particles.subset_index_from_point_cloud_index,embedded_object.embedded_mesh.elements(emb_seg)).Get(a,b);
+    int a,b;
+    VECTOR<int,2>(embedded_object.embedded_particles.subset_index_from_point_cloud_index.Subset(embedded_object.embedded_mesh.elements(emb_seg))).Get(a,b);
     return embedded_object.Position_Of_Embedded_Particle(b)-embedded_object.Position_Of_Embedded_Particle(a);
 }
 // returns a vector normal to emb_seg and the triangle_normal
@@ -93,7 +94,8 @@ template<class T> static VECTOR<T,3>
 Embedded_Subelement_Normal(const EMBEDDED_OBJECT<VECTOR<T,3>,3>& embedded_object,const int emb_tri,const int tetrahedron)
 {
     assert(embedded_object.Element_Containing_Subelement(emb_tri)==tetrahedron);
-    int a,b,c;VECTOR<int,3>::Map(embedded_object.embedded_particles.subset_index_from_point_cloud_index,embedded_object.embedded_object.mesh.elements(emb_tri)).Get(a,b,c);
+    int a,b,c;
+    VECTOR<int,3>(embedded_object.embedded_particles.subset_index_from_point_cloud_index.Subset(embedded_object.embedded_object.mesh.elements(emb_tri))).Get(a,b,c);
     return PLANE<T>::Normal(embedded_object.Position_Of_Embedded_Particle(a),embedded_object.Position_Of_Embedded_Particle(b),embedded_object.Position_Of_Embedded_Particle(c));
 }
 //#####################################################################
