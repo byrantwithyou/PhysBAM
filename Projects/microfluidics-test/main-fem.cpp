@@ -100,15 +100,24 @@ void Run(PARSE_ARGS& parse_args)
 
     timer("compute matrix");
 
+    printf("==========================\n");
+    cem.Print_Current();
+    printf("==========================\n");
     cl.Eliminate_Irregular_Blocks(cem);
 
     timer("elim irreg");
 
+    cem.Print_Current();
+    printf("==========================\n");
     cl.Eliminate_Non_Seperators(cem);
 
     timer("elim non sep");
 
+    cem.Print_Current();
+    printf("==========================\n");
     cem.Full_Reordered_Elimination();
+    cem.Print_Current();
+    printf("==========================\n");
 
     timer("elim 3");
 

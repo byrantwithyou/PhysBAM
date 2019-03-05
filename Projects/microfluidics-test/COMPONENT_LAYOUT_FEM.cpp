@@ -1725,8 +1725,13 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
         }
         cem.Add_Block_Matrix_Entry(Value(b),Value(b),i+2);
     }
-    int num_sym=matrix_block_list.m;
-    
+
+    for(int i=0;i<matrix_block_list.m;i++)
+    {
+        int j=cem.Create_Matrix_Block(true);
+        cem.block_list(j).M=matrix_block_list(i).M;
+    }
+
     for(BLOCK_ID b(0);b<blocks.m;b++)
     {
         const auto& bl=blocks(b);
@@ -1740,7 +1745,9 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
                 {
                     BLOCK_ID b2=bl.connections(c).id;
                     int i=Fill_Connection_Matrix(b,c,b2,con_id);
-                    cem.Add_Block_Matrix_Entry(Value(b),Value(b2),i+2);
+                    int j=cem.Create_Matrix_Block(false);
+                    cem.block_list(j).M=matrix_block_list(i).M;
+                    cem.Add_Block_Matrix_Entry(Value(b),Value(b2),j);
                 }
             }
         }
@@ -1754,13 +1761,11 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
         int bd=irregular_connections(ref).block_data;
         const auto& d=irregular_reference_block_data(bd);
         for(const auto& p:d.pairs)
-            cem.Add_Block_Matrix_Entry(Value(ic.regular),Value(p.b),p.mat_id+2);
-    }
-
-    for(int i=0;i<matrix_block_list.m;i++)
-    {
-        int j=cem.Create_Matrix_Block(i<num_sym);
-        cem.block_list(j).M=matrix_block_list(i).M;
+        {
+            int j=cem.Create_Matrix_Block(false);
+            cem.block_list(j).M=matrix_block_list(p.mat_id).M;
+            cem.Add_Block_Matrix_Entry(Value(ic.regular),Value(p.b),j);
+        }
     }
     
     rhs_block_list.Resize(blocks.m);
@@ -1861,6 +1866,7 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
     // Multiply solution sol(b) by F when done.
 
     cem.End_Fill_Blocks();
+    cem.valid_row.Resize(Value(blocks.m),use_init,true);
 }
 //#####################################################################
 // Function Compute_Block_Hash
@@ -2129,7 +2135,7 @@ Apply_To_RHS(BLOCK_ID b,const BLOCK_VECTOR<T>& w)
     {
         const auto& c=bl.connections(cc);
         if(c.con_id>=0)
-            Copy_Vector_Data(w,b,rd.regular_pairs(c.con_id),c.id);
+            Copy_Vector_Data(w,b,rd.regular_pairs(cc),c.id);
         else
         {
             const auto& ic=irregular_connections(~c.con_id);
@@ -2193,6 +2199,7 @@ Eliminate_Simple(CACHED_ELIMINATION_MATRIX<T>& cem,BLOCK_ID first,int con_id_sou
         b=bl.connections(1-con_id).id;
         con_id=bl.connections(1-con_id).con_id;
     }
+    Eliminate_Strip(cem,list);
 }
 //#####################################################################
 // Function Eliminate_Rows

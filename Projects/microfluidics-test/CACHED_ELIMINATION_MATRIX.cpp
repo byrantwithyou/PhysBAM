@@ -295,8 +295,11 @@ Print_Full() const
     for(int i=0;i<rows.m;i++){
         for(int j=0;j<rows.m;j++){
             int m=Get_Block_Lazy(i,j);
+            bool tr=m&use_trans;
+            m&=~use_trans;
+            if(m&use_neg) m=-(m&~use_neg);
             if(m==zero_block) printf("    ");
-            else if(m&use_trans) printf("%3it",m&~use_trans);
+            else if(tr) printf("%3it",m);
             else printf("%4i",m);}
         printf("\n");}
 }
@@ -312,8 +315,11 @@ Print_Current() const
         for(int j=0;j<rows.m;j++){
             if(!valid_row(j)) continue;
             int m=Get_Block_Lazy(i,j);
+            bool tr=m&use_trans;
+            m&=~use_trans;
+            if(m&use_neg) m=-(m&~use_neg);
             if(m==zero_block) printf("    ");
-            else if(m&use_trans) printf("%3it",m&~use_trans);
+            else if(tr) printf("%3it",m);
             else printf("%4i",m);}
         printf("\n");}
 }
