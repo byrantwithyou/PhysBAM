@@ -841,7 +841,7 @@ Make_Canonical_Joint_2(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,ARRAY<
         ARRAY<BLOCK_CONNECTION> con;
         if(it.k!=0) con.Append({BLOCK_ID(it.k-1),1});
         if(it.k!=it.nseg-1) con.Append({BLOCK_ID(it.k+1),0});
-        cc->blocks.Append({id,{XFORM_ID(),TV()},con,{0,1}});
+        cc->blocks(BLOCK_ID(it.k))={id,{XFORM_ID(),TV()},con,{0,1}};
     }
     cc->irregular_connections.Append({BLOCK_ID(~0)});
     cc->irregular_connections.Append({BLOCK_ID(~1)});
