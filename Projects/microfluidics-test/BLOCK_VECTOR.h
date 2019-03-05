@@ -28,6 +28,10 @@ struct BLOCK_VECTOR
     void Add_e(int i,TV u) {Add_v(i+nv,u);}
     void Add_u(int i,int e,TV u) {Add_v(i+e*nv,u);}
     void Add_p(int i,T u) {V(2*(nv+ne)+i)+=u;}
+    void Set_v(int i,TV u) {V(2*i)=u(0);V(2*i+1)=u(1);}
+    void Set_e(int i,TV u) {Set_v(i+nv,u);}
+    void Set_u(int i,int e,TV u) {Set_v(i+e*nv,u);}
+    void Set_p(int i,T u) {V(2*(nv+ne)+i)=u;}
 };
 
 }

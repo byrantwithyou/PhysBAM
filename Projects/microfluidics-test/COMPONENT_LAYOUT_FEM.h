@@ -138,6 +138,8 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     ARRAY<BLOCK_MATRIX<T> > matrix_block_list;
 
     ARRAY<BLOCK_VECTOR<T>,BLOCK_ID> rhs_block_list;
+
+    ARRAY<TRIPLE<BLOCK_ID,BLOCK_ID,int> > nonzero_blocks;
     
     typedef std::tuple<CANONICAL_BLOCK_ID,int,CANONICAL_BLOCK_ID,int> REGULAR_CON_KEY;
     HASHTABLE<REGULAR_CON_KEY,int> regular_connection_matrix_blocks;
@@ -328,7 +330,11 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     void Eliminate_Non_Seperators(CACHED_ELIMINATION_MATRIX<T>& cem);
     void Eliminate_Strip(CACHED_ELIMINATION_MATRIX<T>& cem,const ARRAY<BLOCK_ID>& a);
     void Eliminate_Simple(CACHED_ELIMINATION_MATRIX<T>& cem,BLOCK_ID first,int con_id_source);
-    void Visualize_Block_State(BLOCK_ID b);
+    void Visualize_Block_State(BLOCK_ID b) const;
+    void Transform_Solution(const CACHED_ELIMINATION_MATRIX<T>& cem);
+    void Visualize_Solution(BLOCK_ID b) const;
+    void Dump_World_Space_System() const;
+    void Transform_To_World_Space(BLOCK_MATRIX<T>& M,const BLOCK_MATRIX<T>& B,BLOCK_ID a,BLOCK_ID b) const;
 
   private:
     std::tuple<TV,T,T> Elbow_Pit(T angle,T width) const;

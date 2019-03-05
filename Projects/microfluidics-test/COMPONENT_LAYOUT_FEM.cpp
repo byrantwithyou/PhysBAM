@@ -9,6 +9,7 @@
 #include <Core/Math_Tools/RANGE.h>
 #include <Core/Matrices/MATRIX_MXN.h>
 #include <Core/Matrices/ROTATION.h>
+#include <Core/Matrices/SYSTEM_MATRIX_HELPER.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <fstream>
 #include <list>
@@ -1392,8 +1393,8 @@ Fill_Canonical_Block_Matrix(BLOCK_MATRIX<T>& mat,const CANONICAL_BLOCK& cb)
         T scale=mu*F.Determinant()/6;
         T p_scale=F.Determinant()/6;
 
-        for(int r=0;r<1;r++)
-            for(int s=0;s<1;s++)
+        for(int r=0;r<2;r++)
+            for(int s=0;s<2;s++)
                 for(int i=0;i<3;i++)
                     for(int j=0;j<3;j++)
                     {
@@ -1405,7 +1406,7 @@ Fill_Canonical_Block_Matrix(BLOCK_MATRIX<T>& mat,const CANONICAL_BLOCK& cb)
                         mat.Add_uu(dof[r](i),r,dof[s](j),s,M+M.Trace());
                     }
 
-        for(int s=0;s<1;s++)
+        for(int s=0;s<2;s++)
             for(int i=0;i<3;i++)
                 for(int j=0;j<3;j++)
                 {
@@ -1576,7 +1577,7 @@ Copy_Vector_Data(const BLOCK_VECTOR<T>& B,BLOCK_ID b,const DOF_PAIRS& dp,BLOCK_I
     MATRIX<T,2> M=xforms(blocks(b).xform.id);
     T s=1/sqrt(M.Determinant());
     M*=s;
-    
+
     for(auto p:dp.v) A.Add_v(p.x,M.Transpose_Times(B.Get_v(p.y)));
     for(auto p:dp.e) A.Add_e(p.x,M.Transpose_Times(B.Get_e(p.y)));
     for(auto p:dp.p) A.Add_p(p.x,s*B.Get_p(p.y));
@@ -1593,7 +1594,7 @@ Fill_Block_Matrix(BLOCK_ID b)
     const auto& rd=reference_block_data(ib);
     const auto& bl=blocks(b);
     mat.Resize();
-    
+
     Copy_Matrix_Data(mat,b,rd.pairs,rd.pairs,b,b);
 
     for(int cc=0;cc<bl.connections.m;cc++)
@@ -1730,7 +1731,7 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
     Compute_Reference_Blocks();
     Compute_Reference_Irregular_Connections();
     matrix_block_list.Resize(reference_block_data.m);
-    
+
     for(BLOCK_ID b(0);b<blocks.m;b++)
     {
         int i=reference_block(b).y;
@@ -1740,6 +1741,7 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
             Fill_Block_Matrix(b);
         }
         cem.Add_Block_Matrix_Entry(Value(b),Value(b),i+2);
+        nonzero_blocks.Append({b,b,i});
     }
 
     for(int i=0;i<matrix_block_list.m;i++)
@@ -1764,6 +1766,7 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
                     int j=cem.Create_Matrix_Block(false);
                     cem.block_list(j).M=matrix_block_list(i).M;
                     cem.Add_Block_Matrix_Entry(Value(b),Value(b2),j);
+                    nonzero_blocks.Append({b,b2,i});
                 }
             }
         }
@@ -1781,11 +1784,12 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
             int j=cem.Create_Matrix_Block(false);
             cem.block_list(j).M=matrix_block_list(p.mat_id).M;
             cem.Add_Block_Matrix_Entry(Value(ic.regular),Value(p.b),j);
+            nonzero_blocks.Append({ic.regular,p.b,p.mat_id});
         }
     }
-    
+
     rhs_block_list.Resize(blocks.m);
-    
+
     if(analytic_velocity && analytic_pressure)
     {
         for(BLOCK_ID b(0);b<blocks.m;b++)
@@ -1873,7 +1877,15 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
             Apply_To_RHS(bc.b,w);
         }
     }
-    
+
+    for(BLOCK_ID i(0);i<rhs_block_list.m;i++)
+    {
+        int j=-1;
+        if(rhs_block_list(i).V.m)
+            j=cem.vector_list.Append(rhs_block_list(i).V);
+        cem.rhs(Value(i))=j;
+    }
+
     // TODO: rhs
     // multiply rhs(b) by F.Transpose(), where
     // A = xforms(blocks(b).xform.id);
@@ -1883,6 +1895,12 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
 
     cem.End_Fill_Blocks();
     cem.valid_row.Resize(Value(blocks.m),use_init,true);
+
+    LOG::printf("CM\n");
+    for(auto&p:canonical_block_matrices) LOG::printf("%P %P\n",std::make_tuple(p.nv_r,p.ne_r,p.np_r,p.nv_c,p.ne_c,p.np_c),p.M);
+
+    for(int i=0;i<cem.block_list.m;i++)
+        LOG::printf("%i %P\n",i,cem.block_list(i).M);
 }
 //#####################################################################
 // Function Compute_Block_Hash
@@ -1931,7 +1949,6 @@ Compute_Reference_Blocks()
         irreg_con_v.Sort();
         irreg_con_e.Sort();
 
-        LOG::printf("%P -> %P\n",b,std::make_tuple(bl.block,reg_con,irreg_con_v,irreg_con_e));
         auto pr=h.Insert(std::make_tuple(bl.block,reg_con,irreg_con_v,irreg_con_e),{});
         if(pr.y)
         {
@@ -1984,7 +2001,7 @@ Compute_Dof_Remapping(BLOCK_ID b)
     rd.dof_map_v.Resize(cb.X.m,use_init,1);
     rd.dof_map_e.Resize(cb.S.m,use_init,1);
     LOG::printf("A: %P %P\n",rd.dof_map_v,rd.dof_map_e);
-    
+
     for(int cc=0;cc<bl.connections.m;cc++)
     {
         const auto& c=bl.connections(cc);
@@ -2036,7 +2053,7 @@ Compute_Dof_Remapping(BLOCK_ID b)
     LOG::printf("D: %P %P %P\n",rd.dof_map_v,rd.dof_map_e,rd.dof_map_p);
     LOG::printf("E: %P %P %P\n",rd.num_dofs_v,rd.num_dofs_e,rd.num_dofs_p);
 
-    
+
     // Copy from self
     for(int i=0;i<rd.dof_map_v.m;i++)
         if(rd.dof_map_v(i)>=0)
@@ -2264,7 +2281,7 @@ Eliminate_Non_Seperators(CACHED_ELIMINATION_MATRIX<T>& cem)
 // Function Visualize_Block_State
 //#####################################################################
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Visualize_Block_State(BLOCK_ID b)
+Visualize_Block_State(BLOCK_ID b) const
 {
     auto& bl=blocks(b);
     MATRIX<T,TV::m> M=xforms(bl.xform.id);
@@ -2352,6 +2369,113 @@ Visualize_Block_State(BLOCK_ID b)
             });
     }
 }
-    
+//#####################################################################
+// Function Visualize_Solution
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Visualize_Solution(BLOCK_ID b) const
+{
+    const auto& bl=blocks(b);
+    const MATRIX<T,TV::m>& M=xforms(bl.xform.id);
+    TV B=bl.xform.b;
+    const auto& cb=canonical_blocks(bl.block);
+    auto Z=[=](int i){return M*cb.X(i)+bl.xform.b;};
+    const auto& rd=reference_block_data(reference_block(b).y);
+    const auto& U=rhs_block_list(b);
+    for(int i=0;i<cb.X.m;i++)
+        if(rd.dof_map_v(i)>=0)
+        {
+            Add_Debug_Particle(Z(i),VECTOR<T,3>(1,0,0));
+            Debug_Particle_Set_Attribute<TV>("V",U.Get_v(rd.dof_map_v(i)));
+        }
+
+    for(int i=0;i<cb.S.m;i++)
+        if(rd.dof_map_e(i)>=0)
+        {
+            Add_Debug_Particle((Z(cb.S(i).x)+Z(cb.S(i).y))/2,VECTOR<T,3>(1,0,0));
+            Debug_Particle_Set_Attribute<TV>("V",U.Get_e(rd.dof_map_e(i)));
+        }
+
+    for(int i=0;i<cb.X.m;i++)
+        if(rd.dof_map_p(i)>=0)
+        {
+            Add_Debug_Particle(Z(i),VECTOR<T,3>(0,1,0));
+            Debug_Particle_Set_Attribute<TV>("display_size",U.Get_p(rd.dof_map_p(i)));
+        }
+}
+//#####################################################################
+// Function Transform_Solution
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Transform_Solution(const CACHED_ELIMINATION_MATRIX<T>& cem)
+{
+    for(BLOCK_ID b(0);b<blocks.m;b++)
+    {
+        int j=cem.rhs(Value(b));
+        auto& U=rhs_block_list(b);
+        U.V=cem.vector_list(j);
+        const auto& A = xforms(blocks(b).xform.id);
+        T s=1/sqrt(A.Determinant());
+        auto F = A*s;
+        LOG::printf("xform %P\n",A);
+
+        for(int i=0;i<U.nv;i++) U.Set_v(i,F*U.Get_v(i));
+        for(int i=0;i<U.ne;i++) U.Set_e(i,F*U.Get_e(i));
+        for(int i=0;i<U.np;i++) U.Set_p(i,s*U.Get_p(i));
+    }
+}
+//#####################################################################
+// Function Dump_World_Space_System
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Dump_World_Space_System() const
+{
+    SYSTEM_MATRIX_HELPER<T> h;
+
+    for(auto t:nonzero_blocks)
+    {
+        const BLOCK_MATRIX<T>& B=matrix_block_list(t.z);
+        BLOCK_MATRIX<T> M(B);
+        M.M.x.Fill(0);
+        Transform_To_World_Space(M,B,t.x,t.y);
+        
+    }
+// struct SYSTEM_MATRIX_HELPER
+// {
+//     ARRAY<TRIPLE<int,int,T> > data;
+//     int start;
+//     bool compacted;
+}
+//#####################################################################
+// Function Transform_To_World_Space
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Transform_To_World_Space(BLOCK_MATRIX<T>& M,const BLOCK_MATRIX<T>& B,BLOCK_ID a,BLOCK_ID b) const
+{
+    MATRIX<T,2> Ma=xforms(blocks(a).xform.id);
+    MATRIX<T,2> Mb=xforms(blocks(b).xform.id);
+    T sa=1/sqrt(Ma.Determinant());
+    T sb=1/sqrt(Mb.Determinant());
+    Ma*=sa;
+    Mb*=sb;
+
+    for(int p=0;p<B.nv_r;p++)
+    {
+        for(int r=0;r<B.nv_c;r++) M.Add_vv(p,r,Ma.Transpose_Times(B.Get_vv(p,r)*Mb));
+        for(int r=0;r<B.ne_c;r++) M.Add_ve(p,r,Ma.Transpose_Times(B.Get_ve(p,r)*Mb));
+        for(int r=0;r<B.np_c;r++) M.Add_vp(p,r,Ma.Transpose_Times(B.Get_vp(p,r)*sb));
+    }
+    for(int p=0;p<B.ne_r;p++)
+    {
+        for(int r=0;r<B.nv_c;r++) M.Add_ev(p,r,Ma.Transpose_Times(B.Get_ev(p,r)*Mb));
+        for(int r=0;r<B.ne_c;r++) M.Add_ee(p,r,Ma.Transpose_Times(B.Get_ee(p,r)*Mb));
+        for(int r=0;r<B.np_c;r++) M.Add_ep(p,r,Ma.Transpose_Times(B.Get_ep(p,r)*sb));
+    }
+    for(int p=0;p<B.np_r;p++)
+    {
+        for(int r=0;r<B.nv_c;r++) M.Add_pv(p,r,Mb.Transpose_Times(B.Get_pv(p,r)*sa));
+        for(int r=0;r<B.ne_c;r++) M.Add_pe(p,r,Mb.Transpose_Times(B.Get_pe(p,r)*sa));
+    }
+}
 template class COMPONENT_LAYOUT_FEM<VECTOR<double,2> >;
 }
