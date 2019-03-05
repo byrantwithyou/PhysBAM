@@ -4,6 +4,7 @@
 //#####################################################################
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Data_Structures/TRIPLE.h>
+#include <Core/Data_Structures/TUPLE.h>
 #include <Core/Log/LOG.h>
 #include <Core/Math_Tools/RANGE.h>
 #include <Core/Matrices/MATRIX_MXN.h>
