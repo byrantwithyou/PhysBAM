@@ -289,7 +289,7 @@ Set_Connector(VERTEX_DATA& vd,BLOCK_ID id,int con_id)
         vd.con.regular=id;
         vd.con.con_id=con_id;
         if(vd.con.edge_on_v.m)
-            irregular_connections.Append(vd.con);
+            blocks(id).connections(con_id).con_id=~irregular_connections.Append(vd.con);
     }
 }
 //#####################################################################
