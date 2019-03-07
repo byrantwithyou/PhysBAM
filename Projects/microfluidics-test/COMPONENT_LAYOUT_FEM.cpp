@@ -822,26 +822,34 @@ Make_Canonical_Joint_2(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,ARRAY<
     cc->blocks.Resize(BLOCK_ID(cst.num_dofs-1));
     auto& ic0=cc->irregular_connections(cc->irregular_connections.Append({BLOCK_ID(~0)}));
     auto& ic1=cc->irregular_connections(cc->irregular_connections.Append({BLOCK_ID(~1)}));
+    int last_con=-1;
     for(BLOCK_MESHING_ITERATOR<TV> it(sides.x,sides.y,cst.num_dofs-1,target_length);it.Valid();it.Next())
     {
         CANONICAL_BLOCK_ID id=canonical_blocks.Add_End();
         CANONICAL_BLOCK& cb=canonical_blocks.Last();
         it.Build(cb.X,cb.E,cb.S);
-        cb.cross_sections.Append({{0,it.X0.m},{0,it.First_Diagonal_Edge()},false});
-        cb.cross_sections.Append({{it.X0.m,cb.X.m},{it.Last_Diagonal_Edge()+1,cb.S.m},true});
+        ARRAY<BLOCK_CONNECTION> con;
         if(it.k==0)
         {
             for(int j=0;j<it.X0.m;j++) cb.bc_v.Append(j);
             for(int j=0;j<it.First_Diagonal_Edge();j++) cb.bc_e.Append(j);
+        }
+        else
+        {
+            cb.cross_sections.Append({{0,it.X0.m},{0,it.First_Diagonal_Edge()},false});
+            con.Append({BLOCK_ID(it.k-1),last_con});
         }
         if(it.k==it.nseg-1)
         {
             for(int j=it.X0.m;j<cb.X.m;j++) cb.bc_v.Append(j);
             for(int j=it.Last_Diagonal_Edge()+1;j<cb.S.m;j++) cb.bc_e.Append(j);
         }
-        ARRAY<BLOCK_CONNECTION> con;
-        if(it.k!=0) con.Append({BLOCK_ID(it.k-1),1});
-        if(it.k!=it.nseg-1) con.Append({BLOCK_ID(it.k+1),0});
+        else
+        {
+            cb.cross_sections.Append({{it.X0.m,cb.X.m},{it.Last_Diagonal_Edge()+1,cb.S.m},true});
+            con.Append({BLOCK_ID(it.k+1),0});
+        }
+        last_con=con.m-1;
         cc->blocks(BLOCK_ID(it.k))={id,{XFORM_ID(),TV()},con,{0,1}};
         ic0.edge_on_v.Append({BLOCK_ID(it.k),it.X0.m});
         ic0.edge_on_v.Append({BLOCK_ID(it.k),0});
