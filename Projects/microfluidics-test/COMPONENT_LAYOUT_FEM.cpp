@@ -2337,7 +2337,7 @@ Visualize_Block_State(BLOCK_ID b)
             {
                 if(b==b2)
                 {
-                    Add_Debug_Particle(Z(a),o?VECTOR<T,3>(1,1,1):VECTOR<T,3>(.5,.5,.5));
+                    Add_Debug_Particle(Z(c),o?VECTOR<T,3>(.5,.5,.5):VECTOR<T,3>(1,1,1));
                     Debug_Particle_Set_Attribute<TV>("display_size",.05);
                 }
             },
@@ -2345,7 +2345,7 @@ Visualize_Block_State(BLOCK_ID b)
             {
                 if(b==b2)
                 {
-                    Add_Debug_Particle((Z(cb.S(a).x)+Z(cb.S(a).y))/2,o?VECTOR<T,3>(1,1,1):VECTOR<T,3>(.5,.5,.5));
+                    Add_Debug_Particle((Z(cb.S(c).x)+Z(cb.S(c).y))/2,o?VECTOR<T,3>(.5,.5,.5):VECTOR<T,3>(1,1,1));
                     Debug_Particle_Set_Attribute<TV>("display_size",.05);
                 }
             });
