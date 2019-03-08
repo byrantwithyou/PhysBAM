@@ -2326,7 +2326,6 @@ Visualize_Block_State(BLOCK_ID b)
         }
     }
 
-    return;
     for(int i:bl.edge_on)
     {
         auto& ic=irregular_connections(i);
