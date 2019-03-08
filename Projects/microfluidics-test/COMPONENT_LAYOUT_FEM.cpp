@@ -724,6 +724,7 @@ Make_Canonical_Joint_3_Small(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,
         CANONICAL_BLOCK& cb=canonical_blocks.Last();
         it.Build(cb.X,cb.E,cb.S);
         cb.bc_v={0,it.X0.m-1,it.X0.m,cb.X.m-1};
+        if(it.k==nseg-1) cb.bc_v.Append(it.X0.m+cst.num_dofs-1);
         cb.bc_e={it.First_Diagonal_Edge(),it.Last_Diagonal_Edge()};
         cc->blocks.Append({id,{XFORM_ID(),TV()}});
     }
