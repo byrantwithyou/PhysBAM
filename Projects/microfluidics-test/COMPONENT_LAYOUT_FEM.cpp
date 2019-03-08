@@ -315,6 +315,8 @@ Emit_Component_Blocks(const CANONICAL_COMPONENT* cc,const XFORM& xf,ARRAY<VERTEX
     {
         for(auto& b:a.edge_on_v)
             b.x+=offset;
+        for(auto& b:a.edge_on_e)
+            b.x+=offset;
 
         if(a.regular>=BLOCK_ID())
         {
