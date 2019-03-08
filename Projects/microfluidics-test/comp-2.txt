@@ -1,0 +1,13 @@
+l .22
+c C 5 1
+v A 0 0
+v B 1 0
+v D -2 2
+v E -2.5 0.5
+u C B A U1 1
+t C D A U2 0 0
+t C E A U3 0 0
+j C 3 A B BB D DD E EE
+p C U1 BB
+p C U2 DD
+p C U3 EE
