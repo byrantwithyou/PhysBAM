@@ -837,6 +837,8 @@ Make_Canonical_Joint_2(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,ARRAY<
         {
             for(int j=0;j<it.X0.m;j++) cb.bc_v.Append(j);
             for(int j=0;j<it.First_Diagonal_Edge();j++) cb.bc_e.Append(j);
+            ic0.edge_on_v.Append({BLOCK_ID(it.k),0});
+            ic1.edge_on_v.Append({BLOCK_ID(it.k),it.X0.m-1});
         }
         else
         {
@@ -856,10 +858,8 @@ Make_Canonical_Joint_2(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,ARRAY<
         last_con=con.m-1;
         cc->blocks(BLOCK_ID(it.k))={id,{XFORM_ID(),TV()},con,{0,1}};
         ic0.edge_on_v.Append({BLOCK_ID(it.k),it.X0.m});
-        ic0.edge_on_v.Append({BLOCK_ID(it.k),0});
-        ic0.edge_on_e.Append({BLOCK_ID(it.k),it.First_Diagonal_Edge()});
         ic1.edge_on_v.Append({BLOCK_ID(it.k),cb.X.m-1});
-        ic1.edge_on_v.Append({BLOCK_ID(it.k),it.X0.m-1});
+        ic0.edge_on_e.Append({BLOCK_ID(it.k),it.First_Diagonal_Edge()});
         ic1.edge_on_e.Append({BLOCK_ID(it.k),it.Last_Diagonal_Edge()});
     }
     return {cc,{ext+sep,ext+sep}};
