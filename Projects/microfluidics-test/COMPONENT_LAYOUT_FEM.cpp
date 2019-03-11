@@ -621,16 +621,20 @@ Make_Canonical_Joint_3_Average(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT
     VECTOR<TV,2> e=Extrude(w((k+1)%3),w((k+2)%3),dirs((k+2)%3));
     e+=dirs((k+2)%3)*sep;
     ARRAY<TV> s0=Polyline({w((k+1)%3),e(0)},target_length),s1=Polyline({w((k+2)%3),e(1)},target_length),b;
+    int index=cc->irregular_connections.Add_End();
+    int ick2=cc->irregular_connections.Append({BLOCK_ID(~((k+2)%3))});
     for(BLOCK_MESHING_ITERATOR<TV> it(s0,s1,cst.num_dofs-1,target_length);it.Valid();it.Next())
     {
         CANONICAL_BLOCK_ID id=canonical_blocks.Add_End();
         CANONICAL_BLOCK& cb=canonical_blocks.Last();
         it.Build(cb.X,cb.E,cb.S);
+        ARRAY<BLOCK_CONNECTION> con;
+        Joint_Connection(0,it,cb,cc->irregular_connections(index),cc->irregular_connections(ick2),con,it.k==1?0:1);
         for(int i=0;it.k==0 && i<it.X0.m;i++) cb.bc_v.Append(i);
         for(int i=0;it.k==0 && i<it.First_Diagonal_Edge();i++) cb.bc_e.Append(i);
         for(int i=it.X0.m;it.k==it.nseg-1 && i<cb.X.m;i++) cb.bc_v.Append(i);
         for(int i=it.Last_Diagonal_Edge()+1;it.k==it.nseg-1 && i<cb.S.m;i++) cb.bc_e.Append(i);
-        cc->blocks.Append({id,{XFORM_ID(),TV()}});
+        cc->blocks.Append({id,{XFORM_ID(),TV()},con,{0,1}});
         b.Append(it.X1(0));
     }
     VECTOR<TV,2> e0=Extrude(w(k),w((k+1)%3),dirs((k+1)%3)),e1=Extrude(w(k),w((k+2)%3),dirs(k));
@@ -642,19 +646,30 @@ Make_Canonical_Joint_3_Average(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT
     int n0=t0.m;
     t0.Append_Elements(b);
     t0.Append_Elements(Polyline({t0.Pop_Value(),e1(1)},target_length));
+    int ick1=cc->irregular_connections.Append({BLOCK_ID(~((k+1)%3))});
+    int ick=cc->irregular_connections.Append({BLOCK_ID(~k)});
+    int offset=Value(cc->blocks.m);
     for(BLOCK_MESHING_ITERATOR<TV> it(t0,t1,cst.num_dofs-1,target_length);it.Valid();it.Next())
     {
         CANONICAL_BLOCK_ID id=canonical_blocks.Add_End();
         CANONICAL_BLOCK& cb=canonical_blocks.Last();
         it.Build(cb.X,cb.E,cb.S);
-        for(int i=0;it.k==0 && i<it.X0.m;i++)
+        ARRAY<BLOCK_CONNECTION> con;
+        if(it.k==0)
         {
-            if(i<n0 || i>=n0+b.m-1) cb.bc_v.Append(i);
-            if((i>0 && i<n0) || i>(n0+b.m-1)) cb.bc_e.Append(i-1);
+            cb.cross_sections.Append({{n0-1,n0+b.m},{n0-1,n0+b.m-1},false});
+            con.Append({BLOCK_ID(),~index});
+            cc->irregular_connections(index).regular=BLOCK_ID(offset+it.k);
+            for(int i=0;i<it.X0.m;i++)
+            {
+                if(i<n0 || i>=n0+b.m-1) cb.bc_v.Append(i);
+                if((i>0 && i<n0) || i>(n0+b.m-1)) cb.bc_e.Append(i-1);
+            }
         }
+        Joint_Connection(offset,it,cb,cc->irregular_connections(ick1),cc->irregular_connections(ick),con,1);
         for(int i=it.X0.m;it.k==it.nseg-1 && i<cb.X.m;i++) cb.bc_v.Append(i);
         for(int i=it.Last_Diagonal_Edge()+1;it.k==it.nseg-1 && i<cb.S.m;i++) cb.bc_e.Append(i);
-        cc->blocks.Append({id,{XFORM_ID(),TV()}});
+        cc->blocks.Append({id,{XFORM_ID(),TV()},con,{2,3}});
     }
     ARRAY<T> ext={e1.Average().Magnitude(),e0.Average().Magnitude(),e.Average().Magnitude()};
     return {cc,{ext((3-k)%3),ext((4-k)%3),ext((5-k)%3)}};
@@ -668,6 +683,34 @@ Make_Canonical_Joint_3(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,ARRAY<
     T minimum_angle=min(2*pi-key.angles.Sum(),key.angles.Min());
     if(minimum_angle<pi/4) return Make_Canonical_Joint_3_Small(key);
     else return Make_Canonical_Joint_3_Average(key);
+}
+//#####################################################################
+// Function Joint_Connection
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Joint_Connection(int offset,BLOCK_MESHING_ITERATOR<TV>& it,CANONICAL_BLOCK& cb,
+    IRREGULAR_CONNECTION& ic0,IRREGULAR_CONNECTION& ic1,ARRAY<BLOCK_CONNECTION>& con,int prev) const
+{
+    BLOCK_ID self(offset+it.k);
+    if(it.k==0)
+    {
+        ic0.edge_on_v.Append({self,0});
+        ic1.edge_on_v.Append({self,it.X0.m-1});
+    }
+    else
+    {
+        cb.cross_sections.Append({{0,it.X0.m},{0,it.First_Diagonal_Edge()},false});
+        con.Append({BLOCK_ID(offset+it.k-1),prev});
+    }
+    if(it.k!=it.nseg-1)
+    {
+        cb.cross_sections.Append({{it.X0.m,cb.X.m},{it.Last_Diagonal_Edge()+1,cb.S.m},true});
+        con.Append({BLOCK_ID(offset+it.k+1),0});
+    }
+    ic0.edge_on_v.Append({self,it.X0.m});
+    ic1.edge_on_v.Append({self,cb.X.m-1});
+    ic0.edge_on_e.Append({self,it.First_Diagonal_Edge()});
+    ic1.edge_on_e.Append({self,it.Last_Diagonal_Edge()});
 }
 //#####################################################################
 // Function Make_Canonical_Joint_2
@@ -686,41 +729,24 @@ Make_Canonical_Joint_2(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,ARRAY<
     cc->blocks.Resize(BLOCK_ID(cst.num_dofs-1));
     auto& ic0=cc->irregular_connections(cc->irregular_connections.Append({BLOCK_ID(~0)}));
     auto& ic1=cc->irregular_connections(cc->irregular_connections.Append({BLOCK_ID(~1)}));
-    int last_con=-1;
     for(BLOCK_MESHING_ITERATOR<TV> it(sides.x,sides.y,cst.num_dofs-1,target_length);it.Valid();it.Next())
     {
         CANONICAL_BLOCK_ID id=canonical_blocks.Add_End();
         CANONICAL_BLOCK& cb=canonical_blocks.Last();
         it.Build(cb.X,cb.E,cb.S);
         ARRAY<BLOCK_CONNECTION> con;
+        Joint_Connection(0,it,cb,ic0,ic1,con,it.k==1?0:1);
         if(it.k==0)
         {
             for(int j=0;j<it.X0.m;j++) cb.bc_v.Append(j);
             for(int j=0;j<it.First_Diagonal_Edge();j++) cb.bc_e.Append(j);
-            ic0.edge_on_v.Append({BLOCK_ID(it.k),0});
-            ic1.edge_on_v.Append({BLOCK_ID(it.k),it.X0.m-1});
-        }
-        else
-        {
-            cb.cross_sections.Append({{0,it.X0.m},{0,it.First_Diagonal_Edge()},false});
-            con.Append({BLOCK_ID(it.k-1),last_con});
         }
         if(it.k==it.nseg-1)
         {
             for(int j=it.X0.m;j<cb.X.m;j++) cb.bc_v.Append(j);
             for(int j=it.Last_Diagonal_Edge()+1;j<cb.S.m;j++) cb.bc_e.Append(j);
         }
-        else
-        {
-            cb.cross_sections.Append({{it.X0.m,cb.X.m},{it.Last_Diagonal_Edge()+1,cb.S.m},true});
-            con.Append({BLOCK_ID(it.k+1),0});
-        }
-        last_con=con.m-1;
         cc->blocks(BLOCK_ID(it.k))={id,{XFORM_ID(),TV()},con,{0,1}};
-        ic0.edge_on_v.Append({BLOCK_ID(it.k),it.X0.m});
-        ic1.edge_on_v.Append({BLOCK_ID(it.k),cb.X.m-1});
-        ic0.edge_on_e.Append({BLOCK_ID(it.k),it.First_Diagonal_Edge()});
-        ic1.edge_on_e.Append({BLOCK_ID(it.k),it.Last_Diagonal_Edge()});
     }
     return {cc,{ext+sep,ext+sep}};
 }

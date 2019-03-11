@@ -343,6 +343,8 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     VECTOR<TV,2> Extrude(const TV& v0,const TV& v1,const TV& n) const;
     PAIR<ARRAY<TV>,ARRAY<TV> > Arc(const TV& c,T angle,T len_arm,T ext0,T ext1) const;
     ARRAY<TV> Polyline(const ARRAY<TV>& points,T dx) const;
+    void Joint_Connection(int offset,BLOCK_MESHING_ITERATOR<TV>& it,CANONICAL_BLOCK& cb,
+        IRREGULAR_CONNECTION& ic0,IRREGULAR_CONNECTION& ic1,ARRAY<BLOCK_CONNECTION>& con,int prev) const;
 };
 
 }
