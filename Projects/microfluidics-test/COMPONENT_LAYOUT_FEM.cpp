@@ -727,15 +727,15 @@ Make_Canonical_Joint_2(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,ARRAY<
 
     CANONICAL_COMPONENT* cc=new CANONICAL_COMPONENT;
     cc->blocks.Resize(BLOCK_ID(cst.num_dofs-1));
-    auto& ic0=cc->irregular_connections(cc->irregular_connections.Append({BLOCK_ID(~0)}));
-    auto& ic1=cc->irregular_connections(cc->irregular_connections.Append({BLOCK_ID(~1)}));
+    int ic0=cc->irregular_connections.Append({BLOCK_ID(~0)});
+    int ic1=cc->irregular_connections.Append({BLOCK_ID(~1)});
     for(BLOCK_MESHING_ITERATOR<TV> it(sides.x,sides.y,cst.num_dofs-1,target_length);it.Valid();it.Next())
     {
         CANONICAL_BLOCK_ID id=canonical_blocks.Add_End();
         CANONICAL_BLOCK& cb=canonical_blocks.Last();
         it.Build(cb.X,cb.E,cb.S);
         ARRAY<BLOCK_CONNECTION> con;
-        Joint_Connection(0,it,cb,ic0,ic1,con,it.k==1?0:1);
+        Joint_Connection(0,it,cb,cc->irregular_connections(ic0),cc->irregular_connections(ic1),con,it.k==1?0:1);
         if(it.k==0)
         {
             for(int j=0;j<it.X0.m;j++) cb.bc_v.Append(j);
