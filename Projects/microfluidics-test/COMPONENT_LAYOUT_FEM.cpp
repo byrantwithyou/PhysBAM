@@ -754,7 +754,7 @@ Make_Canonical_Joint_3_Average(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT
         }
         dirs(i)=ROTATION<TV>::From_Angle(tot).Rotated_X_Axis();
         w(i)=ROTATION<TV>::From_Angle(tot).Rotate(Elbow_Pit_Oriented(angles(i),cst.width));
-        tot+=key.angles(i);
+        tot+=angles(i);
     }
 
     CANONICAL_COMPONENT* cc=new CANONICAL_COMPONENT;
