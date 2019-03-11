@@ -1137,7 +1137,6 @@ Merge_Blocks(BLOCK_ID id,int con_id)
     BLOCK_ID id2=bl.connections(con_id).id;
     int con_id2=bl.connections(con_id).con_id;
     BLOCK& bl2=blocks(id2);
-    LOG::printf("merge: %P %P\n",id,id2);
 
     auto pr=Merge_Canonical_Blocks(bl.block,con_id,bl.xform,bl2.block,con_id2,bl2.xform);
     bl.block=pr->x;
@@ -1169,7 +1168,6 @@ Merge_Blocks(BLOCK_ID id,int con_id)
             blocks(b).connections(d).con_id=bl.connections.m;
         }
         bl.connections.Append(bl2.connections(c));
-        LOG::printf("A %P\n",id);
     }
 
     for(int i:bl2.edge_on)
@@ -1472,134 +1470,66 @@ Copy_Vector_Data(const BLOCK_VECTOR<T>& B,BLOCK_ID b,const DOF_PAIRS& dp,BLOCK_I
 // Function Fill_Block_Matrix
 //#####################################################################
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Fill_Block_Matrix(BLOCK_ID b)
+Fill_Block_Matrix(REFERENCE_BLOCK_DATA& rd)
 {
-    int ib=reference_block(b).y;
-    auto& mat=matrix_block_list(ib);
-    Init_Block_Matrix(mat,b,b);
-    const auto& rd=reference_block_data(ib);
+    BLOCK_ID b=rd.b;
     const auto& bl=blocks(b);
-    mat.Resize();
+    Init_Block_Matrix(rd.M,b,b);
 
-    Copy_Matrix_Data(mat,b,rd.pairs,rd.pairs,b,b);
+    Copy_Matrix_Data(rd.M,b,rd.pairs,rd.pairs,b,b);
 
     for(int cc=0;cc<bl.connections.m;cc++)
     {
         const auto& c=bl.connections(cc);
         if(c.con_id>=0)
         {
-            const auto& p=reference_block_data(reference_block(c.id).y).regular_pairs(c.con_id);
-            Copy_Matrix_Data(mat,c.id,p,p,b,b);
+            const auto& p=reference_block_data(blocks(c.id).ref_id).regular_pairs(c.con_id);
+            Copy_Matrix_Data(rd.M,c.id,p,p,b,b);
         }
         else
         {
             const auto& ic=irregular_connections(~c.con_id);
-            const auto& irbd=irregular_reference_block_data(ic.block_data);
+            const auto& irbd=reference_irregular_data(ic.ref_id);
             for(const auto& h:irbd.pairs)
-                Copy_Matrix_Data(mat,h.b,h.dof[0][1],h.dof[0][1],b,b);
+                Copy_Matrix_Data(rd.M,h.b,h.irreg_pairs[0][1],h.irreg_pairs[0][1],b,b);
         }
     }
 
     for(int e:bl.edge_on)
     {
         const auto& ic=irregular_connections(e);
-        const auto& irbd=irregular_reference_block_data(ic.block_data);
+        const auto& irbd=reference_irregular_data(ic.ref_id);
         for(const auto& h:irbd.pairs)
             if(h.b==b)
-                Copy_Matrix_Data(mat,h.b,h.dof[1][0],h.dof[1][0],ic.regular,ic.regular);
+                Copy_Matrix_Data(rd.M,h.b,h.irreg_pairs[1][0],h.irreg_pairs[1][0],ic.regular,ic.regular);
     }
 }
 //#####################################################################
 // Function Fill_Connection_Matrix
 //#####################################################################
-template<class T> int COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Fill_Connection_Matrix(BLOCK_ID b0,int con_id0,BLOCK_ID b1,int con_id1)
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Fill_Connection_Matrix(REFERENCE_CONNECTION_DATA& cd)
 {
-    auto key=std::make_tuple(blocks(b0).block,con_id0,blocks(b1).block,con_id1);
-    auto pr=regular_connection_matrix_blocks.Insert(key,0);
-    if(!pr.y) return *pr.x;
-    *pr.x=matrix_block_list.Add_End();
-    auto& mat=matrix_block_list(*pr.x);
-
-    Init_Block_Matrix(mat,b0,b1);
-    PHYSBAM_ASSERT(blocks(b0).connections(con_id0).master);
-    mat.Resize();
-    const auto& cb0=canonical_blocks(blocks(b0).block);
-    const auto& cb1=canonical_blocks(blocks(b1).block);
-    REFERENCE_BLOCK_DATA* rd[2];
-    rd[0]=&reference_block_data(reference_block(b0).y);
-    rd[1]=&reference_block_data(reference_block(b1).y);
-    DOF_PAIRS* pairs[2];
-    pairs[0]=&rd[0]->regular_pairs(con_id0);
-    pairs[1]=&rd[1]->regular_pairs(con_id1);
-    Visit_Regular_Cross_Section_Dofs(cb0.cross_sections(con_id0),
-        cb1.cross_sections(con_id1),true, // 0 is master
-        [&](int a,int b,bool o)
-        {
-            int f[2]={a,b};
-            int i=!o,r=rd[i]->dof_map_v(f[i]),s=rd[i]->dof_map_p(f[i]);
-            if(r>=0) pairs[o]->v.Append({r,f[o]});
-            if(s>=0) pairs[o]->p.Append({s,f[o]});
-        },
-        [&](int a,int b,bool o)
-        {
-            int f[2]={a,b};
-            int i=!o,r=rd[i]->dof_map_e(f[i]);
-            if(r>=0) pairs[o]->e.Append({r,f[o]});
-        });
-    Copy_Matrix_Data(mat,b0,rd[0]->pairs,*pairs[0],b0,b1);
-    Copy_Matrix_Data(mat,b1,*pairs[1],rd[1]->pairs,b0,b1);
-    return *pr.x;
+    Init_Block_Matrix(cd.M,cd.b[0],cd.b[1]);
+    PHYSBAM_ASSERT(blocks(cd.b[0]).connections(cd.con_id[0]).master);
+    auto& rd0=reference_block_data(blocks(cd.b[0]).ref_id);
+    auto& rd1=reference_block_data(blocks(cd.b[1]).ref_id);
+    Copy_Matrix_Data(cd.M,cd.b[0],rd0.pairs,rd0.regular_pairs(cd.con_id[0]),cd.b[0],cd.b[1]);
+    Copy_Matrix_Data(cd.M,cd.b[1],rd1.regular_pairs(cd.con_id[1]),rd1.pairs,cd.b[0],cd.b[1]);
 }
 //#####################################################################
 // Function Fill_Irregular_Connection_Matrix
 //#####################################################################
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Fill_Irregular_Connection_Matrix(IRREGULAR_CONNECTION& ic)
+Fill_Irregular_Connection_Matrix(REFERENCE_IRREGULAR_DATA& ri)
 {
-    ic.block_data=irregular_reference_block_data.Add_End();
-    auto& d=irregular_reference_block_data(ic.block_data);
-    HASHTABLE<BLOCK_ID,int> prs; // index into d.pairs
-
-    // Copy from irregular neighbors
-    REFERENCE_BLOCK_DATA* rd[2];
-    rd[0]=&reference_block_data(reference_block(ic.regular).y);
-    Visit_Irregular_Cross_Section_Dofs(ic,
-        canonical_blocks(blocks(ic.regular).block).cross_sections(ic.con_id),
-        [&](int a,BLOCK_ID b,int c,bool o)
-        {
-            auto y=prs.Insert(b,0);
-            if(y.y) *y.x=d.pairs.Add_End();
-            auto& z=d.pairs(*y.x);
-            rd[1]=&reference_block_data(reference_block(b).y);
-            int f[2]={a,c};
-            int i=!o,r=rd[i]->dof_map_v(f[i]),s=rd[i]->dof_map_p(f[i]);
-            for(int j=0;j<2;j++)
-            {
-                if(r>=0) z.dof[i][j].v.Append({r,f[j]});
-                if(s>=0) z.dof[i][j].p.Append({s,f[j]});
-            }
-        },
-        [&](int a,BLOCK_ID b,int c,bool o)
-        {
-            auto y=prs.Insert(b,0);
-            if(y.y) *y.x=d.pairs.Add_End();
-            auto& z=d.pairs(*y.x);
-            rd[1]=&reference_block_data(reference_block(b).y);
-            int f[2]={a,c};
-            int i=!o,r=rd[i]->dof_map_e(f[i]);
-            for(int j=0;j<2;j++)
-                if(r>=0) z.dof[i][j].e.Append({r,f[j]});
-        });
-
-    for(const auto&p:prs)
+    BLOCK_ID bb=irregular_connections(ri.ic_id).regular;
+    for(auto&z:ri.pairs)
     {
-        const auto& z=d.pairs(p.data);
-        auto& M=matrix_block_list(z.mat_id);
-        Init_Block_Matrix(M,ic.regular,p.key);
-        BLOCK_ID b[2]={ic.regular,p.key};
+        Init_Block_Matrix(z.M,bb,z.b);
+        BLOCK_ID b[2]={bb,z.b};
         for(int i=0;i<2;i++)
-            Copy_Matrix_Data(M,b[i],z.dof[0][i],z.dof[1][i],ic.regular,p.key);
+            Copy_Matrix_Data(z.M,b[i],z.irreg_pairs[0][i],z.irreg_pairs[1][i],bb,z.b);
     }
 }
 //#####################################################################
@@ -1615,61 +1545,74 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
     HASHTABLE<BLOCK_ID,int> lookup_matrix_by_block;
 
     Compute_Reference_Blocks();
+    Compute_Reference_Regular_Connections();
     Compute_Reference_Irregular_Connections();
-    matrix_block_list.Resize(reference_block_data.m);
+
+    for(auto& rd:reference_block_data)
+    {
+        Compute_Dof_Remapping(rd);
+        Compute_Dof_Pairs(rd);
+    }
+
+    for(auto& rc:reference_connection_data)
+        Compute_Dof_Pairs(rc);
+
+    for(auto& ri:reference_irregular_data)
+        Compute_Dof_Pairs(ri);
+
+    for(auto& rd:reference_block_data)
+    {
+        Fill_Block_Matrix(rd);
+        rd.mat_id=cem.Create_Matrix_Block(true);
+        cem.block_list(rd.mat_id).M=rd.M.M;
+    }
+
+    for(auto& rc:reference_connection_data)
+    {
+        Fill_Connection_Matrix(rc);
+        rc.mat_id=cem.Create_Matrix_Block(false);
+        cem.block_list(rc.mat_id).M=rc.M.M;
+    }
+
+    for(auto& ri:reference_irregular_data)
+    {
+        Fill_Irregular_Connection_Matrix(ri);
+        for(auto& d:ri.pairs)
+        {
+            d.mat_id=cem.Create_Matrix_Block(false);
+            cem.block_list(d.mat_id).M=d.M.M;
+        }
+    }
 
     for(BLOCK_ID b(0);b<blocks.m;b++)
     {
-        int i=reference_block(b).y;
-        if(reference_block(b).x==b)
-        {
-            Compute_Dof_Remapping(b);
-            Fill_Block_Matrix(b);
-        }
-        cem.Add_Block_Matrix_Entry(Value(b),Value(b),i+2);
-        nonzero_blocks.Append({b,b,i});
-    }
-
-    for(int i=0;i<matrix_block_list.m;i++)
-    {
-        int j=cem.Create_Matrix_Block(true);
-        cem.block_list(j).M=matrix_block_list(i).M;
+        int id=reference_block_data(blocks(b).ref_id).mat_id;
+        cem.Add_Block_Matrix_Entry(Value(b),Value(b),id);
+        nonzero_blocks.Append({b,b,id});
     }
 
     for(BLOCK_ID b(0);b<blocks.m;b++)
     {
         const auto& bl=blocks(b);
-
-        for(int c=0;c<bl.connections.m;c++)
+        for(int cc=0;cc<bl.connections.m;cc++)
         {
-            int con_id=bl.connections(c).con_id;
-            if(con_id>=0)
+            const auto& c=bl.connections(cc);
+            if(c.con_id>=0 && c.master)
             {
-                if(bl.connections(c).master)
-                {
-                    BLOCK_ID b2=bl.connections(c).id;
-                    int i=Fill_Connection_Matrix(b,c,b2,con_id);
-                    int j=cem.Create_Matrix_Block(false);
-                    cem.block_list(j).M=matrix_block_list(i).M;
-                    cem.Add_Block_Matrix_Entry(Value(b),Value(b2),j);
-                    nonzero_blocks.Append({b,b2,i});
-                }
+                auto reg_id=regular_connection_hash.Get(std::make_tuple(bl.ref_id,cc,blocks(c.id).ref_id,c.con_id));
+                int id=reference_connection_data(reg_id).mat_id;
+                cem.Add_Block_Matrix_Entry(Value(b),Value(c.id),id);
+                nonzero_blocks.Append({b,c.id,id});
             }
         }
     }
 
-    for(int i=0;i<irregular_connections.m;i++)
+    for(auto& ic:irregular_connections)
     {
-        auto& ic=irregular_connections(i);
-        int ref=ic.ref_ic;
-        if(ref==i) Fill_Irregular_Connection_Matrix(ic);
-        int bd=irregular_connections(ref).block_data;
-        const auto& d=irregular_reference_block_data(bd);
-        for(const auto& p:d.pairs)
+        auto &ri=reference_irregular_data(ic.ref_id);
+        for(const auto& p:ri.pairs)
         {
-            int j=cem.Create_Matrix_Block(false);
-            cem.block_list(j).M=matrix_block_list(p.mat_id).M;
-            cem.Add_Block_Matrix_Entry(Value(ic.regular),Value(p.b),j);
+            cem.Add_Block_Matrix_Entry(Value(ic.regular),Value(p.b),p.mat_id);
             nonzero_blocks.Append({ic.regular,p.b,p.mat_id});
         }
     }
@@ -1794,14 +1737,12 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Compute_Reference_Blocks()
 {
-    reference_block.Resize(blocks.m,no_init);
-
     typedef ARRAY<std::tuple<CANONICAL_BLOCK_ID,int,bool> > REG_CON;
     typedef ARRAY<std::tuple<int,CANONICAL_BLOCK_ID,int> > IRREG_CON_V;
     typedef ARRAY<std::tuple<int,CANONICAL_BLOCK_ID,int> > IRREG_CON_E;
     typedef std::tuple<CANONICAL_BLOCK_ID,REG_CON,IRREG_CON_V,IRREG_CON_E> KEY;
 
-    HASHTABLE<KEY,BLOCK_ID> h;
+    HASHTABLE<KEY,REFERENCE_BLOCK_ID> h;
 
     for(BLOCK_ID b(0);b<blocks.m;b++)
     {
@@ -1809,7 +1750,7 @@ Compute_Reference_Blocks()
         IRREG_CON_V irreg_con_v;
         IRREG_CON_E irreg_con_e;
 
-        const auto& bl=blocks(b);
+        auto& bl=blocks(b);
         for(int cc=0;cc<bl.connections.m;cc++)
         {
             const auto& c=bl.connections(cc);
@@ -1838,16 +1779,36 @@ Compute_Reference_Blocks()
         auto pr=h.Insert(std::make_tuple(bl.block,reg_con,irreg_con_v,irreg_con_e),{});
         if(pr.y)
         {
-            int i=reference_block_data.Add_End();
-            reference_block_data(i).regular_pairs.Resize(bl.connections.m);
-            reference_block(b)={b,i};
-            *pr.x=b;
+            *pr.x=reference_block_data.Add_End();
+            auto& rd=reference_block_data(*pr.x);
+            rd.b=b;
+            rd.regular_pairs.Resize(bl.connections.m);
         }
-        else reference_block(b)=reference_block(*pr.x);
+        bl.ref_id=*pr.x;
     }
 }
 //#####################################################################
-// Function Compute_Block_Hash
+// Function Compute_Reference_Regular_Connections
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Compute_Reference_Regular_Connections()
+{
+    for(BLOCK_ID b(0);b<blocks.m;b++)
+    {
+        const auto& bl=blocks(b);
+        for(int cc=0;cc<bl.connections.m;cc++)
+        {
+            const auto& c=bl.connections(cc);
+            if(c.con_id>=0 && c.master)
+            {
+                auto pr=regular_connection_hash.Insert(std::make_tuple(bl.ref_id,cc,blocks(c.id).ref_id,c.con_id),{});
+                if(pr.y) *pr.x=reference_connection_data.Append({{b,c.id},{cc,c.con_id}});
+            }
+        }
+    }
+}
+//#####################################################################
+// Function Compute_Reference_Irregular_Connections
 //#####################################################################
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Compute_Reference_Irregular_Connections()
@@ -1878,15 +1839,12 @@ Compute_Connection_Hash(BLOCK_ID b0,int con_id0,BLOCK_ID b1,int con_id1)
 // Function Compute_Dof_Remapping
 //#####################################################################
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Compute_Dof_Remapping(BLOCK_ID b)
+Compute_Dof_Remapping(REFERENCE_BLOCK_DATA& rd)
 {
-    LOG::printf("block: %P\n",b);
-    auto& rd=reference_block_data(reference_block(b).y);
-    const auto& bl=blocks(b);
+    const auto& bl=blocks(rd.b);
     const auto& cb=canonical_blocks(bl.block);
     rd.dof_map_v.Resize(cb.X.m,use_init,1);
     rd.dof_map_e.Resize(cb.S.m,use_init,1);
-    LOG::printf("A: %P %P\n",rd.dof_map_v,rd.dof_map_e);
 
     for(int cc=0;cc<bl.connections.m;cc++)
     {
@@ -1920,13 +1878,11 @@ Compute_Dof_Remapping(BLOCK_ID b)
                 });
         }
     }
-    LOG::printf("B: %P %P\n",rd.dof_map_v,rd.dof_map_e);
 
     int iv=0,ie=0,ip=0;
     rd.dof_map_p=rd.dof_map_v;
     rd.dof_map_v.Subset(cb.bc_v).Fill(0);
     rd.dof_map_e.Subset(cb.bc_e).Fill(0);
-    LOG::printf("C: %P %P %P\n",rd.dof_map_v,rd.dof_map_e,rd.dof_map_p);
     for(int i=0;i<rd.dof_map_v.m;i++)
         rd.dof_map_v(i)=rd.dof_map_v(i)?iv++:-1;
     for(int i=0;i<rd.dof_map_e.m;i++)
@@ -1936,21 +1892,6 @@ Compute_Dof_Remapping(BLOCK_ID b)
     rd.num_dofs_v=iv;
     rd.num_dofs_e=ie;
     rd.num_dofs_p=ip;
-    LOG::printf("D: %P %P %P\n",rd.dof_map_v,rd.dof_map_e,rd.dof_map_p);
-    LOG::printf("E: %P %P %P\n",rd.num_dofs_v,rd.num_dofs_e,rd.num_dofs_p);
-
-
-    // Copy from self
-    for(int i=0;i<rd.dof_map_v.m;i++)
-        if(rd.dof_map_v(i)>=0)
-            rd.pairs.v.Append({rd.dof_map_v(i),i});
-    for(int i=0;i<rd.dof_map_e.m;i++)
-        if(rd.dof_map_e(i)>=0)
-            rd.pairs.e.Append({rd.dof_map_e(i),i});
-    for(int i=0;i<rd.dof_map_p.m;i++)
-        if(rd.dof_map_p(i)>=0)
-            rd.pairs.p.Append({rd.dof_map_p(i),i});
-    LOG::printf("F: %P %P %P\n",rd.pairs.v,rd.pairs.e,rd.pairs.p);
 }
 //#####################################################################
 // Function Init_Block_Matrix
@@ -1958,8 +1899,8 @@ Compute_Dof_Remapping(BLOCK_ID b)
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Init_Block_Matrix(BLOCK_MATRIX<T>& M,BLOCK_ID a,BLOCK_ID b) const
 {
-    const auto& c=reference_block_data(reference_block(a).y);
-    const auto& d=reference_block_data(reference_block(b).y);
+    const auto& c=reference_block_data(blocks(a).ref_id);
+    const auto& d=reference_block_data(blocks(b).ref_id);
     M.nv_r=c.num_dofs_v;
     M.ne_r=c.num_dofs_e;
     M.np_r=c.num_dofs_p;
@@ -1974,7 +1915,7 @@ Init_Block_Matrix(BLOCK_MATRIX<T>& M,BLOCK_ID a,BLOCK_ID b) const
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Init_Block_Vector(BLOCK_VECTOR<T>& V,BLOCK_ID b) const
 {
-    const auto& c=reference_block_data(reference_block(b).y);
+    const auto& c=reference_block_data(blocks(b).ref_id);
     V.nv=c.num_dofs_v;
     V.ne=c.num_dofs_e;
     V.np=c.num_dofs_p;
@@ -2045,7 +1986,7 @@ Make_BC_Block(const PIPE_KEY& key,bool is_v) -> BC_KEY
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Apply_To_RHS(BLOCK_ID b,const BLOCK_VECTOR<T>& w)
 {
-    const auto& rd=reference_block_data(reference_block(b).y);
+    const auto& rd=reference_block_data(blocks(b).ref_id);
     const auto& bl=blocks(b);
 
     Copy_Vector_Data(w,b,rd.pairs,b);
@@ -2058,19 +1999,19 @@ Apply_To_RHS(BLOCK_ID b,const BLOCK_VECTOR<T>& w)
         else
         {
             const auto& ic=irregular_connections(~c.con_id);
-            const auto& irbd=irregular_reference_block_data(ic.block_data);
+            const auto& irbd=reference_irregular_data(ic.ref_id);
             for(const auto& h:irbd.pairs)
-                Copy_Vector_Data(w,b,h.dof[1][0],h.b);
+                Copy_Vector_Data(w,b,h.irreg_pairs[1][0],h.b);
         }
     }
 
     for(int e:bl.edge_on)
     {
         const auto& ic=irregular_connections(e);
-        const auto& irbd=irregular_reference_block_data(ic.block_data);
+        const auto& irbd=reference_irregular_data(ic.ref_id);
         for(const auto& h:irbd.pairs)
             if(h.b==b)
-                Copy_Vector_Data(w,b,h.dof[0][1],ic.regular);
+                Copy_Vector_Data(w,b,h.irreg_pairs[0][1],ic.regular);
     }
 }
 //#####################################################################
@@ -2162,6 +2103,100 @@ Eliminate_Non_Seperators(CACHED_ELIMINATION_MATRIX<T>& cem)
     }
     for(BLOCK_ID b(0);b<blocks.m;b++)
         assert(!cem.valid_row(Value(b)) || blocks(b).flags&1);
+}
+//#####################################################################
+// Function Compute_Dof_Pairs
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Compute_Dof_Pairs(REFERENCE_BLOCK_DATA& rd)
+{
+    // Copy from self
+    for(int i=0;i<rd.dof_map_v.m;i++)
+        if(rd.dof_map_v(i)>=0)
+            rd.pairs.v.Append({rd.dof_map_v(i),i});
+    for(int i=0;i<rd.dof_map_e.m;i++)
+        if(rd.dof_map_e(i)>=0)
+            rd.pairs.e.Append({rd.dof_map_e(i),i});
+    for(int i=0;i<rd.dof_map_p.m;i++)
+        if(rd.dof_map_p(i)>=0)
+            rd.pairs.p.Append({rd.dof_map_p(i),i});
+}
+//#####################################################################
+// Function Compute_Dof_Pairs
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Compute_Dof_Pairs(REFERENCE_CONNECTION_DATA& rc)
+{
+    const auto& cb0=canonical_blocks(blocks(rc.b[0]).block);
+    const auto& cb1=canonical_blocks(blocks(rc.b[1]).block);
+    REFERENCE_BLOCK_DATA* rd[2];
+    rd[0]=&reference_block_data(blocks(rc.b[0]).ref_id);
+    rd[1]=&reference_block_data(blocks(rc.b[1]).ref_id);
+    DOF_PAIRS* pairs[2];
+    pairs[0]=&rd[0]->regular_pairs(rc.con_id[0]);
+    pairs[1]=&rd[1]->regular_pairs(rc.con_id[1]);
+    Visit_Regular_Cross_Section_Dofs(cb0.cross_sections(rc.con_id[0]),
+        cb1.cross_sections(rc.con_id[1]),true, // 0 is master
+        [&](int a,int b,bool o)
+        {
+            int f[2]={a,b};
+            int i=!o,r=rd[i]->dof_map_v(f[i]),s=rd[i]->dof_map_p(f[i]);
+            if(r>=0) pairs[o]->v.Append({r,f[o]});
+            if(s>=0) pairs[o]->p.Append({s,f[o]});
+        },
+        [&](int a,int b,bool o)
+        {
+            int f[2]={a,b};
+            int i=!o,r=rd[i]->dof_map_e(f[i]);
+            if(r>=0) pairs[o]->e.Append({r,f[o]});
+        });
+}
+//#####################################################################
+// Function Compute_Dof_Pairs
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Compute_Dof_Pairs(REFERENCE_IRREGULAR_DATA& ri)
+{
+    auto& ic=irregular_connections(ri.ic_id);
+    HASHTABLE<BLOCK_ID,int> prs; // index into d.pairs
+
+    // Copy from irregular neighbors
+    REFERENCE_BLOCK_DATA* rd[2];
+    rd[0]=&reference_block_data(blocks(ic.regular).ref_id);
+    Visit_Irregular_Cross_Section_Dofs(ic,
+        canonical_blocks(blocks(ic.regular).block).cross_sections(ic.con_id),
+        [&](int a,BLOCK_ID b,int c,bool o)
+        {
+            auto y=prs.Insert(b,0);
+            if(y.y) *y.x=ri.pairs.Add_End();
+            auto& z=ri.pairs(*y.x);
+            rd[1]=&reference_block_data(blocks(b).ref_id);
+            int f[2]={a,c};
+            int i=!o,r=rd[i]->dof_map_v(f[i]),s=rd[i]->dof_map_p(f[i]);
+            for(int j=0;j<2;j++)
+            {
+                if(r>=0) z.irreg_pairs[i][j].v.Append({r,f[j]});
+                if(s>=0) z.irreg_pairs[i][j].p.Append({s,f[j]});
+            }
+        },
+        [&](int a,BLOCK_ID b,int c,bool o)
+        {
+            auto y=prs.Insert(b,0);
+            if(y.y) *y.x=ri.pairs.Add_End();
+            auto& z=ri.pairs(*y.x);
+            rd[1]=&reference_block_data(blocks(b).ref_id);
+            int f[2]={a,c};
+            int i=!o,r=rd[i]->dof_map_e(f[i]);
+            for(int j=0;j<2;j++)
+                if(r>=0) z.irreg_pairs[i][j].e.Append({r,f[j]});
+        });
+}
+//#####################################################################
+// Function Compute_Dof_Pairs
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Compute_Dof_Pairs()
+{
 }
 //#####################################################################
 // Function Visualize_Block_State
@@ -2266,7 +2301,7 @@ Visualize_Solution(BLOCK_ID b) const
     TV B=bl.xform.b;
     const auto& cb=canonical_blocks(bl.block);
     auto Z=[=](int i){return M*cb.X(i)+bl.xform.b;};
-    const auto& rd=reference_block_data(reference_block(b).y);
+    const auto& rd=reference_block_data(blocks(b).ref_id);
     const auto& U=rhs_block_list(b);
     for(int i=0;i<cb.X.m;i++)
         if(rd.dof_map_v(i)>=0)
@@ -2303,7 +2338,6 @@ Transform_Solution(const CACHED_ELIMINATION_MATRIX<T>& cem)
         const auto& A = xforms(blocks(b).xform.id);
         T s=1/sqrt(A.Determinant());
         auto F = A*s;
-        LOG::printf("xform %P\n",A);
 
         for(int i=0;i<U.nv;i++) U.Set_v(i,F*U.Get_v(i));
         for(int i=0;i<U.ne;i++) U.Set_e(i,F*U.Get_e(i));
@@ -2316,16 +2350,16 @@ Transform_Solution(const CACHED_ELIMINATION_MATRIX<T>& cem)
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Dump_World_Space_System() const
 {
-    SYSTEM_MATRIX_HELPER<T> h;
+    // SYSTEM_MATRIX_HELPER<T> h;
 
-    for(auto t:nonzero_blocks)
-    {
-        const BLOCK_MATRIX<T>& B=matrix_block_list(t.z);
-        BLOCK_MATRIX<T> M(B);
-        M.M.x.Fill(0);
-        Transform_To_World_Space(M,B,t.x,t.y);
+    // for(auto t:nonzero_blocks)
+    // {
+    //     const BLOCK_MATRIX<T>& B=matrix_block_list(t.z);
+    //     BLOCK_MATRIX<T> M(B);
+    //     M.M.x.Fill(0);
+    //     Transform_To_World_Space(M,B,t.x,t.y);
         
-    }
+    // }
 // struct SYSTEM_MATRIX_HELPER
 // {
 //     ARRAY<TRIPLE<int,int,T> > data;
