@@ -304,7 +304,8 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     struct VERTEX_DATA
     {
         TV X;
-        IRREGULAR_CONNECTION con;
+        BLOCK_CONNECTION con;
+        int ic=-7; // if con.id<0, vd holds irregular connection. ic is an index in irregular_connections.
     };
 
     void Emit_Component_Blocks(const CANONICAL_COMPONENT* cc,const XFORM& xf,ARRAY<VERTEX_DATA>& vd);

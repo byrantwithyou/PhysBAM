@@ -208,7 +208,7 @@ Parse_Input(const std::string& pipe_file)
 
                     VERTEX_DATA vd;
                     vd.X=C;
-                    vd.con.regular=b;
+                    vd.con.id=b;
                     vd.con.con_id=0;
                     connection_points.Set(name4,vd);
 
@@ -281,17 +281,18 @@ Parse_Input(const std::string& pipe_file)
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Set_Connector(VERTEX_DATA& vd,BLOCK_ID id,int con_id)
 {
-    if(vd.con.regular>=BLOCK_ID())
+    if(vd.con.id>=BLOCK_ID())
     {
-        blocks(vd.con.regular).connections(vd.con.con_id)={id,con_id};
-        blocks(id).connections(con_id)={vd.con.regular,vd.con.con_id};
+        blocks(vd.con.id).connections(vd.con.con_id)={id,con_id};
+        blocks(id).connections(con_id)={vd.con.id,vd.con.con_id};
     }
     else
     {
-        vd.con.regular=id;
-        vd.con.con_id=con_id;
-        if(vd.con.edge_on_v.m)
-            blocks(id).connections(con_id).con_id=~irregular_connections.Append(vd.con);
+        IRREGULAR_CONNECTION& con=irregular_connections(vd.ic);
+        con.regular=id;
+        con.con_id=con_id;
+        if(con.edge_on_v.m)
+            blocks(id).connections(con_id).con_id=~vd.ic;
     }
 }
 //#####################################################################
@@ -300,7 +301,7 @@ Set_Connector(VERTEX_DATA& vd,BLOCK_ID id,int con_id)
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Emit_Component_Blocks(const CANONICAL_COMPONENT* cc,const XFORM& xf,ARRAY<VERTEX_DATA>& vd)
 {
-    int offset=Value(blocks.m);
+    int offset=Value(blocks.m),offset_edge_on=irregular_connections.m;
     for(BLOCK_ID b(0);b<cc->blocks.m;b++)
     {
         auto& bb=blocks(blocks.Append(cc->blocks(b)));
@@ -311,6 +312,8 @@ Emit_Component_Blocks(const CANONICAL_COMPONENT* cc,const XFORM& xf,ARRAY<VERTEX
             else Set_Connector(vd(~Value(con.id)),b+offset,c);
         }
         bb.xform=Compose_Xform(xf,bb.xform);
+        for(auto& e:bb.edge_on)
+            e+=offset_edge_on;
     }
 
     for(auto a:cc->irregular_connections)
@@ -320,12 +323,11 @@ Emit_Component_Blocks(const CANONICAL_COMPONENT* cc,const XFORM& xf,ARRAY<VERTEX
         for(auto& b:a.edge_on_e)
             b.x+=offset;
 
-        if(a.regular>=BLOCK_ID())
-        {
-            a.regular+=offset;
-            irregular_connections.Append(a);
-        }
-        else vd(~Value(a.regular)).con=a;
+        int index=irregular_connections.Append(a);
+        IRREGULAR_CONNECTION& con=irregular_connections(index);
+        if(con.regular>=BLOCK_ID())
+            con.regular+=offset;
+        else vd(~Value(con.regular)).ic=index;
     }
 }
 //#####################################################################
