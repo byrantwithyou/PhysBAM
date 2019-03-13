@@ -123,28 +123,6 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     };
     std::map<JOINT_KEY,PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > > canonical_joints;
 
-    struct PIPE_CHANGE_KEY
-    {
-        int num_dofs[2];
-        T width[2];
-        T length;
-
-        bool operator<(const PIPE_CHANGE_KEY& p) const
-        {
-            for(int i=0;i<2;i++)
-            {
-                if(num_dofs[i]<p.num_dofs[i]) return true;
-                if(p.num_dofs[i]<num_dofs[i]) return false;
-                if(width[i]<p.width[i]-comp_tol) return true;
-                if(p.width[i]<width[i]-comp_tol) return false;
-            }
-            if(length<p.length-comp_tol) return true;
-            return false;
-        }
-    };
-    std::map<PIPE_CHANGE_KEY,CANONICAL_COMPONENT<T>*> canonical_changes;
-    std::map<PIPE_CHANGE_KEY,CANONICAL_BLOCK<T>*> canonical_change_blocks;
-
     typedef TRIPLE<CANONICAL_BLOCK<T>*,INTERVAL<int>,INTERVAL<int> > BC_KEY;
     std::map<PIPE_KEY<T>,BC_KEY> canonical_bc_blocks[2];
     BC_KEY Make_BC_Block(const PIPE_KEY<T>& key,bool is_v);
@@ -154,8 +132,6 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > Make_Canonical_Joint_3_Small(const JOINT_KEY& key);
     PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > Make_Canonical_Joint_3_Average(const JOINT_KEY& key);
     PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > Make_Canonical_Joint_3(const JOINT_KEY& key);
-    CANONICAL_COMPONENT<T>* Make_Canonical_Pipe_Change(const PIPE_CHANGE_KEY& key);
-    CANONICAL_BLOCK<T>* Make_Canonical_Change_Block(const PIPE_CHANGE_KEY& key);
     std::tuple<TV,T,T> Elbow_Pit(T angle,T width) const;
     TV Elbow_Pit_Oriented(T angle,T width) const;
     VECTOR<TV,2> Extrude(const TV& v0,const TV& v1,const TV& n) const;
