@@ -15,6 +15,7 @@
 #include <list>
 #include "BLOCK_MESHING_ITERATOR.h"
 #include "CACHED_ELIMINATION_MATRIX.h"
+#include "COMPONENT_BC.h"
 #include "COMPONENT_CHANGE.h"
 #include "COMPONENT_LAYOUT_FEM.h"
 #include "COMPONENT_PIPE.h"
@@ -51,6 +52,7 @@ template<class T> COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 {
     delete analytic_velocity;
     delete analytic_pressure;
+    for(auto& p:canonical_block_matrices) delete p.key;
 }
 //#####################################################################
 // Function Parse_Input
@@ -73,6 +75,7 @@ Parse_Input(const std::string& pipe_file)
     HASHTABLE<std::string,VERTEX_DATA> connection_points;
     COMPONENT_PIPE<T> comp_pipe;
     COMPONENT_CHANGE<T> comp_change;
+    COMPONENT_BC<T> comp_bc;
     comp_pipe.target_length=target_length;
     comp_change.target_length=target_length;
     
@@ -215,7 +218,7 @@ Parse_Input(const std::string& pipe_file)
                     TV B=vertices.Get(name3);
                     TV dir=(B-A).Normalized();
                     TV C=A+dir*key.length;
-                    auto pr=Make_BC_Block(key,c=='u');
+                    auto pr=comp_bc.Make_Block(key,c=='u');
                     CANONICAL_BLOCK<T>* cb=pr.x;
 
                     BLOCK_ID b=blocks.Add_End();
@@ -1722,53 +1725,6 @@ Init_Block_Vector(BLOCK_VECTOR<T>& V,const CANONICAL_BLOCK<T>* cb) const
     V.ne=cb->S.m;
     V.np=cb->X.m;
     V.Resize();
-}
-//#####################################################################
-// Function Make_BC_V_Block
-//#####################################################################
-template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Make_BC_Block(const PIPE_KEY<T>& key,bool is_v) -> BC_KEY
-{
-    auto it=canonical_bc_blocks[is_v].insert({key,{}});
-    if(!it.second) return it.first->second;
-
-    it.first->second.x=new CANONICAL_BLOCK<T>;
-    auto* cb=it.first->second.x;
-
-    int n=key.num_dofs;
-    PHYSBAM_ASSERT(n%2);
-    cb->X.Resize(2*n);
-    cb->S.Resize(4*(n-1)+1);
-    for(int i=0;i<n;i++)
-    {
-        T y=key.width/(n-1)*i-key.width/2;
-        cb->X(i)=TV(0,y);
-        cb->X(i+n)=TV(key.length,y);
-    }
-
-    for(int i=0;i<n-1;i++)
-    {
-        cb->E.Append({i,i+n,i+1});
-        cb->E.Append({i+n,i+n+1,i+1});
-        cb->S(i)={i,i+1};
-        cb->S(i+(n-1))={i+n,i+n+1};
-        cb->S(i+2*(n-1))={i+n,i+1};
-        cb->S(i+3*(n-1))={i,i+n};
-    }
-    cb->S(4*(n-1))={n-1,2*n-1};
-
-    cb->cross_sections.Append({{n,2*n},{n-1,2*(n-1)},true});
-    cb->bc_v.Append(0);
-    if(is_v) for(int i=1;i<n-1;i++) cb->bc_v.Append(i);
-    cb->bc_v.Append(n-1);
-    cb->bc_v.Append(n);
-    cb->bc_v.Append(2*n-1);
-    if(is_v) for(int i=0;i<n-1;i++) cb->bc_e.Append(i);
-    cb->bc_e.Append(3*(n-1));
-    cb->bc_e.Append(4*(n-1));
-    it.first->second.y={0,n};
-    it.first->second.z={0,n-1};
-    return it.first->second;
 }
 //#####################################################################
 // Function Apply_To_RHS

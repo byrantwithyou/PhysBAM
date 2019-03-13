@@ -123,10 +123,6 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     };
     std::map<JOINT_KEY,PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > > canonical_joints;
 
-    typedef TRIPLE<CANONICAL_BLOCK<T>*,INTERVAL<int>,INTERVAL<int> > BC_KEY;
-    std::map<PIPE_KEY<T>,BC_KEY> canonical_bc_blocks[2];
-    BC_KEY Make_BC_Block(const PIPE_KEY<T>& key,bool is_v);
-
     PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > Make_Canonical_Joint(const JOINT_KEY& key);
     PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > Make_Canonical_Joint_2(const JOINT_KEY& key);
     PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > Make_Canonical_Joint_3_Small(const JOINT_KEY& key);
