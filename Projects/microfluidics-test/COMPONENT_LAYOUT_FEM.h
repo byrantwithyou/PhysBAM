@@ -29,7 +29,6 @@ PHYSBAM_DECLARE_ELEMENT_ID(COMPONENT_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_
 PHYSBAM_DECLARE_ELEMENT_ID(SEPARATOR_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
 PHYSBAM_DECLARE_ELEMENT_ID(CANONICAL_BLOCK_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
 PHYSBAM_DECLARE_ELEMENT_ID(REFERENCE_BLOCK_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
-PHYSBAM_DECLARE_ELEMENT_ID(CROSS_SECTION_TYPE_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
 PHYSBAM_DECLARE_ELEMENT_ID(REFERENCE_CONNECTION_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
 PHYSBAM_DECLARE_ELEMENT_ID(REFERENCE_IRREGULAR_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
 PHYSBAM_DECLARE_ELEMENT_ID(IRREG_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
@@ -46,26 +45,6 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     static constexpr T comp_tol=(T)1e-10;
     T target_length;
     T mu=1;
-
-    struct CROSS_SECTION_TYPE
-    {
-        int num_dofs;
-        T width;
-        int Cmp(const CROSS_SECTION_TYPE& c) const
-        {
-            if(num_dofs<c.num_dofs) return -1;
-            if(c.num_dofs<num_dofs) return 1;
-            if(width<c.width-comp_tol) return -1;
-            if(c.width<width-comp_tol) return 1;
-            return 0;
-        }
-
-        bool operator<(const CROSS_SECTION_TYPE& c) const
-        {return Cmp(c)<0;}
-    };
-
-    ARRAY<CROSS_SECTION_TYPE,CROSS_SECTION_TYPE_ID> cross_section_types;
-    std::map<CROSS_SECTION_TYPE,CROSS_SECTION_TYPE_ID> cross_section_type_lookup;
     
     // v = range of vertex indices in cross section
     // e = range of edge indices in cross section
@@ -177,11 +156,15 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
 
     struct PIPE_KEY
     {
-        CROSS_SECTION_TYPE_ID type;
+        int num_dofs;
+        T width;
         T length;
         bool operator<(const PIPE_KEY& p) const
         {
-            if(type!=p.type) return type<p.type;
+            if(num_dofs<p.num_dofs) return true;
+            if(p.num_dofs<num_dofs) return false;
+            if(width<p.width-comp_tol) return true;
+            if(p.width<width-comp_tol) return false;
             if(length<p.length-comp_tol) return true;
             return false;
         }
@@ -191,11 +174,15 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
 
     struct JOINT_KEY
     {
-        CROSS_SECTION_TYPE_ID type;
+        int num_dofs;
+        T width;
         ARRAY<T> angles;
         bool operator<(const JOINT_KEY& p) const
         {
-            if(type!=p.type) return type<p.type;
+            if(num_dofs<p.num_dofs) return true;
+            if(p.num_dofs<num_dofs) return false;
+            if(width<p.width-comp_tol) return true;
+            if(p.width<width-comp_tol) return false;
             if(angles.m!=p.angles.m) return angles.m<p.angles.m;
             for(int i=0;i<angles.m;i++)
             {
@@ -209,14 +196,19 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
 
     struct PIPE_CHANGE_KEY
     {
-        CROSS_SECTION_TYPE_ID type[2];
+        int num_dofs[2];
+        T width[2];
         T length;
 
         bool operator<(const PIPE_CHANGE_KEY& p) const
         {
             for(int i=0;i<2;i++)
-                if(type[i]!=p.type[i])
-                    return type[i]<p.type[i];
+            {
+                if(num_dofs[i]<p.num_dofs[i]) return true;
+                if(p.num_dofs[i]<num_dofs[i]) return false;
+                if(width[i]<p.width[i]-comp_tol) return true;
+                if(p.width[i]<width[i]-comp_tol) return false;
+            }
             if(length<p.length-comp_tol) return true;
             return false;
         }
@@ -285,7 +277,6 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     CANONICAL_BLOCK_ID Make_Canonical_Pipe_Block(const PIPE_KEY& key);
     CANONICAL_COMPONENT* Make_Canonical_Pipe_Change(const PIPE_CHANGE_KEY& key);
     CANONICAL_BLOCK_ID Make_Canonical_Change_Block(const PIPE_CHANGE_KEY& key);
-    CROSS_SECTION_TYPE_ID Get_Cross_Section_ID(const CROSS_SECTION_TYPE& cs);
     void Compute();
     void Update_Masters();
 

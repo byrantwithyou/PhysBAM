@@ -65,7 +65,7 @@ Parse_Input(const std::string& pipe_file)
     T t0,t1;
     char c;
     TV v0;
-    HASHTABLE<std::string,CROSS_SECTION_TYPE_ID> cross_section_hash;
+    HASHTABLE<std::string,PAIR<int,T> > cross_section_hash;
     HASHTABLE<std::string,TV> vertices;
     HASHTABLE<std::string,VERTEX_DATA> connection_points;
 
@@ -82,7 +82,7 @@ Parse_Input(const std::string& pipe_file)
 
             case 'c':
                 ss>>name>>i0>>t0;
-                cross_section_hash.Set(name,Get_Cross_Section_ID({i0,t0}));
+                cross_section_hash.Set(name,{i0,t0});
                 break;
 
             case 'v':
@@ -94,7 +94,9 @@ Parse_Input(const std::string& pipe_file)
                 {
                     ss>>name2>>i0>>name3;
                     JOINT_KEY key;
-                    key.type=cross_section_hash.Get(name2);
+                    auto cs=cross_section_hash.Get(name2);
+                    key.num_dofs=cs.x;
+                    key.width=cs.y;
                     TV O=vertices.Get(name3);
                     ARRAY<PAIR<TV,std::string> > verts;
                     for(int i=0;i<i0;i++)
@@ -139,7 +141,9 @@ Parse_Input(const std::string& pipe_file)
                     connection_points.Delete(name2);
                     connection_points.Delete(name3);
                     PIPE_KEY key;
-                    key.type=cross_section_hash.Get(name);
+                    auto cs=cross_section_hash.Get(name);
+                    key.num_dofs=cs.x;
+                    key.width=cs.y;
                     TV dir=vd(1).X-vd(0).X;
                     if(!Canonical_Direction(dir))
                     {
@@ -157,8 +161,12 @@ Parse_Input(const std::string& pipe_file)
                 {
                     PIPE_CHANGE_KEY key;
                     ss>>name>>name2;
-                    key.type[0]=cross_section_hash.Get(name);
-                    key.type[1]=cross_section_hash.Get(name2);
+                    auto cs0=cross_section_hash.Get(name);
+                    key.num_dofs[0]=cs0.x;
+                    key.width[0]=cs0.y;
+                    auto cs1=cross_section_hash.Get(name2);
+                    key.num_dofs[1]=cs1.x;
+                    key.width[1]=cs1.y;
                     ss>>name>>name2>>t0>>t1;
                     TV A=vertices.Get(name);
                     TV B=vertices.Get(name2);
@@ -189,7 +197,9 @@ Parse_Input(const std::string& pipe_file)
                     PIPE_KEY key;
                     key.length=target_length;
                     ss>>name>>name2>>name3>>name4;
-                    key.type=cross_section_hash.Get(name);
+                    auto cs=cross_section_hash.Get(name);
+                    key.num_dofs=cs.x;
+                    key.width=cs.y;
                     if(c=='u') ss>>t0;
                     else ss>>v0;
                     TV A=vertices.Get(name2);
@@ -242,22 +252,6 @@ Parse_Input(const std::string& pipe_file)
                         bc.data_e.Fill(v0);
                         bc_t.Append(bc);
                     }
-                }
-                break;
-            case 'T':
-                {
-                    // BOUNDARY_CONDITION bc;
-                    // bc.bc_type=BC_TYPE::traction;
-                    // if(c=='T') bc.bc_type=BC_TYPE::analytic;
-                    // ss>>name>>name2;
-                    // bc.type=cross_section_hash.Get(name);
-                    // VERTEX_DATA& vd=connection_points.Get(name2);
-                    // ss>>name2>>name3;
-                    // TV A=vertices.Get(name2);
-                    // TV B=vertices.Get(name3);
-                    // bc.normal=(B-A).Normalized();
-                    // if(c=='t') ss>>bc.traction;
-                    // vd.bc_id=boundary_conditions.Append(bc);
                 }
                 break;
             case 'U':
@@ -347,15 +341,14 @@ Make_Canonical_Pipe_Block(const PIPE_KEY& key) -> CANONICAL_BLOCK_ID
 
     it.first->second=canonical_blocks.Add_End();
     auto& cb=canonical_blocks(it.first->second);
-    const auto& cst=cross_section_types(key.type);
 
-    int n=cst.num_dofs;
+    int n=key.num_dofs;
     PHYSBAM_ASSERT(n%2);
     cb.X.Resize(2*n);
     cb.S.Resize(4*(n-1)+1);
     for(int i=0;i<n;i++)
     {
-        T y=cst.width/(n-1)*i-cst.width/2;
+        T y=key.width/(n-1)*i-key.width/2;
         cb.X(i)=TV(0,y);
         cb.X(i+n)=TV(key.length,y);
     }
@@ -393,7 +386,7 @@ Make_Canonical_Pipe(const PIPE_KEY& key) -> CANONICAL_COMPONENT*
     T offset=0;
     if(length>target_length*(T)1.5)
     {
-        CANONICAL_BLOCK_ID id=Make_Canonical_Pipe_Block({key.type,target_length});
+        CANONICAL_BLOCK_ID id=Make_Canonical_Pipe_Block({key.num_dofs,key.width,target_length});
         while(length>target_length*(T)1.5)
         {
             cc->blocks.Append(
@@ -406,7 +399,7 @@ Make_Canonical_Pipe(const PIPE_KEY& key) -> CANONICAL_COMPONENT*
             offset+=target_length;
         }
     }
-    CANONICAL_BLOCK_ID id=Make_Canonical_Pipe_Block({key.type,length});
+    CANONICAL_BLOCK_ID id=Make_Canonical_Pipe_Block({key.num_dofs,key.width,length});
     cc->blocks.Append(
         {
             id,
@@ -513,7 +506,6 @@ template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Make_Canonical_Joint_3_Small(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,ARRAY<T> >
 {
     T sep=target_length;
-    const CROSS_SECTION_TYPE& cst=cross_section_types(key.type);
     ARRAY<T> angles(key.angles);
     angles.Append(2*pi-key.angles.Sum());
     int k=0;
@@ -527,7 +519,7 @@ Make_Canonical_Joint_3_Small(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,
             min_abs_angle=angles(i);
         }
         dirs(i)=ROTATION<TV>::From_Angle(tot).Rotated_X_Axis();
-        w(i)=ROTATION<TV>::From_Angle(tot).Rotate(Elbow_Pit_Oriented(angles(i),cst.width));
+        w(i)=ROTATION<TV>::From_Angle(tot).Rotate(Elbow_Pit_Oriented(angles(i),key.width));
         tot+=angles(i);
     }
 
@@ -542,7 +534,7 @@ Make_Canonical_Joint_3_Small(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,
     CANONICAL_COMPONENT* cc=new CANONICAL_COMPONENT;
     ARRAY<TV> t0;
     t0.Append(s0.Last());
-    for(BLOCK_MESHING_ITERATOR<TV> it(s0,s1,cst.num_dofs-1,target_length);it.Valid();it.Next())
+    for(BLOCK_MESHING_ITERATOR<TV> it(s0,s1,key.num_dofs-1,target_length);it.Valid();it.Next())
     {
         CANONICAL_BLOCK_ID id=canonical_blocks.Add_End();
         CANONICAL_BLOCK& cb=canonical_blocks.Last();
@@ -555,7 +547,7 @@ Make_Canonical_Joint_3_Small(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,
         t0.Append(it.X1.Last());
     }
     VECTOR<TV,2> g0=Extrude(w((k+1)%3),w(k),dirs((k+1)%3)),g1=Extrude(w((k+2)%3),w(k),dirs(k));
-    ARRAY<TV> t1=Polyline({g0(0),w(k),g1(0)},cst.width/(cst.num_dofs-1));
+    ARRAY<TV> t1=Polyline({g0(0),w(k),g1(0)},key.width/(key.num_dofs-1));
     int nseg=rint(w(k).Magnitude()/target_length);
     for(BLOCK_MESHING_ITERATOR<TV> it(t0,t1,nseg,target_length);it.Valid();it.Next())
     {
@@ -563,7 +555,7 @@ Make_Canonical_Joint_3_Small(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,
         CANONICAL_BLOCK& cb=canonical_blocks.Last();
         it.Build(cb.X,cb.E,cb.S);
         cb.bc_v={0,it.X0.m-1,it.X0.m,cb.X.m-1};
-        if(it.k==nseg-1) cb.bc_v.Append(it.X0.m+cst.num_dofs-1);
+        if(it.k==nseg-1) cb.bc_v.Append(it.X0.m+key.num_dofs-1);
         cb.bc_e={it.First_Diagonal_Edge(),it.Last_Diagonal_Edge()};
         cc->blocks.Append({id,{}});
     }
@@ -577,7 +569,6 @@ template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Make_Canonical_Joint_3_Average(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,ARRAY<T> >
 {
     T sep=2*target_length;
-    const CROSS_SECTION_TYPE& cst=cross_section_types(key.type);
     ARRAY<T> angles(key.angles);
     angles.Append(2*pi-key.angles.Sum());
     int k=0;
@@ -591,7 +582,7 @@ Make_Canonical_Joint_3_Average(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT
             max_abs_angle=angles(i);
         }
         dirs(i)=ROTATION<TV>::From_Angle(tot).Rotated_X_Axis();
-        w(i)=ROTATION<TV>::From_Angle(tot).Rotate(Elbow_Pit_Oriented(angles(i),cst.width));
+        w(i)=ROTATION<TV>::From_Angle(tot).Rotate(Elbow_Pit_Oriented(angles(i),key.width));
         tot+=angles(i);
     }
 
@@ -601,7 +592,7 @@ Make_Canonical_Joint_3_Average(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT
     ARRAY<TV> s0=Polyline({w((k+1)%3),e(0)},target_length),s1=Polyline({w((k+2)%3),e(1)},target_length),b;
     IRREG_ID index=cc->irregular_connections.Add_End();
     IRREG_ID ick2=cc->irregular_connections.Append({BLOCK_ID(~((k+2)%3))});
-    for(BLOCK_MESHING_ITERATOR<TV> it(s0,s1,cst.num_dofs-1,target_length);it.Valid();it.Next())
+    for(BLOCK_MESHING_ITERATOR<TV> it(s0,s1,key.num_dofs-1,target_length);it.Valid();it.Next())
     {
         CANONICAL_BLOCK_ID id=canonical_blocks.Add_End();
         CANONICAL_BLOCK& cb=canonical_blocks.Last();
@@ -627,7 +618,7 @@ Make_Canonical_Joint_3_Average(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT
     IRREG_ID ick1=cc->irregular_connections.Append({BLOCK_ID(~((k+1)%3))});
     IRREG_ID ick=cc->irregular_connections.Append({BLOCK_ID(~k)});
     int offset=Value(cc->blocks.m);
-    for(BLOCK_MESHING_ITERATOR<TV> it(t0,t1,cst.num_dofs-1,target_length);it.Valid();it.Next())
+    for(BLOCK_MESHING_ITERATOR<TV> it(t0,t1,key.num_dofs-1,target_length);it.Valid();it.Next())
     {
         CANONICAL_BLOCK_ID id=canonical_blocks.Add_End();
         CANONICAL_BLOCK& cb=canonical_blocks.Last();
@@ -696,18 +687,17 @@ Joint_Connection(int offset,BLOCK_MESHING_ITERATOR<TV>& it,CANONICAL_BLOCK& cb,
 template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Make_Canonical_Joint_2(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,ARRAY<T> >
 {
-    const CROSS_SECTION_TYPE& cst=cross_section_types(key.type);
-    T width=cst.width,sep=target_length;
+    T width=key.width,sep=target_length;
     TV vert;
     T ext,angle;
     std::tie(vert,ext,angle)=Elbow_Pit(key.angles(0),width);
     PAIR<ARRAY<TV>,ARRAY<TV> > sides=Arc(vert,angle,width,sep,sep);
 
     CANONICAL_COMPONENT* cc=new CANONICAL_COMPONENT;
-    cc->blocks.Resize(BLOCK_ID(cst.num_dofs-1));
+    cc->blocks.Resize(BLOCK_ID(key.num_dofs-1));
     IRREG_ID ic0=cc->irregular_connections.Append({BLOCK_ID(~0)});
     IRREG_ID ic1=cc->irregular_connections.Append({BLOCK_ID(~1)});
-    for(BLOCK_MESHING_ITERATOR<TV> it(sides.x,sides.y,cst.num_dofs-1,target_length);it.Valid();it.Next())
+    for(BLOCK_MESHING_ITERATOR<TV> it(sides.x,sides.y,key.num_dofs-1,target_length);it.Valid();it.Next())
     {
         CANONICAL_BLOCK_ID id=canonical_blocks.Add_End();
         CANONICAL_BLOCK& cb=canonical_blocks.Last();
@@ -765,19 +755,15 @@ Make_Canonical_Pipe_Change(const PIPE_CHANGE_KEY& key) -> CANONICAL_COMPONENT*
     CANONICAL_COMPONENT* cc=new CANONICAL_COMPONENT;
     it.first->second=cc;
 
-    auto c0=cross_section_types(key.type[0]);
-    auto c1=cross_section_types(key.type[1]);
-    T w0=c0.width,w1=c1.width,dw=w1-w0,wid=key.length/num_sec;
-    int d0=c0.num_dofs,d1=c1.num_dofs,dd=d1-d0;
+    T w0=key.width[0],w1=key.width[1],dw=w1-w0,wid=key.length/num_sec;
+    int d0=key.num_dofs[0],d1=key.num_dofs[1],dd=d1-d0;
     for(int i=0;i<num_sec;i++)
     {
         T ow=w0+dw*i/num_sec;
         T nw=w0+dw*(i+1)/num_sec;
         int od=d0+dd*i/num_sec;
         int nd=d0+dd*(i+1)/num_sec;
-        auto oid=Get_Cross_Section_ID({od,ow});
-        auto nid=Get_Cross_Section_ID({nd,nw});
-        PIPE_CHANGE_KEY k={{oid,nid},wid};
+        PIPE_CHANGE_KEY k={{od,nd},{ow,nw},wid};
         CANONICAL_BLOCK_ID id=Make_Canonical_Change_Block(k);
         cc->blocks.Append(
             {
@@ -828,18 +814,16 @@ Make_Canonical_Change_Block(const PIPE_CHANGE_KEY& key) -> CANONICAL_BLOCK_ID
 
     it.first->second=canonical_blocks.Add_End();
     auto& cb=canonical_blocks(it.first->second);
-    const auto& cst0=cross_section_types(key.type[0]);
-    const auto& cst1=cross_section_types(key.type[1]);
 
-    int n0=cst0.num_dofs;
-    int n1=cst1.num_dofs;
+    int n0=key.num_dofs[0];
+    int n1=key.num_dofs[1];
     PHYSBAM_ASSERT(n0%2);
     PHYSBAM_ASSERT(n1%2);
     cb.X.Resize(n0+n1);
     for(int i=0;i<n0;i++)
-        cb.X(i)=TV(0,cst0.width/n0*i-cst0.width/2);
+        cb.X(i)=TV(0,key.width[0]/n0*i-key.width[0]/2);
     for(int i=0;i<n1;i++)
-        cb.X(i+n0)=TV(key.length,cst1.width/n1*i-cst1.width/2);
+        cb.X(i+n0)=TV(key.length,key.width[1]/n1*i-key.width[1]/2);
 
     Cross_Section_Topology(cb.E,cb.S,
         [&cb](int a,int b){return cb.X(a+1).y<=cb.X(b+1).y;},n0,n1,cb.bc_e);
@@ -847,16 +831,6 @@ Make_Canonical_Change_Block(const PIPE_CHANGE_KEY& key) -> CANONICAL_BLOCK_ID
 
     cb.cross_sections.Append({{0,n0},{0,n0-1},false});
     cb.cross_sections.Append({{n0,2*n0},{n0-1,n0+n1-2},true});
-    return it.first->second;
-}
-//#####################################################################
-// Function Get_Cross_Section_ID
-//#####################################################################
-template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Get_Cross_Section_ID(const CROSS_SECTION_TYPE& cs) -> CROSS_SECTION_TYPE_ID
-{
-    auto it=cross_section_type_lookup.insert({cs,{}});
-    if(it.second) it.first->second=cross_section_types.Append(cs);
     return it.first->second;
 }
 //#####################################################################
@@ -1915,15 +1889,14 @@ Make_BC_Block(const PIPE_KEY& key,bool is_v) -> BC_KEY
 
     it.first->second.x=canonical_blocks.Add_End();
     auto& cb=canonical_blocks(it.first->second.x);
-    const auto& cst=cross_section_types(key.type);
 
-    int n=cst.num_dofs;
+    int n=key.num_dofs;
     PHYSBAM_ASSERT(n%2);
     cb.X.Resize(2*n);
     cb.S.Resize(4*(n-1)+1);
     for(int i=0;i<n;i++)
     {
-        T y=cst.width/(n-1)*i-cst.width/2;
+        T y=key.width/(n-1)*i-key.width/2;
         cb.X(i)=TV(0,y);
         cb.X(i+n)=TV(key.length,y);
     }
