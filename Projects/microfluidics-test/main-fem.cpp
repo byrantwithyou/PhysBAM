@@ -37,7 +37,8 @@ void Run(PARSE_ARGS& parse_args)
 
     int threads=1;
     bool quiet=false,use_krylov=false,print_system=false;
-    std::string pipe_file;
+    std::string pipe_file,output_dir="output";
+    parse_args.Add("-o",&output_dir,"dir","output dir");
     parse_args.Add("-mu",&mu,"mu","viscosity");
     parse_args.Add("-q",&quiet,"disable diagnostics; useful for timing");
     parse_args.Add("-k",&use_krylov,"solve with Krylov method");
@@ -55,7 +56,7 @@ void Run(PARSE_ARGS& parse_args)
     timer("parse input");
 
     GRID<TV> grid(TV_INT()+1,cl.Compute_Bounding_Box(),true);
-    VIEWER_OUTPUT<TV> vo(STREAM_TYPE(0.f),grid,"output");
+    VIEWER_OUTPUT<TV> vo(STREAM_TYPE(0.f),grid,output_dir);
     vo.debug_particles.debug_particles.template Add_Array<T>("display_size");
 
     if(!quiet)
