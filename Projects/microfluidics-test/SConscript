@@ -14,4 +14,5 @@ Automatic_Program(env,"micro",["main.cpp","PARSE_DATA.cpp","FLUID_LAYOUT.cpp",
 Automatic_Program(env,"fem",["main-fem.cpp","CACHED_ELIMINATION_MATRIX.cpp",
                                "FLAT_SYSTEM.cpp","FREQUENCY_TRACKER.cpp",
                                "JOB_SCHEDULER.cpp","COMPONENT_LAYOUT_FEM.cpp",
-                               "COMPONENT_PIPE.cpp","COMPONENT_CHANGE.cpp","COMPONENT_BC.cpp"])
+                               "COMPONENT_PIPE.cpp","COMPONENT_CHANGE.cpp",
+                               "COMPONENT_BC.cpp","COMPONENT_JOINT.cpp"])

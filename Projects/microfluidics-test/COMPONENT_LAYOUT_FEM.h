@@ -99,44 +99,6 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
 
     ARRAY<IRREGULAR_CONNECTION,IRREG_ID> irregular_connections;
 
-    // CANONICAL_COMPONENT construction
-
-    struct JOINT_KEY
-    {
-        int num_dofs;
-        T width;
-        ARRAY<T> angles;
-        bool operator<(const JOINT_KEY& p) const
-        {
-            if(num_dofs<p.num_dofs) return true;
-            if(p.num_dofs<num_dofs) return false;
-            if(width<p.width-comp_tol) return true;
-            if(p.width<width-comp_tol) return false;
-            if(angles.m!=p.angles.m) return angles.m<p.angles.m;
-            for(int i=0;i<angles.m;i++)
-            {
-                if(angles(i)<p.angles(i)-comp_tol) return true;
-                if(p.angles(i)<angles(i)-comp_tol) return false;
-            }
-            return false;
-        }
-    };
-    std::map<JOINT_KEY,PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > > canonical_joints;
-
-    PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > Make_Canonical_Joint(const JOINT_KEY& key);
-    PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > Make_Canonical_Joint_2(const JOINT_KEY& key);
-    PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > Make_Canonical_Joint_3_Small(const JOINT_KEY& key);
-    PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > Make_Canonical_Joint_3_Average(const JOINT_KEY& key);
-    PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > Make_Canonical_Joint_3(const JOINT_KEY& key);
-    std::tuple<TV,T,T> Elbow_Pit(T angle,T width) const;
-    TV Elbow_Pit_Oriented(T angle,T width) const;
-    VECTOR<TV,2> Extrude(const TV& v0,const TV& v1,const TV& n) const;
-    PAIR<ARRAY<TV>,ARRAY<TV> > Arc(const TV& c,T angle,T len_arm,T ext0,T ext1) const;
-    ARRAY<TV> Polyline(const ARRAY<TV>& points,T dx) const;
-    void Joint_Connection(int offset,BLOCK_MESHING_ITERATOR<TV>& it,
-        CANONICAL_BLOCK<T>* cb,CC_IRREGULAR_CONNECTION& ic0,CC_IRREGULAR_CONNECTION& ic1,
-        ARRAY<CC_BLOCK_CONNECTION,CON_ID>& con,CON_ID prev) const;
-
     // BOUNDARY CONDITIONS
 
     struct BOUNDARY_CONDITION
@@ -165,7 +127,6 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
         f-=mu*(Contract<1,2>(ddU)+Contract<0,2>(ddU));
         return f;
     }
-
 
     // DOF MAPPING
 

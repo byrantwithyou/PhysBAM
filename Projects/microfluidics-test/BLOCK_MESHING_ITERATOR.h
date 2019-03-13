@@ -5,6 +5,7 @@
 #ifndef __BLOCK_MESHING_ITERATOR__
 #define __BLOCK_MESHING_ITERATOR__
 #include <Core/Vectors/VECTOR.h>
+#include <list>
 
 namespace PhysBAM{
 
