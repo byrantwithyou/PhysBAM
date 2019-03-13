@@ -17,6 +17,7 @@
 #include "BLOCK_MATRIX.h"
 #include "BLOCK_VECTOR.h"
 #include "COMMON.h"
+#include "XFORM.h"
 
 namespace PhysBAM{
 
@@ -24,7 +25,6 @@ template<class TV> struct COMPONENT_LAYOUT_FEM;
 template<class T> struct CACHED_ELIMINATION_MATRIX;
 template<class TV> struct BLOCK_MESHING_ITERATOR;
 
-PHYSBAM_DECLARE_ELEMENT_ID(XFORM_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
 PHYSBAM_DECLARE_ELEMENT_ID(COMPONENT_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
 PHYSBAM_DECLARE_ELEMENT_ID(SEPARATOR_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
 PHYSBAM_DECLARE_ELEMENT_ID(CANONICAL_BLOCK_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
@@ -44,31 +44,6 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     static constexpr T comp_tol=(T)1e-10;
     T target_length;
     T mu=1;
-    
-    ARRAY<MATRIX<T,TV::m>,XFORM_ID> xforms;
-    HASHTABLE<PAIR<XFORM_ID,XFORM_ID>,XFORM_ID> xform_comp_table;
-    
-    struct XFORMS_LOOKUP_CMP
-    {
-        bool operator()(const TV& a,const TV& b)
-        {
-            for(int i=0;i<TV::m;i++)
-            {
-                if(a(i)<b(i)) return true;
-                if(b(i)<a(i)) return false;
-            }
-            return false;
-        }
-    };
-
-    std::map<TV,XFORM_ID,XFORMS_LOOKUP_CMP> xforms_lookup;
-
-    // transform (rotation + uniform scale + shift); y=M*x+b;
-    struct XFORM
-    {
-        XFORM_ID id; // for matrix part
-        TV b;
-    };
 
     struct CROSS_SECTION_TYPE
     {
@@ -154,7 +129,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     struct BLOCK
     {
         CANONICAL_BLOCK_ID block;
-        XFORM xform;
+        XFORM<TV> xform;
         ARRAY<BLOCK_CONNECTION> connections;
         ARRAY<int> edge_on; // for edge-on (index in irregular_connections)
         int flags=0; // 1=separator, 2=separator-eligible
@@ -282,8 +257,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     ~COMPONENT_LAYOUT_FEM();
     void Parse_Input(const std::string& pipe_file);
 
-    XFORM_ID Compute_Xform(const TV& dir); // dir is normalized
-    XFORM Compose_Xform(const XFORM& a,const XFORM& b);
+    MATRIX<T,2> Compute_Xform(const TV& dir); // dir is normalized
     PAIR<CANONICAL_COMPONENT*,ARRAY<T> > Make_Canonical_Joint(const JOINT_KEY& key);
     PAIR<CANONICAL_COMPONENT*,ARRAY<T> > Make_Canonical_Joint_2(const JOINT_KEY& key);
     PAIR<CANONICAL_COMPONENT*,ARRAY<T> > Make_Canonical_Joint_3_Small(const JOINT_KEY& key);
@@ -308,7 +282,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
         int ic=-7; // if con.id<0, vd holds irregular connection. ic is an index in irregular_connections.
     };
 
-    void Emit_Component_Blocks(const CANONICAL_COMPONENT* cc,const XFORM& xf,ARRAY<VERTEX_DATA>& vd);
+    void Emit_Component_Blocks(const CANONICAL_COMPONENT* cc,const XFORM<TV>& xf,ARRAY<VERTEX_DATA>& vd);
     void Set_Connector(VERTEX_DATA& vd,BLOCK_ID id,int con_id);
 
     // return: flags indicating which connections interact
@@ -320,7 +294,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     void Merge_Blocks(BLOCK_ID id,int con_id);
     PAIR<CANONICAL_BLOCK_ID,ARRAY<int> >*
         Merge_Canonical_Blocks(CANONICAL_BLOCK_ID id0,int con_id0,
-            XFORM xf0,CANONICAL_BLOCK_ID id1,int con_id1,XFORM xf1);
+            XFORM<TV> xf0,CANONICAL_BLOCK_ID id1,int con_id1,XFORM<TV> xf1);
     int Approx_Dof_Count(BLOCK_ID b);
     void Merge_Blocks();
     void Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem);

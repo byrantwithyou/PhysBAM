@@ -68,7 +68,6 @@ Parse_Input(const std::string& pipe_file)
     HASHTABLE<std::string,CROSS_SECTION_TYPE_ID> cross_section_hash;
     HASHTABLE<std::string,TV> vertices;
     HASHTABLE<std::string,VERTEX_DATA> connection_points;
-    xforms.Append(MATRIX<T,2>()+1);
 
     while(getline(fin,line))
     {
@@ -120,7 +119,7 @@ Parse_Input(const std::string& pipe_file)
                         key.angles.Append(a);
                     }
                     auto cj=Make_Canonical_Joint(key);
-                    XFORM xf={Compute_Xform(verts(0).x),O};
+                    XFORM<TV> xf={Compute_Xform(verts(0).x),O};
                     ARRAY<VERTEX_DATA> vd(i0);
                     Emit_Component_Blocks(cj.x,xf,vd);
                     for(int i=0;i<i0;i++)
@@ -148,7 +147,7 @@ Parse_Input(const std::string& pipe_file)
                         std::swap(vd(0),vd(1));
                     }
                     key.length=dir.Normalize();
-                    XFORM xf={Compute_Xform(dir),vd(0).X};
+                    XFORM<TV> xf={Compute_Xform(dir),vd(0).X};
                     auto cc=Make_Canonical_Pipe(key);
                     Emit_Component_Blocks(cc,xf,vd);
                 }
@@ -173,7 +172,7 @@ Parse_Input(const std::string& pipe_file)
                     TV D=C+dir*t1;
                     key.length=t1;
                     auto cc=Make_Canonical_Pipe_Change(key);
-                    XFORM xf={Compute_Xform(dir),A};
+                    XFORM<TV> xf={Compute_Xform(dir),A};
                     ss>>name>>name2;
 
                     ARRAY<VERTEX_DATA> vd(i0);
@@ -299,7 +298,7 @@ Set_Connector(VERTEX_DATA& vd,BLOCK_ID id,int con_id)
 // Function Emit_Component_Blocks
 //#####################################################################
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Emit_Component_Blocks(const CANONICAL_COMPONENT* cc,const XFORM& xf,ARRAY<VERTEX_DATA>& vd)
+Emit_Component_Blocks(const CANONICAL_COMPONENT* cc,const XFORM<TV>& xf,ARRAY<VERTEX_DATA>& vd)
 {
     int offset=Value(blocks.m),offset_edge_on=irregular_connections.m;
     for(BLOCK_ID b(0);b<cc->blocks.m;b++)
@@ -311,7 +310,7 @@ Emit_Component_Blocks(const CANONICAL_COMPONENT* cc,const XFORM& xf,ARRAY<VERTEX
             if(con.id>=BLOCK_ID()) con.id+=offset;
             else Set_Connector(vd(~Value(con.id)),b+offset,c);
         }
-        bb.xform=Compose_Xform(xf,bb.xform);
+        bb.xform=xf*bb.xform;
         for(auto& e:bb.edge_on)
             e+=offset_edge_on;
     }
@@ -334,31 +333,9 @@ Emit_Component_Blocks(const CANONICAL_COMPONENT* cc,const XFORM& xf,ARRAY<VERTEX
 // Function Compute_Xform
 //#####################################################################
 template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Compute_Xform(const TV& dir) -> XFORM_ID
+Compute_Xform(const TV& dir) -> MATRIX<T,2>
 {
-    auto it=xforms_lookup.find(dir);
-    if(it!=xforms_lookup.end()) return it->second;
-    MATRIX<T,TV::m> M(dir,dir.Orthogonal_Vector());
-    XFORM_ID id=xforms.Append(M);
-    xforms_lookup[dir]=id;
-    return id;
-}
-//#####################################################################
-// Function Compose_Xform
-//#####################################################################
-template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Compose_Xform(const XFORM& a,const XFORM& b) -> XFORM
-{
-    if(a.id==XFORM_ID()) return {b.id,a.b+b.b};
-    if(b.id==XFORM_ID()) return {a.id,a.b+xforms(a.id)*b.b};
-
-    auto pr=xform_comp_table.Insert({a.id,b.id},XFORM_ID());
-    if(pr.y)
-    {
-        *pr.x=xforms.Append(xforms(a.id)*xforms(b.id));
-        xform_comp_table.Set({a.id,b.id},*pr.x);
-    }
-    return {*pr.x,a.b+xforms(a.id)*b.b};
+    return MATRIX<T,TV::m>(dir,dir.Orthogonal_Vector());
 }
 //#####################################################################
 // Function Make_Canonical_Pipe_Block
@@ -423,7 +400,7 @@ Make_Canonical_Pipe(const PIPE_KEY& key) -> CANONICAL_COMPONENT*
             cc->blocks.Append(
                 {
                     id,
-                    {XFORM_ID(),TV(offset,0)},
+                    {TV(offset,0)},
                     {{cc->blocks.m-1,1},{cc->blocks.m+1,0}}
                 });
             length-=target_length;
@@ -434,7 +411,7 @@ Make_Canonical_Pipe(const PIPE_KEY& key) -> CANONICAL_COMPONENT*
     cc->blocks.Append(
         {
             id,
-            {XFORM_ID(),TV(offset,0)},
+            {TV(offset,0)},
             {{cc->blocks.m-1,1},{BLOCK_ID(~1),0}}
         });
     for(auto&bl:cc->blocks) bl.flags|=2;
@@ -575,7 +552,7 @@ Make_Canonical_Joint_3_Small(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,
         for(int i=0;it.k==0 && i<it.First_Diagonal_Edge();i++) cb.bc_e.Append(i);
         for(int i=it.X0.m;it.k==it.nseg-1 && i<cb.X.m;i++) cb.bc_v.Append(i);
         for(int i=it.Last_Diagonal_Edge()+1;it.k==it.nseg-1 && i<cb.S.m;i++) cb.bc_e.Append(i);
-        cc->blocks.Append({id,{XFORM_ID(),TV()}});
+        cc->blocks.Append({id,{}});
         t0.Append(it.X1.Last());
     }
     VECTOR<TV,2> g0=Extrude(w((k+1)%3),w(k),dirs((k+1)%3)),g1=Extrude(w((k+2)%3),w(k),dirs(k));
@@ -589,7 +566,7 @@ Make_Canonical_Joint_3_Small(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,
         cb.bc_v={0,it.X0.m-1,it.X0.m,cb.X.m-1};
         if(it.k==nseg-1) cb.bc_v.Append(it.X0.m+cst.num_dofs-1);
         cb.bc_e={it.First_Diagonal_Edge(),it.Last_Diagonal_Edge()};
-        cc->blocks.Append({id,{XFORM_ID(),TV()}});
+        cc->blocks.Append({id,{}});
     }
     ARRAY<T> ext={g1.Average().Magnitude(),g0.Average().Magnitude(),e.Average().Magnitude()};
     return {cc,{ext((3-k)%3),ext((4-k)%3),ext((5-k)%3)}};
@@ -636,7 +613,7 @@ Make_Canonical_Joint_3_Average(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT
         for(int i=0;it.k==0 && i<it.First_Diagonal_Edge();i++) cb.bc_e.Append(i);
         for(int i=it.X0.m;it.k==it.nseg-1 && i<cb.X.m;i++) cb.bc_v.Append(i);
         for(int i=it.Last_Diagonal_Edge()+1;it.k==it.nseg-1 && i<cb.S.m;i++) cb.bc_e.Append(i);
-        cc->blocks.Append({id,{XFORM_ID(),TV()},con,{0,1}});
+        cc->blocks.Append({id,{},con,{0,1}});
         b.Append(it.X1(0));
     }
     VECTOR<TV,2> e0=Extrude(w(k),w((k+1)%3),dirs((k+1)%3)),e1=Extrude(w(k),w((k+2)%3),dirs(k));
@@ -671,7 +648,7 @@ Make_Canonical_Joint_3_Average(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT
         Joint_Connection(offset,it,cb,cc->irregular_connections(ick1),cc->irregular_connections(ick),con,1);
         for(int i=it.X0.m;it.k==it.nseg-1 && i<cb.X.m;i++) cb.bc_v.Append(i);
         for(int i=it.Last_Diagonal_Edge()+1;it.k==it.nseg-1 && i<cb.S.m;i++) cb.bc_e.Append(i);
-        cc->blocks.Append({id,{XFORM_ID(),TV()},con,{2,3}});
+        cc->blocks.Append({id,{},con,{2,3}});
     }
     ARRAY<T> ext={e1.Average().Magnitude(),e0.Average().Magnitude(),e.Average().Magnitude()};
     return {cc,{ext((3-k)%3),ext((4-k)%3),ext((5-k)%3)}};
@@ -748,7 +725,7 @@ Make_Canonical_Joint_2(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,ARRAY<
             for(int j=it.X0.m;j<cb.X.m;j++) cb.bc_v.Append(j);
             for(int j=it.Last_Diagonal_Edge()+1;j<cb.S.m;j++) cb.bc_e.Append(j);
         }
-        cc->blocks(BLOCK_ID(it.k))={id,{XFORM_ID(),TV()},con,{0,1}};
+        cc->blocks(BLOCK_ID(it.k))={id,{},con,{0,1}};
     }
     return {cc,{ext+sep,ext+sep}};
 }
@@ -806,7 +783,7 @@ Make_Canonical_Pipe_Change(const PIPE_CHANGE_KEY& key) -> CANONICAL_COMPONENT*
         cc->blocks.Append(
             {
                 id,
-                {XFORM_ID(),TV(i*wid,0)},
+                {TV(i*wid,0)},
                 {{cc->blocks.m-1,1},{cc->blocks.m+1,0}}
             });
     }
@@ -1062,8 +1039,8 @@ CS Map_Cross_Section(CS cs,const ARRAY<int>& index_v_map,const ARRAY<int>& index
 // Function Merge_Blocks
 //#####################################################################
 template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Merge_Canonical_Blocks(CANONICAL_BLOCK_ID id0,int con_id0,XFORM xf0,
-    CANONICAL_BLOCK_ID id1,int con_id1,XFORM xf1) -> PAIR<CANONICAL_BLOCK_ID,ARRAY<int> >*
+Merge_Canonical_Blocks(CANONICAL_BLOCK_ID id0,int con_id0,XFORM<TV> xf0,
+    CANONICAL_BLOCK_ID id1,int con_id1,XFORM<TV> xf1) -> PAIR<CANONICAL_BLOCK_ID,ARRAY<int> >*
 {
     auto pr=merge_canonical_blocks.Insert(std::make_tuple(id0,con_id0,id1,con_id1),{});
     if(pr.y) return pr.x;
@@ -1089,16 +1066,13 @@ Merge_Canonical_Blocks(CANONICAL_BLOCK_ID id0,int con_id0,XFORM xf0,
             cb.cross_sections.Append(
                 Map_Cross_Section(cb1.cross_sections(i),index_v_map,index_e_map));
 
-    const MATRIX<T,TV::m>& M0=xforms(xf0.id);
-    const MATRIX<T,TV::m>& M1=xforms(xf1.id);
-    MATRIX<T,TV::m> M=M0*M1.Inverse();
-    TV B=xf0.b-M*xf1.b;
+    XFORM<TV> M01i=xf0*xf1.Inverse();
 
     cb.X=cb0.X;
     cb.X.Resize(num_v_dofs);
     for(int i=0;i<cb1.X.m;i++)
     {
-        TV X=M*cb1.X(i)+B;
+        TV X=M01i*cb1.X(i);
         int j=index_v_map(i);
         if(j>=cb0.X.m) cb.X(j)=X;
         else assert((cb.X(j)-X).Magnitude()<(T)1e-6);
@@ -1326,7 +1300,7 @@ Times_U_Dot_V(BLOCK_ID b,BLOCK_VECTOR<T>& w,const BLOCK_VECTOR<T>& u) const
 {
     const auto& bl=blocks(b);
     const auto& cb=canonical_blocks(bl.block);
-    MATRIX<T,2> M=xforms(bl.xform.id);
+    MATRIX<T,2> M=bl.xform.M;
 
     HASHTABLE<IV,int> edge_lookup;
     for(int i=0;i<cb.S.m;i++)
@@ -1365,7 +1339,7 @@ Times_P_U(BLOCK_ID b,BLOCK_VECTOR<T>& w,const ARRAY<T>& div_v,const ARRAY<T>& di
 {
     const auto& bl=blocks(b);
     const auto& cb=canonical_blocks(bl.block);
-    MATRIX<T,2> M=xforms(bl.xform.id);
+    MATRIX<T,2> M=bl.xform.M;
 
     HASHTABLE<IV,int> edge_lookup;
     for(int i=0;i<cb.S.m;i++)
@@ -1401,7 +1375,7 @@ Times_Line_Integral_U_Dot_V(BLOCK_ID b,BLOCK_VECTOR<T>& w,const BLOCK_VECTOR<T>&
 {
     const auto& bl=blocks(b);
     const auto& cb=canonical_blocks(bl.block);
-    MATRIX<T,2> M=xforms(bl.xform.id);
+    MATRIX<T,2> M=bl.xform.M;
     for(int e:cb.bc_e)
     {
         VECTOR<TV,3> r(u.Get_v(cb.S(e).x),u.Get_v(cb.S(e).y),u.Get_e(e)),s;
@@ -1425,9 +1399,9 @@ Copy_Matrix_Data(BLOCK_MATRIX<T>& A,BLOCK_ID b,
     const DOF_PAIRS& dpa,const DOF_PAIRS& dpb,BLOCK_ID ar,BLOCK_ID ac) const
 {
     const BLOCK_MATRIX<T>& B=canonical_block_matrices(blocks(b).block);
-    MATRIX<T,2> G=xforms(blocks(b).xform.id).Inverse();
-    MATRIX<T,2> Ma=G*xforms(blocks(ar).xform.id);
-    MATRIX<T,2> Mb=G*xforms(blocks(ac).xform.id);
+    MATRIX<T,2> G=blocks(b).xform.M.Inverse();
+    MATRIX<T,2> Ma=G*blocks(ar).xform.M;
+    MATRIX<T,2> Mb=G*blocks(ac).xform.M;
     T sa=1/sqrt(Ma.Determinant());
     T sb=1/sqrt(Mb.Determinant());
     Ma*=sa;
@@ -1460,7 +1434,7 @@ Copy_Vector_Data(const BLOCK_VECTOR<T>& B,BLOCK_ID b,const DOF_PAIRS& dp,BLOCK_I
     BLOCK_VECTOR<T>& A=rhs_block_list(b);
     if(!A.V.m) Init_Block_Vector(A,b);
 
-    MATRIX<T,2> M=xforms(blocks(b).xform.id);
+    MATRIX<T,2> M=blocks(b).xform.M;
     T s=1/sqrt(M.Determinant());
     M*=s;
 
@@ -1719,7 +1693,7 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
 
     // TODO: rhs
     // multiply rhs(b) by F.Transpose(), where
-    // A = xforms(blocks(b).xform.id);
+    // A = blocks(b).xform.M;
     // F = A/sqrt(A.Determinant())
     //
     // Multiply solution sol(b) by F when done.
@@ -2027,7 +2001,7 @@ Compute_Bounding_Box() const -> RANGE<TV>
     {
         const CANONICAL_BLOCK& cb=canonical_blocks(bl.block);
         for(auto i:cb.bc_v)
-            box.Enlarge_To_Include_Point(xforms(bl.xform.id)*cb.X(i)+bl.xform.b);
+            box.Enlarge_To_Include_Point(bl.xform*cb.X(i));
     }
     return box;
 }
@@ -2207,14 +2181,12 @@ template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Visualize_Block_State(BLOCK_ID b) const
 {
     auto& bl=blocks(b);
-    MATRIX<T,TV::m> M=xforms(bl.xform.id);
-    TV B=bl.xform.b;
     auto& cb=canonical_blocks(bl.block);
-    auto Z=[=](int i){return M*cb.X(i)+bl.xform.b;};
+    auto Z=[=](int i){return bl.xform*cb.X(i);};
     for(auto t:cb.E)
     {
         VECTOR<TV,3> P;
-        for(int i=0;i<3;i++) P(i)=M*cb.X(t(i))+bl.xform.b;
+        for(int i=0;i<3;i++) P(i)=bl.xform*cb.X(t(i));
         for(auto p:P) Add_Debug_Object(VECTOR<TV,2>(p,P.Average()),VECTOR<T,3>(.5,.5,.5));
     }
     HASHTABLE<int> he,hv;
@@ -2299,10 +2271,8 @@ template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Visualize_Solution(BLOCK_ID b) const
 {
     const auto& bl=blocks(b);
-    const MATRIX<T,TV::m>& M=xforms(bl.xform.id);
-    TV B=bl.xform.b;
     const auto& cb=canonical_blocks(bl.block);
-    auto Z=[=](int i){return M*cb.X(i)+bl.xform.b;};
+    auto Z=[=](int i){return bl.xform*cb.X(i);};
     const auto& rd=reference_block_data(blocks(b).ref_id);
     const auto& U=rhs_block_list(b);
     for(int i=0;i<cb.X.m;i++)
@@ -2337,7 +2307,7 @@ Transform_Solution(const CACHED_ELIMINATION_MATRIX<T>& cem)
         int j=cem.rhs(Value(b));
         auto& U=rhs_block_list(b);
         U.V=cem.vector_list(j);
-        const auto& A = xforms(blocks(b).xform.id);
+        const auto& A = blocks(b).xform.M;
         T s=1/sqrt(A.Determinant());
         auto F = A*s;
 
@@ -2374,8 +2344,8 @@ Dump_World_Space_System() const
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Transform_To_World_Space(BLOCK_MATRIX<T>& M,const BLOCK_MATRIX<T>& B,BLOCK_ID a,BLOCK_ID b) const
 {
-    MATRIX<T,2> Ma=xforms(blocks(a).xform.id);
-    MATRIX<T,2> Mb=xforms(blocks(b).xform.id);
+    MATRIX<T,2> Ma=blocks(a).xform.M;
+    MATRIX<T,2> Mb=blocks(b).xform.M;
     T sa=1/sqrt(Ma.Determinant());
     T sb=1/sqrt(Mb.Determinant());
     Ma*=sa;
