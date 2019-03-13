@@ -335,7 +335,7 @@ Emit_Component_Blocks(const CANONICAL_COMPONENT<T>* cc,const XFORM<TV>& xf,ARRAY
             ic.con_id=a.con_id;
         }
         else
-            vd(~Value(ic.regular)).con.Set_Irreg(index);
+            vd(~Value(a.regular)).con.Set_Irreg(index);
     }
 }
 //#####################################################################
