@@ -18,7 +18,6 @@ PHYSBAM_DECLARE_ELEMENT_ID(CC_IRREG_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_I
 
 template<class T> struct CANONICAL_BLOCK;
 
-// first is master, second is slave
 struct CC_BLOCK_CONNECTION
 {
     CC_BLOCK_ID id;

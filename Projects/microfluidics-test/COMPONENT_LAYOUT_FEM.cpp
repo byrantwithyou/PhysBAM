@@ -209,23 +209,11 @@ Parse_Input(const std::string& pipe_file)
                     auto pr=comp_bc.Make_Block(cs.x,cs.y,len,c=='u');
                     CANONICAL_BLOCK<T>* cb=pr.x;
 
-                    BLOCK_ID b=blocks.Add_End();
-                    BLOCK& bl=blocks(b);
-                    bl.block=pr.x;
-                    bl.xform={Compute_Xform(dir),A};
-                    bl.connections.Append({BLOCK_ID(-1)});
-
-                    VERTEX_DATA vd;
-                    vd.X=C;
-                    vd.con.id=b;
-                    vd.con.con_id=CON_ID();
+                    BLOCK_ID b=blocks.Append({pr.x,{Compute_Xform(dir),A},{BLOCK_ID(-1)}});
+                    VERTEX_DATA vd={C,{b,CON_ID()}};
                     connection_points.Set(name4,vd);
 
-                    BOUNDARY_CONDITION bc;
-                    bc.b=b;
-                    bc.bc_v=pr.y;
-                    bc.bc_e=pr.z;
-                    bc.normal=-dir;
+                    BOUNDARY_CONDITION bc={b,pr.y,pr.z,{},{},-dir};
                     bc.data_v.Resize(bc.bc_v.Size());
                     bc.data_e.Resize(bc.bc_e.Size());
 
