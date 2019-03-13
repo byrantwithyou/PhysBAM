@@ -2,6 +2,8 @@
 // Copyright 2018.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#ifndef __XFORM__
+#define __XFORM__
 #include <Core/Matrices/MATRIX.h>
 namespace PhysBAM{
 
@@ -20,3 +22,4 @@ struct XFORM
     XFORM Inverse() const {auto inv=M.Inverse();return {inv,-inv*b};}
 };
 }
+#endif
