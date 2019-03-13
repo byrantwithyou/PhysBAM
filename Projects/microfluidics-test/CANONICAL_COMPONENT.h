@@ -24,14 +24,14 @@ struct CC_BLOCK_CONNECTION
     CC_BLOCK_ID id;
     CON_ID con_id;
     CC_IRREG_ID irreg_id;
-    bool master,is_regular;
+    bool is_regular;
 
     CC_BLOCK_CONNECTION(CC_BLOCK_ID b=CC_BLOCK_ID(-7),CON_ID c=CON_ID(-7))
-        :id(b),con_id(c),irreg_id(-7),master(false),is_regular(true)
+        :id(b),con_id(c),irreg_id(-7),is_regular(true)
     {}
 
     CC_BLOCK_CONNECTION(CC_IRREG_ID i)
-        :id(-7),con_id(-7),irreg_id(i),master(false),is_regular(false)
+        :id(-7),con_id(-7),irreg_id(i),is_regular(false)
     {}
 
     void Set_Irreg(CC_IRREG_ID i)
@@ -60,7 +60,6 @@ struct CC_IRREGULAR_CONNECTION
     CON_ID con_id;
     // one for each dof on cross section, starting from owned side of cross section
     ARRAY<PAIR<CC_BLOCK_ID,int> > edge_on_v,edge_on_e;
-    CC_IRREG_ID ref_ic=CC_IRREG_ID(-7);
 };
 
 // neighbor block i is given index ~i and con_id=-1.
