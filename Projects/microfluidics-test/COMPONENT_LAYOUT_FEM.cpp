@@ -77,6 +77,7 @@ Parse_Input(const std::string& pipe_file)
     COMPONENT_JOINT<T> comp_joint;
     comp_pipe.target_length=target_length;
     comp_change.target_length=target_length;
+    comp_bc.target_length=target_length;
     comp_joint.target_length=target_length;
     
     while(getline(fin,line))
@@ -90,6 +91,7 @@ Parse_Input(const std::string& pipe_file)
                 ss>>target_length;
                 comp_pipe.target_length=target_length;
                 comp_change.target_length=target_length;
+                comp_bc.target_length=target_length;
                 comp_joint.target_length=target_length;
                 break;
 
