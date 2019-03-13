@@ -32,6 +32,8 @@ PHYSBAM_DECLARE_ELEMENT_ID(REFERENCE_BLOCK_ID,int,ELEMENT_ID_HELPER::for_loop|EL
 PHYSBAM_DECLARE_ELEMENT_ID(CROSS_SECTION_TYPE_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
 PHYSBAM_DECLARE_ELEMENT_ID(REFERENCE_CONNECTION_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
 PHYSBAM_DECLARE_ELEMENT_ID(REFERENCE_IRREGULAR_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
+PHYSBAM_DECLARE_ELEMENT_ID(IRREG_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
+PHYSBAM_DECLARE_ELEMENT_ID(CON_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
 
 template<class T>
 struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
@@ -104,7 +106,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
 
     struct CANONICAL_BLOCK
     {
-        ARRAY<CROSS_SECTION> cross_sections;
+        ARRAY<CROSS_SECTION,CON_ID> cross_sections;
         ARRAY<TV> X;
         ARRAY<IV3> E;
         ARRAY<IV> S;
@@ -121,17 +123,33 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     // first is master, second is slave
     struct BLOCK_CONNECTION
     {
-        BLOCK_ID id=BLOCK_ID(-7);;
-        int con_id; // if irregular, ~con_id is index into irregular_connections
-        bool master;
+        BLOCK_ID id;
+        CON_ID con_id;
+        IRREG_ID irreg_id;
+        bool master,is_regular;
+
+        BLOCK_CONNECTION(BLOCK_ID b=BLOCK_ID(-7),CON_ID c=CON_ID(-7))
+            :id(b),con_id(c),irreg_id(-7),master(false),is_regular(true)
+        {}
+
+        BLOCK_CONNECTION(BLOCK_ID b,IRREG_ID i)
+            :id(b),con_id(-7),irreg_id(i),master(false),is_regular(false)
+        {}
+
+        void Set_Irreg(IRREG_ID i)
+        {
+            con_id=CON_ID(-7);
+            irreg_id=i;
+            is_regular=false;
+        }
     };
 
     struct BLOCK
     {
         CANONICAL_BLOCK_ID block;
         XFORM<TV> xform;
-        ARRAY<BLOCK_CONNECTION> connections;
-        ARRAY<int> edge_on; // for edge-on (index in irregular_connections)
+        ARRAY<BLOCK_CONNECTION,CON_ID> connections;
+        ARRAY<IRREG_ID> edge_on; // for edge-on (index in irregular_connections)
         int flags=0; // 1=separator, 2=separator-eligible
         REFERENCE_BLOCK_ID ref_id=REFERENCE_BLOCK_ID(-7);
     };
@@ -140,10 +158,10 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     struct IRREGULAR_CONNECTION
     {
         BLOCK_ID regular=BLOCK_ID(-7);
-        int con_id;
+        CON_ID con_id;
         // one for each dof on cross section, starting from owned side of cross section
         ARRAY<PAIR<BLOCK_ID,int> > edge_on_v,edge_on_e;
-        int ref_ic=-7;
+        IRREG_ID ref_ic=IRREG_ID(-7);
         REFERENCE_IRREGULAR_ID ref_id=REFERENCE_IRREGULAR_ID(-7);
     };
 
@@ -151,12 +169,12 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     struct CANONICAL_COMPONENT
     {
         ARRAY<BLOCK,BLOCK_ID> blocks;
-        ARRAY<IRREGULAR_CONNECTION> irregular_connections;
+        ARRAY<IRREGULAR_CONNECTION,IRREG_ID> irregular_connections;
     };
 
     ARRAY<BLOCK,BLOCK_ID> blocks;
-    ARRAY<IRREGULAR_CONNECTION> irregular_connections;
-    
+    ARRAY<IRREGULAR_CONNECTION,IRREG_ID> irregular_connections;
+
     struct PIPE_KEY
     {
         CROSS_SECTION_TYPE_ID type;
@@ -217,20 +235,20 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
         int num_dofs_v=-7,num_dofs_e=-7,num_dofs_p=-7;
         ARRAY<int> dof_map_v,dof_map_e,dof_map_p;
         DOF_PAIRS pairs;
-        ARRAY<DOF_PAIRS> regular_pairs; // this block is the source, the connection is the destination
+        ARRAY<DOF_PAIRS,CON_ID> regular_pairs; // this block is the source, the connection is the destination
         BLOCK_MATRIX<T> M;
         int mat_id=-7;
     };
 
     ARRAY<REFERENCE_BLOCK_DATA,REFERENCE_BLOCK_ID> reference_block_data;
 
-    typedef std::tuple<REFERENCE_BLOCK_ID,int,REFERENCE_BLOCK_ID,int> REGULAR_CON_KEY;
+    typedef std::tuple<REFERENCE_BLOCK_ID,CON_ID,REFERENCE_BLOCK_ID,CON_ID> REGULAR_CON_KEY;
     HASHTABLE<REGULAR_CON_KEY,REFERENCE_CONNECTION_ID> regular_connection_hash;
 
     struct REFERENCE_CONNECTION_DATA
     {
         BLOCK_ID b[2];
-        int con_id[2];
+        CON_ID con_id[2];
 
         BLOCK_MATRIX<T> M;
         int mat_id=-7;
@@ -248,7 +266,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
 
     struct REFERENCE_IRREGULAR_DATA
     {
-        int ic_id;
+        IRREG_ID ic_id;
         ARRAY<REFERENCE_IRREGULAR_DATA_HELPER> pairs;
     };
 
@@ -279,22 +297,22 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     {
         TV X;
         BLOCK_CONNECTION con;
-        int ic=-7; // if con.id<0, vd holds irregular connection. ic is an index in irregular_connections.
+        IRREG_ID ic=IRREG_ID(-7); // if con.id<0, vd holds irregular connection. ic is an index in irregular_connections.
     };
 
     void Emit_Component_Blocks(const CANONICAL_COMPONENT* cc,const XFORM<TV>& xf,ARRAY<VERTEX_DATA>& vd);
-    void Set_Connector(VERTEX_DATA& vd,BLOCK_ID id,int con_id);
+    void Set_Connector(VERTEX_DATA& vd,BLOCK_ID id,CON_ID con_id);
 
     // return: flags indicating which connections interact
     // pair: block + master mask
     HASHTABLE<PAIR<CANONICAL_BLOCK_ID,int>,int> separates_dofs;
     int Separates_Dofs(BLOCK_ID b);
 
-    HASHTABLE<std::tuple<CANONICAL_BLOCK_ID,int,CANONICAL_BLOCK_ID,int>,PAIR<CANONICAL_BLOCK_ID,ARRAY<int> > > merge_canonical_blocks;
-    void Merge_Blocks(BLOCK_ID id,int con_id);
+    HASHTABLE<std::tuple<CANONICAL_BLOCK_ID,CON_ID,CANONICAL_BLOCK_ID,CON_ID>,PAIR<CANONICAL_BLOCK_ID,ARRAY<int> > > merge_canonical_blocks;
+    void Merge_Blocks(BLOCK_ID id,CON_ID con_id);
     PAIR<CANONICAL_BLOCK_ID,ARRAY<int> >*
-        Merge_Canonical_Blocks(CANONICAL_BLOCK_ID id0,int con_id0,
-            XFORM<TV> xf0,CANONICAL_BLOCK_ID id1,int con_id1,XFORM<TV> xf1);
+        Merge_Canonical_Blocks(CANONICAL_BLOCK_ID id0,CON_ID con_id0,
+            XFORM<TV> xf0,CANONICAL_BLOCK_ID id1,CON_ID con_id1,XFORM<TV> xf1);
     int Approx_Dof_Count(BLOCK_ID b);
     void Merge_Blocks();
     void Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem);
@@ -305,7 +323,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     void Compute_Reference_Blocks();
     void Compute_Reference_Regular_Connections();
     void Compute_Reference_Irregular_Connections();
-    int Compute_Connection_Hash(BLOCK_ID b0,int con_id0,BLOCK_ID b1,int con_id1);
+    int Compute_Connection_Hash(BLOCK_ID b0,CON_ID con_id0,BLOCK_ID b1,CON_ID con_id1);
     PAIR<int,int> Remap_Owned_Dofs(ARRAY<int>& map_v,ARRAY<int>& map_e,BLOCK_ID b);
     void Compute_Dof_Remapping(REFERENCE_BLOCK_DATA& rd);
     void Compute_Dof_Pairs();
@@ -326,7 +344,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     void Eliminate_Irregular_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem);
     void Eliminate_Non_Seperators(CACHED_ELIMINATION_MATRIX<T>& cem);
     void Eliminate_Strip(CACHED_ELIMINATION_MATRIX<T>& cem,const ARRAY<BLOCK_ID>& a);
-    void Eliminate_Simple(CACHED_ELIMINATION_MATRIX<T>& cem,BLOCK_ID first,int con_id_source);
+    void Eliminate_Simple(CACHED_ELIMINATION_MATRIX<T>& cem,BLOCK_ID first,CON_ID con_id_source);
     void Visualize_Block_State(BLOCK_ID b) const;
     void Transform_Solution(const CACHED_ELIMINATION_MATRIX<T>& cem);
     void Visualize_Solution(BLOCK_ID b) const;
@@ -340,7 +358,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     PAIR<ARRAY<TV>,ARRAY<TV> > Arc(const TV& c,T angle,T len_arm,T ext0,T ext1) const;
     ARRAY<TV> Polyline(const ARRAY<TV>& points,T dx) const;
     void Joint_Connection(int offset,BLOCK_MESHING_ITERATOR<TV>& it,CANONICAL_BLOCK& cb,
-        IRREGULAR_CONNECTION& ic0,IRREGULAR_CONNECTION& ic1,ARRAY<BLOCK_CONNECTION>& con,int prev) const;
+        IRREGULAR_CONNECTION& ic0,IRREGULAR_CONNECTION& ic1,ARRAY<BLOCK_CONNECTION,CON_ID>& con,CON_ID prev) const;
 };
 
 }

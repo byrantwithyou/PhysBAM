@@ -208,7 +208,7 @@ Parse_Input(const std::string& pipe_file)
                     VERTEX_DATA vd;
                     vd.X=C;
                     vd.con.id=b;
-                    vd.con.con_id=0;
+                    vd.con.con_id=CON_ID();
                     connection_points.Set(name4,vd);
 
                     BOUNDARY_CONDITION bc;
@@ -278,9 +278,9 @@ Parse_Input(const std::string& pipe_file)
 // Function Set_Connector
 //#####################################################################
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Set_Connector(VERTEX_DATA& vd,BLOCK_ID id,int con_id)
+Set_Connector(VERTEX_DATA& vd,BLOCK_ID id,CON_ID con_id)
 {
-    if(vd.con.id>=BLOCK_ID())
+    if(vd.con.is_regular)
     {
         blocks(vd.con.id).connections(vd.con.con_id)={id,con_id};
         blocks(id).connections(con_id)={vd.con.id,vd.con.con_id};
@@ -290,8 +290,7 @@ Set_Connector(VERTEX_DATA& vd,BLOCK_ID id,int con_id)
         IRREGULAR_CONNECTION& con=irregular_connections(vd.ic);
         con.regular=id;
         con.con_id=con_id;
-        if(con.edge_on_v.m)
-            blocks(id).connections(con_id).con_id=~vd.ic;
+        blocks(id).connections(con_id).Set_Irreg(vd.ic);
     }
 }
 //#####################################################################
@@ -300,11 +299,11 @@ Set_Connector(VERTEX_DATA& vd,BLOCK_ID id,int con_id)
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Emit_Component_Blocks(const CANONICAL_COMPONENT* cc,const XFORM<TV>& xf,ARRAY<VERTEX_DATA>& vd)
 {
-    int offset=Value(blocks.m),offset_edge_on=irregular_connections.m;
+    int offset=Value(blocks.m),offset_edge_on=Value(irregular_connections.m);
     for(BLOCK_ID b(0);b<cc->blocks.m;b++)
     {
         auto& bb=blocks(blocks.Append(cc->blocks(b)));
-        for(int c=0;c<bb.connections.m;c++)
+        for(CON_ID c(0);c<bb.connections.m;c++)
         {
             auto& con=bb.connections(c);
             if(con.id>=BLOCK_ID()) con.id+=offset;
@@ -322,7 +321,7 @@ Emit_Component_Blocks(const CANONICAL_COMPONENT* cc,const XFORM<TV>& xf,ARRAY<VE
         for(auto& b:a.edge_on_e)
             b.x+=offset;
 
-        int index=irregular_connections.Append(a);
+        IRREG_ID index=irregular_connections.Append(a);
         IRREGULAR_CONNECTION& con=irregular_connections(index);
         if(con.regular>=BLOCK_ID())
             con.regular+=offset;
@@ -401,7 +400,7 @@ Make_Canonical_Pipe(const PIPE_KEY& key) -> CANONICAL_COMPONENT*
                 {
                     id,
                     {TV(offset,0)},
-                    {{cc->blocks.m-1,1},{cc->blocks.m+1,0}}
+                    {{cc->blocks.m-1,CON_ID(1)},{cc->blocks.m+1,CON_ID(0)}}
                 });
             length-=target_length;
             offset+=target_length;
@@ -412,7 +411,7 @@ Make_Canonical_Pipe(const PIPE_KEY& key) -> CANONICAL_COMPONENT*
         {
             id,
             {TV(offset,0)},
-            {{cc->blocks.m-1,1},{BLOCK_ID(~1),0}}
+            {{cc->blocks.m-1,CON_ID(1)},{BLOCK_ID(~1),CON_ID(0)}}
         });
     for(auto&bl:cc->blocks) bl.flags|=2;
     cc->blocks(BLOCK_ID()).flags|=1;
@@ -600,20 +599,20 @@ Make_Canonical_Joint_3_Average(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT
     VECTOR<TV,2> e=Extrude(w((k+1)%3),w((k+2)%3),dirs((k+2)%3));
     e+=dirs((k+2)%3)*sep;
     ARRAY<TV> s0=Polyline({w((k+1)%3),e(0)},target_length),s1=Polyline({w((k+2)%3),e(1)},target_length),b;
-    int index=cc->irregular_connections.Add_End();
-    int ick2=cc->irregular_connections.Append({BLOCK_ID(~((k+2)%3))});
+    IRREG_ID index=cc->irregular_connections.Add_End();
+    IRREG_ID ick2=cc->irregular_connections.Append({BLOCK_ID(~((k+2)%3))});
     for(BLOCK_MESHING_ITERATOR<TV> it(s0,s1,cst.num_dofs-1,target_length);it.Valid();it.Next())
     {
         CANONICAL_BLOCK_ID id=canonical_blocks.Add_End();
         CANONICAL_BLOCK& cb=canonical_blocks.Last();
         it.Build(cb.X,cb.E,cb.S);
-        ARRAY<BLOCK_CONNECTION> con;
-        Joint_Connection(0,it,cb,cc->irregular_connections(index),cc->irregular_connections(ick2),con,it.k==1?0:1);
+        ARRAY<BLOCK_CONNECTION,CON_ID> con;
+        Joint_Connection(0,it,cb,cc->irregular_connections(index),cc->irregular_connections(ick2),con,it.k==1?CON_ID(0):CON_ID(1));
         for(int i=0;it.k==0 && i<it.X0.m;i++) cb.bc_v.Append(i);
         for(int i=0;it.k==0 && i<it.First_Diagonal_Edge();i++) cb.bc_e.Append(i);
         for(int i=it.X0.m;it.k==it.nseg-1 && i<cb.X.m;i++) cb.bc_v.Append(i);
         for(int i=it.Last_Diagonal_Edge()+1;it.k==it.nseg-1 && i<cb.S.m;i++) cb.bc_e.Append(i);
-        cc->blocks.Append({id,{},con,{0,1}});
+        cc->blocks.Append({id,{},con,{IRREG_ID(0),IRREG_ID(1)}});
         b.Append(it.X1(0));
     }
     VECTOR<TV,2> e0=Extrude(w(k),w((k+1)%3),dirs((k+1)%3)),e1=Extrude(w(k),w((k+2)%3),dirs(k));
@@ -625,19 +624,19 @@ Make_Canonical_Joint_3_Average(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT
     int n0=t0.m;
     t0.Append_Elements(b);
     t0.Append_Elements(Polyline({t0.Pop_Value(),e1(1)},target_length));
-    int ick1=cc->irregular_connections.Append({BLOCK_ID(~((k+1)%3))});
-    int ick=cc->irregular_connections.Append({BLOCK_ID(~k)});
+    IRREG_ID ick1=cc->irregular_connections.Append({BLOCK_ID(~((k+1)%3))});
+    IRREG_ID ick=cc->irregular_connections.Append({BLOCK_ID(~k)});
     int offset=Value(cc->blocks.m);
     for(BLOCK_MESHING_ITERATOR<TV> it(t0,t1,cst.num_dofs-1,target_length);it.Valid();it.Next())
     {
         CANONICAL_BLOCK_ID id=canonical_blocks.Add_End();
         CANONICAL_BLOCK& cb=canonical_blocks.Last();
         it.Build(cb.X,cb.E,cb.S);
-        ARRAY<BLOCK_CONNECTION> con;
+        ARRAY<BLOCK_CONNECTION,CON_ID> con;
         if(it.k==0)
         {
             cb.cross_sections.Append({{n0-1,n0+b.m},{n0-1,n0+b.m-1},false});
-            con.Append({BLOCK_ID(),~index});
+            con.Append({BLOCK_ID(),index});
             cc->irregular_connections(index).regular=BLOCK_ID(offset+it.k);
             for(int i=0;i<it.X0.m;i++)
             {
@@ -645,10 +644,10 @@ Make_Canonical_Joint_3_Average(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT
                 if((i>0 && i<n0) || i>(n0+b.m-1)) cb.bc_e.Append(i-1);
             }
         }
-        Joint_Connection(offset,it,cb,cc->irregular_connections(ick1),cc->irregular_connections(ick),con,1);
+        Joint_Connection(offset,it,cb,cc->irregular_connections(ick1),cc->irregular_connections(ick),con,CON_ID(1));
         for(int i=it.X0.m;it.k==it.nseg-1 && i<cb.X.m;i++) cb.bc_v.Append(i);
         for(int i=it.Last_Diagonal_Edge()+1;it.k==it.nseg-1 && i<cb.S.m;i++) cb.bc_e.Append(i);
-        cc->blocks.Append({id,{},con,{2,3}});
+        cc->blocks.Append({id,{},con,{IRREG_ID(2),IRREG_ID(3)}});
     }
     ARRAY<T> ext={e1.Average().Magnitude(),e0.Average().Magnitude(),e.Average().Magnitude()};
     return {cc,{ext((3-k)%3),ext((4-k)%3),ext((5-k)%3)}};
@@ -668,7 +667,7 @@ Make_Canonical_Joint_3(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,ARRAY<
 //#####################################################################
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Joint_Connection(int offset,BLOCK_MESHING_ITERATOR<TV>& it,CANONICAL_BLOCK& cb,
-    IRREGULAR_CONNECTION& ic0,IRREGULAR_CONNECTION& ic1,ARRAY<BLOCK_CONNECTION>& con,int prev) const
+    IRREGULAR_CONNECTION& ic0,IRREGULAR_CONNECTION& ic1,ARRAY<BLOCK_CONNECTION,CON_ID>& con,CON_ID prev) const
 {
     BLOCK_ID self(offset+it.k);
     if(it.k==0)
@@ -684,7 +683,7 @@ Joint_Connection(int offset,BLOCK_MESHING_ITERATOR<TV>& it,CANONICAL_BLOCK& cb,
     if(it.k!=it.nseg-1)
     {
         cb.cross_sections.Append({{it.X0.m,cb.X.m},{it.Last_Diagonal_Edge()+1,cb.S.m},true});
-        con.Append({BLOCK_ID(offset+it.k+1),0});
+        con.Append({BLOCK_ID(offset+it.k+1),CON_ID(0)});
     }
     ic0.edge_on_v.Append({self,it.X0.m});
     ic1.edge_on_v.Append({self,cb.X.m-1});
@@ -706,15 +705,15 @@ Make_Canonical_Joint_2(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,ARRAY<
 
     CANONICAL_COMPONENT* cc=new CANONICAL_COMPONENT;
     cc->blocks.Resize(BLOCK_ID(cst.num_dofs-1));
-    int ic0=cc->irregular_connections.Append({BLOCK_ID(~0)});
-    int ic1=cc->irregular_connections.Append({BLOCK_ID(~1)});
+    IRREG_ID ic0=cc->irregular_connections.Append({BLOCK_ID(~0)});
+    IRREG_ID ic1=cc->irregular_connections.Append({BLOCK_ID(~1)});
     for(BLOCK_MESHING_ITERATOR<TV> it(sides.x,sides.y,cst.num_dofs-1,target_length);it.Valid();it.Next())
     {
         CANONICAL_BLOCK_ID id=canonical_blocks.Add_End();
         CANONICAL_BLOCK& cb=canonical_blocks.Last();
         it.Build(cb.X,cb.E,cb.S);
-        ARRAY<BLOCK_CONNECTION> con;
-        Joint_Connection(0,it,cb,cc->irregular_connections(ic0),cc->irregular_connections(ic1),con,it.k==1?0:1);
+        ARRAY<BLOCK_CONNECTION,CON_ID> con;
+        Joint_Connection(0,it,cb,cc->irregular_connections(ic0),cc->irregular_connections(ic1),con,it.k==1?CON_ID(0):CON_ID(1));
         if(it.k==0)
         {
             for(int j=0;j<it.X0.m;j++) cb.bc_v.Append(j);
@@ -725,7 +724,7 @@ Make_Canonical_Joint_2(const JOINT_KEY& key) -> PAIR<CANONICAL_COMPONENT*,ARRAY<
             for(int j=it.X0.m;j<cb.X.m;j++) cb.bc_v.Append(j);
             for(int j=it.Last_Diagonal_Edge()+1;j<cb.S.m;j++) cb.bc_e.Append(j);
         }
-        cc->blocks(BLOCK_ID(it.k))={id,{},con,{0,1}};
+        cc->blocks(BLOCK_ID(it.k))={id,{},con,{IRREG_ID(0),IRREG_ID(1)}};
     }
     return {cc,{ext+sep,ext+sep}};
 }
@@ -784,10 +783,10 @@ Make_Canonical_Pipe_Change(const PIPE_CHANGE_KEY& key) -> CANONICAL_COMPONENT*
             {
                 id,
                 {TV(i*wid,0)},
-                {{cc->blocks.m-1,1},{cc->blocks.m+1,0}}
+                {{cc->blocks.m-1,CON_ID(1)},{cc->blocks.m+1,CON_ID(0)}}
             });
     }
-    cc->blocks.Last().connections(1).id=BLOCK_ID(~1);
+    cc->blocks.Last().connections(CON_ID(1)).id=BLOCK_ID(~1);
     return cc;
 }
 template<class F> // func(a,b) means val(a)<val(b)
@@ -880,12 +879,12 @@ Update_Masters()
 {
     for(BLOCK_ID b0(0);b0<blocks.m;b0++)
     {
-        for(int c0=0;c0<blocks(b0).connections.m;c0++)
+        for(CON_ID c0(0);c0<blocks(b0).connections.m;c0++)
         {
             auto& n0=blocks(b0).connections(c0);
             BLOCK_ID b1=n0.id;
-            int c1=n0.con_id;
-            if(c1<0) // irregular
+            CON_ID c1=n0.con_id;
+            if(!n0.is_regular)
             {
                 n0.master=true;
                 continue;
@@ -893,20 +892,20 @@ Update_Masters()
             if(b0>b1) continue; // smaller index does the logic
             auto& n1=blocks(b1).connections(c1);
             bool m=true;
-            if(c0==0)
+            if(c0==CON_ID())
             {
-                if(c1!=0) m=true;
+                if(c1!=CON_ID()) m=true;
                 else
                 {
-                    if(blocks(b0).connections.m==2) m=true;
-                    else if(blocks(b1).connections.m==2) m=false;
+                    if(blocks(b0).connections.m==CON_ID(2)) m=true;
+                    else if(blocks(b1).connections.m==CON_ID(2)) m=false;
                 }
             }
             else
             {
                 if(!c1) m=false;
-                else if(blocks(b0).connections.m==2) m=true;
-                else if(blocks(b1).connections.m==2) m=false;
+                else if(blocks(b0).connections.m==CON_ID(2)) m=true;
+                else if(blocks(b1).connections.m==CON_ID(2)) m=false;
             }
             n0.master=m;
             n1.master=!m;
@@ -966,19 +965,19 @@ Separates_Dofs(BLOCK_ID b)
 {
     CANONICAL_BLOCK_ID id=blocks(b).block;
     int mask=0;
-    for(int c=0;c<blocks(b).connections.m;c++)
+    for(CON_ID c(0);c<blocks(b).connections.m;c++)
         if(blocks(b).connections(c).master)
-            mask|=1<<c;
+            mask|=1<<Value(c);
     auto pr=separates_dofs.Insert({id,mask},0);
     if(!pr.y) return *pr.x;
 
     int valid=0;
     const CANONICAL_BLOCK& cb=canonical_blocks(id);
-    ARRAY<int> owner(cb.X.m,use_init,-1);
-    for(int i=0;i<cb.cross_sections.m;i++)
+    ARRAY<CON_ID> owner(cb.X.m,use_init,CON_ID(-1));
+    for(CON_ID i(0);i<cb.cross_sections.m;i++)
     {
         const auto& cs=cb.cross_sections(i);
-        int master=(mask>>i)&1;
+        int master=(mask>>Value(i))&1;
         INTERVAL<int> iv=cs.v;
         int m=(iv.min_corner+iv.max_corner)/2;
         if(cs.own_first) iv.min_corner=m+(iv.Size()&master);
@@ -987,18 +986,18 @@ Separates_Dofs(BLOCK_ID b)
     }
     for(auto e:cb.E)
     {
-        IV3 f(owner.Subset(e));
-        int o=-1;
+        VECTOR<CON_ID,3> f(owner.Subset(e));
+        CON_ID o(-1);
         for(auto i:f)
         {
-            if(i==-1 || i==o) continue;
-            if(o==-1)
+            if(i==CON_ID(-1) || i==o) continue;
+            if(o==CON_ID(-1))
             {
                 o=i;
                 continue;
             }
-            valid|=1<<o;
-            valid|=1<<i;
+            valid|=1<<Value(o);
+            valid|=1<<Value(i);
         }
     }
     *pr.x=valid;
@@ -1039,8 +1038,8 @@ CS Map_Cross_Section(CS cs,const ARRAY<int>& index_v_map,const ARRAY<int>& index
 // Function Merge_Blocks
 //#####################################################################
 template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Merge_Canonical_Blocks(CANONICAL_BLOCK_ID id0,int con_id0,XFORM<TV> xf0,
-    CANONICAL_BLOCK_ID id1,int con_id1,XFORM<TV> xf1) -> PAIR<CANONICAL_BLOCK_ID,ARRAY<int> >*
+Merge_Canonical_Blocks(CANONICAL_BLOCK_ID id0,CON_ID con_id0,XFORM<TV> xf0,
+    CANONICAL_BLOCK_ID id1,CON_ID con_id1,XFORM<TV> xf1) -> PAIR<CANONICAL_BLOCK_ID,ARRAY<int> >*
 {
     auto pr=merge_canonical_blocks.Insert(std::make_tuple(id0,con_id0,id1,con_id1),{});
     if(pr.y) return pr.x;
@@ -1058,10 +1057,10 @@ Merge_Canonical_Blocks(CANONICAL_BLOCK_ID id0,int con_id0,XFORM<TV> xf0,
 
     pr.x->x=canonical_blocks.Add_End();
     CANONICAL_BLOCK& cb=canonical_blocks(pr.x->x);
-    for(int i=0;i<cb0.cross_sections.m;i++)
+    for(CON_ID i(0);i<cb0.cross_sections.m;i++)
         if(i!=con_id0)
             cb.cross_sections.Append(cb0.cross_sections(i));
-    for(int i=0;i<cb1.cross_sections.m;i++)
+    for(CON_ID i(0);i<cb1.cross_sections.m;i++)
         if(i!=con_id1)
             cb.cross_sections.Append(
                 Map_Cross_Section(cb1.cross_sections(i),index_v_map,index_e_map));
@@ -1105,48 +1104,44 @@ Merge_Canonical_Blocks(CANONICAL_BLOCK_ID id0,int con_id0,XFORM<TV> xf0,
 // Function Merge_Blocks
 //#####################################################################
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Merge_Blocks(BLOCK_ID id,int con_id)
+Merge_Blocks(BLOCK_ID id,CON_ID con_id)
 {
-    PHYSBAM_ASSERT(con_id>=0);
+    PHYSBAM_ASSERT(con_id>=CON_ID());
     PHYSBAM_ASSERT(id>=BLOCK_ID());
     BLOCK& bl=blocks(id);
     BLOCK_ID id2=bl.connections(con_id).id;
-    int con_id2=bl.connections(con_id).con_id;
+    CON_ID con_id2=bl.connections(con_id).con_id;
     BLOCK& bl2=blocks(id2);
 
     auto pr=Merge_Canonical_Blocks(bl.block,con_id,bl.xform,bl2.block,con_id2,bl2.xform);
     bl.block=pr->x;
 
-    for(int c=con_id;c<bl.connections.m;c++)
+    for(CON_ID c=con_id;c<bl.connections.m;c++)
     {
-        BLOCK_ID b=bl.connections(c).id;
-        int d=bl.connections(c).con_id;
-        if(d<0) // edge-on
-            irregular_connections(~d).con_id=c-1;
-        else
-            blocks(b).connections(d).con_id=c-1;
+        const auto& cn=bl.connections(c);
+        if(cn.is_regular) blocks(cn.id).connections(cn.con_id).con_id=c-1;
+        else irregular_connections(cn.irreg_id).con_id=c-1;
     }
     bl.connections.Pop();
 
-    for(int c=0;c<bl2.connections.m;c++)
+    for(CON_ID c(0);c<bl2.connections.m;c++)
     {
         if(c==con_id2) continue;
-        BLOCK_ID b=bl2.connections(c).id;
-        int d=bl2.connections(c).con_id;
-        if(d<0) // edge-on
+        auto& cn=bl2.connections(c);
+        if(cn.is_regular)
         {
-            irregular_connections(~d).regular=id;
-            irregular_connections(~d).con_id=bl.connections.m;
+            blocks(cn.id).connections(cn.con_id).id=id;
+            blocks(cn.id).connections(cn.con_id).con_id=bl.connections.m;
         }
         else
         {
-            blocks(b).connections(d).id=id;
-            blocks(b).connections(d).con_id=bl.connections.m;
+            irregular_connections(cn.irreg_id).regular=id;
+            irregular_connections(cn.irreg_id).con_id=bl.connections.m;
         }
-        bl.connections.Append(bl2.connections(c));
+        bl.connections.Append(cn);
     }
 
-    for(int i:bl2.edge_on)
+    for(IRREG_ID i:bl2.edge_on)
     {
         auto& ic=irregular_connections(i);
         for(auto& j:ic.edge_on_v)
@@ -1171,10 +1166,11 @@ Merge_Blocks()
         if(int mask=Separates_Dofs(b))
         {
             PHYSBAM_ASSERT(!(blocks(b).flags&1));
-            int besti=-1,best=INT_MAX;
-            for(int i=0;i<blocks(b).connections.m;i++)
+            CON_ID besti(-1);
+            int best=INT_MAX;
+            for(CON_ID i(0);i<blocks(b).connections.m;i++)
             {
-                if(!(mask&(1<<i))) continue;
+                if(!(mask&(1<<Value(i)))) continue;
                 BLOCK_ID d=blocks(b).connections(i).id;
                 if(blocks(d).flags&1) continue;
                 int c=Approx_Dof_Count(d);
@@ -1184,7 +1180,7 @@ Merge_Blocks()
                     besti=i;
                 }
             }
-            PHYSBAM_ASSERT(besti>=0);
+            PHYSBAM_ASSERT(besti>=CON_ID());
             Merge_Blocks(b,besti);
             b--; // repeat the check on this block
         }
@@ -1454,24 +1450,24 @@ Fill_Block_Matrix(REFERENCE_BLOCK_DATA& rd)
 
     Copy_Matrix_Data(rd.M,b,rd.pairs,rd.pairs,b,b);
 
-    for(int cc=0;cc<bl.connections.m;cc++)
+    for(CON_ID cc(0);cc<bl.connections.m;cc++)
     {
         const auto& c=bl.connections(cc);
-        if(c.con_id>=0)
+        if(c.is_regular)
         {
             const auto& p=reference_block_data(blocks(c.id).ref_id).regular_pairs(c.con_id);
             Copy_Matrix_Data(rd.M,c.id,p,p,b,b);
         }
         else
         {
-            const auto& ic=irregular_connections(~c.con_id);
+            const auto& ic=irregular_connections(c.irreg_id);
             const auto& irbd=reference_irregular_data(ic.ref_id);
             for(const auto& h:irbd.pairs)
                 Copy_Matrix_Data(rd.M,h.b,h.irreg_pairs[0][1],h.irreg_pairs[0][1],b,b);
         }
     }
 
-    for(int e:bl.edge_on)
+    for(IRREG_ID e:bl.edge_on)
     {
         const auto& ic=irregular_connections(e);
         const auto& irbd=reference_irregular_data(ic.ref_id);
@@ -1570,10 +1566,10 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
     for(BLOCK_ID b(0);b<blocks.m;b++)
     {
         const auto& bl=blocks(b);
-        for(int cc=0;cc<bl.connections.m;cc++)
+        for(CON_ID cc(0);cc<bl.connections.m;cc++)
         {
             const auto& c=bl.connections(cc);
-            if(c.con_id>=0 && c.master)
+            if(c.is_regular && c.master)
             {
                 auto reg_id=regular_connection_hash.Get(std::make_tuple(bl.ref_id,cc,blocks(c.id).ref_id,c.con_id));
                 int id=reference_connection_data(reg_id).mat_id;
@@ -1713,7 +1709,7 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Compute_Reference_Blocks()
 {
-    typedef ARRAY<std::tuple<CANONICAL_BLOCK_ID,int,bool> > REG_CON;
+    typedef ARRAY<std::tuple<CANONICAL_BLOCK_ID,CON_ID,bool> > REG_CON;
     typedef ARRAY<std::tuple<int,CANONICAL_BLOCK_ID,int> > IRREG_CON_V;
     typedef ARRAY<std::tuple<int,CANONICAL_BLOCK_ID,int> > IRREG_CON_E;
     typedef std::tuple<CANONICAL_BLOCK_ID,REG_CON,IRREG_CON_V,IRREG_CON_E> KEY;
@@ -1727,16 +1723,16 @@ Compute_Reference_Blocks()
         IRREG_CON_E irreg_con_e;
 
         auto& bl=blocks(b);
-        for(int cc=0;cc<bl.connections.m;cc++)
+        for(CON_ID cc(0);cc<bl.connections.m;cc++)
         {
             const auto& c=bl.connections(cc);
-            if(c.con_id>=0)
+            if(c.is_regular)
                 reg_con.Append(std::make_tuple(blocks(c.id).block,c.con_id,c.master));
             else
             {
-                reg_con.Append(std::make_tuple(CANONICAL_BLOCK_ID(-1),-1,true));
+                reg_con.Append(std::make_tuple(CANONICAL_BLOCK_ID(-1),CON_ID(-1),true));
 
-                const auto& ic=irregular_connections(~c.con_id);
+                const auto& ic=irregular_connections(c.irreg_id);
                 Visit_Irregular_Cross_Section_Dofs(ic,
                     canonical_blocks(blocks(ic.regular).block).cross_sections(ic.con_id),
                     [&](int a,BLOCK_ID b,int c,bool o)
@@ -1772,10 +1768,10 @@ Compute_Reference_Regular_Connections()
     for(BLOCK_ID b(0);b<blocks.m;b++)
     {
         const auto& bl=blocks(b);
-        for(int cc=0;cc<bl.connections.m;cc++)
+        for(CON_ID cc(0);cc<bl.connections.m;cc++)
         {
             const auto& c=bl.connections(cc);
-            if(c.con_id>=0 && c.master)
+            if(c.is_regular && c.master)
             {
                 auto pr=regular_connection_hash.Insert(std::make_tuple(bl.ref_id,cc,blocks(c.id).ref_id,c.con_id),{});
                 if(pr.y) *pr.x=reference_connection_data.Append({{b,c.id},{cc,c.con_id}});
@@ -1789,10 +1785,10 @@ Compute_Reference_Regular_Connections()
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Compute_Reference_Irregular_Connections()
 {
-    typedef std::tuple<CANONICAL_BLOCK_ID,int,ARRAY<PAIR<CANONICAL_BLOCK_ID,int> >,ARRAY<PAIR<CANONICAL_BLOCK_ID,int> > > KEY;
-    HASHTABLE<KEY,int> ref;
+    typedef std::tuple<CANONICAL_BLOCK_ID,CON_ID,ARRAY<PAIR<CANONICAL_BLOCK_ID,int> >,ARRAY<PAIR<CANONICAL_BLOCK_ID,int> > > KEY;
+    HASHTABLE<KEY,IRREG_ID> ref;
 
-    for(int i=0;i<irregular_connections.m;i++)
+    for(IRREG_ID i(0);i<irregular_connections.m;i++)
     {
         auto& ic=irregular_connections(i);
         ARRAY<PAIR<CANONICAL_BLOCK_ID,int> > av,ae;
@@ -1806,7 +1802,7 @@ Compute_Reference_Irregular_Connections()
 // Function Compute_Connection_Hash
 //#####################################################################
 template<class T> int COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Compute_Connection_Hash(BLOCK_ID b0,int con_id0,BLOCK_ID b1,int con_id1)
+Compute_Connection_Hash(BLOCK_ID b0,CON_ID con_id0,BLOCK_ID b1,CON_ID con_id1)
 {
     auto id0=blocks(b0).block,id1=blocks(b1).block;
     return Hash(std::make_tuple(id0,con_id0,id1,con_id1));
@@ -1822,10 +1818,10 @@ Compute_Dof_Remapping(REFERENCE_BLOCK_DATA& rd)
     rd.dof_map_v.Resize(cb.X.m,use_init,1);
     rd.dof_map_e.Resize(cb.S.m,use_init,1);
 
-    for(int cc=0;cc<bl.connections.m;cc++)
+    for(CON_ID cc(0);cc<bl.connections.m;cc++)
     {
         const auto& c=bl.connections(cc);
-        if(c.con_id>=0)
+        if(c.is_regular)
         {
             const auto& cb2=canonical_blocks(blocks(c.id).block);
             Visit_Regular_Cross_Section_Dofs(cb.cross_sections(cc),
@@ -1841,7 +1837,7 @@ Compute_Dof_Remapping(REFERENCE_BLOCK_DATA& rd)
         }
         else
         {
-            const auto& ic=irregular_connections(~c.con_id);
+            const auto& ic=irregular_connections(c.irreg_id);
             Visit_Irregular_Cross_Section_Dofs(ic,
                 canonical_blocks(blocks(ic.regular).block).cross_sections(ic.con_id),
                 [&](int a,BLOCK_ID b,int c,bool o)
@@ -1967,21 +1963,21 @@ Apply_To_RHS(BLOCK_ID b,const BLOCK_VECTOR<T>& w)
 
     Copy_Vector_Data(w,b,rd.pairs,b);
 
-    for(int cc=0;cc<bl.connections.m;cc++)
+    for(CON_ID cc(0);cc<bl.connections.m;cc++)
     {
         const auto& c=bl.connections(cc);
-        if(c.con_id>=0)
+        if(c.is_regular)
             Copy_Vector_Data(w,b,rd.regular_pairs(cc),c.id);
         else
         {
-            const auto& ic=irregular_connections(~c.con_id);
+            const auto& ic=irregular_connections(c.irreg_id);
             const auto& irbd=reference_irregular_data(ic.ref_id);
             for(const auto& h:irbd.pairs)
                 Copy_Vector_Data(w,b,h.irreg_pairs[1][0],h.b);
         }
     }
 
-    for(int e:bl.edge_on)
+    for(IRREG_ID e:bl.edge_on)
     {
         const auto& ic=irregular_connections(e);
         const auto& irbd=reference_irregular_data(ic.ref_id);
@@ -2020,20 +2016,21 @@ Eliminate_Strip(CACHED_ELIMINATION_MATRIX<T>& cem,const ARRAY<BLOCK_ID>& a)
 // Function Eliminate_Strip
 //#####################################################################
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Eliminate_Simple(CACHED_ELIMINATION_MATRIX<T>& cem,BLOCK_ID first,int con_id_source)
+Eliminate_Simple(CACHED_ELIMINATION_MATRIX<T>& cem,BLOCK_ID first,CON_ID con_id_source)
 {
     ARRAY<BLOCK_ID> list;
     BLOCK_ID b=first;
-    int con_id=con_id_source;
+    CON_ID con_id=con_id_source;
     while(1)
     {
         const auto& bl=blocks(b);
-        if(bl.connections.m>2) break;
+        if(bl.connections.m>CON_ID(2)) break;
         if(bl.flags&1) break;
         list.Append(b);
-        if(bl.connections.m==1) break;
-        b=bl.connections(1-con_id).id;
-        con_id=bl.connections(1-con_id).con_id;
+        if(bl.connections.m==CON_ID(1)) break;
+        CON_ID o(1-Value(con_id));
+        b=bl.connections(o).id;
+        con_id=bl.connections(o).con_id;
     }
     Eliminate_Strip(cem,list);
 }
@@ -2069,11 +2066,11 @@ Eliminate_Non_Seperators(CACHED_ELIMINATION_MATRIX<T>& cem)
     {
         if(!cem.valid_row(Value(b))) continue;
         const auto& bl=blocks(b);
-        if(bl.connections.m>2 || bl.flags&1)
+        if(bl.connections.m>CON_ID(2) || bl.flags&1)
         {
             for(const auto& c:bl.connections)
                 Eliminate_Simple(cem,c.id,c.con_id);
-            if(bl.connections.m>2)
+            if(bl.connections.m>CON_ID(2))
                 cem.Eliminate_Row(Value(b));
         }
     }
@@ -2204,10 +2201,10 @@ Visualize_Block_State(BLOCK_ID b) const
         Debug_Particle_Set_Attribute<TV>("display_size",.1);
     }
 
-    for(int cc=0;cc<bl.connections.m;cc++)
+    for(CON_ID cc(0);cc<bl.connections.m;cc++)
     {
         const auto& c=bl.connections(cc);
-        if(c.con_id>=0)
+        if(c.is_regular)
         {
             const auto& cb2=canonical_blocks(blocks(c.id).block);
             Visit_Regular_Cross_Section_Dofs(cb.cross_sections(cc),
@@ -2225,7 +2222,7 @@ Visualize_Block_State(BLOCK_ID b) const
         }
         else
         {
-            const auto& ic=irregular_connections(~c.con_id);
+            const auto& ic=irregular_connections(c.irreg_id);
             Visit_Irregular_Cross_Section_Dofs(ic,
                 canonical_blocks(blocks(ic.regular).block).cross_sections(ic.con_id),
                 [&](int a,BLOCK_ID b,int c,bool o)
@@ -2241,7 +2238,7 @@ Visualize_Block_State(BLOCK_ID b) const
         }
     }
 
-    for(int i:bl.edge_on)
+    for(IRREG_ID i:bl.edge_on)
     {
         auto& ic=irregular_connections(i);
         Visit_Irregular_Cross_Section_Dofs(ic,
