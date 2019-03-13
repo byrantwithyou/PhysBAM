@@ -9,8 +9,9 @@ namespace PhysBAM{
 // Function Make_Canonical_Pipe_Change
 //#####################################################################
 template<class T> CANONICAL_COMPONENT<T>* COMPONENT_CHANGE<T>::
-Make_Component(const PIPE_CHANGE_KEY<T>& key)
+Make_Component(int d0,T w0,int d1,T w1,T l)
 {
+    PIPE_CHANGE_KEY<T> key={{d0,d1},{w0,w1},l};
     auto it=canonical_changes.insert({key,{}});
     if(!it.second) return it.first->second;
 
@@ -20,16 +21,15 @@ Make_Component(const PIPE_CHANGE_KEY<T>& key)
     CANONICAL_COMPONENT<T>* cc=new CANONICAL_COMPONENT<T>;
     it.first->second=cc;
 
-    T w0=key.width[0],w1=key.width[1],dw=w1-w0,wid=key.length/num_sec;
-    int d0=key.num_dofs[0],d1=key.num_dofs[1],dd=d1-d0;
+    T dw=w1-w0,wid=key.length/num_sec;
+    int dd=d1-d0;
     for(int i=0;i<num_sec;i++)
     {
         T ow=w0+dw*i/num_sec;
         T nw=w0+dw*(i+1)/num_sec;
         int od=d0+dd*i/num_sec;
         int nd=d0+dd*(i+1)/num_sec;
-        PIPE_CHANGE_KEY<T> k={{od,nd},{ow,nw},wid};
-        CANONICAL_BLOCK<T>* cb=Make_Block(k);
+        CANONICAL_BLOCK<T>* cb=Make_Block(od,ow,nd,nw,wid);
         cc->blocks.Append(
             {
                 cb,
@@ -72,8 +72,9 @@ void Cross_Section_Topology(ARRAY<VECTOR<int,3> >& E,ARRAY<VECTOR<int,2> >& S,
 // Function Make_Canonical_Change_Block
 //#####################################################################
 template<class T> CANONICAL_BLOCK<T>* COMPONENT_CHANGE<T>::
-Make_Block(const PIPE_CHANGE_KEY<T>& key)
+Make_Block(int d0,T w0,int d1,T w1,T l)
 {
+    PIPE_CHANGE_KEY<T> key={{d0,d1},{w0,w1},l};
     auto it=canonical_change_blocks.insert({key,{}});
     if(!it.second) return it.first->second;
 

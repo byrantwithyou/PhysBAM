@@ -152,33 +152,25 @@ Parse_Input(const std::string& pipe_file)
                     vd(1)=connection_points.Get(name3);
                     connection_points.Delete(name2);
                     connection_points.Delete(name3);
-                    PIPE_KEY<T> key;
                     auto cs=cross_section_hash.Get(name);
-                    key.num_dofs=cs.x;
-                    key.width=cs.y;
                     TV dir=vd(1).X-vd(0).X;
                     if(!Canonical_Direction(dir))
                     {
                         dir=-dir;
                         std::swap(vd(0),vd(1));
                     }
-                    key.length=dir.Normalize();
+                    T len=dir.Normalize();
                     XFORM<TV> xf={Compute_Xform(dir),vd(0).X};
-                    auto cc=comp_pipe.Make_Component(key);
+                    auto cc=comp_pipe.Make_Component(cs.x,cs.y,len);
                     Emit_Component_Blocks(cc,xf,vd);
                 }
                 break;
 
             case 'g':
                 {
-                    PIPE_CHANGE_KEY<T> key;
                     ss>>name>>name2;
                     auto cs0=cross_section_hash.Get(name);
-                    key.num_dofs[0]=cs0.x;
-                    key.width[0]=cs0.y;
                     auto cs1=cross_section_hash.Get(name2);
-                    key.num_dofs[1]=cs1.x;
-                    key.width[1]=cs1.y;
                     ss>>name>>name2>>t0>>t1;
                     TV A=vertices.Get(name);
                     TV B=vertices.Get(name2);
@@ -190,8 +182,7 @@ Parse_Input(const std::string& pipe_file)
                     }
                     TV C=A+dir*t0;
                     TV D=C+dir*t1;
-                    key.length=t1;
-                    auto cc=comp_change.Make_Component(key);
+                    auto cc=comp_change.Make_Component(cs0.x,cs0.y,cs1.x,cs1.y,t1);
                     XFORM<TV> xf={Compute_Xform(dir),A};
                     ss>>name>>name2;
 
@@ -206,19 +197,16 @@ Parse_Input(const std::string& pipe_file)
             case 'u':
             case 't':
                 {
-                    PIPE_KEY<T> key;
-                    key.length=target_length;
+                    T len=target_length;
                     ss>>name>>name2>>name3>>name4;
                     auto cs=cross_section_hash.Get(name);
-                    key.num_dofs=cs.x;
-                    key.width=cs.y;
                     if(c=='u') ss>>t0;
                     else ss>>v0;
                     TV A=vertices.Get(name2);
                     TV B=vertices.Get(name3);
                     TV dir=(B-A).Normalized();
-                    TV C=A+dir*key.length;
-                    auto pr=comp_bc.Make_Block(key,c=='u');
+                    TV C=A+dir*len;
+                    auto pr=comp_bc.Make_Block(cs.x,cs.y,len,c=='u');
                     CANONICAL_BLOCK<T>* cb=pr.x;
 
                     BLOCK_ID b=blocks.Add_End();

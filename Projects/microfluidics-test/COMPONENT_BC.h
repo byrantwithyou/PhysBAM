@@ -23,7 +23,7 @@ struct COMPONENT_BC
     T target_length;
     std::map<PIPE_KEY<T>,TRIP> canonical_bc_blocks[2];
 
-    TRIP Make_Block(const PIPE_KEY<T>& key,bool is_v);
+    TRIP Make_Block(int d,T w,T l,bool is_v);
 };
 
 }

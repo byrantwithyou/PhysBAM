@@ -9,8 +9,9 @@ namespace PhysBAM{
 // Function Make_Block
 //#####################################################################
 template<class T> CANONICAL_BLOCK<T>* COMPONENT_PIPE<T>::
-Make_Block(const PIPE_KEY<T>& key)
+Make_Block(int d,T w,T l)
 {
+    PIPE_KEY<T> key={d,w,l};
     auto it=canonical_pipe_blocks.insert({key,{}});
     if(!it.second) return it.first->second;
 
@@ -49,8 +50,9 @@ Make_Block(const PIPE_KEY<T>& key)
 // Function Make_Component
 //#####################################################################
 template<class T> CANONICAL_COMPONENT<T>* COMPONENT_PIPE<T>::
-Make_Component(const PIPE_KEY<T>& key)
+Make_Component(int d,T w,T l)
 {
+    PIPE_KEY<T> key={d,w,l};
     auto it=canonical_pipes.insert({key,{}});
     if(!it.second) return it.first->second;
 
@@ -61,7 +63,7 @@ Make_Component(const PIPE_KEY<T>& key)
     T offset=0;
     if(length>target_length*(T)1.5)
     {
-        CANONICAL_BLOCK<T>* cb=Make_Block({key.num_dofs,key.width,target_length});
+        CANONICAL_BLOCK<T>* cb=Make_Block(key.num_dofs,key.width,target_length);
         while(length>target_length*(T)1.5)
         {
             cc->blocks.Append(
@@ -74,7 +76,7 @@ Make_Component(const PIPE_KEY<T>& key)
             offset+=target_length;
         }
     }
-    CANONICAL_BLOCK<T>* cb=Make_Block({key.num_dofs,key.width,length});
+    CANONICAL_BLOCK<T>* cb=Make_Block(key.num_dofs,key.width,length);
     cc->blocks.Append(
         {
             cb,

@@ -9,8 +9,9 @@ namespace PhysBAM{
 // Function Make_Block
 //#####################################################################
 template<class T> auto COMPONENT_BC<T>::
-Make_Block(const PIPE_KEY<T>& key,bool is_v) -> TRIP
+Make_Block(int d,T w,T l,bool is_v) -> TRIP
 {
+    PIPE_KEY<T> key={d,w,l};
     auto it=canonical_bc_blocks[is_v].insert({key,{}});
     if(!it.second) return it.first->second;
 

@@ -43,8 +43,8 @@ struct COMPONENT_CHANGE
     std::map<PIPE_CHANGE_KEY<T>,CANONICAL_COMPONENT<T>*> canonical_changes;
     std::map<PIPE_CHANGE_KEY<T>,CANONICAL_BLOCK<T>*> canonical_change_blocks;
 
-    CANONICAL_COMPONENT<T>* Make_Component(const PIPE_CHANGE_KEY<T>& key);
-    CANONICAL_BLOCK<T>* Make_Block(const PIPE_CHANGE_KEY<T>& key);
+    CANONICAL_COMPONENT<T>* Make_Component(int d0,T w0,int d1,T w1,T l);
+    CANONICAL_BLOCK<T>* Make_Block(int d0,T w0,int d1,T w1,T l);
 };
 
 }

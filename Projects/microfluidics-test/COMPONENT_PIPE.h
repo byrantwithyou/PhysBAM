@@ -40,8 +40,8 @@ struct COMPONENT_PIPE
     std::map<PIPE_KEY<T>,CANONICAL_COMPONENT<T>*> canonical_pipes;
     std::map<PIPE_KEY<T>,CANONICAL_BLOCK<T>*> canonical_pipe_blocks;
 
-    CANONICAL_COMPONENT<T>* Make_Component(const PIPE_KEY<T>& key);
-    CANONICAL_BLOCK<T>* Make_Block(const PIPE_KEY<T>& key);
+    CANONICAL_COMPONENT<T>* Make_Component(int d,T w,T l);
+    CANONICAL_BLOCK<T>* Make_Block(int d,T w,T l);
 };
 
 }
