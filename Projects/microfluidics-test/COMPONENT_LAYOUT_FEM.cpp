@@ -281,10 +281,10 @@ Set_Connector(VERTEX_DATA& vd,BLOCK_ID id,CON_ID con_id)
     }
     else
     {
-        IRREGULAR_CONNECTION& con=irregular_connections(vd.ic);
+        IRREGULAR_CONNECTION& con=irregular_connections(vd.con.irreg_id);
         con.regular=id;
         con.con_id=con_id;
-        blocks(id).connections(con_id).Set_Irreg(vd.ic);
+        blocks(id).connections(con_id).Set_Irreg(vd.con.irreg_id);
     }
 }
 //#####################################################################
@@ -319,7 +319,7 @@ Emit_Component_Blocks(const CANONICAL_COMPONENT* cc,const XFORM<TV>& xf,ARRAY<VE
         IRREGULAR_CONNECTION& con=irregular_connections(index);
         if(con.regular>=BLOCK_ID())
             con.regular+=offset;
-        else vd(~Value(con.regular)).ic=index;
+        else vd(~Value(con.regular)).con.Set_Irreg(index);
     }
 }
 //#####################################################################
