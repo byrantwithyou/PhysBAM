@@ -45,7 +45,9 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     static constexpr T comp_tol=(T)1e-10;
     T target_length;
     T mu=1;
-    
+
+    // CANONICAL BLOCKS
+
     // v = range of vertex indices in cross section
     // e = range of edge indices in cross section
     // if own_first, first half of v and e is owned by this block
@@ -55,33 +57,6 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
         INTERVAL<int> v,e;
         bool own_first;
     };
-
-    struct BOUNDARY_CONDITION
-    {
-        BLOCK_ID b=BLOCK_ID(-7);
-        INTERVAL<int> bc_v,bc_e;
-        ARRAY<TV> data_v,data_e;
-        TV normal;
-    };
-    ARRAY<BOUNDARY_CONDITION> bc_v,bc_t;
-
-    ANALYTIC_VECTOR<TV>* analytic_velocity=0;
-    ANALYTIC_SCALAR<TV>* analytic_pressure=0;
-
-    TV Traction(const TV& N,const TV& X) const
-    {
-        SYMMETRIC_MATRIX<T,TV::m> stress=analytic_velocity->dX(X,0).Twice_Symmetric_Part()*mu;
-        stress-=analytic_pressure->f(X,0);
-        return stress*N;
-    }
-
-    TV Force(const TV& X) const
-    {
-        SYMMETRIC_TENSOR<T,0,TV::m> ddU=analytic_velocity->ddX(X,0);
-        TV f=analytic_pressure->dX(X,0);
-        f-=mu*(Contract<1,2>(ddU)+Contract<0,2>(ddU));
-        return f;
-    }
 
     struct CANONICAL_BLOCK
     {
@@ -93,12 +68,9 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     };
     ARRAY<CANONICAL_BLOCK,CANONICAL_BLOCK_ID> canonical_blocks;
 
-    ARRAY<BLOCK_MATRIX<T>,CANONICAL_BLOCK_ID> canonical_block_matrices;
 
-    ARRAY<BLOCK_VECTOR<T>,BLOCK_ID> rhs_block_list;
+    // BLOCKS
 
-    ARRAY<TRIPLE<BLOCK_ID,BLOCK_ID,int> > nonzero_blocks;
-    
     // first is master, second is slave
     struct BLOCK_CONNECTION
     {
@@ -132,6 +104,10 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
         int flags=0; // 1=separator, 2=separator-eligible
         REFERENCE_BLOCK_ID ref_id=REFERENCE_BLOCK_ID(-7);
     };
+    ARRAY<BLOCK,BLOCK_ID> blocks;
+
+
+    // IRREGULAR CONNECTIONS
 
     // regular is master
     struct IRREGULAR_CONNECTION
@@ -144,6 +120,10 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
         REFERENCE_IRREGULAR_ID ref_id=REFERENCE_IRREGULAR_ID(-7);
     };
 
+    ARRAY<IRREGULAR_CONNECTION,IRREG_ID> irregular_connections;
+
+    // CANONICAL_COMPONENT construction
+
     // neighbor block i is given index ~i and con_id=-1.
     struct CANONICAL_COMPONENT
     {
@@ -151,8 +131,6 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
         ARRAY<IRREGULAR_CONNECTION,IRREG_ID> irregular_connections;
     };
 
-    ARRAY<BLOCK,BLOCK_ID> blocks;
-    ARRAY<IRREGULAR_CONNECTION,IRREG_ID> irregular_connections;
 
     struct PIPE_KEY
     {
@@ -216,6 +194,60 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     std::map<PIPE_CHANGE_KEY,CANONICAL_COMPONENT*> canonical_changes;
     std::map<PIPE_CHANGE_KEY,CANONICAL_BLOCK_ID> canonical_change_blocks;
 
+    typedef TRIPLE<CANONICAL_BLOCK_ID,INTERVAL<int>,INTERVAL<int> > BC_KEY;
+    std::map<PIPE_KEY,BC_KEY> canonical_bc_blocks[2];
+    BC_KEY Make_BC_Block(const PIPE_KEY& key,bool is_v);
+
+    PAIR<CANONICAL_COMPONENT*,ARRAY<T> > Make_Canonical_Joint(const JOINT_KEY& key);
+    PAIR<CANONICAL_COMPONENT*,ARRAY<T> > Make_Canonical_Joint_2(const JOINT_KEY& key);
+    PAIR<CANONICAL_COMPONENT*,ARRAY<T> > Make_Canonical_Joint_3_Small(const JOINT_KEY& key);
+    PAIR<CANONICAL_COMPONENT*,ARRAY<T> > Make_Canonical_Joint_3_Average(const JOINT_KEY& key);
+    PAIR<CANONICAL_COMPONENT*,ARRAY<T> > Make_Canonical_Joint_3(const JOINT_KEY& key);
+    CANONICAL_COMPONENT* Make_Canonical_Pipe(const PIPE_KEY& key);
+    CANONICAL_BLOCK_ID Make_Canonical_Pipe_Block(const PIPE_KEY& key);
+    CANONICAL_COMPONENT* Make_Canonical_Pipe_Change(const PIPE_CHANGE_KEY& key);
+    CANONICAL_BLOCK_ID Make_Canonical_Change_Block(const PIPE_CHANGE_KEY& key);
+    std::tuple<TV,T,T> Elbow_Pit(T angle,T width) const;
+    TV Elbow_Pit_Oriented(T angle,T width) const;
+    VECTOR<TV,2> Extrude(const TV& v0,const TV& v1,const TV& n) const;
+    PAIR<ARRAY<TV>,ARRAY<TV> > Arc(const TV& c,T angle,T len_arm,T ext0,T ext1) const;
+    ARRAY<TV> Polyline(const ARRAY<TV>& points,T dx) const;
+    void Joint_Connection(int offset,BLOCK_MESHING_ITERATOR<TV>& it,
+        CANONICAL_BLOCK& cb,IRREGULAR_CONNECTION& ic0,IRREGULAR_CONNECTION& ic1,
+        ARRAY<BLOCK_CONNECTION,CON_ID>& con,CON_ID prev) const;
+
+    // BOUNDARY CONDITIONS
+
+    struct BOUNDARY_CONDITION
+    {
+        BLOCK_ID b=BLOCK_ID(-7);
+        INTERVAL<int> bc_v,bc_e;
+        ARRAY<TV> data_v,data_e;
+        TV normal;
+    };
+    ARRAY<BOUNDARY_CONDITION> bc_v,bc_t;
+
+    ANALYTIC_VECTOR<TV>* analytic_velocity=0;
+    ANALYTIC_SCALAR<TV>* analytic_pressure=0;
+
+    TV Traction(const TV& N,const TV& X) const
+    {
+        SYMMETRIC_MATRIX<T,TV::m> stress=analytic_velocity->dX(X,0).Twice_Symmetric_Part()*mu;
+        stress-=analytic_pressure->f(X,0);
+        return stress*N;
+    }
+
+    TV Force(const TV& X) const
+    {
+        SYMMETRIC_TENSOR<T,0,TV::m> ddU=analytic_velocity->ddX(X,0);
+        TV f=analytic_pressure->dX(X,0);
+        f-=mu*(Contract<1,2>(ddU)+Contract<0,2>(ddU));
+        return f;
+    }
+
+
+    // DOF MAPPING
+
     struct DOF_PAIRS
     {
         ARRAY<IV> v,e,p;
@@ -264,41 +296,13 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
 
     ARRAY<REFERENCE_IRREGULAR_DATA,REFERENCE_IRREGULAR_ID> reference_irregular_data;
 
-    ~COMPONENT_LAYOUT_FEM();
-    void Parse_Input(const std::string& pipe_file);
-
-    MATRIX<T,2> Compute_Xform(const TV& dir); // dir is normalized
-    PAIR<CANONICAL_COMPONENT*,ARRAY<T> > Make_Canonical_Joint(const JOINT_KEY& key);
-    PAIR<CANONICAL_COMPONENT*,ARRAY<T> > Make_Canonical_Joint_2(const JOINT_KEY& key);
-    PAIR<CANONICAL_COMPONENT*,ARRAY<T> > Make_Canonical_Joint_3_Small(const JOINT_KEY& key);
-    PAIR<CANONICAL_COMPONENT*,ARRAY<T> > Make_Canonical_Joint_3_Average(const JOINT_KEY& key);
-    PAIR<CANONICAL_COMPONENT*,ARRAY<T> > Make_Canonical_Joint_3(const JOINT_KEY& key);
-    CANONICAL_COMPONENT* Make_Canonical_Pipe(const PIPE_KEY& key);
-    CANONICAL_BLOCK_ID Make_Canonical_Pipe_Block(const PIPE_KEY& key);
-    CANONICAL_COMPONENT* Make_Canonical_Pipe_Change(const PIPE_CHANGE_KEY& key);
-    CANONICAL_BLOCK_ID Make_Canonical_Change_Block(const PIPE_CHANGE_KEY& key);
     void Compute();
     void Update_Masters();
-
-    typedef TRIPLE<CANONICAL_BLOCK_ID,INTERVAL<int>,INTERVAL<int> > BC_KEY;
-    std::map<PIPE_KEY,BC_KEY> canonical_bc_blocks[2];
-    BC_KEY Make_BC_Block(const PIPE_KEY& key,bool is_v);
-    
-    struct VERTEX_DATA
-    {
-        TV X;
-        BLOCK_CONNECTION con;
-        IRREG_ID ic=IRREG_ID(-7); // if con.id<0, vd holds irregular connection. ic is an index in irregular_connections.
-    };
-
-    void Emit_Component_Blocks(const CANONICAL_COMPONENT* cc,const XFORM<TV>& xf,ARRAY<VERTEX_DATA>& vd);
-    void Set_Connector(VERTEX_DATA& vd,BLOCK_ID id,CON_ID con_id);
 
     // return: flags indicating which connections interact
     // pair: block + master mask
     HASHTABLE<PAIR<CANONICAL_BLOCK_ID,int>,int> separates_dofs;
     int Separates_Dofs(BLOCK_ID b);
-
     HASHTABLE<std::tuple<CANONICAL_BLOCK_ID,CON_ID,CANONICAL_BLOCK_ID,CON_ID>,PAIR<CANONICAL_BLOCK_ID,ARRAY<int> > > merge_canonical_blocks;
     void Merge_Blocks(BLOCK_ID id,CON_ID con_id);
     PAIR<CANONICAL_BLOCK_ID,ARRAY<int> >*
@@ -306,11 +310,6 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
             XFORM<TV> xf0,CANONICAL_BLOCK_ID id1,CON_ID con_id1,XFORM<TV> xf1);
     int Approx_Dof_Count(BLOCK_ID b);
     void Merge_Blocks();
-    void Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem);
-    void Fill_Canonical_Block_Matrix(BLOCK_MATRIX<T>& mat,const CANONICAL_BLOCK& cb);
-    void Fill_Block_Matrix(REFERENCE_BLOCK_DATA& rd);
-    void Fill_Connection_Matrix(REFERENCE_CONNECTION_DATA& cd);
-    void Fill_Irregular_Connection_Matrix(REFERENCE_IRREGULAR_DATA& ri);
     void Compute_Reference_Blocks();
     void Compute_Reference_Regular_Connections();
     void Compute_Reference_Irregular_Connections();
@@ -321,6 +320,19 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     void Compute_Dof_Pairs(REFERENCE_BLOCK_DATA& rd);
     void Compute_Dof_Pairs(REFERENCE_CONNECTION_DATA& rc);
     void Compute_Dof_Pairs(REFERENCE_IRREGULAR_DATA& ri);
+
+
+    // MATRIX ASSEMBLY
+
+    ARRAY<BLOCK_MATRIX<T>,CANONICAL_BLOCK_ID> canonical_block_matrices;
+    ARRAY<BLOCK_VECTOR<T>,BLOCK_ID> rhs_block_list;
+    ARRAY<TRIPLE<BLOCK_ID,BLOCK_ID,int> > nonzero_blocks;
+
+    void Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem);
+    void Fill_Canonical_Block_Matrix(BLOCK_MATRIX<T>& mat,const CANONICAL_BLOCK& cb);
+    void Fill_Block_Matrix(REFERENCE_BLOCK_DATA& rd);
+    void Fill_Connection_Matrix(REFERENCE_CONNECTION_DATA& cd);
+    void Fill_Irregular_Connection_Matrix(REFERENCE_IRREGULAR_DATA& ri);
     void Copy_Matrix_Data(BLOCK_MATRIX<T>& A,BLOCK_ID b,
         const DOF_PAIRS& dpa,const DOF_PAIRS& dpb,BLOCK_ID ar,BLOCK_ID ac) const;
     void Copy_Vector_Data(const BLOCK_VECTOR<T>& B,BLOCK_ID b,const DOF_PAIRS& dp,BLOCK_ID a);
@@ -331,25 +343,44 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     void Times_P_U(BLOCK_ID b,BLOCK_VECTOR<T>& w,const ARRAY<T>& div_v,const ARRAY<T>& div_e) const;
     void Times_Line_Integral_U_Dot_V(BLOCK_ID b,BLOCK_VECTOR<T>& w,const BLOCK_VECTOR<T>& u) const;
     void Apply_To_RHS(BLOCK_ID b,const BLOCK_VECTOR<T>& w);
-    RANGE<TV> Compute_Bounding_Box() const;
+
+
+    // ELIMINATION
+
     void Eliminate_Irregular_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem);
     void Eliminate_Non_Seperators(CACHED_ELIMINATION_MATRIX<T>& cem);
     void Eliminate_Strip(CACHED_ELIMINATION_MATRIX<T>& cem,const ARRAY<BLOCK_ID>& a);
     void Eliminate_Simple(CACHED_ELIMINATION_MATRIX<T>& cem,BLOCK_ID first,CON_ID con_id_source);
+
+
+    // PARSING AND ASSEMBLY
+
+    void Parse_Input(const std::string& pipe_file);
+    MATRIX<T,2> Compute_Xform(const TV& dir); // dir is normalized
+
+    struct VERTEX_DATA
+    {
+        TV X;
+        BLOCK_CONNECTION con;
+        IRREG_ID ic=IRREG_ID(-7); // if con.id<0, vd holds irregular connection. ic is an index in irregular_connections.
+    };
+
+    void Emit_Component_Blocks(const CANONICAL_COMPONENT* cc,const XFORM<TV>& xf,ARRAY<VERTEX_DATA>& vd);
+    void Set_Connector(VERTEX_DATA& vd,BLOCK_ID id,CON_ID con_id);
+
+
+    // DEBUGGING
+
     void Visualize_Block_State(BLOCK_ID b) const;
     void Transform_Solution(const CACHED_ELIMINATION_MATRIX<T>& cem);
     void Visualize_Solution(BLOCK_ID b) const;
     void Dump_World_Space_System() const;
     void Transform_To_World_Space(BLOCK_MATRIX<T>& M,const BLOCK_MATRIX<T>& B,BLOCK_ID a,BLOCK_ID b) const;
 
-  private:
-    std::tuple<TV,T,T> Elbow_Pit(T angle,T width) const;
-    TV Elbow_Pit_Oriented(T angle,T width) const;
-    VECTOR<TV,2> Extrude(const TV& v0,const TV& v1,const TV& n) const;
-    PAIR<ARRAY<TV>,ARRAY<TV> > Arc(const TV& c,T angle,T len_arm,T ext0,T ext1) const;
-    ARRAY<TV> Polyline(const ARRAY<TV>& points,T dx) const;
-    void Joint_Connection(int offset,BLOCK_MESHING_ITERATOR<TV>& it,CANONICAL_BLOCK& cb,
-        IRREGULAR_CONNECTION& ic0,IRREGULAR_CONNECTION& ic1,ARRAY<BLOCK_CONNECTION,CON_ID>& con,CON_ID prev) const;
+    // OTHER
+
+    ~COMPONENT_LAYOUT_FEM();
+    RANGE<TV> Compute_Bounding_Box() const;
 };
 
 }
