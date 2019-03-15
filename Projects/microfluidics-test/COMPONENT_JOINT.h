@@ -56,7 +56,7 @@ struct COMPONENT_JOINT
     PAIR<ARRAY<TV>,ARRAY<TV> > Arc(const TV& c,T angle,T len_arm,T ext0,T ext1) const;
     ARRAY<TV> Polyline(const ARRAY<TV>& points,T dx) const;
     void Joint_Connection(int offset,BLOCK_MESHING_ITERATOR<TV>& it,
-        CANONICAL_BLOCK<T>* cb,CC_IRREGULAR_CONNECTION& ic0,CC_IRREGULAR_CONNECTION& ic1,
+        CANONICAL_BLOCK<T>* cb,CC_IRREGULAR_CONNECTION* ic0,CC_IRREGULAR_CONNECTION* ic1,
         ARRAY<CC_BLOCK_CONNECTION,CON_ID>& con,CON_ID prev) const;
 };
 
