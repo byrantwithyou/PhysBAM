@@ -652,6 +652,7 @@ Merge_Blocks()
             for(CON_ID i(0);i<blocks(b).connections.m;i++)
             {
                 if(!(mask&(1<<Value(i)))) continue;
+                if(!blocks(b).connections(i).is_regular) continue;
                 BLOCK_ID d=blocks(b).connections(i).id;
                 if(blocks(d).flags&1) continue;
                 int c=Approx_Dof_Count(d);
