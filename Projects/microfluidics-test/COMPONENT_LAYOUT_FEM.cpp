@@ -1268,7 +1268,7 @@ template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Compute_Reference_Irregular_Connections()
 {
     typedef std::tuple<CANONICAL_BLOCK<T>*,CON_ID,ARRAY<PAIR<CANONICAL_BLOCK<T>*,int> >,ARRAY<PAIR<CANONICAL_BLOCK<T>*,int> > > KEY;
-    HASHTABLE<KEY,IRREG_ID> ref;
+    HASHTABLE<KEY,REFERENCE_IRREGULAR_ID> ref;
 
     for(IRREG_ID i(0);i<irregular_connections.m;i++)
     {
@@ -1276,8 +1276,9 @@ Compute_Reference_Irregular_Connections()
         ARRAY<PAIR<CANONICAL_BLOCK<T>*,int> > av,ae;
         for(auto p:ic.edge_on_v) av.Append({blocks(p.x).block,p.y});
         for(auto p:ic.edge_on_e) ae.Append({blocks(p.x).block,p.y});
-        auto pr=ref.Insert(std::make_tuple(blocks(ic.regular).block,ic.con_id,av,ae),i);
-        ic.ref_ic=*pr.x;
+        auto pr=ref.Insert(std::make_tuple(blocks(ic.regular).block,ic.con_id,av,ae),{});
+        if(pr.y) *pr.x=reference_irregular_data.Append({i});
+        ic.ref_id=*pr.x;
     }
 }
 //#####################################################################

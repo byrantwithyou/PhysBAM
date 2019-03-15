@@ -93,7 +93,6 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
         CON_ID con_id=CON_ID(-7);
         // one for each dof on cross section, starting from owned side of cross section
         ARRAY<PAIR<BLOCK_ID,int> > edge_on_v,edge_on_e;
-        IRREG_ID ref_ic=IRREG_ID(-7);
         REFERENCE_IRREGULAR_ID ref_id=REFERENCE_IRREGULAR_ID(-7);
     };
 
