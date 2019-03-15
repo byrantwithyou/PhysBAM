@@ -263,8 +263,16 @@ Set_Connector(VERTEX_DATA& vd,BLOCK_ID id,CON_ID con_id)
 {
     if(vd.con.is_regular)
     {
-        blocks(vd.con.id).connections(vd.con.con_id)={id,con_id};
-        blocks(id).connections(con_id)={vd.con.id,vd.con.con_id};
+        if(vd.con.id>=BLOCK_ID())
+        {
+            blocks(vd.con.id).connections(vd.con.con_id)={id,con_id};
+            blocks(id).connections(con_id)={vd.con.id,vd.con.con_id};
+        }
+        else
+        {
+            vd.con.id=id;
+            vd.con.con_id=con_id;
+        }
     }
     else
     {
