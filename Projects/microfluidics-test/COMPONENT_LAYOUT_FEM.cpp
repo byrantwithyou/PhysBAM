@@ -1577,6 +1577,7 @@ Compute_Dof_Pairs(REFERENCE_IRREGULAR_DATA& ri)
             auto y=prs.Insert(b,0);
             if(y.y) *y.x=ri.pairs.Add_End();
             auto& z=ri.pairs(*y.x);
+            z.b=b;
             rd[1]=&reference_block_data(blocks(b).ref_id);
             int f[2]={a,c};
             int i=!o,r=rd[i]->dof_map_v(f[i]),s=rd[i]->dof_map_p(f[i]);
@@ -1591,6 +1592,7 @@ Compute_Dof_Pairs(REFERENCE_IRREGULAR_DATA& ri)
             auto y=prs.Insert(b,0);
             if(y.y) *y.x=ri.pairs.Add_End();
             auto& z=ri.pairs(*y.x);
+            z.b=b;
             rd[1]=&reference_block_data(blocks(b).ref_id);
             int f[2]={a,c};
             int i=!o,r=rd[i]->dof_map_e(f[i]);
