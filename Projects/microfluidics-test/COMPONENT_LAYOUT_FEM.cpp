@@ -353,6 +353,7 @@ Compute()
 
     for(auto& bl:blocks)
     {
+        if(!bl.block) continue;
         auto pr=canonical_block_matrices.Insert(bl.block,{});
         if(pr.y) Fill_Canonical_Block_Matrix(*pr.x,bl.block);
     }
