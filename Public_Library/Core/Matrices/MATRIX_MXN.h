@@ -179,6 +179,9 @@ public:
 
     void Append_Row()
     {x.Resize(++m*n);}
+
+    void Exchange(MATRIX_MXN& M)
+    {std::swap(m,M.m);std::swap(n,M.n);x.Exchange(M.x);}
 //#####################################################################
 };
 template<class T>
