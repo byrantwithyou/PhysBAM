@@ -46,7 +46,8 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
 
     T target_length;
     T mu=1;
-
+    T unit_m,unit_s,unit_kg;
+    
     // BLOCKS
 
     struct BLOCK_CONNECTION
@@ -115,15 +116,15 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
 
     TV Traction(const TV& N,const TV& X) const
     {
-        SYMMETRIC_MATRIX<T,TV::m> stress=analytic_velocity->dX(X,0).Twice_Symmetric_Part()*mu;
-        stress-=analytic_pressure->f(X,0);
+        SYMMETRIC_MATRIX<T,TV::m> stress=analytic_velocity->dX(X/unit_m,0).Twice_Symmetric_Part()/unit_s*mu;
+        stress-=analytic_pressure->f(X/unit_m,0)*unit_kg/sqr(unit_s);
         return stress*N;
     }
 
     TV Force(const TV& X) const
     {
-        SYMMETRIC_TENSOR<T,0,TV::m> ddU=analytic_velocity->ddX(X,0);
-        TV f=analytic_pressure->dX(X,0);
+        SYMMETRIC_TENSOR<T,0,TV::m> ddU=analytic_velocity->ddX(X/unit_m,0)/(unit_m*unit_s);
+        TV f=analytic_pressure->dX(X/unit_m,0)*unit_kg/(unit_m*sqr(unit_s));
         f-=mu*(Contract<1,2>(ddU)+Contract<0,2>(ddU));
         return f;
     }
@@ -249,9 +250,10 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     // DEBUGGING
 
     void Visualize_Block_State(BLOCK_ID b) const;
-    void Transform_Solution(const CACHED_ELIMINATION_MATRIX<T>& cem);
+    void Transform_Solution(const CACHED_ELIMINATION_MATRIX<T>& cem,bool transpose);
     void Visualize_Solution(BLOCK_ID b) const;
     void Dump_World_Space_System(const CACHED_ELIMINATION_MATRIX<T>& cem) const;
+    void Dump_World_Space_Vector(const char* name) const;
     void Transform_To_World_Space(BLOCK_MATRIX<T>& M,const BLOCK_MATRIX<T>& B,BLOCK_ID a,BLOCK_ID b) const;
 
     // OTHER

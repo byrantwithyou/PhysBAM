@@ -38,11 +38,15 @@ void Run(PARSE_ARGS& parse_args)
     int threads=1;
     bool quiet=false,use_krylov=false,print_system=false;
     std::string pipe_file,output_dir="output";
+    T s=1,m=1,kg=1;
     parse_args.Add("-o",&output_dir,"dir","output dir");
     parse_args.Add("-mu",&mu,"mu","viscosity");
     parse_args.Add("-q",&quiet,"disable diagnostics; useful for timing");
     parse_args.Add("-k",&use_krylov,"solve with Krylov method");
     parse_args.Add("-p",&print_system,"dump the system to be solved");
+    parse_args.Add("-m",&m,"scale","scale units of length");
+    parse_args.Add("-s",&s,"scale","scale units of time");
+    parse_args.Add("-kg",&kg,"scale","scale units of mass");
     parse_args.Add("-threads",&threads,"num","number of threads to use");
     parse_args.Extra(&pipe_file,"file","file describing pipes");
     parse_args.Parse();
@@ -50,7 +54,10 @@ void Run(PARSE_ARGS& parse_args)
     timer("args");
 
     COMPONENT_LAYOUT_FEM<TV> cl;
-    cl.mu=mu;
+    cl.unit_m=m;
+    cl.unit_s=s;
+    cl.unit_kg=kg;
+    cl.mu=mu*kg/s;
     cl.Parse_Input(pipe_file);
 
     timer("parse input");
@@ -99,6 +106,8 @@ void Run(PARSE_ARGS& parse_args)
     cem.quiet=quiet;
     cl.Compute_Matrix_Blocks(cem);
     cl.Dump_World_Space_System(cem);
+    cl.Transform_Solution(cem,true);
+    cl.Dump_World_Space_Vector("b");
 
     timer("compute matrix");
 
@@ -131,7 +140,7 @@ void Run(PARSE_ARGS& parse_args)
 
     timer("exec jobs");
 
-    cl.Transform_Solution(cem);
+    cl.Transform_Solution(cem,false);
     if(!quiet)
     {
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
@@ -143,6 +152,7 @@ void Run(PARSE_ARGS& parse_args)
             Flush_Frame<TV>(LOG::sprintf("block %P (%P)",b,cl.blocks(b).block).c_str());
         }
     }
+    cl.Dump_World_Space_Vector("x");
 
     for(int i=1;i<tm.m;i++)
         printf("%20s %5.0f ms\n",tm(i).y,
