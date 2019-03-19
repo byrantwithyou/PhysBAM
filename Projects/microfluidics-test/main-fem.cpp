@@ -98,6 +98,7 @@ void Run(PARSE_ARGS& parse_args)
     CACHED_ELIMINATION_MATRIX<T> cem;
     cem.quiet=quiet;
     cl.Compute_Matrix_Blocks(cem);
+    cl.Dump_World_Space_System(cem);
 
     timer("compute matrix");
 

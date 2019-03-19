@@ -80,9 +80,10 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
         ARRAY<IRREG_ID> edge_on; // for edge-on (index in irregular_connections)
         int flags=0; // 1=separator, 2=separator-eligible
         REFERENCE_BLOCK_ID ref_id=REFERENCE_BLOCK_ID(-7);
+        DOF_COUNTS num_dofs;
     };
     ARRAY<BLOCK,BLOCK_ID> blocks;
-
+    CANONICAL_BLOCK<T>* empty_canonical_block;
 
     // IRREGULAR CONNECTIONS
 
@@ -126,22 +127,21 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
         f-=mu*(Contract<1,2>(ddU)+Contract<0,2>(ddU));
         return f;
     }
-
+    
     // DOF MAPPING
-
     struct DOF_PAIRS
     {
+        DOF_COUNTS num_dofs_d,num_dofs_s;
         ARRAY<IV> v,e,p;
     };
 
     struct REFERENCE_BLOCK_DATA
     {
         BLOCK_ID b;
-        int num_dofs_v=-7,num_dofs_e=-7,num_dofs_p=-7;
+        DOF_COUNTS num_dofs;
         ARRAY<int> dof_map_v,dof_map_e,dof_map_p;
         DOF_PAIRS pairs;
         ARRAY<DOF_PAIRS,CON_ID> regular_pairs; // this block is the source, the connection is the destination
-        BLOCK_MATRIX<T> M;
         int mat_id=-7;
     };
 
@@ -154,8 +154,6 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     {
         BLOCK_ID b[2];
         CON_ID con_id[2];
-
-        BLOCK_MATRIX<T> M;
         int mat_id=-7;
     };
 
@@ -164,8 +162,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     struct REFERENCE_IRREGULAR_DATA_HELPER
     {
         BLOCK_ID b=BLOCK_ID(-7);
-        DOF_PAIRS irreg_pairs[2][2]; // dof[to][from]; 0=regular, 1=irregular
-        BLOCK_MATRIX<T> M;
+        DOF_PAIRS irreg_pairs[2]; // dof[to]; 0=regular, 1=irregular; from=1-to
         int mat_id=-7;
     };
 
@@ -201,7 +198,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     void Compute_Dof_Pairs(REFERENCE_BLOCK_DATA& rd);
     void Compute_Dof_Pairs(REFERENCE_CONNECTION_DATA& rc);
     void Compute_Dof_Pairs(REFERENCE_IRREGULAR_DATA& ri);
-
+    void Fill_Num_Dofs(DOF_PAIRS& dp,BLOCK_ID d,BLOCK_ID s);
 
     // MATRIX ASSEMBLY
 
@@ -211,12 +208,12 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
 
     void Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem);
     void Fill_Canonical_Block_Matrix(BLOCK_MATRIX<T>& mat,const CANONICAL_BLOCK<T>* cb);
-    void Fill_Block_Matrix(REFERENCE_BLOCK_DATA& rd);
-    void Fill_Connection_Matrix(REFERENCE_CONNECTION_DATA& cd);
-    void Fill_Irregular_Connection_Matrix(REFERENCE_IRREGULAR_DATA& ri);
+    void Fill_Block_Matrix(BLOCK_MATRIX<T>& M,const REFERENCE_BLOCK_DATA& rd);
+    void Fill_Connection_Matrix(BLOCK_MATRIX<T>& M,const REFERENCE_CONNECTION_DATA& cd);
+    void Fill_Irregular_Connection_Matrix(ARRAY<BLOCK_MATRIX<T> >& M,const REFERENCE_IRREGULAR_DATA& ri);
     void Copy_Matrix_Data(BLOCK_MATRIX<T>& A,BLOCK_ID b,
         const DOF_PAIRS& dpa,const DOF_PAIRS& dpb,BLOCK_ID ar,BLOCK_ID ac) const;
-    void Copy_Vector_Data(const BLOCK_VECTOR<T>& B,BLOCK_ID b,const DOF_PAIRS& dp,BLOCK_ID a);
+    void Copy_Vector_Data(const BLOCK_VECTOR<T>& B,BLOCK_ID b,const DOF_PAIRS& dp);
     void Init_Block_Matrix(BLOCK_MATRIX<T>& M,BLOCK_ID a,BLOCK_ID b) const;
     void Init_Block_Vector(BLOCK_VECTOR<T>& M,BLOCK_ID b) const;
     void Init_Block_Vector(BLOCK_VECTOR<T>& M,const CANONICAL_BLOCK<T>* cb) const;
@@ -254,7 +251,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     void Visualize_Block_State(BLOCK_ID b) const;
     void Transform_Solution(const CACHED_ELIMINATION_MATRIX<T>& cem);
     void Visualize_Solution(BLOCK_ID b) const;
-    void Dump_World_Space_System() const;
+    void Dump_World_Space_System(const CACHED_ELIMINATION_MATRIX<T>& cem) const;
     void Transform_To_World_Space(BLOCK_MATRIX<T>& M,const BLOCK_MATRIX<T>& B,BLOCK_ID a,BLOCK_ID b) const;
 
     // OTHER
