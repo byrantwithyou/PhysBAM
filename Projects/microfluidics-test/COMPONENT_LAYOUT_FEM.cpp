@@ -6,7 +6,6 @@
 #include <Core/Data_Structures/TRIPLE.h>
 #include <Core/Data_Structures/TUPLE.h>
 #include <Core/Log/LOG.h>
-#include <Core/Log/TEST_UNITS.h>
 #include <Core/Math_Tools/RANGE.h>
 #include <Core/Matrices/MATRIX_MXN.h>
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
@@ -1733,9 +1732,6 @@ Visualize_Solution(BLOCK_ID b) const
     for(int i=0;i<cb->X.m;i++)
         if(rd.dof_map_v(i)>=0)
         {
-            TEST_UNITS(Z(i));
-            TV viz_u_v=U.Get_v(rd.dof_map_v(i));
-            TEST_UNITS(viz_u_v);
             Add_Debug_Particle(Z(i),VECTOR<T,3>(1,0,0));
             Debug_Particle_Set_Attribute<TV>("V",U.Get_v(rd.dof_map_v(i)));
         }
@@ -1743,9 +1739,6 @@ Visualize_Solution(BLOCK_ID b) const
     for(int i=0;i<cb->S.m;i++)
         if(rd.dof_map_e(i)>=0)
         {
-            TEST_UNITS((Z(cb->S(i).x)+Z(cb->S(i).y))/2);
-            TV viz_u_e=U.Get_e(rd.dof_map_e(i));
-            TEST_UNITS(viz_u_e);
             Add_Debug_Particle((Z(cb->S(i).x)+Z(cb->S(i).y))/2,VECTOR<T,3>(1,0,0));
             Debug_Particle_Set_Attribute<TV>("V",U.Get_e(rd.dof_map_e(i)));
         }
@@ -1753,9 +1746,6 @@ Visualize_Solution(BLOCK_ID b) const
     for(int i=0;i<cb->X.m;i++)
         if(rd.dof_map_p(i)>=0)
         {
-            TEST_UNITS(Z(i));
-            T viz_p=U.Get_p(rd.dof_map_p(i));
-            TEST_UNITS(viz_p);
             Add_Debug_Particle(Z(i),VECTOR<T,3>(0,1,0));
             Debug_Particle_Set_Attribute<TV>("display_size",U.Get_p(rd.dof_map_p(i)));
         }
