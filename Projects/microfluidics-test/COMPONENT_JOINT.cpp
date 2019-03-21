@@ -174,7 +174,7 @@ Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles)
         sep_cb->S(offset_edge+3*(d-1))={offset_x+d-1,offset_x+d-1+i+s};
         sep_cb->bc_v.Append_Elements(ARRAY<int>{offset_x,offset_x+i+s,offset_x+d-1,offset_x+d-1+i+s});
         sep_cb->bc_e.Append_Elements(ARRAY<int>{offset_edge+2*(d-1),offset_edge+3*(d-1)});
-        sep_cb->cross_sections.Append({{offset_x+s,offset_x+d+s},{offset_edge,offset_edge+(d-1)},true});
+        sep_cb->cross_sections.Append({{offset_x+s+i,offset_x+d+s+i},{offset_edge,offset_edge+(d-1)},true});
     }
     ARRAY<CC_BLOCK_CONNECTION,CON_ID> sep_con;
     sep_con.Append({cc->blocks.m-1,CON_ID(1)});
