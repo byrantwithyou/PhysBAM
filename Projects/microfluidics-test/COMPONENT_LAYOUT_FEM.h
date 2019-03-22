@@ -81,7 +81,6 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
         ARRAY<IRREG_ID> edge_on; // for edge-on (index in irregular_connections)
         int flags=0; // 1=separator, 2=separator-eligible
         REFERENCE_BLOCK_ID ref_id=REFERENCE_BLOCK_ID(-7);
-        DOF_COUNTS num_dofs;
     };
     ARRAY<BLOCK,BLOCK_ID> blocks;
     CANONICAL_BLOCK<T>* empty_canonical_block;
@@ -139,7 +138,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     struct REFERENCE_BLOCK_DATA
     {
         BLOCK_ID b;
-        DOF_COUNTS num_dofs;
+        DOF_COUNTS num_dofs_d,num_dofs_s;
         ARRAY<int> dof_map_v,dof_map_e,dof_map_p;
         DOF_PAIRS pairs;
         ARRAY<DOF_PAIRS,CON_ID> regular_pairs; // this block is the source, the connection is the destination
@@ -256,6 +255,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     void Dump_World_Space_Vector(const char* name) const;
     void Transform_To_World_Space(BLOCK_MATRIX<T>& M,const BLOCK_MATRIX<T>& B,BLOCK_ID a,BLOCK_ID b) const;
     void Visualize_Flat_Dofs() const;
+    void Check_Analytic_Solution() const;
 
     // OTHER
 

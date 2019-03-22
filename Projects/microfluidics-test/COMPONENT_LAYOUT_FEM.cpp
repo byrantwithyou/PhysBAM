@@ -1205,10 +1205,6 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
 
     cem.End_Fill_Blocks();
     cem.valid_row.Resize(Value(blocks.m),use_init,true);
-
-    LOG::printf("CM\n");
-    for(int i=0;i<cem.block_list.m;i++)
-        LOG::printf("%i %P\n",i,cem.block_list(i).M);
 }
 //#####################################################################
 // Function Compute_Block_Hash
@@ -1325,8 +1321,6 @@ Compute_Dof_Remapping(REFERENCE_BLOCK_DATA& rd)
     const auto* cb=bl.block;
     rd.dof_map_v.Resize(cb->X.m,use_init,1);
     rd.dof_map_e.Resize(cb->S.m,use_init,1);
-    blocks(rd.b).num_dofs={cb->X.m,cb->S.m,cb->X.m};
-    LOG::printf("before block %P -> %P\n",rd.b,blocks(rd.b).num_dofs);
     
     for(CON_ID cc(0);cc<bl.connections.m;cc++)
     {
@@ -1374,8 +1368,9 @@ Compute_Dof_Remapping(REFERENCE_BLOCK_DATA& rd)
         rd.dof_map_e(i)=rd.dof_map_e(i)?ie++:-1;
     for(int i=0;i<rd.dof_map_p.m;i++)
         rd.dof_map_p(i)=rd.dof_map_p(i)?ip++:-1;
-    rd.num_dofs={iv,ie,ip};
-    LOG::printf("after block %P -> %P\n",rd.b,rd.num_dofs);
+    rd.num_dofs_s={cb->X.m,cb->S.m,cb->X.m};
+    rd.num_dofs_d={iv,ie,ip};
+    LOG::printf("block dofs %P %P -> %P\n",rd.b,rd.num_dofs_s,rd.num_dofs_d);
 }
 //#####################################################################
 // Function Init_Block_Matrix
@@ -1385,8 +1380,8 @@ Init_Block_Matrix(BLOCK_MATRIX<T>& M,BLOCK_ID a,BLOCK_ID b) const
 {
     const auto& c=reference_block_data(blocks(a).ref_id);
     const auto& d=reference_block_data(blocks(b).ref_id);
-    M.nr=c.num_dofs;
-    M.nc=d.num_dofs;
+    M.nr=c.num_dofs_d;
+    M.nc=d.num_dofs_d;
     M.Resize();
 }
 //#####################################################################
@@ -1396,7 +1391,7 @@ template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Init_Block_Vector(BLOCK_VECTOR<T>& V,BLOCK_ID b) const
 {
     const auto& c=reference_block_data(blocks(b).ref_id);
-    V.n=c.num_dofs;
+    V.n=c.num_dofs_d;
     V.Resize();
 }
 //#####################################################################
@@ -1793,11 +1788,11 @@ Dump_World_Space_System(const CACHED_ELIMINATION_MATRIX<T>& cem) const
     {
         const auto& c=reference_block_data(blocks(b).ref_id);
         first[0](b)=next_u;
-        next_u+=c.num_dofs.v*2;
+        next_u+=c.num_dofs_d.v*2;
         first[1](b)=next_u;
-        next_u+=c.num_dofs.e*2;
+        next_u+=c.num_dofs_d.e*2;
         first[2](b)=next_p;
-        next_p+=c.num_dofs.p;
+        next_p+=c.num_dofs_d.p;
     }
     first[2]+=next_u;
 
@@ -1811,8 +1806,8 @@ Dump_World_Space_System(const CACHED_ELIMINATION_MATRIX<T>& cem) const
         Transform_To_World_Space(W,M,t.x,t.y);
         const auto& a=reference_block_data(blocks(t.x).ref_id);
         const auto& b=reference_block_data(blocks(t.y).ref_id);
-        int A[3]={a.num_dofs.v*2,a.num_dofs.e*2,a.num_dofs.p};
-        int B[3]={b.num_dofs.v*2,b.num_dofs.e*2,b.num_dofs.p};
+        int A[3]={a.num_dofs_d.v*2,a.num_dofs_d.e*2,a.num_dofs_d.p};
+        int B[3]={b.num_dofs_d.v*2,b.num_dofs_d.e*2,b.num_dofs_d.p};
         for(int i=0,as=0;i<3;i++)
         {
             for(int j=0,bs=0;j<3;j++)
@@ -1847,11 +1842,11 @@ Dump_World_Space_Vector(const char* name) const
     {
         const auto& c=reference_block_data(blocks(b).ref_id);
         first[0](b)=next_u;
-        next_u+=c.num_dofs.v*2;
+        next_u+=c.num_dofs_d.v*2;
         first[1](b)=next_u;
-        next_u+=c.num_dofs.e*2;
+        next_u+=c.num_dofs_d.e*2;
         first[2](b)=next_p;
-        next_p+=c.num_dofs.p;
+        next_p+=c.num_dofs_d.p;
     }
     first[2]+=next_u;
 
@@ -1859,7 +1854,7 @@ Dump_World_Space_Vector(const char* name) const
     for(BLOCK_ID b(0);b<blocks.m;b++)
     {
         const auto& a=reference_block_data(blocks(b).ref_id);
-        int A[3]={a.num_dofs.v*2,a.num_dofs.e*2,a.num_dofs.p};
+        int A[3]={a.num_dofs_d.v*2,a.num_dofs_d.e*2,a.num_dofs_d.p};
         auto& U=rhs_block_list(b);
         for(int i=0,ar=0;i<3;i++)
         {
@@ -1885,11 +1880,11 @@ Visualize_Flat_Dofs() const
     {
         const auto& c=reference_block_data(blocks(b).ref_id);
         first[0](b)=next_u;
-        next_u+=c.num_dofs.v*2;
+        next_u+=c.num_dofs_d.v*2;
         first[1](b)=next_u;
-        next_u+=c.num_dofs.e*2;
+        next_u+=c.num_dofs_d.e*2;
         first[2](b)=next_p;
-        next_p+=c.num_dofs.p;
+        next_p+=c.num_dofs_d.p;
     }
     first[2]+=next_u;
 
@@ -1970,8 +1965,62 @@ Transform_To_World_Space(BLOCK_MATRIX<T>& M,const BLOCK_MATRIX<T>& B,BLOCK_ID a,
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Fill_Num_Dofs(DOF_PAIRS& dp,BLOCK_ID d,BLOCK_ID s)
 {
-    dp.num_dofs_d=reference_block_data(blocks(d).ref_id).num_dofs;
-    dp.num_dofs_s=blocks(s).num_dofs;
+    dp.num_dofs_d=reference_block_data(blocks(d).ref_id).num_dofs_d;
+    dp.num_dofs_s=reference_block_data(blocks(s).ref_id).num_dofs_s;
+}
+//#####################################################################
+// Function Check_Analytic_Solution
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Check_Analytic_Solution() const
+{
+    if(!analytic_velocity || !analytic_pressure) return;
+    T max_u=0,max_p=0;
+    T l2_u=0,l2_p=0;
+    int num_u=0,num_p=0;
+    for(BLOCK_ID b(0);b<blocks.m;b++)
+    {
+        const auto& bl=blocks(b);
+        const auto* cb=bl.block;
+        auto Z=[=](int i){return bl.xform*cb->X(i);};
+        const auto& rd=reference_block_data(blocks(b).ref_id);
+        const auto& W=rhs_block_list(b);
+        for(int i=0;i<cb->X.m;i++)
+            if(rd.dof_map_v(i)>=0)
+            {
+                TV X=Z(i);
+                TV U=analytic_velocity->v(X/unit_m,0)*unit_m/unit_s;
+                TV V=W.Get_v(rd.dof_map_v(i));
+                max_u=std::max(max_u,(U-V).Max_Abs());
+                l2_u+=(U-V).Magnitude_Squared();
+                num_u++;
+            }
+
+        for(int i=0;i<cb->S.m;i++)
+            if(rd.dof_map_e(i)>=0)
+            {
+                TV X=(Z(cb->S(i).x)+Z(cb->S(i).y))/2;
+                TV U=analytic_velocity->v(X/unit_m,0)*unit_m/unit_s;
+                TV V=W.Get_v(rd.dof_map_e(i));
+                max_u=std::max(max_u,(U-V).Max_Abs());
+                l2_u+=(U-V).Magnitude_Squared();
+                num_u++;
+            }
+
+        for(int i=0;i<cb->X.m;i++)
+            if(rd.dof_map_p(i)>=0)
+            {
+                TV X=(Z(cb->S(i).x)+Z(cb->S(i).y))/2;
+                T p=analytic_pressure->f(X/unit_m,0)*unit_m/unit_s;
+                T q=W.Get_p(rd.dof_map_p(i));
+                max_p=std::max(max_p,std::abs(p-q));
+                l2_p+=sqr(p-q);
+                num_p++;
+            }
+    }
+    if(num_u) l2_u=sqrt(l2_u/num_u);
+    if(num_p) l2_p=sqrt(l2_p/num_p);
+    LOG::printf("u l-inf %P   u l-2 %P   p l-inf %P   p l-2 %P\n",max_u,l2_u,max_p,l2_p);
 }
 template class COMPONENT_LAYOUT_FEM<VECTOR<double,2> >;
 }

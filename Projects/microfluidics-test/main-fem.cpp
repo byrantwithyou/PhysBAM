@@ -147,16 +147,12 @@ void Run(PARSE_ARGS& parse_args)
     timer("exec jobs");
 
     cl.Transform_Solution(cem,false);
+    cl.Check_Analytic_Solution();
     if(!quiet)
     {
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
             cl.Visualize_Solution(b);
-        Flush_Frame<TV>("blocks");
-        for(BLOCK_ID b(0);b<cl.blocks.m;b++)
-        {
-            cl.Visualize_Solution(b);
-            Flush_Frame<TV>(LOG::sprintf("block %P (%P)",b,cl.blocks(b).block).c_str());
-        }
+        Flush_Frame<TV>("solution");
     }
     cl.Dump_World_Space_Vector("x");
     cl.Visualize_Flat_Dofs();
