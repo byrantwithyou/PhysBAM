@@ -977,7 +977,7 @@ Fill_Block_Matrix(BLOCK_MATRIX<T>& M,const REFERENCE_BLOCK_DATA& rd)
         const auto& irbd=reference_irregular_data(ic.ref_id);
         for(const auto& h:irbd.pairs)
             if(h.b==b)
-                Copy_Matrix_Data(M,ic.regular,h.irreg_pairs[1],h.irreg_pairs[1],ic.regular,ic.regular);
+                Copy_Matrix_Data(M,ic.regular,h.irreg_pairs[1],h.irreg_pairs[1],b,b);
     }
 }
 //#####################################################################
