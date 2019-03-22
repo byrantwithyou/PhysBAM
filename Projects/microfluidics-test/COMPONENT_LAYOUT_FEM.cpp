@@ -1768,6 +1768,7 @@ Transform_Solution(const CACHED_ELIMINATION_MATRIX<T>& cem,bool transpose)
     for(BLOCK_ID b(0);b<blocks.m;b++)
     {
         int j=cem.rhs(Value(b));
+        if(j<0) continue;
         auto& U=rhs_block_list(b);
         U.V=cem.vector_list(j);
         const auto& A = blocks(b).xform.M;
@@ -1864,7 +1865,7 @@ Dump_World_Space_Vector(const char* name) const
         for(int i=0,ar=0;i<3;i++)
         {
             for(int r=0;r<A[i];r++)
-                sol(first[i](b)+r)=U.V(r+ar);
+                sol(first[i](b)+r)=U.V.m?U.V(r+ar):0;
             ar+=A[i];
         }
     }
