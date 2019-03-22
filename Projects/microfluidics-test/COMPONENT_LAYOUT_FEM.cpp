@@ -12,6 +12,7 @@
 #include <Core/Matrices/SYSTEM_MATRIX_HELPER.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <fstream>
 #include "CACHED_ELIMINATION_MATRIX.h"
 #include "COMPONENT_BC.h"
@@ -236,7 +237,7 @@ Parse_Input(const std::string& pipe_file)
                     if(c=='u')
                     {
                         T y0=cb->X(bc.bc_v.min_corner).y;
-                        T y1=cb->X(bc.bc_v.max_corner).y-1;
+                        T y1=cb->X(bc.bc_v.max_corner-1).y;
                         T a=6*t0/cube(y1-y0);
                         for(int i:bc.bc_v)
                         {
@@ -419,7 +420,7 @@ template<class F>
 void Visit_Cross_Section_Dofs(INTERVAL<int> i0,INTERVAL<int> i1,bool uf0,bool uf1,bool m0,F func)
 {
     int a=i1.min_corner,b=1,c=i0.min_corner,n=i0.Size();
-    if(uf0!=uf1)
+    if(uf0==uf1)
     {
         a=i1.max_corner-1;
         b=-1;
@@ -1332,6 +1333,9 @@ Compute_Dof_Remapping(REFERENCE_BLOCK_DATA& rd)
         const auto& c=bl.connections(cc);
         if(c.is_regular)
         {
+            assert(blocks(c.id).connections(c.con_id).id==rd.b);
+            assert(blocks(c.id).connections(c.con_id).con_id==cc);
+            assert(blocks(c.id).connections(c.con_id).master!=c.master);
             const auto* cb2=blocks(c.id).block;
             Visit_Regular_Cross_Section_Dofs(cb->cross_sections(cc),
                 cb2->cross_sections(c.con_id),c.master,
@@ -1867,6 +1871,67 @@ Dump_World_Space_Vector(const char* name) const
     OCTAVE_OUTPUT<T>((name+(std::string)".txt").c_str()).Write(name,sol);
     for(BLOCK_ID b(0);b<blocks.m;b++)
         LOG::printf("xform %P -> %P\n",b,blocks(b).xform.M);
+}
+//#####################################################################
+// Function Visualize_Flat_Dofs
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Visualize_Flat_Dofs() const
+{
+    int next_u=0,next_p=0;
+    ARRAY<int,BLOCK_ID> first[3];
+    for(int i=0;i<3;i++) first[i].Resize(blocks.m);
+    for(BLOCK_ID b(0);b<blocks.m;b++)
+    {
+        const auto& c=reference_block_data(blocks(b).ref_id);
+        first[0](b)=next_u;
+        next_u+=c.num_dofs.v*2;
+        first[1](b)=next_u;
+        next_u+=c.num_dofs.e*2;
+        first[2](b)=next_p;
+        next_p+=c.num_dofs.p;
+    }
+    first[2]+=next_u;
+
+    for(BLOCK_ID b(0);b<blocks.m;b++)
+    {
+        Visualize_Block_State(b);
+        auto& bl=blocks(b);
+        const auto* cb=bl.block;
+        auto Z=[=](int i){return bl.xform*cb->X(i);};
+        const auto& rd=reference_block_data(bl.ref_id);
+        for(int i=0;i<cb->X.m;i++)
+            if(rd.dof_map_v(i)>=0)
+            {
+                int dof=first[0](b)+rd.dof_map_v(i)*2;
+                Add_Debug_Text(Z(i),LOG::sprintf("%d",dof),VECTOR<T,3>(1,1,0));
+            }
+        for(int i=0;i<cb->S.m;i++)
+            if(rd.dof_map_e(i)>=0)
+            {
+                int dof=first[1](b)+rd.dof_map_e(i)*2;
+                Add_Debug_Text((Z(cb->S(i).x)+Z(cb->S(i).y))/2,LOG::sprintf("%d",dof),VECTOR<T,3>(1,1,0));
+            }
+    }
+    Flush_Frame<TV>("flat velocity dofs");
+    
+    for(BLOCK_ID b(0);b<blocks.m;b++)
+    {
+        Visualize_Block_State(b);
+        auto& bl=blocks(b);
+        const auto* cb=bl.block;
+        auto Z=[=](int i){return bl.xform*cb->X(i);};
+        const auto& rd=reference_block_data(bl.ref_id);
+        for(int i=0;i<cb->X.m;i++)
+            if(rd.dof_map_p(i)>=0)
+            {
+                int dof=first[2](b)+rd.dof_map_p(i);
+                Add_Debug_Text(Z(i),LOG::sprintf("%d",dof),VECTOR<T,3>(1,1,0));
+            }
+    }
+    Flush_Frame<TV>("flat pressure dofs");
+    
+
 }
 //#####################################################################
 // Function Transform_To_World_Space

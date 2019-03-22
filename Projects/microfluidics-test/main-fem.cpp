@@ -108,6 +108,12 @@ void Run(PARSE_ARGS& parse_args)
     cl.Dump_World_Space_System(cem);
     cl.Transform_Solution(cem,true);
     cl.Dump_World_Space_Vector("b");
+    if(!quiet)
+    {
+        for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+            cl.Visualize_Solution(b);
+        Flush_Frame<TV>("rhs blocks");
+    }
 
     timer("compute matrix");
 
@@ -153,6 +159,7 @@ void Run(PARSE_ARGS& parse_args)
         }
     }
     cl.Dump_World_Space_Vector("x");
+    cl.Visualize_Flat_Dofs();
 
     for(int i=1;i<tm.m;i++)
         printf("%20s %5.0f ms\n",tm(i).y,

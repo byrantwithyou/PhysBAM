@@ -255,6 +255,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     void Dump_World_Space_System(const CACHED_ELIMINATION_MATRIX<T>& cem) const;
     void Dump_World_Space_Vector(const char* name) const;
     void Transform_To_World_Space(BLOCK_MATRIX<T>& M,const BLOCK_MATRIX<T>& B,BLOCK_ID a,BLOCK_ID b) const;
+    void Visualize_Flat_Dofs() const;
 
     // OTHER
 
