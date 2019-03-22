@@ -1761,9 +1761,7 @@ Transform_Solution(const CACHED_ELIMINATION_MATRIX<T>& cem,bool transpose)
         int j=cem.rhs(Value(b));
         if(j<0)
         {
-            const auto& c=reference_block_data(blocks(b).ref_id);
-            const auto& d=c.num_dofs;
-            rhs_block_list(b).V.Resize(2*d.v+2*d.e+d.p,init_all,0);
+            Init_Block_Vector(rhs_block_list(b),b);
             continue;
         }
         auto& U=rhs_block_list(b);
