@@ -1519,7 +1519,8 @@ Eliminate_Non_Seperators(CACHED_ELIMINATION_MATRIX<T>& cem)
         if(bl.connections.m>CON_ID(2) || bl.flags&1)
         {
             for(const auto& c:bl.connections)
-                Eliminate_Simple(cem,c.id,c.con_id);
+                if(c.is_regular)
+                    Eliminate_Simple(cem,c.id,c.con_id);
             if(bl.connections.m>CON_ID(2))
                 cem.Eliminate_Row(Value(b));
         }
