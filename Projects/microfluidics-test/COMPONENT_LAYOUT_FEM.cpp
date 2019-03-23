@@ -901,7 +901,7 @@ Copy_Matrix_Data(BLOCK_MATRIX<T>& A,BLOCK_ID b,
     T sb=1/sqrt(Mb.Determinant());
     Ma*=sa;
     Mb*=sb;
-
+    
     PHYSBAM_ASSERT(A.nr==dpa.num_dofs_d);
     PHYSBAM_ASSERT(B.nr==dpa.num_dofs_s);
     PHYSBAM_ASSERT(A.nc==dpb.num_dofs_d);
@@ -960,7 +960,7 @@ Fill_Block_Matrix(BLOCK_MATRIX<T>& M,const REFERENCE_BLOCK_DATA& rd)
         const auto& c=bl.connections(cc);
         if(c.is_regular)
         {
-            const auto& p=reference_block_data(blocks(c.id).ref_id).regular_pairs(c.con_id);
+            auto& p=Regular_Connection_Pair(b,cc,true);
             Copy_Matrix_Data(M,c.id,p,p,b,b);
         }
         else
@@ -991,8 +991,8 @@ Fill_Connection_Matrix(BLOCK_MATRIX<T>& M,const REFERENCE_CONNECTION_DATA& cd)
     PHYSBAM_ASSERT(blocks(cd.b[0]).connections(cd.con_id[0]).master);
     auto& rd0=reference_block_data(blocks(cd.b[0]).ref_id);
     auto& rd1=reference_block_data(blocks(cd.b[1]).ref_id);
-    Copy_Matrix_Data(M,cd.b[0],rd0.pairs,rd0.regular_pairs(cd.con_id[0]),cd.b[0],cd.b[1]);
-    Copy_Matrix_Data(M,cd.b[1],rd1.regular_pairs(cd.con_id[1]),rd1.pairs,cd.b[0],cd.b[1]);
+    Copy_Matrix_Data(M,cd.b[0],rd0.pairs,cd.reg_pairs[1],cd.b[0],cd.b[1]);
+    Copy_Matrix_Data(M,cd.b[1],cd.reg_pairs[0],rd1.pairs,cd.b[0],cd.b[1]);
 }
 //#####################################################################
 // Function Fill_Irregular_Connection_Matrix
@@ -1257,7 +1257,6 @@ Compute_Reference_Blocks()
             *pr.x=reference_block_data.Add_End();
             auto& rd=reference_block_data(*pr.x);
             rd.b=b;
-            rd.regular_pairs.Resize(bl.connections.m);
         }
         bl.ref_id=*pr.x;
     }
@@ -1418,7 +1417,7 @@ Apply_To_RHS(BLOCK_ID b,const BLOCK_VECTOR<T>& w)
     {
         const auto& c=bl.connections(cc);
         if(c.is_regular)
-            Copy_Vector_Data(w,c.id,rd.regular_pairs(cc));
+            Copy_Vector_Data(w,c.id,Regular_Connection_Pair(b,cc,false));
         else
         {
             const auto& ic=irregular_connections(c.irreg_id);
@@ -1555,25 +1554,22 @@ Compute_Dof_Pairs(REFERENCE_CONNECTION_DATA& rc)
     REFERENCE_BLOCK_DATA* rd[2];
     rd[0]=&reference_block_data(blocks(rc.b[0]).ref_id);
     rd[1]=&reference_block_data(blocks(rc.b[1]).ref_id);
-    DOF_PAIRS* pairs[2];
-    pairs[0]=&rd[0]->regular_pairs(rc.con_id[0]);
-    pairs[1]=&rd[1]->regular_pairs(rc.con_id[1]);
-    Fill_Num_Dofs(*pairs[0],rc.b[1],rc.b[0]);
-    Fill_Num_Dofs(*pairs[1],rc.b[0],rc.b[1]);
+    Fill_Num_Dofs(rc.reg_pairs[0],rc.b[0],rc.b[1]);
+    Fill_Num_Dofs(rc.reg_pairs[1],rc.b[1],rc.b[0]);
     Visit_Regular_Cross_Section_Dofs(cb0->cross_sections(rc.con_id[0]),
         cb1->cross_sections(rc.con_id[1]),true, // 0 is master
         [&](int a,int b,bool o)
         {
             int f[2]={a,b};
-            int i=!o,r=rd[i]->dof_map_v(f[i]),s=rd[i]->dof_map_p(f[i]);
-            if(r>=0) pairs[o]->v.Append({r,f[o]});
-            if(s>=0) pairs[o]->p.Append({s,f[o]});
+            int s=o,d=!o,v=rd[d]->dof_map_v(f[d]),p=rd[d]->dof_map_p(f[d]);
+            if(v>=0) rc.reg_pairs[d].v.Append({v,f[s]});
+            if(p>=0) rc.reg_pairs[d].p.Append({p,f[s]});
         },
         [&](int a,int b,bool o)
         {
             int f[2]={a,b};
-            int i=!o,r=rd[i]->dof_map_e(f[i]);
-            if(r>=0) pairs[o]->e.Append({r,f[o]});
+            int s=o,d=!o,e=rd[d]->dof_map_e(f[d]);
+            if(e>=0) rc.reg_pairs[d].e.Append({e,f[s]});
         });
 }
 //#####################################################################
@@ -2021,6 +2017,28 @@ Check_Analytic_Solution() const
     if(num_u) l2_u=sqrt(l2_u/num_u);
     if(num_p) l2_p=sqrt(l2_p/num_p);
     LOG::printf("u l-inf %P   u l-2 %P   p l-inf %P   p l-2 %P\n",max_u,l2_u,max_p,l2_p);
+}
+//#####################################################################
+// Function Regular_Connection_Pair
+//#####################################################################
+template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Regular_Connection_Pair(BLOCK_ID b,CON_ID con_id,bool is_dest) -> const DOF_PAIRS&
+{
+    auto& bl=blocks(b);
+    BLOCK_ID b1=bl.connections(con_id).id;
+    CON_ID con_id1=bl.connections(con_id).con_id;
+    auto& bl1=blocks(b1);
+    REFERENCE_BLOCK_ID ref0=bl.ref_id,ref1=bl1.ref_id;
+
+    if(bl.connections(con_id).master)
+    {
+        auto key=std::make_tuple(ref0,con_id,ref1,con_id1);
+        auto ref_con_id=regular_connection_hash.Get(key);
+        return reference_connection_data(ref_con_id).reg_pairs[!is_dest];
+    }
+    auto key=std::make_tuple(ref1,con_id1,ref0,con_id);
+    auto ref_con_id=regular_connection_hash.Get(key);
+    return reference_connection_data(ref_con_id).reg_pairs[is_dest];
 }
 template class COMPONENT_LAYOUT_FEM<VECTOR<double,2> >;
 }
