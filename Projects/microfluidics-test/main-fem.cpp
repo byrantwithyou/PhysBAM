@@ -106,12 +106,12 @@ void Run(PARSE_ARGS& parse_args)
     cem.quiet=quiet;
     cl.Compute_Matrix_Blocks(cem);
     cl.Dump_World_Space_System(cem);
-    cl.Transform_Solution(cem,true);
+    cl.Transform_Solution(cem,true,true);
     cl.Dump_World_Space_Vector("b");
     if(!quiet)
     {
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
-            cl.Visualize_Solution(b);
+            cl.Visualize_Solution(cl.rhs_block_list(b),b,true);
         Flush_Frame<TV>("rhs blocks");
     }
 
@@ -146,12 +146,12 @@ void Run(PARSE_ARGS& parse_args)
 
     timer("exec jobs");
 
-    cl.Transform_Solution(cem,false);
+    cl.Transform_Solution(cem,false,false);
     cl.Check_Analytic_Solution();
     if(!quiet)
     {
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
-            cl.Visualize_Solution(b);
+            cl.Visualize_Solution(cl.rhs_block_list(b),b,true);
         Flush_Frame<TV>("solution");
     }
     cl.Dump_World_Space_Vector("x");

@@ -249,8 +249,8 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     // DEBUGGING
 
     void Visualize_Block_State(BLOCK_ID b) const;
-    void Transform_Solution(const CACHED_ELIMINATION_MATRIX<T>& cem,bool transpose);
-    void Visualize_Solution(BLOCK_ID b) const;
+    void Transform_Solution(const CACHED_ELIMINATION_MATRIX<T>& cem,bool inverse,bool transpose);
+    void Visualize_Solution(const BLOCK_VECTOR<T>& U,BLOCK_ID b,bool remap_dofs) const;
     void Dump_World_Space_System(const CACHED_ELIMINATION_MATRIX<T>& cem) const;
     void Dump_World_Space_Vector(const char* name) const;
     void Transform_To_World_Space(BLOCK_MATRIX<T>& M,const BLOCK_MATRIX<T>& B,BLOCK_ID a,BLOCK_ID b) const;

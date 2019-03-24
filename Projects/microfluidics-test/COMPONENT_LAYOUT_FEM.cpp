@@ -243,12 +243,12 @@ Parse_Input(const std::string& pipe_file)
                         for(int i:bc.bc_v)
                         {
                             T y=cb->X(i).y;
-                            bc.data_v(i)=a*(y-y0)*(y-y1)*dir;
+                            bc.data_v(i)=a*(y-y0)*(y1-y)*dir;
                         }
                         for(int i:bc.bc_e)
                         {
                             T y=cb->X.Subset(cb->S(i)).Sum().y/2;
-                            bc.data_e(i)=a*(y-y0)*(y-y1)*dir;
+                            bc.data_e(i)=a*(y-y0)*(y1-y)*dir;
                         }
                         bc_v.Append(bc);
                     }
@@ -962,6 +962,7 @@ Copy_Matrix_Data(BLOCK_MATRIX<T>& A,BLOCK_ID b,
 //#####################################################################
 // Function Copy_Vector_Data
 //#####################################################################
+// Input B should be in world space
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Copy_Vector_Data(const BLOCK_VECTOR<T>& B,BLOCK_ID b,const DOF_PAIRS& dp)
 {
@@ -1141,32 +1142,35 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
         {
             BLOCK& bl=blocks(b);
             CANONICAL_BLOCK<T>* cb=bl.block;
+            MATRIX<T,TV::m> M=bl.xform.M.Inverse();
 
             BLOCK_VECTOR<T> w,u;
             Init_Block_Vector(w,cb);
             Init_Block_Vector(u,cb);
             for(auto i:cb->bc_v)
-                u.Add_v(i,analytic_velocity->v(cb->X(i)/unit_m,0)*unit_m/unit_s);
+                u.Add_v(i,M*analytic_velocity->v(cb->X(i)/unit_m,0)*unit_m/unit_s);
             for(auto i:cb->bc_e)
-                u.Add_e(i,analytic_velocity->v(cb->X.Subset(cb->S(i)).Average()/unit_m,0)*unit_m/unit_s);
+                u.Add_e(i,M*analytic_velocity->v(cb->X.Subset(cb->S(i)).Average()/unit_m,0)*unit_m/unit_s);
             w.V=canonical_block_matrices.Get(bl.block).M*u.V;
 
+            // TODO: handle det(M)!=1
             u.V.Fill(0);
             ARRAY<T> div_v(cb->X.m),div_e(cb->S.m);
             for(int i=0;i<cb->X.m;i++)
             {
                 TV Z=cb->X(i);
-                u.Add_v(i,Force(Z));
+                u.Add_v(i,M*Force(Z));
                 div_v(i)=analytic_velocity->dX(Z/unit_m,0).Trace()/unit_s;
             }
             for(int i=0;i<cb->S.m;i++)
             {
                 TV Z=cb->X.Subset(cb->S(i)).Average();
-                u.Add_e(i,Force(Z));
+                u.Add_e(i,M*Force(Z));
                 div_e(i)=analytic_velocity->dX(Z/unit_m,0).Trace()/unit_s;
             }
             Times_U_Dot_V(b,w,u);
             Times_P_U(b,w,div_v,div_e);
+            w.Transform(-bl.xform.M,-1);
             Apply_To_RHS(b,w);
         }
 
@@ -1174,6 +1178,7 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
         {
             BLOCK& bl=blocks(bc.b);
             CANONICAL_BLOCK<T>* cb=bl.block;
+            MATRIX<T,TV::m> M=bl.xform.M.Transposed()/bl.xform.M.Determinant();
 
             BLOCK_VECTOR<T> w,u;
             Init_Block_Vector(w,cb);
@@ -1181,14 +1186,15 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
             for(auto i:cb->bc_v)
             {
                 TV Z=cb->X(i);
-                u.Add_v(i,Traction(bc.normal,Z));
+                u.Add_v(i,M*Traction(bc.normal,Z));
             }
             for(auto i:cb->bc_e)
             {
                 TV Z=cb->X.Subset(cb->S(i)).Average();
-                u.Add_e(i,Traction(bc.normal,Z));
+                u.Add_e(i,M*Traction(bc.normal,Z));
             }
             Times_Line_Integral_U_Dot_V(bc.b,w,u);
+            w.Transform(bl.xform.M,1);
             Apply_To_RHS(bc.b,w);
         }
     }
@@ -1198,13 +1204,16 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
         {
             BLOCK& bl=blocks(bc.b);
             CANONICAL_BLOCK<T>* cb=bl.block;
-
+            MATRIX<T,TV::m> M=bl.xform.M.Inverse();
+            
             BLOCK_VECTOR<T> w,u;
             Init_Block_Vector(w,cb);
             Init_Block_Vector(u,cb);
-            for(int i=0;i<bc.bc_v.Size();i++) u.Add_v(bc.bc_v.min_corner+i,bc.data_v(i));
-            for(int i=0;i<bc.bc_e.Size();i++) u.Add_e(bc.bc_e.min_corner+i,bc.data_e(i));
+
+            for(int i=0;i<bc.bc_v.Size();i++) u.Add_v(bc.bc_v.min_corner+i,M*bc.data_v(i));
+            for(int i=0;i<bc.bc_e.Size();i++) u.Add_e(bc.bc_e.min_corner+i,M*bc.data_e(i));
             w.V=canonical_block_matrices.Get(bl.block).M*u.V;
+            w.Transform(-bl.xform.M,-1);
             Apply_To_RHS(bc.b,w);
         }
 
@@ -1212,13 +1221,15 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
         {
             BLOCK& bl=blocks(bc.b);
             CANONICAL_BLOCK<T>* cb=bl.block;
+            MATRIX<T,TV::m> M=bl.xform.M.Transposed()/bl.xform.M.Determinant();
 
             BLOCK_VECTOR<T> w,u;
             Init_Block_Vector(w,cb);
             Init_Block_Vector(u,cb);
-            for(int i=0;i<bc.bc_v.Size();i++) u.Add_v(bc.bc_v.min_corner+i,bc.data_v(i));
-            for(int i=0;i<bc.bc_e.Size();i++) u.Add_e(bc.bc_e.min_corner+i,bc.data_e(i));
+            for(int i=0;i<bc.bc_v.Size();i++) u.Add_v(bc.bc_v.min_corner+i,M*bc.data_v(i));
+            for(int i=0;i<bc.bc_e.Size();i++) u.Add_e(bc.bc_e.min_corner+i,M*bc.data_e(i));
             Times_Line_Integral_U_Dot_V(bc.b,w,u);
+            w.Transform(bl.xform.M,1);
             Apply_To_RHS(bc.b,w);
         }
     }
@@ -1752,39 +1763,47 @@ Visualize_Block_State(BLOCK_ID b) const
 // Function Visualize_Solution
 //#####################################################################
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Visualize_Solution(BLOCK_ID b) const
+Visualize_Solution(const BLOCK_VECTOR<T>& U,BLOCK_ID b,bool remap_dofs) const
 {
     const auto& bl=blocks(b);
     const auto* cb=bl.block;
     auto Z=[=](int i){return bl.xform*cb->X(i);};
     const auto& rd=reference_block_data(blocks(b).ref_id);
-    const auto& U=rhs_block_list(b);
     for(int i=0;i<cb->X.m;i++)
-        if(rd.dof_map_v(i)>=0)
+    {
+        int k=remap_dofs?rd.dof_map_v(i):i;
+        if(k>=0)
         {
             Add_Debug_Particle(Z(i),VECTOR<T,3>(1,0,0));
-            Debug_Particle_Set_Attribute<TV>("V",U.Get_v(rd.dof_map_v(i)));
+            Debug_Particle_Set_Attribute<TV>("V",U.Get_v(k));
         }
+    }
 
     for(int i=0;i<cb->S.m;i++)
-        if(rd.dof_map_e(i)>=0)
+    {
+        int k=remap_dofs?rd.dof_map_e(i):i;
+        if(k>=0)
         {
             Add_Debug_Particle((Z(cb->S(i).x)+Z(cb->S(i).y))/2,VECTOR<T,3>(1,0,0));
-            Debug_Particle_Set_Attribute<TV>("V",U.Get_e(rd.dof_map_e(i)));
+            Debug_Particle_Set_Attribute<TV>("V",U.Get_e(k));
         }
+    }
 
     for(int i=0;i<cb->X.m;i++)
-        if(rd.dof_map_p(i)>=0)
+    {
+        int k=remap_dofs?rd.dof_map_p(i):i;
+        if(k>=0)
         {
             Add_Debug_Particle(Z(i),VECTOR<T,3>(0,1,0));
-            Debug_Particle_Set_Attribute<TV>("display_size",U.Get_p(rd.dof_map_p(i)));
+            Debug_Particle_Set_Attribute<TV>("display_size",U.Get_p(k));
         }
+    }
 }
 //#####################################################################
 // Function Transform_Solution
 //#####################################################################
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Transform_Solution(const CACHED_ELIMINATION_MATRIX<T>& cem,bool transpose)
+Transform_Solution(const CACHED_ELIMINATION_MATRIX<T>& cem,bool inverse,bool transpose)
 {
     for(BLOCK_ID b(0);b<blocks.m;b++)
     {
@@ -1796,13 +1815,14 @@ Transform_Solution(const CACHED_ELIMINATION_MATRIX<T>& cem,bool transpose)
         }
         auto& U=rhs_block_list(b);
         U.V=cem.vector_list(j);
-        const auto& A = blocks(b).xform.M;
+        auto A = blocks(b).xform.M;
+        if(inverse) A=A.Inverse();
         T s=1/sqrt(A.Determinant());
-        auto F = A*s;
-        if(transpose) F=F.Transposed();
+        A*=s;
+        if(transpose) A=A.Transposed();
 
-        for(int i=0;i<U.n.v;i++) U.Set_v(i,F*U.Get_v(i));
-        for(int i=0;i<U.n.e;i++) U.Set_e(i,F*U.Get_e(i));
+        for(int i=0;i<U.n.v;i++) U.Set_v(i,A*U.Get_v(i));
+        for(int i=0;i<U.n.e;i++) U.Set_e(i,A*U.Get_e(i));
         for(int i=0;i<U.n.p;i++) U.Set_p(i,s*U.Get_p(i));
     }
 }
@@ -1895,8 +1915,6 @@ Dump_World_Space_Vector(const char* name) const
         }
     }
     OCTAVE_OUTPUT<T>((name+(std::string)".txt").c_str()).Write(name,sol);
-    for(BLOCK_ID b(0);b<blocks.m;b++)
-        LOG::printf("xform %P -> %P\n",b,blocks(b).xform.M);
 }
 //#####################################################################
 // Function Visualize_Flat_Dofs
@@ -1965,8 +1983,8 @@ Visualize_Flat_Dofs() const
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Transform_To_World_Space(BLOCK_MATRIX<T>& M,const BLOCK_MATRIX<T>& B,BLOCK_ID a,BLOCK_ID b) const
 {
-    MATRIX<T,2> Ma=blocks(a).xform.M;
-    MATRIX<T,2> Mb=blocks(b).xform.M;
+    MATRIX<T,2> Ma=blocks(a).xform.M.Inverse();
+    MATRIX<T,2> Mb=blocks(b).xform.M.Inverse();
     T sa=1/sqrt(Ma.Determinant());
     T sb=1/sqrt(Mb.Determinant());
     Ma*=sa;
