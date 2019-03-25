@@ -34,7 +34,7 @@ public:
     {return m;}
 
     const T& operator()(const ID i) const
-    {assert((unsigned)i<(unsigned)m);return constant;}
+    {assert((unsigned)Value(i)<(unsigned)Value(m));return constant;}
 
     SIMPLE_ITERATOR<const CONSTANT_ARRAY> begin() const
     {return SIMPLE_ITERATOR<const CONSTANT_ARRAY>(*this,0);}

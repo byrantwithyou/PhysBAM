@@ -35,7 +35,7 @@ public:
     {return m;}
 
     ID operator()(const ID i) const
-    {assert((unsigned)i<(unsigned)m);return i;}
+    {assert((unsigned)Value(i)<(unsigned)Value(m));return i;}
 
     SIMPLE_ITERATOR<const IDENTITY_ARRAY> begin() const
     {return SIMPLE_ITERATOR<const IDENTITY_ARRAY>(*this,0);}
