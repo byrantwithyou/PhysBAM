@@ -5,6 +5,7 @@
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Data_Structures/TRIPLE.h>
 #include <Core/Data_Structures/TUPLE.h>
+#include <Core/Data_Structures/UNION_FIND.h>
 #include <Core/Log/LOG.h>
 #include <Core/Math_Tools/RANGE.h>
 #include <Core/Matrices/MATRIX_MXN.h>
@@ -369,7 +370,6 @@ Compute()
 
     for(auto& bl:blocks)
     {
-        if(!bl.block) continue;
         auto pr=canonical_block_matrices.Insert(bl.block,{});
         if(pr.y) Fill_Canonical_Block_Matrix(*pr.x,bl.block);
     }
@@ -539,17 +539,18 @@ CS Map_Cross_Section(CS cs,const ARRAY<int>& index_v_map,const ARRAY<int>& index
 //#####################################################################
 // Function Merge_Blocks
 //#####################################################################
-template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+template<class T> TRIPLE<CANONICAL_BLOCK<T>*,ARRAY<int>,ARRAY<int> >& COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Merge_Canonical_Blocks(CANONICAL_BLOCK<T>* cb0,CON_ID con_id0,XFORM<TV> xf0,
-    CANONICAL_BLOCK<T>* cb1,CON_ID con_id1,XFORM<TV> xf1) -> PAIR<CANONICAL_BLOCK<T>*,ARRAY<int> >*
+    CANONICAL_BLOCK<T>* cb1,CON_ID con_id1,XFORM<TV> xf1)
 {
     auto pr=merge_canonical_blocks.Insert(std::make_tuple(cb0,con_id0,cb1,con_id1),{});
-    if(!pr.y) return pr.x;
+    if(!pr.y) return *pr.x;
 
     const CROSS_SECTION& cs0=cb0->cross_sections(con_id0);
     const CROSS_SECTION& cs1=cb1->cross_sections(con_id1);
 
-    ARRAY<int> index_v_map,index_e_map;
+    ARRAY<int>& index_v_map=pr.x->y;
+    ARRAY<int>& index_e_map=pr.x->z;
     int num_v_dofs=Merge_Dofs(index_v_map,cb0->X.m,cb1->X.m,cs0.v,cs1.v,
         cs0.own_first,cs1.own_first);
     int num_e_dofs=Merge_Dofs(index_e_map,cb0->S.m,cb1->S.m,cs0.e,cs1.e,
@@ -603,7 +604,7 @@ Merge_Canonical_Blocks(CANONICAL_BLOCK<T>* cb0,CON_ID con_id0,XFORM<TV> xf0,
     E.Flattened()=index_v_map.Subset(E.Flattened());
     cb->E.Append_Elements(E);
 
-    return pr.x;
+    return *pr.x;
 }
 //#####################################################################
 // Function Merge_Blocks
@@ -618,14 +619,16 @@ Merge_Blocks(BLOCK_ID id,CON_ID con_id)
     CON_ID con_id2=bl.connections(con_id).con_id;
     BLOCK& bl2=blocks(id2);
 
-    auto pr=Merge_Canonical_Blocks(bl.block,con_id,bl.xform,bl2.block,con_id2,bl2.xform);
-    bl.block=pr->x;
+    auto& pr=Merge_Canonical_Blocks(bl.block,con_id,bl.xform,bl2.block,con_id2,
+        bl2.xform);
+    bl.block=pr.x;
 
-    for(CON_ID c=con_id;c<bl.connections.m;c++)
+    for(CON_ID c=con_id+1;c<bl.connections.m;c++)
     {
         const auto& cn=bl.connections(c);
         if(cn.is_regular) blocks(cn.id).connections(cn.con_id).con_id=c-1;
         else irregular_connections(cn.irreg_id).con_id=c-1;
+        bl.connections(c-1)=bl.connections(c);
     }
     bl.connections.Pop();
 
@@ -634,15 +637,8 @@ Merge_Blocks(BLOCK_ID id,CON_ID con_id)
         if(c==con_id2) continue;
         auto& cn=bl2.connections(c);
         if(cn.is_regular)
-        {
-            blocks(cn.id).connections(cn.con_id).id=id;
             blocks(cn.id).connections(cn.con_id).con_id=bl.connections.m;
-        }
-        else
-        {
-            irregular_connections(cn.irreg_id).regular=id;
-            irregular_connections(cn.irreg_id).con_id=bl.connections.m;
-        }
+        else irregular_connections(cn.irreg_id).con_id=bl.connections.m;
         bl.connections.Append(cn);
     }
 
@@ -651,10 +647,10 @@ Merge_Blocks(BLOCK_ID id,CON_ID con_id)
         auto& ic=irregular_connections(i);
         for(auto& j:ic.edge_on_v)
             if(j.x==id2)
-            {
-                j.x=id;
-                j.y=pr->y(j.y);
-            }
+                j.y=pr.y(j.y);
+        for(auto& j:ic.edge_on_e)
+            if(j.x==id2)
+                j.y=pr.z(j.y);
     }
 
     bl2={0};
@@ -665,6 +661,7 @@ Merge_Blocks(BLOCK_ID id,CON_ID con_id)
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Merge_Blocks()
 {
+    UNION_FIND<BLOCK_ID> uf(blocks.m);
     for(BLOCK_ID b(0);b<blocks.m;b++)
     {
         if(!blocks(b).block) continue;
@@ -687,11 +684,44 @@ Merge_Blocks()
                 }
             }
             PHYSBAM_ASSERT(besti>=CON_ID());
+            uf.Union(b,blocks(b).connections(besti).id);
             Merge_Blocks(b,besti);
             b--; // repeat the check on this block
         }
     }
-    // TODO: renumber the BLOCK_ID's
+
+    // Remap the block list to compress it
+    BLOCK_ID next(0);
+    ARRAY<BLOCK_ID,BLOCK_ID> mapping(blocks.m,use_init,BLOCK_ID(-11));
+    for(BLOCK_ID b(0);b<blocks.m;b++)
+    {
+        BLOCK_ID p=uf.Find(b);
+        if(mapping(p)<BLOCK_ID()) mapping(p)=next++;
+        mapping(b)=mapping(p);
+        if(blocks(b).block) blocks(mapping(b))=blocks(b);
+    }
+
+    blocks.Resize(next);
+    for(auto& bl:blocks)
+    {
+        for(auto& c:bl.connections)
+            if(c.is_regular)
+            {
+                assert(Value(mapping(c.id))>=0);
+                c.id=mapping(c.id);
+            }
+    }
+    for(auto& ic:irregular_connections)
+    {
+        ic.regular=mapping(ic.regular);
+        for(auto& p:ic.edge_on_v) p.x=mapping(p.x);
+        for(auto& p:ic.edge_on_e) p.x=mapping(p.x);
+    }
+    for(auto& bc:bc_v) bc.b=mapping(bc.b);
+    for(auto& bc:bc_t) bc.b=mapping(bc.b);
+    assert(!reference_block_data.m);
+    assert(!reference_connection_data.m);
+    assert(!reference_irregular_data.m);
 }
 //#####################################################################
 // Function Approx_Dof_Count
@@ -1374,7 +1404,6 @@ Compute_Dof_Remapping(REFERENCE_BLOCK_DATA& rd)
         rd.dof_map_p(i)=rd.dof_map_p(i)?ip++:-1;
     rd.num_dofs_s={cb->X.m,cb->S.m,cb->X.m};
     rd.num_dofs_d={iv,ie,ip};
-    LOG::printf("block dofs %P %P -> %P\n",rd.b,rd.num_dofs_s,rd.num_dofs_d);
 }
 //#####################################################################
 // Function Init_Block_Matrix
@@ -1481,6 +1510,7 @@ Eliminate_Simple(CACHED_ELIMINATION_MATRIX<T>& cem,BLOCK_ID first,CON_ID con_id_
         list.Append(b);
         if(bl.connections.m==CON_ID(1)) break;
         CON_ID o(1-Value(con_id));
+        if(!bl.connections(o).is_regular) break;
         b=bl.connections(o).id;
         con_id=bl.connections(o).con_id;
     }

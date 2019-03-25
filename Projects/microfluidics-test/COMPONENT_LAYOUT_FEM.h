@@ -181,11 +181,11 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     // pair: block + master mask
     HASHTABLE<PAIR<CANONICAL_BLOCK<T>*,int>,int> separates_dofs;
     int Separates_Dofs(BLOCK_ID b);
-    HASHTABLE<std::tuple<CANONICAL_BLOCK<T>*,CON_ID,CANONICAL_BLOCK<T>*,CON_ID>,PAIR<CANONICAL_BLOCK<T>*,ARRAY<int> > > merge_canonical_blocks;
+    HASHTABLE<std::tuple<CANONICAL_BLOCK<T>*,CON_ID,CANONICAL_BLOCK<T>*,CON_ID>,TRIPLE<CANONICAL_BLOCK<T>*,ARRAY<int>,ARRAY<int> > > merge_canonical_blocks;
     void Merge_Blocks(BLOCK_ID id,CON_ID con_id);
-    PAIR<CANONICAL_BLOCK<T>*,ARRAY<int> >*
-        Merge_Canonical_Blocks(CANONICAL_BLOCK<T>* id0,CON_ID con_id0,
-            XFORM<TV> xf0,CANONICAL_BLOCK<T>* id1,CON_ID con_id1,XFORM<TV> xf1);
+    TRIPLE<CANONICAL_BLOCK<T>*,ARRAY<int>,ARRAY<int> >& Merge_Canonical_Blocks(
+        CANONICAL_BLOCK<T>* cb0,CON_ID con_id0,XFORM<TV> xf0,
+        CANONICAL_BLOCK<T>* cb1,CON_ID con_id1,XFORM<TV> xf1);
     int Approx_Dof_Count(BLOCK_ID b);
     void Merge_Blocks();
     void Compute_Reference_Blocks();
