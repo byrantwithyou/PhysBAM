@@ -544,7 +544,7 @@ Merge_Canonical_Blocks(CANONICAL_BLOCK<T>* cb0,CON_ID con_id0,XFORM<TV> xf0,
     CANONICAL_BLOCK<T>* cb1,CON_ID con_id1,XFORM<TV> xf1) -> PAIR<CANONICAL_BLOCK<T>*,ARRAY<int> >*
 {
     auto pr=merge_canonical_blocks.Insert(std::make_tuple(cb0,con_id0,cb1,con_id1),{});
-    if(pr.y) return pr.x;
+    if(!pr.y) return pr.x;
 
     const CROSS_SECTION& cs0=cb0->cross_sections(con_id0);
     const CROSS_SECTION& cs1=cb1->cross_sections(con_id1);
