@@ -529,7 +529,7 @@ template<class CS>
 CS Map_Cross_Section(CS cs,const ARRAY<int>& index_v_map,const ARRAY<int>& index_e_map)
 {
     auto pv=Map_Interval(cs.v,index_v_map);
-    auto pe=Map_Interval(cs.e,index_v_map);
+    auto pe=Map_Interval(cs.e,index_e_map);
     assert(pv.y==pe.y);
     cs.v=pv.x;
     cs.e=pe.x;
@@ -552,7 +552,7 @@ Merge_Canonical_Blocks(CANONICAL_BLOCK<T>* cb0,CON_ID con_id0,XFORM<TV> xf0,
     ARRAY<int> index_v_map,index_e_map;
     int num_v_dofs=Merge_Dofs(index_v_map,cb0->X.m,cb1->X.m,cs0.v,cs1.v,
         cs0.own_first,cs1.own_first);
-    int num_e_dofs=Merge_Dofs(index_e_map,cb0->X.m,cb1->X.m,cs0.e,cs1.e,
+    int num_e_dofs=Merge_Dofs(index_e_map,cb0->S.m,cb1->S.m,cs0.e,cs1.e,
         cs0.own_first,cs1.own_first);
 
     pr.x->x=new CANONICAL_BLOCK<T>;
@@ -581,13 +581,18 @@ Merge_Canonical_Blocks(CANONICAL_BLOCK<T>* cb0,CON_ID con_id0,XFORM<TV> xf0,
     cb->S.Resize(num_e_dofs);
     cb->bc_v=cb0->bc_v;
     cb->bc_e=cb0->bc_e;
-    for(int i=0;i<cb1->E.m;i++)
+    for(int i=0;i<cb1->S.m;i++)
     {
         int j=index_e_map(i);
-        IV s(index_v_map.Subset(cb1->E(i)));
+        IV s(index_v_map.Subset(cb1->S(i)));
         s.Sort();
         if(j>=cb0->S.m) cb->S(j)=s;
-        else assert(cb->S(j)==s);
+        else
+        {
+            auto s0=cb->S(j);
+            s0.Sort();
+            assert(s0==s);
+        }
     }
 
     cb->bc_v.Append_Elements(index_v_map.Subset(cb1->bc_v));
