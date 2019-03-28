@@ -62,6 +62,8 @@ Make_Joint_2(int d,T width,const ARRAY<T>& angles)
         }
         cc->blocks(CC_BLOCK_ID(it.k))={cb,{},con,{ic0,ic1}};
     }
+    cc->irregular_connections(ic0).edge_on_v.Reverse();
+    cc->irregular_connections(ic0).edge_on_e.Reverse();
     return {cc,{ext+sep,ext+sep}};
 }
 //#####################################################################
