@@ -1367,6 +1367,23 @@ Compute_Dof_Remapping(REFERENCE_BLOCK_DATA& rd)
     rd.dof_map_v.Resize(cb->X.m,use_init,1);
     rd.dof_map_e.Resize(cb->S.m,use_init,1);
     
+    HASHTABLE<PAIR<BLOCK_ID,int> > taken;
+    for(IRREG_ID i:bl.edge_on)
+    {
+        auto& ic=irregular_connections(i);
+        Visit_Irregular_Cross_Section_Dofs(ic,
+            blocks(ic.regular).block->cross_sections(ic.con_id),
+            [&](int a,BLOCK_ID b2,int c,bool o)
+            {
+                if(o) taken.Set({b2,c});
+                if(b2==rd.b && o) rd.dof_map_v(c)=0;
+            },
+            [&](int a,BLOCK_ID b2,int c,bool o)
+            {
+                if(b2==rd.b && o) rd.dof_map_e(c)=0;
+            });
+    }
+
     for(CON_ID cc(0);cc<bl.connections.m;cc++)
     {
         const auto& c=bl.connections(cc);
@@ -1380,7 +1397,7 @@ Compute_Dof_Remapping(REFERENCE_BLOCK_DATA& rd)
                 cb2->cross_sections(c.con_id),c.master,
                 [&](int a,int b,bool o)
                 {
-                    if(!o) rd.dof_map_v(a)=0;
+                    if(!o || taken.Contains({c.id,b})) rd.dof_map_v(a)=0;
                 },
                 [&](int a,int b,bool o)
                 {
