@@ -48,8 +48,14 @@ struct CC_BLOCK
     CANONICAL_BLOCK<T>* block;
     XFORM<TV> xform;
     ARRAY<CC_BLOCK_CONNECTION,CON_ID> connections;
-    ARRAY<CC_IRREG_ID> edge_on; // for edge-on (index in irregular_connections)
+    ARRAY<PAIR<CC_IRREG_ID,int> > edge_on; // for edge-on (index in irregular_connections and edge_on)
     int flags=0; // 1=separator, 2=separator-eligible
+};
+
+struct CC_IRREGULAR_EDGE_DATA
+{
+    CC_BLOCK_ID b;
+    int e,v0,v1; // dofs; v0 borders with previous array entry
 };
 
 // regular is master
@@ -58,7 +64,7 @@ struct CC_IRREGULAR_CONNECTION
     CC_BLOCK_ID regular=CC_BLOCK_ID(-7);
     CON_ID con_id;
     // one for each dof on cross section, starting from owned side of cross section
-    ARRAY<PAIR<CC_BLOCK_ID,int> > edge_on_v,edge_on_e;
+    ARRAY<CC_IRREGULAR_EDGE_DATA> edge_on;
 };
 
 // neighbor block i is given index ~i and con_id=-1.

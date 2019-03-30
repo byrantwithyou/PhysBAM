@@ -60,10 +60,10 @@ Make_Joint_2(int d,T width,const ARRAY<T>& angles)
             for(int j=it.X0.m;j<cb->X.m;j++) cb->bc_v.Append(j);
             for(int j=it.Last_Diagonal_Edge()+1;j<cb->S.m;j++) cb->bc_e.Append(j);
         }
-        cc->blocks(CC_BLOCK_ID(it.k))={cb,{},con,{ic0,ic1}};
+        cc->blocks(CC_BLOCK_ID(it.k))={cb,{},con,{{ic0,0},{ic1,0}}};
     }
-    cc->irregular_connections(ic0).edge_on_v.Reverse();
-    cc->irregular_connections(ic0).edge_on_e.Reverse();
+    cc->irregular_connections(ic0).edge_on.Reverse();
+    cc->irregular_connections(ic0).edge_on.Reverse();
     return {cc,{ext+sep,ext+sep}};
 }
 //#####################################################################
@@ -125,7 +125,7 @@ Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles)
         for(int i=0;it.k==0 && i<it.First_Diagonal_Edge();i++) cb->bc_e.Append(i);
         for(int i=it.X0.m;it.k==it.nseg-1 && i<cb->X.m;i++) cb->bc_v.Append(i);
         for(int i=it.Last_Diagonal_Edge()+1;it.k==it.nseg-1 && i<cb->S.m;i++) cb->bc_e.Append(i);
-        cc->blocks.Append({cb,{},con,{index,ick2}});
+        cc->blocks.Append({cb,{},con,{{index,0},{ick2,0}}});
         t0.Append(it.X1.Last());
     }
     VECTOR<TV,2> g0=Extrude(w((k+2)%3),w(k),dirs(k)),g1=Extrude(w((k+1)%3),w(k),dirs((k+1)%3));
@@ -154,7 +154,7 @@ Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles)
         cb->bc_v={0,it.X0.m-1,it.X0.m,cb->X.m-1};
         if(it.k==nseg-1) cb->bc_v.Append(it.X0.m+d-1);
         cb->bc_e={it.First_Diagonal_Edge(),it.Last_Diagonal_Edge()};
-        cc->blocks.Append({cb,{},con,{index}});
+        cc->blocks.Append({cb,{},con,{{index,0}}});
     }
     PHYSBAM_ASSERT(sep_cb->X.m==2*d-1);
     sep_cb->S.Resize(2*(4*d-3));
@@ -228,7 +228,7 @@ Make_Joint_3_Average(int d,T width,const ARRAY<T>& angles)
         for(int i=0;it.k==0 && i<it.First_Diagonal_Edge();i++) cb->bc_e.Append(i);
         for(int i=it.X0.m;it.k==it.nseg-1 && i<cb->X.m;i++) cb->bc_v.Append(i);
         for(int i=it.Last_Diagonal_Edge()+1;it.k==it.nseg-1 && i<cb->S.m;i++) cb->bc_e.Append(i);
-        cc->blocks.Append({cb,{},con,{index,ick2}});
+        cc->blocks.Append({cb,{},con,{{index,0},{ick2,0}}});
         b.Append(it.X1(0));
     }
     VECTOR<TV,2> e0=Extrude(w(k),w((k+1)%3),dirs((k+1)%3)),e1=Extrude(w(k),w((k+2)%3),dirs(k));
@@ -264,7 +264,7 @@ Make_Joint_3_Average(int d,T width,const ARRAY<T>& angles)
             &cc->irregular_connections(ick),con,CON_ID(1));
         for(int i=it.X0.m;it.k==it.nseg-1 && i<cb->X.m;i++) cb->bc_v.Append(i);
         for(int i=it.Last_Diagonal_Edge()+1;it.k==it.nseg-1 && i<cb->S.m;i++) cb->bc_e.Append(i);
-        cc->blocks.Append({cb,{},con,{ick1,ick}});
+        cc->blocks.Append({cb,{},con,{{ick1,0},{ick,0}}});
     }
     ARRAY<T> ext={e1.Average().Magnitude(),e0.Average().Magnitude(),e.Average().Magnitude()};
     return {cc,{ext((3-k)%3),ext((4-k)%3),ext((5-k)%3)}};
@@ -366,12 +366,7 @@ Joint_Connection(int offset,BLOCK_MESHING_ITERATOR<TV>& it,
     ARRAY<CC_BLOCK_CONNECTION,CON_ID>& con,CON_ID prev) const
 {
     CC_BLOCK_ID self(offset+it.k);
-    if(it.k==0)
-    {
-        if(ic0) ic0->edge_on_v.Append({self,0});
-        if(ic1) ic1->edge_on_v.Append({self,it.X0.m-1});
-    }
-    else
+    if(it.k!=0)
     {
         cb->cross_sections.Append({{0,it.X0.m},{0,it.First_Diagonal_Edge()},false});
         con.Append({CC_BLOCK_ID(offset+it.k-1),prev});
@@ -381,10 +376,8 @@ Joint_Connection(int offset,BLOCK_MESHING_ITERATOR<TV>& it,
         cb->cross_sections.Append({{it.X0.m,cb->X.m},{it.Last_Diagonal_Edge()+1,cb->S.m},true});
         con.Append({CC_BLOCK_ID(offset+it.k+1),CON_ID(0)});
     }
-    if(ic0) ic0->edge_on_v.Append({self,it.X0.m});
-    if(ic1) ic1->edge_on_v.Append({self,cb->X.m-1});
-    if(ic0) ic0->edge_on_e.Append({self,it.First_Diagonal_Edge()});
-    if(ic1) ic1->edge_on_e.Append({self,it.Last_Diagonal_Edge()});
+    if(ic0) ic0->edge_on.Append({self,it.First_Diagonal_Edge(),0,it.X0.m});
+    if(ic1) ic1->edge_on.Append({self,it.Last_Diagonal_Edge(),it.X0.m-1,cb->X.m-1});
 }
 
 template class COMPONENT_JOINT<float>;

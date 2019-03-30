@@ -33,6 +33,7 @@ PHYSBAM_DECLARE_ELEMENT_ID(REFERENCE_BLOCK_ID,int,ELEMENT_ID_HELPER::for_loop|EL
 PHYSBAM_DECLARE_ELEMENT_ID(REFERENCE_CONNECTION_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
 PHYSBAM_DECLARE_ELEMENT_ID(REFERENCE_IRREGULAR_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
 PHYSBAM_DECLARE_ELEMENT_ID(IRREG_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
+PHYSBAM_DECLARE_ELEMENT_ID(RID_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
 
 extern double comp_tol;
 
@@ -78,7 +79,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
         CANONICAL_BLOCK<T>* block;
         XFORM<TV> xform;
         ARRAY<BLOCK_CONNECTION,CON_ID> connections;
-        ARRAY<IRREG_ID> edge_on; // for edge-on (index in irregular_connections)
+        ARRAY<PAIR<IRREG_ID,int> > edge_on; // for edge-on (index in irregular_connections and edge_on)
         int flags=0; // 1=separator, 2=separator-eligible
         REFERENCE_BLOCK_ID ref_id=REFERENCE_BLOCK_ID(-7);
     };
@@ -87,13 +88,19 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
 
     // IRREGULAR CONNECTIONS
 
+    struct IRREGULAR_EDGE_DATA
+    {
+        BLOCK_ID b;
+        int e,v0,v1; // dofs; v0 borders with previous array entry
+    };
+
     // regular is master
     struct IRREGULAR_CONNECTION
     {
         BLOCK_ID regular=BLOCK_ID(-7);
         CON_ID con_id=CON_ID(-7);
-        // one for each dof on cross section, starting from owned side of cross section
-        ARRAY<PAIR<BLOCK_ID,int> > edge_on_v,edge_on_e;
+        // one for each edge on cross section, starting from side owned by regular block
+        ARRAY<IRREGULAR_EDGE_DATA> edge_on;
         REFERENCE_IRREGULAR_ID ref_id=REFERENCE_IRREGULAR_ID(-7);
     };
 
@@ -169,7 +176,8 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     struct REFERENCE_IRREGULAR_DATA
     {
         IRREG_ID ic_id;
-        ARRAY<REFERENCE_IRREGULAR_DATA_HELPER> pairs;
+        ARRAY<REFERENCE_IRREGULAR_DATA_HELPER,RID_ID> pairs;
+        ARRAY<PAIR<RID_ID,bool> > mapping;
     };
 
     ARRAY<REFERENCE_IRREGULAR_DATA,REFERENCE_IRREGULAR_ID> reference_irregular_data;
@@ -199,6 +207,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     void Compute_Dof_Pairs(REFERENCE_CONNECTION_DATA& rc);
     void Compute_Dof_Pairs(REFERENCE_IRREGULAR_DATA& ri);
     void Fill_Num_Dofs(DOF_PAIRS& dp,BLOCK_ID d,BLOCK_ID s);
+    template<class F> void Visit_Irregular_Cross_Section_Dofs(const IRREGULAR_CONNECTION& ic,F func_e) const;
 
     // MATRIX ASSEMBLY
 
@@ -210,7 +219,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     void Fill_Canonical_Block_Matrix(BLOCK_MATRIX<T>& mat,const CANONICAL_BLOCK<T>* cb);
     void Fill_Block_Matrix(BLOCK_MATRIX<T>& M,const REFERENCE_BLOCK_DATA& rd);
     void Fill_Connection_Matrix(BLOCK_MATRIX<T>& M,const REFERENCE_CONNECTION_DATA& cd);
-    void Fill_Irregular_Connection_Matrix(ARRAY<BLOCK_MATRIX<T> >& M,const REFERENCE_IRREGULAR_DATA& ri);
+    void Fill_Irregular_Connection_Matrix(ARRAY<BLOCK_MATRIX<T>,RID_ID>& M,const REFERENCE_IRREGULAR_DATA& ri);
     void Copy_Matrix_Data(BLOCK_MATRIX<T>& A,BLOCK_ID b,
         const DOF_PAIRS& dpa,const DOF_PAIRS& dpb,BLOCK_ID ar,BLOCK_ID ac) const;
     void Copy_Vector_Data(const BLOCK_VECTOR<T>& B,BLOCK_ID b,const DOF_PAIRS& dp);
