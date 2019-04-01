@@ -37,6 +37,7 @@ Make_Joint_2(int d,T width,const ARRAY<T>& angles)
     T ext,angle;
     std::tie(vert,ext,angle)=Elbow_Pit(angles(0),width);
     PAIR<ARRAY<TV>,ARRAY<TV> > sides=Arc(vert,angle,width,sep,sep);
+    if(angle>0) std::swap(sides.x,sides.y);
 
     CANONICAL_COMPONENT<T>* cc=new CANONICAL_COMPONENT<T>;
     cc->blocks.Resize(CC_BLOCK_ID(d-1));
@@ -60,10 +61,11 @@ Make_Joint_2(int d,T width,const ARRAY<T>& angles)
             for(int j=it.X0.m;j<cb->X.m;j++) cb->bc_v.Append(j);
             for(int j=it.Last_Diagonal_Edge()+1;j<cb->S.m;j++) cb->bc_e.Append(j);
         }
-        cc->blocks(CC_BLOCK_ID(it.k))={cb,{},con,{{ic0,0},{ic1,0}}};
+        cc->blocks(CC_BLOCK_ID(it.k))={cb,{},con,{{ic0,d-2-it.k},{ic1,it.k}}};
     }
     cc->irregular_connections(ic0).edge_on.Reverse();
-    cc->irregular_connections(ic0).edge_on.Reverse();
+    for(auto& e:cc->irregular_connections(ic0).edge_on)
+        std::swap(e.v0,e.v1);
     return {cc,{ext+sep,ext+sep}};
 }
 //#####################################################################
