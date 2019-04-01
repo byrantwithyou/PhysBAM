@@ -467,17 +467,17 @@ Visit_Irregular_Cross_Section_Dofs(const IRREGULAR_CONNECTION& ic,F func) const
     c+=cs.v.min_corner;
     d+=cs.v.min_corner;
 
-    int irreg_v0=(n+1)/2;
+    int irreg_v0=n/2+1;
     int irreg_v1=n/2;
-    BLOCK_ID last_b(-1);
+    int last_v=-1;
     for(int i=0;i<n;i++)
     {
         bool b1=i<irreg_v1;
         bool b0=i<irreg_v0;
         auto& eo=ic.edge_on(i);
-        IRREGULAR_VISITOR iv={eo.b,a*i+b,a*i+c,a*i+d,eo.e,eo.v0,eo.v1,b0,b0,b1,eo.b!=last_b};
+        IRREGULAR_VISITOR iv={eo.b,a*i+b,a*i+c,a*i+d,eo.e,eo.v0,eo.v1,b0,b0,b1,eo.v0!=last_v};
         func(iv);
-        last_b=eo.b;
+        last_v=eo.v1;
     }
 }
 template<class CS,class FV,class FE>
@@ -1396,7 +1396,7 @@ Compute_Dof_Remapping(REFERENCE_BLOCK_DATA& rd)
     {
         auto& ic=irregular_connections(i.x);
         auto& id=ic.edge_on(i.y);
-        if(i.y<(ic.edge_on.m+1)/2)
+        if(i.y<ic.edge_on.m/2+1)
         {
             rd.dof_map_v(id.v0)=0;
             rd.dof_map_e(id.e)=0;
@@ -1670,7 +1670,7 @@ Compute_Dof_Pairs(REFERENCE_IRREGULAR_DATA& ri)
             if(iv.n0) id=ri.pairs.Add_End();
             ri.mapping.Append({id,iv.n0});
             rd[1]=&reference_block_data(blocks(iv.b).ref_id);
-            int s=iv.re,d=!s;
+            int s=iv.be,d=!s;
             auto& z=ri.pairs(id);
             z.b=iv.b;
             DOF_PAIRS& q=z.irreg_pairs[d];
@@ -1780,7 +1780,7 @@ Visualize_Block_State(BLOCK_ID b) const
     {
         auto& ic=irregular_connections(i.x);
         auto& id=ic.edge_on(i.y);
-        bool o0=(i.y>=(ic.edge_on.m+1)/2);
+        bool o0=i.y>=(ic.edge_on.m/2+1);
         bool o1=(i.y>=ic.edge_on.m/2);
 
         TV A=Z(id.v0),B=Z(id.v1);
