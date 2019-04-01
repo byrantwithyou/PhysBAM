@@ -475,7 +475,7 @@ Visit_Irregular_Cross_Section_Dofs(const IRREGULAR_CONNECTION& ic,F func) const
         bool b1=i<irreg_v1;
         bool b0=i<irreg_v0;
         auto& eo=ic.edge_on(i);
-        IRREGULAR_VISITOR iv={eo.b,a*i+b,a*i+c,a*i+d,eo.e,eo.v0,eo.v1,b0,b0,b1,eo.v0!=last_v};
+        IRREGULAR_VISITOR iv={eo.b,a*i+b,a*i+c,a*i+d,eo.e,eo.v0,eo.v1,b1,b0,b1,eo.v0!=last_v};
         func(iv);
         last_v=eo.v1;
     }
@@ -1397,12 +1397,12 @@ Compute_Dof_Remapping(REFERENCE_BLOCK_DATA& rd)
         auto& ic=irregular_connections(i.x);
         auto& id=ic.edge_on(i.y);
         if(i.y<ic.edge_on.m/2+1)
-        {
             rd.dof_map_v(id.v0)=0;
+        if(i.y<ic.edge_on.m/2)
+        {
+            rd.dof_map_v(id.v1)=0;
             rd.dof_map_e(id.e)=0;
         }
-        if(i.y<ic.edge_on.m/2)
-            rd.dof_map_v(id.v1)=0;
     }
 
     for(CON_ID cc(0);cc<bl.connections.m;cc++)
@@ -1788,7 +1788,7 @@ Visualize_Block_State(BLOCK_ID b) const
         Debug_Particle_Set_Attribute<TV>("display_size",.05);
         Add_Debug_Particle(B,VECTOR<T,3>(1,1,1)/(1+o1));
         Debug_Particle_Set_Attribute<TV>("display_size",.06);
-        Add_Debug_Particle((A+B)/2,VECTOR<T,3>(1,1,1)/(1+o0));
+        Add_Debug_Particle((A+B)/2,VECTOR<T,3>(1,1,1)/(1+o1));
         Debug_Particle_Set_Attribute<TV>("display_size",.05);
     }
 }
