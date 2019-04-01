@@ -17,7 +17,7 @@ struct BLOCK_MESHING_ITERATOR<VECTOR<T,2> >
     typedef VECTOR<int,2> IV;
     typedef VECTOR<int,3> IV3;
 
-    const ARRAY<TV> side0,side1;
+    const ARRAY<TV>& side0,&side1;
     ARRAY<T> l0,l1;
     ARRAY<TV> X0,X1;
     T h;
