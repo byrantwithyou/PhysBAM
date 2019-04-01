@@ -463,9 +463,9 @@ Visit_Irregular_Cross_Section_Dofs(const IRREGULAR_CONNECTION& ic,F func) const
         d=n-1;
         c=n;
     }
-    a+=cs.e.min_corner;
-    b+=cs.v.min_corner;
+    b+=cs.e.min_corner;
     c+=cs.v.min_corner;
+    d+=cs.v.min_corner;
 
     int irreg_v0=(n+1)/2;
     int irreg_v1=n/2;
