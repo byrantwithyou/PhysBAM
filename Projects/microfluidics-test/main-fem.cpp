@@ -85,7 +85,7 @@ void Run(PARSE_ARGS& parse_args)
 
     if(!quiet)
     {
-        Flush_Frame<TV>("init");
+        Flush_Frame<TV>("after master");
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
             cl.Visualize_Block_State(b);
         Flush_Frame<TV>("blocks");
@@ -101,6 +101,19 @@ void Run(PARSE_ARGS& parse_args)
     cl.Compute();
 
     timer("compute");
+
+    if(!quiet)
+    {
+        Flush_Frame<TV>("after merge");
+        for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+            cl.Visualize_Block_State(b);
+        Flush_Frame<TV>("blocks");
+        for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+        {
+            cl.Visualize_Block_State(b);
+            Flush_Frame<TV>(LOG::sprintf("block %P (%P)",b,cl.blocks(b).block).c_str());
+        }
+    }
 
     CACHED_ELIMINATION_MATRIX<T> cem;
     cem.quiet=quiet;
