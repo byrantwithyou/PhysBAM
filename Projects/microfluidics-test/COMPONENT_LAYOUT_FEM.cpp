@@ -671,10 +671,12 @@ Merge_Blocks(BLOCK_ID id,CON_ID con_id)
     for(auto i:bl2.edge_on)
     {
         auto& ic=irregular_connections(i.x);
-        auto& id=ic.edge_on(i.y);
-        id.e=pr.z(id.e);
-        id.v0=pr.y(id.v0);
-        id.v1=pr.y(id.v1);
+        auto& eo=ic.edge_on(i.y);
+        eo.b=id;
+        eo.e=pr.z(eo.e);
+        eo.v0=pr.y(eo.v0);
+        eo.v1=pr.y(eo.v1);
+        bl.edge_on.Append(i);
     }
 
     bl2={0};
