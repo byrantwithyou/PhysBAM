@@ -1,0 +1,9 @@
+l 2.5
+c C 5 10
+v A 0 0
+v B 10 0
+u C A B U 10
+t C B A T 0 0
+p C U T
+U u=10;v=0;
+P p=0;

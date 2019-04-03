@@ -1,0 +1,8 @@
+l .25
+c C 5 1
+v A 0 0
+v B 1.7 0
+u C A B U 1
+u C B A T 1
+# t C B A T 0 0
+p C U T
