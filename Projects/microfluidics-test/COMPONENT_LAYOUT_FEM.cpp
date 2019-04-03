@@ -1520,8 +1520,11 @@ Apply_To_RHS(BLOCK_ID b,const BLOCK_VECTOR<T>& w)
     {
         const auto& ic=irregular_connections(e.x);
         const auto& irbd=reference_irregular_data(ic.ref_id);
-        const auto& h=irbd.pairs(irbd.mapping(e.y).x);
-        Copy_Vector_Data(w,ic.regular,h.irreg_pairs[0]);
+        if(irbd.mapping(e.y).y)
+        {
+            const auto& h=irbd.pairs(irbd.mapping(e.y).x);
+            Copy_Vector_Data(w,ic.regular,h.irreg_pairs[0]);
+        }
     }
 }
 //#####################################################################
