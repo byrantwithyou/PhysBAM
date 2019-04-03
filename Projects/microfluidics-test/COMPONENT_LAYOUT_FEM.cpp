@@ -829,7 +829,7 @@ Fill_Canonical_Block_Matrix(BLOCK_MATRIX<T>& mat,const CANONICAL_BLOCK<T>* cb)
                     TV u;
                     for(int b=0;b<2;b++)
                         u(b)=fem_pres_table[i][6*b+3*s+j];
-                    u=p_scale*G.Transpose_Times(u);
+                    u=-p_scale*G.Transpose_Times(u);
                     mat.Add_pu(v(i),dof[s](j),s,u);
                     mat.Add_up(dof[s](j),s,v(i),u);
                 }
@@ -927,12 +927,12 @@ int fem_line_int_u_dot_v_table[3][3] = {{4, -1, 2}, {-1, 4, 2}, {2, 2, 16}};
 // Function Times_U_Dot_V
 //#####################################################################
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Times_Line_Integral_U_Dot_V(BLOCK_ID b,BLOCK_VECTOR<T>& w,const BLOCK_VECTOR<T>& u) const
+Times_Line_Integral_U_Dot_V(BLOCK_ID b,INTERVAL<int> bc_e,BLOCK_VECTOR<T>& w,const BLOCK_VECTOR<T>& u) const
 {
     const auto& bl=blocks(b);
     const auto* cb=bl.block;
     MATRIX<T,2> M=bl.xform.M;
-    for(int e:cb->bc_e)
+    for(int e:bc_e)
     {
         VECTOR<TV,3> r(u.Get_v(cb->S(e).x),u.Get_v(cb->S(e).y),u.Get_e(e)),s;
         for(int i=0;i<3;i++)
@@ -1177,29 +1177,35 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
             Init_Block_Vector(w,cb);
             Init_Block_Vector(u,cb);
             for(auto i:cb->bc_v)
-                u.Add_v(i,M*analytic_velocity->v(cb->X(i)/unit_m,0)*unit_m/unit_s);
+            {
+                TV Z=bl.xform*cb->X(i);
+                u.Add_v(i,M*analytic_velocity->v(Z/unit_m,0)*unit_m/unit_s);
+            }
             for(auto i:cb->bc_e)
-                u.Add_e(i,M*analytic_velocity->v(cb->X.Subset(cb->S(i)).Average()/unit_m,0)*unit_m/unit_s);
-            w.V=canonical_block_matrices.Get(bl.block).M*u.V;
+            {
+                TV Z=bl.xform*cb->X.Subset(cb->S(i)).Average();
+                u.Add_e(i,M*analytic_velocity->v(Z/unit_m,0)*unit_m/unit_s);
+            }
+            w.V=canonical_block_matrices.Get(bl.block).M*-u.V;
 
             // TODO: handle det(M)!=1
             u.V.Fill(0);
             ARRAY<T> div_v(cb->X.m),div_e(cb->S.m);
             for(int i=0;i<cb->X.m;i++)
             {
-                TV Z=cb->X(i);
+                TV Z=bl.xform*cb->X(i);
                 u.Add_v(i,M*Force(Z));
-                div_v(i)=analytic_velocity->dX(Z/unit_m,0).Trace()/unit_s;
+                div_v(i)=-analytic_velocity->dX(Z/unit_m,0).Trace()/unit_s;
             }
             for(int i=0;i<cb->S.m;i++)
             {
-                TV Z=cb->X.Subset(cb->S(i)).Average();
+                TV Z=bl.xform*cb->X.Subset(cb->S(i)).Average();
                 u.Add_e(i,M*Force(Z));
-                div_e(i)=analytic_velocity->dX(Z/unit_m,0).Trace()/unit_s;
+                div_e(i)=-analytic_velocity->dX(Z/unit_m,0).Trace()/unit_s;
             }
             Times_U_Dot_V(b,w,u);
             Times_P_U(b,w,div_v,div_e);
-            w.Transform(-bl.xform.M,-1);
+            w.Transform(bl.xform.M,1);
             Apply_To_RHS(b,w);
         }
 
@@ -1212,17 +1218,18 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
             BLOCK_VECTOR<T> w,u;
             Init_Block_Vector(w,cb);
             Init_Block_Vector(u,cb);
-            for(auto i:cb->bc_v)
+
+            for(auto i:bc.bc_v)
             {
-                TV Z=cb->X(i);
+                TV Z=bl.xform*cb->X(i);
                 u.Add_v(i,M*Traction(bc.normal,Z));
             }
-            for(auto i:cb->bc_e)
+            for(auto i:bc.bc_e)
             {
-                TV Z=cb->X.Subset(cb->S(i)).Average();
+                TV Z=bl.xform*cb->X.Subset(cb->S(i)).Average();
                 u.Add_e(i,M*Traction(bc.normal,Z));
             }
-            Times_Line_Integral_U_Dot_V(bc.b,w,u);
+            Times_Line_Integral_U_Dot_V(bc.b,bc.bc_e,w,u);
             w.Transform(bl.xform.M,1);
             Apply_To_RHS(bc.b,w);
         }
@@ -1241,8 +1248,8 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
 
             for(int i=0;i<bc.bc_v.Size();i++) u.Add_v(bc.bc_v.min_corner+i,M*bc.data_v(i));
             for(int i=0;i<bc.bc_e.Size();i++) u.Add_e(bc.bc_e.min_corner+i,M*bc.data_e(i));
-            w.V=canonical_block_matrices.Get(bl.block).M*u.V;
-            w.Transform(-bl.xform.M,-1);
+            w.V=canonical_block_matrices.Get(bl.block).M*-u.V;
+            w.Transform(bl.xform.M,1);
             Apply_To_RHS(bc.b,w);
         }
 
@@ -1257,7 +1264,7 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
             Init_Block_Vector(u,cb);
             for(int i=0;i<bc.bc_v.Size();i++) u.Add_v(bc.bc_v.min_corner+i,M*bc.data_v(i));
             for(int i=0;i<bc.bc_e.Size();i++) u.Add_e(bc.bc_e.min_corner+i,M*bc.data_e(i));
-            Times_Line_Integral_U_Dot_V(bc.b,w,u);
+            Times_Line_Integral_U_Dot_V(bc.b,bc.bc_e,w,u);
             w.Transform(bl.xform.M,1);
             Apply_To_RHS(bc.b,w);
         }
@@ -2085,7 +2092,7 @@ Check_Analytic_Solution() const
             {
                 TV X=(Z(cb->S(i).x)+Z(cb->S(i).y))/2;
                 TV U=analytic_velocity->v(X/unit_m,0)*unit_m/unit_s;
-                TV V=W.Get_v(rd.dof_map_e(i));
+                TV V=W.Get_e(rd.dof_map_e(i));
                 max_u=std::max(max_u,(U-V).Max_Abs());
                 l2_u+=(U-V).Magnitude_Squared();
                 num_u++;
@@ -2094,7 +2101,7 @@ Check_Analytic_Solution() const
         for(int i=0;i<cb->X.m;i++)
             if(rd.dof_map_p(i)>=0)
             {
-                TV X=(Z(cb->S(i).x)+Z(cb->S(i).y))/2;
+                TV X=Z(i);
                 T p=analytic_pressure->f(X/unit_m,0)*unit_m/unit_s;
                 T q=W.Get_p(rd.dof_map_p(i));
                 max_p=std::max(max_p,std::abs(p-q));

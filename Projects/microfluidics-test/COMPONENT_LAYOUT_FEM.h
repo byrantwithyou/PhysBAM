@@ -228,7 +228,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     void Init_Block_Vector(BLOCK_VECTOR<T>& M,const CANONICAL_BLOCK<T>* cb) const;
     void Times_U_Dot_V(BLOCK_ID b,BLOCK_VECTOR<T>& v,const BLOCK_VECTOR<T>& u) const;
     void Times_P_U(BLOCK_ID b,BLOCK_VECTOR<T>& w,const ARRAY<T>& div_v,const ARRAY<T>& div_e) const;
-    void Times_Line_Integral_U_Dot_V(BLOCK_ID b,BLOCK_VECTOR<T>& w,const BLOCK_VECTOR<T>& u) const;
+    void Times_Line_Integral_U_Dot_V(BLOCK_ID b,INTERVAL<int> bc_e,BLOCK_VECTOR<T>& w,const BLOCK_VECTOR<T>& u) const;
     void Apply_To_RHS(BLOCK_ID b,const BLOCK_VECTOR<T>& w);
     const DOF_PAIRS& Regular_Connection_Pair(BLOCK_ID b,CON_ID con_id,bool is_dest);
 
