@@ -469,15 +469,15 @@ Visit_Irregular_Cross_Section_Dofs(const IRREGULAR_CONNECTION& ic,F func) const
 
     int irreg_v0=n/2+1;
     int irreg_v1=n/2;
-    int last_v=-1;
+    BLOCK_ID last_b(-1);
     for(int i=0;i<n;i++)
     {
         bool b1=i<irreg_v1;
         bool b0=i<irreg_v0;
         auto& eo=ic.edge_on(i);
-        IRREGULAR_VISITOR iv={eo.b,a*i+b,a*i+c,a*i+d,eo.e,eo.v0,eo.v1,b1,b0,b1,eo.v0!=last_v};
+        IRREGULAR_VISITOR iv={eo.b,a*i+b,a*i+c,a*i+d,eo.e,eo.v0,eo.v1,b1,b0,b1,eo.b!=last_b};
         func(iv);
-        last_v=eo.v1;
+        last_b=eo.b;
     }
 }
 template<class CS,class FV,class FE>
