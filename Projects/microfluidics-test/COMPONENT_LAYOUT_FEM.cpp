@@ -1682,12 +1682,12 @@ Compute_Dof_Pairs(REFERENCE_IRREGULAR_DATA& ri)
             if(iv.n0) id=ri.pairs.Add_End();
             ri.mapping.Append({id,iv.n0});
             rd[1]=&reference_block_data(blocks(iv.b).ref_id);
-            int s=iv.be,d=!s;
             auto& z=ri.pairs(id);
             z.b=iv.b;
-            DOF_PAIRS& q=z.irreg_pairs[d];
 
             {
+                int s=iv.be,d=!s;
+                DOF_PAIRS& q=z.irreg_pairs[d];
                 int f[2]={iv.re,iv.ie};
                 int r=rd[d]->dof_map_e(f[d]);
                 if(r>=0) q.e.Append({r,f[s]});
@@ -1695,6 +1695,8 @@ Compute_Dof_Pairs(REFERENCE_IRREGULAR_DATA& ri)
 
             if(iv.n0)
             {
+                int s=iv.b0,d=!s;
+                DOF_PAIRS& q=z.irreg_pairs[d];
                 int f[2]={iv.r0,iv.i0};
                 int r=rd[d]->dof_map_v(f[d]),p=rd[d]->dof_map_p(f[d]);
                 if(r>=0) q.v.Append({r,f[s]});
@@ -1702,6 +1704,8 @@ Compute_Dof_Pairs(REFERENCE_IRREGULAR_DATA& ri)
             }
 
             {
+                int s=iv.b1,d=!s;
+                DOF_PAIRS& q=z.irreg_pairs[d];
                 int f[2]={iv.r1,iv.i1};
                 int r=rd[d]->dof_map_v(f[d]),p=rd[d]->dof_map_p(f[d]);
                 if(r>=0) q.v.Append({r,f[s]});
