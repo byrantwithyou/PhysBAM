@@ -1072,6 +1072,20 @@ Fill_Irregular_Connection_Matrix(ARRAY<BLOCK_MATRIX<T>,RID_ID>& M,const REFERENC
         Init_Block_Matrix(M(j),bb,z.b);
         Copy_Matrix_Data(M(j),z.b,z.irreg_pairs[0],reference_block_data(blocks(z.b).ref_id).pairs,bb,z.b);
         Copy_Matrix_Data(M(j),bb,reference_block_data(blocks(bb).ref_id).pairs,z.irreg_pairs[1],bb,z.b);
+
+        if(j>RID_ID(0))
+        {
+            RID_ID k=j-1;
+            for(CON_ID cc(0);cc<blocks(z.b).connections.m;cc++)
+            {
+                auto& c=blocks(z.b).connections(cc);
+                if(!c.is_regular || ri.pairs(k).b!=c.id) continue;
+                const auto& dp0=Regular_Connection_Pair(z.b,cc,false);
+                const auto& dp1=Regular_Connection_Pair(z.b,cc,true);
+                Copy_Matrix_Data(M(k),z.b,z.irreg_pairs[0],dp0,bb,c.id);
+                Copy_Matrix_Data(M(j),c.id,ri.pairs(k).irreg_pairs[0],dp1,bb,z.b);
+            }
+        }
     }
 }
 //#####################################################################
@@ -1755,6 +1769,112 @@ Visualize_Block_State(BLOCK_ID b) const
         Add_Debug_Particle(Z(i),hv.Contains(i)?VECTOR<T,3>(1,1,0):VECTOR<T,3>(1,0,0));
         Debug_Particle_Set_Attribute<TV>("display_size",.1);
     }
+
+    for(CON_ID cc(0);cc<bl.connections.m;cc++)
+    {
+        const auto& c=bl.connections(cc);
+        if(c.is_regular)
+        {
+            const auto* cb2=blocks(c.id).block;
+            Visit_Regular_Cross_Section_Dofs(cb->cross_sections(cc),
+                cb2->cross_sections(c.con_id),c.master,
+                [&](int a,int b,bool o)
+                {
+                    Add_Debug_Particle(Z(a),o?VECTOR<T,3>(1,0,0):VECTOR<T,3>(0,1,0));
+                    Debug_Particle_Set_Attribute<TV>("display_size",.2);
+                },
+                [&](int a,int b,bool o)
+                {
+                    Add_Debug_Particle((Z(cb->S(a).x)+Z(cb->S(a).y))/2,o?VECTOR<T,3>(1,0,0):VECTOR<T,3>(0,1,0));
+                    Debug_Particle_Set_Attribute<TV>("display_size",.2);
+                });
+        }
+        else
+        {
+            const auto& ic=irregular_connections(c.irreg_id);
+            Visit_Irregular_Cross_Section_Dofs(ic,
+                [&](const IRREGULAR_VISITOR& iv)
+                {
+                    TV A=Z(iv.r0),B=Z(iv.r1);
+                    Add_Debug_Particle(A,VECTOR<T,3>(iv.b0,0,1));
+                    Debug_Particle_Set_Attribute<TV>("display_size",.2);
+                    Add_Debug_Particle(B,VECTOR<T,3>(iv.b1,0,1));
+                    Debug_Particle_Set_Attribute<TV>("display_size",.25);
+                    Add_Debug_Particle((A+B)/2,VECTOR<T,3>(iv.be,0,1));
+                    Debug_Particle_Set_Attribute<TV>("display_size",.2);
+                });
+        }
+    }
+
+    for(auto i:bl.edge_on)
+    {
+        auto& ic=irregular_connections(i.x);
+        auto& id=ic.edge_on(i.y);
+        bool o0=i.y>=(ic.edge_on.m/2+1);
+        bool o1=(i.y>=ic.edge_on.m/2);
+
+        TV A=Z(id.v0),B=Z(id.v1);
+        Add_Debug_Particle(A,VECTOR<T,3>(1,1,1)/(1+o0));
+        Debug_Particle_Set_Attribute<TV>("display_size",.05);
+        Add_Debug_Particle(B,VECTOR<T,3>(1,1,1)/(1+o1));
+        Debug_Particle_Set_Attribute<TV>("display_size",.06);
+        Add_Debug_Particle((A+B)/2,VECTOR<T,3>(1,1,1)/(1+o1));
+        Debug_Particle_Set_Attribute<TV>("display_size",.05);
+    }
+}
+//#####################################################################
+// Function Visualize_Block_State
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+Visualize_Block_Dofs(BLOCK_ID b) const
+{
+    auto& bl=blocks(b);
+    auto* cb=bl.block;
+    const auto& rd=reference_block_data(blocks(b).ref_id);
+    auto Z=[=](int i){return bl.xform*cb->X(i);};
+    for(auto t:cb->E)
+    {
+        VECTOR<TV,3> P;
+        for(int i=0;i<3;i++) P(i)=bl.xform*cb->X(t(i));
+        for(auto p:P) Add_Debug_Object(VECTOR<TV,2>(p,P.Average()),VECTOR<T,3>(.5,.5,.5));
+    }
+    HASHTABLE<int> he,hv;
+    he.Set_All(cb->bc_e);
+    hv.Set_All(cb->bc_v);
+    for(int i=0;i<cb->S.m;i++)
+    {
+        TV X=Z(cb->S(i).x);
+        TV Y=Z(cb->S(i).y);
+        Add_Debug_Object(VECTOR<TV,2>(X,Y),he.Contains(i)?VECTOR<T,3>(0,1,1):VECTOR<T,3>(0,0,1));
+    }
+    Flush_Frame<TV>(LOG::sprintf("block %P\n",b).c_str());
+    for(int i=0;i<cb->X.m;i++)
+    {
+        Add_Debug_Text(Z(i),LOG::sprintf("%d",i),VECTOR<T,3>(1,1,0));
+    }
+    for(int i=0;i<cb->S.m;i++)
+    {
+        Add_Debug_Text((Z(cb->S(i).x)+Z(cb->S(i).y))/2,LOG::sprintf("%d",i),VECTOR<T,3>(0,1,0));
+    }
+    Flush_Frame<TV>(LOG::sprintf("block %P full\n",b).c_str());
+    for(int i=0;i<cb->X.m;i++)
+    {
+        int k=rd.dof_map_v(i);
+        if(k>=0) Add_Debug_Text(Z(i),LOG::sprintf("%d",k),VECTOR<T,3>(1,1,0));
+    }
+    Flush_Frame<TV>(LOG::sprintf("block %P v\n",b).c_str());
+    for(int i=0;i<cb->S.m;i++)
+    {
+        int k=rd.dof_map_e(i);
+        if(k>=0) Add_Debug_Text((Z(cb->S(i).x)+Z(cb->S(i).y))/2,LOG::sprintf("%d",k),VECTOR<T,3>(0,1,0));
+    }
+    Flush_Frame<TV>(LOG::sprintf("block %P e\n",b).c_str());
+    for(int i=0;i<cb->X.m;i++)
+    {
+        int k=rd.dof_map_p(i);
+        if(k>=0) Add_Debug_Text(Z(i),LOG::sprintf("%d",k),VECTOR<T,3>(1,1,0));
+    }
+    Flush_Frame<TV>(LOG::sprintf("block %P p\n",b).c_str());
 
     for(CON_ID cc(0);cc<bl.connections.m;cc++)
     {

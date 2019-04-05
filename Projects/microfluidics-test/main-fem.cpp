@@ -126,6 +126,8 @@ void Run(PARSE_ARGS& parse_args)
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
             cl.Visualize_Solution(cl.rhs_block_list(b),b,true);
         Flush_Frame<TV>("rhs blocks");
+        for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+            cl.Visualize_Block_Dofs(b);
     }
 
     timer("compute matrix");
