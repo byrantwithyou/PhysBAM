@@ -592,7 +592,7 @@ Merge_Canonical_Blocks(CANONICAL_BLOCK<T>* cb0,CON_ID con_id0,XFORM<TV> xf0,
             cb->cross_sections.Append(
                 Map_Cross_Section(cb1->cross_sections(i),index_v_map,index_e_map));
 
-    XFORM<TV> M01i=xf0*xf1.Inverse();
+    XFORM<TV> M01i=xf0.Inverse()*xf1;
 
     cb->X=cb0->X;
     cb->X.Resize(num_v_dofs);
