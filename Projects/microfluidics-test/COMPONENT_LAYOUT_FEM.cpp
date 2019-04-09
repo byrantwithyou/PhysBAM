@@ -1382,15 +1382,15 @@ Compute_Reference_Regular_Connections()
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Compute_Reference_Irregular_Connections()
 {
-    typedef std::tuple<CANONICAL_BLOCK<T>*,CON_ID,ARRAY<PAIR<CANONICAL_BLOCK<T>*,int> >,ARRAY<PAIR<CANONICAL_BLOCK<T>*,int> > > KEY;
+    typedef std::tuple<CANONICAL_BLOCK<T>*,CON_ID,ARRAY<PAIR<CANONICAL_BLOCK<T>*,int> > > KEY;
     HASHTABLE<KEY,REFERENCE_IRREGULAR_ID> ref;
 
     for(IRREG_ID i(0);i<irregular_connections.m;i++)
     {
         auto& ic=irregular_connections(i);
-        ARRAY<PAIR<CANONICAL_BLOCK<T>*,int> > av,ae;
-        for(auto p:ic.edge_on) av.Append({blocks(p.b).block,p.e});
-        auto pr=ref.Insert(std::make_tuple(blocks(ic.regular).block,ic.con_id,av,ae),{});
+        ARRAY<PAIR<CANONICAL_BLOCK<T>*,int> > ae;
+        for(auto p:ic.edge_on) ae.Append({blocks(p.b).block,p.e});
+        auto pr=ref.Insert(std::make_tuple(blocks(ic.regular).block,ic.con_id,ae),{});
         if(pr.y) *pr.x=reference_irregular_data.Append({i});
         ic.ref_id=*pr.x;
     }
