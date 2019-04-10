@@ -563,7 +563,7 @@ CS Map_Cross_Section(CS cs,const ARRAY<int>& index_v_map,const ARRAY<int>& index
     return cs;
 }
 //#####################################################################
-// Function Merge_Blocks
+// Function Merge_Canonical_Blocks
 //#####################################################################
 template<class T> TRIPLE<CANONICAL_BLOCK<T>*,ARRAY<int>,ARRAY<int> >& COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Merge_Canonical_Blocks(CANONICAL_BLOCK<T>* cb0,CON_ID con_id0,XFORM<TV> xf0,
@@ -606,8 +606,6 @@ Merge_Canonical_Blocks(CANONICAL_BLOCK<T>* cb0,CON_ID con_id0,XFORM<TV> xf0,
 
     cb->S=cb0->S;
     cb->S.Resize(num_e_dofs);
-    cb->bc_v=cb0->bc_v;
-    cb->bc_e=cb0->bc_e;
     for(int i=0;i<cb1->S.m;i++)
     {
         int j=index_e_map(i);
@@ -622,8 +620,18 @@ Merge_Canonical_Blocks(CANONICAL_BLOCK<T>* cb0,CON_ID con_id0,XFORM<TV> xf0,
         }
     }
 
-    cb->bc_v.Append_Elements(index_v_map.Subset(cb1->bc_v));
-    cb->bc_e.Append_Elements(index_e_map.Subset(cb1->bc_e));
+    cb->bc_v=cb0->bc_v;
+    cb->bc_e=cb0->bc_e;
+    for(int v:cb1->bc_v)
+    {
+        int j=index_v_map(v);
+        if(j>=cb0->X.m) cb->bc_v.Append(j);
+    }
+    for(int e:cb1->bc_e)
+    {
+        int j=index_e_map(e);
+        if(j>=cb0->S.m) cb->bc_e.Append(j);
+    }
 
     cb->E=cb0->E;
     ARRAY<IV3> E=cb1->E;
