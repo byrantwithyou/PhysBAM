@@ -709,6 +709,7 @@ Merge_Blocks()
                 if(!(mask&(1<<Value(i)))) continue;
                 if(!blocks(b).connections(i).is_regular) continue;
                 BLOCK_ID d=blocks(b).connections(i).id;
+                if(!blocks(d).block) continue;
                 if(blocks(d).flags&1) continue;
                 int c=Approx_Dof_Count(d);
                 if(c<best) // keep blocks small
