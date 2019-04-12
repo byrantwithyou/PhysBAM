@@ -1067,25 +1067,6 @@ Fill_Connection_Matrix(BLOCK_MATRIX<T>& M,const REFERENCE_CONNECTION_DATA& cd)
     auto& rd1=reference_block_data(blocks(cd.b[1]).ref_id);
     Copy_Matrix_Data(M,cd.b[0],rd0.pairs,cd.reg_pairs[1],cd.b[0],cd.b[1]);
     Copy_Matrix_Data(M,cd.b[1],cd.reg_pairs[0],rd1.pairs,cd.b[0],cd.b[1]);
-
-    for(auto e0:blocks(cd.b[0]).edge_on)
-    {
-        const auto& ic0=irregular_connections(e0.x);
-        const auto& irbd0=reference_irregular_data(ic0.ref_id);
-        const auto& p0=irbd0.mapping(e0.y);
-        if(!p0.y) continue;
-        const auto& h0=irbd0.pairs(p0.x);
-        for(auto e1:blocks(cd.b[1]).edge_on)
-        {
-            const auto& ic1=irregular_connections(e1.x);
-            if(ic1.regular!=ic0.regular) continue;
-            const auto& irbd1=reference_irregular_data(ic1.ref_id);
-            const auto& p1=irbd1.mapping(e1.y);
-            if(!p1.y) continue;
-            const auto& h1=irbd1.pairs(p1.x);
-            Copy_Matrix_Data(M,ic0.regular,h0.irreg_pairs[1],h1.irreg_pairs[1],cd.b[0],cd.b[1]);
-        }
-    }
 }
 //#####################################################################
 // Function Fill_Irregular_Connection_Matrix
@@ -1112,6 +1093,20 @@ Fill_Irregular_Connection_Matrix(ARRAY<BLOCK_MATRIX<T>,RID_ID>& M,const REFERENC
                 const auto& dp1=Regular_Connection_Pair(z.b,cc,true);
                 Copy_Matrix_Data(M(k),z.b,z.irreg_pairs[0],dp0,bb,c.id);
                 Copy_Matrix_Data(M(j),c.id,ri.pairs(k).irreg_pairs[0],dp1,bb,z.b);
+
+                REFERENCE_BLOCK_ID ref0=blocks(z.b).ref_id,ref1=blocks(c.id).ref_id;
+                if(c.master)
+                {
+                    auto key=std::make_tuple(ref0,cc,ref1,c.con_id);
+                    auto& rc=reference_connection_data(regular_connection_hash.Get(key));
+                    Copy_Matrix_Data(rc.M,bb,z.irreg_pairs[1],ri.pairs(k).irreg_pairs[1],z.b,c.id);
+                }
+                else
+                {
+                    auto key=std::make_tuple(ref1,c.con_id,ref0,cc);
+                    auto& rc=reference_connection_data(regular_connection_hash.Get(key));
+                    Copy_Matrix_Data(rc.M,bb,ri.pairs(k).irreg_pairs[1],z.irreg_pairs[1],c.id,z.b);
+                }
             }
         }
     }
@@ -1153,12 +1148,7 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
     }
 
     for(auto& rc:reference_connection_data)
-    {
-        BLOCK_MATRIX<T> M;
-        Fill_Connection_Matrix(M,rc);
-        rc.mat_id=cem.Create_Matrix_Block(false);
-        cem.block_list(rc.mat_id).M.Exchange(M.M);
-    }
+        Fill_Connection_Matrix(rc.M,rc);
 
     for(auto& ri:reference_irregular_data)
     {
@@ -1170,6 +1160,12 @@ Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
             d.mat_id=cem.Create_Matrix_Block(false);
             cem.block_list(d.mat_id).M.Exchange(M(j).M);
         }
+    }
+
+    for(auto& rc:reference_connection_data)
+    {
+        rc.mat_id=cem.Create_Matrix_Block(false);
+        cem.block_list(rc.mat_id).M.Exchange(rc.M.M);
     }
 
     for(BLOCK_ID b(0);b<blocks.m;b++)

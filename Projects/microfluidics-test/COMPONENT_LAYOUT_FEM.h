@@ -161,6 +161,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
         BLOCK_ID b[2];
         CON_ID con_id[2];
         DOF_PAIRS reg_pairs[2]; // dof[dest-index], from-index=1-(dest-index)
+        BLOCK_MATRIX<T> M;
         int mat_id=-7;
     };
 
