@@ -1067,6 +1067,25 @@ Fill_Connection_Matrix(BLOCK_MATRIX<T>& M,const REFERENCE_CONNECTION_DATA& cd)
     auto& rd1=reference_block_data(blocks(cd.b[1]).ref_id);
     Copy_Matrix_Data(M,cd.b[0],rd0.pairs,cd.reg_pairs[1],cd.b[0],cd.b[1]);
     Copy_Matrix_Data(M,cd.b[1],cd.reg_pairs[0],rd1.pairs,cd.b[0],cd.b[1]);
+
+    for(auto e0:blocks(cd.b[0]).edge_on)
+    {
+        const auto& ic0=irregular_connections(e0.x);
+        const auto& irbd0=reference_irregular_data(ic0.ref_id);
+        const auto& p0=irbd0.mapping(e0.y);
+        if(!p0.y) continue;
+        const auto& h0=irbd0.pairs(p0.x);
+        for(auto e1:blocks(cd.b[1]).edge_on)
+        {
+            const auto& ic1=irregular_connections(e1.x);
+            if(ic1.regular!=ic0.regular) continue;
+            const auto& irbd1=reference_irregular_data(ic1.ref_id);
+            const auto& p1=irbd1.mapping(e1.y);
+            if(!p1.y) continue;
+            const auto& h1=irbd1.pairs(p1.x);
+            Copy_Matrix_Data(M,ic0.regular,h0.irreg_pairs[1],h1.irreg_pairs[1],cd.b[0],cd.b[1]);
+        }
+    }
 }
 //#####################################################################
 // Function Fill_Irregular_Connection_Matrix
