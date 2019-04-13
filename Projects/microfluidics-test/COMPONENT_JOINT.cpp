@@ -113,8 +113,8 @@ Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles)
     l1.Reverse();
     ARRAY<TV> s0=Polyline(l0,target_length),s1=Polyline(l1,target_length);
     CANONICAL_COMPONENT<T>* cc=new CANONICAL_COMPONENT<T>;
-    ARRAY<TV> t0;
-    t0.Append(s0(0));
+    ARRAY<TV> t1;
+    t1.Append(s0(0));
     CC_IRREG_ID index=cc->irregular_connections.Add_End();
     CC_IRREG_ID ick2=cc->irregular_connections.Append({CC_BLOCK_ID(~((k+2)%3))});
     for(BLOCK_MESHING_ITERATOR<TV> it(s0,s1,d-1,target_length);it.Valid();it.Next())
@@ -130,10 +130,11 @@ Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles)
         for(int i=it.X0.m;it.k==it.nseg-1 && i<cb->X.m;i++) cb->bc_v.Append(i);
         for(int i=it.Last_Diagonal_Edge()+1;it.k==it.nseg-1 && i<cb->S.m;i++) cb->bc_e.Append(i);
         cc->blocks.Append({cb,{},con,{{index,d-2-it.k},{ick2,it.k}}});
-        t0.Append(it.X1(0));
+        t1.Append(it.X1(0));
     }
+    t1.Reverse();
     VECTOR<TV,2> g0=Extrude(w((k+2)%3),w(k),dirs(k)),g1=Extrude(w((k+1)%3),w(k),dirs((k+1)%3));
-    ARRAY<TV> t1=Polyline({g0(0),w(k),g1(0)},width/(d-1));
+    ARRAY<TV> t0=Polyline({g1(0),w(k),g0(0)},width/(d-1));
     int nseg=rint(w(k).Magnitude()/target_length);
     int offset=Value(cc->blocks.m);
     CANONICAL_BLOCK<T>* sep_cb=new CANONICAL_BLOCK<T>;
@@ -144,49 +145,53 @@ Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles)
         ARRAY<CC_BLOCK_CONNECTION,CON_ID> con;
         if(it.k==0)
         {
+            sep_cb->X.Append_Elements(it.X0);
             cb->cross_sections.Append({{0,it.X0.m},{0,it.First_Diagonal_Edge()},false});
-            con.Append({index});
-            cc->irregular_connections(index).regular=CC_BLOCK_ID(offset+it.k);
+            con.Append({CC_BLOCK_ID(offset+nseg),CON_ID(0)});
+            cb->bc_v.Append(d-1);
         }
         Joint_Connection(offset,it,cb,nullptr,nullptr,con,CON_ID(1));
         if(it.k==nseg-1)
         {
-            sep_cb->X.Append_Elements(it.X1);
             cb->cross_sections.Append({{it.X0.m,cb->X.m},{it.Last_Diagonal_Edge()+1,cb->S.m},true});
-            con.Append({cc->blocks.m+1,CON_ID(0)});
+            con.Append({index});
+            cc->irregular_connections(index).regular=CC_BLOCK_ID(offset+it.k);
         }
         cb->bc_v={0,it.X0.m-1,it.X0.m,cb->X.m-1};
-        if(it.k==nseg-1) cb->bc_v.Append(it.X0.m+d-1);
         cb->bc_e={it.First_Diagonal_Edge(),it.Last_Diagonal_Edge()};
         cc->blocks.Append({cb,{},con,{}});
     }
+
     PHYSBAM_ASSERT(sep_cb->X.m==2*d-1);
     sep_cb->S.Resize(2*(4*d-3));
     for(int j=0;j<sep_cb->X.m-1;j++) sep_cb->S(j)={j,j+1};
-    sep_cb->cross_sections.Append({{0,sep_cb->X.m},{0,sep_cb->X.m-1},false});
+    sep_cb->cross_sections.Append({{0,sep_cb->X.m},{0,sep_cb->X.m-1},true});
     for(int i=0;i<2;i++)
     {
         int offset_x=i*(d-1),s=2*d-1,offset_edge=s-1+i*(3*(d-1)+1);
-        for(int j=0;j<d;j++) sep_cb->X.Append(sep_cb->X(offset_x+j)+dirs((k+i)%3)*sep);
+        for(int j=0;j<d;j++) sep_cb->X.Append(sep_cb->X(offset_x+j)+dirs((k+1-i)%3)*sep);
         for(int j=0;j<d-1;j++)
         {
-            int p=offset_x+j,q=p+i;
-            sep_cb->E.Append({p,q+s,p+1});
-            sep_cb->E.Append({q+s,q+s+1,p+1});
-            sep_cb->S(offset_edge+j)={q+s,q+s+1};
-            sep_cb->S(offset_edge+j+(d-1))={q+s,p+1};
-            sep_cb->S(offset_edge+j+2*(d-1))={p,q+s};
+            int p=offset_x+j,q=p+s+i;
+            sep_cb->E.Append({q,p,q+1});
+            sep_cb->E.Append({p+1,q+1,p});
+
+            sep_cb->S(offset_edge+j)={q,q+1};
+            sep_cb->S(offset_edge+j+(d-1))={q+1,p};
+            sep_cb->S(offset_edge+j+2*(d-1))={p,q};
         }
         sep_cb->S(offset_edge+3*(d-1))={offset_x+d-1,offset_x+d-1+i+s};
         sep_cb->bc_v.Append_Elements(ARRAY<int>{offset_x,offset_x+i+s,offset_x+d-1,offset_x+d-1+i+s});
         sep_cb->bc_e.Append_Elements(ARRAY<int>{offset_edge+2*(d-1),offset_edge+3*(d-1)});
-        sep_cb->cross_sections.Append({{offset_x+s+i,offset_x+d+s+i},{offset_edge,offset_edge+(d-1)},true});
+        sep_cb->cross_sections.Append({{offset_x+s+i,offset_x+d+s+i},{offset_edge,offset_edge+(d-1)},false});
     }
+
     ARRAY<CC_BLOCK_CONNECTION,CON_ID> sep_con;
-    sep_con.Append({cc->blocks.m-1,CON_ID(1)});
-    sep_con.Append({CC_BLOCK_ID(~k),CON_ID(0)});
-    sep_con.Append({CC_BLOCK_ID(~((k+1)%3)),CON_ID(0)});
+    sep_con.Append({cc->blocks.m-1,CON_ID(0)});
+    sep_con.Append({CC_BLOCK_ID(~((k+1)%3)),CON_ID(1)});
+    sep_con.Append({CC_BLOCK_ID(~k),CON_ID(1)});
     cc->blocks.Append({sep_cb,{},sep_con,{}});
+
     cc->irregular_connections(index).edge_on.Reverse();
     for(auto& e:cc->irregular_connections(index).edge_on)
         std::swap(e.v0,e.v1);
