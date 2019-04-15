@@ -156,6 +156,7 @@ Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles)
             cb->cross_sections.Append({{it.X0.m,cb->X.m},{it.Last_Diagonal_Edge()+1,cb->S.m},true});
             con.Append({index});
             cc->irregular_connections(index).regular=CC_BLOCK_ID(offset+it.k);
+            cc->irregular_connections(index).con_id=CON_ID(1);
         }
         cb->bc_v={0,it.X0.m-1,it.X0.m,cb->X.m-1};
         cb->bc_e={it.First_Diagonal_Edge(),it.Last_Diagonal_Edge()};
