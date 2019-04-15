@@ -644,12 +644,11 @@ Merge_Canonical_Blocks(CANONICAL_BLOCK<T>* cb0,CON_ID con_id0,XFORM<TV> xf0,
 // Function Merge_Blocks
 //#####################################################################
 template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Merge_Blocks(BLOCK_ID id,CON_ID con_id)
+Merge_Blocks(BLOCK_ID id,CON_ID con_id,BLOCK_ID id2)
 {
     PHYSBAM_ASSERT(con_id>=CON_ID());
     PHYSBAM_ASSERT(id>=BLOCK_ID());
     BLOCK& bl=blocks(id);
-    BLOCK_ID id2=bl.connections(con_id).id;
     CON_ID con_id2=bl.connections(con_id).con_id;
     BLOCK& bl2=blocks(id2);
 
@@ -696,6 +695,7 @@ template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
 Merge_Blocks()
 {
     UNION_FIND<BLOCK_ID> uf(blocks.m);
+    HASHTABLE<BLOCK_ID,BLOCK_ID> alive_neighbor;
     for(BLOCK_ID b(0);b<blocks.m;b++)
     {
         if(!blocks(b).block) continue;
@@ -704,23 +704,28 @@ Merge_Blocks()
             PHYSBAM_ASSERT(!(blocks(b).flags&1));
             CON_ID besti(-1);
             int best=INT_MAX;
+            BLOCK_ID id2(-1);
             for(CON_ID i(0);i<blocks(b).connections.m;i++)
             {
                 if(!(mask&(1<<Value(i)))) continue;
                 if(!blocks(b).connections(i).is_regular) continue;
                 BLOCK_ID d=blocks(b).connections(i).id;
-                if(!blocks(d).block) continue;
+                d=alive_neighbor.Get_Default(uf.Find(d),d);
+                PHYSBAM_ASSERT(blocks(d).block);
                 if(blocks(d).flags&1) continue;
                 int c=Approx_Dof_Count(d);
                 if(c<best) // keep blocks small
                 {
                     best=c;
                     besti=i;
+                    id2=d;
                 }
             }
             PHYSBAM_ASSERT(besti>=CON_ID());
+            PHYSBAM_ASSERT(id2>=BLOCK_ID());
             uf.Union(b,blocks(b).connections(besti).id);
-            Merge_Blocks(b,besti);
+            alive_neighbor.Set(uf.Find(b),b);
+            Merge_Blocks(b,besti,id2);
             b--; // repeat the check on this block
         }
     }

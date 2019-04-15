@@ -191,7 +191,7 @@ struct COMPONENT_LAYOUT_FEM<VECTOR<T,2> >
     HASHTABLE<PAIR<CANONICAL_BLOCK<T>*,int>,int> separates_dofs;
     int Separates_Dofs(BLOCK_ID b);
     HASHTABLE<std::tuple<CANONICAL_BLOCK<T>*,CON_ID,CANONICAL_BLOCK<T>*,CON_ID>,TRIPLE<CANONICAL_BLOCK<T>*,ARRAY<int>,ARRAY<int> > > merge_canonical_blocks;
-    void Merge_Blocks(BLOCK_ID id,CON_ID con_id);
+    void Merge_Blocks(BLOCK_ID id,CON_ID con_id,BLOCK_ID id2);
     TRIPLE<CANONICAL_BLOCK<T>*,ARRAY<int>,ARRAY<int> >& Merge_Canonical_Blocks(
         CANONICAL_BLOCK<T>* cb0,CON_ID con_id0,XFORM<TV> xf0,
         CANONICAL_BLOCK<T>* cb1,CON_ID con_id1,XFORM<TV> xf1);
