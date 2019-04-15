@@ -187,7 +187,7 @@ Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles)
     }
 
     ARRAY<CC_BLOCK_CONNECTION,CON_ID> sep_con;
-    sep_con.Append({cc->blocks.m-1,CON_ID(0)});
+    sep_con.Append({CC_BLOCK_ID(offset),CON_ID(0)});
     sep_con.Append({CC_BLOCK_ID(~((k+1)%3)),CON_ID(1)});
     sep_con.Append({CC_BLOCK_ID(~k),CON_ID(1)});
     cc->blocks.Append({sep_cb,{},sep_con,{}});
