@@ -167,9 +167,10 @@ Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles)
     sep_cb->S.Resize(2*(4*d-3));
     for(int j=0;j<sep_cb->X.m-1;j++) sep_cb->S(j)={j,j+1};
     sep_cb->cross_sections.Append({{0,sep_cb->X.m},{0,sep_cb->X.m-1},true});
+    int s=2*d-1;
     for(int i=0;i<2;i++)
     {
-        int offset_x=i*(d-1),s=2*d-1,offset_edge=s-1+i*(3*(d-1)+1);
+        int offset_x=i*(d-1),offset_edge=s-1+i*(3*(d-1)+1);
         for(int j=0;j<d;j++) sep_cb->X.Append(sep_cb->X(offset_x+j)+dirs((k+1-i)%3)*sep);
         for(int j=0;j<d-1;j++)
         {
@@ -186,6 +187,7 @@ Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles)
         sep_cb->bc_e.Append_Elements(ARRAY<int>{offset_edge+2*(d-1),offset_edge+3*(d-1)});
         sep_cb->cross_sections.Append({{offset_x+s+i,offset_x+d+s+i},{offset_edge,offset_edge+(d-1)},false});
     }
+    sep_cb->bc_v={0,d-1,s-1,s,s+d-1,s+d,s+2*d-1};
 
     ARRAY<CC_BLOCK_CONNECTION,CON_ID> sep_con;
     sep_con.Append({CC_BLOCK_ID(offset),CON_ID(0)});
