@@ -193,7 +193,7 @@ Parse_Input(const std::string& pipe_file)
                     TV C=A+dir*t0;
                     TV D=C+dir*t1;
                     auto cc=comp_change.Make_Component(cs0.x,cs0.y,cs1.x,cs1.y,t1);
-                    XFORM<TV> xf={Compute_Xform(dir),A};
+                    XFORM<TV> xf={Compute_Xform(dir),C};
                     ss>>name>>name2;
 
                     ARRAY<VERTEX_DATA> vd(i0);

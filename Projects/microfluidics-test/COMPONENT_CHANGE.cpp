@@ -11,6 +11,7 @@ namespace PhysBAM{
 template<class T> CANONICAL_COMPONENT<T>* COMPONENT_CHANGE<T>::
 Make_Component(int d0,T w0,int d1,T w1,T l)
 {
+    PHYSBAM_ASSERT(d0%2 && d1%2);
     PIPE_CHANGE_KEY<T> key={{d0,d1},{w0,w1},l};
     auto it=canonical_changes.insert({key,{}});
     if(!it.second) return it.first->second;
@@ -29,6 +30,9 @@ Make_Component(int d0,T w0,int d1,T w1,T l)
         T nw=w0+dw*(i+1)/num_sec;
         int od=d0+dd*i/num_sec;
         int nd=d0+dd*(i+1)/num_sec;
+        if(od%2==0) od+=sign(dd);
+        if(nd%2==0) nd+=sign(dd);
+        PHYSBAM_ASSERT(od>=std::min(d0,d1) && od<=std::max(d0,d1) && nd>=std::min(d0,d1) && nd<=std::max(d0,d1));
         CANONICAL_BLOCK<T>* cb=Make_Block(od,ow,nd,nw,wid);
         cc->blocks.Append(
             {
@@ -44,16 +48,16 @@ template<class F> // func(a,b) means val(a)<val(b)
 void Cross_Section_Topology(ARRAY<VECTOR<int,3> >& E,ARRAY<VECTOR<int,2> >& S,
     F func,int n0,int n1,ARRAY<int>& bc_e)
 {
-    for(int i=0;i<n0;i++) S.Append({i,i+1});
-    for(int i=0;i<n1;i++) S.Append({i+n0,i+n0+1});
+    for(int i=1;i<n0;i++) S.Append({i-1,i});
+    for(int i=1;i<n1;i++) S.Append({i+n0-1,i+n0});
     int a=0,b=n0,c=n0+n1,ma=a+n0/2,mb=b+n1/2;
     bc_e.Append(S.m);
-    while(a<n0 || b<c)
+    while(a<n0-1 || b<c-1)
     {
         S.Append({a,b});
         // Ensure that the midpoints are topologically connected.
-        bool need_a=(b>=c || (a==ma && b<mb));
-        bool need_b=(a>=b || (b==mb && a<ma));
+        bool need_a=(b>=c-1 || (a==ma && b<mb));
+        bool need_b=(a>=n0-1 || (b==mb && a<ma));
         if(need_a || (!need_b && func(a+1,b+1)))
         {
             E.Append({a,b,a+1});
@@ -87,16 +91,16 @@ Make_Block(int d0,T w0,int d1,T w1,T l)
     PHYSBAM_ASSERT(n1%2);
     cb->X.Resize(n0+n1);
     for(int i=0;i<n0;i++)
-        cb->X(i)=TV(0,key.width[0]/n0*i-key.width[0]/2);
+        cb->X(i)=TV(0,key.width[0]/(n0-1)*i-key.width[0]/2);
     for(int i=0;i<n1;i++)
-        cb->X(i+n0)=TV(key.length,key.width[1]/n1*i-key.width[1]/2);
+        cb->X(i+n0)=TV(key.length,key.width[1]/(n1-1)*i-key.width[1]/2);
 
     Cross_Section_Topology(cb->E,cb->S,
-        [&cb](int a,int b){return cb->X(a+1).y<=cb->X(b+1).y;},n0,n1,cb->bc_e);
+        [&cb](int a,int b){return cb->X(a).y<=cb->X(b).y;},n0,n1,cb->bc_e);
     cb->bc_v={0,n0-1,n0,n0+n1-1};
 
     cb->cross_sections.Append({{0,n0},{0,n0-1},false});
-    cb->cross_sections.Append({{n0,2*n0},{n0-1,n0+n1-2},true});
+    cb->cross_sections.Append({{n0,n0+n1},{n0-1,n0+n1-2},true});
     return it.first->second;
 }
 template struct COMPONENT_CHANGE<float>;
