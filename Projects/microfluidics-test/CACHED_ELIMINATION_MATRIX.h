@@ -6,6 +6,7 @@
 #define __CACHED_ELIMINATION_MATRIX__
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Matrices/MATRIX_MXN.h>
 #include <Core/Vectors/VECTOR.h>
 #include "COMMON.h"
 #include <mutex>

@@ -13,8 +13,12 @@
 #include <map>
 #include <set>
 #include <string>
+#include "ANALYTIC_FEM.h"
 #include "CACHED_ELIMINATION_MATRIX.h"
 #include "COMPONENT_LAYOUT_FEM.h"
+#include "DEBUGGING_FEM.h"
+#include "ELIMINATION_FEM.h"
+#include "MATRIX_CONSTRUCTION_FEM.h"
 #include <chrono>
 
 using namespace PhysBAM;
@@ -38,26 +42,30 @@ void Run(PARSE_ARGS& parse_args)
     int threads=1;
     bool quiet=false,use_krylov=false,print_system=false;
     std::string pipe_file,output_dir="output";
+    std::string analytic_u,analytic_p;
     T s=1,m=1,kg=1;
     parse_args.Add("-o",&output_dir,"dir","output dir");
     parse_args.Add("-mu",&mu,"mu","viscosity");
     parse_args.Add("-q",&quiet,"disable diagnostics; useful for timing");
     parse_args.Add("-k",&use_krylov,"solve with Krylov method");
-    parse_args.Add("-p",&print_system,"dump the system to be solved");
+    parse_args.Add("-d",&print_system,"dump the system to be solved");
     parse_args.Add("-m",&m,"scale","scale units of length");
     parse_args.Add("-s",&s,"scale","scale units of time");
     parse_args.Add("-kg",&kg,"scale","scale units of mass");
     parse_args.Add("-threads",&threads,"num","number of threads to use");
+    parse_args.Add("-u",&analytic_u,"program","analytic velocity");
+    parse_args.Add("-p",&analytic_p,"program","analytic pressure");
     parse_args.Extra(&pipe_file,"file","file describing pipes");
     parse_args.Parse();
 
     timer("args");
 
-    COMPONENT_LAYOUT_FEM<TV> cl;
+    COMPONENT_LAYOUT_FEM<T> cl;
+    // A
     cl.unit_m=m;
     cl.unit_s=s;
     cl.unit_kg=kg;
-    cl.mu=mu*kg/s;
+//    cl.mu=mu*kg/s;
     cl.Parse_Input(pipe_file);
 
     timer("parse input");
@@ -65,16 +73,17 @@ void Run(PARSE_ARGS& parse_args)
     GRID<TV> grid(TV_INT()+1,cl.Compute_Bounding_Box(),true);
     VIEWER_OUTPUT<TV> vo(STREAM_TYPE(0.f),grid,output_dir);
     vo.debug_particles.debug_particles.template Add_Array<T>("display_size");
-
+    DEBUGGING_FEM<T> debug(cl);
+    
     if(!quiet)
     {
         Flush_Frame<TV>("init");
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
-            cl.Visualize_Block_State(b);
+            debug.Visualize_Block_State(b);
         Flush_Frame<TV>("blocks");
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
         {
-            cl.Visualize_Block_State(b);
+            debug.Visualize_Block_State(b);
             Flush_Frame<TV>(LOG::sprintf("block %P (%P)",b,cl.blocks(b).block).c_str());
         }
     }
@@ -87,61 +96,79 @@ void Run(PARSE_ARGS& parse_args)
     {
         Flush_Frame<TV>("after master");
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
-            cl.Visualize_Block_State(b);
+            debug.Visualize_Block_State(b);
         Flush_Frame<TV>("blocks");
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
         {
-            cl.Visualize_Block_State(b);
+            debug.Visualize_Block_State(b);
             Flush_Frame<TV>(LOG::sprintf("block %P (%P)",b,cl.blocks(b).block).c_str());
         }
     }
 
     timer("masters");
     
-    cl.Compute();
+    cl.Merge_Blocks();
 
-    timer("compute");
+    timer("merge blocks");
 
     if(!quiet)
     {
         Flush_Frame<TV>("after merge");
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
-            cl.Visualize_Block_State(b);
+            debug.Visualize_Block_State(b);
         Flush_Frame<TV>("blocks");
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
         {
-            cl.Visualize_Block_State(b);
+            debug.Visualize_Block_State(b);
             Flush_Frame<TV>(LOG::sprintf("block %P (%P)",b,cl.blocks(b).block).c_str());
         }
     }
 
+    MATRIX_CONSTRUCTION_FEM<TV> mc(cl);
     CACHED_ELIMINATION_MATRIX<T> cem;
     cem.quiet=quiet;
-    cl.Compute_Matrix_Blocks(cem);
-    cl.Dump_World_Space_System(cem);
-    cl.Transform_Solution(cem,true,true);
-    cl.Dump_World_Space_Vector("b");
+    cl.Compute_Dof_Pairs();
+    mc.Compute_Matrix_Blocks();
+    ANALYTIC_FEM<TV>* an=0;
+    if(analytic_p.size() && analytic_u.size())
+    {
+        an=new ANALYTIC_FEM<TV>(mc);
+        an->Set_Velocity(analytic_u.c_str());
+        an->Set_Pressure(analytic_p.c_str());
+        an->Compute_RHS();
+    }
+    else
+    {
+        mc.Compute_RHS();
+    }
+    mc.Dump_World_Space_System();
+    mc.Copy_To_CEM(cem);
+
+    mc.Transform_Solution(cem,true,true);
+    mc.Dump_World_Space_Vector("b");
     if(!quiet)
     {
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
-            cl.Visualize_Solution(cl.rhs_block_list(b),b,true);
+            debug.Visualize_Solution(mc.rhs_block_list(b),b,true);
         Flush_Frame<TV>("rhs blocks");
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
-            cl.Visualize_Block_Dofs(b);
+            debug.Visualize_Block_Dofs(b);
     }
 
     timer("compute matrix");
 
+    ELIMINATION_FEM<T> el(cl);
+    
     printf("==========================\n");
     cem.Print_Current();
     printf("==========================\n");
-    cl.Eliminate_Irregular_Blocks(cem);
+    el.Eliminate_Irregular_Blocks(cem);
 
     timer("elim irreg");
 
     cem.Print_Current();
     printf("==========================\n");
-    cl.Eliminate_Non_Seperators(cem);
+    el.Eliminate_Non_Seperators(cem);
 
     timer("elim non sep");
 
@@ -161,16 +188,16 @@ void Run(PARSE_ARGS& parse_args)
 
     timer("exec jobs");
 
-    cl.Transform_Solution(cem,false,false);
-    cl.Check_Analytic_Solution();
+    mc.Transform_Solution(cem,false,false);
+    if(an) an->Check_Analytic_Solution();
     if(!quiet)
     {
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
-            cl.Visualize_Solution(cl.rhs_block_list(b),b,true);
+            debug.Visualize_Solution(mc.rhs_block_list(b),b,true);
         Flush_Frame<TV>("solution");
     }
-    cl.Dump_World_Space_Vector("x");
-    cl.Visualize_Flat_Dofs();
+    mc.Dump_World_Space_Vector("x");
+    debug.Visualize_Flat_Dofs();
 
     for(int i=1;i<tm.m;i++)
         printf("%20s %5.0f ms\n",tm(i).y,

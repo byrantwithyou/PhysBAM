@@ -3,24 +3,26 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Data_Structures/HASHTABLE.h>
-#include <Core/Data_Structures/TRIPLE.h>
+//#include <Core/Data_Structures/TRIPLE.h>
 #include <Core/Data_Structures/TUPLE.h>
 #include <Core/Data_Structures/UNION_FIND.h>
 #include <Core/Log/LOG.h>
+#include <Core/Math_Tools/cube.h>
 #include <Core/Math_Tools/RANGE.h>
-#include <Core/Matrices/MATRIX_MXN.h>
-#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Core/Matrices/SYSTEM_MATRIX_HELPER.h>
-#include <Tools/Read_Write/OCTAVE_OUTPUT.h>
-#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
-#include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
+//#include <Core/Matrices/MATRIX_MXN.h>
+//#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+//#include <Core/Matrices/SYSTEM_MATRIX_HELPER.h>
+//#include <Tools/Read_Write/OCTAVE_OUTPUT.h>
+//#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+//#include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <fstream>
-#include "CACHED_ELIMINATION_MATRIX.h"
+//#include "CACHED_ELIMINATION_MATRIX.h"
 #include "COMPONENT_BC.h"
 #include "COMPONENT_CHANGE.h"
 #include "COMPONENT_JOINT.h"
 #include "COMPONENT_LAYOUT_FEM.h"
 #include "COMPONENT_PIPE.h"
+#include "VISITORS_FEM.h"
 #include <tuple>
 namespace PhysBAM{
 
@@ -49,17 +51,14 @@ bool Canonical_Direction(VECTOR<T,2> u)
 //#####################################################################
 // Function Destructor
 //#####################################################################
-template<class T> COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+template<class T> COMPONENT_LAYOUT_FEM<T>::
 ~COMPONENT_LAYOUT_FEM()
 {
-    delete analytic_velocity;
-    delete analytic_pressure;
-    for(auto& p:canonical_block_matrices) delete p.key;
 }
 //#####################################################################
 // Function Parse_Input
 //#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+template<class T> void COMPONENT_LAYOUT_FEM<T>::
 Parse_Input(const std::string& pipe_file)
 {
     std::ifstream fin(pipe_file);
@@ -231,7 +230,7 @@ Parse_Input(const std::string& pipe_file)
                     VERTEX_DATA vd={C,{b,CON_ID()}};
                     connection_points.Set(name4,vd);
 
-                    BOUNDARY_CONDITION bc={b,pr.y,pr.z,{},{},-dir};
+                    BOUNDARY_CONDITION<T> bc={b,pr.y,pr.z,{},{},-dir};
                     bc.data_v.Resize(bc.bc_v.Size());
                     bc.data_e.Resize(bc.bc_e.Size());
 
@@ -260,15 +259,6 @@ Parse_Input(const std::string& pipe_file)
                     }
                 }
                 break;
-            case 'U':
-                delete analytic_velocity;
-                analytic_velocity=new ANALYTIC_VECTOR_PROGRAM<TV>(ss.str().c_str()+2);
-                break;
-                break;
-            case 'P':
-                delete analytic_pressure;
-                analytic_pressure=new ANALYTIC_SCALAR_PROGRAM<TV>(ss.str().c_str()+2);
-                break;
             default:
                 LOG::printf("PARSE FAIL: %c %s\n",c,ss.str());
         }
@@ -277,7 +267,7 @@ Parse_Input(const std::string& pipe_file)
 //#####################################################################
 // Function Set_Connector
 //#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+template<class T> void COMPONENT_LAYOUT_FEM<T>::
 Set_Connector(VERTEX_DATA& vd,BLOCK_ID id,CON_ID con_id)
 {
     if(vd.con.is_regular)
@@ -304,7 +294,7 @@ Set_Connector(VERTEX_DATA& vd,BLOCK_ID id,CON_ID con_id)
 //#####################################################################
 // Function Emit_Component_Blocks
 //#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+template<class T> void COMPONENT_LAYOUT_FEM<T>::
 Emit_Component_Blocks(const CANONICAL_COMPONENT<T>* cc,const XFORM<TV>& xf,ARRAY<VERTEX_DATA>& vd)
 {
     int offset=Value(blocks.m),offset_edge_on=Value(irregular_connections.m);
@@ -354,7 +344,7 @@ Emit_Component_Blocks(const CANONICAL_COMPONENT<T>* cc,const XFORM<TV>& xf,ARRAY
 //#####################################################################
 // Function Compute_Xform
 //#####################################################################
-template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+template<class T> auto COMPONENT_LAYOUT_FEM<T>::
 Compute_Xform(const TV& dir) -> MATRIX<T,2>
 {
     return MATRIX<T,TV::m>(dir,dir.Orthogonal_Vector());
@@ -362,21 +352,7 @@ Compute_Xform(const TV& dir) -> MATRIX<T,2>
 //#####################################################################
 // Function Compute
 //#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Compute()
-{
-    Merge_Blocks();
-
-    for(auto& bl:blocks)
-    {
-        auto pr=canonical_block_matrices.Insert(bl.block,{});
-        if(pr.y) Fill_Canonical_Block_Matrix(*pr.x,bl.block);
-    }
-}
-//#####################################################################
-// Function Compute
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+template<class T> void COMPONENT_LAYOUT_FEM<T>::
 Update_Masters()
 {
     for(BLOCK_ID b0(0);b0<blocks.m;b0++)
@@ -414,82 +390,10 @@ Update_Masters()
         }
     }
 }
-// F(dof0,dof1,first_owns)
-template<class F>
-void Visit_Cross_Section_Dofs(INTERVAL<int> i0,INTERVAL<int> i1,bool uf0,bool uf1,bool m0,F func)
-{
-    int a=i1.min_corner,b=1,c=i0.min_corner,n=i0.Size();
-    if(uf0==uf1)
-    {
-        a=i1.max_corner-1;
-        b=-1;
-    }
-    if(uf0)
-    {
-        int m=n/2+(n&m0);
-        for(int i=0;i<m;i++) func(c+i,a+b*i,true);
-        for(int i=m;i<n;i++) func(c+i,a+b*i,false);
-    }
-    else
-    {
-        int m=n/2+(n&(1-m0));
-        for(int i=0;i<m;i++) func(c+i,a+b*i,false);
-        for(int i=m;i<n;i++) func(c+i,a+b*i,true);
-    }
-}
-
-struct IRREGULAR_VISITOR
-{
-    BLOCK_ID b;
-    int re,r0,r1;
-    int ie,i0,i1;
-    bool be,b0,b1; // regular owns e,v0,v1
-    bool n0; // v0 not seen before for the irregular block
-};
-
-// F(const IRREGULAR_VISITOR& i)
-template<class T> template<class F> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Visit_Irregular_Cross_Section_Dofs(const IRREGULAR_CONNECTION& ic,F func) const
-{
-    // edge: j=i*a+b
-    // v0: j=i*a+c
-    // v1: j=i*a+d
-    auto& cs=blocks(ic.regular).block->cross_sections(ic.con_id);
-    int a=1,b=0,c=0,d=1,n=ic.edge_on.m;
-    if(!cs.own_first)
-    {
-        a=-1;
-        b=n-1;
-        d=n-1;
-        c=n;
-    }
-    b+=cs.e.min_corner;
-    c+=cs.v.min_corner;
-    d+=cs.v.min_corner;
-
-    int irreg_v0=n/2+1;
-    int irreg_v1=n/2;
-    BLOCK_ID last_b(-1);
-    for(int i=0;i<n;i++)
-    {
-        bool b1=i<irreg_v1;
-        bool b0=i<irreg_v0;
-        auto& eo=ic.edge_on(i);
-        IRREGULAR_VISITOR iv={eo.b,a*i+b,a*i+c,a*i+d,eo.e,eo.v0,eo.v1,b1,b0,b1,eo.b!=last_b};
-        func(iv);
-        last_b=eo.b;
-    }
-}
-template<class CS,class FV,class FE>
-void Visit_Regular_Cross_Section_Dofs(const CS& cs0,const CS& cs1,bool m0,FV func_v,FE func_e)
-{
-    Visit_Cross_Section_Dofs(cs0.v,cs1.v,cs0.own_first,cs1.own_first,m0,func_v);
-    Visit_Cross_Section_Dofs(cs0.e,cs1.e,cs0.own_first,cs1.own_first,m0,func_e);
-}
 //#####################################################################
 // Function Separates_Dofs
 //#####################################################################
-template<class T> int COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+template<class T> int COMPONENT_LAYOUT_FEM<T>::
 Separates_Dofs(BLOCK_ID b)
 {
     CANONICAL_BLOCK<T>* cb=blocks(b).block;
@@ -565,7 +469,7 @@ CS Map_Cross_Section(CS cs,const ARRAY<int>& index_v_map,const ARRAY<int>& index
 //#####################################################################
 // Function Merge_Canonical_Blocks
 //#####################################################################
-template<class T> TRIPLE<CANONICAL_BLOCK<T>*,ARRAY<int>,ARRAY<int> >& COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+template<class T> TRIPLE<CANONICAL_BLOCK<T>*,ARRAY<int>,ARRAY<int> >& COMPONENT_LAYOUT_FEM<T>::
 Merge_Canonical_Blocks(CANONICAL_BLOCK<T>* cb0,CON_ID con_id0,XFORM<TV> xf0,
     CANONICAL_BLOCK<T>* cb1,CON_ID con_id1,XFORM<TV> xf1)
 {
@@ -643,14 +547,14 @@ Merge_Canonical_Blocks(CANONICAL_BLOCK<T>* cb0,CON_ID con_id0,XFORM<TV> xf0,
 //#####################################################################
 // Function Merge_Blocks
 //#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+template<class T> void COMPONENT_LAYOUT_FEM<T>::
 Merge_Blocks(BLOCK_ID id,CON_ID con_id,BLOCK_ID id2)
 {
     PHYSBAM_ASSERT(con_id>=CON_ID());
     PHYSBAM_ASSERT(id>=BLOCK_ID());
-    BLOCK& bl=blocks(id);
+    BLOCK<T>& bl=blocks(id);
     CON_ID con_id2=bl.connections(con_id).con_id;
-    BLOCK& bl2=blocks(id2);
+    BLOCK<T>& bl2=blocks(id2);
 
     auto& pr=Merge_Canonical_Blocks(bl.block,con_id,bl.xform,bl2.block,con_id2,
         bl2.xform);
@@ -691,7 +595,7 @@ Merge_Blocks(BLOCK_ID id,CON_ID con_id,BLOCK_ID id2)
 //#####################################################################
 // Function Merge_Blocks
 //#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+template<class T> void COMPONENT_LAYOUT_FEM<T>::
 Merge_Blocks()
 {
     UNION_FIND<BLOCK_ID> uf(blocks.m);
@@ -766,7 +670,7 @@ Merge_Blocks()
 //#####################################################################
 // Function Approx_Dof_Count
 //#####################################################################
-template<class T> int COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+template<class T> int COMPONENT_LAYOUT_FEM<T>::
 Approx_Dof_Count(BLOCK_ID b)
 {
     const auto& bl=blocks(b);
@@ -777,564 +681,10 @@ Approx_Dof_Count(BLOCK_ID b)
     return num;
 }
 
-
-int fem_visc_table[12][12]=
-{
-    {3,1,0,0,0,-4,3,1,0,0,0,-4},
-    {1,3,0,0,0,-4,0,0,0,0,0,0},
-    {0,0,0,0,0,0,1,-1,0,4,-4,0},
-    {0,0,0,8,-8,0,0,4,0,4,-4,-4},
-    {0,0,0,-8,8,0,-4,0,0,-4,4,4},
-    {-4,-4,0,0,0,8,0,-4,0,-4,4,4},
-    {3,0,1,0,-4,0,3,0,1,0,-4,0},
-    {1,0,-1,4,0,-4,0,0,0,0,0,0},
-    {0,0,0,0,0,0,1,0,3,0,-4,0},
-    {0,0,4,4,-4,-4,0,0,0,8,0,-8},
-    {0,0,-4,-4,4,4,-4,0,-4,0,8,0},
-    {-4,0,0,-4,4,4,0,0,0,-8,0,8}
-};
-
-int fem_pres_table[3][12]=
-{
-    {-1,0,0,1,-1,1,-1,0,0,1,1,-1},
-    {0,1,0,1,-1,-1,0,0,0,2,0,-2},
-    {0,0,0,2,-2,0,0,0,1,1,-1,-1}
-};
-
-//#####################################################################
-// Function Fill_Canonical_Block_Matrix
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Fill_Canonical_Block_Matrix(BLOCK_MATRIX<T>& mat,const CANONICAL_BLOCK<T>* cb)
-{
-    mat.nr=mat.nc={cb->X.m,cb->S.m,cb->X.m};
-    mat.Resize();
-
-    HASHTABLE<IV,int> edge_lookup;
-    for(int i=0;i<cb->S.m;i++)
-        edge_lookup.Set(cb->S(i).Sorted(),i);
-
-    for(IV3 v:cb->E)
-    {
-        IV3 dof[2]={v};
-        for(int i=0;i<3;i++)
-            dof[1](i)=edge_lookup.Get(v.Remove_Index(i).Sorted());
-        MATRIX<T,2> F(cb->X(v.y)-cb->X(v.x),cb->X(v.z)-cb->X(v.x)),G=F.Inverse();
-        T scale=mu*F.Determinant()/6;
-        T p_scale=F.Determinant()/6;
-
-        for(int r=0;r<2;r++)
-            for(int s=0;s<2;s++)
-                for(int i=0;i<3;i++)
-                    for(int j=0;j<3;j++)
-                    {
-                        MATRIX<T,2> M;
-                        for(int a=0;a<2;a++)
-                            for(int b=0;b<2;b++)
-                                M(a,b)=fem_visc_table[6*a+3*r+i][6*b+3*s+j];
-                        M=scale*G.Transpose_Times(M*G);
-                        mat.Add_uu(dof[r](i),r,dof[s](j),s,M+M.Trace());
-                    }
-
-        for(int s=0;s<2;s++)
-            for(int i=0;i<3;i++)
-                for(int j=0;j<3;j++)
-                {
-                    TV u;
-                    for(int b=0;b<2;b++)
-                        u(b)=fem_pres_table[i][6*b+3*s+j];
-                    u=-p_scale*G.Transpose_Times(u);
-                    mat.Add_pu(v(i),dof[s](j),s,u);
-                    mat.Add_up(dof[s](j),s,v(i),u);
-                }
-    }
-}
-
-
-// entry * J / 360
-int fem_u_dot_v_table[6][6]=
-{
-    {6,-1,-1,-4,0,0},
-    {-1,6,-1,0,-4,0},
-    {-1,-1,6,0,0,-4},
-    {-4,0,0,32,16,16},
-    {0,-4,0,16,32,16},
-    {0,0,-4,16,16,32}
-};
-
-//#####################################################################
-// Function Times_U_Dot_V
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Times_U_Dot_V(BLOCK_ID b,BLOCK_VECTOR<T>& w,const BLOCK_VECTOR<T>& u) const
-{
-    const auto& bl=blocks(b);
-    const auto* cb=bl.block;
-    MATRIX<T,2> M=bl.xform.M;
-
-    HASHTABLE<IV,int> edge_lookup;
-    for(int i=0;i<cb->S.m;i++)
-        edge_lookup.Set(cb->S(i).Sorted(),i);
-
-    for(IV3 v:cb->E)
-    {
-        IV3 dof[2]={v};
-        for(int i=0;i<3;i++)
-            dof[1](i)=edge_lookup.Get(v.Remove_Index(i).Sorted());
-        MATRIX<T,2> F(cb->X(v.y)-cb->X(v.x),cb->X(v.z)-cb->X(v.x));
-        T scale=(M*F).Determinant()/360;
-
-        VECTOR<TV,6> r,s;
-        for(int a=0;a<2;a++) for(int i=0;i<3;i++) r(i+3*a)=u.Get_u(dof[a](i),a);
-        for(int i=0;i<6;i++)
-            for(int j=0;j<6;j++)
-                s(i)+=r(j)*fem_u_dot_v_table[i][j];
-        s*=scale;
-        for(int a=0;a<2;a++) for(int i=0;i<3;i++) w.Add_u(dof[a](i),a,s(i+3*a));
-    }
-}
-
-int fem_p_u_table[3][6]=
-{
-    {2, -1, -1, 4, 8, 8},
-    {-1, 2, -1, 8, 4, 8},
-    {-1, -1, 2, 8, 8, 4}
-};
-
-//#####################################################################
-// Function Times_U_Dot_V
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Times_P_U(BLOCK_ID b,BLOCK_VECTOR<T>& w,const ARRAY<T>& div_v,const ARRAY<T>& div_e) const
-{
-    const auto& bl=blocks(b);
-    const auto* cb=bl.block;
-    MATRIX<T,2> M=bl.xform.M;
-
-    HASHTABLE<IV,int> edge_lookup;
-    for(int i=0;i<cb->S.m;i++)
-        edge_lookup.Set(cb->S(i).Sorted(),i);
-
-    for(IV3 v:cb->E)
-    {
-        IV3 dof[2]={v};
-        for(int i=0;i<3;i++)
-            dof[1](i)=edge_lookup.Get(v.Remove_Index(i).Sorted());
-        MATRIX<T,2> F(cb->X(v.y)-cb->X(v.x),cb->X(v.z)-cb->X(v.x));
-        T scale=(M*F).Determinant()/120;
-
-        VECTOR<T,6> r;
-        VECTOR<T,3> s;
-        for(int i=0;i<3;i++) r(i)=div_v(dof[0](i));
-        for(int i=0;i<3;i++) r(i+3)=div_e(dof[1](i));
-        for(int i=0;i<3;i++)
-            for(int j=0;j<6;j++)
-                s(i)+=r(j)*fem_p_u_table[i][j];
-        s*=scale;
-        for(int i=0;i<3;i++) w.Add_p(v(i),s(i));
-    }
-}
-
-int fem_line_int_u_dot_v_table[3][3] = {{4, -1, 2}, {-1, 4, 2}, {2, 2, 16}};
-
-//#####################################################################
-// Function Times_U_Dot_V
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Times_Line_Integral_U_Dot_V(BLOCK_ID b,INTERVAL<int> bc_e,BLOCK_VECTOR<T>& w,const BLOCK_VECTOR<T>& u) const
-{
-    const auto& bl=blocks(b);
-    const auto* cb=bl.block;
-    MATRIX<T,2> M=bl.xform.M;
-    for(int e:bc_e)
-    {
-        VECTOR<TV,3> r(u.Get_v(cb->S(e).x),u.Get_v(cb->S(e).y),u.Get_e(e)),s;
-        for(int i=0;i<3;i++)
-            for(int j=0;j<3;j++)
-                s(i)+=r(j)*fem_line_int_u_dot_v_table[i][j];
-
-        VECTOR<TV,2> X(cb->X.Subset(cb->S(e)));
-        T scale=(M*(X.x-X.y)).Magnitude()/30;
-        w.Add_v(cb->S(e).x,s.x*scale);
-        w.Add_v(cb->S(e).y,s.y*scale);
-        w.Add_e(e,s.z*scale);
-    }
-}
-
-//#####################################################################
-// Function Copy_Matrix_Data
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Copy_Matrix_Data(BLOCK_MATRIX<T>& A,BLOCK_ID b,
-    const DOF_PAIRS& dpa,const DOF_PAIRS& dpb,BLOCK_ID ar,BLOCK_ID ac) const
-{
-    const BLOCK_MATRIX<T>& B=canonical_block_matrices.Get(blocks(b).block);
-    MATRIX<T,2> G=blocks(b).xform.M.Inverse();
-    MATRIX<T,2> Ma=G*blocks(ar).xform.M;
-    MATRIX<T,2> Mb=G*blocks(ac).xform.M;
-    T sa=1/sqrt(Ma.Determinant());
-    T sb=1/sqrt(Mb.Determinant());
-    Ma*=sa;
-    Mb*=sb;
-    
-    PHYSBAM_ASSERT(A.nr==dpa.num_dofs_d);
-    PHYSBAM_ASSERT(B.nr==dpa.num_dofs_s);
-    PHYSBAM_ASSERT(A.nc==dpb.num_dofs_d);
-    PHYSBAM_ASSERT(B.nc==dpb.num_dofs_s);
-    for(auto p:dpa.v)
-    {
-        for(auto r:dpb.v) A.Add_vv(p.x,r.x,Ma.Transpose_Times(B.Get_vv(p.y,r.y)*Mb));
-        for(auto r:dpb.e) A.Add_ve(p.x,r.x,Ma.Transpose_Times(B.Get_ve(p.y,r.y)*Mb));
-        for(auto r:dpb.p) A.Add_vp(p.x,r.x,Ma.Transpose_Times(B.Get_vp(p.y,r.y)*sb));
-    }
-    for(auto p:dpa.e)
-    {
-        for(auto r:dpb.v) A.Add_ev(p.x,r.x,Ma.Transpose_Times(B.Get_ev(p.y,r.y)*Mb));
-        for(auto r:dpb.e) A.Add_ee(p.x,r.x,Ma.Transpose_Times(B.Get_ee(p.y,r.y)*Mb));
-        for(auto r:dpb.p) A.Add_ep(p.x,r.x,Ma.Transpose_Times(B.Get_ep(p.y,r.y)*sb));
-    }
-    for(auto p:dpa.p)
-    {
-        for(auto r:dpb.v) A.Add_pv(p.x,r.x,Mb.Transpose_Times(B.Get_pv(p.y,r.y)*sa));
-        for(auto r:dpb.e) A.Add_pe(p.x,r.x,Mb.Transpose_Times(B.Get_pe(p.y,r.y)*sa));
-    }
-}
-//#####################################################################
-// Function Copy_Vector_Data
-//#####################################################################
-// Input B should be in world space
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Copy_Vector_Data(const BLOCK_VECTOR<T>& B,BLOCK_ID b,const DOF_PAIRS& dp)
-{
-    BLOCK_VECTOR<T>& A=rhs_block_list(b);
-    if(!A.V.m) Init_Block_Vector(A,b);
-
-    MATRIX<T,2> M=blocks(b).xform.M;
-    T s=1/sqrt(M.Determinant());
-    M*=s;
-
-    PHYSBAM_ASSERT(A.n==dp.num_dofs_d);
-    PHYSBAM_ASSERT(B.n==dp.num_dofs_s);
-    for(auto p:dp.v) A.Add_v(p.x,M.Transpose_Times(B.Get_v(p.y)));
-    for(auto p:dp.e) A.Add_e(p.x,M.Transpose_Times(B.Get_e(p.y)));
-    for(auto p:dp.p) A.Add_p(p.x,s*B.Get_p(p.y));
-}
-//#####################################################################
-// Function Fill_Block_Matrix
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Fill_Block_Matrix(BLOCK_MATRIX<T>& M,const REFERENCE_BLOCK_DATA& rd)
-{
-    BLOCK_ID b=rd.b;
-    const auto& bl=blocks(b);
-    Init_Block_Matrix(M,b,b);
-
-    Copy_Matrix_Data(M,b,rd.pairs,rd.pairs,b,b);
-
-    for(CON_ID cc(0);cc<bl.connections.m;cc++)
-    {
-        const auto& c=bl.connections(cc);
-        if(c.is_regular)
-        {
-            auto& p=Regular_Connection_Pair(b,cc,true);
-            Copy_Matrix_Data(M,c.id,p,p,b,b);
-        }
-        else
-        {
-            const auto& ic=irregular_connections(c.irreg_id);
-            const auto& irbd=reference_irregular_data(ic.ref_id);
-            for(const auto& h:irbd.pairs)
-                Copy_Matrix_Data(M,h.b,h.irreg_pairs[0],h.irreg_pairs[0],b,b);
-        }
-    }
-
-    for(auto e:bl.edge_on)
-    {
-        const auto& ic=irregular_connections(e.x);
-        const auto& irbd=reference_irregular_data(ic.ref_id);
-        const auto& p=irbd.mapping(e.y);
-        if(p.y)
-        {
-            auto& h=irbd.pairs(p.x);
-            Copy_Matrix_Data(M,ic.regular,h.irreg_pairs[1],h.irreg_pairs[1],b,b);
-        }
-    }
-}
-//#####################################################################
-// Function Fill_Connection_Matrix
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Fill_Connection_Matrix(BLOCK_MATRIX<T>& M,const REFERENCE_CONNECTION_DATA& cd)
-{
-    Init_Block_Matrix(M,cd.b[0],cd.b[1]);
-    PHYSBAM_ASSERT(blocks(cd.b[0]).connections(cd.con_id[0]).master);
-    auto& rd0=reference_block_data(blocks(cd.b[0]).ref_id);
-    auto& rd1=reference_block_data(blocks(cd.b[1]).ref_id);
-    Copy_Matrix_Data(M,cd.b[0],rd0.pairs,cd.reg_pairs[1],cd.b[0],cd.b[1]);
-    Copy_Matrix_Data(M,cd.b[1],cd.reg_pairs[0],rd1.pairs,cd.b[0],cd.b[1]);
-}
-//#####################################################################
-// Function Fill_Irregular_Connection_Matrix
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Fill_Irregular_Connection_Matrix(ARRAY<BLOCK_MATRIX<T>,RID_ID>& M,const REFERENCE_IRREGULAR_DATA& ri)
-{
-    BLOCK_ID bb=irregular_connections(ri.ic_id).regular;
-    for(RID_ID j(0);j<ri.pairs.m;j++)
-    {
-        auto& z=ri.pairs(j);
-        Init_Block_Matrix(M(j),bb,z.b);
-        Copy_Matrix_Data(M(j),z.b,z.irreg_pairs[0],reference_block_data(blocks(z.b).ref_id).pairs,bb,z.b);
-        Copy_Matrix_Data(M(j),bb,reference_block_data(blocks(bb).ref_id).pairs,z.irreg_pairs[1],bb,z.b);
-
-        if(j>RID_ID(0))
-        {
-            RID_ID k=j-1;
-            for(CON_ID cc(0);cc<blocks(z.b).connections.m;cc++)
-            {
-                auto& c=blocks(z.b).connections(cc);
-                if(!c.is_regular || ri.pairs(k).b!=c.id) continue;
-                const auto& dp0=Regular_Connection_Pair(z.b,cc,false);
-                const auto& dp1=Regular_Connection_Pair(z.b,cc,true);
-                Copy_Matrix_Data(M(k),z.b,z.irreg_pairs[0],dp0,bb,c.id);
-                Copy_Matrix_Data(M(j),c.id,ri.pairs(k).irreg_pairs[0],dp1,bb,z.b);
-
-                REFERENCE_BLOCK_ID ref0=blocks(z.b).ref_id,ref1=blocks(c.id).ref_id;
-                if(c.master)
-                {
-                    auto key=std::make_tuple(ref0,cc,ref1,c.con_id);
-                    auto& rc=reference_connection_data(regular_connection_hash.Get(key));
-                    Copy_Matrix_Data(rc.M,bb,z.irreg_pairs[1],ri.pairs(k).irreg_pairs[1],z.b,c.id);
-                }
-                else
-                {
-                    auto key=std::make_tuple(ref1,c.con_id,ref0,cc);
-                    auto& rc=reference_connection_data(regular_connection_hash.Get(key));
-                    Copy_Matrix_Data(rc.M,bb,ri.pairs(k).irreg_pairs[1],z.irreg_pairs[1],c.id,z.b);
-                }
-            }
-        }
-    }
-}
-//#####################################################################
-// Function Compute_Matrix_Blocks
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Compute_Matrix_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
-{
-    cem.Begin_Fill_Blocks();
-    cem.rows.Resize(Value(blocks.m));
-    cem.rhs.Resize(Value(blocks.m));
-
-    HASHTABLE<BLOCK_ID,int> lookup_matrix_by_block;
-
-    Compute_Reference_Blocks();
-    Compute_Reference_Regular_Connections();
-    Compute_Reference_Irregular_Connections();
-
-    for(auto& rd:reference_block_data)
-    {
-        Compute_Dof_Remapping(rd);
-        Compute_Dof_Pairs(rd);
-    }
-
-    for(auto& rc:reference_connection_data)
-        Compute_Dof_Pairs(rc);
-
-    for(auto& ri:reference_irregular_data)
-        Compute_Dof_Pairs(ri);
-
-    for(auto& rd:reference_block_data)
-    {
-        BLOCK_MATRIX<T> M;
-        Fill_Block_Matrix(M,rd);
-        rd.mat_id=cem.Create_Matrix_Block(true);
-        cem.block_list(rd.mat_id).M.Exchange(M.M);
-    }
-
-    for(auto& rc:reference_connection_data)
-        Fill_Connection_Matrix(rc.M,rc);
-
-    for(auto& ri:reference_irregular_data)
-    {
-        ARRAY<BLOCK_MATRIX<T>,RID_ID> M(ri.pairs.m);
-        Fill_Irregular_Connection_Matrix(M,ri);
-        for(RID_ID j(0);j<ri.pairs.m;j++)
-        {
-            auto& d=ri.pairs(j);
-            d.mat_id=cem.Create_Matrix_Block(false);
-            cem.block_list(d.mat_id).M.Exchange(M(j).M);
-        }
-    }
-
-    for(auto& rc:reference_connection_data)
-    {
-        rc.mat_id=cem.Create_Matrix_Block(false);
-        cem.block_list(rc.mat_id).M.Exchange(rc.M.M);
-    }
-
-    for(BLOCK_ID b(0);b<blocks.m;b++)
-    {
-        int id=reference_block_data(blocks(b).ref_id).mat_id;
-        cem.Add_Block_Matrix_Entry(Value(b),Value(b),id);
-        nonzero_blocks.Append({b,b,id});
-    }
-
-    for(BLOCK_ID b(0);b<blocks.m;b++)
-    {
-        const auto& bl=blocks(b);
-        for(CON_ID cc(0);cc<bl.connections.m;cc++)
-        {
-            const auto& c=bl.connections(cc);
-            if(c.is_regular && c.master)
-            {
-                auto reg_id=regular_connection_hash.Get(std::make_tuple(bl.ref_id,cc,blocks(c.id).ref_id,c.con_id));
-                int id=reference_connection_data(reg_id).mat_id;
-                cem.Add_Block_Matrix_Entry(Value(b),Value(c.id),id);
-                nonzero_blocks.Append({b,c.id,id});
-            }
-        }
-    }
-
-    for(auto& ic:irregular_connections)
-    {
-        auto &ri=reference_irregular_data(ic.ref_id);
-        for(const auto& p:ri.pairs)
-        {
-            cem.Add_Block_Matrix_Entry(Value(ic.regular),Value(p.b),p.mat_id);
-            nonzero_blocks.Append({ic.regular,p.b,p.mat_id});
-        }
-    }
-
-    rhs_block_list.Resize(blocks.m);
-
-    if(analytic_velocity && analytic_pressure)
-    {
-        for(BLOCK_ID b(0);b<blocks.m;b++)
-        {
-            BLOCK& bl=blocks(b);
-            CANONICAL_BLOCK<T>* cb=bl.block;
-            MATRIX<T,TV::m> M=bl.xform.M.Inverse();
-
-            BLOCK_VECTOR<T> w,u;
-            Init_Block_Vector(w,cb);
-            Init_Block_Vector(u,cb);
-            for(auto i:cb->bc_v)
-            {
-                TV Z=bl.xform*cb->X(i);
-                u.Add_v(i,M*analytic_velocity->v(Z/unit_m,0)*unit_m/unit_s);
-            }
-            for(auto i:cb->bc_e)
-            {
-                TV Z=bl.xform*cb->X.Subset(cb->S(i)).Average();
-                u.Add_e(i,M*analytic_velocity->v(Z/unit_m,0)*unit_m/unit_s);
-            }
-            w.V=canonical_block_matrices.Get(bl.block).M*-u.V;
-
-            // TODO: handle det(M)!=1
-            u.V.Fill(0);
-            ARRAY<T> div_v(cb->X.m),div_e(cb->S.m);
-            for(int i=0;i<cb->X.m;i++)
-            {
-                TV Z=bl.xform*cb->X(i);
-                u.Add_v(i,M*Force(Z));
-                div_v(i)=-analytic_velocity->dX(Z/unit_m,0).Trace()/unit_s;
-            }
-            for(int i=0;i<cb->S.m;i++)
-            {
-                TV Z=bl.xform*cb->X.Subset(cb->S(i)).Average();
-                u.Add_e(i,M*Force(Z));
-                div_e(i)=-analytic_velocity->dX(Z/unit_m,0).Trace()/unit_s;
-            }
-            Times_U_Dot_V(b,w,u);
-            Times_P_U(b,w,div_v,div_e);
-            w.Transform(bl.xform.M,1);
-            Apply_To_RHS(b,w);
-        }
-
-        for(const auto& bc:bc_t)
-        {
-            BLOCK& bl=blocks(bc.b);
-            CANONICAL_BLOCK<T>* cb=bl.block;
-            MATRIX<T,TV::m> M=bl.xform.M.Transposed()/bl.xform.M.Determinant();
-
-            BLOCK_VECTOR<T> w,u;
-            Init_Block_Vector(w,cb);
-            Init_Block_Vector(u,cb);
-
-            for(auto i:bc.bc_v)
-            {
-                TV Z=bl.xform*cb->X(i);
-                u.Add_v(i,M*Traction(bc.normal,Z));
-            }
-            for(auto i:bc.bc_e)
-            {
-                TV Z=bl.xform*cb->X.Subset(cb->S(i)).Average();
-                u.Add_e(i,M*Traction(bc.normal,Z));
-            }
-            Times_Line_Integral_U_Dot_V(bc.b,bc.bc_e,w,u);
-            w.Transform(bl.xform.M,1);
-            Apply_To_RHS(bc.b,w);
-        }
-    }
-    else
-    {
-        for(const auto& bc:bc_v)
-        {
-            BLOCK& bl=blocks(bc.b);
-            CANONICAL_BLOCK<T>* cb=bl.block;
-            MATRIX<T,TV::m> M=bl.xform.M.Inverse();
-            
-            BLOCK_VECTOR<T> w,u;
-            Init_Block_Vector(w,cb);
-            Init_Block_Vector(u,cb);
-
-            for(int i=0;i<bc.bc_v.Size();i++) u.Add_v(bc.bc_v.min_corner+i,M*bc.data_v(i));
-            for(int i=0;i<bc.bc_e.Size();i++) u.Add_e(bc.bc_e.min_corner+i,M*bc.data_e(i));
-            w.V=canonical_block_matrices.Get(bl.block).M*-u.V;
-            w.Transform(bl.xform.M,1);
-            Apply_To_RHS(bc.b,w);
-        }
-
-        for(const auto& bc:bc_t)
-        {
-            BLOCK& bl=blocks(bc.b);
-            CANONICAL_BLOCK<T>* cb=bl.block;
-            MATRIX<T,TV::m> M=bl.xform.M.Transposed()/bl.xform.M.Determinant();
-
-            BLOCK_VECTOR<T> w,u;
-            Init_Block_Vector(w,cb);
-            Init_Block_Vector(u,cb);
-            for(int i=0;i<bc.bc_v.Size();i++) u.Add_v(bc.bc_v.min_corner+i,M*bc.data_v(i));
-            for(int i=0;i<bc.bc_e.Size();i++) u.Add_e(bc.bc_e.min_corner+i,M*bc.data_e(i));
-            Times_Line_Integral_U_Dot_V(bc.b,bc.bc_e,w,u);
-            w.Transform(bl.xform.M,1);
-            Apply_To_RHS(bc.b,w);
-        }
-    }
-
-    for(BLOCK_ID i(0);i<rhs_block_list.m;i++)
-    {
-        int j=-1;
-        if(rhs_block_list(i).V.m)
-            j=cem.vector_list.Append(rhs_block_list(i).V);
-        cem.rhs(Value(i))=j;
-    }
-
-    // TODO: rhs
-    // multiply rhs(b) by F.Transpose(), where
-    // A = blocks(b).xform.M;
-    // F = A/sqrt(A.Determinant())
-    //
-    // Multiply solution sol(b) by F when done.
-
-    cem.End_Fill_Blocks();
-    cem.valid_row.Resize(Value(blocks.m),use_init,true);
-}
 //#####################################################################
 // Function Compute_Block_Hash
 //#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+template<class T> void COMPONENT_LAYOUT_FEM<T>::
 Compute_Reference_Blocks()
 {
     typedef ARRAY<std::tuple<CANONICAL_BLOCK<T>*,CON_ID,bool> > REG_CON;
@@ -1361,7 +711,7 @@ Compute_Reference_Blocks()
                 reg_con.Append(std::make_tuple((CANONICAL_BLOCK<T>*)0,CON_ID(-1),true));
 
                 const auto& ic=irregular_connections(c.irreg_id);
-                Visit_Irregular_Cross_Section_Dofs(ic,
+                Visit_Irregular_Cross_Section_Dofs(blocks,ic,
                     [&](const IRREGULAR_VISITOR& iv)
                     {
                         irreg_con.Append(std::make_tuple(blocks(iv.b).block,iv.ie));
@@ -1388,7 +738,7 @@ Compute_Reference_Blocks()
 //#####################################################################
 // Function Compute_Reference_Regular_Connections
 //#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+template<class T> void COMPONENT_LAYOUT_FEM<T>::
 Compute_Reference_Regular_Connections()
 {
     for(BLOCK_ID b(0);b<blocks.m;b++)
@@ -1408,7 +758,7 @@ Compute_Reference_Regular_Connections()
 //#####################################################################
 // Function Compute_Reference_Irregular_Connections
 //#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+template<class T> void COMPONENT_LAYOUT_FEM<T>::
 Compute_Reference_Irregular_Connections()
 {
     typedef std::tuple<CANONICAL_BLOCK<T>*,CON_ID,ARRAY<PAIR<CANONICAL_BLOCK<T>*,int> > > KEY;
@@ -1427,7 +777,7 @@ Compute_Reference_Irregular_Connections()
 //#####################################################################
 // Function Compute_Connection_Hash
 //#####################################################################
-template<class T> int COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+template<class T> int COMPONENT_LAYOUT_FEM<T>::
 Compute_Connection_Hash(BLOCK_ID b0,CON_ID con_id0,BLOCK_ID b1,CON_ID con_id1)
 {
     auto id0=blocks(b0).block,id1=blocks(b1).block;
@@ -1436,7 +786,7 @@ Compute_Connection_Hash(BLOCK_ID b0,CON_ID con_id0,BLOCK_ID b1,CON_ID con_id1)
 //#####################################################################
 // Function Compute_Dof_Remapping
 //#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+template<class T> void COMPONENT_LAYOUT_FEM<T>::
 Compute_Dof_Remapping(REFERENCE_BLOCK_DATA& rd)
 {
     const auto& bl=blocks(rd.b);
@@ -1480,7 +830,7 @@ Compute_Dof_Remapping(REFERENCE_BLOCK_DATA& rd)
         else
         {
             const auto& ic=irregular_connections(c.irreg_id);
-            Visit_Irregular_Cross_Section_Dofs(ic,
+            Visit_Irregular_Cross_Section_Dofs(blocks,ic,
                 [&](const IRREGULAR_VISITOR& iv)
                 {
                     if(!iv.be) rd.dof_map_e(iv.re)=0;
@@ -1504,76 +854,9 @@ Compute_Dof_Remapping(REFERENCE_BLOCK_DATA& rd)
     rd.num_dofs_d={iv,ie,ip};
 }
 //#####################################################################
-// Function Init_Block_Matrix
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Init_Block_Matrix(BLOCK_MATRIX<T>& M,BLOCK_ID a,BLOCK_ID b) const
-{
-    const auto& c=reference_block_data(blocks(a).ref_id);
-    const auto& d=reference_block_data(blocks(b).ref_id);
-    M.nr=c.num_dofs_d;
-    M.nc=d.num_dofs_d;
-    M.Resize();
-}
-//#####################################################################
-// Function Init_Block_Matrix
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Init_Block_Vector(BLOCK_VECTOR<T>& V,BLOCK_ID b) const
-{
-    const auto& c=reference_block_data(blocks(b).ref_id);
-    V.n=c.num_dofs_d;
-    V.Resize();
-}
-//#####################################################################
-// Function Init_Block_Matrix
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Init_Block_Vector(BLOCK_VECTOR<T>& V,const CANONICAL_BLOCK<T>* cb) const
-{
-    V.n={cb->X.m,cb->S.m,cb->X.m};
-    V.Resize();
-}
-//#####################################################################
-// Function Apply_To_RHS
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Apply_To_RHS(BLOCK_ID b,const BLOCK_VECTOR<T>& w)
-{
-    const auto& rd=reference_block_data(blocks(b).ref_id);
-    const auto& bl=blocks(b);
-
-    Copy_Vector_Data(w,b,rd.pairs);
-
-    for(CON_ID cc(0);cc<bl.connections.m;cc++)
-    {
-        const auto& c=bl.connections(cc);
-        if(c.is_regular)
-            Copy_Vector_Data(w,c.id,Regular_Connection_Pair(b,cc,false));
-        else
-        {
-            const auto& ic=irregular_connections(c.irreg_id);
-            const auto& irbd=reference_irregular_data(ic.ref_id);
-            for(const auto& h:irbd.pairs)
-                Copy_Vector_Data(w,h.b,h.irreg_pairs[1]);
-        }
-    }
-
-    for(auto e:bl.edge_on)
-    {
-        const auto& ic=irregular_connections(e.x);
-        const auto& irbd=reference_irregular_data(ic.ref_id);
-        if(irbd.mapping(e.y).y)
-        {
-            const auto& h=irbd.pairs(irbd.mapping(e.y).x);
-            Copy_Vector_Data(w,ic.regular,h.irreg_pairs[0]);
-        }
-    }
-}
-//#####################################################################
 // Function Compute_Bounding_Box
 //#####################################################################
-template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+template<class T> auto COMPONENT_LAYOUT_FEM<T>::
 Compute_Bounding_Box() const -> RANGE<TV>
 {
     RANGE<TV> box=RANGE<TV>::Empty_Box();
@@ -1583,87 +866,9 @@ Compute_Bounding_Box() const -> RANGE<TV>
     return box;
 }
 //#####################################################################
-// Function Eliminate_Strip
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Eliminate_Strip(CACHED_ELIMINATION_MATRIX<T>& cem,const ARRAY<BLOCK_ID>& a)
-{
-    for(int sep=1;sep-1<a.m;sep*=2)
-        for(int i=sep-1;i<a.m;i+=sep*2)
-            if(cem.valid_row(Value(a(i))))
-                cem.Eliminate_Row(Value(a(i)));
-}
-//#####################################################################
-// Function Eliminate_Strip
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Eliminate_Simple(CACHED_ELIMINATION_MATRIX<T>& cem,BLOCK_ID first,CON_ID con_id_source)
-{
-    ARRAY<BLOCK_ID> list;
-    BLOCK_ID b=first;
-    CON_ID con_id=con_id_source;
-    while(1)
-    {
-        const auto& bl=blocks(b);
-        if(bl.connections.m>CON_ID(2)) break;
-        if(bl.flags&1) break;
-        list.Append(b);
-        if(bl.connections.m==CON_ID(1)) break;
-        CON_ID o(1-Value(con_id));
-        if(!bl.connections(o).is_regular) break;
-        b=bl.connections(o).id;
-        con_id=bl.connections(o).con_id;
-    }
-    Eliminate_Strip(cem,list);
-}
-//#####################################################################
-// Function Eliminate_Rows
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Eliminate_Irregular_Blocks(CACHED_ELIMINATION_MATRIX<T>& cem)
-{
-    // Get rid of irregular connections first.
-    for(const auto& ic:irregular_connections)
-    {
-        BLOCK_ID prev(-1);
-        ARRAY<BLOCK_ID> found;
-        for(const auto& p:ic.edge_on)
-        {
-            if(p.b!=prev)
-            {
-                found.Append(p.b);
-                prev=p.b;
-            }
-        }
-        Eliminate_Strip(cem,found);
-    }
-}
-//#####################################################################
-// Function Eliminate_Irregular_Blocks
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Eliminate_Non_Seperators(CACHED_ELIMINATION_MATRIX<T>& cem)
-{
-    for(BLOCK_ID b(0);b<blocks.m;b++)
-    {
-        if(!cem.valid_row(Value(b))) continue;
-        const auto& bl=blocks(b);
-        if(bl.connections.m>CON_ID(2) || bl.flags&1)
-        {
-            for(const auto& c:bl.connections)
-                if(c.is_regular)
-                    Eliminate_Simple(cem,c.id,c.con_id);
-            if(bl.connections.m>CON_ID(2))
-                cem.Eliminate_Row(Value(b));
-        }
-    }
-    for(BLOCK_ID b(0);b<blocks.m;b++)
-        assert(!cem.valid_row(Value(b)) || blocks(b).flags&1);
-}
-//#####################################################################
 // Function Compute_Dof_Pairs
 //#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+template<class T> void COMPONENT_LAYOUT_FEM<T>::
 Compute_Dof_Pairs(REFERENCE_BLOCK_DATA& rd)
 {
     // Copy from self
@@ -1681,7 +886,7 @@ Compute_Dof_Pairs(REFERENCE_BLOCK_DATA& rd)
 //#####################################################################
 // Function Compute_Dof_Pairs
 //#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+template<class T> void COMPONENT_LAYOUT_FEM<T>::
 Compute_Dof_Pairs(REFERENCE_CONNECTION_DATA& rc)
 {
     const auto* cb0=blocks(rc.b[0]).block;
@@ -1710,7 +915,7 @@ Compute_Dof_Pairs(REFERENCE_CONNECTION_DATA& rc)
 //#####################################################################
 // Function Compute_Dof_Pairs
 //#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+template<class T> void COMPONENT_LAYOUT_FEM<T>::
 Compute_Dof_Pairs(REFERENCE_IRREGULAR_DATA& ri)
 {
     auto& ic=irregular_connections(ri.ic_id);
@@ -1719,7 +924,7 @@ Compute_Dof_Pairs(REFERENCE_IRREGULAR_DATA& ri)
     REFERENCE_BLOCK_DATA* rd[2];
     rd[0]=&reference_block_data(blocks(ic.regular).ref_id);
     RID_ID id(-1);
-    Visit_Irregular_Cross_Section_Dofs(ic,
+    Visit_Irregular_Cross_Section_Dofs(blocks,ic,
         [&](const IRREGULAR_VISITOR& iv)
         {
             if(iv.n0) id=ri.pairs.Add_End();
@@ -1765,514 +970,38 @@ Compute_Dof_Pairs(REFERENCE_IRREGULAR_DATA& ri)
 //#####################################################################
 // Function Compute_Dof_Pairs
 //#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+template<class T> void COMPONENT_LAYOUT_FEM<T>::
 Compute_Dof_Pairs()
 {
-}
-//#####################################################################
-// Function Visualize_Block_State
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Visualize_Block_State(BLOCK_ID b) const
-{
-    auto& bl=blocks(b);
-    auto* cb=bl.block;
-    auto Z=[=](int i){return bl.xform*cb->X(i);};
-    for(auto t:cb->E)
+    Compute_Reference_Blocks();
+    Compute_Reference_Regular_Connections();
+    Compute_Reference_Irregular_Connections();
+
+    for(auto& rd:reference_block_data)
     {
-        VECTOR<TV,3> P;
-        for(int i=0;i<3;i++) P(i)=bl.xform*cb->X(t(i));
-        for(auto p:P) Add_Debug_Object(VECTOR<TV,2>(p,P.Average()),VECTOR<T,3>(.5,.5,.5));
-    }
-    HASHTABLE<int> he,hv;
-    he.Set_All(cb->bc_e);
-    hv.Set_All(cb->bc_v);
-    for(int i=0;i<cb->S.m;i++)
-    {
-        TV X=Z(cb->S(i).x);
-        TV Y=Z(cb->S(i).y);
-        Add_Debug_Object(VECTOR<TV,2>(X,Y),he.Contains(i)?VECTOR<T,3>(0,1,1):VECTOR<T,3>(0,0,1));
-    }
-    for(int i=0;i<cb->X.m;i++)
-    {
-        Add_Debug_Particle(Z(i),hv.Contains(i)?VECTOR<T,3>(1,1,0):VECTOR<T,3>(1,0,0));
-        Debug_Particle_Set_Attribute<TV>("display_size",.1);
+        Compute_Dof_Remapping(rd);
+        Compute_Dof_Pairs(rd);
     }
 
-    for(CON_ID cc(0);cc<bl.connections.m;cc++)
-    {
-        const auto& c=bl.connections(cc);
-        if(c.is_regular)
-        {
-            const auto* cb2=blocks(c.id).block;
-            Visit_Regular_Cross_Section_Dofs(cb->cross_sections(cc),
-                cb2->cross_sections(c.con_id),c.master,
-                [&](int a,int b,bool o)
-                {
-                    Add_Debug_Particle(Z(a),o?VECTOR<T,3>(1,0,0):VECTOR<T,3>(0,1,0));
-                    Debug_Particle_Set_Attribute<TV>("display_size",.2);
-                },
-                [&](int a,int b,bool o)
-                {
-                    Add_Debug_Particle((Z(cb->S(a).x)+Z(cb->S(a).y))/2,o?VECTOR<T,3>(1,0,0):VECTOR<T,3>(0,1,0));
-                    Debug_Particle_Set_Attribute<TV>("display_size",.2);
-                });
-        }
-        else
-        {
-            const auto& ic=irregular_connections(c.irreg_id);
-            Visit_Irregular_Cross_Section_Dofs(ic,
-                [&](const IRREGULAR_VISITOR& iv)
-                {
-                    TV A=Z(iv.r0),B=Z(iv.r1);
-                    Add_Debug_Particle(A,VECTOR<T,3>(iv.b0,0,1));
-                    Debug_Particle_Set_Attribute<TV>("display_size",.2);
-                    Add_Debug_Particle(B,VECTOR<T,3>(iv.b1,0,1));
-                    Debug_Particle_Set_Attribute<TV>("display_size",.25);
-                    Add_Debug_Particle((A+B)/2,VECTOR<T,3>(iv.be,0,1));
-                    Debug_Particle_Set_Attribute<TV>("display_size",.2);
-                });
-        }
-    }
+    for(auto& rc:reference_connection_data)
+        Compute_Dof_Pairs(rc);
 
-    for(auto i:bl.edge_on)
-    {
-        auto& ic=irregular_connections(i.x);
-        auto& id=ic.edge_on(i.y);
-        bool o0=i.y>=(ic.edge_on.m/2+1);
-        bool o1=(i.y>=ic.edge_on.m/2);
-
-        TV A=Z(id.v0),B=Z(id.v1);
-        Add_Debug_Particle(A,VECTOR<T,3>(1,1,1)/(1+o0));
-        Debug_Particle_Set_Attribute<TV>("display_size",.05);
-        Add_Debug_Particle(B,VECTOR<T,3>(1,1,1)/(1+o1));
-        Debug_Particle_Set_Attribute<TV>("display_size",.06);
-        Add_Debug_Particle((A+B)/2,VECTOR<T,3>(1,1,1)/(1+o1));
-        Debug_Particle_Set_Attribute<TV>("display_size",.05);
-    }
-}
-//#####################################################################
-// Function Visualize_Block_State
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Visualize_Block_Dofs(BLOCK_ID b) const
-{
-    auto& bl=blocks(b);
-    auto* cb=bl.block;
-    const auto& rd=reference_block_data(blocks(b).ref_id);
-    auto Z=[=](int i){return bl.xform*cb->X(i);};
-    for(auto t:cb->E)
-    {
-        VECTOR<TV,3> P;
-        for(int i=0;i<3;i++) P(i)=bl.xform*cb->X(t(i));
-        for(auto p:P) Add_Debug_Object(VECTOR<TV,2>(p,P.Average()),VECTOR<T,3>(.5,.5,.5));
-    }
-    HASHTABLE<int> he,hv;
-    he.Set_All(cb->bc_e);
-    hv.Set_All(cb->bc_v);
-    for(int i=0;i<cb->S.m;i++)
-    {
-        TV X=Z(cb->S(i).x);
-        TV Y=Z(cb->S(i).y);
-        Add_Debug_Object(VECTOR<TV,2>(X,Y),he.Contains(i)?VECTOR<T,3>(0,1,1):VECTOR<T,3>(0,0,1));
-    }
-    Flush_Frame<TV>(LOG::sprintf("block %P\n",b).c_str());
-    for(int i=0;i<cb->X.m;i++)
-    {
-        Add_Debug_Text(Z(i),LOG::sprintf("%d",i),VECTOR<T,3>(1,1,0));
-    }
-    for(int i=0;i<cb->S.m;i++)
-    {
-        Add_Debug_Text((Z(cb->S(i).x)+Z(cb->S(i).y))/2,LOG::sprintf("%d",i),VECTOR<T,3>(0,1,0));
-    }
-    Flush_Frame<TV>(LOG::sprintf("block %P full\n",b).c_str());
-    for(int i=0;i<cb->X.m;i++)
-    {
-        int k=rd.dof_map_v(i);
-        if(k>=0) Add_Debug_Text(Z(i),LOG::sprintf("%d",k),VECTOR<T,3>(1,1,0));
-    }
-    Flush_Frame<TV>(LOG::sprintf("block %P v\n",b).c_str());
-    for(int i=0;i<cb->S.m;i++)
-    {
-        int k=rd.dof_map_e(i);
-        if(k>=0) Add_Debug_Text((Z(cb->S(i).x)+Z(cb->S(i).y))/2,LOG::sprintf("%d",k),VECTOR<T,3>(0,1,0));
-    }
-    Flush_Frame<TV>(LOG::sprintf("block %P e\n",b).c_str());
-    for(int i=0;i<cb->X.m;i++)
-    {
-        int k=rd.dof_map_p(i);
-        if(k>=0) Add_Debug_Text(Z(i),LOG::sprintf("%d",k),VECTOR<T,3>(1,1,0));
-    }
-    Flush_Frame<TV>(LOG::sprintf("block %P p\n",b).c_str());
-
-    for(CON_ID cc(0);cc<bl.connections.m;cc++)
-    {
-        const auto& c=bl.connections(cc);
-        if(c.is_regular)
-        {
-            const auto* cb2=blocks(c.id).block;
-            Visit_Regular_Cross_Section_Dofs(cb->cross_sections(cc),
-                cb2->cross_sections(c.con_id),c.master,
-                [&](int a,int b,bool o)
-                {
-                    Add_Debug_Particle(Z(a),o?VECTOR<T,3>(1,0,0):VECTOR<T,3>(0,1,0));
-                    Debug_Particle_Set_Attribute<TV>("display_size",.2);
-                },
-                [&](int a,int b,bool o)
-                {
-                    Add_Debug_Particle((Z(cb->S(a).x)+Z(cb->S(a).y))/2,o?VECTOR<T,3>(1,0,0):VECTOR<T,3>(0,1,0));
-                    Debug_Particle_Set_Attribute<TV>("display_size",.2);
-                });
-        }
-        else
-        {
-            const auto& ic=irregular_connections(c.irreg_id);
-            Visit_Irregular_Cross_Section_Dofs(ic,
-                [&](const IRREGULAR_VISITOR& iv)
-                {
-                    TV A=Z(iv.r0),B=Z(iv.r1);
-                    Add_Debug_Particle(A,VECTOR<T,3>(iv.b0,0,1));
-                    Debug_Particle_Set_Attribute<TV>("display_size",.2);
-                    Add_Debug_Particle(B,VECTOR<T,3>(iv.b1,0,1));
-                    Debug_Particle_Set_Attribute<TV>("display_size",.25);
-                    Add_Debug_Particle((A+B)/2,VECTOR<T,3>(iv.be,0,1));
-                    Debug_Particle_Set_Attribute<TV>("display_size",.2);
-                });
-        }
-    }
-
-    for(auto i:bl.edge_on)
-    {
-        auto& ic=irregular_connections(i.x);
-        auto& id=ic.edge_on(i.y);
-        bool o0=i.y>=(ic.edge_on.m/2+1);
-        bool o1=(i.y>=ic.edge_on.m/2);
-
-        TV A=Z(id.v0),B=Z(id.v1);
-        Add_Debug_Particle(A,VECTOR<T,3>(1,1,1)/(1+o0));
-        Debug_Particle_Set_Attribute<TV>("display_size",.05);
-        Add_Debug_Particle(B,VECTOR<T,3>(1,1,1)/(1+o1));
-        Debug_Particle_Set_Attribute<TV>("display_size",.06);
-        Add_Debug_Particle((A+B)/2,VECTOR<T,3>(1,1,1)/(1+o1));
-        Debug_Particle_Set_Attribute<TV>("display_size",.05);
-    }
-}
-//#####################################################################
-// Function Visualize_Solution
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Visualize_Solution(const BLOCK_VECTOR<T>& U,BLOCK_ID b,bool remap_dofs) const
-{
-    const auto& bl=blocks(b);
-    const auto* cb=bl.block;
-    auto Z=[=](int i){return bl.xform*cb->X(i);};
-    const auto& rd=reference_block_data(blocks(b).ref_id);
-    for(int i=0;i<cb->X.m;i++)
-    {
-        int k=remap_dofs?rd.dof_map_v(i):i;
-        if(k>=0)
-        {
-            Add_Debug_Particle(Z(i),VECTOR<T,3>(1,0,0));
-            Debug_Particle_Set_Attribute<TV>("V",U.Get_v(k));
-        }
-    }
-
-    for(int i=0;i<cb->S.m;i++)
-    {
-        int k=remap_dofs?rd.dof_map_e(i):i;
-        if(k>=0)
-        {
-            Add_Debug_Particle((Z(cb->S(i).x)+Z(cb->S(i).y))/2,VECTOR<T,3>(1,0,0));
-            Debug_Particle_Set_Attribute<TV>("V",U.Get_e(k));
-        }
-    }
-
-    for(int i=0;i<cb->X.m;i++)
-    {
-        int k=remap_dofs?rd.dof_map_p(i):i;
-        if(k>=0)
-        {
-            Add_Debug_Particle(Z(i),VECTOR<T,3>(0,1,0));
-            Debug_Particle_Set_Attribute<TV>("display_size",U.Get_p(k));
-        }
-    }
-}
-//#####################################################################
-// Function Transform_Solution
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Transform_Solution(const CACHED_ELIMINATION_MATRIX<T>& cem,bool inverse,bool transpose)
-{
-    for(BLOCK_ID b(0);b<blocks.m;b++)
-    {
-        int j=cem.rhs(Value(b));
-        if(j<0)
-        {
-            Init_Block_Vector(rhs_block_list(b),b);
-            continue;
-        }
-        auto& U=rhs_block_list(b);
-        U.V=cem.vector_list(j);
-        auto A = blocks(b).xform.M;
-        if(inverse) A=A.Inverse();
-        T s=1/sqrt(A.Determinant());
-        A*=s;
-        if(transpose) A=A.Transposed();
-
-        for(int i=0;i<U.n.v;i++) U.Set_v(i,A*U.Get_v(i));
-        for(int i=0;i<U.n.e;i++) U.Set_e(i,A*U.Get_e(i));
-        for(int i=0;i<U.n.p;i++) U.Set_p(i,s*U.Get_p(i));
-    }
-}
-//#####################################################################
-// Function Dump_World_Space_System
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Dump_World_Space_System(const CACHED_ELIMINATION_MATRIX<T>& cem) const
-{
-    int next_u=0,next_p=0;
-    ARRAY<int,BLOCK_ID> first[3];
-    for(int i=0;i<3;i++) first[i].Resize(blocks.m);
-    for(BLOCK_ID b(0);b<blocks.m;b++)
-    {
-        const auto& c=reference_block_data(blocks(b).ref_id);
-        first[0](b)=next_u;
-        next_u+=c.num_dofs_d.v*2;
-        first[1](b)=next_u;
-        next_u+=c.num_dofs_d.e*2;
-        first[2](b)=next_p;
-        next_p+=c.num_dofs_d.p;
-    }
-    first[2]+=next_u;
-
-    SYSTEM_MATRIX_HELPER<T> h;
-    for(auto t:nonzero_blocks)
-    {
-        BLOCK_MATRIX<T> W,M;
-        Init_Block_Matrix(M,t.x,t.y);
-        Init_Block_Matrix(W,t.x,t.y);
-        M.M=cem.block_list(t.z).M;
-        Transform_To_World_Space(W,M,t.x,t.y);
-        const auto& a=reference_block_data(blocks(t.x).ref_id);
-        const auto& b=reference_block_data(blocks(t.y).ref_id);
-        int A[3]={a.num_dofs_d.v*2,a.num_dofs_d.e*2,a.num_dofs_d.p};
-        int B[3]={b.num_dofs_d.v*2,b.num_dofs_d.e*2,b.num_dofs_d.p};
-        for(int i=0,as=0;i<3;i++)
-        {
-            for(int j=0,bs=0;j<3;j++)
-            {
-                for(int r=0;r<A[i];r++)
-                    for(int s=0;s<B[j];s++)
-                        if(W.M(r+as,s+bs))
-                        {
-                            h.data.Append({first[i](t.x)+r,first[j](t.y)+s,W.M(r+as,s+bs)});
-                            if(t.x!=t.y)
-                                h.data.Append({first[j](t.y)+s,first[i](t.x)+r,W.M(r+as,s+bs)});
-                        }
-                bs+=B[j];
-            }
-            as+=A[i];
-        }
-    }
-    SPARSE_MATRIX_FLAT_MXN<T> SM;
-    h.Set_Matrix(next_u+next_p,next_u+next_p,SM);
-    OCTAVE_OUTPUT<T>("M.txt").Write("M",SM);
-}
-//#####################################################################
-// Function Dump_World_Space_System
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Dump_World_Space_Vector(const char* name) const
-{
-    int next_u=0,next_p=0;
-    ARRAY<int,BLOCK_ID> first[3];
-    for(int i=0;i<3;i++) first[i].Resize(blocks.m);
-    for(BLOCK_ID b(0);b<blocks.m;b++)
-    {
-        const auto& c=reference_block_data(blocks(b).ref_id);
-        first[0](b)=next_u;
-        next_u+=c.num_dofs_d.v*2;
-        first[1](b)=next_u;
-        next_u+=c.num_dofs_d.e*2;
-        first[2](b)=next_p;
-        next_p+=c.num_dofs_d.p;
-    }
-    first[2]+=next_u;
-
-    ARRAY<T> sol(next_u+next_p);
-    for(BLOCK_ID b(0);b<blocks.m;b++)
-    {
-        const auto& a=reference_block_data(blocks(b).ref_id);
-        int A[3]={a.num_dofs_d.v*2,a.num_dofs_d.e*2,a.num_dofs_d.p};
-        auto& U=rhs_block_list(b);
-        for(int i=0,ar=0;i<3;i++)
-        {
-            for(int r=0;r<A[i];r++)
-                sol(first[i](b)+r)=U.V.m?U.V(r+ar):0;
-            ar+=A[i];
-        }
-    }
-    OCTAVE_OUTPUT<T>((name+(std::string)".txt").c_str()).Write(name,sol);
-}
-//#####################################################################
-// Function Visualize_Flat_Dofs
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Visualize_Flat_Dofs() const
-{
-    int next_u=0,next_p=0;
-    ARRAY<int,BLOCK_ID> first[3];
-    for(int i=0;i<3;i++) first[i].Resize(blocks.m);
-    for(BLOCK_ID b(0);b<blocks.m;b++)
-    {
-        const auto& c=reference_block_data(blocks(b).ref_id);
-        first[0](b)=next_u;
-        next_u+=c.num_dofs_d.v*2;
-        first[1](b)=next_u;
-        next_u+=c.num_dofs_d.e*2;
-        first[2](b)=next_p;
-        next_p+=c.num_dofs_d.p;
-    }
-    first[2]+=next_u;
-
-    for(BLOCK_ID b(0);b<blocks.m;b++)
-    {
-        Visualize_Block_State(b);
-        auto& bl=blocks(b);
-        const auto* cb=bl.block;
-        auto Z=[=](int i){return bl.xform*cb->X(i);};
-        const auto& rd=reference_block_data(bl.ref_id);
-        for(int i=0;i<cb->X.m;i++)
-            if(rd.dof_map_v(i)>=0)
-            {
-                int dof=first[0](b)+rd.dof_map_v(i)*2;
-                Add_Debug_Text(Z(i),LOG::sprintf("%d",dof),VECTOR<T,3>(1,1,0));
-            }
-        for(int i=0;i<cb->S.m;i++)
-            if(rd.dof_map_e(i)>=0)
-            {
-                int dof=first[1](b)+rd.dof_map_e(i)*2;
-                Add_Debug_Text((Z(cb->S(i).x)+Z(cb->S(i).y))/2,LOG::sprintf("%d",dof),VECTOR<T,3>(1,1,0));
-            }
-    }
-    Flush_Frame<TV>("flat velocity dofs");
-    
-    for(BLOCK_ID b(0);b<blocks.m;b++)
-    {
-        Visualize_Block_State(b);
-        auto& bl=blocks(b);
-        const auto* cb=bl.block;
-        auto Z=[=](int i){return bl.xform*cb->X(i);};
-        const auto& rd=reference_block_data(bl.ref_id);
-        for(int i=0;i<cb->X.m;i++)
-            if(rd.dof_map_p(i)>=0)
-            {
-                int dof=first[2](b)+rd.dof_map_p(i);
-                Add_Debug_Text(Z(i),LOG::sprintf("%d",dof),VECTOR<T,3>(1,1,0));
-            }
-    }
-    Flush_Frame<TV>("flat pressure dofs");
-    
-
-}
-//#####################################################################
-// Function Transform_To_World_Space
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Transform_To_World_Space(BLOCK_MATRIX<T>& M,const BLOCK_MATRIX<T>& B,BLOCK_ID a,BLOCK_ID b) const
-{
-    MATRIX<T,2> Ma=blocks(a).xform.M.Inverse();
-    MATRIX<T,2> Mb=blocks(b).xform.M.Inverse();
-    T sa=1/sqrt(Ma.Determinant());
-    T sb=1/sqrt(Mb.Determinant());
-    Ma*=sa;
-    Mb*=sb;
-
-    for(int p=0;p<B.nr.v;p++)
-    {
-        for(int r=0;r<B.nc.v;r++) M.Add_vv(p,r,Ma.Transpose_Times(B.Get_vv(p,r)*Mb));
-        for(int r=0;r<B.nc.e;r++) M.Add_ve(p,r,Ma.Transpose_Times(B.Get_ve(p,r)*Mb));
-        for(int r=0;r<B.nc.p;r++) M.Add_vp(p,r,Ma.Transpose_Times(B.Get_vp(p,r)*sb));
-    }
-    for(int p=0;p<B.nr.e;p++)
-    {
-        for(int r=0;r<B.nc.v;r++) M.Add_ev(p,r,Ma.Transpose_Times(B.Get_ev(p,r)*Mb));
-        for(int r=0;r<B.nc.e;r++) M.Add_ee(p,r,Ma.Transpose_Times(B.Get_ee(p,r)*Mb));
-        for(int r=0;r<B.nc.p;r++) M.Add_ep(p,r,Ma.Transpose_Times(B.Get_ep(p,r)*sb));
-    }
-    for(int p=0;p<B.nr.p;p++)
-    {
-        for(int r=0;r<B.nc.v;r++) M.Add_pv(p,r,Mb.Transpose_Times(B.Get_pv(p,r)*sa));
-        for(int r=0;r<B.nc.e;r++) M.Add_pe(p,r,Mb.Transpose_Times(B.Get_pe(p,r)*sa));
-    }
+    for(auto& ri:reference_irregular_data)
+        Compute_Dof_Pairs(ri);
 }
 //#####################################################################
 // Function Fill_Num_Dofs
 //#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+template<class T> void COMPONENT_LAYOUT_FEM<T>::
 Fill_Num_Dofs(DOF_PAIRS& dp,BLOCK_ID d,BLOCK_ID s)
 {
     dp.num_dofs_d=reference_block_data(blocks(d).ref_id).num_dofs_d;
     dp.num_dofs_s=reference_block_data(blocks(s).ref_id).num_dofs_s;
 }
 //#####################################################################
-// Function Check_Analytic_Solution
-//#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
-Check_Analytic_Solution() const
-{
-    if(!analytic_velocity || !analytic_pressure) return;
-    T max_u=0,max_p=0;
-    T l2_u=0,l2_p=0;
-    int num_u=0,num_p=0;
-    for(BLOCK_ID b(0);b<blocks.m;b++)
-    {
-        const auto& bl=blocks(b);
-        const auto* cb=bl.block;
-        auto Z=[=](int i){return bl.xform*cb->X(i);};
-        const auto& rd=reference_block_data(blocks(b).ref_id);
-        const auto& W=rhs_block_list(b);
-        for(int i=0;i<cb->X.m;i++)
-            if(rd.dof_map_v(i)>=0)
-            {
-                TV X=Z(i);
-                TV U=analytic_velocity->v(X/unit_m,0)*unit_m/unit_s;
-                TV V=W.Get_v(rd.dof_map_v(i));
-                max_u=std::max(max_u,(U-V).Max_Abs());
-                l2_u+=(U-V).Magnitude_Squared();
-                num_u++;
-            }
-
-        for(int i=0;i<cb->S.m;i++)
-            if(rd.dof_map_e(i)>=0)
-            {
-                TV X=(Z(cb->S(i).x)+Z(cb->S(i).y))/2;
-                TV U=analytic_velocity->v(X/unit_m,0)*unit_m/unit_s;
-                TV V=W.Get_e(rd.dof_map_e(i));
-                max_u=std::max(max_u,(U-V).Max_Abs());
-                l2_u+=(U-V).Magnitude_Squared();
-                num_u++;
-            }
-
-        for(int i=0;i<cb->X.m;i++)
-            if(rd.dof_map_p(i)>=0)
-            {
-                TV X=Z(i);
-                T p=analytic_pressure->f(X/unit_m,0)*unit_m/unit_s;
-                T q=W.Get_p(rd.dof_map_p(i));
-                max_p=std::max(max_p,std::abs(p-q));
-                l2_p+=sqr(p-q);
-                num_p++;
-            }
-    }
-    if(num_u) l2_u=sqrt(l2_u/num_u);
-    if(num_p) l2_p=sqrt(l2_p/num_p);
-    LOG::printf("u l-inf %P   u l-2 %P   p l-inf %P   p l-2 %P\n",max_u,l2_u,max_p,l2_p);
-}
-//#####################################################################
 // Function Regular_Connection_Pair
 //#####################################################################
-template<class T> auto COMPONENT_LAYOUT_FEM<VECTOR<T,2> >::
+template<class T> auto COMPONENT_LAYOUT_FEM<T>::
 Regular_Connection_Pair(BLOCK_ID b,CON_ID con_id,bool is_dest) -> const DOF_PAIRS&
 {
     auto& bl=blocks(b);
@@ -2291,5 +1020,5 @@ Regular_Connection_Pair(BLOCK_ID b,CON_ID con_id,bool is_dest) -> const DOF_PAIR
     auto ref_con_id=regular_connection_hash.Get(key);
     return reference_connection_data(ref_con_id).reg_pairs[is_dest];
 }
-template class COMPONENT_LAYOUT_FEM<VECTOR<double,2> >;
+template class COMPONENT_LAYOUT_FEM<double>;
 }
