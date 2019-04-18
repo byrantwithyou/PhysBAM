@@ -719,36 +719,6 @@ Dump_World_Space_System() const
     ARRAY<int,REFERENCE_CONNECTION_ID> reg_id(cl.reference_connection_data.m);
     ARRAY<ARRAY<int,RID_ID>,REFERENCE_IRREGULAR_ID> irreg_id(cl.reference_irregular_data.m);
 
-    // for(REFERENCE_BLOCK_ID i(0);i<cl.reference_block_data.m;i++)
-    // {
-    //     auto& M=diagonal_system_blocks(i);
-    //     int id=cem.Create_Matrix_Block(true);
-    //     diag_id(i)=id;
-    //     cem.block_list(id).M.Exchange(M.M);
-    // }
-
-    // regular_system_blocks.Resize(cl.reference_connection_data.m);
-    // for(REFERENCE_CONNECTION_ID i(0);i<cl.reference_connection_data.m;i++)
-    // {
-    //     auto& M=regular_system_blocks(i);
-    //     int id=cem.Create_Matrix_Block(false);
-    //     reg_id(i)=id;
-    //     cem.block_list(id).M.Exchange(M.M);
-    // }
-
-    // irregular_system_blocks.Resize(cl.reference_irregular_data.m);
-    // for(REFERENCE_IRREGULAR_ID i(0);i<cl.reference_irregular_data.m;i++)
-    // {
-    //     auto& is=irregular_system_blocks(i);
-    //     irreg_id(i).Resize(cl.reference_irregular_data(i).pairs.m);
-    //     for(RID_ID j(0);j<irreg_id(i).m;j++)
-    //     {
-    //         int id=cem.Create_Matrix_Block(false);
-    //         irreg_id(i)(j)=id;
-    //         cem.block_list(id).M.Exchange(is(j).M);
-    //     }
-    // }
-
     for(BLOCK_ID b(0);b<cl.blocks.m;b++)
         Dump_Matrix_Block(h,first,diagonal_system_blocks(cl.blocks(b).ref_id),b,b);
 
@@ -787,20 +757,6 @@ Dump_World_Space_Vector(const char* name) const
 {
     ARRAY<int,BLOCK_ID> first[3];
     int size=Compute_Global_Dof_Mapping(first);
-    // int next_u=0,next_p=0;
-    // ARRAY<int,BLOCK_ID> first[3];
-    // for(int i=0;i<3;i++) first[i].Resize(cl.blocks.m);
-    // for(BLOCK_ID b(0);b<cl.blocks.m;b++)
-    // {
-    //     const auto& c=cl.reference_block_data(cl.blocks(b).ref_id);
-    //     first[0](b)=next_u;
-    //     next_u+=c.num_dofs_d.v*2;
-    //     first[1](b)=next_u;
-    //     next_u+=c.num_dofs_d.e*2;
-    //     first[2](b)=next_p;
-    //     next_p+=c.num_dofs_d.p;
-    // }
-    // first[2]+=next_u;
 
     ARRAY<T> sol(size);
     for(BLOCK_ID b(0);b<cl.blocks.m;b++)
