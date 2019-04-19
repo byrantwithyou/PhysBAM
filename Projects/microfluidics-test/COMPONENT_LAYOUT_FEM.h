@@ -138,6 +138,8 @@ struct COMPONENT_LAYOUT_FEM
     typedef VECTOR<int,2> IV;
 
     T target_length;
+    T depth;
+    int depth_layers;
     T unit_m,unit_s,unit_kg;
     
     // BLOCKS
