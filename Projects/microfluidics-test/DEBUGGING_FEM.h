@@ -16,6 +16,7 @@ template<class T>
 struct DEBUGGING_FEM
 {
     typedef VECTOR<T,2> TV;
+    typedef VECTOR<int,2> IV2;
     COMPONENT_LAYOUT_FEM<T>& cl;
 
     DEBUGGING_FEM(COMPONENT_LAYOUT_FEM<T>& cl);
@@ -24,6 +25,7 @@ struct DEBUGGING_FEM
     void Visualize_Block_Dofs(BLOCK_ID b) const;
     void Visualize_Solution(const BLOCK_VECTOR<T>& U,BLOCK_ID b,bool remap_dofs) const;
     void Visualize_Flat_Dofs() const;
+    void Visualize_Ticks(BLOCK_ID b) const;
     void Check_Analytic_Solution() const;
     void Dump_World_Space_System() const;
     void Dump_World_Space_Vector(const char* name) const;

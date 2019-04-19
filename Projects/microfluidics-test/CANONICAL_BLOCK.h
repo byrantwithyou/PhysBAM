@@ -34,6 +34,7 @@ struct CANONICAL_BLOCK
     ARRAY<IV3> E;
     ARRAY<IV> S;
     ARRAY<int> bc_v,bc_e;
+    ARRAY<int> ticks; // edge index e -> t. tick is on the side of S(e)(t)
 };
 }
 #endif

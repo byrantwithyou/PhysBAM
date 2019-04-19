@@ -22,6 +22,7 @@ Make_Block(int d,T w,T l)
     PHYSBAM_ASSERT(n%2);
     cb->X.Resize(2*n);
     cb->S.Resize(4*(n-1)+1);
+    cb->ticks.Resize(cb->S.m,use_init,-7);
     for(int i=0;i<n;i++)
     {
         T y=key.width/(n-1)*i-key.width/2;
@@ -37,8 +38,13 @@ Make_Block(int d,T w,T l)
         cb->S(i+(n-1))={i+n,i+n+1};
         cb->S(i+2*(n-1))={i+n,i+1};
         cb->S(i+3*(n-1))={i,i+n};
+        cb->ticks(i)=0;
+        cb->ticks(i+(n-1))=0;
+        cb->ticks(i+2*(n-1))=1;
+        cb->ticks(i+3*(n-1))=0;
     }
     cb->S(4*(n-1))={n-1,2*n-1};
+    cb->ticks(4*(n-1))=0;
 
     cb->cross_sections.Append({{0,n},{0,n-1},false});
     cb->cross_sections.Append({{n,2*n},{n-1,2*(n-1)},true});

@@ -79,7 +79,10 @@ void Run(PARSE_ARGS& parse_args)
     {
         Flush_Frame<TV>("init");
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+        {
             debug.Visualize_Block_State(b);
+            debug.Visualize_Ticks(b);
+        }
         Flush_Frame<TV>("blocks");
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
         {
