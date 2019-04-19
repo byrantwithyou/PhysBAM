@@ -17,4 +17,5 @@ Automatic_Program(env,"fem",["main-fem.cpp","CACHED_ELIMINATION_MATRIX.cpp",
                                "COMPONENT_PIPE.cpp","COMPONENT_CHANGE.cpp",
                                "COMPONENT_BC.cpp","COMPONENT_JOINT.cpp",
                                "ANALYTIC_FEM.cpp","DEBUGGING_FEM.cpp",
-                               "ELIMINATION_FEM.cpp","MATRIX_CONSTRUCTION_FEM.cpp"])
+                               "ELIMINATION_FEM.cpp","MATRIX_CONSTRUCTION_FEM.cpp",
+                               "CANONICAL_BLOCK.cpp"])

@@ -50,6 +50,7 @@ Make_Block(int d,T w,T l)
     cb->cross_sections.Append({{n,2*n},{n-1,2*(n-1)},true});
     cb->bc_v={0,n-1,n,2*n-1};
     cb->bc_e={3*(n-1),4*(n-1)};
+    cb->Compute_Element_Edges();
     return it.first->second;
 }
 //#####################################################################
@@ -94,6 +95,5 @@ Make_Component(int d,T w,T l)
     cc->blocks.Last().flags|=1;
     return cc;
 }
-template class COMPONENT_PIPE<float>;
 template class COMPONENT_PIPE<double>;
 }

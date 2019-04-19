@@ -105,6 +105,8 @@ struct REFERENCE_BLOCK_DATA
     DOF_COUNTS num_dofs_d,num_dofs_s;
     ARRAY<int> dof_map_v,dof_map_e,dof_map_p;
     DOF_PAIRS pairs;
+    ARRAY<int> ticks_e; // edge index e -> k. tick is on the side of S(e)(k)
+    ARRAY<int> ticks_t; // triangle tick masks
 };
 
 struct REFERENCE_CONNECTION_DATA
@@ -187,7 +189,8 @@ struct COMPONENT_LAYOUT_FEM
     void Compute_Dof_Pairs(REFERENCE_IRREGULAR_DATA& ri);
     void Fill_Num_Dofs(DOF_PAIRS& dp,BLOCK_ID d,BLOCK_ID s);
     const DOF_PAIRS& Regular_Connection_Pair(BLOCK_ID b,CON_ID con_id,bool is_dest);
-
+    void Fill_Element_Tick_Masks();
+    
     // PARSING AND ASSEMBLY
     // L
 

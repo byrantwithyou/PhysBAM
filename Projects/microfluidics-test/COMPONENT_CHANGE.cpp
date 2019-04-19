@@ -101,8 +101,8 @@ Make_Block(int d0,T w0,int d1,T w1,T l)
 
     cb->cross_sections.Append({{0,n0},{0,n0-1},false});
     cb->cross_sections.Append({{n0,n0+n1},{n0-1,n0+n1-2},true});
+    cb->Compute_Element_Edges();
     return it.first->second;
 }
-template struct COMPONENT_CHANGE<float>;
 template struct COMPONENT_CHANGE<double>;
 }

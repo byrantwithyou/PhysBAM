@@ -6,6 +6,7 @@
 #define __CANONICAL_BLOCK__
 
 #include <Core/Arrays/ARRAY.h>
+#include <Core/Data_Structures/PAIR.h>
 #include <Core/Math_Tools/INTERVAL.h>
 #include <Core/Vectors/VECTOR.h>
 #include "COMMON.h"
@@ -33,8 +34,11 @@ struct CANONICAL_BLOCK
     ARRAY<TV> X;
     ARRAY<IV3> E;
     ARRAY<IV> S;
+    ARRAY<VECTOR<PAIR<int,bool>,3> > element_edges; // false=ccw, true=cw
     ARRAY<int> bc_v,bc_e;
     ARRAY<int> ticks; // edge index e -> t. tick is on the side of S(e)(t)
+
+    void Compute_Element_Edges();
 };
 }
 #endif

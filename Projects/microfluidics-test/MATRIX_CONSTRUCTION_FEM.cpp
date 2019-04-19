@@ -58,15 +58,12 @@ Fill_Canonical_Block_Matrix(BLOCK_MATRIX<T>& mat,const CANONICAL_BLOCK<T>* cb)
     mat.nr=mat.nc={cb->X.m,cb->S.m,cb->X.m};
     mat.Resize();
 
-    HASHTABLE<IV2,int> edge_lookup;
-    for(int i=0;i<cb->S.m;i++)
-        edge_lookup.Set(cb->S(i).Sorted(),i);
-
-    for(IV3 v:cb->E)
+    for(int q=0;q<cb->E.m;q++)
     {
+        IV3 v=cb->E(q);
         IV3 dof[2]={v};
         for(int i=0;i<3;i++)
-            dof[1](i)=edge_lookup.Get(v.Remove_Index(i).Sorted());
+            dof[1](i)=cb->element_edges(q)(i).x;
         MATRIX<T,2> F(cb->X(v.y)-cb->X(v.x),cb->X(v.z)-cb->X(v.x)),G=F.Inverse();
         T scale=mu*F.Determinant()/6;
         T p_scale=F.Determinant()/6;
@@ -120,15 +117,12 @@ Times_U_Dot_V(BLOCK_ID b,BLOCK_VECTOR<T>& w,const BLOCK_VECTOR<T>& u) const
     const auto* cb=bl.block;
     MATRIX<T,2> M=bl.xform.M;
 
-    HASHTABLE<IV2,int> edge_lookup;
-    for(int i=0;i<cb->S.m;i++)
-        edge_lookup.Set(cb->S(i).Sorted(),i);
-
-    for(IV3 v:cb->E)
+    for(int q=0;q<cb->E.m;q++)
     {
+        IV3 v=cb->E(q);
         IV3 dof[2]={v};
         for(int i=0;i<3;i++)
-            dof[1](i)=edge_lookup.Get(v.Remove_Index(i).Sorted());
+            dof[1](i)=cb->element_edges(q)(i).x;
         MATRIX<T,2> F(cb->X(v.y)-cb->X(v.x),cb->X(v.z)-cb->X(v.x));
         T scale=(M*F).Determinant()/360;
 
@@ -159,15 +153,12 @@ Times_P_U(BLOCK_ID b,BLOCK_VECTOR<T>& w,const ARRAY<T>& div_v,const ARRAY<T>& di
     const auto* cb=bl.block;
     MATRIX<T,2> M=bl.xform.M;
 
-    HASHTABLE<IV2,int> edge_lookup;
-    for(int i=0;i<cb->S.m;i++)
-        edge_lookup.Set(cb->S(i).Sorted(),i);
-
-    for(IV3 v:cb->E)
+    for(int q=0;q<cb->E.m;q++)
     {
+        IV3 v=cb->E(q);
         IV3 dof[2]={v};
         for(int i=0;i<3;i++)
-            dof[1](i)=edge_lookup.Get(v.Remove_Index(i).Sorted());
+            dof[1](i)=cb->element_edges(q)(i).x;
         MATRIX<T,2> F(cb->X(v.y)-cb->X(v.x),cb->X(v.z)-cb->X(v.x));
         T scale=(M*F).Determinant()/120;
 

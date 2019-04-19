@@ -541,6 +541,7 @@ Merge_Canonical_Blocks(CANONICAL_BLOCK<T>* cb0,CON_ID con_id0,XFORM<TV> xf0,
     ARRAY<IV3> E=cb1->E;
     E.Flattened()=index_v_map.Subset(E.Flattened());
     cb->E.Append_Elements(E);
+    cb->Compute_Element_Edges();
 
     return *pr.x;
 }
@@ -1019,6 +1020,27 @@ Regular_Connection_Pair(BLOCK_ID b,CON_ID con_id,bool is_dest) -> const DOF_PAIR
     auto key=std::make_tuple(ref1,con_id1,ref0,con_id);
     auto ref_con_id=regular_connection_hash.Get(key);
     return reference_connection_data(ref_con_id).reg_pairs[is_dest];
+}
+//#####################################################################
+// Function Fill_Element_Tick_Masks
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<T>::
+Fill_Element_Tick_Masks()
+{
+    for(auto& rb:reference_block_data)
+    {
+        const auto* cb=blocks(rb.b).block;
+        for(int i=0;i<cb->E.m;i++)
+        {
+            int m=0;
+            for(int j=0;j<3;j++)
+            {
+                auto p=cb->element_edges(i)(j);
+                m|=(rb.ticks_e(p.x)^p.y)<<j;
+            }
+            rb.ticks_t(i)=m;
+        }
+    }
 }
 template class COMPONENT_LAYOUT_FEM<double>;
 }

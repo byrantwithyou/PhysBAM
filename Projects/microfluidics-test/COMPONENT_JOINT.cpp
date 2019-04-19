@@ -61,6 +61,7 @@ Make_Joint_2(int d,T width,const ARRAY<T>& angles)
             for(int j=it.X0.m;j<cb->X.m;j++) cb->bc_v.Append(j);
             for(int j=it.Last_Diagonal_Edge()+1;j<cb->S.m;j++) cb->bc_e.Append(j);
         }
+        cb->Compute_Element_Edges();
         cc->blocks(CC_BLOCK_ID(it.k))={cb,{},con,{{ic0,d-2-it.k},{ic1,it.k}}};
     }
     cc->irregular_connections(ic0).edge_on.Reverse();
@@ -129,6 +130,7 @@ Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles)
         for(int i=0;it.k==0 && i<it.First_Diagonal_Edge();i++) cb->bc_e.Append(i);
         for(int i=it.X0.m;it.k==it.nseg-1 && i<cb->X.m;i++) cb->bc_v.Append(i);
         for(int i=it.Last_Diagonal_Edge()+1;it.k==it.nseg-1 && i<cb->S.m;i++) cb->bc_e.Append(i);
+        cb->Compute_Element_Edges();
         cc->blocks.Append({cb,{},con,{{index,d-2-it.k},{ick2,it.k}}});
         t1.Append(it.X1(0));
     }
@@ -160,6 +162,7 @@ Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles)
         }
         cb->bc_v={0,it.X0.m-1,it.X0.m,cb->X.m-1};
         cb->bc_e={it.First_Diagonal_Edge(),it.Last_Diagonal_Edge()};
+        cb->Compute_Element_Edges();
         cc->blocks.Append({cb,{},con,{}});
     }
 
@@ -192,6 +195,7 @@ Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles)
     sep_con.Append({CC_BLOCK_ID(offset),CON_ID(0)});
     sep_con.Append({CC_BLOCK_ID(~((k+1)%3)),CON_ID(1)});
     sep_con.Append({CC_BLOCK_ID(~k),CON_ID(1)});
+    sep_cb->Compute_Element_Edges();
     cc->blocks.Append({sep_cb,{},sep_con,{}});
 
     cc->irregular_connections(index).edge_on.Reverse();
@@ -242,6 +246,7 @@ Make_Joint_3_Average(int d,T width,const ARRAY<T>& angles)
         for(int i=0;it.k==0 && i<it.First_Diagonal_Edge();i++) cb->bc_e.Append(i);
         for(int i=it.X0.m;it.k==it.nseg-1 && i<cb->X.m;i++) cb->bc_v.Append(i);
         for(int i=it.Last_Diagonal_Edge()+1;it.k==it.nseg-1 && i<cb->S.m;i++) cb->bc_e.Append(i);
+        cb->Compute_Element_Edges();
         cc->blocks.Append({cb,{},con,{{index,d-2-it.k},{ick2,it.k}}});
         b.Append(it.X1(0));
     }
@@ -278,6 +283,7 @@ Make_Joint_3_Average(int d,T width,const ARRAY<T>& angles)
             &cc->irregular_connections(ick1),con,CON_ID(1));
         for(int i=it.X0.m;it.k==it.nseg-1 && i<cb->X.m;i++) cb->bc_v.Append(i);
         for(int i=it.Last_Diagonal_Edge()+1;it.k==it.nseg-1 && i<cb->S.m;i++) cb->bc_e.Append(i);
+        cb->Compute_Element_Edges();
         cc->blocks.Append({cb,{},con,{{ick,d-2-it.k},{ick1,it.k}}});
     }
     cc->irregular_connections(index).edge_on.Reverse();
@@ -400,6 +406,5 @@ Joint_Connection(int offset,BLOCK_MESHING_ITERATOR<TV>& it,
     if(ic1) ic1->edge_on.Append({self,it.Last_Diagonal_Edge(),it.X0.m-1,cb->X.m-1});
 }
 
-template class COMPONENT_JOINT<float>;
 template class COMPONENT_JOINT<double>;
 }

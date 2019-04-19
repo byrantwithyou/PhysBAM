@@ -57,8 +57,8 @@ Make_Block(int d,T w,T l,bool is_v) -> TRIP
     cb->bc_e.Append(4*(n-1));
     it.first->second.y={0,n};
     it.first->second.z={0,n-1};
+    cb->Compute_Element_Edges();
     return it.first->second;
 }
-template class COMPONENT_BC<float>;
 template class COMPONENT_BC<double>;
 }
