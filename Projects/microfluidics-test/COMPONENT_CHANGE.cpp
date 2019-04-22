@@ -45,7 +45,7 @@ Make_Component(int d0,T w0,int d1,T w1,T l)
     return cc;
 }
 template<class F> // func(a,b) means val(a)<val(b)
-void Cross_Section_Topology(ARRAY<VECTOR<int,3> >& E,ARRAY<VECTOR<int,2> >& S,
+void Cross_Section_Topology(ARRAY<VECTOR<int,3> >& E,ARRAY<VECTOR<int,2> >& S,ARRAY<int>& ticks,
     F func,int n0,int n1,ARRAY<int>& bc_e)
 {
     for(int i=1;i<n0;i++) S.Append({i-1,i});
@@ -71,6 +71,7 @@ void Cross_Section_Topology(ARRAY<VECTOR<int,3> >& E,ARRAY<VECTOR<int,2> >& S,
     }
     bc_e.Append(S.m);
     S.Append({a,b});
+    ticks.Resize(S.m,use_init,0);
 }
 //#####################################################################
 // Function Make_Canonical_Change_Block
@@ -95,7 +96,7 @@ Make_Block(int d0,T w0,int d1,T w1,T l)
     for(int i=0;i<n1;i++)
         cb->X(i+n0)=TV(key.length,key.width[1]/(n1-1)*i-key.width[1]/2);
 
-    Cross_Section_Topology(cb->E,cb->S,
+    Cross_Section_Topology(cb->E,cb->S,cb->ticks,
         [&cb](int a,int b){return cb->X(a).y<=cb->X(b).y;},n0,n1,cb->bc_e);
     cb->bc_v={0,n0-1,n0,n0+n1-1};
 

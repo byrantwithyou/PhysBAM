@@ -46,7 +46,7 @@ Make_Joint_2(int d,T width,const ARRAY<T>& angles)
     for(BLOCK_MESHING_ITERATOR<TV> it(sides.x,sides.y,d-1,target_length);it.Valid();it.Next())
     {
         CANONICAL_BLOCK<T>* cb=new CANONICAL_BLOCK<T>;
-        it.Build(cb->X,cb->E,cb->S);
+        it.Build(cb->X,cb->E,cb->S,cb->ticks);
         ARRAY<CC_BLOCK_CONNECTION,CON_ID> con;
         Joint_Connection(0,it,cb,
             &cc->irregular_connections(ic0),
@@ -121,7 +121,7 @@ Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles)
     for(BLOCK_MESHING_ITERATOR<TV> it(s0,s1,d-1,target_length);it.Valid();it.Next())
     {
         CANONICAL_BLOCK<T>* cb=new CANONICAL_BLOCK<T>;
-        it.Build(cb->X,cb->E,cb->S);
+        it.Build(cb->X,cb->E,cb->S,cb->ticks);
         ARRAY<CC_BLOCK_CONNECTION,CON_ID> con;
         Joint_Connection(0,it,cb,
             &cc->irregular_connections(index),
@@ -143,7 +143,7 @@ Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles)
     for(BLOCK_MESHING_ITERATOR<TV> it(t0,t1,nseg,target_length);it.Valid();it.Next())
     {
         CANONICAL_BLOCK<T>* cb=new CANONICAL_BLOCK<T>;
-        it.Build(cb->X,cb->E,cb->S);
+        it.Build(cb->X,cb->E,cb->S,cb->ticks);
         ARRAY<CC_BLOCK_CONNECTION,CON_ID> con;
         if(it.k==0)
         {
@@ -168,7 +168,12 @@ Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles)
 
     PHYSBAM_ASSERT(sep_cb->X.m==2*d-1);
     sep_cb->S.Resize(2*(4*d-3));
-    for(int j=0;j<sep_cb->X.m-1;j++) sep_cb->S(j)={j,j+1};
+    sep_cb->ticks.Resize(sep_cb->S.m,use_init,-7);
+    for(int j=0;j<sep_cb->X.m-1;j++)
+    {
+        sep_cb->S(j)={j,j+1};
+        sep_cb->ticks(j)=0;
+    }
     sep_cb->cross_sections.Append({{0,sep_cb->X.m},{0,sep_cb->X.m-1},true});
     int s=2*d-1;
     for(int i=0;i<2;i++)
@@ -184,8 +189,13 @@ Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles)
             sep_cb->S(offset_edge+j)={q,q+1};
             sep_cb->S(offset_edge+j+(d-1))={q+1,p};
             sep_cb->S(offset_edge+j+2*(d-1))={p,q};
+
+            sep_cb->ticks(offset_edge+j)=0;
+            sep_cb->ticks(offset_edge+j+(d-1))=0;
+            sep_cb->ticks(offset_edge+j+2*(d-1))=1;
         }
         sep_cb->S(offset_edge+3*(d-1))={offset_x+d-1,offset_x+d-1+i+s};
+        sep_cb->ticks(offset_edge+3*(d-1))=1;
         sep_cb->bc_e.Append_Elements(ARRAY<int>{offset_edge+2*(d-1),offset_edge+3*(d-1)});
         sep_cb->cross_sections.Append({{offset_x+s+i,offset_x+d+s+i},{offset_edge,offset_edge+(d-1)},false});
     }
@@ -237,7 +247,7 @@ Make_Joint_3_Average(int d,T width,const ARRAY<T>& angles)
     for(BLOCK_MESHING_ITERATOR<TV> it(s0,s1,d-1,target_length);it.Valid();it.Next())
     {
         CANONICAL_BLOCK<T>* cb=new CANONICAL_BLOCK<T>;
-        it.Build(cb->X,cb->E,cb->S);
+        it.Build(cb->X,cb->E,cb->S,cb->ticks);
         ARRAY<CC_BLOCK_CONNECTION,CON_ID> con;
         Joint_Connection(0,it,cb,
             &cc->irregular_connections(index),
@@ -265,7 +275,7 @@ Make_Joint_3_Average(int d,T width,const ARRAY<T>& angles)
     for(BLOCK_MESHING_ITERATOR<TV> it(t0,t1,d-1,target_length);it.Valid();it.Next())
     {
         CANONICAL_BLOCK<T>* cb=new CANONICAL_BLOCK<T>;
-        it.Build(cb->X,cb->E,cb->S);
+        it.Build(cb->X,cb->E,cb->S,cb->ticks);
         ARRAY<CC_BLOCK_CONNECTION,CON_ID> con;
         if(it.k==0)
         {

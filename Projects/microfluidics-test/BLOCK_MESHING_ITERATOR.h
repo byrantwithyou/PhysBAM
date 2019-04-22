@@ -43,7 +43,7 @@ struct BLOCK_MESHING_ITERATOR<VECTOR<T,2> >
     int First_Diagonal_Edge() const {return X0.m-1;}
     int Last_Diagonal_Edge() const {return 2*X0.m+X1.m-3;}
 
-    void Build(ARRAY<TV>& X,ARRAY<IV3>& E,ARRAY<IV>& S) const
+    void Build(ARRAY<TV>& X,ARRAY<IV3>& E,ARRAY<IV>& S,ARRAY<int>& ticks) const
     {
         X.Append_Elements(X0);
         X.Append_Elements(X1);
@@ -57,8 +57,10 @@ struct BLOCK_MESHING_ITERATOR<VECTOR<T,2> >
         int n0=X0.m,n1=X1.m;
         E.Resize(n0+n1-2);
         S.Resize(2*(n0+n1-2)+1);
+        ticks.Resize(S.m,use_init,-7);
         int i=0,j=n0,alt=0;
         S(n0-1)=IV(i,j);
+        ticks(n0-1)=0;
         while(i<n0-1 || j<n0+n1-1){
             T a0=0;
             if(i+1<n0) a0=angle(j,i+1,i);
@@ -69,6 +71,8 @@ struct BLOCK_MESHING_ITERATOR<VECTOR<T,2> >
                 E(i+j-n0)=IV3(i+1,i,j);
                 S(i)=IV(i+1,i);
                 S(i+j)=IV(i+1,j);
+                ticks(i)=0;
+                ticks(i+j)=0;
                 i++;
                 alt=1;
             }
@@ -77,6 +81,8 @@ struct BLOCK_MESHING_ITERATOR<VECTOR<T,2> >
                 E(i+j-n0)=IV3(j+1,i,j);
                 S(i+j)=IV(j+1,i);
                 S(n0+n1-2+j)=IV(j+1,j);
+                ticks(i+j)=1;
+                ticks(n0+n1-2+j)=0;
                 j++;
                 alt=0;
             }
