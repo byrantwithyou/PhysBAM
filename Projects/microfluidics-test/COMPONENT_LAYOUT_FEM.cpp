@@ -510,15 +510,21 @@ Merge_Canonical_Blocks(CANONICAL_BLOCK<T>* cb0,CON_ID con_id0,XFORM<TV> xf0,
 
     cb->S=cb0->S;
     cb->S.Resize(num_e_dofs);
+    cb->ticks=cb0->ticks;
+    cb->ticks.Resize(num_e_dofs);
     for(int i=0;i<cb1->S.m;i++)
     {
         int j=index_e_map(i);
         IV s(index_v_map.Subset(cb1->S(i)));
-        s.Sort();
-        if(j>=cb0->S.m) cb->S(j)=s;
+        if(j>=cb0->S.m)
+        {
+            cb->S(j)=s;
+            cb->ticks(j)=cb1->ticks(i);
+        }
         else
         {
             auto s0=cb->S(j);
+            s.Sort();
             s0.Sort();
             assert(s0==s);
         }
@@ -1022,6 +1028,73 @@ Regular_Connection_Pair(BLOCK_ID b,CON_ID con_id,bool is_dest) -> const DOF_PAIR
     return reference_connection_data(ref_con_id).reg_pairs[is_dest];
 }
 //#####################################################################
+// Function Fill_Reference_Ticks
+//#####################################################################
+template<class T> void COMPONENT_LAYOUT_FEM<T>::
+Fill_Reference_Ticks()
+{
+    HASHTABLE<const CANONICAL_BLOCK<T>*,ARRAY<bool> > half_edge_dir; // ccw->false
+    for(const auto& bl:blocks)
+    {
+        const auto* cb=bl.block;
+        auto pr=half_edge_dir.Insert(cb,{});
+        if(!pr.y) continue;
+        auto& ee=*pr.x;
+        ee.Resize(cb->S.m);
+        for(int i=0;i<cb->E.m;i++)
+        {
+            for(int j=0;j<3;j++)
+            {
+                const auto& edge=cb->element_edges(i)(j);
+                ee(edge.x)=edge.y;
+            }
+        }
+    }
+
+    for(auto& rd:reference_block_data)
+        rd.ticks_e=blocks(rd.b).block->ticks;
+
+    for(auto& rd:reference_block_data)
+    {
+        const auto& bl=blocks(rd.b);
+        const auto* cb=bl.block;
+        for(CON_ID cc(0);cc<bl.connections.m;cc++)
+        {
+            const auto& c=bl.connections(cc);
+            if(c.is_regular)
+            {
+                const auto* cb2=blocks(c.id).block;
+                Visit_Regular_Cross_Section_Dofs(cb->cross_sections(cc),
+                    cb2->cross_sections(c.con_id),c.master,
+                    [&](int a,int b,bool o){},
+                    [&](int a,int b,bool o)
+                    {
+                        int ta=rd.ticks_e(a);
+                        int& tb=reference_block_data(blocks(c.id).ref_id).ticks_e(b);
+                        bool ccw_a=half_edge_dir.Get(cb)(a),ccw_b=half_edge_dir.Get(cb2)(b);
+                        if((ccw_a!=ccw_b && ta!=tb) || (ccw_a==ccw_b && ta==tb))
+                            tb=1-tb;
+                    });
+            }
+            else
+            {
+                const auto& ic=irregular_connections(c.irreg_id);
+                Visit_Irregular_Cross_Section_Dofs(blocks,ic,
+                    [&](const IRREGULAR_VISITOR& iv)
+                    {
+                        int& t_reg=rd.ticks_e(iv.re);
+                        int t_irreg=reference_block_data(blocks(iv.b).ref_id).ticks_e(iv.ie);
+                        bool ccw_reg=half_edge_dir.Get(cb)(iv.re),ccw_irreg=half_edge_dir.Get(blocks(iv.b).block)(iv.ie);
+                        if((ccw_reg!=ccw_irreg && t_reg!=t_irreg) || (ccw_reg==ccw_irreg && t_reg==t_irreg))
+                            t_reg=1-t_reg;
+                    });
+            }
+        }
+    }
+
+    Fill_Element_Tick_Masks();
+}
+//#####################################################################
 // Function Fill_Element_Tick_Masks
 //#####################################################################
 template<class T> void COMPONENT_LAYOUT_FEM<T>::
@@ -1029,6 +1102,7 @@ Fill_Element_Tick_Masks()
 {
     for(auto& rb:reference_block_data)
     {
+        rb.ticks_t.Resize(blocks(rb.b).block->E.m);
         const auto* cb=blocks(rb.b).block;
         for(int i=0;i<cb->E.m;i++)
         {

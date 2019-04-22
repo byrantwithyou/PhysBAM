@@ -251,7 +251,7 @@ Visualize_Solution(const BLOCK_VECTOR<T>& U,BLOCK_ID b,bool remap_dofs) const
 // Function Visualize_Ticks
 //#####################################################################
 template<class T> void DEBUGGING_FEM<T>::
-Visualize_Ticks(BLOCK_ID b) const
+Visualize_Ticks(BLOCK_ID b,bool reference_ticks) const
 {
     auto& bl=cl.blocks(b);
     auto* cb=bl.block;
@@ -261,22 +261,23 @@ Visualize_Ticks(BLOCK_ID b) const
     for(int i=0;i<cb->S.m;i++)
         edge_lookup.Set(cb->S(i).Sorted(),i);
 
-    for(auto t:cb->E)
+    const ARRAY<int>& ticks=reference_ticks?cl.reference_block_data(bl.ref_id).ticks_e:cb->ticks;
+    for(int j=0;j<cb->E.m;j++)
     {
+        const auto& t=cb->E(j);
         int check[3]={0,0,0};
         for(int i=0;i<3;i++)
         {
-            int e0=edge_lookup.Get(IV2(t(i),t((i+2)%3)).Sorted());
-            int e1=edge_lookup.Get(IV2(t(i),t((i+1)%3)).Sorted());
+            int e0=cb->element_edges(j)((i+1)%3).x,e1=cb->element_edges(j)((i+2)%3).x;
             TV X=Z(t(i)),X0=Z(t((i+2)%3)),X1=Z(t((i+1)%3));
             TV x0=0.85*X+0.13*X0+0.02*X1,x1=0.85*X+0.02*X0+0.13*X1;
             int cnt=0;
-            if(cb->S(e0)(cb->ticks(e0))==t(i))
+            if(cb->S(e0)(ticks(e0))==t(i))
             {
                 cnt++;
                 Add_Debug_Particle(x0,VECTOR<T,3>(1,0,0));
             }
-            if(cb->S(e1)(cb->ticks(e1))==t(i))
+            if(cb->S(e1)(ticks(e1))==t(i))
             {
                 cnt++;
                 Add_Debug_Particle(x1,VECTOR<T,3>(1,0,0));

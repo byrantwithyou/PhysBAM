@@ -81,7 +81,7 @@ void Run(PARSE_ARGS& parse_args)
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
         {
             debug.Visualize_Block_State(b);
-            debug.Visualize_Ticks(b);
+            debug.Visualize_Ticks(b,false);
         }
         Flush_Frame<TV>("blocks");
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
@@ -131,6 +131,16 @@ void Run(PARSE_ARGS& parse_args)
     CACHED_ELIMINATION_MATRIX<T> cem;
     cem.quiet=quiet;
     cl.Compute_Dof_Pairs();
+    cl.Fill_Reference_Ticks();
+    if(!quiet)
+    {
+        for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+        {
+            debug.Visualize_Block_State(b);
+            debug.Visualize_Ticks(b,true);
+        }
+        Flush_Frame<TV>("ref ticks");
+    }
     mc.Compute_Matrix_Blocks();
     ANALYTIC_FEM<TV>* an=0;
     if(analytic_p.size() && analytic_u.size())

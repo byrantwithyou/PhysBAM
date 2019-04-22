@@ -192,6 +192,7 @@ struct COMPONENT_LAYOUT_FEM
     void Fill_Num_Dofs(DOF_PAIRS& dp,BLOCK_ID d,BLOCK_ID s);
     const DOF_PAIRS& Regular_Connection_Pair(BLOCK_ID b,CON_ID con_id,bool is_dest);
     void Fill_Element_Tick_Masks();
+    void Fill_Reference_Ticks();
     
     // PARSING AND ASSEMBLY
     // L
