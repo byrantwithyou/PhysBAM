@@ -166,7 +166,16 @@ struct DOF_LAYOUT<VECTOR<T,3> >
 };
 
 
-static const int move_order_table[7][3]={}; // TODO
+static const int move_order_table[7][3]=
+{
+    {-7,-7,-7},
+    {1,0,2},
+    {2,1,0},
+    {1,2,0},
+    {0,2,1},
+    {0,1,2},
+    {2,0,1}
+};
 
 template<class TV>
 struct VISIT_ELEMENT_DATA
@@ -185,13 +194,13 @@ void Visit_Elements(const DOF_LAYOUT<VECTOR<T,3> >& dl,F func)
     int m=dl.cb->E.m;
     for(int tri=0;tri<m;tri++)
     {
-        int* move_order=move_order_table[dl.ticks_t(tri)];
+        const int* move_order=move_order_table[dl.ticks_t(tri)];
     
-        VISIT_ELEMENT_DATA<T> vt[3];
+        VISIT_ELEMENT_DATA<TV> vt[3];
         VECTOR<int,3> P=dl.cb->E(tri),S;
-        for(int i=0;i<3;i++) S(i)=dl.cb->element_edges(i).x;
+        for(int i=0;i<3;i++) S(i)=dl.cb->element_edges(tri)(i).x;
     
-        auto fill_vt=[=](auto& keys,VISIT_ELEMENT_DATA<T>& d)
+        auto fill_vt=[=](auto& keys,VISIT_ELEMENT_DATA<TV>& d)
             {
                 d.tri=tri;
                 for(int i=0;i<4;i++)
