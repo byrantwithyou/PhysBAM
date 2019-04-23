@@ -29,6 +29,7 @@ struct DEBUGGING_FEM
     void Check_Analytic_Solution() const;
     void Dump_World_Space_System() const;
     void Dump_World_Space_Vector(const char* name) const;
+    void Visualize_Tetrahedron(BLOCK_ID b) const;
 };
 
 }
