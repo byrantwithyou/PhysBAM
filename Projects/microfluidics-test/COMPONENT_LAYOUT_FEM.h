@@ -88,7 +88,8 @@ struct BOUNDARY_CONDITION
     typedef VECTOR<T,2> TV;
     BLOCK_ID b=BLOCK_ID(-7);
     INTERVAL<int> bc_v,bc_e;
-    ARRAY<TV> data_v,data_e;
+    T flow_rate;
+    TV traction;
     TV normal;
 };
 

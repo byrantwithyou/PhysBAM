@@ -26,6 +26,7 @@ struct MATRIX_CONSTRUCTION_FEM
     MATRIX_CONSTRUCTION_FEM(COMPONENT_LAYOUT_FEM<T>& cl);
     ~MATRIX_CONSTRUCTION_FEM();
     
+    ARRAY<BLOCK_MATRIX<T>,REFERENCE_BLOCK_ID> reference_matrix;
     ARRAY<BLOCK_MATRIX<T>,REFERENCE_BLOCK_ID> diagonal_system_blocks;
     ARRAY<BLOCK_MATRIX<T>,REFERENCE_CONNECTION_ID> regular_system_blocks;
     ARRAY<ARRAY<BLOCK_MATRIX<T>,RID_ID>,REFERENCE_IRREGULAR_ID> irregular_system_blocks;
@@ -36,7 +37,7 @@ struct MATRIX_CONSTRUCTION_FEM
     void Compute_Matrix_Blocks();
     void Compute_RHS();
     void Copy_To_CEM(CACHED_ELIMINATION_MATRIX<T>& cem);
-    void Fill_Canonical_Block_Matrix(BLOCK_MATRIX<T>& mat,const CANONICAL_BLOCK<T>* cb);
+    void Fill_Canonical_Block_Matrix(BLOCK_MATRIX<T>& mat,const REFERENCE_BLOCK_DATA& rb);
     void Fill_Block_Matrix(BLOCK_MATRIX<T>& M,const REFERENCE_BLOCK_DATA& rd);
     void Fill_Connection_Matrix(BLOCK_MATRIX<T>& M,const REFERENCE_CONNECTION_DATA& cd);
     void Fill_Irregular_Connection_Matrix(ARRAY<BLOCK_MATRIX<T>,RID_ID>& M,const REFERENCE_IRREGULAR_DATA& ri);

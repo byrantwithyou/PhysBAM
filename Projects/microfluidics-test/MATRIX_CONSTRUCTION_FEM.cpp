@@ -8,6 +8,7 @@
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include "CACHED_ELIMINATION_MATRIX.h"
 #include "MATRIX_CONSTRUCTION_FEM.h"
+#include "VISITORS_FEM.h"
 namespace PhysBAM{
 //#####################################################################
 // Constructor
@@ -53,48 +54,48 @@ int fem_pres_table[3][12]=
 // Function Fill_Canonical_Block_Matrix
 //#####################################################################
 template<class TV> void MATRIX_CONSTRUCTION_FEM<TV>::
-Fill_Canonical_Block_Matrix(BLOCK_MATRIX<T>& mat,const CANONICAL_BLOCK<T>* cb)
+Fill_Canonical_Block_Matrix(BLOCK_MATRIX<T>& mat,const REFERENCE_BLOCK_DATA& rb)
 {
+    const auto* cb=cl.blocks(rb.b).block;
     mat.nr=mat.nc={cb->X.m,cb->S.m,cb->X.m};
     mat.Resize();
+    
+    DOF_LAYOUT<TV> dl(cl,rb);
+    Visit_Elements(dl,[this,&mat](const VISIT_ELEMENT_DATA<TV>& ve)
+        {
+            int dof[2][ve.e.m];
+            for(int i=0;i<ve.v.m;i++) dof[0][i]=ve.v(i);
+            for(int i=0;i<ve.e.m;i++) dof[1][i]=ve.e(i);
+            MATRIX<T,2> F(ve.X(1)-ve.X(0),ve.X(2)-ve.X(0)),G=F.Inverse();
+            T scale=mu*F.Determinant()/6;
+            T p_scale=F.Determinant()/6;
 
-    for(int q=0;q<cb->E.m;q++)
-    {
-        IV3 v=cb->E(q);
-        IV3 dof[2]={v};
-        for(int i=0;i<3;i++)
-            dof[1](i)=cb->element_edges(q)(i).x;
-        MATRIX<T,2> F(cb->X(v.y)-cb->X(v.x),cb->X(v.z)-cb->X(v.x)),G=F.Inverse();
-        T scale=mu*F.Determinant()/6;
-        T p_scale=F.Determinant()/6;
+            for(int r=0;r<2;r++)
+                for(int s=0;s<2;s++)
+                    for(int i=0;i<3;i++)
+                        for(int j=0;j<3;j++)
+                        {
+                            MATRIX<T,2> M;
+                            for(int a=0;a<2;a++)
+                                for(int b=0;b<2;b++)
+                                    M(a,b)=fem_visc_table[6*a+3*r+i][6*b+3*s+j];
+                            M=scale*G.Transpose_Times(M*G);
+                            mat.Add_uu(dof[r][i],r,dof[s][j],s,M+M.Trace());
+                        }
 
-        for(int r=0;r<2;r++)
             for(int s=0;s<2;s++)
                 for(int i=0;i<3;i++)
                     for(int j=0;j<3;j++)
                     {
-                        MATRIX<T,2> M;
-                        for(int a=0;a<2;a++)
-                            for(int b=0;b<2;b++)
-                                M(a,b)=fem_visc_table[6*a+3*r+i][6*b+3*s+j];
-                        M=scale*G.Transpose_Times(M*G);
-                        mat.Add_uu(dof[r](i),r,dof[s](j),s,M+M.Trace());
+                        TV u;
+                        for(int b=0;b<2;b++)
+                            u(b)=fem_pres_table[i][6*b+3*s+j];
+                        u=-p_scale*G.Transpose_Times(u);
+                        mat.Add_pu(ve.v(i),dof[s][j],s,u);
+                        mat.Add_up(dof[s][j],s,ve.v(i),u);
                     }
-
-        for(int s=0;s<2;s++)
-            for(int i=0;i<3;i++)
-                for(int j=0;j<3;j++)
-                {
-                    TV u;
-                    for(int b=0;b<2;b++)
-                        u(b)=fem_pres_table[i][6*b+3*s+j];
-                    u=-p_scale*G.Transpose_Times(u);
-                    mat.Add_pu(v(i),dof[s](j),s,u);
-                    mat.Add_up(dof[s](j),s,v(i),u);
-                }
-    }
+        });
 }
-
 
 // entry * J / 360
 int fem_u_dot_v_table[6][6]=
@@ -114,26 +115,25 @@ template<class TV> void MATRIX_CONSTRUCTION_FEM<TV>::
 Times_U_Dot_V(BLOCK_ID b,BLOCK_VECTOR<T>& w,const BLOCK_VECTOR<T>& u) const
 {
     const auto& bl=cl.blocks(b);
-    const auto* cb=bl.block;
     MATRIX<T,2> M=bl.xform.M;
 
-    for(int q=0;q<cb->E.m;q++)
-    {
-        IV3 v=cb->E(q);
-        IV3 dof[2]={v};
-        for(int i=0;i<3;i++)
-            dof[1](i)=cb->element_edges(q)(i).x;
-        MATRIX<T,2> F(cb->X(v.y)-cb->X(v.x),cb->X(v.z)-cb->X(v.x));
-        T scale=(M*F).Determinant()/360;
+    DOF_LAYOUT<TV> dl(cl,cl.reference_block_data(bl.ref_id));
+    Visit_Elements(dl,[this,M,&u,&w](const VISIT_ELEMENT_DATA<TV>& ve)
+        {
+            int dof[2][ve.e.m];
+            for(int i=0;i<ve.v.m;i++) dof[0][i]=ve.v(i);
+            for(int i=0;i<ve.e.m;i++) dof[1][i]=ve.e(i);
+            MATRIX<T,2> F(ve.X(1)-ve.X(0),ve.X(2)-ve.X(0)),G=F.Inverse();
+            T scale=(M*F).Determinant()/360;
 
-        VECTOR<TV,6> r,s;
-        for(int a=0;a<2;a++) for(int i=0;i<3;i++) r(i+3*a)=u.Get_u(dof[a](i),a);
-        for(int i=0;i<6;i++)
-            for(int j=0;j<6;j++)
-                s(i)+=r(j)*fem_u_dot_v_table[i][j];
-        s*=scale;
-        for(int a=0;a<2;a++) for(int i=0;i<3;i++) w.Add_u(dof[a](i),a,s(i+3*a));
-    }
+            VECTOR<TV,6> r,s;
+            for(int a=0;a<2;a++) for(int i=0;i<3;i++) r(i+3*a)=u.Get_u(dof[a][i],a);
+            for(int i=0;i<6;i++)
+                for(int j=0;j<6;j++)
+                    s(i)+=r(j)*fem_u_dot_v_table[i][j];
+            s*=scale;
+            for(int a=0;a<2;a++) for(int i=0;i<3;i++) w.Add_u(dof[a][i],a,s(i+3*a));
+        });
 }
 
 int fem_p_u_table[3][6]=
@@ -150,28 +150,27 @@ template<class TV> void MATRIX_CONSTRUCTION_FEM<TV>::
 Times_P_U(BLOCK_ID b,BLOCK_VECTOR<T>& w,const ARRAY<T>& div_v,const ARRAY<T>& div_e) const
 {
     const auto& bl=cl.blocks(b);
-    const auto* cb=bl.block;
     MATRIX<T,2> M=bl.xform.M;
 
-    for(int q=0;q<cb->E.m;q++)
-    {
-        IV3 v=cb->E(q);
-        IV3 dof[2]={v};
-        for(int i=0;i<3;i++)
-            dof[1](i)=cb->element_edges(q)(i).x;
-        MATRIX<T,2> F(cb->X(v.y)-cb->X(v.x),cb->X(v.z)-cb->X(v.x));
-        T scale=(M*F).Determinant()/120;
+    DOF_LAYOUT<TV> dl(cl,cl.reference_block_data(bl.ref_id));
+    Visit_Elements(dl,[this,M,&w,&div_v,&div_e](const VISIT_ELEMENT_DATA<TV>& ve)
+        {
+            int dof[2][ve.e.m];
+            for(int i=0;i<ve.v.m;i++) dof[0][i]=ve.v(i);
+            for(int i=0;i<ve.e.m;i++) dof[1][i]=ve.e(i);
+            MATRIX<T,2> F(ve.X(1)-ve.X(0),ve.X(2)-ve.X(0)),G=F.Inverse();
+            T scale=(M*F).Determinant()/120;
 
-        VECTOR<T,6> r;
-        VECTOR<T,3> s;
-        for(int i=0;i<3;i++) r(i)=div_v(dof[0](i));
-        for(int i=0;i<3;i++) r(i+3)=div_e(dof[1](i));
-        for(int i=0;i<3;i++)
-            for(int j=0;j<6;j++)
-                s(i)+=r(j)*fem_p_u_table[i][j];
-        s*=scale;
-        for(int i=0;i<3;i++) w.Add_p(v(i),s(i));
-    }
+            VECTOR<T,6> r;
+            VECTOR<T,3> s;
+            for(int i=0;i<3;i++) r(i)=div_v(dof[0][i]);
+            for(int i=0;i<3;i++) r(i+3)=div_e(dof[1][i]);
+            for(int i=0;i<3;i++)
+                for(int j=0;j<6;j++)
+                    s(i)+=r(j)*fem_p_u_table[i][j];
+            s*=scale;
+            for(int i=0;i<3;i++) w.Add_p(ve.v(i),s(i));
+        });
 }
 
 int fem_line_int_u_dot_v_table[3][3] = {{4, -1, 2}, {-1, 4, 2}, {2, 2, 16}};
@@ -183,21 +182,21 @@ template<class TV> void MATRIX_CONSTRUCTION_FEM<TV>::
 Times_Line_Integral_U_Dot_V(BLOCK_ID b,INTERVAL<int> bc_e,BLOCK_VECTOR<T>& w,const BLOCK_VECTOR<T>& u) const
 {
     const auto& bl=cl.blocks(b);
-    const auto* cb=bl.block;
     MATRIX<T,2> M=bl.xform.M;
-    for(int e:bc_e)
-    {
-        VECTOR<TV,3> r(u.Get_v(cb->S(e).x),u.Get_v(cb->S(e).y),u.Get_e(e)),s;
-        for(int i=0;i<3;i++)
-            for(int j=0;j<3;j++)
-                s(i)+=r(j)*fem_line_int_u_dot_v_table[i][j];
 
-        VECTOR<TV,2> X(cb->X.Subset(cb->S(e)));
-        T scale=(M*(X.x-X.y)).Magnitude()/30;
-        w.Add_v(cb->S(e).x,s.x*scale);
-        w.Add_v(cb->S(e).y,s.y*scale);
-        w.Add_e(e,s.z*scale);
-    }
+    DOF_LAYOUT<TV> dl(cl,cl.reference_block_data(bl.ref_id));
+    Visit_Faces(dl,bc_e,[this,&u,&w,M](const VISIT_FACE_DATA<TV>& vf)
+        {
+            VECTOR<TV,3> r(u.Get_v(vf.v(0)),u.Get_v(vf.v(1)),u.Get_e(vf.e(0))),s;
+            for(int i=0;i<3;i++)
+                for(int j=0;j<3;j++)
+                    s(i)+=r(j)*fem_line_int_u_dot_v_table[i][j];
+
+            T scale=(M*(vf.X.x-vf.X.y)).Magnitude()/30;
+            w.Add_v(vf.v(0),s.x*scale);
+            w.Add_v(vf.v(1),s.y*scale);
+            w.Add_e(vf.e(0),s.z*scale);
+        });
 }
 
 //#####################################################################
@@ -361,10 +360,20 @@ Fill_Irregular_Connection_Matrix(ARRAY<BLOCK_MATRIX<T>,RID_ID>& M,const REFERENC
 template<class TV> void MATRIX_CONSTRUCTION_FEM<TV>::
 Compute_Matrix_Blocks()
 {
-    for(auto& bl:cl.blocks)
+    if(TV::m==3) reference_matrix.Resize(cl.reference_block_data.m);
+    for(REFERENCE_BLOCK_ID i(0);i<cl.reference_block_data.m;i++)
     {
-        auto pr=canonical_block_matrices.Insert(bl.block,{});
-        if(pr.y) Fill_Canonical_Block_Matrix(*pr.x,bl.block);
+        auto& rd=cl.reference_block_data(i);
+        auto& bl=cl.blocks(rd.b);
+        if(TV::m==2)
+        {
+            auto pr=canonical_block_matrices.Insert(bl.block,{});
+            if(pr.y) Fill_Canonical_Block_Matrix(*pr.x,rd);
+        }
+        else
+        {
+            Fill_Canonical_Block_Matrix(reference_matrix(i),rd);
+        }
     }
 
     diagonal_system_blocks.Resize(cl.reference_block_data.m);
@@ -410,8 +419,20 @@ Compute_RHS()
         Init_Block_Vector(w,cb);
         Init_Block_Vector(u,cb);
 
-        for(int i=0;i<bc.bc_v.Size();i++) u.Add_v(bc.bc_v.min_corner+i,M*bc.data_v(i));
-        for(int i=0;i<bc.bc_e.Size();i++) u.Add_e(bc.bc_e.min_corner+i,M*bc.data_e(i));
+        DOF_LAYOUT<TV> dl(cl,cl.reference_block_data(bl.ref_id));
+        TV A=dl.cb->X(bc.bc_v.min_corner);
+        TV B=dl.cb->X(bc.bc_v.max_corner-1);
+        T width=(B-A).Magnitude();
+        T k=bc.flow_rate*6/width;
+        Visit_Wall_Dofs(dl,bc.bc_v,bc.bc_e,[k,&u,&bc](int v,const TV&,const VECTOR<T,TV::m-1>& uv)
+            {
+                T z=(uv*((T)1-uv)).Product();
+                u.Add_v(v,-k*z*bc.normal);
+            },[k,&u,&bc](int e,const TV&,const VECTOR<T,TV::m-1>& uv)
+            {
+                T z=(uv*((T)1-uv)).Product();
+                u.Add_e(e,-k*z*bc.normal);
+            });
         w.V=canonical_block_matrices.Get(bl.block).M*-u.V;
         w.Transform(bl.xform.M,1);
         Apply_To_RHS(bc.b,w);
@@ -426,8 +447,15 @@ Compute_RHS()
         BLOCK_VECTOR<T> w,u;
         Init_Block_Vector(w,cb);
         Init_Block_Vector(u,cb);
-        for(int i=0;i<bc.bc_v.Size();i++) u.Add_v(bc.bc_v.min_corner+i,M*bc.data_v(i));
-        for(int i=0;i<bc.bc_e.Size();i++) u.Add_e(bc.bc_e.min_corner+i,M*bc.data_e(i));
+        DOF_LAYOUT<TV> dl(cl,cl.reference_block_data(bl.ref_id));
+        TV tr=M*bc.traction;
+        Visit_Wall_Dofs(dl,bc.bc_v,bc.bc_e,[tr,&u](int v,const TV&,const VECTOR<T,TV::m-1>& uv)
+            {
+                u.Add_v(v,tr);
+            },[tr,&u](int e,const TV&,const VECTOR<T,TV::m-1>& uv)
+            {
+                u.Add_e(e,tr);
+            });
         Times_Line_Integral_U_Dot_V(bc.b,bc.bc_e,w,u);
         w.Transform(bl.xform.M,1);
         Apply_To_RHS(bc.b,w);

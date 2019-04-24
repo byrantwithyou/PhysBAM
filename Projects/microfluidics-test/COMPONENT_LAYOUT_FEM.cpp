@@ -224,37 +224,21 @@ Parse_Input(const std::string& pipe_file)
                     TV dir=(B-A).Normalized();
                     TV C=A+dir*len;
                     auto pr=comp_bc.Make_Block(cs.x,cs.y,len,c=='u');
-                    CANONICAL_BLOCK<T>* cb=pr.x;
 
                     BLOCK_ID b=blocks.Append({pr.x,{Compute_Xform(dir),A},{BLOCK_ID(-1)}});
                     VERTEX_DATA vd={C,{b,CON_ID()}};
                     connection_points.Set(name4,vd);
 
                     BOUNDARY_CONDITION<T> bc={b,pr.y,pr.z,{},{},-dir};
-                    bc.data_v.Resize(bc.bc_v.Size());
-                    bc.data_e.Resize(bc.bc_e.Size());
 
                     if(c=='u')
                     {
-                        T y0=cb->X(bc.bc_v.min_corner).y;
-                        T y1=cb->X(bc.bc_v.max_corner-1).y;
-                        T a=6*t0/cube(y1-y0);
-                        for(int i:bc.bc_v)
-                        {
-                            T y=cb->X(i).y;
-                            bc.data_v(i)=a*(y-y0)*(y1-y)*dir;
-                        }
-                        for(int i:bc.bc_e)
-                        {
-                            T y=cb->X.Subset(cb->S(i)).Sum().y/2;
-                            bc.data_e(i)=a*(y-y0)*(y1-y)*dir;
-                        }
+                        bc.flow_rate=t0;
                         bc_v.Append(bc);
                     }
                     else
                     {
-                        bc.data_v.Fill(v0);
-                        bc.data_e.Fill(v0);
+                        bc.traction=v0;
                         bc_t.Append(bc);
                     }
                 }

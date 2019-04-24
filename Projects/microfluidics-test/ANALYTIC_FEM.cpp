@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include "ANALYTIC_FEM.h"
+#include "VISITORS_FEM.h"
 namespace PhysBAM{
 //#####################################################################
 // Constructor
@@ -137,16 +138,14 @@ Compute_RHS()
         mc.Init_Block_Vector(w,cb);
         mc.Init_Block_Vector(u,cb);
 
-        for(auto i:bc.bc_v)
-        {
-            TV Z=bl.xform*cb->X(i);
-            u.Add_v(i,M*Traction(bc.normal,Z));
-        }
-        for(auto i:bc.bc_e)
-        {
-            TV Z=bl.xform*cb->X.Subset(cb->S(i)).Average();
-            u.Add_e(i,M*Traction(bc.normal,Z));
-        }
+        DOF_LAYOUT<TV> dl(mc.cl,mc.cl.reference_block_data(bl.ref_id));
+        Visit_Wall_Dofs(dl,bc.bc_v,bc.bc_e,[M,&u,&bc,&bl,this](int v,const TV& X,const VECTOR<T,TV::m-1>&)
+            {
+                u.Add_v(v,M*Traction(bc.normal,bl.xform*X));
+            },[M,&u,&bc,&bl,this](int e,const TV& X,const VECTOR<T,TV::m-1>&)
+            {
+                u.Add_e(e,M*Traction(bc.normal,bl.xform*X));
+            });
         mc.Times_Line_Integral_U_Dot_V(bc.b,bc.bc_e,w,u);
         w.Transform(bl.xform.M,1);
         mc.Apply_To_RHS(bc.b,w);

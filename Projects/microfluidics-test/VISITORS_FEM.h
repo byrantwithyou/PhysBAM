@@ -188,6 +188,24 @@ struct VISIT_ELEMENT_DATA
 
 // func(const VISIT_ELEMENT_DATA<T>& vt);
 template<class T,class F>
+void Visit_Elements(const DOF_LAYOUT<VECTOR<T,2> >& dl,F func)
+{
+    typedef VECTOR<T,2> TV;
+    int m=dl.cb->E.m;
+    for(int tri=0;tri<m;tri++)
+    {
+        VISIT_ELEMENT_DATA<TV> vt;
+        vt.tri=tri;
+        vt.v=dl.cb->E(tri);
+        for(int i=0;i<3;i++)
+            vt.e(i)=dl.cb->element_edges(tri)(i).x;
+        vt.X={dl.cb->X(vt.v(0)),dl.cb->X(vt.v(1)),dl.cb->X(vt.v(2))};
+        func(vt);
+    }
+}
+        
+// func(const VISIT_ELEMENT_DATA<T>& vt);
+template<class T,class F>
 void Visit_Elements(const DOF_LAYOUT<VECTOR<T,3> >& dl,F func)
 {
     typedef VECTOR<T,3> TV;
@@ -247,18 +265,34 @@ struct VISIT_FACE_DATA
 {
     int edge; // template edge (2D)
     VECTOR<int,TV::m> v; // vertex dofs (3D)
-    VECTOR<int,2*TV::m-1> e; // edge dofs (3D)
+    VECTOR<int,2*TV::m-3> e; // edge dofs (3D)
     VECTOR<TV,TV::m> X;
 };
 
 // func(const VISIT_FACE_DATA<T>& vt)
 template<class T,class F>
-void Visit_Faces(const DOF_LAYOUT<VECTOR<T,3> >& dl,F func)
+void Visit_Faces(const DOF_LAYOUT<VECTOR<T,2> >& dl,INTERVAL<int> bc_e,F func)
+{
+    typedef VECTOR<T,2> TV;
+
+    for(int edge:bc_e)
+    {
+        VISIT_FACE_DATA<TV> vt;
+        vt.edge=edge;
+        vt.v=dl.cb->S(edge);
+        vt.e(0)=edge;
+        vt.X={dl.cb->X(vt.v(0)),dl.cb->X(vt.v(1))};
+        func(vt);
+    }
+}
+
+// func(const VISIT_FACE_DATA<T>& vt)
+template<class T,class F>
+void Visit_Faces(const DOF_LAYOUT<VECTOR<T,3> >& dl,INTERVAL<int> bc_e,F func)
 {
     typedef VECTOR<T,3> TV;
 
-    int m=dl.cb->S.m;
-    for(int edge=0;edge<m;edge++)
+    for(int edge:bc_e)
     {
         VECTOR<int,2> P=dl.cb->S(edge);
         if(dl.ticks_e(edge)) std::swap(P.x,P.y);
@@ -285,6 +319,76 @@ void Visit_Faces(const DOF_LAYOUT<VECTOR<T,3> >& dl,F func)
                 vt[i].e+=1;
                 vt[i].X+=TV(0,0,dl.dz);
             }
+    }
+}
+
+// fv(int v,const TV& X,VECTOR<T,1>(u)); u=[0,1]
+// fe(int e,const TV& X,VECTOR<T,1>(u)); u=[0,1]
+template<class T,class FV,class FE>
+void Visit_Wall_Dofs(const DOF_LAYOUT<VECTOR<T,2> >& dl,INTERVAL<int> bc_v,INTERVAL<int> bc_e,FV fv,FE fe)
+{
+    typedef VECTOR<T,2> TV;
+
+    TV A=dl.cb->X(bc_v.min_corner);
+    TV u=dl.cb->X(bc_v.max_corner-1)-A;
+    u/=u.Magnitude_Squared();
+    
+    for(int v:bc_v)
+    {
+        TV X=dl.cb->X(v);
+        fv(v,X,VECTOR<T,1>((X-A).Dot(u)));
+    }
+    for(int e:bc_e)
+    {
+        TV X=dl.cb->X.Subset(dl.cb->S(e)).Sum()/2;
+        fe(e,X,VECTOR<T,1>((X-A).Dot(u)));
+    }
+}
+
+// fv(int v,const TV& X,VECTOR<T,2>(u,z)); u=[0,1], z=[0,1]
+// fe(int e,const TV& X,VECTOR<T,2>(u,z)); u=[0,1], z=[0,1]
+template<class T,class FV,class FE>
+void Visit_Wall_Dofs(const DOF_LAYOUT<VECTOR<T,3> >& dl,INTERVAL<int> bc_v,INTERVAL<int> bc_e,FV fv,FE fe)
+{
+    typedef VECTOR<T,3> TV;
+
+    TV A=dl.cb->X(bc_v.min_corner);
+    TV u=dl.cb->X(bc_v.max_corner-1)-A;
+    u/=u.Magnitude_Squared();
+    
+    for(int v:bc_v)
+    {
+        TV X=dl.cb->X(v);
+        T y=(X-A).Dot(u);
+        int v0=dl.Vertex(v,0);
+        int e0=dl.Edge_v(v,0);
+        for(int i=0;i<dl.nl+1;i++)
+        {
+            T a=(T)i/dl.nl;
+            fv(v0+i,X.Append(a*dl.dz),VECTOR<T,2>(y,a));
+        }
+        for(int i=0;i<dl.nl;i++)
+        {
+            T a=(i+(T).5)/dl.nl;
+            fv(e0+i,X.Append(a*dl.dz),VECTOR<T,2>(y,a));
+        }
+    }
+    for(int e:bc_e)
+    {
+        TV X=dl.cb->X.Subset(dl.cb->S(e)).Sum()/2;
+        T y=(X-A).Dot(u);
+        int e0=dl.Edge_h(e,0);
+        int e1=dl.Edge_d(e,0);
+        for(int i=0;i<dl.nl+1;i++)
+        {
+            T a=(T)i/dl.nl;
+            fe(e0+i,X.Append(a*dl.dz),VECTOR<T,2>(y,a));
+        }
+        for(int i=0;i<dl.nl;i++)
+        {
+            T a=(i+(T).5)/dl.nl;
+            fe(e1+i,X.Append(a*dl.dz),VECTOR<T,2>(y,a));
+        }
     }
 }
 
