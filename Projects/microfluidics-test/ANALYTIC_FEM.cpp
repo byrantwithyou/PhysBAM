@@ -25,10 +25,10 @@ template<class TV> ANALYTIC_FEM<TV>::
 //#####################################################################
 // Function Check_Analytic_Solution
 //#####################################################################
-template<class TV> void ANALYTIC_FEM<TV>::
+template<class TV> bool ANALYTIC_FEM<TV>::
 Check_Analytic_Solution() const
 {
-    if(!analytic_velocity || !analytic_pressure) return;
+    if(!analytic_velocity || !analytic_pressure) return false;
     T m=mc.cl.unit_m,s=mc.cl.unit_s,kg=mc.cl.unit_kg;
     T max_u=0,max_p=0;
     T l2_u=0,l2_p=0;
@@ -76,6 +76,7 @@ Check_Analytic_Solution() const
     if(num_u) l2_u=sqrt(l2_u/num_u);
     if(num_p) l2_p=sqrt(l2_p/num_p);
     LOG::printf("u l-inf %P   u l-2 %P   p l-inf %P   p l-2 %P\n",max_u,l2_u,max_p,l2_p);
+    return max(max_u,l2_u,max_p,l2_p)<1e-10;
 }
 //#####################################################################
 // Function Compute_RHS
