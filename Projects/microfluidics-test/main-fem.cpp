@@ -18,6 +18,7 @@
 #include "COMPONENT_LAYOUT_FEM.h"
 #include "DEBUGGING_FEM.h"
 #include "ELIMINATION_FEM.h"
+#include "LAYOUT_BUILDER_FEM.h"
 #include "MATRIX_CONSTRUCTION_FEM.h"
 #include <chrono>
 
@@ -61,12 +62,11 @@ void Run(PARSE_ARGS& parse_args)
     timer("args");
 
     COMPONENT_LAYOUT_FEM<T> cl;
-    // A
     cl.unit_m=m;
     cl.unit_s=s;
     cl.unit_kg=kg;
-//    cl.mu=mu*kg/s;
-    cl.Parse_Input(pipe_file);
+    LAYOUT_BUILDER_FEM<T> builder(cl);
+    builder.From_File(pipe_file);
 
     timer("parse input");
 

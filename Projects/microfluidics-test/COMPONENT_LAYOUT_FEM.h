@@ -194,23 +194,6 @@ struct COMPONENT_LAYOUT_FEM
     const DOF_PAIRS& Regular_Connection_Pair(BLOCK_ID b,CON_ID con_id,bool is_dest);
     void Fill_Element_Tick_Masks();
     void Fill_Reference_Ticks();
-    
-    // PARSING AND ASSEMBLY
-    // L
-
-    void Parse_Input(const std::string& pipe_file);
-    MATRIX<T,2> Compute_Xform(const TV& dir); // dir is normalized
-
-    struct VERTEX_DATA
-    {
-        TV X;
-        BLOCK_CONNECTION con;
-    };
-
-    // L
-    void Emit_Component_Blocks(const CANONICAL_COMPONENT<T>* cc,const XFORM<TV>& xf,ARRAY<VERTEX_DATA>& vd);
-    void Set_Connector(VERTEX_DATA& vd,BLOCK_ID id,CON_ID con_id);
-
 
     // OTHER
 
