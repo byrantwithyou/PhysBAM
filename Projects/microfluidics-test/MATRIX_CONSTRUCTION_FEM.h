@@ -43,7 +43,7 @@ struct MATRIX_CONSTRUCTION_FEM
     void Fill_Irregular_Connection_Matrix(ARRAY<BLOCK_MATRIX<T>,RID_ID>& M,const REFERENCE_IRREGULAR_DATA& ri);
     void Copy_Matrix_Data(BLOCK_MATRIX<T>& A,BLOCK_ID b,
         const DOF_PAIRS& dpa,const DOF_PAIRS& dpb,BLOCK_ID ar,BLOCK_ID ac) const;
-    void Copy_Vector_Data(const BLOCK_VECTOR<T>& B,BLOCK_ID b,const DOF_PAIRS& dp);
+    void Copy_Vector_Data(const BLOCK_VECTOR<T>& B,BLOCK_ID a,BLOCK_ID b,const DOF_PAIRS& dp);
     void Init_Block_Matrix(BLOCK_MATRIX<T>& M,BLOCK_ID a,BLOCK_ID b) const;
     void Init_Block_Vector(BLOCK_VECTOR<T>& M,BLOCK_ID b) const;
     void Init_Block_Vector(BLOCK_VECTOR<T>& M,const CANONICAL_BLOCK<T>* cb) const;

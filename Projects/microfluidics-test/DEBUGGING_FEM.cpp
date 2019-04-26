@@ -368,7 +368,6 @@ Visualize_Tetrahedron(BLOCK_ID b) const
         }
     }
 
-    const auto* cb=cl.blocks(b).block;
     const auto& rb=cl.reference_block_data(cl.blocks(b).ref_id);
     auto Z=[=](const TV& X)
     {
@@ -376,7 +375,7 @@ Visualize_Tetrahedron(BLOCK_ID b) const
         MATRIX<T,3> M(m.Column(0).Append(0),m.Column(1).Append(0),TV(0,0,1));
         return M*X+cl.blocks(b).xform.b.Append(0);
     };
-    DOF_LAYOUT<TV> dl(cl,rb,cb->S.m,false);
+    DOF_LAYOUT<TV> dl(cl,rb,false);
     Visit_Elements(dl,[Z](const VISIT_ELEMENT_DATA<TV>& vt)
     {
         VECTOR<TV,4> P;

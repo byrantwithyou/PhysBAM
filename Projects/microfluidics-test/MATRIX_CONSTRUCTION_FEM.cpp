@@ -60,7 +60,7 @@ Fill_Canonical_Block_Matrix(BLOCK_MATRIX<T>& mat,const REFERENCE_BLOCK_DATA& rb)
     mat.nr=mat.nc={cb->X.m,cb->S.m,cb->X.m};
     mat.Resize();
     
-    DOF_LAYOUT<TV> dl(cl,rb);
+    DOF_LAYOUT<TV> dl(cl,rb,false);
     Visit_Elements(dl,[this,&mat](const VISIT_ELEMENT_DATA<TV>& ve)
         {
             int dof[2][ve.e.m];
@@ -117,7 +117,7 @@ Times_U_Dot_V(BLOCK_ID b,BLOCK_VECTOR<T>& w,const BLOCK_VECTOR<T>& u) const
     const auto& bl=cl.blocks(b);
     MATRIX<T,2> M=bl.xform.M;
 
-    DOF_LAYOUT<TV> dl(cl,cl.reference_block_data(bl.ref_id));
+    DOF_LAYOUT<TV> dl(cl,cl.reference_block_data(bl.ref_id),false);
     Visit_Elements(dl,[this,M,&u,&w](const VISIT_ELEMENT_DATA<TV>& ve)
         {
             int dof[2][ve.e.m];
@@ -152,7 +152,7 @@ Times_P_U(BLOCK_ID b,BLOCK_VECTOR<T>& w,const ARRAY<T>& div_v,const ARRAY<T>& di
     const auto& bl=cl.blocks(b);
     MATRIX<T,2> M=bl.xform.M;
 
-    DOF_LAYOUT<TV> dl(cl,cl.reference_block_data(bl.ref_id));
+    DOF_LAYOUT<TV> dl(cl,cl.reference_block_data(bl.ref_id),false);
     Visit_Elements(dl,[this,M,&w,&div_v,&div_e](const VISIT_ELEMENT_DATA<TV>& ve)
         {
             int dof[2][ve.e.m];
@@ -184,7 +184,7 @@ Times_Line_Integral_U_Dot_V(BLOCK_ID b,INTERVAL<int> bc_e,BLOCK_VECTOR<T>& w,con
     const auto& bl=cl.blocks(b);
     MATRIX<T,2> M=bl.xform.M;
 
-    DOF_LAYOUT<TV> dl(cl,cl.reference_block_data(bl.ref_id));
+    DOF_LAYOUT<TV> dl(cl,cl.reference_block_data(bl.ref_id),false);
     Visit_Faces(dl,bc_e,[this,&u,&w,M](const VISIT_FACE_DATA<TV>& vf)
         {
             VECTOR<TV,3> r(u.Get_v(vf.v(0)),u.Get_v(vf.v(1)),u.Get_e(vf.e(0))),s;
@@ -219,43 +219,56 @@ Copy_Matrix_Data(BLOCK_MATRIX<T>& A,BLOCK_ID b,
     PHYSBAM_ASSERT(B.nr==dpa.num_dofs_s);
     PHYSBAM_ASSERT(A.nc==dpb.num_dofs_d);
     PHYSBAM_ASSERT(B.nc==dpb.num_dofs_s);
-    for(auto p:dpa.v)
-    {
-        for(auto r:dpb.v) A.Add_vv(p.x,r.x,Ma.Transpose_Times(B.Get_vv(p.y,r.y)*Mb));
-        for(auto r:dpb.e) A.Add_ve(p.x,r.x,Ma.Transpose_Times(B.Get_ve(p.y,r.y)*Mb));
-        for(auto r:dpb.p) A.Add_vp(p.x,r.x,Ma.Transpose_Times(B.Get_vp(p.y,r.y)*sb));
-    }
-    for(auto p:dpa.e)
-    {
-        for(auto r:dpb.v) A.Add_ev(p.x,r.x,Ma.Transpose_Times(B.Get_ev(p.y,r.y)*Mb));
-        for(auto r:dpb.e) A.Add_ee(p.x,r.x,Ma.Transpose_Times(B.Get_ee(p.y,r.y)*Mb));
-        for(auto r:dpb.p) A.Add_ep(p.x,r.x,Ma.Transpose_Times(B.Get_ep(p.y,r.y)*sb));
-    }
-    for(auto p:dpa.p)
-    {
-        for(auto r:dpb.v) A.Add_pv(p.x,r.x,Mb.Transpose_Times(B.Get_pv(p.y,r.y)*sa));
-        for(auto r:dpb.e) A.Add_pe(p.x,r.x,Mb.Transpose_Times(B.Get_pe(p.y,r.y)*sa));
-    }
+
+    DOF_LAYOUT<TV> dl0a(cl,cl.reference_block_data(cl.blocks(ar).ref_id),true);
+    DOF_LAYOUT<TV> dl1a(cl,cl.reference_block_data(cl.blocks(b).ref_id),false);
+    DOF_LAYOUT<TV> dl0b(cl,cl.reference_block_data(cl.blocks(ac).ref_id),true);
+    DOF_LAYOUT<TV> dl1b(cl,cl.reference_block_data(cl.blocks(b).ref_id),false);
+    Visit_Dof_Pairs(dl0a,dl1a,dpa,
+        [=,&dl0b,&dl1b,&dpb,&A,&B](int dr,int sr)
+        {
+            Visit_Dof_Pairs(dl0b,dl1b,dpb,
+                [=,&A,&B](int dc,int sc){A.Add_vv(dr,dc,Ma.Transpose_Times(B.Get_vv(sr,sc)*Mb));},
+                [=,&A,&B](int dc,int sc){A.Add_ve(dr,dc,Ma.Transpose_Times(B.Get_ve(sr,sc)*Mb));},
+                [=,&A,&B](int dc,int sc){A.Add_vp(dr,dc,Ma.Transpose_Times(B.Get_vp(sr,sc)*sb));});
+        },
+        [=,&dl0b,&dl1b,&dpb,&A,&B](int dr,int sr)
+        {
+            Visit_Dof_Pairs(dl0b,dl1b,dpb,
+                [=,&A,&B](int dc,int sc){A.Add_ev(dr,dc,Ma.Transpose_Times(B.Get_ev(sr,sc)*Mb));},
+                [=,&A,&B](int dc,int sc){A.Add_ee(dr,dc,Ma.Transpose_Times(B.Get_ee(sr,sc)*Mb));},
+                [=,&A,&B](int dc,int sc){A.Add_ep(dr,dc,Ma.Transpose_Times(B.Get_ep(sr,sc)*sb));});
+        },
+        [=,&dl0b,&dl1b,&dpb,&A,&B](int dr,int sr)
+        {
+            Visit_Dof_Pairs(dl0b,dl1b,dpb,
+                [=,&A,&B](int dc,int sc){A.Add_pv(dr,dc,Mb.Transpose_Times(B.Get_pv(sr,sc)*sa));},
+                [=,&A,&B](int dc,int sc){A.Add_pe(dr,dc,Mb.Transpose_Times(B.Get_pe(sr,sc)*sa));},
+                [=,&A,&B](int dc,int sc){});
+        });
 }
 //#####################################################################
 // Function Copy_Vector_Data
 //#####################################################################
 // Input B should be in world space
 template<class TV> void MATRIX_CONSTRUCTION_FEM<TV>::
-Copy_Vector_Data(const BLOCK_VECTOR<T>& B,BLOCK_ID b,const DOF_PAIRS& dp)
+Copy_Vector_Data(const BLOCK_VECTOR<T>& B,BLOCK_ID a,BLOCK_ID b,const DOF_PAIRS& dp)
 {
     BLOCK_VECTOR<T>& A=rhs_block_list(b);
     if(!A.V.m) Init_Block_Vector(A,b);
 
     MATRIX<T,2> M=cl.blocks(b).xform.M;
-    T s=1/sqrt(M.Determinant());
-    M*=s;
+    T r=1/sqrt(M.Determinant());
+    M*=r;
 
     PHYSBAM_ASSERT(A.n==dp.num_dofs_d);
     PHYSBAM_ASSERT(B.n==dp.num_dofs_s);
-    for(auto p:dp.v) A.Add_v(p.x,M.Transpose_Times(B.Get_v(p.y)));
-    for(auto p:dp.e) A.Add_e(p.x,M.Transpose_Times(B.Get_e(p.y)));
-    for(auto p:dp.p) A.Add_p(p.x,s*B.Get_p(p.y));
+    DOF_LAYOUT<TV> dl0(cl,cl.reference_block_data(cl.blocks(b).ref_id),true);
+    DOF_LAYOUT<TV> dl1(cl,cl.reference_block_data(cl.blocks(a).ref_id),false);
+    Visit_Dof_Pairs(dl0,dl1,dp,
+        [=,&A,&B](int d,int s){A.Add_v(d,M.Transpose_Times(B.Get_v(s)));},
+        [=,&A,&B](int d,int s){A.Add_e(d,M.Transpose_Times(B.Get_e(s)));},
+        [=,&A,&B](int d,int s){A.Add_p(d,r*B.Get_p(s));});
 }
 //#####################################################################
 // Function Fill_Block_Matrix
@@ -419,7 +432,7 @@ Compute_RHS()
         Init_Block_Vector(w,cb);
         Init_Block_Vector(u,cb);
 
-        DOF_LAYOUT<TV> dl(cl,cl.reference_block_data(bl.ref_id));
+        DOF_LAYOUT<TV> dl(cl,cl.reference_block_data(bl.ref_id),false);
         TV A=dl.cb->X(bc.bc_v.min_corner);
         TV B=dl.cb->X(bc.bc_v.max_corner-1);
         T width=(B-A).Magnitude();
@@ -447,7 +460,7 @@ Compute_RHS()
         BLOCK_VECTOR<T> w,u;
         Init_Block_Vector(w,cb);
         Init_Block_Vector(u,cb);
-        DOF_LAYOUT<TV> dl(cl,cl.reference_block_data(bl.ref_id));
+        DOF_LAYOUT<TV> dl(cl,cl.reference_block_data(bl.ref_id),false);
         TV tr=M*bc.traction;
         Visit_Wall_Dofs(dl,bc.bc_v,bc.bc_e,[tr,&u](int v,const TV&,const VECTOR<T,TV::m-1>& uv)
             {
@@ -587,19 +600,19 @@ Apply_To_RHS(BLOCK_ID b,const BLOCK_VECTOR<T>& w)
     const auto& rd=cl.reference_block_data(cl.blocks(b).ref_id);
     const auto& bl=cl.blocks(b);
 
-    Copy_Vector_Data(w,b,rd.pairs);
+    Copy_Vector_Data(w,b,b,rd.pairs);
 
     for(CON_ID cc(0);cc<bl.connections.m;cc++)
     {
         const auto& c=bl.connections(cc);
         if(c.is_regular)
-            Copy_Vector_Data(w,c.id,cl.Regular_Connection_Pair(b,cc,false));
+            Copy_Vector_Data(w,b,c.id,cl.Regular_Connection_Pair(b,cc,false));
         else
         {
             const auto& ic=cl.irregular_connections(c.irreg_id);
             const auto& irbd=cl.reference_irregular_data(ic.ref_id);
             for(const auto& h:irbd.pairs)
-                Copy_Vector_Data(w,h.b,h.irreg_pairs[1]);
+                Copy_Vector_Data(w,b,h.b,h.irreg_pairs[1]);
         }
     }
 
@@ -610,7 +623,7 @@ Apply_To_RHS(BLOCK_ID b,const BLOCK_VECTOR<T>& w)
         if(irbd.mapping(e.y).y)
         {
             const auto& h=irbd.pairs(irbd.mapping(e.y).x);
-            Copy_Vector_Data(w,ic.regular,h.irreg_pairs[0]);
+            Copy_Vector_Data(w,b,ic.regular,h.irreg_pairs[0]);
         }
     }
 }

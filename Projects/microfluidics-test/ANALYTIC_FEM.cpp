@@ -139,7 +139,7 @@ Compute_RHS()
         mc.Init_Block_Vector(w,cb);
         mc.Init_Block_Vector(u,cb);
 
-        DOF_LAYOUT<TV> dl(mc.cl,mc.cl.reference_block_data(bl.ref_id));
+        DOF_LAYOUT<TV> dl(mc.cl,mc.cl.reference_block_data(bl.ref_id),false);
         Visit_Wall_Dofs(dl,bc.bc_v,bc.bc_e,[M,&u,&bc,&bl,this](int v,const TV& X,const VECTOR<T,TV::m-1>&)
             {
                 u.Add_v(v,M*Traction(bc.normal,bl.xform*X));

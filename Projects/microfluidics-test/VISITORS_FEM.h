@@ -130,7 +130,7 @@ struct DOF_LAYOUT<VECTOR<T,2> >
 {
     CANONICAL_BLOCK<T>* cb;
 
-    DOF_LAYOUT(const COMPONENT_LAYOUT_FEM<T>& cl,const REFERENCE_BLOCK_DATA& rb)
+    DOF_LAYOUT(const COMPONENT_LAYOUT_FEM<T>& cl,const REFERENCE_BLOCK_DATA& rb,bool condensed)
         :cb(cl.blocks(rb.b).block)
     {}
 };
@@ -145,7 +145,7 @@ struct DOF_LAYOUT<VECTOR<T,3> >
     const ARRAY<int>& ticks_e;
     const ARRAY<int>& ticks_t;
 
-    DOF_LAYOUT(const COMPONENT_LAYOUT_FEM<T>& cl,const REFERENCE_BLOCK_DATA& rb,int num_edges,bool condensed)
+    DOF_LAYOUT(const COMPONENT_LAYOUT_FEM<T>& cl,const REFERENCE_BLOCK_DATA& rb,bool condensed)
         :cb(cl.blocks(rb.b).block),nl(cl.depth_layers),depth(cl.depth),dz(depth/nl),
         ticks_e(rb.ticks_e),ticks_t(rb.ticks_t)
     {
@@ -394,7 +394,7 @@ void Visit_Wall_Dofs(const DOF_LAYOUT<VECTOR<T,3> >& dl,INTERVAL<int> bc_v,INTER
 
 // func(int dest,int src)
 template<class T,class FV,class FE,class FP>
-void Visit_Dof_Pairs(const DOF_LAYOUT<VECTOR<T,2> >& dl,const DOF_PAIRS& dp,FV fv,FE fe,FP fp)
+void Visit_Dof_Pairs(const DOF_LAYOUT<VECTOR<T,2> >& dl0,const DOF_LAYOUT<VECTOR<T,2> >& dl1,const DOF_PAIRS& dp,FV fv,FE fe,FP fp)
 {
     for(auto p:dp.v) fv(p.x,p.y);
     for(auto p:dp.e) fe(p.x,p.y);
