@@ -85,7 +85,7 @@ Make_Joint_3(int d,T width,const ARRAY<T>& angles)
 template<class T> PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > COMPONENT_JOINT<T>::
 Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles)
 {
-    T sep=target_length;
+    T sep=2*target_length,sep_y=target_length;
     ARRAY<T> a(angles);
     a.Append(2*pi-angles.Sum());
     int k=0;
@@ -179,7 +179,7 @@ Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles)
     for(int i=0;i<2;i++)
     {
         int offset_x=i*(d-1),offset_edge=s-1+i*(3*(d-1)+1);
-        for(int j=0;j<d;j++) sep_cb->X.Append(sep_cb->X(offset_x+j)+dirs((k+1-i)%3)*sep);
+        for(int j=0;j<d;j++) sep_cb->X.Append(sep_cb->X(offset_x+j)+dirs((k+1-i)%3)*sep_y);
         for(int j=0;j<d-1;j++)
         {
             int p=offset_x+j,q=p+s+i;
@@ -211,7 +211,7 @@ Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles)
     cc->irregular_connections(index).edge_on.Reverse();
     for(auto& e:cc->irregular_connections(index).edge_on)
         std::swap(e.v0,e.v1);
-    ARRAY<T> ext={g1.Average().Magnitude()+sep,g0.Average().Magnitude()+sep,e.Average().Magnitude()};
+    ARRAY<T> ext={g1.Average().Magnitude()+sep_y,g0.Average().Magnitude()+sep_y,e.Average().Magnitude()};
     return {cc,{ext((3-k)%3),ext((4-k)%3),ext((5-k)%3)}};
 }
 //#####################################################################
