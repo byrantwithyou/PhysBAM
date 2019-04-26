@@ -56,8 +56,7 @@ int fem_pres_table[3][12]=
 template<class TV> void MATRIX_CONSTRUCTION_FEM<TV>::
 Fill_Canonical_Block_Matrix(BLOCK_MATRIX<T>& mat,const REFERENCE_BLOCK_DATA& rb)
 {
-    const auto* cb=cl.blocks(rb.b).block;
-    mat.nr=mat.nc={cb->X.m,cb->S.m,cb->X.m};
+    Init_Block_Matrix(mat,rb.b,rb.b,false);
     mat.Resize();
     
     DOF_LAYOUT<TV> dl(cl,rb,false);
@@ -215,15 +214,16 @@ Copy_Matrix_Data(BLOCK_MATRIX<T>& A,BLOCK_ID b,
     Ma*=sa;
     Mb*=sb;
     
-    PHYSBAM_ASSERT(A.nr==dpa.num_dofs_d);
-    PHYSBAM_ASSERT(B.nr==dpa.num_dofs_s);
-    PHYSBAM_ASSERT(A.nc==dpb.num_dofs_d);
-    PHYSBAM_ASSERT(B.nc==dpb.num_dofs_s);
-
     DOF_LAYOUT<TV> dl0a(cl,cl.reference_block_data(cl.blocks(ar).ref_id),true);
     DOF_LAYOUT<TV> dl1a(cl,cl.reference_block_data(cl.blocks(b).ref_id),false);
     DOF_LAYOUT<TV> dl0b(cl,cl.reference_block_data(cl.blocks(ac).ref_id),true);
     DOF_LAYOUT<TV> dl1b(cl,cl.reference_block_data(cl.blocks(b).ref_id),false);
+
+    PHYSBAM_ASSERT(A.nr==dl0a.counts);
+    PHYSBAM_ASSERT(B.nr==dl1a.counts);
+    PHYSBAM_ASSERT(A.nc==dl0b.counts);
+    PHYSBAM_ASSERT(B.nc==dl1b.counts);
+
     Visit_Dof_Pairs(dl0a,dl1a,dpa,
         [=,&dl0b,&dl1b,&dpb,&A,&B](int dr,int sr)
         {
@@ -255,16 +255,16 @@ template<class TV> void MATRIX_CONSTRUCTION_FEM<TV>::
 Copy_Vector_Data(const BLOCK_VECTOR<T>& B,BLOCK_ID a,BLOCK_ID b,const DOF_PAIRS& dp)
 {
     BLOCK_VECTOR<T>& A=rhs_block_list(b);
-    if(!A.V.m) Init_Block_Vector(A,b);
+    if(!A.V.m) Init_Block_Vector(A,b,true);
 
     MATRIX<T,2> M=cl.blocks(b).xform.M;
     T r=1/sqrt(M.Determinant());
     M*=r;
 
-    PHYSBAM_ASSERT(A.n==dp.num_dofs_d);
-    PHYSBAM_ASSERT(B.n==dp.num_dofs_s);
     DOF_LAYOUT<TV> dl0(cl,cl.reference_block_data(cl.blocks(b).ref_id),true);
     DOF_LAYOUT<TV> dl1(cl,cl.reference_block_data(cl.blocks(a).ref_id),false);
+    PHYSBAM_ASSERT(A.n==dl0.counts);
+    PHYSBAM_ASSERT(B.n==dl1.counts);
     Visit_Dof_Pairs(dl0,dl1,dp,
         [=,&A,&B](int d,int s){A.Add_v(d,M.Transpose_Times(B.Get_v(s)));},
         [=,&A,&B](int d,int s){A.Add_e(d,M.Transpose_Times(B.Get_e(s)));},
@@ -278,7 +278,7 @@ Fill_Block_Matrix(BLOCK_MATRIX<T>& M,const REFERENCE_BLOCK_DATA& rd)
 {
     BLOCK_ID b=rd.b;
     const auto& bl=cl.blocks(b);
-    Init_Block_Matrix(M,b,b);
+    Init_Block_Matrix(M,b,b,true);
 
     Copy_Matrix_Data(M,b,rd.pairs,rd.pairs,b,b);
 
@@ -317,7 +317,7 @@ Fill_Block_Matrix(BLOCK_MATRIX<T>& M,const REFERENCE_BLOCK_DATA& rd)
 template<class TV> void MATRIX_CONSTRUCTION_FEM<TV>::
 Fill_Connection_Matrix(BLOCK_MATRIX<T>& M,const REFERENCE_CONNECTION_DATA& cd)
 {
-    Init_Block_Matrix(M,cd.b[0],cd.b[1]);
+    Init_Block_Matrix(M,cd.b[0],cd.b[1],true);
     PHYSBAM_ASSERT(cl.blocks(cd.b[0]).connections(cd.con_id[0]).master);
     auto& rd0=cl.reference_block_data(cl.blocks(cd.b[0]).ref_id);
     auto& rd1=cl.reference_block_data(cl.blocks(cd.b[1]).ref_id);
@@ -334,7 +334,7 @@ Fill_Irregular_Connection_Matrix(ARRAY<BLOCK_MATRIX<T>,RID_ID>& M,const REFERENC
     for(RID_ID j(0);j<ri.pairs.m;j++)
     {
         auto& z=ri.pairs(j);
-        Init_Block_Matrix(M(j),bb,z.b);
+        Init_Block_Matrix(M(j),bb,z.b,true);
         Copy_Matrix_Data(M(j),z.b,z.irreg_pairs[0],cl.reference_block_data(cl.blocks(z.b).ref_id).pairs,bb,z.b);
         Copy_Matrix_Data(M(j),bb,cl.reference_block_data(cl.blocks(bb).ref_id).pairs,z.irreg_pairs[1],bb,z.b);
 
@@ -425,12 +425,11 @@ Compute_RHS()
     for(const auto& bc:cl.bc_v)
     {
         BLOCK<T>& bl=cl.blocks(bc.b);
-        CANONICAL_BLOCK<T>* cb=bl.block;
         MATRIX<T,TV::m> M=bl.xform.M.Inverse();
             
         BLOCK_VECTOR<T> w,u;
-        Init_Block_Vector(w,cb);
-        Init_Block_Vector(u,cb);
+        Init_Block_Vector(w,bc.b,false);
+        Init_Block_Vector(u,bc.b,false);
 
         DOF_LAYOUT<TV> dl(cl,cl.reference_block_data(bl.ref_id),false);
         TV A=dl.cb->X(bc.bc_v.min_corner);
@@ -454,12 +453,11 @@ Compute_RHS()
     for(const auto& bc:cl.bc_t)
     {
         BLOCK<T>& bl=cl.blocks(bc.b);
-        CANONICAL_BLOCK<T>* cb=bl.block;
         MATRIX<T,TV::m> M=bl.xform.M.Transposed()/bl.xform.M.Determinant();
 
         BLOCK_VECTOR<T> w,u;
-        Init_Block_Vector(w,cb);
-        Init_Block_Vector(u,cb);
+        Init_Block_Vector(w,bc.b,false);
+        Init_Block_Vector(u,bc.b,false);
         DOF_LAYOUT<TV> dl(cl,cl.reference_block_data(bl.ref_id),false);
         TV tr=M*bc.traction;
         Visit_Wall_Dofs(dl,bc.bc_v,bc.bc_e,[tr,&u](int v,const TV&,const VECTOR<T,TV::m-1>& uv)
@@ -564,31 +562,25 @@ Copy_To_CEM(CACHED_ELIMINATION_MATRIX<T>& cem)
 // Function Init_Block_Matrix
 //#####################################################################
 template<class TV> void MATRIX_CONSTRUCTION_FEM<TV>::
-Init_Block_Matrix(BLOCK_MATRIX<T>& M,BLOCK_ID a,BLOCK_ID b) const
+Init_Block_Matrix(BLOCK_MATRIX<T>& M,BLOCK_ID a,BLOCK_ID b,bool compressed) const
 {
     const auto& c=cl.reference_block_data(cl.blocks(a).ref_id);
     const auto& d=cl.reference_block_data(cl.blocks(b).ref_id);
-    M.nr=c.num_dofs_d;
-    M.nc=d.num_dofs_d;
+    DOF_LAYOUT<TV> dlc(cl,c,compressed);
+    DOF_LAYOUT<TV> dld(cl,d,compressed);
+    M.nr=dlc.counts;
+    M.nc=dld.counts;
     M.Resize();
 }
 //#####################################################################
 // Function Init_Block_Matrix
 //#####################################################################
 template<class TV> void MATRIX_CONSTRUCTION_FEM<TV>::
-Init_Block_Vector(BLOCK_VECTOR<T>& V,BLOCK_ID b) const
+Init_Block_Vector(BLOCK_VECTOR<T>& V,BLOCK_ID b,bool compressed) const
 {
     const auto& c=cl.reference_block_data(cl.blocks(b).ref_id);
-    V.n=c.num_dofs_d;
-    V.Resize();
-}
-//#####################################################################
-// Function Init_Block_Matrix
-//#####################################################################
-template<class TV> void MATRIX_CONSTRUCTION_FEM<TV>::
-Init_Block_Vector(BLOCK_VECTOR<T>& V,const CANONICAL_BLOCK<T>* cb) const
-{
-    V.n={cb->X.m,cb->S.m,cb->X.m};
+    DOF_LAYOUT<TV> dl(cl,c,compressed);
+    V.n=dl.counts;
     V.Resize();
 }
 //#####################################################################
@@ -638,7 +630,7 @@ Transform_Solution(const CACHED_ELIMINATION_MATRIX<T>& cem,bool inverse,bool tra
         int j=cem.rhs(Value(b));
         if(j<0)
         {
-            Init_Block_Vector(rhs_block_list(b),b);
+            Init_Block_Vector(rhs_block_list(b),b,true);
             continue;
         }
         auto& U=rhs_block_list(b);
@@ -692,7 +684,7 @@ template<class TV> void MATRIX_CONSTRUCTION_FEM<TV>::
 Dump_Matrix_Block(SYSTEM_MATRIX_HELPER<T>& h,ARRAY<int,BLOCK_ID> first[3],const BLOCK_MATRIX<T>& M,BLOCK_ID b0,BLOCK_ID b1) const
 {
     BLOCK_MATRIX<T> W;
-    Init_Block_Matrix(W,b0,b1);
+    Init_Block_Matrix(W,b0,b1,true);
     Transform_To_World_Space(W,M,b0,b1);
     const auto& a=cl.reference_block_data(cl.blocks(b0).ref_id);
     const auto& b=cl.reference_block_data(cl.blocks(b1).ref_id);

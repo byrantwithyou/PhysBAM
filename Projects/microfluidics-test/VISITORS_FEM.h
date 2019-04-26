@@ -123,24 +123,25 @@ CONDENSED:
 
 template<class TV> struct DOF_LAYOUT;
 
-
-
 template<class T>
 struct DOF_LAYOUT<VECTOR<T,2> >
 {
     CANONICAL_BLOCK<T>* cb;
+    DOF_COUNTS counts;
 
     DOF_LAYOUT(const COMPONENT_LAYOUT_FEM<T>& cl,const REFERENCE_BLOCK_DATA& rb,bool condensed)
         :cb(cl.blocks(rb.b).block)
-    {}
+    {
+        counts=condensed?rb.num_dofs_d:rb.num_dofs_s;
+    }
 };
 
 template<class T>
 struct DOF_LAYOUT<VECTOR<T,3> >
 {
     CANONICAL_BLOCK<T>* cb;
+    DOF_COUNTS counts;
     int nl,nl1,d0,v0;
-    int num_v,num_e,num_p;
     T depth,dz;
     const ARRAY<int>& ticks_e;
     const ARRAY<int>& ticks_t;
@@ -150,14 +151,17 @@ struct DOF_LAYOUT<VECTOR<T,3> >
         ticks_e(rb.ticks_e),ticks_t(rb.ticks_t)
     {
         nl1=nl+1-2*condensed;
-        num_v=nl1;
-        num_e=condensed?rb.num_dofs_d.e:rb.num_dofs_s.e;
-        num_p=nl+1;
-        d0=num_e*nl1;
-        v0=d0+num_e*nl;
+        counts=condensed?rb.num_dofs_d:rb.num_dofs_s;
+        int num_eh=counts.e*nl1,num_ed=counts.e*nl,num_ev=counts.v*nl;
+        d0=num_eh;
+        v0=num_eh+num_ed;
+        counts.e=num_eh+num_ed+num_ev;
+        counts.v*=nl1;
+        counts.p*=nl+1;
     }
 
-    int Vertex(int v, int l, bool is_p=false) const {return v * (nl1+2*is_p) + l;}
+    int Vertex(int v, int l) const {return v * nl1 + l;}
+    int Vertex_p(int v, int l) const {return v * (nl+1) + l;}
     int Edge_h(int e, int l) const {return e * nl1 + l;}
     int Edge_d(int e, int l) const {return e * nl + d0 + l;}
     int Edge_v(int v, int l) const {return v * nl + v0 + l;}
@@ -411,8 +415,8 @@ void Visit_Dof_Pairs(const DOF_LAYOUT<VECTOR<T,3> >& dl0,const DOF_LAYOUT<VECTOR
     assert(nl1==dl1.nl1);
     for(auto p:dp.v)
     {
-        int v0=dl0.Vertex(p.x,0,false);
-        int v1=dl1.Vertex(p.y,0,false);
+        int v0=dl0.Vertex(p.x,0);
+        int v1=dl1.Vertex(p.y,0);
         for(int i=0;i<nl1;i++) fv(v0+i,v1+i);
         int e0=dl0.Edge_v(p.x,0);
         int e1=dl1.Edge_v(p.y,0);
@@ -429,8 +433,8 @@ void Visit_Dof_Pairs(const DOF_LAYOUT<VECTOR<T,3> >& dl0,const DOF_LAYOUT<VECTOR
     }
     for(auto p:dp.p)
     {
-        int v0=dl0.Vertex(p.x,0,true);
-        int v1=dl1.Vertex(p.y,0,true);
+        int v0=dl0.Vertex_p(p.x,0);
+        int v1=dl1.Vertex_p(p.y,0);
         for(int i=0;i<nl+1;i++) fp(v0+i,v1+i);
     }
 }

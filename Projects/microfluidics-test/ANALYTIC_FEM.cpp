@@ -94,8 +94,8 @@ Compute_RHS()
         MATRIX<T,TV::m> M=bl.xform.M.Inverse();
 
         BLOCK_VECTOR<T> w,u;
-        mc.Init_Block_Vector(w,cb);
-        mc.Init_Block_Vector(u,cb);
+        mc.Init_Block_Vector(w,b,false);
+        mc.Init_Block_Vector(u,b,false);
         for(auto i:cb->bc_v)
         {
             TV Z=bl.xform*cb->X(i);
@@ -132,12 +132,11 @@ Compute_RHS()
     for(const auto& bc:mc.cl.bc_t)
     {
         BLOCK<T>& bl=mc.cl.blocks(bc.b);
-        CANONICAL_BLOCK<T>* cb=bl.block;
         MATRIX<T,TV::m> M=bl.xform.M.Transposed()/bl.xform.M.Determinant();
 
         BLOCK_VECTOR<T> w,u;
-        mc.Init_Block_Vector(w,cb);
-        mc.Init_Block_Vector(u,cb);
+        mc.Init_Block_Vector(w,bc.b,false);
+        mc.Init_Block_Vector(u,bc.b,false);
 
         DOF_LAYOUT<TV> dl(mc.cl,mc.cl.reference_block_data(bl.ref_id),false);
         Visit_Wall_Dofs(dl,bc.bc_v,bc.bc_e,[M,&u,&bc,&bl,this](int v,const TV& X,const VECTOR<T,TV::m-1>&)
