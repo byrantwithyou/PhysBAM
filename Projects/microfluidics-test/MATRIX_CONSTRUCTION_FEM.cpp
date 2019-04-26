@@ -734,10 +734,6 @@ Dump_World_Space_System() const
 
     SYSTEM_MATRIX_HELPER<T> h;
 
-    ARRAY<int,REFERENCE_BLOCK_ID> diag_id(cl.reference_block_data.m);
-    ARRAY<int,REFERENCE_CONNECTION_ID> reg_id(cl.reference_connection_data.m);
-    ARRAY<ARRAY<int,RID_ID>,REFERENCE_IRREGULAR_ID> irreg_id(cl.reference_irregular_data.m);
-
     for(BLOCK_ID b(0);b<cl.blocks.m;b++)
         Dump_Matrix_Block(h,first,diagonal_system_blocks(cl.blocks(b).ref_id),b,b);
 
@@ -757,7 +753,7 @@ Dump_World_Space_System() const
 
     for(auto& ic:cl.irregular_connections)
     {
-        for(RID_ID j(0);j<irreg_id(ic.ref_id).m;j++)
+        for(RID_ID j(0);j<irregular_system_blocks(ic.ref_id).m;j++)
         {
             BLOCK_ID b=cl.reference_irregular_data(ic.ref_id).pairs(j).b;
             Dump_Matrix_Block(h,first,irregular_system_blocks(ic.ref_id)(j),ic.regular,b);
