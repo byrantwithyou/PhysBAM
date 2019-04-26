@@ -27,7 +27,23 @@ template<class TV> MATRIX_CONSTRUCTION_FEM<TV>::
     for(auto& p:canonical_block_matrices) delete p.key;
 }
 
-int fem_visc_table[12][12]=
+template<int d>
+struct FEM_TABLES
+{
+    static const constexpr int nodes=d+1;
+    static const constexpr int edges=d*(d+1)/2;
+    static const constexpr int surf_edges=d*(d-1)/2;
+    static const constexpr int vel=nodes+edges;
+    static const constexpr int surf_vel=d+surf_edges;
+    const static int visc[vel*d][vel*d],visc_den=d==2?6:30;
+    const static int pres[nodes][vel*d],pres_den=d==2?6:120;
+    const static int u_dot_v[vel][vel],u_dot_v_den=d==2?360:2520;
+    const static int p_u[nodes][vel],p_u_den=d==2?120:360;
+    const static int surf_u_dot_v[surf_vel][surf_vel];
+};
+
+template<>
+const int FEM_TABLES<2>::visc[12][12]=
 {
     {3,1,0,0,0,-4,3,1,0,0,0,-4},
     {1,3,0,0,0,-4,0,0,0,0,0,0},
@@ -43,11 +59,116 @@ int fem_visc_table[12][12]=
     {-4,0,0,-4,4,4,0,0,0,-8,0,8}
 };
 
-int fem_pres_table[3][12]=
+template<>
+const int FEM_TABLES<3>::visc[30][30]=
+{
+    {3,1,0,0,-4,-1,-1,1,1,0,3,1,0,0,-4,-1,-1,1,1,0,3,1,0,0,-4,-1,-1,1,1,0},
+    {1,3,0,0,-4,1,1,-1,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,1,-1,0,0,0,-3,1,3,-1,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,-1,0,0,0,1,-3,-1,3,0},
+    {-4,-4,0,0,8,0,0,0,0,0,-1,-3,0,0,4,4,4,-4,-4,0,-1,-3,0,0,4,4,4,-4,-4,0},
+    {-1,1,0,0,0,8,4,-8,-4,0,-4,0,0,0,4,4,0,-4,0,0,-1,1,0,0,0,8,4,-8,-4,0},
+    {-1,1,0,0,0,4,8,-4,-8,0,-1,1,0,0,0,4,8,-4,-8,0,-4,0,0,0,4,0,4,0,-4,0},
+    {1,-1,0,0,0,-8,-4,8,4,0,1,3,0,0,-4,-4,-4,4,4,0,0,0,0,0,0,0,0,0,0,0},
+    {1,-1,0,0,0,-4,-8,4,8,0,0,0,0,0,0,0,0,0,0,0,1,3,0,0,-4,-4,-4,4,4,0},
+    {0,0,0,0,0,0,0,0,0,0,1,-1,0,0,0,-4,-8,4,8,0,1,-1,0,0,0,-8,-4,8,4,0},
+    {3,0,1,0,-1,-4,-1,1,0,1,3,0,1,0,-1,-4,-1,1,0,1,3,0,1,0,-1,-4,-1,1,0,1},
+    {1,0,-1,0,-3,0,1,3,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,1,0,3,0,1,-4,1,-1,0,-1,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,-1,0,1,0,-3,-1,0,3},
+    {-4,0,0,0,4,4,0,-4,0,0,-1,0,1,0,8,0,4,-8,0,-4,-1,0,1,0,8,0,4,-8,0,-4},
+    {-1,0,-3,0,4,4,4,-4,0,-4,-4,0,-4,0,0,8,0,0,0,0,-1,0,-3,0,4,4,4,-4,0,-4},
+    {-1,0,1,0,4,0,8,-4,0,-8,-1,0,1,0,4,0,8,-4,0,-8,-4,0,0,0,0,4,4,0,0,-4},
+    {1,0,3,0,-4,-4,-4,4,0,4,1,0,-1,0,-8,0,-4,8,0,4,0,0,0,0,0,0,0,0,0,0},
+    {1,0,-1,0,-4,0,-8,4,0,8,0,0,0,0,0,0,0,0,0,0,1,0,-1,0,-8,0,-4,8,0,4},
+    {0,0,0,0,0,0,0,0,0,0,1,0,-1,0,-4,0,-8,4,0,8,1,0,3,0,-4,-4,-4,4,0,4},
+    {3,0,0,1,-1,-1,-4,0,1,1,3,0,0,1,-1,-1,-4,0,1,1,3,0,0,1,-1,-1,-4,0,1,1},
+    {1,0,0,-1,-3,1,0,0,3,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,1,0,0,-1,1,-3,0,0,-1,3,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,3,1,1,-4,0,-1,-1},
+    {-4,0,0,0,4,0,4,0,-4,0,-1,0,0,1,8,4,0,0,-8,-4,-1,0,0,1,8,4,0,0,-8,-4},
+    {-1,0,0,1,4,8,0,0,-4,-8,-4,0,0,0,0,4,4,0,0,-4,-1,0,0,1,4,8,0,0,-4,-8},
+    {-1,0,0,-3,4,4,4,0,-4,-4,-1,0,0,-3,4,4,4,0,-4,-4,-4,0,0,-4,0,0,8,0,0,0},
+    {1,0,0,-1,-4,-8,0,0,4,8,1,0,0,-1,-8,-4,0,0,8,4,0,0,0,0,0,0,0,0,0,0},
+    {1,0,0,3,-4,-4,-4,0,4,4,0,0,0,0,0,0,0,0,0,0,1,0,0,-1,-8,-4,0,0,8,4},
+    {0,0,0,0,0,0,0,0,0,0,1,0,0,3,-4,-4,-4,0,4,4,1,0,0,-1,-4,-8,0,0,4,8}
+};
+
+template<>
+const int FEM_TABLES<2>::pres[3][12]=
 {
     {-1,0,0,1,-1,1,-1,0,0,1,1,-1},
     {0,1,0,1,-1,-1,0,0,0,2,0,-2},
     {0,0,0,2,-2,0,0,0,1,1,-1,-1}
+};
+
+template<>
+const int FEM_TABLES<3>::pres[4][30]=
+{
+    {-3,-1,0,0,4,-4,-4,4,4,0,-3,0,-1,0,-4,4,-4,4,0,4,-3,0,0,-1,-4,-4,4,0,4,4},
+    {1,3,0,0,-4,-4,-4,4,4,0,1,0,-1,0,-8,0,-4,8,0,4,1,0,0,-1,-8,-4,0,0,8,4},
+    {1,-1,0,0,0,-8,-4,8,4,0,1,0,3,0,-4,-4,-4,4,0,4,1,0,0,-1,-4,-8,0,0,4,8},
+    {1,-1,0,0,0,-4,-8,4,8,0,1,0,-1,0,-4,0,-8,4,0,8,1,0,0,3,-4,-4,-4,0,4,4}
+};
+
+// entry * J / 360
+template<>
+const int FEM_TABLES<2>::u_dot_v[6][6]=
+{
+    {6,-1,-1,-4,0,0},
+    {-1,6,-1,0,-4,0},
+    {-1,-1,6,0,0,-4},
+    {-4,0,0,32,16,16},
+    {0,-4,0,16,32,16},
+    {0,0,-4,16,16,32}
+};
+
+template<>
+const int FEM_TABLES<3>::u_dot_v[10][10]=
+{
+    {6,1,1,1,-4,-4,-4,-6,-6,-6},
+    {1,6,1,1,-4,-6,-6,-4,-4,-6},
+    {1,1,6,1,-6,-4,-6,-4,-6,-4},
+    {1,1,1,6,-6,-6,-4,-6,-4,-4},
+    {-4,-4,-6,-6,32,16,16,16,16,8},
+    {-4,-6,-4,-6,16,32,16,16,8,16},
+    {-4,-6,-6,-4,16,16,32,8,16,16},
+    {-6,-4,-4,-6,16,16,8,32,16,16},
+    {-6,-4,-6,-4,16,8,16,16,32,16},
+    {-6,-6,-4,-4,8,16,16,16,16,32}
+};
+
+template<>
+const int FEM_TABLES<2>::p_u[3][6]=
+{
+    {2, -1, -1, 4, 8, 8},
+    {-1, 2, -1, 8, 4, 8},
+    {-1, -1, 2, 8, 8, 4}
+};
+
+template<>
+const int FEM_TABLES<3>::p_u[4][10]=
+{
+    {0,-1,-1,-1,4,4,4,2,2,2},
+    {-1,0,-1,-1,4,2,2,4,4,2},
+    {-1,-1,0,-1,2,4,2,4,2,4},
+    {-1,-1,-1,0,2,2,4,2,4,4}
+};
+
+template<>
+const int FEM_TABLES<2>::surf_u_dot_v[3][3] =
+{
+    {4, -1, 2},
+    {-1, 4, 2},
+    {2, 2, 16}
+};
+
+template<>
+const int FEM_TABLES<3>::surf_u_dot_v[6][6] =
+{
+    {4, -1, 2},
+    {-1, 4, 2},
+    {2, 2, 16}
 };
 
 //#####################################################################
@@ -62,50 +183,39 @@ Fill_Canonical_Block_Matrix(BLOCK_MATRIX<T>& mat,const REFERENCE_BLOCK_DATA& rb)
     DOF_LAYOUT<TV> dl(cl,rb,false);
     Visit_Elements(dl,[this,&mat](const VISIT_ELEMENT_DATA<TV>& ve)
         {
-            int dof[2][ve.e.m];
-            for(int i=0;i<ve.v.m;i++) dof[0][i]=ve.v(i);
-            for(int i=0;i<ve.e.m;i++) dof[1][i]=ve.e(i);
-            MATRIX<T,2> F(ve.X(1)-ve.X(0),ve.X(2)-ve.X(0)),G=F.Inverse();
-            T scale=mu*F.Determinant()/6;
-            T p_scale=F.Determinant()/6;
+            constexpr int num_u=ve.v.m+ve.e.m;
+            int dof[num_u];
+            for(int i=0;i<ve.v.m;i++) dof[i]=ve.v(i);
+            for(int i=0;i<ve.e.m;i++) dof[ve.v.m+i]=ve.e(i);
+            MATRIX<T,TV::m> F;
+            for(int i=0;i<TV::m;i++) F.Set_Column(i,ve.X(i+1)-ve.X(0));
+            MATRIX<T,TV::m> G=F.Inverse();
+            T scale=mu*F.Determinant()/FEM_TABLES<TV::m>::visc_den;
+            T p_scale=F.Determinant()/FEM_TABLES<TV::m>::pres_den;
 
-            for(int r=0;r<2;r++)
-                for(int s=0;s<2;s++)
-                    for(int i=0;i<3;i++)
-                        for(int j=0;j<3;j++)
-                        {
-                            MATRIX<T,2> M;
-                            for(int a=0;a<2;a++)
-                                for(int b=0;b<2;b++)
-                                    M(a,b)=fem_visc_table[6*a+3*r+i][6*b+3*s+j];
-                            M=scale*G.Transpose_Times(M*G);
-                            mat.Add_uu(dof[r][i],r,dof[s][j],s,M+M.Trace());
-                        }
+            for(int i=0;i<num_u;i++)
+                for(int j=0;j<num_u;j++)
+                {
+                    MATRIX<T,TV::m> M;
+                    for(int a=0;a<TV::m;a++)
+                        for(int b=0;b<TV::m;b++)
+                            M(a,b)=FEM_TABLES<TV::m>::visc[num_u*a+i][num_u*b+j];
+                    M=scale*G.Transpose_Times(M*G);
+                    mat.Add_uu(dof[i],i>=ve.v.m,dof[j],j>=ve.v.m,M+M.Trace());
+                }
 
-            for(int s=0;s<2;s++)
-                for(int i=0;i<3;i++)
-                    for(int j=0;j<3;j++)
-                    {
-                        TV u;
-                        for(int b=0;b<2;b++)
-                            u(b)=fem_pres_table[i][6*b+3*s+j];
-                        u=-p_scale*G.Transpose_Times(u);
-                        mat.Add_pu(ve.v(i),dof[s][j],s,u);
-                        mat.Add_up(dof[s][j],s,ve.v(i),u);
-                    }
+            for(int i=0;i<ve.v.m;i++)
+                for(int j=0;j<num_u;j++)
+                {
+                    TV u;
+                    for(int b=0;b<TV::m;b++)
+                        u(b)=FEM_TABLES<TV::m>::pres[i][num_u*b+j];
+                    u=-p_scale*G.Transpose_Times(u);
+                    mat.Add_pu(ve.v(i),dof[j],j>=ve.v.m,u);
+                    mat.Add_up(dof[j],j>=ve.v.m,ve.v(i),u);
+                }
         });
 }
-
-// entry * J / 360
-int fem_u_dot_v_table[6][6]=
-{
-    {6,-1,-1,-4,0,0},
-    {-1,6,-1,0,-4,0},
-    {-1,-1,6,0,0,-4},
-    {-4,0,0,32,16,16},
-    {0,-4,0,16,32,16},
-    {0,0,-4,16,16,32}
-};
 
 //#####################################################################
 // Function Times_U_Dot_V
@@ -119,28 +229,24 @@ Times_U_Dot_V(BLOCK_ID b,BLOCK_VECTOR<T>& w,const BLOCK_VECTOR<T>& u) const
     DOF_LAYOUT<TV> dl(cl,cl.reference_block_data(bl.ref_id),false);
     Visit_Elements(dl,[this,M,&u,&w](const VISIT_ELEMENT_DATA<TV>& ve)
         {
-            int dof[2][ve.e.m];
-            for(int i=0;i<ve.v.m;i++) dof[0][i]=ve.v(i);
-            for(int i=0;i<ve.e.m;i++) dof[1][i]=ve.e(i);
-            MATRIX<T,2> F(ve.X(1)-ve.X(0),ve.X(2)-ve.X(0)),G=F.Inverse();
-            T scale=(M*F).Determinant()/360;
+            constexpr int num_u=ve.v.m+ve.e.m;
+            int dof[num_u];
+            for(int i=0;i<ve.v.m;i++) dof[i]=ve.v(i);
+            for(int i=0;i<ve.e.m;i++) dof[ve.v.m+i]=ve.e(i);
+            MATRIX<T,TV::m> F;
+            for(int i=0;i<TV::m;i++) F.Set_Column(i,ve.X(i+1)-ve.X(0));
+            MATRIX<T,TV::m> G=F.Inverse();
+            T scale=(M*F).Determinant()/FEM_TABLES<TV::m>::u_dot_v_den;
 
-            VECTOR<TV,6> r,s;
-            for(int a=0;a<2;a++) for(int i=0;i<3;i++) r(i+3*a)=u.Get_u(dof[a][i],a);
-            for(int i=0;i<6;i++)
-                for(int j=0;j<6;j++)
-                    s(i)+=r(j)*fem_u_dot_v_table[i][j];
+            VECTOR<TV,num_u> r,s;
+            for(int i=0;i<num_u;i++) r(i)=u.Get_u(dof[i],i>=ve.v.m);
+            for(int i=0;i<num_u;i++)
+                for(int j=0;j<num_u;j++)
+                    s(i)+=r(j)*FEM_TABLES<TV::m>::u_dot_v[i][j];
             s*=scale;
-            for(int a=0;a<2;a++) for(int i=0;i<3;i++) w.Add_u(dof[a][i],a,s(i+3*a));
+            for(int i=0;i<num_u;i++) w.Add_u(dof[i],i>=ve.v.m,s(i));
         });
 }
-
-int fem_p_u_table[3][6]=
-{
-    {2, -1, -1, 4, 8, 8},
-    {-1, 2, -1, 8, 4, 8},
-    {-1, -1, 2, 8, 8, 4}
-};
 
 //#####################################################################
 // Function Times_U_Dot_V
@@ -154,25 +260,23 @@ Times_P_U(BLOCK_ID b,BLOCK_VECTOR<T>& w,const ARRAY<T>& div_v,const ARRAY<T>& di
     DOF_LAYOUT<TV> dl(cl,cl.reference_block_data(bl.ref_id),false);
     Visit_Elements(dl,[this,M,&w,&div_v,&div_e](const VISIT_ELEMENT_DATA<TV>& ve)
         {
-            int dof[2][ve.e.m];
-            for(int i=0;i<ve.v.m;i++) dof[0][i]=ve.v(i);
-            for(int i=0;i<ve.e.m;i++) dof[1][i]=ve.e(i);
-            MATRIX<T,2> F(ve.X(1)-ve.X(0),ve.X(2)-ve.X(0)),G=F.Inverse();
-            T scale=(M*F).Determinant()/120;
+            constexpr int num_u=ve.v.m+ve.e.m;
+            MATRIX<T,TV::m> F;
+            for(int i=0;i<TV::m;i++) F.Set_Column(i,ve.X(i+1)-ve.X(0));
+            MATRIX<T,TV::m> G=F.Inverse();
+            T scale=(M*F).Determinant()/FEM_TABLES<TV::m>::p_u_den;
 
-            VECTOR<T,6> r;
-            VECTOR<T,3> s;
-            for(int i=0;i<3;i++) r(i)=div_v(dof[0][i]);
-            for(int i=0;i<3;i++) r(i+3)=div_e(dof[1][i]);
-            for(int i=0;i<3;i++)
-                for(int j=0;j<6;j++)
-                    s(i)+=r(j)*fem_p_u_table[i][j];
+            VECTOR<T,num_u> r;
+            VECTOR<T,ve.v.m> s;
+            for(int i=0;i<ve.v.m;i++) r(i)=div_v(ve.v(i));
+            for(int i=0;i<ve.e.m;i++) r(i+ve.v.m)=div_e(ve.e(i));
+            for(int i=0;i<ve.v.m;i++)
+                for(int j=0;j<num_u;j++)
+                    s(i)+=r(j)*FEM_TABLES<TV::m>::p_u[i][j];
             s*=scale;
-            for(int i=0;i<3;i++) w.Add_p(ve.v(i),s(i));
+            for(int i=0;i<ve.v.m;i++) w.Add_p(ve.v(i),s(i));
         });
 }
-
-int fem_line_int_u_dot_v_table[3][3] = {{4, -1, 2}, {-1, 4, 2}, {2, 2, 16}};
 
 //#####################################################################
 // Function Times_U_Dot_V

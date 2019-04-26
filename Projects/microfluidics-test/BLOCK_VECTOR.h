@@ -9,30 +9,30 @@
 
 namespace PhysBAM{
 
-template<class T>
+template<class TV>
 struct BLOCK_VECTOR
 {
-    typedef VECTOR<T,2> TV;
+    typedef typename TV::SCALAR T;
     DOF_COUNTS n;
     ARRAY<T> V;
 
     void Resize()
     {
-        V.Resize(2*n.v+2*n.e+n.p);
+        V.Resize(TV::m*n.v+TV::m*n.e+n.p);
     }
 
-    TV Get_v(int i) const {return TV(V(2*i),V(2*i+1));}
+    TV Get_v(int i) const {TV r;for(int j=0;j<TV::m;j++) r(j)=V(TV::m*i+j);return r;}
     TV Get_e(int i) const {return Get_v(i+n.v);}
     TV Get_u(int i,int e) const {return Get_v(i+e*n.v);}
-    T Get_p(int i) const {return V(2*(n.v+n.e)+i);}
-    void Add_v(int i,TV u) {V(2*i)+=u(0);V(2*i+1)+=u(1);}
+    T Get_p(int i) const {return V(TV::m*(n.v+n.e)+i);}
+    void Add_v(int i,TV u) {for(int j=0;j<TV::m;j++) V(TV::m*i+j)+=u(j);}
     void Add_e(int i,TV u) {Add_v(i+n.v,u);}
     void Add_u(int i,int e,TV u) {Add_v(i+e*n.v,u);}
-    void Add_p(int i,T u) {V(2*(n.v+n.e)+i)+=u;}
-    void Set_v(int i,TV u) {V(2*i)=u(0);V(2*i+1)=u(1);}
+    void Add_p(int i,T u) {V(TV::m*(n.v+n.e)+i)+=u;}
+    void Set_v(int i,TV u) {for(int j=0;j<TV::m;j++) V(TV::m*i+j)=u(j);}
     void Set_e(int i,TV u) {Set_v(i+n.v,u);}
     void Set_u(int i,int e,TV u) {Set_v(i+e*n.v,u);}
-    void Set_p(int i,T u) {V(2*(n.v+n.e)+i)=u;}
+    void Set_p(int i,T u) {V(TV::m*(n.v+n.e)+i)=u;}
 
     void Transform(const MATRIX<T,2>& M,T scale_p)
     {
