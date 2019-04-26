@@ -4,6 +4,9 @@
 //#####################################################################
 #ifndef __VISITORS_FEM__
 #define __VISITORS_FEM__
+#include <Core/Math_Tools/INTERVAL.h>
+#include "COMMON.h"
+#include "COMPONENT_LAYOUT_FEM.h"
 
 namespace PhysBAM{
 // F(dof0,dof1,first_owns)
@@ -300,7 +303,7 @@ void Visit_Faces(const DOF_LAYOUT<VECTOR<T,3> >& dl,INTERVAL<int> bc_e,F func)
     {
         VECTOR<int,2> P=dl.cb->S(edge);
         if(dl.ticks_e(edge)) std::swap(P.x,P.y);
-        VISIT_FACE_DATA<T> vt[2];
+        VISIT_FACE_DATA<TV> vt[2];
         vt[0].edge=edge;
         vt[0].v={dl.Vertex(P.x,0),dl.Vertex(P.y,0),dl.Vertex(P.y,1)};
         vt[0].e(0)=dl.Edge_v(P.y,0);
@@ -326,72 +329,117 @@ void Visit_Faces(const DOF_LAYOUT<VECTOR<T,3> >& dl,INTERVAL<int> bc_e,F func)
     }
 }
 
+template<class TV>
+struct VISIT_ALL_DOFS
+{
+    typedef typename TV::SCALAR T;
+    int i;
+    TV X;
+    VECTOR<T,TV::m-1> uv;
+};
+
 // fv(int v,const TV& X,VECTOR<T,1>(u)); u=[0,1]
 // fe(int e,const TV& X,VECTOR<T,1>(u)); u=[0,1]
-template<class T,class FV,class FE>
-void Visit_Wall_Dofs(const DOF_LAYOUT<VECTOR<T,2> >& dl,INTERVAL<int> bc_v,INTERVAL<int> bc_e,FV fv,FE fe)
+template<bool use_X,bool use_uv,class T,class AR,class FV,class FE>
+void Visit_Dofs(const DOF_LAYOUT<VECTOR<T,2> >& dl,const AR& bc_v,const AR& bc_e,FV fv,FE fe)
 {
     typedef VECTOR<T,2> TV;
 
-    TV A=dl.cb->X(bc_v.min_corner);
-    TV u=dl.cb->X(bc_v.max_corner-1)-A;
-    u/=u.Magnitude_Squared();
+    TV A,u;
+    if(use_uv)
+    {
+        A=dl.cb->X(*bc_v.begin());
+        auto it=bc_v.end();
+        u=dl.cb->X(*--it)-A;
+        u/=u.Magnitude_Squared();
+    }
     
     for(int v:bc_v)
     {
-        TV X=dl.cb->X(v);
-        fv(v,X,VECTOR<T,1>((X-A).Dot(u)));
+        VISIT_ALL_DOFS<TV> va;
+        va.i=v;
+        TV X;
+        if(use_X || use_uv) X=dl.cb->X(v);
+        if(use_X) va.X=X;
+        if(use_uv) va.uv.x=(X-A).Dot(u);
+        fv(va);
     }
     for(int e:bc_e)
     {
+        VISIT_ALL_DOFS<TV> va;
+        va.i=e;
         TV X=dl.cb->X.Subset(dl.cb->S(e)).Sum()/2;
-        fe(e,X,VECTOR<T,1>((X-A).Dot(u)));
+        if(use_X) va.X=X;
+        if(use_uv) va.uv.x=(X-A).Dot(u);
+        fe(va);
     }
 }
 
 // fv(int v,const TV& X,VECTOR<T,2>(u,z)); u=[0,1], z=[0,1]
 // fe(int e,const TV& X,VECTOR<T,2>(u,z)); u=[0,1], z=[0,1]
-template<class T,class FV,class FE>
-void Visit_Wall_Dofs(const DOF_LAYOUT<VECTOR<T,3> >& dl,INTERVAL<int> bc_v,INTERVAL<int> bc_e,FV fv,FE fe)
+template<bool use_X,bool use_uv,class T,class AR,class FV,class FE>
+void Visit_Dofs(const DOF_LAYOUT<VECTOR<T,3> >& dl,const AR& bc_v,const AR& bc_e,FV fv,FE fe)
 {
+    typedef VECTOR<T,2> TV2;
     typedef VECTOR<T,3> TV;
 
-    TV A=dl.cb->X(bc_v.min_corner);
-    TV u=dl.cb->X(bc_v.max_corner-1)-A;
-    u/=u.Magnitude_Squared();
+    TV2 A,u;
+    if(use_uv)
+    {
+        A=dl.cb->X(*bc_v.begin());
+        auto it=bc_v.end();
+        u=dl.cb->X(*--it)-A;
+        u/=u.Magnitude_Squared();
+    }
     
     for(int v:bc_v)
     {
-        TV X=dl.cb->X(v);
-        T y=(X-A).Dot(u);
+        VISIT_ALL_DOFS<TV> va;
+        TV2 X=dl.cb->X(v);
+        if(use_X) va.X=X.Append(0);
+        if(use_uv) va.uv.x=(X-A).Dot(u);
         int v0=dl.Vertex(v,0);
-        int e0=dl.Edge_v(v,0);
         for(int i=0;i<dl.nl+1;i++)
         {
+            va.i=v0+i;
             T a=(T)i/dl.nl;
-            fv(v0+i,X.Append(a*dl.dz),VECTOR<T,2>(y,a));
+            if(use_uv) va.uv.y=a;
+            if(use_X) va.X.z=a*dl.dz;
+            fv(va);
         }
+        int e0=dl.Edge_v(v,0);
         for(int i=0;i<dl.nl;i++)
         {
+            va.i=e0+i;
             T a=(i+(T).5)/dl.nl;
-            fv(e0+i,X.Append(a*dl.dz),VECTOR<T,2>(y,a));
+            if(use_uv) va.uv.y=a;
+            if(use_X) va.X.z=a*dl.dz;
+            fe(va);
         }
     }
     for(int e:bc_e)
     {
-        TV X=dl.cb->X.Subset(dl.cb->S(e)).Sum()/2;
-        T y=(X-A).Dot(u);
+        VISIT_ALL_DOFS<TV> va;
+        TV2 X=dl.cb->X.Subset(dl.cb->S(e)).Sum()/2;
+        if(use_X) va.X=X.Append(0);
+        if(use_uv) va.uv.x=(X-A).Dot(u);
         int e0=dl.Edge_h(e,0);
-        int e1=dl.Edge_d(e,0);
         for(int i=0;i<dl.nl+1;i++)
         {
+            va.i=e0+i;
             T a=(T)i/dl.nl;
-            fe(e0+i,X.Append(a*dl.dz),VECTOR<T,2>(y,a));
+            if(use_uv) va.uv.y=a;
+            if(use_X) va.X.z=a*dl.dz;
+            fe(va);
         }
+        int e1=dl.Edge_d(e,0);
         for(int i=0;i<dl.nl;i++)
         {
+            va.i=e1+i;
             T a=(i+(T).5)/dl.nl;
-            fe(e1+i,X.Append(a*dl.dz),VECTOR<T,2>(y,a));
+            if(use_uv) va.uv.y=a;
+            if(use_X) va.X.z=a*dl.dz;
+            fe(va);
         }
     }
 }
@@ -436,6 +484,80 @@ void Visit_Dof_Pairs(const DOF_LAYOUT<VECTOR<T,3> >& dl0,const DOF_LAYOUT<VECTOR
         int v0=dl0.Vertex_p(p.x,0);
         int v1=dl1.Vertex_p(p.y,0);
         for(int i=0;i<nl+1;i++) fp(v0+i,v1+i);
+    }
+}
+
+// func(int i,const TV& X)
+template<class TV,class FV,class FE>
+void Visit_Dofs(const DOF_LAYOUT<TV>& dl,FV fv,FE fe)
+{
+    Visit_Dofs<true,false>(dl,INTERVAL<int>(0,dl.cb->X.m),INTERVAL<int>(0,dl.cb->S.m),fv,fe);
+}
+
+template<class T,class FV,class FE,class FP>
+void Visit_Compressed_Dofs(const DOF_LAYOUT<VECTOR<T,2> >& dl,const REFERENCE_BLOCK_DATA& rd,FV fv,FE fe,FP fp)
+{
+    typedef VECTOR<T,2> TV;
+
+    for(int i=0;i<dl.cb->X.m;i++)
+    {
+        int j=rd.dof_map_v(i);
+        if(j>=0) fv(j,dl.cb->X(i));
+    }
+
+    for(int i=0;i<dl.cb->S.m;i++)
+    {
+        int j=rd.dof_map_e(i);
+        if(j>=0) fe(j,dl.cb->X.Subset(dl.cb->S(i)).Sum()/2);
+    }
+
+    for(int i=0;i<dl.cb->X.m;i++)
+    {
+        int j=rd.dof_map_p(i);
+        if(j>=0) fp(j,dl.cb->X(i));
+    }
+}
+
+template<class T,class FV,class FE,class FP>
+void Visit_Compressed_Dofs(const DOF_LAYOUT<VECTOR<T,3> >& dl,const REFERENCE_BLOCK_DATA& rd,FV fv,FE fe,FP fp)
+{
+    typedef VECTOR<T,2> TV2;
+
+    for(int i=0;i<dl.cb->X.m;i++)
+    {
+        int j=rd.dof_map_v(i);
+        if(j>=0)
+        {
+            TV2 X=dl.cb->X(i);
+            int v0=dl.Vertex(j,0);
+            for(int k=0;k<dl.nl1;k++) fv(v0+k,X.Append((T)(k+1)/dl.nl*dl.dz));
+            int e0=dl.Edge_v(j,0);
+            for(int k=0;k<dl.nl;k++) fe(e0+k,X.Append((k+(T).5)/dl.nl*dl.dz));
+        }
+    }
+
+    for(int i=0;i<dl.cb->S.m;i++)
+    {
+        int j=rd.dof_map_e(i);
+        if(j>=0)
+        {
+            TV2 X=dl.cb->X.Subset(dl.cb->S(i)).Sum()/2;
+            int e0=dl.Edge_h(j,0);
+            for(int k=0;k<dl.nl1;k++) fe(e0+k,X.Append((T)(k+1)/dl.nl*dl.dz));
+            int e1=dl.Edge_d(j,0);
+            for(int k=0;k<dl.nl;k++) fe(e1+k,X.Append((k+(T).5)/dl.nl*dl.dz));
+        }
+    }
+
+    for(int i=0;i<dl.cb->X.m;i++)
+    {
+        int j=rd.dof_map_p(i);
+        if(j>=0)
+        {
+            TV2 X=dl.cb->X(i);
+            int v0=dl.Vertex_p(j,0);
+            for(int k=0;k<dl.nl+1;k++) fp(v0+k,X.Append((T)k/dl.nl*dl.dz));
+        }
     }
 }
 

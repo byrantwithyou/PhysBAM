@@ -19,6 +19,19 @@ namespace PhysBAM{
 template<class TV> struct IS_SCALAR_BLOCK<INTERVAL<TV> >:public IS_SCALAR_BLOCK<TV>{};
 template<class TV,class RW> struct IS_BINARY_IO_SAFE<INTERVAL<TV>,RW> {static const bool value=true;};
 
+struct INTERVAL_ITERATOR
+{
+    int i;
+    bool operator<(const INTERVAL_ITERATOR& a) const {return i<a.i;}
+    bool operator==(const INTERVAL_ITERATOR& a) const {return i==a.i;}
+    bool operator!=(const INTERVAL_ITERATOR& a) const {return i!=a.i;}
+    INTERVAL_ITERATOR& operator++() {i++;return *this;};
+    INTERVAL_ITERATOR operator++(int) {return {i++};};
+    INTERVAL_ITERATOR& operator--() {i--;return *this;};
+    INTERVAL_ITERATOR operator--(int) {return {i--};};
+    int operator*() const {return i;}
+};
+
 template<class T>
 class INTERVAL
 {
@@ -200,6 +213,12 @@ public:
     T Signed_Distance(const T& X) const
     {return abs(X-Center())-Size();}
 
+    inline INTERVAL_ITERATOR begin() const
+    {STATIC_ASSERT((is_same<int,T>::value));return {min_corner};}
+
+    inline INTERVAL_ITERATOR end() const
+    {STATIC_ASSERT((is_same<int,T>::value));return {max_corner};}
+
     template<class RW> void Read(std::istream& input)
     {Read_Binary<RW>(input,min_corner,max_corner);}
 
@@ -208,23 +227,6 @@ public:
 
 //#####################################################################
 };
-
-struct INTERVAL_ITERATOR
-{
-    int i;
-    bool operator<(const INTERVAL_ITERATOR& a) const {return i<a.i;}
-    bool operator==(const INTERVAL_ITERATOR& a) const {return i==a.i;}
-    bool operator!=(const INTERVAL_ITERATOR& a) const {return i!=a.i;}
-    INTERVAL_ITERATOR& operator++() {i++;return *this;};
-    INTERVAL_ITERATOR operator++(int) {return {i++};};
-    int operator*() const {return i;}
-};
-
-inline INTERVAL_ITERATOR begin(const INTERVAL<int>& range)
-{return {range.min_corner};}
-
-inline INTERVAL_ITERATOR end(const INTERVAL<int>& range)
-{return {range.max_corner};}
 
 template<class T>
 inline INTERVAL<T> operator+(const T& a,const INTERVAL<T>& b)

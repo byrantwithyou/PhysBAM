@@ -34,7 +34,7 @@ struct BLOCK_VECTOR
     void Set_u(int i,int e,TV u) {Set_v(i+e*n.v,u);}
     void Set_p(int i,T u) {V(TV::m*(n.v+n.e)+i)=u;}
 
-    void Transform(const MATRIX<T,2>& M,T scale_p)
+    void Transform(const MATRIX<T,TV::m>& M,T scale_p)
     {
         for(int i=0;i<n.v;i++) Set_v(i,M*Get_v(i));
         for(int i=0;i<n.e;i++) Set_e(i,M*Get_e(i));

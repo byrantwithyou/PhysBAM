@@ -21,5 +21,33 @@ struct XFORM
     TV operator*(const TV& x) const {return M*x+b;}
     XFORM Inverse() const {auto inv=M.Inverse();return {inv,-inv*b};}
 };
+
+template<int d,class T>
+MATRIX<T,d> To_Dim(const MATRIX<T,2>& M)
+{
+    MATRIX<T,d> r;
+    r(d-1,d-1)=1;
+    r.Set_Submatrix(0,0,M);
+    return r;
+}
+
+template<class T>
+VECTOR<T,2> xform(const XFORM<VECTOR<T,2> >& A,const VECTOR<T,2>& v) {return A*v;}
+
+template<class T>
+VECTOR<T,3> xform(const XFORM<VECTOR<T,2> >& A,const VECTOR<T,3>& v) {return (A*v.Remove_Index(2)).Append(v(2));}
+
+template<class T>
+VECTOR<T,2> xform(const MATRIX<T,2>& A,const VECTOR<T,2>& v) {return A*v;}
+
+template<class T>
+VECTOR<T,3> xform(const MATRIX<T,2>& A,const VECTOR<T,3>& v) {return (A*v.Remove_Index(2)).Append(v(2));}
+
+template<class T>
+VECTOR<T,2> xform_trans(const MATRIX<T,2>& A,const VECTOR<T,2>& v) {return A.Transpose_Times(v);}
+
+template<class T>
+VECTOR<T,3> xform_trans(const MATRIX<T,2>& A,const VECTOR<T,3>& v) {return (A.Transpose_Times(A*v.Remove_Index(2))).Append(v(2));}
+
 }
 #endif

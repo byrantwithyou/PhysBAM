@@ -31,7 +31,8 @@ template<int d>
 void Run(PARSE_ARGS& parse_args)
 {
     typedef VECTOR<T,d> TV;
-    typedef VECTOR<int,TV::m> TV_INT;
+    typedef VECTOR<T,2> TV2;
+    typedef VECTOR<int,2> IV2;
 
     ARRAY<PAIR<std::chrono::steady_clock::time_point,const char*> > tm;
     tm.Preallocate(32);
@@ -70,24 +71,24 @@ void Run(PARSE_ARGS& parse_args)
 
     timer("parse input");
 
-    GRID<TV> grid(TV_INT()+1,cl.Compute_Bounding_Box(),true);
-    VIEWER_OUTPUT<TV> vo(STREAM_TYPE(0.f),grid,output_dir);
+    GRID<TV2> grid(IV2()+1,cl.Compute_Bounding_Box(),true);
+    VIEWER_OUTPUT<TV2> vo(STREAM_TYPE(0.f),grid,output_dir);
     vo.debug_particles.debug_particles.template Add_Array<T>("display_size");
     DEBUGGING_FEM<T> debug(cl);
     
     if(!quiet)
     {
-        Flush_Frame<TV>("init");
+        Flush_Frame<TV2>("init");
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
         {
             debug.Visualize_Block_State(b);
             debug.Visualize_Ticks(b,false);
         }
-        Flush_Frame<TV>("blocks");
+        Flush_Frame<TV2>("blocks");
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
         {
             debug.Visualize_Block_State(b);
-            Flush_Frame<TV>(LOG::sprintf("block %P (%P)",b,cl.blocks(b).block).c_str());
+            Flush_Frame<TV2>(LOG::sprintf("block %P (%P)",b,cl.blocks(b).block).c_str());
         }
     }
 
@@ -97,14 +98,14 @@ void Run(PARSE_ARGS& parse_args)
 
     if(!quiet)
     {
-        Flush_Frame<TV>("after master");
+        Flush_Frame<TV2>("after master");
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
             debug.Visualize_Block_State(b);
-        Flush_Frame<TV>("blocks");
+        Flush_Frame<TV2>("blocks");
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
         {
             debug.Visualize_Block_State(b);
-            Flush_Frame<TV>(LOG::sprintf("block %P (%P)",b,cl.blocks(b).block).c_str());
+            Flush_Frame<TV2>(LOG::sprintf("block %P (%P)",b,cl.blocks(b).block).c_str());
         }
     }
 
@@ -116,14 +117,14 @@ void Run(PARSE_ARGS& parse_args)
 
     if(!quiet)
     {
-        Flush_Frame<TV>("after merge");
+        Flush_Frame<TV2>("after merge");
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
             debug.Visualize_Block_State(b);
-        Flush_Frame<TV>("blocks");
+        Flush_Frame<TV2>("blocks");
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
         {
             debug.Visualize_Block_State(b);
-            Flush_Frame<TV>(LOG::sprintf("block %P (%P)",b,cl.blocks(b).block).c_str());
+            Flush_Frame<TV2>(LOG::sprintf("block %P (%P)",b,cl.blocks(b).block).c_str());
         }
     }
 
@@ -139,7 +140,7 @@ void Run(PARSE_ARGS& parse_args)
             debug.Visualize_Block_State(b);
             debug.Visualize_Ticks(b,true);
         }
-        Flush_Frame<TV>("ref ticks");
+        Flush_Frame<TV2>("ref ticks");
     }
     mc.Compute_Matrix_Blocks();
     ANALYTIC_FEM<TV>* an=0;
@@ -161,11 +162,11 @@ void Run(PARSE_ARGS& parse_args)
     mc.Dump_World_Space_Vector("b");
     if(!quiet)
     {
-        for(BLOCK_ID b(0);b<cl.blocks.m;b++)
-            debug.Visualize_Solution(mc.rhs_block_list(b),b,true);
-        Flush_Frame<TV>("rhs blocks");
-        for(BLOCK_ID b(0);b<cl.blocks.m;b++)
-            debug.Visualize_Block_Dofs(b);
+        // for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+        //     debug.Visualize_Solution(mc.rhs_block_list(b),b,true);
+        Flush_Frame<TV2>("rhs blocks");
+        // for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+        //     debug.Visualize_Block_Dofs(b);
     }
 
     timer("compute matrix");
@@ -205,9 +206,9 @@ void Run(PARSE_ARGS& parse_args)
     if(an) an->Check_Analytic_Solution();
     if(!quiet)
     {
-        for(BLOCK_ID b(0);b<cl.blocks.m;b++)
-            debug.Visualize_Solution(mc.rhs_block_list(b),b,true);
-        Flush_Frame<TV>("solution");
+        // for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+        //     debug.Visualize_Solution(mc.rhs_block_list(b),b,true);
+        Flush_Frame<TV2>("solution");
     }
     mc.Dump_World_Space_Vector("x");
     debug.Visualize_Flat_Dofs();
@@ -227,8 +228,8 @@ int main(int argc, char* argv[])
     parse_args.Add("-fem",&use_fem,"use FEM");
     parse_args.Parse(true);
     LOG::Initialize_Logging(false,false,1<<30,true);
-    /*if(use_3d) Run<3>(parse_args);
-      else*/ Run<2>(parse_args);
+    if(use_3d) Run<3>(parse_args);
+    else Run<2>(parse_args);
 
     LOG::Finish_Logging();
     return 0;

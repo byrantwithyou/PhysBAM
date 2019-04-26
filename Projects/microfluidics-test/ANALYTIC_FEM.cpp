@@ -29,49 +29,45 @@ template<class TV> bool ANALYTIC_FEM<TV>::
 Check_Analytic_Solution() const
 {
     if(!analytic_velocity || !analytic_pressure) return false;
-    T m=mc.cl.unit_m,s=mc.cl.unit_s,kg=mc.cl.unit_kg;
+    T m=mc.cl.unit_m,s=mc.cl.unit_s;
     T max_u=0,max_p=0;
     T l2_u=0,l2_p=0;
     int num_u=0,num_p=0;
     for(BLOCK_ID b(0);b<mc.cl.blocks.m;b++)
     {
         const auto& bl=mc.cl.blocks(b);
-        const auto* cb=bl.block;
-        auto Z=[=](int i){return bl.xform*cb->X(i);};
         const auto& rd=mc.cl.reference_block_data(mc.cl.blocks(b).ref_id);
         const auto& W=mc.rhs_block_list(b);
-        for(int i=0;i<cb->X.m;i++)
-            if(rd.dof_map_v(i)>=0)
+        DOF_LAYOUT<TV> dl(mc.cl,mc.cl.reference_block_data(bl.ref_id),true);
+        Visit_Compressed_Dofs(dl,rd,
+            [this,&bl,&W,m,s,&max_u,&l2_u,&num_u](int v,const TV& Y)
             {
-                TV X=Z(i);
+                TV X=xform(bl.xform,Y);
                 TV U=analytic_velocity->v(X/m,0)*m/s;
-                TV V=W.Get_v(rd.dof_map_v(i));
+                TV V=W.Get_v(v);
                 max_u=std::max(max_u,(U-V).Max_Abs());
                 l2_u+=(U-V).Magnitude_Squared();
                 num_u++;
-            }
-
-        for(int i=0;i<cb->S.m;i++)
-            if(rd.dof_map_e(i)>=0)
+            },
+            [this,&bl,&W,m,s,&max_u,&l2_u,&num_u](int e,const TV& Y)
             {
-                TV X=(Z(cb->S(i).x)+Z(cb->S(i).y))/2;
+                TV X=xform(bl.xform,Y);
                 TV U=analytic_velocity->v(X/m,0)*m/s;
-                TV V=W.Get_e(rd.dof_map_e(i));
+                TV V=W.Get_e(e);
                 max_u=std::max(max_u,(U-V).Max_Abs());
                 l2_u+=(U-V).Magnitude_Squared();
                 num_u++;
-            }
-
-        for(int i=0;i<cb->X.m;i++)
-            if(rd.dof_map_p(i)>=0)
+            },
+            [this,&bl,&W,m,s,&max_p,&l2_p,&num_p](int i,const TV& Y)
             {
-                TV X=Z(i);
+                TV X=xform(bl.xform,Y);
                 T p=analytic_pressure->f(X/m,0)*m/s;
-                T q=W.Get_p(rd.dof_map_p(i));
+                T q=W.Get_p(i);
                 max_p=std::max(max_p,std::abs(p-q));
                 l2_p+=sqr(p-q);
                 num_p++;
             }
+        );
     }
     if(num_u) l2_u=sqrt(l2_u/num_u);
     if(num_p) l2_p=sqrt(l2_p/num_p);
@@ -84,70 +80,76 @@ Check_Analytic_Solution() const
 template<class TV> void ANALYTIC_FEM<TV>::
 Compute_RHS()
 {
-    T m=mc.cl.unit_m,s=mc.cl.unit_s,kg=mc.cl.unit_kg;
+    T m=mc.cl.unit_m,s=mc.cl.unit_s;
     mc.rhs_block_list.Resize(mc.cl.blocks.m);
 
     for(BLOCK_ID b(0);b<mc.cl.blocks.m;b++)
     {
         BLOCK<T>& bl=mc.cl.blocks(b);
         CANONICAL_BLOCK<T>* cb=bl.block;
-        MATRIX<T,TV::m> M=bl.xform.M.Inverse();
+        MATRIX<T,TV::m> M=To_Dim<TV::m>(bl.xform.M.Inverse()),XF=To_Dim<TV::m>(bl.xform.M);
 
-        BLOCK_VECTOR<T> w,u;
+        BLOCK_VECTOR<TV> w,u;
         mc.Init_Block_Vector(w,b,false);
         mc.Init_Block_Vector(u,b,false);
-        for(auto i:cb->bc_v)
-        {
-            TV Z=bl.xform*cb->X(i);
-            u.Add_v(i,M*analytic_velocity->v(Z/m,0)*m/s);
-        }
-        for(auto i:cb->bc_e)
-        {
-            TV Z=bl.xform*cb->X.Subset(cb->S(i)).Average();
-            u.Add_e(i,M*analytic_velocity->v(Z/m,0)*m/s);
-        }
+        DOF_LAYOUT<TV> dl(mc.cl,mc.cl.reference_block_data(bl.ref_id),false);
+        Visit_Dofs<true,false>(dl,cb->bc_v,cb->bc_e,
+            [M,&u,XF,this,m,s](const VISIT_ALL_DOFS<TV>& va)
+            {
+                TV Z=XF*va.X;
+                u.Add_v(va.i,M*analytic_velocity->v(Z/m,0)*m/s);
+            },
+            [M,&u,XF,this,m,s](const VISIT_ALL_DOFS<TV>& va)
+            {
+                TV Z=XF*va.X;
+                u.Add_e(va.i,M*analytic_velocity->v(Z/m,0)*m/s);
+            });
         w.V=mc.canonical_block_matrices.Get(bl.block).M*-u.V;
 
         // TODO: handle det(M)!=1
         u.V.Fill(0);
-        ARRAY<T> div_v(cb->X.m),div_e(cb->S.m);
-        for(int i=0;i<cb->X.m;i++)
-        {
-            TV Z=bl.xform*cb->X(i);
-            u.Add_v(i,M*Force(Z));
-            div_v(i)=-analytic_velocity->dX(Z/m,0).Trace()/s;
-        }
-        for(int i=0;i<cb->S.m;i++)
-        {
-            TV Z=bl.xform*cb->X.Subset(cb->S(i)).Average();
-            u.Add_e(i,M*Force(Z));
-            div_e(i)=-analytic_velocity->dX(Z/m,0).Trace()/s;
-        }
+        ARRAY<T> div_v(dl.counts.v),div_e(dl.counts.e);
+        Visit_Dofs(dl,
+            [M,&u,m,s,XF,this,&div_v](const VISIT_ALL_DOFS<TV>& va)
+            {
+                TV Z=XF*va.X;
+                u.Add_v(va.i,M*Force(Z));
+                div_v(va.i)=-analytic_velocity->dX(Z/m,0).Trace()/s;
+            },
+            [M,&u,m,s,XF,this,&div_e](const VISIT_ALL_DOFS<TV>& va)
+            {
+                TV Z=XF*va.X;
+                u.Add_e(va.i,M*Force(Z));
+                div_e(va.i)=-analytic_velocity->dX(Z/m,0).Trace()/s;
+            });
         mc.Times_U_Dot_V(b,w,u);
         mc.Times_P_U(b,w,div_v,div_e);
-        w.Transform(bl.xform.M,1);
+        w.Transform(XF,1);
         mc.Apply_To_RHS(b,w);
     }
 
     for(const auto& bc:mc.cl.bc_t)
     {
         BLOCK<T>& bl=mc.cl.blocks(bc.b);
-        MATRIX<T,TV::m> M=bl.xform.M.Transposed()/bl.xform.M.Determinant();
+        MATRIX<T,TV::m> M=To_Dim<TV::m>(bl.xform.M.Transposed()/bl.xform.M.Determinant());
+        MATRIX<T,TV::m> XF=To_Dim<TV::m>(bl.xform.M);
 
-        BLOCK_VECTOR<T> w,u;
+        BLOCK_VECTOR<TV> w,u;
         mc.Init_Block_Vector(w,bc.b,false);
         mc.Init_Block_Vector(u,bc.b,false);
 
         DOF_LAYOUT<TV> dl(mc.cl,mc.cl.reference_block_data(bl.ref_id),false);
-        Visit_Wall_Dofs(dl,bc.bc_v,bc.bc_e,[M,&u,&bc,&bl,this](int v,const TV& X,const VECTOR<T,TV::m-1>&)
+        Visit_Dofs<true,false>(dl,bc.bc_v,bc.bc_e,
+            [M,&u,&bc,XF,this](const VISIT_ALL_DOFS<TV>& va)
             {
-                u.Add_v(v,M*Traction(bc.normal,bl.xform*X));
-            },[M,&u,&bc,&bl,this](int e,const TV& X,const VECTOR<T,TV::m-1>&)
+                u.Add_v(va.i,M*Traction(TV(bc.normal),XF*va.X));
+            },
+            [M,&u,&bc,XF,this](const VISIT_ALL_DOFS<TV>& va)
             {
-                u.Add_e(e,M*Traction(bc.normal,bl.xform*X));
+                u.Add_e(va.i,M*Traction(TV(bc.normal),XF*va.X));
             });
         mc.Times_Line_Integral_U_Dot_V(bc.b,bc.bc_e,w,u);
-        w.Transform(bl.xform.M,1);
+        w.Transform(XF,1);
         mc.Apply_To_RHS(bc.b,w);
     }
 }
@@ -174,5 +176,6 @@ Force(const TV& X) const
     f-=mc.mu*(Contract<1,2>(ddU)+Contract<0,2>(ddU));
     return f;
 }
-template class ANALYTIC_FEM<VECTOR<double,2> >;
+template struct ANALYTIC_FEM<VECTOR<double,2> >;
+template struct ANALYTIC_FEM<VECTOR<double,3> >;
 }

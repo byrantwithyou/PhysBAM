@@ -211,7 +211,7 @@ Visualize_Block_Dofs(BLOCK_ID b) const
 // Function Visualize_Solution
 //#####################################################################
 template<class T> void DEBUGGING_FEM<T>::
-Visualize_Solution(const BLOCK_VECTOR<T>& U,BLOCK_ID b,bool remap_dofs) const
+Visualize_Solution(const BLOCK_VECTOR<TV>& U,BLOCK_ID b,bool remap_dofs) const
 {
     const auto& bl=cl.blocks(b);
     const auto* cb=bl.block;
