@@ -87,21 +87,21 @@ Compute_RHS()
     {
         BLOCK<T>& bl=mc.cl.blocks(b);
         CANONICAL_BLOCK<T>* cb=bl.block;
-        MATRIX<T,TV::m> M=To_Dim<TV::m>(bl.xform.M.Inverse()),XF=To_Dim<TV::m>(bl.xform.M);
+        MATRIX<T,TV::m> M=To_Dim<TV::m>(bl.xform.M.Inverse());
 
         BLOCK_VECTOR<TV> w,u;
         mc.Init_Block_Vector(w,b,false);
         mc.Init_Block_Vector(u,b,false);
         DOF_LAYOUT<TV> dl(mc.cl,mc.cl.reference_block_data(bl.ref_id),false);
         Visit_Dofs<true,false>(dl,cb->bc_v,cb->bc_e,
-            [M,&u,XF,this,m,s](const VISIT_ALL_DOFS<TV>& va)
+            [M,&u,this,bl,m,s](const VISIT_ALL_DOFS<TV>& va)
             {
-                TV Z=XF*va.X;
+                TV Z=xform(bl.xform,va.X);
                 u.Add_v(va.i,M*analytic_velocity->v(Z/m,0)*m/s);
             },
-            [M,&u,XF,this,m,s](const VISIT_ALL_DOFS<TV>& va)
+            [M,&u,this,bl,m,s](const VISIT_ALL_DOFS<TV>& va)
             {
-                TV Z=XF*va.X;
+                TV Z=xform(bl.xform,va.X);
                 u.Add_e(va.i,M*analytic_velocity->v(Z/m,0)*m/s);
             });
         w.V=mc.canonical_block_matrices.Get(bl.block).M*-u.V;
@@ -110,21 +110,21 @@ Compute_RHS()
         u.V.Fill(0);
         ARRAY<T> div_v(dl.counts.v),div_e(dl.counts.e);
         Visit_Dofs(dl,
-            [M,&u,m,s,XF,this,&div_v](const VISIT_ALL_DOFS<TV>& va)
+            [M,&u,m,s,this,bl,&div_v](const VISIT_ALL_DOFS<TV>& va)
             {
-                TV Z=XF*va.X;
+                TV Z=xform(bl.xform,va.X);
                 u.Add_v(va.i,M*Force(Z));
                 div_v(va.i)=-analytic_velocity->dX(Z/m,0).Trace()/s;
             },
-            [M,&u,m,s,XF,this,&div_e](const VISIT_ALL_DOFS<TV>& va)
+            [M,&u,m,s,this,bl,&div_e](const VISIT_ALL_DOFS<TV>& va)
             {
-                TV Z=XF*va.X;
+                TV Z=xform(bl.xform,va.X);
                 u.Add_e(va.i,M*Force(Z));
                 div_e(va.i)=-analytic_velocity->dX(Z/m,0).Trace()/s;
             });
         mc.Times_U_Dot_V(b,w,u);
         mc.Times_P_U(b,w,div_v,div_e);
-        w.Transform(XF,1);
+        w.Transform(To_Dim<TV::m>(bl.xform.M),1);
         mc.Apply_To_RHS(b,w);
     }
 
@@ -132,7 +132,6 @@ Compute_RHS()
     {
         BLOCK<T>& bl=mc.cl.blocks(bc.b);
         MATRIX<T,TV::m> M=To_Dim<TV::m>(bl.xform.M.Transposed()/bl.xform.M.Determinant());
-        MATRIX<T,TV::m> XF=To_Dim<TV::m>(bl.xform.M);
 
         BLOCK_VECTOR<TV> w,u;
         mc.Init_Block_Vector(w,bc.b,false);
@@ -140,16 +139,16 @@ Compute_RHS()
 
         DOF_LAYOUT<TV> dl(mc.cl,mc.cl.reference_block_data(bl.ref_id),false);
         Visit_Dofs<true,false>(dl,bc.bc_v,bc.bc_e,
-            [M,&u,&bc,XF,this](const VISIT_ALL_DOFS<TV>& va)
+            [M,&u,&bc,bl,this](const VISIT_ALL_DOFS<TV>& va)
             {
-                u.Add_v(va.i,M*Traction(TV(bc.normal),XF*va.X));
+                u.Add_v(va.i,M*Traction(TV(bc.normal),xform(bl.xform,va.X)));
             },
-            [M,&u,&bc,XF,this](const VISIT_ALL_DOFS<TV>& va)
+            [M,&u,&bc,bl,this](const VISIT_ALL_DOFS<TV>& va)
             {
-                u.Add_e(va.i,M*Traction(TV(bc.normal),XF*va.X));
+                u.Add_e(va.i,M*Traction(TV(bc.normal),xform(bl.xform,va.X)));
             });
         mc.Times_Line_Integral_U_Dot_V(bc.b,bc.bc_e,w,u);
-        w.Transform(XF,1);
+        w.Transform(To_Dim<TV::m>(bl.xform.M),1);
         mc.Apply_To_RHS(bc.b,w);
     }
 }

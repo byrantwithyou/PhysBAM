@@ -532,6 +532,7 @@ Compute_RHS()
     for(const auto& bc:cl.bc_v)
     {
         BLOCK<T>& bl=cl.blocks(bc.b);
+        MATRIX<T,2> M=bl.xform.M.Inverse();
             
         BLOCK_VECTOR<TV> w,u;
         Init_Block_Vector(w,bc.b,false);
@@ -542,14 +543,16 @@ Compute_RHS()
         TV2 B=dl.cb->X(bc.bc_v.max_corner-1);
         T width=(B-A).Magnitude();
         T k=bc.flow_rate*6/width;
-        Visit_Dofs<false,true>(dl,bc.bc_v,bc.bc_e,[k,&u,&bc](const VISIT_ALL_DOFS<TV>& va)
+        Visit_Dofs<false,true>(dl,bc.bc_v,bc.bc_e,
+            [k,&u,&bc,&M](const VISIT_ALL_DOFS<TV>& va)
             {
                 T z=(va.uv*((T)1-va.uv)).Product();
-                u.Add_v(va.i,-k*z*TV(bc.normal));
-            },[k,&u,&bc](const VISIT_ALL_DOFS<TV>& va)
+                u.Add_v(va.i,TV(M*-k*z*bc.normal));
+            },
+            [k,&u,&bc,&M](const VISIT_ALL_DOFS<TV>& va)
             {
                 T z=(va.uv*((T)1-va.uv)).Product();
-                u.Add_e(va.i,-k*z*TV(bc.normal));
+                u.Add_e(va.i,TV(M*-k*z*bc.normal));
             });
         w.V=canonical_block_matrices.Get(bl.block).M*-u.V;
         w.Transform(To_Dim<TV::m>(bl.xform.M),1);
@@ -566,10 +569,12 @@ Compute_RHS()
         Init_Block_Vector(u,bc.b,false);
         DOF_LAYOUT<TV> dl(cl,cl.reference_block_data(bl.ref_id),false);
         TV tr=TV(M*bc.traction);
-        Visit_Dofs<false,false>(dl,bc.bc_v,bc.bc_e,[tr,&u](const VISIT_ALL_DOFS<TV>& va)
+        Visit_Dofs<false,false>(dl,bc.bc_v,bc.bc_e,
+            [tr,&u](const VISIT_ALL_DOFS<TV>& va)
             {
                 u.Add_v(va.i,tr);
-            },[tr,&u](const VISIT_ALL_DOFS<TV>& va)
+            },
+            [tr,&u](const VISIT_ALL_DOFS<TV>& va)
             {
                 u.Add_e(va.i,tr);
             });
