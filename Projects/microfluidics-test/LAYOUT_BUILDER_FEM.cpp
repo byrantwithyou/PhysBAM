@@ -57,6 +57,11 @@ From_File(const std::string& file)
                 Set_Target_Length(t0);
                 break;
 
+            case 'z':
+                ss>>t0>>i0;
+                Set_Depth(t0,i0);
+                break;
+
             case 'c':
                 {
                     ss>>name>>i0>>t0;
@@ -145,6 +150,9 @@ To_String() const
         {
             case TAG::SET_LEN:
                 os<<"l "<<cl.target_length;
+                break;
+            case TAG::SET_DEPTH:
+                os<<"z "<<cl.depth<<" "<<cl.depth_layers;
                 break;
             case TAG::DECL_CS:
                 {
@@ -241,6 +249,16 @@ Set_Target_Length(T l)
     comp_bc.target_length=cl.target_length;
     comp_joint.target_length=cl.target_length;
     commands.Append({TAG::SET_LEN,-1});
+}
+//#####################################################################
+// Function Set_Depth
+//#####################################################################
+template<class T> void LAYOUT_BUILDER_FEM<T>::
+Set_Depth(T z,int m)
+{
+    cl.depth=z;
+    cl.depth_layers=m;
+    commands.Append({TAG::SET_DEPTH,-1});
 }
 //#####################################################################
 // Function Cross_Section

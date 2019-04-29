@@ -20,7 +20,7 @@ struct LAYOUT_BUILDER_FEM
     PHYSBAM_DECLARE_ELEMENT_ID(CONNECTOR_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
     PHYSBAM_DECLARE_ELEMENT_ID(BC_U_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
     PHYSBAM_DECLARE_ELEMENT_ID(BC_T_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
-    enum class TAG {SET_LEN,DECL_CS,DECL_VERT,SET_BC_U,SET_BC_T,DECL_JT,DECL_PIPE,CS,VERT,CONNECTOR};
+    enum class TAG {SET_DEPTH,SET_LEN,DECL_CS,DECL_VERT,SET_BC_U,SET_BC_T,DECL_JT,DECL_PIPE,CS,VERT,CONNECTOR};
     struct VERTEX_DATA
     {
         TV X;
@@ -45,6 +45,7 @@ struct LAYOUT_BUILDER_FEM
     void Set_Connector(VERTEX_DATA& vd,BLOCK_ID id,CON_ID con_id);
     MATRIX<T,2> Compute_Xform(const TV& dir); // dir is normalized
     // l <target-length>
+    // z <depth> <volumetric-layers>
     // c <cross-section-name> <num-elements> <width>
     // v <vertex-name> <vertex-location-2d>
     // j <cross-section-name> <num-pipes> <origin-vertex> [<vertex-name> <connection-name>]*
@@ -56,6 +57,7 @@ struct LAYOUT_BUILDER_FEM
     std::string To_String() const;
 
     void Set_Target_Length(T l);
+    void Set_Depth(T z,int m);
     CS_ID Cross_Section(int d,T w);
     VERT_ID Vertex(const TV& X);
     PAIR<CONNECTOR_ID,BC_U_ID> Set_BC(CS_ID cs,VERT_ID from,VERT_ID to,T flow_rate);
