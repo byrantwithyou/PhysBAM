@@ -31,8 +31,10 @@ template<int d>
 void Run(PARSE_ARGS& parse_args)
 {
     typedef VECTOR<T,d> TV;
+    typedef VECTOR<T,3> TV3;
     typedef VECTOR<T,2> TV2;
     typedef VECTOR<int,2> IV2;
+    typedef VECTOR<int,3> IV3;
 
     ARRAY<PAIR<std::chrono::steady_clock::time_point,const char*> > tm;
     tm.Preallocate(32);
@@ -73,7 +75,8 @@ void Run(PARSE_ARGS& parse_args)
 
     GRID<TV2> grid(IV2()+1,cl.Compute_Bounding_Box(),true);
     VIEWER_OUTPUT<TV2> vo2(STREAM_TYPE(0.f),grid,output_dir);
-    VIEWER_OUTPUT<TV> vo(STREAM_TYPE(0.f),GRID<TV>(),output_dir+"/3d");
+    GRID<TV3> grid3(IV3()+1,{grid.domain.min_corner.Append(0),grid.domain.max_corner.Append(cl.depth)},true);
+    VIEWER_OUTPUT<TV3> vo3(STREAM_TYPE(0.f),grid3,output_dir+"/3d");
     vo2.debug_particles.debug_particles.template Add_Array<T>("display_size");
     DEBUGGING_FEM<T> debug(cl);
     
@@ -140,8 +143,11 @@ void Run(PARSE_ARGS& parse_args)
         {
             debug.Visualize_Block_State(b);
             debug.Visualize_Ticks(b,true);
-            debug.Visualize_Tetrahedron(b);
-            Flush_Frame<TV>(LOG::sprintf("block %P",b).c_str());
+            if(d==3)
+            {
+                debug.Visualize_Tetrahedron(b);
+                Flush_Frame<TV>(LOG::sprintf("block %P",b).c_str());
+            }
         }
         Flush_Frame<TV2>("ref ticks");
     }

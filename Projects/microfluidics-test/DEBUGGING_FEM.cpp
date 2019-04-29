@@ -361,38 +361,36 @@ Visualize_Flat_Dofs() const
 template<class T> void DEBUGGING_FEM<T>::
 Visualize_Tetrahedron(BLOCK_ID b) const
 {
-    typedef VECTOR<T,3> TV;
-
     for(BLOCK_ID b(0);b<cl.blocks.m;b++)
     {
         const auto* cb=cl.blocks(b).block;
         auto Z=[=](int i){return cl.blocks(b).xform*cb->X(i);};
         for(auto t:cb->E)
         {
-            VECTOR<TV,3> P;
+            VECTOR<TV3,3> P;
             for(int i=0;i<3;i++) P(i)=Z(t(i)).Append(-0.01);
-            for(int i=0;i<3;i++) Add_Debug_Object(VECTOR<TV,2>(P(i),P((i+1)%3)),VECTOR<T,3>(.2,.2,.2));
+            for(int i=0;i<3;i++) Add_Debug_Object(VECTOR<TV3,2>(P(i),P((i+1)%3)),VECTOR<T,3>(.2,.2,.2));
         }
     }
 
     const auto& rb=cl.reference_block_data(cl.blocks(b).ref_id);
-    auto Z=[=](const TV& X)
+    auto Z=[=](const TV3& X)
     {
         const MATRIX<T,2>& m=cl.blocks(b).xform.M;
-        MATRIX<T,3> M(m.Column(0).Append(0),m.Column(1).Append(0),TV(0,0,1));
+        MATRIX<T,3> M(m.Column(0).Append(0),m.Column(1).Append(0),TV3(0,0,1));
         return M*X+cl.blocks(b).xform.b.Append(0);
     };
-    DOF_LAYOUT<TV> dl(cl,rb,false);
-    Visit_Elements(dl,[Z](const VISIT_ELEMENT_DATA<TV>& vt)
+    DOF_LAYOUT<TV3> dl(cl,rb,false);
+    Visit_Elements(dl,[Z](const VISIT_ELEMENT_DATA<TV3>& vt)
     {
-        VECTOR<TV,4> P;
+        VECTOR<TV3,4> P;
         for(int i=0;i<4;i++) P(i)=Z(vt.X(i));
-        Add_Debug_Object(VECTOR<TV,2>(P(0),P(1)),VECTOR<T,3>(1,1,1));
-        Add_Debug_Object(VECTOR<TV,2>(P(0),P(2)),VECTOR<T,3>(1,1,1));
-        Add_Debug_Object(VECTOR<TV,2>(P(0),P(3)),VECTOR<T,3>(1,1,1));
-        Add_Debug_Object(VECTOR<TV,2>(P(1),P(2)),VECTOR<T,3>(1,1,1));
-        Add_Debug_Object(VECTOR<TV,2>(P(2),P(3)),VECTOR<T,3>(1,1,1));
-        Add_Debug_Object(VECTOR<TV,2>(P(3),P(1)),VECTOR<T,3>(1,1,1));
+        Add_Debug_Object(VECTOR<TV3,2>(P(0),P(1)),VECTOR<T,3>(1,1,1));
+        Add_Debug_Object(VECTOR<TV3,2>(P(0),P(2)),VECTOR<T,3>(1,1,1));
+        Add_Debug_Object(VECTOR<TV3,2>(P(0),P(3)),VECTOR<T,3>(1,1,1));
+        Add_Debug_Object(VECTOR<TV3,2>(P(1),P(2)),VECTOR<T,3>(1,1,1));
+        Add_Debug_Object(VECTOR<TV3,2>(P(2),P(3)),VECTOR<T,3>(1,1,1));
+        Add_Debug_Object(VECTOR<TV3,2>(P(3),P(1)),VECTOR<T,3>(1,1,1));
     });
 }
 template class DEBUGGING_FEM<double>;
