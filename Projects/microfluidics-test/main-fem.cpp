@@ -72,8 +72,9 @@ void Run(PARSE_ARGS& parse_args)
     timer("parse input");
 
     GRID<TV2> grid(IV2()+1,cl.Compute_Bounding_Box(),true);
-    VIEWER_OUTPUT<TV2> vo(STREAM_TYPE(0.f),grid,output_dir);
-    vo.debug_particles.debug_particles.template Add_Array<T>("display_size");
+    VIEWER_OUTPUT<TV2> vo2(STREAM_TYPE(0.f),grid,output_dir);
+    VIEWER_OUTPUT<TV> vo(STREAM_TYPE(0.f),GRID<TV>(),output_dir+"/3d");
+    vo2.debug_particles.debug_particles.template Add_Array<T>("display_size");
     DEBUGGING_FEM<T> debug(cl);
     
     if(!quiet)
@@ -139,6 +140,8 @@ void Run(PARSE_ARGS& parse_args)
         {
             debug.Visualize_Block_State(b);
             debug.Visualize_Ticks(b,true);
+            debug.Visualize_Tetrahedron(b);
+            Flush_Frame<TV>(LOG::sprintf("block %P",b).c_str());
         }
         Flush_Frame<TV2>("ref ticks");
     }
