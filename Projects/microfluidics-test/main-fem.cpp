@@ -162,11 +162,11 @@ void Run(PARSE_ARGS& parse_args)
     mc.Dump_World_Space_Vector("b");
     if(!quiet)
     {
-        // for(BLOCK_ID b(0);b<cl.blocks.m;b++)
-        //     debug.Visualize_Solution(mc.rhs_block_list(b),b,true);
+        for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+            debug.Visualize_Solution(mc.rhs_block_list(b),b,true);
         Flush_Frame<TV2>("rhs blocks");
-        // for(BLOCK_ID b(0);b<cl.blocks.m;b++)
-        //     debug.Visualize_Block_Dofs(b);
+        for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+            debug.Visualize_Block_Dofs(b);
     }
 
     timer("compute matrix");
@@ -206,8 +206,8 @@ void Run(PARSE_ARGS& parse_args)
     if(an) an->Check_Analytic_Solution();
     if(!quiet)
     {
-        // for(BLOCK_ID b(0);b<cl.blocks.m;b++)
-        //     debug.Visualize_Solution(mc.rhs_block_list(b),b,true);
+        for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+            debug.Visualize_Solution(mc.rhs_block_list(b),b,true);
         Flush_Frame<TV2>("solution");
     }
     mc.Dump_World_Space_Vector("x");

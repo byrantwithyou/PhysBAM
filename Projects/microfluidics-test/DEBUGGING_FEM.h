@@ -17,6 +17,7 @@ struct DEBUGGING_FEM
 {
     typedef VECTOR<T,2> TV;
     typedef VECTOR<int,2> IV2;
+    typedef VECTOR<T,3> TV3;
     COMPONENT_LAYOUT_FEM<T>& cl;
 
     DEBUGGING_FEM(COMPONENT_LAYOUT_FEM<T>& cl);
@@ -24,6 +25,7 @@ struct DEBUGGING_FEM
     void Visualize_Block_State(BLOCK_ID b) const;
     void Visualize_Block_Dofs(BLOCK_ID b) const;
     void Visualize_Solution(const BLOCK_VECTOR<TV>& U,BLOCK_ID b,bool remap_dofs) const;
+    void Visualize_Solution(const BLOCK_VECTOR<TV3>& U,BLOCK_ID b,bool remap_dofs) const;
     void Visualize_Flat_Dofs() const;
     void Visualize_Ticks(BLOCK_ID b,bool reference_ticks) const;
     void Check_Analytic_Solution() const;
