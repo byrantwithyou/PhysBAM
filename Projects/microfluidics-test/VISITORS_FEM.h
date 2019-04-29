@@ -460,12 +460,12 @@ void Visit_Dof_Pairs(const DOF_LAYOUT<VECTOR<T,3> >& dl0,const DOF_LAYOUT<VECTOR
     int nl=dl0.nl;
     int nl1=dl0.nl1;
     assert(nl==dl1.nl);
-    assert(nl1==dl1.nl1);
+    assert(nl1==dl1.nl-1);
     for(auto p:dp.v)
     {
         int v0=dl0.Vertex(p.x,0);
         int v1=dl1.Vertex(p.y,0);
-        for(int i=0;i<nl1;i++) fv(v0+i,v1+i);
+        for(int i=0;i<nl1;i++) fv(v0+i,v1+i+1);
         int e0=dl0.Edge_v(p.x,0);
         int e1=dl1.Edge_v(p.y,0);
         for(int i=0;i<nl;i++) fe(e0+i,e1+i);
@@ -474,7 +474,7 @@ void Visit_Dof_Pairs(const DOF_LAYOUT<VECTOR<T,3> >& dl0,const DOF_LAYOUT<VECTOR
     {
         int h0=dl0.Edge_h(p.x,0);
         int h1=dl1.Edge_h(p.y,0);
-        for(int i=0;i<nl1;i++) fe(h0+i,h1+i);
+        for(int i=0;i<nl1;i++) fe(h0+i,h1+i+1);
         int d0=dl0.Edge_d(p.x,0);
         int d1=dl1.Edge_d(p.y,0);
         for(int i=0;i<nl;i++) fe(d0+i,d1+i);
