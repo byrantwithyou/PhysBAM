@@ -312,7 +312,7 @@ template<class TV> void MATRIX_CONSTRUCTION_FEM<TV>::
 Copy_Matrix_Data(BLOCK_MATRIX<TV>& A,BLOCK_ID b,
     const DOF_PAIRS& dpa,const DOF_PAIRS& dpb,BLOCK_ID ar,BLOCK_ID ac) const
 {
-    const BLOCK_MATRIX<TV>& B=canonical_block_matrices.Get(cl.blocks(b).block);
+    const BLOCK_MATRIX<TV>& B=Canonical_Matrix(b);
     MATRIX<T,2> G=cl.blocks(b).xform.M.Inverse();
     MATRIX<T,TV::m> Ma=To_Dim<TV::m>(G*cl.blocks(ar).xform.M);
     MATRIX<T,TV::m> Mb=To_Dim<TV::m>(G*cl.blocks(ac).xform.M);
@@ -475,6 +475,16 @@ Fill_Irregular_Connection_Matrix(ARRAY<BLOCK_MATRIX<TV>,RID_ID>& M,const REFEREN
     }
 }
 //#####################################################################
+// Function Canonical_Matrix
+//#####################################################################
+template<class TV> const BLOCK_MATRIX<TV>& MATRIX_CONSTRUCTION_FEM<TV>::
+Canonical_Matrix(BLOCK_ID b) const
+{
+    const auto& bl=cl.blocks(b);
+    if(TV::m==2) return canonical_block_matrices.Get(bl.block);
+    else return reference_matrix(bl.ref_id);
+}
+//#####################################################################
 // Function Compute_Matrix_Blocks
 //#####################################################################
 template<class TV> void MATRIX_CONSTRUCTION_FEM<TV>::
@@ -554,7 +564,7 @@ Compute_RHS()
                 T z=(va.uv*((T)1-va.uv)).Product();
                 u.Add_e(va.i,TV(M*-k*z*bc.normal));
             });
-        w.V=canonical_block_matrices.Get(bl.block).M*-u.V;
+        w.V=Canonical_Matrix(bc.b).M*-u.V;
         w.Transform(To_Dim<TV::m>(bl.xform.M),1);
         Apply_To_RHS(bc.b,w);
     }

@@ -35,6 +35,7 @@ struct MATRIX_CONSTRUCTION_FEM
     HASHTABLE<CANONICAL_BLOCK<T>*,BLOCK_MATRIX<TV> > canonical_block_matrices;
     ARRAY<BLOCK_VECTOR<TV>,BLOCK_ID> rhs_block_list;
 
+    const BLOCK_MATRIX<TV>& Canonical_Matrix(BLOCK_ID b) const;
     void Compute_Matrix_Blocks();
     void Compute_RHS();
     void Copy_To_CEM(CACHED_ELIMINATION_MATRIX<T>& cem);

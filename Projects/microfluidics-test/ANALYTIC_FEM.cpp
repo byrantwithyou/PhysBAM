@@ -104,7 +104,7 @@ Compute_RHS()
                 TV Z=xform(bl.xform,va.X);
                 u.Add_e(va.i,M*analytic_velocity->v(Z/m,0)*m/s);
             });
-        w.V=mc.canonical_block_matrices.Get(bl.block).M*-u.V;
+        w.V=mc.Canonical_Matrix(b).M*-u.V;
 
         // TODO: handle det(M)!=1
         u.V.Fill(0);
