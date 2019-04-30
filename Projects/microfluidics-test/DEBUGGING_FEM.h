@@ -28,9 +28,6 @@ struct DEBUGGING_FEM
     void Visualize_Solution(const BLOCK_VECTOR<TV3>& U,BLOCK_ID b,bool remap_dofs) const;
     void Visualize_Flat_Dofs() const;
     void Visualize_Ticks(BLOCK_ID b,bool reference_ticks) const;
-    void Check_Analytic_Solution() const;
-    void Dump_World_Space_System() const;
-    void Dump_World_Space_Vector(const char* name) const;
     void Visualize_Tetrahedron(BLOCK_ID b) const;
 };
 
