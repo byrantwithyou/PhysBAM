@@ -530,9 +530,9 @@ void Visit_Compressed_Dofs(const DOF_LAYOUT<VECTOR<T,3> >& dl,const REFERENCE_BL
         {
             TV2 X=dl.cb->X(i);
             int v0=dl.Vertex(j,0);
-            for(int k=0;k<dl.nl1;k++) fv(v0+k,X.Append((T)(k+1)/dl.nl*dl.dz));
+            for(int k=0;k<dl.nl1;k++) fv(v0+k,X.Append((T)(k+1)*dl.dz));
             int e0=dl.Edge_v(j,0);
-            for(int k=0;k<dl.nl;k++) fe(e0+k,X.Append((k+(T).5)/dl.nl*dl.dz));
+            for(int k=0;k<dl.nl;k++) fe(e0+k,X.Append((k+(T).5)*dl.dz));
         }
     }
 
@@ -543,9 +543,9 @@ void Visit_Compressed_Dofs(const DOF_LAYOUT<VECTOR<T,3> >& dl,const REFERENCE_BL
         {
             TV2 X=dl.cb->X.Subset(dl.cb->S(i)).Sum()/2;
             int e0=dl.Edge_h(j,0);
-            for(int k=0;k<dl.nl1;k++) fe(e0+k,X.Append((T)(k+1)/dl.nl*dl.dz));
+            for(int k=0;k<dl.nl1;k++) fe(e0+k,X.Append((T)(k+1)*dl.dz));
             int e1=dl.Edge_d(j,0);
-            for(int k=0;k<dl.nl;k++) fe(e1+k,X.Append((k+(T).5)/dl.nl*dl.dz));
+            for(int k=0;k<dl.nl;k++) fe(e1+k,X.Append((k+(T).5)*dl.dz));
         }
     }
 
@@ -556,7 +556,7 @@ void Visit_Compressed_Dofs(const DOF_LAYOUT<VECTOR<T,3> >& dl,const REFERENCE_BL
         {
             TV2 X=dl.cb->X(i);
             int v0=dl.Vertex_p(j,0);
-            for(int k=0;k<dl.nl+1;k++) fp(v0+k,X.Append((T)k/dl.nl*dl.dz));
+            for(int k=0;k<dl.nl+1;k++) fp(v0+k,X.Append((T)k*dl.dz));
         }
     }
 }
