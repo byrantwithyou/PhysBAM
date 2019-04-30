@@ -29,6 +29,8 @@ struct DEBUGGING_FEM
     void Visualize_Flat_Dofs() const;
     void Visualize_Ticks(BLOCK_ID b,bool reference_ticks) const;
     void Visualize_Tetrahedron(BLOCK_ID b) const;
+    template<int d>
+    void Hightlight_DOF(BLOCK_ID b,int vep,int r,int dim) const;
 };
 
 }

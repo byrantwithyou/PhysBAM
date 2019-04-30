@@ -393,5 +393,49 @@ Visualize_Tetrahedron(BLOCK_ID b) const
         Add_Debug_Object(VECTOR<TV3,2>(P(3),P(1)),VECTOR<T,3>(1,1,1));
     });
 }
+//#####################################################################
+// Function Hightlight_DOF
+//#####################################################################
+template<class T> template<int d> void DEBUGGING_FEM<T>::
+Hightlight_DOF(BLOCK_ID b,int vep,int r,int dim) const
+{
+    typedef VECTOR<T,d> TV;
+    const auto& M=cl.blocks(b).xform;
+    const auto& rb=cl.reference_block_data(cl.blocks(b).ref_id);
+    DOF_LAYOUT<TV> dl(cl,rb,true);
+    int count=0;
+    VECTOR<T,3> color;
+    if(dim>=0) color(dim)=1;
+    Visit_Compressed_Dofs(dl,rb,
+        [&count,&M,&color,vep,r](int v,const TV& X)
+        {
+            if(vep!=0) return;
+            if(count++==r)
+            {
+                Add_Debug_Particle(xform(M,X),color);
+                Debug_Particle_Set_Attribute<TV2>("display_size",.5);
+            }
+        },
+        [&count,&M,&color,vep,r](int e,const TV& X)
+        {
+            if(vep!=1) return;
+            if(count++==r)
+            {
+                Add_Debug_Particle(xform(M,X),color);
+                Debug_Particle_Set_Attribute<TV2>("display_size",.5);
+            }
+        },
+        [&count,&M,&color,vep,r](int p,const TV& X)
+        {
+            if(vep!=2) return;
+            if(count++==r)
+            {
+                Add_Debug_Particle(xform(M,X),VECTOR<T,3>(1,1,0));
+                Debug_Particle_Set_Attribute<TV2>("display_size",.5);
+            }
+        });
+}
 template class DEBUGGING_FEM<double>;
+template void DEBUGGING_FEM<double>::Hightlight_DOF<2>(BLOCK_ID,int,int,int) const;
+template void DEBUGGING_FEM<double>::Hightlight_DOF<3>(BLOCK_ID,int,int,int) const;
 }

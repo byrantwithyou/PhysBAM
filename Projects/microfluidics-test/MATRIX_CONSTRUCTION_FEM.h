@@ -58,6 +58,7 @@ struct MATRIX_CONSTRUCTION_FEM
     void Dump_World_Space_Vector(const char* name) const;
     void Dump_Matrix_Block(SYSTEM_MATRIX_HELPER<T>& h,ARRAY<int,BLOCK_ID> first[3],const BLOCK_MATRIX<TV>& M,BLOCK_ID b0,BLOCK_ID b1) const;
     int Compute_Global_Dof_Mapping(ARRAY<int,BLOCK_ID> first[3]) const;
+    std::tuple<BLOCK_ID,int,int,int> Inverse_DOF_Lookup(int global_dof) const; // BLOCK_ID,vep,dof,dim
 };
 
 }

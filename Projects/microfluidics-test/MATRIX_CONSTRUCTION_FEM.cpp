@@ -917,6 +917,36 @@ Dump_World_Space_Vector(const char* name) const
     }
     OCTAVE_OUTPUT<T>((name+(std::string)".txt").c_str()).Write(name,sol);
 }
+//#####################################################################
+// Function Inverse_DOF_Lookup
+//#####################################################################
+template<class TV> std::tuple<BLOCK_ID,int,int,int> MATRIX_CONSTRUCTION_FEM<TV>::
+Inverse_DOF_Lookup(int global_dof) const
+{
+    ARRAY<int,BLOCK_ID> first[3];
+    Compute_Global_Dof_Mapping(first);
+
+    for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+    {
+        const auto& a=cl.reference_block_data(cl.blocks(b).ref_id);
+        DOF_LAYOUT<TV> dl(cl,a,true);
+        int A[3]={dl.counts.v*TV::m,dl.counts.e*TV::m,dl.counts.p};
+        for(int i=0;i<3;i++)
+            for(int r=0;r<A[i];r++)
+                if(first[i](b)+r==global_dof)
+                {
+                    int dim=-7;
+                    if(i!=2)
+                    {
+                        dim=r%TV::m;
+                        r=r/TV::m;
+                    }
+                    return std::make_tuple(b,i,r,dim);
+                }
+    }
+    PHYSBAM_ASSERT(false);
+    return std::make_tuple(BLOCK_ID(-7),-7,-7,-7);
+}
 template class MATRIX_CONSTRUCTION_FEM<VECTOR<double,2> >;
 template class MATRIX_CONSTRUCTION_FEM<VECTOR<double,3> >;
 }

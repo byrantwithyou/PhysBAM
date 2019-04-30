@@ -48,6 +48,7 @@ void Run(PARSE_ARGS& parse_args)
     std::string pipe_file,output_dir="output";
     std::string analytic_u,analytic_p;
     T s=1,m=1,kg=1;
+    int hl_dof=-1;
     parse_args.Add("-o",&output_dir,"dir","output dir");
     parse_args.Add("-mu",&mu,"mu","viscosity");
     parse_args.Add("-q",&quiet,"disable diagnostics; useful for timing");
@@ -57,6 +58,7 @@ void Run(PARSE_ARGS& parse_args)
     parse_args.Add("-s",&s,"scale","scale units of time");
     parse_args.Add("-kg",&kg,"scale","scale units of mass");
     parse_args.Add("-threads",&threads,"num","number of threads to use");
+    parse_args.Add("-hl",&hl_dof,"dof","highlight global dof");
     parse_args.Add("-u",&analytic_u,"program","analytic velocity");
     parse_args.Add("-p",&analytic_p,"program","analytic pressure");
     parse_args.Extra(&pipe_file,"file","file describing pipes");
@@ -151,6 +153,23 @@ void Run(PARSE_ARGS& parse_args)
         }
         Flush_Frame<TV2>("ref ticks");
     }
+    if(hl_dof>=0)
+    {
+        for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+        {
+            BLOCK_ID bb;
+            int vep,r,dim;
+            std::tie(bb,vep,r,dim)=mc.Inverse_DOF_Lookup(hl_dof);
+            if(bb!=b) continue;
+
+            debug.Visualize_Block_State(b);
+            if(d==3)
+                debug.Visualize_Tetrahedron(b);
+            debug.Hightlight_DOF<d>(b,vep,r,dim);
+            Flush_Frame<TV>("highlight dof");
+        }
+    }
+
     mc.Compute_Matrix_Blocks();
     ANALYTIC_FEM<TV>* an=0;
     if(analytic_p.size() && analytic_u.size())
