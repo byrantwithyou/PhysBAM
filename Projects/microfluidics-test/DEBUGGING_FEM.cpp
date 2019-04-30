@@ -30,23 +30,23 @@ Visualize_Block_State(BLOCK_ID b) const
     auto Z=[=](int i){return bl.xform*cb->X(i);};
     for(auto t:cb->E)
     {
-        VECTOR<TV,3> P;
+        VECTOR<TV2,3> P;
         for(int i=0;i<3;i++) P(i)=bl.xform*cb->X(t(i));
-        for(auto p:P) Add_Debug_Object(VECTOR<TV,2>(p,P.Average()),VECTOR<T,3>(.5,.5,.5));
+        for(auto p:P) Add_Debug_Object(VECTOR<TV2,2>(p,P.Average()),VECTOR<T,3>(.5,.5,.5));
     }
     HASHTABLE<int> he,hv;
     he.Set_All(cb->bc_e);
     hv.Set_All(cb->bc_v);
     for(int i=0;i<cb->S.m;i++)
     {
-        TV X=Z(cb->S(i).x);
-        TV Y=Z(cb->S(i).y);
-        Add_Debug_Object(VECTOR<TV,2>(X,Y),he.Contains(i)?VECTOR<T,3>(0,1,1):VECTOR<T,3>(0,0,1));
+        TV2 X=Z(cb->S(i).x);
+        TV2 Y=Z(cb->S(i).y);
+        Add_Debug_Object(VECTOR<TV2,2>(X,Y),he.Contains(i)?VECTOR<T,3>(0,1,1):VECTOR<T,3>(0,0,1));
     }
     for(int i=0;i<cb->X.m;i++)
     {
         Add_Debug_Particle(Z(i),hv.Contains(i)?VECTOR<T,3>(1,1,0):VECTOR<T,3>(1,0,0));
-        Debug_Particle_Set_Attribute<TV>("display_size",.1);
+        Debug_Particle_Set_Attribute<TV2>("display_size",.1);
     }
 
     for(CON_ID cc(0);cc<bl.connections.m;cc++)
@@ -60,12 +60,12 @@ Visualize_Block_State(BLOCK_ID b) const
                 [&](int a,int b,bool o)
                 {
                     Add_Debug_Particle(Z(a),o?VECTOR<T,3>(1,0,0):VECTOR<T,3>(0,1,0));
-                    Debug_Particle_Set_Attribute<TV>("display_size",.2);
+                    Debug_Particle_Set_Attribute<TV2>("display_size",.2);
                 },
                 [&](int a,int b,bool o)
                 {
                     Add_Debug_Particle((Z(cb->S(a).x)+Z(cb->S(a).y))/2,o?VECTOR<T,3>(1,0,0):VECTOR<T,3>(0,1,0));
-                    Debug_Particle_Set_Attribute<TV>("display_size",.2);
+                    Debug_Particle_Set_Attribute<TV2>("display_size",.2);
                 });
         }
         else
@@ -74,13 +74,13 @@ Visualize_Block_State(BLOCK_ID b) const
             Visit_Irregular_Cross_Section_Dofs(cl.blocks,ic,
                 [&](const IRREGULAR_VISITOR& iv)
                 {
-                    TV A=Z(iv.r0),B=Z(iv.r1);
+                    TV2 A=Z(iv.r0),B=Z(iv.r1);
                     Add_Debug_Particle(A,VECTOR<T,3>(iv.b0,0,1));
-                    Debug_Particle_Set_Attribute<TV>("display_size",.2);
+                    Debug_Particle_Set_Attribute<TV2>("display_size",.2);
                     Add_Debug_Particle(B,VECTOR<T,3>(iv.b1,0,1));
-                    Debug_Particle_Set_Attribute<TV>("display_size",.25);
+                    Debug_Particle_Set_Attribute<TV2>("display_size",.25);
                     Add_Debug_Particle((A+B)/2,VECTOR<T,3>(iv.be,0,1));
-                    Debug_Particle_Set_Attribute<TV>("display_size",.2);
+                    Debug_Particle_Set_Attribute<TV2>("display_size",.2);
                 });
         }
     }
@@ -92,13 +92,13 @@ Visualize_Block_State(BLOCK_ID b) const
         bool o0=i.y>=(ic.edge_on.m/2+1);
         bool o1=(i.y>=ic.edge_on.m/2);
 
-        TV A=Z(id.v0),B=Z(id.v1);
+        TV2 A=Z(id.v0),B=Z(id.v1);
         Add_Debug_Particle(A,VECTOR<T,3>(1,1,1)/(1+o0));
-        Debug_Particle_Set_Attribute<TV>("display_size",.05);
+        Debug_Particle_Set_Attribute<TV2>("display_size",.05);
         Add_Debug_Particle(B,VECTOR<T,3>(1,1,1)/(1+o1));
-        Debug_Particle_Set_Attribute<TV>("display_size",.06);
+        Debug_Particle_Set_Attribute<TV2>("display_size",.06);
         Add_Debug_Particle((A+B)/2,VECTOR<T,3>(1,1,1)/(1+o1));
-        Debug_Particle_Set_Attribute<TV>("display_size",.05);
+        Debug_Particle_Set_Attribute<TV2>("display_size",.05);
     }
 }
 //#####################################################################
@@ -113,20 +113,20 @@ Visualize_Block_Dofs(BLOCK_ID b) const
     auto Z=[=](int i){return bl.xform*cb->X(i);};
     for(auto t:cb->E)
     {
-        VECTOR<TV,3> P;
+        VECTOR<TV2,3> P;
         for(int i=0;i<3;i++) P(i)=bl.xform*cb->X(t(i));
-        for(auto p:P) Add_Debug_Object(VECTOR<TV,2>(p,P.Average()),VECTOR<T,3>(.5,.5,.5));
+        for(auto p:P) Add_Debug_Object(VECTOR<TV2,2>(p,P.Average()),VECTOR<T,3>(.5,.5,.5));
     }
     HASHTABLE<int> he,hv;
     he.Set_All(cb->bc_e);
     hv.Set_All(cb->bc_v);
     for(int i=0;i<cb->S.m;i++)
     {
-        TV X=Z(cb->S(i).x);
-        TV Y=Z(cb->S(i).y);
-        Add_Debug_Object(VECTOR<TV,2>(X,Y),he.Contains(i)?VECTOR<T,3>(0,1,1):VECTOR<T,3>(0,0,1));
+        TV2 X=Z(cb->S(i).x);
+        TV2 Y=Z(cb->S(i).y);
+        Add_Debug_Object(VECTOR<TV2,2>(X,Y),he.Contains(i)?VECTOR<T,3>(0,1,1):VECTOR<T,3>(0,0,1));
     }
-    Flush_Frame<TV>(LOG::sprintf("block %P\n",b).c_str());
+    Flush_Frame<TV2>(LOG::sprintf("block %P\n",b).c_str());
     for(int i=0;i<cb->X.m;i++)
     {
         Add_Debug_Text(Z(i),LOG::sprintf("%d",i),VECTOR<T,3>(1,1,0));
@@ -135,25 +135,25 @@ Visualize_Block_Dofs(BLOCK_ID b) const
     {
         Add_Debug_Text((Z(cb->S(i).x)+Z(cb->S(i).y))/2,LOG::sprintf("%d",i),VECTOR<T,3>(0,1,0));
     }
-    Flush_Frame<TV>(LOG::sprintf("block %P full\n",b).c_str());
+    Flush_Frame<TV2>(LOG::sprintf("block %P full\n",b).c_str());
     for(int i=0;i<cb->X.m;i++)
     {
         int k=rd.dof_map_v(i);
         if(k>=0) Add_Debug_Text(Z(i),LOG::sprintf("%d",k),VECTOR<T,3>(1,1,0));
     }
-    Flush_Frame<TV>(LOG::sprintf("block %P v\n",b).c_str());
+    Flush_Frame<TV2>(LOG::sprintf("block %P v\n",b).c_str());
     for(int i=0;i<cb->S.m;i++)
     {
         int k=rd.dof_map_e(i);
         if(k>=0) Add_Debug_Text((Z(cb->S(i).x)+Z(cb->S(i).y))/2,LOG::sprintf("%d",k),VECTOR<T,3>(0,1,0));
     }
-    Flush_Frame<TV>(LOG::sprintf("block %P e\n",b).c_str());
+    Flush_Frame<TV2>(LOG::sprintf("block %P e\n",b).c_str());
     for(int i=0;i<cb->X.m;i++)
     {
         int k=rd.dof_map_p(i);
         if(k>=0) Add_Debug_Text(Z(i),LOG::sprintf("%d",k),VECTOR<T,3>(1,1,0));
     }
-    Flush_Frame<TV>(LOG::sprintf("block %P p\n",b).c_str());
+    Flush_Frame<TV2>(LOG::sprintf("block %P p\n",b).c_str());
 
     for(CON_ID cc(0);cc<bl.connections.m;cc++)
     {
@@ -166,12 +166,12 @@ Visualize_Block_Dofs(BLOCK_ID b) const
                 [&](int a,int b,bool o)
                 {
                     Add_Debug_Particle(Z(a),o?VECTOR<T,3>(1,0,0):VECTOR<T,3>(0,1,0));
-                    Debug_Particle_Set_Attribute<TV>("display_size",.2);
+                    Debug_Particle_Set_Attribute<TV2>("display_size",.2);
                 },
                 [&](int a,int b,bool o)
                 {
                     Add_Debug_Particle((Z(cb->S(a).x)+Z(cb->S(a).y))/2,o?VECTOR<T,3>(1,0,0):VECTOR<T,3>(0,1,0));
-                    Debug_Particle_Set_Attribute<TV>("display_size",.2);
+                    Debug_Particle_Set_Attribute<TV2>("display_size",.2);
                 });
         }
         else
@@ -180,13 +180,13 @@ Visualize_Block_Dofs(BLOCK_ID b) const
             Visit_Irregular_Cross_Section_Dofs(cl.blocks,ic,
                 [&](const IRREGULAR_VISITOR& iv)
                 {
-                    TV A=Z(iv.r0),B=Z(iv.r1);
+                    TV2 A=Z(iv.r0),B=Z(iv.r1);
                     Add_Debug_Particle(A,VECTOR<T,3>(iv.b0,0,1));
-                    Debug_Particle_Set_Attribute<TV>("display_size",.2);
+                    Debug_Particle_Set_Attribute<TV2>("display_size",.2);
                     Add_Debug_Particle(B,VECTOR<T,3>(iv.b1,0,1));
-                    Debug_Particle_Set_Attribute<TV>("display_size",.25);
+                    Debug_Particle_Set_Attribute<TV2>("display_size",.25);
                     Add_Debug_Particle((A+B)/2,VECTOR<T,3>(iv.be,0,1));
-                    Debug_Particle_Set_Attribute<TV>("display_size",.2);
+                    Debug_Particle_Set_Attribute<TV2>("display_size",.2);
                 });
         }
     }
@@ -198,13 +198,13 @@ Visualize_Block_Dofs(BLOCK_ID b) const
         bool o0=i.y>=(ic.edge_on.m/2+1);
         bool o1=(i.y>=ic.edge_on.m/2);
 
-        TV A=Z(id.v0),B=Z(id.v1);
+        TV2 A=Z(id.v0),B=Z(id.v1);
         Add_Debug_Particle(A,VECTOR<T,3>(1,1,1)/(1+o0));
-        Debug_Particle_Set_Attribute<TV>("display_size",.05);
+        Debug_Particle_Set_Attribute<TV2>("display_size",.05);
         Add_Debug_Particle(B,VECTOR<T,3>(1,1,1)/(1+o1));
-        Debug_Particle_Set_Attribute<TV>("display_size",.06);
+        Debug_Particle_Set_Attribute<TV2>("display_size",.06);
         Add_Debug_Particle((A+B)/2,VECTOR<T,3>(1,1,1)/(1+o1));
-        Debug_Particle_Set_Attribute<TV>("display_size",.05);
+        Debug_Particle_Set_Attribute<TV2>("display_size",.05);
     }
 }
 //#####################################################################
@@ -218,7 +218,7 @@ Visualize_Solution(const BLOCK_VECTOR<TV3>& U,BLOCK_ID b,bool remap_dofs) const
 // Function Visualize_Solution
 //#####################################################################
 template<class T> void DEBUGGING_FEM<T>::
-Visualize_Solution(const BLOCK_VECTOR<TV>& U,BLOCK_ID b,bool remap_dofs) const
+Visualize_Solution(const BLOCK_VECTOR<TV2>& U,BLOCK_ID b,bool remap_dofs) const
 {
     const auto& bl=cl.blocks(b);
     const auto* cb=bl.block;
@@ -230,7 +230,7 @@ Visualize_Solution(const BLOCK_VECTOR<TV>& U,BLOCK_ID b,bool remap_dofs) const
         if(k>=0)
         {
             Add_Debug_Particle(Z(i),VECTOR<T,3>(1,0,0));
-            Debug_Particle_Set_Attribute<TV>("V",U.Get_v(k));
+            Debug_Particle_Set_Attribute<TV2>("V",U.Get_v(k));
         }
     }
 
@@ -240,7 +240,7 @@ Visualize_Solution(const BLOCK_VECTOR<TV>& U,BLOCK_ID b,bool remap_dofs) const
         if(k>=0)
         {
             Add_Debug_Particle((Z(cb->S(i).x)+Z(cb->S(i).y))/2,VECTOR<T,3>(1,0,0));
-            Debug_Particle_Set_Attribute<TV>("V",U.Get_e(k));
+            Debug_Particle_Set_Attribute<TV2>("V",U.Get_e(k));
         }
     }
 
@@ -250,7 +250,7 @@ Visualize_Solution(const BLOCK_VECTOR<TV>& U,BLOCK_ID b,bool remap_dofs) const
         if(k>=0)
         {
             Add_Debug_Particle(Z(i),VECTOR<T,3>(0,1,0));
-            Debug_Particle_Set_Attribute<TV>("display_size",U.Get_p(k));
+            Debug_Particle_Set_Attribute<TV2>("display_size",U.Get_p(k));
         }
     }
 }
@@ -276,8 +276,8 @@ Visualize_Ticks(BLOCK_ID b,bool reference_ticks) const
         for(int i=0;i<3;i++)
         {
             int e0=cb->element_edges(j)((i+1)%3).x,e1=cb->element_edges(j)((i+2)%3).x;
-            TV X=Z(t(i)),X0=Z(t((i+2)%3)),X1=Z(t((i+1)%3));
-            TV x0=0.85*X+0.13*X0+0.02*X1,x1=0.85*X+0.02*X0+0.13*X1;
+            TV2 X=Z(t(i)),X0=Z(t((i+2)%3)),X1=Z(t((i+1)%3));
+            TV2 x0=0.85*X+0.13*X0+0.02*X1,x1=0.85*X+0.02*X0+0.13*X1;
             int cnt=0;
             if(cb->S(e0)(ticks(e0))==t(i))
             {
@@ -335,7 +335,7 @@ Visualize_Flat_Dofs() const
                 Add_Debug_Text((Z(cb->S(i).x)+Z(cb->S(i).y))/2,LOG::sprintf("%d",dof),VECTOR<T,3>(1,1,0));
             }
     }
-    Flush_Frame<TV>("flat velocity dofs");
+    Flush_Frame<TV2>("flat velocity dofs");
     
     for(BLOCK_ID b(0);b<cl.blocks.m;b++)
     {
@@ -351,7 +351,7 @@ Visualize_Flat_Dofs() const
                 Add_Debug_Text(Z(i),LOG::sprintf("%d",dof),VECTOR<T,3>(1,1,0));
             }
     }
-    Flush_Frame<TV>("flat pressure dofs");
+    Flush_Frame<TV2>("flat pressure dofs");
     
 
 }
