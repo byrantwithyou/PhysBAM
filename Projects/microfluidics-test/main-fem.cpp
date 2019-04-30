@@ -80,6 +80,10 @@ void Run(PARSE_ARGS& parse_args)
     GRID<TV3> grid3(IV3()+1,{grid.domain.min_corner.Append(0),grid.domain.max_corner.Append(cl.depth)},true);
     VIEWER_OUTPUT<TV3> vo3(STREAM_TYPE(0.f),grid3,output_dir+"/3d");
     vo2.debug_particles.debug_particles.template Add_Array<T>("display_size");
+    // (local,global)
+    vo3.debug_particles.debug_particles.template Add_Array<VECTOR<int,2>>("e");
+    vo3.debug_particles.debug_particles.template Add_Array<VECTOR<int,2>>("v");
+    vo3.debug_particles.debug_particles.template Add_Array<VECTOR<int,2>>("p");
     DEBUGGING_FEM<T> debug(cl);
     
     if(!quiet)
@@ -152,6 +156,9 @@ void Run(PARSE_ARGS& parse_args)
             }
         }
         Flush_Frame<TV2>("ref ticks");
+
+        if(d==3)
+            debug.Visualize_Tetrahedron_Dofs(mc);
     }
     if(hl_dof>=0)
     {
@@ -165,7 +172,7 @@ void Run(PARSE_ARGS& parse_args)
             debug.Visualize_Block_State(b);
             if(d==3)
                 debug.Visualize_Tetrahedron(b);
-            debug.Hightlight_DOF<d>(b,vep,r,dim);
+            debug.Highlight_Dof<d>(b,vep,r,dim);
             Flush_Frame<TV>("highlight dof");
         }
     }

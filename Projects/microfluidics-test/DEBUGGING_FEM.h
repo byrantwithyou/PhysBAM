@@ -11,6 +11,7 @@
 namespace PhysBAM{
 
 template<class T> struct CACHED_ELIMINATION_MATRIX;
+template<class TV> struct MATRIX_CONSTRUCTION_FEM;
 
 template<class T>
 struct DEBUGGING_FEM
@@ -29,8 +30,10 @@ struct DEBUGGING_FEM
     void Visualize_Flat_Dofs() const;
     void Visualize_Ticks(BLOCK_ID b,bool reference_ticks) const;
     void Visualize_Tetrahedron(BLOCK_ID b) const;
+    void Visualize_Tetrahedron_Dofs(const MATRIX_CONSTRUCTION_FEM<TV3>& mc) const;
+    void Visualize_Tetrahedron_Dofs(const MATRIX_CONSTRUCTION_FEM<TV2>& mc) const {}
     template<int d>
-    void Hightlight_DOF(BLOCK_ID b,int vep,int r,int dim) const;
+    void Highlight_Dof(BLOCK_ID b,int vep,int r,int dim) const;
 };
 
 }

@@ -195,6 +195,12 @@ template void Debug_Particle_Set_Attribute<VECTOR<float,2>,VECTOR<float,2> >(con
 template void Debug_Particle_Set_Attribute<VECTOR<float,2>,float>(const std::string&,float const&);
 template void Debug_Particle_Set_Attribute<VECTOR<float,3>,VECTOR<float,3> >(const std::string&,VECTOR<float,3> const&);
 template void Debug_Particle_Set_Attribute<VECTOR<float,3>,float>(const std::string&,float const&);
+template void Debug_Particle_Set_Attribute<VECTOR<double,1>,VECTOR<int,2> >(const std::string&,VECTOR<int,2> const&);
+template void Debug_Particle_Set_Attribute<VECTOR<double,2>,VECTOR<int,2> >(const std::string&,VECTOR<int,2> const&);
+template void Debug_Particle_Set_Attribute<VECTOR<double,3>,VECTOR<int,2> >(const std::string&,VECTOR<int,2> const&);
+template void Debug_Particle_Set_Attribute<VECTOR<float,1>,VECTOR<int,2> >(const std::string&,VECTOR<int,2> const&);
+template void Debug_Particle_Set_Attribute<VECTOR<float,2>,VECTOR<int,2> >(const std::string&,VECTOR<int,2> const&);
+template void Debug_Particle_Set_Attribute<VECTOR<float,3>,VECTOR<int,2> >(const std::string&,VECTOR<int,2> const&);
 template void Dump_Levelset<VECTOR<double,1>,VECTOR<int,1>,double>(GRID<VECTOR<double,1> > const&,ARRAY<double,VECTOR<int,1> > const&,VECTOR<double,3> const&,VECTOR<double,3> const&);
 template void Dump_Levelset<VECTOR<double,2>,VECTOR<int,2>,double>(GRID<VECTOR<double,2> > const&,ARRAY<double,VECTOR<int,2> > const&,VECTOR<double,3> const&,VECTOR<double,3> const&);
 template void Dump_Levelset<VECTOR<double,3>,VECTOR<int,3>,double>(GRID<VECTOR<double,3> > const&,ARRAY<double,VECTOR<int,3> > const&,VECTOR<double,3> const&,VECTOR<double,3> const&);

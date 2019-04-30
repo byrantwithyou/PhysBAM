@@ -9,6 +9,7 @@
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include "DEBUGGING_FEM.h"
+#include "MATRIX_CONSTRUCTION_FEM.h"
 #include "VISITORS_FEM.h"
 namespace PhysBAM{
 //#####################################################################
@@ -374,17 +375,12 @@ Visualize_Tetrahedron(BLOCK_ID b) const
     }
 
     const auto& rb=cl.reference_block_data(cl.blocks(b).ref_id);
-    auto Z=[=](const TV3& X)
-    {
-        const MATRIX<T,2>& m=cl.blocks(b).xform.M;
-        MATRIX<T,3> M(m.Column(0).Append(0),m.Column(1).Append(0),TV3(0,0,1));
-        return M*X+cl.blocks(b).xform.b.Append(0);
-    };
+    const auto& M=cl.blocks(b).xform;
     DOF_LAYOUT<TV3> dl(cl,rb,false);
-    Visit_Elements(dl,[Z](const VISIT_ELEMENT_DATA<TV3>& vt)
+    Visit_Elements(dl,[&M](const VISIT_ELEMENT_DATA<TV3>& vt)
     {
         VECTOR<TV3,4> P;
-        for(int i=0;i<4;i++) P(i)=Z(vt.X(i));
+        for(int i=0;i<4;i++) P(i)=xform(M,vt.X(i));
         Add_Debug_Object(VECTOR<TV3,2>(P(0),P(1)),VECTOR<T,3>(1,1,1));
         Add_Debug_Object(VECTOR<TV3,2>(P(0),P(2)),VECTOR<T,3>(1,1,1));
         Add_Debug_Object(VECTOR<TV3,2>(P(0),P(3)),VECTOR<T,3>(1,1,1));
@@ -394,10 +390,59 @@ Visualize_Tetrahedron(BLOCK_ID b) const
     });
 }
 //#####################################################################
-// Function Hightlight_DOF
+// Function Visualize_Tetrahedron_Dofs
+//#####################################################################
+template<class T> void DEBUGGING_FEM<T>::
+Visualize_Tetrahedron_Dofs(const MATRIX_CONSTRUCTION_FEM<TV3>& mc) const
+{
+    ARRAY<int,BLOCK_ID> first[3];
+    mc.Compute_Global_Dof_Mapping(first);
+
+    for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+    {
+        const auto& rb=cl.reference_block_data(cl.blocks(b).ref_id);
+        const auto& M=cl.blocks(b).xform;
+        DOF_LAYOUT<TV3> dl(cl,rb,true);
+        int count_v=0,count_e=0,count_p=0;
+
+        Visualize_Tetrahedron(b);
+        Visit_Compressed_Dofs(dl,rb,
+            [&M,b,&count_v,&first](int v,const TV3& X)
+            {
+                Add_Debug_Particle(xform(M,X),VECTOR<T,3>(1,1,1));
+                int dof=first[0](b)+count_v*TV3::m;
+                Debug_Particle_Set_Attribute<TV3>("v",VECTOR<int,2>(v,dof));
+                ++count_v;
+            },
+            [&M,b,&count_e,&first](int e,const TV3& X)
+            {
+                Add_Debug_Particle(xform(M,X),VECTOR<T,3>(1,1,1));
+                int dof=first[1](b)+count_e*TV3::m;
+                Debug_Particle_Set_Attribute<TV3>("e",VECTOR<int,2>(e,dof));
+                ++count_e;
+            },
+            [](int p,const TV3& X){});
+        Flush_Frame<TV3>(LOG::sprintf("block %P ve",b).c_str());
+
+        Visualize_Tetrahedron(b);
+        Visit_Compressed_Dofs(dl,rb,
+            [](int v,const TV3& X){},
+            [](int e,const TV3& X){},
+            [&M,b,&count_p,&first](int p,const TV3& X)
+            {
+                Add_Debug_Particle(xform(M,X),VECTOR<T,3>(1,1,1));
+                int dof=first[2](b)+count_p;
+                Debug_Particle_Set_Attribute<TV3>("p",VECTOR<int,2>(p,dof));
+                ++count_p;
+            });
+        Flush_Frame<TV3>(LOG::sprintf("block %P p",b).c_str());
+    }
+}
+//#####################################################################
+// Function Highlight_Dof
 //#####################################################################
 template<class T> template<int d> void DEBUGGING_FEM<T>::
-Hightlight_DOF(BLOCK_ID b,int vep,int r,int dim) const
+Highlight_Dof(BLOCK_ID b,int vep,int r,int dim) const
 {
     typedef VECTOR<T,d> TV;
     const auto& M=cl.blocks(b).xform;
@@ -413,7 +458,7 @@ Hightlight_DOF(BLOCK_ID b,int vep,int r,int dim) const
             if(count++==r)
             {
                 Add_Debug_Particle(xform(M,X),color);
-                Debug_Particle_Set_Attribute<TV2>("display_size",.5);
+                Debug_Particle_Set_Attribute<TV>("display_size",.5);
             }
         },
         [&count,&M,&color,vep,r](int e,const TV& X)
@@ -422,7 +467,7 @@ Hightlight_DOF(BLOCK_ID b,int vep,int r,int dim) const
             if(count++==r)
             {
                 Add_Debug_Particle(xform(M,X),color);
-                Debug_Particle_Set_Attribute<TV2>("display_size",.5);
+                Debug_Particle_Set_Attribute<TV>("display_size",.5);
             }
         },
         [&count,&M,&color,vep,r](int p,const TV& X)
@@ -431,11 +476,11 @@ Hightlight_DOF(BLOCK_ID b,int vep,int r,int dim) const
             if(count++==r)
             {
                 Add_Debug_Particle(xform(M,X),VECTOR<T,3>(1,1,0));
-                Debug_Particle_Set_Attribute<TV2>("display_size",.5);
+                Debug_Particle_Set_Attribute<TV>("display_size",.5);
             }
         });
 }
 template class DEBUGGING_FEM<double>;
-template void DEBUGGING_FEM<double>::Hightlight_DOF<2>(BLOCK_ID,int,int,int) const;
-template void DEBUGGING_FEM<double>::Hightlight_DOF<3>(BLOCK_ID,int,int,int) const;
+template void DEBUGGING_FEM<double>::Highlight_Dof<2>(BLOCK_ID,int,int,int) const;
+template void DEBUGGING_FEM<double>::Highlight_Dof<3>(BLOCK_ID,int,int,int) const;
 }
