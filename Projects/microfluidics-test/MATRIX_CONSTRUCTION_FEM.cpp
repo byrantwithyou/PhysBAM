@@ -809,8 +809,9 @@ Dump_Matrix_Block(SYSTEM_MATRIX_HELPER<T>& h,ARRAY<int,BLOCK_ID> first[3],const 
     Transform_To_World_Space(W,M,b0,b1);
     const auto& a=cl.reference_block_data(cl.blocks(b0).ref_id);
     const auto& b=cl.reference_block_data(cl.blocks(b1).ref_id);
-    int A[3]={a.num_dofs_d.v*TV::m,a.num_dofs_d.e*TV::m,a.num_dofs_d.p};
-    int B[3]={b.num_dofs_d.v*TV::m,b.num_dofs_d.e*TV::m,b.num_dofs_d.p};
+    DOF_LAYOUT<TV> dla(cl,a,true),dlb(cl,b,true);
+    int A[3]={dla.counts.v*TV::m,dla.counts.e*TV::m,dla.counts.p};
+    int B[3]={dlb.counts.v*TV::m,dlb.counts.e*TV::m,dlb.counts.p};
     for(int i=0,as=0;i<3;i++)
     {
         for(int j=0,bs=0;j<3;j++)
@@ -839,12 +840,13 @@ Compute_Global_Dof_Mapping(ARRAY<int,BLOCK_ID> first[3]) const
     for(BLOCK_ID b(0);b<cl.blocks.m;b++)
     {
         const auto& c=cl.reference_block_data(cl.blocks(b).ref_id);
+        DOF_LAYOUT<TV> dl(cl,c,true);
         first[0](b)=next_u;
-        next_u+=c.num_dofs_d.v*TV::m;
+        next_u+=dl.counts.v*TV::m;
         first[1](b)=next_u;
-        next_u+=c.num_dofs_d.e*TV::m;
+        next_u+=dl.counts.e*TV::m;
         first[2](b)=next_p;
-        next_p+=c.num_dofs_d.p;
+        next_p+=dl.counts.p;
     }
     first[2]+=next_u;
     return next_u+next_p;
@@ -903,7 +905,8 @@ Dump_World_Space_Vector(const char* name) const
     for(BLOCK_ID b(0);b<cl.blocks.m;b++)
     {
         const auto& a=cl.reference_block_data(cl.blocks(b).ref_id);
-        int A[3]={a.num_dofs_d.v*TV::m,a.num_dofs_d.e*TV::m,a.num_dofs_d.p};
+        DOF_LAYOUT<TV> dl(cl,a,true);
+        int A[3]={dl.counts.v*TV::m,dl.counts.e*TV::m,dl.counts.p};
         auto& U=rhs_block_list(b);
         for(int i=0,ar=0;i<3;i++)
         {
