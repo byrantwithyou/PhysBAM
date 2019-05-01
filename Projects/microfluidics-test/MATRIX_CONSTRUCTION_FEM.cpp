@@ -296,17 +296,20 @@ Times_Line_Integral_U_Dot_V(BLOCK_ID b,INTERVAL<int> bc_e,BLOCK_VECTOR<TV>& w,co
     DOF_LAYOUT<TV> dl(cl,cl.reference_block_data(bl.ref_id),false);
     Visit_Faces(dl,bc_e,[this,&u,&w,M](const VISIT_FACE_DATA<TV>& vf)
         {
-            VECTOR<TV,3> r(u.Get_v(vf.v(0)),u.Get_v(vf.v(1)),u.Get_e(vf.e(0))),s;
-            for(int i=0;i<3;i++)
-                for(int j=0;j<3;j++)
+            constexpr int num_u=vf.v.m+vf.e.m;
+            VECTOR<TV,num_u> r,s;
+            for(int i=0;i<vf.v.m;i++) r(i)=u.Get_v(vf.v(i));
+            for(int i=0;i<vf.e.m;i++) r(i+vf.v.m)=u.Get_e(vf.e(i));
+
+            for(int i=0;i<num_u;i++)
+                for(int j=0;j<num_u;j++)
                     s(i)+=r(j)*FEM_TABLES<TV::m>::surf_u_dot_v[i][j];
 
             PHYSBAM_ASSERT(abs(abs(M.Determinant())-1)<comp_tol);
             auto f=typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX_FACE(vf.X);
             T scale=f.Size()/FEM_TABLES<TV::m>::surf_u_dot_v_den;
-            w.Add_v(vf.v(0),s.x*scale);
-            w.Add_v(vf.v(1),s.y*scale);
-            w.Add_e(vf.e(0),s.z*scale);
+            for(int i=0;i<vf.v.m;i++) w.Add_v(vf.v(i),s(i)*scale);
+            for(int i=0;i<vf.e.m;i++) w.Add_e(vf.e(i),s(i+vf.v.m)*scale);
         });
 }
 
