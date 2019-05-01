@@ -214,6 +214,37 @@ Visualize_Block_Dofs(BLOCK_ID b) const
 template<class T> void DEBUGGING_FEM<T>::
 Visualize_Solution(const BLOCK_VECTOR<TV3>& U,BLOCK_ID b,bool remap_dofs) const
 {
+    if(!remap_dofs) return;
+
+    const auto& rb=cl.reference_block_data(cl.blocks(b).ref_id);
+    const auto& M=cl.blocks(b).xform;
+    DOF_LAYOUT<TV3> dl(cl,rb,true);
+
+    Visualize_Tetrahedron(b);
+    Visit_Compressed_Dofs(dl,rb,
+        [&M,&U](int v,const TV3& X)
+        {
+            Add_Debug_Particle(xform(M,X),VECTOR<T,3>(1,0,0));
+            Debug_Particle_Set_Attribute<TV3>("V",U.Get_v(v));
+        },
+        [&M,&U](int e,const TV3& X)
+        {
+            Add_Debug_Particle(xform(M,X),VECTOR<T,3>(1,0,0));
+            Debug_Particle_Set_Attribute<TV3>("V",U.Get_e(e));
+        },
+        [](int p,const TV3& X){});
+    Flush_Frame<TV3>(LOG::sprintf("sol %P ve",b).c_str());
+
+    Visualize_Tetrahedron(b);
+    Visit_Compressed_Dofs(dl,rb,
+        [](int v,const TV3& X){},
+        [](int e,const TV3& X){},
+        [&M,&U](int p,const TV3& X)
+        {
+            Add_Debug_Particle(xform(M,X),VECTOR<T,3>(1,0,0));
+            Debug_Particle_Set_Attribute<TV3>("display_size",U.Get_p(p));
+        });
+    Flush_Frame<TV3>(LOG::sprintf("sol %P p",b).c_str());
 }
 //#####################################################################
 // Function Visualize_Solution

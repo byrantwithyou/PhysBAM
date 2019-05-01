@@ -199,7 +199,7 @@ void Run(PARSE_ARGS& parse_args)
     {
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
             debug.Visualize_Solution(mc.rhs_block_list(b),b,true);
-        Flush_Frame<TV2>("rhs blocks");
+        Flush_Frame<TV>("rhs blocks");
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
             debug.Visualize_Block_Dofs(b);
     }
@@ -243,7 +243,7 @@ void Run(PARSE_ARGS& parse_args)
     {
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
             debug.Visualize_Solution(mc.rhs_block_list(b),b,true);
-        Flush_Frame<TV2>("solution");
+        Flush_Frame<TV>("solution");
     }
     mc.Dump_World_Space_Vector("x");
     debug.Visualize_Flat_Dofs();
