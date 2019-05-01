@@ -417,18 +417,16 @@ void Visit_Dofs(const DOF_LAYOUT<VECTOR<T,3> >& dl,const AR& bc_v,const AR& bc_e
         for(int i=0;i<dl.nl+1;i++)
         {
             va.i=v0+i;
-            T a=(T)i/dl.nl;
-            if(use_uv) va.uv.y=a;
-            if(use_X) va.X.z=a*dl.dz;
+            if(use_uv) va.uv.y=(T)i/dl.nl;
+            if(use_X) va.X.z=i*dl.dz;
             fv(va);
         }
         int e0=dl.Edge_v(v,0);
         for(int i=0;i<dl.nl;i++)
         {
             va.i=e0+i;
-            T a=(i+(T).5)/dl.nl;
-            if(use_uv) va.uv.y=a;
-            if(use_X) va.X.z=a*dl.dz;
+            if(use_uv) va.uv.y=(i+(T).5)/dl.nl;
+            if(use_X) va.X.z=(i+(T).5)*dl.dz;
             fe(va);
         }
     }
@@ -442,18 +440,16 @@ void Visit_Dofs(const DOF_LAYOUT<VECTOR<T,3> >& dl,const AR& bc_v,const AR& bc_e
         for(int i=0;i<dl.nl+1;i++)
         {
             va.i=e0+i;
-            T a=(T)i/dl.nl;
-            if(use_uv) va.uv.y=a;
-            if(use_X) va.X.z=a*dl.dz;
+            if(use_uv) va.uv.y=(T)i/dl.nl;
+            if(use_X) va.X.z=i*dl.dz;
             fe(va);
         }
         int e1=dl.Edge_d(e,0);
         for(int i=0;i<dl.nl;i++)
         {
             va.i=e1+i;
-            T a=(i+(T).5)/dl.nl;
-            if(use_uv) va.uv.y=a;
-            if(use_X) va.X.z=a*dl.dz;
+            if(use_uv) va.uv.y=(i+(T).5)/dl.nl;
+            if(use_X) va.X.z=(i+(T).5)*dl.dz;
             fe(va);
         }
     }
