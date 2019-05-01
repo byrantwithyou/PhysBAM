@@ -6,6 +6,9 @@
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Core/Matrices/SYSTEM_MATRIX_HELPER.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
+#include <Geometry/Basic_Geometry/SEGMENT_2D.h>
+#include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include "CACHED_ELIMINATION_MATRIX.h"
 #include "MATRIX_CONSTRUCTION_FEM.h"
 #include "VISITORS_FEM.h"
@@ -298,7 +301,9 @@ Times_Line_Integral_U_Dot_V(BLOCK_ID b,INTERVAL<int> bc_e,BLOCK_VECTOR<TV>& w,co
                 for(int j=0;j<3;j++)
                     s(i)+=r(j)*FEM_TABLES<TV::m>::surf_u_dot_v[i][j];
 
-            T scale=(M*(vf.X.x-vf.X.y)).Magnitude()/FEM_TABLES<TV::m>::surf_u_dot_v_den;
+            PHYSBAM_ASSERT(abs(abs(M.Determinant())-1)<comp_tol);
+            auto f=typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX_FACE(vf.X);
+            T scale=f.Size()/FEM_TABLES<TV::m>::surf_u_dot_v_den;
             w.Add_v(vf.v(0),s.x*scale);
             w.Add_v(vf.v(1),s.y*scale);
             w.Add_e(vf.e(0),s.z*scale);
