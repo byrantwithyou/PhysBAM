@@ -40,11 +40,11 @@ Make_Block(int d,T w,T l,bool is_v) -> TRIP
         cb->S(i+3*(n-1))={i,i+n};
         cb->ticks(i)=0;
         cb->ticks(i+(n-1))=0;
-        cb->ticks(i+2*(n-1))=1;
-        cb->ticks(i+3*(n-1))=0;
+        cb->ticks(i+2*(n-1))=0;
+        cb->ticks(i+3*(n-1))=1;
     }
     cb->S(4*(n-1))={n-1,2*n-1};
-    cb->ticks(4*(n-1))=0;
+    cb->ticks(4*(n-1))=1;
 
     cb->cross_sections.Append({{n,2*n},{n-1,2*(n-1)},true});
     cb->bc_v.Append(0);
