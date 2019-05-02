@@ -392,23 +392,32 @@ void Visit_Dofs(const DOF_LAYOUT<VECTOR<T,3> >& dl,LAYER_RANGE lr,const AR& bc_v
     typedef VECTOR<T,2> TV2;
     typedef VECTOR<T,3> TV;
 
-    int begin,end,step;
+    int begin_f,end_f,step_f,begin_vol,end_vol,step_vol;
     switch(lr)
     {
         case LAYER_RANGE::ALL:
-            begin=0;
-            end=dl.nl+1;
-            step=1;
+            begin_f=0;
+            end_f=dl.nl+1;
+            step_f=1;
+            begin_vol=0;
+            end_vol=dl.nl;
+            step_vol=1;
             break;
         case LAYER_RANGE::SKIP_BOTTOM_TOP:
-            begin=1;
-            end=dl.nl;
-            step=1;
+            begin_f=1;
+            end_f=dl.nl;
+            step_f=1;
+            begin_vol=0;
+            end_vol=dl.nl;
+            step_vol=1;
             break;
         case LAYER_RANGE::BOTTOM_TOP_ONLY:
-            begin=0;
-            end=dl.nl+1;
-            step=dl.nl;
+            begin_f=0;
+            end_f=dl.nl+1;
+            step_f=dl.nl;
+            begin_vol=0;
+            end_vol=0;
+            step_vol=0;
             break;
     }
 
@@ -428,7 +437,7 @@ void Visit_Dofs(const DOF_LAYOUT<VECTOR<T,3> >& dl,LAYER_RANGE lr,const AR& bc_v
         if(use_X) va.X=X.Append(0);
         if(use_uv) va.uv.x=(X-A).Dot(u);
         int v0=dl.Vertex(v,0);
-        for(int i=begin;i<end;i+=step)
+        for(int i=begin_f;i<end_f;i+=step_f)
         {
             va.i=v0+i;
             if(use_uv) va.uv.y=(T)i/dl.nl;
@@ -436,7 +445,7 @@ void Visit_Dofs(const DOF_LAYOUT<VECTOR<T,3> >& dl,LAYER_RANGE lr,const AR& bc_v
             fv(va);
         }
         int e0=dl.Edge_v(v,0);
-        for(int i=0;i<dl.nl;i++)
+        for(int i=begin_vol;i<end_vol;i+=step_vol)
         {
             va.i=e0+i;
             if(use_uv) va.uv.y=(i+(T).5)/dl.nl;
@@ -451,7 +460,7 @@ void Visit_Dofs(const DOF_LAYOUT<VECTOR<T,3> >& dl,LAYER_RANGE lr,const AR& bc_v
         if(use_X) va.X=X.Append(0);
         if(use_uv) va.uv.x=(X-A).Dot(u);
         int e0=dl.Edge_h(e,0);
-        for(int i=begin;i<end;i+=step)
+        for(int i=begin_f;i<end_f;i+=step_f)
         {
             va.i=e0+i;
             if(use_uv) va.uv.y=(T)i/dl.nl;
@@ -459,7 +468,7 @@ void Visit_Dofs(const DOF_LAYOUT<VECTOR<T,3> >& dl,LAYER_RANGE lr,const AR& bc_v
             fe(va);
         }
         int e1=dl.Edge_d(e,0);
-        for(int i=0;i<dl.nl;i++)
+        for(int i=begin_vol;i<end_vol;i+=step_vol)
         {
             va.i=e1+i;
             if(use_uv) va.uv.y=(i+(T).5)/dl.nl;
