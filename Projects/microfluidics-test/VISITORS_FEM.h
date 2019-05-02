@@ -314,10 +314,11 @@ void Visit_Faces(const DOF_LAYOUT<VECTOR<T,3> >& dl,INTERVAL<int> bc_e,F func)
 {
     typedef VECTOR<T,3> TV;
 
-    auto fill_vt=[=](int edge,VISIT_FACE_DATA<TV>* vt,bool mirrored)
+    for(int edge:bc_e)
     {
         VECTOR<int,2> P=dl.cb->S(edge);
-        if((dl.ticks_e(edge) && !mirrored) || (!dl.ticks_e(edge) && mirrored)) std::swap(P.x,P.y);
+        if(dl.ticks_e(edge)) std::swap(P.x,P.y);
+        VISIT_FACE_DATA<TV> vt[2];
         vt[0].edge=edge;
         vt[0].v={dl.Vertex(P.x,0),dl.Vertex(P.y,0),dl.Vertex(P.y,1)};
         vt[0].e(0)=dl.Edge_v(P.y,0);
@@ -331,32 +332,15 @@ void Visit_Faces(const DOF_LAYOUT<VECTOR<T,3> >& dl,INTERVAL<int> bc_e,F func)
         vt[1].e(1)=dl.Edge_h(edge,1);
         vt[1].e(2)=dl.Edge_v(P.x,0);
         vt[1].X={dl.X(P.x,1),dl.X(P.x,0),dl.X(P.y,1)};
-    };
-
-    for(int edge:bc_e)
-    {
-        VISIT_FACE_DATA<TV> vt[2],mirror_vt[2];
-        fill_vt(edge,vt,false);
-        fill_vt(edge,mirror_vt,true);
-        for(int i=0;i<2;i++)
-        {
-            mirror_vt[i].v+=dl.nl-1;
-            mirror_vt[i].e+=dl.nl-1;
-            mirror_vt[i].X+=TV(0,0,(dl.nl-1)*dl.dz);
-        }
 
         for(int l=0;l<dl.nl;l++)
-        {
-            VISIT_FACE_DATA<TV>* vtp=vt;
-            if(l==dl.nl-1) vtp=mirror_vt;
             for(int i=0;i<2;i++)
             {
                 func(vt[i]);
-                vtp[i].v+=1;
-                vtp[i].e+=1;
-                vtp[i].X+=TV(0,0,dl.dz);
+                vt[i].v+=1;
+                vt[i].e+=1;
+                vt[i].X+=TV(0,0,dl.dz);
             }
-        }
     }
 }
 
