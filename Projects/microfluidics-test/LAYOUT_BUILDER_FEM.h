@@ -40,6 +40,8 @@ struct LAYOUT_BUILDER_FEM
     COMPONENT_BC<T> comp_bc;
     COMPONENT_JOINT<T> comp_joint;
 
+    int refine=1;
+
     LAYOUT_BUILDER_FEM(COMPONENT_LAYOUT_FEM<T>& cl);
     void Emit_Component_Blocks(const CANONICAL_COMPONENT<T>* cc,const XFORM<TV>& xf,ARRAY<VERTEX_DATA>& vd);
     void Set_Connector(VERTEX_DATA& vd,BLOCK_ID id,CON_ID con_id);

@@ -54,18 +54,18 @@ From_File(const std::string& file)
         {
             case 'l':
                 ss>>t0;
-                Set_Target_Length(t0);
+                Set_Target_Length(t0/refine);
                 break;
 
             case 'z':
                 ss>>t0>>i0;
-                Set_Depth(t0,i0);
+                Set_Depth(t0,i0*refine);
                 break;
 
             case 'c':
                 {
                     ss>>name>>i0>>t0;
-                    CS_ID cs=Cross_Section(i0,t0);
+                    CS_ID cs=Cross_Section(i0*refine,t0);
                     cs_names.Set(name,cs);
                 }
                 break;
@@ -267,7 +267,7 @@ template<class T> auto LAYOUT_BUILDER_FEM<T>::
 Cross_Section(int d,T w) -> CS_ID
 {
     w*=cl.unit_m;
-    CS_ID c=cross_sections.Append({d,w});
+    CS_ID c=cross_sections.Append({d+1,w});
     commands.Append({TAG::DECL_CS,Value(c)});
     return c;
 }

@@ -1,5 +1,5 @@
 l 2.5
-c C 5 10
+c C 4 10
 v A 0 0
 v B 10 0
 u C A B U 10

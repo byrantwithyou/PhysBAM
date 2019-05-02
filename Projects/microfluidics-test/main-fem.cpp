@@ -49,6 +49,7 @@ void Run(PARSE_ARGS& parse_args)
     std::string analytic_u,analytic_p;
     T s=1,m=1,kg=1;
     int hl_dof=-1;
+    int refine=1;
     parse_args.Add("-o",&output_dir,"dir","output dir");
     parse_args.Add("-mu",&mu,"mu","viscosity");
     parse_args.Add("-q",&quiet,"disable diagnostics; useful for timing");
@@ -59,6 +60,7 @@ void Run(PARSE_ARGS& parse_args)
     parse_args.Add("-kg",&kg,"scale","scale units of mass");
     parse_args.Add("-threads",&threads,"num","number of threads to use");
     parse_args.Add("-hl",&hl_dof,"dof","highlight global dof");
+    parse_args.Add("-refine",&refine,"factor","refine factor");
     parse_args.Add("-u",&analytic_u,"program","analytic velocity");
     parse_args.Add("-p",&analytic_p,"program","analytic pressure");
     parse_args.Extra(&pipe_file,"file","file describing pipes");
@@ -71,6 +73,7 @@ void Run(PARSE_ARGS& parse_args)
     cl.unit_s=s;
     cl.unit_kg=kg;
     LAYOUT_BUILDER_FEM<T> builder(cl);
+    builder.refine=refine;
     builder.From_File(pipe_file);
 
     timer("parse input");
