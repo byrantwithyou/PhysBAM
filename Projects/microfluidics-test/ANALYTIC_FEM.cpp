@@ -93,7 +93,7 @@ Compute_RHS()
         mc.Init_Block_Vector(w,b,false);
         mc.Init_Block_Vector(u,b,false);
         DOF_LAYOUT<TV> dl(mc.cl,mc.cl.reference_block_data(bl.ref_id),false);
-        Visit_Dofs<true,false>(dl,cb->bc_v,cb->bc_e,
+        Visit_Wall_Dofs(dl,cb->bc_v,cb->bc_e,
             [M,&u,this,bl,m,s](const VISIT_ALL_DOFS<TV>& va)
             {
                 TV Z=xform(bl.xform,va.X);
@@ -109,7 +109,7 @@ Compute_RHS()
         // TODO: handle det(M)!=1
         u.V.Fill(0);
         ARRAY<T> div_v(dl.counts.v),div_e(dl.counts.e);
-        Visit_Dofs(dl,
+        Visit_Dofs(dl,LAYER_RANGE::ALL,
             [M,&u,m,s,this,bl,&div_v](const VISIT_ALL_DOFS<TV>& va)
             {
                 TV Z=xform(bl.xform,va.X);
@@ -138,7 +138,7 @@ Compute_RHS()
         mc.Init_Block_Vector(u,bc.b,false);
 
         DOF_LAYOUT<TV> dl(mc.cl,mc.cl.reference_block_data(bl.ref_id),false);
-        Visit_Dofs<true,false>(dl,bc.bc_v,bc.bc_e,
+        Visit_Dofs<true,false>(dl,LAYER_RANGE::ALL,bc.bc_v,bc.bc_e,
             [M,&u,&bc,bl,this](const VISIT_ALL_DOFS<TV>& va)
             {
                 u.Add_v(va.i,M*Traction(TV(bc.normal),xform(bl.xform,va.X)));

@@ -369,12 +369,21 @@ struct VISIT_ALL_DOFS
     VECTOR<T,TV::m-1> uv;
 };
 
+enum class LAYER_RANGE
+{
+    ALL,
+    SKIP_BOTTOM_TOP,
+    BOTTOM_TOP_ONLY
+};
+
 // fv(int v,const TV& X,VECTOR<T,1>(u)); u=[0,1]
 // fe(int e,const TV& X,VECTOR<T,1>(u)); u=[0,1]
 template<bool use_X,bool use_uv,class T,class AR,class FV,class FE>
-void Visit_Dofs(const DOF_LAYOUT<VECTOR<T,2> >& dl,const AR& bc_v,const AR& bc_e,FV fv,FE fe)
+void Visit_Dofs(const DOF_LAYOUT<VECTOR<T,2> >& dl,LAYER_RANGE lr,const AR& bc_v,const AR& bc_e,FV fv,FE fe)
 {
     typedef VECTOR<T,2> TV;
+
+    if(lr!=LAYER_RANGE::ALL) return;
 
     TV A,u;
     if(use_uv)
@@ -409,10 +418,30 @@ void Visit_Dofs(const DOF_LAYOUT<VECTOR<T,2> >& dl,const AR& bc_v,const AR& bc_e
 // fv(int v,const TV& X,VECTOR<T,2>(u,z)); u=[0,1], z=[0,1]
 // fe(int e,const TV& X,VECTOR<T,2>(u,z)); u=[0,1], z=[0,1]
 template<bool use_X,bool use_uv,class T,class AR,class FV,class FE>
-void Visit_Dofs(const DOF_LAYOUT<VECTOR<T,3> >& dl,const AR& bc_v,const AR& bc_e,FV fv,FE fe)
+void Visit_Dofs(const DOF_LAYOUT<VECTOR<T,3> >& dl,LAYER_RANGE lr,const AR& bc_v,const AR& bc_e,FV fv,FE fe)
 {
     typedef VECTOR<T,2> TV2;
     typedef VECTOR<T,3> TV;
+
+    int begin,end,step;
+    switch(lr)
+    {
+        case LAYER_RANGE::ALL:
+            begin=0;
+            end=dl.nl+1;
+            step=1;
+            break;
+        case LAYER_RANGE::SKIP_BOTTOM_TOP:
+            begin=1;
+            end=dl.nl;
+            step=1;
+            break;
+        case LAYER_RANGE::BOTTOM_TOP_ONLY:
+            begin=0;
+            end=dl.nl+1;
+            step=dl.nl;
+            break;
+    }
 
     TV2 A,u;
     if(use_uv)
@@ -430,7 +459,7 @@ void Visit_Dofs(const DOF_LAYOUT<VECTOR<T,3> >& dl,const AR& bc_v,const AR& bc_e
         if(use_X) va.X=X.Append(0);
         if(use_uv) va.uv.x=(X-A).Dot(u);
         int v0=dl.Vertex(v,0);
-        for(int i=0;i<dl.nl+1;i++)
+        for(int i=begin;i<end;i+=step)
         {
             va.i=v0+i;
             if(use_uv) va.uv.y=(T)i/dl.nl;
@@ -453,7 +482,7 @@ void Visit_Dofs(const DOF_LAYOUT<VECTOR<T,3> >& dl,const AR& bc_v,const AR& bc_e
         if(use_X) va.X=X.Append(0);
         if(use_uv) va.uv.x=(X-A).Dot(u);
         int e0=dl.Edge_h(e,0);
-        for(int i=0;i<dl.nl+1;i++)
+        for(int i=begin;i<end;i+=step)
         {
             va.i=e0+i;
             if(use_uv) va.uv.y=(T)i/dl.nl;
@@ -516,9 +545,22 @@ void Visit_Dof_Pairs(const DOF_LAYOUT<VECTOR<T,3> >& dl0,const DOF_LAYOUT<VECTOR
 
 // func(int i,const TV& X)
 template<class TV,class FV,class FE>
-void Visit_Dofs(const DOF_LAYOUT<TV>& dl,FV fv,FE fe)
+void Visit_Dofs(const DOF_LAYOUT<TV>& dl,LAYER_RANGE lr,FV fv,FE fe)
 {
-    Visit_Dofs<true,false>(dl,INTERVAL<int>(0,dl.cb->X.m),INTERVAL<int>(0,dl.cb->S.m),fv,fe);
+    Visit_Dofs<true,false>(dl,lr,INTERVAL<int>(0,dl.cb->X.m),INTERVAL<int>(0,dl.cb->S.m),fv,fe);
+}
+
+template<class T,class AR,class FV,class FE>
+void Visit_Wall_Dofs(const DOF_LAYOUT<VECTOR<T,3> >& dl,const AR& bc_v,const AR& bc_e,FV fv,FE fe)
+{
+    Visit_Dofs<true,false>(dl,LAYER_RANGE::SKIP_BOTTOM_TOP,bc_v,bc_e,fv,fe);
+    Visit_Dofs<true,false>(dl,LAYER_RANGE::BOTTOM_TOP_ONLY,INTERVAL<int>(0,dl.cb->X.m),INTERVAL<int>(0,dl.cb->S.m),fv,fe);
+}
+
+template<class T,class AR,class FV,class FE>
+void Visit_Wall_Dofs(const DOF_LAYOUT<VECTOR<T,2> >& dl,const AR& bc_v,const AR& bc_e,FV fv,FE fe)
+{
+    Visit_Dofs<true,false>(dl,LAYER_RANGE::ALL,bc_v,bc_e,fv,fe);
 }
 
 template<class T,class FV,class FE,class FP>
