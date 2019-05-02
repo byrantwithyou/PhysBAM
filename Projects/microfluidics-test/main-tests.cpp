@@ -18,10 +18,11 @@ using namespace PhysBAM;
 typedef float RW;
 typedef double T;
 
+template<int d>
 void Solve_And_Check(COMPONENT_LAYOUT_FEM<T>& cl,const LAYOUT_BUILDER_FEM<T>& builder,
     T mu,const std::string& au,const std::string& ap)
 {
-    typedef VECTOR<T,2> TV;
+    typedef VECTOR<T,d> TV;
     cl.Update_Masters();
     cl.Merge_Blocks();
     MATRIX_CONSTRUCTION_FEM<TV> mc(cl);
@@ -54,6 +55,7 @@ void Solve_And_Check(COMPONENT_LAYOUT_FEM<T>& cl,const LAYOUT_BUILDER_FEM<T>& bu
     //mc.Dump_World_Space_Vector("x");
 }
 
+template<int d>
 void Test_Pipe(RANDOM_NUMBERS<T>& rng,T mu,T s,T m,T kg,const std::string& au,const std::string& ap)
 {
     typedef VECTOR<T,2> TV;
@@ -66,16 +68,18 @@ void Test_Pipe(RANDOM_NUMBERS<T>& rng,T mu,T s,T m,T kg,const std::string& au,co
         T a=rng.Get_Uniform_Number(-1,0),b=rng.Get_Uniform_Number(1,2);
         T y=rng.Get_Uniform_Number(-1,1);
         builder.Set_Target_Length(0.25);
-        auto cs=builder.Cross_Section(5,1.0);
+        builder.Set_Depth(1,2);
+        auto cs=builder.Cross_Section(4,1.0);
         auto v0=builder.Vertex(TV(a,y));
         auto v1=builder.Vertex(TV(b,-y));
         auto bc0=builder.Set_BC(cs,v0,v1,1.0);
         auto bc1=builder.Set_BC(cs,v1,v0,TV());
         builder.Pipe(cs,bc0.x,bc1.x);
     }
-    Solve_And_Check(cl,builder,mu,au,ap);
+    Solve_And_Check<d>(cl,builder,mu,au,ap);
 }
 
+template<int d>
 void Test_Var_Size_Pipe(RANDOM_NUMBERS<T>& rng,T mu,T s,T m,T kg,const std::string& au,const std::string& ap)
 {
     typedef VECTOR<T,2> TV;
@@ -89,8 +93,9 @@ void Test_Var_Size_Pipe(RANDOM_NUMBERS<T>& rng,T mu,T s,T m,T kg,const std::stri
         T y=rng.Get_Uniform_Number(-1,1);
         T offset=rng.Get_Uniform_Number(0.5,1),len=rng.Get_Uniform_Number(0.5,1.5);
         builder.Set_Target_Length(0.25);
-        auto cs0=builder.Cross_Section(5,1.0);
-        auto cs1=builder.Cross_Section(7,1.5);
+        builder.Set_Depth(1,2);
+        auto cs0=builder.Cross_Section(4,1.0);
+        auto cs1=builder.Cross_Section(6,1.5);
         auto v0=builder.Vertex(TV(a,y));
         auto v1=builder.Vertex(TV(b,-y));
         auto bc0=builder.Set_BC(cs0,v0,v1,1.0);
@@ -99,9 +104,10 @@ void Test_Var_Size_Pipe(RANDOM_NUMBERS<T>& rng,T mu,T s,T m,T kg,const std::stri
         builder.Pipe(cs0,bc0.x,p(0));
         builder.Pipe(cs1,bc1.x,p(1));
     }
-    Solve_And_Check(cl,builder,mu,au,ap);
+    Solve_And_Check<d>(cl,builder,mu,au,ap);
 }
 
+template<int d>
 void Test_Joint2(T angle,T mu,T s,T m,T kg,const std::string& au,const std::string& ap)
 {
     typedef VECTOR<T,2> TV;
@@ -112,21 +118,23 @@ void Test_Joint2(T angle,T mu,T s,T m,T kg,const std::string& au,const std::stri
     LAYOUT_BUILDER_FEM<T> builder(cl);
     {
         builder.Set_Target_Length(0.25);
-        auto cs=builder.Cross_Section(5,1.0);
+        builder.Set_Depth(1,2);
+        auto cs=builder.Cross_Section(4,1.0);
         auto v0=builder.Vertex(TV());
-        TV d(1,2);
-        auto v1=builder.Vertex(d);
+        TV dir(1,2);
+        auto v1=builder.Vertex(dir);
         ROTATION<TV> R=ROTATION<TV>::From_Angle(angle);
-        auto v2=builder.Vertex(R.Rotate(d));
+        auto v2=builder.Vertex(R.Rotate(dir));
         auto bc0=builder.Set_BC(cs,v1,v0,1.0);
         auto bc1=builder.Set_BC(cs,v2,v0,TV(1,1));
         auto j=builder.Joint(cs,2,v0,{v1,v2});
         builder.Pipe(cs,bc0.x,j(0));
         builder.Pipe(cs,bc1.x,j(1));
     }
-    Solve_And_Check(cl,builder,mu,au,ap);
+    Solve_And_Check<d>(cl,builder,mu,au,ap);
 }
 
+template<int d>
 void Test_Joint3(T a0,T a1,T mu,T s,T m,T kg,const std::string& au,const std::string& ap)
 {
     typedef VECTOR<T,2> TV;
@@ -137,14 +145,15 @@ void Test_Joint3(T a0,T a1,T mu,T s,T m,T kg,const std::string& au,const std::st
     LAYOUT_BUILDER_FEM<T> builder(cl);
     {
         builder.Set_Target_Length(0.25);
-        auto cs=builder.Cross_Section(5,1.0);
+        builder.Set_Depth(1,2);
+        auto cs=builder.Cross_Section(4,1.0);
         auto v0=builder.Vertex(TV());
-        TV d(1,2);
-        auto v1=builder.Vertex(d);
+        TV dir(1,2);
+        auto v1=builder.Vertex(dir);
         ROTATION<TV> R0=ROTATION<TV>::From_Angle(a0);
-        auto v2=builder.Vertex(R0.Rotate(d));
+        auto v2=builder.Vertex(R0.Rotate(dir));
         ROTATION<TV> R1=ROTATION<TV>::From_Angle(a0+a1);
-        auto v3=builder.Vertex(R1.Rotate(d));
+        auto v3=builder.Vertex(R1.Rotate(dir));
         auto bc0=builder.Set_BC(cs,v1,v0,1.0);
         auto bc1=builder.Set_BC(cs,v2,v0,TV(1,1));
         auto bc2=builder.Set_BC(cs,v3,v0,0.5);
@@ -153,9 +162,10 @@ void Test_Joint3(T a0,T a1,T mu,T s,T m,T kg,const std::string& au,const std::st
         builder.Pipe(cs,bc1.x,j(1));
         builder.Pipe(cs,bc2.x,j(2));
     }
-    Solve_And_Check(cl,builder,mu,au,ap);
+    Solve_And_Check<d>(cl,builder,mu,au,ap);
 }
 
+template<int d>
 void Run(PARSE_ARGS& parse_args)
 {
     typedef VECTOR<T,2> TV;
@@ -179,33 +189,37 @@ void Run(PARSE_ARGS& parse_args)
 
     for(int i=0;i<10;i++)
     {
-        Test_Pipe(rng,mu,m,s,kg,analytic_u,analytic_p);
+        Test_Pipe<d>(rng,mu,m,s,kg,analytic_u,analytic_p);
     }
 
     for(int i=0;i<10;i++)
     {
-        Test_Var_Size_Pipe(rng,mu,m,s,kg,analytic_u,analytic_p);
+        Test_Var_Size_Pipe<d>(rng,mu,m,s,kg,analytic_u,analytic_p);
     }
 
     for(int i=0;i<5;i++)
     {
         T angle=rng.Get_Uniform_Number(0.2*pi,1.8*pi);
-        Test_Joint2(angle,mu,m,s,kg,analytic_u,analytic_p);
-        Test_Joint2(-angle,mu,m,s,kg,analytic_u,analytic_p);
+        Test_Joint2<d>(angle,mu,m,s,kg,analytic_u,analytic_p);
+        Test_Joint2<d>(-angle,mu,m,s,kg,analytic_u,analytic_p);
     }
 
     for(int i=0;i<10;i++)
     {
         T a0=rng.Get_Uniform_Number(0.2*pi,0.9*pi),a1=rng.Get_Uniform_Number(0.2*pi,0.9*pi);
-        Test_Joint3(a0,a1,mu,m,s,kg,analytic_u,analytic_p);
+        Test_Joint3<d>(a0,a1,mu,m,s,kg,analytic_u,analytic_p);
     }
 }
 
 int main(int argc, char* argv[])
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
+    bool use_3d=false;
     PARSE_ARGS parse_args(argc,argv);
-    Run(parse_args);
+    parse_args.Add("-3d",&use_3d,"use 3D");
+    parse_args.Parse(true);
+    if(use_3d) Run<3>(parse_args);
+    else Run<2>(parse_args);
     return 0;
 }
 
