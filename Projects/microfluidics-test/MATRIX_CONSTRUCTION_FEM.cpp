@@ -42,7 +42,7 @@ struct FEM_TABLES
     const static int pres[nodes][vel*d],pres_den=d==2?6:120;
     const static int u_dot_v[vel][vel],u_dot_v_den=d==2?360:2520;
     const static int p_u[nodes][vel],p_u_den=d==2?120:360;
-    const static int surf_u_dot_v[surf_vel][surf_vel],surf_u_dot_v_den=d==2?30:360;
+    const static int surf_u_dot_v[surf_vel][surf_vel],surf_u_dot_v_den=d==2?30:180;
 };
 
 template<>
