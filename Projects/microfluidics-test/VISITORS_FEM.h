@@ -217,10 +217,11 @@ void Visit_Elements(const DOF_LAYOUT<VECTOR<T,3> >& dl,F func)
 {
     typedef VECTOR<T,3> TV;
     int m=dl.cb->E.m;
-
     for(int tri=0;tri<m;tri++)
     {
-        VISIT_ELEMENT_DATA<TV> vt[3],mirror_vt[3];
+        const int* move_order=move_order_table[dl.ticks_t(tri)];
+    
+        VISIT_ELEMENT_DATA<TV> vt[3];
         VECTOR<int,3> P=dl.cb->E(tri),S;
         for(int i=0;i<3;i++) S(i)=dl.cb->element_edges(tri)(i).x;
     
@@ -248,37 +249,21 @@ void Visit_Elements(const DOF_LAYOUT<VECTOR<T,3> >& dl,F func)
             };
 
         VECTOR<VECTOR<int,2>,4> keys({0,0},{1,0},{2,0},{0,1});
-        const int* move_order=move_order_table[dl.ticks_t(tri)];
         for(int i=0;i<3;i++)
         {
             keys(3).x=move_order[i];
             fill_vt(keys,vt[i]);
             keys(move_order[i])=keys(3);
         }
-        keys=VECTOR<VECTOR<int,2>,4>({0,0},{1,0},{2,0},{0,1});
-        for(int i=0;i<3;i++)
-        {
-            int j=2-i;
-            keys(3).x=move_order[j];
-            fill_vt(keys,mirror_vt[i]);
-            keys(move_order[j])=keys(3);
-            mirror_vt[i].v+=dl.nl-1;
-            mirror_vt[i].e+=dl.nl-1;
-            mirror_vt[i].X+=TV(0,0,(dl.nl-1)*dl.dz);
-        }
 
         for(int l=0;l<dl.nl;l++)
-        {
-            VISIT_ELEMENT_DATA<TV>* vtp=vt;
-            if(l==dl.nl-1) vtp=mirror_vt;
             for(int i=0;i<3;i++)
             {
-                func(vtp[i]);
-                vtp[i].v+=1;
-                vtp[i].e+=1;
-                vtp[i].X+=TV(0,0,dl.dz);
+                func(vt[i]);
+                vt[i].v+=1;
+                vt[i].e+=1;
+                vt[i].X+=TV(0,0,dl.dz);
             }
-        }
     }
 }
 
