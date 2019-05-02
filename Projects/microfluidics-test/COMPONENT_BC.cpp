@@ -32,11 +32,20 @@ Make_Block(int d,T w,T l,bool is_v) -> TRIP
 
     for(int i=0;i<n-1;i++)
     {
-        cb->E.Append({i,i+n,i+1});
-        cb->E.Append({i+n,i+n+1,i+1});
+        if(i==0)
+        {
+            cb->E.Append({i,i+n,i+n+1});
+            cb->E.Append({i+n+1,i+1,i});
+        }
+        else
+        {
+            cb->E.Append({i,i+n,i+1});
+            cb->E.Append({i+n,i+n+1,i+1});
+        }
         cb->S(i)={i,i+1};
         cb->S(i+(n-1))={i+n,i+n+1};
-        cb->S(i+2*(n-1))={i+n,i+1};
+        if(i==0) cb->S(i+2*(n-1))={i+n+1,i};
+        else cb->S(i+2*(n-1))={i+n,i+1};
         cb->S(i+3*(n-1))={i,i+n};
         cb->ticks(i)=0;
         cb->ticks(i+(n-1))=0;
