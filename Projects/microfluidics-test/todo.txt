@@ -3,3 +3,5 @@ NOTE: I needed to set the variable "OPENBLAS_NUM_THREADS=1" to avoid openblas do
 * Reuse storage, renumber items.
 
 * Free old storage.
+
+* For potential convergence issues: check how many faces are on the boundary. May need to flip the triangle directions.
