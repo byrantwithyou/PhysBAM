@@ -26,7 +26,7 @@ struct ANALYTIC_FEM
     
     TV Traction(const TV& N,const TV& X) const;
     TV Force(const TV& X) const;
-    bool Check_Analytic_Solution() const;
+    bool Check_Analytic_Solution(bool dump) const;
     void Compute_RHS();
 
     void Set_Velocity(const char* s)

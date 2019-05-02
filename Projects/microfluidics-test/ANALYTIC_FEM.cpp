@@ -2,6 +2,8 @@
 // Copyright 2019.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include "ANALYTIC_FEM.h"
 #include "VISITORS_FEM.h"
 namespace PhysBAM{
@@ -26,7 +28,7 @@ template<class TV> ANALYTIC_FEM<TV>::
 // Function Check_Analytic_Solution
 //#####################################################################
 template<class TV> bool ANALYTIC_FEM<TV>::
-Check_Analytic_Solution() const
+Check_Analytic_Solution(bool dump) const
 {
     if(!analytic_velocity || !analytic_pressure) return false;
     T m=mc.cl.unit_m,s=mc.cl.unit_s;
@@ -40,7 +42,7 @@ Check_Analytic_Solution() const
         const auto& W=mc.rhs_block_list(b);
         DOF_LAYOUT<TV> dl(mc.cl,mc.cl.reference_block_data(bl.ref_id),true);
         Visit_Compressed_Dofs(dl,rd,
-            [this,&bl,&W,m,s,&max_u,&l2_u,&num_u](int v,const TV& Y)
+            [this,&bl,&W,m,s,&max_u,&l2_u,&num_u,dump](int v,const TV& Y)
             {
                 TV X=xform(bl.xform,Y);
                 TV U=analytic_velocity->v(X/m,0)*m/s;
@@ -48,8 +50,13 @@ Check_Analytic_Solution() const
                 max_u=std::max(max_u,(U-V).Max_Abs());
                 l2_u+=(U-V).Magnitude_Squared();
                 num_u++;
+                if(dump)
+                {
+                    Add_Debug_Particle(X,VECTOR<T,3>(1,1,1));
+                    Debug_Particle_Set_Attribute<TV>("V",U-V);
+                }
             },
-            [this,&bl,&W,m,s,&max_u,&l2_u,&num_u](int e,const TV& Y)
+            [this,&bl,&W,m,s,&max_u,&l2_u,&num_u,dump](int e,const TV& Y)
             {
                 TV X=xform(bl.xform,Y);
                 TV U=analytic_velocity->v(X/m,0)*m/s;
@@ -57,8 +64,13 @@ Check_Analytic_Solution() const
                 max_u=std::max(max_u,(U-V).Max_Abs());
                 l2_u+=(U-V).Magnitude_Squared();
                 num_u++;
+                if(dump)
+                {
+                    Add_Debug_Particle(X,VECTOR<T,3>(1,1,1));
+                    Debug_Particle_Set_Attribute<TV>("V",U-V);
+                }
             },
-            [this,&bl,&W,m,s,&max_p,&l2_p,&num_p](int i,const TV& Y)
+            [this,&bl,&W,m,s,&max_p,&l2_p,&num_p,dump](int i,const TV& Y)
             {
                 TV X=xform(bl.xform,Y);
                 T p=analytic_pressure->f(X/m,0)*m/s;
@@ -66,12 +78,18 @@ Check_Analytic_Solution() const
                 max_p=std::max(max_p,std::abs(p-q));
                 l2_p+=sqr(p-q);
                 num_p++;
+                if(dump)
+                {
+                    Add_Debug_Particle(X,VECTOR<T,3>(1,1,1));
+                    Debug_Particle_Set_Attribute<TV>("display_size",abs(p-q));
+                }
             }
         );
     }
     if(num_u) l2_u=sqrt(l2_u/num_u);
     if(num_p) l2_p=sqrt(l2_p/num_p);
     LOG::printf("u l-inf %P   u l-2 %P   p l-inf %P   p l-2 %P\n",max_u,l2_u,max_p,l2_p);
+    if(dump) Flush_Frame<TV>("error");
     return max(max_u,l2_u,max_p,l2_p)<1e-10;
 }
 //#####################################################################

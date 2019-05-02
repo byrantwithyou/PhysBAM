@@ -241,7 +241,8 @@ void Run(PARSE_ARGS& parse_args)
     timer("exec jobs");
 
     mc.Transform_Solution(cem,false,false);
-    if(an) an->Check_Analytic_Solution();
+    Flush_Frame<TV>("transform solution");
+    if(an) an->Check_Analytic_Solution(!quiet);
     if(!quiet)
     {
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
