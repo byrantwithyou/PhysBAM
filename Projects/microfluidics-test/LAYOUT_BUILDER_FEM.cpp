@@ -5,6 +5,7 @@
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Log/LOG.h>
 #include <Core/Math_Tools/cube.h>
+#include <Core/Matrices/ROTATION.h>
 #include <fstream>
 #include "LAYOUT_BUILDER_FEM.h"
 namespace PhysBAM{
@@ -93,6 +94,22 @@ From_File(const std::string& file)
                     ARRAY<CONNECTOR_ID> r=Joint(cs,i0,o,arms);
                     for(int i=0;i<i0;i++)
                         con_names.Set(c(i),r(i));
+                }
+                break;
+
+            case '+':
+                {
+                    ss>>name>>name2>>name3;
+                    CS_ID cs=cs_names.Get(name);
+                    VERT_ID o=vert_names.Get(name2);
+                    VERT_ID v0=vert_names.Get(name3);
+                    VECTOR<CONNECTOR_ID,4> c=Joint_4_Right_Angle(cs,o,v0);
+                    for(int i=0;i<4;i++)
+                    {
+                        std::string name;
+                        ss>>name;
+                        con_names.Set(name,c(i));
+                    }
                 }
                 break;
 
@@ -201,6 +218,20 @@ To_String() const
                         os<<" V"<<commands(i+3+j*2).y<<" K"<<commands(i+3+j*2+1).y;
                     }
                     i+=2+2*n;
+                }
+                break;
+            case TAG::DECL_4WJT:
+                {
+                    PHYSBAM_ASSERT(commands(i+1).x==TAG::CS);
+                    PHYSBAM_ASSERT(commands(i+2).x==TAG::VERT);
+                    PHYSBAM_ASSERT(commands(i+3).x==TAG::VERT);
+                    os<<"+ C"<<commands(i+1).y<<" "<<" V"<<commands(i+2).y<<" V"<<commands(i+3).y;
+                    for(int j=0;j<4;j++)
+                    {
+                        PHYSBAM_ASSERT(commands(i+4+j).x==TAG::CONNECTOR);
+                        os<<" K"<<commands(i+4+j).y;
+                    }
+                    i+=7;
                 }
                 break;
             case TAG::DECL_PIPE:
@@ -384,6 +415,35 @@ Joint(CS_ID cs,int n,VERT_ID o,const ARRAY<VERT_ID>& arms) -> ARRAY<CONNECTOR_ID
         commands.Append({TAG::VERT,Value(arms(i))});
         commands.Append({TAG::CONNECTOR,Value(vc(i).y)});
     }
+    return r;
+}
+//#####################################################################
+// Function Joint_4_Right_Angle
+//#####################################################################
+template<class T> auto LAYOUT_BUILDER_FEM<T>::
+Joint_4_Right_Angle(CS_ID cs,VERT_ID o,VERT_ID v0) -> VECTOR<CONNECTOR_ID,4>
+{
+    auto crs=cross_sections(cs);
+    TV O=verts(o),V0=verts(v0);
+    TV dir=(V0-O).Normalized();
+
+    auto cj=comp_joint.Make_Joint_4_Right_Angle(crs.x,crs.y,Canonical_Direction(dir));
+    XFORM<TV> xf={Compute_Xform(Canonical_Direction(dir)?dir:-dir),O};
+    ARRAY<VERTEX_DATA> vd(4);
+    Emit_Component_Blocks(cj.x,xf,vd);
+    VECTOR<CONNECTOR_ID,4> r;
+    for(int i=0;i<4;i++)
+    {
+        ROTATION<TV> Q=ROTATION<TV>::From_Angle(pi/2*i);
+        vd(i).X=O+Q.Rotate(dir)*cj.y(i);
+        CONNECTOR_ID c=last_cid++;
+        connectors.Set(c,vd(i));
+        r(i)=c;
+    }
+    ARRAY<PAIR<TAG,int> > com={{TAG::DECL_4WJT,-1},{TAG::CS,Value(cs)},{TAG::VERT,Value(o)},{TAG::VERT,Value(v0)}};
+    commands.Append_Elements(com);
+    for(int i=0;i<4;i++)
+        commands.Append({TAG::CONNECTOR,Value(r(i))});
     return r;
 }
 //#####################################################################

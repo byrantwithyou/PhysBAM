@@ -1,0 +1,17 @@
+l .22
+z 0.25 1
+c C 4 1
+v O 0 0
+v E 2 0
+v N 0 2
+v W -2 0
+v S 0 -2
+u C E O UE 1
+u C N O UN 1
+t C W O TW 0 0
+t C S O TS 0 0
++ C O E KE KN KW KS
+p C UE KE
+p C UN KN
+p C TW KW
+p C TS KS

@@ -50,6 +50,7 @@ struct COMPONENT_JOINT
     PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > Make_Joint_3(int d,T width,const ARRAY<T>& angles);
     PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles);
     PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > Make_Joint_3_Average(int d,T width,const ARRAY<T>& angles);
+    PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > Make_Joint_4_Right_Angle(int d,T width,bool is_canonical_dir);
     std::tuple<TV,T,T> Elbow_Pit(T angle,T width) const;
     TV Elbow_Pit_Oriented(T angle,T width) const;
     VECTOR<TV,2> Extrude(const TV& v0,const TV& v1,const TV& n) const;

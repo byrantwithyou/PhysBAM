@@ -20,7 +20,7 @@ struct LAYOUT_BUILDER_FEM
     PHYSBAM_DECLARE_ELEMENT_ID(CONNECTOR_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
     PHYSBAM_DECLARE_ELEMENT_ID(BC_U_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
     PHYSBAM_DECLARE_ELEMENT_ID(BC_T_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_HELPER::logical|ELEMENT_ID_HELPER::add_T);
-    enum class TAG {SET_DEPTH,SET_LEN,DECL_CS,DECL_VERT,SET_BC_U,SET_BC_T,DECL_JT,DECL_PIPE,CS,VERT,CONNECTOR};
+    enum class TAG {SET_DEPTH,SET_LEN,DECL_CS,DECL_VERT,SET_BC_U,SET_BC_T,DECL_JT,DECL_PIPE,DECL_4WJT,CS,VERT,CONNECTOR};
     struct VERTEX_DATA
     {
         TV X;
@@ -51,6 +51,7 @@ struct LAYOUT_BUILDER_FEM
     // c <cross-section-name> <num-elements> <width>
     // v <vertex-name> <vertex-location-2d>
     // j <cross-section-name> <num-pipes> <origin-vertex> [<vertex-name> <connection-name>]*
+    // + <cross-section-name> <origin-vertex> <vertex-name> <east-connection-name> <north> <west> <south>
     // p <cross-section-name> <connection-name> <connection-name>
     // g <cross-section-name> <cross-section-name> <vertex-name> <vertex-name> <distance> <length> <connection-name> <connection-name>
     // u <cross-section-name> <origin-vertex> <vertex-name> <connection-name> <flow-rate>
@@ -65,6 +66,7 @@ struct LAYOUT_BUILDER_FEM
     PAIR<CONNECTOR_ID,BC_U_ID> Set_BC(CS_ID cs,VERT_ID from,VERT_ID to,T flow_rate);
     PAIR<CONNECTOR_ID,BC_T_ID> Set_BC(CS_ID cs,VERT_ID from,VERT_ID to,const TV& traction);
     ARRAY<CONNECTOR_ID> Joint(CS_ID cs,int n,VERT_ID o,const ARRAY<VERT_ID>& arms);
+    VECTOR<CONNECTOR_ID,4> Joint_4_Right_Angle(CS_ID cs,VERT_ID o,VERT_ID v0);
     void Pipe(CS_ID cs,CONNECTOR_ID a,CONNECTOR_ID b);
     VECTOR<CONNECTOR_ID,2> Pipe(CS_ID cs0,CS_ID cs1,VERT_ID v0,VERT_ID v1,T offset,T length);
 };

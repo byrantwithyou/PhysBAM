@@ -306,6 +306,81 @@ Make_Joint_3_Average(int d,T width,const ARRAY<T>& angles)
     return {cc,{ext((3-k)%3),ext((4-k)%3),ext((5-k)%3)}};
 }
 //#####################################################################
+// Function Make_Joint_4_Right_Angle
+//#####################################################################
+template<class T> PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > COMPONENT_JOINT<T>::
+Make_Joint_4_Right_Angle(int d,T width,bool is_canonical_dir)
+{
+    CANONICAL_COMPONENT<T>* cc=new CANONICAL_COMPONENT<T>;
+    cc->blocks.Resize(CC_BLOCK_ID(d-1));
+    auto cdir=[is_canonical_dir](int d){return (d+(!is_canonical_dir)*2)%4;};
+    CC_IRREG_ID ic_north=cc->irregular_connections.Append({CC_BLOCK_ID(~cdir(1))});
+    CC_IRREG_ID ic_south=cc->irregular_connections.Append({CC_BLOCK_ID(~cdir(3))});
+
+    T dx=width/(d-1);
+    int n=d+2;
+    for(int i=0;i<d-1;i++)
+    {
+        CANONICAL_BLOCK<T>* cb=new CANONICAL_BLOCK<T>;
+        cb->X.Resize(2*n);
+        cb->S.Resize(4*(n-1)+1);
+        cb->ticks.Resize(cb->S.m,use_init,-7);
+        for(int j=0;j<n;j++)
+        {
+            T y=j*dx-width/2-dx;
+            cb->X(j)=TV(i*dx-width/2,y);
+            cb->X(j+n)=TV((i+1)*dx-width/2,y);
+        }
+        for(int j=0;j<n-1;j++)
+        {
+            cb->E.Append({j,j+n,j+1});
+            cb->E.Append({j+n,j+n+1,j+1});
+            cb->S(j)={j,j+1};
+            cb->S(j+(n-1))={j+n,j+n+1};
+            cb->S(j+2*(n-1))={j+n,j+1};
+            cb->S(j+3*(n-1))={j,j+n};
+            cb->ticks(j)=0;
+            cb->ticks(j+(n-1))=0;
+            cb->ticks(j+2*(n-1))=1;
+            cb->ticks(j+3*(n-1))=0;
+        }
+        cb->S(4*(n-1))={n-1,2*n-1};
+        cb->ticks(4*(n-1))=0;
+
+        ARRAY<CC_BLOCK_CONNECTION,CON_ID> con;
+        if(i==0)
+        {
+            cb->bc_v.Append_Elements(ARRAY<int>{0,1,n-2,n-1});
+            cb->bc_e.Append_Elements(ARRAY<int>{0,n-2});
+            cb->cross_sections.Append({{1,n-1},{1,n-2},false});
+            con.Append({CC_BLOCK_ID(~cdir(2)),CON_ID(1)});
+        }
+        else
+        {
+            cb->cross_sections.Append({{0,n},{0,n-1},false});
+            con.Append({CC_BLOCK_ID(i-1),CON_ID(1)});
+        }
+        if(i==d-2)
+        {
+            cb->bc_v.Append_Elements(ARRAY<int>{n,n+1,2*n-2,2*n-1});
+            cb->bc_e.Append_Elements(ARRAY<int>{n-1,2*n-3});
+            cb->cross_sections.Append({{n+1,2*n-1},{n,2*n-3},true});
+            con.Append({CC_BLOCK_ID(~cdir(0)),CON_ID(0)});
+        }
+        else
+        {
+            cb->cross_sections.Append({{n,2*n},{n-1,2*n-2},true});
+            con.Append({CC_BLOCK_ID(i+1),CON_ID(0)});
+        }
+        cc->irregular_connections(ic_south).edge_on.Append({CC_BLOCK_ID(i),3*(n-1),n,0});
+        cc->irregular_connections(ic_north).edge_on.Append({CC_BLOCK_ID(i),4*(n-1),n-1,2*n-1});
+        cb->Compute_Element_Edges();
+        cc->blocks(CC_BLOCK_ID(i))={cb,{},con,{{ic_south,d-2-i},{ic_north,i}}};
+    }
+    cc->irregular_connections(ic_south).edge_on.Reverse();
+    return {cc,{width/2,width/2+dx,width/2,width/2+dx}};
+}
+//#####################################################################
 // Function Elbow_Pit
 //#####################################################################
 template<class T> auto COMPONENT_JOINT<T>::
