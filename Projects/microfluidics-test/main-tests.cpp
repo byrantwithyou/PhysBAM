@@ -36,13 +36,8 @@ void Solve_And_Check(COMPONENT_LAYOUT_FEM<T>& cl,const LAYOUT_BUILDER_FEM<T>& bu
     an.Set_Velocity(au.c_str());
     an.Set_Pressure(ap.c_str());
     an.Compute_RHS();
-
-    mc.Dump_World_Space_System();
     mc.Copy_To_CEM(cem);
-
     mc.Transform_Solution(cem,true,true);
-    //mc.Dump_World_Space_Vector("b");
-
     ELIMINATION_FEM<T> el(cl);
     el.Eliminate_Irregular_Blocks(cem);
     el.Eliminate_Non_Seperators(cem);
@@ -52,7 +47,6 @@ void Solve_And_Check(COMPONENT_LAYOUT_FEM<T>& cl,const LAYOUT_BUILDER_FEM<T>& bu
     mc.Transform_Solution(cem,false,false);
     if(!an.Check_Analytic_Solution(false))
         printf("%s\n",builder.To_String().c_str());
-    //mc.Dump_World_Space_Vector("x");
 }
 
 template<int d>
@@ -166,6 +160,39 @@ void Test_Joint3(T a0,T a1,T mu,T s,T m,T kg,const std::string& au,const std::st
 }
 
 template<int d>
+void Test_Joint4_Right_Angle(T angle,T mu,T s,T m,T kg,const std::string& au,const std::string& ap)
+{
+    typedef VECTOR<T,2> TV;
+    COMPONENT_LAYOUT_FEM<T> cl;
+    cl.unit_m=m;
+    cl.unit_s=s;
+    cl.unit_kg=kg;
+    LAYOUT_BUILDER_FEM<T> builder(cl);
+    {
+        builder.Set_Target_Length(0.25);
+        builder.Set_Depth(1,2);
+        auto cs=builder.Cross_Section(4,1.0);
+        ROTATION<TV> R=ROTATION<TV>::From_Angle(angle);
+        auto O=builder.Vertex(TV());
+        TV v0=R.Rotate(TV(2,0));
+        auto east=builder.Vertex(v0);
+        auto north=builder.Vertex(v0.Rotate_Counterclockwise_90());
+        auto west=builder.Vertex(-v0);
+        auto south=builder.Vertex(v0.Rotate_Clockwise_90());
+        auto bc_east=builder.Set_BC(cs,east,O,1.0);
+        auto bc_north=builder.Set_BC(cs,north,O,0.8);
+        auto bc_south=builder.Set_BC(cs,south,O,TV(1,1));
+        auto bc_west=builder.Set_BC(cs,west,O,TV());
+        auto j=builder.Joint_4_Right_Angle(cs,O,east);
+        builder.Pipe(cs,bc_east.x,j(0));
+        builder.Pipe(cs,bc_north.x,j(1));
+        builder.Pipe(cs,bc_west.x,j(2));
+        builder.Pipe(cs,bc_south.x,j(3));
+    }
+    Solve_And_Check<d>(cl,builder,mu,au,ap);
+}
+
+template<int d>
 void Run(PARSE_ARGS& parse_args)
 {
     typedef VECTOR<T,2> TV;
@@ -208,6 +235,12 @@ void Run(PARSE_ARGS& parse_args)
     {
         T a0=rng.Get_Uniform_Number(0.2*pi,0.9*pi),a1=rng.Get_Uniform_Number(0.2*pi,0.9*pi);
         Test_Joint3<d>(a0,a1,mu,m,s,kg,analytic_u,analytic_p);
+    }
+
+    for(int i=0;i<10;i++)
+    {
+        T angle=rng.Get_Uniform_Number(-2*pi,2*pi);
+        Test_Joint4_Right_Angle<d>(angle,mu,m,s,kg,analytic_u,analytic_p);
     }
 }
 
