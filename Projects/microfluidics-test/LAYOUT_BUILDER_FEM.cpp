@@ -15,7 +15,7 @@ bool Canonical_Direction(VECTOR<T,2> u)
     double comp_tol=1e-10;
     if(u.x>comp_tol) return true;
     if(u.x<-comp_tol) return false;
-    if(u.x>comp_tol) return true;
+    if(u.y>comp_tol) return true;
     return false;
 }
 
