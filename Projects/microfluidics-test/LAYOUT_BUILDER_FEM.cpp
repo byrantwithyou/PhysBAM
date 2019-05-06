@@ -174,7 +174,7 @@ To_String() const
             case TAG::DECL_CS:
                 {
                     CS_ID cs(c.y);
-                    os<<"c C"<<c.y<<" "<<cross_sections(cs).x<<" "<<cross_sections(cs).y;
+                    os<<"c C"<<c.y<<" "<<cross_sections(cs).x-1<<" "<<cross_sections(cs).y;
                 }
                 break;
             case TAG::DECL_VERT:
@@ -225,7 +225,7 @@ To_String() const
                     PHYSBAM_ASSERT(commands(i+1).x==TAG::CS);
                     PHYSBAM_ASSERT(commands(i+2).x==TAG::VERT);
                     PHYSBAM_ASSERT(commands(i+3).x==TAG::VERT);
-                    os<<"+ C"<<commands(i+1).y<<" "<<" V"<<commands(i+2).y<<" V"<<commands(i+3).y;
+                    os<<"+ C"<<commands(i+1).y<<" V"<<commands(i+2).y<<" V"<<commands(i+3).y;
                     for(int j=0;j<4;j++)
                     {
                         PHYSBAM_ASSERT(commands(i+4+j).x==TAG::CONNECTOR);
