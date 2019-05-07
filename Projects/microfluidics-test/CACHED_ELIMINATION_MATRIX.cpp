@@ -38,6 +38,8 @@ enum {zero_block=0,id_block=1,invalid_block=-1,
       use_trans=1<<30,use_neg=1<<29,is_vec=1<<28,
       raw_mask=~(use_trans|use_neg)};
 
+enum {pseudo_inv=1<<30,raw_op_mask=~pseudo_inv};
+
 int arg_type[op_last][4] =
 {
     [op_nop]={0,0,0,0},
@@ -73,6 +75,40 @@ void Inverse(MATRIX_MXN<double>& A)
     for(int r=0;r<A.m;r++)
         for(int c=0;c<r;c++)
             A(r,c)=A(c,r);
+}
+
+void Pseudo_Inverse(MATRIX_MXN<float>& A)
+{
+    float tol=1e-10;
+    ARRAY<float> s(A.m),u(A.m*A.m),vt(A.m*A.m),superb(A.m);
+    int ret=LAPACKE_sgesvd(LAPACK_ROW_MAJOR,'S','S',A.m,A.n,A.x.Get_Array_Pointer(),A.m,
+        s.Get_Array_Pointer(),u.Get_Array_Pointer(),A.m,vt.Get_Array_Pointer(),A.m,superb.Get_Array_Pointer());
+    PHYSBAM_ASSERT(!ret);
+    for(int i=0;i<A.m;i++)
+    {
+       float ss=s(i);
+       if(s(i)>tol) ss=1.0/s(i);
+       cblas_sscal(A.m,ss,&vt(i*A.m),1);
+    }
+    cblas_sgemm(CblasRowMajor,CblasTrans,CblasTrans,
+        A.m,A.m,A.m,1.0,vt.Get_Array_Pointer(),A.m,u.Get_Array_Pointer(),A.m,0.0,A.x.Get_Array_Pointer(),A.m);
+}
+
+void Pseudo_Inverse(MATRIX_MXN<double>& A)
+{
+    double tol=1e-10;
+    ARRAY<double> s(A.m),u(A.m*A.m),vt(A.m*A.m),superb(A.m);
+    int ret=LAPACKE_dgesvd(LAPACK_ROW_MAJOR,'S','S',A.m,A.n,A.x.Get_Array_Pointer(),A.m,
+        s.Get_Array_Pointer(),u.Get_Array_Pointer(),A.m,vt.Get_Array_Pointer(),A.m,superb.Get_Array_Pointer());
+    PHYSBAM_ASSERT(!ret);
+    for(int i=0;i<A.m;i++)
+    {
+       double ss=s(i);
+       if(s(i)>tol) ss=1.0/s(i);
+       cblas_dscal(A.m,ss,&vt(i*A.m),1);
+    }
+    cblas_dgemm(CblasRowMajor,CblasTrans,CblasTrans,
+        A.m,A.m,A.m,1.0,vt.Get_Array_Pointer(),A.m,u.Get_Array_Pointer(),A.m,0.0,A.x.Get_Array_Pointer(),A.m);
 }
 
 // A = sa*A+sbc*op(B,bt)*op(C,ct)
@@ -135,7 +171,7 @@ Eliminate_Row(int r)
 {
     PHYSBAM_ASSERT(valid_row(r));
     int diag_matrix=Get_Block_Lazy(r,r);
-    int inv=Compute_Inv(diag_matrix);
+    int inv=Compute_Inv(diag_matrix,pinv_last_blk && valid_row.Count_Matches(true)==1);
     ARRAY<MATRIX_BLOCK>& row=rows(r);
     rhs(r)=Matrix_Times(inv,rhs(r));
     for(int i=0;i<row.m;i++){
@@ -213,15 +249,17 @@ Symmetric(int a) const
 // Function Compute_Inv
 //#####################################################################
 template<class T> int CACHED_ELIMINATION_MATRIX<T>::
-Compute_Inv(int a)
+Compute_Inv(int a,bool pinv)
 {
     if(a==id_block) return id_block;
-    if(a&use_neg) return Negate(Compute_Inv(Negate(a)));
-    if(int* r=cached_ops.Get_Pointer({op_mat_inv,a,0})) return *r;
+    if(a&use_neg) return Negate(Compute_Inv(Negate(a),pinv));
+    int op_inv=op_mat_inv;
+    if(pinv) op_inv|=pseudo_inv;
+    if(int* r=cached_ops.Get_Pointer({op_inv,a,0})) return *r;
     PHYSBAM_ASSERT(block_list(a).sym);
     int n=Create_Matrix_Block(true);
-    jobs.Append({op_mat_inv,{a},n});
-    cached_ops.Set({op_mat_inv,a,0},n);
+    jobs.Append({op_inv,{a},n});
+    cached_ops.Set({op_inv,a,0},n);
     return n;
 }
 //#####################################################################
@@ -573,12 +611,14 @@ Execute(CACHED_ELIMINATION_MATRIX<T>* cem)
 {
     auto& bl=cem->block_list;
     auto& vl=cem->vector_list;
-    switch(op)
+    int raw_op=op&raw_op_mask;
+    switch(raw_op)
     {
         case op_nop: break;
         case op_mat_inv:
             bl(o).M=bl(a[0]).M;
-            Inverse(bl(o).M);
+            if(op&pseudo_inv) Pseudo_Inverse(bl(o).M);
+            else Inverse(bl(o).M);
             break;
         case op_mat_mul:
             {
@@ -635,11 +675,11 @@ Execute(CACHED_ELIMINATION_MATRIX<T>* cem)
     {
         std::unique_lock<std::mutex> lck(cem->mtx);
         for(int l=0;l<3;l++)
-            if(arg_type[op][l]>0 && a[l]>=0)
+            if(arg_type[raw_op][l]>0 && a[l]>=0)
             {
-                if(!--cem->data_refs[arg_type[op][l]-1](a[l]&raw_mask))
+                if(!--cem->data_refs[arg_type[raw_op][l]-1](a[l]&raw_mask))
                 {
-                    if(arg_type[op][l]==1) bl(a[l]&raw_mask).M.x.Clean_Memory();
+                    if(arg_type[raw_op][l]==1) bl(a[l]&raw_mask).M.x.Clean_Memory();
                     else vl(a[l]&raw_mask).Clean_Memory();
                 }
             }
@@ -658,11 +698,11 @@ Compute_Job_Deps()
     for(int i=0;i<jobs.m;i++)
     {
         auto& j=jobs(i);
-        if(arg_type[j.op][3]>0)
-            provider[arg_type[j.op][3]-1](j.o)=i;
+        if(arg_type[j.op&raw_op_mask][3]>0)
+            provider[arg_type[j.op&raw_op_mask][3]-1](j.o)=i;
         for(int l=0;l<3;l++)
-            if(arg_type[j.op][l]>0 && j.a[l]>=0)
-                user[arg_type[j.op][l]-1](j.a[l]&raw_mask).Append(i);
+            if(arg_type[j.op&raw_op_mask][l]>0 && j.a[l]>=0)
+                user[arg_type[j.op&raw_op_mask][l]-1](j.a[l]&raw_mask).Append(i);
     }
 }
 //#####################################################################
@@ -675,7 +715,7 @@ Eliminate_Trans()
         {
             auto& j=jobs(p);
             auto& k=jobs(u);
-            if(j.op==op_mat_mul && k.op==op_mat_add && (k.a[1]&use_trans) && j.o==(k.a[1]&raw_mask))
+            if((j.op&raw_op_mask)==op_mat_mul && (k.op&raw_op_mask)==op_mat_add && (k.a[1]&use_trans) && j.o==(k.a[1]&raw_mask))
             {
                 std::swap(j.a[1],j.a[2]);
                 j.a[1]=Transposed(j.a[1]);
@@ -692,7 +732,7 @@ Simplify_Jobs()
 {
     for(auto& j:jobs)
     {
-        switch(j.op)
+        switch(j.op&raw_op_mask)
         {
             case op_mat_mul:
             case op_vec_mul:
@@ -710,7 +750,7 @@ Combine_Ops()
         {
             auto j=jobs(p);
             auto k=jobs(u);
-            if(j.op==op_mat_mul && k.op==op_mat_add && j.a[0]<0 && !(k.a[1]&use_trans))
+            if((j.op&raw_op_mask)==op_mat_mul && (k.op&raw_op_mask)==op_mat_add && j.a[0]<0 && !(k.a[1]&use_trans))
             {
                 if((k.a[1]&raw_mask)==j.o) std::swap(k.a[0],k.a[1]);
                 PHYSBAM_ASSERT((k.a[0]&raw_mask)==j.o);
@@ -731,8 +771,8 @@ Combine_Ops()
 template<class T> int CACHED_ELIMINATION_MATRIX<T>::
 Provides_Argument(const JOB& j,int a) const
 {
-    if(arg_type[j.op][a]==0) return -1;
-    return provider[arg_type[j.op][a]-1](j.a[a]&raw_mask);
+    if(arg_type[j.op&raw_op_mask][a]==0) return -1;
+    return provider[arg_type[j.op&raw_op_mask][a]-1](j.a[a]&raw_mask);
 }
 //#####################################################################
 // Function Uses_Output
@@ -741,8 +781,8 @@ template<class T> const ARRAY<int>& CACHED_ELIMINATION_MATRIX<T>::
 Uses_Output(const JOB& j) const
 {
     static const ARRAY<int> empty;
-    if(arg_type[j.op][3]==0) return empty;
-    return user[arg_type[j.op][3]-1](j.o);
+    if(arg_type[j.op&raw_op_mask][3]==0) return empty;
+    return user[arg_type[j.op&raw_op_mask][3]-1](j.o);
 }
 //#####################################################################
 // Function Remove_Job_Deps
@@ -751,11 +791,11 @@ template<class T> void CACHED_ELIMINATION_MATRIX<T>::
 Remove_Job_Deps(int j)
 {
     const auto& k=jobs(j);
-    if(arg_type[k.op][3]>0)
-        provider[arg_type[k.op][3]-1](k.o)=-1;
+    if(arg_type[k.op&raw_op_mask][3]>0)
+        provider[arg_type[k.op&raw_op_mask][3]-1](k.o)=-1;
     for(int i=0;i<3;i++)
-        if(arg_type[k.op][i]>0 && k.a[i]>=0){
-            auto& a=user[arg_type[k.op][i]-1](k.a[i]&raw_mask);
+        if(arg_type[k.op&raw_op_mask][i]>0 && k.a[i]>=0){
+            auto& a=user[arg_type[k.op&raw_op_mask][i]-1](k.a[i]&raw_mask);
             int m=a.Find(j);
             PHYSBAM_ASSERT(m>=0);
             a.Remove_Index_Lazy(m);}
@@ -767,11 +807,11 @@ template<class T> void CACHED_ELIMINATION_MATRIX<T>::
 Add_Job_Deps(int j)
 {
     const auto& k=jobs(j);
-    if(arg_type[k.op][3]>0)
-        provider[arg_type[k.op][3]-1](k.o)=j;
+    if(arg_type[k.op&raw_op_mask][3]>0)
+        provider[arg_type[k.op&raw_op_mask][3]-1](k.o)=j;
     for(int i=0;i<3;i++)
-        if(arg_type[k.op][i]>0)
-            user[arg_type[k.op][i]-1](k.a[i]&raw_mask).Append(j);
+        if(arg_type[k.op&raw_op_mask][i]>0)
+            user[arg_type[k.op&raw_op_mask][i]-1](k.a[i]&raw_mask).Append(j);
 }
 //#####################################################################
 // Function Relabel
@@ -790,7 +830,7 @@ Relabel()
     for(int i=0;i<jobs.m;i++)
     {
         auto& j=jobs(i);
-        if(j.op!=op_nop) new_job(i)=next_job++;
+        if((j.op&raw_op_mask)!=op_nop) new_job(i)=next_job++;
     }
 
     for(int t=0;t<2;t++)
@@ -800,7 +840,7 @@ Relabel()
             int p=provider[t](i);
             if(p<0) continue;
             auto& j=jobs(p);
-            if(j.op!=op_nop && j.op!=op_mat_inv && j.a[0]>=0)
+            if((j.op&raw_op_mask)!=op_nop && (j.op&raw_op_mask)!=op_mat_inv && j.a[0]>=0)
             {
                 if(user[t](j.a[0]&raw_mask).m==1)
                 {
@@ -819,11 +859,11 @@ Relabel()
     {
         if(new_job(i)<0) continue;
         JOB j=jobs(i);
-        if(j.o>=0 && arg_type[j.op][3]>0)
-            j.o=new_data[arg_type[j.op][3]-1](j.o);
+        if(j.o>=0 && arg_type[j.op&raw_op_mask][3]>0)
+            j.o=new_data[arg_type[j.op&raw_op_mask][3]-1](j.o);
         for(int i=0;i<3;i++)
-            if(j.a[i]>=0 && arg_type[j.op][i]>0)
-                j.a[i]=(j.a[i]&~raw_mask)|new_data[arg_type[j.op][i]-1](j.a[i]&raw_mask);
+            if(j.a[i]>=0 && arg_type[j.op&raw_op_mask][i]>0)
+                j.a[i]=(j.a[i]&~raw_mask)|new_data[arg_type[j.op&raw_op_mask][i]-1](j.a[i]&raw_mask);
         jobs(new_job(i))=j;
     }
     jobs.Resize(next_job);
@@ -846,8 +886,8 @@ Relabel()
     {
         auto& j=jobs(i);
         for(int l=0;l<3;l++)
-            if(j.a[l]>=0 && arg_type[j.op][l]>0)
-                data_refs[arg_type[j.op][l]-1](j.a[l]&raw_mask)++;
+            if(j.a[l]>=0 && arg_type[j.op&raw_op_mask][l]>0)
+                data_refs[arg_type[j.op&raw_op_mask][l]-1](j.a[l]&raw_mask)++;
     }
     for(auto& a:rhs) if(a>=0) data_refs[1](a)++;
 }

@@ -45,7 +45,7 @@ struct CACHED_ELIMINATION_MATRIX
 
     ARRAY<bool> valid_row;
     ARRAY<int> elimination_order;
-    bool quiet;
+    bool quiet,pinv_last_blk=false;
 
     // Note: Jobs are constructed in SSA form
     struct JOB
@@ -81,7 +81,7 @@ struct CACHED_ELIMINATION_MATRIX
     void Eliminate_Row(int r);
     int& Get_Block(int r,int c);
     int Get_Block_Lazy(int r,int c) const;
-    int Compute_Inv(int m);
+    int Compute_Inv(int m,bool pinv);
     int Compute_Mul(int a,int b);
     int Compute_Add(int a,int b);
     int Compute_Elim(int a,int b,int c);

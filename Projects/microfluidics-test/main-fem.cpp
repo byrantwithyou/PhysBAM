@@ -44,7 +44,7 @@ void Run(PARSE_ARGS& parse_args)
     timer("start");
 
     int threads=1;
-    bool quiet=false,use_krylov=false,print_system=false;
+    bool quiet=false,use_krylov=false,print_system=false,pinv=false;
     std::string pipe_file,output_dir="output";
     std::string analytic_u,analytic_p;
     T s=1,m=1,kg=1;
@@ -53,6 +53,7 @@ void Run(PARSE_ARGS& parse_args)
     parse_args.Add("-o",&output_dir,"dir","output dir");
     parse_args.Add("-mu",&mu,"mu","viscosity");
     parse_args.Add("-q",&quiet,"disable diagnostics; useful for timing");
+    parse_args.Add("-pinv",&pinv,"perform pseudo inverse");
     parse_args.Add("-k",&use_krylov,"solve with Krylov method");
     parse_args.Add("-d",&print_system,"dump the system to be solved");
     parse_args.Add("-m",&m,"scale","scale units of length");
@@ -144,6 +145,7 @@ void Run(PARSE_ARGS& parse_args)
     MATRIX_CONSTRUCTION_FEM<TV> mc(cl);
     CACHED_ELIMINATION_MATRIX<T> cem;
     cem.quiet=quiet;
+    cem.pinv_last_blk=pinv;
     cl.Compute_Dof_Pairs();
     cl.Fill_Reference_Ticks();
     if(!quiet)
