@@ -195,11 +195,11 @@ void Run(PARSE_ARGS& parse_args)
     {
         mc.Compute_RHS();
     }
-    mc.Dump_World_Space_System();
+    if(!quiet) mc.Dump_World_Space_System();
     mc.Copy_To_CEM(cem);
 
     mc.Transform_Solution(cem,true,true);
-    mc.Dump_World_Space_Vector("b");
+    if(!quiet) mc.Dump_World_Space_Vector("b");
     if(!quiet)
     {
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
@@ -251,8 +251,11 @@ void Run(PARSE_ARGS& parse_args)
             debug.Visualize_Solution(mc.rhs_block_list(b),b,true);
         Flush_Frame<TV>("solution");
     }
-    mc.Dump_World_Space_Vector("x");
-    debug.Visualize_Flat_Dofs();
+    if(!quiet)
+    {
+        mc.Dump_World_Space_Vector("x");
+        debug.Visualize_Flat_Dofs();
+    }
 
     for(int i=1;i<tm.m;i++)
         printf("%20s %5.0f ms\n",tm(i).y,
@@ -269,6 +272,7 @@ int main(int argc, char* argv[])
     parse_args.Add("-fem",&use_fem,"use FEM");
     parse_args.Parse(true);
     LOG::Initialize_Logging(false,false,1<<30,true);
+    LOG::printf("%s\n",parse_args.Print_Arguments());
     if(use_3d) Run<3>(parse_args);
     else Run<2>(parse_args);
 
