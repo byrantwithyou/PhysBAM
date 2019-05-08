@@ -240,8 +240,8 @@ Merge_Canonical_Blocks(CANONICAL_BLOCK<T>* cb0,CON_ID con_id0,XFORM<TV> xf0,
 //#####################################################################
 // Function Merge_Blocks
 //#####################################################################
-template<class T> void COMPONENT_LAYOUT_FEM<T>::
-Merge_Blocks(BLOCK_ID id,CON_ID con_id,BLOCK_ID id2)
+template<class T> template <class F> void COMPONENT_LAYOUT_FEM<T>::
+Merge_Blocks(BLOCK_ID id,CON_ID con_id,BLOCK_ID id2,F alias)
 {
     PHYSBAM_ASSERT(con_id>=CON_ID());
     PHYSBAM_ASSERT(id>=BLOCK_ID());
@@ -256,7 +256,7 @@ Merge_Blocks(BLOCK_ID id,CON_ID con_id,BLOCK_ID id2)
     for(CON_ID c=con_id+1;c<bl.connections.m;c++)
     {
         const auto& cn=bl.connections(c);
-        if(cn.is_regular) blocks(cn.id).connections(cn.con_id).con_id=c-1;
+        if(cn.is_regular) blocks(alias(cn.id)).connections(cn.con_id).con_id=c-1;
         else irregular_connections(cn.irreg_id).con_id=c-1;
         bl.connections(c-1)=bl.connections(c);
     }
@@ -267,7 +267,7 @@ Merge_Blocks(BLOCK_ID id,CON_ID con_id,BLOCK_ID id2)
         if(c==con_id2) continue;
         auto& cn=bl2.connections(c);
         if(cn.is_regular)
-            blocks(cn.id).connections(cn.con_id).con_id=bl.connections.m;
+            blocks(alias(cn.id)).connections(cn.con_id).con_id=bl.connections.m;
         else irregular_connections(cn.irreg_id).con_id=bl.connections.m;
         bl.connections.Append(cn);
     }
@@ -292,7 +292,11 @@ template<class T> void COMPONENT_LAYOUT_FEM<T>::
 Merge_Blocks()
 {
     UNION_FIND<BLOCK_ID> uf(blocks.m);
-    HASHTABLE<BLOCK_ID,BLOCK_ID> alive_neighbor;
+    HASHTABLE<BLOCK_ID,BLOCK_ID> ufs_root_blk;
+    auto alias=[&uf,&ufs_root_blk](BLOCK_ID b)
+    {
+        return ufs_root_blk.Get_Default(uf.Find(b),b);
+    };
     for(BLOCK_ID b(0);b<blocks.m;b++)
     {
         if(!blocks(b).block) continue;
@@ -306,8 +310,7 @@ Merge_Blocks()
             {
                 if(!(mask&(1<<Value(i)))) continue;
                 if(!blocks(b).connections(i).is_regular) continue;
-                BLOCK_ID d=blocks(b).connections(i).id;
-                d=alive_neighbor.Get_Default(uf.Find(d),d);
+                BLOCK_ID d=alias(blocks(b).connections(i).id);
                 PHYSBAM_ASSERT(blocks(d).block);
                 if(blocks(d).flags&1) continue;
                 int c=Approx_Dof_Count(d);
@@ -320,9 +323,9 @@ Merge_Blocks()
             }
             PHYSBAM_ASSERT(besti>=CON_ID());
             PHYSBAM_ASSERT(id2>=BLOCK_ID());
-            uf.Union(b,blocks(b).connections(besti).id);
-            alive_neighbor.Set(uf.Find(b),b);
-            Merge_Blocks(b,besti,id2);
+            Merge_Blocks(b,besti,id2,alias);
+            uf.Union(b,id2);
+            ufs_root_blk.Set(uf.Find(b),b);
             b--; // repeat the check on this block
         }
     }
