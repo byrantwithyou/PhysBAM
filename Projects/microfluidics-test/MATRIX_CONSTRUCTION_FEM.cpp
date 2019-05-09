@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Data_Structures/TUPLE.h>
+#include <Core/Log/LOG.h>
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Core/Matrices/SYSTEM_MATRIX_HELPER.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
@@ -954,6 +955,34 @@ Inverse_DOF_Lookup(int global_dof) const
     }
     PHYSBAM_ASSERT(false);
     return std::make_tuple(BLOCK_ID(-7),-7,-7,-7);
+}
+//#####################################################################
+// Function Print_Statistics
+//#####################################################################
+template<class TV> void MATRIX_CONSTRUCTION_FEM<TV>::
+Print_Statistics() const
+{
+    HASHTABLE<CANONICAL_BLOCK<T>*> cbs;
+    for(const auto& b:cl.blocks)
+        cbs.Insert(b.block);
+    LOG::printf("blocks: %P\ncanonical-blocks: %P\nref-blocks: %P\nref-reg-con: %P\nref-irreg-con: %P\n",
+        cl.blocks.m,cbs.Size(),cl.reference_block_data.m,cl.reference_connection_data.m,cl.reference_irregular_data.m);
+    int p2=0,v2=0;
+    int p3=0,v3=0;
+    for(const auto& rb:cl.reference_block_data)
+    {
+        p2+=rb.num_dofs_d.p;
+        v2+=rb.num_dofs_d.v+rb.num_dofs_d.e;
+        if(TV::m==3)
+        {
+            DOF_LAYOUT<TV> dl(cl,rb,true);
+            p3+=dl.counts.p;
+            v3+=dl.counts.v+dl.counts.e;
+        }
+    }
+    LOG::printf("dofs 2d p: %d, v: %d, total: %d\n",p2,v2*2,p2+v2*2);
+    if(TV::m==3)
+        LOG::printf("dofs 3d p: %d, v: %d, total: %d\n",p3,v3*3,p3+v3*3);
 }
 template class MATRIX_CONSTRUCTION_FEM<VECTOR<double,2> >;
 template class MATRIX_CONSTRUCTION_FEM<VECTOR<double,3> >;
