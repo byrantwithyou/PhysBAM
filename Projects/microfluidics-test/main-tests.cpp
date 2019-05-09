@@ -193,6 +193,84 @@ void Test_Joint4_Right_Angle(T angle,T mu,T s,T m,T kg,const std::string& au,con
 }
 
 template<int d>
+void Generate_Grid(T mu,T s,T m,T kg)
+{
+    typedef VECTOR<T,2> TV;
+    T w=1;
+    T dx=w+1.5*w;
+    int n=3;
+
+    COMPONENT_LAYOUT_FEM<T> cl;
+    cl.unit_m=m;
+    cl.unit_s=s;
+    cl.unit_kg=kg;
+    LAYOUT_BUILDER_FEM<T> builder(cl);
+    builder.Set_Target_Length(0.25);
+    builder.Set_Depth(w,1);
+    auto cs=builder.Cross_Section(4,w);
+
+    using VERT_ID=LAYOUT_BUILDER_FEM<T>::VERT_ID;
+    using CID=LAYOUT_BUILDER_FEM<T>::CONNECTOR_ID;
+
+    ARRAY<PAIR<VERT_ID,VECTOR<CID,4> > > verts(n*n); // CID*4: +x,+y,-x,-y
+    VERT_ID src=builder.Vertex(TV(-dx,(n-1)*dx)),sink=builder.Vertex(TV(n*dx,0));
+    for(int i=0;i<n;i++)
+        for(int j=0;j<n;j++)
+            verts(i*n+j)={builder.Vertex(TV(i*dx,j*dx)),{CID(-1),CID(-1),CID(-1),CID(-1)}};
+
+    int dirs[4][2]=
+    {
+        {1,0},
+        {0,1},
+        {-1,0},
+        {0,-1}
+    };
+    for(int i=0;i<n;i++)
+        for(int j=0;j<n;j++)
+        {
+            auto& v=verts(i*n+j);
+            ARRAY<VERT_ID> arms;
+            for(int k=0;k<4;k++)
+            {
+                int nx=i+dirs[k][0],ny=j+dirs[k][1];
+                if(nx>=0 && nx<n && ny>=0 && ny<n)
+                    arms.Append(verts(nx*n+ny).x);
+                else if(i==0 && j==n-1 && k==2)
+                    arms.Append(src);
+                else if(i==n-1 && j==0 && k==0)
+                    arms.Append(sink);
+            }
+            ARRAY<CID> jt;
+            if(arms.m==4)
+                jt=builder.Joint_4_Right_Angle(cs,v.x,arms(0));
+            else
+                jt=builder.Joint(cs,arms.m,v.x,arms);
+            for(int k=0,b=0;k<4;k++)
+            {
+                int nx=i+dirs[k][0],ny=j+dirs[k][1];
+                if(nx>=0 && nx<n && ny>=0 && ny<n)
+                    v.y(k)=jt(b++);
+                else if((i==0 && j==n-1 && k==2) || (i==n-1 && j==0 && k==0))
+                    v.y(k)=jt(b++);
+            }
+        }
+
+    for(int i=1;i<n;i++)
+        for(int j=0;j<n;j++)
+            builder.Pipe(cs,verts((i-1)*n+j).y(0),verts(i*n+j).y(2));
+    for(int i=0;i<n;i++)
+        for(int j=1;j<n;j++)
+            builder.Pipe(cs,verts(i*n+j-1).y(1),verts(i*n+j).y(3));
+
+    auto bc_src=builder.Set_BC(cs,src,verts(n-1).x,1);
+    auto bc_sink=builder.Set_BC(cs,sink,verts((n-1)*n).x,TV());
+    builder.Pipe(cs,bc_src.x,verts(n-1).y(2));
+    builder.Pipe(cs,verts((n-1)*n).y(0),bc_sink.x);
+
+    printf("%s\n",builder.To_String().c_str());
+}
+
+template<int d>
 void Run(PARSE_ARGS& parse_args)
 {
     typedef VECTOR<T,2> TV;
