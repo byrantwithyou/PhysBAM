@@ -422,7 +422,7 @@ Compute_Reference_Blocks()
         }
 
         auto pr=h.Insert(std::make_tuple(bl.block,reg_con,irreg_con),{});
-        if(pr.y)
+        if(force_blk_ref || pr.y)
         {
             *pr.x=reference_block_data.Add_End();
             auto& rd=reference_block_data(*pr.x);
@@ -466,7 +466,7 @@ Compute_Reference_Irregular_Connections()
         ARRAY<PAIR<CANONICAL_BLOCK<T>*,int> > ae;
         for(auto p:ic.edge_on) ae.Append({blocks(p.b).block,p.e});
         auto pr=ref.Insert(std::make_tuple(blocks(ic.regular).block,ic.con_id,ae),{});
-        if(pr.y) *pr.x=reference_irregular_data.Append({i});
+        if(force_blk_ref || pr.y) *pr.x=reference_irregular_data.Append({i});
         ic.ref_id=*pr.x;
     }
 }
