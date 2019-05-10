@@ -667,13 +667,17 @@ Copy_To_CEM(CACHED_ELIMINATION_MATRIX<T>& cem)
         }
     }
 
-    for(auto& ic:cl.irregular_connections)
+    for(const auto& ic:cl.irregular_connections)
     {
-        for(RID_ID j(0);j<irreg_id(ic.ref_id).m;j++)
+        const auto& irbd=cl.reference_irregular_data(ic.ref_id);
+        for(int i=0;i<ic.edge_on.m;i++)
         {
-            int id=irreg_id(ic.ref_id)(j);
-            BLOCK_ID b=cl.reference_irregular_data(ic.ref_id).pairs(j).b;
-            cem.Add_Block_Matrix_Entry(Value(ic.regular),Value(b),id);
+            const auto& p=irbd.mapping(i);
+            if(p.y)
+            {
+                int id=irreg_id(ic.ref_id)(p.x);
+                cem.Add_Block_Matrix_Entry(Value(ic.regular),Value(ic.edge_on(i).b),id);
+            }
         }
     }
 
@@ -888,12 +892,14 @@ Dump_World_Space_System() const
         }
     }
 
-    for(auto& ic:cl.irregular_connections)
+    for(const auto& ic:cl.irregular_connections)
     {
-        for(RID_ID j(0);j<irregular_system_blocks(ic.ref_id).m;j++)
+        const auto& irbd=cl.reference_irregular_data(ic.ref_id);
+        for(int i=0;i<ic.edge_on.m;i++)
         {
-            BLOCK_ID b=cl.reference_irregular_data(ic.ref_id).pairs(j).b;
-            Dump_Matrix_Block(h,first,irregular_system_blocks(ic.ref_id)(j),ic.regular,b);
+            const auto& p=irbd.mapping(i);
+            if(p.y)
+                Dump_Matrix_Block(h,first,irregular_system_blocks(ic.ref_id)(p.x),ic.regular,ic.edge_on(i).b);
         }
     }
 
