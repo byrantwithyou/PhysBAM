@@ -386,7 +386,7 @@ Compute_Reference_Blocks()
     typedef ARRAY<std::tuple<CANONICAL_BLOCK<T>*,CON_ID,bool> > REG_CON;
     typedef ARRAY<std::tuple<CANONICAL_BLOCK<T>*,int> > IRREG_CON;
     typedef ARRAY<std::tuple<CANONICAL_BLOCK<T>*,CON_ID,int,int> > EDGE_ON;
-    typedef std::tuple<CANONICAL_BLOCK<T>*,REG_CON,IRREG_CON> KEY;
+    typedef std::tuple<CANONICAL_BLOCK<T>*,REG_CON,IRREG_CON,EDGE_ON> KEY;
 
     HASHTABLE<KEY,REFERENCE_BLOCK_ID> h;
 
@@ -421,7 +421,7 @@ Compute_Reference_Blocks()
             edge_on.Append(std::make_tuple(blocks(ic.regular).block,ic.con_id,p.y,ic.edge_on(p.y).e));
         }
 
-        auto pr=h.Insert(std::make_tuple(bl.block,reg_con,irreg_con),{});
+        auto pr=h.Insert(std::make_tuple(bl.block,reg_con,irreg_con,edge_on),{});
         if(force_blk_ref || pr.y)
         {
             *pr.x=reference_block_data.Add_End();
