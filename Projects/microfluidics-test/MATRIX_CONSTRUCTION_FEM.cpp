@@ -734,8 +734,14 @@ Apply_To_RHS(BLOCK_ID b,const BLOCK_VECTOR<TV>& w)
         {
             const auto& ic=cl.irregular_connections(c.irreg_id);
             const auto& irbd=cl.reference_irregular_data(ic.ref_id);
-            for(const auto& h:irbd.pairs)
-                Copy_Vector_Data(w,b,h.b,h.irreg_pairs[1]);
+            for(int e=0;e<ic.edge_on.m;e++)
+            {
+                if(irbd.mapping(e).y)
+                {
+                    const auto& h=irbd.pairs(irbd.mapping(e).x);
+                    Copy_Vector_Data(w,b,ic.edge_on(e).b,h.irreg_pairs[1]);
+                }
+            }
         }
     }
 
