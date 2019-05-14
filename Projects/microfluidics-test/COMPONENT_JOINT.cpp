@@ -418,7 +418,7 @@ Arc(const TV& c,T angle,T len_arm,T ext0,T ext1) const -> PAIR<ARRAY<TV>,ARRAY<T
     }
     inner.Append(c);
 
-    T da=sign(arc_angle)*2*asin(target_length/2*len_arm),offset=0,a=arc_angle;
+    T da=sign(arc_angle)*2*asin(target_length/2/len_arm),offset=0,a=arc_angle;
     TV v=(arm0-c).Normalized();
     while(abs(a)>abs(da)*1.5)
     {
