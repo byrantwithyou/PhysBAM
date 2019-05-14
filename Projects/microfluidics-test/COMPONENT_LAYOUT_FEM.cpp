@@ -445,11 +445,40 @@ Compute_Reference_Regular_Connections()
             const auto& c=bl.connections(cc);
             if(c.is_regular && c.master)
             {
-                auto pr=regular_connection_hash.Insert(std::make_tuple(bl.ref_id,cc,blocks(c.id).ref_id,c.con_id),{});
+                const auto& other=blocks(c.id);
+                REFERENCE_IRREGULAR_ID ic_ref[4]=
+                {
+                    bl.edge_on.m?irregular_connections(bl.edge_on(0).x).ref_id:REFERENCE_IRREGULAR_ID(-1),
+                    bl.edge_on.m?irregular_connections(bl.edge_on(1).x).ref_id:REFERENCE_IRREGULAR_ID(-1),
+                    other.edge_on.m?irregular_connections(other.edge_on(0).x).ref_id:REFERENCE_IRREGULAR_ID(-1),
+                    other.edge_on.m?irregular_connections(other.edge_on(1).x).ref_id:REFERENCE_IRREGULAR_ID(-1)
+                };
+                auto pr=regular_connection_hash.Insert(std::make_tuple(
+                    bl.ref_id,cc,ic_ref[0],ic_ref[1],
+                    other.ref_id,c.con_id,ic_ref[2],ic_ref[3]),{});
                 if(pr.y) *pr.x=reference_connection_data.Append({{b,c.id},{cc,c.con_id}});
             }
         }
     }
+}
+//#####################################################################
+// Function Regular_Connection
+//#####################################################################
+template<class T> REFERENCE_CONNECTION_ID COMPONENT_LAYOUT_FEM<T>::
+Regular_Connection(BLOCK_ID b0,CON_ID c0,BLOCK_ID b1) const
+{
+    const auto& bl=blocks(b0);
+    const auto& other=blocks(b1);
+    REFERENCE_IRREGULAR_ID ic_ref[4]=
+    {
+        bl.edge_on.m?irregular_connections(bl.edge_on(0).x).ref_id:REFERENCE_IRREGULAR_ID(-1),
+        bl.edge_on.m?irregular_connections(bl.edge_on(1).x).ref_id:REFERENCE_IRREGULAR_ID(-1),
+        other.edge_on.m?irregular_connections(other.edge_on(0).x).ref_id:REFERENCE_IRREGULAR_ID(-1),
+        other.edge_on.m?irregular_connections(other.edge_on(1).x).ref_id:REFERENCE_IRREGULAR_ID(-1)
+    };
+    return regular_connection_hash.Get(std::make_tuple(
+        bl.ref_id,c0,ic_ref[0],ic_ref[1],
+        other.ref_id,bl.connections(c0).con_id,ic_ref[2],ic_ref[3]));
 }
 //#####################################################################
 // Function Compute_Reference_Irregular_Connections
@@ -670,8 +699,8 @@ template<class T> void COMPONENT_LAYOUT_FEM<T>::
 Compute_Dof_Pairs()
 {
     Compute_Reference_Blocks();
-    Compute_Reference_Regular_Connections();
     Compute_Reference_Irregular_Connections();
+    Compute_Reference_Regular_Connections();
 
     for(auto& rd:reference_block_data)
     {
@@ -703,17 +732,13 @@ Regular_Connection_Pair(BLOCK_ID b,CON_ID con_id,bool is_dest) -> const DOF_PAIR
     auto& bl=blocks(b);
     BLOCK_ID b1=bl.connections(con_id).id;
     CON_ID con_id1=bl.connections(con_id).con_id;
-    auto& bl1=blocks(b1);
-    REFERENCE_BLOCK_ID ref0=bl.ref_id,ref1=bl1.ref_id;
 
     if(bl.connections(con_id).master)
     {
-        auto key=std::make_tuple(ref0,con_id,ref1,con_id1);
-        auto ref_con_id=regular_connection_hash.Get(key);
+        auto ref_con_id=Regular_Connection(b,con_id,b1);
         return reference_connection_data(ref_con_id).reg_pairs[!is_dest];
     }
-    auto key=std::make_tuple(ref1,con_id1,ref0,con_id);
-    auto ref_con_id=regular_connection_hash.Get(key);
+    auto ref_con_id=Regular_Connection(b1,con_id1,b);
     return reference_connection_data(ref_con_id).reg_pairs[is_dest];
 }
 //#####################################################################

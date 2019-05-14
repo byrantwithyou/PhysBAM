@@ -160,7 +160,8 @@ struct COMPONENT_LAYOUT_FEM
 
     ARRAY<REFERENCE_BLOCK_DATA,REFERENCE_BLOCK_ID> reference_block_data;
 
-    typedef std::tuple<REFERENCE_BLOCK_ID,CON_ID,REFERENCE_BLOCK_ID,CON_ID> REGULAR_CON_KEY;
+    typedef std::tuple<REFERENCE_BLOCK_ID,CON_ID,REFERENCE_IRREGULAR_ID,REFERENCE_IRREGULAR_ID,
+        REFERENCE_BLOCK_ID,CON_ID,REFERENCE_IRREGULAR_ID,REFERENCE_IRREGULAR_ID> REGULAR_CON_KEY;
     HASHTABLE<REGULAR_CON_KEY,REFERENCE_CONNECTION_ID> regular_connection_hash;
 
     ARRAY<REFERENCE_CONNECTION_DATA,REFERENCE_CONNECTION_ID> reference_connection_data;
@@ -193,6 +194,7 @@ struct COMPONENT_LAYOUT_FEM
     void Compute_Dof_Pairs(REFERENCE_CONNECTION_DATA& rc);
     void Compute_Dof_Pairs(REFERENCE_IRREGULAR_DATA& ri);
     void Fill_Num_Dofs(DOF_PAIRS& dp,BLOCK_ID d,BLOCK_ID s);
+    REFERENCE_CONNECTION_ID Regular_Connection(BLOCK_ID b0,CON_ID c0,BLOCK_ID b1) const;
     const DOF_PAIRS& Regular_Connection_Pair(BLOCK_ID b,CON_ID con_id,bool is_dest);
     void Fill_Element_Tick_Masks();
     void Fill_Reference_Ticks();

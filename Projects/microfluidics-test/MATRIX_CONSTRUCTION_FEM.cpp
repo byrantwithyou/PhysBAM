@@ -466,17 +466,14 @@ Fill_Irregular_Connection_Matrix(ARRAY<BLOCK_MATRIX<TV>,RID_ID>& M,const REFEREN
                 Copy_Matrix_Data(M(k),z.b,z.irreg_pairs[0],dp0,bb,c.id);
                 Copy_Matrix_Data(M(j),c.id,ri.pairs(k).irreg_pairs[0],dp1,bb,z.b);
 
-                REFERENCE_BLOCK_ID ref0=cl.blocks(z.b).ref_id,ref1=cl.blocks(c.id).ref_id;
                 if(c.master)
                 {
-                    auto key=std::make_tuple(ref0,cc,ref1,c.con_id);
-                    auto& M=regular_system_blocks(cl.regular_connection_hash.Get(key));
+                    auto& M=regular_system_blocks(cl.Regular_Connection(z.b,cc,c.id));
                     Copy_Matrix_Data(M,bb,z.irreg_pairs[1],ri.pairs(k).irreg_pairs[1],z.b,c.id);
                 }
                 else
                 {
-                    auto key=std::make_tuple(ref1,c.con_id,ref0,cc);
-                    auto& M=regular_system_blocks(cl.regular_connection_hash.Get(key));
+                    auto& M=regular_system_blocks(cl.Regular_Connection(c.id,c.con_id,z.b));
                     Copy_Matrix_Data(M,bb,ri.pairs(k).irreg_pairs[1],z.irreg_pairs[1],c.id,z.b);
                 }
             }
@@ -660,7 +657,7 @@ Copy_To_CEM(CACHED_ELIMINATION_MATRIX<T>& cem)
             const auto& c=bl.connections(cc);
             if(c.is_regular && c.master)
             {
-                auto i=cl.regular_connection_hash.Get(std::make_tuple(bl.ref_id,cc,cl.blocks(c.id).ref_id,c.con_id));
+                auto i=cl.Regular_Connection(b,cc,c.id);
                 int id=reg_id(i);
                 cem.Add_Block_Matrix_Entry(Value(b),Value(c.id),id);
             }
@@ -886,7 +883,7 @@ Dump_World_Space_System() const
             const auto& c=bl.connections(cc);
             if(c.is_regular && c.master)
             {
-                auto i=cl.regular_connection_hash.Get(std::make_tuple(bl.ref_id,cc,cl.blocks(c.id).ref_id,c.con_id));
+                auto i=cl.Regular_Connection(b,cc,c.id);
                 Dump_Matrix_Block(h,first,regular_system_blocks(i),b,c.id);
             }
         }
