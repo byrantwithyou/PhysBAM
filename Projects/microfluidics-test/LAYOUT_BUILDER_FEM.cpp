@@ -373,7 +373,6 @@ Joint(CS_ID cs,int n,VERT_ID o,const ARRAY<VERT_ID>& arms) -> ARRAY<CONNECTOR_ID
 {
     auto crs=cross_sections(cs);
     TV O=verts(o);
-    ARRAY<TV> vertx;
     ARRAY<PAIR<TV,CONNECTOR_ID> > vc;
     for(VERT_ID p:arms)
     {
