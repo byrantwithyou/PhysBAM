@@ -396,15 +396,35 @@ Joint(CS_ID cs,int n,VERT_ID o,const ARRAY<VERT_ID>& arms) -> ARRAY<CONNECTOR_ID
         if(a<0) a+=2*pi;
         angles.Append(a);
     }
-    auto cj=comp_joint.Make_Component(crs.x,crs.y,angles);
-    XFORM<TV> xf={Compute_Xform(vc(0).x),O};
+    angles.Append(2*pi-angles.Sum());
+    int j=0;
+    for(int k=1;k<n;k++)
+    {
+        for(int i=0;i<n;i++)
+        {
+            if(angles((k+i)%n)-angles((j+i)%n)>comp_tol)
+                break;
+            else if(angles((k+i)%n)-angles((j+i)%n)<-comp_tol)
+            {
+                j=k;
+                break;
+            }
+        }
+    }
+    ARRAY<T> key_angles(angles.m);
+    for(int i=0;i<n;i++)
+        key_angles(i)=angles((j+i)%n);
+
+    auto cj=comp_joint.Make_Component(crs.x,crs.y,key_angles);
+    XFORM<TV> xf={Compute_Xform(vc(j).x),O};
     ARRAY<VERTEX_DATA> vd(n);
     Emit_Component_Blocks(cj.x,xf,vd);
     ARRAY<CONNECTOR_ID> r;
     for(int i=0;i<n;i++)
     {
-        vd(i).X=O+vc(i).x*cj.y(i);
-        connectors.Set(vc(i).y,vd(i));
+        int k=(j+i)%n;
+        vd(i).X=O+vc(k).x*cj.y(i);
+        connectors.Set(vc(k).y,vd(i));
         r.Append(vc(i).y);
     }
     ARRAY<PAIR<TAG,int> > com={{TAG::DECL_JT,n},{TAG::CS,Value(cs)},{TAG::VERT,Value(o)}};
@@ -426,18 +446,20 @@ Joint_4_Right_Angle(CS_ID cs,VERT_ID o,VERT_ID v0) -> VECTOR<CONNECTOR_ID,4>
     TV O=verts(o),V0=verts(v0);
     TV dir=(V0-O).Normalized();
 
-    auto cj=comp_joint.Make_Joint_4_Right_Angle(crs.x,crs.y,Canonical_Direction(dir));
+    auto cj=comp_joint.Make_Joint_4_Right_Angle(crs.x,crs.y);
     XFORM<TV> xf={Compute_Xform(Canonical_Direction(dir)?dir:-dir),O};
     ARRAY<VERTEX_DATA> vd(4);
     Emit_Component_Blocks(cj.x,xf,vd);
     VECTOR<CONNECTOR_ID,4> r;
+    int j=Canonical_Direction(dir)?0:2;
     for(int i=0;i<4;i++)
     {
-        ROTATION<TV> Q=ROTATION<TV>::From_Angle(pi/2*i);
+        int k=(j+i)%4;
+        ROTATION<TV> Q=ROTATION<TV>::From_Angle(pi/2*k);
         vd(i).X=O+Q.Rotate(dir)*cj.y(i);
         CONNECTOR_ID c=last_cid++;
         connectors.Set(c,vd(i));
-        r(i)=c;
+        r(k)=c;
     }
     ARRAY<PAIR<TAG,int> > com={{TAG::DECL_4WJT,-1},{TAG::CS,Value(cs)},{TAG::VERT,Value(o)},{TAG::VERT,Value(v0)}};
     commands.Append_Elements(com);

@@ -14,14 +14,14 @@ namespace PhysBAM{
 template<class T> PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > COMPONENT_JOINT<T>::
 Make_Component(int d,T width,const ARRAY<T>& angles)
 {
-    PHYSBAM_ASSERT(angles.m>=1);
+    PHYSBAM_ASSERT(angles.m>=2);
     JOINT_KEY<T> key={d,width,angles};
     auto it=canonical_joints.insert({key,{}});
     if(!it.second) return it.first->second;
 
-    if(angles.m==1)
+    if(angles.m==2)
         it.first->second=Make_Joint_2(d,width,angles);
-    else if(angles.m==2)
+    else if(angles.m==3)
         it.first->second=Make_Joint_3(d,width,angles);
     else PHYSBAM_FATAL_ERROR("joint type not supported");
     return it.first->second;
@@ -75,8 +75,7 @@ Make_Joint_2(int d,T width,const ARRAY<T>& angles)
 template<class T> PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > COMPONENT_JOINT<T>::
 Make_Joint_3(int d,T width,const ARRAY<T>& angles)
 {
-    T minimum_angle=min(2*(T)pi-angles.Sum(),angles.Min());
-    if(minimum_angle<pi/4) return Make_Joint_3_Small(d,width,angles);
+    if(angles(0)<pi/4) return Make_Joint_3_Small(d,width,angles);
     else return Make_Joint_3_Average(d,width,angles);
 }
 //#####################################################################
@@ -86,30 +85,22 @@ template<class T> PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > COMPONENT_JOINT<T>::
 Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles)
 {
     T sep=2*target_length,sep_y=target_length;
-    ARRAY<T> a(angles);
-    a.Append(2*pi-angles.Sum());
-    int k=0;
-    T min_abs_angle=a(k),tot=0;
+    T tot=0;
     VECTOR<TV,3> dirs,w;
     for(int i=0;i<3;i++)
     {
-        if(a(i)<min_abs_angle)
-        {
-            k=i;
-            min_abs_angle=a(i);
-        }
         dirs(i)=ROTATION<TV>::From_Angle(tot).Rotated_X_Axis();
-        w(i)=ROTATION<TV>::From_Angle(tot).Rotate(Elbow_Pit_Oriented(a(i),width));
-        tot+=a(i);
+        w(i)=ROTATION<TV>::From_Angle(tot).Rotate(Elbow_Pit_Oriented(angles(i),width));
+        tot+=angles(i);
     }
 
-    VECTOR<TV,2> e=Extrude(w((k+2)%3),w((k+1)%3),dirs((k+2)%3));
-    e+=dirs((k+2)%3)*sep;
-    ARRAY<TV> l0={e(0),w((k+2)%3)},l1={e(1),w((k+1)%3)};
-    if(a((k+1)%3)>a((k+2)%3)+pi/10)
-        l1.Append(w((k+1)%3)+dirs((k+1)%3)*sep);
-    if(a((k+2)%3)>a((k+1)%3)+pi/10)
-        l0.Append(w((k+2)%3)+dirs(k)*sep);
+    VECTOR<TV,2> e=Extrude(w(2),w(1),dirs(2));
+    e+=dirs(2)*sep;
+    ARRAY<TV> l0={e(0),w(2)},l1={e(1),w(1)};
+    if(angles(1)>angles(2)+pi/10)
+        l1.Append(w(1)+dirs(1)*sep);
+    if(angles(2)>angles(1)+pi/10)
+        l0.Append(w(2)+dirs(0)*sep);
     l0.Reverse();
     l1.Reverse();
     ARRAY<TV> s0=Polyline(l0,target_length),s1=Polyline(l1,target_length);
@@ -117,7 +108,7 @@ Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles)
     ARRAY<TV> t1;
     t1.Append(s0(0));
     CC_IRREG_ID index=cc->irregular_connections.Add_End();
-    CC_IRREG_ID ick2=cc->irregular_connections.Append({CC_BLOCK_ID(~((k+2)%3))});
+    CC_IRREG_ID ick2=cc->irregular_connections.Append({CC_BLOCK_ID(~2)});
     for(BLOCK_MESHING_ITERATOR<TV> it(s0,s1,d-1,target_length);it.Valid();it.Next())
     {
         CANONICAL_BLOCK<T>* cb=new CANONICAL_BLOCK<T>;
@@ -135,9 +126,9 @@ Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles)
         t1.Append(it.X1(0));
     }
     t1.Reverse();
-    VECTOR<TV,2> g0=Extrude(w((k+2)%3),w(k),dirs(k)),g1=Extrude(w((k+1)%3),w(k),dirs((k+1)%3));
-    ARRAY<TV> t0=Polyline({g1(0),w(k),g0(0)},width/(d-1));
-    int nseg=rint(w(k).Magnitude()/target_length);
+    VECTOR<TV,2> g0=Extrude(w(2),w(0),dirs(0)),g1=Extrude(w(1),w(0),dirs(1));
+    ARRAY<TV> t0=Polyline({g1(0),w(0),g0(0)},width/(d-1));
+    int nseg=rint(w(0).Magnitude()/target_length);
     int offset=Value(cc->blocks.m);
     for(BLOCK_MESHING_ITERATOR<TV> it(t0,t1,nseg,target_length);it.Valid();it.Next())
     {
@@ -167,7 +158,7 @@ Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles)
     for(int i=0;i<2;i++)
     {
         int offset_x=i*(d-1),offset_edge=edge_base+i*(3*(d-1)+1);
-        for(int j=0;j<d;j++) sep_cb->X.Append(sep_cb->X(offset_x+j)+dirs((k+1-i)%3)*sep_y);
+        for(int j=0;j<d;j++) sep_cb->X.Append(sep_cb->X(offset_x+j)+dirs((1-i)%3)*sep_y);
         for(int j=0;j<d-1;j++)
         {
             int p=offset_x+j,q=vert_base+offset_x+j+i;
@@ -190,15 +181,15 @@ Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles)
     sep_cb->bc_v.Append_Elements(ARRAY<int>({d-1,vert_base,vert_base+d-1,vert_base+d,vert_base+2*d-1}));
 
     auto& sep_con=sep_blk.connections;
-    sep_con.Append({CC_BLOCK_ID(~((k+1)%3)),CON_ID(1)});
-    sep_con.Append({CC_BLOCK_ID(~k),CON_ID(1)});
+    sep_con.Append({CC_BLOCK_ID(~1),CON_ID(1)});
+    sep_con.Append({CC_BLOCK_ID(~0),CON_ID(1)});
     sep_cb->Compute_Element_Edges();
 
     cc->irregular_connections(index).edge_on.Reverse();
     for(auto& e:cc->irregular_connections(index).edge_on)
         std::swap(e.v0,e.v1);
     ARRAY<T> ext={g1.Average().Magnitude()+sep_y,g0.Average().Magnitude()+sep_y,e.Average().Magnitude()};
-    return {cc,{ext((3-k)%3),ext((4-k)%3),ext((5-k)%3)}};
+    return {cc,{ext(0),ext(1),ext(2)}};
 }
 //#####################################################################
 // Function Make_Joint_3_Average
@@ -207,21 +198,19 @@ template<class T> PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > COMPONENT_JOINT<T>::
 Make_Joint_3_Average(int d,T width,const ARRAY<T>& angles)
 {
     T sep=2*target_length;
-    ARRAY<T> a(angles);
-    a.Append(2*pi-angles.Sum());
     int k=0;
-    T max_abs_angle=a(k),tot=0;
+    T max_abs_angle=angles(k),tot=0;
     VECTOR<TV,3> dirs,w;
     for(int i=0;i<3;i++)
     {
-        if(a(i)>max_abs_angle)
+        if(angles(i)>max_abs_angle)
         {
             k=i;
-            max_abs_angle=a(i);
+            max_abs_angle=angles(i);
         }
         dirs(i)=ROTATION<TV>::From_Angle(tot).Rotated_X_Axis();
-        w(i)=ROTATION<TV>::From_Angle(tot).Rotate(Elbow_Pit_Oriented(a(i),width));
-        tot+=a(i);
+        w(i)=ROTATION<TV>::From_Angle(tot).Rotate(Elbow_Pit_Oriented(angles(i),width));
+        tot+=angles(i);
     }
 
     CANONICAL_COMPONENT<T>* cc=new CANONICAL_COMPONENT<T>;
@@ -295,13 +284,16 @@ Make_Joint_3_Average(int d,T width,const ARRAY<T>& angles)
 // Function Make_Joint_4_Right_Angle
 //#####################################################################
 template<class T> PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > COMPONENT_JOINT<T>::
-Make_Joint_4_Right_Angle(int d,T width,bool is_canonical_dir)
+Make_Joint_4_Right_Angle(int d,T width)
 {
+    JOINT_KEY<T> key={d,width,{pi/2,pi/2,pi/2,pi/2}};
+    auto it=canonical_joints.insert({key,{}});
+    if(!it.second) return it.first->second;
+
     CANONICAL_COMPONENT<T>* cc=new CANONICAL_COMPONENT<T>;
     cc->blocks.Resize(CC_BLOCK_ID(d-1));
-    auto cdir=[is_canonical_dir](int d){return (d+(!is_canonical_dir)*2)%4;};
-    CC_IRREG_ID ic_north=cc->irregular_connections.Append({CC_BLOCK_ID(~cdir(1))});
-    CC_IRREG_ID ic_south=cc->irregular_connections.Append({CC_BLOCK_ID(~cdir(3))});
+    CC_IRREG_ID ic_north=cc->irregular_connections.Append({CC_BLOCK_ID(~1)});
+    CC_IRREG_ID ic_south=cc->irregular_connections.Append({CC_BLOCK_ID(~3)});
 
     T dx=width/(d-1);
     int n=d+2;
@@ -339,7 +331,7 @@ Make_Joint_4_Right_Angle(int d,T width,bool is_canonical_dir)
             cb->bc_v.Append_Elements(ARRAY<int>{0,1,n-2,n-1});
             cb->bc_e.Append_Elements(ARRAY<int>{0,n-2});
             cb->cross_sections.Append({{1,n-1},{1,n-2},false});
-            con.Append({CC_BLOCK_ID(~cdir(2)),CON_ID(1)});
+            con.Append({CC_BLOCK_ID(~2),CON_ID(1)});
         }
         else
         {
@@ -351,7 +343,7 @@ Make_Joint_4_Right_Angle(int d,T width,bool is_canonical_dir)
             cb->bc_v.Append_Elements(ARRAY<int>{n,n+1,2*n-2,2*n-1});
             cb->bc_e.Append_Elements(ARRAY<int>{n-1,2*n-3});
             cb->cross_sections.Append({{n+1,2*n-1},{n,2*n-3},true});
-            con.Append({CC_BLOCK_ID(~cdir(0)),CON_ID(0)});
+            con.Append({CC_BLOCK_ID(~0),CON_ID(0)});
         }
         else
         {
@@ -364,7 +356,8 @@ Make_Joint_4_Right_Angle(int d,T width,bool is_canonical_dir)
         cc->blocks(CC_BLOCK_ID(i))={cb,{},con,{{ic_south,d-2-i},{ic_north,i}}};
     }
     cc->irregular_connections(ic_south).edge_on.Reverse();
-    return {cc,{width/2,width/2+dx,width/2,width/2+dx}};
+    it.first->second={cc,{width/2,width/2+dx,width/2,width/2+dx}};
+    return it.first->second;
 }
 //#####################################################################
 // Function Elbow_Pit
