@@ -410,8 +410,15 @@ Fill_Block_Matrix(BLOCK_MATRIX<TV>& M,const REFERENCE_BLOCK_DATA& rd)
         {
             const auto& ic=cl.irregular_connections(c.irreg_id);
             const auto& irbd=cl.reference_irregular_data(ic.ref_id);
-            for(const auto& h:irbd.pairs)
-                Copy_Matrix_Data(M,h.b,h.irreg_pairs[0],h.irreg_pairs[0],b,b);
+            for(int i=0;i<ic.edge_on.m;i++)
+            {
+                const auto& p=irbd.mapping(i);
+                if(p.y)
+                {
+                    const auto& h=irbd.pairs(p.x);
+                    Copy_Matrix_Data(M,ic.edge_on(i).b,h.irreg_pairs[0],h.irreg_pairs[0],b,b);
+                }
+            }
         }
     }
 
