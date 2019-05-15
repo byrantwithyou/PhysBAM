@@ -271,6 +271,116 @@ void Generate_Grid(T mu,T s,T m,T kg)
 }
 
 template<int d>
+void Generate_Fab0(T mu,T s,T m,T kg)
+{
+    typedef VECTOR<T,2> TV;
+    T dx=1.25;
+
+    COMPONENT_LAYOUT_FEM<T> cl;
+    cl.unit_m=m;
+    cl.unit_s=s;
+    cl.unit_kg=kg;
+    LAYOUT_BUILDER_FEM<T> builder(cl);
+    builder.Set_Target_Length(dx);
+    builder.Set_Depth(dx,1);
+    auto cs=builder.Cross_Section(4,5);
+
+    using VERT_ID=LAYOUT_BUILDER_FEM<T>::VERT_ID;
+    using CID=LAYOUT_BUILDER_FEM<T>::CONNECTOR_ID;
+
+    VERT_ID v0=builder.Vertex(TV(70.353,422.351));
+    VERT_ID v1=builder.Vertex(TV(70.353,352.552));
+    VERT_ID v2=builder.Vertex(TV(323.853,352.552));
+    VERT_ID v3=builder.Vertex(TV(323.853,306.858));
+    VERT_ID v4=builder.Vertex(TV(221.353,306.858));
+    VERT_ID v5=builder.Vertex(TV(221.353,90.351));
+    VERT_ID v6=builder.Vertex(TV(323.853,331.352));
+    TV O(336.351,331.352);
+    VERT_ID v7=builder.Vertex(O);
+
+    VERT_ID v9=builder.Vertex(TV(452.354,331.352));
+    VERT_ID v10=builder.Vertex(TV(452.354,292.352));
+    VERT_ID v11=builder.Vertex(TV(532.353,292.352));
+    VERT_ID v12=builder.Vertex(TV(532.353,241.351));
+
+    auto src0=builder.Set_BC(cs,v0,v1,1);
+    auto src5=builder.Set_BC(cs,v5,v4,1);
+    auto sink12=builder.Set_BC(cs,v12,v11,TV());
+
+    auto coil=[&builder,cs](const TV& O,T l,T h)
+    {
+        T dy=h/6,dx=l/6;
+        VERT_ID w[12]=
+        {
+            builder.Vertex(O+TV(0,2*dy)),
+            builder.Vertex(O+TV(0,3*dy)),
+            builder.Vertex(O+TV(dx,3*dy)),
+
+            builder.Vertex(O+TV(2*dx,3*dy)),
+            builder.Vertex(O+TV(3*dx,3*dy)),
+            builder.Vertex(O+TV(3*dx,2*dy)),
+
+            builder.Vertex(O+TV(3*dx,-2*dy)),
+            builder.Vertex(O+TV(3*dx,-3*dy)),
+            builder.Vertex(O+TV(4*dx,-3*dy)),
+
+            builder.Vertex(O+TV(5*dx,-3*dy)),
+            builder.Vertex(O+TV(6*dx,-3*dy)),
+            builder.Vertex(O+TV(6*dx,-2*dy)),
+        };
+        VECTOR<CID,2> jt[4];
+        for(int i=0;i<4;i++)
+        {
+            int j=1+3*i;
+            jt[i]=builder.Joint(cs,2,w[j],{w[j-1],w[j+1]});
+        }
+        for(int i=1;i<4;i++)
+            builder.Pipe(cs,jt[i-1](1),jt[i](0));
+        return std::make_tuple(w[0],jt[0](0),w[11],jt[3](1));
+    };
+
+    auto j1=builder.Joint(cs,2,v1,{v0,v2});
+    auto j2=builder.Joint(cs,2,v2,{v1,v6});
+    auto j3=builder.Joint(cs,2,v3,{v6,v4});
+    auto j4=builder.Joint(cs,2,v4,{v3,v5});
+    auto j6=builder.Joint(cs,3,v6,{v2,v3,v7});
+    auto j10=builder.Joint(cs,2,v10,{v9,v11});
+    auto j11=builder.Joint(cs,2,v11,{v10,v12});
+
+    T l=20.390,h=45.694;
+    VERT_ID q=builder.Vertex(O+TV(0,h));
+    auto j7=builder.Joint(cs,2,v7,{v6,q});
+    CID last=j7(1);
+    VERT_ID last_v=v7;
+    for(int i=0;i<5;i++)
+    {
+        auto c=coil(O,l,h);
+        builder.Pipe(cs,last,std::get<1>(c));
+        last=std::get<3>(c);
+        last_v=std::get<2>(c);
+        O+=TV(l,0);
+    }
+    VERT_ID w=builder.Vertex(O);
+    auto jw=builder.Joint(cs,2,w,{last_v,v9});
+    auto j9=builder.Joint(cs,2,v9,{w,v10});
+    builder.Pipe(cs,last,jw(0));
+    builder.Pipe(cs,jw(1),j9(0));
+
+    builder.Pipe(cs,src0.x,j1(0));
+    builder.Pipe(cs,j1(1),j2(0));
+    builder.Pipe(cs,j2(1),j6(0));
+    builder.Pipe(cs,j6(2),j7(0));
+    builder.Pipe(cs,j6(1),j3(0));
+    builder.Pipe(cs,j3(1),j4(0));
+    builder.Pipe(cs,j4(1),src5.x);
+    builder.Pipe(cs,j9(1),j10(0));
+    builder.Pipe(cs,j10(1),j11(0));
+    builder.Pipe(cs,j11(1),sink12.x);
+
+    printf("%s\n",builder.To_String().c_str());
+}
+
+template<int d>
 void Run(PARSE_ARGS& parse_args)
 {
     typedef VECTOR<T,2> TV;
