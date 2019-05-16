@@ -185,6 +185,8 @@ void Run(PARSE_ARGS& parse_args)
         }
     }
     mc.Print_Statistics();
+    LOG::printf("canonical-j2: %d\ncanonical-j3-avg: %d\ncanonical-j3-small: %d\ncanonical-j4: %d\n",
+        builder.comp_joint.num_j2,builder.comp_joint.num_j3_avg,builder.comp_joint.num_j3_small,builder.comp_joint.num_j4);
     if(stats_only) return;
 
     mc.Compute_Matrix_Blocks();

@@ -44,6 +44,7 @@ struct COMPONENT_JOINT
     
     T target_length;
     std::map<JOINT_KEY<T>,PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > > canonical_joints;
+    int num_j2=0,num_j3_avg=0,num_j3_small=0,num_j4=0;
 
     PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > Make_Component(int d,T width,const ARRAY<T>& angles);
     PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > Make_Joint_2(int d,T width,const ARRAY<T>& angles);

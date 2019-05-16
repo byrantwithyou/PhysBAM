@@ -1014,6 +1014,7 @@ Print_Statistics() const
     HASHTABLE<CANONICAL_BLOCK<T>*> cbs;
     for(const auto& b:cl.blocks)
         cbs.Insert(b.block);
+    LOG::printf("merge: %d\n",cl.num_merge);
     LOG::printf("blocks: %P\ncanonical-blocks: %P\nref-blocks: %P\nref-reg-con: %P\nref-irreg-con: %P\n",
         cl.blocks.m,cbs.Size(),cl.reference_block_data.m,cl.reference_connection_data.m,cl.reference_irregular_data.m);
     int p2=0,v2=0;

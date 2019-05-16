@@ -143,6 +143,8 @@ struct COMPONENT_LAYOUT_FEM
     int depth_layers;
     T unit_m,unit_s,unit_kg;
     bool force_blk_ref=false;
+
+    int num_merge=0;
     
     // BLOCKS
     ARRAY<BLOCK<T>,BLOCK_ID> blocks;

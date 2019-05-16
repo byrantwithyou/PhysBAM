@@ -245,6 +245,7 @@ Merge_Blocks(BLOCK_ID id,CON_ID con_id,BLOCK_ID id2,F alias)
 {
     PHYSBAM_ASSERT(con_id>=CON_ID());
     PHYSBAM_ASSERT(id>=BLOCK_ID());
+    ++num_merge;
     BLOCK<T>& bl=blocks(id);
     CON_ID con_id2=bl.connections(con_id).con_id;
     BLOCK<T>& bl2=blocks(id2);

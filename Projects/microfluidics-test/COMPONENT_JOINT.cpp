@@ -32,6 +32,7 @@ Make_Component(int d,T width,const ARRAY<T>& angles)
 template<class T> PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > COMPONENT_JOINT<T>::
 Make_Joint_2(int d,T width,const ARRAY<T>& angles)
 {
+    ++num_j2;
     T sep=target_length;
     TV vert;
     T ext,angle;
@@ -84,6 +85,7 @@ Make_Joint_3(int d,T width,const ARRAY<T>& angles)
 template<class T> PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > COMPONENT_JOINT<T>::
 Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles)
 {
+    ++num_j3_small;
     T sep=2*target_length,sep_y=target_length;
     T tot=0;
     VECTOR<TV,3> dirs,w;
@@ -197,6 +199,7 @@ Make_Joint_3_Small(int d,T width,const ARRAY<T>& angles)
 template<class T> PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > COMPONENT_JOINT<T>::
 Make_Joint_3_Average(int d,T width,const ARRAY<T>& angles)
 {
+    ++num_j3_avg;
     T sep=2*target_length;
     int k=0;
     T max_abs_angle=angles(k),tot=0;
@@ -289,6 +292,7 @@ Make_Joint_4_Right_Angle(int d,T width)
     JOINT_KEY<T> key={d,width,{pi/2,pi/2,pi/2,pi/2}};
     auto it=canonical_joints.insert({key,{}});
     if(!it.second) return it.first->second;
+    ++num_j4;
 
     CANONICAL_COMPONENT<T>* cc=new CANONICAL_COMPONENT<T>;
     cc->blocks.Resize(CC_BLOCK_ID(d-1));
