@@ -5,6 +5,7 @@
 #ifndef __BLOCK_MESHING_ITERATOR__
 #define __BLOCK_MESHING_ITERATOR__
 #include <Core/Vectors/VECTOR.h>
+#include <Geometry/Basic_Geometry/TRIANGLE_2D.h>
 #include <list>
 
 namespace PhysBAM{
@@ -53,6 +54,7 @@ struct BLOCK_MESHING_ITERATOR<VECTOR<T,2> >
             TV v=(X(v0)-X(v1)).Normalized();
             return TV::Angle_Between(u,v);
         };
+        auto area=[X](int v0,int v1,int v2){return TRIANGLE_2D<T>(X(v0),X(v1),X(v2)).Signed_Area();};
 
         int n0=X0.m,n1=X1.m;
         E.Resize(n0+n1-2);
@@ -66,7 +68,18 @@ struct BLOCK_MESHING_ITERATOR<VECTOR<T,2> >
             if(i+1<n0) a0=angle(j,i+1,i);
             T a1=0;
             if(j+1<n0+n1) a1=angle(j,j+1,i);
-            if(j+1>=n0+n1 || (i+1<n0 && abs(a0-a1)<1e-6 && alt==0) || (i+1<n0 && a0>a1))
+            bool sep_i=((i+1<=n0/2 && j<n0+n1/2) || (i+1>n0/2 && j>=n0+n1/2));
+            bool sep_j=((i<=n0/2 && j+1<n0+n1/2) || (i>n0/2 && j+1>=n0+n1/2));
+            // Choose i+1 side when
+            // j+1 is not feasible, or
+            // i is feasible, and edge i+1 -- j separates the borrowed dofs, and i+1 is more preferable than j+1.
+            //
+            // i+1 is more preferable when
+            // j+1 side failed to separate dofs.
+            // When both sides separate dofs, i+1 forms a less sharp triangle.
+            // When there is a tie, alternate the side choice.
+            if(j+1>=n0+n1 || (i+1<n0 && area(i,j+1,i+1)<1e-6) ||
+                (i+1<n0 && area(j,j+1,i+1)>=1e-6 && sep_i && (!sep_j || (abs(a0-a1)<1e-6 && alt==0) || a0>a1)))
             {
                 E(i+j-n0)=IV3(i+1,i,j);
                 S(i)=IV(i+1,i);
