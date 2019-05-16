@@ -125,29 +125,25 @@ private:
         std::list<PAIR<T,TV> > verts;
         TV p0=(1-s)*loc(0,side0,l0)+s*loc(0,side1,l1);
         TV p1=(1-s)*loc(1,side0,l0)+s*loc(1,side1,l1);
-        auto begin=verts.insert(verts.end(),{0,p0});
-        auto end=verts.insert(verts.end(),{1,p1});
+        verts.insert(verts.end(),{0,p0});
+        verts.insert(verts.end(),{1,p1});
         T max_len=(p1-p0).Magnitude();
         while(max_len>1.5*h)
         {
-            T u=(begin->x+end->x)*0.5;
-            TV v=(1-s)*loc(u,side0,l0)+s*loc(u,side1,l1);
-            verts.insert(end,{u,v});
-            max_len=0;
+            T len=0;
             for(auto k=verts.begin();k!=verts.end();k++)
             {
                 if(k==verts.begin()) continue;
                 auto prev=k;
                 prev--;
-                T d=(k->y-prev->y).Magnitude();
-                if(d>max_len)
-                {
-                    begin=prev;
-                    end=k;
-                    max_len=d;
-                }
+                T u=(prev->x+k->x)*0.5;
+                TV v=(1-s)*loc(u,side0,l0)+s*loc(u,side1,l1);
+                verts.insert(k,{u,v});
+                len=std::max(len,std::max((prev->y-v).Magnitude(),(k->y-v).Magnitude()));
             }
+            max_len=len;
         }
+
         ARRAY<TV> ret;
         for(auto iter=verts.begin();iter!=verts.end();iter++)
             ret.Append(iter->y);
