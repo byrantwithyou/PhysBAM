@@ -287,7 +287,7 @@ Set_Target_Length(T l)
 template<class T> void LAYOUT_BUILDER_FEM<T>::
 Set_Depth(T z,int m)
 {
-    cl.depth=z;
+    cl.depth=z*cl.unit_m;
     cl.depth_layers=m;
     commands.Append({TAG::SET_DEPTH,-1});
 }

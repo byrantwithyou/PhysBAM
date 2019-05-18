@@ -2,6 +2,7 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Math_Tools/pow.h>
 #include <Core/Matrices/ROTATION.h>
 #include <Core/Utilities/PROCESS_UTILITIES.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
@@ -26,7 +27,7 @@ void Solve_And_Check(COMPONENT_LAYOUT_FEM<T>& cl,const LAYOUT_BUILDER_FEM<T>& bu
     cl.Update_Masters();
     cl.Merge_Blocks();
     MATRIX_CONSTRUCTION_FEM<TV> mc(cl);
-    mc.mu=mu;
+    mc.mu=mu*cl.unit_kg*pow<2-d>(cl.unit_m)/cl.unit_s;
     CACHED_ELIMINATION_MATRIX<T> cem;
     cem.quiet=true;
     cl.Compute_Dof_Pairs();

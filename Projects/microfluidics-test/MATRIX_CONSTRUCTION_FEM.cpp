@@ -195,10 +195,10 @@ Fill_Canonical_Block_Matrix(BLOCK_MATRIX<TV>& mat,const REFERENCE_BLOCK_DATA& rb
             for(int i=0;i<ve.v.m;i++) dof[i]=ve.v(i);
             for(int i=0;i<ve.e.m;i++) dof[ve.v.m+i]=ve.e(i);
             MATRIX<T,TV::m> F;
-            for(int i=0;i<TV::m;i++) F.Set_Column(i,ve.X(i+1)-ve.X(0));
+            for(int i=0;i<TV::m;i++) F.Set_Column(i,ve.X(i+1)/cl.unit_m-ve.X(0)/cl.unit_m);
             MATRIX<T,TV::m> G=F.Inverse();
-            T scale=mu*F.Determinant()/FEM_TABLES<TV::m>::visc_den;
-            T p_scale=F.Determinant()/FEM_TABLES<TV::m>::pres_den;
+            T scale=mu*F.Determinant()/FEM_TABLES<TV::m>::visc_den/sqr(cl.unit_m);
+            T p_scale=F.Determinant()/FEM_TABLES<TV::m>::pres_den/cl.unit_m;
 
             for(int i=0;i<num_u;i++)
                 for(int j=0;j<num_u;j++)
@@ -241,7 +241,7 @@ Times_U_Dot_V(BLOCK_ID b,BLOCK_VECTOR<TV>& w,const BLOCK_VECTOR<TV>& u) const
             for(int i=0;i<ve.v.m;i++) dof[i]=ve.v(i);
             for(int i=0;i<ve.e.m;i++) dof[ve.v.m+i]=ve.e(i);
             MATRIX<T,TV::m> F;
-            for(int i=0;i<TV::m;i++) F.Set_Column(i,ve.X(i+1)-ve.X(0));
+            for(int i=0;i<TV::m;i++) F.Set_Column(i,ve.X(i+1)/cl.unit_m-ve.X(0)/cl.unit_m);
             MATRIX<T,TV::m> G=F.Inverse();
             T scale=(M*F).Determinant()/FEM_TABLES<TV::m>::u_dot_v_den;
 
@@ -269,7 +269,7 @@ Times_P_U(BLOCK_ID b,BLOCK_VECTOR<TV>& w,const ARRAY<T>& div_v,const ARRAY<T>& d
         {
             constexpr int num_u=ve.v.m+ve.e.m;
             MATRIX<T,TV::m> F;
-            for(int i=0;i<TV::m;i++) F.Set_Column(i,ve.X(i+1)-ve.X(0));
+            for(int i=0;i<TV::m;i++) F.Set_Column(i,ve.X(i+1)/cl.unit_m-ve.X(0)/cl.unit_m);
             MATRIX<T,TV::m> G=F.Inverse();
             T scale=(M*F).Determinant()/FEM_TABLES<TV::m>::p_u_den;
 

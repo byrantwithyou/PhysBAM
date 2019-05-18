@@ -2,6 +2,7 @@
 // Copyright 2019.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Math_Tools/pow.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include "ANALYTIC_FEM.h"
@@ -31,7 +32,8 @@ template<class TV> bool ANALYTIC_FEM<TV>::
 Check_Analytic_Solution(bool dump) const
 {
     if(!analytic_velocity || !analytic_pressure) return false;
-    T m=mc.cl.unit_m,s=mc.cl.unit_s;
+    T m=mc.cl.unit_m,s=mc.cl.unit_s,kg=mc.cl.unit_kg;
+    T unit_p=kg*pow<2-TV::m>(m)/(s*s);
     T max_u=0,max_p=0;
     T l2_u=0,l2_p=0;
     int num_u=0,num_p=0;
@@ -70,10 +72,10 @@ Check_Analytic_Solution(bool dump) const
                     Debug_Particle_Set_Attribute<TV>("V",U-V);
                 }
             },
-            [this,&bl,&W,m,s,&max_p,&l2_p,&num_p,dump](int i,const TV& Y)
+            [this,&bl,&W,m,unit_p,s,&max_p,&l2_p,&num_p,dump](int i,const TV& Y)
             {
                 TV X=xform(bl.xform,Y);
-                T p=analytic_pressure->f(X/m,0)*m/s;
+                T p=analytic_pressure->f(X/m,0)*unit_p;
                 T q=W.Get_p(i);
                 max_p=std::max(max_p,std::abs(p-q));
                 l2_p+=sqr(p-q);
@@ -177,8 +179,9 @@ template<class TV> TV ANALYTIC_FEM<TV>::
 Traction(const TV& N,const TV& X) const
 {
     T m=mc.cl.unit_m,s=mc.cl.unit_s,kg=mc.cl.unit_kg;
+    T unit_p=kg*pow<2-TV::m>(m)/(s*s);
     SYMMETRIC_MATRIX<T,TV::m> stress=analytic_velocity->dX(X/m,0).Twice_Symmetric_Part()/s*mc.mu;
-    stress-=analytic_pressure->f(X/m,0)*kg/sqr(s);
+    stress-=analytic_pressure->f(X/m,0)*unit_p;
     return stress*N;
 }
 //#####################################################################
@@ -188,8 +191,9 @@ template<class TV> TV ANALYTIC_FEM<TV>::
 Force(const TV& X) const
 {
     T m=mc.cl.unit_m,s=mc.cl.unit_s,kg=mc.cl.unit_kg;
+    T unit_p=kg*pow<2-TV::m>(m)/(s*s);
     SYMMETRIC_TENSOR<T,0,TV::m> ddU=analytic_velocity->ddX(X/m,0)/(m*s);
-    TV f=analytic_pressure->dX(X/m,0)*kg/(m*sqr(s));
+    TV f=analytic_pressure->dX(X/m,0)*unit_p/m;
     f-=mc.mu*(Contract<1,2>(ddU)+Contract<0,2>(ddU));
     return f;
 }
