@@ -4,6 +4,7 @@
 //#####################################################################
 #include <Core/Data_Structures/TUPLE.h>
 #include <Core/Log/LOG.h>
+#include <Core/Math_Tools/pow.h>
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Core/Matrices/SYSTEM_MATRIX_HELPER.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
@@ -195,7 +196,8 @@ Fill_Canonical_Block_Matrix(BLOCK_MATRIX<TV>& mat,const REFERENCE_BLOCK_DATA& rb
             for(int i=0;i<ve.v.m;i++) dof[i]=ve.v(i);
             for(int i=0;i<ve.e.m;i++) dof[ve.v.m+i]=ve.e(i);
             MATRIX<T,TV::m> F;
-            for(int i=0;i<TV::m;i++) F.Set_Column(i,ve.X(i+1)/cl.unit_m-ve.X(0)/cl.unit_m);
+            for(int i=0;i<TV::m;i++) F.Set_Column(i,ve.X(i+1)-ve.X(0));
+            F/=cl.unit_m;
             MATRIX<T,TV::m> G=F.Inverse();
             T scale=mu*F.Determinant()/FEM_TABLES<TV::m>::visc_den/sqr(cl.unit_m);
             T p_scale=F.Determinant()/FEM_TABLES<TV::m>::pres_den/cl.unit_m;
@@ -241,7 +243,8 @@ Times_U_Dot_V(BLOCK_ID b,BLOCK_VECTOR<TV>& w,const BLOCK_VECTOR<TV>& u) const
             for(int i=0;i<ve.v.m;i++) dof[i]=ve.v(i);
             for(int i=0;i<ve.e.m;i++) dof[ve.v.m+i]=ve.e(i);
             MATRIX<T,TV::m> F;
-            for(int i=0;i<TV::m;i++) F.Set_Column(i,ve.X(i+1)/cl.unit_m-ve.X(0)/cl.unit_m);
+            for(int i=0;i<TV::m;i++) F.Set_Column(i,ve.X(i+1)-ve.X(0));
+            F/=cl.unit_m;
             MATRIX<T,TV::m> G=F.Inverse();
             T scale=(M*F).Determinant()/FEM_TABLES<TV::m>::u_dot_v_den;
 
@@ -269,7 +272,8 @@ Times_P_U(BLOCK_ID b,BLOCK_VECTOR<TV>& w,const ARRAY<T>& div_v,const ARRAY<T>& d
         {
             constexpr int num_u=ve.v.m+ve.e.m;
             MATRIX<T,TV::m> F;
-            for(int i=0;i<TV::m;i++) F.Set_Column(i,ve.X(i+1)/cl.unit_m-ve.X(0)/cl.unit_m);
+            for(int i=0;i<TV::m;i++) F.Set_Column(i,ve.X(i+1)-ve.X(0));
+            F/=cl.unit_m;
             MATRIX<T,TV::m> G=F.Inverse();
             T scale=(M*F).Determinant()/FEM_TABLES<TV::m>::p_u_den;
 
@@ -308,7 +312,7 @@ Times_Line_Integral_U_Dot_V(BLOCK_ID b,INTERVAL<int> bc_e,BLOCK_VECTOR<TV>& w,co
 
             PHYSBAM_ASSERT(abs(abs(M.Determinant())-1)<comp_tol);
             auto f=typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX_FACE(vf.X);
-            T scale=f.Size()/FEM_TABLES<TV::m>::surf_u_dot_v_den;
+            T scale=f.Size()/pow<TV::m-1>(cl.unit_m)/FEM_TABLES<TV::m>::surf_u_dot_v_den/cl.unit_m;
             for(int i=0;i<vf.v.m;i++) w.Add_v(vf.v(i),s(i)*scale);
             for(int i=0;i<vf.e.m;i++) w.Add_e(vf.e(i),s(i+vf.v.m)*scale);
         });
