@@ -1023,8 +1023,9 @@ Print_Statistics() const
         cl.blocks.m,cbs.Size(),cl.reference_block_data.m,cl.reference_connection_data.m,cl.reference_irregular_data.m);
     int p2=0,v2=0;
     int p3=0,v3=0;
-    for(const auto& rb:cl.reference_block_data)
+    for(const auto& b:cl.blocks)
     {
+        const auto& rb=cl.reference_block_data(b.ref_id);
         p2+=rb.num_dofs_d.p;
         v2+=rb.num_dofs_d.v+rb.num_dofs_d.e;
         if(TV::m==3)
