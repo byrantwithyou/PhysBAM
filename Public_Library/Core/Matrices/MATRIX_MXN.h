@@ -78,6 +78,11 @@ public:
         :m(A.Rows()),n(A.Columns()),x(m*n)
     {for(int i=0;i<m;i++) for(int j=i;j<n;j++) (*this)(i,j)=A(i,j);}
 
+    MATRIX_MXN(MATRIX_MXN&& array)
+        :m(array.m),n(array.n),x(std::move(array.x))
+    {
+    }
+
     ~MATRIX_MXN()
     {}
 
@@ -140,6 +145,14 @@ public:
     {x.Resize(d*d);m=n=d;
     for(int j=0;j<d;j++) for(int i=0;i<=j;i++) (*this)(i,j)=A(i,j);
     return *this;}
+
+    MATRIX_MXN& operator=(MATRIX_MXN&& array)
+    {
+        m=array.m;
+        n=array.n;
+        x=std::move(array.x);
+        return *this;
+    }
 
     void Transpose()
     {*this=Transposed();}
