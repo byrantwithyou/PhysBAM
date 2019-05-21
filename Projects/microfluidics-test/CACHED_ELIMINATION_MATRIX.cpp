@@ -34,10 +34,6 @@ enum op_type
     op_last
 };
 
-enum {zero_block=0,id_block=1,invalid_block=-1,
-      use_trans=1<<30,use_neg=1<<29,is_vec=1<<28,
-      raw_mask=~(use_trans|use_neg)};
-
 enum {pseudo_inv=1<<30,raw_op_mask=~pseudo_inv};
 
 int arg_type[op_last][4] =
@@ -218,32 +214,6 @@ Get_Block_Lazy(int r,int c) const
         if(row(i).c==c)
             return row(i).matrix_id;
     return zero_block;
-}
-//#####################################################################
-// Function Transposed
-//#####################################################################
-template<class T> int CACHED_ELIMINATION_MATRIX<T>::
-Transposed(int a) const
-{
-    if(Symmetric(a)) return a;
-    return a^use_trans;
-}
-//#####################################################################
-// Function Transposed
-//#####################################################################
-template<class T> int CACHED_ELIMINATION_MATRIX<T>::
-Negate(int a) const
-{
-    if(a==zero_block) return a;
-    return a^use_neg;
-}
-//#####################################################################
-// Function Transposed
-//#####################################################################
-template<class T> bool CACHED_ELIMINATION_MATRIX<T>::
-Symmetric(int a) const
-{
-    return block_list(a&raw_mask).sym;
 }
 //#####################################################################
 // Function Compute_Inv

@@ -13,6 +13,10 @@
 
 namespace PhysBAM{
 
+enum {zero_block=0,id_block=1,invalid_block=-1,
+      use_trans=1<<30,use_neg=1<<29,is_vec=1<<28,
+      raw_mask=~(use_trans|use_neg)};
+
 template<class T> class MATRIX_MXN;
 template<class T>
 struct CACHED_ELIMINATION_MATRIX
@@ -93,9 +97,12 @@ struct CACHED_ELIMINATION_MATRIX
     void Pack_Vector(ARRAY<VECTOR<int,2>,DOF_ID>& dof_map,ARRAY<T,DOF_ID>& v,const ARRAY<int>& u);
     int Matrix_Times(int m,int in);
     int Sub_Times(int out,int m,int in);
-    int Transposed(int a) const;
-    int Negate(int a) const;
-    bool Symmetric(int a) const;
+    int Transposed(int a) const
+    {return Symmetric(a)?a:a^use_trans;}
+    int Negate(int a) const
+    {return a==zero_block?a:a^use_neg;}
+    bool Symmetric(int a) const
+    {return block_list(a&raw_mask).sym;}
     ARRAY<int> Transposed(const ARRAY<int>& a) const;
     ARRAY<int> Prod_List(int a) const;
     void Reduce_Rows_By_Frequency(int begin,int end,int fill_limit);
