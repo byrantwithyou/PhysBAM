@@ -167,7 +167,7 @@ Eliminate_Row(int r)
 {
     PHYSBAM_ASSERT(valid_row(r));
     int diag_matrix=Get_Block_Lazy(r,r);
-    int inv=Compute_Inv(diag_matrix,pinv_last_blk && valid_row.Count_Matches(true)==1);
+    int inv=Compute_Inv(diag_matrix,pinv_last_blk && elimination_order.m==valid_row.m-1);
     ARRAY<MATRIX_BLOCK>& row=rows(r);
     rhs(r)=Matrix_Times(inv,rhs(r));
     for(int i=0;i<row.m;i++){
