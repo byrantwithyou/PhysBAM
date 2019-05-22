@@ -7,18 +7,36 @@
 #include "JOB_SCHEDULER.h"
 #include <mutex>
 #include <thread>
+#include <x86intrin.h>
 
 namespace PhysBAM{
+bool use_job_timing;
 
 void Thread_Function(JOB_SCHEDULER_CORE* s)
 {
+    bool use_timing=use_job_timing;
+    struct TIMING_DATA
+    {
+        long long t0,t1;
+        int job;
+    } cur;
+    ARRAY<TIMING_DATA> timing_data;
+    long long t0,t1;
+    if(use_timing) t0=__rdtsc();
+    
     int job=-1;
+    
     while(1)
     {
         job=s->Finish_Job(job);
         if(job<0) break;
+
+        long long t0;
+        if(use_timing) t0=__rdtsc();
         s->execute_job(s->jobs(job).job,s->data);
+        if(use_timing) timing_data.Append({{t0,__rdtsc()},job});
     }
+    if(use_timing) t1=__rdtsc();
 }
 
 int JOB_SCHEDULER_CORE::Finish_Job(int job)
