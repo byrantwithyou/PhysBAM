@@ -818,6 +818,7 @@ Relabel()
             new_data[t](i)=next[t]++;
         }
         data_refs[t]=new std::atomic<int>[next[t]];
+        for(int i=0;i<next[t];i++) data_refs[t][i].store(0);
     }
 
     for(auto& a:rhs) if(a>=0) a=new_data[1](a);
