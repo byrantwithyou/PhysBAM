@@ -642,18 +642,15 @@ Execute(CACHED_ELIMINATION_MATRIX<T>* cem)
         default: PHYSBAM_FATAL_ERROR();
     }
 
-    {
-        std::unique_lock<std::mutex> lck(cem->mtx);
-        for(int l=0;l<3;l++)
-            if(arg_type[raw_op][l]>0 && a[l]>=0)
+    for(int l=0;l<3;l++)
+        if(arg_type[raw_op][l]>0 && a[l]>=0)
+        {
+            if(!--cem->data_refs[arg_type[raw_op][l]-1][a[l]&raw_mask])
             {
-                if(!--cem->data_refs[arg_type[raw_op][l]-1](a[l]&raw_mask))
-                {
-                    if(arg_type[raw_op][l]==1) bl(a[l]&raw_mask).M.x.Clean_Memory();
-                    else vl(a[l]&raw_mask).Clean_Memory();
-                }
+                if(arg_type[raw_op][l]==1) bl(a[l]&raw_mask).M.x.Clean_Memory();
+                else vl(a[l]&raw_mask).Clean_Memory();
             }
-    }
+        }
 }
 //#####################################################################
 // Function Compute_Job_Deps
@@ -820,7 +817,7 @@ Relabel()
             }
             new_data[t](i)=next[t]++;
         }
-        data_refs[t].Resize(next[t]);
+        data_refs[t]=new std::atomic<int>[next[t]];
     }
 
     for(auto& a:rhs) if(a>=0) a=new_data[1](a);
@@ -857,9 +854,9 @@ Relabel()
         auto& j=jobs(i);
         for(int l=0;l<3;l++)
             if(j.a[l]>=0 && arg_type[j.op&raw_op_mask][l]>0)
-                data_refs[arg_type[j.op&raw_op_mask][l]-1](j.a[l]&raw_mask)++;
+                data_refs[arg_type[j.op&raw_op_mask][l]-1][j.a[l]&raw_mask]++;
     }
-    for(auto& a:rhs) if(a>=0) data_refs[1](a)++;
+    for(auto& a:rhs) if(a>=0) data_refs[1][a]++;
 }
 //#####################################################################
 // Function Register_Matrix_Block

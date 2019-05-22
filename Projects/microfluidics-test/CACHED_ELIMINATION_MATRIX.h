@@ -10,6 +10,7 @@
 #include <Core/Vectors/VECTOR.h>
 #include "COMMON.h"
 #include <mutex>
+#include <atomic>
 
 namespace PhysBAM{
 
@@ -65,9 +66,13 @@ struct CACHED_ELIMINATION_MATRIX
     int num_orig_blocks;
     int num_orig_vectors;
     ARRAY<VECTOR<int,2> > dep_list;
-    std::mutex mtx;
-    ARRAY<int> data_refs[2];
+    std::atomic<int>* data_refs[2]={0,0};
 
+    ~CACHED_ELIMINATION_MATRIX()
+    {
+        for(auto p:data_refs) delete [] p;
+    }
+    
     template<class F>
     void Foreach_Single_User_Pair(F f)
     {
