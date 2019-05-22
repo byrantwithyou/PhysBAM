@@ -150,6 +150,7 @@ int JOB_SCHEDULER_CORE::Compute_Priority_By_Paths_Rec(int j)
     int p=0;
     for(auto k:jobs(j)->release_list)
         p=std::max(p,Compute_Priority_By_Paths_Rec(k));
+    p++;
     jobs(j)->priority=p;
     return p;
 }
