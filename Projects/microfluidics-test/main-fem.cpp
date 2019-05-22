@@ -22,10 +22,15 @@
 #include "MATRIX_CONSTRUCTION_FEM.h"
 #include <chrono>
 
-using namespace PhysBAM;
 
 typedef float RW;
 typedef double T;
+
+using namespace PhysBAM;
+
+namespace PhysBAM{
+extern bool use_job_timing;
+}
 
 template<int d>
 void Run(PARSE_ARGS& parse_args)
@@ -66,6 +71,7 @@ void Run(PARSE_ARGS& parse_args)
     parse_args.Add("-refine",&refine,"factor","refine factor");
     parse_args.Add("-u",&analytic_u,"program","analytic velocity");
     parse_args.Add("-p",&analytic_p,"program","analytic pressure");
+    parse_args.Add("-timing",&use_job_timing,"use job timing");
     parse_args.Extra(&pipe_file,"file","file describing pipes");
     parse_args.Parse();
 
@@ -290,4 +296,3 @@ int main(int argc, char* argv[])
     LOG::Finish_Logging();
     return 0;
 }
-

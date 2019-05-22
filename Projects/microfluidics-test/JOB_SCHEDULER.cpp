@@ -4,6 +4,7 @@
 //#####################################################################
 #include <Core/Log/LOG.h>
 #include <climits>
+#include <fstream>
 #include "JOB_SCHEDULER.h"
 #include <mutex>
 #include <thread>
@@ -12,17 +13,18 @@
 namespace PhysBAM{
 bool use_job_timing;
 
-void Thread_Function(JOB_SCHEDULER_CORE* s)
+void Thread_Function(JOB_SCHEDULER_CORE* s, int tid)
 {
+    auto dur=[](auto a,auto b){return std::chrono::duration_cast<std::chrono::duration<double> >(b-a).count();};
     bool use_timing=use_job_timing;
     struct TIMING_DATA
     {
-        long long t0,t1;
-        int job;
-    } cur;
+        double t0=0,t1=0;
+        int job=0;
+    };
     ARRAY<TIMING_DATA> timing_data;
-    long long t0,t1;
-    if(use_timing) t0=__rdtsc();
+    std::chrono::steady_clock::time_point t0,t1;
+    if(use_timing) t0=std::chrono::steady_clock::now();
     
     int job=-1;
     
@@ -31,12 +33,25 @@ void Thread_Function(JOB_SCHEDULER_CORE* s)
         job=s->Finish_Job(job);
         if(job<0) break;
 
-        long long t0;
-        if(use_timing) t0=__rdtsc();
+        std::chrono::steady_clock::time_point ta;
+        if(use_timing) ta=std::chrono::steady_clock::now();
+
         s->execute_job(s->jobs(job).job,s->data);
-        if(use_timing) timing_data.Append({{t0,__rdtsc()},job});
+        if(use_timing)
+        {
+            std::chrono::steady_clock::time_point tb=std::chrono::steady_clock::now();
+            timing_data.Append({dur(t0,ta),dur(ta,tb),job});
+            t0=tb;
+        }
     }
-    if(use_timing) t1=__rdtsc();
+    if(use_timing)
+    {
+        t1=std::chrono::steady_clock::now();
+        std::ofstream fout(LOG::sprintf("timing-%i.txt",tid));
+        for(auto d:timing_data) LOG::fprintf(fout,"%i %.1f %.1f\n",d.job,d.t0*1e6,d.t1*1e6);
+        LOG::fprintf(fout,"%.1f\n",dur(t0,t1)*1e6);
+    }
+
 }
 
 int JOB_SCHEDULER_CORE::Finish_Job(int job)
@@ -86,7 +101,7 @@ void JOB_SCHEDULER_CORE::Execute_Jobs(int num_threads)
         [this](int r,int s){return jobs(r).priority<jobs(s).priority;});
 
     ARRAY<std::thread*> threads;
-    for(int i=0;i<num_threads;i++) threads.Append(new std::thread(Thread_Function,this));
+    for(int i=0;i<num_threads;i++) threads.Append(new std::thread(Thread_Function,this,i));
     
     for(int i=0;i<threads.m;i++){
         threads(i)->join();
