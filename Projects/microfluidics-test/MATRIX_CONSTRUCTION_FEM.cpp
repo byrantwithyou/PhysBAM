@@ -450,6 +450,24 @@ Fill_Connection_Matrix(BLOCK_MATRIX<TV>& M,const REFERENCE_CONNECTION_DATA& cd)
     auto& rd1=cl.reference_block_data(cl.blocks(cd.b[1]).ref_id);
     Copy_Matrix_Data(M,cd.b[0],rd0.pairs,cd.reg_pairs[1],cd.b[0],cd.b[1]);
     Copy_Matrix_Data(M,cd.b[1],cd.reg_pairs[0],rd1.pairs,cd.b[0],cd.b[1]);
+
+    for(int k=0;k<cl.blocks(cd.b[0]).edge_on.m;k++)
+    {
+        const auto& eo=cl.blocks(cd.b[0]).edge_on(k);
+        const auto& ic=cl.irregular_connections(eo.x);
+        const auto& ri=cl.reference_irregular_data(ic.ref_id);
+        for(int j=-1;j<2;j+=2)
+        {
+            int n=eo.y+j;
+            if(n<0 || n>=ic.edge_on.m) continue;
+            if(ic.edge_on(n).b==cd.b[1])
+            {
+                RID_ID j0=ri.mapping(eo.y).x,j1=ri.mapping(n).x;
+                PHYSBAM_ASSERT(abs(Value(j0-j1))==1);
+                Copy_Matrix_Data(M,ic.regular,ri.pairs(j0).irreg_pairs[1],ri.pairs(j1).irreg_pairs[1],cd.b[0],cd.b[1]);
+            }
+        }
+    }
 }
 //#####################################################################
 // Function Fill_Irregular_Connection_Matrix
@@ -476,49 +494,6 @@ Fill_Irregular_Connection_Matrix(ARRAY<BLOCK_MATRIX<TV>,RID_ID>& M,const REFEREN
                 const auto& dp1=cl.Regular_Connection_Pair(z.b,cc,true);
                 Copy_Matrix_Data(M(k),z.b,z.irreg_pairs[0],dp0,bb,c.id);
                 Copy_Matrix_Data(M(j),c.id,ri.pairs(k).irreg_pairs[0],dp1,bb,z.b);
-            }
-        }
-    }
-}
-//#####################################################################
-// Function Fill_Connection_Matrix_From_Irregular_Part
-//#####################################################################
-template<class TV> void MATRIX_CONSTRUCTION_FEM<TV>::
-Fill_Connection_Matrix_From_Irregular_Part()
-{
-    HASHTABLE<PAIR<REFERENCE_IRREGULAR_ID,REFERENCE_CONNECTION_ID> > visited;
-    for(IRREG_ID i(0);i<cl.irregular_connections.m;i++)
-    {
-        const auto& ic=cl.irregular_connections(i);
-        BLOCK_ID bb=ic.regular;
-        const REFERENCE_IRREGULAR_DATA& ri=cl.reference_irregular_data(ic.ref_id);
-        for(int e=0;e<ic.edge_on.m-1;e++)
-        {
-            if(!ri.mapping(e+1).y) continue;
-            BLOCK_ID b0=ic.edge_on(e).b,b1=ic.edge_on(e+1).b;
-            CON_ID c0(-1);
-            for(CON_ID ci(0);ci<cl.blocks(b0).connections.m;ci++)
-                if(cl.blocks(b0).connections(ci).id==b1)
-                {
-                    c0=ci;
-                    break;
-                }
-            PHYSBAM_ASSERT(c0>=CON_ID());
-            const auto& c=cl.blocks(b0).connections(c0);
-            CON_ID c1=c.con_id;
-            REFERENCE_CONNECTION_ID rci=c.master?cl.Regular_Connection(b0,c0,b1):cl.Regular_Connection(b1,c1,b0);
-            auto pr=visited.Insert({ic.ref_id,rci});
-            if(!pr) continue;
-            RID_ID j0=ri.mapping(e).x,j1=ri.mapping(e+1).x;
-            if(c.master)
-            {
-                auto& M=regular_system_blocks(rci);
-                Copy_Matrix_Data(M,bb,ri.pairs(j0).irreg_pairs[1],ri.pairs(j1).irreg_pairs[1],b0,b1);
-            }
-            else
-            {
-                auto& M=regular_system_blocks(rci);
-                Copy_Matrix_Data(M,bb,ri.pairs(j1).irreg_pairs[1],ri.pairs(j0).irreg_pairs[1],b1,b0);
             }
         }
     }
@@ -579,7 +554,6 @@ Compute_Matrix_Blocks()
         is.Resize(ri.pairs.m);
         Fill_Irregular_Connection_Matrix(is,ri);
     }
-    Fill_Connection_Matrix_From_Irregular_Part();
 }
 //#####################################################################
 // Function Compute_RHS
@@ -701,7 +675,7 @@ Copy_To_CEM(CACHED_ELIMINATION_MATRIX<T>& cem)
             const auto& c=bl.connections(cc);
             if(c.is_regular && c.master)
             {
-                auto i=cl.Regular_Connection(b,cc,c.id);
+                auto i=cl.regular_connection_hash.Get(cl.Regular_Connection_Key(b,cc,c.id));
                 int id=reg_id(i);
                 cem.Add_Block_Matrix_Entry(Value(b),Value(c.id),id);
             }
@@ -933,7 +907,7 @@ Dump_World_Space_System() const
             const auto& c=bl.connections(cc);
             if(c.is_regular && c.master)
             {
-                auto i=cl.Regular_Connection(b,cc,c.id);
+                auto i=cl.regular_connection_hash.Get(cl.Regular_Connection_Key(b,cc,c.id));
                 Dump_Matrix_Block(h,first,regular_system_blocks(i),b,c.id);
             }
         }
