@@ -12,8 +12,13 @@
 #include "FLUID_LAYOUT.h"
 #include "FREQUENCY_TRACKER.h"
 #include "JOB_SCHEDULER.h"
+#if USE_LAPACK
 #include <cblas.h>
 #include <lapacke.h>
+#elif USE_MKL
+#include <mkl_cblas.h>
+#include <mkl_lapacke.h>
+#endif
 #include <suitesparse/colamd.h>
 
 namespace PhysBAM{
