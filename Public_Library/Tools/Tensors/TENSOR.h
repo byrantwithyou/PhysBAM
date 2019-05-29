@@ -51,8 +51,9 @@ public:
     for(int i=0;i<m;i++) t.x(i)=x(i)/a;
     return t;}
 
-    SYMMETRIC_TENSOR<T,m,n> Twice_Symmetric_Part_12() const
-    {SYMMETRIC_TENSOR<T,m,n> t;
+    SYMMETRIC_TENSOR<T,0,m,n> Twice_Symmetric_Part_12() const
+    {STATIC_ASSERT(n==p);
+    SYMMETRIC_TENSOR<T,0,m,n> t;
     for(int i=0;i<m;i++) t.x(i)=x(i).Twice_Symmetric_Part();
     return t;}
 

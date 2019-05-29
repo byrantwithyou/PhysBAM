@@ -22,4 +22,5 @@ void test_1()
     TEST(((-(-((-0.62-a)*v)))/(abs(tan(tan(b)))+1)));
     TEST((((-(-((-0.62-a)*v)))/(abs(tan(tan(b)))+1))/(abs(sin(a))+1)));
     TEST((-(((-0.62-a)*v)/(abs(((-((+v)-v)).Magnitude()))+1))));
+    TEST(u.Cross(v.Cross(u*u.Dot(v))));
 }

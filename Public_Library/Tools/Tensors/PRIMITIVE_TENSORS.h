@@ -1915,8 +1915,8 @@ template<class T,int m> ZERO_TENSOR<T,m> Symmetric_Double_Contract_12(const PERM
 template<class T,int m> ZERO_TENSOR<T,m> Symmetric_Double_Contract_12(const PERMUTATION_TENSOR<T>& t,const IDENTITY_MATRIX<T,m>& cm1,const ZERO_MATRIX<T,m>& cm2){return ZERO_TENSOR<T,m>();}
 template<class T,int m> ZERO_TENSOR<T,m> Symmetric_Double_Contract_12(const PERMUTATION_TENSOR<T>& t,const IDENTITY_MATRIX<T,m>& cm1,const IDENTITY_MATRIX<T,m>& cm2){return ZERO_TENSOR<T,m>();}
 template<class T,int m> ZERO_TENSOR<T,m> Symmetric_Double_Contract_12(const PERMUTATION_TENSOR<T>& t,const IDENTITY_MATRIX<T,m>& cm1,const SCALE_MATRIX<T,m>& cm2){return ZERO_TENSOR<T,m>();}
-template<class T,int m> SYMMETRIC_TENSOR<T,0,m,m> Symmetric_Double_Contract_12(const PERMUTATION_TENSOR<T>& t,const IDENTITY_MATRIX<T,m>& cm1,const MATRIX<T,m>& cm2)
-{return Contract_2(t,cm2).Twice_Symmetric_Part_12();}
+template<class T> SYMMETRIC_TENSOR<T,0,3,3> Symmetric_Double_Contract_12(const PERMUTATION_TENSOR<T>& t,const IDENTITY_MATRIX<T,3>& cm1,const MATRIX<T,3>& cm2)
+{return Contract<2,0>(t,cm2).Twice_Symmetric_Part_12();}
 
 template<class T,int m> ZERO_TENSOR<T,m> Symmetric_Double_Contract_12(const PERMUTATION_TENSOR<T>& t,const SCALE_MATRIX<T,m>& cm1,const ZERO_MATRIX<T,m>& cm2){return ZERO_TENSOR<T,m>();}
 template<class T,int m> ZERO_TENSOR<T,m> Symmetric_Double_Contract_12(const PERMUTATION_TENSOR<T>& t,const SCALE_MATRIX<T,m>& cm1,const IDENTITY_MATRIX<T,m>& cm2){return ZERO_TENSOR<T,m>();}
