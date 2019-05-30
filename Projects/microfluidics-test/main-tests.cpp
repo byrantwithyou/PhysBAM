@@ -193,7 +193,6 @@ void Test_Joint4_Right_Angle(T angle,T mu,T s,T m,T kg,const std::string& au,con
     Solve_And_Check<d>(cl,builder,mu,au,ap);
 }
 
-template<int d>
 void Generate_Grid(T mu,T s,T m,T kg)
 {
     typedef VECTOR<T,2> TV;
@@ -271,7 +270,132 @@ void Generate_Grid(T mu,T s,T m,T kg)
     printf("%s\n",builder.To_String().c_str());
 }
 
-template<int d>
+template<class VERT_ID,class CID,class T,class CS_ID>
+std::tuple<VERT_ID,CID,VERT_ID,CID> Coil(LAYOUT_BUILDER_FEM<T>& builder,CS_ID cs,const VECTOR<T,2>& O,T l,T h)
+{
+    typedef VECTOR<T,2> TV;
+    T dy=h/6,dx=l/6;
+    VERT_ID w[12]=
+    {
+        builder.Vertex(O+TV(0,2*dy)),
+        builder.Vertex(O+TV(0,3*dy)),
+        builder.Vertex(O+TV(dx,3*dy)),
+
+        builder.Vertex(O+TV(2*dx,3*dy)),
+        builder.Vertex(O+TV(3*dx,3*dy)),
+        builder.Vertex(O+TV(3*dx,2*dy)),
+
+        builder.Vertex(O+TV(3*dx,-2*dy)),
+        builder.Vertex(O+TV(3*dx,-3*dy)),
+        builder.Vertex(O+TV(4*dx,-3*dy)),
+
+        builder.Vertex(O+TV(5*dx,-3*dy)),
+        builder.Vertex(O+TV(6*dx,-3*dy)),
+        builder.Vertex(O+TV(6*dx,-2*dy)),
+    };
+    VECTOR<CID,2> jt[4];
+    for(int i=0;i<4;i++)
+    {
+        int j=1+3*i;
+        jt[i]=builder.Joint(cs,2,w[j],{w[j-1],w[j+1]});
+    }
+    for(int i=1;i<4;i++)
+        builder.Pipe(cs,jt[i-1](1),jt[i](0));
+    return std::make_tuple(w[0],jt[0](0),w[11],jt[3](1));
+};
+
+void Generate_Simple(T mu,T s,T m,T kg)
+{
+    typedef VECTOR<T,2> TV;
+    T w=1;
+    COMPONENT_LAYOUT_FEM<T> cl;
+    cl.unit_m=m;
+    cl.unit_s=s;
+    cl.unit_kg=kg;
+    LAYOUT_BUILDER_FEM<T> builder(cl);
+    builder.Set_Target_Length(0.25);
+    builder.Set_Depth(w,1);
+    auto cs=builder.Cross_Section(4,w);
+    auto cs1=builder.Cross_Section(10,w*2.5);
+
+    using VERT_ID=LAYOUT_BUILDER_FEM<T>::VERT_ID;
+    using CID=LAYOUT_BUILDER_FEM<T>::CONNECTOR_ID;
+
+    T x=0;
+    VERT_ID v0=builder.Vertex(TV(x,2));
+    VERT_ID v2=builder.Vertex(TV(x,-2));
+    x+=2;
+    VERT_ID v1=builder.Vertex(TV(x,2));
+    VERT_ID v3=builder.Vertex(TV(x,-2));
+    x+=2;
+    VERT_ID v4=builder.Vertex(TV(x,0));
+    auto src0=builder.Set_BC(cs,v0,v1,1);
+    auto src2=builder.Set_BC(cs,v2,v3,1);
+    auto j1=builder.Joint(cs,2,v1,{v0,v4});
+    auto j3=builder.Joint(cs,2,v3,{v2,v4});
+    x+=2;
+    VERT_ID v5=builder.Vertex(TV(x,0));
+    auto c0=Coil<VERT_ID,CID>(builder,cs,TV(x,0),4.,6.);
+    x+=4;
+    auto j4=builder.Joint(cs,3,v4,{v1,v3,v5});
+    auto j5=builder.Joint(cs,2,v5,{v4,std::get<0>(c0)});
+    auto c1=Coil<VERT_ID,CID>(builder,cs,TV(x,0),4.,6.);
+    x+=4;
+    VERT_ID v6=builder.Vertex(TV(x,0));
+    x+=3;
+    VERT_ID v7=builder.Vertex(TV(x,0));
+    auto j6=builder.Joint(cs,2,v6,{std::get<2>(c1),v7});
+    auto p67=builder.Pipe(cs,cs1,v6,v7,1,1);
+    x+=3;
+    VERT_ID v8=builder.Vertex(TV(x,0));
+    auto p78=builder.Pipe(cs1,cs,v7,v8,1,1);
+    x+=1;
+    VERT_ID v9=builder.Vertex(TV(x,0));
+    VERT_ID v10=builder.Vertex(TV(x,-4));
+    VERT_ID v10a=builder.Vertex(TV(x,-6));
+    auto src10a=builder.Set_BC(cs,v10a,v10,1);
+    x+=1;
+    T y=-2;
+    VERT_ID v11=builder.Vertex(TV(x,y));
+    auto j9=builder.Joint(cs,2,v9,{v8,v11});
+    auto j10=builder.Joint(cs,2,v10,{v10a,v11});
+    x+=2;
+    VERT_ID v12=builder.Vertex(TV(x,y));
+    auto j11=builder.Joint(cs,3,v11,{v9,v10,v12});
+    auto c2=Coil<VERT_ID,CID>(builder,cs,TV(x,y),4.,6.);
+    auto j12=builder.Joint(cs,2,v12,{v11,std::get<0>(c2)});
+    x+=4;
+    auto c3=Coil<VERT_ID,CID>(builder,cs,TV(x,y),4.,6.);
+    x+=4;
+    VERT_ID v13=builder.Vertex(TV(x,y));
+    x+=2;
+    VERT_ID v14=builder.Vertex(TV(x,y));
+    auto j13=builder.Joint(cs,2,v13,{std::get<2>(c3),v14});
+    auto sink=builder.Set_BC(cs,v14,v13,TV());
+
+    builder.Pipe(cs,src0.x,j1(0));
+    builder.Pipe(cs,src2.x,j3(0));
+    builder.Pipe(cs,j1(1),j4(0));
+    builder.Pipe(cs,j3(1),j4(1));
+    builder.Pipe(cs,j4(2),j5(0));
+    builder.Pipe(cs,j5(1),std::get<1>(c0));
+    builder.Pipe(cs,std::get<3>(c0),std::get<1>(c1));
+    builder.Pipe(cs,std::get<3>(c1),j6(0));
+    builder.Pipe(cs,j6(1),p67(0));
+    builder.Pipe(cs1,p67(1),p78(0));
+    builder.Pipe(cs,p78(1),j9(0));
+    builder.Pipe(cs,j9(1),j11(0));
+    builder.Pipe(cs,src10a.x,j10(0));
+    builder.Pipe(cs,j10(1),j11(1));
+    builder.Pipe(cs,j11(2),j12(0));
+    builder.Pipe(cs,j12(1),std::get<1>(c2));
+    builder.Pipe(cs,std::get<3>(c2),std::get<1>(c3));
+    builder.Pipe(cs,std::get<3>(c3),j13(0));
+    builder.Pipe(cs,j13(1),sink.x);
+
+    printf("%s\n",builder.To_String().c_str());
+}
+
 void Generate_Fab0(T mu,T s,T m,T kg)
 {
     typedef VECTOR<T,2> TV;
@@ -308,38 +432,6 @@ void Generate_Fab0(T mu,T s,T m,T kg)
     auto src5=builder.Set_BC(cs,v5,v4,1);
     auto sink12=builder.Set_BC(cs,v12,v11,TV());
 
-    auto coil=[&builder,cs](const TV& O,T l,T h)
-    {
-        T dy=h/6,dx=l/6;
-        VERT_ID w[12]=
-        {
-            builder.Vertex(O+TV(0,2*dy)),
-            builder.Vertex(O+TV(0,3*dy)),
-            builder.Vertex(O+TV(dx,3*dy)),
-
-            builder.Vertex(O+TV(2*dx,3*dy)),
-            builder.Vertex(O+TV(3*dx,3*dy)),
-            builder.Vertex(O+TV(3*dx,2*dy)),
-
-            builder.Vertex(O+TV(3*dx,-2*dy)),
-            builder.Vertex(O+TV(3*dx,-3*dy)),
-            builder.Vertex(O+TV(4*dx,-3*dy)),
-
-            builder.Vertex(O+TV(5*dx,-3*dy)),
-            builder.Vertex(O+TV(6*dx,-3*dy)),
-            builder.Vertex(O+TV(6*dx,-2*dy)),
-        };
-        VECTOR<CID,2> jt[4];
-        for(int i=0;i<4;i++)
-        {
-            int j=1+3*i;
-            jt[i]=builder.Joint(cs,2,w[j],{w[j-1],w[j+1]});
-        }
-        for(int i=1;i<4;i++)
-            builder.Pipe(cs,jt[i-1](1),jt[i](0));
-        return std::make_tuple(w[0],jt[0](0),w[11],jt[3](1));
-    };
-
     auto j1=builder.Joint(cs,2,v1,{v0,v2});
     auto j2=builder.Joint(cs,2,v2,{v1,v6});
     auto j3=builder.Joint(cs,2,v3,{v6,v4});
@@ -355,7 +447,7 @@ void Generate_Fab0(T mu,T s,T m,T kg)
     VERT_ID last_v=v7;
     for(int i=0;i<5;i++)
     {
-        auto c=coil(O,l,h);
+        auto c=Coil<VERT_ID,CID>(builder,cs,O,l,h);
         builder.Pipe(cs,last,std::get<1>(c));
         last=std::get<3>(c);
         last_v=std::get<2>(c);
