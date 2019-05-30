@@ -49,7 +49,7 @@ void Run(PARSE_ARGS& parse_args)
     timer("start");
 
     int threads=1;
-    bool quiet=false,use_krylov=false,print_system=false,pinv=false,stats_only=false,force_blk_ref=false;
+    bool quiet=false,use_krylov=false,print_system=false,pinv=false,stats_only=false,force_blk_ref=false,illus_only=false;
     std::string pipe_file,output_dir="output";
     std::string analytic_u,analytic_p;
     T s=1,m=1,kg=1;
@@ -61,6 +61,7 @@ void Run(PARSE_ARGS& parse_args)
     parse_args.Add("-pinv",&pinv,"perform pseudo inverse");
     parse_args.Add("-force_blk_ref",&force_blk_ref,"force every block a reference block");
     parse_args.Add("-stats",&stats_only,"show statistics");
+    parse_args.Add("-illus",&illus_only,"dump illustrations");
     parse_args.Add("-k",&use_krylov,"solve with Krylov method");
     parse_args.Add("-d",&print_system,"dump the system to be solved");
     parse_args.Add("-m",&m,"scale","scale units of length");
@@ -194,7 +195,11 @@ void Run(PARSE_ARGS& parse_args)
     mc.Print_Statistics();
     LOG::printf("canonical-j2: %d\ncanonical-j3-avg: %d\ncanonical-j3-small: %d\ncanonical-j4: %d\n",
         builder.comp_joint.num_j2,builder.comp_joint.num_j3_avg,builder.comp_joint.num_j3_small,builder.comp_joint.num_j4);
-    if(stats_only) return;
+    if(illus_only)
+    {
+        debug.Visualize_Domain("domain.eps");
+    }
+    if(stats_only || illus_only) return;
 
     mc.Compute_Matrix_Blocks();
     ANALYTIC_FEM<TV>* an=0;

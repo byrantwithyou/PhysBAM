@@ -8,6 +8,7 @@
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
+#include <Geometry/Images/EPS_FILE.h>
 #include "DEBUGGING_FEM.h"
 #include "MATRIX_CONSTRUCTION_FEM.h"
 #include "VISITORS_FEM.h"
@@ -510,6 +511,46 @@ Highlight_Dof(BLOCK_ID b,int vep,int r,int dim) const
                 Debug_Particle_Set_Attribute<TV>("display_size",.5);
             }
         });
+}
+//#####################################################################
+// Function Visualize_Domain
+//#####################################################################
+template<class T> void DEBUGGING_FEM<T>::
+Visualize_Domain(const std::string& name) const
+{
+    EPS_FILE<T> eps(name);
+    eps.cur_format.line_width=0.008;
+    eps.cur_format.point_radius=0.008;
+    eps.cur_format.line_style=1;
+    eps.cur_format.fill_style=1;
+
+    auto draw_boundary_edge=[&eps](const BLOCK<T>& bl,int i)
+    {
+        const auto& e=bl.block->S(i);
+        eps.Draw_Object(bl.xform*bl.block->X(e(0)),bl.xform*bl.block->X(e(1)));
+    };
+
+    for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+    {
+        const auto& bl=cl.blocks(b);
+        for(int i:bl.block->bc_e)
+            draw_boundary_edge(bl,i);
+    }
+
+    for(const auto& bc:cl.bc_v)
+    {
+        eps.cur_format.line_color=TV3(0,1,0);
+        const auto& bl=cl.blocks(bc.b);
+        for(int i:bc.bc_e)
+            draw_boundary_edge(bl,i);
+    }
+    for(const auto& bc:cl.bc_t)
+    {
+        eps.cur_format.line_color=TV3(1,0,0);
+        const auto& bl=cl.blocks(bc.b);
+        for(int i:bc.bc_e)
+            draw_boundary_edge(bl,i);
+    }
 }
 template class DEBUGGING_FEM<double>;
 template void DEBUGGING_FEM<double>::Highlight_Dof<2>(BLOCK_ID,int,int,int) const;
