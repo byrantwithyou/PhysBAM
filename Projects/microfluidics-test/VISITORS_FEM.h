@@ -419,6 +419,8 @@ void Visit_Dofs(const DOF_LAYOUT<VECTOR<T,3> >& dl,LAYER_RANGE lr,const AR& bc_v
             end_vol=0;
             step_vol=0;
             break;
+        default:
+            PHYSBAM_FATAL_ERROR();
     }
 
     TV2 A,u;
