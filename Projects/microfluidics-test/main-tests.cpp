@@ -2,7 +2,6 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <Core/Data_Structures/UNION_FIND.h>
 #include <Core/Math_Tools/pow.h>
 #include <Core/Matrices/ROTATION.h>
 #include <Core/Utilities/PROCESS_UTILITIES.h>
@@ -194,14 +193,70 @@ void Test_Joint4_Right_Angle(T angle,T mu,T s,T m,T kg,const std::string& au,con
     Solve_And_Check<d>(cl,builder,mu,au,ap);
 }
 
-void Generate_Random_Ortho_Grid(RANDOM_NUMBERS<T>& rng,T mu,T s,T m,T kg)
+struct CROSS_DATA
 {
-    T w=1;
-    T dx=w+1.5*w;
-    int n=20;
+    using VERT_ID=LAYOUT_BUILDER_FEM<T>::VERT_ID;
+    using CID=LAYOUT_BUILDER_FEM<T>::CONNECTOR_ID;
+
+    VERT_ID vid;
+    VECTOR<PAIR<VERT_ID,CID>,4> c; // CID*4: +x,+y,-x,-y
+    CROSS_DATA()
+    {
+        vid=VERT_ID(-1);
+        for(int i=0;i<4;i++) c(i)={VERT_ID(-1),CID(-1)};
+    }
+};
+
+// http://random.groverlab.org/candidate/59378553.html
+static VECTOR<VECTOR<T,2>,2> grid0[]=
+{
+    {{2,9},{2,8}},{{5,9},{5,8}},
+    {{0,8},{2,8}},{{2,8},{3,8}},{{3,8},{4,8}},{{5,8},{6,8}},
+    {{3,8},{3,7}},{{4,8},{4,7}},{{6,8},{6,7}},{{7,8},{7,7}},
+    {{0,7},{3,7}},{{4,7},{6,7}},{{6,7},{7,7}},
+    {{0,7},{0,6}},{{3,7},{3,6}},{{4,7},{4,6}},{{6,7},{6,6}},{{7,7},{7,4}},
+    {{0,6},{1,6}},{{1,6},{3,6}},{{3,6},{4,6}},{{5,6},{6,6}},
+    {{0,6},{0,5}},{{1,6},{1,5}},
+    {{0,5},{1,5}},{{1,5},{2,5}},{{2,5},{3,5}},{{3,5},{4,5}},
+    {{0,5},{0,4}},{{1,5},{1,4}},{{2,5},{2,4}},{{3,5},{3,4}},{{4,5},{4,4}},{{5,5},{5,4}},{{6,5},{6,4}},
+    {{0,4},{1,4}},{{2,4},{3,4}},{{4,4},{5,4}},{{5,4},{6,4}},{{6,4},{7,4}},
+    {{0,4},{0,3}},{{1,4},{1,3}},{{2,4},{2,3}},{{3,4},{3,2}},{{4,4},{4,3}},{{5,4},{5,3}},{{6,4},{6,3}},{{7,4},{7,2}},
+    {{0,3},{1,3}},{{1,3},{2,3}},{{5,3},{6,3}},
+    {{5,3},{5,2}},{{6,3},{6,2}},
+    {{0,2},{1,2}},{{2,2},{3,2}},{{3,2},{4,2}},{{5,2},{6,2}},{{6,2},{7,2}},
+    {{0,2},{0,0}},{{1,2},{1,1}},{{2,2},{2,1}},{{5,2},{5,1}},{{6,2},{6,1}},{{7,2},{7,1}},
+    {{1,1},{2,1}},{{2,1},{3.5,1}},{{3.5,1},{4,1}},{{6,1},{7,1}},
+    {{3.5,1},{3.5,0}},{{7,1},{7,0}}
+};
+
+// http://random.groverlab.org/candidate/11460287.html
+static VECTOR<VECTOR<T,2>,2> grid1[]=
+{
+    {{2,9},{2,8}},{{5,9},{5,8}},
+    {{0,8},{1,8}},{{2,8},{3,8}},{{3,8},{5,8}},{{5,8},{6,8}},{{6,8},{7,8}},
+    {{0,8},{0,7}},{{1,8},{1,7}},{{2,8},{2,7}},{{3,8},{3,7}},{{5,8},{5,7}},{{6,8},{6,7}},{{7,8},{7,7}},
+    {{0,7},{1,7}},{{1,7},{2,7}},{{2,7},{3,7}},{{3,7},{4,7}},{{5,7},{6,7}},{{6,7},{7,7}},
+    {{1,7},{1,6}},{{2,7},{2,6}},{{3,7},{3,5}},{{4,7},{4,5}},{{5,7},{5,6}},{{6,7},{6,6}},
+    {{0,6},{1,6}},{{1,6},{2,6}},{{5,6},{6,6}},
+    {{0,6},{0,4}},{{1,6},{1,5}},{{2,6},{2,5}},{{5,6},{5,5}},{{6,6},{6,5}},{{7,6},{7,4}},
+    {{1,5},{2,5}},{{2,5},{3,5}},{{4,5},{5,5}},
+    {{1,5},{1,4}},{{2,5},{2,4}},{{4,5},{4,4}},{{5,5},{5,4}},
+    {{0,4},{1,4}},{{1,4},{2,4}},{{2,4},{4,4}},{{4,4},{5,4}},{{5,4},{6,4}},{{6,4},{7,4}},
+    {{1,4},{1,3}},{{5,4},{5,3}},{{6,4},{6,3}},{{7,4},{7,3}},
+    {{0,3},{1,3}},{{2,3},{3,3}},{{5,3},{6,3}},{{6,3},{7,3}},
+    {{0,3},{0,2}},{{3,3},{3,2}},{{4,3},{4,2}},{{5,3},{5,1}},{{6,3},{6,2}},{{7,3},{7,2}},
+    {{0,2},{1,2}},{{1,2},{3,2}},{{3,2},{4,2}},{{6,2},{7,2}},
+    {{1,2},{1,1}},{{3,2},{3,1}},{{7,2},{7,1}},
+    {{0,1},{1,1}},{{1,1},{3,1}},{{3,1},{3.5,1}},{{3.5,1},{4,1}},{{5,1},{7,1}},
+    {{0,1},{0,0}},{{3.5,1},{3.5,0}},{{7,1},{7,0}}
+};
+
+void Generate_Random_Ortho_Grid(const VECTOR<VECTOR<T,2>,2>* edges,int ne,T mu,T s,T m,T kg)
+{
+    T w=0.004;
+    T dx=0.025+w;
 
     typedef VECTOR<T,2> TV;
-    typedef VECTOR<int,TV::m> TV_INT;
     using VERT_ID=LAYOUT_BUILDER_FEM<T>::VERT_ID;
     using CID=LAYOUT_BUILDER_FEM<T>::CONNECTOR_ID;
 
@@ -210,80 +265,36 @@ void Generate_Random_Ortho_Grid(RANDOM_NUMBERS<T>& rng,T mu,T s,T m,T kg)
     cl.unit_s=s;
     cl.unit_kg=kg;
     LAYOUT_BUILDER_FEM<T> builder(cl);
-    builder.Set_Target_Length(0.25);
+    builder.Set_Target_Length(w/2);
     builder.Set_Depth(w,1);
-    auto cs=builder.Cross_Section(4,w);
+    auto cs=builder.Cross_Section(2,w);
 
-    struct VERT_DATA
+    HASHTABLE<TV,CROSS_DATA> crs;
+    T maxy=0;
+    for(int i=0;i<ne;i++)
     {
-        VERT_ID vid;
-        VECTOR<PAIR<VERT_ID,CID>,4> c; // CID*4: +x,+y,-x,-y
-        VERT_DATA()
-        {
-            vid=VERT_ID(-1);
-            for(int i=0;i<4;i++) c(i)={VERT_ID(-1),CID(-1)};
-        }
-    };
-    HASHTABLE<TV_INT,VERT_DATA> crs;
+        const auto& e=edges[i];
+        maxy=max(maxy,e(0).y,e(1).y);
+        auto pr0=crs.Insert(e(0),{});
+        if(pr0.y) pr0.x->vid=builder.Vertex({e(0).x*dx,e(0).y*dx});
+        auto pr1=crs.Insert(e(1),{});
+        if(pr1.y) pr1.x->vid=builder.Vertex({e(1).x*dx,e(1).y*dx});
 
-    HASHTABLE<VECTOR<TV_INT,2> > edges;
-    T p_keep=0.5;
-    for(int i=0;i<n;i++)
-        for(int j=0;j<n;j++)
-            for(int a=0;a<2;a++)
-                if(rng.Get_Number()<p_keep)
-                {
-                    TV_INT v0(i,j),v1(i,j);
-                    v1(a)+=1;
-                    auto pr0=crs.Insert(v0,{});
-                    if(pr0.y) pr0.x->vid=builder.Vertex({v0.x*dx,v0.y*dx});
-                    auto pr1=crs.Insert(v1,{});
-                    if(pr1.y) pr1.x->vid=builder.Vertex({v1.x*dx,v1.y*dx});
-                    edges.Insert({v0,v1});
-                    edges.Insert({v1,v0});
-                }
-
-    VERT_ID num_verts=builder.verts.m;
-    PHYSBAM_ASSERT(Value(num_verts)==crs.Size());
-    UNION_FIND<VERT_ID> uf(num_verts);
-    for(const auto& e:edges)
-        uf.Union(crs.Get(e(0)).vid,crs.Get(e(1)).vid);
-    HASHTABLE<VERT_ID> roots;
-    for(VERT_ID v(0);v<num_verts;v++)
-        roots.Insert(uf.Find(v));
-    int cnt=roots.Size();
-    int num_try=100000000;
-    while(cnt>1 && num_try>0)
-    {
-        int i=rng.Get_Uniform_Integer(0,n-1);
-        int j=rng.Get_Uniform_Integer(0,n-1);
-        int a=rng.Get_Uniform_Number(0,1);
-        num_try--;
-
-        TV_INT p0(i,j),p1(i,j);
-        p1(a)+=1;
-        auto* v0=crs.Get_Pointer(p0);
-        auto* v1=crs.Get_Pointer(p1);
-        if(!v0 || !v1) continue;
-        if(uf.Find(v0->vid)==uf.Find(v1->vid)) continue;
-        auto pr=edges.Insert({p0,p1});
-        PHYSBAM_ASSERT(pr);
-        edges.Insert({p1,p0});
-        uf.Union(v0->vid,v1->vid);
-        --cnt;
-    }
-
-    for(const auto& e:edges)
-    {
-        int a=-1;
+        int a=-1,b=-1;
         if(e(0).x==e(1).x)
+        {
             a=e(1).y>e(0).y?1:3;
+            b=4-a;
+        }
         else
+        {
             a=e(1).x>e(0).x?0:2;
-        auto& v0=crs.Get(e(0));
-        auto& v1=crs.Get(e(1));
-        v0.c(a).x=v1.vid;
+            b=2-a;
+        }
+        pr0.x->c(a).x=pr1.x->vid;
+        pr1.x->c(b).x=pr0.x->vid;
     }
+
     for(auto& v:crs)
     {
         ARRAY<VERT_ID> arms;
@@ -292,7 +303,8 @@ void Generate_Random_Ortho_Grid(RANDOM_NUMBERS<T>& rng,T mu,T s,T m,T kg)
         if(arms.m==0) continue;
         if(arms.m==1)
         {
-            if(rng.Get_Number()<0.5)
+            // top ports are inlets.
+            if(v.key.y==maxy)
             {
                 auto src=builder.Set_BC(cs,v.data.vid,arms(0),1);
                 for(int i=0;i<4;i++) if(v.data.c(i).x>=VERT_ID())
@@ -320,9 +332,9 @@ void Generate_Random_Ortho_Grid(RANDOM_NUMBERS<T>& rng,T mu,T s,T m,T kg)
         else PHYSBAM_FATAL_ERROR();
     }
 
-    HASHTABLE<VECTOR<VERT_ID,2> > done;
-    for(const auto& e:edges)
+    for(int i=0;i<ne;i++)
     {
+        const auto& e=edges[i];
         int a=-1,b=-1;
         if(e(0).x==e(1).x)
         {
@@ -336,14 +348,8 @@ void Generate_Random_Ortho_Grid(RANDOM_NUMBERS<T>& rng,T mu,T s,T m,T kg)
         }
         const auto& v0=crs.Get(e(0));
         const auto& v1=crs.Get(e(1));
-        auto pr=done.Insert({v0.vid,v1.vid});
-        if(pr)
-        {
-            builder.Pipe(cs,v0.c(a).y,v1.c(b).y);
-            done.Insert({v1.vid,v0.vid});
-        }
+        builder.Pipe(cs,v0.c(a).y,v1.c(b).y);
     }
-
     printf("%s\n",builder.To_String().c_str());
 }
 
