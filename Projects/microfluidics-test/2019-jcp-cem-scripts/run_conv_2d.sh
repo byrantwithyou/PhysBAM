@@ -2,13 +2,13 @@
 
 NAME=conv-2d
 
-export OPENBLAS_NUM_THREADS=6
-ARGS="../fem -q"
+export OPENBLAS_NUM_THREADS=1
+ARGS="../fem -q -threads 6"
 FULL=1 # Set to 1 for a full rebuild; 0 to skip rerunning the simulations
 
-tests=(comp-0 comp-1 comp-2 comp-3 comp-13 comp-14)
+tests=(simple grid20 rgrid0 rgrid1 voronoi-s4 voronoi-s15)
 LO=2
-HI=24
+HI=16
 ANA="-u 'u=sin(x)*y+cos(y)+x*y,v=cos(x*y)+sin(y)*x+x*x-1' -p 'p=sin(x+y+1)'"
 
 if [ "X$FULL" = "X1" ] ; then
@@ -16,7 +16,7 @@ if [ "X$FULL" = "X1" ] ; then
     mkdir -p $NAME
     for c in ${tests[@]} ; do
         for r in `seq $HI -1 $LO` ; do
-            echo $ARGS -o $NAME/$c-r$r -refine $r $ANA ../$c.txt
+            echo $ARGS -o $NAME/$c-r$r -refine $r $ANA ../$c.txt;
         done
     done | xargs -P 4 -n 1 -d '\n' bash -c > /dev/null
 fi
