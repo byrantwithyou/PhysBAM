@@ -1,17 +1,17 @@
-l 0.25
+l 0.5
 z 1 1
-c C0 4 1
-v V0 -2.5 5
-v V1 7.5 0
+c C0 2 1
+v V0 -4 8
+v V1 12 0
 v V2 0 0
-v V3 0 2.5
-v V4 0 5
-v V5 2.5 0
-v V6 2.5 2.5
-v V7 2.5 5
-v V8 5 0
-v V9 5 2.5
-v V10 5 5
+v V3 0 4
+v V4 0 8
+v V5 4 0
+v V6 4 4
+v V7 4 8
+v V8 8 0
+v V9 8 4
+v V10 8 8
 j C0 2 V2 V5 K0 V3 K1
 j C0 3 V3 V6 K2 V4 K3 V2 K4
 j C0 3 V4 V7 K5 V0 K6 V3 K7

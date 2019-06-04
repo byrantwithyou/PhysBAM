@@ -259,7 +259,7 @@ static VECTOR<VECTOR<T,2>,2> grid1[]=
     {{0,1},{0,0}},{{3.5,1},{3.5,0}},{{7,1},{7,0}}
 };
 
-void Generate_Random_Ortho_Grid(const VECTOR<VECTOR<T,2>,2>* edges,int ne,T mu,T s,T m,T kg)
+void Generate_Random_Ortho_Grid(const VECTOR<VECTOR<T,2>,2>* edges,int ne,T mu,T s,T m,T kg,const char* filename)
 {
     T w=0.004;
     T dx=0.025+w;
@@ -278,11 +278,12 @@ void Generate_Random_Ortho_Grid(const VECTOR<VECTOR<T,2>,2>* edges,int ne,T mu,T
     auto cs=builder.Cross_Section(2,w);
 
     HASHTABLE<TV,CROSS_DATA> crs;
-    T maxy=0;
+    T maxy=0,miny=1e6;
     for(int i=0;i<ne;i++)
     {
         const auto& e=edges[i];
         maxy=max(maxy,e(0).y,e(1).y);
+        miny=min(miny,e(0).y,e(1).y);
         auto pr0=crs.Insert(e(0),{});
         if(pr0.y) pr0.x->vid=builder.Vertex({e(0).x*dx,e(0).y*dx});
         auto pr1=crs.Insert(e(1),{});
@@ -311,18 +312,19 @@ void Generate_Random_Ortho_Grid(const VECTOR<VECTOR<T,2>,2>* edges,int ne,T mu,T
         if(arms.m==0) continue;
         if(arms.m==1)
         {
-            // top ports are inlets.
-            if(v.key.y==maxy)
-            {
-                auto src=builder.Set_BC(cs,v.data.vid,arms(0),1);
-                for(int i=0;i<4;i++) if(v.data.c(i).x>=VERT_ID())
-                    v.data.c(i).y=src.x;
-            }
-            else
+            if(v.key.y==miny)
             {
                 auto sink=builder.Set_BC(cs,v.data.vid,arms(0),TV());
                 for(int i=0;i<4;i++) if(v.data.c(i).x>=VERT_ID())
                     v.data.c(i).y=sink.x;
+            }
+            else
+            {
+                T flowrate=0;
+                if(v.key.y==maxy) flowrate=1;
+                auto src=builder.Set_BC(cs,v.data.vid,arms(0),flowrate);
+                for(int i=0;i<4;i++) if(v.data.c(i).x>=VERT_ID())
+                    v.data.c(i).y=src.x;
             }
         }
         else if(arms.m<4)
@@ -358,24 +360,24 @@ void Generate_Random_Ortho_Grid(const VECTOR<VECTOR<T,2>,2>* edges,int ne,T mu,T
         const auto& v1=crs.Get(e(1));
         builder.Pipe(cs,v0.c(a).y,v1.c(b).y);
     }
-    printf("%s\n",builder.To_String().c_str());
+    FILE* file=fopen(filename,"w");
+    fprintf(file,"%s\n",builder.To_String().c_str());
 }
 
-void Generate_Grid(T mu,T s,T m,T kg)
+void Generate_Grid(T mu,T s,T m,T kg,int n,const char* filename)
 {
     typedef VECTOR<T,2> TV;
     T w=1;
-    T dx=w+1.5*w;
-    int n=3;
+    T dx=w+3*w;
 
     COMPONENT_LAYOUT_FEM<T> cl;
     cl.unit_m=m;
     cl.unit_s=s;
     cl.unit_kg=kg;
     LAYOUT_BUILDER_FEM<T> builder(cl);
-    builder.Set_Target_Length(0.25);
+    builder.Set_Target_Length(0.5);
     builder.Set_Depth(w,1);
-    auto cs=builder.Cross_Section(4,w);
+    auto cs=builder.Cross_Section(2,w);
 
     using VERT_ID=LAYOUT_BUILDER_FEM<T>::VERT_ID;
     using CID=LAYOUT_BUILDER_FEM<T>::CONNECTOR_ID;
@@ -435,7 +437,8 @@ void Generate_Grid(T mu,T s,T m,T kg)
     builder.Pipe(cs,bc_src.x,verts(n-1).y(2));
     builder.Pipe(cs,verts((n-1)*n).y(0),bc_sink.x);
 
-    printf("%s\n",builder.To_String().c_str());
+    FILE* file=fopen(filename,"w");
+    fprintf(file,"%s\n",builder.To_String().c_str());
 }
 
 template<class VERT_ID,class CID,class T,class CS_ID>
@@ -472,7 +475,7 @@ std::tuple<VERT_ID,CID,VERT_ID,CID> Coil(LAYOUT_BUILDER_FEM<T>& builder,CS_ID cs
     return std::make_tuple(w[0],jt[0](0),w[11],jt[3](1));
 };
 
-void Generate_Simple(T mu,T s,T m,T kg)
+void Generate_Simple(T mu,T s,T m,T kg,const char* filename)
 {
     typedef VECTOR<T,2> TV;
     T w=1;
@@ -481,10 +484,10 @@ void Generate_Simple(T mu,T s,T m,T kg)
     cl.unit_s=s;
     cl.unit_kg=kg;
     LAYOUT_BUILDER_FEM<T> builder(cl);
-    builder.Set_Target_Length(0.25);
+    builder.Set_Target_Length(0.5);
     builder.Set_Depth(w,1);
-    auto cs=builder.Cross_Section(4,w);
-    auto cs1=builder.Cross_Section(10,w*2.5);
+    auto cs=builder.Cross_Section(2,w);
+    auto cs1=builder.Cross_Section(14,w*7);
 
     using VERT_ID=LAYOUT_BUILDER_FEM<T>::VERT_ID;
     using CID=LAYOUT_BUILDER_FEM<T>::CONNECTOR_ID;
@@ -501,40 +504,40 @@ void Generate_Simple(T mu,T s,T m,T kg)
     auto src2=builder.Set_BC(cs,v2,v3,1);
     auto j1=builder.Joint(cs,2,v1,{v0,v4});
     auto j3=builder.Joint(cs,2,v3,{v2,v4});
-    x+=2;
+    x+=3;
     VERT_ID v5=builder.Vertex(TV(x,0));
-    auto c0=Coil<VERT_ID,CID>(builder,cs,TV(x,0),4.,6.);
-    x+=4;
+    auto c0=Coil<VERT_ID,CID>(builder,cs,TV(x,0),4.5,4.5);
+    x+=4.5;
     auto j4=builder.Joint(cs,3,v4,{v1,v3,v5});
     auto j5=builder.Joint(cs,2,v5,{v4,std::get<0>(c0)});
-    auto c1=Coil<VERT_ID,CID>(builder,cs,TV(x,0),4.,6.);
-    x+=4;
+    auto c1=Coil<VERT_ID,CID>(builder,cs,TV(x,0),4.5,4.5);
+    x+=4.5;
     VERT_ID v6=builder.Vertex(TV(x,0));
-    x+=3;
+    x+=6;
     VERT_ID v7=builder.Vertex(TV(x,0));
     auto j6=builder.Joint(cs,2,v6,{std::get<2>(c1),v7});
-    auto p67=builder.Pipe(cs,cs1,v6,v7,1,1);
-    x+=3;
+    auto p67=builder.Pipe(cs,cs1,v6,v7,2,3);
+    x+=6;
     VERT_ID v8=builder.Vertex(TV(x,0));
-    auto p78=builder.Pipe(cs1,cs,v7,v8,1,1);
+    auto p78=builder.Pipe(cs1,cs,v7,v8,2,3);
     x+=1;
     VERT_ID v9=builder.Vertex(TV(x,0));
-    VERT_ID v10=builder.Vertex(TV(x,-4));
-    VERT_ID v10a=builder.Vertex(TV(x,-6));
+    VERT_ID v10=builder.Vertex(TV(x,-6));
+    VERT_ID v10a=builder.Vertex(TV(x,-8));
     auto src10a=builder.Set_BC(cs,v10a,v10,1);
     x+=1;
-    T y=-2;
+    T y=-3;
     VERT_ID v11=builder.Vertex(TV(x,y));
     auto j9=builder.Joint(cs,2,v9,{v8,v11});
     auto j10=builder.Joint(cs,2,v10,{v10a,v11});
-    x+=2;
+    x+=3;
     VERT_ID v12=builder.Vertex(TV(x,y));
     auto j11=builder.Joint(cs,3,v11,{v9,v10,v12});
-    auto c2=Coil<VERT_ID,CID>(builder,cs,TV(x,y),4.,6.);
+    auto c2=Coil<VERT_ID,CID>(builder,cs,TV(x,y),4.5,4.5);
     auto j12=builder.Joint(cs,2,v12,{v11,std::get<0>(c2)});
-    x+=4;
-    auto c3=Coil<VERT_ID,CID>(builder,cs,TV(x,y),4.,6.);
-    x+=4;
+    x+=4.5;
+    auto c3=Coil<VERT_ID,CID>(builder,cs,TV(x,y),4.5,4.5);
+    x+=4.5;
     VERT_ID v13=builder.Vertex(TV(x,y));
     x+=2;
     VERT_ID v14=builder.Vertex(TV(x,y));
@@ -561,7 +564,8 @@ void Generate_Simple(T mu,T s,T m,T kg)
     builder.Pipe(cs,std::get<3>(c3),j13(0));
     builder.Pipe(cs,j13(1),sink.x);
 
-    printf("%s\n",builder.To_String().c_str());
+    FILE* file=fopen(filename,"w");
+    fprintf(file,"%s\n",builder.To_String().c_str());
 }
 
 void Generate_Fab0(T mu,T s,T m,T kg)
@@ -662,12 +666,9 @@ struct point_traits<VECTOR<T,2> >
 }
 }
 
-void Generate_Voronoi_Pipes(RANDOM_NUMBERS<T>& rng,T mu,T s,T m,T kg)
+void Generate_Voronoi_Pipes(RANDOM_NUMBERS<T>& rng,T mu,T s,T m,T kg,int n,T radius,const char* filename)
 {
-    T w=0.1;
-    T radius=10;
-    int n=15;
-
+    T w=0.2;
     typedef VECTOR<T,2> TV;
     typedef VECTOR<int,TV::m> TV_INT;
     using VERT_ID=LAYOUT_BUILDER_FEM<T>::VERT_ID;
@@ -825,7 +826,8 @@ void Generate_Voronoi_Pipes(RANDOM_NUMBERS<T>& rng,T mu,T s,T m,T kg)
     for(const auto& ei:edge_ids)
         builder.Pipe(cs,links(ei(0))(ei(1)),links(ei(1))(ei(0)));
 
-    printf("%s\n",builder.To_String().c_str());
+    FILE* file=fopen(filename,"w");
+    fprintf(file,"%s\n",builder.To_String().c_str());
 }
 
 template<int d>
@@ -835,6 +837,7 @@ void Run(PARSE_ARGS& parse_args)
     typedef VECTOR<int,TV::m> TV_INT;
     
     std::string analytic_u,analytic_p,output_dir("output");
+    bool gen_tests=false;
     T mu=1;
     T s=1,m=1,kg=1;
     int seed=time(0);
@@ -844,11 +847,34 @@ void Run(PARSE_ARGS& parse_args)
     parse_args.Add("-s",&s,"scale","scale units of time");
     parse_args.Add("-kg",&kg,"scale","scale units of mass");
     parse_args.Add("-seed",&seed,"seed","random seed");
-    parse_args.Extra(&analytic_u,"program","analytic velocity");
-    parse_args.Extra(&analytic_p,"program","analytic pressure");
+    parse_args.Add("-gen",&gen_tests,"generate tests");
+    parse_args.Parse(true);
+    if(!gen_tests)
+    {
+        parse_args.Extra(&analytic_u,"program","analytic velocity");
+        parse_args.Extra(&analytic_p,"program","analytic pressure");
+    }
     parse_args.Parse();
     LOG::printf("seed: %P\n",seed);
     RANDOM_NUMBERS<T> rng(seed);
+    if(gen_tests)
+    {
+        Generate_Simple(mu,s,m,kg,"simple.txt");
+        Generate_Random_Ortho_Grid(grid0,sizeof(grid0)/sizeof(grid0[0]),mu,s,m,kg,"rgrid0.txt");
+        Generate_Random_Ortho_Grid(grid1,sizeof(grid1)/sizeof(grid1[0]),mu,s,m,kg,"rgrid1.txt");
+        Generate_Grid(mu,s,m,kg,20,"grid20.txt");
+        for(int i=3;i<=10;i++)
+            Generate_Grid(mu,s,m,kg,i,LOG::sprintf("grid%d.txt",i).c_str());
+        {
+            RANDOM_NUMBERS<T> rng(4);
+            Generate_Voronoi_Pipes(rng,mu,s,m,kg,15,10.0,"voronoi-s4.txt");
+        }
+        {
+            RANDOM_NUMBERS<T> rng(15);
+            Generate_Voronoi_Pipes(rng,mu,s,m,kg,15,10.0,"voronoi-s15.txt");
+        }
+        return;
+    }
 
     for(int i=0;i<10;i++)
     {
