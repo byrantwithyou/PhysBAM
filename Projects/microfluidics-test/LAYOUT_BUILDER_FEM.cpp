@@ -374,9 +374,11 @@ Joint(CS_ID cs,int n,VERT_ID o,const ARRAY<VERT_ID>& arms) -> ARRAY<CONNECTOR_ID
     auto crs=cross_sections(cs);
     TV O=verts(o);
     ARRAY<PAIR<TV,CONNECTOR_ID> > vc;
+    ARRAY<CONNECTOR_ID> r;
     for(VERT_ID p:arms)
     {
         CONNECTOR_ID c=last_cid++;
+        r.Append(c);
         vc.Append({(verts(p)-O).Normalized(),c});
     }
     TV first=vc(0).x;
@@ -419,20 +421,18 @@ Joint(CS_ID cs,int n,VERT_ID o,const ARRAY<VERT_ID>& arms) -> ARRAY<CONNECTOR_ID
     XFORM<TV> xf={Compute_Xform(vc(j).x),O};
     ARRAY<VERTEX_DATA> vd(n);
     Emit_Component_Blocks(cj.x,xf,vd);
-    ARRAY<CONNECTOR_ID> r;
     for(int i=0;i<n;i++)
     {
         int k=(j+i)%n;
         vd(i).X=O+vc(k).x*cj.y(i);
         connectors.Set(vc(k).y,vd(i));
-        r.Append(vc(i).y);
     }
     ARRAY<PAIR<TAG,int> > com={{TAG::DECL_JT,n},{TAG::CS,Value(cs)},{TAG::VERT,Value(o)}};
     commands.Append_Elements(com);
     for(int i=0;i<n;i++)
     {
         commands.Append({TAG::VERT,Value(arms(i))});
-        commands.Append({TAG::CONNECTOR,Value(vc(i).y)});
+        commands.Append({TAG::CONNECTOR,Value(r(i))});
     }
     return r;
 }
