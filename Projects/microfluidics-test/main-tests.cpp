@@ -2,10 +2,17 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Math_Tools/pow.h>
 #include <Core/Matrices/ROTATION.h>
 #include <Core/Utilities/PROCESS_UTILITIES.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
+#include <Grid_Tools/Grids/GRID.h>
+#include <Geometry/Basic_Geometry/SPHERE.h>
+#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
+#include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
+#include <Geometry/Seeding/POISSON_DISK.h>
 #include <string>
 #include "ANALYTIC_FEM.h"
 #include "CACHED_ELIMINATION_MATRIX.h"
@@ -13,6 +20,7 @@
 #include "ELIMINATION_FEM.h"
 #include "LAYOUT_BUILDER_FEM.h"
 #include "MATRIX_CONSTRUCTION_FEM.h"
+#include <boost/polygon/voronoi.hpp>
 
 using namespace PhysBAM;
 
@@ -629,6 +637,193 @@ void Generate_Fab0(T mu,T s,T m,T kg)
     builder.Pipe(cs,j9(1),j10(0));
     builder.Pipe(cs,j10(1),j11(0));
     builder.Pipe(cs,j11(1),sink12.x);
+
+    printf("%s\n",builder.To_String().c_str());
+}
+
+namespace boost {
+namespace polygon {
+template<>
+struct geometry_concept<VECTOR<T,2> >
+{
+    typedef point_concept type;
+};
+
+template<>
+struct point_traits<VECTOR<T,2> >
+{
+    typedef int coordinate_type;
+
+    static inline coordinate_type get(const VECTOR<T,2>& point,orientation_2d orient)
+    {
+        return (orient==HORIZONTAL)?point.x:point.y;
+    }
+};
+}
+}
+
+void Generate_Voronoi_Pipes(RANDOM_NUMBERS<T>& rng,T mu,T s,T m,T kg)
+{
+    T w=0.1;
+    T radius=10;
+    int n=15;
+
+    typedef VECTOR<T,2> TV;
+    typedef VECTOR<int,TV::m> TV_INT;
+    using VERT_ID=LAYOUT_BUILDER_FEM<T>::VERT_ID;
+    using CID=LAYOUT_BUILDER_FEM<T>::CONNECTOR_ID;
+
+    COMPONENT_LAYOUT_FEM<T> cl;
+    cl.unit_m=m;
+    cl.unit_s=s;
+    cl.unit_kg=kg;
+    LAYOUT_BUILDER_FEM<T> builder(cl);
+    builder.Set_Target_Length(w/2);
+    builder.Set_Depth(w,1);
+    auto cs=builder.Cross_Section(2,w);
+
+    SPHERE<TV> sphere(TV(),radius);
+    GRID<TV> grid(TV_INT()+1,RANGE<TV>(TV()-radius,TV()+radius),true);
+    VIEWER_OUTPUT<TV> vo(STREAM_TYPE(0.f),grid,"voronoi");
+    Flush_Frame<TV>("init");
+
+    ARRAY<TV> X;
+    POISSON_DISK<TV> poisson_disk(1);
+    poisson_disk.Set_Distance_By_Volume(pi*sqr(radius)/n);
+    ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> > obj(sphere);
+    poisson_disk.Sample(rng,obj,X);
+
+    for(const auto& x:X)
+        Add_Debug_Particle(x,VECTOR<T,3>(0.5,0.5,0.5));
+    Flush_Frame<TV>("samples");
+
+    int N=100;
+    for(int i=0;i<N;i++)
+    {
+        ROTATION<TV> Q=ROTATION<TV>::From_Angle(2*pi/N*i);
+        Add_Debug_Particle(Q.Rotate(TV(1,0)*radius),VECTOR<T,3>(1,0,0));
+    }
+
+    using boost::polygon::voronoi_diagram;
+    typedef boost::polygon::voronoi_vertex<T> VORONOI_VERTEX;
+    voronoi_diagram<T> vd;
+    construct_voronoi(X.begin(),X.end(),&vd);
+    for(const auto& x:X)
+        Add_Debug_Particle(x,VECTOR<T,3>(0.5,0.5,0.5));
+
+    HASHTABLE<const VORONOI_VERTEX*,VERT_ID> mapping;
+    HASHTABLE<VERT_ID> velocity_bc;
+    ARRAY<VECTOR<VERT_ID,2> > edge_ids;
+    ARRAY<VECTOR<TV,2> > edges;
+    auto append_clip=[radius,&edges,&edge_ids,&builder,&mapping,&velocity_bc]
+        (TV a,const VORONOI_VERTEX* pa,TV b,const VORONOI_VERTEX* pb)
+    {
+        T ra=a.Magnitude();
+        if(ra>radius)
+        {
+            std::swap(a,b);
+            std::swap(pa,pb);
+            ra=a.Magnitude();
+        }
+        if(ra<=radius)
+        {
+            TV n=b-a;
+            T r=n.Normalize();
+            T t=-a.Dot(n);
+            T dis=sqrt(sqr(a.Dot(n))-(a.Dot(a)-sqr(radius)));
+            if(t+dis>=0) t+=dis;
+            else t-=dis;
+
+            auto pr=mapping.Insert(pa,VERT_ID(-1));
+            if(pr.y)
+                *pr.x=builder.Vertex(a);
+            VERT_ID vb(-1);
+
+            if(t<r)
+            {
+                TV q=a+n*t;
+                vb=builder.Vertex(q);
+                if(q.x<=0)
+                    velocity_bc.Insert(vb);
+            }
+            else
+            {
+                t=r;
+                auto pr=mapping.Insert(pb,VERT_ID(-1));
+                if(pr.y)
+                    *pr.x=builder.Vertex(b);
+                vb=*pr.x;
+            }
+            edges.Append(VECTOR<TV,2>(a,a+n*t));
+            edge_ids.Append(VECTOR<VERT_ID,2>(*pr.x,vb));
+        }
+    };
+
+    for(voronoi_diagram<T>::const_edge_iterator edge=vd.edges().begin();edge!=vd.edges().end();++edge)
+    {
+        if(edge->is_finite())
+        {
+            if(edge->cell()->source_index() < edge->twin()->cell()->source_index())
+            {
+                TV a(edge->vertex0()->x(),edge->vertex0()->y());
+                TV b(edge->vertex1()->x(),edge->vertex1()->y());
+                append_clip(a,edge->vertex0(),b,edge->vertex1());
+            }
+        }
+        else if(edge->vertex0())
+        {
+            TV s(edge->vertex0()->x(),edge->vertex0()->y());
+            TV p0=X(edge->cell()->source_index()),p1=X(edge->twin()->cell()->source_index());
+            TV d=(p1-p0).Normalized().Rotate_Counterclockwise_90();
+            append_clip(s,edge->vertex0(),s+d*radius,0);
+        }
+    }
+
+    T min_l=radius*2;
+    for(int i=0;i<edges.m;i++)
+    {
+        const auto& e=edges(i);
+        Add_Debug_Object(e,VECTOR<T,3>(1,1,1));
+        Add_Debug_Text((e(0)+e(1))*0.5,LOG::sprintf("%d",i),VECTOR<T,3>(1,0,1));
+        min_l=min(min_l,(e(0)-e(1)).Magnitude());
+    }
+    LOG::printf("min length: %P\n",min_l);
+    Flush_Frame<TV>("voronoi");
+
+    ARRAY<ARRAY<CID,VERT_ID>,VERT_ID> links(builder.verts.m);
+    for(auto& l:links)
+        l.Resize(builder.verts.m,use_init,CID(-7));
+
+    for(const auto& ei:edge_ids)
+        links(ei(0))(ei(1))=links(ei(1))(ei(0))=CID(-1);
+
+    for(VERT_ID i(0);i<links.m;i++)
+    {
+        ARRAY<VERT_ID> arms;
+        for(VERT_ID j(0);j<links.m;j++)
+            if(links(i)(j)==CID(-1)) arms.Append(j);
+        PHYSBAM_ASSERT(arms.m==3 || arms.m==1);
+        if(arms.m==3)
+        {
+            auto k=builder.Joint(cs,arms.m,i,arms);
+            int l=0;
+            for(VERT_ID j(0);j<links.m;j++)
+                if(links(i)(j)==CID(-1)) links(i)(j)=k(l++);
+        }
+        else
+        {
+            CID bc(-1);
+            if(velocity_bc.Contains(i))
+                bc=builder.Set_BC(cs,i,arms(0),1).x;
+            else
+                bc=builder.Set_BC(cs,i,arms(0),TV()).x;
+
+            for(VERT_ID j(0);j<links.m;j++)
+                if(links(i)(j)==CID(-1)) links(i)(j)=bc;
+        }
+    }
+    for(const auto& ei:edge_ids)
+        builder.Pipe(cs,links(ei(0))(ei(1)),links(ei(1))(ei(0)));
 
     printf("%s\n",builder.To_String().c_str());
 }
