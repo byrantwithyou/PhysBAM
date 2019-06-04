@@ -10,6 +10,7 @@
 
 namespace PhysBAM{
 
+extern double comp_tol;
 template<class TV> struct BLOCK_MESHING_ITERATOR;
 template<class T>
 struct BLOCK_MESHING_ITERATOR<VECTOR<T,2> >
@@ -78,8 +79,8 @@ struct BLOCK_MESHING_ITERATOR<VECTOR<T,2> >
             // j+1 side failed to separate dofs.
             // When both sides separate dofs, i+1 forms a less sharp triangle.
             // When there is a tie, alternate the side choice.
-            if(j+1>=n0+n1 || (i+1<n0 && area(i,j+1,i+1)<1e-6) ||
-                (i+1<n0 && area(j,j+1,i+1)>=1e-6 && sep_i && (!sep_j || (abs(a0-a1)<1e-6 && alt==0) || a0>a1)))
+            if(j+1>=n0+n1 || (i+1<n0 && area(i,j+1,i+1)<comp_tol) ||
+                (i+1<n0 && area(j,j+1,i+1)>=comp_tol && sep_i && (!sep_j || (abs(a0-a1)<comp_tol && alt==0) || a0>a1)))
             {
                 E(i+j-n0)=IV3(i+1,i,j);
                 S(i)=IV(i+1,i);
