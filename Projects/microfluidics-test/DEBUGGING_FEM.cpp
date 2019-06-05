@@ -513,21 +513,53 @@ Highlight_Dof(BLOCK_ID b,int vep,int r,int dim) const
         });
 }
 //#####################################################################
-// Function Visualize_Domain
+// Function Visualize_Meshing
 //#####################################################################
 template<class T> void DEBUGGING_FEM<T>::
-Visualize_Domain(const std::string& name) const
+Visualize_Meshing(const std::string& name,const RANGE<TV2>& domain) const
 {
-    EPS_FILE<T> eps(name);
+    T scale=200/domain.Edge_Lengths().Max();
+    auto box=domain*scale;
+    EPS_FILE<T> eps(name,box.Thickened(1e-2));
     eps.cur_format.line_width=0.008;
     eps.cur_format.point_radius=0.008;
     eps.cur_format.line_style=1;
     eps.cur_format.fill_style=1;
 
-    auto draw_boundary_edge=[&eps](const BLOCK<T>& bl,int i)
+    for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+    {
+        const auto& bl=cl.blocks(b);
+        const auto* cb=bl.block;
+        auto Z=[=](int i){return bl.xform*cb->X(i);};
+        for(int i=0;i<cb->S.m;i++)
+        {
+            TV2 X=Z(cb->S(i).x);
+            TV2 Y=Z(cb->S(i).y);
+            if(!domain.Lazy_Inside(X) && !domain.Lazy_Inside(Y))
+                continue;
+            eps.Draw_Object(domain.Clamp(X)*scale,domain.Clamp(Y)*scale);
+        }
+    }
+}
+//#####################################################################
+// Function Visualize_Domain
+//#####################################################################
+template<class T> void DEBUGGING_FEM<T>::
+Visualize_Domain(const std::string& name,const RANGE<TV2>& anno) const
+{
+    auto box=cl.Compute_Bounding_Box();
+    T scale=200/box.Edge_Lengths().Max();
+    box*=scale;
+    EPS_FILE<T> eps(name,box.Thickened(1e-2));
+    eps.cur_format.line_width=0.5;
+    eps.cur_format.point_radius=0.5;
+    eps.cur_format.line_style=1;
+    eps.cur_format.fill_style=1;
+
+    auto draw_boundary_edge=[&eps,scale](const BLOCK<T>& bl,int i)
     {
         const auto& e=bl.block->S(i);
-        eps.Draw_Object(bl.xform*bl.block->X(e(0)),bl.xform*bl.block->X(e(1)));
+        eps.Draw_Object(bl.xform*bl.block->X(e(0))*scale,bl.xform*bl.block->X(e(1))*scale);
     };
 
     for(BLOCK_ID b(0);b<cl.blocks.m;b++)
@@ -550,6 +582,16 @@ Visualize_Domain(const std::string& name) const
         const auto& bl=cl.blocks(bc.b);
         for(int i:bc.bc_e)
             draw_boundary_edge(bl,i);
+    }
+
+    if(!anno.Empty())
+    {
+        auto rect=anno*scale;
+        eps.cur_format.line_color=TV3(1,0,0);
+        eps.Draw_Object(rect.min_corner,TV2(rect.max_corner.x,rect.min_corner.y));
+        eps.Draw_Object(rect.min_corner,TV2(rect.min_corner.x,rect.max_corner.y));
+        eps.Draw_Object(rect.max_corner,TV2(rect.max_corner.x,rect.min_corner.y));
+        eps.Draw_Object(rect.max_corner,TV2(rect.min_corner.x,rect.max_corner.y));
     }
 }
 template class DEBUGGING_FEM<double>;

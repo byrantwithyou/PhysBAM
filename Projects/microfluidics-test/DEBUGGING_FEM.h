@@ -35,7 +35,8 @@ struct DEBUGGING_FEM
     void Visualize_Tetrahedron_Dofs(const MATRIX_CONSTRUCTION_FEM<TV2>& mc) const {}
     template<int d>
     void Highlight_Dof(BLOCK_ID b,int vep,int r,int dim) const;
-    void Visualize_Domain(const std::string& name) const;
+    void Visualize_Domain(const std::string& name,const RANGE<TV2>& anno) const;
+    void Visualize_Meshing(const std::string& name,const RANGE<TV2>& domain) const;
 };
 
 }

@@ -49,7 +49,9 @@ void Run(PARSE_ARGS& parse_args)
     timer("start");
 
     int threads=1;
-    bool quiet=false,use_krylov=false,print_system=false,pinv=false,stats_only=false,force_blk_ref=false,illus_only=false;
+    bool quiet=false,use_krylov=false,print_system=false,pinv=false,stats_only=false,force_blk_ref=false,illus_domain=false;
+    bool illus_meshing=false;
+    TV2 min_corner,max_corner;
     std::string pipe_file,output_dir="output";
     std::string analytic_u,analytic_p;
     T s=1,m=1,kg=1;
@@ -61,7 +63,10 @@ void Run(PARSE_ARGS& parse_args)
     parse_args.Add("-pinv",&pinv,"perform pseudo inverse");
     parse_args.Add("-force_blk_ref",&force_blk_ref,"force every block a reference block");
     parse_args.Add("-stats",&stats_only,"show statistics");
-    parse_args.Add("-illus",&illus_only,"dump illustrations");
+    parse_args.Add("-illus",&illus_domain,"dump domain");
+    parse_args.Add("-illus_meshing",&illus_meshing,"dump meshing");
+    parse_args.Add("-min_corner",&min_corner,"point","min corner");
+    parse_args.Add("-max_corner",&max_corner,"point","max corner");
     parse_args.Add("-k",&use_krylov,"solve with Krylov method");
     parse_args.Add("-d",&print_system,"dump the system to be solved");
     parse_args.Add("-m",&m,"scale","scale units of length");
@@ -195,11 +200,16 @@ void Run(PARSE_ARGS& parse_args)
     mc.Print_Statistics();
     LOG::printf("canonical-j2: %d\ncanonical-j3-avg: %d\ncanonical-j3-small: %d\ncanonical-j4: %d\n",
         builder.comp_joint.num_j2,builder.comp_joint.num_j3_avg,builder.comp_joint.num_j3_small,builder.comp_joint.num_j4);
-    if(illus_only)
+    if(illus_domain)
+        debug.Visualize_Domain("domain.eps",RANGE<TV2>::Empty_Box());
+    if(illus_meshing)
     {
-        debug.Visualize_Domain("domain.eps");
+        RANGE<TV2> range(min_corner,max_corner);
+        debug.Visualize_Domain("domain-anno.eps",range);
+        debug.Visualize_Meshing("meshing.eps",range);
     }
-    if(stats_only || illus_only) return;
+
+    if(stats_only || illus_domain || illus_meshing) return;
 
     mc.Compute_Matrix_Blocks();
     ANALYTIC_FEM<TV>* an=0;
