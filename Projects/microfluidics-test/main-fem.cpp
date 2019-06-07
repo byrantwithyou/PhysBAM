@@ -283,7 +283,7 @@ void Run(PARSE_ARGS& parse_args)
     }
 
     for(int i=1;i<tm.m;i++)
-        printf("%20s %5.0f ms\n",tm(i).y,
+        LOG::printf("%20s %5.0f ms\n",tm(i).y,
         std::chrono::duration_cast<std::chrono::duration<double> >(tm(i).x-tm(i-1).x).count()*1000);
 
     if(quiet)
