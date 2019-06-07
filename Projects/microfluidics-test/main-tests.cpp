@@ -487,7 +487,7 @@ void Generate_Simple(T mu,T s,T m,T kg,const char* filename)
     builder.Set_Target_Length(0.5);
     builder.Set_Depth(w,1);
     auto cs=builder.Cross_Section(2,w);
-    auto cs1=builder.Cross_Section(14,w*7);
+    auto cs1=builder.Cross_Section(6,w*7);
 
     using VERT_ID=LAYOUT_BUILDER_FEM<T>::VERT_ID;
     using CID=LAYOUT_BUILDER_FEM<T>::CONNECTOR_ID;
