@@ -725,9 +725,9 @@ Fill_Num_Dofs(DOF_PAIRS& dp,BLOCK_ID d,BLOCK_ID s)
 // Function Regular_Connection_Pair
 //#####################################################################
 template<class T> auto COMPONENT_LAYOUT_FEM<T>::
-Regular_Connection_Pair(BLOCK_ID b,CON_ID con_id,bool is_dest) -> const DOF_PAIRS&
+Regular_Connection_Pair(BLOCK_ID b,CON_ID con_id,bool is_dest) const -> const DOF_PAIRS&
 {
-    auto& bl=blocks(b);
+    const auto& bl=blocks(b);
     BLOCK_ID b1=bl.connections(con_id).id;
     CON_ID con_id1=bl.connections(con_id).con_id;
 
