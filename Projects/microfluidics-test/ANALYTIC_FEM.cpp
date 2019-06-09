@@ -26,12 +26,14 @@ template<class TV> ANALYTIC_FEM<TV>::
     delete analytic_pressure;
 }
 //#####################################################################
-// Function Check_Analytic_Solution
+// Function Check_Solution
 //#####################################################################
-template<class TV> bool ANALYTIC_FEM<TV>::
-Check_Analytic_Solution(bool dump) const
+template<class T,int d>
+bool Check_Solution(const MATRIX_CONSTRUCTION_FEM<VECTOR<T,d> >& mc,
+    std::function<VECTOR<T,d>(const VECTOR<T,d>&)> fv,
+    std::function<T(const VECTOR<T,d>&)> fp,bool dump)
 {
-    if(!analytic_velocity || !analytic_pressure) return false;
+    typedef VECTOR<T,d> TV;
     T m=mc.cl.unit_m,s=mc.cl.unit_s,kg=mc.cl.unit_kg;
     T unit_p=kg*pow<2-TV::m>(m)/(s*s);
     T max_u=0,max_p=0;
@@ -44,10 +46,10 @@ Check_Analytic_Solution(bool dump) const
         const auto& W=mc.rhs_block_list(b);
         DOF_LAYOUT<TV> dl(mc.cl,mc.cl.reference_block_data(bl.ref_id),true);
         Visit_Compressed_Dofs(dl,rd,
-            [this,&bl,&W,m,s,&max_u,&l2_u,&num_u,dump](int v,const TV& Y)
+            [&bl,&W,m,s,&max_u,&l2_u,&num_u,dump,fv](int v,const TV& Y)
             {
                 TV X=xform(bl.xform,Y);
-                TV U=analytic_velocity->v(X/m,0)*m/s;
+                TV U=fv(X/m)*m/s;
                 TV V=W.Get_v(v);
                 max_u=std::max(max_u,(U-V).Max_Abs());
                 l2_u+=(U-V).Magnitude_Squared();
@@ -58,10 +60,10 @@ Check_Analytic_Solution(bool dump) const
                     Debug_Particle_Set_Attribute<TV>("V",U-V);
                 }
             },
-            [this,&bl,&W,m,s,&max_u,&l2_u,&num_u,dump](int e,const TV& Y)
+            [&bl,&W,m,s,&max_u,&l2_u,&num_u,dump,fv](int e,const TV& Y)
             {
                 TV X=xform(bl.xform,Y);
-                TV U=analytic_velocity->v(X/m,0)*m/s;
+                TV U=fv(X/m)*m/s;
                 TV V=W.Get_e(e);
                 max_u=std::max(max_u,(U-V).Max_Abs());
                 l2_u+=(U-V).Magnitude_Squared();
@@ -72,10 +74,10 @@ Check_Analytic_Solution(bool dump) const
                     Debug_Particle_Set_Attribute<TV>("V",U-V);
                 }
             },
-            [this,&bl,&W,m,unit_p,s,&max_p,&l2_p,&num_p,dump](int i,const TV& Y)
+            [&bl,&W,m,unit_p,s,&max_p,&l2_p,&num_p,dump,fp](int i,const TV& Y)
             {
                 TV X=xform(bl.xform,Y);
-                T p=analytic_pressure->f(X/m,0)*unit_p;
+                T p=fp(X/m)*unit_p;
                 T q=W.Get_p(i);
                 max_p=std::max(max_p,std::abs(p-q));
                 l2_p+=sqr(p-q);
@@ -93,6 +95,17 @@ Check_Analytic_Solution(bool dump) const
     LOG::printf("u l-inf %P   u l-2 %P   p l-inf %P   p l-2 %P\n",max_u,l2_u,max_p,l2_p);
     if(dump) Flush_Frame<TV>("error");
     return max(max_u,l2_u,max_p,l2_p)<1e-10;
+}
+//#####################################################################
+// Function Check_Analytic_Solution
+//#####################################################################
+template<class TV> bool ANALYTIC_FEM<TV>::
+Check_Analytic_Solution(bool dump) const
+{
+    if(!analytic_velocity || !analytic_pressure) return false;
+    auto fv=[this](const TV& X){return analytic_velocity->v(X,0);};
+    auto fp=[this](const TV& X){return analytic_pressure->f(X,0);};
+    return Check_Solution<T,TV::m>(mc,fv,fp,dump);
 }
 //#####################################################################
 // Function Compute_RHS

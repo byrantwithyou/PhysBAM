@@ -39,5 +39,10 @@ struct ANALYTIC_FEM
         analytic_pressure=new ANALYTIC_SCALAR_PROGRAM<TV>(s);
     }
 };
+
+template<class T,int d>
+bool Check_Solution(const MATRIX_CONSTRUCTION_FEM<VECTOR<T,d> >& mc,
+    std::function<VECTOR<T,d>(const VECTOR<T,d>&)> fv,
+    std::function<T(const VECTOR<T,d>&)> fp,bool dump);
 }
 #endif

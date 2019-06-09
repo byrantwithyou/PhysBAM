@@ -55,10 +55,12 @@ void Run(PARSE_ARGS& parse_args)
     TV2 min_corner,max_corner;
     std::string pipe_file,output_dir="output";
     std::string analytic_u,analytic_p;
+    std::string sol_file;
     T s=1,m=1,kg=1;
     int hl_dof=-1;
     int refine=1;
     parse_args.Add("-o",&output_dir,"dir","output dir");
+    parse_args.Add("-check_sol",&sol_file,"file","compare with saved solution");
     parse_args.Add("-mu",&mu,"mu","viscosity");
     parse_args.Add("-q",&quiet,"disable diagnostics; useful for timing");
     parse_args.Add("-dump_sol",&dump_solution,"dump solution");
@@ -275,6 +277,16 @@ void Run(PARSE_ARGS& parse_args)
 
     mc.Transform_Solution(cem,false,false);
     if(an) an->Check_Analytic_Solution(!quiet);
+    if(!sol_file.empty())
+    {
+        SOLUTION_FEM<TV> sol;
+        Read_From_File(sol_file,sol);
+        sol.Prepare_Hierarchy();
+        auto fv=[&sol](const TV& X){return sol.Velocity(X);};
+        auto fp=[&sol](const TV& X){return sol.Pressure(X);};
+        Check_Solution<T,TV::m>(mc,fv,fp,!quiet);
+    }
+
     if(!quiet)
     {
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
