@@ -40,6 +40,16 @@ struct BLOCK_VECTOR
         for(int i=0;i<n.e;i++) Set_e(i,M*Get_e(i));
         for(int i=0;i<n.p;i++) Set_p(i,scale_p*Get_p(i));
     }
+
+    template<class RW> void Read(std::istream& input)
+    {
+        Read_Binary<RW>(input,n,V);
+    }
+
+    template<class RW> void Write(std::ostream& output) const
+    {
+        Write_Binary<RW>(output,n,V);
+    }
 };
 
 }

@@ -25,6 +25,16 @@ struct DOF_COUNTS
 {
     int v=-7,e=-7,p=-7;
     bool operator==(const DOF_COUNTS& n) const {return v==n.v && e==n.e && p==n.p;}
+
+    template<class RW> void Read(std::istream& input)
+    {
+        Read_Binary<RW>(input,v,e,p);
+    }
+
+    template<class RW> void Write(std::ostream& output) const
+    {
+        Write_Binary<RW>(output,v,e,p);
+    }
 };
 
 inline std::ostream& operator<<(std::ostream& output,const DOF_COUNTS& n)

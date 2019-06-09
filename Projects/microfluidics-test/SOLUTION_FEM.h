@@ -5,6 +5,9 @@
 #ifndef __SOLUTION_FEM__
 #define __SOLUTION_FEM__
 
+#include <Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
+#include <Geometry/Basic_Geometry/TETRAHEDRON.h>
+#include <Geometry/Basic_Geometry/TRIANGLE_2D.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
@@ -20,6 +23,8 @@
 
 namespace PhysBAM{
 
+extern double comp_tol;
+
 template<class TV> struct HIERARCHY_POLICY;
 template<class T>
 struct HIERARCHY_POLICY<VECTOR<T,2> >
@@ -32,12 +37,50 @@ struct HIERARCHY_POLICY<VECTOR<T,3> >
     typedef TETRAHEDRON_HIERARCHY<T> TREE;
 };
 
+template<class T>
+VECTOR<T,6> Velocity_Weights(const VECTOR<T,3>& x)
+{
+    T u=x(0),v=x(1);
+    return {2*sqr(u)+4*u*v+2*sqr(v)-3*u-3*v+1,2*sqr(u)-u,2*sqr(v)-v,4*u*v,-4*u*v-4*sqr(v)+4*v,-4*sqr(u)-4*u*v+4*u};
+}
+
+template<class T>
+VECTOR<T,3> Pressure_Weights(const VECTOR<T,3>& x)
+{
+    T u=x(0),v=x(1);
+    return {1-u-v,u,v};
+}
+
+template<class T>
+VECTOR<T,10> Velocity_Weights(const VECTOR<T,4>& x)
+{
+    T u=x(0),v=x(1),w=x(2);
+    return {2*sqr(u)+4*u*v+4*u*w+2*sqr(v)+4*v*w+2*sqr(w)-3*u-3*v-3*w+1,
+        2*sqr(u)-u,
+        2*sqr(v)-v,
+        2*sqr(w)-w,
+        -4*sqr(u)-4*u*v-4*u*w+4*u,
+        -4*u*v-4*sqr(v)-4*v*w+4*v,
+        -4*u*w-4*v*w-4*sqr(w)+4*w,
+        4*u*v,
+        4*w*u,
+        4*v*w};
+}
+
+template<class T>
+VECTOR<T,4> Pressure_Weights(const VECTOR<T,4>& x)
+{
+    T u=x(0),v=x(1),w=x(2);
+    return {1-u-v-w,u,v,w};
+}
+
 template<class TV>
 struct SOLUTION_FEM
 {
     typedef typename TV::SCALAR T;
     typedef typename MESH_POLICY<TV::m>::MESH MESH;
     typedef typename HIERARCHY_POLICY<TV>::TREE TREE;
+    typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX SIMPLEX;
 
     GEOMETRY_PARTICLES<TV> particles;
     MESH mesh;
@@ -45,6 +88,7 @@ struct SOLUTION_FEM
     ARRAY<int,BLOCK_ID> first_v,first_e,last_elem;
     ARRAY<PAIR<BLOCK_ID,int> > dof_v,dof_e,dof_p;
     HASHTABLE<PAIR<BLOCK_ID,int>,TV> bc_v,bc_e;
+    ARRAY<BLOCK_VECTOR<TV>,BLOCK_ID> sol_block_list;
     TREE* tree=0;
 
     SOLUTION_FEM()
@@ -143,6 +187,7 @@ struct SOLUTION_FEM
 
     void Build(const MATRIX_CONSTRUCTION_FEM<TV>& mc)
     {
+        ARRAY<VECTOR<int,TV::m+1> > elements;
         for(BLOCK_ID b(0);b<mc.cl.blocks.m;b++)
         {
             const auto& bl=mc.cl.blocks(b);
@@ -150,42 +195,118 @@ struct SOLUTION_FEM
             DOF_LAYOUT<TV> dl(mc.cl,rb,false);
             first_v.Append(particles.Add_Elements(dl.counts.p));
             first_e.Append(element_edges.m*(TV::m-1)*3);
-            Visit_Elements(dl,[this,&bl](const VISIT_ELEMENT_DATA<TV>& ve)
+            Visit_Elements(dl,[this,&bl,&elements](const VISIT_ELEMENT_DATA<TV>& ve)
             {
                 for(int i=0;i<ve.X.m;i++)
                     particles.X(first_v.Last()+ve.v(i))=xform(bl.xform,ve.X(i));
-                mesh.elements.Append(ve.v+first_v.Last());
+                elements.Append(ve.v+first_v.Last());
                 element_edges.Append(ve.e+first_e.Last());
             });
-            last_elem.Append(mesh.elements.m);
+            last_elem.Append(elements.m);
         }
+        mesh.Initialize_Mesh(particles.number,elements);
 
         Fill_Global_Dof_Mapping(mc.cl);
         Fill_Velocity_BC(mc.cl);
+        sol_block_list=mc.rhs_block_list;
+    }
+
+    void Prepare_Hierarchy()
+    {
+        tree=new TREE(mesh,particles);
     }
 
     TV Velocity(const TV& X) const
     {
-        if(!tree)
-            tree=new TREE(mesh,particles);
+        auto getv=[this](int elem,int v)
+        {
+            const auto& dof=dof_v(v);
+            if(dof.x<BLOCK_ID())
+            {
+                BLOCK_ID b=last_elem.Binary_Search(elem);
+                const auto* bc=bc_v.Get_Pointer({b,v});
+                if(bc) return *bc;
+                else return TV();
+            }
+            else
+                return sol_block_list(dof.x).Get_v(dof.y);
+        };
+        auto gete=[this](int elem,int e)
+        {
+            const auto& dof=dof_e(e);
+            if(dof.x<BLOCK_ID())
+            {
+                BLOCK_ID b=last_elem.Binary_Search(elem);
+                const auto* bc=bc_e.Get_Pointer({b,e});
+                if(bc) return *bc;
+                else return TV();
+            }
+            else
+                return sol_block_list(dof.x).Get_e(dof.y);
+        };
 
-        return TV();
+        ARRAY<int> hits;
+        tree->Intersection_List(X,hits);
+        for(int elem:hits)
+        {
+            auto simplex=SIMPLEX(particles.X.Subset(mesh.elements(elem)));
+            VECTOR<T,TV::m+1> w=simplex.Barycentric_Coordinates(X);
+            if(w.Min()>-comp_tol)
+            {
+                auto N=Velocity_Weights(w);
+                VECTOR<TV,N.m> V;
+                for(int i=0;i<mesh.elements(elem).m;i++)
+                    V(i)=getv(elem,mesh.elements(elem)(i));
+                for(int i=0;i<element_edges(elem).m;i++)
+                    V(i+mesh.elements(elem).m)=gete(elem,element_edges(elem)(i));
+                return V.Weighted_Sum(N);
+            }
+        }
+        PHYSBAM_FATAL_ERROR();
     }
 
     T Pressure(const TV& X) const
     {
-        if(!tree)
-            tree=new TREE(mesh,particles);
-
-        return 0;
+        auto get=[this](int elem,int v)
+        {
+            const auto& dof=dof_p(v);
+            PHYSBAM_ASSERT(dof.x>=BLOCK_ID());
+            return sol_block_list(dof.x).Get_p(dof.y);
+        };
+        ARRAY<int> hits;
+        tree->Intersection_List(X,hits);
+        for(int elem:hits)
+        {
+            auto simplex=SIMPLEX(particles.X.Subset(mesh.elements(elem)));
+            VECTOR<T,TV::m+1> w=simplex.Barycentric_Coordinates(X);
+            if(w.Min()>-comp_tol)
+            {
+                auto N=Pressure_Weights(w);
+                VECTOR<T,N.m> P;
+                for(int i=0;i<mesh.elements(elem).m;i++)
+                    P(i)=get(elem,mesh.elements(elem)(i));
+                return P.Weighted_Sum(N);
+            }
+        }
+        PHYSBAM_FATAL_ERROR();
     }
 
-    void Read(TYPED_ISTREAM input)
+    template<class RW> void Read(std::istream& input)
     {
+        Read_Binary<RW>(input,particles,mesh,element_edges);
+        Read_Binary<RW>(input,first_v,first_e,last_elem);
+        Read_Binary<RW>(input,dof_v,dof_e,dof_p);
+        Read_Binary<RW>(input,bc_v,bc_e);
+        Read_Binary<RW>(input,sol_block_list);
     }
 
-    void Write(TYPED_OSTREAM output) const
+    template<class RW> void Write(std::ostream& output) const
     {
+        Write_Binary<RW>(output,particles,mesh,element_edges);
+        Write_Binary<RW>(output,first_v,first_e,last_elem);
+        Write_Binary<RW>(output,dof_v,dof_e,dof_p);
+        Write_Binary<RW>(output,bc_v,bc_e);
+        Write_Binary<RW>(output,sol_block_list);
     }
 };
 }

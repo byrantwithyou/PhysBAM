@@ -20,6 +20,7 @@
 #include "ELIMINATION_FEM.h"
 #include "LAYOUT_BUILDER_FEM.h"
 #include "MATRIX_CONSTRUCTION_FEM.h"
+#include "SOLUTION_FEM.h"
 #include <chrono>
 
 
@@ -50,7 +51,7 @@ void Run(PARSE_ARGS& parse_args)
 
     int threads=1;
     bool quiet=false,use_krylov=false,print_system=false,pinv=false,stats_only=false,force_blk_ref=false,illus_domain=false;
-    bool illus_meshing=false;
+    bool illus_meshing=false,dump_solution=false;
     TV2 min_corner,max_corner;
     std::string pipe_file,output_dir="output";
     std::string analytic_u,analytic_p;
@@ -60,6 +61,7 @@ void Run(PARSE_ARGS& parse_args)
     parse_args.Add("-o",&output_dir,"dir","output dir");
     parse_args.Add("-mu",&mu,"mu","viscosity");
     parse_args.Add("-q",&quiet,"disable diagnostics; useful for timing");
+    parse_args.Add("-dump_sol",&dump_solution,"dump solution");
     parse_args.Add("-pinv",&pinv,"perform pseudo inverse");
     parse_args.Add("-force_blk_ref",&force_blk_ref,"force every block a reference block");
     parse_args.Add("-stats",&stats_only,"show statistics");
@@ -291,6 +293,13 @@ void Run(PARSE_ARGS& parse_args)
         Create_Directory(output_dir);
         Create_Directory(output_dir+"/common");
         LOG::Instance()->Copy_Log_To_File(output_dir+"/common/log.txt",false);
+    }
+
+    if(dump_solution)
+    {
+        SOLUTION_FEM<TV> solution;
+        solution.Build(mc);
+        Write_To_File(STREAM_TYPE((double)0),output_dir+"/sol",solution);
     }
 }
 
