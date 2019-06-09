@@ -40,21 +40,21 @@ struct HIERARCHY_POLICY<VECTOR<T,3> >
 template<class T>
 VECTOR<T,6> Velocity_Weights(const VECTOR<T,3>& x)
 {
-    T u=x(0),v=x(1);
+    T u=x(1),v=x(2);
     return {2*sqr(u)+4*u*v+2*sqr(v)-3*u-3*v+1,2*sqr(u)-u,2*sqr(v)-v,4*u*v,-4*u*v-4*sqr(v)+4*v,-4*sqr(u)-4*u*v+4*u};
 }
 
 template<class T>
 VECTOR<T,3> Pressure_Weights(const VECTOR<T,3>& x)
 {
-    T u=x(0),v=x(1);
+    T u=x(1),v=x(2);
     return {1-u-v,u,v};
 }
 
 template<class T>
 VECTOR<T,10> Velocity_Weights(const VECTOR<T,4>& x)
 {
-    T u=x(0),v=x(1),w=x(2);
+    T u=x(1),v=x(2),w=x(3);
     return {2*sqr(u)+4*u*v+4*u*w+2*sqr(v)+4*v*w+2*sqr(w)-3*u-3*v-3*w+1,
         2*sqr(u)-u,
         2*sqr(v)-v,
@@ -70,7 +70,7 @@ VECTOR<T,10> Velocity_Weights(const VECTOR<T,4>& x)
 template<class T>
 VECTOR<T,4> Pressure_Weights(const VECTOR<T,4>& x)
 {
-    T u=x(0),v=x(1),w=x(2);
+    T u=x(1),v=x(2),w=x(3);
     return {1-u-v-w,u,v,w};
 }
 
