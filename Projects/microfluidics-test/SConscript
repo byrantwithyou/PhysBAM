@@ -27,3 +27,11 @@ Automatic_Program(env,"tests",["main-tests.cpp","CACHED_ELIMINATION_MATRIX.cpp",
                                "ANALYTIC_FEM.cpp","DEBUGGING_FEM.cpp",
                                "ELIMINATION_FEM.cpp","MATRIX_CONSTRUCTION_FEM.cpp",
                                "CANONICAL_BLOCK.cpp"])
+Automatic_Program(env,"sol_viewer",["main-viewer.cpp","CACHED_ELIMINATION_MATRIX.cpp",
+                             "FREQUENCY_TRACKER.cpp",
+                             "JOB_SCHEDULER.cpp","COMPONENT_LAYOUT_FEM.cpp","LAYOUT_BUILDER_FEM.cpp",
+                             "COMPONENT_PIPE.cpp","COMPONENT_CHANGE.cpp",
+                             "COMPONENT_BC.cpp","COMPONENT_JOINT.cpp",
+                             "ANALYTIC_FEM.cpp","DEBUGGING_FEM.cpp",
+                             "ELIMINATION_FEM.cpp","MATRIX_CONSTRUCTION_FEM.cpp",
+                             "CANONICAL_BLOCK.cpp"])
