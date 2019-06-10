@@ -43,7 +43,9 @@ void Run(PARSE_ARGS& parse_args)
     typedef VECTOR<int,3> IV3;
 
     std::string output_dir="sol_out",sol_file;
+    TV X;
     parse_args.Add("-o",&output_dir,"dir","output dir");
+    parse_args.Add("-x",&X,"position","interpolate solution");
     parse_args.Extra(&sol_file,"file","solution file");
     parse_args.Parse();
 
@@ -72,24 +74,13 @@ void Run(PARSE_ARGS& parse_args)
     Flush_Frame<TV>("init");
 
     dump_mesh();
-    for(const auto& t:sol.mesh.elements)
-    {
-        TV X=sol.particles.X.Subset(t).Sum()/t.m;
-        TV vel=sol.Velocity(X);
-        Add_Debug_Particle(X,VECTOR<T,3>(1,0,0));
-        Debug_Particle_Set_Attribute<TV>("V",vel);
-    }
-    Flush_Frame<TV>("velocity");
-
-    dump_mesh();
-    for(const auto& t:sol.mesh.elements)
-    {
-        TV X=sol.particles.X.Subset(t).Sum()/t.m;
-        T pres=sol.Pressure(X);
-        Add_Debug_Particle(X,VECTOR<T,3>(0,1,0));
-        Debug_Particle_Set_Attribute<TV>("display_size",pres);
-    }
-    Flush_Frame<TV>("velocity");
+    TV vel=sol.Velocity(X);
+    T pres=sol.Pressure(X);
+    LOG::printf("solution at %P: %P %P\n",X,vel,pres);
+    Add_Debug_Particle(X,VECTOR<T,3>(1,0,0));
+    Debug_Particle_Set_Attribute<TV>("V",vel);
+    Debug_Particle_Set_Attribute<TV>("display_size",pres);
+    Flush_Frame<TV>("solution");
 }
 
 int main(int argc, char* argv[])
