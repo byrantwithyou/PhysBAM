@@ -184,6 +184,13 @@ Compute_RHS()
         w.Transform(To_Dim<TV::m>(bl.xform.M),1);
         mc.Apply_To_RHS(bc.b,w);
     }
+
+    for(BLOCK_ID b(0);b<mc.cl.blocks.m;b++)
+    {
+        const auto& rb=mc.cl.reference_block_data(mc.cl.blocks(b).ref_id);
+        DOF_LAYOUT<TV> dl(mc.cl,rb,true);
+        mc.rhs_block_list(b).n=dl.counts;
+    }
 }
 //#####################################################################
 // Function Traction
