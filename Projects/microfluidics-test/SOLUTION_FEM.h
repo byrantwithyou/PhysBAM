@@ -209,6 +209,12 @@ struct SOLUTION_FEM
         Fill_Global_Dof_Mapping(mc.cl);
         Fill_Velocity_BC(mc.cl);
         sol_block_list=mc.rhs_block_list;
+        for(BLOCK_ID b(0);b<mc.cl.blocks.m;b++)
+        {
+            const auto& rb=mc.cl.reference_block_data(mc.cl.blocks(b).ref_id);
+            DOF_LAYOUT<TV> dl(mc.cl,rb,true);
+            sol_block_list(b).n=dl.counts;
+        }
     }
 
     void Prepare_Hierarchy()
