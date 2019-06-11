@@ -27,7 +27,7 @@ for c in ${tests[@]} ; do
 EOF
     for r in `seq $LO 1 $HI` ; do
         grep 'l-2' $NAME/$c-r$r/common/log.txt |\
-            sed "s/.*f \([^ ]*\).*2 \([^ ]*\).*f \([^ ]*\).*2 \([^<]*\).*/$r \1 \2 \3 \4/g" >> $NAME/$c.txt
+            sed "s/.*l-inf \([^ ]*\).*l-2 \([^ ]*\).*l-inf \([^ ]*\).*l-2 \([^<]*\).*/$r \1 \2 \3 \4/g" >> $NAME/$c.txt
     done
 
     for i in 2 3 4 5 ; do
