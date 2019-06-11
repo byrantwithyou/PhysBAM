@@ -82,6 +82,7 @@ struct SOLUTION_FEM
     typedef typename HIERARCHY_POLICY<TV>::TREE TREE;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX SIMPLEX;
 
+    T intersection_tol=0;
     GEOMETRY_PARTICLES<TV> particles;
     MESH mesh;
     ARRAY<VECTOR<int,(TV::m-1)*3> > element_edges;
@@ -187,6 +188,7 @@ struct SOLUTION_FEM
 
     void Build(const MATRIX_CONSTRUCTION_FEM<TV>& mc)
     {
+        intersection_tol=mc.cl.target_length/10;
         ARRAY<VECTOR<int,TV::m+1> > elements;
         for(BLOCK_ID b(0);b<mc.cl.blocks.m;b++)
         {
@@ -246,7 +248,7 @@ struct SOLUTION_FEM
         };
 
         ARRAY<int> hits;
-        tree->Intersection_List(X,hits);
+        tree->Intersection_List(X,hits,intersection_tol);
         for(int elem:hits)
         {
             auto simplex=SIMPLEX(particles.X.Subset(mesh.elements(elem)));
@@ -274,7 +276,7 @@ struct SOLUTION_FEM
             return sol_block_list(dof.x).Get_p(dof.y);
         };
         ARRAY<int> hits;
-        tree->Intersection_List(X,hits);
+        tree->Intersection_List(X,hits,intersection_tol);
         for(int elem:hits)
         {
             auto simplex=SIMPLEX(particles.X.Subset(mesh.elements(elem)));
@@ -293,6 +295,7 @@ struct SOLUTION_FEM
 
     template<class RW> void Read(std::istream& input)
     {
+        Read_Binary<RW>(input,intersection_tol);
         Read_Binary<RW>(input,particles,mesh,element_edges);
         Read_Binary<RW>(input,first_v,first_e,last_elem);
         Read_Binary<RW>(input,dof_v,dof_e,dof_p);
@@ -302,6 +305,7 @@ struct SOLUTION_FEM
 
     template<class RW> void Write(std::ostream& output) const
     {
+        Write_Binary<RW>(output,intersection_tol);
         Write_Binary<RW>(output,particles,mesh,element_edges);
         Write_Binary<RW>(output,first_v,first_e,last_elem);
         Write_Binary<RW>(output,dof_v,dof_e,dof_p);
