@@ -44,6 +44,7 @@ struct COMPONENT_JOINT
     
     T target_length;
     std::map<JOINT_KEY<T>,PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > > canonical_joints;
+    bool rounded_corner=false;
     int num_j2=0,num_j3_avg=0,num_j3_small=0,num_j4=0;
 
     PAIR<CANONICAL_COMPONENT<T>*,ARRAY<T> > Make_Component(int d,T width,const ARRAY<T>& angles);
@@ -56,6 +57,7 @@ struct COMPONENT_JOINT
     TV Elbow_Pit_Oriented(T angle,T width) const;
     VECTOR<TV,2> Extrude(const TV& v0,const TV& v1,const TV& n) const;
     PAIR<ARRAY<TV>,ARRAY<TV> > Arc(const TV& c,T angle,T len_arm,T ext0,T ext1) const;
+    PAIR<ARRAY<TV>,ARRAY<TV> > Corner(const TV& c,T angle,T len_arm,T ext0,T ext1) const;
     ARRAY<TV> Polyline(const ARRAY<TV>& points,T dx) const;
     void Joint_Connection(int offset,BLOCK_MESHING_ITERATOR<TV>& it,
         CANONICAL_BLOCK<T>* cb,CC_IRREGULAR_CONNECTION* ic0,CC_IRREGULAR_CONNECTION* ic1,

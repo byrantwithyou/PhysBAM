@@ -37,7 +37,9 @@ Make_Joint_2(int d,T width,const ARRAY<T>& angles)
     TV vert;
     T ext,angle;
     std::tie(vert,ext,angle)=Elbow_Pit(angles(0),width);
-    PAIR<ARRAY<TV>,ARRAY<TV> > sides=Arc(vert,angle,width,sep,sep);
+    PAIR<ARRAY<TV>,ARRAY<TV> > sides;
+    if(rounded_corner) sides=Arc(vert,angle,width,sep,sep);
+    else sides=Corner(vert,angle,width,sep,sep);
     if(angle>0) std::swap(sides.x,sides.y);
 
     CANONICAL_COMPONENT<T>* cc=new CANONICAL_COMPONENT<T>;
@@ -432,6 +434,34 @@ Arc(const TV& c,T angle,T len_arm,T ext0,T ext1) const -> PAIR<ARRAY<TV>,ARRAY<T
         outer.Append(arm1+d*ext1);
     }
     return {inner,outer};
+}
+//#####################################################################
+// Function Corner
+//#####################################################################
+template<class T> auto COMPONENT_JOINT<T>::
+Corner(const TV& c,T angle,T len_arm,T ext0,T ext1) const -> PAIR<ARRAY<TV>,ARRAY<TV> >
+{
+    PHYSBAM_ASSERT(abs(angle)<=pi);
+    T arc_angle=angle>0?angle-pi:angle+pi;
+    TV arm0(c(0),-c(1));
+    TV arm1=c+ROTATION<TV>::From_Angle(arc_angle).Rotate(arm0-c);
+    ARRAY<TV> inner,outer;
+    if(ext0)
+    {
+        inner.Append(c+TV(ext0,0));
+        outer.Append(arm0+TV(ext0,0));
+    }
+    T l=1/cos(arc_angle/2)*len_arm;
+    TV elbow=c+ROTATION<TV>::From_Angle(arc_angle/2).Rotate(arm0-c).Normalized()*l;
+    inner.Append(c);
+    outer.Append(elbow);
+    if(ext1)
+    {
+        TV d=ROTATION<TV>::From_Angle(angle).Rotated_X_Axis();
+        inner.Append(c+d*ext1);
+        outer.Append(arm1+d*ext1);
+    }
+    return {Polyline(inner,target_length),Polyline(outer,target_length)};
 }
 //#####################################################################
 // Function Polyline
