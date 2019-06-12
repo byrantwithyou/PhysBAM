@@ -177,12 +177,12 @@ struct SOLUTION_FEM
                 [this,k,&bc,&M](const VISIT_ALL_DOFS<TV>& va)
                 {
                     T z=(va.uv*((T)1-va.uv)).Product();
-                    bc_v.Insert({bc.b,va.i},TV(M*-k*z*bc.normal));
+                    bc_v.Insert({bc.b,first_v(bc.b)+va.i},TV(M*-k*z*bc.normal));
                 },
                 [this,k,&bc,&M](const VISIT_ALL_DOFS<TV>& va)
                 {
                     T z=(va.uv*((T)1-va.uv)).Product();
-                    bc_e.Insert({bc.b,va.i},TV(M*-k*z*bc.normal));
+                    bc_e.Insert({bc.b,first_e(bc.b)+va.i},TV(M*-k*z*bc.normal));
                 });
         }
     }
@@ -191,23 +191,21 @@ struct SOLUTION_FEM
     {
         T s=an.mc.cl.unit_s,m=an.mc.cl.unit_m;
         const COMPONENT_LAYOUT_FEM<T>& cl=an.mc.cl;
-        for(int b=0;b<cl.bc_v.m;b++)
+        for(BLOCK_ID b(0);b<cl.blocks.m;b++)
         {
-            const auto& bc=cl.bc_v(b);
-            const auto& bl=cl.blocks(bc.b);
-            MATRIX<T,TV::m> M=To_Dim<TV::m>(bl.xform.M.Inverse());
+            const auto& bl=cl.blocks(b);
             DOF_LAYOUT<TV> dl(cl,cl.reference_block_data(bl.ref_id),false);
 
-            Visit_Dofs<false,true>(dl,LAYER_RANGE::ALL,bc.bc_v,bc.bc_e,
-                [this,&bc,&M,&bl,&an,s,m](const VISIT_ALL_DOFS<TV>& va)
+            Visit_Dofs<true,false>(dl,LAYER_RANGE::ALL,bl.block->bc_v,bl.block->bc_e,
+                [this,b,&bl,&an,s,m](const VISIT_ALL_DOFS<TV>& va)
                 {
                     TV Z=xform(bl.xform,va.X);
-                    bc_v.Insert({bc.b,va.i},TV(M*an.analytic_velocity->v(Z/m,0)*m/s));
+                    bc_v.Insert({b,first_v(b)+va.i},TV(an.analytic_velocity->v(Z/m,0)*m/s));
                 },
-                [this,&bc,&M,&bl,&an,s,m](const VISIT_ALL_DOFS<TV>& va)
+                [this,b,&bl,&an,s,m](const VISIT_ALL_DOFS<TV>& va)
                 {
                     TV Z=xform(bl.xform,va.X);
-                    bc_e.Insert({bc.b,va.i},TV(M*an.analytic_velocity->v(Z/m,0)*m/s));
+                    bc_e.Insert({b,first_e(b)+va.i},TV(an.analytic_velocity->v(Z/m,0)*m/s));
                 });
         }
     }
@@ -254,7 +252,7 @@ struct SOLUTION_FEM
             const auto& dof=dof_v(v);
             if(dof.x<BLOCK_ID())
             {
-                BLOCK_ID b=last_elem.Binary_Search(elem);
+                BLOCK_ID b=BLOCK_ID(std::upper_bound(last_elem.begin(),last_elem.end(),elem)-last_elem.begin());
                 const auto* bc=bc_v.Get_Pointer({b,v});
                 if(bc) return *bc;
                 else return TV();
@@ -267,7 +265,7 @@ struct SOLUTION_FEM
             const auto& dof=dof_e(e);
             if(dof.x<BLOCK_ID())
             {
-                BLOCK_ID b=last_elem.Binary_Search(elem);
+                BLOCK_ID b=BLOCK_ID(std::upper_bound(last_elem.begin(),last_elem.end(),elem)-last_elem.begin());
                 const auto* bc=bc_e.Get_Pointer({b,e});
                 if(bc) return *bc;
                 else return TV();
