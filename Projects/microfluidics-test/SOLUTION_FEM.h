@@ -16,6 +16,7 @@
 #include <Geometry/Topology/TETRAHEDRON_MESH.h>
 #include <Geometry/Topology/TOPOLOGY_POLICY.h>
 #include <Geometry/Topology/TRIANGLE_MESH.h>
+#include "ANALYTIC_FEM.h"
 #include "BLOCK_VECTOR.h"
 #include "COMPONENT_LAYOUT_FEM.h"
 #include "MATRIX_CONSTRUCTION_FEM.h"
@@ -186,7 +187,32 @@ struct SOLUTION_FEM
         }
     }
 
-    void Build(const MATRIX_CONSTRUCTION_FEM<TV>& mc)
+    void Fill_Analytic_Velocity_BC(const ANALYTIC_FEM<TV>& an)
+    {
+        T s=an.mc.cl.unit_s,m=an.mc.cl.unit_m;
+        const COMPONENT_LAYOUT_FEM<T>& cl=an.mc.cl;
+        for(int b=0;b<cl.bc_v.m;b++)
+        {
+            const auto& bc=cl.bc_v(b);
+            const auto& bl=cl.blocks(bc.b);
+            MATRIX<T,TV::m> M=To_Dim<TV::m>(bl.xform.M.Inverse());
+            DOF_LAYOUT<TV> dl(cl,cl.reference_block_data(bl.ref_id),false);
+
+            Visit_Dofs<false,true>(dl,LAYER_RANGE::ALL,bc.bc_v,bc.bc_e,
+                [this,&bc,&M,&bl,&an,s,m](const VISIT_ALL_DOFS<TV>& va)
+                {
+                    TV Z=xform(bl.xform,va.X);
+                    bc_v.Insert({bc.b,va.i},TV(M*an.analytic_velocity->v(Z/m,0)*m/s));
+                },
+                [this,&bc,&M,&bl,&an,s,m](const VISIT_ALL_DOFS<TV>& va)
+                {
+                    TV Z=xform(bl.xform,va.X);
+                    bc_e.Insert({bc.b,va.i},TV(M*an.analytic_velocity->v(Z/m,0)*m/s));
+                });
+        }
+    }
+
+    void Build(const MATRIX_CONSTRUCTION_FEM<TV>& mc,const ANALYTIC_FEM<TV>* an)
     {
         intersection_tol=mc.cl.target_length/10;
         ARRAY<VECTOR<int,TV::m+1> > elements;
@@ -209,7 +235,10 @@ struct SOLUTION_FEM
         mesh.Initialize_Mesh(particles.number,elements);
 
         Fill_Global_Dof_Mapping(mc.cl);
-        Fill_Velocity_BC(mc.cl);
+        if(an)
+            Fill_Analytic_Velocity_BC(*an);
+        else
+            Fill_Velocity_BC(mc.cl);
         sol_block_list=mc.rhs_block_list;
     }
 

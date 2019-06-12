@@ -312,7 +312,7 @@ void Run(PARSE_ARGS& parse_args)
     if(dump_solution)
     {
         SOLUTION_FEM<TV> solution;
-        solution.Build(mc);
+        solution.Build(mc,an);
         Write_To_File(STREAM_TYPE((double)0),output_dir+"/sol",solution);
     }
 }
