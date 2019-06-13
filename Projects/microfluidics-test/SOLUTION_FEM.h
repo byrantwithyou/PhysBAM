@@ -166,7 +166,6 @@ struct SOLUTION_FEM
         {
             const auto& bc=cl.bc_v(b);
             const auto& bl=cl.blocks(bc.b);
-            MATRIX<T,2> M=bl.xform.M.Inverse();
             DOF_LAYOUT<TV> dl(cl,cl.reference_block_data(bl.ref_id),false);
             TV2 A=dl.cb->X(bc.bc_v.min_corner);
             TV2 B=dl.cb->X(bc.bc_v.max_corner-1);
@@ -174,15 +173,15 @@ struct SOLUTION_FEM
             T k=bc.flow_rate*6/width;
 
             Visit_Dofs<false,true>(dl,LAYER_RANGE::ALL,bc.bc_v,bc.bc_e,
-                [this,k,&bc,&M](const VISIT_ALL_DOFS<TV>& va)
+                [this,k,&bc](const VISIT_ALL_DOFS<TV>& va)
                 {
                     T z=(va.uv*((T)1-va.uv)).Product();
-                    bc_v.Insert({bc.b,first_v(bc.b)+va.i},TV(M*-k*z*bc.normal));
+                    bc_v.Insert({bc.b,first_v(bc.b)+va.i},TV(-k*z*bc.normal));
                 },
-                [this,k,&bc,&M](const VISIT_ALL_DOFS<TV>& va)
+                [this,k,&bc](const VISIT_ALL_DOFS<TV>& va)
                 {
                     T z=(va.uv*((T)1-va.uv)).Product();
-                    bc_e.Insert({bc.b,first_e(bc.b)+va.i},TV(M*-k*z*bc.normal));
+                    bc_e.Insert({bc.b,first_e(bc.b)+va.i},TV(-k*z*bc.normal));
                 });
         }
     }
