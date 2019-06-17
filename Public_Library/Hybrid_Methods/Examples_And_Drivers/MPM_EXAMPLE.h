@@ -82,6 +82,7 @@ public:
     T inv_Wi=0;
     bool use_strong_cfl=false;
     bool use_sound_speed_cfl=false;
+    bool compute_sound_speed=false;
     int reflection_bc_flags=0;
     
     T newton_tolerance=1;

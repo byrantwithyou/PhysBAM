@@ -16,6 +16,7 @@ template<class TV> class MPM_OBJECTIVE;
 template<class TV> class PARTICLE_GRID_WEIGHTS;
 template<class TV> class MPM_KRYLOV_VECTOR;
 template<class T> class KRYLOV_VECTOR_BASE;
+template<class TV> class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE;
 
 template<class TV>
 class MPM_DRIVER
@@ -53,12 +54,15 @@ public:
     T Compute_Dt() const;
     T Max_Particle_Speed() const;
     T Grid_V_Upper_Bound() const;
+    SYMMETRIC_MATRIX<T,TV::m> Conjugate_Stress_Diff(const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dpdf,const TV& u) const;
+    T Compute_Max_Sound_Speed() const;
     void Update_Simulated_Particles();
     void Print_Grid_Stats(const char* str,T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<TV,TV_INT>* u0);
     void Print_Particle_Stats(const char* str,T dt);
     void Print_Energy_Stats(const char* str,const ARRAY<TV,TV_INT>& u);
     void Grid_To_Particle_Limit_Dt();
     void Limit_Dt_Sound_Speed();
+    void Print_Max_Sound_Speed();
     template<class S> void Reflection_Boundary_Condition(ARRAY<S,TV_INT>& u,bool flip_sign);
     void Reflect_Or_Invalidate_Particle(int p);
 //#####################################################################

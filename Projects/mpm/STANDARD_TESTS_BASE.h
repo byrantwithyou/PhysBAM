@@ -33,6 +33,7 @@ public:
     using BASE::output_directory;using BASE::mass_contour;using BASE::plasticity_models;
     using BASE::restart;using BASE::dt;using BASE::time;using BASE::lag_Dp;
     using BASE::frame_dt;using BASE::min_dt;using BASE::max_dt;
+    using BASE::compute_sound_speed;
     using BASE::ghost;using BASE::use_affine;using BASE::cfl_F;using BASE::use_strong_cfl;
     using BASE::use_midpoint;using BASE::use_symplectic_euler;using BASE::test_output_prefix;
     using BASE::print_stats;using BASE::only_write_particles;using BASE::use_test_output;

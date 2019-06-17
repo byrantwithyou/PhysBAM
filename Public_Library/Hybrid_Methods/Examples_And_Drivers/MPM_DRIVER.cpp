@@ -5,6 +5,7 @@
 #include <Core/Log/DEBUG_SUBSTEPS.h>
 #include <Core/Log/LOG.h>
 #include <Core/Log/SCOPE.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/MINRES.h>
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
@@ -133,6 +134,7 @@ Advance_One_Time_Step()
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after forces",1);
     Grid_To_Particle_Limit_Dt();
     Limit_Dt_Sound_Speed();
+    Print_Max_Sound_Speed();
     Grid_To_Particle();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after grid to particle",1);
     Update_Plasticity_And_Hardening();
@@ -428,6 +430,83 @@ Limit_Dt_Sound_Speed()
     example.velocity.array=(example.velocity.array-example.velocity_save.array)*s+example.velocity_save.array;
     example.velocity_friction_save.array=(example.velocity_friction_save.array-example.velocity_save.array)*s+example.velocity_save.array;
     example.dt=dt;
+}
+//#####################################################################
+// Function Conjugate_Stress_Diff
+//#####################################################################
+template<class TV> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> MPM_DRIVER<TV>::
+Conjugate_Stress_Diff(const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dpdf,const TV& u) const
+{
+    DIAGONAL_MATRIX<T,TV::m> U(u);
+    SYMMETRIC_MATRIX<T,TV::m> S=SYMMETRIC_MATRIX<T,TV::m>::Conjugate(U,dpdf.H);
+    for(int i=0;i<TV::SPIN::m;i++){
+        int j=(i+1)%TV::m,k=(j+1)%TV::m;
+        S(j,j)+=dpdf.B(i)*u(k)*u(k);
+        S(k,k)+=dpdf.B(i)*u(j)*u(j);
+        S(j,k)+=dpdf.C(i)*u(j)*u(k);}
+    return S;
+} 
+//#####################################################################
+// Function Compute_Max_Sound_Speed
+//#####################################################################
+template<class TV> auto MPM_DRIVER<TV>::
+Compute_Max_Sound_Speed() const -> T
+{
+    T epsilon=std::numeric_limits<T>::epsilon();
+    T tolerance=sqrt(epsilon);
+    T max_speed=0;
+    for(int f=0;f<example.forces.m;f++){
+        if(const MPM_FINITE_ELEMENTS<TV>* force=dynamic_cast<MPM_FINITE_ELEMENTS<TV>*>(example.forces(f))){
+            for(int k=0;k<example.simulated_particles.m;k++){
+                int p=example.simulated_particles(k);
+                const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dpdf=force->dPi_dF(p);
+                const DIAGONAL_MATRIX<T,TV::m>& sigma=force->sigma(p);
+                RANDOM_NUMBERS<T> random;
+                TV u,v;
+                T eig_est=0;
+                for(int i=0;i<100;i++){
+                    TV u0,v0;
+                    random.Fill_Uniform(u0,-1,1);
+                    random.Fill_Uniform(v0,-1,1);
+                    u0.Normalize();
+                    v0.Normalize();
+                    T e=u0.Dot(Conjugate_Stress_Diff(dpdf,sigma*v0)*u0);
+                    if(e>eig_est){
+                        eig_est=e;
+                        u=u0;
+                        v=v0;}}
+                if(!eig_est) continue;
+
+                T ev=FLT_MAX,pev=0;
+                while(abs(ev-pev)>tolerance*ev){
+                    DIAGONAL_MATRIX<T,TV::m> E;
+                    MATRIX<T,TV::m> V;
+                    auto A=Conjugate_Stress_Diff(dpdf,u);
+                    A=A.Conjugate(sigma,A);
+                    A.Fast_Solve_Eigenproblem(E,V);
+                    v=V.Column(E.x.Arg_Max());
+                    auto B=Conjugate_Stress_Diff(dpdf,sigma*v);
+                    B.Fast_Solve_Eigenproblem(E,V);
+                    const int kk=E.x.Arg_Max();
+                    u=V.Column(kk);
+                    pev=ev;
+                    ev=E.x(kk);}
+
+                T density=example.particles.mass(p)/example.particles.volume(p);
+                T speed=sqrt(ev/density);
+                max_speed=max(max_speed,speed);}}}
+    return max_speed;
+}
+//#####################################################################
+// Function Print_Max_Sound_Speed
+//#####################################################################
+template<class TV> void MPM_DRIVER<TV>::
+Print_Max_Sound_Speed() 
+{
+    T max_sound_speed=Compute_Max_Sound_Speed();
+    LOG::printf("max sound speed: %.16P\n",max_sound_speed);
+    LOG::printf("dx: %.16P\n",example.grid.dX.Min());
+    LOG::printf("dx/soundspeed: %.16P\n",example.grid.dX.Min()/max_sound_speed);
 }
 //#####################################################################
 // Function Update_Plasticity_And_Hardening
