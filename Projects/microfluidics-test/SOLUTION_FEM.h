@@ -39,10 +39,80 @@ struct HIERARCHY_POLICY<VECTOR<T,3> >
 };
 
 template<class T>
+void Barycentric_Coordinates_Diff(const VECTOR<VECTOR<T,2>,3>& X,const VECTOR<T,2>& P,VECTOR<VECTOR<T,2>,3>& dw)
+{
+    typedef VECTOR<T,2> TV;
+    TV u=X(1)-X(0),v=X(2)-X(0);
+    T f=1/u.Cross(v)(0);
+    dw(1)=TV(v(1),-v(0))*f;
+    dw(2)=TV(-u(1),u(0))*f;
+    dw(0)=-dw(1)-dw(2);
+}
+
+template<class T>
+void Barycentric_Coordinates_Diff(const VECTOR<VECTOR<T,3>,4>& X,const VECTOR<T,3>& P,VECTOR<VECTOR<T,3>,4>& dw)
+{
+}
+
+template<class T>
 VECTOR<T,6> Velocity_Weights(const VECTOR<T,3>& x)
 {
     T u=x(1),v=x(2);
     return {2*sqr(u)+4*u*v+2*sqr(v)-3*u-3*v+1,2*sqr(u)-u,2*sqr(v)-v,4*u*v,-4*u*v-4*sqr(v)+4*v,-4*sqr(u)-4*u*v+4*u};
+}
+
+template<class T>
+MATRIX<T,2> Velocity_Gradient(const VECTOR<T,3>& w,const VECTOR<VECTOR<T,2>,3>& dw,const VECTOR<VECTOR<T,2>,6>& V)
+{
+    typedef VECTOR<T,2> TV;
+    typedef MATRIX<T,2> TM;
+
+    T u=w(1),v=w(2);
+    VECTOR<TV,6> dNdw=
+    {
+        TV(4*u+4*v-3,4*u+4*v-3),
+        TV(4*u-1,0),
+        TV(0,4*v-1),
+        TV(4*v,4*u),
+        TV(-4*v,-4*u-8*v+4),
+        TV(-8*u-4*v+4,-4*u)
+    };
+    TM dV;
+    for(int i=0;i<6;i++)
+    {
+        VECTOR<TV,2> dwdx=dw.Remove_Index(0);
+        TV dNdx=dwdx.Weighted_Sum(dNdw(i));
+        dV+=TM::Outer_Product(V(i),dNdx);
+    }
+    return dV;
+}
+
+template<class T>
+VECTOR<T,2> Pressure_Gradient(const VECTOR<T,3>& w,const VECTOR<VECTOR<T,2>,3>& dw,const VECTOR<T,3>& P)
+{
+    typedef VECTOR<T,2> TV;
+
+    VECTOR<TV,3> dNdw=
+    {
+        TV(-1,-1),
+        TV(1,0),
+        TV(0,1),
+    };
+    TV dP;
+    for(int i=0;i<3;i++)
+    {
+        VECTOR<TV,2> dwdx=dw.Remove_Index(0);
+        TV dNdx=dwdx.Weighted_Sum(dNdw(i));
+        dP+=P(i)*dNdx;
+    }
+    return dP;
+}
+
+template<class T>
+VECTOR<T,3> Pressure_Gradient(const VECTOR<T,4>& w,const VECTOR<VECTOR<T,3>,4>& dw,const VECTOR<T,4>& P)
+{
+    typedef VECTOR<T,3> TV;
+    return TV();
 }
 
 template<class T>
@@ -66,6 +136,13 @@ VECTOR<T,10> Velocity_Weights(const VECTOR<T,4>& x)
         4*u*v,
         4*w*u,
         4*v*w};
+}
+
+template<class T>
+MATRIX<T,3> Velocity_Gradient(const VECTOR<T,4>& w,const VECTOR<VECTOR<T,3>,4>& dw,const VECTOR<VECTOR<T,3>,10>& V)
+{
+    typedef MATRIX<T,3> TM;
+    return TM();
 }
 
 template<class T>
@@ -244,7 +321,7 @@ struct SOLUTION_FEM
         tree=new TREE(mesh,particles);
     }
 
-    TV Velocity(const TV& X) const
+    TV Velocity(const TV& X,MATRIX<T,TV::m>* grad=0) const
     {
         auto getv=[this](int elem,int v)
         {
@@ -287,13 +364,19 @@ struct SOLUTION_FEM
                     V(i)=getv(elem,mesh.elements(elem)(i));
                 for(int i=0;i<element_edges(elem).m;i++)
                     V(i+mesh.elements(elem).m)=gete(elem,element_edges(elem)(i));
+                if(grad)
+                {
+                    VECTOR<TV,TV::m+1> dw;
+                    Barycentric_Coordinates_Diff(simplex.X,X,dw);
+                    *grad=Velocity_Gradient(w,dw,V);
+                }
                 return V.Weighted_Sum(N);
             }
         }
         PHYSBAM_FATAL_ERROR();
     }
 
-    T Pressure(const TV& X) const
+    T Pressure(const TV& X,TV* grad=0) const
     {
         auto get=[this](int elem,int v)
         {
@@ -313,6 +396,12 @@ struct SOLUTION_FEM
                 VECTOR<T,N.m> P;
                 for(int i=0;i<mesh.elements(elem).m;i++)
                     P(i)=get(elem,mesh.elements(elem)(i));
+                if(grad)
+                {
+                    VECTOR<TV,TV::m+1> dw;
+                    Barycentric_Coordinates_Diff(simplex.X,X,dw);
+                    *grad=Pressure_Gradient(w,dw,P);
+                }
                 return P.Weighted_Sum(N);
             }
         }

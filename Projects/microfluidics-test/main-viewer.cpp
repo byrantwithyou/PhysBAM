@@ -4,6 +4,7 @@
 //#####################################################################
 #include <Core/Data_Structures/PAIR.h>
 #include <Core/Utilities/PROCESS_UTILITIES.h>
+#include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
@@ -37,6 +38,7 @@ template<int d>
 void Run(PARSE_ARGS& parse_args)
 {
     typedef VECTOR<T,d> TV;
+    typedef MATRIX<T,d> TM;
     typedef VECTOR<T,3> TV3;
     typedef VECTOR<T,2> TV2;
     typedef VECTOR<int,2> IV2;
@@ -44,7 +46,12 @@ void Run(PARSE_ARGS& parse_args)
 
     std::string output_dir="sol_out",sol_file;
     TV X;
+    T min_color=1e-8,max_color=20;
+    bool dump_grad=false;
     parse_args.Add("-o",&output_dir,"dir","output dir");
+    parse_args.Add("-g",&dump_grad,"dump gradients");
+    parse_args.Add("-min_color",&min_color,"value","minimum value for the coolest color");
+    parse_args.Add("-max_color",&max_color,"value","maximum value for the hottest color");
     parse_args.Add("-x",&X,"position","interpolate solution");
     parse_args.Extra(&sol_file,"file","solution file");
     parse_args.Parse();
@@ -81,6 +88,41 @@ void Run(PARSE_ARGS& parse_args)
     Debug_Particle_Set_Attribute<TV>("V",vel);
     Debug_Particle_Set_Attribute<TV>("display_size",pres);
     Flush_Frame<TV>("solution");
+
+    if(dump_grad)
+    {
+        INTERPOLATED_COLOR_MAP<T> icm;
+        icm.Initialize_Colors(min_color,max_color,false,true,false);
+        T min_f=1e12,max_f=-1e12;
+        for(const auto& e:sol.mesh.elements)
+        {
+            TV x=sol.particles.X.Subset(e).Sum()/e.m;
+            TM g;
+            sol.Velocity(x,&g);
+            T n=g.Frobenius_Norm();
+            min_f=min(min_f,n);
+            max_f=max(max_f,n);
+            Add_Debug_Particle(x,icm(n));
+        }
+        LOG::printf("grad V norm: %P %P\n",min_f,max_f);
+        Flush_Frame<TV>("grad V");
+
+        icm.Initialize_Colors(min_color,max_color,false,true,false);
+        min_f=1e12;
+        max_f=-1e12;
+        for(const auto& e:sol.mesh.elements)
+        {
+            TV x=sol.particles.X.Subset(e).Sum()/e.m;
+            TV g;
+            sol.Pressure(x,&g);
+            T n=g.Magnitude();
+            min_f=min(min_f,n);
+            max_f=max(max_f,n);
+            Add_Debug_Particle(x,icm(n));
+        }
+        LOG::printf("grad P norm: %P %P\n",min_f,max_f);
+        Flush_Frame<TV>("grad P");
+    }
 }
 
 int main(int argc, char* argv[])
