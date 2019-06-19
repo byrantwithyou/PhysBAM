@@ -423,6 +423,7 @@ template<int d> void Register_Attributes_s()
     Register_Attribute_Sample<MATRIX<float,d,d>,MATRIX<double,d,d> >(3,d,d,d*d,0);
     Register_Attribute_Sample<DIAGONAL_MATRIX<float,d>,DIAGONAL_MATRIX<double,d> >(4,d,d,d,0);
     Register_Attribute_Sample<VECTOR<int,d> >(2,2,0,d,d*sizeof(int));
+    Register_Attribute_Sample<SYMMETRIC_MATRIX<float,d>,SYMMETRIC_MATRIX<double,d> >(7,d,d,d*(d+1)/2,0);
 }
 template<class T,int d> void Register_Attributes_ts(int s,int fs,int ts)
 {
