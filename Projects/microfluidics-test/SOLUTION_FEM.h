@@ -321,35 +321,8 @@ struct SOLUTION_FEM
         tree=new TREE(mesh,particles);
     }
 
-    TV Velocity(const TV& X,MATRIX<T,TV::m>* grad=0) const
+    int Intersect(const TV& X) const
     {
-        auto getv=[this](int elem,int v)
-        {
-            const auto& dof=dof_v(v);
-            if(dof.x<BLOCK_ID())
-            {
-                BLOCK_ID b=BLOCK_ID(std::upper_bound(last_elem.begin(),last_elem.end(),elem)-last_elem.begin());
-                const auto* bc=bc_v.Get_Pointer({b,v});
-                if(bc) return *bc;
-                else return TV();
-            }
-            else
-                return sol_block_list(dof.x).Get_v(dof.y);
-        };
-        auto gete=[this](int elem,int e)
-        {
-            const auto& dof=dof_e(e);
-            if(dof.x<BLOCK_ID())
-            {
-                BLOCK_ID b=BLOCK_ID(std::upper_bound(last_elem.begin(),last_elem.end(),elem)-last_elem.begin());
-                const auto* bc=bc_e.Get_Pointer({b,e});
-                if(bc) return *bc;
-                else return TV();
-            }
-            else
-                return sol_block_list(dof.x).Get_e(dof.y);
-        };
-
         ARRAY<int> hits;
         tree->Intersection_List(X,hits,intersection_tol);
         for(int elem:hits)
@@ -357,55 +330,94 @@ struct SOLUTION_FEM
             auto simplex=SIMPLEX(particles.X.Subset(mesh.elements(elem)));
             VECTOR<T,TV::m+1> w=simplex.Barycentric_Coordinates(X);
             if(w.Min()>-comp_tol)
-            {
-                auto N=Velocity_Weights(w);
-                VECTOR<TV,N.m> V;
-                for(int i=0;i<mesh.elements(elem).m;i++)
-                    V(i)=getv(elem,mesh.elements(elem)(i));
-                for(int i=0;i<element_edges(elem).m;i++)
-                    V(i+mesh.elements(elem).m)=gete(elem,element_edges(elem)(i));
-                if(grad)
-                {
-                    VECTOR<TV,TV::m+1> dw;
-                    Barycentric_Coordinates_Diff(simplex.X,X,dw);
-                    *grad=Velocity_Gradient(w,dw,V);
-                }
-                return V.Weighted_Sum(N);
-            }
+                return elem;
         }
-        PHYSBAM_FATAL_ERROR();
+        return -1;
+    }
+
+    TV Get_Vertex_Velocity(int elem,int v) const
+    {
+        const auto& dof=dof_v(v);
+        if(dof.x<BLOCK_ID())
+        {
+            BLOCK_ID b=BLOCK_ID(std::upper_bound(last_elem.begin(),last_elem.end(),elem)-last_elem.begin());
+            const auto* bc=bc_v.Get_Pointer({b,v});
+            if(bc) return *bc;
+            else return TV();
+        }
+        else
+            return sol_block_list(dof.x).Get_v(dof.y);
+    }
+
+    TV Get_Edge_Velocity(int elem,int e) const
+    {
+        const auto& dof=dof_e(e);
+        if(dof.x<BLOCK_ID())
+        {
+            BLOCK_ID b=BLOCK_ID(std::upper_bound(last_elem.begin(),last_elem.end(),elem)-last_elem.begin());
+            const auto* bc=bc_e.Get_Pointer({b,e});
+            if(bc) return *bc;
+            else return TV();
+        }
+        else
+            return sol_block_list(dof.x).Get_e(dof.y);
+    }
+
+    T Get_Pressure(int elem,int v) const
+    {
+        const auto& dof=dof_p(v);
+        PHYSBAM_ASSERT(dof.x>=BLOCK_ID());
+        return sol_block_list(dof.x).Get_p(dof.y);
+    }
+
+    TV Velocity(int elem,const TV& X,MATRIX<T,TV::m>* grad=0) const
+    {
+        auto simplex=SIMPLEX(particles.X.Subset(mesh.elements(elem)));
+        VECTOR<T,TV::m+1> w=simplex.Barycentric_Coordinates(X);
+        auto N=Velocity_Weights(w);
+        VECTOR<TV,N.m> V;
+        for(int i=0;i<mesh.elements(elem).m;i++)
+            V(i)=Get_Vertex_Velocity(elem,mesh.elements(elem)(i));
+        for(int i=0;i<element_edges(elem).m;i++)
+            V(i+mesh.elements(elem).m)=Get_Edge_Velocity(elem,element_edges(elem)(i));
+        if(grad)
+        {
+            VECTOR<TV,TV::m+1> dw;
+            Barycentric_Coordinates_Diff(simplex.X,X,dw);
+            *grad=Velocity_Gradient(w,dw,V);
+        }
+        return V.Weighted_Sum(N);
+    }
+
+    TV Velocity(const TV& X,MATRIX<T,TV::m>* grad=0) const
+    {
+        int elem=Intersect(X);
+        PHYSBAM_ASSERT(elem>=0);
+        return Velocity(elem,X,grad);
+    }
+
+    T Pressure(int elem,const TV& X,TV* grad=0) const
+    {
+        auto simplex=SIMPLEX(particles.X.Subset(mesh.elements(elem)));
+        VECTOR<T,TV::m+1> w=simplex.Barycentric_Coordinates(X);
+        auto N=Pressure_Weights(w);
+        VECTOR<T,N.m> P;
+        for(int i=0;i<mesh.elements(elem).m;i++)
+            P(i)=Get_Pressure(elem,mesh.elements(elem)(i));
+        if(grad)
+        {
+            VECTOR<TV,TV::m+1> dw;
+            Barycentric_Coordinates_Diff(simplex.X,X,dw);
+            *grad=Pressure_Gradient(w,dw,P);
+        }
+        return P.Weighted_Sum(N);
     }
 
     T Pressure(const TV& X,TV* grad=0) const
     {
-        auto get=[this](int elem,int v)
-        {
-            const auto& dof=dof_p(v);
-            PHYSBAM_ASSERT(dof.x>=BLOCK_ID());
-            return sol_block_list(dof.x).Get_p(dof.y);
-        };
-        ARRAY<int> hits;
-        tree->Intersection_List(X,hits,intersection_tol);
-        for(int elem:hits)
-        {
-            auto simplex=SIMPLEX(particles.X.Subset(mesh.elements(elem)));
-            VECTOR<T,TV::m+1> w=simplex.Barycentric_Coordinates(X);
-            if(w.Min()>-comp_tol)
-            {
-                auto N=Pressure_Weights(w);
-                VECTOR<T,N.m> P;
-                for(int i=0;i<mesh.elements(elem).m;i++)
-                    P(i)=get(elem,mesh.elements(elem)(i));
-                if(grad)
-                {
-                    VECTOR<TV,TV::m+1> dw;
-                    Barycentric_Coordinates_Diff(simplex.X,X,dw);
-                    *grad=Pressure_Gradient(w,dw,P);
-                }
-                return P.Weighted_Sum(N);
-            }
-        }
-        PHYSBAM_FATAL_ERROR();
+        int elem=Intersect(X);
+        PHYSBAM_ASSERT(elem>=0);
+        return Pressure(elem,X,grad);
     }
 
     template<class RW> void Read(std::istream& input)
