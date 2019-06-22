@@ -206,13 +206,17 @@ void Run(PARSE_ARGS& parse_args)
     mc.Print_Statistics();
     LOG::printf("canonical-j2: %d\ncanonical-j3-avg: %d\ncanonical-j3-small: %d\ncanonical-j4: %d\n",
         builder.comp_joint.num_j2,builder.comp_joint.num_j3_avg,builder.comp_joint.num_j3_small,builder.comp_joint.num_j4);
+
+    if(illus_domain || illus_meshing)
+        if(!Directory_Exists(output_dir))
+            Create_Directory(output_dir);
     if(illus_domain)
-        debug.Visualize_Domain("domain.eps",RANGE<TV2>::Empty_Box());
+        debug.Visualize_Domain(output_dir+"/domain.eps",RANGE<TV2>::Empty_Box());
     if(illus_meshing)
     {
         RANGE<TV2> range(min_corner,max_corner);
-        debug.Visualize_Domain("domain-anno.eps",range);
-        debug.Visualize_Meshing("meshing.eps",range);
+        debug.Visualize_Domain(output_dir+"/domain-anno.eps",range);
+        debug.Visualize_Meshing(output_dir+"/meshing.eps",range);
     }
 
     if(stats_only || illus_domain || illus_meshing) return;
