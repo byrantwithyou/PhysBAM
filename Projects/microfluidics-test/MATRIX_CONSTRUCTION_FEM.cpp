@@ -473,28 +473,34 @@ Fill_Connection_Matrix(BLOCK_MATRIX<TV>& M,const REFERENCE_CONNECTION_DATA& cd)
 // Function Fill_Irregular_Connection_Matrix
 //#####################################################################
 template<class TV> void MATRIX_CONSTRUCTION_FEM<TV>::
-Fill_Irregular_Connection_Matrix(ARRAY<BLOCK_MATRIX<TV>,RID_ID>& M,const REFERENCE_IRREGULAR_DATA& ri)
+Fill_Irregular_Connection_Matrix(BLOCK_MATRIX<TV>& M,const REFERENCE_IRREGULAR_DATA& ri,RID_ID j)
 {
     BLOCK_ID bb=cl.irregular_connections(ri.ic_id).regular;
-    for(RID_ID j(0);j<ri.pairs.m;j++)
-    {
-        auto& z=ri.pairs(j);
-        Init_Block_Matrix(M(j),bb,z.b,true);
-        Copy_Matrix_Data(M(j),z.b,z.irreg_pairs[0],cl.reference_block_data(cl.blocks(z.b).ref_id).pairs,bb,z.b);
-        Copy_Matrix_Data(M(j),bb,cl.reference_block_data(cl.blocks(bb).ref_id).pairs,z.irreg_pairs[1],bb,z.b);
+    auto& z=ri.pairs(j);
+    Init_Block_Matrix(M,bb,z.b,true);
+    Copy_Matrix_Data(M,z.b,z.irreg_pairs[0],cl.reference_block_data(cl.blocks(z.b).ref_id).pairs,bb,z.b);
+    Copy_Matrix_Data(M,bb,cl.reference_block_data(cl.blocks(bb).ref_id).pairs,z.irreg_pairs[1],bb,z.b);
 
-        if(j>RID_ID(0))
+    if(j>RID_ID(0))
+    {
+        RID_ID k=j-1;
+        for(CON_ID cc(0);cc<cl.blocks(z.b).connections.m;cc++)
         {
-            RID_ID k=j-1;
-            for(CON_ID cc(0);cc<cl.blocks(z.b).connections.m;cc++)
-            {
-                auto& c=cl.blocks(z.b).connections(cc);
-                if(!c.is_regular || ri.pairs(k).b!=c.id) continue;
-                const auto& dp0=cl.Regular_Connection_Pair(z.b,cc,false);
-                const auto& dp1=cl.Regular_Connection_Pair(z.b,cc,true);
-                Copy_Matrix_Data(M(k),z.b,z.irreg_pairs[0],dp0,bb,c.id);
-                Copy_Matrix_Data(M(j),c.id,ri.pairs(k).irreg_pairs[0],dp1,bb,z.b);
-            }
+            auto& c=cl.blocks(z.b).connections(cc);
+            if(!c.is_regular || ri.pairs(k).b!=c.id) continue;
+            const auto& dp1=cl.Regular_Connection_Pair(z.b,cc,true);
+            Copy_Matrix_Data(M,c.id,ri.pairs(k).irreg_pairs[0],dp1,bb,z.b);
+        }
+    }
+    if(j<ri.pairs.m-1)
+    {
+        auto& y=ri.pairs(j+1);
+        for(CON_ID cc(0);cc<cl.blocks(y.b).connections.m;cc++)
+        {
+            auto& c=cl.blocks(y.b).connections(cc);
+            if(!c.is_regular || ri.pairs(j).b!=c.id) continue;
+            const auto& dp0=cl.Regular_Connection_Pair(y.b,cc,false);
+            Copy_Matrix_Data(M,y.b,y.irreg_pairs[0],dp0,bb,c.id);
         }
     }
 }
@@ -533,26 +539,45 @@ Compute_Matrix_Blocks()
     diagonal_system_blocks.Resize(cl.reference_block_data.m);
     for(REFERENCE_BLOCK_ID i(0);i<cl.reference_block_data.m;i++)
     {
-        auto& rd=cl.reference_block_data(i);
         auto& M=diagonal_system_blocks(i);
-        Fill_Block_Matrix(M,rd);
+        M=[this,i](MATRIX_MXN<T>& M)
+            {
+                BLOCK_MATRIX<TV> bm;
+                auto& rd=cl.reference_block_data(i);
+                Fill_Block_Matrix(bm,rd);
+                M.Exchange(bm.M);
+            };
     }
 
     regular_system_blocks.Resize(cl.reference_connection_data.m);
     for(REFERENCE_CONNECTION_ID i(0);i<cl.reference_connection_data.m;i++)
     {
-        auto& rc=cl.reference_connection_data(i);
         auto& M=regular_system_blocks(i);
-        Fill_Connection_Matrix(M,rc);
+        M=[this,i](MATRIX_MXN<T>& M)
+            {
+                BLOCK_MATRIX<TV> bm;
+                auto& rc=cl.reference_connection_data(i);
+                Fill_Connection_Matrix(bm,rc);
+                M.Exchange(bm.M);
+            };
     }
 
     irregular_system_blocks.Resize(cl.reference_irregular_data.m);
     for(REFERENCE_IRREGULAR_ID i(0);i<cl.reference_irregular_data.m;i++)
     {
-        auto& ri=cl.reference_irregular_data(i);
         auto& is=irregular_system_blocks(i);
+        auto& ri=cl.reference_irregular_data(i);
         is.Resize(ri.pairs.m);
-        Fill_Irregular_Connection_Matrix(is,ri);
+        for(RID_ID j(0);j<ri.pairs.m;j++)
+        {
+            is(j)=[this,i,j](MATRIX_MXN<T>& M)
+                {
+                    BLOCK_MATRIX<TV> bm;
+                    auto& ri=cl.reference_irregular_data(i);
+                    Fill_Irregular_Connection_Matrix(bm,ri,j);
+                    M.Exchange(bm.M);
+                };
+        }
     }
 }
 //#####################################################################
@@ -643,7 +668,7 @@ Copy_To_CEM(CACHED_ELIMINATION_MATRIX<T>& cem)
         auto& M=diagonal_system_blocks(i);
         int id=cem.Create_Matrix_Block(true);
         diag_id(i)=id;
-        cem.block_list(id).M.Exchange(M.M);
+        cem.block_list(id).fill_func=M;
     }
 
     regular_system_blocks.Resize(cl.reference_connection_data.m);
@@ -652,7 +677,7 @@ Copy_To_CEM(CACHED_ELIMINATION_MATRIX<T>& cem)
         auto& M=regular_system_blocks(i);
         int id=cem.Create_Matrix_Block(false);
         reg_id(i)=id;
-        cem.block_list(id).M.Exchange(M.M);
+        cem.block_list(id).fill_func=M;
     }
 
     irregular_system_blocks.Resize(cl.reference_irregular_data.m);
@@ -664,7 +689,7 @@ Copy_To_CEM(CACHED_ELIMINATION_MATRIX<T>& cem)
         {
             int id=cem.Create_Matrix_Block(false);
             irreg_id(i)(j)=id;
-            cem.block_list(id).M.Exchange(is(j).M);
+            cem.block_list(id).fill_func=is(j);
         }
     }
 
@@ -904,7 +929,12 @@ Dump_World_Space_System() const
     SYSTEM_MATRIX_HELPER<T> h;
 
     for(BLOCK_ID b(0);b<cl.blocks.m;b++)
-        Dump_Matrix_Block(h,first,diagonal_system_blocks(cl.blocks(b).ref_id),b,b);
+    {
+        BLOCK_MATRIX<TV> bm;
+        Init_Block_Matrix(bm,b,b,true);
+        diagonal_system_blocks(cl.blocks(b).ref_id)(bm.M);
+        Dump_Matrix_Block(h,first,bm,b,b);
+    }
 
     for(BLOCK_ID b(0);b<cl.blocks.m;b++)
     {
@@ -915,7 +945,10 @@ Dump_World_Space_System() const
             if(c.is_regular && c.master)
             {
                 auto i=cl.regular_connection_hash.Get(cl.Regular_Connection_Key(b,cc,c.id));
-                Dump_Matrix_Block(h,first,regular_system_blocks(i),b,c.id);
+                BLOCK_MATRIX<TV> bm;
+                Init_Block_Matrix(bm,b,c.id,true);
+                regular_system_blocks(i)(bm.M);
+                Dump_Matrix_Block(h,first,bm,b,c.id);
             }
         }
     }
@@ -927,7 +960,12 @@ Dump_World_Space_System() const
         {
             const auto& p=irbd.mapping(i);
             if(p.y)
-                Dump_Matrix_Block(h,first,irregular_system_blocks(ic.ref_id)(p.x),ic.regular,ic.edge_on(i).b);
+            {
+                BLOCK_MATRIX<TV> bm;
+                Init_Block_Matrix(bm,ic.regular,ic.edge_on(i).b,true);
+                irregular_system_blocks(ic.ref_id)(p.x)(bm.M);
+                Dump_Matrix_Block(h,first,bm,ic.regular,ic.edge_on(i).b);
+            }
         }
     }
 

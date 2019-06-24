@@ -27,15 +27,13 @@ namespace
 // const char* op_names[]={
 //     "op_nop",
 //     "op_mat_inv","op_mat_mul","op_mat_add",
-//     "op_vec_mul","op_vec_add",
-//     "free_mat","free_vec"};
+//     "op_vec_mul","op_vec_add"};
 
 enum op_type
 {
     op_nop,
     op_mat_inv,op_mat_mul,op_mat_add,
     op_vec_mul,op_vec_add,
-    free_mat,free_vec,
     op_last
 };
 
@@ -48,9 +46,7 @@ int arg_type[op_last][4] =
     [op_mat_mul]={1,1,1,1},
     [op_mat_add]={1,1,0,1},
     [op_vec_mul]={2,1,2,2},
-    [op_vec_add]={2,2,0,2},
-    [free_mat]={1,0,0,0},
-    [free_vec]={2,0,0,0}
+    [op_vec_add]={2,2,0,2}
 };
 }
 
@@ -587,6 +583,16 @@ Execute(CACHED_ELIMINATION_MATRIX<T>* cem)
     auto& bl=cem->block_list;
     auto& vl=cem->vector_list;
     int raw_op=op&raw_op_mask;
+    for(int l=0;l<3;l++)
+        if(arg_type[raw_op][l]==1 && a[l]>1)
+        {
+            if(bl(a[l]&raw_mask).M.m==0)
+            {
+                assert(bl(a[l]&raw_mask).fill_func);
+                bl(a[l]&raw_mask).fill_func(bl(a[l]&raw_mask).M);
+            }
+        }
+    
     switch(raw_op)
     {
         case op_nop: break;
@@ -637,12 +643,6 @@ Execute(CACHED_ELIMINATION_MATRIX<T>* cem)
         case op_vec_add:
             if(a[1]&use_neg) vl(o)=vl(a[0])-vl(a[1]);
             else vl(o)=vl(a[0])+vl(a[1]);
-            break;
-        case free_mat:
-            bl(a[0]).M.x.Clean_Memory();
-            break;
-        case free_vec:
-            vl(a[0]).Clean_Memory();
             break;
         default: PHYSBAM_FATAL_ERROR();
     }

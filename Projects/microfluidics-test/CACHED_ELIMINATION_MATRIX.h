@@ -27,6 +27,7 @@ struct CACHED_ELIMINATION_MATRIX
         MATRIX_MXN<T> M;
         bool sym;
         ARRAY<int> prod_list;
+        std::function<void(MATRIX_MXN<T>& M)> fill_func=0;
     };
 
     ARRAY<MATRIX_INFO> block_list;

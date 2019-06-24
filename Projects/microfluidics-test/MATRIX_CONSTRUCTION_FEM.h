@@ -26,11 +26,11 @@ struct MATRIX_CONSTRUCTION_FEM
 
     MATRIX_CONSTRUCTION_FEM(COMPONENT_LAYOUT_FEM<T>& cl);
     ~MATRIX_CONSTRUCTION_FEM();
-    
+
     ARRAY<BLOCK_MATRIX<TV>,REFERENCE_BLOCK_ID> reference_matrix;
-    ARRAY<BLOCK_MATRIX<TV>,REFERENCE_BLOCK_ID> diagonal_system_blocks;
-    ARRAY<BLOCK_MATRIX<TV>,REFERENCE_CONNECTION_ID> regular_system_blocks;
-    ARRAY<ARRAY<BLOCK_MATRIX<TV>,RID_ID>,REFERENCE_IRREGULAR_ID> irregular_system_blocks;
+    ARRAY<std::function<void(MATRIX_MXN<T>&)>,REFERENCE_BLOCK_ID> diagonal_system_blocks;
+    ARRAY<std::function<void(MATRIX_MXN<T>&)>,REFERENCE_CONNECTION_ID> regular_system_blocks;
+    ARRAY<ARRAY<std::function<void(MATRIX_MXN<T>&)>,RID_ID>,REFERENCE_IRREGULAR_ID> irregular_system_blocks;
 
     HASHTABLE<CANONICAL_BLOCK<T>*,BLOCK_MATRIX<TV> > canonical_block_matrices;
     ARRAY<BLOCK_VECTOR<TV>,BLOCK_ID> rhs_block_list;
@@ -42,7 +42,7 @@ struct MATRIX_CONSTRUCTION_FEM
     void Fill_Canonical_Block_Matrix(BLOCK_MATRIX<TV>& mat,const REFERENCE_BLOCK_DATA& rb);
     void Fill_Block_Matrix(BLOCK_MATRIX<TV>& M,const REFERENCE_BLOCK_DATA& rd);
     void Fill_Connection_Matrix(BLOCK_MATRIX<TV>& M,const REFERENCE_CONNECTION_DATA& cd);
-    void Fill_Irregular_Connection_Matrix(ARRAY<BLOCK_MATRIX<TV>,RID_ID>& M,const REFERENCE_IRREGULAR_DATA& ri);
+    void Fill_Irregular_Connection_Matrix(BLOCK_MATRIX<TV>& M,const REFERENCE_IRREGULAR_DATA& ri,RID_ID j);
     void Copy_Matrix_Data(BLOCK_MATRIX<TV>& A,BLOCK_ID b,
         const DOF_PAIRS& dpa,const DOF_PAIRS& dpb,BLOCK_ID ar,BLOCK_ID ac) const;
     void Copy_Vector_Data(const BLOCK_VECTOR<TV>& B,BLOCK_ID a,BLOCK_ID b,const DOF_PAIRS& dp);
