@@ -9,8 +9,9 @@
 #include <Core/Matrices/MATRIX_MXN.h>
 #include <Core/Vectors/VECTOR.h>
 #include "COMMON.h"
-#include <mutex>
+#include "MANAGED_MATRIX.h"
 #include <atomic>
+#include <mutex>
 
 namespace PhysBAM{
 
@@ -22,12 +23,12 @@ template<class T> class MATRIX_MXN;
 template<class T>
 struct CACHED_ELIMINATION_MATRIX
 {
+    MANAGED_MATRIX<T,MATRIX_MXN<T> > matrix_cache;
+
     struct MATRIX_INFO
     {
-        MATRIX_MXN<T> M;
         bool sym;
         ARRAY<int> prod_list;
-        std::function<void(MATRIX_MXN<T>& M)> fill_func=0;
     };
 
     ARRAY<MATRIX_INFO> block_list;
@@ -52,7 +53,7 @@ struct CACHED_ELIMINATION_MATRIX
     ARRAY<bool> valid_row;
     ARRAY<int> elimination_order;
     bool quiet,pinv_last_blk=false;
-
+    
     // Note: Jobs are constructed in SSA form
     struct JOB
     {

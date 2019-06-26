@@ -668,7 +668,7 @@ Copy_To_CEM(CACHED_ELIMINATION_MATRIX<T>& cem)
         auto& M=diagonal_system_blocks(i);
         int id=cem.Create_Matrix_Block(true);
         diag_id(i)=id;
-        cem.block_list(id).fill_func=M;
+        cem.matrix_cache.entries(id).fill_func=M;
     }
 
     regular_system_blocks.Resize(cl.reference_connection_data.m);
@@ -677,7 +677,7 @@ Copy_To_CEM(CACHED_ELIMINATION_MATRIX<T>& cem)
         auto& M=regular_system_blocks(i);
         int id=cem.Create_Matrix_Block(false);
         reg_id(i)=id;
-        cem.block_list(id).fill_func=M;
+        cem.matrix_cache.entries(id).fill_func=M;
     }
 
     irregular_system_blocks.Resize(cl.reference_irregular_data.m);
@@ -689,7 +689,7 @@ Copy_To_CEM(CACHED_ELIMINATION_MATRIX<T>& cem)
         {
             int id=cem.Create_Matrix_Block(false);
             irreg_id(i)(j)=id;
-            cem.block_list(id).fill_func=is(j);
+            cem.matrix_cache.entries(id).fill_func=is(j);
         }
     }
 

@@ -59,6 +59,8 @@ void Run(PARSE_ARGS& parse_args)
     T s=1,m=1,kg=1;
     int hl_dof=-1;
     int refine=1;
+    int cache_size=-1;
+    std::string cache_pattern="cache-%d.txt";
     parse_args.Add("-o",&output_dir,"dir","output dir");
     parse_args.Add("-check_sol",&sol_file,"file","compare with saved solution");
     parse_args.Add("-mu",&mu,"mu","viscosity");
@@ -83,6 +85,8 @@ void Run(PARSE_ARGS& parse_args)
     parse_args.Add("-u",&analytic_u,"program","analytic velocity");
     parse_args.Add("-p",&analytic_p,"program","analytic pressure");
     parse_args.Add("-timing",&use_job_timing,"use job timing");
+    parse_args.Add("-cache_size",&cache_size,"size","number of cache entries to use");
+    parse_args.Add("-cache",&cache_pattern,"pattern","printf pattern for generating cache filenames");
     parse_args.Extra(&pipe_file,"file","file describing pipes");
     parse_args.Parse();
 
@@ -277,6 +281,7 @@ void Run(PARSE_ARGS& parse_args)
 
     timer("back solve");
 
+    cem.matrix_cache.Init(cache_pattern,cache_size);
     cem.Execute_Jobs(threads);
 
     timer("exec jobs");

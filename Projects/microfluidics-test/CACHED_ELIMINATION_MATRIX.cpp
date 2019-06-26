@@ -254,7 +254,8 @@ Compute_Mul(int a,int b)
         return *p;
     ARRAY<int> prod_list_trans=Transposed(prod_list);
     bool sym=prod_list==prod_list_trans;
-    int n=block_list.Append({{},sym,prod_list});
+    matrix_cache.entries.Add_End();
+    int n=block_list.Append({sym,prod_list});
     jobs.Append({op_mat_mul,{-1,a,b},n});
 
     if(!sym) cached_ops.Set({op_mat_mul,Transposed(b),Transposed(a)},n^use_trans);
@@ -338,8 +339,10 @@ Print_Current() const
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::
 Begin_Fill_Blocks()
 {
-    block_list.Append({{},true,{zero_block}});
-    block_list.Append({{},true,{id_block}});
+    matrix_cache.entries.Add_End();
+    matrix_cache.entries.Add_End();
+    block_list.Append({true,{zero_block}});
+    block_list.Append({true,{id_block}});
 }
 //#####################################################################
 // Function End_Fill_Blocks
@@ -371,15 +374,18 @@ Fill_Blocks(ARRAY<VECTOR<int,2>,DOF_ID>& dof_map,const ARRAY<TRIPLE<DOF_ID,DOF_I
             id=block_list.m;
             hash_to_id.Set(h,id);
             int n=Create_Matrix_Block(t.key.x==t.key.y);
-            MATRIX_MXN<T>& M=block_list(n).M;
-            M.Resize(orig_sizes(t.key.x),orig_sizes(t.key.y));
-            for(auto& s:t.data){
-                M(s.x,s.y)=code_values(s.z);
-                std::swap(s.x,s.y);}
-            t.data.Sort();
-            int th=Hash(t.data);
+            matrix_cache.entries(n).fill_func=[this,&t,&code_values](MATRIX_MXN<T>& M)
+                {
+                    M.Resize(orig_sizes(t.key.x),orig_sizes(t.key.y));
+                    for(auto& s:t.data) M(s.x,s.y)=code_values(s.z);
+                };
+            auto S=t.data;
+            for(auto& s:S) std::swap(s.x,s.y);
+            S.Sort();
+            int th=Hash(S);
             if(th!=h)
-                hash_to_id.Set(th,id|use_trans);}
+                hash_to_id.Set(th,id|use_trans);
+        }
         blocks_to_canonical_block_id.Set(t.key,id);}
 
     Unpack_Vector(dof_map,orig_rhs,rhs_vector);
@@ -563,7 +569,7 @@ Execute_Jobs(int num_threads)
     Combine_Ops();
     Simplify_Jobs();
     Relabel();
-
+        
     JOB_SCHEDULER<JOB,CACHED_ELIMINATION_MATRIX<T> > scheduler(this);
     for(int i=0;i<jobs.m;i++){
         int id=scheduler.Add_Job(&jobs(i),0);
@@ -580,53 +586,43 @@ Execute_Jobs(int num_threads)
 template<class T> void CACHED_ELIMINATION_MATRIX<T>::JOB::
 Execute(CACHED_ELIMINATION_MATRIX<T>* cem)
 {
-    auto& bl=cem->block_list;
     auto& vl=cem->vector_list;
     int raw_op=op&raw_op_mask;
+    MATRIX_MXN<T>* MO=0,*MA[3]={};
     for(int l=0;l<3;l++)
         if(arg_type[raw_op][l]==1 && a[l]>1)
-        {
-            if(bl(a[l]&raw_mask).M.m==0)
-            {
-                assert(bl(a[l]&raw_mask).fill_func);
-                bl(a[l]&raw_mask).fill_func(bl(a[l]&raw_mask).M);
-            }
-        }
-    
+            MA[l]=&cem->matrix_cache.Use(a[l]&raw_mask);
+    if(arg_type[raw_op][3]==1 && o>1)
+        MO=&cem->matrix_cache.Use(o);
+
     switch(raw_op)
     {
         case op_nop: break;
         case op_mat_inv:
-            bl(o).M=bl(a[0]).M;
-            if(op&pseudo_inv) Pseudo_Inverse(bl(o).M);
-            else Inverse(bl(o).M);
+            *MO=*MA[0];
+            if(op&pseudo_inv) Pseudo_Inverse(*MO);
+            else Inverse(*MO);
             break;
         case op_mat_mul:
             {
                 int s0=0,s1=((a[1]^a[2])&use_neg)?-1:1;
                 if(a[0]>=0) s0=(a[0]&use_neg)?-1:1;
-                auto& A=bl(a[1]&raw_mask).M;
-                auto& B=bl(a[2]&raw_mask).M;
-                auto& C=bl(o).M;
-                if(a[0]<0) C.Resize(a[1]&use_trans?A.n:A.m,a[2]&use_trans?B.m:B.n);
-                else if((a[0]&raw_mask)!=o) C=bl(a[0]&raw_mask).M;
-                Times_MM(C,s0,A,a[1]&use_trans,B,a[2]&use_trans,s1);
+                if(a[0]<0) MO->Resize(a[1]&use_trans?MA[1]->n:MA[1]->m,a[2]&use_trans?MA[2]->m:MA[2]->n);
+                else if((a[0]&raw_mask)!=o) *MO=*MA[0];
+                Times_MM(*MO,s0,*MA[1],a[1]&use_trans,*MA[2],a[2]&use_trans,s1);
             }
             break;
         case op_mat_add:
             {
-                auto& A=bl(a[0]&raw_mask).M;
-                auto& B=bl(a[1]&raw_mask).M;
-                auto& C=bl(o).M;
                 if(a[1]&use_trans)
                 {
-                    if(a[1]&use_neg) C=A-B.Transposed();
-                    else C=A+B.Transposed();
+                    if(a[1]&use_neg) *MO=*MA[0]-MA[1]->Transposed();
+                    else *MO=*MA[0]+MA[1]->Transposed();
                 }
                 else
                 {
-                    if(a[1]&use_neg) C=A-B;
-                    else C=A+B;
+                    if(a[1]&use_neg) *MO=*MA[0]-*MA[1];
+                    else *MO=*MA[0]+*MA[1];
                 }
             }
             break;
@@ -634,7 +630,7 @@ Execute(CACHED_ELIMINATION_MATRIX<T>* cem)
             {
                 int s0=0,s1=((a[1]^a[2])&use_neg)?-1:1;
                 if(a[0]>=0) s0=(a[0]&use_neg)?-1:1;
-                auto& M=bl(a[1]&raw_mask).M;
+                auto& M=*MA[1];
                 if(a[0]<0) vl(o).Resize(a[1]&use_trans?M.n:M.m);
                 else if(a[0]!=o) vl(o)=vl(a[0]&raw_mask);
                 Times_MV(vl(o),s1,M,a[1]&use_trans,vl(a[2]&raw_mask),s0);
@@ -648,14 +644,14 @@ Execute(CACHED_ELIMINATION_MATRIX<T>* cem)
     }
 
     for(int l=0;l<3;l++)
-        if(arg_type[raw_op][l]>0 && a[l]>=0)
+        if(arg_type[raw_op][l]>0 && a[l]>1)
         {
-            if(!--cem->data_refs[arg_type[raw_op][l]-1][a[l]&raw_mask])
-            {
-                if(arg_type[raw_op][l]==1) bl(a[l]&raw_mask).M.x.Clean_Memory();
-                else vl(a[l]&raw_mask).Clean_Memory();
-            }
+            bool rem=!--cem->data_refs[arg_type[raw_op][l]-1][a[l]&raw_mask];
+            if(arg_type[raw_op][l]==1) cem->matrix_cache.Release(a[l]&raw_mask,rem);
+            else if(rem) vl(a[l]&raw_mask).Clean_Memory();
         }
+    if(arg_type[raw_op][3]==1 && o>1)
+        cem->matrix_cache.Release(o,false);
 }
 //#####################################################################
 // Function Compute_Job_Deps
@@ -870,7 +866,8 @@ Relabel()
 template<class T> int CACHED_ELIMINATION_MATRIX<T>::
 Create_Matrix_Block(bool sym)
 {
-    return block_list.Append({{},sym,{block_list.m}});
+    matrix_cache.entries.Add_End();
+    return block_list.Append({sym,{block_list.m}});
 }
 //#####################################################################
 // Function Add_Block_Matrix_Entry

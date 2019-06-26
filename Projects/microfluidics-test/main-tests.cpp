@@ -27,6 +27,9 @@ using namespace PhysBAM;
 typedef float RW;
 typedef double T;
 
+int cache_size=-1;
+std::string cache_pattern="cache-%d.txt";
+
 template<int d>
 void Solve_And_Check(COMPONENT_LAYOUT_FEM<T>& cl,const LAYOUT_BUILDER_FEM<T>& builder,
     T mu,const std::string& au,const std::string& ap)
@@ -52,6 +55,7 @@ void Solve_And_Check(COMPONENT_LAYOUT_FEM<T>& cl,const LAYOUT_BUILDER_FEM<T>& bu
     el.Eliminate_Non_Seperators(cem);
     cem.Full_Reordered_Elimination();
     cem.Back_Solve();
+    cem.matrix_cache.Init(cache_pattern,cache_size);
     cem.Execute_Jobs(1);
     mc.Transform_Solution(cem,false,false);
     if(!an.Check_Analytic_Solution(false))
@@ -848,6 +852,8 @@ void Run(PARSE_ARGS& parse_args)
     parse_args.Add("-kg",&kg,"scale","scale units of mass");
     parse_args.Add("-seed",&seed,"seed","random seed");
     parse_args.Add("-gen",&gen_tests,"generate tests");
+    parse_args.Add("-cache_size",&cache_size,"size","number of cache entries to use");
+    parse_args.Add("-cache",&cache_pattern,"pattern","printf pattern for generating cache filenames");
     parse_args.Parse(true);
     if(!gen_tests)
     {
