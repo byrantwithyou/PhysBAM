@@ -16,6 +16,8 @@ namespace PhysBAM{
 //###################################################################
 bool Directory_Exists(const std::string& dirname);
 bool Create_Directory(const std::string& dirname);
+bool Remove_File(const std::string& filename,bool check_compressed=true);
+bool Remove_Directory(const std::string& filename);
 std::string Real_Path(const std::string& path);
 int Compare_File_Times_Ignoring_Compression_Suffix(const std::string& filename1,const std::string& filename2);
 std::istream* Safe_Open_Input_Raw(const std::string& filename,bool binary=true);

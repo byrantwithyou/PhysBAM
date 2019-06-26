@@ -44,6 +44,16 @@ bool Create_Directory(const std::string& dirname)
     return true;
 }
 
+bool Remove_File(const std::string& filename,bool check_compressed)
+{
+    PHYSBAM_NOT_IMPLEMENTED();
+}
+
+bool Remove_Directory(const std::string& filename)
+{
+    PHYSBAM_NOT_IMPLEMENTED();
+}
+
 std::string Real_Path(const std::string& path)//TODO: Implement this for windows
 {
     PHYSBAM_NOT_IMPLEMENTED();
@@ -85,20 +95,39 @@ std::string Get_Working_Directory()
 
 bool Directory_Exists(const std::string& dirname)
 {
-    return !std::ifstream(dirname.c_str()).fail();
+    struct stat buf;
+    int st_ret=stat(dirname.c_str(),&buf);
+    if(st_ret) return false;
+    return S_ISDIR(buf.st_mode);
 }
 
 bool Create_Directory(const std::string& dirname)
 {
-    if(!Directory_Exists(dirname)){
-        std::string command="mkdir -p "+dirname;
-        LOG::cout<<"Creating directory using system(\""<<command<<"\")...";
-        if(system(command.c_str()) || !Directory_Exists(dirname)){
-            LOG::cerr<<"Failed!"<<std::endl;
-            throw FILESYSTEM_ERROR("Create_Directory failed");
-            return false;}
-        LOG::cout<<"Successful!"<<std::endl;}
-    return true;
+    int mk_ret=mkdir(dirname.c_str(), 0775);
+    if(!mk_ret)
+    {
+        LOG::cout<<"Creating directory "<<dirname<<" Successful."<<std::endl;
+        return true;
+    }
+    if(Directory_Exists(dirname)) return true;
+    LOG::cout<<"Creating directory "<<dirname<<" Failed."<<std::endl;
+    throw FILESYSTEM_ERROR("Create_Directory failed");
+}
+
+bool Remove_File(const std::string& filename,bool check_compressed)
+{
+    if(!unlink(filename.c_str())) return true;
+    if(check_compressed)
+    {
+        std::string comp=filename+".gz";
+        return !unlink(comp.c_str());
+    }
+    return false;
+}
+
+bool Remove_Directory(const std::string& filename)
+{
+    return !rmdir(filename.c_str());
 }
 
 std::string Real_Path(const std::string& path)
