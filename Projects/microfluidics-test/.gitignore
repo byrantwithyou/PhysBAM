@@ -1,3 +1,5 @@
 table-gen/generate-table
 test_proj
 fem
+tests
+sol_viewer
