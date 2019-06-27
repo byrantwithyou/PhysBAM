@@ -62,7 +62,6 @@ struct MANAGED_MATRIX
         std::unique_lock<std::mutex> lck(*e.mtx);
         if(e.state==state_type::in_cache)
         {
-            LOG::printf("hit %i\n",i);
             e.recent=true;
             e.num_users++;
             e.state=state_type::in_cache;
@@ -148,7 +147,6 @@ struct MANAGED_MATRIX
             std::string file=LOG::sprintf(pattern.c_str(),i);
             Read_From_File(file,*e.obj);
             Remove_File(file);
-            LOG::printf("miss %i\n",i);
         }
         e.state=state_type::in_cache;
     }
