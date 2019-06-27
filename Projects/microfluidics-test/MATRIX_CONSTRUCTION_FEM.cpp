@@ -19,9 +19,19 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class TV> MATRIX_CONSTRUCTION_FEM<TV>::
-MATRIX_CONSTRUCTION_FEM(COMPONENT_LAYOUT_FEM<T>& cl)
+MATRIX_CONSTRUCTION_FEM(COMPONENT_LAYOUT_FEM<T>& cl,const std::string& cache_pattern,int cache_size)
     :cl(cl)
 {
+    if(TV::m==2)
+    {
+        HASHTABLE<CANONICAL_BLOCK<T>*> cbs;
+        for(const auto& b:cl.blocks)
+            cbs.Insert(b.block);
+        canonical_matrix_cache.entries.Resize(cbs.Size());
+    }
+    else
+        canonical_matrix_cache.entries.Resize(Value(cl.reference_block_data.m));
+    canonical_matrix_cache.Init(cache_pattern,cache_size);
 }
 //#####################################################################
 // Destructor
@@ -323,7 +333,7 @@ Times_Line_Integral_U_Dot_V(BLOCK_ID b,INTERVAL<int> bc_e,BLOCK_VECTOR<TV>& w,co
 //#####################################################################
 template<class TV> void MATRIX_CONSTRUCTION_FEM<TV>::
 Copy_Matrix_Data(BLOCK_MATRIX<TV>& A,BLOCK_ID b,
-    const DOF_PAIRS& dpa,const DOF_PAIRS& dpb,BLOCK_ID ar,BLOCK_ID ac) const
+    const DOF_PAIRS& dpa,const DOF_PAIRS& dpb,BLOCK_ID ar,BLOCK_ID ac)
 {
     const BLOCK_MATRIX<TV>& B=Canonical_Matrix(b);
     MATRIX<T,2> G=cl.blocks(b).xform.M.Inverse();
@@ -366,6 +376,7 @@ Copy_Matrix_Data(BLOCK_MATRIX<TV>& A,BLOCK_ID b,
                 [=,&A,&B](int dc,int sc){A.Add_pe(dr,dc,Mb.Transpose_Times(B.Get_pe(sr,sc)*sa));},
                 [=,&A,&B](int dc,int sc){});
         });
+    Release_Canonical_Matrix(b);
 }
 //#####################################################################
 // Function Copy_Vector_Data
@@ -508,11 +519,37 @@ Fill_Irregular_Connection_Matrix(BLOCK_MATRIX<TV>& M,const REFERENCE_IRREGULAR_D
 // Function Canonical_Matrix
 //#####################################################################
 template<class TV> const BLOCK_MATRIX<TV>& MATRIX_CONSTRUCTION_FEM<TV>::
-Canonical_Matrix(BLOCK_ID b) const
+Canonical_Matrix(BLOCK_ID b)
 {
     const auto& bl=cl.blocks(b);
-    if(TV::m==2) return canonical_block_matrices.Get(bl.block);
-    else return reference_matrix(bl.ref_id);
+    if(TV::m==2)
+    {
+        int i=canonical_block_matrices.Get(bl.block);
+        return canonical_matrix_cache.Use(i);
+    }
+    else
+    {
+        int i=reference_matrix(bl.ref_id);
+        return canonical_matrix_cache.Use(i);
+    }
+}
+//#####################################################################
+// Function Release_Canonical_Matrix
+//#####################################################################
+template<class TV> void MATRIX_CONSTRUCTION_FEM<TV>::
+Release_Canonical_Matrix(BLOCK_ID b)
+{
+    const auto& bl=cl.blocks(b);
+    if(TV::m==2)
+    {
+        int i=canonical_block_matrices.Get(bl.block);
+        canonical_matrix_cache.Release(i,false);
+    }
+    else
+    {
+        int i=reference_matrix(bl.ref_id);
+        canonical_matrix_cache.Release(i,false);
+    }
 }
 //#####################################################################
 // Function Compute_Matrix_Blocks
@@ -521,18 +558,32 @@ template<class TV> void MATRIX_CONSTRUCTION_FEM<TV>::
 Compute_Matrix_Blocks()
 {
     if(TV::m==3) reference_matrix.Resize(cl.reference_block_data.m);
+    int next=0;
     for(REFERENCE_BLOCK_ID i(0);i<cl.reference_block_data.m;i++)
     {
         auto& rd=cl.reference_block_data(i);
         auto& bl=cl.blocks(rd.b);
         if(TV::m==2)
         {
-            auto pr=canonical_block_matrices.Insert(bl.block,{});
-            if(pr.y) Fill_Canonical_Block_Matrix(*pr.x,rd);
+            auto pr=canonical_block_matrices.Insert(bl.block,-1);
+            if(pr.y)
+            {
+                canonical_matrix_cache.entries(next).fill_func=[this,i](BLOCK_MATRIX<TV>& M)
+                {
+                    const auto& rd=cl.reference_block_data(i);
+                    Fill_Canonical_Block_Matrix(M,rd);
+                };
+                *pr.x=next++;
+            }
         }
         else
         {
-            Fill_Canonical_Block_Matrix(reference_matrix(i),rd);
+            reference_matrix(i)=Value(i);
+            canonical_matrix_cache.entries(Value(i)).fill_func=[this,i](BLOCK_MATRIX<TV>& M)
+            {
+                const auto& rd=cl.reference_block_data(i);
+                Fill_Canonical_Block_Matrix(M,rd);
+            };
         }
     }
 
@@ -614,6 +665,7 @@ Compute_RHS()
                 u.Add_e(va.i,TV(M*-k*z*bc.normal));
             });
         w.V=Canonical_Matrix(bc.b).M*-u.V;
+        Release_Canonical_Matrix(bc.b);
         w.Transform(To_Dim<TV::m>(bl.xform.M),1);
         Apply_To_RHS(bc.b,w);
     }

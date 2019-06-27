@@ -138,6 +138,7 @@ Compute_RHS()
                 u.Add_e(va.i,M*analytic_velocity->v(Z/m,0)*m/s);
             });
         w.V=mc.Canonical_Matrix(b).M*-u.V;
+        mc.Release_Canonical_Matrix(b);
 
         // TODO: handle det(M)!=1
         u.V.Fill(0);

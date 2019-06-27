@@ -67,6 +67,16 @@ struct BLOCK_MATRIX
     void Add_pe(int r,int c,TV u) {Add_R(TV::m*(nr.v+nr.e)+r,TV::m*(c+nc.v),u);}
     void Add_up(int r,int er,int c,TV u) {Add_C(TV::m*(r+er*nr.v),TV::m*(nc.v+nc.e)+c,u);}
     void Add_pu(int r,int c,int ec,TV u) {Add_R(TV::m*(nr.v+nr.e)+r,TV::m*(c+ec*nc.v),u);}
+
+    template<class RW> void Read(std::istream& input)
+    {
+        Read_Binary<RW>(input,nr,nc,M);
+    }
+
+    template<class RW> void Write(std::ostream& output) const
+    {
+        Write_Binary<RW>(output,nr,nc,M);
+    }
 };
 
 }

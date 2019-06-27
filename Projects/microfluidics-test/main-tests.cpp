@@ -37,12 +37,12 @@ void Solve_And_Check(COMPONENT_LAYOUT_FEM<T>& cl,const LAYOUT_BUILDER_FEM<T>& bu
     typedef VECTOR<T,d> TV;
     cl.Update_Masters();
     cl.Merge_Blocks();
-    MATRIX_CONSTRUCTION_FEM<TV> mc(cl);
-    mc.mu=mu*cl.unit_kg*pow<2-d>(cl.unit_m)/cl.unit_s;
     CACHED_ELIMINATION_MATRIX<T> cem;
     cem.quiet=true;
     cl.Compute_Dof_Pairs();
     cl.Fill_Reference_Ticks();
+    MATRIX_CONSTRUCTION_FEM<TV> mc(cl,"canonical-%d",cache_size);
+    mc.mu=mu*cl.unit_kg*pow<2-d>(cl.unit_m)/cl.unit_s;
     mc.Compute_Matrix_Blocks();
     ANALYTIC_FEM<TV> an(mc);
     an.Set_Velocity(au.c_str());

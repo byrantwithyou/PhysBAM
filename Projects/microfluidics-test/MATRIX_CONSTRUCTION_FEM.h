@@ -7,6 +7,7 @@
 #include "BLOCK_MATRIX.h"
 #include "BLOCK_VECTOR.h"
 #include "COMPONENT_LAYOUT_FEM.h"
+#include "MANAGED_MATRIX.h"
 
 namespace PhysBAM{
 
@@ -24,18 +25,20 @@ struct MATRIX_CONSTRUCTION_FEM
     COMPONENT_LAYOUT_FEM<T>& cl;
     T mu=1;
 
-    MATRIX_CONSTRUCTION_FEM(COMPONENT_LAYOUT_FEM<T>& cl);
+    MATRIX_CONSTRUCTION_FEM(COMPONENT_LAYOUT_FEM<T>& cl,const std::string& cache_pattern,int cache_size=-1);
     ~MATRIX_CONSTRUCTION_FEM();
 
-    ARRAY<BLOCK_MATRIX<TV>,REFERENCE_BLOCK_ID> reference_matrix;
+    MANAGED_MATRIX<T,BLOCK_MATRIX<TV> > canonical_matrix_cache;
+    ARRAY<int,REFERENCE_BLOCK_ID> reference_matrix;
     ARRAY<std::function<void(MATRIX_MXN<T>&)>,REFERENCE_BLOCK_ID> diagonal_system_blocks;
     ARRAY<std::function<void(MATRIX_MXN<T>&)>,REFERENCE_CONNECTION_ID> regular_system_blocks;
     ARRAY<ARRAY<std::function<void(MATRIX_MXN<T>&)>,RID_ID>,REFERENCE_IRREGULAR_ID> irregular_system_blocks;
 
-    HASHTABLE<CANONICAL_BLOCK<T>*,BLOCK_MATRIX<TV> > canonical_block_matrices;
+    HASHTABLE<CANONICAL_BLOCK<T>*,int> canonical_block_matrices;
     ARRAY<BLOCK_VECTOR<TV>,BLOCK_ID> rhs_block_list;
 
-    const BLOCK_MATRIX<TV>& Canonical_Matrix(BLOCK_ID b) const;
+    const BLOCK_MATRIX<TV>& Canonical_Matrix(BLOCK_ID b);
+    void Release_Canonical_Matrix(BLOCK_ID b);
     void Compute_Matrix_Blocks();
     void Compute_RHS();
     void Copy_To_CEM(CACHED_ELIMINATION_MATRIX<T>& cem);
@@ -44,7 +47,7 @@ struct MATRIX_CONSTRUCTION_FEM
     void Fill_Connection_Matrix(BLOCK_MATRIX<TV>& M,const REFERENCE_CONNECTION_DATA& cd);
     void Fill_Irregular_Connection_Matrix(BLOCK_MATRIX<TV>& M,const REFERENCE_IRREGULAR_DATA& ri,RID_ID j);
     void Copy_Matrix_Data(BLOCK_MATRIX<TV>& A,BLOCK_ID b,
-        const DOF_PAIRS& dpa,const DOF_PAIRS& dpb,BLOCK_ID ar,BLOCK_ID ac) const;
+        const DOF_PAIRS& dpa,const DOF_PAIRS& dpb,BLOCK_ID ar,BLOCK_ID ac);
     void Copy_Vector_Data(const BLOCK_VECTOR<TV>& B,BLOCK_ID a,BLOCK_ID b,const DOF_PAIRS& dp);
     void Init_Block_Matrix(BLOCK_MATRIX<TV>& M,BLOCK_ID a,BLOCK_ID b,bool compressed) const;
     void Init_Block_Vector(BLOCK_VECTOR<TV>& M,BLOCK_ID b,bool compressed) const;
