@@ -31,6 +31,7 @@ MATRIX_CONSTRUCTION_FEM(COMPONENT_LAYOUT_FEM<T>& cl,const std::string& cache_pat
     }
     else
         canonical_matrix_cache.entries.Resize(Value(cl.reference_block_data.m));
+    canonical_matrix_cache.refill_on_pagefault=true;
     canonical_matrix_cache.Init(cache_pattern,cache_size);
 }
 //#####################################################################

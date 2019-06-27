@@ -167,13 +167,13 @@ void Run(PARSE_ARGS& parse_args)
         }
     }
 
-    MATRIX_CONSTRUCTION_FEM<TV> mc(cl,cache_pattern+"-canonical",cache_size);
-    mc.mu=mu*cl.unit_kg*pow<2-TV::m>(cl.unit_m)/cl.unit_s;
     CACHED_ELIMINATION_MATRIX<T> cem;
     cem.quiet=quiet;
     cem.pinv_last_blk=pinv;
     cl.Compute_Dof_Pairs();
     cl.Fill_Reference_Ticks();
+    MATRIX_CONSTRUCTION_FEM<TV> mc(cl,cache_pattern+"-canonical",cache_size);
+    mc.mu=mu*cl.unit_kg*pow<2-TV::m>(cl.unit_m)/cl.unit_s;
     if(!quiet)
     {
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)

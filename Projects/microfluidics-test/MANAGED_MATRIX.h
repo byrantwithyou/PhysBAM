@@ -34,6 +34,8 @@ struct MANAGED_MATRIX
 
     ARRAY<ENTRY> entries;
     int entries_size=0;
+    // alias state on_disk to need_fill
+    bool refill_on_pagefault=false;
 
     std::mutex clock_mtx;
     ARRAY<int> cache_entries;
@@ -144,9 +146,16 @@ struct MANAGED_MATRIX
         else
         {
             assert(e.state==state_type::on_disk);
-            std::string file=LOG::sprintf(pattern.c_str(),i);
-            Read_From_File(file,*e.obj);
-            Remove_File(file);
+            if(!refill_on_pagefault)
+            {
+                std::string file=LOG::sprintf(pattern.c_str(),i);
+                Read_From_File(file,*e.obj);
+                Remove_File(file);
+            }
+            else
+            {
+                if(e.fill_func) e.fill_func(*e.obj);
+            }
         }
         e.state=state_type::in_cache;
     }
@@ -155,8 +164,11 @@ struct MANAGED_MATRIX
     void Evict(int i)
     {
         ENTRY& e=entries(i);
-        std::string file=LOG::sprintf(pattern.c_str(),i);
-        Write_To_File<T>(file,*e.obj);
+        if(!refill_on_pagefault)
+        {
+            std::string file=LOG::sprintf(pattern.c_str(),i);
+            Write_To_File<T>(file,*e.obj);
+        }
         delete e.obj;
         e.obj=0;
         e.state=state_type::on_disk;
