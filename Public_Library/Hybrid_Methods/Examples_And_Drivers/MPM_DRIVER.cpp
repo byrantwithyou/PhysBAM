@@ -506,7 +506,7 @@ Print_Max_Sound_Speed()
     T max_sound_speed=Compute_Max_Sound_Speed();
     LOG::printf("max sound speed: %.16P\n",max_sound_speed);
     LOG::printf("dx: %.16P\n",example.grid.dX.Min());
-    LOG::printf("dx/soundspeed: %.16P\n",example.grid.dX.Min()/max_sound_speed);
+    LOG::printf("dx/soundspeed: %.16P\n",Robust_Divide(example.grid.dX.Min(),max_sound_speed));
 }
 //#####################################################################
 // Function Update_Plasticity_And_Hardening
