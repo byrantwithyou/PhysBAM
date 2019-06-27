@@ -15,6 +15,9 @@ namespace PhysBAM{
 // Platform Specific Function Definitions
 //###################################################################
 bool Directory_Exists(const std::string& dirname);
+bool Directory_Exists(const char* dirname);
+bool Create_Directory(char* dirname);
+bool Create_Directory(const char* dirname);
 bool Create_Directory(const std::string& dirname);
 bool Remove_File(const std::string& filename,bool check_compressed=true);
 bool Remove_Directory(const std::string& filename);

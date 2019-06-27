@@ -93,25 +93,45 @@ std::string Get_Working_Directory()
 //###################################################################
 #elif defined(__linux__) || defined(__CYGWIN__) || defined(__APPLE__)
 
-bool Directory_Exists(const std::string& dirname)
+bool Directory_Exists(const char* dirname)
 {
     struct stat buf;
-    int st_ret=stat(dirname.c_str(),&buf);
+    int st_ret=stat(dirname,&buf);
     if(st_ret) return false;
     return S_ISDIR(buf.st_mode);
 }
 
+bool Directory_Exists(const std::string& dirname)
+{
+    return Directory_Exists(dirname.c_str());
+}
+
+bool Create_Directory(char* dirname)
+{
+    for(char* s=dirname+1; *s; s++)
+        if(*s=='/')
+        {
+            *s=0;
+            if(mkdir(dirname, 0775) && errno!=EEXIST) return false;
+            *s='/';
+        }
+
+    if(!mkdir(dirname, 0775)) return true;
+    if(errno!=EEXIST) return false;
+    return Directory_Exists(dirname);
+}
+
+bool Create_Directory(const char* dirname)
+{
+    int len=strlen(dirname)+1;
+    char copy[len];
+    memcpy(copy,dirname,len);
+    return Create_Directory(copy);
+}
+
 bool Create_Directory(const std::string& dirname)
 {
-    int mk_ret=mkdir(dirname.c_str(), 0775);
-    if(!mk_ret)
-    {
-        LOG::cout<<"Creating directory "<<dirname<<" Successful."<<std::endl;
-        return true;
-    }
-    if(Directory_Exists(dirname)) return true;
-    LOG::cout<<"Creating directory "<<dirname<<" Failed."<<std::endl;
-    throw FILESYSTEM_ERROR("Create_Directory failed");
+    return Create_Directory(dirname.c_str());
 }
 
 bool Remove_File(const std::string& filename,bool check_compressed)
@@ -218,7 +238,7 @@ std::istream* Safe_Open_Input_Raw(const std::string& filename,bool binary)
 std::ostream* Safe_Open_Output_Raw(const std::string& filename,bool binary,bool write_compressed_if_possible)
 {
     bool compressed=File_Is_Compressed(filename);
-    std::ios_base::openmode flags=std::ios::out;if(binary) flags|=std::ios::binary; 
+    std::ios_base::openmode flags=std::ios::out;if(binary) flags|=std::ios::binary;
     if(!write_compressed_if_possible && File_Exists_Ignoring_Compression_Suffix(filename+".gz")){
         LOG::cerr<<"Refusing to write "<<filename<<" uncompressed when compressed version already exists\n";
         throw FILESYSTEM_ERROR("Safe_Open_Output failed (compressed already exists)");}
