@@ -10,12 +10,14 @@
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Math_Tools/sqr.h>
 #include <Core/Matrices/MATRIX_BASE.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
 namespace PhysBAM{
 
 template<class T>
 class MATRIX_MXN:public MATRIX_BASE<T,MATRIX_MXN<T> >
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef MATRIX_BASE<T,MATRIX_MXN<T> > BASE;
     using BASE::operator+;using BASE::operator+=;using BASE::operator-;using BASE::operator-=;using BASE::operator*;using BASE::operator*=;
     using BASE::Times_Transpose;using BASE::Transpose_Times;
@@ -195,6 +197,13 @@ public:
 
     void Exchange(MATRIX_MXN& M)
     {std::swap(m,M.m);std::swap(n,M.n);x.Exchange(M.x);}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,m,n,x);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,m,n,x);}
+
 //#####################################################################
 };
 template<class T>
