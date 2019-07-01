@@ -1,27 +1,25 @@
 #!/bin/bash
 
-NAME=self-conv-2d
+NAME=self-conv-3d
+SOL_FOLDER=sol-3d
 
 export OPENBLAS_NUM_THREADS=1
-ARGS="../fem -q -threads 16 -mu 8.9e-4"
+ARGS="../fem -3d -q -threads 16 -mu 8.9e-4"
 FULL=1 # Set to 1 for a full rebuild; 0 to skip rerunning the simulations
 
 tests=(simple grid20 rgrid0 rgrid1 voronoi-s4 voronoi-s15)
 LO=2
-HI=16
-SOL=32
+HI=5
+SOL=8
 
 if [ "X$FULL" = "X1" ] ; then
     rm -rf $NAME
     mkdir -p $NAME
     for c in ${tests[@]} ; do
-        $ARGS -o $NAME/$c-r$SOL -refine $SOL -dump_sol ../$c.txt > /dev/null
-    done
-    for c in ${tests[@]} ; do
         for r in `seq $HI -1 $LO` ; do
-            echo $ARGS -o $NAME/$c-r$r -refine $r -check_sol $NAME/$c-r$SOL/sol.gz ../$c.txt;
+            $ARGS -o $NAME/$c-r$r -refine $r -check_sol $SOL_FOLDER/$c-r$SOL/sol.gz ../$c.txt;
         done
-    done | xargs -P 4 -n 1 -d '\n' bash -c > /dev/null
+    done
 fi
 
 for c in ${tests[@]} ; do
@@ -33,7 +31,7 @@ res linf l2
 EOF
     for r in `seq $LO 1 $HI` ; do
         res=`bc <<< "2*$r"`
-        maxsol=`grep 'sol max' $NAME/$c-r$SOL/common/log.txt | sed "s/.*sol maxv \([^ ]*\) maxp \([^<]*\).*/\1 \2/g"`
+        maxsol=`grep 'sol max' $SOL_FOLDER/$c-r$SOL/common/log.txt | sed "s/.*sol maxv \([^ ]*\) maxp \([^<]*\).*/\1 \2/g"`
         read maxv maxp <<< "$maxsol"
         err=`grep 'l-2' $NAME/$c-r$r/common/log.txt | sed "s/.*l-inf \([^ ]*\).*l-2 \([^ ]*\).*l-inf \([^ ]*\).*l-2 \([^<]*\).*/\1 \2 \3 \4/g"`;
         read vlinf vl2 plinf pl2 <<< "$err"
