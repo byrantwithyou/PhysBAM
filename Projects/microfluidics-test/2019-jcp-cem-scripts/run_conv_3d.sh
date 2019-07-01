@@ -3,13 +3,13 @@
 NAME=conv-3d
 
 export OPENBLAS_NUM_THREADS=1
-ARGS="../fem -3d -q -threads 8"
+ARGS="../fem -3d -q -threads 12"
 FULL=1 # Set to 1 for a full rebuild; 0 to skip rerunning the simulations
 
 tests=(simple grid20 rgrid0 rgrid1 voronoi-s4 voronoi-s15)
 LO=2
 HI=5
-ANA="-u 'u=sin(x)*y+cos(y)*z+x*y,v=cos(x)*cos(y)+sin(y)*x+x*x+y*z-1,w=sin(z)*y+cos(x)*z' -p 'p=sin(x+y+1)+cos(z)'"
+ANA="-u 'u=sin(14*x)*y+cos(15*y)*z+x*y,v=cos(14*x)*cos(16*y)+sin(15*y)*x+x*x+y*z-1,w=sin(17*z)*y+cos(15*x)*z' -p 'p=sin(15*x+14*y+1)+cos(16*z)'"
 
 if [ "X$FULL" = "X1" ] ; then
     rm -rf $NAME

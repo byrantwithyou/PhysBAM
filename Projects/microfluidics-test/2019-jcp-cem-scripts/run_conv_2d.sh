@@ -9,7 +9,7 @@ FULL=1 # Set to 1 for a full rebuild; 0 to skip rerunning the simulations
 tests=(simple grid20 rgrid0 rgrid1 voronoi-s4 voronoi-s15)
 LO=2
 HI=16
-ANA="-u 'u=sin(x)*y+cos(y)+x*y,v=cos(x)*cos(y)+sin(y)*x+x*x-1' -p 'p=sin(x+y+1)'"
+ANA="-u 'u=sin(12*x)*y+cos(15*y)+x*y,v=cos(14*x)*cos(13*y)+sin(16*y)*x+x*x-1' -p 'p=sin(15*x+10*y+1)'"
 
 if [ "X$FULL" = "X1" ] ; then
     rm -rf $NAME
