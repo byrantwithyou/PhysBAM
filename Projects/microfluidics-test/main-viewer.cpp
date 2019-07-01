@@ -55,7 +55,7 @@ void Run(PARSE_ARGS& parse_args)
     parse_args.Add("-res",&resolution,"resolution","resolution");
     parse_args.Add("-min_color",&min_color,&user_color_scale,"value","minimum value for the coolest color");
     parse_args.Add("-max_color",&max_color,&user_color_scale,"value","maximum value for the hottest color");
-    parse_args.Add("-x",&X,"position","interpolate solution");
+    parse_args.Add("-x",&X,&user_query,"position","interpolate solution");
     parse_args.Extra(&sol_file,"file","solution file");
     parse_args.Parse();
 
