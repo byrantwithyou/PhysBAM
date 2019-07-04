@@ -416,7 +416,10 @@ Initialize()
             T density=2*unit_rho*scale_mass;
             Seed_Particles(box,0,0,density,particles_per_cell);
             Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
+            particles.mu*=0;
+            particles.mu0*=0;
             Add_Gravity(m/(s*s)*TV(0,-1.8));
+            Add_Walls(-1,COLLISION_TYPE::separate,0,grid.dX.Min()*m,false);
         } break;
         case 24:{ // (fluid test) circle drop
             // one: ./mpm -kkt -scale_E 0
