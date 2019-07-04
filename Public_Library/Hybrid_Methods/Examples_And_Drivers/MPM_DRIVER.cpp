@@ -412,17 +412,9 @@ Limit_Dt_Sound_Speed()
 {
     if(!example.use_sound_speed_cfl) return;
     T dt=example.dt;
-    for(int f=0;f<example.forces.m;f++){
-        if(const MPM_FINITE_ELEMENTS<TV>* force=dynamic_cast<MPM_FINITE_ELEMENTS<TV>*>(example.forces(f))){
-            for(int k=0;k<example.simulated_particles.m;k++){
-                int p=example.simulated_particles(k);
-                const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& d=force->dPi_dF(p);
-                T K=d.H.Diagonal_Part().x.Max_Abs();
-                T J=example.particles.F(p).Determinant();
-                T rho=example.particles.mass(p)/(example.particles.volume(p)*J);
-                T speed=sqrt(K/(J*rho));
-                T new_dt=example.grid.dX.Min()/speed*example.cfl_sound;
-                dt=min(dt,new_dt);}}}
+    T max_speed=Compute_Max_Sound_Speed();
+    dt=std::min(dt,Robust_Divide(example.grid.dX.Min(),max_speed));
+
     if(dt<example.min_dt) dt=example.min_dt;
     if(dt>=example.dt) return;
     T s=dt/example.dt;
@@ -478,7 +470,7 @@ Compute_Max_Sound_Speed() const -> T
                 if(!eig_est) continue;
 
                 T ev=FLT_MAX,pev=0;
-                while(abs(ev-pev)>tolerance*ev){
+                while(abs(ev-pev)>tolerance*ev && abs(ev)>tolerance){
                     DIAGONAL_MATRIX<T,TV::m> E;
                     MATRIX<T,TV::m> V;
                     auto A=Conjugate_Stress_Diff(dpdf,u);
