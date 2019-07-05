@@ -414,7 +414,7 @@ Limit_Dt_Sound_Speed()
     if(!example.use_sound_speed_cfl) return;
     T dt=example.dt;
     T max_speed=Compute_Max_Sound_Speed();
-    dt=std::min(dt,Robust_Divide(example.grid.dX.Min(),max_speed));
+    dt=std::min(dt,Robust_Divide(example.grid.dX.Min(),max_speed)*example.cfl_sound);
 
     if(dt<example.min_dt) dt=example.min_dt;
     if(dt>=example.dt) return;
