@@ -296,6 +296,7 @@ void Run(PARSE_ARGS& parse_args)
         auto fv=[&sol](const TV& X){return sol.Velocity(X);};
         auto fp=[&sol](const TV& X){return sol.Pressure(X);};
         Check_Solution<T,TV::m>(mc,fv,fp,!quiet);
+        LOG::printf("sol maxv %P maxp %P\n",sol.Max_Velocity_Magnitude(),sol.Max_Pressure());
     }
 
     if(!quiet)

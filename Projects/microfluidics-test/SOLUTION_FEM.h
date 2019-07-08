@@ -420,6 +420,34 @@ struct SOLUTION_FEM
         return Pressure(elem,X,grad);
     }
 
+    T Max_Pressure() const
+    {
+        T p=-FLT_MAX;
+        for(const auto& bv:sol_block_list)
+        {
+            for(int i=0;i<bv.n.p;i++)
+                p=std::max(p,bv.Get_p(i));
+        }
+        return p;
+    }
+
+    T Max_Velocity_Magnitude() const
+    {
+        T v=-FLT_MAX;
+        for(const auto& bv:sol_block_list)
+        {
+            for(int i=0;i<bv.n.v;i++)
+                v=std::max(v,bv.Get_v(i).Magnitude());
+            for(int i=0;i<bv.n.e;i++)
+                v=std::max(v,bv.Get_e(i).Magnitude());
+        }
+        for(const auto& bc:bc_v)
+            v=std::max(v,bc.data.Magnitude());
+        for(const auto& bc:bc_e)
+            v=std::max(v,bc.data.Magnitude());
+        return v;
+    }
+
     template<class RW> void Read(std::istream& input)
     {
         Read_Binary<RW>(input,intersection_tol);
