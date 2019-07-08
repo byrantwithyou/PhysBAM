@@ -16,7 +16,6 @@ namespace PhysBAM{
 
 template<class TV> class STANDARD_TESTS;
 template<class T,int d> class ISOTROPIC_CONSTITUTIVE_MODEL;
-
 template<class TV>
 class STANDARD_TESTS_BASE:public MPM_EXAMPLE<TV>
 {
@@ -33,7 +32,7 @@ public:
     using BASE::output_directory;using BASE::mass_contour;using BASE::plasticity_models;
     using BASE::restart;using BASE::dt;using BASE::time;using BASE::lag_Dp;
     using BASE::frame_dt;using BASE::min_dt;using BASE::max_dt;
-    using BASE::compute_sound_speed;
+    using BASE::compute_sound_speed;using BASE::reflection_bc;
     using BASE::ghost;using BASE::use_affine;using BASE::cfl_F;using BASE::use_strong_cfl;
     using BASE::use_midpoint;using BASE::use_symplectic_euler;using BASE::test_output_prefix;
     using BASE::print_stats;using BASE::only_write_particles;using BASE::use_test_output;
@@ -45,6 +44,7 @@ public:
     using BASE::Add_Collision_Object;using typename BASE::COLLISION_TYPE;
     using BASE::data_directory;using BASE::reflection_bc_flags;
     using BASE::quad_F_coeff;using BASE::use_sound_speed_cfl;using BASE::cfl_sound;
+    using BASE::side_bc_type;
 
     int test_number;
     int resolution;

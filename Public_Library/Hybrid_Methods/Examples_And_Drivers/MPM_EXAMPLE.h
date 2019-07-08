@@ -31,6 +31,7 @@ class MPM_EXAMPLE
     typedef VECTOR<int,TV::m> TV_INT;
 public:
     typedef typename MPM_COLLISION_OBJECT<TV>::COLLISION_TYPE COLLISION_TYPE;
+    enum BC_TYPE {BC_FREE, BC_SLIP, BC_NOSLIP};
     GRID<TV> grid;
     STREAM_TYPE stream_type;
     MPM_PARTICLES<TV>& particles;
@@ -83,6 +84,7 @@ public:
     bool use_strong_cfl=false;
     bool use_sound_speed_cfl=false;
     bool compute_sound_speed=false;
+    bool reflection_bc=false;
     int reflection_bc_flags=0;
     bool test_sound_speed=false;
     
@@ -100,6 +102,9 @@ public:
     bool output_structures_each_frame=false;
     T quad_F_coeff=0;
     bool asymmetric_system=false;
+
+    VECTOR<BC_TYPE,TV::m*2> side_bc_type; // -x, +x, -y, +y, -z, +z
+    std::function<TV(const TV& X,T)> bc_velocity=0;
 
     MPM_EXAMPLE(const STREAM_TYPE stream_type_input);
     MPM_EXAMPLE(const MPM_EXAMPLE&) = delete;

@@ -70,6 +70,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add_Not("-no_affine",&use_affine,"Use affine PIC");
     parse_args.Add("-affine",&use_affine,"Use affine PIC");
     parse_args.Add("-compute_sound_speed",&compute_sound_speed,"Compute Sound Speed");
+    parse_args.Add("-use_reflect",&reflection_bc,"Use reflection as boundary conditions");
     parse_args.Add("-midpoint",&use_midpoint,"Use midpoint rule");
     parse_args.Add("-symplectic_euler",&use_symplectic_euler,"Use forward euler for grid update");
     parse_args.Add("-print_stats",&print_stats,"Print momentum/energy stats");
@@ -429,11 +430,15 @@ Add_Walls(int flags,COLLISION_TYPE type,T friction,T inset,bool penalty) // -x +
     for(int a=0;a<TV::m;a++)
         for(int s=0;s<2;s++)
             if(flags&(1<<(a*2+s))){
+                if(reflection_bc){
+                    if (type==COLLISION_TYPE::slip) side_bc_type(2*a+s)=MPM_EXAMPLE<TV>::BC_TYPE::BC_SLIP;
+                    if (type==COLLISION_TYPE::stick) side_bc_type(2*a+s)=MPM_EXAMPLE<TV>::BC_TYPE::BC_NOSLIP;}
                 RANGE<TV> wall=range;
-                if(s) wall.max_corner(a)=grid.domain.min_corner(a)+inset;
+                if(s)wall.max_corner(a)=grid.domain.min_corner(a)+inset;
                 else wall.min_corner(a)=grid.domain.max_corner(a)-inset;
-                if(penalty) Add_Penalty_Collision_Object(wall);
-                else Add_Collision_Object(wall,type,friction);}
+                if(!reflection_bc){
+                    if(penalty) Add_Penalty_Collision_Object(wall);
+                    else Add_Collision_Object(wall,type,friction);}}
 }
 //#####################################################################
 // Function Seed_Lagrangian_Particles
