@@ -325,7 +325,7 @@ void Generate_Random_Ortho_Grid(T scale,const VECTOR<VECTOR<T,2>,2>* edges,int n
             else
             {
                 T flowrate=0;
-                if(v.key.y==maxy) flowrate=1;
+                if(v.key.y==maxy) flowrate=0.005;
                 auto src=builder.Set_BC(cs,v.data.vid,arms(0),flowrate);
                 for(int i=0;i<4;i++) if(v.data.c(i).x>=VERT_ID())
                     v.data.c(i).y=src.x;
@@ -436,7 +436,7 @@ void Generate_Grid(T scale,T mu,T s,T m,T kg,int n,const char* filename)
         for(int j=1;j<n;j++)
             builder.Pipe(cs,verts(i*n+j-1).y(1),verts(i*n+j).y(3));
 
-    auto bc_src=builder.Set_BC(cs,src,verts(n-1).x,1);
+    auto bc_src=builder.Set_BC(cs,src,verts(n-1).x,0.005);
     auto bc_sink=builder.Set_BC(cs,sink,verts((n-1)*n).x,TV());
     builder.Pipe(cs,bc_src.x,verts(n-1).y(2));
     builder.Pipe(cs,verts((n-1)*n).y(0),bc_sink.x);
@@ -487,6 +487,7 @@ void Generate_Simple(T scale,T mu,T s,T m,T kg,const char* filename)
     cl.unit_m=m;
     cl.unit_s=s;
     cl.unit_kg=kg;
+    T flowrate=0.005;
     LAYOUT_BUILDER_FEM<T> builder(cl);
     builder.Set_Target_Length(0.5*scale);
     builder.Set_Depth(w,1);
@@ -504,8 +505,8 @@ void Generate_Simple(T scale,T mu,T s,T m,T kg,const char* filename)
     VERT_ID v3=builder.Vertex(TV(x,-2)*scale);
     x+=2;
     VERT_ID v4=builder.Vertex(TV(x,0)*scale);
-    auto src0=builder.Set_BC(cs,v0,v1,1);
-    auto src2=builder.Set_BC(cs,v2,v3,1);
+    auto src0=builder.Set_BC(cs,v0,v1,flowrate);
+    auto src2=builder.Set_BC(cs,v2,v3,flowrate);
     auto j1=builder.Joint(cs,2,v1,{v0,v4});
     auto j3=builder.Joint(cs,2,v3,{v2,v4});
     x+=3;
@@ -528,7 +529,7 @@ void Generate_Simple(T scale,T mu,T s,T m,T kg,const char* filename)
     VERT_ID v9=builder.Vertex(TV(x,0)*scale);
     VERT_ID v10=builder.Vertex(TV(x,-6)*scale);
     VERT_ID v10a=builder.Vertex(TV(x,-8)*scale);
-    auto src10a=builder.Set_BC(cs,v10a,v10,1);
+    auto src10a=builder.Set_BC(cs,v10a,v10,flowrate);
     x+=1;
     T y=-3;
     VERT_ID v11=builder.Vertex(TV(x,y)*scale);
@@ -819,7 +820,7 @@ void Generate_Voronoi_Pipes(T scale,RANDOM_NUMBERS<T>& rng,T mu,T s,T m,T kg,int
         {
             CID bc(-1);
             if(velocity_bc.Contains(i))
-                bc=builder.Set_BC(cs,i,arms(0),1).x;
+                bc=builder.Set_BC(cs,i,arms(0),0.005).x;
             else
                 bc=builder.Set_BC(cs,i,arms(0),TV()).x;
 
