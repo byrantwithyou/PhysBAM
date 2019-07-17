@@ -516,13 +516,12 @@ Highlight_Dof(BLOCK_ID b,int vep,int r,int dim) const
 // Function Visualize_Meshing
 //#####################################################################
 template<class T> void DEBUGGING_FEM<T>::
-Visualize_Meshing(const std::string& name,const RANGE<TV2>& domain) const
+Visualize_Meshing(const std::string& name,const IV2& dim,const RANGE<TV2>& domain) const
 {
-    T scale=200/domain.Edge_Lengths().Max();
-    auto box=domain*scale;
-    EPS_FILE<T> eps(name,box.Thickened(1e-2));
-    eps.cur_format.line_width=0.008;
-    eps.cur_format.point_radius=0.008;
+    EPS_FILE<T> eps(name,RANGE<TV2>(TV2(),TV2(dim(0),dim(1))));
+    T scale=(dim/domain.Edge_Lengths()).Min();
+    eps.cur_format.line_width=1/scale;
+    eps.cur_format.point_radius=1/scale;
     eps.cur_format.line_style=1;
     eps.cur_format.fill_style=1;
 
@@ -545,53 +544,102 @@ Visualize_Meshing(const std::string& name,const RANGE<TV2>& domain) const
 // Function Visualize_Domain
 //#####################################################################
 template<class T> void DEBUGGING_FEM<T>::
-Visualize_Domain(const std::string& name,const RANGE<TV2>& anno) const
+Visualize_Domain(const std::string& name,bool fill,const IV2& dim,const RANGE<TV2>& anno,const RANGE<TV2>& bound) const
 {
-    auto box=cl.Compute_Bounding_Box();
-    T scale=200/box.Edge_Lengths().Max();
-    box*=scale;
-    EPS_FILE<T> eps(name,box.Thickened(1e-2));
-    eps.cur_format.line_width=0.5;
-    eps.cur_format.point_radius=0.5;
-    eps.cur_format.line_style=1;
-    eps.cur_format.fill_style=1;
+    EPS_FILE<T> eps(name,RANGE<TV2>(TV2(),TV2(dim(0),dim(1))));
+    RANGE<TV2> box=cl.Compute_Bounding_Box();
+    T scale=(dim/box.Edge_Lengths()).Min();
+    eps.cur_format.line_width=1/scale;
+    eps.cur_format.point_radius=1/scale;
 
-    auto draw_boundary_edge=[&eps,scale](const BLOCK<T>& bl,int i)
+    if(bound.Empty())
     {
-        const auto& e=bl.block->S(i);
-        eps.Draw_Object(bl.xform*bl.block->X(e(0))*scale,bl.xform*bl.block->X(e(1))*scale);
-    };
-
-    for(BLOCK_ID b(0);b<cl.blocks.m;b++)
-    {
-        const auto& bl=cl.blocks(b);
-        for(int i:bl.block->bc_e)
-            draw_boundary_edge(bl,i);
+        for(const auto& bc:cl.bc_v)
+        {
+            eps.cur_format.line_style=0;
+            eps.cur_format.fill_color=TV3(0,0,1);
+            eps.cur_format.fill_style=1;
+            const auto& bl=cl.blocks(bc.b);
+            if(bc.flow_rate==0) continue;
+            TV2 X;
+            for(int i:bc.bc_v)
+                X+=bl.xform*bl.block->X(i);
+            X/=bc.bc_v.Size();
+            eps.Draw_Object(X+bc.normal*12/scale,6/scale);
+        }
+        for(const auto& bc:cl.bc_t)
+        {
+            eps.cur_format.line_style=0;
+            eps.cur_format.fill_color=TV3(1,0,0);
+            eps.cur_format.fill_style=1;
+            const auto& bl=cl.blocks(bc.b);
+            TV2 X;
+            for(int i:bc.bc_v)
+                X+=bl.xform*bl.block->X(i);
+            X/=bc.bc_v.Size();
+            eps.Draw_Object(X+bc.normal*12/scale,6/scale);
+        }
     }
 
-    for(const auto& bc:cl.bc_v)
+    if(fill)
     {
-        eps.cur_format.line_color=TV3(0,1,0);
-        const auto& bl=cl.blocks(bc.b);
-        for(int i:bc.bc_e)
-            draw_boundary_edge(bl,i);
+        eps.cur_format.line_style=0;
+        eps.cur_format.fill_style=1;
+        eps.cur_format.fill_color=TV3(0,0,0);
+        for(const auto& bl:cl.blocks)
+            for(const auto& e:bl.block->E)
+            {
+                bool inside=true;
+                for(int j:e)
+                    if(!bound.Empty() && !bound.Lazy_Inside(bl.xform*bl.block->X(j))) inside=false;
+                if(inside)
+                    eps.Draw_Object(bl.xform*bl.block->X(e(0)),bl.xform*bl.block->X(e(1)),bl.xform*bl.block->X(e(2)));
+            }
     }
-    for(const auto& bc:cl.bc_t)
+    else
     {
-        eps.cur_format.line_color=TV3(1,0,0);
-        const auto& bl=cl.blocks(bc.b);
-        for(int i:bc.bc_e)
-            draw_boundary_edge(bl,i);
+        eps.cur_format.line_style=1;
+        eps.cur_format.fill_style=0;
+        auto draw_boundary_edge=[&eps,&bound](const BLOCK<T>& bl,int i)
+        {
+            const auto& e=bl.block->S(i);
+            bool inside=true;
+            for(int j:e)
+                if(!bound.Empty() && !bound.Lazy_Inside(bl.xform*bl.block->X(j))) inside=false;
+            if(inside)
+            eps.Draw_Object(bl.xform*bl.block->X(e(0)),bl.xform*bl.block->X(e(1)));
+        };
+
+        for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+        {
+            const auto& bl=cl.blocks(b);
+            for(int i:bl.block->bc_e)
+                draw_boundary_edge(bl,i);
+        }
+        for(const auto& bc:cl.bc_v)
+        {
+            const auto& bl=cl.blocks(bc.b);
+            for(int i:bc.bc_e)
+                draw_boundary_edge(bl,i);
+        }
+        for(const auto& bc:cl.bc_t)
+        {
+            const auto& bl=cl.blocks(bc.b);
+            for(int i:bc.bc_e)
+                draw_boundary_edge(bl,i);
+        }
     }
 
     if(!anno.Empty())
     {
-        auto rect=anno*scale;
+        eps.cur_format.line_width=2/scale;
+        eps.cur_format.line_style=1;
         eps.cur_format.line_color=TV3(1,0,0);
-        eps.Draw_Object(rect.min_corner,TV2(rect.max_corner.x,rect.min_corner.y));
-        eps.Draw_Object(rect.min_corner,TV2(rect.min_corner.x,rect.max_corner.y));
-        eps.Draw_Object(rect.max_corner,TV2(rect.max_corner.x,rect.min_corner.y));
-        eps.Draw_Object(rect.max_corner,TV2(rect.min_corner.x,rect.max_corner.y));
+        eps.cur_format.fill_style=0;
+        eps.Draw_Object(anno.min_corner,TV2(anno.max_corner.x,anno.min_corner.y));
+        eps.Draw_Object(anno.min_corner,TV2(anno.min_corner.x,anno.max_corner.y));
+        eps.Draw_Object(anno.max_corner,TV2(anno.max_corner.x,anno.min_corner.y));
+        eps.Draw_Object(anno.max_corner,TV2(anno.min_corner.x,anno.max_corner.y));
     }
 }
 template class DEBUGGING_FEM<double>;

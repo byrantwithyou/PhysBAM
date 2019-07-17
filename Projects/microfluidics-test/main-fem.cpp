@@ -51,8 +51,10 @@ void Run(PARSE_ARGS& parse_args)
 
     int threads=1;
     bool quiet=false,use_krylov=false,print_system=false,pinv=false,stats_only=false,force_blk_ref=false,illus_domain=false,
-        illus_meshing=false,dump_solution=false,rounded_corner=false;
+        illus_zoom=false,dump_solution=false,rounded_corner=false;
     TV2 min_corner,max_corner;
+    IV2 illus_size(128,128);
+    bool illus_fill=false;
     std::string pipe_file,output_dir="output";
     std::string analytic_u,analytic_p;
     std::string sol_file;
@@ -70,7 +72,9 @@ void Run(PARSE_ARGS& parse_args)
     parse_args.Add("-force_blk_ref",&force_blk_ref,"force every block a reference block");
     parse_args.Add("-stats",&stats_only,"show statistics");
     parse_args.Add("-illus",&illus_domain,"dump domain");
-    parse_args.Add("-illus_meshing",&illus_meshing,"dump meshing");
+    parse_args.Add("-illus_size",&illus_size,"dimension","illustration size");
+    parse_args.Add("-illus_fill",&illus_fill,"use filled illustration");
+    parse_args.Add("-illus_zoom",&illus_zoom,"magnify part");
     parse_args.Add("-min_corner",&min_corner,"point","min corner");
     parse_args.Add("-max_corner",&max_corner,"point","max corner");
     parse_args.Add("-rounded_corner",&rounded_corner,"use rounded corner");
@@ -104,7 +108,9 @@ void Run(PARSE_ARGS& parse_args)
 
     timer("parse input");
 
-    GRID<TV2> grid(IV2()+1,cl.Compute_Bounding_Box(),true);
+    RANGE<TV2> box=cl.Compute_Bounding_Box();
+    LOG::printf("bounding box: %P\n",box);
+    GRID<TV2> grid(IV2()+1,box,true);
     VIEWER_OUTPUT<TV2> vo2(STREAM_TYPE(0.f),grid,output_dir);
     GRID<TV3> grid3(IV3()+1,{grid.domain.min_corner.Append(0),grid.domain.max_corner.Append(cl.depth)},true);
     VIEWER_OUTPUT<TV3> vo3(STREAM_TYPE(0.f),grid3,output_dir+"/3d");
@@ -211,19 +217,20 @@ void Run(PARSE_ARGS& parse_args)
     LOG::printf("canonical-j2: %d\ncanonical-j3-avg: %d\ncanonical-j3-small: %d\ncanonical-j4: %d\n",
         builder.comp_joint.num_j2,builder.comp_joint.num_j3_avg,builder.comp_joint.num_j3_small,builder.comp_joint.num_j4);
 
-    if(illus_domain || illus_meshing)
+    if(illus_domain || illus_zoom)
         if(!Directory_Exists(output_dir))
             Create_Directory(output_dir);
     if(illus_domain)
-        debug.Visualize_Domain(output_dir+"/domain.eps",RANGE<TV2>::Empty_Box());
-    if(illus_meshing)
+        debug.Visualize_Domain(output_dir+"/domain.eps",illus_fill,illus_size,RANGE<TV2>::Empty_Box(),RANGE<TV2>::Empty_Box());
+    if(illus_zoom)
     {
         RANGE<TV2> range(min_corner,max_corner);
-        debug.Visualize_Domain(output_dir+"/domain-anno.eps",range);
-        debug.Visualize_Meshing(output_dir+"/meshing.eps",range);
+        debug.Visualize_Domain(output_dir+"/domain-anno.eps",illus_fill,illus_size,range,RANGE<TV2>::Empty_Box());
+        debug.Visualize_Domain(output_dir+"/domain-part.eps",false,illus_size,RANGE<TV2>::Empty_Box(),range);
+        debug.Visualize_Meshing(output_dir+"/meshing.eps",illus_size,range);
     }
 
-    if(stats_only || illus_domain || illus_meshing) return;
+    if(stats_only || illus_domain || illus_zoom) return;
 
     mc.Compute_Matrix_Blocks();
     ANALYTIC_FEM<TV>* an=0;
