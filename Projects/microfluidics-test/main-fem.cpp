@@ -303,7 +303,6 @@ void Run(PARSE_ARGS& parse_args)
         auto fv=[&sol](const TV& X){return sol.Velocity(X);};
         auto fp=[&sol](const TV& X){return sol.Pressure(X);};
         Check_Solution<T,TV::m>(mc,fv,fp,!quiet);
-        LOG::printf("sol maxv %P maxp %P\n",sol.Max_Velocity_Magnitude(),sol.Max_Pressure());
     }
 
     if(!quiet)
@@ -330,6 +329,7 @@ void Run(PARSE_ARGS& parse_args)
     {
         SOLUTION_FEM<TV> solution;
         solution.Build(mc,an);
+        LOG::printf("sol maxv %P maxp %P\n",solution.Max_Velocity_Magnitude(),solution.Max_Pressure());
         Write_To_File(STREAM_TYPE((double)0),output_dir+"/sol",solution);
     }
 }
