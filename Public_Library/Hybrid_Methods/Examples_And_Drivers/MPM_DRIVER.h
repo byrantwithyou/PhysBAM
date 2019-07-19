@@ -54,7 +54,6 @@ public:
     T Compute_Dt() const;
     T Max_Particle_Speed() const;
     T Grid_V_Upper_Bound() const;
-    SYMMETRIC_MATRIX<T,TV::m> Conjugate_Stress_Diff(const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dpdf,const TV& u) const;
     T Compute_Max_Sound_Speed() const;
     void Update_Simulated_Particles();
     void Print_Grid_Stats(const char* str,T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<TV,TV_INT>* u0);
@@ -65,6 +64,7 @@ public:
     void Print_Max_Sound_Speed();
     template<class S> void Reflection_Boundary_Condition(ARRAY<S,TV_INT>& u,bool flip_sign);
     void Reflect_Or_Invalidate_Particle(int p);
+    void Test_Sound_Speed(int num) const;
 //#####################################################################
 };
 }

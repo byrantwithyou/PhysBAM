@@ -119,6 +119,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-strong_cfl",&use_strong_cfl,"limit dt based on final change in X and F");
     parse_args.Add("-sound_cfl",&use_sound_speed_cfl,"limit dt based on final change in X and F");
     parse_args.Add("-reflection_bc",&reflection_bc_flags,"flags","Flags indicating which walls should be reflection BC");
+    parse_args.Add("-test_c",&this->test_sound_speed,"test sound speed calculations");
 
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);

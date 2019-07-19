@@ -9,6 +9,7 @@
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/MINRES.h>
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
+#include <Tools/Polynomials/QUADRATIC.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
@@ -426,9 +427,10 @@ Limit_Dt_Sound_Speed()
 //#####################################################################
 // Function Conjugate_Stress_Diff
 //#####################################################################
-template<class TV> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> MPM_DRIVER<TV>::
-Conjugate_Stress_Diff(const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dpdf,const TV& u) const
+template<class TV> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m>
+Conjugate_Stress_Diff(const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dpdf,const TV& u)
 {
+    typedef typename TV::SCALAR T;
     DIAGONAL_MATRIX<T,TV::m> U(u);
     SYMMETRIC_MATRIX<T,TV::m> S=SYMMETRIC_MATRIX<T,TV::m>::Conjugate(U,dpdf.H);
     for(int i=0;i<TV::SPIN::m;i++){
@@ -438,14 +440,137 @@ Conjugate_Stress_Diff(const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dpdf,c
         S(j,k)+=dpdf.C(i)*u(j)*u(k);}
     return S;
 } 
+template<class TV,class T>
+inline T Compute_Maximum_Tensor_Contraction_Brute(const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dpdf,const DIAGONAL_MATRIX<T,TV::m>& sigma)
+{
+    T epsilon=std::numeric_limits<T>::epsilon();
+    T tolerance=sqrt(epsilon);
+    RANDOM_NUMBERS<T> random;
+    TV u,v;
+    T eig_est=-FLT_MAX;
+    for(int i=0;i<100;i++){
+        TV u0,v0;
+        random.Fill_Uniform(u0,-1,1);
+        random.Fill_Uniform(v0,-1,1);
+        u0.Normalize();
+        v0.Normalize();
+        T e=u0.Dot(Conjugate_Stress_Diff(dpdf,sigma*v0)*u0);
+        if(e>eig_est){
+            eig_est=e;
+            u=u0;
+            v=v0;}}
+
+    T ev=FLT_MAX,pev=0;
+    int iter=10000;
+    while(abs(ev-pev)>tolerance*ev && abs(ev)>tolerance){
+        if(!--iter)
+        {
+            LOG::printf("STOP EARLY\n");
+            return ev;
+        }
+        DIAGONAL_MATRIX<T,TV::m> E;
+        MATRIX<T,TV::m> V;
+        auto A=Conjugate_Stress_Diff(dpdf,u);
+        A=A.Conjugate(sigma,A);
+        A.Fast_Solve_Eigenproblem(E,V);
+        v=V.Column(E.x.Arg_Max());
+        auto B=Conjugate_Stress_Diff(dpdf,sigma*v);
+        B.Fast_Solve_Eigenproblem(E,V);
+        const int kk=E.x.Arg_Max();
+        u=V.Column(kk);
+        pev=ev;
+        ev=E.x(kk);}
+    return ev;
+}
+template<class T>
+inline T Compute_Maximum_Tensor_Contraction(const SYMMETRIC_MATRIX<T,2>& H, const VECTOR<T,1>& A0, const VECTOR<T,1>& A1, const VECTOR<T,1>& B)
+{
+    T A01=A0.x,A10=A1.x,H00=H.x00,H10=H.x10+B.x,H11=H.x11;
+    T t0=A01*A10-A01*H00-A10*H11+H00*H11-H10*H10;
+    T t1=-H11+A01-2*H10-H00+A10;
+    T t2=-H11+A01+2*H10-H00+A10;
+    T t4=A10*A10-A10*H00-A10*H11+H00*H11-H10*H10;
+    T t5=A01*A10-A01*H11-A10*H11-H10*H10+H11*H11;
+    T t6=A01*A10-A01*H00-A10*H00+H00*H00-H10*H10;
+    QUADRATIC<T> q(t0*t1*t2,-2*(t4+t5)*t0,t4*t5);
+    q.Compute_Roots();
+
+    T x = max(H.x00,H.x11,A0.x,A1.x);
+    auto do_v02=[=,&x](T v02)
+    {
+        T v12=1-v02;
+        T den=(t5*v12-t6*v02);
+        T num=v02*(2*t0*v12-t6);
+        if(den<0)
+        {
+            den=-den;
+            num=-num;
+        }
+
+        if(num>=0 && num<=den)
+        {
+            T nu=(num-v12*den)*H10;
+            T de=((A01-H00)*num+(H00-A10)*v12*den);
+            T t0=nu/de;
+            T e=(((A10*v12/v02+H00)*t0+2*H10)*v12*t0+A01*v02+H11*v12)*num/den;
+            if(e>x)
+            {
+                x=e;
+                LOG::printf("SPECIAL\n");
+            }
+        }
+    };
+    T epsilon=std::numeric_limits<T>::epsilon()/100;
+    for(int i=0;i<2;i++)
+        if(q.roots>i && q.root[i]>=epsilon && q.root[i]<=1-epsilon)
+            do_v02(q.root[i]);
+    return x;
+}
+template<class TV,class T>
+inline T Compute_Maximum_Tensor_Contraction(const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dpdf,const DIAGONAL_MATRIX<T,2>& sigma)
+{
+    typename TV::SPIN B0,B1,C;
+    SYMMETRIC_MATRIX<T,TV::m> S=SYMMETRIC_MATRIX<T,TV::m>::Conjugate(sigma,dpdf.H);
+    for(int i=0;i<TV::SPIN::m;i++){
+        int j=(i+1)%TV::m,k=(j+1)%TV::m;
+        C(i)=dpdf.C(i)*sigma(j)*sigma(k);
+        B0(i)=dpdf.B(i)*sigma(j)*sigma(j);
+        B1(i)=dpdf.B(i)*sigma(k)*sigma(k);}
+    return Compute_Maximum_Tensor_Contraction(S,B0,B1,C);
+}
+template<class TV,class T>
+inline T Compute_Maximum_Tensor_Contraction(const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dpdf,const DIAGONAL_MATRIX<T,3>& sigma)
+{
+    return Compute_Maximum_Tensor_Contraction_Brute(dpdf,sigma);
+}
+//#####################################################################
+// Function Test_Sound_Speed
+//#####################################################################
+template<class TV> void MPM_DRIVER<TV>::
+Test_Sound_Speed(int num) const
+{
+    DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV> dpdf;
+    DIAGONAL_MATRIX<T,TV::m> sigma;
+    RANDOM_NUMBERS<T> r;
+    LOG::printf("===== TEST %i =====\n",num);
+    for(int i=0;i<num;i++)
+    {
+        r.Fill_Uniform(dpdf.H,-1,1);
+        r.Fill_Uniform(dpdf.B,-1,1);
+        r.Fill_Uniform(dpdf.C,-1,1);
+        r.Fill_Uniform(sigma.x,-1,1);
+        T x=Compute_Maximum_Tensor_Contraction(dpdf,sigma);
+        T y=Compute_Maximum_Tensor_Contraction_Brute(dpdf,sigma);
+        T r=abs(x-y)/maxabs(maxabs(x,y),(T)FLT_MIN);
+        if(r>1e-6) LOG::printf("COMP: %P %P -> %P\n",x,y,r);
+    }
+}
 //#####################################################################
 // Function Compute_Max_Sound_Speed
 //#####################################################################
 template<class TV> auto MPM_DRIVER<TV>::
 Compute_Max_Sound_Speed() const -> T
 {
-    T epsilon=std::numeric_limits<T>::epsilon();
-    T tolerance=sqrt(epsilon);
     T max_speed=0;
     for(int f=0;f<example.forces.m;f++){
         if(const MPM_FINITE_ELEMENTS<TV>* force=dynamic_cast<MPM_FINITE_ELEMENTS<TV>*>(example.forces(f))){
@@ -453,39 +578,9 @@ Compute_Max_Sound_Speed() const -> T
                 int p=example.simulated_particles(k);
                 const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dpdf=force->dPi_dF(p);
                 const DIAGONAL_MATRIX<T,TV::m>& sigma=force->sigma(p);
-                RANDOM_NUMBERS<T> random;
-                TV u,v;
-                T eig_est=0;
-                for(int i=0;i<100;i++){
-                    TV u0,v0;
-                    random.Fill_Uniform(u0,-1,1);
-                    random.Fill_Uniform(v0,-1,1);
-                    u0.Normalize();
-                    v0.Normalize();
-                    T e=u0.Dot(Conjugate_Stress_Diff(dpdf,sigma*v0)*u0);
-                    if(e>eig_est){
-                        eig_est=e;
-                        u=u0;
-                        v=v0;}}
-                if(!eig_est) continue;
-
-                T ev=FLT_MAX,pev=0;
-                while(abs(ev-pev)>tolerance*ev && abs(ev)>tolerance){
-                    DIAGONAL_MATRIX<T,TV::m> E;
-                    MATRIX<T,TV::m> V;
-                    auto A=Conjugate_Stress_Diff(dpdf,u);
-                    A=A.Conjugate(sigma,A);
-                    A.Fast_Solve_Eigenproblem(E,V);
-                    v=V.Column(E.x.Arg_Max());
-                    auto B=Conjugate_Stress_Diff(dpdf,sigma*v);
-                    B.Fast_Solve_Eigenproblem(E,V);
-                    const int kk=E.x.Arg_Max();
-                    u=V.Column(kk);
-                    pev=ev;
-                    ev=E.x(kk);}
-
+                T cm=Compute_Maximum_Tensor_Contraction(dpdf,sigma);
                 T density=example.particles.mass(p)/example.particles.volume(p);
-                T speed=sqrt(ev/density);
+                T speed=sqrt(cm/density);
                 max_speed=max(max_speed,speed);}}}
     return max_speed;
 }
@@ -495,6 +590,8 @@ Compute_Max_Sound_Speed() const -> T
 template<class TV> void MPM_DRIVER<TV>::
 Print_Max_Sound_Speed() 
 {
+    static bool first=example.test_sound_speed;
+    if(first){first=false;Test_Sound_Speed(100);}
     T max_sound_speed=Compute_Max_Sound_Speed();
     LOG::printf("max sound speed: %.16P\n",max_sound_speed);
     LOG::printf("dx: %.16P\n",example.grid.dX.Min());
