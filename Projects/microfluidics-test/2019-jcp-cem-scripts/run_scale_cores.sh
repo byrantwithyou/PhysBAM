@@ -47,27 +47,31 @@ for c in ${tests[@]} ; do
 done
 
 for c in ${tests[@]} ; do
-    cat <<EOF > $NAME/$c.txt
+    for dim in "" "-3d"; do
+        cat <<EOF > $NAME/$c$dim.txt
 threads prep solving
 EOF
-    for i in `seq 0 4` ; do
-        th=`perl -e "{print 2**$i}"`;
-        echo "$th `./timing_parse.pl < $NAME/$c-t$th/common/log.txt`" >> $NAME/$c.txt
-    done
-
-    cat <<EOF > $NAME/$c-3d.txt
-threads prep solving
-EOF
-    for i in `seq 0 4` ; do
-        th=`perl -e "{print 2**$i}"`;
-        echo "$th `./timing_parse.pl < $NAME/$c-3d-t$th/common/log.txt`" >> $NAME/$c-3d.txt
+        for i in `seq 0 4` ; do
+            th=`perl -e "{print 2**$i}"`;
+            echo "$th `./timing_parse.pl < $NAME/$c$dim-t$th/common/log.txt`" >> $NAME/$c$dim.txt
+        done
     done
 done
 
-sed -e 's/XXXX/grid20/g' -e 's/YYYY/rgrid0/g' -e 's/ZZZZ/voronoi-s4/g' \
-    -e 's/EEEE/-1/g' -e 's/CCCC/10^4/g' timing_plot.tex  > $NAME/plot.tex 
-sed -e 's/XXXX/grid20-3d/g' -e 's/YYYY/rgrid0-3d/g' -e 's/ZZZZ/voronoi-s4-3d/g' \
-    -e 's/EEEE/-1/g' -e 's/CCCC/10^5/g' timing_plot.tex  > $NAME/plot-3d.tex 
+sed -e "s/DDDD/1:16/g" timing_plot.tex > $NAME/plot.tex
+sed -e "s/DDDD/1:16/g" timing_plot.tex > $NAME/plot-3d.tex
+for i in `seq 0 $((${#tests[@]}-1))` ; do
+    for dim in "" "-3d" ; do
+        c=${tests[$i]}$dim
+        rm fit.log
+        gnuplot -e "fit a*x+b \"$NAME/$c.txt\" u (log10(\$1)):(log10(\$3)) via a,b" 2>/dev/null
+        a=`grep Final -A 4 fit.log| grep "^a" | sed 's/a *= \([^ ]*\).*/\1/g'`
+        b=`grep Final -A 4 fit.log| grep "^b" | sed 's/b *= \([^ ]*\).*/\1/g'`
+        order=`perl -e "{printf('%.2f',$a);}"`
+        b10=`perl -e "{print 10**$b}"`
+        sed -i -e "s/XXXX$i/$c/g" -e "s/EEEE$i/$a/g" -e "s/CCCC$i/$b10/g" -e "s/OOOO$i/$order/g" $NAME/plot$dim.tex
+    done
+done
 
 for c in ${tests[@]} ; do
     cat <<EOF > $NAME/waiting-$c.txt

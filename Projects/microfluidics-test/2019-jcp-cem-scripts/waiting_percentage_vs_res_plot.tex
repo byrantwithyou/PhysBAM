@@ -1,0 +1,27 @@
+\documentclass[class=minimal,border=0pt]{standalone}
+\usepackage{pgfplots}
+
+\begin{document}
+\pgfplotsset{width=10cm,height=8cm,compat=1.13}
+\begin{tikzpicture}
+\begin{axis}[
+    enlargelimits=false,
+    legend cell align=left,
+    xlabel={Resolution},
+    ylabel={Percentage of waiting time},
+    %xticklabels={,,},
+    legend entries={XXXX,YYYY,ZZZZ},
+    legend pos=north east,
+%    ymin=0,
+%    ymax=40,
+%    xmax=16,
+    legend style={nodes={scale=1.2, transform shape},fill=none,draw=none},
+    log ticks with fixed point,
+%    title={Convergence plot}
+]
+\addplot[mark=x,color=red] table[x=res,y=percentage]{XXXX.txt};
+\addplot[mark=x,color=green] table[x=res,y=percentage]{YYYY.txt};
+\addplot[mark=x,color=blue] table[x=res,y=percentage]{ZZZZ.txt};
+\end{axis}
+\end{tikzpicture}
+\end{document}
