@@ -46,6 +46,52 @@ for c in ${tests[@]} ; do
     echo "$c-3d,$rndtot,$blks,$rndjbs,$dofspb" >> $NAME/stats.csv
 done
 
+for c in ${tests[@]} ; do
+    cat <<EOF > $NAME/$c.txt
+threads prep solving
+EOF
+    for i in `seq 0 4` ; do
+        th=`perl -e "{print 2**$i}"`;
+        echo "$th `./timing_parse.pl < $NAME/$c-t$th/common/log.txt`" >> $NAME/$c.txt
+    done
+
+    cat <<EOF > $NAME/$c-3d.txt
+threads prep solving
+EOF
+    for i in `seq 0 4` ; do
+        th=`perl -e "{print 2**$i}"`;
+        echo "$th `./timing_parse.pl < $NAME/$c-3d-t$th/common/log.txt`" >> $NAME/$c-3d.txt
+    done
+done
+
+sed -e 's/XXXX/grid20/g' -e 's/YYYY/rgrid0/g' -e 's/ZZZZ/voronoi-s4/g' \
+    -e 's/EEEE/-1/g' -e 's/CCCC/10^4/g' timing_plot.tex  > $NAME/plot.tex 
+sed -e 's/XXXX/grid20-3d/g' -e 's/YYYY/rgrid0-3d/g' -e 's/ZZZZ/voronoi-s4-3d/g' \
+    -e 's/EEEE/-1/g' -e 's/CCCC/10^5/g' timing_plot.tex  > $NAME/plot-3d.tex 
+
+for c in ${tests[@]} ; do
+    cat <<EOF > $NAME/waiting-$c.txt
+threads waiting solving percentage
+EOF
+    for i in `seq 0 4` ; do
+        th=`perl -e "{print 2**$i}"`;
+        echo "$th `cat $NAME/$c-t$th/timing-*.txt | ./waiting_parse.pl`" >> $NAME/waiting-$c.txt
+    done
+
+    cat <<EOF > $NAME/waiting-$c-3d.txt
+threads waiting solving percentage
+EOF
+    for i in `seq 0 4` ; do
+        th=`perl -e "{print 2**$i}"`;
+        echo "$th `cat $NAME/$c-3d-t$th/timing-*.txt | ./waiting_parse.pl`" >> $NAME/waiting-$c-3d.txt
+    done
+done
+
+sed -e 's/XXXX/waiting-grid20/g' -e 's/YYYY/waiting-rgrid0/g' -e 's/ZZZZ/waiting-voronoi-s4/g' \
+    waiting_percentage_plot.tex  > $NAME/plot-waiting.tex 
+sed -e 's/XXXX/waiting-grid20-3d/g' -e 's/YYYY/waiting-rgrid0-3d/g' -e 's/ZZZZ/waiting-voronoi-s4-3d/g' \
+    waiting_percentage_plot.tex  > $NAME/plot-waiting-3d.tex 
+
 cat <<EOF > $NAME/SConstruct
 import os
 import re

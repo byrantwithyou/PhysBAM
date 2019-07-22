@@ -1,0 +1,29 @@
+\documentclass[class=minimal,border=0pt]{standalone}
+\usepackage{pgfplots}
+
+\begin{document}
+\pgfplotsset{width=10cm,height=8cm,compat=1.13}
+\begin{tikzpicture}
+\begin{loglogaxis}[
+    enlargelimits=false,
+    legend cell align=left,
+    xlabel={Number of threads},
+    ylabel={Solving time},
+    %xticklabels={,,},
+    legend entries={XXXX,YYYY,ZZZZ,$y=CCCC x^{EEEE}$},
+    legend pos=north east,
+%    ymin=0,
+%    ymax=40,
+%    xmax=16,
+    legend style={nodes={scale=1.2, transform shape},fill=none,draw=none},
+    xtick={1,2,4,8,16},
+    log ticks with fixed point,
+%    title={Convergence plot}
+]
+\addplot[mark=x,color=red] table[x=threads,y=solving]{XXXX.txt};
+\addplot[mark=x,color=green] table[x=threads,y=solving]{YYYY.txt};
+\addplot[mark=x,color=blue] table[x=threads,y=solving]{ZZZZ.txt};
+\addplot[mark=none,dotted,thick,domain=1:16] {CCCC*pow(x,EEEE)};
+\end{loglogaxis}
+\end{tikzpicture}
+\end{document}
