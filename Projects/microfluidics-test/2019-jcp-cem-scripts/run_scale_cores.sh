@@ -25,7 +25,7 @@ if [ "X$FULL" = "X1" ] ; then
 fi
 
 cat <<EOF > $NAME/stats.csv
-Name,Total dofs,Blocks,Tasks,Avg dofs/block
+Name,Resolution,Total dofs,Blocks,Tasks,Avg dofs/block
 EOF
 for c in ${tests[@]} ; do
     tot=`grep "dofs 2d" $NAME/$c-t1/common/log.txt | sed 's/.*total: \([^<]*\).*/\1/g'`
@@ -34,7 +34,8 @@ for c in ${tests[@]} ; do
     dofspb=`perl -e "{printf('%.1f',$tot/$blks);}"`
     rndtot=`perl -e "{printf('%.1f M',$tot/1e6);}"`
     rndjbs=`perl -e "{printf('%.1f K',$jbs/1e3);}"`
-    echo "$c,$rndtot,$blks,$rndjbs,$dofspb" >> $NAME/stats.csv
+    res=`perl -e "{print 2*$R2;}"`
+    echo "$c,$res,$rndtot,$blks,$rndjbs,$dofspb" >> $NAME/stats.csv
 done
 for c in ${tests[@]} ; do
     tot=`grep "dofs 3d" $NAME/$c-3d-t1/common/log.txt | sed 's/.*total: \([^<]*\).*/\1/g'`
@@ -43,7 +44,8 @@ for c in ${tests[@]} ; do
     dofspb=`perl -e "{printf('%.1f',$tot/$blks);}"`
     rndtot=`perl -e "{printf('%.1f M',$tot/1e6);}"`
     rndjbs=`perl -e "{printf('%.1f K',$jbs/1e3);}"`
-    echo "$c-3d,$rndtot,$blks,$rndjbs,$dofspb" >> $NAME/stats.csv
+    res=`perl -e "{print 2*$R3;}"`
+    echo "$c-3d,$res,$rndtot,$blks,$rndjbs,$dofspb" >> $NAME/stats.csv
 done
 
 for c in ${tests[@]} ; do
