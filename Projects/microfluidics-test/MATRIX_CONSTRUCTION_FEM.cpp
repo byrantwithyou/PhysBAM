@@ -974,11 +974,8 @@ Compute_Global_Dof_Mapping(ARRAY<int,BLOCK_ID> first[3]) const
 // Function Dump_World_Space_System
 //#####################################################################
 template<class TV> void MATRIX_CONSTRUCTION_FEM<TV>::
-Dump_World_Space_System() const
+Dump_World_Space_System(ARRAY<int,BLOCK_ID> first[3],int size,SPARSE_MATRIX_FLAT_MXN<T>& SM) const
 {
-    ARRAY<int,BLOCK_ID> first[3];
-    int size=Compute_Global_Dof_Mapping(first);
-
     SYSTEM_MATRIX_HELPER<T> h;
 
     for(BLOCK_ID b(0);b<cl.blocks.m;b++)
@@ -1022,20 +1019,27 @@ Dump_World_Space_System() const
         }
     }
 
-    SPARSE_MATRIX_FLAT_MXN<T> SM;
     h.Set_Matrix(size,size,SM);
-    OCTAVE_OUTPUT<T>("M.txt").Write("M",SM);
 }
 //#####################################################################
 // Function Dump_World_Space_System
 //#####################################################################
 template<class TV> void MATRIX_CONSTRUCTION_FEM<TV>::
-Dump_World_Space_Vector(const char* name) const
+Dump_World_Space_System() const
 {
     ARRAY<int,BLOCK_ID> first[3];
     int size=Compute_Global_Dof_Mapping(first);
-
-    ARRAY<T> sol(size);
+    SPARSE_MATRIX_FLAT_MXN<T> SM;
+    Dump_World_Space_System(first,size,SM);
+    OCTAVE_OUTPUT<T>("M.txt").Write("M",SM);
+}
+//#####################################################################
+// Function Dump_World_Space_Vector
+//#####################################################################
+template<class TV> void MATRIX_CONSTRUCTION_FEM<TV>::
+Dump_World_Space_Vector(ARRAY<int,BLOCK_ID> first[3],int size,ARRAY<T>& vec) const
+{
+    vec.Resize(size);
     for(BLOCK_ID b(0);b<cl.blocks.m;b++)
     {
         const auto& a=cl.reference_block_data(cl.blocks(b).ref_id);
@@ -1045,10 +1049,21 @@ Dump_World_Space_Vector(const char* name) const
         for(int i=0,ar=0;i<3;i++)
         {
             for(int r=0;r<A[i];r++)
-                sol(first[i](b)+r)=U.V.m?U.V(r+ar):0;
+                vec(first[i](b)+r)=U.V.m?U.V(r+ar):0;
             ar+=A[i];
         }
     }
+}
+//#####################################################################
+// Function Dump_World_Space_Vector
+//#####################################################################
+template<class TV> void MATRIX_CONSTRUCTION_FEM<TV>::
+Dump_World_Space_Vector(const char* name) const
+{
+    ARRAY<int,BLOCK_ID> first[3];
+    int size=Compute_Global_Dof_Mapping(first);
+    ARRAY<T> sol;
+    Dump_World_Space_Vector(first,size,sol);
     OCTAVE_OUTPUT<T>((name+(std::string)".txt").c_str()).Write(name,sol);
 }
 //#####################################################################

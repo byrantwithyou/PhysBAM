@@ -3,7 +3,11 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Data_Structures/PAIR.h>
+#include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Core/Utilities/PROCESS_UTILITIES.h>
+#include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
+#include <Tools/Krylov_Solvers/MATRIX_SYSTEM.h>
+#include <Tools/Krylov_Solvers/MINRES.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
@@ -248,9 +252,12 @@ void Run(PARSE_ARGS& parse_args)
     if(!quiet) mc.Dump_World_Space_System();
     mc.Copy_To_CEM(cem);
 
+    timer("compute matrix");
+
+    if(!quiet || use_krylov)
+        mc.Transform_Solution(cem,true,true);
     if(!quiet)
     {
-        mc.Transform_Solution(cem,true,true);
         mc.Dump_World_Space_Vector("b");
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
             debug.Visualize_Solution(mc.rhs_block_list(b),b,true);
@@ -259,7 +266,34 @@ void Run(PARSE_ARGS& parse_args)
             debug.Visualize_Block_Dofs(b);
     }
 
-    timer("compute matrix");
+    timer("transform matrix");
+
+    ARRAY<T> krylov_sol;
+    if(use_krylov)
+    {
+        ARRAY<int,BLOCK_ID> first[3];
+        int size=mc.Compute_Global_Dof_Mapping(first);
+        ARRAY<T> b;
+        mc.Dump_World_Space_Vector(first,size,b);
+        SPARSE_MATRIX_FLAT_MXN<T> SM;
+        mc.Dump_World_Space_System(first,size,SM);
+
+        typedef KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > KRY_VEC;
+        typedef MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_MXN<T>,T,KRY_VEC> KRY_MAT;
+        KRY_MAT sys(SM);
+        KRY_VEC rhs,sol;
+        rhs.v=b;
+        sol.v.Resize(size);
+
+        ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
+        sys.Test_System(sol);
+        MINRES<T> mr;
+        timer("test krylov");
+        bool converged=mr.Solve(sys,sol,rhs,av,1e-12,0,100000);
+        timer("krylov solve");
+        if(!converged) LOG::printf("KRYLOV SOLVER DID NOT CONVERGE.\n");
+        krylov_sol=sol.v;
+    }
 
     ELIMINATION_FEM<T> el(cl);
     
@@ -312,6 +346,15 @@ void Run(PARSE_ARGS& parse_args)
         Flush_Frame<TV>("solution");
         mc.Dump_World_Space_Vector("x");
         debug.Visualize_Flat_Dofs();
+    }
+
+    if(use_krylov)
+    {
+        ARRAY<int,BLOCK_ID> first[3];
+        int size=mc.Compute_Global_Dof_Mapping(first);
+        ARRAY<T> world_sol;
+        mc.Dump_World_Space_Vector(first,size,world_sol);
+        LOG::printf("Krylov diff %P\n",(world_sol-krylov_sol).Max_Abs());
     }
 
     for(int i=1;i<tm.m;i++)

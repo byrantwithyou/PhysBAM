@@ -57,6 +57,8 @@ struct MATRIX_CONSTRUCTION_FEM
     void Apply_To_RHS(BLOCK_ID b,const BLOCK_VECTOR<TV>& w);
     void Transform_To_World_Space(BLOCK_MATRIX<TV>& M,const BLOCK_MATRIX<TV>& B,BLOCK_ID a,BLOCK_ID b) const;
     void Transform_Solution(const CACHED_ELIMINATION_MATRIX<T>& cem,bool inverse,bool transpose);
+    void Dump_World_Space_System(ARRAY<int,BLOCK_ID> first[3],int size,SPARSE_MATRIX_FLAT_MXN<T>& SM) const;
+    void Dump_World_Space_Vector(ARRAY<int,BLOCK_ID> first[3],int size,ARRAY<T>& vec) const;
     void Dump_World_Space_System() const;
     void Dump_World_Space_Vector(const char* name) const;
     void Dump_Matrix_Block(SYSTEM_MATRIX_HELPER<T>& h,ARRAY<int,BLOCK_ID> first[3],const BLOCK_MATRIX<TV>& M,BLOCK_ID b0,BLOCK_ID b1) const;
