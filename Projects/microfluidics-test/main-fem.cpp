@@ -22,11 +22,11 @@
 #include "COMPONENT_LAYOUT_FEM.h"
 #include "DEBUGGING_FEM.h"
 #include "ELIMINATION_FEM.h"
+#include "KRYLOV_SOLVER_FEM.h"
 #include "LAYOUT_BUILDER_FEM.h"
 #include "MATRIX_CONSTRUCTION_FEM.h"
 #include "SOLUTION_FEM.h"
 #include <chrono>
-
 
 typedef float RW;
 typedef double T;
@@ -54,11 +54,12 @@ void Run(PARSE_ARGS& parse_args)
     timer("start");
 
     int threads=1;
+    int kn=100000;
     bool quiet=false,use_krylov=false,print_system=false,pinv=false,stats_only=false,force_blk_ref=false,illus_domain=false,
         illus_zoom=false,dump_solution=false,rounded_corner=false;
     TV2 min_corner,max_corner;
     IV2 illus_size(128,128);
-    bool illus_fill=false;
+    bool illus_fill=false,use_mkl_sparse=false;
     std::string pipe_file,output_dir="output";
     std::string analytic_u,analytic_p;
     std::string sol_file;
@@ -83,6 +84,8 @@ void Run(PARSE_ARGS& parse_args)
     parse_args.Add("-max_corner",&max_corner,"point","max corner");
     parse_args.Add("-rounded_corner",&rounded_corner,"use rounded corner");
     parse_args.Add("-k",&use_krylov,"solve with Krylov method");
+    parse_args.Add("-kn",&kn,"number","max krylov iterations");
+    parse_args.Add("-mklsp",&use_mkl_sparse,"use MKL sparse matrix-vector multiply");
     parse_args.Add("-d",&print_system,"dump the system to be solved");
     parse_args.Add("-m",&m,"scale","scale units of length");
     parse_args.Add("-s",&s,"scale","scale units of time");
@@ -278,18 +281,19 @@ void Run(PARSE_ARGS& parse_args)
         SPARSE_MATRIX_FLAT_MXN<T> SM;
         mc.Dump_World_Space_System(first,size,SM);
 
-        typedef KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > KRY_VEC;
-        typedef MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_MXN<T>,T,KRY_VEC> KRY_MAT;
-        KRY_MAT sys(SM);
-        KRY_VEC rhs,sol;
+        typedef KRYLOV_VECTOR_FEM<T> KRY_VEC;
+        typedef KRYLOV_SYSTEM_FEM<T> KRY_MAT;
+        KRY_MAT sys(SM,threads,use_mkl_sparse);
+        KRY_VEC rhs(threads),sol(threads);
         rhs.v=b;
         sol.v.Resize(size);
+        timer("prep krylov");
 
         ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
-        sys.Test_System(sol);
+        //sys.Test_System(sol);
         MINRES<T> mr;
         timer("test krylov");
-        bool converged=mr.Solve(sys,sol,rhs,av,1e-12,0,100000);
+        bool converged=mr.Solve(sys,sol,rhs,av,1e-12,0,kn);
         timer("krylov solve");
         if(!converged) LOG::printf("KRYLOV SOLVER DID NOT CONVERGE.\n");
         krylov_sol=sol.v;
@@ -390,7 +394,6 @@ int main(int argc, char* argv[])
     LOG::printf("%s\n",parse_args.Print_Arguments());
     if(use_3d) Run<3>(parse_args);
     else Run<2>(parse_args);
-
     LOG::Finish_Logging();
     return 0;
 }
