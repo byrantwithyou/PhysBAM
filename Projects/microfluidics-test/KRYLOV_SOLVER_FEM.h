@@ -196,6 +196,7 @@ struct KRYLOV_SYSTEM_FEM:public KRYLOV_SYSTEM_BASE<T>
         P=&preconditioner;
         temp_vector=&vector;
     }
+#if USE_MKL
     void Init_Sparse_Matrix(double dummy)
     {
         mkl_sparse_d_create_csr(&spA,SPARSE_INDEX_BASE_ZERO,A.m,A.n,
@@ -218,6 +219,7 @@ struct KRYLOV_SYSTEM_FEM:public KRYLOV_SYSTEM_BASE<T>
         mkl_sparse_s_mv(SPARSE_OPERATION_NON_TRANSPOSE,1,
             spA,descA,(T*)x.base_pointer,0,result.base_pointer);
     }
+#endif
     void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result,bool transpose=false) const override
     {
         const VECTOR_T& vx=dynamic_cast<const VECTOR_T&>(x);
