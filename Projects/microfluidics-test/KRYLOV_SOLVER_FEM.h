@@ -11,6 +11,7 @@
 #include <cblas.h>
 #include <lapacke.h>
 #elif USE_MKL
+#include <mkl.h>
 #include <mkl_cblas.h>
 #include <mkl_lapacke.h>
 #include <mkl_spblas.h>
@@ -40,6 +41,7 @@ struct KRYLOV_VECTOR_FEM:public KRYLOV_VECTOR_BASE<T>
     }
     static void Scalar_Times_Vector(double a,const ARRAY<double>& x,ARRAY<double>& y,int threads)
     {
+#if 0
         int s=x.m/threads,l=x.m-s*(threads-1);
 #pragma omp parallel for
         for(int tid=0;tid<threads;tid++)
@@ -47,9 +49,13 @@ struct KRYLOV_VECTOR_FEM:public KRYLOV_VECTOR_BASE<T>
             int n=tid==threads-1?l:s;
             cblas_daxpy(n,a,x.base_pointer+tid*s,1,y.base_pointer+tid*s,1);
         }
+#else
+        cblas_daxpy(x.m,a,x.base_pointer,1,y.base_pointer,1);
+#endif
     }
     static void Scalar_Times_Vector(float a,const ARRAY<float>& x,ARRAY<float>& y,int threads)
     {
+#if 0
         int s=x.m/threads,l=x.m-s*(threads-1);
 #pragma omp parallel for
         for(int tid=0;tid<threads;tid++)
@@ -57,9 +63,13 @@ struct KRYLOV_VECTOR_FEM:public KRYLOV_VECTOR_BASE<T>
             int n=tid==threads-1?l:s;
             cblas_saxpy(n,a,x.base_pointer+tid*s,1,y.base_pointer+tid*s,1);
         }
+#else
+        cblas_saxpy(x.m,a,x.base_pointer,1,y.base_pointer,1);
+#endif
     }
     static void Scale_Vector(double a,ARRAY<double>& x,int threads)
     {
+#if 0
         int s=x.m/threads,l=x.m-s*(threads-1);
 #pragma omp parallel for
         for(int tid=0;tid<threads;tid++)
@@ -67,9 +77,13 @@ struct KRYLOV_VECTOR_FEM:public KRYLOV_VECTOR_BASE<T>
             int n=tid==threads-1?l:s;
             cblas_dscal(n,a,x.base_pointer+tid*s,1);
         }
+#else
+        cblas_dscal(x.m,a,x.base_pointer,1);
+#endif
     }
     static void Scale_Vector(float a,ARRAY<float >& x,int threads)
     {
+#if 0
         int s=x.m/threads,l=x.m-s*(threads-1);
 #pragma omp parallel for
         for(int tid=0;tid<threads;tid++)
@@ -77,6 +91,9 @@ struct KRYLOV_VECTOR_FEM:public KRYLOV_VECTOR_BASE<T>
             int n=tid==threads-1?l:s;
             cblas_sscal(n,a,x.base_pointer+tid*s,1);
         }
+#else
+        cblas_sscal(x.m,a,x.base_pointer,1);
+#endif
     }
     KRYLOV_VECTOR_BASE<T>& operator+=(const KRYLOV_VECTOR_BASE<T>& bv) override
     {
@@ -172,6 +189,7 @@ struct KRYLOV_SYSTEM_FEM:public KRYLOV_SYSTEM_BASE<T>
 #if USE_MKL
         if(use_mkl_sparse)
         {
+            mkl_set_num_threads(threads);
             ja.Resize(A.A.m);
             entries.Resize(A.A.m);
             for(int i=0;i<A.A.m;i++)
@@ -241,6 +259,7 @@ struct KRYLOV_SYSTEM_FEM:public KRYLOV_SYSTEM_BASE<T>
     static float Dot_Product(const ARRAY<float>& u,const ARRAY<float>& v,int threads)
     {
         PHYSBAM_ASSERT(u.m==v.m);
+#if 0
         int s=u.m/threads,l=u.m-s*(threads-1);
         float r=0;
 #pragma omp parallel for reduction(+:r)
@@ -250,10 +269,14 @@ struct KRYLOV_SYSTEM_FEM:public KRYLOV_SYSTEM_BASE<T>
             r=r+d;
         }
         return r;
+#else
+        return cblas_sdot(u.m,u.base_pointer,1,v.base_pointer,1);
+#endif
     }
     static double Dot_Product(const ARRAY<double>& u,const ARRAY<double>& v,int threads)
     {
         PHYSBAM_ASSERT(u.m==v.m);
+#if 0
         int s=u.m/threads,l=u.m-s*(threads-1);
         double r=0;
 #pragma omp parallel for reduction(+:r)
@@ -263,6 +286,9 @@ struct KRYLOV_SYSTEM_FEM:public KRYLOV_SYSTEM_BASE<T>
             r=r+d;
         }
         return r;
+#else
+        return cblas_ddot(u.m,u.base_pointer,1,v.base_pointer,1);
+#endif
     }
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const override
     {
