@@ -65,7 +65,7 @@ void Run(PARSE_ARGS& parse_args)
         illus_zoom=false,dump_solution=false,rounded_corner=false;
     TV2 min_corner,max_corner;
     IV2 illus_size(128,128);
-    bool illus_fill=false,use_mkl_sparse=false;
+    bool illus_fill=false,use_mkl_sparse=false,dump_sysbin=false;
     std::string pipe_file,output_dir="output";
     std::string analytic_u,analytic_p;
     std::string sol_file;
@@ -79,6 +79,7 @@ void Run(PARSE_ARGS& parse_args)
     parse_args.Add("-mu",&mu,"mu","viscosity");
     parse_args.Add("-q",&quiet,"disable diagnostics; useful for timing");
     parse_args.Add("-dump_sol",&dump_solution,"dump solution");
+    parse_args.Add("-dump_sysbin",&dump_sysbin,"dump system in binary format");
     parse_args.Add("-pinv",&pinv,"perform pseudo inverse");
     parse_args.Add("-force_blk_ref",&force_blk_ref,"force every block a reference block");
     parse_args.Add("-stats",&stats_only,"show statistics");
@@ -263,7 +264,7 @@ void Run(PARSE_ARGS& parse_args)
 
     timer("compute matrix");
 
-    if(!quiet || use_krylov)
+    if(!quiet || use_krylov || dump_sysbin)
         mc.Transform_Solution(cem,true,true);
     if(!quiet)
     {
@@ -277,8 +278,15 @@ void Run(PARSE_ARGS& parse_args)
 
     timer("transform matrix");
 
+    if(quiet)
+    {
+        Create_Directory(output_dir);
+        Create_Directory(output_dir+"/common");
+        LOG::Instance()->Copy_Log_To_File(output_dir+"/common/log.txt",false);
+    }
+
     ARRAY<T> krylov_sol;
-    if(use_krylov)
+    if(use_krylov || dump_sysbin)
     {
         ARRAY<int,BLOCK_ID> first[3];
         int size=mc.Compute_Global_Dof_Mapping(first);
@@ -287,22 +295,59 @@ void Run(PARSE_ARGS& parse_args)
         SPARSE_MATRIX_FLAT_MXN<T> SM;
         mc.Dump_World_Space_System(first,size,SM);
 
-        typedef KRYLOV_VECTOR_FEM<T> KRY_VEC;
-        typedef KRYLOV_SYSTEM_FEM<T> KRY_MAT;
-        KRY_MAT sys(SM,threads,use_mkl_sparse);
-        KRY_VEC rhs(threads),sol(threads);
-        rhs.v=b;
-        sol.v.Resize(size);
-        timer("prep krylov");
+        if(use_krylov)
+        {
+            typedef KRYLOV_VECTOR_FEM<T> KRY_VEC;
+            typedef KRYLOV_SYSTEM_FEM<T> KRY_MAT;
+            KRY_MAT sys(SM,threads,use_mkl_sparse);
+            KRY_VEC rhs(threads),sol(threads);
+            rhs.v=b;
+            sol.v.Resize(size);
+            timer("prep krylov");
 
-        ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
-        //sys.Test_System(sol);
-        MINRES<T> mr;
-        timer("test krylov");
-        bool converged=mr.Solve(sys,sol,rhs,av,1e-12,0,kn);
-        timer("krylov solve");
-        if(!converged) LOG::printf("KRYLOV SOLVER DID NOT CONVERGE.\n");
-        krylov_sol=sol.v;
+            ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
+            //sys.Test_System(sol);
+            MINRES<T> mr;
+            timer("test krylov");
+            bool converged=mr.Solve(sys,sol,rhs,av,1e-12,0,kn);
+            timer("krylov solve");
+            if(!converged) LOG::printf("KRYLOV SOLVER DID NOT CONVERGE.\n");
+            krylov_sol=sol.v;
+        }
+        else if(dump_sysbin)
+        {
+            ARRAY<int> row,col;
+            ARRAY<T> entries;
+            for(int i=0;i<SM.m;i++)
+                for(int j=SM.offsets(i);j<SM.offsets(i+1);j++)
+                {
+                    int r=i;
+                    int c=SM.A(j).j;
+                    if(c>=r)
+                    {
+                        row.Append(r);
+                        col.Append(c);
+                        entries.Append(SM.A(j).a);
+                    }
+                }
+            auto write_bin=[&output_dir](const auto& arr,const char* name)
+            {
+                // size values
+                std::FILE* file=std::fopen((output_dir+name).c_str(),"wb");
+                std::fwrite(&arr.m,sizeof(arr.m),1,file);
+                std::fwrite(arr.base_pointer,sizeof(arr(0)),arr.m,file);
+                std::fclose(file);
+            };
+            write_bin(col,"/col.bin");
+            write_bin(row,"/row.bin");
+            write_bin(b,"/rhs.bin");
+            // dim nnz values
+            std::FILE* entries_file=std::fopen((output_dir+"/entries.bin").c_str(),"wb");
+            std::fwrite(&SM.m,sizeof(SM.m),1,entries_file);
+            std::fwrite(&entries.m,sizeof(entries.m),1,entries_file);
+            std::fwrite(entries.base_pointer,sizeof(T),entries.m,entries_file);
+            std::fclose(entries_file);
+        }
     }
 
     ELIMINATION_FEM<T> el(cl);
@@ -365,25 +410,26 @@ void Run(PARSE_ARGS& parse_args)
         debug.Visualize_Flat_Dofs();
     }
 
-    if(use_krylov)
+    if(use_krylov || dump_sysbin)
     {
         ARRAY<int,BLOCK_ID> first[3];
         int size=mc.Compute_Global_Dof_Mapping(first);
         ARRAY<T> world_sol;
         mc.Dump_World_Space_Vector(first,size,world_sol);
-        LOG::printf("Krylov diff %P\n",(world_sol-krylov_sol).Max_Abs());
+        if(use_krylov)
+            LOG::printf("Krylov diff %P\n",(world_sol-krylov_sol).Max_Abs());
+        else if(dump_sysbin)
+        {
+            std::FILE* file=std::fopen((output_dir+"/x.bin").c_str(),"wb");
+            std::fwrite(&world_sol.m,sizeof(world_sol.m),1,file);
+            std::fwrite(world_sol.base_pointer,sizeof(T),world_sol.m,file);
+            std::fclose(file);
+        }
     }
 
     for(int i=1;i<tm.m;i++)
         LOG::printf("%20s %5.0f ms\n",tm(i).y,
         std::chrono::duration_cast<std::chrono::duration<double> >(tm(i).x-tm(i-1).x).count()*1000);
-
-    if(quiet)
-    {
-        Create_Directory(output_dir);
-        Create_Directory(output_dir+"/common");
-        LOG::Instance()->Copy_Log_To_File(output_dir+"/common/log.txt",false);
-    }
 
     if(dump_solution)
     {
