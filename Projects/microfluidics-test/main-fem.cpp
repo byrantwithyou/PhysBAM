@@ -27,6 +27,12 @@
 #include "MATRIX_CONSTRUCTION_FEM.h"
 #include "SOLUTION_FEM.h"
 #include <chrono>
+#if USE_MKL
+#include <mkl.h>
+#endif
+#ifdef USE_OPENMP
+#include <omp.h>
+#endif
 
 typedef float RW;
 typedef double T;
@@ -327,6 +333,13 @@ void Run(PARSE_ARGS& parse_args)
     timer("back solve");
 
     cem.matrix_cache.Init(cache_pattern,cache_size);
+    // Let job scheduler spawn threads.
+#ifdef USE_OPENMP
+        omp_set_num_threads(1);
+#endif
+#ifdef USE_MKL
+        mkl_set_num_threads(1);
+#endif
     cem.Execute_Jobs(threads);
 
     timer("exec jobs");
