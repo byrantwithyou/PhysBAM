@@ -392,30 +392,17 @@ void Visit_Dofs(const DOF_LAYOUT<VECTOR<T,3> >& dl,LAYER_RANGE lr,const AR& bc_v
     typedef VECTOR<T,2> TV2;
     typedef VECTOR<T,3> TV;
 
-    int begin_f,end_f,step_f,begin_vol,end_vol,step_vol;
+    int begin_f=0,end_f=dl.nl+1,step_f=1,begin_vol=0,end_vol=dl.nl,step_vol=1;
     switch(lr)
     {
         case LAYER_RANGE::ALL:
-            begin_f=0;
-            end_f=dl.nl+1;
-            step_f=1;
-            begin_vol=0;
-            end_vol=dl.nl;
-            step_vol=1;
             break;
         case LAYER_RANGE::SKIP_BOTTOM_TOP:
             begin_f=1;
             end_f=dl.nl;
-            step_f=1;
-            begin_vol=0;
-            end_vol=dl.nl;
-            step_vol=1;
             break;
         case LAYER_RANGE::BOTTOM_TOP_ONLY:
-            begin_f=0;
-            end_f=dl.nl+1;
             step_f=dl.nl;
-            begin_vol=0;
             end_vol=0;
             step_vol=0;
             break;
