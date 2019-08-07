@@ -73,9 +73,9 @@ int main(int argc,char* argv[])
     omp_set_num_threads(threads);
     mkl_set_num_threads(threads);
 
-    vector<int> col,row;
+    vector<int> col,offsets;
     vector<T> rhs,entries,ref_sol;
-    int dim,nnz;
+    int dim;
     auto read_bin=[&dir](auto& arr,const char* name)
     {
         FILE* file=fopen((dir+name).c_str(),"rb");
@@ -88,21 +88,37 @@ int main(int argc,char* argv[])
     timer("init");
 
     read_bin(col,"/col.bin");
-    read_bin(row,"/row.bin");
-    for(auto& e:col) e+=1;
-    for(auto& e:row) e+=1;
+    read_bin(offsets,"/offsets.bin");
     read_bin(rhs,"/rhs.bin");
     read_bin(ref_sol,"/x.bin");
     FILE* file=fopen((dir+"/entries.bin").c_str(),"rb");
     fread(&dim,sizeof(int),1,file);
-    fread(&nnz,sizeof(int),1,file);
-    entries.resize(nnz);
-    fread(&entries[0],sizeof(T),nnz,file);
+    int s;
+    fread(&s,sizeof(int),1,file);
+    entries.resize(s);
+    fread(&entries[0],sizeof(T),s,file);
     fclose(file);
+
+    int nnz=0;
+    vector<int> half_row,half_col;
+    vector<T> half_entries;
+    for(int i=0;i<dim;i++)
+        for(int j=offsets[i];j<offsets[i+1];j++)
+        {
+            int r=i+1;
+            int c=col[j]+1;
+            if(c>=r)
+            {
+                half_row.push_back(r);
+                half_col.push_back(c);
+                half_entries.push_back(entries[j]);
+                ++nnz;
+            }
+        }
     printf("name %s dim %d nnz %d threads %d\n",dir.c_str(),dim,nnz,threads);
     timer("import");
 
-    solve(dim,nnz,entries,row,col,rhs);
+    solve(dim,nnz,half_entries,half_row,half_col,rhs);
     timer("solve");
 
     check(rhs,ref_sol);

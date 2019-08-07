@@ -316,20 +316,13 @@ void Run(PARSE_ARGS& parse_args)
         }
         else if(dump_sysbin)
         {
-            ARRAY<int> row,col;
-            ARRAY<T> entries;
-            for(int i=0;i<SM.m;i++)
-                for(int j=SM.offsets(i);j<SM.offsets(i+1);j++)
-                {
-                    int r=i;
-                    int c=SM.A(j).j;
-                    if(c>=r)
-                    {
-                        row.Append(r);
-                        col.Append(c);
-                        entries.Append(SM.A(j).a);
-                    }
-                }
+            ARRAY<int> col(SM.A.m);
+            ARRAY<T> entries(SM.A.m);
+            for(int i=0;i<SM.A.m;i++)
+            {
+                col(i)=SM.A(i).j;
+                entries(i)=SM.A(i).a;
+            }
             auto write_bin=[&output_dir](const auto& arr,const char* name)
             {
                 // size values
@@ -339,7 +332,7 @@ void Run(PARSE_ARGS& parse_args)
                 std::fclose(file);
             };
             write_bin(col,"/col.bin");
-            write_bin(row,"/row.bin");
+            write_bin(SM.offsets,"/offsets.bin");
             write_bin(b,"/rhs.bin");
             // dim nnz values
             std::FILE* entries_file=std::fopen((output_dir+"/entries.bin").c_str(),"wb");
