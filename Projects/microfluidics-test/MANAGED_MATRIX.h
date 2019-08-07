@@ -9,6 +9,7 @@
 #include <Core/Log/LOG.h>
 #include <Core/Matrices/MATRIX_MXN.h>
 #include <Core/Vectors/VECTOR.h>
+#include <functional>
 #include "COMMON.h"
 #include <atomic>
 #include <mutex>
