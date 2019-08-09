@@ -444,7 +444,7 @@ template<class TV,class T>
 inline T Compute_Maximum_Tensor_Contraction_Brute(const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dpdf,const DIAGONAL_MATRIX<T,TV::m>& sigma)
 {
     T epsilon=std::numeric_limits<T>::epsilon();
-    T tolerance=sqrt(epsilon);
+    T tolerance=sqrt(epsilon)/100;
     RANDOM_NUMBERS<T> random;
     TV u,v;
     T eig_est=-FLT_MAX;
@@ -465,6 +465,7 @@ inline T Compute_Maximum_Tensor_Contraction_Brute(const DIAGONALIZED_ISOTROPIC_S
     while(abs(ev-pev)>tolerance*ev && abs(ev)>tolerance){
         if(!--iter)
         {
+            break;
             LOG::printf("STOP EARLY\n");
             return ev;
         }
@@ -480,6 +481,24 @@ inline T Compute_Maximum_Tensor_Contraction_Brute(const DIAGONALIZED_ISOTROPIC_S
         u=V.Column(kk);
         pev=ev;
         ev=E.x(kk);}
+
+    T best_a=-FLT_MAX;
+    for(int i=0;i<TV::m;i++)
+        for(int j=0;j<TV::m;j++)
+        {
+            TV u0,v0;
+            u0(i)=1;
+            v0(j)=1;
+            T e=u0.Dot(Conjugate_Stress_Diff(dpdf,sigma*v0)*u0);
+            if(e>best_a)
+                best_a=e;
+        }
+    if(best_a*1.0000001>ev) return best_a;
+
+#pragma omp critical
+    {
+        LOG::printf("XX %P %P -> %P   %P\n",u,v,ev,ev/best_a);
+    }
     return ev;
 }
 template<class T>
@@ -574,6 +593,7 @@ Compute_Max_Sound_Speed() const -> T
     T max_speed=0;
     for(int f=0;f<example.forces.m;f++){
         if(const MPM_FINITE_ELEMENTS<TV>* force=dynamic_cast<MPM_FINITE_ELEMENTS<TV>*>(example.forces(f))){
+#pragma omp parallel for reduction(max:max_speed)
             for(int k=0;k<example.simulated_particles.m;k++){
                 int p=example.simulated_particles(k);
                 const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dpdf=force->dPi_dF(p);
