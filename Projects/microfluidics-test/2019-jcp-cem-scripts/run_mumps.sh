@@ -63,6 +63,34 @@ if [ "X$FULL" = "X1" ] ; then
     done
 fi
 
+cat <<EOF > $NAME/stats.csv
+Name,Resolution,Total dofs,Blocks,Tasks,Avg dofs/block
+EOF
+for p in `seq 0 3` ; do
+    c=${tests[$p]}
+    r=${res2[$p]}
+    tot=`grep "dofs 2d" $NAME/$c-t1/common/log.txt | sed 's/.*total: \([^<]*\).*/\1/g'`
+    blks=`grep ">blocks:" $NAME/$c-t1/common/log.txt | sed 's/.*blocks: \([^<]*\).*/\1/g'`
+    jbs=`grep "jobs:" $NAME/$c-t1/common/log.txt | sed 's/.*jobs: \([^<]*\).*/\1/g'`
+    dofspb=`perl -e "{printf('%.1f',$tot/$blks);}"`
+    rndtot=`perl -e "{printf('%.1f M',$tot/1e6);}"`
+    rndjbs=`perl -e "{printf('%.1f K',$jbs/1e3);}"`
+    res=`perl -e "{print 2*$r;}"`
+    echo "$c,$res,$rndtot,$blks,$rndjbs,$dofspb" >> $NAME/stats.csv
+done
+for p in `seq 0 3` ; do
+    c=${tests[$p]}
+    r=${res3[$p]}
+    tot=`grep "dofs 3d" $NAME/$c-3d-t1/common/log.txt | sed 's/.*total: \([^<]*\).*/\1/g'`
+    blks=`grep ">blocks:" $NAME/$c-3d-t1/common/log.txt | sed 's/.*blocks: \([^<]*\).*/\1/g'`
+    jbs=`grep "jobs:" $NAME/$c-3d-t1/common/log.txt | sed 's/.*jobs: \([^<]*\).*/\1/g'`
+    dofspb=`perl -e "{printf('%.1f',$tot/$blks);}"`
+    rndtot=`perl -e "{printf('%.1f M',$tot/1e6);}"`
+    rndjbs=`perl -e "{printf('%.1f K',$jbs/1e3);}"`
+    res=`perl -e "{print 2*$r;}"`
+    echo "$c-3d,$res,$rndtot,$blks,$rndjbs,$dofspb" >> $NAME/stats.csv
+done
+
 
 cat <<EOF > $NAME/result.txt
 EOF
@@ -85,3 +113,31 @@ for th in 1 2 4 8 16 ; do
         done
     done
 done
+
+
+for c in ${tests[@]} ; do
+    for dim in "" "-3d"; do
+        grep "$c$dim " $NAME/result.txt | awk '{print $2,$3}' > $NAME/$c$dim.txt
+        grep "$c$dim " $NAME/result.txt | awk '{print $2,$4}' > $NAME/$c$dim-mumps.txt
+        grep "$c$dim " $NAME/result.txt | awk '{print $2,$5}' > $NAME/$c$dim-umfpack.txt
+        sed -e "s/CCCC/$c$dim/g" -e "s/MMMM/$c$dim-mumps/g" -e "s/FFFF/$c$dim-umfpack/g" -e "s/TTTT/$c$dim/g" \
+            comparison_timing_plot.tex > $NAME/plot-$c$dim.tex
+    done
+done
+
+cat <<EOF > $NAME/SConstruct
+import os
+import re
+env=Environment(ENV = os.environ)
+env['PSSUFFIX']=".eps"
+r=re.compile(".*\.tex$")
+for f in [x for x in os.listdir(".") if r.match(x)]:
+    t=env.DVI(f)
+    env.PostScript(t)
+    env.PDF(t)
+EOF
+(
+    cd $NAME
+    scons
+)
+
