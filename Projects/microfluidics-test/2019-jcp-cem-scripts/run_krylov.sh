@@ -56,3 +56,41 @@ for th in 1 2 4 8 16 ; do
         done
     done
 done
+
+
+for c in ${tests[@]} ; do
+    for dim in "" "-3d"; do
+        grep "$c$dim " $NAME/result.txt | awk '{print $2,$4}' > $NAME/$c$dim-iter-time.txt
+        grep "$c$dim " $NAME/result.txt | awk '{print $2,$5}' > $NAME/$c$dim-num-iters.txt
+    done
+done
+
+cp krylov_iter_time.tex $NAME/plot-iter-time.tex
+cp krylov_iter_time.tex $NAME/plot-iter-time-3d.tex
+cp num_krylov_iter.tex $NAME/plot-num-iters.tex
+cp num_krylov_iter.tex $NAME/plot-num-iters-3d.tex
+
+for dim in "" "-3d" ; do
+    for p in `seq 0 3` ; do
+        c=${tests[$p]}
+        sed -i -e "s/XXXX$p/$c$dim-iter-time/g" $NAME/plot-iter-time$dim.tex
+        sed -i -e "s/XXXX$p/$c$dim-num-iters/g" $NAME/plot-num-iters$dim.tex
+    done
+done
+
+cat <<EOF > $NAME/SConstruct
+import os
+import re
+env=Environment(ENV = os.environ)
+env['PSSUFFIX']=".eps"
+r=re.compile(".*\.tex$")
+for f in [x for x in os.listdir(".") if r.match(x)]:
+    t=env.DVI(f)
+    env.PostScript(t)
+    env.PDF(t)
+EOF
+(
+    cd $NAME
+    scons
+)
+
