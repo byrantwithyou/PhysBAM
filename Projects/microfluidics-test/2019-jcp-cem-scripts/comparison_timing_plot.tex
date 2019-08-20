@@ -5,7 +5,11 @@
 \pgfplotsset{width=10cm,height=8cm,compat=1.13}
 \begin{tikzpicture}
 \begin{loglogaxis}[
-    enlargelimits=false,
+    log basis x=2,
+    log basis y=10,
+    % enlargelimits=false,
+    enlarge y limits=0.3,
+    enlarge x limits=false,
     legend cell align=left,
     xlabel={Number of threads},
     ylabel={Solving time (second)},
@@ -17,8 +21,7 @@
 %    xmax=16,
     legend style={nodes={scale=1.2, transform shape},fill=none,draw=none},
     xtick=data,
-    ytick={1,2,4,8,16,32,64,128},
-    log ticks with fixed point,
+    xticklabel=\pgfmathparse{2^\tick}\pgfmathprintnumber{\pgfmathresult},
 %    title={Convergence plot}
 ]
 \addplot[mark=x,color=red] table[x index=0,y expr={\thisrowno{1}/1000}]{CCCC.txt};
