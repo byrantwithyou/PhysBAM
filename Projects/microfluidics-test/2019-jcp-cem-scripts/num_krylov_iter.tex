@@ -8,24 +8,24 @@
     enlargelimits=false,
     legend cell align=left,
     xlabel={Number of threads},
-    ylabel={Number of effective Krylov iterations},
+    ylabel={Budget Krylov iterations},
     %xticklabels={,,},
-    legend entries={XXXX0,XXXX1,XXXX2,XXXX3,$20$ iterations},
+    legend entries={TTTT0,TTTT1,TTTT2,TTTT3},
     legend pos=north east,
 %    ymin=0,
 %    ymax=40,
 %    xmax=16,
     legend style={nodes={scale=1.2, transform shape},fill=none,draw=none},
     xtick=data,
-    ytick={0.0625,0.125,0.25,0.5,1,2,4,8,16,32,64,128,256,512,1024},
+    ytick={1,2,4,8,16,32,64,128,256,512},
     log ticks with fixed point,
+    ymin=4,
 %    title={Convergence plot}
 ]
 \addplot[mark=x,color=cyan] table[x index=0,y index=1]{XXXX0.txt};
 \addplot[mark=x,color=red] table[x index=0,y index=1]{XXXX1.txt};
 \addplot[mark=x,color=green] table[x index=0,y index=1]{XXXX2.txt};
 \addplot[mark=x,color=blue] table[x index=0,y index=1]{XXXX3.txt};
-\addplot[mark=none,dotted,thick,domain=1:16] {20};
 \end{loglogaxis}
 \end{tikzpicture}
 \end{document}

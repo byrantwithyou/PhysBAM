@@ -73,8 +73,8 @@ cp num_krylov_iter.tex $NAME/plot-num-iters-3d.tex
 for dim in "" "-3d" ; do
     for p in `seq 0 3` ; do
         c=${tests[$p]}
-        sed -i -e "s/XXXX$p/$c$dim-iter-time/g" $NAME/plot-iter-time$dim.tex
-        sed -i -e "s/XXXX$p/$c$dim-num-iters/g" $NAME/plot-num-iters$dim.tex
+        sed -i -e "s/XXXX$p/$c$dim-iter-time/g" -e "s/TTTT$p/$c$dim/g" $NAME/plot-iter-time$dim.tex
+        sed -i -e "s/XXXX$p/$c$dim-num-iters/g" -e "s/TTTT$p/$c$dim/g" $NAME/plot-num-iters$dim.tex
     done
 done
 
