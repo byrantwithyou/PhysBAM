@@ -5,6 +5,8 @@
 \pgfplotsset{width=10cm,height=8cm,compat=1.13}
 \begin{tikzpicture}
 \begin{loglogaxis}[
+    log basis x=2,
+    log basis y=10,
     enlargelimits=false,
     legend cell align=left,
     xlabel={Number of threads},
@@ -17,9 +19,7 @@
 %    xmax=16,
     legend style={nodes={scale=1.2, transform shape},fill=none,draw=none},
     xtick=data,
-    ytick={1,2,4,8,16,32,64,128},
-    log ticks with fixed point,
-%    title={Convergence plot}
+    xticklabel=\pgfmathparse{2^\tick}\pgfmathprintnumber{\pgfmathresult},
 ]
 \addplot[mark=x,color=red] table[x=threads,y=solving]{XXXX0.txt};
 \addplot[mark=x,color=green] table[x=threads,y=solving]{XXXX1.txt};
