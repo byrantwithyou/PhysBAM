@@ -607,11 +607,11 @@ inline T Compute_Maximum_Tensor_Contraction_Brute(const DIAGONALIZED_ISOTROPIC_S
             if(e>best_a)
                 best_a=e;
         }
-    if(best_a*1.0000001>ev) return best_a;
+    if(best_a*1.0000001>=ev) return best_a;
 
 #pragma omp critical
     {
-        LOG::printf("XX %P %P -> %P   %P\n",u,v,ev,ev/best_a);
+        LOG::printf("XX %P %P -> %P   %P\n",u,v,ev,Robust_Divide(ev,best_a));
     }
     return ev;
 }
@@ -644,6 +644,7 @@ inline T Compute_Maximum_Tensor_Contraction(const SYMMETRIC_MATRIX<T,2>& H, cons
         {
             T nu=(num-v12*den)*H10;
             T de=((A01-H00)*num+(H00-A10)*v12*den);
+            PHYSBAM_ASSERT(de!=(T)0.);
             T t0=nu/de;
             T e=(((A10*v12/v02+H00)*t0+2*H10)*v12*t0+A01*v02+H11*v12)*num/den;
             if(e>x)
@@ -662,19 +663,26 @@ inline T Compute_Maximum_Tensor_Contraction(const SYMMETRIC_MATRIX<T,2>& H, cons
 template<class TV,class T>
 inline T Compute_Maximum_Tensor_Contraction(const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dpdf,const DIAGONAL_MATRIX<T,2>& sigma)
 {
-    typename TV::SPIN B0,B1,C;
-    SYMMETRIC_MATRIX<T,TV::m> S=SYMMETRIC_MATRIX<T,TV::m>::Conjugate(sigma,dpdf.H);
-    for(int i=0;i<TV::SPIN::m;i++){
-        int j=(i+1)%TV::m,k=(j+1)%TV::m;
-        C(i)=dpdf.C(i)*sigma(j)*sigma(k);
-        B0(i)=dpdf.B(i)*sigma(j)*sigma(j);
-        B1(i)=dpdf.B(i)*sigma(k)*sigma(k);}
+    auto S=SYMMETRIC_MATRIX<T,TV::m>::Conjugate(sigma,dpdf.H);
+    VECTOR<T,1> B0(dpdf.B(0)*sigma(1)*sigma(1)),B1(dpdf.B(0)*sigma(0)*sigma(0)),C(dpdf.C(0)*sigma(1)*sigma(0));
     return Compute_Maximum_Tensor_Contraction(S,B0,B1,C);
 }
-template<class TV,class T>
-inline T Compute_Maximum_Tensor_Contraction(const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dpdf,const DIAGONAL_MATRIX<T,3>& sigma)
+template<class T,class TV>
+const T Compute_Maximum_Tensor_Contraction(const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dpdf,const DIAGONAL_MATRIX<T,3>& sigma)
 {
-    return Compute_Maximum_Tensor_Contraction_Brute(dpdf,sigma);
+    DIAGONAL_MATRIX<T,2> S2;
+    SYMMETRIC_MATRIX<T,2> H2;
+    T ev=-FLT_MAX;
+    for(int d=0;d<TV::m;++d){
+        for(int i=0;i<2;++i){
+            S2(i)=sigma((d+i+1)%TV::m);}
+        H2.x00=dpdf.H((d+1)%TV::m,(d+1)%TV::m);
+        H2.x11=dpdf.H((d+2)%TV::m,(d+2)%TV::m);
+        H2.x10=dpdf.H((d+1)%TV::m,(d+2)%TV::m);
+        auto S=SYMMETRIC_MATRIX<T,2>::Conjugate(S2,H2);
+        VECTOR<T,1> B0(dpdf.B(d)*S2(1)*S2(1)),B1(dpdf.B(d)*S2(0)*S2(0)),C(dpdf.C(d)*S2(1)*S2(0));
+        ev=max(ev,Compute_Maximum_Tensor_Contraction(S,B0,B1,C));}
+    return ev;
 }
 //#####################################################################
 // Function Test_Sound_Speed
