@@ -1,0 +1,26 @@
+1. Set MKLROOT
+Set it through a script provided by MKL.
+e.g.
+source ~/intel-mkl/compilers_and_libraries_2019.4.243/linux/mkl/bin/mklvars.sh intel64
+
+
+2. Build MUMPS
+a. Get MUMPS from http://mumps.enseeiht.fr/
+b. Let MUMPS_ROOT be the top level foler of MUMPS.
+
+c. Configure and build MUMPS.
+   There are two options: MPI version (mumps-par. the one we are using for comparison);
+   or shared memory/openmp version (mumps-seq-omp. It does not scale at all. Never used).
+c1. MPI version:
+    ln -s mkl_par $MUMPS_ROOT/Makefile.inc
+    then make inside $MUMPS_ROOT
+c2. openmp version:
+    ln -s mkl_seq $MUMPS_ROOT/Makefile.inc
+    then make inside $MUMPS_ROOT
+
+d. make inside this folder to build either mumps-par or mumps-seq-omp.
+
+3. Run
+a. Need to call ./fem -dump_sysbin to output matrices/rhs/solution to the output_dir (-o)
+b. ./mumps-seq-omp <output_dir> <#threads>
+c. mpirun -n <#threads> ./mumps-seq-omp <output_dir> <#threads>

@@ -1,0 +1,14 @@
+1. Set MKLROOT
+Set it through a script provided by MKL.
+e.g.
+source ~/intel-mkl/compilers_and_libraries_2019.4.243/linux/mkl/bin/mklvars.sh intel64
+
+
+2. Build SuiteSparse/UMFPACK
+a. Get SuiteSparse from http://faculty.cse.tamu.edu/davis/suitesparse.html
+b. Let SUITESPARSE_ROOT be the top level folder.
+c. make inside $SUITESPARSE_ROOT
+
+3. Run
+a. Need to call ./fem -dump_sysbin to output matrices/rhs/solution to the output_dir (-o)
+b. ./ldivide <output_dir> <#threads>
