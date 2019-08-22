@@ -46,12 +46,13 @@ void Run(PARSE_ARGS& parse_args)
     typedef VECTOR<int,3> IV3;
     typedef VECTOR<T,4> RGBA;
 
-    std::string output_dir="sol_out",sol_file;
+    std::string output_dir="sol_out",sol_file,ref_sol_file;
     TV X;
     T min_color=1e-8,max_color=20;
     bool user_query=false,user_color_scale=false;
     int resolution=256;
     parse_args.Add("-o",&output_dir,"dir","output dir");
+    parse_args.Add("-ref",&ref_sol_file,"file","reference solution file");
     parse_args.Add("-res",&resolution,"resolution","resolution");
     parse_args.Add("-min_color",&min_color,&user_color_scale,"value","minimum value for the coolest color");
     parse_args.Add("-max_color",&max_color,&user_color_scale,"value","maximum value for the hottest color");
@@ -68,6 +69,13 @@ void Run(PARSE_ARGS& parse_args)
     SOLUTION_FEM<TV> sol;
     Read_From_File(sol_file,sol);
     sol.Prepare_Hierarchy();
+
+    SOLUTION_FEM<TV> ref_sol;
+    if(ref_sol_file!="")
+    {
+        Read_From_File(ref_sol_file,ref_sol);
+        ref_sol.Prepare_Hierarchy();
+    }
 
     auto dump_mesh=[&sol]()
     {
@@ -98,7 +106,9 @@ void Run(PARSE_ARGS& parse_args)
     INTERVAL<T> range_v=INTERVAL<T>::Empty_Box(),
         range_dv=INTERVAL<T>::Empty_Box(),
         range_p=INTERVAL<T>::Empty_Box(),
-        range_dp=INTERVAL<T>::Empty_Box();
+        range_dp=INTERVAL<T>::Empty_Box(),
+        range_p_err=INTERVAL<T>::Empty_Box(),
+        range_v_err=INTERVAL<T>::Empty_Box();
     RANGE<TV> box=RANGE<TV>::Bounding_Box(sol.particles.X);
     for(const auto& e:sol.mesh.elements)
     {
@@ -112,26 +122,39 @@ void Run(PARSE_ARGS& parse_args)
         range_dv.Enlarge_To_Include_Point(dv.Frobenius_Norm());
         range_p.Enlarge_To_Include_Point(p);
         range_dp.Enlarge_To_Include_Point(dp.Magnitude());
+        if(ref_sol_file!="")
+        {
+            int ref_elem=ref_sol.Intersect(x);
+            TV ref_v=ref_sol.Velocity(ref_elem,x);
+            T ref_p=ref_sol.Pressure(ref_elem,x);
+            range_v_err.Enlarge_To_Include_Point((v-ref_v).Magnitude());
+            range_p_err.Enlarge_To_Include_Point(abs(p-ref_p));
+        }
     }
     LOG::printf("v range: %P\n",range_v);
     LOG::printf("dv range: %P\n",range_dv);
     LOG::printf("p range: %P\n",range_p);
     LOG::printf("dp range: %P\n",range_dp);
+    if(ref_sol_file!="")
+    {
+        LOG::printf("v error range: %P\n",range_v_err);
+        LOG::printf("p error range: %P\n",range_p_err);
+    }
 
     T dx=box.Edge_Lengths().Max()/resolution;
     int m=box.Edge_Lengths()(0)/dx,n=box.Edge_Lengths()(1)/dx;
-    INTERPOLATED_COLOR_MAP<T> icm_v,icm_p,icm_dv,icm_dp;
-    icm_v.Initialize_Colors(range_v.min_corner,range_v.max_corner,false,true,false);
-    icm_p.Initialize_Colors(range_p.min_corner,range_p.max_corner,false,true,false);
-    icm_dv.Initialize_Colors(range_dv.min_corner,range_dv.max_corner,false,true,false);
-    icm_dp.Initialize_Colors(range_dp.min_corner,range_dp.max_corner,false,true,false);
-    if(user_color_scale)
-    {
-        icm_v.Initialize_Colors(min_color,max_color,false,true,false);
-        icm_p.Initialize_Colors(min_color,max_color,false,true,false);
-        icm_dv.Initialize_Colors(min_color,max_color,false,true,false);
-        icm_dp.Initialize_Colors(min_color,max_color,false,true,false);
-    }
+    INTERPOLATED_COLOR_MAP<T> icm;
+    icm.colors.Add_Control_Point(1.00001,VECTOR<T,3>(1,1,1));
+    icm.colors.Add_Control_Point(1,VECTOR<T,3>(.5,0,0));
+    icm.colors.Add_Control_Point(1-.01,VECTOR<T,3>(1,0,0));
+    icm.colors.Add_Control_Point(1-.02,VECTOR<T,3>(1,.5,0));
+    icm.colors.Add_Control_Point(1-.04,VECTOR<T,3>(1,1,0));
+    icm.colors.Add_Control_Point(1-.08,VECTOR<T,3>(0,1,0));
+    icm.colors.Add_Control_Point(1-.16,VECTOR<T,3>(0,1,1));
+    icm.colors.Add_Control_Point(1-.32,VECTOR<T,3>(0,0,1));
+    icm.colors.Add_Control_Point(1-.64,VECTOR<T,3>(.5,0,1));
+    icm.colors.Add_Control_Point(0,VECTOR<T,3>(0,0,0));
+    T gamma=10;
 
     // H: in degrees [0,360]
     auto HSV_To_RGB=[](T h,T s,T v)
@@ -143,7 +166,23 @@ void Run(PARSE_ARGS& parse_args)
         return VECTOR<T,3>(r,g,b);
     };
 
+    auto normalize=[user_color_scale,min_color,max_color,gamma](T x,T mn,T mx,bool use_log)
+    {
+        if(user_color_scale)
+        {
+            mn=min_color;
+            mx=max_color;
+        }
+        T n=(x-mn)/(mx-mn);
+        if(use_log)
+        {
+            return 1-pow(2,-n*gamma);
+        }
+        else return n;
+    };
+
     ARRAY<RGBA,IV2> img_v(IV2(m,n)),img_v_mag(IV2(m,n)),img_p(IV2(m,n)),img_dv(IV2(m,n)),img_dp(IV2(m,n));
+    ARRAY<RGBA,IV2> img_v_err(IV2(m,n)),img_p_err(IV2(m,n));
     for(int j=0;TV::m==2 && j<n;j++) for(int i=0;i<m;i++)
     {
         TV x=box.Minimum_Corner()+TV::Axis_Vector(0)*i*dx+TV::Axis_Vector(1)*j*dx;
@@ -158,16 +197,32 @@ void Run(PARSE_ARGS& parse_args)
         if(angle<0) angle+=2*pi;
         angle=angle/pi*180;
         img_v(index)=HSV_To_RGB(angle,(v.Magnitude()-range_v.min_corner)/range_v.Size(),1).Append(1);
-        img_v_mag(index)=icm_v(v.Magnitude()).Append(1);
-        img_p(index)=icm_p(p).Append(1);
-        img_dp(index)=icm_dp(dp.Magnitude()).Append(1);
-        img_dv(index)=icm_dv(dv.Frobenius_Norm()).Append(1);
+        img_v_mag(index)=icm(normalize(v.Magnitude(),range_v.min_corner,range_v.max_corner,true)).Append(1);
+        img_p(index)=icm(normalize(p,range_p.min_corner,range_p.max_corner,true)).Append(1);
+        img_dp(index)=icm(normalize(dp.Magnitude(),range_dp.min_corner,range_dp.max_corner,true)).Append(1);
+        img_dv(index)=icm(normalize(dv.Frobenius_Norm(),range_dv.min_corner,range_dv.max_corner,true)).Append(1);
+
+        if(ref_sol_file!="")
+        {
+            int ref_elem=ref_sol.Intersect(x);
+            TV ref_v=ref_sol.Velocity(ref_elem,x);
+            T ref_p=ref_sol.Pressure(ref_elem,x);
+            img_v_err(index)=icm(normalize((v-ref_v).Magnitude(),range_v_err.min_corner,range_v_err.max_corner,true)).Append(1);
+            img_p_err(index)=icm(normalize(abs(p-ref_p),range_p_err.min_corner,range_p_err.max_corner,true)).Append(1);
+        }
     }
 
     ARRAY<TV3,IV2> bar(IV2(1000,1));
     for(int i=0;i<1000;i++)
-        bar(IV2(i,0))=icm_p.colors.Value((i/(T)999)*(icm_p.mx-icm_p.mn)+icm_p.mn);
+        bar(IV2(i,0))=icm.colors.Value((i/(T)999)*(icm.mx-icm.mn)+icm.mn);
     PNG_FILE<T>::Write(output_dir+"/bar.png",bar);
+    for(int i=0;i<1000;i++)
+    {
+        T x=i/(T)999;
+        T y=1-pow(2,-x*gamma);
+        bar(IV2(i,0))=icm.colors.Value(y*(icm.mx-icm.mn)+icm.mn);
+    }
+    PNG_FILE<T>::Write(output_dir+"/log_bar.png",bar);
 
     ARRAY<RGBA,IV2> wheel(IV2(1000,1000));
     for(int i=0;i<1000;i++) for(int j=0;j<1000;j++)
@@ -187,6 +242,11 @@ void Run(PARSE_ARGS& parse_args)
     PNG_FILE<T>::Write(output_dir+"/p.png",img_p);
     PNG_FILE<T>::Write(output_dir+"/dp.png",img_dp);
     PNG_FILE<T>::Write(output_dir+"/dv.png",img_dv);
+    if(ref_sol_file!="")
+    {
+        PNG_FILE<T>::Write(output_dir+"/err_p.png",img_p_err);
+        PNG_FILE<T>::Write(output_dir+"/err_v.png",img_v_err);
+    }
 }
 
 int main(int argc, char* argv[])
