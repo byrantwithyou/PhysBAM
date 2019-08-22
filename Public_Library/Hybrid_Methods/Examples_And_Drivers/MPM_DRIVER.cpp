@@ -644,14 +644,16 @@ inline T Compute_Maximum_Tensor_Contraction(const SYMMETRIC_MATRIX<T,2>& H, cons
         {
             T nu=(num-v12*den)*H10;
             T de=((A01-H00)*num+(H00-A10)*v12*den);
-            PHYSBAM_ASSERT(de!=(T)0.);
-            T t0=nu/de;
-            T e=(((A10*v12/v02+H00)*t0+2*H10)*v12*t0+A01*v02+H11*v12)*num/den;
-            if(e>x)
-            {
-                x=e;
-                LOG::printf("SPECIAL\n");
-            }
+            if (abs(de)>1e-10){
+                T t0=nu/de;
+                T e=(((A10*v12/v02+H00)*t0+2*H10)*v12*t0+A01*v02+H11*v12)*num/den;
+                if(e>x)
+                {
+                    x=e;
+                    LOG::printf("SPECIAL\n");
+                }}
+            else{
+                LOG::printf("Not Stable!\n");}
         }
     };
     T epsilon=std::numeric_limits<T>::epsilon()/100;
