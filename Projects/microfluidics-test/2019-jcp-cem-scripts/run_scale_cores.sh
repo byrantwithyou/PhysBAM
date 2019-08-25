@@ -51,7 +51,7 @@ done
 for c in ${tests[@]} ; do
     for dim in "" "-3d"; do
         cat <<EOF > $NAME/$c$dim.txt
-threads prep solving
+threads prep solving total
 EOF
         for i in `seq 0 4` ; do
             th=`perl -e "{print 2**$i}"`;
@@ -66,7 +66,7 @@ for i in `seq 0 $((${#tests[@]}-1))` ; do
     for dim in "" "-3d" ; do
         c=${tests[$i]}$dim
         rm fit.log
-        gnuplot -e "fit a*x+b \"$NAME/$c.txt\" u (log10(\$1)):(log10(\$3)) via a,b" 2>/dev/null
+        gnuplot -e "fit a*x+b \"$NAME/$c.txt\" u (log10(\$1)):(log10(\$4)) via a,b" 2>/dev/null
         a=`grep Final -A 4 fit.log| grep "^a" | sed 's/a *= \([^ ]*\).*/\1/g'`
         b=`grep Final -A 4 fit.log| grep "^b" | sed 's/b *= \([^ ]*\).*/\1/g'`
         order=`perl -e "{printf('%.2f',$a);}"`

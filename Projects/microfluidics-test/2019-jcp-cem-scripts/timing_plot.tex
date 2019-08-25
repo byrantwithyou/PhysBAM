@@ -10,7 +10,7 @@
     enlargelimits=false,
     legend cell align=left,
     xlabel={Number of threads},
-    ylabel={Solving time (second)},
+    ylabel={Total run time (second)},
     %xticklabels={,,},
     legend entries={XXXX0,XXXX1,XXXX2},
     legend pos=north east,
@@ -21,9 +21,9 @@
     xtick=data,
     xticklabel=\pgfmathparse{2^\tick}\pgfmathprintnumber{\pgfmathresult},
 ]
-\addplot[mark=x,color=red] table[x=threads,y=solving]{XXXX0.txt};
-\addplot[mark=x,color=green] table[x=threads,y=solving]{XXXX1.txt};
-\addplot[mark=x,color=blue] table[x=threads,y=solving]{XXXX2.txt};
+\addplot[mark=x,color=red] table[x=threads,y=total]{XXXX0.txt};
+\addplot[mark=x,color=green] table[x=threads,y=total]{XXXX1.txt};
+\addplot[mark=x,color=blue] table[x=threads,y=total]{XXXX2.txt};
 \addplot[mark=none,dotted,thick,color=red,domain=DDDD] {CCCC0*pow(x,EEEE0)} node[text=black,pos=0.5,above] {OOOO0};
 \addplot[mark=none,dotted,thick,color=green,domain=DDDD] {CCCC1*pow(x,EEEE1)} node[text=black,pos=0.5,above] {OOOO1};
 \addplot[mark=none,dotted,thick,color=blue,domain=DDDD] {CCCC2*pow(x,EEEE2)} node[text=black,pos=0.5,above] {OOOO2};

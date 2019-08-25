@@ -20,6 +20,6 @@ while(<STDIN>)
     if(/exec jobs *(.*) ms/)
     {
         $solving+=$1;
-        printf("%.3f %.3f\n",$prep/1000,$solving/1000);
+        printf("%.3f %.3f %.3f\n",$prep/1000,$solving/1000,($prep+$solving)/1000);
     }
 }
