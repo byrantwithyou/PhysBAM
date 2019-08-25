@@ -22,6 +22,9 @@ if [ "X$FULL" = "X1" ] ; then
             echo $ARGS -o $NAME/$c-r$r -refine $r -check_sol $NAME/$c-r$SOL/sol.gz ../$c.txt;
         done
     done | xargs -P 4 -n 1 -d '\n' bash -c > /dev/null
+
+    $ARGS -o $NAME/simple-error -dump_sol -refine $HI ../simple.txt;
+    ../sol_viewer $NAME/simple-error/sol.gz -res 1024 -ref $NAME/simple-r$SOL/sol.gz -o $NAME/simple-plot-error
 fi
 
 for c in ${tests[@]} ; do
@@ -52,6 +55,26 @@ EOF
     read opa opb <<< "$P"
     sed -i -e "s/IIII/$opa/g" -e "s/EEEE/$opb/g" $NAME/plot-$c-p.tex
 done
+
+(
+    cd $NAME/simple-plot-error;
+    X0=750;
+    Y0=80;
+    X1=790;
+    Y1=120;
+    S0=40;
+    S1=40;
+
+    convert -crop ${S0}x${S1}+$X0+$Y0 dp.png dp-large.png
+    convert -crop ${S0}x${S1}+$X0+$Y0 dv.png dv-large.png
+    convert -crop ${S0}x${S1}+$X0+$Y0 err-p.png err-p-large.png
+    convert -crop ${S0}x${S1}+$X0+$Y0 err-v.png err-v-large.png
+
+    convert -fill none -stroke red -strokewidth 2 -draw "rectangle $X0,$Y0,$X1,$Y1" dp.png dp-anno.png
+    convert -fill none -stroke red -strokewidth 2 -draw "rectangle $X0,$Y0,$X1,$Y1" dv.png dv-anno.png
+    convert -fill none -stroke red -strokewidth 2 -draw "rectangle $X0,$Y0,$X1,$Y1" err-p.png err-p-anno.png
+    convert -fill none -stroke red -strokewidth 2 -draw "rectangle $X0,$Y0,$X1,$Y1" err-v.png err-v-anno.png
+)
 
 cat <<EOF > $NAME/SConstruct
 import os

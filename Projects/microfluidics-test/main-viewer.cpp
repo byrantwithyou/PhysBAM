@@ -222,7 +222,7 @@ void Run(PARSE_ARGS& parse_args)
         T y=1-pow(2,-x*gamma);
         bar(IV2(i,0))=icm.colors.Value(y*(icm.mx-icm.mn)+icm.mn);
     }
-    PNG_FILE<T>::Write(output_dir+"/log_bar.png",bar);
+    PNG_FILE<T>::Write(output_dir+"/log-bar.png",bar);
 
     ARRAY<RGBA,IV2> wheel(IV2(1000,1000));
     for(int i=0;i<1000;i++) for(int j=0;j<1000;j++)
@@ -238,14 +238,14 @@ void Run(PARSE_ARGS& parse_args)
     PNG_FILE<T>::Write(output_dir+"/wheel.png",wheel);
 
     PNG_FILE<T>::Write(output_dir+"/v.png",img_v);
-    PNG_FILE<T>::Write(output_dir+"/v_mag.png",img_v_mag);
+    PNG_FILE<T>::Write(output_dir+"/v-mag.png",img_v_mag);
     PNG_FILE<T>::Write(output_dir+"/p.png",img_p);
     PNG_FILE<T>::Write(output_dir+"/dp.png",img_dp);
     PNG_FILE<T>::Write(output_dir+"/dv.png",img_dv);
     if(ref_sol_file!="")
     {
-        PNG_FILE<T>::Write(output_dir+"/err_p.png",img_p_err);
-        PNG_FILE<T>::Write(output_dir+"/err_v.png",img_v_err);
+        PNG_FILE<T>::Write(output_dir+"/err-p.png",img_p_err);
+        PNG_FILE<T>::Write(output_dir+"/err-v.png",img_v_err);
     }
 }
 
