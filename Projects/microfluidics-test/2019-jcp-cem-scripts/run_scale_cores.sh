@@ -71,7 +71,11 @@ for i in `seq 0 $((${#tests[@]}-1))` ; do
         b=`grep Final -A 4 fit.log| grep "^b" | sed 's/b *= \([^ ]*\).*/\1/g'`
         order=`perl -e "{printf('%.2f',$a);}"`
         b10=`perl -e "{print 10**$b}"`
-        sed -i -e "s/XXXX$i/$c/g" -e "s/EEEE$i/$a/g" -e "s/CCCC$i/$b10/g" -e "s/OOOO$i/$order/g" $NAME/plot$dim.tex
+        slow=`grep '^1 ' $NAME/$c.txt | awk '{print $4}'`;
+        fast=`grep '^16 ' $NAME/$c.txt | awk '{print $4}'`;
+        sed -i -e "s/XXXX$i/$c/g" -e "s/EEEE$i/$a/g" -e "s/CCCC$i/$b10/g" -e "s/OOOO$i/$order/g" \
+            -e "s/SSSS$i/$slow/g" -e "s/FFFF$i/$fast/g" \
+            $NAME/plot$dim.tex
     done
 done
 

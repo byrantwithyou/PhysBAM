@@ -18,8 +18,15 @@
 %    ymax=40,
 %    xmax=16,
     legend style={nodes={scale=1.2, transform shape},fill=none,draw=none},
+    ytick={SSSS0,SSSS1,SSSS2},
     xtick=data,
     xticklabel=\pgfmathparse{2^\tick}\pgfmathprintnumber{\pgfmathresult},
+    yticklabel={
+        \pgfkeys{/pgf/fpu=true}
+        \pgfmathparse{10^\tick}%
+            \pgfmathprintnumber[fixed relative, precision=4]{\pgfmathresult}
+        \pgfkeys{/pgf/fpu=false}
+    },
 ]
 \addplot[mark=x,color=red] table[x=threads,y=total]{XXXX0.txt};
 \addplot[mark=x,color=green] table[x=threads,y=total]{XXXX1.txt};
@@ -27,6 +34,27 @@
 \addplot[mark=none,dotted,thick,color=red,domain=DDDD] {CCCC0*pow(x,EEEE0)} node[text=black,pos=0.5,above] {OOOO0};
 \addplot[mark=none,dotted,thick,color=green,domain=DDDD] {CCCC1*pow(x,EEEE1)} node[text=black,pos=0.5,above] {OOOO1};
 \addplot[mark=none,dotted,thick,color=blue,domain=DDDD] {CCCC2*pow(x,EEEE2)} node[text=black,pos=0.5,above] {OOOO2};
+\end{loglogaxis}
+\begin{loglogaxis}[
+    log basis x=2,
+    log basis y=10,
+    enlargelimits=false,
+    xmajorticks=false,
+    yticklabel pos=right,
+    ytick={FFFF0,FFFF1,FFFF2},
+    yticklabel={
+        \pgfkeys{/pgf/fpu=true}
+        \pgfmathparse{10^\tick}%
+            \pgfmathprintnumber[fixed relative, precision=4]{\pgfmathresult}
+        \pgfkeys{/pgf/fpu=false}
+    },
+]
+\addplot[draw=none,mark=x,color=red] table[x=threads,y=total]{XXXX0.txt};
+\addplot[draw=none,mark=x,color=green] table[x=threads,y=total]{XXXX1.txt};
+\addplot[draw=none,mark=x,color=blue] table[x=threads,y=total]{XXXX2.txt};
+\addplot[draw=none,mark=none,dotted,thick,color=red,domain=DDDD] {CCCC0*pow(x,EEEE0)};
+\addplot[draw=none,mark=none,dotted,thick,color=green,domain=DDDD] {CCCC1*pow(x,EEEE1)};
+\addplot[draw=none,mark=none,dotted,thick,color=blue,domain=DDDD] {CCCC2*pow(x,EEEE2)};
 \end{loglogaxis}
 \end{tikzpicture}
 \end{document}
