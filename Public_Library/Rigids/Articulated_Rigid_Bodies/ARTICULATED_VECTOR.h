@@ -33,6 +33,8 @@ public:
     T& Raw_Get(int i) override;
     KRYLOV_VECTOR_BASE<T>* Clone_Default() const override;
     void Resize(const KRYLOV_VECTOR_BASE<T>& v) override;
+    void Get(ARRAY_VIEW<T> a) const override;
+    void Set(ARRAY_VIEW<const T> a) override;
 //#####################################################################
 };
 }

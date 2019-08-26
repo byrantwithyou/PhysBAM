@@ -116,6 +116,22 @@ Resize(const KRYLOV_VECTOR_BASE<T>& vb)
 {
     v.Resize(debug_cast<const MPM_PROJECTION_VECTOR<TV>&>(vb).v.m);
 }
+//#####################################################################
+// Function Get
+//#####################################################################
+template<class TV> void MPM_PROJECTION_VECTOR<TV>::
+Get(ARRAY_VIEW<T> a) const
+{
+    a=v;
+}
+//#####################################################################
+// Function Set
+//#####################################################################
+template<class TV> void MPM_PROJECTION_VECTOR<TV>::
+Set(ARRAY_VIEW<const T> a)
+{
+    v=a;
+}
 namespace PhysBAM{
 template class MPM_PROJECTION_VECTOR<VECTOR<float,3> >;
 template class MPM_PROJECTION_VECTOR<VECTOR<float,2> >;

@@ -1,4 +1,5 @@
 #include <Core/Arrays/ARRAY.h>
+#include <Core/Arrays/ARRAY_VIEW.h>
 #include <Core/Arrays/INDIRECT_ARRAY.h>
 #include <Core/Vectors/VECTOR_3D.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
@@ -218,6 +219,46 @@ static void Resize_Helper(KRYLOV_VECTOR_WRAPPER<T,INDIRECT_ARRAY<ARRAY_VIEW<T2>,
     view.Fill(T2());
     v.v.array.Exchange(view);
     delete [] view.Get_Array_Pointer();
+}
+template<class T>
+void Get_Helper(const T& a,T*& p)
+{
+    *p++=a;
+}
+template<class T,class T2,class T_ARRAY,class ID>
+void Get_Helper(const ARRAY_BASE<T2,T_ARRAY,ID>& self,T*& p)
+{
+    for(ID i(0);i<self.Size();i++)
+        Get_Helper(self(i),p);
+}
+//#####################################################################
+// Function Get
+//#####################################################################
+template<class T,class TV> void KRYLOV_VECTOR_WRAPPER<T,TV>::
+Get(ARRAY_VIEW<T> a) const
+{
+    T* p=a.base_pointer;
+    Get_Helper(v,p);
+}
+template<class T>
+void Set_Helper(T& a,const T*& p)
+{
+    a=*p++;
+}
+template<class T,class T2,class T_ARRAY,class ID>
+void Set_Helper(ARRAY_BASE<T2,T_ARRAY,ID>& self,const T*& p)
+{
+    for(ID i(0);i<self.Size();i++)
+        Set_Helper(self(i),p);
+}
+//#####################################################################
+// Function Set
+//#####################################################################
+template<class T,class TV> void KRYLOV_VECTOR_WRAPPER<T,TV>::
+Set(ARRAY_VIEW<const T> a)
+{
+    const T* p=a.base_pointer;
+    Set_Helper(v,p);
 }
 //#####################################################################
 // Function Resize

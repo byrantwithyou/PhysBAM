@@ -248,6 +248,21 @@ Scale(const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>& v,const INTERFACE_POISSON
         q(k)=v.q(k)*s.q(k);
 }
 //#####################################################################
+// Function Get
+//#####################################################################
+template<class TV> void COUPLED_SYSTEM_VECTOR<TV>::
+Get(ARRAY_VIEW<T> a) const
+{
+    aoeua;
+}
+//#####################################################################
+// Function Set
+//#####################################################################
+template<class TV> void COUPLED_SYSTEM_VECTOR<TV>::
+Set(ARRAY_VIEW<const T> a)
+{
+}
+//#####################################################################
 namespace PhysBAM{
 template class INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<VECTOR<float,1> >;
 template class INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<VECTOR<float,2> >;

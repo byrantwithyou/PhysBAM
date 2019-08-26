@@ -108,6 +108,32 @@ Resize(const KRYLOV_VECTOR_BASE<T>& w)
 {
     v.Resize(debug_cast<const ARTICULATED_VECTOR<TV>&>(w).v.m);
 }
+//#####################################################################
+// Function Get
+//#####################################################################
+template<class TV> void ARTICULATED_VECTOR<TV>::
+Get(ARRAY_VIEW<T> a) const
+{
+    int k=0;
+    for(const auto& t:v)
+    {
+        for(T b:t.linear) a(k++)=b;
+        for(T b:t.angular) a(k++)=b;
+    }
+}
+//#####################################################################
+// Function Set
+//#####################################################################
+template<class TV> void ARTICULATED_VECTOR<TV>::
+Set(ARRAY_VIEW<const T> a)
+{
+    int k=0;
+    for(auto& t:v)
+    {
+        for(T& b:t.linear) b=a(k++);
+        for(T& b:t.angular) b=a(k++);
+    }
+}
 namespace PhysBAM{
 template class ARTICULATED_VECTOR<VECTOR<float,1> >;
 template class ARTICULATED_VECTOR<VECTOR<float,2> >;

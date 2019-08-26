@@ -2,6 +2,7 @@
 // Copyright 2009.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Utilities/DEBUG_CAST.h>
 #include <Hybrid_Methods/System/MPM_KRYLOV_VECTOR_RB.h>
 using namespace PhysBAM;
@@ -154,6 +155,38 @@ Resize(const KRYLOV_VECTOR_BASE<T>& w)
     const MPM_KRYLOV_VECTOR_RB<TV>& v=debug_cast<const MPM_KRYLOV_VECTOR_RB<TV>&>(w);
     u.Resize(v.u.domain);
     twists.Resize(v.twists.m);
+}
+//#####################################################################
+// Function Get
+//#####################################################################
+template<class TV> void MPM_KRYLOV_VECTOR_RB<TV>::
+Get(ARRAY_VIEW<T> a) const
+{
+    int k=0;
+    for(int i:valid_indices)
+        for(T b:u.array(i))
+            a(k++)=b;
+    for(const auto& t:twists)
+    {
+        for(T b:t.linear) a(k++)=b;
+        for(T b:t.angular) a(k++)=b;
+    }
+}
+//#####################################################################
+// Function Set
+//#####################################################################
+template<class TV> void MPM_KRYLOV_VECTOR_RB<TV>::
+Set(ARRAY_VIEW<const T> a)
+{
+    int k=0;
+    for(int i:valid_indices)
+        for(T& b:u.array(i))
+            b=a(k++);
+    for(auto& t:twists)
+    {
+        for(T& b:t.linear) b=a(k++);
+        for(T& b:t.angular) b=a(k++);
+    }
 }
 namespace PhysBAM{
 template class MPM_KRYLOV_VECTOR_RB<VECTOR<float,2> >;

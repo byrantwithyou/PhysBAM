@@ -134,6 +134,30 @@ Resize(const KRYLOV_VECTOR_BASE<T>& v)
     pressure.Resize(pv.pressure.m);
     for(int i=0;i<pressure.m;i++) pressure(i).Resize(pv.pressure(i).Size());
 }
+//#####################################################################
+// Function Get
+//#####################################################################
+template<class TV> void PRESSURE_VELOCITY_VECTOR<TV>::
+Get(ARRAY_VIEW<T> a) const
+{
+    solid_velocity.Get(a);
+    int k=solid_velocity.Raw_Size();
+    for(const auto& i:pressure)
+        for(const auto& j:i)
+            a(k++)=j;
+}
+//#####################################################################
+// Function Set
+//#####################################################################
+template<class TV> void PRESSURE_VELOCITY_VECTOR<TV>::
+Set(ARRAY_VIEW<const T> a)
+{
+    solid_velocity.Set(a);
+    int k=solid_velocity.Raw_Size();
+    for(auto& i:pressure)
+        for(auto& j:i)
+            j=a(k++);
+}
 namespace PhysBAM{
 template class PRESSURE_VELOCITY_VECTOR<VECTOR<float,1> >;
 template class PRESSURE_VELOCITY_VECTOR<VECTOR<float,2> >;

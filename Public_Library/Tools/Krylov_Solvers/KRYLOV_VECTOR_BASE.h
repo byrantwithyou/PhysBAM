@@ -29,6 +29,8 @@ public:
     virtual int Raw_Size() const=0;
     virtual T& Raw_Get(int i)=0;
     const T& Raw_Get(int i) const;
+    virtual void Get(ARRAY_VIEW<T> a) const=0;
+    virtual void Set(ARRAY_VIEW<const T> a)=0;
     virtual KRYLOV_VECTOR_BASE* Clone_Default() const=0;
     virtual void Resize(const KRYLOV_VECTOR_BASE& v)=0;
 //#####################################################################

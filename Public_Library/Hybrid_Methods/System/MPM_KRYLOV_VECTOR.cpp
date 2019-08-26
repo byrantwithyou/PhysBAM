@@ -129,6 +129,28 @@ Resize(const KRYLOV_VECTOR_BASE<T>& w)
 {
     u.Resize(debug_cast<const MPM_KRYLOV_VECTOR<TV>&>(w).u.domain);
 }
+//#####################################################################
+// Function Get
+//#####################################################################
+template<class TV> void MPM_KRYLOV_VECTOR<TV>::
+Get(ARRAY_VIEW<T> a) const
+{
+    int k=0;
+    for(int i:valid_indices)
+        for(T b:u.array(i))
+            a(k++)=b;
+}
+//#####################################################################
+// Function Set
+//#####################################################################
+template<class TV> void MPM_KRYLOV_VECTOR<TV>::
+Set(ARRAY_VIEW<const T> a)
+{
+    int k=0;
+    for(int i:valid_indices)
+        for(T& b:u.array(i))
+            b=a(k++);
+}
 namespace PhysBAM{
 template class MPM_KRYLOV_VECTOR<VECTOR<float,2> >;
 template class MPM_KRYLOV_VECTOR<VECTOR<float,3> >;

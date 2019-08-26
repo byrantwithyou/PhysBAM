@@ -222,6 +222,42 @@ Resize(const KRYLOV_VECTOR_BASE<T>& v)
     kinematic_and_static_rigid_V.array.Set(rigid_V.array);
 }
 //#####################################################################
+// Function Get
+//#####################################################################
+template<class TV> void GENERALIZED_VELOCITY<TV>::
+Get(ARRAY_VIEW<T> a) const
+{
+    int k=0;
+    for(int i=0;i<V.Size();i++)
+        for(const auto& j:V(i))
+            a(k++)=j;
+    for(int i=0;i<rigid_V.Size();i++)
+    {
+        for(const auto& j:rigid_V(i).linear)
+            a(k++)=j;
+        for(const auto& j:rigid_V(i).angular)
+            a(k++)=j;
+    }
+}
+//#####################################################################
+// Function Set
+//#####################################################################
+template<class TV> void GENERALIZED_VELOCITY<TV>::
+Set(ARRAY_VIEW<const T> a)
+{
+    int k=0;
+    for(int i=0;i<V.Size();i++)
+        for(auto& j:V(i))
+            j=a(k++);
+    for(int i=0;i<rigid_V.Size();i++)
+    {
+        for(auto& j:rigid_V(i).linear)
+            j=a(k++);
+        for(auto& j:rigid_V(i).angular)
+            j=a(k++);
+    }
+}
+//#####################################################################
 namespace PhysBAM{
 template class GENERALIZED_VELOCITY<VECTOR<float,1> >;
 template class GENERALIZED_VELOCITY<VECTOR<float,2> >;

@@ -163,6 +163,29 @@ Resize(const KRYLOV_VECTOR_BASE<T>& v)
     viscous_force_coefficients.Resize(cs.viscous_force_coefficients.m);
 }
 //#####################################################################
+// Function Get
+//#####################################################################
+template<class TV> void COUPLED_SYSTEM_VECTOR<TV>::
+Get(ARRAY_VIEW<T> a) const
+{
+    int k=0;
+    for(const auto& i:pressure) a(k++)=i;
+    for(const auto& i:lambda) a(k++)=i;
+    for(const auto& i:force_coefficients) a(k++)=i;
+    for(const auto& i:viscous_force_coefficients) a(k++)=i;
+}
+//#####################################################################
+// Function Set
+//#####################################################################
+template<class TV> void COUPLED_SYSTEM_VECTOR<TV>::
+Set(ARRAY_VIEW<const T> a)
+{
+    int k=0;
+    for(auto& i:pressure) i=a(k++);
+    for(auto& i:lambda) i=a(k++);
+    for(auto& i:force_coefficients) i=a(k++);
+    for(auto& i:viscous_force_coefficients) i=a(k++);
+}
 namespace PhysBAM{
 template class COUPLED_SYSTEM_VECTOR<VECTOR<float,1> >;
 template class COUPLED_SYSTEM_VECTOR<VECTOR<float,2> >;

@@ -292,6 +292,21 @@ Scale(const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>& v,const INTERFACE_STOKES_S
     }
 }
 //#####################################################################
+// Function Get
+//#####################################################################
+template<class TV> void COUPLED_SYSTEM_VECTOR<TV>::
+Get(ARRAY_VIEW<T> a) const
+{
+    aoeua;
+}
+//#####################################################################
+// Function Set
+//#####################################################################
+template<class TV> void COUPLED_SYSTEM_VECTOR<TV>::
+Set(ARRAY_VIEW<const T> a)
+{
+}
+//#####################################################################
 namespace PhysBAM{
 template class INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<VECTOR<float,1> >;
 template class INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<VECTOR<float,2> >;

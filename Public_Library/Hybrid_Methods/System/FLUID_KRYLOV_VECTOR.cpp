@@ -129,6 +129,22 @@ Resize(const KRYLOV_VECTOR_BASE<T>& w)
 {
     p.Resize(debug_cast<const FLUID_KRYLOV_VECTOR<TV>&>(w).p.domain);
 }
+//#####################################################################
+// Function Get
+//#####################################################################
+template<class TV> void FLUID_KRYLOV_VECTOR<TV>::
+Get(ARRAY_VIEW<T> a) const
+{
+    a=p.array.Subset(valid_indices);
+}
+//#####################################################################
+// Function Set
+//#####################################################################
+template<class TV> void FLUID_KRYLOV_VECTOR<TV>::
+Set(ARRAY_VIEW<const T> a)
+{
+    p.array.Subset(valid_indices)=a;
+}
 namespace PhysBAM{
 template class FLUID_KRYLOV_VECTOR<VECTOR<float,2> >;
 template class FLUID_KRYLOV_VECTOR<VECTOR<float,3> >;
