@@ -58,7 +58,7 @@ void Solve_And_Check(COMPONENT_LAYOUT_FEM<T>& cl,const LAYOUT_BUILDER_FEM<T>& bu
     cem.matrix_cache.Init(cache_pattern,cache_size);
     cem.Execute_Jobs(1);
     mc.Transform_Solution(cem,false,false);
-    if(!an.Check_Analytic_Solution(false))
+    if(!an.Check_Analytic_Solution(false,false))
         printf("%s\n",builder.To_String().c_str());
 }
 

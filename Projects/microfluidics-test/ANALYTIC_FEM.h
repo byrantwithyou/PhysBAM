@@ -26,7 +26,7 @@ struct ANALYTIC_FEM
     
     TV Traction(const TV& N,const TV& X) const;
     TV Force(const TV& X) const;
-    bool Check_Analytic_Solution(bool dump) const;
+    bool Check_Analytic_Solution(bool dump,bool proj_null) const;
     void Compute_RHS();
 
     void Set_Velocity(const char* s)
@@ -43,6 +43,6 @@ struct ANALYTIC_FEM
 template<class T,int d>
 bool Check_Solution(const MATRIX_CONSTRUCTION_FEM<VECTOR<T,d> >& mc,
     std::function<VECTOR<T,d>(const VECTOR<T,d>&)> fv,
-    std::function<T(const VECTOR<T,d>&)> fp,bool dump);
+    std::function<T(const VECTOR<T,d>&)> fp,bool dump,bool proj_null);
 }
 #endif

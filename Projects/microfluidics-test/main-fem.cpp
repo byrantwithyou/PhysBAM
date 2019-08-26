@@ -383,7 +383,7 @@ void Run(PARSE_ARGS& parse_args)
     timer("exec jobs");
 
     mc.Transform_Solution(cem,false,false);
-    if(an) an->Check_Analytic_Solution(!quiet);
+    if(an) an->Check_Analytic_Solution(!quiet,pinv);
     if(!sol_file.empty())
     {
         SOLUTION_FEM<TV> sol;
@@ -391,7 +391,7 @@ void Run(PARSE_ARGS& parse_args)
         sol.Prepare_Hierarchy();
         auto fv=[&sol](const TV& X){return sol.Velocity(X);};
         auto fp=[&sol](const TV& X){return sol.Pressure(X);};
-        Check_Solution<T,TV::m>(mc,fv,fp,!quiet);
+        Check_Solution<T,TV::m>(mc,fv,fp,!quiet,pinv);
     }
 
     if(!quiet)

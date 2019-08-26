@@ -31,7 +31,7 @@ template<class TV> ANALYTIC_FEM<TV>::
 template<class T,int d>
 bool Check_Solution(const MATRIX_CONSTRUCTION_FEM<VECTOR<T,d> >& mc,
     std::function<VECTOR<T,d>(const VECTOR<T,d>&)> fv,
-    std::function<T(const VECTOR<T,d>&)> fp,bool dump)
+    std::function<T(const VECTOR<T,d>&)> fp,bool dump,bool proj_null)
 {
     typedef VECTOR<T,d> TV;
     T m=mc.cl.unit_m,s=mc.cl.unit_s,kg=mc.cl.unit_kg;
@@ -39,6 +39,27 @@ bool Check_Solution(const MATRIX_CONSTRUCTION_FEM<VECTOR<T,d> >& mc,
     T max_u=0,max_p=0;
     T l2_u=0,l2_p=0;
     int num_u=0,num_p=0;
+
+    T proj_p_sol=0,proj_p=0;
+    for(BLOCK_ID b(0);proj_null && b<mc.cl.blocks.m;b++)
+    {
+        const auto& bl=mc.cl.blocks(b);
+        const auto& rd=mc.cl.reference_block_data(mc.cl.blocks(b).ref_id);
+        const auto& W=mc.rhs_block_list(b);
+        DOF_LAYOUT<TV> dl(mc.cl,mc.cl.reference_block_data(bl.ref_id),true);
+        Visit_Compressed_Dofs(dl,rd,
+            [](int v,const TV& Y){},
+            [](int e,const TV& Y){},
+            [&bl,&W,m,unit_p,s,fp,&num_p,&proj_p_sol,&proj_p](int i,const TV& Y)
+            {
+                TV X=xform(bl.xform,Y);
+                proj_p_sol+=fp(X/m)*unit_p;
+                proj_p+=W.Get_p(i);
+                num_p++;
+            }
+        );
+    }
+
     for(BLOCK_ID b(0);b<mc.cl.blocks.m;b++)
     {
         const auto& bl=mc.cl.blocks(b);
@@ -74,14 +95,21 @@ bool Check_Solution(const MATRIX_CONSTRUCTION_FEM<VECTOR<T,d> >& mc,
                     Debug_Particle_Set_Attribute<TV>("V",U-V);
                 }
             },
-            [&bl,&W,m,unit_p,s,&max_p,&l2_p,&num_p,dump,fp](int i,const TV& Y)
+            [&bl,&W,m,unit_p,s,&max_p,&l2_p,&num_p,dump,fp,proj_null,proj_p,proj_p_sol](int i,const TV& Y)
             {
                 TV X=xform(bl.xform,Y);
                 T p=fp(X/m)*unit_p;
                 T q=W.Get_p(i);
+                if(proj_null)
+                {
+                    p-=proj_p_sol/(T)num_p;
+                    q-=proj_p/(T)num_p;
+                }
+                else
+                    num_p++;
+
                 max_p=std::max(max_p,std::abs(p-q));
                 l2_p+=sqr(p-q);
-                num_p++;
                 if(dump)
                 {
                     Add_Debug_Particle(X,VECTOR<T,3>(1,1,1));
@@ -100,12 +128,12 @@ bool Check_Solution(const MATRIX_CONSTRUCTION_FEM<VECTOR<T,d> >& mc,
 // Function Check_Analytic_Solution
 //#####################################################################
 template<class TV> bool ANALYTIC_FEM<TV>::
-Check_Analytic_Solution(bool dump) const
+Check_Analytic_Solution(bool dump,bool proj_null) const
 {
     if(!analytic_velocity || !analytic_pressure) return false;
     auto fv=[this](const TV& X){return analytic_velocity->v(X,0);};
     auto fp=[this](const TV& X){return analytic_pressure->f(X,0);};
-    return Check_Solution<T,TV::m>(mc,fv,fp,dump);
+    return Check_Solution<T,TV::m>(mc,fv,fp,dump,proj_null);
 }
 //#####################################################################
 // Function Compute_RHS
