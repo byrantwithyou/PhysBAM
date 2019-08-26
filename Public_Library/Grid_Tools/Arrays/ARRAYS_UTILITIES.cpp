@@ -57,6 +57,18 @@ Compute_Gradient_At_Cells_From_Face_Data(const GRID<TV>& face_grid,T_ARRAYS_DIME
             grad_cell_array(cell_index)[axis]=one_over_dx[axis]*(face_array.Component(axis)(second_face_index)-face_array.Component(axis)(first_face_index));}}
 }
 //#####################################################################
+// Function Compute_Gradient_At_Cells_From_Cell_Data
+//#####################################################################
+template<class TV,class T2> void ARRAYS_UTILITIES<TV,T2>::
+Compute_Gradient_At_Cells_From_Cell_Data(const GRID<TV>& grid,T_ARRAYS_DIMENSION_VECTOR_T2& grad_cell_array,const T_ARRAYS_DIMENSION_T2& cell_array,const int number_of_ghost_cells)
+{
+    TV one_over_two_dx=(T).5*grid.one_over_dX;
+    for(CELL_ITERATOR<TV> iterator(grid,number_of_ghost_cells);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+        for(int axis=0;axis<TV::m;axis++){
+            TV_INT axis_vector=TV_INT::Axis_Vector(axis);
+            grad_cell_array(cell_index)(axis)=(cell_array(cell_index+axis_vector)-cell_array(cell_index-axis_vector))*one_over_two_dx(axis);}}
+}
+//#####################################################################
 // Function Compute_Divergence_At_Cells_From_Face_Data
 //#####################################################################
 template<class TV,class T2> void ARRAYS_UTILITIES<TV,T2>::

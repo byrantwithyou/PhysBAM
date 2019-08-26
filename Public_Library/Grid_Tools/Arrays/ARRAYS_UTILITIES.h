@@ -26,6 +26,7 @@ public:
     static void Compute_Face_Data_From_Cell_Data(const GRID<TV>& face_grid,T_FACE_ARRAYS_T2& face_array,const T_ARRAYS_DIMENSION_T2& cell_array,const int number_of_ghost_cells=0);
     static void Compute_Gradient_At_Faces_From_Cell_Data(const GRID<TV>& face_grid,T_FACE_ARRAYS_T2& grad_face_array,const T_ARRAYS_DIMENSION_T2& cell_array,const int number_of_ghost_cells=0);
     static void Compute_Gradient_At_Cells_From_Face_Data(const GRID<TV>& face_grid,T_ARRAYS_DIMENSION_VECTOR_T2& grad_cell_array,const T_FACE_ARRAYS_T2& face_array,const int number_of_ghost_cells=0);
+    static void Compute_Gradient_At_Cells_From_Cell_Data(const GRID<TV>& grid,T_ARRAYS_DIMENSION_VECTOR_T2& grad_cell_array,const T_ARRAYS_DIMENSION_T2& cell_array,const int number_of_ghost_cells);
     static void Compute_Divergence_At_Cells_From_Face_Data(const GRID<TV>& face_grid,T_ARRAYS_DIMENSION_T2& div_cell_array,const T_FACE_ARRAYS_T2& face_array,const int number_of_ghost_cells=0);
 //#####################################################################
 };
