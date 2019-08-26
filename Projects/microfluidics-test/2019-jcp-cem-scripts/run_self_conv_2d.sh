@@ -7,6 +7,7 @@ ARGS="../fem -q -threads 16 -mu 8.9e-4"
 FULL=1 # Set to 1 for a full rebuild; 0 to skip rerunning the simulations
 
 tests=(simple grid20 rgrid0 rgrid1 voronoi-s4 voronoi-s15)
+names=(wide grid20 rgrid0 rgrid1 voronoi-s4 voronoi-s15)
 LO=2
 HI=16
 SOL=32
@@ -27,7 +28,9 @@ if [ "X$FULL" = "X1" ] ; then
     ../sol_viewer $NAME/simple-error/sol.gz -res 1024 -ref $NAME/simple-r$SOL/sol.gz -o $NAME/simple-plot-error
 fi
 
-for c in ${tests[@]} ; do
+for i in `seq 0 $((${#tests[@]}-1))` ; do
+    c=${tests[$i]}
+    name=${names[$i]}
     cat <<EOF > $NAME/$c-p.txt
 res linf l2
 EOF
@@ -44,8 +47,8 @@ EOF
         echo "$res `perl -e \"{print $vlinf/$maxv}\"` `perl -e \"{print $vl2/$maxv}\"`" >> $NAME/$c-v.txt
     done
 
-    sed -e 's/LLLL/p/g' -e "s/XXXX/$c-p/g" -e "s/TTTT/$c pressure/g" conv_plot.tex  > $NAME/plot-$c-p.tex
-    sed -e 's/LLLL/\\mathbf{v}/g' -e "s/XXXX/$c-v/g" -e "s/TTTT/$c velocity/g" conv_plot.tex  > $NAME/plot-$c-v.tex
+    sed -e 's/LLLL/p/g' -e "s/XXXX/$c-p/g" -e "s/TTTT/$name pressure/g" conv_plot.tex  > $NAME/plot-$c-p.tex
+    sed -e 's/LLLL/\\mathbf{v}/g' -e "s/XXXX/$c-v/g" -e "s/TTTT/$name velocity/g" conv_plot.tex  > $NAME/plot-$c-v.tex
 
     V=`./conv_regression.pl $NAME/$c-v.txt $NAME/$c-v-regres.txt`
     read ova ovb <<< "$V"

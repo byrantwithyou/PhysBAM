@@ -7,6 +7,7 @@ ARGS="../fem -3d -q -threads 12"
 FULL=1 # Set to 1 for a full rebuild; 0 to skip rerunning the simulations
 
 tests=(simple grid20 rgrid0 rgrid1 voronoi-s4 voronoi-s15)
+names=(wide grid20 rgrid0 rgrid1 voronoi-s4 voronoi-s15)
 LO=2
 HI=5
 ANA="-u 'u=sin(14*x)*y+cos(15*y)*z+x*y,v=cos(14*x)*cos(16*y)+sin(15*y)*x+x*x+y*z-1,w=sin(17*z)*y+cos(15*x)*z' -p 'p=sin(15*x+14*y+1)+cos(16*z)'"
@@ -21,7 +22,9 @@ if [ "X$FULL" = "X1" ] ; then
     done | xargs -P 1 -n 1 -d '\n' bash -c > /dev/null
 fi
 
-for c in ${tests[@]} ; do
+for i in `seq 0 $((${#tests[@]}-1))` ; do
+    c=${tests[$i]}
+    name=${names[$i]}
     cat <<EOF > $NAME/$c-p.txt
 res linf l2
 EOF
@@ -36,8 +39,8 @@ EOF
             sed "s/.*l-inf \([^ ]*\).*l-2 \([^ ]*\).*l-inf \([^ ]*\).*l-2 \([^<]*\).*/$res \1 \2/g" >> $NAME/$c-v.txt
     done
 
-    sed -e 's/LLLL/p/g' -e "s/XXXX/$c-p/g" -e "s/TTTT/$c pressure/g" conv_plot.tex  > $NAME/plot-$c-p.tex
-    sed -e 's/LLLL/\\mathbf{v}/g' -e "s/XXXX/$c-v/g" -e "s/TTTT/$c velocity/g" conv_plot.tex  > $NAME/plot-$c-v.tex
+    sed -e 's/LLLL/p/g' -e "s/XXXX/$c-p/g" -e "s/TTTT/$name pressure/g" conv_plot.tex  > $NAME/plot-$c-p.tex
+    sed -e 's/LLLL/\\mathbf{v}/g' -e "s/XXXX/$c-v/g" -e "s/TTTT/$name velocity/g" conv_plot.tex  > $NAME/plot-$c-v.tex
 
     V=`./conv_regression.pl $NAME/$c-v.txt $NAME/$c-v-regres.txt`
     read ova ovb <<< "$V"

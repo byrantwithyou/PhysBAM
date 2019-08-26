@@ -8,6 +8,7 @@ export MKL_NUM_THREADS=1
 
 # tests=(simple grid20 rgrid0 rgrid1 voronoi-s4 voronoi-s15)
 tests=(simple grid20 rgrid0 voronoi-s4)
+names=(wide grid20 rgrid0 voronoi-s4)
 res2=(16 4 6 8)
 res3=(4 2 3 3)
 ARGS="../fem -q -mu 8.9e-4"
@@ -68,6 +69,7 @@ Name,Resolution,Total dofs,Blocks,Tasks,Avg dofs/block
 EOF
 for p in `seq 0 3` ; do
     c=${tests[$p]}
+    name=${names[$p]}
     r=${res2[$p]}
     tot=`grep "dofs 2d" $NAME/$c-t1/common/log.txt | sed 's/.*total: \([^<]*\).*/\1/g'`
     blks=`grep ">blocks:" $NAME/$c-t1/common/log.txt | sed 's/.*blocks: \([^<]*\).*/\1/g'`
@@ -76,10 +78,11 @@ for p in `seq 0 3` ; do
     rndtot=`perl -e "{printf('%.1f M',$tot/1e6);}"`
     rndjbs=`perl -e "{printf('%.1f K',$jbs/1e3);}"`
     res=`perl -e "{print 2*$r;}"`
-    echo "$c,$res,$rndtot,$blks,$rndjbs,$dofspb" >> $NAME/stats.csv
+    echo "$name,$res,$rndtot,$blks,$rndjbs,$dofspb" >> $NAME/stats.csv
 done
 for p in `seq 0 3` ; do
     c=${tests[$p]}
+    name=${names[$p]}
     r=${res3[$p]}
     tot=`grep "dofs 3d" $NAME/$c-3d-t1/common/log.txt | sed 's/.*total: \([^<]*\).*/\1/g'`
     blks=`grep ">blocks:" $NAME/$c-3d-t1/common/log.txt | sed 's/.*blocks: \([^<]*\).*/\1/g'`
@@ -88,7 +91,7 @@ for p in `seq 0 3` ; do
     rndtot=`perl -e "{printf('%.1f M',$tot/1e6);}"`
     rndjbs=`perl -e "{printf('%.1f K',$jbs/1e3);}"`
     res=`perl -e "{print 2*$r;}"`
-    echo "$c-3d,$res,$rndtot,$blks,$rndjbs,$dofspb" >> $NAME/stats.csv
+    echo "$name-3d,$res,$rndtot,$blks,$rndjbs,$dofspb" >> $NAME/stats.csv
 done
 
 
@@ -96,7 +99,9 @@ cat <<EOF > $NAME/result.txt
 EOF
 
 for th in 1 2 4 8 16 ; do
-    for c in ${tests[@]} ; do
+    for i in `seq 0 $((${#tests[@]}-1))` ; do
+        c=${tests[$i]}
+        name=${names[$i]}
         for dim in "" "-3d"; do
             mumps_time=`grep "solve" $NAME/$c$dim-mumps-t$th/common/log.txt | sed 's/.*solve *\(.*\) ms.*/\1/g'`
             umfpack_time=`grep "solve" $NAME/$c$dim-umfpack-t$th/common/log.txt | sed 's/.*solve *\(.*\) ms.*/\1/g'`
@@ -109,18 +114,20 @@ for th in 1 2 4 8 16 ; do
             exec_jobs=`grep "exec jobs" $NAME/$c$dim-t$th/common/log.txt | sed 's/.*jobs *\(.*\) ms.*/\1/g'`
             sol=`perl -e "{printf('%f',$comp_matrix+$elim_irreg+$elim_non_sep+$elim_3+$back+$exec_jobs);}"`
 
-            echo $c$dim $th $sol $mumps_time $umfpack_time >> $NAME/result.txt
+            echo $name$dim $th $sol $mumps_time $umfpack_time >> $NAME/result.txt
         done
     done
 done
 
 
-for c in ${tests[@]} ; do
+for i in `seq 0 $((${#tests[@]}-1))` ; do
+    c=${tests[$i]}
+    name=${names[$i]}
     for dim in "" "-3d"; do
-        grep "$c$dim " $NAME/result.txt | awk '{print $2,$3}' > $NAME/$c$dim.txt
-        grep "$c$dim " $NAME/result.txt | awk '{print $2,$4}' > $NAME/$c$dim-mumps.txt
-        grep "$c$dim " $NAME/result.txt | awk '{print $2,$5}' > $NAME/$c$dim-umfpack.txt
-        sed -e "s/CCCC/$c$dim/g" -e "s/MMMM/$c$dim-mumps/g" -e "s/FFFF/$c$dim-umfpack/g" -e "s/TTTT/$c$dim/g" \
+        grep "$name$dim " $NAME/result.txt | awk '{print $2,$3}' > $NAME/$c$dim.txt
+        grep "$name$dim " $NAME/result.txt | awk '{print $2,$4}' > $NAME/$c$dim-mumps.txt
+        grep "$name$dim " $NAME/result.txt | awk '{print $2,$5}' > $NAME/$c$dim-umfpack.txt
+        sed -e "s/CCCC/$c$dim/g" -e "s/MMMM/$c$dim-mumps/g" -e "s/FFFF/$c$dim-umfpack/g" -e "s/TTTT/$name$dim/g" \
             comparison_timing_plot.tex > $NAME/plot-$c$dim.tex
     done
 done

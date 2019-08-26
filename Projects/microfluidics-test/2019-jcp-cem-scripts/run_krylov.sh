@@ -8,6 +8,7 @@ export MKL_NUM_THREADS=1
 
 # tests=(simple grid20 rgrid0 rgrid1 voronoi-s4 voronoi-s15)
 tests=(simple grid20 rgrid0 voronoi-s4)
+names=(wide grid20 rgrid0 voronoi-s4)
 res2=(16 4 6 8)
 res3=(4 2 3 3)
 ARGS="../fem -q -mu 8.9e-4"
@@ -38,7 +39,9 @@ cat <<EOF > $NAME/result.txt
 EOF
 
 for th in 1 2 4 8 16 ; do
-    for c in ${tests[@]} ; do
+    for i in `seq 0 $((${#tests[@]}-1))` ; do
+        c=${tests[$i]}
+        name=${names[$i]}
         for dim in "" "-3d"; do
             krylov_time=`grep "krylov solve" $NAME/$c$dim-krylov-t$th/common/log.txt | sed 's/.*solve *\(.*\) ms.*/\1/g'`
             iter_time=`perl -e "{printf('%f',$krylov_time/10);}"`
@@ -52,16 +55,18 @@ for th in 1 2 4 8 16 ; do
             sol=`perl -e "{printf('%f',$comp_matrix+$elim_irreg+$elim_non_sep+$elim_3+$back+$exec_jobs);}"`
 
             eq_iters=`perl -e "{printf('%f',$sol/$iter_time);}"`
-            echo $c$dim $th $sol $iter_time $eq_iters >> $NAME/result.txt
+            echo $name$dim $th $sol $iter_time $eq_iters >> $NAME/result.txt
         done
     done
 done
 
 
-for c in ${tests[@]} ; do
+for i in `seq 0 $((${#tests[@]}-1))` ; do
+    c=${tests[$i]}
+    name=${names[$i]}
     for dim in "" "-3d"; do
-        grep "$c$dim " $NAME/result.txt | awk '{print $2,$4}' > $NAME/$c$dim-iter-time.txt
-        grep "$c$dim " $NAME/result.txt | awk '{print $2,$5}' > $NAME/$c$dim-num-iters.txt
+        grep "$name$dim " $NAME/result.txt | awk '{print $2,$4}' > $NAME/$c$dim-iter-time.txt
+        grep "$name$dim " $NAME/result.txt | awk '{print $2,$5}' > $NAME/$c$dim-num-iters.txt
     done
 done
 
@@ -71,10 +76,11 @@ cp num_krylov_iter.tex $NAME/plot-num-iters.tex
 cp num_krylov_iter.tex $NAME/plot-num-iters-3d.tex
 
 for dim in "" "-3d" ; do
-    for p in `seq 0 3` ; do
+    for p in `seq 0 $((${#tests[@]}-1))` ; do
         c=${tests[$p]}
-        sed -i -e "s/XXXX$p/$c$dim-iter-time/g" -e "s/TTTT$p/$c$dim/g" $NAME/plot-iter-time$dim.tex
-        sed -i -e "s/XXXX$p/$c$dim-num-iters/g" -e "s/TTTT$p/$c$dim/g" $NAME/plot-num-iters$dim.tex
+        name=${names[$p]}
+        sed -i -e "s/XXXX$p/$c$dim-iter-time/g" -e "s/TTTT$p/$name$dim/g" $NAME/plot-iter-time$dim.tex
+        sed -i -e "s/XXXX$p/$c$dim-num-iters/g" -e "s/TTTT$p/$name$dim/g" $NAME/plot-num-iters$dim.tex
     done
 done
 
