@@ -130,7 +130,7 @@ Update_Advection_Equation_Cell_Lookup(const GRID<TV>& grid,ARRAY<T2,TV_INT>& Z,c
 
     ARRAY<TV,TV_INT> V_cell(grid.Domain_Indices(3));T_AVERAGING averaging;
 
-    for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()) V_cell(iterator.Cell_Index())=averaging.Face_To_Cell_Vector(grid,iterator.Cell_Index(),V);
+    for(CELL_ITERATOR<TV> iterator(grid,3);iterator.Valid();iterator.Next()) V_cell(iterator.Cell_Index())=averaging.Face_To_Cell_Vector(grid,iterator.Cell_Index(),V);
 
     UPDATE_ADVECTION_EQUATION_HELPER<TV::m>::Apply(*this,grid,Z,Z_ghost,V_cell,dt,time);
 }
