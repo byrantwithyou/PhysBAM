@@ -314,6 +314,16 @@ public:
     for(ID i(0);i<m;i++) result=T::Componentwise_Max(result,abs(self(i)));
     return result;}
 
+    T Componentwise_Max() const
+    {const T_ARRAY& self=Derived();T result=self(ID(0));ID m=self.Size();
+    for(ID i(1);i<m;i++) result=T::Componentwise_Max(result,self(i));
+    return result;}
+
+    T Componentwise_Min() const
+    {const T_ARRAY& self=Derived();T result=self(ID(0));ID m=self.Size();
+    for(ID i(1);i<m;i++) result=T::Componentwise_Min(result,self(i));
+    return result;}
+
     T Sum() const
     {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();
     for(ID i(0);i<m;i++) result+=self(i);
