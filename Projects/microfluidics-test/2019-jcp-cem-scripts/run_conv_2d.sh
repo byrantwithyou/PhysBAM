@@ -8,6 +8,7 @@ FULL=1 # Set to 1 for a full rebuild; 0 to skip rerunning the simulations
 
 tests=(simple grid20 rgrid0 rgrid1 voronoi-s4 voronoi-s15)
 names=(wide grid20 rgrid0 rgrid1 voronoi-s4 voronoi-s15)
+pinv=(0 0 0 0 1 0)
 LO=2
 HI=16
 ANA="-u 'u=sin(12*x)*y+cos(15*y)+x*y,v=cos(14*x)*cos(13*y)+sin(16*y)*x+x*x-1' -p 'p=sin(15*x+10*y+1)'"
@@ -15,40 +16,80 @@ ANA="-u 'u=sin(12*x)*y+cos(15*y)+x*y,v=cos(14*x)*cos(13*y)+sin(16*y)*x+x*x-1' -p
 if [ "X$FULL" = "X1" ] ; then
     rm -rf $NAME
     mkdir -p $NAME
-    for c in ${tests[@]} ; do
+    for i in `seq 0 $((${#tests[@]}-1))` ; do
+        c=${tests[$i]}
+        p=${pinv[$i]}
         for r in `seq $HI -1 $LO` ; do
             echo $ARGS -o $NAME/$c-r$r -refine $r $ANA ../$c.txt;
         done
+        if [ "X$p" = "X1" ] ; then
+            for r in `seq $HI -1 $LO` ; do
+                echo $ARGS -pinv -o $NAME/$c-pinv-r$r -refine $r $ANA ../$c-pinv.txt;
+            done
+        fi
     done | xargs -P 4 -n 1 -d '\n' bash -c > /dev/null
 fi
+
 
 for i in `seq 0 $((${#tests[@]}-1))` ; do
     c=${tests[$i]}
     name=${names[$i]}
-    cat <<EOF > $NAME/$c-p.txt
+    q=${pinv[$i]}
+
+    S=()
+    if [ "X$q" = "X1" ] ; then
+        S=("-" "-pinv-")
+    else
+        S=("-")
+    fi
+
+    for k in ${S[@]} ; do
+        cat <<EOF > $NAME/$c${k}p.txt
 res linf l2
 EOF
-    cat <<EOF > $NAME/$c-v.txt
+        cat <<EOF > $NAME/$c${k}v.txt
 res linf l2
 EOF
-    for r in `seq $LO 1 $HI` ; do
-        res=`bc <<< "2*$r"`
-        grep 'l-2' $NAME/$c-r$r/common/log.txt |\
-            sed "s/.*l-inf \([^ ]*\).*l-2 \([^ ]*\).*l-inf \([^ ]*\).*l-2 \([^<]*\).*/$res \3 \4/g" >> $NAME/$c-p.txt
-        grep 'l-2' $NAME/$c-r$r/common/log.txt |\
-            sed "s/.*l-inf \([^ ]*\).*l-2 \([^ ]*\).*l-inf \([^ ]*\).*l-2 \([^<]*\).*/$res \1 \2/g" >> $NAME/$c-v.txt
+        for r in `seq $LO 1 $HI` ; do
+            res=`bc <<< "2*$r"`
+            grep 'l-2' $NAME/$c${k}r$r/common/log.txt |\
+                sed "s/.*l-inf \([^ ]*\).*l-2 \([^ ]*\).*l-inf \([^ ]*\).*l-2 \([^<]*\).*/$res \3 \4/g" >> $NAME/$c${k}p.txt
+            grep 'l-2' $NAME/$c${k}r$r/common/log.txt |\
+                sed "s/.*l-inf \([^ ]*\).*l-2 \([^ ]*\).*l-inf \([^ ]*\).*l-2 \([^<]*\).*/$res \1 \2/g" >> $NAME/$c${k}v.txt
+        done
     done
 
-    sed -e 's/LLLL/p/g' -e "s/XXXX/$c-p/g" -e "s/TTTT/$name pressure/g" conv_plot.tex  > $NAME/plot-$c-p.tex 
-    sed -e 's/LLLL/\\mathbf{v}/g' -e "s/XXXX/$c-v/g" -e "s/TTTT/$name velocity/g" conv_plot.tex  > $NAME/plot-$c-v.tex 
+    if [ "X$q" = "X1" ] ; then
+        cp conv_plot_pinv.tex $NAME/plot-$c-p.tex
+        cp conv_plot_pinv.tex $NAME/plot-$c-v.tex
+    else
+        cp conv_plot.tex $NAME/plot-$c-p.tex
+        cp conv_plot.tex $NAME/plot-$c-v.tex
+    fi
+
+    sed -i -e 's/LLLL/p/g' -e "s/XXXX/$c-p/g" -e "s/TTTT/$name pressure/g" $NAME/plot-$c-p.tex
+    sed -i -e 's/LLLL/\\mathbf{v}/g' -e "s/XXXX/$c-v/g" -e "s/TTTT/$name velocity/g" $NAME/plot-$c-v.tex
 
     V=`./conv_regression.pl $NAME/$c-v.txt $NAME/$c-v-regres.txt`
     read ova ovb <<< "$V"
-    sed -i -e "s/IIII/$ova/g" -e "s/EEEE/$ovb/g" $NAME/plot-$c-v.tex 
+    sed -i -e "s/IIII/$ova/g" -e "s/EEEE/$ovb/g" $NAME/plot-$c-v.tex
 
     P=`./conv_regression.pl $NAME/$c-p.txt $NAME/$c-p-regres.txt`
     read opa opb <<< "$P"
-    sed -i -e "s/IIII/$opa/g" -e "s/EEEE/$opb/g" $NAME/plot-$c-p.tex 
+    sed -i -e "s/IIII/$opa/g" -e "s/EEEE/$opb/g" $NAME/plot-$c-p.tex
+
+    if [ "X$q" = "X1" ] ; then
+        sed -i -e "s/YYYY/$c-pinv-p/g" $NAME/plot-$c-p.tex
+        sed -i -e "s/YYYY/$c-pinv-v/g" $NAME/plot-$c-v.tex
+
+        V=`./conv_regression.pl $NAME/$c-pinv-v.txt $NAME/$c-pinv-v-regres.txt`
+        read ova ovb <<< "$V"
+        sed -i -e "s/MMMM/$ova/g" -e "s/FFFF/$ovb/g" $NAME/plot-$c-v.tex
+
+        P=`./conv_regression.pl $NAME/$c-pinv-p.txt $NAME/$c-pinv-p-regres.txt`
+        read opa opb <<< "$P"
+        sed -i -e "s/MMMM/$opa/g" -e "s/FFFF/$opb/g" $NAME/plot-$c-p.tex
+    fi
 done
 
 cat <<EOF > $NAME/SConstruct

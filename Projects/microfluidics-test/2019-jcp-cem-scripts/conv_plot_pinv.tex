@@ -1,0 +1,41 @@
+\documentclass[class=minimal,border=0pt]{standalone}
+\usepackage{pgfplots}
+
+\begin{document}
+\pgfplotsset{width=10cm,height=8cm,compat=1.13}
+\begin{tikzpicture}
+\begin{loglogaxis}[
+    enlargelimits=false,
+    legend cell align=left,
+    %xlabel={Resolution},
+    %ylabel={Error},
+    %xticklabels={,,},
+    legend entries={$L^\infty_{LLLL}$ (IIII),$L^2_{LLLL}$ (EEEE),$L^\infty_{LLLL}$ (MMMM) pinv,$L^2_{LLLL}$ (FFFF) pinv},
+    legend pos=south west,
+%    ymin=0,
+%    ymax=40,
+%    xmax=16,
+    legend style={nodes={scale=1.2, transform shape},fill=none,draw=none},
+    tick scale binop=\times,
+    scale ticks above exponent=1,
+    y tick label style={
+        /pgf/number format/.cd,
+            fixed,
+            %fixed zerofill,
+            precision=0,
+        /tikz/.cd
+    }%,
+%    title={Convergence plot}
+]
+\addplot[only marks,mark options={solid,color=red,fill=red},mark=triangle*,color=red] table[x=res,y=linf]{XXXX.txt};
+\addplot[only marks,mark options={solid,color=blue,fill=blue},mark=triangle*,color=blue] table[x=res,y=l2]{XXXX.txt};
+\addplot[only marks,mark options={solid,color=purple,fill=none},mark=o,mark size=3pt,color=purple] table[x=res,y=linf]{YYYY.txt};
+\addplot[only marks,mark options={solid,color=cyan,fill=none},mark=o,mark size=3pt,color=cyan] table[x=res,y=l2]{YYYY.txt};
+\addplot[mark=none,color=red] table[x=res,y=linf]{XXXX-regres.txt};
+\addplot[mark=none,color=blue] table[x=res,y=l2]{XXXX-regres.txt};
+\addplot[mark=none,color=purple] table[x=res,y=linf]{YYYY-regres.txt};
+\addplot[mark=none,color=cyan] table[x=res,y=l2]{YYYY-regres.txt};
+\end{loglogaxis}
+\node[anchor=east] at (8cm,6cm) {TTTT};
+\end{tikzpicture}
+\end{document}
