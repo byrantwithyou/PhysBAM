@@ -18,6 +18,9 @@
 #define PHYSBAM_WARNING(message) \
     do{static bool __first_time__=true;if(__first_time__){PhysBAM::DEBUG_UTILITIES::Warning((message),__FUNCTION__,__FILE__,__LINE__);__first_time__=false;}}while(0)
 
+#define PHYSBAM_WARNING_REPEATING(message) \
+    PhysBAM::DEBUG_UTILITIES::Warning((message),__FUNCTION__,__FILE__,__LINE__);
+
 #define PHYSBAM_FUNCTION_IS_NOT_DEFINED() \
     PhysBAM::DEBUG_UTILITIES::Function_Is_Not_Defined(PHYSBAM_DEBUG_FUNCTION_NAME,__FILE__,__LINE__,typeid(*this))
 
