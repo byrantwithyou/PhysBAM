@@ -1,5 +1,5 @@
 //#####################################################################
-// Copyright 2007-2008, Geoffrey Irving, Eftychios Sifakis.
+// Copyright 2019, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 // Class LAPACK
@@ -7,28 +7,43 @@
 #ifndef __LAPACK__
 #define __LAPACK__
 
+#include <complex>
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Arrays/ARRAY_VIEW.h>
 #include <Core/Matrices/MATRIX_BASE.h>
 #include <cblas.h>
+#define lapack_complex_double std::complex<double>
+#define lapack_complex_float std::complex<float>
 #include <lapacke.h>
 namespace PhysBAM{
 
-inline int xgelsy( int matrix_layout, int m, int n,
-    int nrhs, double* a, int lda,
-    double* b, int ldb, int* jpvt,
-    double rcond, int* rank )
+// Overloads
+
+inline int xgelsy(int matrix_layout, int m, int n, int nrhs, double* a,
+    int lda, double* b, int ldb, int* jpvt, double rcond, int* rank)
 {
     return LAPACKE_dgelsy( matrix_layout, m, n, nrhs, a, lda, b, ldb, jpvt, rcond, rank );
 }
 
-inline int xgelsy( int matrix_layout, int m, int n,
-    int nrhs, float* a, int lda,
-    float* b, int ldb, int* jpvt,
-    float rcond, int* rank )
+inline int xgelsy(int matrix_layout, int m, int n, int nrhs, float* a,
+    int lda, float* b, int ldb, int* jpvt, float rcond, int* rank)
 {
     return LAPACKE_sgelsy( matrix_layout, m, n, nrhs, a, lda, b, ldb, jpvt, rcond, rank );
 }
+
+inline int xgelsy(int matrix_layout, int m, int n, int nrhs, std::complex<double>* a,
+    int lda, std::complex<double>* b, int ldb, int* jpvt, double rcond, int* rank)
+{
+    return LAPACKE_zgelsy( matrix_layout, m, n, nrhs, a, lda, b, ldb, jpvt, rcond, rank );
+}
+
+inline int xgelsy(int matrix_layout, int m, int n, int nrhs, std::complex<float>* a,
+    int lda, std::complex<float>* b, int ldb, int* jpvt, float rcond, int* rank)
+{
+    return LAPACKE_cgelsy( matrix_layout, m, n, nrhs, a, lda, b, ldb, jpvt, rcond, rank );
+}
+
+// Uses
 
 template<class T,class T_MATRIX1,class T_MATRIX2,class T_MATRIX3>
 void Least_Squares_Solve(const MATRIX_BASE<T,T_MATRIX1>& M,
