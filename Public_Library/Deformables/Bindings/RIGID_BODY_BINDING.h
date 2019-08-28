@@ -47,6 +47,9 @@ public:
     int Id_Number() const
     {return rigid_body_particles_index;}
 
+    TWIST<TV> Parent_Wrench(const TV& force) const
+    {return TWIST<TV>(force,Rigid_Body().World_Space_Vector(object_space_position).Cross(force));}
+
     TV Embedded_Position() const override;
     TV Embedded_Position(ARRAY_VIEW<const TV> X) const override;
     TV Embedded_Velocity() const override;
