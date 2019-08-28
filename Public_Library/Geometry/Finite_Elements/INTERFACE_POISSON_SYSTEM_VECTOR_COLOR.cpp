@@ -250,17 +250,28 @@ Scale(const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>& v,const INTERFACE_POISSON
 //#####################################################################
 // Function Get
 //#####################################################################
-template<class TV> void COUPLED_SYSTEM_VECTOR<TV>::
+template<class TV> void INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>::
 Get(ARRAY_VIEW<T> a) const
 {
-    aoeua;
+    int k=0;
+    for(const auto&i:u)
+        for(const auto&j:i)
+            a(k++)=j;
+    for(const auto&i:q)
+        a(k++)=i;
 }
 //#####################################################################
 // Function Set
 //#####################################################################
-template<class TV> void COUPLED_SYSTEM_VECTOR<TV>::
+template<class TV> void INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>::
 Set(ARRAY_VIEW<const T> a)
 {
+    int k=0;
+    for(auto&i:u)
+        for(auto&j:i)
+            j=a(k++);
+    for(auto&i:q)
+        i=a(k++);
 }
 //#####################################################################
 namespace PhysBAM{

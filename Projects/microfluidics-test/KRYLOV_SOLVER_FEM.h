@@ -158,6 +158,14 @@ struct KRYLOV_VECTOR_FEM:public KRYLOV_VECTOR_BASE<T>
         const KRYLOV_VECTOR_FEM<T>& w=debug_cast<const KRYLOV_VECTOR_FEM<T>&>(u);
         v.Resize(w.v.Size());
     }
+    void Get(ARRAY_VIEW<T> a) const override
+    {
+        a=v;
+    }
+    void Set(ARRAY_VIEW<const T> a) override
+    {
+        v=a;
+    }
 };
 
 template<typename T>

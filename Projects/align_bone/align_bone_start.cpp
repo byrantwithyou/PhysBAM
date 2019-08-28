@@ -83,6 +83,16 @@ struct KV:public KRYLOV_VECTOR_BASE<T>
     const T& Raw_Get(int i) const {if(i<9) return M.x[i];return V(i-9);}
     virtual KRYLOV_VECTOR_BASE* Clone_Default() const {return new KV;}
     virtual void Resize(const KRYLOV_VECTOR_BASE& v) {}
+    virtual void Get(ARRAY_VIEW<T> a) const override
+    {
+        for(int i=0;i<9;i++) a(i)=M.x[i];
+        for(int i=0;i<3;i++) a(i+9)=V(i);
+    }
+    virtual void Set(ARRAY_VIEW<const T> a) override
+    {
+        for(int i=0;i<9;i++) M.x[i]=a(i);
+        for(int i=0;i<3;i++) V(i)=a(i+9);
+    }
 };
 
 struct KM:public KRYLOV_SYSTEM_BASE<T>
