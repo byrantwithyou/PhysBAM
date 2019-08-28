@@ -43,16 +43,16 @@ public:
         q.Enqueue(11);
         TEST(q(2)==11);
         TEST(q.Size()==3);
-        TEST(q.Peek()==3);
+        TEST(q.Front()==3);
         TEST(q.Dequeue()==3);
-        TEST(q.Peek()==7);
+        TEST(q.Front()==7);
         TEST(q.Size()==2);
 
         q.Enqueue(15);
         TEST(q.Size()==3);
-        q.Safe_Enqueue(19);
+        q.Enqueue(19);
         TEST(q.Size()==4);
-        TEST(q.Peek()==7);
+        TEST(q.Front()==7);
 
         TEST(q(0)==7);
         TEST(q(1)==11);
@@ -63,23 +63,23 @@ public:
         TEST(q.Dequeue()==11);
         TEST(q.Dequeue()==15);
         TEST(q(0)==19);
-        TEST(q.Peek()==19);
+        TEST(q.Front()==19);
         TEST(q.Dequeue()==19);
 
         q.Remove_All();
         TEST(q.Size()==0);
 
-        q.Safe_Enqueue(3);
+        q.Enqueue(3);
         TEST(q.Empty()==false);
-        q.Safe_Enqueue(7);
-        q.Safe_Enqueue(11);
+        q.Enqueue(7);
+        q.Enqueue(11);
         TEST(q.Size()==3);
         q.Enqueue(44);
         
         TEST(q.Dequeue()==3);
         TEST(q.Dequeue()==7);
         q.Enqueue(15);
-        TEST(q.Peek()==11);
+        TEST(q.Front()==11);
         TEST(q(2)==15);
         TEST(q.Size()==3);
 

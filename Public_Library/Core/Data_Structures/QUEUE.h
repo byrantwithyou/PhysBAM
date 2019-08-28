@@ -21,25 +21,24 @@ public:
          :array(size+1),front(0),back(0)
     {}
 
-    void Enqueue(const T& element)
-    {array(back)=element;if(++back>=array.m) back=0;
-    assert(back!=front);} // dies if you run out of room
-
-    void Safe_Enqueue(const T& element) // resizes array on overflow
-    {array(back)=element;if(++back>=array.m) back=0;
+    void Enqueue(const T& element) // resizes array on overflow
+    {array(back)=element;
+    if(++back>=array.m) back=0;
     if(back==front){
-        ARRAY<T> new_array(4*array.m/3+2);back=0;
+        ARRAY<T> new_array(4*array.m/3+2);
+        back=0;
         for(int index=front;index<array.m;index++) new_array(back++)=array(index);
         for(int index=0;index<front;index++) new_array(back++)=array(index);
-        front=0;array.Exchange(new_array);}}
+        front=0;
+        array.Exchange(new_array);}}
 
     T Dequeue()
     {assert(!Empty());int index=front;if(++front>=array.m) front=0;return array(index);}
 
-    const T& Peek() const
-    {return array(front);}
+    const T& operator()(const int i) const
+    {assert((unsigned)i<(unsigned)Size());int index=front+i;if(index>=array.m) index-=array.m;return array(index);}
 
-    const T& operator()(const int i)
+    T& operator()(const int i)
     {assert((unsigned)i<(unsigned)Size());int index=front+i;if(index>=array.m) index-=array.m;return array(index);}
 
     int Size() const
@@ -53,6 +52,18 @@ public:
 
     void Remove_All()
     {front=0;back=0;}
+
+    const T& Front() const
+    {return array(front);}
+
+    T& Front()
+    {return array(front);}
+
+    const T& Back() const
+    {return array(back?back-1:array.m-1);}
+
+    T& Back() 
+    {return array(back?back-1:array.m-1);}
 
 //#####################################################################
 };
