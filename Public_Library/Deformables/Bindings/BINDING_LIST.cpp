@@ -242,6 +242,27 @@ Apply_Impulse(const int particle_index,const TV& impulse,ARRAY_VIEW<TV> V_input,
     else V_input(particle_index)+=particles.one_over_mass(particle_index)*impulse;
 }
 //#####################################################################
+// Function Remove_Bindings
+//#####################################################################
+template<class TV> void BINDING_LIST<TV>::
+Remove_Bindings(const ARRAY<int>& bound_particles)
+{
+    ARRAY<bool> remove_binding(bindings.m);
+    remove_binding.Subset(binding_index_from_particle_index.Subset(bound_particles)).Fill(true);
+
+    // recreate the binding list without the input binding
+    ARRAY<BINDING<TV>*> bindings_old=bindings;
+    bindings.Remove_All();
+    binding_index_from_particle_index.Remove_All();
+
+    // add bindings that aren't being removed
+    for(int b=0;b<bindings_old.m;b++)
+    {
+        if(remove_binding(b)) delete bindings_old(b);
+        else Add_Binding(bindings_old(b));
+    }
+}
+//#####################################################################
 namespace PhysBAM{
 template class BINDING_LIST<VECTOR<float,1> >;
 template class BINDING_LIST<VECTOR<float,2> >;

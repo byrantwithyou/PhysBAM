@@ -140,6 +140,7 @@ public:
     void Apply_Impulse(const int particle_index,const TV& impulse,bool update_neighbors=true);
     void Apply_Impulse(const int particle_index,const TV& impulse,ARRAY_VIEW<TV> V_input,bool update_neighbors=true) const;
     void Apply_Impulse(const int particle_index,const TV& impulse,ARRAY_VIEW<TV> V,ARRAY_VIEW<TWIST<TV> > rigid_V,bool update_neighbors=true) const;
+    void Remove_Bindings(const ARRAY<int>& bound_particles);
     void Read(TYPED_ISTREAM input);
     void Write(TYPED_OSTREAM output) const;
 //#####################################################################
