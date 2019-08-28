@@ -83,6 +83,7 @@ public:
     virtual void Set_Overdamping_Fraction(ARRAY_VIEW<const T> overdamping_fraction); // 1 is critically damped
     void Ensure_Minimum_Overdamping_Fraction(const T overdamping_fraction=1); // 1 is critically damped
     void Clamp_Restlength_With_Fraction_Of_Springs(const T fraction=.01);
+    void Enlarge_Restlength_By(const T enlargement_ratio);
     void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian) override;
     void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const override;
     void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const override;
@@ -110,13 +111,13 @@ public:
 template<class TV> LINEAR_SPRINGS<TV>*
 Create_Edge_Springs(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh,const typename TV::SCALAR stiffness=2e3,
     const typename TV::SCALAR overdamping_fraction=1,const bool limit_time_step_by_strain_rate=true,const typename TV::SCALAR max_strain_per_time_step=.1,
-    const bool use_rest_state_for_strain_rate=true,const typename TV::SCALAR restlength_enlargement_fraction=0,const bool verbose=true);
+    const bool use_rest_state_for_strain_rate=true,const typename TV::SCALAR restlength_enlargement_fraction=0,const bool verbose=true,const typename TV::SCALAR rest_length_material_length_enlargement_ratio=0);
 
 template<class T_OBJECT> LINEAR_SPRINGS<typename T_OBJECT::VECTOR_T>*
 Create_Edge_Springs(T_OBJECT& object,
     const typename T_OBJECT::SCALAR stiffness=2e3,const typename T_OBJECT::SCALAR overdamping_fraction=1,const bool limit_time_step_by_strain_rate=true,
     const typename T_OBJECT::SCALAR max_strain_per_time_step=.1,const bool use_rest_state_for_strain_rate=true,const typename T_OBJECT::SCALAR restlength_enlargement_fraction=0,
-    const bool verbose=true);
+    const bool verbose=true,const typename T_OBJECT::SCALAR rest_length_material_length_enlargement_ratio=0);
 
 }
 #endif

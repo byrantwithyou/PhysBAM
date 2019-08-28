@@ -29,7 +29,7 @@
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <cfloat>
 using ::std::sqrt;
-using namespace PhysBAM;
+namespace PhysBAM{
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -243,6 +243,14 @@ Clamp_Restlength_With_Fraction_Of_Springs(const T fraction)
     length.Sort();
     T minimum_restlength=length(min((int)(fraction*length.m)+1,length.m));LOG::cout<<"Enlarging the restlength of all linear springs below "<<minimum_restlength<<std::endl;
     Clamp_Restlength(minimum_restlength);
+}
+//#####################################################################
+// Function Enlarge_Restlength_By
+//#####################################################################
+template <class TV> void LINEAR_SPRINGS<TV>:: 
+Enlarge_Restlength_By(const T enlargement_ratio)
+{
+    restlength=restlength*(1+enlargement_ratio);
 }
 //#####################################################################
 // Function Update_Position_Based_State
@@ -535,14 +543,17 @@ Effective_Impulse_Factor(int s) const
 //#####################################################################
 // Function Create_Edge_Springs
 //#####################################################################
-template<class TV> LINEAR_SPRINGS<TV>* PhysBAM::
-Create_Edge_Springs(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh,const typename TV::SCALAR stiffness,const typename TV::SCALAR overdamping_fraction,
-    const bool limit_time_step_by_strain_rate,const typename TV::SCALAR max_strain_per_time_step,const bool use_rest_state_for_strain_rate,
-    const typename TV::SCALAR restlength_enlargement_fraction,const bool verbose)
+template<class TV> LINEAR_SPRINGS<TV>*
+Create_Edge_Springs(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh,
+    const typename TV::SCALAR stiffness,const typename TV::SCALAR overdamping_fraction,
+    const bool limit_time_step_by_strain_rate,const typename TV::SCALAR max_strain_per_time_step,
+    const bool use_rest_state_for_strain_rate,const typename TV::SCALAR restlength_enlargement_fraction,
+    const bool verbose,const typename TV::SCALAR rest_length_material_length_enlargement_ratio)
 {
     LINEAR_SPRINGS<TV>* ls=new LINEAR_SPRINGS<TV>(particles,segment_mesh);
     ls->Set_Restlength_From_Particles();
     if(restlength_enlargement_fraction) ls->Clamp_Restlength_With_Fraction_Of_Springs(restlength_enlargement_fraction);
+    if(rest_length_material_length_enlargement_ratio!=0) ls->Enlarge_Restlength_By(rest_length_material_length_enlargement_ratio);
     ls->Set_Stiffness(stiffness);
     ls->Set_Overdamping_Fraction(overdamping_fraction);
     ls->Limit_Time_Step_By_Strain_Rate(limit_time_step_by_strain_rate,max_strain_per_time_step);
@@ -554,37 +565,64 @@ Create_Edge_Springs(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& segment_me
 //#####################################################################
 // Function Create_Edge_Springs
 //#####################################################################
-template<class T_OBJECT> LINEAR_SPRINGS<typename T_OBJECT::VECTOR_T>* PhysBAM::
+template<class T_OBJECT> LINEAR_SPRINGS<typename T_OBJECT::VECTOR_T>*
 Create_Edge_Springs(T_OBJECT& object,
-    const typename T_OBJECT::SCALAR stiffness,const typename T_OBJECT::SCALAR overdamping_fraction,const bool limit_time_step_by_strain_rate,
-    const typename T_OBJECT::SCALAR max_strain_per_time_step,const bool use_rest_state_for_strain_rate,const typename T_OBJECT::SCALAR restlength_enlargement_fraction,
-    const bool verbose)
+    const typename T_OBJECT::SCALAR stiffness,const typename T_OBJECT::SCALAR overdamping_fraction,
+    const bool limit_time_step_by_strain_rate,const typename T_OBJECT::SCALAR max_strain_per_time_step,
+    const bool use_rest_state_for_strain_rate,const typename T_OBJECT::SCALAR restlength_enlargement_fraction,
+    const bool verbose,const typename T_OBJECT::SCALAR rest_length_material_length_enlargement_ratio)
 {
     return Create_Edge_Springs(dynamic_cast<DEFORMABLE_PARTICLES<typename T_OBJECT::VECTOR_T>&>(object.particles),object.Get_Segment_Mesh(),stiffness,overdamping_fraction,limit_time_step_by_strain_rate,max_strain_per_time_step,
-        use_rest_state_for_strain_rate,restlength_enlargement_fraction,verbose);
+        use_rest_state_for_strain_rate,restlength_enlargement_fraction,verbose,rest_length_material_length_enlargement_ratio);
 }
+template class LINEAR_SPRINGS<VECTOR<double,2> >;
+template class LINEAR_SPRINGS<VECTOR<double,3> >;
+template class LINEAR_SPRINGS<VECTOR<float,2> >;
+template class LINEAR_SPRINGS<VECTOR<float,3> >;
+template LINEAR_SPRINGS<TETRAHEDRALIZED_VOLUME<double>::VECTOR_T>*
+Create_Edge_Springs<TETRAHEDRALIZED_VOLUME<double> >(TETRAHEDRALIZED_VOLUME<double>&,
+    TETRAHEDRALIZED_VOLUME<double>::SCALAR,TETRAHEDRALIZED_VOLUME<double>::SCALAR,bool,
+    TETRAHEDRALIZED_VOLUME<double>::SCALAR,bool,TETRAHEDRALIZED_VOLUME<double>::SCALAR,
+    bool,TETRAHEDRALIZED_VOLUME<double>::SCALAR);
+template LINEAR_SPRINGS<TETRAHEDRALIZED_VOLUME<float>::VECTOR_T>*
+Create_Edge_Springs<TETRAHEDRALIZED_VOLUME<float> >(TETRAHEDRALIZED_VOLUME<float>&,
+    TETRAHEDRALIZED_VOLUME<float>::SCALAR,TETRAHEDRALIZED_VOLUME<float>::SCALAR,bool,
+    TETRAHEDRALIZED_VOLUME<float>::SCALAR,bool,TETRAHEDRALIZED_VOLUME<float>::SCALAR,
+    bool,TETRAHEDRALIZED_VOLUME<float>::SCALAR);
+template LINEAR_SPRINGS<TRIANGULATED_AREA<double>::VECTOR_T>*
+Create_Edge_Springs<TRIANGULATED_AREA<double> >(TRIANGULATED_AREA<double>&,
+    TRIANGULATED_AREA<double>::SCALAR,TRIANGULATED_AREA<double>::SCALAR,bool,
+    TRIANGULATED_AREA<double>::SCALAR,bool,TRIANGULATED_AREA<double>::SCALAR,
+    bool,TRIANGULATED_AREA<double>::SCALAR);
+template LINEAR_SPRINGS<TRIANGULATED_SURFACE<float>::VECTOR_T>*
+Create_Edge_Springs<TRIANGULATED_SURFACE<float> >(TRIANGULATED_SURFACE<float>&,
+    TRIANGULATED_SURFACE<float>::SCALAR,TRIANGULATED_SURFACE<float>::SCALAR,bool,
+    TRIANGULATED_SURFACE<float>::SCALAR,bool,TRIANGULATED_SURFACE<float>::SCALAR,
+    bool,TRIANGULATED_SURFACE<float>::SCALAR);
+template LINEAR_SPRINGS<SEGMENTED_CURVE<VECTOR<double,3> >::VECTOR_T>*
+Create_Edge_Springs<SEGMENTED_CURVE<VECTOR<double,3> > >(SEGMENTED_CURVE<VECTOR<double,3> >&,
+    SEGMENTED_CURVE<VECTOR<double,3> >::SCALAR,SEGMENTED_CURVE<VECTOR<double,3> >::SCALAR,
+    bool,SEGMENTED_CURVE<VECTOR<double,3> >::SCALAR,bool,SEGMENTED_CURVE<VECTOR<double,3> >::SCALAR,
+    bool,SEGMENTED_CURVE<VECTOR<double,3> >::SCALAR);
+template LINEAR_SPRINGS<SEGMENTED_CURVE<VECTOR<float,2> >::VECTOR_T>*
+Create_Edge_Springs<SEGMENTED_CURVE<VECTOR<float,2> > >(SEGMENTED_CURVE<VECTOR<float,2> >&,
+    SEGMENTED_CURVE<VECTOR<float,2> >::SCALAR,SEGMENTED_CURVE<VECTOR<float,2> >::SCALAR,
+    bool,SEGMENTED_CURVE<VECTOR<float,2> >::SCALAR,bool,SEGMENTED_CURVE<VECTOR<float,2> >::SCALAR,
+    bool,SEGMENTED_CURVE<VECTOR<float,2> >::SCALAR);
+template LINEAR_SPRINGS<SEGMENTED_CURVE<VECTOR<float,3> >::VECTOR_T>*
+Create_Edge_Springs<SEGMENTED_CURVE<VECTOR<float,3> > >(SEGMENTED_CURVE<VECTOR<float,3> >&,
+    SEGMENTED_CURVE<VECTOR<float,3> >::SCALAR,SEGMENTED_CURVE<VECTOR<float,3> >::SCALAR,
+    bool,SEGMENTED_CURVE<VECTOR<float,3> >::SCALAR,bool,SEGMENTED_CURVE<VECTOR<float,3> >::SCALAR,
+    bool,SEGMENTED_CURVE<VECTOR<float,3> >::SCALAR);
+template LINEAR_SPRINGS<SEGMENTED_CURVE_2D<double>::VECTOR_T>*
+Create_Edge_Springs<SEGMENTED_CURVE_2D<double> >(SEGMENTED_CURVE_2D<double>&,
+    SEGMENTED_CURVE_2D<double>::SCALAR,SEGMENTED_CURVE_2D<double>::SCALAR,bool,
+    SEGMENTED_CURVE_2D<double>::SCALAR,bool,SEGMENTED_CURVE_2D<double>::SCALAR,
+    bool,SEGMENTED_CURVE_2D<double>::SCALAR);
+template LINEAR_SPRINGS<TRIANGULATED_SURFACE<double>::VECTOR_T>*
+Create_Edge_Springs<TRIANGULATED_SURFACE<double> >(TRIANGULATED_SURFACE<double>&,
+    TRIANGULATED_SURFACE<double>::SCALAR,TRIANGULATED_SURFACE<double>::SCALAR,bool,
+    TRIANGULATED_SURFACE<double>::SCALAR,bool,TRIANGULATED_SURFACE<double>::SCALAR,
+    bool,TRIANGULATED_SURFACE<double>::SCALAR);
 //#####################################################################
-namespace PhysBAM{
-#define INSTANTIATION_HELPER(T) \
-    template class LINEAR_SPRINGS<VECTOR<T,2> >; \
-    template class LINEAR_SPRINGS<VECTOR<T,3> >; \
-    template LINEAR_SPRINGS<SEGMENTED_CURVE<VECTOR<T,1> >::VECTOR_T>* Create_Edge_Springs<SEGMENTED_CURVE<VECTOR<T,1> > >(SEGMENTED_CURVE<VECTOR<T,1> >&, \
-        SEGMENTED_CURVE<VECTOR<T,1> >::SCALAR,SEGMENTED_CURVE<VECTOR<T,1> >::SCALAR,bool,SEGMENTED_CURVE<VECTOR<T,1> >::SCALAR,bool,SEGMENTED_CURVE<VECTOR<T,1> >::SCALAR,bool); \
-    template LINEAR_SPRINGS<SEGMENTED_CURVE<VECTOR<T,2> >::VECTOR_T>* Create_Edge_Springs<SEGMENTED_CURVE<VECTOR<T,2> > >(SEGMENTED_CURVE<VECTOR<T,2> >&, \
-        SEGMENTED_CURVE<VECTOR<T,2> >::SCALAR,SEGMENTED_CURVE<VECTOR<T,2> >::SCALAR,bool,SEGMENTED_CURVE<VECTOR<T,2> >::SCALAR,bool,SEGMENTED_CURVE<VECTOR<T,2> >::SCALAR,bool); \
-    template LINEAR_SPRINGS<SEGMENTED_CURVE<VECTOR<T,3> >::VECTOR_T>* Create_Edge_Springs<SEGMENTED_CURVE<VECTOR<T,3> > >(SEGMENTED_CURVE<VECTOR<T,3> >&, \
-        SEGMENTED_CURVE<VECTOR<T,3> >::SCALAR,SEGMENTED_CURVE<VECTOR<T,3> >::SCALAR,bool,SEGMENTED_CURVE<VECTOR<T,3> >::SCALAR,bool,SEGMENTED_CURVE<VECTOR<T,3> >::SCALAR,bool); \
-    template LINEAR_SPRINGS<TETRAHEDRALIZED_VOLUME<T>::VECTOR_T>* Create_Edge_Springs<TETRAHEDRALIZED_VOLUME<T> >(TETRAHEDRALIZED_VOLUME<T>&,TETRAHEDRALIZED_VOLUME<T>::SCALAR, \
-        TETRAHEDRALIZED_VOLUME<T>::SCALAR,bool,TETRAHEDRALIZED_VOLUME<T>::SCALAR,bool,TETRAHEDRALIZED_VOLUME<T>::SCALAR,bool); \
-    template LINEAR_SPRINGS<TRIANGULATED_SURFACE<T>::VECTOR_T>* Create_Edge_Springs<TRIANGULATED_SURFACE<T> >(TRIANGULATED_SURFACE<T>&,TRIANGULATED_SURFACE<T>::SCALAR, \
-        TRIANGULATED_SURFACE<T>::SCALAR,bool,TRIANGULATED_SURFACE<T>::SCALAR,bool,TRIANGULATED_SURFACE<T>::SCALAR,bool); \
-    template LINEAR_SPRINGS<VECTOR<T,3> >* Create_Edge_Springs<VECTOR<T,3> >(DEFORMABLE_PARTICLES<VECTOR<T,3> >&,SEGMENT_MESH&,VECTOR<T,3>::SCALAR,VECTOR<T,3>::SCALAR,bool, \
-        VECTOR<T,3>::SCALAR,bool,VECTOR<T,3>::SCALAR,bool); \
-    template LINEAR_SPRINGS<SEGMENTED_CURVE_2D<T>::VECTOR_T>* Create_Edge_Springs<SEGMENTED_CURVE_2D<T> >(SEGMENTED_CURVE_2D<T>&,SEGMENTED_CURVE_2D<T>::SCALAR, \
-        SEGMENTED_CURVE_2D<T>::SCALAR,bool,SEGMENTED_CURVE_2D<T>::SCALAR,bool,SEGMENTED_CURVE_2D<T>::SCALAR,bool); \
-    template LINEAR_SPRINGS<TRIANGULATED_AREA<T>::VECTOR_T>* Create_Edge_Springs<TRIANGULATED_AREA<T> >(TRIANGULATED_AREA<T>&,TRIANGULATED_AREA<T>::SCALAR, \
-        TRIANGULATED_AREA<T>::SCALAR,bool,TRIANGULATED_AREA<T>::SCALAR,bool,TRIANGULATED_AREA<T>::SCALAR,bool);
-
-INSTANTIATION_HELPER(float)
-INSTANTIATION_HELPER(double)
 }
