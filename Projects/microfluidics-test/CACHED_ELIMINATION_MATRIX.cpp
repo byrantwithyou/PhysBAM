@@ -76,11 +76,11 @@ void Inverse(MATRIX_MXN<double>& A)
 
 void Pseudo_Inverse(MATRIX_MXN<float>& A)
 {
-    float tol=1e-10;
     ARRAY<float> s(A.m),u(A.m*A.m),vt(A.m*A.m),superb(A.m);
     int ret=LAPACKE_sgesvd(LAPACK_ROW_MAJOR,'S','S',A.m,A.n,A.x.Get_Array_Pointer(),A.m,
         s.Get_Array_Pointer(),u.Get_Array_Pointer(),A.m,vt.Get_Array_Pointer(),A.m,superb.Get_Array_Pointer());
     PHYSBAM_ASSERT(!ret);
+    float tol=1e-8*A.m*s.Max();
     for(int i=0;i<A.m;i++)
     {
        float ss=s(i);
@@ -93,11 +93,11 @@ void Pseudo_Inverse(MATRIX_MXN<float>& A)
 
 void Pseudo_Inverse(MATRIX_MXN<double>& A)
 {
-    double tol=1e-10;
     ARRAY<double> s(A.m),u(A.m*A.m),vt(A.m*A.m),superb(A.m);
     int ret=LAPACKE_dgesvd(LAPACK_ROW_MAJOR,'S','S',A.m,A.n,A.x.Get_Array_Pointer(),A.m,
         s.Get_Array_Pointer(),u.Get_Array_Pointer(),A.m,vt.Get_Array_Pointer(),A.m,superb.Get_Array_Pointer());
     PHYSBAM_ASSERT(!ret);
+    double tol=1e-16*A.m*s.Max();
     for(int i=0;i<A.m;i++)
     {
        double ss=s(i);
