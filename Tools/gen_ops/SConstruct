@@ -1,0 +1,4 @@
+import os
+env=Environment(ENV=os.environ)
+env.Append(CXXFLAGS=["-std=gnu++17","-g3","-Wall"]);
+env.Program("gen-code",["main.cpp"])
