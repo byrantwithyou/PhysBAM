@@ -53,7 +53,7 @@ public:
         ARRAY<ARRAY<T> >& rhs_input,int axis_input,T scale_input);
 
     void Add_Entry(int constraint_index,int orientation,int flat_index_diff_ref,int color,T value)
-    {helper->data(orientation)(color)(constraint_index,flat_index_diff_ref)+=value*scale;}
+    {helper->data(orientation)(color)(constraint_index)(flat_index_diff_ref)+=value*scale;}
 
     void Add_Constraint_Rhs_Entry(int constraint_index,int orientation,int color,T value)
     {helper->rhs_data(orientation)(color)(constraint_index)+=value*scale;}

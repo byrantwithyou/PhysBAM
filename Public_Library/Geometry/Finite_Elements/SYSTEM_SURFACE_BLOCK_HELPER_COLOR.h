@@ -26,7 +26,7 @@ class SYSTEM_SURFACE_BLOCK_HELPER_COLOR
 
 public:
     
-    VECTOR<ARRAY<MATRIX_MXN<T> >,TV::m> data;
+    VECTOR<ARRAY<ARRAY<ARRAY<T> > >,TV::m> data;
     VECTOR<ARRAY<ARRAY<T> >,TV::m> rhs_data;
     CELL_DOMAIN_INTERFACE_COLOR<TV> *cdi;
     CELL_MANAGER_COLOR<TV> *cm;

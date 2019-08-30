@@ -30,7 +30,9 @@ Initialize(CELL_DOMAIN_INTERFACE_COLOR<TV> &cdi_input,const BASIS_STENCIL_UNIFOR
     flat_diff.Sort(LEXICOGRAPHIC_COMPARE());
     
     data.Resize(cdi->colors);
-    for(int c=0;c<cdi->colors;c++) data(c).Resize(cdi->flat_size,flat_diff.m);
+    for(int c=0;c<cdi->colors;c++){
+        data(c).Resize(cdi->flat_size);
+        for(auto&a:data(c)) a.Resize(flat_diff.m);}
 }
 //#####################################################################
 // Function Initialize
@@ -79,17 +81,17 @@ Mark_Active_Cells(T tol)
         int i=cdi->Flatten(it.index);
         int r=cdi->remap(i);
         for(int c=0;c<cdi->colors;c++)
-            for(int k=0;k<data(c).n;k++){
-                data(c)(r,k)+=data(c)(i,k);
-                data(c)(i,k)=0;}}
+            for(int k=0;k<data(c)(i).m;k++){
+                data(c)(r)(k)+=data(c)(i)(k);
+                data(c)(i)(k)=0;}}
     for(int c=0;c<cdi->colors;c++)
         for(int l=0;l<data(c).m;l++)
-            for(int k=0;k<data(c).n;k++)
-                if(abs(data(c)(l,k))>tol){
+            for(int k=0;k<data(c)(l).m;k++)
+                if(abs(data(c)(l)(k))>tol){
                     cm(0)->Set_Active(l,c);
                     for(int p=0;p<flat_diff(k).m;p++)
                         cm(p+1)->Set_Active(l+flat_diff(k)(p),c);}
-                else data(c)(l,k)=0;
+                else data(c)(l)(k)=0;
 }
 //#####################################################################
 // Function Build_Matrix
@@ -102,7 +104,7 @@ Build_Matrix(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix)
 
     for(int c=0;c<cdi->colors;c++){
         SPARSE_MATRIX_FLAT_MXN<T>& M=matrix(c);
-        MATRIX_MXN<T>& d=data(c);
+        ARRAY<ARRAY<T> >& d=data(c);
         ARRAY<int>& comp_m=cm(0)->compressed(c);
         ARRAY<int>& comp_n=cm(1)->compressed(c);
         int m=cm(0)->dofs(c);
@@ -117,8 +119,8 @@ Build_Matrix(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix)
             int row=comp_m(i);
             if(row>=0){
                 ARRAY<SPARSE_MATRIX_ENTRY<T> > entries;
-                for(int j=0;j<d.n;j++){
-                    T value=d(i,j);
+                for(int j=0;j<d(i).m;j++){
+                    T value=d(i)(j);
                     if(value){
                         int column=comp_n(i+flat_diff(j)(0));
                         M.offsets(row+1)++;
@@ -149,7 +151,7 @@ Build_Matrix_With_Contract(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix,Args&& ...a
 
     for(int c=0;c<cdi->colors;c++){
         SPARSE_MATRIX_FLAT_MXN<T>& M=matrix(c);
-        MATRIX_MXN<T>& d=data(c);
+        ARRAY<ARRAY<T> >& d=data(c);
         ARRAY<int>* comp_m=&pruned_cm(0)->compressed(c);
         ARRAY<int>* comp_n=0;
         int m=pruned_cm(0)->dofs(c),n=-1;
@@ -167,7 +169,7 @@ Build_Matrix_With_Contract(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix,Args&& ...a
             if(cdi->Is_Outside_Cell(i)) continue;
             int row=(*comp_m)(i);
             if(row>=0){
-                contract_row_view(0).Set(d.x.Array_View(d.n*i,d.n));
+                contract_row_view(0).Set(d(i));
                 for(int j=0;j<instructions.m;j++){
                     ARRAY<int>& comp=cm(contract_index(j))->compressed(c);
                     contract_row_view(j+1).Fill(0);

@@ -38,12 +38,12 @@ Mark_Active_Cells(T tol)
 {
     for(int i=0;i<TV::m;i++)
         for(int c=0;c<cdi->colors;c++){
-            MATRIX_MXN<T>& d=data(i)(c);
+            ARRAY<ARRAY<T> >& d=data(i)(c);
             for(int l=0;l<d.m;l++)
-                for(int k=0;k<d.n;k++)
-                    if(abs(d(l,k))>tol)
+                for(int k=0;k<d(l).m;k++)
+                    if(abs(d(l)(k))>tol)
                         cm->Set_Active((*cdi->flat_base(i))(l)+flat_diff(k),c);
-                    else d(l,k)=0;}
+                    else d(l)(k)=0;}
 }
 //#####################################################################
 // Function Build_Matrix
@@ -65,13 +65,13 @@ Build_Matrix(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix,ARRAY<T>& constraint_rhs)
 
         int row=0;
         for(int orientation=0;orientation<TV::m;orientation++){
-            const MATRIX_MXN<T>& d=data(orientation)(c);
+            const ARRAY<ARRAY<T> >& d=data(orientation)(c);
             const ARRAY<T>& rd=rhs_data(orientation)(c);
             for(int i=0;i<d.m;i++,row++){
                 constraint_rhs(row)+=rd(i);
                 ARRAY<SPARSE_MATRIX_ENTRY<T> > entries;
-                for(int j=0;j<d.n;j++){
-                    T value=d(i,j);
+                for(int j=0;j<d(i).m;j++){
+                    T value=d(i)(j);
                     if(value){
                         int column=comp_n((*cdi->flat_base(orientation))(i)+flat_diff(j));
                         M.offsets(row+1)++;
@@ -89,7 +89,8 @@ Resize()
 {
     for(int i=0;i<TV::m;i++)
         for(int c=0;c<cdi->colors;c++){
-            data(i)(c).Resize(cdi->flat_base(i)->m,flat_diff.m);
+            data(i)(c).Resize(cdi->flat_base(i)->m);
+            for(auto&a:data(i)(c)) a.Resize(flat_diff.m);
             rhs_data(i)(c).Resize(cdi->flat_base(i)->m);}
 }
 namespace PhysBAM{

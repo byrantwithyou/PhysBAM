@@ -36,12 +36,12 @@ template<class TV> void SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<TV>::
 Mark_Active_Cells(T tol)
 {
     for(int c=0;c<cdi->colors;c++){
-        MATRIX_MXN<T>& d=data(c);
+        ARRAY<ARRAY<T> >& d=data(c);
         for(int l=0;l<d.m;l++)
-            for(int k=0;k<d.n;k++)
-                if(abs(d(l,k))>tol)
+            for(int k=0;k<d(l).m;k++)
+                if(abs(d(l)(k))>tol)
                     cm->Set_Active(cdi->flat_base_scalar(l)+flat_diff(k),c);
-                else d(l,k)=0;}
+                else d(l)(k)=0;}
 }
 //#####################################################################
 // Function Build_Matrix
@@ -61,13 +61,13 @@ Build_Matrix(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix,ARRAY<T>& constraint_rhs)
         M.m=m;
         constraint_rhs.Resize(m);
 
-        MATRIX_MXN<T>& d=data(c);
+        ARRAY<ARRAY<T> >& d=data(c);
         const ARRAY<T>& rd=rhs_data(c);
         for(int row=0;row<d.m;row++){
             constraint_rhs(row)+=rd(row);
             ARRAY<SPARSE_MATRIX_ENTRY<T> > entries;
-            for(int j=0;j<d.n;j++){
-                T value=d(row,j);
+            for(int j=0;j<d(row).m;j++){
+                T value=d(row)(j);
                 if(value){
                     int column=comp_n(cdi->flat_base_scalar(row)+flat_diff(j));
                     M.offsets(row+1)++;
@@ -84,7 +84,8 @@ template<class TV> void SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<TV>::
 Resize()
 {
     for(int c=0;c<cdi->colors;c++){
-        data(c).Resize(cdi->flat_base_scalar.m,flat_diff.m);
+        data(c).Resize(cdi->flat_base_scalar.m);
+        for(auto&a:data(c)) a.Resize(flat_diff.m);
         rhs_data(c).Resize(cdi->flat_base_scalar.m);}
 }
 namespace PhysBAM{

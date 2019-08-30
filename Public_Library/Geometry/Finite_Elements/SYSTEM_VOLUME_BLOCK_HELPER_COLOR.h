@@ -25,7 +25,7 @@ class SYSTEM_VOLUME_BLOCK_HELPER_COLOR
     typedef VECTOR<int,TV::m> TV_INT;
 
 public:
-    ARRAY<MATRIX_MXN<T> > data;
+    ARRAY<ARRAY<ARRAY<T> > > data;
     CELL_DOMAIN_INTERFACE_COLOR<TV>* cdi;
     ARRAY<CELL_MANAGER_COLOR<TV>*> cm; // size = # basis functions
     ARRAY<ARRAY<int> > flat_diff;

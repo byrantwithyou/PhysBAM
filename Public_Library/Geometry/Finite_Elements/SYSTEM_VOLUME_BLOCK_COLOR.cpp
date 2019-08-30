@@ -69,7 +69,7 @@ Add_Open_Subcell_Entries(int flat_index,int subcell,int color)
 template<class TV,int static_degree> void SYSTEM_VOLUME_BLOCK_COLOR<TV,static_degree>::
 Add_Entry(int flat_index,int flat_index_diff_ref,int color,T value)
 {
-    helper->data(color)(flat_index,flat_index_diff_ref)+=value*scale(color);
+    helper->data(color)(flat_index)(flat_index_diff_ref)+=value*scale(color);
 }
 //#####################################################################
 // Function Add_Open_Entry
