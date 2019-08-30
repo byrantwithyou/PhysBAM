@@ -53,9 +53,9 @@ int arg_type[op_last][4] =
 void Inverse(MATRIX_MXN<float>& A)
 {
     ARRAY<int> idiv(A.m);
-    int ret_f = LAPACKE_ssytrf( LAPACK_ROW_MAJOR, 'U', A.m, A.x.Get_Array_Pointer(), A.m, idiv.Get_Array_Pointer() );
+    int ret_f = LAPACKE_ssytrf( LAPACK_COL_MAJOR, 'U', A.m, A.x.Get_Array_Pointer(), A.m, idiv.Get_Array_Pointer() );
     PHYSBAM_ASSERT(!ret_f);
-    int ret_i = LAPACKE_ssytri( LAPACK_ROW_MAJOR, 'U', A.m, A.x.Get_Array_Pointer(), A.m, idiv.Get_Array_Pointer() );
+    int ret_i = LAPACKE_ssytri( LAPACK_COL_MAJOR, 'U', A.m, A.x.Get_Array_Pointer(), A.m, idiv.Get_Array_Pointer() );
     PHYSBAM_ASSERT(!ret_i);
     for(int r=0;r<A.m;r++)
         for(int c=0;c<r;c++)
@@ -65,9 +65,9 @@ void Inverse(MATRIX_MXN<float>& A)
 void Inverse(MATRIX_MXN<double>& A)
 {
     ARRAY<int> idiv(A.m);
-    int ret_f = LAPACKE_dsytrf( LAPACK_ROW_MAJOR, 'U', A.m, A.x.Get_Array_Pointer(), A.m, idiv.Get_Array_Pointer() );
+    int ret_f = LAPACKE_dsytrf( LAPACK_COL_MAJOR, 'U', A.m, A.x.Get_Array_Pointer(), A.m, idiv.Get_Array_Pointer() );
     PHYSBAM_ASSERT(!ret_f);
-    int ret_i = LAPACKE_dsytri( LAPACK_ROW_MAJOR, 'U', A.m, A.x.Get_Array_Pointer(), A.m, idiv.Get_Array_Pointer() );
+    int ret_i = LAPACKE_dsytri( LAPACK_COL_MAJOR, 'U', A.m, A.x.Get_Array_Pointer(), A.m, idiv.Get_Array_Pointer() );
     PHYSBAM_ASSERT(!ret_i);
     for(int r=0;r<A.m;r++)
         for(int c=0;c<r;c++)
@@ -77,7 +77,7 @@ void Inverse(MATRIX_MXN<double>& A)
 void Pseudo_Inverse(MATRIX_MXN<float>& A)
 {
     ARRAY<float> s(A.m),u(A.m*A.m),vt(A.m*A.m),superb(A.m);
-    int ret=LAPACKE_sgesvd(LAPACK_ROW_MAJOR,'S','S',A.m,A.n,A.x.Get_Array_Pointer(),A.m,
+    int ret=LAPACKE_sgesvd(LAPACK_COL_MAJOR,'S','S',A.m,A.n,A.x.Get_Array_Pointer(),A.m,
         s.Get_Array_Pointer(),u.Get_Array_Pointer(),A.m,vt.Get_Array_Pointer(),A.m,superb.Get_Array_Pointer());
     PHYSBAM_ASSERT(!ret);
     float tol=1e-8*A.m*s.Max();
@@ -87,14 +87,14 @@ void Pseudo_Inverse(MATRIX_MXN<float>& A)
        if(s(i)>tol) ss=1.0/s(i);
        cblas_sscal(A.m,ss,&vt(i*A.m),1);
     }
-    cblas_sgemm(CblasRowMajor,CblasTrans,CblasTrans,
+    cblas_sgemm(CblasColMajor,CblasTrans,CblasTrans,
         A.m,A.m,A.m,1.0,vt.Get_Array_Pointer(),A.m,u.Get_Array_Pointer(),A.m,0.0,A.x.Get_Array_Pointer(),A.m);
 }
 
 void Pseudo_Inverse(MATRIX_MXN<double>& A)
 {
     ARRAY<double> s(A.m),u(A.m*A.m),vt(A.m*A.m),superb(A.m);
-    int ret=LAPACKE_dgesvd(LAPACK_ROW_MAJOR,'S','S',A.m,A.n,A.x.Get_Array_Pointer(),A.m,
+    int ret=LAPACKE_dgesvd(LAPACK_COL_MAJOR,'S','S',A.m,A.n,A.x.Get_Array_Pointer(),A.m,
         s.Get_Array_Pointer(),u.Get_Array_Pointer(),A.m,vt.Get_Array_Pointer(),A.m,superb.Get_Array_Pointer());
     PHYSBAM_ASSERT(!ret);
     double tol=1e-16*A.m*s.Max();
@@ -104,7 +104,7 @@ void Pseudo_Inverse(MATRIX_MXN<double>& A)
        if(s(i)>tol) ss=1.0/s(i);
        cblas_dscal(A.m,ss,&vt(i*A.m),1);
     }
-    cblas_dgemm(CblasRowMajor,CblasTrans,CblasTrans,
+    cblas_dgemm(CblasColMajor,CblasTrans,CblasTrans,
         A.m,A.m,A.m,1.0,vt.Get_Array_Pointer(),A.m,u.Get_Array_Pointer(),A.m,0.0,A.x.Get_Array_Pointer(),A.m);
 }
 
@@ -116,10 +116,10 @@ void Times_MM(MATRIX_MXN<float>& A,float sa,const MATRIX_MXN<float>& B,bool bt,c
     int n=ct?C.m:C.n;
     if(A.m!=m || A.n!=n) A.Resize(m,n);
     
-    cblas_sgemm( CblasRowMajor, bt?CblasTrans:CblasNoTrans, ct?CblasTrans:CblasNoTrans,
+    cblas_sgemm( CblasColMajor, bt?CblasTrans:CblasNoTrans, ct?CblasTrans:CblasNoTrans,
         m,n,k,sbc,B.x.Get_Array_Pointer(),
-        B.n, C.x.Get_Array_Pointer(), C.n,
-        sa, A.x.Get_Array_Pointer(), A.n);
+        B.m, C.x.Get_Array_Pointer(), C.m,
+        sa, A.x.Get_Array_Pointer(), A.m);
 }
 
 void Times_MM(MATRIX_MXN<double>& A,double sa,const MATRIX_MXN<double>& B,bool bt,const MATRIX_MXN<double>& C,bool ct,double sbc)
@@ -129,24 +129,24 @@ void Times_MM(MATRIX_MXN<double>& A,double sa,const MATRIX_MXN<double>& B,bool b
     int n=ct?C.m:C.n;
     if(A.m!=m || A.n!=n) A.Resize(m,n);
     
-    cblas_dgemm( CblasRowMajor, bt?CblasTrans:CblasNoTrans, ct?CblasTrans:CblasNoTrans,
+    cblas_dgemm( CblasColMajor, bt?CblasTrans:CblasNoTrans, ct?CblasTrans:CblasNoTrans,
         m,n,k,sbc,B.x.Get_Array_Pointer(),
-        B.n, C.x.Get_Array_Pointer(), C.n,
-        sa, A.x.Get_Array_Pointer(), A.n);
+        B.m, C.x.Get_Array_Pointer(), C.m,
+        sa, A.x.Get_Array_Pointer(), A.m);
 }
 
 // v = b*v + a*M*u
 void Times_MV(ARRAY<float>& v,float a,const MATRIX_MXN<float>& M,bool t,const ARRAY<float>& u,float b)
 {
-    cblas_sgemv(CblasRowMajor,t?CblasTrans:CblasNoTrans,M.m,M.n,
-        a, M.x.Get_Array_Pointer(), M.n, u.Get_Array_Pointer(), 1, b,
+    cblas_sgemv(CblasColMajor,t?CblasTrans:CblasNoTrans,M.m,M.n,
+        a, M.x.Get_Array_Pointer(), M.m, u.Get_Array_Pointer(), 1, b,
         v.Get_Array_Pointer(), 1);
 }
 
 void Times_MV(ARRAY<double>& v,double a,const MATRIX_MXN<double>& M,bool t,const ARRAY<double>& u,double b)
 {
-    cblas_dgemv(CblasRowMajor,t?CblasTrans:CblasNoTrans,M.m,M.n,
-        a, M.x.Get_Array_Pointer(), M.n, u.Get_Array_Pointer(), 1, b,
+    cblas_dgemv(CblasColMajor,t?CblasTrans:CblasNoTrans,M.m,M.n,
+        a, M.x.Get_Array_Pointer(), M.m, u.Get_Array_Pointer(), 1, b,
         v.Get_Array_Pointer(), 1);
 }
 

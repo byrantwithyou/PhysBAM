@@ -102,10 +102,10 @@ public:
     x.Exchange(x_new);m=m_new;n=n_new;}
 
     T& operator()(const int i,const int j)
-    {assert((unsigned)i<(unsigned)m);assert((unsigned)j<(unsigned)n);return x(i*n+j);}
+    {assert((unsigned)i<(unsigned)m);assert((unsigned)j<(unsigned)n);return x(j*m+i);}
 
     const T& operator()(const int i,const int j) const
-    {assert((unsigned)i<(unsigned)m);assert((unsigned)j<(unsigned)n);return x(i*n+j);}
+    {assert((unsigned)i<(unsigned)m);assert((unsigned)j<(unsigned)n);return x(j*m+i);}
 
     bool Valid_Index(const int i,const int j) const
     {return (unsigned)i<(unsigned)m && (unsigned)j<(unsigned)n;}
