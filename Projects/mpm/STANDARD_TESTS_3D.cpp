@@ -2175,6 +2175,44 @@ Initialize()
             Add_Fixed_Corotated(E*unit_p*scale_E,nu);
             Add_Clamped_Plasticity(*new COROTATED_FIXED<T,TV::m>(E,nu),theta_c,theta_s,max_hardening,hardening_factor,NULL); 
         } break;
+        case 73:{
+            Set_Grid(RANGE<TV>(TV(-1,0,-1),TV(2,2,2))*m,TV_INT(3,2,3),TV_INT()+1);
+            RANGE<TV> ym(TV(0.2,0.0,0.2)*m,TV(0.8,0.2,0.8)*m);
+            RANGE<TV> xm(TV(0.2,0.2,0.2)*m,TV(0.3,0.5,0.8)*m);
+            RANGE<TV> xM(TV(0.7,0.2,0.2)*m,TV(0.8,0.5,0.8)*m);
+            RANGE<TV> zm(TV(0.3,0.2,0.2)*m,TV(0.7,0.5,0.3)*m);
+            RANGE<TV> zM(TV(0.3,0.2,0.7)*m,TV(0.7,0.5,0.8)*m);
+            Add_Penalty_Collision_Object(ym);
+            Add_Penalty_Collision_Object(xm);
+            Add_Penalty_Collision_Object(xM);
+            Add_Penalty_Collision_Object(zm);
+            Add_Penalty_Collision_Object(zM);
+            Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,true);
+            T density=2*unit_rho*scale_mass;
+            T half_edge=.05;
+            ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<TV> > ob(ORIENTED_BOX<TV>(RANGE<TV>::Centered_Box()*half_edge*m,ROTATION<TV>()));
+            Seed_Particles(ob,0,0,density,particles_per_cell);
+            int m_per_box=particles.number;
+            for(int i=0;i<particles.number;i++) particles.valid(i)=false;
+            begin_frame=[this,m_per_box,half_edge](int frame)
+                {
+                    int grid_i=3,grid_j=3;
+                    if(frame%3==0 && frame<200){
+                        for(int i=0;i<grid_i;++i){
+                            for(int j=0;j<grid_j;++j){
+                                auto min_grid=[half_edge](int index, int grid){return (T)index/grid+sqrt(2)*half_edge;};
+                                auto max_grid=[half_edge](int index, int grid){return (T)(index+1)/grid-sqrt(2)*half_edge;};
+                                int old_m=particles.number;
+                                TV center=random.Get_Uniform_Vector(TV(min_grid(i,grid_i),min_grid(j,grid_j),0.6),TV(max_grid(i,grid_i),max_grid(j,grid_j),0.8))*m;
+                                T angle=random.Get_Uniform_Number((T)0,(T)pi*2);
+                                ROTATION<TV> rotation(angle,TV(0,1,0));
+                                for(int k=0;k<m_per_box;k++) Add_Particle(center+rotation.Rotate(particles.X(k)),0,0,particles.mass(k),particles.volume(k));
+                                ARRAY<int> mpm_particles;
+                                for(int k=old_m;k<old_m+m_per_box;k++) mpm_particles.Append(k);
+                                Add_Fixed_Corotated(1e2*unit_p*scale_E,0.3,&mpm_particles);}}}
+                };
+            Add_Gravity(m/(s*s)*TV(0,-9.8,0));
+            } break;
         case 950:{ // kdtree wet sand ball (filled with weak)
             // ./mpm 950 -3d -resolution 50 -threads 10 -max_dt 1e-4 -framerate 120 -last_frame 120 -fooT1 0.000001 -fooT2 1000 -fooT4 0.2 -symplectic_euler -no_implicit_plasticity -o bbb
             particles.Store_Fp(true);
