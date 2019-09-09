@@ -629,6 +629,7 @@ inline T Compute_Maximum_Tensor_Contraction(const SYMMETRIC_MATRIX<T,2>& H, cons
     q.Compute_Roots();
 
     T x = max(H.x00,H.x11,A0.x,A1.x);
+    return x;
     auto do_v02=[=,&x](T v02)
     {
         T v12=1-v02;
