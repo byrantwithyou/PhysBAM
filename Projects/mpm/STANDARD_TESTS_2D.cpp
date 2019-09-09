@@ -1526,28 +1526,33 @@ Initialize()
                 };
         } break;
         case 72:{
-            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            Set_Grid(RANGE<TV>(TV(),TV(1,2))*m,TV_INT(1,2));
             T density=2*unit_rho*scale_mass;
-            T half_edge=.05;
-            ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<TV> > ob(ORIENTED_BOX<TV>(RANGE<TV>::Centered_Box()*half_edge*m,ROTATION<TV>()));
-            Seed_Particles(ob,0,0,density,particles_per_cell);
-            int m_per_box=particles.number;
-            for(int i=0;i<particles.number;i++) particles.valid(i)=false;
-            begin_frame=[this,m_per_box,half_edge](int frame)
+            T gravity=9.8*m/(s*s);
+            T half_edge=.05*m;
+            int seed_freq=4;
+            int ob_per_frame=2;
+            RANGE<TV> seed_box=grid.domain.Thickened(-.1*m);
+            seed_box.min_corner.y=seed_box.max_corner.y-sqr(seed_freq*frame_dt)/2*gravity;
+            seed_box=seed_box.Thickened(-sqrt((T)TV::m)*half_edge*m);
+            seed_box.max_corner.x=seed_box.min_corner.x+seed_box.Edge_Lengths().x/ob_per_frame;
+            begin_frame=[this,ob_per_frame,seed_freq,half_edge,density,seed_box](int frame)
                 {
-                    int ob_per_frame=2;
-                    if(frame%3==0 && frame<200){
-                        for(int i=0;i<ob_per_frame;++i){
-                            int old_m=particles.number;
-                            TV center=random.Get_Uniform_Vector(TV((T)i/ob_per_frame+sqrt(2)*half_edge,0.6),TV((T)(i+1)/ob_per_frame-sqrt(2)*half_edge,0.8))*m;
-                            T angle=random.Get_Uniform_Number((T)0,(T)pi*2);
-                            ROTATION<TV> rotation(ROTATION<TV>::From_Angle(angle));
-                            for(int k=0;k<m_per_box;k++) Add_Particle(center+rotation.Rotate(particles.X(k)),0,0,particles.mass(k),particles.volume(k));
-                            ARRAY<int> mpm_particles;
-                            for(int k=old_m;k<old_m+m_per_box;k++) mpm_particles.Append(k);
-                            Add_Fixed_Corotated(1e2*unit_p*scale_E,0.3,&mpm_particles);}}
+                    int num_part=particles.X.m;
+                    if(frame%seed_freq==0 && frame<200){
+                        for(int i=0;i<ob_per_frame;i++){
+                            RANGE<TV> obj=RANGE<TV>::Centered_Box()*half_edge*m;
+                            ROTATION<TV> rot=random.template Get_Rotation<TV>();
+                            ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<TV> > ob(ORIENTED_BOX<TV>(obj,rot));
+                            TV center;
+                            random.Fill_Uniform(center,seed_box);
+                            center.x+=i*seed_box.Edge_Lengths().x;
+                            ob.analytic.corner+=center;
+                            Seed_Particles(ob,0,0,density,particles_per_cell);}}
+                    ARRAY<int> new_particles(IDENTITY_ARRAY<>(particles.X.m-num_part)+num_part);
+                    Add_Fixed_Corotated(1e2*unit_p*scale_E,0.3,&new_particles);
                 };
-            Add_Gravity(m/(s*s)*TV(0,-9.8));
+            Add_Gravity(TV(0,-gravity));
             Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,false);
         } break;    
 
