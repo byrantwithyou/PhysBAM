@@ -450,6 +450,13 @@ std::tuple<VERT_ID,CID,VERT_ID,CID> Coil(LAYOUT_BUILDER_FEM<T>& builder,CS_ID cs
 {
     typedef VECTOR<T,2> TV;
     T dy=h/6,dx=l/6;
+    LOG::printf("X=%P\n",O(0));
+    LOG::printf("X=%P\n",O(0)+3*dx);
+    LOG::printf("X=%P\n",O(0)+6*dx);
+
+    LOG::printf("Y=%P\n",O(1)+3*dy);
+    LOG::printf("Y=%P\n",O(1));
+    LOG::printf("Y=%P\n",O(1)-3*dy);
     VERT_ID w[12]=
     {
         builder.Vertex(O+TV(0,2*dy)),
@@ -493,61 +500,88 @@ void Generate_Simple(T scale,T mu,T s,T m,T kg,const char* filename)
     builder.Set_Depth(w,1);
     auto cs=builder.Cross_Section(2,w);
     auto cs1=builder.Cross_Section(6,w*7);
+    LOG::printf("Y=%P\n",3.5*w);;
+    LOG::printf("Y=%P\n",-3.5*w);;
 
     using VERT_ID=LAYOUT_BUILDER_FEM<T>::VERT_ID;
     using CID=LAYOUT_BUILDER_FEM<T>::CONNECTOR_ID;
 
+    LOG::printf("BEGIN simple\n");
     T x=0;
+    LOG::printf("X=%P\n",x*scale);
+    LOG::printf("Y=%P\n",2*scale);
+    LOG::printf("Y=%P\n",-2*scale);
     VERT_ID v0=builder.Vertex(TV(x,2)*scale);
     VERT_ID v2=builder.Vertex(TV(x,-2)*scale);
     x+=2;
+    LOG::printf("X=%P\n",x*scale);
     VERT_ID v1=builder.Vertex(TV(x,2)*scale);
     VERT_ID v3=builder.Vertex(TV(x,-2)*scale);
     x+=2;
+    LOG::printf("X=%P\n",x*scale);
+    LOG::printf("Y=%P\n",0);
     VERT_ID v4=builder.Vertex(TV(x,0)*scale);
     auto src0=builder.Set_BC(cs,v0,v1,flowrate);
     auto src2=builder.Set_BC(cs,v2,v3,flowrate);
     auto j1=builder.Joint(cs,2,v1,{v0,v4});
     auto j3=builder.Joint(cs,2,v3,{v2,v4});
     x+=3;
+    LOG::printf("X=%P\n",x*scale);
     VERT_ID v5=builder.Vertex(TV(x,0)*scale);
     auto c0=Coil<VERT_ID,CID>(builder,cs,TV(x,0)*scale,4.5*scale,4.5*scale);
     x+=4.5;
+    LOG::printf("X=%P\n",x*scale);
     auto j4=builder.Joint(cs,3,v4,{v1,v3,v5});
     auto j5=builder.Joint(cs,2,v5,{v4,std::get<0>(c0)});
     auto c1=Coil<VERT_ID,CID>(builder,cs,TV(x,0)*scale,4.5*scale,4.5*scale);
     x+=4.5;
+    LOG::printf("X=%P\n",x*scale);
     VERT_ID v6=builder.Vertex(TV(x,0)*scale);
     x+=6;
+    LOG::printf("X=%P\n",(x-6+2)*scale);
+    LOG::printf("X=%P\n",(x-6+5)*scale);
     VERT_ID v7=builder.Vertex(TV(x,0)*scale);
     auto j6=builder.Joint(cs,2,v6,{std::get<2>(c1),v7});
     auto p67=builder.Pipe(cs,cs1,v6,v7,2*scale,3*scale);
     x+=6;
+    LOG::printf("X=%P\n",(x-6+2)*scale);
+    LOG::printf("X=%P\n",(x-6+5)*scale);
     VERT_ID v8=builder.Vertex(TV(x,0)*scale);
     auto p78=builder.Pipe(cs1,cs,v7,v8,2*scale,3*scale);
     x+=1;
+    LOG::printf("X=%P\n",x*scale);
+    LOG::printf("Y=%P\n",-6*scale);
+    LOG::printf("Y=%P\n",-8*scale);
     VERT_ID v9=builder.Vertex(TV(x,0)*scale);
     VERT_ID v10=builder.Vertex(TV(x,-6)*scale);
     VERT_ID v10a=builder.Vertex(TV(x,-8)*scale);
     auto src10a=builder.Set_BC(cs,v10a,v10,flowrate);
     x+=1;
+    LOG::printf("X=%P\n",x*scale);
     T y=-3;
+    LOG::printf("Y=%P\n",y*scale);
     VERT_ID v11=builder.Vertex(TV(x,y)*scale);
     auto j9=builder.Joint(cs,2,v9,{v8,v11});
     auto j10=builder.Joint(cs,2,v10,{v10a,v11});
     x+=3;
+    LOG::printf("X=%P\n",x*scale);
     VERT_ID v12=builder.Vertex(TV(x,y)*scale);
     auto j11=builder.Joint(cs,3,v11,{v9,v10,v12});
     auto c2=Coil<VERT_ID,CID>(builder,cs,TV(x,y)*scale,4.5*scale,4.5*scale);
     auto j12=builder.Joint(cs,2,v12,{v11,std::get<0>(c2)});
     x+=4.5;
+    LOG::printf("X=%P\n",x*scale);
     auto c3=Coil<VERT_ID,CID>(builder,cs,TV(x,y)*scale,4.5*scale,4.5*scale);
     x+=4.5;
+    LOG::printf("X=%P\n",x*scale);
     VERT_ID v13=builder.Vertex(TV(x,y)*scale);
     x+=2;
+    LOG::printf("X=%P\n",x*scale);
     VERT_ID v14=builder.Vertex(TV(x,y)*scale);
     auto j13=builder.Joint(cs,2,v13,{std::get<2>(c3),v14});
     auto sink=builder.Set_BC(cs,v14,v13,TV());
+
+    LOG::printf("END simple\n");
 
     builder.Pipe(cs,src0.x,j1(0));
     builder.Pipe(cs,src2.x,j3(0));
