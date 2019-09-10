@@ -1,0 +1,34 @@
+\documentclass[class=minimal,border=0pt]{standalone}
+\usepackage{pgfplots}
+
+\begin{document}
+\pgfplotsset{width=10cm,height=8cm,compat=1.13}
+\begin{tikzpicture}
+\begin{loglogaxis}[
+    log basis x=2,
+    log basis y=10,
+    enlargelimits=false,
+    legend cell align=left,
+    xlabel={Resolution},
+    ylabel={Solving time (second)},
+    %xticklabels={,,},
+    legend entries={LLLL0,LLLL1,LLLL2},
+    legend pos=north west,
+%    ymin=0,
+%    ymax=40,
+%    xmax=16,
+    legend style={nodes={scale=1.2, transform shape},fill=none,draw=none},
+    xtick={4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36},
+    xticklabel=\pgfmathparse{2^\tick}\pgfmathprintnumber{\pgfmathresult},
+%    title={Convergence plot}
+]
+\addplot[mark=x,color=red] table[x=res,y=solving]{XXXX0.txt};
+\addplot[mark=x,color=green] table[x=res,y=solving]{XXXX1.txt};
+\addplot[mark=x,color=blue] table[x=res,y=solving]{XXXX2.txt};
+\addplot[mark=none,dotted,thick,color=red,domain=DDDD] {CCCC0*pow(x,EEEE0)} node[text=black,pos=0.5,above] {OOOO0};
+\addplot[mark=none,dotted,thick,color=green,domain=DDDD] {CCCC1*pow(x,EEEE1)} node[text=black,pos=0.5,above] {OOOO1};
+\addplot[mark=none,dotted,thick,color=blue,domain=DDDD] {CCCC2*pow(x,EEEE2)} node[text=black,pos=0.5,above] {OOOO2};
+\end{loglogaxis}
+\node[anchor=east] at (8cm,0.5cm) {TTTT};
+\end{tikzpicture}
+\end{document}
