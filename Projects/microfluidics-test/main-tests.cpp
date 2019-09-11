@@ -11,6 +11,7 @@
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
+#include <Geometry/Images/EPS_FILE.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Geometry/Seeding/POISSON_DISK.h>
 #include <string>
@@ -364,7 +365,7 @@ void Generate_Random_Ortho_Grid(T scale,const VECTOR<VECTOR<T,2>,2>* edges,int n
         const auto& v1=crs.Get(e(1));
         builder.Pipe(cs,v0.c(a).y,v1.c(b).y);
     }
-    FILE* file=fopen(filename,"w");
+    FILE* file=fopen(LOG::sprintf("%s.txt",filename).c_str(),"w");
     fprintf(file,"%s\n",builder.To_String().c_str());
 }
 
@@ -441,7 +442,7 @@ void Generate_Grid(T scale,T mu,T s,T m,T kg,int n,const char* filename)
     builder.Pipe(cs,bc_src.x,verts(n-1).y(2));
     builder.Pipe(cs,verts((n-1)*n).y(0),bc_sink.x);
 
-    FILE* file=fopen(filename,"w");
+    FILE* file=fopen(LOG::sprintf("%s.txt",filename).c_str(),"w");
     fprintf(file,"%s\n",builder.To_String().c_str());
 }
 
@@ -603,7 +604,7 @@ void Generate_Simple(T scale,T mu,T s,T m,T kg,const char* filename)
     builder.Pipe(cs,std::get<3>(c3),j13(0));
     builder.Pipe(cs,j13(1),sink.x);
 
-    FILE* file=fopen(filename,"w");
+    FILE* file=fopen(LOG::sprintf("%s.txt",filename).c_str(),"w");
     fprintf(file,"%s\n",builder.To_String().c_str());
 }
 
@@ -724,7 +725,7 @@ void Generate_Voronoi_Pipes(T scale,RANDOM_NUMBERS<T>& rng,T mu,T s,T m,T kg,int
 
     SPHERE<TV> sphere(TV(),radius);
     GRID<TV> grid(TV_INT()+1,RANGE<TV>(TV()-radius,TV()+radius),true);
-    VIEWER_OUTPUT<TV> vo(STREAM_TYPE(0.f),grid,"voronoi");
+    VIEWER_OUTPUT<TV> vo(STREAM_TYPE(0.f),grid,LOG::sprintf("out-%s",filename));
     Flush_Frame<TV>("init");
 
     ARRAY<TV> X;
@@ -748,8 +749,11 @@ void Generate_Voronoi_Pipes(T scale,RANDOM_NUMBERS<T>& rng,T mu,T s,T m,T kg,int
     typedef boost::polygon::voronoi_vertex<T> VORONOI_VERTEX;
     voronoi_diagram<T> vd;
     construct_voronoi(X.begin(),X.end(),&vd);
-    for(const auto& x:X)
-        Add_Debug_Particle(x,VECTOR<T,3>(0.5,0.5,0.5));
+    for(int j=0;j<X.m;j++)
+    {
+        Add_Debug_Particle(X(j),VECTOR<T,3>(0.5,0.5,0.5));
+        Add_Debug_Text(X(j),LOG::sprintf("%d",j),VECTOR<T,3>(1,1,1));
+    }
 
     HASHTABLE<const VORONOI_VERTEX*,VERT_ID> mapping;
     HASHTABLE<VERT_ID> velocity_bc;
@@ -830,6 +834,47 @@ void Generate_Voronoi_Pipes(T scale,RANDOM_NUMBERS<T>& rng,T mu,T s,T m,T kg,int
     LOG::printf("min length: %P\n",min_l);
     Flush_Frame<TV>("voronoi");
 
+
+    {
+        EPS_FILE<T> eps(LOG::sprintf("%s.eps",filename));
+        eps.cur_format.line_width=1.0/radius;
+        eps.cur_format.point_radius=2.0/radius;
+        eps.cur_format.fill_style=1;
+        for(int i=0;i<edges.m;i++)
+        {
+            eps.cur_format.line_style=1;
+            const auto& e=edges(i);
+            eps.Draw_Object(e(0),e(1));
+
+            TV v0=e(0),v1=e(1);
+            T r0=e(0).Magnitude(),r1=e(1).Magnitude();
+            if(r0>r1)
+            {
+                std::swap(v0,v1);
+                std::swap(r0,r1);
+            }
+            if(r1>0.95*radius){
+                // BC
+                TV dir=(v1-v0).Normalized();
+                eps.cur_format.line_style=0;
+                if(v1(0)<=0)
+                    eps.cur_format.fill_color=VECTOR<T,3>(0,0,1);
+                else
+                    eps.cur_format.fill_color=VECTOR<T,3>(1,0,0);
+                eps.Draw_Object(v1+dir*0.05*radius);
+            }
+        }
+
+        eps.cur_format.point_radius=1.0/radius;
+        eps.cur_format.fill_color=VECTOR<T,3>(0.5,0.5,0.5);
+        for(int j=0;j<X.m;j++)
+        {
+            eps.Draw_Object(X(j));
+            LOG::printf("V%d=(%P,%P)\n",j,X(j)(0)*scale,X(j)(1)*scale);
+        }
+    }
+
+
     ARRAY<ARRAY<CID,VERT_ID>,VERT_ID> links(builder.verts.m);
     for(auto& l:links)
         l.Resize(builder.verts.m,use_init,CID(-7));
@@ -865,7 +910,7 @@ void Generate_Voronoi_Pipes(T scale,RANDOM_NUMBERS<T>& rng,T mu,T s,T m,T kg,int
     for(const auto& ei:edge_ids)
         builder.Pipe(cs,links(ei(0))(ei(1)),links(ei(1))(ei(0)));
 
-    FILE* file=fopen(filename,"w");
+    FILE* file=fopen(LOG::sprintf("%s.txt",filename).c_str(),"w");
     fprintf(file,"%s\n",builder.To_String().c_str());
 }
 
@@ -900,19 +945,19 @@ void Run(PARSE_ARGS& parse_args)
     RANDOM_NUMBERS<T> rng(seed);
     if(gen_tests)
     {
-        Generate_Simple(1.0/40,mu,s,m,kg,"simple.txt");
-        Generate_Random_Ortho_Grid(1/0.2,grid0,sizeof(grid0)/sizeof(grid0[0]),mu,s,m,kg,"rgrid0.txt");
-        Generate_Random_Ortho_Grid(1/0.2,grid1,sizeof(grid1)/sizeof(grid1[0]),mu,s,m,kg,"rgrid1.txt");
-        Generate_Grid(1.0/80,mu,s,m,kg,20,"grid20.txt");
+        Generate_Simple(1.0/40,mu,s,m,kg,"simple");
+        Generate_Random_Ortho_Grid(1/0.2,grid0,sizeof(grid0)/sizeof(grid0[0]),mu,s,m,kg,"rgrid0");
+        Generate_Random_Ortho_Grid(1/0.2,grid1,sizeof(grid1)/sizeof(grid1[0]),mu,s,m,kg,"rgrid1");
+        Generate_Grid(1.0/80,mu,s,m,kg,20,"grid20");
         for(int i=3;i<=10;i++)
-            Generate_Grid(1,mu,s,m,kg,i,LOG::sprintf("grid%d.txt",i).c_str());
+            Generate_Grid(1,mu,s,m,kg,i,LOG::sprintf("grid%d",i).c_str());
         {
             RANDOM_NUMBERS<T> rng(4);
-            Generate_Voronoi_Pipes(1.0/20,rng,mu,s,m,kg,15,10.0,"voronoi-s4.txt");
+            Generate_Voronoi_Pipes(1.0/20,rng,mu,s,m,kg,15,10.0,"voronoi-s4");
         }
         {
             RANDOM_NUMBERS<T> rng(15);
-            Generate_Voronoi_Pipes(1.0/20,rng,mu,s,m,kg,15,10.0,"voronoi-s15.txt");
+            Generate_Voronoi_Pipes(1.0/20,rng,mu,s,m,kg,15,10.0,"voronoi-s15");
         }
         return;
     }
