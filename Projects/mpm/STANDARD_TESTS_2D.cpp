@@ -384,6 +384,37 @@ Initialize()
                     Debug_Particle_Set_Attribute<TV>("V",frame.r.Rotate(TV(v,0)));
                 });
         } break;
+        case 20:{
+            Set_Grid(RANGE<TV>(TV(0,0),TV(4,6))*m,TV_INT(2,3));
+            int jet_freq=3;
+            T init_vel=7*m;
+            auto func=[this,jet_freq,init_vel](int frame)
+                {
+                    if (frame%jet_freq==0){
+                        int old_m=particles.X.m;
+                        T density=2*unit_rho*scale_mass;
+                        RANGE<TV> box1(TV(.1,3.75)*m,TV(.3,3.77)*m), box2(TV(.1,3.5)*m,TV(.3,3.57));
+                        Seed_Particles(box1,[=](const TV& X){return TV(init_vel,0);},0,density,particles_per_cell);
+                        Seed_Particles(box2,[=](const TV& X){return TV(init_vel,0);},0,density,particles_per_cell);
+                        box1+=RANGE<TV>(TV(3.6,0),TV(3.6,0))*m;
+                        box2+=RANGE<TV>(TV(3.6,0),TV(3.6,0))*m;
+                        Seed_Particles(box1,[=](const TV& X){return TV(-init_vel,0);},0,density,particles_per_cell);
+                        Seed_Particles(box2,[=](const TV& X){return TV(-init_vel,0);},0,density,particles_per_cell);
+                        ARRAY<int> new_particles(IDENTITY_ARRAY<>(particles.X.m-old_m)+old_m);
+                        Set_Lame_On_Particles(1e3*unit_p*scale_E,.3,&new_particles);
+                        particles.mu*=0;
+                        particles.mu0*=0;
+                    }
+                };
+            this->begin_frame.Append(func);
+            Add_Collision_Object(RANGE<TV>(TV(0.,3.74),TV(.7,3.75))*m,COLLISION_TYPE::slip,0.);
+            Add_Collision_Object(RANGE<TV>(TV(1.3,3.49),TV(2.,3.5))*m,COLLISION_TYPE::slip,0.);
+            Add_Collision_Object(RANGE<TV>(TV(1.3,3.74),TV(2.,3.75))*m,COLLISION_TYPE::slip,0.);
+            Add_Collision_Object(RANGE<TV>(TV(0.,3.49),TV(.7,3.5))*m,COLLISION_TYPE::slip,0.);
+            Add_Gravity(m/(s*s)*TV(0,-1.8));
+            Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
+            Add_Walls(-1,COLLISION_TYPE::slip,.3,.1*m,false);
+        } break;
         case 21:{ // circle with random initial velocities
             Set_Grid(RANGE<TV>(TV(-3,-3),TV(4,4))*m);
             SPHERE<TV> sphere(TV(.5,.5)*m,.3*m);
@@ -1591,9 +1622,10 @@ Initialize()
                             ob.analytic.corner+=center;
                             Seed_Particles(ob,0,0,density,particles_per_cell);}}
                     ARRAY<int> new_particles(IDENTITY_ARRAY<>(particles.X.m-num_part)+num_part);
-                    Add_Fixed_Corotated(1e2*unit_p*scale_E,0.3,&new_particles);
+                    Set_Lame_On_Particles(1e2*unit_p*scale_E,0.3,&new_particles);
                 };
             this->begin_frame.Append(func);
+            Add_Fixed_Corotated(1e2*unit_p*scale_E,0.3);
             Add_Gravity(TV(0,-gravity));
             Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,false);
         } break;    

@@ -29,6 +29,7 @@ public:
     ARRAY_VIEW<bool> valid;
     ARRAY_VIEW<T> mu,lambda,mu0,lambda0;
     ARRAY_VIEW<T> vort;
+    ARRAY_VIEW<int> myc;
 
     MPM_PARTICLES();
     virtual ~MPM_PARTICLES();

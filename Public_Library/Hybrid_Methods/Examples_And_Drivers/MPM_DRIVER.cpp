@@ -169,7 +169,7 @@ Simulate_To_Frame(const int frame)
             LOG::cout<<"substep dt: "<<example.dt<<std::endl;
 
             Step([=](){Advance_One_Time_Step();},"time-step");
-            LOG::cout<<"actuarial dt: "<<example.dt<<std::endl;
+            LOG::cout<<"actual dt: "<<example.dt<<std::endl;
 
 
             // Time step was reduced
@@ -502,6 +502,9 @@ Limit_Dt_Sound_Speed()
     if(!example.use_sound_speed_cfl) return;
     T dt=example.dt;
     T max_speed=Compute_Max_Sound_Speed();
+    LOG::printf("max sound speed: %.16P\n",max_speed);
+    LOG::printf("dx: %.16P\n",example.grid.dX.Min());
+    LOG::printf("dx/soundspeed: %.16P\n",Robust_Divide(example.grid.dX.Min(),max_speed));
     dt=std::min(dt,Robust_Divide(example.grid.dX.Min(),max_speed)*example.cfl_sound);
 
     if(dt<example.min_dt) dt=example.min_dt;
@@ -699,11 +702,9 @@ Compute_Max_Sound_Speed() const -> T
                 T speed=ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>::Sound_Speed(
                     force->sigma(p),force->dPi_dF(p),density);
                 max_speed=max(max_speed,speed);}}}
-
     for(auto* pf:example.lagrangian_forces)
         if(FINITE_VOLUME<TV,TV::m>* fv=dynamic_cast<FINITE_VOLUME<TV,TV::m>*>(pf))
             max_speed=max(max_speed,fv->Compute_Sound_Speed());
-
     return max_speed;
 }
 //#####################################################################
@@ -715,9 +716,6 @@ Print_Max_Sound_Speed()
     static bool first=example.test_sound_speed;
     if(first){first=false;Test_Sound_Speed(100);}
     T max_sound_speed=Compute_Max_Sound_Speed();
-    LOG::printf("max sound speed: %.16P\n",max_sound_speed);
-    LOG::printf("dx: %.16P\n",example.grid.dX.Min());
-    LOG::printf("dx/soundspeed: %.16P\n",Robust_Divide(example.grid.dX.Min(),max_sound_speed));
 }
 //#####################################################################
 // Function Update_Plasticity_And_Hardening

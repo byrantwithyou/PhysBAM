@@ -75,6 +75,7 @@ public:
     T sigma_Y;
     bool use_cohesion;
     std::function<void ()> destroy;
+    std::string sph_rel="2k";
     ARRAY<T> extra_T;
     ARRAY<int> extra_int;
     bool dump_collision_objects;

@@ -20,7 +20,7 @@ void writePartio(const std::string& output_filename,const MPM_PARTICLES<VECTOR<T
 {
     Partio::ParticlesDataMutable* parts=Partio::create();
 
-    Partio::ParticleAttribute posH,vH,FxH,FyH,FzH,mH,volH,validH;
+    Partio::ParticleAttribute posH,vH,FxH,FyH,FzH,mH,volH,validH,colorH;
     posH=parts->addAttribute("position",Partio::VECTOR,3);
     vH=parts->addAttribute("v",Partio::VECTOR,3);
     FxH=parts->addAttribute("Fx",Partio::VECTOR,3);
@@ -28,6 +28,7 @@ void writePartio(const std::string& output_filename,const MPM_PARTICLES<VECTOR<T
     FzH=parts->addAttribute("Fz",Partio::VECTOR,3);
     volH=parts->addAttribute("vol",Partio::VECTOR,1);
     mH=parts->addAttribute("m",Partio::VECTOR,1);
+    colorH=parts->addAttribute("myc",Partio::INT,1);
     if(dump_valid) validH=parts->addAttribute("valid",Partio::INT,1);
 
     for(int i=0;i<particles.number;++i){
@@ -56,7 +57,7 @@ void writePartio(const std::string& output_filename,const MPM_PARTICLES<VECTOR<T
 
         vol[0]=particles.volume(i);
         m[0]=particles.mass(i);
-
+        *parts->dataWrite<int>(colorH,idx)=particles.myc(i);
         if(dump_valid) *parts->dataWrite<int>(validH,idx)=particles.valid(i);}
 
     Partio::write(output_filename.c_str(),*parts);
