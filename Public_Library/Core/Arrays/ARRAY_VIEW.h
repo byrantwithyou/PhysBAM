@@ -20,18 +20,18 @@ class ARRAY_VIEW:public ARRAY_BASE<typename remove_const<T>::type,ARRAY_VIEW<T,I
 {
     struct UNUSABLE{};
     template<class S> struct COPY_CONST{typedef typename conditional<is_const<T>::value,typename add_const<S>::type,S>::type TYPE;};
-    typedef ARRAY_BASE<typename remove_const<T>::type,ARRAY_VIEW<T,ID>,ID> BASE;
 public:
     typedef int HAS_UNTYPED_READ_WRITE;
     typedef typename remove_const<T>::type ELEMENT;typedef ID INDEX;
+    typedef ARRAY_BASE<ELEMENT,ARRAY_VIEW<T,ID>,ID> BASE;
+    typedef typename conditional<is_const<T>::value,ELEMENT,UNUSABLE>::type U;
     typedef T& RESULT_TYPE;
     typedef T* iterator; // for stl
     typedef const T* const_iterator; // for stl
 
     // m and base_pointer inherit constness of T
-    typename COPY_CONST<ID>::TYPE m;
-    friend class ARRAY_VIEW<typename conditional<is_const<T>::value,ELEMENT,const ELEMENT>::type,ID>;
-    typename COPY_CONST<T*>::TYPE base_pointer;
+    ID m;
+    T* base_pointer;
 
     using BASE::Same_Array;
 
@@ -46,9 +46,9 @@ public:
     ARRAY_VIEW(const ARRAY_VIEW<T,ID>&) = default;
     ARRAY_VIEW(ARRAY_VIEW<T,ID>&& a)
         :m(a.m),base_pointer(a.base_pointer)
-    {const_cast<T*&>(a.base_pointer)=0;}
+    {a.base_pointer=0;}
 
-    ARRAY_VIEW(const ARRAY_VIEW<typename conditional<is_const<T>::value,typename remove_const<T>::type,UNUSABLE>::type,ID>& array)
+    ARRAY_VIEW(const ARRAY_VIEW<U,ID>& array)
         :m(array.m),base_pointer(array.base_pointer)
     {}
 
@@ -67,13 +67,13 @@ public:
     ID Size() const
     {return m;}
 
-    T& operator()(const ID i)
+    T& operator()(ID i)
     {assert((unsigned)Value(i)<(unsigned)Value(m));return base_pointer[Value(i)];}
 
-    const T& operator()(const ID i) const
+    const T& operator()(ID i) const
     {assert((unsigned)Value(i)<(unsigned)Value(m));return base_pointer[Value(i)];}
 
-    bool Valid_Index(const ID i) const
+    bool Valid_Index(ID i) const
     {return (unsigned)Value(i)<(unsigned)Value(m);}
 
     ARRAY_VIEW& operator=(const ARRAY_VIEW& source)
@@ -84,7 +84,7 @@ public:
     const_cast<T*&>(source.base_pointer)=0;return *this;}
 
     template<class T_ARRAY1>
-    ARRAY_VIEW& operator=(const T_ARRAY1& source)
+    ARRAY_VIEW& operator=(const ARRAY_BASE<ELEMENT,T_ARRAY1,ID>& source)
     {return BASE::operator=(source);}
 
     T* Get_Array_Pointer()
@@ -105,9 +105,6 @@ public:
     const T* end() const // for stl
     {return Get_Array_Pointer()+m;}
 
-    ARRAY_VIEW<typename remove_const<T>::type>& Const_Cast() const // return reference to allow Exchange
-    {return reinterpret_cast<ARRAY_VIEW<typename remove_const<T>::type>&>(const_cast<ARRAY_VIEW&>(*this));}
-
     static bool Same_Array(const ARRAY_VIEW& array0,const ARRAY_VIEW& array1)
     {return array0.Get_Array_Pointer()==array1.Get_Array_Pointer();}
 
@@ -127,7 +124,7 @@ public:
     void Set(const ARRAY_VIEW<T,ID>& array)
     {Set(array.base_pointer,array.m);}
 
-    void Set(const ARRAY_VIEW<typename conditional<is_const<T>::value,typename remove_const<T>::type,UNUSABLE>::type,ID>& array)
+    void Set(const ARRAY_VIEW<U,ID>& array)
     {Set(array.base_pointer,array.m);}
 
     template<class T_ARRAY>

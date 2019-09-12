@@ -336,7 +336,7 @@ Test_System()
 template<class TV,int d> void INCOMPRESSIBLE_FINITE_VOLUME<TV,d>::
 Gradient(ARRAY_VIEW<const T> p,ARRAY<TV>& gradient) const
 {
-    ARRAY_VIEW<T> modifiable_p(p.Const_Cast());
+    ARRAY_VIEW<T> modifiable_p(const_cast<T*>(p.Get_Array_Pointer()),p.m);
     if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data(modifiable_p);
     gradient.Resize(particles.Size(),no_init);
     gradient.Subset(force_dynamic_particles_list).Fill(TV());
@@ -351,7 +351,8 @@ Gradient(ARRAY_VIEW<const T> p,ARRAY<TV>& gradient) const
 template<class TV,int d> void INCOMPRESSIBLE_FINITE_VOLUME<TV,d>::
 Negative_Divergence(ARRAY_VIEW<const TV> V,ARRAY<T>& divergence) const
 {
-    if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data(V.Const_Cast());
+    ARRAY_VIEW<TV> modifiable_V(const_cast<TV*>(V.Get_Array_Pointer()),V.m);
+    if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data(modifiable_V);
     divergence.Resize(particles.Size(),no_init);
     INDIRECT_ARRAY<ARRAY<T>,ARRAY<int>&> divergence_subset=divergence.Subset(force_dynamic_particles_list);
     divergence_subset.Fill(T());
