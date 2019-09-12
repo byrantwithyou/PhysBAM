@@ -52,7 +52,7 @@ public:
     {if(new_size<array->m) array->m=new_size;
     buffer_size=new_size;
     assert(array->m<=buffer_size);
-    ARRAY_VIEW<T> temp(array->m,new T[Value(new_size)]);
+    ARRAY_VIEW<T> temp(new T[Value(new_size)],array->m);
     temp=*array;
     temp.Exchange(*array);
     delete[] temp.Get_Array_Pointer();}

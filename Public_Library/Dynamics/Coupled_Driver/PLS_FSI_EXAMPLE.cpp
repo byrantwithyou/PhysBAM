@@ -292,9 +292,9 @@ Write_Output_Files(const int frame) const
             oo.Write("db_V",solid_body_collection.deformable_body_collection.particles.V.Flattened());}
         if(solid_body_collection.rigid_body_collection.rigid_body_particles.frame.m){
             RIGID_BODY_PARTICLES<TV>& particle=solid_body_collection.rigid_body_collection.rigid_body_particles;
-            ARRAY_VIEW<T> f(particle.frame.m*(sizeof(FRAME<TV>)/sizeof(T)),(T*)particle.frame.Get_Array_Pointer());
+            ARRAY_VIEW<T> f((T*)particle.frame.Get_Array_Pointer(),particle.frame.m*(sizeof(FRAME<TV>)/sizeof(T)));
             oo.Write("rb_frame",f);
-            ARRAY_VIEW<T> t(particle.twist.m*TWIST<TV>::m,(T*)particle.twist.Get_Array_Pointer());
+            ARRAY_VIEW<T> t((T*)particle.twist.Get_Array_Pointer(),particle.twist.m*TWIST<TV>::m);
             oo.Write("rb_twist",t);}
         if(fluids_parameters.incompressible)
             oo.Write("if_u",fluid_collection.incompressible_fluid_collection.face_velocities.array);

@@ -57,7 +57,7 @@ public:
 {
     if(triangulated_surface) triangulated_surface->Initialize_Hierarchy(false);
     if(segmented_curve) segmented_curve->Initialize_Hierarchy(false);
-    ARRAY_VIEW<TV> tmp_view(full_particles.X.Size(),full_particles.X.Get_Array_Pointer());
+    ARRAY_VIEW<TV> tmp_view(full_particles.X.Get_Array_Pointer(),full_particles.X.Size());
     subset.array.Exchange(tmp_view);
     particle_hierarchy.Initialize_Hierarchy_Using_KD_Tree();}
 

@@ -286,7 +286,7 @@ Process_Hits(GLint hits,GLuint buffer[],int modifiers)
     for(int i=0;i<(int)hits;i++){
         GLint names=buffer[idx];
         int object_id=buffer[idx+3];
-        ARRAY_VIEW<GLuint> name_buffer(names-1,&buffer[idx+4]);
+        ARRAY_VIEW<GLuint> name_buffer(&buffer[idx+4],names-1);
         PHYSBAM_ASSERT(0<=object_id && object_id<opengl_world.object_list.m);
         unsigned int denom=0xffffffff;
         T min_depth=(T)buffer[idx+1]/denom;
@@ -314,7 +314,7 @@ Process_Hits(GLint hits,GLuint buffer[],int modifiers)
         int object_id=buffer[current_idx+3];
         PHYSBAM_ASSERT(0<=object_id && object_id<opengl_world.object_list.m && opengl_world.object_list(object_id)->selectable);
         selected_object=opengl_world.object_list(object_id);
-        ARRAY_VIEW<GLuint> name_buffer(names-1,&buffer[current_idx+4]);
+        ARRAY_VIEW<GLuint> name_buffer(&buffer[current_idx+4],names-1);
         if(!selected_object->Set_Selection(name_buffer,modifiers))
             selected_object=0;}
 

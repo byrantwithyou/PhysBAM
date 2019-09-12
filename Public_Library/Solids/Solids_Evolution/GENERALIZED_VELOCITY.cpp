@@ -191,8 +191,8 @@ Exchange(GENERALIZED_VELOCITY<TV>& gv)
 template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>* GENERALIZED_VELOCITY<TV>::
 Clone_Default() const
 {
-    GENERALIZED_VELOCITY<TV>* gv=new GENERALIZED_VELOCITY<TV>(ARRAY_VIEW<TV>(V.array.m,new TV[V.array.m]),V.indices,
-        ARRAY_VIEW<TWIST<TV> >(rigid_V.array.m,new TWIST<TV>[rigid_V.array.m]),rigid_V.indices,kinematic_and_static_rigid_V.indices);
+    GENERALIZED_VELOCITY<TV>* gv=new GENERALIZED_VELOCITY<TV>(ARRAY_VIEW<TV>(new TV[V.array.m],V.array.m),V.indices,
+        ARRAY_VIEW<TWIST<TV> >(new TWIST<TV>[rigid_V.array.m],rigid_V.array.m),rigid_V.indices,kinematic_and_static_rigid_V.indices);
     gv->deep_copy=true;
     return gv;
 }
@@ -204,7 +204,7 @@ void Resize_Helper(AV& a,const AV& b)
 {
     if(a.Size()==b.Size()) return;
     if(a.Size()>b.Size()){a.m=b.m;return;}
-    AV t(b.m,new typename AV::ELEMENT[b.m]);
+    AV t(new typename AV::ELEMENT[b.m],b.m);
     t.Fill(typename AV::ELEMENT());
     a.Exchange(t);
     delete [] t.Get_Array_Pointer();

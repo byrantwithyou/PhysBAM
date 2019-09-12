@@ -69,7 +69,7 @@ protected:
     assert(counts_new.Min()>=0);
     int size_new=counts_new.Product();
     Calculate_Acceleration_Constants(box);
-    array.Set(size_new,new T[size_new]);
+    array.Set(new T[size_new],size_new);
     if(initialize_using_initialization_value) array.Fill(initialization_value);}
 public:
 
@@ -126,7 +126,7 @@ public:
     {Resize(RANGE<TV_INT>(TV_INT(),corner),init_all,initialization_value);}
 
     void Reallocate_In_Place(const RANGE<TV_INT>& box)
-    {TV_INT counts_new(box.Edge_Lengths());int size_new=counts_new.Product();Calculate_Acceleration_Constants(box);delete [] array.Get_Array_Pointer();array.Set(size_new,new T[size_new]);}
+    {TV_INT counts_new(box.Edge_Lengths());int size_new=counts_new.Product();Calculate_Acceleration_Constants(box);delete [] array.Get_Array_Pointer();array.Set(new T[size_new],size_new);}
 
     void Resize_In_Place(const RANGE<TV_INT>& box)
     {TV_INT counts_new(box.Edge_Lengths());

@@ -35,7 +35,7 @@ private:
     using BASE::Calculate_Acceleration_Constants;
 
     void Initialize(typename remove_const<T>::type* raw_data)
-    {ARRAY_VIEW<typename remove_const<T>::type> new_array(domain.Size(),raw_data);new_array.Exchange(array);}
+    {ARRAY_VIEW<typename remove_const<T>::type> new_array(raw_data,domain.Size());new_array.Exchange(array);}
 
 public:
 
@@ -45,7 +45,7 @@ public:
 
     ARRAY_VIEW(const ARRAY_VIEW<typename remove_const<T>::type,TV_INT>& array_input)
         :BASE(array_input.domain)
-    {array.Set(domain.Size(),(typename remove_const<T>::type*)array_input.array.Get_Array_Pointer());} // TODO: why do I need this cast?
+    {array.Set((typename remove_const<T>::type*)array_input.array.Get_Array_Pointer(),domain.Size());} // TODO: why do I need this cast?
 
     template<class T_ARRAY>
     ARRAY_VIEW(T_ARRAY& array_input,typename enable_if<is_same<ELEMENT,typename T_ARRAY::ELEMENT>::value && !IS_ARRAY_VIEW<T_ARRAY>::value,UNUSABLE>::type unusable=UNUSABLE())

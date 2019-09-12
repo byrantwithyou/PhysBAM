@@ -123,7 +123,7 @@ public:
     template<class T_PARTICLES> void
     Initialize(const ARRAY_VIEW<T_PARTICLES*>& elements_per_cell)
     {PHYSBAM_ASSERT(static_cast<void*>(static_cast<T_PARTICLES*>(0))==static_cast<PARTICLES*>(0)); // make sure the following cast is valid
-    Initialize(ARRAY_VIEW<const PARTICLES* const>(elements_per_cell.Size(),reinterpret_cast<const PARTICLES* const*>(elements_per_cell.Get_Array_Pointer())));}
+    Initialize(ARRAY_VIEW<const PARTICLES* const>(reinterpret_cast<const PARTICLES* const*>(elements_per_cell.Get_Array_Pointer()),elements_per_cell.Size()));}
 
     template<class T_PARTICLES> void
     Initialize(const ARRAY<T_PARTICLES*>& elements_per_cell)

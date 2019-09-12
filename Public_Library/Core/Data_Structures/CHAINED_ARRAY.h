@@ -48,7 +48,7 @@ public:
     static ARRAY_VIEW<U> Get_Helper(CA& ca,const ID& i)
     {
         if(DATA* d=ca.hash.Get_Pointer(i)){
-            if(d->i>=0) return ARRAY_VIEW<U>(1,&d->t);
+            if(d->i>=0) return ARRAY_VIEW<U>(&d->t,1);
             return ca.extra(~d->i);}
         return ARRAY_VIEW<U>();
     }

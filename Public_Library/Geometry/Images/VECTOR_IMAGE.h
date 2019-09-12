@@ -51,7 +51,7 @@ public:
     void Draw_Object(ARRAY_VIEW<TV> pts); // polygon
     void Draw_Object(ARRAY_VIEW<TV> outside,ARRAY_VIEW<ARRAY_VIEW<TV> > holes); // polygon with holes
     template <int d> void Draw_Object(const VECTOR<TV,d>& pts) // polygon
-    {Draw_Object(ARRAY_VIEW<TV>(d,const_cast<TV*>(&pts(0))));}
+    {Draw_Object(ARRAY_VIEW<TV>(const_cast<TV*>(&pts(0)),d));}
     void Draw_Object(const TV &pt,T radius); // circle
     void Draw_Object(const RANGE<TV>& box);
 

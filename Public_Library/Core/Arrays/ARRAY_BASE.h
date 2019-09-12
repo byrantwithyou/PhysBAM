@@ -166,18 +166,18 @@ public:
     {return (unsigned)Value(i)<Value(Size());}
 
     ARRAY_VIEW<typename ELEMENT_OF_VECTOR<T>::TYPE> Flattened() // valid only for contiguous arrays of VECTOR<T,d>
-    {T_ARRAY& self=Derived();return ARRAY_VIEW<typename T::ELEMENT>(T::m*self.Size(),self.Get_Array_Pointer()->begin());}
+    {T_ARRAY& self=Derived();return ARRAY_VIEW<typename T::ELEMENT>(self.Get_Array_Pointer()->begin(),T::m*self.Size());}
 
     ARRAY_VIEW<const typename ELEMENT_OF_VECTOR<T>::TYPE> Flattened() const // valid only for contiguous arrays of VECTOR<T,d>
-    {const T_ARRAY& self=Derived();return ARRAY_VIEW<const typename T::ELEMENT>(T::m*self.Size(),self.Get_Array_Pointer()->begin());}
+    {const T_ARRAY& self=Derived();return ARRAY_VIEW<const typename T::ELEMENT>(self.Get_Array_Pointer()->begin(),T::m*self.Size());}
 
     template<class ID1>
     ARRAY_VIEW<const T,ID1> Array_View(const ID first,const ID1 length) const
-    {const T_ARRAY& self=Derived();assert((unsigned)(Value(first)+Value(length))<=(unsigned)Value(self.Size()) && Value(length)>=0);return ARRAY_VIEW<const T,ID1>(length,self.Get_Array_Pointer()+Value(first));}
+    {const T_ARRAY& self=Derived();assert((unsigned)(Value(first)+Value(length))<=(unsigned)Value(self.Size()) && Value(length)>=0);return ARRAY_VIEW<const T,ID1>(self.Get_Array_Pointer()+Value(first),length);}
 
     template<class ID1>
     ARRAY_VIEW<T,ID1> Array_View(const ID first,const ID1 length)
-    {T_ARRAY& self=Derived();assert((unsigned)(Value(first)+Value(length))<=(unsigned)Value(self.Size()) && Value(length)>=0);return ARRAY_VIEW<T,ID1>(length,(T*)self.Get_Array_Pointer()+Value(first));}
+    {T_ARRAY& self=Derived();assert((unsigned)(Value(first)+Value(length))<=(unsigned)Value(self.Size()) && Value(length)>=0);return ARRAY_VIEW<T,ID1>((T*)self.Get_Array_Pointer()+Value(first),length);}
 
     ARRAY_VIEW<const T,ID> Array_View(INTERVAL<ID> I) const
     {return Array_View(I.min_corner,I.max_corner-I.min_corner);}

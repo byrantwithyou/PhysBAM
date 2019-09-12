@@ -98,7 +98,7 @@ public:
         T_ARRAY_VIEW::Exchange(array_new,data(i));
         p_start+=sizes_new(i);}
     delete[] array.base_pointer;
-    array.Set(new_length,p);}
+    array.Set(p,new_length);}
 
     void Clean_Memory()
     {Resize(RANGE<TV_INT>(TV_INT::All_Ones_Vector(),TV_INT()),false,false);}

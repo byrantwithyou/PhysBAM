@@ -213,7 +213,7 @@ Reinitialize(bool force)
                 for(int j=0;j<particles_per_cell.array.Size();j++){
                     if(particles_per_cell.array(j)) initialization_array(j)=particles_per_cell.array(j);
                     else initialization_array(j)=0;}
-                ARRAY_VIEW<const PARTICLES<TV>* const> initialization_array_view(initialization_array.Size(),initialization_array.Get_Array_Pointer());
+                ARRAY_VIEW<const PARTICLES<TV>* const> initialization_array_view(initialization_array.Get_Array_Pointer(),initialization_array.Size());
                 particles_multiple(i)->Initialize(initialization_array_view);
                 particles_per_cell.Delete_Pointers_And_Clean_Memory();}
             else{

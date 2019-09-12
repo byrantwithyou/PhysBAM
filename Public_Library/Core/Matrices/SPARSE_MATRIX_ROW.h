@@ -21,7 +21,7 @@ public:
     ARRAY_VIEW<const SPARSE_MATRIX_ENTRY<T> > A;
 
     SPARSE_MATRIX_ROW(const SPARSE_MATRIX_FLAT_MXN<T>& M,int r)
-        :n(M.n),A(M.offsets(r+1)-M.offsets(r),&M.A(M.offsets(r)))
+        :n(M.n),A(&M.A(M.offsets(r)),M.offsets(r+1)-M.offsets(r))
     {}
 
     T Dot(const SPARSE_MATRIX_ROW& r) const

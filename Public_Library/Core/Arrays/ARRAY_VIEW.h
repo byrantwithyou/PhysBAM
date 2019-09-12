@@ -39,7 +39,7 @@ public:
         :m(0),base_pointer(0)
     {}
 
-    ARRAY_VIEW(const ID m,T* raw_data)
+    ARRAY_VIEW(T* raw_data,ID m)
         :m(m),base_pointer(raw_data)
     {}
 
@@ -121,22 +121,22 @@ public:
     {STATIC_ASSERT(!is_const<T>::value); // make ARRAY_VIEW<const T> equivalent to const ARRAY_VIEW<const T>
     exchange(m,other.m);exchange(base_pointer,other.base_pointer);}
 
-    void Set(const ID m_input,typename COPY_CONST<T*>::TYPE raw_data)
+    void Set(typename COPY_CONST<T*>::TYPE raw_data,ID m_input)
     {m=m_input;base_pointer=raw_data;}
 
     void Set(const ARRAY_VIEW<T,ID>& array)
-    {Set(array.m,array.base_pointer);}
+    {Set(array.base_pointer,array.m);}
 
     void Set(const ARRAY_VIEW<typename conditional<is_const<T>::value,typename remove_const<T>::type,UNUSABLE>::type,ID>& array)
-    {Set(array.m,array.base_pointer);}
+    {Set(array.base_pointer,array.m);}
 
     template<class T_ARRAY>
     void Set(T_ARRAY& array,typename enable_if<is_same<ELEMENT,typename T_ARRAY::ELEMENT>::value && !IS_ARRAY_VIEW<T_ARRAY>::value,UNUSABLE>::type unusable=UNUSABLE())
-    {Set(array.m,array.Get_Array_Pointer());}
+    {Set(array.Get_Array_Pointer(),array.m);}
 
     template<class T_ARRAY>
     void Set(T_ARRAY array,typename enable_if<is_same<ELEMENT,typename T_ARRAY::ELEMENT>::value && IS_ARRAY_VIEW<T_ARRAY>::value,UNUSABLE>::type unusable=UNUSABLE())
-    {Set(array.m,array.Get_Array_Pointer());}
+    {Set(array.Get_Array_Pointer(),array.m);}
 
     template<class RW>
     void Read(std::istream& input)
@@ -154,10 +154,10 @@ public:
 //#####################################################################
 };
 template<> struct HASH_REDUCE<const char*>
-{static int H(const char* key){return HASH_REDUCE<ARRAY_VIEW<const char> >::H(ARRAY_VIEW<const char>((int)strlen(key),key));}};
+{static int H(const char* key){return HASH_REDUCE<ARRAY_VIEW<const char> >::H(ARRAY_VIEW<const char>(key,(int)strlen(key)));}};
 template<> struct HASH_REDUCE<char*>
 {static int H(const char* key){return HASH_REDUCE<const char*>::H(key);}};
 template<> struct HASH_REDUCE<std::string>
-{static int H(const std::string& key){return HASH_REDUCE<ARRAY_VIEW<const char> >::H(ARRAY_VIEW<const char>((int)key.length(),key.c_str()));}};
+{static int H(const std::string& key){return HASH_REDUCE<ARRAY_VIEW<const char> >::H(ARRAY_VIEW<const char>(key.c_str(),(int)key.length()));}};
 }
 #endif

@@ -128,12 +128,12 @@ struct FLUID_LAYOUT_FEM<VECTOR<T,2> >
     ARRAY_VIEW<const TRIANGLE_ID> Edge_Triangles(EDGE_ID t) const
     {
         const auto& a=(*area_hidden.mesh.edge_triangles)(Value(t));
-        return {a.m,reinterpret_cast<const TRIANGLE_ID*>(a.Get_Array_Pointer())};
+        return {reinterpret_cast<const TRIANGLE_ID*>(a.Get_Array_Pointer()),a.m};
     }
     ARRAY_VIEW<const TRIANGLE_ID> Incident_Triangles(PARTICLE_ID t) const
     {
         const auto& a=(*area_hidden.mesh.incident_elements)(Value(t));
-        return {a.m,reinterpret_cast<const TRIANGLE_ID*>(a.Get_Array_Pointer())};
+        return {reinterpret_cast<const TRIANGLE_ID*>(a.Get_Array_Pointer()),a.m};
     }
     VECTOR<PARTICLE_ID,2> Edge(EDGE_ID e) const
     {

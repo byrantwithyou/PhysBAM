@@ -161,7 +161,7 @@ template<class T,class T2,class I>
 static KRYLOV_VECTOR_BASE<T>* Clone_Default_Helper(const KRYLOV_VECTOR_WRAPPER<T,INDIRECT_ARRAY<ARRAY_VIEW<T2>,I> >& v)
 {
     typedef INDIRECT_ARRAY<ARRAY_VIEW<T2>,I> TV;
-    ARRAY_VIEW<T2> view(v.v.array.Size(),new T2[v.v.array.Size()]);
+    ARRAY_VIEW<T2> view(new T2[v.v.array.Size()],v.v.array.Size());
     for(int i=0;i<view.Size();i++) view(i)=T2();
     KRYLOV_VECTOR_WRAPPER<T,TV>* c=new KRYLOV_VECTOR_WRAPPER<T,TV>(view,v.v.indices);
     c->deep_copy=true;
@@ -211,11 +211,11 @@ static void Resize_Helper(KRYLOV_VECTOR_WRAPPER<T,INDIRECT_ARRAY<ARRAY_VIEW<T2>,
 {
     if(v.v.array.Size()==w.v.array.Size()) return;
     if(v.v.array.Size()>w.v.array.Size()){
-        ARRAY_VIEW<T2> view(w.v.array.Size(),v.v.array.Get_Array_Pointer());
+        ARRAY_VIEW<T2> view(v.v.array.Get_Array_Pointer(),w.v.array.Size());
         v.v.array.Exchange(view);
         return;}
 
-    ARRAY_VIEW<T2> view(w.v.array.Size(),new T2[w.v.array.Size()]);
+    ARRAY_VIEW<T2> view(new T2[w.v.array.Size()],w.v.array.Size());
     view.Fill(T2());
     v.v.array.Exchange(view);
     delete [] view.Get_Array_Pointer();
