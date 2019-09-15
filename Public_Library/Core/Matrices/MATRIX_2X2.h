@@ -23,7 +23,7 @@ public:
     typedef int HAS_UNTYPED_READ_WRITE;
     typedef T SCALAR;
     enum WORKAROUND1 {m=2,n=2};
-    typedef MATRIX_BASE<T,MATRIX<T,2> > BASE;using BASE::operator*;using BASE::Transpose_Times;using BASE::Times_Transpose;
+    typedef MATRIX_BASE<T,MATRIX<T,2> > BASE;using BASE::operator*;using BASE::operator+;using BASE::Transpose_Times;using BASE::Times_Transpose;
 
     T x[4];
 
