@@ -10,7 +10,6 @@
 #include <Core/Matrices/MATRIX_0X0.h>
 #include <Core/Matrices/MATRIX_1X1.h>
 #include <Core/Matrices/MATRIX_2X2.h>
-#include <Core/Matrices/MATRIX_2X3.h>
 #include <Core/Matrices/MATRIX_3X2.h>
 #include <Core/Matrices/MATRIX_3X3.h>
 #include <Core/Matrices/MATRIX_4X4.h>
@@ -24,7 +23,7 @@ class MATRIX:public MATRIX_BASE<T,MATRIX<T,m_input,n_input> >
 public:
     typedef int HAS_UNTYPED_READ_WRITE;
     enum WORKAROUND1 {m=m_input,n=n_input,size=n_input*m_input};
-    STATIC_ASSERT((!((m>=2 && m<=3 && n>=2 && n<=3) || (m==4 && n==4) || (m==0 && n==0)))); // 0x0, 1x1, 2x2, 2x3, 3x2, 3x3, and 4x4 are specialized
+    STATIC_ASSERT(!((m==n && m<=4) || (m==3 && n==2))); // 0x0, 1x1, 2x2, 3x2, 3x3, and 4x4 are specialized
     typedef T SCALAR;typedef MATRIX_BASE<T,MATRIX<T,m_input,n_input> > BASE;
     using BASE::Frobenius_Norm_Squared;using BASE::operator*;using BASE::operator-;using BASE::operator+;using BASE::operator-=;
     using BASE::operator+=;using BASE::Transpose_Times;using BASE::Times_Transpose;using BASE::PLU_Solve;
@@ -43,6 +42,13 @@ public:
         for(int i=0;i<size;i++) x[i]=T();
     }
 
+    template<class ...Args>
+    explicit MATRIX(const T& a,const T& b,Args&& ...args)
+        :x{a,b,args...}
+    {
+        STATIC_ASSERT(2+sizeof...(args)==m*n);
+    }
+        
     MATRIX(const MATRIX& A)
         :BASE()
     {
@@ -269,10 +275,25 @@ public:
     static MATRIX<T,0,1> Cross_Product_Matrix(const VECTOR<T,1>& v)
     {STATIC_ASSERT((m==0 && n==1));return MATRIX<T,0,1>();}
 
-    MATRIX<T,n> Normal_Equations_Matrix() const
-    {MATRIX<T,n> result;
-    for(int j=0;j<n;j++) for(int i=0;i<n;i++) for(int k=0;k<m;k++) result(i,j)+=(*this)(k,i)*(*this)(k,j);
-    return result;}
+    SYMMETRIC_MATRIX<T,n> Normal_Equations_Matrix() const
+    {
+        SYMMETRIC_MATRIX<T,n> result;
+        for(int j=0;j<n;j++)
+            for(int i=0;i<n;i++)
+                for(int k=0;k<m;k++)
+                    result(i,j)+=(*this)(k,i)*(*this)(k,j);
+        return result;
+    }
+
+    SYMMETRIC_MATRIX<T,m> Outer_Product_Matrix() const
+    {
+        SYMMETRIC_MATRIX<T,m> result;
+        for(int j=0;j<m;j++)
+            for(int i=0;i<m;i++)
+                for(int k=0;k<n;k++)
+                    result(i,j)+=(*this)(i,k)*(*this)(j,k);
+        return result;
+    }
 
     VECTOR<T,n> Normal_Equations_Solve(const VECTOR<T,m>& b) const
     {MATRIX<T,n> A_transpose_A(Normal_Equations_Matrix());VECTOR<T,n> A_transpose_b(Transpose_Times(b));return A_transpose_A.Cholesky_Solve(A_transpose_b);}

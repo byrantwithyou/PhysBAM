@@ -238,7 +238,11 @@ public:
     {return Weighted_Normal().Magnitude();}
 
     MATRIX<T,2,3> Transposed() const
-    {return MATRIX<T,2,3>::Transposed(*this);}
+    {
+        MATRIX<T,2,3> r;
+        for(int i=0;i<3;i++) for(int j=0;j<2;j++) r(j,i)=(*this)(i,j);
+        return r;
+    }
 
     static MATRIX Outer_Product(const VECTOR<T,3>& u,const VECTOR<T,2>& v)
     {MATRIX result;

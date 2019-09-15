@@ -6,7 +6,6 @@
 //#####################################################################
 #include <Core/Arrays/INDIRECT_ARRAY.h>
 #include <Core/Matrices/MATRIX.h>
-#include <Core/Matrices/MATRIX_2X3.h>
 #include <Core/Matrices/MATRIX_3X2.h>
 #include <Core/Matrices/MATRIX_3X3.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>

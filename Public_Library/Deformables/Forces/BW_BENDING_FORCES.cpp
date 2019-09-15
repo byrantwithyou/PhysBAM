@@ -8,7 +8,6 @@
 #include <Core/Math_Tools/cyclic_shift.h>
 #include <Core/Math_Tools/Robust_Functions.h>
 #include <Core/Matrices/MATRIX.h>
-#include <Core/Matrices/MATRIX_2X3.h>
 #include <Core/Matrices/MATRIX_3X2.h>
 #include <Core/Matrices/MATRIX_3X3.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>

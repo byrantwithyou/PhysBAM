@@ -8,7 +8,6 @@
 #include <Core/Math_Tools/exchange_sort.h>
 #include <Core/Math_Tools/maxabs.h>
 #include <Core/Matrices/DIAGONAL_MATRIX.h>
-#include <Core/Matrices/MATRIX_2X3.h>
 #include <Core/Matrices/MATRIX_3X2.h>
 #include <Core/Matrices/MATRIX_3X3.h>
 #include <Core/Matrices/MATRIX_MXN.h>

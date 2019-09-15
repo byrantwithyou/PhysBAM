@@ -13,7 +13,7 @@ static TV o(1.2,2.3,1.4);
 static VECTOR<T,2> p(1.2,2.3);
 static MATRIX<T,2> m2(1.2,1.3,2,4.1);
 static MATRIX<T,3> m3(1.2,1.3,2,4.1,.2,.3,.5,.2,.7);
-static MATRIX<T,2,3> mx(1.2,1.3,2,4.1,.2,.3);
+static MATRIX<T,2,3> mx(1.2,1.3,2.,4.1,.2,.3);
 static SYMMETRIC_MATRIX<T,3> s3(1.2,1.3,2,4.1,.2,.3);
 static SYMMETRIC_MATRIX<T,2> s2(1.2,1.3,2);
 

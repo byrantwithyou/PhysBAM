@@ -3,10 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Data_Structures/SPARSE_UNION_FIND.h>
-#include <Core/Matrices/MATRIX_2X2.h>
-#include <Core/Matrices/MATRIX_2X3.h>
-#include <Core/Matrices/MATRIX_3X2.h>
-#include <Core/Matrices/MATRIX_3X3.h>
+#include <Core/Matrices/MATRIX.h>
 #include <Core/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <Core/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <Core/Matrices/UPPER_TRIANGULAR_MATRIX_2X2.h>
@@ -144,7 +141,7 @@ template<class T,int d> inline T Simplex_Minimum_Altitude(const MATRIX<T,d>& Dm_
 }
 template<class T> inline T Simplex_Minimum_Altitude(const MATRIX<T,2,3>& Dm_inverse)
 {
-    return Dm_inverse.transpose.R_From_QR_Factorization().Inverse().Simplex_Minimum_Altitude();
+    return Dm_inverse.Transposed().R_From_QR_Factorization().Inverse().Simplex_Minimum_Altitude();
 }
 }
 template<class TV,int d> void LINEAR_FINITE_VOLUME<TV,d>::
