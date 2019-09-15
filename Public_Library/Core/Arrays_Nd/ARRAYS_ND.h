@@ -85,7 +85,7 @@ public:
     array=source.array;return *this;}
 
     ARRAY& operator=(ARRAY&& a)
-    {domain=a.domain;stride=a.stride;offset=a.offset;array=std::move(a.array);return *this;}
+    {domain=a.domain;stride=a.stride;offset=a.offset;array.Set(a.array);a.array.Set(0,0);return *this;}
 
     template<class T_ARRAY1>
     ARRAY& operator=(const T_ARRAY1& source)
