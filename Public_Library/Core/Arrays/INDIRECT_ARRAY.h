@@ -35,7 +35,6 @@ class INDIRECT_ARRAY:public INDIRECT_ARRAY_BASE<T_INDICES>,
     struct UNUSABLE{};
     typedef typename conditional<IS_ARRAY_VIEW<T_ARRAY>::value,T_ARRAY,T_ARRAY&>::type T_ARRAY_VIEW;
 public:
-    typedef int HAS_UNTYPED_READ_WRITE;
     typedef T ELEMENT;typedef ID INDEX;
     typedef typename ARRAY_RESULT_TYPE<T_ARRAY>::TYPE RESULT_TYPE;
     typedef typename T_ARRAY::CONST_RESULT_TYPE CONST_RESULT_TYPE;
@@ -83,12 +82,6 @@ public:
     INDIRECT_ARRAY& operator=(const T_OTHER_ARRAY& source)
     {return BASE::operator=(source);}
 
-    typename conditional<is_const<T_ARRAY>::value,const T*,T*>::type Get_Array_Pointer()
-    {return array.Get_Array_Pointer();}
-
-    const T* Get_Array_Pointer() const
-    {return array.Get_Array_Pointer();}
-
     bool Using_Externally_Allocated_Pointer()
     {return array.Using_Externally_Allocated_Pointer();}
 
@@ -103,13 +96,6 @@ public:
 
     SIMPLE_ITERATOR<const INDIRECT_ARRAY> end() const
     {return SIMPLE_ITERATOR<const INDIRECT_ARRAY>(*this,Size());}
-
-private:
-    template<class RW> void Read(std::istream& input)
-    {PHYSBAM_NOT_IMPLEMENTED();}
-
-    template<class RW> void Write(std::ostream& output) const
-    {Write_Binary<RW>(output,Size());Write_Binary_Array<RW>(output,Get_Array_Pointer(),Size());}
 //#####################################################################
 };
 }
