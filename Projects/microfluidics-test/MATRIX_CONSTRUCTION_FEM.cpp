@@ -256,7 +256,6 @@ Times_U_Dot_V(BLOCK_ID b,BLOCK_VECTOR<TV>& w,const BLOCK_VECTOR<TV>& u) const
             MATRIX<T,TV::m> F;
             for(int i=0;i<TV::m;i++) F.Set_Column(i,ve.X(i+1)-ve.X(0));
             F/=cl.unit_m;
-            MATRIX<T,TV::m> G=F.Inverse();
             T scale=(M*F).Determinant()/FEM_TABLES<TV::m>::u_dot_v_den;
 
             VECTOR<TV,num_u> r,s;
@@ -285,7 +284,6 @@ Times_P_U(BLOCK_ID b,BLOCK_VECTOR<TV>& w,const ARRAY<T>& div_v,const ARRAY<T>& d
             MATRIX<T,TV::m> F;
             for(int i=0;i<TV::m;i++) F.Set_Column(i,ve.X(i+1)-ve.X(0));
             F/=cl.unit_m;
-            MATRIX<T,TV::m> G=F.Inverse();
             T scale=(M*F).Determinant()/FEM_TABLES<TV::m>::p_u_den;
 
             VECTOR<T,num_u> r;

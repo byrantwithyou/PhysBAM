@@ -461,7 +461,6 @@ inline AUTO_HESS<VECTOR<T,3>,VECTOR<T,m>,Q>
 Cross_Product(const AUTO_HESS<VECTOR<T,3>,VECTOR<T,m>,Q>& a,const VECTOR<T,3>& b)
 {
     VECTOR<T,3> ab=a.x.Cross(b);
-    MATRIX<T,3> oa=MATRIX<T,3>::Cross_Product_Matrix(a.x);
     MATRIX<T,3> ob=MATRIX<T,3>::Cross_Product_Matrix(b);
     return {ab,-ob*a.dx,Contract<0,0>(a.ddx,ob)};
 }
@@ -472,7 +471,6 @@ Cross_Product(const VECTOR<T,3>& a,const AUTO_HESS<VECTOR<T,3>,VECTOR<T,m>,Q>& b
 {
     VECTOR<T,3> ab=a.Cross(b.x);
     MATRIX<T,3> oa=MATRIX<T,3>::Cross_Product_Matrix(a);
-    MATRIX<T,3> ob=MATRIX<T,3>::Cross_Product_Matrix(b.x);
     return {ab,oa*b.dx,-Contract<0,0>(b.ddx,oa)};
 }
 

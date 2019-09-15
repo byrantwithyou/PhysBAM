@@ -118,7 +118,6 @@ Compute_Position_Based_State(const T dt,const T time)
 
             // compute 6x6 matrix assuming impulse applied at r2 and measured at r1
             TV r1=joint_location(joint_index_1)-rigid_body.Frame().t,r2=joint_location(joint_index_2)-rigid_body.Frame().t;
-            MATRIX<T,3> r_cross_1=MATRIX<T,3>::Cross_Product_Matrix(r1),r_cross_2=MATRIX<T,3>::Cross_Product_Matrix(r2);
             MATRIX<T,3> c10=I_inverse.Times_Cross_Product_Matrix(r2),c01=I_inverse.Cross_Product_Matrix_Times(-r1);
             MATRIX<T,3> c00=c10.Cross_Product_Matrix_Times(-r1)+1/rigid_body.Mass();
             SYMMETRIC_MATRIX<T,3> c11=I_inverse;

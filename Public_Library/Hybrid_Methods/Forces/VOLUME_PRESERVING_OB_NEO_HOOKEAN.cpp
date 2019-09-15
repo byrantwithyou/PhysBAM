@@ -83,7 +83,6 @@ Hessian(const MATRIX<T,TV::m>& F,const SYMMETRIC_MATRIX<T,TV::m>& S,
     MATRIX<T,TV::m> A=G(p).Transposed()*(G(p).Transposed().Double_Contract(F));
     MATRIX<T,TV::m> B=(G(p)*F*G(p)).Transposed();
     SYMMETRIC_MATRIX<T,TV::m> D=SYMMETRIC_MATRIX<T,TV::m>::Conjugate(M(p),S);
-    MATRIX<T,TV::m> E=M(p)*S.Trace();
     T e = 1./(TV::m);
     T d=G(p).Transposed().Double_Contract(F);
     T g=M(p).Double_Contract(S);
