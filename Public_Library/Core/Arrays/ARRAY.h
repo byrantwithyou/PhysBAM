@@ -20,6 +20,7 @@ namespace PhysBAM{
 template<class T,class ID> class ARRAY;
 template<class T,class ID> struct IS_ARRAY<ARRAY<T,ID> > {static const bool value=true;};
 template<class T,class ID> struct IS_ARRAY_VIEW<ARRAY<T,ID> > {static const bool value=false;};
+template<class T,class ID> struct HAS_POINTER<ARRAY<T,ID> > {static const bool value=true;};
 
 template<class T,class ID> struct CANONICALIZE_CONST_ARRAY<ARRAY<T,ID> >:public FIRST<ARRAY_VIEW<const T,ID> >{};
 

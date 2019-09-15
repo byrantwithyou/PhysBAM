@@ -14,6 +14,7 @@ namespace PhysBAM{
 
 template<class T,class ID> struct IS_ARRAY<ARRAY_VIEW<T,ID> > {static const bool value=true;};
 template<class T,class ID> struct IS_ARRAY_VIEW<ARRAY_VIEW<T,ID> > {static const bool value=true;};
+template<class T,class ID> struct HAS_POINTER<ARRAY_VIEW<T,ID> > {static const bool value=true;};
 
 template<class T,class ID>
 class ARRAY_VIEW:public ARRAY_BASE<typename remove_const<T>::type,ARRAY_VIEW<T,ID>,ID>

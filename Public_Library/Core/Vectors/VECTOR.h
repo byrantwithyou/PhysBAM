@@ -31,6 +31,7 @@ namespace PhysBAM{
 
 template<class T_ARRAY,class T_INDICES> class INDIRECT_ARRAY;
 template<class T,int d> struct IS_ARRAY<VECTOR<T,d> > {static const bool value=true;};
+template<class T,int d> struct HAS_POINTER<VECTOR<T,d> > {static const bool value=true;};
 
 template<class T,int d>
 class VECTOR:public ARRAY_BASE<T,VECTOR<T,d> >
