@@ -40,7 +40,7 @@ template<class T> struct ASSERT_SAME_HELPER<T,T>{static const bool value=true;};
 
 #define STATIC_ASSERT_SAME(T1,T2) static_assert(::PhysBAM::ASSERT_SAME_HELPER<T1,T2>::value,"ASSERT_SAME_HELPER<"#T1","#T2">")
 
-template<class T1,class T2=void,class T3=void,class T4=void> struct FIRST{typedef T1 TYPE;};
+template<class T,class... U> struct FIRST{typedef T TYPE;};
 
 template<class T_ARRAY,class ENABLER=void> struct IS_ARRAY {static const bool value=false;};
 template<class T_ARRAY> struct IS_ARRAY<const T_ARRAY>:public IS_ARRAY<T_ARRAY>{};
