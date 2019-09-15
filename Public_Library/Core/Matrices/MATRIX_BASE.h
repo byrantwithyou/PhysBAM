@@ -20,13 +20,25 @@ using std::abs;
 namespace PhysBAM{
 
 template<class T_MATRIX> struct MATRIX_INFO;
-template<class T,int m,int n> struct MATRIX_INFO<MATRIX<T,m,n> >{typedef VECTOR<T,m> LEFT_VECTOR;typedef VECTOR<T,n> RIGHT_VECTOR;typedef MATRIX<T,n,m> TRANSPOSE;};
-template<class T,int d> struct MATRIX_INFO<DIAGONAL_MATRIX<T,d> >{typedef VECTOR<T,d> LEFT_VECTOR;typedef VECTOR<T,d> RIGHT_VECTOR;typedef DIAGONAL_MATRIX<T,d> TRANSPOSE;};
-template<class T,int d> struct MATRIX_INFO<SYMMETRIC_MATRIX<T,d> >{typedef VECTOR<T,d> LEFT_VECTOR;typedef VECTOR<T,d> RIGHT_VECTOR;typedef SYMMETRIC_MATRIX<T,d> TRANSPOSE;};
-template<class T,int d> struct MATRIX_INFO<UPPER_TRIANGULAR_MATRIX<T,d> >{typedef VECTOR<T,d> LEFT_VECTOR;typedef VECTOR<T,d> RIGHT_VECTOR;};
-template<class T> struct MATRIX_INFO<MATRIX_MXN<T> >{typedef ARRAY<T> LEFT_VECTOR;typedef ARRAY<T> RIGHT_VECTOR;typedef MATRIX_MXN<T> TRANSPOSE;};
-template<class T,class T_MATRIX> struct MATRIX_INFO<MATRIX_BASE<T,T_MATRIX> >{typedef typename MATRIX_INFO<T_MATRIX>::LEFT_VECTOR LEFT_VECTOR;
-    typedef typename MATRIX_INFO<T_MATRIX>::RIGHT_VECTOR RIGHT_VECTOR;typedef typename MATRIX_INFO<T_MATRIX>::TRANSPOSE TRANSPOSE;};
+template<class T,int a,int b> struct MATRIX_INFO<MATRIX<T,a,b> >{static const int m=a,n=b;};
+template<class T,int d> struct MATRIX_INFO<DIAGONAL_MATRIX<T,d> >{static const int m=d,n=d;};
+template<class T,int d> struct MATRIX_INFO<SYMMETRIC_MATRIX<T,d> >{static const int m=d,n=d;};
+template<class T,int d> struct MATRIX_INFO<UPPER_TRIANGULAR_MATRIX<T,d> >{static const int m=d,n=d;};
+template<class T> struct MATRIX_INFO<MATRIX_MXN<T> >{static const int m=-1,n=-1;};
+template<class T> struct MATRIX_INFO<MATRIX_VIEW<T> >{static const int m=-1,n=-1;};
+template<class T,class T_MATRIX> struct MATRIX_INFO<MATRIX_BASE<T,T_MATRIX> >:public MATRIX_INFO<T_MATRIX> {};
+
+template<class T,int a,int b> struct SIZED_MATRIX_HELPER {typedef MATRIX<T,a,b> TYPE;};
+template<class T,int a> struct SIZED_MATRIX_HELPER<T,a,-1> {typedef MATRIX_MXN<T> TYPE;};
+template<class T,int b> struct SIZED_MATRIX_HELPER<T,-1,b> {typedef MATRIX_MXN<T> TYPE;};
+template<class T> struct SIZED_MATRIX_HELPER<T,-1,-1> {typedef MATRIX_MXN<T> TYPE;};
+template<class T,int a,int b> using SIZED_MATRIX = typename SIZED_MATRIX_HELPER<T,a,b>::TYPE;
+template<class T_MAT> using MATRIX_COPY = SIZED_MATRIX<typename T_MAT::ELEMENT,MATRIX_INFO<T_MAT>::m,MATRIX_INFO<T_MAT>::n>;
+
+template<class T,int a> struct SIZED_VECTOR_HELPER {typedef VECTOR<T,a> TYPE;};
+template<class T> struct SIZED_VECTOR_HELPER<T,-1> {typedef ARRAY<T> TYPE;};
+template<class T,int a> using SIZED_VECTOR = typename SIZED_VECTOR_HELPER<T,a>::TYPE;
+template<class T_VEC> using VECTOR_COPY = SIZED_VECTOR<typename T_VEC::ELEMENT,FIXED_SIZE_VECTOR<T_VEC>::size>;
 
 template<class T_MATRIX> struct EFFICIENT_MATRIX {static const bool value=false;};
 template<class T,int m,int n> struct EFFICIENT_MATRIX<MATRIX<T,m,n> > {static const bool value=((m>=2 && m<=3 && n>=2 && n<=3) || (m==4 && n==4) || (m==0 && n==0));};
@@ -36,18 +48,6 @@ template<class T,class T_MATRIX> struct EFFICIENT_MATRIX<MATRIX_BASE<T,T_MATRIX>
 template<class T,int d> struct EFFICIENT_MATRIX<VECTOR<T,d> > {static const bool value=(d<=3);};
 template<class T,class T_VECTOR> struct EFFICIENT_MATRIX<ARRAY_BASE<T,T_VECTOR> >:public EFFICIENT_MATRIX<T_VECTOR>{};
 
-template<class T_VECTOR> struct VECTOR_TYPE {typedef ARRAY<typename T_VECTOR::ELEMENT> TYPE;};
-template<class T,int d> struct VECTOR_TYPE<VECTOR<T,d> > {typedef VECTOR<T,d> TYPE;};
-
-template<class T1,class T2,class ENABLER=void> struct PRODUCT;
-template<class T,int m,int n> struct PRODUCT<MATRIX<T,m,n>,VECTOR<T,n> >{typedef VECTOR<T,m> TYPE;};
-template<class T,int d> struct PRODUCT<MATRIX_MXN<T>,VECTOR<T,d> >{typedef ARRAY<T> TYPE;};
-template<class T,int m,int n,class V> struct PRODUCT<MATRIX<T,m,n>,V,typename enable_if<(IS_ARRAY<V>::value && !FIXED_SIZE_VECTOR<V>::value)>::type>{typedef VECTOR<T,m> TYPE;};
-template<class T,class V> struct PRODUCT<MATRIX_MXN<T>,V,typename enable_if<(IS_ARRAY<V>::value && !FIXED_SIZE_VECTOR<V>::value)>::type>{typedef ARRAY<T> TYPE;};
-template<class T,int m,int n,int k> struct PRODUCT<MATRIX<T,m,k>,MATRIX<T,k,n> >{typedef MATRIX<T,m,n> TYPE;};
-template<class T,int m,int n> struct PRODUCT<MATRIX<T,m,n>,MATRIX_MXN<T> >{typedef MATRIX_MXN<T> TYPE;};
-template<class T,int m,int n> struct PRODUCT<MATRIX_MXN<T>,MATRIX<T,m,n> >{typedef MATRIX_MXN<T> TYPE;};
-template<class T> struct PRODUCT<MATRIX_MXN<T>,MATRIX_MXN<T> >{typedef MATRIX_MXN<T> TYPE;};
 
 namespace{
 template<int line,class A,class B=void> struct ASSERT_EFFICIENT
@@ -77,26 +77,20 @@ template<int line,class A,class B=void> struct ASSERT_EFFICIENT
 template<class T,class T_MATRIX>
 class MATRIX_BASE
 {
-    template<class T_MATRIX1>
-    T_MATRIX& operator=(const T_MATRIX&) const
-    {STATIC_ASSERT((T)false);}
-
-    MATRIX_BASE& operator=(const MATRIX_BASE&) const
-    {STATIC_ASSERT((T)false);}
-
-    MATRIX_BASE(const MATRIX_BASE&)
-    {STATIC_ASSERT((T)false);}
+protected:
+    MATRIX_BASE& operator=(const MATRIX_BASE&) = default;
+    MATRIX_BASE& operator=(MATRIX_BASE&&) = default;
+    MATRIX_BASE(const MATRIX_BASE&) = default;
 
 public:
     typedef T SCALAR;
-    typedef typename MATRIX_INFO<T_MATRIX>::RIGHT_VECTOR RIGHT_VECTOR;typedef typename MATRIX_INFO<T_MATRIX>::LEFT_VECTOR LEFT_VECTOR;
-    typedef typename RIGHT_VECTOR::template REBIND<int>::TYPE COLUMN_PERMUTATION;
+    typedef SIZED_VECTOR<T,MATRIX_INFO<T_MATRIX>::m> LEFT_VECTOR;
+    typedef SIZED_VECTOR<T,MATRIX_INFO<T_MATRIX>::n> RIGHT_VECTOR;
+    typedef SIZED_VECTOR<int,MATRIX_INFO<T_MATRIX>::n> COLUMN_PERMUTATION;
 
-    MATRIX_BASE()
-    {}
+    MATRIX_BASE() = default;
 
-    ~MATRIX_BASE()
-    {}
+    ~MATRIX_BASE() = default;
 
     T_MATRIX& Derived()
     {return static_cast<T_MATRIX&>(*this);}
@@ -173,35 +167,58 @@ public:
     template<class T_MATRIX0,class T_VECTOR,class T_VECTOR1>
     static void Add_Transpose_Times(const MATRIX_BASE<T,T_MATRIX0>& A,const ARRAY_BASE<T,T_VECTOR>& v,ARRAY_BASE<T,T_VECTOR1>& y)
     {WARN_IF_NOT_EFFICIENT(T_MATRIX0,T_VECTOR1);assert(A.Rows()==v.Size() && A.Columns()==y.Size());
-    if(Test_Aliased(v,y)){typename VECTOR_TYPE<T_VECTOR>::TYPE u(v);Add_Transpose_Times_Vector_Helper(A,u,y);}else Add_Transpose_Times_Vector_Helper(A,v,y);}
+    if(Test_Aliased(v,y)){VECTOR_COPY<T_VECTOR> u(v);Add_Transpose_Times_Vector_Helper(A,u,y);}else Add_Transpose_Times_Vector_Helper(A,v,y);}
 
     template<class T_MATRIX0,class T_VECTOR,class T_VECTOR1>
     static void Add_Times(const MATRIX_BASE<T,T_MATRIX0>& A,const ARRAY_BASE<T,T_VECTOR>& v,ARRAY_BASE<T,T_VECTOR1>& y)
     {WARN_IF_NOT_EFFICIENT(T_MATRIX0,T_VECTOR);assert(A.Columns()==v.Size() && A.Rows()==y.Size());
-    if(Test_Aliased(v,y)){typename VECTOR_TYPE<T_VECTOR>::TYPE u(v);Add_Times_Vector_Helper(A,u,y);}else Add_Times_Vector_Helper(A,v,y);}
+    if(Test_Aliased(v,y)){VECTOR_COPY<T_VECTOR> u(v);Add_Times_Vector_Helper(A,u,y);}else Add_Times_Vector_Helper(A,v,y);}
 
     template<class T_MATRIX0,class T_VECTOR,class T_VECTOR1>
     static void Subtract_Times(const MATRIX_BASE<T,T_MATRIX0>& A,const ARRAY_BASE<T,T_VECTOR>& v,ARRAY_BASE<T,T_VECTOR1>& y)
     {WARN_IF_NOT_EFFICIENT(T_MATRIX0,T_VECTOR);assert(A.Columns()==v.Size() && A.Rows()==y.Size());
-    if(Test_Aliased(v,y)){typename VECTOR_TYPE<T_VECTOR>::TYPE u(v);Subtract_Times_Vector_Helper(A,u,y);}else Subtract_Times_Vector_Helper(A,v,y);}
+    if(Test_Aliased(v,y)){VECTOR_COPY<T_VECTOR> u(v);Subtract_Times_Vector_Helper(A,u,y);}else Subtract_Times_Vector_Helper(A,v,y);}
 
     template<class T_MATRIX0>
     auto Transpose_Times(const MATRIX_BASE<T,T_MATRIX0>& A) const
-    {decltype(Derived().Transposed()*A) M((INITIAL_SIZE)Columns(),(INITIAL_SIZE)A.Columns());Add_Transpose_Times(Derived(),A,M);return M;}
+    {
+        static const int a=MATRIX_INFO<T_MATRIX>::n;
+        static const int b=MATRIX_INFO<T_MATRIX0>::n;
+        SIZED_MATRIX<T,a,b> M((INITIAL_SIZE)Columns(),(INITIAL_SIZE)A.Columns());
+        Add_Transpose_Times(Derived(),A,M);
+        return M;
+    }
 
     template<int d>
     auto Transpose_Times(const SYMMETRIC_MATRIX<T,d>& A) const
-    {decltype(Derived().Transposed()*A) M((INITIAL_SIZE)Columns(),(INITIAL_SIZE)d);Add_Transpose_Times(Derived(),A,M);return M;}
+    {
+        static const int a=MATRIX_INFO<T_MATRIX>::n;
+        SIZED_MATRIX<T,a,d> M((INITIAL_SIZE)Columns(),(INITIAL_SIZE)d);
+        Add_Transpose_Times(Derived(),A,M);
+        return M;
+    }
 
     template<int d>
     auto Transpose_Times(const DIAGONAL_MATRIX<T,d>& A) const
-    {WARN_IF_NOT_EFFICIENT(T_MATRIX);decltype(Derived().Transposed()*A) M((INITIAL_SIZE)Columns(),(INITIAL_SIZE)d);
-    for(int i=0;i<Columns();i++) for(int k=0;k<Rows();k++) M(i,k)=(*this)(k,i)*A(k,k);
-    return M;}
+    {
+        WARN_IF_NOT_EFFICIENT(T_MATRIX);
+        static const int a=MATRIX_INFO<T_MATRIX>::n;
+        SIZED_MATRIX<T,a,d> M((INITIAL_SIZE)Columns(),(INITIAL_SIZE)d);
+        for(int i=0;i<Columns();i++)
+            for(int k=0;k<Rows();k++)
+                M(i,k)=(*this)(k,i)*A(k,k);
+        return M;
+    }
 
     template<class T_MATRIX0>
     auto Times_Transpose(const MATRIX_BASE<T,T_MATRIX0>& A) const
-    {decltype(*this*A.Derived().Transposed()) M((INITIAL_SIZE)Rows(),(INITIAL_SIZE)A.Rows());Add_Times_Transpose(Derived(),A,M);return M;}
+    {
+        static const int a=MATRIX_INFO<T_MATRIX>::m;
+        static const int b=MATRIX_INFO<T_MATRIX0>::m;
+        SIZED_MATRIX<T,a,b> M((INITIAL_SIZE)Rows(),(INITIAL_SIZE)A.Rows());
+        Add_Times_Transpose(Derived(),A,M);
+        return M;
+    }
 
     template<int d>
     auto Times_Transpose(const DIAGONAL_MATRIX<T,d>& A) const
@@ -213,17 +230,32 @@ public:
 
     template<class T_VECTOR>
     auto Transpose_Times(const ARRAY_BASE<T,T_VECTOR>& y) const
-    {assert(y.Size()==Rows());decltype(Derived().Transposed()*y) result((INITIAL_SIZE)Columns());
-    Add_Transpose_Times(Derived(),y.Derived(),result);return result;}
+    {
+        assert(y.Size()==Rows());
+        RIGHT_VECTOR result((INITIAL_SIZE)Columns());
+        Add_Transpose_Times(Derived(),y.Derived(),result);
+        return result;
+    }
 
     template<class T_MATRIX0>
     auto operator*(const MATRIX_BASE<T,T_MATRIX0>& A) const
-    {assert(Columns()==A.Rows());typename PRODUCT<T_MATRIX,T_MATRIX0>::TYPE M((INITIAL_SIZE)Rows(),(INITIAL_SIZE)A.Columns());Add_Times(Derived(),A,M);return M;}
+    {
+        assert(Columns()==A.Rows());
+        static const int a=MATRIX_INFO<T_MATRIX>::m;
+        static const int b=MATRIX_INFO<T_MATRIX0>::n;
+        SIZED_MATRIX<T,a,b> M((INITIAL_SIZE)Rows(),(INITIAL_SIZE)A.Columns());
+        Add_Times(Derived(),A,M);
+        return M;
+    }
 
     template<class T_VECTOR>
     auto operator*(const ARRAY_BASE<T,T_VECTOR>& y) const
-    {assert(y.Size()==Columns());typename PRODUCT<T_MATRIX,typename VECTOR_TYPE<T_VECTOR>::TYPE>::TYPE result((INITIAL_SIZE)Rows());
-    Add_Times(Derived(),y.Derived(),result);return result;}
+    {
+        assert(y.Size()==Columns());
+        LEFT_VECTOR result((INITIAL_SIZE)Rows());
+        Add_Times(Derived(),y.Derived(),result);
+        return result;
+    }
 
     template<class T_VECTOR,class T_VECTOR1>
     void Times(const ARRAY_BASE<T,T_VECTOR>& y,ARRAY_BASE<T,T_VECTOR1>& z) const
@@ -254,9 +286,16 @@ public:
 
     template<int d>
     auto Transpose_Times(const UPPER_TRIANGULAR_MATRIX<T,d>& A) const
-    {assert(Rows()==d);decltype(Derived().Transposed()) M((INITIAL_SIZE)Columns(),(INITIAL_SIZE)d);
-    for(int j=0;j<Columns();j++) for(int k=0;k<d;k++) for(int i=0;i<=k;i++) M(j,k)+=(*this)(i,j)*A(i,k);
-    return M;}
+    {
+        assert(Rows()==d);
+        static const int a=MATRIX_INFO<T_MATRIX>::n;
+        SIZED_MATRIX<T,a,d> M((INITIAL_SIZE)Columns(),(INITIAL_SIZE)d);
+        for(int j=0;j<Columns();j++)
+            for(int k=0;k<d;k++)
+                for(int i=0;i<=k;i++)
+                    M(j,k)+=(*this)(i,j)*A(i,k);
+        return M;
+    }
 
     T_MATRIX& operator*=(const T a)
     {WARN_IF_NOT_EFFICIENT(T_MATRIX);
