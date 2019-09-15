@@ -48,6 +48,13 @@ public:
     MATRIX& operator=(const MATRIX& matrix)
     {return *this;}
 
+    template<class T_MATRIX>
+    MATRIX& operator=(const MATRIX_BASE<T,T_MATRIX>& A)
+    {
+        assert(Rows()==A.Rows() && Columns()==A.Columns());
+        return *this;
+    }
+
     int Rows() const
     {return 0;}
 

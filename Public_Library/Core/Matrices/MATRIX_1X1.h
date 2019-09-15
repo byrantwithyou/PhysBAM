@@ -79,6 +79,14 @@ public:
     MATRIX& operator=(const MATRIX& matrix)
     {x00=matrix.x00;return *this;}
 
+    template<class T_MATRIX>
+    MATRIX& operator=(const MATRIX_BASE<T,T_MATRIX>& A)
+    {
+        assert(Rows()==A.Rows() && Columns()==A.Columns());
+        x00=A(0,0);
+        return *this;
+    }
+
     ~MATRIX()
     {x00.~T();}
 

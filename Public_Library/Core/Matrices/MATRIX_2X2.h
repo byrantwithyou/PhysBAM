@@ -86,6 +86,14 @@ public:
         x[0]=matrix_input.x[0];x[1]=matrix_input.x[1];x[2]=matrix_input.x[2];x[3]=matrix_input.x[3];return *this;
     }
 
+    template<class T_MATRIX>
+    MATRIX& operator=(const MATRIX_BASE<T,T_MATRIX>& A)
+    {
+        assert(Rows()==A.Rows() && Columns()==A.Columns());
+        x[0]=A(0,0);x[1]=A(1,0);x[2]=A(0,1);x[3]=A(1,1);
+        return *this;
+    }
+
     int Rows() const
     {return 2;}
 

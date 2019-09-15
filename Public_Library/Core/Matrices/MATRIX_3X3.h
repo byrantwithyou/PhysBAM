@@ -96,6 +96,16 @@ public:
         return *this;
     }
 
+    template<class T_MATRIX>
+    MATRIX& operator=(const MATRIX_BASE<T,T_MATRIX>& A)
+    {
+        assert(Rows()==A.Rows() && Columns()==A.Columns());
+        x[0]=A(0,0);x[1]=A(1,0);x[2]=A(2,0);
+        x[3]=A(0,1);x[4]=A(1,1);x[5]=A(2,1);
+        x[6]=A(0,2);x[7]=A(1,2);x[8]=A(2,2);
+        return *this;
+    }
+
     int Rows() const
     {return 3;}
 
