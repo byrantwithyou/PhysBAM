@@ -15,7 +15,7 @@ inline typename TV::SCALAR Dot_Product(const TV& v1,const TV& v2)
 {return v1.Dot(v2);}
 
 template<class T>
-inline typename enable_if<is_scalar<T>::value,T>::type Dot_Product(const T a1,const T a2)
+inline enable_if_t<is_scalar<T>::value,T> Dot_Product(const T a1,const T a2)
 {return a1*a2;}
 
 template<class TV>
@@ -28,11 +28,11 @@ inline double Dot_Product_Double_Precision(const VECTOR<T,d>& v1,const VECTOR<T,
 {return v1.Dot(v2);}
 
 template<class T>
-inline typename enable_if<is_scalar<T>::value,double>::type Dot_Product_Double_Precision(const T a1,const T a2)
+inline enable_if_t<is_scalar<T>::value,double> Dot_Product_Double_Precision(const T a1,const T a2)
 {return a1*a2;}
 
 template<class T>
-inline typename enable_if<is_scalar<T>::value,T>::type Magnitude_Squared(const T a)
+inline enable_if_t<is_scalar<T>::value,T> Magnitude_Squared(const T a)
 {return a*a;}
 
 template<class TV>

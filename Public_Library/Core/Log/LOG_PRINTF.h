@@ -57,7 +57,7 @@ extern int fprintf_parse_flags(std::ostream& out,const char *format,int len);
 void fprintf_rec(const char *format,OUT_STATE& state);
 template<typename T,typename... Args> void fprintf_rec(const char *format,OUT_STATE& state,T&& value,Args&&... args);
 
-template<typename T> typename enable_if<is_integral<T>::value && !is_const<T>::value>::type
+template<typename T> enable_if_t<is_integral<T>::value && !is_const<T>::value>
 capture_num_written(int num,T* value)
 {
     *value=num;
@@ -81,7 +81,7 @@ fprintf_fill_format_p(const char *format,OUT_STATE& state,T&& param)
     throw std::runtime_error("invalid format string.");
 }
 
-template<typename T,typename U,typename... Args> typename enable_if<!is_integral<typename remove_reference<T>::type>::value>::type
+template<typename T,typename U,typename... Args> enable_if_t<!is_integral<typename remove_reference<T>::type>::value>
 fprintf_fill_format_p(const char *format,OUT_STATE& state,T&& param,
     U&& value,Args&&... args)
 {
@@ -128,7 +128,7 @@ fprintf_fill_format_w(const char *format,OUT_STATE& state,T&& param)
     throw std::runtime_error("invalid format string.");
 }
 
-template<typename T,typename U,typename... Args> typename enable_if<!is_integral<typename remove_reference<T>::type>::value>::type
+template<typename T,typename U,typename... Args> enable_if_t<!is_integral<typename remove_reference<T>::type>::value>
 fprintf_fill_format_w(const char *format,OUT_STATE& state,T&& param,
     U&& value,Args&&... args)
 {

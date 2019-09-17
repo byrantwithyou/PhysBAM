@@ -60,16 +60,16 @@ struct FIXED_NUMBER
 template<class T> struct IS_FIXED_NUMBER {static const bool value=false;};
 template<class T,int m> struct IS_FIXED_NUMBER<FIXED_NUMBER<T,m> > {static const bool value=true;};
 
-template<class T,class A,int m> inline auto operator*(const A& x,const FIXED_NUMBER<T,m>&) -> typename enable_if<!IS_FIXED_NUMBER<A>::value,decltype(x*(T)m)>::type  {return x*(T)m;}
-template<class T,class A,int m> inline auto operator*(const FIXED_NUMBER<T,m>&,const A& x) -> typename enable_if<!IS_FIXED_NUMBER<A>::value,decltype((T)m*x)>::type {return (T)m*x;}
-template<class T,class A,int m> inline auto operator/(const A& x,const FIXED_NUMBER<T,m>&) -> typename enable_if<!IS_FIXED_NUMBER<A>::value,decltype(x/(T)m)>::type {return x/(T)m;}
-template<class T,class A,int m> inline auto operator/(const FIXED_NUMBER<T,m>&,const A& x) -> typename enable_if<!IS_FIXED_NUMBER<A>::value,decltype((T)m/x)>::type {return (T)m/x;}
+template<class T,class A,int m> inline auto operator*(const A& x,const FIXED_NUMBER<T,m>&) -> enable_if_t<!IS_FIXED_NUMBER<A>::value,decltype(x*(T)m)>  {return x*(T)m;}
+template<class T,class A,int m> inline auto operator*(const FIXED_NUMBER<T,m>&,const A& x) -> enable_if_t<!IS_FIXED_NUMBER<A>::value,decltype((T)m*x)> {return (T)m*x;}
+template<class T,class A,int m> inline auto operator/(const A& x,const FIXED_NUMBER<T,m>&) -> enable_if_t<!IS_FIXED_NUMBER<A>::value,decltype(x/(T)m)> {return x/(T)m;}
+template<class T,class A,int m> inline auto operator/(const FIXED_NUMBER<T,m>&,const A& x) -> enable_if_t<!IS_FIXED_NUMBER<A>::value,decltype((T)m/x)> {return (T)m/x;}
 template<class T,class A,int m> inline A& operator*=(A& x,const FIXED_NUMBER<T,m>&) {return x*=(T)m;}
 template<class T,class A,int m> inline A& operator/=(A& x,const FIXED_NUMBER<T,m>&) {return x/=(T)m;}
 
-template<class T,class A> inline typename enable_if<!IS_FIXED_NUMBER<A>::value,const A&>::type operator*(const A& x,const FIXED_NUMBER<T,1>&) {return x;}
-template<class T,class A> inline typename enable_if<!IS_FIXED_NUMBER<A>::value,const A&>::type operator*(const FIXED_NUMBER<T,1>&,const A& x) {return x;}
-template<class T,class A> inline typename enable_if<!IS_FIXED_NUMBER<A>::value,const A&>::type operator/(const A& x,const FIXED_NUMBER<T,1>&) {return x;}
+template<class T,class A> inline enable_if_t<!IS_FIXED_NUMBER<A>::value,const A&> operator*(const A& x,const FIXED_NUMBER<T,1>&) {return x;}
+template<class T,class A> inline enable_if_t<!IS_FIXED_NUMBER<A>::value,const A&> operator*(const FIXED_NUMBER<T,1>&,const A& x) {return x;}
+template<class T,class A> inline enable_if_t<!IS_FIXED_NUMBER<A>::value,const A&> operator/(const A& x,const FIXED_NUMBER<T,1>&) {return x;}
 template<class T,class A> inline A& operator*=(A& x,const FIXED_NUMBER<T,1>&) {return x;}
 template<class T,class A> inline A& operator/=(A& x,const FIXED_NUMBER<T,1>&) {return x;}
 
@@ -88,10 +88,10 @@ template<class T,int m> inline T operator-(const FIXED_NUMBER<T,m>&,const T& x) 
 
 template<class T,int m> inline std::ostream& operator<<(std::ostream& output,const FIXED_NUMBER<T,m>&) {return output<<(T)m;}
 
-template<class T,int m> typename enable_if<is_scalar<T>::value>::type Fill_From(T& a,const FIXED_NUMBER<T,m>& b){a=(T)m;}
+template<class T,int m> enable_if_t<is_scalar<T>::value> Fill_From(T& a,const FIXED_NUMBER<T,m>& b){a=(T)m;}
 template<class T,int m> void Fill_From(FIXED_NUMBER<T,m>& a,const FIXED_NUMBER<T,m>& b){a=b;}
 
-template<class T> typename enable_if<is_scalar<T>::value,T>::type Choose(T& a,T& b){a=b;}
+template<class T> enable_if_t<is_scalar<T>::value,T> Choose(T& a,T& b){a=b;}
 template<class T,int m> T Choose(const T& a,const FIXED_NUMBER<T,m>& b);
 template<class T,int m> T Choose(const FIXED_NUMBER<T,m>& a,const T& b);
 template<class T,int m,int n> T Choose(const FIXED_NUMBER<T,m>& a,const FIXED_NUMBER<T,n>& b);

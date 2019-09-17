@@ -10,7 +10,9 @@
 #include <Core/Utilities/STATIC_ASSERT.h>
 #include <Core/Utilities/TYPE_UTILITIES.h>
 #include <Core/Vectors/VECTOR_FORWARD.h>
+#include <type_traits>
 namespace PhysBAM{
+using std::enable_if_t;
 
 template<class T,class ID=int> class ARRAY_VIEW;
 template<class T,class T_ARRAY,class ID=int> class ARRAY_BASE;
@@ -43,11 +45,11 @@ template<int d> struct DOMAIN_INDEX_TYPE<FACE_INDEX<d> > {typedef RANGE<VECTOR<i
 
 template<class T0,class T1,class T_ARRAY0,class T_ARRAY1,class ID,class OP> auto
 Array_Expression_Helper(const ARRAY_BASE<T0,T_ARRAY0,ID>& array0,const ARRAY_BASE<T1,T_ARRAY1,ID>& array1,OP op,
-    typename enable_if<!(FIXED_SIZE_VECTOR<T_ARRAY0>::value || FIXED_SIZE_VECTOR<T_ARRAY1>::value),int>::type=0);
+    enable_if_t<!(FIXED_SIZE_VECTOR<T_ARRAY0>::value || FIXED_SIZE_VECTOR<T_ARRAY1>::value),int> =0);
 
 template<class T0,class T1,class T_ARRAY0,class T_ARRAY1,class OP> auto
 Array_Expression_Helper(const ARRAY_BASE<T0,T_ARRAY0,int>& array0,const ARRAY_BASE<T1,T_ARRAY1,int>& array1,OP op,
-    typename enable_if<FIXED_SIZE_VECTOR<T_ARRAY0>::value || FIXED_SIZE_VECTOR<T_ARRAY1>::value,int>::type=0);
+    enable_if_t<FIXED_SIZE_VECTOR<T_ARRAY0>::value || FIXED_SIZE_VECTOR<T_ARRAY1>::value,int> =0);
 
 template<class T,class T_ARRAY,class ID,class OP> auto
 Array_Expression_Helper(const ARRAY_BASE<T,T_ARRAY,ID>& array,OP op);

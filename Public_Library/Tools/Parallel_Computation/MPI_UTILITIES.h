@@ -44,7 +44,7 @@ template<class T> struct DATATYPE_HELPER<VECTOR<T,1> >:public DATATYPE_HELPER<T>
 template<class T> struct DATATYPE_HELPER<MATRIX<T,1,1> >:public DATATYPE_HELPER<T>{};
 
 template<class T,int d> MPI::Datatype Scalar_Block_Datatype();
-template<class TV> struct DATATYPE_HELPER<TV,typename enable_if<IS_SCALAR_BLOCK<TV>::value && (sizeof(TV)>sizeof(typename TV::SCALAR))>::type>{static MPI::Datatype Datatype()
+template<class TV> struct DATATYPE_HELPER<TV,enable_if_t<IS_SCALAR_BLOCK<TV>::value && (sizeof(TV)>sizeof(typename TV::SCALAR))>>{static MPI::Datatype Datatype()
 {typedef typename TV::SCALAR T;return Scalar_Block_Datatype<T,sizeof(TV)/sizeof(T)>();}};
 
 template<class T> struct DATATYPE_HELPER<SPARSE_MATRIX_ENTRY<T> >{static MPI::Datatype Datatype();};
@@ -61,14 +61,14 @@ template<class T> struct HAS_DATATYPE<T,typename FIRST<void,typename DATATYPE_HE
 template<class T> inline int Pack_Size(const MPI::Comm& comm)
 {return Datatype<T>().Pack_size(1,comm);}
 
-template<class T> inline int Pack_Size(const T& data,typename enable_if<HAS_DATATYPE<T>::value,const MPI::Comm&>::type comm)
+template<class T> inline int Pack_Size(const T& data,enable_if_t<HAS_DATATYPE<T>::value,const MPI::Comm&> comm)
 {return Pack_Size<T>(comm);}
 
-template<class T> inline void Pack(const T& data,ARRAY_VIEW<char> buffer,int& position,typename enable_if<HAS_DATATYPE<T>::value,const MPI::Comm&>::type comm)
+template<class T> inline void Pack(const T& data,ARRAY_VIEW<char> buffer,int& position,enable_if_t<HAS_DATATYPE<T>::value,const MPI::Comm&> comm)
 {assert(Pack_Size(data,comm)<=buffer.Size()-position);
 Datatype<T>().Pack(&data,1,buffer.Get_Array_Pointer(),buffer.Size(),position,comm);}
 
-template<class T> inline void Unpack(T& data,ARRAY_VIEW<const char> buffer,int& position,const typename enable_if<HAS_DATATYPE<T>::value,const MPI::Comm&>::type comm)
+template<class T> inline void Unpack(T& data,ARRAY_VIEW<const char> buffer,int& position,const enable_if_t<HAS_DATATYPE<T>::value,const MPI::Comm&> comm)
 {Datatype<T>().Unpack(buffer.Get_Array_Pointer(),buffer.Size(),&data,1,position,comm);}
 //#####################################################################
 // Pack/Unpack for arrays
@@ -125,7 +125,7 @@ template<class T,int d> inline int Pack_Size(const PARTICLES<VECTOR<T,d> >& data
 PHYSBAM_ASSERT(size==MPI::UNSIGNED_CHAR.Pack_size(size,comm)); // assert that we can implement pack ourselves for particles
 return size;}
 
-template<class T_PARTICLES> inline typename enable_if<is_base_of<PARTICLES<typename T_PARTICLES::VECTOR>,T_PARTICLES>::value,int>::type // work around compiler bug with enable_if
+template<class T_PARTICLES> inline enable_if_t<is_base_of<PARTICLES<typename T_PARTICLES::VECTOR>,T_PARTICLES>::value,int> // work around compiler bug with enable_if
 Pack_Size(const T_PARTICLES& particles,const MPI::Comm& comm)
 {return Pack_Size(particles,comm);}
 

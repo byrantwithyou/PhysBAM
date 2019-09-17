@@ -83,11 +83,11 @@ void Fill_From(VEC_HOLDER<OBJ1,BASE1>& o,const VEC_HOLDER<OBJ,BASE>& v)
 }
 
 template<int i,class A,int d,class OBJ>
-inline typename enable_if<!(i>=0 && i<d)>::type
+inline enable_if_t<!(i>=0 && i<d)>
 Extract_Entry_Helper(VECTOR<A,d>& dx,const OBJ& c) {}
 
 template<int i,class A,int d,class OBJ>
-inline typename enable_if<(i>=0 && i<d)>::type
+inline enable_if_t<(i>=0 && i<d)>
 Extract_Entry_Helper(VECTOR<A,d>& dx,const OBJ& c)
 {
     Fill_From(dx(i),c.obj);

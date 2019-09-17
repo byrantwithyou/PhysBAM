@@ -48,12 +48,12 @@ public:
     {array.Set((ELEMENT*)array_input.array.Get_Array_Pointer(),domain.Size());} // TODO: why do I need this cast?
 
     template<class T_ARRAY>
-    ARRAY_VIEW(T_ARRAY& array_input,typename enable_if<is_same<ELEMENT,typename T_ARRAY::ELEMENT>::value && !IS_ARRAY_VIEW<T_ARRAY>::value,UNUSABLE>::type unusable=UNUSABLE())
+    ARRAY_VIEW(T_ARRAY& array_input,enable_if_t<is_same<ELEMENT,typename T_ARRAY::ELEMENT>::value && !IS_ARRAY_VIEW<T_ARRAY>::value,UNUSABLE> unusable=UNUSABLE())
         :BASE(array_input.Domain_Indices())
     {Initialize(array_input.array.Get_Array_Pointer());}
 
     template<class T_ARRAY>
-    ARRAY_VIEW(T_ARRAY array_input,typename enable_if<is_same<ELEMENT,typename T_ARRAY::ELEMENT>::value && IS_ARRAY_VIEW<T_ARRAY>::value,UNUSABLE>::type unusable=UNUSABLE())
+    ARRAY_VIEW(T_ARRAY array_input,enable_if_t<is_same<ELEMENT,typename T_ARRAY::ELEMENT>::value && IS_ARRAY_VIEW<T_ARRAY>::value,UNUSABLE> unusable=UNUSABLE())
         :BASE(array_input.Domain_Indices())
     {Initialize(array_input.array.Get_Array_Pointer());}
 
@@ -74,11 +74,11 @@ public:
     {Calculate_Acceleration_Constants(array.domain);Initialize(array.base_pointer);}
 
     template<class T_ARRAY>
-    void Set(T_ARRAY& array,typename enable_if<is_same<ELEMENT,typename T_ARRAY::ELEMENT>::value && !IS_ARRAY_VIEW<T_ARRAY>::value,UNUSABLE>::type unusable=UNUSABLE())
+    void Set(T_ARRAY& array,enable_if_t<is_same<ELEMENT,typename T_ARRAY::ELEMENT>::value && !IS_ARRAY_VIEW<T_ARRAY>::value,UNUSABLE> unusable=UNUSABLE())
     {Calculate_Acceleration_Constants(array.Domain_Indices());Initialize(array.Get_Array_Pointer());}
 
     template<class T_ARRAY>
-    void Set(T_ARRAY array,typename enable_if<is_same<ELEMENT,typename T_ARRAY::ELEMENT>::value && IS_ARRAY_VIEW<T_ARRAY>::value,UNUSABLE>::type unusable=UNUSABLE())
+    void Set(T_ARRAY array,enable_if_t<is_same<ELEMENT,typename T_ARRAY::ELEMENT>::value && IS_ARRAY_VIEW<T_ARRAY>::value,UNUSABLE> unusable=UNUSABLE())
     {Calculate_Acceleration_Constants(array.Domain_Indices());Initialize(array.Get_Array_Pointer());}
 
     static bool Same_Array(const ARRAY_VIEW& array0,const ARRAY_VIEW& array1)

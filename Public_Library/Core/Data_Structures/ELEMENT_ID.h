@@ -99,7 +99,7 @@ public:
 //#####################################################################
 };
 
-template<class T> inline typename enable_if<is_fundamental<T>::value,T>::type
+template<class T> inline enable_if_t<is_fundamental<T>::value,T>
 Value(T i)
 {return i;}
 
@@ -129,7 +129,7 @@ template<class ID_TYPE> struct HASH_REDUCE<ID_TYPE,typename FIRST<void,typename 
 {static int H(ID_TYPE id){return id.Value();}};
 
 template<class ID,class SCALAR>
-struct REPLACE_FLOATING_POINT<ID,SCALAR,typename enable_if<(typename ID::ELEMENT_ID_TAG)1>::type>
+struct REPLACE_FLOATING_POINT<ID,SCALAR,enable_if_t<(typename ID::ELEMENT_ID_TAG)1>>
 {typedef ID TYPE;};
 }
 #endif

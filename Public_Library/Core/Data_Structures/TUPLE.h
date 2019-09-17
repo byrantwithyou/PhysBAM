@@ -16,13 +16,13 @@ template<class... Args>
 struct TUPLE_IO
 {
     static const int n=std::tuple_size<std::tuple<Args...> >::value;
-    template<int i> static typename std::enable_if<(i<n-1)>::type
+    template<int i> static enable_if_t<(i<n-1)>
     P(std::ostream& o,const std::tuple<Args...>& object)
     {
         o<<std::get<i>(object)<<" ";
         P<i+1>(o,object);
     }
-    template<int i> static typename std::enable_if<(i==n-1)>::type
+    template<int i> static enable_if_t<(i==n-1)>
     P(std::ostream& o,const std::tuple<Args...>& object)
     {
         o<<std::get<i>(object);
@@ -40,7 +40,7 @@ inline std::ostream& operator<<(std::ostream& o,const std::tuple<Args...>& objec
 template<class... Args> struct HASH_REDUCE<std::tuple<Args...> >
 {
     template<int n>
-    static typename std::enable_if<(n>3),int>::type
+    static enable_if_t<(n>3),int>
     F(const std::tuple<Args...>& key)
     {
         return int_hash(F<n-2>(key),
@@ -49,7 +49,7 @@ template<class... Args> struct HASH_REDUCE<std::tuple<Args...> >
     }
 
     template<int n>
-    static typename std::enable_if<(n==3),int>::type
+    static enable_if_t<(n==3),int>
     F(const std::tuple<Args...>& key)
     {
         return int_hash(
@@ -59,7 +59,7 @@ template<class... Args> struct HASH_REDUCE<std::tuple<Args...> >
     }
 
     template<int n>
-    static typename std::enable_if<(n==2),int>::type
+    static enable_if_t<(n==2),int>
     F(const std::tuple<Args...>& key)
     {
         return int_hash(
@@ -68,14 +68,14 @@ template<class... Args> struct HASH_REDUCE<std::tuple<Args...> >
     }
 
     template<int n>
-    static typename std::enable_if<(n==1),int>::type
+    static enable_if_t<(n==1),int>
     F(const std::tuple<Args...>& key)
     {
         return int_hash(Hash_Reduce(std::get<0>(key)));
     }
 
     template<int n>
-    static typename std::enable_if<(n==0),int>::type
+    static enable_if_t<(n==0),int>
     F(const std::tuple<Args...>& key)
     {
         return missing_element_hash;

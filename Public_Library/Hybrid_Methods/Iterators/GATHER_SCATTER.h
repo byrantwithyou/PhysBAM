@@ -105,7 +105,7 @@ public:
     }
 
     template<class DATA,class F,class... Args>
-    typename std::enable_if<sizeof(((*(F*)0)(0,*(DATA*)0),true))>::type
+    enable_if_t<sizeof(((*(F*)0)(0,*(DATA*)0),true))>
     Helper(T_FACE_SCRATCH& face_scratch,bool want_gradient,int p,DATA& data,F f,Args&&... args)
     {
         f(p,data);
@@ -113,7 +113,7 @@ public:
     }
 
     template<class DATA,class F,class... Args>
-    typename std::enable_if<sizeof(((*(F*)0)(0,*(PARTICLE_GRID_ITERATOR<TV>*)0,*(DATA*)0),true))>::type
+    enable_if_t<sizeof(((*(F*)0)(0,*(PARTICLE_GRID_ITERATOR<TV>*)0,*(DATA*)0),true))>
     Helper(T_FACE_SCRATCH& face_scratch,bool want_gradient,int p,DATA& data,F f,Args&&... args)
     {
         for(PARTICLE_GRID_ITERATOR<TV> it(weights,p,want_gradient,face_scratch(0));it.Valid();it.Next())
@@ -122,7 +122,7 @@ public:
     }
 
     template<class DATA,class F,class... Args>
-    typename std::enable_if<sizeof(((*(F*)0)(0,*(PARTICLE_GRID_FACE_ITERATOR<TV>*)0,*(DATA*)0),true))>::type
+    enable_if_t<sizeof(((*(F*)0)(0,*(PARTICLE_GRID_FACE_ITERATOR<TV>*)0,*(DATA*)0),true))>
     Helper(T_FACE_SCRATCH& face_scratch,bool want_gradient,int p,DATA& data,F f,Args&&... args)
     {
         for(PARTICLE_GRID_FACE_ITERATOR<TV> it(face_weights,p,want_gradient,face_scratch);it.Valid();it.Next())

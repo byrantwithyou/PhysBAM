@@ -17,6 +17,7 @@ using std::add_lvalue_reference;
 using std::add_pointer;
 using std::conditional;
 using std::enable_if;
+using std::enable_if_t;
 using std::is_base_of;
 using std::is_class;
 using std::is_const;
@@ -62,8 +63,8 @@ template<class T> struct HAS_TRIVIAL_DESTRUCTOR {static const bool value=is_pod<
 template<class T,class RW,class ENABLER=void> struct IS_BINARY_IO_SAFE;
 
 template<class T,class SCALAR,class ENABLER=void> struct REPLACE_FLOATING_POINT{};
-template<class T,class SCALAR> struct REPLACE_FLOATING_POINT<T,SCALAR,typename enable_if<(is_same<T,float>::value || is_same<T,double>::value) && (is_same<SCALAR,float>::value || is_same<SCALAR,double>::value)>::type>{typedef SCALAR TYPE;};
-template<class T,class SCALAR> struct REPLACE_FLOATING_POINT<T,SCALAR,typename enable_if<!(is_same<T,float>::value || is_same<T,double>::value) && is_fundamental<T>::value && (is_same<SCALAR,float>::value || is_same<SCALAR,double>::value)>::type>{typedef T TYPE;};
-template<class T,class SCALAR> struct REPLACE_FLOATING_POINT<T,SCALAR,typename enable_if<is_pointer<T>::value>::type> {typedef typename REPLACE_FLOATING_POINT<typename remove_pointer<T>::type,SCALAR>::type* TYPE;};
+template<class T,class SCALAR> struct REPLACE_FLOATING_POINT<T,SCALAR,enable_if_t<(is_same<T,float>::value || is_same<T,double>::value) && (is_same<SCALAR,float>::value || is_same<SCALAR,double>::value)> >{typedef SCALAR TYPE;};
+template<class T,class SCALAR> struct REPLACE_FLOATING_POINT<T,SCALAR,enable_if_t<!(is_same<T,float>::value || is_same<T,double>::value) && is_fundamental<T>::value && (is_same<SCALAR,float>::value || is_same<SCALAR,double>::value)> >{typedef T TYPE;};
+template<class T,class SCALAR> struct REPLACE_FLOATING_POINT<T,SCALAR,enable_if_t<is_pointer<T>::value> > {typedef typename REPLACE_FLOATING_POINT<typename remove_pointer<T>::type,SCALAR>::type* TYPE;};
 }
 #endif

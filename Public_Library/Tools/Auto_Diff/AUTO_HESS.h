@@ -672,22 +672,22 @@ struct AUTO_HESS_MAT
     {return {x.Twice_Symmetric_Part(),::PhysBAM::Twice_Symmetric_Part<0,1>(dx)};}
 
     template<class T_MAT1>
-    typename std::enable_if<IS_MATRIX<T_MAT1>::value,AUTO_HESS<MATRIX<T,p,T_MAT1::n>,VECTOR<T,m>,Q> >::type
+    enable_if_t<IS_MATRIX<T_MAT1>::value,AUTO_HESS<MATRIX<T,p,T_MAT1::n>,VECTOR<T,m>,Q> >
     Transpose_Times(const AUTO_HESS<T_MAT1,VECTOR<T,m>,Q>& a) const
     {return {x.Transpose_Times(a.x),::PhysBAM::Transposed<0,1>(Contract<0,0>(dx,a.x))+Contract<0,0>(a.dx,x)};}
 
     template<class T_MAT1>
-    typename std::enable_if<IS_MATRIX<T_MAT1>::value,AUTO_HESS<MATRIX<T,n,T_MAT1::m>,VECTOR<T,m>,Q> >::type
+    enable_if_t<IS_MATRIX<T_MAT1>::value,AUTO_HESS<MATRIX<T,n,T_MAT1::m>,VECTOR<T,m>,Q> >
     Times_Transpose(const AUTO_HESS<T_MAT1,VECTOR<T,m>,Q>& a) const
     {return {x.Times_Transpose(a.x),Contract<1,1>(dx,a.x)+::PhysBAM::Transposed<0,1>(Contract<1,1>(a.dx,x))};}
 
     template<class T_MAT1>
-    typename std::enable_if<IS_MATRIX<T_MAT1>::value,AUTO_HESS<MATRIX<T,p,T_MAT1::n>,VECTOR<T,m>,Q> >::type
+    enable_if_t<IS_MATRIX<T_MAT1>::value,AUTO_HESS<MATRIX<T,p,T_MAT1::n>,VECTOR<T,m>,Q> >
     Transpose_Times(const T_MAT1& a) const
     {return {x.Transpose_Times(a),::PhysBAM::Transposed<0,1>(Contract<0,0>(dx,a))};}
 
     template<class T_MAT1>
-    typename std::enable_if<IS_MATRIX<T_MAT1>::value,AUTO_HESS<MATRIX<T,n,T_MAT1::m>,VECTOR<T,m>,Q> >::type
+    enable_if_t<IS_MATRIX<T_MAT1>::value,AUTO_HESS<MATRIX<T,n,T_MAT1::m>,VECTOR<T,m>,Q> >
     Times_Transpose(const T_MAT1& a) const
     {return {x.Times_Transpose(a),Contract<1,1>(dx,a)};}
 
@@ -700,12 +700,12 @@ struct AUTO_HESS_MAT
     {return {x.Outer_Product_Matrix(),::PhysBAM::Twice_Symmetric_Part<0,1>(Contract<1,1>(dx,x))};}
 
     template<class T_MAT1>
-    typename std::enable_if<IS_MATRIX<T_MAT1>::value,AUTO_HESS<T,VECTOR<T,m>,Q> >::type
+    enable_if_t<IS_MATRIX<T_MAT1>::value,AUTO_HESS<T,VECTOR<T,m>,Q> >
     Double_Contract(const AUTO_HESS<T_MAT1,VECTOR<T,m>,Q>& a) const
     {return {::PhysBAM::Double_Contract(x,a.x),Contract<0,1>(Contract<1,1>(dx,a.x))+Contract<0,1>(Contract<1,1>(a.dx,x))};}
 
     template<class T_MAT1>
-    typename std::enable_if<IS_MATRIX<T_MAT1>::value,AUTO_HESS<T,VECTOR<T,m>,Q> >::type
+    enable_if_t<IS_MATRIX<T_MAT1>::value,AUTO_HESS<T,VECTOR<T,m>,Q> >
     Double_Contract(const T_MAT1& a) const
     {return {::PhysBAM::Double_Contract(x,a),Contract<0,1>(Contract<1,1>(dx,a))};}
 };
@@ -735,189 +735,189 @@ struct AUTO_HESS<SYMMETRIC_MATRIX<T,n>,VECTOR<T,m>,Q>:public AUTO_HESS_MAT<SYMME
 };
 
 template<class T,class T_MAT,int m,int Q>
-typename std::enable_if<IS_MATRIX<T_MAT>::value,AUTO_HESS<T_MAT,VECTOR<T,m>,Q> >::type
+enable_if_t<IS_MATRIX<T_MAT>::value,AUTO_HESS<T_MAT,VECTOR<T,m>,Q> >
 operator*(const AUTO_HESS<T_MAT,VECTOR<T,m>,Q>& a,const AUTO_HESS<T,VECTOR<T,m>,Q>& b)
 {
     return {a.x*b.x,b.x*a.dx+Tensor_Product<2>(a.x,b.dx)};
 }
 
 template<class T,class T_MAT,int m,int Q>
-typename std::enable_if<IS_MATRIX<T_MAT>::value,AUTO_HESS<T_MAT,VECTOR<T,m>,Q> >::type
+enable_if_t<IS_MATRIX<T_MAT>::value,AUTO_HESS<T_MAT,VECTOR<T,m>,Q> >
 operator*(const T_MAT& a,const AUTO_HESS<T,VECTOR<T,m>,Q>& b)
 {
     return {a*b.x,Tensor_Product<2>(a,b.dx)};
 }
 
 template<class T,class T_MAT,int m,int Q>
-typename std::enable_if<IS_MATRIX<T_MAT>::value,AUTO_HESS<T_MAT,VECTOR<T,m>,Q> >::type
+enable_if_t<IS_MATRIX<T_MAT>::value,AUTO_HESS<T_MAT,VECTOR<T,m>,Q> >
 operator*(const AUTO_HESS<T_MAT,VECTOR<T,m>,Q>& a,const T& b)
 {
     return {a.x*b,a.dx*b};
 }
 
 template<class T,class T_MAT,int m,int Q>
-typename std::enable_if<IS_MATRIX<T_MAT>::value,AUTO_HESS<T_MAT,VECTOR<T,m>,Q> >::type
+enable_if_t<IS_MATRIX<T_MAT>::value,AUTO_HESS<T_MAT,VECTOR<T,m>,Q> >
 operator*(const AUTO_HESS<T,VECTOR<T,m>,Q>& a,const T_MAT& b)
 {
     return {b*a.x,Tensor_Product<2>(b,a.dx)};
 }
 
 template<class T,class T_MAT,int m,int Q>
-typename std::enable_if<IS_MATRIX<T_MAT>::value,AUTO_HESS<T_MAT,VECTOR<T,m>,Q> >::type
+enable_if_t<IS_MATRIX<T_MAT>::value,AUTO_HESS<T_MAT,VECTOR<T,m>,Q> >
 operator*(const AUTO_HESS<T,VECTOR<T,m>,Q>& b,const AUTO_HESS<T_MAT,VECTOR<T,m>,Q>& a)
 {
     return a*b;
 }
 
 template<class T,class T_MAT,int m,int Q>
-typename std::enable_if<IS_MATRIX<T_MAT>::value,AUTO_HESS<T_MAT,VECTOR<T,m>,Q> >::type
+enable_if_t<IS_MATRIX<T_MAT>::value,AUTO_HESS<T_MAT,VECTOR<T,m>,Q> >
 operator*(const T& b,const AUTO_HESS<T_MAT,VECTOR<T,m>,Q>& a)
 {
     return a*b;
 }
 
 template<class T,class T_MAT,int m,int Q>
-typename std::enable_if<IS_MATRIX<T_MAT>::value,AUTO_HESS<T_MAT,VECTOR<T,m>,Q> >::type
+enable_if_t<IS_MATRIX<T_MAT>::value,AUTO_HESS<T_MAT,VECTOR<T,m>,Q> >
 operator/(const AUTO_HESS<T_MAT,VECTOR<T,m>,Q>& a,const AUTO_HESS<T,VECTOR<T,m>,Q>& b)
 {
     return a*((T)1/b);
 }
 
 template<class T,class T_MAT,int m,int Q>
-typename std::enable_if<IS_MATRIX<T_MAT>::value,AUTO_HESS<T_MAT,VECTOR<T,m>,Q> >::type
+enable_if_t<IS_MATRIX<T_MAT>::value,AUTO_HESS<T_MAT,VECTOR<T,m>,Q> >
 operator/(const AUTO_HESS<T_MAT,VECTOR<T,m>,Q>& a,const T& b)
 {
     return a*((T)1/b);
 }
 
 template<class T,class T_MAT,int m,int Q>
-typename std::enable_if<IS_MATRIX<T_MAT>::value,AUTO_HESS<T_MAT,VECTOR<T,m>,Q> >::type
+enable_if_t<IS_MATRIX<T_MAT>::value,AUTO_HESS<T_MAT,VECTOR<T,m>,Q> >
 operator/(const T_MAT& a,const AUTO_HESS<T,VECTOR<T,m>,Q>& b)
 {
     return a*((T)1/b);
 }
 
 template<class T,class T_MAT,int m,int Q>
-typename std::enable_if<IS_MATRIX<T_MAT>::value,AUTO_HESS<VECTOR<T,T_MAT::m>,VECTOR<T,m>,Q> >::type
+enable_if_t<IS_MATRIX<T_MAT>::value,AUTO_HESS<VECTOR<T,T_MAT::m>,VECTOR<T,m>,Q> >
 operator*(const AUTO_HESS<T_MAT,VECTOR<T,m>,Q>& a,const AUTO_HESS<VECTOR<T,T_MAT::n>,VECTOR<T,m>,Q>& b)
 {
     return {a.x*b.x,Contract<1>(a.dx,b.x)+a.x*b.dx};
 }
 
 template<class T,class T_MAT,int m,int Q>
-typename std::enable_if<IS_MATRIX<T_MAT>::value,AUTO_HESS<VECTOR<T,T_MAT::m>,VECTOR<T,m>,Q> >::type
+enable_if_t<IS_MATRIX<T_MAT>::value,AUTO_HESS<VECTOR<T,T_MAT::m>,VECTOR<T,m>,Q> >
 operator*(const AUTO_HESS<T_MAT,VECTOR<T,m>,Q>& a,const VECTOR<T,T_MAT::n>& b)
 {
     return {a.x*b,Contract<1>(a.dx,b)};
 }
 
 template<class T,class T_MAT,int m,int Q>
-typename std::enable_if<IS_MATRIX<T_MAT>::value,AUTO_HESS<VECTOR<T,T_MAT::m>,VECTOR<T,m>,Q> >::type
+enable_if_t<IS_MATRIX<T_MAT>::value,AUTO_HESS<VECTOR<T,T_MAT::m>,VECTOR<T,m>,Q> >
 operator*(const T_MAT& a,const AUTO_HESS<VECTOR<T,T_MAT::n>,VECTOR<T,m>,Q>& b)
 {
     return {a*b.x,a*b.dx,Contract<0,1>(b.ddx,a)};
 }
 
 template<class T,class T_MAT0,class T_MAT1,int m,int Q>
-typename std::enable_if<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value,AUTO_HESS<decltype(T_MAT0()+T_MAT1()),VECTOR<T,m>,Q> >::type
+enable_if_t<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value,AUTO_HESS<decltype(T_MAT0()+T_MAT1()),VECTOR<T,m>,Q> >
 operator+(const AUTO_HESS<T_MAT0,VECTOR<T,m>,Q>& a,const AUTO_HESS<T_MAT1,VECTOR<T,m>,Q>& b)
 {
     return {a.x+b.x,a.dx+b.dx,a.ddx+b.ddx};
 }
 
 template<class T,class T_MAT0,class T_MAT1,int m,int Q>
-typename std::enable_if<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value,AUTO_HESS<decltype(T_MAT0()+T_MAT1()),VECTOR<T,m>,Q> >::type
+enable_if_t<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value,AUTO_HESS<decltype(T_MAT0()+T_MAT1()),VECTOR<T,m>,Q> >
 operator+(const AUTO_HESS<T_MAT0,VECTOR<T,m>,Q>& a,const T_MAT1& b)
 {
     return {a.x+b,a.dx,a.ddx};
 }
 
 template<class T,class T_MAT0,class T_MAT1,int m,int Q>
-typename std::enable_if<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value,AUTO_HESS<decltype(T_MAT0()+T_MAT1()),VECTOR<T,m>,Q> >::type
+enable_if_t<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value,AUTO_HESS<decltype(T_MAT0()+T_MAT1()),VECTOR<T,m>,Q> >
 operator+(const T_MAT0& a,const AUTO_HESS<T_MAT1,VECTOR<T,m>,Q>& b)
 {
     return {a+b.x,b.dx,b.ddx};
 }
 
 template<class T,class T_MAT0,class T_MAT1,int m,int Q>
-typename std::enable_if<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value,AUTO_HESS<decltype(T_MAT0()-T_MAT1()),VECTOR<T,m>,Q> >::type
+enable_if_t<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value,AUTO_HESS<decltype(T_MAT0()-T_MAT1()),VECTOR<T,m>,Q> >
 operator-(const AUTO_HESS<T_MAT0,VECTOR<T,m>,Q>& a,const AUTO_HESS<T_MAT1,VECTOR<T,m>,Q>& b)
 {
     return {a.x-b.x,a.dx-b.dx,a.ddx-b.ddx};
 }
 
 template<class T,class T_MAT0,class T_MAT1,int m,int Q>
-typename std::enable_if<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value,AUTO_HESS<decltype(T_MAT0()-T_MAT1()),VECTOR<T,m>,Q> >::type
+enable_if_t<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value,AUTO_HESS<decltype(T_MAT0()-T_MAT1()),VECTOR<T,m>,Q> >
 operator-(const AUTO_HESS<T_MAT0,VECTOR<T,m>,Q>& a,const T_MAT1& b)
 {
     return {a.x-b,a.dx,a.ddx};
 }
 
 template<class T,class T_MAT0,class T_MAT1,int m,int Q>
-typename std::enable_if<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value,AUTO_HESS<decltype(T_MAT0()-T_MAT1()),VECTOR<T,m>,Q> >::type
+enable_if_t<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value,AUTO_HESS<decltype(T_MAT0()-T_MAT1()),VECTOR<T,m>,Q> >
 operator-(const T_MAT0& a,const AUTO_HESS<T_MAT1,VECTOR<T,m>,Q>& b)
 {
     return {a-b.x,-b.dx,-b.ddx};
 }
 
 template<class T,class T_MAT0,class T_MAT1,int m,int Q>
-typename std::enable_if<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value,AUTO_HESS<decltype(T_MAT0()*T_MAT1()),VECTOR<T,m>,Q> >::type
+enable_if_t<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value,AUTO_HESS<decltype(T_MAT0()*T_MAT1()),VECTOR<T,m>,Q> >
 operator*(const AUTO_HESS<T_MAT0,VECTOR<T,m>,Q>& a,const AUTO_HESS<T_MAT1,VECTOR<T,m>,Q>& b)
 {
     return {a.x*b.x,Contract<1,0>(a.dx,b.x)+Contract<0,1>(b.dx,a.x)};
 }
 
 template<class T,class T_MAT0,class T_MAT1,int m,int Q>
-typename std::enable_if<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value,AUTO_HESS<decltype(T_MAT0()*T_MAT1()),VECTOR<T,m>,Q> >::type
+enable_if_t<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value,AUTO_HESS<decltype(T_MAT0()*T_MAT1()),VECTOR<T,m>,Q> >
 operator*(const AUTO_HESS<T_MAT0,VECTOR<T,m>,Q>& a,const T_MAT1& b)
 {
     return {a.x*b,Contract<1,0>(a.dx,b)};
 }
 
 template<class T,class T_MAT0,class T_MAT1,int m,int Q>
-typename std::enable_if<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value,AUTO_HESS<decltype(T_MAT0()*T_MAT1()),VECTOR<T,m>,Q> >::type
+enable_if_t<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value,AUTO_HESS<decltype(T_MAT0()*T_MAT1()),VECTOR<T,m>,Q> >
 operator*(const T_MAT0& a,const AUTO_HESS<T_MAT1,VECTOR<T,m>,Q>& b)
 {
     return {a*b.x,Contract<0,1>(b.dx,a)};
 }
 
 template<class T,class T_MAT0,class T_MAT1,int m,int Q>
-typename std::enable_if<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value&&T_MAT0::m==T_MAT1::m,AUTO_HESS<MATRIX<T,T_MAT0::n,T_MAT1::n>,VECTOR<T,m>,Q> >::type
+enable_if_t<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value&&T_MAT0::m==T_MAT1::m,AUTO_HESS<MATRIX<T,T_MAT0::n,T_MAT1::n>,VECTOR<T,m>,Q> >
 Transpose_Times(const AUTO_HESS<T_MAT0,VECTOR<T,m>,Q>& a,const AUTO_HESS<T_MAT1,VECTOR<T,m>,Q>& b)
 {
     return a.Transpose_Times(b);
 }
 
 template<class T,class T_MAT0,class T_MAT1,int m,int Q>
-typename std::enable_if<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value&&T_MAT0::m==T_MAT1::m,AUTO_HESS<MATRIX<T,T_MAT0::n,T_MAT1::n>,VECTOR<T,m>,Q> >::type
+enable_if_t<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value&&T_MAT0::m==T_MAT1::m,AUTO_HESS<MATRIX<T,T_MAT0::n,T_MAT1::n>,VECTOR<T,m>,Q> >
 Transpose_Times(const AUTO_HESS<T_MAT0,VECTOR<T,m>,Q>& a,const T_MAT1& b)
 {
     return a.Transpose_Times(b);
 }
 
 template<class T,class T_MAT0,class T_MAT1,int m,int Q>
-typename std::enable_if<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value&&T_MAT0::m==T_MAT1::m,AUTO_HESS<MATRIX<T,T_MAT0::n,T_MAT1::n>,VECTOR<T,m>,Q> >::type
+enable_if_t<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value&&T_MAT0::m==T_MAT1::m,AUTO_HESS<MATRIX<T,T_MAT0::n,T_MAT1::n>,VECTOR<T,m>,Q> >
 Transpose_Times(const T_MAT0& a,const AUTO_HESS<T_MAT1,VECTOR<T,m>,Q>& b)
 {
     return {Transpose_Times(a,b.x),Contract<0,0>(b.dx,a)};
 }
 
 template<class T,class T_MAT0,class T_MAT1,int m,int Q>
-typename std::enable_if<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value&&T_MAT0::n==T_MAT1::n,AUTO_HESS<MATRIX<T,T_MAT0::m,T_MAT1::m>,VECTOR<T,m>,Q> >::type
+enable_if_t<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value&&T_MAT0::n==T_MAT1::n,AUTO_HESS<MATRIX<T,T_MAT0::m,T_MAT1::m>,VECTOR<T,m>,Q> >
 Times_Transpose(const AUTO_HESS<T_MAT0,VECTOR<T,m>,Q>& a,const AUTO_HESS<T_MAT1,VECTOR<T,m>,Q>& b)
 {
     return a.Times_Transpose(b);
 }
 
 template<class T,class T_MAT0,class T_MAT1,int m,int Q>
-typename std::enable_if<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value&&T_MAT0::n==T_MAT1::n,AUTO_HESS<MATRIX<T,T_MAT0::m,T_MAT1::m>,VECTOR<T,m>,Q> >::type
+enable_if_t<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value&&T_MAT0::n==T_MAT1::n,AUTO_HESS<MATRIX<T,T_MAT0::m,T_MAT1::m>,VECTOR<T,m>,Q> >
 Times_Transpose(const AUTO_HESS<T_MAT0,VECTOR<T,m>,Q>& a,const T_MAT1& b)
 {
     return a.Times_Transpose(b);
 }
 
 template<class T,class T_MAT0,class T_MAT1,int m,int Q>
-typename std::enable_if<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value&&T_MAT0::n==T_MAT1::n,AUTO_HESS<MATRIX<T,T_MAT0::m,T_MAT1::m>,VECTOR<T,m>,Q> >::type
+enable_if_t<IS_MATRIX<T_MAT0>::value&&IS_MATRIX<T_MAT1>::value&&T_MAT0::n==T_MAT1::n,AUTO_HESS<MATRIX<T,T_MAT0::m,T_MAT1::m>,VECTOR<T,m>,Q> >
 Times_Transpose(const T_MAT0& a,const AUTO_HESS<T_MAT1,VECTOR<T,m>,Q>& b)
 {
     return {a*a.x,Contract<1,1>(a.dx,a)};

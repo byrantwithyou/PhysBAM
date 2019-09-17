@@ -66,7 +66,7 @@ public:
     {return FIXED_NUMBER<T,1>();}
 
     template<class T_ARRAY>
-    static typename enable_if<is_same<typename T_ARRAY::ELEMENT,TV>::value && T_ARRAY::m==1,FIXED_NUMBER<T,1>>::type
+    static enable_if_t<is_same<typename T_ARRAY::ELEMENT,TV>::value && T_ARRAY::m==1,FIXED_NUMBER<T,1>>
     Clamped_Barycentric_Coordinates(const TV& location,const T_ARRAY& X)
     {return FIXED_NUMBER<T,1>();}
 
@@ -83,7 +83,7 @@ public:
     {return X.x;}
 
     template<class T_ARRAY>
-    static typename enable_if<is_same<typename T_ARRAY::ELEMENT,TV>::value && T_ARRAY::m==1,TV>::type
+    static enable_if_t<is_same<typename T_ARRAY::ELEMENT,TV>::value && T_ARRAY::m==1,TV>
     Point_From_Barycentric_Coordinates(const FIXED_NUMBER<T,1>,const T_ARRAY& X)
     {return X(0);}
 

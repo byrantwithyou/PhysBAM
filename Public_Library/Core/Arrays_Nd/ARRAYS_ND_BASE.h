@@ -134,11 +134,11 @@ public:
     ARRAYS_ND_BASE& operator*=(const T& a)
     {array*=a;return *this;}
 
-    template<class T2> typename enable_if<is_convertible<T2,T>::value,ARRAYS_ND_BASE&>::type
+    template<class T2> enable_if_t<is_convertible<T2,T>::value,ARRAYS_ND_BASE&>
     operator*=(const T2 a)
     {array*=(T)a;return *this;}
 
-    template<class T2> typename enable_if<is_scalar<T2>::value && !is_convertible<T2,T>::value,ARRAYS_ND_BASE&>::type
+    template<class T2> enable_if_t<is_scalar<T2>::value && !is_convertible<T2,T>::value,ARRAYS_ND_BASE&>
     operator*=(const T2 a)
     {array*=a;return *this;}
 

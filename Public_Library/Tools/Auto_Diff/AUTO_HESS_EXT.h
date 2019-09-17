@@ -47,35 +47,35 @@ template<class T,class MAT> struct DIFF_UNUSED_OK<HESSIAN_VEC<T,MAT> > {static c
 template<> struct DIFF_UNUSED_OK<DIFF_UNUSED> {static const int value=1;};
 
 template<class T,class U>
-inline typename enable_if<(DIFF_UNUSED_OK<T>::value | DIFF_UNUSED_OK<U>::value)==1,DIFF_UNUSED>::type
+inline enable_if_t<(DIFF_UNUSED_OK<T>::value | DIFF_UNUSED_OK<U>::value)==1,DIFF_UNUSED>
 operator+ (const T&,const U&) {return DIFF_UNUSED();}
 
 template<class T,class U>
-inline typename enable_if<(DIFF_UNUSED_OK<T>::value | DIFF_UNUSED_OK<U>::value)==1,DIFF_UNUSED>::type
+inline enable_if_t<(DIFF_UNUSED_OK<T>::value | DIFF_UNUSED_OK<U>::value)==1,DIFF_UNUSED>
 operator- (const T&,const U&) {return DIFF_UNUSED();}
 
 template<class T,class U>
-inline typename enable_if<(DIFF_UNUSED_OK<T>::value | DIFF_UNUSED_OK<U>::value)==1,DIFF_UNUSED>::type
+inline enable_if_t<(DIFF_UNUSED_OK<T>::value | DIFF_UNUSED_OK<U>::value)==1,DIFF_UNUSED>
 operator* (const T&,const U&) {return DIFF_UNUSED();}
 
 template<class T,class U>
-inline typename enable_if<(DIFF_UNUSED_OK<T>::value | DIFF_UNUSED_OK<U>::value)==1,DIFF_UNUSED>::type
+inline enable_if_t<(DIFF_UNUSED_OK<T>::value | DIFF_UNUSED_OK<U>::value)==1,DIFF_UNUSED>
 operator/ (const T&,const U&) {return DIFF_UNUSED();}
 
 template<class T,class U>
-inline typename enable_if<(DIFF_UNUSED_OK<T>::value | DIFF_UNUSED_OK<U>::value)==1,DIFF_UNUSED>::type
+inline enable_if_t<(DIFF_UNUSED_OK<T>::value | DIFF_UNUSED_OK<U>::value)==1,DIFF_UNUSED>
 Contract_00(const T&,const U&) {return DIFF_UNUSED();}
 template<class T,class U>
-inline typename enable_if<(DIFF_UNUSED_OK<T>::value | DIFF_UNUSED_OK<U>::value)==1,DIFF_UNUSED>::type
+inline enable_if_t<(DIFF_UNUSED_OK<T>::value | DIFF_UNUSED_OK<U>::value)==1,DIFF_UNUSED>
 Contract_10(const T&,const U&) {return DIFF_UNUSED();}
 template<class T,class U>
-inline typename enable_if<(DIFF_UNUSED_OK<T>::value | DIFF_UNUSED_OK<U>::value)==1,DIFF_UNUSED>::type
+inline enable_if_t<(DIFF_UNUSED_OK<T>::value | DIFF_UNUSED_OK<U>::value)==1,DIFF_UNUSED>
 Contract_11(const T&,const U&) {return DIFF_UNUSED();}
 template<class T,class U>
-inline typename enable_if<(DIFF_UNUSED_OK<T>::value | DIFF_UNUSED_OK<U>::value)==1,DIFF_UNUSED>::type
+inline enable_if_t<(DIFF_UNUSED_OK<T>::value | DIFF_UNUSED_OK<U>::value)==1,DIFF_UNUSED>
 Tensor_Product_01(const T&,const U&) {return DIFF_UNUSED();}
 template<class T,class U>
-inline typename enable_if<(DIFF_UNUSED_OK<T>::value | DIFF_UNUSED_OK<U>::value)==1,DIFF_UNUSED>::type
+inline enable_if_t<(DIFF_UNUSED_OK<T>::value | DIFF_UNUSED_OK<U>::value)==1,DIFF_UNUSED>
 Double_Contract_00_11(const T&,const U&) {return DIFF_UNUSED();}
 template<class T> inline DIFF_UNUSED Contract_0(const DIFF_UNUSED&,const T&) {return DIFF_UNUSED();}
 template<class T> inline DIFF_UNUSED Tensor_Product_0(const DIFF_UNUSED&,const T&) {return DIFF_UNUSED();}
@@ -83,75 +83,75 @@ inline DIFF_UNUSED Choose(const DIFF_UNUSED&,const DIFF_UNUSED&) {return DIFF_UN
 inline DIFF_UNUSED Choose_Zero(const DIFF_UNUSED&) {return DIFF_UNUSED();}
 inline void Fill_From(DIFF_UNUSED&,const DIFF_UNUSED&) {}
 
-template<int Q,class T,class U> auto Symmetric_Outer_Product_Q(const T&,const U&) -> typename enable_if<!(Q),DIFF_UNUSED>::type {return DIFF_UNUSED();}
+template<int Q,class T,class U> auto Symmetric_Outer_Product_Q(const T&,const U&) -> enable_if_t<!(Q),DIFF_UNUSED> {return DIFF_UNUSED();}
 
-template<int Q,class T,class U> auto Symmetric_Outer_Product_Q(const T&t,const U&u) -> typename enable_if<(bool)Q,decltype(Symmetric_Outer_Product(t,u))>::type {return Symmetric_Outer_Product(t,u);}
+template<int Q,class T,class U> auto Symmetric_Outer_Product_Q(const T&t,const U&u) -> enable_if_t<(bool)Q,decltype(Symmetric_Outer_Product(t,u))> {return Symmetric_Outer_Product(t,u);}
 
-template<int Q,class T,class U> auto Symmetric_Transpose_Times_Q(const T&,const U&) -> typename enable_if<!(Q),DIFF_UNUSED>::type {return DIFF_UNUSED();}
-template<int Q,class T,class U> auto Symmetric_Transpose_Times_Q(const T&t,const U&u) -> typename enable_if<(bool)Q,decltype(Symmetric_Transpose_Times(t,u))>::type {return Symmetric_Transpose_Times(t,u);}
+template<int Q,class T,class U> auto Symmetric_Transpose_Times_Q(const T&,const U&) -> enable_if_t<!(Q),DIFF_UNUSED> {return DIFF_UNUSED();}
+template<int Q,class T,class U> auto Symmetric_Transpose_Times_Q(const T&t,const U&u) -> enable_if_t<(bool)Q,decltype(Symmetric_Transpose_Times(t,u))> {return Symmetric_Transpose_Times(t,u);}
 
-template<int Q,class T,class U> auto Outer_Product_Q(const T&,const U&) -> typename enable_if<!(Q),DIFF_UNUSED>::type {return DIFF_UNUSED();}
-template<int Q,class T,class U> auto Outer_Product_Q(const T&t,const U&u) -> typename enable_if<(bool)Q,decltype(Outer_Product(t,u))>::type {return Outer_Product(t,u);}
+template<int Q,class T,class U> auto Outer_Product_Q(const T&,const U&) -> enable_if_t<!(Q),DIFF_UNUSED> {return DIFF_UNUSED();}
+template<int Q,class T,class U> auto Outer_Product_Q(const T&t,const U&u) -> enable_if_t<(bool)Q,decltype(Outer_Product(t,u))> {return Outer_Product(t,u);}
 
-template<int Q,class T,class U> auto Symmetric_Tensor_Product_12_Q(const T&,const U&) -> typename enable_if<!(Q),DIFF_UNUSED>::type {return DIFF_UNUSED();}
-template<int Q,class T,class U> auto Symmetric_Tensor_Product_12_Q(const T&t,const U&u) -> typename enable_if<(bool)Q,decltype(Symmetric_Tensor_Product_12(t,u))>::type {return Symmetric_Tensor_Product_12(t,u);}
+template<int Q,class T,class U> auto Symmetric_Tensor_Product_12_Q(const T&,const U&) -> enable_if_t<!(Q),DIFF_UNUSED> {return DIFF_UNUSED();}
+template<int Q,class T,class U> auto Symmetric_Tensor_Product_12_Q(const T&t,const U&u) -> enable_if_t<(bool)Q,decltype(Symmetric_Tensor_Product_12(t,u))> {return Symmetric_Tensor_Product_12(t,u);}
 
-template<int Q,class T,class U> auto Symmetric_Tensor_Product_23_Q(const T&,const U&) -> typename enable_if<!(Q),DIFF_UNUSED>::type {return DIFF_UNUSED();}
-template<int Q,class T,class U> auto Symmetric_Tensor_Product_23_Q(const T&t,const U&u) -> typename enable_if<(bool)Q,decltype(Symmetric_Tensor_Product_23(t,u))>::type {return Symmetric_Tensor_Product_23(t,u);}
+template<int Q,class T,class U> auto Symmetric_Tensor_Product_23_Q(const T&,const U&) -> enable_if_t<!(Q),DIFF_UNUSED> {return DIFF_UNUSED();}
+template<int Q,class T,class U> auto Symmetric_Tensor_Product_23_Q(const T&t,const U&u) -> enable_if_t<(bool)Q,decltype(Symmetric_Tensor_Product_23(t,u))> {return Symmetric_Tensor_Product_23(t,u);}
 
-template<int Q,class T,class U> auto Tensor_Product_2_Q(const T&,const U&) -> typename enable_if<!(Q),DIFF_UNUSED>::type {return DIFF_UNUSED();}
-template<int Q,class T,class U> auto Tensor_Product_2_Q(const T&t,const U&u) -> typename enable_if<(bool)Q,decltype(Tensor_Product_2(t,u))>::type {return Tensor_Product_2(t,u);}
+template<int Q,class T,class U> auto Tensor_Product_2_Q(const T&,const U&) -> enable_if_t<!(Q),DIFF_UNUSED> {return DIFF_UNUSED();}
+template<int Q,class T,class U> auto Tensor_Product_2_Q(const T&t,const U&u) -> enable_if_t<(bool)Q,decltype(Tensor_Product_2(t,u))> {return Tensor_Product_2(t,u);}
 
-template<int Q,class T,class U> auto Tensor_Product_01_Q(const T&,const U&) -> typename enable_if<!(Q),DIFF_UNUSED>::type {return DIFF_UNUSED();}
-template<int Q,class T,class U> auto Tensor_Product_01_Q(const T&t,const U&u) -> typename enable_if<(bool)Q,decltype(Tensor_Product_01(t,u))>::type {return Tensor_Product_01(t,u);}
+template<int Q,class T,class U> auto Tensor_Product_01_Q(const T&,const U&) -> enable_if_t<!(Q),DIFF_UNUSED> {return DIFF_UNUSED();}
+template<int Q,class T,class U> auto Tensor_Product_01_Q(const T&t,const U&u) -> enable_if_t<(bool)Q,decltype(Tensor_Product_01(t,u))> {return Tensor_Product_01(t,u);}
 
-template<int Q,class T,class U> auto Symmetric_Contract_10_12_Q(const T&,const U&) -> typename enable_if<!(Q),DIFF_UNUSED>::type {return DIFF_UNUSED();}
-template<int Q,class T,class U> auto Symmetric_Contract_10_12_Q(const T&t,const U&u) -> typename enable_if<(bool)Q,decltype(Symmetric_Contract_10_12(t,u))>::type {return Symmetric_Contract_10_12(t,u);}
+template<int Q,class T,class U> auto Symmetric_Contract_10_12_Q(const T&,const U&) -> enable_if_t<!(Q),DIFF_UNUSED> {return DIFF_UNUSED();}
+template<int Q,class T,class U> auto Symmetric_Contract_10_12_Q(const T&t,const U&u) -> enable_if_t<(bool)Q,decltype(Symmetric_Contract_10_12(t,u))> {return Symmetric_Contract_10_12(t,u);}
 
-template<int Q,class T,class U> auto Symmetric_Contract_00_12_Q(const T&,const U&) -> typename enable_if<!(Q),DIFF_UNUSED>::type {return DIFF_UNUSED();}
-template<int Q,class T,class U> auto Symmetric_Contract_00_12_Q(const T&t,const U&u) -> typename enable_if<(bool)Q,decltype(Symmetric_Contract_00_12(t,u))>::type {return Symmetric_Contract_00_12(t,u);}
+template<int Q,class T,class U> auto Symmetric_Contract_00_12_Q(const T&,const U&) -> enable_if_t<!(Q),DIFF_UNUSED> {return DIFF_UNUSED();}
+template<int Q,class T,class U> auto Symmetric_Contract_00_12_Q(const T&t,const U&u) -> enable_if_t<(bool)Q,decltype(Symmetric_Contract_00_12(t,u))> {return Symmetric_Contract_00_12(t,u);}
 
-template<int Q,class T,class U> auto Tensor_Product_1_Q(const T&,const U&) -> typename enable_if<!(Q),DIFF_UNUSED>::type {return DIFF_UNUSED();}
-template<int Q,class T,class U> auto Tensor_Product_1_Q(const T&t,const U&u) -> typename enable_if<(bool)Q,decltype(Tensor_Product_1(t,u))>::type {return Tensor_Product_1(t,u);}
+template<int Q,class T,class U> auto Tensor_Product_1_Q(const T&,const U&) -> enable_if_t<!(Q),DIFF_UNUSED> {return DIFF_UNUSED();}
+template<int Q,class T,class U> auto Tensor_Product_1_Q(const T&t,const U&u) -> enable_if_t<(bool)Q,decltype(Tensor_Product_1(t,u))> {return Tensor_Product_1(t,u);}
 
-template<int Q,class T,class U> auto Symmetric_Contract_00_23_Q(const T&,const U&) -> typename enable_if<!(Q),DIFF_UNUSED>::type {return DIFF_UNUSED();}
-template<int Q,class T,class U> auto Symmetric_Contract_00_23_Q(const T&t,const U&u) -> typename enable_if<(bool)Q,decltype(Symmetric_Contract_00_23(t,u))>::type {return Symmetric_Contract_00_23(t,u);}
+template<int Q,class T,class U> auto Symmetric_Contract_00_23_Q(const T&,const U&) -> enable_if_t<!(Q),DIFF_UNUSED> {return DIFF_UNUSED();}
+template<int Q,class T,class U> auto Symmetric_Contract_00_23_Q(const T&t,const U&u) -> enable_if_t<(bool)Q,decltype(Symmetric_Contract_00_23(t,u))> {return Symmetric_Contract_00_23(t,u);}
 
-template<int Q,class T,class U> auto Contract_01_Q(const T&,const U&) -> typename enable_if<!(Q),DIFF_UNUSED>::type {return DIFF_UNUSED();}
-template<int Q,class T,class U> auto Contract_01_Q(const T&t,const U&u) -> typename enable_if<(bool)Q,decltype(Contract_01(t,u))>::type {return Contract_01(t,u);}
+template<int Q,class T,class U> auto Contract_01_Q(const T&,const U&) -> enable_if_t<!(Q),DIFF_UNUSED> {return DIFF_UNUSED();}
+template<int Q,class T,class U> auto Contract_01_Q(const T&t,const U&u) -> enable_if_t<(bool)Q,decltype(Contract_01(t,u))> {return Contract_01(t,u);}
 
-template<int Q,class T,class U> auto Symmetric_Contract_11_23_Q(const T&,const U&) -> typename enable_if<!(Q),DIFF_UNUSED>::type {return DIFF_UNUSED();}
-template<int Q,class T,class U> auto Symmetric_Contract_11_23_Q(const T&t,const U&u) -> typename enable_if<(bool)Q,decltype(Symmetric_Contract_11_23(t,u))>::type {return Symmetric_Contract_11_23(t,u);}
+template<int Q,class T,class U> auto Symmetric_Contract_11_23_Q(const T&,const U&) -> enable_if_t<!(Q),DIFF_UNUSED> {return DIFF_UNUSED();}
+template<int Q,class T,class U> auto Symmetric_Contract_11_23_Q(const T&t,const U&u) -> enable_if_t<(bool)Q,decltype(Symmetric_Contract_11_23(t,u))> {return Symmetric_Contract_11_23(t,u);}
 
-template<int Q,class T,class U> auto Symmetric_Contract_01_23_Q(const T&,const U&) -> typename enable_if<!(Q),DIFF_UNUSED>::type {return DIFF_UNUSED();}
-template<int Q,class T,class U> auto Symmetric_Contract_01_23_Q(const T&t,const U&u) -> typename enable_if<(bool)Q,decltype(Symmetric_Contract_01_23(t,u))>::type {return Symmetric_Contract_01_23(t,u);}
+template<int Q,class T,class U> auto Symmetric_Contract_01_23_Q(const T&,const U&) -> enable_if_t<!(Q),DIFF_UNUSED> {return DIFF_UNUSED();}
+template<int Q,class T,class U> auto Symmetric_Contract_01_23_Q(const T&t,const U&u) -> enable_if_t<(bool)Q,decltype(Symmetric_Contract_01_23(t,u))> {return Symmetric_Contract_01_23(t,u);}
 
-template<int Q,class T,class U> auto Symmetric_Double_Contract_00_11_01_Q(const T&,const U&) -> typename enable_if<!(Q),DIFF_UNUSED>::type {return DIFF_UNUSED();}
-template<int Q,class T,class U> auto Symmetric_Double_Contract_00_11_01_Q(const T&t,const U&u) -> typename enable_if<(bool)Q,decltype(Symmetric_Double_Contract_00_11_01(t,u))>::type {return Symmetric_Double_Contract_00_11_01(t,u);}
+template<int Q,class T,class U> auto Symmetric_Double_Contract_00_11_01_Q(const T&,const U&) -> enable_if_t<!(Q),DIFF_UNUSED> {return DIFF_UNUSED();}
+template<int Q,class T,class U> auto Symmetric_Double_Contract_00_11_01_Q(const T&t,const U&u) -> enable_if_t<(bool)Q,decltype(Symmetric_Double_Contract_00_11_01(t,u))> {return Symmetric_Double_Contract_00_11_01(t,u);}
 
-template<int Q,class T> auto Contract_01_Q(const T&) -> typename enable_if<!(Q),DIFF_UNUSED>::type {return DIFF_UNUSED();}
-template<int Q,class T> auto Contract_01_Q(const T&t) -> typename enable_if<(bool)Q,decltype(Contract_01(t))>::type {return Contract_01_Q<Q&1>(t);}
+template<int Q,class T> auto Contract_01_Q(const T&) -> enable_if_t<!(Q),DIFF_UNUSED> {return DIFF_UNUSED();}
+template<int Q,class T> auto Contract_01_Q(const T&t) -> enable_if_t<(bool)Q,decltype(Contract_01(t))> {return Contract_01_Q<Q&1>(t);}
 
-template<int Q,class T> auto Transposed_01_Q(const T&) -> typename enable_if<!(Q),DIFF_UNUSED>::type {return DIFF_UNUSED();}
-template<int Q,class T> auto Transposed_01_Q(const T&t) -> typename enable_if<(bool)Q,decltype(Transposed_01(t))>::type {return Transposed_01_Q<Q&1>(t);}
+template<int Q,class T> auto Transposed_01_Q(const T&) -> enable_if_t<!(Q),DIFF_UNUSED> {return DIFF_UNUSED();}
+template<int Q,class T> auto Transposed_01_Q(const T&t) -> enable_if_t<(bool)Q,decltype(Transposed_01(t))> {return Transposed_01_Q<Q&1>(t);}
 
-template<int Q,class T> auto Twice_Symmetric_Part_23_Q(const T&) -> typename enable_if<!(Q),DIFF_UNUSED>::type {return DIFF_UNUSED();}
-template<int Q,class T> auto Twice_Symmetric_Part_23_Q(const T&t) -> typename enable_if<(bool)Q,decltype(Twice_Symmetric_Part_23(t))>::type {return Twice_Symmetric_Part_23(t);}
+template<int Q,class T> auto Twice_Symmetric_Part_23_Q(const T&) -> enable_if_t<!(Q),DIFF_UNUSED> {return DIFF_UNUSED();}
+template<int Q,class T> auto Twice_Symmetric_Part_23_Q(const T&t) -> enable_if_t<(bool)Q,decltype(Twice_Symmetric_Part_23(t))> {return Twice_Symmetric_Part_23(t);}
 
-template<int Q,class T> auto Twice_Symmetric_Part_01_Q(const T&) -> typename enable_if<!(Q),DIFF_UNUSED>::type {return DIFF_UNUSED();}
-template<int Q,class T> auto Twice_Symmetric_Part_01_Q(const T&t) -> typename enable_if<(bool)Q,decltype(Twice_Symmetric_Part_01(t))>::type {return Twice_Symmetric_Part_01(t);}
+template<int Q,class T> auto Twice_Symmetric_Part_01_Q(const T&) -> enable_if_t<!(Q),DIFF_UNUSED> {return DIFF_UNUSED();}
+template<int Q,class T> auto Twice_Symmetric_Part_01_Q(const T&t) -> enable_if_t<(bool)Q,decltype(Twice_Symmetric_Part_01(t))> {return Twice_Symmetric_Part_01(t);}
 
-template<int Q,class T,class U> auto Symmetric_Tensor_Product_02_23_Q(const T&,const U&) -> typename enable_if<!(Q),DIFF_UNUSED>::type {return DIFF_UNUSED();}
-template<int Q,class T,class U> auto Symmetric_Tensor_Product_02_23_Q(const T&t,const U&u) -> typename enable_if<(bool)Q,decltype(Symmetric_Tensor_Product_02_23(t,u))>::type {return Symmetric_Tensor_Product_02_23(t,u);}
+template<int Q,class T,class U> auto Symmetric_Tensor_Product_02_23_Q(const T&,const U&) -> enable_if_t<!(Q),DIFF_UNUSED> {return DIFF_UNUSED();}
+template<int Q,class T,class U> auto Symmetric_Tensor_Product_02_23_Q(const T&t,const U&u) -> enable_if_t<(bool)Q,decltype(Symmetric_Tensor_Product_02_23(t,u))> {return Symmetric_Tensor_Product_02_23(t,u);}
 
-template<int Q,class T> auto Transpose_Times_Self_Q(const T&) -> typename enable_if<!(Q),DIFF_UNUSED>::type {return DIFF_UNUSED();}
-template<int Q,class T> auto Transpose_Times_Self_Q(const T&t) -> typename enable_if<(bool)Q,decltype(Transpose_Times_Self(t))>::type {return Transpose_Times_Self(t);}
+template<int Q,class T> auto Transpose_Times_Self_Q(const T&) -> enable_if_t<!(Q),DIFF_UNUSED> {return DIFF_UNUSED();}
+template<int Q,class T> auto Transpose_Times_Self_Q(const T&t) -> enable_if_t<(bool)Q,decltype(Transpose_Times_Self(t))> {return Transpose_Times_Self(t);}
 
-template<int Q,class T> auto Outer_Product_Q(const T&) -> typename enable_if<!(Q),DIFF_UNUSED>::type {return DIFF_UNUSED();}
-template<int Q,class T> auto Outer_Product_Q(const T&t) -> typename enable_if<(bool)Q,decltype(Outer_Product(t))>::type {return Outer_Product(t);}
+template<int Q,class T> auto Outer_Product_Q(const T&) -> enable_if_t<!(Q),DIFF_UNUSED> {return DIFF_UNUSED();}
+template<int Q,class T> auto Outer_Product_Q(const T&t) -> enable_if_t<(bool)Q,decltype(Outer_Product(t))> {return Outer_Product(t);}
 
-template<int Q,class T,class U,class V> auto Symmetric_Double_Contract_12_With_Tensor_Q(const T&,const U&,const V&) -> typename enable_if<!(Q),DIFF_UNUSED>::type {return DIFF_UNUSED();}
-template<int Q,class T,class U,class V> auto Symmetric_Double_Contract_12_With_Tensor_Q(const T&t,const U&u,const V&v) -> typename enable_if<(bool)Q,decltype(Symmetric_Double_Contract_12_With_Tensor(t,u,v))>::type {return Symmetric_Double_Contract_12_With_Tensor(t,u,v);}
+template<int Q,class T,class U,class V> auto Symmetric_Double_Contract_12_With_Tensor_Q(const T&,const U&,const V&) -> enable_if_t<!(Q),DIFF_UNUSED> {return DIFF_UNUSED();}
+template<int Q,class T,class U,class V> auto Symmetric_Double_Contract_12_With_Tensor_Q(const T&t,const U&u,const V&v) -> enable_if_t<(bool)Q,decltype(Symmetric_Double_Contract_12_With_Tensor(t,u,v))> {return Symmetric_Double_Contract_12_With_Tensor(t,u,v);}
 
 ///////////////// AUTO_HESS_EXT /////////////////
 
@@ -191,17 +191,17 @@ Make_Hess(T x,const DIFF_UNUSED& dx,const DIFF_UNUSED& ddx)
 {return AUTO_HESS_EXT<T,DIFF_UNUSED,DIFF_UNUSED,0>(x,dx,ddx);}
 
 template<class LAYOUT,class T>
-typename enable_if<is_scalar<T>::value,AUTO_HESS_EXT<T,typename EMPTY_VEC<1,LAYOUT,-1>::TYPE,typename EMPTY_MAT<LAYOUT,-1>::TYPE,3> >::type
+enable_if_t<is_scalar<T>::value,AUTO_HESS_EXT<T,typename EMPTY_VEC<1,LAYOUT,-1>::TYPE,typename EMPTY_MAT<LAYOUT,-1>::TYPE,3> >
 Hess_From_Const(T a)
 {return AUTO_HESS_EXT<T,typename EMPTY_VEC<1,LAYOUT,-1>::TYPE,typename EMPTY_MAT<LAYOUT,-1>::TYPE,3>(a);}
 
 template<class LAYOUT,class T>
-typename enable_if<is_scalar<T>::value,AUTO_HESS_EXT<T,typename EMPTY_VEC<1,LAYOUT,-1>::TYPE,DIFF_UNUSED,1> >::type
+enable_if_t<is_scalar<T>::value,AUTO_HESS_EXT<T,typename EMPTY_VEC<1,LAYOUT,-1>::TYPE,DIFF_UNUSED,1> >
 Diff_From_Const(T a)
 {return AUTO_HESS_EXT<T,typename EMPTY_VEC<1,LAYOUT,-1>::TYPE,DIFF_UNUSED,1>(a);}
 
 template<class LAYOUT,class T>
-typename enable_if<is_scalar<T>::value,AUTO_HESS_EXT<T,DIFF_UNUSED,DIFF_UNUSED,0> >::type
+enable_if_t<is_scalar<T>::value,AUTO_HESS_EXT<T,DIFF_UNUSED,DIFF_UNUSED,0> >
 From_Const(T a)
 {return AUTO_HESS_EXT<T,DIFF_UNUSED,DIFF_UNUSED,0>(a);}
 
@@ -225,7 +225,7 @@ Cross_Helper_2(const AUTO_HESS_EXT_VEC<VECTOR<T,3>,VEC1,MAT1,Q>& a,const VECTOR<
     -> decltype(Make_Hess_Vec(VECTOR<T,3>(),-MATRIX<T,3>()*typename conditional<Q&1,GRADIENT_VEC<VECTOR<T,3>,VEC1>,DIFF_UNUSED>::type(),Contract_00(typename conditional<(Q&2)!=0,HESSIAN_VEC<VECTOR<T,3>,MAT1>,DIFF_UNUSED>::type(),MATRIX<T,3>())));
 
 template<class TV,class VEC1,class MAT1,int Q,class TYPE>
-typename enable_if<TV::m!=3,AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q> >::type
+enable_if_t<TV::m!=3,AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q> >
 Cross_Helper(const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q>& a,TYPE);
 
 template<class TV,class VEC,class MAT,int Q>
@@ -292,14 +292,14 @@ Cross_Helper_2(const AUTO_HESS_EXT_VEC<VECTOR<T,3>,VEC1,MAT1,Q>& a,const VECTOR<
 }
 
 template<class TV,class VEC1,class MAT1,int Q,class TYPE>
-typename enable_if<TV::m!=3,AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q> >::type
+enable_if_t<TV::m!=3,AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q> >
 Cross_Helper_1(const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q>& a,TYPE)
 {
     PHYSBAM_FATAL_ERROR("Cross product not defined except in 3D.");
     return a;
 }
 template<class TV,class VEC1,class MAT1,int Q,class TYPE>
-typename enable_if<TV::m!=3,AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q> >::type
+enable_if_t<TV::m!=3,AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q> >
 Cross_Helper_2(const AUTO_HESS_EXT_VEC<TV,VEC1,MAT1,Q>& a,TYPE)
 {
     PHYSBAM_FATAL_ERROR("Cross product not defined except in 3D.");
@@ -481,17 +481,17 @@ Make_Hess_Mat(const T_MAT& x,const DIFF_UNUSED& dx,const DIFF_UNUSED& ddx)
 {return AUTO_HESS_EXT_MAT<T_MAT,DIFF_UNUSED,DIFF_UNUSED,0>(x,dx,ddx);}
 
 template<class LAYOUT,class A>
-typename enable_if<IS_MATRIX<A>::value,AUTO_HESS_EXT_MAT<A,typename EMPTY_VEC<1,LAYOUT,A::m,A::n>::TYPE,typename EMPTY_MAT<LAYOUT,A::m,A::n>::TYPE,3> >::type
+enable_if_t<IS_MATRIX<A>::value,AUTO_HESS_EXT_MAT<A,typename EMPTY_VEC<1,LAYOUT,A::m,A::n>::TYPE,typename EMPTY_MAT<LAYOUT,A::m,A::n>::TYPE,3> >
 Hess_From_Const(const A& a)
 {return AUTO_HESS_EXT_MAT<A,typename EMPTY_VEC<1,LAYOUT,A::m,A::n>::TYPE,typename EMPTY_MAT<LAYOUT,A::m,A::n>::TYPE,3>(a);}
 
 template<class LAYOUT,class A>
-typename enable_if<IS_MATRIX<A>::value,AUTO_HESS_EXT_MAT<A,typename EMPTY_VEC<1,LAYOUT,A::m,A::n>::TYPE,DIFF_UNUSED,1> >::type
+enable_if_t<IS_MATRIX<A>::value,AUTO_HESS_EXT_MAT<A,typename EMPTY_VEC<1,LAYOUT,A::m,A::n>::TYPE,DIFF_UNUSED,1> >
 Diff_From_Const(const A& a)
 {return AUTO_HESS_EXT_MAT<A,typename EMPTY_VEC<1,LAYOUT,A::m,A::n>::TYPE,DIFF_UNUSED,1>(a);}
 
 template<class LAYOUT,class A>
-typename enable_if<IS_MATRIX<A>::value,AUTO_HESS_EXT_MAT<A,DIFF_UNUSED,DIFF_UNUSED,0> >::type
+enable_if_t<IS_MATRIX<A>::value,AUTO_HESS_EXT_MAT<A,DIFF_UNUSED,DIFF_UNUSED,0> >
 From_Const(const A& a)
 {return AUTO_HESS_EXT_MAT<A,DIFF_UNUSED,DIFF_UNUSED,0>(a);}
 

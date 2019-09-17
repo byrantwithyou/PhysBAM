@@ -14,11 +14,11 @@ typedef VECTOR<int,TV::m> TV_INT;
 
 #define TEST(...) Hess_Test([](auto u,auto v,auto a,auto b){return __VA_ARGS__;},#__VA_ARGS__)
 
-template<class A> auto Diff_Helper(const A& a) -> typename enable_if<IS_SCALAR<decltype(a.x)>::value && !IS_VECTOR<A>::value,A>::type {return a;}
-template<class A> auto Diff_Helper(const A& a) -> typename enable_if<IS_VECTOR<decltype(a.x)>::value,decltype(a.Dot(TV(1.1,2.3,-1.2)))>::type {return a.Dot(TV(1.1,2.3,-1.2));}
+template<class A> auto Diff_Helper(const A& a) -> enable_if_t<IS_SCALAR<decltype(a.x)>::value && !IS_VECTOR<A>::value,A> {return a;}
+template<class A> auto Diff_Helper(const A& a) -> enable_if_t<IS_VECTOR<decltype(a.x)>::value,decltype(a.Dot(TV(1.1,2.3,-1.2)))> {return a.Dot(TV(1.1,2.3,-1.2));}
 
-template<class A> auto Diff_Helper(const A& a) -> typename enable_if<IS_SCALAR<A>::value,A>::type {return a;}
-template<class A> auto Diff_Helper(const A& a) -> typename enable_if<IS_VECTOR<A>::value,decltype(a.Dot(TV(1.1,2.3,-1.2)))>::type {return a.Dot(TV(1.1,2.3,-1.2));}
+template<class A> auto Diff_Helper(const A& a) -> enable_if_t<IS_SCALAR<A>::value,A> {return a;}
+template<class A> auto Diff_Helper(const A& a) -> enable_if_t<IS_VECTOR<A>::value,decltype(a.Dot(TV(1.1,2.3,-1.2)))> {return a.Dot(TV(1.1,2.3,-1.2));}
 
 template<class F>
 void Hess_Test(F f,const char* str)

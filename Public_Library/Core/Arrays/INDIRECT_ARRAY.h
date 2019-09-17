@@ -44,19 +44,6 @@ public:
     T_ARRAY_VIEW array;
     CONST_T_INDICES indices;
 
-//     template<class T_OTHER_ARRAY>
-//     INDIRECT_ARRAY(T_OTHER_ARRAY& array,typename ADD_REFERENCE<CONST_T_INDICES>::TYPE indices,typename enable_if<:IS_ARRAY_VIEW<T_OTHER_ARRAY>::value,UNUSABLE>::type unusable=UNUSABLE())
-//         :array(array),indices(indices)
-//     {
-//         STATIC_ASSERT(is_base_of<T_ARRAY,T_OTHER_ARRAY>::value); // avoid grabbing reference to temporary
-//     }
-
-//     template<class T_OTHER_ARRAY>
-//     INDIRECT_ARRAY(T_OTHER_ARRAY array,typename ADD_REFERENCE<CONST_T_INDICES>::TYPE indices,typename enable_if<IS_ARRAY_VIEW<T_OTHER_ARRAY>::value,UNUSABLE>::type unusable=UNUSABLE())
-//         :array(array),indices(indices)
-//     {
-//     }
-
     INDIRECT_ARRAY(T_ARRAY_VIEW array,typename add_lvalue_reference<CONST_T_INDICES>::type indices)
         :array(array),indices(indices)
     {

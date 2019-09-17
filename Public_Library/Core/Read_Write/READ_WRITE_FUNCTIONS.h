@@ -31,15 +31,15 @@ inline std::ostream& operator<<(std::ostream& output_stream,R (*func)(A,B,C,D))
 //#####################################################################
 // Read_Binary
 //#####################################################################
-template<class RW,class T> inline typename enable_if<!HAS_TYPED_READ<T>::value && !IS_BINARY_IO_SAFE<T,RW>::value>::type
+template<class RW,class T> inline enable_if_t<!HAS_TYPED_READ<T>::value && !IS_BINARY_IO_SAFE<T,RW>::value>
 Read_Binary(std::istream& input,T& d)
 {d.template Read<RW>(input);}
 
-template<class RW,class T> inline typename enable_if<IS_BINARY_IO_SAFE<T,RW>::value>::type
+template<class RW,class T> inline enable_if_t<IS_BINARY_IO_SAFE<T,RW>::value>
 Read_Binary(std::istream& input,T& d)
 {input.read(reinterpret_cast<char*>(&d),sizeof(T));}
 
-template<class RW,class T> inline typename enable_if<HAS_TYPED_READ<T>::value && !IS_BINARY_IO_SAFE<T,RW>::value>::type
+template<class RW,class T> inline enable_if_t<HAS_TYPED_READ<T>::value && !IS_BINARY_IO_SAFE<T,RW>::value>
 Read_Binary(std::istream& input,T& d)
 {TYPED_ISTREAM typed_input(input,STREAM_TYPE(RW()));d.Read(typed_input);}
 
@@ -65,7 +65,7 @@ template<class RW> inline void
 Read_Binary(std::istream& input,std::string& d)
 {int n;Read_Primitive(input,n);char* buffer=new char[n];input.read(buffer,n);d.assign(buffer,buffer+n);delete[] buffer;}
 
-template<class T> inline typename enable_if<!HAS_TYPED_READ<T>::value>::type
+template<class T> inline enable_if_t<!HAS_TYPED_READ<T>::value>
 Read_Binary(TYPED_ISTREAM input,T& d)
 {
     if(input.type.use_doubles)
@@ -74,22 +74,22 @@ Read_Binary(TYPED_ISTREAM input,T& d)
         Read_Binary<float>(input.stream,d);
 }
 
-template<class T> inline typename enable_if<HAS_TYPED_READ<T>::value>::type
+template<class T> inline enable_if_t<HAS_TYPED_READ<T>::value>
 Read_Binary(TYPED_ISTREAM input,T& d)
 {d.Read(input);}
 
 //#####################################################################
 // Write_Binary
 //#####################################################################
-template<class RW,class T> inline typename enable_if<!HAS_TYPED_WRITE<T>::value && !IS_BINARY_IO_SAFE<T,RW>::value && !is_pointer<T>::value>::type
+template<class RW,class T> inline enable_if_t<!HAS_TYPED_WRITE<T>::value && !IS_BINARY_IO_SAFE<T,RW>::value && !is_pointer<T>::value>
 Write_Binary(std::ostream& output,const T& d)
 {d.template Write<RW>(output);}
 
-template<class RW,class T> inline typename enable_if<IS_BINARY_IO_SAFE<T,RW>::value>::type
+template<class RW,class T> inline enable_if_t<IS_BINARY_IO_SAFE<T,RW>::value>
 Write_Binary(std::ostream& output,const T& d)
 {output.write(reinterpret_cast<const char*>(&d),sizeof(T));}
 
-template<class RW,class T> inline typename enable_if<HAS_TYPED_WRITE<T>::value && !IS_BINARY_IO_SAFE<T,RW>::value>::type
+template<class RW,class T> inline enable_if_t<HAS_TYPED_WRITE<T>::value && !IS_BINARY_IO_SAFE<T,RW>::value>
 Write_Binary(std::ostream& output,const T& d)
 {TYPED_OSTREAM typed_output(output,STREAM_TYPE(RW()));d.Write(typed_output);}
 
@@ -115,7 +115,7 @@ template<class RW> inline void
 Write_Binary(std::ostream& output,const std::string& d)
 {int n=int(d.size());Write_Primitive(output,n);const char* s=d.c_str();output.write(s,n);}
 
-template<class T> inline typename enable_if<!HAS_TYPED_WRITE<T>::value>::type
+template<class T> inline enable_if_t<!HAS_TYPED_WRITE<T>::value>
 Write_Binary(TYPED_OSTREAM output,const T& d)
 {
     if(output.type.use_doubles)
@@ -124,7 +124,7 @@ Write_Binary(TYPED_OSTREAM output,const T& d)
         Write_Binary<float>(output.stream,d);
 }
 
-template<class T> inline typename enable_if<HAS_TYPED_WRITE<T>::value>::type
+template<class T> inline enable_if_t<HAS_TYPED_WRITE<T>::value>
 Write_Binary(TYPED_OSTREAM output,const T& d)
 {
     d.Write(output);
@@ -155,19 +155,19 @@ inline void Write_Binary(TYPED_OSTREAM output,const T1& d1,const T2& d2,Args&& .
 //#####################################################################
 // Read/Write_Binary_Array
 //#####################################################################
-template<class RW,class T> inline typename enable_if<IS_BINARY_IO_SAFE<T,RW>::value>::type
+template<class RW,class T> inline enable_if_t<IS_BINARY_IO_SAFE<T,RW>::value>
 Read_Binary_Array(std::istream& input,T* array,const int number_of_elements)
 {input.read(reinterpret_cast<char*>(array),number_of_elements*sizeof(T));}
 
-template<class RW,class T> inline typename enable_if<!IS_BINARY_IO_SAFE<T,RW>::value>::type
+template<class RW,class T> inline enable_if_t<!IS_BINARY_IO_SAFE<T,RW>::value>
 Read_Binary_Array(std::istream& input,T* array,const int number_of_elements)
 {for(int i=0;i<number_of_elements;i++) Read_Binary<RW>(input,array[i]);}
 
-template<class RW,class T> inline typename enable_if<IS_BINARY_IO_SAFE<T,RW>::value>::type
+template<class RW,class T> inline enable_if_t<IS_BINARY_IO_SAFE<T,RW>::value>
 Write_Binary_Array(std::ostream& output,const T* array,const int number_of_elements)
 {if(number_of_elements) output.write(reinterpret_cast<const char*>(array),number_of_elements*sizeof(T));}
 
-template<class RW,class T> inline typename enable_if<!IS_BINARY_IO_SAFE<T,RW>::value>::type
+template<class RW,class T> inline enable_if_t<!IS_BINARY_IO_SAFE<T,RW>::value>
 Write_Binary_Array(std::ostream& output,const T* array,const int number_of_elements)
 {for(int i=0;i<number_of_elements;i++) Write_Binary<RW>(output,array[i]);}
 //#####################################################################

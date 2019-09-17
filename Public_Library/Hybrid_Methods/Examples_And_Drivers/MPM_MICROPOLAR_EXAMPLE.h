@@ -100,7 +100,7 @@ public:
     void Set_Weights(int order);
     void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction,
         std::function<FRAME<TV>(T)> func_frame=0,std::function<TWIST<TV>(T)> func_twist=0);
-    template<class OBJECT> typename enable_if<!is_pointer<OBJECT>::value>::type
+    template<class OBJECT> enable_if_t<!is_pointer<OBJECT>::value>
     Add_Collision_Object(const OBJECT& object,COLLISION_TYPE type,T friction,
         std::function<FRAME<TV>(T)> func_frame=0,std::function<TWIST<TV>(T)> func_twist=0)
     {Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<OBJECT>(object),type,friction,func_frame,func_twist);}

@@ -183,7 +183,7 @@ public:
     void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction,
         std::function<FRAME<TV>(T)> func_frame=0,std::function<TWIST<TV>(T)> func_twist=0);
     void Add_Fluid_Wall(IMPLICIT_OBJECT<TV>* io);
-    template<class OBJECT> typename enable_if<!is_pointer<OBJECT>::value>::type
+    template<class OBJECT> enable_if_t<!is_pointer<OBJECT>::value>
     Add_Collision_Object(const OBJECT& object,COLLISION_TYPE type,T friction,
         std::function<FRAME<TV>(T)> func_frame=0,std::function<TWIST<TV>(T)> func_twist=0)
     {Add_Collision_Object(Make_IO(object),type,friction,func_frame,func_twist);}

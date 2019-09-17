@@ -18,7 +18,7 @@ namespace PhysBAM{
 //#####################################################################
 // Function Force_Value
 //#####################################################################
-template<class T,class A> typename enable_if<!is_same<T,A>::value,T>::type Force_Value(A v){return v.x;}
+template<class T,class A> enable_if_t<!is_same<T,A>::value,T> Force_Value(A v){return v.x;}
 template<class T> T Force_Value(T v){return v;}
 //#####################################################################
 // Constructor

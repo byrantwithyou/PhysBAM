@@ -45,91 +45,91 @@ DECLARE_BLOCK(vSV,MATRIX);
 DECLARE_BLOCK(vVV,TENSOR);
 
 template<template<class OBJ> class BLOCK,class OBJ0,class OBJ1> auto
-Add_BB(const BLOCK<OBJ0>& b0,const BLOCK<OBJ1>& b1,typename enable_if<BLOCK<OBJ0>::block_tag,void*>::type=0)
+Add_BB(const BLOCK<OBJ0>& b0,const BLOCK<OBJ1>& b1,enable_if_t<BLOCK<OBJ0>::block_tag,void*> =0)
 {
     return BLOCK<typename remove_const<typename remove_reference<decltype(b0.obj+b1.obj)>::type>::type>(b0.obj+b1.obj);
 }
 
 template<template<class OBJ> class BLOCK,class OBJ0,class OBJ1> auto
-Sub_BB(const BLOCK<OBJ0>& b0,const BLOCK<OBJ1>& b1,typename enable_if<BLOCK<OBJ0>::block_tag,void*>::type=0)
+Sub_BB(const BLOCK<OBJ0>& b0,const BLOCK<OBJ1>& b1,enable_if_t<BLOCK<OBJ0>::block_tag,void*> =0)
 {
     return BLOCK<typename remove_const<typename remove_reference<decltype(b0.obj-b1.obj)>::type>::type>(b0.obj-b1.obj);
 }
 
 template<template<class OBJ> class BLOCK,class OBJ> auto
-Neg_B(const BLOCK<OBJ>& b,typename enable_if<BLOCK<OBJ>::block_tag,void*>::type=0)
+Neg_B(const BLOCK<OBJ>& b,enable_if_t<BLOCK<OBJ>::block_tag,void*> =0)
 {
     return BLOCK<typename remove_const<typename remove_reference<decltype(-b.obj)>::type>::type>(-b.obj);
 }
 
 template<template<class OBJ> class BLOCK,class OBJ,class T> auto
-Mul_BS(const BLOCK<OBJ>& b,const T& s,typename enable_if<BLOCK<OBJ>::block_tag && IS_SCALAR<T>::value,void*>::type=0)
+Mul_BS(const BLOCK<OBJ>& b,const T& s,enable_if_t<BLOCK<OBJ>::block_tag && IS_SCALAR<T>::value,void*> =0)
 {
     return BLOCK<typename remove_const<typename remove_reference<decltype(b.obj*s)>::type>::type>(b.obj*s);
 }
 
 template<template<class OBJ> class BLOCK,class OBJ,class T> auto
-Div_BS(const BLOCK<OBJ>& b,const T& s,typename enable_if<BLOCK<OBJ>::block_tag && IS_SCALAR<T>::value,void*>::type=0)
+Div_BS(const BLOCK<OBJ>& b,const T& s,enable_if_t<BLOCK<OBJ>::block_tag && IS_SCALAR<T>::value,void*> =0)
 {
     return BLOCK<typename remove_const<typename remove_reference<decltype(b.obj/s)>::type>::type>(b.obj/s);
 }
 
 template<class OBJ,class MAT> auto
-Mul_MB(const MAT& mat,const BLOCK_vV<OBJ>& block,typename enable_if<IS_MATRIX<MAT>::value,void*>::type=0)
+Mul_MB(const MAT& mat,const BLOCK_vV<OBJ>& block,enable_if_t<IS_MATRIX<MAT>::value,void*> =0)
 {
     return Make_vV(mat*block.obj);
 }
 
 template<class OBJ,class MAT> auto
-Mul_MB(const MAT& mat,const BLOCK_vS<OBJ>& block,typename enable_if<IS_MATRIX<MAT>::value,void*>::type=0)
+Mul_MB(const MAT& mat,const BLOCK_vS<OBJ>& block,enable_if_t<IS_MATRIX<MAT>::value,void*> =0)
 {
     return Make_vS(mat*block.obj);
 }
 
 template<class OBJ,class VEC> auto
-Contract_0(const BLOCK_vSS<OBJ>& block,const VEC& vec,typename enable_if<IS_VECTOR<VEC>::value,void*>::type=0)
+Contract_0(const BLOCK_vSS<OBJ>& block,const VEC& vec,enable_if_t<IS_VECTOR<VEC>::value,void*> =0)
 {
     return Make_sSS(block.obj.Dot(vec));
 }
 
 template<class OBJ,class VEC> auto
-Contract_0(const BLOCK_vVS<OBJ>& block,const VEC& vec,typename enable_if<IS_VECTOR<VEC>::value,void*>::type=0)
+Contract_0(const BLOCK_vVS<OBJ>& block,const VEC& vec,enable_if_t<IS_VECTOR<VEC>::value,void*> =0)
 {
     return Make_sVS(Transpose_Times(block.obj,vec));
 }
 
 template<class OBJ,class VEC> auto
-Contract_0(const BLOCK_vSV<OBJ>& block,const VEC& vec,typename enable_if<IS_VECTOR<VEC>::value,void*>::type=0)
+Contract_0(const BLOCK_vSV<OBJ>& block,const VEC& vec,enable_if_t<IS_VECTOR<VEC>::value,void*> =0)
 {
     return Make_sSV(Transpose_Times(block.obj,vec));
 }
 
 template<class OBJ,class VEC> auto
-Contract_0(const BLOCK_vVV<OBJ>& block,const VEC& vec,typename enable_if<IS_VECTOR<VEC>::value,void*>::type=0)
+Contract_0(const BLOCK_vVV<OBJ>& block,const VEC& vec,enable_if_t<IS_VECTOR<VEC>::value,void*> =0)
 {
     return Make_sVV(Contract<0>(block.obj,vec));
 }
 
 template<class OBJ,class MAT> auto
-Contract_00(const BLOCK_vSS<OBJ>& block,const MAT& mat,typename enable_if<IS_MATRIX<MAT>::value,void*>::type=0)
+Contract_00(const BLOCK_vSS<OBJ>& block,const MAT& mat,enable_if_t<IS_MATRIX<MAT>::value,void*> =0)
 {
     return Make_vSS(Transpose_Times(mat,block.obj));
 }
 
 template<class OBJ,class MAT> auto
-Contract_00(const BLOCK_vVS<OBJ>& block,const MAT& mat,typename enable_if<IS_MATRIX<MAT>::value,void*>::type=0)
+Contract_00(const BLOCK_vVS<OBJ>& block,const MAT& mat,enable_if_t<IS_MATRIX<MAT>::value,void*> =0)
 {
     return Make_vVS(Transpose_Times(mat,block.obj));
 }
 
 template<class OBJ,class MAT> auto
-Contract_00(const BLOCK_vSV<OBJ>& block,const MAT& mat,typename enable_if<IS_MATRIX<MAT>::value,void*>::type=0)
+Contract_00(const BLOCK_vSV<OBJ>& block,const MAT& mat,enable_if_t<IS_MATRIX<MAT>::value,void*> =0)
 {
     return Make_vSV(Transpose_Times(mat,block.obj));
 }
 
 template<class OBJ,class MAT> auto
-Contract_00(const BLOCK_vVV<OBJ>& block,const MAT& mat,typename enable_if<IS_MATRIX<MAT>::value,void*>::type=0)
+Contract_00(const BLOCK_vVV<OBJ>& block,const MAT& mat,enable_if_t<IS_MATRIX<MAT>::value,void*> =0)
 {
     return Make_vVV(Contract<0,0>(block.obj,mat));
 }
@@ -147,61 +147,61 @@ Transpose_Times_Self(const BLOCK_vV<OBJ>& block)
 }
 
 template<class OBJ,class VEC> auto
-Transpose_Times(const BLOCK_vS<OBJ>& block,const VEC& vec,typename enable_if<IS_VECTOR<VEC>::value,void*>::type=0)
+Transpose_Times(const BLOCK_vS<OBJ>& block,const VEC& vec,enable_if_t<IS_VECTOR<VEC>::value,void*> =0)
 {
     return Make_sS(block.obj.Dot(vec));
 }
 
 template<class OBJ,class VEC> auto
-Transpose_Times(const BLOCK_vV<OBJ>& block,const VEC& vec,typename enable_if<IS_VECTOR<VEC>::value,void*>::type=0)
+Transpose_Times(const BLOCK_vV<OBJ>& block,const VEC& vec,enable_if_t<IS_VECTOR<VEC>::value,void*> =0)
 {
     return Make_sV(Transpose_Times(block.obj,vec));
 }
 
 template<class OBJ,class VEC> auto
-Tensor_Product_0(const BLOCK_sVV<OBJ>& block,const VEC& vec,typename enable_if<IS_VECTOR<VEC>::value,void*>::type=0)
+Tensor_Product_0(const BLOCK_sVV<OBJ>& block,const VEC& vec,enable_if_t<IS_VECTOR<VEC>::value,void*> =0)
 {
     return Make_vVV(Tensor_Product<0>(block.obj,vec));
 }
 
 template<class OBJ,class VEC> auto
-Tensor_Product_0(const BLOCK_sVS<OBJ>& block,const VEC& vec,typename enable_if<IS_VECTOR<VEC>::value,void*>::type=0)
+Tensor_Product_0(const BLOCK_sVS<OBJ>& block,const VEC& vec,enable_if_t<IS_VECTOR<VEC>::value,void*> =0)
 {
     return Make_vVS(Outer_Product(vec,block.obj));
 }
 
 template<class OBJ,class VEC> auto
-Tensor_Product_0(const BLOCK_sSV<OBJ>& block,const VEC& vec,typename enable_if<IS_VECTOR<VEC>::value,void*>::type=0)
+Tensor_Product_0(const BLOCK_sSV<OBJ>& block,const VEC& vec,enable_if_t<IS_VECTOR<VEC>::value,void*> =0)
 {
     return Make_vSV(Outer_Product(vec,block.obj));
 }
 
 template<class OBJ,class VEC> auto
-Tensor_Product_0(const BLOCK_sSS<OBJ>& block,const VEC& vec,typename enable_if<IS_VECTOR<VEC>::value,void*>::type=0)
+Tensor_Product_0(const BLOCK_sSS<OBJ>& block,const VEC& vec,enable_if_t<IS_VECTOR<VEC>::value,void*> =0)
 {
     return Make_vSS(vec*block.obj);
 }
 
 template<class OBJ0,class VEC> auto
-Tensor_Product_1(const BLOCK_vV<OBJ0>& block0,const VEC& vec,typename enable_if<IS_VECTOR<VEC>::value,void*>::type=0)
+Tensor_Product_1(const BLOCK_vV<OBJ0>& block0,const VEC& vec,enable_if_t<IS_VECTOR<VEC>::value,void*> =0)
 {
     return Make_mV(Tensor_Product<1>(block0.obj,vec));
 }
 
 template<class OBJ0,class VEC> auto
-Tensor_Product_1(const BLOCK_vS<OBJ0>& block0,const VEC& vec,typename enable_if<IS_VECTOR<VEC>::value,void*>::type=0)
+Tensor_Product_1(const BLOCK_vS<OBJ0>& block0,const VEC& vec,enable_if_t<IS_VECTOR<VEC>::value,void*> =0)
 {
     return Make_mS(Outer_Product(block0.obj,vec));
 }
 
 template<class OBJ0,class VEC> auto
-Tensor_Product_0(const BLOCK_vV<OBJ0>& block0,const VEC& vec,typename enable_if<IS_VECTOR<VEC>::value,void*>::type=0)
+Tensor_Product_0(const BLOCK_vV<OBJ0>& block0,const VEC& vec,enable_if_t<IS_VECTOR<VEC>::value,void*> =0)
 {
     return Make_mV(Tensor_Product<0>(block0.obj,vec));
 }
 
 template<class OBJ0,class VEC> auto
-Tensor_Product_0(const BLOCK_vS<OBJ0>& block0,const VEC& vec,typename enable_if<IS_VECTOR<VEC>::value,void*>::type=0)
+Tensor_Product_0(const BLOCK_vS<OBJ0>& block0,const VEC& vec,enable_if_t<IS_VECTOR<VEC>::value,void*> =0)
 {
     return Make_mS(Outer_Product(vec,block0.obj));
 }
@@ -255,13 +255,13 @@ Tensor_Product_2(const BLOCK_vS<OBJ0>& block0,const BLOCK_sS<OBJ1>& block1)
 }
 
 template<class OBJ,class MAT> auto
-Tensor_Product_2(const MAT& mat,const BLOCK_sV<OBJ>& block,typename enable_if<IS_MATRIX<MAT>::value,void*>::type=0)
+Tensor_Product_2(const MAT& mat,const BLOCK_sV<OBJ>& block,enable_if_t<IS_MATRIX<MAT>::value,void*> =0)
 {
     return Make_mV(Tensor_Product<2>(mat,block.obj));
 }
 
 template<class OBJ,class MAT> auto
-Tensor_Product_2(const MAT& mat,const BLOCK_sS<OBJ>& block,typename enable_if<IS_MATRIX<MAT>::value,void*>::type=0)
+Tensor_Product_2(const MAT& mat,const BLOCK_sS<OBJ>& block,enable_if_t<IS_MATRIX<MAT>::value,void*> =0)
 {
     return Make_mS(mat*block.obj);
 }
@@ -279,13 +279,13 @@ Outer_Product(const BLOCK_sS<OBJ>& block)
 }
 
 template<class OBJ,class VEC> auto
-Outer_Product(const VEC& vec,const BLOCK_sV<OBJ>& block,typename enable_if<IS_VECTOR<VEC>::value,void*>::type=0)
+Outer_Product(const VEC& vec,const BLOCK_sV<OBJ>& block,enable_if_t<IS_VECTOR<VEC>::value,void*> =0)
 {
     return Make_vV(Outer_Product(vec,block.obj));
 }
 
 template<class OBJ,class VEC> auto
-Outer_Product(const VEC& vec,const BLOCK_sS<OBJ>& block,typename enable_if<IS_VECTOR<VEC>::value,void*>::type=0)
+Outer_Product(const VEC& vec,const BLOCK_sS<OBJ>& block,enable_if_t<IS_VECTOR<VEC>::value,void*> =0)
 {
     return Make_vS(block.obj*vec);
 }
@@ -328,25 +328,25 @@ Symmetric_Outer_Product(const BLOCK_sS<OBJ0>& block0,const BLOCK_sS<OBJ1>& block
 }
 
 template<class OBJ,class MAT> auto
-Contract_01(const BLOCK_vVV<OBJ>& block,const MAT& mat,typename enable_if<IS_MATRIX<MAT>::value,void*>::type=0)
+Contract_01(const BLOCK_vVV<OBJ>& block,const MAT& mat,enable_if_t<IS_MATRIX<MAT>::value,void*> =0)
 {
     return Make_vVV(Contract<0,1>(block.obj,mat));
 }
 
 template<class OBJ,class MAT> auto
-Contract_01(const BLOCK_vVS<OBJ>& block,const MAT& mat,typename enable_if<IS_MATRIX<MAT>::value,void*>::type=0)
+Contract_01(const BLOCK_vVS<OBJ>& block,const MAT& mat,enable_if_t<IS_MATRIX<MAT>::value,void*> =0)
 {
     return Make_vVS(mat*block.obj);
 }
 
 template<class OBJ,class MAT> auto
-Contract_01(const BLOCK_vSV<OBJ>& block,const MAT& mat,typename enable_if<IS_MATRIX<MAT>::value,void*>::type=0)
+Contract_01(const BLOCK_vSV<OBJ>& block,const MAT& mat,enable_if_t<IS_MATRIX<MAT>::value,void*> =0)
 {
     return Make_vSV(mat*block.obj);
 }
 
 template<class OBJ,class MAT> auto
-Contract_01(const BLOCK_vSS<OBJ>& block,const MAT& mat,typename enable_if<IS_MATRIX<MAT>::value,void*>::type=0)
+Contract_01(const BLOCK_vSS<OBJ>& block,const MAT& mat,enable_if_t<IS_MATRIX<MAT>::value,void*> =0)
 {
     return Make_vSS(mat*block.obj);
 }
@@ -403,21 +403,21 @@ Symmetric_Tensor_Product_12(const BLOCK_vS<OBJ0>& block0,const BLOCK_sS<OBJ1>& b
 
 template<class TEN,class OBJ0,class OBJ1> auto
 Double_Contract_12(const TEN& a,const BLOCK_vV<OBJ0>& block0,const BLOCK_vV<OBJ1>& block1,
-    typename enable_if<IS_TENSOR<TEN>::value,void*>::type=0)
+    enable_if_t<IS_TENSOR<TEN>::value,void*> =0)
 {
     return Make_vVV(Contract<2,0>(Contract<1,0>(a,block0.obj),block1.obj));
 }
 
 template<class TEN,class OBJ0,class OBJ1> auto
 Double_Contract_12(const TEN& a,const BLOCK_vV<OBJ0>& block0,const BLOCK_vS<OBJ1>& block1,
-    typename enable_if<IS_TENSOR<TEN>::value,void*>::type=0)
+    enable_if_t<IS_TENSOR<TEN>::value,void*> =0)
 {
     return Make_vVS(Contract<2>(a,block1.obj)*block0.obj);
 }
 
 template<class TEN,class OBJ0,class OBJ1> auto
 Double_Contract_12(const TEN& a,const BLOCK_vS<OBJ0>& block0,const BLOCK_vV<OBJ1>& block1,
-    typename enable_if<IS_TENSOR<TEN>::value,void*>::type=0)
+    enable_if_t<IS_TENSOR<TEN>::value,void*> =0)
 {
     return Make_vSV(Contract<1>(a,block0.obj)*block1.obj);
 }
@@ -489,61 +489,61 @@ Transposed_01(const BLOCK_mS<OBJ0>& block0)
 }
 
 template<class OBJ,class MAT> auto
-Contract_00(const BLOCK_mV<OBJ>& block,const MAT& mat,typename enable_if<IS_MATRIX<MAT>::value,void*>::type=0)
+Contract_00(const BLOCK_mV<OBJ>& block,const MAT& mat,enable_if_t<IS_MATRIX<MAT>::value,void*> =0)
 {
     return Make_mV(Contract<0,0>(block.obj,mat));
 }
 
 template<class OBJ,class MAT> auto
-Contract_00(const BLOCK_mS<OBJ>& block,const MAT& mat,typename enable_if<IS_MATRIX<MAT>::value,void*>::type=0)
+Contract_00(const BLOCK_mS<OBJ>& block,const MAT& mat,enable_if_t<IS_MATRIX<MAT>::value,void*> =0)
 {
     return Make_mS(Transpose_Times(block.obj,mat));
 }
 
 template<class OBJ,class MAT> auto
-Contract_01(const BLOCK_mV<OBJ>& block,const MAT& mat,typename enable_if<IS_MATRIX<MAT>::value,void*>::type=0)
+Contract_01(const BLOCK_mV<OBJ>& block,const MAT& mat,enable_if_t<IS_MATRIX<MAT>::value,void*> =0)
 {
     return Make_mV(Contract<0,1>(block.obj,mat));
 }
 
 template<class OBJ,class MAT> auto
-Contract_01(const BLOCK_mS<OBJ>& block,const MAT& mat,typename enable_if<IS_MATRIX<MAT>::value,void*>::type=0)
+Contract_01(const BLOCK_mS<OBJ>& block,const MAT& mat,enable_if_t<IS_MATRIX<MAT>::value,void*> =0)
 {
     return Make_mS((mat*block.obj).Transposed());
 }
 
 template<class OBJ,class MAT> auto
-Contract_10(const BLOCK_mV<OBJ>& block,const MAT& mat,typename enable_if<IS_MATRIX<MAT>::value,void*>::type=0)
+Contract_10(const BLOCK_mV<OBJ>& block,const MAT& mat,enable_if_t<IS_MATRIX<MAT>::value,void*> =0)
 {
     return Make_mV(Contract<1,0>(block.obj,mat));
 }
 
 template<class OBJ,class MAT> auto
-Contract_10(const BLOCK_mS<OBJ>& block,const MAT& mat,typename enable_if<IS_MATRIX<MAT>::value,void*>::type=0)
+Contract_10(const BLOCK_mS<OBJ>& block,const MAT& mat,enable_if_t<IS_MATRIX<MAT>::value,void*> =0)
 {
     return Make_mS(block.obj*mat);
 }
 
 template<class OBJ,class MAT> auto
-Contract_11(const BLOCK_mV<OBJ>& block,const MAT& mat,typename enable_if<IS_MATRIX<MAT>::value,void*>::type=0)
+Contract_11(const BLOCK_mV<OBJ>& block,const MAT& mat,enable_if_t<IS_MATRIX<MAT>::value,void*> =0)
 {
     return Make_mV(Contract<1,1>(block.obj,mat));
 }
 
 template<class OBJ,class MAT> auto
-Contract_11(const BLOCK_mS<OBJ>& block,const MAT& mat,typename enable_if<IS_MATRIX<MAT>::value,void*>::type=0)
+Contract_11(const BLOCK_mS<OBJ>& block,const MAT& mat,enable_if_t<IS_MATRIX<MAT>::value,void*> =0)
 {
     return Make_mS(Times_Transpose(block.obj,mat));
 }
 
 template<class OBJ,class MAT> auto
-Double_Contract_00_11(const BLOCK_mV<OBJ>& block,const MAT& mat,typename enable_if<IS_MATRIX<MAT>::value,void*>::type=0)
+Double_Contract_00_11(const BLOCK_mV<OBJ>& block,const MAT& mat,enable_if_t<IS_MATRIX<MAT>::value,void*> =0)
 {
     return Make_sV(Contract<0,1>(Contract<1,1>(block.obj,mat)));
 }
 
 template<class OBJ,class MAT> auto
-Double_Contract_00_11(const BLOCK_mS<OBJ>& block,const MAT& mat,typename enable_if<IS_MATRIX<MAT>::value,void*>::type=0)
+Double_Contract_00_11(const BLOCK_mS<OBJ>& block,const MAT& mat,enable_if_t<IS_MATRIX<MAT>::value,void*> =0)
 {
     return Make_sS(block.obj.Double_Contract(mat));
 }

@@ -86,24 +86,24 @@ void Get(OUT& o,const MAT_HOLDER<OBJ,COL,BASE>& v)
 }
 
 template<int i,int j,int ni,int nj,class A,class OBJ>
-inline typename enable_if<(i>=0 && i<ni && j>=0 && j<nj)>::type
+inline enable_if_t<(i>=0 && i<ni && j>=0 && j<nj)>
 Extract_Entry_Helper(MATRIX<A,ni,nj>& ddx,const OBJ& h)
 {
     Fill_From(ddx(i,j),h.obj);
 }
 template<int i,int j,int ni,int nj,class A,class OBJ>
-inline typename enable_if<!(i>=0 && i<ni && j>=0 && j<nj)>::type
+inline enable_if_t<!(i>=0 && i<ni && j>=0 && j<nj)>
 Extract_Entry_Helper(MATRIX<A,ni,nj>& ddx,const OBJ& h) {}
 
 template<int i,int j,int ni,int nj,class A,class OBJ>
-inline typename enable_if<(i>=0 && i<ni && j>=0 && j<nj)>::type
+inline enable_if_t<(i>=0 && i<ni && j>=0 && j<nj)>
 Extract_Entry_Transpose_Helper(MATRIX<A,ni,nj>& ddx,const OBJ& h)
 {
     Fill_From_Transpose(ddx(i,j),h.obj);
 }
 
 template<int i,int j,int ni,int nj,class A,class OBJ>
-inline typename enable_if<!(i>=0 && i<ni && j>=0 && j<nj)>::type
+inline enable_if_t<!(i>=0 && i<ni && j>=0 && j<nj)>
 Extract_Entry_Transpose_Helper(MATRIX<A,ni,nj>& ddx,const OBJ& h) {}
 
 template<int i,int j,int ni,int nj,class A,class OBJ,class BASE> inline void

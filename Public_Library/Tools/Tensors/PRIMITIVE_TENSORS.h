@@ -49,7 +49,7 @@ PERMUTATION_TENSOR
 //##################################################################### 
 
 template<int s,class T,class TN>
-typename enable_if<IS_TENSOR<TN>::value,ZERO_MATRIX<T,s==0?TN::n:TN::m,s==2?TN::n:TN::p> >::type
+enable_if_t<IS_TENSOR<TN>::value,ZERO_MATRIX<T,s==0?TN::n:TN::m,s==2?TN::n:TN::p> >
 Contract(const TN& t,ZERO_VECTOR<T,(s==0?TN::m:s==1?TN::n:TN::p)> z)
 {return ZERO_MATRIX<T,s==0?TN::n:TN::m,s==2?TN::n:TN::p>();}
 
@@ -58,7 +58,7 @@ Contract(const ZERO_TENSOR<T,m,n,p>& t,const VECTOR<T,(s==0?m:s==1?n:p)>& v)
 {return ZERO_MATRIX<T,s==0?n:m,s==2?n:p>();}
 
 template<int s,class T,int m,int n,int p>
-typename enable_if<s==0,MATRIX<T,n,p> >::type
+enable_if_t<s==0,MATRIX<T,n,p> >
 Contract(const TENSOR<T,m,n,p>& t,const VECTOR<T,m>& v)
 {
     MATRIX<T,n,p> M;
@@ -67,7 +67,7 @@ Contract(const TENSOR<T,m,n,p>& t,const VECTOR<T,m>& v)
 }
 
 template<int s,class T,int m,int n,int p>
-typename enable_if<s==1,MATRIX<T,m,p> >::type
+enable_if_t<s==1,MATRIX<T,m,p> >
 Contract(const TENSOR<T,m,n,p>& t,const VECTOR<T,n>& v)
 {
     MATRIX<T,m,p> M;
@@ -76,7 +76,7 @@ Contract(const TENSOR<T,m,n,p>& t,const VECTOR<T,n>& v)
 }
 
 template<int s,class T,int m,int n,int p>
-typename enable_if<s==2,MATRIX<T,m,n> >::type
+enable_if_t<s==2,MATRIX<T,m,n> >
 Contract(const TENSOR<T,m,n,p>& t,const VECTOR<T,p>& v)
 {
     MATRIX<T,m,n> M;
@@ -160,12 +160,12 @@ Contract(const DIAGONAL_TENSOR<T,m>& t,const VECTOR<T,m>& v)
 // Function Contract<r,s>(T)
 //##################################################################### 
 
-template<int r,int s,class T,int m,int n,int p> typename enable_if<(r+s!=1 || m==n)&&(r+s!=2 || m==p)&&(r+s!=3 || n==p),ZERO_VECTOR<T,r+s==1?p:r+s==2?n:m> >::type
+template<int r,int s,class T,int m,int n,int p> enable_if_t<(r+s!=1 || m==n)&&(r+s!=2 || m==p)&&(r+s!=3 || n==p),ZERO_VECTOR<T,r+s==1?p:r+s==2?n:m> >
 Contract(const ZERO_TENSOR<T,m,n,p>& t)
 {return ZERO_VECTOR<T,r+s==1?p:r+s==2?n:m>();}
 
 template<int r,int s,class T,int m,int p>
-typename enable_if<r+s==1,VECTOR<T,p> >::type
+enable_if_t<r+s==1,VECTOR<T,p> >
 Contract(const TENSOR<T,m,m,p>& t)
 {
     VECTOR<T,p> v;
@@ -174,7 +174,7 @@ Contract(const TENSOR<T,m,m,p>& t)
 }
 
 template<int r,int s,class T,int m,int n>
-typename enable_if<r+s==2,VECTOR<T,n> >::type
+enable_if_t<r+s==2,VECTOR<T,n> >
 Contract(const TENSOR<T,m,n,m>& t)
 {
     VECTOR<T,n> v;
@@ -183,7 +183,7 @@ Contract(const TENSOR<T,m,n,m>& t)
 }
 
 template<int r,int s,class T,int m,int n>
-typename enable_if<r+s==3,VECTOR<T,m> >::type
+enable_if_t<r+s==3,VECTOR<T,m> >
 Contract(const TENSOR<T,m,n,n>& t)
 {
     VECTOR<T,m> v;
@@ -200,7 +200,7 @@ Contract(const SYMMETRIC_TENSOR<T,3-r-s,m,n>& t)
 }
 
 template<int r,int s,class T,int m,int u>
-typename enable_if<r+s+u!=3,VECTOR<T,m> >::type
+enable_if_t<r+s+u!=3,VECTOR<T,m> >
 Contract(const SYMMETRIC_TENSOR<T,u,m>& t)
 {
     VECTOR<T,m> v;
@@ -215,7 +215,7 @@ Contract(const VEC_ID_TENSOR<T,3-r-s,m,n>& t)
 }
 
 template<int r,int s,class T,int m,int u>
-typename enable_if<r+s+u!=3,VECTOR<T,m> >::type
+enable_if_t<r+s+u!=3,VECTOR<T,m> >
 Contract(const VEC_ID_TENSOR<T,u,m,m>& t)
 {
     return t.v;
@@ -228,7 +228,7 @@ Contract(const VEC_ID_SYM_TENSOR<T,3-r-s,m>& t)
 }
 
 template<int r,int s,class T,int u,int m>
-typename enable_if<u!=3-r-s,VECTOR<T,m> >::type
+enable_if_t<u!=3-r-s,VECTOR<T,m> >
 Contract(const VEC_ID_SYM_TENSOR<T,u,m>& t)
 {
     return t.v*(m+1);
@@ -245,7 +245,7 @@ Contract(const PERMUTATION_TENSOR<T>& t)
 //##################################################################### 
 
 template<int s,class MAT,class T,int m>
-typename enable_if<IS_MATRIX<MAT>::value,ZERO_TENSOR<T,s==0?m:MAT::m,s==1?m:s==2?MAT::n:MAT::m,s==2?m:MAT::n> >::type
+enable_if_t<IS_MATRIX<MAT>::value,ZERO_TENSOR<T,s==0?m:MAT::m,s==1?m:s==2?MAT::n:MAT::m,s==2?m:MAT::n> >
 Tensor_Product(const MAT&,const ZERO_VECTOR<T,m>&)
 {
     return ZERO_TENSOR<T,s==0?m:MAT::m,s==1?m:s==2?MAT::n:MAT::m,s==2?m:MAT::n>();
@@ -259,7 +259,7 @@ Tensor_Product(const ZERO_MATRIX<T,m,n>&,const VECTOR<T,p>&)
 }
 
 template<int s,class T,int m,int n,int p>
-typename enable_if<s==0,TENSOR<T,p,m,n> >::type
+enable_if_t<s==0,TENSOR<T,p,m,n> >
 Tensor_Product(const MATRIX<T,m,n>& M,const VECTOR<T,p>& v)
 {
     TENSOR<T,p,m,n> t;
@@ -268,7 +268,7 @@ Tensor_Product(const MATRIX<T,m,n>& M,const VECTOR<T,p>& v)
 }
 
 template<int s,class T,int m,int n,int p>
-typename enable_if<s==1,TENSOR<T,m,p,n> >::type
+enable_if_t<s==1,TENSOR<T,m,p,n> >
 Tensor_Product(const MATRIX<T,m,n>& M,const VECTOR<T,p>& v)
 {
     TENSOR<T,m,p,n> t;
@@ -277,7 +277,7 @@ Tensor_Product(const MATRIX<T,m,n>& M,const VECTOR<T,p>& v)
 }
 
 template<int s,class T,int m,int n,int p>
-typename enable_if<s==2,TENSOR<T,m,n,p> >::type
+enable_if_t<s==2,TENSOR<T,m,n,p> >
 Tensor_Product(const MATRIX<T,m,n>& M,const VECTOR<T,p>& v)
 {
     TENSOR<T,m,n,p> t;
@@ -329,7 +329,7 @@ Transposed(const ZERO_TENSOR<T,m,n,p>& t)
 }
 
 template<int r,int s,class T,int m,int n,int p>
-typename enable_if<r+s==1,TENSOR<T,n,m,p> >::type
+enable_if_t<r+s==1,TENSOR<T,n,m,p> >
 Transposed(const TENSOR<T,m,n,p>& t)
 {
     TENSOR<T,n,m,p> z;
@@ -338,7 +338,7 @@ Transposed(const TENSOR<T,m,n,p>& t)
 }
 
 template<int r,int s,class T,int m,int n,int p>
-typename enable_if<r+s==2,TENSOR<T,p,n,m> >::type
+enable_if_t<r+s==2,TENSOR<T,p,n,m> >
 Transposed(const TENSOR<T,m,n,p>& t)
 {
     TENSOR<T,p,n,m> z;
@@ -347,7 +347,7 @@ Transposed(const TENSOR<T,m,n,p>& t)
 }
 
 template<int r,int s,class T,int m,int n,int p>
-typename enable_if<r+s==3,TENSOR<T,m,p,n> >::type
+enable_if_t<r+s==3,TENSOR<T,m,p,n> >
 Transposed(const TENSOR<T,m,n,p>& t)
 {
     TENSOR<T,m,p,n> z;
@@ -356,14 +356,14 @@ Transposed(const TENSOR<T,m,n,p>& t)
 }
 
 template<int r,int s,class TEN>
-typename enable_if<IS_SYM_TENSOR<3-r-s,TEN>::value,TEN>::type
+enable_if_t<IS_SYM_TENSOR<3-r-s,TEN>::value,TEN>
 Transposed(const TEN& t)
 {
     return t;
 }
 
 template<int r,int s,class T,int m,int n,int u>
-typename enable_if<r+s+u!=3,SYMMETRIC_TENSOR<T,r+s-u,m,n> >::type
+enable_if_t<r+s+u!=3,SYMMETRIC_TENSOR<T,r+s-u,m,n> >
 Transposed(const SYMMETRIC_TENSOR<T,u,m,n>& t)
 {
     SYMMETRIC_TENSOR<T,r+s-u,m,n> z;
@@ -372,14 +372,14 @@ Transposed(const SYMMETRIC_TENSOR<T,u,m,n>& t)
 }
 
 template<int r,int s,class T,int m,int n,int u>
-typename enable_if<r+s+u!=3,VEC_ID_TENSOR<T,r+s-u,m,n> >::type
+enable_if_t<r+s+u!=3,VEC_ID_TENSOR<T,r+s-u,m,n> >
 Transposed(const VEC_ID_TENSOR<T,u,m,n>& t)
 {
     return VEC_ID_TENSOR<T,r+s-u,m,n>(t.v);
 }
 
 template<int r,int s,class T,int u,int m>
-typename enable_if<r+s+u!=3,VEC_ID_SYM_TENSOR<T,r+s-u,m> >::type
+enable_if_t<r+s+u!=3,VEC_ID_SYM_TENSOR<T,r+s-u,m> >
 Transposed(const VEC_ID_SYM_TENSOR<T,u,m>& t)
 {
     return VEC_ID_SYM_TENSOR<T,r+s-u,m>(t.v);
@@ -396,14 +396,14 @@ Transposed(const PERMUTATION_TENSOR<T>& t)
 //##################################################################### 
 
 template<int r,int s,class TEN>
-typename enable_if<IS_SYM_TENSOR<3-r-s,TEN>::value,decltype(TEN()*2)>::type
+enable_if_t<IS_SYM_TENSOR<3-r-s,TEN>::value,decltype(TEN()*2)>
 Twice_Symmetric_Part(const TEN& M)
 {
     return M*2;
 }
 
 template<int r,int s,class T,int m,int n>
-typename enable_if<r+s==1,SYMMETRIC_TENSOR<T,3-r-s,m,n> >::type
+enable_if_t<r+s==1,SYMMETRIC_TENSOR<T,3-r-s,m,n> >
 Twice_Symmetric_Part(const TENSOR<T,n,n,m>& M)
 {
     SYMMETRIC_TENSOR<T,3-r-s,m,n> sm;
@@ -415,7 +415,7 @@ Twice_Symmetric_Part(const TENSOR<T,n,n,m>& M)
 }
 
 template<int r,int s,class T,int m,int n>
-typename enable_if<r+s==2,SYMMETRIC_TENSOR<T,3-r-s,m,n> >::type
+enable_if_t<r+s==2,SYMMETRIC_TENSOR<T,3-r-s,m,n> >
 Twice_Symmetric_Part(const TENSOR<T,n,m,n>& M)
 {
     SYMMETRIC_TENSOR<T,3-r-s,m,n> sm;
@@ -427,7 +427,7 @@ Twice_Symmetric_Part(const TENSOR<T,n,m,n>& M)
 }
 
 template<int r,int s,class T,int m,int n>
-typename enable_if<r+s==3,SYMMETRIC_TENSOR<T,3-r-s,m,n> >::type
+enable_if_t<r+s==3,SYMMETRIC_TENSOR<T,3-r-s,m,n> >
 Twice_Symmetric_Part(const TENSOR<T,m,n,n>& M)
 {
     SYMMETRIC_TENSOR<T,3-r-s,m,n> sm;
@@ -437,7 +437,7 @@ Twice_Symmetric_Part(const TENSOR<T,m,n,n>& M)
 }
 
 template<int r,int s,int u,class T,int m>
-typename enable_if<3-r-s!=u,SYMMETRIC_TENSOR<T,3-r-s,m,m> >::type
+enable_if_t<3-r-s!=u,SYMMETRIC_TENSOR<T,3-r-s,m,m> >
 Twice_Symmetric_Part(const SYMMETRIC_TENSOR<T,u,m,m>& M)
 {
     SYMMETRIC_TENSOR<T,3-r-s,m,m> sm;
@@ -449,14 +449,14 @@ Twice_Symmetric_Part(const SYMMETRIC_TENSOR<T,u,m,m>& M)
 }
 
 template<int r,int s,int u,class T,int m>
-typename enable_if<3-r-s!=u,SYMMETRIC_TENSOR<T,3-r-s,m,m> >::type
+enable_if_t<3-r-s!=u,SYMMETRIC_TENSOR<T,3-r-s,m,m> >
 Twice_Symmetric_Part(const VEC_ID_SYM_TENSOR<T,u,m>& M)
 {
     return VEC_ID_SYM_TENSOR<T,3-r-s,m>(M.v)+VEC_ID_TENSOR<T,3-r-s,m,m>(M.v*2);
 }
 
 // template<int r,int s,class T,int m,int n,int p>
-// typename enable_if<r+s==1?m==n:r+s==2?m==p:n==p,ZERO_TENSOR<T,m,n,p> >::type
+// enable_if_t<r+s==1?m==n:r+s==2?m==p:n==p,ZERO_TENSOR<T,m,n,p> >
 // Twice_Symmetric_Part(const ZERO_TENSOR<T,m,n,p>& M)
 // {
 //     return M;
@@ -469,7 +469,7 @@ Twice_Symmetric_Part(const VEC_ID_TENSOR<T,3-r-s,m,n>& M)
 }
 
 template<int r,int s,class T,int u,int m>
-typename enable_if<u!=3-r-s,VEC_ID_SYM_TENSOR<T,3-r-s,m> >::type
+enable_if_t<u!=3-r-s,VEC_ID_SYM_TENSOR<T,3-r-s,m> >
 Twice_Symmetric_Part(const VEC_ID_TENSOR<T,u,m,m>& M)
 {
     return VEC_ID_SYM_TENSOR<T,3-r-s,m>(M.v);
@@ -482,7 +482,7 @@ Twice_Symmetric_Part(const PERMUTATION_TENSOR<T>& M)
 }
 
 template<int r,int s,class MAT,class VEC>
-typename enable_if<(IS_MATRIX<MAT>::value && IS_VECTOR<VEC>::value),decltype(Twice_Symmetric_Part<r,s>(Tensor_Product<r>(MAT(),VEC())))>::type
+enable_if_t<(IS_MATRIX<MAT>::value && IS_VECTOR<VEC>::value),decltype(Twice_Symmetric_Part<r,s>(Tensor_Product<r>(MAT(),VEC())))>
 Symmetric_Tensor_Product(const MAT& a,const VEC& b)
 {
     return Twice_Symmetric_Part<r,s>(Tensor_Product<r>(a,b));
@@ -748,14 +748,14 @@ operator+(const ZERO_TENSOR<T,TEN::m,TEN::n,TEN::p>& a,const TEN& b)
 }
 
 template<class TEN,class T>
-typename enable_if<(0<TENSOR_ORDER<TEN>::value),TEN>::type
+enable_if_t<(0<TENSOR_ORDER<TEN>::value),TEN>
 operator+(const TEN& b,const ZERO_TENSOR<T,TEN::m,TEN::n,TEN::p>& a)
 {
     return b;
 }
 
 template<class TEN,class T>
-typename enable_if<(1<=TENSOR_ORDER<TEN>::value),TENSOR<T,TEN::m,TEN::n,TEN::p> >::type
+enable_if_t<(1<=TENSOR_ORDER<TEN>::value),TENSOR<T,TEN::m,TEN::n,TEN::p> >
 operator+(const TENSOR<T,TEN::m,TEN::n,TEN::p>& a,const TEN& b)
 {
     TENSOR<T,TEN::m,TEN::n,TEN::p> t(a);
@@ -763,7 +763,7 @@ operator+(const TENSOR<T,TEN::m,TEN::n,TEN::p>& a,const TEN& b)
 }
 
 template<class TEN,class T>
-typename enable_if<(1<TENSOR_ORDER<TEN>::value),TENSOR<T,TEN::m,TEN::n,TEN::p> >::type
+enable_if_t<(1<TENSOR_ORDER<TEN>::value),TENSOR<T,TEN::m,TEN::n,TEN::p> >
 operator+(const TEN& b,const TENSOR<T,TEN::m,TEN::n,TEN::p>& a)
 {
     TENSOR<T,TEN::m,TEN::n,TEN::p> t(a);
@@ -771,7 +771,7 @@ operator+(const TEN& b,const TENSOR<T,TEN::m,TEN::n,TEN::p>& a)
 }
 
 template<class TEN,class T,int u,int m,int n>
-typename enable_if<(2<=TENSOR_ORDER<TEN>::value && IS_SYM_TENSOR<u,TEN>::value),SYMMETRIC_TENSOR<T,u,m,n> >::type
+enable_if_t<(2<=TENSOR_ORDER<TEN>::value && IS_SYM_TENSOR<u,TEN>::value),SYMMETRIC_TENSOR<T,u,m,n> >
 operator+(const SYMMETRIC_TENSOR<T,u,m,n>& a,const TEN& b)
 {
     SYMMETRIC_TENSOR<T,u,m,n> t(a);
@@ -779,7 +779,7 @@ operator+(const SYMMETRIC_TENSOR<T,u,m,n>& a,const TEN& b)
 }
 
 template<class TEN,class T,int u,int m,int n>
-typename enable_if<(2<TENSOR_ORDER<TEN>::value && IS_SYM_TENSOR<u,TEN>::value),SYMMETRIC_TENSOR<T,u,m,n> >::type
+enable_if_t<(2<TENSOR_ORDER<TEN>::value && IS_SYM_TENSOR<u,TEN>::value),SYMMETRIC_TENSOR<T,u,m,n> >
 operator+(const TEN& b,const SYMMETRIC_TENSOR<T,u,m,n>& a)
 {
     SYMMETRIC_TENSOR<T,u,m,n> t(a);
@@ -787,7 +787,7 @@ operator+(const TEN& b,const SYMMETRIC_TENSOR<T,u,m,n>& a)
 }
 
 template<class TEN,class T,int u,int m,int n>
-typename enable_if<(2<=TENSOR_ORDER<TEN>::value && !IS_SYM_TENSOR<u,TEN>::value),TENSOR<T,TEN::m,TEN::n,TEN::p> >::type
+enable_if_t<(2<=TENSOR_ORDER<TEN>::value && !IS_SYM_TENSOR<u,TEN>::value),TENSOR<T,TEN::m,TEN::n,TEN::p> >
 operator+(const SYMMETRIC_TENSOR<T,u,m,n>& a,const TEN& b)
 {
     TENSOR<T,TEN::m,TEN::n,TEN::p> t;
@@ -796,7 +796,7 @@ operator+(const SYMMETRIC_TENSOR<T,u,m,n>& a,const TEN& b)
 }
 
 template<class TEN,class T,int u,int m,int n>
-typename enable_if<(2<TENSOR_ORDER<TEN>::value && !IS_SYM_TENSOR<u,TEN>::value),TENSOR<T,u==0?m:n,u==1?m:n,u==2?m:n> >::type
+enable_if_t<(2<TENSOR_ORDER<TEN>::value && !IS_SYM_TENSOR<u,TEN>::value),TENSOR<T,u==0?m:n,u==1?m:n,u==2?m:n> >
 operator+(const TEN& b,const SYMMETRIC_TENSOR<T,u,m,n>& a)
 {
     TENSOR<T,TEN::m,TEN::n,TEN::p> t;
@@ -867,7 +867,7 @@ operator+(const VEC_ID_TENSOR<T,v,m,m>& b,const VEC_ID_SYM_TENSOR<T,u,m>& a)
     return t+=b;
 }
 
-template<class T,int u,int v,int m> typename enable_if<u!=v,TENSOR<T,m> >::type
+template<class T,int u,int v,int m> enable_if_t<u!=v,TENSOR<T,m> >
 operator+(const VEC_ID_TENSOR<T,v,m,m>& b,const VEC_ID_TENSOR<T,u,m,m>& a)
 {
     TENSOR<T,m> t;
@@ -1020,14 +1020,14 @@ operator-(const TEN& b,const ZERO_TENSOR<T,TEN::m,TEN::n,TEN::p>& a)
 }
 
 template<class TEN,class T>
-typename enable_if<TENSOR_ORDER<TEN>::value!=0,TEN>::type
+enable_if_t<TENSOR_ORDER<TEN>::value!=0,TEN>
 operator-(const ZERO_TENSOR<T,TEN::m,TEN::n,TEN::p>& a,const TEN& b)
 {
     return -b;
 }
 
 template<class TEN,class T>
-typename enable_if<(1<=TENSOR_ORDER<TEN>::value),TENSOR<T,TEN::m,TEN::n,TEN::p> >::type
+enable_if_t<(1<=TENSOR_ORDER<TEN>::value),TENSOR<T,TEN::m,TEN::n,TEN::p> >
 operator-(const TENSOR<T,TEN::m,TEN::n,TEN::p>& a,const TEN& b)
 {
     TENSOR<T,TEN::m,TEN::n,TEN::p> t(a);
@@ -1035,7 +1035,7 @@ operator-(const TENSOR<T,TEN::m,TEN::n,TEN::p>& a,const TEN& b)
 }
 
 template<class TEN,class T>
-typename enable_if<(2<=TENSOR_ORDER<TEN>::value),TENSOR<T,TEN::m,TEN::n,TEN::p> >::type
+enable_if_t<(2<=TENSOR_ORDER<TEN>::value),TENSOR<T,TEN::m,TEN::n,TEN::p> >
 operator-(const TEN& b,const TENSOR<T,TEN::m,TEN::n,TEN::p>& a)
 {
     TENSOR<T,TEN::m,TEN::n,TEN::p> t(-a);
@@ -1043,7 +1043,7 @@ operator-(const TEN& b,const TENSOR<T,TEN::m,TEN::n,TEN::p>& a)
 }
 
 template<class TEN,class T,int u,int m,int n>
-typename enable_if<(2<=TENSOR_ORDER<TEN>::value && IS_SYM_TENSOR<u,TEN>::value),SYMMETRIC_TENSOR<T,u,m,n> >::type
+enable_if_t<(2<=TENSOR_ORDER<TEN>::value && IS_SYM_TENSOR<u,TEN>::value),SYMMETRIC_TENSOR<T,u,m,n> >
 operator-(const SYMMETRIC_TENSOR<T,u,m,n>& a,const TEN& b)
 {
     SYMMETRIC_TENSOR<T,u,m,n> t(a);
@@ -1051,7 +1051,7 @@ operator-(const SYMMETRIC_TENSOR<T,u,m,n>& a,const TEN& b)
 }
 
 template<class TEN,class T,int u,int m,int n>
-typename enable_if<(2<TENSOR_ORDER<TEN>::value && IS_SYM_TENSOR<u,TEN>::value),SYMMETRIC_TENSOR<T,u,m,n> >::type
+enable_if_t<(2<TENSOR_ORDER<TEN>::value && IS_SYM_TENSOR<u,TEN>::value),SYMMETRIC_TENSOR<T,u,m,n> >
 operator-(const TEN& b,const SYMMETRIC_TENSOR<T,u,m,n>& a)
 {
     SYMMETRIC_TENSOR<T,u,m,n> t(-a);
@@ -1059,7 +1059,7 @@ operator-(const TEN& b,const SYMMETRIC_TENSOR<T,u,m,n>& a)
 }
 
 template<class TEN,class T,int u,int m,int n>
-typename enable_if<(2<=TENSOR_ORDER<TEN>::value && !IS_SYM_TENSOR<u,TEN>::value),TENSOR<T,u==0?m:n,u==1?m:n,u==2?m:n> >::type
+enable_if_t<(2<=TENSOR_ORDER<TEN>::value && !IS_SYM_TENSOR<u,TEN>::value),TENSOR<T,u==0?m:n,u==1?m:n,u==2?m:n> >
 operator-(const SYMMETRIC_TENSOR<T,u,m,n>& a,const TEN& b)
 {
     TENSOR<T,u==0?m:n,u==1?m:n,u==2?m:n> t;
@@ -1068,7 +1068,7 @@ operator-(const SYMMETRIC_TENSOR<T,u,m,n>& a,const TEN& b)
 }
 
 template<class TEN,class T,int u,int m,int n>
-typename enable_if<(2<TENSOR_ORDER<TEN>::value && !IS_SYM_TENSOR<u,TEN>::value),TENSOR<T,u==0?m:n,u==1?m:n,u==2?m:n> >::type
+enable_if_t<(2<TENSOR_ORDER<TEN>::value && !IS_SYM_TENSOR<u,TEN>::value),TENSOR<T,u==0?m:n,u==1?m:n,u==2?m:n> >
 operator-(const TEN& b,const SYMMETRIC_TENSOR<T,u,m,n>& a)
 {
     TENSOR<T,u==0?m:n,u==1?m:n,u==2?m:n> t;
@@ -1125,7 +1125,7 @@ operator-(const VEC_ID_TENSOR<T,u,m,m>& b,const VEC_ID_SYM_TENSOR<T,u,m>& a)
     return t;
 }
 
-template<class T,int u,int v,int m> typename enable_if<u!=v,TENSOR<T,m> >::type
+template<class T,int u,int v,int m> enable_if_t<u!=v,TENSOR<T,m> >
 operator-(const VEC_ID_TENSOR<T,v,m,m>& b,const VEC_ID_TENSOR<T,u,m,m>& a)
 {
     TENSOR<T,m> t;
@@ -1140,7 +1140,7 @@ operator-(const VEC_ID_SYM_TENSOR<T,u,m>& a,const VEC_ID_SYM_TENSOR<T,u,m>& b)
 }
 
 template<class TEN0,class TEN1>
-typename enable_if<(TENSOR_ORDER<TEN0>::value<=TENSOR_ORDER<TEN1>::value),TENSOR<typename TEN0::SCALAR,TEN0::m,TEN0::n,TEN0::p> >::type
+enable_if_t<(TENSOR_ORDER<TEN0>::value<=TENSOR_ORDER<TEN1>::value),TENSOR<typename TEN0::SCALAR,TEN0::m,TEN0::n,TEN0::p> >
 operator-(const TEN0& a,const TEN1& b)
 {
     TENSOR<typename TEN0::SCALAR,TEN0::m,TEN0::n,TEN0::p> t;
@@ -1258,28 +1258,28 @@ operator-(const PERMUTATION_TENSOR<T>& a,const TENSOR<T,3,3,3>& b)
 //##################################################################### 
 
 template<int r,int s,class TEN,class T,int q0,int q1>
-typename enable_if<IS_TENSOR<TEN>::value && (r==0?TEN::m:r==1?TEN::n:TEN::p)==(s==0?q0:q1),ZERO_TENSOR<T,r==0?TEN::m:(s==0?q0:q1),r==1?TEN::n:(s==0?q0:q1),r==2?TEN::p:(s==0?q0:q1)> >::type
+enable_if_t<IS_TENSOR<TEN>::value && (r==0?TEN::m:r==1?TEN::n:TEN::p)==(s==0?q0:q1),ZERO_TENSOR<T,r==0?TEN::m:(s==0?q0:q1),r==1?TEN::n:(s==0?q0:q1),r==2?TEN::p:(s==0?q0:q1)> >
 Contract(const TEN& a,const ZERO_MATRIX<T,q0,q1>& M)
 {
     return ZERO_TENSOR<T,r==0?TEN::m:(s==0?q0:q1),r==1?TEN::n:(s==0?q0:q1),r==2?TEN::p:(s==0?q0:q1)>();
 }
 
 template<int r,int s,class TEN,class T>
-typename enable_if<IS_TENSOR<TEN>::value,TEN>::type
+enable_if_t<IS_TENSOR<TEN>::value,TEN>
 Contract(const TEN& a,const SCALE_MATRIX<T,r==0?TEN::m:r==1?TEN::n:TEN::p>& M)
 {
     return a*M.x;
 }
 
 template<int r,int s,class TEN,class T>
-typename enable_if<IS_TENSOR<TEN>::value,TEN>::type
+enable_if_t<IS_TENSOR<TEN>::value,TEN>
 Contract(const TEN& a,const IDENTITY_MATRIX<T,r==0?TEN::m:r==1?TEN::n:TEN::p>& M)
 {
     return a;
 }
 
 template<int r,int s,class T,int m,int n,int p,int q0,int q1>
-typename enable_if<((r==0?m:r==1?n:p)==(s==0?q0:q1)),ZERO_TENSOR<T,r!=0?m:(s==1?q0:q1),r!=1?n:(s==1?q0:q1),r!=2?p:(s==1?q0:q1)> >::type
+enable_if_t<((r==0?m:r==1?n:p)==(s==0?q0:q1)),ZERO_TENSOR<T,r!=0?m:(s==1?q0:q1),r!=1?n:(s==1?q0:q1),r!=2?p:(s==1?q0:q1)> >
 Contract(const ZERO_TENSOR<T,m,n,p>& a,const MATRIX<T,q0,q1>& M)
 {
     return ZERO_TENSOR<T,r!=0?m:(s==1?q0:q1),r!=1?n:(s==1?q0:q1),r!=2?p:(s==1?q0:q1)>();
@@ -1298,7 +1298,7 @@ Contract(const ZERO_TENSOR<T,m,n,p>& a,const DIAGONAL_MATRIX<T,r==0?m:r==1?n:p>&
 }
 
 template<int r,int s,class T,int m,int n,int p,int q>
-typename enable_if<r==0 && s==0,TENSOR<T,q,n,p> >::type
+enable_if_t<r==0 && s==0,TENSOR<T,q,n,p> >
 Contract(const TENSOR<T,m,n,p>& a,const MATRIX<T,m,q>& M)
 {
     TENSOR<T,q,n,p> t;
@@ -1309,7 +1309,7 @@ Contract(const TENSOR<T,m,n,p>& a,const MATRIX<T,m,q>& M)
 }
 
 template<int r,int s,class T,int m,int n,int p,int q>
-typename enable_if<r==1 && s==0,TENSOR<T,m,q,p> >::type
+enable_if_t<r==1 && s==0,TENSOR<T,m,q,p> >
 Contract(const TENSOR<T,m,n,p>& a,const MATRIX<T,n,q>& M)
 {
     TENSOR<T,m,q,p> t;
@@ -1319,7 +1319,7 @@ Contract(const TENSOR<T,m,n,p>& a,const MATRIX<T,n,q>& M)
 }
 
 template<int r,int s,class T,int m,int n,int p,int q>
-typename enable_if<r==2 && s==0,TENSOR<T,m,n,q> >::type
+enable_if_t<r==2 && s==0,TENSOR<T,m,n,q> >
 Contract(const TENSOR<T,m,n,p>& a,const MATRIX<T,p,q>& M)
 {
     TENSOR<T,m,n,q> t;
@@ -1329,7 +1329,7 @@ Contract(const TENSOR<T,m,n,p>& a,const MATRIX<T,p,q>& M)
 }
 
 template<int r,int s,class T,int m,int n,int p,int q>
-typename enable_if<r==0 && s==1,TENSOR<T,q,n,p> >::type
+enable_if_t<r==0 && s==1,TENSOR<T,q,n,p> >
 Contract(const TENSOR<T,m,n,p>& a,const MATRIX<T,q,m>& M)
 {
     TENSOR<T,q,n,p> t;
@@ -1340,7 +1340,7 @@ Contract(const TENSOR<T,m,n,p>& a,const MATRIX<T,q,m>& M)
 }
 
 template<int r,int s,class T,int m,int n,int p,int q>
-typename enable_if<r==1 && s==1,TENSOR<T,m,q,p> >::type
+enable_if_t<r==1 && s==1,TENSOR<T,m,q,p> >
 Contract(const TENSOR<T,m,n,p>& a,const MATRIX<T,q,n>& M)
 {
     TENSOR<T,m,q,p> t;
@@ -1350,7 +1350,7 @@ Contract(const TENSOR<T,m,n,p>& a,const MATRIX<T,q,n>& M)
 }
 
 template<int r,int s,class T,int m,int n,int p,int q>
-typename enable_if<r==2 && s==1,TENSOR<T,m,n,q> >::type
+enable_if_t<r==2 && s==1,TENSOR<T,m,n,q> >
 Contract(const TENSOR<T,m,n,p>& a,const MATRIX<T,q,p>& M)
 {
     TENSOR<T,m,n,q> t;
@@ -1360,7 +1360,7 @@ Contract(const TENSOR<T,m,n,p>& a,const MATRIX<T,q,p>& M)
 }
 
 template<int r,int s,class T,int m,int n,int p>
-typename enable_if<r==0,TENSOR<T,m,n,p> >::type
+enable_if_t<r==0,TENSOR<T,m,n,p> >
 Contract(const TENSOR<T,m,n,p>& a,const SYMMETRIC_MATRIX<T,m>& M)
 {
     TENSOR<T,m,n,p> t;
@@ -1371,7 +1371,7 @@ Contract(const TENSOR<T,m,n,p>& a,const SYMMETRIC_MATRIX<T,m>& M)
 }
 
 template<int r,int s,class T,int m,int n,int p>
-typename enable_if<r==1,TENSOR<T,m,n,p> >::type
+enable_if_t<r==1,TENSOR<T,m,n,p> >
 Contract(const TENSOR<T,m,n,p>& a,const SYMMETRIC_MATRIX<T,n>& M)
 {
     TENSOR<T,m,n,p> t;
@@ -1381,7 +1381,7 @@ Contract(const TENSOR<T,m,n,p>& a,const SYMMETRIC_MATRIX<T,n>& M)
 }
 
 template<int r,int s,class T,int m,int n,int p>
-typename enable_if<r==2,TENSOR<T,m,n,p> >::type
+enable_if_t<r==2,TENSOR<T,m,n,p> >
 Contract(const TENSOR<T,m,n,p>& a,const SYMMETRIC_MATRIX<T,p>& M)
 {
     TENSOR<T,m,n,p> t;
@@ -1391,7 +1391,7 @@ Contract(const TENSOR<T,m,n,p>& a,const SYMMETRIC_MATRIX<T,p>& M)
 }
 
 template<int r,int s,class T,int m,int n,int p>
-typename enable_if<r==0,TENSOR<T,m,n,p> >::type
+enable_if_t<r==0,TENSOR<T,m,n,p> >
 Contract(const TENSOR<T,m,n,p>& a,const DIAGONAL_MATRIX<T,m>& M)
 {
     TENSOR<T,m,n,p> t;
@@ -1401,7 +1401,7 @@ Contract(const TENSOR<T,m,n,p>& a,const DIAGONAL_MATRIX<T,m>& M)
 }
 
 template<int r,int s,class T,int m,int n,int p>
-typename enable_if<r==1,TENSOR<T,m,n,p> >::type
+enable_if_t<r==1,TENSOR<T,m,n,p> >
 Contract(const TENSOR<T,m,n,p>& a,const DIAGONAL_MATRIX<T,n>& M)
 {
     TENSOR<T,m,n,p> t;
@@ -1411,7 +1411,7 @@ Contract(const TENSOR<T,m,n,p>& a,const DIAGONAL_MATRIX<T,n>& M)
 }
 
 template<int r,int s,class T,int m,int n,int p>
-typename enable_if<r==2,TENSOR<T,m,n,p> >::type
+enable_if_t<r==2,TENSOR<T,m,n,p> >
 Contract(const TENSOR<T,m,n,p>& a,const DIAGONAL_MATRIX<T,p>& M)
 {
     TENSOR<T,m,n,p> t;
@@ -1421,7 +1421,7 @@ Contract(const TENSOR<T,m,n,p>& a,const DIAGONAL_MATRIX<T,p>& M)
 }
 
 template<int r,int s,class T,int m,int n,int p>
-typename enable_if<s==0,SYMMETRIC_TENSOR<T,r,p,n> >::type
+enable_if_t<s==0,SYMMETRIC_TENSOR<T,r,p,n> >
 Contract(const SYMMETRIC_TENSOR<T,r,m,n>& a,const MATRIX<T,m,p>& M)
 {
     SYMMETRIC_TENSOR<T,r,p,n> t;
@@ -1432,7 +1432,7 @@ Contract(const SYMMETRIC_TENSOR<T,r,m,n>& a,const MATRIX<T,m,p>& M)
 }
 
 template<int r,int s,class T,int m,int n,int p>
-typename enable_if<(r==1 && s==0),TENSOR<T,m,p,n> >::type
+enable_if_t<(r==1 && s==0),TENSOR<T,m,p,n> >
 Contract(const SYMMETRIC_TENSOR<T,0,m,n>& a,const MATRIX<T,n,p>& M)
 {
     TENSOR<T,m,p,n> t;
@@ -1442,7 +1442,7 @@ Contract(const SYMMETRIC_TENSOR<T,0,m,n>& a,const MATRIX<T,n,p>& M)
 }
 
 template<int r,int s,class T,int m,int n,int p>
-typename enable_if<(r==2 && s==0),TENSOR<T,m,n,p> >::type
+enable_if_t<(r==2 && s==0),TENSOR<T,m,n,p> >
 Contract(const SYMMETRIC_TENSOR<T,0,m,n>& a,const MATRIX<T,n,p>& M)
 {
     TENSOR<T,m,n,p> t;
@@ -1452,7 +1452,7 @@ Contract(const SYMMETRIC_TENSOR<T,0,m,n>& a,const MATRIX<T,n,p>& M)
 }
 
 template<int r,int s,class T,int m,int n,int p>
-typename enable_if<(r==0 && s==0),TENSOR<T,p,m,n> >::type
+enable_if_t<(r==0 && s==0),TENSOR<T,p,m,n> >
 Contract(const SYMMETRIC_TENSOR<T,1,m,n>& a,const MATRIX<T,n,p>& M)
 {
     TENSOR<T,p,m,n> t;
@@ -1463,7 +1463,7 @@ Contract(const SYMMETRIC_TENSOR<T,1,m,n>& a,const MATRIX<T,n,p>& M)
 }
 
 template<int r,int s,class T,int m,int n,int p>
-typename enable_if<(r==2 && s==0),TENSOR<T,n,m,p> >::type
+enable_if_t<(r==2 && s==0),TENSOR<T,n,m,p> >
 Contract(const SYMMETRIC_TENSOR<T,1,m,n>& a,const MATRIX<T,n,p>& M)
 {
     TENSOR<T,n,m,p> t;
@@ -1474,7 +1474,7 @@ Contract(const SYMMETRIC_TENSOR<T,1,m,n>& a,const MATRIX<T,n,p>& M)
 }
 
 template<int r,int s,class T,int m,int n,int p>
-typename enable_if<(r==0 && s==0),TENSOR<T,p,n,m> >::type
+enable_if_t<(r==0 && s==0),TENSOR<T,p,n,m> >
 Contract(const SYMMETRIC_TENSOR<T,2,m,n>& a,const MATRIX<T,n,p>& M)
 {
     TENSOR<T,p,n,m> t;
@@ -1485,7 +1485,7 @@ Contract(const SYMMETRIC_TENSOR<T,2,m,n>& a,const MATRIX<T,n,p>& M)
 }
 
 template<int r,int s,class T,int m,int n,int p>
-typename enable_if<(r==1 && s==0),TENSOR<T,n,p,m> >::type
+enable_if_t<(r==1 && s==0),TENSOR<T,n,p,m> >
 Contract(const SYMMETRIC_TENSOR<T,2,m,n>& a,const MATRIX<T,n,p>& M)
 {
     TENSOR<T,n,p,m> t;
@@ -1496,7 +1496,7 @@ Contract(const SYMMETRIC_TENSOR<T,2,m,n>& a,const MATRIX<T,n,p>& M)
 }
 
 template<int r,int s,class T,int m,int n,int p>
-typename enable_if<s==1,SYMMETRIC_TENSOR<T,r,p,n> >::type
+enable_if_t<s==1,SYMMETRIC_TENSOR<T,r,p,n> >
 Contract(const SYMMETRIC_TENSOR<T,r,m,n>& a,const MATRIX<T,p,m>& M)
 {
     SYMMETRIC_TENSOR<T,r,p,n> t;
@@ -1507,7 +1507,7 @@ Contract(const SYMMETRIC_TENSOR<T,r,m,n>& a,const MATRIX<T,p,m>& M)
 }
 
 template<int r,int s,class T,int m,int n,int p>
-typename enable_if<(r==1 && s==1),TENSOR<T,m,p,n> >::type
+enable_if_t<(r==1 && s==1),TENSOR<T,m,p,n> >
 Contract(const SYMMETRIC_TENSOR<T,0,m,n>& a,const MATRIX<T,p,n>& M)
 {
     TENSOR<T,m,p,n> t;
@@ -1517,7 +1517,7 @@ Contract(const SYMMETRIC_TENSOR<T,0,m,n>& a,const MATRIX<T,p,n>& M)
 }
 
 template<int r,int s,class T,int m,int n,int p>
-typename enable_if<(r==2 && s==1),TENSOR<T,m,n,p> >::type
+enable_if_t<(r==2 && s==1),TENSOR<T,m,n,p> >
 Contract(const SYMMETRIC_TENSOR<T,0,m,n>& a,const MATRIX<T,p,n>& M)
 {
     TENSOR<T,m,n,p> t;
@@ -1527,7 +1527,7 @@ Contract(const SYMMETRIC_TENSOR<T,0,m,n>& a,const MATRIX<T,p,n>& M)
 }
 
 template<int r,int s,class T,int m,int n,int p>
-typename enable_if<(r==0 && s==1),TENSOR<T,p,m,n> >::type
+enable_if_t<(r==0 && s==1),TENSOR<T,p,m,n> >
 Contract(const SYMMETRIC_TENSOR<T,1,m,n>& a,const MATRIX<T,p,n>& M)
 {
     TENSOR<T,p,m,n> t;
@@ -1538,7 +1538,7 @@ Contract(const SYMMETRIC_TENSOR<T,1,m,n>& a,const MATRIX<T,p,n>& M)
 }
 
 template<int r,int s,class T,int m,int n,int p>
-typename enable_if<(r==2 && s==1),TENSOR<T,n,m,p> >::type
+enable_if_t<(r==2 && s==1),TENSOR<T,n,m,p> >
 Contract(const SYMMETRIC_TENSOR<T,1,m,n>& a,const MATRIX<T,p,n>& M)
 {
     TENSOR<T,n,m,p> t;
@@ -1549,7 +1549,7 @@ Contract(const SYMMETRIC_TENSOR<T,1,m,n>& a,const MATRIX<T,p,n>& M)
 }
 
 template<int r,int s,class T,int m,int n,int p>
-typename enable_if<(r==0 && s==1),TENSOR<T,p,n,m> >::type
+enable_if_t<(r==0 && s==1),TENSOR<T,p,n,m> >
 Contract(const SYMMETRIC_TENSOR<T,2,m,n>& a,const MATRIX<T,p,n>& M)
 {
     TENSOR<T,p,n,m> t;
@@ -1560,7 +1560,7 @@ Contract(const SYMMETRIC_TENSOR<T,2,m,n>& a,const MATRIX<T,p,n>& M)
 }
 
 template<int r,int s,class T,int m,int n,int p>
-typename enable_if<(r==1 && s==1),TENSOR<T,n,p,m> >::type
+enable_if_t<(r==1 && s==1),TENSOR<T,n,p,m> >
 Contract(const SYMMETRIC_TENSOR<T,2,m,n>& a,const MATRIX<T,p,n>& M)
 {
     TENSOR<T,n,p,m> t;
@@ -1581,7 +1581,7 @@ Contract(const SYMMETRIC_TENSOR<T,r,m,n>& a,const SYMMETRIC_MATRIX<T,m>& M)
 }
 
 template<int r,int s,class T,int m,int n>
-typename enable_if<r==1,TENSOR<T,m,n,n> >::type
+enable_if_t<r==1,TENSOR<T,m,n,n> >
 Contract(const SYMMETRIC_TENSOR<T,0,m,n>& a,const SYMMETRIC_MATRIX<T,n>& M)
 {
     TENSOR<T,m,n,n> t;
@@ -1591,7 +1591,7 @@ Contract(const SYMMETRIC_TENSOR<T,0,m,n>& a,const SYMMETRIC_MATRIX<T,n>& M)
 }
 
 template<int r,int s,class T,int m,int n>
-typename enable_if<r==2,TENSOR<T,m,n,n> >::type
+enable_if_t<r==2,TENSOR<T,m,n,n> >
 Contract(const SYMMETRIC_TENSOR<T,0,m,n>& a,const SYMMETRIC_MATRIX<T,n>& M)
 {
     TENSOR<T,m,n,n> t;
@@ -1601,7 +1601,7 @@ Contract(const SYMMETRIC_TENSOR<T,0,m,n>& a,const SYMMETRIC_MATRIX<T,n>& M)
 }
 
 template<int r,int s,class T,int m,int n>
-typename enable_if<r==0,TENSOR<T,n,m,n> >::type
+enable_if_t<r==0,TENSOR<T,n,m,n> >
 Contract(const SYMMETRIC_TENSOR<T,1,m,n>& a,const SYMMETRIC_MATRIX<T,n>& M)
 {
     TENSOR<T,n,m,n> t;
@@ -1612,7 +1612,7 @@ Contract(const SYMMETRIC_TENSOR<T,1,m,n>& a,const SYMMETRIC_MATRIX<T,n>& M)
 }
 
 template<int r,int s,class T,int m,int n>
-typename enable_if<r==2,TENSOR<T,n,m,n> >::type
+enable_if_t<r==2,TENSOR<T,n,m,n> >
 Contract(const SYMMETRIC_TENSOR<T,1,m,n>& a,const SYMMETRIC_MATRIX<T,n>& M)
 {
     TENSOR<T,n,m,n> t;
@@ -1623,7 +1623,7 @@ Contract(const SYMMETRIC_TENSOR<T,1,m,n>& a,const SYMMETRIC_MATRIX<T,n>& M)
 }
 
 template<int r,int s,class T,int m,int n>
-typename enable_if<r==0,TENSOR<T,n,n,m> >::type
+enable_if_t<r==0,TENSOR<T,n,n,m> >
 Contract(const SYMMETRIC_TENSOR<T,2,m,n>& a,const SYMMETRIC_MATRIX<T,n>& M)
 {
     TENSOR<T,n,n,m> t;
@@ -1634,7 +1634,7 @@ Contract(const SYMMETRIC_TENSOR<T,2,m,n>& a,const SYMMETRIC_MATRIX<T,n>& M)
 }
 
 template<int r,int s,class T,int m,int n>
-typename enable_if<r==1,TENSOR<T,n,n,m> >::type
+enable_if_t<r==1,TENSOR<T,n,n,m> >
 Contract(const SYMMETRIC_TENSOR<T,2,m,n>& a,const SYMMETRIC_MATRIX<T,n>& M)
 {
     TENSOR<T,n,n,m> t;
@@ -1664,7 +1664,7 @@ Contract(const SYMMETRIC_TENSOR<T,r,m,n>& a,const DIAGONAL_MATRIX<T,m>& M)
 }
 
 template<int r,int s,class T,int m,int n>
-typename enable_if<r==1,TENSOR<T,m,n,n> >::type
+enable_if_t<r==1,TENSOR<T,m,n,n> >
 Contract(const SYMMETRIC_TENSOR<T,0,m,n>& a,const DIAGONAL_MATRIX<T,n>& M)
 {
     TENSOR<T,m,n,n> t;
@@ -1674,7 +1674,7 @@ Contract(const SYMMETRIC_TENSOR<T,0,m,n>& a,const DIAGONAL_MATRIX<T,n>& M)
 }
 
 template<int r,int s,class T,int m,int n>
-typename enable_if<r==2,TENSOR<T,m,n,n> >::type
+enable_if_t<r==2,TENSOR<T,m,n,n> >
 Contract(const SYMMETRIC_TENSOR<T,0,m,n>& a,const DIAGONAL_MATRIX<T,n>& M)
 {
     TENSOR<T,m,n,n> t;
@@ -1684,7 +1684,7 @@ Contract(const SYMMETRIC_TENSOR<T,0,m,n>& a,const DIAGONAL_MATRIX<T,n>& M)
 }
 
 template<int r,int s,class T,int m,int n>
-typename enable_if<r==0,TENSOR<T,n,m,n> >::type
+enable_if_t<r==0,TENSOR<T,n,m,n> >
 Contract(const SYMMETRIC_TENSOR<T,1,m,n>& a,const DIAGONAL_MATRIX<T,n>& M)
 {
     TENSOR<T,n,m,n> t;
@@ -1696,7 +1696,7 @@ Contract(const SYMMETRIC_TENSOR<T,1,m,n>& a,const DIAGONAL_MATRIX<T,n>& M)
 }
 
 template<int r,int s,class T,int m,int n>
-typename enable_if<r==2,TENSOR<T,n,m,n> >::type
+enable_if_t<r==2,TENSOR<T,n,m,n> >
 Contract(const SYMMETRIC_TENSOR<T,1,m,n>& a,const DIAGONAL_MATRIX<T,n>& M)
 {
     TENSOR<T,n,m,n> t;
@@ -1708,7 +1708,7 @@ Contract(const SYMMETRIC_TENSOR<T,1,m,n>& a,const DIAGONAL_MATRIX<T,n>& M)
 }
 
 template<int r,int s,class T,int m,int n>
-typename enable_if<r==0,TENSOR<T,n,n,m> >::type
+enable_if_t<r==0,TENSOR<T,n,n,m> >
 Contract(const SYMMETRIC_TENSOR<T,2,m,n>& a,const DIAGONAL_MATRIX<T,n>& M)
 {
     TENSOR<T,n,n,m> t;
@@ -1720,7 +1720,7 @@ Contract(const SYMMETRIC_TENSOR<T,2,m,n>& a,const DIAGONAL_MATRIX<T,n>& M)
 }
 
 template<int r,int s,class T,int m,int n>
-typename enable_if<r==1,TENSOR<T,n,n,m> >::type
+enable_if_t<r==1,TENSOR<T,n,n,m> >
 Contract(const SYMMETRIC_TENSOR<T,2,m,n>& a,const DIAGONAL_MATRIX<T,n>& M)
 {
     TENSOR<T,n,n,m> t;
@@ -1732,7 +1732,7 @@ Contract(const SYMMETRIC_TENSOR<T,2,m,n>& a,const DIAGONAL_MATRIX<T,n>& M)
 }
 
 template<int r,int s,class T,int m,int p>
-typename enable_if<s==0,SYMMETRIC_TENSOR<T,r,p> >::type
+enable_if_t<s==0,SYMMETRIC_TENSOR<T,r,p> >
 Contract(const DIAGONAL_TENSOR<T,m>& a,const MATRIX<T,m,p>& M)
 {
     SYMMETRIC_TENSOR<T,r,p,m> t;
@@ -1743,7 +1743,7 @@ Contract(const DIAGONAL_TENSOR<T,m>& a,const MATRIX<T,m,p>& M)
 }
 
 template<int r,int s,class T,int m,int p>
-typename enable_if<s==1,SYMMETRIC_TENSOR<T,r,p,m> >::type
+enable_if_t<s==1,SYMMETRIC_TENSOR<T,r,p,m> >
 Contract(const DIAGONAL_TENSOR<T,m>& a,const MATRIX<T,p,m>& M)
 {
     SYMMETRIC_TENSOR<T,r,p,m> t;
@@ -1760,14 +1760,14 @@ Contract(const DIAGONAL_TENSOR<T,m>& a,const DIAGONAL_MATRIX<T,m>& M)
 }
 
 template<int r,int s,class T,int m,int n,int p>
-typename enable_if<s==0,VEC_ID_TENSOR<T,r,p,n> >::type
+enable_if_t<s==0,VEC_ID_TENSOR<T,r,p,n> >
 Contract(const VEC_ID_TENSOR<T,r,m,n>& a,const MATRIX<T,m,p>& M)
 {
     return VEC_ID_TENSOR<T,r,p,n>(M.Transpose_Times(a.v));
 }
 
 template<int r,int s,class T,int m,int n,int p>
-typename enable_if<s==1,VEC_ID_TENSOR<T,r,p,n> >::type
+enable_if_t<s==1,VEC_ID_TENSOR<T,r,p,n> >
 Contract(const VEC_ID_TENSOR<T,r,m,n>& a,const MATRIX<T,p,m>& M)
 {
     return VEC_ID_TENSOR<T,r,p,n>(M*a.v);
@@ -1781,21 +1781,21 @@ Contract(const VEC_ID_TENSOR<T,r,m,n>& a,const SYMMETRIC_MATRIX<T,m>& M)
 
 template<int r,int s,class T,int m,int n,int p0,int p1,int u> auto
 Contract(const VEC_ID_TENSOR<T,u,m,n>& a,const MATRIX<T,p0,p1>& M)
-    -> typename enable_if<r!=u && (r<3-r-u)==(s==0) && n==(s==0?p0:p1),decltype(Tensor_Product<u>(M.Transposed(),a.v))>::type
+    -> enable_if_t<r!=u && (r<3-r-u)==(s==0) && n==(s==0?p0:p1),decltype(Tensor_Product<u>(M.Transposed(),a.v))>
 {
     return Tensor_Product<u>(M.Transposed(),a.v);
 }
 
 template<int r,int s,class T,int m,int n,int p0,int p1,int u> auto
 Contract(const VEC_ID_TENSOR<T,u,m,n>& a,const MATRIX<T,p0,p1>& M)
-    -> typename enable_if<r!=u && (r<3-r-u)!=(s==0) && n==(s==0?p0:p1),decltype(Tensor_Product<u>(M,a.v))>::type
+    -> enable_if_t<r!=u && (r<3-r-u)!=(s==0) && n==(s==0?p0:p1),decltype(Tensor_Product<u>(M,a.v))>
 {
     return Tensor_Product<u>(M,a.v);
 }
 
 template<int r,int s,class T,int m,int n,int u> auto
 Contract(const VEC_ID_TENSOR<T,u,m,n>& a,const SYMMETRIC_MATRIX<T,n>& M)
-    -> typename enable_if<r!=u,decltype(Tensor_Product<u>(M,a.v))>::type
+    -> enable_if_t<r!=u,decltype(Tensor_Product<u>(M,a.v))>
 {
     return Tensor_Product<u>(M,a.v);
 }
@@ -1815,7 +1815,7 @@ Contract(const VEC_ID_SYM_TENSOR<T,u,m>& a,const SYMMETRIC_MATRIX<T,m>& M)
 }
 
 template<int r,int s,class T,int q>
-typename enable_if<r==0 && s==0,TENSOR<T,q,3,3> >::type
+enable_if_t<r==0 && s==0,TENSOR<T,q,3,3> >
 Contract(const PERMUTATION_TENSOR<T>& a,const MATRIX<T,3,q>& M)
 {
     TENSOR<T,q,3,3> t;
@@ -1824,7 +1824,7 @@ Contract(const PERMUTATION_TENSOR<T>& a,const MATRIX<T,3,q>& M)
 }
 
 template<int r,int s,class T,int q>
-typename enable_if<r==1 && s==0,TENSOR<T,3,q,3> >::type
+enable_if_t<r==1 && s==0,TENSOR<T,3,q,3> >
 Contract(const PERMUTATION_TENSOR<T>& a,const MATRIX<T,3,q>& M)
 {
     TENSOR<T,3,q,3> t;
@@ -1835,7 +1835,7 @@ Contract(const PERMUTATION_TENSOR<T>& a,const MATRIX<T,3,q>& M)
 }
 
 template<int r,int s,class T,int q>
-typename enable_if<r==2 && s==0,TENSOR<T,3,3,q> >::type
+enable_if_t<r==2 && s==0,TENSOR<T,3,3,q> >
 Contract(const PERMUTATION_TENSOR<T>& a,const MATRIX<T,3,q>& M)
 {
     TENSOR<T,3,3,q> t;
@@ -1846,7 +1846,7 @@ Contract(const PERMUTATION_TENSOR<T>& a,const MATRIX<T,3,q>& M)
 }
 
 template<int r,int s,class T,int q>
-typename enable_if<r==0 && s==1,TENSOR<T,q,3,3> >::type
+enable_if_t<r==0 && s==1,TENSOR<T,q,3,3> >
 Contract(const PERMUTATION_TENSOR<T>& a,const MATRIX<T,q,3>& M)
 {
     TENSOR<T,q,3,3> t;
@@ -1855,7 +1855,7 @@ Contract(const PERMUTATION_TENSOR<T>& a,const MATRIX<T,q,3>& M)
 }
 
 template<int r,int s,class T,int q>
-typename enable_if<r==1 && s==1,TENSOR<T,3,q,3> >::type
+enable_if_t<r==1 && s==1,TENSOR<T,3,q,3> >
 Contract(const PERMUTATION_TENSOR<T>& a,const MATRIX<T,q,3>& M)
 {
     TENSOR<T,3,q,3> t;
@@ -1866,7 +1866,7 @@ Contract(const PERMUTATION_TENSOR<T>& a,const MATRIX<T,q,3>& M)
 }
 
 template<int r,int s,class T,int q>
-typename enable_if<r==2 && s==1,TENSOR<T,3,3,q> >::type
+enable_if_t<r==2 && s==1,TENSOR<T,3,3,q> >
 Contract(const PERMUTATION_TENSOR<T>& a,const MATRIX<T,q,3>& M)
 {
     TENSOR<T,3,3,q> t;
@@ -1877,7 +1877,7 @@ Contract(const PERMUTATION_TENSOR<T>& a,const MATRIX<T,q,3>& M)
 }
 
 template<int r,int s,class T>
-typename enable_if<r==0,TENSOR<T,3,3,3> >::type
+enable_if_t<r==0,TENSOR<T,3,3,3> >
 Contract(const PERMUTATION_TENSOR<T>& a,const SYMMETRIC_MATRIX<T,3>& M)
 {
     TENSOR<T,3,3,3> t;
@@ -1886,7 +1886,7 @@ Contract(const PERMUTATION_TENSOR<T>& a,const SYMMETRIC_MATRIX<T,3>& M)
 }
 
 template<int r,int s,class T>
-typename enable_if<r==1,TENSOR<T,3,3,3> >::type
+enable_if_t<r==1,TENSOR<T,3,3,3> >
 Contract(const PERMUTATION_TENSOR<T>& a,const SYMMETRIC_MATRIX<T,3>& M)
 {
     TENSOR<T,3,3,3> t;
@@ -1897,7 +1897,7 @@ Contract(const PERMUTATION_TENSOR<T>& a,const SYMMETRIC_MATRIX<T,3>& M)
 }
 
 template<int r,int s,class T>
-typename enable_if<r==2,TENSOR<T,3,3,3> >::type
+enable_if_t<r==2,TENSOR<T,3,3,3> >
 Contract(const PERMUTATION_TENSOR<T>& a,const SYMMETRIC_MATRIX<T,3>& M)
 {
     TENSOR<T,3,3,3> t;
@@ -1985,23 +1985,23 @@ template<class T,int m> SYMMETRIC_TENSOR<T,0,m,m> Symmetric_Double_Contract_12(c
 template<class T,int m> SYMMETRIC_TENSOR<T,0,m,m> Symmetric_Double_Contract_12(const DIAGONAL_TENSOR<T,m>& t,const MATRIX<T,m>& cm1,const DIAGONAL_MATRIX<T,m>& cm2)
 {return Symmetric_Double_Contract_12(t,cm2,cm1);}
 
-template<class T_TEN> typename enable_if<IS_TENSOR<T_TEN>::value,T_TEN>::type Choose(const T_TEN& a,const T_TEN& b);
+template<class T_TEN> enable_if_t<IS_TENSOR<T_TEN>::value,T_TEN> Choose(const T_TEN& a,const T_TEN& b);
 template<class T_TEN0,class T_TEN1>
-typename enable_if<IS_TENSOR<T_TEN0>::value &&
+enable_if_t<IS_TENSOR<T_TEN0>::value &&
     IS_TENSOR<T_TEN1>::value &&
     !(IS_SYM_TENSOR<0,T_TEN0>::value && IS_SYM_TENSOR<0,T_TEN1>::value) &&
     !(IS_SYM_TENSOR<1,T_TEN0>::value && IS_SYM_TENSOR<1,T_TEN1>::value) &&
     !(IS_SYM_TENSOR<2,T_TEN0>::value && IS_SYM_TENSOR<2,T_TEN1>::value),
-    TENSOR<typename T_TEN0::SCALAR,T_TEN0::m,T_TEN0::n,T_TEN0::p> >::TYPE
+    TENSOR<typename T_TEN0::SCALAR,T_TEN0::m,T_TEN0::n,T_TEN0::p> >
 Choose(const T_TEN0& a,const T_TEN1& b);
-template<class T_TEN0,class T_TEN1> typename enable_if<IS_SYM_TENSOR<0,T_TEN0>::value && IS_SYM_TENSOR<0,T_TEN1>::value,SYMMETRIC_TENSOR<typename T_TEN0::SCALAR,0,T_TEN0::um,T_TEN0::un> >::type Choose(const T_TEN0& a,const T_TEN1& b);
-template<class T_TEN0,class T_TEN1> typename enable_if<IS_SYM_TENSOR<1,T_TEN0>::value && IS_SYM_TENSOR<1,T_TEN1>::value,SYMMETRIC_TENSOR<typename T_TEN0::SCALAR,1,T_TEN0::um,T_TEN0::un> >::type Choose(const T_TEN0& a,const T_TEN1& b);
-template<class T_TEN0,class T_TEN1> typename enable_if<IS_SYM_TENSOR<2,T_TEN0>::value && IS_SYM_TENSOR<2,T_TEN1>::value,SYMMETRIC_TENSOR<typename T_TEN0::SCALAR,2,T_TEN0::um,T_TEN0::un> >::type Choose(const T_TEN0& a,const T_TEN1& b);
+template<class T_TEN0,class T_TEN1> enable_if_t<IS_SYM_TENSOR<0,T_TEN0>::value && IS_SYM_TENSOR<0,T_TEN1>::value,SYMMETRIC_TENSOR<typename T_TEN0::SCALAR,0,T_TEN0::um,T_TEN0::un> > Choose(const T_TEN0& a,const T_TEN1& b);
+template<class T_TEN0,class T_TEN1> enable_if_t<IS_SYM_TENSOR<1,T_TEN0>::value && IS_SYM_TENSOR<1,T_TEN1>::value,SYMMETRIC_TENSOR<typename T_TEN0::SCALAR,1,T_TEN0::um,T_TEN0::un> > Choose(const T_TEN0& a,const T_TEN1& b);
+template<class T_TEN0,class T_TEN1> enable_if_t<IS_SYM_TENSOR<2,T_TEN0>::value && IS_SYM_TENSOR<2,T_TEN1>::value,SYMMETRIC_TENSOR<typename T_TEN0::SCALAR,2,T_TEN0::um,T_TEN0::un> > Choose(const T_TEN0& a,const T_TEN1& b);
 template<class T,int m,class T_TEN> T_TEN Choose(const T_TEN& a,const ZERO_TENSOR<T,T_TEN::m,T_TEN::n,T_TEN::p>& b);
 template<class T,int m,class T_TEN> T_TEN Choose(const ZERO_TENSOR<T,T_TEN::m,T_TEN::n,T_TEN::p>& a,const T_TEN& b);
 template<class T,int m,int n,int p> ZERO_TENSOR<T,m,n,p> Choose(const ZERO_TENSOR<T,m,n,p>& a,const ZERO_TENSOR<T,m,n,p>& b);
 
-template<class T> typename enable_if<IS_TENSOR<T>::value||IS_MATRIX<T>::value||IS_VECTOR<T>::value||is_scalar<T>::value,T>::type Choose_Zero(const T& a);
+template<class T> enable_if_t<IS_TENSOR<T>::value||IS_MATRIX<T>::value||IS_VECTOR<T>::value||is_scalar<T>::value,T> Choose_Zero(const T& a);
 template<class T,int d> SCALE_MATRIX<T,d> Choose_Zero(const IDENTITY_MATRIX<T,d>& a);
 template<class T,int m> typename conditional<m==0,FIXED_NUMBER<T,m>,T>::type Choose_Zero(const FIXED_NUMBER<T,m>& a);
 
@@ -2009,7 +2009,7 @@ template<class T,int m> typename conditional<m==0,FIXED_NUMBER<T,m>,T>::type Cho
 // operator=
 //##################################################################### 
 
-template<class T> typename enable_if<IS_TENSOR<T>::value>::type Fill_From(T& a,const T& b){a=b;}
+template<class T> enable_if_t<IS_TENSOR<T>::value> Fill_From(T& a,const T& b){a=b;}
 
 template<class T,int m,int n,int p> void
 Fill_From(TENSOR<T,m,n,p>& a,const ZERO_TENSOR<T,m,n,p>& b)

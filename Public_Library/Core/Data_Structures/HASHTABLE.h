@@ -121,7 +121,7 @@ private:
     void Insert(const HASHTABLE_ENTRY_TEMPLATE<TK,void>& entry)
     {Insert(entry.key);}
 
-    template<class T2> typename enable_if<!is_same<T2,void>::value>::type
+    template<class T2> enable_if_t<!is_same<T2,void>::value>
     Insert(const HASHTABLE_ENTRY_TEMPLATE<TK,T2>& entry)
     {Insert(entry.key,entry.data);}
 public:

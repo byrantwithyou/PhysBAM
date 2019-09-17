@@ -54,7 +54,7 @@ Tensor_Product_0(const GRADIENT_VEC<TV,VEC>& v,const VECTOR<T,d>& u)
 
 template<class T_MAT,class T,class VEC> auto
 Tensor_Product_2(const T_MAT& m,const GRADIENT<T,VEC>& v)
-    -> typename enable_if<IS_MATRIX<T_MAT>::value,GRADIENT_MAT<MATRIX<T,T_MAT::m,T_MAT::n>,decltype(TENSOR_PRODUCT_2_VV_M::Type(v.x,m))> >::type
+    -> enable_if_t<IS_MATRIX<T_MAT>::value,GRADIENT_MAT<MATRIX<T,T_MAT::m,T_MAT::n>,decltype(TENSOR_PRODUCT_2_VV_M::Type(v.x,m))> >
 {GRADIENT_MAT<MATRIX<T,T_MAT::m,T_MAT::n>,decltype(TENSOR_PRODUCT_2_VV_M::Type(v.x,m))> r;TENSOR_PRODUCT_2_VV_M()(r.x,v.x,m);return r;}
 
 template<class T_MAT,class MAT> auto

@@ -79,7 +79,7 @@ operator=(FFT&& p)
 //#####################################################################
 // Function Pack_Copy
 //#####################################################################
-template<int n,class T> static typename std::enable_if<n==1>::type
+template<int n,class T> static enable_if_t<n==1>
 Pack_Copy(const std::complex<T>* s,std::complex<T>* d,int* pack_sizes,int* ds,int* dd)
 {
     memmove(d,s,*pack_sizes*sizeof(*s));
@@ -87,7 +87,7 @@ Pack_Copy(const std::complex<T>* s,std::complex<T>* d,int* pack_sizes,int* ds,in
 //#####################################################################
 // Function Pack_Copy
 //#####################################################################
-template<int n,class T> static typename std::enable_if<n!=1>::type
+template<int n,class T> static enable_if_t<n!=1>
 Pack_Copy(const std::complex<T>* s,std::complex<T>* d,int* pack_sizes,int* ds,int* dd)
 {
     for(int i=0;i<*pack_sizes;i++)
@@ -123,7 +123,7 @@ Pack(ARRAY<std::complex<T> >& a)
 //#####################################################################
 // Function Unpack_Copy
 //#####################################################################
-template<int n,class T> static typename std::enable_if<n==1>::type
+template<int n,class T> static enable_if_t<n==1>
 Unpack_Copy(const std::complex<T>* s,std::complex<T>* d,int* pack_sizes,int* ds,int* dd)
 {
     memmove(d,s,*pack_sizes*sizeof(*s));
@@ -131,7 +131,7 @@ Unpack_Copy(const std::complex<T>* s,std::complex<T>* d,int* pack_sizes,int* ds,
 //#####################################################################
 // Function Unpack_Copy
 //#####################################################################
-template<int n,class T> static typename std::enable_if<n!=1>::type
+template<int n,class T> static enable_if_t<n!=1>
 Unpack_Copy(const std::complex<T>* s,std::complex<T>* d,int* pack_sizes,int* ds,int* dd)
 {
     for(int i=*pack_sizes-1;i>=0;i--)
@@ -140,7 +140,7 @@ Unpack_Copy(const std::complex<T>* s,std::complex<T>* d,int* pack_sizes,int* ds,
 //#####################################################################
 // Function Unpack_Conj
 //#####################################################################
-template<int n,class T> static typename std::enable_if<n==1>::type
+template<int n,class T> static enable_if_t<n==1>
 Unpack_Conj(const std::complex<T>* s,std::complex<T>* d,int* sizes,int* st)
 {
     for(int i=1;2*i<*sizes;i++)
@@ -149,7 +149,7 @@ Unpack_Conj(const std::complex<T>* s,std::complex<T>* d,int* sizes,int* st)
 //#####################################################################
 // Function Unpack_Conj
 //#####################################################################
-template<int n,class T> static typename std::enable_if<n!=1>::type
+template<int n,class T> static enable_if_t<n!=1>
 Unpack_Conj(const std::complex<T>* s,std::complex<T>* d,int* sizes,int* st)
 {
     Unpack_Conj<n-1>(s,d,sizes+1,st+1);

@@ -73,7 +73,7 @@ public:
     void Seed_Particles_Poisson(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
         std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,T particles_per_cell);
 
-    template<class T_OBJECT> typename enable_if<!is_base_of<IMPLICIT_OBJECT<TV>,T_OBJECT>::value>::type
+    template<class T_OBJECT> enable_if_t<!is_base_of<IMPLICIT_OBJECT<TV>,T_OBJECT>::value>
     Seed_Particles_Poisson(const T_OBJECT& object,std::function<TV(const TV&)> V,
         std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,T particles_per_cell)
     {ANALYTIC_IMPLICIT_OBJECT<T_OBJECT> obj(object);Seed_Particles_Poisson(obj,V,dV,density,particles_per_cell);}
@@ -81,7 +81,7 @@ public:
     void Seed_Particles_Uniform(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
         std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,const GRID<TV>& seed_grid);
 
-    template<class T_OBJECT> typename enable_if<!is_base_of<IMPLICIT_OBJECT<TV>,T_OBJECT>::value>::type
+    template<class T_OBJECT> enable_if_t<!is_base_of<IMPLICIT_OBJECT<TV>,T_OBJECT>::value>
     Seed_Particles_Uniform(const T_OBJECT& object,std::function<TV(const TV&)> V,
         std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,const GRID<TV>& seed_grid)
     {ANALYTIC_IMPLICIT_OBJECT<T_OBJECT> obj(object);Seed_Particles_Uniform(obj,V,dV,density,seed_grid);}
@@ -89,7 +89,7 @@ public:
     void Seed_Particles(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
         std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,T particles_per_cell);
 
-    template<class T_OBJECT> typename enable_if<!is_base_of<IMPLICIT_OBJECT<TV>,T_OBJECT>::value>::type
+    template<class T_OBJECT> enable_if_t<!is_base_of<IMPLICIT_OBJECT<TV>,T_OBJECT>::value>
     Seed_Particles(const T_OBJECT& object,std::function<TV(const TV&)> V,
         std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,T particles_per_cell)
     {ANALYTIC_IMPLICIT_OBJECT<T_OBJECT> obj(object);Seed_Particles(obj,V,dV,density,particles_per_cell);}

@@ -14,7 +14,7 @@ namespace PhysBAM{
 // Makes a view from a, copying data to tmp if necessary.
 // Returns true if a copy was made
 template<class T,class T_ARRAY>
-typename enable_if<HAS_POINTER<T_ARRAY>::value,bool>::type
+enable_if_t<HAS_POINTER<T_ARRAY>::value,bool>
 Make_View(ARRAY_VIEW<T>& v,ARRAY_BASE<T,T_ARRAY>& a,ARRAY<T>& tmp)
 {
     v.Set(a.Derived());
@@ -22,7 +22,7 @@ Make_View(ARRAY_VIEW<T>& v,ARRAY_BASE<T,T_ARRAY>& a,ARRAY<T>& tmp)
 }
 
 template<class T,class T_ARRAY>
-typename enable_if<HAS_POINTER<T_ARRAY>::value,bool>::type
+enable_if_t<HAS_POINTER<T_ARRAY>::value,bool>
 Make_View(ARRAY_VIEW<const T>& v,const ARRAY_BASE<T,T_ARRAY>& a,ARRAY<T>& tmp)
 {
     v.Set(a.Derived());
@@ -30,7 +30,7 @@ Make_View(ARRAY_VIEW<const T>& v,const ARRAY_BASE<T,T_ARRAY>& a,ARRAY<T>& tmp)
 }
 
 template<class T,class T_ARRAY>
-typename enable_if<!HAS_POINTER<T_ARRAY>::value,bool>::type
+enable_if_t<!HAS_POINTER<T_ARRAY>::value,bool>
 Make_View(ARRAY_VIEW<T>& v,ARRAY_BASE<T,T_ARRAY>& a,ARRAY<T>& tmp)
 {
     tmp=a;
@@ -39,7 +39,7 @@ Make_View(ARRAY_VIEW<T>& v,ARRAY_BASE<T,T_ARRAY>& a,ARRAY<T>& tmp)
 }
 
 template<class T,class T_ARRAY>
-typename enable_if<!HAS_POINTER<T_ARRAY>::value,bool>::type
+enable_if_t<!HAS_POINTER<T_ARRAY>::value,bool>
 Make_View(ARRAY_VIEW<const T>& v,const ARRAY_BASE<T,T_ARRAY>& a,ARRAY<T>& tmp)
 {
     tmp=a;
