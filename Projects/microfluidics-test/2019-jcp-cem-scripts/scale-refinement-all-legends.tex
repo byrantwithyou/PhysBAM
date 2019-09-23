@@ -1,0 +1,32 @@
+\documentclass[class=minimal,border=0pt]{standalone}
+\usepackage{pgfplots}
+
+\begin{document}
+\pgfplotsset{width=10cm,height=8cm,compat=1.13}
+\begin{tikzpicture}
+\begin{axis}[
+    legend cell align=left,
+    legend columns=3,
+    hide axis,
+    legend entries={XXXX0 (XXX02 XXX03),XXXX1 (XXX12 XXX13),XXXX2 (XXX22 XXX23),
+        YYYY0 (YYY02 YYY03),YYYY1 (YYY12 YYY13),YYYY2 (YYY22 YYY23),
+        ZZZZ0 (ZZZ02 ZZZ03),ZZZZ1 (ZZZ12 ZZZ13),ZZZZ2 (ZZZ22 ZZZ23)},
+    legend pos=south east,
+    xmin=0,
+    xmax=1,
+    ymin=0.8,
+    ymax=1,
+    legend style={fill=none,draw=none}
+]
+\addlegendimage{mark=x,color=red};
+\addlegendimage{mark=x,color=green};
+\addlegendimage{mark=x,color=blue};
+\addlegendimage{mark=o,color=red};
+\addlegendimage{mark=o,color=green};
+\addlegendimage{mark=o,color=blue};
+\addlegendimage{mark=triangle,color=red};
+\addlegendimage{mark=triangle,color=green};
+\addlegendimage{mark=triangle,color=blue};
+\end{axis}
+\end{tikzpicture}
+\end{document}
