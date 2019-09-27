@@ -16,7 +16,6 @@ namespace TESSELLATION{
 template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(
     const RANGE<VECTOR<T,3> >& box,const VECTOR<int,3>& res)
 {
-    typedef VECTOR<T,3> TV;
     TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
     surface->Initialize_Box_Mesh_And_Particles(res,box);
     return surface;
