@@ -37,11 +37,25 @@ public:
     ID operator()(const ID i) const
     {assert((unsigned)Value(i)<(unsigned)Value(m));return i;}
 
-    SIMPLE_ITERATOR<const IDENTITY_ARRAY> begin() const
-    {return SIMPLE_ITERATOR<const IDENTITY_ARRAY>(*this,0);}
+    struct ITERATOR
+    {
+        ID i;
+        explicit ITERATOR(ID i): i(i) {}
+        ID operator*() const {return i;}
+        ITERATOR& operator++(){i++;return *this;}
+        ITERATOR operator++(int){ITERATOR it(i++);}
+        ITERATOR& operator--(){i--;return *this;}
+        ITERATOR operator--(int){ITERATOR it(i--);}
+        bool operator==(const ITERATOR& it) const {return i==it.i;}
+        bool operator!=(const ITERATOR& it) const {return i!=it.i;}
+        bool operator<(const ITERATOR& it) const {return i<it.i;}
+        bool operator>(const ITERATOR& it) const {return i>it.i;}
+        bool operator<=(const ITERATOR& it) const {return i<=it.i;}
+        bool operator>=(const ITERATOR& it) const {return i>=it.i;}
+    };
 
-    SIMPLE_ITERATOR<const IDENTITY_ARRAY> end() const
-    {return SIMPLE_ITERATOR<const IDENTITY_ARRAY>(*this,Size());}
+    ITERATOR begin() const {return ITERATOR(0);}
+    ITERATOR end() const {return ITERATOR(m);}
 
 //#####################################################################
 };

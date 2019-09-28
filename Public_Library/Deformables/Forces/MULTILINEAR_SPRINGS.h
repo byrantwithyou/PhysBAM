@@ -20,7 +20,6 @@ public:
     using BASE::visual_restlength;using BASE::restlength;using BASE::constant_youngs_modulus;using BASE::youngs_modulus;using BASE::particles;using BASE::segment_mesh;
     using BASE::damping;using BASE::force_segments;using BASE::states;using BASE::current_lengths;
     using BASE::Invalidate_CFL;
-    typedef typename BASE::SEGMENT_ITERATOR SEGMENT_ITERATOR;
 
     ARRAY<T,VECTOR<int,1> > intervals;
     ARRAY<T,VECTOR<int,1> > youngs_modulus_scaling;

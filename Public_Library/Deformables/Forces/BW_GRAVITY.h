@@ -7,7 +7,7 @@
 #ifndef __BW_GRAVITY__
 #define __BW_GRAVITY__
 
-#include <Core/Data_Structures/FORCE_ELEMENTS.h>
+#include <Core/Arrays/ARRAY.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{
 
@@ -18,11 +18,10 @@ class BW_GRAVITY:public DEFORMABLES_FORCES<TV>
 public:
     typedef DEFORMABLES_FORCES<TV> BASE;
     using BASE::particles;
-    typedef typename FORCE_ELEMENTS::ITERATOR ELEMENT_ITERATOR;
     typedef typename BASE::FREQUENCY_DATA DEFORMABLE_FREQUENCY_DATA;
 
     TV gravity;
-    FORCE_ELEMENTS force_particles;
+    ARRAY<int> force_particles;
 public:
 
     BW_GRAVITY(DEFORMABLE_PARTICLES<TV>& particles_input,const TV& gravity_input)
@@ -59,12 +58,6 @@ public:
     T CFL_Strain_Rate() const override
     {return FLT_MAX;}
 
-protected:
-    template<class T_ARRAY>
-    T_ARRAY Get_Particle_List(const T_ARRAY& array)
-    {return array;}
-
-public:
 //#####################################################################
     void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const override;
     T Potential_Energy(const T time) const override;

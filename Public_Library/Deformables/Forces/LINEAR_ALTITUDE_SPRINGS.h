@@ -7,7 +7,6 @@
 #ifndef __LINEAR_ALTITUDE_SPRINGS__
 #define __LINEAR_ALTITUDE_SPRINGS__
 
-#include <Core/Data_Structures/FORCE_ELEMENTS.h>
 #include <Geometry/Topology/TOPOLOGY_POLICY.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 #include <Deformables/Forces/SOLIDS_FORCES_POLICY.h>
@@ -24,7 +23,6 @@ public:
 protected:
     using BASE::cfl_number;
 public:
-    typedef typename FORCE_ELEMENTS::ITERATOR ELEMENT_ITERATOR;
     typedef typename BASE::FREQUENCY_DATA FREQUENCY_DATA;
 
     T_MESH& mesh;
@@ -61,7 +59,7 @@ public:
     mutable ARRAY<VECTOR<T,2> > strains_of_spring; // VECTOR<T,2>(strain_rate, strain)
     mutable ARRAY<VECTOR<VECTOR<T,2>,d+1> > strains_of_spring_all_springs; // VECTOR<T,2>(strain_rate, strain)
 
-    FORCE_ELEMENTS force_elements;
+    ARRAY<int> force_elements;
 protected:
 
     struct SPRING_STATE{

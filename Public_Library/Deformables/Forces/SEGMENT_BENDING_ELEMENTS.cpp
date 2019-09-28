@@ -27,7 +27,7 @@ Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 template<class T> void SEGMENT_BENDING_ELEMENTS<T>::
 Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 {
-    force_triples.Update(bending_triples,particle_is_simulated);
+    Update_Force_Elements(force_triples,bending_triples,particle_is_simulated);
 }
 //#####################################################################
 // Function Set_Triples_From_Segment_Mesh
@@ -77,7 +77,7 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
     elastic_s.Resize(bending_triples.m,no_init);
     damping_coefficient.Resize(bending_triples.m,no_init);
     force_directions.Resize(bending_triples.m,no_init);
-    for(TRIPLE_ITERATOR iterator(force_triples);iterator.Valid();iterator.Next()){int q=iterator.Data();
+    for(int q:force_triples){
         int i,j,k;bending_triples(q).Get(i,j,k);
         TV n1=(particles.X(j)-particles.X(i)).Rotate_Clockwise_90(),n2=(particles.X(k)-particles.X(j)).Rotate_Clockwise_90();
         T length1=n1.Normalize(),length2=n2.Normalize();
@@ -93,7 +93,7 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
 template<class T> void SEGMENT_BENDING_ELEMENTS<T>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
-    for(TRIPLE_ITERATOR iterator(force_triples);iterator.Valid();iterator.Next()){int q=iterator.Data();
+    for(int q:force_triples){
         int i,j,k;bending_triples(q).Get(i,j,k);
         TV n1,n2;force_directions(q).Get(n1,n2);TV dj=-n1-n2;
         T s=elastic_s(q);
@@ -105,7 +105,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 template<class T> void SEGMENT_BENDING_ELEMENTS<T>::
 Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
-    for(TRIPLE_ITERATOR iterator(force_triples);iterator.Valid();iterator.Next()){int q=iterator.Data();
+    for(int q:force_triples){
         int i,j,k;bending_triples(q).Get(i,j,k);
         TV n1,n2;force_directions(q).Get(n1,n2);n1=n2=TV(0,-1);TV dj=-n1-n2;
         T s=-damping_coefficient(q)*(TV::Dot_Product(n1,V(i))+TV::Dot_Product(dj,V(j))+TV::Dot_Product(n2,V(k)));
@@ -119,7 +119,7 @@ CFL_Strain_Rate() const
 {
     T max_dtheta_dt=0;
     ARRAY_VIEW<const TV> V(particles.V);
-    for(TRIPLE_ITERATOR iterator(force_triples);iterator.Valid();iterator.Next()){int q=iterator.Data();
+    for(int q:force_triples){
         int i,j,k;bending_triples(q).Get(i,j,k);
         TV n1,n2;force_directions(q).Get(n1,n2);TV dj=-n1-n2;
         T dtheta_dt=TV::Dot_Product(n1,V(i))+TV::Dot_Product(dj,V(j))+TV::Dot_Product(n2,V(k)); // TODO: check scaling

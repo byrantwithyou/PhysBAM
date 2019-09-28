@@ -20,7 +20,6 @@ private:
 public:
     typedef POINTWISE_DEFORMABLE_FORCE<TV> BASE;
     using BASE::particles;using BASE::mpi_solids;using BASE::force_particles;
-    typedef typename FORCE_ELEMENTS::ITERATOR ELEMENT_ITERATOR;
     T coefficient,dt_dv_over_dx;
     T& dt;
 

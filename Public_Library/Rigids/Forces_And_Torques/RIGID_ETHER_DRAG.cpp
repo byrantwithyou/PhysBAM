@@ -27,7 +27,7 @@ template<class TV> RIGID_ETHER_DRAG<TV>::
 template<class TV> void RIGID_ETHER_DRAG<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const
 {
-    for(ELEMENT_ITERATOR iterator(force_rigid_body_particles);iterator.Valid();iterator.Next()){int k=iterator.Data();
+    for(int k:force_rigid_body_particles){
         if(use_spatially_varying_wind){
             if(spatially_varying_wind_domain.Lazy_Inside(rigid_body_collection.rigid_body_particles.frame(k).t))
                 rigid_F(k).linear+=spatially_varying_wind_viscosity*rigid_body_collection.rigid_body_particles.mass(k)*
@@ -41,7 +41,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) con
 template<class TV> void RIGID_ETHER_DRAG<TV>::
 Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const
 {
-    for(ELEMENT_ITERATOR iterator(force_rigid_body_particles);iterator.Valid();iterator.Next()){int k=iterator.Data();
+    for(int k:force_rigid_body_particles){
         if(use_spatially_varying_wind){
             if(spatially_varying_wind_domain.Lazy_Inside(rigid_body_collection.rigid_body_particles.frame(k).t))
                 rigid_F(k).linear-=spatially_varying_wind_viscosity*rigid_body_collection.rigid_body_particles.mass(k)*rigid_V(k).linear;

@@ -24,7 +24,6 @@ public:
     using BASE::particles;using BASE::Invalidate_CFL;using BASE::max_strain_per_time_step;using BASE::use_rest_state_for_strain_rate;
     using BASE::spring_states;using BASE::use_plasticity;using BASE::mesh;
     using BASE::cache_strain;using BASE::strains_of_spring;
-    typedef typename BASE::ELEMENT_ITERATOR ELEMENT_ITERATOR;
 public:
     using BASE::parameters;using BASE::Compute_Plasticity;
 

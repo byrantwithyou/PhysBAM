@@ -70,7 +70,7 @@ CFL_Strain_Rate() const
 {
     T dx=0,max_strain_rate=0;
     ARRAY_VIEW<const TV> V(particles.V);
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         const VECTOR<int,4>& element_nodes=mesh.elements(t);
         T minimum_signed_distance=FLT_MAX;TV minimum_normal;TV weights;VECTOR<int,4> spring_nodes;
         int min_spring_index=Find_Shortest_Spring(t,element_nodes,spring_nodes,minimum_signed_distance,minimum_normal,weights);
@@ -97,7 +97,7 @@ Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency)
 {
     // TODO: add CFL component for edge edges
     T one_over_cfl_number=1/cfl_number,one_over_cfl_number_squared=sqr(one_over_cfl_number);
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         const VECTOR<int,4>& element_nodes=mesh.elements(t);
         FREQUENCY_DATA element_frequency;
         for(int s=0;s<4;s++){ // point face
@@ -126,7 +126,7 @@ Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency)
 template<class T> void LINEAR_TET_SPRINGS<T>::
 Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 {
-    force_elements.Update(mesh.elements,particle_is_simulated);
+    Update_Force_Elements(force_elements,mesh.elements,particle_is_simulated);
     // TODO: implement me
     //if(cache_strain) strains_of_spring.Resize(mesh.elements.m,false,false);
 }
@@ -146,7 +146,7 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
 {
     spring_states.Resize(mesh.elements.m);
 
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         const VECTOR<int,4>& element_nodes=mesh.elements(t);
         SPRING_STATE& state=spring_states(t);
         state.id=Find_Shortest_Spring(t,element_nodes,state.spring_nodes,state.current_length,state.direction,state.weights); // TODO: minimum weights needs to be computed
@@ -160,7 +160,7 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
 template<class T> void LINEAR_TET_SPRINGS<T>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         const SPRING_STATE& spring_state=spring_states(t);
         if(spring_state.id!=0){
             const SPRING_PARAMETER& spring_param=spring_parameters(t)(spring_state.id);
@@ -180,7 +180,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 template<class T> void LINEAR_TET_SPRINGS<T>::
 Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         const SPRING_STATE& spring_state=spring_states(t);
         if(spring_state.id!=0){
 
@@ -202,7 +202,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 template<class T> void LINEAR_TET_SPRINGS<T>::
 Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time,bool transpose) const
 {
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         const SPRING_STATE& spring_state=spring_states(t);
         if(spring_state.id!=0){
             const SPRING_PARAMETER& spring_param=spring_parameters(t)(spring_state.id);

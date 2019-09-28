@@ -14,9 +14,10 @@ template<class TV> void GRAVITY<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const
 {
     if(!gravity.Magnitude_Squared()) return;
-    for(ELEMENT_ITERATOR iterator(force_particles);iterator.Valid();iterator.Next()){int p=iterator.Data();F(p)+=particles.mass(p)*gravity;}
-    for(ELEMENT_ITERATOR iterator(force_rigid_body_particles);iterator.Valid();iterator.Next()){
-        int p=iterator.Data();rigid_F(p).linear+=rigid_body_collection.rigid_body_particles.mass(p)*gravity;}
+    for(int p:force_particles) F(p)+=particles.mass(p)*gravity;
+    auto& rm=rigid_body_collection.rigid_body_particles.mass;
+    for(int p:force_rigid_body_particles)
+        rigid_F(p).linear+=rm(p)*gravity;
 }
 //#####################################################################
 // Function Potential_Energy
@@ -25,10 +26,11 @@ template<class TV> typename TV::SCALAR GRAVITY<TV>::
 Potential_Energy(const T time) const
 {
     T potential_energy=0;
-    for(ELEMENT_ITERATOR iterator(force_particles);iterator.Valid();iterator.Next()){int p=iterator.Data();
-        potential_energy-=particles.mass(p)*TV::Dot_Product(particles.X(p),gravity);}
-    for(ELEMENT_ITERATOR iterator(force_rigid_body_particles);iterator.Valid();iterator.Next()){int p=iterator.Data();
-        potential_energy-=rigid_body_collection.rigid_body_particles.mass(p)*TV::Dot_Product(rigid_body_collection.rigid_body_particles.frame(p).t,gravity);}
+    for(int p:force_particles)
+        potential_energy-=particles.mass(p)*particles.X(p).Dot(gravity);
+    auto& rbp=rigid_body_collection.rigid_body_particles;
+    for(int p:force_rigid_body_particles)
+        potential_energy-=rbp.mass(p)*rbp.frame(p).t.Dot(gravity);
     return potential_energy;
 }
 //#####################################################################

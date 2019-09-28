@@ -54,8 +54,8 @@ Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 template<class T> void SIMPLE_TRIANGLE_BENDING_ELEMENTS<T>::
 Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 {
-    force_quadruples.Update(bending_quadruples,particle_is_simulated);
-    force_segments.Update(spring_connectivity.elements);
+    Update_Force_Elements(force_quadruples,bending_quadruples,particle_is_simulated);
+    Update_Force_Elements(force_segments,spring_connectivity.elements,particle_is_simulated);
 }
 //#####################################################################
 // Function Set_Quadruples_From_Triangle_Mesh
@@ -138,7 +138,7 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
 
     int ignored_elements=0,total_elements=0;
     ARRAY_VIEW<const TV> X(particles.X);
-    for(QUADRUPLE_ITERATOR iterator(force_quadruples);iterator.Valid();iterator.Next()){int q=iterator.Data();
+    for(int q:force_quadruples){
         VECTOR<T,2> weights;
         int shared_edge_binding_index,fictitious_edge_binding_index;linear_bindings(q).Get(shared_edge_binding_index,fictitious_edge_binding_index);
         LINEAR_BINDING<TV,2>* shared_edge_binding=dynamic_cast<LINEAR_BINDING<TV,2>*>(binding_list.bindings(shared_edge_binding_index));

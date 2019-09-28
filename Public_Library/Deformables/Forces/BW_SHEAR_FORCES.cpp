@@ -35,7 +35,7 @@ template<class TV> BW_SHEAR_FORCES<TV>::
 template<class TV> void BW_SHEAR_FORCES<TV>::
 Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
-    for(TRIANGLE_ITERATOR iterator(force_simplices);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    for(int s:force_simplices){
         typename BASE::STATE& state=states(s);
         typename BASE::MATERIAL_FORCE_STATE& material_force_state=material_force_states(s);
         Compute_UV_Deformation(s);
@@ -71,7 +71,7 @@ Potential_Energy(const T time) const
 {
     T potential_energy=0;
     const_cast<BW_SHEAR_FORCES<TV>* >(this)->Update_Position_Based_State(time,true,true);
-    for(TRIANGLE_ITERATOR iterator(force_simplices);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    for(int s:force_simplices){
         potential_energy+=Potential_Energy(s,time);}
     return potential_energy;
 }

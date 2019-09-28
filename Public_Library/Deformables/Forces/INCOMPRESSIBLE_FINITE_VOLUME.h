@@ -7,7 +7,6 @@
 #ifndef __INCOMPRESSIBLE_FINITE_VOLUME__
 #define __INCOMPRESSIBLE_FINITE_VOLUME__
 
-#include <Core/Data_Structures/FORCE_ELEMENTS.h>
 #include <Core/Math_Tools/FACTORIAL.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
 #include <Geometry/Constitutive_Models/STRAIN_MEASURE.h>
@@ -43,7 +42,6 @@ class INCOMPRESSIBLE_FINITE_VOLUME:public DEFORMABLES_FORCES<TV_input>,public IN
     typedef typename MESH_POLICY<d-1>::MESH T_BOUNDARY_MESH;
     typedef typename MESH_POLICY<d>::MESH T_MESH;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,d>::OBJECT T_OBJECT;
-    typedef typename FORCE_ELEMENTS::ITERATOR ELEMENT_ITERATOR;
 
     typedef DEFORMABLES_FORCES<TV> BASE;
     typedef typename BASE::FREQUENCY_DATA FREQUENCY_DATA;
@@ -91,10 +89,9 @@ private:
     mutable ARRAY<TV> gradient_full;
     ARRAY<T_MATRIX> Bs_per_node;
     ARRAY<TV> boundary_normals;
-    FORCE_ELEMENTS force_elements;
-    FORCE_ELEMENTS force_boundary_elements;
-    FORCE_ELEMENTS force_dynamic_particles;
-    ARRAY<int> force_dynamic_particles_list;
+    ARRAY<int> force_elements;
+    ARRAY<int> force_boundary_elements;
+    ARRAY<int> force_dynamic_particles;
     friend class POISSON_SYSTEM<TV,d>;
 public:
 

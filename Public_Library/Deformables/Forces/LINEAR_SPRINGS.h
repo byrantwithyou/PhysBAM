@@ -7,7 +7,6 @@
 #ifndef __LINEAR_SPRINGS__
 #define __LINEAR_SPRINGS__
 
-#include <Core/Data_Structures/FORCE_ELEMENTS.h>
 #include <Core/Matrices/MATRIX_FORWARD.h>
 #include <Core/Vectors/VECTOR_2D.h>
 #include <Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
@@ -22,7 +21,6 @@ public:
     typedef DEFORMABLES_FORCES<TV> BASE;
     using BASE::particles;using BASE::Invalidate_CFL;using BASE::cfl_number;
     using BASE::max_strain_per_time_step;using BASE::use_rest_state_for_strain_rate;using BASE::compute_half_forces;
-    typedef typename FORCE_ELEMENTS::ITERATOR SEGMENT_ITERATOR;
     typedef typename BASE::FREQUENCY_DATA FREQUENCY_DATA;
     typedef MATRIX<T,TV::m> T_MATRIX;
 
@@ -59,7 +57,7 @@ protected:
     ARRAY<T> current_lengths;
 
 public:
-    FORCE_ELEMENTS force_segments;
+    ARRAY<int> force_segments;
     LINEAR_SPRINGS(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh_input);
 
     virtual ~LINEAR_SPRINGS();

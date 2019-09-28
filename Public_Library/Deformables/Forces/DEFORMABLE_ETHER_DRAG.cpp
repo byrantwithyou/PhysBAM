@@ -11,7 +11,7 @@ using namespace PhysBAM;
 template<class TV> void DEFORMABLE_ETHER_DRAG<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
-    for(ELEMENT_ITERATOR iterator(force_particles);iterator.Valid();iterator.Next()){int k=iterator.Data();
+    for(int k:force_particles){
         if(use_spatially_varying_wind){
             if(spatially_varying_wind_domain.Lazy_Inside(particles.X(k))) F(k)+=spatially_varying_wind_viscosity*particles.mass(k)*Spatially_Varying_Wind_Velocity(particles.X(k));
             else if(use_constant_wind) F(k)+=constant_wind_viscosity*particles.mass(k)*constant_wind;}
@@ -23,7 +23,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 template<class TV> void DEFORMABLE_ETHER_DRAG<TV>::
 Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
-    for(ELEMENT_ITERATOR iterator(force_particles);iterator.Valid();iterator.Next()){int k=iterator.Data();
+    for(int k:force_particles){
         if(use_spatially_varying_wind){
             if(spatially_varying_wind_domain.Lazy_Inside(particles.X(k))) F(k)-=spatially_varying_wind_viscosity*particles.mass(k)*V(k);
             else if(use_constant_wind) F(k)-=constant_wind_viscosity*particles.mass(k)*V(k);}

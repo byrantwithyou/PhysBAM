@@ -80,5 +80,11 @@ public:
     virtual T Potential_Energy(const T time) const;
 //#####################################################################
 };
+template<class T_ARRAY> void Update_Force_Particles(ARRAY<int>& force_particles,
+    const ARRAY_BASE<int,T_ARRAY>& particles,
+    const ARRAY<bool>& particle_is_simulated,bool check_dups);
+template<int d,class T_ARRAY> void Update_Force_Elements(ARRAY<int>& force_elements,
+    const ARRAY_BASE<VECTOR<int,d>,T_ARRAY>& elements,
+    const ARRAY<bool>& particle_is_simulated);
 }
 #endif

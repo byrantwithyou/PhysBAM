@@ -7,7 +7,6 @@
 #ifndef __POINTWISE_FORCE__
 #define __POINTWISE_FORCE__
 
-#include <Core/Data_Structures/FORCE_ELEMENTS.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Tools/Particles/PARTICLES_FORWARD.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_OBJECT_FORWARD.h>
@@ -29,8 +28,8 @@ protected:
     bool influence_all_particles,influence_all_rigid_body_particles;
     MPI_SOLIDS<TV>* mpi_solids;
 public:
-    FORCE_ELEMENTS force_particles;
-    FORCE_ELEMENTS force_rigid_body_particles;
+    ARRAY<int> force_particles;
+    ARRAY<int> force_rigid_body_particles;
 
     POINTWISE_FORCE(DEFORMABLE_PARTICLES<TV>& particles_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARRAY<int>* influenced_particles_input,
         ARRAY<int>* influenced_rigid_body_particles_input);
@@ -51,10 +50,6 @@ public:
 
 protected:
     void Update_Mpi(const ARRAY<bool>& particle_is_simulated,const ARRAY<bool>& rigid_particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) override;
-
-    template<class T_ARRAY>
-    T_ARRAY Get_Particle_List(const T_ARRAY& array)
-    {return array;}
 
     template<class T_ARRAY>
     ARRAY<int> Get_Rigid_Body_Particle_List(const T_ARRAY& array);

@@ -7,7 +7,6 @@
 #ifndef __WIND_DRAG_3D__
 #define __WIND_DRAG_3D__
 
-#include <Core/Data_Structures/FORCE_ELEMENTS.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
@@ -23,7 +22,6 @@ class WIND_DRAG_3D:public SOLIDS_FORCES<VECTOR<T_input,3> >
 public:
     typedef SOLIDS_FORCES<TV> BASE;
     using BASE::particles;
-    typedef typename FORCE_ELEMENTS::ITERATOR ELEMENT_ITERATOR;
     typedef typename BASE::RIGID_FREQUENCY_DATA RIGID_FREQUENCY_DATA;
     typedef typename BASE::DEFORMABLE_FREQUENCY_DATA DEFORMABLE_FREQUENCY_DATA;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_SIMPLICIAL_OBJECT;
@@ -52,8 +50,8 @@ private:
         T one_third_area;TV inward_normal,center,wind_velocity;
     };
     ARRAY<OPTIMIZATION> optimization;
-    FORCE_ELEMENTS force_elements;
-    FORCE_ELEMENTS force_particles;
+    ARRAY<int> force_elements;
+    ARRAY<int> force_particles;
     ARRAY<TV> vertex_normals; // TODO: use triangulated_surface.vertex_normals
     
     MPI_SOLIDS<TV>* mpi_solids;

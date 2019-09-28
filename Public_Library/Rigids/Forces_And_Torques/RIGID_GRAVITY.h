@@ -16,7 +16,6 @@ class RIGID_GRAVITY:public RIGID_POINTWISE_FORCE<TV>
     typedef typename TV::SCALAR T;
 public:
     typedef RIGID_POINTWISE_FORCE<TV> BASE;
-    typedef typename FORCE_ELEMENTS::ITERATOR ELEMENT_ITERATOR;
     TV gravity;
     
     using BASE::force_rigid_body_particles;using BASE::rigid_body_collection;

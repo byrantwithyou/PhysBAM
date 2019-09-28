@@ -19,7 +19,6 @@ class BW_MATERIAL_SPACE_FORCES:public BW_FORCES<TV,d,3>
 public:
     typedef BW_FORCES<TV,d,3> BASE;
     using BASE::particles;using BASE::states;using BASE::force_simplices;using BASE::triangle_mesh;
-    typedef typename FORCE_ELEMENTS::ITERATOR TRIANGLE_ITERATOR;
 
 protected:
     struct MATERIAL_FORCE_STATE{

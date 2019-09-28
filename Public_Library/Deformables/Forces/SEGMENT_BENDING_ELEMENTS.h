@@ -7,7 +7,6 @@
 #ifndef __SEGMENT_BENDING_ELEMENTS__
 #define __SEGMENT_BENDING_ELEMENTS__
 
-#include <Core/Data_Structures/FORCE_ELEMENTS.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{
@@ -21,7 +20,6 @@ public:
     typedef DEFORMABLES_FORCES<TV> BASE;
     using BASE::particles;using BASE::max_strain_per_time_step;
     using BASE::use_rest_state_for_strain_rate;using BASE::Limit_Time_Step_By_Strain_Rate;
-    typedef typename FORCE_ELEMENTS::ITERATOR TRIPLE_ITERATOR;
     typedef typename BASE::FREQUENCY_DATA FREQUENCY_DATA;
 
     ARRAY<VECTOR<int,3> > bending_triples; // for each triple, the bending point is vertex 2.
@@ -32,7 +30,7 @@ public:
 private:
     ARRAY<T> elastic_s,damping_coefficient;
     ARRAY<VECTOR<TV,2> > force_directions; // directions for nodes 1 and 3 (2 given by subtraction)
-    FORCE_ELEMENTS force_triples;
+    ARRAY<int> force_triples;
 public:
 
     SEGMENT_BENDING_ELEMENTS(DEFORMABLE_PARTICLES<TV>& particles)

@@ -81,7 +81,6 @@ template<class T,int d>
 T Max_Sound_Speed(const FINITE_VOLUME<VECTOR<T,d>,d>& fvm,SOLID_BODY_COLLECTION<VECTOR<T,d> >& sbc,bool dump)
 {
     typedef VECTOR<T,d> TV;
-    typedef typename FORCE_ELEMENTS::ITERATOR FORCE_ITERATOR;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,d>::OBJECT T_OBJECT;
     auto st=sbc.deformable_body_collection.template Find_Structure<T_OBJECT*>(0);
     DEFORMABLE_PARTICLES<TV>& particles=sbc.deformable_body_collection.particles;
@@ -90,8 +89,7 @@ T Max_Sound_Speed(const FINITE_VOLUME<VECTOR<T,d>,d>& fvm,SOLID_BODY_COLLECTION<
     T max_c=0;
     //SYMMETRIC_MATRIX<T,TV::m> H; // H(i,k) = x_iikk
     //typename TV::SPIN B,C; // B = x_ikik; C = x_ikki; order: (1D: none; 2D: 01; 3D: 12 20 01)
-    for(FORCE_ITERATOR iterator(fvm.force_elements);iterator.Valid();iterator.Next()){
-        int t=iterator.Data();
+    for(int t:fvm.force_elements){
         const DIAGONAL_MATRIX<T,d>& F=fvm.Fe_hat(t);
         const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dPdF=(*fvm.dPi_dFe)(t);
         T rho=fvm.use_uniform_density?fvm.density:(*fvm.density_list)(t),J=F.Determinant();

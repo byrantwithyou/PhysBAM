@@ -7,8 +7,9 @@
 #ifndef __IMPLICIT_ZERO_LENGTH_SPRINGS__
 #define __IMPLICIT_ZERO_LENGTH_SPRINGS__
 
-#include <Core/Data_Structures/FORCE_ELEMENTS.h>
+#include <Core/Arrays/ARRAY.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
+#include <climits>
 namespace PhysBAM{
 
 template<class TV>
@@ -18,7 +19,6 @@ class IMPLICIT_ZERO_LENGTH_SPRINGS:public DEFORMABLES_FORCES<TV>,public SPRINGS_
 public:
     typedef DEFORMABLES_FORCES<TV> BASE;
     using BASE::particles;
-    typedef typename FORCE_ELEMENTS::ITERATOR SEGMENT_ITERATOR;
     typedef typename BASE::FREQUENCY_DATA FREQUENCY_DATA;
 
     SEGMENT_MESH& segment_mesh;
@@ -27,7 +27,7 @@ public:
     ARRAY<T> damping;
     T constant_damping;
 protected:
-    FORCE_ELEMENTS force_segments;
+    ARRAY<int> force_segments;
 
 public:
     IMPLICIT_ZERO_LENGTH_SPRINGS(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh_input);

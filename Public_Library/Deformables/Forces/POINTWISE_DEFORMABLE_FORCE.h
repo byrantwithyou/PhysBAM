@@ -7,7 +7,6 @@
 #ifndef __POINTWISE_DEFORMABLE_FORCE__
 #define __POINTWISE_DEFORMABLE_FORCE__
 
-#include <Core/Data_Structures/FORCE_ELEMENTS.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Tools/Particles/PARTICLES_FORWARD.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_OBJECT_FORWARD.h>
@@ -30,7 +29,7 @@ protected:
     ARRAY<bool> is_simulated;
 
 public:
-    FORCE_ELEMENTS force_particles;
+    ARRAY<int> force_particles;
 
     POINTWISE_DEFORMABLE_FORCE(DEFORMABLE_PARTICLES<TV>& particles_input,ARRAY<int>* influenced_particles_input)
         :DEFORMABLES_FORCES<TV>(particles_input),influenced_particles(influenced_particles_input),
@@ -66,11 +65,6 @@ public:
 
     void Own_Influenced_Particles()
     {need_destroy_influenced_particles=true;}
-
-protected:
-    template<class T_ARRAY>
-    T_ARRAY Get_Particle_List(const T_ARRAY& array)
-    {return array;}
 //#####################################################################
 };
 }

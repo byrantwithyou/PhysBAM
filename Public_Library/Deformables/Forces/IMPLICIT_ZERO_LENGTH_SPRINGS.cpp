@@ -38,7 +38,7 @@ Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 template<class TV> void IMPLICIT_ZERO_LENGTH_SPRINGS<TV>::
 Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 {
-    force_segments.Update(segment_mesh.elements,particle_is_simulated);
+    Update_Force_Elements(force_segments,segment_mesh.elements,particle_is_simulated);
 }
 //#####################################################################
 // Function Set_Stiffness_Based_On_Reduced_Mass
@@ -93,11 +93,11 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 template<class TV> void IMPLICIT_ZERO_LENGTH_SPRINGS<TV>::
 Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
-    if(!damping.m) for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    if(!damping.m) for(int s:force_segments){
         int node1,node2;segment_mesh.elements(s).Get(node1,node2);
         TV force=constant_damping*(V(node1)-V(node2));
         F(node1)-=force;F(node2)+=force;}
-    else for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    else for(int s:force_segments){
         int node1,node2;segment_mesh.elements(s).Get(node1,node2);
         TV force=damping(s)*(V(node1)-V(node2));
         F(node1)-=force;F(node2)+=force;}
@@ -108,11 +108,11 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 template<class TV> void IMPLICIT_ZERO_LENGTH_SPRINGS<TV>::
 Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time,bool transpose) const
 {
-    if(!stiffness.m) for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    if(!stiffness.m) for(int s:force_segments){
         int node1,node2;segment_mesh.elements(s).Get(node1,node2);
         TV force=constant_stiffness*(V(node2)-V(node1));
         F(node1)+=force;F(node2)-=force;}
-    else for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    else for(int s:force_segments){
         int node1,node2;segment_mesh.elements(s).Get(node1,node2);
         TV force=stiffness(s)*(V(node2)-V(node1));
         F(node1)+=force;F(node2)-=force;}
@@ -124,7 +124,7 @@ template<class TV> typename TV::SCALAR IMPLICIT_ZERO_LENGTH_SPRINGS<TV>::
 Potential_Energy(const T time) const
 {
     T potential_energy=0;
-    for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    for(int s:force_segments){
         int node1,node2;segment_mesh.elements(s).Get(node1,node2);
         T stiff=stiffness.m?stiffness(s):constant_stiffness;
         potential_energy+=(T).5*stiff*(particles.X(node2)-particles.X(node1)).Magnitude_Squared();}

@@ -5,7 +5,6 @@
 #ifndef __LINEAR_TET_SPRINGS__
 #define __LINEAR_TET_SPRINGS__
 
-#include <Core/Data_Structures/FORCE_ELEMENTS.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{
@@ -23,7 +22,6 @@ public:
 protected:
     using BASE::cfl_number;
     enum WORKAROUND{spring_count=7};
-    typedef typename FORCE_ELEMENTS::ITERATOR ELEMENT_ITERATOR;
     typedef typename BASE::FREQUENCY_DATA FREQUENCY_DATA;
 
 public:
@@ -51,7 +49,7 @@ public:
     ARRAY<VECTOR<SPRING_PARAMETER,spring_count> > spring_parameters;
 
 protected:
-    FORCE_ELEMENTS force_elements;
+    ARRAY<int> force_elements;
     
     ARRAY<SPRING_STATE> spring_states;
     ARRAY<VECTOR<T,6> > edge_restlength_squared; // (0,1),(0,2),(0,3),(1,2),(1,3),(2,3)

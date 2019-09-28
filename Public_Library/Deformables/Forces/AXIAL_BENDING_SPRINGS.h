@@ -11,7 +11,6 @@
 #ifndef __AXIAL_BENDING_SPRINGS__
 #define __AXIAL_BENDING_SPRINGS__
 
-#include <Core/Data_Structures/FORCE_ELEMENTS.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_FORWARD.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
@@ -27,7 +26,6 @@ class AXIAL_BENDING_SPRINGS:public DEFORMABLES_FORCES<VECTOR<T_input,3> >
 public:
     typedef DEFORMABLES_FORCES<TV> BASE;
     using BASE::particles;using BASE::max_strain_per_time_step;using BASE::use_rest_state_for_strain_rate;using BASE::Invalidate_CFL;using BASE::cfl_number;
-    typedef typename FORCE_ELEMENTS::ITERATOR SPRING_ITERATOR;
     typedef typename BASE::FREQUENCY_DATA FREQUENCY_DATA;
 
     TRIANGLE_MESH& triangle_mesh;
@@ -42,7 +40,7 @@ private:
     ARRAY<T> optimization_current_length;
     ARRAY<TV> optimization_direction;
     ARRAY<VECTOR<T,4> > optimization_weights;
-    FORCE_ELEMENTS force_springs;
+    ARRAY<int> force_springs;
 public:
     bool verbose;
 

@@ -7,7 +7,6 @@
 #ifndef __FINITE_VOLUME__
 #define __FINITE_VOLUME__
 
-#include <Core/Data_Structures/FORCE_ELEMENTS.h>
 #include <Core/Math_Tools/FACTORIAL.h>
 #include <Core/Matrices/MATRIX.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_FORWARD.h>
@@ -28,7 +27,6 @@ public:
     typedef DEFORMABLES_FORCES<TV> BASE;
     using BASE::particles;using BASE::max_strain_per_time_step;
     using BASE::cfl_number;using BASE::compute_half_forces;
-    typedef typename FORCE_ELEMENTS::ITERATOR FORCE_ITERATOR;
     typedef typename BASE::FREQUENCY_DATA FREQUENCY_DATA;
 
     STRAIN_MEASURE<TV,d>& strain_measure;
@@ -55,9 +53,9 @@ protected:
     ARRAY<SYMMETRIC_MATRIX<T,TV::m> >* node_stiffness;
     ARRAY<MATRIX<T,TV::m> >* edge_stiffness;
 public:
-    FORCE_ELEMENTS force_elements;
-    FORCE_ELEMENTS* force_segments;
-    FORCE_ELEMENTS force_particles;
+    ARRAY<int> force_elements;
+    ARRAY<int>* force_segments;
+    ARRAY<int> force_particles;
 protected:
     bool destroy_data;
 public:

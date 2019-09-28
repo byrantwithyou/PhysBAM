@@ -8,7 +8,6 @@
 #define __FINITE_VOLUME_HEXAHEDRONS__
 
 #include <Core/Arrays/INDIRECT_ARRAY.h>
-#include <Core/Data_Structures/FORCE_ELEMENTS.h>
 #include <Core/Matrices/MATRIX_FORWARD.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_FORWARD.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
@@ -29,7 +28,6 @@ class FINITE_VOLUME_HEXAHEDRONS:public DEFORMABLES_FORCES<VECTOR<T_input,3> >,pu
 public:
     typedef DEFORMABLES_FORCES<TV> BASE;
     using BASE::particles;using BASE::cfl_number;using BASE::max_strain_per_time_step;
-    typedef typename FORCE_ELEMENTS::ITERATOR ELEMENT_ITERATOR;
     typedef typename BASE::FREQUENCY_DATA FREQUENCY_DATA;
 
     STRAIN_MEASURE_HEXAHEDRONS<T>& strain_measure;
@@ -49,8 +47,8 @@ public:
 private:
     ISOTROPIC_CONSTITUTIVE_MODEL<T,3>* isotropic_model;
     ANISOTROPIC_CONSTITUTIVE_MODEL<T,3>* anisotropic_model;
-    FORCE_ELEMENTS force_elements;
-    FORCE_ELEMENTS force_particles;
+    ARRAY<int> force_elements;
+    ARRAY<int> force_particles;
     ARRAY<T>* density_list;
     T density;
 public:

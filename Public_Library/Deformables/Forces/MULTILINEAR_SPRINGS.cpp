@@ -46,7 +46,7 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
     ARRAY_VIEW<const TV> X(particles.X);
     Invalidate_CFL();
     spring_count.Fill(0);
-    for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    for(int s:force_segments){
         typename BASE::STATE& state=states(s);
         const VECTOR<int,2>& nodes=segment_mesh.elements(s);
         state.nodes=nodes;
@@ -68,7 +68,7 @@ template<class TV> void MULTILINEAR_SPRINGS<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
     LINEAR_SPRINGS<TV>::Add_Velocity_Independent_Forces(F,time);
-    for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    for(int s:force_segments){
         const VECTOR<int,2>& nodes=segment_mesh.elements(s);
         TV force=correction_force(s)*states(s).direction;
         F(nodes[0])+=force;F(nodes[1])-=force;}

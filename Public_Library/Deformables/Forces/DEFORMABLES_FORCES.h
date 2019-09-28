@@ -10,7 +10,6 @@
 #include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Core/Data_Structures/DATA_STRUCTURES_FORWARD.h>
 #include <Core/Data_Structures/ELEMENT_ID.h>
-#include <Core/Data_Structures/FORCE_ELEMENTS.h>
 #include <Core/Log/DEBUG_UTILITIES.h>
 namespace PhysBAM{
 
@@ -104,6 +103,13 @@ public:
     void Test_Diff(const T time);
 //#####################################################################
 };
+// defined in RIGIDS_FORCES
+template<class T_ARRAY> void Update_Force_Particles(ARRAY<int>& force_particles,
+    const ARRAY_BASE<int,T_ARRAY>& particles,
+    const ARRAY<bool>& particle_is_simulated,bool check_dups);
+template<int d,class T_ARRAY> void Update_Force_Elements(ARRAY<int>& force_elements,
+    const ARRAY_BASE<VECTOR<int,d>,T_ARRAY>& elements,
+    const ARRAY<bool>& particle_is_simulated);
 
 // tag classes to allow iteration over certain types of forces
 struct SPRINGS_TAG{};

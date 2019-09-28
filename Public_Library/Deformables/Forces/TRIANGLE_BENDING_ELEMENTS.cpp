@@ -26,7 +26,7 @@ Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 template<class T> void TRIANGLE_BENDING_ELEMENTS<T>::
 Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 {
-    force_quadruples.Update(bending_quadruples,particle_is_simulated);
+    Update_Force_Elements(force_quadruples,bending_quadruples,particle_is_simulated);
 }
 //#####################################################################
 // Function Set_Area_Cutoff_With_Fraction_Of_Triangles
@@ -114,7 +114,7 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
     int ignored_elements=0,total_elements=0;
     ARRAY_VIEW<const TV> X(particles.X);
     T twice_area_cutoff_squared=sqr(2*area_cutoff);
-    for(QUADRUPLE_ITERATOR iterator(force_quadruples);iterator.Valid();iterator.Next()){int q=iterator.Data();
+    for(int q:force_quadruples){
         int i,j,k,l;bending_quadruples(q).Get(i,j,k,l);
         TV xij=X(i)-X(j),xik=X(i)-X(k),xlk=X(l)-X(k),xlj=X(l)-X(j),n1=TV::Cross_Product(xij,xik),n2=TV::Cross_Product(xlk,xlj);
         T n1_magnitude_squared=n1.Magnitude_Squared(),n2_magnitude_squared=n2.Magnitude_Squared();
@@ -145,7 +145,7 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
 template<class T> void TRIANGLE_BENDING_ELEMENTS<T>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
-    for(QUADRUPLE_ITERATOR iterator(force_quadruples);iterator.Valid();iterator.Next()){int q=iterator.Data();
+    for(int q:force_quadruples){
         int i,j,k,l;bending_quadruples(q).Get(i,j,k,l);
         TV n1,dj,dk,n2;force_directions(q).Get(n1,dj,dk,n2);
         T s=elastic_s(q);
@@ -157,7 +157,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 template<class T> void TRIANGLE_BENDING_ELEMENTS<T>::
 Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
-    for(QUADRUPLE_ITERATOR iterator(force_quadruples);iterator.Valid();iterator.Next()){int q=iterator.Data();
+    for(int q:force_quadruples){
         int i,j,k,l;bending_quadruples(q).Get(i,j,k,l);
         TV n1,dj,dk,n2;force_directions(q).Get(n1,dj,dk,n2);
         T s=damping_coefficient(q)*(TV::Dot_Product(n1,V(i))+TV::Dot_Product(dj,V(j))+TV::Dot_Product(dk,V(k))+TV::Dot_Product(n2,V(l)));
@@ -171,7 +171,7 @@ CFL_Strain_Rate() const
 {
     T max_dtheta_dt=0,dtheta_dt;
     ARRAY_VIEW<const TV> X(particles.X),V(particles.V);
-    for(QUADRUPLE_ITERATOR iterator(force_quadruples);iterator.Valid();iterator.Next()){int q=iterator.Data();
+    for(int q:force_quadruples){
         int i,j,k,l;bending_quadruples(q).Get(i,j,k,l);
         TV n1,dj,dk,n2;force_directions(q).Get(n1,dj,dk,n2);
         TV e=X(k)-X(j);

@@ -7,7 +7,6 @@
 #ifndef __TRIANGLE_BENDING_ELEMENTS__
 #define __TRIANGLE_BENDING_ELEMENTS__
 
-#include <Core/Data_Structures/FORCE_ELEMENTS.h>
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
@@ -21,7 +20,6 @@ class TRIANGLE_BENDING_ELEMENTS:public DEFORMABLES_FORCES<VECTOR<T_input,3> >
 public:
     typedef DEFORMABLES_FORCES<TV> BASE;
     using BASE::particles;using BASE::max_strain_per_time_step;using BASE::use_rest_state_for_strain_rate;using BASE::Limit_Time_Step_By_Strain_Rate;
-    typedef typename FORCE_ELEMENTS::ITERATOR QUADRUPLE_ITERATOR;
     typedef typename BASE::FREQUENCY_DATA FREQUENCY_DATA;
 
     ARRAY<VECTOR<int,4> >& bending_quadruples; // for each quadruple, the bending axis is elements 2 and 3.
@@ -45,7 +43,7 @@ private:
     ARRAY<T>* reference_plastic_hardening;
     ARRAY<T>* sine_half_elastic_angle_save;
     bool print_number_ignored;
-    FORCE_ELEMENTS force_quadruples;
+    ARRAY<int> force_quadruples;
 public:
 
     TRIANGLE_BENDING_ELEMENTS(DEFORMABLE_PARTICLES<TV>& particles)

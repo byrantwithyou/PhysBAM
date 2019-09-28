@@ -20,7 +20,6 @@ public:
     typedef BW_MATERIAL_SPACE_FORCES<TV,1> BASE;
     using BASE::particles;using BASE::force_simplices;using BASE::states;using BASE::material_force_states;
     using BASE::Potential_Energy;using BASE::Compute_UV_Deformation;
-    typedef typename FORCE_ELEMENTS::ITERATOR TRIANGLE_ITERATOR;
     typedef typename BASE::FREQUENCY_DATA FREQUENCY_DATA;
 
     BW_SHEAR_FORCES(DEFORMABLE_PARTICLES<TV>& particles,TRIANGLE_MESH& triangle_mesh_input,const T stiffness_coefficient_input,const T damping_coefficient_input);

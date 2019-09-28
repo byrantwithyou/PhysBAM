@@ -43,7 +43,7 @@ Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency)
 {
     T one_over_d_squared=(T)1/sqr(d);
     T one_over_cfl_number=1/cfl_number,one_over_cfl_number_squared=sqr(one_over_cfl_number);
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         const VECTOR<int,d+1>& nodes=mesh.elements(t);
         for(int i=0;i<nodes.m;i++) for(int j=0;j<nodes.m;j++){
             const SPRING_PARAMETER& parameter=parameters(t)(j);
@@ -66,7 +66,7 @@ Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 template<class TV,int d> void LINEAR_ALTITUDE_SPRINGS<TV,d>::
 Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 {
-    force_elements.Update(mesh.elements,particle_is_simulated);
+    Update_Force_Elements(force_elements,mesh.elements,particle_is_simulated);
     if(cache_strain) strains_of_spring.Resize(mesh.elements.m,no_init);
 }
 //#####################################################################

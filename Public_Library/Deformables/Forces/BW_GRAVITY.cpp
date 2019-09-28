@@ -13,8 +13,7 @@ template<class TV> void BW_GRAVITY<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
     if(!gravity.Magnitude_Squared()) return;
-    for(ELEMENT_ITERATOR iterator(force_particles);iterator.Valid();iterator.Next()){
-        int p=iterator.Data();F(p)+=particles.mass(p)*gravity;}
+    for(int p:force_particles) F(p)+=particles.mass(p)*gravity;
 }
 //#####################################################################
 // Function Potential_Energy
@@ -23,7 +22,7 @@ template<class TV> typename TV::SCALAR BW_GRAVITY<TV>::
 Potential_Energy(const T time) const
 {
     T potential_energy=0;
-    for(ELEMENT_ITERATOR iterator(force_particles);iterator.Valid();iterator.Next()){int p=iterator.Data();
+    for(int p:force_particles){
         potential_energy-=particles.mass(p)*TV::Dot_Product(particles.X(p),gravity);}
     return potential_energy;
 }
@@ -34,7 +33,7 @@ Potential_Energy(const T time) const
 template<class TV> void BW_GRAVITY<TV>::
 Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 {
-    force_particles.Update(Get_Particle_List(IDENTITY_ARRAY<>(particles.Size())),particle_is_simulated);
+    Update_Force_Particles(force_particles,IDENTITY_ARRAY<>(particles.Size()),particle_is_simulated,false);
 }
 //#####################################################################
 namespace PhysBAM{

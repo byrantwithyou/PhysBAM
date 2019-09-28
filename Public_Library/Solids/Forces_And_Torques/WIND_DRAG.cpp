@@ -63,7 +63,7 @@ Update_Position_Based_State(const T time)
     T wind_viscosity=use_constant_wind?constant_wind_viscosity:spatially_varying_wind_viscosity;
     if(wind_viscosity || spatially_varying_wind_pressure || wind_density || spatially_varying_wind_density){
         optimization.Resize(simplicial_object.mesh.elements.m,no_init);
-        if(deformable_simplicial_object) for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+        if(deformable_simplicial_object) for(int t:force_elements){
             const TV_INT& nodes=simplicial_object.mesh.elements(t);
             optimization(t).center=particles.X.Subset(nodes).Sum()/TV::m;
             optimization(t).inward_normal=T_SIMPLEX::Normal(particles.X.Subset(nodes));
@@ -77,10 +77,10 @@ Update_Position_Based_State(const T time)
             if(use_spatially_varying_wind) optimization(t).wind_velocity=Spatially_Varying_Wind_Velocity(optimization(t).center);}}
     if(linear_normal_viscosity && deformable_simplicial_object){ // compute vertex normals for fragment
         vertex_normals.Resize(particles.Size(),init_all);
-        for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+        for(int t:force_elements){
             const TV_INT& nodes=simplicial_object.mesh.elements(t);
             vertex_normals.Subset(nodes)+=T_SIMPLEX::Normal(particles.X.Subset(nodes));}
-        for(ELEMENT_ITERATOR iterator(force_particles);iterator.Valid();iterator.Next()) vertex_normals(iterator.Data()).Normalize();}
+        for(int p:force_particles) vertex_normals(p).Normalize();}
 }
 //#####################################################################
 // Function Add_Velocity_Independent_Forces
@@ -115,7 +115,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,
     T wind_viscosity=use_constant_wind?constant_wind_viscosity:spatially_varying_wind_viscosity;
     if(wind_viscosity || spatially_varying_wind_pressure || wind_density || spatially_varying_wind_density){
         if(!spatially_varying_wind_pressure && !wind_density && !spatially_varying_wind_density) PHYSBAM_FATAL_ERROR();
-        if(deformable_simplicial_object) for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+        if(deformable_simplicial_object) for(int t:force_elements){
             const TV_INT& nodes=deformable_simplicial_object->mesh.elements(t);
             TV wind_velocity=use_constant_wind?constant_wind:optimization(t).wind_velocity;
             TV relative_velocity=wind_velocity-particles.V.Subset(nodes).Sum()/TV::m;
@@ -135,7 +135,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,
         }}
     if(linear_normal_viscosity && deformable_simplicial_object){
         TV wind_acceleration=linear_normal_viscosity*constant_wind;
-        for(ELEMENT_ITERATOR iterator(force_particles);iterator.Valid();iterator.Next()){int p=iterator.Data();
+        for(int p:force_particles){
             if(use_constant_wind) F(p)+=particles.mass(p)*TV::Dot_Product(wind_acceleration,vertex_normals(p))*vertex_normals(p);
             else F(p)+=particles.mass(p)*linear_normal_viscosity*TV::Dot_Product(Spatially_Varying_Wind_Velocity(particles.X(p)),vertex_normals(p))*vertex_normals(p);}}
 }
@@ -148,7 +148,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const TWIST<TV> 
     if(use_constant_wind==use_spatially_varying_wind) PHYSBAM_FATAL_ERROR();
     T wind_viscosity=use_constant_wind?constant_wind_viscosity:spatially_varying_wind_viscosity;
     if(wind_viscosity){
-        if(deformable_simplicial_object) for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+        if(deformable_simplicial_object) for(int t:force_elements){
             const TV_INT& nodes=deformable_simplicial_object->mesh.elements(t);
             // wind drag pressure - per unit area
             TV negative_V=-V.Subset(nodes).Sum()/TV::m;
@@ -166,7 +166,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const TWIST<TV> 
                 simplex_force*=optimization(t).area_over_m; // one third of the triangle force is distriduted to each node
                 wrench.linear+=simplex_force;wrench.angular+=TV::Cross_Product(optimization(t).center-rigid_body->Frame().t,simplex_force);}}}
     if(linear_normal_viscosity && deformable_simplicial_object){
-        for(ELEMENT_ITERATOR iterator(force_particles);iterator.Valid();iterator.Next()){int p=iterator.Data();
+        for(int p:force_particles){
             F(p)-=particles.mass(p)*linear_normal_viscosity*TV::Dot_Product(V(p),vertex_normals(p))*vertex_normals(p);}}
 }
 //#####################################################################
@@ -175,8 +175,8 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const TWIST<TV> 
 template<class TV> void WIND_DRAG<TV>::
 Update_Mpi(const ARRAY<bool>& particle_is_simulated,const ARRAY<bool>& rigid_particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 {
-    force_elements.Update(deformable_simplicial_object->mesh.elements,particle_is_simulated);
-    force_particles.Update(deformable_simplicial_object->mesh.elements.Flattened(),particle_is_simulated);
+    Update_Force_Elements(force_elements,deformable_simplicial_object->mesh.elements,particle_is_simulated);
+    Update_Force_Particles(force_particles,deformable_simplicial_object->mesh.elements.Flattened(),particle_is_simulated,true);
 }
 //#####################################################################
 namespace PhysBAM{

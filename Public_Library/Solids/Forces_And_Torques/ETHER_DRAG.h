@@ -19,7 +19,6 @@ private:
 public:
     typedef POINTWISE_FORCE<TV> BASE;
     using BASE::particles;using BASE::rigid_body_collection;using BASE::mpi_solids;using BASE::force_particles;using BASE::force_rigid_body_particles;
-    typedef typename FORCE_ELEMENTS::ITERATOR ELEMENT_ITERATOR;
 
     bool use_constant_wind;
     T constant_wind_viscosity,constant_wind_angular_viscosity;

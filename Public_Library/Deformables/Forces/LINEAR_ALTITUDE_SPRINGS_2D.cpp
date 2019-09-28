@@ -79,7 +79,7 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
     ARRAY_VIEW<const TV> X(particles.X);int node1,node2,node3; // node1 is the isolated vertex and nodes2,3 are the segment
     int used_springs=0,total_elements=0;
     spring_states.Resize(mesh.elements.m);
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         int i,j,k;mesh.elements(t).Get(i,j,k);
         int hmin=0;T cross_length_max=-FLT_MAX;
         for(int h=0;h<3;h++){
@@ -106,7 +106,7 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
 template<class T> void LINEAR_ALTITUDE_SPRINGS_2D<T>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         const SPRING_STATE& state=spring_states(t);
         if(state.node>=0){
             int i,j,k;mesh.elements(t).Get(i,j,k);
@@ -123,7 +123,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 template<class T> void LINEAR_ALTITUDE_SPRINGS_2D<T>::
 Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         const SPRING_STATE& spring_state=spring_states(t);
         if(spring_state.node>=0){
             int i,j,k;mesh.elements(t).Get(i,j,k);
@@ -139,8 +139,7 @@ template<class T> int LINEAR_ALTITUDE_SPRINGS_2D<T>::
 Velocity_Dependent_Forces_Size() const
 {
     int aggregate_id=0;
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){
-        int t=iterator.Data();
+    for(int t:force_elements){
         const SPRING_STATE& spring_state=spring_states(t);
         if(spring_state.node>=0) aggregate_id++;}
     return aggregate_id;
@@ -152,7 +151,7 @@ template<class T> void LINEAR_ALTITUDE_SPRINGS_2D<T>::
 Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> aggregate,const T time) const
 {
     int aggregate_id=0;
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         const SPRING_STATE& spring_state=spring_states(t);
         if(spring_state.node>=0){
             int i,j,k;mesh.elements(t).Get(i,j,k);
@@ -167,7 +166,7 @@ template<class T> void LINEAR_ALTITUDE_SPRINGS_2D<T>::
 Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VIEW<TV> F,const T time) const
 {
     int aggregate_id=0;
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         const SPRING_STATE& spring_state=spring_states(t);
         if(spring_state.node>=0){
             int i,j,k;mesh.elements(t).Get(i,j,k);
@@ -184,7 +183,7 @@ CFL_Strain_Rate() const
 {
     T max_strain_rate=0,dx;TV direction,barycentric,v_interpolated;int node1,node2,node3; // 1 is vertex, 2,3 is segment
     ARRAY<VECTOR<int,3> >& elements=mesh.elements;ARRAY_VIEW<const TV> X(particles.X),V(particles.V);
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         int i,j,k;elements(t).Get(i,j,k);
         int hmin=0;T cross_length_max=-FLT_MAX;
         for(int h=0;h<3;h++){

@@ -26,7 +26,7 @@ BW_MATERIAL_SPACE_FORCES(DEFORMABLE_PARTICLES<TV>& particles,TRIANGLE_MESH& tria
     material_force_states.Resize(triangle_mesh.elements.m,no_init);
     ARRAY<bool> particle_is_simulated(particles.Size());particle_is_simulated.Fill(true);
     Update_Mpi(particle_is_simulated,0);
-    for(TRIANGLE_ITERATOR iterator(force_simplices);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    for(int s:force_simplices){
         int node1,node2,node3;triangle_mesh.elements(s).Get(node1,node2,node3);
         typename BASE::STATE& state=states(s);
         state.nodes=VECTOR<int,3>(node1,node2,node3);
@@ -63,7 +63,7 @@ Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 template<class TV,int d> void BW_MATERIAL_SPACE_FORCES<TV,d>::
 Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 {
-    force_simplices.Update(triangle_mesh.elements,particle_is_simulated);
+    Update_Force_Elements(force_simplices,triangle_mesh.elements,particle_is_simulated);
 }
 //#####################################################################
 // Function Compute_UV_Deformation

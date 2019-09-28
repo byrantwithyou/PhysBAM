@@ -97,8 +97,8 @@ Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 template<class TV,int d> void LINEAR_FINITE_VOLUME<TV,d>::
 Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 {
-    force_elements.Update(mesh.elements,particle_is_simulated);
-    force_particles.Update(mesh.elements.Flattened(),particle_is_simulated);
+    Update_Force_Elements(force_elements,mesh.elements,particle_is_simulated);
+    Update_Force_Particles(force_particles,mesh.elements.Flattened(),particle_is_simulated,true);
 }
 //#####################################################################
 // Function Add_Velocity_Independent_Forces
@@ -106,7 +106,7 @@ Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 template<class TV,int d> void LINEAR_FINITE_VOLUME<TV,d>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         MATRIX<T,TV::m,d> G=Stress(t)*Bm(t);
         STRAIN_MEASURE<TV,d>::Distribute_Force(F,mesh.elements(t),G);}
 }
@@ -116,7 +116,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 template<class TV,int d> void LINEAR_FINITE_VOLUME<TV,d>::
 Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         SYMMETRIC_MATRIX<T,TV::m> cauchy_strain_rate=(Ds(V,t)*Dm_inverse(t)).Symmetric_Part();
         MATRIX<T,TV::m,d> G=(2*beta*cauchy_strain_rate+alpha*cauchy_strain_rate.Trace())*Bm(t);
         STRAIN_MEASURE<TV,d>::Distribute_Force(F,mesh.elements(t),G);}
@@ -127,7 +127,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 template<class TV,int d> void LINEAR_FINITE_VOLUME<TV,d>::
 Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time,bool transpose) const
 {
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         MATRIX<T,TV::m,d> dG=Stress_Differential(V,t)*Bm(t);
         STRAIN_MEASURE<TV,d>::Distribute_Force(F,mesh.elements(t),dG);}
 }
@@ -151,7 +151,7 @@ Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency)
     T one_over_cfl_number=1/cfl_number,one_over_cfl_number_squared=sqr(one_over_cfl_number);
 
     ARRAY<FREQUENCY_DATA> fragment_particle_frequency(frequency.Size());
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         T local_density=use_uniform_density?density:(*density_list)(t);
         T altitude_squared=sqr(Simplex_Minimum_Altitude(Dm_inverse(t)));
         T elastic_squared=(lambda+2*mu)/(local_density*altitude_squared)*one_over_cfl_number_squared;
@@ -159,7 +159,7 @@ Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency)
         const VECTOR<int,d+1>& nodes=mesh.elements(t);
         for(int j=0;j<nodes.m;j++){FREQUENCY_DATA& data=fragment_particle_frequency(nodes[j]);
             data.elastic_squared=max(data.elastic_squared,elastic_squared);data.damping=max(data.damping,damping);}}
-    for(ELEMENT_ITERATOR iterator(force_particles);iterator.Valid();iterator.Next()){int p=iterator.Data();
+    for(int p:force_particles){
         frequency(p).elastic_squared+=fragment_particle_frequency(p).elastic_squared;
         frequency(p).damping+=fragment_particle_frequency(p).damping;}
 }
@@ -170,7 +170,7 @@ template<class TV,int d> typename TV::SCALAR LINEAR_FINITE_VOLUME<TV,d>::
 CFL_Strain_Rate() const
 {
     T max_strain_rate=0;
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         max_strain_rate=max(max_strain_rate,(Ds(particles.V,t)*Dm_inverse(t)).Max_Abs());}
     return Robust_Divide(max_strain_per_time_step,max_strain_rate);
 }

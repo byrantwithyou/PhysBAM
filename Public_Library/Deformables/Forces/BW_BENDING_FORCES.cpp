@@ -53,8 +53,7 @@ BW_BENDING_FORCES(DEFORMABLE_PARTICLES<TV>& particles,TRIANGLE_MESH& triangle_me
     bending_states.Resize(number_quadruples);
     ARRAY<bool> particle_is_simulated(particles.Size());particle_is_simulated.Fill(true);
     Update_Mpi(particle_is_simulated,0);
-    for(CONSTRAINT_ITERATOR iterator(force_simplices);iterator.Valid();iterator.Next()){
-        int q=iterator.Data();
+    for(int q:force_simplices){
         int x2,x1,x0,x3;constraint_particles(q).Get(x2,x1,x0,x3);
         typename BASE::STATE& state=states(q);
         state.nodes=VECTOR<int,4>(x0,x1,x2,x3);
@@ -83,7 +82,7 @@ Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 template<class TV> void BW_BENDING_FORCES<TV>::
 Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 {
-    force_simplices.Update(constraint_particles,particle_is_simulated);
+    Update_Force_Elements(force_simplices,constraint_particles,particle_is_simulated);
 }
 //#####################################################################
 // Function Update_Position_Based_State
@@ -91,7 +90,7 @@ Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 template<class TV> void BW_BENDING_FORCES<TV>::
 Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian)
 {
-    for(CONSTRAINT_ITERATOR iterator(force_simplices);iterator.Valid();iterator.Next()){int q=iterator.Data();
+    for(int q:force_simplices){
         typename BASE::STATE& state=states(q);
         BENDING_STATE& bending_state=bending_states(q);
         TV x20=particles.X(state.nodes(2))-particles.X(state.nodes(0)),x10=particles.X(state.nodes(1))-particles.X(state.nodes(0));
@@ -196,9 +195,8 @@ Potential_Energy(const T time) const
 {
     T potential_energy=0;
     const_cast<BW_BENDING_FORCES<TV>* >(this)->Update_Position_Based_State(time,true,true);
-    for(CONSTRAINT_ITERATOR iterator(force_simplices);iterator.Valid();iterator.Next()){int s=iterator.Data();
-        potential_energy+=Potential_Energy(s,time);}
-        return potential_energy;
+    for(int s:force_simplices) potential_energy+=Potential_Energy(s,time);
+    return potential_energy;
 }
 //#####################################################################
 // Function Create_BW_Bending_Force

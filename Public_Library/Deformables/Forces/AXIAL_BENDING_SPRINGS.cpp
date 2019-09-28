@@ -48,7 +48,7 @@ Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 template<class T> void AXIAL_BENDING_SPRINGS<T>::
 Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 {
-    force_springs.Update(spring_particles,particle_is_simulated);
+    Update_Force_Elements(force_springs,spring_particles,particle_is_simulated);
 }
 //#####################################################################
 // Function Initialize
@@ -131,7 +131,7 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
     optimization_weights.Resize(spring_particles.m,no_init);
     optimization_coefficient.Resize(spring_particles.m,no_init);
 
-    for(SPRING_ITERATOR iterator(force_springs);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    for(int s:force_springs){
         const VECTOR<int,4>& nodes=spring_particles(s);
         VECTOR<T,2> weights;
         Axial_Vector(nodes,optimization_current_length(s),optimization_direction(s),weights,attached_edge_length(s));
@@ -144,7 +144,7 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
 template<class T> void AXIAL_BENDING_SPRINGS<T>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
-    for(SPRING_ITERATOR iterator(force_springs);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    for(int s:force_springs){
         int node1,node2,node3,node4;spring_particles(s).Get(node1,node2,node3,node4);
         T w1,w2,w3,w4;optimization_weights(s).Get(w1,w2,w3,w4);
         TV force=youngs_modulus(s)/restlength(s)/*sqr(attached_edge_length(s)/attached_edge_restlength(s)-1)*/*(optimization_current_length(s)-visual_restlength(s))*optimization_direction(s);
@@ -156,7 +156,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 template<class T> void AXIAL_BENDING_SPRINGS<T>::
 Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
-    for(SPRING_ITERATOR iterator(force_springs);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    for(int s:force_springs){
         int node1,node2,node3,node4;spring_particles(s).Get(node1,node2,node3,node4);
         T w1,w2,w3,w4;optimization_weights(s).Get(w1,w2,w3,w4);
         TV force=(optimization_coefficient(s)*TV::Dot_Product(w1*V(node1)+w2*V(node2)-w3*V(node3)-w4*V(node4),optimization_direction(s)))*optimization_direction(s);
@@ -168,7 +168,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 template<class T> void AXIAL_BENDING_SPRINGS<T>::
 Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time,bool transpose) const
 {
-    for(SPRING_ITERATOR iterator(force_springs);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    for(int s:force_springs){
         int node1,node2,node3,node4;spring_particles(s).Get(node1,node2,node3,node4);
         T w1,w2,w3,w4;optimization_weights(s).Get(w1,w2,w3,w4);
         TV dl=w1*V(node1)+w2*V(node2)-w3*V(node3)-w4*V(node4);
@@ -182,7 +182,7 @@ template<class T> void AXIAL_BENDING_SPRINGS<T>::
 Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency)
 {
     T one_over_cfl_number=1/cfl_number,one_over_cfl_number_squared=sqr(one_over_cfl_number);
-    for(SPRING_ITERATOR iterator(force_springs);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    for(int s:force_springs){
         const VECTOR<int,4>& nodes=spring_particles(s);
         T one_over_mass_times_restlength=(T).25/restlength(s)*particles.one_over_effective_mass.Subset(nodes).Sum();
         T elastic_hertz_squared=4*youngs_modulus(s)*one_over_mass_times_restlength*one_over_cfl_number_squared;
@@ -197,13 +197,13 @@ CFL_Strain_Rate() const
 {
     ARRAY_VIEW<const TV> V(particles.V);
     T max_strain_rate=0;
-    if(use_rest_state_for_strain_rate) for(SPRING_ITERATOR iterator(force_springs);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    if(use_rest_state_for_strain_rate) for(int s:force_springs){
         const VECTOR<int,4>& nodes=spring_particles(s);
         TV dx;VECTOR<T,2> weights;T current_length;T current_edge_length;
         Axial_Vector(nodes,current_length,dx,weights,current_edge_length); // dx is normalized
         T strain_rate=TV::Dot_Product((1-weights.x)*V(nodes[0])+weights.x*V(nodes[1])-(1-weights.y)*V(nodes[2])-weights.y*V(nodes[3]),dx)/restlength(s);
         max_strain_rate=max(max_strain_rate,abs(strain_rate));}
-    else for(SPRING_ITERATOR iterator(force_springs);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    else for(int s:force_springs){
         const VECTOR<int,4>& nodes=spring_particles(s);
         TV dx;VECTOR<T,2> weights;T current_length;T current_edge_length;
         Axial_Vector(nodes,current_length,dx,weights,current_edge_length); // dx is normalized
@@ -257,7 +257,7 @@ template<class T> T AXIAL_BENDING_SPRINGS<T>::
 Potential_Energy(const T time) const
 {
     T potential_energy=0;
-    for(SPRING_ITERATOR iterator(force_springs);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    for(int s:force_springs){
         potential_energy+=Potential_Energy(s,time);}
     return potential_energy;
 }

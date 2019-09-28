@@ -14,7 +14,7 @@ template<class TV> void DEFORMABLE_GRAVITY<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
     if(!gravity.Magnitude_Squared()) return;
-    for(ELEMENT_ITERATOR iterator(force_particles);iterator.Valid();iterator.Next()){int p=iterator.Data();F(p)+=gravity*particles.mass(p);}
+    for(int p:force_particles){F(p)+=gravity*particles.mass(p);}
 }
 //#####################################################################
 // Function Potential_Energy
@@ -31,7 +31,7 @@ template<class TV> typename TV::SCALAR DEFORMABLE_GRAVITY<TV>::
 Potential_Energy(const T time) const
 {
     T potential_energy=0;
-    for(ELEMENT_ITERATOR iterator(force_particles);iterator.Valid();iterator.Next()){int p=iterator.Data();
+    for(int p:force_particles){
         potential_energy+=Potential_Energy(p,time);}
     return potential_energy;
 }

@@ -14,8 +14,8 @@ template<class TV> void POINTWISE_DEFORMABLE_FORCE<TV>::
 Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 {
     this->mpi_solids=mpi_solids;
-    if(influence_all_particles) force_particles.Update(Get_Particle_List(IDENTITY_ARRAY<>(particles.Size())),particle_is_simulated);
-    else if(influenced_particles) force_particles.Update(Get_Particle_List(*influenced_particles),particle_is_simulated);
+    if(influence_all_particles) Update_Force_Particles(force_particles,IDENTITY_ARRAY<>(particles.Size()),particle_is_simulated,false);
+    else if(influenced_particles) Update_Force_Particles(force_particles,*influenced_particles,particle_is_simulated,true);
     is_simulated=particle_is_simulated;
 }
 //#####################################################################

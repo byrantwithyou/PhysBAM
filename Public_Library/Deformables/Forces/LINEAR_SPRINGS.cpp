@@ -157,7 +157,7 @@ Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 template<class TV> void LINEAR_SPRINGS<TV>::
 Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 {
-    force_segments.Update(segment_mesh.elements,particle_is_simulated);
+    Update_Force_Elements(force_segments,segment_mesh.elements,particle_is_simulated);
     if(cache_strain) strains_of_segment.Resize(segment_mesh.elements.m,no_init);
 }
 //#####################################################################
@@ -262,7 +262,7 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
     current_lengths.Resize(segment_mesh.elements.m,no_init);
     
     ARRAY_VIEW<const TV> X(particles.X);
-    if(!damping.m) for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    if(!damping.m) for(int s:force_segments){
         int node1,node2;segment_mesh.elements(s).Get(node1,node2);
         STATE& state=states(s);
         state.nodes=VECTOR<int,2>(node1,node2);
@@ -270,7 +270,7 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
         state.direction=state.dX;
         current_lengths(s)=state.direction.Normalize();
         state.coefficient=constant_damping/restlength(s);}
-    else for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    else for(int s:force_segments){
         int node1,node2;segment_mesh.elements(s).Get(node1,node2);
         STATE& state=states(s);
         state.nodes=VECTOR<int,2>(node1,node2);
@@ -278,7 +278,7 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
         state.direction=state.dX;
         current_lengths(s)=state.direction.Normalize();
         state.coefficient=damping(s)/restlength(s);}
-    if(use_plasticity) for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    if(use_plasticity) for(int s:force_segments){
         T strain=(current_lengths(s)-visual_restlength(s))/restlength(s);T strain_sign=sign(strain),strain_magnitude=abs(strain);
         if(strain_magnitude>plastic_yield_strain(s)){
             visual_restlength(s)=clamp(current_lengths(s)-strain_sign*plastic_yield_strain(s)*restlength(s),plastic_visual_restlength(s)/plasticity_clamp_ratio,
@@ -294,11 +294,11 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
 template<class TV> void LINEAR_SPRINGS<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
-    if(!youngs_modulus.m) for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    if(!youngs_modulus.m) for(int s:force_segments){
         const STATE& state=states(s);
         TV force=constant_youngs_modulus/restlength(s)*(current_lengths(s)-visual_restlength(s))*state.direction;
         F(state.nodes[0])+=force;F(state.nodes[1])-=force;}
-    else for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    else for(int s:force_segments){
         const STATE& state=states(s);
         TV force=youngs_modulus(s)/restlength(s)*(current_lengths(s)-visual_restlength(s))*state.direction;
         F(state.nodes[0])+=force;F(state.nodes[1])-=force;}
@@ -311,7 +311,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 {
     //int springs_processed=0;
     //LOG::Time("spring add velocity dependent");
-    for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    for(int s:force_segments){
         const STATE& state=states(s);
         //springs_processed++;
         TV force=(state.coefficient*TV::Dot_Product(V(state.nodes[0])-V(state.nodes[1]),state.direction))*state.direction;
@@ -323,14 +323,14 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 template<class TV> void LINEAR_SPRINGS<TV>::
 Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time,bool transpose) const
 {
-    if(!youngs_modulus.m) for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    if(!youngs_modulus.m) for(int s:force_segments){
         const STATE& state=states(s);
         int node1,node2;segment_mesh.elements(s).Get(node1,node2);
         TV dl=V(node2)-V(node1);
         T l=current_lengths(s),l3=cube(l);
         TV dforce=constant_youngs_modulus*(l-restlength(s))/(restlength(s)*l)*dl+constant_youngs_modulus/l3*TV::Dot_Product(state.dX,dl)*state.dX;
         F(node1)+=dforce;F(node2)-=dforce;}
-    else for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    else for(int s:force_segments){
         const STATE& state=states(s);
         int node1,node2;segment_mesh.elements(s).Get(node1,node2);
         TV dl=V(node2)-V(node1);
@@ -344,9 +344,7 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F
 template<class TV> int LINEAR_SPRINGS<TV>::
 Velocity_Dependent_Forces_Size() const
 {
-    int aggregate_id=0;
-    for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()) aggregate_id++;
-    return aggregate_id;
+    return force_segments.m;
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces_First_Half
@@ -355,7 +353,7 @@ template<class TV> void LINEAR_SPRINGS<TV>::
 Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> aggregate,const T time) const
 {
     int aggregate_id=0;
-    for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    for(int s:force_segments){
         const STATE& state=states(s);
         aggregate(aggregate_id++)+=state.sqrt_coefficient*TV::Dot_Product(V(state.nodes[0])-V(state.nodes[1]),state.direction);}
 }
@@ -366,7 +364,7 @@ template<class TV> void LINEAR_SPRINGS<TV>::
 Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VIEW<TV> F,const T time) const
 {
     int aggregate_id=0;
-    for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    for(int s:force_segments){
         const STATE& state=states(s);
         TV force=state.sqrt_coefficient*aggregate(aggregate_id++)*state.direction;
         F(state.nodes[0])+=force;F(state.nodes[1])-=force;}
@@ -378,7 +376,7 @@ template<class TV> void LINEAR_SPRINGS<TV>::
 Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency)
 {
     T one_over_cfl_number=1/cfl_number,one_over_cfl_number_squared=sqr(one_over_cfl_number);
-    for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    for(int s:force_segments){
         const VECTOR<int,2>& nodes=segment_mesh.elements(s);
         T ym=youngs_modulus.m?youngs_modulus(s):constant_youngs_modulus;
         T d=damping.m?damping(s):constant_damping;
@@ -393,13 +391,13 @@ template<class TV> typename TV::SCALAR LINEAR_SPRINGS<TV>::
 CFL_Strain_Rate() const
 {
     T max_strain_rate=0,strain_rate;TV dx;
-    if(use_rest_state_for_strain_rate) for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    if(use_rest_state_for_strain_rate) for(int s:force_segments){
         int i,j;segment_mesh.elements(s).Get(i,j);
         dx=particles.X(j)-particles.X(i);T magnitude=dx.Magnitude();if(magnitude!=0) dx.Normalize();
         strain_rate=TV::Dot_Product(particles.V(j)-particles.V(i),dx)/restlength(s);
         max_strain_rate=max(max_strain_rate,abs(strain_rate));
         if(cache_strain){strains_of_segment(s)=VECTOR<T,2>(abs(strain_rate),abs((magnitude-visual_restlength(s))/restlength(s)));}}
-    else for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    else for(int s:force_segments){
         int i,j;segment_mesh.elements(s).Get(i,j);
         dx=particles.X(j)-particles.X(i);
         strain_rate=TV::Dot_Product(particles.V(j)-particles.V(i),dx)/TV::Dot_Product(dx,dx);
@@ -485,7 +483,7 @@ template<class TV> typename TV::SCALAR LINEAR_SPRINGS<TV>::
 Potential_Energy(const T time) const
 {
     T potential_energy=0;
-    for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    for(int s:force_segments){
         potential_energy+=Potential_Energy(s,time);}
     return potential_energy;
 }
@@ -499,7 +497,7 @@ Add_Force_Data(ARRAY<FORCE_DATA<TV> >& force_data_list,const std::string& force_
     FORCE_DATA<TV> force_data;
     if(force_name.empty()) force_data.name="LINEAR_SPRINGS";
     else force_data.name=force_name;
-    for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
+    for(int s:force_segments){
         int node1,node2;segment_mesh.elements(s).Get(node1,node2);
         force_data.first_action_point=X(node1);
         force_data.second_action_point=X(node2);

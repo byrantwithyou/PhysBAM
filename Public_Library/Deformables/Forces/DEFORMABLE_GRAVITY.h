@@ -17,7 +17,6 @@ class DEFORMABLE_GRAVITY:public POINTWISE_DEFORMABLE_FORCE<TV>
 public:
     typedef POINTWISE_DEFORMABLE_FORCE<TV> BASE;
     using BASE::particles;using BASE::influenced_particles;using BASE::mpi_solids;using BASE::force_particles;using BASE::is_simulated;
-    typedef typename FORCE_ELEMENTS::ITERATOR ELEMENT_ITERATOR;
 
     TV gravity;
 public:

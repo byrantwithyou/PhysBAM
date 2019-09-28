@@ -7,7 +7,6 @@
 #ifndef __RIGID_POINTWISE_FORCE__
 #define __RIGID_POINTWISE_FORCE__
 
-#include <Core/Data_Structures/FORCE_ELEMENTS.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Rigids/Forces_And_Torques/RIGIDS_FORCES.h>
 namespace PhysBAM{
@@ -24,7 +23,7 @@ protected:
     ARRAY<int> *influenced_rigid_body_particles;
     bool need_destroy_influenced_rigid_body_particles;
 public:
-    FORCE_ELEMENTS force_rigid_body_particles;
+    ARRAY<int> force_rigid_body_particles;
 
     RIGID_POINTWISE_FORCE(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARRAY<int>* influenced_rigid_body_particles_input)
         :RIGIDS_FORCES<TV>(rigid_body_collection_input),influenced_rigid_body_particles(influenced_rigid_body_particles_input),

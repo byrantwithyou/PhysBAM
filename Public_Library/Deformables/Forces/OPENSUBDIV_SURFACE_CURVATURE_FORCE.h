@@ -7,7 +7,6 @@
 #ifndef __OPENSUBDIV_SURFACE_CURVATURE_FORCE__
 #define __OPENSUBDIV_SURFACE_CURVATURE_FORCE__
 
-#include <Core/Data_Structures/FORCE_ELEMENTS.h>
 #include <Core/Matrices/MATRIX.h>
 #include <Core/Matrices/MATRIX_FORWARD.h>
 #include <Geometry/Topology_Based_Geometry/OPENSUBDIV_SURFACE.h>

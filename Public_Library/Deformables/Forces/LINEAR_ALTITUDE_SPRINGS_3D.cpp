@@ -157,7 +157,7 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
     else spring_states_all_springs.Resize(mesh.elements.m);
     int used_springs=0,total_elements=0;
     ARRAY_VIEW<const TV> X=particles.X;int node1,node2,node3,node4; // node1 is the isolated vertex and nodes2,3,4 are the triangle
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data(); // use shortest spring only
+    for(int t:force_elements){ // use shortest spring only
         total_elements++;
         int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         if(use_shortest_spring_only){
@@ -191,7 +191,7 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
 template<class T> void LINEAR_ALTITUDE_SPRINGS_3D<T>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         int total_springs=use_shortest_spring_only?1:4;
         for(int spring_index=0;spring_index<total_springs;spring_index++){
             const SPRING_STATE* state_ptr;
@@ -213,7 +213,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 template<class T> void LINEAR_ALTITUDE_SPRINGS_3D<T>::
 Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         int total_springs=use_shortest_spring_only?1:4;
         for(int spring_index=0;spring_index<total_springs;spring_index++){
             const SPRING_STATE* state_ptr;
@@ -235,7 +235,7 @@ template<class T> int LINEAR_ALTITUDE_SPRINGS_3D<T>::
 Velocity_Dependent_Forces_Size() const
 {
     int aggregate_id=0;
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         int total_springs=use_shortest_spring_only?1:4;
         for(int spring_index=0;spring_index<total_springs;spring_index++){
             const SPRING_STATE* state_ptr;
@@ -252,7 +252,7 @@ template<class T> void LINEAR_ALTITUDE_SPRINGS_3D<T>::
 Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> aggregate,const T time) const
 {
     int aggregate_id=0;
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         int total_springs=use_shortest_spring_only?1:4;
         for(int spring_index=0;spring_index<total_springs;spring_index++){
             const SPRING_STATE* state_ptr;
@@ -272,7 +272,7 @@ template<class T> void LINEAR_ALTITUDE_SPRINGS_3D<T>::
 Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VIEW<TV> F,const T time) const
 {
     int aggregate_id=0;
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         int total_springs=use_shortest_spring_only?1:4;
         for(int spring_index=0;spring_index<total_springs;spring_index++){
             const SPRING_STATE* state_ptr;
@@ -292,7 +292,7 @@ Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VI
 template<class T> void LINEAR_ALTITUDE_SPRINGS_3D<T>::
 Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time,bool transpose) const
 {
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         int total_springs=use_shortest_spring_only?1:4;
         for(int spring_index=0;spring_index<total_springs;spring_index++){
             const SPRING_STATE* state_ptr;
@@ -336,7 +336,7 @@ CFL_Strain_Rate() const
     T max_strain_rate=0;int node1,node2,node3,node4; // node1 is the vertex and nodes2,3,4 are the triangle
     T strain_rate,strain;
     ARRAY<VECTOR<int,4> >& elements=mesh.elements;ARRAY_VIEW<const TV> X(particles.X);
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         int i,j,k,l;elements(t).Get(i,j,k,l);
         if(use_shortest_spring_only){
             int hmin=0;T cross_area_max=(T)-FLT_MAX;
@@ -368,7 +368,7 @@ Add_Force_Data(ARRAY<FORCE_DATA<TV> >& force_data_list,const std::string& force_
     FORCE_DATA<TV> force_data;
     if(force_name.empty()) force_data.name="LINEAR_ALTITUDE_SPRINGS_3D";
     else force_data.name=force_name;
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         int total_springs=use_shortest_spring_only?1:4;
         for(int spring_index=0;spring_index<total_springs;spring_index++){
             const SPRING_STATE* state_ptr;
@@ -419,7 +419,7 @@ template<class T> T LINEAR_ALTITUDE_SPRINGS_3D<T>::
 Potential_Energy(const T time) const
 {
     T potential_energy=0;
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         potential_energy+=Potential_Energy(t,time);}
     return potential_energy;
 }

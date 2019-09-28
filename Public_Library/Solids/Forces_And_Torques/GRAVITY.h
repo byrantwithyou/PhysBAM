@@ -18,7 +18,6 @@ public:
     typedef POINTWISE_FORCE<TV> BASE;
     using BASE::particles;using BASE::rigid_body_collection;using BASE::influenced_particles;
     using BASE::mpi_solids;using BASE::force_particles;using BASE::force_rigid_body_particles;
-    typedef typename FORCE_ELEMENTS::ITERATOR ELEMENT_ITERATOR;
 
     TV gravity;
 public:

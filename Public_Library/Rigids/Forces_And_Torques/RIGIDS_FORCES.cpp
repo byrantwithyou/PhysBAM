@@ -6,7 +6,7 @@
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Rigids/Forces_And_Torques/RIGIDS_FORCES.h>
-using namespace PhysBAM;
+namespace PhysBAM{
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -72,14 +72,47 @@ Potential_Energy(const T time) const
     return 0;
 }
 //#####################################################################
-namespace PhysBAM{
-#define INSTANTIATION_HELPER(T,d) \
-    template class RIGIDS_FORCES<VECTOR<T,d> >;
-
-INSTANTIATION_HELPER(float,1);
-INSTANTIATION_HELPER(float,2);
-INSTANTIATION_HELPER(float,3);
-INSTANTIATION_HELPER(double,1);
-INSTANTIATION_HELPER(double,2);
-INSTANTIATION_HELPER(double,3);
+// Function Update_Force_Elements
+//#####################################################################
+template<int d,class T_ARRAY> void
+Update_Force_Elements(ARRAY<int>& force_elements,
+    const ARRAY_BASE<VECTOR<int,d>,T_ARRAY>& elements,
+    const ARRAY<bool>& particle_is_simulated)
+{
+    const T_ARRAY& e=elements.Derived();
+    force_elements.Remove_All();
+    for(int i=0;i<e.Size();i++)
+        if(particle_is_simulated.Subset(e(i)).Contains(true))
+            force_elements.Append(i);
+}
+//#####################################################################
+// Function Update_Force_Particles
+//#####################################################################
+template<class T_ARRAY> void
+Update_Force_Particles(ARRAY<int>& force_particles,
+    const ARRAY_BASE<int,T_ARRAY>& particles,
+    const ARRAY<bool>& particle_is_simulated,bool check_dups)
+{
+    const T_ARRAY& e=particles.Derived();
+    force_particles.Remove_All();
+    for(int i=0;i<e.Size();i++)
+        if(particle_is_simulated(e(i)))
+            force_particles.Append(e(i));
+    if(check_dups) Prune_Duplicates(force_particles);
+}
+//#####################################################################
+template class RIGIDS_FORCES<VECTOR<float,1> >;
+template class RIGIDS_FORCES<VECTOR<float,2> >;
+template class RIGIDS_FORCES<VECTOR<float,3> >;
+template class RIGIDS_FORCES<VECTOR<double,1> >;
+template class RIGIDS_FORCES<VECTOR<double,2> >;
+template class RIGIDS_FORCES<VECTOR<double,3> >;
+template void Update_Force_Elements<2,ARRAY<VECTOR<int,2>,int> >(ARRAY<int,int>&,ARRAY_BASE<VECTOR<int,2>,ARRAY<VECTOR<int,2>,int>,int> const&,ARRAY<bool,int> const&);
+template void Update_Force_Elements<3,ARRAY<VECTOR<int,3>,int> >(ARRAY<int,int>&,ARRAY_BASE<VECTOR<int,3>,ARRAY<VECTOR<int,3>,int>,int> const&,ARRAY<bool,int> const&);
+template void Update_Force_Elements<4,ARRAY<VECTOR<int,4>,int> >(ARRAY<int,int>&,ARRAY_BASE<VECTOR<int,4>,ARRAY<VECTOR<int,4>,int>,int> const&,ARRAY<bool,int> const&);
+template void Update_Force_Elements<8,ARRAY<VECTOR<int,8>,int> >(ARRAY<int,int>&,ARRAY_BASE<VECTOR<int,8>,ARRAY<VECTOR<int,8>,int>,int> const&,ARRAY<bool,int> const&);
+template void Update_Force_Particles<ARRAY<int,int> >(ARRAY<int,int>&,ARRAY_BASE<int,ARRAY<int,int>,int> const&,ARRAY<bool,int> const&,bool);
+template void Update_Force_Particles<ARRAY_VIEW<int const,int> >(ARRAY<int,int>&,ARRAY_BASE<int,ARRAY_VIEW<int const,int>,int> const&,ARRAY<bool,int> const&,bool);
+template void Update_Force_Particles<ARRAY_VIEW<int,int> >(ARRAY<int,int>&,ARRAY_BASE<int,ARRAY_VIEW<int,int>,int> const&,ARRAY<bool,int> const&,bool);
+template void Update_Force_Particles<IDENTITY_ARRAY<int> >(ARRAY<int,int>&,ARRAY_BASE<int,IDENTITY_ARRAY<int>,int> const&,ARRAY<bool,int> const&,bool);
 }

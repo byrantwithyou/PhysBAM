@@ -7,7 +7,6 @@
 #ifndef __RIGID_LINEAR_SPRINGS__
 #define __RIGID_LINEAR_SPRINGS__
 
-#include <Core/Data_Structures/FORCE_ELEMENTS.h>
 #include <Core/Vectors/VECTOR_2D.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Rigids/Forces_And_Torques/RIGIDS_FORCES.h>
@@ -23,7 +22,6 @@ public:
     typedef RIGIDS_FORCES<TV> BASE;
     using BASE::Invalidate_CFL;using BASE::cfl_number;using BASE::rigid_body_collection;
     using BASE::max_strain_per_time_step;using BASE::use_rest_state_for_strain_rate;
-    typedef typename FORCE_ELEMENTS::ITERATOR SEGMENT_ITERATOR;
     typedef typename BASE::FREQUENCY_DATA FREQUENCY_DATA;
 
 public:
@@ -46,7 +44,7 @@ public:
     };
     ARRAY<STATE> states;
 public:
-    FORCE_ELEMENTS force_segments;
+    ARRAY<int> force_segments;
     RIGID_LINEAR_SPRINGS(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input);
     virtual ~RIGID_LINEAR_SPRINGS();
 

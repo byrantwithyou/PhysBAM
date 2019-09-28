@@ -19,7 +19,6 @@ class BW_BENDING_FORCES:public BW_FORCES<TV,1,4>
 public:
     typedef BW_FORCES<TV,1,4> BASE;
     using BASE::particles;using BASE::states;using BASE::force_simplices;using BASE::triangle_mesh;
-    typedef typename FORCE_ELEMENTS::ITERATOR CONSTRAINT_ITERATOR;
 
 protected:
     struct BENDING_STATE{

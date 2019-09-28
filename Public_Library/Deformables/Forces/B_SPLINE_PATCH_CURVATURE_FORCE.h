@@ -7,7 +7,6 @@
 #ifndef __B_SPLINE_PATCH_CURVATURE_FORCE__
 #define __B_SPLINE_PATCH_CURVATURE_FORCE__
 
-#include <Core/Data_Structures/FORCE_ELEMENTS.h>
 #include <Core/Matrices/MATRIX.h>
 #include <Core/Matrices/MATRIX_FORWARD.h>
 #include <Tools/Tensors/TENSOR.h>

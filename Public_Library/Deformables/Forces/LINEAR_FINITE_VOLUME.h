@@ -8,7 +8,6 @@
 #define __LINEAR_FINITE_VOLUME__
 
 #include <Core/Arrays/INDIRECT_ARRAY.h>
-#include <Core/Data_Structures/FORCE_ELEMENTS.h>
 #include <Core/Math_Tools/FACTORIAL.h>
 #include <Core/Matrices/MATRIX_FORWARD.h>
 #include <Geometry/Topology/TOPOLOGY_POLICY.h>
@@ -26,7 +25,6 @@ class LINEAR_FINITE_VOLUME:public DEFORMABLES_FORCES<TV>,public FINITE_VOLUME_TA
 public:
     typedef DEFORMABLES_FORCES<TV> BASE;
     using BASE::particles;using BASE::max_strain_per_time_step;using BASE::cfl_number;
-    typedef typename FORCE_ELEMENTS::ITERATOR ELEMENT_ITERATOR;
     typedef typename BASE::FREQUENCY_DATA FREQUENCY_DATA;
 
     T_OBJECT& object;
@@ -40,8 +38,8 @@ private:
     ARRAY<MATRIX<T,TV::m,d> > Bm;
     ARRAY<MATRIX<T,d,TV::m> >* Dm_inverse_save;
     ARRAY<MATRIX<T,TV::m,d> >* Bm_save;
-    FORCE_ELEMENTS force_elements;
-    FORCE_ELEMENTS force_particles;
+    ARRAY<int> force_elements;
+    ARRAY<int> force_particles;
     ARRAY<T>* density_list;
     T density;
 public:

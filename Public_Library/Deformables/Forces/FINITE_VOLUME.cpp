@@ -119,7 +119,7 @@ Use_Stiffness_Matrix()
     if(!strain_measure.mesh.segment_mesh) strain_measure.mesh.Initialize_Segment_Mesh();
     if(!strain_measure.mesh.element_edges) strain_measure.mesh.Initialize_Element_Edges();
     if(force_segments) delete force_segments;
-    force_segments=new FORCE_ELEMENTS();
+    force_segments=new ARRAY<int>();
 }
 //#####################################################################
 // Function Update_Be_Scales
@@ -161,9 +161,9 @@ template<class TV,int d> void FINITE_VOLUME<TV,d>::
 Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 {
     if(!strain_measure.mesh.segment_mesh) strain_measure.mesh.Initialize_Segment_Mesh();
-    force_elements.Update(strain_measure.mesh.elements,particle_is_simulated);
-    if(force_segments) force_segments->Update(strain_measure.mesh.segment_mesh->elements,particle_is_simulated);
-    force_particles.Update(strain_measure.mesh.elements.Flattened(),particle_is_simulated);
+    Update_Force_Elements(force_elements,strain_measure.mesh.elements,particle_is_simulated);
+    if(force_segments) Update_Force_Elements(*force_segments,strain_measure.mesh.segment_mesh->elements,particle_is_simulated);
+    Update_Force_Particles(force_particles,strain_measure.mesh.elements.Flattened(),particle_is_simulated,true);
 }
 //#####################################################################
 // Function Update_Position_Based_State
@@ -196,7 +196,7 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
     MATRIX<T,d> V_local;
     if(!plasticity_model){
         MATRIX<MATRIX<T,TV::m>,d+1,d+1> dfdx;
-        for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+        for(int t:force_elements){
             strain_measure.F(t).Singular_Value_Decomposition(U(t),Fe_hat(t),V_local);
             if(implicit_surface) Set_Inversion_Based_On_Implicit_Surface(*this,*implicit_surface,t);
             if(anisotropic_model) anisotropic_model->Update_State_Dependent_Auxiliary_Variables(Fe_hat(t),V_local,t);
@@ -231,7 +231,7 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
         if(implicit_surface) PHYSBAM_NOT_IMPLEMENTED();
         if(anisotropic_model) PHYSBAM_NOT_IMPLEMENTED();
         DIAGONAL_MATRIX<T,d> Fe_project_hat;
-        for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+        for(int t:force_elements){
             T_MATRIX F=strain_measure.F(t);
             (F*plasticity_model->Fp_inverse(t)).Singular_Value_Decomposition(U(t),Fe_hat(t),V_local);
             if(implicit_surface) Set_Inversion_Based_On_Implicit_Surface(*this,*implicit_surface,t);
@@ -244,10 +244,8 @@ Update_Position_Based_State(const T time,const bool is_position_update,const boo
     if(compute_half_forces){
         sqrt_Be_scales.Resize(Be_scales.m);
         for(int i=0;i<Be_scales.m;i++) sqrt_Be_scales(i)=sqrt(-Be_scales(i));
-        int n=0;
-        for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()) n++;
         half_force_size=constitutive_model.P_From_Strain_Rate_Forces_Size();
-        total_half_force_size=half_force_size*n;}
+        total_half_force_size=half_force_size*force_elements.m;}
 }
 //#####################################################################
 // Function Add_Velocity_Independent_Forces
@@ -256,11 +254,11 @@ template<class TV,int d> void FINITE_VOLUME<TV,d>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
     if(anisotropic_model)
-        for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+        for(int t:force_elements){
             T_MATRIX forces=U(t)*(Be_scales(t)*anisotropic_model->P_From_Strain(Fe_hat(t),(*V)(t),t)).Times_Transpose(De_inverse_hat(t));
             strain_measure.Distribute_Force(F,t,forces);}
     else
-        for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+        for(int t:force_elements){
             T_MATRIX forces=U(t)*(Be_scales(t)*isotropic_model->P_From_Strain(Fe_hat(t),t)).Times_Transpose(De_inverse_hat(t));
             strain_measure.Distribute_Force(F,t,forces);}
 }
@@ -273,13 +271,13 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
     //force_elements.Print();
     if(node_stiffness && edge_stiffness && !dPi_dFe && !dP_dFe){
         if(dP_dFe || dPi_dFe) PHYSBAM_FATAL_ERROR();
-        for(FORCE_ITERATOR iterator(force_particles);iterator.Valid();iterator.Next()){int p=iterator.Data();
+        for(int p:force_particles){
             F(p)+=(*node_stiffness)(p)*V(p);}
-        for(FORCE_ITERATOR iterator(*force_segments);iterator.Valid();iterator.Next()){int e=iterator.Data();
+        for(int e:*force_segments){
             int m,n;strain_measure.mesh.segment_mesh->elements(e).Get(m,n);
             F(m)+=(*edge_stiffness)(e)*V(n);F(n)+=(*edge_stiffness)(e).Transpose_Times(V(m));}}
     else{
-        for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+        for(int t:force_elements){
             MATRIX<T,d> Fe_dot_hat=U(t).Transpose_Times(strain_measure.Ds(V,t))*De_inverse_hat(t);
             T_MATRIX forces=U(t)*(Be_scales(t)*constitutive_model.P_From_Strain_Rate(Fe_hat(t),Fe_dot_hat,t)).Times_Transpose(De_inverse_hat(t));
             strain_measure.Distribute_Force(F,t,forces);}}
@@ -301,7 +299,7 @@ Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency)
     // TODO: MPI
     T one_over_cfl_number=1/cfl_number,one_over_cfl_number_squared=sqr(one_over_cfl_number);
     HASHTABLE<int,FREQUENCY_DATA> particle_frequency;
-    for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         T one_over_altitude_squared_and_density=(T)1/(sqr(strain_measure.Rest_Altitude(t))*(use_uniform_density?density:(*density_list)(t)));
         T elastic_squared=constitutive_model.Maximum_Elastic_Stiffness(t)*one_over_altitude_squared_and_density*one_over_cfl_number_squared;
         T damping=constitutive_model.Maximum_Damping_Stiffness(t)*one_over_altitude_squared_and_density*one_over_cfl_number;
@@ -320,7 +318,7 @@ template<class TV,int d> typename TV::SCALAR FINITE_VOLUME<TV,d>::
 CFL_Strain_Rate() const
 {
     T max_strain_rate=0;
-    for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         max_strain_rate=max(max_strain_rate,strain_measure.Velocity_Gradient(t).Max_Abs());}
     return Robust_Divide(max_strain_per_time_step,max_strain_rate);
 }
@@ -335,7 +333,7 @@ Semi_Implicit_Impulse_Precomputation(const T time,const T max_dt,ARRAY<T>* time_
     if(!semi_implicit_data) semi_implicit_data=new ARRAY<DIAGONALIZED_SEMI_IMPLICIT_ELEMENT<TV,d> >(elements,no_init);
     else semi_implicit_data->Resize(elements,no_init);
     twice_max_strain_per_time_step=2*max_strain_per_time_step;
-    for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         DIAGONALIZED_SEMI_IMPLICIT_ELEMENT<TV,d>& data=(*semi_implicit_data)(t);
         data.nodes=strain_measure.mesh.elements(t);
         data.Bm_scale=Be_scales(t);
@@ -349,7 +347,7 @@ Semi_Implicit_Impulse_Precomputation(const T time,const T max_dt,ARRAY<T>* time_
         data.time=time;if(time_plus_dt) (*time_plus_dt)(t)=time+min(data.dt_cfl,twice_max_strain_per_time_step/strain_measure.Velocity_Gradient(t).Max_Abs());}
     if(verbose){
         T min_W=FLT_MAX,max_W=0,min_dt_cfl=FLT_MAX,max_dt_cfl=0;
-        for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+        for(int t:force_elements){
             DIAGONALIZED_SEMI_IMPLICIT_ELEMENT<TV,d>& data=(*semi_implicit_data)(t);
             min_W=min(min_W,data.W.Min());max_W=max(max_W,data.W.Max());
             min_dt_cfl=min(min_dt_cfl,data.dt_cfl);max_dt_cfl=max(max_dt_cfl,data.dt_cfl);}
@@ -421,8 +419,8 @@ Add_Semi_Implicit_Impulse(const int element,const T dt,T* time_plus_dt)
 template<class TV,int d> void FINITE_VOLUME<TV,d>::
 Add_Semi_Implicit_Impulses(const T dt,ARRAY<T>* time_plus_dt)
 {
-    if(time_plus_dt) for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();Add_Semi_Implicit_Impulse(t,dt,&(*time_plus_dt)(t));}
-    else for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();Add_Semi_Implicit_Impulse(t,dt,0);}
+    if(time_plus_dt) for(int t:force_elements){Add_Semi_Implicit_Impulse(t,dt,&(*time_plus_dt)(t));}
+    else for(int t:force_elements){Add_Semi_Implicit_Impulse(t,dt,0);}
 }
 //#####################################################################
 // Function Velocity_Dependent_Forces_Size
@@ -440,7 +438,7 @@ Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> ag
 {
     PHYSBAM_ASSERT(!(node_stiffness && edge_stiffness && !dPi_dFe && !dP_dFe) && compute_half_forces);
     int start_force=1;
-    for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         MATRIX<T,d> Fe_dot_hat=U(t).Transpose_Times(strain_measure.Ds(V,t))*De_inverse_hat(t)*sqrt_Be_scales(t);
         constitutive_model.P_From_Strain_Rate_First_Half(Fe_hat(t),aggregate.Array_View(start_force,half_force_size),Fe_dot_hat,t);
         start_force+=half_force_size;}
@@ -453,7 +451,7 @@ Add_Velocity_Dependent_Forces_Second_Half(const ARRAY_VIEW<const T> aggregate,AR
 {
     int start_force=1;
     PHYSBAM_ASSERT(!(node_stiffness && edge_stiffness && !dPi_dFe && !dP_dFe) && compute_half_forces);
-    for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+    for(int t:force_elements){
         T_MATRIX forces=U(t)*constitutive_model.P_From_Strain_Rate_Second_Half(Fe_hat(t),aggregate.Array_View(start_force,half_force_size),t).Times_Transpose(De_inverse_hat(t))*sqrt_Be_scales(t);
         strain_measure.Distribute_Force(F,t,forces);
         start_force+=half_force_size;}
@@ -478,7 +476,7 @@ Potential_Energy(const T time) const
     T potential_energy=0;
     if(anisotropic_model) PHYSBAM_NOT_IMPLEMENTED();
     else
-        for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+        for(int t:force_elements){
             potential_energy-=Be_scales(t)*isotropic_model->Energy_Density(Fe_hat(t),t);}
     return potential_energy;
 }
@@ -489,21 +487,21 @@ template<class TV,int d> void FINITE_VOLUME<TV,d>::
 Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> VV,ARRAY_VIEW<TV> F,const T time,bool transpose) const
 {
     if(node_stiffness && edge_stiffness){
-        for(FORCE_ITERATOR iterator(force_particles);iterator.Valid();iterator.Next()){int p=iterator.Data();
+        for(int p:force_particles){
             F(p)+=(*node_stiffness)(p)*VV(p);}
-        for(FORCE_ITERATOR iterator(*force_segments);iterator.Valid();iterator.Next()){int e=iterator.Data();
+        for(int e:*force_segments){
             int m,n;strain_measure.mesh.segment_mesh->elements(e).Get(m,n);
             F(m)+=(*edge_stiffness)(e)*VV(n);F(n)+=(*edge_stiffness)(e).Transpose_Times(VV(m));}}
     else if(anisotropic_model){
         if(!dPi_dFe && !dP_dFe) PHYSBAM_FATAL_ERROR();
-        for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+        for(int t:force_elements){
             T_MATRIX dDs=strain_measure.Ds(VV,t),dG;
             if(dP_dFe) dG=U(t)*(Be_scales(t)*anisotropic_model->dP_From_dF(U(t).Transpose_Times(dDs)*De_inverse_hat(t),Fe_hat(t),(*V)(t),(*dP_dFe)(t),t)).Times_Transpose(De_inverse_hat(t));
             else dG=U(t)*(Be_scales(t)*anisotropic_model->dP_From_dF(U(t).Transpose_Times(dDs)*De_inverse_hat(t),Fe_hat(t),(*V)(t),(*dPi_dFe)(t),t)).Times_Transpose(De_inverse_hat(t));
             strain_measure.Distribute_Force(F,t,dG);}}
     else{
         if(!dPi_dFe) PHYSBAM_FATAL_ERROR();
-        for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+        for(int t:force_elements){
             T_MATRIX dDs=strain_measure.Ds(VV,t);
             T_MATRIX dG=U(t)*(Be_scales(t)*isotropic_model->dP_From_dF(U(t).Transpose_Times(dDs)*De_inverse_hat(t),(*dPi_dFe)(t),t)).Times_Transpose(De_inverse_hat(t));
             strain_measure.Distribute_Force(F,t,dG);}}
