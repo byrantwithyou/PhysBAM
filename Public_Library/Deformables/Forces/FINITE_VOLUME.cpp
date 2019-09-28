@@ -507,6 +507,26 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> VV,ARRAY_VIEW<TV> 
             strain_measure.Distribute_Force(F,t,dG);}}
 }
 //#####################################################################
+// Function Compute_Sound_Speed
+//#####################################################################
+template<class TV,int d> auto FINITE_VOLUME<TV,d>::
+Compute_Sound_Speed() const -> T
+{
+    assert(!anisotropic_model && isotropic_model);
+    ARRAY<int> counts(particles.number);
+    counts.Subset(strain_measure.mesh.elements.Flattened())+=1;
+    T speed=0;
+    for(int t:force_elements)
+    {
+        T mass=0;
+        for(int p:strain_measure.mesh.elements(t))
+            mass+=particles.mass(p)/counts(p);
+        T density=mass/strain_measure.mesh_object.Element_Size(t);
+        speed=max(speed,isotropic_model->Sound_Speed(Fe_hat(t),density,t));
+    }
+    return speed;
+}
+//#####################################################################
 namespace PhysBAM{
 template class FINITE_VOLUME<VECTOR<float,2>,2>;
 template class FINITE_VOLUME<VECTOR<float,3>,2>;

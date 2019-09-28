@@ -144,6 +144,31 @@ Test(const DIAGONAL_MATRIX<T,d>& F,const int id) const
         Isotropic_Stress_Derivative(Fd,dPi_dF[i],id);}
     Report_Diagnostics(F,E0,E,P0,P,dPi_dF0,dPi_dF,e);
 }
+//#####################################################################
+// Function Sound_Speed
+//#####################################################################
+template<class T,int d> T ISOTROPIC_CONSTITUTIVE_MODEL<T,d>::
+Sound_Speed(const DIAGONAL_MATRIX<T,d>& F,
+    const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dPi_dF,T density)
+{
+    // This does not handle all cases, but it suffices nearly always in practice.
+    TV F2=(F*F).x;
+    T cm=(dPi_dF.H.Diagonal_Part()*F2).Max();
+    for(int a=0;a<TV::m;a++)
+        for(int i=0;i<2;i++)
+            cm=max(cm,dPi_dF.B(a)*F2((a+i+1)%TV::m));
+    return sqrt(cm/density);
+}
+//#####################################################################
+// Function Sound_Speed
+//#####################################################################
+template<class T,int d> T ISOTROPIC_CONSTITUTIVE_MODEL<T,d>::
+Sound_Speed(const DIAGONAL_MATRIX<T,d>& F,T density,const int id) const
+{
+    DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV> dPi_dF;
+    Isotropic_Stress_Derivative(F,dPi_dF,id);
+    return Sound_Speed(F,dPi_dF,density);
+}
 namespace PhysBAM{
 template class ISOTROPIC_CONSTITUTIVE_MODEL<float,1>;
 template class ISOTROPIC_CONSTITUTIVE_MODEL<float,2>;

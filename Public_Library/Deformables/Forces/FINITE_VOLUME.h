@@ -97,6 +97,7 @@ public:
     void Add_Semi_Implicit_Impulse(const int element,const T dt,T* time_plus_dt);
     void Add_Semi_Implicit_Impulses(const T dt,ARRAY<T>* time_plus_dt);
     T Potential_Energy(const T time) const override;
+    T Compute_Sound_Speed() const;
 //#####################################################################
 };
 

@@ -5,6 +5,7 @@
 #include <Core/Log/DEBUG_SUBSTEPS.h>
 #include <Core/Log/LOG.h>
 #include <Core/Log/SCOPE.h>
+#include <Core/Math_Tools/RANGE_ITERATOR.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/MINRES.h>
@@ -14,6 +15,10 @@
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
+#include <Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
+#include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
+#include <Deformables/Forces/FINITE_VOLUME.h>
+#include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_DRIVER.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
@@ -25,9 +30,6 @@
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
 #include <Hybrid_Methods/System/MPM_KRYLOV_VECTOR.h>
 #include <Hybrid_Methods/System/MPM_OBJECTIVE.h>
-#include <Core/Math_Tools/RANGE_ITERATOR.h>
-#include <Solids/Solids/SOLID_BODY_COLLECTION.h>
-#include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 
 #ifdef USE_OPENMP
 #include <omp.h>
@@ -721,12 +723,15 @@ Compute_Max_Sound_Speed() const -> T
 #pragma omp parallel for reduction(max:max_speed)
             for(int k=0;k<example.simulated_particles.m;k++){
                 int p=example.simulated_particles(k);
-                const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dpdf=force->dPi_dF(p);
-                const DIAGONAL_MATRIX<T,TV::m>& sigma=force->sigma(p);
-                T cm=Compute_Maximum_Tensor_Contraction(dpdf,sigma);
                 T density=example.particles.mass(p)/example.particles.volume(p);
-                T speed=sqrt(cm/density);
+                T speed=ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>::Sound_Speed(
+                    force->sigma(p),force->dPi_dF(p),density);
                 max_speed=max(max_speed,speed);}}}
+
+    for(auto* pf:example.lagrangian_forces)
+        if(FINITE_VOLUME<TV,TV::m>* fv=dynamic_cast<FINITE_VOLUME<TV,TV::m>*>(pf))
+            max_speed=max(max_speed,fv->Compute_Sound_Speed());
+
     return max_speed;
 }
 //#####################################################################

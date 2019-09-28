@@ -27,6 +27,8 @@ public:
     virtual void Update_State_Dependent_Auxiliary_Variables(const DIAGONAL_MATRIX<T,d>& F,const int id);
     virtual T Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int id) const=0;
     void Test(const DIAGONAL_MATRIX<T,d>& F,const int id) const;
+    T Sound_Speed(const DIAGONAL_MATRIX<T,d>& F,T density,const int id) const;
+    static T Sound_Speed(const DIAGONAL_MATRIX<T,d>& F,const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dPi_dF,T density);
 //#####################################################################
 };
 }
