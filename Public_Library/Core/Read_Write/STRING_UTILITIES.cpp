@@ -48,6 +48,14 @@ std::string toupper(const std::string& str)
     return str_copy;
 }
 
+std::string tolower(const std::string& str)
+{
+    std::string str_copy=str;
+    for(std::string::iterator iter=str_copy.begin();iter!=str_copy.end();iter++)
+        *iter=::tolower(*iter);
+    return str_copy;
+}
+
 bool Parse_Integer_Range(const std::string& str,ARRAY<int>& integer_list)
 {
     const char* c_str=str.c_str();

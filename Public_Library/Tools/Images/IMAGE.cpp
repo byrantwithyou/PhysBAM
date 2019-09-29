@@ -20,7 +20,7 @@ using namespace PhysBAM;
 template<class T> template<int d> void IMAGE<T>::
 Read(const std::string& filename,ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& image)
 {
-    std::string extension=Get_File_Extension(filename);
+    std::string extension=tolower(Get_File_Extension(filename));
     if(extension=="bmp") BMP_FILE<T>::Read(filename,image);
     else if(extension=="jpg") JPG_FILE<T>::Read(filename,image);
     else if(extension=="ppm") PPM_FILE<T>::Read(filename,image);
@@ -58,7 +58,7 @@ Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& imag
                     if(random_stuff(k)>normalized_values(k)) corrected_image->array(t)[k]=(floored_values[k]+(T).5001)/(T)256; // use normal quantized floor
                     else corrected_image->array(t)[k]=(floored_values[k]+(T)1.5001)/(T)256;}}} // jump to next value
     const ARRAY<VECTOR<T,d> ,VECTOR<int,2> > &image_to_write=corrected_image?*corrected_image:image;
-    std::string extension=Get_File_Extension(filename);
+    std::string extension=tolower(Get_File_Extension(filename));
     if(extension=="bmp") BMP_FILE<T>::Write(filename,image_to_write);
     else if(extension=="jpg") JPG_FILE<T>::Write(filename,image_to_write);
     else if(extension=="ppm") PPM_FILE<T>::Write(filename,image_to_write);
@@ -74,7 +74,7 @@ Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& imag
 template<class T> bool IMAGE<T>::
 Is_Supported(const std::string& filename)
 {
-    std::string extension=Get_File_Extension(filename);
+    std::string extension=tolower(Get_File_Extension(filename));
     if(extension=="bmp") return BMP_FILE<T>::Is_Supported();
     else if(extension=="jpg") return JPG_FILE<T>::Is_Supported();
     else if(extension=="ppm") return PPM_FILE<T>::Is_Supported();

@@ -21,6 +21,7 @@ bool Is_Number(const std::string& str); // integer or floating point
 int Compare_Strings(const std::string &str1,const std::string &str2,bool case_sensitive=true);
 int Compare_Strings(const char* str1,int len1,const char* str2,int len2,bool case_sensitive=true);
 std::string toupper(const std::string& str);
+std::string tolower(const std::string& str);
 bool Parse_Integer_Range(const std::string& str,ARRAY<int>& integer_list);
 
 // integer list format: [range],[range],[range],... where each [range] is either a single <number> or <number>-<number>, e.g. "1-3,4,7,10-11"
