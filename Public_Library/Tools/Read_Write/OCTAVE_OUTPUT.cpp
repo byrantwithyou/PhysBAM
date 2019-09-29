@@ -337,11 +337,12 @@ operator<(const OCTAVE_SPARSE_MATRIX_ENTRY<T>& o) const
 template<class T> template<class T2> void OCTAVE_OUTPUT<T>::
 Write(const char* name,const ARRAY<T2,VECTOR<int,2> >& m)
 {
-    VECTOR<int,2> counts=m.domain.Edge_Lengths();
+    VECTOR<int,2> counts=m.domain.Edge_Lengths(),i;
     out<<"% name: "<<name<<"\n% type: matrix\n% rows: "<<counts.y<<"\n% columns: "<<counts.x<<"\n";
-    for(RANGE_ITERATOR<2> it(m.domain);it.Valid();it.Next()){
-        out<<m(it.index)<<" ";
-        if(it.index(0)>=m.domain.max_corner(0)) out<<"\n";}
+    for(i.y=m.domain.min_corner.y;i.y<m.domain.max_corner.y;i.y++){
+        for(i.x=m.domain.min_corner.x;i.x<m.domain.max_corner.x;i.x++)
+            out<<m(i)<<" ";
+        out<<"\n";}
 }
 //#####################################################################
 // Function Write
@@ -349,11 +350,13 @@ Write(const char* name,const ARRAY<T2,VECTOR<int,2> >& m)
 template<class T> template<class T2,int d> void OCTAVE_OUTPUT<T>::
 Write(const char* name,const ARRAY<VECTOR<T2,d>,VECTOR<int,2> >& m)
 {
-    VECTOR<int,2> counts=m.domain.Edge_Lengths();
+    VECTOR<int,2> counts=m.domain.Edge_Lengths(),i;
     out<<"% name: "<<name<<"\n% type: matrix\n% ndims: 3\n"<<counts.x<<" "<<counts.y<<" "<<d<<"\n";
-    for(int i=0;i<d;i++)
-        for(RANGE_ITERATOR<2> it(m.domain);it.Valid();it.Next())
-            out<<m(it.index)(i)<<std::endl;
+    for(int a=0;a<d;a++)
+        for(i.y=m.domain.min_corner.y;i.y<m.domain.max_corner.y;i.y++){
+            for(i.x=m.domain.min_corner.x;i.x<m.domain.max_corner.x;i.x++)
+                out<<m(i)(a)<<" ";
+            out<<"\n";}
 }
 //#####################################################################
 // Function Write
