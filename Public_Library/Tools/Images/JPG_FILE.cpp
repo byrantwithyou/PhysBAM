@@ -39,24 +39,34 @@ Read(const std::string& filename,ARRAY<VECTOR<T,4> ,VECTOR<int,2> >& image)
 template<class T> void JPG_FILE<T>::
 Read(const std::string& filename,ARRAY<VECTOR<T,3> ,VECTOR<int,2> >& image)
 {
-    struct jpeg_decompress_struct cinfo;FILE * infile;int row_stride;struct jpeg_error_mgr error_manager;
+    struct jpeg_decompress_struct cinfo;
+    FILE * infile = 0;
+    int row_stride=0;
+    struct jpeg_error_mgr error_manager;
     if(!(infile=fopen(filename.c_str(),"rb"))) throw READ_ERROR(LOG::sprintf("JPG_FILE::Read: Can't open %s",filename.c_str()));
-    cinfo.err=jpeg_std_error(&error_manager);error_manager.error_exit=Read_Error;
-    jpeg_create_decompress(&cinfo);jpeg_stdio_src(&cinfo,infile);jpeg_read_header(&cinfo,TRUE);jpeg_start_decompress(&cinfo);
+    cinfo.err=jpeg_std_error(&error_manager);
+    error_manager.error_exit=Read_Error;
+    jpeg_create_decompress(&cinfo);
+    jpeg_stdio_src(&cinfo,infile);
+    jpeg_read_header(&cinfo,TRUE);
+    jpeg_start_decompress(&cinfo);
 
     row_stride=cinfo.output_width*cinfo.output_components;
-    JSAMPLE* row=new unsigned char[row_stride];JSAMPROW row_pointer[]={row};
+    JSAMPLE* row=new unsigned char[row_stride];
+    JSAMPROW row_pointer[]={row};
     LOG::cout<<"reading "<<filename<<": "<<row_stride/3<<" x "<<cinfo.output_height<<std::endl;
 
     image.Resize(VECTOR<int,2>(cinfo.output_width,cinfo.output_height),no_init);
     VECTOR<int,2> counts=image.domain.Edge_Lengths();
     while(cinfo.output_scanline<cinfo.output_height){
-        jpeg_read_scanlines(&cinfo,row_pointer,1);int index=0;
+        jpeg_read_scanlines(&cinfo,row_pointer,1);
+        int index=0;
         for(int i=0;i<counts.x;i++){
             unsigned char r=row[index++],g=row[index++],b=row[index++];
-            image(i,counts.y-cinfo.output_scanline+1)=IMAGE<T>::Byte_Color_To_Scalar_Color(VECTOR<unsigned char,3>(r,g,b));}}
-    jpeg_finish_decompress(&cinfo);jpeg_destroy_decompress(&cinfo);delete[] row;
-
+            image(i,counts.y-cinfo.output_scanline)=IMAGE<T>::Byte_Color_To_Scalar_Color(VECTOR<unsigned char,3>(r,g,b));}}
+    jpeg_finish_decompress(&cinfo);
+    jpeg_destroy_decompress(&cinfo);
+    delete[] row;
     fclose(infile);
 }
 //#####################################################################
@@ -75,15 +85,24 @@ Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& imag
     if(!(outfile = fopen(filename.c_str(), "wb")))
         PHYSBAM_FATAL_ERROR(LOG::sprintf("JPG_FILE::Write: Can't open %s",filename.c_str()));
     jpeg_stdio_dest(&cinfo,outfile);
-    cinfo.image_width=counts.x;cinfo.image_height=counts.y;cinfo.input_components=3;
+    cinfo.image_width=counts.x;
+    cinfo.image_height=counts.y;
+    cinfo.input_components=3;
     cinfo.in_color_space=JCS_RGB; // colorspace of input image
-    jpeg_set_defaults(&cinfo);jpeg_set_quality(&cinfo,95,TRUE); // limit to baseline-JPEG values
+    jpeg_set_defaults(&cinfo);
+    jpeg_set_quality(&cinfo,95,TRUE); // limit to baseline-JPEG values
     jpeg_start_compress(&cinfo,TRUE);
 
     int row_stride=cinfo.image_width*3; // JSAMPLEs per row in image_buffer
-    JSAMPLE* row=new unsigned char[row_stride];JSAMPROW row_pointer[]={row};
+    JSAMPLE* row=new unsigned char[row_stride];
+    JSAMPROW row_pointer[]={row};
     while(cinfo.next_scanline < cinfo.image_height){
-        int index=0;for(int i=0;i<counts.x;i++){VECTOR<unsigned char,d> pixel=IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,counts.y-cinfo.next_scanline-1));row[index++]=pixel[0];row[index++]=pixel[1];row[index++]=pixel[2];} // copy row
+        int index=0;
+        for(int i=0;i<counts.x;i++){
+            VECTOR<unsigned char,d> pixel=IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,counts.y-cinfo.next_scanline));
+            row[index++]=pixel[0];
+            row[index++]=pixel[1];
+            row[index++]=pixel[2];} // copy row
         jpeg_write_scanlines(&cinfo,row_pointer,1);}
     delete[] row;
     jpeg_finish_compress(&cinfo);
