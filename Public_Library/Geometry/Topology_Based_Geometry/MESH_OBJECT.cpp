@@ -361,6 +361,29 @@ Write_Obj(const std::string& filename) const
     fout<<"\n";
 }
 //#####################################################################
+// Function Compact_Copy
+//#####################################################################
+template<class TV,class T_MESH> void MESH_OBJECT<TV,T_MESH>::
+Compact_Copy(const MESH_OBJECT& obj)
+{
+    ARRAY<int> particle_map(obj.particles.X.m);
+    particle_map.Subset(obj.mesh.elements.Flattened()).Fill(1);
+    int next_p=0;
+    for(int i=0;i<particle_map.m;i++)
+    {
+        if(particle_map(i)) particle_map(i)=next_p++;
+        else particle_map(i)=-1;
+    }
+    mesh.elements.Resize(obj.mesh.elements.m);
+    mesh.elements.Flattened()=particle_map.Subset(obj.mesh.elements.Flattened());
+
+    particles.Add_Elements(next_p);
+    for(int i=0;i<particle_map.m;i++)
+        if(particle_map(i)>=0)
+            particles.X(particle_map(i))=obj.particles.X(i);
+    Update_Number_Nodes();
+}
+//#####################################################################
 namespace PhysBAM{
 template class MESH_OBJECT<VECTOR<float,1>,POINT_SIMPLEX_MESH>;
 template class MESH_OBJECT<VECTOR<float,1>,SEGMENT_MESH>;

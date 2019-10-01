@@ -861,22 +861,9 @@ Remove_Degenerate_Triangles(const T area_threshold)
 template<class T> TRIANGULATED_SURFACE<T>* TRIANGULATED_SURFACE<T>::
 Create_Compact_Copy() const
 {
-    ARRAY<int> new_to_old;
-    HASHTABLE<int,int> old_to_new;
-    TRIANGLE_MESH* triangle_mesh=new TRIANGLE_MESH;
-    triangle_mesh->elements.Resize(mesh.elements.m);
-    for(int i=0;i<mesh.elements.m;i++){const VECTOR<int,3>& element=mesh.elements(i);
-        for(int j=0;j<3;j++){
-            int& a=old_to_new.Get_Or_Insert(element(j),-1);
-            if(a<0) a=new_to_old.Append(element(j));
-            triangle_mesh->elements(i)(j)=a;}}
-
-    GEOMETRY_PARTICLES<TV>* deformable_geometry_particle=new GEOMETRY_PARTICLES<TV>;
-    deformable_geometry_particle->Add_Elements(new_to_old.Size());
-    deformable_geometry_particle->X.Prefix(deformable_geometry_particle->Size())=particles.X.Subset(new_to_old);
-    TRIANGULATED_SURFACE* triangulated_surface=new TRIANGULATED_SURFACE(*triangle_mesh,*deformable_geometry_particle);
-    triangulated_surface->Update_Number_Nodes();
-    return triangulated_surface;
+    auto* obj=new TRIANGULATED_SURFACE<T>;
+    obj->Compact_Copy(*this);
+    return obj;
 }
 //#####################################################################
 // Function Print_Statistics
