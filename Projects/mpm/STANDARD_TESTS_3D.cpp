@@ -19,6 +19,7 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UNION.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UTILITIES.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
 #include <Deformables/Constitutive_Models/MOONEY_RIVLIN_CURVATURE.h>
@@ -336,6 +337,40 @@ Initialize()
             this->solid_body_collection.deformable_body_collection.Test_Forces(0);
             Add_Neo_Hookean(31.685*unit_p*scale_E,0.44022); //solve({E/(2*(1+r))=11,E*r/((1+r)*(1-2*r))=81},{E,r});
         } break;
+        case 13:{ // Lagrangian mesh example; 
+            Set_Grid(RANGE<TV>(TV(),TV(30,30,30))*m);
+            T density=5*unit_rho*scale_mass;
+            TETRAHEDRALIZED_VOLUME<T> tv,tv1,tv2;
+            Read_From_File(data_directory+"/Tetrahedralized_Volumes/sphere_2k.tet",tv);
+            SPHERE<TV> sphere1(TV(10,13,15)*m,2*m);
+            VECTOR<T,3> angular_velocity1(TV(0,0,foo_T1));
+            SPHERE<TV> sphere2(TV(20,15,15)*m,2*m);
+            VECTOR<T,3> angular_velocity2(TV(0,0,foo_T2));
+            tv1.particles.Add_Elements(tv.particles.X.m);
+            tv2.particles.Add_Elements(tv.particles.X.m);
+            for(int i=0;i<tv.particles.X.m;i++)
+            {
+                tv1.particles.X(i)=tv.particles.X(i)*sphere1.radius+sphere1.center;
+                tv2.particles.X(i)=tv.particles.X(i)*sphere2.radius+sphere2.center;
+            }
+            tv1.mesh.elements=tv.mesh.elements;
+            tv2.mesh.elements=tv.mesh.elements;
+            tv1.Update_Number_Nodes();
+            tv2.Update_Number_Nodes();
+            auto& o1=Seed_Lagrangian_Particles(tv1,
+                [=](const TV& X){return angular_velocity1.Cross(X-sphere1.center)+TV(0.75,0,0)*(m/s);},
+                [=](const TV&){return MATRIX<T,3>::Cross_Product_Matrix(angular_velocity1);},
+                density,true,false);
+            auto& o2=Seed_Lagrangian_Particles(tv2,
+                [=](const TV& X){return angular_velocity2.Cross(X-sphere2.center)+TV(-0.75,0,0)*(m/s);},
+                [=](const TV&){return MATRIX<T,3>::Cross_Product_Matrix(angular_velocity2);},
+                density,true,false);
+            o1.Update_Number_Nodes();
+            o2.Update_Number_Nodes();
+            Add_Fixed_Corotated(o1,31.685*unit_p*scale_E,0.44022); //solve({E/(2*(1+r))=11,E*r/((1+r)*(1-2*r))=81},{E,r});
+            Add_Fixed_Corotated(o2,31.685*unit_p*scale_E,0.44022); //solve({E/(2*(1+r))=11,E*r/((1+r)*(1-2*r))=81},{E,r});
+        } break;
+
         case 14:{ // drop an oldroyd-b to a ground SCA energy
             Set_Grid(RANGE<TV>(TV(-1,0,-1),TV(1,1,1))*m,TV_INT(2,1,2));
             RANGE<TV> ym(TV(-5,0,-5)*m,TV(5,.1,5)*m);
