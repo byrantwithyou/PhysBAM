@@ -17,14 +17,13 @@ namespace PhysBAM{
 //#####################################################################
 template<int d> SIMPLEX_MESH<d>::
 SIMPLEX_MESH()
-    :number_nodes(0),neighbor_nodes(0),incident_elements(0),adjacent_elements(0),neighbor_elements(0)
+    :number_nodes(0)
 {}
 //#####################################################################
 // Constructor
 //#####################################################################
 template<int d> SIMPLEX_MESH<d>::
 SIMPLEX_MESH(const int number_nodes_input,const ARRAY<VECTOR<int,d+1> >& simplex_list)
-    :neighbor_nodes(0),incident_elements(0),adjacent_elements(0),neighbor_elements(0)
 {
     Initialize_Mesh(number_nodes_input,simplex_list);
 }
@@ -33,7 +32,6 @@ SIMPLEX_MESH(const int number_nodes_input,const ARRAY<VECTOR<int,d+1> >& simplex
 //#####################################################################
 template<int d> SIMPLEX_MESH<d>::
 SIMPLEX_MESH(const SIMPLEX_MESH& mesh)
-    :neighbor_nodes(0),incident_elements(0),adjacent_elements(0),neighbor_elements(0)
 {
     Initialize_Mesh(mesh);
 }
@@ -43,7 +41,11 @@ SIMPLEX_MESH(const SIMPLEX_MESH& mesh)
 template<int d> SIMPLEX_MESH<d>::
 ~SIMPLEX_MESH()
 {
-    delete neighbor_nodes;delete incident_elements;delete adjacent_elements;delete neighbor_elements;
+    delete neighbor_nodes;
+    delete incident_elements;
+    delete adjacent_elements;
+    delete neighbor_elements;
+    delete node_list;
 }
 //#####################################################################
 // Function Clean_Memory
@@ -51,7 +53,8 @@ template<int d> SIMPLEX_MESH<d>::
 template<int d> void SIMPLEX_MESH<d>::
 Clean_Memory()
 {
-    elements.Clean_Memory();Delete_Auxiliary_Structures();
+    elements.Clean_Memory();
+    Delete_Auxiliary_Structures();
 }
 //#####################################################################
 // Function Delete_Auxiliary_Structures
@@ -59,7 +62,16 @@ Clean_Memory()
 template<int d> void SIMPLEX_MESH<d>::
 Delete_Auxiliary_Structures()
 {
-    delete neighbor_nodes;neighbor_nodes=0;delete incident_elements;incident_elements=0;delete adjacent_elements;adjacent_elements=0;delete neighbor_elements;neighbor_elements=0;
+    delete neighbor_nodes;
+    neighbor_nodes=0;
+    delete incident_elements;
+    incident_elements=0;
+    delete adjacent_elements;
+    adjacent_elements=0;
+    delete neighbor_elements;
+    neighbor_elements=0;
+    delete node_list;
+    node_list=0;
 }
 //#####################################################################
 // Function Refresh_Auxiliary_Structures
@@ -88,6 +100,29 @@ Simplex(const VECTOR<int,d+1>& nodes) const
     for(int k=0;k<(*incident_elements)(short_list).m;k++){int t=(*incident_elements)(short_list)(k);
         if(Nodes_In_Simplex(check,t)) return t;}
     return -1;
+}
+//#####################################################################
+// Function Initialize_Nodes
+//#####################################################################
+template<int d> void SIMPLEX_MESH<d>::
+Initialize_Nodes(bool reinitialize)
+{
+    if(node_list!=0 && node_list->Size()==number_nodes && !reinitialize) return;
+    delete node_list;
+    node_list=new ARRAY<int>();
+    Append_Unique_Nodes(*node_list);
+}
+//#####################################################################
+// Function Append_Unique_Nodes
+//#####################################################################
+template<int d> void SIMPLEX_MESH<d>::
+Append_Unique_Nodes(ARRAY<int>& indices) const
+{
+    ARRAY<int> table(number_nodes);
+    table.Subset(elements.Flattened()).Fill(1);
+    for(int i=0;i<table.m;i++)
+        if(table(i))
+            indices.Append(i);
 }
 //#####################################################################
 // Function Initialize_Neighbor_Nodes
@@ -299,6 +334,7 @@ Assert_Consistent() const
     if(incident_elements) assert(incident_elements->m==number_nodes);
     if(adjacent_elements) assert(adjacent_elements->m==elements.m);
     if(neighbor_elements) assert(neighbor_elements->m==elements.m);
+    if(node_list) assert(node_list->m==number_nodes);
     return true;
 }
 //#####################################################################

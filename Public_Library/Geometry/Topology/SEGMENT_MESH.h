@@ -55,7 +55,7 @@ public:
     void Refresh_Auxiliary_Structures() override;
     void Initialize_Connected_Segments();
     void Initialize_Ordered_Loop_Nodes();
-    void Initialize_Straight_Mesh(const int number_of_points,bool loop=false);
+    void Initialize_Straight_Mesh(const int number_of_points,bool loop=false,int start_offset=0);
     void Initialize_Boundary_Mesh();
     bool Assert_Consistent() const override;
 //#####################################################################

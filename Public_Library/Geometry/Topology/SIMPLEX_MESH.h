@@ -24,10 +24,11 @@ public:
 
     int number_nodes; // number of nodes in the mesh
     ARRAY<VECTOR<int,d+1> > elements; // array of d+1 indices for each simplex - elements(i,t) is i'th index in simplex t
-    ARRAY<ARRAY<int> >* neighbor_nodes; // for each node, list of neighboring nodes
-    ARRAY<ARRAY<int> >* incident_elements; // for each node, list of neighboring simplices that contain it
-    ARRAY<ARRAY<int> >* adjacent_elements; // for each simplex, list of (up to d+1) adjacent neighboring simplices
-    ARRAY<ARRAY<int> >* neighbor_elements; // for each simplex, list of simplices sharing at least one node
+    ARRAY<ARRAY<int> >* neighbor_nodes=0; // for each node, list of neighboring nodes
+    ARRAY<ARRAY<int> >* incident_elements=0; // for each node, list of neighboring simplices that contain it
+    ARRAY<ARRAY<int> >* adjacent_elements=0; // for each simplex, list of (up to d+1) adjacent neighboring simplices
+    ARRAY<ARRAY<int> >* neighbor_elements=0; // for each simplex, list of simplices sharing at least one node
+    ARRAY<int>* node_list=0; // array of indices of nodes in simplex
 
     SIMPLEX_MESH(); // simplest constructor - null mesh
     SIMPLEX_MESH(const int number_nodes_input,const ARRAY<VECTOR<int,d+1> >& simplex_list);
@@ -91,6 +92,7 @@ public:
     void Initialize_Neighbor_Nodes();
     void Initialize_Incident_Elements();
     void Initialize_Adjacent_Elements();
+    void Initialize_Nodes(bool reinitialize=true);
 private: // helper function for Initialize_Adjacent_Elements
     void Find_And_Append_Adjacent_Elements(const int simplex,const VECTOR<int,d>& face);
 public:
@@ -110,6 +112,7 @@ public:
     void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const;
     template<class T> void Mark_Nodes_Referenced(ARRAY<T>& marks,const T& mark) const;
     template<int d2> void Simplices_On_Subsimplex(const VECTOR<int,d2>& subsimplex_nodes,ARRAY<int>& simplices_on_subsimplex) const;
+    void Append_Unique_Nodes(ARRAY<int>& indices) const;
 //#####################################################################
 };
 }

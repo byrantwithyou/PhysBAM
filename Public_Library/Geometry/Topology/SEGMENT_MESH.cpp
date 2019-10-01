@@ -112,13 +112,13 @@ Initialize_Ordered_Loop_Nodes()
 // Function Initialize_Straight_Mesh
 //#####################################################################
 void SEGMENT_MESH::
-Initialize_Straight_Mesh(const int number_of_points,bool loop)
+Initialize_Straight_Mesh(const int number_of_points,bool loop,int start_offset)
 {
     Clean_Memory();
-    number_nodes=number_of_points;
+    number_nodes=number_of_points+start_offset;
     elements.Exact_Resize(number_of_points-!loop);
-    for(int i=0;i<number_of_points-1;i++)elements(i).Set(i,i+1);
-    if(loop) elements(number_of_points-1).Set(number_of_points-1,0);
+    for(int i=0;i<number_of_points-1;i++)elements(i).Set(start_offset+i,start_offset+i+1);
+    if(loop) elements(number_of_points-1).Set(number_nodes-1,start_offset);
 }
 //#####################################################################
 // Function Initialize_Boundary_Mesh
