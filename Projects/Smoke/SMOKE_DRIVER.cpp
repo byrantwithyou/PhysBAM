@@ -112,7 +112,7 @@ Particle_To_Grid()
     example.face_velocities.Fill((T)0);
 
     example.boundary->Set_Fixed_Boundary(true,0);
-    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(example.grid,ghost,false);
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(example.grid,ghost,no_init);
     example.boundary->Fill_Ghost_Faces(example.grid,example.face_velocities,face_velocities_ghost,time,ghost);
 
     // Rasterize mass and momentum to faces
@@ -152,7 +152,7 @@ template<class TV> void SMOKE_DRIVER<TV>::
 Grid_To_Particle()
 {
     example.boundary->Set_Fixed_Boundary(true,0);
-    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(example.grid,ghost,false);
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(example.grid,ghost,no_init);
     example.boundary->Fill_Ghost_Faces(example.grid,example.face_velocities,face_velocities_ghost,time,ghost);
 
     SMOKE_PARTICLES<TV>& particles=example.particles;
@@ -264,7 +264,7 @@ Convect(const T dt,const T time)
         Particle_To_Grid();}
     else{
         example.boundary->Set_Fixed_Boundary(true,0);
-        ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(example.grid,ghost,false);
+        ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(example.grid,ghost,no_init);
         example.boundary->Fill_Ghost_Faces(example.grid,example.face_velocities,face_velocities_ghost,time,ghost);
         example.advection_scalar.Update_Advection_Equation_Face(
         example.grid,example.face_velocities,face_velocities_ghost,face_velocities_ghost,*example.boundary,dt,time);

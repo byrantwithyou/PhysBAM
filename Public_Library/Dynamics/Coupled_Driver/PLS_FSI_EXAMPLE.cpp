@@ -392,16 +392,10 @@ template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
 Set_Boundary_Conditions(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,ARRAY<T,TV_INT>& psi_D_value,
     ARRAY<T,FACE_INDEX<TV::m> >& psi_N_value) const
 {
-    void Resize(const RANGE<TV_INT>& box,const bool initialize_new_elements=true,const bool copy_existing_elements=true,const T& initialization_value=T());
-
-    psi_D.Resize(fluids_parameters.grid->Domain_Indices(3),no_init);
-    psi_N.Resize(fluids_parameters.grid->Domain_Indices(3),false,false);
-    psi_D_value.Resize(fluids_parameters.grid->Domain_Indices(3),no_init);
-    psi_N_value.Resize(fluids_parameters.grid->Domain_Indices(3),false,false);
-    psi_D.Fill(false);
-    psi_N.Fill(false);
-    psi_D_value.Fill(0);
-    psi_N_value.Fill(0);
+    psi_D.Resize(fluids_parameters.grid->Domain_Indices(3),init_all,false);
+    psi_N.Resize(fluids_parameters.grid->Domain_Indices(3),init_all,false);
+    psi_D_value.Resize(fluids_parameters.grid->Domain_Indices(3),init_all,0);
+    psi_N_value.Resize(fluids_parameters.grid->Domain_Indices(3),init_all,0);
 
     GRID<TV>& grid=*fluids_parameters.grid;
     for(CELL_ITERATOR<TV> it(grid,3,GRID<TV>::GHOST_REGION);it.Valid();it.Next()){

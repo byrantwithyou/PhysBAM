@@ -37,17 +37,39 @@ public:
     {}
 
     template<class T2>
-    ARRAY(const GRID<VECTOR<T2,dimension> >& grid,const int ghost_cells=0,const bool initialize_using_default_constructor=true)
-    {Resize(grid,ghost_cells,initialize_using_default_constructor);}
+    ARRAY(const GRID<VECTOR<T2,d> >& grid,const int ghost_cells=0)
+    {Resize(grid.Domain_Indices(ghost_cells),true,false,T());}
 
-    ARRAY(const RANGE<TV_INT>& domain_indices_input,const bool initialize_using_default_constructor=true)
-    {Resize(domain_indices_input,initialize_using_default_constructor);}
+    template<class T2>
+    ARRAY(const GRID<VECTOR<T2,d> >& grid,const int ghost_cells,NO_INIT)
+    {Resize(grid.Domain_Indices(ghost_cells),false,false,T());}
+
+    template<class T2>
+    ARRAY(const GRID<VECTOR<T2,d> >& grid,NO_INIT)
+    {Resize(grid.Domain_Indices(),false,false,T());}
+
+    template<class T2>
+    ARRAY(const GRID<VECTOR<T2,d> >& grid,const int ghost_cells,USE_INIT,const T& initialization_value=T())
+    {Resize(grid.Domain_Indices(ghost_cells),true,false,initialization_value);}
+
+    template<class T2>
+    ARRAY(const GRID<VECTOR<T2,d> >& grid,USE_INIT,const T& initialization_value=T())
+    {Resize(grid.Domain_Indices(),true,false,initialization_value);}
+
+    ARRAY(const RANGE<TV_INT>& domain_indices_input)
+    {Resize(domain_indices_input,true,false,T());}
+
+    ARRAY(const RANGE<TV_INT>& domain_indices_input,NO_INIT)
+    {Resize(domain_indices_input,false,false,T());}
+
+    ARRAY(const RANGE<TV_INT>& domain_indices_input,USE_INIT,const T& initialization_value=T())
+    {Resize(domain_indices_input,true,false,initialization_value);}
 
     ARRAY(const ARRAY& old_array)
-    {Resize(old_array.Domain_Indices(),false,false);Copy(old_array);}
+    {Resize(old_array.Domain_Indices(),false,false,T());Copy(old_array);}
 
     ARRAY(ARRAY&& old_array) = default;
-
+    
     virtual ~ARRAY()
     {delete[] array.base_pointer;}
 
@@ -66,15 +88,52 @@ public:
     {return domain_indices;}
 
     ARRAY& operator=(const ARRAY& source)
-    {if(source.Domain_Indices()!=Domain_Indices()) Resize(source.Domain_Indices(),false,false);Copy(source);return *this;}
+    {if(source.Domain_Indices()!=Domain_Indices()) Resize(source.Domain_Indices(),no_init);Copy(source);return *this;}
 
     ARRAY& operator=(ARRAY&&) = default;
 
     template<class T2>
-    void Resize(const GRID<VECTOR<T2,dimension> >& grid,const int ghost_cells=0,const bool initialize_new_elements=true,const bool copy_existing_elements=true,const T& initialization_value=T())
-    {Resize(grid.Domain_Indices(ghost_cells),initialize_new_elements,copy_existing_elements,initialization_value);}
+    void Resize(const GRID<VECTOR<T2,d> >& grid,const int ghost_cells=0)
+    {Resize(grid.Domain_Indices(ghost_cells),true,true,T());}
 
-    virtual void Resize(const RANGE<TV_INT>& domain,const bool initialize_new_elements=true,const bool copy_existing_elements=true,const T& initialization_value=T())
+    template<class T2>
+    void Resize(const GRID<VECTOR<T2,d> >& grid,const int ghost_cells,NO_INIT)
+    {Resize(grid.Domain_Indices(ghost_cells),false,false,T());}
+
+    template<class T2>
+    void Resize(const GRID<VECTOR<T2,d> >& grid,NO_INIT)
+    {Resize(grid.Domain_Indices(),false,false,T());}
+
+    template<class T2>
+    void Resize(const GRID<VECTOR<T2,d> >& grid,const int ghost_cells,USE_INIT,const T& initialization_value=T())
+    {Resize(grid.Domain_Indices(ghost_cells),true,true,initialization_value);}
+
+    template<class T2>
+    void Resize(const GRID<VECTOR<T2,d> >& grid,USE_INIT,const T& initialization_value=T())
+    {Resize(grid.Domain_Indices(),true,true,initialization_value);}
+
+    template<class T2>
+    void Resize(const GRID<VECTOR<T2,d> >& grid,const int ghost_cells,INIT_ALL,const T& initialization_value=T())
+    {Resize(grid.Domain_Indices(ghost_cells),true,false,initialization_value);}
+
+    template<class T2>
+    void Resize(const GRID<VECTOR<T2,d> >& grid,INIT_ALL,const T& initialization_value=T())
+    {Resize(grid.Domain_Indices(),true,false,initialization_value);}
+
+    void Resize(const RANGE<TV_INT>& domain_indices_input)
+    {Resize(domain_indices_input,true,true,T());}
+
+    void Resize(const RANGE<TV_INT>& domain_indices_input,NO_INIT)
+    {Resize(domain_indices_input,false,false,T());}
+
+    void Resize(const RANGE<TV_INT>& domain_indices_input,USE_INIT,const T& initialization_value=T())
+    {Resize(domain_indices_input,true,true,initialization_value);}
+
+    void Resize(const RANGE<TV_INT>& domain_indices_input,INIT_ALL,const T& initialization_value=T())
+    {Resize(domain_indices_input,true,false,initialization_value);}
+
+  protected:
+    virtual void Resize(const RANGE<TV_INT>& domain,const bool initialize_new_elements,const bool copy_existing_elements,const T& initialization_value)
     {TV_INT sizes_new;bool early_return=true;
     VECTOR<RANGE<TV_INT>,dimension> domains;
     domain_indices=domain;
@@ -99,9 +158,10 @@ public:
         p_start+=sizes_new(i);}
     delete[] array.base_pointer;
     array.Set(p,new_length);}
-
+  public:
+    
     void Clean_Memory()
-    {Resize(RANGE<TV_INT>(TV_INT::All_Ones_Vector(),TV_INT()),false,false);}
+    {Resize(RANGE<TV_INT>(TV_INT::All_Ones_Vector(),TV_INT()),false,false,T());}
 
     void Delete_Pointers_And_Clean_Memory()
     {for(int i=0;i<array.m;i++) delete array.base_pointer[i];Clean_Memory();}

@@ -42,7 +42,7 @@ public:
     void Update_Advection_Equation_Face_Lookup(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<TV::m> >& Z,const T_FACE_LOOKUP& Z_ghost,
         const T_FACE_LOOKUP& face_velocities,BOUNDARY<TV,T>& boundary,const T dt,const T time,
         const T_FACE_LOOKUP* Z_min_ghost,const T_FACE_LOOKUP* Z_max_ghost,ARRAY<T,FACE_INDEX<TV::m> >* Z_min,ARRAY<T,FACE_INDEX<TV::m> >* Z_max)
-    {ARRAY<bool,FACE_INDEX<TV::m> > face_velocities_valid_mask_next(grid,3,false);
+    {ARRAY<bool,FACE_INDEX<TV::m> > face_velocities_valid_mask_next(grid,3,no_init);
     for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT face=iterator.Face_Index();int axis=iterator.Axis();
         if(!body_list.Swept_Occupied_Face_Center(iterator.Full_Index())){

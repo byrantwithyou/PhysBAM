@@ -82,9 +82,10 @@ Update_Advection_Equation_Face_Lookup(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<TV
     ARRAY<T,FACE_INDEX<TV::m> > Z_temp=Z;
     int number_of_ghost_cells=Z_ghost.Number_Of_Ghost_Cells();
     if(!ensure_second_order){
-        ARRAY<T,FACE_INDEX<TV::m> > Z_min_ghost=Z_ghost.V_face,Z_max_ghost=Z_ghost.V_face,Z_min(grid,0,false),Z_max(grid,0,false);
+        ARRAY<T,FACE_INDEX<TV::m> > Z_min_ghost=Z_ghost.V_face,Z_max_ghost=Z_ghost.V_face,Z_min(grid,no_init),Z_max(grid,no_init);
         nested_advection.Update_Advection_Equation_Face(grid,Z_temp,Z_ghost.V_face,face_velocities.V_face,boundary,dt,time,&Z_min_ghost,&Z_max_ghost,&Z_min,&Z_max); // Z_temp now has time n+1 data
-        ARRAY<T,FACE_INDEX<TV::m> > Z_forward_ghost(grid,number_of_ghost_cells,false);boundary.Fill_Ghost_Faces(grid,Z_temp,Z_forward_ghost,time+dt,number_of_ghost_cells);
+        ARRAY<T,FACE_INDEX<TV::m> > Z_forward_ghost(grid,number_of_ghost_cells,no_init);
+        boundary.Fill_Ghost_Faces(grid,Z_temp,Z_forward_ghost,time+dt,number_of_ghost_cells);
         boundary.Fill_Ghost_Faces(grid,Z_min,Z_min_ghost,time+dt,number_of_ghost_cells);boundary.Fill_Ghost_Faces(grid,Z_max,Z_max_ghost,time+dt,number_of_ghost_cells);
         nested_advection.Update_Advection_Equation_Face(grid,Z_temp,Z_forward_ghost,face_velocities.V_face,boundary,-dt,time+dt,&Z_min_ghost,&Z_max_ghost,&Z_min,&Z_max); // Z_temp has time n data
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
@@ -96,7 +97,8 @@ Update_Advection_Equation_Face_Lookup(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<TV
             else Z(axis,index)=Z_forward_ghost(axis,index);}}
     else{
         nested_advection.Update_Advection_Equation_Face(grid,Z_temp,Z_ghost.V_face,face_velocities.V_face,boundary,dt,time,0,0,0,0); // Z_temp now has time n+1 data
-        ARRAY<T,FACE_INDEX<TV::m> > Z_forward_ghost(grid,number_of_ghost_cells,false);boundary.Fill_Ghost_Faces(grid,Z_temp,Z_forward_ghost,time+dt,number_of_ghost_cells);
+        ARRAY<T,FACE_INDEX<TV::m> > Z_forward_ghost(grid,number_of_ghost_cells,no_init);
+        boundary.Fill_Ghost_Faces(grid,Z_temp,Z_forward_ghost,time+dt,number_of_ghost_cells);
         nested_advection.Update_Advection_Equation_Face(grid,Z_temp,Z_forward_ghost,face_velocities.V_face,boundary,-dt,time+dt,0,0,0,0); // Z_temp has time n data
         for(FACE_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             FACE_INDEX<TV::m> index=iterator.Full_Index();

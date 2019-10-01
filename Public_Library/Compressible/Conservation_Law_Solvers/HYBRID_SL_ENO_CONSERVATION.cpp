@@ -62,7 +62,7 @@ Update_Conservation_Law(GRID<TV>& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRA
             }
         }
 
-        conservation->fluxes.Resize(grid.Domain_Indices(),true,false);
+        conservation->fluxes.Resize(grid.Domain_Indices(),init_all);
         conservation->Compute_Flux(grid,U,U_ghost,psi,dt,eigensystems,eigensystems_explicit,psi_N,face_velocities,outflow_boundaries,rhs,thinshell,eigensystems_auxiliary,fluxes_auxiliary);
     }
 

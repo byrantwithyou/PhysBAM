@@ -477,7 +477,7 @@ Move_Grid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const TV_INT& shift_domai
         {ARRAY<T,TV_INT> phi_ghost(grid->Domain_Indices(number_of_ghost_cells),no_init);
             phi_boundary->Fill_Ghost_Cells(*grid,particle_levelset_evolution->phi,phi_ghost,0,time,number_of_ghost_cells);
         ARRAY<T,TV_INT>::Limited_Shifted_Get(particle_levelset_evolution->phi,phi_ghost,temp_shift);}
-        {ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(*grid,number_of_ghost_cells,false);
+        {ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(*grid,number_of_ghost_cells,no_init);
             fluid_boundary->Fill_Ghost_Faces(*grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
         for(int axis=0;axis<TV::m;axis++)
             ARRAY<T,TV_INT>::Limited_Shifted_Get(face_velocities.Component(axis),face_velocities_ghost.Component(axis),temp_shift);}

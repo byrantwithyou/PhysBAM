@@ -54,8 +54,8 @@ Advance_One_Time_Step_Convection(const T dt,const T time,const ARRAY<T,FACE_INDE
 {
     // TODO: make efficient if advection velocities are same as advected velocities
     // find ghost cells
-    ARRAY<T,FACE_INDEX<TV::m> > advection_face_velocities_ghost(grid,number_of_ghost_cells,false);
-    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_to_advect_ghost(grid,number_of_ghost_cells,false);
+    ARRAY<T,FACE_INDEX<TV::m> > advection_face_velocities_ghost(grid,number_of_ghost_cells,no_init);
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_to_advect_ghost(grid,number_of_ghost_cells,no_init);
     boundary->Fill_Ghost_Faces(grid,face_velocities_to_advect,face_velocities_to_advect_ghost,time,number_of_ghost_cells);
     boundary->Fill_Ghost_Faces(grid,advecting_face_velocities,advection_face_velocities_ghost,time,number_of_ghost_cells);
 
@@ -68,7 +68,7 @@ Advance_One_Time_Step_Convection(const T dt,const T time,const ARRAY<T,FACE_INDE
 template<class TV> void INCOMPRESSIBLE_UNIFORM<TV>::
 Advance_One_Time_Step_Forces(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,const bool implicit_viscosity,const ARRAY<T,TV_INT>* phi_ghost,const int number_of_ghost_cells)
 {
-    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost;face_velocities_ghost.Resize(grid,number_of_ghost_cells,false);
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(grid,number_of_ghost_cells,no_init);
     boundary->Fill_Ghost_Faces(grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
 
     // update strain and apply elastic forces
@@ -170,7 +170,7 @@ template<class TV> void INCOMPRESSIBLE_UNIFORM<TV>::
 Implicit_Viscous_Update(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time)
 { 
     int number_of_ghost_cells=3;
-    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost;face_velocities_ghost.Resize(grid,number_of_ghost_cells,false);
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(grid,number_of_ghost_cells,no_init);
     boundary->Fill_Ghost_Faces(grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
 
     for(int axis=0;axis<TV::m;axis++){
@@ -245,7 +245,8 @@ Extrapolate_Velocity_Across_Interface(ARRAY<T,FACE_INDEX<TV::m> >& face_velociti
     const int ghost_cells=2*(int)std::ceil(band_width)+1;
     if(mpi_grid){
         ARRAY<T,FACE_INDEX<TV::m> > phi_faces(grid,ghost_cells);
-        ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(grid,ghost_cells,false);boundary->Fill_Ghost_Faces(grid,face_velocities,face_velocities_ghost,0,ghost_cells); // TODO: use real time
+        ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(grid,ghost_cells,no_init);
+        boundary->Fill_Ghost_Faces(grid,face_velocities,face_velocities_ghost,0,ghost_cells); // TODO: use real time
         ARRAY<bool,FACE_INDEX<TV::m> > fixed_faces=fixed_faces_input?*fixed_faces_input:ARRAY<bool,FACE_INDEX<TV::m> >(grid,ghost_cells);
         for(int axis=0;axis<TV::m;axis++){
             T_ARRAYS_BASE &phi_face=phi_faces.Component(axis),&face_velocity=face_velocities_ghost.Component(axis);ARRAYS_ND_BASE<bool,TV_INT>& fixed_face=fixed_faces.Component(axis);

@@ -133,7 +133,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
     rhs.v.Resize(num_cells);
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
 
-    face_velocities_ghost.Resize(*fluids_parameters.grid,3,false);
+    face_velocities_ghost.Resize(*fluids_parameters.grid,3,no_init);
     fluids_parameters.incompressible->boundary->Fill_Ghost_Faces(grid,face_velocities,face_velocities_ghost,0,3);
 
     T beta_n=1/fluids_parameters.density,beta_p=1/fluids_parameters.outside_density;
@@ -241,7 +241,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
 template<class TV> void KANG_POISSON_VISCOSITY<TV>::
 Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,bool implicit) const
 {
-    face_velocities_ghost.Resize(*fluids_parameters.grid,3,false);
+    face_velocities_ghost.Resize(*fluids_parameters.grid,3,no_init);
     fluids_parameters.incompressible->boundary->Fill_Ghost_Faces(*fluids_parameters.grid,face_velocities,face_velocities_ghost,0,3);
     for(int d=0;d<TV::m;d++){
         Apply_Viscosity(face_velocities,d,dt,implicit);

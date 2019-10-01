@@ -81,7 +81,7 @@ public:
     virtual ~INCOMPRESSIBLE();
 
     virtual void Initialize_Grids(const GRID<TV>& grid)
-    {valid_mask.Resize(grid.Domain_Indices(3),true,true,true);}
+    {valid_mask.Resize(grid.Domain_Indices(3),init_all,true);}
 
     void Set_Custom_Advection(ADVECTION<TV,T>& advection_input)
     {advection=&advection_input;}

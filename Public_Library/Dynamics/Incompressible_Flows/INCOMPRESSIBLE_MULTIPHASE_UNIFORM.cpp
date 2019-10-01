@@ -45,9 +45,9 @@ template<class TV> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>::
 Advance_One_Time_Step_Convection(const T dt,const T time,ARRAY<T,FACE_INDEX<TV::m> >& advecting_face_velocities,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_to_advect,const ARRAY<bool>* pseudo_dirichlet_regions,const int number_of_ghost_cells)
 {
     // TODO: make efficient if advection velocities are same as advected velocities
-    ARRAY<T,FACE_INDEX<TV::m> > advection_face_velocities_ghost;advection_face_velocities_ghost.Resize(grid,number_of_ghost_cells,false);
+    ARRAY<T,FACE_INDEX<TV::m> > advection_face_velocities_ghost(grid,number_of_ghost_cells,no_init);
     boundary->Fill_Ghost_Faces(grid,advecting_face_velocities,advection_face_velocities_ghost,time,number_of_ghost_cells);
-    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_to_advect_ghost;face_velocities_to_advect_ghost.Resize(grid,number_of_ghost_cells,false);
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_to_advect_ghost(grid,number_of_ghost_cells,no_init);
     boundary->Fill_Ghost_Faces(grid,face_velocities_to_advect,face_velocities_to_advect_ghost,time,number_of_ghost_cells);
 
     // update convection
@@ -74,7 +74,7 @@ Advance_One_Time_Step_Convection(const T dt,const T time,ARRAY<T,FACE_INDEX<TV::
 template<class TV> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<TV>::
 Advance_One_Time_Step_Forces(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time,const bool implicit_viscosity,const ARRAY<ARRAY<T,TV_INT>>* phi_ghost,const ARRAY<bool>* pseudo_dirichlet_regions,const int number_of_ghost_cells)
 {
-    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(grid.Domain_Indices(number_of_ghost_cells),false);
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(grid.Domain_Indices(number_of_ghost_cells),no_init);
     boundary->Fill_Ghost_Faces(grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
 
     // update strain and apply elastic forces

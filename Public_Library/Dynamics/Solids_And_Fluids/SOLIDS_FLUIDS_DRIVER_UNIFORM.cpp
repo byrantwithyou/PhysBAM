@@ -886,9 +886,9 @@ Advect_Fluid(const T dt,const int substep)
     if(incompressible){
         if(number_of_regions<=1){
             ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
-            face_velocities_ghost.Resize(incompressible->grid,example.fluids_parameters.number_of_ghost_cells,false);
+            face_velocities_ghost.Resize(incompressible->grid,example.fluids_parameters.number_of_ghost_cells,no_init);
             if(Two_Way_Coupled() && solids_fluids_parameters.use_leakproof_solve){
-                projected_face_velocities_ghost.Resize(incompressible->grid,example.fluids_parameters.number_of_ghost_cells,false);
+                projected_face_velocities_ghost.Resize(incompressible->grid,example.fluids_parameters.number_of_ghost_cells,no_init);
                 incompressible->boundary->Fill_Ghost_Faces(grid,face_velocities,projected_face_velocities_ghost,time+dt,example.fluids_parameters.number_of_ghost_cells);
                 advection_face_velocities_ghost=&projected_face_velocities_ghost;
                 incompressible->boundary->Fill_Ghost_Faces(grid,incompressible->projection.face_velocities_save_for_projection,face_velocities_ghost,time+dt,example.fluids_parameters.number_of_ghost_cells);}
@@ -896,9 +896,9 @@ Advect_Fluid(const T dt,const int substep)
                 incompressible->boundary->Fill_Ghost_Faces(grid,face_velocities,face_velocities_ghost,time+dt,example.fluids_parameters.number_of_ghost_cells);
                 advection_face_velocities_ghost=&face_velocities_ghost;}}
         else if(number_of_regions>=2){
-            face_velocities_ghost.Resize(incompressible->grid,example.fluids_parameters.number_of_ghost_cells,false);
+            face_velocities_ghost.Resize(incompressible->grid,example.fluids_parameters.number_of_ghost_cells,no_init);
             if(Two_Way_Coupled() && solids_fluids_parameters.use_leakproof_solve){
-                projected_face_velocities_ghost.Resize(incompressible->grid,example.fluids_parameters.number_of_ghost_cells,false);
+                projected_face_velocities_ghost.Resize(incompressible->grid,example.fluids_parameters.number_of_ghost_cells,no_init);
                 particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.levelset_callbacks->Get_Levelset_Velocity(grid,
                     particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple,projected_face_velocities_ghost,time+dt);
                 incompressible->boundary->Fill_Ghost_Faces(grid,incompressible->projection.face_velocities_save_for_projection,face_velocities_ghost,time+dt,example.fluids_parameters.number_of_ghost_cells);

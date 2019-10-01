@@ -245,7 +245,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         if(fluids_parameters.compressible && velocity_update){
             for(int i=0;i<V.V.Size();i++) V.V(i)=mass.one_over_mass(i)*B.V(i);
             for(int i=0;i<V.rigid_V.Size();i++) V.rigid_V(i)=mass.world_space_rigid_mass_inverse(i)*B.rigid_V(i);
-            solid_projected_face_velocities_star.Resize(Get_Grid(),true,false);
+            solid_projected_face_velocities_star.Resize(Get_Grid(),init_all);
             Apply_Solid_Boundary_Conditions(current_velocity_time,false,solid_projected_face_velocities_star);}
 
         poisson.Find_Solution_Regions();

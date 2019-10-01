@@ -294,7 +294,7 @@ template<class TV> template<class T_ARRAYS_PARTICLES> void PARTICLE_LEVELSET_UNI
 Euler_Step_Particles_Wrapper(const ARRAY<T,FACE_INDEX<TV::m> >& V,T_ARRAYS_PARTICLES& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time,
     const bool update_particle_cells_after_euler_step,const bool assume_particles_in_correct_blocks,const bool enforce_domain_boundaries)
 {
-    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost;face_velocities_ghost.Resize(levelset.grid,number_of_ghost_cells,false);
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(levelset.grid,number_of_ghost_cells,no_init);
     levelset.boundary->Fill_Ghost_Faces(levelset.grid,V,face_velocities_ghost,time,number_of_ghost_cells);
     Euler_Step_Particles(face_velocities_ghost,particles,particle_type,dt,time,update_particle_cells_after_euler_step,assume_particles_in_correct_blocks,enforce_domain_boundaries);
 }

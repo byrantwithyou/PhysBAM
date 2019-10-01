@@ -659,7 +659,7 @@ Neumann_Boundary_Condition(const FACE_INDEX<TV::m>& face,T& bc) const
 template<class TV> void MPM_MAC_DRIVER<TV>::
 Compute_Boundary_Conditions()
 {
-    example.psi_N.Resize(example.grid,example.ghost,false);
+    example.psi_N.Resize(example.grid,example.ghost,no_init);
 #pragma omp parallel
     for(FACE_ITERATOR_THREADED<TV> it(example.grid,example.ghost);it.Valid();it.Next()){
         T u_bc=0;

@@ -188,7 +188,7 @@ Advance_To_Target_Time(const T target_time)
 
         LOG::Time("Fill ghost");
 PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",1);
-        ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost;face_velocities_ghost.Resize(example.incompressible.grid,example.number_of_ghost_cells,false);
+        ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost(example.incompressible.grid,example.number_of_ghost_cells,no_init);
         example.incompressible.boundary->Fill_Ghost_Faces(example.mac_grid,example.face_velocities,face_velocities_ghost,time+dt,example.number_of_ghost_cells);
 
         ARRAY<T,TV_INT> phi_back(example.mac_grid.Domain_Indices(example.number_of_ghost_cells));

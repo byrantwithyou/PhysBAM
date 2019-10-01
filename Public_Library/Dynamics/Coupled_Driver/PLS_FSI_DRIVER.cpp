@@ -263,7 +263,7 @@ Initialize_Fluids_Grids()
     example.fluid_collection.Initialize_Grids();
     fluids_parameters.particle_levelset_evolution->Initialize_Domain(fluids_parameters.p_grid);
     fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).Set_Band_Width((T)2*fluids_parameters.particle_half_bandwidth);
-    fluids_parameters.incompressible->valid_mask.Resize(grid.Domain_Indices(example.fluids_parameters.number_of_ghost_cells),true,true,true);
+    fluids_parameters.incompressible->valid_mask.Resize(grid.Domain_Indices(example.fluids_parameters.number_of_ghost_cells),use_init,true);
     fluids_parameters.incompressible->grid=grid.Get_MAC_Grid();
 //    p.Resize(p_grid.Domain_Indices(1));p_save_for_projection.Resize(p_grid.Domain_Indices(1));face_velocities_save_for_projection.Resize(p_grid);
     if(SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>* slip=dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>*>(&solids_evolution))
@@ -427,7 +427,7 @@ Advect_Fluid(const T dt,const int substep)
     // important to compute ghost velocity values for particles near domain boundaries
     ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost;
     ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
-    face_velocities_ghost.Resize(incompressible->grid,fluids_parameters.number_of_ghost_cells,false);
+    face_velocities_ghost.Resize(incompressible->grid,fluids_parameters.number_of_ghost_cells,no_init);
     incompressible->boundary->Fill_Ghost_Faces(grid,face_velocities,face_velocities_ghost,time+dt,fluids_parameters.number_of_ghost_cells);
 
     fluids_parameters.phi_boundary_water.Use_Extrapolation_Mode(false);

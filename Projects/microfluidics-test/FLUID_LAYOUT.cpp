@@ -27,7 +27,7 @@ Compute(const PARSE_DATA<TV>& pd)
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    used_faces.Resize(grid,1,true,true,{nodof,-1,-1,0});
+    used_faces.Resize(grid,1,use_init,{nodof,-1,-1,0});
     used_cells.Resize(grid.Domain_Indices(1),use_init,{nodof,-1,-1,0,DOF_ID(-1)});
     
     for(auto& i:pd.pipes)

@@ -52,7 +52,7 @@ Initialize_Grids()
     all_true.Fill(true);
     cell_neighbors_visible.Resize(grid.Domain_Indices(3),no_init);
     cell_neighbors_visible.Fill(all_true); // initialize here so collision aware redistancing works in Initialize
-    face_neighbors_visible.Resize(grid,1,false);face_neighbors_visible.Fill(all_true);
+    face_neighbors_visible.Resize(grid,1,init_all,all_true);
 }
 //##################################################################### 
 // Function Compute_Occupied_Blocks

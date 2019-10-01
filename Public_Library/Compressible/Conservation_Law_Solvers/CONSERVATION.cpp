@@ -209,7 +209,7 @@ Update_Conservation_Law(GRID<TV>& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRA
     T_ARRAYS_DIMENSION_SCALAR rhs(U_domain_indices);
 
     if(fluxes_auxiliary) save_fluxes=true;
-    if(save_fluxes) fluxes.Resize(grid.Domain_Indices(),true,false);
+    if(save_fluxes) fluxes.Resize(grid.Domain_Indices(),init_all);
 
     Compute_Flux(grid,U,U_ghost,psi,dt,eigensystems,eigensystems_explicit,psi_N,face_velocities,outflow_boundaries,rhs,thinshell,eigensystems_auxiliary,fluxes_auxiliary);
 

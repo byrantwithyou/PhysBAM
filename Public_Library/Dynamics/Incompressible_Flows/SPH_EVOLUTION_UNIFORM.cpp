@@ -164,9 +164,10 @@ Set_Up_For_Projection(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T time)
     LOG::Time("initializing");
     PROJECTION_DYNAMICS_UNIFORM<TV>& projection=incompressible.projection;
     ARRAY<T,FACE_INDEX<TV::m> > preset_velocities=face_velocities;
-    particle_velocities.Resize(grid.Domain_Indices(3),false,false);particle_velocities.Fill(0);
-    valid_particle_face_velocities.Resize(grid.Domain_Indices(3),false,false);valid_particle_face_velocities.Fill(false);
-    cell_weight=ARRAY<T,TV_INT>(grid.Domain_Indices(1));face_weight=ARRAY<T,FACE_INDEX<TV::m> >(grid,1);
+    particle_velocities.Resize(grid.Domain_Indices(3),init_all,0);
+    valid_particle_face_velocities.Resize(grid.Domain_Indices(3),init_all,false);
+    cell_weight=ARRAY<T,TV_INT>(grid.Domain_Indices(1));
+    face_weight=ARRAY<T,FACE_INDEX<TV::m> >(grid,1);
     
     LOG::Time("rasterize velocities to grid");
     Rasterize_Velocities_To_Grid(particle_velocities,cell_weight,face_weight);

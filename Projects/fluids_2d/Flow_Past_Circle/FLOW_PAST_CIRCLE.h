@@ -200,7 +200,7 @@ typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE Get_Boundary_Along_Ray(cons
 void Write_Output_Files(const int frame) const override
 {
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Write_Output_Files(frame);
-    ARRAY<T,FACE_INDEX<2> > face_velocities_ghost(*fluids_parameters.grid,3,false);
+    ARRAY<T,FACE_INDEX<2> > face_velocities_ghost(*fluids_parameters.grid,3,no_init);
     fluids_parameters.incompressible->boundary->Fill_Ghost_Faces(*fluids_parameters.grid,fluid_collection.incompressible_fluid_collection.face_velocities,face_velocities_ghost,0,3);
     ARRAY<VECTOR<T,1>,TV_INT> grid_vorticity(fluids_parameters.grid->Domain_Indices(3),no_init);
     ARRAY<T,TV_INT> grid_vorticity_magnitude(fluids_parameters.grid->Domain_Indices(3),no_init);

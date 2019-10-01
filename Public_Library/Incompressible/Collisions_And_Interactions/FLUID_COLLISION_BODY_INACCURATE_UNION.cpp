@@ -94,10 +94,8 @@ Initialize_Grid_Structures()
     // phi and velocity
     phi.Resize(grid.Cell_Indices(3),no_init);
     phi.Fill(10*grid.dX.Min());
-    face_velocities.Resize(grid,3,false,false);
-    face_velocities.Fill((T)0);
-    face_velocities_set.Resize(grid,3,false,false);
-    face_velocities_set.Fill(false);
+    face_velocities.Resize(grid,3,init_all,0);
+    face_velocities_set.Resize(grid,3,init_all,false);
     T_FACE_ARRAYS_INT face_velocities_count(grid,3);
     T_FACE_ARRAYS_COLLISION_GEOMETRY_ID face_operations(grid,3);
     for(COLLISION_GEOMETRY_ID i(0);i<collision_bodies.collision_geometry_collection.bodies.m;i++)

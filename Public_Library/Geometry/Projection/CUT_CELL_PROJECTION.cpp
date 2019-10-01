@@ -239,7 +239,7 @@ Cut_Cell_Projection(const GRID<TV>& grid,int ghost,
         T r=sys.Convergence_Norm(*av(0));
         LOG::cout<<"residual: "<<r<<std::endl;}
 
-    if(valid_u) valid_u->Resize(grid.Domain_Indices(ghost),false,false);
+    if(valid_u) valid_u->Resize(grid.Domain_Indices(ghost),no_init);
 
     for(FACE_RANGE_ITERATOR<TV::m> it(grid.Domain_Indices(ghost),RF::skip_outer);it.Valid();it.Next()){
         int ca=cell_index(it.face.First_Cell_Index());
