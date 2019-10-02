@@ -75,7 +75,7 @@ public:
     void Mark_Nodes_Referenced(ARRAY<int>& marks,const int mark) const override;
     T Volumetric_Volume();
     void Merge_Overlapping_Particles_And_Renumber(ARRAY<int>& condensation_mapping,T tol=0);
-    void Compact_Copy(const MESH_OBJECT& obj);
+    void Compact_Copy(const MESH_OBJECT& obj,ARRAY<int>* mapping=0);
 
 private:
     virtual void Refresh_Auxiliary_Structures_Helper()=0;

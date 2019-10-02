@@ -859,10 +859,16 @@ Remove_Degenerate_Triangles(const T area_threshold)
 // Function Create_Compact_Copy
 //#####################################################################
 template<class T> TRIANGULATED_SURFACE<T>* TRIANGULATED_SURFACE<T>::
-Create_Compact_Copy() const
+Create_Compact_Copy(bool copy_velocities) const
 {
     auto* obj=new TRIANGULATED_SURFACE<T>;
-    obj->Compact_Copy(*this);
+    ARRAY<int> particle_map;
+    obj->Compact_Copy(*this,&particle_map);
+    if(copy_velocities && obj->particles.store_velocity){
+        particles.Store_Velocity();
+        for(int i=0;i<particle_map.m;i++)
+            if(particle_map(i)>=0)
+                particles.V(particle_map(i))=obj->particles.V(i);}
     return obj;
 }
 //#####################################################################
