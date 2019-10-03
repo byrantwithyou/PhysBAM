@@ -1,15 +1,15 @@
 #ifndef __DOUBLE_ERROR__
 #define __DOUBLE_ERROR__
 
-#include "quadmath.h"
+#include <Core/Log/LOG.h>
 #include <cfloat>
 #include <cmath>
-#include <iostream>
 #include <iomanip>
-#include <string>
+#include <iostream>
 #include <sstream>
+#include <string>
+#include "quadmath.h"
 #include <type_traits>
-#include <Core/Log/LOG.h>
 
 namespace PhysBAM {
 typedef __float128 quad;

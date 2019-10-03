@@ -1,10 +1,10 @@
-#include <vector>
-#include <cstdio>
 #include <cassert>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <map>
 #include <string>
-#include <cstring>
-#include <cstdlib>
+#include <vector>
 
 template<int b>
 struct basis_vector

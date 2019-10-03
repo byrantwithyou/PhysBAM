@@ -8,8 +8,8 @@
 #define __TUPLE__
 
 #include <Core/Data_Structures/HASH_REDUCE.h>
-#include <tuple>
 #include <iostream>
+#include <tuple>
 namespace PhysBAM{
 
 template<class... Args>

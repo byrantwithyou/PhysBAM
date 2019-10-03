@@ -1,10 +1,10 @@
+#include <cassert>
 #include <cstdio>
 #include <iostream>
 #include <map>
 #include <sstream>
 #include <string>
 #include <regex>
-#include <cassert>
 
 using namespace std;
 

@@ -6,11 +6,11 @@
 //##################################################################### 
 #ifndef __ITERATIVE_SOLVER__
 #define __ITERATIVE_SOLVER__
+#include <cassert>
 #include <climits>
+#include <cmath>
 #include <functional>
 #include <limits>
-#include <cassert>
-#include <cmath>
 
 namespace PhysBAM{
 

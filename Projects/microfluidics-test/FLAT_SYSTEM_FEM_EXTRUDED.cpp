@@ -4,8 +4,8 @@
 //#####################################################################
 #include <Core/Matrices/SYSTEM_MATRIX_HELPER.h>
 #include "COMMON.h"
-#include "FLUID_LAYOUT_FEM_EXTRUDED.h"
 #include "FLAT_SYSTEM_FEM_EXTRUDED.h"
+#include "FLUID_LAYOUT_FEM_EXTRUDED.h"
 
 namespace PhysBAM{
 

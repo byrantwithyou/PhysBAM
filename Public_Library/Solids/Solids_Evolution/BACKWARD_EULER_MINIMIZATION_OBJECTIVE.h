@@ -12,9 +12,9 @@
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
+#include <Rigids/Forces_And_Torques/MOVE_RIGID_BODY_DIFF.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_MINIMIZATION_SYSTEM.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_SYSTEM.h>
-#include <Rigids/Forces_And_Torques/MOVE_RIGID_BODY_DIFF.h>
 namespace PhysBAM{
 template<class TV> class SOLID_BODY_COLLECTION;
 template<class TV> class BACKWARD_EULER_MINIMIZATION_SYSTEM;

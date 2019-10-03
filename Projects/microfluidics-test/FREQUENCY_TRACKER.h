@@ -4,8 +4,8 @@
 //#####################################################################
 #ifndef __FREQUENCY_TRACKER__
 #define __FREQUENCY_TRACKER__
-#include <set>
 #include <map>
+#include <set>
 #include <vector>
 
 namespace PhysBAM{

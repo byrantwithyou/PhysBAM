@@ -5,8 +5,8 @@
 #ifndef __KRYLOV_SOLVER_FEM__
 #define __KRYLOV_SOLVER_FEM__
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
+#include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #if USE_LAPACK
 #include <cblas.h>
 #include <lapacke.h>

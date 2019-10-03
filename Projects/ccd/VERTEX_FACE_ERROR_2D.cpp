@@ -1,10 +1,10 @@
-#include <ctime>
-#include <functional>
 #include <Core/Log/LOG.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Core/Vectors/VECTOR.h>
-#include <Geometry/Basic_Geometry/TRIANGLE_2D.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
+#include <Geometry/Basic_Geometry/TRIANGLE_2D.h>
+#include <ctime>
+#include <functional>
 #include "DOUBLE_ERROR.h"
 
 using namespace PhysBAM;

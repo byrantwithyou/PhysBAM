@@ -1,12 +1,12 @@
+#include <Core/Log/LOG.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Vectors/VECTOR.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
+#include <Geometry/Basic_Geometry/TRIANGLE_2D.h>
 #include <algorithm>
 #include <ctime>
 #include <functional>
 #include <string>
-#include <Core/Log/LOG.h>
-#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
-#include <Core/Vectors/VECTOR.h>
-#include <Geometry/Basic_Geometry/TRIANGLE_2D.h>
-#include <Tools/Parsing/PARSE_ARGS.h>
 #include "DOUBLE_ERROR.h"
 
 using namespace PhysBAM;
