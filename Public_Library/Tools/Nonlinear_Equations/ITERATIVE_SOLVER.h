@@ -56,7 +56,7 @@ T Bisection_Secant_Root(FUNC F,T a,T b,
     T Fa=F(a),Fb=F(b),x_old=a,x=b,Fx_old=Fa,Fx=Fb;
     assert(Fa*Fb<=0);
     while(b-a>tolerance && iterations++<max_iterations){
-        if(abs(Fx-Fx_old)<tolerance){ // bisection method
+        if(abs(Fx-Fx_old)<=tolerance){ // bisection method
             T m=(T).5*(a+b),Fm=F(m);if(Fa*Fm<=0){b=m;Fb=Fm;}else{a=m;Fa=Fm;}
             x_old=a;x=b;Fx_old=Fa;Fx=Fb;} // update secant points
         else{ // secant method
