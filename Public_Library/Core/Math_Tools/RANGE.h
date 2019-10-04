@@ -249,7 +249,10 @@ public:
 
     bool Lazy_Inside_Half_Open(const TV& location) const
     {return location.All_Greater_Equal(min_corner) && location.All_Less(max_corner);}
-    
+
+    bool Lazy_Inside(const RANGE<TV>& other) const
+    {return other.min_corner.All_Greater_Equal(min_corner) && other.max_corner.All_Less_Equal(max_corner);}
+
     bool Inside(const TV& location,const T thickness_over_two) const
     {return Thickened(-thickness_over_two).Lazy_Inside(location);}
 
