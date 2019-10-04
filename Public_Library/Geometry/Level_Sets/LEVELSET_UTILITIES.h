@@ -40,6 +40,27 @@ public:
     static T Heaviside(const T phi,const T value_minus,const T value_plus,const T half_width=0)
     {return value_minus+(value_plus-value_minus)*Heaviside(phi,half_width);}
 
+/* 
+ * hphi =  0  if phi<-E,
+ *         1  if phi>E
+ *         0.5 (tanh(phi/2E)+1) else.
+ */
+    static T Heaviside_Tanh(const T phi,const T half_width=0)
+    {//if(phi <= -half_width) return 0;if(phi >= half_width) return 1;
+    T phi_over_width=phi/(half_width*2);return (T).5*(1+tanh(phi_over_width));}
+/* 
+ *  phi =  -1  if hphi==0,
+ *          1  if hphi==1,
+ *          2E tanh^(2 hphi -1) else.
+ *
+ *          tanh^ = 0.5*ln((x+1)/(x-1))
+ *          2E tanh^(2 hphi -1)= E*ln(hpi/(hpi-1))
+ */
+
+     static T Inverse_Heaviside_Tanh(const T hphi,const T half_width=0)
+    {if(hphi>=1)return 1;if(hphi < std::numeric_limits<T>::epsilon()) return -1;
+    return log(hphi/(1-hphi))*half_width;}
+
     static T Delta(const T phi,const T half_width)
     {if(phi <= -half_width || phi >= half_width) return 0;else return (T)(1+cos(pi*phi/half_width))/(2*half_width);}
 
