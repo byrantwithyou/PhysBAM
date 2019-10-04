@@ -189,6 +189,25 @@ std::string sprintf(const char *format,Args&&... args)
     fprintf(stream,format,args...);
     return stream.str();
 }
+
+template<typename... Args>
+int fprintf(std::ostream& out,const std::string& format,Args&&... args)
+{
+    return fprintf(out,format.c_str(),args...);
+}
+
+template<typename... Args>
+int printf(const std::string& format,Args&&... args)
+{
+    return printf(format.c_str(),args...);
+}
+
+template<typename... Args>
+std::string sprintf(const std::string& format,Args&&... args)
+{
+    return sprintf(format.c_str(),args...);
+}
+
 extern int fputc(int c, std::ostream& out);
 extern int fputs(const char *s, std::ostream& out);
 extern int puts(const char *s);
