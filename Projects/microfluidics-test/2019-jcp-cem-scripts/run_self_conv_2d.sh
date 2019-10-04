@@ -61,9 +61,9 @@ done
 
 (
     cd $NAME/simple-plot-error;
-    X0=750;
+    X0=800;
     Y0=80;
-    X1=790;
+    X1=840;
     Y1=120;
     S0=40;
     S1=40;

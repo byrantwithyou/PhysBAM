@@ -143,18 +143,29 @@ void Run(PARSE_ARGS& parse_args)
 
     T dx=box.Edge_Lengths().Max()/resolution;
     int m=box.Edge_Lengths()(0)/dx,n=box.Edge_Lengths()(1)/dx;
-    INTERPOLATED_COLOR_MAP<T> icm;
-    icm.colors.Add_Control_Point(1.00001,VECTOR<T,3>(1,1,1));
-    icm.colors.Add_Control_Point(1,VECTOR<T,3>(.5,0,0));
-    icm.colors.Add_Control_Point(1-.01,VECTOR<T,3>(1,0,0));
-    icm.colors.Add_Control_Point(1-.02,VECTOR<T,3>(1,.5,0));
-    icm.colors.Add_Control_Point(1-.04,VECTOR<T,3>(1,1,0));
-    icm.colors.Add_Control_Point(1-.08,VECTOR<T,3>(0,1,0));
-    icm.colors.Add_Control_Point(1-.16,VECTOR<T,3>(0,1,1));
-    icm.colors.Add_Control_Point(1-.32,VECTOR<T,3>(0,0,1));
-    icm.colors.Add_Control_Point(1-.64,VECTOR<T,3>(.5,0,1));
-    icm.colors.Add_Control_Point(0,VECTOR<T,3>(0,0,0));
-    T gamma=10;
+    INTERPOLATED_COLOR_MAP<T> log10_icm;
+    log10_icm.colors.Add_Control_Point(1.00001,VECTOR<T,3>(1,1,1));
+    log10_icm.colors.Add_Control_Point(1,VECTOR<T,3>(1,1,1));
+    log10_icm.colors.Add_Control_Point(1e-1,VECTOR<T,3>(1,0,0));
+    log10_icm.colors.Add_Control_Point(1e-2,VECTOR<T,3>(1,.5,0));
+    log10_icm.colors.Add_Control_Point(1e-3,VECTOR<T,3>(1,1,0));
+    log10_icm.colors.Add_Control_Point(1e-4,VECTOR<T,3>(0,1,0));
+    log10_icm.colors.Add_Control_Point(1e-5,VECTOR<T,3>(0,1,1));
+    log10_icm.colors.Add_Control_Point(1e-6,VECTOR<T,3>(0,0,1));
+    log10_icm.colors.Add_Control_Point(1e-7,VECTOR<T,3>(.5,0,1));
+    log10_icm.colors.Add_Control_Point(0,VECTOR<T,3>(0,0,0));
+
+    INTERPOLATED_COLOR_MAP<T> linear_icm;
+    linear_icm.colors.Add_Control_Point(1.00001,VECTOR<T,3>(1,1,1));
+    linear_icm.colors.Add_Control_Point(1,VECTOR<T,3>(1,1,1));
+    linear_icm.colors.Add_Control_Point(0.875,VECTOR<T,3>(1,0,0));
+    linear_icm.colors.Add_Control_Point(0.75,VECTOR<T,3>(1,.5,0));
+    linear_icm.colors.Add_Control_Point(0.625,VECTOR<T,3>(1,1,0));
+    linear_icm.colors.Add_Control_Point(0.5,VECTOR<T,3>(0,1,0));
+    linear_icm.colors.Add_Control_Point(0.375,VECTOR<T,3>(0,1,1));
+    linear_icm.colors.Add_Control_Point(0.25,VECTOR<T,3>(0,0,1));
+    linear_icm.colors.Add_Control_Point(0.125,VECTOR<T,3>(.5,0,1));
+    linear_icm.colors.Add_Control_Point(0,VECTOR<T,3>(0,0,0));
 
     // H: in degrees [0,360]
     auto HSV_To_RGB=[](T h,T s,T v)
@@ -166,19 +177,14 @@ void Run(PARSE_ARGS& parse_args)
         return VECTOR<T,3>(r,g,b);
     };
 
-    auto normalize=[user_color_scale,min_color,max_color,gamma](T x,T mn,T mx,bool use_log)
+    auto normalize=[user_color_scale,min_color,max_color](T x,T mn,T mx)
     {
         if(user_color_scale)
         {
             mn=min_color;
             mx=max_color;
         }
-        T n=(x-mn)/(mx-mn);
-        if(use_log)
-        {
-            return 1-pow(2,-n*gamma);
-        }
-        else return n;
+        return (x-mn)/(mx-mn);
     };
 
     ARRAY<RGBA,IV2> img_v(IV2(m,n)),img_v_mag(IV2(m,n)),img_p(IV2(m,n)),img_dv(IV2(m,n)),img_dp(IV2(m,n));
@@ -197,30 +203,30 @@ void Run(PARSE_ARGS& parse_args)
         if(angle<0) angle+=2*pi;
         angle=angle/pi*180;
         img_v(index)=HSV_To_RGB(angle,(v.Magnitude()-range_v.min_corner)/range_v.Size(),1).Append(1);
-        img_v_mag(index)=icm(normalize(v.Magnitude(),range_v.min_corner,range_v.max_corner,true)).Append(1);
-        img_p(index)=icm(normalize(p,range_p.min_corner,range_p.max_corner,true)).Append(1);
-        img_dp(index)=icm(normalize(dp.Magnitude(),range_dp.min_corner,range_dp.max_corner,true)).Append(1);
-        img_dv(index)=icm(normalize(dv.Frobenius_Norm(),range_dv.min_corner,range_dv.max_corner,true)).Append(1);
+        img_v_mag(index)=linear_icm(normalize(v.Magnitude(),range_v.min_corner,range_v.max_corner)).Append(1);
+        img_p(index)=linear_icm(normalize(p,range_p.min_corner,range_p.max_corner)).Append(1);
+        img_dp(index)=log10_icm(normalize(dp.Magnitude(),range_dp.min_corner,range_dp.max_corner)).Append(1);
+        img_dv(index)=log10_icm(normalize(dv.Frobenius_Norm(),range_dv.min_corner,range_dv.max_corner)).Append(1);
 
         if(ref_sol_file!="")
         {
             int ref_elem=ref_sol.Intersect(x);
             TV ref_v=ref_sol.Velocity(ref_elem,x);
             T ref_p=ref_sol.Pressure(ref_elem,x);
-            img_v_err(index)=icm(normalize((v-ref_v).Magnitude(),range_v_err.min_corner,range_v_err.max_corner,true)).Append(1);
-            img_p_err(index)=icm(normalize(abs(p-ref_p),range_p_err.min_corner,range_p_err.max_corner,true)).Append(1);
+            img_v_err(index)=log10_icm(normalize((v-ref_v).Magnitude(),range_v.min_corner,range_v.max_corner)).Append(1);
+            img_p_err(index)=log10_icm(normalize(abs(p-ref_p),1e-15,range_p.max_corner-range_p.min_corner)).Append(1);
         }
     }
 
     ARRAY<TV3,IV2> bar(IV2(1000,1));
     for(int i=0;i<1000;i++)
-        bar(IV2(i,0))=icm.colors.Value((i/(T)999)*(icm.mx-icm.mn)+icm.mn);
+        bar(IV2(i,0))=linear_icm.colors.Value((i/(T)999)*(linear_icm.mx-linear_icm.mn)+linear_icm.mn);
     PNG_FILE<T>::Write(output_dir+"/bar.png",bar);
     for(int i=0;i<1000;i++)
     {
         T x=i/(T)999;
-        T y=1-pow(2,-x*gamma);
-        bar(IV2(i,0))=icm.colors.Value(y*(icm.mx-icm.mn)+icm.mn);
+        T y=pow(10,-(1-x)*8);
+        bar(IV2(i,0))=log10_icm.colors.Value(y*(log10_icm.mx-log10_icm.mn)+log10_icm.mn);
     }
     PNG_FILE<T>::Write(output_dir+"/log-bar.png",bar);
 
