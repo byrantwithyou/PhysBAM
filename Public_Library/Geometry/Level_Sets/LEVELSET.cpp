@@ -337,6 +337,15 @@ Principal_Curvatures(const TV& X) const
     T grad_phi_magnitude=N.Normalize();
     return Compute_Principal_Curvatures(N,Hessian(X)/grad_phi_magnitude);
 }
+//#####################################################################
+// Function Get_Heaviside
+//#####################################################################
+template<class TV> void LEVELSET<TV>::
+Get_Heaviside(ARRAY<T,TV_INT>& hphi,const T half_interface_width, int ghost_cells) const
+{
+    for(CELL_ITERATOR<TV> iterator(grid,ghost_cells);iterator.Valid();iterator.Next())
+        hphi(iterator.Cell_Index())=LEVELSET_UTILITIES<T>::Heaviside_Tanh(-phi(iterator.Cell_Index()),half_interface_width);
+}
 namespace PhysBAM{
 template class LEVELSET<VECTOR<float,1> >;
 template class LEVELSET<VECTOR<float,2> >;

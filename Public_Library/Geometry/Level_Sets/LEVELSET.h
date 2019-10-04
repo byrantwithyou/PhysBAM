@@ -212,6 +212,7 @@ public:
         const bool add_seed_indices_for_ghost_cells=false,int process_sign=0);
     T Approximate_Surface_Size(const T interface_thickness=3,const T time=0) const;
     VECTOR<T,TV::m-1> Principal_Curvatures(const TV& X) const;
+    void Get_Heaviside(ARRAY<T,TV_INT>& hphi,const T half_interface_width,int ghost_cells=0) const;
 //#####################################################################
 };
 }
