@@ -12,6 +12,7 @@
 #include "FLUID_LAYOUT.h"
 #include "FREQUENCY_TRACKER.h"
 #include "JOB_SCHEDULER.h"
+#include "EXECUTE_HELPER.h"
 #if USE_LAPACK
 #include <cblas.h>
 #include <lapacke.h>
@@ -20,7 +21,6 @@
 #include <mkl_lapacke.h>
 #endif
 #include <suitesparse/colamd.h>
-
 namespace PhysBAM{
 namespace
 {
@@ -569,7 +569,7 @@ Execute_Jobs(int num_threads)
     Combine_Ops();
     Simplify_Jobs();
     Relabel();
-        
+
     JOB_SCHEDULER<JOB,CACHED_ELIMINATION_MATRIX<T> > scheduler(this);
     for(int i=0;i<jobs.m;i++){
         int id=scheduler.Add_Job(&jobs(i),0);
@@ -589,6 +589,7 @@ Execute(CACHED_ELIMINATION_MATRIX<T>* cem)
     auto& vl=cem->vector_list;
     int raw_op=op&raw_op_mask;
     MATRIX_MXN<T>* MO=0,*MA[3]={};
+    //this initializes 
     for(int l=0;l<3;l++)
         if(arg_type[raw_op][l]==1 && a[l]>1)
             MA[l]=&cem->matrix_cache.Use(a[l]&raw_mask);

@@ -27,6 +27,7 @@
 #include "LAYOUT_BUILDER_FEM.h"
 #include "MATRIX_CONSTRUCTION_FEM.h"
 #include "SOLUTION_FEM.h"
+#include "EXECUTE_HELPER.h"
 #include <chrono>
 #if USE_MKL
 #include <mkl.h>
@@ -392,8 +393,7 @@ void Run(PARSE_ARGS& parse_args)
 #ifdef USE_MKL
         mkl_set_num_threads(1);
 #endif
-    cem.Execute_Jobs(threads);
-
+    Execute_Helper(&cem,threads);
     timer("exec jobs");
 
     mc.Transform_Solution(cem,false,false);

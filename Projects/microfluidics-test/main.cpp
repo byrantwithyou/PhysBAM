@@ -37,6 +37,7 @@
 #include "FLUID_LAYOUT.h"
 #include "FLUID_LAYOUT_FEM.h"
 #include "FLUID_LAYOUT_FEM_EXTRUDED.h"
+#include "EXECUTE_HELPER.h"
 #include <chrono>
 
 using namespace PhysBAM;
@@ -157,7 +158,7 @@ void Run_FEM(PARSE_ARGS& parse_args)
     elim_mat.Reduce_Rows_By_Frequency(Value(fl.blocks.m)-Value(fl.pipes.m),Value(fl.blocks.m),3);
     elim_mat.Full_Reordered_Elimination();
     elim_mat.Back_Solve();
-    elim_mat.Execute_Jobs(threads);
+    Execute_Helper(&elim_mat,threads);
     ARRAY<T,DOF_ID> elim_sol;
     elim_mat.Pack_Vector(fl.dof_map,elim_sol,elim_mat.rhs);
     if(use_krylov) LOG::printf("ANS DIFF: %g\n",(elim_sol-sol_vector).Max_Abs());
@@ -243,7 +244,7 @@ void Run(PARSE_ARGS& parse_args)
     elim_mat.Full_Reordered_Elimination();
     elim_mat.Back_Solve();
     std::chrono::steady_clock::time_point t4 = std::chrono::steady_clock::now();
-    elim_mat.Execute_Jobs(threads);
+    Execute_Helper(&elim_mat,threads);
     std::chrono::steady_clock::time_point t5 = std::chrono::steady_clock::now();
 
     ARRAY<T,DOF_ID> elim_sol;

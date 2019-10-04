@@ -21,6 +21,7 @@
 #include "ELIMINATION_FEM.h"
 #include "LAYOUT_BUILDER_FEM.h"
 #include "MATRIX_CONSTRUCTION_FEM.h"
+#include "EXECUTE_HELPER.h"
 #include <boost/polygon/voronoi.hpp>
 
 using namespace PhysBAM;
@@ -57,7 +58,7 @@ void Solve_And_Check(COMPONENT_LAYOUT_FEM<T>& cl,const LAYOUT_BUILDER_FEM<T>& bu
     cem.Full_Reordered_Elimination();
     cem.Back_Solve();
     cem.matrix_cache.Init(cache_pattern,cache_size);
-    cem.Execute_Jobs(1);
+    Execute_Helper(&cem,1);
     mc.Transform_Solution(cem,false,false);
     if(!an.Check_Analytic_Solution(false,false))
         printf("%s\n",builder.To_String().c_str());

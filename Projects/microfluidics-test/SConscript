@@ -3,35 +3,60 @@
 Import('env Automatic_Program')
 env=env.Copy(USE_GEOMETRY=1)
 env.Append(LIBS=["colamd"]);
+
+USE_CUDA=0
+if USE_CUDA:
+    import os
+    cpppath=os.environ["CUDA_INC"]
+    libpath=os.environ["CUDA_LD"]
+    env.Append(LIBS=['cudart'],CPPPATH=[cpppath],LIBPATH=[libpath]);
+    cuda_env=Environment(CC='nvcc -c')
+    cuda_env.Program('CUDA_KERNEL.so','CUDA_KERNEL.cu')
+
 Automatic_Program(env,"micro",["main.cpp","PARSE_DATA.cpp","FLUID_LAYOUT.cpp",
-                               "CACHED_ELIMINATION_MATRIX.cpp",
-                               "FLAT_SYSTEM.cpp","FREQUENCY_TRACKER.cpp",
-                               "JOB_SCHEDULER.cpp",
-                               "FLUID_LAYOUT_FEM.cpp","FLUID_LAYOUT_FEM_EXTRUDED.cpp",
-                               "PARSE_DATA_FEM.cpp",
-                               "FLAT_SYSTEM_FEM.cpp","FLAT_SYSTEM_FEM_EXTRUDED.cpp",
-                               "FEM_MESHING_TESTS.cpp","FEM_TABLE.cpp"])
+			       "CACHED_ELIMINATION_MATRIX.cpp",
+			       "EXECUTE_HELPER.cpp",
+			       "FLAT_SYSTEM.cpp","FREQUENCY_TRACKER.cpp",
+			       "JOB_SCHEDULER.cpp",
+			       "FLUID_LAYOUT_FEM.cpp","FLUID_LAYOUT_FEM_EXTRUDED.cpp",
+			       "PARSE_DATA_FEM.cpp",
+			       "FLAT_SYSTEM_FEM.cpp","FLAT_SYSTEM_FEM_EXTRUDED.cpp",
+			       "FEM_MESHING_TESTS.cpp","FEM_TABLE.cpp"])
 Automatic_Program(env,"fem",["main-fem.cpp","CACHED_ELIMINATION_MATRIX.cpp",
-                             "FREQUENCY_TRACKER.cpp",
-                             "JOB_SCHEDULER.cpp","COMPONENT_LAYOUT_FEM.cpp","LAYOUT_BUILDER_FEM.cpp",
-                             "COMPONENT_PIPE.cpp","COMPONENT_CHANGE.cpp",
-                             "COMPONENT_BC.cpp","COMPONENT_JOINT.cpp",
-                             "ANALYTIC_FEM.cpp","DEBUGGING_FEM.cpp",
-                             "ELIMINATION_FEM.cpp","MATRIX_CONSTRUCTION_FEM.cpp",
-                             "CANONICAL_BLOCK.cpp"])
+			     "FREQUENCY_TRACKER.cpp",
+			     "EXECUTE_HELPER.cpp",
+			     "JOB_SCHEDULER.cpp","COMPONENT_LAYOUT_FEM.cpp","LAYOUT_BUILDER_FEM.cpp",
+			     "COMPONENT_PIPE.cpp","COMPONENT_CHANGE.cpp",
+			     "COMPONENT_BC.cpp","COMPONENT_JOINT.cpp",
+			     "ANALYTIC_FEM.cpp","DEBUGGING_FEM.cpp",
+			     "ELIMINATION_FEM.cpp","MATRIX_CONSTRUCTION_FEM.cpp",
+			     "CANONICAL_BLOCK.cpp"])
 Automatic_Program(env,"tests",["main-tests.cpp","CACHED_ELIMINATION_MATRIX.cpp",
-                               "FREQUENCY_TRACKER.cpp",
-                               "JOB_SCHEDULER.cpp","COMPONENT_LAYOUT_FEM.cpp","LAYOUT_BUILDER_FEM.cpp",
-                               "COMPONENT_PIPE.cpp","COMPONENT_CHANGE.cpp",
-                               "COMPONENT_BC.cpp","COMPONENT_JOINT.cpp",
-                               "ANALYTIC_FEM.cpp","DEBUGGING_FEM.cpp",
-                               "ELIMINATION_FEM.cpp","MATRIX_CONSTRUCTION_FEM.cpp",
-                               "CANONICAL_BLOCK.cpp"])
+			       "FREQUENCY_TRACKER.cpp",
+			       "EXECUTE_HELPER.cpp",
+			       "JOB_SCHEDULER.cpp","COMPONENT_LAYOUT_FEM.cpp","LAYOUT_BUILDER_FEM.cpp",
+			       "COMPONENT_PIPE.cpp","COMPONENT_CHANGE.cpp",
+			       "COMPONENT_BC.cpp","COMPONENT_JOINT.cpp",
+			       "ANALYTIC_FEM.cpp","DEBUGGING_FEM.cpp",
+			       "ELIMINATION_FEM.cpp","MATRIX_CONSTRUCTION_FEM.cpp",
+			       "CANONICAL_BLOCK.cpp"])
 Automatic_Program(env,"sol_viewer",["main-viewer.cpp","CACHED_ELIMINATION_MATRIX.cpp",
-                             "FREQUENCY_TRACKER.cpp",
-                             "JOB_SCHEDULER.cpp","COMPONENT_LAYOUT_FEM.cpp","LAYOUT_BUILDER_FEM.cpp",
-                             "COMPONENT_PIPE.cpp","COMPONENT_CHANGE.cpp",
-                             "COMPONENT_BC.cpp","COMPONENT_JOINT.cpp",
-                             "ANALYTIC_FEM.cpp","DEBUGGING_FEM.cpp",
-                             "ELIMINATION_FEM.cpp","MATRIX_CONSTRUCTION_FEM.cpp",
-                             "CANONICAL_BLOCK.cpp"])
+			     "FREQUENCY_TRACKER.cpp",
+			     "EXECUTE_HELPER.cpp",
+			     "JOB_SCHEDULER.cpp","COMPONENT_LAYOUT_FEM.cpp","LAYOUT_BUILDER_FEM.cpp",
+			     "COMPONENT_PIPE.cpp","COMPONENT_CHANGE.cpp",
+			     "COMPONENT_BC.cpp","COMPONENT_JOINT.cpp",
+			     "ANALYTIC_FEM.cpp","DEBUGGING_FEM.cpp",
+			     "ELIMINATION_FEM.cpp","MATRIX_CONSTRUCTION_FEM.cpp",
+			     "CANONICAL_BLOCK.cpp"])
+
+if USE_CUDA:
+    Automatic_Program(env,"fem_cuda",["main-fem.cpp","CACHED_ELIMINATION_MATRIX.cpp",
+                                "FREQUENCY_TRACKER.cpp",
+                                "EXECUTE_HELPER_CUDA.cpp",
+                                "JOB_SCHEDULER.cpp","COMPONENT_LAYOUT_FEM.cpp","LAYOUT_BUILDER_FEM.cpp",
+                                "COMPONENT_PIPE.cpp","COMPONENT_CHANGE.cpp",
+                                "COMPONENT_BC.cpp","COMPONENT_JOINT.cpp",
+                                "ANALYTIC_FEM.cpp","DEBUGGING_FEM.cpp",
+                                "ELIMINATION_FEM.cpp","MATRIX_CONSTRUCTION_FEM.cpp",
+                                "CANONICAL_BLOCK.cpp","CUDA_KERNEL.so"])

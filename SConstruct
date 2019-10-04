@@ -305,6 +305,7 @@ def Find_Sources(dirs,ignore=[],sources=[],exclude=[]):
 ### convert sources into objects
 def Automatic_Object_Helper(env,source,libraries):
     if type(source)!=str: return source # assume it's already an object
+    if source.endswith('.so'): return source
     cppdefines_reversed=env['CPPDEFINES'][::-1]
     cpppath_reversed=env['CPPPATH_HIDDEN'][::-1]
     for lib in libraries:
