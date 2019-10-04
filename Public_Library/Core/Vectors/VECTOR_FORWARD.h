@@ -41,9 +41,13 @@ template<class TV,class SCALAR> struct REPLACE_FLOATING_POINT<TWIST<TV>,SCALAR>{
 template<class TV,class SCALAR> struct REPLACE_FLOATING_POINT<FRAME<TV>,SCALAR>{typedef FRAME<typename REPLACE_FLOATING_POINT<TV,SCALAR>::TYPE> TYPE;};
 template<class TV,class SCALAR> struct REPLACE_FLOATING_POINT<ROTATION<TV>,SCALAR>{typedef ROTATION<typename REPLACE_FLOATING_POINT<TV,SCALAR>::TYPE> TYPE;};
 
-template<class T> struct IS_VECTOR{static const int value=0;};
-template<class T,int d> struct IS_VECTOR<ZERO_VECTOR<T,d> > {static const int value=1;};
-template<class T,int d> struct IS_VECTOR<VECTOR<T,d> > {static const int value=1;};
+template<class T> struct HAS_M_FOR_STATIC_SIZE{static const bool value=false;};
+template<class T,int d> struct HAS_M_FOR_STATIC_SIZE<VECTOR<T,d> >{static const bool value=true;};
+template<class T,int d> struct HAS_M_FOR_STATIC_SIZE<TWIST<VECTOR<T,d> > >{static const bool value=true;};
+
+template<class T> struct IS_VECTOR{static const bool value=false;};
+template<class T,int d> struct IS_VECTOR<ZERO_VECTOR<T,d> > {static const bool value=true;};
+template<class T,int d> struct IS_VECTOR<VECTOR<T,d> > {static const bool value=true;};
 
 }
 #endif
