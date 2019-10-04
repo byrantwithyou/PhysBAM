@@ -8,6 +8,8 @@
 #define __SYMMETRIC_MATRIX_NXN__
 
 #include <Core/Arrays/ARRAYS_FORWARD.h>
+#include <Core/Math_Tools/min.h>
+#include <Core/Read_Write/FILE_UTILITIES.h>
 #include <cassert>
 #include <iostream>
 namespace PhysBAM{
@@ -21,23 +23,34 @@ class SYMMETRIC_MATRIX_NXN
 public:
     typedef int HAS_UNTYPED_READ_WRITE;
     int n; // size of the n by n matrix
-    int size; // number of elements in the matrix: (n*n+n)/2
-    T *x; // pointer to the one dimensional data
+    ARRAY<T> x; // pointer to the one dimensional data
 
     SYMMETRIC_MATRIX_NXN()
-        :n(0),size(0),x(0)
+        :n(0)
     {}
 
     SYMMETRIC_MATRIX_NXN(const int n_input);
-    SYMMETRIC_MATRIX_NXN(const SYMMETRIC_MATRIX_NXN<T>& matrix_input);
-
-    ~SYMMETRIC_MATRIX_NXN();
+    SYMMETRIC_MATRIX_NXN(const SYMMETRIC_MATRIX_NXN<T>& matrix_input) = default;
+    ~SYMMETRIC_MATRIX_NXN() = default;
+    SYMMETRIC_MATRIX_NXN<T>& operator=(const SYMMETRIC_MATRIX_NXN<T>& A) = default;
 
     T& operator()(int i,int j)
     {return i<j?Element_Upper(i,j):Element_Lower(i,j);}
 
     const T& operator()(int i,int j) const
     {return i<j?Element_Upper(i,j):Element_Lower(i,j);}
+
+    void Resize(const int n_new)
+    {
+        if(n_new==n) return;
+        ARRAY<T> y(n_new*(n_new+1)/2);
+        int n1=min(n,n_new);
+        for(int i=0;i<n1;i++)
+            for(int j=0;j<=0;j++)
+                y((2*n_new-j-1)*j/2+i)=Element_Lower(i,j);
+        y.Exchange(x);
+        n=n_new;
+    }
 
     T& Element_Upper(int i,int j)
     {return Element_Lower(j,i);}
@@ -46,21 +59,16 @@ public:
     {return Element_Lower(j,i);}
 
     T& Element_Lower(int i,int j)
-    {assert((unsigned)i<(unsigned)n && (unsigned)j<=(unsigned)i);return x[((2*n-j-1)*j>>1)+i];}
+    {assert((unsigned)i<(unsigned)n && (unsigned)j<=(unsigned)i);return x(((2*n-j-1)*j>>1)+i);}
 
     const T& Element_Lower(int i,int j) const
-    {assert((unsigned)i<(unsigned)n && (unsigned)j<=(unsigned)i);return x[((2*n-j-1)*j>>1)+i];}
+    {assert((unsigned)i<(unsigned)n && (unsigned)j<=(unsigned)i);return x(((2*n-j-1)*j>>1)+i);}
 
     template<class RW> void Read(std::istream& input)
-    {delete[] x;
-    Read_Binary<RW>(input,n);
-    assert(n>=0);
-    size=(n*n+n)/2;
-    x=0;
-    if(n>0){x=new T[size];Read_Binary_Array<RW>(input,x,size);}}
+    {Read_Binary<RW>(input,n,x);}
 
     template<class RW> void Write(std::ostream& output) const
-    {Write_Binary<RW>(output,n);Write_Binary_Array<RW>(output,x,size);}
+    {Write_Binary<RW>(output,n,x);}
 
 //#####################################################################
     static SYMMETRIC_MATRIX_NXN<T> Outer_Product(const ARRAY<T>& u);
@@ -71,7 +79,6 @@ public:
     void Maximum_Eigenvalue_Eigenvector_Pair(T& max_eigenvalue,ARRAY<T>& max_eigenvector,RANDOM_NUMBERS<T>* random_numbers=0,const T tolerance=(T)1e-5,
         const T randomization_decay_factor=(T)0.9,const int max_iterations=1000000);
     void In_Place_Cholesky_Factorization(MATRIX_MXN<T>& L);
-    SYMMETRIC_MATRIX_NXN<T>& operator=(const SYMMETRIC_MATRIX_NXN<T>& A);
     SYMMETRIC_MATRIX_NXN<T>& operator+=(const SYMMETRIC_MATRIX_NXN<T>& A);
     SYMMETRIC_MATRIX_NXN<T>& operator-=(const SYMMETRIC_MATRIX_NXN<T>& A);
     SYMMETRIC_MATRIX_NXN<T>& operator*=(const T a);

@@ -15,28 +15,8 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> SYMMETRIC_MATRIX_NXN<T>::
 SYMMETRIC_MATRIX_NXN(const int n_input)
-    :n(n_input),size((n*n+n)/2)
+    :n(n_input),x((n*n+n)/2)
 {
-    x=new T[size];
-    for(int k=0;k<size;k++) x[k]=0;
-}
-//#####################################################################
-// Constructor
-//#####################################################################
-template<class T> SYMMETRIC_MATRIX_NXN<T>::
-SYMMETRIC_MATRIX_NXN(const SYMMETRIC_MATRIX_NXN<T>& matrix_input)
-    :n(matrix_input.n),size((n*n+n)/2)
-{
-    x=new T[size];
-    for(int k=0;k<size;k++) x[k]=matrix_input.x[k];
-}
-//#####################################################################
-// Destructor
-//#####################################################################
-template<class T> SYMMETRIC_MATRIX_NXN<T>::
-~SYMMETRIC_MATRIX_NXN()
-{
-    delete[] x;
 }
 //#####################################################################
 // Function Outer_Product
@@ -56,9 +36,9 @@ Sqr() const
 {
     SYMMETRIC_MATRIX_NXN<T> result(n);
     for(int j=0;j<n;j++) for(int i=j;i<n;i++){
-        for(int k=0;k<j;k++) result(i,j)+=x[((2*n-k-1)*k>>1)+i]*x[((2*n-k-1)*k>>1)+j];
-        for(int k=j;k<=i;k++) result(i,j)+=x[((2*n-k-1)*k>>1)+i]*x[((2*n-j-1)*j>>1)+k];
-        for(int k=i+1;k<n;k++) result(i,j)+=x[((2*n-i-1)*i>>1)+k]*x[((2*n-j-1)*j>>1)+k];}
+        for(int k=0;k<j;k++) result(i,j)+=x(((2*n-k-1)*k>>1)+i)*x(((2*n-k-1)*k>>1)+j);
+        for(int k=j;k<=i;k++) result(i,j)+=x(((2*n-k-1)*k>>1)+i)*x(((2*n-j-1)*j>>1)+k);
+        for(int k=i+1;k<n;k++) result(i,j)+=x(((2*n-i-1)*i>>1)+k)*x(((2*n-j-1)*j>>1)+k);}
     return result;
 }
 //#####################################################################
@@ -138,23 +118,12 @@ In_Place_Cholesky_Factorization(MATRIX_MXN<T>& L)
         for(int i=j+1;i<n;i++) L(i,j)=Element_Lower(i,j)*diagonal_inverse;} // update L
 }
 //#####################################################################
-// Function operator=
-//#####################################################################
-template<class T> SYMMETRIC_MATRIX_NXN<T>& SYMMETRIC_MATRIX_NXN<T>::
-operator=(const SYMMETRIC_MATRIX_NXN<T>& A)
-{
-    if(!x || n!=A.n){delete[] x;x=new T[(A.n*A.n+A.n)/2];}
-    n=A.n;size=(n*n+n)/2;
-    for(int k=0;k<size;k++) x[k]=A.x[k];
-    return *this;
-}
-//#####################################################################
 // Function operator+=
 //#####################################################################
 template<class T> SYMMETRIC_MATRIX_NXN<T>& SYMMETRIC_MATRIX_NXN<T>::
 operator+=(const SYMMETRIC_MATRIX_NXN<T>& A)
 {
-    for(int i=0;i<size;i++) x[i]+=A.x[i];
+    x+=A.x;
     return *this;
 }
 //#####################################################################
@@ -163,7 +132,7 @@ operator+=(const SYMMETRIC_MATRIX_NXN<T>& A)
 template<class T> SYMMETRIC_MATRIX_NXN<T>& SYMMETRIC_MATRIX_NXN<T>::
 operator-=(const SYMMETRIC_MATRIX_NXN<T>& A)
 {
-    for(int i=0;i<size;i++) x[i]-=A.x[i];
+    x-=A.x;
     return *this;
 }
 //#####################################################################
@@ -172,7 +141,7 @@ operator-=(const SYMMETRIC_MATRIX_NXN<T>& A)
 template<class T> SYMMETRIC_MATRIX_NXN<T>& SYMMETRIC_MATRIX_NXN<T>::
 operator*=(const T a)
 {
-    for(int i=0;i<size;i++) x[i]*=a;
+    x*=a;
     return *this;
 }
 //#####################################################################
@@ -183,7 +152,7 @@ operator+(const SYMMETRIC_MATRIX_NXN<T>& A) const
 {
     assert(A.n==n);
     SYMMETRIC_MATRIX_NXN<T> result(n);
-    for(int i=0;i<size;i++) result.x[i]=x[i]+A.x[i];
+    result.x=x+A.x;
     return result;
 }
 //#####################################################################
@@ -194,7 +163,7 @@ operator-(const SYMMETRIC_MATRIX_NXN<T>& A) const
 {
     assert(A.n==n);
     SYMMETRIC_MATRIX_NXN<T> result(n);
-    for(int i=0;i<size;i++) result.x[i]=x[i]-A.x[i];
+    result.x=x-A.x;
     return result;
 }
 //#####################################################################
@@ -204,7 +173,7 @@ template<class T> SYMMETRIC_MATRIX_NXN<T> SYMMETRIC_MATRIX_NXN<T>::
 operator*(const T a) const
 {
     SYMMETRIC_MATRIX_NXN<T> result(n);
-    for(int i=0;i<size;i++) result.x[i]=x[i]*a;
+    result.x=x*a;
     return result;
 }
 //#####################################################################
@@ -217,9 +186,9 @@ operator*(const ARRAY<T>& y) const
     ARRAY<T> result(n);
     for(int i=0;i<n;i++){
         for(int j=0;j<=i;j++)
-            result(i)+=x[((2*n-j-1)*j>>1)+i]*y(j);
+            result(i)+=x(((2*n-j-1)*j>>1)+i)*y(j);
         for(int j=i+1;j<n;j++)
-            result(i)+=x[((2*n-i-1)*i>>1)+j]*y(j);}
+            result(i)+=x(((2*n-i-1)*i>>1)+j)*y(j);}
     return result;
 }
 //#####################################################################
@@ -229,7 +198,7 @@ template<class T> void SYMMETRIC_MATRIX_NXN<T>::
 Set_Identity_Matrix()
 {
     Set_Zero_Matrix();
-    for(int i=0,j=n;j>0;i+=j--) x[i]=1;
+    for(int i=0,j=n;j>0;i+=j--) x(i)=1;
 }
 //#####################################################################
 // Function Set_Zero_Matrix
@@ -237,7 +206,7 @@ Set_Identity_Matrix()
 template<class T> void SYMMETRIC_MATRIX_NXN<T>::
 Set_Zero_Matrix()
 {
-    for(int i=0;i<size;i++) x[i]=0;
+    x.Fill(0);
 }
 //#####################################################################
 // Function Identity_Matrix
@@ -246,7 +215,7 @@ template<class T> SYMMETRIC_MATRIX_NXN<T> SYMMETRIC_MATRIX_NXN<T>::
 Identity_Matrix(const int n)
 {
     SYMMETRIC_MATRIX_NXN<T> A(n);
-    for(int i=0,j=n;j>0;i+=j--) A.x[i]=1;
+    for(int i=0,j=n;j>0;i+=j--) A.x(i)=1;
     return A;
 }
 //#####################################################################
