@@ -144,28 +144,10 @@ void Run(PARSE_ARGS& parse_args)
     T dx=box.Edge_Lengths().Max()/resolution;
     int m=box.Edge_Lengths()(0)/dx,n=box.Edge_Lengths()(1)/dx;
     INTERPOLATED_COLOR_MAP<T> log10_icm;
-    log10_icm.colors.Add_Control_Point(1.00001,VECTOR<T,3>(1,1,1));
-    log10_icm.colors.Add_Control_Point(1,VECTOR<T,3>(1,1,1));
-    log10_icm.colors.Add_Control_Point(1e-1,VECTOR<T,3>(1,0,0));
-    log10_icm.colors.Add_Control_Point(1e-2,VECTOR<T,3>(1,.5,0));
-    log10_icm.colors.Add_Control_Point(1e-3,VECTOR<T,3>(1,1,0));
-    log10_icm.colors.Add_Control_Point(1e-4,VECTOR<T,3>(0,1,0));
-    log10_icm.colors.Add_Control_Point(1e-5,VECTOR<T,3>(0,1,1));
-    log10_icm.colors.Add_Control_Point(1e-6,VECTOR<T,3>(0,0,1));
-    log10_icm.colors.Add_Control_Point(1e-7,VECTOR<T,3>(.5,0,1));
-    log10_icm.colors.Add_Control_Point(0,VECTOR<T,3>(0,0,0));
+    log10_icm.Initialize_Colors(1e-6,1,true,true,false);
 
     INTERPOLATED_COLOR_MAP<T> linear_icm;
-    linear_icm.colors.Add_Control_Point(1.00001,VECTOR<T,3>(1,1,1));
-    linear_icm.colors.Add_Control_Point(1,VECTOR<T,3>(1,1,1));
-    linear_icm.colors.Add_Control_Point(0.875,VECTOR<T,3>(1,0,0));
-    linear_icm.colors.Add_Control_Point(0.75,VECTOR<T,3>(1,.5,0));
-    linear_icm.colors.Add_Control_Point(0.625,VECTOR<T,3>(1,1,0));
-    linear_icm.colors.Add_Control_Point(0.5,VECTOR<T,3>(0,1,0));
-    linear_icm.colors.Add_Control_Point(0.375,VECTOR<T,3>(0,1,1));
-    linear_icm.colors.Add_Control_Point(0.25,VECTOR<T,3>(0,0,1));
-    linear_icm.colors.Add_Control_Point(0.125,VECTOR<T,3>(.5,0,1));
-    linear_icm.colors.Add_Control_Point(0,VECTOR<T,3>(0,0,0));
+    linear_icm.Initialize_Colors(0,1,false,true,false);
 
     // H: in degrees [0,360]
     auto HSV_To_RGB=[](T h,T s,T v)
