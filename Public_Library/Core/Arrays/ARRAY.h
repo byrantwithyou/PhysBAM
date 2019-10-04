@@ -221,9 +221,9 @@ private:
         if(buffer_size<m_new){
             int new_buffer_size=exact?p:(p?2*p:2);
             T* new_buffer=(T*)new unsigned char[sizeof(T)*new_buffer_size];
-            if(init) for(int i=(fill?0:n);i<p;i++) new(new_buffer+i)T(initialization_value...);
             if(copy) for(int i=0;i<n;i++) new(new_buffer+i)T(std::move(base_pointer[i]));
-            if(!init) for(int i=(copy?n:0);i<p;i++) new(new_buffer+i)T;
+            if(init) for(int i=(fill?0:n);i<p;i++) new(new_buffer+i)T(initialization_value...);
+            else for(int i=(copy?n:0);i<p;i++) new(new_buffer+i)T;
             Call_Destructors_And_Free();
             base_pointer=new_buffer;
             buffer_size=ID(new_buffer_size);}
