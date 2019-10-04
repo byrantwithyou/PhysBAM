@@ -1000,6 +1000,30 @@ Fill_Holes(bool connect_to_centroid)
     if(connect_to_centroid) this->Update_Number_Nodes();
 }
 //#####################################################################
+// Function Get_Vertex_Normals
+//#####################################################################
+template<class T> void TRIANGULATED_SURFACE<T>::
+Get_Vertex_Normals(ARRAY<TV>& normals) const
+{
+    if(avoid_normal_interpolation_across_sharp_edges) PHYSBAM_NOT_IMPLEMENTED();
+    else normals=*vertex_normals;
+}
+//#####################################################################
+// Function Get_Average_Vertex_Area
+//#####################################################################
+template <class T> void TRIANGULATED_SURFACE<T>::
+Get_Average_Vertex_Area(ARRAY<T>& vertex_area)
+{
+    vertex_area.Resize(mesh.number_nodes);
+    for(int t=0;t<mesh.elements.m;t++){
+        int node1,node2,node3;
+        mesh.elements(t).Get(node1,node2,node3);
+        T area_over_3=TRIANGLE_3D<T>::Area(particles.X(node1),particles.X(node2),particles.X(node3))/3;
+        vertex_area(node1)+=area_over_3;
+        vertex_area(node2)+=area_over_3;
+        vertex_area(node3)+=area_over_3;}
+}
+//#####################################################################
 namespace PhysBAM{
 template class TRIANGULATED_SURFACE<float>;
 template class TRIANGULATED_SURFACE<double>;

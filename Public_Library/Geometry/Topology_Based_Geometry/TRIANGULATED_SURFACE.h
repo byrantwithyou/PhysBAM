@@ -57,6 +57,9 @@ public:
     {if(triangle_list) return (*triangle_list)(index).Normal();
     return PLANE<T>::Normal(particles.X.Subset(mesh.elements(index)));}
     
+    TV Normal(const int aggregate) const
+    {return Face_Normal(aggregate);}
+
     TV Centroid(const int triangle) const
     {int i,j,k;mesh.elements(triangle).Get(i,j,k);
     return ((T)1/3)*(particles.X(i)+particles.X(j)+particles.X(k));}
@@ -99,9 +102,6 @@ public:
 
     T Signed_Size(const int triangle) const
     {return Signed_Area(triangle);}
-
-    TV Normal(const int aggregate) const
-    {return Face_Normal(aggregate);}
 
 //#####################################################################
     void Clean_Memory() override;
@@ -157,6 +157,8 @@ public:
     // polygons have same orientation as triangles
     void Compute_Holes(ARRAY<ARRAY<int> >& holes);
     void Fill_Holes(bool connect_to_centroid=false);
+    void Get_Vertex_Normals(ARRAY<TV>& normals) const;
+    void Get_Average_Vertex_Area(ARRAY<T>& vertex_area);
   private:
     void Refresh_Auxiliary_Structures_Helper() override;
 //#####################################################################

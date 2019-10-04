@@ -42,6 +42,8 @@ public:
     void Get_Segments_Near_Segments(ARRAY<ARRAY<int> >& segments_near_segments,const SEGMENT_MESH& test_segment_mesh,ARRAY_VIEW<const TV> X,const T thickness_over_2,
         const bool update_bounding_boxes);
     TV Normal(const int aggregate) const;
+    void Get_Vertex_Normals(ARRAY<VECTOR<T,2> >& normals) const;
+    void Get_Segment_Normals(ARRAY<VECTOR<T,2> >& segment_normals) const;
 //#####################################################################
 };
 }

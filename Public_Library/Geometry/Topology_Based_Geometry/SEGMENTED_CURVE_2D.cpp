@@ -154,6 +154,34 @@ Get_Segments_Near_Segments(ARRAY<ARRAY<int> >& segments_near_segments,const SEGM
     
     if(!hierarchy_defined){delete hierarchy;hierarchy=0;}
 }
+//#####################################################################
+// Function Get_Vertex_Normals
+//#####################################################################
+template<class T> void SEGMENTED_CURVE_2D<T>::
+Get_Vertex_Normals(ARRAY<TV>& normals) const
+{
+    normals.Resize(particles.number,init_all);
+    ARRAY<int> vertex_edge_numbers(particles.number);
+
+    for(int e=0;e<mesh.elements.m;e++){
+        int i,j;mesh.elements(e).Get(i,j);
+        vertex_edge_numbers(i)++;
+        vertex_edge_numbers(j)++;
+        TV segment_normal=SEGMENT_2D<T>(particles.X(i),particles.X(j)).Normal();
+        normals(i)+=segment_normal;
+        normals(j)+=segment_normal;}
+    for(int i=0;i<normals.Size();i++) normals(i)/=vertex_edge_numbers(i);
+}
+//#####################################################################
+// Function Get_Segment_Normals
+//#####################################################################
+template<class T> void SEGMENTED_CURVE_2D<T>::
+Get_Segment_Normals(ARRAY<TV>& segment_normals) const
+{
+    segment_normals.Resize(mesh.elements.m);
+    for(int e=0;e<mesh.elements.m;e++)
+        segment_normals(e)=Normal(e);
+}
 //####################################################################
 namespace PhysBAM{
 template class SEGMENTED_CURVE_2D<float>;
