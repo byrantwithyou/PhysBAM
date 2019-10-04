@@ -6,6 +6,7 @@
 #include <Core/Log/DEBUG_SUBSTEPS.h>
 #include <Core/Log/LOG.h>
 #include <Core/Log/SCOPE.h>
+#include <Core/Math_Tools/pow.h>
 #include <Core/Matrices/DIAGONAL_MATRIX.h>
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Core/Matrices/SYMMETRIC_MATRIX.h>

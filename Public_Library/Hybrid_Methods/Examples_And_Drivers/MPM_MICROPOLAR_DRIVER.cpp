@@ -5,6 +5,7 @@
 #include <Core/Log/DEBUG_SUBSTEPS.h>
 #include <Core/Log/LOG.h>
 #include <Core/Log/SCOPE.h>
+#include <Core/Math_Tools/pow.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/MINRES.h>
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>

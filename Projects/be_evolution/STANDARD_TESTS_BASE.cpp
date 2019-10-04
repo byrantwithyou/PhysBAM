@@ -2,6 +2,7 @@
 // Copyright 2011.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Math_Tools/pow.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <Tools/Parsing/PARSE_ARGS.h>

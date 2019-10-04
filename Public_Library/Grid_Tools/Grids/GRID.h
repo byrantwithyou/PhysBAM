@@ -11,7 +11,6 @@
 
 #include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
-#include <Core/Math_Tools/pow.h>
 #include <Core/Math_Tools/RANGE.h>
 #include <Core/Vectors/VECTOR_3D.h>
 #include <Grid_Tools/Grids/FACE_INDEX.h>

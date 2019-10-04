@@ -10,6 +10,7 @@
 #define __STANDARD_TESTS_2D__
 
 #include <Core/Log/LOG.h>
+#include <Core/Math_Tools/pow.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Images/PNG_FILE.h>
 #include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>

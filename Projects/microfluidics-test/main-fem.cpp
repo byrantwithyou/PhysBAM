@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Data_Structures/PAIR.h>
+#include <Core/Math_Tools/pow.h>
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Core/Utilities/PROCESS_UTILITIES.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>

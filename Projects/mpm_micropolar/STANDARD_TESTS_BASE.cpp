@@ -2,6 +2,7 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Math_Tools/pow.h>
 #include <Core/Math_Tools/RANGE_ITERATOR.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>

@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Log/DEBUG_SUBSTEPS.h>
+#include <Core/Math_Tools/pow.h>
 #include <Core/Math_Tools/RANGE_ITERATOR.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Images/PNG_FILE.h>

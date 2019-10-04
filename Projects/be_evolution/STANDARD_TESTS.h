@@ -73,6 +73,7 @@
 
 #include <Core/Arrays/PROJECTED_ARRAY.h>
 #include <Core/Log/LOG.h>
+#include <Core/Math_Tools/pow.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>

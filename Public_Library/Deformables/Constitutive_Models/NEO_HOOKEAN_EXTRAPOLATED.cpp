@@ -3,7 +3,6 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Math_Tools/cube.h>
-#include <Core/Math_Tools/pow.h>
 #include <Core/Matrices/DIAGONAL_MATRIX.h>
 #include <Core/Matrices/MATRIX_2X2.h>
 #include <Core/Matrices/MATRIX_3X3.h>

@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Log/DEBUG_SUBSTEPS.h>
+#include <Core/Math_Tools/pow.h>
 #include <Tools/Auto_Diff/AUTO_HESS.h>
 #include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>

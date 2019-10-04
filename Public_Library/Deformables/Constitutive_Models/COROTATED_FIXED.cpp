@@ -4,7 +4,6 @@
 //#####################################################################
 #include <Core/Log/LOG.h>
 #include <Core/Math_Tools/cube.h>
-#include <Core/Math_Tools/pow.h>
 #include <Core/Matrices/DIAGONAL_MATRIX.h>
 #include <Core/Matrices/MATRIX_1X1.h>
 #include <Core/Matrices/MATRIX_2X2.h>
