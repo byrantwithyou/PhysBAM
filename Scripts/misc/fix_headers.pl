@@ -84,6 +84,24 @@ sub dump_headers
     $cf = "";
     $last = "";
 }
+sub try_find_file
+{
+    my ($file,$pre,$post)=@_;
+    if(defined $lookup{$file})
+    {
+        $lookup{$file}=~/^(.*?)\//;
+        if(!defined $category{$1}){$category{$1}=[];}
+        my $L=$category{$1};
+        push @$L, ["<$lookup{$file}>",$pre,$post];
+        return 1;
+    }
+    if(defined $local_lookup{$file})
+    {
+        push @local_includes, ["\"$local_lookup{$file}\"",$pre,$post];
+        return 1;
+    }
+    return 0;
+};
 for $filenamex (@ARGV)
 {
     $filename=$filenamex;
@@ -104,16 +122,11 @@ for $filenamex (@ARGV)
         my $file = $5;
         my $pre = $1;
         my $post = $7;
-        if(defined $system{$file}){push @system, [$full,$pre,$post];next;}
-        if(defined $lookup{$file})
+        if(&try_find_file($file,$pre,$post)){next;}
+        if(/([a-zA-Z_]+)\.h/)
         {
-            $lookup{$file}=~/^(.*?)\//;
-            if(!defined $category{$1}){$category{$1}=[];}
-            my $L=$category{$1};
-            push @$L, ["<$lookup{$file}>",$pre,$post];
-            next;
+            if(&try_find_file(uc($1).".h",$pre,$post)){next;}
         }
-        if(defined $local_lookup{$file}){push @local_includes, ["\"$local_lookup{$file}\"",$pre,$post];next;}
         if(!$path){push @other, [$full,$pre,$post];next;}
         print  "include not recognized: '$file' in '$filename'\n";
         push @other, [$full,$pre,$post];
