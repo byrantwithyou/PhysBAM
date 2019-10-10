@@ -52,7 +52,8 @@ Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& imag
                 VECTOR<T,d> pixel_values((T)256*corrected_image->array(t));
                 VECTOR<int,d> floored_values;
                 for(int channel=0;channel<d;channel++) floored_values[channel]=(int)pixel_values[channel];
-                VECTOR<T,d> random_stuff=random.Get_Uniform_Vector(VECTOR<T,d>(),VECTOR<T,d>::All_Ones_Vector());
+                VECTOR<T,d> random_stuff;
+                random.Fill_Uniform(random_stuff,0,1);
                 VECTOR<T,d> normalized_values=pixel_values-VECTOR<T,d>(floored_values);
                 for(int k=0;k<d;k++)
                     if(random_stuff(k)>normalized_values(k)) corrected_image->array(t)[k]=(floored_values[k]+(T).5001)/(T)256; // use normal quantized floor

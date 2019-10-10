@@ -667,7 +667,8 @@ Init(const RANGE<TV>& box,T radius_input)
     P[2]=box.Center()-e*(T)2;
     P[1]=TV(P[2].x,P[0].y);
     P[3]=TV(P[0].x,P[2].y);
-    TV E=random.Get_Uniform_Vector(box);
+    TV E;
+    random.Fill_Uniform(E,box);
 
     CELL *cellP[4]={};
     COEDGE *PE[4]={},*EP[4]={},*PQ[4]={},*QP[4]={};

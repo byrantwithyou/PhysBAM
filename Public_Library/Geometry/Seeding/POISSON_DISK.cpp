@@ -79,7 +79,8 @@ Sample(RANDOM_NUMBERS<T>& random,const RANGE<TV>& box,ARRAY<TV>& X)
             Insert_In_Array(grid_array,grid.Cell(X(i)),i,grid.numbers_of_cells,
                 ghost,is_periodic,(TV_INT*)0);}
     else{
-        TV first_point=random.Get_Uniform_Vector(box);
+        TV first_point;
+        random.Fill_Uniform(first_point,box);
         grid_array(grid.Cell(first_point))=0;
         X.Append(first_point);}
     ARRAY<int> active(IDENTITY_ARRAY<>(X.m));
@@ -104,7 +105,8 @@ template<class TV> TV POISSON_DISK<TV>::
 Generate_Random_Point_Around_Annulus(RANDOM_NUMBERS<T>& random,TV& center) const
 {
     while(1){
-        TV v=random.Get_Uniform_Vector(RANGE<TV>::Centered_Box());
+        TV v;
+        random.Fill_Uniform(v,-1,1);
         T mag2=v.Magnitude_Squared();
         if(mag2>=0.25 && mag2<=1) return v*min_distance*2+center;}
     return TV();

@@ -200,6 +200,16 @@ inline UPPER_TRIANGULAR_MATRIX<T,d> operator-(const DIAGONAL_MATRIX<T,d>& A,cons
 template<class T>
 inline std::ostream& operator<<(std::ostream& output_stream,const UPPER_TRIANGULAR_MATRIX<T,0>& A)
 {return output_stream<<"[]";}
+
+template<class T> class RANDOM_NUMBERS;
+//#####################################################################
+// Function Random_Fill_Uniform
+//#####################################################################
+template<class T,int d> void
+Random_Fill_Uniform(RANDOM_NUMBERS<T>& rand,UPPER_TRIANGULAR_MATRIX<T,d>& m,const T a,const T b)
+{
+    for(int j=0;j<d;j++) for(int i=0;i<=j;i++) m(i,j)=rand.Get_Uniform_Number(a,b);
+}
 //#####################################################################
 }
 #endif

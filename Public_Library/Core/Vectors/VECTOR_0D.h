@@ -449,6 +449,15 @@ template<class T> inline bool
 in_bounds(const VECTOR<T,0>& v,const VECTOR<T,0>& vmin,const VECTOR<T,0>& vmax)
 {return true;}
 
+template<class T> class RANDOM_NUMBERS;
+//#####################################################################
+// Function Random_Fill_Uniform
+//#####################################################################
+template<class T,int d> void
+Random_Fill_Uniform(RANDOM_NUMBERS<T>& rand,VECTOR<T,d>& u,const VECTOR<T,d>& v0,const VECTOR<T,d>& v1)
+{
+    for(int i=0;i<d;i++) u(i)=rand.Get_Uniform_Number(v0(i),v1(i));
+}
 //#####################################################################
 }
 #include <Core/Vectors/VECTOR.h>

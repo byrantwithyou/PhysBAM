@@ -350,5 +350,12 @@ template<class T,int d>
 inline DIAGONAL_MATRIX<T,d> exp(const DIAGONAL_MATRIX<T,d>& A)
 {return DIAGONAL_MATRIX<T,d>(exp(A.x));}
 //#####################################################################
+// Function Random_Fill_Uniform
+//#####################################################################
+template<class T,int d> void
+Random_Fill_Uniform(RANDOM_NUMBERS<T>& rand,DIAGONAL_MATRIX<T,d>& m,const T a,const T b)
+{
+    for(int i=0;i<m.Rows();i++) m(i,i)=rand.Get_Uniform_Number(a,b);
+}
 }
 #endif

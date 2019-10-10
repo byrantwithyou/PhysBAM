@@ -301,7 +301,8 @@ Initialize()
             begin_frame=[this](int frame)
                 {
                     if(frame%8==0 && frame<200){
-                        TV center=random.Get_Uniform_Vector(TV(.4,1,.4),TV(.6,1,.6))*m;
+                        TV center;
+                        random.Fill_Uniform(center,TV(.4,1,.4)*m,TV(.6,1,.6)*m);
                         T angle=random.Get_Uniform_Number((T)0,(T)pi*2);
                         ROTATION<TV> rotation(angle,TV(0,1,0));
                         int old_m=particles.number;
@@ -2191,7 +2192,7 @@ Initialize()
             ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
             for(int p=0;p<number_of_particles;p++){
                 particles.valid(p)=true;
-                particles.X(p)=random.Get_Uniform_Vector(block);
+                random.Fill_Uniform(particles.X(p),block);
                 particles.F(p)=MATRIX<T,TV::m>()+1;
                 if(particles.store_Fp) particles.Fp(p).Set_Identity_Matrix();
                 particles.V(p)=TV();
@@ -2238,7 +2239,8 @@ Initialize()
                                 auto min_grid=[half_edge](int index, int grid){return (T)index/grid+sqrt(2)*half_edge;};
                                 auto max_grid=[half_edge](int index, int grid){return (T)(index+1)/grid-sqrt(2)*half_edge;};
                                 int old_m=particles.number;
-                                TV center=random.Get_Uniform_Vector(TV(min_grid(i,grid_i),min_grid(j,grid_j),0.6),TV(max_grid(i,grid_i),max_grid(j,grid_j),0.8))*m;
+                                TV center;
+                                random.Fill_Uniform(center,TV(min_grid(i,grid_i),min_grid(j,grid_j),0.6)*m,TV(max_grid(i,grid_i),max_grid(j,grid_j),0.8)*m);
                                 T angle=random.Get_Uniform_Number((T)0,(T)pi*2);
                                 ROTATION<TV> rotation(angle,TV(0,1,0));
                                 for(int k=0;k<m_per_box;k++) Add_Particle(center+rotation.Rotate(particles.X(k)),0,0,particles.mass(k),particles.volume(k));

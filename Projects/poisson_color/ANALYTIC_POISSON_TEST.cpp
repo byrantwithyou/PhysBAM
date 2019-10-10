@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Log/LOG.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include "ANALYTIC_POISSON_TEST.h"
 using namespace PhysBAM;
@@ -14,7 +15,7 @@ Test(const RANGE<TV>& domain) const
     int c=-4;
     TV X;
     for(int i=0;i<100 && c<0;i++){
-        X=rand.Get_Uniform_Vector(domain);
+        rand.Fill_Uniform(X,domain);
         analytic_levelset->phi(X,0,c);}
     if(c<0){
         LOG::cout<<"Could not find nonnegative color for poisson solution test."<<std::endl;

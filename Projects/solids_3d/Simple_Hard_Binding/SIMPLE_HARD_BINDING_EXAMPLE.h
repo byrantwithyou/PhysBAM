@@ -123,7 +123,9 @@ void Subsample_Surface()
     // Sprinkle more points on the boundary
     for(int i=0;i<subsamples*surface->mesh.elements.m;i++){
         int triangle=random_numbers.Get_Uniform_Integer(1,surface->mesh.elements.m);
-        VECTOR<T,3> weights;do{weights=random_numbers.Get_Uniform_Vector(TV(),TV(1,1,1));}while(weights.x+weights.y>=1);weights.z=(T)1-weights.x-weights.y;
+        VECTOR<T,3> weights;
+        do random_numbers.Fill_Uniform(weights,TV(),TV(1,1,1));
+        while(weights.x+weights.y>=1);weights.z=(T)1-weights.x-weights.y;
         int hard_bound_particle=particles.Add_Element();
         binding_list.Add_Binding(new LINEAR_BINDING<TV,3>(particles,hard_bound_particle,surface->mesh.elements(triangle),weights));
         int soft_bound_particle=particles.Add_Element();
@@ -220,7 +222,9 @@ void Add_Subsamples(const int triangle,ARRAY<BINDING<TV>*>& new_binding_list,ARR
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     for(int i=0;i<subsamples;i++){
-        VECTOR<T,3> weights;do{weights=random_numbers.Get_Uniform_Vector(TV(),TV(1,1,1));}while(weights.x+weights.y>=1);weights.z=(T)1-weights.x-weights.y;
+        VECTOR<T,3> weights;
+        do random_numbers.Fill_Uniform(weights,TV(),TV(1,1,1));
+        while(weights.x+weights.y>=1);weights.z=(T)1-weights.x-weights.y;
         // add hard binding
         int hard_bound_particle=particles.Add_Element_From_Deletion_List();
         // get the parents in the coarse mesh

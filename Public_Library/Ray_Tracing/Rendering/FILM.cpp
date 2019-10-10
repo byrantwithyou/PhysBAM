@@ -654,7 +654,12 @@ Generate_Stratified_Sample_Points(const VECTOR<int,2>& pixel_index,const CAMERA<
                 SAMPLE sample;
                 sample.time=0;
                 sample.alpha=0;
-                if(sampler==JITTERED) sample.film_position=subpixel_center+random.Get_Uniform_Vector(-(T).5*subpixel_grid.dX,(T).5*subpixel_grid.dX);
+                if(sampler==JITTERED)
+                {
+                    TV2 X;
+                    random.Fill_Uniform(X,-(T).5*subpixel_grid.dX,(T).5*subpixel_grid.dX);
+                    sample.film_position=subpixel_center+X;
+                }
                 else sample.film_position=subpixel_center;
                 sample.world_position=camera.focal_point+camera.horizontal_vector*sample.film_position[0]+camera.vertical_vector*sample.film_position[1];
                 samples.Append(sample);}}}
@@ -664,7 +669,12 @@ Generate_Stratified_Sample_Points(const VECTOR<int,2>& pixel_index,const CAMERA<
             SAMPLE sample;
             sample.time=0;
             sample.alpha=0;
-            if(sampler==JITTERED) sample.film_position=pixel_center+random.Get_Uniform_Vector(-(T).5*grid.dX,(T).5*grid.dX);
+            if(sampler==JITTERED)
+            {
+                TV2 X;
+                random.Fill_Uniform(X,-(T).5*grid.dX,(T).5*grid.dX);
+                sample.film_position=pixel_center+X;
+            }
             else sample.film_position=pixel_center;
             sample.world_position=camera.focal_point+camera.horizontal_vector*sample.film_position[0]+camera.vertical_vector*sample.film_position[1];
             samples.Append(sample);}}

@@ -97,7 +97,8 @@ Test_Move_Rigid_Body_Diff()
     
     RANDOM_NUMBERS<T> rand;
 
-    FRAME<TV> frame0=rand.template Get_Frame<TV>(TV()-1,TV()+1);
+    FRAME<TV> frame0;
+    rand.Fill_Uniform(frame0,-1,1);
     MATRIX<T,TV::m> inertia_tmp;
     rand.Fill_Uniform(inertia_tmp,-1,1);
     SYMMETRIC_MATRIX<T,TV::m> inertia0=inertia_tmp.Outer_Product_Matrix();

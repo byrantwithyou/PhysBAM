@@ -211,7 +211,9 @@ Update_Streamlines()
 
     for(int i=0;i<number_of_streamlines;i++){
         int p=streamlines.particles.Add_Element();
-        TV X=streamlines.particles.X(p)=random.Get_Uniform_Vector(grid.domain);
+        TV X;
+        random.Fill_Uniform(X,grid.domain);
+        streamlines.particles.X(p)=X;
         for(int step=0;step<number_of_steps;step++){
             TV velocity=linear_interpolation.Clamped_To_Array_Face(grid,V_lookup,X);
             TV X_new=X+step_length*velocity;

@@ -109,8 +109,11 @@ public:
 };
 template<class TV> inline std::istream& operator>>(std::istream& input,FRAME<TV>& f)
 {Ignore(input,'(');input>>f.t>>f.r;Ignore(input,')');return input;}
-
 template<class TV> inline std::ostream& operator<<(std::ostream& output,const FRAME<TV>& f)
 {output<<"("<<f.t<<"  "<<f.r<<")";return output;}
+template<class T,class TV> void
+Random_Fill_Uniform(RANDOM_NUMBERS<T>& rand,FRAME<TV>& f,const T a,const T b);
+template<class T,class TV> void
+Random_Fill_Uniform(RANDOM_NUMBERS<T>& rand,FRAME<TV>& m,const TV& v0,const TV& v1);
 }
 #endif

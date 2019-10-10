@@ -137,7 +137,8 @@ public:
     for(int i=0;i<num_iterations_per_test && ok;i++){
         RANGE<TV> box=Make_Random_Valid_Box<TV>();
         box.max_corner+=(T).1; // Avoid sliver boxes, as these cannot computed accurately enough.
-        T random_value=rand.Get_Uniform_Number((T).1,(T)10);
+        T random_value;
+        rand.Fill_Uniform(random_value,(T).1,(T)10);
         Test(Equal_To_Tolerance((box*random_value).Size(),box.Size()*pow<TV::m,T>(random_value)),"Multiplication affects scaling of volume correctly.",ok);
         Test(Equal_To_Tolerance((box/random_value).Size(),box.Size()/pow<TV::m,T>(random_value)),"Division affects scaling of volume correctly.",ok);}
     return ok;}
@@ -177,7 +178,7 @@ public:
         box.Reset_Bounds(random_vector);
         Test(box.Lazy_Inside(random_vector),"Reset_bounds moves bounds correctly.",ok);
         for(int j=0;j<num_iterations_per_subtest && ok;j++){
-            box_vector=rand.Get_Uniform_Vector(copy);
+            rand.Fill_Uniform(box_vector,copy);
             Test(box_vector==random_vector || !box.Lazy_Inside(box_vector),"Reset_bounds does not include any points but center.",ok);}}
 
     ARRAY<TV> points(num_iterations_per_test);
@@ -210,10 +211,12 @@ public:
     {bool ok=true;
     for(int i=0;i<num_iterations_per_test && ok;i++){ // TODO: test Enlarge_By_Sign
         RANGE<TV> box=Make_Random_Valid_Box<TV>()/2,copy=box; // make box smaller so it's more likely that random points end on the border
-        T random_delta=rand.Get_Uniform_Number((T)1e-3,(T)10);
+        T random_delta;
+        rand.Fill_Uniform(random_delta,(T)1e-3,(T)10);
         copy.Change_Size(random_delta);
         for(int j=0;j<num_iterations_per_subtest && ok;j++){
-            TV random_inside_vector=rand.Get_Uniform_Vector(box),shift;
+            TV random_inside_vector,shift;;
+            rand.Fill_Uniform(random_inside_vector,box);
             rand.Fill_Uniform(shift,(T)1e-5,random_delta);
             Test(copy.Lazy_Inside(random_inside_vector+shift),"Scalar expansion allows for sufficiently-close vectors outside boundary.",ok);}
         copy=box;
@@ -221,12 +224,15 @@ public:
         rand.Fill_Uniform(random_expansion,(T)1e-3,(T)4);
         copy.Change_Size(random_expansion);
         for(int j=0;j<num_iterations_per_subtest && ok;j++){
-            TV random_inside_vector=rand.Get_Uniform_Vector(box),shift=rand.Get_Uniform_Vector(-random_expansion,random_expansion);
+            TV random_inside_vector,shift;
+            rand.Fill_Uniform(random_inside_vector,box);
+            rand.Fill_Uniform(shift,-random_expansion,random_expansion);
             Test(copy.Lazy_Inside(random_inside_vector+shift),"Vector expansion allows for sufficiently-close vectors outside boundary.",ok);}
         box.max_corner+=(T).1; // Make sure volumes can be computed accurately to pass tolerance.
         for(int j=0;j<num_iterations_per_subtest && ok;j++){
             copy=box;
-            T random_delta_value=rand.Get_Uniform_Number((T).01,(T)10);
+            T random_delta_value;
+            rand.Fill_Uniform(random_delta_value,(T).01,(T)10);
             copy.Change_Size(random_delta_value);
             Test(Equal_To_Tolerance(copy.Size(),box.Thickened(random_delta_value).Size()),"Change_Size and Thicken produce same volume.",ok);
             copy=box;
@@ -245,15 +251,18 @@ public:
     for(int i=0;i<num_iterations_per_test && ok;i++){ // TODO: test boundary better
         RANGE<TV> box=Make_Random_Valid_Box<TV>();
         for(int j=0;j<num_iterations_per_subtest && ok;j++){
-            TV random_vector=rand.Get_Uniform_Vector(box*(T)2);
-            T random_value=rand.Get_Uniform_Number((T)0.01,(T)1);
+            TV random_vector;
+            rand.Fill_Uniform(random_vector,box*(T)2);
+            T random_value;
+            rand.Fill_Uniform(random_value,(T)0.01,(T)1);
             bool lazy_inside=box.Lazy_Inside(random_vector),lazy_outside=box.Lazy_Outside(random_vector),inside=box.Inside(random_vector,random_value),
                 outside=box.Outside(random_vector,random_value),boundary=box.Boundary(random_vector,random_value);
             Test(!(lazy_inside==lazy_outside || (!lazy_inside && inside) || (!lazy_outside && outside) || (inside && outside) || (inside && !boundary && !lazy_inside)
                 || (outside && !boundary && !lazy_outside) || (boundary && inside) || (boundary && outside)),"Compatibility tests for outside/inside booleans correct.",ok);
-            random_vector=rand.Get_Uniform_Vector(box); // guaranteed to be inside this time
+            rand.Fill_Uniform(random_vector,box); // guaranteed to be inside this time
             Test(box.Lazy_Inside(random_vector),"Random vector generated to be inside box is indeed inside.",ok);}
-        T random_delta=rand.Get_Uniform_Number((T)0.001,(T)1);
+        T random_delta;
+        rand.Fill_Uniform(random_delta,(T)0.001,(T)1);
         TV min=box.Minimum_Corner(),max=box.Maximum_Corner();
         Test(box.Boundary(min,random_delta) && box.Boundary(max,random_delta) && box.Lazy_Inside(min) && !box.Lazy_Outside(min) && box.Lazy_Inside(max) && !box.Lazy_Outside(max),
             "Minimum/maximum corners pass inside/outside tests.",ok);
@@ -266,7 +275,8 @@ public:
     for(int i=0;i<num_iterations_per_test && ok;i++){
         RANGE<TV> box=Make_Random_Valid_Box<TV>();
         for(int j=0;j<num_iterations_per_subtest && ok;j++){
-            TV random_vector=rand.Get_Uniform_Vector(box*(T)2);
+            TV random_vector;
+            rand.Fill_Uniform(random_vector,box*(T)2);
             Test(!((box.Inside(random_vector,epsilon) && box.Clamp(random_vector)!=random_vector) || !box.Lazy_Inside(box.Clamp(random_vector))),
                 "Clamp only does something if the vector is outside the box.",ok);
             rand.Fill_Uniform(random_vector,(T)-2,(T)2); // -2 to 2 so that sometimes it is in the unit box, sometimes not
@@ -281,7 +291,9 @@ public:
     for(int i=0;i<num_iterations_per_test && ok;i++){
         TV center1=rand.template Get_Vector_In_Unit_Sphere<TV>(),center2=rand.template Get_Vector_In_Unit_Sphere<TV>();
         if((center1-center2).Magnitude()<(T)0.1){i--;continue;} // too close -- try again
-        T distance=(center1-center2).Magnitude(),radius1=rand.Get_Uniform_Number((T)0.01,distance-(T)0.01),radius2=rand.Get_Uniform_Number((T)0.01,distance-radius1-(T)0.01);
+        T distance=(center1-center2).Magnitude(),radius1,radius2;
+        rand.Fill_Uniform(radius1,(T)0.01,distance-(T)0.01);
+        rand.Fill_Uniform(radius2,(T)0.01,distance-radius1-(T)0.01);
         radius1/=(T)2;radius2/=(T)2; // because just because two points of a box are in the sphere does not mean the whole box is
         VECTOR<TV,4> random_vectors;
         for(int j=0;j<4;j++) random_vectors(j)=rand.template Get_Vector_In_Unit_Sphere<TV>();
@@ -312,7 +324,8 @@ public:
                 "Intersection volume preserved under cyclic shift.",ok);}
 
         for(int j=0;j<num_iterations_per_subtest && ok;j++){
-            TV random_vector=rand.Get_Uniform_Vector(RANGE<TV>::Unit_Box());
+            TV random_vector;
+            rand.Fill_Uniform(random_vector,0,1);
             bool in1=box1.Lazy_Inside(random_vector),in2=box2.Lazy_Inside(random_vector),in_intersection=intersection.Lazy_Inside(random_vector),
                 in_combination=combination.Lazy_Inside(random_vector);
             Test(!in1 || !in2 || in_intersection,"If a random vector is in two boxes, it is in their intersection.",ok);
@@ -347,7 +360,8 @@ public:
         T volume=box.Size();
         for(int j=0;j<TV::m && ok;j++) Test(Equal_To_Tolerance(volume/bounds(j),box.Remove_Dimension(j).Size()),"Volume changes according to removed dimension.",ok);
         for(int j=0;j<num_iterations_per_subtest && ok;j++){
-            TV inside_vector=rand.Get_Uniform_Vector(box);
+            TV inside_vector;
+            rand.Fill_Uniform(inside_vector,box);
             Test(box.Lazy_Inside(inside_vector),"Box contains random vector inside of it.",ok);
             for(int k=0;k<TV::m && ok;k++) Test(box.Remove_Dimension(k).Lazy_Inside(inside_vector.Remove_Index(k)),"Box with removed dimension contains vector with removed dimension.",ok);}}
     return ok;}
@@ -370,12 +384,16 @@ public:
     for(int i=0;i<num_iterations_per_test && ok;i++){
         RANGE<TV> box=Make_Random_Valid_Box<TV>();
         for(int j=0;j<num_iterations_per_subtest && ok;j++){
-            TV random_inside1=rand.Get_Uniform_Vector(box),random_inside2=rand.Get_Uniform_Vector(box),random_vector;
+            TV random_inside1,random_inside2,random_vector;
+            rand.Fill_Uniform(random_inside1,box);
+            rand.Fill_Uniform(random_inside2,box);
             rand.Fill_Uniform(random_vector,(T)-2,(T)2);
             RAY<TV> ray0(random_vector,random_inside1-random_vector),ray1(random_inside2,random_inside1-random_inside2),ray1_copy=ray0,ray2_copy=ray1; // both of these intersect the box
             Test(INTERSECTION::Intersects(ray0,box,epsilon) && INTERSECTION::Intersects(ray1,box,epsilon),"Box intersects rays with one endpoint inside.",ok);
             T radius=(box.Maximum_Corner()-box.Minimum_Corner()).Magnitude()/(T)2;
-            TV endpoint=box.Center()+rand.template Get_Direction<TV>()*rand.Get_Uniform_Number(radius+(T).1,radius+(T)3),direction=rand.template Get_Direction<TV>();
+            TV X;
+            rand.Fill_Uniform(X,radius+(T).1,radius+(T)3);
+            TV endpoint=box.Center()+rand.template Get_Direction<TV>()*X,direction=rand.template Get_Direction<TV>();
             direction-=direction.Projected(endpoint-box.Center());
             RAY<TV> ray2(endpoint,direction),ray3(endpoint,endpoint-box.Center()),ray3_copy=ray2,ray4_copy=ray3;
             if(direction.Magnitude()>epsilon) Test(!INTERSECTION::Intersects(ray2,box,epsilon),"Ray outside radius of box does not intersect box.",ok);
@@ -391,14 +409,17 @@ public:
         T box_radius=(box.Maximum_Corner()-box.Minimum_Corner()).Magnitude();
         TV box_center=box.Center();
         for(int j=0;j<num_iterations_per_subtest && ok;j++){
-            T distance_from_box=rand.Get_Uniform_Number(box_radius+(T)100*epsilon,(T)10);
+            T distance_from_box;
+            rand.Fill_Uniform(distance_from_box,box_radius+(T)100*epsilon,(T)10);
             TV random_center=box_center+rand.template Get_Direction<TV>()*distance_from_box;
-            T random_radius=rand.Get_Uniform_Number(epsilon,distance_from_box-box_radius-(T)10*epsilon);
+            T random_radius;
+            rand.Fill_Uniform(random_radius,epsilon,distance_from_box-box_radius-(T)10*epsilon);
             SPHERE<TV> sphere(random_center,random_radius);
             Test(!INTERSECTION::Intersects(box,sphere,epsilon),"Box and far-away sphere do not intersect.",ok);
-            TV intersecting_center;
+            TV intersecting_center,X;
             rand.Fill_Uniform(intersecting_center,(T)-2,(T)2);
-            T intersecting_radius=(intersecting_center-rand.Get_Uniform_Vector(box)).Magnitude();
+            rand.Fill_Uniform(X,box);
+            T intersecting_radius=(intersecting_center-X).Magnitude();
             SPHERE<TV> intersecting_sphere(intersecting_center,intersecting_radius);
             Test(INTERSECTION::Intersects(box,intersecting_sphere,epsilon),"Box intersects with sphere containing at least one box point.",ok);
             TV random_outside_center;
@@ -406,7 +427,8 @@ public:
             while(box.Inside(random_outside_center,(T)2*epsilon)) rand.Fill_Uniform(random_outside_center,(T)-2,(T)2);
             SPHERE<TV> outside_sphere(random_outside_center,(random_outside_center-box.Clamp(random_outside_center)).Magnitude()-(T)2*epsilon);
             Test(!INTERSECTION::Intersects(box,outside_sphere,epsilon),"Box does not intersect with sphere constructed to be on the outside.",ok);
-            TV random_inside_center=rand.Get_Uniform_Vector(box); // also tests "Surface" function
+            TV random_inside_center;
+            rand.Fill_Uniform(random_inside_center,box); // also tests "Surface" function
             SPHERE<TV> inside_sphere(random_inside_center,(random_inside_center-box.Surface(random_inside_center)).Magnitude()-(T)2*epsilon);
             Test(INTERSECTION::Intersects(box,inside_sphere,epsilon),"Box intersects sphere completely on the inside.",ok);}}
     return ok;}
@@ -417,7 +439,8 @@ public:
     for(int i=0;i<num_iterations_per_test && ok;i++){
         RANGE<TV> box=Make_Random_Valid_Box<TV>();
         for(int j=0;j<num_iterations_per_subtest && ok;j++){
-            TV random_inside_vector=rand.Get_Uniform_Vector(box);
+            TV random_inside_vector;
+            rand.Fill_Uniform(random_inside_vector,box);
             TV random_outside_vector;
             rand.Fill_Uniform(random_outside_vector,(T)-2,(T)2);
             while(box.Inside(random_outside_vector,(T)2*epsilon)) rand.Fill_Uniform(random_outside_vector,(T)-2,(T)2);

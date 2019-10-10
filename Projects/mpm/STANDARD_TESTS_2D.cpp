@@ -1542,7 +1542,8 @@ Initialize()
                     if(frame%seed_freq==0 && frame<200){
                         for(int i=0;i<ob_per_frame;i++){
                             RANGE<TV> obj=RANGE<TV>::Centered_Box()*half_edge*m;
-                            ROTATION<TV> rot=random.template Get_Rotation<TV>();
+                            ROTATION<TV> rot;
+                            random.Fill_Uniform(rot);
                             ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<TV> > ob(ORIENTED_BOX<TV>(obj,rot));
                             TV center;
                             random.Fill_Uniform(center,seed_box);

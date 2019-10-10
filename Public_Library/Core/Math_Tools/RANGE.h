@@ -376,6 +376,14 @@ inline std::istream& operator>>(std::istream& input,RANGE<TV>& box)
 {Ignore(input,'(');input>>box.min_corner>>box.max_corner;Ignore(input,')');return input;}
 template<class TV> struct HASH_REDUCE<RANGE<TV> >
 {static int H(const RANGE<TV>& key){return int_hash(HASH_REDUCE<TV>::H(key.min_corner),HASH_REDUCE<TV>::H(key.max_corner));}};
+//#####################################################################
+// Function Random_Fill_Uniform
+//#####################################################################
+template<class T,class TV> void
+Random_Fill_Uniform(RANDOM_NUMBERS<T>& rand,TV& u,const RANGE<TV>& box)
+{
+    rand.Fill_Uniform(u,box.min_corner,box.max_corner);
+}
 }
 #include <Core/Math_Tools/RANGE_ITERATOR.h>
 #endif

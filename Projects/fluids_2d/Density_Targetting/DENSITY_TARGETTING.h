@@ -374,7 +374,8 @@ void Initialize_SPH_Particles() override
     T particle_multiplier=1;
     number_of_sph_particles=int(particle_region.Size()*sph_evolution.target_particles_per_unit_volume/particle_multiplier);
     for(int i=0;i<number_of_sph_particles;i++){
-        TV X=random.Get_Uniform_Vector(particle_region);
+        TV X;
+        random.Fill_Uniform(X,particle_region);
         TV_INT block=grid.Block_Index(X,3);
         if(!removed_negative_particles(block)) removed_negative_particles(block)=new PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>();
         int id=removed_negative_particles(block)->Add_Element();
@@ -410,7 +411,8 @@ void Add_SPH_Particles_For_Sources(const ARRAY<ORIENTED_BOX<TV> > &sources,const
             if(sources(s).Lazy_Inside(location)){
                 if(!removed_negative_particles(block)) removed_negative_particles(block)=new PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>();
                 while(removed_negative_particles(block)->Size()<target_density_factor*fraction_of_particles_for_sph*fluids_parameters.number_particles_per_cell){
-                    TV X=random.Get_Uniform_Vector(block_bounding_box);
+                    TV X;
+                    random.Fill_Uniform(X,block_bounding_box);
                     int id=removed_negative_particles(block)->Add_Element();
                     (*removed_negative_particles(block)->template Get_Array<int>("id"))(id)=particle_id++;
                     removed_negative_particles(block)->X(id)=X;removed_negative_particles(block)->V(id)=sources_velocity(s);

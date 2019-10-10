@@ -605,7 +605,7 @@ Reseed_Add_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,T_ARRAYS_PA
                 if(store_unique_particle_id) id=cell_particles->template Get_Array<int>("id");}
             if(id) (*id)(index)=last_unique_particle_id++;
             cell_particles->quantized_collision_distance(index)=(unsigned short)(local_random.Get_Number()*USHRT_MAX);
-            cell_particles->X(index)=local_random.Get_Uniform_Vector(block_bounding_box);
+            local_random.Fill_Uniform(cell_particles->X(index),block_bounding_box);
             cell_particles->radius(index)=1;//Default value
             if(!Attract_Individual_Particle_To_Interface_And_Adjust_Radius(particles,*cell_particles,phi_min,phi_max,block,index,particle_type,time,true,local_random,list_to_process) && attempts++<5) k--;}}
     Update_Particle_Cells_Part(domain,particles,number_of_particles_per_block,list_to_process);

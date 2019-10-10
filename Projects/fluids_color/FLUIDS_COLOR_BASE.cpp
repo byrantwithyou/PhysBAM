@@ -822,7 +822,7 @@ Analytic_Test()
         TV X;
         int c=-4;
         do{
-            X=rand.Get_Uniform_Vector(grid.domain);
+            rand.Fill_Uniform(X,grid.domain);
             analytic_levelset->phi(X/m,0,c);}
         while(c<0);
         analytic_velocity(c)->Test(X,0);

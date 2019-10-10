@@ -533,10 +533,10 @@ FRAME<TV> Find_Placement(RANDOM_NUMBERS<T>& random,const RANGE<TV>& bounding_box
 {
     for(int i=0;i<10000;i++){
         FRAME<TV> frame;
-        if(want_rotate) frame.r=random.template Get_Rotation<TV>();
+        if(want_rotate) random.Fill_Uniform(frame.r);
         ORIENTED_BOX<TV> oriented_box(bounding_box,frame.r);
         RANGE<TV> new_box(oriented_box.Bounding_Box());
-        frame.t=random.Get_Uniform_Vector(world.min_corner-new_box.min_corner,world.max_corner-new_box.max_corner);
+        random.Fill_Uniform(frame.t,world.min_corner-new_box.min_corner,world.max_corner-new_box.max_corner);
         oriented_box.corner+=frame.t;
         bool okay=true;
         for(int j=0;j<bounding_boxes.m;j++) if(oriented_box.Intersection(bounding_boxes(j))){okay=false;break;}
@@ -1458,7 +1458,9 @@ void Add_Subsamples(const int surface_triangle_index,ARRAY<BINDING<TV>*>& new_bi
     const VECTOR<int,3>& triangle=surface_elements(surface_triangle_index);
     ARRAY<int>& particle_subsamples=triangle_free_particles(surface_triangle_index);
     for(int i=0;i<subsamples;i++){
-        VECTOR<T,3> weights;do{weights=random_numbers.Get_Uniform_Vector(TV(),TV(1,1,1));}while(weights.x+weights.y>=1);weights.z=(T)1-weights.x-weights.y;
+        VECTOR<T,3> weights;
+        do random_numbers.Fill_Uniform(weights,0,1);
+        while(weights.x+weights.y>=1);weights.z=(T)1-weights.x-weights.y;
         int hard_bound_particle=particles.Add_Element_From_Deletion_List();
         new_binding_list.Append(new LINEAR_BINDING<TV,3>(particles,hard_bound_particle,triangle,weights));
         int soft_bound_particle=particles.Add_Element_From_Deletion_List();

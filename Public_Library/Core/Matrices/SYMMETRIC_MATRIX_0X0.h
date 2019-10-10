@@ -420,5 +420,12 @@ operator-(const DIAGONAL_MATRIX<T,0>& A,const SYMMETRIC_MATRIX<T,0>& B)
     return SYMMETRIC_MATRIX<T,0>();
 }
 //#####################################################################
+// Function Random_Fill_Uniform
+//#####################################################################
+template<class T,int d> void
+Random_Fill_Uniform(RANDOM_NUMBERS<T>& rand,SYMMETRIC_MATRIX<T,d>& m,const T a,const T b)
+{
+    for(int i=0;i<m.Rows();i++) for(int j=0;j<=i;j++) m(i,j)=rand.Get_Uniform_Number(a,b);
+}
 }
 #endif

@@ -105,5 +105,14 @@ template<class TV> inline std::istream& operator>>(std::istream& input,TWIST<TV>
 
 template<class TV> inline std::ostream& operator<<(std::ostream& output,const TWIST<TV>& v)
 {output<<"("<<v.linear<<"  "<<v.angular<<")";return output;}
+//#####################################################################
+// Function Random_Fill_Uniform
+//#####################################################################
+template<class T,class TV> void
+Random_Fill_Uniform(RANDOM_NUMBERS<T>& rand,TWIST<TV>& m,const T a,const T b)
+{
+    rand.Fill_Uniform(m.linear,a,b);
+    rand.Fill_Uniform(m.angular,a,b);
+}
 }
 #endif

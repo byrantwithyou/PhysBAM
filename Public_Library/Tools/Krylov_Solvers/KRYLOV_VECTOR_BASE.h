@@ -38,5 +38,11 @@ public:
 //#####################################################################
 };
 template<class T> std::ostream& operator<<(std::ostream& output,const KRYLOV_VECTOR_BASE<T>& x);
+template<class T> class RANDOM_NUMBERS;
+//#####################################################################
+// Function Random_Fill_Uniform
+//#####################################################################
+template<class T> void
+Random_Fill_Uniform(RANDOM_NUMBERS<T>& rand,KRYLOV_VECTOR_BASE<T>& v,T a,T b);
 }
 #endif

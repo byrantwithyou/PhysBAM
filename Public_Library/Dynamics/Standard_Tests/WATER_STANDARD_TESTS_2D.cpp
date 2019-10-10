@@ -379,7 +379,8 @@ Initialize_SPH_Particles()
         RANGE<TV> particle_region((TV((T).2,1)),TV((T).3,(T)1.2));
         number_of_sph_particles=int(particle_region.Size()*sph_evolution.target_particles_per_unit_volume);
         for(int i=0;i<number_of_sph_particles;i++){
-            TV X=random.Get_Uniform_Vector(particle_region);
+            TV X;
+            random.Fill_Uniform(X,particle_region);
             TV_INT block=grid.Block_Index(X,3);
             if(!removed_negative_particles(block)) removed_negative_particles(block)=particle_levelset.template_removed_particles.Clone();
             int id=removed_negative_particles(block)->Add_Element();
@@ -394,7 +395,8 @@ Initialize_SPH_Particles()
         number_of_sph_particles=int(particle_region.Size()*sph_evolution.target_particles_per_unit_volume/particle_multiplier);
         for(int region=0;region<3;region++){
             for(int i=0;i<number_of_sph_particles;i++){
-                TV X=random.Get_Uniform_Vector(particle_region);
+                TV X;
+                random.Fill_Uniform(X,particle_region);
                 TV_INT block=grid.Block_Index(X,3);
                 if(!removed_negative_particles(block)) removed_negative_particles(block)=particle_levelset.template_removed_particles.Clone();
                 int id=removed_negative_particles(block)->Add_Element();
@@ -413,7 +415,8 @@ Initialize_SPH_Particles()
         T particle_multiplier=1;
         number_of_sph_particles=int(particle_region.Size()*sph_evolution.target_particles_per_unit_volume/particle_multiplier);
         for(int i=0;i<number_of_sph_particles;i++){
-            TV X=random.Get_Uniform_Vector(particle_region);
+            TV X;
+            random.Fill_Uniform(X,particle_region);
             TV_INT block=grid.Block_Index(X,3);
             if(!removed_negative_particles(block)) removed_negative_particles(block)=particle_levelset.template_removed_particles.Clone();
             int id=removed_negative_particles(block)->Add_Element();

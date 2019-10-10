@@ -723,5 +723,14 @@ auto operator*(const SYMMETRIC_MATRIX<T,d>& A,const MATRIX_BASE<T,T_MATRIX>& B)
 
 template<class T,class T_MATRIX>
 T_MATRIX exp(const MATRIX_BASE<T,T_MATRIX>& M);
+template<class T> class RANDOM_NUMBERS;
+//#####################################################################
+// Function Random_Fill_Uniform
+//#####################################################################
+template<class T,class T_MATRIX> void
+Random_Fill_Uniform(RANDOM_NUMBERS<T>& rand,MATRIX_BASE<T,T_MATRIX>& m,const T a,const T b)
+{
+    for(int i=0;i<m.Rows();i++) for(int j=0;j<m.Columns();j++) m(i,j)=rand.Get_Uniform_Number(a,b);
+}
 }
 #endif

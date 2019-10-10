@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Log/LOG.h>
+#include <Core/Math_Tools/RANGE.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_LEVELSET.h>
 using namespace PhysBAM;
@@ -20,7 +21,8 @@ template<class TV> void ANALYTIC_LEVELSET<TV>::
 Test(const RANGE<TV>& domain) const
 {
     RANDOM_NUMBERS<T> rand;
-    TV X=rand.Get_Uniform_Vector(domain),dX;
+    TV X,dX;
+    rand.Fill_Uniform(X,domain);
     T e=1e-6,t=rand.Get_Uniform_Number(0,1);
     rand.Fill_Uniform(dX,-e,e);
     int c0,c1;

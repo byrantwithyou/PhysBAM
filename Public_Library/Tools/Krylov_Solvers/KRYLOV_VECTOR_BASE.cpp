@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Log/DEBUG_UTILITIES.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 using namespace PhysBAM;
@@ -40,6 +41,16 @@ template<class T> std::ostream& operator<<(std::ostream& output,const KRYLOV_VEC
         if(i<n-1) output<<' ';}
     output<<")";
     return output;
+}
+//#####################################################################
+// Function Random_Fill_Uniform
+//#####################################################################
+template<class T> void
+Random_Fill_Uniform(RANDOM_NUMBERS<T>& rand,KRYLOV_VECTOR_BASE<T>& v,T a,T b)
+{
+    ARRAY<T> u(v.Raw_Size());
+    rand.Fill_Uniform(u,a,b);
+    v.Set(u);
 }
 template class KRYLOV_VECTOR_BASE<float>;
 template class KRYLOV_VECTOR_BASE<double>;

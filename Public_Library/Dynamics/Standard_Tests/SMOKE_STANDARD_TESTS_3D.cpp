@@ -119,7 +119,9 @@ Get_Body_Force(ARRAY<T,FACE_INDEX<3> >& force,const T dt,const T time)
                     LOG::cout<<"adding particle now have "<<vorticity_particles.Size()+1<<std::endl;
                     add_count++;int particle_id=vorticity_particles.Add_Element(); 
                     vorticity_particles.radius(particle_id)=particle_radius;
-                    vorticity_particles.X(particle_id)=iterator.Location()+random.Get_Uniform_Vector(cell_lower,cell_upper);
+                    TV X;
+                    random.Fill_Uniform(X,cell_lower,cell_upper);
+                    vorticity_particles.X(particle_id)=iterator.Location()+X;
                     vorticity_particles.vorticity(particle_id)=(T)source_vorticity_magnitude*TV::Cross_Product(TV(0,1,0),(vorticity_particles.X(particle_id)-source.Center()).Normalized()).Normalized();}}
             vortex_particle_evolution->Euler_Step(face_velocities_ghost,dt,time);}
 }

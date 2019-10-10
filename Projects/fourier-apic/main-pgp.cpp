@@ -65,7 +65,11 @@ void Sample_Box_Regularly(ARRAY<TV>& X,int particles_per_dim)
 void Sample_Box_Random(RANDOM_NUMBERS<T>& rand,ARRAY<TV>& X,int number_of_particles)
 {
     for(int i=0;i<number_of_particles;i++)
-        X.Append(rand.Get_Uniform_Vector(RANGE<TV>::Unit_Box()));
+    {
+        TV Y;
+        rand.Fill_Uniform(Y,0,1);
+        X.Append(Y);
+    }
 }
 
 int main(int argc, char* argv[])

@@ -9,8 +9,9 @@
 #include <Core/Matrices/MATRIX_2X2.h>
 #include <Core/Matrices/MATRIX_3X3.h>
 #include <Core/Matrices/ROTATION.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Core/Vectors/TWIST.h>
-using namespace PhysBAM;
+namespace PhysBAM{
 using ::std::sin;
 using ::std::cos;
 //#####################################################################
@@ -234,9 +235,52 @@ From_Rotated_Vector(const TV& initial_vector,const TV& final_vector)
     return ROTATION<TV>(sqrt(s_squared),v.x,v.y,v.z);
 }
 //#####################################################################
-namespace PhysBAM{
+// Function Random_Fill_Uniform_
+//#####################################################################
+template<class T> void
+Random_Fill_Uniform_(RANDOM_NUMBERS<T>& rand,ROTATION<VECTOR<T,1> >& r)
+{
+}
+//#####################################################################
+// Function Random_Fill_Uniform_
+//#####################################################################
+template<class T> void
+Random_Fill_Uniform_(RANDOM_NUMBERS<T>& rand,ROTATION<VECTOR<T,2> >& r)
+{
+    VECTOR<T,2> v=rand.template Get_Direction<VECTOR<T,2> >();
+    r.c=std::complex<T>(v.x,v.y);
+}
+//#####################################################################
+// Function Random_Fill_Uniform_
+//#####################################################################
+template<class T> void
+Random_Fill_Uniform_(RANDOM_NUMBERS<T>& rand,ROTATION<VECTOR<T,3> >& r)
+{
+    r.q=QUATERNION<T>(rand.template Get_Direction<VECTOR<T,4> >());
+}
+//#####################################################################
+// Function Random_Fill_Uniform
+//#####################################################################
+template<class T,int d> void
+Random_Fill_Uniform(RANDOM_NUMBERS<T>& rand,ROTATION<VECTOR<T,d> >& r)
+{
+    Random_Fill_Uniform_(rand,r);
+}
+//#####################################################################
 template class ROTATION<VECTOR<float,2> >;
 template class ROTATION<VECTOR<float,3> >;
 template class ROTATION<VECTOR<double,2> >;
 template class ROTATION<VECTOR<double,3> >;
+template void Random_Fill_Uniform<double,1>(RANDOM_NUMBERS<double>&,
+    ROTATION<VECTOR<double,1> >&);
+template void Random_Fill_Uniform<double,2>(RANDOM_NUMBERS<double>&,
+    ROTATION<VECTOR<double,2> >&);
+template void Random_Fill_Uniform<double,3>(RANDOM_NUMBERS<double>&,
+    ROTATION<VECTOR<double,3> >&);
+template void Random_Fill_Uniform<float,1>(RANDOM_NUMBERS<float>&,
+    ROTATION<VECTOR<float,1> >&);
+template void Random_Fill_Uniform<float,2>(RANDOM_NUMBERS<float>&,
+    ROTATION<VECTOR<float,2> >&);
+template void Random_Fill_Uniform<float,3>(RANDOM_NUMBERS<float>&,
+    ROTATION<VECTOR<float,3> >&);
 }

@@ -16,7 +16,6 @@ namespace PhysBAM{
 template<class TV> class RANGE;
 template<class TV> class ROTATION;
 template<class TV> class FRAME;
-template<class TV> class TWIST;
 template<class T,int d> class VECTOR;
 template<class T,int d> class DIAGONAL_MATRIX;
 template<class T,int d> class SYMMETRIC_MATRIX;
@@ -48,41 +47,45 @@ public:
     void operator=(const RANDOM_NUMBERS&) = delete;
     virtual ~RANDOM_NUMBERS();
 
-    template<class T2,class T_ARRAY,class ID> void Fill_Uniform(ARRAY_BASE<T2,T_ARRAY,ID>& array,const T a,const T b)
-    {T_ARRAY& derived=array.Derived();for(ID i(0);i<derived.Size();i++) Fill_Uniform(derived(i),a,b);}
-
     template<class RW> void Read(std::istream& input)
     {Read_Binary<RW>(input,gaussian_iset,gset);input>>random_number_generator;}
 
     template<class RW> void Write(std::ostream& output) const
     {Write_Binary<RW>(output,gaussian_iset,gset);output<<random_number_generator;}
 
-    template<class TV> void Fill_Uniform(TV& X,const RANGE<TV>& box)
-    {X=Get_Uniform_Vector<TV>(box);}
-
     template<class T2,class T_ARRAY,class ID> void Random_Shuffle(ARRAY_BASE<T2,T_ARRAY,ID>& array)
     {T_ARRAY& derived=array.Derived();for(ID i(derived.Size()-1);i>=ID(0);i--) exchange(array(i),array(Get_Uniform_Integer(0,i)));}
 
+    template<class T_OBJECT,class ...Args> auto
+    Fill_Uniform(T_OBJECT& obj,Args&&...args) -> enable_if_t<sizeof((Random_Fill_Uniform(*this,obj,args...),1))>
+    {Random_Fill_Uniform(*this,obj,args...);}
+
+    template<class T_OBJECT,class ...Args> auto
+    Fill_Uniform(T_OBJECT& obj,T a,T b) -> enable_if_t<sizeof((Random_Fill_Uniform(*this,obj,a,b),1))>
+    {Random_Fill_Uniform(*this,obj,a,b);}
+
 //#####################################################################
     void Set_Seed(const unsigned int seed_input=time(0));
-    template<int d> VECTOR<T,d> Get_Uniform_Vector(const VECTOR<T,d>& v0,const VECTOR<T,d>& v1);
-    template<int d> VECTOR<T,d> Get_Uniform_Vector(const T a,const T b);
-    template<class TV> TV Get_Uniform_Vector(const RANGE<TV>& box);
-    void Fill_Uniform(T& x,const T a,const T b);
-    template<class T_VECTOR> void Fill_Uniform(ARRAY_BASE<T,T_VECTOR>& v,const T a,const T b);
-    template<class T_MATRIX> void Fill_Uniform(MATRIX_BASE<T,T_MATRIX>& m,const T a,const T b);
-    template<int d> void Fill_Uniform(DIAGONAL_MATRIX<T,d>& m,const T a,const T b);
-    template<int d> void Fill_Uniform(SYMMETRIC_MATRIX<T,d>& m,const T a,const T b);
-    template<int d> void Fill_Uniform(UPPER_TRIANGULAR_MATRIX<T,d>& m,const T a,const T b);
-    template<class TV> void Fill_Uniform(TWIST<TV>& m,const T a,const T b);
-    template<class TV> void Fill_Uniform(FRAME<TV>& m,const T a,const T b);
     T Get_Gaussian();
     template<class TV> TV Get_Vector_In_Unit_Sphere();
     template<class TV> TV Get_Direction();
-    template<class TV> ROTATION<TV> Get_Rotation();
-    template<class TV> FRAME<TV> Get_Frame(const TV& v0,const TV& v1);
-    template<class TV> TWIST<TV> Get_Twist(const T& a);
 //#####################################################################
 };
+//#####################################################################
+// Function Random_Fill_Uniform
+//#####################################################################
+template<class T> void
+Random_Fill_Uniform(RANDOM_NUMBERS<T>& rand,T& x,const T a,const T b)
+{
+    x=rand.Get_Uniform_Number(a,b);
+}
+//#####################################################################
+// Function Random_Fill_Uniform
+//#####################################################################
+template<class T,class T2,class T_ARRAY,class ID> void
+Random_Fill_Uniform(RANDOM_NUMBERS<T>& rand,ARRAY_BASE<T2,T_ARRAY,ID>& array,const T a,const T b)
+{
+    for(auto&x:array) rand.Fill_Uniform(x,a,b);
+}
 }
 #endif

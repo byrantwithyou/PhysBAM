@@ -183,7 +183,8 @@ Initialize_Example()
                 ANALYTIC_LEVELSET_MODE al(epsilon,radius,mode,0,1);
                 RANDOM_NUMBERS<T> rand;
                 T e=1e-6,t=rand.Get_Uniform_Number(0,1);
-                TV X=rand.Get_Uniform_Vector(grid.domain),dX;
+                TV X,dX;
+                rand.Fill_Uniform(X,grid.domain);
                 rand.Fill_Uniform(dX,-e,e);
                 T f0=al.f(X,t),f1=al.f(X+dX,t);
                 TV df0=al.df(X,t),df1=al.df(X+dX,t);

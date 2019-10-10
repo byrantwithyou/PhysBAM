@@ -65,7 +65,9 @@ int main(int argc,char* argv[])
             const ROTATION<TV> rotation=ROTATION<TV>::From_Angle(45);
             for(int i=0;i<number_of_points;i++){
                 MPLE_POINT<TV,w> point;
-                point.X=rotation.Rotate(random.Get_Uniform_Vector(block));
+                TV X;
+                random.Fill_Uniform(X,block);
+                point.X=rotation.Rotate(X);
                 mple.points.Append(point);}}
             break;
         default:{LOG::cerr<<"Unknown test number"<<std::endl;exit(-1);}}

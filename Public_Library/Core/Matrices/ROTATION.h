@@ -395,5 +395,10 @@ Rotate(const VECTOR<int,3>& v) const // homogenous of degree 2 in q, since we ca
 template<> inline VECTOR<int,3> ROTATION<VECTOR<int,3> >::
 Inverse_Rotate(const VECTOR<int,3>& v) const // homogenous of degree 2 in q, since we can't usefully assume normalization for integer case
 {return 2*q.s*VECTOR<int,3>::Cross_Product(v,q.v)+(q.s*q.s-q.v.Magnitude_Squared())*v+2*VECTOR<int,3>::Dot_Product(q.v,v)*q.v;}
+//#####################################################################
+// Function Random_Fill_Uniform
+//#####################################################################
+template<class T,int d> void
+Random_Fill_Uniform(RANDOM_NUMBERS<T>& rand,ROTATION<VECTOR<T,d> >& r);
 }
 #endif

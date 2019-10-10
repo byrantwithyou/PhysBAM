@@ -278,9 +278,9 @@ void Initialize_Phi() override
         ARRAY<TV> velocities(drops);
         RANGE<TV> velocity_box((T)-.2,(T).2,(T)-.2,(T).2);
         for(int i=0;i<drops;i++){
-            sources(i).center=random.Get_Uniform_Vector(grid.Domain());
+            random.Fill_Uniform(sources(i).center,grid.Domain());
             sources(i).radius=random.Get_Uniform_Number(radius_min,radius_max);
-            velocities(i)=random.Get_Uniform_Vector(velocity_box);}
+            random.Get_Uniform_Vector(velocities(i),velocity_box);}
          for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){
             TV location=iterator.Location();TV_INT cell=iterator.Cell_Index();
             T& phi=fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index());

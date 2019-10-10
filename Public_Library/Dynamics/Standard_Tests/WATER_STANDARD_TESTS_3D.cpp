@@ -233,7 +233,12 @@ Initial_Velocity(const TV& X) const
 {
     if(test_number==7 || test_number==11) return TV(0,1,0);
     if(test_number==12 || test_number==13) return TV(-1,0,0);
-    if(test_number==22) return height_noise_random.Get_Uniform_Vector(-(T).16*TV::All_Ones_Vector(),(T).16*TV::All_Ones_Vector());
+    if(test_number==22)
+    {
+        TV u;
+        height_noise_random.Fill_Uniform(u,-(T).16,(T).16);
+        return u;
+    }
     return TV();
 }
 //#####################################################################
@@ -433,7 +438,8 @@ Initialize_SPH_Particles_Helper(int test_number,WATER_STANDARD_TESTS_3D<VECTOR<T
         RANDOM_NUMBERS<T> random;
         random.Set_Seed(1);
         for(int i=0;i<number_of_sph_particles;i++){
-            TV X=random.Get_Uniform_Vector(TV((T).2,1,(T).2),TV((T).3,(T)1.2,(T).3));
+            TV X;
+            random.Fill_Uniform(X,TV((T).2,1,(T).2),TV((T).3,(T)1.2,(T).3));
             TV_INT block=grid.Block_Index(X,3);
             if(!removed_negative_particles(block)) removed_negative_particles(block)=particle_levelset.template_removed_particles.Clone();
             int id=removed_negative_particles(block)->Add_Element();
@@ -449,7 +455,8 @@ Initialize_SPH_Particles_Helper(int test_number,WATER_STANDARD_TESTS_3D<VECTOR<T
         number_of_sph_particles=int(particle_region.Size()*sph_evolution.target_particles_per_unit_volume/particle_multiplier);
         for(int region=0;region<3;region++){
             for(int i=0;i<number_of_sph_particles;i++){
-                TV X=random.Get_Uniform_Vector(particle_region);
+                TV X;
+                random.Fill_Uniform(X,particle_region);
                 TV_INT block=grid.Block_Index(X,3);
                 if(!removed_negative_particles(block)) removed_negative_particles(block)=particle_levelset.template_removed_particles.Clone();
                 int id=removed_negative_particles(block)->Add_Element();
@@ -472,7 +479,8 @@ Initialize_SPH_Particles_Helper(int test_number,WATER_STANDARD_TESTS_3D<VECTOR<T
         T particle_multiplier=(T).5;//to start compressed
         number_of_sph_particles=int(particle_region.Size()*sph_evolution.target_particles_per_unit_volume/particle_multiplier);
         for(int i=0;i<number_of_sph_particles;i++){
-            TV X=random.Get_Uniform_Vector(particle_region);
+            TV X;
+            random.Fill_Uniform(X,particle_region);
             TV_INT block=grid.Block_Index(X,3);
             if(!removed_negative_particles(block)) removed_negative_particles(block)=particle_levelset.template_removed_particles.Clone();
             int id=removed_negative_particles(block)->Add_Element();
