@@ -44,11 +44,13 @@ public:
     void Multiply(const KRYLOV_VECTOR_BASE<T>& bdX,KRYLOV_VECTOR_BASE<T>& bdF,bool transpose=false) const override
     {const KRYLOV_VECTOR_T& dX=debug_cast<const KRYLOV_VECTOR_T&>(bdX);KRYLOV_VECTOR_T& dF=debug_cast<KRYLOV_VECTOR_T&>(bdF);
     if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data(dX.v.array);
-    solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Positions(dX.v.array); // TODO: assumes bindings are linear, consider switching this to clamping velocities
+    auto& dbc=solid_body_collection.deformable_body_collection;
+    dbc.binding_list.Clamp_Particles_To_Embedded_Positions(dX.v.array); // TODO: assumes bindings are linear, consider switching this to clamping velocities
     if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data(dX.v.array);
-    solid_body_collection.Force_Differential(dX.v.array,dF.v.array,time);
+    dF.v.array.Fill(TV());
+    dbc.Add_Implicit_Velocity_Independent_Forces(dX.v.array,dF.v.array,time);
     if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data(dX.v.array);
-    solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(dF.v.array);}
+    dbc.binding_list.Distribute_Force_To_Parents(dF.v.array);}
 
     void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& dX) const override
     {Project(dX);}
@@ -91,7 +93,8 @@ One_Newton_Step_Toward_Steady_State(const T time,ARRAY<TV>& dX_full)
     KRYLOV_VECTOR_WRAPPER<T,INDIRECT_ARRAY<ARRAY<TV> > > dX(dX_full,dynamic_particles),B(B_full,dynamic_particles);
 
     B_full.Subset(solid_body_collection.deformable_body_collection.dynamic_particles).Fill(TV());
-    if(!balance_external_forces_only) solid_body_collection.Add_Velocity_Independent_Forces(B_full,rigid_B_full,time);
+    GENERALIZED_VELOCITY<TV> GB(B_full,rigid_B_full,solid_body_collection);
+    if(!balance_external_forces_only) solid_body_collection.Add_Velocity_Independent_Forces(GB,time);
     example_forces_and_velocities.Add_External_Forces(B_full,time);
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(B_full);
     B.v=-B.v;
@@ -139,7 +142,7 @@ Advance_One_Time_Step_Position(const T dt,const T time,const bool solids)
         solid_body_collection.deformable_body_collection.Update_Collision_Penalty_Forces_And_Derivatives();
         GENERALIZED_VELOCITY<TV>& R=debug_cast<GENERALIZED_VELOCITY<TV>&>(*krylov_vectors(0));
         R.V.Fill(TV());
-        solid_body_collection.Add_Velocity_Independent_Forces(R.V.array,R.rigid_V.array,time+dt);
+        solid_body_collection.Add_Velocity_Independent_Forces(R,time+dt);
         example_forces_and_velocities.Add_External_Forces(R.V.array,time+dt);
         binding_list.Distribute_Force_To_Parents(R.V.array);
         example_forces_and_velocities.Zero_Out_Enslaved_Position_Nodes(R.V.array,time+dt);

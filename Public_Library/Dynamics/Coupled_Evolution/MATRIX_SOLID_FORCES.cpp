@@ -61,7 +61,7 @@ Times_Add(const GENERALIZED_VELOCITY<TV>& solid_velocities,ARRAY<T,FORCE_AGGREGA
     //if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data(V.V.array);
     // solid_body_collection.Implicit_Velocity_Independent_Forces(V.V.array,F.V.array,dt,current_velocity_time+dt);
     // we don't inherit velocity dependent forces to the drifted particles (contrary to the explicit velocity independent ones) because that would compromise symmetry
-    Add_Velocity_Dependent_Forces_First_Half(solid_velocities.V.array,solid_velocities.rigid_V.array,force_coefficients,current_velocity_time+dt);
+    Add_Velocity_Dependent_Forces_First_Half(solid_velocities,force_coefficients,current_velocity_time+dt);
 }
 //#####################################################################
 // Function Times
@@ -78,7 +78,7 @@ Times(const GENERALIZED_VELOCITY<TV>& solid_velocities,ARRAY<T,FORCE_AGGREGATE_I
 template<class TV> void MATRIX_SOLID_FORCES<TV>::
 Transpose_Times_Add(const ARRAY<T,FORCE_AGGREGATE_ID>& force_coefficients,GENERALIZED_VELOCITY<TV>& solid_velocities) const
 {
-    Add_Velocity_Dependent_Forces_Second_Half(force_coefficients,solid_velocities.V.array,solid_velocities.rigid_V.array,current_velocity_time+dt);
+    Add_Velocity_Dependent_Forces_Second_Half(force_coefficients,solid_velocities,current_velocity_time+dt);
 }
 //#####################################################################
 // Function Transpose_Times
@@ -109,21 +109,21 @@ Velocity_Dependent_Forces_Size() const
 //#####################################################################
 // can depend on position too
 template<class TV> void MATRIX_SOLID_FORCES<TV>::
-Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<const TWIST<TV> > rigid_V_full,ARRAY_VIEW<T,FORCE_AGGREGATE_ID> aggregate,const T time) const
+Add_Velocity_Dependent_Forces_First_Half(const GENERALIZED_VELOCITY<TV>& V,ARRAY_VIEW<T,FORCE_AGGREGATE_ID> aggregate,const T time) const
 {
     FORCE_AGGREGATE_ID aggregate_size(0);
     for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++){
         PHYSBAM_ASSERT(solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces);
         ARRAY_VIEW<T> single_force_aggregate=aggregate.Array_View(aggregate_size,force_dof_counts(k));
         aggregate_size+=force_dof_counts(k);
-        solid_body_collection.deformable_body_collection.deformables_forces(k)->Add_Velocity_Dependent_Forces_First_Half(V_full,single_force_aggregate,time);}
+        solid_body_collection.deformable_body_collection.deformables_forces(k)->Add_Velocity_Dependent_Forces_First_Half(V.V.array,single_force_aggregate,time);}
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces_Second_Half
 //#####################################################################
 // can depend on position too
 template<class TV> void MATRIX_SOLID_FORCES<TV>::
-Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T,FORCE_AGGREGATE_ID> aggregate,ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T time) const
+Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T,FORCE_AGGREGATE_ID> aggregate,GENERALIZED_VELOCITY<TV>& F,const T time) const
 {
     FORCE_AGGREGATE_ID aggregate_size(0);
     for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++){
@@ -131,7 +131,7 @@ Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T,FORCE_AGGREGATE_ID>
         //ARRAY_VIEW<const T> single_force_aggregate=aggregate.Array_View(aggregate_size,single_aggregate_size);
         ARRAY_VIEW<const T> single_force_aggregate(aggregate.Get_Array_Pointer()+Value(aggregate_size),force_dof_counts(k));
         aggregate_size+=force_dof_counts(k);
-        solid_body_collection.deformable_body_collection.deformables_forces(k)->Add_Velocity_Dependent_Forces_Second_Half(single_force_aggregate,F_full,time);}
+        solid_body_collection.deformable_body_collection.deformables_forces(k)->Add_Velocity_Dependent_Forces_Second_Half(single_force_aggregate,F.V.array,time);}
 }
 //#####################################################################
 // Function Test_Matrix
@@ -144,38 +144,50 @@ Test_Matrix() const
     ARRAY<T,FORCE_AGGREGATE_ID> aggregate(size),aggregate2(size);
     random.Fill_Uniform(aggregate,-1,1);
 
-    int number=solid_body_collection.deformable_body_collection.particles.number;
-    ARRAY<TV> V(number),V1(number),V2(number),V3(number),V4(number);
-    random.Fill_Uniform(V,-1,1);
+    GENERALIZED_VELOCITY<TV> pattern(solid_body_collection);
+    GENERALIZED_VELOCITY<TV>& GV0=(GENERALIZED_VELOCITY<TV>&)*pattern.Clone_Default();
+    GENERALIZED_VELOCITY<TV>& GV1=(GENERALIZED_VELOCITY<TV>&)*pattern.Clone_Default();
+    GENERALIZED_VELOCITY<TV>& GV2=(GENERALIZED_VELOCITY<TV>&)*pattern.Clone_Default();
+    GENERALIZED_VELOCITY<TV>& GV3=(GENERALIZED_VELOCITY<TV>&)*pattern.Clone_Default();
+    GENERALIZED_VELOCITY<TV>& GV4=(GENERALIZED_VELOCITY<TV>&)*pattern.Clone_Default();
 
-    int rigid_number=solid_body_collection.rigid_body_collection.rigid_body_particles.number;
-    ARRAY<TWIST<TV> > twist(rigid_number),twist2(rigid_number),twist3(rigid_number),twist4(rigid_number),twist5(rigid_number);
-    random.Fill_Uniform(twist,-1,1);
+    int n=GV0.Raw_Size();
+    ARRAY<T> r0(n),r1(n),r2(n),r3(n),r4(n);
+    random.Fill_Uniform(r0,-1,1);
+    GV0.Set(r0);
 
-    Add_Velocity_Dependent_Forces_Second_Half(aggregate,V1,twist2,0);
-    Add_Velocity_Dependent_Forces_First_Half(V,twist,aggregate2,0);
-    Add_Velocity_Dependent_Forces_Second_Half(aggregate2,V2,twist3,0);
-    solid_body_collection.Add_Velocity_Dependent_Forces(V,twist,V3,twist4,0);
-    solid_body_collection.Add_Velocity_Dependent_Forces(V1,twist2,V4,twist5,0);
+    Add_Velocity_Dependent_Forces_Second_Half(aggregate,GV1,0);
+    Add_Velocity_Dependent_Forces_First_Half(GV0,aggregate2,0);
+    Add_Velocity_Dependent_Forces_Second_Half(aggregate2,GV2,0);
+    solid_body_collection.Add_Velocity_Dependent_Forces(GV0,GV3,0);
+    solid_body_collection.Add_Velocity_Dependent_Forces(GV1,GV4,0);
+    GV1.Get(r1);
+    GV2.Get(r2);
+    GV3.Get(r3);
+    GV4.Get(r4);
 
-    CONSTANT_ARRAY<RIGID_BODY_MASS<TV,true> > rigid_mass(twist.m,RIGID_BODY_MASS<TV,true>(1,DIAGONAL_MATRIX<T,TV::SPIN::m>::Identity_Matrix()));
-    T inner_solids=V.Dot(V1)+twist.Inner_Product(rigid_mass,twist2);
+    T inner_solids=r0.Dot(r1);
     T inner_aggregate=aggregate.Dot(aggregate2);
     LOG::cout<<"MATRIX_SOLID_FORCES Symmetry Test: "<<inner_solids<<"  vs  "<<inner_aggregate<<"  relative  "<<abs(inner_solids-inner_aggregate)/maxabs((T)1e-30,inner_solids,inner_aggregate)<<std::endl;
 
-    T inner1=V.Dot(V)+twist.Inner_Product(rigid_mass,twist);
-    T inner3=V2.Dot(V2)+twist3.Inner_Product(rigid_mass,twist3);
-    T inner4=V3.Dot(V3)+twist4.Inner_Product(rigid_mass,twist4);
-    T inner_def=V.Dot(V3)+twist.Inner_Product(rigid_mass,twist4);
-    V2+=V3;
-    twist3+=twist4;
-    T innerD=V2.Dot(V2)+twist3.Inner_Product(rigid_mass,twist3);
+    T inner1=r0.Dot(r0);
+    T inner3=r2.Dot(r2);
+    T inner4=r3.Dot(r3);
+    T inner_def=r0.Dot(r3);
+    r2+=r3;
+    T innerD=r2.Dot(r2);
     LOG::cout<<"MATRIX_SOLID_FORCES C vs D test: "<<inner3<<"  vs  "<<inner4<<"   diff "<<innerD<<"   orig "<<inner1<<"  relative  "<<abs(innerD)/maxabs((T)1e-30,inner3,inner4)<<std::endl;
     LOG::cout<<"MATRIX_SOLID_FORCES D definiteness (should be negative): "<<inner_def<<std::endl;
 
-    T solids_inner1=V.Dot(V4)+twist.Inner_Product(rigid_mass,twist5);
-    T solids_inner2=V1.Dot(V3)+twist2.Inner_Product(rigid_mass,twist4);
+    T solids_inner1=r0.Dot(r4);
+    T solids_inner2=r1.Dot(r3);
     LOG::cout<<"MATRIX_SOLID_FORCES D Symmetry Test: "<<solids_inner1<<"  vs  "<<solids_inner2<<"  relative  "<<abs(solids_inner1-solids_inner2)/maxabs((T)1e-30,solids_inner1,solids_inner2)<<std::endl;
+
+    delete & GV0;
+    delete & GV1;
+    delete & GV2;
+    delete & GV3;
+    delete & GV4;
 }
 //#####################################################################
 // Function Print_Each_Matrix

@@ -57,9 +57,9 @@ Force(const VECTOR_T& V,VECTOR_T& F) const
 {
     F.V.array.Subset(solid_body_collection.deformable_body_collection.simulated_particles).Fill(TV());
     F.rigid_V.array.Subset(solid_body_collection.rigid_body_collection.simulated_rigid_body_particles).Fill(TWIST<TV>());
-    solid_body_collection.Add_Implicit_Velocity_Independent_Forces(V.V.array,V.rigid_V.array,F.V.array,F.rigid_V.array,time);
+    solid_body_collection.Add_Implicit_Velocity_Independent_Forces(V,F,time);
     F*=dt;
-    solid_body_collection.Add_Velocity_Dependent_Forces(V.V.array,V.rigid_V.array,F.V.array,F.rigid_V.array,time);
+    solid_body_collection.Add_Velocity_Dependent_Forces(V,F,time);
 }
 //#####################################################################
 // Function Multiply

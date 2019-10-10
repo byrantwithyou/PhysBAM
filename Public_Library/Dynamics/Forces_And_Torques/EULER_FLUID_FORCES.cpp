@@ -13,6 +13,7 @@
 #include <Rigids/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
+#include <Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Dynamics/Forces_And_Torques/EULER_FLUID_FORCES.h>
 using ::std::sqrt;
@@ -38,7 +39,7 @@ template<class TV> EULER_FLUID_FORCES<TV>::
 // Function Add_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void EULER_FLUID_FORCES<TV>::
-Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const
+Add_Velocity_Independent_Forces(GENERALIZED_VELOCITY<TV>& F,const T time) const
 {
     COLLISION_GEOMETRY_ID body_id;int simplex_id;
     T distance,max_distance=grid.dX.Magnitude();
@@ -63,8 +64,8 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,
                 int rigid_body_index=rigid_body.particle_index;
                 T face_area=cell_size*one_over_dx[axis],face_pressure=pressure_at_faces.Component(axis)(face_index);
                 TV center_of_mass=rigid_body.Frame().t,force=face_area*face_pressure*direction*TV::Axis_Vector(axis);
-                rigid_F(rigid_body_index).linear+=force;
-                rigid_F(rigid_body_index).angular+=TV::Cross_Product(location-center_of_mass,force);}
+                F.rigid_V.array(rigid_body_index).linear+=force;
+                F.rigid_V.array(rigid_body_index).angular+=TV::Cross_Product(location-center_of_mass,force);}
             else PHYSBAM_FATAL_ERROR("deformable part not implemented");}}
 }
 //#####################################################################

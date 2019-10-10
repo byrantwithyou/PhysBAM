@@ -19,6 +19,7 @@ template<class TV> class DEFORMABLE_BODY_COLLECTION;
 template<class TV> class RIGID_BODY_CLUSTER_BINDINGS;
 template<class TV> class DEFORMABLES_FORCES;
 template<class TV> class RIGIDS_FORCES;
+template<class TV> class GENERALIZED_VELOCITY;
 
 template<class TV>
 class SOLID_BODY_COLLECTION
@@ -72,7 +73,7 @@ public:
     {return Find_Type<T_FORCE>(solids_forces,index);}
 
 //#####################################################################
-    void Add_All_Forces(ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T time,const bool damping_only=false);
+    void Add_All_Forces(GENERALIZED_VELOCITY<TV>& F,const T time,const bool damping_only=false);
     int Add_Force(SOLIDS_FORCES<TV>* force);
     int Add_Force(DEFORMABLES_FORCES<TV>* force);
     int Add_Force(RIGIDS_FORCES<TV>* force);
@@ -85,11 +86,11 @@ public:
     void Update_Simulated_Particles();
     void Delete_Forces();
     void Update_Position_Based_State(const T time,const bool is_position_update,const bool update_hessian);
-    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T time) const;
-    void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<const TWIST<TV> > rigid_V_full,ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T time) const;
-    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<const TWIST<TV> > rigid_V_full,
-        ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T time,bool transpose=false) const;
-    void Force_Differential(ARRAY_VIEW<const TV> dX_full,ARRAY_VIEW<TV> dF_full,const T time) const;
+    void Add_Velocity_Independent_Forces(GENERALIZED_VELOCITY<TV>& F,const T time) const;
+    void Add_Velocity_Dependent_Forces(const GENERALIZED_VELOCITY<TV>& V,GENERALIZED_VELOCITY<TV>& F,const T time) const;
+    void Add_Implicit_Velocity_Independent_Forces(const GENERALIZED_VELOCITY<TV>& V,
+        GENERALIZED_VELOCITY<TV>& F,const T time,bool transpose=false) const;
+    void Force_Differential(const GENERALIZED_VELOCITY<TV>& dX_full,GENERALIZED_VELOCITY<TV>& dF_full,const T time) const; 
     void Enforce_Definiteness(const bool enforce_definiteness_input=true);
     void Compute_Linear_Momentum(TV& linear_momentum) const;
     void Compute_Energy(const T time,T& kinetic_energy,T& potential_energy) const;

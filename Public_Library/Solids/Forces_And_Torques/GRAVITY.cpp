@@ -6,18 +6,19 @@
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Solids/Forces_And_Torques/GRAVITY.h>
+#include <Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Add_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void GRAVITY<TV>::
-Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const
+Add_Velocity_Independent_Forces(GENERALIZED_VELOCITY<TV>& F,const T time) const
 {
     if(!gravity.Magnitude_Squared()) return;
-    for(int p:force_particles) F(p)+=particles.mass(p)*gravity;
+    for(int p:force_particles) F.V.array(p)+=particles.mass(p)*gravity;
     auto& rm=rigid_body_collection.rigid_body_particles.mass;
     for(int p:force_rigid_body_particles)
-        rigid_F(p).linear+=rm(p)*gravity;
+        F.rigid_V.array(p).linear+=rm(p)*gravity;
 }
 //#####################################################################
 // Function Potential_Energy

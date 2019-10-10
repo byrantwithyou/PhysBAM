@@ -5,6 +5,7 @@
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Solids/Forces_And_Torques/ETHER_DRAG.h>
+#include <Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
 using namespace PhysBAM;
 template<class TV> ETHER_DRAG<TV>::
 ETHER_DRAG(DEFORMABLE_PARTICLES<TV>& particles_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARRAY<int>* influenced_particles_input,
@@ -28,39 +29,39 @@ template<class TV> ETHER_DRAG<TV>::
 // Function Add_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void ETHER_DRAG<TV>::
-Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const
+Add_Velocity_Independent_Forces(GENERALIZED_VELOCITY<TV>& F,const T time) const
 {
     for(int k:force_particles){
         if(use_spatially_varying_wind){
-            if(spatially_varying_wind_domain.Lazy_Inside(particles.X(k))) F(k)+=spatially_varying_wind_viscosity*particles.mass(k)*Spatially_Varying_Wind_Velocity(particles.X(k));
-            else if(use_constant_wind) F(k)+=constant_wind_viscosity*particles.mass(k)*constant_wind;}
-        else if(use_constant_wind) F(k)+=constant_wind_viscosity*particles.mass(k)*constant_wind;}
+            if(spatially_varying_wind_domain.Lazy_Inside(particles.X(k))) F.V.array(k)+=spatially_varying_wind_viscosity*particles.mass(k)*Spatially_Varying_Wind_Velocity(particles.X(k));
+            else if(use_constant_wind) F.V.array(k)+=constant_wind_viscosity*particles.mass(k)*constant_wind;}
+        else if(use_constant_wind) F.V.array(k)+=constant_wind_viscosity*particles.mass(k)*constant_wind;}
     for(int k:force_rigid_body_particles){
         if(use_spatially_varying_wind){
             if(spatially_varying_wind_domain.Lazy_Inside(rigid_body_collection.rigid_body_particles.frame(k).t))
-                rigid_F(k).linear+=spatially_varying_wind_viscosity*rigid_body_collection.rigid_body_particles.mass(k)*
+                F.rigid_V.array(k).linear+=spatially_varying_wind_viscosity*rigid_body_collection.rigid_body_particles.mass(k)*
                     Spatially_Varying_Wind_Velocity(rigid_body_collection.rigid_body_particles.frame(k).t);
-            else if(use_constant_wind) rigid_F(k).linear+=constant_wind_viscosity*rigid_body_collection.rigid_body_particles.mass(k)*constant_wind;}
-        else if(use_constant_wind) rigid_F(k).linear+=constant_wind_viscosity*rigid_body_collection.rigid_body_particles.mass(k)*constant_wind;}
+            else if(use_constant_wind) F.rigid_V.array(k).linear+=constant_wind_viscosity*rigid_body_collection.rigid_body_particles.mass(k)*constant_wind;}
+        else if(use_constant_wind) F.rigid_V.array(k).linear+=constant_wind_viscosity*rigid_body_collection.rigid_body_particles.mass(k)*constant_wind;}
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces
 //#####################################################################
 template<class TV> void ETHER_DRAG<TV>::
-Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const
+Add_Velocity_Dependent_Forces(const GENERALIZED_VELOCITY<TV>& V,GENERALIZED_VELOCITY<TV>& F,const T time) const
 {
     for(int k:force_particles){
         if(use_spatially_varying_wind){
-            if(spatially_varying_wind_domain.Lazy_Inside(particles.X(k))) F(k)-=spatially_varying_wind_viscosity*particles.mass(k)*V(k);
-            else if(use_constant_wind) F(k)-=constant_wind_viscosity*particles.mass(k)*V(k);}
-        else if(use_constant_wind) F(k)-=constant_wind_viscosity*particles.mass(k)*V(k);}
+            if(spatially_varying_wind_domain.Lazy_Inside(particles.X(k))) F.V.array(k)-=spatially_varying_wind_viscosity*particles.mass(k)*V.V.array(k);
+            else if(use_constant_wind) F.V.array(k)-=constant_wind_viscosity*particles.mass(k)*V.V.array(k);}
+        else if(use_constant_wind) F.V.array(k)-=constant_wind_viscosity*particles.mass(k)*V.V.array(k);}
     for(int k:force_rigid_body_particles){
         if(use_spatially_varying_wind){
             if(spatially_varying_wind_domain.Lazy_Inside(rigid_body_collection.rigid_body_particles.frame(k).t))
-                rigid_F(k).linear-=spatially_varying_wind_viscosity*rigid_body_collection.rigid_body_particles.mass(k)*rigid_V(k).linear;
-            else if(use_constant_wind) rigid_F(k).linear-=constant_wind_viscosity*rigid_body_collection.rigid_body_particles.mass(k)*rigid_V(k).linear;}
-        else if(use_constant_wind) rigid_F(k).linear-=constant_wind_viscosity*rigid_body_collection.rigid_body_particles.mass(k)*rigid_V(k).linear;
-        if(constant_wind_angular_viscosity) rigid_F(k).angular-=constant_wind_angular_viscosity*rigid_V(k).angular;}
+                F.rigid_V.array(k).linear-=spatially_varying_wind_viscosity*rigid_body_collection.rigid_body_particles.mass(k)*V.rigid_V.array(k).linear;
+            else if(use_constant_wind) F.rigid_V.array(k).linear-=constant_wind_viscosity*rigid_body_collection.rigid_body_particles.mass(k)*V.rigid_V.array(k).linear;}
+        else if(use_constant_wind) F.rigid_V.array(k).linear-=constant_wind_viscosity*rigid_body_collection.rigid_body_particles.mass(k)*V.rigid_V.array(k).linear;
+        if(constant_wind_angular_viscosity) F.rigid_V.array(k).angular-=constant_wind_angular_viscosity*V.rigid_V.array(k).angular;}
 }
 //#####################################################################
 // Function Enforce_Definiteness
@@ -73,7 +74,7 @@ Enforce_Definiteness(const bool enforce_definiteness_input)
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void ETHER_DRAG<TV>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time,bool transpose) const
+Add_Implicit_Velocity_Independent_Forces(const GENERALIZED_VELOCITY<TV>& V,GENERALIZED_VELOCITY<TV>& F,const T time,bool transpose) const
 {
 }
 //#####################################################################

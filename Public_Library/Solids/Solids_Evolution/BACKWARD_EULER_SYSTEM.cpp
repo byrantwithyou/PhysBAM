@@ -60,10 +60,10 @@ Force(const VECTOR_T& V,VECTOR_T& F) const
     solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities(V.V.array,V.rigid_V.array);
     if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data(V.V.array);
     if(fully_implicit){
-        solid_body_collection.Add_Implicit_Velocity_Independent_Forces(V.V.array,V.rigid_V.array,F.V.array,F.rigid_V.array,current_velocity_time+dt);
+        solid_body_collection.Add_Implicit_Velocity_Independent_Forces(V,F,current_velocity_time+dt);
         F*=dt;}
     // we don't inherit velocity dependent forces to the drifted particles (contrary to the explicit velocity independent ones) because that would compromise symmetry
-    solid_body_collection.Add_Velocity_Dependent_Forces(V.V.array,V.rigid_V.array,F.V.array,F.rigid_V.array,current_velocity_time+dt);
+    solid_body_collection.Add_Velocity_Dependent_Forces(V,F,current_velocity_time+dt);
     if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data(F.V.array);
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(F.V.array,F.rigid_V.array);
     solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Distribute_Force_To_Parents(F.rigid_V.array);

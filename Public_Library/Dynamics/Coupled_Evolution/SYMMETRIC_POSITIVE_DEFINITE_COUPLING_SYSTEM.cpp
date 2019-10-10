@@ -554,7 +554,7 @@ Apply_Massless_Structure_Force_To_Fluid(ARRAY<T>& fluid_velocity,T time) const
     ARRAY<T> temp(temporary_faces.m);
     temporary_solids_velocity.V.array.Fill(TV());
     temporary_solids_velocity.rigid_V.array.Fill(TWIST<TV>());
-    solid_forces->solid_body_collection.Add_Velocity_Independent_Forces(temporary_solids_velocity.V.array,temporary_solids_velocity.rigid_V.array,time);
+    solid_forces->solid_body_collection.Add_Velocity_Independent_Forces(temporary_solids_velocity,time);
     if(print_each_matrix) OCTAVE_OUTPUT<T>(LOG::sprintf("f-%i.txt",solve_id).c_str()).Write("f",temporary_solids_velocity);
     fluid_to_solid_interpolation->Transpose_Times(temporary_solids_velocity,temp);
     Dump_Substep(temp,temporary_solids_velocity,"after interp");

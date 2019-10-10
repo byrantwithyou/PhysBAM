@@ -30,6 +30,7 @@ public:
     INDIRECT_ARRAY<ARRAY_VIEW<TWIST<TV> > > kinematic_and_static_rigid_V;  // TODO: Go away.
     bool deep_copy;
 
+    GENERALIZED_VELOCITY(const SOLID_BODY_COLLECTION<TV>& solid_body_collection);
     GENERALIZED_VELOCITY(ARRAY_VIEW<TV> V_full,ARRAY_VIEW<TWIST<TV> > rigid_V_full,const SOLID_BODY_COLLECTION<TV>& solid_body_collection);
     GENERALIZED_VELOCITY(ARRAY_VIEW<TV> V_full,const ARRAY<int>& dynamic_particles,ARRAY_VIEW<TWIST<TV> > rigid_V_full,
         const ARRAY<int>& dynamic_rigid_body_particles,const ARRAY<int>& static_and_kinematic_rigid_bodies);

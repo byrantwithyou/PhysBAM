@@ -39,6 +39,7 @@
 #include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
+#include <Tools/Parsing/PARSE_ARGS.h>
 #include <Geometry/Basic_Geometry/SMOOTH_GEAR.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Constitutive_Models/STRAIN_MEASURE.h>
@@ -73,6 +74,7 @@
 #include <Solids/Forces_And_Torques/GRAVITY.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
+#include <Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
 #include <Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 #include <fstream>
@@ -1123,6 +1125,8 @@ void Plot_Energy_Landscape()
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     ARRAY<TV> F(particles.X.m);
     ARRAY<TWIST<TV> > TW;
+    ARRAY<int> empty;
+    GENERALIZED_VELOCITY<TV> gv(F,empty,TW,empty,empty);
     ARRAY<TV> X;
     ARRAY<TV> N;
     ARRAY<T> E;
@@ -1137,7 +1141,7 @@ void Plot_Energy_Landscape()
             solid_body_collection.Update_Position_Based_State(0,false,false);
             T ke,pe;
             solid_body_collection.Compute_Energy(0,ke,pe);
-            solid_body_collection.Add_Velocity_Independent_Forces(F,TW,0);
+            solid_body_collection.Add_Velocity_Independent_Forces(gv,0);
             E.Append(ke+pe);
             X.Append(particles.X(5));
             N.Append(F(5).Normalized());

@@ -124,7 +124,7 @@ Compute_Unconstrained(const KRYLOV_VECTOR_BASE<T>& Bdv,KRYLOV_SYSTEM_BASE<T>* h,
         GENERALIZED_VELOCITY<TV>& gg=debug_cast<GENERALIZED_VELOCITY<TV>&>(*g);
         tmp1.V.array.Fill(TV());
         tmp1.rigid_V.array.Fill(TWIST<TV>());
-        solid_body_collection.Add_Velocity_Independent_Forces(tmp1.V.array,tmp1.rigid_V.array,time);
+        solid_body_collection.Add_Velocity_Independent_Forces(tmp1,time);
         gg.V.array.Copy(-dt,tmp1.V.array,tmp0.V.array);
         gg.rigid_V.array.Copy(-dt,tmp1.rigid_V.array,tmp0.rigid_V.array);}
 }

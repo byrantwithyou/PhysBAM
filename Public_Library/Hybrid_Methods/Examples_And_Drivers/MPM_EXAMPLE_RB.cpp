@@ -15,6 +15,7 @@
 #include <Solids/Collisions/PENALTY_FORCE_COLLECTION.h>
 #include <Solids/Forces_And_Torques/RIGID_DEFORMABLE_PENALTY_WITH_FRICTION.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
+#include <Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_EXAMPLE_RB.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
@@ -194,7 +195,8 @@ Add_Forces(ARRAY<TV,TV_INT>& F,ARRAY<TWIST<TV> >& RF,const T time) const
 #pragma omp parallel for
     for(int i=0;i<lagrangian_forces_F.m;i++)
         lagrangian_forces_F(i)=TV();
-    solid_body_collection.Add_Velocity_Independent_Forces(lagrangian_forces_F,RF,time);
+    GENERALIZED_VELOCITY<TV> gv(lagrangian_forces_F,RF,solid_body_collection);
+    solid_body_collection.Add_Velocity_Independent_Forces(gv,time);
     gather_scatter.template Scatter<int>(false,
         [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid){
             F(it.Index())+=it.Weight()*lagrangian_forces_F(p);});
@@ -219,7 +221,9 @@ Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,ARRAY<TWIST<TV> 
     gather_scatter.template Gather<int>(false,
         [this,&V](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid){
             lagrangian_forces_V(p)+=it.Weight()*V(it.Index());});
-    solid_body_collection.Add_Implicit_Velocity_Independent_Forces(lagrangian_forces_V,RV,lagrangian_forces_F,RF,time,transpose);
+    GENERALIZED_VELOCITY<TV> gv(lagrangian_forces_V,const_cast<ARRAY<TWIST<TV> >&>(RV),solid_body_collection);
+    GENERALIZED_VELOCITY<TV> gf(lagrangian_forces_F,RF,solid_body_collection);
+    solid_body_collection.Add_Implicit_Velocity_Independent_Forces(gv,gf,time,transpose);
     RF=-RF;
     gather_scatter.template Scatter<int>(false,
         [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid){

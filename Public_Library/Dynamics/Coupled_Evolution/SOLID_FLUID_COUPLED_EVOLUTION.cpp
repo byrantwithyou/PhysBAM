@@ -184,7 +184,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         B.rigid_V.array.Fill(TWIST<TV>());
         example_forces_and_velocities.Add_External_Forces(B.V.array,current_velocity_time+dt);
         example_forces_and_velocities.Add_External_Forces(B.rigid_V.array,current_velocity_time+dt);
-        solid_body_collection.Add_Velocity_Independent_Forces(B.V.array,B.rigid_V.array,current_velocity_time+dt); // this is a nop for binding forces
+        solid_body_collection.Add_Velocity_Independent_Forces(B,current_velocity_time+dt); // this is a nop for binding forces
         solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(B.V.array,B.rigid_V.array);
         solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Distribute_Force_To_Parents(rigid_B_full);
         if(solid_body_collection.deformable_body_collection.soft_bindings.Need_Bindings_Mapped()){

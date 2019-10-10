@@ -12,6 +12,7 @@
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Solids/Forces_And_Torques/WIND_DRAG.h>
+#include <Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
 using namespace PhysBAM;
 //#####################################################################
 template<class TV> const LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<TV,typename TV::SCALAR> WIND_DRAG<TV>::interpolation;
@@ -108,7 +109,7 @@ Add_Velocity_Independent_Forces_Helper(TV relative_velocity,int t) const
 // Function Add_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void WIND_DRAG<TV>::
-Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const
+Add_Velocity_Independent_Forces(GENERALIZED_VELOCITY<TV>& F,const T time) const
 {
     surface_area=0;
     if(use_constant_wind==use_spatially_varying_wind) PHYSBAM_FATAL_ERROR();
@@ -120,11 +121,13 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,
             TV wind_velocity=use_constant_wind?constant_wind:optimization(t).wind_velocity;
             TV relative_velocity=wind_velocity-particles.V.Subset(nodes).Sum()/TV::m;
             TV triangle_force=Add_Velocity_Independent_Forces_Helper(relative_velocity,t);
-            F(nodes(0))+=triangle_force;F(nodes(1))+=triangle_force;F(nodes(2))+=triangle_force;}
+            F.V.array(nodes(0))+=triangle_force;
+            F.V.array(nodes(1))+=triangle_force;
+            F.V.array(nodes(2))+=triangle_force;}
         else{
             if(rigid_body->Has_Infinite_Inertia() || rigid_body->particle_index<0) return;
             LOG::cout<<"M: Adding drag to "<<rigid_body->particle_index<<std::endl;
-            TWIST<TV>& wrench=rigid_F(rigid_body->particle_index);
+            TWIST<TV>& wrench=F.rigid_V.array(rigid_body->particle_index);
             for(int t=0;t<rigid_body->simplicial_object->mesh.elements.m;t++){
                 TV wind_velocity=use_constant_wind?constant_wind:optimization(t).wind_velocity;
                 TV relative_velocity=wind_velocity-rigid_body->Pointwise_Object_Velocity(optimization(t).center);
@@ -136,14 +139,14 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,
     if(linear_normal_viscosity && deformable_simplicial_object){
         TV wind_acceleration=linear_normal_viscosity*constant_wind;
         for(int p:force_particles){
-            if(use_constant_wind) F(p)+=particles.mass(p)*TV::Dot_Product(wind_acceleration,vertex_normals(p))*vertex_normals(p);
-            else F(p)+=particles.mass(p)*linear_normal_viscosity*TV::Dot_Product(Spatially_Varying_Wind_Velocity(particles.X(p)),vertex_normals(p))*vertex_normals(p);}}
+            if(use_constant_wind) F.V.array(p)+=particles.mass(p)*TV::Dot_Product(wind_acceleration,vertex_normals(p))*vertex_normals(p);
+            else F.V.array(p)+=particles.mass(p)*linear_normal_viscosity*TV::Dot_Product(Spatially_Varying_Wind_Velocity(particles.X(p)),vertex_normals(p))*vertex_normals(p);}}
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces
 //#####################################################################
 template<class TV> void WIND_DRAG<TV>::
-Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const
+Add_Velocity_Dependent_Forces(const GENERALIZED_VELOCITY<TV>& V,GENERALIZED_VELOCITY<TV>& F,const T time) const
 {
     if(use_constant_wind==use_spatially_varying_wind) PHYSBAM_FATAL_ERROR();
     T wind_viscosity=use_constant_wind?constant_wind_viscosity:spatially_varying_wind_viscosity;
@@ -151,14 +154,14 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const TWIST<TV> 
         if(deformable_simplicial_object) for(int t:force_elements){
             const TV_INT& nodes=deformable_simplicial_object->mesh.elements(t);
             // wind drag pressure - per unit area
-            TV negative_V=-V.Subset(nodes).Sum()/TV::m;
+            TV negative_V=-V.V.array.Subset(nodes).Sum()/TV::m;
             TV triangle_force=wind_viscosity*(negative_V-TV::Dot_Product(negative_V,optimization(t).inward_normal)*optimization(t).inward_normal);
             // total force
             triangle_force*=optimization(t).area_over_m; // one third of the triangle force is distriduted to each node
-            F(nodes(0))+=triangle_force;F(nodes(1))+=triangle_force;F(nodes(2))+=triangle_force;}
+            F.V.array(nodes(0))+=triangle_force;F.V.array(nodes(1))+=triangle_force;F.V.array(nodes(2))+=triangle_force;}
         else{
             if(rigid_body->Has_Infinite_Inertia() || rigid_body->particle_index<0) return;
-            TWIST<TV>& wrench=rigid_F(rigid_body->particle_index);
+            TWIST<TV>& wrench=F.rigid_V.array(rigid_body->particle_index);
             for(int t=0;t<rigid_body->simplicial_object->mesh.elements.m;t++){
                 TV negative_V=-rigid_body->Pointwise_Object_Velocity(optimization(t).center);
                 TV simplex_force=wind_viscosity*(negative_V-TV::Dot_Product(negative_V,optimization(t).inward_normal)*optimization(t).inward_normal);
@@ -167,7 +170,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const TWIST<TV> 
                 wrench.linear+=simplex_force;wrench.angular+=TV::Cross_Product(optimization(t).center-rigid_body->Frame().t,simplex_force);}}}
     if(linear_normal_viscosity && deformable_simplicial_object){
         for(int p:force_particles){
-            F(p)-=particles.mass(p)*linear_normal_viscosity*TV::Dot_Product(V(p),vertex_normals(p))*vertex_normals(p);}}
+            F.V.array(p)-=particles.mass(p)*linear_normal_viscosity*TV::Dot_Product(V.V.array(p),vertex_normals(p))*vertex_normals(p);}}
 }
 //#####################################################################
 // Function Update_Mpi

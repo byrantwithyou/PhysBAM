@@ -6,9 +6,19 @@
 //#####################################################################
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
+#include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
 using namespace PhysBAM;
+//#####################################################################
+// Constructor
+//#####################################################################
+template<class TV> GENERALIZED_VELOCITY<TV>::
+GENERALIZED_VELOCITY(const SOLID_BODY_COLLECTION<TV>& solid_body_collection)
+    :GENERALIZED_VELOCITY(solid_body_collection.deformable_body_collection.particles.V,
+        solid_body_collection.rigid_body_collection.rigid_body_particles.twist,
+        solid_body_collection)
+{}
 //#####################################################################
 // Constructor
 //#####################################################################

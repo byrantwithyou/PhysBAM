@@ -53,7 +53,7 @@ Velocity_Dependent_Forces_Size() const
 // Function Add_Velocity_Dependent_Forces_First_Half
 //#####################################################################
 template<class TV> void SOLIDS_FORCES<TV>::
-Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<T> aggregate,const T time) const
+Add_Velocity_Dependent_Forces_First_Half(const GENERALIZED_VELOCITY<TV>& V,ARRAY_VIEW<T> aggregate,const T time) const
 {
     PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }
@@ -61,7 +61,7 @@ Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const
 // Function Add_Velocity_Dependent_Forces_Second_Half
 //#####################################################################
 template<class TV> void SOLIDS_FORCES<TV>::
-Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const
+Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,GENERALIZED_VELOCITY<TV>& F,const T time) const
 {
     PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }
@@ -69,7 +69,7 @@ Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VI
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void SOLIDS_FORCES<TV>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time,bool transpose) const
+Add_Implicit_Velocity_Independent_Forces(const GENERALIZED_VELOCITY<TV>& V,GENERALIZED_VELOCITY<TV>& F,const T time,bool transpose) const
 {
 }
 //#####################################################################

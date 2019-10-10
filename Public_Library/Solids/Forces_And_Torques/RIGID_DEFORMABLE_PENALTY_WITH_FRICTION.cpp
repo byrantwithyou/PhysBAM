@@ -16,6 +16,7 @@
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Solids/Forces_And_Torques/RIGID_DEFORMABLE_PENALTY_WITH_FRICTION.h>
+#include <Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -39,7 +40,7 @@ template<class TV> RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>::
 // Function Add_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>::
-Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const
+Add_Velocity_Independent_Forces(GENERALIZED_VELOCITY<TV>& F,const T time) const
 {
     TIMER_SCOPE_FUNC;
     for(int i=0;i<collision_pairs.m;i++){
@@ -47,9 +48,9 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,
         const RIGID_BODY<TV>& rb=rigid_body_collection.Rigid_Body(c.b);
         if(c.active){
             TV j=stiffness_coefficient*(particles.X(c.p)-c.Y);
-            F(c.p)-=j;
+            F.V.array(c.p)-=j;
             if(!rb.Has_Infinite_Inertia())
-                rigid_F(c.b)+=rb.Gather(TWIST<TV>(j,typename TV::SPIN()),c.Y);}}
+                F.rigid_V.array(c.b)+=rb.Gather(TWIST<TV>(j,typename TV::SPIN()),c.Y);}}
 }
 //#####################################################################
 // Function Update_Position_Based_State
@@ -69,9 +70,8 @@ Update_Position_Based_State(const T time)
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,
-    ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TV> F,
-    ARRAY_VIEW<TWIST<TV> > rigid_F,const T time,bool transpose) const
+Add_Implicit_Velocity_Independent_Forces(const GENERALIZED_VELOCITY<TV>& V,
+    GENERALIZED_VELOCITY<TV>& F,const T time,bool transpose) const
 {
     TIMER_SCOPE_FUNC;
     for(int i=0;i<collision_pairs.m;i++){
@@ -81,23 +81,23 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,
             TV j=stiffness_coefficient*(particles.X(c.p)-c.Y);
             if(rb.Has_Infinite_Inertia()){
                 if(transpose)
-                    F(c.p)+=(c.dYdZ-1).Transpose_Times(stiffness_coefficient*V(c.p));
-                else F(c.p)+=(c.dYdZ-1)*(stiffness_coefficient*V(c.p));}
+                    F.V.array(c.p)+=(c.dYdZ-1).Transpose_Times(stiffness_coefficient*V.V.array(c.p));
+                else F.V.array(c.p)+=(c.dYdZ-1)*(stiffness_coefficient*V.V.array(c.p));}
             else{
                 if(transpose){
-                    TWIST<TV> tw=rb.Scatter(rigid_V(c.b),c.Y);
-                    TV dj=tw.linear-V(c.p),cp=j.Cross(tw.angular);
+                    TWIST<TV> tw=rb.Scatter(V.rigid_V.array(c.b),c.Y);
+                    TV dj=tw.linear-V.V.array(c.p),cp=j.Cross(tw.angular);
                     TV dZ=stiffness_coefficient*dj,dY=cp-dZ;
-                    rigid_F(c.b).linear+=c.dYdL.Transpose_Times(dY)-cp;
-                    rigid_F(c.b).angular+=c.dYdA.Transpose_Times(dY);
-                    F(c.p)+=dZ+c.dYdZ.Transpose_Times(dY);}
+                    F.rigid_V.array(c.b).linear+=c.dYdL.Transpose_Times(dY)-cp;
+                    F.rigid_V.array(c.b).angular+=c.dYdA.Transpose_Times(dY);
+                    F.V.array(c.p)+=dZ+c.dYdZ.Transpose_Times(dY);}
                 else{
-                    TV dZ=V(c.p),dL=rigid_V(c.b).linear;
-                    auto dA=rigid_V(c.b).angular;
+                    TV dZ=V.V.array(c.p),dL=V.rigid_V.array(c.b).linear;
+                    auto dA=V.rigid_V.array(c.b).angular;
                     TV dY=c.dYdZ*dZ+c.dYdL*dL+c.dYdA*dA;
                     TV dj=stiffness_coefficient*(dZ-dY);
-                    F(c.p)-=dj;
-                    rigid_F(c.b)+=rb.Gather(TWIST<TV>(dj,(dY-dL).Cross(j)),c.Y);}}}}
+                    F.V.array(c.p)-=dj;
+                    F.rigid_V.array(c.b)+=rb.Gather(TWIST<TV>(dj,(dY-dL).Cross(j)),c.Y);}}}}
 }
 //#####################################################################
 // Function Potential_Energy
@@ -285,9 +285,8 @@ Add_Pair(int p,int b,int e,const TV& X0,const FRAME<TV>& f,T thickness)
 // Function Add_Velocity_Dependent_Forces
 //#####################################################################
 template<class TV> void RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>::
-Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,
-    ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TV> F,
-    ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const
+Add_Velocity_Dependent_Forces(const GENERALIZED_VELOCITY<TV>& V,
+    GENERALIZED_VELOCITY<TV>& F,const T time) const
 {
     PHYSBAM_FATAL_ERROR();
 }
@@ -327,7 +326,7 @@ Limit_Time_Step_By_Strain_Rate(const bool limit_time_step_by_strain_rate_input,c
 // Function Add_Velocity_Dependent_Forces_First_Half
 //#####################################################################
 template<class TV> void RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>::
-Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<T> aggregate,const T time) const
+Add_Velocity_Dependent_Forces_First_Half(const GENERALIZED_VELOCITY<TV>& V,ARRAY_VIEW<T> aggregate,const T time) const
 {
     PHYSBAM_FATAL_ERROR();
 }
@@ -335,7 +334,7 @@ Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const
 // Function Add_Velocity_Dependent_Forces_Second_Half
 //#####################################################################
 template<class TV> void RIGID_DEFORMABLE_PENALTY_WITH_FRICTION<TV>::
-Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const
+Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,GENERALIZED_VELOCITY<TV>& F,const T time) const
 {
     PHYSBAM_FATAL_ERROR();
 }

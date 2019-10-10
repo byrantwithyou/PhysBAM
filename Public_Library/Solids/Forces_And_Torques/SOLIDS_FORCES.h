@@ -17,6 +17,7 @@ namespace PhysBAM{
 
 template<class TV> class MPI_SOLIDS;
 template<class TV> class RIGID_BODY_COLLECTION;
+template<class TV> class GENERALIZED_VELOCITY;
 class SEGMENT_MESH;
 
 
@@ -67,12 +68,12 @@ public:
     virtual void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const=0;
     virtual void Update_Mpi(const ARRAY<bool>& particle_is_simulated,const ARRAY<bool>& rigid_particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)=0;
     virtual void Update_Position_Based_State(const T time);
-    virtual void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const=0;
-    virtual void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const=0;
+    virtual void Add_Velocity_Independent_Forces(GENERALIZED_VELOCITY<TV>& F,const T time) const=0;
+    virtual void Add_Velocity_Dependent_Forces(const GENERALIZED_VELOCITY<TV>& V,GENERALIZED_VELOCITY<TV>& F,const T time) const=0;
     virtual int Velocity_Dependent_Forces_Size() const;
-    virtual void Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<T> aggregate,const T time) const;
-    virtual void Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const;
-    virtual void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time,bool transpose=false) const;
+    virtual void Add_Velocity_Dependent_Forces_First_Half(const GENERALIZED_VELOCITY<TV>& V,ARRAY_VIEW<T> aggregate,const T time) const;
+    virtual void Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,GENERALIZED_VELOCITY<TV>& F,const T time) const;
+    virtual void Add_Implicit_Velocity_Independent_Forces(const GENERALIZED_VELOCITY<TV>& V,GENERALIZED_VELOCITY<TV>& F,const T time,bool transpose=false) const;
     virtual void Enforce_Definiteness(const bool enforce_definiteness_input);
     virtual T CFL_Strain_Rate() const=0;
     virtual void Initialize_CFL(ARRAY_VIEW<DEFORMABLE_FREQUENCY_DATA> frequency,ARRAY_VIEW<RIGID_FREQUENCY_DATA> rigid_frequency)=0;

@@ -84,7 +84,7 @@ Prepare_Backward_Euler_System(BACKWARD_EULER_SYSTEM<TV>& system,const T dt,const
     example_forces_and_velocities.Add_External_Forces(B_full,current_velocity_time+dt);
     example_forces_and_velocities.Add_External_Forces(rigid_B_full,current_velocity_time+dt);
     if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data_Global(particles.V);
-    solid_body_collection.Add_Velocity_Independent_Forces(B_full,rigid_B_full,current_velocity_time+dt); // this is a nop for binding forces
+    solid_body_collection.Add_Velocity_Independent_Forces(B_all,current_velocity_time+dt); // this is a nop for binding forces
     if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data_Global(B_full);
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(B_full,rigid_B_full);
     solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Distribute_Force_To_Parents(rigid_B_full);

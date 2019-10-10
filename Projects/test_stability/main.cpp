@@ -182,7 +182,7 @@ void Step(SOLID_BODY_COLLECTION<TV>& sbc,EXPLICIT_EXAMPLE<TV>& example)
         U1=M*U;}
 
     col*=0;
-    sbc.Add_Velocity_Independent_Forces(col,ARRAY_VIEW<TWIST<TV> >(),example.time);
+    sbc.deformable_body_collection.Add_Velocity_Independent_Forces(col,example.time);
     for(int i=0;i<particles.number;i++){
         particles.X(i)+=example.dt*example.dt*example.alpha/particles.mass(i)*col(i)+example.dt*particles.V(i);
         particles.V(i)+=example.dt/particles.mass(i)*col(i);}
