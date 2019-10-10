@@ -84,6 +84,20 @@ operator*=(const T a)
     return *this;
 }
 //#####################################################################
+// Function Set_Zero
+//#####################################################################
+template<class TV> void MPM_KRYLOV_VECTOR_RB<TV>::
+Set_Zero()
+{
+#pragma omp parallel for
+    for(int k=0;k<valid_indices.m;k++){
+        int i=valid_indices(k);
+        u.array(i)=TV();}
+#pragma omp parallel for
+    for(int k=0;k<twists.m;k++)
+        twists(k)=TWIST<TV>();
+}
+//#####################################################################
 // Function Copy
 //#####################################################################
 template<class TV> void MPM_KRYLOV_VECTOR_RB<TV>::

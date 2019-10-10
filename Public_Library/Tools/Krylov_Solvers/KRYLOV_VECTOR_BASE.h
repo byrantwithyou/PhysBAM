@@ -34,6 +34,7 @@ public:
     virtual void Set(ARRAY_VIEW<const T> a)=0;
     virtual KRYLOV_VECTOR_BASE* Clone_Default() const=0;
     virtual void Resize(const KRYLOV_VECTOR_BASE& v)=0;
+    virtual void Set_Zero()=0;
 //#####################################################################
 };
 template<class T> std::ostream& operator<<(std::ostream& output,const KRYLOV_VECTOR_BASE<T>& x);

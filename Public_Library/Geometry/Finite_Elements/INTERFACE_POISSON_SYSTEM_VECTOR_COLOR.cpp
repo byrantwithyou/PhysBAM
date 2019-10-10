@@ -191,8 +191,11 @@ Resize(const KRYLOV_VECTOR_BASE<T>& v)
         u(c).Resize(cs.u(c).m);
     q.Resize(cs.q.m);
 }
+//#####################################################################
+// Function Set_Zero
+//#####################################################################
 template<class TV> void INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>::
-Zero_Out()
+Set_Zero()
 {
     for(int c=0;c<colors;c++)
 #pragma omp parallel for

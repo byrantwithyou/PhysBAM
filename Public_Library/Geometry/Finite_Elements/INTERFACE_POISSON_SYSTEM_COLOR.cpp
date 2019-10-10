@@ -247,7 +247,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result,bool trans
 {
     const VECTOR_T& xc=debug_cast<const VECTOR_T&>(x);
     VECTOR_T& rc=debug_cast<VECTOR_T&>(result);
-    rc.Zero_Out();
+    rc.Set_Zero();
     for(int c=0;c<cdi->colors;c++)
 #pragma omp parallel for
         for(int i=0;i<cm_u->dofs(c);i++){

@@ -40,6 +40,7 @@ public:
     void Resize(const KRYLOV_VECTOR_BASE<T>& v) override;
     void Get(ARRAY_VIEW<T> a) const override;
     void Set(ARRAY_VIEW<const T> a) override;
+    void Set_Zero() override;
 
     T Max_Abs() const;
     void Scale(const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>& v,const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>& s);

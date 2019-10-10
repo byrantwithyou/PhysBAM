@@ -166,6 +166,10 @@ struct KRYLOV_VECTOR_FEM:public KRYLOV_VECTOR_BASE<T>
     {
         v=a;
     }
+    void Set_Zero() override
+    {
+        *this*=0;
+    }
 };
 
 template<typename T>

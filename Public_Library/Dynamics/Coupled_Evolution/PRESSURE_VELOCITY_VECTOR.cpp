@@ -65,6 +65,15 @@ operator*=(const T a)
     return *this;
 }
 //#####################################################################
+// Function Set_Zero
+//#####################################################################
+template<class TV> void PRESSURE_VELOCITY_VECTOR<TV>::
+Set_Zero()
+{
+    solid_velocity.Set_Zero();
+    for(auto&a:pressure) a.Fill(0);
+}
+//#####################################################################
 // Function Copy
 //#####################################################################
 template<class TV> void PRESSURE_VELOCITY_VECTOR<TV>::

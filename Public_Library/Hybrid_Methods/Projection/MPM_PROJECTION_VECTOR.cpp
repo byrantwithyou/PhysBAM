@@ -58,6 +58,17 @@ operator*=(const T a)
     return *this;
 }
 //#####################################################################
+// Function Set_Zero
+//#####################################################################
+template<class TV> void MPM_PROJECTION_VECTOR<TV>::
+Set_Zero()
+{
+    TIMER_SCOPE_FUNC;
+#pragma omp parallel for
+    for(int i=0;i<v.m;i++)
+        v(i)=T();
+}
+//#####################################################################
 // Function Copy
 //#####################################################################
 template<class TV> void MPM_PROJECTION_VECTOR<TV>::

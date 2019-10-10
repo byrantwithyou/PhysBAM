@@ -71,6 +71,17 @@ operator*=(const T a)
     return *this;
 }
 //#####################################################################
+// Function Set_Zero
+//#####################################################################
+template<class TV> void FLUID_KRYLOV_VECTOR<TV>::
+Set_Zero()
+{
+#pragma omp parallel for
+    for(int k=0;k<valid_indices.m;k++){
+        int i=valid_indices(k);
+        p.array(i)=T();}
+}
+//#####################################################################
 // Function Copy
 //#####################################################################
 template<class TV> void FLUID_KRYLOV_VECTOR<TV>::

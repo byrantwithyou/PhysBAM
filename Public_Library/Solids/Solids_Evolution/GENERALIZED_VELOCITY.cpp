@@ -93,6 +93,16 @@ operator*=(const T a)
     return *this;
 }
 //#####################################################################
+// Function Set_Zero
+//#####################################################################
+template<class TV> void GENERALIZED_VELOCITY<TV>::
+Set_Zero()
+{
+    V.Fill(TV());
+    rigid_V.Fill(TWIST<TV>());
+    kinematic_and_static_rigid_V.Fill(TWIST<TV>());
+}
+//#####################################################################
 // Function Copy
 //#####################################################################
 template<class TV> void GENERALIZED_VELOCITY<TV>::

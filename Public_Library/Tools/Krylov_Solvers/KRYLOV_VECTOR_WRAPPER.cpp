@@ -72,6 +72,14 @@ operator*=(const T a)
     return *this;
 }
 //#####################################################################
+// Function Set_Zero
+//#####################################################################
+template<class T,class TV> void KRYLOV_VECTOR_WRAPPER<T,TV>::
+Set_Zero()
+{
+    v.Fill(typename remove_reference_t<TV>::ELEMENT());
+}
+//#####################################################################
 // Function Copy
 //#####################################################################
 template<class T,class TV> void KRYLOV_VECTOR_WRAPPER<T,TV>::

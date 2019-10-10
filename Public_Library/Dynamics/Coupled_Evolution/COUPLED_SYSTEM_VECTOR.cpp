@@ -73,6 +73,17 @@ operator*=(const T a)
     return *this;
 }
 //#####################################################################
+// Function Set_Zero
+//#####################################################################
+template<class TV> void COUPLED_SYSTEM_VECTOR<TV>::
+Set_Zero()
+{
+    pressure.Fill(0);
+    lambda.Fill(0);
+    force_coefficients.Fill(0);
+    viscous_force_coefficients.Fill(0);
+}
+//#####################################################################
 // Function Copy
 //#####################################################################
 template<class TV> void COUPLED_SYSTEM_VECTOR<TV>::

@@ -35,6 +35,7 @@ using std::is_scalar;
 using std::remove_const;
 using std::remove_pointer;
 using std::remove_reference;
+using std::remove_reference_t;
 
 template<class T1,class T2> struct ASSERT_SAME_HELPER{static const bool value=false;};
 template<class T> struct ASSERT_SAME_HELPER<T,T>{static const bool value=true;};

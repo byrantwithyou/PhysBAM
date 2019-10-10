@@ -111,6 +111,26 @@ operator*=(const T a)
     return *this;
 }
 //#####################################################################
+// Function Set_Zero
+//#####################################################################
+template<class TV> void INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>::
+Set_Zero()
+{
+#pragma omp parallel
+#pragma omp single
+    {
+        for(int i=0;i<TV::m;i++)
+            for(int c=0;c<colors;c++)
+#pragma omp task
+                u(i)(c).Fill(0);
+        for(int c=0;c<colors;c++)
+#pragma omp task
+            p(c).Fill(0);
+#pragma omp task
+        q.Fill(0);
+    }
+}
+//#####################################################################
 // Function Copy
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>::
