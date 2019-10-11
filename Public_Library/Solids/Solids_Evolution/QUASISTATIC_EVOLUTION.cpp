@@ -90,7 +90,7 @@ One_Newton_Step_Toward_Steady_State(const T time,ARRAY<TV>& dX_full)
     const ARRAY<int>& dynamic_particles=solid_body_collection.deformable_body_collection.dynamic_particles;
 
     dX_full.Resize(particles.Size()); // an initial guess might be passed in for dX, otherwise it's zero
-    KRYLOV_VECTOR_WRAPPER<T,INDIRECT_ARRAY<ARRAY<TV> > > dX(dX_full,dynamic_particles),B(B_full,dynamic_particles);
+    KRYLOV_VECTOR_WRAPPER<T,INDIRECT_ARRAY<ARRAY_VIEW<TV> > > dX(ARRAY_VIEW<TV>(dX_full).Subset(dynamic_particles)),B(ARRAY_VIEW<TV>(B_full).Subset(dynamic_particles));
 
     B_full.Subset(solid_body_collection.deformable_body_collection.dynamic_particles).Fill(TV());
     GENERALIZED_VELOCITY<TV> GB(B_full,rigid_B_full,solid_body_collection);

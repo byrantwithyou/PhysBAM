@@ -19,7 +19,6 @@ public:
 
     KRYLOV_VECTOR_WRAPPER();
     KRYLOV_VECTOR_WRAPPER(TV vector);
-    template<class VECTOR,class INDICES> KRYLOV_VECTOR_WRAPPER(VECTOR& vector,const INDICES& index);
     virtual ~KRYLOV_VECTOR_WRAPPER();
 
     KRYLOV_VECTOR_BASE<T>& operator+=(const KRYLOV_VECTOR_BASE<T>& bv) override;

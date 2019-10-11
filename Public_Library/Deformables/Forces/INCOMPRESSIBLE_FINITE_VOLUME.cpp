@@ -220,7 +220,7 @@ Make_Incompressible(const T dt,const bool correct_volume)
             particles.V(p)+=particles.one_over_mass(p)*gradient_full(p);}}
 
     Negative_Divergence(particles.V,divergence_full);
-    KRYLOV_VECTOR_T divergence(divergence_full,force_dynamic_particles);
+    KRYLOV_VECTOR_T divergence(divergence_full.Subset(force_dynamic_particles));
 
     if(correct_volume){
         T one_over_dt=1/dt,maximum_volume_recovery_fraction=dt/max(minimum_volume_recovery_time_scale,(T)1e-10);
@@ -233,7 +233,7 @@ Make_Incompressible(const T dt,const bool correct_volume)
     LOG::cout<<"divergence magnitude = "<<system.Magnitude(divergence)<<std::endl;
 
     pressure_full.Resize(particles.Size(),no_init);
-    KRYLOV_VECTOR_T pressure(pressure_full,force_dynamic_particles);
+    KRYLOV_VECTOR_T pressure(pressure_full.Subset(force_dynamic_particles));
     pressure.v.Fill((T)0);
 
     {CONJUGATE_RESIDUAL<T> cr;
@@ -266,9 +266,9 @@ Test_System()
     const ARRAY<int> &fragment_dynamic_particles=force_dynamic_particles,
         &fragment_particles=force_dynamic_particles;
     INDIRECT_ARRAY<ARRAY<T> > volumes(volumes_full,fragment_dynamic_particles);
-    KRYLOV_VECTOR_T pressure(pressure_full,fragment_dynamic_particles),divergence(divergence_full,fragment_dynamic_particles);
-    INDIRECT_ARRAY<ARRAY_VIEW<TV> > X(particles.X,fragment_dynamic_particles),V(particles.V,fragment_dynamic_particles);
-    INDIRECT_ARRAY<ARRAY<TV> > gradient(gradient_full,fragment_dynamic_particles);
+    KRYLOV_VECTOR_T pressure(pressure_full.Subset(fragment_dynamic_particles)),divergence(divergence_full.Subset(fragment_dynamic_particles));
+    INDIRECT_ARRAY<ARRAY_VIEW<TV> > X(particles.X.Subset(fragment_dynamic_particles)),V(particles.V.Subset(fragment_dynamic_particles));
+    INDIRECT_ARRAY<ARRAY<TV> > gradient(gradient_full.Subset(fragment_dynamic_particles));
     ARRAY<T> old_volumes(volumes);
     particles.V.Subset(fragment_particles).Fill(TV());
     pressure_full.Subset(fragment_particles).Fill(T());
@@ -313,7 +313,8 @@ Test_System()
         if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data(particles.X);
         Update_Position_Based_State(0,true,true);
 
-        ARRAY<T> dv_full(volumes_full.m);KRYLOV_VECTOR_T dv(dv_full,fragment_dynamic_particles);
+        ARRAY<T> dv_full(volumes_full.m);
+        KRYLOV_VECTOR_T dv(dv_full.Subset(fragment_dynamic_particles));
         dv.v=volumes-old_volumes;
         divergence*=dt;
 
