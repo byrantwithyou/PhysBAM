@@ -22,6 +22,7 @@ template<class TV> class RIGID_BODY_STATE;
 template<class TV> class SOLID_BODY_COLLECTION;
 template<class TV> class GRID;
 template<class TV> class EXAMPLE_FORCES_AND_VELOCITIES;
+template<class TV> class GENERALIZED_VELOCITY;
 
 template<class TV>
 class SOLIDS_EVOLUTION
@@ -39,8 +40,7 @@ public:
     bool fully_implicit;
 protected:
     ARRAY<KRYLOV_VECTOR_BASE<T>*> krylov_vectors;
-    ARRAY<TV> B_full;
-    ARRAY<TWIST<TV> > rigid_B_full;
+    GENERALIZED_VELOCITY<TV>& GV_B;
 public:
     ARRAY<RIGID_BODY_MASS<TV,true> > world_space_rigid_mass;
     ARRAY<RIGID_BODY_MASS<TV,true> > world_space_rigid_mass_inverse;

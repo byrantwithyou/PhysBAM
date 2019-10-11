@@ -15,6 +15,7 @@ namespace PhysBAM{
 template<class TV> class DEFORMALBLE_OBJECT_COLLISIONS;
 template<class TV> class SOLIDS_PARAMETERS;
 template<class TV> class RIGID_BODY_COLLECTION;
+template<class TV> class RIGID_SLENDER_ROD_COLLECTION;
 template<class TV> class DEFORMABLE_BODY_COLLECTION;
 template<class TV> class RIGID_BODY_CLUSTER_BINDINGS;
 template<class TV> class DEFORMABLES_FORCES;
@@ -32,6 +33,7 @@ public:
     COLLISION_BODY_COLLECTION<TV>& collision_body_list;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
+    RIGID_SLENDER_ROD_COLLECTION<TV>& rigid_slender_rod_collection;
     ARRAY<SOLIDS_FORCES<TV>*> solids_forces;
     T cfl_number;
     T cfl_elastic,cfl_damping;
@@ -100,6 +102,7 @@ public:
         const bool read_deformable_body,const bool read_from_every_process,ARRAY<int>* needs_init=0,ARRAY<int>* needs_destroy=0);
     void Write(const STREAM_TYPE stream_type,const std::string& prefix,const int frame,const int first_frame,const bool include_static_variables,const bool write_rigid_body,
         const bool write_deformable_body,const bool write_from_every_process,const bool output_interaction_pairs) const;
+    GENERALIZED_VELOCITY<TV>& New_Generalized_Velocity() const;
 //#####################################################################
 };
 }

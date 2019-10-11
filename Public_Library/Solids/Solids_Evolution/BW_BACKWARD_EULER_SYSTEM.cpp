@@ -30,8 +30,13 @@ using namespace PhysBAM;
 template<class TV> BW_BACKWARD_EULER_SYSTEM<TV>::
 BW_BACKWARD_EULER_SYSTEM(SOLID_BODY_COLLECTION<TV>& solid_body_collection,BW_COLLISIONS<TV>& bw_collisions_input,EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities,
     const T dt_input,const T time_input)
-    :KRYLOV_SYSTEM_BASE<typename TV::SCALAR>(false,true),solid_body_collection(solid_body_collection),bw_collisions(bw_collisions_input),
-    example_forces_and_velocities(example_forces_and_velocities),dt(dt_input),time(time_input)
+    :KRYLOV_SYSTEM_BASE<typename TV::SCALAR>(false,true),
+    solid_body_collection(solid_body_collection),
+    bw_collisions(bw_collisions_input),
+    example_forces_and_velocities(example_forces_and_velocities),
+    dt(dt_input),time(time_input),
+    GV_F(solid_body_collection.New_Generalized_Velocity()),
+    GV_B(solid_body_collection.New_Generalized_Velocity())
 {
 }
 //#####################################################################
@@ -40,6 +45,8 @@ BW_BACKWARD_EULER_SYSTEM(SOLID_BODY_COLLECTION<TV>& solid_body_collection,BW_COL
 template<class TV> BW_BACKWARD_EULER_SYSTEM<TV>::
 ~BW_BACKWARD_EULER_SYSTEM()
 {
+    delete &GV_F;
+    delete &GV_B;
 }
 //#####################################################################
 // Function Set_Boundary_Conditions

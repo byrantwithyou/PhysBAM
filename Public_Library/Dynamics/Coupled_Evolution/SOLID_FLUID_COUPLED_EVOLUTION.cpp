@@ -44,6 +44,7 @@
 #include <Deformables/Forces/BINDING_SPRINGS.h>
 #include <Solids/Collisions/RIGID_DEFORMABLE_COLLISIONS.h>
 #include <Solids/Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.h>
+#include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Incompressible/Collisions_And_Interactions/DEFORMABLE_OBJECT_FLUID_COLLISIONS.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
@@ -147,16 +148,9 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=rigid_body_collection.rigid_body_particles;
     MPI_SOLIDS<TV>* mpi_solids=solid_body_collection.deformable_body_collection.mpi_solids;
 
-    if(solids){
-        B_full.Resize(particles.Size(),no_init);
-        rigid_B_full.Resize(rigid_body_particles.Size(),no_init);}
-    else{
-        if(fluids && solids_fluids_parameters.mpi_solid_fluid){ // Gather the fluid terms for the RHS of the solid here
-            B_full.Resize(particles.Size(),no_init);
-            rigid_B_full.Resize(rigid_body_particles.Size(),no_init);}}
-
-    GENERALIZED_VELOCITY<TV> V(particles.V,rigid_body_particles.twist,solid_body_collection),
-        B(B_full,rigid_B_full,solid_body_collection);
+    GENERALIZED_VELOCITY<TV> V(solid_body_collection),&B=GV_B;
+    if(solids || (fluids && solids_fluids_parameters.mpi_solid_fluid))
+        B.Resize(V);
     GENERALIZED_MASS<TV> mass(solid_body_collection);
 
     ARRAY<int,TV_INT> cell_index_to_matrix_index;
@@ -186,7 +180,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         example_forces_and_velocities.Add_External_Forces(B.rigid_V.array,current_velocity_time+dt);
         solid_body_collection.Add_Velocity_Independent_Forces(B,current_velocity_time+dt); // this is a nop for binding forces
         solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(B.V.array,B.rigid_V.array);
-        solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Distribute_Force_To_Parents(rigid_B_full);
+        solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Distribute_Force_To_Parents(B.rigid_V.array);
         if(solid_body_collection.deformable_body_collection.soft_bindings.Need_Bindings_Mapped()){
             solid_body_collection.deformable_body_collection.soft_bindings.Map_Forces_From_Parents(B.V.array,B.rigid_V.array);
             solid_body_collection.deformable_body_collection.binding_list.Clear_Hard_Bound_Particles(B.V.array);
@@ -409,8 +403,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
             for(int i=0;i<V.V.Size();i++) B.V(i)=solid_system_mpi->one_over_modified_mass(i)*B.V(i);
             for(int i=0;i<V.rigid_V.Size();i++){B.rigid_V(i).linear=solid_system_mpi->modified_world_space_rigid_mass_inverse(i)*B.rigid_V(i).linear;
                 B.rigid_V(i).angular=solid_system_mpi->modified_world_space_rigid_inertia_tensor_inverse(i)*B.rigid_V(i).angular;}
-            V.V=B.V;V.rigid_V=B.rigid_V;
-            V.V*=(T)-1;V.rigid_V*=(T)-1;
+            V.Copy(-1,B);
             solid_system->Set_Global_Boundary_Conditions(V,X_save,rigid_frame_save,rigid_velocity_save,rigid_angular_momentum_save,V_save,
                 solids_parameters.implicit_solve_parameters.test_system,solids_parameters.implicit_solve_parameters.print_matrix);
             solids_fluids_parameters.mpi_solid_fluid->Parallel_Solve_Solid_Part(*solid_system_mpi,V,B,krylov_vectors,1,solids_parameters.implicit_solve_parameters.cg_iterations,solids_parameters.implicit_solve_parameters.cg_tolerance);}
@@ -463,11 +456,6 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
                 A_array(i).Construct_Incomplete_Cholesky_Factorization(poisson.pcg.modified_incomplete_cholesky,poisson.pcg.modified_incomplete_cholesky_coefficient,
                     poisson.pcg.preconditioner_zero_tolerance,poisson.pcg.preconditioner_zero_replacement); // check to see if the blocks can be preconditioned even though the whole
 
-            ar_full.Resize(particles.Size(),no_init);
-            rigid_ar_full.Resize(rigid_body_particles.Size(),no_init);
-            z_full.Resize(particles.Size(),no_init);
-            rigid_z_full.Resize(rigid_body_particles.Size(),no_init);
-            GENERALIZED_VELOCITY<TV> ar_V(ar_full,rigid_ar_full,solid_body_collection),z_V(z_full,rigid_z_full,solid_body_collection);
             PRESSURE_VELOCITY_VECTOR<TV> V_coupled(V,x_array.v),B_coupled(B,b_array);
             LOG::Time(solver_name);
             static int solve_id=-1;
@@ -685,7 +673,6 @@ Set_Dirichlet_Boundary_Conditions(const T time)
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION<TV>::
 Compute_W(const T current_position_time)
 {
-    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=Get_Face_Velocities();
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
@@ -808,7 +795,7 @@ Compute_W(const T current_position_time)
         }
 
         if(using_levelset && fluids_parameters.fluid_affects_solid){
-            GENERALIZED_VELOCITY<TV> V(particles.V,rigid_body_particles.twist,solid_body_collection);
+            GENERALIZED_VELOCITY<TV> V(solid_body_collection);
             // check whether this face can see fluid
             // cast a ray left and right
             // TODO: must exchange solid velocities to do this! for parallel.  Alt, just do solid explicit part on all procs.
@@ -1101,9 +1088,7 @@ template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION<TV>::
 Add_Nondynamic_Solids_To_Right_Hand_Side(ARRAY<ARRAY<T> >& right_hand_side,const ARRAY<INTERVAL<int> >& interior_regions,const int colors)
 {
     POISSON_COLLIDABLE_UNIFORM<TV>* poisson=Get_Poisson();
-    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
-    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-    GENERALIZED_VELOCITY<TV> V(particles.V,rigid_body_particles.twist,solid_body_collection);
+    GENERALIZED_VELOCITY<TV> V(solid_body_collection);
     for(int i=0;i<colors;i++)
         if(poisson->filled_region_touches_dirichlet(i)||poisson->solve_neumann_regions)
             SOLID_FLUID_SYSTEM<TV,SPARSE_MATRIX_FLAT_MXN<T> >::Add_J_Rigid_Transpose_Times_Velocity(J_rigid_kinematic(i),V,right_hand_side(i).Array_View(interior_regions(i)));
@@ -1124,8 +1109,6 @@ Average_Solid_Projected_Face_Velocities_For_Energy_Update(const ARRAY<T,FACE_IND
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION<TV>::
 Apply_Solid_Boundary_Conditions(const T time,const bool use_pseudo_velocities,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
 {
-    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
     POISSON_COLLIDABLE_UNIFORM<TV>& poisson=*Get_Poisson();
 
     // TODO: it is possible that we will end up with strange face weight behavior in cells on domain boundaries, depending on how we're setting up our Ws.
@@ -1163,7 +1146,7 @@ Apply_Solid_Boundary_Conditions(const T time,const bool use_pseudo_velocities,AR
                 velocity=(T)0;
                 if(dual_cell_weights(axis,face_index)){
                     FACE_WEIGHT_ELEMENTS& face_weights=*dual_cell_weights(axis,face_index);
-                    GENERALIZED_VELOCITY<TV> V(particles.V,rigid_body_particles.twist,solid_body_collection);
+                    GENERALIZED_VELOCITY<TV> V(solid_body_collection);
                     for(int i=0;i<face_weights.m;i++) velocity+=face_weights(i).y*V.V(face_weights(i).x)(axis);}
                 if(rigid_body_dual_cell_weights(axis,face_index)){
                     FACE_WEIGHT_ELEMENTS& face_weights=*rigid_body_dual_cell_weights(axis,face_index);

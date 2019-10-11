@@ -73,6 +73,7 @@ protected:
     mutable ARRAY<T,COUPLING_CONSTRAINT_ID> coupling_faces;
     mutable ARRAY<TV> temporary_velocities;
     mutable ARRAY<TWIST<TV> > temporary_twists;
+    mutable ARRAY<TWIST<TV> > temporary_rod_twists;
     mutable ARRAY<T> pressure;
     mutable ARRAY<T> temporary_faces;
     mutable ARRAY<T,COUPLING_CONSTRAINT_ID> temporary_lambdas;
@@ -84,6 +85,7 @@ protected:
 public:
     mutable ARRAY<TV> pressure_impulses;
     mutable ARRAY<TWIST<TV> > pressure_impulses_twist;
+    mutable ARRAY<TWIST<TV> > pressure_impulses_rod_twist;
 
     bool run_self_tests;
     bool print_poisson_matrix;

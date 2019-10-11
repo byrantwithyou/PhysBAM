@@ -1123,17 +1123,15 @@ void Plot_Energy_Density(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm,T stiffness)
 void Plot_Energy_Landscape()
 {
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-    ARRAY<TV> F(particles.X.m);
-    ARRAY<TWIST<TV> > TW;
     ARRAY<int> empty;
-    GENERALIZED_VELOCITY<TV> gv(F,empty,TW,empty,empty);
+    GENERALIZED_VELOCITY<TV>& gv=solid_body_collection.New_Generalized_Velocity();
     ARRAY<TV> X;
     ARRAY<TV> N;
     ARRAY<T> E;
     ARRAY<TV> TX(particles.X);
     for(int i=-image_size/2;i<=image_size/2;i++)
         for(int j=-image_size/2;j<=image_size/2;j++){
-            F.Fill(TV());
+            gv.Set_Zero();
             T x=2*sigma_range*i/image_size+1.1e-5;
             T y=2*sigma_range*j/image_size+1.2e-5;
             particles.X(3)=TV(-x,y);
@@ -1144,7 +1142,7 @@ void Plot_Energy_Landscape()
             solid_body_collection.Add_Velocity_Independent_Forces(gv,0);
             E.Append(ke+pe);
             X.Append(particles.X(5));
-            N.Append(F(5).Normalized());
+            N.Append(gv.V.array(5).Normalized());
         }
 
     INTERPOLATED_COLOR_MAP<T> mp;
@@ -1154,6 +1152,7 @@ void Plot_Energy_Landscape()
         Add_Debug_Particle(X(i),mp(E(i)));
         Debug_Particle_Set_Attribute<TV>("V",N(i));}
     particles.X=TX;
+    delete &gv;
 }
 //#####################################################################
 // Function Plot_Contour_Landscape

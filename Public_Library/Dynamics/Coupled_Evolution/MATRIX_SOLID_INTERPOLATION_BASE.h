@@ -41,7 +41,7 @@ public:
     void Times(const GENERALIZED_VELOCITY<TV>& solids,ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints) const;
     virtual void Transpose_Times_Add(const ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints,GENERALIZED_VELOCITY<TV>& solids) const=0;
     void Transpose_Times(const ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints,GENERALIZED_VELOCITY<TV>& solids) const;
-    void Test_Matrix(int number_particles,int number_rigid_particles) const;
+    void Test_Matrix(const GENERALIZED_VELOCITY<TV>& gv,int number_particles,int number_rigid_particles) const;
     virtual void Print_Each_Matrix(int n,GENERALIZED_VELOCITY<TV>& G) const=0;
     virtual void Add_Diagonal(ARRAY<T,COUPLING_CONSTRAINT_ID>& diagonal,const GENERALIZED_MASS<TV>& solid_mass) const=0;
     void Store_Maps(const GENERALIZED_VELOCITY<TV>& G);

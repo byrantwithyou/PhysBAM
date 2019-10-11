@@ -5,6 +5,8 @@
 // Class MATRIX_MXN
 //#####################################################################
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
+#include <Rigids/Slender_Rods/RIGID_SLENDER_ROD_COLLECTION.h>
+#include <Rigids/Slender_Rods/RIGID_SLENDER_ROD_PARTICLES.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
@@ -17,24 +19,31 @@ template<class TV> GENERALIZED_VELOCITY<TV>::
 GENERALIZED_VELOCITY(const SOLID_BODY_COLLECTION<TV>& solid_body_collection)
     :GENERALIZED_VELOCITY(solid_body_collection.deformable_body_collection.particles.V,
         solid_body_collection.rigid_body_collection.rigid_body_particles.twist,
+        solid_body_collection.rigid_slender_rod_collection.rigid_slender_rod_particles.twist,
         solid_body_collection)
 {}
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class TV> GENERALIZED_VELOCITY<TV>::
-GENERALIZED_VELOCITY(ARRAY_VIEW<TV> V_full,ARRAY_VIEW<TWIST<TV> > rigid_V_full,const SOLID_BODY_COLLECTION<TV>& solid_body_collection)
+GENERALIZED_VELOCITY(ARRAY_VIEW<TV> V_full,ARRAY_VIEW<TWIST<TV> > rigid_V_full,
+    ARRAY_VIEW<TWIST<TV> > rigid_rod_V_full,
+    const SOLID_BODY_COLLECTION<TV>& solid_body_collection)
     :V(V_full,solid_body_collection.deformable_body_collection.dynamic_particles),rigid_V(rigid_V_full,solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles),
+    rigid_rod_V(rigid_rod_V_full,solid_body_collection.rigid_slender_rod_collection.dynamic_rigid_rod_particles),
     kinematic_and_static_rigid_V(rigid_V_full,solid_body_collection.rigid_body_collection.static_and_kinematic_rigid_bodies),deep_copy(false)
 {}
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class TV> GENERALIZED_VELOCITY<TV>::
-GENERALIZED_VELOCITY(ARRAY_VIEW<TV> V_full,const ARRAY<int>& dynamic_particles,ARRAY_VIEW<TWIST<TV> > rigid_V_full,
-    const ARRAY<int>& dynamic_rigid_body_particles,const ARRAY<int>& static_and_kinematic_rigid_bodies)
-    :V(V_full,dynamic_particles),rigid_V(rigid_V_full,dynamic_rigid_body_particles),
-    kinematic_and_static_rigid_V(rigid_V_full,static_and_kinematic_rigid_bodies),deep_copy(false)
+GENERALIZED_VELOCITY(ARRAY_VIEW<TV> V_full,ARRAY_VIEW<TWIST<TV> > rigid_V_full,
+    ARRAY_VIEW<TWIST<TV> > rigid_rod_V_full,
+    const GENERALIZED_VELOCITY<TV>& gv)
+    :V(V_full,gv.V.indices),rigid_V(rigid_V_full,gv.rigid_V.indices),
+    rigid_rod_V(rigid_rod_V_full,gv.rigid_rod_V.indices),
+    kinematic_and_static_rigid_V(rigid_V_full,gv.kinematic_and_static_rigid_V.indices),
+    deep_copy(false)
 {}
 //#####################################################################
 // Destructor
@@ -44,7 +53,8 @@ template<class TV> GENERALIZED_VELOCITY<TV>::
 {
     if(deep_copy){
         delete [] V.array.Get_Array_Pointer();
-        delete [] rigid_V.array.Get_Array_Pointer();}
+        delete [] rigid_V.array.Get_Array_Pointer();
+        delete [] rigid_rod_V.array.Get_Array_Pointer();}
 }
 //#####################################################################
 // Operator =
@@ -54,6 +64,7 @@ operator=(const GENERALIZED_VELOCITY& gv)
 {
     V=gv.V;
     rigid_V=gv.rigid_V;
+    rigid_rod_V=gv.rigid_rod_V;
     kinematic_and_static_rigid_V=gv.kinematic_and_static_rigid_V;
     return *this;
 }
@@ -66,6 +77,7 @@ operator+=(const BASE& bv)
     const GENERALIZED_VELOCITY& v=debug_cast<const GENERALIZED_VELOCITY&>(bv);
     V+=v.V;
     rigid_V+=v.rigid_V;
+    rigid_rod_V+=v.rigid_rod_V;
     kinematic_and_static_rigid_V+=v.kinematic_and_static_rigid_V;
     return *this;
 }
@@ -78,6 +90,7 @@ operator-=(const BASE& bv)
     const GENERALIZED_VELOCITY& v=debug_cast<const GENERALIZED_VELOCITY&>(bv);
     V-=v.V;
     rigid_V-=v.rigid_V;
+    rigid_rod_V-=v.rigid_rod_V;
     kinematic_and_static_rigid_V-=v.kinematic_and_static_rigid_V;
     return *this;
 }
@@ -89,6 +102,7 @@ operator*=(const T a)
 {
     V*=a;
     rigid_V*=a;
+    rigid_rod_V*=a;
     kinematic_and_static_rigid_V*=a;
     return *this;
 }
@@ -100,6 +114,7 @@ Set_Zero()
 {
     V.Fill(TV());
     rigid_V.Fill(TWIST<TV>());
+    rigid_rod_V.Fill(TWIST<TV>());
     kinematic_and_static_rigid_V.Fill(TWIST<TV>());
 }
 //#####################################################################
@@ -111,6 +126,7 @@ Copy(const T c,const BASE& bv)
     const GENERALIZED_VELOCITY& v=debug_cast<const GENERALIZED_VELOCITY&>(bv);
     V=c*v.V;
     rigid_V=c*v.rigid_V;
+    rigid_rod_V=c*v.rigid_rod_V;
     kinematic_and_static_rigid_V=c*v.kinematic_and_static_rigid_V;
 }
 //#####################################################################
@@ -122,6 +138,7 @@ Copy(const T c1,const BASE& bv1,const BASE& bv2)
     const GENERALIZED_VELOCITY& v1=debug_cast<const GENERALIZED_VELOCITY&>(bv1),&v2=debug_cast<const GENERALIZED_VELOCITY&>(bv2);
     V=c1*v1.V+v2.V;
     rigid_V=c1*v1.rigid_V+v2.rigid_V;
+    rigid_rod_V=c1*v1.rigid_rod_V+v2.rigid_rod_V;
     kinematic_and_static_rigid_V=c1*v1.kinematic_and_static_rigid_V+v2.kinematic_and_static_rigid_V;
 }
 //#####################################################################
@@ -140,6 +157,11 @@ Pack(ARRAY<T> &velocities) const
             velocities(index++)=rigid_V(i).linear(j);
         for(int j=0;j<T_SPIN::m;j++)
             velocities(index++)=rigid_V(i).angular(j);}
+    for(int i=0;i<rigid_rod_V.Size();i++){
+        for(int j=0;j<TV::m;j++)
+            velocities(index++)=rigid_rod_V(i).linear(j);
+        for(int j=0;j<T_SPIN::m;j++)
+            velocities(index++)=rigid_rod_V(i).angular(j);}
 }
 //#####################################################################
 // Function Unpack
@@ -157,6 +179,11 @@ Unpack(ARRAY<T> &velocities)
             rigid_V(i).linear(j)=velocities(index++);
         for(int j=0;j<T_SPIN::m;j++)
             rigid_V(i).angular(j)=velocities(index++);}
+    for(int i=0;i<rigid_rod_V.Size();i++){
+        for(int j=0;j<TV::m;j++)
+            rigid_rod_V(i).linear(j)=velocities(index++);
+        for(int j=0;j<T_SPIN::m;j++)
+            rigid_rod_V(i).angular(j)=velocities(index++);}
 }
 //#####################################################################
 // Function Unpack_And_Add
@@ -174,6 +201,11 @@ Unpack_And_Add(ARRAY<T> &velocities)
             rigid_V(i).linear(j)+=velocities(index++);
         for(int j=0;j<T_SPIN::m;j++)
             rigid_V(i).angular(j)+=velocities(index++);}
+    for(int i=0;i<rigid_rod_V.Size();i++){
+        for(int j=0;j<TV::m;j++)
+            rigid_rod_V(i).linear(j)+=velocities(index++);
+        for(int j=0;j<T_SPIN::m;j++)
+            rigid_rod_V(i).angular(j)+=velocities(index++);}
 }
 //#####################################################################
 // Function Raw_Size
@@ -181,7 +213,7 @@ Unpack_And_Add(ARRAY<T> &velocities)
 template<class TV> int GENERALIZED_VELOCITY<TV>::
 Raw_Size() const
 {
-    return V.Size()*TV::m+rigid_V.Size()*TWIST<TV>::dimension;
+    return V.Size()*TV::m+rigid_V.Size()*TWIST<TV>::dimension+rigid_rod_V.Size()*TWIST<TV>::dimension;
 }
 //#####################################################################
 // Function Raw_Get
@@ -191,9 +223,16 @@ Raw_Get(int i)
 {
     if(i<V.Size()*TV::m) return V(i/TV::m)(i%TV::m);
     i-=V.Size()*TV::m;
+    if(i<rigid_V.Size()*TWIST<TV>::dimension)
+    {
+        int o=i%TWIST<TV>::dimension,n=i/TWIST<TV>::dimension;
+        if(o<TV::m) return rigid_V(n).linear(o);
+        return rigid_V(n).angular(o-TV::m);
+    }
+    i-=rigid_rod_V.Size()*TWIST<TV>::dimension;
     int o=i%TWIST<TV>::dimension,n=i/TWIST<TV>::dimension;
-    if(o<TV::m) return rigid_V(n).linear(o);
-    return rigid_V(n).angular(o-TV::m);
+    if(o<TV::m) return rigid_rod_V(n).linear(o);
+    return rigid_rod_V(n).angular(o-TV::m);
 }
 //#####################################################################
 // Function Exchange
@@ -203,6 +242,7 @@ Exchange(GENERALIZED_VELOCITY<TV>& gv)
 {
     V.array.Exchange(gv.V.array);
     rigid_V.array.Exchange(gv.rigid_V.array);
+    rigid_rod_V.array.Exchange(gv.rigid_rod_V.array);
     kinematic_and_static_rigid_V.array.Exchange(gv.kinematic_and_static_rigid_V.array);
 }
 //#####################################################################
@@ -211,8 +251,11 @@ Exchange(GENERALIZED_VELOCITY<TV>& gv)
 template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>* GENERALIZED_VELOCITY<TV>::
 Clone_Default() const
 {
-    GENERALIZED_VELOCITY<TV>* gv=new GENERALIZED_VELOCITY<TV>(ARRAY_VIEW<TV>(new TV[V.array.m],V.array.m),V.indices,
-        ARRAY_VIEW<TWIST<TV> >(new TWIST<TV>[rigid_V.array.m],rigid_V.array.m),rigid_V.indices,kinematic_and_static_rigid_V.indices);
+    GENERALIZED_VELOCITY<TV>* gv=new GENERALIZED_VELOCITY<TV>(
+        ARRAY_VIEW<TV>(new TV[V.array.m],V.array.m),
+        ARRAY_VIEW<TWIST<TV> >(new TWIST<TV>[rigid_V.array.m],rigid_V.array.m),
+        ARRAY_VIEW<TWIST<TV> >(new TWIST<TV>[rigid_rod_V.array.m],rigid_rod_V.array.m),
+        *this);
     gv->deep_copy=true;
     return gv;
 }
@@ -224,10 +267,13 @@ void Resize_Helper(AV& a,const AV& b)
 {
     if(a.Size()==b.Size()) return;
     if(a.Size()>b.Size()){a.m=b.m;return;}
-    AV t(new typename AV::ELEMENT[b.m],b.m);
-    t.Fill(typename AV::ELEMENT());
-    a.Exchange(t);
-    delete [] t.Get_Array_Pointer();
+    delete [] a.Get_Array_Pointer();
+    if(b.m)
+    {
+        a.Set(new typename AV::ELEMENT[b.m],b.m);
+        a.Fill(typename AV::ELEMENT());
+    }
+    else a.Set(0,0);
 }
 //#####################################################################
 // Function Resize
@@ -239,6 +285,7 @@ Resize(const KRYLOV_VECTOR_BASE<T>& v)
     const GENERALIZED_VELOCITY<TV>& gv=debug_cast<const GENERALIZED_VELOCITY<TV>&>(v);
     Resize_Helper(V.array,gv.V.array);
     Resize_Helper(rigid_V.array,gv.rigid_V.array);
+    Resize_Helper(rigid_rod_V.array,gv.rigid_rod_V.array);
     kinematic_and_static_rigid_V.array.Set(rigid_V.array);
 }
 //#####################################################################
@@ -258,6 +305,13 @@ Get(ARRAY_VIEW<T> a) const
         for(const auto& j:rigid_V(i).angular)
             a(k++)=j;
     }
+    for(int i=0;i<rigid_rod_V.Size();i++)
+    {
+        for(const auto& j:rigid_rod_V(i).linear)
+            a(k++)=j;
+        for(const auto& j:rigid_rod_V(i).angular)
+            a(k++)=j;
+    }
 }
 //#####################################################################
 // Function Set
@@ -274,6 +328,13 @@ Set(ARRAY_VIEW<const T> a)
         for(auto& j:rigid_V(i).linear)
             j=a(k++);
         for(auto& j:rigid_V(i).angular)
+            j=a(k++);
+    }
+    for(int i=0;i<rigid_rod_V.Size();i++)
+    {
+        for(auto& j:rigid_rod_V(i).linear)
+            j=a(k++);
+        for(auto& j:rigid_rod_V(i).angular)
             j=a(k++);
     }
 }

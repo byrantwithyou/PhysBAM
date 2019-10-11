@@ -140,7 +140,7 @@ template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
 Apply_Velocity_Update(const VECTOR_T& V,ARRAY<T,FACE_INDEX<TV::m> >& fluid_velocity,ARRAY<T,TV_INT>& fluid_pressures,GENERALIZED_VELOCITY<TV>& solid_velocity,
     GENERALIZED_VELOCITY<TV>& force_on_solid,bool want_solid,bool want_fluid) const
 {
-    GENERALIZED_VELOCITY<TV> temporary_solids_velocity(temporary_velocities,temporary_twists,solid_system->solid_body_collection);
+    GENERALIZED_VELOCITY<TV> temporary_solids_velocity(temporary_velocities,temporary_twists,temporary_rod_twists,solid_system->solid_body_collection);
     Exchange_Coupled_Vector(const_cast<VECTOR_T&>(V));
     Gather(V,temporary_faces,temporary_solids_velocity);
     ARRAY<T> dummy_array(index_map.indexed_constraints.m);
@@ -150,7 +150,7 @@ Apply_Velocity_Update(const VECTOR_T& V,ARRAY<T,FACE_INDEX<TV::m> >& fluid_veloc
     Inverse_Mass(temporary_faces,temporary_solids_velocity);
 
     if(want_solid){
-        GENERALIZED_VELOCITY<TV> pressure_force(pressure_impulses,pressure_impulses_twist,solid_system->solid_body_collection);
+        GENERALIZED_VELOCITY<TV> pressure_force(pressure_impulses,pressure_impulses_twist,pressure_impulses_rod_twist,solid_system->solid_body_collection);
         solid_interpolation->Transpose_Times(V.lambda,pressure_force); // Save the pressure force for fracture
         solid_velocity-=temporary_solids_velocity;}
 
@@ -363,7 +363,7 @@ Set_Up_RHS(VECTOR_T& V,VECTOR_T& F,const GENERALIZED_VELOCITY<TV>& solids_veloci
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
 Setup_Tolerances(const VECTOR_T& F,const ARRAY<T>& fluid_velocity,const GENERALIZED_VELOCITY<TV>& structure_velocity)
 {
-    GENERALIZED_VELOCITY<TV> solids_velocity_star_projected(temporary_velocities,temporary_twists,solid_system->solid_body_collection);
+    GENERALIZED_VELOCITY<TV> solids_velocity_star_projected(temporary_velocities,temporary_twists,temporary_rod_twists,solid_system->solid_body_collection);
 
     T eps=(T)1e-5;
     if(solid_node){
@@ -443,7 +443,7 @@ Print_Each_Matrix(int n) const
 {
      fluid_gradient->Print_Each_Matrix(n);
      if(!leakproof_solve){
-         GENERALIZED_VELOCITY<TV> temporary_solids_velocity(temporary_velocities,temporary_twists,solid_system->solid_body_collection);
+         GENERALIZED_VELOCITY<TV> temporary_solids_velocity(temporary_velocities,temporary_twists,temporary_rod_twists,solid_system->solid_body_collection);
          solid_forces->Print_Each_Matrix(n,temporary_solids_velocity,sqrt(dt));
          solid_interpolation->Print_Each_Matrix(n,temporary_solids_velocity);
          if(fluid_to_solid_interpolation) fluid_to_solid_interpolation->Print_Each_Matrix(n,fluid_gradient->gradient.m,temporary_solids_velocity);
@@ -521,7 +521,7 @@ Inverse_Mass(ARRAY<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& structure_veloci
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
 Massless_Gather(const VECTOR_T& V,ARRAY<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& structure_velocity) const
 {
-    GENERALIZED_VELOCITY<TV> temporary_solids_velocity(temporary_velocities,temporary_twists,solid_system->solid_body_collection);
+    GENERALIZED_VELOCITY<TV> temporary_solids_velocity(temporary_velocities,temporary_twists,temporary_rod_twists,solid_system->solid_body_collection);
     fluid_gradient->Times(V.pressure,fluid_velocity);
     if(use_viscous_forces) fluid_viscous_forces->Transpose_Times_Add(V.viscous_force_coefficients,fluid_velocity);
     solid_forces->Transpose_Times(V.force_coefficients,temporary_solids_velocity);
@@ -535,7 +535,7 @@ Massless_Gather(const VECTOR_T& V,ARRAY<T>& fluid_velocity,GENERALIZED_VELOCITY<
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
 Massless_Scatter(const ARRAY<T>& fluid_velocity,const GENERALIZED_VELOCITY<TV>& structure_velocity,VECTOR_T& F) const
 {
-    GENERALIZED_VELOCITY<TV> temporary_solids_velocity(temporary_velocities,temporary_twists,solid_system->solid_body_collection);
+    GENERALIZED_VELOCITY<TV> temporary_solids_velocity(temporary_velocities,temporary_twists,temporary_rod_twists,solid_system->solid_body_collection);
     fluid_gradient->Transpose_Times(fluid_velocity,F.pressure);
     if(use_viscous_forces) fluid_viscous_forces->Times(fluid_velocity,F.viscous_force_coefficients);
     fluid_to_solid_interpolation->Times(fluid_velocity,temporary_solids_velocity);
@@ -550,7 +550,7 @@ template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
 Apply_Massless_Structure_Force_To_Fluid(ARRAY<T>& fluid_velocity,T time) const
 {
     if(!fluid_to_solid_interpolation) return;
-    GENERALIZED_VELOCITY<TV> temporary_solids_velocity(temporary_velocities,temporary_twists,solid_system->solid_body_collection);
+    GENERALIZED_VELOCITY<TV> temporary_solids_velocity(temporary_velocities,temporary_twists,temporary_rod_twists,solid_system->solid_body_collection);
     ARRAY<T> temp(temporary_faces.m);
     temporary_solids_velocity.V.array.Fill(TV());
     temporary_solids_velocity.rigid_V.array.Fill(TWIST<TV>());
@@ -570,7 +570,7 @@ template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
 Multiply(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bF,bool transpose) const
 {
     const VECTOR_T& V=debug_cast<const VECTOR_T&>(bV);VECTOR_T& F=debug_cast<VECTOR_T&>(bF);
-    GENERALIZED_VELOCITY<TV> temporary_solids_velocity(temporary_velocities,temporary_twists,solid_system->solid_body_collection);
+    GENERALIZED_VELOCITY<TV> temporary_solids_velocity(temporary_velocities,temporary_twists,temporary_rod_twists,solid_system->solid_body_collection);
 
     Exchange_Coupled_Vector(const_cast<VECTOR_T&>(V));
     Gather(V,temporary_faces,temporary_solids_velocity);
@@ -714,7 +714,8 @@ Test_Matrix() const
     if(!leakproof_solve) solid_forces->Test_Matrix();
     int number=solid_system->solid_body_collection.deformable_body_collection.particles.number;
     int rigid_number=solid_system->solid_body_collection.rigid_body_collection.rigid_body_particles.number;
-    solid_interpolation->Test_Matrix(number,rigid_number);
+    GENERALIZED_VELOCITY<TV> gv(solid_system->solid_body_collection);
+    solid_interpolation->Test_Matrix(gv,number,rigid_number);
     if(use_viscous_forces) fluid_viscous_forces->Test_Matrix();
 
     VECTOR_T a;
@@ -796,7 +797,7 @@ template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
 Compute_Scatter_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& gather_matrix)
 {
     SYSTEM_MATRIX_HELPER<T> matrix_helper;
-    GENERALIZED_VELOCITY<TV> temporary_solids_velocity(temporary_velocities,temporary_twists,solid_system->solid_body_collection);
+    GENERALIZED_VELOCITY<TV> temporary_solids_velocity(temporary_velocities,temporary_twists,temporary_rod_twists,solid_system->solid_body_collection);
     
     int size_p=index_map.Number_Cells(),size_lambda=Value(fluid_interpolation->Number_Of_Constraints()),size_force=leakproof_solve?0:Value(solid_forces->Velocity_Dependent_Forces_Size());
     int size_viscous=use_viscous_forces?Value(fluid_viscous_forces->Viscous_Forces_Size()):0;
@@ -835,7 +836,7 @@ Compute_Scatter_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& gather_matrix)
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
 Compute_Inverse_Mass_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& inverse_mass)
 {
-    GENERALIZED_VELOCITY<TV> temporary_solids_velocity(temporary_velocities,temporary_twists,solid_system->solid_body_collection);
+    GENERALIZED_VELOCITY<TV> temporary_solids_velocity(temporary_velocities,temporary_twists,temporary_rod_twists,solid_system->solid_body_collection);
     SYSTEM_MATRIX_HELPER<T> matrix_helper;
     int size_fluids=index_map.Number_Faces(),size_solids=fluid_to_solid_interpolation?0:temporary_solids_velocity.Raw_Size();
 

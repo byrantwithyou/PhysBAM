@@ -26,7 +26,7 @@ namespace PhysBAM{
 template<class TV> BACKWARD_EULER_MINIMIZATION_OBJECTIVE<TV>::
 BACKWARD_EULER_MINIMIZATION_OBJECTIVE(SOLID_BODY_COLLECTION<TV>& solid_body_collection,BACKWARD_EULER_MINIMIZATION_SYSTEM<TV>& minimization_system)
     :solid_body_collection(solid_body_collection),
-    v1(solid_body_collection.deformable_body_collection.particles.V,solid_body_collection.rigid_body_collection.rigid_body_particles.twist,solid_body_collection),
+    v1(solid_body_collection),
     v0(static_cast<GENERALIZED_VELOCITY<TV>&>(*v1.Clone_Default())),tmp0(static_cast<GENERALIZED_VELOCITY<TV>&>(*v1.Clone_Default())),
     tmp1(static_cast<GENERALIZED_VELOCITY<TV>&>(*v1.Clone_Default())),minimization_system(minimization_system),collision_thickness(1e-15),last_energy(FLT_MAX),collisions_in_solve(true)
 {

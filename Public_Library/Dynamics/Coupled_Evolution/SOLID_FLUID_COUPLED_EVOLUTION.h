@@ -38,8 +38,9 @@ public:
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m-1>::SIMPLEX T_THIN_SHELL_SIMPLEX;
 protected:
     typedef NEWMARK_EVOLUTION<TV> BASE;
-    using BASE::solid_body_collection;using BASE::solids_parameters;using BASE::example_forces_and_velocities;
-    using BASE::B_full;using BASE::rigid_B_full;using BASE::repulsions;using BASE::rigid_deformable_collisions;
+    using BASE::solid_body_collection;using BASE::solids_parameters;
+    using BASE::example_forces_and_velocities;using BASE::GV_B;
+    using BASE::repulsions;using BASE::rigid_deformable_collisions;
     using BASE::Initialize_World_Space_Masses;using BASE::world_space_rigid_mass_inverse;
     using BASE::world_space_rigid_mass;using BASE::solids_evolution_callbacks;using BASE::krylov_vectors;
     using BASE::X_save;using BASE::rigid_frame_save;using BASE::V_save;using BASE::rigid_velocity_save;
@@ -64,7 +65,6 @@ protected:
     ARRAY<DIAGONAL_MATRIX<T,TV::m> > rigid_body_fluid_mass;
     ARRAY<TV> rigid_body_updated_center_of_mass;
     ARRAY<SYMMETRIC_MATRIX<T,TV::SPIN::m> > rigid_body_fluid_inertia;
-    ARRAY<TV> ar_full,z_full,zaq_full;ARRAY<TWIST<TV> > rigid_ar_full,rigid_z_full,rigid_zaq_full; // extra vectors for conjugate residual
     ARRAY<T,FACE_INDEX<TV::m> > solid_projected_face_velocities_star;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> coupled_vectors;
 

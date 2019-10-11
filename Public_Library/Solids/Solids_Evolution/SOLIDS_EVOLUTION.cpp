@@ -31,6 +31,7 @@
 #include <Solids/Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
+#include <Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
 #include <Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
 #include <limits>
 using namespace PhysBAM;
@@ -42,6 +43,7 @@ template<class TV> SOLIDS_EVOLUTION<TV>::
 SOLIDS_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities)
     :solid_body_collection(solid_body_collection_input),solids_parameters(solids_parameters_input),rigid_body_collisions(0),rigid_deformable_collisions(0),time(0),
     solids_evolution_callbacks(&solids_evolution_callbacks_default),fully_implicit(false),
+    GV_B(solid_body_collection.New_Generalized_Velocity()),
     kinematic_evolution(solid_body_collection.rigid_body_collection,example_forces_and_velocities,solids_parameters.rigid_body_evolution_parameters.use_kinematic_keyframes),
     example_forces_and_velocities(example_forces_and_velocities)
 {}
@@ -54,6 +56,7 @@ template<class TV> SOLIDS_EVOLUTION<TV>::
     delete rigid_body_collisions;
     delete rigid_deformable_collisions;
     krylov_vectors.Delete_Pointers_And_Clean_Memory();
+    delete &GV_B;
 }
 //#####################################################################
 // Function Euler_Step_Position

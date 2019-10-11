@@ -195,7 +195,7 @@ Add_Forces(ARRAY<TV,TV_INT>& F,ARRAY<TWIST<TV> >& RF,const T time) const
 #pragma omp parallel for
     for(int i=0;i<lagrangian_forces_F.m;i++)
         lagrangian_forces_F(i)=TV();
-    GENERALIZED_VELOCITY<TV> gv(lagrangian_forces_F,RF,solid_body_collection);
+    GENERALIZED_VELOCITY<TV> gv(lagrangian_forces_F,RF,ARRAY_VIEW<TWIST<TV> >(),solid_body_collection);
     solid_body_collection.Add_Velocity_Independent_Forces(gv,time);
     gather_scatter.template Scatter<int>(false,
         [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid){
@@ -221,8 +221,8 @@ Add_Hessian_Times(ARRAY<TV,TV_INT>& F,const ARRAY<TV,TV_INT>& V,ARRAY<TWIST<TV> 
     gather_scatter.template Gather<int>(false,
         [this,&V](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid){
             lagrangian_forces_V(p)+=it.Weight()*V(it.Index());});
-    GENERALIZED_VELOCITY<TV> gv(lagrangian_forces_V,const_cast<ARRAY<TWIST<TV> >&>(RV),solid_body_collection);
-    GENERALIZED_VELOCITY<TV> gf(lagrangian_forces_F,RF,solid_body_collection);
+    GENERALIZED_VELOCITY<TV> gv(lagrangian_forces_V,const_cast<ARRAY<TWIST<TV> >&>(RV),ARRAY_VIEW<TWIST<TV> >(),solid_body_collection);
+    GENERALIZED_VELOCITY<TV> gf(lagrangian_forces_F,RF,ARRAY_VIEW<TWIST<TV> >(),solid_body_collection);
     solid_body_collection.Add_Implicit_Velocity_Independent_Forces(gv,gf,time,transpose);
     RF=-RF;
     gather_scatter.template Scatter<int>(false,

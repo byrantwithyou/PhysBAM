@@ -20,7 +20,7 @@ public:
     typedef SOLIDS_EVOLUTION<TV> BASE;
     using BASE::solid_body_collection;using BASE::solids_parameters;using BASE::Set_External_Positions;using BASE::example_forces_and_velocities;
 private:
-    using BASE::krylov_vectors;using BASE::B_full;using BASE::rigid_B_full;
+    using BASE::krylov_vectors;using BASE::GV_B;
     ARRAY<TV> dX_full;
 public:
     bool balance_external_forces_only;

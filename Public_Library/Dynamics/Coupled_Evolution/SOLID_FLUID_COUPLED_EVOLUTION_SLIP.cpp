@@ -216,10 +216,8 @@ template<class TV> BACKWARD_EULER_SYSTEM<TV>* SOLID_FLUID_COUPLED_EVOLUTION_SLIP
 Setup_Solids(const T dt,const T current_velocity_time,const T current_position_time,const bool velocity_update,const bool leakproof_solve)
 {
     PHYSBAM_ASSERT(!solids_parameters.use_trapezoidal_rule_for_velocities); // two-way coupling does not work with trapezoidal rule
-    ARRAY<int> empty_list;
     MPI_SOLIDS<TV>* mpi_solids=solid_body_collection.deformable_body_collection.mpi_solids;
-    GENERALIZED_VELOCITY<TV> B(B_full,solid_body_collection.deformable_body_collection.dynamic_particles,rigid_B_full,
-        solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles,empty_list);
+    GENERALIZED_VELOCITY<TV>& B=GV_B;
     //bool solids=Simulate_Solids() && (!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Solid_Node());
 
     if(!leakproof_solve){
@@ -297,6 +295,7 @@ Solve(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velocities,const T dt,con
 
     ARRAY<int> empty_list;
 
+    GENERALIZED_VELOCITY<TV>& GV_V=solid_body_collection.New_Generalized_Velocity();
     ARRAY<TV> V_n(particles.V);ARRAY<TWIST<TV> > twist_n(rigid_body_particles.twist);
     SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>* coupled_system=new SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>(fluids_parameters.use_preconditioner_for_slip_system,
         0,boundary_condition_collection,iterator_info,solid_body_collection,fluid_collection,density,centered_velocity,one_over_rho_c_squared,leakproof_solve,false,
@@ -305,7 +304,7 @@ Solve(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velocities,const T dt,con
     fluids_parameters.callbacks->Substitute_Coupling_Matrices(*coupled_system,dt,current_velocity_time,current_position_time,velocity_update,leakproof_solve);
     BACKWARD_EULER_SYSTEM<TV>* solid_system=Setup_Solids(dt,current_velocity_time,current_position_time,velocity_update,leakproof_solve);
     coupled_system->solid_system=solid_system;
-    GENERALIZED_VELOCITY<TV> V(particles.V,rigid_body_particles.twist,solid_body_collection),B(B_full,rigid_B_full,solid_body_collection);
+    GENERALIZED_VELOCITY<TV> V(solid_body_collection),&B=GV_B;
     GENERALIZED_VELOCITY<TV>& F=debug_cast<GENERALIZED_VELOCITY<TV>&>(*krylov_vectors(0));
     if(!leakproof_solve)
         if(solids_fluids_parameters.mpi_solid_fluid)
@@ -397,7 +396,7 @@ Solve(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velocities,const T dt,con
     if(fluids && (!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Fluid_Node()) && Simulate_Compressible_Fluids()){
         ARRAY<T,COUPLING_CONSTRAINT_ID> coupled_faces_solid_interpolated_velocity_n;
         ARRAY<T,COUPLING_CONSTRAINT_ID> coupled_faces_solid_interpolated_velocity_np1;
-        coupled_system->Interpolate_Solid_Velocity_To_Coupled_Faces(GENERALIZED_VELOCITY<TV>(V_n,twist_n,solid_body_collection),coupled_faces_solid_interpolated_velocity_n);
+        coupled_system->Interpolate_Solid_Velocity_To_Coupled_Faces(GV_V,coupled_faces_solid_interpolated_velocity_n);
         coupled_system->Interpolate_Solid_Velocity_To_Coupled_Faces(V,coupled_faces_solid_interpolated_velocity_np1);
         if(velocity_update || leakproof_solve){
             coupled_system->Get_Pressure(coupled_x,pressure);
@@ -422,6 +421,7 @@ Solve(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velocities,const T dt,con
 
     delete coupled_system;coupled_system=0;
     delete solid_system;solid_system=0;
+    delete &GV_V;
 }
 //#####################################################################
 // Function Output_Iterators
@@ -632,9 +632,6 @@ Get_Coupled_Faces_And_Interpolated_Solid_Velocities(const COLLISION_AWARE_INDEX_
     const MATRIX_SOLID_INTERPOLATION<TV>& solid_interpolation,const ARRAY<bool,FACE_INDEX<TV::m> >& psi_N_domain,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,
     ARRAY<T,COUPLING_CONSTRAINT_ID>& coupling_face_velocities)
 {
-    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
-
     psi_N=psi_N_domain;
 
     // Set coupling faces as Neumann
@@ -642,7 +639,7 @@ Get_Coupled_Faces_And_Interpolated_Solid_Velocities(const COLLISION_AWARE_INDEX_
         psi_N(iterator.face)=true;}
 
     // Project solid velocities at coupling faces. (JV_s)
-    GENERALIZED_VELOCITY<TV> V_S(particles.V,rigid_body_particles.twist,solid_body_collection);
+    GENERALIZED_VELOCITY<TV> V_S(solid_body_collection);
     coupling_face_velocities.Resize(solid_interpolation.Number_Of_Constraints());
     solid_interpolation.Times(V_S,coupling_face_velocities);
 }

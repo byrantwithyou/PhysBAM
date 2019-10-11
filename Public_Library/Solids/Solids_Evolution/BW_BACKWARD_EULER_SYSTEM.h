@@ -30,8 +30,7 @@ public:
     EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities;
     T dt,time;
 
-    ARRAY<TV> F_full,B_full;
-    ARRAY<TWIST<TV> > rigid_F_full,rigid_B_full;
+    GENERALIZED_VELOCITY<TV>& GV_F,&GV_B;
 
     BW_BACKWARD_EULER_SYSTEM(SOLID_BODY_COLLECTION<TV>& solid_body_collection,BW_COLLISIONS<TV>& bw_collisions_input,
         EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities,const T dt_input,const T time_input);

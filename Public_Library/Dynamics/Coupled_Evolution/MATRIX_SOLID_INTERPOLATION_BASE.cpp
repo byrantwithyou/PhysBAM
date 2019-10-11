@@ -62,9 +62,11 @@ Transpose_Times(const ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints,GENERALIZED_V
 // Function Test_Matrix
 //#####################################################################
 template<class TV> void MATRIX_SOLID_INTERPOLATION_BASE<TV>::
-Test_Matrix(int number_particles,int number_rigid_particles) const
+Test_Matrix(const GENERALIZED_VELOCITY<TV>& gv,int number_particles,int number_rigid_particles) const
 {
     RANDOM_NUMBERS<T> random;
+    GENERALIZED_VELOCITY<TV>& solids=static_cast<GENERALIZED_VELOCITY<TV>&>(*gv.Clone_Default());
+    GENERALIZED_VELOCITY<TV>& solids2=static_cast<GENERALIZED_VELOCITY<TV>&>(*gv.Clone_Default());
 
     ARRAY<TV> V(number_particles),V1(number_particles);
     random.Fill_Uniform(V,-1,1);
@@ -73,7 +75,6 @@ Test_Matrix(int number_particles,int number_rigid_particles) const
     random.Fill_Uniform(twist,-1,1);
 
     ARRAY<int> empty;
-    GENERALIZED_VELOCITY<TV> solids(V,empty,twist,empty,empty),solids2(V1,empty,twist2,empty,empty);
 
     ARRAY<T,COUPLING_CONSTRAINT_ID> constraints(Number_Of_Constraints()),constraints2(Number_Of_Constraints());
     random.Fill_Uniform(constraints,-1,1);
@@ -87,6 +88,8 @@ Test_Matrix(int number_particles,int number_rigid_particles) const
 
     LOG::cout<<"MATRIX_SOLID_INTERPOLATION_BASE Test: "<<inner_solids<<"  vs  "<<inner_constraints<<"  relative  "<<
         abs(inner_solids-inner_constraints)/maxabs((T)1e-30,inner_solids,inner_constraints)<<std::endl;
+    delete &solids;
+    delete &solids2;
 }
 //#####################################################################
 // Function Store_Maps

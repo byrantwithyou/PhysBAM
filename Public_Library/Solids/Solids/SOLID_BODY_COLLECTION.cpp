@@ -9,6 +9,7 @@
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
+#include <Rigids/Slender_Rods/RIGID_SLENDER_ROD_COLLECTION.h>
 #include <Deformables/Bindings/SOFT_BINDINGS.h>
 #include <Deformables/Collisions_And_Interactions/COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.h>
@@ -29,6 +30,7 @@ SOLID_BODY_COLLECTION(DEFORMABLE_PARTICLES<TV>* particles)
     :collision_body_list(*new COLLISION_BODY_COLLECTION<TV>),
     deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(particles,&collision_body_list)),
     rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(&collision_body_list)),
+    rigid_slender_rod_collection(*new RIGID_SLENDER_ROD_COLLECTION<TV>),
     print_energy(false),simulate(true),iterations_used_diagnostic(0)
 {
     Print_Diagnostics();
@@ -45,6 +47,7 @@ template<class TV> SOLID_BODY_COLLECTION<TV>::
     solids_forces.Delete_Pointers_And_Clean_Memory();
     delete &deformable_body_collection;
     delete &rigid_body_collection;
+    delete &rigid_slender_rod_collection;
     delete &collision_body_list;
 }
 //#####################################################################
@@ -327,7 +330,7 @@ template<class TV> void SOLID_BODY_COLLECTION<TV>::
 Add_All_Forces(GENERALIZED_VELOCITY<TV>& F,const T time,const bool damping_only)
 {
     if(!damping_only) Add_Velocity_Independent_Forces(F,time);
-    GENERALIZED_VELOCITY<TV> V(deformable_body_collection.particles.V,rigid_body_collection.rigid_body_particles.twist,*this);
+    GENERALIZED_VELOCITY<TV> V(*this);
     Add_Velocity_Dependent_Forces(V,F,time);
 }
 //#####################################################################
@@ -359,6 +362,15 @@ Add_Force(RIGIDS_FORCES<TV>* force)
     rigid_body_collection.rigids_forces.Append(force);
     force->Set_CFL_Number(cfl_number);
     return rigid_body_collection.rigids_forces.m-1;
+}
+//#####################################################################
+// Function New_Generalized_Velocity
+//#####################################################################
+template<class TV> GENERALIZED_VELOCITY<TV>& SOLID_BODY_COLLECTION<TV>::
+New_Generalized_Velocity() const
+{
+    GENERALIZED_VELOCITY<TV> gv(*this);
+    return static_cast<GENERALIZED_VELOCITY<TV>&>(*gv.Clone_Default());
 }
 //#####################################################################
 namespace PhysBAM{

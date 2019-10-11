@@ -74,42 +74,42 @@ Prepare_Backward_Euler_System(BACKWARD_EULER_SYSTEM<TV>& system,const T dt,const
     ARTICULATED_RIGID_BODY<TV>& articulated_rigid_body=solid_body_collection.rigid_body_collection.articulated_rigid_body; // Needn't be a pointer
     rigid_body_collection.Update_Angular_Velocity(); // make sure omega = I^{-1} L
 
-    B_full.Resize(particles.Size(),no_init);rigid_B_full.Resize(rigid_body_particles.Size(),no_init);
-
-    GENERALIZED_VELOCITY<TV> B_all(B_full,rigid_B_full,solid_body_collection);
-    GENERALIZED_VELOCITY<TV> V_all(particles.V,rigid_body_particles.twist,solid_body_collection);
+    GENERALIZED_VELOCITY<TV> &B_all=GV_B;
+    GENERALIZED_VELOCITY<TV> V_all(solid_body_collection);
+    GV_B.Resize(V_all);
     KRYLOV_SOLVER<T>::Ensure_Size(krylov_vectors,V_all,1); // Ensure Finish_Backward_Euler_Step can run successfully
 
-    B_full.Subset(solid_body_collection.deformable_body_collection.simulated_particles).Fill(TV());rigid_B_full.Fill(TWIST<TV>());
-    example_forces_and_velocities.Add_External_Forces(B_full,current_velocity_time+dt);
-    example_forces_and_velocities.Add_External_Forces(rigid_B_full,current_velocity_time+dt);
+    GV_B.V.array.Subset(solid_body_collection.deformable_body_collection.simulated_particles).Fill(TV());
+    GV_B.rigid_V.array.Fill(TWIST<TV>());
+    example_forces_and_velocities.Add_External_Forces(GV_B.V.array,current_velocity_time+dt);
+    example_forces_and_velocities.Add_External_Forces(GV_B.rigid_V.array,current_velocity_time+dt);
     if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data_Global(particles.V);
     solid_body_collection.Add_Velocity_Independent_Forces(B_all,current_velocity_time+dt); // this is a nop for binding forces
-    if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data_Global(B_full);
-    solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(B_full,rigid_B_full);
-    solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Distribute_Force_To_Parents(rigid_B_full);
+    if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data_Global(GV_B.V.array);
+    solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(GV_B.V.array,GV_B.rigid_V.array);
+    solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Distribute_Force_To_Parents(GV_B.rigid_V.array);
 
     if(solid_body_collection.deformable_body_collection.soft_bindings.Need_Bindings_Mapped()){
-        if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data_Global(B_full);
-        solid_body_collection.deformable_body_collection.soft_bindings.Map_Forces_From_Parents(B_full,rigid_B_full);
-        solid_body_collection.deformable_body_collection.binding_list.Clear_Hard_Bound_Particles(B_full);
-        if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data_Global(B_full);
+        if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data_Global(GV_B.V.array);
+        solid_body_collection.deformable_body_collection.soft_bindings.Map_Forces_From_Parents(GV_B.V.array,GV_B.rigid_V.array);
+        solid_body_collection.deformable_body_collection.binding_list.Clear_Hard_Bound_Particles(GV_B.V.array);
+        if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data_Global(GV_B.V.array);
         for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++)
             if(dynamic_cast<BINDING_SPRINGS<TV>*>(&*solid_body_collection.deformable_body_collection.deformables_forces(k)))
-                solid_body_collection.deformable_body_collection.deformables_forces(k)->Add_Implicit_Velocity_Independent_Forces(particles.X,B_full,current_velocity_time+dt);
-        if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data_Global(B_full);
-        solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(B_full,rigid_B_full);}
+                solid_body_collection.deformable_body_collection.deformables_forces(k)->Add_Implicit_Velocity_Independent_Forces(particles.X,GV_B.V.array,current_velocity_time+dt);
+        if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data_Global(GV_B.V.array);
+        solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(GV_B.V.array,GV_B.rigid_V.array);}
 
     Initialize_World_Space_Masses();
     if(articulated_rigid_body.constrain_pd_directions){
-        for(int i=0;i<solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i);rigid_B_full(p)=world_space_rigid_mass_inverse(p)*rigid_B_full(p);}
-        articulated_rigid_body.Poststabilization_Projection(rigid_B_full,true);
-        for(int i=0;i<solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i);rigid_B_full(p)=world_space_rigid_mass(p)*rigid_B_full(p);}}
+        for(int i=0;i<solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i);GV_B.rigid_V.array(p)=world_space_rigid_mass_inverse(p)*GV_B.rigid_V.array(p);}
+        articulated_rigid_body.Poststabilization_Projection(GV_B.rigid_V.array,true);
+        for(int i=0;i<solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i);GV_B.rigid_V.array(p)=world_space_rigid_mass(p)*GV_B.rigid_V.array(p);}}
 
     for(int i=0;i<solid_body_collection.deformable_body_collection.dynamic_particles.m;i++){int p=solid_body_collection.deformable_body_collection.dynamic_particles(i);
-        B_full(p)=particles.V(p)+dt*particles.one_over_mass(p)*B_full(p);}
+        GV_B.V.array(p)=particles.V(p)+dt*particles.one_over_mass(p)*GV_B.V.array(p);}
     for(int i=0;i<solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i);
-        rigid_B_full(p)=rigid_body_particles.twist(p)+world_space_rigid_mass_inverse(p)*rigid_B_full(p)*dt;}
+        GV_B.rigid_V.array(p)=rigid_body_particles.twist(p)+world_space_rigid_mass_inverse(p)*GV_B.rigid_V.array(p)*dt;}
 
     V_all=B_all;
     rigid_body_collection.Update_Angular_Momentum();
@@ -124,7 +124,7 @@ Prepare_Backward_Euler_System(BACKWARD_EULER_SYSTEM<TV>& system,const T dt,const
         saved_pd=rigid_body_particles.twist;
         solid_body_collection.rigid_body_collection.articulated_rigid_body.Poststabilization_Projection(saved_pd,true);
         saved_pd=rigid_body_particles.twist-saved_pd;}
-    if(!velocity_update) example_forces_and_velocities.Add_External_Impulses_Before(B_full,current_position_time,(T)2*dt); // 2*dt is position dt TODO: what time?
+    if(!velocity_update) example_forces_and_velocities.Add_External_Impulses_Before(GV_B.V.array,current_position_time,(T)2*dt); // 2*dt is position dt TODO: what time?
 }
 //#####################################################################
 // Function Finish_Backward_Euler_Step
@@ -146,18 +146,18 @@ Finish_Backward_Euler_Step(KRYLOV_SYSTEM_BASE<T>& system,const T dt,const T curr
             ARRAY<TWIST<TV> > rigid_V_projected;rigid_V_projected.Resize(rigid_body_collection.rigid_body_particles.Size(),no_init);
             for(int i=0;i<solid_body_collection.deformable_body_collection.dynamic_particles.m;i++){
                 int p=solid_body_collection.deformable_body_collection.dynamic_particles(i);
-                V_no_projection(p)=B_full(p)+dt*particles.one_over_mass(p)*F_full(p);}
+                V_no_projection(p)=GV_B.V.array(p)+dt*particles.one_over_mass(p)*F_full(p);}
             for(int i=0;i<solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){
                 int p=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i);
-                rigid_V_no_projection(p)=rigid_B_full(p)+world_space_rigid_mass_inverse(p)*rigid_F_full(p)*dt;}
+                rigid_V_no_projection(p)=GV_B.rigid_V.array(p)+world_space_rigid_mass_inverse(p)*rigid_F_full(p)*dt;}
             V_projected=V_no_projection;
             GENERALIZED_VELOCITY<TV> V_projected_all(V_projected,rigid_V_projected,solid_body_collection);
             system.Project(V_projected_all);*/}
         else{
             for(int i=0;i<solid_body_collection.deformable_body_collection.dynamic_particles.m;i++){int p=solid_body_collection.deformable_body_collection.dynamic_particles(i);
-                particles.V(p)=B_full(p)+dt*particles.one_over_mass(p)*F.V.array(p);}
+                particles.V(p)=GV_B.V.array(p)+dt*particles.one_over_mass(p)*F.V.array(p);}
             for(int i=0;i<solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i);
-                rigid_body_particles.twist(p)=rigid_B_full(p)+world_space_rigid_mass_inverse(p)*F.rigid_V.array(p)*dt;}
+                rigid_body_particles.twist(p)=GV_B.rigid_V.array(p)+world_space_rigid_mass_inverse(p)*F.rigid_V.array(p)*dt;}
 
             // No friction for these, so reproject them.
             solid_body_collection.rigid_body_collection.articulated_rigid_body.Poststabilization_Projection(rigid_body_particles.twist,true);
@@ -184,9 +184,6 @@ Finish_Backward_Euler_Step(KRYLOV_SYSTEM_BASE<T>& system,const T dt,const T curr
 template<class TV> void NEWMARK_EVOLUTION<TV>::
 Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,const T current_position_time,const bool velocity_update)
 {
-    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-    RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
-    RIGID_BODY_PARTICLES<TV>& rigid_body_particles=rigid_body_collection.rigid_body_particles;
     MPI_SOLIDS<TV>* mpi_solids=solid_body_collection.deformable_body_collection.mpi_solids;
     BACKWARD_EULER_SYSTEM<TV> system(this,solid_body_collection,dt,current_velocity_time,current_position_time,
         solids_parameters.enforce_poststabilization_in_cg?&solid_body_collection.rigid_body_collection.articulated_rigid_body:0,
@@ -210,7 +207,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
     solver->restart_iterations=solids_parameters.implicit_solve_parameters.cg_restart_iterations;
     system.project_nullspace_frequency=solids_parameters.implicit_solve_parameters.project_nullspace_frequency;
 
-    GENERALIZED_VELOCITY<TV> V(particles.V,rigid_body_particles.twist,solid_body_collection),B(B_full,rigid_B_full,solid_body_collection);
+    GENERALIZED_VELOCITY<TV> V(solid_body_collection),&B=GV_B;
     GENERALIZED_MASS<TV> mass(solid_body_collection); // TODO: Doing duplicate computation of mass.
 
     if(solids_parameters.implicit_solve_parameters.spectral_analysis){
@@ -278,14 +275,17 @@ Trapezoidal_Step_Velocity(const T dt,const T time)
     // update V implicitly to time+dt/2
     Backward_Euler_Step_Velocity_Helper(dt/2,time,time+dt/2,true);
     // set up rigid_V_save for extrapolation step
-    rigid_V_save.Resize(rigid_body_collection.rigid_body_particles.Size(),no_init);
+    GENERALIZED_VELOCITY<TV> V(solid_body_collection);
+    V_save.Resize(V.V.array.m,no_init);
+    rigid_V_save.Resize(V.rigid_V.array.m,no_init);
+    GENERALIZED_VELOCITY<TV> V_n(V_save,rigid_V_save,ARRAY_VIEW<TWIST<TV> >(),solid_body_collection);
     for(int i=0;i<solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i);
-        rigid_V_save(p).linear=rigid_velocity_save(p).linear;
-        rigid_V_save(p).angular=rigid_body_collection.Rigid_Body(p).World_Space_Inertia_Tensor_Inverse_Times(rigid_angular_momentum_save(p));}
+        V_n.rigid_V.array(p).linear=rigid_velocity_save(p).linear;
+        V_n.rigid_V.array(p).angular=rigid_body_collection.Rigid_Body(p).World_Space_Inertia_Tensor_Inverse_Times(rigid_angular_momentum_save(p));}
     // Use V_n instead of V_save rather than copying it around another time.  Also simplifies state dependencies.
     // extrapolate V to time+dt based on V at time and time+dt/2
-    GENERALIZED_VELOCITY<TV> V_n(V_save,rigid_V_save,solid_body_collection),V(particles.V,rigid_body_collection.rigid_body_particles.twist,solid_body_collection);
-    V*=(T)2;V-=V_n;
+    V*=(T)2;
+    V-=V_n;
 
     // enforce boundary conditions again
     if(solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions) solid_body_collection.deformable_body_collection.collisions.Activate_Collisions(false);
