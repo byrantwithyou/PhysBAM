@@ -22,8 +22,8 @@
 #endif
 #include <suitesparse/colamd.h>
 namespace PhysBAM{
-namespace
-{
+
+
 // const char* op_names[]={
 //     "op_nop",
 //     "op_mat_inv","op_mat_mul","op_mat_add",
@@ -48,7 +48,7 @@ int arg_type[op_last][4] =
     [op_vec_mul]={2,1,2,2},
     [op_vec_add]={2,2,0,2}
 };
-}
+
 
 void Inverse(MATRIX_MXN<float>& A)
 {

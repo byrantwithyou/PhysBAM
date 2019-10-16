@@ -9,7 +9,7 @@ if USE_CUDA:
     import os
     cpppath=os.environ["CUDA_INC"]
     libpath=os.environ["CUDA_LD"]
-    env.Append(LIBS=['cudart'],CPPPATH=[cpppath],LIBPATH=[libpath]);
+    env.Append(LIBS=['cudart','cublas'],CPPPATH=[cpppath],LIBPATH=[libpath]);
     cuda_env=Environment(CC='nvcc -c')
     cuda_env.Program('CUDA_KERNEL.so','CUDA_KERNEL.cu')
 
