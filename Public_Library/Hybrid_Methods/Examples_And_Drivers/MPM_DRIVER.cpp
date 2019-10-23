@@ -5,6 +5,7 @@
 #include <Core/Log/DEBUG_SUBSTEPS.h>
 #include <Core/Log/LOG.h>
 #include <Core/Log/SCOPE.h>
+#include <Core/Math_Tools/pow.h>
 #include <Core/Math_Tools/RANGE_ITERATOR.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
@@ -425,6 +426,7 @@ Grid_To_Particle()
             MATRIX<T,TV::m> A=dt*h.grad_Vp+1;
             if(example.quad_F_coeff) A+=sqr(dt*h.grad_Vp)*example.quad_F_coeff;
             particles.F(p)=A*particles.F(p);
+            if(example.dilation_only) particles.F(p)=MATRIX<T,TV::m>()+pow<1,TV::m>(particles.F(p).Determinant());
             TV xp_new;
             if(example.use_midpoint) xp_new=particles.X(p)+dt/2*(h.V_weight_old+h.V_pic);
             else xp_new=particles.X(p)+dt*h.V_pic;

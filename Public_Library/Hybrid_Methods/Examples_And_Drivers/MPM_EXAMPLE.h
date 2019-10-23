@@ -87,7 +87,8 @@ public:
     bool reflection_bc=false;
     int reflection_bc_flags=0;
     bool test_sound_speed=false;
-    
+    bool dilation_only=false;
+
     T newton_tolerance=1;
     int newton_iterations=100;
     T solver_tolerance=(T).5;
