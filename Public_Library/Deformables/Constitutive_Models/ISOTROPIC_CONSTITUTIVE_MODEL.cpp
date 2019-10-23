@@ -154,9 +154,9 @@ Sound_Speed(const DIAGONAL_MATRIX<T,d>& F,
     // This does not handle all cases, but it suffices nearly always in practice.
     TV F2=(F*F).x;
     T cm=(dPi_dF.H.Diagonal_Part()*F2).Max();
-    for(int a=0;a<TV::m;a++)
+    for(int a=0;a<TV::SPIN::m;a++)
         for(int i=0;i<2;i++)
-            cm=max(cm,dPi_dF.B(a)*F2((a+i+1)%TV::m));
+            cm=max(cm,dPi_dF.B(a)*F2((a+i+1)%TV::SPIN::m));
     return sqrt(cm/density);
 }
 //#####################################################################
