@@ -416,6 +416,7 @@ Initialize()
             T density=2*unit_rho*scale_mass;
             Seed_Particles(box,0,0,density,particles_per_cell);
             Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
+            dilation_only=true;
             particles.mu*=0;
             particles.mu0*=0;
             Add_Gravity(m/(s*s)*TV(0,-1.8));
@@ -427,6 +428,7 @@ Initialize()
             T density=2*unit_rho*scale_mass;
             Seed_Particles(box,0,0,density,particles_per_cell);
             Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
+            dilation_only=true;
             particles.mu*=0;
             particles.mu0*=0;
             Add_Gravity(m/(s*s)*TV(0,-1.8));
@@ -443,23 +445,77 @@ Initialize()
         } break;
         case 25:{ // (fluid test) pool of water w/ single particle
             Set_Grid(RANGE<TV>::Unit_Box()*m);
-            RANGE<TV> box(grid.dX*(T).5,TV(1*m-grid.dX(0)*(T).5,0.25*m));
+            RANGE<TV> box(grid.dX*4,TV(1*m-grid.dX(0)*4,0.25*m));
             T density=2*unit_rho*scale_mass;
             T volume=grid.dX.Product()/particles_per_cell;
             T mass=density*volume;
             Seed_Particles(box,0,0,density,particles_per_cell);
             Add_Particle(TV(.5,.9),0,0,mass,volume);
             Add_Gravity(m/(s*s)*TV(0,-1.8));
+            Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
+            dilation_only=true;
+            particles.mu*=0;
+            particles.mu0*=0;
+            Add_Walls(-1,COLLISION_TYPE::separate,.2,grid.dX(0)*4,false);
         } break;
         case 26:{ // Rayleigh Taylor
             Set_Grid(RANGE<TV>::Unit_Box()*m);
-            RANGE<TV> box(grid.dX*2,TV(1*m-2*grid.dX(0),0.20*m));
+            LOG::printf("FLAGS: %i %i\n",this->reflection_bc,this->reflection_bc_flags);
+            int gap=this->reflection_bc?0:4;
+            RANGE<TV> box(grid.dX*gap,TV(1*m-grid.dX(0)*gap,0.5*m));
             T density=2*unit_rho*scale_mass;
             Seed_Particles(box,0,0,density,particles_per_cell);
-            density*=10;
-            box+=TV(0,0.20*m-2*grid.dX(0));
-            Seed_Particles(box,0,0,density,particles_per_cell);
+            ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
+            for(int i=0;i<particles.X.m;i++)
+                if(particles.X(i).y>box.Center().y)
+                {
+                    particles.mass(i)*=2;
+                    (*colors)(i)=VECTOR<T,3>(1,0,0);
+                }
             Add_Gravity(m/(s*s)*TV(0,-1.8));
+            Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
+            dilation_only=true;
+            particles.mu*=0;
+            particles.mu0*=0;
+            if(this->reflection_bc) this->reflection_bc_flags=-1;
+            else Add_Walls(-1,COLLISION_TYPE::separate,.2,grid.dX(0)*gap,false);
+        } break;
+        case 31:{ // Light fluid on heavy fluid
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            RANGE<TV> box(grid.dX*4,TV(1*m-grid.dX(0)*4,0.5*m));
+            T density=2*unit_rho*scale_mass;
+            Seed_Particles(box,0,0,density,particles_per_cell);
+            ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
+            for(int i=0;i<particles.X.m;i++)
+                if(particles.X(i).y>box.Center().y)
+                {
+                    particles.mass(i)*=.5;
+                    (*colors)(i)=VECTOR<T,3>(1,0,0);
+                }
+            Add_Gravity(m/(s*s)*TV(0,-1.8));
+            Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
+            dilation_only=true;
+            particles.mu*=0;
+            particles.mu0*=0;
+            Add_Walls(-1,COLLISION_TYPE::separate,.2,grid.dX(0)*4,false);
+        } break;
+        case 34:{ // Light fluid on heavy fluid
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            RANGE<TV> box(grid.dX*4,TV(1*m-grid.dX(0)*4,0.5*m));
+            T density=2*unit_rho*scale_mass;
+            Seed_Particles(box,0,0,density,particles_per_cell);
+            ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
+            
+            int i=particles.X.m/3;
+            particles.mass(i)*=.001;
+            (*colors)(i)=VECTOR<T,3>(1,0,0);
+
+            Add_Gravity(m/(s*s)*TV(0,-1.8));
+            Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
+            dilation_only=true;
+            particles.mu*=0;
+            particles.mu0*=0;
+            Add_Walls(-1,COLLISION_TYPE::separate,.2,grid.dX(0)*4,false);
         } break;
         case 98:{ // full box
             Set_Grid(RANGE<TV>::Unit_Box()*m);
