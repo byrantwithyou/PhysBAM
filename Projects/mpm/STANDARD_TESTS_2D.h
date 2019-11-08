@@ -49,14 +49,11 @@ public:
     using BASE::forced_collision_type;using BASE::penalty_damping_stiffness;using BASE::Set_Lame_On_Particles;
     using BASE::friction;using BASE::friction_is_set;using BASE::sigma_Y;using BASE::use_cohesion;
     using BASE::destroy;using BASE::plasticity_models;using BASE::write_output_files;using BASE::read_output_files;
-    using BASE::begin_frame;using BASE::end_frame;using BASE::begin_time_step;using BASE::end_time_step;
-    using BASE::extra_T;using BASE::extra_int;using BASE::dilation_only;
+    using BASE::extra_T;using BASE::extra_int;using BASE::dilation_only;using BASE::Add_Callbacks;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();
 
-    void Write_Output_Files(const int frame) override;
-    void Read_Output_Files(const int frame) override;
     void Initialize() override;
     
     // additional storage

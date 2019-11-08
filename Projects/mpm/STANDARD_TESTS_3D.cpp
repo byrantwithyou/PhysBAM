@@ -66,24 +66,6 @@ template<class T> STANDARD_TESTS<VECTOR<T,3> >::
 {
 }
 //#####################################################################
-// Function Write_Output_Files
-//#####################################################################
-template<class T> void STANDARD_TESTS<VECTOR<T,3> >::
-Write_Output_Files(const int frame)
-{
-    if(write_output_files) write_output_files(frame);
-    BASE::Write_Output_Files(frame);
-}
-//#####################################################################
-// Function Read_Output_Files
-//#####################################################################
-template<class T> void STANDARD_TESTS<VECTOR<T,3> >::
-Read_Output_Files(const int frame)
-{
-    if(read_output_files) read_output_files(frame);
-    BASE::Read_Output_Files(frame);
-}
-//#####################################################################
 // Function Initialize
 //#####################################################################
 template<class T> void STANDARD_TESTS<VECTOR<T,3> >::
@@ -298,7 +280,7 @@ Initialize()
             foo_int1=particles.number;
             LOG::cout<<"one torus particle #: "<<foo_int1<<std::endl;
             Add_Gravity(m/(s*s)*TV(0,-9.8,0));
-            begin_frame=[this](int frame)
+            auto func=[this](int frame)
                 {
                     if(frame%8==0 && frame<200){
                         TV center;
@@ -311,6 +293,7 @@ Initialize()
                         for(int k=old_m;k<old_m+foo_int1;k++) mpm_particles.Append(k);
                         Add_Fixed_Corotated(150*unit_p*scale_E,0.3,&mpm_particles);}
                 };
+            this->begin_frame.Append(func);
         } break;
         case 11:{ // skew impact of two elastic spheres with initial angular velocity
             Set_Grid(RANGE<TV>(TV(),TV(30,30,30))*m);
@@ -389,7 +372,7 @@ Initialize()
             MPM_OLDROYD_FINITE_ELEMENTS<TV> *fe=new MPM_OLDROYD_FINITE_ELEMENTS<TV>(force_helper,*neo,gather_scatter,0,this->inv_Wi,quad_F_coeff);
             Add_Force(*fe);
             Add_Gravity(m/(s*s)*TV(0,-9.8,0));
-            begin_time_step=[this](T time)
+            Add_Callbacks(true,"time-step",[this]()
                 {
                     if(time>=10/24.0*s){
                         lagrangian_forces.Delete_Pointers_And_Clean_Memory();
@@ -397,7 +380,7 @@ Initialize()
                         RANGE<TV> ym(TV(-5,0,-5)*m,TV(5,.1+(time/s-10/24.0)*.5,5)*m);
                         Add_Penalty_Collision_Object(ym);
                         Add_Gravity(m/(s*s)*TV(0,-9.8,0));}
-                };
+                });
         } break;
         case 15:{ // rotating cylinder oldroyd-b SCA energy
             //NEWTONIAN ./mpm -3d 15 -affine -max_dt 5e-4 -resolution 15 -fooint1 2 -fooT1 0 -fooT2 100 -fooT3 1e30 -fooT4 2e-4 -scale_mass 20 -last_frame 30
@@ -475,7 +458,7 @@ Initialize()
             Add_Force(*new MPM_VISCOSITY<TV>(force_helper,gather_scatter,0,foo_T4));
             LOG::cout<<"Polyethylene glycol added. mu="<<neo->mu<<", lambda="<<neo->lambda<<", Weissenbergi="<<foo_T3<<std::endl;
             LOG::cout<<"Particle count: "<<particles.number<<std::endl;
-            begin_frame=[this,state](int frame)
+            auto func=[this,state](int frame)
                 {
                     if(state->levelset1){
                         PHYSBAM_ASSERT(!state->cylinder);
@@ -500,7 +483,8 @@ Initialize()
                         Dump_Levelset(ghost_grid,ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T> >(*state->cylinder),VECTOR<T,3>(1,1,0));
                         LOG::cout<<"...done!"<<std::endl;}
                 };
-            begin_time_step=[this,state](T time)
+            this->begin_frame.Append(func);
+            Add_Callbacks(true,"time-step",[this,state]()
                 {
                     if(state->cylinder){
                         PHYSBAM_ASSERT(!state->levelset1);
@@ -512,7 +496,7 @@ Initialize()
                         state->cylinder->Set_Endpoints(rotator.Rotate(TV(-0.025,-0.034,0)*m),rotator.Rotate(TV(0.025,-0.034,0)*m));
                         Add_Penalty_Collision_Object(*state->cylinder);
                         LOG::cout<<"...done!"<<std::endl;}
-                };
+                });
             destroy=[=]()
                 {
                     delete state->surface1;
@@ -905,7 +889,8 @@ Initialize()
                 if(!use_foo_T5) foo_T5=(T)1e-2;
                 Add_Lambda_Particles(&sand_particles,E*foo_T5,nu,(T)1000*unit_rho,true,(T)0.3,(T)1);}
             int add_gravity_frame=restart?restart:10;
-            begin_frame=[this,add_gravity_frame](int frame){if(frame==add_gravity_frame) Add_Gravity(TV(0,20,0));};
+            auto func=[this,add_gravity_frame](int frame){if(frame==add_gravity_frame) Add_Gravity(TV(0,20,0));};
+            this->begin_frame.Append(func);
         } break;
         case 48:{ // sand ball
             particles.Store_Fp(true); if(!no_implicit_plasticity) use_implicit_plasticity=true;
@@ -1473,9 +1458,9 @@ Initialize()
                 *new ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T> >(seed_range),TV(0,-1,0),grid.domain.max_corner,
                 TV(0,-pour_speed,0),gravity,max_dt*pour_speed+grid.dX.y,seed_buffer,mass,volume);
             destroy=[=](){delete source;};
-            write_output_files=[=](int frame){source->Write_Output_Files(frame);};
-            read_output_files=[=](int frame){source->Read_Output_Files(frame);};
-            begin_time_step=[=](T time)
+            write_output_files.Append([=](int frame){source->Write_Output_Files(frame);});
+            read_output_files.Append([=](int frame){source->Read_Output_Files(frame);});
+            Add_Callbacks(true,"time-step",[=]()
                 {
                     if(time<0.08||time>=foo_T3) return;
                     ARRAY<int> affected_particles;
@@ -1493,11 +1478,11 @@ Initialize()
                         if(MPM_DRUCKER_PRAGER<TV>* dp=dynamic_cast<MPM_DRUCKER_PRAGER<TV>*>(plasticity_models(i)))
                             dp->Initialize_Particles(&affected_particles);
                 
-                };
-            end_time_step=[=](T time){
-                if(time<=foo_T3)
-                    source->End_Time_Step(time);
-            };
+                });
+            Add_Callbacks(false,"time-step",[=](){
+                    if(time<=foo_T3)
+                        source->End_Time_Step(time);
+                });
 
 
 
@@ -2056,7 +2041,7 @@ Initialize()
             if(!use_foo_T1) foo_T1=10;
             int add_gravity_frame=restart?restart:foo_T1;
             T pass_speed=foo_T2;
-            begin_frame=[this,add_gravity_frame,shrinking_sphere,pass_speed,&resting_radius](int frame){
+            auto func=[this,add_gravity_frame,shrinking_sphere,pass_speed,&resting_radius](int frame){
                 if(restart){
                 if(frame==restart){
                     Add_Gravity(TV(0,-9.8,0));
@@ -2073,6 +2058,7 @@ Initialize()
                     else if(frame==add_gravity_frame+9){
                         collision_objects.Pop(); 
                         for(int p=0;p<particles.X.m;p++) particles.V(p)+=TV(0,-5.4,0);}}};
+            this->begin_frame.Append(func);
         } break;
 
         case 949:{ // lambda voronoi sand ball
@@ -2230,7 +2216,7 @@ Initialize()
             Seed_Particles(ob,0,0,density,particles_per_cell);
             int m_per_box=particles.number;
             for(int i=0;i<particles.number;i++) particles.valid(i)=false;
-            begin_frame=[this,m_per_box,half_edge](int frame)
+            auto func=[this,m_per_box,half_edge](int frame)
                 {
                     int grid_i=3,grid_j=3;
                     if(frame%3==0 && frame<200){
@@ -2248,6 +2234,7 @@ Initialize()
                                 for(int k=old_m;k<old_m+m_per_box;k++) mpm_particles.Append(k);
                                 Add_Fixed_Corotated(1e2*unit_p*scale_E,0.3,&mpm_particles);}}}
                 };
+            this->begin_frame.Append(func);
             Add_Gravity(m/(s*s)*TV(0,-9.8,0));
             Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,false);
             } break;

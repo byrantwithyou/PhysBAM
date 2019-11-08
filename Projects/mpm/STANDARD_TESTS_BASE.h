@@ -74,8 +74,6 @@ public:
     bool friction_is_set;
     T sigma_Y;
     bool use_cohesion;
-    std::function<void (int frame)> write_output_files;
-    std::function<void (int frame)> read_output_files;
     std::function<void ()> destroy;
     ARRAY<T> extra_T;
     ARRAY<int> extra_int;

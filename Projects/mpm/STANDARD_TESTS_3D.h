@@ -51,16 +51,13 @@ public:
     using BASE::forced_collision_type;using BASE::scale_speed;using BASE::Add_Drucker_Prager_Case;
     using BASE::friction;using BASE::friction_is_set;using BASE::sigma_Y;using BASE::use_cohesion;using BASE::destroy;
     using BASE::collision_objects;using BASE::Set_Lame_On_Particles;using BASE::plasticity_models;
-    using BASE::write_output_files;using BASE::read_output_files;using BASE::begin_frame;
-    using BASE::end_frame;using BASE::begin_time_step;using BASE::end_time_step;
+    using BASE::write_output_files;using BASE::read_output_files;
     using BASE::dump_collision_objects;using BASE::Perturb;using BASE::Uniform;using BASE::extra_T;using BASE::extra_int;
-    using BASE::Set_Grid;
+    using BASE::Set_Grid;using BASE::Add_Callbacks;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();
 
-    void Write_Output_Files(const int frame) override;
-    void Read_Output_Files(const int frame) override;
     void Initialize() override;
 
     // additional storage

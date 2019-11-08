@@ -66,7 +66,7 @@ template<class TV> MPM_DRIVER<TV>::
 template<class TV> void MPM_DRIVER<TV>::
 Execute_Main_Program()
 {
-    Initialize();
+    Step([=](){Initialize();},"initialize");
     Simulate_To_Frame(example.last_frame);
 }
 //#####################################################################
@@ -127,27 +127,20 @@ Initialize()
 template<class TV> void MPM_DRIVER<TV>::
 Advance_One_Time_Step()
 {
-    if(example.begin_time_step) example.begin_time_step(example.time);
-
-    Update_Simulated_Particles();
+    Step([=](){Update_Simulated_Particles();},"simulated-particles");
     Print_Particle_Stats("particle state",example.dt);
-    Update_Particle_Weights();
-    example.gather_scatter.Prepare_Scatter(example.particles);
-    Particle_To_Grid();
+    Step([=](){Update_Particle_Weights();},"update-weights",false);
+    Step([=](){example.gather_scatter.Prepare_Scatter(example.particles);},"prepare-scatter",false);
+    Step([=](){Particle_To_Grid();},"p2g");
     Print_Grid_Stats("after particle to grid",example.dt,example.velocity,0);
     Print_Energy_Stats("after particle to grid",example.velocity);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after particle to grid",1);
-    Apply_Forces();
-    Extrapolate_Velocity();
+    Step([=](){Apply_Forces();},"forces");
     Print_Grid_Stats("after forces",example.dt,example.velocity,&example.velocity_save);
-    Grid_To_Particle_Limit_Dt();
-    Limit_Dt_Sound_Speed();
+    Step([=](){Grid_To_Particle_Limit_Dt();},"g2p-limit-dt",false);
+    Step([=](){Limit_Dt_Sound_Speed();},"sound-speed-limit-dt",false);
     Print_Max_Sound_Speed();
-    Grid_To_Particle();
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("after grid to particle",1);
-    Update_Plasticity_And_Hardening();
-
-    if(example.end_time_step) example.end_time_step(example.time);
+    Step([=](){Grid_To_Particle();},"g2p",true);
+    Step([=](){Update_Plasticity_And_Hardening();},"plasticity-hardening",false);
 }
 //#####################################################################
 // Function Simulate_To_Frame
@@ -157,7 +150,8 @@ Simulate_To_Frame(const int frame)
 {
     for(;current_frame<frame;current_frame++){
         LOG::SCOPE scope("FRAME","frame %d",current_frame+1);
-        if(example.begin_frame) example.begin_frame(current_frame);
+        for(int i=0;i<example.begin_frame.m;i++)
+            example.begin_frame(i)(current_frame);
         if(example.substeps_delay_frame==current_frame)
             DEBUG_SUBSTEPS::write_substeps_level=example.write_substeps_level;
         T time_at_frame=example.time+example.frame_dt;
@@ -174,7 +168,7 @@ Simulate_To_Frame(const int frame)
             example.dt=next_time-example.time;
             LOG::cout<<"substep dt: "<<example.dt<<std::endl;
 
-            Advance_One_Time_Step();
+            Step([=](){Advance_One_Time_Step();},"time-step");
             LOG::cout<<"actuarial dt: "<<example.dt<<std::endl;
 
 
@@ -184,9 +178,10 @@ Simulate_To_Frame(const int frame)
                 next_time=example.time+example.dt;
                 done=false;}
 
-            PHYSBAM_DEBUG_WRITE_SUBSTEP("end substep %i",0,substep);
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("end substep %i",0);
             example.time=next_time;}
-        if(example.end_frame) example.end_frame(current_frame);
+        for(int i=0;i<example.end_frame.m;i++)
+            example.end_frame(i)(current_frame);
         Write_Output_Files(++output_number);}
 }
 //#####################################################################
@@ -257,12 +252,11 @@ Particle_To_Grid()
             example.velocity(index)+=particles.mass(p)*V;
         });
 
-    
     example.valid_grid_indices.Remove_All();
     example.valid_grid_cell_indices.Remove_All();
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("before reflect m mv",1);
     Reflect_Boundary_Mass_Momentum();
-    Reflection_Boundary_Condition(example.velocity,true);
-    Reflection_Boundary_Condition(example.mass,false);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after reflect m mv",1);
 
     for(RANGE_ITERATOR<TV::m> it(example.mass.domain);it.Valid();it.Next()){
         int i=example.mass.Standard_Index(it.index);
@@ -275,112 +269,88 @@ Particle_To_Grid()
         else example.velocity.array(i)=TV();}
 }
 //#####################################################################
-// Function Reflect_Boundary
-//#####################################################################
-template<class TV> template<class S, class N> void MPM_DRIVER<TV>::
-Reflect_Boundary(S func_s,N func_n,RI flag) const
-{
-    TV_INT ranges[2]={TV_INT(),example.grid.numbers_of_cells};
-    for (RANGE_ITERATOR<TV::m> it(example.grid.Domain_Indices(),example.ghost,0,flag);it.Valid();it.Next()){
-        auto bc_type=example.side_bc_type(it.side);
-        TV_INT image=it.index;
-        int axis=it.side/2,side=it.side%2;
-        image(axis)=2*ranges[side](axis)-it.index(axis)-1;
-        if (bc_type==example.BC_SLIP) func_s(image,it.index,axis);
-        else func_n(image,it.index,axis);}
-}
-//#####################################################################
 // Function Reflection_Boundary_Mass_Momentum
 //#####################################################################
 template <class TV> void MPM_DRIVER<TV>::
 Reflect_Boundary_Mass_Momentum()
-{   
-    if (!example.reflection_bc) return;
-    Reflect_Boundary(
-    [&](const TV_INT& in,const TV_INT& out, const int axis)
-    {   
-        T bc=0;
-        if(example.bc_velocity){
-            TV nearest_point=example.grid.Clamp(example.grid.Center(out));
-            bc=example.bc_velocity(nearest_point,example.time)(axis);}
-        T& mass_in=example.mass(in),&mass_out=example.mass(out);  
-        TV& momentum_in=example.velocity(in),&momentum_out=example.velocity(out);
-        T mv_in_old=momentum_in(axis);
-        T mv_out_old=momentum_out(axis);
-        momentum_in(axis)+=2*bc*mass_out-momentum_out(axis);
-        momentum_out(axis)=2*bc*mass_in-mv_in_old+mv_out_old;
-        mass_in+=mass_out;
-        mass_out=mass_in;
-        for(int index=0;index<TV::m && index!=axis;index++){
-            momentum_in(index)+=momentum_out(index);
-            momentum_out(index)=momentum_in(index);}
-    },
-    [&](const TV_INT& in,const TV_INT& out, const int axis)
-    {
-        TV& momentum_in=example.velocity(in),&momentum_out=example.velocity(out);
-        momentum_in+=momentum_out;
-        momentum_out=momentum_in;
-        T& mass_in=example.mass(in),&mass_out=example.mass(out);
-        mass_in+=mass_out;
-        mass_out=mass_in;
-    },
-    RI::ghost|RI::duplicate_corners);
+{
+    if(!example.reflection_bc) return;
+    TV_INT ranges[2]={TV_INT(),example.grid.numbers_of_cells};
+    for(RANGE_ITERATOR<TV::m> it(example.grid.Domain_Indices(),example.ghost,0,
+            RI::ghost|RI::duplicate_corners);it.Valid();it.Next()){
+        auto bc_type=example.side_bc_type(it.side);
+        TV_INT image=it.index;
+        int axis=it.side/2,side=it.side%2;
+        image(axis)=2*ranges[side](axis)-it.index(axis)-1;
+        T& m_i=example.mass(image),&m_o=example.mass(it.index),m_t=m_i+m_o;
+        TV& mv_i=example.velocity(image),&mv_o=example.velocity(it.index);
+        TV mv_id=mv_i-mv_o,mv_od=-mv_id,mv_in=mv_i+mv_o,mv_on=mv_in;
+        if(bc_type!=example.BC_FREE && example.bc_velocity){
+            TV nearest_point=example.grid.Clamp(example.grid.Center(it.index));
+            TV bc=example.bc_velocity(nearest_point,example.time);
+            mv_id+=2*m_o*bc;
+            mv_od+=2*m_i*bc;}
+        if(bc_type==example.BC_SLIP){
+            mv_in(axis)=mv_id(axis);
+            mv_on(axis)=mv_od(axis);}
+        if(bc_type==example.BC_NOSLIP){
+            mv_i=mv_id;
+            mv_o=mv_od;}
+        else{
+            mv_i=mv_in;
+            mv_o=mv_on;}
+        m_o=m_i=m_t;};
 }
 //#####################################################################
-// Function Extrapolate_Velocity
+// Function Reflect_Boundary_Velocity
 //#####################################################################
 template <class TV> void MPM_DRIVER<TV>::
-Extrapolate_Velocity()
+Reflect_Boundary_Velocity(ARRAY<TV,TV_INT>& u)
 {
-    if (!example.reflection_bc) return;
-    Reflect_Boundary(
-    [&](const TV_INT& in,const TV_INT& out,const int axis)
-    {
-        T bc=(T) 0;
-        if(example.bc_velocity){
-            TV nearest_point=example.grid.Clamp(example.grid.Center(out));
-            bc=example.bc_velocity(nearest_point,example.time)(axis);}
-        example.velocity(out)(axis)=(2*bc-example.velocity(in)(axis));
-        for(int index=0;index<TV::m && index!=axis;index++){
-            example.velocity(out)(index)=example.velocity(in)(index);}
-    },
-    [&](const TV_INT& in,const TV_INT& out, const int axis)
-    {
-        example.velocity(out)=example.velocity(in);
-    },
-    RI::ghost|RI::duplicate_corners);
+    if(!example.reflection_bc) return;
+    TV_INT ranges[2]={TV_INT(),example.grid.numbers_of_cells};
+    for(RANGE_ITERATOR<TV::m> it(example.grid.Domain_Indices(),example.ghost,0,
+            RI::ghost|RI::duplicate_corners);it.Valid();it.Next()){
+        auto bc_type=example.side_bc_type(it.side);
+        TV_INT image=it.index;
+        int axis=it.side/2,side=it.side%2;
+        image(axis)=2*ranges[side](axis)-it.index(axis)-1;
+        T m=example.mass(it.index);
+        if(!m) continue;
+        TV v_i=u(image),&v_o=u(it.index);
+        TV v_od=-v_i,v_on=v_i;
+        if(bc_type!=example.BC_FREE && example.bc_velocity){
+            TV nearest_point=example.grid.Clamp(example.grid.Center(it.index));
+            TV bc=example.bc_velocity(nearest_point,example.time);
+            v_od+=bc*2;}
+        if(bc_type==example.BC_SLIP) v_on(axis)=v_od(axis);
+        if(bc_type==example.BC_NOSLIP) v_o=v_od;
+        else v_o=v_on;}
 }
 //#####################################################################
-// Function Reflect_Boundary_Particle_Force
+// Function Reflect_Boundary_Force
 //#####################################################################
 template <class TV> void MPM_DRIVER<TV>::
-Reflect_Boundary_Particle_Force(ARRAY<TV,TV_INT>& force)
+Reflect_Boundary_Force(ARRAY<TV,TV_INT>& force)
 {
-    if (!example.reflection_bc) return;
-    Reflect_Boundary(
-    [&](const TV_INT& in,const TV_INT& out, const int axis)
-    {   for(int index=0;index<TV::m && index!=axis;index++){
-        force(in)(index)+=force(out)(index);}
-        force(in)(axis)-=force(out)(axis);},
-    [&](const TV_INT& in,const TV_INT& out, const int axis)
-    {force(in)+=force(out);},
-    RI::ghost|RI::duplicate_corners);
-}
-//#####################################################################
-// Function Reflect_Boundary_Grid_Force
-//#####################################################################
-template <class TV> void MPM_DRIVER<TV>::
-Reflect_Boundary_Grid_Force(ARRAY<TV,TV_INT>& force)
-{
-    if (!example.reflection_bc) return;
-    Reflect_Boundary(
-    [&](const TV_INT& in,const TV_INT& out, const int axis)
-    {   for(int index=0;index<TV::m && index!=axis;index++){
-        force(out)(index)=force(in)(index);}
-        force(out)(axis)=-force(in)(axis);},
-    [&](const TV_INT& in,const TV_INT& out, const int axis)
-    {force(out)=force(in);},
-    RI::ghost|RI::delay_corners);
+    if(!example.reflection_bc) return;
+    TV_INT ranges[2]={TV_INT(),example.grid.numbers_of_cells};
+    for(RANGE_ITERATOR<TV::m> it(example.grid.Domain_Indices(),example.ghost,0,RI::ghost|RI::duplicate_corners);it.Valid();it.Next()){
+        auto bc_type=example.side_bc_type(it.side);
+        TV_INT image=it.index;
+        int axis=it.side/2,side=it.side%2;
+        image(axis)=2*ranges[side](axis)-it.index(axis)-1;
+        TV& f_i=force(image),&f_o=force(it.index);
+        TV f_id=f_i-f_o,f_od=-f_id,f_in=f_i+f_o,f_on=f_in;
+        if(bc_type==example.BC_SLIP){
+            f_in(axis)=f_id(axis);
+            f_on(axis)=f_od(axis);}
+        if(bc_type==example.BC_NOSLIP){
+            f_i=f_id;
+            f_o=f_od;}
+        else{
+            f_i=f_in;
+            f_o=f_on;}}
 }
 //#####################################################################
 // Function Grid_To_Particle
@@ -557,7 +527,7 @@ Conjugate_Stress_Diff(const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dpdf,c
         S(k,k)+=dpdf.B(i)*u(j)*u(j);
         S(j,k)+=dpdf.C(i)*u(j)*u(k);}
     return S;
-} 
+}
 template<class TV,class T>
 inline T Compute_Maximum_Tensor_Contraction_Brute(const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dpdf,const DIAGONAL_MATRIX<T,TV::m>& sigma)
 {
@@ -649,7 +619,7 @@ inline T Compute_Maximum_Tensor_Contraction(const SYMMETRIC_MATRIX<T,2>& H, cons
         {
             T nu=(num-v12*den)*H10;
             T de=((A01-H00)*num+(H00-A10)*v12*den);
-            if (abs(de)>1e-10){
+            if(abs(de)>1e-10){
                 T t0=nu/de;
                 T e=(((A10*v12/v02+H00)*t0+2*H10)*v12*t0+A01*v02+H11*v12)*num/den;
                 if(e>x)
@@ -740,7 +710,7 @@ Compute_Max_Sound_Speed() const -> T
 // Function Print_Max_Sound_Speed
 //#####################################################################
 template<class TV> void MPM_DRIVER<TV>::
-Print_Max_Sound_Speed() 
+Print_Max_Sound_Speed()
 {
     static bool first=example.test_sound_speed;
     if(first){first=false;Test_Sound_Speed(100);}
@@ -772,7 +742,7 @@ Apply_Particle_Forces(ARRAY<TV,TV_INT>& F)
         example.solid_body_collection.deformable_body_collection.Add_Velocity_Independent_Forces(example.lagrangian_forces_F,example.time);
         example.gather_scatter.template Scatter<int>(false,
             [this,&F](int p,const PARTICLE_GRID_ITERATOR<TV>& it,int tid){
-                F(it.Index())+=it.Weight()*example.lagrangian_forces_F(p);});} 
+                F(it.Index())+=it.Weight()*example.lagrangian_forces_F(p);});}
 }
 //#####################################################################
 // Function Apply_Grid_Forces
@@ -798,15 +768,18 @@ Apply_Forces()
         example.Precompute_Forces(example.time,example.dt,0);
         objective.tmp2.u*=0;
 
-
         //Add Particle Forces
         auto &F=objective.tmp2.u;
         Apply_Particle_Forces(F);
-        Reflect_Boundary_Particle_Force(F);
         Apply_Grid_Forces(F);
-        Reflect_Boundary_Grid_Force(F);
+        example.velocity.Exchange(F);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("forces before reflect",1);
+        example.velocity.Exchange(F);
+        Reflect_Boundary_Force(F);
+        example.velocity.Exchange(F);
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("forces after reflect",1);
+        example.velocity.Exchange(F);
 
-        Reflection_Boundary_Condition(objective.tmp2.u,true);
         for(int i=0;i<example.valid_grid_indices.m;i++){
             int p=example.valid_grid_indices(i);
             dv.u.array(p)=example.dt/example.mass.array(p)*objective.tmp2.u.array(p);}
@@ -828,7 +801,7 @@ Apply_Forces()
             newtons_method.use_gmres=true;
             newtons_method.use_cg=false;
             newtons_method.Make_Vanilla_Newton();}
-        
+
         example.Update_Lagged_Forces(example.time);
         newtons_method.require_one_iteration=!objective.Initial_Guess(dv,newtons_method.tolerance,example.asymmetric_system && !newtons_method.use_gradient_magnitude_objective,newtons_method.use_gradient_magnitude_objective);
         if(example.test_diff) objective.Test_Diff(dv);
@@ -846,6 +819,8 @@ Apply_Forces()
         example.velocity.array(j)=dv.u.array(j)+objective.v0.u.array(j);
         example.velocity_friction_save.array(j)+=objective.v0.u.array(j);}
     example.velocity_friction_save.array.Subset(objective.system.stuck_nodes)=objective.system.stuck_velocity;
+    Reflect_Boundary_Velocity(example.velocity);
+    Reflect_Boundary_Velocity(example.velocity_friction_save);
 }
 //#####################################################################
 // Function Apply_Friction
@@ -991,36 +966,18 @@ Print_Energy_Stats(const char* str,const ARRAY<TV,TV_INT>& u)
 template<class T,int d> void flip(VECTOR<T,d>& u,int a){u(a)=-u(a);}
 template<class T> void flip(T& u,int a){}
 //#####################################################################
-// Function Reflection_Boundary_Condition
-//#####################################################################
-template<class TV> template<class S> void MPM_DRIVER<TV>::
-Reflection_Boundary_Condition(ARRAY<S,TV_INT>& u,bool flip_sign)
-{
-    if(!example.reflection_bc_flags) return;
-    TV_INT ranges[2]={TV_INT(),example.grid.numbers_of_cells};
-    for(RANGE_ITERATOR<TV::m> it(example.grid.Domain_Indices(),example.ghost,0,
-            RI::ghost|RI::side_mask,example.reflection_bc_flags);it.Valid();it.Next()){
-        int axis=it.side/2,side=it.side%2;
-        TV_INT pair=it.index;
-        pair(axis)=2*ranges[side](axis)-it.index(axis)-1;
-        if(flip_sign) flip(u(it.index),axis);
-        u(pair)+=u(it.index);
-        u(it.index)=S();}
-    for(RANGE_ITERATOR<TV::m> it(example.grid.Domain_Indices(),example.ghost,0,
-            RI::ghost|RI::delay_corners|RI::side_mask,example.reflection_bc_flags);it.Valid();it.Next()){
-        int axis=it.side/2,side=it.side%2;
-        TV_INT pair=it.index;
-        pair(axis)=2*ranges[side](axis)-it.index(axis)-1;
-        u(it.index)=u(pair);
-        if(flip_sign) flip(u(it.index),axis);}
-}
-//#####################################################################
 // Function Reflect_Particles
 //#####################################################################
 template<class TV> void MPM_DRIVER<TV>::
 Reflect_Or_Invalidate_Particle(int p)
 {
-    int f=example.reflection_bc_flags;
+    int f=0;
+    for(int i=0;i<2*TV::m;i++)
+    {
+        auto bc_type=example.side_bc_type(i);
+        if(bc_type==example.BC_SLIP || bc_type==example.BC_NOSLIP)
+            f|=1<<i;
+    }
     TV A=example.grid.domain.min_corner;
     TV B=example.grid.domain.max_corner;
     TV& X=example.particles.X(p),&V=example.particles.V(p);
@@ -1031,6 +988,22 @@ Reflect_Or_Invalidate_Particle(int p)
         else if(X(a)>B(a)){
             if((f>>(2*a+1))&1){X(a)=2*B(a)-X(a);V(a)=-V(a);}
             else example.particles.valid(p)=false;}}
+}
+//#####################################################################
+// Function Step
+//#####################################################################
+template<class TV> void MPM_DRIVER<TV>::
+Step(std::function<void()> func,const char* name,bool dump_substep,bool do_step)
+{
+    auto& p=example.time_step_callbacks.Get_Or_Insert(name);
+    p.x=true; // Flag the callback name as recognized, for sanity checking later
+    if(!do_step) return;
+    for(int i=0;i<p.y(1).m;i++) p.y(1)(i)();
+    func();
+    // Note: p may be invalidated by func(), so we must re-access it here.
+    const auto& q=example.time_step_callbacks.Get_Or_Insert(name);
+    for(int i=0;i<q.y(0).m;i++) q.y(0)(i)();
+    if(dump_substep) PHYSBAM_DEBUG_WRITE_SUBSTEP(name,1);
 }
 //#####################################################################
 namespace PhysBAM{

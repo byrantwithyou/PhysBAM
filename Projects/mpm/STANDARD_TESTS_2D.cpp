@@ -76,24 +76,6 @@ template<class T> STANDARD_TESTS<VECTOR<T,2> >::
 {
 }
 //#####################################################################
-// Function Write_Output_Files
-//#####################################################################
-template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
-Write_Output_Files(const int frame)
-{
-    if(write_output_files) write_output_files(frame);
-    BASE::Write_Output_Files(frame);
-}
-//#####################################################################
-// Function Read_Output_Files
-//#####################################################################
-template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
-Read_Output_Files(const int frame)
-{
-    if(read_output_files) read_output_files(frame);
-    BASE::Read_Output_Files(frame);
-}
-//#####################################################################
 // Function Initialize
 //#####################################################################
 template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
@@ -276,7 +258,7 @@ Initialize()
             Add_Fixed_Corotated(20*unit_p*scale_E,0.4,&foo,false);
             Add_Gravity(m/(s*s)*TV(0,-9.8));
             Add_Walls(-1,COLLISION_TYPE::separate,1.9,.1*m,true);
-            begin_time_step=[this](T time)
+            Add_Callbacks(true,"time-step",[this]()
                 {
                     if(time>=10/24.0*s){
                         lagrangian_forces.Delete_Pointers_And_Clean_Memory();
@@ -284,7 +266,7 @@ Initialize()
                         this->output_structures_each_frame=true;
                         Add_Walls(-1,COLLISION_TYPE::separate,1.9,.1+(T)(time/s-10/24.0)*0.08*m,true);
                         Add_Gravity(m/(s*s)*TV(0,-9.8));}
-                };
+                });
         } break;
         case 13:{ // surface tension test: fixed topology circle shell
             Set_Grid(RANGE<TV>::Unit_Box()*m);
@@ -377,7 +359,7 @@ Initialize()
                 particles.X(i)=frame*particles.X(i);
                 particles.V(i)=frame.r.Rotate(particles.V(i));}
             Add_Gravity(TV(0,-g));
-            write_output_files=[=](int)
+            write_output_files.Append([=](int)
                 {
                     T c=sin(angle)*g;
                     T d=coefficient_of_friction*cos(angle)*g;
@@ -400,7 +382,7 @@ Initialize()
                         else v=0;}
                     Add_Debug_Particle(frame*(box.max_corner+TV(x,0)),VECTOR<T,3>(1,0,0));
                     Debug_Particle_Set_Attribute<TV>("V",frame.r.Rotate(TV(v,0)));
-                };
+                });
         } break;
         case 21:{ // circle with random initial velocities
             Set_Grid(RANGE<TV>(TV(-3,-3),TV(4,4))*m);
@@ -478,7 +460,7 @@ Initialize()
             particles.mu*=0;
             particles.mu0*=0;
             if(this->reflection_bc) this->reflection_bc_flags=-1;
-            else Add_Walls(-1,COLLISION_TYPE::separate,.2,grid.dX(0)*gap,false);
+            Add_Walls(-1,COLLISION_TYPE::separate,.2,grid.dX(0)*gap,false);
         } break;
         case 31:{ // Light fluid on heavy fluid
             Set_Grid(RANGE<TV>::Unit_Box()*m);
@@ -703,7 +685,7 @@ Initialize()
             stf->Set_Stiffness((T)1); // TODO: units
             stf->Set_Damping((T)0.1); // TODO: units
             Add_Force(*stf);
-            begin_time_step=[this](T time)
+            Add_Callbacks(true,"time-step",[this]()
                 {
                     delete lagrangian_forces(lagrangian_forces.m-1);
                     lagrangian_forces.Remove_End();
@@ -722,7 +704,7 @@ Initialize()
                     stf->Set_Stiffness((T)1); // TODO: units
                     stf->Set_Damping((T)0);
                     Add_Force(*stf);
-                };
+                });
         } break;
         case 37:{ // sand box drop, better paramaters, with Hencky, usage: mpm 38 -resolution 100
             particles.Store_Fp(true);
@@ -965,7 +947,7 @@ Initialize()
             //     for(int k=0;k<foo.m;k++) foo(k)=k+N_sand;
             //     Add_Fixed_Corotated(35.37e5*unit_p*scale_E,0.3,&foo);}
             if(test_number==56 || test_number==57)
-                begin_time_step=[this](T time)
+                Add_Callbacks(true,"time-step",[this]()
                     {
                         T y=0;
                         T v=foo_T2*m/s;
@@ -984,7 +966,7 @@ Initialize()
                             LOG::printf("time=%P\tmin_corner_y=%P\n",time,y);
                             Add_Collision_Object(RANGE<TV>(min_corner*m,(min_corner+0.2)*m),COLLISION_TYPE::slip,0);
                             Add_Gravity(m/(s*s)*TV(0,-9.8));}
-                    };
+                    });
         } break;
         case 54:
         case 58:
@@ -1021,7 +1003,8 @@ Initialize()
             if(test_number==58){
                 if(!use_foo_T4) foo_T4=(T)1;
                 Add_Lambda_Particles(&sand_particles,E*foo_T4,nu,(T)1000*unit_rho,true,(T)0.3,(T)1);}
-            begin_frame=[this](int frame){if(frame==10) Add_Gravity(TV(0,20));};
+            auto func=[this](int frame){if(frame==10) Add_Gravity(TV(0,20));};
+            this->begin_frame.Append(func);
         } break;
         case 55:{ // Moving collision object
             particles.Store_Fp(true);
@@ -1063,9 +1046,9 @@ Initialize()
                 *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(seed_range),TV(0,-1),grid.domain.max_corner,
                 TV(0,-pour_speed),gravity,max_dt*pour_speed+grid.dX.y,seed_buffer,mass,volume);
             destroy=[=](){delete source;};
-            write_output_files=[=](int frame){source->Write_Output_Files(frame);};
-            read_output_files=[=](int frame){source->Read_Output_Files(frame);};
-            begin_time_step=[=](T time)
+            write_output_files.Append([=](int frame){source->Write_Output_Files(frame);});
+            read_output_files.Append([=](int frame){source->Read_Output_Files(frame);});
+            Add_Callbacks(true,"time-step",[=]()
                 {
                     if(time>foo_T3) return;
                     ARRAY<int> affected_particles;
@@ -1082,8 +1065,8 @@ Initialize()
                     for(int i=0;i<plasticity_models.m;i++)
                         if(MPM_DRUCKER_PRAGER<TV>* dp=dynamic_cast<MPM_DRUCKER_PRAGER<TV>*>(plasticity_models(i)))
                             dp->Initialize_Particles(&affected_particles);
-                };
-            end_time_step=[=](T time){if(time<=foo_T3) source->End_Time_Step(time);};
+                });
+            Add_Callbacks(false,"time-step",[=](){if(time<=foo_T3) source->End_Time_Step(time);});
 
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
             int case_num=use_hardening_mast_case?hardening_mast_case:2;
@@ -1192,7 +1175,8 @@ Initialize()
             if(!use_foo_T4) foo_T4=(T)1;
             Add_Lambda_Particles(&sand_particles,E*foo_T4,nu,(T)1000*unit_rho,true,(T)0.3,(T)1);
             int add_gravity_frame=restart?restart:60;
-            begin_frame=[this,add_gravity_frame](int frame){if(frame==add_gravity_frame) Add_Gravity(TV(0,-20));};
+            auto func=[this,add_gravity_frame](int frame){if(frame==add_gravity_frame) Add_Gravity(TV(0,-20));};
+            this->begin_frame.Append(func);
         } break;
         case 64:{
             particles.Store_Fp(true);
@@ -1432,9 +1416,9 @@ Initialize()
                 *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(seed_range),TV(0,-1),grid.domain.max_corner,
                 TV(0,-pour_speed),gravity,max_dt*pour_speed+grid.dX.y,seed_buffer,mass,volume);
             destroy=[=](){delete source;};
-            write_output_files=[=](int frame){source->Write_Output_Files(frame);};
-            read_output_files=[=](int frame){source->Read_Output_Files(frame);};
-            begin_time_step=[=](T time)
+            write_output_files.Append([=](int frame){source->Write_Output_Files(frame);});
+            read_output_files.Append([=](int frame){source->Read_Output_Files(frame);});
+            Add_Callbacks(true,"time-step",[=]()
                 {
                     if(time>foo_T3) return;
                     ARRAY<int> affected_particles;
@@ -1451,8 +1435,8 @@ Initialize()
                     for(int i=0;i<plasticity_models.m;i++)
                         if(MPM_DRUCKER_PRAGER<TV>* dp=dynamic_cast<MPM_DRUCKER_PRAGER<TV>*>(plasticity_models(i)))
                             dp->Initialize_Particles(&affected_particles);
-                };
-            end_time_step=[=](T time){if(time<=foo_T3) source->End_Time_Step(time);};
+                });
+            Add_Callbacks(false,"time-step",[=](){if(time<=foo_T3) source->End_Time_Step(time);});
 
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
             int case_num=use_hardening_mast_case?hardening_mast_case:2;
@@ -1570,7 +1554,7 @@ Initialize()
             this->Add_Gravity2(m/(s*s)*TV(0,-9.81));
             if(this->reflection_bc_flags==0)
                 Add_Walls(-1,COLLISION_TYPE::separate,0,.25*m,false);
-            end_time_step=[=](T time)
+            Add_Callbacks(false,"time-step",[=]()
                 {
                     for(int i=0;i<particles.F.m;i++){
                         T J=particles.F(i).Determinant();
@@ -1579,7 +1563,7 @@ Initialize()
                     for(int i=0;i<particles.V.m;i++)
                         if(particles.V(i).Magnitude()>50)
                             PHYSBAM_FATAL_ERROR("VELOCITY TOO BIG");
-                };
+                });
         } break;
         case 72:{
             Set_Grid(RANGE<TV>(TV(),TV(1,2))*m,TV_INT(1,2));
@@ -1592,7 +1576,7 @@ Initialize()
             seed_box.min_corner.y=seed_box.max_corner.y-sqr(seed_freq*frame_dt)/2*gravity;
             seed_box=seed_box.Thickened(-sqrt((T)TV::m)*half_edge*m);
             seed_box.max_corner.x=seed_box.min_corner.x+seed_box.Edge_Lengths().x/ob_per_frame;
-            begin_frame=[this,ob_per_frame,seed_freq,half_edge,density,seed_box](int frame)
+            auto func=[this,ob_per_frame,seed_freq,half_edge,density,seed_box](int frame)
                 {
                     int num_part=particles.X.m;
                     if(frame%seed_freq==0 && frame<200){
@@ -1609,6 +1593,7 @@ Initialize()
                     ARRAY<int> new_particles(IDENTITY_ARRAY<>(particles.X.m-num_part)+num_part);
                     Add_Fixed_Corotated(1e2*unit_p*scale_E,0.3,&new_particles);
                 };
+            this->begin_frame.Append(func);
             Add_Gravity(TV(0,-gravity));
             Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,false);
         } break;    

@@ -46,7 +46,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     use_theta_c(false),use_theta_s(false),use_hardening_factor(false),use_max_hardening(false),
     theta_c(0),theta_s(0),hardening_factor(0),max_hardening(0),use_implicit_plasticity(false),no_implicit_plasticity(false),
     hardening_mast_case(0),use_hardening_mast_case(false),override_output_directory(false),
-    m(1),s(1),kg(1),forced_collision_type(-1),friction(0),friction_is_set(false),sigma_Y(0),use_cohesion(false),write_output_files(0),read_output_files(0),
+    m(1),s(1),kg(1),forced_collision_type(-1),friction(0),friction_is_set(false),sigma_Y(0),use_cohesion(false),
     dump_collision_objects(false),tests(stream_type_input,solid_body_collection.deformable_body_collection)
 {
     T framerate=0;
@@ -433,14 +433,17 @@ Add_Walls(int flags,COLLISION_TYPE type,T friction,T inset,bool penalty) // -x +
         for(int s=0;s<2;s++)
             if(flags&(1<<(a*2+s))){
                 if(reflection_bc){
-                    if (type==COLLISION_TYPE::slip) side_bc_type(2*a+s)=MPM_EXAMPLE<TV>::BC_TYPE::BC_SLIP;
-                    if (type==COLLISION_TYPE::stick) side_bc_type(2*a+s)=MPM_EXAMPLE<TV>::BC_TYPE::BC_NOSLIP;}
-                RANGE<TV> wall=range;
-                if(s)wall.max_corner(a)=grid.domain.min_corner(a)+inset;
-                else wall.min_corner(a)=grid.domain.max_corner(a)-inset;
-                if(!reflection_bc){
-                    if(penalty) Add_Penalty_Collision_Object(wall);
-                    else Add_Collision_Object(wall,type,friction);}}
+                    if(type==COLLISION_TYPE::slip || type==COLLISION_TYPE::separate)
+                        side_bc_type(2*a+s)=MPM_EXAMPLE<TV>::BC_TYPE::BC_SLIP;
+                    if(type==COLLISION_TYPE::stick)
+                        side_bc_type(2*a+s)=MPM_EXAMPLE<TV>::BC_TYPE::BC_NOSLIP;}
+                else{
+                    RANGE<TV> wall=range;
+                    if(s)wall.max_corner(a)=grid.domain.min_corner(a)+inset;
+                    else wall.min_corner(a)=grid.domain.max_corner(a)-inset;
+                    if(!reflection_bc){
+                        if(penalty) Add_Penalty_Collision_Object(wall);
+                        else Add_Collision_Object(wall,type,friction);}}}
 }
 //#####################################################################
 // Function Seed_Lagrangian_Particles

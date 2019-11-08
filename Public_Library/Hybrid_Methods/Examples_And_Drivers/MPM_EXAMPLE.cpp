@@ -60,6 +60,7 @@ Write_Output_Files(const int frame)
         oo.Write("V",particles.V.Flattened());
         oo.Write("u",velocity.array.Flattened());}
 
+    for(int i=0;i<write_output_files.m;i++) write_output_files(i)(frame);
 #pragma omp parallel
 #pragma omp single
     {
@@ -99,6 +100,7 @@ Read_Output_Files(const int frame)
     std::string f=LOG::sprintf("%d",frame);
     Read_From_File(LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
     Read_From_File(LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
+    for(int i=0;i<read_output_files.m;i++) read_output_files(i)(frame);
 }
 //#####################################################################
 // Function Capture_Stress
@@ -344,6 +346,13 @@ Update_Lagged_Forces(const T time) const
             lf->Lagged_Update_Position_Based_State(time);
 }
 //#####################################################################
+// Function Add_Callbacks
+//#####################################################################
+template<class TV> void MPM_EXAMPLE<TV>::
+Add_Callbacks(bool is_begin,const char* func_name,std::function<void()> func)
+{
+    time_step_callbacks.Get_Or_Insert(func_name).y(is_begin).Append(func);
+}
 namespace PhysBAM{
 template class MPM_EXAMPLE<VECTOR<float,2> >;
 template class MPM_EXAMPLE<VECTOR<float,3> >;

@@ -4,6 +4,7 @@
 //#####################################################################
 #ifndef __MPM_EXAMPLE__
 #define __MPM_EXAMPLE__
+#include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Matrices/MATRIX.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
@@ -54,6 +55,8 @@ public:
     ARRAY<MPM_COLLISION_OBJECT<TV>*> collision_objects;
     mutable ARRAY<TV> lagrangian_forces_V,lagrangian_forces_F;
     MPM_FORCE_HELPER<TV>& force_helper;
+
+    HASHTABLE<std::string,PAIR<bool,VECTOR<ARRAY<std::function<void()> >,2> > > time_step_callbacks; // begin, end
 
     T initial_time=0;
     int last_frame=100;
@@ -112,13 +115,13 @@ public:
     void operator=(const MPM_EXAMPLE&) = delete;
     virtual ~MPM_EXAMPLE();
     
-    virtual void Write_Output_Files(const int frame);
-    virtual void Read_Output_Files(const int frame);
+    virtual void Write_Output_Files(const int frame) final;
+    virtual void Read_Output_Files(const int frame) final;
     virtual void Initialize()=0;
-    std::function<void(int frame)> begin_frame;
-    std::function<void(int frame)> end_frame;
-    std::function<void(T time)> begin_time_step;
-    std::function<void(T time)> end_time_step;
+    ARRAY<std::function<void(int frame)> > begin_frame;
+    ARRAY<std::function<void(int frame)> > end_frame;
+    ARRAY<std::function<void(int frame)> > write_output_files;
+    ARRAY<std::function<void(int frame)> > read_output_files;
 
     void Capture_Stress();
     void Precompute_Forces(const T time,const T dt,const bool update_hessian);
@@ -143,6 +146,7 @@ public:
     T Total_Grid_Kinetic_Energy(const ARRAY<TV,TV_INT>& u) const;
     T Total_Particle_Kinetic_Energy() const;
     T Average_Particle_Mass() const;
+    void Add_Callbacks(bool is_begin,const char* func_name,std::function<void()> func);
 //#####################################################################
 };
 }

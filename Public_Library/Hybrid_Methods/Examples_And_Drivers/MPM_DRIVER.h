@@ -65,14 +65,13 @@ public:
     void Grid_To_Particle_Limit_Dt();
     void Limit_Dt_Sound_Speed();
     void Print_Max_Sound_Speed();
-    void Extrapolate_Velocity();
     void Reflect_Boundary_Mass_Momentum();
-    void Reflect_Boundary_Particle_Force(ARRAY<TV,TV_INT>& force);
-    void Reflect_Boundary_Grid_Force(ARRAY<TV,TV_INT>& force);
-    template<class S, class N> void Reflect_Boundary(S func_s,N func_n,RI flag) const;
-    template<class S> void Reflection_Boundary_Condition(ARRAY<S,TV_INT>& u,bool flip_sign);
+    void Reflect_Boundary_Velocity(ARRAY<TV,TV_INT>& u);
+    void Reflect_Boundary_Force(ARRAY<TV,TV_INT>& force);
+    template<class S, class L, class N> void Reflect_Boundary(S func_s,L func_l,N func_n,RI flag) const;
     void Reflect_Or_Invalidate_Particle(int p);
     void Test_Sound_Speed(int num) const;
+    void Step(std::function<void()> func,const char* name,bool dump_substep=true,bool do_step=true);
 //#####################################################################
 };
 }
