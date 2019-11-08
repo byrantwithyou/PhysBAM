@@ -64,6 +64,7 @@ void Run(PARSE_ARGS& parse_args)
     int kn=100000;
     bool quiet=false,use_krylov=false,print_system=false,pinv=false,stats_only=false,force_blk_ref=false,illus_domain=false,
         illus_zoom=false,dump_solution=false,rounded_corner=false;
+    bool visualize_blocks=true;
     TV2 min_corner,max_corner;
     IV2 illus_size(128,128);
     bool illus_fill=false,use_mkl_sparse=false,dump_sysbin=false;
@@ -106,6 +107,7 @@ void Run(PARSE_ARGS& parse_args)
     parse_args.Add("-timing",&use_job_timing,"use job timing");
     parse_args.Add("-cache_size",&cache_size,"size","number of cache entries to use");
     parse_args.Add("-cache",&cache_pattern,"pattern","printf pattern for generating cache filenames");
+    parse_args.Add_Not("-no_blocks",&visualize_blocks,"visualize per-black data");
     parse_args.Extra(&pipe_file,"file","file describing pipes");
     parse_args.Parse();
 
@@ -145,10 +147,13 @@ void Run(PARSE_ARGS& parse_args)
             debug.Visualize_Ticks(b,false);
         }
         Flush_Frame<TV2>("blocks");
-        for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+        if(visualize_blocks)
         {
-            debug.Visualize_Block_State(b);
-            Flush_Frame<TV2>(LOG::sprintf("block %P (%P)",b,cl.blocks(b).block).c_str());
+            for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+            {
+                debug.Visualize_Block_State(b);
+                Flush_Frame<TV2>(LOG::sprintf("block %P (%P)",b,cl.blocks(b).block).c_str());
+            }
         }
     }
 
@@ -162,10 +167,13 @@ void Run(PARSE_ARGS& parse_args)
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
             debug.Visualize_Block_State(b);
         Flush_Frame<TV2>("blocks");
-        for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+        if(visualize_blocks)
         {
-            debug.Visualize_Block_State(b);
-            Flush_Frame<TV2>(LOG::sprintf("block %P (%P)",b,cl.blocks(b).block).c_str());
+            for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+            {
+                debug.Visualize_Block_State(b);
+                Flush_Frame<TV2>(LOG::sprintf("block %P (%P)",b,cl.blocks(b).block).c_str());
+            }
         }
     }
 
@@ -181,10 +189,13 @@ void Run(PARSE_ARGS& parse_args)
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
             debug.Visualize_Block_State(b);
         Flush_Frame<TV2>("blocks");
-        for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+        if(visualize_blocks)
         {
-            debug.Visualize_Block_State(b);
-            Flush_Frame<TV2>(LOG::sprintf("block %P (%P)",b,cl.blocks(b).block).c_str());
+            for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+            {
+                debug.Visualize_Block_State(b);
+                Flush_Frame<TV2>(LOG::sprintf("block %P (%P)",b,cl.blocks(b).block).c_str());
+            }
         }
     }
 
@@ -204,7 +215,8 @@ void Run(PARSE_ARGS& parse_args)
             if(d==3)
             {
                 debug.Visualize_Tetrahedron(b);
-                Flush_Frame<TV>(LOG::sprintf("block %P",b).c_str());
+                if(visualize_blocks)
+                    Flush_Frame<TV>(LOG::sprintf("block %P",b).c_str());
             }
         }
         Flush_Frame<TV2>("ref ticks");
@@ -273,8 +285,9 @@ void Run(PARSE_ARGS& parse_args)
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
             debug.Visualize_Solution(mc.rhs_block_list(b),b,true);
         Flush_Frame<TV>("rhs blocks");
-        for(BLOCK_ID b(0);b<cl.blocks.m;b++)
-            debug.Visualize_Block_Dofs(b);
+        if(visualize_blocks)
+            for(BLOCK_ID b(0);b<cl.blocks.m;b++)
+                debug.Visualize_Block_Dofs(b);
     }
 
     timer("transform matrix");
