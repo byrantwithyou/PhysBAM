@@ -26,7 +26,9 @@ int main(int argc, char* argv[])
 
     T radius=1./200;
     GRID<TV> grid(TV_INT()+1,RANGE<TV>::Unit_Box(),true);
-    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),grid,"output");
+    VIEWER_DIR viewer_dir("output");
+    VIEWER_OUTPUT vo(STREAM_TYPE((RW)0),viewer_dir);
+    Use_Debug_Particles<TV>();
 
     ARRAY<TV> X,Y;
 
@@ -44,13 +46,13 @@ int main(int argc, char* argv[])
 
     // for(int i=0;i<X.m;i++)
     //     Add_Debug_Particle(X(i),VECTOR<T,3>(1,0,0));
-    // Flush_Frame<TV>("voronoi");
+    // Flush_Frame("voronoi");
 
     // for(int i=0;i<Y.m;i++)
     //     Add_Debug_Particle(Y(i),VECTOR<T,3>(1,0,0));
-    // Flush_Frame<TV>("poisson disc");
+    // Flush_Frame("poisson disc");
     
-    // Flush_Frame<TV>("end");
+    // Flush_Frame("end");
 
     return 0;
 }

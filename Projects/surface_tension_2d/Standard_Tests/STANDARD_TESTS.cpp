@@ -24,9 +24,6 @@ STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     solid_density(0),solid_width(0),analytic_solution(0),linear_force(0),rand(0),use_viscosity(false)
 {
     LOG::cout<<std::setprecision(16);
-    debug_particles.template Add_Array<VECTOR<T,3> >("color");
-    debug_particles.Store_Velocity(true);
-    Store_Debug_Particles(&debug_particles);
 
     fluids_parameters.use_preconditioner_for_slip_system=false;
     solids_parameters.implicit_solve_parameters.cg_iterations=3000;
@@ -154,7 +151,7 @@ STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
         
     THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Rigid_Body_Walls(*this);
     if(!this->user_output_directory)
-        output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d",test_number,resolution);
+        viewer_dir.output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d",test_number,resolution);
 }
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -592,12 +589,9 @@ Limit_Solids_Dt(T& dt,const T time)
 // Function Write_Output_Files
 //#####################################################################
 template<class T> void STANDARD_TESTS<T>::
-Write_Output_Files(const int frame) const
+Write_Output_Files() const
 {
-    BASE::Write_Output_Files(frame);
-    if(debug_particles.Size() || frame==0){
-        Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),frame));
-        Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles);}
+    BASE::Write_Output_Files();
 }
 //#####################################################################
 // Function Initialize_Surface_Particles
@@ -699,17 +693,6 @@ Update_Time_Varying_Material_Properties(const T time)
     if(rebuild_curve) Rebuild_Surface();
 }
 //#####################################################################
-// Function Store_Debug_Particles
-//#####################################################################
-template<class T> GEOMETRY_PARTICLES<VECTOR<T,2> >*  STANDARD_TESTS<T>::
-Store_Debug_Particles(GEOMETRY_PARTICLES<TV>* particle)
-{
-    static GEOMETRY_PARTICLES<TV>* stored_particles=0;
-    GEOMETRY_PARTICLES<TV>* tmp=stored_particles;
-    if(particle) stored_particles=particle;
-    return tmp;
-}
-//#####################################################################
 // Function FSI_Analytic_Test
 //#####################################################################
 template<class T> void STANDARD_TESTS<T>::
@@ -721,7 +704,6 @@ FSI_Analytic_Test()
     fluids_parameters.collision_bodies_affecting_fluid->use_collision_face_neighbors=true;
     TV solid_gravity=TV(0,-(T)9.8*m/(s*s));
     fluids_parameters.surface_tension=0;
-    debug_particles.template Add_Array<VECTOR<T,3> >("color");
 
     fluids_parameters.gravity.y=-(T)9.8*m;
     fluids_parameters.density=(T)100/(m*m);
@@ -753,9 +735,6 @@ FSI_Analytic_Test()
     size.x=(size.x-solid_width)/2;
     analytic_solution=-(solid_mass*-solid_gravity.y+rho*size.x*size.y*fluids_parameters.gravity)*size.x/(2*size.y*fluids_parameters.viscosity);
     LOG::cout<<"analytic_solution "<<analytic_solution<<std::endl;
-
-    Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),0));
-    Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),0),debug_particles);
 }
 //#####################################################################
 // Function Postprocess_Frame

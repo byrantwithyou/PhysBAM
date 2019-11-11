@@ -26,7 +26,7 @@ public:
     typedef T_input T;typedef VECTOR<T,3> TV;
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::data_directory;
-    using BASE::restart_frame;using BASE::output_directory;using BASE::solids_parameters;using BASE::write_last_frame;
+    using BASE::restart_frame;using BASE::viewer_dir;using BASE::solids_parameters;
     using BASE::solid_body_collection;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
     using BASE::user_last_frame;
@@ -54,7 +54,7 @@ void Initialize_Bodies() override
     if(!user_last_frame) last_frame=1000;
     if(!this->user_frame_rate) frame_rate=24;
     if(!this->user_output_directory)
-        output_directory="Rigid_Particle_Spheres/output";
+        viewer_dir.output_directory="Rigid_Particle_Spheres/output";
     solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-6;
     solids_parameters.implicit_solve_parameters.cg_iterations=500;
     segment_mesh.elements.Resize(1);

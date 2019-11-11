@@ -55,7 +55,7 @@ HAIR_STRAND_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parameter_list.Begin_Parse(parameter_file);
     std::string test_name=parameter_list.Get_Parameter("test_name",(std::string)"Test");
     if(!this->user_output_directory)
-        output_directory=LOG::sprintf("Hair_Sim_Tests/%s_%d",test_name.c_str(),test_number);
+        viewer_dir.output_directory=LOG::sprintf("Hair_Sim_Tests/%s_%d",test_name.c_str(),test_number);
     solids_parameters.cfl=parameter_list.Get_Parameter("cfl",(T)10);
     cfl_strain_rate=parameter_list.Get_Parameter("cfl_strain_rate",(T)0.1);
     solids_parameters.implicit_solve_parameters.cg_iterations=parameter_list.Get_Parameter("cg_iterations",(int)200);
@@ -78,7 +78,7 @@ HAIR_STRAND_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parameter_list.End_Parse();
     LOG::cout<<"Parameters were"<<std::endl;
     parameter_list.Write(LOG::cout);
-    parameter_list.Write(output_directory+"/parameters");
+    parameter_list.Write(viewer_dir.output_directory+"/parameters");
 }
 //#####################################################################
 // Function Initialize_Bodies
@@ -233,8 +233,8 @@ Initialize_Bodies()
         segment_adhesion=new SEGMENT_ADHESION<TV>(particles,edges.mesh,particle_to_spring_id,solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.intersecting_edge_edge_pairs);
         segment_adhesion->Set_Parameters(adhesion_stiffness,(T)10,adhesion_start_radius,adhesion_stop_radius,max_connections);
         solid_body_collection.Add_Force(segment_adhesion);
-        segment_adhesion->Write_State(stream_type,output_directory+"/adhesion.0");
-        segment_adhesion->Update_Partitions(false,solid_body_collection.deformable_body_collection.mpi_solids,output_directory);}
+        segment_adhesion->Write_State(stream_type,viewer_dir.output_directory+"/adhesion.0");
+        segment_adhesion->Update_Partitions(false,solid_body_collection.deformable_body_collection.mpi_solids,viewer_dir);}
 
     for(int i=0;i<fixed_nodes_start.m;i++) init_positions_start.Append(particles.X(fixed_nodes_start(i)));
     for(int i=0;i<fixed_nodes_end.m;i++) init_positions_end.Append(particles.X(fixed_nodes_end(i)));
@@ -533,16 +533,16 @@ Preprocess_Solids_Substep(const T time) {
 template<class T_input> void HAIR_STRAND_TESTS<T_input>::
 Postprocess_Frame(const int frame)
 {
-    if(segment_adhesion) segment_adhesion->Write_State(stream_type,output_directory+LOG::sprintf("/adhesion.%d",frame));
+    if(segment_adhesion) segment_adhesion->Write_State(stream_type,viewer_dir.output_directory+LOG::sprintf("/adhesion.%d",frame));
 }
 //#####################################################################
 // Function Write_Output_Files
 //#####################################################################
 template<class T_input> void HAIR_STRAND_TESTS<T_input>::
-Write_Output_Files(const int frame) const
+Write_Output_Files() const
 {
-    BASE::Write_Output_Files(frame);
-    if(segment_adhesion) segment_adhesion->Write_State(stream_type,output_directory+LOG::sprintf("/adhesion.%d",frame));
+    BASE::Write_Output_Files();
+    if(segment_adhesion) segment_adhesion->Write_State(stream_type,viewer_dir.current_directory+"/adhesion");
 }
 //#####################################################################
 namespace PhysBAM{

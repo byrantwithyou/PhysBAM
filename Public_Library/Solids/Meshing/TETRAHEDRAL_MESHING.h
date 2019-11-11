@@ -7,6 +7,7 @@
 #ifndef __TETRAHEDRAL_MESHING__
 #define __TETRAHEDRAL_MESHING__
 
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Solids/Meshing/LEVEL_SET_FORCES_AND_VELOCITIES.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
@@ -34,7 +35,7 @@ public:
     IMPLICIT_OBJECT<TV>* implicit_surface;
     LEVEL_SET_FORCES_AND_VELOCITIES<TV>* level_set_forces_and_velocities;
     const STREAM_TYPE stream_type;
-    std::string output_directory;
+    VIEWER_DIR viewer_dir;
     int frame;
     T curvature_subdivision_threshold,interpolation_error_subdivision_threshold;
     T maximum_boundary_edge_length;
@@ -132,7 +133,7 @@ private:
     void Discard_To_Get_Nice_Topology(RED_GREEN_TETRAHEDRA<T>& redgreen,ARRAY<bool>& keep_tet_flag,const bool verbose=true);
     void Envelope_Interior_Nodes(ARRAY<bool>& keep_tet_flag);
 public:
-    void Write_Output_Files(const int frame);
+    void Write_Output_Files();
 //#####################################################################
 };
 }

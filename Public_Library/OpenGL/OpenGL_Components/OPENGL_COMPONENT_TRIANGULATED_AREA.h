@@ -19,13 +19,13 @@ class OPENGL_COMPONENT_TRIANGULATED_AREA:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,2> TV;
 public:
-    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
-    OPENGL_COMPONENT_TRIANGULATED_AREA(const std::string &filename);
-    OPENGL_COMPONENT_TRIANGULATED_AREA(const std::string &filename,const std::string &color_map_filename);
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
+    using OPENGL_COMPONENT<T>::viewer_dir;
+    OPENGL_COMPONENT_TRIANGULATED_AREA(const VIEWER_DIR& viewer_dir,const std::string &filename);
+    OPENGL_COMPONENT_TRIANGULATED_AREA(const VIEWER_DIR& viewer_dir,const std::string &filename,const std::string &color_map_filename);
     virtual ~OPENGL_COMPONENT_TRIANGULATED_AREA();
     
-    bool Valid_Frame(int frame_input) const override;
-    void Set_Frame(int frame_input) override;
+    void Set_Frame() override;
     void Set_Draw(bool draw_input = true) override;
 
     void Display() const override;
@@ -43,7 +43,6 @@ public:
 private:
     std::string filename;
     const std::string *color_map_filename;
-    int frame_loaded;
     bool valid;
 };
 

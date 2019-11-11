@@ -54,9 +54,9 @@ Initialize()
     PHYSBAM_ASSERT(state.initialize);
     state.initialize();
 
-    if(state.restart) state.Read_Output_Files(state.restart);
+    if(state.restart) state.Read_Output_Files();
 
-    if(!state.restart) Write_Output_Files(0);
+    if(!state.restart) Write_Output_Files();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",1);
 }
 //#####################################################################
@@ -97,7 +97,7 @@ Simulate_To_Frame(const int frame)
             Advance_One_Time_Step();
             state.time=next_time;}
         if(state.end_frame) state.end_frame(current_frame);
-        Write_Output_Files(++output_number);}
+        Write_Output_Files();}
 }
 //#####################################################################
 // Function Write_Substep
@@ -108,23 +108,21 @@ Write_Substep(const std::string& title)
     state.frame_title=title;
     LOG::printf("Writing substep [%s]: output_number=%i, time=%g, frame=%i\n",
         state.frame_title,output_number+1,state.time,current_frame);
-    Write_Output_Files(++output_number);
+    Write_Output_Files();
     state.frame_title="";
 }
 //#####################################################################
 // Write_Output_Files
 //#####################################################################
 template<class TV> void SHALLOW_WATER_DRIVER<TV>::
-Write_Output_Files(const int frame)
+Write_Output_Files()
 {
     LOG::SCOPE scope("Write_Output_Files");
-    Create_Directory(state.output_directory);
-    Create_Directory(state.output_directory+LOG::sprintf("/%d",frame));
-    Create_Directory(state.output_directory+"/common");
-    Write_To_Text_File(state.output_directory+LOG::sprintf("/%d/frame_title",frame),state.frame_title);
-    state.Write_Output_Files(frame);
-    Write_To_Text_File(state.output_directory+"/common/last_frame",frame,"\n");
-    Write_To_File(state.stream_type,state.output_directory+"/common/grid",state.grid);
+    state.viewer_dir.Start_Directory(0,state.frame_title);
+    state.frame_title="";
+    if(state.viewer_dir.First_Frame())
+        Write_To_File(state.stream_type,state.viewer_dir.output_directory+"/common/grid",state.grid);
+    state.Write_Output_Files();
 
     ARRAY<T,TV_INT> h(state.U.domain);
     ARRAY<TV,TV_INT> v(state.U.domain);
@@ -133,9 +131,10 @@ Write_Output_Files(const int frame)
         T a=UU(0);
         h(it.index)=a;
         v(it.index)=UU.template Slice<1,TV::m>()/a;}
-    Write_To_File(state.stream_type,LOG::sprintf("%s/%d/centered_velocities",state.output_directory.c_str(),frame),v);
-    Write_To_File(state.stream_type,LOG::sprintf("%s/%d/heightfield",state.output_directory.c_str(),frame),h);
-    state.debug_particles.Write_Debug_Particles(state.stream_type,state.output_directory,frame);
+    Write_To_File(state.stream_type,state.viewer_dir.current_directory+"/centered_velocities",v);
+    Write_To_File(state.stream_type,state.viewer_dir.current_directory+"/heightfield",h);
+    state.debug_particles.Write_Debug_Particles(state.stream_type,state.viewer_dir);
+    state.viewer_dir.Finish_Directory();
 }
 //#####################################################################
 // Function Compute_Dt

@@ -15,7 +15,7 @@ template<class TV> SHALLOW_WATER_STATE<TV>::
 SHALLOW_WATER_STATE(const STREAM_TYPE stream_type)
     :stream_type(stream_type),ghost(3),
     last_frame(100),write_substeps_level(-1),substeps_delay_frame(-1),
-    output_directory("output"),data_directory("../../Public_Data"),use_test_output(false),
+    viewer_dir("output"),data_directory("../../Public_Data"),use_test_output(false),
     restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),cfl(1),
     shallow_water(*new SHALLOW_WATER<TV>(grid,U)),debug_particles(*new DEBUG_PARTICLES<TV>)
 {
@@ -32,24 +32,22 @@ template<class TV> SHALLOW_WATER_STATE<TV>::
 // Function Write_Output_Files
 //#####################################################################
 template<class TV> void SHALLOW_WATER_STATE<TV>::
-Write_Output_Files(const int frame)
+Write_Output_Files()
 {
-    std::string f=LOG::sprintf("%d",frame);
     if(this->use_test_output){
-        std::string file=LOG::sprintf("%s/%s-%03d.txt",output_directory.c_str(),test_output_prefix.c_str(),frame);
+        std::string file=LOG::sprintf("%s/%s-%03d.txt",viewer_dir.output_directory.c_str(),test_output_prefix.c_str(),viewer_dir.frame_stack(0));
         OCTAVE_OUTPUT<T> oo(file.c_str());}
 
-    Write_To_File(stream_type,output_directory+"/common/grid",grid);
-    Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
+    Write_To_File(stream_type,viewer_dir.output_directory+"/common/grid",grid);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/restart_data",time);
 }
 //#####################################################################
 // Function Read_Output_Files
 //#####################################################################
 template<class TV> void SHALLOW_WATER_STATE<TV>::
-Read_Output_Files(const int frame)
+Read_Output_Files()
 {
-    std::string f=LOG::sprintf("%d",frame);
-    Read_From_File(LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
+    Read_From_File(viewer_dir.current_directory+"/restart_data",time);
 }
 //#####################################################################
 namespace PhysBAM{

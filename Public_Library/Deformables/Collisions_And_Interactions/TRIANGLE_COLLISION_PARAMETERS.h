@@ -44,7 +44,6 @@ public:
     bool use_new_triangle_hierarchy,use_sort_for_new_triangle_hierarchy;
     bool perform_per_time_step_repulsions;
     bool perform_per_collision_step_repulsions;
-    bool output_interaction_pairs;
     bool perform_repulsion_pair_attractions;
     T repulsion_pair_attractions_threshold;
     bool use_gauss_jacobi;

@@ -8,9 +8,9 @@
 #ifndef __SPHERE_EXAMPLE__
 #define __SPHERE_EXAMPLE__
 
+#include "math.h"
 #include <fstream>
 #include <iostream>
-#include "math.h"
 
 #include <Core/Math_Tools/RANGE.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
@@ -46,7 +46,7 @@ public:
     typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
     typedef VECTOR<bool,2*TV::m> T_FACE_VECTOR_BOOL;
 
-    using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::viewer_dir;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::solid_body_collection;using BASE::stream_type;
     using BASE::data_directory;using BASE::test_number;using BASE::resolution;using BASE::solids_evolution;
     using BASE::user_last_frame;
@@ -174,16 +174,16 @@ public:
             solid_initial_position=TV((T).65,(T).11,(T)0);}
 
         if(!this->user_output_directory){
-            if(timesplit) output_directory=LOG::sprintf("Sphere_Example/Test_%d__Resolution_%d_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),
+            if(timesplit) viewer_dir.output_directory=LOG::sprintf("Sphere_Example/Test_%d__Resolution_%d_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),
                 (fluids_parameters.grid->counts.y),(fluids_parameters.grid->counts.z));
-            else output_directory=LOG::sprintf("Sphere_Example/Test_%d__Resolution_%d_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y),
+            else viewer_dir.output_directory=LOG::sprintf("Sphere_Example/Test_%d__Resolution_%d_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y),
                 (fluids_parameters.grid->counts.z));
-            if(eno_scheme==2) output_directory+="_density_weighted";
-            else if(eno_scheme==3) output_directory+="_velocity_weighted";
-            if(use_slip) output_directory+="_slip";
-            if(transition_to_incompressible) output_directory+="_transition_incompressible";
-            if(use_fixed_farfield_boundary) output_directory+="_fixedFF";
-            output_directory+=LOG::sprintf("_mass_%f",solid_mass);}
+            if(eno_scheme==2) viewer_dir.output_directory+="_density_weighted";
+            else if(eno_scheme==3) viewer_dir.output_directory+="_velocity_weighted";
+            if(use_slip) viewer_dir.output_directory+="_slip";
+            if(transition_to_incompressible) viewer_dir.output_directory+="_transition_incompressible";
+            if(use_fixed_farfield_boundary) viewer_dir.output_directory+="_fixedFF";
+            viewer_dir.output_directory+=LOG::sprintf("_mass_%f",solid_mass);}
 
         state_inside=TV_DIMENSION((T)1,(T)0,(T)0,(T)0,(T)1);
         state_outside=TV_DIMENSION((T).125,(T)0,(T)0,(T)0,(T).1);

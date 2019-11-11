@@ -10,9 +10,9 @@
 #include <Geometry/Spatial_Acceleration/PARTICLE_HIERARCHY.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
+#include "FLUID_LAYOUT_FEM.h"
 #include <list>
 #include <map>
-#include "FLUID_LAYOUT_FEM.h"
 
 namespace PhysBAM{
 //#####################################################################
@@ -765,14 +765,14 @@ Dump_Dofs() const
         std::string s=LOG::sprintf("%i",vel_edge_dofs(i));
         BLOCK_ID bid=edge_blocks(i);
         Add_Debug_Text(p,s,colors[Value(bid)%2]);}
-    Flush_Frame<TV>("vel dofs");
+    Flush_Frame("vel dofs");
 
     Dump_Mesh();
     for(PARTICLE_ID i(0);i<Number_Particles();i++){
         if(pressure_dofs(i)<DOF_ID()) continue;
         std::string s=LOG::sprintf("%i",pressure_dofs(i));
         Add_Debug_Text(X(i),s,colors[Value(node_blocks(i))%2]);}
-    Flush_Frame<TV>("pressure dofs");
+    Flush_Frame("pressure dofs");
 }
 //#####################################################################
 // Function Dump_Layout

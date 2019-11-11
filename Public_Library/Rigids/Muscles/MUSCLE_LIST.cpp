@@ -2,6 +2,7 @@
 // Copyright 2005-2007, Kevin Der, Eran Guendelman, Eftychios Sifakis.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Rigids/Muscles/ATTACHMENT_POINT.h>
 #include <Rigids/Muscles/MUSCLE_LIST.h>
@@ -38,11 +39,11 @@ Initialize_Muscle_Attachments_On_Rigid_Body()
 // Function Read
 //#####################################################################
 template<class TV> void MUSCLE_LIST<TV>::
-Read(const std::string& directory,const int frame)
+Read(const VIEWER_DIR& viewer_dir)
 {
     Clean_Memory();
     FILE_ISTREAM input;
-    Safe_Open_Input(input,LOG::sprintf("%s/%d/muscle_states",directory.c_str(),frame));
+    Safe_Open_Input(input,viewer_dir.current_directory+"/muscle_states");
     int num_muscles;Read_Binary(input,num_muscles);//muscles.Resize(num_muscles);
     for(int i=0;i<num_muscles;i++){
         MUSCLE<TV>* muscle=new MUSCLE<TV>(muscle_force_curve);
@@ -53,10 +54,10 @@ Read(const std::string& directory,const int frame)
 // Function Write
 //#####################################################################
 template<class TV> void MUSCLE_LIST<TV>::
-Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame) const
+Write(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir) const
 {
     FILE_OSTREAM output;
-    Safe_Open_Output(output,stream_type,LOG::sprintf("%s/%d/muscle_states",directory.c_str(),frame));
+    Safe_Open_Output(output,stream_type,viewer_dir.current_directory+"/muscle_states");
     Write_Binary(output,muscles.m);
     for(int i=0;i<muscles.m;i++) Write_Binary(output,*muscles(i));
 }

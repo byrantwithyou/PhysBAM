@@ -66,12 +66,6 @@ inline std::string Number_To_String(const int i)
 std::string Find_First_Nonexistent_File_In_Sequence(std::string filename_pattern,const int id_start=0,int* id_result=0);
 std::string Find_First_Nonexistent_Directory_In_Sequence(std::string directory_pattern,const int id_start=0,int* id_final=0);
 std::string Make_First_Nonexistent_Directory_In_Sequence(std::string directory_pattern,const int id_start=0,int* id_final=0);
-//###################################################################
-// Utilities for "animated" files (files with %d for frame number)
-//###################################################################
-bool Is_Animated(const std::string &filename);
-std::string Get_Frame_Filename(const std::string &filename,int frame);
-bool Frame_File_Exists(const std::string &filename,int frame);
 //#####################################################################
 // Read_From_File
 //#####################################################################

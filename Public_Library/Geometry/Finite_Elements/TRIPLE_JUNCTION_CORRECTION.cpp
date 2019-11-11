@@ -125,7 +125,7 @@ Compute_Pairwise_Data()
         if(data.trust.Contains(-1)) continue;
         Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
     }
-    Flush_Frame<TV>("trust");
+    Flush_Frame("trust");
 }
 //#####################################################################
 // Function Initialize_Pairwise_Level_Set
@@ -146,7 +146,7 @@ Initialize_Pairwise_Level_Set()
             Add_Debug_Particle(it.Location(),VECTOR<T,3>(data.trust.y==1,data.trust.Sum()==2,data.trust.x==1)/(1+(data.phi<0)));
             Debug_Particle_Set_Attribute<TV>("display_size",abs(data.phi));
             pairwise_phi(data.trust.x)(data.trust.y)(it.index)=data.phi;}}
-    Flush_Frame<TV>(__FUNCTION__);
+    Flush_Frame(__FUNCTION__);
 }
 //#####################################################################
 // Function Fill_Valid_Region_With_Exprapolation
@@ -176,14 +176,14 @@ Fill_Valid_Region_With_Exprapolation()
         Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(3)(6),VECTOR<T,3>(0,1,1));
         Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(4)(6),VECTOR<T,3>(1,0,1));
         Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(5)(6),VECTOR<T,3>(1,1,0));
-        Flush_Frame<TV>("extrap");}
+        Flush_Frame("extrap");}
     Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(3)(4),VECTOR<T,3>(1,0,0));
     Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(3)(5),VECTOR<T,3>(0,1,0));
     Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(4)(5),VECTOR<T,3>(0,0,1));
     Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(3)(6),VECTOR<T,3>(0,1,1));
     Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(4)(6),VECTOR<T,3>(1,0,1));
     Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(5)(6),VECTOR<T,3>(1,1,0));
-    Flush_Frame<TV>("after extrap");
+    Flush_Frame("after extrap");
 }
 //#####################################################################
 // Function Meet_Phi
@@ -312,7 +312,7 @@ One_Step_Triple_Junction_Correction()
                                     if(abs(p01)<abs(pp(0))) p01=pp(0)/div;
                                     if(abs(p02)<abs(pp(1))) p02=pp(1)/div;
                                     if(abs(p12)<abs(pp(2))) p12=pp(2)/div;}}}
-    Flush_Frame<TV>("start");
+    Flush_Frame("start");
 
     for(typename HASHTABLE<TRIPLE<int,int,TV_INT>,T>::ITERATOR it(total_size);it.Valid();it.Next())
         pairwise_phi(it.Key().x)(it.Key().y)(it.Key().z)-=it.Data();
@@ -322,7 +322,7 @@ One_Step_Triple_Junction_Correction()
     Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(3)(6),VECTOR<T,3>(0,1,1));
     Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(4)(6),VECTOR<T,3>(1,0,1));
     Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(5)(6),VECTOR<T,3>(1,1,0));
-    Flush_Frame<TV>(__FUNCTION__);
+    Flush_Frame(__FUNCTION__);
 }
 //#####################################################################
 // Function Fill_Combined_Level_Set_At_Index
@@ -406,7 +406,7 @@ Update_Color_Level_Sets()
 
     for(NODE_ITERATOR<TV> it(grid,ghost);it.Valid();it.Next())
         PHYSBAM_ASSERT(combined_color(it.index)>=0);
-    Flush_Frame<TV>(__FUNCTION__);
+    Flush_Frame(__FUNCTION__);
 }
 //#####################################################################
 // Function Cut_Interface
@@ -420,7 +420,7 @@ Cut_Interface(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data)
     Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(3)(6),VECTOR<T,3>(0,1,1));
     Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(4)(6),VECTOR<T,3>(1,0,1));
     Dump_Interface<T,TV,TV_INT>(grid,pairwise_phi(5)(6),VECTOR<T,3>(1,1,0));
-    Flush_Frame<TV>("pairwise ls");
+    Flush_Frame("pairwise ls");
 
     MARCHING_CUBES_COLOR<TV>::Initialize_Case_Table();
     const VECTOR<TV_INT,(1<<TV::m)>& bits=GRID<TV>::Binary_Counts(TV_INT());
@@ -467,7 +467,7 @@ Cut_Interface(HASHTABLE<TV_INT,CELL_ELEMENTS>& index_to_cell_data)
 
         Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
         Cut_Cell_With_Pairwise_Phi(index_to_cell_data,it.index);}
-    Flush_Frame<TV>(__FUNCTION__);
+    Flush_Frame(__FUNCTION__);
     combined_color.array-=bc_colors;
 }
 template<class TV>
@@ -640,7 +640,7 @@ Compute_Pairwise_Level_Set_Data()
             Add_Debug_Particle(it.Location(),VECTOR<T,3>(pairwise_data(it.index).trust==VECTOR<short,2>(0,1),0,1));
         Add_Debug_Particle(it.Location(),VECTOR<T,3>(p<0,p>=0,0));
         Debug_Particle_Set_Attribute<TV>("display_size",abs(p));}
-    Flush_Frame<TV>(__FUNCTION__);
+    Flush_Frame(__FUNCTION__);
 
     for(int t=0;t<20;t++)
         One_Step_Triple_Junction_Correction();

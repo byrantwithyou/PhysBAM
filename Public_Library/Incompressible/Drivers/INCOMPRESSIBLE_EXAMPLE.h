@@ -6,6 +6,7 @@
 #define __INCOMPRESSIBLE_EXAMPLE__
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Grid_PDE/Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
 #include <Grid_PDE/Boundaries/BOUNDARY.h>
@@ -32,7 +33,7 @@ public:
     bool write_debug_data;
     bool analytic_test;
     int order;
-    std::string output_directory;
+    VIEWER_DIR viewer_dir;
 
     int number_of_ghost_cells;
     T cfl;
@@ -56,8 +57,8 @@ public:
     T Time_At_Frame(const int frame) const
     {return frame/frame_rate;}
 
-    virtual void Write_Output_Files(const int frame);
-    virtual void Read_Output_Files(const int frame);
+    virtual void Write_Output_Files();
+    virtual void Read_Output_Files();
     virtual void Initialize_Fields()=0;
     virtual void Initialize_Confinement() {}
     virtual void Get_Scalar_Field_Sources(const T time)=0;

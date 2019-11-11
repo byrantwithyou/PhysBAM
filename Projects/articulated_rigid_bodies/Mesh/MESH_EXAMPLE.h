@@ -22,8 +22,8 @@ class MESH_EXAMPLE:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 public:
     typedef T_input T;
     typedef VECTOR<T,3> TV;typedef SOLIDS_EXAMPLE<TV> BASE;
-    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::solids_parameters;
-    using BASE::write_last_frame;using BASE::data_directory;using BASE::stream_type;using BASE::solid_body_collection;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::viewer_dir;using BASE::solids_parameters;
+    using BASE::data_directory;using BASE::stream_type;using BASE::solid_body_collection;
     using BASE::Set_External_Velocities; // silence -Woverloaded-virtual
     using BASE::user_last_frame;
     
@@ -47,7 +47,7 @@ public:
         increment=0;
         tests.data_directory=data_directory;
         if(!this->user_output_directory)
-            output_directory="Mesh/output";
+            viewer_dir.output_directory="Mesh/output";
     }
 
     virtual ~MESH_EXAMPLE()

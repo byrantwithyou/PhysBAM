@@ -11,6 +11,7 @@
 #include <Incompressible/Grid_Based_Fields/DENSITY_CONTAINER.h>
 #include <Incompressible/Grid_Based_Fields/TEMPERATURE_CONTAINER.h>
 namespace PhysBAM{
+class VIEWER_DIR;
 
 template<class TV>
 class INCOMPRESSIBLE_FLUID_COLLECTION
@@ -30,8 +31,8 @@ public:
     ~INCOMPRESSIBLE_FLUID_COLLECTION();
 
 //#####################################################################
-    void Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const;
-    void Read_Output_Files(const std::string& output_directory,const int frame);
+    void Write_Output_Files(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir) const;
+    void Read_Output_Files(const VIEWER_DIR& viewer_dir);
     void Initialize_Grids();
 //#####################################################################
 };

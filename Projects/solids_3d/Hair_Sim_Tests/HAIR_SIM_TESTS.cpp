@@ -55,7 +55,7 @@ HAIR_SIM_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
 {
     parse_args.Add("-hairsim",&sim_folder,"dir","the hair sime to run");
     parse_args.Add("-modelname",&rigid_model,"file","the rigid model to bind to");
-    parse_args.Add("-guide",&guide_sim_folder,"dir","the guide hair sim to read from");
+    parse_args.Add("-guide",&guide_viewer_dir.output_directory,"dir","the guide hair sim to read from");
     parse_args.Add("-params",&param_file,"file","parameter file");
     parse_args.Parse();
 
@@ -69,7 +69,7 @@ HAIR_SIM_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parameter_list.Begin_Parse(parameter_file);
     std::string test_name=parameter_list.Get_Parameter("test_name",(std::string)"Test");
     if(!this->user_output_directory)
-            output_directory=LOG::sprintf("Hair_Sim_Tests/%s_%d",test_name.c_str(),test_number);
+            viewer_dir.output_directory=LOG::sprintf("Hair_Sim_Tests/%s_%d",test_name.c_str(),test_number);
     use_wind=parameter_list.Get_Parameter("use_wind",(bool)false);
     use_drag=parameter_list.Get_Parameter("use_drag",(bool)false);
     drag_viscosity=parameter_list.Get_Parameter("drag_viscosity",(T)5);
@@ -120,7 +120,7 @@ HAIR_SIM_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parameter_list.End_Parse();
     LOG::cout<<"Parameters were"<<std::endl;
     parameter_list.Write(LOG::cout);
-    parameter_list.Write(output_directory+"/parameters");
+    parameter_list.Write(viewer_dir.output_directory+"/parameters");
 
     // frame rates and level set sampling rate
     levelset_frequency=(T)1/levelset_frame_rate;
@@ -171,7 +171,7 @@ Initialize_Bodies()
         if(!user_last_frame) last_frame=1000;}
 
     // give mon hints
-    LOG::cout<<"MONITOR output_directory="<<(Get_Working_Directory()+"/"+output_directory)<<std::endl;
+    LOG::cout<<"MONITOR viewer_dir.output_directory="<<(Get_Working_Directory()+"/"+viewer_dir.output_directory)<<std::endl;
     LOG::cout<<"MONITOR end_frame="<<last_frame<<std::endl;
     if(cameras!=""){
         LOG::cout<<"MONITOR gl="<<cameras<<std::endl;
@@ -243,12 +243,14 @@ Initialize_Bodies()
     
     //fake deformable object for guide hairs
     offset=particles.Size();
-    if(!guide_sim_folder.empty()) {
+    if(!guide_viewer_dir.output_directory.empty()) {
         COLLISION_BODY_COLLECTION<TV> guide_list;
         guide_object1=new DEFORMABLE_BODY_COLLECTION<TV>(0,&guide_list);
         guide_object2=new DEFORMABLE_BODY_COLLECTION<TV>(0,&guide_list);
-        guide_object1->Read(guide_sim_folder+"/",guide_sim_folder+"/",0,-1,1,solids_parameters.write_from_every_process);
-        guide_object2->Read(guide_sim_folder+"/",guide_sim_folder+"/",1,-1,0,solids_parameters.write_from_every_process);
+        guide_viewer_dir.Find_Next_Directory(0);
+        guide_object1->Read(viewer_dir,true);
+        guide_viewer_dir.Find_Next_Directory(0);
+        guide_object2->Read(viewer_dir,true);
         SEGMENTED_CURVE<TV>& guide_edges=guide_object1->template Find_Structure<SEGMENTED_CURVE<TV>&>(0);
         particles.Add_Elements(guide_edges.particles.Size());
         for(int i=0;i<guide_edges.mesh.elements.m;i++){sim_guide_edges.mesh.elements.Append(guide_edges.mesh.elements(i)+VECTOR<int,2>(offset,offset));}
@@ -383,8 +385,8 @@ Initialize_Bodies()
         segment_adhesion=new SEGMENT_ADHESION<TV>(particles,edges.mesh,particle_to_spring_id,solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.intersecting_edge_edge_pairs);
         segment_adhesion->Set_Parameters(adhesion_stiffness,(T)10,adhesion_start_radius,adhesion_stop_radius,max_connections);
         solid_body_collection.Add_Force(segment_adhesion);
-        if(restart) segment_adhesion->Read_State(output_directory+LOG::sprintf("/adhesion.%d",restart_frame));
-        else segment_adhesion->Write_State(stream_type,output_directory+"/adhesion.0");}
+        if(restart) segment_adhesion->Read_State(viewer_dir.output_directory+LOG::sprintf("/adhesion.%d",restart_frame));
+        else segment_adhesion->Write_State(stream_type,viewer_dir.output_directory+"/adhesion.0");}
     // drag forces
     ETHER_DRAG<TV>* ether_drag=new ETHER_DRAG<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,&active_particles,NULL);
     solid_body_collection.Add_Force(ether_drag);
@@ -449,7 +451,7 @@ Initialize_Bodies()
     // ignore collisions on nodes that start inside
     for(int i=0;i<fixed_nodes.m;i++) deformable_body_collection.collisions.ignored_nodes.Append(fixed_nodes(i));
     if(restart)
-        Read_From_File(output_directory+"/ignored_nodes",deformable_body_collection.collisions.ignored_nodes);
+        Read_From_File(viewer_dir.output_directory+"/ignored_nodes",deformable_body_collection.collisions.ignored_nodes);
     else{
         /*for(int i=0;i<edges.mesh.elements.m;i++) {
             const VECTOR<int,2> &nodes=edges.mesh.elements(i);
@@ -460,7 +462,7 @@ Initialize_Bodies()
         for(int i=deformable_body_collection.collisions.ignored_nodes.m;i>1;i--) if(deformable_body_collection.collisions.ignored_nodes(i)==deformable_body_collection.collisions.ignored_nodes(i-1)) deformable_body_collection.collisions.ignored_nodes.Remove_Index_Lazy(i);*/
         for(int i=0;i<particles.Size();i++) 
             if(implicit_rigid_body->Implicit_Geometry_Lazy_Inside(particles.X(i))) deformable_body_collection.collisions.ignored_nodes.Append(i);
-        Write_To_File(stream_type,output_directory+"/ignored_nodes",deformable_body_collection.collisions.ignored_nodes);}
+        Write_To_File(stream_type,viewer_dir.output_directory+"/ignored_nodes",deformable_body_collection.collisions.ignored_nodes);}
 
     comparator=new COLLISION_PAIR_COMPARATOR(&solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry,implicit_rigid_body);
     //comb
@@ -477,7 +479,7 @@ Initialize_Bodies()
         sphere.Is_Kinematic()=true;}
         
     //guide forces (head is needed)
-    if (use_spring_guide&&!guide_sim_folder.empty()){
+    if (use_spring_guide&&!guide_viewer_dir.output_directory.empty()){
         ARRAY<int,HAIR_ID> roots(number_of_hairs);
         ARRAY<ARRAY<int>,HAIR_ID> hairs(next_segment_id);
         for(int p=0;p<particles.Size();p++) hairs(particle_to_spring_id(p)).Append(p);
@@ -490,7 +492,7 @@ Initialize_Bodies()
         guide_adhesion=new GUIDE_ADHESION<TV>(particles,edges.mesh,sim_guide_edges.mesh,particle_to_spring_id,roots);
         guide_adhesion->Set_Parameters(guide_stiffness,(T)10,guide_thickness,max_connections);
         guide_adhesion->Update_Springs(true);
-        guide_adhesion->Write_State(stream_type,output_directory+"/adhesion.0");
+        guide_adhesion->Write_State(stream_type,viewer_dir.output_directory+"/adhesion.0");
         solid_body_collection.Add_Force(guide_adhesion);
     }
     //hairs
@@ -555,7 +557,7 @@ Initialize_Bodies()
 
     // setup segment adhesion for partitions (be it single threaded  or not)
     // i.e. build local and boundary meshes and other mpi stuff for adhesion
-    if(segment_adhesion) segment_adhesion->Update_Partitions(restart,solid_body_collection.deformable_body_collection.mpi_solids,output_directory);
+    if(segment_adhesion) segment_adhesion->Update_Partitions(restart,solid_body_collection.deformable_body_collection.mpi_solids,viewer_dir);
         
     // initial projection rest lengths (needs to happen after MPI restriction)
     project_restlengths.Resize(project_mesh.elements.m);
@@ -644,7 +646,8 @@ Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_p
         T alpha=frame-(T)(int)frame;
         if(frame>current_frame){
             guide_object1=guide_object2;
-            guide_object2->Read(guide_sim_folder+"/",guide_sim_folder+"/",++current_frame,-1,0,solids_parameters.write_from_every_process);}
+            guide_viewer_dir.Find_Next_Directory(0);
+            guide_object2->Read(guide_viewer_dir,false);}
         if(guide_object1) for (int i=1;i<=guide_object1->particles.Size();i++) {V(offset+i)=(1-alpha)*guide_object1->particles.V(i)+alpha*guide_object2->particles.V(i);}}
 }
 //#####################################################################
@@ -667,7 +670,8 @@ Set_External_Positions(ARRAY_VIEW<TV> X,const T time)
         T alpha=frame-(T)(int)frame;
         if(frame>current_frame){
             guide_object1=guide_object2;
-            guide_object2->Read(guide_sim_folder+"/",guide_sim_folder+"/",++current_frame,-1,false,solids_parameters.write_from_every_process);}
+            guide_viewer_dir.Find_Next_Directory(0);
+            guide_object2->Read(guide_viewer_dir,false);}
         if(guide_object1) for (int i=1;i<=guide_object1->particles.Size();i++) {X(offset+i)=(1-alpha)*guide_object1->particles.X(i)+alpha*guide_object2->particles.X(i);}}
 }
 //#####################################################################
@@ -787,9 +791,9 @@ template<class T_input> void HAIR_SIM_TESTS<T_input>::
 Postprocess_Frame(const int frame)
 {
     if (frame/frame_rate>=start_time) solids_parameters.triangle_collision_parameters.temporary_enable_collisions=solids_parameters.triangle_collision_parameters.perform_self_collision;
-    //Write_Output_Files(frame);
-    if(segment_adhesion) segment_adhesion->Write_State(stream_type,output_directory+LOG::sprintf("/adhesion.%d",frame));
-    if(guide_adhesion) guide_adhesion->Write_State(stream_type,output_directory+LOG::sprintf("/adhesion.%d",frame));
+    //Write_Output_Files();
+    if(segment_adhesion) segment_adhesion->Write_State(stream_type,viewer_dir.output_directory+LOG::sprintf("/adhesion.%d",frame));
+    if(guide_adhesion) guide_adhesion->Write_State(stream_type,viewer_dir.output_directory+LOG::sprintf("/adhesion.%d",frame));
 }
 //#####################################################################
 // Function Add_External_Impulses_Before
@@ -873,7 +877,7 @@ Add_External_Impulses_Helper(ARRAY_VIEW<TV> V,const T time,const T dt,bool use_m
 // Function Write_Output_Files
 //#####################################################################
 template<class T_input> template<class T_IMPLICIT_COMBINED> void HAIR_SIM_TESTS<T_input>::
-Write_Interpolated_Level_Set(const int frame,T_IMPLICIT_COMBINED& combined) const
+Write_Interpolated_Level_Set(const VIEWER_DIR& viewer_dir,T_IMPLICIT_COMBINED& combined) const
 {
     if(write_substeps_level){
         LEVELSET_IMPLICIT_OBJECT<TV> *levelset=(LEVELSET_IMPLICIT_OBJECT<TV>*)combined.implicit_object1;
@@ -881,22 +885,22 @@ Write_Interpolated_Level_Set(const int frame,T_IMPLICIT_COMBINED& combined) cons
         ARRAY<T,VECTOR<int,3> > phi(grid.Domain_Indices());
         for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int ij=0;ij<grid.counts.z;ij++) phi(i,j,ij)=combined(grid.X(TV_INT(i,j,ij)));
         LEVELSET<TV> interpolated_levelset(grid,phi);
-        Write_To_File(stream_type,LOG::sprintf("%s/grid.%d",output_directory.c_str(),frame),grid);
-        Write_To_File(stream_type,LOG::sprintf("%s/levelset.%d",output_directory.c_str(),frame),interpolated_levelset);}
+        Write_To_File(stream_type,viewer_dir.current_directory+"/grid",grid);
+        Write_To_File(stream_type,viewer_dir.current_directory+"/levelset",interpolated_levelset);}
     else{
-        Write_To_File(stream_type,LOG::sprintf("%s/grid.%d",output_directory.c_str(),frame),((LEVELSET_IMPLICIT_OBJECT<TV>*)combined.implicit_object1)->levelset.grid);
-        Write_To_File(stream_type,LOG::sprintf("%s/levelset.%d",output_directory.c_str(),frame),((LEVELSET_IMPLICIT_OBJECT<TV>*)combined.implicit_object1)->levelset);}
+        Write_To_File(stream_type,viewer_dir.current_directory+"/grid",((LEVELSET_IMPLICIT_OBJECT<TV>*)combined.implicit_object1)->levelset.grid);
+        Write_To_File(stream_type,viewer_dir.current_directory+"/levelset",((LEVELSET_IMPLICIT_OBJECT<TV>*)combined.implicit_object1)->levelset);}
 }
 template<class T_input> void HAIR_SIM_TESTS<T_input>::
-Write_Output_Files(const int frame) const
+Write_Output_Files() const
 {
-    BASE::Write_Output_Files(frame);
-    if(segment_adhesion) segment_adhesion->Write_State(stream_type,output_directory+LOG::sprintf("/adhesion.%d",frame));
-    if(guide_adhesion) guide_adhesion->Write_State(stream_type,output_directory+LOG::sprintf("/adhesion.%d",frame));
+    BASE::Write_Output_Files();
+    if(segment_adhesion) segment_adhesion->Write_State(stream_type,viewer_dir.current_directory+"/adhesion");
+    if(guide_adhesion) guide_adhesion->Write_State(stream_type,viewer_dir.current_directory+"/adhesion");
     if(use_deforming_levelsets){
-        if(use_eulerian_level_set_interpolation) Write_Interpolated_Level_Set(frame,
+        if(use_eulerian_level_set_interpolation) Write_Interpolated_Level_Set(viewer_dir,
             ((IMPLICIT_OBJECT_COMBINED_EULERIAN<TV>&)*((IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*)implicit_rigid_body->implicit_object)->object_space_implicit_object));
-        else if(use_eulerian_level_set_interpolation) Write_Interpolated_Level_Set(frame,
+        else if(use_eulerian_level_set_interpolation) Write_Interpolated_Level_Set(viewer_dir,
             ((IMPLICIT_OBJECT_COMBINED<TV>&)*((IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*)implicit_rigid_body->implicit_object)->object_space_implicit_object));
     }
 }

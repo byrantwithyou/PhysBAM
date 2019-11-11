@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <OpenGL/OpenGL/OPENGL_MATERIAL.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_HEIGHTFIELD_2D.h>
 using namespace PhysBAM;
@@ -10,12 +11,12 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_HEIGHTFIELD_2D<T>::
-OPENGL_COMPONENT_HEIGHTFIELD_2D(const GRID<TV2> &grid_input, 
+OPENGL_COMPONENT_HEIGHTFIELD_2D(const VIEWER_DIR& viewer_dir,const GRID<TV2> &grid_input, 
                                 const std::string& height_filename_input,
                                 const std::string& xz_filename_input,
                                 const std::string& uv_filename_input,
                                 int m_start_input,int m_end_input,int n_start_input,int n_end_input)
-    :OPENGL_COMPONENT<T>("Heightfield 2D"), 
+    :OPENGL_COMPONENT<T>(viewer_dir,"Heightfield 2D"), 
     triangulated_surface(*TRIANGULATED_SURFACE<T>::Create()),
     opengl_triangulated_surface(triangulated_surface,false,OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Cyan())),
     vertical_offset(0), allow_smooth_shading(true), subdivide_surface(false),
@@ -59,10 +60,6 @@ OPENGL_COMPONENT_HEIGHTFIELD_2D(const GRID<TV2> &grid_input,
         vector_locations.Resize(counts.Product());
         uv_filename=uv_filename_input;}
     else{uv=0;uv_filename="";}
-
-    is_animation = Is_Animated(height_filename);
-    frame_loaded = -1;
-
     Reinitialize();
 }
 //#####################################################################
@@ -77,20 +74,12 @@ template<class T> OPENGL_COMPONENT_HEIGHTFIELD_2D<T>::
     delete xz;
 }
 //#####################################################################
-// Function Valid_Frame
-//#####################################################################
-template<class T> bool OPENGL_COMPONENT_HEIGHTFIELD_2D<T>::
-Valid_Frame(int frame_input) const
-{
-    return File_Exists(is_animation?LOG::sprintf(height_filename.c_str(),frame_input):height_filename);
-}
-//#####################################################################
 // Function Set_Frame
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_2D<T>::
-Set_Frame(int frame_input)
+Set_Frame()
 {
-    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
+    
     Reinitialize();
 }
 //#####################################################################
@@ -173,53 +162,51 @@ Turn_Smooth_Shading_Off()
 // Function Reinitialize
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_2D<T>::
-Reinitialize(bool force)
+Reinitialize()
 {
-    if(draw){
-        if(force || (is_animation && frame_loaded != frame) || (!is_animation && frame_loaded < 0)){
-            bool success = true;
-            valid = false;
+    if(!draw) return;
+    bool success = true;
+    valid = false;
 
-            if(success && !grid_filename.empty()){
-                std::string filename=Get_Frame_Filename(grid_filename,frame);
-                if(File_Exists(filename)){
-                    Read_From_File(filename,grid);
-                    PHYSBAM_ASSERT(grid.counts.x==initial_grid.counts.x && grid.counts.y==initial_grid.counts.y);}
-                else success=false;}
+    if(success && !grid_filename.empty()){
+        std::string filename=viewer_dir.current_directory+"/"+grid_filename;
+        if(File_Exists(filename)){
+            Read_From_File(filename,grid);
+            PHYSBAM_ASSERT(grid.counts.x==initial_grid.counts.x && grid.counts.y==initial_grid.counts.y);}
+        else success=false;}
 
-            if(success){
-                std::string filename=Get_Frame_Filename(height_filename,frame);
-                if(File_Exists(filename)){
-                    Read_From_File(filename,height);
-                    if(!height.Size().All_Greater_Equal(counts)) success = false;}
-                else success=false;}
+    if(success){
+        std::string filename=viewer_dir.current_directory+"/"+height_filename;
+        if(File_Exists(filename)){
+            Read_From_File(filename,height);
+            if(!height.Size().All_Greater_Equal(counts)) success = false;}
+        else success=false;}
 
-            if(success && xz){
-                std::string filename=Get_Frame_Filename(xz_filename,frame);
-                if(File_Exists(filename)){
-                    Read_From_File(filename,*xz);
-                    if(!xz->Size().All_Greater_Equal(counts)) success = false;}
-                else success=false;}
+    if(success && xz){
+        std::string filename=viewer_dir.current_directory+"/"+xz_filename;
+        if(File_Exists(filename)){
+            Read_From_File(filename,*xz);
+            if(!xz->Size().All_Greater_Equal(counts)) success = false;}
+        else success=false;}
 
-            if(success && draw_velocities && uv_filename.length()){
-                std::string filename=Get_Frame_Filename(uv_filename,frame);
-                if(File_Exists(filename)){
-                    Read_From_File(filename,*uv);
-                    if(!uv->Size().All_Greater_Equal(counts))
-                        success = false;
-                    else{
-                        int idx = 0;
-                        for(int i=domain.min_corner.x;i<domain.max_corner.x;i++)for(int j=domain.min_corner.y;j<domain.max_corner.y;j++){
-                            vector_field(idx) = TV((*uv)(i,j).x,0,(*uv)(i,j).y);
-                            TV2 pt=grid.X(TV_INT2(i,j));
-                            vector_locations(idx) = TV(pt.x, scale*(height(i,j)+vertical_offset), pt.y);
-                            idx++;}}}
-                else success=false;}
+    if(success && draw_velocities && uv_filename.length()){
+        std::string filename=viewer_dir.current_directory+"/"+uv_filename;
+        if(File_Exists(filename)){
+            Read_From_File(filename,*uv);
+            if(!uv->Size().All_Greater_Equal(counts))
+                success = false;
+            else{
+                int idx = 0;
+                for(int i=domain.min_corner.x;i<domain.max_corner.x;i++)for(int j=domain.min_corner.y;j<domain.max_corner.y;j++){
+                        vector_field(idx) = TV((*uv)(i,j).x,0,(*uv)(i,j).y);
+                        TV2 pt=grid.X(TV_INT2(i,j));
+                        vector_locations(idx) = TV(pt.x, scale*(height(i,j)+vertical_offset), pt.y);
+                        idx++;}}}
+        else success=false;}
 
-            if(success){
-                Update_Surface();
-                frame_loaded = frame;
-                valid = true;}}}
+    if(success){
+        Update_Surface();
+        valid = true;}
 }
 //#####################################################################
 // Function Update_Surface
@@ -366,7 +353,7 @@ template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_2D<T>::
 Toggle_Draw_Velocities()
 {
     draw_velocities = !draw_velocities;
-    Reinitialize(true);
+    Reinitialize();
 }
 //#####################################################################
 // Function Toggle_Subdivision
@@ -375,7 +362,7 @@ template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_2D<T>::
 Toggle_Subdivision()
 {
     subdivide_surface = !subdivide_surface;
-    Reinitialize(true);
+    Reinitialize();
 }
 //#####################################################################
 // Function Selection_Bounding_Box

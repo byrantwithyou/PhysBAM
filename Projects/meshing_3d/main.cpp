@@ -27,7 +27,7 @@ int main(int argc,char **argv)
     parse_args.Parse();
 
     GENERIC_EXAMPLE<T> example(stream_type,parameter_file);
-    example.tetrahedral_meshing.output_directory=opt_out;
+    example.tetrahedral_meshing.viewer_dir.output_directory=opt_out;
     example.data_directory=opt_data;
 
     MESHING_DRIVER<T> driver(example);

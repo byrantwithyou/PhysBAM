@@ -20,12 +20,11 @@ class OPENGL_COMPONENT_TRIANGULATED_SURFACE:public OPENGL_COMPONENT<T>
     typedef VECTOR<T,3> TV;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;
-    using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
-    OPENGL_COMPONENT_TRIANGULATED_SURFACE(const std::string &filename, bool use_display_list = true);
+    using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::viewer_dir;
+    OPENGL_COMPONENT_TRIANGULATED_SURFACE(const VIEWER_DIR& viewer_dir, const std::string& filename,bool use_display_list = true);
     virtual ~OPENGL_COMPONENT_TRIANGULATED_SURFACE();
     
-    bool Valid_Frame(int frame_input) const override;
-    void Set_Frame(int frame_input) override;
+    void Set_Frame() override;
     void Set_Draw(bool draw_input = true) override;
 
     void Display() const override;
@@ -51,7 +50,6 @@ public:
 
 private:
     std::string filename;
-    int frame_loaded;
     bool valid;
     bool use_display_list;
 };

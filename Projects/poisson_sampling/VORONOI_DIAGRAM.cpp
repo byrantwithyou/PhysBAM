@@ -311,7 +311,7 @@ Visualize_State(const char* title) const
     // for(auto it:vertices)
     //     Add_Debug_Particle(it->X,color_v[it->state]);
 
-    Flush_Frame<TV>(title);
+    Flush_Frame(title);
 }
 //#####################################################################
 // Function Sanity_Checks

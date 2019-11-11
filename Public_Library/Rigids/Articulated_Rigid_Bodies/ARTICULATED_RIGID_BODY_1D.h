@@ -18,6 +18,7 @@ template<class TV> class ARTICULATED_RIGID_BODY;
 template<class TV> class MUSCLE_LIST;
 template<class TV> class RIGID_BODY;
 template<class TV> class JOINT_MESH;
+class VIEWER_DIR;
 
 template<class T>
 class ARTICULATED_RIGID_BODY<VECTOR<T,1> >
@@ -48,8 +49,8 @@ public:
     {return use_muscle_actuators || use_pd_actuators;}
 
 //#####################################################################
-    void Read(const std::string& directory,const int frame);
-    void Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame) const;
+    void Read(const VIEWER_DIR& viewer_dir);
+    void Write(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir) const;
     int Parent_Id(JOINT_ID joint_id) const;
     int Child_Id(JOINT_ID joint_id) const;
     RIGID_BODY<TV>* Parent(JOINT_ID joint_id);

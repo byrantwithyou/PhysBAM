@@ -34,7 +34,7 @@ Execute_Main_Program()
 {
     {LOG::SCOPE scope("INITIALIZING","Initializing");
     this->Initialize();
-    if(!example.restart) Write_Output_Files(0);}
+    if(!example.restart) Write_Output_Files();}
     Simulate_To_Frame(example.last_frame);
 }
 //#####################################################################
@@ -48,7 +48,7 @@ Simulate_To_Frame(const int frame_input)
         Preprocess_Frame(current_frame+1);
         Advance_To_Target_Time(example.Time_At_Frame(current_frame+1));
         Postprocess_Frame(++current_frame);
-        if(example.write_output_files && example.write_substeps_level==-1) Write_Output_Files(current_frame);
+        if(example.write_output_files && example.write_substeps_level==-1) Write_Output_Files();
         else if(example.write_substeps_level!=-1) Write_Substep(LOG::sprintf("END Frame %d",current_frame));
         LOG::cout<<"TIME = "<<time<<std::endl;}
 }

@@ -1,8 +1,8 @@
 #include <Core/Log/LOG.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
+#include "DOUBLE_ERROR.h"
 #include <sstream>
 #include <string>
-#include "DOUBLE_ERROR.h"
 
 using namespace PhysBAM;
 

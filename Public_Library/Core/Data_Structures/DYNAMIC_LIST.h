@@ -17,6 +17,7 @@
 #include <Core/Data_Structures/ELEMENT_ID.h>
 #include <Core/Data_Structures/HASHTABLE.h>
 namespace PhysBAM{
+class VIEWER_DIR;
 
 class DYNAMIC_LIST_CORE
 {
@@ -44,11 +45,11 @@ public:
 
     // Reads the set of active id's and updates the index<->id maps.
     // needs_init is filled with id's of those elements which have become newly active and need to be initialized.
-    void Read(const std::string& prefix,ARRAY<int>& needs_init);
+    void Read(const VIEWER_DIR& viewer_dir,const std::string& list_name,ARRAY<int>& needs_init);
 
     // Writes the set of active id's.
     // needs_write indicates which elements have not been written since their creation, so derived classes should write those out (and reset the needs_write list).
-    void Write(STREAM_TYPE stream_type,const std::string& prefix) const;
+    void Write(STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir,const std::string& list_name) const;
 
     void Clean_Memory();
     void Remove_All();
@@ -137,11 +138,11 @@ public:
     void Fill_Needs_Write() // all elements will be written during the next Write()
     {core.Fill_Needs_Write();}
 
-    void Read(const std::string& prefix,ARRAY<ID>& needs_init)
-    {core.Read(prefix,reinterpret_cast<ARRAY<int>&>(needs_init));}
+    void Read(const VIEWER_DIR& viewer_dir,const std::string& list_name,ARRAY<ID>& needs_init)
+    {core.Read(viewer_dir,list_name,reinterpret_cast<ARRAY<int>&>(needs_init));}
 
-    void Write(STREAM_TYPE stream_type,const std::string& prefix) const
-    {core.Write(stream_type,prefix);}
+    void Write(STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir,const std::string& list_name) const
+    {core.Write(stream_type,viewer_dir,list_name);}
 
 private:
     static T* Cast(void* pointer)

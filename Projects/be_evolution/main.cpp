@@ -9,9 +9,9 @@
 #include <Solids/Examples_And_Drivers/SOLIDS_DRIVER.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
-#include <climits>
 #include "STANDARD_TESTS.h"
 #include "STANDARD_TESTS_2D.h"
+#include <climits>
 
 using namespace PhysBAM;
 

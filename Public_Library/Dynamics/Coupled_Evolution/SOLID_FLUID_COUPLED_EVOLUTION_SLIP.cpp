@@ -6,6 +6,7 @@
 #include <Core/Log/DEBUG_SUBSTEPS.h>
 #include <Core/Log/SCOPE.h>
 #include <Core/Math_Tools/Inverse.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
@@ -427,7 +428,7 @@ Solve(ARRAY<T,FACE_INDEX<TV::m> >& incompressible_face_velocities,const T dt,con
 // Function Output_Iterators
 //#####################################################################
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>::
-Output_Iterators(const STREAM_TYPE stream_type,const char* output_directory,int frame) const
+Output_Iterators(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir) const
 {
     // This isn't so great - it means the iterator might actually be different from the one used.
     LOG::cout<<"OUTPUT ITERATORS"<<std::endl;
@@ -445,8 +446,7 @@ Output_Iterators(const STREAM_TYPE stream_type,const char* output_directory,int 
         particles.X(p)=iterator.Location();
         color_attribute(p)=VECTOR<T,3>((T).5,(T).5,1);}
 
-    Create_Directory(LOG::sprintf("%s/%i",output_directory,frame));
-    Write_To_File(stream_type,LOG::sprintf("%s/%i/collision_iterators",output_directory,frame),particles);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/collision_iterators",particles);
 }
 //#####################################################################
 // Function Make_Divergence_Free

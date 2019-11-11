@@ -5,9 +5,9 @@
 #ifndef __COMPONENT_JOINT__
 #define __COMPONENT_JOINT__
 
-#include <map>
 #include "CANONICAL_BLOCK.h"
 #include "CANONICAL_COMPONENT.h"
+#include <map>
 
 namespace PhysBAM{
 

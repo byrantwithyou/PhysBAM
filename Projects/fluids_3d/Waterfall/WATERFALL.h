@@ -25,7 +25,7 @@ class WATERFALL:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>,public BOUNDARY_OPEN_CA
     typedef ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,TV_INT> T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::data_directory;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::viewer_dir;using BASE::data_directory;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::stream_type;using BASE::solid_body_collection;using BASE::test_number;using BASE::resolution;
     using BASE::user_last_frame;
 
@@ -58,7 +58,7 @@ public:
         fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
         fluids_parameters.write_debug_data=true;
         if(!this->user_output_directory)
-            output_directory=LOG::sprintf("Waterfall/Test_%d_Waterfall_Resolution_%d_%d_%d",test_number,(fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),
+            viewer_dir.output_directory=LOG::sprintf("Waterfall/Test_%d_Waterfall_Resolution_%d_%d_%d",test_number,(fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),
             (fluids_parameters.grid->counts.z-1));
         fluids_parameters.delete_fluid_inside_objects=true;
         fluids_parameters.enforce_divergence_free_extrapolation=false;

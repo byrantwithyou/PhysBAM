@@ -184,11 +184,13 @@ int main(int argc, char* argv[])
     PNG_FILE<T>::Write(output_filename,image);
 
     if(dump_particles){
-        VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),example.grid,viewer_directory);
+        VIEWER_DIR viewer_dir(viewer_directory);
+        VIEWER_OUTPUT vo(STREAM_TYPE((RW)0),viewer_dir);
+        Use_Debug_Particles<TV>();
         for(int i=0;i<example.particles.X.m;i++)
             Add_Debug_Particle(example.particles.X(i),VECTOR<T,3>(1,0,0));
-        Flush_Frame<TV>("particles");
-        Flush_Frame<TV>("end");
+        Flush_Frame("particles");
+        Flush_Frame("end");
     }
     
     return 0;

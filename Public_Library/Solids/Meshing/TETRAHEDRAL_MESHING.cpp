@@ -39,12 +39,12 @@ TETRAHEDRAL_MESHING(const STREAM_TYPE stream_type)
     :solids_parameters(*new SOLIDS_PARAMETERS<TV>),solid_body_collection(*new SOLID_BODY_COLLECTION<TV>),
     solids_evolution(new NEWMARK_EVOLUTION<TV>(solids_parameters,solid_body_collection,*new EXAMPLE_FORCES_AND_VELOCITIES<TV>)),
     implicit_surface(0),level_set_forces_and_velocities(0),
-    stream_type(stream_type),output_directory("meshing_data"),frame(0),extra_refinement_criteria(0),dependent_nodes(0),boundary_mesh(0)
+    stream_type(stream_type),viewer_dir("meshing_data"),frame(0),extra_refinement_criteria(0),dependent_nodes(0),boundary_mesh(0)
 {
     Use_Masses_And_Springs();Set_Curvature_Subdivision_Threshold();Set_Interpolation_Error_Subdivision_Threshold();Set_Maximum_Boundary_Edge_Length();
     Set_Density();Increase_Mass_On_Boundary();Use_Dynamic_Ether_Viscosity();Use_Global_Quality_Criteria_For_Early_Exit();
     Replace_Green_Refinement_With_Embedded_T_Junctions();
-    use_constant_mass=true;solids_parameters.cfl=(T).5;solids_parameters.rigid_body_evolution_parameters.write_rigid_bodies=false;
+    use_constant_mass=true;solids_parameters.cfl=(T).5;
     solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
     symmetric_initial_grid=false;
 }
@@ -82,8 +82,8 @@ Snap_Nodes_To_Level_Set_Boundary(const int iterations)
     for(int t=0;t<mesh.boundary_nodes->m;t++) for(int k=0;k<iterations;k++){
         int node=(*mesh.boundary_nodes)(t);TV X=deformable_body_collection.particles.X(node);
         deformable_body_collection.particles.X(node)-=implicit_surface->Extended_Phi(X)*implicit_surface->Extended_Normal(X);}
-    Create_Directory(output_directory);
-    Write_Output_Files(++frame);
+    Create_Directory(viewer_dir.output_directory);
+    Write_Output_Files();
 }
 //#####################################################################
 // Function Initialize_Optimization
@@ -124,15 +124,15 @@ Initialize_Optimization(const bool verbose)
 template<class T> void TETRAHEDRAL_MESHING<T>::
 Create_Final_Mesh_With_Optimization(const int number_of_initial_steps,const int number_of_final_steps,const bool verbose)
 {
-    Write_Output_Files(frame);
+    Write_Output_Files();
     for(int i=0;i<number_of_initial_steps;i++){
         if(verbose) LOG::cout<<"Working on initial iteration "<<i<<" of "<<number_of_initial_steps<<"+"<<number_of_final_steps<<std::endl;
         Optimization_Sweep(i/(T)(i+2),verbose);
-        Write_Output_Files(++frame);}
+        Write_Output_Files();}
     for(int i=0;i<number_of_final_steps;i++){
         if(verbose) LOG::cout<<"Working on iteration "<<i<<" of "<<number_of_final_steps<<" (full step towards boundary)"<<std::endl;
         Optimization_Sweep(0,verbose);
-        Write_Output_Files(++frame);}
+        Write_Output_Files();}
 }
 //#####################################################################
 // Function Optimization_Sweep
@@ -360,13 +360,13 @@ Initialize_Dynamics()
 template<class T> void TETRAHEDRAL_MESHING<T>::
 Create_Final_Mesh_With_Dynamics(const T time_step,const int number_of_force_steps,const int number_of_velocity_steps,const bool verbose)
 {
-    Write_Output_Files(frame);
+    Write_Output_Files();
 
     // forces
     for(int k=0;k<number_of_force_steps;k++){
         Advance_Dynamics((k-1)*time_step,k*time_step,verbose);
         if(verbose) LOG::cout<<"TIME STEP = "<<k<<", TIME = "<<" "<<k*time_step<<std::endl;
-        Write_Output_Files(++frame);}
+        Write_Output_Files();}
 
     // enslaved velocities
     if(verbose) LOG::cout<<"\n\n\n SWITCHING TO SETTING EXTERNAL VELOCITIES RATHER THAN FORCES!!!\n\n"<<std::endl;
@@ -374,7 +374,7 @@ Create_Final_Mesh_With_Dynamics(const T time_step,const int number_of_force_step
     for(int k=number_of_force_steps;k<number_of_force_steps+number_of_velocity_steps;k++){
         Advance_Dynamics((k-1)*time_step,k*time_step,verbose);
         if(verbose) LOG::cout<<"TIME STEP = "<<k<<", TIME = "<<" "<<k*time_step<<std::endl;
-        Write_Output_Files(++frame);}
+        Write_Output_Files();}
 }
 //#####################################################################
 // Function Advance_Dynamics
@@ -702,24 +702,23 @@ Envelope_Interior_Nodes(ARRAY<bool>& keep_tet_flag)
 // Function Write_Output_Files
 //#####################################################################
 template<class T> void TETRAHEDRAL_MESHING<T>::
-Write_Output_Files(const int frame)
+Write_Output_Files()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-    Create_Directory(output_directory);
-    std::string f=LOG::sprintf("%d",frame);
-    Create_Directory(output_directory+"/"+f);
-    Create_Directory(output_directory+"/common");
+
+    viewer_dir.Start_Directory(0,0);
+
     // write state
-    solid_body_collection.Write(stream_type,output_directory,frame,solids_parameters.write_static_variables_every_frame,solids_parameters.rigid_body_evolution_parameters.write_rigid_bodies,
-        solids_parameters.write_deformable_body,solids_parameters.write_from_every_process,false);
-    Write_To_File(stream_type,output_directory+"/tetrahedralized_volume_"+f+".tet",tetrahedralized_volume);
+    solid_body_collection.Write(stream_type,viewer_dir,solids_parameters.write_static_variables_every_frame,
+        solids_parameters.write_from_every_process);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/tetrahedralized_volume.tet",tetrahedralized_volume);
     // write boundary mesh and bindings
     if(replace_green_refinement_with_embedded_t_junctions && frame==0){
-        Write_To_File(stream_type,output_directory+"/boundary_mesh",*boundary_mesh);
-        Write_To_File(stream_type,output_directory+"/bindings",solid_body_collection.deformable_body_collection.binding_list);}
+        Write_To_File(stream_type,viewer_dir.output_directory+"/boundary_mesh",*boundary_mesh);
+        Write_To_File(stream_type,viewer_dir.output_directory+"/bindings",solid_body_collection.deformable_body_collection.binding_list);}
     // write diagnostics
-    {std::ostream* output(Safe_Open_Output_Raw(output_directory+"/diagnostics."+f,false));
+    {std::ostream* output(Safe_Open_Output_Raw(viewer_dir.current_directory+"/diagnostics",false));
     tetrahedralized_volume.Print_Statistics(*output);
     int index;
     *output<<"max_phi = "<<tetrahedralized_volume.Maximum_Magnitude_Phi_On_Boundary(*implicit_surface,&index);*output<<" ("<<index<<")"<<std::endl;
@@ -727,7 +726,8 @@ Write_Output_Files(const int frame)
     if(linear_springs){*output<<"max_edge_compression = "<<linear_springs->Maximum_Compression_Or_Expansion_Fraction(&index);*output<<" ("<<index<<")"<<std::endl;}
     delete output;}
     // write last frame
-    Write_To_Text_File(output_directory+"/common/last_frame",frame,"\n");
+
+    viewer_dir.Finish_Directory();
 }
 //#####################################################################
 namespace PhysBAM{

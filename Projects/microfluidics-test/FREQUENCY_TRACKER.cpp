@@ -2,8 +2,8 @@
 // Copyright 2018.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <cassert>
 #include "FREQUENCY_TRACKER.h"
+#include <cassert>
 namespace PhysBAM{
 void FREQUENCY_TRACKER::Add(int id, int row)
 {

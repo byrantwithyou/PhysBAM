@@ -26,8 +26,8 @@
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS_SPLINE.h>
 #include <Hybrid_Methods/Projection/MPM_PROJECTION_SYSTEM.h>
 #include <Hybrid_Methods/Seeding/MPM_PARTICLE_SOURCE.h>
-#include <fstream>
 #include "STANDARD_TESTS_BASE.h"
+#include <fstream>
 #ifdef USE_OPENMP
 #include <omp.h>
 #endif
@@ -55,7 +55,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-substeps_delay",&substeps_delay_frame,"frame","delay substeps until after this frame");
     parse_args.Add("-last_frame",&last_frame,&user_last_frame,"frame","number of frames to simulate");
     parse_args.Add("-threads",&threads,"threads","Number of threads");
-    parse_args.Add("-o",&output_directory,&override_output_directory,"dir","Output directory");
+    parse_args.Add("-o",&viewer_dir.output_directory,&override_output_directory,"dir","Output directory");
     parse_args.Add("-framerate",&framerate,"rate","Number of frames per second");
     parse_args.Add("-frame_dt",&frame_dt,"rate","Number of frames per second");
     parse_args.Add("-min_dt",&min_dt,"dt","Minimum time step size");
@@ -424,7 +424,7 @@ Energy_Vorticity_Analysis() const
         pe_particle-=particles.mass(p)*this->gravity.Dot(particles.X(p));}
 
     if(particle_vort){
-        std::ofstream fout(LOG::sprintf("%s/pvort-%i.txt",output_directory,id).c_str());
+        std::ofstream fout(LOG::sprintf("%s/pvort-%i.txt",viewer_dir.output_directory,id).c_str());
         fout<<"vort x y\n";
         for(int p=0;p<particles.X.m;p++){
             if(!particles.valid(p)) continue;
@@ -464,12 +464,12 @@ Velocity_Fourier_Analysis() const
             ke(wrap(it.index+counts/2,TV_INT(),counts))=sqr(abs(out(it.index))/max_ke);
             bins(rint(k.Magnitude()))+=ke(it.index);}
         if(id%dump_modes_freq==0)
-            Dump_Image(LOG::sprintf("%s/modes-%i-%c.png",output_directory,id,"xyz"[a]),ke);
+            Dump_Image(LOG::sprintf("%s/modes-%i-%c.png",viewer_dir.output_directory,id,"xyz"[a]),ke);
         if(taylor_modes>0)
             for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>::Unit_Box()*2);it.Valid();it.Next())
                 total_taylor+=sqr(abs(out(wrap((it.index*2-1)*taylor_modes,TV_INT(),grid.numbers_of_cells))));
         else total_taylor+=sqr(abs(out(TV_INT())));}
-    std::ofstream fout(LOG::sprintf("%s/bins-%i.txt",output_directory,id).c_str());
+    std::ofstream fout(LOG::sprintf("%s/bins-%i.txt",viewer_dir.output_directory,id).c_str());
     for(int i=0;i<bins.m;i++)
         fout<<i<<" "<<bins(i)<<std::endl;
 
@@ -539,10 +539,10 @@ Add_Source(const TV& X0,const TV& n,IMPLICIT_OBJECT<TV>* io,
     if(owns_io) destroy.Append([io](){delete io;});
 
     static int source_id=0;
-    this->write_output_files.Append([=](int frame){
-            Write_To_File(stream_type,output_directory+LOG::sprintf("/%d/source-%d",frame,source_id),*source);});
-    this->read_output_files.Append([=](int frame){
-            Read_From_File(output_directory+LOG::sprintf("/%d/source-%d",frame,source_id),*source);});
+    this->write_output_files.Append([=](){
+            Write_To_File(stream_type,viewer_dir.current_directory+LOG::sprintf("/source-%d",source_id),*source);});
+    this->read_output_files.Append([=](){
+            Read_From_File(viewer_dir.current_directory+LOG::sprintf("/source-%d",source_id),*source);});
     source_id++;
 }
 //#####################################################################

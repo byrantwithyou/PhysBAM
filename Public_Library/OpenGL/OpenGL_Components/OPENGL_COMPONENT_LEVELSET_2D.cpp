@@ -4,6 +4,7 @@
 //#####################################################################
 #include <Core/Log/LOG.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <OpenGL/OpenGL/OPENGL_GRID_2D.h>
 #include <OpenGL/OpenGL/OPENGL_INDEXED_COLOR_MAP.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_LEVELSET_2D.h>
@@ -13,9 +14,9 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_LEVELSET_2D<T>::
-OPENGL_COMPONENT_LEVELSET_2D(const std::string& levelset_filename_input,const std::string filename_set_input)
-    :OPENGL_COMPONENT<T>("Levelset 2D"),opengl_levelset(0),levelset_filename(levelset_filename_input),filename_set(filename_set_input),
-    frame_loaded(-1),set(0),use_sets(true),set_loaded(-1),valid(false),draw_multiple_levelsets(false)
+OPENGL_COMPONENT_LEVELSET_2D(const VIEWER_DIR& viewer_dir,const std::string& levelset_filename_input,const std::string filename_set_input)
+    :OPENGL_COMPONENT<T>(viewer_dir,"Levelset 2D"),opengl_levelset(0),levelset_filename(levelset_filename_input),filename_set(filename_set_input),
+    set(0),use_sets(true),set_loaded(-1),valid(false),draw_multiple_levelsets(false)
 {
     viewer_callbacks.Set("toggle_color_mode",{[this](){Toggle_Color_Mode();},"Toggle color mode"});
     viewer_callbacks.Set("toggle_smooth",{[this](){Toggle_Smooth();},"Toggle smooth levelset draw"});
@@ -29,7 +30,7 @@ OPENGL_COMPONENT_LEVELSET_2D(const std::string& levelset_filename_input,const st
 
     int number_of_sets=0;
     while(filename_set!=""){
-        std::string filename=LOG::sprintf(filename_set.c_str(),frame,number_of_sets);
+        std::string filename=viewer_dir.current_directory+"/"+LOG::sprintf(filename_set.c_str(),number_of_sets);
         LOG::cout<<"Checking "<<filename<<std::endl;
         if(File_Exists(filename)) number_of_sets++;else break;}
     LOG::cout<<"Found "<<number_of_sets<<" levelsets for multiphase"<<std::endl;
@@ -42,7 +43,6 @@ OPENGL_COMPONENT_LEVELSET_2D(const std::string& levelset_filename_input,const st
     opengl_levelset=opengl_levelsets(0);
     delete color_map;
 
-    is_animation=Is_Animated(levelset_filename);
     Reinitialize();
 }
 //#####################################################################
@@ -58,21 +58,12 @@ template<class T> OPENGL_COMPONENT_LEVELSET_2D<T>::
         delete opengl_levelsets(j);}
 }
 //#####################################################################
-// Function Valid_Frame
-//#####################################################################
-template<class T> bool OPENGL_COMPONENT_LEVELSET_2D<T>::
-Valid_Frame(int frame_input) const
-{
-    if(use_sets) return File_Exists(LOG::sprintf(filename_set.c_str(),frame_input,set));
-    else return Frame_File_Exists(levelset_filename,frame_input);
-}
-//#####################################################################
 // Function Set_Frame
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_LEVELSET_2D<T>::
-Set_Frame(int frame_input)
+Set_Frame()
 {
-    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
+    
     Reinitialize();
 }
 //#####################################################################
@@ -110,11 +101,10 @@ template<class T> void OPENGL_COMPONENT_LEVELSET_2D<T>::
 Print_Cell_Selection_Info(std::ostream& stream,const TV_INT& cell) const
 {
     if(!valid) return;
-    if(Is_Up_To_Date(frame)){
-        if(opengl_levelsets(0)->levelset.grid.Is_MAC_Grid()){
-            for(int i=0;i<opengl_levelsets.m;i++) 
-                stream<<component_name<<": phi["<<i<<"]="<<opengl_levelsets(i)->levelset.phi(cell)
-                             <<" curvature["<<i<<"]="<<opengl_levelsets(i)->levelset.Compute_Curvature(opengl_levelsets(i)->levelset.grid.Center(cell))<<std::endl;}}
+    if(opengl_levelsets(0)->levelset.grid.Is_MAC_Grid()){
+        for(int i=0;i<opengl_levelsets.m;i++) 
+            stream<<component_name<<": phi["<<i<<"]="<<opengl_levelsets(i)->levelset.phi(cell)
+                  <<" curvature["<<i<<"]="<<opengl_levelsets(i)->levelset.Compute_Curvature(opengl_levelsets(i)->levelset.grid.Center(cell))<<std::endl;}
         // if(current_selection && current_selection->type==OPENGL_SELECTION::COMPONENT_PARTICLES_2D){
         //     OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T> *selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>*)current_selection;
         //     VECTOR<T,2> location=selection->location;
@@ -128,32 +118,34 @@ template<class T> void OPENGL_COMPONENT_LEVELSET_2D<T>::
 Print_Node_Selection_Info(std::ostream& stream,const TV_INT& node) const
 {
     if(!valid) return;
-    if(Is_Up_To_Date(frame)){
-        if(!opengl_levelsets(0)->levelset.grid.Is_MAC_Grid()){
-            for(int i=0;i<opengl_levelsets.m;i++) 
-                stream<<component_name<<": phi["<<i<<"]="<<opengl_levelsets(i)->levelset.phi(node)<<std::endl;}}
+    if(!opengl_levelsets(0)->levelset.grid.Is_MAC_Grid()){
+        for(int i=0;i<opengl_levelsets.m;i++) 
+            stream<<component_name<<": phi["<<i<<"]="<<opengl_levelsets(i)->levelset.phi(node)<<std::endl;}
 }
 //#####################################################################
 // Function Reinitialize
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_LEVELSET_2D<T>::
-Reinitialize(const bool force_even_if_not_drawn)
+Reinitialize()
 {
-    if(draw||force_even_if_not_drawn){
-        if((is_animation && (frame_loaded!=frame || set_loaded!=set)) || (!is_animation && frame_loaded<0)){
-            valid=false;std::string filename;
-            if(use_sets)
-                for(int i=0;i<opengl_levelsets.m;i++){
-                    filename=LOG::sprintf(filename_set.c_str(),frame,i);
-                    if(File_Exists(filename)) Read_From_File(filename.c_str(),opengl_levelsets(i)->levelset);
-                    else return;
-                    opengl_levelsets(i)->Update();}
-            else{
-                filename=Get_Frame_Filename(levelset_filename,frame);
-                if(File_Exists(filename)) Read_From_File(filename.c_str(),opengl_levelset->levelset);
-                else return;
-                opengl_levelset->Update();}
-            frame_loaded=frame;set_loaded=set;valid=true;}}
+    if(!draw) return;
+    valid=false;
+    std::string filename;
+    if(use_sets)
+        for(int i=0;i<opengl_levelsets.m;i++){
+            filename=viewer_dir.current_directory+"/"+LOG::sprintf(filename_set.c_str(),i);
+            if(File_Exists(filename))
+                Read_From_File(filename.c_str(),opengl_levelsets(i)->levelset);
+            else return;
+            opengl_levelsets(i)->Update();}
+    else{
+        filename=viewer_dir.current_directory+"/"+levelset_filename;
+        if(File_Exists(filename))
+            Read_From_File(filename.c_str(),opengl_levelset->levelset);
+        else return;
+        opengl_levelset->Update();}
+    set_loaded=set;
+    valid=true;
 }
 //#####################################################################
 // Function Toggle_Color_Mode

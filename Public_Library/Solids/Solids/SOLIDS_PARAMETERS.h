@@ -25,7 +25,6 @@ public:
     RIGID_BODY_COLLISION_PARAMETERS<TV>& rigid_body_collision_parameters;
     RIGID_BODY_EVOLUTION_PARAMETERS<TV>& rigid_body_evolution_parameters;
     DEFORMABLE_OBJECT_COLLISION_PARAMETERS<TV>& deformable_object_collision_parameters;
-    bool write_deformable_body;
     bool verbose,verbose_dt;
     T cfl;
     bool fracture;

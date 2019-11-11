@@ -17,8 +17,8 @@ namespace PhysBAM{
 // OPENGL_FACE_SCALAR_FIELD_3D
 //#####################################################################
 template<class T,class T2> OPENGL_FACE_SCALAR_FIELD_3D<T,T2>::
-OPENGL_FACE_SCALAR_FIELD_3D(const GRID<TV> &grid_input,ARRAY<T2,FACE_INDEX<3> > &face_values_input,OPENGL_COLOR_MAP<T2> *color_map_input)
-    :grid(grid_input),face_values(face_values_input),
+OPENGL_FACE_SCALAR_FIELD_3D(const GRID<TV> &grid_input,ARRAY<T2,FACE_INDEX<3> > &face_values_input,bool& face_values_valid,OPENGL_COLOR_MAP<T2> *color_map_input)
+    :grid(grid_input),face_values(face_values_input),face_values_valid(face_values_valid),
     color_map(color_map_input),opengl_points(*new ARRAY<TV>)
 {
     PHYSBAM_ASSERT(color_map);
@@ -38,6 +38,7 @@ template<class T,class T2> OPENGL_FACE_SCALAR_FIELD_3D<T,T2>::
 template<class T,class T2> void OPENGL_FACE_SCALAR_FIELD_3D<T,T2>::
 Display() const
 {
+    if(!face_values_valid) return;
     if(face_values.Component(0).domain.Empty()) return;
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
@@ -59,6 +60,7 @@ Bounding_Box() const
 template<class T,class T2> void OPENGL_FACE_SCALAR_FIELD_3D<T,T2>::
 Update()
 {
+    if(!face_values_valid) return;
     OPENGL_UNIFORM_SLICE<T>* slice=(OPENGL_UNIFORM_SLICE<T>*)this->slice;
     opengl_points.points.Remove_All();
     opengl_points.Store_Point_Colors(true);
@@ -84,6 +86,7 @@ Bool_Update_Helper(OPENGL_FACE_SCALAR_FIELD_3D<T,bool>& self)
 template<> void OPENGL_FACE_SCALAR_FIELD_3D<float,bool>::
 Update()
 {
+    if(!face_values_valid) return;
     Bool_Update_Helper(*this);
 }
 //#####################################################################
@@ -92,6 +95,7 @@ Update()
 template<> void OPENGL_FACE_SCALAR_FIELD_3D<double,bool>::
 Update()
 {
+    if(!face_values_valid) return;
     Bool_Update_Helper(*this);
 }
 //#####################################################################
@@ -108,6 +112,7 @@ Slice_Has_Changed()
 template<class T,class T2> void OPENGL_FACE_SCALAR_FIELD_3D<T,T2>::
 Print_Selection_Info(std::ostream& output_stream) const
 {
+    if(!face_values_valid) return;
     // TODO: this should also interpolate to particles
     if(selected_index.x>=0 && grid.Is_MAC_Grid()){
         FACE_INDEX<TV::m> ix(0,selected_index),iy(1,selected_index),iz(2,selected_index);

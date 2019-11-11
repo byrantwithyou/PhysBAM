@@ -16,6 +16,7 @@ namespace PhysBAM{
 
 template<class TV> class RIGID_SLENDER_ROD_PARTICLES;
 template<class TV> class SLENDER_ROD_FORCES;
+class VIEWER_DIR;
 
 template<class TV>
 class RIGID_SLENDER_ROD_COLLECTION
@@ -35,8 +36,8 @@ public:
     RIGID_SLENDER_ROD_COLLECTION(const RIGID_SLENDER_ROD_COLLECTION&) = delete;
     void operator=(const RIGID_SLENDER_ROD_COLLECTION&) = delete;
     ~RIGID_SLENDER_ROD_COLLECTION();
-    void Read(const std::string& directory,const int frame);
-    void Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame) const;
+    void Read(const VIEWER_DIR& viewer_dir);
+    void Write(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir) const;
     void Update_Simulated_Particles();
 
     void Add_Velocity_Independent_Forces(ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T time) const;

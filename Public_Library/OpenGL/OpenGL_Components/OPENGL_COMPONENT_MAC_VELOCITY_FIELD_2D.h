@@ -23,7 +23,7 @@ class OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D:public OPENGL_COMPONENT<T>,public O
     typedef VECTOR<T,2> TV;typedef VECTOR<int,TV::m> TV_INT;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
-    using OPENGL_OBJECT<T>::viewer_callbacks;using OPENGL_COMPONENT<T>::is_animation;
+    using OPENGL_OBJECT<T>::viewer_callbacks;using OPENGL_COMPONENT<T>::viewer_dir;
     using OPENGL_COMPONENT<T>::component_name;
     typedef LINEAR_INTERPOLATION_UNIFORM<TV,T> T_LINEAR_INTERPOLATION_VECTOR;
     OPENGL_MAC_VELOCITY_FIELD_2D<T>* opengl_mac_velocity_field;
@@ -31,7 +31,6 @@ public:
     bool draw_vorticity;
 private:
     std::string velocity_filename;
-    int frame_loaded;
     bool valid;
     bool draw_divergence;
     bool draw_streamlines,use_seed_for_streamlines;
@@ -39,27 +38,21 @@ private:
     OPENGL_SCALAR_FIELD_2D<T>* opengl_divergence_field;
     SEGMENTED_CURVE_2D<T> streamlines;
     OPENGL_SEGMENTED_CURVE_2D<T> opengl_streamlines;
-    std::string psi_N_psi_D_basedir;
     int number_of_steps;
     T min_vorticity,max_vorticity;
     unsigned int streamline_seed;
     
 public:
-    OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(const GRID<TV> &grid,const std::string &velocity_filename_input);
+    OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(const VIEWER_DIR& viewer_dir,const GRID<TV> &grid,const std::string &velocity_filename_input);
     virtual ~OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D();
 
-    bool Valid_Frame(int frame_input) const override;
-    bool Is_Up_To_Date(int frame) const override { return valid && frame_loaded == frame; }
-    void Set_Frame(int frame_input) override;
+    void Set_Frame() override;
     void Set_Draw(bool draw_input = true) override;
     void Display() const override;
     void Print_Cell_Selection_Info(std::ostream& stream,const TV_INT& cell) const override;
     void Print_Node_Selection_Info(std::ostream& stream,const TV_INT& node) const override;
     bool Use_Bounding_Box() const override { return draw && valid; }
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
-
-    void Set_Psi_N_Psi_D_Basedir_For_Divergence(std::string psi_N_psi_D_basedir_input)
-    {psi_N_psi_D_basedir=psi_N_psi_D_basedir_input;}
 
     void Toggle_Velocity_Mode();
     void Toggle_Velocity_Mode_And_Draw();

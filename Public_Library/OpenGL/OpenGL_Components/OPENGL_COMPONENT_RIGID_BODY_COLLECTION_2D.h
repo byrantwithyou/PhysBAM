@@ -28,8 +28,6 @@ class OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D:public OPENGL_COMPONENT<T>
 protected:
     typedef VECTOR<T,2> TV;
 
-    std::string basedir;
-    int frame_loaded;
     bool valid;
     bool show_object_names;
     bool output_positions;
@@ -73,14 +71,14 @@ protected:
     ARRAY<PAIR<VECTOR<T,2>,T>,int> forces_and_torques;
 
 public:
-    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_OBJECT<T>::viewer_callbacks;
-    OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(const std::string& basedir);
-    OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir);
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
+    using OPENGL_OBJECT<T>::viewer_callbacks;using OPENGL_COMPONENT<T>::viewer_dir;
+
+    OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(const VIEWER_DIR& viewer_dir);
+    OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(const VIEWER_DIR& viewer_dir,RIGID_BODY_COLLECTION<TV>& rigid_body_collection);
     virtual ~OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D();
     
-    bool Valid_Frame(int frame_input) const override;
-    void Set_Frame(int frame_input) override;
+    void Set_Frame() override;
     void Set_Draw(bool draw_input = true) override;
 
     void Display() const override;
@@ -113,7 +111,7 @@ public:
     void Toggle_Forces_And_Torques();
 
 public:
-    virtual void Reinitialize(const bool force=false,const bool read_geometry=true);    // Needs to be called after some state changes
+    virtual void Reinitialize(const bool read_geometry=true);    // Needs to be called after some state changes
 protected:
     void Set_Draw_Mode(const int mode);
     int Get_Draw_Mode() const;

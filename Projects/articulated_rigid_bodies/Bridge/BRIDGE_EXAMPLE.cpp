@@ -20,8 +20,8 @@
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
-#include <map>
 #include "BRIDGE_EXAMPLE.h"
+#include <map>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -42,7 +42,7 @@ BRIDGE_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Parse();
     tests.data_directory=data_directory;
     if(!this->user_output_directory)
-        output_directory=LOG::sprintf("Bridge/%s%s",output_directory.c_str(),(selection==0?"_blocks":"_lathe_chains"));
+        viewer_dir.output_directory=LOG::sprintf("Bridge/%s%s",viewer_dir.output_directory.c_str(),(selection==0?"_blocks":"_lathe_chains"));
 }
 //#####################################################################
 // Destructor

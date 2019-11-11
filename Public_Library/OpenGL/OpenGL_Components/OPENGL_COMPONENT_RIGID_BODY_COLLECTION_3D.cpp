@@ -5,6 +5,7 @@
 #include <Core/Arrays/INDIRECT_ARRAY.h>
 #include <Core/Log/LOG.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Geometry/Basic_Geometry/BOUNDED_HORIZONTAL_PLANE.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
@@ -36,8 +37,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
-OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(const std::string& basedir_input,bool use_display_lists)
-    :OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(*new RIGID_BODY_COLLECTION<TV>(0),basedir_input,use_display_lists)
+OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(const VIEWER_DIR& viewer_dir,bool use_display_lists)
+    :OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(viewer_dir,*new RIGID_BODY_COLLECTION<TV>(0),use_display_lists)
 {
     need_destroy_rigid_body_collection=true;
 }
@@ -45,8 +46,8 @@ OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(const std::string& basedir_input,bool 
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
-OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir_input,bool use_display_lists)
-    :OPENGL_COMPONENT<T>("Rigid Geometry Collection"),basedir(basedir_input),use_display_lists(use_display_lists),frame_loaded(-1),valid(false),
+OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(const VIEWER_DIR& viewer_dir,RIGID_BODY_COLLECTION<TV>& rigid_body_collection,bool use_display_lists)
+    :OPENGL_COMPONENT<T>(viewer_dir,"Rigid Geometry Collection"),use_display_lists(use_display_lists),valid(false),
     rigid_body_collection(rigid_body_collection),articulated_rigid_body(0),
     velocity_field(velocity_vectors,positions,OPENGL_COLOR::Cyan(),.25,true,true),
     angular_velocity_field(angular_velocity_vectors,positions,OPENGL_COLOR::Magenta(),.25,true,true),need_destroy_rigid_body_collection(false),one_sided(false),
@@ -91,7 +92,6 @@ Initialize()
     viewer_callbacks.Set("toggle_joint_frames",{[this](){Toggle_Joint_Frames();},"Toggle joint frames"});
     viewer_callbacks.Set("toggle_forces_and_torques",{[this](){Toggle_Forces_And_Torques();},"Toggle forces and torques"});
 
-    is_animation=true;
     show_object_names=false;
     output_positions=true;
     draw_velocity_vectors=false;
@@ -154,142 +154,68 @@ Resize_Structures(const int size)
 // Function Reinitialize
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
-Reinitialize(const bool force,const bool read_geometry)
+Reinitialize()
 {
-    if(draw && (force || (is_animation && (frame_loaded!=frame)) || (!is_animation && (frame_loaded<0)))){
-        valid=false;
-        if(!File_Exists(LOG::sprintf("%s/%d/rigid_body_particles",basedir.c_str(),frame))) return;
+    if(!draw) return;
+    valid=false;
+    if(!File_Exists(viewer_dir.current_directory+"/rigid_body_particles")) return;
 
-        // TODO: currently reads in all structures, should only read in certain kinds based on read_triangulated_surface,read_implicit_surface,read_tetrahedralized_volume
-        rigid_body_collection.Read(basedir,frame,&needs_init,&needs_destroy);
+    // TODO: currently reads in all structures, should only read in certain kinds based on read_triangulated_surface,read_implicit_surface,read_tetrahedralized_volume
+    rigid_body_collection.Read(viewer_dir,&needs_init,&needs_destroy);
 
-        std::string arb_state_file=LOG::sprintf("%s/%d/arb_state",basedir.c_str(),frame);
-        if(File_Exists(arb_state_file)){
-            if(!articulated_rigid_body) articulated_rigid_body=new ARTICULATED_RIGID_BODY<TV>(rigid_body_collection); // TODO: read in the actual particles
-            articulated_rigid_body->Read(basedir,frame);
-            Initialize();}
-        else{delete articulated_rigid_body;articulated_rigid_body=0;}
+    std::string arb_state_file=viewer_dir.current_directory+"/arb_state";
+    if(File_Exists(arb_state_file)){
+        if(!articulated_rigid_body) articulated_rigid_body=new ARTICULATED_RIGID_BODY<TV>(rigid_body_collection); // TODO: read in the actual particles
+        articulated_rigid_body->Read(viewer_dir);
+        Initialize();}
+    else{delete articulated_rigid_body;articulated_rigid_body=0;}
 
-        if(File_Exists(LOG::sprintf("%s/%d/arb_info",basedir.c_str(),frame))){
-            Read_Articulated_Information(LOG::sprintf("%s/%d/arb_info",basedir.c_str(),frame));}
+    if(File_Exists(viewer_dir.current_directory+"/arb_info")){
+        Read_Articulated_Information(viewer_dir.current_directory+"/arb_info");}
 
-        // only enlarge array as we read in more geometry to memory
-        int max_number_of_bodies=max(extra_components.Size(),rigid_body_collection.rigid_body_particles.Size());
-        Resize_Structures(max_number_of_bodies);
+    // only enlarge array as we read in more geometry to memory
+    int max_number_of_bodies=max(extra_components.Size(),rigid_body_collection.rigid_body_particles.Size());
+    Resize_Structures(max_number_of_bodies);
 
-        std::string filename=LOG::sprintf("%s/%d/rigid_body_forces_and_torques",basedir.c_str(),frame);
-        if(File_Exists(filename)) Read_From_File(filename,forces_and_torques);
-        else forces_and_torques.Resize(0);
-        if(has_init_destroy_information) for(int i=0;i<needs_destroy.m;i++) Destroy_Geometry(needs_destroy(i));
+    std::string filename=viewer_dir.current_directory+"/rigid_body_forces_and_torques";
+    if(File_Exists(filename)) Read_From_File(filename,forces_and_torques);
+    else forces_and_torques.Resize(0);
+    if(has_init_destroy_information) for(int i=0;i<needs_destroy.m;i++) Destroy_Geometry(needs_destroy(i));
 
-        std::string rigid_body_colors_file=LOG::sprintf("%s/%d/rigid_body_colors",basedir.c_str(),frame);
-        if(File_Exists(rigid_body_colors_file)) Read_From_File(rigid_body_colors_file,opengl_colors);
-        else{opengl_colors.Resize(max_number_of_bodies);opengl_colors.Fill(OPENGL_COLOR::Cyan());}
+    std::string rigid_body_colors_file=viewer_dir.current_directory+"/rigid_body_colors";
+    if(File_Exists(rigid_body_colors_file)) Read_From_File(rigid_body_colors_file,opengl_colors);
+    else{opengl_colors.Resize(max_number_of_bodies);opengl_colors.Fill(OPENGL_COLOR::Cyan());}
 
-        // Initialize bodies which have become active
-        if(has_init_destroy_information) for(int i=0;i<needs_init.m;i++){
+    // Initialize bodies which have become active
+    if(has_init_destroy_information) for(int i=0;i<needs_init.m;i++){
             int id=needs_init(i);PHYSBAM_ASSERT(rigid_body_collection.Is_Active(id));
             Create_Geometry(id);}
-        else for(int i=0;i<max_number_of_bodies;i++){if(rigid_body_collection.Is_Active(i)) Create_Geometry(i);} // TODO: can we figure out what bodies need_init
+    else for(int i=0;i<max_number_of_bodies;i++){if(rigid_body_collection.Is_Active(i)) Create_Geometry(i);} // TODO: can we figure out what bodies need_init
 
-        // Only display real bodies (not ghost bodies)
-        if(File_Exists(LOG::sprintf("%s/%d/partition",basedir.c_str(),frame))) {
-            ARRAY<int> particles_of_this_partition;
-            Read_From_File(LOG::sprintf("%s/%d/partition",basedir.c_str(),frame),particles_of_this_partition);
-            for(int i=0;i<max_number_of_bodies;i++)
-                draw_object(i)=false;
-            for(int i=0;i<particles_of_this_partition.Size();i++)
-                draw_object(particles_of_this_partition(i))=true;}
+    // Only display real bodies (not ghost bodies)
+    if(File_Exists(viewer_dir.current_directory+"/partition")) {
+        ARRAY<int> particles_of_this_partition;
+        Read_From_File(viewer_dir.current_directory+"/partition",particles_of_this_partition);
+        for(int i=0;i<max_number_of_bodies;i++)
+            draw_object(i)=false;
+        for(int i=0;i<particles_of_this_partition.Size();i++)
+            draw_object(particles_of_this_partition(i))=true;}
 
-        // Update active bodies / remove inactive bodies
-        for(int id=0;id<rigid_body_collection.rigid_body_particles.Size();id++){
-            if(rigid_body_collection.Is_Active(id)){
-                Update_Geometry(id);
-                RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(id);
-                IMPLICIT_OBJECT<TV>* object_space_implicit_object=body.implicit_object?body.implicit_object->object_space_implicit_object:0;
-                if(body.name=="ground" || (object_space_implicit_object && typeid(*object_space_implicit_object)==typeid(ANALYTIC_IMPLICIT_OBJECT<BOUNDED_HORIZONTAL_PLANE<TV> >)))
-                    Set_Object_Material(id,OPENGL_COLOR::Ground_Tan((T)1));
-                else{
-                    if(one_sided) Set_Object_Material(id,front_color_map->Lookup(Value(id)));
-                    else Set_Object_Material(id,front_color_map->Lookup(Value(id)),back_color_map->Lookup(Value(id)));}}
-            else Destroy_Geometry(id);}
-        for(int id=rigid_body_collection.rigid_body_particles.Size();id<opengl_triangulated_surface.Size();id++) Destroy_Geometry(id);
+    // Update active bodies / remove inactive bodies
+    for(int id=0;id<rigid_body_collection.rigid_body_particles.Size();id++){
+        if(rigid_body_collection.Is_Active(id)){
+            Update_Geometry(id);
+            RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(id);
+            IMPLICIT_OBJECT<TV>* object_space_implicit_object=body.implicit_object?body.implicit_object->object_space_implicit_object:0;
+            if(body.name=="ground" || (object_space_implicit_object && typeid(*object_space_implicit_object)==typeid(ANALYTIC_IMPLICIT_OBJECT<BOUNDED_HORIZONTAL_PLANE<TV> >)))
+                Set_Object_Material(id,OPENGL_COLOR::Ground_Tan((T)1));
+            else{
+                if(one_sided) Set_Object_Material(id,front_color_map->Lookup(Value(id)));
+                else Set_Object_Material(id,front_color_map->Lookup(Value(id)),back_color_map->Lookup(Value(id)));}}
+        else Destroy_Geometry(id);}
+    for(int id=rigid_body_collection.rigid_body_particles.Size();id<opengl_triangulated_surface.Size();id++) Destroy_Geometry(id);
 
-        frame_loaded=frame;
-        valid=true;}
-
-    Update_Object_Labels();
-
-    if(use_display_lists) Initialize_Display_Lists();
-}
-//#####################################################################
-// Function Reinitialize_Without_Files
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
-Reinitialize_Without_Files(const bool force)
-{
-    if(draw && (force || (is_animation && (frame_loaded!=frame)) || (!is_animation && (frame_loaded<0)))){
-        LOG::cout<<"Reinit being called\n";
-        valid=false;
-
-        ARRAY<int> needs_init;
-        for(int i=0;i<articulated_rigid_body->rigid_body_collection.rigid_body_particles.Size();i++) if(articulated_rigid_body->rigid_body_collection.Is_Active(i)) needs_init.Append(i);
-
-        // only enlarge array as we read in more geometry to memory
-        int max_number_of_bodies=max(extra_components.Size(),rigid_body_collection.rigid_body_particles.Size());
-        Resize_Structures(max_number_of_bodies);
-
-        // Initialize bodies which have become active
-        for(int i=0;i<needs_init.m;i++){
-            int id=needs_init(i);PHYSBAM_ASSERT(rigid_body_collection.Is_Active(id));
-            Create_Geometry(id);}
-        
-        // Update active bodies / remove inactive bodies
-        for(int id=0;id<rigid_body_collection.rigid_body_particles.Size();id++){
-            if(rigid_body_collection.Is_Active(id)) Update_Geometry(id);
-            else Destroy_Geometry(id);}
-        for(int id=rigid_body_collection.rigid_body_particles.Size();id<opengl_triangulated_surface.Size();id++) Destroy_Geometry(id);
-
-        valid=true;}
-
-    Update_Object_Labels();
-
-    if(use_display_lists) Initialize_Display_Lists();
-}
-//#####################################################################
-// Function Initialize_One_Body
-//#####################################################################
-template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
-Initialize_One_Body(const int body_id,const bool force)
-{
-    if(draw && (force || (is_animation && (frame_loaded!=frame)) || (!is_animation && (frame_loaded<0)))){
-        LOG::cout<<"Init for one body being called\n";
-        valid=false;
-
-        // only enlarge array as we read in more geometry to memory
-        int max_number_of_bodies=max(opengl_triangulated_surface.Size(),extra_components.Size(),rigid_body_collection.rigid_body_particles.Size());
-        Resize_Structures(max_number_of_bodies);
-        // only enlarge array as we read in more geometry to memory
-        opengl_colors.Resize(max_number_of_bodies);opengl_colors.Fill(OPENGL_COLOR::Cyan());
-        opengl_triangulated_surface.Resize(max_number_of_bodies);
-        opengl_tetrahedralized_volume.Resize(max_number_of_bodies);
-        opengl_levelset.Resize(max_number_of_bodies);
-        //extra_components.Resize(max_number_of_bodies);
-        opengl_axes.Resize(max_number_of_bodies);
-        draw_object.Resize(max_number_of_bodies);
-        use_object_bounding_box.Resize(max_number_of_bodies);
-
-        // Initialize bodies which have become active
-        PHYSBAM_ASSERT(rigid_body_collection.Is_Active(body_id));
-        Create_Geometry(body_id);
-
-        // Update active bodies / remove inactive bodies
-        for(int id=0;id<rigid_body_collection.rigid_body_particles.Size();id++){
-            if(rigid_body_collection.Is_Active(id)) Update_Geometry(id);
-            else Destroy_Geometry(id);}
-        for(int id=rigid_body_collection.rigid_body_particles.Size();id<opengl_triangulated_surface.Size();id++) Destroy_Geometry(id);
-
-        valid=true;}
+    valid=true;
 
     Update_Object_Labels();
 
@@ -363,11 +289,11 @@ Create_Geometry(const int id)
 
     // add extra components
     if(opengl_tetrahedralized_volume(id)){
-        std::string filename_pattern=LOG::sprintf("%s/accumulated_impulses_%d.%%d",basedir.c_str(),id);
-        if(Frame_File_Exists(filename_pattern,frame)){
+        std::string filename=viewer_dir.current_directory+"/accumulated_impulses_"+std::to_string(id);
+        if(File_Exists(filename)){
             LOG::cout<<"Adding accumulated impulses to rigid body "<<id<<std::endl;
             OPENGL_COMPONENT_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD<T>* component=
-                new OPENGL_COMPONENT_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD<T>(*tetrahedralized_volume,filename_pattern);
+                new OPENGL_COMPONENT_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD<T>(viewer_dir,*tetrahedralized_volume,filename);
             component->opengl_vector_field.Enslave_Transform_To(*opengl_axes(id));
             extra_components(id).Append(component);}}
 }
@@ -379,7 +305,7 @@ Update_Geometry(const int id)
 {
     if(opengl_axes(id)) *opengl_axes(id)->frame=FRAME<VECTOR<T,3> >(rigid_body_collection.Rigid_Body(id).Frame());
     if(opengl_tetrahedralized_volume(id)){
-        std::string color_map_filename=LOG::sprintf("%s/%d/stress_map_of_tetrahedralized_volume_%d",basedir.c_str(),frame,id);
+        std::string color_map_filename=viewer_dir.current_directory+"/stress_map_of_tetrahedralized_volume_"+std::to_string(id);
         if(File_Exists(color_map_filename)){
             if(!opengl_tetrahedralized_volume(id)->color_map) opengl_tetrahedralized_volume(id)->color_map=new ARRAY<OPENGL_COLOR>;
             Read_From_File(color_map_filename,*opengl_tetrahedralized_volume(id)->color_map);}
@@ -403,7 +329,8 @@ Update_Geometry(const int id)
             opengl_triangulated_surface(id)->draw_particles=draw_simplicial_object_particles;
         }
     }
-    for(int i=0;i<extra_components(id).m;i++) extra_components(id)(i)->Set_Frame(frame);
+    for(int i=0;i<extra_components(id).m;i++)
+        extra_components(id)(i)->Set_Frame();
 }
 //#####################################################################
 // Function Destroy_Geometry
@@ -470,20 +397,12 @@ Update_Object_Labels()
             else opengl_triangulated_surface(i)->Set_Name(rigid_body_collection.Rigid_Body(i).name);}}
 }
 //#####################################################################
-// Function Valid_Frame
-//#####################################################################
-template<class T> bool OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
-Valid_Frame(int frame_input) const
-{
-    return File_Exists(LOG::sprintf("%s/%d/rigid_body_particles",basedir.c_str(),frame_input));
-}
-//#####################################################################
 // Function Set_Frame
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
-Set_Frame(int frame_input)
+Set_Frame()
 {
-    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
+    
     Reinitialize();
 }
 //#####################################################################
@@ -728,7 +647,7 @@ template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T>::
 Toggle_One_Sided()
 {
     one_sided=!one_sided;
-    Reinitialize(true);
+    Reinitialize();
 }
 //#####################################################################
 // Function Toggle_Draw_Particles

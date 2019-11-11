@@ -47,9 +47,9 @@ template<class TV> POUR_SOURCE<TV>::
 // Function Write_Output_Files
 //#####################################################################
 template<class TV> void POUR_SOURCE<TV>::
-Write_Output_Files(const int frame)
+Write_Output_Files()
 {
-    std::string file=LOG::sprintf("%s/%d/%s",example.output_directory.c_str(),frame,output_file.c_str());
+    std::string file=example.viewer_dir.current_directory+"/"+output_file;
     Write_To_File(example.stream_type,file,waiting_particles,buffer_left,cur_time,waiting_particle_color,next_color,random);
     if(show_waiting_particles){
         T vn=velocity.Dot(normal);
@@ -67,9 +67,9 @@ Write_Output_Files(const int frame)
 // Function Read_Output_Files
 //#####################################################################
 template<class TV> void POUR_SOURCE<TV>::
-Read_Output_Files(const int frame)
+Read_Output_Files()
 {
-    std::string file=LOG::sprintf("%s/%d/%s",example.output_directory.c_str(),frame,output_file.c_str());
+    std::string file=example.viewer_dir.current_directory+"/"+output_file;
     Read_From_File(file,waiting_particles,buffer_left,cur_time,waiting_particle_color,next_color,random);
 }
 //#####################################################################

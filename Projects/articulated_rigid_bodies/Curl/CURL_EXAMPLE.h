@@ -30,8 +30,8 @@ class CURL_EXAMPLE:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::last_frame;using BASE::frame_rate;using BASE::stream_type;
-    using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::solid_body_collection;
-    using BASE::solids_parameters;using BASE::write_last_frame;using BASE::data_directory;
+    using BASE::restart;using BASE::restart_frame;using BASE::viewer_dir;using BASE::solid_body_collection;
+    using BASE::solids_parameters;using BASE::data_directory;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Position_Nodes; // silence -Woverloaded-virtual
     using BASE::user_last_frame;
     
@@ -67,7 +67,7 @@ public:
         shelf00=shelf01=shelf10=shelf11=0;
         tests.data_directory=data_directory;
         if(!this->user_output_directory)
-            output_directory="Curl/output";
+            viewer_dir.output_directory="Curl/output";
     }
 
     virtual ~CURL_EXAMPLE()
@@ -96,7 +96,7 @@ void Initialize_Bodies() override
     if(parameter_file.empty()) parameter_file="Curl/example.param";
     ARB_PARAMETERS::Read_Common_Parameters(parameter_file,*this,parameter_list);
     selection=parameter_list.Get_Parameter("selection",5);
-    if(!this->user_output_directory) output_directory+=LOG::sprintf("_%d",selection);
+    if(!this->user_output_directory) viewer_dir.output_directory+=LOG::sprintf("_%d",selection);
     traditional_pd=parameter_list.Get_Parameter("traditional_pd",false);
     if(traditional_pd) arb->Use_No_Actuators();
     half_acceleration=parameter_list.Get_Parameter("half_acceleration",true);
@@ -539,9 +539,9 @@ void Update_Solids_Parameters(const T time) override
             precomputed_pd_torques(parent->particle_index)-=acceleration;
             precomputed_pd_torques(child->particle_index)+=acceleration;}}
 }
-void Write_Output_Files(const int frame) const override
+void Write_Output_Files() const override
 {
-    BASE::Write_Output_Files(frame);
+    BASE::Write_Output_Files();
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particles;
 
     TV total_linear_momentum,total_angular_momentum;

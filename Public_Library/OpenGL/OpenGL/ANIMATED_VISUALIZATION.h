@@ -29,7 +29,7 @@ public:
     using BASIC_VISUALIZATION<T>::opengl_world;using BASIC_VISUALIZATION<T>::component_list;
     using BASIC_VISUALIZATION<T>::Set_Current_Selection;using BASIC_VISUALIZATION<T>::selected_object;
 
-    ANIMATED_VISUALIZATION();
+    ANIMATED_VISUALIZATION(VIEWER_DIR& viewer_dir);
     virtual ~ANIMATED_VISUALIZATION(){}
 
 private:
@@ -44,9 +44,7 @@ protected:
     void Goto_Start_Frame() override;
     void Render_Offscreen() override;
 
-    virtual bool Valid_Frame(int frame_input);
-
-    virtual void Set_Frame(int frame_input);
+    virtual void Set_Frame();
     virtual void Pre_Frame_Extra() {}
     virtual void Set_Frame_Extra() {}
 
@@ -59,10 +57,13 @@ public:
     void    Toggle_Loop();
     void    Toggle_Fixed_Frame_Rate();
     void    Goto_Last_Frame();
-
+    bool Valid_Frame();
+    
     OPENGL_CALLBACK next_frame_cb,prev_frame_cb,goto_frame_cb,reset_cb,toggle_play_cb,toggle_loop_cb,null_cb;
     OPENGL_CALLBACK toggle_fixed_frame_rate_cb,goto_last_frame_cb,goto_frame_prompt_cb,capture_frames_cb,capture_frames_prompt_cb;
-
+    VIEWER_DIR& viewer_dir;
+    int substeps_level;
+    
 private:
     void    Goto_Frame_Prompt();
     void    Capture_Frames();
@@ -70,13 +71,11 @@ private:
     CAPTURE_FRAMES_PROMPT_STATE capture_frames_prompt_state;
 
 protected:
-    bool    animation_enabled;
     bool    play;
     bool    loop;
     bool    fixed_frame_rate;
     float   last_frame_time;
-    int     start_frame, stop_frame, frame, frame_rate, frame_increment;
-    std::string last_frame_filename;
+    int     start_frame, stop_frame, frame_rate;
     std::string saved_frame_filename;
     int     jpeg_quality;
     std::string frame_title;

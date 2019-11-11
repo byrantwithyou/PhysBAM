@@ -137,7 +137,7 @@ Add_Force(SLENDER_ROD_FORCES<TV>* force)
 // Function Read
 //#####################################################################
 template<class TV> void RIGID_SLENDER_ROD_COLLECTION<TV>::
-Read(const std::string& directory,const int frame)
+Read(const VIEWER_DIR& viewer_dir)
 {
     PHYSBAM_NOT_IMPLEMENTED();
 }
@@ -145,7 +145,7 @@ Read(const std::string& directory,const int frame)
 // Function Write
 //#####################################################################
 template<class TV> void RIGID_SLENDER_ROD_COLLECTION<TV>::
-Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame) const
+Write(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir) const
 {
     PHYSBAM_NOT_IMPLEMENTED();
 }

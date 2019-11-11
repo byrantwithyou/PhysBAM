@@ -10,6 +10,7 @@
 #include <Grid_Tools/Grids/GRID.h>
 #include <Compressible/Equations_Of_State/EOS.h>
 namespace PhysBAM{
+class VIEWER_DIR;
 
 template<class TV>
 class COMPRESSIBLE_FLUID_COLLECTION
@@ -33,8 +34,8 @@ public:
     {eos=eos_input;}
     
     //#####################################################################
-    void Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const;
-    void Read_Output_Files(const std::string& output_directory,const int frame);
+    void Write_Output_Files(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir) const;
+    void Read_Output_Files(const VIEWER_DIR& viewer_dir);
     void Initialize_Grids();
     //#####################################################################
 };

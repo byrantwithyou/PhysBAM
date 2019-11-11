@@ -7,40 +7,46 @@
 #ifndef __VIEWER_OUTPUT__
 #define __VIEWER_OUTPUT__
 
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Core/Vectors/VECTOR.h>
 namespace PhysBAM{
 
-template<class TV> class DEBUG_PARTICLES;
-template<class TV> class GRID;
-
-template<class TV>
 class VIEWER_OUTPUT
 {
 public:
-    typedef typename TV::SCALAR T;
-
-    int frame;
-    std::string output_directory;
+    VIEWER_DIR& viewer_dir;
     STREAM_TYPE stream_type;
 
-    const GRID<TV>& grid;
-    DEBUG_PARTICLES<TV>& debug_particles;
+    ARRAY<std::function<void()> > common_entries;
+    ARRAY<std::function<void()> > entries;
 
-    VIEWER_OUTPUT(STREAM_TYPE stream_type,const GRID<TV>& grid,const std::string& output_directory);
+    VIEWER_OUTPUT(STREAM_TYPE stream_type,VIEWER_DIR& viewer_dir);
     ~VIEWER_OUTPUT();
 
     static VIEWER_OUTPUT* Singleton(VIEWER_OUTPUT* vo=0);
 
-    void Flush_Frame(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const char* title);
     void Flush_Frame(const char* title);
+    void Flush_Frame(const std::string& title)
+    {Flush_Frame(title.c_str());}
+
+    template<class OBJ>
+    void Add_Common(const std::string& name,const OBJ& obj)
+    {
+        common_entries.Append([this,name,&obj]()
+            {Write_To_File(stream_type,viewer_dir.output_directory+"/common/"+name,obj);});
+    }
+
+    template<class OBJ>
+    void Add(const std::string& name,const OBJ& obj)
+    {
+        entries.Append([this,name,&obj]()
+            {Write_To_File(stream_type,viewer_dir.current_directory+"/"+name,obj);});
+    }
+
+    template<class TV> void Use_Debug_Particles();
 };
-template<class TV> inline void Flush_Frame(const char* title)
-{
-    VIEWER_OUTPUT<TV>::Singleton()->Flush_Frame(title);
-}
-template<class T,int d> inline void Flush_Frame(const ARRAY<T,FACE_INDEX<d> >& face_velocities,const char* title)
-{
-    VIEWER_OUTPUT<VECTOR<T,d> >::Singleton()->Flush_Frame(face_velocities,title);
-}
+template<class TV> void Use_Debug_Particles();
+inline void Flush_Frame(const char* title="")
+{VIEWER_OUTPUT::Singleton()->Flush_Frame(title);}
 }
 #endif

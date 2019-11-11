@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Tools/Images/PNG_FILE.h>
 #include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
@@ -27,10 +28,10 @@ struct FRAME_DATA
     ARRAY<T,TV_INT> vorticity;
 };
 
-void Read_Output_Files(FRAME_DATA& fd,const std::string& input,int frame)
+void Read_Output_Files(FRAME_DATA& fd,const VIEWER_DIR& viewer_dir)
 {
-    Read_From_File(LOG::sprintf("%s/common/grid",input.c_str()),fd.grid);
-    Read_From_File(LOG::sprintf("%s/%d/mac_velocities",input.c_str(),frame),fd.velocity);
+    Read_From_File(viewer_dir.output_directory+"/common/grid",fd.grid);
+    Read_From_File(viewer_dir.current_directory+"/mac_velocities",fd.velocity);
 }
 
 VECTOR<T,2> Compute_Vorticity(FRAME_DATA& fd)
@@ -75,7 +76,9 @@ int main(int argc, char* argv[])
     parse_args.Parse();
 
     FRAME_DATA fd;
-    Read_Output_Files(fd,input,frame);
+    VIEWER_DIR viewer_dir(input);
+    viewer_dir.Set(frame);
+    Read_Output_Files(fd,viewer_dir);
     auto bound=Compute_Vorticity(fd);
     LOG::printf("Min vort: %P Max vort: %P\n",bound(0),bound(1));
     Dump(fd,output,vmin,vmax);

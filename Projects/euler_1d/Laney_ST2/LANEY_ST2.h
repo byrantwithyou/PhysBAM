@@ -14,9 +14,9 @@
 
 #include <Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_RF.h>
 #include <Compressible/Equations_Of_State/EOS_GAMMA.h>
+#include "../EULER_1D_EXAMPLE.h"
 #include <fstream>
 #include <iostream>
-#include "../EULER_1D_EXAMPLE.h"
 using namespace PhysBAM;
 
 namespace PhysBAM{
@@ -74,33 +74,33 @@ Write_Matlab_Data_File(const int stepnumber, const GRID<TV>& grid, const ARRAY<T
         EOS_GAMMA<T> *tmp_eos = dynamic_cast<EOS_GAMMA<T>*>(eos);
 
         //output header
-        sprintf(file_name,"%s/header",output_directory);
+        sprintf(file_name,"%s/header",viewer_dir.output_directory);
         matlab_output.Write_Header_File(file_name,grid,stepnumber);
 
         // output primitive variables . . . . 
         //density
-        sprintf(file_name,"%s/density",output_directory);
+        sprintf(file_name,"%s/density",viewer_dir.output_directory);
         for(i=0;i<m;i++) output(i) = u(1,i);
         matlab_output.Write_Output_File(file_name,output,stepnumber);
         //velocity
         for(i=0;i<m;i++) output(i) = u(2,i)/u(1,i);
-        sprintf(file_name,"%s/velocity",output_directory);
+        sprintf(file_name,"%s/velocity",viewer_dir.output_directory);
         matlab_output.Write_Output_File(file_name,output,stepnumber);
         //pressure
         for(i=0;i<m;i++) output1(i) = (tmp_eos->gamma-1.0)*(u(3,i)-.5*u(2,i)*output(i));
-        sprintf(file_name,"%s/pressure",output_directory);
+        sprintf(file_name,"%s/pressure",viewer_dir.output_directory);
         matlab_output.Write_Output_File(file_name,output1,stepnumber);
         //entropy
         for(i=0;i<m;i++) output(i) = tmp_eos->Cv*log(output1(i)/pow(u(1,i),tmp_eos->gamma));
-        sprintf(file_name,"%s/entropy",output_directory);
+        sprintf(file_name,"%s/entropy",viewer_dir.output_directory);
         matlab_output.Write_Output_File(file_name,output,stepnumber);
         //speed of sound
         for(i=0;i<m;i++) output(i) = sqrt(tmp_eos->gamma*output1(i)/u(1,i));
-        sprintf(file_name,"%s/sound_speed",output_directory);
+        sprintf(file_name,"%s/sound_speed",viewer_dir.output_directory);
         matlab_output.Write_Output_File(file_name,output,stepnumber);
         //Mach number
         for(i=0;i<m;i++) output(i) = (u(2,i)/u(1,i))/output(i);
-        sprintf(file_name,"%s/mach_number",output_directory);
+        sprintf(file_name,"%s/mach_number",viewer_dir.output_directory);
         matlab_output.Write_Output_File(file_name,output,stepnumber);
 }
 //#####################################################################    

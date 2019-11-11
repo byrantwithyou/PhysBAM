@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Matrices/MATRIX_MXN.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_2D.h>
@@ -127,11 +128,11 @@ Create_Joint_Function(const JOINT_ID joint_id)
 // Output_Articulation_Points
 //####################################################################################
 template<class T> void ARTICULATED_RIGID_BODY<VECTOR<T,2> >::
-Output_Articulation_Points(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const
+Output_Articulation_Points(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir) const
 {
     if(joint_mesh.Num_Joints()==0) return;
     FILE_OSTREAM output;
-    Safe_Open_Output(output,stream_type,LOG::sprintf("%s/%d/arb_info",output_directory.c_str(),frame));
+    Safe_Open_Output(output,stream_type,viewer_dir.current_directory+"/arb_info");
     Write_Binary(output,joint_mesh.Num_Joints()*2);
     for(int i=0;i<joint_mesh.Num_Joints();i++){
         JOINT<TV>& joint=*joint_mesh.Joints(i);

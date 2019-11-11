@@ -93,7 +93,7 @@ class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >
     typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::solids_fluids_parameters;using BASE::output_directory;using BASE::last_frame;
+    using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::solids_fluids_parameters;using BASE::viewer_dir;using BASE::last_frame;
     using BASE::frame_rate;using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions;using BASE::Add_To_Fluid_Simulation;
     using BASE::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization;using BASE::Add_Volumetric_Body_To_Fluid_Simulation;using BASE::solid_body_collection;using BASE::solids_evolution;
     using BASE::test_number;using BASE::resolution;using BASE::data_directory;using BASE::Add_Thin_Shell_To_Fluid_Simulation;
@@ -383,9 +383,9 @@ public:
         THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Rigid_Body_Walls(*this);
         if(!this->user_output_directory){
             if(fluids_parameters.use_slip)
-                output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d_slip",test_number,resolution);
+                viewer_dir.output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d_slip",test_number,resolution);
             else
-                output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d",test_number,resolution);}
+                viewer_dir.output_directory=LOG::sprintf("Standard_Tests/Test_%d_Resolution_%d",test_number,resolution);}
     }
     //#####################################################################
 // Function Postprocess_Frame
@@ -393,14 +393,13 @@ public:
     void Postprocess_Frame(const int frame) override
     {
         if(debug_particles.Size()){
-            Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),frame));
-            Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles);
+            Create_Directory(LOG::sprintf("%s/%i",viewer_dir.output_directory.c_str(),frame));
+            Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",viewer_dir.output_directory.c_str(),frame),debug_particles);
             debug_particles.Delete_All_Elements();}
 
         if(SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>* evolution=dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>*>(solids_evolution)){
             UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<TV> iterator_info(*fluids_parameters.collision_bodies_affecting_fluid);
-            if(frame==1) evolution->Output_Iterators(this->stream_type,output_directory.c_str(),0);
-            evolution->Output_Iterators(this->stream_type,output_directory.c_str(),frame);}
+            evolution->Output_Iterators(this->stream_type,viewer_dir);}
         if(test_number==40){
             T v=fluid_collection.incompressible_fluid_collection.face_velocities(FACE_INDEX<2>(2,fluids_parameters.grid->counts/2));
             if(solid_body_collection.rigid_body_collection.rigid_body_particles.frame.m>=3) v=solid_body_collection.rigid_body_collection.rigid_body_particles.twist(2).linear.y;
@@ -445,7 +444,7 @@ public:
 
             ARRAY<T,TV_INT> stream_function(RANGE<TV_INT>(domain_indices.min_corner,domain_indices.max_corner+1));
             stream_function(1,1)=0;
-            std::ofstream out(LOG::sprintf("%s/%i/stream_function.dat",output_directory.c_str(),frame).c_str());
+            std::ofstream out(LOG::sprintf("%s/%i/stream_function.dat",viewer_dir.output_directory.c_str(),frame).c_str());
             TV dX=fluids_parameters.grid->DX();
             // use nodes so the derivatives are central
             for(int i=0;i<domain_indices.max_corner.x+1;i++){
@@ -1368,8 +1367,8 @@ void Analytic_Test()
     analytic_solution=-(solid_mass*solid_gravity.Magnitude()+rho*size.x*size.y*fluids_parameters.gravity.Magnitude())*size.x/(2*size.y*fluids_parameters.viscosity);
     LOG::cout<<"analytic_solution "<<analytic_solution<<std::endl;
 
-    Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),0));
-    Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),0),debug_particles);
+    Create_Directory(LOG::sprintf("%s/%i",viewer_dir.output_directory.c_str(),0));
+    Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",viewer_dir.output_directory.c_str(),0),debug_particles);
 }
 //#####################################################################
 // Function Flow_Past_Fixed_Cylinder
@@ -1411,8 +1410,8 @@ void Flow_Past_Fixed_Cylinder()
     sample_points.Append(TV(3,2.25));
     sample_points.Append(TV(2,3));
 
-    Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),0));
-    Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),0),debug_particles);
+    Create_Directory(LOG::sprintf("%s/%i",viewer_dir.output_directory.c_str(),0));
+    Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",viewer_dir.output_directory.c_str(),0),debug_particles);
 }
 //#####################################################################
 // Function Flow_Past_Fixed_Cylinder
@@ -1438,8 +1437,8 @@ void Vortex_Shedding()
     rigid_body.is_static=true;
     Add_Volumetric_Body_To_Fluid_Simulation(rigid_body);
 
-    Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),0));
-    Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),0),debug_particles);
+    Create_Directory(LOG::sprintf("%s/%i",viewer_dir.output_directory.c_str(),0));
+    Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",viewer_dir.output_directory.c_str(),0),debug_particles);
 }
 //#####################################################################
 // Function Oscillating_Disk_Domain_Velocity_Sample

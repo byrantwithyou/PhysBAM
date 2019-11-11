@@ -4,6 +4,7 @@
 //#####################################################################
 
 #include <Core/Matrices/MATRIX.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Grid_Tools/Arrays/FACE_ARRAYS.h>
@@ -50,8 +51,8 @@ void Vorticity_Analysis(const GRID<TV>& grid,const RANGE<TV>& domain,T time,
 int main(int argc, char* argv[])
 {
     PARSE_ARGS parse_args(argc,argv);
-    std::string directory;
-    parse_args.Extra(&directory,"dir","simulation result directory");
+    VIEWER_DIR viewer_dir("output");
+    parse_args.Extra(&viewer_dir.output_directory,"dir","simulation result directory");
     T x0,x1,y0,y1;
     parse_args.Extra(&x0,"float","x0");
     parse_args.Extra(&y0,"float","y0");
@@ -61,14 +62,14 @@ int main(int argc, char* argv[])
 
     int last_step;
     RANGE<TV> domain(TV(x0,y0),TV(x1,y1));
-    Read_From_Text_File(directory+"/common/last_grid_data",last_step);
+    Read_From_Text_File(viewer_dir.output_directory+"/common/last_grid_data",last_step);
     GRID<TV> grid;
-    Read_From_File(directory+"/common/grid",grid);
+    Read_From_File(viewer_dir.output_directory+"/common/grid",grid);
     ARRAY<T,FACE_INDEX<TV::m> > mass, velocity;
     ARRAY<bool,FACE_INDEX<TV::m> > psi_N;
     T time;
     for(int i=0;i<=last_step;i++){
-        std::string d=LOG::sprintf("%s/v%d",directory,i);
+        std::string d=LOG::sprintf("%s/v%d",viewer_dir.output_directory,i);
         Read_From_File(d+"/mass",mass);
         Read_From_File(d+"/mac_velocities",velocity);
         Read_From_File(d+"/psi_N",psi_N);

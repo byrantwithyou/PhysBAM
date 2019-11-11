@@ -4,6 +4,7 @@
 //#####################################################################
 #ifndef __PBD_EXAMPLE__
 #define __PBD_EXAMPLE__
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 namespace PhysBAM{
@@ -30,7 +31,7 @@ public:
     std::string frame_title;
     int write_substeps_level;
     int substeps_delay_frame;
-    std::string output_directory;
+    VIEWER_DIR viewer_dir;
     int restart;
     T dt,time,frame_dt,min_dt,max_dt;
     bool print_stats;
@@ -44,8 +45,8 @@ public:
     virtual ~PBD_EXAMPLE();
     void operator=(const PBD_EXAMPLE&) = delete;
     
-    virtual void Write_Output_Files(const int frame);
-    virtual void Read_Output_Files(const int frame);
+    virtual void Write_Output_Files();
+    virtual void Read_Output_Files();
     virtual void Initialize()=0;
     virtual void Begin_Frame(const int frame)=0;
     virtual void End_Frame(const int frame)=0;

@@ -14,7 +14,7 @@ class FILLING_BOX:public SOLIDS_FLUIDS_EXAMPLE_3D<RW>
 {
 public:
 using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::last_frame;using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::frame_rate;
-using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::restart;using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::restart_frame;using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::output_directory;
+using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::restart;using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::restart_frame;using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::viewer_dir;
 using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::fluids_parameters;
 
 CYLINDER<T> source;VECTOR<T,3> source_velocity;
@@ -35,7 +35,7 @@ CYLINDER<T> source;VECTOR<T,3> source_velocity;
         fluids_parameters.write_removed_positive_particles=false;fluids_parameters.write_removed_negative_particles=false;
         fluids_parameters.write_debug_data=true;
         if(!this->user_output_directory)
-            output_directory="Filling_Box/output";
+            viewer_dir.output_directory="Filling_Box/output";
         fluids_parameters.delete_fluid_inside_objects=true;
         fluids_parameters.enforce_divergence_free_extrapolation=false;
     }

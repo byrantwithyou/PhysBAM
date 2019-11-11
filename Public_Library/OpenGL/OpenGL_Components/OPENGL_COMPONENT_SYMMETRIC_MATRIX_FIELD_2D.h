@@ -17,35 +17,26 @@ class OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,2> TV;
 public:
-    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_OBJECT<T>::viewer_callbacks;
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
+    using OPENGL_OBJECT<T>::viewer_callbacks;using OPENGL_COMPONENT<T>::viewer_dir;
     ARRAY<SYMMETRIC_MATRIX<T,2> ,VECTOR<int,2> > field;
     OPENGL_SYMMETRIC_MATRIX_FIELD_2D<T> opengl_symmetric_matrix_field;
     std::string field_filename;
-    int frame_loaded;
     bool valid;
 
-    OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D(const GRID<TV>& grid,const std::string& field_filename_input)
-        :OPENGL_COMPONENT<T>("Symmetric Matrix Field 2D"),opengl_symmetric_matrix_field(grid,field),
-        field_filename(field_filename_input),frame_loaded(-1),valid(false)
+    OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D(const VIEWER_DIR& viewer_dir,const GRID<TV>& grid,const std::string& field_filename_input)
+        :OPENGL_COMPONENT<T>(viewer_dir,"Symmetric Matrix Field 2D"),opengl_symmetric_matrix_field(grid,field),
+        field_filename(field_filename_input),valid(false)
     {
         viewer_callbacks.Set("increase_size",{[this](){Increase_Size();},"Increase symmetric matrix size"});
         viewer_callbacks.Set("decrease_size",{[this](){Decrease_Size();},"Decrease symmetric matrix size"});
-
-        is_animation=Is_Animated(field_filename);Reinitialize();
     }
 
     virtual ~OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D()
     {}
 
-    bool Valid_Frame(int frame_input) const override
-    {return Frame_File_Exists(field_filename,frame_input);}
-
-    bool Is_Up_To_Date(int frame) const override
-    {return valid && frame_loaded==frame;}
-
-    void Set_Frame(int frame_input) override
-    {OPENGL_COMPONENT<T>::Set_Frame(frame_input);Reinitialize();}
+    void Set_Frame() override
+    {Reinitialize();}
 
     void Set_Draw(bool draw_input=true) override
     {OPENGL_COMPONENT<T>::Set_Draw(draw_input);Reinitialize();}
@@ -66,7 +57,7 @@ public:
     {opengl_symmetric_matrix_field.size*=1/(T)1.1;}
 
 //#####################################################################
-    void Reinitialize(bool force_load_even_if_not_drawn=false);
+    void Reinitialize();
 //#####################################################################
 };
 }

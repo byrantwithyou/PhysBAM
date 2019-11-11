@@ -22,8 +22,9 @@ class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
-    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
     using OPENGL_COMPONENT<T>::World_Space_Box;using OPENGL_COMPONENT<T>::viewer_callbacks;
+    using OPENGL_COMPONENT<T>::viewer_dir;
     GRID<TV> grid,mac_grid,u_grid,v_grid;
     ARRAY<VECTOR<bool,2> ,VECTOR<int,2> > node_neighbors_visible;
     ARRAY<VECTOR<PAIR<bool,T>,2>,VECTOR<int,2> > face_corners_visible_from_face_center_u; // length 2, order is bottom, top
@@ -36,17 +37,13 @@ public:
     OPENGL_SCALAR_FIELD_2D<T,bool> opengl_density_valid_mask;
     OPENGL_SCALAR_FIELD_2D<T,bool> opengl_phi_valid_mask;
 private:
-    std::string directory;
-    int frame_loaded;
     bool valid;
     bool draw_grid_visibility,draw_density_valid_mask,draw_phi_valid_mask;
 
 public:
-    OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D(GRID<TV> &grid,const std::string& directory);
+    OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D(const VIEWER_DIR& viewer_dir,GRID<TV> &grid);
     
-    bool Valid_Frame(int frame_input) const override;
-    bool Is_Up_To_Date(int frame) const override { return valid && frame_loaded == frame; }
-    void Set_Frame(int frame_input) override;
+    void Set_Frame() override;
     void Set_Draw(bool draw_input = true) override;
     void Display() const override;
     bool Use_Bounding_Box() const override { return draw && valid; }
@@ -57,7 +54,7 @@ public:
     void Toggle_Draw_Phi_Valid_Mask();
 
 private:
-    void Reinitialize(bool force=false);
+    void Reinitialize();
 };
 }
 #endif

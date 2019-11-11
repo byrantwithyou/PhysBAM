@@ -6,6 +6,7 @@
 #define __SMOKE_EXAMPLE__
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
@@ -43,7 +44,7 @@ public:
     std::string frame_title;
     int write_substeps_level;
     bool write_debug_data;
-    std::string output_directory;
+    VIEWER_DIR viewer_dir;
     bool N_boundary;
     bool debug_divergence;
     T alpha;
@@ -82,8 +83,8 @@ public:
     void Initialize_Fields();
     void Get_Scalar_Field_Sources(const T time);
     void Set_Weights(int order);
-    virtual void Write_Output_Files(const int frame);
-    virtual void Read_Output_Files(const int frame);
+    virtual void Write_Output_Files();
+    virtual void Read_Output_Files();
     virtual void Set_Boundary_Conditions(const T time, const T source_velocities = 0);
 
 //#####################################################################

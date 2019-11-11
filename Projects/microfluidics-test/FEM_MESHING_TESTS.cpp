@@ -30,11 +30,11 @@ void Test_Degree2_Joint(JOINT_TYPE jt,typename TV::SCALAR a0,typename TV::SCALAR
 
         FLUID_LAYOUT_FEM<TV> fl;
         fl.Dump_Input(pd);
-        Flush_Frame<TV>("init");
+        Flush_Frame("init");
         fl.Compute(pd);
         fl.Print_Statistics();
         fl.Dump_Layout();
-        Flush_Frame<TV>("blocks");}
+        Flush_Frame("blocks");}
 }
 //#####################################################################
 // Function Test_Degree2_Circle
@@ -59,11 +59,11 @@ void Test_Degree2_Circle(JOINT_TYPE jt,typename TV::SCALAR h0,typename TV::SCALA
 
         FLUID_LAYOUT_FEM<TV> fl;
         fl.Dump_Input(pd);
-        Flush_Frame<TV>("init");
+        Flush_Frame("init");
         fl.Compute(pd);
         fl.Print_Statistics();
         fl.Dump_Layout();
-        Flush_Frame<TV>("blocks");}
+        Flush_Frame("blocks");}
 }
 //#####################################################################
 // Function Test_Degree3_Joint
@@ -87,11 +87,11 @@ void Test_Degree3_Joint(JOINT_TYPE jt,typename TV::SCALAR h,int n,int seed)
         
         FLUID_LAYOUT_FEM<TV> fl;
         fl.Dump_Input(pd);
-        Flush_Frame<TV>("init");
+        Flush_Frame("init");
         fl.Compute(pd);
         fl.Print_Statistics();
         fl.Dump_Layout();
-        Flush_Frame<TV>("blocks");}
+        Flush_Frame("blocks");}
 }
 
 template void Test_Degree2_Joint<VECTOR<double,2> >(JOINT_TYPE,double,double,double);

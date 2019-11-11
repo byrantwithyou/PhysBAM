@@ -26,10 +26,9 @@ class COMPRESSIBLE_EXAMPLE:public EXAMPLE<TV_input>
     enum workaround1{d=TV::m};
 
     using BASE::stream_type;
-    using BASE::output_directory;
 
 public:
-    using BASE::last_frame;using BASE::frame_rate;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::viewer_dir;
     int number_of_ghost_cells;
     T cfl;
 
@@ -73,7 +72,7 @@ public:
     virtual void Set_Neumann_Boundary_Conditions();
     virtual void Set_Boundary_Conditions(const T time);
     virtual void Initialize_Solid_Fluid_Coupling();
-    void Write_Output_Files(const int frame) const override;
+    void Write_Output_Files() const override;
     virtual void Advance_Kinematic_Collision_Bodies(const T dt,const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
     virtual void Initialize_Euler_State()=0;
     virtual void Initialize_Bodies()=0;

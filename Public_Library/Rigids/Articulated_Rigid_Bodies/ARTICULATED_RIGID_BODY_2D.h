@@ -12,6 +12,8 @@
 namespace PhysBAM{
 
 template<class TV> class JOINT_FUNCTION;
+class VIEWER_DIR;
+
 template<class T_input>
 class ARTICULATED_RIGID_BODY<VECTOR<T_input,2> >:public ARTICULATED_RIGID_BODY_BASE<VECTOR<T_input,2> >
 {
@@ -36,7 +38,7 @@ public:
     void Post_Stabilization_With_Actuation(const JOINT_ID joint_id);
     VECTOR<T,1> Compute_Target_PD_Angular_Impulse(const JOINT_ID joint_id);
     void Solve_Velocities_for_PD(const T time,const T dt,bool test_system,bool print_matrix) override;
-    void Output_Articulation_Points(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const override;
+    void Output_Articulation_Points(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir) const override;
 //#####################################################################
 };
 }

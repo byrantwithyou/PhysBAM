@@ -23,7 +23,7 @@ public:
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::viewer_dir;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::data_directory;
     using BASE::solid_body_collection;using BASE::stream_type;using BASE::test_number;
     using BASE::user_last_frame;
@@ -45,7 +45,7 @@ public:
         fluids_parameters.write_debug_data=true;
 
         if(!this->user_output_directory)
-            output_directory=LOG::sprintf("Flow_Past_Eftychis/Test_%d",test_number);
+            viewer_dir.output_directory=LOG::sprintf("Flow_Past_Eftychis/Test_%d",test_number);
 
         if(test_number==1){
             fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;

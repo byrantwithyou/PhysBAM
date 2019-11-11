@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
 #include <Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME.h>
@@ -18,8 +19,8 @@ using namespace PhysBAM;
 // Function OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D
 //#####################################################################
 template<class T> OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
-OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D(const std::string& prefix,const int start_frame)
-    :OPENGL_COMPONENT<T>("Deformable Object List"),prefix(prefix),frame_loaded(-1),valid(false),use_active_list(false),display_mode(0),
+OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D(const VIEWER_DIR& viewer_dir)
+    :OPENGL_COMPONENT<T>(viewer_dir,"Deformable Object List"),valid(false),use_active_list(false),display_mode(0),
     incremented_active_object(0),smooth_shading(false),selected_vertex(-1),
     deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(0,0)),
     color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map())
@@ -38,11 +39,10 @@ OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D(const std::string& prefix,const i
     viewer_callbacks.Set("highlight_particle_response",{[this](){Highlight_Particle_Response();},""});
 
     // check for per frame particles
-    if(File_Exists(LOG::sprintf("%s/%d/deformable_object_structures",prefix.c_str(),start_frame)))
+    if(File_Exists(viewer_dir.current_directory+"/deformable_object_structures"))
         invalidate_deformable_objects_selection_each_frame=true;
     else invalidate_deformable_objects_selection_each_frame=false;
 
-    is_animation=true;
     Initialize();
 }
 //#####################################################################
@@ -66,15 +66,13 @@ Initialize()
 // Function Reinitialize
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
-Reinitialize(bool force,bool read_geometry)
+Reinitialize()
 {
-    if(!(draw && (force || (is_animation && frame_loaded!=frame) || (!is_animation && frame_loaded<0)))) return;
+    if(!draw) return;
     static bool first_time=true;
-    std::string frame_string=LOG::sprintf("%s/%d/",prefix.c_str(),frame);
-    std::string static_frame_string=frame_string;
-    int static_frame=File_Exists(frame_string+"deformable_object_structures")?frame:-1;
-    bool read_static_variables=static_frame!=-1 || first_time || !deformable_body_collection.structures.m;
-    if(read_geometry) deformable_body_collection.Read(prefix,prefix,frame,static_frame,read_static_variables,true);
+    bool frame_has_static=File_Exists(viewer_dir.current_directory+"/deformable_object_structures");
+    bool read_static_variables=frame_has_static || first_time || !deformable_body_collection.structures.m;
+    deformable_body_collection.Read(viewer_dir,frame_has_static);
     if(read_static_variables){
         int m=deformable_body_collection.structures.m;active_list.Resize(m,use_init,true);
         point_simplices_1d_objects.Delete_Pointers_And_Clean_Memory();point_simplices_1d_objects.Resize(m);
@@ -87,25 +85,16 @@ Reinitialize(bool force,bool read_geometry)
             else{if(first_time) LOG::cout<<"object "<<i<<": object unrecognized at geometry level\n";}}}
 
     Update_Velocity_Field();
-    frame_loaded=frame;
     valid=true;
     first_time=false;
-}
-//#####################################################################
-// Function Valid_Frame
-//#####################################################################
-template<class T> bool OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
-Valid_Frame(int frame_input) const
-{
-    return File_Exists(LOG::sprintf("%s/%d/deformable_object_particles",prefix.c_str(),frame_input));
 }
 //#####################################################################
 // Function Set_Frame
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D<T>::
-Set_Frame(int frame_input)
+Set_Frame()
 {
-    OPENGL_COMPONENT<T>::Set_Frame(frame_input);Reinitialize();
+    Reinitialize();
 }
 //#####################################################################
 // Function Set_Draw
@@ -293,7 +282,7 @@ Highlight_Particle_Response()
     if(!OPENGL_WORLD<T>::Singleton()->prompt_response.empty()){
         int index=-1;std::istringstream sstream(OPENGL_WORLD<T>::Singleton()->prompt_response);sstream>>index;
         if(index>=0 && index<deformable_body_collection.particles.Size()) selected_vertex=index;}
-    Reinitialize(true);
+    Reinitialize();
 }
 //#####################################################################
 // Function Bounding_Box

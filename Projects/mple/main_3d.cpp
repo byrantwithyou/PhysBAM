@@ -31,15 +31,15 @@ int main(int argc,char* argv[])
     bool use_test=false;
     int test_number=-1;
     bool use_output_directory=false;
-    std::string output_directory="output";
-    MPLE_DRIVER<TV,w> mple;
+    STREAM_TYPE stream_type((RW)0);
+    MPLE_DRIVER<TV,w> mple(stream_type);
     RANDOM_NUMBERS<T> random;
     random.Set_Seed(0);
     int resolution=32;
     int number_of_points=250;
     
     parse_args.Add("-test",&test_number,&use_test,"test","test number");
-    parse_args.Add("-o",&output_directory,&use_output_directory,"o","output directory");
+    parse_args.Add("-o",&mple.viewer_dir.output_directory,&use_output_directory,"o","output directory");
     parse_args.Add("-spread",&mple.spread,"spread","Interface spread int cells");
     parse_args.Add("-contour_value",&mple.contour_value,"contour value","Contour value");
     parse_args.Add("-mu",&mple.mu,"mu","Source power");
@@ -53,8 +53,6 @@ int main(int argc,char* argv[])
     parse_args.Parse();
 
     if(!use_test){LOG::cerr<<"Test number is required."<<std::endl;exit(-1);}
-    if(!use_output_directory) output_directory="output";
-    mple.output_directory=output_directory;
 
     switch(test_number){
         case 1:{
@@ -77,7 +75,6 @@ int main(int argc,char* argv[])
     LOG::cout<<"frames "<<mple.frames<<std::endl;
     LOG::cout<<"mu "<<mple.mu<<std::endl;
         
-    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),mple.grid,output_directory);
     mple.Run();
 
     LOG::Finish_Logging();

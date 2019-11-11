@@ -35,7 +35,7 @@ public:
 //    typedef typename MPM_PARTICLE_SOURCE<TV>::PATH PATH;
     using BASE::last_frame;using BASE::grid;using BASE::particles;
     using BASE::frame_title;using BASE::write_substeps_level;
-    using BASE::collision_objects;using BASE::substeps_delay_frame;using BASE::output_directory;
+    using BASE::collision_objects;using BASE::substeps_delay_frame;using BASE::viewer_dir;
     using BASE::restart;using BASE::dt;using BASE::time;
     using BASE::frame_dt;using BASE::min_dt;using BASE::max_dt;using BASE::ghost;
     using BASE::use_affine;using BASE::only_write_particles;using BASE::only_log;

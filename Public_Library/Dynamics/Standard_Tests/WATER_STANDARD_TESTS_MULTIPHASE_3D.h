@@ -78,8 +78,8 @@ void Initialize(const int test_number_input,const int resolution,const int resta
         lf(500,250);
         grid.Initialize(TV_INT(10*cells+1,10*cells+1,10*cells+1),RANGE<TV>(TV(0,0,0),TV((T).1,(T).1,(T).1)));}
     if(!example.user_output_directory)
-        example.output_directory=LOG::sprintf("Standard_Tests_Multiphase/Test_%d__Resolution_%d_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1),(grid.counts.z-1));
-    LOG::cout<<"output directory="<<example.output_directory<<std::endl;
+        example.viewer_dir.output_directory=LOG::sprintf("Standard_Tests_Multiphase/Test_%d__Resolution_%d_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1),(grid.counts.z-1));
+    LOG::cout<<"output directory="<<example.viewer_dir.output_directory<<std::endl;
 }
 
 //#####################################################################

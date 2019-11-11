@@ -4,6 +4,7 @@
 //#####################################################################
 #include <Core/Log/LOG.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <OpenGL/OpenGL/OPENGL_GRID_3D.h>
 #include <OpenGL/OpenGL/OPENGL_INDEXED_COLOR_MAP.h>
@@ -14,17 +15,18 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_LEVELSET_3D<T>::
-OPENGL_COMPONENT_LEVELSET_3D(const std::string& levelset_filename_input,
+OPENGL_COMPONENT_LEVELSET_3D(const VIEWER_DIR& viewer_dir,
+                             const std::string& levelset_filename_input,
                              const std::string& triangulated_surface_filename_input,
                              const std::string& filename_set_input,
                              const std::string& filename_triangulated_surface_set_input,
                              bool write_generated_triangulated_surface_input,
                              bool check_triangulated_surface_file_time_input)
-    :OPENGL_COMPONENT<T>("Levelset 3D"), opengl_levelset_multiview(0), 
+    :OPENGL_COMPONENT<T>(viewer_dir,"Levelset 3D"), opengl_levelset_multiview(0), 
       levelset_filename(levelset_filename_input),triangulated_surface_filename(triangulated_surface_filename_input),
       filename_set(filename_set_input),filename_triangulated_surface_set(filename_triangulated_surface_set_input),
       write_generated_triangulated_surface(write_generated_triangulated_surface_input),
-      frame_loaded(-1),check_triangulated_surface_file_time(check_triangulated_surface_file_time_input),
+      check_triangulated_surface_file_time(check_triangulated_surface_file_time_input),
 set(0),set_loaded(-1),use_sets(true),draw_multiple_levelsets(true),ghost_cells(3)
 {
     viewer_callbacks.Set("toggle_display_overlay",{[this](){Toggle_Display_Overlay();},"Toggle display overlay (in slice mode)"});
@@ -36,7 +38,7 @@ set(0),set_loaded(-1),use_sets(true),draw_multiple_levelsets(true),ghost_cells(3
 
     int number_of_sets=0;
     while(filename_set!=""){
-        std::string filename=LOG::sprintf(filename_set.c_str(),frame,number_of_sets);
+        std::string filename=LOG::sprintf(filename_set.c_str(),number_of_sets);
         LOG::cout<<"Checking "<<filename<<std::endl;
         if(File_Exists(filename)) number_of_sets++;
         else break;}
@@ -58,7 +60,6 @@ set(0),set_loaded(-1),use_sets(true),draw_multiple_levelsets(true),ghost_cells(3
 
     if(triangulated_surface_filename.length()==0) triangulated_surface_filename="";
 
-    is_animation=levelset_filename.find("%d")!=std::string::npos;
     Reinitialize();
 }
 //#####################################################################
@@ -98,15 +99,6 @@ Set_Slice_Color(const OPENGL_COLOR &inside_slice_color, const OPENGL_COLOR &outs
         opengl_levelset_multiviews(i)->Set_Slice_Color(inside_slice_color, outside_slice_color);
 }
 //#####################################################################
-// Function Valid_Frame
-//#####################################################################
-template<class T> bool OPENGL_COMPONENT_LEVELSET_3D<T>::
-Valid_Frame(int frame_input) const
-{
-    if(use_sets) return File_Exists(LOG::sprintf(filename_set.c_str(),frame,set));
-    else return File_Exists(is_animation?LOG::sprintf(levelset_filename.c_str(),frame_input):levelset_filename);
-}
-//#####################################################################
 // Function Display
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_LEVELSET_3D<T>::
@@ -132,21 +124,15 @@ template<class T> void OPENGL_COMPONENT_LEVELSET_3D<T>::
 Print_Cell_Selection_Info(std::ostream& stream,const TV_INT& cell) const
 {
     if(!draw) return;
-    if(Is_Up_To_Date(frame)){
-        bool is_MAC=true;
-        if(opengl_levelset_multiviews.Size() && opengl_levelset_multiviews(0)->Levelset() && !opengl_levelset_multiviews(0)->Levelset()->grid.Is_MAC_Grid()) is_MAC=false;
-        if(is_MAC){
-            TV_INT index=cell;
-            opengl_levelset_multiviews(0)->Levelset()->grid.Clamp(index,ghost_cells);
-            for(int i=0;i<opengl_levelset_multiviews.m;i++){
-                const LEVELSET<TV>& levelset=*opengl_levelset_multiviews(i)->Levelset();
-                stream<<component_name<<": phi["<<i<<"]="<<levelset.phi(index)
-                             <<" curvature["<<i<<"]="<<levelset.Compute_Curvature(levelset.grid.Center(index))<<std::endl;}}}
-        // if(current_selection && current_selection->type==OPENGL_SELECTION::COMPONENT_PARTICLES_3D){
-        //     OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T> *selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>*)current_selection;
-        //     VECTOR<T,3> location=selection->location;
-        //     for(int i=0;i<opengl_levelset_multiviews.m;i++) if(opengl_levelset_multiviews(i)->Levelset())
-        //         output_stream<<component_name<<": phi["<<i<<"] @ particle="<<opengl_levelset_multiviews(i)->Levelset()->Phi(location)<<std::endl;}}
+    bool is_MAC=true;
+    if(opengl_levelset_multiviews.Size() && opengl_levelset_multiviews(0)->Levelset() && !opengl_levelset_multiviews(0)->Levelset()->grid.Is_MAC_Grid()) is_MAC=false;
+    if(is_MAC){
+        TV_INT index=cell;
+        opengl_levelset_multiviews(0)->Levelset()->grid.Clamp(index,ghost_cells);
+        for(int i=0;i<opengl_levelset_multiviews.m;i++){
+            const LEVELSET<TV>& levelset=*opengl_levelset_multiviews(i)->Levelset();
+            stream<<component_name<<": phi["<<i<<"]="<<levelset.phi(index)
+                  <<" curvature["<<i<<"]="<<levelset.Compute_Curvature(levelset.grid.Center(index))<<std::endl;}}
 }
 //#####################################################################
 // Function Print_Node_Selection_Info
@@ -155,15 +141,14 @@ template<class T> void OPENGL_COMPONENT_LEVELSET_3D<T>::
 Print_Node_Selection_Info(std::ostream& stream,const TV_INT& node) const
 {
     if(!draw) return;
-    if(Is_Up_To_Date(frame)){
-        bool is_MAC=true;
-        if(opengl_levelset_multiviews.Size() && opengl_levelset_multiviews(0)->Levelset() && !opengl_levelset_multiviews(0)->Levelset()->grid.Is_MAC_Grid()) is_MAC=false;
-        if(!is_MAC){
-            TV_INT index=node;
-            opengl_levelset_multiviews(0)->Levelset()->grid.Clamp(index,ghost_cells);
-            for(int i=0;i<opengl_levelset_multiviews.m;i++)
-                if(opengl_levelset_multiviews(i)->Levelset())
-                    stream<<component_name<<": phi["<<i<<"]="<<(*opengl_levelset_multiviews(i)->Levelset()).phi(index)<<std::endl;}}
+    bool is_MAC=true;
+    if(opengl_levelset_multiviews.Size() && opengl_levelset_multiviews(0)->Levelset() && !opengl_levelset_multiviews(0)->Levelset()->grid.Is_MAC_Grid()) is_MAC=false;
+    if(!is_MAC){
+        TV_INT index=node;
+        opengl_levelset_multiviews(0)->Levelset()->grid.Clamp(index,ghost_cells);
+        for(int i=0;i<opengl_levelset_multiviews.m;i++)
+            if(opengl_levelset_multiviews(i)->Levelset())
+                stream<<component_name<<": phi["<<i<<"]="<<(*opengl_levelset_multiviews(i)->Levelset()).phi(index)<<std::endl;}
 }
 //#####################################################################
 // Function Turn_Smooth_Shading_On
@@ -189,16 +174,14 @@ Turn_Smooth_Shading_Off()
 template<class T> void OPENGL_COMPONENT_LEVELSET_3D<T>::
 Reinitialize()
 {
-    if(draw){
-        if((is_animation && (frame_loaded != frame || set_loaded != set)) || (!is_animation && frame_loaded < 0)){
-            if(use_sets){
-                for(int i=0;i<opengl_levelset_multiviews.m;i++)
-                    Reinitialize_Levelset(LOG::sprintf(filename_set.c_str(),frame,i),LOG::sprintf(filename_triangulated_surface_set.c_str(),i,frame),opengl_levelset_multiviews(i));
-                set_loaded=set;}
-            else Reinitialize_Levelset(Get_Frame_Filename(levelset_filename.c_str(),frame), Get_Frame_Filename(triangulated_surface_filename.c_str(),frame), opengl_levelset_multiview);
-            frame_loaded=frame;
-        }
-    }
+    if(!draw) return;
+    if(use_sets){
+        for(int i=0;i<opengl_levelset_multiviews.m;i++)
+            Reinitialize_Levelset(viewer_dir.current_directory+"/"+LOG::sprintf(filename_set.c_str(),i),viewer_dir.current_directory+"/"+LOG::sprintf(filename_triangulated_surface_set.c_str(),i),opengl_levelset_multiviews(i));
+        set_loaded=set;}
+    else Reinitialize_Levelset(viewer_dir.current_directory+"/"+levelset_filename.c_str(),
+        viewer_dir.current_directory+"/"+triangulated_surface_filename.c_str(), 
+        opengl_levelset_multiview);
 }
 //#####################################################################
 // Function Reinitialize_Levelset
@@ -218,9 +201,9 @@ Reinitialize_Levelset(const std::string& levelset_filename, const std::string& t
 // Function Set_Frame
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_LEVELSET_3D<T>::
-Set_Frame(int frame_input)
+Set_Frame()
 {
-    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
+    
     Reinitialize();
 }
 //#####################################################################

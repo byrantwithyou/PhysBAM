@@ -28,7 +28,7 @@ public:
     using BASE::mass;using BASE::force_helper;
     using BASE::frame_title;using BASE::write_substeps_level;using BASE::gather_scatter;
     using BASE::substeps_delay_frame;
-    using BASE::output_directory;
+    using BASE::viewer_dir;
     using BASE::restart;using BASE::dt;using BASE::time;
     using BASE::frame_dt;using BASE::min_dt;using BASE::max_dt;
     using BASE::ghost;using BASE::use_affine;using BASE::cfl_F;using BASE::use_strong_cfl;
@@ -56,8 +56,8 @@ public:
     bool override_output_directory;
     T m,s,kg;
     T unit_p,unit_rho,unit_mu;
-    std::function<void (int frame)> write_output_files;
-    std::function<void (int frame)> read_output_files;
+    std::function<void ()> write_output_files;
+    std::function<void ()> read_output_files;
     std::function<void ()> destroy;
     ARRAY<T> extra_T;
     ARRAY<int> extra_int;

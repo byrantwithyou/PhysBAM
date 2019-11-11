@@ -80,7 +80,7 @@ class SURFACE_TENSION:public PLS_FSI_EXAMPLE<VECTOR<T_input,2> >
     typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
     typedef PLS_FSI_EXAMPLE<TV> BASE;
-    using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::solids_fluids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;
+    using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::solids_fluids_parameters;using BASE::viewer_dir;using BASE::last_frame;using BASE::frame_rate;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
     using BASE::Add_Volumetric_Body_To_Fluid_Simulation;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::two_phase;
     using BASE::test_number;using BASE::resolution;using BASE::data_directory;using BASE::convection_order;using BASE::use_pls_evolution_for_structure;
@@ -162,7 +162,7 @@ public:
     void Remove_Particle(int p);
     T Compute_New_Mass(int p);
     void Copy_Front_Tracked_Velocity_From_Fluid();
-    void Write_Output_Files(const int frame) const override;
+    void Write_Output_Files() const override;
     void Initialize_Surface_Particles(int number);
     void Rebuild_Surface();
     void Substitute_Coupling_Matrices(KRYLOV_SYSTEM_BASE<T>& coupled_system,T dt,T current_velocity_time,T current_position_time,bool velocity_update,bool leakproof_solve) override;

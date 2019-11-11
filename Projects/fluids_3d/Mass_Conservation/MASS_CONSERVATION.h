@@ -36,8 +36,8 @@ class MASS_CONSERVATION:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,3> >
     typedef T_input T;typedef VECTOR<T,3> TV;
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;typedef VECTOR<int,3> TV_INT;
 public:
-    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::fluids_parameters;
-    using BASE::fluid_collection;using BASE::solids_parameters;using BASE::write_time;using BASE::write_frame_title;using BASE::data_directory;using BASE::abort_when_dt_below;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::viewer_dir;using BASE::fluids_parameters;
+    using BASE::fluid_collection;using BASE::solids_parameters;using BASE::write_frame_title;using BASE::data_directory;using BASE::abort_when_dt_below;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes; // silence -Woverloaded-virtual
     using BASE::test_number;using BASE::resolution;using BASE::user_last_frame;
 
@@ -69,7 +69,7 @@ public:
 
         // Common parameters
         if(!this->user_output_directory)
-            output_directory=LOG::sprintf("Mass_Conservation/example_%d_resolution_%d",test_number,resolution);
+            viewer_dir.output_directory=LOG::sprintf("Mass_Conservation/example_%d_resolution_%d",test_number,resolution);
         restart=false;restart_frame=0;if(!this->user_frame_rate) frame_rate=300;
 
         // Fluids parameters
@@ -152,7 +152,6 @@ public:
         // Debugging
         fluids_parameters.write_debug_data=true;
         abort_when_dt_below=(T)1e-7;
-        write_time=true;
         write_frame_title=true;
     }
 

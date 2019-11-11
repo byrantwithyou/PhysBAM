@@ -18,7 +18,7 @@ class SOLIDS_FLUIDS_DRIVER:public DRIVER<TV>
     typedef typename TV::SCALAR T;
     typedef DRIVER<TV> BASE;
 public:
-    using BASE::output_number;using BASE::time;using BASE::Write_Output_Files;using BASE::Read_Time;using BASE::Write_Substep;
+    using BASE::output_number;using BASE::time;using BASE::Write_Output_Files;using BASE::Write_Substep;
     using BASE::current_frame;
     
     SOLIDS_FLUIDS_EXAMPLE<TV>& example;

@@ -13,6 +13,7 @@
 #include "MATRIX_CONSTRUCTION_FEM.h"
 #include "VISITORS_FEM.h"
 namespace PhysBAM{
+VIEWER_OUTPUT* pvo2;
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -128,7 +129,7 @@ Visualize_Block_Dofs(BLOCK_ID b) const
         TV2 Y=Z(cb->S(i).y);
         Add_Debug_Object(VECTOR<TV2,2>(X,Y),he.Contains(i)?VECTOR<T,3>(0,1,1):VECTOR<T,3>(0,0,1));
     }
-    Flush_Frame<TV2>(LOG::sprintf("block %P\n",b).c_str());
+    pvo2->Flush_Frame(LOG::sprintf("block %P\n",b).c_str());
     for(int i=0;i<cb->X.m;i++)
     {
         Add_Debug_Text(Z(i),LOG::sprintf("%d",i),VECTOR<T,3>(1,1,0));
@@ -137,25 +138,25 @@ Visualize_Block_Dofs(BLOCK_ID b) const
     {
         Add_Debug_Text((Z(cb->S(i).x)+Z(cb->S(i).y))/2,LOG::sprintf("%d",i),VECTOR<T,3>(0,1,0));
     }
-    Flush_Frame<TV2>(LOG::sprintf("block %P full\n",b).c_str());
+    pvo2->Flush_Frame(LOG::sprintf("block %P full\n",b).c_str());
     for(int i=0;i<cb->X.m;i++)
     {
         int k=rd.dof_map_v(i);
         if(k>=0) Add_Debug_Text(Z(i),LOG::sprintf("%d",k),VECTOR<T,3>(1,1,0));
     }
-    Flush_Frame<TV2>(LOG::sprintf("block %P v\n",b).c_str());
+    pvo2->Flush_Frame(LOG::sprintf("block %P v\n",b).c_str());
     for(int i=0;i<cb->S.m;i++)
     {
         int k=rd.dof_map_e(i);
         if(k>=0) Add_Debug_Text((Z(cb->S(i).x)+Z(cb->S(i).y))/2,LOG::sprintf("%d",k),VECTOR<T,3>(0,1,0));
     }
-    Flush_Frame<TV2>(LOG::sprintf("block %P e\n",b).c_str());
+    pvo2->Flush_Frame(LOG::sprintf("block %P e\n",b).c_str());
     for(int i=0;i<cb->X.m;i++)
     {
         int k=rd.dof_map_p(i);
         if(k>=0) Add_Debug_Text(Z(i),LOG::sprintf("%d",k),VECTOR<T,3>(1,1,0));
     }
-    Flush_Frame<TV2>(LOG::sprintf("block %P p\n",b).c_str());
+    pvo2->Flush_Frame(LOG::sprintf("block %P p\n",b).c_str());
 
     for(CON_ID cc(0);cc<bl.connections.m;cc++)
     {
@@ -234,7 +235,7 @@ Visualize_Solution(const BLOCK_VECTOR<TV3>& U,BLOCK_ID b,bool remap_dofs) const
             Debug_Particle_Set_Attribute<TV3>("V",U.Get_e(e));
         },
         [](int p,const TV3& X){});
-    Flush_Frame<TV3>(LOG::sprintf("sol %P ve",b).c_str());
+    Flush_Frame(LOG::sprintf("sol %P ve",b).c_str());
 
     Visualize_Tetrahedron(b);
     Visit_Compressed_Dofs(dl,rb,
@@ -245,7 +246,7 @@ Visualize_Solution(const BLOCK_VECTOR<TV3>& U,BLOCK_ID b,bool remap_dofs) const
             Add_Debug_Particle(xform(M,X),VECTOR<T,3>(1,0,0));
             Debug_Particle_Set_Attribute<TV3>("display_size",U.Get_p(p));
         });
-    Flush_Frame<TV3>(LOG::sprintf("sol %P p",b).c_str());
+    Flush_Frame(LOG::sprintf("sol %P p",b).c_str());
 }
 //#####################################################################
 // Function Visualize_Solution
@@ -368,7 +369,7 @@ Visualize_Flat_Dofs() const
                 Add_Debug_Text((Z(cb->S(i).x)+Z(cb->S(i).y))/2,LOG::sprintf("%d",dof),VECTOR<T,3>(1,1,0));
             }
     }
-    Flush_Frame<TV2>("flat velocity dofs");
+    pvo2->Flush_Frame("flat velocity dofs");
     
     for(BLOCK_ID b(0);b<cl.blocks.m;b++)
     {
@@ -384,7 +385,7 @@ Visualize_Flat_Dofs() const
                 Add_Debug_Text(Z(i),LOG::sprintf("%d",dof),VECTOR<T,3>(1,1,0));
             }
     }
-    Flush_Frame<TV2>("flat pressure dofs");
+    pvo2->Flush_Frame("flat pressure dofs");
     
 
 }
@@ -454,7 +455,7 @@ Visualize_Tetrahedron_Dofs(const MATRIX_CONSTRUCTION_FEM<TV3>& mc) const
                 ++count_e;
             },
             [](int p,const TV3& X){});
-        Flush_Frame<TV3>(LOG::sprintf("block %P ve",b).c_str());
+        Flush_Frame(LOG::sprintf("block %P ve",b).c_str());
 
         Visualize_Tetrahedron(b);
         Visit_Compressed_Dofs(dl,rb,
@@ -467,7 +468,7 @@ Visualize_Tetrahedron_Dofs(const MATRIX_CONSTRUCTION_FEM<TV3>& mc) const
                 Debug_Particle_Set_Attribute<TV3>("p",VECTOR<int,2>(p,dof));
                 ++count_p;
             });
-        Flush_Frame<TV3>(LOG::sprintf("block %P p",b).c_str());
+        Flush_Frame(LOG::sprintf("block %P p",b).c_str());
     }
 }
 //#####################################################################

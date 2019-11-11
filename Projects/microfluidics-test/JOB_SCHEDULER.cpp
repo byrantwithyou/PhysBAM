@@ -3,9 +3,9 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Log/LOG.h>
+#include "JOB_SCHEDULER.h"
 #include <climits>
 #include <fstream>
-#include "JOB_SCHEDULER.h"
 #include <mutex>
 #include <thread>
 #include <x86intrin.h>

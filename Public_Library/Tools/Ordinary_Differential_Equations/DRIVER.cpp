@@ -43,7 +43,7 @@ Initialize()
     // setup time
     example.Setup_Log();
     if(example.auto_restart){Read_Last_Frame();example.restart=true;}
-    if(example.restart){current_frame=example.restart_frame;Read_Time(current_frame);}
+    if(example.restart) current_frame=example.restart_frame;
     else current_frame=0;
     output_number=current_frame;
     time=example.Time_At_Frame(current_frame);
@@ -56,7 +56,7 @@ Write_Substep(const std::string& title)
 {
     example.frame_title=title;
     LOG::cout<<"Writing substep ["<<example.frame_title<<"]: output_number="<<output_number+1<<", time="<<time<<", frame="<<current_frame<<std::endl;
-    Write_Output_Files(++output_number);
+    Write_Output_Files();
     example.frame_title="";
 }
 //#####################################################################
@@ -68,24 +68,8 @@ Simulate_To_Frame(const int frame)
     while(current_frame<frame){
         LOG::SCOPE scope("FRAME","Frame %d",current_frame+1);
         Advance_To_Target_Time(example.Time_At_Frame(current_frame+1));
-        Write_Output_Files(++output_number);
+        Write_Output_Files();
         current_frame++;}
-}
-//#####################################################################
-// Function Read_Time
-//#####################################################################
-template<class TV> void DRIVER<TV>::
-Read_Time(const int frame)
-{
-    time=example.Time_At_Frame(frame);
-    std::string filename=LOG::sprintf("%s/%d/time",example.output_directory.c_str(),frame);
-    if(File_Exists(filename)){
-        T corrected_time;
-        Read_From_File(filename,corrected_time);
-        if(abs(time-corrected_time)>(T)1e-4*abs(time)){ // only adjust time if significantly different from default in order to get deterministic restarts
-            time=corrected_time;
-            // adjust initial time so that Simulate_To_Frame() returns correct time (essential when writing substeps)
-        }}
 }
 //#####################################################################
 // Function Read_Last_Frame
@@ -93,7 +77,7 @@ Read_Time(const int frame)
 template<class TV> void DRIVER<TV>::
 Read_Last_Frame()
 {
-    std::string filename=LOG::sprintf("%s/common/last_frame",example.output_directory.c_str());
+    std::string filename=LOG::sprintf("%s/common/last_frame",example.viewer_dir.output_directory.c_str());
     if(File_Exists(filename))
         Read_From_Text_File(filename, example.restart_frame);
 }
@@ -101,15 +85,13 @@ Read_Last_Frame()
 // Write_Output_Files
 //#####################################################################
 template<class TV> void DRIVER<TV>::
-Write_Output_Files(const int frame)
+Write_Output_Files()
 {
-    Create_Directory(example.output_directory);
-    Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
-    Create_Directory(example.output_directory+"/common");
-    example.Write_Output_Files(frame);
-    Write_Time(frame);
-    Write_Last_Frame(frame);
-    Write_To_Text_File(example.output_directory+LOG::sprintf("/%d/frame_title",frame),example.frame_title);
+    example.viewer_dir.Start_Directory(0,example.frame_title);
+    example.frame_title="";
+    example.Write_Output_Files();
+    Write_Time();
+    example.viewer_dir.Finish_Directory();
 }
 //#####################################################################
 namespace PhysBAM{

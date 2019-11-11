@@ -35,7 +35,7 @@ public:
     void Advance_One_Time_Step(bool first_step);
     void Update_Pls(T dt);
     void Simulate_To_Frame(const int frame_input);
-    void Write_Output_Files(const int frame);
+    void Write_Output_Files();
     void Write_Substep(const std::string& title);
     void Update_Level_Set(T dt,bool first_step);
     void Advection_And_BDF(T dt,bool first_step);

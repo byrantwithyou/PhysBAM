@@ -17,7 +17,7 @@ class SPINNING_BAR:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::viewer_dir;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::data_directory;
     using BASE::fluid_collection;using BASE::resolution;
     using BASE::user_last_frame;
@@ -33,7 +33,7 @@ public:
         if(!this->user_frame_rate) frame_rate=24;
         restart=false;restart_frame=18;
         if(!this->user_output_directory)
-            output_directory=LOG::sprintf("Spinning_Bar/output_%d",resolution);
+            viewer_dir.output_directory=LOG::sprintf("Spinning_Bar/output_%d",resolution);
         fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=false; 
         fluids_parameters.number_particles_per_cell=32;
         fluids_parameters.particle_half_bandwidth=1; // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -61,7 +61,7 @@ public:
         fluids_parameters.viscosity=0;//(T)25;
         if(fluids_parameters.viscosity)
             if(!this->user_output_directory)
-                output_directory+=LOG::sprintf("_v%g",fluids_parameters.viscosity);
+                viewer_dir.output_directory+=LOG::sprintf("_v%g",fluids_parameters.viscosity);
     }
 
 //#####################################################################

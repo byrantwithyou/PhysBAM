@@ -15,6 +15,8 @@ namespace PhysBAM{
 template<class TV> class JOINT_MESH;
 template<class TV> class RIGID_BODY_COLLECTION;
 template<class TV> class ARTICULATED_VECTOR;
+class VIEWER_DIR;
+
 template<class TV>
 class ARTICULATED_RIGID_BODY_BASE
 {
@@ -121,7 +123,7 @@ public:
     void Restore_Velocities_And_Momenta();
     virtual void Solve_Velocities_for_PD(const T time,const T dt,bool test_system,bool print_matrix)=0;
     virtual void Apply_Poststabilization_To_Joint(const JOINT_ID joint_id,const bool target_pd=false);
-    virtual void Output_Articulation_Points(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const=0;
+    virtual void Output_Articulation_Points(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir) const=0;
     virtual void Compute_Desired_PD_Velocity(const T dt,const T time){}
     template<class T_CONSTRAINT_FUNCTION> void Compute_Constraint_Correcting_Impulse(T_CONSTRAINT_FUNCTION& constraint_error_function,typename T_CONSTRAINT_FUNCTION::T_IMPULSE& j) const;
     void Apply_Prestabilization_To_Joint(const JOINT_ID joint_id,const T dt,const T epsilon_scale);
@@ -130,8 +132,8 @@ public:
     void Poststabilization_Projection(ARRAY_VIEW<TWIST<TV> > twist,const bool symmetric=false);
     void Generate_Process_List_Using_Contact_Graph(const RIGID_BODY_CONTACT_GRAPH<TV>& contact_graph);
     void Apply_Poststabilization(bool test_system,bool print_matrix,const bool target_pd=false,const bool skip_global_post_stabilized_joints=false,const bool angular_damping_only=false);
-    void Read(const std::string& directory,const int frame);
-    void Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame);
+    void Read(const VIEWER_DIR& viewer_dir);
+    void Write(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir);
     void Effective_Inertia_Inverse(MATRIX<T,d+s>& inertia_inverse,JOINT_ID joint_id) const;
     void Substitute_Joint_Parent_Body(JOINT_ID joint_id,int new_parent,const FRAME<TV>& frame);
     void Substitute_Joint_Child_Body(JOINT_ID joint_id,int new_child,const FRAME<TV>& frame);

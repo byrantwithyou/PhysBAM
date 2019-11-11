@@ -1,8 +1,8 @@
 #include <Core/Log/LOG.h>
+#include "DYNAMIC_IMPLICIT_SURFACE.h"
 #include <algorithm>
 #include <cstdlib>
 #include <cstring>
-#include "DYNAMIC_IMPLICIT_SURFACE.h"
 namespace PhysBAM{
 
 template<class T>

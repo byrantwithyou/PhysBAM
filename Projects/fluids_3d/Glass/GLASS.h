@@ -26,7 +26,7 @@ public:
     typedef ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,TV_INT> T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::viewer_dir;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::data_directory;using BASE::solid_body_collection;
     using BASE::stream_type;using BASE::test_number;using BASE::resolution;using BASE::Adjust_Phi_With_Source;
     using BASE::user_last_frame;
@@ -125,8 +125,8 @@ public:
         time_pour=4;
         
         if(!this->user_output_directory)
-            output_directory=LOG::sprintf("Glass/Glass_%d__Resolution_%d_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1),(grid.counts.z-1));
-        LOG::cout<<"Running SPH simulation to "<<output_directory<<std::endl;
+            viewer_dir.output_directory=LOG::sprintf("Glass/Glass_%d__Resolution_%d_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1),(grid.counts.z-1));
+        LOG::cout<<"Running SPH simulation to "<<viewer_dir.output_directory<<std::endl;
 
         CYLINDER<T> source1;
         source1.Set_Endpoints(TV(-(T).0025,(T).174,0),TV((T).0077,(T).1875,0));

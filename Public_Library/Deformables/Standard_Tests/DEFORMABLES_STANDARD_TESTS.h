@@ -28,6 +28,7 @@ template<class TV,int d> class EMBEDDED_MATERIAL_SURFACE;
 template<class TV> class TRIANGLE_COLLISION_PARAMETERS;
 template<class TV> class GRID;
 template<class TV> class DEFORMABLE_BODY_COLLECTION;
+class VIEWER_DIR;
 
 template<class TV>
 class DEFORMABLES_STANDARD_TESTS
@@ -83,8 +84,8 @@ public:
     template<class T_OBJECT> void
     Substitute_Soft_Bindings_For_Nodes(T_OBJECT& object,SOFT_BINDINGS<TV>& soft_bindings,HASHTABLE<int,int>* persistent_soft_bindings=0,const bool embedded_only=false,
         const bool use_impulses_for_collisions=true);
-    LEVELSET_IMPLICIT_OBJECT<TV>* Read_Or_Initialize_Implicit_Surface(const std::string& levelset_filename,const std::string& output_directory,TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface) const;
-    void Initialize_Tetrahedron_Collisions(const int id_number,const std::string& output_directory,TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,
+    LEVELSET_IMPLICIT_OBJECT<TV>* Read_Or_Initialize_Implicit_Surface(const std::string& levelset_filename,const VIEWER_DIR& viewer_dir,TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface) const;
+    void Initialize_Tetrahedron_Collisions(const int id_number,VIEWER_DIR& viewer_dir,TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,
         TRIANGLE_COLLISION_PARAMETERS<TV>& triangle_collision_parameters,TRIANGULATED_SURFACE<T>* triangulated_surface=0);
     TRIANGULATED_SURFACE<T>& Create_Drifted_Surface(const TRIANGULATED_SURFACE<T>& triangulated_surface,SOFT_BINDINGS<TV>& soft_bindings,const bool use_impulses_for_collisions=false) const;
     template <class T_OBJECT> static void Set_Mass_Of_Particles(const T_OBJECT& volume,const T density,const bool use_constant_mass=false);

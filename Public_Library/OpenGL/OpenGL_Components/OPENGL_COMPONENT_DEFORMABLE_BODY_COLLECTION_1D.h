@@ -22,8 +22,6 @@ class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,1> TV;
 protected:
-    std::string prefix;
-    int frame_loaded;
     bool valid,use_active_list,hide_unselected;
     int display_mode,incremented_active_object;
     bool smooth_shading;
@@ -31,7 +29,7 @@ protected:
     bool invalidate_deformable_objects_selection_each_frame;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
-    using OPENGL_COMPONENT<T>::is_animation;
+    using OPENGL_COMPONENT<T>::viewer_dir;
     using OPENGL_OBJECT<T>::viewer_callbacks;using OPENGL_OBJECT<T>::World_Space_Box;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
     ARRAY<OPENGL_POINT_SIMPLICES_1D<T>*> point_simplices_1d_objects;
@@ -42,11 +40,10 @@ public:
     bool draw_velocity_vectors;
     OPENGL_INDEXED_COLOR_MAP *color_map;
 
-    OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D(const std::string& prefix,const int start_frame);
+    OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D(const VIEWER_DIR& viewer_dir);
     virtual ~OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_1D();
     
-    bool Valid_Frame(int frame_input) const override;
-    void Set_Frame(int frame_input) override;
+    void Set_Frame() override;
     void Set_Draw(bool draw_input=true) override;
     void Draw_All_Objects() override;
 
@@ -75,7 +72,7 @@ public:
     void Increase_Vector_Size();
     void Update_Velocity_Field();
 
-    virtual void Reinitialize(bool force=false,bool read_geometry=true);    // Needs to be called after some state changes
+    virtual void Reinitialize();    // Needs to be called after some state changes
     
     void Toggle_Active_Value_Response();
     void Highlight_Particle_Response();

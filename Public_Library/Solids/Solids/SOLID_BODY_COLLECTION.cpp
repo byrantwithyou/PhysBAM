@@ -6,6 +6,7 @@
 //#####################################################################
 #include <Core/Log/LOG.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
@@ -290,38 +291,25 @@ Print_Energy(const T time,const int step) const
 // Function Read
 //#####################################################################
 template<class TV> void SOLID_BODY_COLLECTION<TV>::
-Read(const std::string& prefix,const int frame,const int static_frame,const bool include_static_variables,const bool read_rigid_body,const bool read_deformable_body,const bool read_from_every_process,ARRAY<int>* needs_init,ARRAY<int>* needs_destroy)
+Read(const VIEWER_DIR& viewer_dir,const bool static_variables_every_frame,
+    ARRAY<int>* needs_init,ARRAY<int>* needs_destroy)
 {
-    std::string local_prefix=prefix;
-    if(deformable_body_collection.mpi_solids && deformable_body_collection.mpi_solids->rank && !read_from_every_process){ // modify prefix to always read from the root's output
-        std::string old_suffix="/"+Value_To_String(deformable_body_collection.mpi_solids->rank+1),new_suffix="/1";
-        size_t position=prefix.size()-old_suffix.size();
-        PHYSBAM_ASSERT(prefix.substr(position)==old_suffix);
-        local_prefix.replace(position,std::string::npos,new_suffix);}
-    if(read_deformable_body){
-        deformable_body_collection.Read(local_prefix,local_prefix,frame,static_frame,include_static_variables,read_from_every_process);}
-    if(read_rigid_body){
-        rigid_body_collection.Read(local_prefix,frame,needs_init,needs_destroy);}
+    deformable_body_collection.Read(viewer_dir,static_variables_every_frame);
+    rigid_body_collection.Read(viewer_dir,needs_init,needs_destroy);
 }
 //#####################################################################
 // Function Write
 //#####################################################################
 template<class TV> void SOLID_BODY_COLLECTION<TV>::
-Write(const STREAM_TYPE stream_type,const std::string& prefix,const int frame,const bool include_static_variables,const bool write_rigid_body,const bool write_deformable_body,const bool write_from_every_process,const bool output_interaction_pairs) const
+Write(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir,const bool static_variables_every_frame,const bool write_from_every_process) const
 {
-    if(write_deformable_body){
-        int static_frame=include_static_variables?frame:-1;
-        bool write_static_variables=include_static_variables || frame==0;
-        deformable_body_collection.Write(stream_type,prefix,prefix,frame,static_frame,write_static_variables,write_from_every_process);
-        ARRAY<FORCE_DATA<TV> > spring_data_list;
-        for(int i=0;i<solids_forces.m;i++) solids_forces(i)->Add_Force_Data(spring_data_list);
-        for(int i=0;i<deformable_body_collection.deformables_forces.m;i++) deformable_body_collection.deformables_forces(i)->Add_Force_Data(spring_data_list);
-        std::string f=Number_To_String(frame);
-        if(spring_data_list.m!=0) Write_To_File(stream_type,prefix+"/"+f+"/force_data",spring_data_list);}
-    if(write_rigid_body)
-        rigid_body_collection.Write(stream_type,prefix,frame);
-    if(output_interaction_pairs)
-        deformable_body_collection.triangle_repulsions.Output_Interaction_Pairs(stream_type,prefix+"/"+Number_To_String(frame)+"/interaction_pairs");
+    deformable_body_collection.Write(stream_type,viewer_dir,static_variables_every_frame,write_from_every_process);
+    ARRAY<FORCE_DATA<TV> > spring_data_list;
+    for(int i=0;i<solids_forces.m;i++) solids_forces(i)->Add_Force_Data(spring_data_list);
+    for(int i=0;i<deformable_body_collection.deformables_forces.m;i++) deformable_body_collection.deformables_forces(i)->Add_Force_Data(spring_data_list);
+    if(spring_data_list.m!=0) Write_To_File(stream_type,viewer_dir.current_directory+"/force_data",spring_data_list);
+    rigid_body_collection.Write(stream_type,viewer_dir);
+    //deformable_body_collection.triangle_repulsions.Output_Interaction_Pairs(stream_type,viewer_dir.current_directory+"/interaction_pairs");
 }
 //#####################################################################
 // Function Add_All_Forces

@@ -5,6 +5,7 @@
 #ifndef __OD_EXAMPLE__
 #define __OD_EXAMPLE__
 #include <Core/Utilities/Find_Type.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 namespace PhysBAM{
@@ -31,7 +32,7 @@ public:
     std::string frame_title;
     int write_substeps_level;
     int substeps_delay_frame;
-    std::string output_directory;
+    VIEWER_DIR viewer_dir;
     int restart;
     T dt,time,frame_dt,min_dt,max_dt;
     bool print_stats;
@@ -44,8 +45,8 @@ public:
     virtual ~OD_EXAMPLE();
     void operator=(const OD_EXAMPLE&) = delete;
     
-    virtual void Write_Output_Files(const int frame);
-    virtual void Read_Output_Files(const int frame);
+    virtual void Write_Output_Files();
+    virtual void Read_Output_Files();
 
     int Add_Structure(STRUCTURE<TV>* structure)
     {return structures.Append(structure);}

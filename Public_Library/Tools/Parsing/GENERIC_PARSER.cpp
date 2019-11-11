@@ -52,7 +52,7 @@ template<class T> void GENERIC_PARSER<T>::
 Preprocess_File(std::string raw_filename,const int frame)
 {
     // strip comments and do include files
-    std::string filename=Get_Frame_Filename(raw_filename,frame);
+    std::string filename=LOG::sprintf(raw_filename,frame);
     std::ifstream input_stream(filename.c_str());
     std::string directory=Get_Base_Directory_Name(filename);
     if(!input_stream) PHYSBAM_FATAL_ERROR(LOG::sprintf("Could not open scene file %s",filename.c_str()));

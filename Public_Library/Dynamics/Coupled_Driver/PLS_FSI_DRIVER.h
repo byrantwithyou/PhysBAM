@@ -22,8 +22,8 @@ class PLS_FSI_DRIVER:public DRIVER<TV>
     typedef ARRAY<TV_DIMENSION,TV_INT> T_ARRAYS_DIMENSION_SCALAR;
     using BASE::time;using BASE::current_frame;
 public:
-    using BASE::output_number;using BASE::Write_Output_Files;using BASE::Read_Time;using BASE::Write_Time;
-    using BASE::Write_Last_Frame;using BASE::Write_Substep;
+    using BASE::output_number;using BASE::Write_Output_Files;using BASE::Write_Time;
+    using BASE::Write_Substep;
 
     PLS_FSI_EXAMPLE<TV>& example;
     ARRAY<T,TV_INT> old_phi;
@@ -42,7 +42,7 @@ public:
     virtual void Postprocess_Frame(const int frame);
     virtual void Preprocess_Frame(const int frame);
     T Compute_Dt(const T time,const T target_time,bool& done);
-    void Write_Output_Files(const int frame) override;
+    void Write_Output_Files() override;
     void Advect_Fluid(const T dt);
     void Execute_Main_Program() override;
     void Simulate_To_Frame(const int frame_input) override;

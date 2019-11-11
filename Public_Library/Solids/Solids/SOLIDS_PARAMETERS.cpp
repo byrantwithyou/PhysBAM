@@ -20,7 +20,7 @@ template<class TV> SOLIDS_PARAMETERS<TV>::
 SOLIDS_PARAMETERS()
     :triangle_collision_parameters(*new TRIANGLE_COLLISION_PARAMETERS<TV>),implicit_solve_parameters(*new IMPLICIT_SOLVE_PARAMETERS<TV>),
     rigid_body_collision_parameters(*new RIGID_BODY_COLLISION_PARAMETERS<TV>),rigid_body_evolution_parameters(*new RIGID_BODY_EVOLUTION_PARAMETERS<TV>),
-    deformable_object_collision_parameters(*new DEFORMABLE_OBJECT_COLLISION_PARAMETERS<TV>),write_deformable_body(true),verbose(true),verbose_dt(false),cfl((T)10),
+    deformable_object_collision_parameters(*new DEFORMABLE_OBJECT_COLLISION_PARAMETERS<TV>),verbose(true),verbose_dt(false),cfl((T)10),
     fracture(false),write_static_variables_every_frame(false),newton_tolerance((T)1e-3),newton_iterations(1),use_partially_converged_result(true),
     write_from_every_process(true),enforce_repulsions_in_cg(true),use_post_cg_constraints(true),use_rigid_deformable_contact(false),rigid_cluster_fracture_frequency(INT_MAX),
     use_trapezoidal_rule_for_velocities(true),enforce_poststabilization_in_cg(true),

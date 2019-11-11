@@ -135,7 +135,7 @@ public:
     bool project_nullspace;
 
     typedef SOLIDS_EXAMPLE<TV> BASE;
-    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::restart;
+    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::viewer_dir;using BASE::restart;
     using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::test_number;
     using BASE::user_last_frame;
 
@@ -159,7 +159,7 @@ public:
 
         tests.data_directory=data_directory;
         if(!this->user_output_directory)
-            output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+            viewer_dir.output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
         if(project_nullspace) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
     }
 
@@ -279,7 +279,6 @@ void Initialize_Bodies() override
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
     solids_parameters.cfl=1;
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-    solids_parameters.triangle_collision_parameters.output_interaction_pairs=true;
     solids_parameters.rigid_body_collision_parameters.use_push_out=true;
     solids_parameters.use_rigid_deformable_contact=true;
     solids_parameters.rigid_body_collision_parameters.collision_bounding_box_thickness=(T)1e-3;
@@ -436,11 +435,11 @@ void Push_Out_Test()
 
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",
         RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)1.5,(T)0))),true,true,1000);
-    tests.Initialize_Tetrahedron_Collisions(1,output_directory,tetrahedralized_volume,solids_parameters.triangle_collision_parameters);
+    tests.Initialize_Tetrahedron_Collisions(1,viewer_dir,tetrahedralized_volume,solids_parameters.triangle_collision_parameters);
 
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume2=tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",
         RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)-1.7,(T)2,(T)0))),true,true,1000);
-    tests.Initialize_Tetrahedron_Collisions(1,output_directory,tetrahedralized_volume2,solids_parameters.triangle_collision_parameters);
+    tests.Initialize_Tetrahedron_Collisions(1,viewer_dir,tetrahedralized_volume2,solids_parameters.triangle_collision_parameters);
 
 //    int n=10;
 //    for(int i=0;i<n;i++) for(int j=0;j<n;j++) for(int k=0;k<n;k++) tests.Add_Rigid_Body("subdivided_box",1,(T)0).Frame().t=TV(1.8*(i+1),1.*j,1.75*k);
@@ -1696,7 +1695,7 @@ void Two_Way_Tori()
     embedding.Update_Binding_List_From_Embedding(solid_body_collection.deformable_body_collection,false);
     tests.Substitute_Soft_Bindings_For_Embedded_Nodes(embedding.material_surface,soft_bindings);
     embedding.Update_Number_Nodes();
-    tests.Initialize_Tetrahedron_Collisions(1,output_directory,embedding.embedded_object.simplicial_object,solids_parameters.triangle_collision_parameters,&embedding.material_surface);
+    tests.Initialize_Tetrahedron_Collisions(1,viewer_dir,embedding.embedded_object.simplicial_object,solids_parameters.triangle_collision_parameters,&embedding.material_surface);
     RIGID_BODY<TV>* rigid_body=&tests.Add_Rigid_Body("torus",1,(T).5);
     rigid_body->Set_Mass(1000);
     rigid_body->Frame().t=TV(0,(T)2,0);

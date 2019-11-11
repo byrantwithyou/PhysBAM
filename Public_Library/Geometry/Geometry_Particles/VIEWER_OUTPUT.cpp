@@ -9,31 +9,28 @@
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
-using namespace PhysBAM;
+namespace PhysBAM{
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class TV> VIEWER_OUTPUT<TV>::
-VIEWER_OUTPUT(STREAM_TYPE stream_type,const GRID<TV>& grid,const std::string& output_directory)
-    :frame(0),output_directory(output_directory),stream_type(stream_type),grid(grid),debug_particles(*new DEBUG_PARTICLES<TV>)
+VIEWER_OUTPUT::
+VIEWER_OUTPUT(STREAM_TYPE stream_type,VIEWER_DIR& viewer_dir)
+    :viewer_dir(viewer_dir),stream_type(stream_type)
 {
     Singleton(this);
-    debug_particles.debug_particles.template Add_Array<T>("display_size");
-    debug_particles.debug_particles.template Add_Array<TV>("V");
 }
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class TV> VIEWER_OUTPUT<TV>::
+VIEWER_OUTPUT::
 ~VIEWER_OUTPUT()
 {
     Singleton(0);
-    delete &debug_particles;
 }
 //#####################################################################
 // Function Singleton
 //#####################################################################
-template<class TV> VIEWER_OUTPUT<TV>* VIEWER_OUTPUT<TV>::
+VIEWER_OUTPUT* VIEWER_OUTPUT::
 Singleton(VIEWER_OUTPUT* vo)
 {
     static VIEWER_OUTPUT* viewer_output=0;
@@ -42,40 +39,43 @@ Singleton(VIEWER_OUTPUT* vo)
     return tmp;
 }
 //#####################################################################
-// Function Initialize
-//#####################################################################
-template<class TV> void VIEWER_OUTPUT<TV>::
-Flush_Frame(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const char* title)
-{
-    if(frame==0){
-        Create_Directory(output_directory);
-        Create_Directory(output_directory+"/common");
-        LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",false);
-        Write_To_File(stream_type,output_directory+"/common/grid",grid);}
-
-    debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
-
-    std::string frame_directory=LOG::sprintf("%s/%i",output_directory.c_str(),frame);
-    Write_To_File(stream_type,frame_directory+"/mac_velocities",face_velocities);
-    if(title) Write_To_Text_File(frame_directory+"/frame_title",title);
-
-    Write_To_Text_File(output_directory+"/common/last_frame",frame,"\n");
-    frame++;
-}
-//#####################################################################
 // Function Flush_Frame
 //#####################################################################
-template<class TV> void VIEWER_OUTPUT<TV>::
+void VIEWER_OUTPUT::
 Flush_Frame(const char* title)
 {
-    ARRAY<T,FACE_INDEX<TV::m> > face_velocities(grid);
-    Flush_Frame(face_velocities,title);
+    viewer_dir.Start_Directory(0,title);
+    if(viewer_dir.First_Frame())
+        for(const auto& f:common_entries) f();
+    for(const auto& f:entries) f();
+    viewer_dir.Finish_Directory();
 }
-namespace PhysBAM{
-template class VIEWER_OUTPUT<VECTOR<float,1> >;
-template class VIEWER_OUTPUT<VECTOR<float,2> >;
-template class VIEWER_OUTPUT<VECTOR<float,3> >;
-template class VIEWER_OUTPUT<VECTOR<double,1> >;
-template class VIEWER_OUTPUT<VECTOR<double,2> >;
-template class VIEWER_OUTPUT<VECTOR<double,3> >;
+//#####################################################################
+// Function Use_Debug_Particles
+//#####################################################################
+template<class TV> void
+Use_Debug_Particles()
+{
+    VIEWER_OUTPUT::Singleton()->Use_Debug_Particles<TV>();
+}
+//#####################################################################
+// Function Use_Debug_Particles
+//#####################################################################
+template<class TV> void VIEWER_OUTPUT::
+Use_Debug_Particles()
+{
+    auto& p=Get_Debug_Particles<TV>();
+    p.debug_particles.template Add_Array<typename TV::SCALAR>("display_size");
+    p.debug_particles.template Add_Array<TV>("V");
+    entries.Append([&p,this]()
+        {
+            p.Write_Debug_Particles(stream_type,viewer_dir);
+        });
+}
+template void Use_Debug_Particles<VECTOR<float,1> >();
+template void Use_Debug_Particles<VECTOR<float,2> >();
+template void Use_Debug_Particles<VECTOR<float,3> >();
+template void Use_Debug_Particles<VECTOR<double,1> >();
+template void Use_Debug_Particles<VECTOR<double,2> >();
+template void Use_Debug_Particles<VECTOR<double,3> >();
 }

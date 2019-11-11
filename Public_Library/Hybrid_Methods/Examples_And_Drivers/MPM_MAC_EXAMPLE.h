@@ -7,6 +7,7 @@
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Data_Structures/PAIR.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
@@ -116,7 +117,7 @@ public:
     std::string frame_title;
     int write_substeps_level=-1;
     int substeps_delay_frame=-1;
-    std::string output_directory="output";
+    VIEWER_DIR viewer_dir{"output"};
     std::string data_directory="../../Public_Data";
     std::string test_output_prefix;
     bool use_test_output=false;
@@ -164,13 +165,13 @@ public:
     void operator=(const MPM_MAC_EXAMPLE&) = delete;
     virtual ~MPM_MAC_EXAMPLE();
     
-    void Write_Output_Files(const int frame);
-    void Read_Output_Files(const int frame);
+    void Write_Output_Files();
+    void Read_Output_Files();
     virtual void Initialize()=0;
     ARRAY<std::function<void(int frame)> > begin_frame;
     ARRAY<std::function<void(int frame)> > end_frame;
-    ARRAY<std::function<void(int frame)> > write_output_files;
-    ARRAY<std::function<void(int frame)> > read_output_files;
+    ARRAY<std::function<void()> > write_output_files;
+    ARRAY<std::function<void()> > read_output_files;
 
     HASHTABLE<std::string,PAIR<bool,VECTOR<ARRAY<std::function<void()> >,2> > > time_step_callbacks; // begin, end
 

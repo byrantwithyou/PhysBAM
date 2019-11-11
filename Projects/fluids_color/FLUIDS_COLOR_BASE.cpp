@@ -78,7 +78,7 @@ FLUIDS_COLOR_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-refine",&refine,"num","Refine space/time by this factor");
     parse_args.Add("-null_p",&use_p_null_mode,"Assume pressure null mode and project it out");
     parse_args.Add("-threads",&number_of_threads,"threads","Number of threads");
-    parse_args.Add("-o",&output_directory,&override_output_directory,"dir","Output directory");
+    parse_args.Add("-o",&viewer_dir.output_directory,&override_output_directory,"dir","Output directory");
     parse_args.Add("-dump_eigen",&dump_largest_eigenvector,"Dump largest few eigenvectors");
     parse_args.Add("-use_mg",&use_multigrid,"Use multigrid preconditioning");
     parse_args.Add("-mg_levels",&num_multigrid_levels,"levels","Number of multigrid levels");
@@ -146,7 +146,7 @@ template<class TV> FLUIDS_COLOR_BASE<TV>::
 template<class TV> void FLUIDS_COLOR_BASE<TV>::
 After_Initialize_Example()
 {
-    if(!override_output_directory) output_directory=LOG::sprintf("Test_%d",test_number);
+    if(!override_output_directory) viewer_dir.output_directory=LOG::sprintf("Test_%d",test_number);
 
     if(use_pls_over_levelset){if(use_level_set_method) use_pls=true;use_level_set_method=false;}
     if(use_levelset_over_pls){if(use_pls) use_level_set_method=true;use_pls=false;}
@@ -588,12 +588,12 @@ Initialize_Common_Example()
 // Function Write_Output_Files
 //#####################################################################
 template<class TV> void FLUIDS_COLOR_BASE<TV>::
-Write_Output_Files(const int frame)
+Write_Output_Files()
 {
-    BASE::Write_Output_Files(frame);
+    BASE::Write_Output_Files();
 
     if(use_test_output){
-        std::string file=LOG::sprintf("%s/%s-%03d.txt",output_directory.c_str(),test_output_prefix.c_str(),frame);
+        std::string file=LOG::sprintf("%s/%s-%03d.txt",viewer_dir.output_directory.c_str(),this->test_output_prefix.c_str(),viewer_dir.frame_stack(0));
         OCTAVE_OUTPUT<T> oo(file.c_str());
         ARRAY<T> u;
         for(int c=0;c<face_velocities.m;c++)

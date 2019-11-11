@@ -14,7 +14,6 @@
 #include <Geometry/Images/EPS_FILE.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Geometry/Seeding/POISSON_DISK.h>
-#include <string>
 #include "ANALYTIC_FEM.h"
 #include "CACHED_ELIMINATION_MATRIX.h"
 #include "COMPONENT_LAYOUT_FEM.h"
@@ -23,6 +22,7 @@
 #include "MATRIX_CONSTRUCTION_FEM.h"
 #include "EXECUTE_HELPER.h"
 #include <boost/polygon/voronoi.hpp>
+#include <string>
 
 using namespace PhysBAM;
 
@@ -725,9 +725,10 @@ void Generate_Voronoi_Pipes(T scale,RANDOM_NUMBERS<T>& rng,T mu,T s,T m,T kg,int
     auto cs=builder.Cross_Section(2,w);
 
     SPHERE<TV> sphere(TV(),radius);
-    GRID<TV> grid(TV_INT()+1,RANGE<TV>(TV()-radius,TV()+radius),true);
-    VIEWER_OUTPUT<TV> vo(STREAM_TYPE(0.f),grid,LOG::sprintf("out-%s",filename));
-    Flush_Frame<TV>("init");
+    VIEWER_DIR viewer_dir(LOG::sprintf("out-%s",filename));
+    VIEWER_OUTPUT vo(STREAM_TYPE(0.f),viewer_dir);
+    Use_Debug_Particles<TV>();
+    Flush_Frame("init");
 
     ARRAY<TV> X;
     POISSON_DISK<TV> poisson_disk(1);
@@ -737,7 +738,7 @@ void Generate_Voronoi_Pipes(T scale,RANDOM_NUMBERS<T>& rng,T mu,T s,T m,T kg,int
 
     for(const auto& x:X)
         Add_Debug_Particle(x,VECTOR<T,3>(0.5,0.5,0.5));
-    Flush_Frame<TV>("samples");
+    Flush_Frame("samples");
 
     int N=100;
     for(int i=0;i<N;i++)
@@ -833,7 +834,7 @@ void Generate_Voronoi_Pipes(T scale,RANDOM_NUMBERS<T>& rng,T mu,T s,T m,T kg,int
         min_l=min(min_l,(e(0)-e(1)).Magnitude());
     }
     LOG::printf("min length: %P\n",min_l);
-    Flush_Frame<TV>("voronoi");
+    Flush_Frame("voronoi");
 
 
     {

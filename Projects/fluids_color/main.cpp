@@ -10,8 +10,8 @@ void Run_Test(PARSE_ARGS& parse_args,STREAM_TYPE stream_type)
 {
     FLUIDS_COLOR<TV>* example=new FLUIDS_COLOR<TV>(stream_type,parse_args);
 
-    Create_Directory(example->output_directory+"/common");
-    LOG::Instance()->Copy_Log_To_File(example->output_directory+"/common/log.txt",example->restart);
+    Create_Directory(example->viewer_dir.output_directory+"/common");
+    LOG::Instance()->Copy_Log_To_File(example->viewer_dir.output_directory+"/common/log.txt",example->restart);
 
     PLS_FC_DRIVER<TV> driver(*example);
     driver.Execute_Main_Program();

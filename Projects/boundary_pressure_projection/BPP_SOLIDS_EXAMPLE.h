@@ -89,13 +89,11 @@ class BPP_SOLIDS_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> 
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
+    using BASE::solids_parameters;using BASE::viewer_dir;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions;using BASE::solids_evolution;
     using BASE::test_number;using BASE::data_directory;
     using BASE::user_last_frame;
     
-    std::ofstream svout;
-
     SOLIDS_STANDARD_TESTS<TV> tests;
 
     GRID<TV> mattress_grid;
@@ -197,7 +195,7 @@ public:
         tests.data_directory=data_directory;
         LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
         if(!this->user_output_directory)
-            output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+            viewer_dir.output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
         if(!user_last_frame) last_frame=1000;
         if(project_nullspace) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
         solid_body_collection.Print_Residuals(opt_residuals);
@@ -266,13 +264,12 @@ public:
                 LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
         if(!this->user_output_directory)
-            output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+            viewer_dir.output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
     }
 
     // Unused callbacks
     void Postprocess_Frame(const int frame) override
     {
-        if(dump_sv) svout.close();
         if(scatter_plot) Dump_Scatter_Plot(frame);
         if(energy_profile_plot) Energy_Profile_Plot(frame);
 
@@ -339,16 +336,6 @@ public:
     }
     void Postprocess_Substep(const T dt,const T time) override
     {
-        if (dump_sv)
-        {
-            FINITE_VOLUME<TV,2>& force_field=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>&>();
-            ARRAY<DIAGONAL_MATRIX<T,2> >& sv=force_field.Fe_hat;
-            
-            for (int i=0;i<sv.m;i++)
-            {
-                svout << sv(i).x.x << " " << sv(i).x.y << std::endl;
-            }
-        }
         if(scatter_plot) Update_Scatter_Plot();
         if(energy_profile_plot){
             FINITE_VOLUME<TV,2>& force_field=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>&>();
@@ -806,24 +793,11 @@ void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) override
     for(int j=0;j<mattress_grid.counts.y;j++) X(m*j)=X(m-1+m*j)=TV(0,0);
 }
 //#####################################################################
-// Function Write_Output_Files
-//#####################################################################
-void Write_Output_Files(const int frame) const override
-{
-    BASE::Write_Output_Files(frame);
-}
-//#####################################################################
 // Function Preprocess_Frame
 //#####################################################################
 void Preprocess_Frame(const int frame) override
 {
     dynamic_cast<NEWMARK_EVOLUTION<TV>&>(*solids_evolution).print_matrix=print_matrix;
-    
-    if (dump_sv)
-    {
-        std::string output_file=LOG::sprintf("Standard_Tests/Test_%d/SV_%d",test_number,frame);
-        svout.open(output_file.c_str());
-    }
     if(test_number==33) Plot_Energy_Landscape();
     if(test_number==100 || test_number==31 || test_number==30) Plot_Contour_Landscape(frame);
     if(test_number==33 && frame==2)
@@ -1158,9 +1132,9 @@ void Plot_Energy_Landscape()
 void Plot_Contour_Landscape(int frame)
 {
     char buff[1000];
-    sprintf(buff, "%s/data", output_directory.c_str());
+    sprintf(buff, "%s/data",viewer_dir.output_directory.c_str());
     Create_Directory(buff);
-    sprintf(buff, "%s/data/%03d.txt", output_directory.c_str(), frame);
+    sprintf(buff, "%s/data/%03d.txt",viewer_dir.output_directory.c_str(), frame);
     std::ofstream out(buff);
 
     if(test_number==31) out<<"tristretch"<<std::endl;
@@ -1192,7 +1166,7 @@ void Plot_Contour_Landscape(int frame)
 //#####################################################################
 void Energy_Profile_Plot(int frame)
 {
-    if(!dual_directory.length()) dual_directory=output_directory+"/dual_output";
+    if(!dual_directory.length()) dual_directory=viewer_dir.output_directory+"/dual_output";
 
     ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>&>().isotropic_model;
     if(!energy_mesh){

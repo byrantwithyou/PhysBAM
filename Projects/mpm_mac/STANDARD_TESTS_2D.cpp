@@ -10,8 +10,8 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UNION.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Seeding/MPM_PARTICLE_SOURCE.h>
-#include <fstream>
 #include "STANDARD_TESTS_2D.h"
+#include <fstream>
 namespace PhysBAM{
 //#####################################################################
 // Constructor
@@ -21,7 +21,7 @@ STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     :STANDARD_TESTS_BASE<TV>(stream_type_input,parse_args)
 {
     parse_args.Parse();
-    if(!this->override_output_directory) output_directory=LOG::sprintf("Test_%i",test_number);
+    if(!this->override_output_directory) viewer_dir.output_directory=LOG::sprintf("Test_%i",test_number);
 }
 //#####################################################################
 // Destructor
@@ -195,12 +195,12 @@ Initialize()
             auto write=[this]()
             {
                 static int id=0;
-                Create_Directory(output_directory+LOG::sprintf("/v%d",id));
-                Write_To_File(stream_type,LOG::sprintf("%s/v%d/mac_velocities",output_directory.c_str(),id),this->velocity);
-                Write_To_File(stream_type,LOG::sprintf("%s/v%d/mass",output_directory.c_str(),id),mass);
-                Write_To_File(stream_type,LOG::sprintf("%s/v%d/psi_N",output_directory.c_str(),id),this->psi_N);
-                Write_To_Text_File(LOG::sprintf("%s/v%d/time",output_directory.c_str(),id),time,"\n");
-                Write_To_Text_File(output_directory+"/common/last_grid_data",id,"\n");
+                Create_Directory(viewer_dir.output_directory+LOG::sprintf("/v%d",id));
+                Write_To_File(stream_type,LOG::sprintf("%s/v%d/mac_velocities",viewer_dir.output_directory.c_str(),id),this->velocity);
+                Write_To_File(stream_type,LOG::sprintf("%s/v%d/mass",viewer_dir.output_directory.c_str(),id),mass);
+                Write_To_File(stream_type,LOG::sprintf("%s/v%d/psi_N",viewer_dir.output_directory.c_str(),id),this->psi_N);
+                Write_To_Text_File(LOG::sprintf("%s/v%d/time",viewer_dir.output_directory.c_str(),id),time,"\n");
+                Write_To_Text_File(viewer_dir.output_directory+"/common/last_grid_data",id,"\n");
                 id++;
             };
             Add_Callbacks(false,"p2g",[write](){

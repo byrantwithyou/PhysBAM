@@ -31,7 +31,7 @@ public:
     typedef T_input T;typedef VECTOR<T,1> TV;typedef VECTOR<int,1> TV_INT;
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
-    using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::viewer_dir;using BASE::fluids_parameters;using BASE::solids_parameters;
     using BASE::resolution;using BASE::user_last_frame;
 
     int eno_scheme;
@@ -92,10 +92,10 @@ public:
 
         solids_parameters.triangle_collision_parameters.perform_self_collision=false;
         if(!this->user_output_directory){
-            if(timesplit) output_directory=LOG::sprintf("Smooth_Flow/Test_1__Resolution_%d_semiimplicit",(fluids_parameters.grid->counts.x));
-            else output_directory=LOG::sprintf("Smooth_Flow/Test_1__Resolution_%d_explicit",(fluids_parameters.grid->counts.x));
-            if(eno_scheme==2) output_directory+="_density_weighted";
-            else if(eno_scheme==3) output_directory+="_velocity_weighted";}
+            if(timesplit) viewer_dir.output_directory=LOG::sprintf("Smooth_Flow/Test_1__Resolution_%d_semiimplicit",(fluids_parameters.grid->counts.x));
+            else viewer_dir.output_directory=LOG::sprintf("Smooth_Flow/Test_1__Resolution_%d_explicit",(fluids_parameters.grid->counts.x));
+            if(eno_scheme==2) viewer_dir.output_directory+="_density_weighted";
+            else if(eno_scheme==3) viewer_dir.output_directory+="_velocity_weighted";}
     }
     
     virtual ~SMOOTH_FLOW() {}

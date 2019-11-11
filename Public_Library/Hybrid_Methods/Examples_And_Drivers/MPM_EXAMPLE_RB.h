@@ -8,6 +8,7 @@
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Data_Structures/PAIR.h>
 #include <Core/Matrices/MATRIX.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Rigids/Forces_And_Torques/MOVE_RIGID_BODY_DIFF.h>
@@ -67,7 +68,7 @@ public:
     std::string frame_title;
     int write_substeps_level=-1;
     int substeps_delay_frame=-1;
-    std::string output_directory="output";
+    VIEWER_DIR viewer_dir{"output"};
     std::string data_directory="../../Public_Data";
     std::string test_output_prefix;
     bool use_test_output=false;
@@ -139,8 +140,8 @@ public:
     void operator=(const MPM_EXAMPLE_RB&) = delete;
     virtual ~MPM_EXAMPLE_RB();
 
-    virtual void Write_Output_Files(const int frame);
-    virtual void Read_Output_Files(const int frame);
+    virtual void Write_Output_Files();
+    virtual void Read_Output_Files();
     virtual void Initialize()=0;
     std::function<void(int frame)> begin_frame;
     std::function<void(int frame)> end_frame;

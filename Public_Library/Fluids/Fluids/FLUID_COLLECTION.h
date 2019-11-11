@@ -10,6 +10,7 @@
 #include <Grid_Tools/Grids/GRID.h>
 #include <Incompressible/Incompressible_Fluids/INCOMPRESSIBLE_FLUID_COLLECTION.h>
 namespace PhysBAM{
+class VIEWER_DIR;
 
 template<class TV>
 class FLUID_COLLECTION
@@ -26,8 +27,8 @@ public:
     virtual ~FLUID_COLLECTION();
 
 //#####################################################################
-    void Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const;
-    void Read_Output_Files(const std::string& output_directory,const int frame);
+    void Write_Output_Files(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir) const;
+    void Read_Output_Files(const VIEWER_DIR& viewer_dir);
     void Initialize_Grids();
 //#####################################################################
 };

@@ -42,7 +42,7 @@ class STANDARD_TESTS:public SOLIDS_EXAMPLE<VECTOR<T_input,2> >
     typedef T_input T;typedef VECTOR<T,2> TV;
 public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
-    using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
+    using BASE::solids_parameters;using BASE::viewer_dir;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
     using BASE::test_number;using BASE::Set_External_Positions;using BASE::data_directory; // silence -Woverloaded-virtual
     using BASE::user_last_frame;
     
@@ -62,7 +62,7 @@ public:
 
         tests.data_directory=data_directory;
         if(!this->user_output_directory)
-            output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+            viewer_dir.output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
         LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
     }
 

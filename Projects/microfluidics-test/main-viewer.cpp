@@ -11,10 +11,6 @@
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
-#include <fstream>
-#include <map>
-#include <set>
-#include <string>
 #include "ANALYTIC_FEM.h"
 #include "CACHED_ELIMINATION_MATRIX.h"
 #include "COMPONENT_LAYOUT_FEM.h"
@@ -24,6 +20,10 @@
 #include "MATRIX_CONSTRUCTION_FEM.h"
 #include "SOLUTION_FEM.h"
 #include <chrono>
+#include <fstream>
+#include <map>
+#include <set>
+#include <string>
 
 
 typedef float RW;
@@ -60,11 +60,12 @@ void Run(PARSE_ARGS& parse_args)
     parse_args.Extra(&sol_file,"file","solution file");
     parse_args.Parse();
 
-    GRID<TV2> grid(IV2()+1,RANGE<TV2>::Centered_Box(),true);
-    VIEWER_OUTPUT<TV2> vo2(STREAM_TYPE(0.f),grid,output_dir);
-    GRID<TV3> grid3(IV3()+1,RANGE<TV3>::Centered_Box(),true);
-    VIEWER_OUTPUT<TV3> vo3(STREAM_TYPE(0.f),grid3,output_dir+"/3d");
-    vo2.debug_particles.debug_particles.template Add_Array<T>("display_size");
+    VIEWER_DIR viewer_dir2(output_dir);
+    VIEWER_OUTPUT vo2(STREAM_TYPE(0.f),viewer_dir2);
+    vo2.Use_Debug_Particles<TV2>();
+    VIEWER_DIR viewer_dir3(output_dir+"/3d");
+    VIEWER_OUTPUT vo3(STREAM_TYPE(0.f),viewer_dir3);
+    vo3.Use_Debug_Particles<TV3>();
     
     SOLUTION_FEM<TV> sol;
     Read_From_File(sol_file,sol);
@@ -89,7 +90,7 @@ void Run(PARSE_ARGS& parse_args)
         }
     };
 
-    Flush_Frame<TV>("init");
+    Flush_Frame("init");
 
     if(user_query)
     {
@@ -100,7 +101,7 @@ void Run(PARSE_ARGS& parse_args)
         Add_Debug_Particle(X,VECTOR<T,3>(1,0,0));
         Debug_Particle_Set_Attribute<TV>("V",vel);
         Debug_Particle_Set_Attribute<TV>("display_size",pres);
-        Flush_Frame<TV>("solution");
+        Flush_Frame("solution");
     }
 
     INTERVAL<T> range_v=INTERVAL<T>::Empty_Box(),

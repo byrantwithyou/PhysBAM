@@ -10,6 +10,7 @@
 #include <Core/Matrices/MATRIX_MXN.h>
 #include <Core/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <Core/Utilities/DEBUG_CAST.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
 #include <Tools/Krylov_Solvers/SYMMQMR.h>
@@ -494,31 +495,31 @@ Apply_Poststabilization(bool test_system,bool print_matrix,const bool target_pd,
 // Function Read
 //#####################################################################
 template<class TV> void ARTICULATED_RIGID_BODY_BASE<TV>::
-Read(const std::string& directory,const int frame)
+Read(const VIEWER_DIR& viewer_dir)
 {
     FILE_ISTREAM input;
-    Safe_Open_Input(input,LOG::sprintf("%s/%d/arb_state",directory.c_str(),frame));
-    joint_mesh.Read(input,directory,frame);
-    std::string muscle_filename=LOG::sprintf("%s/%d/muscle_list",directory.c_str(),frame);
+    Safe_Open_Input(input,viewer_dir.current_directory+"/arb_state");
+    joint_mesh.Read(input,viewer_dir);
+    std::string muscle_filename=viewer_dir.current_directory+"/muscle_list";
     if(File_Exists(muscle_filename)){
         if(!muscle_list) muscle_list=new MUSCLE_LIST<TV>(rigid_body_collection);
-        muscle_list->Read(directory,frame);}
-    std::string muscle_activations_filename=LOG::sprintf("%s/%d/muscle_activations",directory.c_str(),frame);
+        muscle_list->Read(viewer_dir);}
+    std::string muscle_activations_filename=viewer_dir.current_directory+"/muscle_activations";
     if(File_Exists(muscle_activations_filename)) Read_From_File(muscle_activations_filename,muscle_activations);
 }
 //#####################################################################
 // Function Write
 //#####################################################################
 template<class TV> void ARTICULATED_RIGID_BODY_BASE<TV>::
-Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame)
+Write(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir)
 {
     if(joint_mesh.Num_Joints()>0){
         FILE_OSTREAM output;
-        Safe_Open_Output(output,stream_type,LOG::sprintf("%s/%d/arb_state",directory.c_str(),frame));
-        joint_mesh.Write(output,directory,frame);}
-    if(muscle_list) muscle_list->Write(stream_type,directory,frame);
-    Output_Articulation_Points(stream_type,directory,frame);
-    if(muscle_activations.m>0) Write_To_File(stream_type,LOG::sprintf("%s/%d/muscle_activations",directory.c_str(),frame),muscle_activations);
+        Safe_Open_Output(output,stream_type,viewer_dir.current_directory+"/arb_state");
+        joint_mesh.Write(output,viewer_dir);}
+    if(muscle_list) muscle_list->Write(stream_type,viewer_dir);
+    Output_Articulation_Points(stream_type,viewer_dir);
+    if(muscle_activations.m>0) Write_To_File(stream_type,viewer_dir.current_directory+"/muscle_activations",muscle_activations);
 }
 //#####################################################################
 // Function Effective_Inertia_Inverse

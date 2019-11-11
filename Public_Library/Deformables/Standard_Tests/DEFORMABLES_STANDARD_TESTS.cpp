@@ -5,6 +5,7 @@
 // Class DEFORMABLES_STANDARD_TESTS
 //#####################################################################
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Basic_Geometry/TETRAHEDRON.h>
@@ -299,14 +300,14 @@ Substitute_Soft_Bindings_For_Nodes(T_OBJECT& object,SOFT_BINDINGS<TV>& soft_bind
 // Function Read_Or_Initialize_Implicit_Surface
 //#####################################################################
 template<class TV> LEVELSET_IMPLICIT_OBJECT<TV>* DEFORMABLES_STANDARD_TESTS<TV>::
-Read_Or_Initialize_Implicit_Surface(const std::string& levelset_filename,const std::string& output_directory,TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface) const
+Read_Or_Initialize_Implicit_Surface(const std::string& levelset_filename,const VIEWER_DIR& viewer_dir,TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface) const
 {
     if(File_Exists(levelset_filename)){
         LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*LEVELSET_IMPLICIT_OBJECT<TV>::Create();
         Read_From_File(levelset_filename,undeformed_levelset);
         return &undeformed_levelset;}
     LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*Initialize_Implicit_Surface(undeformed_triangulated_surface,100);
-    Create_Directory(output_directory);
+    Create_Directory(viewer_dir.output_directory);
     Write_To_File(stream_type,levelset_filename,undeformed_levelset);
     return &undeformed_levelset;
 }
@@ -314,7 +315,7 @@ Read_Or_Initialize_Implicit_Surface(const std::string& levelset_filename,const s
 // Function Initialize_Tetrahedron_Collisions
 //#####################################################################
 template<class TV> void DEFORMABLES_STANDARD_TESTS<TV>::
-Initialize_Tetrahedron_Collisions(const int id_number,const std::string& output_directory,TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,TRIANGLE_COLLISION_PARAMETERS<TV>& triangle_collision_parameters,
+Initialize_Tetrahedron_Collisions(const int id_number,VIEWER_DIR& viewer_dir,TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,TRIANGLE_COLLISION_PARAMETERS<TV>& triangle_collision_parameters,
     TRIANGULATED_SURFACE<T>* triangulated_surface)
 {
     triangle_collision_parameters.perform_self_collision=false;
@@ -326,8 +327,9 @@ Initialize_Tetrahedron_Collisions(const int id_number,const std::string& output_
     TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface=*(new TRIANGULATED_SURFACE<T>(triangulated_surface->mesh,undeformed_particles));
     undeformed_triangulated_surface.Update_Triangle_List();
     undeformed_triangulated_surface.Initialize_Hierarchy();
-    std::string levelset_filename=LOG::sprintf("%s/common/deformable_body_undeformed_levelset_%d.phi",output_directory.c_str(),id_number);
-    LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*Read_Or_Initialize_Implicit_Surface(levelset_filename,output_directory,undeformed_triangulated_surface);
+    viewer_dir.Make_Common_Directory();
+    std::string levelset_filename=LOG::sprintf("%s/common/deformable_body_undeformed_levelset_%d.phi",viewer_dir.output_directory.c_str(),id_number);
+    LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*Read_Or_Initialize_Implicit_Surface(levelset_filename,viewer_dir,undeformed_triangulated_surface);
     deformable_body_collection.collisions.collision_body_list.Add_Body(new TETRAHEDRON_COLLISION_BODY<T>(tetrahedralized_volume,undeformed_triangulated_surface,undeformed_levelset,triangulated_surface),0,true);
 }
 //#####################################################################
@@ -635,8 +637,6 @@ Mark_Hard_Bindings_With_Free_Particles()
     template TETRAHEDRALIZED_VOLUME<VECTOR<T,3>::SCALAR>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Create_Tetrahedralized_Volume(const std::string&,const RIGID_BODY_STATE<VECTOR<T,3> >&,const bool,const bool,const T,const T); \
     template TRIANGULATED_AREA<VECTOR<T,2>::SCALAR>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,2> >::Create_Mattress(const GRID<VECTOR<T,2> >&,const bool,const RIGID_BODY_STATE<VECTOR<T,2> >*,const T,const bool); \
     template TETRAHEDRALIZED_VOLUME<VECTOR<T,3>::SCALAR>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Create_Mattress(const GRID<VECTOR<T,3> >&,const bool,const RIGID_BODY_STATE<VECTOR<T,3> >*,const T); \
-    template LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Read_Or_Initialize_Implicit_Surface(const std::string&,const std::string&,TRIANGULATED_SURFACE<T>&) const; \
-    template void DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Initialize_Tetrahedron_Collisions(const int,const std::string&,TETRAHEDRALIZED_VOLUME<T>&,TRIANGLE_COLLISION_PARAMETERS<VECTOR<T,3> >&,TRIANGULATED_SURFACE<T>*); \
     template TRIANGULATED_SURFACE<VECTOR<T,3>::SCALAR>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Create_Drifted_Surface(const TRIANGULATED_SURFACE<T>&,SOFT_BINDINGS<VECTOR<T,3> >&,const bool) const; \
     template EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<VECTOR<T,3>::SCALAR>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Create_Embedded_Tetrahedralized_Volume(const SPHERE<VECTOR<T,3> >&,const RIGID_BODY_STATE<VECTOR<T,3> >&,const bool); \
     template EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<VECTOR<T,3>::SCALAR>& DEFORMABLES_STANDARD_TESTS<VECTOR<T,3> >::Create_Embedded_Tetrahedralized_Volume(const TORUS<T>&,const RIGID_BODY_STATE<VECTOR<T,3> >&,const bool); \
@@ -690,3 +690,7 @@ template void DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::Set_Mass_Of_Particl
 template void DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::Set_Mass_Of_Particles<3>(OPENSUBDIV_SURFACE<VECTOR<float,3>,3> const&,float,bool);
 template TRIANGULATED_SURFACE<double> const& DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::Copy_And_Add_Structure<TRIANGULATED_SURFACE<double> const>(TRIANGULATED_SURFACE<double> const&,ARRAY<int,int>*,bool);
 template TRIANGULATED_SURFACE<float> const& DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::Copy_And_Add_Structure<TRIANGULATED_SURFACE<float> const>(TRIANGULATED_SURFACE<float> const&,ARRAY<int,int>*,bool);
+template void DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::Initialize_Tetrahedron_Collisions(int,VIEWER_DIR&,TETRAHEDRALIZED_VOLUME<float>&,TRIANGLE_COLLISION_PARAMETERS<VECTOR<float,3> >&,TRIANGULATED_SURFACE<float>*);
+template void DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::Initialize_Tetrahedron_Collisions(int,VIEWER_DIR&,TETRAHEDRALIZED_VOLUME<double>&,TRIANGLE_COLLISION_PARAMETERS<VECTOR<double,3> >&,TRIANGULATED_SURFACE<double>*);
+template LEVELSET_IMPLICIT_OBJECT<VECTOR<float,3> >* DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::Read_Or_Initialize_Implicit_Surface(std::string const&,VIEWER_DIR const&,TRIANGULATED_SURFACE<float>&) const;
+template LEVELSET_IMPLICIT_OBJECT<VECTOR<double,3> >* DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::Read_Or_Initialize_Implicit_Surface(std::string const&,VIEWER_DIR const&,TRIANGULATED_SURFACE<double>&) const;

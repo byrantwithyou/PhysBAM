@@ -87,18 +87,15 @@ Initialize_Solid_Fluid_Coupling()
 // Write_Output_Files
 //#####################################################################
 template<class TV_input> void COMPRESSIBLE_EXAMPLE<TV_input>::
-Write_Output_Files(const int frame) const
+Write_Output_Files() const
 {
-    Write_To_File(stream_type,output_directory+"/common/grid",mac_grid);
-    std::string f=LOG::sprintf("%d",frame);
-    Write_To_Text_File(output_directory+"/common/last_frame",frame,"\n");
+    if(viewer_dir.First_Frame())
+        Write_To_File(stream_type,viewer_dir.output_directory+"/common/grid",mac_grid);
+    compressible_fluid_collection.Write_Output_Files(stream_type,viewer_dir);
 
-    Write_To_File(stream_type,output_directory+"/"+f+"/grid",mac_grid);
-    compressible_fluid_collection.Write_Output_Files(stream_type,output_directory,frame);
-
-    if(euler.timesplit) Write_To_File(stream_type,output_directory+"/"+f+"/compressible_implicit_pressure",euler.euler_projection.p);
-    Write_To_File(stream_type,output_directory+"/"+f+"/psi_D",euler.euler_projection.elliptic_solver->psi_D);
-    Write_To_File(stream_type,output_directory+"/"+f+"/psi_N",euler.euler_projection.elliptic_solver->psi_N);
+    if(euler.timesplit) Write_To_File(stream_type,viewer_dir.current_directory+"/compressible_implicit_pressure",euler.euler_projection.p);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/psi_D",euler.euler_projection.elliptic_solver->psi_D);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/psi_N",euler.euler_projection.elliptic_solver->psi_N);
 }
 //#####################################################################
 namespace PhysBAM{

@@ -405,21 +405,6 @@ std::string Get_Short_Name(const std::string& filename)
     return Get_Short_Name_Ignoring_Compression_Suffix(Strip_Compression_Suffix(filename));
 }
 
-bool Is_Animated(const std::string &filename)
-{
-    return filename.find("%d") != std::string::npos;
-}
-
-std::string Get_Frame_Filename(const std::string &filename,int frame)
-{
-    return Is_Animated(filename)?LOG::sprintf(filename.c_str(),frame):filename;
-}
-
-bool Frame_File_Exists(const std::string &filename,int frame)
-{
-    return File_Exists(Get_Frame_Filename(filename,frame));
-}
-
 void Ignore(std::istream& input,char c)
 {
     while(isspace(input.peek())) input.get();

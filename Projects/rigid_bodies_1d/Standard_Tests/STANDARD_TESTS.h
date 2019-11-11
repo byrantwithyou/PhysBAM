@@ -34,7 +34,7 @@ class STANDARD_TESTS:public SOLIDS_EXAMPLE<VECTOR<T_input,1> >
     typedef T_input T;typedef VECTOR<T,1> TV;
 public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
-    using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
+    using BASE::solids_parameters;using BASE::viewer_dir;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
     using BASE::test_number;using BASE::Set_External_Positions;using BASE::data_directory; // silence -Woverloaded-virtual
     using BASE::user_last_frame;
     
@@ -50,7 +50,7 @@ public:
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
         solids_parameters.cfl=1;
         if(!this->user_output_directory)
-            output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+            viewer_dir.output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
         solids_parameters.triangle_collision_parameters.perform_self_collision=false;
         parse_args.Parse();
 

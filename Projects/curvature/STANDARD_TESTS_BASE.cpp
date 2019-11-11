@@ -33,8 +33,8 @@
 #include <Solids/Solids_Evolution/BACKWARD_EULER_EVOLUTION.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_MINIMIZATION_OBJECTIVE.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <fstream>
 #include "STANDARD_TESTS_BASE.h"
+#include <fstream>
 namespace PhysBAM{
 //#####################################################################
 // Constructor
@@ -121,7 +121,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
 
     tests.data_directory=data_directory;
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
-    if(!this->user_output_directory) output_directory=LOG::sprintf("Test_%d",test_number);
+    if(!this->user_output_directory) viewer_dir.output_directory=LOG::sprintf("Test_%d",test_number);
     if(use_rand_seed) rand.Set_Seed(rand_seed);
     solids_parameters.implicit_solve_parameters.project_nullspace_frequency=project_nullspace;
     if(use_newmark || use_newmark_be) backward_euler_evolution=0;
@@ -310,9 +310,9 @@ Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T 
 // Function Read_Output_Files_Solids
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
-Read_Output_Files_Solids(const int frame)
+Read_Output_Files_Solids()
 {
-    BASE::Read_Output_Files_Solids(frame);
+    BASE::Read_Output_Files_Solids();
     solid_body_collection.Update_Simulated_Particles();
 }
 //#####################################################################

@@ -3,21 +3,21 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_TRIANGULATED_SURFACE.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_TRIANGULATED_SURFACE<T>::
-OPENGL_COMPONENT_TRIANGULATED_SURFACE(const std::string &filename, bool use_display_list)
-    :OPENGL_COMPONENT<T>("Triangulated Surface"), 
+OPENGL_COMPONENT_TRIANGULATED_SURFACE(const VIEWER_DIR& viewer_dir,const std::string& filename,bool use_display_list)
+    :OPENGL_COMPONENT<T>(viewer_dir,"Triangulated Surface"), 
       triangulated_surface(*TRIANGULATED_SURFACE<T>::Create()),
     opengl_triangulated_surface(triangulated_surface, false,
                                   OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Red()),
                                   OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Blue())),
-      filename(filename), frame_loaded(-1), valid(false), use_display_list(use_display_list)
+      filename(filename),  valid(false), use_display_list(use_display_list)
 {
-    is_animation = Is_Animated(filename);
     Reinitialize();
 }
 //#####################################################################
@@ -31,20 +31,12 @@ template<class T> OPENGL_COMPONENT_TRIANGULATED_SURFACE<T>::
     delete &triangulated_surface;
 }
 //#####################################################################
-// Function Valid_Frame
-//#####################################################################
-template<class T> bool OPENGL_COMPONENT_TRIANGULATED_SURFACE<T>::
-Valid_Frame(int frame_input) const
-{
-    return Frame_File_Exists(filename, frame_input);
-}
-//#####################################################################
 // Function Set_Frame
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_TRIANGULATED_SURFACE<T>::
-Set_Frame(int frame_input)
+Set_Frame()
 {
-    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
+    
     Reinitialize();
 }
 //#####################################################################
@@ -98,23 +90,16 @@ Selection_Bounding_Box() const
 template<class T> void OPENGL_COMPONENT_TRIANGULATED_SURFACE<T>::
 Reinitialize()
 {
-    if(draw)
-    {
-        if((is_animation && frame_loaded != frame) ||
-            (!is_animation && frame_loaded < 0))
-        {
-            valid = false;
-            std::string tmp_filename = Get_Frame_Filename(filename, frame);
-            if(File_Exists(tmp_filename))
-                Read_From_File(tmp_filename,triangulated_surface);
-            else
-                return;
+    if(!draw) return;
+    valid = false;
+    std::string tmp_filename = viewer_dir.current_directory+"/"+filename;
+    if(File_Exists(tmp_filename))
+        Read_From_File(tmp_filename,triangulated_surface);
+    else
+        return;
 
-            opengl_triangulated_surface.name=tmp_filename;
-            frame_loaded = frame;
-            valid = true;
-        }
-    }
+    opengl_triangulated_surface.name=tmp_filename;
+    valid = true;
 }
 namespace PhysBAM{
 template class OPENGL_COMPONENT_TRIANGULATED_SURFACE<float>;

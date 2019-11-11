@@ -207,7 +207,7 @@ Dump_Layout() const
                 Add_Debug_Object<TV3,3>(tet.triangle(j).X,VECTOR<T,3>(0.5,0.5,0.5));
             std::string s=LOG::sprintf("%i",elem_blocks(e));
             Add_Debug_Text(tet.X.Average(),s,VECTOR<T,3>(1,1,1));}
-        Flush_Frame<TV3>("block");}
+        Flush_Frame("block");}
 }
 //#####################################################################
 // Function Dump_Node_Blocks
@@ -226,7 +226,7 @@ Dump_Node_Blocks() const
                 Add_Debug_Particle(tet(j),VECTOR<T,3>(1,1,1));
                 std::string s=LOG::sprintf("%i",Node_Block(PARTICLE_ID(indices(j))));
                 Add_Debug_Text(tet(j),s,VECTOR<T,3>(1,1,1));}}
-        Flush_Frame<TV3>("node block");}
+        Flush_Frame("node block");}
 }
 //#####################################################################
 // Function Dump_Edge_Blocks
@@ -244,7 +244,7 @@ Dump_Edge_Blocks() const
                     {tet(j),tet(k%4)},VECTOR<T,3>(0.5,0.5,0.5));
                 std::string s=LOG::sprintf("%i",Edge_Block(PARTICLE_ID(indices(j)),PARTICLE_ID(indices(k%4))));
                 Add_Debug_Text(0.5*(tet(j)+tet(k%4)),s,VECTOR<T,3>(1,1,1));}}
-        Flush_Frame<TV3>("edge block");}
+        Flush_Frame("edge block");}
 }
 //#####################################################################
 // Function Dump_Dofs
@@ -265,7 +265,7 @@ Dump_Dofs() const
                 if(dof<DOF_ID(0)) continue;
                 std::string s=LOG::sprintf("%i",dof);
                 Add_Debug_Text(tet(j),s,VECTOR<T,3>(1,1,1));}}
-        Flush_Frame<TV3>("vel node dof");}
+        Flush_Frame("vel node dof");}
 
     for(BLOCK_ID b(0);b<blocks.m;b++){
         for(TRIANGLE_ID e(0);e<Number_Tetrahedrons();e++){
@@ -280,7 +280,7 @@ Dump_Dofs() const
                 if(dof<DOF_ID(0)) continue;
                 std::string s=LOG::sprintf("%i",dof);
                 Add_Debug_Text(tet(j),s,VECTOR<T,3>(1,1,1));}}
-        Flush_Frame<TV3>("pressure dof");}
+        Flush_Frame("pressure dof");}
 
     vol_hidden.mesh.segment_mesh->Initialize_Incident_Elements();
     for(BLOCK_ID b(0);b<blocks.m;b++){
@@ -296,7 +296,7 @@ Dump_Dofs() const
                 if(dof<DOF_ID(0)) continue;
                 std::string s=LOG::sprintf("%i",dof);
                 Add_Debug_Text(0.5*(tet(j)+tet(k%4)),s,VECTOR<T,3>(1,1,1));}}
-        Flush_Frame<TV3>("vel edge dof");}
+        Flush_Frame("vel edge dof");}
 
     Dump_Blocks();
 }
@@ -349,7 +349,7 @@ Dump_Blocks() const
                     Add_Debug_Object<TV3,3>(tet_tri.triangle(j).X,VECTOR<T,3>(1,1,1));}
                 if(elem_blocks(e)==b1) visited(b1)=true;}}
         visited(b)=true;
-        Flush_Frame<TV3>("check regular blocks");}
+        Flush_Frame("check regular blocks");}
 }
 //#####################################################################
 // Function Print_Statistics

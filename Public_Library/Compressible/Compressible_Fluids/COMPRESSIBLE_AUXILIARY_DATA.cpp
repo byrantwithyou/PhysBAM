@@ -2,6 +2,7 @@
 // Copyright 2009, Jon Gretarsson, Nipun Kwatra.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Grid_Tools/Computations/GRADIENT_UNIFORM.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
@@ -13,7 +14,7 @@
 namespace PhysBAM{
 namespace COMPRESSIBLE_AUXILIARY_DATA{
 template<class TV,class T_ARRAYS,class T_ARRAYS_BOOL_INPUT,class T_FACE_ARRAYS_DIMENSION_SCALAR>
-void Write_Auxiliary_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame,const GRID<TV>& grid,
+void Write_Auxiliary_Files(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir,const GRID<TV>& grid,
     const int number_of_ghost_cells,const T_ARRAYS& U,const T_ARRAYS_BOOL_INPUT& psi,const EOS<typename TV::SCALAR>& eos,const bool write_debug_data,const T_FACE_ARRAYS_DIMENSION_SCALAR* fluxes)
 {
     typedef typename TV::SCALAR T;
@@ -56,34 +57,33 @@ void Write_Auxiliary_Files(const STREAM_TYPE stream_type,const std::string& outp
                 momentum_flux.Component(axis)(face_index)=fluxes->Component(axis)(face_index)(1);
                 energy_flux.Component(axis)(face_index)=fluxes->Component(axis)(face_index)(TV::m+1);}}}
 
-    std::string f=LOG::sprintf("%d",frame);
     if(write_debug_data){
         GRADIENT::Compute_Magnitude(grid,number_of_ghost_cells,density,density_gradient);
         GRADIENT::Compute_Magnitude(grid,number_of_ghost_cells,pressure,pressure_gradient);
         
-        Write_To_File(stream_type,output_directory+"/"+f+"/density_flux",density_flux);
-        Write_To_File(stream_type,output_directory+"/"+f+"/momentum_flux",momentum_flux);
-        Write_To_File(stream_type,output_directory+"/"+f+"/energy_flux",energy_flux);
+        Write_To_File(stream_type,viewer_dir.current_directory+"/density_flux",density_flux);
+        Write_To_File(stream_type,viewer_dir.current_directory+"/momentum_flux",momentum_flux);
+        Write_To_File(stream_type,viewer_dir.current_directory+"/energy_flux",energy_flux);
 
-        Write_To_File(stream_type,output_directory+"/"+f+"/momentum",momentum);
-        Write_To_File(stream_type,output_directory+"/"+f+"/energy",energy);
-        Write_To_File(stream_type,output_directory+"/"+f+"/density_gradient",density_gradient);
-        Write_To_File(stream_type,output_directory+"/"+f+"/pressure_gradient",pressure_gradient);
-        Write_To_File(stream_type,output_directory+"/"+f+"/entropy",entropy);
-        Write_To_File(stream_type,output_directory+"/"+f+"/enthalpy",enthalpy);
-        Write_To_File(stream_type,output_directory+"/"+f+"/speedofsound",speedofsound);
-        Write_To_File(stream_type,output_directory+"/"+f+"/machnumber",machnumber);
-        Write_To_File(stream_type,output_directory+"/"+f+"/internal_energy",internal_energy);
-        Write_To_File(stream_type,output_directory+"/"+f+"/velocity_plus_c",velocity_plus_c);
-        Write_To_File(stream_type,output_directory+"/"+f+"/velocity_minus_c",velocity_minus_c);}
+        Write_To_File(stream_type,viewer_dir.current_directory+"/momentum",momentum);
+        Write_To_File(stream_type,viewer_dir.current_directory+"/energy",energy);
+        Write_To_File(stream_type,viewer_dir.current_directory+"/density_gradient",density_gradient);
+        Write_To_File(stream_type,viewer_dir.current_directory+"/pressure_gradient",pressure_gradient);
+        Write_To_File(stream_type,viewer_dir.current_directory+"/entropy",entropy);
+        Write_To_File(stream_type,viewer_dir.current_directory+"/enthalpy",enthalpy);
+        Write_To_File(stream_type,viewer_dir.current_directory+"/speedofsound",speedofsound);
+        Write_To_File(stream_type,viewer_dir.current_directory+"/machnumber",machnumber);
+        Write_To_File(stream_type,viewer_dir.current_directory+"/internal_energy",internal_energy);
+        Write_To_File(stream_type,viewer_dir.current_directory+"/velocity_plus_c",velocity_plus_c);
+        Write_To_File(stream_type,viewer_dir.current_directory+"/velocity_minus_c",velocity_minus_c);}
 
-    Write_To_File(stream_type,output_directory+"/"+f+"/density",density);
-    Write_To_File(stream_type,output_directory+"/"+f+"/pressure",pressure);
-    Write_To_File(stream_type,output_directory+"/"+f+"/temperature",temperature);
-    Write_To_File(stream_type,output_directory+"/"+f+"/centered_velocities",velocity);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/density",density);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/pressure",pressure);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/temperature",temperature);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/centered_velocities",velocity);
 }
 template<class TV>
-void Write_Auxiliary_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame,const COMPRESSIBLE_FLUID_COLLECTION<TV>& compressible_fluid_collection,const bool write_debug_data)
+void Write_Auxiliary_Files(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir,const COMPRESSIBLE_FLUID_COLLECTION<TV>& compressible_fluid_collection,const bool write_debug_data)
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -96,19 +96,19 @@ void Write_Auxiliary_Files(const STREAM_TYPE stream_type,const std::string& outp
     const EOS<T>* eos=compressible_fluid_collection.eos;
     const T_FACE_ARRAYS_DIMENSION_SCALAR *fluxes = NULL;
 
-    Write_Auxiliary_Files(stream_type,output_directory,frame,grid,0,U,compressible_fluid_collection.psi,*eos,write_debug_data,fluxes);
+    Write_Auxiliary_Files(stream_type,viewer_dir,grid,0,U,compressible_fluid_collection.psi,*eos,write_debug_data,fluxes);
 }
-template void Write_Auxiliary_Files<VECTOR<float,1>,ARRAY<VECTOR<float,3>,VECTOR<int,1> >,ARRAY<bool,VECTOR<int,1> >,ARRAY<VECTOR<float,3>,FACE_INDEX<1> > >(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,int,GRID<VECTOR<float,1> > const&,int,ARRAY<VECTOR<float,3>,VECTOR<int,1> > const&,ARRAY<bool,VECTOR<int,1> > const&,EOS<VECTOR<float,1>::SCALAR> const&,const bool,const ARRAY<VECTOR<float,3>,FACE_INDEX<1> >*);
-template void Write_Auxiliary_Files<VECTOR<float,2>,ARRAY<VECTOR<float,4>,VECTOR<int,2> >,ARRAY<bool,VECTOR<int,2> >,ARRAY<VECTOR<float,4>,FACE_INDEX<2> > >(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,int,GRID<VECTOR<float,2> > const&,int,ARRAY<VECTOR<float,4>,VECTOR<int,2> > const&,ARRAY<bool,VECTOR<int,2> > const&,EOS<VECTOR<float,2>::SCALAR> const&,const bool,const ARRAY<VECTOR<float,4>,FACE_INDEX<2> >*);
-template void Write_Auxiliary_Files<VECTOR<float,3>,ARRAY<VECTOR<float,5>,VECTOR<int,3> >,ARRAY<bool,VECTOR<int,3> >,ARRAY<VECTOR<float,5>,FACE_INDEX<3> > >(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,int,GRID<VECTOR<float,3> > const&,int,ARRAY<VECTOR<float,5>,VECTOR<int,3> > const&,ARRAY<bool,VECTOR<int,3> > const&,EOS<VECTOR<float,3>::SCALAR> const&,const bool,const ARRAY<VECTOR<float,5>,FACE_INDEX<3> >*);
-template void Write_Auxiliary_Files<VECTOR<float,1> >(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,int,COMPRESSIBLE_FLUID_COLLECTION<VECTOR<float,1> > const&,const bool);
-template void Write_Auxiliary_Files<VECTOR<float,2> >(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,int,COMPRESSIBLE_FLUID_COLLECTION<VECTOR<float,2> > const&,const bool);
-template void Write_Auxiliary_Files<VECTOR<float,3> >(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,int,COMPRESSIBLE_FLUID_COLLECTION<VECTOR<float,3> > const&,const bool);
-template void Write_Auxiliary_Files<VECTOR<double,1>,ARRAY<VECTOR<double,3>,VECTOR<int,1> >,ARRAY<bool,VECTOR<int,1> >,ARRAY<VECTOR<double,3>,FACE_INDEX<1> > >(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,int,GRID<VECTOR<double,1> > const&,int,ARRAY<VECTOR<double,3>,VECTOR<int,1> > const&,ARRAY<bool,VECTOR<int,1> > const&,EOS<VECTOR<double,1>::SCALAR> const&,const bool,const ARRAY<VECTOR<double,3>,FACE_INDEX<1> >*);
-template void Write_Auxiliary_Files<VECTOR<double,2>,ARRAY<VECTOR<double,4>,VECTOR<int,2> >,ARRAY<bool,VECTOR<int,2> >,ARRAY<VECTOR<double,4>,FACE_INDEX<2> > >(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,int,GRID<VECTOR<double,2> > const&,int,ARRAY<VECTOR<double,4>,VECTOR<int,2> > const&,ARRAY<bool,VECTOR<int,2> > const&,EOS<VECTOR<double,2>::SCALAR> const&,const bool,const ARRAY<VECTOR<double,4>,FACE_INDEX<2> >*);
-template void Write_Auxiliary_Files<VECTOR<double,3>,ARRAY<VECTOR<double,5>,VECTOR<int,3> >,ARRAY<bool,VECTOR<int,3> >,ARRAY<VECTOR<double,5>,FACE_INDEX<3> > >(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,int,GRID<VECTOR<double,3> > const&,int,ARRAY<VECTOR<double,5>,VECTOR<int,3> > const&,ARRAY<bool,VECTOR<int,3> > const&,EOS<VECTOR<double,3>::SCALAR> const&,const bool,const ARRAY<VECTOR<double,5>,FACE_INDEX<3> >*);
-template void Write_Auxiliary_Files<VECTOR<double,1> >(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,int,COMPRESSIBLE_FLUID_COLLECTION<VECTOR<double,1> > const&,const bool);
-template void Write_Auxiliary_Files<VECTOR<double,2> >(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,int,COMPRESSIBLE_FLUID_COLLECTION<VECTOR<double,2> > const&,const bool);
-template void Write_Auxiliary_Files<VECTOR<double,3> >(STREAM_TYPE,std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,int,COMPRESSIBLE_FLUID_COLLECTION<VECTOR<double,3> > const&,const bool);
 }
+template void COMPRESSIBLE_AUXILIARY_DATA::Write_Auxiliary_Files<VECTOR<double,1> >(STREAM_TYPE,VIEWER_DIR const&,COMPRESSIBLE_FLUID_COLLECTION<VECTOR<double,1> > const&,bool);
+template void COMPRESSIBLE_AUXILIARY_DATA::Write_Auxiliary_Files<VECTOR<double,1>,ARRAY<VECTOR<double,3>,VECTOR<int,1> >,ARRAY<bool,VECTOR<int,1> >,ARRAY<VECTOR<double,3>,FACE_INDEX<1> > >(STREAM_TYPE,VIEWER_DIR const&,GRID<VECTOR<double,1> > const&,int,ARRAY<VECTOR<double,3>,VECTOR<int,1> > const&,ARRAY<bool,VECTOR<int,1> > const&,EOS<VECTOR<double,1>::SCALAR> const&,bool,ARRAY<VECTOR<double,3>,FACE_INDEX<1> > const*);
+template void COMPRESSIBLE_AUXILIARY_DATA::Write_Auxiliary_Files<VECTOR<double,2> >(STREAM_TYPE,VIEWER_DIR const&,COMPRESSIBLE_FLUID_COLLECTION<VECTOR<double,2> > const&,bool);
+template void COMPRESSIBLE_AUXILIARY_DATA::Write_Auxiliary_Files<VECTOR<double,2>,ARRAY<VECTOR<double,4>,VECTOR<int,2> >,ARRAY<bool,VECTOR<int,2> >,ARRAY<VECTOR<double,4>,FACE_INDEX<2> > >(STREAM_TYPE,VIEWER_DIR const&,GRID<VECTOR<double,2> > const&,int,ARRAY<VECTOR<double,4>,VECTOR<int,2> > const&,ARRAY<bool,VECTOR<int,2> > const&,EOS<VECTOR<double,2>::SCALAR> const&,bool,ARRAY<VECTOR<double,4>,FACE_INDEX<2> > const*);
+template void COMPRESSIBLE_AUXILIARY_DATA::Write_Auxiliary_Files<VECTOR<double,3> >(STREAM_TYPE,VIEWER_DIR const&,COMPRESSIBLE_FLUID_COLLECTION<VECTOR<double,3> > const&,bool);
+template void COMPRESSIBLE_AUXILIARY_DATA::Write_Auxiliary_Files<VECTOR<double,3>,ARRAY<VECTOR<double,5>,VECTOR<int,3> >,ARRAY<bool,VECTOR<int,3> >,ARRAY<VECTOR<double,5>,FACE_INDEX<3> > >(STREAM_TYPE,VIEWER_DIR const&,GRID<VECTOR<double,3> > const&,int,ARRAY<VECTOR<double,5>,VECTOR<int,3> > const&,ARRAY<bool,VECTOR<int,3> > const&,EOS<VECTOR<double,3>::SCALAR> const&,bool,ARRAY<VECTOR<double,5>,FACE_INDEX<3> > const*);
+template void COMPRESSIBLE_AUXILIARY_DATA::Write_Auxiliary_Files<VECTOR<float,1> >(STREAM_TYPE,VIEWER_DIR const&,COMPRESSIBLE_FLUID_COLLECTION<VECTOR<float,1> > const&,bool);
+template void COMPRESSIBLE_AUXILIARY_DATA::Write_Auxiliary_Files<VECTOR<float,1>,ARRAY<VECTOR<float,3>,VECTOR<int,1> >,ARRAY<bool,VECTOR<int,1> >,ARRAY<VECTOR<float,3>,FACE_INDEX<1> > >(STREAM_TYPE,VIEWER_DIR const&,GRID<VECTOR<float,1> > const&,int,ARRAY<VECTOR<float,3>,VECTOR<int,1> > const&,ARRAY<bool,VECTOR<int,1> > const&,EOS<VECTOR<float,1>::SCALAR> const&,bool,ARRAY<VECTOR<float,3>,FACE_INDEX<1> > const*);
+template void COMPRESSIBLE_AUXILIARY_DATA::Write_Auxiliary_Files<VECTOR<float,2> >(STREAM_TYPE,VIEWER_DIR const&,COMPRESSIBLE_FLUID_COLLECTION<VECTOR<float,2> > const&,bool);
+template void COMPRESSIBLE_AUXILIARY_DATA::Write_Auxiliary_Files<VECTOR<float,2>,ARRAY<VECTOR<float,4>,VECTOR<int,2> >,ARRAY<bool,VECTOR<int,2> >,ARRAY<VECTOR<float,4>,FACE_INDEX<2> > >(STREAM_TYPE,VIEWER_DIR const&,GRID<VECTOR<float,2> > const&,int,ARRAY<VECTOR<float,4>,VECTOR<int,2> > const&,ARRAY<bool,VECTOR<int,2> > const&,EOS<VECTOR<float,2>::SCALAR> const&,bool,ARRAY<VECTOR<float,4>,FACE_INDEX<2> > const*);
+template void COMPRESSIBLE_AUXILIARY_DATA::Write_Auxiliary_Files<VECTOR<float,3> >(STREAM_TYPE,VIEWER_DIR const&,COMPRESSIBLE_FLUID_COLLECTION<VECTOR<float,3> > const&,bool);
+template void COMPRESSIBLE_AUXILIARY_DATA::Write_Auxiliary_Files<VECTOR<float,3>,ARRAY<VECTOR<float,5>,VECTOR<int,3> >,ARRAY<bool,VECTOR<int,3> >,ARRAY<VECTOR<float,5>,FACE_INDEX<3> > >(STREAM_TYPE,VIEWER_DIR const&,GRID<VECTOR<float,3> > const&,int,ARRAY<VECTOR<float,5>,VECTOR<int,3> > const&,ARRAY<bool,VECTOR<int,3> > const&,EOS<VECTOR<float,3>::SCALAR> const&,bool,ARRAY<VECTOR<float,5>,FACE_INDEX<3> > const*);
 }

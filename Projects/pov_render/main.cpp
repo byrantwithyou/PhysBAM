@@ -7,6 +7,7 @@
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Core/Utilities/PROCESS_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Tools/Images/PNG_FILE.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Tools/Symbolics/PROGRAM.h>
@@ -29,9 +30,9 @@ typedef double T;
 typedef VECTOR<T,3> TV;
 typedef VECTOR<T,2> TV2;
 
-HASHTABLE<PAIR<std::string,int>,MPM_PARTICLES<TV>*> mpm_particles_cache;
-HASHTABLE<PAIR<std::string,int>,RIGID_BODY_COLLECTION<TV>*> rigid_body_collection_cache;
-HASHTABLE<PAIR<std::string,int>,DEFORMABLE_BODY_COLLECTION<TV>*> deformable_geometry_collection_cache;
+HASHTABLE<std::string,MPM_PARTICLES<TV>*> mpm_particles_cache;
+HASHTABLE<std::string,RIGID_BODY_COLLECTION<TV>*> rigid_body_collection_cache;
+HASHTABLE<std::string,DEFORMABLE_BODY_COLLECTION<TV>*> deformable_body_collection_cache;
 HASHTABLE<std::string,TRIANGULATED_SURFACE<T>*> saved_surface;
 struct TEXTURE
 {
@@ -40,22 +41,22 @@ struct TEXTURE
 };
 HASHTABLE<std::string,TEXTURE*> saved_texture;
 
-RIGID_BODY_COLLECTION<TV>& Load_Rigid_Body_Collection(const std::string& location,int frame)
+RIGID_BODY_COLLECTION<TV>& Load_Rigid_Body_Collection(const VIEWER_DIR& viewer_dir)
 {
-    RIGID_BODY_COLLECTION<TV>*& rigid_body_collection=rigid_body_collection_cache.Get_Or_Insert(PAIR<std::string,int>(location,frame));
+    RIGID_BODY_COLLECTION<TV>*& rigid_body_collection=rigid_body_collection_cache.Get_Or_Insert(viewer_dir.current_directory);
     if(rigid_body_collection) return *rigid_body_collection;
     rigid_body_collection=new RIGID_BODY_COLLECTION<TV>(0);
-    rigid_body_collection->Read(location,frame); // TODO: only load implicit surfaces if load_implicit_surfaces
+    rigid_body_collection->Read(viewer_dir); // TODO: only load implicit surfaces if load_implicit_surfaces
     return *rigid_body_collection;
 }
 
-DEFORMABLE_BODY_COLLECTION<TV>& Load_Deformable_Geometry_Collection(const std::string& location,int frame)
+DEFORMABLE_BODY_COLLECTION<TV>& Load_Deformable_Body_Collection(const VIEWER_DIR& viewer_dir)
 {
-    DEFORMABLE_BODY_COLLECTION<TV>*& deformable_geometry_collection=deformable_geometry_collection_cache.Get_Or_Insert(PAIR<std::string,int>(location,frame));
-    if(deformable_geometry_collection) return *deformable_geometry_collection;
-    deformable_geometry_collection=new DEFORMABLE_BODY_COLLECTION<TV>(0,0);
-    deformable_geometry_collection->Read(location,location,frame,-1,true,true);
-    return *deformable_geometry_collection;
+    DEFORMABLE_BODY_COLLECTION<TV>*& deformable_body_collection=deformable_body_collection_cache.Get_Or_Insert(viewer_dir.current_directory);
+    if(deformable_body_collection) return *deformable_body_collection;
+    deformable_body_collection=new DEFORMABLE_BODY_COLLECTION<TV>(0,0);
+    deformable_body_collection->Read(viewer_dir,true);
+    return *deformable_body_collection;
 }
 
 void Apply_Options(TRIANGULATED_SURFACE<T>* ts, const HASHTABLE<std::string,std::string>& options)
@@ -143,7 +144,9 @@ void Emit_Rigid_Body(std::ofstream& fout,const HASHTABLE<std::string,std::string
     if(options.Contains("index")){
         begin=atoi(options.Get("index").c_str());
         end=begin+1;}
-    RIGID_BODY_COLLECTION<TV>& collection=Load_Rigid_Body_Collection(options.Get("location"),frame);
+    VIEWER_DIR viewer_dir(options.Get("location"));
+    viewer_dir.Set(frame);
+    RIGID_BODY_COLLECTION<TV>& collection=Load_Rigid_Body_Collection(viewer_dir);
     for(int i=begin;i<end;i++){
         RIGID_BODY<TV>& rigid_body=collection.Rigid_Body(i);
         TRIANGULATED_SURFACE<T>* ts=rigid_body.simplicial_object->Create_Compact_Copy();
@@ -154,20 +157,20 @@ void Emit_Rigid_Body(std::ofstream& fout,const HASHTABLE<std::string,std::string
         else Emit_Smooth_Surface(fout,ts,options);}
 }
 
-MPM_PARTICLES<TV>& Load_MPM_Particles(const std::string& location,int frame)
+MPM_PARTICLES<TV>& Load_MPM_Particles(const VIEWER_DIR& viewer_dir)
 {
-    MPM_PARTICLES<TV>*& mpm_particles=mpm_particles_cache.Get_Or_Insert(PAIR<std::string,int>(location,frame));
+    MPM_PARTICLES<TV>*& mpm_particles=mpm_particles_cache.Get_Or_Insert(viewer_dir.current_directory);
     if(!mpm_particles){
-        std::string filename=location+"/%d/mpm_particles";
-        std::string frame_filename=Get_Frame_Filename(filename,frame);
         mpm_particles=new MPM_PARTICLES<TV>();
-        Read_From_File(frame_filename,*mpm_particles);}
+        Read_From_File(viewer_dir.current_directory+"/mpm_particles",*mpm_particles);}
     return *mpm_particles;
 }
 
 void Emit_MPM_Particles(std::ofstream& fout,const HASHTABLE<std::string,std::string>& options,int frame)
 {
-    MPM_PARTICLES<TV>& particles=Load_MPM_Particles(options.Get("location"),frame);
+    VIEWER_DIR viewer_dir(options.Get("location"));
+    viewer_dir.Set(frame);
+    MPM_PARTICLES<TV>& particles=Load_MPM_Particles(viewer_dir);
     T radius=atof(options.Get("radius").c_str());
     int begin=0,end=particles.number;
     if(options.Contains("begin"))
@@ -197,7 +200,9 @@ void Emit_Rigid_Body_Frame(std::ofstream& fout,const HASHTABLE<std::string,std::
     if(options.Contains("index")){
         begin=atoi(options.Get("index").c_str());
         end=begin+1;}
-    RIGID_BODY_COLLECTION<TV>& collection=Load_Rigid_Body_Collection(options.Get("location"),frame);
+    VIEWER_DIR viewer_dir(options.Get("location"));
+    viewer_dir.Set(frame);
+    RIGID_BODY_COLLECTION<TV>& collection=Load_Rigid_Body_Collection(viewer_dir);
     for(int i=begin;i<end;i++){
         RIGID_BODY<TV>& rigid_body=collection.Rigid_Body(i);
         MATRIX<T,3> rot=rigid_body.Frame().r.Rotation_Matrix();
@@ -217,7 +222,9 @@ void Emit_Rigid_Body_Proxy(std::ofstream& fout,const HASHTABLE<std::string,std::
     if(options.Contains("index")){
         begin=atoi(options.Get("index").c_str());
         end=begin+1;}
-    RIGID_BODY_COLLECTION<TV>& collection=Load_Rigid_Body_Collection(options.Get("location"),frame);
+    VIEWER_DIR viewer_dir(options.Get("location"));
+    viewer_dir.Set(frame);
+    RIGID_BODY_COLLECTION<TV>& collection=Load_Rigid_Body_Collection(viewer_dir);
     for(int i=begin;i<end;i++){
         fout<<options.Get("geometry")<<"\n";
         if(options.Contains("transform"))
@@ -238,7 +245,9 @@ void Emit_Rigid_Body_Proxy(std::ofstream& fout,const HASHTABLE<std::string,std::
 void Emit_Deformable_Body(std::ofstream& fout,const HASHTABLE<std::string,std::string>& options,int frame)
 {
     if(const std::string* value=options.Get_Pointer("frame")) frame=atoi(value->c_str());
-    DEFORMABLE_BODY_COLLECTION<TV>& collection=Load_Deformable_Geometry_Collection(options.Get("location"),frame);
+    VIEWER_DIR viewer_dir(options.Get("location"));
+    viewer_dir.Set(frame);
+    DEFORMABLE_BODY_COLLECTION<TV>& collection=Load_Deformable_Body_Collection(viewer_dir);
     STRUCTURE<TV>* structure=collection.structures(atoi(options.Get("index").c_str()));
     TRIANGULATED_SURFACE<T>* ts=0;
 

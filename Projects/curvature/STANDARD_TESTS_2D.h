@@ -40,8 +40,8 @@
 #include <Solids/Solids_Evolution/BACKWARD_EULER_EVOLUTION.h>
 #include <Solids/Solids_Evolution/BACKWARD_EULER_MINIMIZATION_OBJECTIVE.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <fstream>
 #include "STANDARD_TESTS_BASE.h"
+#include <fstream>
 namespace PhysBAM{
 
 template<class TV> class STANDARD_TESTS;

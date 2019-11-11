@@ -2,6 +2,7 @@
 // Copyright 2011.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Grid_Tools/Grids/NODE_ITERATOR.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
@@ -12,7 +13,7 @@
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-using namespace PhysBAM;
+namespace PhysBAM{
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -57,16 +58,16 @@ Clear_Debug_Particles() const
 // Function Write_Debug_Particles
 //#####################################################################
 template<class TV> void DEBUG_PARTICLES<TV>::
-Write_Debug_Particles(STREAM_TYPE stream_type,const std::string& output_directory,int frame) const
+Write_Debug_Particles(STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir) const
 {
-    Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),frame));
-    Write_To_File(stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles,debug_objects,debug_text);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/debug_particles",
+        debug_particles,debug_objects,debug_text);
     Clear_Debug_Particles();
 }
 //#####################################################################
 // Function Add_Debug_Particle
 //#####################################################################
-template<class TV> void PhysBAM::
+template<class TV> void
 Add_Debug_Particle(const TV& X, const VECTOR<typename TV::SCALAR,3>& color)
 {
     typedef typename TV::SCALAR T;
@@ -79,7 +80,7 @@ Add_Debug_Particle(const TV& X, const VECTOR<typename TV::SCALAR,3>& color)
 //#####################################################################
 // Function Debug_Particle_Set_Attribute
 //#####################################################################
-template<class TV,class ATTR> void PhysBAM::
+template<class TV,class ATTR> void
 Debug_Particle_Set_Attribute(const std::string& name,const ATTR& attr)
 {
     DEBUG_PARTICLES<TV>* particles=DEBUG_PARTICLES<TV>::Store_Debug_Particles();
@@ -89,7 +90,7 @@ Debug_Particle_Set_Attribute(const std::string& name,const ATTR& attr)
 //#####################################################################
 // Function Add_Debug_Object
 //#####################################################################
-template<class TV,int d> void PhysBAM::
+template<class TV,int d> void
 Add_Debug_Object(const VECTOR<TV,d>& object,const VECTOR<typename TV::SCALAR,3>& color,const VECTOR<typename TV::SCALAR,3>& bgcolor)
 {
     DEBUG_PARTICLES<TV>* dp=DEBUG_PARTICLES<TV>::Store_Debug_Particles();
@@ -105,7 +106,7 @@ Add_Debug_Object(const VECTOR<TV,d>& object,const VECTOR<typename TV::SCALAR,3>&
 //#####################################################################
 // Function Dump_Surface
 //#####################################################################
-template<class T_SURFACE,class T> void PhysBAM::
+template<class T_SURFACE,class T> void
 Dump_Surface(const T_SURFACE& surface,const VECTOR<T,3>& color,const VECTOR<T,3>& bgcolor)
 {
     typedef VECTOR<T,T_SURFACE::dimension+1> TV;
@@ -115,7 +116,7 @@ Dump_Surface(const T_SURFACE& surface,const VECTOR<T,3>& color,const VECTOR<T,3>
 //#####################################################################
 // Function Dump_Levelset
 //#####################################################################
-template<class TV,class TV_INT,class T> void PhysBAM::
+template<class TV,class TV_INT,class T> void
 Dump_Levelset(const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,const VECTOR<T,3>& color,const VECTOR<T,3>& bgcolor)
 {
     typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT surface;
@@ -125,7 +126,7 @@ Dump_Levelset(const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,const VECTOR<T,3>&
 //#####################################################################
 // Function Dump_Levelset
 //#####################################################################
-template<class TV,class TV_INT,class T> void PhysBAM::
+template<class TV,class TV_INT,class T> void
 Dump_Levelset(const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,const VECTOR<T,3>& color,const VECTOR<T,3>& bgcolor,T contour_value)
 {
     typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT surface;
@@ -135,7 +136,7 @@ Dump_Levelset(const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,const VECTOR<T,3>&
 //#####################################################################
 // Function Dump_Levelset
 //#####################################################################
-template<class TV,class T> void PhysBAM::
+template<class TV,class T> void
 Dump_Levelset(const GRID<TV>& grid,const IMPLICIT_OBJECT<TV>& phi,const VECTOR<T,3>& color,const VECTOR<T,3>& bgcolor)
 {
     GRID<TV> node_grid(grid.Is_MAC_Grid()?grid.Get_Regular_Grid():grid);
@@ -147,7 +148,7 @@ Dump_Levelset(const GRID<TV>& grid,const IMPLICIT_OBJECT<TV>& phi,const VECTOR<T
 //#####################################################################
 // Function Add_Debug_Text
 //#####################################################################
-template<class TV> inline void PhysBAM::
+template<class TV> inline void
 Add_Debug_Text(const TV& X,const std::string& text,const VECTOR<typename TV::SCALAR,3>& color)
 {
     DEBUG_PARTICLES<TV>* dp=DEBUG_PARTICLES<TV>::Store_Debug_Particles();
@@ -157,7 +158,15 @@ Add_Debug_Text(const TV& X,const std::string& text,const VECTOR<typename TV::SCA
     dt.color=color;
     dp->debug_text.Append(dt);
 }
-namespace PhysBAM{
+//#####################################################################
+// Function Get_Debug_Particles
+//#####################################################################
+template<class TV> DEBUG_PARTICLES<TV>&
+Get_Debug_Particles()
+{
+    static DEBUG_PARTICLES<TV> debug_particles;
+    return debug_particles;
+}
 template class DEBUG_PARTICLES<VECTOR<float,1> >;
 template class DEBUG_PARTICLES<VECTOR<float,2> >;
 template class DEBUG_PARTICLES<VECTOR<float,3> >;
@@ -227,4 +236,10 @@ template void Add_Debug_Text<VECTOR<double,2> >(VECTOR<double,2> const&,std::str
 template void Add_Debug_Text<VECTOR<float,2> >(VECTOR<float,2> const&,std::string const&,VECTOR<float,3> const&);
 template void Add_Debug_Text<VECTOR<double,3> >(VECTOR<double,3> const&,std::string const&,VECTOR<double,3> const&);
 template void Add_Debug_Text<VECTOR<float,3> >(VECTOR<float,3> const&,std::string const&,VECTOR<float,3> const&);
+template DEBUG_PARTICLES<VECTOR<float,1> >& Get_Debug_Particles<VECTOR<float,1> >();
+template DEBUG_PARTICLES<VECTOR<float,2> >& Get_Debug_Particles<VECTOR<float,2> >();
+template DEBUG_PARTICLES<VECTOR<float,3> >& Get_Debug_Particles<VECTOR<float,3> >();
+template DEBUG_PARTICLES<VECTOR<double,1> >& Get_Debug_Particles<VECTOR<double,1> >();
+template DEBUG_PARTICLES<VECTOR<double,2> >& Get_Debug_Particles<VECTOR<double,2> >();
+template DEBUG_PARTICLES<VECTOR<double,3> >& Get_Debug_Particles<VECTOR<double,3> >();
 }

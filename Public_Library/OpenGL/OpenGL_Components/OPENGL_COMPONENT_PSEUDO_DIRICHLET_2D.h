@@ -27,17 +27,14 @@ public:
 private:
     T velocity_scale;
     std::string filename;
-    int frame_loaded;
     bool valid;
 public:
-    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
     using OPENGL_COMPONENT<T>::World_Space_Box;
-    using OPENGL_OBJECT<T>::viewer_callbacks;
-    OPENGL_COMPONENT_PSEUDO_DIRICHLET_2D(const GRID<TV> &grid,const std::string &filename_input);
+    using OPENGL_OBJECT<T>::viewer_callbacks;using OPENGL_COMPONENT<T>::viewer_dir;
+    OPENGL_COMPONENT_PSEUDO_DIRICHLET_2D(const VIEWER_DIR& viewer_dir,const GRID<TV> &grid,const std::string &filename_input);
     
-    bool Valid_Frame(int frame_input) const override;
-    bool Is_Up_To_Date(int frame) const override { return valid && frame_loaded == frame; }
-    void Set_Frame(int frame_input) override;
+    void Set_Frame() override;
     void Set_Draw(bool draw_input = true) override;
     void Display() const override;
     bool Use_Bounding_Box() const override { return draw && valid; }
@@ -47,7 +44,7 @@ public:
     void Decrease_Vector_Size();
 
 private:
-    void Reinitialize(bool force=false);
+    void Reinitialize();
 };
 }
 #endif

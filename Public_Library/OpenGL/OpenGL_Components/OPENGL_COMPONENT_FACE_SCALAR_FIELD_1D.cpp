@@ -4,6 +4,7 @@
 //#####################################################################
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D.h>
 using namespace PhysBAM;
@@ -11,13 +12,12 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T,class T2> OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<T,T2>::
-OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D(const GRID<TV> &grid_input,const std::string &values_filename_input,OPENGL_COLOR point_color,OPENGL_COLOR line_color)
-    :OPENGL_COMPONENT<T>("Face Scalar Field 1D"),opengl_face_scalar_field(grid_input,*new ARRAY<T2,FACE_INDEX<1> >,point_color,line_color),
-      values_filename(values_filename_input),frame_loaded(-1),valid(false)
+OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D(const VIEWER_DIR& viewer_dir,const GRID<TV> &grid_input,const std::string &values_filename_input,OPENGL_COLOR point_color,OPENGL_COLOR line_color)
+    :OPENGL_COMPONENT<T>(viewer_dir,"Face Scalar Field 1D"),opengl_face_scalar_field(grid_input,*new ARRAY<T2,FACE_INDEX<1> >,point_color,line_color),
+      values_filename(values_filename_input),valid(false)
 {
     viewer_callbacks.Set("increase_scale",{[this](){Increase_Scale();},"Increase scale"});
     viewer_callbacks.Set("decrease_scale",{[this](){Decrease_Scale();},"Decrease scale"});
-    is_animation = Is_Animated(values_filename);
     Reinitialize();
 }
 //#####################################################################
@@ -29,20 +29,12 @@ template<class T,class T2> OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<T,T2>::
     delete &opengl_face_scalar_field.face_values;
 }
 //#####################################################################
-// Function Valid_Frame
-//#####################################################################
-template<class T,class T2> bool OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<T,T2>::
-Valid_Frame(int frame_input) const
-{
-    return Frame_File_Exists(values_filename,frame_input);
-}
-//#####################################################################
 // Function Set_Frame
 //#####################################################################
 template<class T,class T2> void OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<T,T2>::
-Set_Frame(int frame_input)
+Set_Frame()
 {
-    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
+    
     Reinitialize();
 }
 //#####################################################################
@@ -68,9 +60,8 @@ Display() const
 template<class T,class T2> void OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<T,T2>::
 Print_Selection_Info(std::ostream& stream) const
 {
-    if(Is_Up_To_Date(frame)){
-        stream<<component_name<<": "<<std::endl;
-        opengl_face_scalar_field.Print_Selection_Info(stream);}
+    stream<<component_name<<": "<<std::endl;
+    opengl_face_scalar_field.Print_Selection_Info(stream);
 }
 //#####################################################################
 // Function Bounding_Box
@@ -111,15 +102,13 @@ Decrease_Scale()
 template<class T,class T2> void OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<T,T2>::
 Reinitialize()
 {
-    if(draw && ((is_animation && frame_loaded != frame) || (!is_animation && frame_loaded < 0))){
-        valid=false;
-
-        std::string filename=Get_Frame_Filename(values_filename,frame);
-        if(File_Exists(filename))
-            Read_From_File(filename,opengl_face_scalar_field.face_values);
-        else return;
-        frame_loaded = frame;
-        valid = true;}
+    if(!draw) return;
+    valid=false;
+    std::string filename=viewer_dir.current_directory+"/"+values_filename;
+    if(File_Exists(filename))
+        Read_From_File(filename,opengl_face_scalar_field.face_values);
+    else return;
+    valid = true;
 }
 //#####################################################################
 namespace PhysBAM{

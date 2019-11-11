@@ -2,13 +2,13 @@
 #define __DOUBLE_ERROR__
 
 #include <Core/Log/LOG.h>
+#include "quadmath.h"
 #include <cfloat>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
-#include "quadmath.h"
 #include <type_traits>
 
 namespace PhysBAM {

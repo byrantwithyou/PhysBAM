@@ -27,8 +27,6 @@ class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,2> TV;
 protected:
-    std::string prefix;
-    int frame_loaded;
     bool valid;
     int display_mode;
     bool draw_velocities;
@@ -37,7 +35,8 @@ protected:
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
     using OPENGL_OBJECT<T>::viewer_callbacks;using OPENGL_OBJECT<T>::World_Space_Box;
-    using OPENGL_COMPONENT<T>::is_animation;
+    using OPENGL_COMPONENT<T>::viewer_dir;
+
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
     ARRAY<OPENGL_SEGMENTED_CURVE_2D<T>*> segmented_curve_objects;
     ARRAY<OPENGL_BEZIER_SPLINE_2D<T,3>*> bezier_spline_objects;
@@ -62,11 +61,10 @@ public:
     OPENGL_OBJECT<T>* selected_object;
     ARRAY<bool> active_list;
 
-    OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D(const std::string& prefix,const int start_frame);
+    OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D(const VIEWER_DIR& viewer_dir);
     virtual ~OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D();
     
-    bool Valid_Frame(int frame_input) const override;
-    void Set_Frame(int frame_input) override;
+    void Set_Frame() override;
     void Set_Draw(bool draw_input=true) override;
 
     virtual void Display() const override;
@@ -85,7 +83,7 @@ public:
     void Toggle_Draw_Velocities();
     void Cycle_Display_Mode();
 
-    virtual void Reinitialize(bool force=false);    // Needs to be called after some state changes
+    virtual void Reinitialize();    // Needs to be called after some state changes
 
 private:
     void Initialize();    // Needs to be called after some state changes

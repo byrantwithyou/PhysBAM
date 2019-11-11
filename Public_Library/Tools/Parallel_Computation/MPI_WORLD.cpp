@@ -13,8 +13,8 @@
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <cstdio>
 #include <cstdlib>
-#include <stdexcept>
 #include <mpi.h>
+#include <stdexcept>
 #ifdef LAM_MPI
 #include <lam_config.h>
 #endif

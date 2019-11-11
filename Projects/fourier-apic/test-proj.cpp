@@ -53,9 +53,13 @@ int main(int argc, char* argv[])
 
     GRID<TV> grid(TV_INT()+resolution,domain,true);
     GRID<TV> phi_grid=grid.Get_Regular_Grid().Get_MAC_Grid_At_Regular_Positions();
-    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),grid,"proj");
+    VIEWER_DIR viewer_dir("proj");
+    VIEWER_OUTPUT vo(STREAM_TYPE((RW)0),viewer_dir);
+    Use_Debug_Particles<TV>();
+    vo.Add_Common("grid",grid);
 
     ARRAY<T,FACE_INDEX<TV::m> > u(grid.Domain_Indices(ghost));
+    vo.Add("mac_velocities",u);
     ARRAY<bool,FACE_INDEX<TV::m> > valid_u(grid,ghost);
     ARRAY<T,TV_INT> object_phi(grid.Node_Indices(ghost));
     ARRAY<T,TV_INT> surface_phi(grid.Node_Indices(ghost));
@@ -91,13 +95,13 @@ int main(int argc, char* argv[])
 
     Dump_Levelset(phi_grid,object_phi,VECTOR<T,3>(1,1,0));
     Dump_Levelset(phi_grid,surface_phi,VECTOR<T,3>(1,0,1));
-    Flush_Frame(u,"before projection");
+    Flush_Frame("before projection");
 
     proj.Cut_Cell_Projection(grid,ghost,u,density,dt);
 
     Dump_Levelset(phi_grid,object_phi,VECTOR<T,3>(1,1,0));
     Dump_Levelset(phi_grid,surface_phi,VECTOR<T,3>(1,0,1));
-    Flush_Frame(u,"after projection");
+    Flush_Frame("after projection");
     
     T u_l2=0,u_inf=0,u_max=0;
     int u_cnt=0;
@@ -115,7 +119,7 @@ int main(int argc, char* argv[])
     LOG::printf("u: %.3f %.3f   %.3f\n",u_inf,u_l2,u_max);
     Dump_Levelset(phi_grid,object_phi,VECTOR<T,3>(1,1,0));
     Dump_Levelset(phi_grid,surface_phi,VECTOR<T,3>(1,0,1));
-    Flush_Frame(u,"velocity error");
+    Flush_Frame("velocity error");
 
     T p_l2=0,p_inf=0,p_max=0;
     int p_cnt=0;
@@ -133,7 +137,7 @@ int main(int argc, char* argv[])
     LOG::printf("p: %.3f %.3f   %.3f\n",p_inf,p_l2,p_max);
     Dump_Levelset(phi_grid,object_phi,VECTOR<T,3>(1,1,0));
     Dump_Levelset(phi_grid,surface_phi,VECTOR<T,3>(1,0,1));
-    Flush_Frame(u,"pressure error");
+    Flush_Frame("pressure error");
 
     return 0;
 }

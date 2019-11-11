@@ -22,7 +22,7 @@ public:
     typedef MULTIPHASE_FIRE_EXAMPLES_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::data_directory;
     using BASE::last_frame;using BASE::frame_rate;using BASE::write_output_files;using BASE::pseudo_dirichlet;using BASE::resolution;
-    using BASE::output_directory;using BASE::restart;using BASE::restart_frame;using BASE::test_number;
+    using BASE::viewer_dir;using BASE::restart;using BASE::restart_frame;using BASE::test_number;
     
     MULTIPHASE_FIRE_EXAMPLES(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
         :MULTIPHASE_FIRE_EXAMPLES_UNIFORM<TV>(stream_type_input,parse_args)
@@ -36,9 +36,9 @@ public:
         if(test_number==2) fluids_parameters.grid->Initialize(TV_INT(10*cells+1,10*cells+1,10*cells+1),RANGE<TV>(TV(0,0,0),TV(1,1,1)));
         if(test_number==3) fluids_parameters.grid->Initialize(TV_INT(10*cells+1,10*cells+1,10*cells+1),RANGE<TV>(TV(0,0,0),TV(1,1,1)));
         if(!this->user_output_directory){
-            if(!pseudo_dirichlet) output_directory=LOG::sprintf("Multiphase_Fire_Examples/Example_%d__Resolution_%d_%d_%d",test_number,
+            if(!pseudo_dirichlet) viewer_dir.output_directory=LOG::sprintf("Multiphase_Fire_Examples/Example_%d__Resolution_%d_%d_%d",test_number,
                 (fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),(fluids_parameters.grid->counts.z-1));
-            else output_directory=LOG::sprintf("Multiphase_Fire_Examples/Example_%d__Resolution_%d_%d_%d_pseudo_dirichlet",test_number,
+            else viewer_dir.output_directory=LOG::sprintf("Multiphase_Fire_Examples/Example_%d__Resolution_%d_%d_%d_pseudo_dirichlet",test_number,
                 (fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),(fluids_parameters.grid->counts.z-1));}
     }
 

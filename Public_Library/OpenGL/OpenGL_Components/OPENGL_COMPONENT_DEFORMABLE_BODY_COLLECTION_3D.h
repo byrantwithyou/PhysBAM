@@ -31,8 +31,6 @@ class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D:public OPENGL_COMPONENT<T>
 {
     typedef VECTOR<T,3> TV;
 protected:
-    std::string prefix;
-    int frame_loaded;
     bool valid,use_active_list,hide_unselected;
     int display_mode,display_relative_velocity_mode,number_of_segmented_curve,incremented_active_object;
     bool smooth_shading;
@@ -42,7 +40,7 @@ protected:
     int display_soft_bound_surface_mode,display_hard_bound_surface_mode,display_forces_mode,interaction_pair_display_mode;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;
-    using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
+    using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::viewer_dir;
     using OPENGL_OBJECT<T>::viewer_callbacks;
     using OPENGL_OBJECT<T>::World_Space_Box;
     DEFORMABLE_BODY_COLLECTION<TV> &deformable_body_collection;
@@ -81,11 +79,10 @@ public:
     int selected_index;
     OPENGL_OBJECT<T>* selected_object;
 
-    OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D(const std::string& prefix,const int start_frame);
+    OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D(const VIEWER_DIR& viewer_dir);
     virtual ~OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D();
     
-    bool Valid_Frame(int frame_input) const override;
-    void Set_Frame(int frame_input) override;
+    void Set_Frame() override;
     void Set_Draw(bool draw_input=true) override;
     void Draw_All_Objects() override;
 
@@ -133,7 +130,7 @@ public:
     void Cycle_Hard_Bound_Surface_Display_Mode();
     void Cycle_Interaction_Pair_Display_Mode();
 
-    virtual void Reinitialize(bool force=false,bool read_geometry=true);    // Needs to be called after some state changes
+    void Reinitialize();
     
     void Toggle_Active_Value_Response();
     void Highlight_Particle_Response();

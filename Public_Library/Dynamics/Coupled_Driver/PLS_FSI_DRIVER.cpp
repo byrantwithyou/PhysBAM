@@ -84,7 +84,7 @@ Execute_Main_Program()
     Initialize();
     example.Post_Initialization();
     example.Log_Parameters();
-    if(!example.restart) Write_Output_Files(0);}
+    if(!example.restart) Write_Output_Files();}
     Simulate_To_Frame(example.last_frame);
 }
 //#####################################################################
@@ -98,7 +98,7 @@ Simulate_To_Frame(const int frame_input)
         Preprocess_Frame(current_frame+1);
         Advance_To_Target_Time(example.Time_At_Frame(current_frame+1));
         Postprocess_Frame(++current_frame);
-        if(example.write_output_files && example.write_substeps_level==-1) Write_Output_Files(current_frame);
+        if(example.write_output_files && example.write_substeps_level==-1) Write_Output_Files();
         else if(example.write_substeps_level!=-1)
             PHYSBAM_DEBUG_WRITE_SUBSTEP("END Frame %d",example.write_substeps_level,current_frame);
         LOG::cout<<"TIME = "<<time<<std::endl;}
@@ -112,11 +112,13 @@ Initialize()
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid=*example.fluids_parameters.collision_bodies_affecting_fluid;
 
     if(example.auto_restart){
-        std::string last_frame_file=example.output_directory+"/common/last_frame";
-        int last_frame;Read_From_Text_File(last_frame_file,last_frame);
-        example.restart=true;example.restart_frame=last_frame;
+        std::string last_frame_file=example.viewer_dir.output_directory+"/common/last_frame";
+        int last_frame;
+        Read_From_Text_File(last_frame_file,last_frame);
+        example.restart=true;
+        example.restart_frame=last_frame;
         LOG::cout<<"Auto Restart from frame "<<last_frame<<" (from file "<<last_frame_file<<")"<<std::endl;}
-    if(example.restart){current_frame=example.restart_frame;Read_Time(current_frame);}
+    if(example.restart) current_frame=example.restart_frame;
     else current_frame=0;
     output_number=current_frame;
     time=example.Time_At_Frame(current_frame);
@@ -167,7 +169,7 @@ Initialize()
 
     if(example.restart){
         LOG::SCOPE scope("reading solids data");
-        example.Read_Output_Files_Solids(example.restart_frame);
+        example.Read_Output_Files_Solids();
         example.solids_evolution->time=time=example.Time_At_Frame(example.restart_frame);}
 
     example.solids_evolution->Initialize_Deformable_Objects(example.frame_rate,example.restart);
@@ -208,7 +210,7 @@ Initialize()
 
     // set up the initial state
     if(example.restart){
-        example.Read_Output_Files_Fluids(current_frame);
+        example.Read_Output_Files_Fluids();
         Initialize_Fluids_Grids();
         collision_bodies_affecting_fluid.Rasterize_Objects();
         collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*grid.dX.Min(),5);
@@ -593,15 +595,14 @@ Compute_Dt(const T time,const T target_time,bool& done)
 // Function Write_Output_Files
 //#####################################################################
 template<class TV> void PLS_FSI_DRIVER<TV>::
-Write_Output_Files(const int frame)
+Write_Output_Files()
 {
     LOG::SCOPE scope("writing output files");
-    Create_Directory(example.output_directory);
-    Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
-    Create_Directory(example.output_directory+"/common");
+    example.viewer_dir.Start_Directory(0,example.frame_title);
+    example.frame_title="";
 
     example.fluids_parameters.phi_boundary_water.Use_Extrapolation_Mode(false);
-    example.Write_Output_Files(frame);
+    example.Write_Output_Files();
     example.fluids_parameters.phi_boundary_water.Use_Extrapolation_Mode(true);
 
     GRID<TV>& grid=*example.fluids_parameters.grid;
@@ -621,8 +622,8 @@ Write_Output_Files(const int frame)
             number_of_removed_negative_particles+=pls->removed_negative_particles(iterator.Cell_Index())->Size();
     LOG::cout<<number_of_removed_positive_particles<<" positive and "<<number_of_removed_negative_particles<<" negative removed particles "<<std::endl;
 
-    Write_Time(frame);
-    Write_Last_Frame(frame);
+    Write_Time();
+    example.viewer_dir.Finish_Directory();
 }
 //#####################################################################
 // Function Delete_Particles_Inside_Objects

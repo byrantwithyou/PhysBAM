@@ -121,7 +121,7 @@ bool Check_Solution(const MATRIX_CONSTRUCTION_FEM<VECTOR<T,d> >& mc,
     if(num_u) l2_u=sqrt(l2_u/num_u);
     if(num_p) l2_p=sqrt(l2_p/num_p);
     LOG::printf("u l-inf %P   u l-2 %P   p l-inf %P   p l-2 %P\n",max_u,l2_u,max_p,l2_p);
-    if(dump) Flush_Frame<TV>("error");
+    if(dump) Flush_Frame("error");
     return max(max_u,l2_u,max_p,l2_p)<1e-10;
 }
 //#####################################################################

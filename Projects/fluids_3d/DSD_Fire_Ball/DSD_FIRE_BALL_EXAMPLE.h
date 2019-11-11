@@ -24,7 +24,7 @@ public:
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::last_frame;using BASE::frame_rate;using BASE::write_output_files;
-    using BASE::output_directory;using BASE::restart;using BASE::restart_frame;using BASE::data_directory;
+    using BASE::viewer_dir;using BASE::restart;using BASE::restart_frame;using BASE::data_directory;
     using BASE::user_last_frame;
 
 
@@ -66,7 +66,7 @@ public:
         fluids_parameters.write_particles=true;
         fluids_parameters.number_particles_per_cell=0;
         if(!this->user_output_directory)
-            output_directory="DSD_Fire_Ball/output";
+            viewer_dir.output_directory="DSD_Fire_Ball/output";
         fluids_parameters.use_maccormack_semi_lagrangian_advection=true;
         fluids_parameters.use_maccormack_for_level_set=true;
         fluids_parameters.use_maccormack_compute_mask=true;

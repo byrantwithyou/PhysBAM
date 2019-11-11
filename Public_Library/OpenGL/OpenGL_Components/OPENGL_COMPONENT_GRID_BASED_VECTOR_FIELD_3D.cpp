@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D.h>
 using namespace PhysBAM;
@@ -10,17 +11,14 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>::
-OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D(const GRID<TV> &grid,const std::string &vector_field_filename)
-    :OPENGL_COMPONENT<T>("Cell Centered Velocity Field"), 
+OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D(const VIEWER_DIR& viewer_dir,const GRID<TV> &grid,const std::string &vector_field_filename)
+    :OPENGL_COMPONENT<T>(viewer_dir,"Cell Centered Velocity Field"), 
     opengl_grid_based_vector_field(*(new GRID<TV>(grid)), *(new ARRAY<VECTOR<T,3> ,VECTOR<int,3> >)), 
       vector_field_filename(vector_field_filename), valid(false)
 {
     viewer_callbacks.Set("increase_vector_size",{[this](){Increase_Vector_Size();},"Increase vector size"});
     viewer_callbacks.Set("decrease_vector_size",{[this](){Decrease_Vector_Size();},"Decrease vector size"});
     viewer_callbacks.Set("toggle_arrowhead",{[this](){Toggle_Arrowhead();},"Toggle arrowhead"});
-
-    is_animation = Is_Animated(vector_field_filename);
-    frame_loaded = -1;
 }
 //#####################################################################
 // Destructor
@@ -32,20 +30,12 @@ template<class T> OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>::
     delete &opengl_grid_based_vector_field.V;
 }
 //#####################################################################
-// Function Valid_Frame
-//#####################################################################
-template<class T> bool OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>::
-Valid_Frame(int frame_input) const
-{
-    return Frame_File_Exists(vector_field_filename, frame_input);
-}
-//#####################################################################
 // Function Set_Frame
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>::
-Set_Frame(int frame_input)
+Set_Frame()
 {
-    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
+    
     Reinitialize();
 }
 //#####################################################################
@@ -80,25 +70,15 @@ Bounding_Box() const
 template<class T> void OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>::
 Reinitialize()
 {
-    if(draw)
-    {
-        if(!valid ||
-            (is_animation && frame_loaded != frame) ||
-            (!is_animation && frame_loaded < 0))
-        {
-            valid = false;
-
-            std::string tmp_filename = Get_Frame_Filename(vector_field_filename, frame);
-            if(File_Exists(tmp_filename))
-                Read_From_File(tmp_filename,opengl_grid_based_vector_field.V);
-            else
-                return;
-
-            opengl_grid_based_vector_field.Update();
-            frame_loaded = frame;
-            valid = true;
-        }
-    }
+    if(!draw) return;
+    valid = false;
+    std::string tmp_filename = viewer_dir.current_directory+"/"+vector_field_filename;
+    if(File_Exists(tmp_filename))
+        Read_From_File(tmp_filename,opengl_grid_based_vector_field.V);
+    else
+        return;
+    opengl_grid_based_vector_field.Update();
+    valid = true;
 }
 //#####################################################################
 // Function Print_Selection_Info
@@ -106,9 +86,8 @@ Reinitialize()
 template<class T> void OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D<T>::
 Print_Selection_Info(std::ostream& stream) const
 {
-    if(Is_Up_To_Date(frame)){
-        stream<<component_name<<": ";
-        opengl_grid_based_vector_field.Print_Selection_Info(stream);}
+    stream<<component_name<<": ";
+    opengl_grid_based_vector_field.Print_Selection_Info(stream);
 }
 //#####################################################################
 // Function Increase_Vector_Size

@@ -22,7 +22,7 @@ class EMBEDDING_TEST:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 
 public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
-    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
+    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::viewer_dir;
     using BASE::stream_type;using BASE::solid_body_collection;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes; // silence -Woverloaded-virtual
     using BASE::user_last_frame;
@@ -254,7 +254,7 @@ void Initialize_Bodies() override
     target_position=true;
     use_zero_length_springs=true;
     if(!this->user_output_directory)
-        output_directory="Embedding_Test/output";
+        viewer_dir.output_directory="Embedding_Test/output";
 
     Get_Initial_Data();
     

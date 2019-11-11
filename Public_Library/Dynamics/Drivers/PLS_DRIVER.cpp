@@ -126,7 +126,7 @@ Initialize()
     }
 
     if(example.restart){
-        example.Read_Output_Files(example.restart);
+        example.Read_Output_Files();
         example.collision_bodies_affecting_fluid.Rasterize_Objects();
         example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*example.mac_grid.dX.Min(),5);} // compute grid visibility (for advection later)
     else{
@@ -164,7 +164,7 @@ Initialize()
     example.incompressible.Extrapolate_Velocity_Across_Interface(example.face_velocities,exchanged_phi_ghost,false,example.number_of_ghost_cells,0,TV());
 
     example.Set_Boundary_Conditions(time); // get so CFL is correct
-    if(!example.restart) Write_Output_Files(0);
+    if(!example.restart) Write_Output_Files();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",1);
 }
 //#####################################################################
@@ -302,7 +302,7 @@ Simulate_To_Frame(const int frame)
         Advance_To_Target_Time(example.Time_At_Frame(current_frame+1));
         example.particle_levelset_evolution.Reseed_Particles(time);
         example.particle_levelset_evolution.Delete_Particles_Outside_Grid();
-        Write_Output_Files(++output_number);
+        Write_Output_Files();
         current_frame++;}
 } 
 //#####################################################################
@@ -313,21 +313,19 @@ Write_Substep(const std::string& title)
 {
     example.frame_title=title;
     LOG::cout<<"Writing substep ["<<example.frame_title<<"]: output_number="<<output_number+1<<", time="<<time<<", frame="<<current_frame<<std::endl;
-    Write_Output_Files(++output_number);
+    Write_Output_Files();
     example.frame_title="";
 }
 //#####################################################################
 // Write_Output_Files
 //#####################################################################
 template<class TV> void PLS_DRIVER<TV>::
-Write_Output_Files(const int frame)
+Write_Output_Files()
 {
-    Create_Directory(example.output_directory);
-    Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
-    Create_Directory(example.output_directory+"/common");
-    Write_To_Text_File(example.output_directory+LOG::sprintf("/%d/frame_title",frame),example.frame_title);
-    example.Write_Output_Files(frame);
-    Write_To_Text_File(example.output_directory+"/common/last_frame",frame,"\n");
+    example.viewer_dir.Start_Directory(0,example.frame_title);
+    example.frame_title="";
+    example.Write_Output_Files();
+    example.viewer_dir.Finish_Directory();
 }
 //#####################################################################
 namespace PhysBAM{

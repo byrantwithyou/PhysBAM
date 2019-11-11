@@ -25,7 +25,7 @@ class HAIR_STRAND_TESTS:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
     typedef VECTOR<T,3> TV;
 public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
-    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
+    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::viewer_dir;
     using BASE::stream_type;using BASE::write_substeps_level;using BASE::solid_body_collection;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Set_External_Positions;using BASE::Zero_Out_Enslaved_Velocity_Nodes; // silence -Woverloaded-virtual
     using BASE::user_last_frame;
@@ -75,7 +75,7 @@ public:
     void Add_External_Impulses_Helper(ARRAY_VIEW<TV> V,const T time,const T dt,bool use_momentum_conserving,bool use_non_momentum_conserving);
     void Preprocess_Solids_Substep(const T time) override;    
     void Postprocess_Frame(const int frame) override;
-    void Write_Output_Files(const int frame) const override;
+    void Write_Output_Files() const override;
 //#####################################################################
 };
 }

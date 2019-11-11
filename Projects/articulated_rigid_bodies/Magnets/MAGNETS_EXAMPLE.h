@@ -18,7 +18,7 @@ class MAGNETS_EXAMPLE:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
     typedef T_input T;typedef VECTOR<T,3> TV;
     typedef SOLIDS_EXAMPLE<TV> BASE;
 public:
-    using BASE::output_directory;using BASE::solids_parameters;using BASE::write_last_frame;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;
+    using BASE::viewer_dir;using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;
     using BASE::stream_type;using BASE::solid_body_collection;
     using BASE::Set_External_Velocities; // silence -Woverloaded-virtual
     using BASE::user_last_frame;

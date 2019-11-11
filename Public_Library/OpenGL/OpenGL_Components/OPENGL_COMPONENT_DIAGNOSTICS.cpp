@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_DIAGNOSTICS.h>
 #include <climits>
 using namespace PhysBAM;
@@ -10,8 +11,8 @@ using namespace PhysBAM;
 // OPENGL_COMPONENT_DIAGNOSTICS
 //#####################################################################
 template<class T> OPENGL_COMPONENT_DIAGNOSTICS<T>::
-OPENGL_COMPONENT_DIAGNOSTICS(const std::string& filename_input)
-    :filename(filename_input),frame_loaded(INT_MIN),valid(false)
+OPENGL_COMPONENT_DIAGNOSTICS(const VIEWER_DIR& viewer_dir,const std::string& filename_input)
+    :OPENGL_COMPONENT<T>(viewer_dir),filename(filename_input),valid(false)
 {
 }
 //#####################################################################
@@ -22,20 +23,12 @@ template<class T> OPENGL_COMPONENT_DIAGNOSTICS<T>::
 {
 }
 //#####################################################################
-// Valid_Frame
-//#####################################################################
-template<class T> bool OPENGL_COMPONENT_DIAGNOSTICS<T>::
-Valid_Frame(int frame_input) const
-{
-    return Frame_File_Exists(filename,frame_input);
-}
-//#####################################################################
 // Set_Frame
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_DIAGNOSTICS<T>::
-Set_Frame(int frame_input)
+Set_Frame()
 {
-    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
+    
     Reinitialize();
 }
 //#####################################################################
@@ -53,18 +46,16 @@ Print_Selection_Info(std::ostream& output_stream) const
 template<class T> void OPENGL_COMPONENT_DIAGNOSTICS<T>::
 Reinitialize()
 {
-    if(draw){
-      if((is_animation && frame_loaded != frame) || (!is_animation && frame_loaded==INT_MIN)){
-            lines.Remove_All();
-            valid=false;
-            std::string tmp_filename = Get_Frame_Filename(filename, frame);
-            if(File_Exists(tmp_filename)){
-                std::istream* input=Safe_Open_Input_Raw(tmp_filename,false);
-                std::string line;
-                while(std::getline(*input,line)) lines.Append(line);
-                delete input;
-                frame_loaded=frame;
-                valid=true;}}}
+    if(!draw) return;
+    lines.Remove_All();
+    valid=false;
+    std::string tmp_filename = viewer_dir.current_directory+"/"+filename;
+    if(!File_Exists(tmp_filename)) return;
+    std::istream* input=Safe_Open_Input_Raw(tmp_filename,false);
+    std::string line;
+    while(std::getline(*input,line)) lines.Append(line);
+    delete input;
+    valid=true;
 }
 //#####################################################################
 // Use_Bounding_Box

@@ -249,46 +249,46 @@ Init_Penalty_Collection()
 // Function Read_Output_Files_Solids
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
-Read_Output_Files_Solids(const int frame)
+Read_Output_Files_Solids()
 {
-    BASE::Read_Output_Files_Solids(frame);
+    BASE::Read_Output_Files_Solids();
     if(pfd)
     {
-        Read_From_File(LOG::sprintf("%s/%d/pfd_data",output_directory.c_str(),frame),pfd->grid);
+        Read_From_File(viewer_dir.current_directory+"/pfd_data",pfd->grid);
         pfd->restarted=true;
     }
     if(pfd->di_penalty)
-        Read_From_File(LOG::sprintf("%s/%d/di_data",output_directory.c_str(),frame),*pfd->di_penalty);
+        Read_From_File(viewer_dir.current_directory+"/di_data",*pfd->di_penalty);
     if(pfd->rr_penalty)
-        Read_From_File(LOG::sprintf("%s/%d/rr_data",output_directory.c_str(),frame),*pfd->rr_penalty);
+        Read_From_File(viewer_dir.current_directory+"/rr_data",*pfd->rr_penalty);
     if(pfd->rd_penalty)
-        Read_From_File(LOG::sprintf("%s/%d/rd_data",output_directory.c_str(),frame),*pfd->rd_penalty);
+        Read_From_File(viewer_dir.current_directory+"/rd_data",*pfd->rd_penalty);
     if(pfd->dd_penalty)
-        Read_From_File(LOG::sprintf("%s/%d/dd_data",output_directory.c_str(),frame),*pfd->dd_penalty);
+        Read_From_File(viewer_dir.current_directory+"/dd_data",*pfd->dd_penalty);
 }
 //#####################################################################
 // Function Write_Output_Files
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
-Write_Output_Files(const int frame) const
+Write_Output_Files() const
 {
-    BASE::Write_Output_Files(frame);
+    BASE::Write_Output_Files();
     if(pfd)
     {
 #pragma omp task
         if(pfd->di_penalty)
-            Write_To_File(stream_type,LOG::sprintf("%s/%d/di_data",output_directory.c_str(),frame),*pfd->di_penalty);
+            Write_To_File(stream_type,viewer_dir.current_directory+"/di_data",*pfd->di_penalty);
 #pragma omp task
         if(pfd->rr_penalty)
-            Write_To_File(stream_type,LOG::sprintf("%s/%d/rr_data",output_directory.c_str(),frame),*pfd->rr_penalty);
+            Write_To_File(stream_type,viewer_dir.current_directory+"/rr_data",*pfd->rr_penalty);
 #pragma omp task
         if(pfd->rd_penalty)
-            Write_To_File(stream_type,LOG::sprintf("%s/%d/rd_data",output_directory.c_str(),frame),*pfd->rd_penalty);
+            Write_To_File(stream_type,viewer_dir.current_directory+"/rd_data",*pfd->rd_penalty);
 #pragma omp task
         if(pfd->dd_penalty)
-            Write_To_File(stream_type,LOG::sprintf("%s/%d/dd_data",output_directory.c_str(),frame),*pfd->dd_penalty);
+            Write_To_File(stream_type,viewer_dir.current_directory+"/dd_data",*pfd->dd_penalty);
         if(pfd)
-            Write_To_File(stream_type,LOG::sprintf("%s/%d/pfd_data",output_directory.c_str(),frame),pfd->grid);
+            Write_To_File(stream_type,viewer_dir.current_directory+"/pfd_data",pfd->grid);
     }
 }
 template class STANDARD_TESTS_BASE<VECTOR<float,2> >;

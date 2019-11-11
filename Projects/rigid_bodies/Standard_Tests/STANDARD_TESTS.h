@@ -74,8 +74,8 @@
 #include <Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
 #include <Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <fstream>
 #include "../RANDOM_PLACEMENT.h"
+#include <fstream>
 namespace PhysBAM{
 
 template<class T_input>
@@ -98,7 +98,7 @@ public:
 
     typedef SOLIDS_EXAMPLE<VECTOR<T_input,3> > BASE;
     using BASE::solids_parameters;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::test_number;
-    using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::stream_type;
+    using BASE::data_directory;using BASE::last_frame;using BASE::viewer_dir;using BASE::stream_type;
     using BASE::user_last_frame;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
@@ -114,10 +114,10 @@ public:
 
         tests.data_directory=data_directory;
         if(!this->user_output_directory){
-            output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+            viewer_dir.output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
 
-            if(small_block_mass!=1) output_directory+=LOG::sprintf("_m%g",small_block_mass);
-            if(parameter) output_directory+=LOG::sprintf("_param%i",parameter);}
+            if(small_block_mass!=1) viewer_dir.output_directory+=LOG::sprintf("_m%g",small_block_mass);
+            if(parameter) viewer_dir.output_directory+=LOG::sprintf("_param%i",parameter);}
     }
 
     ~STANDARD_TESTS()

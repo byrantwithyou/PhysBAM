@@ -19,13 +19,12 @@ class OPENGL_COMPONENT_LEVELSET_2D:public OPENGL_COMPONENT<T>,public OPENGL_GRID
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
     using OPENGL_COMPONENT<T>::component_name;using OPENGL_OBJECT<T>::viewer_callbacks;
-    using OPENGL_COMPONENT<T>::is_animation;
-    OPENGL_COMPONENT_LEVELSET_2D(const std::string& levelset_filename_input,const std::string filename_set_input="");
+    using OPENGL_COMPONENT<T>::viewer_dir;
+    
+    OPENGL_COMPONENT_LEVELSET_2D(const VIEWER_DIR& viewer_dir,const std::string& levelset_filename_input,const std::string filename_set_input="");
     virtual ~OPENGL_COMPONENT_LEVELSET_2D();
 
-    bool Valid_Frame(int frame_input) const override;
-
-    void Set_Frame(int frame_input) override;
+    void Set_Frame() override;
     void Set_Draw(bool draw_input = true) override;
 
     void Display() const override;
@@ -33,7 +32,6 @@ public:
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
     void Print_Cell_Selection_Info(std::ostream& stream,const TV_INT& cell) const override;
     void Print_Node_Selection_Info(std::ostream& stream,const TV_INT& node) const override;
-    bool Is_Up_To_Date(int frame) const override {return valid && frame_loaded == frame;}
 
     void Toggle_Color_Mode();
     void Toggle_Smooth();
@@ -46,7 +44,7 @@ public:
     void Toggle_Draw_Ghost_Values();
     
 private:
-    void Reinitialize(const bool force_even_if_not_drawn=false);
+    void Reinitialize();
     template<class> friend class OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D;
 
 public:
@@ -56,7 +54,6 @@ public:
 private:
     std::string levelset_filename;
     std::string filename_set;
-    int frame_loaded;
     int set;
     bool use_sets;
     int set_loaded;

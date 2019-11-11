@@ -13,12 +13,12 @@
 #include <Geometry/Basic_Geometry/PLANE.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <boost/geometry.hpp>
-#include <boost/geometry/geometries/polygon.hpp>
 #include <boost/geometry/geometries/register/point.hpp>
-#include <boost/geometry/geometries/register/ring.hpp>
 #include <boost/geometry/multi/geometries/multi_polygon.hpp>
 #include <boost/geometry/multi/geometries/register/multi_point.hpp>
 #include <boost/geometry/multi/geometries/register/multi_polygon.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
+#include <boost/geometry/geometries/register/ring.hpp>
 
 typedef PhysBAM::VECTOR<float,2> VECTOR_float_2;
 typedef PhysBAM::VECTOR<double,2> VECTOR_double_2;

@@ -80,7 +80,7 @@ Child(JOINT_ID joint_id) const
 // Function Read
 //#####################################################################
 template<class T> void ARTICULATED_RIGID_BODY<VECTOR<T,1> >::
-Read(const std::string& directory,const int frame)
+Read(const VIEWER_DIR& viewer_dir)
 {
     PHYSBAM_WARNING("ARTICULATED_RIGID_BODY<VECTOR<T,1> > not implemented");
 }
@@ -168,7 +168,7 @@ Generate_Process_List_Using_Contact_Graph(const RIGID_BODY_CONTACT_GRAPH<TV>& co
 // Function Write
 //#####################################################################
 template<class T> void ARTICULATED_RIGID_BODY<VECTOR<T,1> >::
-Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame) const
+Write(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir) const
 {
     PHYSBAM_WARNING("ARTICULATED_RIGID_BODY<VECTOR<T,1> > not implemented");
 }

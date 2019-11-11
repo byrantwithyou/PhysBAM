@@ -4,6 +4,7 @@
 //#####################################################################
 #include <Core/Log/LOG.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE.h>
@@ -44,12 +45,12 @@ Convert(PARSE_ARGS& parse_args)
     Create_Directory(output_dir);
 
     DEFORMABLE_BODY_COLLECTION<TV> deformable_body_collection(0,0);
-    for(int frame=start_at;frame<=end_at;frame++)
+    VIEWER_DIR viewer_dir(input_dir);
+    while(viewer_dir.Find_Next_Directory(0) && viewer_dir.frame_stack(0)<=end_at)
     {
-        LOG::printf("Frame %i\n",frame);
-        int static_frame=File_Exists(LOG::sprintf("%s/%d/deformable_object_structures",input_dir,frame))?frame:-1;
-        deformable_body_collection.Read(input_dir,input_dir,frame,static_frame,true,true);
-        if(frame==start_at)
+        LOG::printf("Frame %P\n",viewer_dir.frame_stack);
+        deformable_body_collection.Read(viewer_dir,false);
+        if(viewer_dir.frame_stack(0)==start_at)
         {
             if(!list.m) list=IDENTITY_ARRAY<>(deformable_body_collection.structures.m);
             for(auto i:list)
@@ -59,7 +60,7 @@ Convert(PARSE_ARGS& parse_args)
         for(auto i:list)
         {
             LOG::printf("Object %i\n",i);
-            std::string file=LOG::sprintf("%s/%d/object_%04d.obj",output_dir,i,frame);
+            std::string file=LOG::sprintf("%s/%d/object_%04d.obj",output_dir,i,viewer_dir.frame_stack(0));
             STRUCTURE<TV>* structure=deformable_body_collection.structures(i);
             assert(structure);
             TRIANGULATED_SURFACE<T> * ts=0, copy;

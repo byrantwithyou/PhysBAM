@@ -11,8 +11,8 @@ void Run_Test(PARSE_ARGS& parse_args,STREAM_TYPE stream_type)
 {
     MPM_EXAMPLE_RB<TV>* example=new STANDARD_TESTS<TV>(stream_type,parse_args);
 
-    Create_Directory(example->output_directory+"/common");
-    LOG::Instance()->Copy_Log_To_File(example->output_directory+"/common/log.txt",example->restart);
+    Create_Directory(example->viewer_dir.output_directory+"/common");
+    LOG::Instance()->Copy_Log_To_File(example->viewer_dir.output_directory+"/common/log.txt",example->restart);
 
     MPM_DRIVER_RB<TV> driver(*example);
     driver.Execute_Main_Program();

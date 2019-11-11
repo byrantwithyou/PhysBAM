@@ -97,6 +97,7 @@ Read_Triangulated_Surface(const std::string& triangulated_surface_filename_input
 {
     PHYSBAM_ASSERT(!triangulated_surface);
     triangulated_surface_filename=triangulated_surface_filename_input;
+    LOG::printf("RTS %P\n",triangulated_surface_filename);
 }
 //#####################################################################
 // Function Generate_Triangulated_Surface
@@ -140,6 +141,7 @@ Initialize_Triangulated_Surface()
                     (*triangulated_surface->vertex_normals)(p)=levelset->Normal(triangulated_surface->particles.X(p));
                 if(write_generated_triangulated_surface && triangulated_surface_filename.length() > 0){
                     const int vertex_normals_length=1; // needed for backwards compatibility, since vertex_normals used to be ARRAYS<TV,1>
+                    LOG::printf("VNL %i %P\n",vertex_normals_length,triangulated_surface_filename);
                     Write_To_File(STREAM_TYPE((T)0),triangulated_surface_filename,*triangulated_surface,vertex_normals_length,*triangulated_surface->vertex_normals);}
                 i_own_triangulated_surface=true;}}
         else if(triangulated_surface_filename.length() > 0){
@@ -147,6 +149,7 @@ Initialize_Triangulated_Surface()
             triangulated_surface->Use_Vertex_Normals();triangulated_surface->vertex_normals=new ARRAY<TV>;
             int vertex_normals_length; // needed for backwards compatibility, since vertex_normals used to be ARRAYS<TV,1>
             Read_From_File(triangulated_surface_filename,*triangulated_surface,vertex_normals_length,*triangulated_surface->vertex_normals);
+            LOG::printf("VNL %i %P\n",vertex_normals_length,triangulated_surface_filename);
             PHYSBAM_ASSERT(vertex_normals_length==1);
             i_own_triangulated_surface=true;}}
 }

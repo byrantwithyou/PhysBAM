@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR.h>
 #include <OpenGL/OpenGL/OPENGL_SHAPES.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D.h>
@@ -11,39 +12,29 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T>::
-OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D(GRID<TV> &grid,const std::string& directory)
-    :OPENGL_COMPONENT<T>("Thin Shells Debugging"),grid(grid),
+OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D(const VIEWER_DIR& viewer_dir,GRID<TV> &grid)
+    :OPENGL_COMPONENT<T>(viewer_dir,"Thin Shells Debugging"),grid(grid),
     invalid_color_map(OPENGL_COLOR::Red()),
     opengl_density_valid_mask(grid,density_valid_mask,&invalid_color_map,"density_valid",0,OPENGL_SCALAR_FIELD_2D<T,bool>::DRAW_POINTS),
     opengl_phi_valid_mask(grid,phi_valid_mask,&invalid_color_map,"phi_valid",0,OPENGL_SCALAR_FIELD_2D<T,bool>::DRAW_POINTS),
-    directory(directory),frame_loaded(-1),valid(false),
+    valid(false),
     draw_grid_visibility(false),draw_density_valid_mask(false),draw_phi_valid_mask(false)
 {
     viewer_callbacks.Set("toggle_draw_grid_visibility",{[this](){Toggle_Draw_Grid_Visibility();},"Toggle draw grid visibility"});
     viewer_callbacks.Set("toggle_draw_density_valid_mask",{[this](){Toggle_Draw_Density_Valid_Mask();},"Toggle draw density valid mask"});
     viewer_callbacks.Set("toggle_draw_phi_valid_mask",{[this](){Toggle_Draw_Phi_Valid_Mask();},"Toggle draw phi valid mask"});
 
-    is_animation=true;
     mac_grid=grid.Get_MAC_Grid();
     u_grid=grid.Get_Face_Grid(0);
     v_grid=grid.Get_Face_Grid(1);
 }
 //#####################################################################
-// Function Valid_Frame
-//#####################################################################
-template<class T> bool OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T>::
-Valid_Frame(int frame_input) const
-{
-    // TODO: make more accurate
-    return false;
-}
-//#####################################################################
 // Function Set_Frame
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T>::
-Set_Frame(int frame_input)
+Set_Frame()
 {
-    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
+    
     Reinitialize();
 }
 //#####################################################################
@@ -100,41 +91,34 @@ Display() const
 // Function Reinitialize
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T>::
-Reinitialize(bool force)
+Reinitialize()
 {
-    if(force || (draw && (!valid || (is_animation && (frame_loaded != frame)) || (!is_animation && (frame_loaded < 0)))))
-    {
-        valid = false;
-
-        if(draw_grid_visibility){
-            std::string tmp_filename = Get_Frame_Filename(directory+"/%d/thin_shells_grid_visibility",frame);
-            if(File_Exists(tmp_filename))
-                Read_From_File(tmp_filename,node_neighbors_visible,face_corners_visible_from_face_center_u,face_corners_visible_from_face_center_v);
-        }
-
-        if(draw_density_valid_mask){
-            std::string tmp_filename = Get_Frame_Filename(directory+"/%d/density_valid_mask",frame);
-            if(File_Exists(tmp_filename)){
-                Read_From_File(tmp_filename,density_valid_mask);
-                for(int i=density_valid_mask.domain.min_corner.x;i<density_valid_mask.domain.max_corner.x;i++) for(int j=density_valid_mask.domain.min_corner.y;j<density_valid_mask.domain.max_corner.y;j++) 
-                    density_valid_mask(i,j)=!density_valid_mask(i,j); // negate
-                opengl_density_valid_mask.Update();}
-            else density_valid_mask.Clean_Memory();
-        }
-
-        if(draw_phi_valid_mask){
-            std::string tmp_filename = Get_Frame_Filename(directory+"/%d/phi_valid_mask",frame);
-            if(File_Exists(tmp_filename)){
-                Read_From_File(tmp_filename,phi_valid_mask);
-                for(int i=phi_valid_mask.domain.min_corner.x;i<phi_valid_mask.domain.max_corner.x;i++) for(int j=phi_valid_mask.domain.min_corner.y;j<phi_valid_mask.domain.max_corner.y;j++) 
-                    phi_valid_mask(i,j)=!phi_valid_mask(i,j); // negate
-                opengl_phi_valid_mask.Update();}
-            else phi_valid_mask.Clean_Memory();
-        }
-
-        frame_loaded=frame;
-        valid=true;
+    if(!draw) return;
+    valid = false;
+    if(draw_grid_visibility){
+        std::string tmp_filename = viewer_dir.current_directory+"/thin_shells_grid_visibility";
+        if(File_Exists(tmp_filename))
+            Read_From_File(tmp_filename,node_neighbors_visible,face_corners_visible_from_face_center_u,face_corners_visible_from_face_center_v);
     }
+    if(draw_density_valid_mask){
+        std::string tmp_filename = viewer_dir.current_directory+"/density_valid_mask";
+        if(File_Exists(tmp_filename)){
+            Read_From_File(tmp_filename,density_valid_mask);
+            for(int i=density_valid_mask.domain.min_corner.x;i<density_valid_mask.domain.max_corner.x;i++) for(int j=density_valid_mask.domain.min_corner.y;j<density_valid_mask.domain.max_corner.y;j++) 
+                                                                                                               density_valid_mask(i,j)=!density_valid_mask(i,j); // negate
+            opengl_density_valid_mask.Update();}
+        else density_valid_mask.Clean_Memory();
+    }
+    if(draw_phi_valid_mask){
+        std::string tmp_filename = viewer_dir.current_directory+"/phi_valid_mask";
+        if(File_Exists(tmp_filename)){
+            Read_From_File(tmp_filename,phi_valid_mask);
+            for(int i=phi_valid_mask.domain.min_corner.x;i<phi_valid_mask.domain.max_corner.x;i++) for(int j=phi_valid_mask.domain.min_corner.y;j<phi_valid_mask.domain.max_corner.y;j++) 
+                                                                                                       phi_valid_mask(i,j)=!phi_valid_mask(i,j); // negate
+            opengl_phi_valid_mask.Update();}
+        else phi_valid_mask.Clean_Memory();
+    }
+    valid=true;
 }
 //#####################################################################
 // Function Toggle_Draw_Grid_Visibility
@@ -143,7 +127,7 @@ template<class T> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T>::
 Toggle_Draw_Grid_Visibility()
 {
     draw_grid_visibility=!draw_grid_visibility;
-    Reinitialize(true);
+    Reinitialize();
 }
 //#####################################################################
 // Function Toggle_Draw_Density_Valid_Mask
@@ -152,7 +136,7 @@ template<class T> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T>::
 Toggle_Draw_Density_Valid_Mask()
 {
     draw_density_valid_mask=!draw_density_valid_mask;
-    Reinitialize(true);
+    Reinitialize();
 }
 //#####################################################################
 // Function Toggle_Draw_Phi_Valid_Mask
@@ -161,7 +145,7 @@ template<class T> void OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T>::
 Toggle_Draw_Phi_Valid_Mask()
 {
     draw_phi_valid_mask=!draw_phi_valid_mask;
-    Reinitialize(true);
+    Reinitialize();
 }
 //#####################################################################
 // Function Bounding_Box

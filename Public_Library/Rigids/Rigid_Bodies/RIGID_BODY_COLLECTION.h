@@ -23,6 +23,7 @@ template<class TV> class RIGID_BODY_EVOLUTION_PARAMETERS;
 template<class TV> struct ALLOCATE_HELPER{virtual RIGID_BODY<TV>* Create(int index=0)=0;virtual ~ALLOCATE_HELPER(){}};
 template<class TV,class ID> class STRUCTURE_LIST;
 template<class TV> class STRUCTURE;
+class VIEWER_DIR;
 
 template<class TV>
 class RIGID_BODY_COLLECTION
@@ -91,8 +92,8 @@ public:
     void Update_Angular_Momentum();
     void Update_Angular_Velocity(const ARRAY<int>& particle_indices);
     void Update_Angular_Momentum(const ARRAY<int>& particle_indices);
-    void Read(const std::string& directory,const int frame,ARRAY<int>* needs_init=0,ARRAY<int>* needs_destroy=0);
-    void Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame) const; // TODO: optionally skip certain kinds of structures in output
+    void Read(const VIEWER_DIR& viewer_dir,ARRAY<int>* needs_init=0,ARRAY<int>* needs_destroy=0);
+    void Write(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir) const; // TODO: optionally skip certain kinds of structures in output
     void Update_Simulated_Particles();
     void Update_Level_Set_Transforms();
 

@@ -23,18 +23,16 @@ class OPENGL_COMPONENT_HEIGHTFIELD_1D:public OPENGL_COMPONENT<T>
     typedef VECTOR<T,1> TV;typedef VECTOR<int,1> TV_INT;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
-    using OPENGL_COMPONENT<T>::World_Space_Box;
-    using OPENGL_COMPONENT<T>::viewer_callbacks;using OPENGL_COMPONENT<T>::is_animation;
-    OPENGL_COMPONENT_HEIGHTFIELD_1D(const GRID<TV> &grid, 
+    using OPENGL_COMPONENT<T>::World_Space_Box;using OPENGL_COMPONENT<T>::viewer_dir;
+    using OPENGL_COMPONENT<T>::viewer_callbacks;
+    OPENGL_COMPONENT_HEIGHTFIELD_1D(const VIEWER_DIR& viewer_dir,const GRID<TV> &grid,
                                     const std::string& height_filename,
                                     const std::string& x_filename_input="",
                                     const std::string& ground_filename_input="",
                                     const std::string& u_filename_input="");
     virtual ~OPENGL_COMPONENT_HEIGHTFIELD_1D();
 
-    bool Valid_Frame(int frame_input) const override;
-
-    void Set_Frame(int frame_input) override;
+    void Set_Frame() override;
     void Set_Draw(bool draw_input = true) override;
 
     void Display() const override;
@@ -57,7 +55,7 @@ public:
     void Toggle_Draw_Points();
 
 private:
-    void Reinitialize(bool force=false);
+    void Reinitialize();
 
 public:
     GRID<TV> grid;
@@ -77,7 +75,6 @@ private:
     std::string u_filename;
     T scale;
     T displacement_scale;
-    int frame_loaded;
     bool valid;
     bool draw_velocities;
     bool draw_points;

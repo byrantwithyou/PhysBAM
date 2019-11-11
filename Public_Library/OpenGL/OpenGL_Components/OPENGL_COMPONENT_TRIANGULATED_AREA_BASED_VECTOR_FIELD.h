@@ -21,19 +21,15 @@ public:
     OPENGL_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T> opengl_vector_field;
 private:
     std::string vector_field_filename;
-    int frame_loaded;
     bool valid;
 
 public:
-    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_OBJECT<T>::viewer_callbacks;
-    OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD(TRIANGULATED_AREA<T>& triangulated_area,const std::string &vector_field_filename_input);
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
+    using OPENGL_OBJECT<T>::viewer_callbacks;using OPENGL_COMPONENT<T>::viewer_dir;
+    OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD(const VIEWER_DIR& viewer_dir,TRIANGULATED_AREA<T>& triangulated_area,const std::string &vector_field_filename_input);
     virtual ~OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD();
 
-    bool Valid_Frame(int frame_input) const override;
-    bool Is_Up_To_Date(int frame) const override { return valid && frame_loaded == frame; }
-
-    void Set_Frame(int frame_input) override;
+    void Set_Frame() override;
     void Set_Draw(bool draw_input = true) override;
 
     void Display() const override;
@@ -45,7 +41,7 @@ public:
     void Toggle_Arrowhead();
 
 private:
-    void Reinitialize(bool force_load_even_if_not_drawn=false);
+    void Reinitialize();
 };
 
 }

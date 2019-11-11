@@ -5,6 +5,7 @@
 #include <Core/Arrays/ARRAY_VIEW.h>
 #include <Core/Arrays/IDENTITY_ARRAY.h>
 #include <Core/Arrays/INDIRECT_ARRAY.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Tools/Parsing/PARAMETER_LIST.h>
 #include <Geometry/Grids_Uniform_Computations/DUALCONTOUR_3D.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
@@ -78,7 +79,9 @@ Get_Rigid_Objects(PARAMETER_LIST& parameters,int frame,std::string& rigid_body_c
     if(!rigid_body_collection_cached.Get(prefix,rigid_body_collection)){
         rigid_body_collection=new RIGID_BODY_COLLECTION<TV>(0);
         // bool load_implicit_surfaces;load_implicit_surfaces=parameters.Get_Parameter("Load_Implicit_Surfaces",false); // TODO: this is currently ignored
-        rigid_body_collection->Read(prefix,frame); // TODO: only load implicit surfaces if load_implicit_surfaces
+        VIEWER_DIR viewer_dir(prefix);
+        viewer_dir.Set(frame);
+        rigid_body_collection->Read(viewer_dir); // TODO: only load implicit surfaces if load_implicit_surfaces
         rigid_body_collection_cached.Set(prefix,rigid_body_collection);
         rigid_body_collection_list.Set(name,rigid_body_collection);}
     rigid_body_collection_name=name;
@@ -182,13 +185,14 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         std::string sample_locations_filename=parameters.Get_Parameter("Sample_Locations_File",std::string("unknown"));
         bool two_sided=parameters.Get_Parameter("Two_Sided",true);
         std::string prefix=parameters.Get_Parameter("Prefix",std::string("<unknown>"));
+        VIEWER_DIR viewer_dir(prefix);
+        viewer_dir.Set(local_frame);
         std::string static_frame_prefix=parameters.Get_Parameter("Static_Frame_Prefix",prefix);
         prefix+="/";static_frame_prefix+="/";
         std::string frame_string=LOG::sprintf("%d/",local_frame);
-        int static_frame=File_Exists(static_frame_prefix+frame_string+"deformable_object_structures")?frame:-1;
         std::string free_particles_geometry=parameters.Get_Parameter("Free_Particles_Geometry",std::string("Null")); // object to use instead of an extra object
         std::string free_particles_range=parameters.Get_Parameter("Free_Particles_Range",std::string("<unknown>"));
-        deformable_body_collection.Read(prefix,static_frame_prefix,local_frame,static_frame,true,true);
+        deformable_body_collection.Read(viewer_dir,true);
         if(range!="<unknown>") Parse_Integer_List(range,integer_list);
         else integer_list=IDENTITY_ARRAY<>(deformable_body_collection.structures.m);
         if(split_object){

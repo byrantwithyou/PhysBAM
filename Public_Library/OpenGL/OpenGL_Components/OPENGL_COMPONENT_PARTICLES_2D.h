@@ -22,14 +22,12 @@ class OPENGL_COMPONENT_PARTICLES_2D:public OPENGL_COMPONENT<T>
     typedef VECTOR<T,2> TV;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::World_Space_Box;
-    using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
+    using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::viewer_dir;
     using OPENGL_OBJECT<T>::viewer_callbacks;
-    OPENGL_COMPONENT_PARTICLES_2D(const std::string &filename, const std::string &filename_set_input="", bool use_ids_input = true, bool particles_stored_per_cell_uniform_input = false);
+    OPENGL_COMPONENT_PARTICLES_2D(const VIEWER_DIR& viewer_dir, const std::string &filename_input="", const std::string &filename_set_input="", bool use_ids_input = true, bool particles_stored_per_cell_uniform_input = false);
     virtual ~OPENGL_COMPONENT_PARTICLES_2D();
 
-    bool Valid_Frame(int frame_input) const override;
-
-    void Set_Frame(int frame_input) override;
+    void Set_Frame() override;
     void Set_Draw(bool draw_input = true) override;
 
     void Display() const override;
@@ -52,7 +50,7 @@ public:
     void Toggle_Draw_Multiple_Particle_Sets();
 
 protected:
-    virtual void Reinitialize(bool force=false);
+    virtual void Reinitialize();
     ARRAY_VIEW<int>* Get_Particles_Id_Array(int set_number=0) const;
 
     void Command_Prompt_Response();
@@ -66,7 +64,6 @@ public:
 
     std::string filename;
     std::string filename_set;
-    int frame_loaded;
     int set;
     int set_loaded;
     int number_of_sets;

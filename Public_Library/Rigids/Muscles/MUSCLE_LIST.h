@@ -15,6 +15,7 @@ namespace PhysBAM{
 
 template<class TV> struct ATTACHMENT_POINT;
 template<class TV> class RIGID_BODY_COLLECTION;
+class VIEWER_DIR;
 
 template<class TV>
 class MUSCLE_LIST
@@ -45,8 +46,8 @@ public:
 
 //#####################################################################
     void Initialize_Muscle_Attachments_On_Rigid_Body();
-    void Read(const std::string& directory,const int frame);
-    void Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame) const;
+    void Read(const VIEWER_DIR& viewer_dir);
+    void Write(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir) const;
 //##################################################################### 
 };
 }

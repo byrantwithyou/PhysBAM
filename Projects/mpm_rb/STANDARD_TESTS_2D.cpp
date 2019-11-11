@@ -53,9 +53,9 @@
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_ITERATOR.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
-#include <fstream>
 #include "POUR_SOURCE.h"
 #include "STANDARD_TESTS_2D.h"
+#include <fstream>
 namespace PhysBAM{
 //#####################################################################
 // Constructor
@@ -73,7 +73,7 @@ STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-fooT4",&foo_T4,&use_foo_T4,"T4","a scalar");
     parse_args.Add("-fooT5",&foo_T5,&use_foo_T5,"T5","a scalar");
     parse_args.Parse();
-    if(!this->override_output_directory) output_directory=LOG::sprintf("Test_%i",test_number);
+    if(!this->override_output_directory) viewer_dir.output_directory=LOG::sprintf("Test_%i",test_number);
 }
 //#####################################################################
 // Destructor
@@ -86,19 +86,19 @@ template<class T> STANDARD_TESTS<VECTOR<T,2> >::
 // Function Write_Output_Files
 //#####################################################################
 template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
-Write_Output_Files(const int frame)
+Write_Output_Files()
 {
-    if(write_output_files) write_output_files(frame);
-    BASE::Write_Output_Files(frame);
+    if(write_output_files) write_output_files();
+    BASE::Write_Output_Files();
 }
 //#####################################################################
 // Function Read_Output_Files
 //#####################################################################
 template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
-Read_Output_Files(const int frame)
+Read_Output_Files()
 {
-    if(read_output_files) read_output_files(frame);
-    BASE::Read_Output_Files(frame);
+    if(read_output_files) read_output_files();
+    BASE::Read_Output_Files();
 }
 //#####################################################################
 // Function Initialize
@@ -238,9 +238,9 @@ Initialize()
             Add_Collision_Object(Make_IO(LINE_2D<T>(n,c)));
 
             // Dump solution to viewer
-            write_output_files=[=](int frame)
+            write_output_files=[=]()
             {
-                T time=frame*frame_dt;
+                T time=viewer_dir.frame_stack(0)*frame_dt;
                 T mu=rd_penalty_friction;
                 T acc=g.y*(cos(angle)*mu-sin(angle));
                 if(vel+time*acc>0) // sliding
@@ -284,9 +284,9 @@ Initialize()
             rigid_body.is_static=true;
 
             // Dump solution to viewer
-            write_output_files=[=](int frame)
+            write_output_files=[=]()
             {
-                T time=frame*frame_dt;
+                T time=viewer_dir.frame_stack(0)*frame_dt;
                 T mu=rd_penalty_friction;
                 T acc=g.y*(cos(angle)*mu-sin(angle));
                 if(vel+time*acc>0) // sliding
@@ -390,9 +390,9 @@ Initialize()
             rigid_body.is_static=true;
 
             // Dump solution to viewer
-            write_output_files=[=](int frame)
+            write_output_files=[=]()
             {
-                T time=frame*frame_dt;
+                T time=viewer_dir.frame_stack(0)*frame_dt;
                 T mu=rd_penalty_friction;
                 T acc=g.y*(cos(angle)*mu-sin(angle));
                 if(vel+time*acc>0) // sliding
@@ -512,8 +512,8 @@ Initialize()
                 *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(seed_range),TV(0,-1),spout,
                 TV(0,-pour_speed),gravity,max_dt*pour_speed+grid.dX.y,seed_buffer,mass,volume);
             destroy=[=](){delete source;};
-            write_output_files=[=](int frame){source->Write_Output_Files(frame);};
-            read_output_files=[=](int frame){source->Read_Output_Files(frame);};
+            write_output_files=[=](){source->Write_Output_Files();};
+            read_output_files=[=](){source->Read_Output_Files();};
             begin_time_step=[=](T time)
             {
                 ARRAY<int> affected_particles;

@@ -29,7 +29,7 @@ public:
     using BASE::mass;using BASE::force_helper;using BASE::use_oldroyd;
     using BASE::frame_title;using BASE::write_substeps_level;using BASE::gather_scatter;
     using BASE::collision_objects;using BASE::substeps_delay_frame;
-    using BASE::output_directory;using BASE::mass_contour;using BASE::plasticity_models;
+    using BASE::viewer_dir;using BASE::mass_contour;using BASE::plasticity_models;
     using BASE::restart;using BASE::dt;using BASE::time;using BASE::lag_Dp;
     using BASE::frame_dt;using BASE::min_dt;using BASE::max_dt;
     using BASE::compute_sound_speed;using BASE::reflection_bc;

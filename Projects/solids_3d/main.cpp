@@ -7,7 +7,6 @@
 #include <Solids/Examples_And_Drivers/SOLIDS_DRIVER.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
-#include <climits>
 #include "Armadillo_Test/ARMADILLO_TEST.h"
 #include "Binding_Plasticity/BINDING_PLASTICITY_EXAMPLE.h"
 #include "Binding_Springs_Test/BINDING_SPRINGS_TEST.h"
@@ -25,6 +24,7 @@
 #include "Rigid_Particle_Spheres/RIGID_PARTICLE_SPHERES_EXAMPLE.h"
 #include "Simple_Hard_Binding/SIMPLE_HARD_BINDING_EXAMPLE.h"
 #include "Standard_Tests/STANDARD_TESTS.h"
+#include <climits>
 
 using namespace PhysBAM;
 

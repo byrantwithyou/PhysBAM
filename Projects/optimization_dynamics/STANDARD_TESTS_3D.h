@@ -26,8 +26,8 @@ public:
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();
 
-    void Write_Output_Files(const int frame) override;
-    void Read_Output_Files(const int frame) override;
+    void Write_Output_Files() override;
+    void Read_Output_Files() override;
     void Initialize() override;
     void Begin_Frame(const int frame) override;
     void End_Frame(const int frame) override;

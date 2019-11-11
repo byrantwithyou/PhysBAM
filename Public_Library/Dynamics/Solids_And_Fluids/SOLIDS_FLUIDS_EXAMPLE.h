@@ -21,6 +21,7 @@ template<class TV> class SOLIDS_PARAMETERS;
 template<class TV> class SOLIDS_EVOLUTION;
 template<class TV> class SOLID_BODY_COLLECTION;
 template<class TV> class SOLIDS_FLUIDS_PARAMETERS;
+template<class TV> class DEBUG_PARTICLES;
 
 template<class TV>
 class SOLIDS_FLUIDS_EXAMPLE:public EXAMPLE<TV>,public EXTERNAL_STRAIN_ADJUSTMENT<typename TV::SCALAR>,public EXAMPLE_FORCES_AND_VELOCITIES<TV>,
@@ -31,9 +32,9 @@ class SOLIDS_FLUIDS_EXAMPLE:public EXAMPLE<TV>,public EXTERNAL_STRAIN_ADJUSTMENT
     typedef EXAMPLE<TV> BASE;
 public:
     using EXAMPLE_FORCES_AND_VELOCITIES<TV>::Set_External_Positions; // silence -Woverloaded-virtual
-    using BASE::output_directory;using BASE::frame_title;using BASE::stream_type;using BASE::last_frame;using BASE::frame_rate;
-    using BASE::write_last_frame;using BASE::write_time;using BASE::write_substeps_level;using BASE::Set_Write_Substeps_Level;//using BASE::data_directory;
-    using BASE::restart;
+    using BASE::frame_title;using BASE::stream_type;using BASE::last_frame;using BASE::frame_rate;
+    using BASE::write_substeps_level;using BASE::Set_Write_Substeps_Level;//using BASE::data_directory;
+    using BASE::restart;using BASE::viewer_dir;
 
 protected:
     T minimum_collision_thickness; // needed for ray tracing, etc.
@@ -44,6 +45,7 @@ public:
     SOLID_BODY_COLLECTION<TV>& solid_body_collection;
     SOLIDS_EVOLUTION<TV>* solids_evolution; // defaults to newmark
     bool opt_solidssymmqmr,opt_solidscr,opt_solidscg;
+    DEBUG_PARTICLES<TV>& debug_particles;
 
     SOLIDS_FLUIDS_EXAMPLE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args);
     SOLIDS_FLUIDS_EXAMPLE(const SOLIDS_FLUIDS_EXAMPLE&) = delete;
@@ -59,11 +61,11 @@ public:
     virtual void Postprocess_Frame(const int frame);
     virtual void Preprocess_Substep(const T dt,const T time);
     virtual void Postprocess_Substep(const T dt,const T time);
-    virtual void Read_Output_Files_Fluids(const int frame);
+    virtual void Read_Output_Files_Fluids();
     void Log_Parameters() const override;
     // solids
     virtual void Initialize_Bodies();
-    virtual void Read_Output_Files_Solids(const int frame);
+    virtual void Read_Output_Files_Solids();
     // fluids
     virtual void Extrapolate_Phi_Into_Objects(const T time);
     virtual void Postprocess_Phi(const T time);
@@ -80,6 +82,7 @@ public:
     virtual void Melting_Substep(const T dt,const T time);
     virtual void Modify_Fluid_For_Melting(const T dt,const T time);
     virtual void Update_Melting_Substep_Parameters(const T dt,const T time);
+    virtual void Write_Output_Files() const;
     template<class T_MPI> void Adjust_Output_Directory_For_MPI(const T_MPI mpi);
 //#####################################################################
 };

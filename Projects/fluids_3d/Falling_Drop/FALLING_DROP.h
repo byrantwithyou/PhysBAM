@@ -15,7 +15,7 @@ class FALLING_DROP:public SOLIDS_FLUIDS_EXAMPLE_3D
 {
 public:
     using SOLIDS_FLUIDS_EXAMPLE_3D::last_frame;using SOLIDS_FLUIDS_EXAMPLE_3D::frame_rate;
-    using SOLIDS_FLUIDS_EXAMPLE_3D::restart;using SOLIDS_FLUIDS_EXAMPLE_3D::restart_frame;using SOLIDS_FLUIDS_EXAMPLE_3D::output_directory;
+    using SOLIDS_FLUIDS_EXAMPLE_3D::restart;using SOLIDS_FLUIDS_EXAMPLE_3D::restart_frame;using SOLIDS_FLUIDS_EXAMPLE_3D::viewer_dir;
     using SOLIDS_FLUIDS_EXAMPLE_3D::fluids_parameters;
 
     FALLING_DROP()
@@ -33,7 +33,7 @@ public:
         fluids_parameters.write_removed_positive_particles=false;fluids_parameters.write_removed_negative_particles=false;
         fluids_parameters.write_debug_data=true;
         if(!this->user_output_directory)
-            output_directory="Falling_Drop/output";
+            viewer_dir.output_directory="Falling_Drop/output";
         fluids_parameters.delete_fluid_inside_objects=true;
         fluids_parameters.enforce_divergence_free_extrapolation=false;
     }

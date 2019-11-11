@@ -69,7 +69,7 @@ class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >
     typedef ARRAY<bool,FACE_INDEX<2> > ARRAY<bool,FACE_INDEX<TV::m> >;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::solids_fluids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;
+    using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::solids_fluids_parameters;using BASE::viewer_dir;using BASE::last_frame;using BASE::frame_rate;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
     using BASE::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization;using BASE::Add_Volumetric_Body_To_Fluid_Simulation;using BASE::solid_body_collection;using BASE::solids_evolution;
     using BASE::test_number;using BASE::resolution;using BASE::data_directory;
@@ -89,7 +89,6 @@ public:
     T current_dt;
     bool implicit_solid;
 
-    GEOMETRY_PARTICLES<TV> debug_particles;
     SEGMENTED_CURVE_2D<T>* front_tracked_structure;
     SEGMENTED_CURVE_2D<T>* rebuild_curve;
     ARRAY<TV> saved_tracked_particles_X;
@@ -143,12 +142,11 @@ public:
     void Copy_Front_Tracked_Velocity_From_Fluid();
     void Limit_Dt(T& dt,const T time) override;
     void Limit_Solids_Dt(T& dt,const T time) override;
-    void Write_Output_Files(const int frame) const;
+    void Write_Output_Files() const;
     void Initialize_Surface_Particles(int number);
     void Rebuild_Surface();
     void Substitute_Coupling_Matrices(KRYLOV_SYSTEM_BASE<T>& coupled_system,T dt,T current_velocity_time,T current_position_time,bool velocity_update,bool leakproof_solve) override;
     void Update_Time_Varying_Material_Properties(const T time) override;
-    static GEOMETRY_PARTICLES<TV>*  Store_Debug_Particles(GEOMETRY_PARTICLES<TV>* particle=0);
     void FSI_Analytic_Test();
 //#####################################################################
 };

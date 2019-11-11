@@ -64,7 +64,7 @@ class INCOMPRESSIBLE_TESTS:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
-    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
+    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::viewer_dir;
     using BASE::Time_At_Frame;using BASE::stream_type;using BASE::solid_body_collection;using BASE::test_number;using BASE::mpi_world;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
     using BASE::user_last_frame;
@@ -129,19 +129,19 @@ public:
         LOG::Stat("stiffen",stiffen);
         if(abs(solids_cg_tolerance-(T)1e-3)>(T)1e-7 && (test_number==7 || test_number==8 || test_number==10)) solids_cg_tolerance=(T)1e-2;
         if(!this->user_output_directory){
-            output_directory=LOG::sprintf("Incompressible/Test_%d",test_number);
-            if(frame_rate!=24) output_directory+=LOG::sprintf("_fr%g",frame_rate);
-            if(minimum_volume_recovery_time_scale) output_directory+=LOG::sprintf("_mvrts%g",minimum_volume_recovery_time_scale);
+            viewer_dir.output_directory=LOG::sprintf("Incompressible/Test_%d",test_number);
+            if(frame_rate!=24) viewer_dir.output_directory+=LOG::sprintf("_fr%g",frame_rate);
+            if(minimum_volume_recovery_time_scale) viewer_dir.output_directory+=LOG::sprintf("_mvrts%g",minimum_volume_recovery_time_scale);
     
-            if(test_poissons_ratio!=(T).5) output_directory+=LOG::sprintf("_p%g",test_poissons_ratio);
-            if(hittime!=1) output_directory+=LOG::sprintf("_ht%g",hittime);
-            if(high_resolution) output_directory+="_hires";
-            if(stiffen!=1) output_directory+=LOG::sprintf("_stiff%g",stiffen);
-            if(max_cg_iterations!=20) output_directory+=LOG::sprintf("_cgi%d",max_cg_iterations);
-            if(abs(solids_cg_tolerance-(T)1e-3)>(T)1e-7) output_directory+=LOG::sprintf("_cgs%g",solids_cg_tolerance);
-            if(merge_at_boundary) output_directory+="_bound";
-            if(!use_neumann) output_directory+="_noneumann";
-            if(ground_friction) output_directory+=LOG::sprintf("_fric%g",ground_friction);}
+            if(test_poissons_ratio!=(T).5) viewer_dir.output_directory+=LOG::sprintf("_p%g",test_poissons_ratio);
+            if(hittime!=1) viewer_dir.output_directory+=LOG::sprintf("_ht%g",hittime);
+            if(high_resolution) viewer_dir.output_directory+="_hires";
+            if(stiffen!=1) viewer_dir.output_directory+=LOG::sprintf("_stiff%g",stiffen);
+            if(max_cg_iterations!=20) viewer_dir.output_directory+=LOG::sprintf("_cgi%d",max_cg_iterations);
+            if(abs(solids_cg_tolerance-(T)1e-3)>(T)1e-7) viewer_dir.output_directory+=LOG::sprintf("_cgs%g",solids_cg_tolerance);
+            if(merge_at_boundary) viewer_dir.output_directory+="_bound";
+            if(!use_neumann) viewer_dir.output_directory+="_noneumann";
+            if(ground_friction) viewer_dir.output_directory+=LOG::sprintf("_fric%g",ground_friction);}
     
         if(hittime!=1) tori_n=(int)hittime;
 
@@ -182,7 +182,6 @@ void Initialize_Bodies() override
     solids_parameters.triangle_collision_parameters.collisions_repulsion_clamp_fraction=(T).03;
     solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
     solids_parameters.triangle_collision_parameters.allow_intersections=false;
-    solids_parameters.triangle_collision_parameters.output_interaction_pairs=true;
     self_collide_with_interior_nodes=false;
 
     solids_parameters.cfl=(T)2.0;
@@ -653,7 +652,7 @@ void Initialize_Bodies() override
         else if(use_tet_collisions){
             solids_parameters.triangle_collision_parameters.perform_self_collision=false;
             for(int s=0;s<deformable_body_collection.structures.m;s++) if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.structures(s)))
-                tests.Initialize_Tetrahedron_Collisions(s,output_directory,*volume,solids_parameters.triangle_collision_parameters);}
+                tests.Initialize_Tetrahedron_Collisions(s,viewer_dir,*volume,solids_parameters.triangle_collision_parameters);}
         else if(self_collide_with_interior_nodes){
             FREE_PARTICLES<TV>& interior=*FREE_PARTICLES<TV>::Create(particles);
             for(int s=0;s<deformable_body_collection.structures.m;s++) if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.structures(s))){
@@ -714,7 +713,7 @@ void Add_Incompressible_Force(T_OBJECT* object)
 //#####################################################################
 // Function Read_Output_Files_Solids
 //#####################################################################
-void Read_Output_Files_Solids(const int frame) override
+void Read_Output_Files_Solids() override
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
@@ -723,7 +722,7 @@ void Read_Output_Files_Solids(const int frame) override
         LOG::SCOPE scope("restart hack","restart hack");
         ARRAY<TV> X_save(particles.X);
         ARRAY<T> mass_save(particles.mass);
-        Read_From_File(output_directory+"/deformable_body_collection_particles."+Number_To_String(frame),particles);
+        Read_From_File(viewer_dir.current_directory+"/deformable_body_collection_particles",particles);
         TETRAHEDRALIZED_VOLUME<T>& volume=deformable_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
         int particles_per_torus=volume.mesh.number_nodes/tori_initial_states.m;
         if(volume.mesh.number_nodes%particles_per_torus!=0 || particles.Size()%particles_per_torus!=0) PHYSBAM_FATAL_ERROR();
@@ -731,7 +730,7 @@ void Read_Output_Files_Solids(const int frame) override
         int number_of_old_tori=number_of_tori_read;
         if(number_of_tori_read>tori_initial_states.m) PHYSBAM_FATAL_ERROR();
         particles.Add_Elements(particles_per_torus*(tori_initial_states.m-number_of_tori_read));
-        T time=Time_At_Frame(frame);
+        T time=Time_At_Frame(viewer_dir.frame_stack(0));
         TV fall_X(0,-(T).5*(T)9.8*sqr(time),0);
         TV fall_V(0,-(T)9.8*time,0);
         LOG::cout<<"fall_X = "<<fall_X<<std::endl;
@@ -749,9 +748,9 @@ void Read_Output_Files_Solids(const int frame) override
                 solids_parameters.triangle_collision_parameters.collisions_small_number))
             throw std::runtime_error("Tried to start with intersections Found");}
     else{
-        BASE::Read_Output_Files_Solids(frame);
+        BASE::Read_Output_Files_Solids();
         solid_body_collection.Update_Simulated_Particles();}
-    BASE::Write_Output_Files(frame);
+    BASE::Write_Output_Files();
 }
 //#####################################################################
 // Function Postprocess_Solids_Substep

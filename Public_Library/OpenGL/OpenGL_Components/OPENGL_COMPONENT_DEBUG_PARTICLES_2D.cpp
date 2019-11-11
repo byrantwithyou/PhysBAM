@@ -5,6 +5,7 @@
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Log/LOG.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_2D.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
@@ -21,13 +22,13 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
-OPENGL_COMPONENT_DEBUG_PARTICLES_2D(const std::string &filename_input)
-    :OPENGL_COMPONENT<T>("Particles 2D"),particles(*new GEOMETRY_PARTICLES<TV>),
+OPENGL_COMPONENT_DEBUG_PARTICLES_2D(const VIEWER_DIR& viewer_dir,const std::string& filename)
+    :OPENGL_COMPONENT<T>(viewer_dir,"Particles 2D"),particles(*new GEOMETRY_PARTICLES<TV>),
     debug_objects(*new ARRAY<DEBUG_OBJECT<TV> >),
     debug_text(*new ARRAY<DEBUG_TEXT<TV> >),default_color(OPENGL_COLOR::White()),
     velocity_color(OPENGL_COLOR(1,(T).078,(T).576)),
     draw_velocities(false),draw_arrows(true),scale_velocities((T).025),
-    wireframe_only(false),filename(filename_input),frame_loaded(-1),valid(false),
+    wireframe_only(false),filename(filename),valid(false),
     selected_index(-1)
 {
     viewer_callbacks.Set("show_colored_wireframe",{[this](){Show_Colored_Wireframe();},"Show colored wireframe"});
@@ -37,7 +38,6 @@ OPENGL_COMPONENT_DEBUG_PARTICLES_2D(const std::string &filename_input)
     viewer_callbacks.Set("toggle_arrowhead",{[this](){Toggle_Arrowhead();},"Toggle arrow heads"});
     viewer_callbacks.Set("command_prompt",{[this](){Command_Prompt();},"Command prompt"});
 
-    is_animation=Is_Animated(filename);
     // Don't need to call Reinitialize here because it will be called in first call to Set_Frame
 }
 //#####################################################################
@@ -50,20 +50,12 @@ template<class T> OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
     delete &debug_objects;
 }
 //#####################################################################
-// Function Valid_Frame
-//#####################################################################
-template<class T> bool OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
-Valid_Frame(int frame_input) const
-{
-    return Frame_File_Exists(filename,frame_input);
-}
-//#####################################################################
 // Function Set_Frame
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
-Set_Frame(int frame_input)
+Set_Frame()
 {
-    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
+    
     Reinitialize();
 }
 //#####################################################################
@@ -261,20 +253,18 @@ Selection_Bounding_Box() const
 // Function Reinitialize
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T>::
-Reinitialize(bool force)
+Reinitialize()
 {
-    if(!draw || !(force || !valid || (is_animation && frame_loaded != frame) || (!is_animation && frame_loaded<0))) return;
+    if(!draw) return;
     valid=true;
 
-    std::string frame_filename;
-    frame_filename=Get_Frame_Filename(filename,frame);
+    std::string frame_filename=viewer_dir.current_directory+"/"+filename;
         
     try{
         FILE_ISTREAM input;
         Safe_Open_Input(input,frame_filename);
         Read_Binary(input,particles,debug_objects,debug_text);}
     catch(FILESYSTEM_ERROR&){valid=false;}
-    frame_loaded=frame;
 }
 //#####################################################################
 // Function Show_Colored_Wireframe

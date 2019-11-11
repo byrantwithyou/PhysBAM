@@ -42,11 +42,10 @@ template<class TV> MPM_MICROPOLAR_EXAMPLE<TV>::
 // Function Write_Output_Files
 //#####################################################################
 template<class TV> void MPM_MICROPOLAR_EXAMPLE<TV>::
-Write_Output_Files(const int frame)
+Write_Output_Files()
 {
-    std::string f=LOG::sprintf("%d",frame);
     if(this->use_test_output){
-        std::string file=LOG::sprintf("%s/%s-%03d.txt",output_directory.c_str(),test_output_prefix.c_str(),frame);
+        std::string file=LOG::sprintf("%s/%s-%03d.txt",viewer_dir.output_directory.c_str(),test_output_prefix.c_str(),viewer_dir.frame_stack(0));
         OCTAVE_OUTPUT<T> oo(file.c_str());
         oo.Write("X",particles.X.Flattened());
         oo.Write("V",particles.V.Flattened());
@@ -56,19 +55,19 @@ Write_Output_Files(const int frame)
 #pragma omp single
     {
 #pragma omp task
-        Write_To_File(stream_type,output_directory+"/common/grid",grid);
+        Write_To_File(stream_type,viewer_dir.output_directory+"/common/grid",grid);
 #pragma omp task
-        Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
+        Write_To_File(stream_type,viewer_dir.current_directory+"/restart_data",time);
 
         if(!only_write_particles){
 #pragma omp task
-            Write_To_File(stream_type,LOG::sprintf("%s/%d/centered_velocities",output_directory.c_str(),frame),velocity);
+            Write_To_File(stream_type,viewer_dir.current_directory+"/centered_velocities",velocity);
 #pragma omp task
-            Write_To_File(stream_type,LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
+            Write_To_File(stream_type,viewer_dir.current_directory+"/mpm_particles",particles);
 #pragma omp task
             {
                 GRID<TV> ghost_grid(grid.numbers_of_cells+2*ghost,grid.Ghost_Domain(ghost),true);
-                debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
+                debug_particles.Write_Debug_Particles(stream_type,viewer_dir);
             }
         }
     }
@@ -77,11 +76,10 @@ Write_Output_Files(const int frame)
 // Function Read_Output_Files
 //#####################################################################
 template<class TV> void MPM_MICROPOLAR_EXAMPLE<TV>::
-Read_Output_Files(const int frame)
+Read_Output_Files()
 {
-    std::string f=LOG::sprintf("%d",frame);
-    Read_From_File(LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles);
-    Read_From_File(LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
+    Read_From_File(viewer_dir.current_directory+"/mpm_particles",particles);
+    Read_From_File(viewer_dir.current_directory+"/restart_data",time);
 }
 //#####################################################################
 // Function Capture_Stress

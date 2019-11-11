@@ -9,9 +9,9 @@
 #define __WIND_TUNNEL__
 
 #include <Core/Log/SCOPE.h>
+#include "math.h"
 #include <fstream>
 #include <iostream>
-#include "math.h"
 
 #include <Core/Log/DEBUG_SUBSTEPS.h>
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
@@ -44,7 +44,7 @@ public:
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     typedef BOUNDARY<TV,TV_DIMENSION> BASE_BOUNDARY;
-    using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::stream_type;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::viewer_dir;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::stream_type;
     using BASE::data_directory;using BASE::solid_body_collection;using BASE_BOUNDARY::Boundary;using BASE::test_number;using BASE::resolution;
     using BASE::user_last_frame;
     
@@ -129,11 +129,11 @@ public:
         wall_thickness=(T).1;
         if(!this->user_output_directory){
             if(timesplit)
-                output_directory=LOG::sprintf("Wind_Tunnel/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+                viewer_dir.output_directory=LOG::sprintf("Wind_Tunnel/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
             else
-                output_directory=LOG::sprintf("Wind_Tunnel/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-            if(eno_scheme==2) output_directory+="_density_weighted";
-            else if(eno_scheme==3) output_directory+="_velocity_weighted";}
+                viewer_dir.output_directory=LOG::sprintf("Wind_Tunnel/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+            if(eno_scheme==2) viewer_dir.output_directory+="_density_weighted";
+            else if(eno_scheme==3) viewer_dir.output_directory+="_velocity_weighted";}
     }
     
     virtual ~WIND_TUNNEL() {}

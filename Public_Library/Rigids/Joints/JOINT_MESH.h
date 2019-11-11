@@ -14,6 +14,7 @@
 namespace PhysBAM{
 
 template<class TV> class JOINT;
+class VIEWER_DIR;
 
 template<class TV>
 class JOINT_MESH
@@ -94,8 +95,8 @@ public:
 
 //#####################################################################
     JOINT_ID Add_Joint(JOINT<TV>* new_joint_input);
-    void Read(TYPED_ISTREAM input,const std::string& output_directory,const int frame);
-    void Write(TYPED_OSTREAM output,const std::string& output_directory,const int frame) const;
+    void Read(TYPED_ISTREAM input,const VIEWER_DIR& viewer_dir);
+    void Write(TYPED_OSTREAM output,const VIEWER_DIR& viewer_dir) const;
 //#####################################################################
 };
 }

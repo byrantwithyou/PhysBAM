@@ -9,9 +9,9 @@
 #define __STANDARD_TESTS__
 
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
+#include "math.h"
 #include <fstream>
 #include <iostream>
-#include "math.h"
 
 #include <Core/Arrays/INDIRECT_ARRAY.h>
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
@@ -45,7 +45,7 @@ public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
 
-    using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::viewer_dir;using BASE::fluids_parameters;using BASE::solids_parameters;
     using BASE::solids_fluids_parameters;using BASE::Add_To_Fluid_Simulation;
     using BASE::stream_type;using BASE::data_directory;
     using BASE::solid_body_collection;using BASE::test_number;using BASE::resolution;
@@ -157,13 +157,13 @@ if(!this->user_frame_rate) frame_rate=(T)1000.;}
 
 
         if(!this->user_output_directory){
-            if(timesplit) output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-            else output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-            if(eno_scheme==2) output_directory+="_density_weighted";
-            else if(eno_scheme==3) output_directory+="_velocity_weighted";
-            if(spring_factor!=(T)1) output_directory=LOG::sprintf("%s_spring_factor_%lf",output_directory.c_str(),spring_factor);}
+            if(timesplit) viewer_dir.output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+            else viewer_dir.output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+            if(eno_scheme==2) viewer_dir.output_directory+="_density_weighted";
+            else if(eno_scheme==3) viewer_dir.output_directory+="_velocity_weighted";
+            if(spring_factor!=(T)1) viewer_dir.output_directory=LOG::sprintf("%s_spring_factor_%lf",viewer_dir.output_directory.c_str(),spring_factor);}
 
-        std::string gnuplot_file=output_directory+"/common/gnuplot_data.dat";
+        std::string gnuplot_file=viewer_dir.output_directory+"/common/gnuplot_data.dat";
         gnuplot_file_stream.open(gnuplot_file.c_str());
         LOG::cout<<"writing to file "<<gnuplot_file<<std::endl;
     }
@@ -315,7 +315,7 @@ void Initialize_Bodies() override
 
     // Output, in gnuplot-parsable form, the surface of the mesh
     if(test_number==3){
-        std::string gnuplot_file=LOG::sprintf("%s/common/gnuplot_data_0.dat",output_directory.c_str());
+        std::string gnuplot_file=LOG::sprintf("%s/common/gnuplot_data_0.dat",viewer_dir.output_directory.c_str());
         std::ofstream gnuplot_surface_stream;
         gnuplot_surface_stream.open(gnuplot_file.c_str());
         boundary->mesh.Initialize_Ordered_Loop_Nodes();assert(boundary->mesh.ordered_loop_nodes->m==1);
@@ -369,23 +369,22 @@ void Postprocess_Substep(const T dt,const T time) override
     gnuplot_file_stream.flush();
 }
 //#####################################################################
-// Function Postprocess_Frame
+// Function Write_Output_Files
 //#####################################################################
-void Postprocess_Frame(const int frame) override
+void Write_Output_Files() const override
 {
-    if(test_number!=3) return;
-    std::string gnuplot_file=LOG::sprintf("%s/common/gnuplot_data_%d.dat",output_directory.c_str(),frame);
-    std::ofstream gnuplot_surface_stream;
-    gnuplot_surface_stream.open(gnuplot_file.c_str());
-
-    boundary->mesh.Initialize_Ordered_Loop_Nodes();assert(boundary->mesh.ordered_loop_nodes->m==1);
-    ARRAY<int>& segmented_curve=(*boundary->mesh.ordered_loop_nodes)(0);
-    for(int i=0;i<segmented_curve.m;i++){
-        LOG::cout<<boundary->particles.X(segmented_curve(i))(0)<<"\t"<<boundary->particles.X(segmented_curve(i))(1)<<std::endl;
-        gnuplot_surface_stream<<boundary->particles.X(segmented_curve(i))(0)<<"\t"<<boundary->particles.X(segmented_curve(i))(1)<<std::endl;}
-
-    gnuplot_surface_stream.flush();
-    gnuplot_surface_stream.close();
+    BASE::Write_Output_Files();
+    if(test_number==3)
+    {
+        std::string gnuplot_file=viewer_dir.current_directory+"gnuplot_data.dat";
+        std::ofstream gnuplot_surface_stream(gnuplot_file.c_str());
+        
+        boundary->mesh.Initialize_Ordered_Loop_Nodes();assert(boundary->mesh.ordered_loop_nodes->m==1);
+        ARRAY<int>& segmented_curve=(*boundary->mesh.ordered_loop_nodes)(0);
+        for(int i=0;i<segmented_curve.m;i++){
+            LOG::cout<<boundary->particles.X(segmented_curve(i))(0)<<"\t"<<boundary->particles.X(segmented_curve(i))(1)<<std::endl;
+            gnuplot_surface_stream<<boundary->particles.X(segmented_curve(i))(0)<<"\t"<<boundary->particles.X(segmented_curve(i))(1)<<std::endl;}
+    }
 }
 //#####################################################################
 };

@@ -15,8 +15,8 @@
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
-#include <map>
 #include "FLUID_LAYOUT.h"
+#include <map>
 
 namespace PhysBAM{
 //#####################################################################
@@ -83,7 +83,7 @@ Compute(const PARSE_DATA<TV>& pd)
     }
     num_vertex_blocks=blocks.m;
     if(!quiet) Dump_Blocks();
-    if(!quiet) Flush_Frame<TV>("vertex cells");
+    if(!quiet) Flush_Frame("vertex cells");
     for(auto& i:pd.pipes)
     {
         int dir=pd.Pipe_Dir(i);
@@ -92,14 +92,14 @@ Compute(const PARSE_DATA<TV>& pd)
         Allocate_Cross_Section_Blocks_Faces(box,dir);
     }
     if(!quiet) Dump_Blocks();
-    if(!quiet) Flush_Frame<TV>("pipes");
+    if(!quiet) Flush_Frame("pipes");
 
     for(auto& i:pd.pts)
     {
         Allocate_Cross_Section_Blocks_Faces(i.box,0);
     }
     if(!quiet) Dump_Blocks();
-    if(!quiet) Flush_Frame<TV>("vertex faces");
+    if(!quiet) Flush_Frame("vertex faces");
 
     for(FACE_RANGE_ITERATOR<TV::m> it(used_faces.domain_indices);it.Valid();it.Next())
     {

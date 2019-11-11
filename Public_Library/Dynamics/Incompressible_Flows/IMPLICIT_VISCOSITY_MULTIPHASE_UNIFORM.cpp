@@ -5,6 +5,7 @@
 #include <Core/Log/LOG.h>
 #include <Core/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Grid_PDE/Interpolation/AVERAGING_UNIFORM.h>
@@ -108,13 +109,14 @@ Calculate_Velocity_Jump()
 // Debug_Write
 //#####################################################################
 template<class TV> void IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<TV>::
-Debug_Write(const std::string& output_directory_input)
+Debug_Write(const VIEWER_DIR& viewer_dir)
 {
     POISSON_COLLIDABLE_UNIFORM<TV>& heat_poisson=dynamic_cast<POISSON_COLLIDABLE_UNIFORM<TV>&>(*heat_solver);
     static int frame[3]={0,0,0};
-    std::string output_directory=output_directory_input;if(mpi_grid) output_directory+=LOG::sprintf("/processor%d",mpi_grid->rank);
-    Create_Directory(output_directory);
-    std::string output_directory_axis=LOG::sprintf("%s/%d",output_directory.c_str(),axis);Create_Directory(output_directory_axis);
+    // std::string viewer_dir.output_directory=output_directory_input;
+    // if(mpi_grid) viewer_dir.output_directory+=LOG::sprintf("/processor%d",mpi_grid->rank);
+    std::string output_directory_axis=LOG::sprintf("%s/%d",viewer_dir.current_directory,axis);
+    Create_Directory(output_directory_axis);
     std::string f=Value_To_String(frame[axis]);
     Write_To_File<T>(output_directory_axis+"/grid",face_grid);
     Write_To_File<T>(output_directory_axis+"/psi_N."+f,heat_poisson.psi_N);
@@ -124,7 +126,6 @@ Debug_Write(const std::string& output_directory_input)
     for(int i=0;i<densities.m;i++){
         std::string filename=LOG::sprintf("/levelset_%d.%s",i,f.c_str());
         Write_To_File<T>(output_directory_axis+filename,*heat_poisson.levelset_multiple->levelsets(i));}
-    Write_To_Text_File(output_directory_axis+"/common/last_frame",frame[axis]);frame[axis]+=1;
 }
 //#####################################################################
 namespace PhysBAM{

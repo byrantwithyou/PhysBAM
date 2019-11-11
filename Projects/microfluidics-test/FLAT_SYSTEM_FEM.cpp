@@ -631,7 +631,7 @@ void Solve_And_Display_Solution(const FLUID_LAYOUT_FEM<TV>& fl,const PARSE_DATA_
         Add_Debug_Particle(X,VECTOR<T,3>(1,0,0));
         Debug_Particle_Set_Attribute<TV>("V",v);}
     fl.Dump_Mesh();
-    Flush_Frame<TV>("minres solve");
+    Flush_Frame("minres solve");
 }
 
 template void Generate_Discretization<double,VECTOR<double,2> >(

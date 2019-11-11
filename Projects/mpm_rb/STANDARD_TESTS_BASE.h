@@ -31,7 +31,7 @@ public:
     using BASE::mass;using BASE::force_helper;using BASE::use_oldroyd;
     using BASE::frame_title;using BASE::write_substeps_level;using BASE::gather_scatter;
     using BASE::collision_objects;using BASE::substeps_delay_frame;
-    using BASE::output_directory;using BASE::mass_contour;using BASE::plasticity_models;
+    using BASE::viewer_dir;using BASE::mass_contour;using BASE::plasticity_models;
     using BASE::restart;using BASE::dt;using BASE::time;using BASE::lag_Dp;
     using BASE::frame_dt;using BASE::min_dt;using BASE::max_dt;
     using BASE::ghost;using BASE::use_affine;using BASE::cfl_F;using BASE::use_strong_cfl;
@@ -83,8 +83,8 @@ public:
     bool friction_is_set;
     T sigma_Y;
     bool use_cohesion;
-    std::function<void (int frame)> write_output_files;
-    std::function<void (int frame)> read_output_files;
+    std::function<void ()> write_output_files;
+    std::function<void ()> read_output_files;
     std::function<void ()> destroy;
     ARRAY<T> extra_T;
     ARRAY<int> extra_int;
@@ -170,8 +170,8 @@ public:
     void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io);
     void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction,
         std::function<FRAME<TV>(T)> func_frame,std::function<TWIST<TV>(T)> func_twist);
-    void Write_Output_Files(const int frame) override;
-    void Read_Output_Files(const int frame) override;
+    void Write_Output_Files() override;
+    void Read_Output_Files() override;
 //#####################################################################
 };
 }

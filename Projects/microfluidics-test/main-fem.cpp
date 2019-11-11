@@ -10,14 +10,9 @@
 #include <Tools/Krylov_Solvers/MATRIX_SYSTEM.h>
 #include <Tools/Krylov_Solvers/MINRES.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
-#include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
-#include <fstream>
-#include <map>
-#include <set>
-#include <string>
 #include "ANALYTIC_FEM.h"
 #include "CACHED_ELIMINATION_MATRIX.h"
 #include "COMPONENT_LAYOUT_FEM.h"
@@ -29,6 +24,10 @@
 #include "SOLUTION_FEM.h"
 #include "EXECUTE_HELPER.h"
 #include <chrono>
+#include <fstream>
+#include <map>
+#include <set>
+#include <string>
 #if USE_MKL
 #include <mkl.h>
 #endif
@@ -44,6 +43,8 @@ using namespace PhysBAM;
 namespace PhysBAM{
 extern bool use_job_timing;
 }
+
+VIEWER_OUTPUT* pvo2;
 
 template<int d>
 void Run(PARSE_ARGS& parse_args)
@@ -69,7 +70,8 @@ void Run(PARSE_ARGS& parse_args)
     TV2 min_corner,max_corner;
     IV2 illus_size(128,128);
     bool illus_fill=false,use_mkl_sparse=false,dump_sysbin=false;
-    std::string pipe_file,output_dir="output";
+    std::string pipe_file,output_dir;
+    VIEWER_DIR viewer_dir("output");
     std::string analytic_u,analytic_p;
     std::string sol_file;
     T s=1,m=1,kg=1;
@@ -128,32 +130,35 @@ void Run(PARSE_ARGS& parse_args)
 
     RANGE<TV2> box=cl.Compute_Bounding_Box();
     LOG::printf("bounding box: %P\n",box);
-    GRID<TV2> grid(IV2()+1,box,true);
-    VIEWER_OUTPUT<TV2> vo2(STREAM_TYPE(0.f),grid,output_dir);
-    GRID<TV3> grid3(IV3()+1,{grid.domain.min_corner.Append(0),grid.domain.max_corner.Append(cl.depth)},true);
-    VIEWER_OUTPUT<TV3> vo3(STREAM_TYPE(0.f),grid3,output_dir+"/3d");
-    vo2.debug_particles.debug_particles.template Add_Array<T>("display_size");
+    VIEWER_OUTPUT vo2(STREAM_TYPE(0.f),viewer_dir);
+    vo2.Use_Debug_Particles<TV2>();
+    pvo2=&vo2;
+    VIEWER_DIR viewer_dir_3d(viewer_dir.output_directory+"/3d");
+    VIEWER_OUTPUT vo3(STREAM_TYPE(0.f),viewer_dir_3d);
+    vo3.Use_Debug_Particles<TV3>();
+    VIEWER_OUTPUT::Singleton(d==3?&vo3:&vo2);
+    auto& dp3=Get_Debug_Particles<TV3>();
     // (local,global)
-    vo3.debug_particles.debug_particles.template Add_Array<VECTOR<int,2>>("e");
-    vo3.debug_particles.debug_particles.template Add_Array<VECTOR<int,2>>("v");
-    vo3.debug_particles.debug_particles.template Add_Array<VECTOR<int,2>>("p");
+    dp3.debug_particles.template Add_Array<VECTOR<int,2>>("e");
+    dp3.debug_particles.template Add_Array<VECTOR<int,2>>("v");
+    dp3.debug_particles.template Add_Array<VECTOR<int,2>>("p");
     DEBUGGING_FEM<T> debug(cl);
     
     if(!quiet)
     {
-        Flush_Frame<TV2>("init");
+        vo2.Flush_Frame("init");
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
         {
             debug.Visualize_Block_State(b);
             debug.Visualize_Ticks(b,false);
         }
-        Flush_Frame<TV2>("blocks");
+        vo2.Flush_Frame("blocks");
         if(visualize_blocks)
         {
             for(BLOCK_ID b(0);b<cl.blocks.m;b++)
             {
                 debug.Visualize_Block_State(b);
-                Flush_Frame<TV2>(LOG::sprintf("block %P (%P)",b,cl.blocks(b).block).c_str());
+                vo2.Flush_Frame(LOG::sprintf("block %P (%P)",b,cl.blocks(b).block).c_str());
             }
         }
     }
@@ -164,16 +169,16 @@ void Run(PARSE_ARGS& parse_args)
 
     if(!quiet)
     {
-        Flush_Frame<TV2>("after master");
+        vo2.Flush_Frame("after master");
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
             debug.Visualize_Block_State(b);
-        Flush_Frame<TV2>("blocks");
+        vo2.Flush_Frame("blocks");
         if(visualize_blocks)
         {
             for(BLOCK_ID b(0);b<cl.blocks.m;b++)
             {
                 debug.Visualize_Block_State(b);
-                Flush_Frame<TV2>(LOG::sprintf("block %P (%P)",b,cl.blocks(b).block).c_str());
+                vo2.Flush_Frame(LOG::sprintf("block %P (%P)",b,cl.blocks(b).block).c_str());
             }
         }
     }
@@ -186,16 +191,16 @@ void Run(PARSE_ARGS& parse_args)
 
     if(!quiet)
     {
-        Flush_Frame<TV2>("after merge");
+        vo2.Flush_Frame("after merge");
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
             debug.Visualize_Block_State(b);
-        Flush_Frame<TV2>("blocks");
+        vo2.Flush_Frame("blocks");
         if(visualize_blocks)
         {
             for(BLOCK_ID b(0);b<cl.blocks.m;b++)
             {
                 debug.Visualize_Block_State(b);
-                Flush_Frame<TV2>(LOG::sprintf("block %P (%P)",b,cl.blocks(b).block).c_str());
+                vo2.Flush_Frame(LOG::sprintf("block %P (%P)",b,cl.blocks(b).block).c_str());
             }
         }
     }
@@ -217,10 +222,10 @@ void Run(PARSE_ARGS& parse_args)
             {
                 debug.Visualize_Tetrahedron(b);
                 if(visualize_blocks)
-                    Flush_Frame<TV>(LOG::sprintf("block %P",b).c_str());
+                    Flush_Frame(LOG::sprintf("block %P",b).c_str());
             }
         }
-        Flush_Frame<TV2>("ref ticks");
+        vo2.Flush_Frame("ref ticks");
 
         if(d==3)
             debug.Visualize_Tetrahedron_Dofs(mc);
@@ -238,7 +243,7 @@ void Run(PARSE_ARGS& parse_args)
             if(d==3)
                 debug.Visualize_Tetrahedron(b);
             debug.Highlight_Dof<d>(b,vep,r,dim);
-            Flush_Frame<TV>("highlight dof");
+            Flush_Frame("highlight dof");
         }
     }
     mc.Print_Statistics();
@@ -285,7 +290,7 @@ void Run(PARSE_ARGS& parse_args)
         mc.Dump_World_Space_Vector("b");
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
             debug.Visualize_Solution(mc.rhs_block_list(b),b,true);
-        Flush_Frame<TV>("rhs blocks");
+        Flush_Frame("rhs blocks");
         if(visualize_blocks)
             for(BLOCK_ID b(0);b<cl.blocks.m;b++)
                 debug.Visualize_Block_Dofs(b);
@@ -412,7 +417,7 @@ void Run(PARSE_ARGS& parse_args)
     {
         for(BLOCK_ID b(0);b<cl.blocks.m;b++)
             debug.Visualize_Solution(mc.rhs_block_list(b),b,true);
-        Flush_Frame<TV>("solution");
+        Flush_Frame("solution");
         mc.Dump_World_Space_Vector("x");
         debug.Visualize_Flat_Dofs();
     }

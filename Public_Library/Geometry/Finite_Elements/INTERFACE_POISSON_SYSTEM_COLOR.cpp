@@ -112,7 +112,7 @@ Set_Matrix(const ARRAY<T>& mu,bool use_discontinuous_scalar_field,
     tjc.Compute_Pairwise_Level_Set_Data();
     tjc.Cut_Interface(cdi->index_to_cell_elements);
     Dump(grid,cdi->index_to_cell_elements);
-    Flush_Frame<TV>("cutting");
+    Flush_Frame("cutting");
 
     // STENCILS INTEGRATION 
     

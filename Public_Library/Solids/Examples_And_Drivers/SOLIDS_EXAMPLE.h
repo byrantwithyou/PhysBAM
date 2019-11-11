@@ -38,9 +38,9 @@ class SOLIDS_EXAMPLE:public EXAMPLE<TV>,public EXAMPLE_FORCES_AND_VELOCITIES<TV>
     typedef AVERAGING_UNIFORM<TV> T_AVERAGING;
 public:
     using EXAMPLE_FORCES_AND_VELOCITIES<TV>::Set_External_Positions;
-    using BASE::output_directory;using BASE::frame_title;using BASE::stream_type;using BASE::last_frame;using BASE::frame_rate;
-    using BASE::write_last_frame;using BASE::write_time;using BASE::write_substeps_level;using BASE::Set_Write_Substeps_Level;//using BASE::data_directory;
-    using BASE::restart;using BASE::Write_Frame_Title;
+    using BASE::frame_title;using BASE::stream_type;using BASE::last_frame;using BASE::frame_rate;
+    using BASE::write_substeps_level;using BASE::Set_Write_Substeps_Level;//using BASE::data_directory;
+    using BASE::restart;using BASE::Write_Frame_Title;using BASE::viewer_dir;
 
 protected:
     T minimum_collision_thickness; // needed for ray tracing, etc.
@@ -69,9 +69,9 @@ public:
     void Log_Parameters() const override;
     // solids
     virtual void Initialize_Bodies();
-    virtual void Read_Output_Files_Solids(const int frame);
+    virtual void Read_Output_Files_Solids();
     void Post_Velocity_Advection_Callback(const T dt,const T time){}
-    virtual void Write_Output_Files(const int frame) const override;
+    virtual void Write_Output_Files() const override;
     void Adjust_Output_Directory_For_MPI(const MPI_SOLIDS<TV>* mpi);
 //#####################################################################
 };

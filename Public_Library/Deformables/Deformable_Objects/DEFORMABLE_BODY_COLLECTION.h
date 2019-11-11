@@ -14,7 +14,6 @@
 namespace PhysBAM{
 
 template<class TV> class BINDING_LIST;
-template<class TV> class DEFORMABLE_GEOMETRY_COLLECTION;
 template<class TV> class COLLISION_BODY_COLLECTION;
 template<class TV> class DEFORMABLE_OBJECT_COLLISIONS;
 template<class TV> class DEFORMABLE_PARTICLES;
@@ -28,6 +27,7 @@ template<class TV> class MPI_SOLIDS;
 template<class TV> class DEFORMABLES_FORCES;
 template<class TV> class TRIANGLE_COLLISION_PARAMETERS;
 template<class TV> class STRUCTURE;
+class VIEWER_DIR;
 
 template<class TV>
 class DEFORMABLE_BODY_COLLECTION
@@ -100,10 +100,10 @@ public:
     int Add_Force(DEFORMABLES_FORCES<TV>* force);
     void Initialize(TRIANGLE_COLLISION_PARAMETERS<TV>& triangle_collisions_parameters);
     void Update_Collision_Penalty_Forces_And_Derivatives();
-    void Read_Static_Variables(const std::string& prefix,const int frame);
-    void Write_Static_Variables(const STREAM_TYPE stream_type,const std::string& prefix,const int frame) const;
-    void Read_Dynamic_Variables(const std::string& prefix,const int frame);
-    void Write_Dynamic_Variables(const STREAM_TYPE stream_type,const std::string& prefix,const int frame) const;
+    void Read_Static_Variables(const VIEWER_DIR& viewer_dir);
+    void Write_Static_Variables(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir,bool static_variables_every_frame) const;
+    void Read_Dynamic_Variables(const VIEWER_DIR& viewer_dir);
+    void Write_Dynamic_Variables(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir) const;
     void Update_Simulated_Particles();
     void Set_Mpi_Solids(MPI_SOLIDS<TV>* mpi_solids);
     void Update_CFL();
@@ -120,8 +120,8 @@ public:
 
     void Test_Energy(const T time);
     void Test_Force_Derivatives(const T time);
-    void Read(const std::string& prefix,const std::string& static_prefix,const int frame,const int static_frame,const bool include_static_variables,const bool read_from_every_process);
-    void Write(const STREAM_TYPE,const std::string& prefix,const std::string& static_prefix,const int frame,const int static_frame,const bool include_static_variables,const bool write_from_every_process) const;
+    void Read(const VIEWER_DIR& viewer_dir,const bool read_static_variables);
+    void Write(const STREAM_TYPE,const VIEWER_DIR& viewer_dir,const bool static_variables_every_frame,const bool write_from_every_process=true) const;
 //#####################################################################
 };
 }

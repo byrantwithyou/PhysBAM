@@ -76,11 +76,9 @@ class STANDARD_TESTS:public SOLIDS_EXAMPLE<VECTOR<T_input,2> >
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
-    using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
+    using BASE::solids_parameters;using BASE::viewer_dir;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions;using BASE::solids_evolution; // silence -Woverloaded-virtual
     using BASE::test_number;using BASE::data_directory;using BASE::user_last_frame;
-
-    std::ofstream svout;
 
     SOLIDS_STANDARD_TESTS<TV> tests;
 
@@ -137,7 +135,7 @@ public:
         tests.data_directory=data_directory;
         LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
         if(!this->user_output_directory)
-            output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+            viewer_dir.output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
         if(!user_last_frame) last_frame=1000;
 
         switch(test_number){
@@ -233,7 +231,7 @@ public:
                 LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
         if(!this->user_output_directory)
-            output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+            viewer_dir.output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
     }
 
     void Preprocess_Substep(const T dt,const T time) override
@@ -241,19 +239,6 @@ public:
         if(test_forces){
             solid_body_collection.deformable_body_collection.Test_Energy(time);
             solid_body_collection.deformable_body_collection.Test_Force_Derivatives(time);}
-    }
-    void Postprocess_Substep(const T dt,const T time) override
-    {
-        if (dump_sv)
-        {
-            FINITE_VOLUME<TV,2>& force_field = solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>&>();
-            ARRAY<DIAGONAL_MATRIX<T,2> >& sv = force_field.Fe_hat;
-            
-            for (int i=1; i<=sv.m; i++)
-            {
-                svout << sv(i).x.x << " " << sv(i).x.y << std::endl;
-            }
-        }
     }
 
 //#####################################################################
@@ -678,24 +663,11 @@ void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) override
     for(int j=0;j<mattress_grid.counts.y;j++) X(m*j)=X(m-1+m*j)=TV(0,0);
 }
 //#####################################################################
-// Function Write_Output_Files
-//#####################################################################
-void Write_Output_Files(const int frame) const override
-{
-    BASE::Write_Output_Files(frame);
-}
-//#####################################################################
 // Function Preprocess_Frame
 //#####################################################################
 void Preprocess_Frame(const int frame) override
 {
     dynamic_cast<NEWMARK_EVOLUTION<TV>&>(*solids_evolution).print_matrix=print_matrix;
-    
-    if (dump_sv)
-    {
-        std::string output_file = LOG::sprintf("Standard_Tests/Test_%d/SV_%d",test_number,frame);
-        svout.open(output_file.c_str());
-    }
 }
 //#####################################################################
 // Function Add_Constitutive_Model

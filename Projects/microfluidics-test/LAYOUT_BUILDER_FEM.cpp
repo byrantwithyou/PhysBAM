@@ -6,8 +6,8 @@
 #include <Core/Log/LOG.h>
 #include <Core/Math_Tools/cube.h>
 #include <Core/Matrices/ROTATION.h>
-#include <fstream>
 #include "LAYOUT_BUILDER_FEM.h"
+#include <fstream>
 namespace PhysBAM{
 
 template<class T>

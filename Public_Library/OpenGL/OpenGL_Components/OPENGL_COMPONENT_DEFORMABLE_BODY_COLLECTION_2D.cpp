@@ -4,6 +4,7 @@
 //#####################################################################
 #include <Core/Log/LOG.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Fracture/TRIANGLES_OF_MATERIAL.h>
@@ -20,9 +21,9 @@ using namespace PhysBAM;
 // Function OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D
 //#####################################################################
 template<class T> OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>::
-OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D(const std::string& prefix,const int start_frame)
-    :OPENGL_COMPONENT<T>("Deformable Object List"),prefix(prefix),
-    frame_loaded(-1),valid(false),display_mode(0),draw_velocities(false),velocity_scale(0.025),
+OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D(const VIEWER_DIR& viewer_dir)
+    :OPENGL_COMPONENT<T>(viewer_dir,"Deformable Object List"),
+    valid(false),display_mode(0),draw_velocities(false),velocity_scale(0.025),
     deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(0,0)),
     velocity_field(deformable_body_collection.particles.V,deformable_body_collection.particles.X),color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map()),
     selected_segmented_curve(-1),selected_triangulated_area(-1),selected_triangles_of_material(-1),
@@ -34,11 +35,10 @@ OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D(const std::string& prefix,const i
     viewer_callbacks.Set("toggle_draw_velocities",{[this](){Toggle_Draw_Velocities();},"Toggle draw velocities"});
     viewer_callbacks.Set("cycle_display_mode",{[this](){Cycle_Display_Mode();},"Cycle embedded display mode"});
     // check for per frame structures
-    if(File_Exists(LOG::sprintf("%s/%d/deformable_object_structures",prefix.c_str(),start_frame)))
+    if(File_Exists(viewer_dir.current_directory+"/deformable_object_structures"))
         invalidate_deformable_objects_selection_each_frame=true;
     else invalidate_deformable_objects_selection_each_frame=false;
 
-    is_animation=true;
     Initialize();
 }
 //#####################################################################
@@ -60,17 +60,13 @@ Initialize()
 // Function Reinitialize
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>::
-Reinitialize(bool force)
+Reinitialize()
 {
-    if(!(draw && (force || (is_animation && frame_loaded != frame) || (!is_animation && frame_loaded < 0)))) return;
+    if(!draw) return;
     static bool first_time=true;
-    std::string filename=LOG::sprintf("%s/%d/deformable_object_structures",prefix.c_str(),frame);
-    bool read_static_variables=!deformable_body_collection.structures.m;
-    int static_frame=-1;
-    if(File_Exists(filename)){static_frame=frame;read_static_variables=true;}
-    if(read_static_variables && first_time) LOG::cout << "Deformable bodies static variables will be read each frame" << std::endl;
-    deformable_body_collection.Read(prefix,prefix,frame,static_frame,read_static_variables,true); // Currently this will exit if any of the files don't exist... we should
-                                                                                                                     // change it to not do that
+    bool frame_has_static=File_Exists(viewer_dir.current_directory+"/deformable_object_structures");
+    bool read_static_variables=frame_has_static || first_time || !deformable_body_collection.structures.m;
+    deformable_body_collection.Read(viewer_dir,read_static_variables);
 
     if(read_static_variables){
         int m=deformable_body_collection.structures.m;
@@ -119,31 +115,21 @@ Reinitialize(bool force)
             else PHYSBAM_FATAL_ERROR(LOG::sprintf("Weird object %d",i));}}
     for(int i=0;i<deformable_body_collection.structures.m;i++){
         std::string suffix=LOG::sprintf("_%d",i);
-        std::string frame_prefix=LOG::sprintf("%s/%d",prefix.c_str(),frame);
-        if(File_Exists(frame_prefix+"stress_map_of_triangulated_area"+suffix)){
+        if(File_Exists(viewer_dir.current_directory+"/stress_map_of_triangulated_area"+suffix)){
             if(first_time) LOG::cout<<"adding stress map to triangulated area"<<std::endl;
             ARRAY<OPENGL_COLOR > *color_map=new ARRAY<OPENGL_COLOR >;
-            Read_From_File(frame_prefix+"stress_map_of_triangulated_area"+suffix,*color_map);
+            Read_From_File(viewer_dir.current_directory+"/stress_map_of_triangulated_area"+suffix,*color_map);
             triangulated_area_objects(i)->Set_Color_Map(color_map);}}
-    frame_loaded=frame;
     valid=true;
     first_time=false;
-}
-//#####################################################################
-// Function Valid_Frame
-//#####################################################################
-template<class T> bool OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>::
-Valid_Frame(int frame_input) const
-{
-    return File_Exists(LOG::sprintf("%s%d/deformable_object_particles",prefix.c_str(),frame_input));
 }
 //#####################################################################
 // Function Set_Frame
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T>::
-Set_Frame(int frame_input)
+Set_Frame()
 {
-    OPENGL_COMPONENT<T>::Set_Frame(frame_input);Reinitialize();
+    Reinitialize();
 }
 //#####################################################################
 // Function Set_Draw

@@ -52,8 +52,8 @@
 #include <Solids/Solids_Evolution/BACKWARD_EULER_MINIMIZATION_SYSTEM.h>
 #include <Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
 #include <Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <fstream>
 #include "STANDARD_TESTS_BASE.h"
+#include <fstream>
 #ifdef USE_OPENMP
 #include <omp.h>
 #endif
@@ -69,7 +69,7 @@ class STANDARD_TESTS<VECTOR<T_input,2> >:public STANDARD_TESTS_BASE<VECTOR<T_inp
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;typedef VECTOR<T,3> TV3;
 public:
     typedef STANDARD_TESTS_BASE<TV> BASE;
-    using BASE::solids_parameters;using BASE::output_directory;
+    using BASE::solids_parameters;using BASE::viewer_dir;
     using BASE::last_frame;using BASE::frame_rate;
     using BASE::solid_body_collection;using BASE::stream_type;
     using BASE::solids_evolution;using BASE::test_number;
@@ -77,7 +77,6 @@ public:
     using BASE::unit_J;using BASE::unit_rho;using BASE::unit_p;
     using BASE::backward_euler_evolution;using BASE::user_last_frame;
     
-    std::ofstream svout;
     SOLIDS_STANDARD_TESTS<TV> tests;
 
     T attachment_velocity;
@@ -147,7 +146,7 @@ public:
 
         LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
         if(!this->user_output_directory)
-            output_directory=LOG::sprintf("Test_%d",test_number);
+            viewer_dir.output_directory=LOG::sprintf("Test_%d",test_number);
         if(use_rand_seed) rand.Set_Seed(rand_seed);
         solids_parameters.implicit_solve_parameters.project_nullspace_frequency=project_nullspace;
         penalty_collisions_length*=m;
@@ -382,9 +381,9 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
 //#####################################################################
 // Function Read_Output_Files_Solids
 //#####################################################################
-void Read_Output_Files_Solids(const int frame) override
+void Read_Output_Files_Solids() override
 {
-    BASE::Read_Output_Files_Solids(frame);
+    BASE::Read_Output_Files_Solids();
     solid_body_collection.Update_Simulated_Particles();
 }
 //#####################################################################

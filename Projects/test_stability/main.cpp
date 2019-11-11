@@ -303,13 +303,15 @@ void Run(PARSE_ARGS& parse_args,STREAM_TYPE stream_type,const std::string& outpu
     parse_args.Parse();
 
     std::string data_directory="../../Public_Data";
-    GRID<TV> grid;
-    VIEWER_OUTPUT<TV> vo(stream_type,grid,output_dir);
+    VIEWER_DIR viewer_dir(output_dir);
+    VIEWER_OUTPUT vo(stream_type,viewer_dir);
+    Use_Debug_Particles<TV>();
     SOLID_BODY_COLLECTION<TV> sbc;
     SOLIDS_STANDARD_TESTS<TV> tests(stream_type,data_directory,sbc);
     Setup(sbc,example,tests,test_number);
-    Flush_Frame<TV>("init");
-    sbc.Write(stream_type,output_dir,vo.frame-1,true,true,true,true,true);
+    vo.entries.Append([&sbc,stream_type,&viewer_dir](){sbc.Write(stream_type,viewer_dir);});
+
+    Flush_Frame("init");
 
     sbc.Update_Simulated_Particles();
     example.time=0;
@@ -323,13 +325,10 @@ void Run(PARSE_ARGS& parse_args,STREAM_TYPE stream_type,const std::string& outpu
                 example.dt=frame_end-example.time;
                 end_time=frame_end;}
             Step(sbc,example);
-            if(write_substep){
-                Flush_Frame<TV>("Substep");
-                sbc.Write(stream_type,output_dir,vo.frame-1,true,true,true,true,true);}
+            if(write_substep) Flush_Frame("Substep");
             example.time=end_time;
             example.step++;}
-        if(!write_substep) Flush_Frame<TV>("Frame");
-        sbc.Write(stream_type,output_dir,vo.frame-1,true,true,true,true,true);}
+        if(!write_substep) Flush_Frame("Frame");}
 }
 
 int main(int argc, char* argv[])

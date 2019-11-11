@@ -12,7 +12,7 @@ using namespace PhysBAM;
 template<class TV_input> PLS_EXAMPLE<TV_input>::
 PLS_EXAMPLE(const STREAM_TYPE stream_type_input)
     :stream_type(stream_type_input),last_frame(100),frame_rate(24),
-    write_substeps_level(-1),write_output_files(true),output_directory("output"),restart(0),
+    write_substeps_level(-1),write_output_files(true),viewer_dir("output"),restart(0),
     number_of_ghost_cells(3),cfl(.9),mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),//incompressible_fluid_collection(mac_grid),
     mpi_grid(0),projection(mac_grid),particle_levelset_evolution(mac_grid,collision_bodies_affecting_fluid,number_of_ghost_cells,false),incompressible(mac_grid,projection),boundary(0),
     phi_boundary(0),collision_bodies_affecting_fluid(mac_grid)
@@ -35,44 +35,42 @@ template<class TV_input> PLS_EXAMPLE<TV_input>::
 // Function Write_Output_Files
 //#####################################################################
 template<class TV_input> void PLS_EXAMPLE<TV_input>::
-Write_Output_Files(const int frame)
+Write_Output_Files()
 {
     if(!write_output_files) return;
-    std::string f=LOG::sprintf("%d",frame);
-    Write_To_File(stream_type,output_directory+"/"+f+"/mac_velocities",face_velocities);
-    Write_To_File(stream_type,output_directory+"/common/grid",mac_grid);
-    if(mpi_grid) Write_To_File(stream_type,output_directory+"/common/global_grid",mpi_grid->global_grid);
-    Write_To_File(stream_type,output_directory+"/"+f+"/pressure",incompressible.projection.p);
-    Write_To_File(stream_type,output_directory+"/"+f+"/psi_N",projection.elliptic_solver->psi_N);
-    Write_To_File(stream_type,output_directory+"/"+f+"/psi_D",projection.elliptic_solver->psi_D);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/mac_velocities",face_velocities);
+    Write_To_File(stream_type,viewer_dir.output_directory+"/common/grid",mac_grid);
+    if(mpi_grid) Write_To_File(stream_type,viewer_dir.output_directory+"/common/global_grid",mpi_grid->global_grid);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/pressure",incompressible.projection.p);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/psi_N",projection.elliptic_solver->psi_N);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/psi_D",projection.elliptic_solver->psi_D);
     PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=particle_levelset_evolution.Particle_Levelset(0);
-    Write_To_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset.levelset);
-    Write_To_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,"positive_particles"),particle_levelset.positive_particles);
-    Write_To_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,"negative_particles"),particle_levelset.negative_particles);
-    Write_To_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,"removed_positive_particles"),particle_levelset.removed_positive_particles);
-    Write_To_File(stream_type,LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,"removed_negative_particles"),particle_levelset.removed_negative_particles);
-    Write_To_Text_File(output_directory+"/"+f+"/last_unique_particle_id",particle_levelset.last_unique_particle_id);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/levelset",particle_levelset.levelset);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/positive_particles",particle_levelset.positive_particles);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/negative_particles",particle_levelset.negative_particles);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/removed_positive_particles",particle_levelset.removed_positive_particles);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/removed_negative_particles",particle_levelset.removed_negative_particles);
+    Write_To_Text_File(viewer_dir.current_directory+"/last_unique_particle_id",particle_levelset.last_unique_particle_id);
 }
 //#####################################################################
 // Function Read_Output_Files
 //#####################################################################
 template<class TV_input> void PLS_EXAMPLE<TV_input>::
-Read_Output_Files(const int frame)
+Read_Output_Files()
 {
-    std::string f=LOG::sprintf("%d",frame);
     PARTICLE_LEVELSET_UNIFORM<TV>& particle_levelset=particle_levelset_evolution.Particle_Levelset(0);
-    Read_From_File(output_directory+"/"+f+"/levelset",particle_levelset.levelset);
-    Read_From_File(LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,"positive_particles"),particle_levelset.positive_particles);
-    Read_From_File(LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,"negative_particles"),particle_levelset.negative_particles);
-    Read_From_File(LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,"removed_positive_particles"),particle_levelset.removed_positive_particles);
-    Read_From_File(LOG::sprintf("%s/%d/%s",output_directory.c_str(),frame,"removed_negative_particles"),particle_levelset.removed_negative_particles);
-    Read_From_Text_File(output_directory+"/"+f+"/last_unique_particle_id",particle_levelset.last_unique_particle_id);
+    Read_From_File(viewer_dir.current_directory+"/levelset",particle_levelset.levelset);
+    Read_From_File(viewer_dir.current_directory+"/positive_particles",particle_levelset.positive_particles);
+    Read_From_File(viewer_dir.current_directory+"/negative_particles",particle_levelset.negative_particles);
+    Read_From_File(viewer_dir.current_directory+"/removed_positive_particles",particle_levelset.removed_positive_particles);
+    Read_From_File(viewer_dir.current_directory+"/removed_negative_particles",particle_levelset.removed_negative_particles);
+    Read_From_Text_File(viewer_dir.current_directory+"/last_unique_particle_id",particle_levelset.last_unique_particle_id);
     std::string filename;
-    filename=output_directory+"/"+f+"/pressure";
+    filename=viewer_dir.current_directory+"/pressure";
     if(File_Exists(filename)){
         LOG::cout<<"Reading pressure "<<filename<<std::endl;
         Read_From_File(filename,incompressible.projection.p);}
-    filename=output_directory+"/"+f+"/mac_velocities";
+    filename=viewer_dir.current_directory+"/mac_velocities";
     if(File_Exists(filename)){
         LOG::cout<<"Reading mac_velocities "<<filename<<std::endl;
         Read_From_File(filename,face_velocities);}

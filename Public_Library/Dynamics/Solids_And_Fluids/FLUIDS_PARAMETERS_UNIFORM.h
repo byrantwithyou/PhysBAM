@@ -24,6 +24,7 @@ template<class TV> class SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES;
 template<class TV> class COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES;
 template<class TV> class LAPLACE_UNIFORM;
 template<class TV> class PARTICLE_LEVELSET_EVOLUTION_UNIFORM;
+class VIEWER_DIR;
 
 template<class TV>
 class FLUIDS_PARAMETERS_UNIFORM:public FLUIDS_PARAMETERS<TV>
@@ -137,11 +138,11 @@ public:
     void Evolve_Soot(const T dt,const T time);
     template<class T_ARRAYS_PARTICLES> int Total_Number_Of_Particles(const T_ARRAYS_PARTICLES& particles) const;
     template<class T_ARRAYS_PARTICLES> void Write_Particles(const STREAM_TYPE stream_type,const PARTICLES<TV>& template_particles,const T_ARRAYS_PARTICLES& particles,
-        const std::string& output_directory,const std::string& prefix,const int frame) const;
+        const VIEWER_DIR& viewer_dir,const std::string& prefix) const;
     template<class T_PARTICLES,class T_ARRAYS_PARTICLES> void Read_Particles(const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,
-        const std::string& output_directory,const std::string& prefix,const int frame);
-    void Read_Output_Files(const std::string& output_directory,const int frame);
-    void Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const;
+        const VIEWER_DIR& viewer_dir,const std::string& prefix);
+    void Read_Output_Files(const VIEWER_DIR& viewer_dir);
+    void Write_Output_Files(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir) const;
     void Log_Parameters() const override;
 //#####################################################################
 };      

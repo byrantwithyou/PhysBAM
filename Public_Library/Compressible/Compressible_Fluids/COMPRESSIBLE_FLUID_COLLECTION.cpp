@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Compressible/Compressible_Fluids/COMPRESSIBLE_AUXILIARY_DATA.h>
 #include <Compressible/Compressible_Fluids/COMPRESSIBLE_FLUID_COLLECTION.h>
@@ -24,27 +25,25 @@ template<class TV> COMPRESSIBLE_FLUID_COLLECTION<TV>::
 // Function Write_Output_Files
 //#####################################################################
 template<class TV> void COMPRESSIBLE_FLUID_COLLECTION<TV>::
-Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const
+Write_Output_Files(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir) const
 {
-    std::string f=LOG::sprintf("%d",frame);
-    Write_To_File(stream_type,output_directory+"/"+f+"/psi",psi);
-    Write_To_File(stream_type,output_directory+"/"+f+"/euler_U",U);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/psi",psi);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/euler_U",U);
 
     // TODO(jontg): Write this out optionally.
-    COMPRESSIBLE_AUXILIARY_DATA::Write_Auxiliary_Files(stream_type,output_directory+"/"+f,frame,*this,false);
+    COMPRESSIBLE_AUXILIARY_DATA::Write_Auxiliary_Files(stream_type,viewer_dir,*this,false);
 }
 //#####################################################################
 // Function Read_Output_Files
 //#####################################################################
 template<class TV> void COMPRESSIBLE_FLUID_COLLECTION<TV>::
-Read_Output_Files(const std::string& output_directory,const int frame)
+Read_Output_Files(const VIEWER_DIR& viewer_dir)
 {
-    std::string f=LOG::sprintf("%d",frame);
-    if(File_Exists(output_directory+"/"+f+"/psi")){
-        Read_From_File(output_directory+"/"+f+"/psi",psi);}
+    if(File_Exists(viewer_dir.current_directory+"/psi")){
+        Read_From_File(viewer_dir.current_directory+"/psi",psi);}
 
-    if(File_Exists(output_directory+"/"+f+"/euler_U")){
-        Read_From_File(output_directory+"/"+f+"/euler_U",U);}
+    if(File_Exists(viewer_dir.current_directory+"/euler_U")){
+        Read_From_File(viewer_dir.current_directory+"/euler_U",U);}
 }
 //#####################################################################
 // Function Initialize_Grids

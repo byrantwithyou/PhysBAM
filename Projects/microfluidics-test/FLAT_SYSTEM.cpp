@@ -14,11 +14,11 @@
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Grid_PDE/Poisson/BASIC_DISCRETIZATIONS.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
+#include "COMMON.h"
+#include "FLUID_LAYOUT.h"
 #include <fstream>
 #include <map>
 #include <string>
-#include "COMMON.h"
-#include "FLUID_LAYOUT.h"
 namespace PhysBAM{
 
 template<class T,class TV>
@@ -133,7 +133,7 @@ void Solve_And_Display_Solution(const GRID<TV>& grid,const FLUID_LAYOUT<TV>& fl,
             if(uf.type!=fluid) continue;
             face_velocity(it.Full_Index())=sol.v(Value(uf.global_id));
         }
-        Flush_Frame(face_velocity,"solve");}
+        Flush_Frame("solve");} // face_velocity
 }
 template void Compute_Full_Matrix<double,VECTOR<double,2> >(GRID<VECTOR<double,2> > const&,ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID>,int>&,ARRAY<double,CODE_ID>&,ARRAY<double,DOF_ID>&,FLUID_LAYOUT<VECTOR<double,2> > const&,double);
 template void Compute_Full_Matrix<double,VECTOR<double,3> >(GRID<VECTOR<double,3> > const&,ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID>,int>&,ARRAY<double,CODE_ID>&,ARRAY<double,DOF_ID>&,FLUID_LAYOUT<VECTOR<double,3> > const&,double);

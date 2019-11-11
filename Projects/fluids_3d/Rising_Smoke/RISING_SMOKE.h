@@ -36,7 +36,7 @@ public:
         write_output_files=true;
         matlab_directory="Rising_Smoke/matlab";
         if(!this->user_output_directory)
-            output_directory="Rising_Smoke/output";
+            viewer_dir.output_directory="Rising_Smoke/output";
     }
 
     ~RISING_SMOKE()
@@ -115,13 +115,13 @@ void Write_Data_File(const GRID<TV>& grid,const ARRAY<T,VECTOR<int,3> >& u,const
 
     if(write_output_files){
         std::ofstream output;
-        if(!Directory_Exists(output_directory.c_str())) Create_Directory(output_directory.c_str());
+        if(!Directory_Exists(viewer_dir.output_directory.c_str())) Create_Directory(viewer_dir.output_directory.c_str());
         if(frame == start_frame){
-            sprintf(filename,"%s/common/grid",output_directory.c_str());output.open(filename,std::ios::binary);grid.Write(output);output.close();}
-        sprintf(filename,"%s/%d/density",output_directory.c_str(),frame);output.open(filename,std::ios::binary);density.Write(output);output.close();
-        sprintf(filename,"%s/%d/temperature",output_directory.c_str(),frame);output.open(filename,std::ios::binary);temperature.Write(output);output.close();
-        sprintf(filename,"%s/%d/velocities",output_directory.c_str(),frame);output.open(filename,std::ios::binary);u.Write(output);v.Write(output);output.close();
-        sprintf(filename,"%s/common/last_frame",output_directory.c_str());output.open(filename,std::ios::out|std::ios::trunc);output<<frame<<std::endl;output.close();}
+            sprintf(filename,"%s/common/grid",viewer_dir.output_directory.c_str());output.open(filename,std::ios::binary);grid.Write(output);output.close();}
+        sprintf(filename,"%s/%d/density",viewer_dir.output_directory.c_str(),frame);output.open(filename,std::ios::binary);density.Write(output);output.close();
+        sprintf(filename,"%s/%d/temperature",viewer_dir.output_directory.c_str(),frame);output.open(filename,std::ios::binary);temperature.Write(output);output.close();
+        sprintf(filename,"%s/%d/velocities",viewer_dir.output_directory.c_str(),frame);output.open(filename,std::ios::binary);u.Write(output);v.Write(output);output.close();
+        sprintf(filename,"%s/common/last_frame",viewer_dir.output_directory.c_str());output.open(filename,std::ios::out|std::ios::trunc);output<<frame<<std::endl;output.close();}
 
 }
 //#####################################################################

@@ -51,14 +51,13 @@ template<class TV> MPM_MAC_EXAMPLE<TV>::
 // Function Write_Output_Files
 //#####################################################################
 template<class TV> void MPM_MAC_EXAMPLE<TV>::
-Write_Output_Files(const int frame)
+Write_Output_Files()
 {
     if(only_log){
         debug_particles.Clear_Debug_Particles();
         return;}
-    std::string f=LOG::sprintf("%d",frame);
     if(this->use_test_output){
-        std::string file=LOG::sprintf("%s/%s-%03d.txt",output_directory.c_str(),test_output_prefix.c_str(),frame);
+        std::string file=LOG::sprintf("%s/%s-%03d.txt",viewer_dir.output_directory.c_str(),test_output_prefix.c_str(),viewer_dir.frame_stack(0));
         OCTAVE_OUTPUT<T> oo(file.c_str());
         oo.Write("X",particles.X.Flattened());
         oo.Write("V",particles.V.Flattened());
@@ -68,56 +67,55 @@ Write_Output_Files(const int frame)
 #pragma omp single
     {
 #pragma omp task
-        Write_To_File(stream_type,output_directory+"/common/grid",grid);
+        Write_To_File(stream_type,viewer_dir.output_directory+"/common/grid",grid);
 #pragma omp task
-        Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),
+        Write_To_File(stream_type,viewer_dir.current_directory+"/restart_data",
             time,random,last_linear_momentum,last_angular_momentum,last_grid_te,last_grid_ke,
             last_part_te,last_part_ke);
 #pragma omp task
         if(use_warm_start)
-            Write_To_File(stream_type,LOG::sprintf("%s/%d/pressure",output_directory.c_str(),frame),
+            Write_To_File(stream_type,viewer_dir.current_directory+"/pressure",
                 pressure_save,pressure_valid);
 #pragma omp task
-        Write_To_File(stream_type,LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles,particles.deletion_list);
+        Write_To_File(stream_type,viewer_dir.current_directory+"/mpm_particles",particles,particles.deletion_list);
 #pragma omp task
         if(use_phi)
-            Write_To_File(stream_type,LOG::sprintf("%s/%d/levelset",output_directory.c_str(),frame),levelset);
+            Write_To_File(stream_type,viewer_dir.current_directory+"/levelset",levelset);
 
         if(!only_write_particles){
 #pragma omp task
-            Write_To_File(stream_type,LOG::sprintf("%s/%d/mac_velocities",output_directory.c_str(),frame),velocity);
+            Write_To_File(stream_type,viewer_dir.current_directory+"/mac_velocities",velocity);
             if(xpic){
 #pragma omp task
-                Write_To_File(stream_type,LOG::sprintf("%s/%d/velocity_save",output_directory.c_str(),frame),velocity_save);}
+                Write_To_File(stream_type,viewer_dir.current_directory+"/velocity_save",velocity_save);}
 #pragma omp task
             {
                 GRID<TV> ghost_grid(grid.numbers_of_cells+2*ghost,grid.Ghost_Domain(ghost),true);
                 for(int i=0;i<collision_objects.m;i++)
                     if(IMPLICIT_OBJECT<TV>* io=collision_objects(i)->Get_Implicit_Object(time))
                         Dump_Levelset(ghost_grid,*io,VECTOR<T,3>(0.7,0.3,0.3));
-                debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
+                debug_particles.Write_Debug_Particles(stream_type,viewer_dir);
             }
         }
     }
-    for(int i=0;i<write_output_files.m;i++) write_output_files(i)(frame);
+    for(int i=0;i<write_output_files.m;i++) write_output_files(i)();
 }
 //#####################################################################
 // Function Read_Output_Files
 //#####################################################################
 template<class TV> void MPM_MAC_EXAMPLE<TV>::
-Read_Output_Files(const int frame)
+Read_Output_Files()
 {
-    std::string f=LOG::sprintf("%d",frame);
-    Read_From_File(LOG::sprintf("%s/%d/mpm_particles",output_directory.c_str(),frame),particles,particles.deletion_list);
-    Read_From_File(LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),
+    Read_From_File(viewer_dir.current_directory+"/mpm_particles",particles,particles.deletion_list);
+    Read_From_File(viewer_dir.current_directory+"/restart_data",
         time,random,last_linear_momentum,last_angular_momentum,last_grid_te,last_grid_ke,
         last_part_te,last_part_ke);
     if(xpic)
-        Read_From_File(LOG::sprintf("%s/%d/velocity_save",output_directory.c_str(),frame),velocity_save);
+        Read_From_File(viewer_dir.current_directory+"/velocity_save",velocity_save);
     if(use_warm_start)
-        Read_From_File(LOG::sprintf("%s/%d/pressure",output_directory.c_str(),frame),
+        Read_From_File(viewer_dir.current_directory+"/pressure",
             pressure_save,pressure_valid);
-    for(int i=0;i<read_output_files.m;i++) read_output_files(i)(frame);
+    for(int i=0;i<read_output_files.m;i++) read_output_files(i)();
 }
 //#####################################################################
 // Function Potential_Energy

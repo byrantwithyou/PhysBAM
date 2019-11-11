@@ -21,9 +21,10 @@
 
 #include <Core/Log/SCOPE.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
-#include <memory>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include "MG_PRECONDITIONED_CONJUGATE_GRADIENT.h"
 #include "MULTIGRID_POISSON_SOLVER.h"
+#include <memory>
 namespace PhysBAM{
 
 template<class T,int d>
@@ -35,7 +36,7 @@ class MULTIGRID_POISSON_TESTS
 
 public:
     int test_number;
-    std::string output_dir;
+    VIEWER_DIR viewer_dir;
     int frames;
     bool write_substeps;
     ARRAY<T,TV_INT> x;
@@ -44,7 +45,7 @@ public:
     std::unique_ptr<MULTIGRID_POISSON_SOLVER<T,d> > multigrid_poisson_solver;
 
     MULTIGRID_POISSON_TESTS(int test_number_input,int number_of_threads,int resolution=256)
-        :test_number(test_number_input)
+        :test_number(test_number_input),viewer_dir("")
     {
         T_INDEX size=resolution*T_INDEX::All_Ones_Vector();
         int levels=1;
@@ -76,13 +77,8 @@ public:
         else
             write_substeps=true;
 
-        output_dir=LOG::sprintf("Test_%d_Resolution_%d",test_number,resolution);
+        viewer_dir.output_directory=LOG::sprintf("Test_%d_Resolution_%d",test_number,resolution);
 
-        Create_Directory(output_dir);
-        Create_Directory(output_dir+"/common");
-
-        LOG::Initialize_Logging();
-        LOG::Instance()->Copy_Log_To_File(output_dir+"/common/log.txt",false);
         LOG::cout<<"Running test number "<<test_number<<" at resolution "<<resolution<<" with "<<levels<<" levels"<<std::endl;
         multigrid_poisson_solver.reset(new MULTIGRID_POISSON_SOLVER<T,d>(size,(T)1/resolution,levels,number_of_threads));
 
@@ -178,13 +174,13 @@ public:
             
             // this is really slow. get substep data by actually restarting and solving with i iterations
             if(write_substeps){
-                Write_Substep(0,frame);
+                Write_Substep();
                 ARRAY<T,TV_INT> x_save(x);
                 for(int i=0;i<100;i++){
                     x=x_save;
                     multigrid_poisson_solver->Discretization().b=b;
                     bool converged=cg.Solve(multigrid_system,x,multigrid_poisson_solver->Discretization().b,multigrid_poisson_solver->Discretization().u,tmp,1e-7,1,i);
-                    Write_Substep(i,frame);
+                    Write_Substep();
                     if(converged)
                         break;
                 }        
@@ -205,9 +201,8 @@ public:
     {
         LOG::SCOPE scope("Write frame","Write frame %d",frame);
         MULTIGRID_POISSON<T,d>& multigrid_poisson=multigrid_poisson_solver->Discretization();
-        std::string f=LOG::sprintf("%i",frame);
 
-        Write_To_File<float>(output_dir+"/common/grid",multigrid_poisson.grid);
+        viewer_dir.Start_Directory(0,0);
         ARRAY<T,TV_INT> x_as_density(x);
         T x_min=std::numeric_limits<T>::max();
         T x_max=-x_min;
@@ -223,20 +218,15 @@ public:
         if(x_range)
             x_as_density/=x_range;
 
-        Create_Directory(output_dir+"/"+f);
-        Write_To_File<float>(output_dir+"/"+f+"/density",x_as_density);
-        Write_To_Text_File(output_dir+"/common/last_frame",frame);
+        Write_To_File<float>(viewer_dir.current_directory+"/"+"/density",x_as_density);
+        viewer_dir.Finish_Directory();
     }
 
-    void Write_Substep(int substep,int frame)
+    void Write_Substep()
     {
         LOG::SCOPE scope("Write substep");
         MULTIGRID_POISSON<T,d>& multigrid_poisson=multigrid_poisson_solver->Discretization();
-        std::string f=LOG::sprintf("%i",frame);
-        std::string s=LOG::sprintf("%i",substep);
-
-        Create_Directory(output_dir+"/Frame_"+f+"_x");        
-        Create_Directory(output_dir+"/Frame_"+f+"_residual");
+        viewer_dir.Start_Directory(1,0);
         ARRAY<T,TV_INT> x_as_density(x);
         ARRAY<T,TV_INT> r_as_density(b);
         T x_min=std::numeric_limits<T>::max();
@@ -261,17 +251,9 @@ public:
         if(r_max)
             r_as_density/=r_max;
         
-        if(substep==0){
-            Write_To_File<float>(output_dir+"/Frame_"+f+"_x/grid",multigrid_poisson.grid);
-            Write_To_File<float>(output_dir+"/Frame_"+f+"_residual/grid",multigrid_poisson.grid);
-        }
-        Write_To_File<float>(output_dir+"/Frame_"+f+"_x/density."+s,x_as_density);
-        Write_To_File<float>(output_dir+"/Frame_"+f+"_residual/density."+s,r_as_density);
-
-        Write_To_Text_File(output_dir+"/Frame_"+f+"_x/last_frame",s);
-        Write_To_Text_File(output_dir+"/Frame_"+f+"_residual/last_frame",s);
-
-
+        Write_To_File<float>(viewer_dir.current_directory+"/density_x",x_as_density);
+        Write_To_File<float>(viewer_dir.current_directory+"/density_residual",r_as_density);
+        viewer_dir.Finish_Directory();
     }
 
     void Set_Cell_Type(int frame)

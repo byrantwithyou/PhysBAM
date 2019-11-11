@@ -4,6 +4,7 @@
 //#####################################################################
 #ifndef __SHALLOW_WATER_STATE__
 #define __SHALLOW_WATER_STATE__
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <functional>
 namespace PhysBAM{
@@ -28,7 +29,7 @@ public:
     std::string frame_title;
     int write_substeps_level;
     int substeps_delay_frame;
-    std::string output_directory;
+    VIEWER_DIR viewer_dir;
     std::string data_directory;
     std::string test_output_prefix;
     bool use_test_output;
@@ -45,16 +46,16 @@ public:
     std::function<void(int frame)> end_frame;
     std::function<void(T time)> begin_time_step;
     std::function<void(T time)> end_time_step;
-    std::function<void(int frame)> write_output_files;
-    std::function<void(int frame)> read_output_files;
+    std::function<void()> write_output_files;
+    std::function<void()> read_output_files;
 
     SHALLOW_WATER_STATE(const STREAM_TYPE stream_type);
     SHALLOW_WATER_STATE(const SHALLOW_WATER_STATE&) = delete;
     void operator=(const SHALLOW_WATER_STATE&) = delete;
     ~SHALLOW_WATER_STATE();
 
-    void Write_Output_Files(const int frame);
-    void Read_Output_Files(const int frame);
+    void Write_Output_Files();
+    void Read_Output_Files();
 //#####################################################################
 };
 }

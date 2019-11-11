@@ -2,8 +2,8 @@
 #include <Core/Log/LOG.h>
 #include <Core/Log/SCOPE.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
-#include <iomanip>
 #include "OD_DRIVER.h"
+#include <iomanip>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -45,10 +45,10 @@ Initialize()
 
     example.Initialize();
     if(example.restart)
-        example.Read_Output_Files(example.restart);
+        example.Read_Output_Files();
 
 
-    if(!example.restart) Write_Output_Files(0);
+    if(!example.restart) Write_Output_Files();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",1);
 }
 //#####################################################################
@@ -116,7 +116,7 @@ Simulate_To_Frame(const int frame)
             Advance_One_Time_Step();
             example.time=next_time;}
         example.End_Frame(current_frame);
-        Write_Output_Files(++output_number);}
+        Write_Output_Files();}
 }
 //#####################################################################
 // Function Write_Substep
@@ -127,21 +127,19 @@ Write_Substep(const std::string& title)
     example.frame_title=title;
     LOG::printf("Writing substep [%s]: output_number=%i, time=%g, frame=%i\n",
         example.frame_title,output_number+1,example.time,current_frame);
-    Write_Output_Files(++output_number);
+    Write_Output_Files();
     example.frame_title="";
 }
 //#####################################################################
 // Write_Output_Files
 //#####################################################################
 template<class TV> void OD_DRIVER<TV>::
-Write_Output_Files(const int frame)
+Write_Output_Files()
 {
-    Create_Directory(example.output_directory);
-    Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
-    Create_Directory(example.output_directory+"/common");
-    Write_To_Text_File(example.output_directory+LOG::sprintf("/%d/frame_title",frame),example.frame_title);
-    example.Write_Output_Files(frame);
-    Write_To_Text_File(example.output_directory+"/common/last_frame",frame,"\n");
+    example.viewer_dir.Start_Directory(0,example.frame_title);
+    example.frame_title="";
+    example.Write_Output_Files();
+    example.viewer_dir.Finish_Directory();
 }
 //#####################################################################
 // Function Apply_External_Forces

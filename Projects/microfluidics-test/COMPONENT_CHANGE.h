@@ -5,9 +5,9 @@
 #ifndef __COMPONENT_CHANGE__
 #define __COMPONENT_CHANGE__
 
-#include <map>
 #include "CANONICAL_BLOCK.h"
 #include "CANONICAL_COMPONENT.h"
+#include <map>
 
 namespace PhysBAM{
 

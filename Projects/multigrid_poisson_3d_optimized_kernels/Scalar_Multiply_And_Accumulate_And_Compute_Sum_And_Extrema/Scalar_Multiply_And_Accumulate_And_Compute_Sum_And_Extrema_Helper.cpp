@@ -2,10 +2,10 @@
 // Copyright 2009-2010, Eftychios Sifakis.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <limits>
 #include "../Instantiation_Helpers.h"
 #include "../Thread_Queueing/PTHREAD_QUEUE.h"
 #include "Scalar_Multiply_And_Accumulate_And_Compute_Sum_And_Extrema_Helper.h"
+#include <limits>
 using namespace PhysBAM;
 extern PTHREAD_QUEUE* pthread_queue;
 //#####################################################################

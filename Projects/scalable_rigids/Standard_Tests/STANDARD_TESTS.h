@@ -40,7 +40,7 @@ public:
     int parameter;
 
     typedef SOLIDS_EXAMPLE<TV> BASE;
-    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::restart;
+    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::viewer_dir;using BASE::restart;
     using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::test_number;
     using BASE::user_last_frame;
 
@@ -54,7 +54,7 @@ public:
 
         tests.data_directory=data_directory;
         if(!this->user_output_directory)
-            output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+            viewer_dir.output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
     }
 
     ~STANDARD_TESTS()

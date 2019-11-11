@@ -25,27 +25,17 @@ public:
     DRIVER(EXAMPLE<TV>& example);
     virtual ~DRIVER();
 
-    void Write_Last_Frame(const int frame) const
-    {if(example.write_last_frame) Write_To_Text_File(example.output_directory+"/common/last_frame",frame,"\n");}
-
-    void Write_Time(const int frame) const
-    {if(example.write_time) Write_To_File(example.stream_type,LOG::sprintf("%s/%d/time",example.output_directory.c_str(),frame),time);}
-
-    T Time() const
-    {return time;}
-
-    void Set_Time(const T time_input) 
-    {time=time_input;}
+    void Write_Time() const
+    {Write_To_File(example.stream_type,example.viewer_dir.current_directory+"/time",time);}
     
 //#####################################################################
     virtual void Execute_Main_Program();
     virtual void Initialize();
     virtual void Advance_To_Target_Time(const T target_time)=0;
     virtual void Write_Substep(const std::string& title);
-    virtual void Read_Time(const int frame);
     virtual void Read_Last_Frame();
     virtual void Simulate_To_Frame(const int frame);
-    virtual void Write_Output_Files(const int frame);
+    virtual void Write_Output_Files();
 //#####################################################################
 };
 }

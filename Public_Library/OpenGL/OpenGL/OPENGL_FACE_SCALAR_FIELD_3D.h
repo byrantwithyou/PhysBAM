@@ -20,12 +20,13 @@ public:
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;GRID<TV> grid;
     using OPENGL_OBJECT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::World_Space_Box;
     ARRAY<T2,FACE_INDEX<3> > &face_values;
+    bool& face_values_valid;
     OPENGL_COLOR_MAP<T2> *color_map;
     OPENGL_POINTS_3D<T,ARRAY<TV> > opengl_points;
     TV_INT selected_index;
 
 //#####################################################################
-    OPENGL_FACE_SCALAR_FIELD_3D(const GRID<TV> &grid_input,ARRAY<T2,FACE_INDEX<3> > &face_values_input,OPENGL_COLOR_MAP<T2> *color_map_input);
+    OPENGL_FACE_SCALAR_FIELD_3D(const GRID<TV> &grid_input,ARRAY<T2,FACE_INDEX<3> > &face_values_input,bool& face_values_valid,OPENGL_COLOR_MAP<T2> *color_map_input);
     virtual ~OPENGL_FACE_SCALAR_FIELD_3D();
     void Display() const override;
     virtual RANGE<TV> Bounding_Box() const override;

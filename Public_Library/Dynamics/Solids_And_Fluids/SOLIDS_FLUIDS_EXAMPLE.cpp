@@ -10,6 +10,7 @@
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Grid_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
+#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
@@ -30,7 +31,7 @@ template<class TV> SOLIDS_FLUIDS_EXAMPLE<TV>::
 SOLIDS_FLUIDS_EXAMPLE(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
     :BASE(stream_type,parse_args),use_melting(false),solids_parameters(*new SOLIDS_PARAMETERS<TV>),solids_fluids_parameters(*new SOLIDS_FLUIDS_PARAMETERS<TV>(this)),
     solid_body_collection(*new SOLID_BODY_COLLECTION<TV>),solids_evolution(new NEWMARK_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this)),
-    opt_solidssymmqmr(false),opt_solidscr(false),opt_solidscg(false)
+    opt_solidssymmqmr(false),opt_solidscr(false),opt_solidscg(false),debug_particles(*new DEBUG_PARTICLES<TV>)
 {
     Set_Minimum_Collision_Thickness();
     Set_Write_Substeps_Level(-1);
@@ -61,13 +62,9 @@ template<class TV> SOLIDS_FLUIDS_EXAMPLE<TV>::
 // Function Read_Output_Files_Solids
 //#####################################################################
 template<class TV> void SOLIDS_FLUIDS_EXAMPLE<TV>::
-Read_Output_Files_Solids(const int frame)
+Read_Output_Files_Solids()
 {
-    solid_body_collection.Read(output_directory,frame,frame,solids_parameters.write_static_variables_every_frame,solids_parameters.rigid_body_evolution_parameters.write_rigid_bodies,
-        solids_parameters.write_deformable_body,solids_parameters.write_from_every_process);
-    std::string f=LOG::sprintf("%d",frame);
-    //if(NEWMARK_EVOLUTION<TV>* newmark=dynamic_cast<NEWMARK_EVOLUTION<TV>*>(solids_evolution))
-    //    newmark->Read_Position_Update_Projection_Data(stream_type,output_directory+"/"+f+"/");
+    solid_body_collection.Read(viewer_dir,solids_parameters.write_static_variables_every_frame);
 }
 //#####################################################################
 // Function Log_Parameters
@@ -86,11 +83,8 @@ Log_Parameters() const
 template<class TV> template<class T_MPI> void SOLIDS_FLUIDS_EXAMPLE<TV>::
 Adjust_Output_Directory_For_MPI(const T_MPI mpi)
 {
-    if(mpi && mpi->Number_Of_Processors()>1){
-        output_directory+=LOG::sprintf("/%d",(mpi->rank+1));
-        Create_Directory(output_directory);
-        Create_Directory(output_directory+"/common");
-        LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",restart);}
+    if(mpi && mpi->Number_Of_Processors()>1)
+        viewer_dir.output_directory+=LOG::sprintf("/%d",(mpi->rank+1));
 }
 //#####################################################################
 // Function Post_Initialization
@@ -136,7 +130,7 @@ Postprocess_Substep(const T dt,const T time)
 // Function Read_Output_Files_Fluids
 //#####################################################################
 template<class TV> void SOLIDS_FLUIDS_EXAMPLE<TV>::
-Read_Output_Files_Fluids(const int frame)
+Read_Output_Files_Fluids()
 {
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
 }
@@ -257,6 +251,14 @@ Modify_Fluid_For_Melting(const T dt,const T time)
 template<class TV> void SOLIDS_FLUIDS_EXAMPLE<TV>::
 Update_Melting_Substep_Parameters(const T dt,const T time)
 {
+}
+//#####################################################################
+// Function Write_Output_Files
+//#####################################################################
+template<class TV> void SOLIDS_FLUIDS_EXAMPLE<TV>::
+Write_Output_Files() const
+{
+    debug_particles.Write_Debug_Particles(stream_type,viewer_dir);
 }
 //#####################################################################
 namespace PhysBAM{

@@ -47,8 +47,8 @@
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_ITERATOR.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
-#include <fstream>
 #include "STANDARD_TESTS_2D.h"
+#include <fstream>
 namespace PhysBAM{
 //#####################################################################
 // Constructor
@@ -64,7 +64,7 @@ STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-fooT3",&foo_T3,&use_foo_T3,"T3","a scalar");
     parse_args.Add("-fooT4",&foo_T4,&use_foo_T4,"T4","a scalar");
     parse_args.Parse();
-    if(!this->override_output_directory) output_directory=LOG::sprintf("Test_%i",test_number);
+    if(!this->override_output_directory) viewer_dir.output_directory=LOG::sprintf("Test_%i",test_number);
 }
 //#####################################################################
 // Destructor
@@ -77,19 +77,19 @@ template<class T> STANDARD_TESTS<VECTOR<T,2> >::
 // Function Write_Output_Files
 //#####################################################################
 template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
-Write_Output_Files(const int frame)
+Write_Output_Files()
 {
-    if(write_output_files) write_output_files(frame);
-    BASE::Write_Output_Files(frame);
+    if(write_output_files) write_output_files();
+    BASE::Write_Output_Files();
 }
 //#####################################################################
 // Function Read_Output_Files
 //#####################################################################
 template<class T> void STANDARD_TESTS<VECTOR<T,2> >::
-Read_Output_Files(const int frame)
+Read_Output_Files()
 {
-    if(read_output_files) read_output_files(frame);
-    BASE::Read_Output_Files(frame);
+    if(read_output_files) read_output_files();
+    BASE::Read_Output_Files();
 }
 //#####################################################################
 // Function Initialize

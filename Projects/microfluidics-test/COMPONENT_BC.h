@@ -7,10 +7,10 @@
 
 #include <Core/Data_Structures/TRIPLE.h>
 #include <Core/Math_Tools/INTERVAL.h>
-#include <map>
 #include "CANONICAL_BLOCK.h"
 #include "CANONICAL_COMPONENT.h"
 #include "COMPONENT_PIPE.h"
+#include <map>
 
 namespace PhysBAM{
 

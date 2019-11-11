@@ -56,7 +56,7 @@ Execute_Main_Program()
     Initialize();
     example.Post_Initialization();
     example.Log_Parameters();
-    if(!example.restart) Write_Output_Files(0);}
+    if(!example.restart) Write_Output_Files();}
     Simulate_To_Frame(example.last_frame);
 }
 //#####################################################################
@@ -70,7 +70,7 @@ Simulate_To_Frame(const int frame_input)
         Preprocess_Frame(current_frame+1);
         Advance_To_Target_Time(example.Time_At_Frame(current_frame+1));
         Postprocess_Frame(++current_frame);
-        if(example.write_output_files && example.write_substeps_level==-1) Write_Output_Files(current_frame);
+        if(example.write_output_files && example.write_substeps_level==-1) Write_Output_Files();
         else if(example.write_substeps_level!=-1)
             PHYSBAM_DEBUG_WRITE_SUBSTEP("END Frame %d",example.write_substeps_level,current_frame);
         LOG::cout<<"TIME = "<<time<<std::endl;}
@@ -97,7 +97,7 @@ Initialize()
 
     if(example.restart){
         LOG::SCOPE scope("reading solids data");
-        example.Read_Output_Files_Solids(example.restart_frame);
+        example.Read_Output_Files_Solids();
         solids_evolution.time=time=example.Time_At_Frame(example.restart_frame);}
 
     solids_evolution.Initialize_Deformable_Objects(example.frame_rate,example.restart);
@@ -286,17 +286,15 @@ Compute_Dt(const T time,const T target_time,bool& done)
 // Function Write_Output_Files
 //#####################################################################
 template<class TV> void SOLIDS_DRIVER<TV>::
-Write_Output_Files(const int frame)
+Write_Output_Files()
 {
     LOG::SCOPE scope("writing output files");
-    Create_Directory(example.output_directory);
-    Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
-    Create_Directory(example.output_directory+"/common");
+    example.viewer_dir.Start_Directory(0,example.frame_title);
+    example.frame_title="";
+    example.Write_Output_Files();
 
-    example.Write_Output_Files(frame);
-
-    Write_Time(frame);
-    Write_Last_Frame(frame);
+    Write_Time();
+    example.viewer_dir.Finish_Directory();
 }
 //#####################################################################
 // Function Preprocess_Frame

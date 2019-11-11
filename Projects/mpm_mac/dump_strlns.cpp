@@ -38,10 +38,10 @@ struct FRAME_DATA
 };
 
 template<typename TV>
-void Read_Output_Files(FRAME_DATA<TV>& fd,const std::string& input,int frame)
+void Read_Output_Files(FRAME_DATA<TV>& fd,const VIEWER_DIR& viewer_dir)
 {
-    Read_From_File(LOG::sprintf("%s/common/grid",input.c_str()),fd.grid);
-    Read_From_File(LOG::sprintf("%s/%d/mac_velocities",input.c_str(),frame),fd.velocity);
+    Read_From_File(viewer_dir.output_directory+"/common/grid",fd.grid);
+    Read_From_File(viewer_dir.current_directory+"/mac_velocities",fd.velocity);
 }
 
 template<class TV>
@@ -334,7 +334,7 @@ void Dump_Streamlines(FRAME_DATA<TV>& fd,T sc,const STYLE<TV>& style)
     while(!q.empty()){
         T c=q.begin()->second;
         Dump_Streamline(fd,c,q,covered,style);}
-    Flush_Frame<TV>("surface");
+    Flush_Frame("surface");
 }
 
 int main(int argc, char* argv[])
@@ -348,9 +348,10 @@ int main(int argc, char* argv[])
     int frame=0;
     T seed_contour=0;
     STYLE<TV> style;
-    std::string input="input",output="output";
-    parse_args.Extra(&input,"input","Input directory");
-    parse_args.Add("-o",&output,"output","Output directory");
+    VIEWER_DIR viewer_in("input");
+    VIEWER_DIR viewer_out("output");
+    parse_args.Extra(&viewer_in.output_directory,"input","Input directory");
+    parse_args.Add("-o",&viewer_out.output_directory,"output","Output directory");
     parse_args.Add("-frame",&frame,"frame","Frame");
     parse_args.Add("-c",&seed_contour,"contour","Starting contour value");
     parse_args.Add("-r",&style.radius,"scale","Contour span radius");
@@ -360,10 +361,13 @@ int main(int argc, char* argv[])
     parse_args.Parse();
 
     FRAME_DATA<TV> fd;
-    Read_Output_Files(fd,input,frame);
-    VIEWER_OUTPUT<TV> vo(STREAM_TYPE(T(0)),fd.grid,output);
-    Create_Directory(output+"/common");
-    Flush_Frame(fd.velocity,"init");
+    viewer_in.Set(frame);
+    Read_Output_Files(fd,viewer_in);
+    VIEWER_OUTPUT vo(STREAM_TYPE(T(0)),viewer_out);
+    Use_Debug_Particles<TV>();
+    vo.Add_Common("grid",fd.grid);
+    vo.Add("mac_velocities",fd.velocity);
+    Flush_Frame("init");
     VECTOR<T,2> r=Compute_Streamline(fd);
     Dump_Streamlines(fd,seed_contour,style);
     return 0;

@@ -14,6 +14,7 @@ namespace PhysBAM{
 template<class TV> class GEOMETRY_PARTICLES;
 template<class TV> class GRID;
 template<class TV> class IMPLICIT_OBJECT;
+class VIEWER_DIR;
 
 template<class TV>
 struct DEBUG_OBJECT
@@ -61,9 +62,10 @@ public:
     T edge_separation;
 
     static DEBUG_PARTICLES<TV>* Store_Debug_Particles(DEBUG_PARTICLES<TV>* particle=0);
-    void Write_Debug_Particles(STREAM_TYPE stream_type,const std::string& output_directory,int frame) const;
+    void Write_Debug_Particles(STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir) const;
     void Clear_Debug_Particles() const;
 };
+template<class TV> DEBUG_PARTICLES<TV>& Get_Debug_Particles();
 template<class TV,class ATTR> void Debug_Particle_Set_Attribute(const std::string& name,const ATTR& attr);
 template<class TV> void Add_Debug_Particle(const TV& X, const VECTOR<typename TV::SCALAR,3>& color);
 template<class TV,int d> inline void Add_Debug_Object(const VECTOR<TV,d>& object,const VECTOR<typename TV::SCALAR,3>& color){Add_Debug_Object(object,color,color);}

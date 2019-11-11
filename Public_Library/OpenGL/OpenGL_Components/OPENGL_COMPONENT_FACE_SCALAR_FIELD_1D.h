@@ -21,25 +21,20 @@ public:
     OPENGL_FACE_SCALAR_FIELD_1D<T,T2> opengl_face_scalar_field;
 private:
     std::string values_filename;
-    int frame_loaded;
     bool valid;
 
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
-    using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_OBJECT<T>::viewer_callbacks;
-    OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D(const GRID<TV> &grid_input,const std::string &values_filename_input,OPENGL_COLOR point_color,OPENGL_COLOR line_color);
+    using OPENGL_COMPONENT<T>::component_name;
+    using OPENGL_COMPONENT<T>::viewer_dir;using OPENGL_OBJECT<T>::viewer_callbacks;
+    OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D(const VIEWER_DIR& viewer_dir,const GRID<TV> &grid_input,const std::string &values_filename_input,OPENGL_COLOR point_color,OPENGL_COLOR line_color);
     virtual ~OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D();
-
-    bool Is_Up_To_Date(int frame) const override
-    {return valid && frame_loaded==frame;}
 
     bool Use_Bounding_Box() const override
     {return draw && valid;}
 
 //#####################################################################
-    bool Valid_Frame(int frame_input) const override;
-    void Set_Frame(int frame_input) override;
+    void Set_Frame() override;
     void Set_Draw(bool draw_input = true) override;
     void Display() const override;
     void Print_Selection_Info(std::ostream& stream) const override;

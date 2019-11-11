@@ -16,6 +16,7 @@
 #include <Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{
 class SEGMENT_MESH;
+class VIEWER_DIR;
 
 template<class TV>
 class SEGMENT_ADHESION_SPRING_STATE
@@ -92,8 +93,8 @@ public:
 //#####################################################################
     void Update_Hierarchy();
     void Update_Springs(const bool search_hierarchy);
-    void Update_Collisions_List();
-    void Update_Partitions(bool restart,MPI_SOLIDS<TV>* mpi_solids,const std::string output_directory);
+    void Update_Collisions_List(); 
+    void Update_Partitions(bool restart,MPI_SOLIDS<TV>* mpi_solids,const VIEWER_DIR& viewer_dir);
     void Set_Parameters(const T youngs_modulus_input,const T overdamping_fraction_input,const T on_distance,const T off_distance, const int max_connections_input);
     void Set_Restlength(const T restlength);
     void Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids) override;

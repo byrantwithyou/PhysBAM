@@ -23,7 +23,7 @@ class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D:public OPENGL_COMPONENT<T>
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
-    using OPENGL_COMPONENT<T>::World_Space_Box;using OPENGL_COMPONENT<T>::is_animation;
+    using OPENGL_COMPONENT<T>::World_Space_Box;using OPENGL_COMPONENT<T>::viewer_dir;
     using OPENGL_COMPONENT<T>::viewer_callbacks;
     GRID<TV> grid,mac_grid,u_grid,v_grid,w_grid;
     ARRAY<VECTOR<bool,3>,VECTOR<int,3> > node_neighbors_visible;
@@ -36,19 +36,15 @@ private:
 public:
     OPENGL_SCALAR_FIELD_3D<T,bool> opengl_density_valid_mask;
 private:
-    std::string directory;
-    int frame_loaded;
     bool valid;
     bool draw_density_valid_mask;
     bool draw_node_neighbors_visible;
     bool draw_face_corners_visible;
 
 public:
-    OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D(const GRID<TV> &grid,const std::string& directory);
+    OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D(const VIEWER_DIR& viewer_dir,const GRID<TV> &grid);
     
-    bool Valid_Frame(int frame_input) const override;
-    bool Is_Up_To_Date(int frame) const override { return valid && frame_loaded == frame; }
-    void Set_Frame(int frame_input) override;
+    void Set_Frame() override;
     void Set_Draw(bool draw_input = true) override;
     void Display() const override;
     bool Use_Bounding_Box() const override { return draw && valid; }
@@ -60,7 +56,7 @@ public:
     void Toggle_Draw_Density_Valid_Mask();
 
 private:
-    void Reinitialize(bool force=false);
+    void Reinitialize();
 };
 }
 #endif

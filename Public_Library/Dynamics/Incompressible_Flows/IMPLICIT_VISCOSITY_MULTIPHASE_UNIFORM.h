@@ -16,6 +16,7 @@ template<class T> class MPI_UNIFORM_GRID;
 template<class TV> class POISSON_COLLIDABLE_UNIFORM;
 template<class T_LAPLACE> class HEAT_LAPLACE;
 template<class TV> class PROJECTION_DYNAMICS_UNIFORM;
+class VIEWER_DIR;
 
 template<class TV>
 class IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM:public IMPLICIT_VISCOSITY_UNIFORM<TV>
@@ -42,7 +43,7 @@ private:
     void Setup_Viscosity(const T dt) override;
     void Setup_Boundary_Conditions(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities) override;
     void Calculate_Velocity_Jump();
-    void Debug_Write(const std::string& output_directory_input);
+    void Debug_Write(const VIEWER_DIR& viewer_dir);
 //#####################################################################
 };
 }

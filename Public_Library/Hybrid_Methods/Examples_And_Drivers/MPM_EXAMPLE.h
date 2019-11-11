@@ -6,6 +6,7 @@
 #define __MPM_EXAMPLE__
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Matrices/MATRIX.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
@@ -62,7 +63,7 @@ public:
     std::string frame_title;
     int write_substeps_level=-1;
     int substeps_delay_frame=-1;
-    std::string output_directory="output";
+    VIEWER_DIR viewer_dir{"output"};
     std::string data_directory="../../Public_Data";
     std::string test_output_prefix;
     bool use_test_output=false;
@@ -114,13 +115,13 @@ public:
     void operator=(const MPM_EXAMPLE&) = delete;
     virtual ~MPM_EXAMPLE();
     
-    virtual void Write_Output_Files(const int frame) final;
-    virtual void Read_Output_Files(const int frame) final;
+    virtual void Write_Output_Files() final;
+    virtual void Read_Output_Files() final;
     virtual void Initialize()=0;
     ARRAY<std::function<void(int frame)> > begin_frame;
     ARRAY<std::function<void(int frame)> > end_frame;
-    ARRAY<std::function<void(int frame)> > write_output_files;
-    ARRAY<std::function<void(int frame)> > read_output_files;
+    ARRAY<std::function<void()> > write_output_files;
+    ARRAY<std::function<void()> > read_output_files;
 
     void Capture_Stress();
     void Precompute_Forces(const T time,const T dt,const bool update_hessian);

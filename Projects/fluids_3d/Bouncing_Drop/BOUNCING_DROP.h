@@ -25,7 +25,7 @@ public:
         write_levelset=true;write_velocity=true;write_particles=true;write_removed_positive_particles=false;write_removed_negative_particles=false;
         write_debug_data=true;
         if(!this->user_output_directory)
-            output_directory="Bouncing_Drop/output2";
+            viewer_dir.output_directory="Bouncing_Drop/output2";
         delete_fluid_inside_objects=true;
         enforce_divergence_free_extrapolation=false;
 

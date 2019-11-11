@@ -16,7 +16,6 @@
 #include <Grid_PDE/Boundaries/BOUNDARY_MPI.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
-#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
@@ -54,7 +53,7 @@ using namespace PhysBAM;
 template<class TV> SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::
 SOLIDS_FLUIDS_EXAMPLE_UNIFORM(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args,const int number_of_regions,const typename FLUIDS_PARAMETERS<TV>::TYPE type)
     :SOLIDS_FLUIDS_EXAMPLE<TV>(stream_type,parse_args),fluids_parameters(number_of_regions,type),fluid_collection(*fluids_parameters.grid),resolution(8),
-    debug_particles(*new DEBUG_PARTICLES<TV>),opt_skip_debug_data(false)
+    opt_skip_debug_data(false)
 {
     parse_args.Add("-skip_debug_data",&opt_skip_debug_data,"turn off file io for debug data");
     parse_args.Add("-use_fmm_extrapolation",&fluids_parameters.euler_solid_fluid_coupling_utilities->use_fast_marching,
@@ -70,7 +69,6 @@ template<class TV> SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::
 ~SOLIDS_FLUIDS_EXAMPLE_UNIFORM()
 {
     if(dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>*>(solids_evolution)) fluids_parameters.projection=0;
-    delete &debug_particles;
 }
 //#####################################################################
 // Function Add_Volumetric_Body_To_Fluid_Simulation
@@ -496,11 +494,10 @@ Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const
 // Function Read_Output_Files_Fluids
 //#####################################################################
 template<class TV> void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::
-Read_Output_Files_Fluids(const int frame)
+Read_Output_Files_Fluids()
 {
-    fluids_parameters.Read_Output_Files(output_directory,frame);
-    fluid_collection.Read_Output_Files(output_directory,frame);
-    std::string f=LOG::sprintf("%d",frame);
+    fluids_parameters.Read_Output_Files(viewer_dir);
+    fluid_collection.Read_Output_Files(viewer_dir);
     if(fluids_parameters.smoke||fluids_parameters.fire||fluids_parameters.water){
         if(fluids_parameters.solid_affects_fluid && fluids_parameters.fluid_affects_solid){std::string filename;
             /*
@@ -529,10 +526,10 @@ Read_Output_Files_Fluids(const int frame)
 // Function Write_Output_Files
 //#####################################################################
 template<class TV> void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::
-Write_Output_Files(const int frame) const
+Write_Output_Files() const
 {
     if(this->use_test_output){
-        std::string file=LOG::sprintf("%s/%s-%03d.txt",output_directory.c_str(),this->test_output_prefix.c_str(),frame);
+        std::string file=LOG::sprintf("%s/%s-%03d.txt",viewer_dir.output_directory.c_str(),this->test_output_prefix.c_str(),viewer_dir.frame_stack(0));
         OCTAVE_OUTPUT<T> oo(file.c_str());
         if(solid_body_collection.deformable_body_collection.particles.X.m){
             oo.Write("db_X",solid_body_collection.deformable_body_collection.particles.X.Flattened());
@@ -548,34 +545,27 @@ Write_Output_Files(const int frame) const
         if(fluids_parameters.euler) oo.Write("cf_U",fluids_parameters.euler->U.array.Flattened());}
 
 
-    Create_Directory(output_directory);
-    std::string f=LOG::sprintf("%d",frame);
-    Create_Directory(output_directory+"/"+f);
-    Create_Directory(output_directory+"/common");
-    Write_Frame_Title(frame);
-    debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
-    solid_body_collection.Write(stream_type,output_directory,frame,solids_parameters.write_static_variables_every_frame,
-        solids_parameters.rigid_body_evolution_parameters.write_rigid_bodies,solids_parameters.write_deformable_body,solids_parameters.write_from_every_process,
-        solids_parameters.triangle_collision_parameters.output_interaction_pairs);
+    solid_body_collection.Write(stream_type,viewer_dir,solids_parameters.write_static_variables_every_frame,
+        solids_parameters.write_from_every_process);
     if(NEWMARK_EVOLUTION<TV>* newmark=dynamic_cast<NEWMARK_EVOLUTION<TV>*>(solids_evolution))
-        newmark->Write_Position_Update_Projection_Data(stream_type,output_directory+"/"+f+"/");
+        newmark->Write_Position_Update_Projection_Data(stream_type,viewer_dir.current_directory+"/");
     
-    fluids_parameters.Write_Output_Files(stream_type,output_directory,frame);
-    if(fluids_parameters.incompressible) fluid_collection.Write_Output_Files(stream_type,output_directory,frame);
+    fluids_parameters.Write_Output_Files(stream_type,viewer_dir);
+    if(fluids_parameters.incompressible) fluid_collection.Write_Output_Files(stream_type,viewer_dir);
     if(fluids_parameters.smoke||fluids_parameters.fire||fluids_parameters.water){
         if(fluids_parameters.solid_affects_fluid && fluids_parameters.fluid_affects_solid){
             if(fluids_parameters.write_debug_data){
                 /*
-                Write_To_File(stream_type,output_directory+"/thin_shells_grid_visibility."+f,fluids_parameters.collision_bodies_affecting_fluid->cell_neighbors_visible,
+                Write_To_File(stream_type,viewer_dir.output_directory+"/thin_shells_grid_visibility."+f,fluids_parameters.collision_bodies_affecting_fluid->cell_neighbors_visible,
                     fluids_parameters.collision_bodies_affecting_fluid->face_corners_visible_from_face_center);
                 if(fluids_parameters.smoke && fluids_parameters.use_density && fluids_parameters.semi_lagrangian_collidable_density.use_valid_mask)
-                    Write_To_File(stream_type,output_directory+"/density_valid_mask."+f,fluids_parameters.semi_lagrangian_collidable_density.valid_points_current);
+                    Write_To_File(stream_type,viewer_dir.output_directory+"/density_valid_mask."+f,fluids_parameters.semi_lagrangian_collidable_density.valid_points_current);
                 if(fluids_parameters.smoke && fluids_parameters.use_temperature && fluids_parameters.semi_lagrangian_collidable_temperature.use_valid_mask)
-                    Write_To_File(stream_type,output_directory+"/temperature_valid_mask."+f,fluids_parameters.semi_lagrangian_collidable_temperature.valid_points_current);
-                if(fluids_parameters.semi_lagrangian_collidable_velocity.use_valid_mask) Write_To_File(stream_type,output_directory+"/velocity_valid_mask."+f,
+                    Write_To_File(stream_type,viewer_dir.output_directory+"/temperature_valid_mask."+f,fluids_parameters.semi_lagrangian_collidable_temperature.valid_points_current);
+                if(fluids_parameters.semi_lagrangian_collidable_velocity.use_valid_mask) Write_To_File(stream_type,viewer_dir.output_directory+"/velocity_valid_mask."+f,
                     fluids_parameters.semi_lagrangian_collidable_velocity.valid_points_current);
                 if((fluids_parameters.water || fluids_parameters.fire) && fluids_parameters.semi_lagrangian_collidable_phi.use_valid_mask)
-                    Write_To_File(stream_type,output_directory+"/phi_valid_mask."+f,fluids_parameters.semi_lagrangian_collidable_phi.valid_points_current);*/}}}
+                    Write_To_File(stream_type,viewer_dir.output_directory+"/phi_valid_mask."+f,fluids_parameters.semi_lagrangian_collidable_phi.valid_points_current);*/}}}
 }
 //#####################################################################
 // Function Log_Parameters 
@@ -602,13 +592,13 @@ template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Get_Object_Veloci
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Initialize_Swept_Occupied_Blocks_For_Advection(float,float,float,bool);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Log_Parameters() const;
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Read_Output_Files_Fluids(int);
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Read_Output_Files_Fluids();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Revalidate_Fluid_Scalars();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Revalidate_Fluid_Velocity(ARRAY<float,FACE_INDEX<2> >&);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Revalidate_Phi_After_Modify_Levelset();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Set_Dirichlet_Boundary_Conditions(float);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Set_Ghost_Density_And_Temperature_Inside_Flame_Core();
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Write_Output_Files(int) const;
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Write_Output_Files() const;
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<VECTOR<float,3> >&,PARTICLE_LEVELSET_PARTICLE_TYPE,float);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Get_Levelset_Velocity(GRID<VECTOR<float,3> > const&,LEVELSET_MULTIPLE<VECTOR<float,3> >&,ARRAY<float,FACE_INDEX<3> >&,float) const;
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Get_Object_Velocities(LAPLACE_UNIFORM<VECTOR<float,3> >*,ARRAY<float,FACE_INDEX<3> >&,float,float);
@@ -618,14 +608,14 @@ template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Initialize_Solid_
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Initialize_Swept_Occupied_Blocks_For_Advection(float,float,float,bool);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Log_Parameters() const;
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Read_Output_Files_Fluids(int);
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Read_Output_Files_Fluids();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Revalidate_Fluid_Scalars();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Revalidate_Fluid_Velocity(ARRAY<float,FACE_INDEX<3> >&);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Revalidate_Phi_After_Modify_Levelset();
 template SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::SOLIDS_FLUIDS_EXAMPLE_UNIFORM(STREAM_TYPE,PARSE_ARGS&,int,FLUIDS_PARAMETERS<VECTOR<float,3> >::TYPE);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Set_Dirichlet_Boundary_Conditions(float);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Set_Ghost_Density_And_Temperature_Inside_Flame_Core();
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Write_Output_Files(int) const;
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::Write_Output_Files() const;
 template SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,3> >::~SOLIDS_FLUIDS_EXAMPLE_UNIFORM();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Add_To_Fluid_Simulation(DEFORMABLE_OBJECT_FLUID_COLLISIONS<VECTOR<float,2> >&,bool,bool);
 template SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::SOLIDS_FLUIDS_EXAMPLE_UNIFORM(STREAM_TYPE,PARSE_ARGS&,int,FLUIDS_PARAMETERS<VECTOR<float,2> >::TYPE);
@@ -643,11 +633,11 @@ template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::Initialize_MPI();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::Initialize_Solid_Fluid_Coupling_After_Grid_Initialization();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::Log_Parameters() const;
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::Read_Output_Files_Fluids(int);
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::Read_Output_Files_Fluids();
 template SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::SOLIDS_FLUIDS_EXAMPLE_UNIFORM(STREAM_TYPE,PARSE_ARGS&,int,FLUIDS_PARAMETERS<VECTOR<float,1> >::TYPE);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::Set_Dirichlet_Boundary_Conditions(float);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::Set_Ghost_Density_And_Temperature_Inside_Flame_Core();
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::Write_Output_Files(int) const;
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::Write_Output_Files() const;
 template SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,1> >::~SOLIDS_FLUIDS_EXAMPLE_UNIFORM();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Add_Thin_Shell_To_Fluid_Simulation(RIGID_BODY<VECTOR<float,2> >&,bool,bool);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<float,2> >::Add_Volumetric_Body_To_Fluid_Simulation(RIGID_BODY<VECTOR<float,2> >&,bool,bool);
@@ -676,13 +666,13 @@ template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Get_Object_Veloc
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Initialize_Swept_Occupied_Blocks_For_Advection(double,double,double,bool);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Log_Parameters() const;
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Read_Output_Files_Fluids(int);
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Read_Output_Files_Fluids();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Revalidate_Fluid_Scalars();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Revalidate_Fluid_Velocity(ARRAY<double,FACE_INDEX<2> >&);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Revalidate_Phi_After_Modify_Levelset();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Set_Dirichlet_Boundary_Conditions(double);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Set_Ghost_Density_And_Temperature_Inside_Flame_Core();
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Write_Output_Files(int) const;
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Write_Output_Files() const;
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<VECTOR<double,3> >&,PARTICLE_LEVELSET_PARTICLE_TYPE,double);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Get_Levelset_Velocity(GRID<VECTOR<double,3> > const&,LEVELSET_MULTIPLE<VECTOR<double,3> >&,ARRAY<double,FACE_INDEX<3> >&,double) const;
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Get_Object_Velocities(LAPLACE_UNIFORM<VECTOR<double,3> >*,ARRAY<double,FACE_INDEX<3> >&,double,double);
@@ -692,14 +682,14 @@ template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Initialize_Solid
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Initialize_Swept_Occupied_Blocks_For_Advection(double,double,double,bool);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Log_Parameters() const;
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Read_Output_Files_Fluids(int);
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Read_Output_Files_Fluids();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Revalidate_Fluid_Scalars();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Revalidate_Fluid_Velocity(ARRAY<double,FACE_INDEX<3> >&);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Revalidate_Phi_After_Modify_Levelset();
 template SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::SOLIDS_FLUIDS_EXAMPLE_UNIFORM(STREAM_TYPE,PARSE_ARGS&,int,FLUIDS_PARAMETERS<VECTOR<double,3> >::TYPE);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Set_Dirichlet_Boundary_Conditions(double);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Set_Ghost_Density_And_Temperature_Inside_Flame_Core();
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Write_Output_Files(int) const;
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::Write_Output_Files() const;
 template SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,3> >::~SOLIDS_FLUIDS_EXAMPLE_UNIFORM();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Add_To_Fluid_Simulation(DEFORMABLE_OBJECT_FLUID_COLLISIONS<VECTOR<double,2> >&,bool,bool);
 template SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::SOLIDS_FLUIDS_EXAMPLE_UNIFORM(STREAM_TYPE,PARSE_ARGS&,int,FLUIDS_PARAMETERS<VECTOR<double,2> >::TYPE);
@@ -720,11 +710,11 @@ template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::Initialize_MPI()
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::Initialize_Solid_Fluid_Coupling_After_Grid_Initialization();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::Log_Parameters() const;
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::Read_Output_Files_Fluids(int);
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::Read_Output_Files_Fluids();
 template SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::SOLIDS_FLUIDS_EXAMPLE_UNIFORM(STREAM_TYPE,PARSE_ARGS&,int,FLUIDS_PARAMETERS<VECTOR<double,1> >::TYPE);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::Set_Dirichlet_Boundary_Conditions(double);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::Set_Ghost_Density_And_Temperature_Inside_Flame_Core();
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::Write_Output_Files(int) const;
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::Write_Output_Files() const;
 template SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,1> >::~SOLIDS_FLUIDS_EXAMPLE_UNIFORM();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Add_Thin_Shell_To_Fluid_Simulation(RIGID_BODY<VECTOR<double,2> >&,bool,bool);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<double,2> >::Add_Volumetric_Body_To_Fluid_Simulation(RIGID_BODY<VECTOR<double,2> >&,bool,bool);

@@ -12,6 +12,7 @@
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Grid_PDE/Poisson/PROJECTION_UNIFORM.h>
+#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Rigids/Standard_Tests/RIGIDS_STANDARD_TESTS.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
@@ -24,7 +25,7 @@ class FLOW_PAST_CIRCLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T,2> >
 public:
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::last_frame;using BASE::frame_rate;using BASE::write_output_files;
-    using BASE::output_directory;using BASE::data_directory;using BASE::stream_type;using BASE::fluid_collection;using BASE::solid_body_collection;using BASE::resolution;
+    using BASE::viewer_dir;using BASE::data_directory;using BASE::stream_type;using BASE::fluid_collection;using BASE::solid_body_collection;using BASE::resolution;
     using BASE::Mark_Outside;using BASE::Get_Boundary_Along_Ray;
 
     RIGIDS_STANDARD_TESTS<TV> solids_tests;
@@ -33,7 +34,6 @@ public:
     ARRAY<T,TV_INT> phi_object;
     LEVELSET<TV> levelset_object;
     SPHERE<TV> circle;
-    GEOMETRY_PARTICLES<TV> debug_particles;
     ARRAY<TV> sample_points;
     bool shed,opt_enlarge;
     
@@ -58,8 +58,7 @@ public:
         sample_points.Append(TV(2,3));
 
         if(!this->user_output_directory)
-            output_directory="Flow_Past_Circle/output";
-        debug_particles.template Add_Array<VECTOR<T,3> >("color");
+            viewer_dir.output_directory="Flow_Past_Circle/output";
 
         parse_args.Add("-viscosity",&fluids_parameters.viscosity,"value","viscosity");
         parse_args.Add("-enlarge",&opt_enlarge,"value","Enlarge");
@@ -130,14 +129,6 @@ void Set_Dirichlet_Boundary_Conditions(const T time) override
 //#####################################################################
 void Postprocess_Frame(const int frame) override
 {
-    if(debug_particles.Size()){
-        Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),frame));
-        Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles);
-        debug_particles.Delete_All_Elements();}
-    if(frame==1){
-        Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),0));
-        Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",output_directory.c_str(),0),debug_particles);}
-
     ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
     LINEAR_INTERPOLATION_UNIFORM<TV,T> interp;
     for(int i=0;i<sample_points.m;i++){
@@ -187,19 +178,15 @@ typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE Get_Boundary_Along_Ray(cons
 
     static VECTOR<T,3> color_map[]={VECTOR<T,3>(1,0,0),VECTOR<T,3>(1,.5,0),VECTOR<T,3>(1,0,1),VECTOR<T,3>(0,.5,0),VECTOR<T,3>(0,1,1),VECTOR<T,3>(1,1,0)};
 
-    if(ARRAY_VIEW<VECTOR<T,3> >* color_attribute=debug_particles.template Get_Array<VECTOR<T,3> >("color")){
-        int p=debug_particles.Add_Element();
-        debug_particles.X(p)=X0+theta*(X1-X0);
-        (*color_attribute)(p)=color_map[type];}
-
+    Add_Debug_Particle(X0+theta*(X1-X0),color_map[type]);
     return type;
 }
 //#####################################################################
 // Function Write_Output_Files
 //#####################################################################
-void Write_Output_Files(const int frame) const override
+void Write_Output_Files() const override
 {
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Write_Output_Files(frame);
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::Write_Output_Files();
     ARRAY<T,FACE_INDEX<2> > face_velocities_ghost(*fluids_parameters.grid,3,no_init);
     fluids_parameters.incompressible->boundary->Fill_Ghost_Faces(*fluids_parameters.grid,fluid_collection.incompressible_fluid_collection.face_velocities,face_velocities_ghost,0,3);
     ARRAY<VECTOR<T,1>,TV_INT> grid_vorticity(fluids_parameters.grid->Domain_Indices(3),no_init);
@@ -207,7 +194,7 @@ void Write_Output_Files(const int frame) const override
     VORTICITY_UNIFORM<TV>::Vorticity(*fluids_parameters.grid,FACE_LOOKUP_UNIFORM<TV>(face_velocities_ghost),grid_vorticity,grid_vorticity_magnitude);
     //CELL_ITERATOR<TV> fuckyou(*fluids_parameters.grid,3,GRID<TV>::GHOST_REGION);
     for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid,3,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next()) grid_vorticity(iterator.Cell_Index())=VECTOR<T,1>();
-    Write_To_File(stream_type,LOG::sprintf("%s/grid_vorticity.%d",output_directory.c_str(),frame),grid_vorticity);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/grid_vorticity",grid_vorticity);
 }
 //#####################################################################
 };

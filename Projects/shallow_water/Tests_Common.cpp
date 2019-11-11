@@ -23,7 +23,7 @@ Setup_Common(SHALLOW_WATER_STATE<TV>& st,PARSE_ARGS& parse_args,COMMON_DATA<TV>&
     parse_args.Add("-substeps_delay",&st.substeps_delay_frame,"frame","delay substeps until after this frame");
     parse_args.Add("-last_frame",&st.last_frame,&cd.user_last_frame,"frame","number of frames to simulate");
     parse_args.Add("-threads",&cd.threads,"threads","Number of threads");
-    parse_args.Add("-o",&st.output_directory,"dir","Output directory");
+    parse_args.Add("-o",&st.viewer_dir.output_directory,"dir","Output directory");
     parse_args.Add("-framerate",&framerate,"rate","Number of frames per second");
     parse_args.Add("-min_dt",&st.min_dt,"dt","Minimum time step size");
     parse_args.Add("-max_dt",&st.max_dt,"dt","Maximum time step size");

@@ -21,6 +21,7 @@ template<class TV> class RIGID_BODY_CLUSTER_BINDINGS;
 template<class TV> class DEFORMABLES_FORCES;
 template<class TV> class RIGIDS_FORCES;
 template<class TV> class GENERALIZED_VELOCITY;
+class VIEWER_DIR;
 
 template<class TV>
 class SOLID_BODY_COLLECTION
@@ -98,10 +99,9 @@ public:
     void Compute_Energy(const T time,T& kinetic_energy,T& potential_energy) const;
     TV Compute_Momentum() const;
     void Print_Energy(const T time,const int step) const;
-    void Read(const std::string& prefix,const int frame,const int static_frame,const bool include_static_variables,const bool read_rigid_body,
-        const bool read_deformable_body,const bool read_from_every_process,ARRAY<int>* needs_init=0,ARRAY<int>* needs_destroy=0);
-    void Write(const STREAM_TYPE stream_type,const std::string& prefix,const int frame,const bool include_static_variables,const bool write_rigid_body,
-        const bool write_deformable_body,const bool write_from_every_process,const bool output_interaction_pairs) const;
+    void Read(const VIEWER_DIR& viewer_dir,const bool static_variables_every_frame=false,
+        ARRAY<int>* needs_init=0,ARRAY<int>* needs_destroy=0);
+    void Write(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir,const bool static_variables_every_frame=false,const bool write_from_every_process=true) const;
     GENERALIZED_VELOCITY<TV>& New_Generalized_Velocity() const;
 //#####################################################################
 };

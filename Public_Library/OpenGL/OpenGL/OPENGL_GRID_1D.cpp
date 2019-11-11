@@ -55,10 +55,8 @@ Display() const
 // Function Set_Frame
 //#####################################################################
 template<class T> void OPENGL_GRID_1D<T>::
-Set_Frame(int frame_input)
+Set_Frame()
 {
-    frame=frame_input;
-    return;
 }
 //#####################################################################
 // Function Bounding_Box

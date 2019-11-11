@@ -3,11 +3,11 @@
 #include <Core/Vectors/VECTOR.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Geometry/Basic_Geometry/TRIANGLE_2D.h>
+#include "DOUBLE_ERROR.h"
 #include <algorithm>
 #include <ctime>
 #include <functional>
 #include <string>
-#include "DOUBLE_ERROR.h"
 
 using namespace PhysBAM;
 

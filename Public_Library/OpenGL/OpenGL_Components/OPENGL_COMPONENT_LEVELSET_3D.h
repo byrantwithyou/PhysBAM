@@ -20,9 +20,10 @@ class OPENGL_COMPONENT_LEVELSET_3D:public OPENGL_COMPONENT<T>,public OPENGL_GRID
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
-    using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_COMPONENT<T>::Is_Up_To_Date;using OPENGL_OBJECT<T>::viewer_callbacks;
-    OPENGL_COMPONENT_LEVELSET_3D(const std::string& levelset_filename,
+    using OPENGL_COMPONENT<T>::component_name;
+    using OPENGL_OBJECT<T>::viewer_callbacks;using OPENGL_COMPONENT<T>::viewer_dir;
+    OPENGL_COMPONENT_LEVELSET_3D(const VIEWER_DIR& viewer_dir,
+        const std::string& levelset_filename,
                                  const std::string& triangulated_surface_filename = "",
                                  const std::string& filename_set_input = "",
                                  const std::string& filename_triangulated_surface_set_input = "",
@@ -37,8 +38,6 @@ public:
     void Set_Slice_Color(const OPENGL_COLOR &inside_slice_color,
                          const OPENGL_COLOR &outside_slice_color);
 
-    bool Valid_Frame(int frame_input) const override;
-
     void Display() const override;
     virtual RANGE<TV> Bounding_Box() const override;
     void Print_Cell_Selection_Info(std::ostream& stream,const TV_INT& cell) const override;
@@ -47,7 +46,7 @@ public:
     void Turn_Smooth_Shading_Off() override;
     virtual void Slice_Has_Changed() override;
 
-    void Set_Frame(int frame_input) override;
+    void Set_Frame() override;
     void Set_Draw(bool draw_input = true) override;
     bool Use_Sets() const {return use_sets;}
 
@@ -72,7 +71,6 @@ private:
     std::string filename_set;
     std::string filename_triangulated_surface_set;
     bool write_generated_triangulated_surface;
-    int frame_loaded;
     bool check_triangulated_surface_file_time;
     int set;
     int set_loaded;

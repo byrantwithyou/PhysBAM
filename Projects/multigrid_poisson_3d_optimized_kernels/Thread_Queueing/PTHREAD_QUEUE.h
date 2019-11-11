@@ -4,8 +4,8 @@
 //#####################################################################
 #ifndef __PTHREAD_QUEUE__
 #define __PTHREAD_QUEUE__
-#include <iostream>
 #include "POINTER_QUEUE.h"
+#include <iostream>
 #include <pthread.h>
 namespace PhysBAM{
 

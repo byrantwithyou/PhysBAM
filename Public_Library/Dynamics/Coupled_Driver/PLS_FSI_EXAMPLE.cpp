@@ -272,20 +272,19 @@ Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const
 // Function Read_Output_Files_Fluids
 //#####################################################################
 template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
-Read_Output_Files_Fluids(const int frame)
+Read_Output_Files_Fluids()
 {
-    fluids_parameters.Read_Output_Files(output_directory,frame);
-    fluid_collection.Read_Output_Files(output_directory,frame);
-    std::string f=LOG::sprintf("%d",frame);
+    fluids_parameters.Read_Output_Files(viewer_dir);
+    fluid_collection.Read_Output_Files(viewer_dir);
 }
 //#####################################################################
 // Function Write_Output_Files
 //#####################################################################
 template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
-Write_Output_Files(const int frame) const
+Write_Output_Files() const
 {
     if(this->use_test_output){
-        std::string file=LOG::sprintf("%s/%s-%03d.txt",output_directory.c_str(),this->test_output_prefix.c_str(),frame);
+        std::string file=LOG::sprintf("%s/%s-%03d.txt",viewer_dir.output_directory.c_str(),this->test_output_prefix.c_str(),viewer_dir.frame_stack(0));
         OCTAVE_OUTPUT<T> oo(file.c_str());
         if(solid_body_collection.deformable_body_collection.particles.X.m){
             oo.Write("db_X",solid_body_collection.deformable_body_collection.particles.X.Flattened());
@@ -300,19 +299,13 @@ Write_Output_Files(const int frame) const
             oo.Write("if_u",fluid_collection.incompressible_fluid_collection.face_velocities.array);
         if(fluids_parameters.euler) oo.Write("cf_U",fluids_parameters.euler->U.array.Flattened());}
 
-    Create_Directory(output_directory);
-    std::string f=LOG::sprintf("%d",frame);
-    Create_Directory(output_directory+"/"+f);
-    Create_Directory(output_directory+"/common");
-    Write_Frame_Title(frame);
-    solid_body_collection.Write(stream_type,output_directory,frame,solids_parameters.write_static_variables_every_frame,
-        solids_parameters.rigid_body_evolution_parameters.write_rigid_bodies,solids_parameters.write_deformable_body,solids_parameters.write_from_every_process,
-        solids_parameters.triangle_collision_parameters.output_interaction_pairs);
+    solid_body_collection.Write(stream_type,viewer_dir,solids_parameters.write_static_variables_every_frame,
+        solids_parameters.write_from_every_process);
     if(NEWMARK_EVOLUTION<TV>* newmark=dynamic_cast<NEWMARK_EVOLUTION<TV>*>(solids_evolution))
-        newmark->Write_Position_Update_Projection_Data(stream_type,output_directory+"/"+f+"/");
+        newmark->Write_Position_Update_Projection_Data(stream_type,viewer_dir.current_directory+"/");
     
-    fluids_parameters.Write_Output_Files(stream_type,output_directory,frame);
-    fluid_collection.Write_Output_Files(stream_type,output_directory,frame);
+    fluids_parameters.Write_Output_Files(stream_type,viewer_dir);
+    fluid_collection.Write_Output_Files(stream_type,viewer_dir);
 }
 //#####################################################################
 // Function Log_Parameters 
@@ -329,13 +322,9 @@ Log_Parameters() const
 // Function Read_Output_Files_Solids
 //#####################################################################
 template<class TV_input> void PLS_FSI_EXAMPLE<TV_input>::
-Read_Output_Files_Solids(const int frame)
+Read_Output_Files_Solids()
 {
-    solid_body_collection.Read(output_directory,frame,frame,solids_parameters.write_static_variables_every_frame,solids_parameters.rigid_body_evolution_parameters.write_rigid_bodies,
-        solids_parameters.write_deformable_body,solids_parameters.write_from_every_process);
-    std::string f=LOG::sprintf("%d",frame);
-    //if(NEWMARK_EVOLUTION<TV>* newmark=dynamic_cast<NEWMARK_EVOLUTION<TV>*>(solids_evolution))
-    //    newmark->Read_Position_Update_Projection_Data(stream_type,output_directory+"/"+f+"/");
+    solid_body_collection.Read(viewer_dir,solids_parameters.write_static_variables_every_frame);
 }
 //#####################################################################
 // Function Adjust_Particle_For_Domain_Boundaries

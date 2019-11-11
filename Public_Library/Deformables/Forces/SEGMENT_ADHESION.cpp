@@ -10,6 +10,7 @@
 #include <Core/Log/SCOPE.h>
 #include <Core/Math_Tools/RANGE.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Core/Vectors/VECTOR_2D.h>
 #include <Core/Vectors/VECTOR_3D.h>
 #include <Geometry/Basic_Geometry/SEGMENT_3D.h>
@@ -276,7 +277,7 @@ Update_Collisions_List()
 // Function Update_Partitions
 //#####################################################################
 template<class TV> void SEGMENT_ADHESION<TV>::
-Update_Partitions(bool restart,MPI_SOLIDS<TV>* mpi_solids,const std::string output_directory)
+Update_Partitions(bool restart,MPI_SOLIDS<TV>* mpi_solids,const VIEWER_DIR& viewer_dir)
 {
     this->mpi_solids=mpi_solids;
     if(mpi_solids) for(int i=0;i<mesh.elements.m;i++){
@@ -291,7 +292,7 @@ Update_Partitions(bool restart,MPI_SOLIDS<TV>* mpi_solids,const std::string outp
 
     // Cull hairs that are close at beginning
     if(restart){
-        Read_From_File(output_directory+"/adhesion_existing",existing_pairs); // TODO: use real output_directory
+        Read_From_File(viewer_dir.output_directory+"/adhesion_existing",existing_pairs); // TODO: use real output_directory
         restart=false;}
     else{
         Update_Hierarchy();
@@ -299,7 +300,7 @@ Update_Partitions(bool restart,MPI_SOLIDS<TV>* mpi_solids,const std::string outp
         EDGE_EDGE_INITIAL_CULL_VISITOR<TV> external_visitor(*this,internal_segment_indices,external_segment_indices);
         internal_curve.hierarchy->Intersection_List(*internal_curve.hierarchy,internal_visitor,0);
         if(mpi_solids) internal_curve.hierarchy->Intersection_List(*external_curve.hierarchy,external_visitor,0);
-        Write_To_File<float>(output_directory+"/adhesion_existing",existing_pairs);} // TODO: use real output_directory
+        Write_To_File<float>(viewer_dir.output_directory+"/adhesion_existing",existing_pairs);} // TODO: use real output_directory
 }
 //#####################################################################
 // Function Update_Springs

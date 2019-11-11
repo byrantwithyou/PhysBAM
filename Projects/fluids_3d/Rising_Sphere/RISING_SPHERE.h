@@ -40,7 +40,7 @@ public:
         write_levelset=true;write_velocity=true;write_removed_positive_particles=true;write_removed_negative_particles=true;write_particles=true;
         matlab_directory="RISING_SPHERE/matlab";
         if(!this->user_output_directory)
-            output_directory="RISING_SPHERE/output";
+            viewer_dir.output_directory="RISING_SPHERE/output";
     }
 
     ~RISING_SPHERE() 

@@ -26,7 +26,7 @@ public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::data_directory;
     using BASE::last_frame;using BASE::frame_rate;using BASE::write_output_files;using BASE::Get_Source_Velocities;using BASE::resolution;
-    using BASE::output_directory;using BASE::restart;using BASE::restart_frame;using BASE::solid_body_collection;using BASE::test_number;
+    using BASE::viewer_dir;using BASE::restart;using BASE::restart_frame;using BASE::solid_body_collection;using BASE::test_number;
     using BASE::Adjust_Phi_With_Source;using BASE::user_last_frame;
 
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
@@ -46,7 +46,7 @@ public:
         fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][0]=true;
         fluids_parameters.grid->Initialize(TV_INT(10*resolution+1,10*resolution+1),RANGE<TV>(TV(0,0),TV(1,1)));
         if(!this->user_output_directory)
-            output_directory=LOG::sprintf("Multiphase_Fire_Examples/Example_%d__Resolution_%d_%d",test_number,(fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.x-1));
+            viewer_dir.output_directory=LOG::sprintf("Multiphase_Fire_Examples/Example_%d__Resolution_%d_%d",test_number,(fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.x-1));
         fluids_parameters.number_particles_per_cell=16;
         if(!user_last_frame) last_frame=512;
         fluids_parameters.temperature_container.Set_Ambient_Temperature(T(283.15));fluids_parameters.temperature_container.Set_Cooling_Constant((T)4000);

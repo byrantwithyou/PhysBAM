@@ -18,7 +18,6 @@ class RIGID_BODY_EVOLUTION_PARAMETERS
 public:
     bool use_kinematic_keyframes;
     bool simulate_rigid_bodies;
-    bool write_rigid_bodies;
     T rigid_body_ether_viscosity;
     T max_rigid_body_rotation_per_time_step;
     T max_rigid_body_linear_movement_fraction_per_time_step;

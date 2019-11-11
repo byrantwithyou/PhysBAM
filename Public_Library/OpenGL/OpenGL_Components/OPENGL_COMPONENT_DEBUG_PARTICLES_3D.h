@@ -21,18 +21,16 @@ class OPENGL_COMPONENT_DEBUG_PARTICLES_3D:public OPENGL_COMPONENT<T>
     typedef VECTOR<T,3> TV;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
-    using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
+    using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::viewer_dir;
     using OPENGL_COMPONENT<T>::Slice_Has_Changed;using OPENGL_COMPONENT<T>::World_Space_Box;
     using OPENGL_OBJECT<T>::viewer_callbacks;
     using OPENGL_COMPONENT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::Set_Slice;
     enum SELECTION_TYPE {select_none=0,select_particle=1,select_object=2,select_text=3};
 
-    OPENGL_COMPONENT_DEBUG_PARTICLES_3D(const std::string &filename);
+    OPENGL_COMPONENT_DEBUG_PARTICLES_3D(const VIEWER_DIR& viewer_dir,const std::string& filename);
     virtual ~OPENGL_COMPONENT_DEBUG_PARTICLES_3D();
 
-    bool Valid_Frame(int frame_input) const override;
-
-    void Set_Frame(int frame_input) override;
+    void Set_Frame() override;
     void Set_Draw(bool draw_input = true) override;
 
     void Display() const override;
@@ -54,7 +52,7 @@ public:
     void Set_Slice(OPENGL_SLICE *slice_input) override;
 
 private:
-    void Reinitialize(bool force=false);
+    void Reinitialize();
 
     void Command_Prompt_Response();
 
@@ -71,7 +69,6 @@ public:
 
 private:
     std::string filename;
-    int frame_loaded=-1;
     bool valid=false;
     int selected_particle=-1;
     int selected_object=-1;

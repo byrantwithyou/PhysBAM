@@ -38,9 +38,9 @@
 #include <Hybrid_Methods/Forces/VOLUME_PRESERVING_OB_NEO_HOOKEAN.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
-#include <fstream>
 #include "POUR_SOURCE.h"
 #include "STANDARD_TESTS_3D.h"
+#include <fstream>
 namespace PhysBAM{
 //#####################################################################
 // Constructor
@@ -58,7 +58,7 @@ STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-fooT4",&foo_T4,&use_foo_T4,"T4","a scalar");
     parse_args.Add("-fooT5",&foo_T5,&use_foo_T5,"T5","a scalar");
     parse_args.Parse();
-    if(!this->override_output_directory) output_directory=LOG::sprintf("Test_3d_%i",test_number);
+    if(!this->override_output_directory) viewer_dir.output_directory=LOG::sprintf("Test_3d_%i",test_number);
 }
 //#####################################################################
 // Destructor
@@ -1528,7 +1528,7 @@ Initialize()
             Seed_Particles(*levelset,0,0,density,particles_per_cell);
             LOG::printf("Particle count: %d\n",particles.number);
             Set_Lame_On_Particles(E,nu);
-            Write_To_File(stream_type,output_directory+"/common/all_particles",particles);
+            Write_To_File(stream_type,viewer_dir.output_directory+"/common/all_particles",particles);
             for(int p=0;p<particles.number;++p)
                 if(live_box.Lazy_Outside(particles.X(p)))
                     particles.Add_To_Deletion_List(p);
@@ -1577,8 +1577,8 @@ Initialize()
                 *new ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T> >(seed_range),TV(0,-1,0),grid.domain.max_corner,
                 TV(0,-pour_speed,0),gravity,max_dt*pour_speed+grid.dX.y,seed_buffer,mass,volume);
             destroy=[=](){delete source;};
-            write_output_files.Append([=](int frame){source->Write_Output_Files(frame);});
-            read_output_files.Append([=](int frame){source->Read_Output_Files(frame);});
+            write_output_files.Append([=](){source->Write_Output_Files();});
+            read_output_files.Append([=](){source->Read_Output_Files();});
             Add_Callbacks(true,"time-step",[=]()
                 {
                     if(time<0.08||time>=foo_T3) return;

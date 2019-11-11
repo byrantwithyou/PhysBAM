@@ -5,6 +5,7 @@
 #include <Core/Log/LOG.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Core/Utilities/PROCESS_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
 #include <Tools/Krylov_Solvers/MINRES.h>
@@ -27,7 +28,7 @@
 using namespace PhysBAM;
 
 typedef float RW;
-std::string output_directory="output";
+VIEWER_DIR viewer_dir("output");
 
 typedef VECTOR<double,3> TV3;
 TV3 color_map[4]={TV3(0,0.7,0),TV3(0.8,0.8,0),TV3(0,0.4,1),TV3(0.8,0.2,0)};
@@ -44,22 +45,16 @@ GRID<TV>* Global_Grid(GRID<TV>* grid_in=0)
 template<class TV> struct ANALYTIC_TEST;
 
 
-template<class TV> DEBUG_PARTICLES<TV>& Get_Debug_Particles()
-{
-    static DEBUG_PARTICLES<TV> debug_particles;
-    return debug_particles;
-}
-
 template<class T,int d>
 void Dump_Frame(const ARRAY<T,FACE_INDEX<d> >& u,const char* title)
 {
     static int frame=0;
     char buff[100];
-    sprintf(buff, "%s/%i", output_directory.c_str(), frame);
+    sprintf(buff, "%s/%i",viewer_dir.output_directory.c_str(), frame);
     Create_Directory(buff);
     Write_To_File<RW>((std::string)buff+"/mac_velocities.gz",u);
     if(title) Write_To_Text_File((std::string)buff+"/frame_title",title);
-    Get_Debug_Particles<VECTOR<T,d> >().Write_Debug_Particles(STREAM_TYPE((RW())),output_directory,frame);
+    Get_Debug_Particles<VECTOR<T,d> >().Write_Debug_Particles(STREAM_TYPE((RW())),viewer_dir);
     frame++;
 }
 
@@ -429,7 +424,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     int res=4,max_iter=1000000;
     bool use_preconditioner=false,null=false,dump_matrix=false,debug_particles=false,bc_n=false,bc_d=false,bc_s=false;
     int test_number;
-    parse_args.Add("-o",&output_directory,"dir","output directory");
+    parse_args.Add("-o",&viewer_dir.output_directory,"dir","output directory");
     parse_args.Add("-m",&opt_m,"scale","meter scale");
     parse_args.Add("-s",&opt_s,"scale","second scale");
     parse_args.Add("-kg",&opt_kg,"scale","kilogram scale");
@@ -702,10 +697,10 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
 
     Global_Grid(&grid);
 
-    Create_Directory(output_directory);
-    Create_Directory(output_directory+"/common");
-    LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",false);
-    Write_To_File<RW>(output_directory+"/common/grid.gz",grid);
+    Create_Directory(viewer_dir.output_directory);
+    Create_Directory(viewer_dir.output_directory+"/common");
+    LOG::Instance()->Copy_Log_To_File(viewer_dir.output_directory+"/common/log.txt",false);
+    Write_To_File<RW>(viewer_dir.output_directory+"/common/grid.gz",grid);
 
     Analytic_Test(grid,*test,max_iter,use_preconditioner,null,dump_matrix,debug_particles);
     LOG::Finish_Logging();

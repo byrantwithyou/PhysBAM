@@ -117,13 +117,14 @@ int main(int argc, char* argv[])
     if(seed!=-1) rand_.Set_Seed(seed);
     
     example.grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),example.grid,viewer_directory);
+    VIEWER_DIR viewer_dir(viewer_directory);
+    VIEWER_OUTPUT vo(STREAM_TYPE((RW)0),viewer_dir);
+    Use_Debug_Particles<TV>();
 
     Seed_Particles<T,TV>(example,
         [](const TV& X){return TV();},
         [](const TV& X){return MATRIX<T,TV::m>();},
         (T)100,pow<TV::m>((T)particles_per_dim));
-//    Flush_Frame<TV>("initial");
 
     // TODO: sample particles
 
@@ -151,7 +152,7 @@ int main(int argc, char* argv[])
     driver.Update_Simulated_Particles();
     driver.Update_Particle_Weights();
 
-    driver.Write_Output_Files(0);
+    driver.Write_Output_Files();
 
     TV A(.2,-.1);
     MATRIX<T,TV::m> M(.2,.3,.1,-.3);
@@ -172,11 +173,11 @@ int main(int argc, char* argv[])
         }
     }
 
-    driver.Write_Output_Files(1);
+    driver.Write_Output_Files();
     driver.Grid_To_Particle();
-    driver.Write_Output_Files(2);
+    driver.Write_Output_Files();
     driver.Particle_To_Grid();
-    driver.Write_Output_Files(3);
+    driver.Write_Output_Files();
 
     for(int i=0;i<example.particles.number;i++)
     {
@@ -193,7 +194,7 @@ int main(int argc, char* argv[])
         example.velocity(it.face)-=V(it.face.axis);
         err.Append(example.velocity(it.face));
     }
-    driver.Write_Output_Files(4);
+    driver.Write_Output_Files();
     LOG::printf("%P\n",err);
     
     return 0;

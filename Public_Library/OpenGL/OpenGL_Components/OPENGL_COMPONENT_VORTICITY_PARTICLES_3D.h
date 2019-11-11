@@ -19,9 +19,9 @@ class OPENGL_COMPONENT_VORTICITY_PARTICLES_3D:public OPENGL_COMPONENT_PARTICLES_
 public:
     using OPENGL_COMPONENT_PARTICLES_3D<T>::particles;using OPENGL_COMPONENT_PARTICLES_3D<T>::opengl_vector_field;
 
-    OPENGL_COMPONENT_VORTICITY_PARTICLES_3D(const std::string &filename,bool use_ids_input=true);
+    OPENGL_COMPONENT_VORTICITY_PARTICLES_3D(const VIEWER_DIR& viewer_dir, const std::string &filename_input,bool use_ids_input=true);
 private:
-    void Reinitialize(bool force=false) override;
+    void Reinitialize() override;
 //#####################################################################
 };
 }

@@ -71,7 +71,7 @@ Initialize()
     example.projection.elliptic_solver->pcg.evolution_solver_type=krylov_solver_cg;
     example.projection.elliptic_solver->pcg.cg_restart_iterations=40;
 
-    if(example.restart) example.Read_Output_Files(example.restart);
+    if(example.restart) example.Read_Output_Files();
     
     // setup domain boundaries
     VECTOR<VECTOR<bool,2>,TV::m> constant_extrapolation;constant_extrapolation.Fill(VECTOR<bool,2>::Constant_Vector(true));
@@ -86,7 +86,7 @@ Initialize()
         // Compute born weights
         for(int i=0;i<TV::m;++i) example.weights0(i)->Update(example.particles.X);}
 
-    if(!example.restart) Write_Output_Files(0);
+    if(!example.restart) Write_Output_Files();
     output_number=0;
 }
 //#####################################################################
@@ -316,7 +316,7 @@ Simulate_To_Frame(const int frame)
     while(current_frame<frame){
         LOG::SCOPE scope("FRAME","Frame %d",current_frame+1);
         Advance_To_Target_Time(example.Time_At_Frame(current_frame+1));
-        Write_Output_Files(++output_number);
+        Write_Output_Files();
         current_frame++;}
 }
 //#####################################################################
@@ -327,21 +327,19 @@ Write_Substep(const std::string& title)
 {
     example.frame_title=title;
     LOG::cout<<"Writing substep ["<<example.frame_title<<"]: output_number="<<output_number+1<<", time="<<time<<", frame="<<current_frame<<std::endl;
-    Write_Output_Files(++output_number);
+    Write_Output_Files();
     example.frame_title="";
 }
 //#####################################################################
 // Function Write_Output_Files
 //#####################################################################
 template<class TV> void SMOKE_DRIVER<TV>::
-Write_Output_Files(const int frame)
+Write_Output_Files()
 {
-    Create_Directory(example.output_directory);
-    Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
-    Create_Directory(example.output_directory+"/common");
-    Write_To_Text_File(example.output_directory+LOG::sprintf("/%d/frame_title",frame),example.frame_title);
-    example.Write_Output_Files(frame);
-    Write_To_Text_File(example.output_directory+"/common/last_frame",frame,"\n");
+    example.viewer_dir.Start_Directory(0,example.frame_title);
+    example.frame_title="";
+    example.Write_Output_Files();
+    example.viewer_dir.Finish_Directory();
 }
 //#####################################################################
 // Function Print_Max_Divergence

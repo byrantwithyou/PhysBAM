@@ -68,7 +68,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-test_diff",&test_diff,"test analytic derivatives");
     parse_args.Add("-test_system",&test_system,"test Krylov system properties");
     parse_args.Add("-threads",&threads,"threads","Number of threads");
-    parse_args.Add("-o",&output_directory,&override_output_directory,"dir","Output directory");
+    parse_args.Add("-o",&viewer_dir.output_directory,&override_output_directory,"dir","Output directory");
     parse_args.Add("-mass_contour",&mass_contour,"contour","Draw mass contour as a scale to particle average mass");
     parse_args.Add("-framerate",&framerate,"rate","Number of frames per second");
     parse_args.Add("-frame_dt",&frame_dt,"rate","Number of frames per second");
@@ -652,19 +652,19 @@ Seed_Particles_Surface(const T_STRUCTURE& object,IMPLICIT_OBJECT<TV>& io,std::fu
 // Function Write_Output_Files
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
-Write_Output_Files(const int frame)
+Write_Output_Files()
 {
-    Write_To_File(stream_type,LOG::sprintf("%s/%d/random_number",output_directory.c_str(),frame),random);
-    BASE::Write_Output_Files(frame);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/random_number",random);
+    BASE::Write_Output_Files();
 }
 //#####################################################################
 // Function Read_Output_Files
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
-Read_Output_Files(const int frame)
+Read_Output_Files()
 {
-    Read_From_File(LOG::sprintf("%s/%d/random_number",output_directory.c_str(),frame),random);
-    BASE::Read_Output_Files(frame);
+    Read_From_File(viewer_dir.current_directory+"/random_number",random);
+    BASE::Read_Output_Files();
 }
 template class STANDARD_TESTS_BASE<VECTOR<float,2> >;
 template class STANDARD_TESTS_BASE<VECTOR<float,3> >;

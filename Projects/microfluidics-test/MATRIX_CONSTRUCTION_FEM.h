@@ -4,11 +4,11 @@
 //#####################################################################
 #ifndef __MATRIX_CONSTRUCTION_FEM__
 #define __MATRIX_CONSTRUCTION_FEM__
-#include <functional>
 #include "BLOCK_MATRIX.h"
 #include "BLOCK_VECTOR.h"
 #include "COMPONENT_LAYOUT_FEM.h"
 #include "MANAGED_MATRIX.h"
+#include <functional>
 
 namespace PhysBAM{
 

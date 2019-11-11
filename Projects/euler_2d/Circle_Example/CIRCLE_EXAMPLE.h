@@ -8,9 +8,9 @@
 #ifndef __CIRCLE_EXAMPLE__
 #define __CIRCLE_EXAMPLE__
 
+#include "math.h"
 #include <fstream>
 #include <iostream>
-#include "math.h"
 
 #include <Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
@@ -49,7 +49,7 @@ public:
     typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
     typedef VECTOR<bool,2*TV::m> T_FACE_VECTOR_BOOL;
 
-    using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::viewer_dir;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::solids_fluids_parameters;
     using BASE::stream_type;using BASE::data_directory;using BASE::solid_body_collection;using BASE::test_number;using BASE::resolution;
     using BASE::solids_evolution;using BASE::Add_To_Fluid_Simulation;
@@ -316,16 +316,16 @@ public:
 
         // Set output directory
         if(!this->user_output_directory){
-            if(timesplit) output_directory=LOG::sprintf("Circle_Example/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-            else output_directory=LOG::sprintf("Circle_Example/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-            if(eno_scheme==2) output_directory+="_density_weighted";
-            else if(eno_scheme==3) output_directory+="_velocity_weighted";
-            if(use_slip) output_directory+="_slip";
-            if(transition_to_incompressible)  output_directory+="_transition_incompressible";
-            if(use_soot) output_directory+="_soot";
-            if(use_fixed_farfield_boundary) output_directory+="_fixedFF";
-            if(strong_shock) output_directory+="_strong";
-            output_directory+=LOG::sprintf("_mass_%f",solid_mass);}
+            if(timesplit) viewer_dir.output_directory=LOG::sprintf("Circle_Example/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+            else viewer_dir.output_directory=LOG::sprintf("Circle_Example/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+            if(eno_scheme==2) viewer_dir.output_directory+="_density_weighted";
+            else if(eno_scheme==3) viewer_dir.output_directory+="_velocity_weighted";
+            if(use_slip) viewer_dir.output_directory+="_slip";
+            if(transition_to_incompressible)  viewer_dir.output_directory+="_transition_incompressible";
+            if(use_soot) viewer_dir.output_directory+="_soot";
+            if(use_fixed_farfield_boundary) viewer_dir.output_directory+="_fixedFF";
+            if(strong_shock) viewer_dir.output_directory+="_strong";
+            viewer_dir.output_directory+=LOG::sprintf("_mass_%f",solid_mass);}
     }
 
     virtual ~CIRCLE_EXAMPLE() {}

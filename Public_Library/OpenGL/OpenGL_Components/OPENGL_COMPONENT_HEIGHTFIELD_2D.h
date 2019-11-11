@@ -25,18 +25,16 @@ class OPENGL_COMPONENT_HEIGHTFIELD_2D:public OPENGL_COMPONENT<T>
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
     typedef VECTOR<T,2> TV2;typedef VECTOR<int,2> TV_INT2;
 public:
-    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_OBJECT<T>::viewer_callbacks;
-    OPENGL_COMPONENT_HEIGHTFIELD_2D(const GRID<TV2> &grid, 
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
+    using OPENGL_OBJECT<T>::viewer_callbacks;using OPENGL_COMPONENT<T>::viewer_dir;
+    OPENGL_COMPONENT_HEIGHTFIELD_2D(const VIEWER_DIR& viewer_dir,const GRID<TV2> &grid, 
                                     const std::string& height_filename,
                                     const std::string& xz_filename_input="",
                                     const std::string& uv_filename_input="",
                                     int m_start_input = 0, int m_end_input = 0, int n_start_input = 0, int n_end_input = 0);
     virtual ~OPENGL_COMPONENT_HEIGHTFIELD_2D();
 
-    bool Valid_Frame(int frame_input) const override;
-
-    void Set_Frame(int frame_input) override;
+    void Set_Frame() override;
     void Set_Draw(bool draw_input = true) override;
 
     void Display() const override;
@@ -63,7 +61,7 @@ public:
     void Toggle_Subdivision();
 
 public:
-    void Reinitialize(bool force=false);
+    void Reinitialize();
 private:
     void Update_Surface();
 
@@ -97,7 +95,6 @@ private:
     std::string uv_filename;
     T scale;
     T displacement_scale;
-    int frame_loaded;
     bool valid;
     bool draw_velocities;
     RANGE<TV_INT2> domain;

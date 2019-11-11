@@ -112,7 +112,7 @@ class STANDARD_TESTS:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
-    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
+    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::viewer_dir;
     using BASE::stream_type;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::test_number;
     using BASE::user_last_frame;
     
@@ -237,7 +237,6 @@ public:
         parse_args.Add("-cloth_triangles",&cloth_triangles,&opt_cloth_triangles,"number ","Cloth number of triangles");
         parse_args.Add("-noalt",&no_altitude_springs,"don't use altitude springs");
         parse_args.Add("-backward",&opt_backward,"use backward Euler evolution");
-        parse_args.Add("-printpairs",&solids_parameters.triangle_collision_parameters.output_interaction_pairs,"output interaction pairs");
         parse_args.Add("-spectrum",&solids_parameters.implicit_solve_parameters.spectral_analysis,"run spectral analysis during timestepping");
         parse_args.Add("-residuals",&opt_residuals,"print residuals during timestepping");
         parse_args.Add("-binding_springs",&use_forces_for_drift,"use binding springs for drift particles");
@@ -267,7 +266,7 @@ public:
         tests.data_directory=data_directory;
         LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
         if(!this->user_output_directory)
-            output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+            viewer_dir.output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
         if(!this->user_frame_rate) frame_rate=24;
     
         T cloth_clamp_fraction=(T).03; // from curtain and ball
@@ -277,15 +276,15 @@ public:
         if(no_altitude_springs){
             if(test_number!=5 && !INTERVAL<T>(10,14).Lazy_Inside(test_number) && test_number!=19 && test_number!=22){
                 LOG::cerr<<"-noalt not supported for example "<<test_number<<std::endl;exit(1);}
-            if(!this->user_output_directory) output_directory+="_noalt";}
+            if(!this->user_output_directory) viewer_dir.output_directory+="_noalt";}
         if(stiffness_multiplier!=1){
             if(test_number!=5 && !INTERVAL<T>(10,14).Lazy_Inside(test_number) && test_number!=22 && test_number !=30 && test_number!=1){
                 LOG::cerr<<"-stiffen not supported for example "<<test_number<<std::endl;exit(1);}
-            if(!this->user_output_directory) output_directory+=LOG::sprintf("_stiffen%g",stiffness_multiplier);}
+            if(!this->user_output_directory) viewer_dir.output_directory+=LOG::sprintf("_stiffen%g",stiffness_multiplier);}
         if(damping_multiplier!=1){
             if(test_number!=5 && !INTERVAL<T>(10,14).Lazy_Inside(test_number) && test_number!=22 && test_number!=1){
                 LOG::cerr<<"-dampen not supported for example "<<test_number<<std::endl;exit(1);}
-            if(!this->user_output_directory) output_directory+=LOG::sprintf("_dampen%g",damping_multiplier);}
+            if(!this->user_output_directory) viewer_dir.output_directory+=LOG::sprintf("_dampen%g",damping_multiplier);}
 
         solids_parameters.use_trapezoidal_rule_for_velocities=!use_be;
         solids_parameters.use_rigid_deformable_contact=true;
@@ -440,7 +439,7 @@ public:
                 solids_parameters.triangle_collision_parameters.turn_off_all_collisions=true;
                 break;
             case 24:{
-                if(test_24_poissons_ratio!=(T).5) if(!this->user_output_directory) output_directory+=LOG::sprintf("_p%g",test_24_poissons_ratio);
+                if(test_24_poissons_ratio!=(T).5) if(!this->user_output_directory) viewer_dir.output_directory+=LOG::sprintf("_p%g",test_24_poissons_ratio);
                 break;}
             case 25:
                 if(!user_last_frame) last_frame=(int)(6*frame_rate);
@@ -558,39 +557,39 @@ public:
             solids_parameters.cfl*=10;
             delete solids_evolution;
             solids_evolution=new BACKWARD_EULER_EVOLUTION<TV>(solids_parameters,solid_body_collection,*this);
-            if(!this->user_output_directory) output_directory+="_backward";}
+            if(!this->user_output_directory) viewer_dir.output_directory+="_backward";}
     
         if(opt_noself){
             if(!solids_parameters.triangle_collision_parameters.perform_self_collision){LOG::cerr<<"-noself invalid for examples without self-collisions"<<std::endl;exit(1);}
             solids_parameters.triangle_collision_parameters.perform_self_collision=false;
             solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
             solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
-            if(!this->user_output_directory) output_directory+="_noself";}
+            if(!this->user_output_directory) viewer_dir.output_directory+="_noself";}
     
         if(opt_noglobalrepulsions){
             solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
-            if(!this->user_output_directory) output_directory+="_noglobalrepulsions";}
+            if(!this->user_output_directory) viewer_dir.output_directory+="_noglobalrepulsions";}
     
         if(opt_nopertimesteprepulsions){
             solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
-            if(!this->user_output_directory) output_directory+="_nopertimesteprepulsions";}
+            if(!this->user_output_directory) viewer_dir.output_directory+="_nopertimesteprepulsions";}
     
         if(opt_noattractions){
             solids_parameters.triangle_collision_parameters.perform_repulsion_pair_attractions=false;
-            if(!this->user_output_directory) output_directory+="_noattractions";}
+            if(!this->user_output_directory) viewer_dir.output_directory+="_noattractions";}
     
         if(opt_repulsion_pair_update_frequency){
-            if(!this->user_output_directory) output_directory+=LOG::sprintf("_repulsionpairupdatefrequency=%d",solids_parameters.triangle_collision_parameters.repulsion_pair_update_frequency);}
+            if(!this->user_output_directory) viewer_dir.output_directory+=LOG::sprintf("_repulsionpairupdatefrequency=%d",solids_parameters.triangle_collision_parameters.repulsion_pair_update_frequency);}
     
         if(opt_velocity_prune){
             //solids_parameters.collision_pair_velocity_pruning=true;
-            if(!this->user_output_directory) output_directory+="_velocityprune";}
+            if(!this->user_output_directory) viewer_dir.output_directory+="_velocityprune";}
     
         if(opt_topological_hierarchy_build_frequency){
-            if(!this->user_output_directory) output_directory+=LOG::sprintf("_topologicalhierarchybuildfrequency=%d",solids_parameters.triangle_collision_parameters.topological_hierarchy_build_frequency);}
+            if(!this->user_output_directory) viewer_dir.output_directory+=LOG::sprintf("_topologicalhierarchybuildfrequency=%d",solids_parameters.triangle_collision_parameters.topological_hierarchy_build_frequency);}
     
         if(opt_side_panels){
-            if(!this->user_output_directory) output_directory+=LOG::sprintf("_sidepanels=%d",number_side_panels);}
+            if(!this->user_output_directory) viewer_dir.output_directory+=LOG::sprintf("_sidepanels=%d",number_side_panels);}
         cloth_triangles=2*number_side_panels*(int)(number_side_panels*aspect_ratio);
     
         if(opt_cloth_triangles){
@@ -658,7 +657,7 @@ void Get_Initial_Data()
         case 2:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/adaptive_torus_float.tet",
                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
-            tests.Initialize_Tetrahedron_Collisions(1,output_directory,tetrahedralized_volume,solids_parameters.triangle_collision_parameters);
+            tests.Initialize_Tetrahedron_Collisions(1,viewer_dir,tetrahedralized_volume,solids_parameters.triangle_collision_parameters);
             tests.Add_Ground();
             break;}
         case 3:{
@@ -674,7 +673,7 @@ void Get_Initial_Data()
             embedding.Update_Binding_List_From_Embedding(solid_body_collection.deformable_body_collection,false);
 //            tests.Substitute_Soft_Bindings_For_Embedded_Nodes(embedding.material_surface,soft_bindings);
             embedding.Update_Number_Nodes();
-            tests.Initialize_Tetrahedron_Collisions(1,output_directory,embedding.embedded_object.simplicial_object,solids_parameters.triangle_collision_parameters,&embedding.material_surface);
+            tests.Initialize_Tetrahedron_Collisions(1,viewer_dir,embedding.embedded_object.simplicial_object,solids_parameters.triangle_collision_parameters,&embedding.material_surface);
             tests.Add_Ground();
             break;}
         case 5:
@@ -737,7 +736,7 @@ void Get_Initial_Data()
             Read_From_File(data_directory+"/Tetrahedralized_Volumes/red_green_torus_with_t_junctions/bindings",binding_list);
             tetrahedralized_volume.mesh.boundary_mesh=new TRIANGLE_MESH();
             Read_From_File(data_directory+"/Tetrahedralized_Volumes/red_green_torus_with_t_junctions/boundary_mesh",*tetrahedralized_volume.mesh.boundary_mesh);
-            tests.Initialize_Tetrahedron_Collisions(1,output_directory,tetrahedralized_volume,solids_parameters.triangle_collision_parameters);
+            tests.Initialize_Tetrahedron_Collisions(1,viewer_dir,tetrahedralized_volume,solids_parameters.triangle_collision_parameters);
             tests.Add_Ground();
             break;}
         case 16:
@@ -859,7 +858,7 @@ void Get_Initial_Data()
                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,false,1000);
             solids_parameters.triangle_collision_parameters.perform_self_collision=true;
             solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
-            if(0) tests.Initialize_Tetrahedron_Collisions(1,output_directory,tetrahedralized_volume,solids_parameters.triangle_collision_parameters);
+            if(0) tests.Initialize_Tetrahedron_Collisions(1,viewer_dir,tetrahedralized_volume,solids_parameters.triangle_collision_parameters);
             tests.Add_Ground();
             break;}
         case 25:{
@@ -1596,7 +1595,7 @@ void Initialize_Bodies() override
                 LOG::cout<<"particles.Size()="<<particles.Size()<<std::endl;
                 //solid_body_collection.deformable_body_collection.mpi_solids->Simple_Partition(solid_body_collection,particles.X.array,VECTOR<int,3>(4,1,1));
                 solid_body_collection.deformable_body_collection.mpi_solids->KD_Tree_Partition(solid_body_collection.deformable_body_collection,solid_body_collection.rigid_body_collection,ARRAY<TV>(particles.X));
-                Write_To_File<T>(output_directory+"/particles_of_partition",solid_body_collection.deformable_body_collection.mpi_solids->particles_of_partition);
+                Write_To_File<T>(viewer_dir.output_directory+"/particles_of_partition",solid_body_collection.deformable_body_collection.mpi_solids->particles_of_partition);
                 break;}
             default:
                 LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}}
@@ -1616,9 +1615,9 @@ void Initialize_Bodies() override
 //#####################################################################
 // Function Read_Output_Files_Solids
 //#####################################################################
-void Read_Output_Files_Solids(const int frame) override
+void Read_Output_Files_Solids() override
 {
-    BASE::Read_Output_Files_Solids(frame);
+    BASE::Read_Output_Files_Solids();
     solid_body_collection.Update_Simulated_Particles();
 }
 //#####################################################################

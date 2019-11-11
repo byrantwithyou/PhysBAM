@@ -42,7 +42,7 @@ public:
     void Initialize();
     void Advance_To_Target_Time(const T target_time);
     void Simulate_To_Frame(const int frame_input);
-    void Write_Output_Files(const int frame);
+    void Write_Output_Files();
     void Write_Substep(const std::string& title);
     void Print_Max_Divergence(const char* str);
     T Max_Particle_Speed() const;

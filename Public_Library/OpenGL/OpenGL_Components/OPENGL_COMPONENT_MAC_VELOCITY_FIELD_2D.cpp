@@ -6,6 +6,7 @@
 #include <Core/Log/LOG.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Grid_Tools/Computations/VORTICITY_UNIFORM.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/GRID.h>
@@ -20,11 +21,11 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
-OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(const GRID<TV> &grid,const std::string &velocity_filename_input)
-    :OPENGL_COMPONENT<T>("MAC Velocity Field 2D"),draw_vorticity(false),
+OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(const VIEWER_DIR& viewer_dir,const GRID<TV> &grid,const std::string &velocity_filename_input)
+    :OPENGL_COMPONENT<T>(viewer_dir,"MAC Velocity Field 2D"),draw_vorticity(false),
     velocity_filename(velocity_filename_input),valid(false),draw_divergence(false),
     draw_streamlines(false),use_seed_for_streamlines(false),opengl_divergence_field(0),
-    opengl_streamlines(streamlines),psi_N_psi_D_basedir(""),
+    opengl_streamlines(streamlines),
     min_vorticity(FLT_MAX),max_vorticity(FLT_MIN)
 {
     viewer_callbacks.Set("toggle_velocity_mode",{[this](){Toggle_Velocity_Mode();},"Toggle velocity mode"});
@@ -39,9 +40,6 @@ OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(const GRID<TV> &grid,const std::string &v
     viewer_callbacks.Set("shorten_streamlines",{[this](){Shorten_Streamlines();},"Shorten streamlines"});
     viewer_callbacks.Set("toggle_draw_vorticity",{[this](){Toggle_Draw_Vorticity();},"Toggle draw vorticity"});
     viewer_callbacks.Set("normalize_vorticity_color_map",{[this](){Normalize_Vorticity_Color_Map();},"Normalize vorticity map based on current frame"});
-
-    is_animation=Is_Animated(velocity_filename);
-    frame_loaded=-1;
 
     opengl_mac_velocity_field=new OPENGL_MAC_VELOCITY_FIELD_2D<T>(grid);
     number_of_steps=2*opengl_mac_velocity_field->grid.counts.x;
@@ -71,25 +69,16 @@ template<class T> OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
     delete opengl_vorticity_magnitude;
 }
 //#####################################################################
-// Function Valid_Frame
-//#####################################################################
-template<class T> bool OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
-Valid_Frame(int frame_input) const
-{
-    return Frame_File_Exists(velocity_filename, frame_input);
-}
-//#####################################################################
 // Function Print_Cell_Selection_Info
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
 Print_Cell_Selection_Info(std::ostream& stream,const TV_INT& cell) const
 {
     if(!valid) return;
-    if(Is_Up_To_Date(frame)){
-        stream<<component_name<<": "<<std::endl;
-        opengl_mac_velocity_field->Print_Cell_Selection_Info(stream,cell);
-        if(draw_vorticity)
-            stream<<"vorticity magnitude = "<<opengl_vorticity_magnitude->values(cell)<<std::endl;}
+    stream<<component_name<<": "<<std::endl;
+    opengl_mac_velocity_field->Print_Cell_Selection_Info(stream,cell);
+    if(draw_vorticity)
+        stream<<"vorticity magnitude = "<<opengl_vorticity_magnitude->values(cell)<<std::endl;
 }
 //#####################################################################
 // Function Print_Node_Selection_Info
@@ -102,9 +91,9 @@ Print_Node_Selection_Info(std::ostream& stream,const TV_INT& node) const
 // Function Set_Frame
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
-Set_Frame(int frame_input)
+Set_Frame()
 {
-    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
+    
     Reinitialize();
 }
 //#####################################################################
@@ -143,22 +132,19 @@ Bounding_Box() const
 template<class T> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>::
 Reinitialize()
 {
-    if(draw || draw_divergence){
-        if((is_animation && frame_loaded!=frame) || (!is_animation && frame_loaded < 0)){
-            valid = false;
-            std::string tmp_filename=Get_Frame_Filename(velocity_filename.c_str(), frame);
-            if(File_Exists(tmp_filename)) Read_From_File(tmp_filename,opengl_mac_velocity_field->face_velocities);
-            else return;
-            opengl_mac_velocity_field->Update();
-            frame_loaded=frame;
-            valid=true;
-            Update_Divergence();
-            Update_Streamlines();
-            if(draw_vorticity){
-                Update_Vorticity();
-                opengl_vorticity_magnitude->Update();}
-        }
-    }
+    if(!draw && !draw_divergence) return;
+    valid = false;
+    std::string tmp_filename=viewer_dir.current_directory+"/"+velocity_filename;
+    if(File_Exists(tmp_filename))
+        Read_From_File(tmp_filename,opengl_mac_velocity_field->face_velocities);
+    else return;
+    opengl_mac_velocity_field->Update();
+    valid=true;
+    Update_Divergence();
+    Update_Streamlines();
+    if(draw_vorticity){
+        Update_Vorticity();
+        opengl_vorticity_magnitude->Update();}
 }
 //#####################################################################
 // Function Update_Divergence
@@ -172,13 +158,11 @@ Update_Divergence()
         static ARRAY<bool,FACE_INDEX<TV::m> > psi_N;
         static ARRAY<bool,TV_INT> psi_D;
         bool got_all_psi=true;
-        if(!psi_N_psi_D_basedir.empty()){
-            std::string psi_N_filename=LOG::sprintf("%s/%d/psi_N",psi_N_psi_D_basedir.c_str(),frame);
-            std::string psi_D_filename=LOG::sprintf("%s/%d/psi_D",psi_N_psi_D_basedir.c_str(),frame);
-            if(File_Exists(psi_N_filename)) Read_From_File(psi_N_filename,psi_N);
-            else got_all_psi=false;
-            if(File_Exists(psi_D_filename)) Read_From_File(psi_D_filename,psi_D);
-            else got_all_psi=false;}
+        std::string psi_N_filename=viewer_dir.current_directory+"/psi_N";
+        std::string psi_D_filename=viewer_dir.current_directory+"/psi_D";
+        if(File_Exists(psi_N_filename)) Read_From_File(psi_N_filename,psi_N);
+        else got_all_psi=false;
+        if(File_Exists(psi_D_filename)) Read_From_File(psi_D_filename,psi_D);
         else got_all_psi=false;
         if(!got_all_psi){psi_N.Clean_Memory();psi_D.Clean_Memory();}
         divergence.Resize(grid.counts);

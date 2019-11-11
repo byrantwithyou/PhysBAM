@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <OpenGL/OpenGL/OPENGL_PRIMITIVES.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_HEIGHTFIELD_1D.h>
 using namespace PhysBAM;
@@ -10,12 +11,12 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
-OPENGL_COMPONENT_HEIGHTFIELD_1D(const GRID<TV> &grid_input, 
+OPENGL_COMPONENT_HEIGHTFIELD_1D(const VIEWER_DIR& viewer_dir,const GRID<TV> &grid_input,
                                 const std::string& height_filename_input,
                                 const std::string& x_filename_input,
                                 const std::string& ground_filename_input,
                                 const std::string& u_filename_input)
-    :OPENGL_COMPONENT<T>("Heightfield 1D"), grid(grid_input), opengl_vector_field(vector_field,vector_locations), scale(1), displacement_scale(1), valid(false), 
+    :OPENGL_COMPONENT<T>(viewer_dir,"Heightfield 1D"), grid(grid_input), opengl_vector_field(vector_field,vector_locations), scale(1), displacement_scale(1), valid(false), 
       draw_velocities(true), draw_points(true), selected_index(0)
 {
     viewer_callbacks.Set("increase_scale",{[this](){Increase_Scale();},"Increase scale"});
@@ -38,8 +39,6 @@ OPENGL_COMPONENT_HEIGHTFIELD_1D(const GRID<TV> &grid_input,
         vector_locations.Resize(grid.counts.x);
         u_filename=u_filename_input;}
     else{u=0;u_filename="";}
-    is_animation=height_filename.find("%d")!=std::string::npos;
-    frame_loaded=-1;
 
     Reinitialize();
 }
@@ -54,20 +53,12 @@ template<class T> OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
     delete u;
 }
 //#####################################################################
-// Function Valid_Frame
-//#####################################################################
-template<class T> bool OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
-Valid_Frame(int frame_input) const
-{
-    return File_Exists(is_animation?LOG::sprintf(height_filename.c_str(),frame_input):height_filename);
-}
-//#####################################################################
 // Function Set_Frame
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
-Set_Frame(int frame_input)
+Set_Frame()
 {
-    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
+    
     Reinitialize();
 }
 //#####################################################################
@@ -225,48 +216,45 @@ Selection_Bounding_Box() const
 // Function Reinitialize
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
-Reinitialize(bool force)
+Reinitialize()
 {
-    if(draw){
-        if(force || (is_animation && frame_loaded != frame) || (!is_animation && frame_loaded < 0)){
-            bool success=true;
-            valid=false;
+    if(!draw) return;
+    bool success=true;
+    valid=false;
 
-            if(success){
-                std::string filename=Get_Frame_Filename(height_filename,frame);
-                if(File_Exists(filename)){
-                    Read_From_File(filename,height);
-                    if(height.Size().x != grid.counts.x) success=false;}
-                else success=false;}
+    if(success){
+        std::string filename=viewer_dir.current_directory+"/"+height_filename;
+        if(File_Exists(filename)){
+            Read_From_File(filename,height);
+            if(height.Size().x != grid.counts.x) success=false;}
+        else success=false;}
 
-            if(success && x){
-                std::string filename=Get_Frame_Filename(x_filename,frame);
-                if(File_Exists(filename)){
-                    Read_From_File(filename,*x);
-                    if(height.Size().x != x->Size().x) success=false;}
-                else success=false;}
+    if(success && x){
+        std::string filename=viewer_dir.current_directory+"/"+x_filename;
+        if(File_Exists(filename)){
+            Read_From_File(filename,*x);
+            if(height.Size().x != x->Size().x) success=false;}
+        else success=false;}
     
-            if(success && ground){
-                std::string filename=Get_Frame_Filename(ground_filename,frame);
-                if(File_Exists(filename)){
-                    Read_From_File(filename,*ground);
-                    if(height.Size().x != ground->Size().x) success=false;
-                    else height += (*ground);}
-                else success=false;}
+    if(success && ground){
+        std::string filename=viewer_dir.current_directory+"/"+ground_filename;
+        if(File_Exists(filename)){
+            Read_From_File(filename,*ground);
+            if(height.Size().x != ground->Size().x) success=false;
+            else height += (*ground);}
+        else success=false;}
 
-            if(success && draw_velocities && u_filename.length()){
-                std::string filename=Get_Frame_Filename(u_filename,frame);
-                if(File_Exists(filename)){
-                    Read_From_File(filename,*u);
-                    if(height.Size().x != u->Size().x) success=false;
-                    else for(int i=0;i<grid.counts.x;i++){
-                            vector_field(i)=VECTOR<T,2>((*u)(i),0);
-                            vector_locations(i)=VECTOR<T,2>(grid.X(TV_INT(i)).x, scale*height(i));}}
-                else success=false;}
+    if(success && draw_velocities && u_filename.length()){
+        std::string filename=viewer_dir.current_directory+"/"+u_filename;
+        if(File_Exists(filename)){
+            Read_From_File(filename,*u);
+            if(height.Size().x != u->Size().x) success=false;
+            else for(int i=0;i<grid.counts.x;i++){
+                    vector_field(i)=VECTOR<T,2>((*u)(i),0);
+                    vector_locations(i)=VECTOR<T,2>(grid.X(TV_INT(i)).x, scale*height(i));}}
+        else success=false;}
 
-            if(success){
-                frame_loaded=frame;
-                valid=true;}}}
+    if(success) valid=true;
 }
 //#####################################################################
 // Function Get_Selection_Priority
@@ -300,7 +288,7 @@ template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 Set_Scale(T scale_input)
 {
     scale=scale_input;
-    Reinitialize(true);// To recompute velocity vector positions correctly
+    Reinitialize();// To recompute velocity vector positions correctly
 }
 //#####################################################################
 // Function Increase_Scale
@@ -309,7 +297,7 @@ template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 Increase_Scale()
 {
     scale *= 1.1;
-    Reinitialize(true);// To recompute velocity vector positions correctly
+    Reinitialize();// To recompute velocity vector positions correctly
 }
 //#####################################################################
 // Function Decrease_Scale
@@ -318,7 +306,7 @@ template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 Decrease_Scale()
 {
     scale *= 1/1.1;
-    Reinitialize(true);// To recompute velcity vector positions correctly
+    Reinitialize();// To recompute velcity vector positions correctly
 }
 //#####################################################################
 // Function Increase_Displacement_Scale
@@ -359,7 +347,7 @@ template<class T> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T>::
 Toggle_Draw_Velocities()
 {
     draw_velocities=!draw_velocities;
-    Reinitialize(true);
+    Reinitialize();
 }
 //#####################################################################
 // Function Toggle_Draw_Points

@@ -35,7 +35,7 @@ public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
     typedef VECTOR<T,TV::m+2> TV_DIMENSION;
-    using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::viewer_dir;using BASE::fluids_parameters;using BASE::solids_parameters;
     using BASE::solid_body_collection;using BASE::test_number;using BASE::resolution;
     using BASE::user_last_frame;
     
@@ -123,10 +123,10 @@ public:
         fluids_parameters.compressible_perform_rungekutta_for_implicit_part=implicit_rk;
 
         if(!this->user_output_directory){
-            if(timesplit) output_directory=LOG::sprintf("Sod_ST/Test_%d_%d_semiimplicit_%d_%1.2f",test_number,(fluids_parameters.grid->counts.x),eno_scheme,cfl_number);
-            else output_directory=LOG::sprintf("Sod_ST/Test_%d__Resolution_%d_explicit",test_number,(fluids_parameters.grid->counts.x));
-            if(eno_scheme==2) output_directory+="_density_weighted";
-            else if(eno_scheme==3) output_directory+="_velocity_weighted";}
+            if(timesplit) viewer_dir.output_directory=LOG::sprintf("Sod_ST/Test_%d_%d_semiimplicit_%d_%1.2f",test_number,(fluids_parameters.grid->counts.x),eno_scheme,cfl_number);
+            else viewer_dir.output_directory=LOG::sprintf("Sod_ST/Test_%d__Resolution_%d_explicit",test_number,(fluids_parameters.grid->counts.x));
+            if(eno_scheme==2) viewer_dir.output_directory+="_density_weighted";
+            else if(eno_scheme==3) viewer_dir.output_directory+="_velocity_weighted";}
 
         middle_state_start_point=0.5;right_state_start_point=0;
         if(test_number==1){

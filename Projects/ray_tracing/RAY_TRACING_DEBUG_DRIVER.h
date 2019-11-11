@@ -8,9 +8,6 @@
 #define __RAY_TRACING_DEBUG_DRIVER__
 #include <Ray_Tracing/Rendering/RAY_TRACER_DEBUG_DATA.h>
 #include <Ray_Tracing/Rendering/RENDER_WORLD.h>
-#include <fstream>
-#include <iostream>
-#include <typeinfo>
 #include "Ray_Debugger/Fl_ToggleTree.h"
 #include "Ray_Debugger/IMAGE_WINDOW.h"
 #include "Ray_Debugger/SCENE_WINDOW.h"
@@ -22,6 +19,9 @@
 #include <FL/Fl_Menu_Bar.H>
 #include <FL/Fl_Menu_Item.H>
 #include <FL/Fl_Tile.h>
+#include <fstream>
+#include <iostream>
+#include <typeinfo>
 namespace PhysBAM{
 
 template<class T>

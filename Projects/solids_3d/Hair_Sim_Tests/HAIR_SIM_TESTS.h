@@ -25,7 +25,7 @@ class HAIR_SIM_TESTS:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >,TRIANGLE_REPULSIO
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
-    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
+    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::viewer_dir;
     using BASE::stream_type;using BASE::restart;using BASE::restart_frame;using BASE::solid_body_collection;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Set_External_Positions;using BASE::Zero_Out_Enslaved_Velocity_Nodes; // silence -Woverloaded-virtual
     using BASE::user_last_frame;
@@ -72,13 +72,14 @@ public:
     SEGMENT_ADHESION<TV>* segment_adhesion;
     GUIDE_ADHESION<TV>* guide_adhesion;
     DEFORMABLE_BODY_COLLECTION<TV> *guide_object1,*guide_object2;
+    VIEWER_DIR guide_viewer_dir{"."};
     PARAMETER_LIST parameter_list;
     ARRAY<HAIR_ID> particle_to_spring_id;
     ARRAY<int,HAIR_ID> spring_id_to_particle; // single particle representative of hair
     ARRAY<ARRAY<int>,PARTITION_ID> partition_spring_representative; // for each partition a list of particles that represent the spring
     COLLISION_PAIR_COMPARATOR *comparator;
     RIGID_BODY<TV> *implicit_rigid_body;
-    std::string sim_folder,rigid_model,guide_sim_folder,param_file;
+    std::string sim_folder,rigid_model,param_file;
     int offset;
     int current_frame,current_levelset;
     T levelset_frequency;
@@ -140,8 +141,8 @@ public:
     void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) override;
     void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) override;
     void Add_External_Impulses_Helper(ARRAY_VIEW<TV> V,const T time,const T dt,bool use_momentum_conserving,bool use_non_momentum_conserving);
-    void Write_Output_Files(const int frame) const override;
-    template<class T_IMPLICIT_COMBINED> void Write_Interpolated_Level_Set(const int frame,T_IMPLICIT_COMBINED& combined) const;
+    void Write_Output_Files() const override;
+    template<class T_IMPLICIT_COMBINED> void Write_Interpolated_Level_Set(const VIEWER_DIR& viewer_dir,T_IMPLICIT_COMBINED& combined) const;
     void Point_Face_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,3>& weights,T& one_over_mass1,T& one_over_mass2,T& one_over_mass3,T& one_over_mass4);
     void Point_Face_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,3>& weights,VECTOR<T,4>& one_over_mass) override;
     void Point_Face_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,3>& weights,ARRAY_VIEW<T>& one_over_mass) override;

@@ -6,6 +6,7 @@
 #define __PLS_EXAMPLE__
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Grid_PDE/Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
 #include <Grid_PDE/Boundaries/BOUNDARY.h>
@@ -35,7 +36,7 @@ public:
     std::string frame_title;
     int write_substeps_level;
     bool write_output_files;
-    std::string output_directory;
+    VIEWER_DIR viewer_dir;
     int restart;
     int number_of_ghost_cells;
 
@@ -67,8 +68,8 @@ public:
     void Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,
         const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time) override;
     void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset_multiple,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const override {}
-    virtual void Write_Output_Files(const int frame);
-    virtual void Read_Output_Files(const int frame);
+    virtual void Write_Output_Files();
+    virtual void Read_Output_Files();
     virtual void Set_Boundary_Conditions(const T time)=0;
     virtual void Adjust_Phi_With_Sources(const T time)=0;
     virtual void Initialize_Phi()=0;

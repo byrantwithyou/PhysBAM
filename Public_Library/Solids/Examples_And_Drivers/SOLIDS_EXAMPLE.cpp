@@ -77,15 +77,10 @@ template<class TV> SOLIDS_EXAMPLE<TV>::
 // Function Read_Output_Files_Solids
 //#####################################################################
 template<class TV> void SOLIDS_EXAMPLE<TV>::
-Read_Output_Files_Solids(const int frame)
+Read_Output_Files_Solids()
 {
-    solid_body_collection.Read(output_directory,frame,frame,solids_parameters.write_static_variables_every_frame,solids_parameters.rigid_body_evolution_parameters.write_rigid_bodies,
-        solids_parameters.write_deformable_body,solids_parameters.write_from_every_process);
-    std::string f=LOG::sprintf("%d",frame);
-    //if(NEWMARK_EVOLUTION<TV>* newmark=dynamic_cast<NEWMARK_EVOLUTION<TV>*>(solids_evolution))
-    //    newmark->Read_Position_Update_Projection_Data(stream_type,output_directory+"/"+f+"/");
-
-    Read_From_File(LOG::sprintf("%s/%d/triangle_collision_parameters",output_directory.c_str(),frame),
+    solid_body_collection.Read(viewer_dir,solids_parameters.write_static_variables_every_frame);
+    Read_From_File(viewer_dir.current_directory+"/triangle_collision_parameters",
         solids_parameters.triangle_collision_parameters.repulsion_pair_update_count,
         solids_parameters.triangle_collision_parameters.topological_hierarchy_build_count);
 }
@@ -106,11 +101,8 @@ Log_Parameters() const
 template<class TV> void SOLIDS_EXAMPLE<TV>::
 Adjust_Output_Directory_For_MPI(const MPI_SOLIDS<TV>* mpi)
 {
-    if(mpi && mpi->Number_Of_Processors()>1){
-        output_directory+=LOG::sprintf("/%d",(mpi->rank+1));
-        Create_Directory(output_directory);
-        Create_Directory(output_directory+"/common");
-        LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",restart);}
+    if(mpi && mpi->Number_Of_Processors()>1)
+        viewer_dir.output_directory+=LOG::sprintf("/%d",(mpi->rank+1));
 }
 //#####################################################################
 // Function Post_Initialization
@@ -164,11 +156,11 @@ Initialize_Bodies()
 // Function Write_Output_Files
 //#####################################################################
 template<class TV> void SOLIDS_EXAMPLE<TV>::
-Write_Output_Files(const int frame) const
+Write_Output_Files() const
 {
-    Create_Directory(output_directory);
+    Create_Directory(viewer_dir.output_directory);
     if(this->use_test_output){
-        std::string file=LOG::sprintf("%s/%s-%03d.txt",output_directory.c_str(),this->test_output_prefix.c_str(),frame);
+        std::string file=LOG::sprintf("%s/%s-%03d.txt",viewer_dir.output_directory.c_str(),this->test_output_prefix.c_str(),viewer_dir.frame_stack(0));
         OCTAVE_OUTPUT<T> oo(file.c_str());
         if(solid_body_collection.deformable_body_collection.particles.X.m){
             oo.Write("db_X",solid_body_collection.deformable_body_collection.particles.X.Flattened());
@@ -180,18 +172,13 @@ Write_Output_Files(const int frame) const
             ARRAY_VIEW<T> t((T*)particle.twist.Get_Array_Pointer(),particle.twist.m*TWIST<TV>::m);
             oo.Write("rb_twist",t);}}
 
-    std::string f=LOG::sprintf("%d",frame);
-    Create_Directory(output_directory+"/"+f);
-    Create_Directory(output_directory+"/common");
-    Write_Frame_Title(frame);
-    debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
-    solid_body_collection.Write(stream_type,output_directory,frame,solids_parameters.write_static_variables_every_frame,
-        solids_parameters.rigid_body_evolution_parameters.write_rigid_bodies,solids_parameters.write_deformable_body,solids_parameters.write_from_every_process,
-        solids_parameters.triangle_collision_parameters.output_interaction_pairs);
+    debug_particles.Write_Debug_Particles(stream_type,viewer_dir);
+    solid_body_collection.Write(stream_type,viewer_dir,solids_parameters.write_static_variables_every_frame,
+        solids_parameters.write_from_every_process);
     if(NEWMARK_EVOLUTION<TV>* newmark=dynamic_cast<NEWMARK_EVOLUTION<TV>*>(solids_evolution))
-        newmark->Write_Position_Update_Projection_Data(stream_type,output_directory+"/"+f+"/");
+        newmark->Write_Position_Update_Projection_Data(stream_type,viewer_dir.current_directory+"/");
 
-    Write_To_File(stream_type,LOG::sprintf("%s/%d/triangle_collision_parameters",output_directory.c_str(),frame),
+    Write_To_File(stream_type,viewer_dir.current_directory+"/triangle_collision_parameters",
         solids_parameters.triangle_collision_parameters.repulsion_pair_update_count,
         solids_parameters.triangle_collision_parameters.topological_hierarchy_build_count);
 }

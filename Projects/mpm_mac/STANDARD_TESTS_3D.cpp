@@ -9,8 +9,8 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UNION.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Seeding/MPM_PARTICLE_SOURCE.h>
-#include <fstream>
 #include "STANDARD_TESTS_3D.h"
+#include <fstream>
 namespace PhysBAM{
 //#####################################################################
 // Constructor
@@ -20,7 +20,7 @@ STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     :STANDARD_TESTS_BASE<TV>(stream_type_input,parse_args)
 {
     parse_args.Parse();
-    if(!this->override_output_directory) output_directory=LOG::sprintf("Test_3d_%i",test_number);
+    if(!this->override_output_directory) viewer_dir.output_directory=LOG::sprintf("Test_3d_%i",test_number);
 }
 //#####################################################################
 // Destructor

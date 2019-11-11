@@ -23,7 +23,7 @@ class SOLIDS_FLUIDS_DRIVER_UNIFORM:public SOLIDS_FLUIDS_DRIVER<TV>
     typedef SOLIDS_FLUIDS_DRIVER<TV> BASE;
 public:
     using BASE::current_frame;using BASE::next_dt;using BASE::next_done;using BASE::Write_Time;
-    using BASE::Write_Last_Frame;using BASE::Write_Substep;using BASE::time;
+    using BASE::Write_Substep;using BASE::time;
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>& example;
     T last_dt;
     T restart_dt;
@@ -56,7 +56,7 @@ public:
     T Compute_Dt(const T time,const T target_time,bool& done);
     T Compute_Solids_Dt(const T time);
     T Compute_Fluids_Dt(const T time);
-    void Write_Output_Files(const int frame) override;
+    void Write_Output_Files() override;
     void Integrate_Fluid_Non_Advection_Forces(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt);
     void Setup_Solids(const T time);
     void Setup_Fluids(const T time);

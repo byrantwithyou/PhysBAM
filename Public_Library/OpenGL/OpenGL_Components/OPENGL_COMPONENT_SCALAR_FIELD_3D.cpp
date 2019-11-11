@@ -4,22 +4,22 @@
 //#####################################################################
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_SCALAR_FIELD_3D.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class T,class T2> OPENGL_COMPONENT_SCALAR_FIELD_3D<T,T2>::
-OPENGL_COMPONENT_SCALAR_FIELD_3D(const GRID<TV> &grid_input,
+OPENGL_COMPONENT_SCALAR_FIELD_3D(const VIEWER_DIR& viewer_dir,const GRID<TV> &grid_input,
     const std::string &scalar_field_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input,
     typename OPENGL_SCALAR_FIELD_3D<T,T2>::DRAW_MODE draw_mode_input)
-    :OPENGL_COMPONENT<T>("Scalar Field 3D"), opengl_scalar_field(grid_input,*new ARRAY<T2,VECTOR<int,3> >,color_map_input,draw_mode_input),
-      scalar_field_filename(scalar_field_filename_input), frame_loaded(-1), valid(false)
+    :OPENGL_COMPONENT<T>(viewer_dir,"Scalar Field 3D"), opengl_scalar_field(grid_input,*new ARRAY<T2,VECTOR<int,3> >,color_map_input,draw_mode_input),
+      scalar_field_filename(scalar_field_filename_input),  valid(false)
 {
     viewer_callbacks.Set("toggle_smooth_slice",{[this](){Toggle_Smooth_Slice();},"Toggle smooth"});
     viewer_callbacks.Set("toggle_draw_mode",{[this](){Toggle_Draw_Mode();},"Toggle draw mode"});
     viewer_callbacks.Set("toggle_color_map",{[this](){Toggle_Color_Map();},"Toggle color map"});
-    is_animation = Is_Animated(scalar_field_filename);
 }
 //#####################################################################
 // Destructor
@@ -30,20 +30,12 @@ template<class T,class T2> OPENGL_COMPONENT_SCALAR_FIELD_3D<T,T2>::
     delete &opengl_scalar_field.values;
 }
 //#####################################################################
-// Function Valid_Frame
-//#####################################################################
-template<class T,class T2> bool OPENGL_COMPONENT_SCALAR_FIELD_3D<T,T2>::
-Valid_Frame(int frame_input) const
-{
-    return Frame_File_Exists(scalar_field_filename, frame_input);
-}
-//#####################################################################
 // Function Set_Frame
 //#####################################################################
 template<class T,class T2> void OPENGL_COMPONENT_SCALAR_FIELD_3D<T,T2>::
-Set_Frame(int frame_input)
+Set_Frame()
 {
-    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
+    
     Reinitialize();
 }
 //#####################################################################
@@ -79,7 +71,7 @@ Bounding_Box() const
 template<class T,class T2> void OPENGL_COMPONENT_SCALAR_FIELD_3D<T,T2>::
 Print_Selection_Info(std::ostream& output_stream) const
 {
-    if(Is_Up_To_Date(frame)){
+    if(valid && draw){
         output_stream<<component_name<<": ";
         opengl_scalar_field.Print_Selection_Info(output_stream);}
 }
@@ -89,24 +81,13 @@ Print_Selection_Info(std::ostream& output_stream) const
 template<class T,class T2> void OPENGL_COMPONENT_SCALAR_FIELD_3D<T,T2>::
 Reinitialize()
 {
-    if(draw)
-    {
-        if((is_animation && frame_loaded != frame) ||
-            (!is_animation && frame_loaded < 0))
-        {
-            valid = false;
-
-            std::string filename=Get_Frame_Filename(scalar_field_filename,frame);
-            if(File_Exists(filename))
-                Read_From_File(filename,opengl_scalar_field.values);
-            else
-                return;
-
-            opengl_scalar_field.Update();
-            frame_loaded = frame;
-            valid = true;
-        }
-    }
+    if(!draw) return;
+    valid=false;
+    std::string filename=viewer_dir.current_directory+"/"+scalar_field_filename;
+    if(!File_Exists(filename)) return;
+    Read_From_File(filename,opengl_scalar_field.values);
+    opengl_scalar_field.Update();
+    valid=true;
 }
 //#####################################################################
 // Function Toggle_Smooth_Slice

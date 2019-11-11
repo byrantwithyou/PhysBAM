@@ -2,6 +2,7 @@
 #include <Core/Arrays/INDIRECT_ARRAY.h>
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Matrices/MATRIX_MXN.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
@@ -39,15 +40,15 @@ struct SIM_DATA
     ARRAY<T,TV_INT> pressure,phi;
     LEVELSET<TV> levelset;
 
-    SIM_DATA(STREAM_TYPE& stream_type,const std::string& dir,int frame)
+    SIM_DATA(STREAM_TYPE& stream_type,const VIEWER_DIR& viewer_dir)
         :levelset(grid,phi)
     {
         ARRAY<int,FACE_INDEX<TV::m> > prev_face_color;
         ARRAY<ARRAY<T,FACE_INDEX<TV::m> > > prev_face_velocities;
-        Read_From_File(dir+"/common/grid",grid);
-        Read_From_File(LOG::sprintf("%s/%d/levelset_%d",dir.c_str(),frame,0),levelset);
-        Read_From_File(LOG::sprintf("%s/%d/pressure",dir.c_str(),frame),pressure);
-        Read_From_File(LOG::sprintf("%s/%d/restart_data",dir.c_str(),frame),
+        Read_From_File(viewer_dir.output_directory+"/common/grid",grid);
+        Read_From_File(viewer_dir.current_directory+"/levelset_0",levelset);
+        Read_From_File(viewer_dir.current_directory+"/pressure",pressure);
+        Read_From_File(viewer_dir.current_directory+"/restart_data",
             time,face_color,prev_face_color,face_velocities,prev_face_velocities);
         res=grid.counts.x;
         for(int d=0;d<TV::m;d++) face_grids(d)=grid.Get_Face_Grid(d);
@@ -77,9 +78,11 @@ void Analyze(PARSE_ARGS& parse_args)
 
     for(int i=0;i<sim_dirs.m;i++)
     {
+        VIEWER_DIR viewer_dir(sim_dirs(i));
+        viewer_dir.Set(frame);
         try
         {
-            sim_data.Append(new SIM_DATA<TV>(stream_type,sim_dirs(i),frame));
+            sim_data.Append(new SIM_DATA<TV>(stream_type,viewer_dir));
         }
         catch(...)
         {

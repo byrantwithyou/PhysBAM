@@ -1,5 +1,6 @@
 #include <Core/Read_Write/FILE_UTILITIES.h>
 #include <Core/Utilities/PROCESS_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
 #include <Geometry/Topology_Based_Geometry/B_SPLINE_PATCH.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
@@ -12,15 +13,15 @@ using namespace PhysBAM;
 typedef double T;
 typedef VECTOR<T,3> TV;
 
-HASHTABLE<PAIR<std::string,int>,DEFORMABLE_BODY_COLLECTION<TV>*> deformable_geometry_collection_cache;
+HASHTABLE<std::string,DEFORMABLE_BODY_COLLECTION<TV>*> deformable_body_collection_cache;
 
-DEFORMABLE_BODY_COLLECTION<TV>& Load_Deformable_Geometry_Collection(const std::string& location,int frame)
+DEFORMABLE_BODY_COLLECTION<TV>& Load_Deformable_Body_Collection(const VIEWER_DIR& viewer_dir)
 {
-    DEFORMABLE_BODY_COLLECTION<TV>*& deformable_geometry_collection=deformable_geometry_collection_cache.Get_Or_Insert(PAIR<std::string,int>(location,frame));
-    if(deformable_geometry_collection) return *deformable_geometry_collection;
-    deformable_geometry_collection=new DEFORMABLE_BODY_COLLECTION<TV>(0,0);
-    deformable_geometry_collection->Read(location,location,frame,-1,true,true);
-    return *deformable_geometry_collection;
+    DEFORMABLE_BODY_COLLECTION<TV>*& deformable_body_collection=deformable_body_collection_cache.Get_Or_Insert(viewer_dir.current_directory);
+    if(deformable_body_collection) return *deformable_body_collection;
+    deformable_body_collection=new DEFORMABLE_BODY_COLLECTION<TV>(0,0);
+    deformable_body_collection->Read(viewer_dir,true);
+    return *deformable_body_collection;
 }
 
 void Emit_Spline_Patch(std::ostream& output,B_SPLINE_PATCH<TV,3>& spline)
@@ -102,17 +103,19 @@ int main(int argc,char *argv[])
 
     int frame_number=0;
     std::string output_filename;
-    std::string input_folder;
+    std::string input_directory;
 
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Extra(&frame_number,"frame number","frame number");
     parse_args.Extra(&output_filename,"geo file","output geo file name");
-    parse_args.Extra(&input_folder,"input_folder","input folder name");
+    parse_args.Extra(&input_directory,"input_directory","input directory name");
     parse_args.Parse();
     if(parse_args.unclaimed_arguments){parse_args.Print_Usage();exit(0);}
 
     std::ostream* output=Safe_Open_Output_Raw(output_filename,false);
-    DEFORMABLE_BODY_COLLECTION<TV>& collection=Load_Deformable_Geometry_Collection(input_folder,frame_number);
+    VIEWER_DIR viewer_dir(input_directory);
+    viewer_dir.Set(frame_number);
+    DEFORMABLE_BODY_COLLECTION<TV>& collection=Load_Deformable_Body_Collection(viewer_dir);
     Emit_Deformable_Bodies(*output,collection);
 
     delete output;

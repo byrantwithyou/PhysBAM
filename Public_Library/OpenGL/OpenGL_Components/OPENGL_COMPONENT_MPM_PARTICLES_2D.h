@@ -21,16 +21,14 @@ class OPENGL_COMPONENT_MPM_PARTICLES_2D:public OPENGL_COMPONENT<T>
     typedef VECTOR<T,2> TV;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
-    using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
+    using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::viewer_dir;
     using OPENGL_COMPONENT<T>::Slice_Has_Changed;using OPENGL_COMPONENT<T>::World_Space_Box;
     using OPENGL_OBJECT<T>::viewer_callbacks;
     using OPENGL_COMPONENT<T>::Send_Transform_To_GL_Pipeline;using OPENGL_OBJECT<T>::Set_Slice;
-    OPENGL_COMPONENT_MPM_PARTICLES_2D(const std::string &filename);
+    OPENGL_COMPONENT_MPM_PARTICLES_2D(const VIEWER_DIR& viewer_dir,const std::string &filename);
     virtual ~OPENGL_COMPONENT_MPM_PARTICLES_2D();
 
-    bool Valid_Frame(int frame_input) const override;
-
-    void Set_Frame(int frame_input) override;
+    void Set_Frame() override;
     void Set_Draw(bool draw_input = true) override;
 
     void Display() const override;
@@ -52,7 +50,7 @@ public:
 
 private:
     OPENGL_INDEXED_COLOR_MAP* color_map;
-    void Reinitialize(bool force=false);
+    void Reinitialize();
 
 public:
     MPM_PARTICLES<TV>& particles;
@@ -69,7 +67,6 @@ public:
 
 private:
     std::string filename;
-    int frame_loaded;
     bool valid;
     int selected_index;
 };

@@ -20,8 +20,8 @@ public:
     bool own_object;
     bool use_clip_planes;
 
-    OPENGL_COMPONENT_BASIC(T2 &object)
-        :object(object),own_object(true)
+    OPENGL_COMPONENT_BASIC(const VIEWER_DIR& viewer_dir,T2 &object)
+        :OPENGL_COMPONENT<T>(viewer_dir),object(object),own_object(true)
     {
         Use_Clip_Planes(false);
     }
@@ -72,6 +72,8 @@ public:
 
     void Print_Selection_Info(std::ostream& ostream) const override
     {object.Print_Selection_Info(ostream);}
+
+    void Set_Frame() override {}
 };
 }
 

@@ -9,6 +9,7 @@
 #include <Core/Arrays/ARRAY.h>
 #include <Core/Log/LOG.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Grid_Tools/Fourier_Transforms/FFT.h>
 #include <Grid_Tools/Grids/GRID.h>
@@ -16,14 +17,13 @@
 #include <Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
-#include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <fstream>
 #include "MPLE_DOUBLE_WELL.h"
 #include "MPLE_ITERATOR.h"
 #include "MPLE_POINT.h"
+#include <fstream>
 
 #ifdef USE_OPENMP
 #include <omp.h>
@@ -80,7 +80,8 @@ public:
     int array_m;
     int fft_array_m;
     
-    std::string output_directory;
+    VIEWER_DIR viewer_dir;
+    STREAM_TYPE stream_type;
     T cfl;
     T spread;
     T rescale;
@@ -92,8 +93,9 @@ public:
     T cell_volume;
     T one_over_cell_volume;
     int threads;
+    DEBUG_PARTICLES<TV> debug_particles;
     
-    MPLE_DRIVER():transform(0),output_directory("output"),cfl((T)1),spread((T)1),rescale((T)1),identity((T)0),contour_value((T).5),frames(100),mu(5e-4){}
+    MPLE_DRIVER(STREAM_TYPE stream_type):transform(0),viewer_dir("output"),stream_type(stream_type),cfl((T)1),spread((T)1),rescale((T)1),identity((T)0),contour_value((T).5),frames(100),mu(5e-4){}
     MPLE_DRIVER(const MPLE_DRIVER&) = delete;
     void operator=(const MPLE_DRIVER&) = delete;
 
@@ -193,14 +195,10 @@ public:
             out<<"}"<<std::endl;;}
     }
 
-    void Write(const int frame)
+    void Write()
     {
-        char buff[100];
-        sprintf(buff,"Frame %d",frame);
-
-        Create_Directory(output_directory);
-        Create_Directory(LOG::sprintf("%s/%d",output_directory,frame));
-
+        viewer_dir.Start_Directory(0,0);
+        
         for(int i=0;i<points.m;i++)
             Add_Debug_Particle<TV>(points(i).X,VECTOR<T,3>(1,0,0));
         
@@ -209,14 +207,15 @@ public:
             if(value){
                 Add_Debug_Particle(location.array(i),value>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(0,.5,1));
                 Debug_Particle_Set_Attribute<TV>("display_size",value);}}
-        
+
         T_SURFACE surface;
         MARCHING_CUBES<TV>::Create_Surface(surface,grid,u,contour_value);
-        std::ofstream out(LOG::sprintf("%s/%d/surface",output_directory,frame).c_str());
+        std::ofstream out((viewer_dir.current_directory+"/surface").c_str());
         Dump_Surface(surface,out);
         out.close();
 
-        Flush_Frame<TV>(buff);
+        debug_particles.Write_Debug_Particles(stream_type,viewer_dir);
+        viewer_dir.Finish_Directory();
     }
 
     void Compute_Force()
@@ -296,8 +295,8 @@ public:
 
     void Dump_Points()
     {
-        Create_Directory(output_directory);
-        std::ofstream out(LOG::sprintf("%s/particles",output_directory).c_str());
+        Create_Directory(viewer_dir.output_directory);
+        std::ofstream out(LOG::sprintf("%s/particles",viewer_dir.output_directory).c_str());
         for(int i=0;i<points.m;i++){
             const MPLE_POINT<TV,w>& point=points(i);
             out<<"sphere{<";
@@ -313,10 +312,10 @@ public:
     {
         Initialize();
         Dump_Points();
-        Write(0);
+        Write();
         for(int k=1;k<=frames;k++){
             Advance_Frame(k);
-            Write(k);}
+            Write();}
     }
 };
 }

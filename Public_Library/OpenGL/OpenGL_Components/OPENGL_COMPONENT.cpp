@@ -8,11 +8,9 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT<T>::
-OPENGL_COMPONENT(const std::string &name)
- :frame(0),draw(true),is_animation(false),component_name(name)
+OPENGL_COMPONENT(const VIEWER_DIR& viewer_dir,const std::string &name)
+    :viewer_dir(viewer_dir),draw(true),component_name(name)
 {
-    viewer_callbacks.Set("next_frame",{[this](){Set_Frame(frame+1);},"Next frame"});
-    viewer_callbacks.Set("prev_frame",{[this](){Set_Frame(frame-1);},"Prev frame"});
     viewer_callbacks.Set("toggle_draw",{[this](){Set_Draw(!draw);},"Toggle draw"});
 }
 //#####################################################################
@@ -21,30 +19,6 @@ OPENGL_COMPONENT(const std::string &name)
 template<class T> OPENGL_COMPONENT<T>::
 ~OPENGL_COMPONENT()
 {
-}
-//#####################################################################
-// Function Valid_Frame
-//#####################################################################
-template<class T> bool OPENGL_COMPONENT<T>::
-Valid_Frame(int frame_input) const
-{
-    return false;
-}
-//#####################################################################
-// Function Is_Up_To_Date
-//#####################################################################
-template<class T> bool OPENGL_COMPONENT<T>::
-Is_Up_To_Date(int frame) const
-{
-    return true;
-}
-//#####################################################################
-// Function Set_Frame
-//#####################################################################
-template<class T> void OPENGL_COMPONENT<T>::
-Set_Frame(int frame_input)
-{
-    frame = frame_input;
 }
 //#####################################################################
 // Function Set_Draw

@@ -46,7 +46,7 @@ Initialize()
 template<class TV> void SOLID_SOLVER_PB<TV>::
 Write(int frame) const
 {
-    driver->Write_Output_Files(frame);
+    driver->Write_Output_Files();
 }
 
 //#####################################################################

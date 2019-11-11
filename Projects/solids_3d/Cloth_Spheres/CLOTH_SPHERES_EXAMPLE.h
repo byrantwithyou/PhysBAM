@@ -24,7 +24,7 @@ class CLOTH_SPHERES_EXAMPLE:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 public:
     typedef T_input T;typedef VECTOR<T,3> TV;
     typedef SOLIDS_EXAMPLE<TV> BASE;
-    using BASE::frame_rate;using BASE::last_frame;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::solids_parameters;
+    using BASE::frame_rate;using BASE::last_frame;using BASE::restart;using BASE::restart_frame;using BASE::viewer_dir;using BASE::solids_parameters;
     using BASE::data_directory;using BASE::solid_body_collection;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
     using BASE::user_last_frame;
@@ -106,7 +106,7 @@ void Initialize_Bodies() override
     solids_parameters.cfl=(T)5;
     solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
     if(!this->user_output_directory)
-        output_directory="Cloth_Spheres/output_hires_new";
+        viewer_dir.output_directory="Cloth_Spheres/output_hires_new";
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
     solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
     solids_parameters.triangle_collision_parameters.perform_self_collision=true;

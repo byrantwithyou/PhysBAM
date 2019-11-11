@@ -7,6 +7,7 @@
 #include <Core/Matrices/ROTATION.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Core/Utilities/PROCESS_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <Tools/Krylov_Solvers/MINRES.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
@@ -28,8 +29,8 @@
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Level_Sets/REINITIALIZATION.h>
-#include <iostream>
 #include "ANALYTIC_POISSON_TEST.h"
+#include <iostream>
 #ifdef USE_OPENMP
 #include <omp.h>
 #endif
@@ -72,13 +73,13 @@ void Dump_System(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,ANALYTIC_POISSON_
     typedef VECTOR<int,TV::m> TV_INT;
 
     Dump_Interface<T,TV>(ips);
-    Flush_Frame<TV>("surfaces");
+    Flush_Frame("surfaces");
 
     for(CELL_ITERATOR<TV> it(ips.grid);it.Valid();it.Next()){
         int c=0;
         at.analytic_levelset->phi(it.Location(),0,c);
         Add_Debug_Particle(it.Location(),color_map[c+3]);}
-    Flush_Frame<TV>("level set");
+    Flush_Frame("level set");
     
     char buff[100];
     for(int c=0;c<ips.cdi->colors;c++){
@@ -93,7 +94,7 @@ void Dump_System(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,ANALYTIC_POISSON_
                     if(ips.cm_u->Get_Index(it.index,c_other)>=0) duplicated=true;}
                 if(duplicated) Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,1));
                 else Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));}}                        
-        Flush_Frame<TV>(buff);}
+        Flush_Frame(buff);}
 
     for(typename HASHTABLE<TV_INT,CELL_ELEMENTS>::CONST_ITERATOR it(ips.cdi->index_to_cell_elements);it.Valid();it.Next()){
         const CELL_ELEMENTS& cell_elements=it.Data();
@@ -114,7 +115,7 @@ void Dump_System(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,ANALYTIC_POISSON_
             T f_volume=-at.mu(c)*at.analytic_solution(c)->L(it.Location(),0);
             Add_Debug_Particle(it.Location(),f_volume==0?VECTOR<T,3>(0.25,0.25,0.25):(f_volume>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0)));
             Debug_Particle_Set_Attribute<TV>("display_size",f_volume);}}
-        Flush_Frame<TV>("volumetric forces");
+        Flush_Frame("volumetric forces");
 }
 
 template<class T,class TV>
@@ -130,7 +131,7 @@ void Dump_Vector(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,const INTERFACE_P
                 T u_value=v.u(c)(k);
                 Add_Debug_Particle(it.Location(),u_value==0?VECTOR<T,3>(0.25,0.25,0.25):(u_value>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0)));
                 Debug_Particle_Set_Attribute<TV>("display_size",u_value);}}
-        Flush_Frame<TV>(buff);}
+        Flush_Frame(buff);}
 }
 
 template<class T,class TV>
@@ -144,7 +145,7 @@ void Dump_Vector(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,const ARRAY<T,VEC
         T u_value=u(it.index);
         Add_Debug_Particle(it.Location(),u_value==0?VECTOR<T,3>(0.25,0.25,0.25):(u_value>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0)));
         Debug_Particle_Set_Attribute<TV>("display_size",u_value);}
-    Flush_Frame<TV>(title);
+    Flush_Frame(title);
 }
 
 //#################################################################################################################################################
@@ -173,12 +174,12 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_POISSON_TEST<TV>& at,int max_iter,boo
             T p=color_phi(c)(it.index);
             Add_Debug_Particle(it.Location(),color_map[c]/(p>0?2:1));
             Debug_Particle_Set_Attribute<TV>("display_size",p);}
-        Flush_Frame<TV>("reinitialized level set");
+        Flush_Frame("reinitialized level set");
         LEVELSET<TV> levelset(grid,color_phi(c),1);
         for(NODE_ITERATOR<TV> it(grid);it.Valid();it.Next()){
             Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
             Debug_Particle_Set_Attribute<TV>("V",levelset.Normal(it.Location()));}
-        Flush_Frame<TV>("normals");}
+        Flush_Frame("normals");}
 
     INTERFACE_POISSON_SYSTEM_COLOR<TV> ips(grid,color_phi);
     ips.use_preconditioner=use_preconditioner;
@@ -284,9 +285,9 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     int test_number=1,resolution=4,max_iter=1000000;
     bool use_preconditioner=false,use_test=false,null=false,dump_matrix=false,debug_particles=false,opt_arg=false;
     bool test_analytic_diff=false;
-    std::string output_directory="output";
+    VIEWER_DIR viewer_dir("output");
     parse_args.Extra_Optional(&test_number,&opt_arg,"example number","example number to run");
-    parse_args.Add("-o",&output_directory,"output","output directory");
+    parse_args.Add("-o",&viewer_dir.output_directory,"output","output directory");
     parse_args.Add("-m",&m,"unit","meter scale");
     parse_args.Add("-s",&s,"unit","second scale");
     parse_args.Add("-kg",&kg,"unit","kilogram scale");
@@ -521,8 +522,9 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     GRID<TV> grid(counts,RANGE<TV>(TV(),TV()+1),true);
     GRID<TV> grid2(counts*2,RANGE<TV>(TV(),TV()+1),true);
 
-    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),grid2,output_directory);
-    vo.debug_particles.edge_separation=(T).02;
+    VIEWER_OUTPUT vo(STREAM_TYPE((RW)0),viewer_dir);
+    Use_Debug_Particles<TV>();
+    Get_Debug_Particles<TV>().edge_separation=(T).02;
 
     if(test_analytic_diff) test.Test(grid.domain);
 
@@ -531,17 +533,17 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
         T p=test.analytic_levelset->phi(it.Location(),0,c);
         Add_Debug_Particle(it.Location(),color_map[c+3]);
         Debug_Particle_Set_Attribute<TV>("display_size",p);}
-    Flush_Frame<TV>("level set");
+    Flush_Frame("level set");
     for(int c=-3;c<test.analytic_solution.m;c++){
         for(CELL_ITERATOR<TV> it(grid);it.Valid();it.Next()){
             T p=test.analytic_levelset->dist(it.Location(),0,c);
             Add_Debug_Particle(it.Location(),color_map[c+3]/(p>0?2:1));
             Debug_Particle_Set_Attribute<TV>("display_size",abs(p));
             Debug_Particle_Set_Attribute<TV>("V",test.analytic_levelset->N(it.Location(),0,c));}
-        Flush_Frame<TV>("normals");}
+        Flush_Frame("normals");}
 
     Analytic_Test(grid,test,max_iter,use_preconditioner,null,dump_matrix,debug_particles);
-    Flush_Frame<TV>("finish");
+    Flush_Frame("finish");
     LOG::Finish_Logging();
 }
 

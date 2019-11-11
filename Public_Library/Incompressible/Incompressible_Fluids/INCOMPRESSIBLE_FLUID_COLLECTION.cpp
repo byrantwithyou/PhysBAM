@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Log/LOG.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Grid_PDE/Boundaries/BOUNDARY.h>
@@ -27,20 +28,18 @@ template<class TV> INCOMPRESSIBLE_FLUID_COLLECTION<TV>::
 // Function Write_Output_Files
 //#####################################################################
 template<class TV> void INCOMPRESSIBLE_FLUID_COLLECTION<TV>::
-Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const
+Write_Output_Files(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir) const
 {
-    std::string f=LOG::sprintf("%d",frame);
-    Write_To_File(stream_type,output_directory+"/"+f+"/mac_velocities",face_velocities);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/mac_velocities",face_velocities);
 }
 //#####################################################################
 // Function Read_Output_Files
 //#####################################################################
 template<class TV> void INCOMPRESSIBLE_FLUID_COLLECTION<TV>::
-Read_Output_Files(const std::string& output_directory,const int frame)
+Read_Output_Files(const VIEWER_DIR& viewer_dir)
 {
-    std::string f=LOG::sprintf("%d",frame);
-    std::string filename=output_directory+"/"+f+"/mac_velocities";
-    std::string centered_velocity_filename=output_directory+"/"+f+"/centered_velocities";
+    std::string filename=viewer_dir.current_directory+"/mac_velocities";
+    std::string centered_velocity_filename=viewer_dir.current_directory+"/centered_velocities";
     if(File_Exists(filename)){LOG::cout<<"Reading mac_velocities "<<filename<<std::endl;
         Read_From_File(filename,face_velocities);}
     else if(File_Exists(centered_velocity_filename)){

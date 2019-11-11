@@ -21,15 +21,12 @@ class OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D:public OPENGL_COMPONENT<T>
     typedef VECTOR<T,3> TV;typedef VECTOR<int,TV::m> TV_INT;
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
-    using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_OBJECT<T>::viewer_callbacks;
-    OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D(const GRID<TV> &grid,const std::string &velocity_filename_input);
+    using OPENGL_COMPONENT<T>::component_name;
+    using OPENGL_OBJECT<T>::viewer_callbacks;using OPENGL_COMPONENT<T>::viewer_dir;
+    OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D(const VIEWER_DIR& viewer_dir,const GRID<TV> &grid,const std::string &velocity_filename_input);
     virtual ~OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D();
 
-    bool Valid_Frame(int frame_input) const override;
-    bool Is_Up_To_Date(int frame) const override { return valid && frame_loaded == frame; }
-
-    void Set_Frame(int frame_input) override;
+    void Set_Frame() override;
     void Set_Draw(bool draw_input = true) override;
 
     void Display() const override;
@@ -60,7 +57,6 @@ public:
 
 private:
     std::string velocity_filename;
-    int frame_loaded;
     bool valid;
     T min_vorticity,max_vorticity;
 };

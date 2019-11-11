@@ -24,7 +24,7 @@ class LIGHTHOUSE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>,public BOUNDARY_OPEN_C
     typedef ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,TV_INT> T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::data_directory;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::viewer_dir;using BASE::data_directory;
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::stream_type;using BASE::solid_body_collection;using BASE::resolution;
     using BASE::test_number;
     using BASE::user_last_frame;
@@ -70,7 +70,7 @@ public:
         fluids_parameters.write_debug_data=true;
         fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).save_removed_particle_times=true;
         if(!this->user_output_directory)
-            output_directory=LOG::sprintf("Lighthouse/Test_%d_Lighthouse_Resolution_%d_%d_%d",test_number,(fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),
+            viewer_dir.output_directory=LOG::sprintf("Lighthouse/Test_%d_Lighthouse_Resolution_%d_%d_%d",test_number,(fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),
                 (fluids_parameters.grid->counts.z-1));
         fluids_parameters.delete_fluid_inside_objects=true;
         fluids_parameters.enforce_divergence_free_extrapolation=false;
@@ -204,7 +204,7 @@ bool Adjust_Phi_With_Sources(const T time) override
 //#####################################################################
 void Postprocess_Frame(const int frame) override
 {
-    Write_To_File(stream_type,LOG::sprintf("%s/removed_particle_times.%d",output_directory.c_str(),frame),
+    Write_To_File(stream_type,LOG::sprintf("%s/removed_particle_times.%d",viewer_dir.output_directory.c_str(),frame),
         fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).removed_particle_times);
     std::cout<<"Wrote "<<fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).removed_particle_times.m<<" number of particles"<<std::endl;
     fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).removed_particle_times.Clean_Memory();

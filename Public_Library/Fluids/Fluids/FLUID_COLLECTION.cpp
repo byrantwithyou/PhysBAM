@@ -24,19 +24,19 @@ template<class TV> FLUID_COLLECTION<TV>::
 // Function Write_Output_Files
 //#####################################################################
 template<class TV> void FLUID_COLLECTION<TV>::
-Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const
+Write_Output_Files(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir) const
 {
-    //compressible_fluid_collection.Write_Output_Files(frame);
-    incompressible_fluid_collection.Write_Output_Files(stream_type,output_directory,frame);
+    //compressible_fluid_collection.Write_Output_Files();
+    incompressible_fluid_collection.Write_Output_Files(stream_type,viewer_dir);
 }
 //#####################################################################
 // Function Read_Output_Files
 //#####################################################################
 template<class TV> void FLUID_COLLECTION<TV>::
-Read_Output_Files(const std::string& output_directory,const int frame)
+Read_Output_Files(const VIEWER_DIR& viewer_dir)
 {
-    //compressible_fluid_collection.Read_Output_Files(frame);
-    incompressible_fluid_collection.Read_Output_Files(output_directory,frame);
+    //compressible_fluid_collection.Read_Output_Files();
+    incompressible_fluid_collection.Read_Output_Files(viewer_dir);
 }
 //#####################################################################
 // Function Initialize

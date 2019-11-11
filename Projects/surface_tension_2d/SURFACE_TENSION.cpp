@@ -194,7 +194,7 @@ SURFACE_TENSION(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
 
     Add_Rigid_Body_Walls();
     if(!this->user_output_directory)
-        output_directory=LOG::sprintf("Test_%d",test_number,resolution);
+        viewer_dir.output_directory=LOG::sprintf("Test_%d",test_number,resolution);
 }
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -871,11 +871,10 @@ Copy_Front_Tracked_Velocity_From_Fluid()
 // Function Write_Output_Files
 //#####################################################################
 template<class T> void SURFACE_TENSION<T>::
-Write_Output_Files(const int frame) const
+Write_Output_Files() const
 {
-    BASE::Write_Output_Files(frame);
-    Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),frame));
-    debug_particles.Write_Debug_Particles(this->stream_type,output_directory,frame);
+    BASE::Write_Output_Files();
+    debug_particles.Write_Debug_Particles(this->stream_type,viewer_dir);
 }
 //#####################################################################
 // Function Initialize_Surface_Particles
@@ -1062,7 +1061,7 @@ FSI_Analytic_Test()
     analytic_solution=-(solid_mass*-solid_gravity.y+rho*size.x*size.y*-fluids_parameters.gravity.y)*size.x/(2*size.y*fluids_parameters.viscosity);
     LOG::cout<<"analytic_solution "<<analytic_solution<<std::endl;
 
-    Create_Directory(LOG::sprintf("%s/%i",output_directory.c_str(),0));
+    Create_Directory(LOG::sprintf("%s/%i",viewer_dir.output_directory.c_str(),0));
 }
 //#####################################################################
 // Function Postprocess_Frame

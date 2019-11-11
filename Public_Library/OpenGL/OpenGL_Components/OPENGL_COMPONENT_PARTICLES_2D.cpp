@@ -5,6 +5,7 @@
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Log/LOG.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <OpenGL/OpenGL/OPENGL_INDEXED_COLOR_MAP.h>
 #include <OpenGL/OpenGL/OPENGL_WORLD.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_PARTICLES_2D.h>
@@ -15,10 +16,10 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_PARTICLES_2D<T>::
-OPENGL_COMPONENT_PARTICLES_2D(const std::string &filename_input, const std::string &filename_set_input, bool use_ids_input, bool particles_stored_per_cell_uniform_input)
-    :OPENGL_COMPONENT<T>("Particles 2D"), particles(new GEOMETRY_PARTICLES<TV>),opengl_points(new OPENGL_POINTS_2D<T>(*(new ARRAY<TV>))),
+OPENGL_COMPONENT_PARTICLES_2D(const VIEWER_DIR& viewer_dir, const std::string &filename_input, const std::string &filename_set_input, bool use_ids_input, bool particles_stored_per_cell_uniform_input)
+    :OPENGL_COMPONENT<T>(viewer_dir,"Particles 2D"), particles(new GEOMETRY_PARTICLES<TV>),opengl_points(new OPENGL_POINTS_2D<T>(*(new ARRAY<TV>))),
     opengl_vector_field(*(new ARRAY<TV>), opengl_points->points, OPENGL_COLOR::Cyan()), 
-      filename(filename_input), filename_set(filename_set_input), frame_loaded(-1), set(0), set_loaded(-1),number_of_sets(0),use_sets(false),valid(false),
+      filename(filename_input), filename_set(filename_set_input),  set(0), set_loaded(-1),number_of_sets(0),use_sets(false),valid(false),
       draw_velocities(false), have_velocities(false), use_ids(use_ids_input), 
       particles_stored_per_cell_uniform(particles_stored_per_cell_uniform_input),
 draw_multiple_particle_sets(false),selected_set(-1)
@@ -34,7 +35,7 @@ draw_multiple_particle_sets(false),selected_set(-1)
 
     number_of_sets=0;
     while(filename_set!=""){
-        std::string filename=LOG::sprintf(filename_set.c_str(),frame,number_of_sets);
+        std::string filename=viewer_dir.current_directory+"/"+LOG::sprintf(filename_set.c_str(),number_of_sets);
         LOG::cout<<"Checking "<<filename<<std::endl;
         if(File_Exists(filename)) number_of_sets++;
         else break;}
@@ -50,7 +51,6 @@ draw_multiple_particle_sets(false),selected_set(-1)
         opengl_points_multiple(i)=new OPENGL_POINTS_2D<T>(*(new ARRAY<TV>),color_map->Lookup(i));}
     delete color_map;
         
-    is_animation=Is_Animated(filename);
     // Don't need to call Reinitialize here because it will be called in first call to Set_Frame
 }
 //#####################################################################
@@ -63,20 +63,12 @@ template<class T> OPENGL_COMPONENT_PARTICLES_2D<T>::
     delete &opengl_vector_field.vector_field;
 }
 //#####################################################################
-// Function Valid_Frame
-//#####################################################################
-template<class T> bool OPENGL_COMPONENT_PARTICLES_2D<T>::
-Valid_Frame(int frame_input) const
-{
-    return Frame_File_Exists(filename,frame_input);
-}
-//#####################################################################
 // Function Set_Frame
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_PARTICLES_2D<T>::
-Set_Frame(int frame_input)
+Set_Frame()
 {
-    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
+    
     Reinitialize();
 }
 //#####################################################################
@@ -192,16 +184,16 @@ Selection_Bounding_Box() const
 // Function Reinitialize
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_PARTICLES_2D<T>::
-Reinitialize(bool force)
+Reinitialize()
 {
-    if(!draw || !(force || !valid || (is_animation && frame_loaded != frame) || (!is_animation && frame_loaded<0))) return;
+    if(!draw) return;
     valid=true;
     have_velocities=false;
 
     for(int i=0;i<number_of_sets;i++){
         std::string frame_filename;
-        if(use_sets) frame_filename=LOG::sprintf(filename_set.c_str(),frame,i);
-        else frame_filename=Get_Frame_Filename(filename,frame);
+        if(use_sets) frame_filename=viewer_dir.current_directory+"/"+LOG::sprintf(filename_set.c_str(),i);
+        else frame_filename=viewer_dir.current_directory+"/"+filename;
         
         try{
             FILE_ISTREAM input;
@@ -220,7 +212,6 @@ Reinitialize(bool force)
                 Read_Binary(input,*particles_multiple(i));}
             opengl_points_multiple(i)->Set_Points_From_Particles(*particles_multiple(i),true);}
         catch(FILESYSTEM_ERROR&){valid=false;}}
-    frame_loaded=frame;
 #if 0
     if(draw_velocities && particles->store_velocity){
         have_velocities=true;
@@ -253,7 +244,7 @@ template<class T> void OPENGL_COMPONENT_PARTICLES_2D<T>::
 Toggle_Draw_Velocities()
 {
     draw_velocities=!draw_velocities;
-    if(draw_velocities) Reinitialize(true);
+    if(draw_velocities) Reinitialize();
 }
 //#####################################################################
 // Function Command_Prompt_Response

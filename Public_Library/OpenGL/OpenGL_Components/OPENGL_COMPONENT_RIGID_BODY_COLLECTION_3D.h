@@ -31,9 +31,7 @@ class OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D:public OPENGL_COMPONENT<T>
 protected:
     typedef VECTOR<T,3> TV;
 
-    std::string basedir;
     bool use_display_lists;
-    int frame_loaded;
     bool valid;
     bool show_object_names;
     bool output_positions;
@@ -81,13 +79,12 @@ protected:
     
 public:
     using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::slice;using OPENGL_COMPONENT<T>::frame;
-    using OPENGL_OBJECT<T>::viewer_callbacks;using OPENGL_COMPONENT<T>::is_animation;
-    OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(const std::string& basedir, bool use_display_lists=true);
-    OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir, bool use_display_lists=true);
+    using OPENGL_OBJECT<T>::viewer_callbacks;using OPENGL_COMPONENT<T>::viewer_dir;
+    OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(const VIEWER_DIR& viewer_dir,bool use_display_lists=true);
+    OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(const VIEWER_DIR& viewer_dir,RIGID_BODY_COLLECTION<TV>& rigid_body_collection,bool use_display_lists=true);
     virtual ~OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D();
 
-    bool Valid_Frame(int frame_input) const override;
-    void Set_Frame(int frame_input) override;
+    void Set_Frame() override;
     void Set_Draw(bool draw_input = true) override;
     void Draw_All_Objects() override;
 
@@ -132,10 +129,8 @@ public:
     void Toggle_Forces_And_Torques();
 
     void Resize_Structures(const int size);
-    virtual void Reinitialize(const bool force=false,const bool read_geometry=true);    // Needs to be called after some state changes
-    virtual void Reinitialize_Without_Files(const bool force=false);    // Needs to be called after some state changes
+    virtual void Reinitialize();    // Needs to be called after some state changes
     void Update_Bodies(const bool update_arb_points=true);
-    void Initialize_One_Body(const int body_id,const bool force=false);
 protected:
     void Initialize();
     void Set_Draw_Mode(const int mode);

@@ -7,6 +7,7 @@
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Log/DEBUG_SUBSTEPS.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Grid_PDE/Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
 #include <Grid_PDE/Boundaries/BOUNDARY.h>
@@ -26,8 +27,8 @@ public:
     T frame_rate;
     std::string frame_title;
     int write_substeps_level;
-    bool write_first_frame,write_last_frame,write_time;
-    std::string output_directory,data_directory;
+    VIEWER_DIR viewer_dir;
+    std::string data_directory;
 
     bool auto_restart;
     bool restart;
@@ -64,7 +65,7 @@ public:
     void Set_Write_Substeps_Level(const int level);
     void Write_Frame_Title(const int frame) const;
     void Setup_Log() const;
-    virtual void Write_Output_Files(const int frame) const=0;
+    virtual void Write_Output_Files() const=0;
     virtual void Log_Parameters() const;
 //#####################################################################
 };

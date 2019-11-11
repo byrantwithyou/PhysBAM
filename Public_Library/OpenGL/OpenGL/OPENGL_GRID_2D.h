@@ -15,6 +15,7 @@
 
 namespace PhysBAM
 {
+class VIEWER_DIR;
 
 template<class T>
 class OPENGL_GRID_2D:public OPENGL_OBJECT<T>
@@ -42,15 +43,14 @@ private:
     SELECT_TYPE select_type;
     TV_INT selected_cell;
     TV_INT selected_node;
-    std::string basedir;
-    int frame;
+    const VIEWER_DIR& viewer_dir;
 
 public:
-    OPENGL_GRID_2D(GRID<TV> &grid_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::White(),
-        const std::string basedir_input="",const int frame_input=0);
+    OPENGL_GRID_2D(const VIEWER_DIR& viewer_dir,GRID<TV> &grid_input,
+        const OPENGL_COLOR &color_input=OPENGL_COLOR::White());
 
     void Display() const override;
-    virtual void Set_Frame(int frame_input);
+    virtual void Set_Frame();
     virtual RANGE<VECTOR<T,3> > Bounding_Box() const override;
 
     virtual int Get_Selection_Priority(ARRAY_VIEW<GLuint> indices) override;

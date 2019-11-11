@@ -4,6 +4,7 @@
 //#####################################################################
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <OpenGL/OpenGL_Components/OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D.h>
 using namespace PhysBAM;
@@ -11,11 +12,11 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T,class T2> OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,T2>::
-OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D(const GRID<TV> &grid_input,const std::string &values_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input)
-    :OPENGL_COMPONENT<T>("Face Scalar Field 3D"),opengl_scalar_field(grid_input,internal_scalar_field,color_map_input),
-      values_filename(values_filename_input),frame_loaded(-1),valid(false)
+OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D(const VIEWER_DIR& viewer_dir,const GRID<TV> &grid_input,const std::string &values_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input)
+    :OPENGL_COMPONENT<T>(viewer_dir,"Face Scalar Field 3D"),
+    values_filename(values_filename_input),valid(false),
+    opengl_scalar_field(grid_input,internal_scalar_field,valid,color_map_input)
 {
-    is_animation = Is_Animated(values_filename);
     Reinitialize();
 }
 //#####################################################################
@@ -26,20 +27,11 @@ template<class T,class T2> OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,T2>::
 {
 }
 //#####################################################################
-// Function Valid_Frame
-//#####################################################################
-template<class T,class T2> bool OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,T2>::
-Valid_Frame(int frame_input) const
-{
-    return Frame_File_Exists(values_filename,frame_input);
-}
-//#####################################################################
 // Function Set_Frame
 //#####################################################################
 template<class T,class T2> void OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,T2>::
-Set_Frame(int frame_input)
+Set_Frame()
 {
-    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
     Reinitialize();
 }
 //#####################################################################
@@ -75,9 +67,8 @@ Bounding_Box() const
 template<class T,class T2> void OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,T2>::
 Print_Selection_Info(std::ostream& stream) const
 {
-    if(Is_Up_To_Date(frame)){
-        stream<<component_name<<": "<<std::endl;
-        opengl_scalar_field.Print_Selection_Info(stream);}
+    stream<<component_name<<": "<<std::endl;
+    opengl_scalar_field.Print_Selection_Info(stream);
 }
 //#####################################################################
 // Function Reinitialize
@@ -85,24 +76,14 @@ Print_Selection_Info(std::ostream& stream) const
 template<class T,class T2> void OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,T2>::
 Reinitialize()
 {
-    if(draw)
-    {
-        if((is_animation && frame_loaded != frame) ||
-            (!is_animation && frame_loaded < 0))
-        {
-            valid = false;
-
-            std::string filename;
-            filename=Get_Frame_Filename(values_filename,frame);
-            if(File_Exists(filename))
-                Read_From_File(filename,opengl_scalar_field.face_values);
-            else return;
-
-            opengl_scalar_field.Update();
-            frame_loaded = frame;
-            valid = true;
-        }
-    }
+    if(!draw) return;
+    valid=false;
+    std::string filename=viewer_dir.current_directory+"/"+values_filename;
+    if(File_Exists(filename))
+        Read_From_File(filename,opengl_scalar_field.face_values);
+    else return;
+    opengl_scalar_field.Update();
+    valid=true;
 }
 namespace PhysBAM{
 template class OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<float,int>;

@@ -17,7 +17,7 @@ SMOKE_EXAMPLE(const STREAM_TYPE stream_type_input,int number_of_threads)
     :stream_type(stream_type_input),
     debug_particles(*new DEBUG_PARTICLES<TV>),ghost(5),
     last_frame(100),frame_rate(24),
-    restart(0),write_debug_data(true),output_directory("output"),N_boundary(false),
+    restart(0),write_debug_data(true),viewer_dir("output"),N_boundary(false),
     debug_divergence(false),alpha(0.1),beta(0.00366),
     cfl(.9),grid(TV_INT(),RANGE<TV>::Unit_Box(),true),mpi_grid(0),
     projection(grid,false,false),boundary(0),
@@ -146,38 +146,36 @@ Set_Boundary_Conditions(const T time, const T source_velocities)
 // Function Write_Output_Files
 //#####################################################################
 template<class TV> void SMOKE_EXAMPLE<TV>::
-Write_Output_Files(const int frame)
+Write_Output_Files()
 {
-    std::string f=LOG::sprintf("%d",frame);
-    Write_To_File(stream_type,output_directory+"/"+f+"/mac_velocities",face_velocities);
-    if(mpi_grid) Write_To_File(stream_type,output_directory+"/common/global_grid",mpi_grid->global_grid);
-    Write_To_File(stream_type,output_directory+"/"+f+"/grid",grid);
-    Write_To_File(stream_type,output_directory+"/common/grid",grid);
-    Write_To_File(stream_type,output_directory+"/"+f+"/density",density);
-    Write_To_File(stream_type,output_directory+"/"+f+"/temperature",temperature);// add temperature
+    Write_To_File(stream_type,viewer_dir.current_directory+"/mac_velocities",face_velocities);
+    if(mpi_grid) Write_To_File(stream_type,viewer_dir.output_directory+"/common/global_grid",mpi_grid->global_grid);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/grid",grid);
+    Write_To_File(stream_type,viewer_dir.output_directory+"/common/grid",grid);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/density",density);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/temperature",temperature);// add temperature
     if(write_debug_data){
-        Write_To_File(stream_type,output_directory+"/"+f+"/pressure",projection.p);
-        Write_To_File(stream_type,output_directory+"/"+f+"/psi_N",projection.elliptic_solver->psi_N);
-        Write_To_File(stream_type,output_directory+"/"+f+"/psi_D",projection.elliptic_solver->psi_D);}
+        Write_To_File(stream_type,viewer_dir.current_directory+"/pressure",projection.p);
+        Write_To_File(stream_type,viewer_dir.current_directory+"/psi_N",projection.elliptic_solver->psi_N);
+        Write_To_File(stream_type,viewer_dir.current_directory+"/psi_D",projection.elliptic_solver->psi_D);}
     for(int p=0;p<particles.number;p++){
         Add_Debug_Particle(particles.X(p),VECTOR<T,3>(0,1,0));
         Debug_Particle_Set_Attribute<TV>("V",particles.V(p));}
-    debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
+    debug_particles.Write_Debug_Particles(stream_type,viewer_dir);
 }
 //#####################################################################
 // Function Read_Output_Files
 //#####################################################################
 template<class TV> void SMOKE_EXAMPLE<TV>::
-Read_Output_Files(const int frame)
+Read_Output_Files()
 {
-    std::string f=LOG::sprintf("%d",frame);
-    Read_From_File(output_directory+"/"+f+"/density",density);
+    Read_From_File(viewer_dir.current_directory+"/density",density);
     std::string filename;
-    filename=output_directory+"/"+f+"/mac_velocities";
+    filename=viewer_dir.current_directory+"/mac_velocities";
     if(File_Exists(filename)){
         LOG::cout<<"Reading mac_velocities "<<filename<<std::endl;
         Read_From_File(filename,face_velocities);}
-    filename=output_directory+"/"+f+"/pressure";
+    filename=viewer_dir.current_directory+"/pressure";
     if(File_Exists(filename)){
         LOG::cout<<"Reading pressure "<<filename<<std::endl;
         Read_From_File(filename,projection.p);}

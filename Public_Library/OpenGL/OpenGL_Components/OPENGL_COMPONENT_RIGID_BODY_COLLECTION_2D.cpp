@@ -5,6 +5,7 @@
 #include <Core/Arrays/INDIRECT_ARRAY.h>
 #include <Core/Matrices/MATRIX_MXN.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
@@ -28,8 +29,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
-OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(const std::string& basedir_input)
-    :OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(*new RIGID_BODY_COLLECTION<TV>(0),basedir_input)
+OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(const VIEWER_DIR& viewer_dir)
+    :OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(viewer_dir,*new RIGID_BODY_COLLECTION<TV>(0))
 {
     need_destroy_rigid_body_collection=true;
 }
@@ -37,8 +38,8 @@ OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(const std::string& basedir_input)
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
-OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir_input)
-    :OPENGL_COMPONENT<T>("Rigid Geometry Collection 2D"),basedir(basedir_input),frame_loaded(-1),valid(false),show_object_names(false),output_positions(true),draw_velocity_vectors(false),
+OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(const VIEWER_DIR& viewer_dir,RIGID_BODY_COLLECTION<TV>& rigid_body_collection)
+    :OPENGL_COMPONENT<T>(viewer_dir,"Rigid Geometry Collection 2D"),valid(false),show_object_names(false),output_positions(true),draw_velocity_vectors(false),
     draw_individual_axes(false),draw_node_velocity_vectors(false),draw_segmented_curve(true),draw_triangulated_area(false),draw_implicit_curve(false),
     draw_articulation_points(false),draw_forces_and_torques(false),draw_linear_muscles(false),need_destroy_rigid_body_collection(false),selected_curve(-1),selected_area(-1),selected_joint_id(-1),selected_muscle_id(-1),
     rigid_body_collection(rigid_body_collection),articulated_rigid_body(0),
@@ -56,7 +57,6 @@ OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(RIGID_BODY_COLLECTION<TV>& rigid_body_
     viewer_callbacks.Set("toggle_linear_muscles",{[this](){Toggle_Linear_Muscles();},"Toggle linear muscles"});
     viewer_callbacks.Set("toggle_forces_and_torques",{[this](){Toggle_Forces_And_Torques();},"Toggle forces and torques"});
 
-    is_animation=true;
     has_init_destroy_information=true;
 }
 //#####################################################################
@@ -89,66 +89,64 @@ Get_Draw_Mode() const
 // Function Reinitialize
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
-Reinitialize(const bool force,const bool read_geometry)
+Reinitialize(const bool read_geometry)
 {
-    if(draw && (force || (is_animation && (frame_loaded!=frame)) || (!is_animation && (frame_loaded<0)))){
-        valid=false;
-        if(!File_Exists(LOG::sprintf("%s/%d/rigid_body_particles",basedir.c_str(),frame))) return;
+    if(!draw) return;
+    valid=false;
+    if(!File_Exists(viewer_dir.current_directory+"/rigid_body_particles")) return;
 
-        rigid_body_collection.Read(basedir,frame,&needs_init,&needs_destroy); // TODO: avoiding reading triangulated areas
-        if(has_init_destroy_information) for(int i=0;i<needs_destroy.m;i++) Destroy_Geometry(needs_destroy(i));
+    rigid_body_collection.Read(viewer_dir,&needs_init,&needs_destroy); // TODO: avoiding reading triangulated areas
+    if(has_init_destroy_information) for(int i=0;i<needs_destroy.m;i++) Destroy_Geometry(needs_destroy(i));
 
-        std::string arb_state_file=LOG::sprintf("%s/%d/arb_state",basedir.c_str(),frame);
-        if(File_Exists(arb_state_file)){
-            if(!articulated_rigid_body) articulated_rigid_body=new ARTICULATED_RIGID_BODY<TV>(rigid_body_collection); // TODO: read in the actual particles
-            articulated_rigid_body->Read(basedir,frame);}
-        else{delete articulated_rigid_body;articulated_rigid_body=0;}
+    std::string arb_state_file=viewer_dir.current_directory+"/arb_state";
+    if(File_Exists(arb_state_file)){
+        if(!articulated_rigid_body) articulated_rigid_body=new ARTICULATED_RIGID_BODY<TV>(rigid_body_collection); // TODO: read in the actual particles
+        articulated_rigid_body->Read(viewer_dir);}
+    else{delete articulated_rigid_body;articulated_rigid_body=0;}
 
-        if(File_Exists(LOG::sprintf("%s/%d/arb_info",basedir.c_str(),frame)))
-            Read_Articulated_Information(LOG::sprintf("%s/%d/arb_info",basedir.c_str(),frame));
+    if(File_Exists(viewer_dir.current_directory+"/arb_info"))
+        Read_Articulated_Information(viewer_dir.current_directory+"/arb_info");
 
-        std::string filename=LOG::sprintf("%s/%d/rigid_body_forces_and_torques",basedir.c_str(),frame);
-        if(File_Exists(filename)) Read_From_File(filename,forces_and_torques);
-        else forces_and_torques.Resize(0);
+    std::string filename=viewer_dir.current_directory+"/rigid_body_forces_and_torques";
+    if(File_Exists(filename)) Read_From_File(filename,forces_and_torques);
+    else forces_and_torques.Resize(0);
 
-        int max_number_of_bodies(max(opengl_segmented_curve.Size(),rigid_body_collection.rigid_body_particles.Size()));
-        // only enlarge array as we read in more geometry to memory
-        opengl_segmented_curve.Resize(max_number_of_bodies);
-        opengl_triangulated_area.Resize(max_number_of_bodies);
-        opengl_levelset.Resize(max_number_of_bodies);
-        extra_components.Resize(max_number_of_bodies);
-        opengl_axes.Resize(max_number_of_bodies);
-        draw_object.Resize(max_number_of_bodies);draw_object.Fill(true);
-        use_object_bounding_box.Resize(max_number_of_bodies);use_object_bounding_box.Fill(true);
+    int max_number_of_bodies(max(opengl_segmented_curve.Size(),rigid_body_collection.rigid_body_particles.Size()));
+    // only enlarge array as we read in more geometry to memory
+    opengl_segmented_curve.Resize(max_number_of_bodies);
+    opengl_triangulated_area.Resize(max_number_of_bodies);
+    opengl_levelset.Resize(max_number_of_bodies);
+    extra_components.Resize(max_number_of_bodies);
+    opengl_axes.Resize(max_number_of_bodies);
+    draw_object.Resize(max_number_of_bodies);draw_object.Fill(true);
+    use_object_bounding_box.Resize(max_number_of_bodies);use_object_bounding_box.Fill(true);
 
-        // Initialize bodies which have become active
-        if(has_init_destroy_information) for(int i=0;i<needs_init.m;i++){
+    // Initialize bodies which have become active
+    if(has_init_destroy_information) for(int i=0;i<needs_init.m;i++){
             int id=needs_init(i);PHYSBAM_ASSERT(rigid_body_collection.Is_Active(id));
             Create_Geometry(id);}
 
-        // Only display real bodies (not ghost bodies)
-        if(File_Exists(LOG::sprintf("%s/%d/partition",basedir.c_str(),frame))) {
-            ARRAY<int> particles_of_this_partition;
-            Read_From_File(LOG::sprintf("%s/%d/partition",basedir.c_str(),frame),particles_of_this_partition);
-            for(int i=0;i<max_number_of_bodies;i++)
-                draw_object(i)=false;
-            for(int i=0;i<particles_of_this_partition.Size();i++)
-                draw_object(particles_of_this_partition(i))=true;}
+    // Only display real bodies (not ghost bodies)
+    if(File_Exists(viewer_dir.current_directory+"/partition")) {
+        ARRAY<int> particles_of_this_partition;
+        Read_From_File(viewer_dir.current_directory+"/partition",particles_of_this_partition);
+        for(int i=0;i<max_number_of_bodies;i++)
+            draw_object(i)=false;
+        for(int i=0;i<particles_of_this_partition.Size();i++)
+            draw_object(particles_of_this_partition(i))=true;}
 
-        // Update active bodies / remove inactive bodies
-        for(int id=0;id<rigid_body_collection.rigid_body_particles.Size();id++){
-            if(rigid_body_collection.Is_Active(id)) Update_Geometry(id);
-            else Destroy_Geometry(id);}
-        for(int id=rigid_body_collection.rigid_body_particles.Size();id<opengl_segmented_curve.Size();id++) Destroy_Geometry(id);
-        if(File_Exists(LOG::sprintf("%s/%d/colors",basedir.c_str(),frame)))
-            Read_From_File(LOG::sprintf("%s/%d/colors",basedir.c_str(),frame),colors);
-        for(int id=0;id<colors.m;id++){
-            if(colors(id)==0) Set_Object_Color(id,OPENGL_COLOR::Green());
-            if(colors(id)==1) Set_Object_Color(id,OPENGL_COLOR::Magenta());}
+    // Update active bodies / remove inactive bodies
+    for(int id=0;id<rigid_body_collection.rigid_body_particles.Size();id++){
+        if(rigid_body_collection.Is_Active(id)) Update_Geometry(id);
+        else Destroy_Geometry(id);}
+    for(int id=rigid_body_collection.rigid_body_particles.Size();id<opengl_segmented_curve.Size();id++) Destroy_Geometry(id);
+    if(File_Exists(viewer_dir.current_directory+"/colors"))
+        Read_From_File(viewer_dir.current_directory+"/colors",colors);
+    for(int id=0;id<colors.m;id++){
+        if(colors(id)==0) Set_Object_Color(id,OPENGL_COLOR::Green());
+        if(colors(id)==1) Set_Object_Color(id,OPENGL_COLOR::Magenta());}
 
-        frame_loaded=frame;
-        valid=true;}
-
+    valid=true;
     Update_Object_Labels();
 }
 //#####################################################################
@@ -183,11 +181,11 @@ Create_Geometry(const int id)
 
     // add extra components
     if(opengl_triangulated_area(id)){
-        std::string filename_pattern=LOG::sprintf("%s/accumulated_impulses_%d.%%d",basedir.c_str(),id);
-        if(Frame_File_Exists(filename_pattern,frame)){
+        std::string filename=viewer_dir.current_directory+"/accumulated_impulses_"+std::to_string(id);
+        if(File_Exists(filename)){
             LOG::cout<<"Adding accumulated impulses to rigid body "<<id<<std::endl;
             OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>* component=
-                new OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>(*triangulated_area,filename_pattern);
+                new OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>(viewer_dir,*triangulated_area,filename);
             component->opengl_vector_field.Enslave_Transform_To(*opengl_axes(id));
             extra_components(id).Append(component);}}
 }
@@ -199,12 +197,12 @@ Update_Geometry(const int id)
 {
     if(opengl_axes(id)) *opengl_axes(id)->frame=Convert_2d_To_3d(rigid_body_collection.Rigid_Body(id).Frame());
     if(opengl_triangulated_area(id)){
-        std::string color_map_filename=LOG::sprintf("%s/%d/stress_map_of_triangulated_area_%d",basedir.c_str(),frame,id);
+        std::string color_map_filename=viewer_dir.current_directory+"/stress_map_of_triangulated_area_"+std::to_string(id);
         if(File_Exists(color_map_filename)){
             if(!opengl_triangulated_area(id)->color_map) opengl_triangulated_area(id)->color_map=new ARRAY<OPENGL_COLOR>;
             Read_From_File(color_map_filename,*opengl_triangulated_area(id)->color_map);}
         else if(opengl_triangulated_area(id)->color_map){delete opengl_triangulated_area(id)->color_map;opengl_triangulated_area(id)->color_map=0;}}
-    for(int i=0;i<extra_components(id).m;i++) extra_components(id)(i)->Set_Frame(frame);
+    for(int i=0;i<extra_components(id).m;i++) extra_components(id)(i)->Set_Frame();
 }
 //#####################################################################
 // Function Destroy_Geometry
@@ -273,20 +271,12 @@ Update_Object_Labels()
                 rigid_body_collection.Rigid_Body(i).Update_Angular_Velocity();}}}}
 }
 //#####################################################################
-// Function Valid_Frame
-//#####################################################################
-template<class T> bool OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
-Valid_Frame(int frame_input) const
-{
-    return File_Exists(LOG::sprintf("%s/%d/rigid_body_particles",basedir.c_str(),frame_input));
-}
-//#####################################################################
 // Function Set_Frame
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>::
-Set_Frame(int frame_input)
+Set_Frame()
 {
-    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
+    
     Reinitialize();
 }
 //#####################################################################

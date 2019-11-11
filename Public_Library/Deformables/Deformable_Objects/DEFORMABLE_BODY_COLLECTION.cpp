@@ -9,6 +9,7 @@
 #include <Core/Log/SCOPE.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Deformables/Bindings/SOFT_BINDINGS.h>
 #include <Deformables/Collisions_And_Interactions/COLLISION_PENALTY_FORCES.h>
@@ -84,18 +85,17 @@ Update_Collision_Penalty_Forces_And_Derivatives()
 // Function Read_Dynamic_Variables
 //#####################################################################
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
-Read_Dynamic_Variables(const std::string& prefix,const int frame)
+Read_Dynamic_Variables(const VIEWER_DIR& viewer_dir)
 {
-    Read_From_File(prefix+"/"+Number_To_String(frame)+"/deformable_object_particles",particles);
+    Read_From_File(viewer_dir.current_directory+"/deformable_object_particles",particles);
     // if number==0, the particles format doesn't remember the set of attributes, so the following line makes restarts look more exact
     particles.Store_Velocity();
-    std::string frame_string=Number_To_String(frame);
     // read in bindings
-    std::string binding_state_name=prefix+"/"+frame_string+"/bindings";
+    std::string binding_state_name=viewer_dir.current_directory+"/bindings";
     if(File_Exists(binding_state_name))
         Read_From_File(binding_state_name,binding_list);
     else binding_list.Clean_Memory();
-    std::string soft_binding_state_name=prefix+"/"+frame_string+"/soft_bindings";
+    std::string soft_binding_state_name=viewer_dir.current_directory+"/soft_bindings";
     if(File_Exists(soft_binding_state_name))
         Read_From_File(soft_binding_state_name,soft_bindings);
     else soft_bindings.Clean_Memory();
@@ -107,41 +107,39 @@ Read_Dynamic_Variables(const std::string& prefix,const int frame)
 // Function Write_Dynamic_Variables
 //#####################################################################
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
-Write_Dynamic_Variables(const STREAM_TYPE stream_type,const std::string& prefix,const int frame) const
+Write_Dynamic_Variables(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir) const
 {
-    Write_To_File(stream_type,prefix+"/"+Number_To_String(frame)+"/deformable_object_particles",particles);
-    std::string f=Number_To_String(frame);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/deformable_object_particles",particles);
     if(binding_list.bindings.m>0)
-        Write_To_File(stream_type,prefix+"/"+f+"/bindings",binding_list);
+        Write_To_File(stream_type,viewer_dir.current_directory+"/bindings",binding_list);
     if(soft_bindings.bindings.m>0)
-        Write_To_File(stream_type,prefix+"/"+f+"/soft_bindings",soft_bindings);
+        Write_To_File(stream_type,viewer_dir.current_directory+"/soft_bindings",soft_bindings);
 }
 //#####################################################################
 // Function Read
 //#####################################################################
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
-Read(const std::string& prefix,const std::string& static_prefix,const int frame,
-    const int static_frame,const bool include_static_variables,const bool read_from_every_process)
+Read(const VIEWER_DIR& viewer_dir,const bool read_static_variables)
 {
     particles.Store_Mass();
-    if(include_static_variables) Read_Static_Variables(static_prefix,static_frame);
-    Read_Dynamic_Variables(prefix,frame);
-    if(mpi_solids && read_from_every_process) // make sure every process has all the correct data
+    if(read_static_variables) Read_Static_Variables(viewer_dir);
+    Read_Dynamic_Variables(viewer_dir);
+    if(mpi_solids) // make sure every process has all the correct data
         mpi_solids->Broadcast_Data(particles.X,particles.V);
 }
 //#####################################################################
 // Function Write
 //#####################################################################
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
-Write(const STREAM_TYPE stream_type,const std::string& prefix,const std::string& static_prefix,const int frame,
-    const int static_frame,const bool include_static_variables,const bool write_from_every_process) const
+Write(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir,const bool static_variables_every_frame,const bool write_from_every_process) const
 {
     if(mpi_solids){
         DEFORMABLE_PARTICLES<TV>& const_particles=const_cast<DEFORMABLE_PARTICLES<TV>&>(particles);
         mpi_solids->Gather_Data(const_particles.X,const_particles.V);
         if(mpi_solids->rank && !write_from_every_process) return;}
-    if(include_static_variables) Write_Static_Variables(stream_type,static_prefix,static_frame);
-    Write_Dynamic_Variables(stream_type,prefix,frame);
+    if(static_variables_every_frame || viewer_dir.First_Frame())
+        Write_Static_Variables(stream_type,viewer_dir,static_variables_every_frame);
+    Write_Dynamic_Variables(stream_type,viewer_dir);
 }
 //#####################################################################
 // Function Update_Simulated_Particles
@@ -412,11 +410,13 @@ Test_Force_Derivatives(const T time)
 // Function Read_Static_Variables
 //#####################################################################
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
-Read_Static_Variables(const std::string& prefix,const int frame)
+Read_Static_Variables(const VIEWER_DIR& viewer_dir)
 {
-    std::string f=frame==-1?"common":Number_To_String(frame);
     FILE_ISTREAM input;
-    Safe_Open_Input(input,prefix+"/"+f+"/deformable_object_structures");
+    std::string file=viewer_dir.current_directory+"/deformable_object_structures";
+    if(!File_Exists(file))
+        file=viewer_dir.output_directory+"/common/deformable_object_structures";
+    Safe_Open_Input(input,file);
     int m;
     Read_Binary(input,m);
     // TODO: merge this functionality with dynamic lists to allow for more flexibility
@@ -435,11 +435,11 @@ Read_Static_Variables(const std::string& prefix,const int frame)
 // Function Write_Static_Variables
 //#####################################################################
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
-Write_Static_Variables(const STREAM_TYPE stream_type,const std::string& prefix,const int frame) const
+Write_Static_Variables(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir,bool static_variables_every_frame) const
 {
-    std::string f=frame==-1?"common":Number_To_String(frame);
     FILE_OSTREAM output;
-    Safe_Open_Output(output,stream_type,prefix+"/"+f+"/deformable_object_structures");
+    std::string dir=static_variables_every_frame?viewer_dir.current_directory:viewer_dir.output_directory+"/common";
+    Safe_Open_Output(output,stream_type,dir+"/deformable_object_structures");
     Write_Binary(output,structures.m);
     for(int k=0;k<structures.m;k++) structures(k)->Write_Structure(output);
 }

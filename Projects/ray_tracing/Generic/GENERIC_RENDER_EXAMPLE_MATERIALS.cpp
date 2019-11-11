@@ -44,8 +44,8 @@
 #include <Ray_Tracing/Rendering_Shaders/RENDERING_VOXEL_FIRE_SHADER.h>
 #include <Ray_Tracing/Rendering_Shaders/RENDERING_VOXEL_SHADER.h>
 #include <Ray_Tracing/Rendering_Shaders/RENDERING_WOOD_SHADER.h>
-#include <cstdio>
 #include "GENERIC_RENDER_EXAMPLE.h"
+#include <cstdio>
 //#include <Rendering_Shaders/RENDERING_HAIR_SHADER.h>
 using namespace PhysBAM;
 //#####################################################################

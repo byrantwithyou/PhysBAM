@@ -48,9 +48,9 @@
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_ITERATOR.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
-#include <fstream>
 #include "POUR_SOURCE.h"
 #include "STANDARD_TESTS_2D.h"
+#include <fstream>
 namespace PhysBAM{
 //#####################################################################
 // Constructor
@@ -66,7 +66,7 @@ STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-fooT3",&foo_T3,&use_foo_T3,"T3","a scalar");
     parse_args.Add("-fooT4",&foo_T4,&use_foo_T4,"T4","a scalar");
     parse_args.Parse();
-    if(!this->override_output_directory) output_directory=LOG::sprintf("Test_%i",test_number);
+    if(!this->override_output_directory) viewer_dir.output_directory=LOG::sprintf("Test_%i",test_number);
 }
 //#####################################################################
 // Destructor
@@ -359,7 +359,7 @@ Initialize()
                 particles.X(i)=frame*particles.X(i);
                 particles.V(i)=frame.r.Rotate(particles.V(i));}
             Add_Gravity(TV(0,-g));
-            write_output_files.Append([=](int)
+            write_output_files.Append([=]()
                 {
                     T c=sin(angle)*g;
                     T d=coefficient_of_friction*cos(angle)*g;
@@ -1077,8 +1077,8 @@ Initialize()
                 *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(seed_range),TV(0,-1),grid.domain.max_corner,
                 TV(0,-pour_speed),gravity,max_dt*pour_speed+grid.dX.y,seed_buffer,mass,volume);
             destroy=[=](){delete source;};
-            write_output_files.Append([=](int frame){source->Write_Output_Files(frame);});
-            read_output_files.Append([=](int frame){source->Read_Output_Files(frame);});
+            write_output_files.Append([=](){source->Write_Output_Files();});
+            read_output_files.Append([=](){source->Read_Output_Files();});
             Add_Callbacks(true,"time-step",[=]()
                 {
                     if(time>foo_T3) return;
@@ -1447,8 +1447,8 @@ Initialize()
                 *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(seed_range),TV(0,-1),grid.domain.max_corner,
                 TV(0,-pour_speed),gravity,max_dt*pour_speed+grid.dX.y,seed_buffer,mass,volume);
             destroy=[=](){delete source;};
-            write_output_files.Append([=](int frame){source->Write_Output_Files(frame);});
-            read_output_files.Append([=](int frame){source->Read_Output_Files(frame);});
+            write_output_files.Append([=](){source->Write_Output_Files();});
+            read_output_files.Append([=](){source->Read_Output_Files();});
             Add_Callbacks(true,"time-step",[=]()
                 {
                     if(time>foo_T3) return;

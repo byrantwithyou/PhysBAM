@@ -6,9 +6,9 @@
 //#####################################################################
 #include <Core/Math_Tools/integer_log.h>
 #include <Tools/Images/IMAGE.h>
-#include <fstream>
 #include "IMAGE_WINDOW.h"
 #include <Fl/Fl.h>
+#include <fstream>
 using namespace PhysBAM;
 //#####################################################################
 // IMAGE_WINDOW

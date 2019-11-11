@@ -13,21 +13,20 @@ template<class T>
 class OPENGL_COMPONENT_DIAGNOSTICS:public OPENGL_COMPONENT<T>
 {
     std::string filename;
-    int frame_loaded;
     bool valid;
     ARRAY<std::string> lines;
 
 //#####################################################################
 public:
-    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::component_name;
-    using OPENGL_COMPONENT<T>::is_animation;
-    OPENGL_COMPONENT_DIAGNOSTICS(const std::string& filename);
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
+    using OPENGL_COMPONENT<T>::component_name;using OPENGL_COMPONENT<T>::viewer_dir;
+    
+    OPENGL_COMPONENT_DIAGNOSTICS(const VIEWER_DIR& viewer_dir,const std::string& filename);
     virtual ~OPENGL_COMPONENT_DIAGNOSTICS();
 private:
     void Reinitialize();
     void Print_Selection_Info(std::ostream& ostream) const override;    
-    bool Valid_Frame(int frame) const override;
-    void Set_Frame(int frame) override;
+    void Set_Frame() override;
     //virtual RANGE<TV> Bounding_Box() const override;
     bool Use_Bounding_Box() const override;
     void Display() const override;

@@ -26,7 +26,7 @@ public:
     typedef ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,TV_INT> T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::viewer_dir;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::data_directory;
     using BASE::test_number;using BASE::resolution;using BASE::user_last_frame;
 
@@ -72,8 +72,8 @@ public:
         if(!user_last_frame) last_frame=1000;
         
         if(!this->user_output_directory)
-            output_directory=LOG::sprintf("DSD_No_Navier_Stokes/DSD_No_Navier_Stokes_%d__Resolution_%d_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1),(grid.counts.z-1));
-        LOG::cout<<"Running DSD simulation to "<<output_directory<<std::endl;
+            viewer_dir.output_directory=LOG::sprintf("DSD_No_Navier_Stokes/DSD_No_Navier_Stokes_%d__Resolution_%d_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1),(grid.counts.z-1));
+        LOG::cout<<"Running DSD simulation to "<<viewer_dir.output_directory<<std::endl;
 
         //sources
         sources.Append(SPHERE<TV>(TV(3.75,4,4),(T)0.2));

@@ -24,17 +24,17 @@ template<class T> STANDARD_TESTS<VECTOR<T,3> >::
 // Function Write_Output_Files
 //#####################################################################
 template<class T> void STANDARD_TESTS<VECTOR<T,3> >::
-Write_Output_Files(const int frame)
+Write_Output_Files()
 {
-    BASE::Write_Output_Files(frame);
+    BASE::Write_Output_Files();
 }
 //#####################################################################
 // Function Read_Output_Files
 //#####################################################################
 template<class T> void STANDARD_TESTS<VECTOR<T,3> >::
-Read_Output_Files(const int frame)
+Read_Output_Files()
 {
-    BASE::Read_Output_Files(frame);
+    BASE::Read_Output_Files();
 }
 //#####################################################################
 // Function Initialize

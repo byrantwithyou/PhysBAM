@@ -29,7 +29,7 @@ public:
     typedef VECTOR<int,TV::m> TV_INT;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::viewer_dir;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::data_directory;
     using BASE::solid_body_collection;using BASE::stream_type;using BASE::test_number;using BASE::resolution;using BASE::user_last_frame;
 
@@ -81,8 +81,8 @@ public:
         grid.Initialize(TV_INT(10*cells+1,20*cells+1,10*cells+1),RANGE<TV>(TV((T)-.01,(T)-.01,(T)-.01),TV((T).01,(T).02,(T).01)));
 
         if(!this->user_output_directory)
-            output_directory=LOG::sprintf("Two_Phase/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
-        LOG::cout<<"output directory="<<output_directory<<std::endl;
+            viewer_dir.output_directory=LOG::sprintf("Two_Phase/Test_%d__Resolution_%d_%d",test_number,(grid.counts.x-1),(grid.counts.y-1));
+        LOG::cout<<"output directory="<<viewer_dir.output_directory<<std::endl;
 
         // set example-specific parameters
         fluids_parameters.object_friction=(test_number==2||test_number==3)?(T)1:0;

@@ -48,7 +48,7 @@ class STANDARD_TESTS_WATER:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2
     typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;
+    using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::viewer_dir;using BASE::last_frame;using BASE::frame_rate;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions;using BASE::mpi_world; // silence -Woverloaded-virtual
     using BASE::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization;using BASE::solid_body_collection;using BASE::test_number;using BASE::resolution;
     using BASE::Add_To_Fluid_Simulation;using BASE::Add_Volumetric_Body_To_Fluid_Simulation;using BASE::Add_Thin_Shell_To_Fluid_Simulation;using BASE::Adjust_Phi_With_Source;
@@ -230,11 +230,11 @@ public:
 
         THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Rigid_Body_Walls(*this);
         if(!this->user_output_directory){
-            // output_directory=LOG::sprintf("Standard_Tests_Water/Test_%d_Resolution_%d_density_%d",test_number,resolution,solid_density);
+            // viewer_dir.output_directory=LOG::sprintf("Standard_Tests_Water/Test_%d_Resolution_%d_density_%d",test_number,resolution,solid_density);
             if(fluids_parameters.use_slip)
-                output_directory=LOG::sprintf("Standard_Tests_Water/Test_%d_Resolution_%d_slip",test_number,resolution);
+                viewer_dir.output_directory=LOG::sprintf("Standard_Tests_Water/Test_%d_Resolution_%d_slip",test_number,resolution);
             else
-                output_directory=LOG::sprintf("Standard_Tests_Water/Test_%d_Resolution_%d",test_number,resolution);}
+                viewer_dir.output_directory=LOG::sprintf("Standard_Tests_Water/Test_%d_Resolution_%d",test_number,resolution);}
     }
     void Postprocess_Frame(const int frame) override {
         

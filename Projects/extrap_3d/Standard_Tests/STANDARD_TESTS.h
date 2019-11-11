@@ -108,11 +108,10 @@ class STANDARD_TESTS:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
-    using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
+    using BASE::solids_parameters;using BASE::viewer_dir;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
     using BASE::stream_type;using BASE::solids_evolution;using BASE::test_number;using BASE::data_directory;
     using BASE::user_last_frame;
     
-    std::ofstream svout;
     SOLIDS_STANDARD_TESTS<TV> tests;
 
     GRID<TV> mattress_grid,mattress_grid2,mattress_grid3,mattress_grid1;
@@ -257,7 +256,7 @@ public:
         tests.data_directory=data_directory;
         LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
         if(!this->user_output_directory)
-            output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+            viewer_dir.output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
         if(!this->user_frame_rate) frame_rate=24;
         override_no_collisions=override_no_collisions&&!override_collisions;
         if(use_rand_seed) rand.Set_Seed(rand_seed);
@@ -556,7 +555,7 @@ void Get_Initial_Data()
         case 2:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/adaptive_torus_float.tet",
                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
-            tests.Initialize_Tetrahedron_Collisions(1,output_directory,tetrahedralized_volume,solids_parameters.triangle_collision_parameters);
+            tests.Initialize_Tetrahedron_Collisions(1,viewer_dir,tetrahedralized_volume,solids_parameters.triangle_collision_parameters);
             tests.Add_Ground();
             break;}
 
@@ -2155,9 +2154,9 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
 //#####################################################################
 // Function Read_Output_Files_Solids
 //#####################################################################
-void Read_Output_Files_Solids(const int frame) override
+void Read_Output_Files_Solids() override
 {
-    BASE::Read_Output_Files_Solids(frame);
+    BASE::Read_Output_Files_Solids();
     solid_body_collection.Update_Simulated_Particles();
 }
 //#####################################################################
@@ -2347,13 +2346,6 @@ void Postprocess_Substep(const T dt,const T time) override
     LOG::cout<<"Minimum tet volume: "<<min_volume<<std::endl;
     if(test_number==29)
         LOG::cout << "Self collisions enabled=" << solids_parameters.triangle_collision_parameters.perform_self_collision << " " << time << std::endl;
-    if(dump_sv){
-        for(int f=0;FINITE_VOLUME<TV,3>* force_field=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>*>(f);f++){
-            ARRAY<DIAGONAL_MATRIX<T,3> >& sv=force_field->Fe_hat;
-            for(int i=0;i<sv.m;i++){
-                svout << sv(i).x.x << " " << sv(i).x.y << " " << sv(i).x.z << std::endl;
-                Add_Debug_Particle(sv(i).To_Vector(),TV(1,1,0));
-                Debug_Particle_Set_Attribute<TV>("V",-force_field->isotropic_model->P_From_Strain(sv(i),i).To_Vector());}}}
     if(test_number==48){
         stuck_particles.Remove_All();
         T r=std::max((T)0,hole-time*stretch);
@@ -2389,12 +2381,6 @@ void Bind_Intersecting_Particles()
 void Preprocess_Frame(const int frame) override
 {
     dynamic_cast<NEWMARK_EVOLUTION<TV>&>(*solids_evolution).print_matrix=print_matrix;
-    if (dump_sv)
-    {
-        std::string output_file=LOG::sprintf("%s/SV_%d",output_directory.c_str(),frame);
-        svout.open(output_file.c_str());
-    }
-
     if(test_number==32 && frame==1100) Bind_Intersecting_Particles();
 
     if(test_number==52)
@@ -2595,7 +2581,6 @@ void Test_Model(ISOTROPIC_CONSTITUTIVE_MODEL<T,3>& icm)
 //#####################################################################
 void Postprocess_Frame(const int frame) override
 {
-    if(dump_sv) svout.close();
     if(test_number==100) Plot_Contour_Landscape(frame);
 }
 //#####################################################################
@@ -2669,9 +2654,9 @@ void Add_Primary_Contour_Segments(ISOTROPIC_CONSTITUTIVE_MODEL<T,3>& icm)
 void Plot_Contour_Landscape(int frame)
 {
     char buff[1000];
-    sprintf(buff, "%s/data", output_directory.c_str());
+    sprintf(buff, "%s/data", viewer_dir.output_directory.c_str());
     Create_Directory(buff);
-    sprintf(buff, "%s/data/%03d.txt", output_directory.c_str(), frame);
+    sprintf(buff, "%s/data/%03d.txt", viewer_dir.output_directory.c_str(), frame);
     std::ofstream out(buff);
 
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;

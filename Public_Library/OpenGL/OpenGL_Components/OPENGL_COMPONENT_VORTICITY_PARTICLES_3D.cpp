@@ -8,15 +8,15 @@
 using namespace PhysBAM;
 
 template<class T> OPENGL_COMPONENT_VORTICITY_PARTICLES_3D<T>::
-OPENGL_COMPONENT_VORTICITY_PARTICLES_3D(const std::string &filename,bool use_ids_input)
-    :OPENGL_COMPONENT_PARTICLES_3D<T>(filename,"",use_ids_input,false)
+OPENGL_COMPONENT_VORTICITY_PARTICLES_3D(const VIEWER_DIR& viewer_dir,const std::string &filename_input,bool use_ids_input)
+    :OPENGL_COMPONENT_PARTICLES_3D<T>(viewer_dir,filename_input,"",use_ids_input,false)
 {}
 
 template<class T> void OPENGL_COMPONENT_VORTICITY_PARTICLES_3D<T>::
-Reinitialize(bool force)
+Reinitialize()
 {
     const ARRAY_VIEW<typename TV::SPIN>& vorticity=*particles->template Get_Array<typename TV::SPIN>("vorticity");
-    OPENGL_COMPONENT_PARTICLES_3D<T>::Reinitialize(force);
+    OPENGL_COMPONENT_PARTICLES_3D<T>::Reinitialize();
     if(!have_velocities){
         have_velocities=true;
         opengl_vector_field.vector_field.Resize(particles->Size());

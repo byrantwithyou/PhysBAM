@@ -5,6 +5,7 @@
 #include <Core/Arrays/INDIRECT_ARRAY.h>
 #include <Core/Matrices/MATRIX_MXN.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h> // TODO: remove once MUSCLE.cpp exists (workaround for windows compiler bug)
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
@@ -17,8 +18,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T>::
-OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(const std::string& basedir_input)
-    :OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(*new RIGID_BODY_COLLECTION<TV>(0),basedir_input)
+OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(const VIEWER_DIR& viewer_dir)
+    :OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(viewer_dir,*new RIGID_BODY_COLLECTION<TV>(0))
 {
     need_destroy_rigid_body_collection=true;
 }
@@ -26,15 +27,14 @@ OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(const std::string& basedir_input)
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T>::
-OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir_input)
-    :OPENGL_COMPONENT<T>("Rigid Geometry Collection 1D"),basedir(basedir_input),frame_loaded(-1),valid(false),show_object_names(false),output_positions(true),draw_velocity_vectors(false),
+OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(const VIEWER_DIR& viewer_dir,RIGID_BODY_COLLECTION<TV>& rigid_body_collection)
+    :OPENGL_COMPONENT<T>(viewer_dir,"Rigid Geometry Collection 1D"),valid(false),show_object_names(false),output_positions(true),draw_velocity_vectors(false),
     draw_node_velocity_vectors(false),draw_point_simplices(true),rigid_body_collection(rigid_body_collection),need_destroy_rigid_body_collection(false)
 {
     viewer_callbacks.Set("toggle_output_positions",{[this](){Toggle_Output_Positions();},"Toggle output positions"});
     viewer_callbacks.Set("toggle_show_object_names",{[this](){Toggle_Show_Object_Names();},"Toggle show object names"});
     viewer_callbacks.Set("toggle_draw_mode",{[this](){Toggle_Draw_Mode();},"Toggle draw mode"});
 
-    is_animation=true;
     has_init_destroy_information=true;
 }
 //#####################################################################
@@ -49,37 +49,36 @@ template<class T> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T>::
 // Function Reinitialize
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T>::
-Reinitialize(const bool force,const bool read_geometry)
+Reinitialize(const bool read_geometry)
 {
-    if(draw && (force || (is_animation && (frame_loaded!=frame)) || (!is_animation && (frame_loaded<0)))){
-        valid=false;
-        if(!File_Exists(LOG::sprintf("%s/%d/rigid_body_particles",basedir.c_str(),frame))) return;
-        rigid_body_collection.Read(basedir,frame,&needs_init,&needs_destroy);
+    if(!draw) return;
+    valid=false;
+    if(!File_Exists(viewer_dir.current_directory+"/rigid_body_particles")) return;
+    rigid_body_collection.Read(viewer_dir,&needs_init,&needs_destroy);
 
-        if(has_init_destroy_information) for(int i=0;i<needs_destroy.m;i++) Destroy_Geometry(needs_destroy(i));
+    if(has_init_destroy_information) for(int i=0;i<needs_destroy.m;i++) Destroy_Geometry(needs_destroy(i));
 
-        int max_number_of_bodies(max(opengl_point_simplices.Size(),rigid_body_collection.rigid_body_particles.Size()));
-        // only enlarge array as we read in more geometry to memory
-        opengl_point_simplices.Resize(max_number_of_bodies);
-        opengl_axes.Resize(max_number_of_bodies);
-        draw_object.Resize(max_number_of_bodies);draw_object.Fill(true);
-        use_object_bounding_box.Resize(max_number_of_bodies);use_object_bounding_box.Fill(true);
+    int max_number_of_bodies(max(opengl_point_simplices.Size(),rigid_body_collection.rigid_body_particles.Size()));
+    // only enlarge array as we read in more geometry to memory
+    opengl_point_simplices.Resize(max_number_of_bodies);
+    opengl_axes.Resize(max_number_of_bodies);
+    draw_object.Resize(max_number_of_bodies);draw_object.Fill(true);
+    use_object_bounding_box.Resize(max_number_of_bodies);use_object_bounding_box.Fill(true);
 
-        // Initialize bodies which have become active
-        if(has_init_destroy_information) for(int i=0;i<needs_init.m;i++){
+    // Initialize bodies which have become active
+    if(has_init_destroy_information) for(int i=0;i<needs_init.m;i++){
             int id=needs_init(i);PHYSBAM_ASSERT(rigid_body_collection.Is_Active(id));
             Create_Geometry(id);}
-        else for(int i=0;i<max_number_of_bodies;i++){if(rigid_body_collection.Is_Active(i)) Create_Geometry(i);} // TODO: can we figure out what bodies need_init
+    else for(int i=0;i<max_number_of_bodies;i++){if(rigid_body_collection.Is_Active(i)) Create_Geometry(i);} // TODO: can we figure out what bodies need_init
 
-        // Update active bodies / remove inactive bodies
-        for(int id=0;id<rigid_body_collection.rigid_body_particles.Size();id++){
-            if(rigid_body_collection.Is_Active(id)) Update_Geometry(id);
-            else Destroy_Geometry(id);}
-        for(int id=rigid_body_collection.rigid_body_particles.Size();id<opengl_point_simplices.Size();id++){
-            Destroy_Geometry(id);}
+    // Update active bodies / remove inactive bodies
+    for(int id=0;id<rigid_body_collection.rigid_body_particles.Size();id++){
+        if(rigid_body_collection.Is_Active(id)) Update_Geometry(id);
+        else Destroy_Geometry(id);}
+    for(int id=rigid_body_collection.rigid_body_particles.Size();id<opengl_point_simplices.Size();id++){
+        Destroy_Geometry(id);}
 
-        frame_loaded=frame;
-        valid=true;}
+    valid=true;
 
     Update_Object_Labels();
 }
@@ -135,20 +134,12 @@ Update_Object_Labels()
                     rigid_body_collection.Rigid_Body(i).Update_Angular_Velocity();}}}}
 }
 //#####################################################################
-// Function Valid_Frame
-//#####################################################################
-template<class T> bool OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T>::
-Valid_Frame(int frame_input) const
-{
-    return File_Exists(LOG::sprintf("%s/%d/rigid_bodies",basedir.c_str(),frame_input));
-}
-//#####################################################################
 // Function Set_Frame
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T>::
-Set_Frame(int frame_input)
+Set_Frame()
 {
-    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
+    
     Reinitialize();
 }
 //#####################################################################

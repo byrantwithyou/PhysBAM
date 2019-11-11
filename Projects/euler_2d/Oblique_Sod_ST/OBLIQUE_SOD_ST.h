@@ -12,9 +12,9 @@
 #ifndef __OBLIQUE_SOD_ST__
 #define __OBLIQUE_SOD_ST__
 
+#include "math.h"
 #include <fstream>
 #include <iostream>
-#include "math.h"
 
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/GRID.h>
@@ -33,7 +33,7 @@ class OBLIQUE_SOD_ST:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >
 public: 
     typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::stream_type;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::viewer_dir;using BASE::fluids_parameters;using BASE::stream_type;
     using BASE::resolution;using BASE::user_last_frame;
 
     T angle;
@@ -83,11 +83,11 @@ public:
         fluids_parameters.compressible_timesplit=timesplit;
 
         if(!this->user_output_directory){
-            output_directory="Oblique_Sod_ST/matlab";        
-            if(timesplit) output_directory=LOG::sprintf("Oblique_Sod_ST/Resolution_%d_%d_semiimplicit",(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-            else output_directory=LOG::sprintf("Oblique_Sod_ST/Resolution_%d_%d_explicit",(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-            if(eno_scheme==2) output_directory+="_density_weighted";
-            else if(eno_scheme==3) output_directory+="_velocity_weighted";}
+            viewer_dir.output_directory="Oblique_Sod_ST/matlab";        
+            if(timesplit) viewer_dir.output_directory=LOG::sprintf("Oblique_Sod_ST/Resolution_%d_%d_semiimplicit",(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+            else viewer_dir.output_directory=LOG::sprintf("Oblique_Sod_ST/Resolution_%d_%d_explicit",(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+            if(eno_scheme==2) viewer_dir.output_directory+="_density_weighted";
+            else if(eno_scheme==3) viewer_dir.output_directory+="_velocity_weighted";}
     }
     
     virtual ~OBLIQUE_SOD_ST() {}

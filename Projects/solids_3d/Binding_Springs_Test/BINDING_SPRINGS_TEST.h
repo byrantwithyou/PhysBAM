@@ -28,7 +28,7 @@ class BINDING_SPRINGS_TEST:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
     typedef VECTOR<T,3> TV;
 public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
-    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::test_number;
+    using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::viewer_dir;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions;using BASE::solid_body_collection; // silence -Woverloaded-virtual
     using BASE::user_last_frame;
     
@@ -92,7 +92,7 @@ void Initialize_Bodies() override
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     if(!this->user_output_directory)
-        output_directory=LOG::sprintf("Binding_Springs_Test/Test_%d",test_number);
+        viewer_dir.output_directory=LOG::sprintf("Binding_Springs_Test/Test_%d",test_number);
     if(!this->user_frame_rate) frame_rate=24;
     solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-6;
     if(!user_last_frame) last_frame=200;

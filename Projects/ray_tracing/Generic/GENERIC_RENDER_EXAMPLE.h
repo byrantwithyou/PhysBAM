@@ -19,8 +19,8 @@
 #include <Ray_Tracing/Rendering_Objects/RENDERING_TRIANGULATED_SURFACE.h>
 #include <Ray_Tracing/Rendering_Objects/RENDERING_UNIFORM_GRID_ACCELERATOR.h>
 #include <Ray_Tracing/Rendering_Shaders/VOLUMETRIC_SHADER.h>
-#include <list>
 #include "../RAY_TRACING_EXAMPLE.h"
+#include <list>
 namespace PhysBAM{
 
 template<class T>

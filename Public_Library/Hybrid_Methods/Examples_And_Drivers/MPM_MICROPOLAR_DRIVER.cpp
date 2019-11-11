@@ -69,7 +69,7 @@ Initialize()
     example.Initialize();
     PHYSBAM_ASSERT(example.grid.Is_MAC_Grid());
     if(example.restart)
-        example.Read_Output_Files(example.restart);
+        example.Read_Output_Files();
 
     example.mass.Resize(example.grid.Domain_Indices(example.ghost));
     example.velocity.Resize(example.grid.Domain_Indices(example.ghost));
@@ -94,7 +94,7 @@ Initialize()
 
     Update_Simulated_Particles();
 
-    if(!example.restart) Write_Output_Files(0);
+    if(!example.restart) Write_Output_Files();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",1);
 }
 //#####################################################################
@@ -156,7 +156,7 @@ Simulate_To_Frame(const int frame)
             PHYSBAM_DEBUG_WRITE_SUBSTEP("end substep %i",0,substep);
             example.time=next_time;}
         if(example.end_frame) example.end_frame(current_frame);
-        Write_Output_Files(++output_number);}
+        Write_Output_Files();}
 }
 //#####################################################################
 // Function Write_Substep
@@ -167,22 +167,20 @@ Write_Substep(const std::string& title)
     example.frame_title=title;
     LOG::printf("Writing substep [%s]: output_number=%i, time=%g, frame=%i\n",
         example.frame_title,output_number+1,example.time,current_frame);
-    Write_Output_Files(++output_number);
+    Write_Output_Files();
     example.frame_title="";
 }
 //#####################################################################
 // Write_Output_Files
 //#####################################################################
 template<class TV> void MPM_MICROPOLAR_DRIVER<TV>::
-Write_Output_Files(const int frame)
+Write_Output_Files()
 {
     LOG::SCOPE scope("Write_Output_Files");
-    Create_Directory(example.output_directory);
-    Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
-    Create_Directory(example.output_directory+"/common");
-    Write_To_Text_File(example.output_directory+LOG::sprintf("/%d/frame_title",frame),example.frame_title);
-    example.Write_Output_Files(frame);
-    Write_To_Text_File(example.output_directory+"/common/last_frame",frame,"\n");
+    example.viewer_dir.Start_Directory(0,example.frame_title);
+    example.frame_title="";
+    example.Write_Output_Files();
+    example.viewer_dir.Finish_Directory();
 }
 //#####################################################################
 // Function Update_Particle_Weights

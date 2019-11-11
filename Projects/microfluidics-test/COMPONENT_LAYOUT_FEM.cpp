@@ -15,7 +15,6 @@
 //#include <Tools/Read_Write/OCTAVE_OUTPUT.h>
 //#include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 //#include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
-#include <fstream>
 //#include "CACHED_ELIMINATION_MATRIX.h"
 #include "COMPONENT_BC.h"
 #include "COMPONENT_CHANGE.h"
@@ -23,6 +22,7 @@
 #include "COMPONENT_LAYOUT_FEM.h"
 #include "COMPONENT_PIPE.h"
 #include "VISITORS_FEM.h"
+#include <fstream>
 #include <tuple>
 namespace PhysBAM{
 

@@ -6,6 +6,7 @@
 #include <Core/Arrays/INDIRECT_ARRAY.h>
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Matrices/MATRIX_MXN.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Tools/Images/PNG_FILE.h>
 #include <Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
@@ -54,12 +55,14 @@ void Draw_Bubble(PARSE_ARGS& parse_args)
     parse_args.Parse();
 
     GRID<TV> grid;
-    Read_From_File(LOG::sprintf("%s/common/grid",sim_dir.c_str()),grid);
+    VIEWER_DIR viewer_dir(sim_dir);
+    viewer_dir.Set(frame);
+    Read_From_File(viewer_dir.output_directory+"/common/grid",grid);
     std::cout<<grid.domain<<size<<std::endl;
     if(force_dims) size.y=(int)(grid.domain.Edge_Lengths().y/grid.domain.Edge_Lengths().x*size.x);
 
     ARRAY<T,TV_INT> pressure;
-    Read_From_File(LOG::sprintf("%s/%d/pressure",sim_dir.c_str(),frame),pressure);
+    Read_From_File(viewer_dir.current_directory+"/pressure",pressure);
 
     if(depressurize)
     {
@@ -84,7 +87,7 @@ void Draw_Bubble(PARSE_ARGS& parse_args)
         for(int i=0;;i++){
             ARRAY<T,TV_INT>* phi=new ARRAY<T,TV_INT>;
             LEVELSET<TV>* ls=new LEVELSET<TV>(grid,*phi);
-            try{Read_From_File(LOG::sprintf("%s/%d/levelset_%d.gz",sim_dir.c_str(),frame,i),*ls);}
+            try{Read_From_File(viewer_dir.current_directory+LOG::sprintf("/levelset_%d.gz",i),*ls);}
             catch(...){delete ls;break;}
             phis.Append(phi);
             levelsets.Append(ls);

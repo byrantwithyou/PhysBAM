@@ -6,6 +6,7 @@
 #include <Core/Math_Tools/cube.h>
 #include <Core/Matrices/MATRIX_3X3.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Grid_Tools/Computations/VORTICITY_UNIFORM.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
@@ -157,21 +158,21 @@ Euler_Step(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,const T dt,c
 // Function Write_Output_Files
 //#####################################################################
 template<class T> void VORTEX_PARTICLE_EVOLUTION_3D<T>::
-Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const
+Write_Output_Files(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir) const
 {
    LOG::Time("Writing Vortex Specific Data");
-   Write_To_File(stream_type,LOG::sprintf("%s/%d/vorticity_particles",output_directory.c_str(),frame),vorticity_particles);
-   Write_To_File(stream_type,LOG::sprintf("%s/%d/grid_vorticity",output_directory.c_str(),frame),grid_vorticity);
-   Write_To_File(stream_type,LOG::sprintf("%s/%d/grid_vorticity_particles",output_directory.c_str(),frame),grid_vorticity_particles);
+   Write_To_File(stream_type,viewer_dir.current_directory+"/vorticity_particles",vorticity_particles);
+   Write_To_File(stream_type,viewer_dir.current_directory+"/grid_vorticity",grid_vorticity);
+   Write_To_File(stream_type,viewer_dir.current_directory+"/grid_vorticity_particles",grid_vorticity_particles);
    LOG::Stop_Time();
 }
 //#####################################################################
 // Function Read_Output_Files
 //#####################################################################
 template<class T> void VORTEX_PARTICLE_EVOLUTION_3D<T>::
-Read_Output_Files(const std::string& input_directory,const int frame)
+Read_Output_Files(const VIEWER_DIR& viewer_dir)
 {
-    Read_From_File(LOG::sprintf("%s/%d/vorticity_particles",input_directory.c_str(),frame),vorticity_particles);
+    Read_From_File(viewer_dir.current_directory+"/vorticity_particles",vorticity_particles);
 }
 //#####################################################################
 namespace PhysBAM{

@@ -60,11 +60,10 @@ template<class TV> MPM_EXAMPLE_RB<TV>::
 // Function Write_Output_Files
 //#####################################################################
 template<class TV> void MPM_EXAMPLE_RB<TV>::
-Write_Output_Files(const int frame)
+Write_Output_Files()
 {
-    std::string f=LOG::sprintf("%d",frame);
     if(use_test_output){
-        std::string file=LOG::sprintf("%s/%s-%03d.txt",output_directory.c_str(),test_output_prefix.c_str(),frame);
+        std::string file=LOG::sprintf("%s/%s-%03d.txt",viewer_dir.output_directory.c_str(),test_output_prefix.c_str(),viewer_dir.frame_stack(0));
         OCTAVE_OUTPUT<T> oo(file.c_str());
         oo.Write("X",particles.X.Flattened());
         oo.Write("V",particles.V.Flattened());
@@ -74,33 +73,33 @@ Write_Output_Files(const int frame)
 #pragma omp single
     {
 #pragma omp task
-        Write_To_File(stream_type,output_directory+"/common/grid",grid);
+        Write_To_File(stream_type,viewer_dir.output_directory+"/common/grid",grid);
 #pragma omp task
-        if(!system(LOG::sprintf("rm -f %s/%d/mpm_particles.gz ;  ln -s ./deformable_object_particles.gz %s/%d/mpm_particles.gz",output_directory.c_str(),frame,output_directory.c_str(),frame).c_str())){}
+        if(!system(LOG::sprintf("rm -f %s/mpm_particles.gz ;  ln -s ./deformable_object_particles.gz %s/mpm_particles.gz",viewer_dir.current_directory,viewer_dir.current_directory).c_str())){}
 #pragma omp task
-        Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
+        Write_To_File(stream_type,viewer_dir.current_directory+"/restart_data",time);
 #pragma omp task
         {
-            solid_body_collection.Write(stream_type,output_directory,frame,false,true,true,true,false);
+            solid_body_collection.Write(stream_type,viewer_dir);
         }
         if(pfd)
         {
 #pragma omp task
             if(pfd->di_penalty)
-                Write_To_File(stream_type,LOG::sprintf("%s/%d/di_data",output_directory.c_str(),frame),*pfd->di_penalty);
+                Write_To_File(stream_type,viewer_dir.current_directory+"/di_data",*pfd->di_penalty);
 #pragma omp task
             if(pfd->rr_penalty)
-                Write_To_File(stream_type,LOG::sprintf("%s/%d/rr_data",output_directory.c_str(),frame),*pfd->rr_penalty);
+                Write_To_File(stream_type,viewer_dir.current_directory+"/rr_data",*pfd->rr_penalty);
 #pragma omp task
             if(pfd->rd_penalty)
-                Write_To_File(stream_type,LOG::sprintf("%s/%d/rd_data",output_directory.c_str(),frame),*pfd->rd_penalty);
+                Write_To_File(stream_type,viewer_dir.current_directory+"/rd_data",*pfd->rd_penalty);
             if(pfd)
-                Write_To_File(stream_type,LOG::sprintf("%s/%d/pfd_data",output_directory.c_str(),frame),pfd->grid);
+                Write_To_File(stream_type,viewer_dir.current_directory+"/pfd_data",pfd->grid);
         }
         
         if(!only_write_particles){
 #pragma omp task
-            Write_To_File(stream_type,LOG::sprintf("%s/%d/centered_velocities",output_directory.c_str(),frame),velocity);
+            Write_To_File(stream_type,viewer_dir.current_directory+"/centered_velocities",velocity);
 #pragma omp task
             {
                 GRID<TV> ghost_grid(grid.numbers_of_cells+2*ghost,grid.Ghost_Domain(ghost),true);
@@ -109,7 +108,7 @@ Write_Output_Files(const int frame)
                         Dump_Levelset(ghost_grid,*io,VECTOR<T,3>(0.7,0.3,0.3));
                 if(mass_contour>=0)
                     Dump_Levelset(grid,mass,VECTOR<T,3>(0.2,0.6,0.2),mass_contour*Average_Particle_Mass());
-                debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
+                debug_particles.Write_Debug_Particles(stream_type,viewer_dir);
             }
         }
     }
@@ -118,10 +117,9 @@ Write_Output_Files(const int frame)
 // Function Read_Output_Files
 //#####################################################################
 template<class TV> void MPM_EXAMPLE_RB<TV>::
-Read_Output_Files(const int frame)
+Read_Output_Files()
 {
-    std::string f=LOG::sprintf("%d",frame);
-    solid_body_collection.Read(output_directory,frame,0,false,true,true,true);
+    solid_body_collection.Read(viewer_dir);
     if(particles.template Get_Array<T>("one_over_mass"))
         particles.Remove_Array_Using_Index(particles.Get_Attribute_Index("one_over_mass"));
     if(particles.template Get_Array<T>("effective_mass"))
@@ -129,18 +127,18 @@ Read_Output_Files(const int frame)
     if(particles.template Get_Array<T>("one_over_effective_mass"))
         particles.Remove_Array_Using_Index(particles.Get_Attribute_Index("one_over_effective_mass"));
 
-    Read_From_File(LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
+    Read_From_File(viewer_dir.current_directory+"/restart_data",time);
     if(pfd)
     {
-        Read_From_File(LOG::sprintf("%s/%d/pfd_data",output_directory.c_str(),frame),pfd->grid);
+        Read_From_File(viewer_dir.current_directory+"/pfd_data",pfd->grid);
         pfd->restarted=true;
     }
     if(pfd->di_penalty)
-        Read_From_File(LOG::sprintf("%s/%d/di_data",output_directory.c_str(),frame),*pfd->di_penalty);
+        Read_From_File(viewer_dir.current_directory+"/di_data",*pfd->di_penalty);
     if(pfd->rr_penalty)
-        Read_From_File(LOG::sprintf("%s/%d/rr_data",output_directory.c_str(),frame),*pfd->rr_penalty);
+        Read_From_File(viewer_dir.current_directory+"/rr_data",*pfd->rr_penalty);
     if(pfd->rd_penalty)
-        Read_From_File(LOG::sprintf("%s/%d/rd_data",output_directory.c_str(),frame),*pfd->rd_penalty);
+        Read_From_File(viewer_dir.current_directory+"/rd_data",*pfd->rd_penalty);
 }
 //#####################################################################
 // Function Capture_Stress

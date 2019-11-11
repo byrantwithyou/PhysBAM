@@ -28,7 +28,7 @@ public:
     using BASE::data_directory;using BASE::solid_body_collection;
     using BASE::solids_parameters;using BASE::solids_evolution;
     using BASE::m;using BASE::s;using BASE::kg;
-    using BASE::output_directory;using BASE::stream_type;
+    using BASE::viewer_dir;using BASE::stream_type;
 
     SOLIDS_STANDARD_TESTS<TV> tests;
 
@@ -61,8 +61,8 @@ public:
     void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io);
     void Preprocess_Substep(const T dt,const T time) override;
     void Postprocess_Substep(const T dt,const T time) override;
-    void Read_Output_Files_Solids(const int frame) override;
-    void Write_Output_Files(const int frame) const override;
+    void Read_Output_Files_Solids() override;
+    void Write_Output_Files() const override;
     void Init_Penalty_Collection();
 };
 }

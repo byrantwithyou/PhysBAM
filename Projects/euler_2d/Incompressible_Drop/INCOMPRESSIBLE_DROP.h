@@ -8,9 +8,9 @@
 #ifndef __INCOMPRESSIBLE_DROP__
 #define __INCOMPRESSIBLE_DROP__
 
+#include "math.h"
 #include <fstream>
 #include <iostream>
-#include "math.h"
 
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
@@ -35,7 +35,7 @@ public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
 
-    using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::viewer_dir;using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;
     using BASE::test_number;using BASE::resolution;using BASE::user_last_frame;
 
     /***************
@@ -99,10 +99,10 @@ public:
         else if(test_number==2) fluids_parameters.density=(T)10;
 
         if(!this->user_output_directory){
-            if(timesplit) output_directory=LOG::sprintf("Incompressible_Drop/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-            else output_directory=LOG::sprintf("Incompressible_Drop/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
-            if(eno_scheme==2) output_directory+="_density_weighted";
-            else if(eno_scheme==3) output_directory+="_velocity_weighted";}
+            if(timesplit) viewer_dir.output_directory=LOG::sprintf("Incompressible_Drop/Test_%d__Resolution_%d_%d_semiimplicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+            else viewer_dir.output_directory=LOG::sprintf("Incompressible_Drop/Test_%d__Resolution_%d_%d_explicit",test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y));
+            if(eno_scheme==2) viewer_dir.output_directory+="_density_weighted";
+            else if(eno_scheme==3) viewer_dir.output_directory+="_velocity_weighted";}
     }
     
     virtual ~INCOMPRESSIBLE_DROP() {}

@@ -24,10 +24,6 @@
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Geometry_Particles/VIEWER_OUTPUT.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
-#include <fstream>
-#include <map>
-#include <set>
-#include <string>
 #include "CACHED_ELIMINATION_MATRIX.h"
 #include "FEM_MESHING_TESTS.h"
 #include "FEM_TABLE.h"
@@ -39,6 +35,10 @@
 #include "FLUID_LAYOUT_FEM_EXTRUDED.h"
 #include "EXECUTE_HELPER.h"
 #include <chrono>
+#include <fstream>
+#include <map>
+#include <set>
+#include <string>
 
 using namespace PhysBAM;
 
@@ -65,11 +65,11 @@ void Run_FEM(PARSE_ARGS& parse_args)
     std::string pipe_file;
     bool run_tests=false,use_krylov=false;
     int seed=time(0),threads=1;
-    std::string output_dir="output";
+    VIEWER_DIR viewer_dir("output");
     parse_args.Add("-mu",&mu,"mu","viscosity");
     parse_args.Add("-tests",&run_tests,"run FEM tests");
     parse_args.Add("-k",&use_krylov,"solve with Krylov method");
-    parse_args.Add("-o",&output_dir,"dir","output dir");
+    parse_args.Add("-o",&viewer_dir.output_directory,"dir","output dir");
     parse_args.Add("-threads",&threads,"num","number of threads to use");
     parse_args.Parse(true);
     if(!run_tests)
@@ -77,9 +77,8 @@ void Run_FEM(PARSE_ARGS& parse_args)
     else parse_args.Add("-seed",&seed,"seed","random seed");
     parse_args.Parse();
 
-    GRID<TV> grid;
-    VIEWER_OUTPUT<TV> vo(STREAM_TYPE(0.f),grid,output_dir);
-    Create_Directory(output_dir+"/common");
+    VIEWER_OUTPUT vo(STREAM_TYPE(0.f),viewer_dir);
+    Use_Debug_Particles<TV>();
 
     if(d==2 && run_tests){
         Run_Meshing_Tests(seed);
@@ -90,19 +89,19 @@ void Run_FEM(PARSE_ARGS& parse_args)
 
     FLUID_LAYOUT_FEM<TV> fl;
     fl.Dump_Input(pd);
-    Flush_Frame<TV>("init");
+    Flush_Frame("init");
     fl.Compute(pd);
     fl.Print_Statistics();
     fl.Dump_Mesh();
-    Flush_Frame<TV>("meshing");
+    Flush_Frame("meshing");
     fl.Dump_Layout();
-    Flush_Frame<TV>("blocks");
+    Flush_Frame("blocks");
     fl.Dump_Node_Blocks();
-    Flush_Frame<TV>("nodes");
+    Flush_Frame("nodes");
     fl.Dump_Edge_Blocks();
-    Flush_Frame<TV>("edges");
+    Flush_Frame("edges");
     fl.Dump_Dofs();
-    Flush_Frame<TV>("dofs");
+    Flush_Frame("dofs");
     
     if(d==3) return;
     ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> > coded_entries;
@@ -170,7 +169,7 @@ void Run_FEM(PARSE_ARGS& parse_args)
         //LOG::printf("sol: %P\n",sol_vector);
         LOG::printf("elim sol error: %P\n",elim_sol_error.Max_Abs());
         if(use_krylov) LOG::printf("krylov sol error: %P\n",ksol_error.Max_Abs());}
-    LOG::Instance()->Copy_Log_To_File(output_dir+"/common/log.txt",false);
+    LOG::Instance()->Copy_Log_To_File(viewer_dir.output_directory+"/common/log.txt",false);
 }
 
 template<int d>
@@ -198,8 +197,10 @@ void Run(PARSE_ARGS& parse_args)
     pd.Parse_Input(pipe_file);
     
     GRID<TV> grid(pd.box_size,RANGE<TV>(TV(),TV(pd.box_size)*dx),true);
-    VIEWER_OUTPUT<TV> vo(STREAM_TYPE(0.f),grid,"output");
-    if(!quiet) Flush_Frame<TV>("init");
+    VIEWER_DIR viewer_dir("output");
+    VIEWER_OUTPUT vo(STREAM_TYPE(0.f),viewer_dir);
+    Use_Debug_Particles<TV>();
+    if(!quiet) Flush_Frame("init");
 
     FLUID_LAYOUT<TV> fl(grid);
     fl.quiet=quiet;
@@ -207,11 +208,11 @@ void Run(PARSE_ARGS& parse_args)
     fl.Compute(pd);
     if(!quiet){
         fl.Dump_Layout();
-        Flush_Frame<TV>("grid setup");
+        Flush_Frame("grid setup");
         fl.Dump_Dofs();
-        Flush_Frame<TV>("grid dofs");
+        Flush_Frame("grid dofs");
         fl.Dump_Blocks();
-        Flush_Frame<TV>("grid blocks");}
+        Flush_Frame("grid blocks");}
 
     SYSTEM_MATRIX_HELPER<T> MH;
     ARRAY<TRIPLE<DOF_ID,DOF_ID,CODE_ID> > coded_entries;
@@ -257,7 +258,7 @@ void Run(PARSE_ARGS& parse_args)
             auto& uf=fl.used_faces(it.Full_Index());
             if(uf.type!=fluid) continue;
             face_velocity(it.Full_Index())=elim_mat.vector_list(elim_mat.rhs(uf.block_id))(uf.block_dof);}
-        Flush_Frame(face_velocity,"elim solve");}
+        Flush_Frame("elim solve");}
     std::chrono::steady_clock::time_point t6 = std::chrono::steady_clock::now();
 
     printf("grid setup    %5.0f ms\n",

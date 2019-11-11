@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <OpenGL/OpenGL/OPENGL_COLOR.h>
 #include <OpenGL/OpenGL/OPENGL_GRID_3D.h>
 #include <OpenGL/OpenGL/OPENGL_SHAPES.h>
@@ -12,29 +13,19 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>::
-OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D(const GRID<TV> &grid,const std::string &filename_input)
-    :OPENGL_COMPONENT<T>("Pseudo Dirichlet"),mac_grid(grid.Get_MAC_Grid()),velocity_scale(0.025),filename(filename_input),frame_loaded(-1),valid(false)
+OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D(const VIEWER_DIR& viewer_dir,const GRID<TV> &grid,const std::string &filename_input)
+    :OPENGL_COMPONENT<T>(viewer_dir,"Pseudo Dirichlet"),mac_grid(grid.Get_MAC_Grid()),velocity_scale(0.025),filename(filename_input),valid(false)
 {
     viewer_callbacks.Set("increase_vector_size",{[this](){Increase_Vector_Size();},"Increase vector size"});
     viewer_callbacks.Set("decrease_vector_size",{[this](){Decrease_Vector_Size();},"Decrease vector size"});
-
-    is_animation = Is_Animated(filename);
-}
-//#####################################################################
-// Function Valid_Frame
-//#####################################################################
-template<class T> bool OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>::
-Valid_Frame(int frame_input) const
-{
-    return Frame_File_Exists(filename, frame_input);
 }
 //#####################################################################
 // Function Set_Frame
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>::
-Set_Frame(int frame_input)
+Set_Frame()
 {
-    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
+    
     Reinitialize();
 }
 //#####################################################################
@@ -85,24 +76,16 @@ Display() const
 // Function Reinitialize
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>::
-Reinitialize(bool force)
+Reinitialize()
 {
-    if(draw||force)
-    {
-        if(!valid || (is_animation && frame_loaded != frame) || (!is_animation && frame_loaded < 0))
-        {
-            valid = false;
-
-            std::string tmp_filename = Get_Frame_Filename(filename, frame);
-            if(File_Exists(tmp_filename))
-                Read_From_File(tmp_filename,pseudo_dirichlet_cells);
-            else
-                return;
-
-            frame_loaded=frame;
-            valid=true;
-        }
-    }
+    if(!draw) return;
+    valid = false;
+    std::string tmp_filename=viewer_dir.current_directory+"/"+filename;
+    if(File_Exists(tmp_filename))
+        Read_From_File(tmp_filename,pseudo_dirichlet_cells);
+    else
+        return;
+    valid=true;
 }
 //#####################################################################
 // Function Bounding_Box
@@ -120,11 +103,10 @@ template<class T> void OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D<T>::
 Print_Cell_Selection_Info(std::ostream& stream,const TV_INT& cell) const
 {
     if(!valid) return;
-    if(Is_Up_To_Date(frame)){
-        // TODO: This is not an efficient lookup...
-        for(int i=0;i<pseudo_dirichlet_cells.m;i++){
-            if(pseudo_dirichlet_cells(i).x==cell){
-                stream<<component_name<<":  velocity = "<<pseudo_dirichlet_cells(i).y<<std::endl;}}}
+    // TODO: This is not an efficient lookup...
+    for(int i=0;i<pseudo_dirichlet_cells.m;i++){
+        if(pseudo_dirichlet_cells(i).x==cell){
+            stream<<component_name<<":  velocity = "<<pseudo_dirichlet_cells(i).y<<std::endl;}}
 }
 //#####################################################################
 // Function Print_Node_Selection_Info

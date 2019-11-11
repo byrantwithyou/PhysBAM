@@ -41,7 +41,7 @@ Initialize_Bodies()
     ARRAY<float> masses;
 
     if(!this->user_output_directory)
-        output_directory=LOG::sprintf("Mass_Weighted_Self_Collisions/Test_%d",test_number);
+        viewer_dir.output_directory=LOG::sprintf("Mass_Weighted_Self_Collisions/Test_%d",test_number);
     
     if(!user_last_frame) last_frame=1000;
     if(!this->user_frame_rate) frame_rate=24;

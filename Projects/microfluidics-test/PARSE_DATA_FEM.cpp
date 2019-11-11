@@ -6,10 +6,10 @@
 #include <Core/Matrices/MATRIX_FORWARD.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_SCALAR.h>
 #include <Geometry/Analytic_Tests/ANALYTIC_VECTOR.h>
+#include "PARSE_DATA_FEM.h"
 #include <fstream>
 #include <map>
 #include <string>
-#include "PARSE_DATA_FEM.h"
 namespace PhysBAM{
 //#####################################################################
 // Constructor

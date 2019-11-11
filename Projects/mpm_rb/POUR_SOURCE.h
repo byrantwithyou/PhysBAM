@@ -44,8 +44,8 @@ public:
         const TV& release_plane_normal,const TV& release_plane_pt,const TV& velocity,
         const TV& gravity,T max_shift,T seeding_buffer,T mass,T volume);
     ~POUR_SOURCE();
-    void Write_Output_Files(const int frame);
-    void Read_Output_Files(const int frame);
+    void Write_Output_Files();
+    void Read_Output_Files();
     void Begin_Time_Step(const T time);
     void End_Time_Step(const T time);
     void Refill(bool init);

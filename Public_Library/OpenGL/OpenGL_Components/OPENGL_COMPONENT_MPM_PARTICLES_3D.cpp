@@ -5,6 +5,7 @@
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Log/LOG.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <OpenGL/OpenGL/OPENGL_MATERIAL.h>
@@ -19,14 +20,14 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_MPM_PARTICLES_3D<T>::
-OPENGL_COMPONENT_MPM_PARTICLES_3D(const std::string &filename_input)
-    :OPENGL_COMPONENT<T>("Particles 3D"),color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map()),
+OPENGL_COMPONENT_MPM_PARTICLES_3D(const VIEWER_DIR& viewer_dir,const std::string &filename)
+    :OPENGL_COMPONENT<T>(viewer_dir,"Particles 3D"),color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map()),
     particles(*new MPM_PARTICLES<TV>),
     default_color(OPENGL_COLOR::Yellow()),velocity_color(OPENGL_COLOR(1,(T).078,(T).576)),
     draw_velocities(false),draw_phases(false),draw_arrows(true),draw_B(false),draw_F(false),
     B_color{{1,.5f,.5f},{.5f,1,.5f},{.5f,.5f,1}},
     F_color(OPENGL_COLOR::Red(),OPENGL_COLOR::Green(),OPENGL_COLOR::Blue()),scale_velocities((T).025),
-    filename(filename_input),frame_loaded(-1),valid(false),
+    valid(false),
     selected_index(-1)
 {
     // We use white color for the default phase(0).
@@ -40,7 +41,6 @@ OPENGL_COMPONENT_MPM_PARTICLES_3D(const std::string &filename_input)
     viewer_callbacks.Set("toggle_F",{[this](){draw_F=!draw_F;},"Toggle F display"});
     viewer_callbacks.Set("toggle_B",{[this](){draw_B=!draw_B;},"Toggle B display"});
 
-    is_animation=Is_Animated(filename);
     // Don't need to call Reinitialize here because it will be called in first call to Set_Frame
 }
 //#####################################################################
@@ -52,20 +52,12 @@ template<class T> OPENGL_COMPONENT_MPM_PARTICLES_3D<T>::
     delete &particles;
 }
 //#####################################################################
-// Function Valid_Frame
-//#####################################################################
-template<class T> bool OPENGL_COMPONENT_MPM_PARTICLES_3D<T>::
-Valid_Frame(int frame_input) const
-{
-    return Frame_File_Exists(filename,frame_input);
-}
-//#####################################################################
 // Function Set_Frame
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_MPM_PARTICLES_3D<T>::
-Set_Frame(int frame_input)
+Set_Frame()
 {
-    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
+    
     Reinitialize();
 }
 //#####################################################################
@@ -245,20 +237,15 @@ Selection_Bounding_Box() const
 // Function Reinitialize
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_MPM_PARTICLES_3D<T>::
-Reinitialize(bool force)
+Reinitialize()
 {
-    if(!draw || !(force || !valid || (is_animation && frame_loaded != frame) || (!is_animation && frame_loaded<0))) return;
+    if(!draw) return;
     valid=true;
-
-    std::string frame_filename;
-    frame_filename=Get_Frame_Filename(filename,frame);
-        
     try{
         FILE_ISTREAM input;
-        Safe_Open_Input(input,frame_filename);
+        Safe_Open_Input(input,viewer_dir.current_directory+"/mpm_particles");
         Read_Binary(input,particles);}
     catch(FILESYSTEM_ERROR&){valid=false;}
-    frame_loaded=frame;
 }
 //#####################################################################
 // Function Toggle_Draw_Velocities

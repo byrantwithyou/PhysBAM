@@ -3,18 +3,17 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <OpenGL/OpenGL/OPENGL_CALLBACK.h>
 #include <OpenGL/OpenGL/OPENGL_GRID_2D.h>
 #include <OpenGL/OpenGL/OPENGL_PREFERENCES.h>
 #include <OpenGL/OpenGL/OPENGL_SELECTION.h>
 using namespace PhysBAM;
 template<class T> OPENGL_GRID_2D<T>::
-OPENGL_GRID_2D(GRID<TV> &grid_input,const OPENGL_COLOR &color_input,
-    const std::string basedir_input,const int frame_input)
+OPENGL_GRID_2D(const VIEWER_DIR& viewer_dir,GRID<TV> &grid_input,const OPENGL_COLOR &color_input)
     :grid(grid_input),active_cell_mask(0),ghost_cell_mask(0),
     active_face_mask(0),ghost_face_mask(0),active_node_mask(0),ghost_node_mask(0),color(color_input),
-    draw(true),draw_ghost_values(true),draw_mask_type(0),select_type(SELECT_TYPE::NONE),selected_cell(-1,-1),selected_node(-1,-1),
-    basedir(basedir_input),frame(frame_input)
+    draw(true),draw_ghost_values(true),draw_mask_type(0),select_type(SELECT_TYPE::NONE),selected_cell(-1,-1),selected_node(-1,-1),viewer_dir(viewer_dir)
 {
     viewer_callbacks.Set("toggle_draw_ghost_values",{[this](){Toggle_Draw_Ghost_Values();},"toggle_draw_ghost_values"});
     Reinitialize();
@@ -165,12 +164,13 @@ Display() const
     glPopAttrib();
     glPopMatrix();
 }
+//#####################################################################
+// Function Set_Frame
+//#####################################################################
 template<class T> void OPENGL_GRID_2D<T>::
-Set_Frame(int frame_input)
+Set_Frame()
 {
-    frame=frame_input;
     Reinitialize();
-    return;
 }
 //#####################################################################
 // Function Bounding_Box
@@ -230,37 +230,37 @@ Toggle_Draw_Ghost_Values()
 template<class T> void OPENGL_GRID_2D<T>::
 Reinitialize()
 {
-    std::string filename=LOG::sprintf("%s/%d/active_cell_mask",basedir.c_str(),frame);
+    std::string filename=viewer_dir.current_directory+"/active_cell_mask";
     if(File_Exists(filename)){
         if(!active_cell_mask) active_cell_mask=new ARRAY<bool,TV_INT>();
         active_cell_mask->Clean_Memory();
         Read_From_File(filename,*active_cell_mask);}
 
-    filename=LOG::sprintf("%s/%d/ghost_cell_mask",basedir.c_str(),frame);
+    filename=viewer_dir.current_directory+"/ghost_cell_mask";
     if(File_Exists(filename)){
         if(!ghost_cell_mask) ghost_cell_mask=new ARRAY<bool,TV_INT>();
         ghost_cell_mask->Clean_Memory();
         Read_From_File(filename,*ghost_cell_mask);}
 
-    filename=LOG::sprintf("%s/%d/active_face_mask",basedir.c_str(),frame);
+    filename=viewer_dir.current_directory+"/active_face_mask";
     if(File_Exists(filename)){
         if(!active_face_mask) active_face_mask=new ARRAY<bool,FACE_INDEX<TV::m> >();
         active_face_mask->Clean_Memory();
         Read_From_File(filename,*active_face_mask);}
 
-    filename=LOG::sprintf("%s/%d/ghost_face_mask",basedir.c_str(),frame);
+    filename=viewer_dir.current_directory+"/ghost_face_mask";
     if(File_Exists(filename)){
         if(!ghost_face_mask) ghost_face_mask=new ARRAY<bool,FACE_INDEX<TV::m> >();
         ghost_face_mask->Clean_Memory();
         Read_From_File(filename,*ghost_face_mask);}
 
-    filename=LOG::sprintf("%s/%d/active_node_mask",basedir.c_str(),frame);
+    filename=viewer_dir.current_directory+"/active_node_mask";
     if(File_Exists(filename)){
         if(!active_node_mask) active_node_mask=new ARRAY<bool,TV_INT>();
         active_node_mask->Clean_Memory();
         Read_From_File(filename,*active_node_mask);}
 
-    filename=LOG::sprintf("%s/%d/ghost_node_mask",basedir.c_str(),frame);
+    filename=viewer_dir.current_directory+"/ghost_node_mask";
     if(File_Exists(filename)){
         if(!ghost_node_mask) ghost_node_mask=new ARRAY<bool,TV_INT>();
         ghost_node_mask->Clean_Memory();

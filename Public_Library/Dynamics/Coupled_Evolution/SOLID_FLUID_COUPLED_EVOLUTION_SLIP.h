@@ -27,6 +27,7 @@ template<class TV> class FLUID_COLLECTION;
 template<class TV> class EULER_PROJECTION_UNIFORM;
 template<class TV> class IMPLICIT_BOUNDARY_CONDITION_COLLECTION;
 template<class TV> class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO;
+class VIEWER_DIR;
 
 template<class TV>
 class SOLID_FLUID_COUPLED_EVOLUTION_SLIP:public NEWMARK_EVOLUTION<TV>,public PROJECTION_DYNAMICS_UNIFORM<TV>
@@ -134,7 +135,7 @@ private:
         ARRAY<T,COUPLING_CONSTRAINT_ID>& coupling_face_velocities);
 public:
     void Get_Coupled_Faces_And_Interpolated_Solid_Velocities(const T time,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);
-    void Output_Iterators(const STREAM_TYPE stream_type,const char* output_directory,int frame) const;
+    void Output_Iterators(const STREAM_TYPE stream_type,const VIEWER_DIR& viewer_dir) const;
 //#####################################################################
 };
 }

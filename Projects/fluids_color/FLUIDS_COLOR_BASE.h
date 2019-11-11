@@ -24,7 +24,7 @@ class FLUIDS_COLOR_BASE:public PLS_FC_EXAMPLE<TV>
     typedef SYMMETRIC_MATRIX<T,TV::m> SM;
 
 public:
-    using BASE::grid;using BASE::output_directory;using BASE::face_velocities;using BASE::write_substeps_level;
+    using BASE::grid;using BASE::viewer_dir;using BASE::face_velocities;using BASE::write_substeps_level;
     using BASE::restart;using BASE::last_frame;using BASE::use_level_set_method;using BASE::use_pls;
     using BASE::dt;using BASE::levelset_color;using BASE::mu;using BASE::rho;using BASE::dump_matrix;
     using BASE::sparse_dump_matrix;using BASE::number_of_colors;using BASE::num_multigrid_levels;using BASE::use_multigrid;
@@ -102,7 +102,7 @@ public:
 
     void After_Initialize_Example();
     bool Initialize_Common_Example();
-    void Write_Output_Files(const int frame) override;
+    void Write_Output_Files() override;
     void Initialize() override;
     void Set_Level_Set(T time);
     void Level_Set_Error(T time);

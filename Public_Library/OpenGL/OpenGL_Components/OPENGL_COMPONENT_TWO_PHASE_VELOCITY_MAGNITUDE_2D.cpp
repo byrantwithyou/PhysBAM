@@ -13,9 +13,9 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D<T>::
-OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D(OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>& V_minus_component,OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>& V_plus_component,
+OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D(const VIEWER_DIR& viewer_dir,OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>& V_minus_component,OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>& V_plus_component,
        OPENGL_COMPONENT_LEVELSET_2D<T>& levelset_component)
-    :OPENGL_COMPONENT<T>("Two-Phase Magnitude Velocity Field 2D"),
+    :OPENGL_COMPONENT<T>(viewer_dir,"Two-Phase Magnitude Velocity Field 2D"),
     magnitude_height_scale(0),V_minus_component(V_minus_component),
     V_plus_component(V_plus_component),levelset_component(levelset_component),
     opengl_two_phase_velocity_magnitude(*new OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D<T>(V_minus_component.opengl_grid_based_vector_field.grid,V_minus_component.opengl_grid_based_vector_field.V,V_plus_component.opengl_grid_based_vector_field.V,levelset_component.opengl_levelset->levelset))
@@ -33,20 +33,12 @@ template<class T> OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D<T>::
 ~OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D()
 {}
 //#####################################################################
-// Function Valid_Frame
-//#####################################################################
-template<class T> bool OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D<T>::
-Valid_Frame(int frame_input) const
-{
-    return valid;
-}
-//#####################################################################
 // Function Set_Frame
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D<T>::
-Set_Frame(int frame_input)
+Set_Frame()
 {
-    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
+    
     Reinitialize();
 }
 //#####################################################################
@@ -107,15 +99,14 @@ Decrease_Point_Size()
 // Function Reinitialize
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D<T>::
-Reinitialize(const bool force_even_if_not_drawn)
+Reinitialize()
 {  
-    if(draw||force_even_if_not_drawn){
-        V_minus_component.Reinitialize(true);
-        V_plus_component.Reinitialize(true);
-        levelset_component.Reinitialize(true);
-        valid=V_minus_component.Valid_Frame(frame)&&V_plus_component.Valid_Frame(frame)&&levelset_component.Valid_Frame(frame);
-        opengl_two_phase_velocity_magnitude.Update();
-    }
+    if(!draw) return;
+    V_minus_component.Reinitialize();
+    V_plus_component.Reinitialize();
+    levelset_component.Reinitialize();
+    valid=V_minus_component.valid && V_plus_component.valid && levelset_component.valid;
+    opengl_two_phase_velocity_magnitude.Update();
 }
 namespace PhysBAM{
 template class OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D<float>;

@@ -131,7 +131,11 @@ int main(int argc, char* argv[])
     if(seed!=-1) rand.Set_Seed(seed);
     
     example.grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
-    VIEWER_OUTPUT<TV> vo(STREAM_TYPE((RW)0),example.grid,viewer_directory);
+    VIEWER_DIR viewer_dir(viewer_directory);
+    VIEWER_OUTPUT vo(STREAM_TYPE((RW)0),viewer_dir);
+    Use_Debug_Particles<TV>();
+    vo.Add_Common("grid",example.grid);
+    vo.Add("mac_velocities",example.velocity);
     ARRAY<TV> unit_X;
     if(use_px&&use_py) unit_X.Append(TV(px,py));
     else if(irregular_seeding) Sample_Box_Random(rand,unit_X,irregular_seeding);
@@ -194,7 +198,7 @@ int main(int argc, char* argv[])
                 for(int i=0;i<example.particles.X.m;i++){
                     Add_Debug_Particle(example.particles.X(i),VECTOR<T,3>(1,0,0));
                     Debug_Particle_Set_Attribute<TV,TV>("V",example.particles.V(i));}
-                Flush_Frame(example.velocity,"p2g");}
+                Flush_Frame("p2g");}
             if(use_pressure || mu)
                 driver.Compute_Boundary_Conditions();
             if(use_pressure) driver.Pressure_Projection();
@@ -206,7 +210,7 @@ int main(int argc, char* argv[])
                 for(int i=0;i<example.particles.X.m;i++){
                     Add_Debug_Particle(example.particles.X(i),VECTOR<T,3>(1,0,0));
                     Debug_Particle_Set_Attribute<TV,TV>("V",example.particles.V(i));}
-                Flush_Frame(example.velocity,"particle dof");}
+                Flush_Frame("particle dof");}
             for(int q=0;q<example.particles.V.m;q++)
             {
                 for(int j=0;j<dofs_per_particle;j++)
@@ -218,7 +222,7 @@ int main(int argc, char* argv[])
             }
         }
     }
-    if(dump_particles) Flush_Frame<TV>("end");
+    if(dump_particles) Flush_Frame("end");
 
     ARRAY<ARRAY<ARRAY<std::complex<T>,TV_INT> > > F(dofs_per_cell);
 

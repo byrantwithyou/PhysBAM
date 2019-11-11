@@ -21,9 +21,8 @@ class SOLIDS_DRIVER:public DRIVER<TV>
     typedef ARRAY<TV_DIMENSION,TV_INT> T_ARRAYS_DIMENSION_SCALAR;
     typedef DRIVER<TV> BASE;
 public:
-    using BASE::output_number;using BASE::time;using BASE::Read_Time;using BASE::Write_Substep;
-    using BASE::Write_Time;using BASE::Write_Last_Frame;
-    using BASE::current_frame;
+    using BASE::output_number;using BASE::time;using BASE::Write_Substep;
+    using BASE::Write_Time;using BASE::current_frame;
     SOLIDS_EXAMPLE<TV>& example;
     T next_dt; // for fluid time stepping
     bool next_done; // for fluid time stepping
@@ -42,7 +41,7 @@ public:
     void Advance_To_Target_Time(const T target_time) override;
     void Postprocess_Frame(const int frame);
     T Compute_Dt(const T time,const T target_time,bool& done);
-    void Write_Output_Files(const int frame) override;
+    void Write_Output_Files() override;
     void Setup_Solids(const T time);
     void Solid_Position_Update(const T dt);
     void Rigid_Cluster_Fracture(const T dt_full_advance,const T dt_cfl);

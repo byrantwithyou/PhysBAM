@@ -84,7 +84,7 @@ public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
     typedef typename TV::SPIN T_SPIN;
 
-    using BASE::output_directory;using BASE::solids_parameters;using BASE::write_last_frame;using BASE::data_directory;using BASE::last_frame;
+    using BASE::viewer_dir;using BASE::solids_parameters;using BASE::data_directory;using BASE::last_frame;
     using BASE::stream_type;using BASE::frame_rate;using BASE::solid_body_collection;using BASE::test_number;
     using BASE::user_last_frame;
     
@@ -112,7 +112,6 @@ public:
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
 
         solids_parameters.cfl=(T).9;
-        solids_parameters.triangle_collision_parameters.output_interaction_pairs=true;
 
         solids_parameters.rigid_body_collision_parameters.use_push_out=true;
         solids_parameters.use_rigid_deformable_contact=true;
@@ -131,7 +130,7 @@ public:
         if(!this->fixed_dt && !this->max_dt && !this->min_dt) this->fixed_dt=1;
         tests.data_directory=data_directory;
         if(!this->user_output_directory)
-            output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
+            viewer_dir.output_directory=LOG::sprintf("Standard_Tests/Test_%d",test_number);
         if(arb.use_krylov_poststab) arb.use_poststab_in_cg=false;
         if(use_prestab_iterations) solids_parameters.rigid_body_collision_parameters.contact_iterations=arb.max_iterations;
     }

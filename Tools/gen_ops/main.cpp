@@ -2,9 +2,9 @@
 #include <cstdio>
 #include <iostream>
 #include <map>
+#include <regex>
 #include <sstream>
 #include <string>
-#include <regex>
 
 using namespace std;
 

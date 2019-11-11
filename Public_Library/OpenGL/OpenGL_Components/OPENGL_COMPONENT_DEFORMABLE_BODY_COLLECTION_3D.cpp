@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Read_Write/FILE_UTILITIES.h>
+#include <Core/Utilities/VIEWER_DIR.h>
 #include <Geometry/Topology_Based_Geometry/B_SPLINE_PATCH.h>
 #include <Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS.h>
@@ -21,8 +22,8 @@ using namespace PhysBAM;
 // Function OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D
 //#####################################################################
 template<class T> OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
-OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D(const std::string& prefix,const int start_frame)
-    :OPENGL_COMPONENT<T>("Deformable Object List"),prefix(prefix),frame_loaded(-1),valid(false),use_active_list(false),hide_unselected(false),display_mode(0),display_relative_velocity_mode(0),number_of_segmented_curve(1),
+OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D(const VIEWER_DIR& viewer_dir)
+    :OPENGL_COMPONENT<T>(viewer_dir,"Deformable Object List"),valid(false),use_active_list(false),hide_unselected(false),display_mode(0),display_relative_velocity_mode(0),number_of_segmented_curve(1),
     incremented_active_object(0),smooth_shading(false),selected_vertex(-1),
     display_hard_bound_surface_mode(0),display_forces_mode(0),interaction_pair_display_mode(0),
     deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(0,0)),
@@ -58,7 +59,7 @@ OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D(const std::string& prefix,const i
     viewer_callbacks.Set("cycle_interaction_pair_display_mode",{[this](){Cycle_Interaction_Pair_Display_Mode();},"Cycle display of interaction pairs"});
 
     // check for per frame particles
-    if(File_Exists(LOG::sprintf("%s/%d/deformable_object_structures",prefix.c_str(),start_frame)))
+    if(File_Exists(viewer_dir.current_directory+"/deformable_object_structures"))
         invalidate_deformable_objects_selection_each_frame=true;
     else invalidate_deformable_objects_selection_each_frame=false;
 
@@ -67,7 +68,6 @@ OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D(const std::string& prefix,const i
     color_map_relative_velocity->Add_Color(0,OPENGL_COLOR(0.5,0.5,0.5));
     color_map_relative_velocity->Add_Color(.05,OPENGL_COLOR(0,0,1));
 
-    is_animation=true;
     color_map_forces=new OPENGL_COLOR_RAMP<T>();
     color_map_forces->Add_Color(-1.,OPENGL_COLOR(0,0,1));
     color_map_forces->Add_Color(-.01,OPENGL_COLOR(0,1,1));
@@ -128,22 +128,20 @@ Set_All_Materials(const OPENGL_MATERIAL& meshfront,const OPENGL_MATERIAL& front_
 // Function Reinitialize
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
-Reinitialize(bool force,bool read_geometry)
+Reinitialize()
 {
-    if(!(draw && (force || (is_animation && frame_loaded!=frame) || (!is_animation && frame_loaded<0)))) return;
+    if(!draw) return;
     static bool first_time=true;
-    std::string frame_string=LOG::sprintf("%s/%d/",prefix.c_str(),frame);
-    std::string static_frame_string=frame_string;
-    int static_frame=File_Exists(frame_string+"deformable_object_structures")?frame:-1;
-    bool read_static_variables=static_frame!=-1 || first_time || !deformable_body_collection.structures.m;
-    if(read_geometry) deformable_body_collection.Read(prefix,prefix,frame,static_frame,read_static_variables,true);
-    if(File_Exists(frame_string+"/interaction_pairs") && interaction_pair_display_mode)
-        Read_From_File(frame_string+"/interaction_pairs",point_triangle_interaction_pairs,edge_edge_interaction_pairs);
+    bool frame_has_static=File_Exists(viewer_dir.current_directory+"/deformable_object_structures");
+    bool read_static_variables=frame_has_static || first_time;
+    deformable_body_collection.Read(viewer_dir,read_static_variables);
+    if(File_Exists(viewer_dir.current_directory+"/interaction_pairs") && interaction_pair_display_mode)
+        Read_From_File(viewer_dir.current_directory+"/interaction_pairs",point_triangle_interaction_pairs,edge_edge_interaction_pairs);
     else{
         point_triangle_interaction_pairs.Remove_All();
         edge_edge_interaction_pairs.Remove_All();}
     
-    std::string filename=frame_string+"/deformable_object_force_data";
+    std::string filename=viewer_dir.current_directory+"/deformable_object_force_data";
     if(File_Exists(filename)){
         if(first_time) LOG::cout<<"reading "<<filename<<std::endl;
         Read_From_File(filename,force_data_list);}
@@ -248,16 +246,16 @@ Reinitialize(bool force,bool read_geometry)
         if(deformable_body_collection.soft_bindings.bindings.m) has_soft_bindings=true;
 #endif
         if(tetrahedralized_volume_objects(i)){
-            std::string filename=LOG::sprintf("%s/%d/subset_%d",prefix.c_str(),frame,i);
+            std::string filename=viewer_dir.current_directory+"/subset_"+std::to_string(i);
             if(File_Exists(filename))Read_From_File(filename,tetrahedralized_volume_objects(i)->subset);
-            filename=LOG::sprintf("%s/%d/colliding_nodes_%d",prefix.c_str(),frame,i);
+            filename=viewer_dir.current_directory+"/colliding_nodes_"+std::to_string(i);
             if(File_Exists(filename))Read_From_File(filename,tetrahedralized_volume_objects(i)->subset_particles);}
         else if(hexahedralized_volume_objects(i)){
-            std::string filename=LOG::sprintf("%s/%d/subset_%d",prefix.c_str(),frame,i);
+            std::string filename=viewer_dir.current_directory+"/subset_"+std::to_string(i);
             if(File_Exists(filename))Read_From_File(filename,hexahedralized_volume_objects(i)->subset);
-            filename=LOG::sprintf("%s/%d/colliding_nodes_%d",prefix.c_str(),frame,i);
+            filename=viewer_dir.current_directory+"/colliding_nodes_"+std::to_string(i);
             if(File_Exists(filename))Read_From_File(filename,hexahedralized_volume_objects(i)->subset_particles);
-            filename=LOG::sprintf("%s/%d/directions_%d",prefix.c_str(),frame,i);
+            filename=viewer_dir.current_directory+"/directions_"+std::to_string(i);
             if(File_Exists(filename))Read_From_File(filename,hexahedralized_volume_objects(i)->vectors_at_hex_centers);}}
     if(smooth_shading){
         for(int i=0;i<triangulated_surface_objects.m;i++) if(triangulated_surface_objects(i)) triangulated_surface_objects(i)->Initialize_Vertex_Normals();
@@ -269,27 +267,17 @@ Reinitialize(bool force,bool read_geometry)
             free_particles_indirect_arrays(i)->array.Exchange(tmp);}
 
     Update_Velocity_Field();
-    frame_loaded=frame;
     valid=true;
     first_time=false;
 
     for(number_of_segmented_curve=0;deformable_body_collection.template Find_Structure<SEGMENTED_CURVE<TV>*>(number_of_segmented_curve);number_of_segmented_curve++);
 }
 //#####################################################################
-// Function Valid_Frame
-//#####################################################################
-template<class T> bool OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
-Valid_Frame(int frame_input) const
-{
-    return File_Exists(LOG::sprintf("%s/%d/deformable_object_particles",prefix.c_str(),frame_input));
-}
-//#####################################################################
 // Function Set_Frame
 //#####################################################################
 template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
-Set_Frame(int frame_input)
+Set_Frame()
 {
-    OPENGL_COMPONENT<T>::Set_Frame(frame_input);
     Reinitialize();
 }
 //#####################################################################
@@ -820,7 +808,7 @@ Highlight_Particle_Response()
     if(!OPENGL_WORLD<T>::Singleton()->prompt_response.empty()){
         int index=-1;std::istringstream sstream(OPENGL_WORLD<T>::Singleton()->prompt_response);sstream>>index;
         if(index>=0 && index<deformable_body_collection.particles.Size()) selected_vertex=index;}
-    Reinitialize(true);
+    Reinitialize();
 }
 //#####################################################################
 // Function Selection_Bounding_Box
@@ -963,7 +951,7 @@ template<class T> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T>::
 Cycle_Interaction_Pair_Display_Mode()
 {
     if(!interaction_pair_display_mode && !point_triangle_interaction_pairs.m && !edge_edge_interaction_pairs.m){
-        std::string file=LOG::sprintf("%s/%d/interaction_pairs",prefix.c_str(),frame);
+        std::string file=viewer_dir.current_directory+"/interaction_pairs";
         if(File_Exists(file))
             Read_From_File(file,point_triangle_interaction_pairs,edge_edge_interaction_pairs);}
     interaction_pair_display_mode=(interaction_pair_display_mode+1)%4;

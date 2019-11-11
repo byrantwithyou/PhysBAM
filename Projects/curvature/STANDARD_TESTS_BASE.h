@@ -22,7 +22,7 @@ class STANDARD_TESTS_BASE:public SOLIDS_EXAMPLE<TV>
 public:
     typedef SOLIDS_EXAMPLE<TV> BASE;typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m>::OBJECT T_OBJECT;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_SURFACE;
-    using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
+    using BASE::solids_parameters;using BASE::viewer_dir;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
     using BASE::stream_type;using BASE::solids_evolution;using BASE::test_number;using BASE::data_directory;using BASE::m;using BASE::s;using BASE::kg;
     
     SOLIDS_STANDARD_TESTS<TV> tests;
@@ -77,7 +77,7 @@ public:
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) override;
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) override {}
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) override;
-    void Read_Output_Files_Solids(const int frame) override;
+    void Read_Output_Files_Solids() override;
     void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) override;
     bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) override;
     void Preprocess_Substep(const T dt,const T time) override;

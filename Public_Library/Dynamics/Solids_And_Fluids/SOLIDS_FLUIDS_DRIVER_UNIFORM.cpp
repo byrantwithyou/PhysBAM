@@ -139,7 +139,7 @@ Initialize()
 
     if(example.restart){
         LOG::SCOPE scope("reading solids data");
-        example.Read_Output_Files_Solids(example.restart_frame);
+        example.Read_Output_Files_Solids();
         solids_evolution.time=time=example.Time_At_Frame(example.restart_frame);}
 
     solids_evolution.Initialize_Deformable_Objects(example.frame_rate,example.restart);
@@ -233,7 +233,7 @@ Initialize()
 
     // set up the initial state
     if(example.restart){
-        example.Read_Output_Files_Fluids(current_frame);
+        example.Read_Output_Files_Fluids();
         Initialize_Fluids_Grids();
         collision_bodies_affecting_fluid.Rasterize_Objects();
         collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*grid.dX.Min(),5);
@@ -1366,17 +1366,16 @@ Compute_Dt(const T time,const T target_time,bool& done)
 // Function Write_Output_Files
 //#####################################################################
 template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
-Write_Output_Files(const int frame)
+Write_Output_Files()
 {
     LOG::SCOPE scope("writing output files");
-    Create_Directory(example.output_directory);
-    Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
-    Create_Directory(example.output_directory+"/common");
+    example.viewer_dir.Start_Directory(0,example.frame_title);
+    example.frame_title="";
 
     int number_of_regions=example.fluids_parameters.number_of_regions;
 
     if(number_of_regions==1) example.fluids_parameters.phi_boundary_water.Use_Extrapolation_Mode(false);
-    example.Write_Output_Files(frame);
+    example.Write_Output_Files();
     if(number_of_regions==1) example.fluids_parameters.phi_boundary_water.Use_Extrapolation_Mode(true);
 
     if(number_of_regions>=1){
@@ -1399,8 +1398,8 @@ Write_Output_Files(const int frame)
                     number_of_removed_negative_particles+=pls->removed_negative_particles(iterator.Cell_Index())->Size();
             LOG::cout<<number_of_removed_positive_particles<<" positive and "<<number_of_removed_negative_particles<<" negative removed particles "<<std::endl;}}
 
-    Write_Time(frame);
-    Write_Last_Frame(frame);
+    Write_Time();
+    example.viewer_dir.Finish_Directory();
 }
 //#####################################################################
 namespace PhysBAM{

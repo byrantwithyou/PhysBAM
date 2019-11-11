@@ -11,11 +11,11 @@
 #include <Core/Matrices/SYMMETRIC_MATRIX.h>
 #include <Core/Vectors/VECTOR.h>
 #include <Geometry/Topology/SEGMENT_MESH.h>
-#include <map>
 #include "CANONICAL_COMPONENT.h"
 #include "COMMON.h"
 #include "COMPONENT_PIPE.h"
 #include "XFORM.h"
+#include <map>
 
 namespace PhysBAM{
 

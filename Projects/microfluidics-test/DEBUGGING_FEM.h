@@ -4,10 +4,10 @@
 //#####################################################################
 #ifndef __DEBUGGING_FEM__
 #define __DEBUGGING_FEM__
-#include <string>
 #include "BLOCK_MATRIX.h"
 #include "BLOCK_VECTOR.h"
 #include "COMPONENT_LAYOUT_FEM.h"
+#include <string>
 
 namespace PhysBAM{
 

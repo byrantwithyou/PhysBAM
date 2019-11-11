@@ -19,7 +19,6 @@
 namespace PhysBAM{
 
 template<class TV> class RIGID_BODY;
-template<class TV> class DEBUG_PARTICLES;
 
 template<class TV>
 class SOLIDS_FLUIDS_EXAMPLE_UNIFORM:public SOLIDS_FLUIDS_EXAMPLE<TV>,public LEVELSET_CALLBACKS<TV>,public SPH_CALLBACKS<TV>,
@@ -34,16 +33,16 @@ class SOLIDS_FLUIDS_EXAMPLE_UNIFORM:public SOLIDS_FLUIDS_EXAMPLE<TV>,public LEVE
     typedef AVERAGING_UNIFORM<TV> T_AVERAGING;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE<TV> BASE;
-    using BASE::output_directory;using BASE::restart;using BASE::Write_Frame_Title;using BASE::solids_parameters;using BASE::stream_type;
+    using BASE::restart;using BASE::Write_Frame_Title;using BASE::solids_parameters;using BASE::stream_type;
     using BASE::solids_fluids_parameters;using BASE::solid_body_collection;using BASE::solids_evolution;
     using BASE::Adjust_Phi_With_Sources;using BASE::minimum_collision_thickness;using FLUIDS_PARAMETERS_CALLBACKS<TV>::Adjust_Density_And_Temperature_With_Sources;
     using FLUIDS_PARAMETERS_CALLBACKS<TV>::Get_Source_Reseed_Mask;using FLUIDS_PARAMETERS_CALLBACKS<TV>::Get_Analytic_Velocities;
     using FLUIDS_PARAMETERS_CALLBACKS<TV>::Get_Source_Velocities;using FLUIDS_PARAMETERS_CALLBACKS<TV>::Get_Object_Velocities; // silence -Woverloaded-virtual
+    using BASE::viewer_dir;
 
     FLUIDS_PARAMETERS_UNIFORM<TV> fluids_parameters;
     FLUID_COLLECTION<TV> fluid_collection;
     int resolution;
-    DEBUG_PARTICLES<TV>& debug_particles;
     bool opt_skip_debug_data;
 
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args,const int number_of_regions,const typename FLUIDS_PARAMETERS<TV>::TYPE type);
@@ -91,8 +90,8 @@ public:
     void Get_Object_Velocities(LAPLACE_UNIFORM<TV>* elliptic_solver,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time) override;
     void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset_multiple,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const override;
     void Initialize_Swept_Occupied_Blocks_For_Advection(const T dt,const T time,T maximum_fluid_velocity,const bool include_removed_particle_velocities);
-    void Read_Output_Files_Fluids(const int frame) override;
-    virtual void Write_Output_Files(const int frame) const override;
+    void Read_Output_Files_Fluids() override;
+    virtual void Write_Output_Files() const override;
     void Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time) override;
     void Log_Parameters() const override;
 //#####################################################################

@@ -26,8 +26,6 @@ protected:
     typedef VECTOR<T,1> TV;
     typedef VECTOR<T,TV::m+(TV::m==1)> TV_BOX;
 
-    std::string basedir;
-    int frame_loaded;
     bool valid;
     bool show_object_names;
     bool output_positions;
@@ -49,15 +47,14 @@ protected:
     bool need_destroy_rigid_body_collection;
 
 public:
-    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;using OPENGL_COMPONENT<T>::is_animation;
-    using OPENGL_OBJECT<T>::viewer_callbacks;
-    OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(const std::string& basedir);
-    OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir);
+    using OPENGL_COMPONENT<T>::draw;using OPENGL_COMPONENT<T>::frame;
+    using OPENGL_OBJECT<T>::viewer_callbacks;using OPENGL_COMPONENT<T>::viewer_dir;
+    OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(const VIEWER_DIR& viewer_dir);
+    OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(const VIEWER_DIR& viewer_dir,RIGID_BODY_COLLECTION<TV>& rigid_body_collection);
     virtual ~OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D();
     
 //#####################################################################
-    bool Valid_Frame(int frame_input) const override;
-    void Set_Frame(int frame_input) override;
+    void Set_Frame() override;
     void Set_Draw(bool draw_input = true) override;
 
     void Display() const override;
@@ -74,7 +71,7 @@ public:
     void Toggle_Draw_Mode();
 
 public:
-    virtual void Reinitialize(const bool force=false,const bool read_geometry=true); // Needs to be called after some state changes
+    virtual void Reinitialize(const bool read_geometry=true); // Needs to be called after some state changes
 protected:
     void Create_Geometry(const int id);
     void Update_Geometry(const int id);

@@ -8,9 +8,9 @@
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
 
+#include "math.h"
 #include <fstream>
 #include <iostream>
-#include "math.h"
 
 #include <Core/Math_Tools/RANGE.h>
 #include <Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
@@ -69,7 +69,7 @@ public:
     typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
     typedef VECTOR<bool,2*TV::m> T_FACE_VECTOR_BOOL;
 
-    using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::restart;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::viewer_dir;using BASE::restart;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::solids_fluids_parameters;
     using BASE::solid_body_collection; using BASE::data_directory;using BASE::test_number;using BASE::resolution;
     using BASE::solids_evolution; using BASE::stream_type;using BASE::Add_To_Fluid_Simulation;
@@ -506,20 +506,20 @@ public:
 
             // output directory
             if(!this->user_output_directory){
-                if(timesplit) output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_%d_semiimplicit",
+                if(timesplit) viewer_dir.output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_%d_semiimplicit",
                     test_number,(fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y),(fluids_parameters.grid->counts.z));
-                else output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_%d_explicit",test_number,
+                else viewer_dir.output_directory=LOG::sprintf("Standard_Tests/Test_%d__Resolution_%d_%d_%d_explicit",test_number,
                     (fluids_parameters.grid->counts.x),(fluids_parameters.grid->counts.y),(fluids_parameters.grid->counts.z));
-                if(eno_scheme==2) output_directory+="_density_weighted";
-                else if(eno_scheme==3) output_directory+="_velocity_weighted";
-                if(use_slip) output_directory+="_slip";
-                if(transition_to_incompressible) output_directory+="_transition_incompressible";
-                if(use_soot) output_directory+="_soot";
-                if(use_fixed_farfield_boundary) output_directory+="_fixedFF";
-                if(strong_shock) output_directory+="_strong";
-                if(fracture_walls) output_directory+="_fracture";
-                output_directory+=LOG::sprintf("_mass_%f",solid_mass);
-                output_directory+=LOG::sprintf("_fp_%d",fp);}
+                if(eno_scheme==2) viewer_dir.output_directory+="_density_weighted";
+                else if(eno_scheme==3) viewer_dir.output_directory+="_velocity_weighted";
+                if(use_slip) viewer_dir.output_directory+="_slip";
+                if(transition_to_incompressible) viewer_dir.output_directory+="_transition_incompressible";
+                if(use_soot) viewer_dir.output_directory+="_soot";
+                if(use_fixed_farfield_boundary) viewer_dir.output_directory+="_fixedFF";
+                if(strong_shock) viewer_dir.output_directory+="_strong";
+                if(fracture_walls) viewer_dir.output_directory+="_fracture";
+                viewer_dir.output_directory+=LOG::sprintf("_mass_%f",solid_mass);
+                viewer_dir.output_directory+=LOG::sprintf("_fp_%d",fp);}
         }
     virtual ~STANDARD_TESTS() {}
 

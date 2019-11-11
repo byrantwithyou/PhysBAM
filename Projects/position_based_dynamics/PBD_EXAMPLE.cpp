@@ -15,7 +15,7 @@ template<class TV> PBD_EXAMPLE<TV>::
 PBD_EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     :stream_type(stream_type_input),debug_particles(*new DEBUG_PARTICLES<TV>),
     last_frame(100),
-    write_substeps_level(-1),substeps_delay_frame(-1),output_directory("output"),
+    write_substeps_level(-1),substeps_delay_frame(-1),viewer_dir("output"),
     restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(1e-8),max_dt(frame_dt),
     print_stats(false),solver_iterations(1),test_diff(false),threads(1)
 {
@@ -33,31 +33,28 @@ template<class TV> PBD_EXAMPLE<TV>::
 // Function Write_Output_Files
 //#####################################################################
 template<class TV> void PBD_EXAMPLE<TV>::
-Write_Output_Files(const int frame)
+Write_Output_Files()
 {
-    std::string f=LOG::sprintf("%d",frame);
-
-    Write_To_File(stream_type,LOG::sprintf("%s/%d/inverse_mass",output_directory.c_str(),frame),w);
-    Write_To_File(stream_type,LOG::sprintf("%s/%d/positions",output_directory.c_str(),frame),X);
-    Write_To_File(stream_type,LOG::sprintf("%s/%d/velocities",output_directory.c_str(),frame),V);
-    Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/inverse_mass",w);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/positions",X);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/velocities",V);
+    Write_To_File(stream_type,viewer_dir.current_directory+"/restart_data",time);
 
     for(int i=0;i<X.m;i++){
         Add_Debug_Particle(X(i),VECTOR<T,3>(1,1,1));
         Debug_Particle_Set_Attribute<TV>("V",V(i));}
-    debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
+    debug_particles.Write_Debug_Particles(stream_type,viewer_dir);
 }
 //#####################################################################
 // Function Read_Output_Files
 //#####################################################################
 template<class TV> void PBD_EXAMPLE<TV>::
-Read_Output_Files(const int frame)
+Read_Output_Files()
 {
-    std::string f=LOG::sprintf("%d",frame);
-    Read_From_File(LOG::sprintf("%s/%d/inverse_mass",output_directory.c_str(),frame),w);
-    Read_From_File(LOG::sprintf("%s/%d/positions",output_directory.c_str(),frame),X);
-    Read_From_File(LOG::sprintf("%s/%d/velocities",output_directory.c_str(),frame),V);
-    Read_From_File(LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
+    Read_From_File(viewer_dir.current_directory+"/inverse_mass",w);
+    Read_From_File(viewer_dir.current_directory+"/positions",X);
+    Read_From_File(viewer_dir.current_directory+"/velocities",V);
+    Read_From_File(viewer_dir.current_directory+"/restart_data",time);
 }
 
 //#####################################################################

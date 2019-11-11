@@ -134,7 +134,7 @@ Initialize()
 
     example.Initialize();
     if(example.restart){
-        example.Read_Output_Files(example.restart);}
+        example.Read_Output_Files();}
     else{
         example.Rebuild_Levelset_Color();
         for(FACE_ITERATOR<TV> it(example.grid,example.number_of_ghost_cells);it.Valid();it.Next())
@@ -156,7 +156,7 @@ Initialize()
     if(!example.restart && example.use_pls) example.particle_levelset_evolution_multiple.Seed_Particles(time);
     example.particle_levelset_evolution_multiple.Delete_Particles_Outside_Grid();
 
-    if(!example.restart) Write_Output_Files(0);
+    if(!example.restart) Write_Output_Files();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",1);
 }
 //#####################################################################
@@ -565,7 +565,7 @@ Simulate_To_Frame(const int frame)
         if(current_frame%1==0 && 0){
             example.particle_levelset_evolution_multiple.Reseed_Particles(time);
             example.particle_levelset_evolution_multiple.Delete_Particles_Outside_Grid();}
-        Write_Output_Files(++output_number);}
+        Write_Output_Files();}
 }
 //#####################################################################
 // Function Write_Substep
@@ -575,21 +575,19 @@ Write_Substep(const std::string& title)
 {
     example.frame_title=title;
     LOG::cout<<"Writing substep ["<<example.frame_title<<"]: output_number="<<output_number+1<<", time="<<time<<", frame="<<current_frame<<std::endl;
-    Write_Output_Files(++output_number);
+    Write_Output_Files();
     example.frame_title="";
 }
 //#####################################################################
 // Write_Output_Files
 //#####################################################################
 template<class TV> void PLS_FC_DRIVER<TV>::
-Write_Output_Files(const int frame)
+Write_Output_Files()
 {
-    Create_Directory(example.output_directory);
-    Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
-    Create_Directory(example.output_directory+"/common");
-    Write_To_Text_File(example.output_directory+LOG::sprintf("/%d/frame_title",frame),example.frame_title);
-    example.Write_Output_Files(frame);
-    Write_To_Text_File(example.output_directory+"/common/last_frame",frame,"\n");
+    example.viewer_dir.Start_Directory(0,example.frame_title);
+    example.frame_title="";
+    example.Write_Output_Files();
+    example.viewer_dir.Finish_Directory();
 }
 //#####################################################################
 // Function Dump_Largest_Eigenvector

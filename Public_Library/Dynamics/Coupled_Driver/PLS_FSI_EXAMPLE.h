@@ -37,8 +37,8 @@ class PLS_FSI_EXAMPLE:public EXAMPLE<TV_input>,public EXAMPLE_FORCES_AND_VELOCIT
     typedef typename MATRIX_POLICY<TV>::TRANSFORMATION_MATRIX T_TRANSFORMATION_MATRIX;
     typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;typedef FACE_LOOKUP_COLLIDABLE_UNIFORM<TV> T_FACE_LOOKUP_COLLIDABLE;
 public:
-    typedef EXAMPLE<TV> BASE;using BASE::Set_Write_Substeps_Level;
-    using BASE::output_directory;using BASE::restart;using BASE::Write_Frame_Title;using BASE::stream_type;
+    typedef EXAMPLE<TV> BASE;using BASE::Set_Write_Substeps_Level;using BASE::viewer_dir;
+    using BASE::restart;using BASE::Write_Frame_Title;using BASE::stream_type;
     using FLUIDS_PARAMETERS_CALLBACKS<TV>::Get_Source_Reseed_Mask;
     using FLUIDS_PARAMETERS_CALLBACKS<TV>::Get_Source_Velocities;using FLUIDS_PARAMETERS_CALLBACKS<TV>::Get_Object_Velocities; // silence -Woverloaded-virtual
 
@@ -90,8 +90,8 @@ public:
     void Get_Object_Velocities(LAPLACE_UNIFORM<TV>* elliptic_solver,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time) override;
     void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<TV>& levelset_multiple,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const override;
     void Initialize_Swept_Occupied_Blocks_For_Advection(const T dt,const T time,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);
-    void Read_Output_Files_Fluids(const int frame);
-    void Write_Output_Files(const int frame) const override;
+    void Read_Output_Files_Fluids();
+    void Write_Output_Files() const override;
     void Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time) override;
     void Log_Parameters() const override;
     void Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,
@@ -105,7 +105,7 @@ public:
     virtual void Postprocess_Substep(const T dt,const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();} // time at start of substep
     // solids
     virtual void Initialize_Bodies() {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Read_Output_Files_Solids(const int frame);
+    virtual void Read_Output_Files_Solids();
     // fluids
     virtual void Extrapolate_Phi_Into_Objects(const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
     virtual void Postprocess_Phi(const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
