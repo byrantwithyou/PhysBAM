@@ -27,7 +27,6 @@ class RISING_SPHERE:public WATER_FREE_SURFACE_3D_EXAMPLE<T,RW>
 {
 public:
     RISING_SPHERE() {
-        initial_time=0.;
         if(!this->user_frame_rate) frame_rate=3*24;
         if(!user_last_frame) last_frame=12*frame_rate;
         restart_frame=0;

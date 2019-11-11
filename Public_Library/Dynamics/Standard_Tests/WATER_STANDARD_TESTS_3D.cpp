@@ -60,7 +60,6 @@ Initialize(const int test_number_input,const int resolution)
 
     auto lf=[this](int f)
         {
-            example.first_frame=0;
             if(!example.user_last_frame)
                 example.last_frame=500;
         };

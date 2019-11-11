@@ -16,7 +16,7 @@ template<class TV> SMOKE_EXAMPLE<TV>::
 SMOKE_EXAMPLE(const STREAM_TYPE stream_type_input,int number_of_threads)
     :stream_type(stream_type_input),
     debug_particles(*new DEBUG_PARTICLES<TV>),ghost(5),
-    initial_time(0),first_frame(0),last_frame(100),frame_rate(24),
+    last_frame(100),frame_rate(24),
     restart(0),write_debug_data(true),output_directory("output"),N_boundary(false),
     debug_divergence(false),alpha(0.1),beta(0.00366),
     cfl(.9),grid(TV_INT(),RANGE<TV>::Unit_Box(),true),mpi_grid(0),
@@ -59,7 +59,7 @@ CFL(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
 template<class TV> typename TV::SCALAR SMOKE_EXAMPLE<TV>::
 Time_At_Frame(const int frame) const 
 {
-    return initial_time+(frame-first_frame)/frame_rate;
+    return frame/frame_rate;
 }
 //#####################################################################
 // Function Initialize_Grid

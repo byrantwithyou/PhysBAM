@@ -1263,7 +1263,7 @@ Postprocess_Frame(const int frame)
     if(number_of_regions>=1){
         example.Postprocess_Phi(time); // actually changes phi !!!
 
-        if(particle_levelset_evolution->use_particle_levelset && (frame-example.first_frame)%example.fluids_parameters.reseeding_frame_rate==0){
+        if(particle_levelset_evolution->use_particle_levelset && (frame)%example.fluids_parameters.reseeding_frame_rate==0){
             LOG::Time("Reseeding... ");
             particle_levelset_evolution->Reseed_Particles(time);
             particle_levelset_evolution->Delete_Particles_Outside_Grid();
@@ -1347,7 +1347,6 @@ Write_Output_Files(const int frame)
     Create_Directory(example.output_directory);
     Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
     Create_Directory(example.output_directory+"/common");
-    Write_First_Frame(frame);
 
     int number_of_regions=example.fluids_parameters.number_of_regions;
 

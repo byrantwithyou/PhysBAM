@@ -38,7 +38,7 @@ class SOLIDS_EXAMPLE:public EXAMPLE<TV>,public EXAMPLE_FORCES_AND_VELOCITIES<TV>
     typedef AVERAGING_UNIFORM<TV> T_AVERAGING;
 public:
     using EXAMPLE_FORCES_AND_VELOCITIES<TV>::Set_External_Positions;
-    using BASE::output_directory;using BASE::frame_title;using BASE::stream_type;using BASE::initial_time;using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;
+    using BASE::output_directory;using BASE::frame_title;using BASE::stream_type;using BASE::last_frame;using BASE::frame_rate;
     using BASE::write_last_frame;using BASE::write_time;using BASE::write_substeps_level;using BASE::Set_Write_Substeps_Level;//using BASE::data_directory;
     using BASE::restart;using BASE::Write_Frame_Title;
 

@@ -25,7 +25,7 @@ class RIGID_PARTICLE_SPHERES_EXAMPLE:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 public:
     typedef T_input T;typedef VECTOR<T,3> TV;
     typedef SOLIDS_EXAMPLE<TV> BASE;
-    using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::data_directory;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::data_directory;
     using BASE::restart_frame;using BASE::output_directory;using BASE::solids_parameters;using BASE::write_last_frame;
     using BASE::solid_body_collection;using BASE::test_number;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual

@@ -25,9 +25,6 @@ public:
     DRIVER(EXAMPLE<TV>& example);
     virtual ~DRIVER();
 
-    void Write_First_Frame(const int frame) const
-    {if(example.write_first_frame && frame==example.first_frame) Write_To_Text_File(example.output_directory+"/common/first_frame",frame,"\n");}
-
     void Write_Last_Frame(const int frame) const
     {if(example.write_last_frame) Write_To_Text_File(example.output_directory+"/common/last_frame",frame,"\n");}
 

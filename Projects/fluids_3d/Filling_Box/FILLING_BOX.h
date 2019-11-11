@@ -13,7 +13,7 @@ template<class T>
 class FILLING_BOX:public SOLIDS_FLUIDS_EXAMPLE_3D<RW>
 {
 public:
-using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::first_frame;using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::last_frame;using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::frame_rate;
+using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::last_frame;using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::frame_rate;
 using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::restart;using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::restart_frame;using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::output_directory;
 using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::fluids_parameters;
 
@@ -22,7 +22,6 @@ CYLINDER<T> source;VECTOR<T,3> source_velocity;
     FILLING_BOX() 
         :SOLIDS_FLUIDS_EXAMPLE_3D<RW>(fluids_parameters.WATER),source(VECTOR<T,3>(0,(T).75,(T).5),VECTOR<T,3>((T).05,(T).75,(T).5),(T).1),source_velocity((T)2,0,0)
     {
-        first_frame=0;
         if(!user_last_frame) last_frame=1000;
         if(!this->user_frame_rate) frame_rate=24;
         restart=false;restart_frame=0;

@@ -13,7 +13,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> SHALLOW_WATER_STATE<TV>::
 SHALLOW_WATER_STATE(const STREAM_TYPE stream_type)
-    :stream_type(stream_type),ghost(3),initial_time(0),
+    :stream_type(stream_type),ghost(3),
     last_frame(100),write_substeps_level(-1),substeps_delay_frame(-1),
     output_directory("output"),data_directory("../../Public_Data"),use_test_output(false),
     restart(0),dt(0),time(0),frame_dt((T)1/24),min_dt(0),max_dt(frame_dt),cfl(1),

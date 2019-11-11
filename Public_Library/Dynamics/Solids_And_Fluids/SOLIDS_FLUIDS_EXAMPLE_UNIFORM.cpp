@@ -554,13 +554,13 @@ Write_Output_Files(const int frame) const
     Create_Directory(output_directory+"/common");
     Write_Frame_Title(frame);
     debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
-    solid_body_collection.Write(stream_type,output_directory,frame,first_frame,solids_parameters.write_static_variables_every_frame,
+    solid_body_collection.Write(stream_type,output_directory,frame,solids_parameters.write_static_variables_every_frame,
         solids_parameters.rigid_body_evolution_parameters.write_rigid_bodies,solids_parameters.write_deformable_body,solids_parameters.write_from_every_process,
         solids_parameters.triangle_collision_parameters.output_interaction_pairs);
     if(NEWMARK_EVOLUTION<TV>* newmark=dynamic_cast<NEWMARK_EVOLUTION<TV>*>(solids_evolution))
         newmark->Write_Position_Update_Projection_Data(stream_type,output_directory+"/"+f+"/");
     
-    fluids_parameters.Write_Output_Files(stream_type,output_directory,first_frame,frame);
+    fluids_parameters.Write_Output_Files(stream_type,output_directory,frame);
     if(fluids_parameters.incompressible) fluid_collection.Write_Output_Files(stream_type,output_directory,frame);
     if(fluids_parameters.smoke||fluids_parameters.fire||fluids_parameters.water){
         if(fluids_parameters.solid_affects_fluid && fluids_parameters.fluid_affects_solid){

@@ -140,8 +140,6 @@ Write_Output_Files(const int frame)
     Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
     Create_Directory(example.output_directory+"/common");
     Write_To_Text_File(example.output_directory+LOG::sprintf("/%d/frame_title",frame),example.frame_title);
-    if(frame==0)
-        Write_To_Text_File(example.output_directory+"/common/first_frame",frame,"\n");
     example.Write_Output_Files(frame);
     Write_To_Text_File(example.output_directory+"/common/last_frame",frame,"\n");
 }

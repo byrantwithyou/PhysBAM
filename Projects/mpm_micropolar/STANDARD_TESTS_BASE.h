@@ -24,7 +24,7 @@ class STANDARD_TESTS_BASE:public MPM_MICROPOLAR_EXAMPLE<TV>
     typedef MPM_MICROPOLAR_EXAMPLE<TV> BASE;
 
 public:
-    using BASE::initial_time;using BASE::last_frame;using BASE::grid;using BASE::particles;
+    using BASE::last_frame;using BASE::grid;using BASE::particles;
     using BASE::mass;using BASE::force_helper;
     using BASE::frame_title;using BASE::write_substeps_level;using BASE::gather_scatter;
     using BASE::substeps_delay_frame;

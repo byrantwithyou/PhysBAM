@@ -48,7 +48,6 @@ Initialize(const int test_number_input,const int resolution,const T angle_fracti
     // set up the domain
     int cells=resolution;
     if(test_number==1 || test_number==2 || test_number==3){
-        example.first_frame=0;
         if(!example.user_last_frame) example.last_frame=3840;
         grid.Initialize(TV_INT(10,15)*cells+1,RANGE<TV>(TV(),TV(1,1.5)));}
     else if(test_number==4){
@@ -58,7 +57,6 @@ Initialize(const int test_number_input,const int resolution,const T angle_fracti
         fluids_parameters.use_poisson=true;  // TODO This is a hack to tell Projection to use poisson rather than laplace
         // TODO: need to call use_variable_beta on the poisson solver if we ACTUALLY want to use variable beta
         fluids_parameters.second_order_cut_cell_method=false;
-        example.first_frame=0;
         if(!example.user_last_frame) example.last_frame=1000;
         grid.Initialize(TV_INT()+10*cells+1,RANGE<TV>::Centered_Box());}
     else{LOG::cerr<<"unrecognized test number "<<test_number<<std::endl;exit(1);}

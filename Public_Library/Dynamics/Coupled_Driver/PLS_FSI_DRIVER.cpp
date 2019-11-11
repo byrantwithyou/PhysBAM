@@ -84,7 +84,7 @@ Execute_Main_Program()
     Initialize();
     example.Post_Initialization();
     example.Log_Parameters();
-    if(!example.restart) Write_Output_Files(example.first_frame);}
+    if(!example.restart) Write_Output_Files(0);}
     Simulate_To_Frame(example.last_frame);
 }
 //#####################################################################
@@ -117,7 +117,7 @@ Initialize()
         example.restart=true;example.restart_frame=last_frame;
         LOG::cout<<"Auto Restart from frame "<<last_frame<<" (from file "<<last_frame_file<<")"<<std::endl;}
     if(example.restart){current_frame=example.restart_frame;Read_Time(current_frame);}
-    else current_frame=example.first_frame;
+    else current_frame=0;
     output_number=current_frame;
     time=example.Time_At_Frame(current_frame);
     example.fluids_parameters.callbacks=&example;
@@ -553,7 +553,7 @@ Postprocess_Frame(const int frame)
 
     example.Postprocess_Phi(time);
 
-    if(particle_levelset_evolution->use_particle_levelset && (frame-example.first_frame)%example.fluids_parameters.reseeding_frame_rate==0){
+    if(particle_levelset_evolution->use_particle_levelset && (frame)%example.fluids_parameters.reseeding_frame_rate==0){
         LOG::Time("Reseeding... ");
         particle_levelset_evolution->Reseed_Particles(time);
         particle_levelset_evolution->Delete_Particles_Outside_Grid();
@@ -599,7 +599,6 @@ Write_Output_Files(const int frame)
     Create_Directory(example.output_directory);
     Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
     Create_Directory(example.output_directory+"/common");
-    Write_First_Frame(frame);
 
     example.fluids_parameters.phi_boundary_water.Use_Extrapolation_Mode(false);
     example.Write_Output_Files(frame);

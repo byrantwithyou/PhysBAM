@@ -30,7 +30,7 @@ public:
         //grid
         m=101; xmin=-5.; xmax=5.;
         //time
-        initial_time=0.;final_time=60*3.38e-2;if(!this->user_frame_rate) frame_rate=60./final_time;
+        final_time=60*3.38e-2;if(!this->user_frame_rate) frame_rate=60./final_time;
         cfl_number=1.;
         //custom stuff . . . 
         eos = new EOS_GAMMA<T>;

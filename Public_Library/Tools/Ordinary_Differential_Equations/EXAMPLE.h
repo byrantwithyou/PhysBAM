@@ -22,8 +22,7 @@ class EXAMPLE
 
 public:
     const STREAM_TYPE stream_type;
-    T initial_time;
-    int first_frame,last_frame;
+    int last_frame;
     T frame_rate;
     std::string frame_title;
     int write_substeps_level;

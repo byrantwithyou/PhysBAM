@@ -309,7 +309,7 @@ void Run(PARSE_ARGS& parse_args,STREAM_TYPE stream_type,const std::string& outpu
     SOLIDS_STANDARD_TESTS<TV> tests(stream_type,data_directory,sbc);
     Setup(sbc,example,tests,test_number);
     Flush_Frame<TV>("init");
-    sbc.Write(stream_type,output_dir,vo.frame-1,0,true,true,true,true,true);
+    sbc.Write(stream_type,output_dir,vo.frame-1,true,true,true,true,true);
 
     sbc.Update_Simulated_Particles();
     example.time=0;
@@ -325,11 +325,11 @@ void Run(PARSE_ARGS& parse_args,STREAM_TYPE stream_type,const std::string& outpu
             Step(sbc,example);
             if(write_substep){
                 Flush_Frame<TV>("Substep");
-                sbc.Write(stream_type,output_dir,vo.frame-1,0,true,true,true,true,true);}
+                sbc.Write(stream_type,output_dir,vo.frame-1,true,true,true,true,true);}
             example.time=end_time;
             example.step++;}
         if(!write_substep) Flush_Frame<TV>("Frame");
-        sbc.Write(stream_type,output_dir,vo.frame-1,0,true,true,true,true,true);}
+        sbc.Write(stream_type,output_dir,vo.frame-1,true,true,true,true,true);}
 }
 
 int main(int argc, char* argv[])

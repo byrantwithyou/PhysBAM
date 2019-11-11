@@ -23,7 +23,7 @@ class FLOW_PAST_CIRCLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T,2> >
 {
 public:
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::write_output_files;
+    using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::last_frame;using BASE::frame_rate;using BASE::write_output_files;
     using BASE::output_directory;using BASE::data_directory;using BASE::stream_type;using BASE::fluid_collection;using BASE::solid_body_collection;using BASE::resolution;
     using BASE::Mark_Outside;using BASE::Get_Boundary_Along_Ray;
 

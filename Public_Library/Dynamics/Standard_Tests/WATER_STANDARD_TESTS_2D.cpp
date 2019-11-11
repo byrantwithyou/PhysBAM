@@ -56,80 +56,64 @@ Initialize(const int test_number_input,const int resolution)
     // set up the domain
     int cells=1*resolution;
     if(test_number==1){
-        example.first_frame=0;
         if(!example.user_last_frame) example.last_frame=10;
         grid.Initialize(TV_INT(15*cells+1,10*cells+1),RANGE<TV>(TV(),TV((T)1.5,1)));}
     else if(test_number==2){
-        example.first_frame=0;
         if(!example.user_last_frame) example.last_frame=100;
         grid.Initialize(TV_INT(10*cells+1,15*cells+1),RANGE<TV>(TV(),TV(1,(T)1.5)));}
     else if(test_number==3){
-        example.first_frame=0;
         if(!example.user_last_frame) example.last_frame=150;
         grid.Initialize(TV_INT(10*cells+1,15*cells+1),RANGE<TV>(TV(),TV(1,(T)1.5)));}
     else if(test_number==4){
-        example.first_frame=0;
         if(!example.user_last_frame) example.last_frame=200;
         grid.Initialize(TV_INT(15*cells+1,10*cells+1),RANGE<TV>(TV(),TV((T)1.5,1)));
         motion_curve.Add_Control_Point(0,TV((T)1.25,(T).55));
         motion_curve.Add_Control_Point((T).2,TV((T).8,(T).1)); // .03 was old
         motion_curve.Add_Control_Point(3,TV((T).8,(T).1));}
     else if(test_number==5){
-        example.first_frame=0;
         if(!example.user_last_frame) example.last_frame=150;
         grid.Initialize(TV_INT(10*cells+1,25*cells+1),RANGE<TV>(TV(),TV((T).1,(T).25)));}
     else if(test_number==6){
-        example.first_frame=0;
         if(!example.user_last_frame) example.last_frame=50;
         grid.Initialize(TV_INT(25*cells+1,10*cells+1),RANGE<TV>(TV(),TV(1,(T).4)));}
     else if(test_number==7){
         fluids_parameters.gravity=TV();
-        example.first_frame=0;
         if(!example.user_last_frame) example.last_frame=100;
         grid.Initialize(TV_INT(10*cells+1,15*cells+1),RANGE<TV>(TV(),TV(1,(T)1.5)));}
     else if(test_number==8){
-        example.first_frame=0;
         if(!example.user_last_frame) example.last_frame=1000;
         grid.Initialize(TV_INT(10*cells+1,15*cells+1),RANGE<TV>(TV(),TV(1,(T)1.5)));}
     else if(test_number==9){
-        example.first_frame=0;
         if(!example.user_last_frame) example.last_frame=1000;
         grid.Initialize(TV_INT(16*cells+1,6*cells+1),RANGE<TV>(TV(),TV(4,(T)1.5)));}
     else if(test_number==10){
-        example.first_frame=0;
         if(!example.user_last_frame) example.last_frame=1000;
         grid.Initialize(TV_INT(6*cells+1,12*cells+1),RANGE<TV>(TV(),TV((T)1.5,3)));}
     else if(test_number==11){
         fluids_parameters.gravity=TV();
-        example.first_frame=0;
         if(!example.user_last_frame) example.last_frame=100;
         grid.Initialize(TV_INT(4*cells+1,6*cells+1),RANGE<TV>(TV(),TV(1,(T)1.5)));}
     else if(test_number==12){
         fluids_parameters.viscosity=(T)1000;fluids_parameters.implicit_viscosity=true;
-        example.first_frame=0;
         if(!example.user_last_frame) example.last_frame=100;
         grid.Initialize(TV_INT(10*cells+1,15*cells+1),RANGE<TV>(TV(),TV(1,(T)1.5)));}
     else if(test_number==13){
         fluids_parameters.viscosity=(T)0;fluids_parameters.implicit_viscosity=true;fluids_parameters.variable_viscosity=true;
         fluids_parameters.use_explicit_part_of_implicit_viscosity=true;
-        example.first_frame=0;
         if(!example.user_last_frame) example.last_frame=100;
         grid.Initialize(TV_INT(10*cells,15*cells),RANGE<TV>(TV(0,0),TV(1,(T)1.5)),true);}
     else if(test_number==14){
         fluids_parameters.viscosity=(T)0;fluids_parameters.implicit_viscosity=true;fluids_parameters.variable_viscosity=true;
         fluids_parameters.use_explicit_part_of_implicit_viscosity=true;
-        example.first_frame=0;
         if(!example.user_last_frame) example.last_frame=100;
         grid.Initialize(TV_INT(10*cells,15*cells),RANGE<TV>(TV(0,0),TV(1,(T)1.5)),true);}
     else if(test_number==15){
         fluids_parameters.analytic_test=true;
         //fluids_parameters.viscosity=(T)1000;fluids_parameters.implicit_viscosity=true;fluids_parameters.variable_viscosity=false;
         //fluids_parameters.use_explicit_part_of_implicit_viscosity=false;
-        example.first_frame=0;
         if(!example.user_last_frame) example.last_frame=100;
         grid.Initialize(TV_INT(2*cells,3*cells),RANGE<TV>(TV(0,0),TV(1,(T)1.5)),true);}
     else if(test_number==20){ //MIKE example
-        example.first_frame=0;
         if(!example.user_last_frame) example.last_frame=2000;
         //grid.Initialize(TV_INT(15*cells+1,10*cells+1,10*cells+1),RANGE<TV>(TV(0,0,0),TV((T)1.5,1,1)));
         grid.Initialize(TV_INT(201,81),RANGE<TV>(TV(),TV((T)2,(T).8)));
@@ -141,7 +125,6 @@ Initialize(const int test_number_input,const int resolution)
         motion_curve.Add_Control_Point((T).075,TV((T)1,(T).1));
         motion_curve.Add_Control_Point(3,TV((T)1,(T).55));}
     else if(test_number==21){
-        example.first_frame=0;
         if(!example.user_last_frame) example.last_frame=1000;
         fluids_parameters.cfl=(T)0.9;
         fluids_parameters.incompressible_iterations=100;

@@ -52,7 +52,7 @@ Initialize()
     DEBUG_SUBSTEPS::write_substeps_level=example.write_substeps_level;
 
     // setup time
-    if(example.restart) current_frame=example.restart;else current_frame=example.first_frame;
+    if(example.restart) current_frame=example.restart;else current_frame=0;
     output_number=current_frame;
     time=example.Time_At_Frame(current_frame);
 
@@ -164,7 +164,7 @@ Initialize()
     example.incompressible.Extrapolate_Velocity_Across_Interface(example.face_velocities,exchanged_phi_ghost,false,example.number_of_ghost_cells,0,TV());
 
     example.Set_Boundary_Conditions(time); // get so CFL is correct
-    if(!example.restart) Write_Output_Files(example.first_frame);
+    if(!example.restart) Write_Output_Files(0);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",1);
 }
 //#####################################################################
@@ -300,9 +300,8 @@ Simulate_To_Frame(const int frame)
     while(current_frame<frame){
         LOG::SCOPE scope("FRAME","Frame %d",current_frame+1);
         Advance_To_Target_Time(example.Time_At_Frame(current_frame+1));
-        if((current_frame-example.first_frame)%1==0){
-            example.particle_levelset_evolution.Reseed_Particles(time);
-            example.particle_levelset_evolution.Delete_Particles_Outside_Grid();}
+        example.particle_levelset_evolution.Reseed_Particles(time);
+        example.particle_levelset_evolution.Delete_Particles_Outside_Grid();
         Write_Output_Files(++output_number);
         current_frame++;}
 } 
@@ -327,8 +326,6 @@ Write_Output_Files(const int frame)
     Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
     Create_Directory(example.output_directory+"/common");
     Write_To_Text_File(example.output_directory+LOG::sprintf("/%d/frame_title",frame),example.frame_title);
-    if(frame==example.first_frame) 
-        Write_To_Text_File(example.output_directory+"/common/first_frame",frame,"\n");
     example.Write_Output_Files(frame);
     Write_To_Text_File(example.output_directory+"/common/last_frame",frame,"\n");
 }

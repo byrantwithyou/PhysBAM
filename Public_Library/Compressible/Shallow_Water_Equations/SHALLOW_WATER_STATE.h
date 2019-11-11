@@ -24,7 +24,6 @@ public:
     int ghost;
 
     // initialization & output
-    T initial_time;
     int last_frame;
     std::string frame_title;
     int write_substeps_level;

@@ -25,7 +25,7 @@ class STANDARD_TESTS<VECTOR<T,3> >:public STANDARD_TESTS_BASE<VECTOR<T,3> >
     typedef typename MPM_COLLISION_OBJECT<TV>::COLLISION_TYPE COLLISION_TYPE;
 
 public:
-    using BASE::initial_time;using BASE::last_frame;using BASE::grid;using BASE::particles;
+    using BASE::last_frame;using BASE::grid;using BASE::particles;
     using BASE::frame_title;using BASE::write_substeps_level;using BASE::particles_per_cell;
     using BASE::substeps_delay_frame;using BASE::scale_mass;using BASE::scale_E;
     using BASE::output_directory;using BASE::restart;using BASE::dt;using BASE::time;

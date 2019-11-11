@@ -30,7 +30,6 @@ class PLS_FC_EXAMPLE:public LEVELSET_CALLBACKS<TV_input>
 public:
     enum WORKAROUND1{num_bc=3};
     STREAM_TYPE stream_type;
-    T initial_time;
     int last_frame;
     std::string frame_title;
     int write_substeps_level;

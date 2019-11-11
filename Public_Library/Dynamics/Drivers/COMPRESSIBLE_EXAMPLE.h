@@ -25,11 +25,11 @@ class COMPRESSIBLE_EXAMPLE:public EXAMPLE<TV_input>
     typedef EXAMPLE<TV> BASE;
     enum workaround1{d=TV::m};
 
-    using BASE::stream_type;using BASE::initial_time;
+    using BASE::stream_type;
     using BASE::output_directory;
 
 public:
-    using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;
+    using BASE::last_frame;using BASE::frame_rate;
     int number_of_ghost_cells;
     T cfl;
 
@@ -65,7 +65,7 @@ public:
     virtual ~COMPRESSIBLE_EXAMPLE();
     
     T Time_At_Frame(const int frame) const override
-    {return initial_time+(frame-first_frame)/frame_rate;}
+    {return frame/frame_rate;}
 
     virtual void Apply_Isobaric_Fix(const T dt,const T time);
     void Set_Domain_Boundary_Conditions();

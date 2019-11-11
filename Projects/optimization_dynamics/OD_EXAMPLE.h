@@ -27,7 +27,6 @@ public:
 
     ARRAY<STRUCTURE<TV>*> structures;
 
-    T initial_time;
     int last_frame;
     std::string frame_title;
     int write_substeps_level;

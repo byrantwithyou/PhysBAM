@@ -100,8 +100,6 @@ Parse_Arguments(PARSE_ARGS& parse_args)
     opengl_window_title="opengl_1d: " + Real_Path(basedir);
 #endif
 
-    if(File_Exists(basedir+"/common/first_frame")) Read_From_Text_File(basedir+"/common/first_frame",start_frame);
-
     ANIMATED_VISUALIZATION<T>::Parse_Arguments(parse_args);
 
     if(parse_args.unclaimed_arguments)

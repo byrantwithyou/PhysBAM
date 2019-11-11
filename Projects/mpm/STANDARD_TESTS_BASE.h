@@ -25,7 +25,7 @@ class STANDARD_TESTS_BASE:public MPM_EXAMPLE<TV>
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m>::OBJECT T_VOLUME;
 
 public:
-    using BASE::initial_time;using BASE::last_frame;using BASE::grid;using BASE::particles;
+    using BASE::last_frame;using BASE::grid;using BASE::particles;
     using BASE::mass;using BASE::force_helper;using BASE::use_oldroyd;
     using BASE::frame_title;using BASE::write_substeps_level;using BASE::gather_scatter;
     using BASE::collision_objects;using BASE::substeps_delay_frame;

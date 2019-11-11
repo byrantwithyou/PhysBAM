@@ -38,7 +38,7 @@ class PLS_FSI_EXAMPLE:public EXAMPLE<TV_input>,public EXAMPLE_FORCES_AND_VELOCIT
     typedef FACE_LOOKUP_UNIFORM<TV> T_FACE_LOOKUP;typedef FACE_LOOKUP_COLLIDABLE_UNIFORM<TV> T_FACE_LOOKUP_COLLIDABLE;
 public:
     typedef EXAMPLE<TV> BASE;using BASE::Set_Write_Substeps_Level;
-    using BASE::output_directory;using BASE::first_frame;using BASE::restart;using BASE::Write_Frame_Title;using BASE::stream_type;
+    using BASE::output_directory;using BASE::restart;using BASE::Write_Frame_Title;using BASE::stream_type;
     using FLUIDS_PARAMETERS_CALLBACKS<TV>::Get_Source_Reseed_Mask;
     using FLUIDS_PARAMETERS_CALLBACKS<TV>::Get_Source_Velocities;using FLUIDS_PARAMETERS_CALLBACKS<TV>::Get_Object_Velocities; // silence -Woverloaded-virtual
 

@@ -81,7 +81,7 @@ Update_Solids_Parameters(const T time)
 {
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
-    int frame=(int)(first_frame+(time-initial_time)*frame_rate);
+    int frame=(int)(time*frame_rate);
     if(frame<start_drop){
         T max_linear_velocity=(T).1,max_angular_velocity=(T).1;
         solids_parameters.rigid_body_evolution_parameters.clamp_rigid_body_velocities=true;

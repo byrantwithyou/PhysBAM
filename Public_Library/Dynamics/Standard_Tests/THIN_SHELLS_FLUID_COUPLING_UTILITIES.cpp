@@ -346,8 +346,6 @@ Set_Density(SEGMENTED_CURVE_2D<T>& segmented_curve,const T density,const bool us
 //#####################################################################
 template<class T_EXAMPLE> static void Set_Example_Common_Parameters_From_Parameter_List(T_EXAMPLE& example,PARAMETER_LIST& parameter_list)
 {
-    parameter_list.Get_Parameter_In_Place("initial_time",example.initial_time);
-    parameter_list.Get_Parameter_In_Place("first_frame",example.first_frame);
     parameter_list.Get_Parameter_In_Place("last_frame",example.last_frame);
     parameter_list.Get_Parameter_In_Place("frame_rate",example.frame_rate);
     parameter_list.Get_Parameter_In_Place("restart",example.restart);

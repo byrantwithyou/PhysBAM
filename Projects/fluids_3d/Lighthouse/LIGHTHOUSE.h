@@ -24,7 +24,7 @@ class LIGHTHOUSE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>,public BOUNDARY_OPEN_C
     typedef ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,TV_INT> T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::data_directory;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::data_directory;
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::stream_type;using BASE::solid_body_collection;using BASE::resolution;
     using BASE::test_number;
     using BASE::user_last_frame;
@@ -55,7 +55,6 @@ public:
         rigid_body_collection(solid_body_collection.rigid_body_collection),inaccurate_union(*fluids_parameters.grid)
     {
         parse_args.Parse();
-        first_frame=0;
         if(!user_last_frame) last_frame=1000;
         if(!this->user_frame_rate) frame_rate=36;
         restart=false;restart_frame=18;

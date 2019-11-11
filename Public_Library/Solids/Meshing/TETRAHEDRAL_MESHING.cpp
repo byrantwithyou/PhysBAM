@@ -711,7 +711,7 @@ Write_Output_Files(const int frame)
     Create_Directory(output_directory+"/"+f);
     Create_Directory(output_directory+"/common");
     // write state
-    solid_body_collection.Write(stream_type,output_directory,frame,1,solids_parameters.write_static_variables_every_frame,solids_parameters.rigid_body_evolution_parameters.write_rigid_bodies,
+    solid_body_collection.Write(stream_type,output_directory,frame,solids_parameters.write_static_variables_every_frame,solids_parameters.rigid_body_evolution_parameters.write_rigid_bodies,
         solids_parameters.write_deformable_body,solids_parameters.write_from_every_process,false);
     Write_To_File(stream_type,output_directory+"/tetrahedralized_volume_"+f+".tet",tetrahedralized_volume);
     // write boundary mesh and bindings

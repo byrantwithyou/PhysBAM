@@ -24,8 +24,7 @@ class INCOMPRESSIBLE_EXAMPLE:public RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>
 
 public:
     STREAM_TYPE stream_type;
-    T initial_time;
-    int first_frame,last_frame;
+    int last_frame;
     T frame_rate;
     int restart;
     std::string frame_title;
@@ -55,7 +54,7 @@ public:
     virtual ~INCOMPRESSIBLE_EXAMPLE();
     
     T Time_At_Frame(const int frame) const
-    {return initial_time+(frame-first_frame)/frame_rate;}
+    {return frame/frame_rate;}
 
     virtual void Write_Output_Files(const int frame);
     virtual void Read_Output_Files(const int frame);

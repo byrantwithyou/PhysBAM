@@ -33,7 +33,7 @@ class STANDARD_TESTS_BASE:public MPM_MAC_EXAMPLE<TV>
 
 public:
 //    typedef typename MPM_PARTICLE_SOURCE<TV>::PATH PATH;
-    using BASE::initial_time;using BASE::last_frame;using BASE::grid;using BASE::particles;
+    using BASE::last_frame;using BASE::grid;using BASE::particles;
     using BASE::frame_title;using BASE::write_substeps_level;
     using BASE::collision_objects;using BASE::substeps_delay_frame;using BASE::output_directory;
     using BASE::restart;using BASE::dt;using BASE::time;

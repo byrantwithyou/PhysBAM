@@ -36,7 +36,7 @@ Execute_Main_Program()
     Initialize();
     example.Post_Initialization();
     example.Log_Parameters();
-    if(!example.restart) Write_Output_Files(example.first_frame);}
+    if(!example.restart) Write_Output_Files(0);}
     Simulate_To_Frame(example.last_frame);
 }
 //#####################################################################

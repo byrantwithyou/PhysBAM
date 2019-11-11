@@ -676,7 +676,7 @@ Read_Output_Files(const std::string& output_directory,const int frame)
 // Function Write_Output_Files
 //#####################################################################
 template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
-Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int first_frame,const int frame) const
+Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const
 {
     std::string f=LOG::sprintf("%d",frame);
     if(!simulate) return;
@@ -688,7 +688,7 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
         Write_To_File(stream_type,output_directory+"/"+f+"/soot",soot_ghost);
         if(use_soot_fuel_combustion) Write_To_File(stream_type,output_directory+"/"+f+"/soot_fuel",soot_fuel_ghost);}
     if(smoke || fire || water || sph){
-        if(frame==first_frame){Write_To_File(stream_type,output_directory+"/common/grid",*grid);
+        if(frame==0){Write_To_File(stream_type,output_directory+"/common/grid",*grid);
         if(mpi_grid) Write_To_File(stream_type,output_directory+"/common/global_grid",mpi_grid->global_grid);}
         Write_To_File(stream_type,output_directory+"/"+f+"/grid",*grid);
         if(mpi_grid) Write_To_File(stream_type,output_directory+"/"+f+"/global_grid",mpi_grid->global_grid);
@@ -776,7 +776,7 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
             Write_To_File(stream_type,output_directory+"/"+f+"/psi_D",incompressible->projection.elliptic_solver->psi_D);
             Write_To_File(stream_type,output_directory+"/"+f+"/colors",incompressible->projection.elliptic_solver->filled_region_colors);}}
     else if(compressible){
-        if(frame==first_frame){
+        if(frame==0){
             Write_To_File(stream_type,output_directory+"/common/grid",euler->grid);
             if(mpi_grid) Write_To_File(stream_type,output_directory+"/common/global_grid",mpi_grid->global_grid);}
         Write_To_File(stream_type,output_directory+"/"+f+"/grid",euler->grid);

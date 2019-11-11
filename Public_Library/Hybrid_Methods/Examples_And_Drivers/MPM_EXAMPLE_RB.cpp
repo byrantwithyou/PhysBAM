@@ -81,7 +81,7 @@ Write_Output_Files(const int frame)
         Write_To_File(stream_type,LOG::sprintf("%s/%d/restart_data",output_directory.c_str(),frame),time);
 #pragma omp task
         {
-            solid_body_collection.Write(stream_type,output_directory,frame,0,false,true,true,true,false);
+            solid_body_collection.Write(stream_type,output_directory,frame,false,true,true,true,false);
         }
         if(pfd)
         {

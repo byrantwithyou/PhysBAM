@@ -44,7 +44,7 @@ public:
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     typedef BOUNDARY<TV,TV_DIMENSION> BASE_BOUNDARY;
-    using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::stream_type;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::stream_type;
     using BASE::data_directory;using BASE::solid_body_collection;using BASE_BOUNDARY::Boundary;using BASE::test_number;using BASE::resolution;
     using BASE::user_last_frame;
     
@@ -105,7 +105,6 @@ public:
         if(test_number==4){fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;}
         if(test_number==7){fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;}
         //time
-        initial_time=(T)0.;
         if(!user_last_frame) last_frame=1000;
         if(!this->user_frame_rate) frame_rate=(T)80.;
         if(test_number==1) if(!user_last_frame) last_frame=320;

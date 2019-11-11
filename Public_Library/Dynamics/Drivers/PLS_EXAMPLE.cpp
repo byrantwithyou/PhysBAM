@@ -11,7 +11,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV_input> PLS_EXAMPLE<TV_input>::
 PLS_EXAMPLE(const STREAM_TYPE stream_type_input)
-    :stream_type(stream_type_input),initial_time(0),first_frame(0),last_frame(100),frame_rate(24),
+    :stream_type(stream_type_input),last_frame(100),frame_rate(24),
     write_substeps_level(-1),write_output_files(true),output_directory("output"),restart(0),
     number_of_ghost_cells(3),cfl(.9),mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),//incompressible_fluid_collection(mac_grid),
     mpi_grid(0),projection(mac_grid),particle_levelset_evolution(mac_grid,collision_bodies_affecting_fluid,number_of_ghost_cells,false),incompressible(mac_grid,projection),boundary(0),

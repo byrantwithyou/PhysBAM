@@ -23,7 +23,7 @@ class PLS_FSI_DRIVER:public DRIVER<TV>
     using BASE::time;using BASE::current_frame;
 public:
     using BASE::output_number;using BASE::Write_Output_Files;using BASE::Read_Time;using BASE::Write_Time;
-    using BASE::Write_First_Frame;using BASE::Write_Last_Frame;using BASE::Write_Substep;
+    using BASE::Write_Last_Frame;using BASE::Write_Substep;
 
     PLS_FSI_EXAMPLE<TV>& example;
     ARRAY<T,TV_INT> old_phi;

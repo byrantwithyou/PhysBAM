@@ -16,7 +16,6 @@ class BOUNCING_DROP:public WATER_FREE_SURFACE_3D_EXAMPLE<T,RW>
 public:
     BOUNCING_DROP()
     {
-        first_frame=0;
         if(!user_last_frame) last_frame=300;
         if(!this->user_frame_rate) frame_rate=24;
         restart=false;restart_frame=100;

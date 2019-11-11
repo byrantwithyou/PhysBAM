@@ -37,8 +37,7 @@ public:
     DEBUG_PARTICLES<TV>& debug_particles;
     int ghost;
 
-    T initial_time;
-    int first_frame,last_frame;
+    int last_frame;
     T frame_rate;
     int restart;
     std::string frame_title;

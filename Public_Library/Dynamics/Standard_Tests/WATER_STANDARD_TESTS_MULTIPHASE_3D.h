@@ -40,7 +40,6 @@ void Initialize(const int test_number_input,const int resolution,const int resta
     int cells=1*resolution;
     auto lf=[this](int f,int r)
         {
-            example.first_frame=0;
             if(!example.user_last_frame)
                 example.last_frame=f;
             if(!example.user_frame_rate)

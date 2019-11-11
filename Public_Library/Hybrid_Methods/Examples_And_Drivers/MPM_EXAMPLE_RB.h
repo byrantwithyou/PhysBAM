@@ -63,7 +63,6 @@ public:
     mutable ARRAY<TV> lagrangian_forces_V,lagrangian_forces_F;
     MPM_FORCE_HELPER<TV>& force_helper;
 
-    T initial_time=0;
     int last_frame=100;
     std::string frame_title;
     int write_substeps_level=-1;

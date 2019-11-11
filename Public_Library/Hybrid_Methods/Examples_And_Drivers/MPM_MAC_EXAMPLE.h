@@ -112,7 +112,6 @@ public:
     RANDOM_NUMBERS<T> random;
 
     // initialization & output
-    T initial_time=0;
     int last_frame=100;
     std::string frame_title;
     int write_substeps_level=-1;

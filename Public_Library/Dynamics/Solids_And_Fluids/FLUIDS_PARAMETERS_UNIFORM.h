@@ -141,7 +141,7 @@ public:
     template<class T_PARTICLES,class T_ARRAYS_PARTICLES> void Read_Particles(const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,
         const std::string& output_directory,const std::string& prefix,const int frame);
     void Read_Output_Files(const std::string& output_directory,const int frame);
-    void Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int first_frame,const int frame) const;
+    void Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_directory,const int frame) const;
     void Log_Parameters() const override;
 //#####################################################################
 };      

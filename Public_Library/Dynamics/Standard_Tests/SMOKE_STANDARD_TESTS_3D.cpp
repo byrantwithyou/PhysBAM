@@ -48,7 +48,6 @@ Initialize(const int test_number_input,const int resolution)
     //set up the domain
     int cells=resolution;
     if(test_number==1||test_number==2||test_number==3||test_number==4){
-        example.first_frame=0;
         if(!example.user_last_frame)
             example.last_frame=3840;
         grid.Initialize(TV_INT(10,10,25)*cells+1,RANGE<TV>(TV(-10,-10,-5),TV(10,10,45)));}

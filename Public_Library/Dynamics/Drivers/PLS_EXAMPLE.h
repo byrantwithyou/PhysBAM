@@ -30,8 +30,7 @@ class PLS_EXAMPLE:public LEVELSET_CALLBACKS<TV_input>
 
 public:
     STREAM_TYPE stream_type;
-    T initial_time;
-    int first_frame,last_frame;
+    int last_frame;
     T frame_rate;
     std::string frame_title;
     int write_substeps_level;
@@ -60,7 +59,7 @@ public:
     virtual ~PLS_EXAMPLE();
     
     T Time_At_Frame(const int frame) const
-    {return initial_time+(frame-first_frame)/frame_rate;}
+    {return frame/frame_rate;}
 
     void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const override
     {V_levelset=face_velocities;}

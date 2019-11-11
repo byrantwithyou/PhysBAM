@@ -33,7 +33,7 @@ public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
     typedef VECTOR<T,TV::m+2> TV_DIMENSION;
-    using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;
     using BASE::solid_body_collection;using BASE::test_number;using BASE::resolution;
 
     TV_DIMENSION state_left,state_middle,state_right; // (density,velocity,pressure)
@@ -81,7 +81,6 @@ public:
         fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
         if(test_number==1 || test_number==2) fluids_parameters.domain_walls[0][1]=true;
         //time
-        initial_time=(T)0.;
         if(!user_last_frame) last_frame=1500;
         if(!this->user_frame_rate) frame_rate=(T)100.;
         fluids_parameters.cfl=cfl_number;

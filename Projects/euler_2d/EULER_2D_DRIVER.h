@@ -44,9 +44,9 @@ public:
 void Initialize()
 {
     // initialize time
-    total_steps=(int)((example.final_time-example.initial_time)*example.frame_rate);
-    time_per_frame=(example.final_time-example.initial_time)/total_steps;
-    time=example.initial_time+example.restart_step_number*time_per_frame;
+    total_steps=(int)(example.final_time*example.frame_rate);
+    time_per_frame=example.final_time/total_steps;
+    time=example.example.restart_step_number*time_per_frame;
     
     std::cout << "total step = " << total_steps << " time_per_frame = " << time_per_frame << " time = " << time << std::endl;
 
@@ -84,8 +84,8 @@ void Execute_Main_Program()
 {
     for(int k=example.restart_step_number+1;k<=total_steps;k++){
         std::cout << std::endl;
-        Advance_One_Frame(example.initial_time+k*time_per_frame);
-        std::cout << "Finished frame " << k << " - time " << example.initial_time+k*time_per_frame << std::endl;
+        Advance_One_Frame(example.k*time_per_frame);
+        std::cout << "Finished frame " << k << " - time " << example.k*time_per_frame << std::endl;
         example.Write_Matlab_Data_File(k,euler.grid,U);}
 }
 //#####################################################################

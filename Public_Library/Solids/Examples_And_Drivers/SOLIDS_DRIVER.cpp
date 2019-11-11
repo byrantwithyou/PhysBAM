@@ -56,7 +56,7 @@ Execute_Main_Program()
     Initialize();
     example.Post_Initialization();
     example.Log_Parameters();
-    if(!example.restart) Write_Output_Files(example.first_frame);}
+    if(!example.restart) Write_Output_Files(0);}
     Simulate_To_Frame(example.last_frame);
 }
 //#####################################################################
@@ -295,7 +295,6 @@ Write_Output_Files(const int frame)
     Create_Directory(example.output_directory);
     Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
     Create_Directory(example.output_directory+"/common");
-    Write_First_Frame(frame);
 
     example.Write_Output_Files(frame);
 

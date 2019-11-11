@@ -46,7 +46,7 @@ public:
     typedef VECTOR<T,2*TV::m> T_FACE_VECTOR;typedef VECTOR<TV,2*TV::m> TV_FACE_VECTOR;
     typedef VECTOR<bool,2*TV::m> T_FACE_VECTOR_BOOL;
 
-    using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::solid_body_collection;using BASE::stream_type;
     using BASE::data_directory;using BASE::test_number;using BASE::resolution;using BASE::solids_evolution;
     using BASE::user_last_frame;
@@ -134,7 +134,6 @@ public:
         fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=false;
         fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=false;fluids_parameters.domain_walls[2][1]=false;
         //time
-        initial_time=(T)0.;
         if(!user_last_frame) last_frame=1000;
         if(!this->user_frame_rate) frame_rate=(T)100.;
         fluids_parameters.cfl=cfl_number;

@@ -307,11 +307,11 @@ Read(const std::string& prefix,const int frame,const int static_frame,const bool
 // Function Write
 //#####################################################################
 template<class TV> void SOLID_BODY_COLLECTION<TV>::
-Write(const STREAM_TYPE stream_type,const std::string& prefix,const int frame,const int first_frame,const bool include_static_variables,const bool write_rigid_body,const bool write_deformable_body,const bool write_from_every_process,const bool output_interaction_pairs) const
+Write(const STREAM_TYPE stream_type,const std::string& prefix,const int frame,const bool include_static_variables,const bool write_rigid_body,const bool write_deformable_body,const bool write_from_every_process,const bool output_interaction_pairs) const
 {
     if(write_deformable_body){
         int static_frame=include_static_variables?frame:-1;
-        bool write_static_variables=include_static_variables || frame==first_frame;
+        bool write_static_variables=include_static_variables || frame==0;
         deformable_body_collection.Write(stream_type,prefix,prefix,frame,static_frame,write_static_variables,write_from_every_process);
         ARRAY<FORCE_DATA<TV> > spring_data_list;
         for(int i=0;i<solids_forces.m;i++) solids_forces(i)->Add_Force_Data(spring_data_list);

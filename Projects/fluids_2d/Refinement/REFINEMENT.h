@@ -17,7 +17,7 @@ class REFINEMENT:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >
     typedef T_input T;typedef VECTOR<T,2> TV;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::write_output_files;
+    using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::last_frame;using BASE::frame_rate;using BASE::write_output_files;
     using BASE::output_directory;using BASE::restart;using BASE::restart_frame;using BASE::data_directory;using BASE::fluid_collection;using BASE::solid_body_collection;
     using BASE::resolution;using BASE::test_number;using BASE::Get_Object_Velocities; // silence -Woverloaded-virtual
     using BASE::user_last_frame;

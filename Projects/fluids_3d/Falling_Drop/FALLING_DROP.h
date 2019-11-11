@@ -14,14 +14,13 @@ template<class T>
 class FALLING_DROP:public SOLIDS_FLUIDS_EXAMPLE_3D
 {
 public:
-    using SOLIDS_FLUIDS_EXAMPLE_3D::first_frame;using SOLIDS_FLUIDS_EXAMPLE_3D::last_frame;using SOLIDS_FLUIDS_EXAMPLE_3D::frame_rate;
+    using SOLIDS_FLUIDS_EXAMPLE_3D::last_frame;using SOLIDS_FLUIDS_EXAMPLE_3D::frame_rate;
     using SOLIDS_FLUIDS_EXAMPLE_3D::restart;using SOLIDS_FLUIDS_EXAMPLE_3D::restart_frame;using SOLIDS_FLUIDS_EXAMPLE_3D::output_directory;
     using SOLIDS_FLUIDS_EXAMPLE_3D::fluids_parameters;
 
     FALLING_DROP()
         :SOLIDS_FLUIDS_EXAMPLE_3D(fluids_parameters.WATER)
     {
-        first_frame=0;
         if(!user_last_frame) last_frame=1000;
         if(!this->user_frame_rate) frame_rate=24;
         restart=false;restart_frame=18;

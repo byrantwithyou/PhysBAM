@@ -12,7 +12,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> DRIVER<TV>::
 DRIVER(EXAMPLE<TV>& example)
-    :time(0),example(example),current_frame(0),output_number(example.first_frame)
+    :time(0),example(example),current_frame(0),output_number(0)
 {
     DEBUG_SUBSTEPS::write_substeps_level=example.write_substeps_level;
     DEBUG_SUBSTEPS::writer=[=](const std::string& title){Write_Substep(title);};
@@ -44,7 +44,7 @@ Initialize()
     example.Setup_Log();
     if(example.auto_restart){Read_Last_Frame();example.restart=true;}
     if(example.restart){current_frame=example.restart_frame;Read_Time(current_frame);}
-    else current_frame=example.first_frame;
+    else current_frame=0;
     output_number=current_frame;
     time=example.Time_At_Frame(current_frame);
 }
@@ -85,7 +85,7 @@ Read_Time(const int frame)
         if(abs(time-corrected_time)>(T)1e-4*abs(time)){ // only adjust time if significantly different from default in order to get deterministic restarts
             time=corrected_time;
             // adjust initial time so that Simulate_To_Frame() returns correct time (essential when writing substeps)
-            example.initial_time=time-(frame-example.first_frame)/example.frame_rate;}}
+        }}
 }
 //#####################################################################
 // Function Read_Last_Frame
@@ -106,7 +106,6 @@ Write_Output_Files(const int frame)
     Create_Directory(example.output_directory);
     Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
     Create_Directory(example.output_directory+"/common");
-    Write_First_Frame(frame);
     example.Write_Output_Files(frame);
     Write_Time(frame);
     Write_Last_Frame(frame);

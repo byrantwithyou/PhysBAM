@@ -1196,8 +1196,6 @@ void Energy_Profile_Plot(int frame)
 {
     if(!dual_directory.length()) dual_directory=output_directory+"/dual_output";
 
-    if(this->write_first_frame && frame==this->first_frame) Write_To_Text_File(dual_directory+"/common/first_frame",frame,"\n");
-
     ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>&>().isotropic_model;
     if(!energy_mesh){
         energy_particles.Store_Velocity(true);
@@ -1239,7 +1237,7 @@ void Energy_Profile_Plot(int frame)
     energy_particles.Delete_All_Elements();
 
     Write_To_File(this->stream_type,dual_directory+"/"+Number_To_String(frame)+"/deformable_object_particles",energy_mesh->particles);
-    if(frame==1 || (this->restart && frame==this->first_frame)){
+    if(frame==1 || (this->restart && frame==0)){
         Create_Directory(LOG::sprintf("%s/%i",dual_directory.c_str(),0));
         Write_To_File(this->stream_type,LOG::sprintf("%s/%i/debug_particles",dual_directory.c_str(),0),energy_particles);
         Write_To_File(this->stream_type,dual_directory+"/0/deformable_object_particles",energy_mesh->particles);

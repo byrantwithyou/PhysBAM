@@ -77,7 +77,7 @@ Initialize()
     // Logging
     if(example.monitor_conservation_error) euler.Compute_Total_Conserved_Quantity(false,(T)0,euler.initial_total_conserved_quantity);
 
-    Write_Output_Files(example.first_frame);
+    Write_Output_Files(0);
 }
 //#####################################################################
 // Advance_To_Target_Time

@@ -22,7 +22,7 @@ class MULTIPHASE_FIRE_EXAMPLES_UNIFORM:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::first_frame;using BASE::data_directory;using BASE::Adjust_Phi_With_Source;
+    using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::data_directory;using BASE::Adjust_Phi_With_Source;
     using BASE::last_frame;using BASE::frame_rate;using BASE::write_output_files;using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;
     using BASE::output_directory;using BASE::restart;using BASE::restart_frame;using BASE::solid_body_collection;using BASE::test_number;
     using BASE::user_last_frame;

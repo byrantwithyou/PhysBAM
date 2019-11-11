@@ -122,8 +122,6 @@ Write_Output_Files(const int frame)
     Create_Directory(state.output_directory+LOG::sprintf("/%d",frame));
     Create_Directory(state.output_directory+"/common");
     Write_To_Text_File(state.output_directory+LOG::sprintf("/%d/frame_title",frame),state.frame_title);
-    if(frame==0)
-        Write_To_Text_File(state.output_directory+"/common/first_frame",frame,"\n");
     state.Write_Output_Files(frame);
     Write_To_Text_File(state.output_directory+"/common/last_frame",frame,"\n");
     Write_To_File(state.stream_type,state.output_directory+"/common/grid",state.grid);

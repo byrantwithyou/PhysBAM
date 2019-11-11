@@ -29,7 +29,7 @@ class EULER_1D_EXAMPLE
 {
 public:
     //time
-    T initial_time,final_time;
+    T final_time;
     T frame_rate;                        
     
     int restart_step_number;
@@ -53,7 +53,7 @@ public:
     char output_directory[256];
     
     EULER_1D_EXAMPLE()
-        :initial_time((T)0),final_time((T)1),frame_rate((T)24),restart_step_number(0),cfl_number((T)1),
+        :final_time((T)1),frame_rate((T)24),restart_step_number(0),cfl_number((T)1),
         set_max_time_step(false),max_time_step(1.e8),spatial_order(3),rungekutta_order(3),m(10),xmin((T)0),xmax((T)1),u_boundary(0),eos(0),conservation_method(0)
     {
         strcpy(output_directory,"matlab");

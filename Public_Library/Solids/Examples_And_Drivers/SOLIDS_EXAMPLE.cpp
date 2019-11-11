@@ -185,7 +185,7 @@ Write_Output_Files(const int frame) const
     Create_Directory(output_directory+"/common");
     Write_Frame_Title(frame);
     debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
-    solid_body_collection.Write(stream_type,output_directory,frame,first_frame,solids_parameters.write_static_variables_every_frame,
+    solid_body_collection.Write(stream_type,output_directory,frame,solids_parameters.write_static_variables_every_frame,
         solids_parameters.rigid_body_evolution_parameters.write_rigid_bodies,solids_parameters.write_deformable_body,solids_parameters.write_from_every_process,
         solids_parameters.triangle_collision_parameters.output_interaction_pairs);
     if(NEWMARK_EVOLUTION<TV>* newmark=dynamic_cast<NEWMARK_EVOLUTION<TV>*>(solids_evolution))

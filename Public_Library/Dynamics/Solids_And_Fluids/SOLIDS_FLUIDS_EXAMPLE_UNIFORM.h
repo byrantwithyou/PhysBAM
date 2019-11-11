@@ -34,7 +34,7 @@ class SOLIDS_FLUIDS_EXAMPLE_UNIFORM:public SOLIDS_FLUIDS_EXAMPLE<TV>,public LEVE
     typedef AVERAGING_UNIFORM<TV> T_AVERAGING;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE<TV> BASE;
-    using BASE::output_directory;using BASE::first_frame;using BASE::restart;using BASE::Write_Frame_Title;using BASE::solids_parameters;using BASE::stream_type;
+    using BASE::output_directory;using BASE::restart;using BASE::Write_Frame_Title;using BASE::solids_parameters;using BASE::stream_type;
     using BASE::solids_fluids_parameters;using BASE::solid_body_collection;using BASE::solids_evolution;
     using BASE::Adjust_Phi_With_Sources;using BASE::minimum_collision_thickness;using FLUIDS_PARAMETERS_CALLBACKS<TV>::Adjust_Density_And_Temperature_With_Sources;
     using FLUIDS_PARAMETERS_CALLBACKS<TV>::Get_Source_Reseed_Mask;using FLUIDS_PARAMETERS_CALLBACKS<TV>::Get_Analytic_Velocities;

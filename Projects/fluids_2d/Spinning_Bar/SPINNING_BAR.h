@@ -17,7 +17,7 @@ class SPINNING_BAR:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<VECTOR<T_input,2> >
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::data_directory;
     using BASE::fluid_collection;using BASE::resolution;
     using BASE::user_last_frame;
@@ -29,7 +29,6 @@ public:
     {
         parse_args.Parse();
         fluids_parameters.grid->Initialize(TV_INT(resolution*20,resolution*20),RANGE<TV>(TV(0,0),TV(1,1)));
-        first_frame=0;
         if(!user_last_frame) last_frame=2000;
         if(!this->user_frame_rate) frame_rate=24;
         restart=false;restart_frame=18;

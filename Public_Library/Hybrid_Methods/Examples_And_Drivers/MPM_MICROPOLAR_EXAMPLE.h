@@ -46,7 +46,6 @@ public:
     GATHER_SCATTER<TV>& gather_scatter;
     MPM_FORCE_HELPER<TV>& force_helper;
 
-    T initial_time=0;
     int last_frame=100;
     std::string frame_title;
     int write_substeps_level=-1;

@@ -21,7 +21,7 @@ class STANDARD_TESTS_BASE:public PBD_EXAMPLE<TV>
     typedef PBD_EXAMPLE<TV> BASE;
 
 public:
-    using BASE::initial_time;using BASE::last_frame;
+    using BASE::last_frame;
     using BASE::frame_title;using BASE::write_substeps_level;
     using BASE::substeps_delay_frame;
     using BASE::output_directory;using BASE::restart;using BASE::dt;using BASE::time;

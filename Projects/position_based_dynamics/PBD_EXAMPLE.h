@@ -26,7 +26,6 @@ public:
     ARRAY<TV> V;
     ARRAY<PBD_CONSTRAINTS_BASE<TV>*> constraints;
 
-    T initial_time;
     int last_frame;
     std::string frame_title;
     int write_substeps_level;

@@ -23,7 +23,7 @@ public:
     typedef T_input T;typedef VECTOR<T,3> TV;
     typedef SOLIDS_EXAMPLE<TV> BASE;
     using BASE::output_directory;using BASE::solids_parameters;using BASE::solid_body_collection;using BASE::write_last_frame;using BASE::data_directory;
-    using BASE::stream_type;using BASE::restart;using BASE::initial_time;using BASE::first_frame;using BASE::last_frame;using BASE::restart_frame;using BASE::frame_rate;
+    using BASE::stream_type;using BASE::restart;using BASE::last_frame;using BASE::restart_frame;using BASE::frame_rate;
     using BASE::test_number;using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Position_Nodes; // silence -Woverloaded-virtual
     using BASE::user_last_frame;
     

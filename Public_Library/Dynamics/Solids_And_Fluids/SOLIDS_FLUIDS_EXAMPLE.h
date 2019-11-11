@@ -31,7 +31,7 @@ class SOLIDS_FLUIDS_EXAMPLE:public EXAMPLE<TV>,public EXTERNAL_STRAIN_ADJUSTMENT
     typedef EXAMPLE<TV> BASE;
 public:
     using EXAMPLE_FORCES_AND_VELOCITIES<TV>::Set_External_Positions; // silence -Woverloaded-virtual
-    using BASE::output_directory;using BASE::frame_title;using BASE::stream_type;using BASE::initial_time;using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;
+    using BASE::output_directory;using BASE::frame_title;using BASE::stream_type;using BASE::last_frame;using BASE::frame_rate;
     using BASE::write_last_frame;using BASE::write_time;using BASE::write_substeps_level;using BASE::Set_Write_Substeps_Level;//using BASE::data_directory;
     using BASE::restart;
 

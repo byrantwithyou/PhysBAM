@@ -100,7 +100,7 @@ public:
     void Print_Energy(const T time,const int step) const;
     void Read(const std::string& prefix,const int frame,const int static_frame,const bool include_static_variables,const bool read_rigid_body,
         const bool read_deformable_body,const bool read_from_every_process,ARRAY<int>* needs_init=0,ARRAY<int>* needs_destroy=0);
-    void Write(const STREAM_TYPE stream_type,const std::string& prefix,const int frame,const int first_frame,const bool include_static_variables,const bool write_rigid_body,
+    void Write(const STREAM_TYPE stream_type,const std::string& prefix,const int frame,const bool include_static_variables,const bool write_rigid_body,
         const bool write_deformable_body,const bool write_from_every_process,const bool output_interaction_pairs) const;
     GENERALIZED_VELOCITY<TV>& New_Generalized_Velocity() const;
 //#####################################################################

@@ -49,7 +49,7 @@ Initialize()
     DEBUG_SUBSTEPS::write_substeps_level=example.write_substeps_level;
 
     // setup time
-    if(example.restart) current_frame=example.restart;else current_frame=example.first_frame;
+    if(example.restart) current_frame=example.restart;else current_frame=0;
     output_number=current_frame;
     time=example.Time_At_Frame(current_frame);
 
@@ -103,7 +103,7 @@ Initialize()
         example.incompressible.Set_Variable_Viscosity(false);}
 
     example.Get_Scalar_Field_Sources(time);
-    if(!example.restart) Write_Output_Files(example.first_frame);
+    if(!example.restart) Write_Output_Files(0);
 }
 //#####################################################################
 // Scalar_Advance
@@ -239,8 +239,6 @@ Write_Output_Files(const int frame)
     Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
     Create_Directory(example.output_directory+"/common");
     Write_To_Text_File(example.output_directory+LOG::sprintf("/%d/frame_title",frame),example.frame_title);
-    if(frame==example.first_frame) 
-        Write_To_Text_File(example.output_directory+"/common/first_frame",frame,"\n");
     example.Write_Output_Files(frame);
     Write_To_Text_File(example.output_directory+"/common/last_frame",frame,"\n");
 }

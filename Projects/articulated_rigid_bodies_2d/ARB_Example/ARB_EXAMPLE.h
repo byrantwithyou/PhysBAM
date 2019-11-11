@@ -29,7 +29,7 @@ class ARB_EXAMPLE:public SOLIDS_EXAMPLE<VECTOR<T_input,2> >
     typedef T_input T;
 public:
     typedef VECTOR<T,2> TV;typedef SOLIDS_EXAMPLE<TV> BASE;
-    using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;
+    using BASE::last_frame;using BASE::frame_rate;
     using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::solid_body_collection;using BASE::solids_evolution;
     using BASE::solids_parameters;using BASE::write_last_frame;using BASE::data_directory;using BASE::test_number;
     using BASE::user_last_frame;

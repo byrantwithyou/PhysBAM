@@ -15,7 +15,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> EXAMPLE<TV>::
 EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
-    :stream_type(stream_type_input),initial_time(0),first_frame(0),last_frame(120),frame_rate(24),frame_title(""),
+    :stream_type(stream_type_input),last_frame(120),frame_rate(24),frame_title(""),
     write_substeps_level(-1),write_first_frame(true),write_last_frame(true),write_time(true),
     output_directory("output"),data_directory("../../Public_Data"),auto_restart(false),restart(false),
     restart_frame(0),write_output_files(true),write_frame_title(true),abort_when_dt_below(0),
@@ -33,7 +33,6 @@ EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-framerate",&frame_rate,&user_frame_rate,"rate","frame rate");
     parse_args.Add("-max_dt",&max_dt,"size","fix the time step size to be no larger than this value.");
     parse_args.Add("-delay_substeps",&substeps_delay_frame,"frame","delay substeps until later frame");
-    parse_args.Add("-first_frame",&first_frame,"frame","first frame");
     parse_args.Add("-last_frame",&last_frame,&user_last_frame,"frame","last frame");
     parse_args.Add("-restart",&restart_frame,&restart,"frame","restart frame");
     parse_args.Add("-substeps",&substeps_delay_level,"level","substep output level");
@@ -82,7 +81,7 @@ Setup_Log() const
 template<class TV> typename TV::SCALAR EXAMPLE<TV>::
 Time_At_Frame(const int frame) const
 {
-    return initial_time+(frame-first_frame)/frame_rate;
+    return frame/frame_rate;
 }
 template<class TV> bool EXAMPLE<TV>::
 Clamp_Time_Step_With_Target_Time(const T time,const T target_time,T& dt)
@@ -113,8 +112,6 @@ template<class TV> void EXAMPLE<TV>::
 Log_Parameters() const
 {
     LOG::SCOPE scope("EXAMPLE parameters");
-    LOG::cout<<"initial_time="<<initial_time<<std::endl;
-    LOG::cout<<"first_frame="<<first_frame<<std::endl;
     LOG::cout<<"last_frame="<<last_frame<<std::endl;
     LOG::cout<<"frame_rate="<<frame_rate<<std::endl;
     LOG::cout<<"auto_restart="<<auto_restart<<std::endl;

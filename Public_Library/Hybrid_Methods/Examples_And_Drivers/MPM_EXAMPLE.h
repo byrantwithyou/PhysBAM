@@ -58,7 +58,6 @@ public:
 
     HASHTABLE<std::string,PAIR<bool,VECTOR<ARRAY<std::function<void()> >,2> > > time_step_callbacks; // begin, end
 
-    T initial_time=0;
     int last_frame=100;
     std::string frame_title;
     int write_substeps_level=-1;
