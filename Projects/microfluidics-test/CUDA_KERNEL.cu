@@ -15,23 +15,6 @@ __global__ void cuda_Hello_World(){
     int tid = getGlobalIdx_1D_2D();
     printf("Hello World from thread ID:%d\n",tid);
 }
-//op_nop - no operator
-//op_mat_inv -  matrix inversion
-__device__ void op_mat_inv(){
-
-}
-//op_mat_mul - matrix multiplication
-__device__ void op_mat_mul(){
-
-}
-//op mat add - matrix addition
-__device__ void op_mat_add(){
-
-}
-//op_vec_mul - multiply two vectors
-__device__ void op_vec_mul(){
-
-}
 //op_vec_add - add two vectors
 __global__ void op_vec_add(double * result,double * vector0,double * vector1,double scalar,int size){
     int tid = blockIdx.x * blockDim.x + threadIdx.x;
@@ -64,7 +47,91 @@ void cuda_kernel_vector_addition(double * result,double * vector0,double * vecto
     cudaFree(device_result);
 }
 
+void cuda_dgemm_helper(bool at,bool bt,int m, int n, int k,const double * alpha,const double * A,int lda,const double * B,int ldb,const double * beta,double * C,double ldc){
+    cublasStatus_t status;
+    cublasHandle_t handle;
+    status = cublasCreate(&handle);
+    status  = cublasDgemm(handle,at?CUBLAS_OP_T:CUBLAS_OP_N,bt?CUBLAS_OP_T:CUBLAS_OP_N,m,n,k,alpha,A,lda,B,ldb,beta,C,ldc);
+    
+    if (status != CUBLAS_STATUS_SUCCESS) {
+        printf("TIMES MM not working");
+    }
 
+    cublasDestroy(handle);
+
+    return;
+}
+
+void cuda_dgemm(bool at,bool bt,int m, int n, int k,const double * alpha,const double * A,int lda,const double * B,int ldb,const double * beta,double * C,double ldc){
+    //allocate device variables here
+    double * device_A;
+    double * device_B;
+    double * device_C;
+
+    cudaMalloc(&device_A,m*k*sizeof(double));
+    cudaMalloc(&device_B,n*k*sizeof(double));
+    cudaMalloc(&device_C,m*n*sizeof(double));
+
+    cudaMemcpy(device_A,A,m * k * sizeof(double),cudaMemcpyHostToDevice);
+    cudaMemcpy(device_B,B,n* k * sizeof(double),cudaMemcpyHostToDevice);
+    cudaMemcpy(device_C,C,m * n * sizeof(double),cudaMemcpyHostToDevice);
+
+    cuda_dgemm_helper(at,bt,m,n,k,alpha,device_A,lda,device_B,ldb,beta,device_C,ldc);
+    
+    cudaMemcpy(C,device_C,m * n * sizeof(double),cudaMemcpyDeviceToHost);
+    
+    cudaDeviceSynchronize();
+
+    cudaFree(device_A);
+    cudaFree(device_B);
+    cudaFree(device_C);
+
+    return;
+}
+
+void cuda_gemv_helper(bool t,int m, int n,const double * alpha,const double * A, int lda, const double * x, int cx, const double * beta,double * y,int incy)
+{
+    cublasStatus_t status;
+    cublasHandle_t handle;
+    
+    status = cublasCreate(&handle);
+    status = cublasDgemv(handle, t?CUBLAS_OP_T:CUBLAS_OP_N,m,n,alpha,A,lda,x,cx,beta,y,incy);
+    
+    if (status != CUBLAS_STATUS_SUCCESS) {
+        printf("TIMES MM not working");
+    }
+
+    cublasDestroy(handle);
+
+    return;
+}
+
+void cuda_dgemv(bool t,int m, int n,const double * alpha,const double * A, int lda, const double * x, int cx, const double * beta,double * y,int incy)
+{
+    double * device_x; //vector
+    double * device_A; //matrix
+    double * device_y; //vector 
+
+    cudaMalloc(&device_x,(t?m:n)*sizeof(double));
+    cudaMalloc(&device_A,m*n*sizeof(double));
+    cudaMalloc(&device_y,(t?n:m)*sizeof(double));
+
+    cudaMemcpy(device_x,x,(t?m:n)*sizeof(double),cudaMemcpyHostToDevice);
+    cudaMemcpy(device_A,A,m* n * sizeof(double),cudaMemcpyHostToDevice);
+    cudaMemcpy(device_y,y,(t?n:m)*sizeof(double),cudaMemcpyHostToDevice);
+
+    cuda_gemv_helper(t,m,n,alpha,device_A,lda,device_x,cx,beta,device_y,incy);
+
+    cudaMemcpy(y,device_y,(t?n:m)*sizeof(double),cudaMemcpyDeviceToHost);
+
+    cudaDeviceSynchronize();
+
+    cudaFree(device_x);
+    cudaFree(device_A);
+    cudaFree(device_y);
+
+    return;
+}
 
 void Execute_Helper_Kernel(int){
     //create cublas Handle here

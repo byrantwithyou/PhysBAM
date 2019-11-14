@@ -91,7 +91,7 @@ void Pseudo_Inverse(MATRIX_MXN<float>& A)
         A.m,A.m,A.m,1.0,vt.Get_Array_Pointer(),A.m,u.Get_Array_Pointer(),A.m,0.0,A.x.Get_Array_Pointer(),A.m);
 }
 
-void Pseudo_Inverse(MATRIX_MXN<double>& A)
+static void Pseudo_Inverse(MATRIX_MXN<double>& A)
 {
     ARRAY<double> s(A.m),u(A.m*A.m),vt(A.m*A.m),superb(A.m);
     int ret=LAPACKE_dgesvd(LAPACK_COL_MAJOR,'S','S',A.m,A.n,A.x.Get_Array_Pointer(),A.m,

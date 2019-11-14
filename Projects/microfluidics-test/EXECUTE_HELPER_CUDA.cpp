@@ -19,6 +19,9 @@
 //these are the prototypes for the cuda_kernels we want to run
 void Execute_Helper_Kernel(int);
 void cuda_kernel_vector_addition(double* result,double * vector1,double * vector2,double scalar,int size);
+void cuda_dgemm(bool at,bool bt,int m, int n, int k,const double * alpha,const double * A,int lda,const double * B,int ldb,const double * beta,double * C,double ldc);
+void cuda_dgemv(bool t,int m, int n,const double * alpha,const double * A, int lda, const double * x, int cx, const double * beta,double * y,int incy);
+
 namespace PhysBAM
 {
   //variables copies over from Cached Elimination Matrix
@@ -42,15 +45,6 @@ int cuda_arg_type[op_last][4] =
     [op_vec_mul]={2,1,2,2},
     [op_vec_add]={2,2,0,2}
 };
-
-  //create structure for CUDA JOB
-  //struct CUDA_JOB:
-  //{
-    /* data */
-  //  int op;
-  //   int a[3],o;
-  //  void Execute(CACHED_ELIMINATION_MATRIX<double>*cem);
-  //};
 
 void Execute(CACHED_ELIMINATION_MATRIX<double>::JOB* job,CACHED_ELIMINATION_MATRIX<double>*cem);
 
@@ -101,9 +95,25 @@ static void Inverse(MATRIX_MXN<double>& A)
 //Declare function as static so it's only availble to this file
 static void Times_MV(ARRAY<double>& v,double a,const MATRIX_MXN<double>& M,bool t,const ARRAY<double>& u,double b)
 {
-    cblas_dgemv(CblasColMajor,t?CblasTrans:CblasNoTrans,M.m,M.n,
+
+//a=0;
+  double * alpha_ptr = &a;
+  double * beta_ptr = &b;
+
+  ARRAY<double> copyV = v;
+  
+  cuda_dgemv(t,M.m,M.n,alpha_ptr, M.x.Get_Array_Pointer(),M.m,u.Get_Array_Pointer(), 1,beta_ptr, v.Get_Array_Pointer(), 1);
+  
+  cblas_dgemv(CblasColMajor,t?CblasTrans:CblasNoTrans,M.m,M.n,
         a, M.x.Get_Array_Pointer(), M.m, u.Get_Array_Pointer(), 1, b,
-        v.Get_Array_Pointer(), 1);
+        copyV.Get_Array_Pointer(), 1);
+  
+  if((v-copyV).Max_Abs()>1e-6){
+    LOG::printf("TR %P %P %P %d %d %d %d\n",t,a,b,M.m,M.n,v.m,u.m);
+    LOG::printf("CCCC %P\n",v);
+  LOG::printf("DDDD %P\n",copyV);
+    PHYSBAM_ASSERT(false);
+  }
 }
 
 static void Times_MM(MATRIX_MXN<double>& A,double sa,const MATRIX_MXN<double>& B,bool bt,const MATRIX_MXN<double>& C,bool ct,double sbc)
@@ -112,11 +122,11 @@ static void Times_MM(MATRIX_MXN<double>& A,double sa,const MATRIX_MXN<double>& B
     int k=bt?B.m:B.n;
     int n=ct?C.m:C.n;
     if(A.m!=m || A.n!=n) A.Resize(m,n);
-    
-    cblas_dgemm( CblasColMajor, bt?CblasTrans:CblasNoTrans, ct?CblasTrans:CblasNoTrans,
-        m,n,k,sbc,B.x.Get_Array_Pointer(),
-        B.m, C.x.Get_Array_Pointer(), C.m,
-        sa, A.x.Get_Array_Pointer(), A.m);
+
+    MATRIX_MXN<double> res_A(A),copy_A(A);
+    double * sbc_pointer = &sbc;
+    double * sa_pointer = &sa;
+    cuda_dgemm(bt,ct,m,n,k,sbc_pointer,B.x.Get_Array_Pointer(),B.m,C.x.Get_Array_Pointer(),C.m,sa_pointer,A.x.Get_Array_Pointer(),A.m);
 }
 
 //Define the struct cuda_execute based off the execute in CACHED_ELIMINATION MATRIX
