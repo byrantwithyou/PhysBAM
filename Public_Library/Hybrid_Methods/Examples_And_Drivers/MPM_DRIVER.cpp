@@ -138,7 +138,6 @@ Advance_One_Time_Step()
     Print_Grid_Stats("after forces",example.dt,example.velocity,&example.velocity_save);
     Step([=](){Grid_To_Particle_Limit_Dt();},"g2p-limit-dt",false);
     Step([=](){Limit_Dt_Sound_Speed();},"sound-speed-limit-dt",false);
-    Print_Max_Sound_Speed();
     Step([=](){Grid_To_Particle();},"g2p",true);
     Step([=](){Update_Plasticity_And_Hardening();},"plasticity-hardening",false);
 }
@@ -706,16 +705,6 @@ Compute_Max_Sound_Speed() const -> T
         if(FINITE_VOLUME<TV,TV::m>* fv=dynamic_cast<FINITE_VOLUME<TV,TV::m>*>(pf))
             max_speed=max(max_speed,fv->Compute_Sound_Speed());
     return max_speed;
-}
-//#####################################################################
-// Function Print_Max_Sound_Speed
-//#####################################################################
-template<class TV> void MPM_DRIVER<TV>::
-Print_Max_Sound_Speed()
-{
-    static bool first=example.test_sound_speed;
-    if(first){first=false;Test_Sound_Speed(100);}
-    T max_sound_speed=Compute_Max_Sound_Speed();
 }
 //#####################################################################
 // Function Update_Plasticity_And_Hardening

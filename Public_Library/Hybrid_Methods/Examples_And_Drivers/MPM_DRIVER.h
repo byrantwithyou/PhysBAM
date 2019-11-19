@@ -64,7 +64,6 @@ public:
     void Print_Energy_Stats(const char* str,const ARRAY<TV,TV_INT>& u);
     void Grid_To_Particle_Limit_Dt();
     void Limit_Dt_Sound_Speed();
-    void Print_Max_Sound_Speed();
     void Reflect_Boundary_Mass_Momentum();
     void Reflect_Boundary_Velocity(ARRAY<TV,TV_INT>& u);
     void Reflect_Boundary_Force(ARRAY<TV,TV_INT>& force);
