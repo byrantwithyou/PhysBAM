@@ -17,7 +17,6 @@ MPM_PARTICLES()
     Add_Array("volume",&volume);
     Add_Array("F",&F);
     Add_Array("valid",&valid);
-    Add_Array("myc",&myc);
     this->template Add_Array<VECTOR<T,3> >("color");
 }
 //#####################################################################

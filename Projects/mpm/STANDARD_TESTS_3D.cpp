@@ -846,13 +846,15 @@ Initialize()
             // if(test_number==34){
             //     T El=500*unit_p*foo_T1,nul=0.1*foo_T3;
             //     Add_Lambda_Particles(&sand_particles,El,nul,foo_T2,true);}
-            for(int k=0;k<particles.myc.m;++k){
+            particles.template Add_Array<int>("myc");
+            ARRAY_VIEW<int>& myc=*particles.template Get_Array<int>("myc");
+            for(int k=0;k<myc.m;++k){
                 T color_random=random.Get_Number();
                 if(color_random<(T)0.85){
-                    particles.myc(k)=1;}
+                    myc(k)=1;}
                 else if(color_random<(T)0.95){
-                    particles.myc(k)=2;}
-                else particles.myc(k)=3;}
+                    myc(k)=2;}
+                else myc(k)=3;}
             Add_Gravity(m/(s*s)*TV(0,-9.81,0));
         } break;
         case 35:{ // cup
@@ -911,13 +913,15 @@ Initialize()
             Set_Lame_On_Particles(E,nu);
             Add_Drucker_Prager_Case(E,nu,2);
             Add_Gravity(m/(s*s)*TV(0,-9.81,0));
-            for(int k=0;k<particles.myc.m;++k){
+            particles.template Add_Array<int>("myc");
+            ARRAY_VIEW<int>& myc=*particles.template Get_Array<int>("myc");
+            for(int k=0;k<myc.m;++k){
                 T color_random=random.Get_Number();
                 if(color_random<(T)0.85){
-                    particles.myc(k)=1;}
+                    myc(k)=1;}
                 else if(color_random<(T)0.95){
-                    particles.myc(k)=2;}
-                else particles.myc(k)=3;}
+                    myc(k)=2;}
+                else myc(k)=3;}
             if(dump_collision_objects){
                 TRIANGULATED_SURFACE<T>* ts=TESSELLATION::Tessellate_Boundary(hourglass,extra_int(0),extra_int(1));
                 Write_To_File(stream_type,LOG::sprintf("hourglass-%d-%d.tri.gz",extra_int(0),extra_int(1)),*ts);
