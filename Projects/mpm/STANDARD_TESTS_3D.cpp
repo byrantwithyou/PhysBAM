@@ -8,6 +8,7 @@
 #include <Geometry/Basic_Geometry/CONE.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
 #include <Geometry/Basic_Geometry/HOURGLASS.h>
+#include <Geometry/Tessellation/BOWL_TESSELLATION.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <Geometry/Basic_Geometry/BOWL.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
@@ -388,6 +389,10 @@ Initialize()
                                 s=rot.Rotate(s)+center;}}}}
             };
             this->begin_frame.Append(func);
+            if(dump_collision_objects){
+                TRIANGULATED_SURFACE<T>* ts=TESSELLATION::Generate_Triangles(bowl);
+                Write_To_File(stream_type,LOG::sprintf("bowl.tri.gz"),*ts);
+                delete ts;}
             destroy=[=]()
                 {
                     delete slist;
