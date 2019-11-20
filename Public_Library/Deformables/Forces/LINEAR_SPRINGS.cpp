@@ -622,5 +622,13 @@ Create_Edge_Springs<TRIANGULATED_SURFACE<double> >(TRIANGULATED_SURFACE<double>&
     TRIANGULATED_SURFACE<double>::SCALAR,TRIANGULATED_SURFACE<double>::SCALAR,bool,
     TRIANGULATED_SURFACE<double>::SCALAR,bool,TRIANGULATED_SURFACE<double>::SCALAR,
     bool,TRIANGULATED_SURFACE<double>::SCALAR);
+template LINEAR_SPRINGS<VECTOR<float,3> >* Create_Edge_Springs<VECTOR<float,3> >(
+    DEFORMABLE_PARTICLES<VECTOR<float,3> >&,SEGMENT_MESH&,VECTOR<float,3>::SCALAR,
+    VECTOR<float,3>::SCALAR,bool,VECTOR<float,3>::SCALAR,bool,VECTOR<float,3>::SCALAR,
+    bool,VECTOR<float,3>::SCALAR);
+template LINEAR_SPRINGS<VECTOR<double,3> >* Create_Edge_Springs<VECTOR<double,3> >(
+    DEFORMABLE_PARTICLES<VECTOR<double,3> >&,SEGMENT_MESH&,VECTOR<double,3>::SCALAR,
+    VECTOR<double,3>::SCALAR,bool,VECTOR<double,3>::SCALAR,bool,VECTOR<double,3>::SCALAR,
+    bool,VECTOR<double,3>::SCALAR);
 //#####################################################################
 }
