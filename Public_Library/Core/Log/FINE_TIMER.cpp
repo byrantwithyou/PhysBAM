@@ -38,9 +38,10 @@ void Dump_Timing_Info(bool sort_self)
     while(max_calls/=10) calls_digits++;
     calls_digits=std::max(calls_digits,5);
     LOG::printf("\ntotal   self  %*s name\n",calls_digits,"calls");
+    total_time=3.2e9;
     for(const auto& it:function_map)
     {
-        LOG::printf("%.4f %.4f %*lli %s\n",
+        LOG::printf("%8.4f %8.4f %*lli %s\n",
             (double)it->total_time/total_time,
             (double)(it->total_time-it->child_time)/total_time,
             calls_digits,it->num_calls,it->name);

@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Log/DEBUG_SUBSTEPS.h>
+#include <Core/Log/FINE_TIMER.h>
 #include <Core/Log/LOG.h>
 #include <Core/Log/SCOPE.h>
 #include <Core/Math_Tools/pow.h>
@@ -68,6 +69,7 @@ Execute_Main_Program()
 {
     Step([=](){Initialize();},"initialize");
     Simulate_To_Frame(example.last_frame);
+    FINE_TIMER::Dump_Timing_Info();
 }
 //#####################################################################
 // Initialize
@@ -75,6 +77,7 @@ Execute_Main_Program()
 template<class TV> void MPM_DRIVER<TV>::
 Initialize()
 {
+    TIMER_SCOPE_FUNC;
     LOG::cout<<std::setprecision(16)<<std::endl;
     DEBUG_SUBSTEPS::write_substeps_level=example.substeps_delay_frame<0?example.write_substeps_level:-1;
 
@@ -127,6 +130,7 @@ Initialize()
 template<class TV> void MPM_DRIVER<TV>::
 Advance_One_Time_Step()
 {
+    TIMER_SCOPE_FUNC;
     Step([=](){Update_Simulated_Particles();},"simulated-particles");
     Print_Particle_Stats("particle state",example.dt);
     Step([=](){Update_Particle_Weights();},"update-weights",false);
@@ -147,6 +151,7 @@ Advance_One_Time_Step()
 template<class TV> void MPM_DRIVER<TV>::
 Simulate_To_Frame(const int frame)
 {
+    TIMER_SCOPE_FUNC;
     for(;current_frame<frame;current_frame++){
         LOG::SCOPE scope("FRAME","frame %d",current_frame+1);
         for(int i=0;i<example.begin_frame.m;i++)
@@ -189,6 +194,7 @@ Simulate_To_Frame(const int frame)
 template<class TV> void MPM_DRIVER<TV>::
 Write_Substep(const std::string& title)
 {
+    TIMER_SCOPE_FUNC;
     example.frame_title=title;
     LOG::printf("Writing substep [%s]: output_number=%i, time=%g, frame=%i\n",
         example.frame_title,output_number+1,example.time,current_frame);
@@ -201,6 +207,7 @@ Write_Substep(const std::string& title)
 template<class TV> void MPM_DRIVER<TV>::
 Write_Output_Files(const int frame)
 {
+    TIMER_SCOPE_FUNC;
     LOG::SCOPE scope("Write_Output_Files");
     Create_Directory(example.output_directory);
     Create_Directory(example.output_directory+LOG::sprintf("/%d",frame));
@@ -215,6 +222,7 @@ Write_Output_Files(const int frame)
 template<class TV> void MPM_DRIVER<TV>::
 Update_Particle_Weights()
 {
+    TIMER_SCOPE_FUNC;
     example.weights->Update(example.particles.X);
     if(example.particles.store_B){
         example.Dp_inv.Resize(example.particles.X.m);
@@ -226,6 +234,7 @@ Update_Particle_Weights()
 template<class TV> void MPM_DRIVER<TV>::
 Particle_To_Grid()
 {
+    TIMER_SCOPE_FUNC;
     MPM_PARTICLES<TV>& particles=example.particles;
 
 #pragma omp parallel for
@@ -271,6 +280,7 @@ Particle_To_Grid()
 template <class TV> void MPM_DRIVER<TV>::
 Reflect_Boundary_Mass_Momentum()
 {
+    TIMER_SCOPE_FUNC;
     if(!example.reflection_bc) return;
     TV_INT ranges[2]={TV_INT(),example.grid.numbers_of_cells};
     for(RANGE_ITERATOR<TV::m> it(example.grid.Domain_Indices(),example.ghost,0,
@@ -304,6 +314,7 @@ Reflect_Boundary_Mass_Momentum()
 template <class TV> void MPM_DRIVER<TV>::
 Reflect_Boundary_Velocity(ARRAY<TV,TV_INT>& u)
 {
+    TIMER_SCOPE_FUNC;
     if(!example.reflection_bc) return;
     TV_INT ranges[2]={TV_INT(),example.grid.numbers_of_cells};
     for(RANGE_ITERATOR<TV::m> it(example.grid.Domain_Indices(),example.ghost,0,
@@ -330,6 +341,7 @@ Reflect_Boundary_Velocity(ARRAY<TV,TV_INT>& u)
 template <class TV> void MPM_DRIVER<TV>::
 Reflect_Boundary_Force(ARRAY<TV,TV_INT>& force)
 {
+    TIMER_SCOPE_FUNC;
     if(!example.reflection_bc) return;
     TV_INT ranges[2]={TV_INT(),example.grid.numbers_of_cells};
     for(RANGE_ITERATOR<TV::m> it(example.grid.Domain_Indices(),example.ghost,0,RI::ghost|RI::duplicate_corners);it.Valid();it.Next()){
@@ -355,6 +367,7 @@ Reflect_Boundary_Force(ARRAY<TV,TV_INT>& force)
 template<class TV> void MPM_DRIVER<TV>::
 Grid_To_Particle()
 {
+    TIMER_SCOPE_FUNC;
     struct HELPER
     {
         TV V_pic,V_weight_old,V_pic_fric;
@@ -445,19 +458,22 @@ void Enforce_Limit_Max(T& s,T bound,const MATRIX<T,d>& a,const MATRIX<T,d>& b)
 template<class TV> void MPM_DRIVER<TV>::
 Grid_To_Particle_Limit_Dt()
 {
+    TIMER_SCOPE_FUNC;
     if(!example.use_strong_cfl) return;
     struct HELPER
     {
         TV V_pic,V_pic_s,V_weight_old;
         MATRIX<T,TV::m> grad_Vp,grad_Vp_s;
+        T s=1;
     };
 
-    T dt=example.dt,s=1;
+    T dt=example.dt;
     T midpoint_frac=example.use_midpoint?(T).5:1;
-
-    // TODO: this is NOT threadsafe.
+    T s=1;
+    
     example.gather_scatter.template Gather<HELPER>(true,
-        [](int p,HELPER& h){h=HELPER();},
+        [&s](HELPER& h){s=std::min(s,h.s);},
+        [](int p,HELPER& h){T x=h.s;h=HELPER();h.s=x;},
         [this,midpoint_frac](int p,const PARTICLE_GRID_ITERATOR<TV>& it,HELPER& h)
         {
             T w=it.Weight();
@@ -475,13 +491,13 @@ Grid_To_Particle_Limit_Dt()
             h.grad_Vp+=Outer_Product(V_grid,dw);
             h.grad_Vp_s+=Outer_Product(V_grid_s,dw);
         },
-        [this,dt,&s](int p,HELPER& h)
+        [this,dt](int p,HELPER& h)
         {
-            Enforce_Limit_Max(s,example.cfl_F,dt*h.grad_Vp,dt*h.grad_Vp_s);
+            Enforce_Limit_Max(h.s,example.cfl_F,dt*h.grad_Vp,dt*h.grad_Vp_s);
             TV xp_new_s,xp_new_s2;
             if(example.use_midpoint){xp_new_s=dt/2*(h.V_weight_old+h.V_pic);xp_new_s2=dt/2*h.V_pic_s;}
             else{xp_new_s=dt*h.V_pic;xp_new_s2=dt*h.V_pic_s;}
-            Enforce_Limit_Max(s,example.cfl,xp_new_s,xp_new_s2);
+            Enforce_Limit_Max(h.s,example.cfl,xp_new_s,xp_new_s2);
         });
     if(example.dt*s<example.min_dt) s=example.min_dt/example.dt;
     if(s>=1) return;
@@ -496,6 +512,7 @@ Grid_To_Particle_Limit_Dt()
 template<class TV> void MPM_DRIVER<TV>::
 Limit_Dt_Sound_Speed()
 {
+    TIMER_SCOPE_FUNC;
     if(!example.use_sound_speed_cfl) return;
     T dt=example.dt;
     T max_speed=Compute_Max_Sound_Speed();
@@ -667,6 +684,7 @@ const T Compute_Maximum_Tensor_Contraction(const DIAGONALIZED_ISOTROPIC_STRESS_D
 template<class TV> void MPM_DRIVER<TV>::
 Test_Sound_Speed(int num) const
 {
+    TIMER_SCOPE_FUNC;
     DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV> dpdf;
     DIAGONAL_MATRIX<T,TV::m> sigma;
     RANDOM_NUMBERS<T> r;
@@ -689,6 +707,7 @@ Test_Sound_Speed(int num) const
 template<class TV> auto MPM_DRIVER<TV>::
 Compute_Max_Sound_Speed() const -> T
 {
+    TIMER_SCOPE_FUNC;
     T max_speed=0;
     for(int f=0;f<example.forces.m;f++){
         if(const MPM_FINITE_ELEMENTS<TV>* force=dynamic_cast<MPM_FINITE_ELEMENTS<TV>*>(example.forces(f))){
@@ -710,6 +729,7 @@ Compute_Max_Sound_Speed() const -> T
 template<class TV> void MPM_DRIVER<TV>::
 Update_Plasticity_And_Hardening()
 {
+    TIMER_SCOPE_FUNC;
     for(int i=0;i<example.plasticity_models.m;i++)
         example.plasticity_models(i)->Update_Particles();
 }
@@ -719,6 +739,7 @@ Update_Plasticity_And_Hardening()
 template<class TV> void MPM_DRIVER<TV>::
 Apply_Particle_Forces(ARRAY<TV,TV_INT>& F)
 {
+    TIMER_SCOPE_FUNC;
     if(example.lagrangian_forces.m) {
         example.lagrangian_forces_F.Resize(example.particles.X.m,no_init);
 #pragma omp parallel for
@@ -735,6 +756,7 @@ Apply_Particle_Forces(ARRAY<TV,TV_INT>& F)
 template<class TV> void MPM_DRIVER<TV>::
 Apply_Grid_Forces(ARRAY<TV,TV_INT>& F)
 {
+    TIMER_SCOPE_FUNC;
     for(int i=0;i<example.forces.m;i++)
         example.forces(i)->Add_Forces(F,example.time);
 }
@@ -744,15 +766,18 @@ Apply_Grid_Forces(ARRAY<TV,TV_INT>& F)
 template<class TV> void MPM_DRIVER<TV>::
 Apply_Forces()
 {
+    TIMER_SCOPE_FUNC;
     example.Capture_Stress();
     objective.Reset();
     LOG::printf("max velocity: %.16P\n",Max_Particle_Speed());
     if(example.use_symplectic_euler){
+        TIMER_SCOPE("Apply_Forces A");
         example.force_helper.B.Resize(example.particles.number);
         example.force_helper.B.Fill(MATRIX<T,TV::m>());
         example.Precompute_Forces(example.time,example.dt,0);
         objective.tmp2.u*=0;
 
+        TIMER_SCOPE("Apply_Forces B");
         //Add Particle Forces
         auto &F=objective.tmp2.u;
         Apply_Particle_Forces(F);
@@ -765,6 +790,7 @@ Apply_Forces()
         PHYSBAM_DEBUG_WRITE_SUBSTEP("forces after reflect",1);
         example.velocity.Exchange(F);
 
+        TIMER_SCOPE("Apply_Forces C");
         for(int i=0;i<example.valid_grid_indices.m;i++){
             int p=example.valid_grid_indices(i);
             dv.u.array(p)=example.dt/example.mass.array(p)*objective.tmp2.u.array(p);}
@@ -772,7 +798,9 @@ Apply_Forces()
         objective.tmp1=dv;
         objective.Adjust_For_Collision(dv);
         objective.tmp0=dv;
-        Apply_Friction();}
+        Apply_Friction();
+        TIMER_SCOPE("Apply_Forces D");
+    }
     else{
         NEWTONS_METHOD<T> newtons_method;
         newtons_method.tolerance=example.newton_tolerance*example.dt;
@@ -798,14 +826,17 @@ Apply_Forces()
         if(!converged) LOG::cout<<"WARNING: Newton's method did not converge"<<std::endl;
         Apply_Friction();
         objective.Restore_F();}
+        TIMER_SCOPE("Apply_Forces E");
 #pragma omp parallel for
     for(int i=0;i<example.valid_grid_indices.m;i++){
         int j=example.valid_grid_indices(i);
         example.velocity.array(j)=dv.u.array(j)+objective.v0.u.array(j);
         example.velocity_friction_save.array(j)+=objective.v0.u.array(j);}
+        TIMER_SCOPE("Apply_Forces F");
     example.velocity_friction_save.array.Subset(objective.system.stuck_nodes)=objective.system.stuck_velocity;
     Reflect_Boundary_Velocity(example.velocity);
     Reflect_Boundary_Velocity(example.velocity_friction_save);
+        TIMER_SCOPE("Apply_Forces G");
 }
 //#####################################################################
 // Function Apply_Friction
@@ -813,6 +844,7 @@ Apply_Forces()
 template<class TV> void MPM_DRIVER<TV>::
 Apply_Friction()
 {
+    TIMER_SCOPE_FUNC;
     example.velocity_friction_save=dv.u;
     if(!example.collision_objects.m) return;
     if(example.use_symplectic_euler){
@@ -883,6 +915,7 @@ Grid_V_Upper_Bound() const
 template<class TV> void MPM_DRIVER<TV>::
 Update_Simulated_Particles()
 {
+    TIMER_SCOPE_FUNC;
     example.simulated_particles.Remove_All();
     for(int p=0;p<example.particles.number;p++)
         if(example.particles.valid(p))
@@ -901,6 +934,7 @@ Update_Simulated_Particles()
 template<class TV> void MPM_DRIVER<TV>::
 Print_Grid_Stats(const char* str,T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<TV,TV_INT>* u0)
 {
+    TIMER_SCOPE_FUNC;
     if(!example.print_stats) return;
     typename TV::SPIN am=example.Total_Grid_Angular_Momentum(dt,u,u0);
     TV lm=example.Total_Grid_Linear_Momentum(u);
@@ -918,6 +952,7 @@ Print_Grid_Stats(const char* str,T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<TV,T
 template<class TV> void MPM_DRIVER<TV>::
 Print_Particle_Stats(const char* str,T dt)
 {
+    TIMER_SCOPE_FUNC;
     if(!example.print_stats) return;
     typename TV::SPIN am=example.Total_Particle_Angular_Momentum();
     TV lm=example.Total_Particle_Linear_Momentum();
@@ -935,6 +970,7 @@ Print_Particle_Stats(const char* str,T dt)
 template<class TV> void MPM_DRIVER<TV>::
 Print_Energy_Stats(const char* str,const ARRAY<TV,TV_INT>& u)
 {
+    TIMER_SCOPE_FUNC;
     if(!example.print_stats) return;
     example.Capture_Stress();
     example.Precompute_Forces(example.time,example.dt,false);

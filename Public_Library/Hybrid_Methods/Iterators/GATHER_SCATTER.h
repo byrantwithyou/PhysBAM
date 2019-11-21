@@ -46,9 +46,30 @@ public:
     void Prepare_Scatter(const MPM_PARTICLES<TV>& particles);
     int Compute_Optimal_Bins(ARRAY<int>& bin_ends,ARRAY<int>& counts,ARRAY<int>& sum_counts,int min_width,int max_bins);
 
+private:
+    template<class DATA,class REDUCE> static enable_if_t<sizeof(((*(REDUCE*)0)(*(DATA*)0),1)),int> Test_Reduce(int);
+    template<class DATA,class REDUCE> static char Test_Reduce(...);
+public:
+    
+    // Safe to write to grid data
+    template<class DATA,class REDUCE,class... Args>
+    enable_if_t<sizeof(Test_Reduce<DATA,REDUCE>(0))==1>
+    Scatter(bool want_gradient,REDUCE&& reduce,Args&&... args)
+    {
+        Scatter_Reduce<DATA>(want_gradient,[](const DATA&){},reduce,args...);
+    }
+
+    // Safe to write to grid data
+    template<class DATA,class REDUCE,class... Args>
+    enable_if_t<sizeof(Test_Reduce<DATA,REDUCE>(0))!=1>
+    Scatter(bool want_gradient,REDUCE&& reduce,Args&&... args)
+    {
+        Scatter_Reduce<DATA>(want_gradient,reduce,args...);
+    }
+
     // Safe to write to grid data
     template<class DATA,class... Args>
-    void Scatter(bool want_gradient,Args&&... args)
+    void Scatter_Reduce(bool want_gradient,Args&&... args)
     {
         if(threads>=2){
 #pragma omp parallel
@@ -56,18 +77,19 @@ public:
         else Scatter_Serial<DATA>(want_gradient,args...);
     }
 
-    template<class DATA,class... Args>
-    void Scatter_Serial(bool want_gradient,Args&&... args)
+    template<class DATA,class REDUCE,class... Args>
+    void Scatter_Serial(bool want_gradient,REDUCE&& reduce,Args&&... args)
     {
         T_FACE_SCRATCH face_scratch;
         DATA data((DATA()));
         for(int k=0;k<simulated_particles.m;k++){
             int p=simulated_particles(k);
             Helper(face_scratch,want_gradient,p,data,args...);}
+        if(reduce) reduce(data);
     }
 
-    template<class DATA,class... Args>
-    void Scatter_Parallel(bool want_gradient,Args&&... args)
+    template<class DATA,class REDUCE,class... Args>
+    void Scatter_Parallel(bool want_gradient,REDUCE&& reduce,Args&&... args)
     {
         for(int pass=0;pass<partitions;++pass){
 #pragma omp for
@@ -77,21 +99,40 @@ public:
                 T_FACE_SCRATCH face_scratch;
                 for(int k=0;k<bins(bin_id).m;k++){
                     int p=bins(bin_id)(k);
-                    Helper(face_scratch,want_gradient,p,data,args...);}}
+                    Helper(face_scratch,want_gradient,p,data,args...);}
+#pragma omp critical
+                reduce(data);
+            }
 #pragma omp barrier
         }
+    }
+    
+    // Safe to write to grid data
+    template<class DATA,class REDUCE,class... Args>
+    enable_if_t<sizeof(Test_Reduce<DATA,REDUCE>(0))==1>
+    Gather(bool want_gradient,REDUCE&& reduce,Args&&... args)
+    {
+        Gather_Reduce<DATA>(want_gradient,[](const DATA&){},reduce,args...);
+    }
+
+    // Safe to write to grid data
+    template<class DATA,class REDUCE,class... Args>
+    enable_if_t<sizeof(Test_Reduce<DATA,REDUCE>(0))!=1>
+    Gather(bool want_gradient,REDUCE&& reduce,Args&&... args)
+    {
+        Gather_Reduce<DATA>(want_gradient,reduce,args...);
     }
 
     // Safe to write to particle data
     template<class DATA,class... Args>
-    void Gather(bool want_gradient,Args&&... args)
+    void Gather_Reduce(bool want_gradient,Args&&... args)
     {
 #pragma omp parallel
         Gather_Parallel<DATA>(want_gradient,args...);
     }
 
-    template<class DATA,class... Args>
-    void Gather_Parallel(bool want_gradient,Args&&... args)
+    template<class DATA,class REDUCE,class... Args>
+    void Gather_Parallel(bool want_gradient,REDUCE&& reduce,Args&&... args)
     {
 #pragma omp for
         for(int tid=0;tid<threads;tid++){
@@ -101,7 +142,10 @@ public:
             T_FACE_SCRATCH face_scratch;
             for(int k=a;k<b;k++){
                 int p=simulated_particles(k);
-                Helper(face_scratch,want_gradient,p,data,args...);}}
+                Helper(face_scratch,want_gradient,p,data,args...);}
+#pragma omp critical
+            reduce(data);
+        }
     }
 
     template<class DATA,class F,class... Args>

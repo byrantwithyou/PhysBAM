@@ -1427,7 +1427,7 @@ Move_Particles()
                     example.particles.X(p)+=example.dt*example.flip_adv_velocity(p);
                     Clip(p);}}
         else if(example.flip && example.position_update=='x'){
-            example.gather_scatter->template Gather_Parallel<int>(false,
+            example.gather_scatter->template Gather_Parallel<int>(false,[](int){},
                 [this](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,int data)
                 {example.particles.X(p)(it.Index().axis)+=example.dt*it.Weight()*
                         (example.velocity(it.Index())+example.velocity_save(it.Index()))/2;},
@@ -1437,7 +1437,7 @@ Move_Particles()
             for(int p=0;p<example.particles.X.m;p++)
                 if(example.particles.valid(p)){
                     example.particles.X(p)+=example.dt*example.effective_v(p)*0.5;}
-            example.gather_scatter->template Gather_Parallel<int>(false,
+            example.gather_scatter->template Gather_Parallel<int>(false,[](int){},
                 [this](int p,const PARTICLE_GRID_FACE_ITERATOR<TV>& it,int data)
                 {example.particles.X(p)(it.Index().axis)+=example.dt*it.Weight()*example.velocity_save(it.Index());},
                 Clip);}

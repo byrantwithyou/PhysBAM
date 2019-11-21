@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Log/FINE_TIMER.h>
 #include <Core/Log/LOG.h>
 #include <Core/Matrices/DIAGONAL_MATRIX.h>
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
@@ -46,6 +47,7 @@ template<class TV> MPM_FINITE_ELEMENTS<TV>::
 template<class TV> void MPM_FINITE_ELEMENTS<TV>:: 
 Precompute(const T time,const T dt,bool want_dE,bool want_ddE)
 {
+    TIMER_SCOPE_FUNC;
     PHYSBAM_ASSERT(!want_ddE||want_dE);
     U.Resize(particles.X.m);
     FV.Resize(particles.X.m);
@@ -53,6 +55,7 @@ Precompute(const T time,const T dt,bool want_dE,bool want_ddE)
     dPi_dF.Resize(particles.X.m);
     PFT.Resize(particles.X.m);
 
+    TIMER_SCOPE("Precompute-A");
 #pragma omp parallel for
     for(int k=0;k<gather_scatter.simulated_particles.m;k++){
         int p=gather_scatter.simulated_particles(k);
@@ -81,6 +84,7 @@ Potential_Energy(const T time) const
 template<class TV> void MPM_FINITE_ELEMENTS<TV>:: 
 Add_Forces(ARRAY<TV,TV_INT>& F,const T time) const
 {
+    TIMER_SCOPE_FUNC;
     T c=force_helper.quad_F_coeff;
     bool use_c=c!=0;
     gather_scatter.template Scatter<MATRIX<T,TV::m> >(true,

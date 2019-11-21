@@ -897,7 +897,7 @@ Initialize()
             if(extra_T.m<4) extra_T.Append(.0225);
             if(extra_T.m<5) extra_T.Append(.1);
             particles.Store_Fp(true);
-            Set_Grid(RANGE<TV>(TV(-0.2,-0.45,-0.2)*m,TV(0.2,0.45,0.2)*m),TV_INT(4,9,4));
+            Set_Grid(RANGE<TV>(TV(-0.2,-0.45,-0.2)*m,TV(0.22,0.44,0.22)*m),TV_INT(1,2,1));
             LOG::cout<<"GRID DX: " <<grid.dX<<std::endl;
             HOURGLASS<TV> hourglass(TV::Axis_Vector(1),TV(),extra_T(0),extra_T(1),extra_T(2),extra_T(3));
             IMPLICIT_OBJECT<TV>* hg=new ANALYTIC_IMPLICIT_OBJECT<HOURGLASS<TV> >(hourglass);
