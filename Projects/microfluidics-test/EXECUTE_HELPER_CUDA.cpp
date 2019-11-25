@@ -21,7 +21,7 @@ void Execute_Helper_Kernel(int);
 void cuda_kernel_vector_addition(double* result,double * vector1,double * vector2,double scalar,int size);
 void cuda_dgemm(bool at,bool bt,int m, int n, int k,const double * alpha,const double * A,int lda,const double * B,int ldb,const double * beta,double * C,double ldc);
 void cuda_dgemv(bool t,int m, int n,const double * alpha,const double * A, int lda, const double * x, int cx, const double * beta,double * y,int incy);
-
+void cuda_dscal(int n,const double * alpha,double *x,int incx);
 namespace PhysBAM
 {
   //variables copies over from Cached Elimination Matrix
@@ -73,10 +73,19 @@ static void Pseudo_Inverse(MATRIX_MXN<double>& A)
     {
        double ss=s(i);
        if(s(i)>tol) ss=1.0/s(i);
+       double * alpha_ptr = &ss;
+       cuda_dscal(A.m,alpha_ptr,&vt(i*A.m),1);
+       /*
        cblas_dscal(A.m,ss,&vt(i*A.m),1);
+      */
     }
+    /*
     cblas_dgemm(CblasColMajor,CblasTrans,CblasTrans,
         A.m,A.m,A.m,1.0,vt.Get_Array_Pointer(),A.m,u.Get_Array_Pointer(),A.m,0.0,A.x.Get_Array_Pointer(),A.m);
+    */
+    const double alpha= 1.0;
+    const double beta = 0.0;
+    cuda_dgemm(true,true,A.m,A.m,A.m,&alpha,vt.Get_Array_Pointer(),A.m, u.Get_Array_Pointer(),A.m,&beta,A.x.Get_Array_Pointer(),A.m);
 }
 
 //Declare function as static so it's only availble to this file
@@ -94,16 +103,9 @@ static void Inverse(MATRIX_MXN<double>& A)
 
 //Declare function as static so it's only availble to this file
 static void Times_MV(ARRAY<double>& v,double a,const MATRIX_MXN<double>& M,bool t,const ARRAY<double>& u,double b)
-{
-
-//a=0;
-  double * alpha_ptr = &a;
-  double * beta_ptr = &b;
-
-  ARRAY<double> copyV = v;
-  
-  cuda_dgemv(t,M.m,M.n,alpha_ptr, M.x.Get_Array_Pointer(),M.m,u.Get_Array_Pointer(), 1,beta_ptr, v.Get_Array_Pointer(), 1);
-  
+{  
+  cuda_dgemv(t,M.m,M.n,&a, M.x.Get_Array_Pointer(),M.m,u.Get_Array_Pointer(), 1,&b, v.Get_Array_Pointer(), 1);
+  /*
   cblas_dgemv(CblasColMajor,t?CblasTrans:CblasNoTrans,M.m,M.n,
         a, M.x.Get_Array_Pointer(), M.m, u.Get_Array_Pointer(), 1, b,
         copyV.Get_Array_Pointer(), 1);
@@ -114,6 +116,7 @@ static void Times_MV(ARRAY<double>& v,double a,const MATRIX_MXN<double>& M,bool 
   LOG::printf("DDDD %P\n",copyV);
     PHYSBAM_ASSERT(false);
   }
+  */
 }
 
 static void Times_MM(MATRIX_MXN<double>& A,double sa,const MATRIX_MXN<double>& B,bool bt,const MATRIX_MXN<double>& C,bool ct,double sbc)
@@ -122,11 +125,7 @@ static void Times_MM(MATRIX_MXN<double>& A,double sa,const MATRIX_MXN<double>& B
     int k=bt?B.m:B.n;
     int n=ct?C.m:C.n;
     if(A.m!=m || A.n!=n) A.Resize(m,n);
-
-    MATRIX_MXN<double> res_A(A),copy_A(A);
-    double * sbc_pointer = &sbc;
-    double * sa_pointer = &sa;
-    cuda_dgemm(bt,ct,m,n,k,sbc_pointer,B.x.Get_Array_Pointer(),B.m,C.x.Get_Array_Pointer(),C.m,sa_pointer,A.x.Get_Array_Pointer(),A.m);
+    cuda_dgemm(bt,ct,m,n,k,&sbc,B.x.Get_Array_Pointer(),B.m,C.x.Get_Array_Pointer(),C.m,&sa,A.x.Get_Array_Pointer(),A.m);
 }
 
 //Define the struct cuda_execute based off the execute in CACHED_ELIMINATION MATRIX

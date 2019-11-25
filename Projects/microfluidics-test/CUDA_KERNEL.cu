@@ -11,10 +11,6 @@ __device__ int getGlobalIdx_1D_2D(){
     return blockIdx.x * blockDim.x * blockDim.y + threadIdx.y * blockDim.x + threadIdx.x;
 }
 
-__global__ void cuda_Hello_World(){
-    int tid = getGlobalIdx_1D_2D();
-    printf("Hello World from thread ID:%d\n",tid);
-}
 //op_vec_add - add two vectors
 __global__ void op_vec_add(double * result,double * vector0,double * vector1,double scalar,int size){
     int tid = blockIdx.x * blockDim.x + threadIdx.x;
@@ -38,13 +34,42 @@ void cuda_kernel_vector_addition(double * result,double * vector0,double * vecto
 
     op_vec_add<<<1,size>>>(device_result,device_vector0,device_vector1,scalar,size);
 
-    cudaDeviceSynchronize();
 
     cudaMemcpy(result,device_result,size * sizeof(double),cudaMemcpyDeviceToHost);
+    
+    cudaDeviceSynchronize();
 
     cudaFree(device_vector0);
     cudaFree(device_vector0);
     cudaFree(device_result);
+}
+void cuda_dscal_helper(int n,const double * alpha,double *x,int incx){
+    cublasStatus_t status;
+    cublasHandle_t handle;
+    
+    status = cublasCreate(&handle);
+    status = cublasDscal(handle,n,alpha,x,incx);
+    
+    if (status != CUBLAS_STATUS_SUCCESS) {
+        printf("TIMES MM not working");
+    }
+    cublasDestroy(handle);
+
+}
+
+void cuda_dscal(int n, const double * alpha,double *x,int incx){
+    double * device_x;
+    
+    cudaMalloc(&device_x,n*sizeof(double));
+    cudaMemcpy(device_x,x,n*sizeof(double),cudaMemcpyHostToDevice);
+    
+    cuda_dscal_helper(n,alpha,device_x,incx);
+    
+    cudaMemcpy(x,device_x,n*sizeof(double),cudaMemcpyDeviceToHost);
+    cudaDeviceSynchronize();
+    
+    cudaFree(device_x);
+    return;
 }
 
 void cuda_dgemm_helper(bool at,bool bt,int m, int n, int k,const double * alpha,const double * A,int lda,const double * B,int ldb,const double * beta,double * C,double ldc){
@@ -56,7 +81,6 @@ void cuda_dgemm_helper(bool at,bool bt,int m, int n, int k,const double * alpha,
     if (status != CUBLAS_STATUS_SUCCESS) {
         printf("TIMES MM not working");
     }
-
     cublasDestroy(handle);
 
     return;
@@ -80,6 +104,7 @@ void cuda_dgemm(bool at,bool bt,int m, int n, int k,const double * alpha,const d
     
     cudaMemcpy(C,device_C,m * n * sizeof(double),cudaMemcpyDeviceToHost);
     
+    //Blocks the host until all CUDA Threads and function calls are finished   
     cudaDeviceSynchronize();
 
     cudaFree(device_A);
