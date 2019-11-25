@@ -214,7 +214,6 @@ Initialize()
             Set_Grid(RANGE<TV>::Unit_Box()*m);
             density=unit_rho*scale_mass;
             use_analytic_field=true;
-            typedef DIAGONAL_MATRIX<T,2> TM;
             auto f=[=](auto x){return x*(1-x)*(x*x-x-1);};
             auto df=[=](auto x){return (1-2*x)*(2*x*x-2*x-1);};
             auto g=[=](auto x){return x*(1-x)*(x+1)*(3*x*x-7);};
@@ -303,7 +302,6 @@ Initialize()
             Set_Grid(RANGE<TV>::Centered_Box()*m);
             density=unit_rho*scale_mass;
             use_analytic_field=true;
-            typedef DIAGONAL_MATRIX<T,2> TM;
             Add_Velocity(
                 [=](auto Y,auto t)
                 {
