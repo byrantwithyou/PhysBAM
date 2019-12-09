@@ -326,7 +326,7 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TETRAHEDRON<T>& tetrahed
                 for(int j=0;j<3;j++,index=(index+1)%4){
                     other_indices[j]=index;
                     interface_locations[j]=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(X_nodes[i],X_nodes[index],LEVELSET_UTILITIES<T>::Theta(phi_nodes[i],phi_nodes[index]));}
-                if(i%2 == 0){exchange(interface_locations[0],interface_locations[2]);exchange(other_indices[1],other_indices[3]);}
+                if(i%2 == 0){exchange(interface_locations[0],interface_locations[2]);exchange(other_indices[0],other_indices[2]);}
                 // (i1,o1,o2,o3), (i2,i1,o2,o3), (i3,i1,i2,o3)
                 negative_tetrahedra.Append(TETRAHEDRON<T>(interface_locations[0],X_nodes(other_indices[0]),X_nodes(other_indices[1]),X_nodes(other_indices[2])));
                 negative_tetrahedra.Append(TETRAHEDRON<T>(interface_locations[1],interface_locations[0],X_nodes(other_indices[1]),X_nodes(other_indices[2])));
