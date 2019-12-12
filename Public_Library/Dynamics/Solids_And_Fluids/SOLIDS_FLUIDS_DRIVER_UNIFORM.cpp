@@ -1290,17 +1290,36 @@ Postprocess_Frame(const int frame)
         solids_evolution.rigid_body_collisions->Print_Interpenetration_Statistics();
 }
 //#####################################################################
-// Function Compute_Dt
+// Function Compute_Solids_Dt
 //#####################################################################
 template<class TV> typename TV::SCALAR SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
-Compute_Dt(const T time,const T target_time,bool& done)
+Compute_Solids_Dt(const T time)
 {
     SOLIDS_PARAMETERS<TV>& solids_parameters=example.solids_parameters;
     SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters=example.solids_fluids_parameters;
     SOLIDS_EVOLUTION<TV>& solids_evolution=*example.solids_evolution;
+    SOLIDS_EVOLUTION_CALLBACKS<TV>* solids_evolution_callbacks=solids_evolution.solids_evolution_callbacks;
+
+    // solids dt
+    T solids_dt=FLT_MAX;
+    if(solids_evolution.Use_CFL()) solids_dt=min(solids_dt,example.solid_body_collection.CFL(solids_parameters.verbose_dt));
+    solids_dt=min(solids_dt,solids_evolution_callbacks->Constraints_CFL());
+    if(solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies) solids_dt=min(solids_dt,example.solid_body_collection.rigid_body_collection.CFL_Rigid(solids_parameters.rigid_body_evolution_parameters,solids_parameters.verbose_dt));
+    if(example.solid_body_collection.deformable_body_collection.mpi_solids)
+        solids_dt=example.solid_body_collection.deformable_body_collection.mpi_solids->Reduce_Min_Global(solids_dt);
+    if(solids_fluids_parameters.mpi_solid_fluid)
+        solids_dt=solids_fluids_parameters.mpi_solid_fluid->Reduce_Min(solids_dt);
+    return solids_dt;
+}
+//#####################################################################
+// Function Compute_Fluids_Dt
+//#####################################################################
+template<class TV> typename TV::SCALAR SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
+Compute_Fluids_Dt(const T time)
+{
+    SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters=example.solids_fluids_parameters;
     FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example.fluids_parameters;
     FLUID_COLLECTION<TV>& fluid_collection=example.fluid_collection;
-    SOLIDS_EVOLUTION_CALLBACKS<TV>* solids_evolution_callbacks=solids_evolution.solids_evolution_callbacks;
     int number_of_regions=fluids_parameters.number_of_regions;
     bool fluids=Simulate_Fluids() && (!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Fluid_Node());
 
@@ -1318,18 +1337,18 @@ Compute_Dt(const T time,const T target_time,bool& done)
         if(fluids_parameters.sph || fluids_parameters.use_sph_for_removed_negative_particles) fluids_dt=min(fluids_dt,fluids_parameters.cfl*fluids_parameters.sph_evolution->CFL());
         LOG::cout<<"before example cfl clamping:  "<<fluids_dt<<std::endl;
         if(fluids_parameters.mpi_grid && !solids_fluids_parameters.mpi_solid_fluid) fluids_parameters.mpi_grid->Synchronize_Dt(fluids_dt);}
-
-    // solids dt
-    T solids_dt=FLT_MAX;
-    if(solids_evolution.Use_CFL()) solids_dt=min(solids_dt,example.solid_body_collection.CFL(solids_parameters.verbose_dt));
-    solids_dt=min(solids_dt,solids_evolution_callbacks->Constraints_CFL());
-    if(solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies) solids_dt=min(solids_dt,example.solid_body_collection.rigid_body_collection.CFL_Rigid(solids_parameters.rigid_body_evolution_parameters,solids_parameters.verbose_dt));
-    if(example.solid_body_collection.deformable_body_collection.mpi_solids)
-        solids_dt=example.solid_body_collection.deformable_body_collection.mpi_solids->Reduce_Min_Global(solids_dt);
-    if(solids_fluids_parameters.mpi_solid_fluid){
-        solids_dt=solids_fluids_parameters.mpi_solid_fluid->Reduce_Min(solids_dt);
-        fluids_dt=solids_fluids_parameters.mpi_solid_fluid->Reduce_Min(fluids_dt);}
-
+    if(solids_fluids_parameters.mpi_solid_fluid)
+        fluids_dt=solids_fluids_parameters.mpi_solid_fluid->Reduce_Min(fluids_dt);
+    return fluids_dt;
+}
+//#####################################################################
+// Function Compute_Dt
+//#####################################################################
+template<class TV> typename TV::SCALAR SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
+Compute_Dt(const T time,const T target_time,bool& done)
+{
+    T fluids_dt=Compute_Fluids_Dt(time);
+    T solids_dt=Compute_Solids_Dt(time);
     T dt=min(fluids_dt,solids_dt);
     done=example.Clamp_Time_Step_With_Target_Time(time,target_time,dt);
     if(Simulate_Fluids())

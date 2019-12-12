@@ -54,6 +54,8 @@ public:
     void Advance_To_Target_Time(const T target_time) override;
     void Postprocess_Frame(const int frame) override;
     T Compute_Dt(const T time,const T target_time,bool& done);
+    T Compute_Solids_Dt(const T time);
+    T Compute_Fluids_Dt(const T time);
     void Write_Output_Files(const int frame) override;
     void Integrate_Fluid_Non_Advection_Forces(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt);
     void Setup_Solids(const T time);
