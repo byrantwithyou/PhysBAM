@@ -524,7 +524,7 @@ Add_External_Impulses_Helper(ARRAY_VIEW<TV> V,const T time,const T dt,bool use_m
 // Function Preprocess_Solids_Substep
 //#####################################################################
 template<class T_input> void HAIR_STRAND_TESTS<T_input>::
-Preprocess_Solids_Substep(const T time,const int substep) {
+Preprocess_Solids_Substep(const T time) {
     if(segment_adhesion) segment_adhesion->Update_Springs(true);
 }
 //#####################################################################

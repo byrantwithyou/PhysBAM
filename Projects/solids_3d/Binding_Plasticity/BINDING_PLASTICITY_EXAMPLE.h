@@ -203,7 +203,7 @@ void Create_Rigid_Stamp()
 //#####################################################################
 // Function Postprocess_Solids_Substep
 //#####################################################################
-void Postprocess_Solids_Substep(const T time,const int substep) override
+void Postprocess_Solids_Substep(const T time) override
 {
     if(time>final_time) return;
 

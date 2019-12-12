@@ -674,7 +674,7 @@ Set_External_Positions(ARRAY_VIEW<TV> X,const T time)
 // Function Add_Connectivity
 //#####################################################################
 template<class T_input> void HAIR_SIM_TESTS<T_input>::
-Preprocess_Solids_Substep(const T time,const int substep) {
+Preprocess_Solids_Substep(const T time) {
     if(segment_adhesion){segment_adhesion->Update_Collisions_List();segment_adhesion->Update_Springs(true);}
     //if(segment_adhesion){segment_adhesion->Update_Springs(true);}
     if(guide_adhesion) guide_adhesion->Update_Springs(false);

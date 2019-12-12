@@ -217,7 +217,7 @@ void Make_Tread(const T z_shift,int tread_side)
 //#####################################################################
 // Function Preprocess_Solids_Substep
 //#####################################################################
-void Preprocess_Solids_Substep(const T time,const int substep) override
+void Preprocess_Solids_Substep(const T time) override
 {
     Reset_Joints();
     T running_time=max(time-start_rolling,(T)0);

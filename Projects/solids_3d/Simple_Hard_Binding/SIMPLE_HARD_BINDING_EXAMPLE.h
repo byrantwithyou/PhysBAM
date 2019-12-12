@@ -278,7 +278,7 @@ void Persist_Subsamples(const int triangle,ARRAY<BINDING<TV>*>& new_binding_list
 //#####################################################################
 // Function Preprocess_Solids_Substep
 //#####################################################################
-void Preprocess_Solids_Substep(const T time,const int substep) override
+void Preprocess_Solids_Substep(const T time) override
 {
     if(!dynamic_subsampling) return;
 

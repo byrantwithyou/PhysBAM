@@ -98,12 +98,12 @@ Advance_To_Target_Time(const T target_time)
         PHYSBAM_DEBUG_WRITE_SUBSTEP("object compatibility",1);
         if(example.solid_affects_fluid) example.euler_solid_fluid_coupling_utilities.Fill_Solid_Cells();
         PHYSBAM_DEBUG_WRITE_SUBSTEP("advect fluid",1);
-        Advect_Fluid(dt,substep);
+        Advect_Fluid(dt);
 
         Restore_Solids_To_Time_N_Plus_One();
 
         PHYSBAM_DEBUG_WRITE_SUBSTEP("project fluid at end of substep",1);
-        Advance_Fluid_One_Time_Step_Implicit_Part(dt,time,substep);
+        Advance_Fluid_One_Time_Step_Implicit_Part(dt,time);
 
         time+=dt;
 
@@ -147,7 +147,7 @@ Restore_Solids_To_Time_N_Plus_One()
 // Advect_Fluid
 //#####################################################################
 template<class TV> void COMPRESSIBLE_DRIVER<TV>::
-Advect_Fluid(const T dt,const int substep)
+Advect_Fluid(const T dt)
 {
     EULER_UNIFORM<TV>& euler=example.euler;
     SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<TV>& euler_solid_fluid_coupling_utilities=example.euler_solid_fluid_coupling_utilities;
@@ -190,7 +190,7 @@ Advect_Fluid(const T dt,const int substep)
 // Advance_Fluid_One_Time_Step_Implicit_Part
 //#####################################################################
 template<class TV> void COMPRESSIBLE_DRIVER<TV>::
-Advance_Fluid_One_Time_Step_Implicit_Part(const T dt_projection,const T time_projection,const int substep)
+Advance_Fluid_One_Time_Step_Implicit_Part(const T dt_projection,const T time_projection)
 {
     EULER_UNIFORM<TV>& euler=example.euler;
 

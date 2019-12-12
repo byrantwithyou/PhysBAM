@@ -43,7 +43,7 @@ public:
     virtual void Preprocess_Frame(const int frame);
     T Compute_Dt(const T time,const T target_time,bool& done);
     void Write_Output_Files(const int frame) override;
-    void Advect_Fluid(const T dt,const int substep);
+    void Advect_Fluid(const T dt);
     void Execute_Main_Program() override;
     void Simulate_To_Frame(const int frame_input) override;
     void Delete_Particles_Inside_Objects(const T time);

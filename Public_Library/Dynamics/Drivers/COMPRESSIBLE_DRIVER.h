@@ -31,8 +31,8 @@ private:
     void Setup_Fluids(const T time);
     void Restore_Solids_To_Time_N(const T time_n_plus_one);
     void Restore_Solids_To_Time_N_Plus_One();
-    void Advect_Fluid(const T dt,const int substep);
-    void Advance_Fluid_One_Time_Step_Implicit_Part(const T dt_projection,const T time_projection,const int substep);
+    void Advect_Fluid(const T dt);
+    void Advance_Fluid_One_Time_Step_Implicit_Part(const T dt_projection,const T time_projection);
     T Compute_Dt(const T time,const T target_time,bool& done);
 
 //#####################################################################

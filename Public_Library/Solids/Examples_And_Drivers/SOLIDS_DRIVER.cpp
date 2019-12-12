@@ -37,7 +37,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> SOLIDS_DRIVER<TV>::
 SOLIDS_DRIVER(SOLIDS_EXAMPLE<TV>& example_input)
-    :BASE(example_input),example(example_input),project_at_frame_boundaries(true),last_dt(0),restart_dt(0),reset_with_restart(false)
+    :BASE(example_input),example(example_input),last_dt(0),restart_dt(0),reset_with_restart(false)
 {
 }
 //#####################################################################
@@ -109,14 +109,14 @@ Initialize()
 // Function Rigid_Cluster_Fracture
 //#####################################################################
 template<class TV> void SOLIDS_DRIVER<TV>::
-Rigid_Cluster_Fracture(const T dt_full_advance,const T dt_cfl,const int substep)
+Rigid_Cluster_Fracture(const T dt_full_advance,const T dt_cfl)
 {
     Check_For_Interrupts(); // see if keyboard or other interrupts are waiting
     SOLIDS_EVOLUTION<TV>& solids_evolution=*example.solids_evolution;
     RIGID_BODY_CLUSTER_BINDINGS<TV>& rigid_bindings=example.solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings;
     ARRAY<int> active_clusters;
 
-    if(rigid_bindings.callbacks && ((substep-1)%example.solids_parameters.rigid_cluster_fracture_frequency)==0 && rigid_bindings.Size()){
+    if(rigid_bindings.callbacks && rigid_bindings.Size()){
         T dt=min(dt_cfl*example.solids_parameters.rigid_cluster_fracture_frequency,dt_full_advance);
         // TODO update example.fluids_parameters.collision_bodies_affecting_fluid for Deactivate_And_Return_Clusters
         rigid_bindings.Deactivate_And_Return_Clusters(active_clusters);
@@ -140,7 +140,7 @@ Rigid_Cluster_Fracture(const T dt_full_advance,const T dt_cfl,const int substep)
         rigid_bindings.callbacks->Create_New_Clusters();
         example.solid_body_collection.Update_Simulated_Particles();
 
-        Setup_Solids(time,substep); // resetup solids before evolution.
+        Setup_Solids(time); // resetup solids before evolution.
     }
 }
 //#####################################################################
@@ -155,18 +155,18 @@ Advance_To_Target_Time(const T target_time)
     bool done=false;for(int substep=1;!done;substep++){
         LOG::SCOPE scope("SUBSTEP","substep %d",substep);
 
-        Setup_Solids(time,substep);
+        Setup_Solids(time);
         T dt=Compute_Dt(time,target_time,done);
         
-        Rigid_Cluster_Fracture(dt_full_advance,dt,substep);
+        Rigid_Cluster_Fracture(dt_full_advance,dt);
 
         example.Preprocess_Substep(dt,time);
 
         PHYSBAM_DEBUG_WRITE_SUBSTEP("solid position update",1);
-        Solid_Position_Update(dt,substep);/*S1*/
+        Solid_Position_Update(dt);/*S1*/
 
         PHYSBAM_DEBUG_WRITE_SUBSTEP("solid velocity update",1);
-        Solid_Velocity_Update(dt,substep,done);/*S2*/
+        Solid_Velocity_Update(dt);/*S2*/
 
         example.Postprocess_Substep(dt,time);
 
@@ -178,14 +178,14 @@ Advance_To_Target_Time(const T target_time)
 // Function Setup_Solids
 //#####################################################################
 template<class TV> void SOLIDS_DRIVER<TV>::
-Setup_Solids(const T time,const int substep)
+Setup_Solids(const T time)
 {
     SOLIDS_PARAMETERS<TV>& solids_parameters=example.solids_parameters;
     SOLIDS_EVOLUTION<TV>& solids_evolution=*example.solids_evolution;
     SOLIDS_EVOLUTION_CALLBACKS<TV>* solids_evolution_callbacks=solids_evolution.solids_evolution_callbacks;
 
     if(solids_parameters.triangle_collision_parameters.perform_self_collision && solids_parameters.triangle_collision_parameters.temporary_enable_collisions){
-        solids_evolution_callbacks->Self_Collisions_Begin_Callback(time,substep);
+        solids_evolution_callbacks->Self_Collisions_Begin_Callback(time);
         solids_parameters.triangle_collision_parameters.repulsion_pair_update_count=0;
         example.solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.Save_Self_Collision_Free_State();
         if((solids_parameters.triangle_collision_parameters.topological_hierarchy_build_count++)%solids_parameters.triangle_collision_parameters.topological_hierarchy_build_frequency==0){
@@ -193,7 +193,7 @@ Setup_Solids(const T time,const int substep)
             example.solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.Build_Topological_Structure_Of_Hierarchies();}
         solids_parameters.triangle_collision_parameters.self_collision_free_time=time;}
 
-    solids_evolution_callbacks->Preprocess_Solids_Substep(time,substep);
+    solids_evolution_callbacks->Preprocess_Solids_Substep(time);
     if(solids_parameters.deformable_object_collision_parameters.use_spatial_partition_for_levelset_collision_objects) // TODO - ANDY - why is this needed??? TODO: move this to the right places inside solids evolution 
         example.solid_body_collection.collision_body_list.Update_Spatial_Partition(solids_parameters.deformable_object_collision_parameters.spatial_partition_voxel_size_heuristic,
             solids_parameters.deformable_object_collision_parameters.spatial_partition_number_of_cells,solids_parameters.deformable_object_collision_parameters.spatial_partition_voxel_size_scale_factor);
@@ -203,7 +203,7 @@ Setup_Solids(const T time,const int substep)
 // Function Solid_Position_Update
 //#####################################################################
 template<class TV> void SOLIDS_DRIVER<TV>::
-Solid_Position_Update(const T dt,const int substep)
+Solid_Position_Update(const T dt)
 {
     Check_For_Interrupts(); // see if keyboard or other interrupts are waiting
     LOG::SCOPE scope("solids position update");
@@ -232,7 +232,7 @@ Solid_Position_Update(const T dt,const int substep)
 // Function Solid_Velocity_Update
 //#####################################################################
 template<class TV> void SOLIDS_DRIVER<TV>::
-Solid_Velocity_Update(const T dt,const int substep,const bool done)
+Solid_Velocity_Update(const T dt)
 {
     Check_For_Interrupts(); // see if keyboard or other interrupts are waiting
     LOG::SCOPE scope("solids velocity update");
@@ -241,7 +241,7 @@ Solid_Velocity_Update(const T dt,const int substep,const bool done)
     SOLIDS_EVOLUTION_CALLBACKS<TV>* solids_evolution_callbacks=solids_evolution.solids_evolution_callbacks;
     solids_evolution.Advance_One_Time_Step_Velocity(dt,time,true);
     solids_evolution.time+=dt;
-    solids_evolution_callbacks->Postprocess_Solids_Substep(solids_evolution.time,substep);
+    solids_evolution_callbacks->Postprocess_Solids_Substep(solids_evolution.time);
     solids_evolution_callbacks->Apply_Constraints(dt,solids_evolution.time);
 }
 //#####################################################################

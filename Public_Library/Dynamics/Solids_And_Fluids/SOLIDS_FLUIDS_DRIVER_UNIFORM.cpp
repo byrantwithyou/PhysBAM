@@ -345,15 +345,15 @@ Initialize()
 // Function Rigid_Cluster_Fracture
 //#####################################################################
 template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
-Rigid_Cluster_Fracture(const T dt_full_advance,const T dt_cfl,const int substep)
+Rigid_Cluster_Fracture(const T dt_cfl)
 {
     Check_For_Interrupts(); // see if keyboard or other interrupts are waiting
     SOLIDS_EVOLUTION<TV>& solids_evolution=*example.solids_evolution;
     RIGID_BODY_CLUSTER_BINDINGS<TV>& rigid_bindings=example.solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings;
     ARRAY<int> active_clusters;
 
-    if(rigid_bindings.callbacks && ((substep-1)%example.solids_parameters.rigid_cluster_fracture_frequency)==0 && rigid_bindings.Size()){
-        T dt=min(dt_cfl*example.solids_parameters.rigid_cluster_fracture_frequency,dt_full_advance);
+    if(rigid_bindings.callbacks && rigid_bindings.Size()){
+        T dt=min(dt_cfl*example.solids_parameters.rigid_cluster_fracture_frequency,dt_cfl);
         // TODO update example.fluids_parameters.collision_bodies_affecting_fluid for Deactivate_And_Return_Clusters
         rigid_bindings.Deactivate_And_Return_Clusters(active_clusters);
         example.solid_body_collection.Update_Simulated_Particles();
@@ -376,7 +376,7 @@ Rigid_Cluster_Fracture(const T dt_full_advance,const T dt_cfl,const int substep)
         rigid_bindings.callbacks->Create_New_Clusters();
         example.solid_body_collection.Update_Simulated_Particles();
 
-        Setup_Solids(time,substep); // resetup solids before evolution.
+        Setup_Solids(time); // resetup solids before evolution.
     }
 }
 //#####################################################################
@@ -418,6 +418,25 @@ Initialize_Fluids_Grids()
 template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
 Advance_To_Target_Time(const T target_time)
 {
+    example.solids_parameters.triangle_collision_parameters.steps_since_self_collision_free=0;
+    bool done=false;for(int substep=1;!done;substep++){
+        LOG::SCOPE scope("SUBSTEP","substep %d",substep);
+
+        Setup_Solids(time);
+        Setup_Fluids(time);
+        T dt=Compute_Dt(time,target_time,done);
+        Advance_One_Time_Step(dt);
+
+        last_dt=restart_dt?restart_dt:dt;time+=last_dt;restart_dt=0;
+
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("END Substep %d",0,substep);}
+}
+//#####################################################################
+// Function Advance_One_Time_Step
+//#####################################################################
+template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
+Advance_One_Time_Step(const T dt)
+{
     FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example.fluids_parameters;
     SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters=example.solids_fluids_parameters;
     INCOMPRESSIBLE_UNIFORM<TV>* incompressible=fluids_parameters.incompressible;
@@ -425,65 +444,52 @@ Advance_To_Target_Time(const T target_time)
     int number_of_regions=fluids_parameters.number_of_regions;
     const bool fluids=Simulate_Fluids() && (!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Fluid_Node());
 
-    T dt_full_advance=target_time-time;
-
-    example.solids_parameters.triangle_collision_parameters.steps_since_self_collision_free=0;
-    bool done=false;for(int substep=1;!done;substep++){
-        LOG::SCOPE scope("SUBSTEP","substep %d",substep);
-
-        Setup_Solids(time,substep);
-        Setup_Fluids(time);
-        T dt=Compute_Dt(time,target_time,done);
+    if(fluids_parameters.compressible) euler->Save_State(euler->U_save,euler->euler_projection.face_velocities_save,euler->need_to_remove_added_internal_energy_save);
         
-        if(fluids_parameters.compressible) euler->Save_State(euler->U_save,euler->euler_projection.face_velocities_save,euler->need_to_remove_added_internal_energy_save);
-        
-        Rigid_Cluster_Fracture(dt_full_advance,dt,substep);
+    Rigid_Cluster_Fracture(dt);
 
-        example.Preprocess_Substep(dt,time);
+    example.Preprocess_Substep(dt,time);
 
-        if(fluids) example.Update_Fluid_Parameters(dt,time);
-        if(fluids_parameters.use_flame_speed_multiplier) example.Get_Flame_Speed_Multiplier(dt,time);
-        if(example.use_melting && number_of_regions==1) example.Update_Melting_Substep_Parameters(dt,time);
+    if(fluids) example.Update_Fluid_Parameters(dt,time);
+    if(fluids_parameters.use_flame_speed_multiplier) example.Get_Flame_Speed_Multiplier(dt,time);
+    if(example.use_melting && number_of_regions==1) example.Update_Melting_Substep_Parameters(dt,time);
 
-        if(fluids && Two_Way_Coupled()){
-            if(fluids_parameters.compressible) fluids_parameters.Get_Neumann_And_Dirichlet_Boundary_Conditions(euler->euler_projection.elliptic_solver,euler->euler_projection.face_velocities,dt,time); // Put valid state on coupled faces.
-            PHYSBAM_DEBUG_WRITE_SUBSTEP("integrate fluid forces for solid coupling",1);
-            Integrate_Fluid_Non_Advection_Forces(example.fluid_collection.incompressible_fluid_collection.face_velocities,dt/2,substep);/*F1*/}
+    if(fluids && Two_Way_Coupled()){
+        if(fluids_parameters.compressible) fluids_parameters.Get_Neumann_And_Dirichlet_Boundary_Conditions(euler->euler_projection.elliptic_solver,euler->euler_projection.face_velocities,dt,time); // Put valid state on coupled faces.
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("integrate fluid forces for solid coupling",1);
+        Integrate_Fluid_Non_Advection_Forces(example.fluid_collection.incompressible_fluid_collection.face_velocities,dt/2);/*F1*/}
 
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("solid position update",1);
-        Solid_Position_Update(dt,substep);/*S1*/
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("solid position update",1);
+    Solid_Position_Update(dt);/*S1*/
 
-        if(fluids){
-            PHYSBAM_DEBUG_WRITE_SUBSTEP("object compatibility",1);
-            if(Two_Way_Coupled()){  // Restore time n fluid state
-                if(Simulate_Incompressible_Fluids()) incompressible->projection.Restore_After_Projection(example.fluid_collection.incompressible_fluid_collection.face_velocities);
-                if(fluids_parameters.compressible) euler->Restore_State(euler->U_save,euler->euler_projection.face_velocities_save,euler->need_to_remove_added_internal_energy_save);}
+    if(fluids){
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("object compatibility",1);
+        if(Two_Way_Coupled()){  // Restore time n fluid state
+            if(Simulate_Incompressible_Fluids()) incompressible->projection.Restore_After_Projection(example.fluid_collection.incompressible_fluid_collection.face_velocities);
+            if(fluids_parameters.compressible) euler->Restore_State(euler->U_save,euler->euler_projection.face_velocities_save,euler->need_to_remove_added_internal_energy_save);}
 
-            if(fluids_parameters.solid_affects_fluid && solids_fluids_parameters.use_leakproof_solve) Advance_Fluid_One_Time_Step_Implicit_Part_For_Object_Compatibility(last_dt,time-last_dt,substep);/*F2*/
-            PHYSBAM_DEBUG_WRITE_SUBSTEP("advect fluid",1);
-            Advect_Fluid(dt,substep);/*F3*/
-            if(fluids_parameters.compressible && !fluids_parameters.use_slip){//slip does one sided interpolation, so dont need it 
-                fluids_parameters.euler_solid_fluid_coupling_utilities->Fill_Solid_Cells();}}
+        if(fluids_parameters.solid_affects_fluid && solids_fluids_parameters.use_leakproof_solve) Advance_Fluid_One_Time_Step_Implicit_Part_For_Object_Compatibility(last_dt,time-last_dt);/*F2*/
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("advect fluid",1);
+        Advect_Fluid(dt);/*F3*/
+        if(fluids_parameters.compressible && !fluids_parameters.use_slip){//slip does one sided interpolation, so dont need it 
+            fluids_parameters.euler_solid_fluid_coupling_utilities->Fill_Solid_Cells();}}
 
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("solid velocity update",1);
-        Solid_Velocity_Update(dt,substep,done);/*S2*/
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("solid velocity update",1);
+    Solid_Velocity_Update(dt);/*S2*/
 
-        if(fluids){
-            PHYSBAM_DEBUG_WRITE_SUBSTEP("project fluid at end of substep",1);
-            Advance_Fluid_One_Time_Step_Implicit_Part(done,dt,substep);
-            if(fluids_parameters.compressible && (!euler->timesplit || !euler->thinshell)) fluids_parameters.euler_solid_fluid_coupling_utilities->Fill_Solid_Cells();}/*F4*/
+    if(fluids){
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("project fluid at end of substep",1);
+        Advance_Fluid_One_Time_Step_Implicit_Part(dt);
+        if(fluids_parameters.compressible && (!euler->timesplit || !euler->thinshell)) fluids_parameters.euler_solid_fluid_coupling_utilities->Fill_Solid_Cells();}/*F4*/
 
-        example.Postprocess_Substep(dt,time);
-
-        last_dt=restart_dt?restart_dt:dt;time+=last_dt;restart_dt=0;
-
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("END Substep %d",0,substep);}
+    example.Postprocess_Substep(dt,time);
+    
 }
 //#####################################################################
 // Function Integrate_Fluid_Non_Advection_Forces
 //#####################################################################
 template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
-Integrate_Fluid_Non_Advection_Forces(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const int substep)
+Integrate_Fluid_Non_Advection_Forces(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt)
 {
     FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example.fluids_parameters;
     int number_of_regions=fluids_parameters.number_of_regions;
@@ -528,14 +534,14 @@ Integrate_Fluid_Non_Advection_Forces(ARRAY<T,FACE_INDEX<TV::m> >& face_velocitie
 // Function Setup_Solids
 //#####################################################################
 template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
-Setup_Solids(const T time,const int substep)
+Setup_Solids(const T time)
 {
     SOLIDS_PARAMETERS<TV>& solids_parameters=example.solids_parameters;
     SOLIDS_EVOLUTION<TV>& solids_evolution=*example.solids_evolution;
     SOLIDS_EVOLUTION_CALLBACKS<TV>* solids_evolution_callbacks=solids_evolution.solids_evolution_callbacks;
 
     if(solids_parameters.triangle_collision_parameters.perform_self_collision && solids_parameters.triangle_collision_parameters.temporary_enable_collisions){
-        solids_evolution_callbacks->Self_Collisions_Begin_Callback(time,substep);
+        solids_evolution_callbacks->Self_Collisions_Begin_Callback(time);
         solids_parameters.triangle_collision_parameters.repulsion_pair_update_count=0;
         example.solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.Save_Self_Collision_Free_State();
         if((solids_parameters.triangle_collision_parameters.topological_hierarchy_build_count++)%solids_parameters.triangle_collision_parameters.topological_hierarchy_build_frequency==0){
@@ -543,7 +549,7 @@ Setup_Solids(const T time,const int substep)
             example.solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.Build_Topological_Structure_Of_Hierarchies();}
         solids_parameters.triangle_collision_parameters.self_collision_free_time=time;}
 
-    solids_evolution_callbacks->Preprocess_Solids_Substep(time,substep);
+    solids_evolution_callbacks->Preprocess_Solids_Substep(time);
     if(solids_parameters.deformable_object_collision_parameters.use_spatial_partition_for_levelset_collision_objects) // TODO - ANDY - why is this needed??? TODO: move this to the right places inside solids evolution 
         example.solid_body_collection.collision_body_list.Update_Spatial_Partition(solids_parameters.deformable_object_collision_parameters.spatial_partition_voxel_size_heuristic,
             solids_parameters.deformable_object_collision_parameters.spatial_partition_number_of_cells,solids_parameters.deformable_object_collision_parameters.spatial_partition_voxel_size_scale_factor);
@@ -574,7 +580,7 @@ Setup_Fluids(const T time)
 // Function Solid_Position_Update
 //#####################################################################
 template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
-Solid_Position_Update(const T dt,const int substep)
+Solid_Position_Update(const T dt)
 {
     Check_For_Interrupts(); // see if keyboard or other interrupts are waiting
     LOG::SCOPE scope("solids position update");
@@ -648,7 +654,7 @@ Solid_Position_Update(const T dt,const int substep)
 // Function Project_Fluid
 //#####################################################################
 template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
-Project_Fluid(const T dt_projection,const T time_projection,const int substep)
+Project_Fluid(const T dt_projection,const T time_projection)
 {
     FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example.fluids_parameters;
     FLUID_COLLECTION<TV>& fluid_collection=example.fluid_collection;
@@ -834,7 +840,7 @@ Project_Fluid(const T dt_projection,const T time_projection,const int substep)
 // Function Advance_Fluid_One_Time_Step_Implicit_Part_For_Object_Compatibility
 //#####################################################################
 template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
-Advance_Fluid_One_Time_Step_Implicit_Part_For_Object_Compatibility(const T dt_projection,const T time_projection,const int substep)
+Advance_Fluid_One_Time_Step_Implicit_Part_For_Object_Compatibility(const T dt_projection,const T time_projection)
 {
     // if(example.fluids_parameters.compressible) PHYSBAM_FATAL_ERROR("This currently doesn't work, as Fill_Solid_Cells is not aware of pseudo-velocities");
     SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters=example.solids_fluids_parameters;
@@ -848,14 +854,14 @@ Advance_Fluid_One_Time_Step_Implicit_Part_For_Object_Compatibility(const T dt_pr
         if(fluids_parameters.fluid_affects_solid){
             incompressible->projection.Set_Up_For_Projection(example.fluid_collection.incompressible_fluid_collection.face_velocities);
             incompressible->projection.Exchange_Pressures_For_Projection();}
-        if(solids_fluids_parameters.use_leakproof_solve) Project_Fluid(dt_projection,time_projection,substep);
+        if(solids_fluids_parameters.use_leakproof_solve) Project_Fluid(dt_projection,time_projection);
         if(fluids_parameters.fluid_affects_solid) incompressible->projection.Exchange_Pressures_For_Projection();}
 }
 //#####################################################################
 // Function Advect_Fluid
 //#####################################################################
 template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
-Advect_Fluid(const T dt,const int substep)
+Advect_Fluid(const T dt)
 {
     FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example.fluids_parameters;
     FLUID_COLLECTION<TV>& fluid_collection=example.fluid_collection;
@@ -973,22 +979,22 @@ Advect_Fluid(const T dt,const int substep)
             if(Two_Way_Coupled() && solids_fluids_parameters.use_leakproof_solve){
                 incompressible_multiphase->Advance_One_Time_Step_Convection(dt,time,*advection_face_velocities_ghost,incompressible_multiphase->projection.face_velocities_save_for_projection,&fluids_parameters.pseudo_dirichlet_regions,fluids_parameters.number_of_ghost_cells);
                 incompressible->projection.Restore_After_Projection(example.fluid_collection.incompressible_fluid_collection.face_velocities);
-                Integrate_Fluid_Non_Advection_Forces(face_velocities,dt,substep);}
+                Integrate_Fluid_Non_Advection_Forces(face_velocities,dt);}
             else{
                 incompressible_multiphase->Advance_One_Time_Step_Convection(dt,time,*advection_face_velocities_ghost,face_velocities,&fluids_parameters.pseudo_dirichlet_regions,fluids_parameters.number_of_ghost_cells);
-                Integrate_Fluid_Non_Advection_Forces(face_velocities,dt,substep);}}
+                Integrate_Fluid_Non_Advection_Forces(face_velocities,dt);}}
         else if(!fluids_parameters.sph){
             if(Two_Way_Coupled() && solids_fluids_parameters.use_leakproof_solve){
                 PHYSBAM_DEBUG_WRITE_SUBSTEP("before forces",1);
                 incompressible->Advance_One_Time_Step_Convection(dt,time,*advection_face_velocities_ghost,incompressible->projection.face_velocities_save_for_projection,fluids_parameters.number_of_ghost_cells);
                 PHYSBAM_DEBUG_WRITE_SUBSTEP("before restore",1);
                 incompressible->projection.Restore_After_Projection(example.fluid_collection.incompressible_fluid_collection.face_velocities);
-                Integrate_Fluid_Non_Advection_Forces(face_velocities,dt,substep);
+                Integrate_Fluid_Non_Advection_Forces(face_velocities,dt);
                 PHYSBAM_DEBUG_WRITE_SUBSTEP("before convection",1);}
             else{
                 PHYSBAM_DEBUG_WRITE_SUBSTEP("before forces",1);
                 if(!fluids_parameters.stokes_flow) incompressible->Advance_One_Time_Step_Convection(dt,time,*advection_face_velocities_ghost,face_velocities,fluids_parameters.number_of_ghost_cells);
-                Integrate_Fluid_Non_Advection_Forces(face_velocities,dt,substep);}}
+                Integrate_Fluid_Non_Advection_Forces(face_velocities,dt);}}
         fluids_parameters.Blend_In_External_Velocity(face_velocities,dt,time);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after explicit part",1);}
 
@@ -1124,7 +1130,7 @@ Advect_Fluid(const T dt,const int substep)
 // Function Solid_Velocity_Update
 //#####################################################################
 template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
-Solid_Velocity_Update(const T dt,const int substep,const bool done)
+Solid_Velocity_Update(const T dt)
 {
     Check_For_Interrupts(); // see if keyboard or other interrupts are waiting
     LOG::SCOPE scope("solids velocity update");
@@ -1138,15 +1144,15 @@ Solid_Velocity_Update(const T dt,const int substep,const bool done)
 
     // TODO: if this updates positions, it should go in S1.  Otherwise, here.
     solids_evolution.time+=dt;
-    // if(solids_parameters.fracture_evolution) solids_parameters.fracture_evolution->Postprocess_Solids_Substep(solids_evolution.time,substep);
-    solids_evolution_callbacks->Postprocess_Solids_Substep(solids_evolution.time,substep);
+    // if(solids_parameters.fracture_evolution) solids_parameters.fracture_evolution->Postprocess_Solids_Substep(solids_evolution.time);
+    solids_evolution_callbacks->Postprocess_Solids_Substep(solids_evolution.time);
     solids_evolution_callbacks->Apply_Constraints(dt,solids_evolution.time);
 }
 //#####################################################################
 // Function Advance_Fluid_One_Time_Step_Implicit_Part
 //#####################################################################
 template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
-Advance_Fluid_One_Time_Step_Implicit_Part(const bool done,const T dt,const int substep)
+Advance_Fluid_One_Time_Step_Implicit_Part(const T dt)
 {
     FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example.fluids_parameters;
     FLUID_COLLECTION<TV>& fluid_collection=example.fluid_collection;
@@ -1160,7 +1166,6 @@ Advance_Fluid_One_Time_Step_Implicit_Part(const bool done,const T dt,const int s
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
     SOLIDS_EVOLUTION<TV>& solids_evolution=*example.solids_evolution;
 
-    if(fluids_parameters.solid_affects_fluid && !fluids_parameters.fluid_affects_solid && !done && !project_at_frame_boundaries) return;
     assert(!fluids_parameters.fluid_affects_solid || fluids_parameters.solid_affects_fluid);
     if(Two_Way_Coupled()){
         if(fluids_parameters.use_slip)
@@ -1210,8 +1215,7 @@ Advance_Fluid_One_Time_Step_Implicit_Part(const bool done,const T dt,const int s
                 incompressible_multiphase->strains(i)->Extrapolate_Strain_Across_Interface(particle_levelset_evolution_multiple->phis(i));}}
 
         if(fluids_parameters.move_grid){fluids_parameters.Move_Grid(fluid_collection.incompressible_fluid_collection.face_velocities,time+dt);Initialize_Fluids_Grids();}}
-    else if(!fluids_parameters.solid_affects_fluid || (done && project_at_frame_boundaries)){ // TODO: use actual velocities rather than effective velocities if one-way coupled && done
-        Project_Fluid(dt,time,substep);}
+    else Project_Fluid(dt,time); // TODO: use actual velocities rather than effective velocities if one-way coupled && done
 
     if(fluids_parameters.compressible){
         if(fluids_parameters.compressible_monitor_conservation_error){

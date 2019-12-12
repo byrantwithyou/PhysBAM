@@ -24,9 +24,9 @@ public:
 
 //#####################################################################
     virtual void Update_Solids_Parameters(const T time);
-    virtual void Self_Collisions_Begin_Callback(const T time,const int substep);
-    virtual void Preprocess_Solids_Substep(const T time,const int substep);
-    virtual void Postprocess_Solids_Substep(const T time,const int substep);
+    virtual void Self_Collisions_Begin_Callback(const T time);
+    virtual void Preprocess_Solids_Substep(const T time);
+    virtual void Postprocess_Solids_Substep(const T time);
     virtual void Apply_Constraints(const T dt,const T time);
     virtual T Constraints_CFL();
     virtual void Pre_Advance_Cluster_Fracture(const T& dt, const T& time);

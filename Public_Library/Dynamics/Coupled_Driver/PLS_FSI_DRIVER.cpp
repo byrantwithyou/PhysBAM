@@ -303,7 +303,7 @@ First_Order_Time_Step(int substep,T dt)
         face_velocities_scratch-=face_velocities;
         PHYSBAM_DEBUG_WRITE_SUBSTEP("revert velocity and store difference",1);}
 
-    Advect_Fluid(dt,substep);
+    Advect_Fluid(dt);
     LOG::cout<<"Maximum face velocity (after advect) = ("<<face_velocities.Max_Abs().Magnitude()<<": "<<face_velocities.Max_Abs()<<std::endl;
     PHYSBAM_DEBUG_WRITE_SUBSTEP("advect",1);
     if(example.kang_poisson_viscosity && !fluids_parameters.implicit_viscosity){
@@ -397,7 +397,7 @@ Advance_To_Target_Time(const T target_time)
 
     bool done=false;for(int substep=1;!done;substep++){
         LOG::SCOPE scope("SUBSTEP","substep %d",substep);
-        solids_evolution_callbacks->Preprocess_Solids_Substep(time,substep);
+        solids_evolution_callbacks->Preprocess_Solids_Substep(time);
         particle_levelset_evolution->Set_Number_Particles_Per_Cell(fluids_parameters.number_particles_per_cell);
         T dt=Compute_Dt(time,target_time,done);
         example.Preprocess_Substep(dt,time);
@@ -405,7 +405,7 @@ Advance_To_Target_Time(const T target_time)
 
         First_Order_Time_Step(substep,dt);
 
-        solids_evolution_callbacks->Postprocess_Solids_Substep(example.solids_evolution->time,substep);
+        solids_evolution_callbacks->Postprocess_Solids_Substep(example.solids_evolution->time);
         example.Postprocess_Substep(dt,time);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("END Substep %d",0,substep);}
 }
@@ -413,7 +413,7 @@ Advance_To_Target_Time(const T target_time)
 // Function Advect_Fluid
 //#####################################################################
 template<class TV> void PLS_FSI_DRIVER<TV>::
-Advect_Fluid(const T dt,const int substep)
+Advect_Fluid(const T dt)
 {
     FLUIDS_PARAMETERS_UNIFORM<TV>& fluids_parameters=example.fluids_parameters;
     FLUID_COLLECTION<TV>& fluid_collection=example.fluid_collection;

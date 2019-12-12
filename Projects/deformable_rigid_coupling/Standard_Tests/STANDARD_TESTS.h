@@ -197,14 +197,14 @@ TV Sidewinding_Position(const T time,const T segment)
 //#####################################################################
 // Function Self_Collisions_Begin_Callback
 //#####################################################################
-void Self_Collisions_Begin_Callback(const T time,const int substep) override
+void Self_Collisions_Begin_Callback(const T time) override
 {
     if(dynamic_subsampling && solids_parameters.triangle_collision_parameters.perform_self_collision) Update_Subsamples();
 }
 //#####################################################################
 // Function Preprocess_Solids_Substep
 //#####################################################################
-void Preprocess_Solids_Substep(const T time,const int substep) override
+void Preprocess_Solids_Substep(const T time) override
 {
     if(dynamic_subsampling && !solids_parameters.triangle_collision_parameters.perform_self_collision) Update_Subsamples();
 }

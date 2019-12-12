@@ -25,7 +25,6 @@ public:
     using BASE::Write_Time;using BASE::Write_Last_Frame;
     using BASE::current_frame;
     SOLIDS_EXAMPLE<TV>& example;
-    bool project_at_frame_boundaries;
     T next_dt; // for fluid time stepping
     bool next_done; // for fluid time stepping
     T last_dt;
@@ -44,10 +43,10 @@ public:
     void Postprocess_Frame(const int frame);
     T Compute_Dt(const T time,const T target_time,bool& done);
     void Write_Output_Files(const int frame) override;
-    void Setup_Solids(const T time,const int substep);
-    void Solid_Position_Update(const T dt,const int substep);
-    void Rigid_Cluster_Fracture(const T dt_full_advance,const T dt_cfl,const int substep);
-    void Solid_Velocity_Update(const T dt,const int substep,const bool done);
+    void Setup_Solids(const T time);
+    void Solid_Position_Update(const T dt);
+    void Rigid_Cluster_Fracture(const T dt_full_advance,const T dt_cfl);
+    void Solid_Velocity_Update(const T dt);
 //#####################################################################
 };
 }

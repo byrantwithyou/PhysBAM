@@ -26,7 +26,7 @@ Update_Solids_Parameters(const T time)
 // Function Self_Collisions_Begin_Callback
 //#####################################################################
 template<class TV> void SOLIDS_EVOLUTION_CALLBACKS<TV>::
-Self_Collisions_Begin_Callback(const T time,const int substep)
+Self_Collisions_Begin_Callback(const T time)
 {
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
 }
@@ -34,7 +34,7 @@ Self_Collisions_Begin_Callback(const T time,const int substep)
 // Function Preprocess_Solids_Substep
 //#####################################################################
 template<class TV> void SOLIDS_EVOLUTION_CALLBACKS<TV>::
-Preprocess_Solids_Substep(const T time,const int substep)
+Preprocess_Solids_Substep(const T time)
 {
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
 }
@@ -42,7 +42,7 @@ Preprocess_Solids_Substep(const T time,const int substep)
 // Function Postprocess_Solids_Substep
 //#####################################################################
 template<class TV> void SOLIDS_EVOLUTION_CALLBACKS<TV>::
-Postprocess_Solids_Substep(const T time,const int substep)
+Postprocess_Solids_Substep(const T time)
 {
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
 }

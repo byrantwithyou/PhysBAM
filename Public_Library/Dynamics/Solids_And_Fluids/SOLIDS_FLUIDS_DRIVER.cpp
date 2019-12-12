@@ -17,7 +17,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> SOLIDS_FLUIDS_DRIVER<TV>::
 SOLIDS_FLUIDS_DRIVER(SOLIDS_FLUIDS_EXAMPLE<TV>& example_input)
-    :BASE(example_input),example(example_input),project_at_frame_boundaries(true)
+    :BASE(example_input),example(example_input)
 {
 }
 //#####################################################################

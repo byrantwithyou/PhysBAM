@@ -22,7 +22,7 @@ class SOLIDS_FLUIDS_DRIVER_UNIFORM:public SOLIDS_FLUIDS_DRIVER<TV>
 
     typedef SOLIDS_FLUIDS_DRIVER<TV> BASE;
 public:
-    using BASE::project_at_frame_boundaries;using BASE::current_frame;using BASE::next_dt;using BASE::next_done;using BASE::Write_Time;
+    using BASE::current_frame;using BASE::next_dt;using BASE::next_done;using BASE::Write_Time;
     using BASE::Write_Last_Frame;using BASE::Write_Substep;using BASE::time;
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>& example;
     T last_dt;
@@ -55,16 +55,17 @@ public:
     void Postprocess_Frame(const int frame) override;
     T Compute_Dt(const T time,const T target_time,bool& done);
     void Write_Output_Files(const int frame) override;
-    void Integrate_Fluid_Non_Advection_Forces(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const int substep);
-    void Setup_Solids(const T time,const int substep);
+    void Integrate_Fluid_Non_Advection_Forces(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt);
+    void Setup_Solids(const T time);
     void Setup_Fluids(const T time);
-    void Solid_Position_Update(const T dt,const int substep);
-    void Rigid_Cluster_Fracture(const T dt_full_advance,const T dt_cfl,const int substep);
-    void Project_Fluid(const T dt_projection,const T time_projection,const int substep);
-    void Advance_Fluid_One_Time_Step_Implicit_Part_For_Object_Compatibility(const T dt_projection,const T time_projection,const int substep);
-    void Advect_Fluid(const T dt,const int substep);
-    void Solid_Velocity_Update(const T dt,const int substep,const bool done);
-    void Advance_Fluid_One_Time_Step_Implicit_Part(const bool done,const T dt,const int substep);
+    void Solid_Position_Update(const T dt);
+    void Rigid_Cluster_Fracture(const T dt_cfl);
+    void Project_Fluid(const T dt_projection,const T time_projection);
+    void Advance_Fluid_One_Time_Step_Implicit_Part_For_Object_Compatibility(const T dt_projection,const T time_projection);
+    void Advect_Fluid(const T dt);
+    void Solid_Velocity_Update(const T dt);
+    void Advance_Fluid_One_Time_Step_Implicit_Part(const T dt);
+    void Advance_One_Time_Step(const T dt);
 //#####################################################################
 };
 }

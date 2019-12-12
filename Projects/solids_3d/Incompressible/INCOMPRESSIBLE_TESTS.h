@@ -756,7 +756,7 @@ void Read_Output_Files_Solids(const int frame) override
 //#####################################################################
 // Function Postprocess_Solids_Substep
 //#####################################################################
-void Postprocess_Solids_Substep(const T time,const int substep) override
+void Postprocess_Solids_Substep(const T time) override
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;

@@ -73,7 +73,7 @@ public:
     void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) override;
     void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) override;
     void Add_External_Impulses_Helper(ARRAY_VIEW<TV> V,const T time,const T dt,bool use_momentum_conserving,bool use_non_momentum_conserving);
-    void Preprocess_Solids_Substep(const T time,const int substep) override;    
+    void Preprocess_Solids_Substep(const T time) override;    
     void Postprocess_Frame(const int frame) override;
     void Write_Output_Files(const int frame) const override;
 //#####################################################################

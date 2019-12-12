@@ -22,7 +22,6 @@ public:
     using BASE::current_frame;
     
     SOLIDS_FLUIDS_EXAMPLE<TV>& example;
-    bool project_at_frame_boundaries;
     T next_dt; // for fluid time stepping
     bool next_done; // for fluid time stepping
 
