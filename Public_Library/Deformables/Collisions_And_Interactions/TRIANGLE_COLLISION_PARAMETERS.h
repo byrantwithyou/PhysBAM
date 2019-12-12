@@ -21,7 +21,7 @@ public:
     bool temporary_enable_collisions;
     int repulsion_pair_update_count,repulsion_pair_update_frequency;
     T self_collision_free_time;
-    int steps_since_self_collision_free,total_collision_loops;
+    int total_collision_loops;
     int topological_hierarchy_build_count,topological_hierarchy_build_frequency;
     bool check_initial_mesh_for_self_intersection;
     bool check_mesh_for_self_intersection;

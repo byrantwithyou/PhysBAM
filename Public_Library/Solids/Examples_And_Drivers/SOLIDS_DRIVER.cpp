@@ -151,7 +151,6 @@ Advance_To_Target_Time(const T target_time)
 {
     T dt_full_advance=target_time-time;
 
-    example.solids_parameters.triangle_collision_parameters.steps_since_self_collision_free=0;
     bool done=false;for(int substep=1;!done;substep++){
         LOG::SCOPE scope("SUBSTEP","substep %d",substep);
 
@@ -223,8 +222,7 @@ Solid_Position_Update(const T dt)
     if(solids_parameters.triangle_collision_parameters.perform_self_collision && solids_parameters.triangle_collision_parameters.temporary_enable_collisions){
         LOG::SCOPE scope("adjust velocity for self repulsion and self collisions");
         int repulsions,collisions_found;
-        solids_evolution.Adjust_Velocity_For_Self_Repulsion_And_Self_Collisions(dt,time,repulsions,collisions_found,false);
-        solids_parameters.triangle_collision_parameters.steps_since_self_collision_free=0;}
+        solids_evolution.Adjust_Velocity_For_Self_Repulsion_And_Self_Collisions(dt,time,repulsions,collisions_found,false);}
     // Exchange solid positions back to fluid nodes so that they can figure out effective velocity and do collidable advection
     PHYSBAM_DEBUG_WRITE_SUBSTEP("solid position updated",1);
 }

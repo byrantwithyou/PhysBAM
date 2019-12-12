@@ -418,7 +418,6 @@ Initialize_Fluids_Grids()
 template<class TV> void SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>::
 Advance_To_Target_Time(const T target_time)
 {
-    example.solids_parameters.triangle_collision_parameters.steps_since_self_collision_free=0;
     bool done=false;for(int substep=1;!done;substep++){
         LOG::SCOPE scope("SUBSTEP","substep %d",substep);
 
@@ -612,8 +611,7 @@ Solid_Position_Update(const T dt)
         if(solids_parameters.triangle_collision_parameters.perform_self_collision && solids_parameters.triangle_collision_parameters.temporary_enable_collisions){
             LOG::SCOPE scope("adjust velocity for self repulsion and self collisions");
             int repulsions,collisions_found;
-            solids_evolution.Adjust_Velocity_For_Self_Repulsion_And_Self_Collisions(dt,time,repulsions,collisions_found,false);
-            solids_parameters.triangle_collision_parameters.steps_since_self_collision_free=0;}}
+            solids_evolution.Adjust_Velocity_For_Self_Repulsion_And_Self_Collisions(dt,time,repulsions,collisions_found,false);}}
     else{
         solids_evolution_callbacks->Update_Solids_Parameters(time+dt);
         solids_evolution.kinematic_evolution.Set_External_Positions(example.solid_body_collection.rigid_body_collection.rigid_body_particles.frame,time+dt);

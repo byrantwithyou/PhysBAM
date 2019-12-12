@@ -19,7 +19,7 @@ template<class TV> TRIANGLE_COLLISION_PARAMETERS<TV>::
 TRIANGLE_COLLISION_PARAMETERS()
     :perform_self_collision(true),
     initialize_collisions_without_objects(false),temporary_enable_collisions(true),repulsion_pair_update_count(0),repulsion_pair_update_frequency(INT_MAX),
-    self_collision_free_time(0),steps_since_self_collision_free(0),total_collision_loops(4),topological_hierarchy_build_count(0),topological_hierarchy_build_frequency(1),
+    self_collision_free_time(0),total_collision_loops(4),topological_hierarchy_build_count(0),topological_hierarchy_build_frequency(1),
     check_initial_mesh_for_self_intersection(false),check_mesh_for_self_intersection(true),turn_off_all_collisions(false),allow_intersections(false),
     allow_intersections_tolerance((T)1e-8),collisions_small_number((T)1e-8),collisions_repulsion_thickness((T)1e-2),clamp_repulsion_thickness(true),
     collisions_repulsion_clamp_fraction((T).9),collisions_collision_thickness((T)1e-6),repulsions_youngs_modulus((T)30),collisions_final_repulsion_youngs_modulus((T)30),
