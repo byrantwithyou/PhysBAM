@@ -340,6 +340,9 @@ Initialize()
             example.fluids_parameters.euler_solid_fluid_coupling_utilities->Update_Cut_Out_Grid();
             if(euler->timesplit && euler->thinshell) example.fluids_parameters.euler_solid_fluid_coupling_utilities->Initialize_Collision_Data();}
         if(example.fluids_parameters.analytic_test) example.Get_Analytic_Velocities(time);}
+
+    example.Post_Initialization();
+    example.Log_Parameters();
 }
 //#####################################################################
 // Function Rigid_Cluster_Fracture

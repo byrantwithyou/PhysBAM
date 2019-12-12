@@ -34,8 +34,6 @@ Execute_Main_Program()
 {
     {LOG::SCOPE scope("INITIALIZING","Initializing");
     this->Initialize();
-    example.Post_Initialization();
-    example.Log_Parameters();
     if(!example.restart) Write_Output_Files(0);}
     Simulate_To_Frame(example.last_frame);
 }
