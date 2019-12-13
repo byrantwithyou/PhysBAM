@@ -33,20 +33,11 @@ template<class TV> void SOLIDS_FLUIDS_DRIVER<TV>::
 Execute_Main_Program()
 {
     {LOG::SCOPE scope("INITIALIZING","Initializing");
-    Initialize();
+    this->Initialize();
     example.Post_Initialization();
     example.Log_Parameters();
     if(!example.restart) Write_Output_Files(0);}
     Simulate_To_Frame(example.last_frame);
-}
-//#####################################################################
-// Function Initialize
-//#####################################################################
-template<class TV> void SOLIDS_FLUIDS_DRIVER<TV>::
-Initialize()
-{
-    BASE::Initialize();
-    example.solid_body_collection.deformable_body_collection.mpi_solids=example.solid_body_collection.deformable_body_collection.mpi_solids;
 }
 //#####################################################################
 // Function Simulate_To_Frame

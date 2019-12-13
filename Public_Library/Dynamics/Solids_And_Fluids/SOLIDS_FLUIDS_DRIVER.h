@@ -40,7 +40,6 @@ public:
 //#####################################################################
     void Advance_To_Target_Time(const T target_time) override {}
     void Execute_Main_Program() override;
-    void Initialize() override;
     void Simulate_To_Frame(const int frame_input) override;
 //#####################################################################
 };
