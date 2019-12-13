@@ -426,8 +426,6 @@ Advance_To_Target_Time(const T target_time)
         T dt=Compute_Dt(time,target_time,done);
         Advance_One_Time_Step(dt);
 
-        last_dt=restart_dt?restart_dt:dt;time+=last_dt;restart_dt=0;
-
         PHYSBAM_DEBUG_WRITE_SUBSTEP("END Substep %d",0,substep);}
 }
 //#####################################################################
@@ -482,7 +480,10 @@ Advance_One_Time_Step(const T dt)
         if(fluids_parameters.compressible && (!euler->timesplit || !euler->thinshell)) fluids_parameters.euler_solid_fluid_coupling_utilities->Fill_Solid_Cells();}/*F4*/
 
     example.Postprocess_Substep(dt,time);
-    
+
+    last_dt=restart_dt?restart_dt:dt;
+    time+=last_dt;
+    restart_dt=0;
 }
 //#####################################################################
 // Function Integrate_Fluid_Non_Advection_Forces

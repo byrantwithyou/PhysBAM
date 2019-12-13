@@ -68,7 +68,6 @@ Simulate_To_Frame(const int frame_input)
     while(current_frame<frame_input){
         LOG::SCOPE scope("FRAME","Frame %d",current_frame+1);
         Preprocess_Frame(current_frame+1);
-        example.solids_evolution->kinematic_evolution.Get_Current_Kinematic_Keyframes(example.Time_At_Frame(current_frame+1)-time,time);
         Advance_To_Target_Time(example.Time_At_Frame(current_frame+1));
         Postprocess_Frame(++current_frame);
         if(example.write_output_files && example.write_substeps_level==-1) Write_Output_Files(current_frame);

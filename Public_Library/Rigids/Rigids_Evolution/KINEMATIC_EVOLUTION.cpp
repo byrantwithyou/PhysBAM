@@ -10,8 +10,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> KINEMATIC_EVOLUTION<TV>::
-KINEMATIC_EVOLUTION(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>& rigid_body_example_velocities,bool use_kinematic_keyframes_input)
-    :rigid_body_collection(rigid_body_collection_input),rigid_body_example_velocities(rigid_body_example_velocities),use_kinematic_keyframes(use_kinematic_keyframes_input)
+KINEMATIC_EVOLUTION(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>& rigid_body_example_velocities)
+    :rigid_body_collection(rigid_body_collection_input),rigid_body_example_velocities(rigid_body_example_velocities)
 {
 }
 //#####################################################################
@@ -38,10 +38,7 @@ Set_External_Velocities(TWIST<TV>& twist,const T time,const int id)
 {
     RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(id);
     if(rigid_body.is_static){twist=TWIST<TV>();return;}
-    if(!use_kinematic_keyframes){Set_Kinematic_Velocities(twist,(T)1e-3,time,id);return;} // Use 1e-3 for backward differencing if the example did not implement velocity calculations.
-    RIGID_BODY_STATE<TV> interpolated_state;
-    rigid_body.Interpolate_Between_States(kinematic_current_state(rigid_body.particle_index),kinematic_next_state(rigid_body.particle_index),time,interpolated_state);
-    twist=interpolated_state.twist;
+    Set_Kinematic_Velocities(twist,(T)1e-3,time,id);
 }
 //#####################################################################
 // Function Set_Kinematic_Velocities
@@ -59,37 +56,12 @@ Set_Kinematic_Velocities(TWIST<TV>& twist,const T frame_dt,const T time,const in
     twist=current_state.twist;
 }
 //#####################################################################
-// Function Get_Current_Kinematic_Keyframes
-//#####################################################################
-template<class TV> void KINEMATIC_EVOLUTION<TV>::
-Get_Current_Kinematic_Keyframes(const T dt,const T time)
-{
-    if(!use_kinematic_keyframes) return;
-    kinematic_current_state.Remove_All();kinematic_next_state.Remove_All();
-    kinematic_current_state.Resize(rigid_body_collection.rigid_body_particles.Size());
-    kinematic_next_state.Resize(rigid_body_collection.rigid_body_particles.Size());
-    for(int i=0;i<rigid_body_collection.kinematic_rigid_bodies.m;i++){int p=rigid_body_collection.kinematic_rigid_bodies(i);
-        kinematic_current_state(p).time=time;kinematic_next_state(p).time=time+dt;
-        rigid_body_example_velocities.Set_Kinematic_Positions(kinematic_current_state(p).frame,time,p);
-        rigid_body_example_velocities.Set_Kinematic_Positions(kinematic_next_state(p).frame,time+dt,p);
-        Set_Kinematic_Velocities(kinematic_current_state(p).twist,dt,time,p);
-        Set_Kinematic_Velocities(kinematic_next_state(p).twist,dt,time+dt,p);}
-}
-//#####################################################################
 // Function Set_External_Positions
 //#####################################################################
 template<class TV> void KINEMATIC_EVOLUTION<TV>::
 Set_External_Positions(FRAME<TV>& frame,const T time,const int id)
 {
-    RIGID_BODY<TV>* rigid_body=&rigid_body_collection.Rigid_Body(id);
-    int new_id=id;
-    int index=rigid_body->particle_index;
-    if(!use_kinematic_keyframes){
-        rigid_body_example_velocities.Set_Kinematic_Positions(frame,time,new_id);
-        return;}
-    RIGID_BODY_STATE<TV> interpolated_state;
-    rigid_body->Interpolate_Between_States(kinematic_current_state(index),kinematic_next_state(index),time,interpolated_state);
-    frame=interpolated_state.frame;
+    rigid_body_example_velocities.Set_Kinematic_Positions(frame,time,id);
 }
 //#####################################################################
 // Function Set_External_Positions

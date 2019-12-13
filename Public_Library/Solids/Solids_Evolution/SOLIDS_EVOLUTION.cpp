@@ -44,7 +44,7 @@ SOLIDS_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLE
     :solid_body_collection(solid_body_collection_input),solids_parameters(solids_parameters_input),rigid_body_collisions(0),rigid_deformable_collisions(0),time(0),
     solids_evolution_callbacks(&solids_evolution_callbacks_default),fully_implicit(false),
     GV_B(solid_body_collection.New_Generalized_Velocity()),
-    kinematic_evolution(solid_body_collection.rigid_body_collection,example_forces_and_velocities,solids_parameters.rigid_body_evolution_parameters.use_kinematic_keyframes),
+    kinematic_evolution(solid_body_collection.rigid_body_collection,example_forces_and_velocities),
     example_forces_and_velocities(example_forces_and_velocities)
 {}
 //#####################################################################

@@ -23,12 +23,9 @@ class KINEMATIC_EVOLUTION
     enum WORKAROUND {d=TV::m};
 public:
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
-    ARRAY<RIGID_BODY_STATE<TV> > kinematic_current_state; // TODO: These are sparse; compact them
-    ARRAY<RIGID_BODY_STATE<TV> > kinematic_next_state;
     RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>& rigid_body_example_velocities;
-    bool use_kinematic_keyframes;
 
-    KINEMATIC_EVOLUTION(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>& rigid_body_example_velocities,bool use_kinematic_keyframes_input);
+    KINEMATIC_EVOLUTION(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>& rigid_body_example_velocities);
     virtual ~KINEMATIC_EVOLUTION();
 
 //#####################################################################
@@ -37,7 +34,6 @@ public:
     virtual void Set_Kinematic_Velocities(TWIST<TV>& twist,const T frame_dt,const T time,const int id);
     void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time);
     virtual void Set_External_Positions(FRAME<TV>& frame,const T time,const int id);
-    void Get_Current_Kinematic_Keyframes(const T dt,const T time);
     void Reset_Kinematic_Rigid_Bodies(const T time);
 //#####################################################################
 };

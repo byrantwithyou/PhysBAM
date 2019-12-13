@@ -171,7 +171,6 @@ Initialize_Rigid_Bodies(const T frame_rate, const bool restart)
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     // initialize kinematic object positions and velocities
     if(!restart){
-        kinematic_evolution.Get_Current_Kinematic_Keyframes(1/frame_rate,time);
         kinematic_evolution.Set_External_Positions(rigid_body_collection.rigid_body_particles.frame,time);
         kinematic_evolution.Set_External_Velocities(rigid_body_collection.rigid_body_particles.twist,time,time);
         rigid_body_collection.Update_Angular_Momentum();

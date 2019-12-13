@@ -18,7 +18,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> INCOMPRESSIBLE_DRIVER<TV>::
 INCOMPRESSIBLE_DRIVER(INCOMPRESSIBLE_EXAMPLE<TV>& example)
-    :example(example),kinematic_evolution(example.rigid_body_collection,example,true)
+    :example(example),kinematic_evolution(example.rigid_body_collection,example)
 {
     DEBUG_SUBSTEPS::write_substeps_level=example.write_substeps_level;
     DEBUG_SUBSTEPS::writer=[=](const std::string& title){Write_Substep(title);};
@@ -55,7 +55,6 @@ Initialize()
 
     // initialize collision objects
     example.Initialize_Bodies();
-    kinematic_evolution.Get_Current_Kinematic_Keyframes(1/example.frame_rate,time);
     kinematic_evolution.Set_External_Positions(example.rigid_body_collection.rigid_body_particles.frame,time);
     kinematic_evolution.Set_External_Velocities(example.rigid_body_collection.rigid_body_particles.twist,time,time);
 
@@ -213,7 +212,6 @@ Simulate_To_Frame(const int frame)
 {
     while(current_frame<frame){
         LOG::SCOPE scope("FRAME","Frame %d",current_frame+1);
-        kinematic_evolution.Get_Current_Kinematic_Keyframes(example.Time_At_Frame(current_frame+1)-time,time);        
         Advance_To_Target_Time(example.Time_At_Frame(current_frame+1));
         Write_Output_Files(++output_number);
         current_frame++;}
