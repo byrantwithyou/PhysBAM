@@ -10,6 +10,7 @@
 #include <Core/Arrays/ARRAYS_FORWARD.h>
 #include <Core/Matrices/MATRIX_POLICY.h>
 #include <Core/Matrices/SYMMETRIC_MATRIX.h>
+#include <Grid_Tools/Grids/GRID.h>
 #include <Grid_PDE/Advection/ADVECTION_FORWARD.h>
 #include <Grid_PDE/Advection/ADVECTION_UNIFORM_FORWARD.h>
 #include <Incompressible/Boundaries/BOUNDARY_FORWARD.h>
