@@ -2,6 +2,9 @@
 // Copyright 2019, Craig Schroeder, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
+#include <Fluids/Fluids/FLUID_COLLECTION.h>
+#include <Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS.h>
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
 #include "FLUID_BC_PB.h"
 #include "FLUID_SOLVER_PB.h"
@@ -132,6 +135,8 @@ template<class TV> void FLUID_SOLVER_PB<TV>::
 Save(FLUID_STATE<TV>* fluid_state) const
 {
     FLUID_STATE_PB<TV>& st=dynamic_cast<FLUID_STATE_PB<TV>&>(*fluid_state);
+    st.face_velocities=driver->example.fluid_collection.incompressible_fluid_collection.face_velocities;
+    st.pressure=driver->example.fluids_parameters.incompressible->projection.p;
 }
 
 //#####################################################################
@@ -141,6 +146,8 @@ template<class TV> void FLUID_SOLVER_PB<TV>::
 Restore(const FLUID_STATE<TV>* fluid_state)
 {
     const FLUID_STATE_PB<TV>& st=dynamic_cast<const FLUID_STATE_PB<TV>&>(*fluid_state);
+    driver->example.fluid_collection.incompressible_fluid_collection.face_velocities=st.face_velocities;
+    driver->example.fluids_parameters.incompressible->projection.p=st.pressure;
 }
 
 //#####################################################################

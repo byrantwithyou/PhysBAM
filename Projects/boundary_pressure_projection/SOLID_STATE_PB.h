@@ -13,10 +13,12 @@ struct SOLID_STATE_PB:public SOLID_STATE<TV>
 {
     typedef typename TV::SCALAR T;
 
-    T time;
+    T time=0;
     ARRAY<TV> X,V;
     ARRAY<FRAME<TV> > frame;
     ARRAY<TWIST<TV> > twist;
+    int repulsion_pair_update_count=0;
+    int topological_hierarchy_build_count=0;
 
     SOLID_STATE_PB()=default;
     virtual ~SOLID_STATE_PB()=default;

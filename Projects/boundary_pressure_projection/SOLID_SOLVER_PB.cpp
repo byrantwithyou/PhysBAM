@@ -4,9 +4,11 @@
 //#####################################################################
 #include <Rigids/Particles/RIGID_BODY_PARTICLES.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
+#include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
+#include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
 #include "SOLID_BC_PB.h"
 #include "SOLID_SOLVER_PB.h"
@@ -133,6 +135,10 @@ Save(SOLID_STATE<TV>* solid_state) const
     st.twist=driver->example.solid_body_collection.rigid_body_collection.rigid_body_particles.twist;
     st.X=driver->example.solid_body_collection.deformable_body_collection.particles.X;
     st.V=driver->example.solid_body_collection.deformable_body_collection.particles.V;
+    st.repulsion_pair_update_count=
+        driver->example.solids_parameters.triangle_collision_parameters.repulsion_pair_update_count;
+    st.topological_hierarchy_build_count=
+        driver->example.solids_parameters.triangle_collision_parameters.topological_hierarchy_build_count;
 }
 
 //#####################################################################
@@ -148,6 +154,10 @@ Restore(const SOLID_STATE<TV>* solid_state)
     driver->example.solid_body_collection.rigid_body_collection.Update_Angular_Momentum();
     driver->example.solid_body_collection.deformable_body_collection.particles.X=st.X;
     driver->example.solid_body_collection.deformable_body_collection.particles.V=st.V;
+    driver->example.solids_parameters.triangle_collision_parameters.repulsion_pair_update_count=
+        st.repulsion_pair_update_count;
+    driver->example.solids_parameters.triangle_collision_parameters.topological_hierarchy_build_count=
+        st.topological_hierarchy_build_count;
 }
 
 //#####################################################################
