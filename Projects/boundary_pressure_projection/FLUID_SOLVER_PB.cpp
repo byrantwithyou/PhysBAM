@@ -156,7 +156,8 @@ Restore(const FLUID_STATE<TV>* fluid_state)
 template<class TV> auto FLUID_SOLVER_PB<TV>::
 Diff_u(const FLUID_STATE<TV>* fluid_state) const -> T
 {
-    return 0;
+    const FLUID_STATE_PB<TV>& st=dynamic_cast<const FLUID_STATE_PB<TV>&>(*fluid_state);
+    return (driver->example.fluid_collection.incompressible_fluid_collection.face_velocities.array-st.face_velocities.array).Max_Abs();
 }
 
 //#####################################################################
@@ -165,7 +166,8 @@ Diff_u(const FLUID_STATE<TV>* fluid_state) const -> T
 template<class TV> auto FLUID_SOLVER_PB<TV>::
 Diff_p(const FLUID_STATE<TV>* fluid_state) const -> T
 {
-    return 0;
+    const FLUID_STATE_PB<TV>& st=dynamic_cast<const FLUID_STATE_PB<TV>&>(*fluid_state);
+    return (driver->example.fluids_parameters.incompressible->projection.p.array-st.pressure.array).Max_Abs();
 }
 
 template class FLUID_SOLVER_PB<VECTOR<float,2> >;

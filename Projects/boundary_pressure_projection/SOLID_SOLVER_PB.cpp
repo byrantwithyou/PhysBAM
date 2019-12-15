@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Rigids/Particles/RIGID_BODY_PARTICLES.h>
+#include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
@@ -160,13 +161,31 @@ Restore(const SOLID_STATE<TV>* solid_state)
         st.topological_hierarchy_build_count;
 }
 
+template<class T> T Max_Rot_Disp(const ROTATION<VECTOR<T,3> >& R){return 2*R.Quaternion().v.Magnitude();}
+template<class T> T Max_Rot_Disp(const ROTATION<VECTOR<T,2> >& R){return abs(R.Complex()-(T)1);}
+template<class T> T Max_Rot_Disp(const ROTATION<VECTOR<T,1> >& R){return 0;}
+
 //#####################################################################
 // Function Diff_x
 //#####################################################################
 template<class TV> auto SOLID_SOLVER_PB<TV>::
 Diff_x(const SOLID_STATE<TV>* solid_state) const -> T
 {
-    return 0;
+    const SOLID_STATE_PB<TV>& st=dynamic_cast<const SOLID_STATE_PB<TV>&>(*solid_state);
+    T diff_d=(driver->example.solid_body_collection.deformable_body_collection.particles.X-st.X).Maximum_Magnitude();
+    auto& frame=driver->example.solid_body_collection.rigid_body_collection.rigid_body_particles.frame;
+    auto& rb=driver->example.solid_body_collection.rigid_body_collection.rigid_body_particles.rigid_body;
+
+    T diff_r=0;
+    for(int i=0;i<st.frame.m;i++)
+    {
+        const FRAME<TV> &f1=frame(i),&f0=st.frame(i);
+        T dist_t=(f1.t-f0.t).Magnitude();
+        T dist_r=rb(i)->Object_Space_Bounding_Box().Edge_Lengths().Magnitude()*Max_Rot_Disp(f1.r*f0.r.Inverse());
+        diff_r=max(diff_r,dist_t+dist_r);
+    }
+
+    return max(diff_d,diff_r);
 }
 
 //#####################################################################
@@ -175,7 +194,21 @@ Diff_x(const SOLID_STATE<TV>* solid_state) const -> T
 template<class TV> auto SOLID_SOLVER_PB<TV>::
 Diff_v(const SOLID_STATE<TV>* solid_state) const -> T
 {
-    return 0;
+    const SOLID_STATE_PB<TV>& st=dynamic_cast<const SOLID_STATE_PB<TV>&>(*solid_state);
+    T diff_d=(driver->example.solid_body_collection.deformable_body_collection.particles.V-st.V).Maximum_Magnitude();
+    auto& twist=driver->example.solid_body_collection.rigid_body_collection.rigid_body_particles.twist;
+    auto& rb=driver->example.solid_body_collection.rigid_body_collection.rigid_body_particles.rigid_body;
+
+    T diff_r=0;
+    for(int i=0;i<st.twist.m;i++)
+    {
+        const TWIST<TV> &f1=twist(i),&f0=st.twist(i);
+        T dist_t=(f1.linear-f0.linear).Magnitude();
+        T dist_r=rb(i)->Object_Space_Bounding_Box().Edge_Lengths().Magnitude()*(f1.angular-f0.angular).Magnitude();
+        diff_r=max(diff_r,dist_t+dist_r);
+    }
+
+    return max(diff_d,diff_r);
 }
 
 template class SOLID_SOLVER_PB<VECTOR<float,2> >;
