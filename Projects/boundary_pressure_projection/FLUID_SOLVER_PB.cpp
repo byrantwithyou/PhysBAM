@@ -77,6 +77,7 @@ Simulate_Time_Step(FLUID_BC<TV>* bc,T time,T dt)
 template<class TV> void FLUID_SOLVER_PB<TV>::
 Predict_Time_Step(T time,T dt)
 {
+    // Predict that the state does not change.
 }
 
 //#####################################################################
