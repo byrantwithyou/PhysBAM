@@ -15,9 +15,6 @@ void Run_Test(PARSE_ARGS& parse_args,STREAM_TYPE stream_type)
 {
     OD_EXAMPLE<TV>* example=new STANDARD_TESTS<TV>(stream_type,parse_args);
 
-    Create_Directory(example->viewer_dir.output_directory+"/common");
-    LOG::Instance()->Copy_Log_To_File(example->viewer_dir.output_directory+"/common/log.txt",example->restart);
-
     OD_SOLVER<TV>* solver=new OD_SOLVER<TV>(*example);
     OD_DRIVER<TV> driver(*example,*solver);
     driver.Execute_Main_Program();

@@ -48,14 +48,10 @@ template<class TV> struct ANALYTIC_TEST;
 template<class T,int d>
 void Dump_Frame(const ARRAY<T,FACE_INDEX<d> >& u,const char* title)
 {
-    static int frame=0;
-    char buff[100];
-    sprintf(buff, "%s/%i",viewer_dir.output_directory.c_str(), frame);
-    Create_Directory(buff);
-    Write_To_File<RW>((std::string)buff+"/mac_velocities.gz",u);
-    if(title) Write_To_Text_File((std::string)buff+"/frame_title",title);
+    viewer_dir.Start_Directory(0,title);
+    Write_To_File<RW>(viewer_dir.current_directory+"/mac_velocities.gz",u);
     Get_Debug_Particles<VECTOR<T,d> >().Write_Debug_Particles(STREAM_TYPE((RW())),viewer_dir);
-    frame++;
+    viewer_dir.Finish_Directory();
 }
 
 template<class T,class TV>
@@ -697,9 +693,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
 
     Global_Grid(&grid);
 
-    Create_Directory(viewer_dir.output_directory);
-    Create_Directory(viewer_dir.output_directory+"/common");
-    LOG::Instance()->Copy_Log_To_File(viewer_dir.output_directory+"/common/log.txt",false);
+    viewer_dir.Make_Common_Directory();
     Write_To_File<RW>(viewer_dir.output_directory+"/common/grid.gz",grid);
 
     Analytic_Test(grid,*test,max_iter,use_preconditioner,null,dump_matrix,debug_particles);

@@ -15,9 +15,6 @@ void Run_Test(PARSE_ARGS& parse_args,STREAM_TYPE stream_type)
 {
     PBD_EXAMPLE<TV>* example=new STANDARD_TESTS<TV>(stream_type,parse_args);
 
-    Create_Directory(example->viewer_dir.output_directory+"/common");
-    LOG::Instance()->Copy_Log_To_File(example->viewer_dir.output_directory+"/common/log.txt",example->restart);
-
     PBD_DRIVER<TV> driver(*example);
     driver.Execute_Main_Program();
     delete example;

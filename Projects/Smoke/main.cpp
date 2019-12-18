@@ -188,10 +188,6 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
         LOG::cout<<"ERROR: MPI initialized? Shouldn't reach here."<<std::endl;
         example->mpi_grid=new MPI_UNIFORM_GRID<TV>(example->grid,5);
         if(example->mpi_grid->Number_Of_Processors()>1) example->viewer_dir.output_directory+=LOG::sprintf("/%d",(mpi_world.rank+1));}
-
-    // OUTPUT DIR
-    Create_Directory(example->viewer_dir.output_directory+"/common");
-    LOG::Instance()->Copy_Log_To_File(example->viewer_dir.output_directory+"/common/log.txt",false);
     
     // DRIVER MAIN LOOP
     SMOKE_DRIVER<TV> driver(*example);
