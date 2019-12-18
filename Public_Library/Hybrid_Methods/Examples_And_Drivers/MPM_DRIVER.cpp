@@ -403,8 +403,12 @@ Grid_To_Particle()
         {
             MATRIX<T,TV::m> A=dt*h.grad_Vp+1;
             if(example.quad_F_coeff) A+=sqr(dt*h.grad_Vp)*example.quad_F_coeff;
-            particles.F(p)=A*particles.F(p);
-            if(example.dilation_only) particles.F(p)=MATRIX<T,TV::m>()+pow<1,TV::m>(particles.F(p).Determinant());
+            if(example.dilation_only)
+            {
+                T J=particles.F(p).Determinant()*(dt*h.grad_Vp.Trace()+1);
+                particles.F(p)=MATRIX<T,TV::m>()+pow<1,TV::m>(J);
+            }
+            else particles.F(p)=A*particles.F(p);
             TV xp_new;
             if(example.use_midpoint) xp_new=particles.X(p)+dt/2*(h.V_weight_old+h.V_pic);
             else xp_new=particles.X(p)+dt*h.V_pic;
@@ -491,7 +495,8 @@ Grid_To_Particle_Limit_Dt()
         },
         [this,dt](int p,HELPER& h)
         {
-            Enforce_Limit_Max(h.s,example.cfl_F,dt*h.grad_Vp,dt*h.grad_Vp_s);
+            if(example.dilation_only) Enforce_Limit_Max(h.s,example.cfl_F,dt*h.grad_Vp.Trace(),dt*h.grad_Vp_s.Trace());
+            else Enforce_Limit_Max(h.s,example.cfl_F,dt*h.grad_Vp,dt*h.grad_Vp_s);
             TV xp_new_s,xp_new_s2;
             if(example.use_midpoint){xp_new_s=dt/2*(h.V_weight_old+h.V_pic);xp_new_s2=dt/2*h.V_pic_s;}
             else{xp_new_s=dt*h.V_pic;xp_new_s2=dt*h.V_pic_s;}
