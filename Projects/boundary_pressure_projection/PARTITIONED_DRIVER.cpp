@@ -65,7 +65,7 @@ Initialize()
     fluid_old_state=fluid_solver->Make_State();
     fluid_prev_state=fluid_solver->Make_State();
     fluid_bc=fluid_solver->Make_BC();
-    
+
     solid_solver->Initialize();
     solid_new_state=solid_solver->Make_State();
     solid_old_state=solid_solver->Make_State();
@@ -120,18 +120,22 @@ Simulate_Time_Step(T dt)
 
     fluid_solver->Predict_Time_Step(time,dt);
 
-    for(int i=1;i<=max_subiterations;i++)
+    // BPP p0 init
+
+    for(int i=0;i<max_subiterations;i++)
     {
         interface->Compute_BC(fluid_solver,solid_bc,time,dt);
         solid_solver->Restore(solid_old_state);
         solid_solver->Simulate_Time_Step(solid_bc,time,dt);
+
+        // BPP solve for p0 here
 
         interface->Compute_BC(solid_solver,fluid_bc,time,dt);
         fluid_solver->Restore(fluid_old_state);
         fluid_solver->Simulate_Time_Step(fluid_bc,time,dt);
 
         // Must wait for two states to be available to compute convergence
-        if(i>1 && Is_Subiteration_Converged())
+        if(i>0 && Is_Subiteration_Converged())
             break;
 
         solid_solver->Save(solid_prev_state);
