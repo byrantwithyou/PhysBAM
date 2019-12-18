@@ -9,6 +9,7 @@ namespace PhysBAM{
 
 template<class TV> class FLUID_STATE;
 template<class TV> class FLUID_BC;
+template<class TV> class FLUID_BOUNDARY_VECTOR;
 
 template<class TV>
 class FLUID_SOLVER
@@ -31,11 +32,14 @@ public:
     virtual void After_Frame(int frame)=0;
     virtual FLUID_STATE<TV>* Make_State() const=0;
     virtual FLUID_BC<TV>* Make_BC() const=0;
-
+    virtual FLUID_BOUNDARY_VECTOR<TV>* Make_Boundary_Vector() const=0;
+    
     virtual void Save(FLUID_STATE<TV>* fluid_state) const=0;
     virtual void Restore(const FLUID_STATE<TV>* fluid_state)=0;
     virtual T Diff_u(const FLUID_STATE<TV>* fluid_state) const=0;
     virtual T Diff_p(const FLUID_STATE<TV>* fluid_state) const=0;
+
+    virtual void Get_Constraints(ARRAY<FLUID_BOUNDARY_VECTOR<TV>*>& array) const=0;
 };
 }
 #endif

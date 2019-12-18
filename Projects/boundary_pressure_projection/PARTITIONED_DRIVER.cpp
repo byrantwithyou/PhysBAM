@@ -3,11 +3,14 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Log/LOG.h>
+#include <Core/Matrices/MATRIX_MXN.h>
 #include "FLUID_BC.h"
+#include "FLUID_BOUNDARY_VECTOR.h"
 #include "FLUID_SOLVER.h"
 #include "FLUID_STATE.h"
 #include "PARTITIONED_DRIVER.h"
 #include "SOLID_BC.h"
+#include "SOLID_BOUNDARY_VECTOR.h"
 #include "SOLID_FLUID_INTERFACE.h"
 #include "SOLID_SOLVER.h"
 #include "SOLID_STATE.h"
@@ -120,15 +123,13 @@ Simulate_Time_Step(T dt)
 
     fluid_solver->Predict_Time_Step(time,dt);
 
-    // BPP p0 init
-
     for(int i=0;i<max_subiterations;i++)
     {
         interface->Compute_BC(fluid_solver,solid_bc,time,dt);
         solid_solver->Restore(solid_old_state);
         solid_solver->Simulate_Time_Step(solid_bc,time,dt);
 
-        // BPP solve for p0 here
+        if(use_bpp) BPP_Projection(dt); // NOTE: this chanages solid velocity
 
         interface->Compute_BC(solid_solver,fluid_bc,time,dt);
         fluid_solver->Restore(fluid_old_state);
@@ -141,6 +142,54 @@ Simulate_Time_Step(T dt)
         solid_solver->Save(solid_prev_state);
         fluid_solver->Save(fluid_prev_state);
     }
+}
+
+//#####################################################################
+// Function BPP_Projection
+//#####################################################################
+template<class TV> void PARTITIONED_DRIVER<TV>::
+BPP_Projection(T dt)
+{
+    ARRAY<FLUID_BOUNDARY_VECTOR<TV>*> C;
+    fluid_solver->Get_Constraints(C);
+
+    if(p0.m!=C.m) p0.Resize(C.m,init_all);
+
+    SOLID_BOUNDARY_VECTOR<TV>* solid_velocity=solid_solver->Make_Boundary_Vector();
+    interface->Get_Boundary(solid_velocity);
+    solid_solver->Fill_Boundary_Vector(solid_velocity);
+
+    ARRAY<SOLID_BOUNDARY_VECTOR<TV>*> Cs(C.m);
+    ARRAY<SOLID_BOUNDARY_VECTOR<TV>*> Mi_Cs(C.m);
+    ARRAY<T> rhs(C.m);
+
+    for(int i=0;i<C.m;i++)
+    {
+        Cs(i)=solid_solver->Make_Boundary_Vector();
+        interface->Distribute_Force(Cs(i),C(i));
+
+        Mi_Cs(i)=solid_solver->Make_Boundary_Vector();
+        solid_solver->Mass_Inverse(Mi_Cs(i),Cs(i));
+
+        rhs(i)=-solid_solver->Inner_Product(Cs(i),solid_velocity);
+    }
+
+    MATRIX_MXN<T> M(C.m);
+    for(int i=0;i<C.m;i++)
+        for(int j=0;j<=i;j++)
+            M(i,j)=M(j,i)=solid_solver->Inner_Product(Cs(i),Mi_Cs(j));
+
+    ARRAY<T> dp0=M.Cholesky_Solve(rhs);
+
+    p0+=dp0/dt;
+
+    for(int i=0;i<dp0.m;i++)
+        solid_solver->Apply_Velocity_Change(dp0(i),Mi_Cs(i));
+
+    C.Delete_Pointers_And_Clean_Memory();
+    Cs.Delete_Pointers_And_Clean_Memory();
+    Mi_Cs.Delete_Pointers_And_Clean_Memory();
+    delete solid_velocity;
 }
 
 //#####################################################################

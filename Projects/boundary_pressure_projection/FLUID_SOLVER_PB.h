@@ -32,13 +32,17 @@ public:
     virtual void After_Time_Step(T time,T dt) override;
     virtual void Before_Frame(int frame) override;
     virtual void After_Frame(int frame) override;
+
     virtual FLUID_STATE<TV>* Make_State() const override;
     virtual FLUID_BC<TV>* Make_BC() const override;
+    virtual FLUID_BOUNDARY_VECTOR<TV>* Make_Boundary_Vector() const override;
 
     virtual void Save(FLUID_STATE<TV>* fluid_state) const override;
     virtual void Restore(const FLUID_STATE<TV>* fluid_state) override;
     virtual T Diff_u(const FLUID_STATE<TV>* fluid_state) const override;
     virtual T Diff_p(const FLUID_STATE<TV>* fluid_state) const override;
+
+    virtual void Get_Constraints(ARRAY<FLUID_BOUNDARY_VECTOR<TV>*>& array) const override;
 };
 }
 #endif

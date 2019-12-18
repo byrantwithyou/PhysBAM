@@ -2,6 +2,7 @@
 // Copyright 2019, Craig Schroeder, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Vectors/TWIST.h>
 #include <Rigids/Particles/RIGID_BODY_PARTICLES.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
@@ -12,6 +13,7 @@
 #include <Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
 #include "SOLID_BC_PB.h"
+#include "SOLID_BOUNDARY_VECTOR_PB.h"
 #include "SOLID_SOLVER_PB.h"
 #include "SOLID_STATE_PB.h"
 namespace PhysBAM{
@@ -209,6 +211,93 @@ Diff_v(const SOLID_STATE<TV>* solid_state) const -> T
     }
 
     return max(diff_d,diff_r);
+}
+
+//#####################################################################
+// Function Make_Boundary_Vector
+//#####################################################################
+template<class TV> SOLID_BOUNDARY_VECTOR<TV>* SOLID_SOLVER_PB<TV>::
+Make_Boundary_Vector() const
+{
+    return new SOLID_BOUNDARY_VECTOR_PB<TV>;
+}
+
+//#####################################################################
+// Function Fill_Boundary_Vector
+//#####################################################################
+template<class TV> void SOLID_SOLVER_PB<TV>::
+Fill_Boundary_Vector(SOLID_BOUNDARY_VECTOR<TV>* v) const
+{
+    SOLID_BOUNDARY_VECTOR_PB<TV>& bv=dynamic_cast<SOLID_BOUNDARY_VECTOR_PB<TV>&>(*v);
+    const auto& V=driver->example.solid_body_collection.deformable_body_collection.particles.V;
+    const auto& twist=driver->example.solid_body_collection.rigid_body_collection.rigid_body_particles.twist;
+
+    for(auto& p:bv.V)
+        p.data=V(p.key);
+
+    for(auto& p:bv.twist)
+        p.data=twist(p.key);
+}
+
+//#####################################################################
+// Function Apply_Velocity_Change
+//#####################################################################
+template<class TV> void SOLID_SOLVER_PB<TV>::
+Apply_Velocity_Change(T c,const SOLID_BOUNDARY_VECTOR<TV>* v) const
+{
+    const SOLID_BOUNDARY_VECTOR_PB<TV>& bv=dynamic_cast<const SOLID_BOUNDARY_VECTOR_PB<TV>&>(*v);
+    auto& V=driver->example.solid_body_collection.deformable_body_collection.particles.V;
+    auto& twist=driver->example.solid_body_collection.rigid_body_collection.rigid_body_particles.twist;
+
+    for(const auto& p:bv.V)
+        V(p.key)+=c*p.data;
+
+    for(const auto& p:bv.twist)
+        twist(p.key)+=c*p.data;
+}
+
+//#####################################################################
+// Function Inner_Product
+//#####################################################################
+template<class TV> auto SOLID_SOLVER_PB<TV>::
+Inner_Product(const SOLID_BOUNDARY_VECTOR<TV>* u, const SOLID_BOUNDARY_VECTOR<TV>* v) -> T
+{
+    const SOLID_BOUNDARY_VECTOR_PB<TV>& bu=dynamic_cast<const SOLID_BOUNDARY_VECTOR_PB<TV>&>(*u);
+    const SOLID_BOUNDARY_VECTOR_PB<TV>& bv=dynamic_cast<const SOLID_BOUNDARY_VECTOR_PB<TV>&>(*v);
+    T x=0;
+    TV y;
+    TWIST<TV> z;
+
+    for(const auto& p:bv.V)
+        if(bu.V.Get(p.key,y))
+            x+=p.data.Dot(y);
+
+    for(const auto& p:bv.twist)
+        if(bu.twist.Get(p.key,z))
+            x+=p.data.Dot(z);
+
+    return x;
+}
+
+//#####################################################################
+// Function Mass_Inverse
+//#####################################################################
+template<class TV> void SOLID_SOLVER_PB<TV>::
+Mass_Inverse(SOLID_BOUNDARY_VECTOR<TV>* u, const SOLID_BOUNDARY_VECTOR<TV>* v)
+{
+    SOLID_BOUNDARY_VECTOR_PB<TV>& bu=dynamic_cast<SOLID_BOUNDARY_VECTOR_PB<TV>&>(*u);
+    const SOLID_BOUNDARY_VECTOR_PB<TV>& bv=dynamic_cast<const SOLID_BOUNDARY_VECTOR_PB<TV>&>(*v);
+    bu.V.Remove_All();
+    bu.twist.Remove_All();
+
+    const auto& mi=driver->example.solid_body_collection.deformable_body_collection.particles.one_over_mass;
+    const auto& rb=driver->example.solid_body_collection.rigid_body_collection.rigid_body_particles.rigid_body;
+
+    for(const auto& p:bv.V)
+        bu.V.Set(p.key,mi(p.key)*p.data);
+
+    for(const auto& p:bv.twist)
+        bu.twist.Set(p.key,rb(p.key)->Inertia_Inverse_Times(p.data));
 }
 
 template class SOLID_SOLVER_PB<VECTOR<float,2> >;

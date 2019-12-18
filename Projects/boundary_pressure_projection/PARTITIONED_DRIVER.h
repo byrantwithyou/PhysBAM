@@ -33,6 +33,7 @@ public:
     T min_dt = 0;
     T fixed_dt = 0;
     int max_subiterations = INT_MAX;
+    bool use_bpp = false;
 
     T utol=0;
     T ptol=0;
@@ -51,6 +52,8 @@ private:
     FLUID_BC<TV> * fluid_bc = 0;
     SOLID_BC<TV> * solid_bc = 0;
 
+    ARRAY<T> p0;
+    
 public:
     PARTITIONED_DRIVER();
     ~PARTITIONED_DRIVER();
@@ -64,6 +67,7 @@ private:
     void Read(int frame);
     T Compute_Dt(T target_time,bool& done) const;
     bool Is_Subiteration_Converged() const;
+    void BPP_Projection(T dt);
 };
 }
 #endif

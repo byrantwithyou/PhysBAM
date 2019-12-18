@@ -24,6 +24,30 @@ Compute_BC(SOLID_SOLVER<TV>* solid_solver,FLUID_BC<TV>* fluid_bc,T time,T dt) co
     LOG::printf("DO THIS: %s\n",__PRETTY_FUNCTION__);
 }
 
+//#####################################################################
+// Function Interpolate_Velocity
+//#####################################################################
+template<class TV> void SOLID_FLUID_INTERFACE_PB<TV>::
+Interpolate_Velocity(FLUID_BOUNDARY_VECTOR<TV>* u, const SOLID_BOUNDARY_VECTOR<TV>* v)
+{
+}
+
+//#####################################################################
+// Function Distribute_Force
+//#####################################################################
+template<class TV> void SOLID_FLUID_INTERFACE_PB<TV>::
+Distribute_Force(SOLID_BOUNDARY_VECTOR<TV>* v, const FLUID_BOUNDARY_VECTOR<TV>* u)
+{
+}
+
+//#####################################################################
+// Function Get_Boundary
+//#####################################################################
+template<class TV> void SOLID_FLUID_INTERFACE_PB<TV>::
+Get_Boundary(SOLID_BOUNDARY_VECTOR<TV>* v)
+{
+}
+
 template class SOLID_FLUID_INTERFACE_PB<VECTOR<float,2> >;
 template class SOLID_FLUID_INTERFACE_PB<VECTOR<float,3> >;
 template class SOLID_FLUID_INTERFACE_PB<VECTOR<double,2> >;

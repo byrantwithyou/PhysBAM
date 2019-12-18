@@ -33,11 +33,17 @@ public:
     virtual void After_Frame(int frame) override;
     virtual SOLID_STATE<TV>* Make_State() const override;
     virtual SOLID_BC<TV>* Make_BC() const override;
+    virtual SOLID_BOUNDARY_VECTOR<TV>* Make_Boundary_Vector() const override;
 
     virtual void Save(SOLID_STATE<TV>* solid_state) const override;
     virtual void Restore(const SOLID_STATE<TV>* solid_state) override;
     virtual T Diff_x(const SOLID_STATE<TV>* solid_state) const override;
     virtual T Diff_v(const SOLID_STATE<TV>* solid_state) const override;
+
+    virtual void Fill_Boundary_Vector(SOLID_BOUNDARY_VECTOR<TV>* v) const override;
+    virtual void Apply_Velocity_Change(T c,const SOLID_BOUNDARY_VECTOR<TV>* v) const override;
+    virtual T Inner_Product(const SOLID_BOUNDARY_VECTOR<TV>* u, const SOLID_BOUNDARY_VECTOR<TV>* v) override;
+    virtual void Mass_Inverse(SOLID_BOUNDARY_VECTOR<TV>* u, const SOLID_BOUNDARY_VECTOR<TV>* v) override;
 };
 }
 #endif

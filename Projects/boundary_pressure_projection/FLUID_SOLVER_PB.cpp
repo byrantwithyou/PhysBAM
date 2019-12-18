@@ -171,6 +171,23 @@ Diff_p(const FLUID_STATE<TV>* fluid_state) const -> T
     return (driver->example.fluids_parameters.incompressible->projection.p.array-st.pressure.array).Max_Abs();
 }
 
+//#####################################################################
+// Function Get_Constraints
+//#####################################################################
+template<class TV> void FLUID_SOLVER_PB<TV>::
+Get_Constraints(ARRAY<FLUID_BOUNDARY_VECTOR<TV>*>& array) const
+{
+}
+
+//#####################################################################
+// Function Make_Boundary_Vector
+//#####################################################################
+template<class TV> FLUID_BOUNDARY_VECTOR<TV>* FLUID_SOLVER_PB<TV>::
+Make_Boundary_Vector() const
+{
+    return 0;
+}
+
 template class FLUID_SOLVER_PB<VECTOR<float,2> >;
 template class FLUID_SOLVER_PB<VECTOR<float,3> >;
 template class FLUID_SOLVER_PB<VECTOR<double,2> >;

@@ -24,6 +24,10 @@ public:
 
     virtual void Compute_BC(FLUID_SOLVER<TV>* fluid_solver,SOLID_BC<TV>* solid_bc,T time,T dt) const override;
     virtual void Compute_BC(SOLID_SOLVER<TV>* solid_solver,FLUID_BC<TV>* fluid_bc,T time,T dt) const override;
+
+    virtual void Interpolate_Velocity(FLUID_BOUNDARY_VECTOR<TV>* u, const SOLID_BOUNDARY_VECTOR<TV>* v) override;
+    virtual void Distribute_Force(SOLID_BOUNDARY_VECTOR<TV>* v, const FLUID_BOUNDARY_VECTOR<TV>* u) override;
+    virtual void Get_Boundary(SOLID_BOUNDARY_VECTOR<TV>* v) override;
 };
 }
 #endif
