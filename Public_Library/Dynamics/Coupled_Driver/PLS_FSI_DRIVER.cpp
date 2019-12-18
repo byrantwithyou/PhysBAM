@@ -112,12 +112,9 @@ Initialize()
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<TV>& collision_bodies_affecting_fluid=*example.fluids_parameters.collision_bodies_affecting_fluid;
 
     if(example.auto_restart){
-        std::string last_frame_file=example.viewer_dir.output_directory+"/common/last_frame";
-        int last_frame;
-        Read_From_Text_File(last_frame_file,last_frame);
+        example.viewer_dir.Read_Last_Frame(0);
         example.restart=true;
-        example.restart_frame=last_frame;
-        LOG::cout<<"Auto Restart from frame "<<last_frame<<" (from file "<<last_frame_file<<")"<<std::endl;}
+        example.restart_frame=example.viewer_dir.frame_stack(0);}
     if(example.restart) current_frame=example.restart_frame;
     else current_frame=0;
     output_number=current_frame;

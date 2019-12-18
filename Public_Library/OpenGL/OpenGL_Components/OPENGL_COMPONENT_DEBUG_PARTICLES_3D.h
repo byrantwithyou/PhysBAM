@@ -65,7 +65,7 @@ public:
     bool draw_velocities=false;
     bool draw_arrows=true;
     T scale_velocities=(T).025;
-    bool wireframe_only;
+    bool wireframe_only=false;
 
 private:
     std::string filename;

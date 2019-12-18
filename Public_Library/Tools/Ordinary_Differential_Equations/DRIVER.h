@@ -33,7 +33,6 @@ public:
     virtual void Initialize();
     virtual void Advance_To_Target_Time(const T target_time)=0;
     virtual void Write_Substep(const std::string& title);
-    virtual void Read_Last_Frame();
     virtual void Simulate_To_Frame(const int frame);
     virtual void Write_Output_Files();
 //#####################################################################

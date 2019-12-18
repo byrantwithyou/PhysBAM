@@ -26,7 +26,7 @@ void VIEWER_DIR::Advance_Directory(int substep_level)
     }
     else
     {
-        assert((unsigned)substep_level<10);
+        assert((unsigned)substep_level<=max_substep_level);
         frame_stack.Resize(substep_level+1);
         frame_stack.Last()++;
     }
@@ -71,7 +71,7 @@ bool VIEWER_DIR::Find_Next_Directory(int substep_level)
 {
     ARRAY<int> stack_save=frame_stack;
     std::string dir_save=current_directory;
-    assert(substep_level>=0 && substep_level<10);
+    assert(substep_level>=0 && substep_level<=max_substep_level);
     int last_level=frame_stack.m-1;
     for(int i=frame_stack.m;i<=substep_level;i++)
     {
@@ -128,6 +128,14 @@ void VIEWER_DIR::Read_Last_Frame(ARRAY<int>& stack) const
     std::ifstream lf(output_directory+"/common/last_frame");
     getline(lf,line);
     Parse_Frame(stack, line);
+}
+
+void VIEWER_DIR::Read_Last_Frame(int substep_level)
+{
+    Read_Last_Frame(frame_stack);
+    if(frame_stack.m>substep_level+1)
+        frame_stack.Resize(substep_level+1);
+    Update_Current_Directory();
 }
 
 void VIEWER_DIR::Parse_Frame(ARRAY<int>& stack, const char* frame_string) const

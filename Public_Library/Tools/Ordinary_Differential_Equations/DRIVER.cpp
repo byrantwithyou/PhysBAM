@@ -42,7 +42,10 @@ Initialize()
 {
     // setup time
     example.Setup_Log();
-    if(example.auto_restart){Read_Last_Frame();example.restart=true;}
+    if(example.auto_restart){
+        example.viewer_dir.Read_Last_Frame(0);
+        example.restart=true;
+        example.restart_frame=example.viewer_dir.frame_stack(0);}
     if(example.restart) current_frame=example.restart_frame;
     else current_frame=0;
     output_number=current_frame;
@@ -70,16 +73,6 @@ Simulate_To_Frame(const int frame)
         Advance_To_Target_Time(example.Time_At_Frame(current_frame+1));
         Write_Output_Files();
         current_frame++;}
-}
-//#####################################################################
-// Function Read_Last_Frame
-//#####################################################################
-template<class TV> void DRIVER<TV>::
-Read_Last_Frame()
-{
-    std::string filename=LOG::sprintf("%s/common/last_frame",example.viewer_dir.output_directory.c_str());
-    if(File_Exists(filename))
-        Read_From_Text_File(filename, example.restart_frame);
 }
 //#####################################################################
 // Write_Output_Files

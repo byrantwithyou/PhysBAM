@@ -12,6 +12,7 @@
 namespace PhysBAM{
 struct VIEWER_DIR
 {
+    static const int max_substep_level = 10;
     std::string output_directory;
     std::string current_directory;
     ARRAY<int> frame_stack;
@@ -36,8 +37,7 @@ struct VIEWER_DIR
     bool Find_Next_Directory(int substep_level);
     bool Find_Prev_Directory(int substep_level);
     void Read_Last_Frame(ARRAY<int>& stack) const;
-    void Read_Last_Frame()
-    {Read_Last_Frame(frame_stack);}
+    void Read_Last_Frame(int substep_level=max_substep_level);
     void Set(int frame);
     void Set(const std::string& frame_string)
     {Set(frame_string.c_str());}
