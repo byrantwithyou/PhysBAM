@@ -60,19 +60,22 @@ public:
         if(!this->user_output_directory)
             viewer_dir.output_directory="Flow_Past_Circle/output";
 
-        parse_args.Add("-viscosity",&fluids_parameters.viscosity,"value","viscosity");
+        parse_args.Add("-viscosity",&fluids_parameters.viscosity,&fluids_parameters.implicit_viscosity,"value","viscosity");
         parse_args.Add("-enlarge",&opt_enlarge,"value","Enlarge");
         parse_args.Add("-shed",&shed,"shed");
         parse_args.Parse();
 
+        if(opt_enlarge) circle.radius+=fluids_parameters.grid->dX.Min();
+        if(!fluids_parameters.implicit_viscosity)
+        {
+            if(shed) fluids_parameters.viscosity=(T).01;
+            else fluids_parameters.viscosity=(T).1;
+            fluids_parameters.implicit_viscosity=true;
+        }
+        if(shed) circle.center=TV();
         solids_tests.data_directory=data_directory;
         if(shed) fluids_parameters.grid->Initialize(TV_INT((int)(2.5*resolution)+1,resolution+1),RANGE<TV>(TV(-(T)2.5,-(T)3.5),TV(15,(T)3.5)));
         else fluids_parameters.grid->Initialize(TV_INT(resolution+1,resolution+1),RANGE<TV>(TV(0,0),TV(4,4)));
-        if(fluids_parameters.viscosity) fluids_parameters.implicit_viscosity=true;
-        if(opt_enlarge) circle.radius+=fluids_parameters.grid->dX.Min();
-        if(shed) fluids_parameters.viscosity=(T).01;
-        else fluids_parameters.viscosity=(T).1;
-        if(shed) circle.center=TV();
     }
     
     ~FLOW_PAST_CIRCLE()
@@ -97,7 +100,7 @@ void Get_Source_Velocities(ARRAY<T,FACE_INDEX<2> >& face_velocities,ARRAY<bool,F
     GRID<TV> u_grid=fluids_parameters.grid->Get_Face_Grid(0),v_grid=fluids_parameters.grid->Get_Face_Grid(1);
     T flow_speed=(T)1;
     for(int j=0;j<u_grid.counts.y;j++){
-        FACE_INDEX<2> a(1,TV_INT(1,j)),b(1,TV_INT(u_grid.counts.x,j));
+        FACE_INDEX<2> a(0,TV_INT(0,j)),b(0,TV_INT(u_grid.counts.x-1,j));
         face_velocities(a)=flow_speed;
         psi_N(a)=true;}
 }
