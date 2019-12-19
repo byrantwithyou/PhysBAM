@@ -349,7 +349,6 @@ template<class T_EXAMPLE> static void Set_Example_Common_Parameters_From_Paramet
     parameter_list.Get_Parameter_In_Place("last_frame",example.last_frame);
     parameter_list.Get_Parameter_In_Place("frame_rate",example.frame_rate);
     parameter_list.Get_Parameter_In_Place("restart",example.restart);
-    parameter_list.Get_Parameter_In_Place("restart_frame",example.restart_frame);
     parameter_list.Get_Parameter_In_Place("verbose_dt",example.solids_parameters.verbose_dt);
     //parameter_list.Get_Parameter_In_Place("use_collision_aware_velocity_extrapolation",example.use_collision_aware_velocity_extrapolation);
     //parameter_list.Get_Parameter_In_Place("use_collision_aware_signed_distance",example.use_collision_aware_signed_distance);

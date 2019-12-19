@@ -24,7 +24,7 @@ class CLOTH_SPHERES_EXAMPLE:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
 public:
     typedef T_input T;typedef VECTOR<T,3> TV;
     typedef SOLIDS_EXAMPLE<TV> BASE;
-    using BASE::frame_rate;using BASE::last_frame;using BASE::restart;using BASE::restart_frame;using BASE::viewer_dir;using BASE::solids_parameters;
+    using BASE::frame_rate;using BASE::last_frame;using BASE::restart;using BASE::viewer_dir;using BASE::solids_parameters;
     using BASE::data_directory;using BASE::solid_body_collection;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
     using BASE::user_last_frame;
@@ -102,7 +102,7 @@ void Initialize_Bodies() override
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
     if(!user_last_frame) last_frame=240;
-    restart=false;restart_frame=0;  
+    restart=0;  
     solids_parameters.cfl=(T)5;
     solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
     if(!this->user_output_directory)

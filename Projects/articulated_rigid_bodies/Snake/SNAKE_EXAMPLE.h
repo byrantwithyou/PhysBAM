@@ -18,7 +18,7 @@ class SNAKE_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_3D
     typedef VECTOR<T,3> TV;
 public:
     using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::last_frame;using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::frame_rate;
-    using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::restart;using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::restart_frame;using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::viewer_dir;
+    using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::restart;using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::viewer_dir;
     using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::solids_parameters;using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::data_directory;
 
     ARTICULATED_RIGID_BODY<TV>* arb;

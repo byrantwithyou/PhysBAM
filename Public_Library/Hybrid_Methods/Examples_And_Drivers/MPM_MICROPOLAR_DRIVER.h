@@ -25,8 +25,7 @@ class MPM_MICROPOLAR_DRIVER
     typedef typename MPM_COLLISION_OBJECT<TV>::COLLISION_TYPE COLLISION_TYPE;
 public:
 
-    int current_frame;
-    int output_number;
+    int current_frame=0;
 
     MPM_MICROPOLAR_EXAMPLE<TV>& example;
     ARRAY<TV,TV_INT> forces;

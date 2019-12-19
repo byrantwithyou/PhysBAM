@@ -55,6 +55,7 @@ public:
     std::string data_directory="../../Public_Data";
     std::string test_output_prefix;
     bool use_test_output=false;
+    bool auto_restart=false;
     int restart=0;
     T dt=0,time=0,frame_dt=(T)1/24;
     T min_dt=0,max_dt=frame_dt;

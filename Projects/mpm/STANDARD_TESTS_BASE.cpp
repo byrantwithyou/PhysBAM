@@ -167,6 +167,14 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
 
     particles.Store_Fp(use_plasticity);
     particles.Store_B(use_affine);
+    this->write_output_files.Append([this]()
+        {
+            Write_To_File(stream_type,viewer_dir.current_directory+"/restart_data_stb",random);
+        });
+    this->read_output_files.Append([this]()
+        {
+            Read_From_File(viewer_dir.current_directory+"/restart_data_stb",random);
+        });
 }
 //#####################################################################
 // Destructor

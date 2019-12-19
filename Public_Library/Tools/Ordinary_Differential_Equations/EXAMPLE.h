@@ -30,9 +30,8 @@ public:
     VIEWER_DIR viewer_dir;
     std::string data_directory;
 
-    bool auto_restart;
-    bool restart;
-    int restart_frame;
+    bool auto_restart=false;
+    int restart;
     bool write_output_files,write_frame_title;
 
     T abort_when_dt_below;

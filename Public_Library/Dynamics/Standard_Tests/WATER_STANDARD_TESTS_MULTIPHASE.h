@@ -45,7 +45,7 @@ public:
     virtual ~WATER_STANDARD_TESTS_MULTIPHASE();
 
 //#####################################################################
-    void Initialize(const int test_number_input,const int resolution,const int restart_frame);
+    void Initialize(const int test_number_input,const int resolution,const int restart);
     virtual void Initialize_Advection(const bool always_use_objects=false);
     void Initialize_Bodies();
     static int Number_Of_Regions(int test_number);

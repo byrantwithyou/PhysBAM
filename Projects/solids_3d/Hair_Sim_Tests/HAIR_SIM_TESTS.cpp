@@ -205,7 +205,7 @@ Initialize_Bodies()
     wind_start_time=(T)1;
     wind_stop_time=(T)5;
 
-    if(restart) current_levelset=max(0,round_number(((float)restart_frame/(float)frame_rate-start_time)/levelset_frequency));
+    if(restart) current_levelset=max(0,round_number(((float)restart/(float)frame_rate-start_time)/levelset_frequency));
 
     //################################################################
     // Geometry Phase
@@ -385,7 +385,7 @@ Initialize_Bodies()
         segment_adhesion=new SEGMENT_ADHESION<TV>(particles,edges.mesh,particle_to_spring_id,solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.intersecting_edge_edge_pairs);
         segment_adhesion->Set_Parameters(adhesion_stiffness,(T)10,adhesion_start_radius,adhesion_stop_radius,max_connections);
         solid_body_collection.Add_Force(segment_adhesion);
-        if(restart) segment_adhesion->Read_State(viewer_dir.output_directory+LOG::sprintf("/adhesion.%d",restart_frame));
+        if(restart) segment_adhesion->Read_State(viewer_dir.output_directory+LOG::sprintf("/adhesion.%d",restart));
         else segment_adhesion->Write_State(stream_type,viewer_dir.output_directory+"/adhesion.0");}
     // drag forces
     ETHER_DRAG<TV>* ether_drag=new ETHER_DRAG<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,&active_particles,NULL);

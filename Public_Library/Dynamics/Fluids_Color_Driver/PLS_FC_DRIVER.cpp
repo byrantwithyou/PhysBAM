@@ -79,10 +79,14 @@ Initialize()
     LOG::cout<<std::setprecision(16)<<std::endl;
     DEBUG_SUBSTEPS::write_substeps_level=example.substeps_delay_frame<0?example.write_substeps_level:-1;
 
-    // setup time
+    if(example.auto_restart){
+        example.viewer_dir.Read_Last_Frame(0);
+        example.restart=example.viewer_dir.frame_stack(0);}
+    else if(example.restart)
+        example.viewer_dir.Set(example.restart);
+    if(example.restart) example.viewer_dir.Make_Common_Directory(true);
     current_frame=example.restart;
-    output_number=current_frame;
-    example.time=time=example.time_steps_per_frame*current_frame*example.dt;
+    example.time=time=current_frame*example.dt;
 
     example.levelset_color.phi.Resize(example.grid.Domain_Indices(example.number_of_ghost_cells));
     example.levelset_color.color.Resize(example.grid.Domain_Indices(example.number_of_ghost_cells));
@@ -574,7 +578,7 @@ template<class TV> void PLS_FC_DRIVER<TV>::
 Write_Substep(const std::string& title)
 {
     example.frame_title=title;
-    LOG::cout<<"Writing substep ["<<example.frame_title<<"]: output_number="<<output_number+1<<", time="<<time<<", frame="<<current_frame<<std::endl;
+    LOG::cout<<"Writing substep ["<<example.frame_title<<"]: output_number="<<example.viewer_dir.frame_stack<<", time="<<time<<", frame="<<current_frame<<std::endl;
     Write_Output_Files();
     example.frame_title="";
 }

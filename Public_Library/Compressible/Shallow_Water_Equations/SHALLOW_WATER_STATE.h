@@ -33,6 +33,7 @@ public:
     std::string data_directory;
     std::string test_output_prefix;
     bool use_test_output;
+    bool auto_restart=false;
     int restart;
     T dt,time,frame_dt,min_dt,max_dt;
     T cfl;

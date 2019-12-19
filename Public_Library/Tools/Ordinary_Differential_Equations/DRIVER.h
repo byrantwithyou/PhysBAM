@@ -19,8 +19,7 @@ public:
     typedef typename TV::SCALAR T;
     T time;
     EXAMPLE<TV>& example;
-    int current_frame;
-    int output_number;
+    int current_frame=0;
 
     DRIVER(EXAMPLE<TV>& example);
     virtual ~DRIVER();

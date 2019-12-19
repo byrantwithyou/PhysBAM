@@ -18,7 +18,7 @@ class SOLIDS_FLUIDS_DRIVER:public DRIVER<TV>
     typedef typename TV::SCALAR T;
     typedef DRIVER<TV> BASE;
 public:
-    using BASE::output_number;using BASE::time;using BASE::Write_Output_Files;using BASE::Write_Substep;
+    using BASE::time;using BASE::Write_Output_Files;using BASE::Write_Substep;
     using BASE::current_frame;
     
     SOLIDS_FLUIDS_EXAMPLE<TV>& example;
@@ -31,7 +31,7 @@ public:
     virtual ~SOLIDS_FLUIDS_DRIVER();
 
     virtual void Preprocess_Frame(const int frame)
-    {if(example.substeps_delay_frame==frame){example.Set_Write_Substeps_Level(example.substeps_delay_level);output_number=frame-1;}
+    {if(example.substeps_delay_frame==frame){example.Set_Write_Substeps_Level(example.substeps_delay_level);}
     example.Preprocess_Frame(frame);}
     
     virtual void Postprocess_Frame(const int frame)

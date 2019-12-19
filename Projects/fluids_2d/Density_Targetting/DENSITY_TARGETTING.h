@@ -26,7 +26,7 @@ public:
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::viewer_dir;using BASE::Adjust_Phi_With_Sources;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::viewer_dir;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::data_directory;using BASE::fluid_collection;
     using BASE::solid_body_collection;using BASE::stream_type;using BASE::test_number;using BASE::resolution;
     using BASE::user_last_frame;
@@ -73,7 +73,7 @@ public:
         parse_args.Parse();
         int cells=1*resolution;
         if(!this->user_frame_rate) frame_rate=24;
-        restart=false;restart_frame=0;
+        restart=0;
         fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
         fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
         fluids_parameters.number_particles_per_cell=4;

@@ -39,7 +39,7 @@ Initialize(const int test_number_input,const int resolution)
 
     // set up the standard fluid environment
     if(!example.user_frame_rate) example.frame_rate=24;
-    example.restart=false;example.restart_frame=0;
+    example.restart=0;
     fluids_parameters.domain_walls(0)(0)=true;fluids_parameters.domain_walls(0)(1)=true;fluids_parameters.domain_walls(1)(0)=true;fluids_parameters.domain_walls(1)(1)=false;
     fluids_parameters.number_particles_per_cell=16;
     fluids_parameters.viscosity=(T)0;fluids_parameters.implicit_viscosity=false;

@@ -17,8 +17,7 @@ class SHALLOW_WATER_DRIVER
     typedef VECTOR<int,TV::m> TV_INT;
 public:
 
-    int current_frame;
-    int output_number;
+    int current_frame=0;
 
     SHALLOW_WATER_STATE<TV>& state;
     

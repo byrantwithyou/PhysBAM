@@ -42,13 +42,13 @@ void VIEWER_DIR::Update_Current_Directory()
             current_directory+="."+std::to_string(frame_stack(i));}
 }
 
-void VIEWER_DIR::Make_Common_Directory()
+void VIEWER_DIR::Make_Common_Directory(bool append_log)
 {
     if(made_common) return;
     Create_Directory(output_directory);
     Create_Directory(output_directory+"/common");
     if(!no_log)
-        LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",false);
+        LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",append_log);
     made_common=true;
 }
 

@@ -51,9 +51,13 @@ Initialize()
 {
     DEBUG_SUBSTEPS::write_substeps_level=example.write_substeps_level;
 
-    // setup time
-    if(example.restart) current_frame=example.restart;else current_frame=0;
-    output_number=current_frame;
+    if(example.auto_restart){
+        example.viewer_dir.Read_Last_Frame(0);
+        example.restart=example.viewer_dir.frame_stack(0);}
+    else if(example.restart)
+        example.viewer_dir.Set(example.restart);
+    if(example.restart) example.viewer_dir.Make_Common_Directory(true);
+    current_frame=example.restart;
     time=example.Time_At_Frame(current_frame);
 
     example.phi_boundary_water.Set_Velocity_Pointer(example.face_velocities);
@@ -312,7 +316,7 @@ template<class TV> void PLS_DRIVER<TV>::
 Write_Substep(const std::string& title)
 {
     example.frame_title=title;
-    LOG::cout<<"Writing substep ["<<example.frame_title<<"]: output_number="<<output_number+1<<", time="<<time<<", frame="<<current_frame<<std::endl;
+    LOG::cout<<"Writing substep ["<<example.frame_title<<"]: output_number="<<example.viewer_dir.frame_stack<<", time="<<time<<", frame="<<current_frame<<std::endl;
     Write_Output_Files();
     example.frame_title="";
 }

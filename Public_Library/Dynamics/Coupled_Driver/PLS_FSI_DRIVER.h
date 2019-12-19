@@ -22,7 +22,7 @@ class PLS_FSI_DRIVER:public DRIVER<TV>
     typedef ARRAY<TV_DIMENSION,TV_INT> T_ARRAYS_DIMENSION_SCALAR;
     using BASE::time;using BASE::current_frame;
 public:
-    using BASE::output_number;using BASE::Write_Output_Files;using BASE::Write_Time;
+    using BASE::Write_Output_Files;using BASE::Write_Time;
     using BASE::Write_Substep;
 
     PLS_FSI_EXAMPLE<TV>& example;

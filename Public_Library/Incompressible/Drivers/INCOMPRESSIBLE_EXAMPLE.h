@@ -27,6 +27,7 @@ public:
     STREAM_TYPE stream_type;
     int last_frame;
     T frame_rate;
+    bool auto_restart=false;
     int restart;
     std::string frame_title;
     int write_substeps_level;

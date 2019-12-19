@@ -15,7 +15,7 @@ class FALLING_DROP:public SOLIDS_FLUIDS_EXAMPLE_3D
 {
 public:
     using SOLIDS_FLUIDS_EXAMPLE_3D::last_frame;using SOLIDS_FLUIDS_EXAMPLE_3D::frame_rate;
-    using SOLIDS_FLUIDS_EXAMPLE_3D::restart;using SOLIDS_FLUIDS_EXAMPLE_3D::restart_frame;using SOLIDS_FLUIDS_EXAMPLE_3D::viewer_dir;
+    using SOLIDS_FLUIDS_EXAMPLE_3D::restart;using SOLIDS_FLUIDS_EXAMPLE_3D::viewer_dir;
     using SOLIDS_FLUIDS_EXAMPLE_3D::fluids_parameters;
 
     FALLING_DROP()
@@ -23,7 +23,7 @@ public:
     {
         if(!user_last_frame) last_frame=1000;
         if(!this->user_frame_rate) frame_rate=24;
-        restart=false;restart_frame=18;
+        restart=0;
         fluids_parameters.grid.Initialize(TV_INT(101,101,101),RANGE<TV>(TV(0,0,0),TV(1,1,1)));
         fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
         fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;

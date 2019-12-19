@@ -12,7 +12,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> DRIVER<TV>::
 DRIVER(EXAMPLE<TV>& example)
-    :time(0),example(example),current_frame(0),output_number(0)
+    :time(0),example(example),current_frame(0)
 {
     DEBUG_SUBSTEPS::write_substeps_level=example.write_substeps_level;
     DEBUG_SUBSTEPS::writer=[=](const std::string& title){Write_Substep(title);};
@@ -40,15 +40,13 @@ Execute_Main_Program()
 template<class TV> void DRIVER<TV>::
 Initialize()
 {
-    // setup time
-    example.Setup_Log();
     if(example.auto_restart){
         example.viewer_dir.Read_Last_Frame(0);
-        example.restart=true;
-        example.restart_frame=example.viewer_dir.frame_stack(0);}
-    if(example.restart) current_frame=example.restart_frame;
-    else current_frame=0;
-    output_number=current_frame;
+        example.restart=example.viewer_dir.frame_stack(0);}
+    else if(example.restart)
+        example.viewer_dir.Set(example.restart);
+    if(example.restart) example.viewer_dir.Make_Common_Directory(true);
+    current_frame=example.restart;
     time=example.Time_At_Frame(current_frame);
 }
 //#####################################################################
@@ -58,7 +56,7 @@ template<class TV> void DRIVER<TV>::
 Write_Substep(const std::string& title)
 {
     example.frame_title=title;
-    LOG::cout<<"Writing substep ["<<example.frame_title<<"]: output_number="<<output_number+1<<", time="<<time<<", frame="<<current_frame<<std::endl;
+    LOG::cout<<"Writing substep ["<<example.frame_title<<"]: output_number="<<example.viewer_dir.frame_stack<<", time="<<time<<", frame="<<current_frame<<std::endl;
     Write_Output_Files();
     example.frame_title="";
 }

@@ -27,7 +27,7 @@ template<class TV,class T_WATER_STANDARD_TESTS> WATER_STANDARD_TESTS_MULTIPHASE<
 {
 }
 template<class TV,class T_WATER_STANDARD_TESTS> void WATER_STANDARD_TESTS_MULTIPHASE<TV,T_WATER_STANDARD_TESTS>::
-Initialize(const int test_number_input,const int resolution,const int restart_frame)
+Initialize(const int test_number_input,const int resolution,const int restart)
 {
     BASE::Initialize(Non_Multiphase_Test_Number(test_number_input),resolution);
     test_number=test_number_input;
@@ -90,7 +90,7 @@ Initialize(const int test_number_input,const int resolution,const int restart_fr
         //fluids_parameters_input.cfl=4;
     }
     else if(test_number==16){
-        if(restart_frame>=500){
+        if(restart>=500){
             fluids_parameters_input.densities(0)=500;        
             fluids_parameters_input.use_multiphase_strain(0)=true;
             fluids_parameters_input.elastic_moduli(0)=15000;
@@ -104,8 +104,8 @@ Initialize(const int test_number_input,const int resolution,const int restart_fr
             fluids_parameters_input.elastic_moduli(3)=15000;
             fluids_parameters_input.plasticity_alphas(3)=0;
             fluids_parameters_input.viscosities(3)=(T)200;}
-        else if(restart_frame>=296) fluids_parameters_input.densities(0)=500;         
-        else if(restart_frame>=68){
+        else if(restart>=296) fluids_parameters_input.densities(0)=500;         
+        else if(restart>=68){
             fluids_parameters_input.densities(0)=1500;   
             fluids_parameters_input.implicit_viscosity_iterations=50;
             fluids_parameters_input.implicit_viscosity=false;

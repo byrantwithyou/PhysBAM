@@ -20,9 +20,8 @@ class PLS_FC_DRIVER
     typedef VECTOR<int,TV::m> TV_INT;
 public:
     
-    int current_frame;
+    int current_frame=0;
     T time;
-    int output_number;
     
     PLS_FC_EXAMPLE<TV>& example;
     

@@ -21,7 +21,7 @@ class SOLIDS_DRIVER:public DRIVER<TV>
     typedef ARRAY<TV_DIMENSION,TV_INT> T_ARRAYS_DIMENSION_SCALAR;
     typedef DRIVER<TV> BASE;
 public:
-    using BASE::output_number;using BASE::time;using BASE::Write_Substep;
+    using BASE::time;using BASE::Write_Substep;
     using BASE::Write_Time;using BASE::current_frame;
     SOLIDS_EXAMPLE<TV>& example;
     T next_dt; // for fluid time stepping

@@ -49,7 +49,8 @@ Initialize()
     DEBUG_SUBSTEPS::write_substeps_level=state.substeps_delay_frame<0?state.write_substeps_level:-1;
 
     // setup time
-    output_number=current_frame=state.restart;
+    current_frame=state.restart;
+    state.viewer_dir.Set(state.restart);
     state.U.Resize(state.grid.Node_Indices(state.ghost));
     PHYSBAM_ASSERT(state.initialize);
     state.initialize();
@@ -106,8 +107,8 @@ template<class TV> void SHALLOW_WATER_DRIVER<TV>::
 Write_Substep(const std::string& title)
 {
     state.frame_title=title;
-    LOG::printf("Writing substep [%s]: output_number=%i, time=%g, frame=%i\n",
-        state.frame_title,output_number+1,state.time,current_frame);
+    LOG::printf("Writing substep [%s]: output_number=%P, time=%g, frame=%i\n",
+        state.frame_title,state.viewer_dir.frame_stack,state.time,current_frame);
     Write_Output_Files();
     state.frame_title="";
 }

@@ -89,8 +89,14 @@ Initialize()
     LOG::cout<<std::setprecision(16);
     DEBUG_SUBSTEPS::write_substeps_level=example.substeps_delay_frame<0?example.write_substeps_level:-1;
 
-    // setup time
-    output_number=current_frame=example.restart;
+    if(example.auto_restart){
+        example.viewer_dir.Read_Last_Frame(0);
+        example.restart=example.viewer_dir.frame_stack(0);}
+    else if(example.restart)
+        example.viewer_dir.Set(example.restart);
+    if(example.restart) example.viewer_dir.Make_Common_Directory(true);
+    current_frame=example.restart;
+    example.time=current_frame*example.frame_dt;
 
     example.Initialize();
     for(int i=0;i<TV::m;i++){
@@ -222,8 +228,8 @@ Write_Substep(const std::string& title)
 {
     TIMER_SCOPE_FUNC;
     example.frame_title=title;
-    LOG::printf("Writing substep [%s]: output_number=%i, time=%g, frame=%i\n",
-        example.frame_title,output_number+1,example.time,current_frame);
+    LOG::printf("Writing substep [%s]: output_number=%P, time=%g, frame=%i\n",
+        example.frame_title,example.viewer_dir.frame_stack,example.time,current_frame);
     Write_Output_Files();
     example.frame_title="";
 }

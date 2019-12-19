@@ -17,8 +17,8 @@ template<class TV> EXAMPLE<TV>::
 EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     :stream_type(stream_type_input),last_frame(120),frame_rate(24),frame_title(""),
     write_substeps_level(-1),
-    viewer_dir("output"),data_directory("../../Public_Data"),auto_restart(false),restart(false),
-    restart_frame(0),write_output_files(true),write_frame_title(true),abort_when_dt_below(0),
+    viewer_dir("output"),data_directory("../../Public_Data"),auto_restart(false),restart(0),
+    write_output_files(true),write_frame_title(true),abort_when_dt_below(0),
     mpi_world(0),need_finish_logging(true),test_number(0),
     substeps_delay_frame(-1),substeps_delay_level(-1),use_test_output(false),test_output_prefix(""),
     opt_all_verbose(false),opt_query_output(false),opt_nolog(false),opt_verbosity(1<<30)
@@ -34,7 +34,7 @@ EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-max_dt",&max_dt,"size","fix the time step size to be no larger than this value.");
     parse_args.Add("-delay_substeps",&substeps_delay_frame,"frame","delay substeps until later frame");
     parse_args.Add("-last_frame",&last_frame,&user_last_frame,"frame","last frame");
-    parse_args.Add("-restart",&restart_frame,&restart,"frame","restart frame");
+    parse_args.Add("-restart",&restart,"frame","restart frame");
     parse_args.Add("-substeps",&substeps_delay_level,"level","substep output level");
     parse_args.Add("-v",&opt_verbosity,"level","verbosity level");
     parse_args.Add("-auto_restart",&auto_restart,"restart from last_frame");
@@ -111,7 +111,6 @@ Log_Parameters() const
     LOG::cout<<"frame_rate="<<frame_rate<<std::endl;
     LOG::cout<<"auto_restart="<<auto_restart<<std::endl;
     LOG::cout<<"restart="<<restart<<std::endl;
-    LOG::cout<<"restart_frame="<<restart_frame<<std::endl;
     LOG::cout<<"write_output_files="<<write_output_files<<std::endl;
     LOG::cout<<"write_frame_title="<<write_frame_title<<std::endl;
     LOG::cout<<"write_substeps_level="<<write_substeps_level<<std::endl;

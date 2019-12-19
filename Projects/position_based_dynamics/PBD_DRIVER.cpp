@@ -131,8 +131,8 @@ template<class TV> void PBD_DRIVER<TV>::
 Write_Substep(const std::string& title)
 {
     example.frame_title=title;
-    LOG::printf("Writing substep [%s]: output_number=%i, time=%g, frame=%i\n",
-        example.frame_title,output_number+1,example.time,current_frame);
+    LOG::printf("Writing substep [%s]: output_number=%P, time=%g, frame=%i\n",
+        example.frame_title,example.viewer_dir.frame_stack,example.time,current_frame);
     Write_Output_Files();
     example.frame_title="";
 }

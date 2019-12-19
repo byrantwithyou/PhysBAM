@@ -25,7 +25,7 @@ class WATERFALL:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>,public BOUNDARY_OPEN_CA
     typedef ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,TV_INT> T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::viewer_dir;using BASE::data_directory;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::viewer_dir;using BASE::data_directory;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::stream_type;using BASE::solid_body_collection;using BASE::test_number;using BASE::resolution;
     using BASE::user_last_frame;
 
@@ -46,7 +46,7 @@ public:
 
         if(!user_last_frame) last_frame=1000;
         if(!this->user_frame_rate) frame_rate=36;
-        restart=false;restart_frame=18;
+        restart=0;
         int cells=1*resolution;
         fluids_parameters.grid->Initialize(TV_INT(2*cells+1,3*cells+1,2*cells+1),RANGE<TV>(TV(-4,-8,0),TV(4,4,8)));
         fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;

@@ -20,7 +20,7 @@ public:
     typedef VECTOR<T,3> TV;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::viewer_dir;using BASE::Adjust_Phi_With_Sources;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::viewer_dir;using BASE::Adjust_Phi_With_Sources;
     using BASE::Get_Source_Reseed_Mask;using BASE::Get_Source_Velocities;using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::data_directory;
     using BASE::solid_body_collection;using BASE::Time_At_Frame;using BASE::test_number;using BASE::resolution;using BASE::Adjust_Phi_With_Source;
 
@@ -32,7 +32,7 @@ public:
     {
         parse_args.Parse();
 
-        tests.Initialize(test_number,resolution,restart_frame);
+        tests.Initialize(test_number,resolution,restart);
         fluids_parameters.Initialize_Number_Of_Regions(WATER_STANDARD_TESTS_MULTIPHASE_3D<TV>::Number_Of_Regions(test_number));
         *fluids_parameters.grid=tests.grid;
 /*

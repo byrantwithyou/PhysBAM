@@ -140,7 +140,7 @@ Initialize()
     if(example.restart){
         LOG::SCOPE scope("reading solids data");
         example.Read_Output_Files_Solids();
-        solids_evolution.time=time=example.Time_At_Frame(example.restart_frame);}
+        solids_evolution.time=time=example.Time_At_Frame(example.restart);}
 
     solids_evolution.Initialize_Deformable_Objects(example.frame_rate,example.restart);
 

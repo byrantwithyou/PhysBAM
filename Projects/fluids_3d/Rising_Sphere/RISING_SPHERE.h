@@ -29,7 +29,7 @@ public:
     RISING_SPHERE() {
         if(!this->user_frame_rate) frame_rate=3*24;
         if(!user_last_frame) last_frame=12*frame_rate;
-        restart_frame=0;
+        restart=0;
         m=30;n=60;mn=30;//m=84;n=60;mn=84;//105,75,105
         xmin=(T)0;xmax=(T)1;ymin=(T)0;ymax=(T)2;zmin=(T)0;zmax=(T)1;
         domain_walls[0][0]=true;domain_walls[0][1]=true;domain_walls[1][0]=true;domain_walls[1][1]=false;domain_walls[2][0]=true;domain_walls[2][1]=true;

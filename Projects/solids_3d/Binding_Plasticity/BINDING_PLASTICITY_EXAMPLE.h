@@ -37,7 +37,7 @@ class BINDING_PLASTICITY_EXAMPLE:public SOLIDS_EXAMPLE<VECTOR<T_input,3> >
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     typedef SOLIDS_EXAMPLE<TV> BASE;
-    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::viewer_dir;using BASE::solids_parameters;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::viewer_dir;using BASE::solids_parameters;
     using BASE::data_directory;using BASE::stream_type;using BASE::solid_body_collection;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
     using BASE::user_last_frame;

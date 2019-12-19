@@ -20,7 +20,7 @@ public:
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::solid_body_collection;using BASE::test_number;
-    using BASE::restart_frame;using BASE::resolution;
+    using BASE::resolution;
 
     SMOKE_STANDARD_TESTS_3D<TV> tests;
 

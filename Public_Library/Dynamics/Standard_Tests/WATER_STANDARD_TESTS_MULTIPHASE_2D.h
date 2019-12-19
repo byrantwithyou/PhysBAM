@@ -34,9 +34,9 @@ public:
     {
     }
 
-void Initialize(const int test_number_input,const int resolution,const int restart_frame=-1)
+void Initialize(const int test_number_input,const int resolution,const int restart=0)
 {
-    BASE::Initialize(test_number_input,resolution,restart_frame);
+    BASE::Initialize(test_number_input,resolution,restart);
     LOG::cout<<"Running Multiphase Standard Test Number "<<test_number<<" at resolution "<<resolution<<std::endl;
     int cells=1*resolution;
     if(test_number==11){

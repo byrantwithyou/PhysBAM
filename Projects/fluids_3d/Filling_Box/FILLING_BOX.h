@@ -14,7 +14,7 @@ class FILLING_BOX:public SOLIDS_FLUIDS_EXAMPLE_3D<RW>
 {
 public:
 using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::last_frame;using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::frame_rate;
-using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::restart;using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::restart_frame;using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::viewer_dir;
+using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::restart;using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::viewer_dir;
 using SOLIDS_FLUIDS_EXAMPLE_3D<RW>::fluids_parameters;
 
 CYLINDER<T> source;VECTOR<T,3> source_velocity;
@@ -24,7 +24,7 @@ CYLINDER<T> source;VECTOR<T,3> source_velocity;
     {
         if(!user_last_frame) last_frame=1000;
         if(!this->user_frame_rate) frame_rate=24;
-        restart=false;restart_frame=0;
+        restart=0;
         fluids_parameters.grid.Initialize(TV_INT(76,51,51),RANGE<TV>(TV(0,0,0),TV(1.5,1,1)));
         fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
         fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;

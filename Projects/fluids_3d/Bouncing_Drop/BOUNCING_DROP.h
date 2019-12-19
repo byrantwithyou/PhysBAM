@@ -18,7 +18,7 @@ public:
     {
         if(!user_last_frame) last_frame=300;
         if(!this->user_frame_rate) frame_rate=24;
-        restart=false;restart_frame=100;
+        restart=0;
         grid.Initialize(TV_INT(50,50,50),RANGE<TV>(TV(0,0,0),TV(1,1,1)));
         domain_walls[0][0]=true;domain_walls[0][1]=true;domain_walls[1][0]=true;domain_walls[1][1]=false;domain_walls[2][0]=true;domain_walls[2][1]=true;
         number_particles_per_cell=16;

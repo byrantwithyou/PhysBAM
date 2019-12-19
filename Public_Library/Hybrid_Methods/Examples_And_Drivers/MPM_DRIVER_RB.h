@@ -23,8 +23,7 @@ class MPM_DRIVER_RB
     typedef typename MPM_COLLISION_OBJECT<TV>::COLLISION_TYPE COLLISION_TYPE;
 public:
 
-    int current_frame;
-    int output_number;
+    int current_frame=0;
 
     MPM_EXAMPLE_RB<TV>& example;
     MPM_OBJECTIVE_RB<TV>& objective;

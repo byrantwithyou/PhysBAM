@@ -19,9 +19,8 @@ class PLS_DRIVER
     typedef ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<TV,T> T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
 
 protected:
-    int current_frame;
+    int current_frame=0;
     T time;
-    int output_number;
 
     PLS_EXAMPLE<TV>& example;
 public:

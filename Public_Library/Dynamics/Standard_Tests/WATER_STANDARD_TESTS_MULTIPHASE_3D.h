@@ -32,9 +32,9 @@ public:
     {
     }
 
-void Initialize(const int test_number_input,const int resolution,const int restart_frame)
+void Initialize(const int test_number_input,const int resolution,const int restart)
 {
-    BASE::Initialize(test_number_input,resolution,restart_frame);
+    BASE::Initialize(test_number_input,resolution,restart);
     test_number=test_number_input;
     LOG::cout<<"Running Multiphase Standard Test Number "<<test_number<<" at resolution "<<resolution<<std::endl;
     int cells=1*resolution;

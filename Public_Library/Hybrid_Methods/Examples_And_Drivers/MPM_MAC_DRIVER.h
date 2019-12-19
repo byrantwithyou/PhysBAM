@@ -25,8 +25,7 @@ class MPM_MAC_DRIVER
 public:
     enum {pressure_D=-1,pressure_N=-2,pressure_uninit=-3};
 
-    int current_frame;
-    int output_number;
+    int current_frame=0;
 
     MPM_MAC_EXAMPLE<TV>& example;
 

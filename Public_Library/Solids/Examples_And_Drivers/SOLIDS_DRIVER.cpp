@@ -98,7 +98,7 @@ Initialize()
     if(example.restart){
         LOG::SCOPE scope("reading solids data");
         example.Read_Output_Files_Solids();
-        solids_evolution.time=time=example.Time_At_Frame(example.restart_frame);}
+        solids_evolution.time=time=example.Time_At_Frame(example.restart);}
 
     solids_evolution.Initialize_Deformable_Objects(example.frame_rate,example.restart);
 
@@ -302,7 +302,8 @@ Write_Output_Files()
 template<class TV> void SOLIDS_DRIVER<TV>::
 Preprocess_Frame(const int frame)
 {
-    if(example.substeps_delay_frame==frame){example.Set_Write_Substeps_Level(example.substeps_delay_level);output_number=frame-1;}
+    if(example.substeps_delay_frame==frame)
+        example.Set_Write_Substeps_Level(example.substeps_delay_level);
     example.Preprocess_Frame(frame);
 }
 //#####################################################################

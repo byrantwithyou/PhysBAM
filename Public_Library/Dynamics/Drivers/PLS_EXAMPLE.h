@@ -37,6 +37,7 @@ public:
     int write_substeps_level;
     bool write_output_files;
     VIEWER_DIR viewer_dir;
+    bool auto_restart=false;
     int restart;
     int number_of_ghost_cells;
 

@@ -24,7 +24,7 @@ class LIGHTHOUSE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>,public BOUNDARY_OPEN_C
     typedef ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,TV_INT> T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV> BASE;
-    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::viewer_dir;using BASE::data_directory;
+    using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::viewer_dir;using BASE::data_directory;
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::stream_type;using BASE::solid_body_collection;using BASE::resolution;
     using BASE::test_number;
     using BASE::user_last_frame;
@@ -57,7 +57,7 @@ public:
         parse_args.Parse();
         if(!user_last_frame) last_frame=1000;
         if(!this->user_frame_rate) frame_rate=36;
-        restart=false;restart_frame=18;
+        restart=0;
         int cells=1*resolution;
         fluids_parameters.grid->Initialize(TV_INT(14*cells+1,3*cells+1,8*cells+1),RANGE<TV>(TV(-80,0,0),TV(60,30,80)));
         fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;

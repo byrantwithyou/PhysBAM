@@ -25,7 +25,7 @@ struct VIEWER_DIR
     ~VIEWER_DIR();
 
     // Write
-    void Make_Common_Directory();
+    void Make_Common_Directory(bool append_log=false);
     void Start_Directory(int substep_level,const char* title);
     void Start_Directory(int substep_level,const std::string& title)
     {Start_Directory(substep_level,title.c_str());}

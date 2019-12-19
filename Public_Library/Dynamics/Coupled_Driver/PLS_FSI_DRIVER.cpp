@@ -69,9 +69,8 @@ template<class TV> PLS_FSI_DRIVER<TV>::
 template<class TV> void PLS_FSI_DRIVER<TV>::
 Preprocess_Frame(const int frame)
 {
-    if(example.substeps_delay_frame==frame){
+    if(example.substeps_delay_frame==frame)
         example.Set_Write_Substeps_Level(example.substeps_delay_level);
-        output_number=frame-1;}
     example.Preprocess_Frame(frame);
 }
 //#####################################################################
@@ -113,13 +112,12 @@ Initialize()
 
     if(example.auto_restart){
         example.viewer_dir.Read_Last_Frame(0);
-        example.restart=true;
-        example.restart_frame=example.viewer_dir.frame_stack(0);}
-    if(example.restart) current_frame=example.restart_frame;
-    else current_frame=0;
-    output_number=current_frame;
+        example.restart=example.viewer_dir.frame_stack(0);}
+    else if(example.restart)
+        example.viewer_dir.Set(example.restart);
+    if(example.restart) example.viewer_dir.Make_Common_Directory(true);
+    current_frame=example.restart;
     time=example.Time_At_Frame(current_frame);
-    example.fluids_parameters.callbacks=&example;
 
     *example.fluids_parameters.grid=example.fluids_parameters.grid->Get_MAC_Grid();
     example.fluids_parameters.p_grid=*example.fluids_parameters.grid;
@@ -167,7 +165,7 @@ Initialize()
     if(example.restart){
         LOG::SCOPE scope("reading solids data");
         example.Read_Output_Files_Solids();
-        example.solids_evolution->time=time=example.Time_At_Frame(example.restart_frame);}
+        example.solids_evolution->time=time=example.Time_At_Frame(example.restart);}
 
     example.solids_evolution->Initialize_Deformable_Objects(example.frame_rate,example.restart);
 

@@ -22,7 +22,7 @@ public:
     typedef MULTIPHASE_FIRE_EXAMPLES_UNIFORM<TV> BASE;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::data_directory;
     using BASE::last_frame;using BASE::frame_rate;using BASE::write_output_files;using BASE::pseudo_dirichlet;using BASE::resolution;
-    using BASE::viewer_dir;using BASE::restart;using BASE::restart_frame;using BASE::test_number;
+    using BASE::viewer_dir;using BASE::restart;using BASE::test_number;
     
     MULTIPHASE_FIRE_EXAMPLES(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
         :MULTIPHASE_FIRE_EXAMPLES_UNIFORM<TV>(stream_type_input,parse_args)
