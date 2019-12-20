@@ -1080,24 +1080,15 @@ Initialize()
 
         case 49:{
             Set_Grid(RANGE<TV>(TV(0,0,0),TV(1,2,1))*m,TV_INT(1,2,1));
-            int jet_freq=1;
             T init_vel=m;
-            auto func=[this,jet_freq,init_vel](int frame)
-            {
-                if (frame%jet_freq==0){
-                    int old_m=particles.X.m;
-                    T density=100*unit_rho*scale_mass;
-                    RANGE<TV> box(TV(.025,1.25,.5)*m,TV(.375,1.35,0.55)*m);
-                    Seed_Particles(box,[=](const TV& X){return TV(init_vel,0,0);},0,density,particles_per_cell);
-                    Seed_Particles(box+TV(.6,0,0.025)*m,[=](const TV& X){return TV(-init_vel,0,0);},0,density,particles_per_cell);
-                    ARRAY<int> new_particles(IDENTITY_ARRAY<>(particles.X.m-old_m)+old_m);
-                    Set_Lame_On_Particles(1e3*unit_p*scale_E,.3,&new_particles);
-                    particles.mu*=0;
-                    particles.mu0*=0;}
-            };
-            this->begin_frame.Append(func);
-            Add_Gravity(m/(s*s)*TV(0,-1.8,0));
-            Add_Fixed_Corotated(3537*unit_p*scale_E,0.3);
+            T E=1e3*unit_p*scale_E,nu=.3;
+            TV gravity(0,-1.8*m/(s*s),0);
+            T density=100*unit_rho*scale_mass;
+            this->no_mu=true;
+            Add_Source(TV(.2,1.3,.525)*m,TV(1,0,0),(T).05*m,init_vel,gravity,density,E,nu,0,FLT_MAX);
+            Add_Source(TV(.8,1.3,.475)*m,TV(-1,0,0),(T).05*m,init_vel,gravity,density,E,nu,0,FLT_MAX);
+            Add_Gravity(gravity);
+            Add_Fixed_Corotated(E,nu);
             Add_Walls(-1,COLLISION_TYPE::slip,.3,.025*m,false);
         } break;
 

@@ -83,6 +83,7 @@ public:
     bool dump_collision_objects;
     ARRAY<MPM_PARTICLE_SOURCE<TV>*> sources;
     std::function<void(const ARRAY<int>&)> update_dp_func;
+    bool no_mu=false;
 
     RANDOM_NUMBERS<T> random;
     POISSON_DISK<TV>& poisson_disk;

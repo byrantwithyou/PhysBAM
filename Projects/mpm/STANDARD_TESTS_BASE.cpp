@@ -2,6 +2,7 @@
 // Copyright 2015, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Log/FINE_TIMER.h>
 #include <Core/Math_Tools/pow.h>
 #include <Core/Math_Tools/RANGE_ITERATOR.h>
 #include <Tools/Parsing/PARSE_ARGS.h>
@@ -593,9 +594,11 @@ Add_Source(const TV& source_location,const TV& source_normal,
         random,source_location,source_normal,source_normal*source_speed,
         gravity,Make_IO(seed_volume));
     T mu=E/(2*(1+nu));
+    if(no_mu) mu=0;
     T lambda=E*nu/((1+nu)*(1-2*nu));
     Add_Callbacks(false,"time-step",[=]()
         {
+            TIMER_SCOPE("Add_Source callback");
             if(time<start_time || time>=stop_time) return;
             ARRAY<TV> X,V;
             ARRAY<MATRIX<T,TV::m> > dV;
