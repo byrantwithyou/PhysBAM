@@ -118,6 +118,7 @@ Initialize()
     if(example.restart) example.viewer_dir.Make_Common_Directory(true);
     current_frame=example.restart;
     time=example.Time_At_Frame(current_frame);
+    example.fluids_parameters.callbacks=&example;
 
     *example.fluids_parameters.grid=example.fluids_parameters.grid->Get_MAC_Grid();
     example.fluids_parameters.p_grid=*example.fluids_parameters.grid;
