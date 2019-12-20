@@ -30,7 +30,7 @@ public:
     void operator=(const MPM_PLASTICITY_MODEL&) = delete;
     virtual ~MPM_PLASTICITY_MODEL();
 
-    virtual void Initialize_Particles(ARRAY<int>* affected_particles) const;
+    virtual void Initialize_Particles(const ARRAY<int>* affected_particles) const;
     virtual bool Compute(TV& strain,MATRIX<T,TV::m>* dstrain,typename TV::SPIN* r_sum,
         typename TV::SPIN* r_diff,const TV& Fe,bool store_hardening,int p) const=0;
     virtual void Update_Particles() const;

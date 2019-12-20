@@ -54,7 +54,8 @@ public:
     using BASE::write_output_files;using BASE::read_output_files;
     using BASE::dump_collision_objects;using BASE::Perturb;using BASE::Uniform;using BASE::extra_T;using BASE::extra_int;
     using BASE::Set_Grid;using BASE::Add_Callbacks;
-    using BASE::sph_rel;
+    using BASE::sph_rel;using BASE::Add_Source;using BASE::update_dp_func;
+    
 
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();

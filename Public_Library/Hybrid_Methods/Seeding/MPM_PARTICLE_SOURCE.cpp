@@ -15,10 +15,8 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> MPM_PARTICLE_SOURCE<TV>::
 MPM_PARTICLE_SOURCE(POISSON_DISK<TV>& poisson_disk,RANDOM_NUMBERS<T>& random,
-    const TV& X0,const TV& n,IMPLICIT_OBJECT<TV>* io,
-    std::function<void(TV X,T ts,T t,SOURCE_PATH<TV>& p)> path)
-    :X0(X0),n(n.Normalized()),io(io),poisson_disk(poisson_disk),random(random),
-    path(path)
+    const TV& X0,const TV& n,const TV& V0,const TV& g,IMPLICIT_OBJECT<TV>* io)
+    :X0(X0),n(n.Normalized()),V0(V0),g(g),io(io),poisson_disk(poisson_disk),random(random)
 {
     frame.t=X0;
     frame.r=ROTATION<TV>::From_Rotated_Vector(TV::Axis_Vector(0),n);
@@ -26,17 +24,16 @@ MPM_PARTICLE_SOURCE(POISSON_DISK<TV>& poisson_disk,RANDOM_NUMBERS<T>& random,
     sample_box=ORIENTED_BOX<TV>(io->box,frame.Inverse()).Axis_Aligned_Bounding_Box();
     sample_box.min_corner.x=0;
     sample_box.max_corner.x=0;
+    PHYSBAM_ASSERT(V0.Dot(n)>0);
 }
 //#####################################################################
 // Function Seed
 //#####################################################################
 template<class TV> void MPM_PARTICLE_SOURCE<TV>::
-Seed(T t0,T dt,ARRAY<TV>& X,ARRAY<TV>& V,ARRAY<MATRIX<T,TV::m> >* dV)
+Seed(T dt,ARRAY<TV>& X,ARRAY<TV>& V,ARRAY<MATRIX<T,TV::m> >* dV)
 {
-    SOURCE_PATH<TV> init_p;
-    path(X0,t0,t0,init_p);
-    T seed_velocity=init_p.vp.Dot(n);
-    if(seed_velocity<=0) return;
+    LOG::printf("SEED: %P\n",dt);
+    T seed_velocity=V0.Dot(n);
     sample_box.max_corner.x=seed_velocity*dt;
     int seed_X_m=seed_X.m;
     poisson_disk.Sample(random,sample_box,seed_X);
@@ -47,14 +44,10 @@ Seed(T t0,T dt,ARRAY<TV>& X,ARRAY<TV>& V,ARRAY<MATRIX<T,TV::m> >* dV)
         Z.x=0;
         Z=frame*Z;
         if(!io->Lazy_Inside(Z)) continue;
-        SOURCE_PATH<TV> p;
-        path(Z,t0+ts,t0+dt,p);
-        X.Append(p.xp);
-        V.Append(p.vp);
-        if(dV){
-            MATRIX<T,TV::m> dvp_dz=p.vp_x+MATRIX<T,TV::m>::Outer_Product(p.vp_ts/seed_velocity-p.vp_x*n,n);
-            MATRIX<T,TV::m> dxp_dz=p.xp_x+MATRIX<T,TV::m>::Outer_Product(p.xp_ts/seed_velocity-p.xp_x*n,n);
-            dV->Append(dvp_dz*dxp_dz.Inverse());}}
+        T t=dt-ts;
+        X.Append(Z+t*V0+t*t/2*g);
+        V.Append(V0+t*g);
+        if(dV) dV->Append(Outer_Product(g,n/(V0.Dot(n)+t*g.Dot(n))));}
     for(int i=seed_X.m-1;i>=0;i--){
         seed_X(i).x-=sample_box.max_corner.x;
         if(seed_X(i).x<-2*poisson_disk.h)

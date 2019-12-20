@@ -48,7 +48,6 @@
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_ITERATOR.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
-#include "POUR_SOURCE.h"
 #include "STANDARD_TESTS_2D.h"
 #include <fstream>
 namespace PhysBAM{
@@ -1062,46 +1061,17 @@ Initialize()
             RANGE<TV> ground(TV(-10,-10)*m,TV(10,.1)*m);
             if(use_penalty_collisions) Add_Penalty_Collision_Object(ground);
             else Add_Collision_Object(ground,COLLISION_TYPE::slip,0.3);
-            T density=(T)2200*unit_rho*scale_mass;
-            T E=1e4*unit_p*scale_E,nu=.3;
-            T spout_width=.05*m;
-            T spout_height=.1*m;
-            T seed_buffer=grid.dX.y*5;
-            T pour_speed=.4*m/s;
-            TV gravity=TV(0,-9.8*m/(s*s));
-            RANGE<TV> seed_range(TV(-spout_width/2,1*m-spout_height),TV(spout_width/2,1*m+seed_buffer));
-
-            T volume=grid.dX.Product()/particles_per_cell;
-            T mass=density*volume;
-            POUR_SOURCE<TV>* source=new POUR_SOURCE<TV>(*this,
-                *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(seed_range),TV(0,-1),grid.domain.max_corner,
-                TV(0,-pour_speed),gravity,max_dt*pour_speed+grid.dX.y,seed_buffer,mass,volume);
-            destroy=[=](){delete source;};
-            write_output_files.Append([=](){source->Write_Output_Files();});
-            read_output_files.Append([=](){source->Read_Output_Files();});
-            Add_Callbacks(true,"time-step",[=]()
-                {
-                    if(time>foo_T3) return;
-                    ARRAY<int> affected_particles;
-                    int n=particles.number;
-                    source->Begin_Time_Step(time);
-                    T mu=E/(2*(1+nu));
-                    T lambda=E*nu/((1+nu)*(1-2*nu));
-                    for(int i=n;i<particles.number;i++){
-                        particles.mu(i)=mu;
-                        particles.mu0(i)=mu;
-                        particles.lambda(i)=lambda;
-                        particles.lambda0(i)=lambda;
-                        affected_particles.Append(i);}
-                    for(int i=0;i<plasticity_models.m;i++)
-                        if(MPM_DRUCKER_PRAGER<TV>* dp=dynamic_cast<MPM_DRUCKER_PRAGER<TV>*>(plasticity_models(i)))
-                            dp->Initialize_Particles(&affected_particles);
-                });
-            Add_Callbacks(false,"time-step",[=](){if(time<=foo_T3) source->End_Time_Step(time);});
-
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
             int case_num=use_hardening_mast_case?hardening_mast_case:2;
+            T E=1e4*unit_p*scale_E,nu=.3;
             Add_Drucker_Prager_Case(E,nu,case_num);
+            TV spout(0,1*m);
+            T density=(T)2200*unit_rho*scale_mass;
+            T spout_width=.05*m;
+            T pour_speed=.4*m/s;
+            TV gravity=TV(0,-9.8*m/(s*s));
+            Add_Source(spout,TV(0,-1),spout_width/2,pour_speed,gravity,density,E,nu,
+                0,foo_T3,update_dp_func);
             Add_Gravity(gravity);
         } break;
         case 60:{//cohesion sanity check
@@ -1432,46 +1402,17 @@ Initialize()
 
             if(use_penalty_collisions) Add_Penalty_Collision_Object(ground);
             else Add_Collision_Object(ground,COLLISION_TYPE::stick,0);
-            T density=(T)2200*unit_rho*scale_mass;
-            T E=1e4*unit_p*scale_E,nu=.3;
-            T spout_width=.05*m;
-            T spout_height=.1*m;
-            T seed_buffer=grid.dX.y*5;
-            T pour_speed=.4*m/s;
-            TV gravity=TV(0,-9.8*m/(s*s));
-            RANGE<TV> seed_range(TV(-spout_width/2,2*m-spout_height),TV(spout_width/2,2*m+seed_buffer));
-
-            T volume=grid.dX.Product()/particles_per_cell;
-            T mass=density*volume;
-            POUR_SOURCE<TV>* source=new POUR_SOURCE<TV>(*this,
-                *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(seed_range),TV(0,-1),grid.domain.max_corner,
-                TV(0,-pour_speed),gravity,max_dt*pour_speed+grid.dX.y,seed_buffer,mass,volume);
-            destroy=[=](){delete source;};
-            write_output_files.Append([=](){source->Write_Output_Files();});
-            read_output_files.Append([=](){source->Read_Output_Files();});
-            Add_Callbacks(true,"time-step",[=]()
-                {
-                    if(time>foo_T3) return;
-                    ARRAY<int> affected_particles;
-                    int n=particles.number;
-                    source->Begin_Time_Step(time);
-                    T mu=E/(2*(1+nu));
-                    T lambda=E*nu/((1+nu)*(1-2*nu));
-                    for(int i=n;i<particles.number;i++){
-                        particles.mu(i)=mu;
-                        particles.mu0(i)=mu;
-                        particles.lambda(i)=lambda;
-                        particles.lambda0(i)=lambda;
-                        affected_particles.Append(i);}
-                    for(int i=0;i<plasticity_models.m;i++)
-                        if(MPM_DRUCKER_PRAGER<TV>* dp=dynamic_cast<MPM_DRUCKER_PRAGER<TV>*>(plasticity_models(i)))
-                            dp->Initialize_Particles(&affected_particles);
-                });
-            Add_Callbacks(false,"time-step",[=](){if(time<=foo_T3) source->End_Time_Step(time);});
-
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
             int case_num=use_hardening_mast_case?hardening_mast_case:2;
+            T E=1e4*unit_p*scale_E,nu=.3;
             Add_Drucker_Prager_Case(E,nu,case_num);
+            TV spout(0,2*m);
+            T density=(T)2200*unit_rho*scale_mass;
+            T spout_width=.05*m;
+            T pour_speed=.4*m/s;
+            TV gravity=TV(0,-9.8*m/(s*s));
+            Add_Source(spout,TV(0,-1),spout_width/2,pour_speed,gravity,density,E,nu,
+                0,foo_T3,update_dp_func);
             Add_Gravity(gravity);
         } break;
 
@@ -1627,6 +1568,19 @@ Initialize()
             this->begin_frame.Append(func);
             Add_Fixed_Corotated(1e2*unit_p*scale_E,0.3);
             Add_Gravity(TV(0,-gravity));
+            Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,false);
+        } break;    
+
+        case 68:{ // Source test
+            Set_Grid(RANGE<TV>::Unit_Box()*m,TV_INT(1,1));
+            T E=1e4*unit_p*scale_E,nu=.3;
+            T density=(T)2200*unit_rho*scale_mass;
+            TV gravity=TV(0,-9.8*m/(s*s));
+            Add_Drucker_Prager_Case(E,nu,2);
+            Add_Source(TV((T)0.5*m,0.9*m),TV(0,-1),.05*m/2,.4*m/s,gravity,density,E,nu,0,FLT_MAX,update_dp_func);
+            Add_Source(TV((T)0.9*m,(T)0.5*m),TV(-1,0),.1*m/2,.4*m/s,gravity,density,E,nu,0,FLT_MAX,update_dp_func);
+            Add_Source(TV((T)0.2*m,(T)0.2*m),TV((T).4,(T).6),.05*m/2,3*m/s,gravity,density,E,nu,0,FLT_MAX,update_dp_func);
+            Add_Gravity(gravity);
             Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,false);
         } break;    
 

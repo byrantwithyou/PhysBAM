@@ -9,7 +9,6 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INVERT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UNION.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
-#include <Hybrid_Methods/Seeding/MPM_PARTICLE_SOURCE.h>
 #include "STANDARD_TESTS_2D.h"
 #include <fstream>
 namespace PhysBAM{
@@ -182,16 +181,8 @@ Initialize()
             Add_Collision_Object(sphere,COLLISION_TYPE::slip,0,0,0);
             RANGE<TV> source_range=grid.domain;
             source_range.min_corner.x-=grid.dX.x;
-            Add_Source(grid.domain.min_corner,TV(1,0),Make_IO(source_range),
-                [=](TV X,T ts,T t,SOURCE_PATH<TV>& p)
-                {
-                    p.vp=TV(velocity,0);
-                    p.xp=X+(t-ts)*p.vp;
-                    p.xp_ts=-p.vp;
-                    p.vp_ts=TV();
-                    p.xp_x=MATRIX<T,TV::m>()+1;
-                    p.vp_x=MATRIX<T,TV::m>();
-                },density,particles_per_cell,true);
+            Add_Source(grid.domain.min_corner,TV(1,0),TV(velocity,0),TV(),
+                Make_IO(source_range),density,particles_per_cell,true);
             auto write=[this]()
             {
                 static int id=0;
@@ -343,17 +334,8 @@ Initialize()
             source_range.max_corner.y=0;
             TV X0=source_range.min_corner;
             X0.x+=2*inlet_radius;
-            Add_Source(X0,TV(0,1),Make_IO(source_range),
-                [=](TV X,T ts,T t,SOURCE_PATH<TV>& p)
-                {
-                    p.vp=TV(0,velocity);
-                    if(time>stop_time) p.vp=TV();
-                    p.xp=X+(t-ts)*p.vp;
-                    p.xp_ts=-p.vp;
-                    p.vp_ts=TV();
-                    p.xp_x=MATRIX<T,TV::m>()+1;
-                    p.vp_x=MATRIX<T,TV::m>();
-                },density,particles_per_cell,true);
+            Add_Source(X0,TV(0,1),TV(0,velocity),TV(),
+                Make_IO(source_range),density,particles_per_cell,true);
         } break;
         case 29:{
             Set_Grid(RANGE<TV>::Centered_Box()*2);

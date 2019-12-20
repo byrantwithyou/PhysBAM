@@ -53,7 +53,6 @@
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_ITERATOR.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
-#include "POUR_SOURCE.h"
 #include "STANDARD_TESTS_2D.h"
 #include <fstream>
 namespace PhysBAM{
@@ -496,44 +495,15 @@ Initialize()
             bw.is_static=true;
             bw.Frame().t=TV(1.5,0.05);
 
-            T density=(T)2200*unit_rho*scale_mass;
             T E=1e4*unit_p*scale_E,nu=.3;
+            Add_Drucker_Prager_Case(E,nu,2);
             TV spout(1.5,0.8);
+            T density=(T)2200*unit_rho*scale_mass;
             T spout_width=.05*m;
-            T spout_height=.05*m;
-            T seed_buffer=grid.dX.y*5;
             T pour_speed=.2*m/s;
             TV gravity=TV(0,-9.8*m/(s*s));
-            RANGE<TV> seed_range(spout+TV(-spout_width/2,-spout_height),spout+TV(spout_width/2,seed_buffer));
-
-            T volume=grid.dX.Product()/particles_per_cell;
-            T mass=density*volume;
-            POUR_SOURCE<TV>* source=new POUR_SOURCE<TV>(*this,
-                *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(seed_range),TV(0,-1),spout,
-                TV(0,-pour_speed),gravity,max_dt*pour_speed+grid.dX.y,seed_buffer,mass,volume);
-            destroy=[=](){delete source;};
-            write_output_files=[=](){source->Write_Output_Files();};
-            read_output_files=[=](){source->Read_Output_Files();};
-            begin_time_step=[=](T time)
-            {
-                ARRAY<int> affected_particles;
-                int n=particles.number;
-                source->Begin_Time_Step(time);
-                T mu=E/(2*(1+nu));
-                T lambda=E*nu/((1+nu)*(1-2*nu));
-                for(int i=n;i<particles.number;i++){
-                    particles.mu(i)=mu;
-                    particles.mu0(i)=mu;
-                    particles.lambda(i)=lambda;
-                    particles.lambda0(i)=lambda;
-                    affected_particles.Append(i);}
-                for(int i=0;i<plasticity_models.m;i++)
-                    if(MPM_DRUCKER_PRAGER<TV>* dp=dynamic_cast<MPM_DRUCKER_PRAGER<TV>*>(plasticity_models(i)))
-                        dp->Initialize_Particles(&affected_particles);
-            };
-            end_time_step=[=](T time){source->End_Time_Step(time);};
-
-            Add_Drucker_Prager_Case(E,nu,2);
+            Add_Source(spout,TV(0,-1),spout_width/2,pour_speed,gravity,density,E,nu,
+                0,FLT_MAX,update_dp_func);
             Add_Gravity(gravity);
 
             RIGID_BODY<TV>& sphere=tests.Add_Analytic_Sphere(0.2,density*0.1);

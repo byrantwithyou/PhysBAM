@@ -50,6 +50,7 @@ public:
     using BASE::friction;using BASE::friction_is_set;using BASE::sigma_Y;using BASE::use_cohesion;
     using BASE::destroy;using BASE::plasticity_models;using BASE::write_output_files;using BASE::read_output_files;
     using BASE::extra_T;using BASE::extra_int;using BASE::dilation_only;using BASE::Add_Callbacks;
+    using BASE::Add_Source;using BASE::update_dp_func;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();

@@ -56,16 +56,16 @@ public:
     using BASE::end_frame;using BASE::begin_time_step;using BASE::end_time_step;
     using BASE::dump_collision_objects;using BASE::Perturb;using BASE::Uniform;using BASE::extra_T;using BASE::extra_int;
     using BASE::rd_penalty_stiffness;using BASE::rd_penalty_friction;
-    using BASE::tests;using BASE::solid_body_collection;
+    using BASE::tests;using BASE::solid_body_collection;using BASE::Sand_Color;
     using BASE::seed;using BASE::Seed_Particles_Surface;using BASE::Seed_Particles_Volume;
-    
+    using BASE::Add_Source;using BASE::update_dp_func;using BASE::use_colored_sand;
+
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();
 
     void Write_Output_Files() override;
     void Read_Output_Files() override;
     void Initialize() override;
-    VECTOR<T,3> Sand_Color();
 
     // additional storage
     int foo_int1;
@@ -79,9 +79,6 @@ public:
     bool use_foo_T3;
     bool use_foo_T4;
     bool use_foo_T5;
-
-    PIECEWISE_CONSTANT_PDF<T> sand_color_sampler;
-    VECTOR<T,3> sand_colors[3];
 //#####################################################################
 };
 }

@@ -32,7 +32,6 @@ class STANDARD_TESTS_BASE:public MPM_MAC_EXAMPLE<TV>
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m>::OBJECT T_VOLUME;
 
 public:
-//    typedef typename MPM_PARTICLE_SOURCE<TV>::PATH PATH;
     using BASE::last_frame;using BASE::grid;using BASE::particles;
     using BASE::frame_title;using BASE::write_substeps_level;
     using BASE::collision_objects;using BASE::substeps_delay_frame;using BASE::viewer_dir;
@@ -140,9 +139,9 @@ public:
             [this](const TV& X){return analytic_velocity->dX(X,0);},
             density,particles_per_cell);}
 
-    void Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)> dV,
+    int Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)> dV,
         const T mass,const T volume);
-    void Add_Particle(const TV& X,const TV& V,const MATRIX<T,TV::m>& dV,const T mass,const T volume);
+    int Add_Particle(const TV& X,const TV& V,const MATRIX<T,TV::m>& dV,const T mass,const T volume);
 
     void Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale=TV_INT()+1,int default_resolution=32);
     void Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale,TV_INT resolution_padding,
@@ -152,9 +151,8 @@ public:
         valid_face=[](const FACE_INDEX<TV::m>&){return true;}) const;
     void Velocity_Fourier_Analysis() const;
     void Energy_Vorticity_Analysis() const;
-    void Add_Source(const TV& X0,const TV& n,IMPLICIT_OBJECT<TV>* io,
-        std::function<void(TV X,T ts,T t,SOURCE_PATH<TV>& p)> path,T density,
-        T particles_per_cell,bool owns_io);
+    void Add_Source(const TV& X0,const TV& n,const TV& V0,const TV& g,
+        IMPLICIT_OBJECT<TV>* io,T density,T particles_per_cell,bool owns_io);
     void Commandline_Analytic_test();
 //#####################################################################
 };

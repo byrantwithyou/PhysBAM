@@ -183,7 +183,7 @@ Uniform(T a,T b) -> T
 //#####################################################################
 // Function Add_Particle
 //#####################################################################
-template<class TV> void STANDARD_TESTS_BASE<TV>::
+template<class TV> int STANDARD_TESTS_BASE<TV>::
 Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)> dV,
     const T mass,const T volume)
 {
@@ -198,6 +198,7 @@ Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,T
     particles.volume(p)=volume;
     ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
     (*color_attribute)(p)=VECTOR<T,3>(1,1,1);
+    return p;
 }
 //#####################################################################
 // Function Add_Gravity

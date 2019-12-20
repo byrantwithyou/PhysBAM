@@ -32,7 +32,7 @@ template<class TV> MPM_DRUCKER_PRAGER<TV>::
 // Function Initialize_Particle
 //#####################################################################
 template<class TV> void MPM_DRUCKER_PRAGER<TV>::
-Initialize_Particles(ARRAY<int>* affected_particles) const
+Initialize_Particles(const ARRAY<int>* affected_particles) const
 {
     Initialize_Particles(affected_particles,0);
 }
@@ -40,7 +40,7 @@ Initialize_Particles(ARRAY<int>* affected_particles) const
 // Function Initialize_Particle
 //#####################################################################
 template<class TV> void MPM_DRUCKER_PRAGER<TV>::
-Initialize_Particles(ARRAY<int>* affected_particles,T sigma_Y0) const
+Initialize_Particles(const ARRAY<int>* affected_particles,T sigma_Y0) const
 {
     if(affected_particles)
 #pragma omp parallel for

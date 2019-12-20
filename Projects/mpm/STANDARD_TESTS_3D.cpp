@@ -5,12 +5,11 @@
 #include <Core/Data_Structures/KD_TREE.h>
 #include <Core/Matrices/FRAME.h>
 #include <Grid_Tools/Grids/NODE_ITERATOR.h>
+#include <Geometry/Basic_Geometry/BOWL.h>
 #include <Geometry/Basic_Geometry/CONE.h>
 #include <Geometry/Basic_Geometry/CYLINDER.h>
 #include <Geometry/Basic_Geometry/HOURGLASS.h>
-#include <Geometry/Tessellation/BOWL_TESSELLATION.h>
 #include <Geometry/Basic_Geometry/ORIENTED_BOX.h>
-#include <Geometry/Basic_Geometry/BOWL.h>
 #include <Geometry/Basic_Geometry/SPHERE.h>
 #include <Geometry/Basic_Geometry/TORUS.h>
 #include <Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>
@@ -21,6 +20,8 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UNION.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UTILITIES.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Seeding/POISSON_DISK.h>
+#include <Geometry/Tessellation/BOWL_TESSELLATION.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <Deformables/Collisions_And_Interactions/PINNING_FORCE.h>
 #include <Deformables/Constitutive_Models/COROTATED_FIXED.h>
@@ -38,7 +39,6 @@
 #include <Hybrid_Methods/Forces/VOLUME_PRESERVING_OB_NEO_HOOKEAN.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
-#include "POUR_SOURCE.h"
 #include "STANDARD_TESTS_3D.h"
 #include <fstream>
 namespace PhysBAM{
@@ -1562,59 +1562,16 @@ Initialize()
             RANGE<TV> ground(TV(-10,-10,-10)*m,TV(10,0,10)*m);
             if(use_penalty_collisions) Add_Penalty_Collision_Object(ground);
             else Add_Collision_Object(ground,COLLISION_TYPE::stick,0);
-            T density=(T)2200*unit_rho*scale_mass;
             T E=35.37e4*unit_p*scale_E,nu=.3;
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            Add_Drucker_Prager(E,nu,foo_T2);
+            TV spout(0,0.06*m,0);
+            T density=(T)2200*unit_rho*scale_mass;
             T spout_width=8.334e-3*m;
-            T spout_height=.01*m;
-            T seed_buffer=grid.dX.y*5;
             T pour_speed=.16319*m/s;
             TV gravity=TV(0,-9.8*m/(s*s),0);
-            CYLINDER<T> seed_range(TV(0,0.06*m-spout_height,0),TV(0,0.06*m+seed_buffer,0),spout_width/2);
-
-            T volume=grid.dX.Product()/particles_per_cell;
-            T mass=density*volume;
-            POUR_SOURCE<TV>* source=new POUR_SOURCE<TV>(*this,
-                *new ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T> >(seed_range),TV(0,-1,0),grid.domain.max_corner,
-                TV(0,-pour_speed,0),gravity,max_dt*pour_speed+grid.dX.y,seed_buffer,mass,volume);
-            destroy=[=](){delete source;};
-            write_output_files.Append([=](){source->Write_Output_Files();});
-            read_output_files.Append([=](){source->Read_Output_Files();});
-            Add_Callbacks(true,"time-step",[=]()
-                {
-                    if(time<0.08||time>=foo_T3) return;
-                    ARRAY<int> affected_particles;
-                    int n=particles.number;
-                    source->Begin_Time_Step(time);
-                    T mu=E/(2*(1+nu));
-                    T lambda=E*nu/((1+nu)*(1-2*nu));
-                    for(int i=n;i<particles.number;i++){
-                        particles.mu(i)=mu;
-                        particles.mu0(i)=mu;
-                        particles.lambda(i)=lambda;
-                        particles.lambda0(i)=lambda;
-                        affected_particles.Append(i);}
-                    for(int i=0;i<plasticity_models.m;i++)
-                        if(MPM_DRUCKER_PRAGER<TV>* dp=dynamic_cast<MPM_DRUCKER_PRAGER<TV>*>(plasticity_models(i)))
-                            dp->Initialize_Particles(&affected_particles);
-                
-                });
-            Add_Callbacks(false,"time-step",[=](){
-                    if(time<=foo_T3)
-                        source->End_Time_Step(time);
-                });
-
-
-
-            if(!no_implicit_plasticity) use_implicit_plasticity=true;
-            //int case_num=use_hardening_mast_case?hardening_mast_case:2;
-
-            //ARRAY<int> sand_particles(particles.X.m);
-            //for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
-
-            // Add_Drucker_Prager(E,nu,foo_T2,&sand_particles);
-            Add_Drucker_Prager(E,nu,foo_T2);
-
-            // Add_Drucker_Prager_Case(E,nu,case_num);
+            Add_Source(spout,TV(0,-1,0),spout_width/2,pour_speed,gravity,density,E,nu,
+                (T)0.08,foo_T3,update_dp_func);
             Set_Lame_On_Particles(E,nu);
             Add_Gravity(gravity);
         } break;

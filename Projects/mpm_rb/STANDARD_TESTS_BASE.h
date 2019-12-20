@@ -16,6 +16,8 @@
 namespace PhysBAM{
 
 template<class TV> class STANDARD_TESTS;
+template<class TV> class POISSON_DISK;
+template<class TV> class MPM_PARTICLE_SOURCE;
 template<class T,int d> class ISOTROPIC_CONSTITUTIVE_MODEL;
 
 template<class TV>
@@ -92,6 +94,10 @@ public:
 
     RANDOM_NUMBERS<T> random;
     SOLIDS_STANDARD_TESTS<TV> tests;
+    POISSON_DISK<TV>& poisson_disk;
+    ARRAY<MPM_PARTICLE_SOURCE<TV>*> sources;
+    std::function<void(const ARRAY<int>&)> update_dp_func;
+    bool use_colored_sand=false;
 
     STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS_BASE();
@@ -147,8 +153,9 @@ public:
         std::function<FRAME<TV>(T)> func_frame=0,std::function<TWIST<TV>(T)> func_twist=0)
     {Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<OBJECT>(object),type,friction,func_frame,func_twist);}
 
-    void Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)> dV,
+    int Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)> dV,
         const T mass,const T volume);
+    int Add_Particle(const TV& X,const TV& V,const MATRIX<T,TV::m>& dV,const T mass,const T volume);
     void Add_Lambda_Particles(ARRAY<int>* affected_particles,T E,T nu,T density,bool no_mu=false,T porosity=(T)1,T saturation_level=(T)1);
     int Add_Gravity(TV g,ARRAY<int>* affected_particles=0);
     int Add_Gravity2(TV g,ARRAY<int>* affected_particles=0);
@@ -170,8 +177,12 @@ public:
     void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io);
     void Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction,
         std::function<FRAME<TV>(T)> func_frame,std::function<TWIST<TV>(T)> func_twist);
+    void Add_Source(const TV& source_location,const TV& source_normal,
+        T source_radius,T source_speed,const TV& gravity,T density,T E,T nu,
+        T start_time,T stop_time,std::function<void(const ARRAY<int>&)> particle_func);
     void Write_Output_Files() override;
     void Read_Output_Files() override;
+    VECTOR<T,3> Sand_Color();
 //#####################################################################
 };
 }

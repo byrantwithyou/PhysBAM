@@ -8,7 +8,6 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_INVERT.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UNION.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
-#include <Hybrid_Methods/Seeding/MPM_PARTICLE_SOURCE.h>
 #include "STANDARD_TESTS_3D.h"
 #include <fstream>
 namespace PhysBAM{
@@ -99,17 +98,8 @@ Initialize()
             TV X0=source_range.min_corner;
             X0.x+=2*inlet_half_width;
             X0.z+=2*inlet_half_width;
-            Add_Source(X0,TV(0,1,0),Make_IO(source_range),
-                [=](TV X,T ts,T t,SOURCE_PATH<TV>& p)
-                {
-                    p.vp=TV(0,velocity,0);
-                    if(time>stop_time) p.vp=TV();
-                    p.xp=X+(t-ts)*p.vp;
-                    p.xp_ts=-p.vp;
-                    p.vp_ts=TV();
-                    p.xp_x=MATRIX<T,TV::m>()+1;
-                    p.vp_x=MATRIX<T,TV::m>();
-                },density,particles_per_cell,true);
+            Add_Source(X0,TV(0,1,0),TV(0,velocity,0),TV(),
+                Make_IO(source_range),density,particles_per_cell,true);
         } break;
         case 100: this->Commandline_Analytic_test(); break;
         default: PHYSBAM_FATAL_ERROR("test number not implemented");

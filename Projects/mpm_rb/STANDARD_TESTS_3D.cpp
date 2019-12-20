@@ -44,7 +44,6 @@
 #include <Hybrid_Methods/Forces/VOLUME_PRESERVING_OB_NEO_HOOKEAN.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS.h>
-#include "POUR_SOURCE.h"
 #include "STANDARD_TESTS_3D.h"
 #include <fstream>
 namespace PhysBAM{
@@ -55,8 +54,7 @@ template<class T> STANDARD_TESTS<VECTOR<T,3> >::
 STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     :STANDARD_TESTS_BASE<TV>(stream_type_input,parse_args),
     foo_int1(0),foo_T1(0),foo_T2(0),foo_T3(0),foo_T4(0),foo_T5(0),
-    use_foo_T1(false),use_foo_T2(false),use_foo_T3(false),use_foo_T4(false),use_foo_T5(false),
-    sand_color_sampler(3)
+    use_foo_T1(false),use_foo_T2(false),use_foo_T3(false),use_foo_T4(false),use_foo_T5(false)
 {
     parse_args.Add("-fooint1",&foo_int1,"int1","a interger");
     parse_args.Add("-fooT1",&foo_T1,&use_foo_T1,"T1","a scalar");
@@ -93,27 +91,12 @@ Read_Output_Files()
     BASE::Read_Output_Files();
 }
 //#####################################################################
-// Function Colorize_Particles
-//#####################################################################
-template<class T> VECTOR<T,3> STANDARD_TESTS<VECTOR<T,3> >::
-Sand_Color()
-{
-    return sand_colors[sand_color_sampler.Sample(random.Get_Number()).x];
-}
-//#####################################################################
 // Function Initialize
 //#####################################################################
 template<class T> void STANDARD_TESTS<VECTOR<T,3> >::
 Initialize()
 {
     this->asymmetric_system=true;
-    sand_color_sampler.pdf(0)=0.05;
-    sand_color_sampler.pdf(1)=0.1;
-    sand_color_sampler.pdf(2)=0.85;
-    sand_color_sampler.Compute_Cumulative_Distribution_Function();
-    sand_colors[0]=VECTOR<T,3>(1,1,1);
-    sand_colors[1]=VECTOR<T,3>(107.0/255,84.0/255,30.0/255);
-    sand_colors[2]=VECTOR<T,3>(1,169.0/255,95.0/255);
     switch(test_number)
     {
             // sticking: ./mpm_rb -3d 8 -float -scale_E .1 -rd_stiffness 1e-1 -max_dt .01 -T .1 -T .1 -T .2 -regular_seeding
@@ -409,51 +392,18 @@ Initialize()
             bw.is_static=true;
             bw.Frame().t=TV(1.5,0.05,1.5);
 
-            T density=(T)2200*unit_rho*scale_mass;
+            use_colored_sand=true;
             T E=35.37e4*unit_p*scale_E,nu=.3;
-            TV spout(1.5,0.8,1.5);
-            T spout_width=.1*m;
-            T spout_height=.05*m;
-            T seed_buffer=grid.dX.y*5;
-            T pour_speed=.2*m/s;
-            TV gravity=TV(0,-9.8*m/(s*s),0);
-            RANGE<TV> seed_range(spout+TV(-spout_width/2,-spout_height,-spout_width/2),
-                spout+TV(spout_width/2,seed_buffer,spout_width/2));
-
-            T volume=grid.dX.Product()/particles_per_cell;
-            T mass=density*volume;
-            POUR_SOURCE<TV>* source=new POUR_SOURCE<TV>(*this,
-                *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(seed_range),TV(0,-1,0),spout,
-                TV(0,-pour_speed,0),gravity,max_dt*pour_speed+grid.dX.y,seed_buffer,mass,volume);
-            destroy=[=](){delete source;};
-            write_output_files=[=](){source->Write_Output_Files();};
-            read_output_files=[=](){source->Read_Output_Files();};
-            ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
-            begin_time_step=[=](T time)
-            {
-                if(this->pfd) this->pfd->ccd_d_stale=true;
-                ARRAY<int> affected_particles;
-                int n=particles.number;
-                source->Begin_Time_Step(time);
-                T mu=E/(2*(1+nu));
-                T lambda=E*nu/((1+nu)*(1-2*nu));
-                for(int i=n;i<particles.number;i++){
-                    particles.mu(i)=mu;
-                    particles.mu0(i)=mu;
-                    particles.lambda(i)=lambda;
-                    particles.lambda0(i)=lambda;
-                    (*colors)(i)=Sand_Color();
-                    affected_particles.Append(i);}
-                LOG::printf("Particles: %d %d\n",particles.number,particles.number-n);
-                for(int i=0;i<plasticity_models.m;i++)
-                    if(MPM_DRUCKER_PRAGER<TV>* dp=dynamic_cast<MPM_DRUCKER_PRAGER<TV>*>(plasticity_models(i)))
-                        dp->Initialize_Particles(&affected_particles);
-            };
-            end_time_step=[=](T time){source->End_Time_Step(time);};
-
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
             Add_Drucker_Prager(E,nu,foo_T2);
+            TV spout(1.5,0.8,1.5);
+            T density=(T)2200*unit_rho*scale_mass;
+            T spout_width=.1*m;
+            T pour_speed=.2*m/s;
+            TV gravity=TV(0,-9.8*m/(s*s),0);
             Set_Lame_On_Particles(E,nu);
+            Add_Source(spout,TV(0,-1,0),spout_width/2,pour_speed,gravity,density,E,nu,
+                0,FLT_MAX,update_dp_func);
             Add_Gravity(gravity);
 
             RIGID_BODY<TV>& sphere=tests.Add_Analytic_Sphere(0.2,density*0.1);
@@ -472,45 +422,16 @@ Initialize()
             bw.is_static=true;
             bw.Frame().t=TV(1.5,0.05,1.5);
 
-            T density=(T)2200*unit_rho*scale_mass;
             T E=1e4*unit_p*scale_E,nu=.3;
             TV spout(1.5,0.8,1.5);
+            T density=(T)2200*unit_rho*scale_mass;
             T spout_width=.1*m;
-            T spout_height=.05*m;
-            T seed_buffer=grid.dX.y*5;
             T pour_speed=.2*m/s;
             TV gravity=TV(0,-9.8*m/(s*s),0);
-            RANGE<TV> seed_range(spout+TV(-spout_width/2,-spout_height,-spout_width/2),
-                spout+TV(spout_width/2,seed_buffer,spout_width/2));
-
-            T volume=grid.dX.Product()/particles_per_cell;
-            T mass=density*volume;
-            POUR_SOURCE<TV>* source=new POUR_SOURCE<TV>(*this,
-                *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(seed_range),TV(0,-1,0),spout,
-                TV(0,-pour_speed,0),gravity,max_dt*pour_speed+grid.dX.y,seed_buffer,mass,volume);
-            destroy=[=](){delete source;};
-            write_output_files=[=](){source->Write_Output_Files();};
-            read_output_files=[=](){source->Read_Output_Files();};
-            begin_time_step=[=](T time)
-            {
-                if(this->pfd) this->pfd->ccd_d_stale=true;
-                ARRAY<int> affected_particles;
-                int n=particles.number;
-                source->Begin_Time_Step(time);
-                T mu=E/(2*(1+nu));
-                T lambda=E*nu/((1+nu)*(1-2*nu));
-                for(int i=n;i<particles.number;i++){
-                    particles.mu(i)=mu;
-                    particles.mu0(i)=mu;
-                    particles.lambda(i)=lambda;
-                    particles.lambda0(i)=lambda;
-                    affected_particles.Append(i);}
-                LOG::printf("Particles: %d %d\n",particles.number,particles.number-n);
-                for(int i=0;i<plasticity_models.m;i++)
-                    if(MPM_PLASTICITY_CLAMP<TV>* pc=dynamic_cast<MPM_PLASTICITY_CLAMP<TV>*>(plasticity_models(i)))
-                        pc->Initialize_Particles(&affected_particles);
-            };
-            end_time_step=[=](T time){source->End_Time_Step(time);};
+            Set_Lame_On_Particles(E,nu);
+            Add_Source(spout,TV(0,-1,0),spout_width/2,pour_speed,gravity,density,E,nu,
+                0,FLT_MAX,0);
+            Add_Gravity(gravity);
 
             if(!use_theta_c) theta_c=0.015;
             if(!use_theta_s) theta_s=.000001;
@@ -686,54 +607,18 @@ Initialize()
             auto* rg=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,0,g);
             solid_body_collection.rigid_body_collection.Add_Force(rg);
 
+            use_colored_sand=true;
             T E=35.37e6*unit_p*scale_E,nu=.3;
-            TV spout(0,1,0);
-            T spout_width=.2*m;
-            T spout_height=.2*m;
-            T seed_buffer=grid.dX.y*5;
-            T pour_speed=.3*m/s;
-            RANGE<TV> seed_range(spout+TV(-spout_width/2,-spout_height,-spout_width/2),
-                spout+TV(spout_width/2,seed_buffer,spout_width/2));
-
-            T volume=grid.dX.Product()/particles_per_cell;
-            T mass=density*volume;
-            POUR_SOURCE<TV>* source=new POUR_SOURCE<TV>(*this,
-                *new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(seed_range),TV(0,-1,0),spout,
-                TV(0,-pour_speed,0),g,max_dt*pour_speed+grid.dX.y,seed_buffer,mass,volume);
-            destroy=[=](){delete source;};
-            write_output_files=[=](){source->Write_Output_Files();};
-            read_output_files=[=](){source->Read_Output_Files();};
-            T source_start=4;
-            T source_end=100;
-            ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
-            begin_time_step=[=](T time)
-            {
-                if(time<source_start || time>source_end) return;
-                if(this->pfd->ccd_d) this->pfd->ccd_d_stale=true;
-                ARRAY<int> affected_particles;
-                int n=particles.number;
-                source->Begin_Time_Step(time-source_start);
-                T mu=E/(2*(1+nu));
-                T lambda=E*nu/((1+nu)*(1-2*nu));
-                for(int i=n;i<particles.number;i++){
-                    particles.mu(i)=mu;
-                    particles.mu0(i)=mu;
-                    particles.lambda(i)=lambda;
-                    particles.lambda0(i)=lambda;
-                    (*colors)(i)=Sand_Color();
-                    affected_particles.Append(i);}
-                LOG::printf("Particles: %d %d\n",particles.number,particles.number-n);
-                for(int i=0;i<plasticity_models.m;i++)
-                    if(MPM_DRUCKER_PRAGER<TV>* dp=dynamic_cast<MPM_DRUCKER_PRAGER<TV>*>(plasticity_models(i)))
-                        dp->Initialize_Particles(&affected_particles);
-            };
-            end_time_step=[=](T time){
-                if(time<source_start) return;
-                source->End_Time_Step(time-source_start);};
-
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
             Add_Drucker_Prager(E,nu,foo_T2);
+            TV spout(0,1,0);
+            T spout_width=.2*m;
+            T pour_speed=.3*m/s;
+            T source_start=4;
+            T source_end=100;
             Set_Lame_On_Particles(E,nu);
+            Add_Source(spout,TV(0,-1,0),spout_width/2,pour_speed,g,density,E,nu,
+                source_start,source_end,update_dp_func);
             Add_Gravity(g);
             break;}
 
@@ -834,60 +719,18 @@ Initialize()
             RANGE<TV> ground(TV(-10,-10,-10)*m,TV(10,0,10)*m);
             if(use_penalty_collisions) Add_Penalty_Collision_Object(ground);
             else Add_Collision_Object(ground,COLLISION_TYPE::stick,0);
-            T density=(T)2200*unit_rho*scale_mass;
+
             T E=35.37e4*unit_p*scale_E,nu=.3;
+            if(!no_implicit_plasticity) use_implicit_plasticity=true;
+            Add_Drucker_Prager(E,nu,foo_T2);
+            TV spout(0,0.06*m,0);
+            T density=(T)2200*unit_rho*scale_mass;
             T spout_width=8.334e-3*m;
-            T spout_height=.01*m;
-            T seed_buffer=grid.dX.y*5;
             T pour_speed=.16319*m/s;
             TV gravity=TV(0,-9.8*m/(s*s),0);
-            CYLINDER<T> seed_range(TV(0,0.06*m-spout_height,0),TV(0,0.06*m+seed_buffer,0),spout_width/2);
-
-            T volume=grid.dX.Product()/particles_per_cell;
-            T mass=density*volume;
-            POUR_SOURCE<TV>* source=new POUR_SOURCE<TV>(*this,
-                *new ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T> >(seed_range),TV(0,-1,0),grid.domain.max_corner,
-                TV(0,-pour_speed,0),gravity,max_dt*pour_speed+grid.dX.y,seed_buffer,mass,volume);
-            destroy=[=](){delete source;};
-            write_output_files=[=](){source->Write_Output_Files();};
-            read_output_files=[=](){source->Read_Output_Files();};
-            begin_time_step=[=](T time)
-                {
-                    if(time<0.08||time>=foo_T3) return;
-                    ARRAY<int> affected_particles;
-                    int n=particles.number;
-                    source->Begin_Time_Step(time);
-                    T mu=E/(2*(1+nu));
-                    T lambda=E*nu/((1+nu)*(1-2*nu));
-                    for(int i=n;i<particles.number;i++){
-                        particles.mu(i)=mu;
-                        particles.mu0(i)=mu;
-                        particles.lambda(i)=lambda;
-                        particles.lambda0(i)=lambda;
-                        affected_particles.Append(i);}
-                    for(int i=0;i<plasticity_models.m;i++)
-                        if(MPM_DRUCKER_PRAGER<TV>* dp=dynamic_cast<MPM_DRUCKER_PRAGER<TV>*>(plasticity_models(i)))
-                            dp->Initialize_Particles(&affected_particles);
-                
-                };
-            end_time_step=[=](T time){
-                if(time<=foo_T3)
-                    source->End_Time_Step(time-0.08);
-            };
-
-
-
-            if(!no_implicit_plasticity) use_implicit_plasticity=true;
-            //int case_num=use_hardening_mast_case?hardening_mast_case:2;
-
-            //ARRAY<int> sand_particles(particles.X.m);
-            //for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
-
-            // Add_Drucker_Prager(E,nu,foo_T2,&sand_particles);
-            Add_Drucker_Prager(E,nu,foo_T2);
-
-            // Add_Drucker_Prager_Case(E,nu,case_num);
             Set_Lame_On_Particles(E,nu);
+            Add_Source(spout,TV(0,-1,0),spout_width/2,pour_speed,gravity,density,E,nu,
+                0.08,foo_T3,update_dp_func);
             Add_Gravity(gravity);
         } break;
 
@@ -901,58 +744,15 @@ Initialize()
             T density=(T)2200*unit_rho*scale_mass;
             T E=35.37e4*unit_p*scale_E,nu=.3;
             T spout_width=8.334e-3*m;
-            T spout_height=.01*m;
-            T seed_buffer=grid.dX.y*5;
             T pour_speed=.16319*m/s;
             TV gravity=TV(0,-9.8*m/(s*s),0);
-            CYLINDER<T> seed_range(TV(0,0.06*m-spout_height,0),TV(0,0.06*m+seed_buffer,0),spout_width/2);
-
-            T volume=grid.dX.Product()/particles_per_cell;
-            T mass=density*volume;
-            POUR_SOURCE<TV>* source=new POUR_SOURCE<TV>(*this,
-                *new ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T> >(seed_range),TV(0,-1,0),grid.domain.max_corner,
-                TV(0,-pour_speed,0),gravity,max_dt*pour_speed+grid.dX.y,seed_buffer,mass,volume);
-            destroy=[=](){delete source;};
-            write_output_files=[=](){source->Write_Output_Files();};
-            read_output_files=[=](){source->Read_Output_Files();};
-            begin_time_step=[=](T time)
-                {
-                    if(time<0.08||time>=foo_T3) return;
-                    if(this->pfd) this->pfd->ccd_d_stale=true;
-                    ARRAY<int> affected_particles;
-                    int n=particles.number;
-                    source->Begin_Time_Step(time);
-                    T mu=E/(2*(1+nu));
-                    T lambda=E*nu/((1+nu)*(1-2*nu));
-                    for(int i=n;i<particles.number;i++){
-                        particles.mu(i)=mu;
-                        particles.mu0(i)=mu;
-                        particles.lambda(i)=lambda;
-                        particles.lambda0(i)=lambda;
-                        affected_particles.Append(i);}
-                    for(int i=0;i<plasticity_models.m;i++)
-                        if(MPM_DRUCKER_PRAGER<TV>* dp=dynamic_cast<MPM_DRUCKER_PRAGER<TV>*>(plasticity_models(i)))
-                            dp->Initialize_Particles(&affected_particles);
-                
-                };
-            end_time_step=[=](T time){
-                if(time<=foo_T3)
-                    source->End_Time_Step(time-0.08);
-            };
-
-
-
+            use_colored_sand=true;
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
-            //int case_num=use_hardening_mast_case?hardening_mast_case:2;
-
-            //ARRAY<int> sand_particles(particles.X.m);
-            //for(int p=0;p<particles.X.m;p++) sand_particles(p)=p;
-
-            // Add_Drucker_Prager(E,nu,foo_T2,&sand_particles);
             Add_Drucker_Prager(E,nu,foo_T2);
-
-            // Add_Drucker_Prager_Case(E,nu,case_num);
+            TV spout(0,0.06*m,0);
             Set_Lame_On_Particles(E,nu);
+            Add_Source(spout,TV(0,-1,0),spout_width/2,pour_speed,gravity,density,E,nu,
+                0.08,foo_T3,update_dp_func);
             Add_Gravity(gravity);
         } break;
             

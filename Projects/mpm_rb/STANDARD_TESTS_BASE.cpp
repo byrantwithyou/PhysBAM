@@ -34,6 +34,7 @@
 #include <Hybrid_Methods/Forces/MPM_PLASTICITY_CLAMP.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
 #include <Hybrid_Methods/Iterators/PARTICLE_GRID_WEIGHTS_SPLINE.h>
+#include <Hybrid_Methods/Seeding/MPM_PARTICLE_SOURCE.h>
 #include "STANDARD_TESTS_BASE.h"
 #ifdef USE_OPENMP
 #include <omp.h>
@@ -53,7 +54,8 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     theta_c(0),theta_s(0),hardening_factor(0),max_hardening(7),use_implicit_plasticity(false),no_implicit_plasticity(false),
     hardening_mast_case(0),use_hardening_mast_case(false),override_output_directory(false),
     m(1),s(1),kg(1),forced_collision_type(-1),friction(0),friction_is_set(false),sigma_Y(0),use_cohesion(false),write_output_files(0),read_output_files(0),
-    dump_collision_objects(false),tests(STREAM_TYPE(0.f),data_directory,solid_body_collection)
+    dump_collision_objects(false),tests(STREAM_TYPE(0.f),data_directory,solid_body_collection),
+    poisson_disk(*new POISSON_DISK<TV>(1))
 {
     T framerate=0;
     bool use_quasi_exp_F_update=false;
@@ -197,6 +199,23 @@ template<class TV> STANDARD_TESTS_BASE<TV>::
 ~STANDARD_TESTS_BASE()
 {
     if(destroy) destroy();
+    for(auto p:sources)
+    {
+        delete p->io;
+        delete p;
+    }
+    delete &poisson_disk;
+}
+//#####################################################################
+// Function Colorize_Particles
+//#####################################################################
+template<class TV> auto STANDARD_TESTS_BASE<TV>::
+Sand_Color() -> VECTOR<T,3>
+{
+    T p=random.Get_Number();
+    if(p<0.05) return VECTOR<T,3>(1,1,1);
+    if(p<0.05+0.1) return VECTOR<T,3>(107.0/255,84.0/255,30.0/255);
+    return VECTOR<T,3>(1,169.0/255,95.0/255);
 }
 //#####################################################################
 // Function Seed_Particles
@@ -205,9 +224,7 @@ template<class TV> void STANDARD_TESTS_BASE<TV>::
 Seed_Particles_Poisson(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
     std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,T particles_per_cell,const char* name)
 {
-    POISSON_DISK<TV> poisson_disk(1);
     ARRAY<TV> X;
-    poisson_disk.Set_Distance_By_Volume(grid.dX.Product()/particles_per_cell);
     poisson_disk.Sample(random,object,X);
 
     T volume=grid.dX.Product()/particles_per_cell;
@@ -269,25 +286,34 @@ Uniform(T a,T b) -> T
 //#####################################################################
 // Function Add_Particle
 //#####################################################################
-template<class TV> void STANDARD_TESTS_BASE<TV>::
-Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)> dV,
-    const T mass,const T volume)
+template<class TV> int STANDARD_TESTS_BASE<TV>::
+Add_Particle(const TV& X,const TV& V,const MATRIX<T,TV::m>& dV,const T mass,const T volume)
 {
     int p=particles.Add_Element();
     particles.valid(p)=true;
     particles.X(p)=X;
-    if(V) particles.V(p)=V(X);
+    particles.V(p)=V;
     particles.F(p)=MATRIX<T,TV::m>()+1;
     if(particles.store_Fp) particles.Fp(p).Set_Identity_Matrix();
-    if(particles.store_B && dV){
-        if(lag_Dp) particles.B(p)=dV(X);
+    if(particles.store_B){
+        if(lag_Dp) particles.B(p)=dV;
         else
-            particles.B(p)=dV(X)*weights->Dp_Inverse(X).Inverse();}
+            particles.B(p)=dV*weights->Dp_Inverse(X).Inverse();}
     if(particles.store_S) particles.S(p)=SYMMETRIC_MATRIX<T,TV::m>()+1;
     particles.mass(p)=mass;
     particles.volume(p)=volume;
     ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
     (*color_attribute)(p)=VECTOR<T,3>(1,1,1);
+    return p;
+}
+//#####################################################################
+// Function Add_Particle
+//#####################################################################
+template<class TV> int STANDARD_TESTS_BASE<TV>::
+Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)> dV,
+    const T mass,const T volume)
+{
+    return Add_Particle(X,V?V(X):TV(),dV?dV(X):MATRIX<T,TV::m>(),mass,volume);
 }
 //#####################################################################
 // Function Add_Lambda_Particles
@@ -384,19 +410,20 @@ Add_Drucker_Prager(T E,T nu,T a0,T a1,T a3,T a4,ARRAY<int>* affected_particles,b
     ST_VENANT_KIRCHHOFF_HENCKY_STRAIN<T,TV::m>* hencky=new ST_VENANT_KIRCHHOFF_HENCKY_STRAIN<T,TV::m>(E,nu);
     if(no_mu){nu=0;hencky->Zero_Out_Mu();}
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model=*hencky;
-    MPM_DRUCKER_PRAGER<TV>& plasticity=*new MPM_DRUCKER_PRAGER<TV>(particles,0,a0,a1,a3,a4);
-    plasticity.use_implicit=use_implicit_plasticity;
+    MPM_DRUCKER_PRAGER<TV>* plasticity=new MPM_DRUCKER_PRAGER<TV>(particles,0,a0,a1,a3,a4);
+    plasticity->use_implicit=use_implicit_plasticity;
     PARTICLE_GRID_FORCES<TV>* fe=0;
     if(use_implicit_plasticity){
-        fe=new MPM_PLASTIC_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles,plasticity);
+        fe=new MPM_PLASTIC_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles,*plasticity);
         this->asymmetric_system=true;}
     else{
         MPM_FINITE_ELEMENTS<TV>* mfe=new MPM_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles);
-        plasticity.gather_scatter=&mfe->gather_scatter;
+        plasticity->gather_scatter=&mfe->gather_scatter;
         fe=mfe;}
-    plasticity.Initialize_Particles(affected_particles,sigma_Y);
-    plasticity_models.Append(&plasticity);
+    plasticity->Initialize_Particles(affected_particles,sigma_Y);
+    plasticity_models.Append(plasticity);
     Set_Lame_On_Particles(E,nu,affected_particles);
+    update_dp_func=[=](const ARRAY<int>& a){plasticity->Initialize_Particles(&a);};
     return Add_Force(*fe);
 }
 //#####################################################################
@@ -549,6 +576,7 @@ Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale,int default_resolution)
     if(!user_resolution) resolution=default_resolution;
     grid.Initialize(resolution_scale*resolution,domain,true);
     Set_Weights(order);
+    poisson_disk.Set_Distance_By_Volume(grid.dX.Product()/particles_per_cell);
 }
 //#####################################################################
 // Function Set_Grid
@@ -561,6 +589,7 @@ Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale,TV_INT resolution_paddi
     int scaled_resolution=(resolution+resolution_multiple-1)/resolution_multiple;
     grid.Initialize(resolution_scale*scaled_resolution+resolution_padding,domain,true);
     Set_Weights(order);
+    poisson_disk.Set_Distance_By_Volume(grid.dX.Product()/particles_per_cell);
 }
 //#####################################################################
 // Function Add_Collision_Object
@@ -642,11 +671,52 @@ Seed_Particles_Surface(const T_STRUCTURE& object,IMPLICIT_OBJECT<TV>& io,std::fu
         particles.volume(p)=volume;}
 
     ARRAY<TV> X(ts.particles.X);
-    POISSON_DISK<TV> poisson_disk(1);
-    poisson_disk.Set_Distance_By_Volume(volume);
     poisson_disk.Sample(random,io,X);
     for(int p=ts.particles.X.m;p<X.m;p++)
         Add_Particle(X(p),V,dV,mass,volume);
+}
+//#####################################################################
+// Function Add_Source
+//#####################################################################
+template<class TV> void STANDARD_TESTS_BASE<TV>::
+Add_Source(const TV& source_location,const TV& source_normal,
+    T source_radius,T source_speed,const TV& gravity,T density,T E,T nu,
+    T start_time,T stop_time,
+    std::function<void(const ARRAY<int>&)> particle_func)
+{
+    T volume=grid.dX.Product()/particles_per_cell;
+    T mass=density*volume;
+    SPHERE<TV> seed_volume(source_location,source_radius);
+    MPM_PARTICLE_SOURCE<TV>* source=new MPM_PARTICLE_SOURCE<TV>(poisson_disk,
+        random,source_location,source_normal,source_normal*source_speed,
+        gravity,Make_IO(seed_volume));
+    T mu=E/(2*(1+nu));
+    T lambda=E*nu/((1+nu)*(1-2*nu));
+    this->end_time_step=[=](T time)
+        {
+            if(time<start_time || time>=stop_time) return;
+            if(this->pfd) this->pfd->ccd_d_stale=true;
+            ARRAY<TV> X,V;
+            ARRAY<MATRIX<T,TV::m> > dV;
+            ARRAY<int> affected_particles;
+            source->Seed(this->dt,X,V,&dV);
+            for(int i=0;i<X.m;i++)
+            {
+                int p=Add_Particle(X(i),V(i),dV(i),mass,volume);
+                particles.mu(p)=mu;
+                particles.mu0(p)=mu;
+                particles.lambda(p)=lambda;
+                particles.lambda0(p)=lambda;
+                affected_particles.Append(p);
+            }
+            if(particle_func) particle_func(affected_particles);
+            if(use_colored_sand)
+            {
+                ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
+                for(int p:affected_particles)
+                    (*colors)(p)=Sand_Color();
+            }
+        };
 }
 //#####################################################################
 // Function Write_Output_Files
@@ -654,7 +724,11 @@ Seed_Particles_Surface(const T_STRUCTURE& object,IMPLICIT_OBJECT<TV>& io,std::fu
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Write_Output_Files()
 {
-    Write_To_File(stream_type,viewer_dir.current_directory+"/random_number",random);
+    FILE_OSTREAM output;
+    Safe_Open_Output(output,stream_type,viewer_dir.current_directory+"/restart_data_stb");
+    Write_Binary(output,random);
+    for(auto p:sources) 
+        Write_Binary(output,*p);
     BASE::Write_Output_Files();
 }
 //#####################################################################
@@ -663,7 +737,11 @@ Write_Output_Files()
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Read_Output_Files()
 {
-    Read_From_File(viewer_dir.current_directory+"/random_number",random);
+    FILE_ISTREAM input;
+    Safe_Open_Input(input,viewer_dir.current_directory+"/restart_data_stb");
+    Read_Binary(input,random);
+    for(auto p:sources) 
+        Read_Binary(input,*p);
     BASE::Read_Output_Files();
 }
 template class STANDARD_TESTS_BASE<VECTOR<float,2> >;

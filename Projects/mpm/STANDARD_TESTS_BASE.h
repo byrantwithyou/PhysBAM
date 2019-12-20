@@ -15,6 +15,8 @@
 namespace PhysBAM{
 
 template<class TV> class STANDARD_TESTS;
+template<class TV> class POISSON_DISK;
+template<class TV> class MPM_PARTICLE_SOURCE;
 template<class T,int d> class ISOTROPIC_CONSTITUTIVE_MODEL;
 template<class TV>
 class STANDARD_TESTS_BASE:public MPM_EXAMPLE<TV>
@@ -44,7 +46,7 @@ public:
     using BASE::Add_Collision_Object;using typename BASE::COLLISION_TYPE;
     using BASE::data_directory;using BASE::reflection_bc_flags;
     using BASE::quad_F_coeff;using BASE::use_sound_speed_cfl;using BASE::cfl_sound;
-    using BASE::side_bc_type;
+    using BASE::side_bc_type;using BASE::Add_Callbacks;
 
     int test_number;
     int resolution;
@@ -79,8 +81,11 @@ public:
     ARRAY<T> extra_T;
     ARRAY<int> extra_int;
     bool dump_collision_objects;
+    ARRAY<MPM_PARTICLE_SOURCE<TV>*> sources;
+    std::function<void(const ARRAY<int>&)> update_dp_func;
 
     RANDOM_NUMBERS<T> random;
+    POISSON_DISK<TV>& poisson_disk;
     DEFORMABLES_STANDARD_TESTS<TV> tests;
 
     STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
@@ -122,8 +127,9 @@ public:
     Add_Penalty_Collision_Object(const OBJECT& object,const T coefficient_of_friction=(T)0)
     {Add_Penalty_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<OBJECT>(object),coefficient_of_friction);}
 
-    void Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)> dV,
+    int Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)> dV,
         const T mass,const T volume);
+    int Add_Particle(const TV& X,const TV& V,const MATRIX<T,TV::m>& dV,const T mass,const T volume);
     void Add_Lambda_Particles(ARRAY<int>* affected_particles,T E,T nu,T density,bool no_mu=false,T porosity=(T)1,T saturation_level=(T)1);
     int Add_Gravity(TV g,ARRAY<int>* affected_particles=0);
     int Add_Gravity2(TV g,ARRAY<int>* affected_particles=0);
@@ -142,6 +148,9 @@ public:
     void Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale=TV_INT()+1,int default_resolution=32);
     void Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale,TV_INT resolution_padding,
         int resolution_multiple=1,int default_resolution=32);
+    void Add_Source(const TV& source_location,const TV& source_normal,
+        T source_radius,T source_speed,const TV& gravity,T density,T E,T nu,
+        T start_time,T stop_time,std::function<void(const ARRAY<int>&)> particle_func);
 //#####################################################################
 };
 }

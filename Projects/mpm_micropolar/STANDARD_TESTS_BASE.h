@@ -94,7 +94,7 @@ public:
         std::function<MATRIX<T,TV::m>(const TV&)> dV,T density,T particles_per_cell)
     {ANALYTIC_IMPLICIT_OBJECT<T_OBJECT> obj(object);Seed_Particles(obj,V,dV,density,particles_per_cell);}
 
-    void Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)> dV,
+    int Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)> dV,
         const T mass,const T volume);
     int Add_Gravity(TV g);
     int Add_Quasi_Pressure(T E,T gamma);

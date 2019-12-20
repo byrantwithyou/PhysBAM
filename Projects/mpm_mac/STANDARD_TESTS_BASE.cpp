@@ -261,16 +261,16 @@ Seed_Particles(IMPLICIT_OBJECT<TV>& object,std::function<TV(const TV&)> V,
 //#####################################################################
 // Function Add_Particle
 //#####################################################################
-template<class TV> void STANDARD_TESTS_BASE<TV>::
+template<class TV> int STANDARD_TESTS_BASE<TV>::
 Add_Particle(const TV& X,std::function<TV(const TV&)> V,std::function<MATRIX<T,TV::m>(const TV&)> dV,
     const T mass,const T volume)
 {
-    Add_Particle(X,V?V(X):TV(),dV?dV(X):MATRIX<T,TV::m>(),mass,volume);
+    return Add_Particle(X,V?V(X):TV(),dV?dV(X):MATRIX<T,TV::m>(),mass,volume);
 }
 //#####################################################################
 // Function Add_Particle
 //#####################################################################
-template<class TV> void STANDARD_TESTS_BASE<TV>::
+template<class TV> int STANDARD_TESTS_BASE<TV>::
 Add_Particle(const TV& X,const TV& V,const MATRIX<T,TV::m>& dV,const T mass,const T volume)
 {
     int p=particles.Add_Element_From_Deletion_List();
@@ -287,6 +287,7 @@ Add_Particle(const TV& X,const TV& V,const MATRIX<T,TV::m>& dV,const T mass,cons
     particles.volume(p)=volume;
     ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
     (*color_attribute)(p)=VECTOR<T,3>(1,1,1);
+    return p;
 }
 //#####################################################################
 // Function Set_Grid
@@ -520,12 +521,11 @@ Velocity_Fourier_Analysis() const
 // Function Add_Source
 //#####################################################################
 template<class TV> void STANDARD_TESTS_BASE<TV>::
-Add_Source(const TV& X0,const TV& n,IMPLICIT_OBJECT<TV>* io,
-    std::function<void(TV X,T ts,T t,SOURCE_PATH<TV>& p)> path,T density,
-    T particles_per_cell,bool owns_io)
+Add_Source(const TV& X0,const TV& n,const TV& V0,const TV& g,
+    IMPLICIT_OBJECT<TV>* io,T density,T particles_per_cell,bool owns_io)
 {
     MPM_PARTICLE_SOURCE<TV>* source=new MPM_PARTICLE_SOURCE<TV>(
-        poisson_disk,random,X0,n,io,path);
+        poisson_disk,random,X0,n,V0,g,io);
     T volume=grid.dX.Product()/particles_per_cell;
     T mass=density*volume;
     // NOTE: assumes initial particles are already added.
@@ -533,10 +533,10 @@ Add_Source(const TV& X0,const TV& n,IMPLICIT_OBJECT<TV>* io,
     Add_Callbacks(false,"move-particles",[=](){
             ARRAY<TV> X,V;
             ARRAY<MATRIX<T,TV::m> > dV;
-            source->Seed(time,dt,X,V,&dV);
+            source->Seed(dt,X,V,&dV);
             for(int i=0;i<X.m;i++)
                 Add_Particle(X(i),V(i),dV(i),mass,volume);});
-    if(owns_io) destroy.Append([io](){delete io;});
+    if(owns_io) destroy.Append([io,source](){delete io;delete source;});
 
     static int source_id=0;
     this->write_output_files.Append([=](){
