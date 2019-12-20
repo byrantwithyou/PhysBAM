@@ -150,7 +150,7 @@ public:
         int resolution_multiple=1,int default_resolution=32);
     void Add_Source(const TV& source_location,const TV& source_normal,
         T source_radius,T source_speed,const TV& gravity,T density,T E,T nu,
-        T start_time,T stop_time,std::function<void(const ARRAY<int>&)> particle_func);
+        T start_time,T stop_time);
 //#####################################################################
 };
 }

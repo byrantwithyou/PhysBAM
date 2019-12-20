@@ -1070,8 +1070,7 @@ Initialize()
             T spout_width=.05*m;
             T pour_speed=.4*m/s;
             TV gravity=TV(0,-9.8*m/(s*s));
-            Add_Source(spout,TV(0,-1),spout_width/2,pour_speed,gravity,density,E,nu,
-                0,foo_T3,update_dp_func);
+            Add_Source(spout,TV(0,-1),spout_width/2,pour_speed,gravity,density,E,nu,0,foo_T3);
             Add_Gravity(gravity);
         } break;
         case 60:{//cohesion sanity check
@@ -1411,8 +1410,7 @@ Initialize()
             T spout_width=.05*m;
             T pour_speed=.4*m/s;
             TV gravity=TV(0,-9.8*m/(s*s));
-            Add_Source(spout,TV(0,-1),spout_width/2,pour_speed,gravity,density,E,nu,
-                0,foo_T3,update_dp_func);
+            Add_Source(spout,TV(0,-1),spout_width/2,pour_speed,gravity,density,E,nu,0,foo_T3);
             Add_Gravity(gravity);
         } break;
 
@@ -1577,9 +1575,9 @@ Initialize()
             T density=(T)2200*unit_rho*scale_mass;
             TV gravity=TV(0,-9.8*m/(s*s));
             Add_Drucker_Prager_Case(E,nu,2);
-            Add_Source(TV((T)0.5*m,0.9*m),TV(0,-1),.05*m/2,.4*m/s,gravity,density,E,nu,0,FLT_MAX,update_dp_func);
-            Add_Source(TV((T)0.9*m,(T)0.5*m),TV(-1,0),.1*m/2,.4*m/s,gravity,density,E,nu,0,FLT_MAX,update_dp_func);
-            Add_Source(TV((T)0.2*m,(T)0.2*m),TV((T).4,(T).6),.05*m/2,3*m/s,gravity,density,E,nu,0,FLT_MAX,update_dp_func);
+            Add_Source(TV((T)0.5*m,0.9*m),TV(0,-1),.05*m/2,.4*m/s,gravity,density,E,nu,0,FLT_MAX);
+            Add_Source(TV((T)0.9*m,(T)0.5*m),TV(-1,0),.1*m/2,4*m/s,gravity,density,E,nu,0,FLT_MAX);
+            Add_Source(TV((T)0.2*m,(T)0.2*m),TV((T).4,(T).6),.05*m/2,3*m/s,gravity,density,E,nu,0,FLT_MAX);
             Add_Gravity(gravity);
             Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,false);
         } break;    

@@ -58,7 +58,7 @@ public:
     using BASE::rd_penalty_stiffness;using BASE::rd_penalty_friction;
     using BASE::tests;using BASE::solid_body_collection;using BASE::Sand_Color;
     using BASE::seed;using BASE::Seed_Particles_Surface;using BASE::Seed_Particles_Volume;
-    using BASE::Add_Source;using BASE::update_dp_func;using BASE::use_colored_sand;
+    using BASE::Add_Source;using BASE::use_colored_sand;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();

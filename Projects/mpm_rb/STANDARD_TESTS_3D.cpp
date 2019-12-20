@@ -402,8 +402,7 @@ Initialize()
             T pour_speed=.2*m/s;
             TV gravity=TV(0,-9.8*m/(s*s),0);
             Set_Lame_On_Particles(E,nu);
-            Add_Source(spout,TV(0,-1,0),spout_width/2,pour_speed,gravity,density,E,nu,
-                0,FLT_MAX,update_dp_func);
+            Add_Source(spout,TV(0,-1,0),spout_width/2,pour_speed,gravity,density,E,nu,0,FLT_MAX);
             Add_Gravity(gravity);
 
             RIGID_BODY<TV>& sphere=tests.Add_Analytic_Sphere(0.2,density*0.1);
@@ -429,8 +428,7 @@ Initialize()
             T pour_speed=.2*m/s;
             TV gravity=TV(0,-9.8*m/(s*s),0);
             Set_Lame_On_Particles(E,nu);
-            Add_Source(spout,TV(0,-1,0),spout_width/2,pour_speed,gravity,density,E,nu,
-                0,FLT_MAX,0);
+            Add_Source(spout,TV(0,-1,0),spout_width/2,pour_speed,gravity,density,E,nu,0,FLT_MAX);
             Add_Gravity(gravity);
 
             if(!use_theta_c) theta_c=0.015;
@@ -617,8 +615,7 @@ Initialize()
             T source_start=4;
             T source_end=100;
             Set_Lame_On_Particles(E,nu);
-            Add_Source(spout,TV(0,-1,0),spout_width/2,pour_speed,g,density,E,nu,
-                source_start,source_end,update_dp_func);
+            Add_Source(spout,TV(0,-1,0),spout_width/2,pour_speed,g,density,E,nu,source_start,source_end);
             Add_Gravity(g);
             break;}
 
@@ -729,8 +726,7 @@ Initialize()
             T pour_speed=.16319*m/s;
             TV gravity=TV(0,-9.8*m/(s*s),0);
             Set_Lame_On_Particles(E,nu);
-            Add_Source(spout,TV(0,-1,0),spout_width/2,pour_speed,gravity,density,E,nu,
-                0.08,foo_T3,update_dp_func);
+            Add_Source(spout,TV(0,-1,0),spout_width/2,pour_speed,gravity,density,E,nu,0.08,foo_T3);
             Add_Gravity(gravity);
         } break;
 
@@ -751,8 +747,7 @@ Initialize()
             Add_Drucker_Prager(E,nu,foo_T2);
             TV spout(0,0.06*m,0);
             Set_Lame_On_Particles(E,nu);
-            Add_Source(spout,TV(0,-1,0),spout_width/2,pour_speed,gravity,density,E,nu,
-                0.08,foo_T3,update_dp_func);
+            Add_Source(spout,TV(0,-1,0),spout_width/2,pour_speed,gravity,density,E,nu,0.08,foo_T3);
             Add_Gravity(gravity);
         } break;
             

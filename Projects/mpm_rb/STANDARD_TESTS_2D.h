@@ -52,7 +52,7 @@ public:
     using BASE::begin_frame;using BASE::end_frame;using BASE::begin_time_step;using BASE::end_time_step;
     using BASE::extra_T;using BASE::extra_int;using BASE::solid_body_collection;
     using BASE::rd_penalty_stiffness;using BASE::rd_penalty_friction;
-    using BASE::Add_Source;using BASE::update_dp_func;
+    using BASE::Add_Source;
     
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
     virtual ~STANDARD_TESTS();

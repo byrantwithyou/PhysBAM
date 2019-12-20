@@ -584,8 +584,7 @@ Set_Grid(const RANGE<TV>& domain,TV_INT resolution_scale,TV_INT resolution_paddi
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Add_Source(const TV& source_location,const TV& source_normal,
     T source_radius,T source_speed,const TV& gravity,T density,T E,T nu,
-    T start_time,T stop_time,
-    std::function<void(const ARRAY<int>&)> particle_func)
+    T start_time,T stop_time)
 {
     T volume=grid.dX.Product()/particles_per_cell;
     T mass=density*volume;
@@ -611,7 +610,7 @@ Add_Source(const TV& source_location,const TV& source_normal,
                 particles.lambda0(p)=lambda;
                 affected_particles.Append(p);
             }
-            if(particle_func) particle_func(affected_particles);
+            if(update_dp_func) update_dp_func(affected_particles);
         });
 }
 

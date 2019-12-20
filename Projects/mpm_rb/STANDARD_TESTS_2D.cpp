@@ -502,8 +502,7 @@ Initialize()
             T spout_width=.05*m;
             T pour_speed=.2*m/s;
             TV gravity=TV(0,-9.8*m/(s*s));
-            Add_Source(spout,TV(0,-1),spout_width/2,pour_speed,gravity,density,E,nu,
-                0,FLT_MAX,update_dp_func);
+            Add_Source(spout,TV(0,-1),spout_width/2,pour_speed,gravity,density,E,nu,0,FLT_MAX);
             Add_Gravity(gravity);
 
             RIGID_BODY<TV>& sphere=tests.Add_Analytic_Sphere(0.2,density*0.1);

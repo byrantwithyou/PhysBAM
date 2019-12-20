@@ -179,7 +179,7 @@ public:
         std::function<FRAME<TV>(T)> func_frame,std::function<TWIST<TV>(T)> func_twist);
     void Add_Source(const TV& source_location,const TV& source_normal,
         T source_radius,T source_speed,const TV& gravity,T density,T E,T nu,
-        T start_time,T stop_time,std::function<void(const ARRAY<int>&)> particle_func);
+        T start_time,T stop_time);
     void Write_Output_Files() override;
     void Read_Output_Files() override;
     VECTOR<T,3> Sand_Color();

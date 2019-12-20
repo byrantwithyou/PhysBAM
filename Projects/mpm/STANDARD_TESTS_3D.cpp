@@ -1570,8 +1570,7 @@ Initialize()
             T spout_width=8.334e-3*m;
             T pour_speed=.16319*m/s;
             TV gravity=TV(0,-9.8*m/(s*s),0);
-            Add_Source(spout,TV(0,-1,0),spout_width/2,pour_speed,gravity,density,E,nu,
-                (T)0.08,foo_T3,update_dp_func);
+            Add_Source(spout,TV(0,-1,0),spout_width/2,pour_speed,gravity,density,E,nu,(T)0.08,foo_T3);
             Set_Lame_On_Particles(E,nu);
             Add_Gravity(gravity);
         } break;

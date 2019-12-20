@@ -681,8 +681,7 @@ Seed_Particles_Surface(const T_STRUCTURE& object,IMPLICIT_OBJECT<TV>& io,std::fu
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Add_Source(const TV& source_location,const TV& source_normal,
     T source_radius,T source_speed,const TV& gravity,T density,T E,T nu,
-    T start_time,T stop_time,
-    std::function<void(const ARRAY<int>&)> particle_func)
+    T start_time,T stop_time)
 {
     T volume=grid.dX.Product()/particles_per_cell;
     T mass=density*volume;
@@ -709,7 +708,7 @@ Add_Source(const TV& source_location,const TV& source_normal,
                 particles.lambda0(p)=lambda;
                 affected_particles.Append(p);
             }
-            if(particle_func) particle_func(affected_particles);
+            if(update_dp_func) update_dp_func(affected_particles);
             if(use_colored_sand)
             {
                 ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >("color");
