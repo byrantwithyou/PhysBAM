@@ -12,8 +12,10 @@
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/MINRES.h>
 #include <Tools/Nonlinear_Equations/NEWTONS_METHOD.h>
+#include <Tools/Parallel_Computation/APPEND_HOLDER.h>
 #include <Tools/Polynomials/QUADRATIC.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
+#include <Grid_Tools/Grids/CELL_ITERATOR_THREADED.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
@@ -98,6 +100,7 @@ Initialize()
     example.mass.Resize(example.grid.Domain_Indices(example.ghost));
     example.velocity.Resize(example.grid.Domain_Indices(example.ghost));
     example.velocity_save.Resize(example.grid.Domain_Indices(example.ghost));
+    example.velocity_friction_save.Resize(example.grid.Domain_Indices(example.ghost));
     dv.u.Resize(example.grid.Domain_Indices(example.ghost));
     rhs.u.Resize(example.grid.Domain_Indices(example.ghost));
     objective.system.tmp.u.Resize(example.grid.Domain_Indices(example.ghost));
@@ -245,7 +248,8 @@ Particle_To_Grid()
     for(int i=0;i<example.mass.array.m;i++){
         example.mass.array(i)=0;
         example.velocity.array(i)=TV();
-        example.velocity_save.array(i)=TV();}
+        example.velocity_save.array(i)=TV();
+        example.velocity_friction_save.array(i)=TV();}
 
     bool use_gradient=example.weights->use_gradient_transfer;
     example.gather_scatter.template Scatter<int>(true,
@@ -268,15 +272,30 @@ Particle_To_Grid()
     Reflect_Boundary_Mass_Momentum();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after reflect m mv",1);
 
-    for(RANGE_ITERATOR<TV::m> it(example.mass.domain);it.Valid();it.Next()){
-        int i=example.mass.Standard_Index(it.index);
-        if(example.mass.array(i)){
-            example.valid_grid_indices.Append(i);
-            example.valid_grid_cell_indices.Append(it.index);
-            TV v=example.velocity.array(i)/example.mass.array(i);
-            example.velocity.array(i)=v;
-            example.velocity_save.array(i)=v;}
-        else example.velocity.array(i)=TV();}
+    APPEND_HOLDER<int> flat_h(example.valid_grid_indices);
+    APPEND_HOLDER<TV_INT> indices_h(example.valid_grid_cell_indices);
+#pragma omp parallel
+    {
+#pragma omp single
+        {
+            flat_h.Init();
+            indices_h.Init();
+        }
+#pragma omp barrier
+        ARRAY<int>& flat_t=flat_h.Array();
+        ARRAY<TV_INT>& indices_t=indices_h.Array();
+        for(CELL_ITERATOR_THREADED<TV> it(example.grid,example.ghost);it.Valid();it.Next()){
+            int i=example.mass.Standard_Index(it.index);
+            if(example.mass.array(i)){
+                flat_t.Append(i);
+                indices_t.Append(it.index);
+                TV v=example.velocity.array(i)/example.mass.array(i);
+                example.velocity.array(i)=v;
+                example.velocity_save.array(i)=v;}
+            else example.velocity.array(i)=TV();}
+    }
+    flat_h.Combine();
+    indices_h.Combine();
 }
 //#####################################################################
 // Function Reflection_Boundary_Mass_Momentum
@@ -780,11 +799,12 @@ Apply_Forces()
     objective.Reset();
     LOG::printf("max velocity: %.16P\n",Max_Particle_Speed());
     if(example.use_symplectic_euler){
-        TIMER_SCOPE("Apply_Forces A");
         example.force_helper.B.Resize(example.particles.number);
         example.force_helper.B.Fill(MATRIX<T,TV::m>());
         example.Precompute_Forces(example.time,example.dt,0);
-        objective.tmp2.u*=0;
+#pragma omp parallel for
+        for(int i=0;i<objective.tmp2.u.array.m;i++)
+            objective.tmp2.u.array(i)=TV();
 
         TIMER_SCOPE("Apply_Forces B");
         //Add Particle Forces
@@ -808,7 +828,6 @@ Apply_Forces()
         objective.Adjust_For_Collision(dv);
         objective.tmp0=dv;
         Apply_Friction();
-        TIMER_SCOPE("Apply_Forces D");
     }
     else{
         NEWTONS_METHOD<T> newtons_method;
@@ -845,7 +864,6 @@ Apply_Forces()
     example.velocity_friction_save.array.Subset(objective.system.stuck_nodes)=objective.system.stuck_velocity;
     Reflect_Boundary_Velocity(example.velocity);
     Reflect_Boundary_Velocity(example.velocity_friction_save);
-        TIMER_SCOPE("Apply_Forces G");
 }
 //#####################################################################
 // Function Apply_Friction
@@ -854,7 +872,10 @@ template<class TV> void MPM_DRIVER<TV>::
 Apply_Friction()
 {
     TIMER_SCOPE_FUNC;
-    example.velocity_friction_save=dv.u;
+#pragma omp parallel for
+    for(int i=0;i<example.valid_grid_indices.m;i++){
+        int j=example.valid_grid_indices(i);
+        example.velocity_friction_save.array(j)=dv.u.array(j);}
     if(!example.collision_objects.m) return;
     if(example.use_symplectic_euler){
         objective.v1.Copy(1,objective.v0,dv);}

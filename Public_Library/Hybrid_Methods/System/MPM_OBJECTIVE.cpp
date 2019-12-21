@@ -300,12 +300,14 @@ Reset()
         F0(p)=system.example.particles.F(p);
         if(system.example.particles.store_S) S0(p)=system.example.particles.S(p);
         X0(p)=system.example.particles.X(p);}
-
-    v0.u=system.example.velocity;
+    v0.u.Resize(system.example.velocity.domain);
     v1.u.Resize(v0.u.domain);
     tmp0.u.Resize(v0.u.domain);
     tmp1.u.Resize(v0.u.domain);
     tmp2.u.Resize(v0.u.domain);
+#pragma omp parallel for
+    for(int i=0;i<v0.u.array.m;i++)
+        v0.u.array(i)=system.example.velocity.array(i);
 }
 //#####################################################################
 // Function Test_Diff
