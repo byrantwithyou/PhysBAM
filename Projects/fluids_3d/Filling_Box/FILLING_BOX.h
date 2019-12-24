@@ -37,7 +37,6 @@ CYLINDER<T> source;VECTOR<T,3> source_velocity;
         if(!this->user_output_directory)
             viewer_dir.output_directory="Filling_Box/output";
         fluids_parameters.delete_fluid_inside_objects=true;
-        fluids_parameters.enforce_divergence_free_extrapolation=false;
     }
 
     ~FILLING_BOX() 

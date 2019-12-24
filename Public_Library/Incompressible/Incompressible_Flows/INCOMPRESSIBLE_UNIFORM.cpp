@@ -238,7 +238,7 @@ CFL(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const bool inviscid,const bool 
 // Function Extrapolate_Velocity_Across_Interface
 //#####################################################################
 template<class TV> void INCOMPRESSIBLE_UNIFORM<TV>::
-Extrapolate_Velocity_Across_Interface(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const ARRAY<T,TV_INT>& phi_ghost,const bool enforce_divergence_free,const T band_width,
+Extrapolate_Velocity_Across_Interface(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const ARRAY<T,TV_INT>& phi_ghost,const T band_width,
     const T damping,const TV& air_speed,const ARRAY<VECTOR<bool,TV::m>,FACE_INDEX<TV::m> >* face_neighbors_visible,const ARRAY<bool,FACE_INDEX<TV::m> >* fixed_faces_input)
 {
     T delta=band_width*grid.dX.Max();
@@ -280,23 +280,6 @@ Extrapolate_Velocity_Across_Interface(ARRAY<T,FACE_INDEX<TV::m> >& face_velociti
             extrapolate.Extrapolate();
             if(damping) for(FACE_ITERATOR<TV> iterator(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next()){TV_INT index=iterator.Face_Index();
                 if(!fixed_face(index) && phi_face(index)<delta) face_velocity(index)=(1-damping)*face_velocity(index)+damping*air_speed[axis];}}}
-
-    // make extrapolated velocity divergence free
-    if(enforce_divergence_free){
-        ARRAY<T,TV_INT> p_new(grid.Domain_Indices(1));ARRAY<bool,TV_INT> psi_D_new(grid.Domain_Indices(1));ARRAY<bool,FACE_INDEX<TV::m> > psi_N_new(grid);
-        ARRAY<T,TV_INT>::Exchange(p_new,projection.p);ARRAY<bool,TV_INT>::Exchange(psi_D_new,projection.elliptic_solver->psi_D);
-        ARRAY<bool,FACE_INDEX<TV::m> >::Exchange(psi_N_new,projection.elliptic_solver->psi_N);
-        projection.elliptic_solver->Set_Dirichlet_Outer_Boundaries();
-        for(CELL_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
-            if(phi_ghost(index) >= delta) projection.elliptic_solver->psi_D(index)=true;
-            else if(phi_ghost(index) <= 0) projection.elliptic_solver->psi_N.Set_All_Faces(true,index);
-            else{
-                bool local_maximum=true;
-                for(int i=0;i<GRID<TV>::number_of_neighbors_per_cell;i++) if(phi_ghost(index)<phi_ghost(iterator.Cell_Neighbor(i))){local_maximum=false;break;}
-                if(local_maximum)projection.elliptic_solver->psi_D(index)=true;}}
-        projection.Make_Divergence_Free(face_velocities,0,0); // TODO: use real dt/time
-        ARRAY<T,TV_INT>::Exchange(p_new,projection.p);ARRAY<bool,TV_INT>::Exchange(psi_D_new,projection.elliptic_solver->psi_D);
-        ARRAY<bool,FACE_INDEX<TV::m> >::Exchange(psi_N_new,projection.elliptic_solver->psi_N);} // restore pressure for use as initial guess for incompressible projection
 }
 //#####################################################################
 // Function Set_Dirichlet_Boundary_Conditions

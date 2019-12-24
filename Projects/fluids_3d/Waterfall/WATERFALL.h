@@ -61,7 +61,6 @@ public:
             viewer_dir.output_directory=LOG::sprintf("Waterfall/Test_%d_Waterfall_Resolution_%d_%d_%d",test_number,(fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.y-1),
             (fluids_parameters.grid->counts.z-1));
         fluids_parameters.delete_fluid_inside_objects=true;
-        fluids_parameters.enforce_divergence_free_extrapolation=false;
         fluids_parameters.store_particle_ids=true;
         fluids_parameters.second_order_cut_cell_method=true;
         fluids_parameters.cfl=(T)1.9;

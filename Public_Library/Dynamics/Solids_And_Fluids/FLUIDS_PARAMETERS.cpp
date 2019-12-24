@@ -46,7 +46,7 @@ FLUIDS_PARAMETERS(const TYPE type)
     use_vorticity_confinement(false),use_vorticity_confinement_fuel(true),use_variable_vorticity_confinement(false),
     confinement_parameter((T).05),confinement_parameter_fuel((T)1.2),
     use_non_zero_divergence(false),
-    second_order_cut_cell_method(false),enforce_divergence_free_extrapolation(false),solve_neumann_regions(true),solve_single_cell_neumann_regions(false),evolution_solver_type(krylov_solver_cg),
+    second_order_cut_cell_method(false),solve_neumann_regions(true),solve_single_cell_neumann_regions(false),evolution_solver_type(krylov_solver_cg),
     kolmogorov((T)0),turbulence_lowest_angular_frequency(16),turbulence_update_frame_rate(20),turbulence(*new TURBULENCE<TV>),
     use_external_velocity(false),
     use_soot(false),use_density(true),use_temperature(true),

@@ -165,7 +165,7 @@ Initialize()
     int extrapolation_cells=2*example.number_of_ghost_cells+2;
     ARRAY<T,TV_INT> exchanged_phi_ghost(example.mac_grid.Domain_Indices(extrapolation_cells));
     example.particle_levelset_evolution.Particle_Levelset(0).levelset.boundary->Fill_Ghost_Cells(example.mac_grid,example.particle_levelset_evolution.phi,exchanged_phi_ghost,0,time,extrapolation_cells);
-    example.incompressible.Extrapolate_Velocity_Across_Interface(example.face_velocities,exchanged_phi_ghost,false,example.number_of_ghost_cells,0,TV());
+    example.incompressible.Extrapolate_Velocity_Across_Interface(example.face_velocities,exchanged_phi_ghost,example.number_of_ghost_cells,0,TV());
 
     example.Set_Boundary_Conditions(time); // get so CFL is correct
     if(!example.restart) Write_Output_Files();
@@ -290,7 +290,7 @@ PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",1);
         int band_width=example.number_of_ghost_cells+1;
         ARRAY<T,TV_INT> exchanged_phi_ghost(example.mac_grid.Domain_Indices(2*band_width+2));
         example.particle_levelset_evolution.Particle_Levelset(0).levelset.boundary->Fill_Ghost_Cells(example.mac_grid,example.particle_levelset_evolution.phi,exchanged_phi_ghost,0,time+dt,2*band_width+2);
-        example.incompressible.Extrapolate_Velocity_Across_Interface(example.face_velocities,exchanged_phi_ghost,false,band_width,0,TV());
+        example.incompressible.Extrapolate_Velocity_Across_Interface(example.face_velocities,exchanged_phi_ghost,band_width,0,TV());
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after extrapolate",1);
 
         time+=dt;}

@@ -83,7 +83,7 @@ public:
     bool use_vorticity_confinement,use_vorticity_confinement_fuel,use_variable_vorticity_confinement;
     T confinement_parameter,confinement_parameter_fuel;
     bool use_non_zero_divergence;
-    bool second_order_cut_cell_method,enforce_divergence_free_extrapolation;
+    bool second_order_cut_cell_method;
     bool solve_neumann_regions;
     bool solve_single_cell_neumann_regions;
     KRYLOV_SOLVER_TYPE evolution_solver_type;

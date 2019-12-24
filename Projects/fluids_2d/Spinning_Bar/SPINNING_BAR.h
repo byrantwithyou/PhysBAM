@@ -44,7 +44,6 @@ public:
         fluids_parameters.write_removed_positive_particles=false;fluids_parameters.write_removed_negative_particles=false;
         fluids_parameters.write_debug_data=true;fluids_parameters.write_ghost_values=true;
         fluids_parameters.delete_fluid_inside_objects=true;
-        //fluids_parameters.enforce_divergence_free_extrapolation=true;
 
         //fluids_parameters.levelset_substeps=.9;
 

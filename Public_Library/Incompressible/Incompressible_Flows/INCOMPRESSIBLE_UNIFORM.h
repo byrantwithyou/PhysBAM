@@ -82,7 +82,7 @@ public:
     T CFL(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const bool inviscid=false,const bool viscous_only=false) const;
     void Apply_Vorticity_Confinement_Force(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<TV,TV_INT>& F);
     virtual void Compute_Vorticity_Confinement_Force(const GRID<TV>& grid,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_ghost,ARRAY<TV,TV_INT>& F);
-    void Extrapolate_Velocity_Across_Interface(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_input,const ARRAY<T,TV_INT>& phi_ghost,const bool enforce_divergence_free=false,const T band_width=3,
+    void Extrapolate_Velocity_Across_Interface(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities_input,const ARRAY<T,TV_INT>& phi_ghost,const T band_width=3,
         const T damping=0,const TV& air_speed=TV(),const ARRAY<VECTOR<bool,TV::m>,FACE_INDEX<TV::m> >* face_neighbors_visible=0,const ARRAY<bool,FACE_INDEX<TV::m> >* fixed_faces_input=0);
     void Set_Dirichlet_Boundary_Conditions(const ARRAY<T,TV_INT>* phi,const T pressure);
     void Set_Dirichlet_Boundary_Conditions(const ARRAY<T,TV_INT>* phi,const ARRAY<T,TV_INT>& pressure);

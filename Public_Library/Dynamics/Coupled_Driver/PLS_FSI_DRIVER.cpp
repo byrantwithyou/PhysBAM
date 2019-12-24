@@ -243,7 +243,7 @@ Initialize()
 //        Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,particle_levelset_evolution->Particle_Levelset(0).levelset,extrapolation_bandwidth);
         if(!example.two_phase) 
             incompressible->Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,exchanged_phi_ghost,
-                example.fluids_parameters.enforce_divergence_free_extrapolation,extrapolation_bandwidth,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);
+                extrapolation_bandwidth,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);
     }
 }
 //#####################################################################
@@ -330,7 +330,7 @@ First_Order_Time_Step(int substep,T dt)
 //    Extrapolate_Velocity_Across_Interface(example.face_velocities,particle_levelset_evolution->Particle_Levelset(0).levelset,extrapolation_bandwidth);
     if(!example.two_phase) Extrapolate_Velocity_Across_Interface(time,dt);
         //incompressible->Extrapolate_Velocity_Across_Interface(example.face_velocities,exchanged_phi_ghost,
-        //    fluids_parameters.enforce_divergence_free_extrapolation,extrapolation_bandwidth,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);
+        //    extrapolation_bandwidth,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("extrapolate about interface",1);
     incompressible->boundary->Apply_Boundary_Condition_Face(incompressible->grid,face_velocities,time+dt);
     LOG::cout<<"Maximum face velocity = ("<<face_velocities.Max_Abs().Magnitude()<<": "<<face_velocities.Max_Abs()<<std::endl;
@@ -474,7 +474,7 @@ Advect_Fluid(const T dt)
 //            Extrapolate_Velocity_Across_Interface(face_velocities,particle_levelset_evolution->Particle_Levelset(0).levelset,extrapolation_bandwidth);
             if(!example.two_phase)
                 incompressible->Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,exchanged_phi_ghost,
-                    fluids_parameters.enforce_divergence_free_extrapolation,extrapolation_bandwidth,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);
+                    extrapolation_bandwidth,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);
             incompressible->Advance_One_Time_Step_Convection(dt,rk.time,face_velocities,face_velocities,fluids_parameters.number_of_ghost_cells);}}
     else incompressible->Advance_One_Time_Step_Convection(dt,time,face_velocities_ghost,face_velocities,fluids_parameters.number_of_ghost_cells);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after advection",1);

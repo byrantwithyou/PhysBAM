@@ -35,7 +35,6 @@ public:
         if(!this->user_output_directory)
             viewer_dir.output_directory="Falling_Drop/output";
         fluids_parameters.delete_fluid_inside_objects=true;
-        fluids_parameters.enforce_divergence_free_extrapolation=false;
     }
     
     ~FALLING_DROP() 

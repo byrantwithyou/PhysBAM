@@ -94,7 +94,8 @@ Find_A_Part_Two(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& A_array,ARRAY<ARRAY<T> >& b_a
     TV one_over_dx2=Inverse(grid.dX*grid.dX);
     T default_row_sum=-2*one_over_dx2.Sum_Abs(),r=0;
     TV_INT grid_counts=grid.counts;
-    for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+    for(CELL_ITERATOR<TV> iterator(grid,1);iterator.Valid();iterator.Next()){
+        TV_INT cell_index=iterator.Cell_Index();
         int color=filled_region_colors(cell_index);
         if(color!=-2 && (filled_region_touches_dirichlet(color)||solve_neumann_regions)){
             int matrix_index=cell_index_to_matrix_index(cell_index);
@@ -216,14 +217,6 @@ Set_Neumann_Outer_Boundaries()
 {
     for(FACE_ITERATOR<TV> iterator(grid,0,GRID<TV>::BOUNDARY_REGION);iterator.Valid();iterator.Next()) psi_N.Component(iterator.Axis())(iterator.Face_Index())=true;
     pcg.Enforce_Compatibility();
-}
-//#####################################################################
-// Function Set_Dirichlet_Outer_Boundaries
-//#####################################################################
-template<class TV> void LAPLACE_UNIFORM<TV>::
-Set_Dirichlet_Outer_Boundaries()
-{
-    for(CELL_ITERATOR<TV> iterator(grid,1,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next()) psi_D(iterator.Cell_Index())=true;
 }
 //#####################################################################
 // Function Use_Psi_R

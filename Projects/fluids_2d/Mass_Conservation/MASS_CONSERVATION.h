@@ -86,7 +86,6 @@ public:
         fluids_parameters.store_particle_ids=true;
         fluids_parameters.delete_fluid_inside_objects=false;
         fluids_parameters.gravity=TV();
-        fluids_parameters.enforce_divergence_free_extrapolation=false;
         fluids_parameters.incompressible_tolerance=(T)1e-12;
         fluids_parameters.use_maccormack_for_level_set=false;
         fluids_parameters.use_maccormack_for_incompressible=false;
