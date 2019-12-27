@@ -2438,6 +2438,38 @@ Initialize()
 
         } break;
 
+        case 74:{ // Reflection bc test
+            Set_Grid(RANGE<TV>(TV(),TV(4,1,1))*m,TV_INT(4,1,1));
+            this->reflection_bc=true;
+            this->use_full_reflection=true;
+            T E=1e4*unit_p*scale_E,nu=.3;
+            T density=(T)2*unit_rho*scale_mass;
+            TV gravity=TV(0,-9.8*m/(s*s),0);
+            T vel=1*m/s;
+            RANGE<TV> box(TV(.25,0,.25)*m,TV(1.25,.5,.75)*m);
+            VECTOR<TV,8> C;
+            box.Corners(C);
+            Seed_Particles(box,[=](const TV& X){return TV(vel,0,0);},0,density,particles_per_cell);
+            Add_Fixed_Corotated(E,nu);
+            Add_Gravity(gravity);
+            Add_Walls(-1,COLLISION_TYPE::separate,.3,0,false);
+            if(friction_is_set) this->reflection_bc_friction=friction;
+            T a=this->reflection_bc_friction*-gravity.y;
+            PHYSBAM_ASSERT(vel>=0);
+            write_output_files.Append([this,vel,a,C]()
+                {
+                    TV v,x;
+                    if(a*time<=vel)
+                    {
+                        v.x=vel-a*time;
+                        x.x=vel*time-a*time*time/2;
+                    }
+                    else x.x=vel*vel/(a*2);
+                    for(auto X:C) Add_Debug_Particle(X+x,VECTOR<T,3>(1,0,0));
+                });
+        } break;    
+
+
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     if(forced_collision_type!=-1)
