@@ -18,7 +18,14 @@ struct VIEWER_DIR
     ARRAY<int> frame_stack;
     bool no_log=false;
     bool made_common=false;
-    
+
+    struct SAVE_STATE
+    {
+        std::string current_directory;
+        ARRAY<int> frame_stack;
+        bool made_common=false;
+    };
+
     explicit VIEWER_DIR(const std::string& output_directory);
     VIEWER_DIR(const VIEWER_DIR&)=delete;
     VIEWER_DIR&operator=(const VIEWER_DIR&)=delete;
@@ -34,21 +41,25 @@ struct VIEWER_DIR
     {return frame_stack.m==1 && frame_stack(0)==0;}
 
     // Read
-    bool Find_Next_Directory(int substep_level);
-    bool Find_Prev_Directory(int substep_level);
+    bool Find_Next_Directory(int substep_level,bool check_last_frame);
+    bool Find_Prev_Directory(int substep_level,bool check_last_frame);
     void Read_Last_Frame(ARRAY<int>& stack) const;
     void Read_Last_Frame(int substep_level=max_substep_level);
     void Set(int frame);
     void Set(const std::string& frame_string)
     {Set(frame_string.c_str());}
     void Set(const char* frame_string);
-
+    bool Valid_Frame(bool check_last_frame);
+    
     // Helper utilities
     void Advance_Directory(int substep_level);
     void Update_Current_Directory();
     void Parse_Frame(ARRAY<int>& stack,const std::string& frame_string) const
     {Parse_Frame(stack,frame_string.c_str());}
     void Parse_Frame(ARRAY<int>& stack,const char* frame_string) const;
+
+    void Save_State(SAVE_STATE& s) const;
+    void Restore_State(const SAVE_STATE& s);
 };
 }
 #endif

@@ -98,23 +98,14 @@ Initialize_Components_And_Key_Bindings()
     opengl_world.Set_Key_Binding_Category("User-Defined Keys");
 }
 //#####################################################################
-// Function Valid_Frame
-//#####################################################################
-template<class T> bool ANIMATED_VISUALIZATION<T>::
-Valid_Frame()
-{
-    ARRAY<int> last_frame_stack;
-    viewer_dir.Read_Last_Frame(last_frame_stack);
-    return !LEXICOGRAPHIC_COMPARE()(last_frame_stack,viewer_dir.frame_stack);
-}
-//#####################################################################
 // Function Goto_Start_Frame
 //#####################################################################
 template<class T> void ANIMATED_VISUALIZATION<T>::
 Goto_Start_Frame()
 {
     viewer_dir.Set(0);
-    Set_Frame();
+    if(viewer_dir.Valid_Frame(true))
+        Set_Frame();
 }
 //#####################################################################
 // Function Goto_Last_Frame
@@ -123,7 +114,7 @@ template<class T> void ANIMATED_VISUALIZATION<T>::
 Goto_Last_Frame()
 {
     viewer_dir.Read_Last_Frame();
-    if(Directory_Exists(viewer_dir.current_directory))
+    if(viewer_dir.Valid_Frame(false))
         Set_Frame();
 }
 //#####################################################################
@@ -154,7 +145,7 @@ Capture_Frames(const std::string& filename_pattern,int capture_start_frame,int c
     for(int f=capture_start_frame;f<=capture_end_frame;f++)
     {
         viewer_dir.Set(f);
-        if(!Valid_Frame()) break;
+        if(!viewer_dir.Valid_Frame(true)) break;
         Set_Frame();
         if(use_eps){
             std::string filename=LOG::sprintf(filename_pattern.c_str(),f);
@@ -229,12 +220,14 @@ Update_OpenGL_Strings()
 template<class T> void ANIMATED_VISUALIZATION<T>::
 Next_Frame()
 {
-    bool valid=viewer_dir.Find_Next_Directory(substeps_level);
-    if(!valid && loop) viewer_dir.Set(0);
-    if(valid || loop){
-        Set_Frame();
-        opengl_world.Set_Idle_Callback(play?next_frame_cb:null_cb,fixed_frame_rate?(float)1/frame_rate:0);}
-    else if(play) opengl_world.Set_Idle_Callback(next_frame_cb,.2);
+    bool valid=viewer_dir.Find_Next_Directory(substeps_level,true);
+    
+    if(!valid && play && loop){
+        viewer_dir.Set(0);
+        valid=viewer_dir.Valid_Frame(true);}
+    if(valid) Set_Frame();
+    T skip_time=fixed_frame_rate?(float)1/frame_rate:0;
+    opengl_world.Set_Idle_Callback(play?next_frame_cb:null_cb,skip_time);
 }
 //#####################################################################
 // Function Prev_Frame
@@ -242,7 +235,7 @@ Next_Frame()
 template<class T> void ANIMATED_VISUALIZATION<T>::
 Prev_Frame()
 {
-    if(viewer_dir.Find_Prev_Directory(substeps_level))
+    if(viewer_dir.Find_Prev_Directory(substeps_level,true))
         Set_Frame();
 }
 //#####################################################################
@@ -252,9 +245,11 @@ template<class T> void ANIMATED_VISUALIZATION<T>::
 Goto_Frame_Prompt()
 {
     if(opengl_world.prompt_response.empty()) return;
+    VIEWER_DIR::SAVE_STATE save;
+    viewer_dir.Save_State(save);
     viewer_dir.Set(opengl_world.prompt_response);
-    if(!Directory_Exists(viewer_dir.current_directory)) return;
-    Set_Frame();
+    if(viewer_dir.Valid_Frame(true)) Set_Frame();
+    else viewer_dir.Restore_State(save);
 }
 //#####################################################################
 // Function Goto_Frame
@@ -271,7 +266,7 @@ template<class T> void ANIMATED_VISUALIZATION<T>::
 Reset()
 {
     viewer_dir.Set(0);
-    Set_Frame();
+    if(viewer_dir.Valid_Frame(true)) Set_Frame();
     if(play) Toggle_Play(); // Stop playing
 }
 //#####################################################################

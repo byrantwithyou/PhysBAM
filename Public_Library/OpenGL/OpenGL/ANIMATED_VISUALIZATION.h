@@ -57,7 +57,6 @@ public:
     void    Toggle_Loop();
     void    Toggle_Fixed_Frame_Rate();
     void    Goto_Last_Frame();
-    bool Valid_Frame();
     
     OPENGL_CALLBACK next_frame_cb,prev_frame_cb,goto_frame_cb,reset_cb,toggle_play_cb,toggle_loop_cb,null_cb;
     OPENGL_CALLBACK toggle_fixed_frame_rate_cb,goto_last_frame_cb,goto_frame_prompt_cb,capture_frames_cb,capture_frames_prompt_cb;

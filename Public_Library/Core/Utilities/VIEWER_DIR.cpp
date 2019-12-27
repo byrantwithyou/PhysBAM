@@ -67,37 +67,50 @@ void VIEWER_DIR::Finish_Directory()
     lf<<std::endl;
 }
 
-bool VIEWER_DIR::Find_Next_Directory(int substep_level)
+bool VIEWER_DIR::Find_Next_Directory(int substep_level,bool check_last_frame)
 {
-    ARRAY<int> stack_save=frame_stack;
-    std::string dir_save=current_directory;
+    SAVE_STATE save;
+    Save_State(save);
+    ARRAY<int> last_frame_stack;
+    if(check_last_frame) Read_Last_Frame(last_frame_stack);
     assert(substep_level>=0 && substep_level<=max_substep_level);
-    int last_level=frame_stack.m-1;
-    for(int i=frame_stack.m;i<=substep_level;i++)
+    for(int i=substep_level;i>=0;i--)
     {
         Advance_Directory(i);
+        if(check_last_frame && LEXICOGRAPHIC_COMPARE()(last_frame_stack,frame_stack))
+            break;
         if(Directory_Exists(current_directory))
             return true;
     }
-    for(int i=last_level;i>=0;i--)
-    {
-        Advance_Directory(i);
-        if(Directory_Exists(current_directory))
-            return true;
-    }
-    frame_stack.Exchange(stack_save);
-    current_directory=std::move(dir_save);
+    Restore_State(save);
     return false;
 }
 
-bool VIEWER_DIR::Find_Prev_Directory(int substep_level)
+bool VIEWER_DIR::Valid_Frame(bool check_last_frame)
 {
+    if(check_last_frame){
+        ARRAY<int> last_frame_stack;
+        Read_Last_Frame(last_frame_stack);
+        if(LEXICOGRAPHIC_COMPARE()(last_frame_stack,frame_stack))
+            return false;}
+    return Directory_Exists(current_directory);
+}
+
+bool VIEWER_DIR::Find_Prev_Directory(int substep_level,bool check_last_frame)
+{
+    if(!frame_stack.m) return false;
     if(frame_stack.m==1 && frame_stack(0)==0) return false;
-    assert(frame_stack.Last()>0);
+    if(!Valid_Frame(check_last_frame)) return false;
+    SAVE_STATE save;
+    Save_State(save);
     frame_stack.Last()--;
     while(frame_stack.m>1 && frame_stack.Last()==0) frame_stack.Pop();
     Update_Current_Directory();
-    assert(Directory_Exists(current_directory));
+    if(!Directory_Exists(current_directory))
+    {
+        Restore_State(save);
+        return false;
+    }
     for(int s=frame_stack.m;s<=substep_level;s++)
     {
         frame_stack.Append(0);
@@ -105,7 +118,8 @@ bool VIEWER_DIR::Find_Prev_Directory(int substep_level)
             frame_stack.Last()++;
         current_directory+="."+std::to_string(frame_stack.Last());
     }
-    assert(Directory_Exists(current_directory));
+    while(frame_stack.m>1 && !frame_stack.Last()) frame_stack.Pop();
+    Update_Current_Directory();
     return true;
 }
 
@@ -149,6 +163,20 @@ void VIEWER_DIR::Parse_Frame(ARRAY<int>& stack, const char* frame_string) const
         stack.Append(strtol(frame_string, &t, 10));
         frame_string=t;
     }
+}
+
+void VIEWER_DIR::Save_State(SAVE_STATE& s) const
+{
+    s.current_directory=current_directory;
+    s.frame_stack=frame_stack;
+    s.made_common=made_common;
+}
+
+void VIEWER_DIR::Restore_State(const SAVE_STATE& s)
+{
+    current_directory=s.current_directory;
+    frame_stack=s.frame_stack;
+    made_common=s.made_common;
 }
 
 }
