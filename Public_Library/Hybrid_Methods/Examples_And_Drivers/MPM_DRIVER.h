@@ -64,6 +64,7 @@ public:
     void Grid_To_Particle_Limit_Dt();
     void Limit_Dt_Sound_Speed();
     void Reflect_Boundary_Mass_Momentum();
+    void Reflect_Boundary_Friction(const ARRAY<T,TV_INT>& mass,ARRAY<TV,TV_INT>& u) const;
     void Reflect_Boundary_Velocity(ARRAY<TV,TV_INT>& u);
     void Reflect_Boundary_Force(ARRAY<TV,TV_INT>& force);
     template<class S, class L, class N> void Reflect_Boundary(S func_s,L func_l,N func_n,RI flag) const;

@@ -33,7 +33,7 @@ class MPM_EXAMPLE
     typedef VECTOR<int,TV::m> TV_INT;
 public:
     typedef typename MPM_COLLISION_OBJECT<TV>::COLLISION_TYPE COLLISION_TYPE;
-    enum BC_TYPE {BC_FREE, BC_SLIP, BC_NOSLIP};
+    enum BC_TYPE {BC_FREE, BC_SLIP, BC_NOSLIP, BC_SEP};
     GRID<TV> grid;
     STREAM_TYPE stream_type;
     MPM_PARTICLES<TV>& particles;
@@ -90,6 +90,8 @@ public:
     bool compute_sound_speed=false;
     bool reflection_bc=false;
     int reflection_bc_flags=0;
+    bool use_full_reflection=false;
+    T reflection_bc_friction=0;
     bool test_sound_speed=false;
     bool dilation_only=false;
 
