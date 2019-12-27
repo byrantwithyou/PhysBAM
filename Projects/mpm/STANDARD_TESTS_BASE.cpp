@@ -463,14 +463,17 @@ Add_Clamped_Plasticity(ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& icm,T theta_c,T th
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Add_Walls(int flags,COLLISION_TYPE type,T friction,T inset,bool penalty) // -x +x -y +y [ -z +z ], as bit flags
 {
+    if(reflection_bc) this->reflection_bc_friction=friction;
     RANGE<TV> range=grid.domain.Thickened(grid.dX*(ghost*2+1));
     for(int a=0;a<TV::m;a++)
         for(int s=0;s<2;s++)
             if(flags&(1<<(a*2+s))){
                 if(reflection_bc){
-                    if(type==COLLISION_TYPE::slip || type==COLLISION_TYPE::separate)
+                    if(type==COLLISION_TYPE::slip)
                         side_bc_type(2*a+s)=MPM_EXAMPLE<TV>::BC_TYPE::BC_SLIP;
-                    if(type==COLLISION_TYPE::stick)
+                    else if(type==COLLISION_TYPE::separate)
+                        side_bc_type(2*a+s)=MPM_EXAMPLE<TV>::BC_TYPE::BC_SEP;
+                    else if(type==COLLISION_TYPE::stick)
                         side_bc_type(2*a+s)=MPM_EXAMPLE<TV>::BC_TYPE::BC_NOSLIP;}
                 else{
                     RANGE<TV> wall=range;
