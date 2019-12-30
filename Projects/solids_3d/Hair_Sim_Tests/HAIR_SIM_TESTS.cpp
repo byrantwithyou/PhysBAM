@@ -247,9 +247,9 @@ Initialize_Bodies()
         COLLISION_BODY_COLLECTION<TV> guide_list;
         guide_object1=new DEFORMABLE_BODY_COLLECTION<TV>(0,&guide_list);
         guide_object2=new DEFORMABLE_BODY_COLLECTION<TV>(0,&guide_list);
-        guide_viewer_dir.Find_Next_Directory(0);
+        guide_viewer_dir.Find_Next_Directory(0,false);
         guide_object1->Read(viewer_dir,true);
-        guide_viewer_dir.Find_Next_Directory(0);
+        guide_viewer_dir.Find_Next_Directory(0,false);
         guide_object2->Read(viewer_dir,true);
         SEGMENTED_CURVE<TV>& guide_edges=guide_object1->template Find_Structure<SEGMENTED_CURVE<TV>&>(0);
         particles.Add_Elements(guide_edges.particles.Size());
@@ -646,7 +646,7 @@ Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_p
         T alpha=frame-(T)(int)frame;
         if(frame>current_frame){
             guide_object1=guide_object2;
-            guide_viewer_dir.Find_Next_Directory(0);
+            guide_viewer_dir.Find_Next_Directory(0,false);
             guide_object2->Read(guide_viewer_dir,false);}
         if(guide_object1) for (int i=1;i<=guide_object1->particles.Size();i++) {V(offset+i)=(1-alpha)*guide_object1->particles.V(i)+alpha*guide_object2->particles.V(i);}}
 }
@@ -670,7 +670,7 @@ Set_External_Positions(ARRAY_VIEW<TV> X,const T time)
         T alpha=frame-(T)(int)frame;
         if(frame>current_frame){
             guide_object1=guide_object2;
-            guide_viewer_dir.Find_Next_Directory(0);
+            guide_viewer_dir.Find_Next_Directory(0,false);
             guide_object2->Read(guide_viewer_dir,false);}
         if(guide_object1) for (int i=1;i<=guide_object1->particles.Size();i++) {X(offset+i)=(1-alpha)*guide_object1->particles.X(i)+alpha*guide_object2->particles.X(i);}}
 }

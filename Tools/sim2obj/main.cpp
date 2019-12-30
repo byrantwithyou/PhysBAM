@@ -46,7 +46,7 @@ Convert(PARSE_ARGS& parse_args)
 
     DEFORMABLE_BODY_COLLECTION<TV> deformable_body_collection(0,0);
     VIEWER_DIR viewer_dir(input_dir);
-    while(viewer_dir.Find_Next_Directory(0) && viewer_dir.frame_stack(0)<=end_at)
+    while(viewer_dir.Find_Next_Directory(0,false) && viewer_dir.frame_stack(0)<=end_at)
     {
         LOG::printf("Frame %P\n",viewer_dir.frame_stack);
         deformable_body_collection.Read(viewer_dir,false);
