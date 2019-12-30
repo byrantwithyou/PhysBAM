@@ -1597,7 +1597,6 @@ Initialize()
             Add_Fixed_Corotated(E,nu);
             Add_Gravity(gravity);
             Add_Walls(-1,COLLISION_TYPE::separate,.3,0,false);
-            if(friction_is_set) this->reflection_bc_friction=friction;
             T a=this->reflection_bc_friction*-gravity.y;
             PHYSBAM_ASSERT(vel>=0);
             write_output_files.Append([this,vel,a,C]()

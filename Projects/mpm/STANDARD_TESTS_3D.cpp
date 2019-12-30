@@ -819,26 +819,34 @@ Initialize()
 
         case 34:{ // sand dam break
             // usage:./mpm 34 -3d -use_exp_F -max_dt 1e-3 -unit_p*scale_E 10 -fooT1 10 -fooT2 1000 -fooT3 3 -last_frame 20 
+            // usage: ./siggraph-2020/run_sand_dam_break.sh
             particles.Store_Fp(true);
 
+            T shift=.1;
             Set_Grid(RANGE<TV>::Unit_Box()*m);
-            RANGE<TV> ground(TV(-0.1,0,-0.1)*m,TV(1.1,0.1,1.1)*m);
-            RANGE<TV> left_wall(TV(-0.1,0,-0.1)*m,TV(0.1,1.1,1.1)*m);
-            RANGE<TV> back_wall(TV(-0.1,0,-0.1)*m,TV(1.1,1.1,0.1)*m);
-            if(use_penalty_collisions){
-                Add_Penalty_Collision_Object(ground);
-                Add_Penalty_Collision_Object(left_wall);
-                Add_Penalty_Collision_Object(back_wall);}
+            if(this->reflection_bc)
+            {
+                shift=0;
+                Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,false);
+            }
             else{
-                Add_Collision_Object(ground,COLLISION_TYPE::stick,0);
-                Add_Collision_Object(left_wall,COLLISION_TYPE::stick,0);
-                Add_Collision_Object(back_wall,COLLISION_TYPE::stick,0);}
+                RANGE<TV> ground(TV(-0.1,0,-0.1)*m,TV(1.1,shift,1.1)*m);
+                RANGE<TV> left_wall(TV(-0.1,0,-0.1)*m,TV(shift,1.1,1.1)*m);
+                RANGE<TV> back_wall(TV(-0.1,0,-0.1)*m,TV(1.1,1.1,shift)*m);
+                if(use_penalty_collisions){
+                    Add_Penalty_Collision_Object(ground);
+                    Add_Penalty_Collision_Object(left_wall);
+                    Add_Penalty_Collision_Object(back_wall);}
+                else{
+                    Add_Collision_Object(ground,COLLISION_TYPE::stick,0);
+                    Add_Collision_Object(left_wall,COLLISION_TYPE::stick,0);
+                    Add_Collision_Object(back_wall,COLLISION_TYPE::stick,0);}}
 
             T density=(T)2200*unit_rho*scale_mass;
             T E=35.37e6*unit_p*scale_E,nu=.3;
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
-            T gap=grid.dX(1)*0.1;
-            RANGE<TV> box(TV(.1*m+gap,.1*m+gap,.1*m+gap),TV(.3,.75,.3)*m);
+            T gap=grid.dX(1)*shift;
+            RANGE<TV> box(TV(shift*m+gap,shift*m+gap,shift*m+gap),TV(.3,.75,.3)*m);
             Seed_Particles(box,0,0,density,particles_per_cell);
             ARRAY<int> sand_particles(particles.X.m);
             
@@ -2453,7 +2461,6 @@ Initialize()
             Add_Fixed_Corotated(E,nu);
             Add_Gravity(gravity);
             Add_Walls(-1,COLLISION_TYPE::separate,.3,0,false);
-            if(friction_is_set) this->reflection_bc_friction=friction;
             T a=this->reflection_bc_friction*-gravity.y;
             PHYSBAM_ASSERT(vel>=0);
             write_output_files.Append([this,vel,a,C]()

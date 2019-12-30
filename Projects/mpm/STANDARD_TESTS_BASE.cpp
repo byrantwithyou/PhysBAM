@@ -128,6 +128,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-reflection_bc",&reflection_bc_flags,"flags","Flags indicating which walls should be reflection BC");
     parse_args.Add("-test_c",&this->test_sound_speed,"test sound speed calculations");
     parse_args.Add("-dilation_only",&this->dilation_only,"Discard non-volumetric portions of F");
+    parse_args.Add("-use_reflect_friction",&this->use_full_reflection,"Use frictional reflection bc");
 
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);
@@ -463,6 +464,8 @@ Add_Clamped_Plasticity(ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& icm,T theta_c,T th
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Add_Walls(int flags,COLLISION_TYPE type,T friction,T inset,bool penalty) // -x +x -y +y [ -z +z ], as bit flags
 {
+    if(forced_collision_type!=-1) type=(COLLISION_TYPE)forced_collision_type;
+    if(friction_is_set) friction=this->friction;
     if(reflection_bc) this->reflection_bc_friction=friction;
     RANGE<TV> range=grid.domain.Thickened(grid.dX*(ghost*2+1));
     for(int a=0;a<TV::m;a++)
