@@ -356,12 +356,11 @@ PAIR<TV,TV> Reflect_Helper(T m_i,T m_o,TV v_i,TV v_o,auto type,T mu,int a,int s,
     v_id_n(a)=v_id(a);
     v_od_n(a)=v_od(a);
     v_in(a)=0;
-    v_on(a)=0;
 
-    T d_v_t_mag=v_in.Magnitude();
-    T r=1-mu*d_v_n/d_v_t_mag;
+    T d_v_t_mag=v_in.Normalize();
+    T r=d_v_t_mag-mu*d_v_n;
     if(r<0) return {v_id_n,v_od_n};
-    return {v_id_n+r*v_in,v_od_n+r*v_on};
+    return {v_id_n+r*v_in,v_od_n+r*v_in};
 }
 
 //#####################################################################
