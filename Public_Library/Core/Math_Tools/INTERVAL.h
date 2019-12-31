@@ -11,6 +11,7 @@
 #include <Core/Math_Tools/FIXED_NUMBER.h>
 #include <Core/Math_Tools/max.h>
 #include <Core/Math_Tools/min.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Core/Read_Write/READ_WRITE_FUNCTIONS.h>
 #include <Core/Vectors/SCALAR_POLICY.h>
 #include <cfloat>
@@ -242,5 +243,14 @@ template<class T> inline INTERVAL<T> operator*(const typename T::SCALAR a,const 
 template<class T>
 inline std::ostream& operator<<(std::ostream& output,const INTERVAL<T>& interval)
 {output<<"("<<interval.min_corner<<" "<<interval.max_corner<<")";return output;}
+
+//#####################################################################
+// Function Random_Fill_Uniform
+//#####################################################################
+template<class T,class T2> void
+Random_Fill_Uniform(RANDOM_NUMBERS<T>& rand,T2& t,const INTERVAL<T2>& iv)
+{
+    rand.Fill_Uniform(t,iv.min_corner,iv.max_corner);
+}
 }
 #endif
