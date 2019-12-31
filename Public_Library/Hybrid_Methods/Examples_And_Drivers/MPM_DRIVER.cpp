@@ -191,7 +191,7 @@ Simulate_To_Frame(const int frame)
                 next_time=example.time+example.dt;
                 done=false;}
 
-            PHYSBAM_DEBUG_WRITE_SUBSTEP("end substep %i",0);
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("end substep %i",0,substep);
             example.time=next_time;}
         for(int i=0;i<example.end_frame.m;i++)
             example.end_frame(i)(current_frame);
