@@ -20,6 +20,7 @@
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UNION.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT_UTILITIES.h>
 #include <Geometry/Implicit_Objects/LEVELSET_IMPLICIT_OBJECT.h>
+#include <Geometry/Seeding/OBJECT_PLACEMENT.h>
 #include <Geometry/Seeding/POISSON_DISK.h>
 #include <Geometry/Tessellation/BOWL_TESSELLATION.h>
 #include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
@@ -324,79 +325,76 @@ Initialize()
             Add_Neo_Hookean(31.685*unit_p*scale_E,0.44022); //solve({E/(2*(1+r))=11,E*r/((1+r)*(1-2*r))=81},{E,r});
         } break;
         case 73:{
-            Set_Grid(RANGE<TV>(TV(-1,0,-1)*m,TV(1,2,1))*m);
+            Set_Grid(RANGE<TV>(TV(-.75,0,-.75)*m,TV(.75,1.5,.75))*m,TV_INT(1,1,1));
+            if(extra_int.m<1) extra_int.Append(8);
+            if(extra_int.m<2) extra_int.Append(20);
             T density=2*unit_rho*scale_mass;
             T gravity=9.8*m/(s*s);
-            T half_edge=.12*m;
-            int seed_freq=4;
-            int ob_per_frame_x=2;
-            int ob_per_frame_z=2;
-            int ob_per_frame=ob_per_frame_x*ob_per_frame_z;
-            RANGE<TV> seed_box=grid.domain.Thickened(-.1*m);
-            seed_box=seed_box.Thickened(-sqrt((T)TV::m)*half_edge*m);
-            seed_box.min_corner.y=seed_box.max_corner.y-sqr(seed_freq*frame_dt)/2*gravity;
-            seed_box.max_corner.x=seed_box.min_corner.x+seed_box.Edge_Lengths().x/ob_per_frame_x;
-            seed_box.max_corner.z=seed_box.min_corner.z+seed_box.Edge_Lengths().z/ob_per_frame_z;
-            TETRAHEDRALIZED_VOLUME<T>* cube=TETRAHEDRALIZED_VOLUME<T>::Create();
-            cube->Initialize_Cube_Mesh_And_Particles(GRID<TV>(TV_INT()+10,RANGE<TV>::Centered_Box()*half_edge*m));
-            auto &s=Seed_Lagrangian_Particles(*cube,0,0,density,false,false);
-            ARRAY<TETRAHEDRALIZED_VOLUME<T>*>* slist=new ARRAY<TETRAHEDRALIZED_VOLUME<T>*>;
-            slist->Append(&s);
-            int particles_per_cube=particles.X.m;
-            for(int frame=0;frame<last_frame;++frame){
-                if(frame%seed_freq==0 && frame<200){
-                    for(int i=0;i<ob_per_frame_x;i++){
-                        for (int j=0;j<ob_per_frame_z;j++){
-                            TETRAHEDRALIZED_VOLUME<T>* cube1=TETRAHEDRALIZED_VOLUME<T>::Create();
-                            cube1->particles.Add_Elements(cube->particles.X.m);
-                            for(int dim=0;dim<cube->particles.X.m;dim++){
-                                cube1->particles.X(dim)=cube->particles.X(dim)/100000;}
-                            cube1->mesh.elements=cube->mesh.elements;
-                            cube1->Update_Number_Nodes();
-                            auto &s=Seed_Lagrangian_Particles(*cube1,0,0,density,false,true);
-                            slist->Append(&s);}}}}
-            for(int i=0;i<slist->m;++i){
-                (*slist)(i)->Update_Number_Nodes();}
-            particles.valid.Fill(false);
-            Add_Fixed_Corotated(1e2*unit_p*scale_E,0.3);
-            Add_Gravity(TV(0,-gravity,0));
-            if(!no_implicit_plasticity) use_implicit_plasticity=true;
-            BOWL<T> bowl(.25*m,.25*m,.25*m);
+            T half_edge=.1*m;
+            T bowl_radius=.5*m;
+            T side_radius=.25*m;
+            T fall_speed=.2*m/s;
+            T diff_speed=.1*m/s;
+            int mesh_res=extra_int(0);
+            int last_seed_frame=extra_int(1);
+            T E=1e2*unit_p*scale_E,nu=0.3;
+            CYLINDER<T> cyl(TV(0,1.5*m,0),TV(0,(1.5-half_edge*4)*m,0),bowl_radius);
+            OBJECT_PLACEMENT<TV> * op=new OBJECT_PLACEMENT<TV>(random,Make_IO(cyl));
+            typename OBJECT_PLACEMENT<TV>::OBJECT obj;
+            obj.box=RANGE<TV>::Centered_Box()*half_edge*m;
+            obj.scale={1,1};
+            obj.max_angulare_vel=(T).1/s;
+            obj.velocity_range=RANGE<TV>(TV(0,-fall_speed,0)).Thickened(diff_speed);
+            op->objects.Append(obj);
+            op->min_sep=half_edge;
+            this->write_structures_every_frame=true;
+
+            BOWL<T> bowl(bowl_radius-side_radius,side_radius,.1*m);
             if(use_penalty_collisions){
                 LOG::cout<<"USE PENALTY COLLISIONS"<<std::endl;
                 Add_Penalty_Collision_Object(bowl);}
             else{
-                Add_Collision_Object(new ANALYTIC_IMPLICIT_OBJECT<BOWL<T> >(bowl),COLLISION_TYPE::separate,1,
-                [=](T time){return FRAME<TV>(TV(0,.6,0),ROTATION<TV>(pi,TV(1,0,0)));},
-                [=](T time){return TWIST<TV>();});}
+                Add_Collision_Object(Make_IO(bowl),COLLISION_TYPE::separate,1,
+                    [=](T time){return FRAME<TV>(TV(0,side_radius,0),ROTATION<TV>(pi,TV(1,0,0)));},
+                    [](T time){return TWIST<TV>();});}
             Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,false);
+
             auto func=[=](int frame)
-            {   
-                if(frame%seed_freq==0 && frame<200){
-                    particles.valid.Subset(IDENTITY_ARRAY<>(ob_per_frame*particles_per_cube)+(frame/seed_freq*ob_per_frame+1)*particles_per_cube).Fill(true);
-                    for(int i=0;i<ob_per_frame_x;i++){
-                        for(int j=0;j<ob_per_frame_z;j++){
-                            T angle=random.Get_Uniform_Number((T)0,pi);
-                            TV direction=random.template Get_Direction<TV>();
-                            ROTATION<TV> rot(angle,direction);
-                            TV center;
-                            random.Fill_Uniform(center,seed_box);
-                            center.x+=i*seed_box.Edge_Lengths().x;
-                            center.z+=j*seed_box.Edge_Lengths().z;
-                            for(auto &s:particles.X.Subset(IDENTITY_ARRAY<>(particles_per_cube)+particles_per_cube*(1+frame*ob_per_frame/seed_freq+j+i*ob_per_frame_z)))
-                            {
-                                s*=100000;
-                                s=rot.Rotate(s)+center;}}}}
+            {
+                if(dump_collision_objects && frame==0){
+                    TRIANGULATED_SURFACE<T>* ts=TESSELLATION::Generate_Triangles(bowl);
+                    Write_To_File(stream_type,viewer_dir.output_directory+"/bowl.tri.gz",*ts);
+                    delete ts;}
+
+                if(frame>last_seed_frame) return;
+                op->pts=particles.X;
+                op->boxes.Remove_All();
+                ARRAY<typename OBJECT_PLACEMENT<TV>::SEEDING> objs;
+                op->Seed_Objects(objs,10);
+                for(const auto& o:objs)
+                {
+                    assert(o.index==0);
+                    TETRAHEDRALIZED_VOLUME<T> cube;
+                    cube.Initialize_Cube_Mesh_And_Particles(GRID<TV>(TV_INT()+mesh_res,obj.box*o.scale));
+                    for(auto&X:cube.particles.X) X=o.frame*X;
+                    auto& st=Seed_Lagrangian_Particles(cube,
+                        [&o](const TV& X){return o.twist.linear+o.twist.angular.Cross(X-o.frame.t);},
+                        [&o](const TV& X){return MATRIX<T,3>::Cross_Product_Matrix(o.twist.angular);},
+                        density,false,false);
+                    Add_Fixed_Corotated(st,E,nu);
+                }
+                if(objs.m)
+                    for(auto* s:this->solid_body_collection.deformable_body_collection.structures)
+                        s->Update_Number_Nodes();
             };
             this->begin_frame.Append(func);
-            if(dump_collision_objects){
-                TRIANGULATED_SURFACE<T>* ts=TESSELLATION::Generate_Triangles(bowl);
-                Write_To_File(stream_type,LOG::sprintf("bowl.tri.gz"),*ts);
-                delete ts;}
+            
+            Add_Gravity(TV(0,-gravity,0));
+
             destroy=[=]()
                 {
-                    delete slist;
-                    delete cube;
+                    delete op->io;
+                    delete op;
                 };
         } break;
         case 13:{ // Lagrangian mesh example; 
