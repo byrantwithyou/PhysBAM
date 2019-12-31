@@ -89,4 +89,6 @@ template VECTOR<double,1> RANDOM_NUMBERS<double>::Get_Vector_In_Unit_Sphere<VECT
 template VECTOR<float,1> RANDOM_NUMBERS<float>::Get_Vector_In_Unit_Sphere<VECTOR<float,1> >();
 template VECTOR<double,3> RANDOM_NUMBERS<double>::Get_Vector_In_Unit_Sphere<VECTOR<double,3> >();
 template VECTOR<float,3> RANDOM_NUMBERS<float>::Get_Vector_In_Unit_Sphere<VECTOR<float,3> >();
+template VECTOR<double,0> RANDOM_NUMBERS<double>::Get_Vector_In_Unit_Sphere<VECTOR<double,0> >();
+template VECTOR<float,0> RANDOM_NUMBERS<float>::Get_Vector_In_Unit_Sphere<VECTOR<float,0> >();
 }
