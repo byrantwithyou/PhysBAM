@@ -16,7 +16,7 @@ namespace PhysBAM{
 //#####################################################################
 template<class T> RANDOM_NUMBERS<T>::
 RANDOM_NUMBERS(const unsigned int seed)
-    :gaussian_iset(0)
+    :gaussian_iset(0),gset(0)
 {
     Set_Seed(seed);
 }
