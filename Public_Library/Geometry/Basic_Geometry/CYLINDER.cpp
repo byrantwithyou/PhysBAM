@@ -149,11 +149,8 @@ Hessian(const TV& X) const
 template<class T> RANGE<VECTOR<T,3> > CYLINDER<T>::
 Bounding_Box() const
 {
-    TV edge1=(T)2*radius*plane1.normal.Unit_Orthogonal_Vector();
-    TV edge2=TV::Cross_Product(plane1.normal,edge1);
-    TV corner=plane1.x0-(T).5*(edge1+edge2);
-    ORIENTED_BOX<TV> oriented_box(corner,MATRIX<T,3>(-height*plane1.normal,edge1,edge2)); // TODO(jontg): ...
-    return oriented_box.Axis_Aligned_Bounding_Box();
+    TV C=(plane1.x0+plane2.x0)/2,u=plane1.normal,w=height/2*abs(u);
+    return RANGE<TV>(C).Thickened(w+(Outer_Product(u,u)-1).Column_Magnitudes()*radius);
 }
 //#####################################################################
 namespace PhysBAM{
