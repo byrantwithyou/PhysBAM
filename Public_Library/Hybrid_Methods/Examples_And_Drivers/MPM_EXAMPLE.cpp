@@ -71,7 +71,7 @@ Write_Output_Files()
         Write_To_File(stream_type,viewer_dir.current_directory+"/restart_data",time);
 #pragma omp task
         {
-            solid_body_collection.Write(stream_type,viewer_dir);
+            solid_body_collection.Write(stream_type,viewer_dir,write_structures_every_frame);
         }
 
         if(!only_write_particles){

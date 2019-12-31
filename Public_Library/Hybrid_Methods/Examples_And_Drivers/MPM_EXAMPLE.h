@@ -94,6 +94,7 @@ public:
     T reflection_bc_friction=0;
     bool test_sound_speed=false;
     bool dilation_only=false;
+    bool write_structures_every_frame=false;
 
     T newton_tolerance=1;
     int newton_iterations=100;
