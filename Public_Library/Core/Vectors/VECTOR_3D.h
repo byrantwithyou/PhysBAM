@@ -342,6 +342,9 @@ public:
     static VECTOR Axis_Vector(const int axis)
     {VECTOR vec;vec[axis]=(T)1;return vec;}
 
+    VECTOR Add_Axis(int axis,T value) const
+    {VECTOR vec=*this;vec(axis)+=value;return vec;}
+
     static VECTOR Constant_Vector(const T& constant)
     {return VECTOR(constant,constant,constant);}
 

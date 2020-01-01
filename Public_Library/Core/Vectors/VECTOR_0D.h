@@ -288,6 +288,9 @@ public:
     static VECTOR Axis_Vector(const int axis)
     {PHYSBAM_FATAL_ERROR();}
 
+    VECTOR Add_Axis(int axis,T value) const
+    {PHYSBAM_FATAL_ERROR();}
+
     void Split(VECTOR& v1,VECTOR& v2) const
     {}
 

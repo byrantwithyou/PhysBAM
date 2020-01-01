@@ -251,6 +251,9 @@ public:
     static VECTOR Axis_Vector(const int axis)
     {VECTOR r;r(axis)=(T)1;return r;}
 
+    VECTOR Add_Axis(int axis,T value) const
+    {VECTOR vec=*this;vec(axis)+=value;return vec;}
+
     static VECTOR Constant_Vector(const T& constant)
     {VECTOR r;
     for(int i=0;i<d;i++) r.array[i]=constant;
