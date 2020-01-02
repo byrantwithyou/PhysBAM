@@ -20,7 +20,7 @@ void writePartio(const std::string& output_filename,const MPM_PARTICLES<VECTOR<T
 {
     Partio::ParticlesDataMutable* parts=Partio::create();
 
-    Partio::ParticleAttribute posH,vH,FxH,FyH,FzH,mH,volH,validH,colorH;
+    Partio::ParticleAttribute posH,vH,FxH,FyH,FzH,mH,volH,validH,colorH,prop4rH;
     posH=parts->addAttribute("position",Partio::VECTOR,3);
     vH=parts->addAttribute("v",Partio::VECTOR,3);
     FxH=parts->addAttribute("Fx",Partio::VECTOR,3);
@@ -29,6 +29,8 @@ void writePartio(const std::string& output_filename,const MPM_PARTICLES<VECTOR<T
     volH=parts->addAttribute("vol",Partio::VECTOR,1);
     mH=parts->addAttribute("m",Partio::VECTOR,1);
     const ARRAY_VIEW<int>* myc=particles.template Get_Array<int>("myc");
+    const ARRAY_VIEW<T>* prop4r=particles.template Get_Array<T>("prop4r");
+    if(prop4r) prop4rH=parts->addAttribute("prop4r",Partio::VECTOR,1);
     if(myc) colorH=parts->addAttribute("myc",Partio::INT,1);
     if(dump_valid) validH=parts->addAttribute("valid",Partio::INT,1);
 
@@ -42,7 +44,6 @@ void writePartio(const std::string& output_filename,const MPM_PARTICLES<VECTOR<T
         float *Fz=parts->dataWrite<float>(FzH,idx);
         float *vol=parts->dataWrite<float>(volH,idx);
         float *m=parts->dataWrite<float>(mH,idx);
-
         VECTOR<T,3> pFx(particles.F(i).Column(0));
         VECTOR<T,3> pFy(particles.F(i).Column(1));
         VECTOR<T,3> pFz(N==3?VECTOR<T,3>(particles.F(i).Column(N-1)):VECTOR<T,3>(0,0,1));
@@ -59,6 +60,7 @@ void writePartio(const std::string& output_filename,const MPM_PARTICLES<VECTOR<T
         vol[0]=particles.volume(i);
         m[0]=particles.mass(i);
         if(myc) *parts->dataWrite<int>(colorH,idx)=(*myc)(i);
+        if(prop4r) (parts->dataWrite<float>(prop4rH,idx))[0]=(*prop4r)(i);
         if(dump_valid) *parts->dataWrite<int>(validH,idx)=particles.valid(i);}
 
     Partio::write(output_filename.c_str(),*parts);

@@ -801,6 +801,9 @@ Compute_Max_Sound_Speed() const -> T
                 T density=example.particles.mass(p)/example.particles.volume(p);
                 T speed=ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>::Sound_Speed(
                     force->sigma(p),force->dPi_dF(p),density);
+                    #if 0
+                        if (ARRAY_VIEW<T>* prop4r=example.particles.template Get_Array<T>("prop4r")) (*prop4r)(p)=speed;
+                    #endif
                 max_speed=max(max_speed,speed);}}}
     for(auto* pf:example.lagrangian_forces)
         if(FINITE_VOLUME<TV,TV::m>* fv=dynamic_cast<FINITE_VOLUME<TV,TV::m>*>(pf))
