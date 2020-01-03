@@ -25,7 +25,7 @@
 #include <Deformables/Forces/IMPLICIT_OBJECT_PENALTY_FORCE_WITH_FRICTION.h>
 #include <Solids/Collisions/PENALTY_FORCE_COLLECTION.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
-#include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
+#include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/MPM_DRUCKER_PRAGER.h>
 #include <Hybrid_Methods/Forces/MPM_FINITE_ELEMENTS.h>
@@ -609,7 +609,10 @@ Add_Collision_Object(IMPLICIT_OBJECT<TV>* io)
 template<class TV> void STANDARD_TESTS_BASE<TV>::
 Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction,std::function<FRAME<TV>(T)> func_frame,std::function<TWIST<TV>(T)> func_twist)
 {
-    collision_objects.Append(new MPM_COLLISION_IMPLICIT_OBJECT<TV>(io,type,friction,func_frame,func_twist));
+    auto* co=new MPM_COLLISION_OBJECT<TV>(io,type,friction);
+    co->func_frame=func_frame;
+    co->func_twist=func_twist;
+    collision_objects.Append(co);
 }
 //#####################################################################
 // Function Seed_Particles_Surface

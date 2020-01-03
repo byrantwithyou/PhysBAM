@@ -7,7 +7,7 @@
 #include <Grid_PDE/Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
-#include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
+#include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_MAC_EXAMPLE.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Iterators/GATHER_SCATTER.h>
@@ -319,7 +319,10 @@ Average_Particle_Mass() const
 template<class TV> void MPM_MAC_EXAMPLE<TV>::
 Add_Collision_Object(IMPLICIT_OBJECT<TV>* io,COLLISION_TYPE type,T friction,std::function<FRAME<TV>(T)> func_frame,std::function<TWIST<TV>(T)> func_twist)
 {
-    collision_objects.Append(new MPM_COLLISION_IMPLICIT_OBJECT<TV>(io,type,friction,func_frame,func_twist));
+    auto* co=new MPM_COLLISION_OBJECT<TV>(io,type,friction);
+    co->func_frame=func_frame;
+    co->func_twist=func_twist;
+    collision_objects.Append(co);
 }
 //#####################################################################
 // Function Add_Fluid_Wall

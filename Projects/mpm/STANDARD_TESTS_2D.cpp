@@ -35,7 +35,6 @@
 #include <Deformables/Forces/LINEAR_SPRINGS.h>
 #include <Deformables/Forces/SURFACE_TENSION_FORCE.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
-#include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_OBJECT.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/MPM_DRUCKER_PRAGER.h>
@@ -244,7 +243,7 @@ Initialize()
             Add_Fixed_Corotated(1*unit_p*scale_E,0.3,&foo);
             Add_Gravity(m/(s*s)*TV(0,-9.8));
             Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,false);
-            MPM_COLLISION_IMPLICIT_OBJECT<TV>* bottom=dynamic_cast<MPM_COLLISION_IMPLICIT_OBJECT<TV>*>(collision_objects(3));
+            MPM_COLLISION_OBJECT<TV>* bottom=dynamic_cast<MPM_COLLISION_OBJECT<TV>*>(collision_objects(3));
             bottom->func_frame=[this](T time){return FRAME<TV>(TV(0,(T).75-abs((T).15*time*scale_speed-(T).75)));};
             bottom->func_twist=[this](T time){return TWIST<TV>(TV(0,-sign((T).15*time*scale_speed-(T).75)*(T).15*scale_speed),typename TV::SPIN());};
         } break;
