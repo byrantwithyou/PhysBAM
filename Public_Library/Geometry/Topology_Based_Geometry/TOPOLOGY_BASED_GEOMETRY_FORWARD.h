@@ -2,10 +2,10 @@
 // Copyright 2007, Geoffrey Irving.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class TOPOLOGY_BASED_GEOMETRY_GEOMETRY_FORWARD 
+// Class TOPOLOGY_BASED_GEOMETRY_FORWARD 
 //#####################################################################
-#ifndef __TOPOLOGY_BASED_GEOMETRY_GEOMETRY_FORWARD__
-#define __TOPOLOGY_BASED_GEOMETRY_GEOMETRY_FORWARD__
+#ifndef __TOPOLOGY_BASED_GEOMETRY_FORWARD__
+#define __TOPOLOGY_BASED_GEOMETRY_FORWARD__
 
 namespace PhysBAM{
 
