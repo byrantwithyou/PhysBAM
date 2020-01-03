@@ -34,7 +34,6 @@
 #include <Deformables/Forces/SURFACE_TENSION_FORCE_3D.h>
 #include <Solids/Collisions/PENALTY_FORCE_COLLECTION.h>
 #include <Solids/Solids/SOLID_BODY_COLLECTION.h>
-#include <Hybrid_Methods/Collisions/MPM_COLLISION_IMPLICIT_SPHERE.h>
 #include <Hybrid_Methods/Collisions/MPM_COLLISION_OBJECT.h>
 #include <Hybrid_Methods/Examples_And_Drivers/MPM_PARTICLES.h>
 #include <Hybrid_Methods/Forces/MPM_DRUCKER_PRAGER.h>
