@@ -495,6 +495,22 @@ template<class T> inline VECTOR<T,3>
 rint(const VECTOR<T,3>& v)
 {return VECTOR<T,3>(rint(v.x),rint(v.y),rint(v.z));}
 
+inline VECTOR<int,3>
+fdiv(const VECTOR<int,3>& a,const VECTOR<int,3>& b)
+{return VECTOR<int,3>(fdiv(a.x,b.x),fdiv(a.y,b.y),fdiv(a.z,b.z));}
+
+inline VECTOR<int,3>
+fdiv(const VECTOR<int,3>& a,int b)
+{return VECTOR<int,3>(fdiv(a.x,b),fdiv(a.y,b),fdiv(a.z,b));}
+
+inline VECTOR<int,3>
+cdiv(const VECTOR<int,3>& a,const VECTOR<int,3>& b)
+{return VECTOR<int,3>(cdiv(a.x,b.x),cdiv(a.y,b.y),cdiv(a.z,b.z));}
+
+inline VECTOR<int,3>
+cdiv(const VECTOR<int,3>& a,int b)
+{return VECTOR<int,3>(cdiv(a.x,b),cdiv(a.y,b),cdiv(a.z,b));}
+
 template<class T> inline VECTOR<T,3>
 exp(const VECTOR<T,3>& v)
 {return VECTOR<T,3>(exp(v.x),exp(v.y),exp(v.z));}

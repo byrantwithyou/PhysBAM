@@ -10,6 +10,7 @@
 #include <Core/Arrays/ARRAY_BASE.h>
 #include <Core/Log/DEBUG_UTILITIES.h>
 #include <Core/Math_Tools/FIXED_NUMBER.h>
+#include <Core/Math_Tools/int_div.h>
 #include <Core/Math_Tools/Inverse.h>
 #include <Core/Vectors/SCALAR_POLICY.h>
 #include <cmath>
@@ -396,6 +397,22 @@ ceil(const VECTOR<T,0>& v)
 template<class T> inline VECTOR<T,0>
 rint(const VECTOR<T,0>& v)
 {return v;}
+
+inline VECTOR<int,0>
+fdiv(const VECTOR<int,0>& a,const VECTOR<int,0>& b)
+{return a;}
+
+inline VECTOR<int,0>
+fdiv(const VECTOR<int,0>& a,int b)
+{return a;}
+
+inline VECTOR<int,0>
+cdiv(const VECTOR<int,0>& a,const VECTOR<int,0>& b)
+{return a;}
+
+inline VECTOR<int,0>
+cdiv(const VECTOR<int,0>& a,int b)
+{return a;}
 
 template<class T> inline VECTOR<T,0>
 exp(const VECTOR<T,0>& v)

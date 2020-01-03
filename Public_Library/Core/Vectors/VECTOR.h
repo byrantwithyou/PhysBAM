@@ -479,6 +479,46 @@ rint(const VECTOR<T,d>& v)
     return r;
 }
 //#####################################################################
+// Function fdiv
+//#####################################################################
+template<int d> inline VECTOR<int,d>
+fdiv(const VECTOR<int,d>& a,const VECTOR<int,d>& b)
+{
+    VECTOR<int,d> r;
+    for(int i=0;i<d;i++) r.array[i]=fdiv(a.array[i],b.array[i]);
+    return r;
+}
+//#####################################################################
+// Function fdiv
+//#####################################################################
+template<int d> inline VECTOR<int,d>
+fdiv(const VECTOR<int,d>& a,int b)
+{
+    VECTOR<int,d> r;
+    for(int i=0;i<d;i++) r.array[i]=fdiv(a.array[i],b);
+    return r;
+}
+//#####################################################################
+// Function cdiv
+//#####################################################################
+template<int d> inline VECTOR<int,d>
+cdiv(const VECTOR<int,d>& a,const VECTOR<int,d>& b)
+{
+    VECTOR<int,d> r;
+    for(int i=0;i<d;i++) r.array[i]=cdiv(a.array[i],b.array[i]);
+    return r;
+}
+//#####################################################################
+// Function cdiv
+//#####################################################################
+template<int d> inline VECTOR<int,d>
+cdiv(const VECTOR<int,d>& a,int b)
+{
+    VECTOR<int,d> r;
+    for(int i=0;i<d;i++) r.array[i]=cdiv(a.array[i],b);
+    return r;
+}
+//#####################################################################
 // Function exp
 //#####################################################################
 template<class T,int d> inline VECTOR<T,d>
