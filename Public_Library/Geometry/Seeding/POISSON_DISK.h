@@ -30,7 +30,7 @@ public:
     void Sample(RANDOM_NUMBERS<T>& random,const RANGE<TV>& box,ARRAY<TV>& X);
     void Set_Distance_By_Volume(T volume_per_sample);
 private:
-    TV Generate_Random_Point_Around_Annulus(RANDOM_NUMBERS<T>& random,TV& center) const;
+    TV Generate_Random_Point_Around_Annulus(RANDOM_NUMBERS<T>& random,const TV& center) const;
     bool Check_Distance(const GRID<TV>& grid,ARRAY<int,TV_INT>& grid_array,const TV& point,ARRAY<TV>& X) const;
 //#####################################################################
 };

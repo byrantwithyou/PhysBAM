@@ -95,14 +95,15 @@ Sample(RANDOM_NUMBERS<T>& random,const RANGE<TV>& box,ARRAY<TV>& X)
                 int index=X.Append(new_point);
                 active.Append(index);
                 Insert_In_Array(grid_array,grid.Cell(new_point),index,
-                    grid.numbers_of_cells,ghost,is_periodic,(TV_INT*)0);}}
+                    grid.numbers_of_cells,ghost,is_periodic,(TV_INT*)0);
+                break;}}
         if(!found_at_least_one) active.Remove_Index_Lazy(random_index);}
 }
 //#####################################################################
 // Function Generate_Random_Point_Around_Annulus
 //#####################################################################
 template<class TV> TV POISSON_DISK<TV>::
-Generate_Random_Point_Around_Annulus(RANDOM_NUMBERS<T>& random,TV& center) const
+Generate_Random_Point_Around_Annulus(RANDOM_NUMBERS<T>& random,const TV& center) const
 {
     while(1){
         TV v;
@@ -118,7 +119,7 @@ template<class TV> bool POISSON_DISK<TV>::
 Check_Distance(const GRID<TV>& grid,ARRAY<int,TV_INT>& grid_array,const TV& point,ARRAY<TV>& X) const
 {
     TV_INT cell=grid.Cell(point);
-    RANGE<TV_INT> candidate_range(cell-1,cell+2);
+    RANGE<TV_INT> candidate_range(cell-2,cell+3);
     for(RANGE_ITERATOR<TV::m> it(candidate_range);it.Valid();it.Next()){
         if(grid_array(it.index)==-1) continue;
         if((point-X(grid_array(it.index))).Magnitude_Squared()<sqr(min_distance)) return false;}
