@@ -528,6 +528,7 @@ Read_Output_Files_Fluids()
 template<class TV> void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>::
 Write_Output_Files() const
 {
+    BASE::Write_Output_Files();
     if(this->use_test_output){
         std::string file=LOG::sprintf("%s/%s-%03d.txt",viewer_dir.output_directory.c_str(),this->test_output_prefix.c_str(),viewer_dir.frame_stack(0));
         OCTAVE_OUTPUT<T> oo(file.c_str());

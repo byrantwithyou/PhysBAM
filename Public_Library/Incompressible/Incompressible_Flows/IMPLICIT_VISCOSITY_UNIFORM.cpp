@@ -9,6 +9,7 @@
 #include <Grid_PDE/Boundaries/BOUNDARY.h>
 #include <Grid_PDE/Interpolation/AVERAGING_UNIFORM.h>
 #include <Grid_PDE/Poisson/LAPLACE_UNIFORM.h>
+#include <Geometry/Projection/BOUNDARY_CONDITION_DOUBLE_FINE.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/LAPLACE_COLLIDABLE_UNIFORM.h>
 #include <Incompressible/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>
 #include <Incompressible/Incompressible_Flows/IMPLICIT_VISCOSITY_UNIFORM.h>
@@ -47,7 +48,8 @@ Viscous_Update(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities
     heat_solver->pcg.Set_Maximum_Iterations(maximum_implicit_viscosity_iterations);
 
     Setup_Viscosity(dt);
-    Setup_Boundary_Conditions(face_velocities_ghost);
+    if(bc_fine) bc_fine->Get_Viscosity_Boundary_Conditions(heat_solver->psi_D,heat_solver->psi_N,u,axis);
+    else Setup_Boundary_Conditions(face_velocities_ghost);
 
     // copy velocities into u so unchanged velocities can be copied out unconditionally...
     // TODO: make shared face copied in a more clever way to avoid this copy 

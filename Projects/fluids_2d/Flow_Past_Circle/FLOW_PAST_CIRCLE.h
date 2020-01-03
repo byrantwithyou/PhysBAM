@@ -13,6 +13,8 @@
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Grid_PDE/Poisson/PROJECTION_UNIFORM.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
+#include <Geometry/Projection/BOUNDARY_CONDITION_DOUBLE_FINE.h>
 #include <Rigids/Standard_Tests/RIGIDS_STANDARD_TESTS.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
@@ -31,22 +33,23 @@ public:
     RIGIDS_STANDARD_TESTS<TV> solids_tests;
     T rho,rho_bottom,rho_top,buoyancy_constant;
     RANGE<TV> source_domain;
-    ARRAY<T,TV_INT> phi_object;
-    LEVELSET<TV> levelset_object;
     SPHERE<TV> circle;
+    IMPLICIT_OBJECT<TV> * io;
     ARRAY<TV> sample_points;
+    
     bool shed,opt_enlarge;
     
     FLOW_PAST_CIRCLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
         :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type_input,parse_args,0,fluids_parameters.SMOKE),solids_tests(stream_type_input,data_directory,solid_body_collection.rigid_body_collection),
-        levelset_object(*fluids_parameters.grid,phi_object),circle(TV((T)2,(T)2),(T).5),shed(false),opt_enlarge(false)
+        circle(TV((T)2,(T)2),(T).5),shed(false),opt_enlarge(false)
     {
         //fluids_parameters.cfl=0.75;
         fluids_parameters.cfl=.9;
         fluids_parameters.gravity=TV();
         fluids_parameters.density=1;
         //fluids_parameters.cfl=1.75;
-        fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][0]=true;
+        fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=false;
+        fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][0]=true;
         fluids_parameters.use_vorticity_confinement=false;
         fluids_parameters.use_levelset_viscosity=true;
         write_output_files=true;fluids_parameters.write_debug_data=true;
@@ -74,12 +77,16 @@ public:
         }
         if(shed) circle.center=TV();
         solids_tests.data_directory=data_directory;
-        if(shed) fluids_parameters.grid->Initialize(TV_INT((int)(2.5*resolution)+1,resolution+1),RANGE<TV>(TV(-(T)2.5,-(T)3.5),TV(15,(T)3.5)));
-        else fluids_parameters.grid->Initialize(TV_INT(resolution+1,resolution+1),RANGE<TV>(TV(0,0),TV(4,4)));
+        if(shed) fluids_parameters.grid->Initialize(TV_INT((int)(2.5*resolution),resolution),RANGE<TV>(TV(-(T)2.5,-(T)3.5),TV(15,(T)3.5)),true);
+        else fluids_parameters.grid->Initialize(TV_INT(resolution,resolution),RANGE<TV>(TV(0,0),TV(4,4)),true);
+        fluids_parameters.Use_Unified_Boundary_Conditions();
+        io=Make_IO(circle);
     }
     
     ~FLOW_PAST_CIRCLE()
-    {}
+    {
+        delete io;
+    }
 
 //#####################################################################
 // Function Initialize_Bodies
@@ -97,12 +104,23 @@ void Initialize_Bodies() override
 //#####################################################################
 void Get_Source_Velocities(ARRAY<T,FACE_INDEX<2> >& face_velocities,ARRAY<bool,FACE_INDEX<2> >& psi_N,const T time) override
 {
+    PHYSBAM_FATAL_ERROR();
     GRID<TV> u_grid=fluids_parameters.grid->Get_Face_Grid(0),v_grid=fluids_parameters.grid->Get_Face_Grid(1);
     T flow_speed=(T)1;
     for(int j=0;j<u_grid.counts.y;j++){
         FACE_INDEX<2> a(0,TV_INT(0,j)),b(0,TV_INT(u_grid.counts.x-1,j));
         face_velocities(a)=flow_speed;
         psi_N(a)=true;}
+}
+//#####################################################################
+// Function Get_Unified_Boundary_Conditions
+//#####################################################################
+void Get_Unified_Boundary_Conditions(BOUNDARY_CONDITION_DOUBLE_FINE<TV>* bc_fine,const T time)
+{
+    bc_fine->Set(io,bc_fine->bc_noslip,[](const TV& X,int a){Add_Debug_Particle(X,VECTOR<T,3>(1,1,0));return 0;});
+    bc_fine->Set_Domain_Walls(1,bc_fine->bc_noslip,[](const TV& X,int a){Add_Debug_Particle(X,VECTOR<T,3>(0,0,1));return TV(1,0)(a);});
+    bc_fine->Set_Domain_Walls(2,bc_fine->bc_free,[](const TV& X,int a){Add_Debug_Particle(X,VECTOR<T,3>(1,0,0));return 0;});
+    bc_fine->Set_Domain_Walls(12,bc_fine->bc_slip,[](const TV& X,int a){Add_Debug_Particle(X,VECTOR<T,3>(0,1,0));return 0;});
 }
 //#####################################################################
 // Function Construct_Levelsets_For_Objects
@@ -123,6 +141,7 @@ void Initialize_Advection()    override
 //#####################################################################
 void Set_Dirichlet_Boundary_Conditions(const T time) override
 {
+    PHYSBAM_FATAL_ERROR();
     for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
         if(circle.Inside(iterator.Location(),(T).1*fluids_parameters.grid->dX.Max()))
             fluids_parameters.incompressible->projection.elliptic_solver->psi_D(iterator.index)=true;
@@ -145,6 +164,7 @@ void Postprocess_Frame(const int frame) override
 //#####################################################################
 void Mark_Outside(ARRAY<bool,FACE_INDEX<TV::m> >& outside) override
 {
+    PHYSBAM_FATAL_ERROR();
     for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,0);iterator.Valid();iterator.Next()) outside(iterator.Full_Index())=true;
     for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,2);iterator.Valid();iterator.Next()) outside(iterator.Full_Index())=true;
     for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,3);iterator.Valid();iterator.Next()) outside(iterator.Full_Index())=true;
@@ -158,6 +178,7 @@ void Mark_Outside(ARRAY<bool,FACE_INDEX<TV::m> >& outside) override
 //#####################################################################
 typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE Get_Boundary_Along_Ray(const FACE_INDEX<TV::m>& f1,const FACE_INDEX<TV::m>& f2,T& theta,T& value) override
 {
+    PHYSBAM_FATAL_ERROR();
     typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE type=BOUNDARY_CONDITIONS_CALLBACKS<TV>::unused;
     TV X0=fluids_parameters.grid->Face(f1);
     TV X1=fluids_parameters.grid->Face(f2);

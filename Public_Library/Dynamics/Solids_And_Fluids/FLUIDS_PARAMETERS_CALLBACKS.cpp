@@ -2,6 +2,7 @@
 // Copyright 2004-2008, Ronald Fedkiw, Geoffrey Irving, Nipun Kwatra, Frank Losasso, Avi Robinson-Mosher, Nick Rasmussen, Andrew Selle, Tamar Shinar, Jonathan Su.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Geometry/Projection/BOUNDARY_CONDITION_DOUBLE_FINE.h>
 #include <Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS_CALLBACKS.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -227,6 +228,13 @@ Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const
 //#####################################################################
 template<class TV> void FLUIDS_PARAMETERS_CALLBACKS<TV>::
 Substitute_Coupling_Matrices(KRYLOV_SYSTEM_BASE<T>& coupled_system,T dt,T current_velocity_time,T current_position_time,bool velocity_update,bool leakproof_solve)
+{
+}
+//#####################################################################
+// Function Get_Unified_Boundary_Conditions
+//#####################################################################
+template<class TV> void FLUIDS_PARAMETERS_CALLBACKS<TV>::
+Get_Unified_Boundary_Conditions(BOUNDARY_CONDITION_DOUBLE_FINE<TV>* bc_fine,T time)
 {
 }
 namespace PhysBAM{

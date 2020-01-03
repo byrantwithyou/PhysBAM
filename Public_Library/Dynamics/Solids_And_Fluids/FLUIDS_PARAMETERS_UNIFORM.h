@@ -24,6 +24,7 @@ template<class TV> class SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES;
 template<class TV> class COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES;
 template<class TV> class LAPLACE_UNIFORM;
 template<class TV> class PARTICLE_LEVELSET_EVOLUTION_UNIFORM;
+template<class TV> class BOUNDARY_CONDITION_DOUBLE_FINE;
 class VIEWER_DIR;
 
 template<class TV>
@@ -80,6 +81,7 @@ public:
     SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<TV>* euler_solid_fluid_coupling_utilities;
     COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES<TV>* compressible_incompressible_coupling_utilities;
     PROJECTION_DYNAMICS_UNIFORM<TV>* projection;
+    BOUNDARY_CONDITION_DOUBLE_FINE<TV>* bc_fine=0;
 
     // multiphase parameters
     ARRAY<T> masses; // used to keep track of mass loss in the driver
@@ -116,6 +118,7 @@ public:
     void Initialize_Fluid_Evolution(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);
     void Use_Fluid_Coupling_Defaults() override;
     void Use_No_Fluid_Coupling_Defaults() override;
+    void Use_Unified_Boundary_Conditions();
     void Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time);
     void Delete_Particles_Inside_Objects(const T time);
     void Initialize_Number_Of_Regions(const int number_of_regions_input);
@@ -129,6 +132,8 @@ public:
     void Apply_Isobaric_Fix(const T dt,const T time);
     void Get_Neumann_And_Dirichlet_Boundary_Conditions(LAPLACE_UNIFORM<TV>* elliptic_solver,
             ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time);
+    void Get_Unified_Boundary_Conditions(LAPLACE_UNIFORM<TV>* elliptic_solver,
+    ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T time);
     void Set_Domain_Boundary_Conditions(LAPLACE_UNIFORM<TV>& elliptic_solver,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T time);
     void Blend_In_External_Velocity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time);
     void Move_Grid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T time);

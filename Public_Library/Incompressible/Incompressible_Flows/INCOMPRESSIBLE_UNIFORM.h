@@ -15,6 +15,7 @@ namespace PhysBAM{
 template<class TV> class BOUNDARY_CONDITIONS_CALLBACKS;
 template<class TV,class T> class EXTRAPOLATION_UNIFORM;
 template<class TV> class GRID_BASED_COLLISION_GEOMETRY_UNIFORM;
+template<class TV> class BOUNDARY_CONDITION_DOUBLE_FINE;
 
 template<class TV>
 class INCOMPRESSIBLE_UNIFORM:public INCOMPRESSIBLE<TV>
@@ -50,6 +51,7 @@ public:
     T energy_clamp;
     int vc_projection_direction;
     T buoyancy_constant;
+    BOUNDARY_CONDITION_DOUBLE_FINE<TV>* bc_fine=0;
 protected:               
     BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<TV>& boundary_default;
     ADVECTION_MACCORMACK_UNIFORM<TV,T,ADVECTION<TV,T> >* advection_maccormack;

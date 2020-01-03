@@ -19,6 +19,7 @@ template<class TV> class PARTICLE_LEVELSET_PARTICLES;
 template<class TV> class PARTICLE_LEVELSET;
 template<class TV> class LAPLACE_UNIFORM;
 template<class TV> struct GRID_ARRAYS_POLICY;
+template<class TV> struct BOUNDARY_CONDITION_DOUBLE_FINE;
 
 template<class TV>
 class FLUIDS_PARAMETERS_CALLBACKS:public BOUNDARY_CONDITIONS_CALLBACKS<TV>
@@ -60,6 +61,7 @@ public:
     virtual void Initialize_Fluids_Grids();
     virtual void Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time);
     virtual void Substitute_Coupling_Matrices(KRYLOV_SYSTEM_BASE<T>& coupled_system,T dt,T current_velocity_time,T current_position_time,bool velocity_update,bool leakproof_solve);
+    virtual void Get_Unified_Boundary_Conditions(BOUNDARY_CONDITION_DOUBLE_FINE<TV>* bc_fine,const T time);
 //#####################################################################
 };
 }

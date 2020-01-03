@@ -23,6 +23,7 @@
 #include <Grid_PDE/Boundaries/BOUNDARY_REFLECTION_UNIFORM.h>
 #include <Geometry/Level_Sets/LEVELSET.h>
 #include <Geometry/Level_Sets/LEVELSET_UTILITIES.h>
+#include <Geometry/Projection/BOUNDARY_CONDITION_DOUBLE_FINE.h>
 #include <Rigids/Collisions/COLLISION_BODY_COLLECTION.h>
 #include <Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
 #include <Incompressible/Collisions_And_Interactions/FLUID_COLLISION_BODY_INACCURATE_UNION.h>
@@ -81,6 +82,7 @@ template<class TV> FLUIDS_PARAMETERS_UNIFORM<TV>::
     delete euler;
     delete euler_solid_fluid_coupling_utilities;
     delete compressible_incompressible_coupling_utilities;
+    delete bc_fine;
 }
 template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Initialize_Number_Of_Regions(const int number_of_regions_input)
@@ -332,7 +334,10 @@ template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
 Get_Neumann_And_Dirichlet_Boundary_Conditions(LAPLACE_UNIFORM<TV>* elliptic_solver,
         ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time)
 {
-    elliptic_solver->psi_N.Fill(false);elliptic_solver->psi_D.Fill(false);
+    if(bc_fine)
+        return Get_Unified_Boundary_Conditions(elliptic_solver,face_velocities,time);
+    elliptic_solver->psi_N.Fill(false);
+    elliptic_solver->psi_D.Fill(false);
     if(incompressible){
         POISSON_COLLIDABLE_UNIFORM<TV>* poisson=incompressible->projection.poisson_collidable;
         if(poisson) poisson->beta_face.Fill(1/density);}
@@ -345,6 +350,26 @@ Get_Neumann_And_Dirichlet_Boundary_Conditions(LAPLACE_UNIFORM<TV>* elliptic_solv
         if(elliptic_solver->All_Cell_Faces_Neumann(cell_index)){
             elliptic_solver->psi_D(cell_index)=true;
             elliptic_solver->u(cell_index)=(T)0;}}  // Never flag a solid cell as Dirichlet unless it's surrounded by Neumann BC
+}
+//#####################################################################
+// Function Get_Unified_Boundary_Conditions
+//#####################################################################
+template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
+Get_Unified_Boundary_Conditions(LAPLACE_UNIFORM<TV>* elliptic_solver,
+    ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T time)
+{
+    if(incompressible){
+        POISSON_COLLIDABLE_UNIFORM<TV>* poisson=incompressible->projection.poisson_collidable;
+        if(poisson) poisson->beta_face.Fill(1/density);}
+
+    // for(int axis=0;axis<TV::m;axis++)
+    //     for(int axis_side=0;axis_side<2;axis_side++){
+    //         char bc_type=domain_walls(axis)(axis_side)?bc_fine->bc_slip:bc_fine->bc_free;
+    //         int side=2*axis+axis_side;
+    //         bc_fine->Set_Domain_Walls(1<<side,bc_type,0);}
+
+    callbacks->Get_Unified_Boundary_Conditions(bc_fine,time);
+    bc_fine->Get_Pressure_Boundary_Conditions(elliptic_solver->psi_D,elliptic_solver->psi_N,elliptic_solver->u,face_velocities);
 }
 //#####################################################################
 // Function Set_Domain_Boundary_Conditions
@@ -804,6 +829,14 @@ Log_Parameters() const
     LOG::SCOPE scope("FLUIDS_PARAMETERS_UNIFORM parameters");
     BASE::Log_Parameters();
     if(euler) euler->Log_Parameters();
+}
+//#####################################################################
+// Function Use_Unified_Boundary_Conditions
+//#####################################################################
+template<class TV> void FLUIDS_PARAMETERS_UNIFORM<TV>::
+Use_Unified_Boundary_Conditions()
+{
+    bc_fine=new BOUNDARY_CONDITION_DOUBLE_FINE<TV>(*grid,number_of_ghost_cells);
 }
 //#####################################################################
 template class FLUIDS_PARAMETERS_UNIFORM<VECTOR<float,1> >;

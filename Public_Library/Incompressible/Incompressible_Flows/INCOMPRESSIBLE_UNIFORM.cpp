@@ -175,6 +175,7 @@ Implicit_Viscous_Update(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,
 
     for(int axis=0;axis<TV::m;axis++){
         IMPLICIT_VISCOSITY_UNIFORM<TV> implicit_viscosity(*projection.elliptic_solver,variable_viscosity,projection.density,viscosity,0,axis,false,false);
+        implicit_viscosity.bc_fine=bc_fine;
         implicit_viscosity.Viscous_Update(grid,face_velocities,face_velocities_ghost,dt,time,maximum_implicit_viscosity_iterations);}
     if(mpi_grid) mpi_grid->Copy_Common_Face_Data(face_velocities);
 }

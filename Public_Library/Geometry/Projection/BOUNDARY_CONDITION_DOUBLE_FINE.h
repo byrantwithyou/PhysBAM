@@ -8,11 +8,13 @@
 #define __BOUNDARY_CONDITION_DOUBLE_FINE__
 
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
+#include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Data_Structures/TRIPLE.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 namespace PhysBAM{
 
-template<class TV> class LEVELSET;
+template<class TV> class IMPLICIT_OBJECT;
 
 template<class TV>
 class BOUNDARY_CONDITION_DOUBLE_FINE
@@ -25,7 +27,7 @@ public:
     GRID<TV> mac_grid; // original grid
     GRID<TV> grid; // double fine, node grid.
     int ghost;
-    ARRAY<char,TV_INT> bc_type;
+    ARRAY<char,TV_INT> bc_type,bc_type_current;
     HASHTABLE<TV_INT,PAIR<T,int> > bc_p;
     HASHTABLE<FACE_INDEX<TV::m>,TRIPLE<T,int,bool> > bc_u;
 
@@ -37,11 +39,15 @@ public:
 
     void Reset(char type);
 
-    void Set(const LEVELSET<TV>& ls,char type,std::function<T(const TV& X)> f=0,bool thin=false,bool invert=false,T contour=0);
-    void Set(const T_SURFACE& surface,char type,std::function<T(const TV& X, int e)> f=0,bool thin=false);
+    void Set(const IMPLICIT_OBJECT<TV>* io,char type,std::function<T(const TV& X,int a)> f=0,bool thin=false,bool invert=false,T contour=0);
+    void Set(const T_SURFACE& surface,char type,std::function<T(const TV& X,int a)> f=0,bool thin=false);
+    void Set_Domain_Walls(int side_mask,char type,std::function<T(const TV& X,int a)> f=0);
+
+    void Set_Current_Values(const RANGE<TV_INT>& domain,char type,std::function<T(const TV_INT& i0,const TV_INT& i1,int a)> f,bool thin);
 
     void Get_Pressure_Boundary_Conditions(ARRAY<bool,TV_INT>& psi_D,
-        ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,ARRAY<T,TV_INT>& p) const;
+        ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,ARRAY<T,TV_INT>& p,
+        ARRAY<T,FACE_INDEX<TV::m> >& u) const;
     void Get_Viscosity_Boundary_Conditions(ARRAY<bool,TV_INT>& psi_D,
         ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,ARRAY<T,TV_INT>& u,int axis) const;
 //#####################################################################

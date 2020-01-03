@@ -12,6 +12,7 @@ namespace PhysBAM{
 
 template<class TV> class LAPLACE_UNIFORM;
 template<class T> class MPI_UNIFORM_GRID;
+template<class TV> class BOUNDARY_CONDITION_DOUBLE_FINE;
 
 template<class TV>
 class IMPLICIT_VISCOSITY_UNIFORM
@@ -35,7 +36,8 @@ protected:
     bool use_variable_viscosity;
     bool use_psi_R;
 public:
-
+    BOUNDARY_CONDITION_DOUBLE_FINE<TV>* bc_fine=0;
+    
     IMPLICIT_VISCOSITY_UNIFORM(LAPLACE_UNIFORM<TV>& elliptic_solver_input,const ARRAY<T,TV_INT>& variable_viscosity_input,const T density_input,const T viscosity_input,T_MPI_GRID* mpi_grid_input,
         const int axis_input,bool use_variable_viscosity_input,bool use_psi_R_input);
     IMPLICIT_VISCOSITY_UNIFORM(const IMPLICIT_VISCOSITY_UNIFORM&) = delete;
