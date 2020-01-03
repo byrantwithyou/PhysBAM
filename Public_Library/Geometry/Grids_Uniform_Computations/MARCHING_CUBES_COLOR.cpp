@@ -30,12 +30,8 @@
 #include <Geometry/Grids_Uniform_Computations/MARCHING_CUBES_COLOR.h>
 #include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#ifdef ENABLE_TIMING
-#include <x86intrin.h>
-#endif
 
 using namespace PhysBAM;
-//#define ENABLE_TIMING
 namespace{
 ARRAY<int> interface_case_table;
 ARRAY<int> interface_triangle_table;
@@ -591,15 +587,8 @@ Initialize_Case_Table()
     static bool first=true;
     if(!first) return;
     first=false;
-#ifdef ENABLE_TIMING
-    unsigned long long t0=__rdtsc();
-#endif
     if(TV::m==3) Initialize_Case_Table_3D();
     if(TV::m==2) Initialize_Case_Table_2D();
-#ifdef ENABLE_TIMING
-    unsigned long long t1=__rdtsc();
-    printf("setup: %.2f\n", (t1-t0)/3059.107);
-#endif
 }
 //#####################################################################
 // Function Get_Elements_For_Cell
@@ -608,9 +597,6 @@ template<class TV> void MARCHING_CUBES_COLOR<TV>::
 Get_Elements_For_Cell(ARRAY<INTERFACE_ELEMENT>& interface,ARRAY<BOUNDARY_ELEMENT>& boundary,
     const VECTOR<int,num_corners>& colors,const VECTOR<T,num_corners>& phi)
 {
-#ifdef ENABLE_TIMING
-    unsigned long long t0=__rdtsc();
-#endif
     int next_color=0;
     HASHTABLE<int,int> color_map;
     VECTOR<int,num_corners> re_color;
@@ -633,10 +619,6 @@ Get_Elements_For_Cell(ARRAY<INTERFACE_ELEMENT>& interface,ARRAY<BOUNDARY_ELEMENT
             color_list[next_color]=colors(i+num_corners/2);
             color_map.Set(colors(i+num_corners/2),next_color++);}
     Get_Boundary_Elements_For_Cell(boundary,re_color2,colors.array+num_corners/2,phi.array+num_corners/2,1,color_list);
-#ifdef ENABLE_TIMING
-    unsigned long long t5=__rdtsc();
-    printf("query: %.2f\n", (t5-t0)/3059.107);
-#endif
 }
 int vertex_lookup_2d[4][2]={{0,1},{2,3},{0,2},{1,3}};
 template<int n>
