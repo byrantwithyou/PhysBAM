@@ -71,6 +71,9 @@ public:
     void Reflect_Or_Invalidate_Particle(int p);
     void Test_Sound_Speed(int num) const;
     void Step(std::function<void()> func,const char* name,bool dump_substep=true,bool do_step=true);
+    void Apply_Reflection_Collision_Objects();
+    void Sample_Reflection_Collision_Object(int i);
+    void Update_Reflection_Collision_Object(int i);
 //#####################################################################
 };
 }

@@ -17,6 +17,7 @@
 #include <Grid_Tools/Grids/CELL_ITERATOR.h>
 #include <Grid_Tools/Grids/CELL_ITERATOR_THREADED.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
+#include <Geometry/Seeding/POISSON_DISK_SURFACE.h>
 #include <Deformables/Collisions_And_Interactions/IMPLICIT_OBJECT_COLLISION_PENALTY_FORCES.h>
 #include <Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
 #include <Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
@@ -1111,6 +1112,57 @@ Reflect_Or_Invalidate_Particle(int p)
         else if(X(a)>B(a)){
             if((f>>(2*a+1))&1){X(a)=2*B(a)-X(a);V(a)=-V(a);}
             else example.particles.valid(p)=false;}}
+}
+//#####################################################################
+// Function Apply_Reflection_Collision_Objects
+//#####################################################################
+template<class TV> void MPM_DRIVER<TV>::
+Apply_Reflection_Collision_Objects()
+{
+    if(!example.use_reflection_collision_objects) return;
+    for(int i=example.collision_objects.m;i<example.collision_objects_reflection.m;i++)
+        delete example.collision_objects_reflection(i);
+    example.collision_objects_reflection.Resize(example.collision_objects.m);
+    for(int i=0;i<example.collision_objects_reflection.m;i++)
+    {
+        auto* co=example.collision_objects(i);
+        auto* cor=example.collision_objects_reflection(i);
+        if(!cor)
+        {
+            cor=new typename MPM_EXAMPLE<TV>::REFLECT_OBJECT_DATA;
+            example.collision_objects_reflection(i)=cor;
+            Sample_Reflection_Collision_Object(i);
+            Update_Reflection_Collision_Object(i);
+            if(co->func_frame) cor->last_frame=co->func_frame(example.time);
+        }
+        else if(co->func_frame)
+        {
+            FRAME<TV> frame=co->func_frame(example.time);
+            if(frame!=cor->last_frame)
+            {
+                cor->last_frame=frame;
+                Update_Reflection_Collision_Object(i);
+            }
+        }
+    }
+}
+//#####################################################################
+// Function Sample_Reflection_Collision_Object
+//#####################################################################
+template<class TV> void MPM_DRIVER<TV>::
+Sample_Reflection_Collision_Object(int i)
+{
+    POISSON_DISK_SURFACE<TV> pds;
+    pds.Set_Distance((T).5*example.grid.dX.Min());
+    pds.Sample(example.random,example.collision_objects(i)->io,example.collision_objects_reflection(i)->X);
+}
+//#####################################################################
+// Function Update_Reflection_Collision_Object
+//#####################################################################
+template<class TV> void MPM_DRIVER<TV>::
+Update_Reflection_Collision_Object(int i)
+{
+    PHYSBAM_NOT_IMPLEMENTED();
 }
 //#####################################################################
 // Function Step

@@ -46,7 +46,7 @@ public:
     using BASE::Add_Collision_Object;using typename BASE::COLLISION_TYPE;
     using BASE::data_directory;using BASE::reflection_bc_flags;
     using BASE::quad_F_coeff;using BASE::use_sound_speed_cfl;using BASE::cfl_sound;
-    using BASE::side_bc_type;using BASE::Add_Callbacks;
+    using BASE::side_bc_type;using BASE::Add_Callbacks;using BASE::random;
 
     int test_number;
     int resolution;
@@ -85,7 +85,6 @@ public:
     std::function<void(const ARRAY<int>&)> update_dp_func;
     bool no_mu=false;
 
-    RANDOM_NUMBERS<T> random;
     POISSON_DISK<TV>& poisson_disk;
     DEFORMABLES_STANDARD_TESTS<TV> tests;
 

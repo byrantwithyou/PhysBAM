@@ -5,7 +5,9 @@
 #ifndef __MPM_EXAMPLE__
 #define __MPM_EXAMPLE__
 #include <Core/Data_Structures/HASHTABLE.h>
+#include <Core/Matrices/FRAME.h>
 #include <Core/Matrices/MATRIX.h>
+#include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Core/Utilities/VIEWER_DIR.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
@@ -54,6 +56,15 @@ public:
     PARTICLE_GRID_WEIGHTS<TV>* weights=0;
     GATHER_SCATTER<TV>& gather_scatter;
     ARRAY<MPM_COLLISION_OBJECT<TV>*> collision_objects;
+    RANDOM_NUMBERS<T> random;
+
+    struct REFLECT_OBJECT_DATA
+    {
+        ARRAY<TV> X;
+        FRAME<TV> last_frame;
+    };
+
+    ARRAY<REFLECT_OBJECT_DATA*> collision_objects_reflection;
     mutable ARRAY<TV> lagrangian_forces_V,lagrangian_forces_F;
     MPM_FORCE_HELPER<TV>& force_helper;
 
@@ -92,6 +103,7 @@ public:
     int reflection_bc_flags=0;
     bool use_full_reflection=false;
     T reflection_bc_friction=0;
+    bool use_reflection_collision_objects=false;
     bool test_sound_speed=false;
     bool dilation_only=false;
     bool write_structures_every_frame=false;
