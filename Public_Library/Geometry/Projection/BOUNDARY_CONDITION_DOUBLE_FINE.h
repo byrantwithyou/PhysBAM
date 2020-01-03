@@ -40,9 +40,9 @@ public:
     void Set(const LEVELSET<TV>& ls,char type,std::function<T(const TV& X)> f=0,bool thin=false,bool invert=false,T contour=0);
     void Set(const T_SURFACE& surface,char type,std::function<T(const TV& X, int e)> f=0,bool thin=false);
 
-    void Set_Pressure_Boundary_Conditions(ARRAY<bool,TV_INT>& psi_D,
+    void Get_Pressure_Boundary_Conditions(ARRAY<bool,TV_INT>& psi_D,
         ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,ARRAY<T,TV_INT>& p) const;
-    void Set_Viscosity_Boundary_Conditions(ARRAY<bool,TV_INT>& psi_D,
+    void Get_Viscosity_Boundary_Conditions(ARRAY<bool,TV_INT>& psi_D,
         ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,ARRAY<T,TV_INT>& u,int axis) const;
 //#####################################################################
 };
