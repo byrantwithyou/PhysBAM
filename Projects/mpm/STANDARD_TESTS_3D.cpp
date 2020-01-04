@@ -309,6 +309,7 @@ Initialize()
             Seed_Particles(sphere2,[=](const TV& X){return angular_velocity2.Cross(X-sphere2.center)+TV(-0.75,0,0)*(m/s);},
                 [=](const TV&){return MATRIX<T,3>::Cross_Product_Matrix(angular_velocity2);},density,particles_per_cell);
             Add_Neo_Hookean(31.685*unit_p*scale_E,0.44022); //solve({E/(2*(1+r))=11,E*r/((1+r)*(1-2*r))=81},{E,r});
+            Add_Walls(-1,COLLISION_TYPE::separate,.3,0,false);
         } break;
         case 12:{ // surface tension test: fixed topology circle shell
             Set_Grid(RANGE<TV>(TV(-1.5,-1.5,-1.5),TV(1.5,1.5,1.5))*m);
@@ -677,7 +678,18 @@ Initialize()
             Set_Lame_On_Particles(E,nu);
             Add_Gravity(m/(s*s)*TV(0,-9.81,0));
         } break;
-        case 20:
+        //// an elastic sphere collide with a collision object 
+        case 20: {
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            Add_Walls(-1,COLLISION_TYPE::separate,.3,0,false);
+            T density=4*unit_rho*scale_mass;
+            SPHERE<TV> sphere(TV(.1,.8,.5)*m,.06*m);
+            Seed_Particles(sphere,[=](const TV& X){return TV(.6*(m/s),0,0);},0,
+                density,particles_per_cell);
+            Add_Neo_Hookean(unit_p*scale_E,0.425);
+            Add_Collision_Object(SPHERE<TV>(TV(.5,.5,.5)*m,.2*m),COLLISION_TYPE::separate,.3);
+            Add_Gravity(m/(s*s)*TV(0,-1.8,0));
+        } break;
         case 21:
         case 22:
         case 23:
