@@ -47,6 +47,7 @@ public:
     using BASE::data_directory;using BASE::reflection_bc_flags;
     using BASE::quad_F_coeff;using BASE::use_sound_speed_cfl;using BASE::cfl_sound;
     using BASE::side_bc_type;using BASE::Add_Callbacks;using BASE::random;
+    using BASE::r_cfl;using BASE::r_sound_speed;using BASE::r_F;using BASE::extra_render;
 
     int test_number;
     int resolution;
