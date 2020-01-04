@@ -57,11 +57,11 @@ public:
     GATHER_SCATTER<TV>& gather_scatter;
     ARRAY<MPM_COLLISION_OBJECT<TV>*> collision_objects;
     RANDOM_NUMBERS<T> random;
+    ARRAY<int,TV_INT> colliding_nodes;
 
     struct REFLECT_OBJECT_DATA
     {
         ARRAY<TV> X;
-        FRAME<TV> last_frame;
     };
 
     ARRAY<REFLECT_OBJECT_DATA*> collision_objects_reflection;

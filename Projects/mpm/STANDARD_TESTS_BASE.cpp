@@ -133,8 +133,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-r_F",&r_F,"dump out F for rendering particles");
     parse_args.Add("-r_sound_speed",&r_sound_speed,"dump out sound speed for rendering particles");
     parse_args.Add("-extra_render",&extra_render,"need extra information for rendering");
-
-
+    parse_args.Add("-use_explicit_collisions",&this->use_reflection_collision_objects,"Use explicit object collision");
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);
     PHYSBAM_ASSERT((int)r_cfl+(int)r_sound_speed+(int)r_F<=1);

@@ -8,6 +8,7 @@
 #include <Core/Log/SCOPE.h>
 #include <Core/Math_Tools/pow.h>
 #include <Core/Math_Tools/RANGE_ITERATOR.h>
+#include <Core/Matrices/FRAME.h>
 #include <Core/Random_Numbers/RANDOM_NUMBERS.h>
 #include <Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <Tools/Krylov_Solvers/MINRES.h>
@@ -891,17 +892,29 @@ Apply_Forces()
             dv.u.array(p)=example.dt/example.mass.array(p)*objective.tmp2.u.array(p);}
         objective.system.forced_collisions.Remove_All();
         objective.tmp1=dv;
-        objective.Adjust_For_Collision(dv);
+
+        if(!example.use_reflection_collision_objects)
+            objective.Adjust_For_Collision(dv);
+
         objective.tmp0=dv;
-        if(example.reflection_bc && example.use_full_reflection)
+        if((example.reflection_bc && example.use_full_reflection) ||
+            example.use_reflection_collision_objects)
         {
 #pragma omp parallel for
             for(int i=0;i<example.valid_grid_indices.m;i++){
                 int j=example.valid_grid_indices(i);
                 example.velocity.array(j)=dv.u.array(j)+objective.v0.u.array(j);}
-            PHYSBAM_DEBUG_WRITE_SUBSTEP("velocities before friction",1);
-            Reflect_Boundary_Friction(example.mass,example.velocity);
-            PHYSBAM_DEBUG_WRITE_SUBSTEP("velocities after friction",1);
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("velocities before local collisions",1);
+            if(example.use_reflection_collision_objects)
+            {
+                Apply_Reflection_Collision_Objects();
+                PHYSBAM_DEBUG_WRITE_SUBSTEP("velocities after object collisions",1);
+            }
+            if(example.reflection_bc && example.use_full_reflection)
+            {
+                Reflect_Boundary_Friction(example.mass,example.velocity);
+                PHYSBAM_DEBUG_WRITE_SUBSTEP("velocities after boundary collisions",1);
+            }
 #pragma omp parallel for
             for(int i=0;i<example.valid_grid_indices.m;i++){
                 int j=example.valid_grid_indices(i);
@@ -957,7 +970,7 @@ Apply_Friction()
     for(int i=0;i<example.valid_grid_indices.m;i++){
         int j=example.valid_grid_indices(i);
         example.velocity_friction_save.array(j)=dv.u.array(j);}
-    if(!example.collision_objects.m) return;
+    if(!example.collision_objects.m || example.use_reflection_collision_objects) return;
     if(example.use_symplectic_euler){
         objective.v1.Copy(1,objective.v0,dv);}
     else{
@@ -1125,31 +1138,125 @@ template<class TV> void MPM_DRIVER<TV>::
 Apply_Reflection_Collision_Objects()
 {
     if(!example.use_reflection_collision_objects) return;
+    if(!example.colliding_nodes.array.m)
+        example.colliding_nodes.Resize(example.mass.domain,use_init,-1);
+
     for(int i=example.collision_objects.m;i<example.collision_objects_reflection.m;i++)
         delete example.collision_objects_reflection(i);
     example.collision_objects_reflection.Resize(example.collision_objects.m);
+    struct NODE_DATA
+    {
+        int i=-1;
+        T w=0;
+        TV V;
+    };
+    ARRAY<NODE_DATA> node_data;
+    struct INTERACTION_DATA
+    {
+        int flat_index;
+        int node_data_index;
+        T w;
+    };
+    ARRAY<ARRAY<ARRAY<INTERACTION_DATA> > > interaction_data(example.collision_objects_reflection.m);
     for(int i=0;i<example.collision_objects_reflection.m;i++)
     {
         auto* co=example.collision_objects(i);
         auto* cor=example.collision_objects_reflection(i);
+        FRAME<TV> frame;
+        if(co->func_frame) frame=co->func_frame(example.time+example.dt);
         if(!cor)
         {
             cor=new typename MPM_EXAMPLE<TV>::REFLECT_OBJECT_DATA;
             example.collision_objects_reflection(i)=cor;
             Sample_Reflection_Collision_Object(i);
-            Update_Reflection_Collision_Object(i);
-            if(co->func_frame) cor->last_frame=co->func_frame(example.time);
         }
-        else if(co->func_frame)
+        interaction_data(i).Resize(cor->X.m);
+        typename PARTICLE_GRID_ITERATOR<TV>::SCRATCH scratch;
+        for(int p=0;p<cor->X.m;p++)
         {
-            FRAME<TV> frame=co->func_frame(example.time);
-            if(frame!=cor->last_frame)
+            auto& id=interaction_data(i)(p);
+            TV X=frame*cor->X(p);
+            for(PARTICLE_GRID_ITERATOR<TV> it(example.weights,X,false,scratch);it.Valid();it.Next())
             {
-                cor->last_frame=frame;
-                Update_Reflection_Collision_Object(i);
+                int index=example.mass.Standard_Index(it.Index());
+                T w=it.Weight();
+                if(!example.mass.array(index)) continue;
+                if(w<std::numeric_limits<T>::epsilon()) continue;
+                LOG::printf("w %P\n",w);
+                int& cn=example.colliding_nodes.array(index);
+                if(cn<0)
+                {
+                    cn=node_data.Append({index,w,example.velocity.array(index)});
+                    example.velocity.array(index)=TV();
+                }
+                else node_data(cn).w+=w;
+                id.Append({index,cn,w});
+                Add_Debug_Object(VECTOR<TV,2>(X,example.grid.Center(it.Index())),VECTOR<T,3>(1,0,0));
             }
+            Add_Debug_Particle(X,VECTOR<T,3>(1,!id.m,0));
         }
     }
+    for(int i=0;i<example.collision_objects_reflection.m;i++)
+    {
+        auto* co=example.collision_objects(i);
+        auto* cor=example.collision_objects_reflection(i);
+        const auto& id_o=interaction_data(i);
+        FRAME<TV> frame;
+        if(co->func_frame) frame=co->func_frame(example.time+example.dt);
+        for(int p=0;p<id_o.m;p++)
+        {
+            const auto& id_p=id_o(p);
+            if(!id_p.m) continue;
+            T mp=0,beta=0;
+            TV vp;
+            for(const auto& id_i:id_p)
+            {
+                const NODE_DATA& d=node_data(id_i.node_data_index);
+                T w=id_i.w,a=w/d.w,mi=example.mass.array(id_i.flat_index),a_mi=a*mi,w_a_mi=w*a_mi;
+                mp+=w_a_mi;
+                beta+=w*w_a_mi;
+                vp+=w_a_mi*d.V;
+            }
+            vp/=mp;
+            beta/=mp;
+            TV X=frame*cor->X(p);
+            TV n=co->Normal(X,example.time+example.dt);
+            TV b=co->Velocity(X,example.time+example.dt);
+            TV vp_b=(vp-b)/-beta;
+            T vp_b_n=0;
+            if(co->type!=co->stick)
+            {
+                LOG::printf("FAIL!!!\n");
+                vp_b_n=vp_b.Dot(n);
+                vp_b=vp_b_n*n;
+            }
+            TV vp2;
+            for(const auto& id_i:id_p)
+            {
+                const NODE_DATA& d=node_data(id_i.node_data_index);
+                T w=id_i.w,a=w/d.w,mi=example.mass.array(id_i.flat_index),a_mi=a*mi,w_a_mi=w*a_mi;
+                TV j_ip=w_a_mi*vp_b;
+                TV v0=d.V,v1=v0+w*vp_b;
+                if(co->type==co->separate)
+                {
+                    if(vp_b_n<0) v1=v0;
+                    else
+                    {
+                        TV vt=(b-v1).Projected_Orthogonal_To_Unit_Direction(n);
+                        T vt_m=vt.Normalize();
+                        v1+=min(co->friction*w*vp_b_n,vt_m)*vt;
+                    }
+                }
+                vp2+=w_a_mi*v1;
+                LOG::printf("vp2 %P %P %P\n",w,w_a_mi,v1);
+                example.velocity.array(id_i.flat_index)+=a*v1;
+            }
+            vp2/=mp;
+            LOG::printf("new V %P\n",vp2);
+        }
+    }
+    for(const auto& cn:node_data)
+        example.colliding_nodes.array(cn.i)=-1;
 }
 //#####################################################################
 // Function Sample_Reflection_Collision_Object
@@ -1160,14 +1267,6 @@ Sample_Reflection_Collision_Object(int i)
     POISSON_DISK_SURFACE<TV> pds;
     pds.Set_Distance((T).5*example.grid.dX.Min());
     pds.Sample(example.random,example.collision_objects(i)->io,example.collision_objects_reflection(i)->X);
-}
-//#####################################################################
-// Function Update_Reflection_Collision_Object
-//#####################################################################
-template<class TV> void MPM_DRIVER<TV>::
-Update_Reflection_Collision_Object(int i)
-{
-    PHYSBAM_NOT_IMPLEMENTED();
 }
 //#####################################################################
 // Function Step
