@@ -584,6 +584,8 @@ Grid_To_Particle_Limit_Dt()
             else{xp_new_s=dt*h.V_pic;xp_new_s2=dt*h.V_pic_s;}
             Enforce_Limit_Max(h.s,example.cfl,xp_new_s,xp_new_s2);
         });
+        
+
     if(example.dt*s<example.min_dt) s=example.min_dt/example.dt;
     if(s>=1) return;
     LOG::printf("X J CFL scale: %g -> %g\n",example.dt,example.dt*s);
@@ -605,7 +607,6 @@ Limit_Dt_Sound_Speed()
     LOG::printf("dx: %.16P\n",example.grid.dX.Min());
     LOG::printf("dx/soundspeed: %.16P\n",Robust_Divide(example.grid.dX.Min(),max_speed));
     dt=std::min(dt,Robust_Divide(example.grid.dX.Min(),max_speed)*example.cfl_sound);
-
     if(dt<example.min_dt) dt=example.min_dt;
     if(dt>=example.dt) return;
     T s=dt/example.dt;
@@ -802,9 +803,13 @@ Compute_Max_Sound_Speed() const -> T
                 T density=example.particles.mass(p)/example.particles.volume(p);
                 T speed=ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>::Sound_Speed(
                     force->sigma(p),force->dPi_dF(p),density);
-                    #if 0
-                        if (ARRAY_VIEW<T>* prop4r=example.particles.template Get_Array<T>("prop4r")) (*prop4r)(p)=speed;
-                    #endif
+                    if(example.extra_render){
+                        if(example.r_sound_speed){
+                            if (ARRAY_VIEW<T>* prop4r=example.particles.template Get_Array<T>("prop4r")) (*prop4r)(p)=speed;}
+                        if(example.r_cfl){
+                            if (ARRAY_VIEW<T>* prop4r=example.particles.template Get_Array<T>("prop4r")){
+                                T s=Robust_Divide(example.grid.dX.Min(),speed)/example.dt;
+                                (*prop4r)(p)=s<1?s:(*prop4r)(p);}}} 
                 max_speed=max(max_speed,speed);}}}
     for(auto* pf:example.lagrangian_forces)
         if(FINITE_VOLUME<TV,TV::m>* fv=dynamic_cast<FINITE_VOLUME<TV,TV::m>*>(pf))

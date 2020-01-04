@@ -96,6 +96,10 @@ public:
     T cfl_F=(T).5;
     T cfl_sound=(T).9;
     T inv_Wi=0;
+    bool r_sound_speed=false;
+    bool r_cfl=false;
+    bool r_F=false;
+    bool extra_render=false;
     bool use_strong_cfl=false;
     bool use_sound_speed_cfl=false;
     bool compute_sound_speed=false;

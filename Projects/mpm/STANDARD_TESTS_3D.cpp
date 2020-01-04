@@ -2364,9 +2364,8 @@ Initialize()
     if(forced_collision_type!=-1)
         for(int i=0;i<collision_objects.m;i++)
             collision_objects(i)->type=(COLLISION_TYPE)forced_collision_type;
-    #if 0
-        particles.template Add_Array<T>("prop4r");
-    #endif
+    if(extra_render){
+        particles.template Add_Array<T>("prop4r");}
 }
 template class STANDARD_TESTS<VECTOR<float,3> >;
 template class STANDARD_TESTS<VECTOR<double,3> >;

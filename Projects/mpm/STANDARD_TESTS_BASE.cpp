@@ -124,14 +124,22 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-dump_collisions",&dump_collision_objects,"dump out collision objects");
     parse_args.Add("-test_output_prefix",&test_output_prefix,&use_test_output,"","prefix to use for test output");
     parse_args.Add("-strong_cfl",&use_strong_cfl,"limit dt based on final change in X and F");
-    parse_args.Add("-sound_cfl",&use_sound_speed_cfl,"limit dt based on final change in X and F");
+    parse_args.Add("-sound_cfl",&use_sound_speed_cfl,"limit dt based on soudn speed");
     parse_args.Add("-reflection_bc",&reflection_bc_flags,"flags","Flags indicating which walls should be reflection BC");
     parse_args.Add("-test_c",&this->test_sound_speed,"test sound speed calculations");
     parse_args.Add("-dilation_only",&this->dilation_only,"Discard non-volumetric portions of F");
     parse_args.Add("-use_reflect_friction",&this->use_full_reflection,"Use frictional reflection bc");
+    parse_args.Add("-r_cfl",&r_cfl,"dump out cfl for rendering particles");
+    parse_args.Add("-r_F",&r_F,"dump out F for rendering particles");
+    parse_args.Add("-r_sound_speed",&r_sound_speed,"dump out sound speed for rendering particles");
+    parse_args.Add("-extra_render",&extra_render,"need extra information for rendering");
+
 
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);
+    PHYSBAM_ASSERT((int)r_cfl+(int)r_sound_speed+(int)r_F<=1);
+    PHYSBAM_ASSERT((use_sound_speed_cfl || (!r_cfl && !r_sound_speed)) && (use_strong_cfl || !r_F));
+
     if(use_slip) forced_collision_type=COLLISION_TYPE::slip;
     if(use_stick) forced_collision_type=COLLISION_TYPE::stick;
     if(use_separate) forced_collision_type=COLLISION_TYPE::separate;

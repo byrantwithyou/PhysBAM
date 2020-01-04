@@ -55,6 +55,7 @@ public:
     using BASE::dump_collision_objects;using BASE::Perturb;using BASE::Uniform;using BASE::extra_T;using BASE::extra_int;
     using BASE::Set_Grid;using BASE::Add_Callbacks;
     using BASE::sph_rel;using BASE::Add_Source;
+    using BASE::extra_render;
     
 
     STANDARD_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args);
