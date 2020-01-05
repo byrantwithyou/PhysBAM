@@ -543,6 +543,16 @@ Initialize()
             Add_Particle(TV(.8,.5),0,0,mass,volume);
             Add_Gravity(m/(s*s)*TV(0,-1.8));
         } break;
+        case 97:{ // single particle on collision box
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            T density=1000*unit_rho*scale_mass;
+            T volume=grid.dX.Product()/particles_per_cell;
+            T mass=density*volume;
+            Add_Particle(TV(.5,.7),[](const TV& X){return TV(1,0);},0,mass,volume);
+            RANGE<TV> box(TV(.1,.4)*m,TV(.9,.6)*m);
+            Add_Collision_Object(box,COLLISION_TYPE::stick,friction);
+            Add_Gravity(m/(s*s)*TV(0,-9.8));
+        } break;
         case 27:{ // drop an oldroyd-b to a ground
             Set_Grid(RANGE<TV>(TV(-1,0),TV(1,1))*m,TV_INT(2,1));
             Add_Collision_Object(RANGE<TV>(TV(-5,-5),TV(5,.1))*m,COLLISION_TYPE::stick,0);
