@@ -2360,7 +2360,7 @@ Initialize()
             Set_Grid(RANGE<TV>::Centered_Box()*m);
             SPHERE<TV> sphere(TV()*m,.6*m);
             T density=2*unit_rho*scale_mass;
-            T e=1.1;
+            T e=1.001;
             DIAGONAL_MATRIX<T,3> D(e,1/e,1/e);
             Seed_Particles(sphere,0,0,density,particles_per_cell);
             particles.F.Fill(D);
