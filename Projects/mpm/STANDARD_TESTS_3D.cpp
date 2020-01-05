@@ -2356,6 +2356,17 @@ Initialize()
                     for(auto X:C) Add_Debug_Particle(X+x,VECTOR<T,3>(1,0,0));
                 });
         } break;    
+        case 75:{ // vibrational test
+            Set_Grid(RANGE<TV>::Centered_Box()*m);
+            SPHERE<TV> sphere(TV()*m,.6*m);
+            T density=2*unit_rho*scale_mass;
+            T e=1.1;
+            DIAGONAL_MATRIX<T,3> D(e,1/e,1/e);
+            Seed_Particles(sphere,0,0,density,particles_per_cell);
+            particles.F.Fill(D);
+            for(auto&x:particles.X) x=D*x;
+            Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
+        } break;
 
 
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
