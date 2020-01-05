@@ -25,8 +25,9 @@ Bounding_Box() const
 // Function Signed_Distance
 //#####################################################################
 template<class T> T BOWL<T>::
-Signed_Distance(const TV& X) const
+Signed_Distance(const TV& Z) const
 {
+    TV X=frame*Z;
     T radius=::std::hypot(X.x,X.z);
     T dX_x=radius-hole_radius,dX_y=X.y,dX_mag=::std::hypot(dX_x,dX_y);
 
@@ -90,82 +91,88 @@ Compute_Hess_Helper(const BOWL<T>& b,const TV& X)
 // Function Normal
 //#####################################################################
 template<class T> VECTOR<T,3> BOWL<T>::
-Normal(const TV& X) const
+Normal(const TV& Z) const
 {
-    return Compute_Diff_Helper(*this,X).dx;
+    TV X=frame*Z;
+    return frame.r.Rotate(Compute_Diff_Helper(*this,X).dx);
 }
 //#####################################################################
 // Function Suface
 //#####################################################################
 template<class T> VECTOR<T,3> BOWL<T>::
-Surface(const TV& X) const 
+Surface(const TV& Z) const 
 {
+    TV X=frame*Z;
     AUTO_DIFF<T,TV> diff=Compute_Diff_Helper(*this,X);
-    return X-diff.dx*diff.x;
+    return Z-frame.r.Rotate(diff.dx)*diff.x;
 }
 //#####################################################################
 // Function Normal
 //#####################################################################
 template<class T> VECTOR<T,3> BOWL<T>::
-Normal(const TV& X,const int aggregate) const 
+Normal(const TV& Z,const int aggregate) const 
 {
-    return Normal(X);
+    return Normal(Z);
 }
 //#####################################################################
 // Function Hessian
 //#####################################################################
 template<class T> SYMMETRIC_MATRIX<T,3> BOWL<T>::
-Hessian(const TV& X) const
+Hessian(const TV& Z) const
 {
-    return Compute_Hess_Helper(*this,X).ddx;
+    TV X=frame*Z;
+    auto H=Compute_Hess_Helper(*this,X).ddx;
+    auto R=frame.r.Rotation_Matrix();
+    return SYMMETRIC_MATRIX<T,TV::m>::Conjugate(R,H);
 }
 //#####################################################################
 // Function Principal_Curvatures
 //#####################################################################
 template<class T> VECTOR<T,2> BOWL<T>::
-Principal_Curvatures(const TV& X) const
+Principal_Curvatures(const TV& Z) const
 {
+    TV X=frame*Z;
     return ::PhysBAM::Principal_Curvatures(Compute_Hess_Helper(*this,X));
 }
 //#####################################################################
 // Function Lazy_Inside
 //#####################################################################
 template<class T> bool BOWL<T>::
-Lazy_Inside(const TV& X) const 
+Lazy_Inside(const TV& Z) const 
 {
-    return Signed_Distance(X)<0;
+    return Signed_Distance(Z)<0;
 }
 //#####################################################################
 // Function Lazy_Outside
 //#####################################################################
 template<class T> bool BOWL<T>::
-Lazy_Outside(const TV& X) const  
+Lazy_Outside(const TV& Z) const  
 {
-    return !Lazy_Inside(X);
+    return !Lazy_Inside(Z);
 }
 //#####################################################################
 // Function Inside
 //#####################################################################
 template<class T> bool BOWL<T>::
-Inside(const TV& X,const T thickness_over_two) const 
+Inside(const TV& Z,const T thickness_over_two) const 
 {
-    return Signed_Distance(X)<=-thickness_over_two;
+    return Signed_Distance(Z)<=-thickness_over_two;
 }
 //#####################################################################
 // Function Outside
 //#####################################################################
 template<class T> bool BOWL<T>::
-Outside(const TV& X,const T thickness_over_two) const  
+Outside(const TV& Z,const T thickness_over_two) const  
 {
-    return Signed_Distance(X)>=thickness_over_two;
+    return Signed_Distance(Z)>=thickness_over_two;
 }
 //#####################################################################
 // Function Boundary
 //#####################################################################
 template<class T> bool BOWL<T>::
-Boundary(const TV& X,const T thickness_over_two) const
+Boundary(const TV& Z,const T thickness_over_two) const
 {
-    T sd=Signed_Distance(X);
+    T sd=Signed_Distance(Z);
     return (sd<thickness_over_two && sd>-thickness_over_two);
 }
 //#####################################################################

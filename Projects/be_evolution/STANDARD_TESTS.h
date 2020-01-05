@@ -1263,10 +1263,9 @@ void Get_Initial_Data()
             T vertical_straight_length=0.12;
             T thickness=0.01;
             T coefficient_of_friction=0.3;
-            RIGID_BODY<TV>& rounding=tests.Add_Analytic_Bowl(flat_bottom_radius,rounded_interior_radius,thickness,128,32);
+            RIGID_BODY<TV>& rounding=tests.Add_Analytic_Bowl(TV(),TV(0,1,0),flat_bottom_radius,rounded_interior_radius,thickness,128,32);
             rounding.coefficient_of_friction=coefficient_of_friction;
-            rounding.Frame().r=ROTATION<TV>((T)pi,TV(1,0,0));
-            rounding.Frame().t=TV(0,rounded_interior_radius+thickness,0);
+            rounding.Frame().t=TV(0,thickness,0);
             rounding.is_static=true;
 
             RIGID_BODY<TV>& walls=tests.Add_Analytic_Shell(vertical_straight_length,flat_bottom_radius+rounded_interior_radius+thickness,flat_bottom_radius+rounded_interior_radius,128);

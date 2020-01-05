@@ -349,14 +349,13 @@ Initialize()
             op->min_sep=half_edge;
             this->write_structures_every_frame=true;
 
-            BOWL<T> bowl(bowl_radius-side_radius,side_radius,.1*m);
+            BOWL<T> bowl(TV(),TV(0,1,0),bowl_radius-side_radius,side_radius,.1*m);
+            
             if(use_penalty_collisions){
                 LOG::cout<<"USE PENALTY COLLISIONS"<<std::endl;
                 Add_Penalty_Collision_Object(bowl);}
             else{
-                Add_Collision_Object(Make_IO(bowl),COLLISION_TYPE::separate,1,
-                    [=](T time){return FRAME<TV>(TV(0,side_radius,0),ROTATION<TV>(pi,TV(1,0,0)));},
-                    [](T time){return TWIST<TV>();});}
+                Add_Collision_Object(Make_IO(bowl),COLLISION_TYPE::separate,1,0,0);}
             Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,false);
 
             auto func=[=](int frame)

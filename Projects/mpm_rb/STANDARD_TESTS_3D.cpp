@@ -494,7 +494,7 @@ Initialize()
             RANDOM_NUMBERS<T> rng(seed);
             T density=(T)2200*unit_rho*scale_mass;
             TV g=m/(s*s)*TV(0,1.8,0);
-            RIGID_BODY<TV>& bowl=tests.Add_Analytic_Bowl((T)0,(T)1,(T)0.05);
+            RIGID_BODY<TV>& bowl=tests.Add_Analytic_Bowl(TV(),TV(0,1,0),(T)0,(T)1,(T)0.05);
             bowl.is_static=true;
 
             RANGE<TV> box(TV(-0.6,-2.6,-0.6),TV(0.6,0,0.6));
@@ -546,8 +546,7 @@ Initialize()
             RANDOM_NUMBERS<T> rng(seed);
             T density=(T)2200*unit_rho*scale_mass;
             TV g=m/(s*s)*TV(0,-1.8,0);
-            RIGID_BODY<TV>& bowl=tests.Add_Analytic_Bowl((T)0,(T)1,(T)0.05);
-            bowl.Frame().r=ROTATION<TV>::From_Euler_Angles(pi,0,0);
+            RIGID_BODY<TV>& bowl=tests.Add_Analytic_Bowl(TV(),TV(0,1,0),(T)0,(T)1,(T)0.05);
             bowl.is_static=true;
 
             RANGE<TV> box(TV(-0.6,0,-0.6),TV(0.6,5.6,0.6));
