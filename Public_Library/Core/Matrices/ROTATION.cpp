@@ -226,13 +226,15 @@ Average_Rotation(const ARRAY<ROTATION<TV> >& rotations)
 template<class T>  ROTATION<VECTOR<T,3> > ROTATION<VECTOR<T,3> >::
 From_Rotated_Vector(const TV& initial_vector,const TV& final_vector)
 {
-    TV initial_unit=initial_vector.Normalized(),final_unit=final_vector.Normalized();
-    T cos_theta=clamp(TV::Dot_Product(initial_unit,final_unit),(T)-1,(T)1);
-    TV v=TV::Cross_Product(initial_unit,final_unit);
-    T v_magnitude=v.Magnitude();if(v_magnitude==0) return ROTATION<TV>(); //initial and final vectors are collinear
-    T s_squared=(T).5*(1+cos_theta); // uses the half angle formula
-    T v_magnitude_desired=sqrt(1-s_squared);v*=(v_magnitude_desired/v_magnitude);
-    return ROTATION<TV>(sqrt(s_squared),v.x,v.y,v.z);
+    TV u=initial_vector.Normalized(),v=final_vector.Normalized(),w=u.Cross(v);
+    T d=u.Dot(v);
+    if(d>=-(T).5) return QUATERNION<T>(w.Prepend(1+d).Normalized());
+    T m=w.Normalize();
+    w.Project_Orthogonal_To_Unit_Direction(u);
+    T epsilon=std::numeric_limits<T>::epsilon();
+    if(w.Magnitude_Squared()<epsilon)
+        w=u.Orthogonal_Vector().Projected_Orthogonal_To_Unit_Direction(v).Normalized();
+    return QUATERNION<T>(w.Prepend(m/(1-d)).Normalized());
 }
 //#####################################################################
 // Function Random_Fill_Uniform_
