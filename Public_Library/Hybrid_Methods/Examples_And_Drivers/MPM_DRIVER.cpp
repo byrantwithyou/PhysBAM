@@ -578,12 +578,17 @@ Grid_To_Particle_Limit_Dt()
         },
         [this,dt](int p,HELPER& h)
         {
+            T s_save=h.s;
+            h.s=1;
             if(example.dilation_only) Enforce_Limit_Max(h.s,example.cfl_F,dt*h.grad_Vp.Trace(),dt*h.grad_Vp_s.Trace());
             else Enforce_Limit_Max(h.s,example.cfl_F,dt*h.grad_Vp,dt*h.grad_Vp_s);
             TV xp_new_s,xp_new_s2;
             if(example.use_midpoint){xp_new_s=dt/2*(h.V_weight_old+h.V_pic);xp_new_s2=dt/2*h.V_pic_s;}
             else{xp_new_s=dt*h.V_pic;xp_new_s2=dt*h.V_pic_s;}
             Enforce_Limit_Max(h.s,example.cfl,xp_new_s,xp_new_s2);
+            if(example.extra_render && example.r_F){
+                if (ARRAY_VIEW<T>* prop4r=example.particles.template Get_Array<T>("prop4r")) (*prop4r)(p)=h.s;}
+            h.s=min(h.s,s_save);
         });
         
 
