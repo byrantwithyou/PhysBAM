@@ -85,6 +85,7 @@ public:
     ARRAY<MPM_PARTICLE_SOURCE<TV>*> sources;
     std::function<void(const ARRAY<int>&)> update_dp_func;
     bool no_mu=false;
+    bool use_sand_color=false;
 
     POISSON_DISK<TV>& poisson_disk;
     DEFORMABLES_STANDARD_TESTS<TV> tests;

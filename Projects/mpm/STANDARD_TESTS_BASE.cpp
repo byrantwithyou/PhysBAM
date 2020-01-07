@@ -134,6 +134,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-r_sound_speed",&r_sound_speed,"dump out sound speed for rendering particles");
     parse_args.Add("-extra_render",&extra_render,"need extra information for rendering");
     parse_args.Add("-use_explicit_collisions",&this->use_reflection_collision_objects,"Use explicit object collision");
+    parse_args.Add("-sand_color",&use_sand_color,"Use sand color for rendering");
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);
     PHYSBAM_ASSERT((int)r_cfl+(int)r_sound_speed+(int)r_F<=1);
@@ -142,7 +143,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     if(use_slip) forced_collision_type=COLLISION_TYPE::slip;
     if(use_stick) forced_collision_type=COLLISION_TYPE::stick;
     if(use_separate) forced_collision_type=COLLISION_TYPE::separate;
-
+    if(use_sand_color) particles.template Add_Array<int>("myc");
     unit_p=kg*pow<2-TV::m>(m)/(s*s);
     unit_rho=kg*pow<-TV::m>(m);
     unit_mu=kg*pow<2-TV::m>(m)/s;
@@ -279,6 +280,12 @@ template<class TV> int STANDARD_TESTS_BASE<TV>::
 Add_Particle(const TV& X,const TV& V,const MATRIX<T,TV::m>& dV,const T mass,const T volume)
 {
     int p=particles.Add_Element();
+    auto &myc=*particles.template Get_Array<int>("myc");
+    if (use_sand_color && &myc) {
+        T color=random.Get_Number();
+        if(color<(T)0.85) myc(p)=1;
+        else if(color<(T)0.95) myc(p)=2;
+        else myc(p)=3;}
     particles.valid(p)=true;
     particles.X(p)=X;
     particles.V(p)=V;
