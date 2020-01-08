@@ -99,7 +99,10 @@ Set_Domain_Walls(int side_mask,char type,std::function<T(const TV& X,int a)> f)
     }
     else
     {
-        for(FACE_RANGE_ITERATOR<TV::m> it(mac_grid.Domain_Indices(),0,0,RF::side_mask|RF::ghost,side_mask);it.Valid();it.Next())
+        bool ns=type==bc_noslip;
+        auto flags=RF::side_mask|RF::ghost;
+        if(ns) flags|=RF::skip_outer;
+        for(FACE_RANGE_ITERATOR<TV::m> it(mac_grid.Domain_Indices(),ns,0,flags,side_mask);it.Valid();it.Next())
         {
             auto& z=bc_u.Get_Or_Insert(it.face);
             if(f) z.x+=f(mac_grid.Face(it.face),it.face.axis);
