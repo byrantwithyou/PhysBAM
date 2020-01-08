@@ -51,7 +51,7 @@ public:
         fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=false;
         fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][0]=true;
         fluids_parameters.use_vorticity_confinement=false;
-        fluids_parameters.use_levelset_viscosity=true;
+        fluids_parameters.use_levelset_viscosity=false;
         write_output_files=true;fluids_parameters.write_debug_data=true;
         source_domain=RANGE<TV>(TV((T).45,(T)0),TV((T).55,(T).1));
 //        fluids_parameters.use_maccormack_semi_lagrangian_advection=true;
@@ -100,27 +100,14 @@ void Initialize_Bodies() override
     fluids_parameters.incompressible_iterations=1000;
 }
 //#####################################################################
-// Function Get_Source_Velocities
-//#####################################################################
-void Get_Source_Velocities(ARRAY<T,FACE_INDEX<2> >& face_velocities,ARRAY<bool,FACE_INDEX<2> >& psi_N,const T time) override
-{
-    PHYSBAM_FATAL_ERROR();
-    GRID<TV> u_grid=fluids_parameters.grid->Get_Face_Grid(0),v_grid=fluids_parameters.grid->Get_Face_Grid(1);
-    T flow_speed=(T)1;
-    for(int j=0;j<u_grid.counts.y;j++){
-        FACE_INDEX<2> a(0,TV_INT(0,j)),b(0,TV_INT(u_grid.counts.x-1,j));
-        face_velocities(a)=flow_speed;
-        psi_N(a)=true;}
-}
-//#####################################################################
 // Function Get_Unified_Boundary_Conditions
 //#####################################################################
 void Get_Unified_Boundary_Conditions(BOUNDARY_CONDITION_DOUBLE_FINE<TV>* bc_fine,const T time)
 {
-    bc_fine->Set(io,bc_fine->bc_noslip,[](const TV& X,int a){Add_Debug_Particle(X,VECTOR<T,3>(1,1,0));return 0;});
-    bc_fine->Set_Domain_Walls(1,bc_fine->bc_noslip,[](const TV& X,int a){Add_Debug_Particle(X,VECTOR<T,3>(0,0,1));return TV(1,0)(a);});
-    bc_fine->Set_Domain_Walls(2,bc_fine->bc_free,[](const TV& X,int a){Add_Debug_Particle(X,VECTOR<T,3>(1,0,0));return 0;});
-    bc_fine->Set_Domain_Walls(12,bc_fine->bc_slip,[](const TV& X,int a){Add_Debug_Particle(X,VECTOR<T,3>(0,1,0));return 0;});
+    bc_fine->Set(io,bc_fine->bc_noslip,0);
+    bc_fine->Set_Domain_Walls(1,bc_fine->bc_noslip,[](const TV& X,int a){return TV(1,0)(a);});
+    bc_fine->Set_Domain_Walls(2,bc_fine->bc_free,0);
+    bc_fine->Set_Domain_Walls(12,bc_fine->bc_slip,0);
 }
 //#####################################################################
 // Function Construct_Levelsets_For_Objects
@@ -137,16 +124,6 @@ void Initialize_Advection()    override
     fluids_parameters.Use_No_Fluid_Coupling_Defaults();
 }
 //#####################################################################
-// Function Set_Dirichlet_Boundary_Conditions
-//#####################################################################
-void Set_Dirichlet_Boundary_Conditions(const T time) override
-{
-    PHYSBAM_FATAL_ERROR();
-    for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
-        if(circle.Inside(iterator.Location(),(T).1*fluids_parameters.grid->dX.Max()))
-            fluids_parameters.incompressible->projection.elliptic_solver->psi_D(iterator.index)=true;
-}
-//#####################################################################
 // Function Postprocess_Frame
 //#####################################################################
 void Postprocess_Frame(const int frame) override
@@ -158,52 +135,6 @@ void Postprocess_Frame(const int frame) override
         for(int d=0;d<V.m;d++)
             V(d)=interp.Clamped_To_Array(fluids_parameters.grid->Get_Face_Grid(d),face_velocities.Component(d),X);
         LOG::cout<<"velocity at "<<X<<" : "<<V<<std::endl;}
-}
-//#####################################################################
-// Function Mark_Outside
-//#####################################################################
-void Mark_Outside(ARRAY<bool,FACE_INDEX<TV::m> >& outside) override
-{
-    PHYSBAM_FATAL_ERROR();
-    for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,0);iterator.Valid();iterator.Next()) outside(iterator.Full_Index())=true;
-    for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,2);iterator.Valid();iterator.Next()) outside(iterator.Full_Index())=true;
-    for(FACE_ITERATOR<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,3);iterator.Valid();iterator.Next()) outside(iterator.Full_Index())=true;
-    for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) if(circle.Lazy_Inside(iterator.Location())){
-        VECTOR<FACE_INDEX<2>,4> faces;
-        GRID<TV>::Neighboring_Faces(faces,iterator.index);
-        for(int i=0;i<faces.m;i++) outside(faces(i))=true;}
-}
-//#####################################################################
-// Function Get_Viscosity_Boundary_Along_Ray
-//#####################################################################
-typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE Get_Boundary_Along_Ray(const FACE_INDEX<TV::m>& f1,const FACE_INDEX<TV::m>& f2,T& theta,T& value) override
-{
-    PHYSBAM_FATAL_ERROR();
-    typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE type=BOUNDARY_CONDITIONS_CALLBACKS<TV>::unused;
-    TV X0=fluids_parameters.grid->Face(f1);
-    TV X1=fluids_parameters.grid->Face(f2);
-    if(circle.Inside(X1,-fluids_parameters.grid->dX.Max()*(T)2)){ // circle
-        theta=1;
-        value=0;
-        type=BOUNDARY_CONDITIONS_CALLBACKS<TV>::noslip;}
-    else if(f1.index.y!=f2.index.y){ // top or bottom
-        theta=1;
-        value=0;
-        type=BOUNDARY_CONDITIONS_CALLBACKS<TV>::slip;}
-    else if(f1.index.x<f2.index.x){ // right
-        theta=(T).5;
-        value=0;
-        type=BOUNDARY_CONDITIONS_CALLBACKS<TV>::free;}
-    else if(f1.index.x>f2.index.x){ // left
-        theta=1;
-        value=TV(1,0)(f2.axis);
-        type=BOUNDARY_CONDITIONS_CALLBACKS<TV>::slip;}
-    else PHYSBAM_FATAL_ERROR("Did not expect a boundary condition here.");
-
-    static VECTOR<T,3> color_map[]={VECTOR<T,3>(1,0,0),VECTOR<T,3>(1,.5,0),VECTOR<T,3>(1,0,1),VECTOR<T,3>(0,.5,0),VECTOR<T,3>(0,1,1),VECTOR<T,3>(1,1,0)};
-
-    Add_Debug_Particle(X0+theta*(X1-X0),color_map[type]);
-    return type;
 }
 //#####################################################################
 // Function Write_Output_Files
