@@ -51,6 +51,7 @@ EXAMPLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
 
     if(mpi_world && !opt_all_verbose && mpi_world->initialized && mpi_world->rank) opt_verbosity=0;
     LOG::Initialize_Logging(opt_verbosity<10,false,opt_verbosity,!opt_nolog);
+    Setup_Log();
     fixed_dt*=s;
     frame_rate/=s;
     max_dt*=s;
