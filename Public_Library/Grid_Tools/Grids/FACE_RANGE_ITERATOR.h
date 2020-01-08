@@ -97,6 +97,9 @@ enum class RF
 inline RF operator|(RF a,RF b){return RF((int)a|(int)b);}
 inline RF operator&(RF a,RF b){return RF((int)a&(int)b);}
 inline RF operator^(RF a,RF b){return RF((int)a^(int)b);}
+inline RF& operator|=(RF& a,RF b){return a=a|b;}
+inline RF& operator&=(RF& a,RF b){return a=a&b;}
+inline RF& operator^=(RF& a,RF b){return a=a^b;}
 inline RF operator~(RF a){return RF(~(int)a);}
 inline bool operator!(RF a){return !(int)a;}
 inline bool any(RF a){return (int)a;}
