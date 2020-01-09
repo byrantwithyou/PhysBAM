@@ -1624,6 +1624,20 @@ Initialize()
                 });
         } break;    
 
+        case 75:{ // Single Particel Stability Test
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            T density=2*unit_rho*scale_mass;
+            T volume=grid.dX.Product()/particles_per_cell;
+            T mass=density*volume;
+            Add_Particle(TV(.5,.5),0,0,mass,volume);
+            TV u,v;
+            random.Fill_Uniform(u,-.1,.1);
+            particles.F.Fill(DIAGONAL_MATRIX<T,2>(1,1)+MATRIX<T,2>(u,v));
+            T E=1e2*unit_p*scale_E;
+            T nu=.3;
+            Add_Neo_Hookean(E,nu);
+        } break;
+
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     if(forced_collision_type!=-1)
