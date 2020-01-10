@@ -17,6 +17,15 @@ namespace PhysBAM{
 // Node grid, return cut edges.
 template<class T,class TV>
 void Grid_Surface_Intersection(
+    HASHTABLE<EDGE_INDEX<1>,GRID_SURFACE_INTERSECTION_DATA<TV> >& hash,
+    const GRID<TV>& grid,const POINT_SIMPLICES_1D<T>& surface,bool compute_inside)
+{
+    PHYSBAM_NOT_IMPLEMENTED();
+}
+
+// Node grid, return cut edges.
+template<class T,class TV>
+void Grid_Surface_Intersection(
     HASHTABLE<EDGE_INDEX<2>,GRID_SURFACE_INTERSECTION_DATA<TV> >& hash,
     const GRID<TV>& grid,const SEGMENTED_CURVE_2D<T>& surface,bool compute_inside)
 {
@@ -82,6 +91,65 @@ void Grid_Surface_Intersection(
 {
     PHYSBAM_NOT_IMPLEMENTED();
 }
-template void Grid_Surface_Intersection<double,VECTOR<double,2> >(HASHTABLE<EDGE_INDEX<2>,GRID_SURFACE_INTERSECTION_DATA<VECTOR<double,2> > >&,GRID<VECTOR<double,2> > const&,SEGMENTED_CURVE_2D<double> const&,bool);
-template void Grid_Surface_Intersection<float,VECTOR<float,2> >(HASHTABLE<EDGE_INDEX<2>,GRID_SURFACE_INTERSECTION_DATA<VECTOR<float,2> > >&,GRID<VECTOR<float,2> > const&,SEGMENTED_CURVE_2D<float> const&,bool);
+
+template<class TV>
+void Flood_Fill(ARRAY<bool,VECTOR<int,TV::m> >& a,
+    const HASHTABLE<EDGE_INDEX<TV::m>,GRID_SURFACE_INTERSECTION_DATA<TV> >& hash)
+{
+    typedef VECTOR<int,TV::m> TV_INT;
+    a.Fill(false);
+
+    for(auto& h:hash)
+    {
+        if(h.key.axis!=TV::m-1) continue;
+        if(h.data.cut_elements.m%2==0) continue;
+        TV_INT i=h.key.index.Add_Axis(TV::m-1,1);
+        if(i(TV::m-1)<a.domain.min_corner(TV::m-1))
+            i(TV::m-1)=a.domain.min_corner(TV::m-1);
+        if(!a.domain.Lazy_Inside_Half_Open(i)) continue;
+        a(i)^=1;
+    }
+
+    RANGE<TV_INT> domain=a.domain;
+    domain.min_corner(TV::m-1)++;
+    for(RANGE_ITERATOR<TV::m> it(domain);it.Valid();it.Next())
+        a(it.index)^=a(it.index.Add_Axis(TV::m-1,-1));
+}
+
+template void Grid_Surface_Intersection<double,VECTOR<double,1> >(
+    HASHTABLE<EDGE_INDEX<1>,GRID_SURFACE_INTERSECTION_DATA<VECTOR<double,1> > >&,
+    GRID<VECTOR<double,1> > const&,POINT_SIMPLICES_1D<double> const&,bool);
+template void Grid_Surface_Intersection<double,VECTOR<double,2> >(
+    HASHTABLE<EDGE_INDEX<2>,GRID_SURFACE_INTERSECTION_DATA<VECTOR<double,2> > >&,
+    GRID<VECTOR<double,2> > const&,SEGMENTED_CURVE_2D<double> const&,bool);
+template void Grid_Surface_Intersection<double,VECTOR<double,3> >(
+    HASHTABLE<EDGE_INDEX<3>,GRID_SURFACE_INTERSECTION_DATA<VECTOR<double,3> > >&,
+    GRID<VECTOR<double,3> > const&,TRIANGULATED_SURFACE<double> const&,bool);
+template void Grid_Surface_Intersection<float,VECTOR<float,1> >(
+    HASHTABLE<EDGE_INDEX<1>,GRID_SURFACE_INTERSECTION_DATA<VECTOR<float,1> > >&,
+    GRID<VECTOR<float,1> > const&,POINT_SIMPLICES_1D<float> const&,bool);
+template void Grid_Surface_Intersection<float,VECTOR<float,2> >(
+    HASHTABLE<EDGE_INDEX<2>,GRID_SURFACE_INTERSECTION_DATA<VECTOR<float,2> > >&,
+    GRID<VECTOR<float,2> > const&,SEGMENTED_CURVE_2D<float> const&,bool);
+template void Grid_Surface_Intersection<float,VECTOR<float,3> >(
+    HASHTABLE<EDGE_INDEX<3>,GRID_SURFACE_INTERSECTION_DATA<VECTOR<float,3> > >&,
+    GRID<VECTOR<float,3> > const&,TRIANGULATED_SURFACE<float> const&,bool);
+template void Flood_Fill<VECTOR<double,1> >(ARRAY<bool,VECTOR<int,VECTOR<double,1>::m> >&,
+    HASHTABLE<EDGE_INDEX<VECTOR<double,1>::m>,
+    GRID_SURFACE_INTERSECTION_DATA<VECTOR<double,1> > > const&);
+template void Flood_Fill<VECTOR<double,2> >(ARRAY<bool,VECTOR<int,VECTOR<double,2>::m> >&,
+    HASHTABLE<EDGE_INDEX<VECTOR<double,2>::m>,
+    GRID_SURFACE_INTERSECTION_DATA<VECTOR<double,2> > > const&);
+template void Flood_Fill<VECTOR<double,3> >(ARRAY<bool,VECTOR<int,VECTOR<double,3>::m> >&,
+    HASHTABLE<EDGE_INDEX<VECTOR<double,3>::m>,
+    GRID_SURFACE_INTERSECTION_DATA<VECTOR<double,3> > > const&);
+template void Flood_Fill<VECTOR<float,1> >(ARRAY<bool,VECTOR<int,VECTOR<float,1>::m> >&,
+    HASHTABLE<EDGE_INDEX<VECTOR<float,1>::m>,
+    GRID_SURFACE_INTERSECTION_DATA<VECTOR<float,1> > > const&);
+template void Flood_Fill<VECTOR<float,2> >(ARRAY<bool,VECTOR<int,VECTOR<float,2>::m> >&,
+    HASHTABLE<EDGE_INDEX<VECTOR<float,2>::m>,
+    GRID_SURFACE_INTERSECTION_DATA<VECTOR<float,2> > > const&);
+template void Flood_Fill<VECTOR<float,3> >(ARRAY<bool,VECTOR<int,VECTOR<float,3>::m> >&,
+    HASHTABLE<EDGE_INDEX<VECTOR<float,3>::m>,
+    GRID_SURFACE_INTERSECTION_DATA<VECTOR<float,3> > > const&);
 }

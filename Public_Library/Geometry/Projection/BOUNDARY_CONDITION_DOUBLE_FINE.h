@@ -21,6 +21,7 @@ class BOUNDARY_CONDITION_DOUBLE_FINE
 {
     typedef VECTOR<int,TV::m> TV_INT;typedef typename TV::SCALAR T;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_SURFACE;
+    typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m>::OBJECT T_OBJECT;
 
 public:
     enum bc_enum {bc_slip=-3,bc_noslip=-2,bc_free=-1};
@@ -41,6 +42,7 @@ public:
 
     void Set(const IMPLICIT_OBJECT<TV>* io,char type,std::function<T(const TV& X,int a)> f=0,bool thin=false,bool invert=false,T contour=0);
     void Set(const T_SURFACE& surface,char type,std::function<T(const TV& X,int a)> f=0,bool thin=false);
+    void Set(T_OBJECT& object,char type,std::function<T(const TV& X,int a)> f=0,bool thin=false);
     void Set_Domain_Walls(int side_mask,char type,std::function<T(const TV& X,int a)> f=0);
 
     void Set_Current_Values(const RANGE<TV_INT>& domain,char type,std::function<T(const TV_INT& i0,const TV_INT& i1,int a)> f,bool thin);

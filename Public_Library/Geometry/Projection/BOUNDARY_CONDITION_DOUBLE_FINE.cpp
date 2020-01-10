@@ -10,7 +10,12 @@
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
+#include <Geometry/Intersections/GRID_SURFACE_INTERSECTION.h>
 #include <Geometry/Projection/BOUNDARY_CONDITION_DOUBLE_FINE.h>
+#include <Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
+#include <Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
+#include <Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
+#include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 namespace PhysBAM{
 
 //#####################################################################
@@ -75,7 +80,54 @@ Set(const IMPLICIT_OBJECT<TV>* io,char type,std::function<T(const TV& X,int a)> 
 template<class TV> void BOUNDARY_CONDITION_DOUBLE_FINE<TV>::
 Set(const T_SURFACE& surface,char type,std::function<T(const TV& X,int a)> f,bool thin)
 {
-    PHYSBAM_NOT_IMPLEMENTED();
+    PHYSBAM_ASSERT(!thin || type==bc_noslip || type==bc_slip);
+
+    ARRAY<bool,TV_INT> flood_fill_array(bc_type.domain.Edge_Lengths()/2+1);
+
+    for(RANGE_ITERATOR<TV::m> it(TV_INT()+2);it.Valid();it.Next())
+    {
+        if((it.index.Sum()+TV::m)%2) continue; // don't compute if we don't need
+        if(type!=bc_noslip && it.index!=TV_INT()+1) continue;
+
+        TV X0=grid.Node(bc_type.domain.min_corner+it.index);
+        TV X1=grid.Node(bc_type.domain.max_corner-it.index);
+        TV_INT counts=bc_type.domain.Edge_Lengths()/2-it.index;
+        TV_INT offset=bc_type.domain.min_corner+it.index;
+        GRID<TV> vis_grid(counts,RANGE<TV>(X0,X1),false);
+        // fine = 2 * vis + offset;
+
+        HASHTABLE<EDGE_INDEX<TV::m>,GRID_SURFACE_INTERSECTION_DATA<TV> > hash;
+        Grid_Surface_Intersection(hash,vis_grid,surface,!thin);
+
+        if(!thin)
+        {
+            bc_type_current.Fill(1);
+            ARRAY<TV_INT> seeds;
+            for(const auto& h:hash)
+            {
+                TV_INT i0=2*h.key.index+offset,i1=i0.Add_Axis(h.key.axis,2);
+                seeds.Append(i0);
+                seeds.Append(i1);
+                bc_type_current(i0)=h.data.in[0]?type:0;
+                bc_type_current(i1)=h.data.in[1]?type:0;
+            }
+
+            Flood_Fill(flood_fill_array,hash);
+            for(RANGE_ITERATOR<TV::m> it2(counts+1);it2.Valid();it2.Next())
+                if(flood_fill_array(it2.index))
+                    set_bc(bc_type,bc_type_current,2*it2.index+offset,type);
+        }
+
+        // TODO: fill bc_u
+    }
+}
+//#####################################################################
+// Function Set
+//#####################################################################
+template<class TV> void BOUNDARY_CONDITION_DOUBLE_FINE<TV>::
+Set(T_OBJECT& object,char type,std::function<T(const TV& X,int a)> f,bool thin)
+{
+    return Set(object.Get_Boundary_Object(),type,f,thin);
 }
 //#####################################################################
 // Function Set_Domain_Walls

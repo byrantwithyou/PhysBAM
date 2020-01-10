@@ -28,6 +28,12 @@ struct GRID_SURFACE_INTERSECTION_DATA
 // Node grid, return cut edges.
 template<class T,class TV>
 void Grid_Surface_Intersection(
+    HASHTABLE<EDGE_INDEX<1>,GRID_SURFACE_INTERSECTION_DATA<TV> >& hash,
+    const GRID<TV>& grid,const POINT_SIMPLICES_1D<T>& surface,bool compute_inside);
+
+// Node grid, return cut edges.
+template<class T,class TV>
+void Grid_Surface_Intersection(
     HASHTABLE<EDGE_INDEX<2>,GRID_SURFACE_INTERSECTION_DATA<TV> >& hash,
     const GRID<TV>& grid,const SEGMENTED_CURVE_2D<T>& surface,bool compute_inside);
 
@@ -35,5 +41,10 @@ template<class T,class TV>
 void Grid_Surface_Intersection(
     HASHTABLE<EDGE_INDEX<3>,GRID_SURFACE_INTERSECTION_DATA<TV> >& hash,
     const GRID<TV>& grid,const TRIANGULATED_SURFACE<T>& surface,bool compute_inside);
+
+template<class TV>
+void Flood_Fill(ARRAY<bool,VECTOR<int,TV::m> >& a,
+    const HASHTABLE<EDGE_INDEX<TV::m>,GRID_SURFACE_INTERSECTION_DATA<TV> >& hash);
+
 }
 #endif
