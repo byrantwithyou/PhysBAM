@@ -151,8 +151,7 @@ Advance_One_Time_Step()
     Print_Energy_Stats("after particle to grid",example.velocity);
     Step([=](){Apply_Forces();},"forces");
     Print_Grid_Stats("after forces",example.dt,example.velocity,&example.velocity_save);
-    Step([=](){Grid_To_Particle_Limit_Dt();},"g2p-limit-dt",false);
-    Step([=](){Limit_Dt_Sound_Speed();},"sound-speed-limit-dt",false);
+    Step([=](){Reduce_Dt();},"reduce-dt",false);
     Step([=](){Grid_To_Particle();},"g2p",true);
     Step([=](){Update_Plasticity_And_Hardening();},"plasticity-hardening",false);
 }
@@ -512,6 +511,31 @@ Grid_To_Particle()
             Reflect_Or_Invalidate_Particle(p);
         });
 }
+//#####################################################################
+// Function Reduce_Dt
+//#####################################################################
+template<class TV> void MPM_DRIVER<TV>::
+Reduce_Dt()
+{
+    TIMER_SCOPE_FUNC;
+    T dt=example.dt;
+    if(example.use_strong_cfl) dt=std::min(dt,Grid_To_Particle_Limit_Dt());
+    dt=std::min(dt,Limit_Dt_Sound_Speed());
+    dt=std::max(dt,example.min_dt);
+    if(dt>=example.dt) return;
+
+    T s=dt/example.dt;
+    LOG::printf("dt scale: %g -> %g (%g)\n",example.dt,dt,s);
+#pragma omp parallel for
+    for(int i=0;i<example.valid_grid_indices.m;i++){
+        int j=example.valid_grid_indices(i);
+        TV vs=example.velocity_save.array(j);
+        TV& v=example.velocity.array(j);
+        v=(v-vs)*s+vs;
+        TV& vf=example.velocity_friction_save.array(j);
+        vf=(vf-vs)*s+vs;}
+    example.dt=dt;
+}
 // Lower s if necessary so that |t*(a+t*b)|<=bound for all 0<=t<=s
 template<class T>
 void Enforce_Limit_Max(T& s,T bound,T a,T b)
@@ -541,11 +565,10 @@ void Enforce_Limit_Max(T& s,T bound,const MATRIX<T,d>& a,const MATRIX<T,d>& b)
 //#####################################################################
 // Function Grid_To_Particle_Limit_Dt
 //#####################################################################
-template<class TV> void MPM_DRIVER<TV>::
-Grid_To_Particle_Limit_Dt()
+template<class TV> auto MPM_DRIVER<TV>::
+Grid_To_Particle_Limit_Dt() -> T
 {
     TIMER_SCOPE_FUNC;
-    if(!example.use_strong_cfl) return;
     struct HELPER
     {
         TV V_pic,V_pic_s,V_weight_old;
@@ -591,20 +614,14 @@ Grid_To_Particle_Limit_Dt()
                 if (ARRAY_VIEW<T>* prop4r=example.particles.template Get_Array<T>("prop4r")) (*prop4r)(p)=h.s;}
             h.s=min(h.s,s_save);
         });
-        
 
-    if(example.dt*s<example.min_dt) s=example.min_dt/example.dt;
-    if(s>=1) return;
-    LOG::printf("X J CFL scale: %g -> %g\n",example.dt,example.dt*s);
-    example.dt*=s;
-    example.velocity.array=(example.velocity.array-example.velocity_save.array)*s+example.velocity_save.array;
-    example.velocity_friction_save.array=(example.velocity_friction_save.array-example.velocity_save.array)*s+example.velocity_save.array;
+    return example.dt*s;
 }
 //#####################################################################
 // Function Limit_Dt_Sound_Speed
 //#####################################################################
-template<class TV> void MPM_DRIVER<TV>::
-Limit_Dt_Sound_Speed()
+template<class TV> auto MPM_DRIVER<TV>::
+Limit_Dt_Sound_Speed() -> T
 {
     TIMER_SCOPE_FUNC;
     T dt=example.dt;
@@ -635,14 +652,7 @@ Limit_Dt_Sound_Speed()
             LOG::printf("SINGLE PARTICLE (F) %g %g (%g)\n",example.dt,dt,dt/example.dt);
         }
     }
-
-    if(dt<example.min_dt) dt=example.min_dt;
-    if(dt>=example.dt) return;
-
-    T s=dt/example.dt;
-    example.velocity.array=(example.velocity.array-example.velocity_save.array)*s+example.velocity_save.array;
-    example.velocity_friction_save.array=(example.velocity_friction_save.array-example.velocity_save.array)*s+example.velocity_save.array;
-    example.dt=dt;
+    return dt;
 }
 //#####################################################################
 // Function Max_Dt_Single_Particle_Pressure
@@ -1349,6 +1359,7 @@ Sample_Reflection_Collision_Object(int i)
 template<class TV> void MPM_DRIVER<TV>::
 Step(std::function<void()> func,const char* name,bool dump_substep,bool do_step)
 {
+    TIMER_SCOPE_FUNC;
     auto& p=example.time_step_callbacks.Get_Or_Insert(name);
     p.x=true; // Flag the callback name as recognized, for sanity checking later
     if(!do_step) return;

@@ -32,7 +32,6 @@ MPM_PARTICLE_SOURCE(POISSON_DISK<TV>& poisson_disk,RANDOM_NUMBERS<T>& random,
 template<class TV> void MPM_PARTICLE_SOURCE<TV>::
 Seed(T dt,ARRAY<TV>& X,ARRAY<TV>& V,ARRAY<MATRIX<T,TV::m> >* dV)
 {
-    LOG::printf("SEED: %P\n",dt);
     T seed_velocity=V0.Dot(n);
     sample_box.max_corner.x=seed_velocity*dt;
     int seed_X_m=seed_X.m;

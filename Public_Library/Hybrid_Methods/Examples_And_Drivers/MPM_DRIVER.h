@@ -63,8 +63,9 @@ public:
     void Print_Grid_Stats(const char* str,T dt,const ARRAY<TV,TV_INT>& u,const ARRAY<TV,TV_INT>* u0);
     void Print_Particle_Stats(const char* str,T dt);
     void Print_Energy_Stats(const char* str,const ARRAY<TV,TV_INT>& u);
-    void Grid_To_Particle_Limit_Dt();
-    void Limit_Dt_Sound_Speed();
+    T Grid_To_Particle_Limit_Dt();
+    T Limit_Dt_Sound_Speed();
+    void Reduce_Dt();
     void Reflect_Boundary_Mass_Momentum();
     void Reflect_Boundary_Friction(const ARRAY<T,TV_INT>& mass,ARRAY<TV,TV_INT>& u) const;
     void Reflect_Boundary_Velocity(ARRAY<TV,TV_INT>& u);

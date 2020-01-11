@@ -1547,17 +1547,18 @@ Initialize()
         // ./mpm -3d 44 -last_frame 20 -fooT3 1 -resolution 10 -fooT2 35 -use_exp_F -max_dt 2e-4 -symplectic_euler 
         case 44:{ // sand falling into a pile.
             particles.Store_Fp(true);
-            Set_Grid(RANGE<TV>(TV(-.1,-0.02,-0.1)*5*m,TV(0.1,0.06,0.1))*5*m,TV_INT(5,2,5),TV_INT(),4);
+            Set_Grid(RANGE<TV>(TV(-.08,0,-.08)*m,TV(.08,.06,.08))*m,TV_INT(8,3,8),TV_INT(),4);
             RANGE<TV> ground(TV(-10,-10,-10)*m,TV(10,0,10)*m);
-            if(use_penalty_collisions) Add_Penalty_Collision_Object(ground);
+            if(this->reflection_bc) Add_Walls(0x37,COLLISION_TYPE::separate,.3,.025*m,false);
+            else if(use_penalty_collisions) Add_Penalty_Collision_Object(ground);
             else Add_Collision_Object(ground,COLLISION_TYPE::stick,0);
             T E=35.37e6*unit_p*scale_E,nu=.3;
             if(!no_implicit_plasticity) use_implicit_plasticity=true;
             Add_Drucker_Prager(E,nu,foo_T2);
-            TV spout(0,0.3*m,0);
+            TV spout(0,.06*m,0);
             T density=(T)2200*unit_rho*scale_mass;
-            T spout_width=8.334e-3*3*m;
-            T pour_speed=.16319*5*m/s;
+            T spout_width=0.008334*m;
+            T pour_speed=.16319*m/s;
             TV gravity=TV(0,-9.8*m/(s*s),0);
             Add_Source(spout,TV(0,-1,0),spout_width/2,pour_speed,gravity,density,E,nu,(T)0.08,foo_T3);
             Set_Lame_On_Particles(E,nu);
