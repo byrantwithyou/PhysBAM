@@ -2316,7 +2316,7 @@ Initialize()
             T E=1e4*unit_p*scale_E,nu=.3;
             T density=(T)2*unit_rho*scale_mass;
             TV gravity=TV(0,-9.8*m/(s*s),0);
-            T vel=1*m/s;
+            T vel=2*m/s;
             RANGE<TV> box(TV(.25,0,.25)*m,TV(1.25,.5,.75)*m);
             VECTOR<TV,8> C;
             box.Corners(C);
