@@ -181,6 +181,7 @@ Simulate_To_Frame(const int frame)
                 done=true;}
             else if(next_time+example.dt>time_at_frame) next_time=(example.time+time_at_frame)/2;
             example.dt=next_time-example.time;
+            T original_dt=example.dt;
             LOG::cout<<"substep dt: "<<example.dt<<std::endl;
 
             Step([=](){Advance_One_Time_Step();},"time-step");
@@ -188,7 +189,7 @@ Simulate_To_Frame(const int frame)
 
 
             // Time step was reduced
-            if(example.dt<next_time-example.time){
+            if(example.dt<original_dt){
                 LOG::printf("dt reduced: %g to %g\n",next_time-example.time,example.dt);
                 next_time=example.time+example.dt;
                 done=false;}
@@ -606,20 +607,89 @@ template<class TV> void MPM_DRIVER<TV>::
 Limit_Dt_Sound_Speed()
 {
     TIMER_SCOPE_FUNC;
-    if(!example.use_sound_speed_cfl) return;
     T dt=example.dt;
-    T max_speed=Compute_Max_Sound_Speed();
-    LOG::printf("max sound speed: %.16P\n",max_speed);
-    LOG::printf("dx: %.16P\n",example.grid.dX.Min());
-    LOG::printf("dx/soundspeed: %.16P\n",Robust_Divide(example.grid.dX.Min(),max_speed));
-    dt=std::min(dt,Robust_Divide(example.grid.dX.Min(),max_speed)*example.cfl_sound);
+    if(example.use_sound_speed_cfl)
+    {
+        T max_speed=Compute_Max_Sound_Speed();
+        LOG::printf("max sound speed: %.16P\n",max_speed);
+        LOG::printf("dx: %.16P\n",example.grid.dX.Min());
+        LOG::printf("dx/soundspeed: %.16P\n",Robust_Divide(example.grid.dX.Min(),max_speed));
+        dt=std::min(dt,Robust_Divide(example.grid.dX.Min(),max_speed)*example.cfl_sound);
+        LOG::printf("SOUND CFL %g %g (%g)\n",example.dt,dt,dt/example.dt);
+    }
+    if(example.use_single_particle_cfl && example.dilation_only)
+    {
+        T new_dt=Max_Dt_Single_Particle_Pressure();
+        if(new_dt<dt)
+        {
+            dt=new_dt;
+            LOG::printf("SINGLE PARTICLE (J) %g %g (%g)\n",example.dt,dt,dt/example.dt);
+        }
+    }
+    if(example.use_single_particle_cfl && !example.dilation_only)
+    {
+        T new_dt=Max_Dt_Single_Particle();
+        if(new_dt<dt)
+        {
+            dt=new_dt;
+            LOG::printf("SINGLE PARTICLE (F) %g %g (%g)\n",example.dt,dt,dt/example.dt);
+        }
+    }
+
     if(dt<example.min_dt) dt=example.min_dt;
     if(dt>=example.dt) return;
+
     T s=dt/example.dt;
-    LOG::printf("SOUND CFL %g %g (%g)\n",example.dt,dt,s);
     example.velocity.array=(example.velocity.array-example.velocity_save.array)*s+example.velocity_save.array;
     example.velocity_friction_save.array=(example.velocity_friction_save.array-example.velocity_save.array)*s+example.velocity_save.array;
     example.dt=dt;
+}
+//#####################################################################
+// Function Max_Dt_Single_Particle_Pressure
+//#####################################################################
+template<class TV> auto MPM_DRIVER<TV>::
+Max_Dt_Single_Particle_Pressure() const -> T
+{
+    TIMER_SCOPE_FUNC;
+    T dt=example.dt;
+    T K=TV::m==2?6:(T)3.14;
+    for(int f=0;f<example.forces.m;f++){
+        if(const MPM_FINITE_ELEMENTS<TV>* force=dynamic_cast<MPM_FINITE_ELEMENTS<TV>*>(example.forces(f))){
+#pragma omp parallel for reduction(min:dt)
+            for(int k=0;k<example.simulated_particles.m;k++){
+                int p=example.simulated_particles(k);
+                T density=example.particles.mass(p)/example.particles.volume(p);
+                T J=force->sigma(p).Determinant();
+                T num=sqr(example.cfl_single_particle*example.grid.dX.Min())*density;
+                T den=K*TV::m;
+#if 0
+                T dp_over_Jm1=force->constitutive_model.Robust_Divided_Pressure(J,p);
+                den*=sqr(J)*dp_over_Jm1*J/(J+1);
+#else
+                T lambda=force->constitutive_model.Pressure_Bound(J,p);
+                if(J>=1)
+                {
+                    num*=J+1;
+                    den*=J*J*J*lambda;
+                }
+                else
+                {
+                    num*=2;
+                    den*=sqr(2-J)*lambda;
+                }
+#endif
+                if(num<sqr(dt)*den) dt=sqrt(num/den);}}}
+    PHYSBAM_ASSERT(example.lagrangian_forces.m==0);
+    return dt;
+}
+//#####################################################################
+// Function Max_Dt_Single_Particle
+//#####################################################################
+template<class TV> auto MPM_DRIVER<TV>::
+Max_Dt_Single_Particle() const -> T
+{
+    PHYSBAM_FATAL_ERROR();
+    return 0;
 }
 //#####################################################################
 // Function Conjugate_Stress_Diff

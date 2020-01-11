@@ -169,6 +169,22 @@ Sound_Speed(const DIAGONAL_MATRIX<T,d>& F,T density,const int id) const
     Isotropic_Stress_Derivative(F,dPi_dF,id);
     return Sound_Speed(F,dPi_dF,density);
 }
+//#####################################################################
+// Function Robust_Divided_Pressure
+//#####################################################################
+template<class T,int d> T ISOTROPIC_CONSTITUTIVE_MODEL<T,d>::
+Robust_Divided_Pressure(T J,const int id) const
+{
+    PHYSBAM_FATAL_ERROR();
+}
+//#####################################################################
+// Function Pressure_Bound
+//#####################################################################
+template<class T,int d> T ISOTROPIC_CONSTITUTIVE_MODEL<T,d>::
+Pressure_Bound(T J,const int id) const
+{
+    PHYSBAM_FATAL_ERROR();
+}
 namespace PhysBAM{
 template class ISOTROPIC_CONSTITUTIVE_MODEL<float,1>;
 template class ISOTROPIC_CONSTITUTIVE_MODEL<float,2>;

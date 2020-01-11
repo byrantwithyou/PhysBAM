@@ -111,7 +111,9 @@ public:
     bool test_sound_speed=false;
     bool dilation_only=false;
     bool write_structures_every_frame=false;
-
+    bool use_single_particle_cfl=false;
+    T cfl_single_particle=(T)0.9;
+    
     T newton_tolerance=1;
     int newton_iterations=100;
     T solver_tolerance=(T).5;

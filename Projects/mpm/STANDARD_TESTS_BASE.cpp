@@ -125,6 +125,8 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-test_output_prefix",&test_output_prefix,&use_test_output,"","prefix to use for test output");
     parse_args.Add("-strong_cfl",&use_strong_cfl,"limit dt based on final change in X and F");
     parse_args.Add("-sound_cfl",&use_sound_speed_cfl,"limit dt based on soudn speed");
+    parse_args.Add("-single_particle_cfl",&this->use_single_particle_cfl,"limit dt based on single particle stability");
+    parse_args.Add("-cfl_p",&this->cfl_single_particle,"cfl","limit dt based on single particle stability");
     parse_args.Add("-reflection_bc",&reflection_bc_flags,"flags","Flags indicating which walls should be reflection BC");
     parse_args.Add("-test_c",&this->test_sound_speed,"test sound speed calculations");
     parse_args.Add("-dilation_only",&this->dilation_only,"Discard non-volumetric portions of F");

@@ -29,6 +29,13 @@ public:
     void Test(const DIAGONAL_MATRIX<T,d>& F,const int id) const;
     T Sound_Speed(const DIAGONAL_MATRIX<T,d>& F,T density,const int id) const;
     static T Sound_Speed(const DIAGONAL_MATRIX<T,d>& F,const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dPi_dF,T density);
+
+    // Computes dpsi_dJ/(J-I) robustly. (should fail if not a pressure-based model)
+    virtual T Robust_Divided_Pressure(T J,const int id) const;
+
+    // L such that 0 >= dpsi_dJ >= L*(J-1)/J^2   if   J<=1
+    // L such that 0 <= dpsi_dJ <= L*(J-1)       if   J>=1
+    virtual T Pressure_Bound(T J,const int id) const;
 //#####################################################################
 };
 }
