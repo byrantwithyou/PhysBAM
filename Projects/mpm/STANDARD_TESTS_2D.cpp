@@ -426,7 +426,8 @@ Initialize()
             RANGE<TV> box(grid.dX*2,TV(0.2,0.75)*m);
             T density=2*unit_rho*scale_mass;
             Seed_Particles(box,0,0,density,particles_per_cell);
-            Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
+            if(extra_int.m && extra_int(0)) Add_Neo_Hookean(1e3*unit_p*scale_E,0.3);
+            else Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
             dilation_only=true;
             particles.mu*=0;
             particles.mu0*=0;
