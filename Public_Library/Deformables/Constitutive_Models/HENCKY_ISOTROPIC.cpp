@@ -2,6 +2,7 @@
 // Copyright 2003-2011, Ron Fedkiw, Geoffrey Irving, Igor Neverov, Russell Howes, Eftychios Sifakis.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Math_Tools/Robust_Functions.h>
 #include <Core/Matrices/DIAGONAL_MATRIX.h>
 #include <Core/Matrices/MATRIX.h>
 #include <Core/Matrices/SYMMETRIC_MATRIX.h>
@@ -118,6 +119,26 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC
 
     Isotropic_Stress_Derivative_Helper(F,dP_dF,failure_threshold,id_mu,id_lambda);
     if(enforce_definiteness) dP_dF.Enforce_Definiteness();
+}
+//#####################################################################
+// Function Robust_Divided_Pressure
+//#####################################################################
+template<class T,int d> T HENCKY_ISOTROPIC<T,d>::
+Robust_Divided_Pressure(T J,const int id) const
+{
+    T id_mu=Mu(id),id_lambda=Lambda(id);
+    PHYSBAM_ASSERT(!id_mu);
+    return id_lambda*log1p_x_over_x(J-1)/J;
+}
+//#####################################################################
+// Function Pressure_Bound
+//#####################################################################
+template<class T,int d> T HENCKY_ISOTROPIC<T,d>::
+Pressure_Bound(T J,const int id) const
+{
+    T id_mu=Mu(id),id_lambda=Lambda(id);
+    PHYSBAM_ASSERT(!id_mu);
+    return id_lambda;
 }
 namespace PhysBAM{
 template class HENCKY_ISOTROPIC<double,2>;

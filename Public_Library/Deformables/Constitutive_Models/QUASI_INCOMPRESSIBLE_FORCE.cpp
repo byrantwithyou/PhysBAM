@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Log/LOG.h>
+#include <Core/Math_Tools/Robust_Functions.h>
 #include <Core/Matrices/DIAGONAL_MATRIX.h>
 #include <Core/Matrices/MATRIX_2X2.h>
 #include <Core/Matrices/MATRIX_3X3.h>
@@ -66,6 +67,22 @@ Energy_Density(const DIAGONAL_MATRIX<T,TV::m>& F,const int id) const
     T J=F.Determinant(),g=gamma-1;
     if(J<1e-10) return 1e20;
     return stiffness*(J-1+(pow(J,-g)-1)/g);
+}
+//#####################################################################
+// Function Robust_Divided_Pressure
+//#####################################################################
+template<class TV> typename TV::SCALAR QUASI_INCOMPRESSIBLE_FORCE<TV>::
+Robust_Divided_Pressure(T J,const int id) const
+{
+    return stiffness*gamma*exp_x_minus_1_over_x(-gamma*log(J))*log1p_x_over_x(J-1);
+}
+//#####################################################################
+// Function Pressure_Bound
+//#####################################################################
+template<class TV> typename TV::SCALAR QUASI_INCOMPRESSIBLE_FORCE<TV>::
+Pressure_Bound(T J,const int id) const
+{
+    PHYSBAM_FATAL_ERROR("this model grows too quickly as J -> 0");
 }
 namespace PhysBAM{
 template class QUASI_INCOMPRESSIBLE_FORCE<VECTOR<float,1> >;

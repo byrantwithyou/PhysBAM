@@ -30,6 +30,8 @@ public:
     DIAGONAL_MATRIX<T,d> P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const int id) const override;
     MATRIX<T,d> P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const int id) const override;
     void Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dP_dF,const int id) const override;
+    virtual T Robust_Divided_Pressure(T J,const int id) const override;
+    virtual T Pressure_Bound(T J,const int id) const override;
 //#####################################################################
 };
 }

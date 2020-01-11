@@ -33,6 +33,8 @@ public:
     T Energy_Density(const DIAGONAL_MATRIX<T,TV::m>& F,const int id) const override;
 
     void Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,TV::m>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<TV>& dP_dF,const int id) const override;
+    virtual T Robust_Divided_Pressure(T J,const int id) const override;
+    virtual T Pressure_Bound(T J,const int id) const override;
 //#####################################################################
 };
 }

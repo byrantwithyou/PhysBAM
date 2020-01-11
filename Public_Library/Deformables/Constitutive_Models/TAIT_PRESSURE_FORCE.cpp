@@ -4,6 +4,7 @@
 //#####################################################################
 #include <Core/Log/LOG.h>
 #include <Core/Math_Tools/cube.h>
+#include <Core/Math_Tools/Robust_Functions.h>
 #include <Core/Matrices/DIAGONAL_MATRIX.h>
 #include <Core/Matrices/MATRIX_2X2.h>
 #include <Core/Matrices/MATRIX_3X3.h>
@@ -72,6 +73,22 @@ Energy_Density(const DIAGONAL_MATRIX<T,TV::m>& F,const int id) const
     if(J<1e-10) return 1e20;
     T e=exp((1-J)/tait_const);
     return tait_const*stiffness*(tait_const*(e-1)+J-1);
+}
+//#####################################################################
+// Function Robust_Divided_Pressure
+//#####################################################################
+template<class TV> typename TV::SCALAR TAIT_PRESSURE_FORCE<TV>::
+Robust_Divided_Pressure(T J,const int id) const
+{
+    return -stiffness*exp_x_minus_1_over_x((1-J)/tait_const);
+}
+//#####################################################################
+// Function Pressure_Bound
+//#####################################################################
+template<class TV> typename TV::SCALAR TAIT_PRESSURE_FORCE<TV>::
+Pressure_Bound(T J,const int id) const
+{
+    PHYSBAM_FATAL_ERROR();
 }
 namespace PhysBAM{
 template class TAIT_PRESSURE_FORCE<VECTOR<float,1> >;
