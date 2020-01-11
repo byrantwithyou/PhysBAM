@@ -1630,7 +1630,7 @@ Initialize()
             T density=2*unit_rho*scale_mass;
             T volume=grid.dX.Product()/particles_per_cell;
             T mass=density*volume;
-            Add_Particle(TV(.5,.5),0,0,mass,volume);
+            Add_Particle(TV(.52,.543),0,0,mass,volume);
             TV u,v;
             random.Fill_Uniform(u,-.1,.1);
             particles.F.Fill(DIAGONAL_MATRIX<T,2>(1,1)+MATRIX<T,2>(u,v));
