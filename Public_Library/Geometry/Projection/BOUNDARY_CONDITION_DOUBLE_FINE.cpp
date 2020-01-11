@@ -101,24 +101,45 @@ Set(const T_SURFACE& surface,char type,std::function<T(const TV& X,int a)> f,boo
 
         if(!thin)
         {
-            bc_type_current.Fill(1);
-            ARRAY<TV_INT> seeds;
-            for(const auto& h:hash)
-            {
-                TV_INT i0=2*h.key.index+offset,i1=i0.Add_Axis(h.key.axis,2);
-                seeds.Append(i0);
-                seeds.Append(i1);
-                bc_type_current(i0)=h.data.in[0]?type:0;
-                bc_type_current(i1)=h.data.in[1]?type:0;
-            }
-
             Flood_Fill(flood_fill_array,hash);
             for(RANGE_ITERATOR<TV::m> it2(counts+1);it2.Valid();it2.Next())
                 if(flood_fill_array(it2.index))
                     set_bc(bc_type,bc_type_current,2*it2.index+offset,type);
         }
 
-        // TODO: fill bc_u
+        for(const auto& h:hash)
+        {
+            TV_INT i[2]={2*h.key.index+offset};
+            i[1]=i[0].Add_Axis(h.key.axis,2);
+            TV X0=grid.Node(i[0]);
+            TV X1=grid.Node(i[1]);
+            T y=0;
+            for(const auto& t:h.data.cut_elements)
+            {
+                TV Z=X0+(X1-X0)*t.y;
+                y+=f(Z,0xDEADBEEF);
+            }
+            y/=h.data.cut_elements.m;
+            if(type==bc_free)
+            {
+                for(int j=0;j<2;j++)
+                    if(!h.data.in[j])
+                    {
+                        auto& z=bc_p.Get_Or_Insert(i[j]);
+                        if(f) z.x+=y;
+                        z.y++;
+                    }
+            }
+            else
+            {
+                FACE_INDEX<TV::m> face;
+                // TODO
+                auto& z=bc_u.Get_Or_Insert(face);
+                if(f) z.x+=y;
+                z.y++;
+                if(thin) z.z=true;
+            }
+        }
     }
 }
 //#####################################################################
