@@ -1,9 +1,10 @@
 //#####################################################################
-// Copyright 2003-2007, Ron Fedkiw, Geoffrey Irving, Igor Neverov, Eftychios Sifakis, Joseph Teran.
+// Copyright 2003-2020, Ron Fedkiw, Geoffrey Irving, Igor Neverov, Craig Schroeder, Eftychios Sifakis, Yunxin Sun, Joseph Teran.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <Core/Math_Tools/cube.h>
 #include <Core/Math_Tools/pow.h>
+#include <Core/Math_Tools/Robust_Functions.h>
 #include <Core/Matrices/DIAGONAL_MATRIX.h>
 #include <Core/Matrices/MATRIX_1X1.h>
 #include <Core/Matrices/MATRIX_2X2.h>
@@ -195,6 +196,26 @@ Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int id) const
     if(J<=0) return (T)1e16; // TODO: Do something smarter here.
     T log_J=log(J);
     return id_mu*((T).5*(I1-TV::m)-log_J)+(T).5*id_lambda*sqr(log_J);
+}
+//#####################################################################
+// Function Robust_Divided_Pressure
+//#####################################################################
+template<class T,int d> T NEO_HOOKEAN<T,d>::
+Robust_Divided_Pressure(T J,const int id) const
+{
+    T id_mu=Mu(id),id_lambda=Lambda(id);
+    PHYSBAM_ASSERT(!id_mu);
+    return id_lambda*log1p_x_over_x(J-1)/J;
+}
+//#####################################################################
+// Function Pressure_Bound
+//#####################################################################
+template<class T,int d> T NEO_HOOKEAN<T,d>::
+Pressure_Bound(T J,const int id) const
+{
+    T id_mu=Mu(id),id_lambda=Lambda(id);
+    PHYSBAM_ASSERT(!id_mu);
+    return id_lambda;
 }
 namespace PhysBAM{
 template class NEO_HOOKEAN<float,1>;

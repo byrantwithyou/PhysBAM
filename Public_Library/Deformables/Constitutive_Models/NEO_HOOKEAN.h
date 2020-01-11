@@ -51,7 +51,8 @@ public:
     int P_From_Strain_Rate_Forces_Size() const override;
     void P_From_Strain_Rate_First_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<T> aggregate,const MATRIX<T,d>& F_dot,const int id) const override;
     MATRIX<T,d> P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,const ARRAY_VIEW<const T> aggregate,const int id) const override;
-
+    virtual T Robust_Divided_Pressure(T J,const int id) const;
+    virtual T Pressure_Bound(T J,const int id) const;
 //#####################################################################
 };
 }
