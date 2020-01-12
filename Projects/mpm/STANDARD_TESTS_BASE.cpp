@@ -409,9 +409,10 @@ Add_Drucker_Prager(T E,T nu,T a0,T a1,T a3,T a4,ARRAY<int>* affected_particles,b
     if(no_mu){nu=0;hencky->Zero_Out_Mu();}
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model=*hencky;
     MPM_DRUCKER_PRAGER<TV>* plasticity=new MPM_DRUCKER_PRAGER<TV>(particles,0,a0,a1,a3,a4);
-    plasticity->use_implicit=use_implicit_plasticity;
+    plasticity->use_implicit=(use_implicit_plasticity&&!no_implicit_plasticity);
+    PHYSBAM_ASSERT(!plasticity->use_implicit || !use_symplectic_euler);
     PARTICLE_GRID_FORCES<TV>* fe=0;
-    if(use_implicit_plasticity){
+    if(plasticity->use_implicit){
         fe=new MPM_PLASTIC_FINITE_ELEMENTS<TV>(force_helper,constitutive_model,gather_scatter,affected_particles,*plasticity);
         this->asymmetric_system=true;}
     else{
@@ -461,9 +462,10 @@ Add_Clamped_Plasticity(ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& icm,T theta_c,T th
 {
     MPM_PLASTICITY_CLAMP<TV>& plasticity=*new MPM_PLASTICITY_CLAMP<TV>(particles,0,theta_c,theta_s,
         max_hardening,hardening_factor);
-    plasticity.use_implicit=use_implicit_plasticity;
+    plasticity.use_implicit=(use_implicit_plasticity&&!no_implicit_plasticity);
+    PHYSBAM_ASSERT(!plasticity.use_implicit || !use_symplectic_euler);
     PARTICLE_GRID_FORCES<TV>* fe=0;
-    if(use_implicit_plasticity){
+    if(plasticity.use_implicit){
         fe=new MPM_PLASTIC_FINITE_ELEMENTS<TV>(force_helper,icm,gather_scatter,affected_particles,plasticity);
         this->asymmetric_system=true;}
     else{
