@@ -77,6 +77,7 @@ public:
     bool friction_is_set;
     T sigma_Y;
     bool use_cohesion;
+    bool use_vc=true;
     std::function<void ()> destroy;
     std::string sph_rel="2k";
     ARRAY<T> extra_T;

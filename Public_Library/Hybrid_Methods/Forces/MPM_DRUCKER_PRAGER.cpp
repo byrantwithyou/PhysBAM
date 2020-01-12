@@ -20,6 +20,7 @@ MPM_DRUCKER_PRAGER(MPM_PARTICLES<TV>& particles,GATHER_SCATTER<TV>* gather_scatt
     particles.Add_Array("plastic_deformation",&plastic_def);
     particles.Add_Array("dp_rho_f",&rho_F);
     particles.Add_Array("dp_cohesion",&sigma_Y);
+    particles.Add_Array("vcp",&vc);
 }
 //#####################################################################
 // Destructor
@@ -68,8 +69,9 @@ Compute(TV& strain,MATRIX<T,TV::m>* dstrain,typename TV::SPIN* r_sum,typename TV
     T mu=particles.mu(id),lambda=particles.lambda(id);
     T g=1/(d*lambda+2*mu);
     T b=1/(2*mu);
-    T beta=-sigma_Y(id)*g/(rho_F(id)*TV::m);
-    TV strain_trial=log(abs(Fe))+beta;
+    T beta=-sigma_Y(id)*g/(rho_F(id)*d);
+    TV log_Fe=log(abs(Fe));
+    TV strain_trial=log_Fe+beta+vc(id)/d;
     T k=strain_trial.Sum();
     TV sh=strain_trial-k/d;
     T q=sh.Magnitude();
@@ -79,12 +81,16 @@ Compute(TV& strain,MATRIX<T,TV::m>* dstrain,typename TV::SPIN* r_sum,typename TV
     if(q==0 || k>0){
         strain=sigma_Y(id)?exp(-beta)*TV::All_Ones_Vector():TV::All_Ones_Vector();
         if(dstrain) *dstrain=MATRIX<T,d>();
-        if(store_hardening) Update_Hardening(id,(strain_trial-beta).Magnitude());
+        if(store_hardening){
+            if(use_vc) vc(id)+=log_Fe.Sum()+beta*d;
+            Update_Hardening(id,log_Fe.Magnitude());}
         return true;} 
     T p=r*b/q;
     TV h_strain=k/d-p*sh;
     strain=exp(h_strain-beta);
-    if(store_hardening) Update_Hardening(id,dg);
+    if(store_hardening){
+        vc(id)=0;
+        Update_Hardening(id,dg);}
 
 // What if Fe<0?
     if(!dstrain) return true;

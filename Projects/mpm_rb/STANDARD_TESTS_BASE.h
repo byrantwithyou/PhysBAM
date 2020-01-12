@@ -85,6 +85,7 @@ public:
     bool friction_is_set;
     T sigma_Y;
     bool use_cohesion;
+    bool use_vc=true;
     std::function<void ()> write_output_files;
     std::function<void ()> read_output_files;
     std::function<void ()> destroy;

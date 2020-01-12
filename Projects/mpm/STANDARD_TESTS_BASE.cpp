@@ -119,6 +119,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-separate",&use_separate,"force separating collisions");
     parse_args.Add("-friction",&friction,&friction_is_set,"friction","Coefficient of friction");
     parse_args.Add("-cohesion",&sigma_Y,&use_cohesion,"cohesion","sigma_Y in Drucker Prager");
+    parse_args.Add_Not("-no_vc",&use_vc,"Use v_cp volume correction term for Drucker Prager");
     parse_args.Add("-T",&extra_T,"float","extra float argument");
     parse_args.Add("-I",&extra_int,"int","extra int argument");
     parse_args.Add("-dump_collisions",&dump_collision_objects,"dump out collision objects");
@@ -410,6 +411,7 @@ Add_Drucker_Prager(T E,T nu,T a0,T a1,T a3,T a4,ARRAY<int>* affected_particles,b
     ISOTROPIC_CONSTITUTIVE_MODEL<T,TV::m>& constitutive_model=*hencky;
     MPM_DRUCKER_PRAGER<TV>* plasticity=new MPM_DRUCKER_PRAGER<TV>(particles,0,a0,a1,a3,a4);
     plasticity->use_implicit=(use_implicit_plasticity&&!no_implicit_plasticity);
+    plasticity->use_vc=use_vc;
     PHYSBAM_ASSERT(!plasticity->use_implicit || !use_symplectic_euler);
     PARTICLE_GRID_FORCES<TV>* fe=0;
     if(plasticity->use_implicit){

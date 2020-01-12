@@ -26,7 +26,9 @@ public:
     mutable ARRAY_VIEW<T> plastic_def;
     mutable ARRAY_VIEW<T> rho_F;
     mutable ARRAY_VIEW<T> sigma_Y;
+    mutable ARRAY_VIEW<T> vc;
     T a0,a1,a3,a4;
+    bool use_vc=true;
 
     MPM_DRUCKER_PRAGER(MPM_PARTICLES<TV>& particles,GATHER_SCATTER<TV>* gather_scatter,T a0,T a1,T a3,T a4);
     virtual ~MPM_DRUCKER_PRAGER();
