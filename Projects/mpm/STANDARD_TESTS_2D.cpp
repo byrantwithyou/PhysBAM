@@ -1631,9 +1631,9 @@ Initialize()
             T volume=grid.dX.Product()/particles_per_cell;
             T mass=density*volume;
             Add_Particle(TV(.52,.543),0,0,mass,volume);
-            TV u,v;
-            random.Fill_Uniform(u,-.1,.1);
-            particles.F.Fill(DIAGONAL_MATRIX<T,2>(1,1)+MATRIX<T,2>(u,v));
+            MATRIX<T,2> m;
+            random.Fill_Uniform(m,-.1,.1);
+            particles.F.Fill(m+1);
             T E=1e2*unit_p*scale_E;
             T nu=.3;
             Add_Neo_Hookean(E,nu);
