@@ -1639,6 +1639,26 @@ Initialize()
             Add_Neo_Hookean(E,nu);
         } break;
 
+        case 76:{ // Reproduce the bowl instability problem
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            Add_Walls(-1,COLLISION_TYPE::separate,.1,.1*m,false);
+            T density=4*unit_rho*scale_mass;
+            Add_Collision_Object(SPHERE<TV>(TV(),.3*m),COLLISION_TYPE::separate,.1);
+            Add_Collision_Object(SPHERE<TV>(TV(1,0)*m,.3*m),COLLISION_TYPE::separate,.1);
+            SPHERE<TV> sphere1(TV(.1,.5)*m,.05*m);
+            TRIANGULATED_AREA<T>* ta1=TESSELLATION::Generate_Triangles(sphere1,ceil(sphere1.radius/grid.dX.x*4));
+            TRIANGULATED_AREA<T>& new_ta1=Seed_Lagrangian_Particles(*ta1,[=](const TV& X){return TV(foo_T1,0)*m;},
+                0,density,true);
+            Add_Fixed_Corotated(new_ta1,1e2*unit_p*scale_E,0.3);
+            SPHERE<TV> sphere2(TV(.9,.5)*m,.05*m);
+            TRIANGULATED_AREA<T>* ta2=TESSELLATION::Generate_Triangles(sphere2,ceil(sphere2.radius/grid.dX.x*4));
+            TRIANGULATED_AREA<T>& new_ta2=Seed_Lagrangian_Particles(*ta2,[=](const TV& X){return TV(-foo_T1,0)*m;},
+                0,density,true);
+            Add_Fixed_Corotated(new_ta2,1e2*unit_p*scale_E,0.3);
+            for(auto* s:this->solid_body_collection.deformable_body_collection.structures) s->Update_Number_Nodes();
+            Add_Gravity(m/(s*s)*TV(0,-1.8));
+        } break;
+
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
     }
     if(forced_collision_type!=-1)
