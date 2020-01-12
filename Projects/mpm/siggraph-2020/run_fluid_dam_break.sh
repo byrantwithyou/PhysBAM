@@ -10,7 +10,6 @@ $CMD -cfl_p 1.4 -o $DIR"_min_unstable"
 $CMD -cfl_p 2.0 -o $DIR"_unstable"
 
 $CMD -cfl_p 0.9 -I 1 -o $DIR"_nh_ours"
-$CMD -cfl_p 1.3 -I 1 -o $DIR"_nh_max_stable" # TODO: number is not right
-$CMD -cfl_p 1.4 -I 1 -o $DIR"_nh_min_unstable" # TODO: number is not right
+$CMD -cfl_p 1.4 -I 1 -o $DIR"_nh_max_stable" 
+$CMD -cfl_p 1.5 -I 1 -o $DIR"_nh_min_unstable" 
 $CMD -cfl_p 2.0 -I 1 -o $DIR"_nh_unstable"
-
