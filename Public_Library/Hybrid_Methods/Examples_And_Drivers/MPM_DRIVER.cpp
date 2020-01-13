@@ -1108,10 +1108,14 @@ template<class TV> typename TV::SCALAR MPM_DRIVER<TV>::
 Max_Particle_Speed() const
 {
     T v2=0;
+    T max_F=0;
 #pragma omp parallel for reduction(max:v2)
     for(int k=0;k<example.simulated_particles.m;k++){
         int p=example.simulated_particles(k);
-        v2=max(v2,example.particles.V(p).Magnitude_Squared());}
+        v2=max(v2,example.particles.V(p).Magnitude_Squared());
+        auto F=example.particles.F(p);
+        max_F=max(max_F,(F.Transpose_Times(F)-1).Frobenius_Norm_Squared());}
+    LOG::printf("maximum F magnitude: %P\n",sqrt(max_F));
     return sqrt(v2);
 }
 //#####################################################################
