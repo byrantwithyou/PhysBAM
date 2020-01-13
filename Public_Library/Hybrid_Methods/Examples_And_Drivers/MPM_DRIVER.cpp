@@ -223,6 +223,8 @@ Write_Output_Files()
     example.viewer_dir.Start_Directory(0,example.frame_title);
     example.frame_title="";
     example.Write_Output_Files();
+    if(example.extra_render && example.r_F){
+        if (ARRAY_VIEW<T>* prop4r=example.particles.template Get_Array<T>("prop4r")) (*prop4r).Fill((T)1);}
     example.viewer_dir.Finish_Directory();
 }
 //#####################################################################
@@ -611,10 +613,12 @@ Grid_To_Particle_Limit_Dt() -> T
             else{xp_new_s=dt*h.V_pic;xp_new_s2=dt*h.V_pic_s;}
             Enforce_Limit_Max(h.s,example.cfl,xp_new_s,xp_new_s2);
             if(example.extra_render && example.r_F){
-                if (ARRAY_VIEW<T>* prop4r=example.particles.template Get_Array<T>("prop4r")) (*prop4r)(p)=h.s;}
+                if (ARRAY_VIEW<T>* prop4r=example.particles.template Get_Array<T>("prop4r")) {
+                    if((T)0==(*prop4r)(p)){
+                        (*prop4r)(p)=h.s;}
+                    else if((*prop4r)(p)>h.s) (*prop4r)(p)=h.s;}}
             h.s=min(h.s,s_save);
         });
-
     return example.dt*s;
 }
 //#####################################################################
