@@ -33,7 +33,7 @@ private:
 protected:
     BOUNDARY<TV,T>& boundary_default; 
     const ARRAY<T,FACE_INDEX<TV::m> >* face_velocities;
-    const ARRAY<TV,TV_INT>* cell_velocities;
+    const ARRAY<TV,TV_INT>* cell_velocities=0;
 public:
 
     GRID_AND_ARRAY_CONTAINER(GRID<TV>& grid_input);
