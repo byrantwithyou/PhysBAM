@@ -182,6 +182,7 @@ Simulate_To_Frame(const int frame)
             example.dt=next_time-example.time;
             T original_dt=example.dt;
             LOG::cout<<"substep dt: "<<example.dt<<std::endl;
+            PHYSBAM_ASSERT(example.dt>0);
 
             Step([=](){Advance_One_Time_Step();},"time-step");
             LOG::cout<<"actual dt: "<<example.dt<<std::endl;
@@ -189,7 +190,7 @@ Simulate_To_Frame(const int frame)
 
             // Time step was reduced
             if(example.dt<original_dt){
-                LOG::printf("dt reduced: %g to %g\n",next_time-example.time,example.dt);
+                LOG::printf("dt reduced: %g to %g  (%g)\n",original_dt,example.dt,original_dt-example.dt);
                 next_time=example.time+example.dt;
                 done=false;}
 
@@ -521,10 +522,18 @@ Reduce_Dt()
 {
     TIMER_SCOPE_FUNC;
     T dt=example.dt;
-    if(example.use_strong_cfl) dt=std::min(dt,Grid_To_Particle_Limit_Dt());
+    if(example.use_strong_cfl)
+    {
+        T new_dt=Grid_To_Particle_Limit_Dt();
+        if(new_dt<dt)
+        {
+            LOG::printf("STRONG CFL %g %g (%g)\n",new_dt,dt,new_dt/dt);
+            dt=new_dt;
+        }
+    }
     dt=std::min(dt,Limit_Dt_Sound_Speed());
     dt=std::max(dt,example.min_dt);
-    if(dt>=example.dt) return;
+    if(dt>=example.dt*(T)0.99) return;
 
     T s=dt/example.dt;
     LOG::printf("dt scale: %g -> %g (%g)\n",example.dt,dt,s);
