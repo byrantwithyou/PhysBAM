@@ -298,17 +298,17 @@ Initialize()
             this->begin_frame.Append(func);
         } break;
         case 11:{ // skew impact of two elastic spheres with initial angular velocity
-            Set_Grid(RANGE<TV>(TV(),TV(30,30,30))*m);
-            T density=5*unit_rho*scale_mass;
-            SPHERE<TV> sphere1(TV(10,13,15)*m,2*m);
+            Set_Grid(RANGE<TV>::Unit_Box()*m);
+            T density=2200*unit_rho*scale_mass;
+            SPHERE<TV> sphere1(TV(10,15,15)/30*m,2*m/30);
             VECTOR<T,3> angular_velocity1(TV(0,0,foo_T1));
-            Seed_Particles(sphere1,[=](const TV& X){return angular_velocity1.Cross(X-sphere1.center)+TV(0.75,0,0)*(m/s);},
+            Seed_Particles(sphere1,[=](const TV& X){return angular_velocity1.Cross(X-sphere1.center)+TV(5,0,0)*(m/s);},
                 [=](const TV&){return MATRIX<T,3>::Cross_Product_Matrix(angular_velocity1);},density,particles_per_cell);
-            SPHERE<TV> sphere2(TV(20,15,15)*m,2*m);
+            SPHERE<TV> sphere2(TV(20,15,15)/30*m,2*m/30);
             VECTOR<T,3> angular_velocity2(TV(0,0,foo_T2));
-            Seed_Particles(sphere2,[=](const TV& X){return angular_velocity2.Cross(X-sphere2.center)+TV(-0.75,0,0)*(m/s);},
+            Seed_Particles(sphere2,[=](const TV& X){return angular_velocity2.Cross(X-sphere2.center)+TV(-5,0,0)*(m/s);},
                 [=](const TV&){return MATRIX<T,3>::Cross_Product_Matrix(angular_velocity2);},density,particles_per_cell);
-            Add_Neo_Hookean(31.685*unit_p*scale_E,0.44022); //solve({E/(2*(1+r))=11,E*r/((1+r)*(1-2*r))=81},{E,r});
+            Add_Neo_Hookean(1e4*unit_p*scale_E,0.3); //solve({E/(2*(1+r))=11,E*r/((1+r)*(1-2*r))=81},{E,r});
             Add_Walls(-1,COLLISION_TYPE::separate,.3,0,false);
         } break;
         case 12:{ // surface tension test: fixed topology circle shell
