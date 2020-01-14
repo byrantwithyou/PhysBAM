@@ -72,6 +72,7 @@ Bool_Update_Helper(OPENGL_FACE_SCALAR_FIELD_2D<T,bool>& self)
     for(FACE_ITERATOR<VECTOR<T,2> > it(self.grid,self.face_values.Number_Of_Ghost_Cells());it.Valid();it.Next())
         if(self.face_values(it.Full_Index()))
             self.opengl_points.points.Append(it.Location());
+    self.opengl_points.color=self.color_map->Lookup(0);
 }
 //#####################################################################
 // Update

@@ -609,7 +609,7 @@ Initialize_Components_And_Key_Bindings()
 
     opengl_world.Set_Key_Binding_Category("Fluid Boundaries");
     if(has_valid_grid && File_Exists(viewer_dir.current_directory+"/psi_N")){
-        OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D<T,bool>* psi_N_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D<T,bool>(viewer_dir,grid,viewer_dir.current_directory+"/psi_N",
+        OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D<T,bool>* psi_N_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D<T,bool>(viewer_dir,grid,"/psi_N",
             new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Cyan()));
         Add_Component(psi_N_component,"Psi_N points",'\0',BASIC_VISUALIZATION<T>::START_HIDDEN|BASIC_VISUALIZATION<T>::OWNED);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),psi_N_component->viewer_callbacks.Get("toggle_draw"));}
