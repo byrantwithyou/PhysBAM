@@ -2321,7 +2321,9 @@ Initialize()
             RANGE<TV> box(TV(.25,0,.25)*m,TV(1.25,.5,.75)*m);
             VECTOR<TV,8> C;
             box.Corners(C);
-            Seed_Particles(box,[=](const TV& X){return TV(vel,0,0);},0,density,particles_per_cell);
+            TETRAHEDRALIZED_VOLUME<T> cube;
+            cube.Initialize_Cube_Mesh_And_Particles(GRID<TV>(TV_INT(box.Edge_Lengths()*grid.one_over_dX*2)+1,box));
+            Seed_Lagrangian_Particles(cube,[=](const TV& X){return TV(vel,0,0);},0,density,false,false);
             Add_Fixed_Corotated(E,nu);
             Add_Gravity(gravity);
             Add_Walls(-1,COLLISION_TYPE::separate,.3,0,false);
