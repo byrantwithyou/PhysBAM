@@ -18,6 +18,8 @@
 #include <Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 namespace PhysBAM{
 
+// fine_node_index = (2*face.index+1).Add_Axis(face.axis,-1);
+
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -74,6 +76,14 @@ Set(const IMPLICIT_OBJECT<TV>* io,char type,std::function<T(const TV& X,int a)> 
             },thin);
     else Set_Current_Values(domain,type,0,thin);
 }
+template<int d> inline PAIR<FACE_INDEX<d>,bool> Node_To_Face(VECTOR<int,d> p)
+{
+    int a=0;
+    for(int k=0;k<d;k++) a+=((p(k)&1)^1)*k;
+    if(d==3 && a==d) return {{},false};
+    return {{a,fdiv(p,2)},true};
+}
+
 //#####################################################################
 // Function Set
 //#####################################################################
@@ -90,19 +100,18 @@ Set(const T_SURFACE& surface,char type,std::function<T(const TV& X,int a)> f,boo
         if(type!=bc_noslip && it.index!=TV_INT()+1) continue;
 
         TV X0=grid.Node(bc_type.domain.min_corner+it.index);
-        TV X1=grid.Node(bc_type.domain.max_corner-it.index);
-        TV_INT counts=bc_type.domain.Edge_Lengths()/2-it.index;
+        TV X1=grid.Node(bc_type.domain.max_corner-1-it.index);
+        TV_INT counts=(bc_type.domain.Edge_Lengths()+1)/2-it.index;
         TV_INT offset=bc_type.domain.min_corner+it.index;
         GRID<TV> vis_grid(counts,RANGE<TV>(X0,X1),false);
         // fine = 2 * vis + offset;
-
         HASHTABLE<EDGE_INDEX<TV::m>,GRID_SURFACE_INTERSECTION_DATA<TV> > hash;
         Grid_Surface_Intersection(hash,vis_grid,surface,!thin);
 
         if(!thin)
         {
             Flood_Fill(flood_fill_array,hash);
-            for(RANGE_ITERATOR<TV::m> it2(counts+1);it2.Valid();it2.Next())
+            for(RANGE_ITERATOR<TV::m> it2(flood_fill_array.domain);it2.Valid();it2.Next())
                 if(flood_fill_array(it2.index))
                     set_bc(bc_type,bc_type_current,2*it2.index+offset,type);
         }
@@ -114,28 +123,32 @@ Set(const T_SURFACE& surface,char type,std::function<T(const TV& X,int a)> f,boo
             TV X0=grid.Node(i[0]);
             TV X1=grid.Node(i[1]);
             T y=0;
-            for(const auto& t:h.data.cut_elements)
+            auto face_p=Node_To_Face(i[0].Add_Axis(h.key.axis,1));
+            if(!face_p.y) continue;
+
+            if(f)
             {
-                TV Z=X0+(X1-X0)*t.y;
-                y+=f(Z,0xDEADBEEF);
+                for(const auto& t:h.data.cut_elements)
+                {
+                    TV Z=X0+(X1-X0)*t.y;
+                    y+=f(Z,face_p.x.axis);
+                }
+                y/=h.data.cut_elements.m;
             }
-            y/=h.data.cut_elements.m;
             if(type==bc_free)
             {
                 for(int j=0;j<2;j++)
                     if(!h.data.in[j])
                     {
                         auto& z=bc_p.Get_Or_Insert(i[j]);
-                        if(f) z.x+=y;
+                        z.x+=y;
                         z.y++;
                     }
             }
             else
             {
-                FACE_INDEX<TV::m> face;
-                // TODO
-                auto& z=bc_u.Get_Or_Insert(face);
-                if(f) z.x+=y;
+                auto& z=bc_u.Get_Or_Insert(face_p.x);
+                z.x+=y;
                 z.y++;
                 if(thin) z.z=true;
             }
