@@ -49,7 +49,7 @@ Convert(PARSE_ARGS& parse_args)
     while(viewer_dir.Find_Next_Directory(0,false) && viewer_dir.frame_stack(0)<=end_at)
     {
         LOG::printf("Frame %P\n",viewer_dir.frame_stack);
-        deformable_body_collection.Read(viewer_dir,false);
+        deformable_body_collection.Read(viewer_dir,true);
         if(viewer_dir.frame_stack(0)==start_at)
         {
             if(!list.m) list=IDENTITY_ARRAY<>(deformable_body_collection.structures.m);
