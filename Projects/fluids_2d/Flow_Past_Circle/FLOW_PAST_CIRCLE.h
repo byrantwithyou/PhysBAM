@@ -15,6 +15,7 @@
 #include <Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <Geometry/Projection/BOUNDARY_CONDITION_DOUBLE_FINE.h>
+#include <Geometry/Tessellation/SPHERE_TESSELLATION.h>
 #include <Rigids/Standard_Tests/RIGIDS_STANDARD_TESTS.h>
 #include <Incompressible/Collisions_And_Interactions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
@@ -36,8 +37,9 @@ public:
     SPHERE<TV> circle;
     IMPLICIT_OBJECT<TV> * io;
     ARRAY<TV> sample_points;
+    SEGMENTED_CURVE_2D<T>* sc=0;
     
-    bool shed,opt_enlarge;
+    bool shed,opt_enlarge,use_sc=false;
     
     FLOW_PAST_CIRCLE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
         :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<TV>(stream_type_input,parse_args,0,fluids_parameters.SMOKE),solids_tests(stream_type_input,data_directory,solid_body_collection.rigid_body_collection),
@@ -63,9 +65,12 @@ public:
         if(!this->user_output_directory)
             viewer_dir.output_directory="Flow_Past_Circle/output";
 
+        int sc_n=20;
         parse_args.Add("-viscosity",&fluids_parameters.viscosity,&fluids_parameters.implicit_viscosity,"value","viscosity");
         parse_args.Add("-enlarge",&opt_enlarge,"value","Enlarge");
         parse_args.Add("-shed",&shed,"shed");
+        parse_args.Add("-sc",&use_sc,"use segmented curve");
+        parse_args.Add("-sc_n",&sc_n,"n","segments on curve");
         parse_args.Parse();
 
         if(opt_enlarge) circle.radius+=fluids_parameters.grid->dX.Min();
@@ -81,11 +86,13 @@ public:
         else fluids_parameters.grid->Initialize(TV_INT(resolution,resolution),RANGE<TV>(TV(0,0),TV(4,4)),true);
         fluids_parameters.Use_Unified_Boundary_Conditions();
         io=Make_IO(circle);
+        sc=TESSELLATION::Tessellate_Boundary(circle,sc_n);
     }
     
     ~FLOW_PAST_CIRCLE()
     {
         delete io;
+        delete sc;
     }
 
 //#####################################################################
@@ -104,7 +111,8 @@ void Initialize_Bodies() override
 //#####################################################################
 void Get_Unified_Boundary_Conditions(BOUNDARY_CONDITION_DOUBLE_FINE<TV>* bc_fine,const T time)
 {
-    bc_fine->Set(io,bc_fine->bc_noslip,0);
+    if(use_sc) bc_fine->Set(*sc,bc_fine->bc_noslip,[](const TV& X,int a){Add_Debug_Particle(X,VECTOR<T,3>(1,0,0));return 0;});
+    else bc_fine->Set(io,bc_fine->bc_noslip,0);
     bc_fine->Set_Domain_Walls(1,bc_fine->bc_noslip,[](const TV& X,int a){return TV(1,0)(a);});
     bc_fine->Set_Domain_Walls(2,bc_fine->bc_free,0);
     bc_fine->Set_Domain_Walls(12,bc_fine->bc_slip,0);
@@ -150,6 +158,10 @@ void Write_Output_Files() const override
     //CELL_ITERATOR<TV> fuckyou(*fluids_parameters.grid,3,GRID<TV>::GHOST_REGION);
     for(CELL_ITERATOR<TV> iterator(*fluids_parameters.grid,3,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next()) grid_vorticity(iterator.Cell_Index())=VECTOR<T,1>();
     Write_To_File(stream_type,viewer_dir.current_directory+"/grid_vorticity",grid_vorticity);
+    if(use_sc)
+    {
+        Dump_Surface(*sc,VECTOR<T,3>(.5,1,0));
+    }
 }
 //#####################################################################
 };
