@@ -139,6 +139,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-extra_render",&extra_render,"need extra information for rendering");
     parse_args.Add("-use_explicit_collisions",&this->use_reflection_collision_objects,"Use explicit object collision");
     parse_args.Add("-sand_color",&use_sand_color,"Use sand color for rendering");
+    parse_args.Add_Not("-no_affine_cfl",&this->use_affine_cfl,"No not use B_p for affine CFL.");
     parse_args.Parse(true);
     PHYSBAM_ASSERT((int)use_slip+(int)use_stick+(int)use_separate<=1);
     PHYSBAM_ASSERT((int)r_cfl+(int)r_sound_speed+(int)r_F<=1);

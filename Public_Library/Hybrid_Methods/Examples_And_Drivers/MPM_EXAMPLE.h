@@ -113,6 +113,7 @@ public:
     bool write_structures_every_frame=false;
     bool use_single_particle_cfl=false;
     T cfl_single_particle=(T)0.9;
+    bool use_affine_cfl=true;
     
     T newton_tolerance=1;
     int newton_iterations=100;

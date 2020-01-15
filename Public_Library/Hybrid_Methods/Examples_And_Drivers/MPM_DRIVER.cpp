@@ -1124,7 +1124,7 @@ Max_Particle_Speed() const
 template<class TV> typename TV::SCALAR MPM_DRIVER<TV>::
 Grid_V_Upper_Bound() const
 {
-    if(!example.use_affine) return Max_Particle_Speed();
+    if(!example.use_affine || !example.use_affine_cfl) return Max_Particle_Speed();
     T result=0;
     T xi=(T)6*sqrt((T)TV::m)*example.grid.one_over_dX.Min();
 #pragma omp parallel for reduction(max:result)
