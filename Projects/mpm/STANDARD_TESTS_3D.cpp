@@ -302,8 +302,10 @@ Initialize()
             T density=2200*unit_rho*scale_mass;
             SPHERE<TV> sphere1(TV(10,15,15)/30*m,2*m/30);
             VECTOR<T,3> angular_velocity1(TV(0,0,foo_T1));
+            ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >("color");
             Seed_Particles(sphere1,[=](const TV& X){return angular_velocity1.Cross(X-sphere1.center)+TV(5,0,0)*(m/s);},
                 [=](const TV&){return MATRIX<T,3>::Cross_Product_Matrix(angular_velocity1);},density,particles_per_cell);
+            color_attribute->Fill(TV(1,0,0));
             SPHERE<TV> sphere2(TV(20,15,15)/30*m,2*m/30);
             VECTOR<T,3> angular_velocity2(TV(0,0,foo_T2));
             Seed_Particles(sphere2,[=](const TV& X){return angular_velocity2.Cross(X-sphere2.center)+TV(-5,0,0)*(m/s);},
