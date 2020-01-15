@@ -2,6 +2,7 @@
 // Copyright 2015, Andre Pradhana and Gergely Klar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Log/LOG.h>
 #include <Core/Matrices/MATRIX.h>
 #include <Core/Read_Write/FILE_UTILITIES.h>
@@ -15,11 +16,117 @@
 
 using namespace PhysBAM;
 
+HASHTABLE<std::string,std::string> name_map;
+
+std::string get_name(const std::string& name)
+{
+    std::string s;
+    if(name_map.Get(name,s)) return s;
+    return name;
+}
+
+template<class U,int d,class TV,class IT>
+bool Try_Write_Vector(Partio::ParticlesDataMutable* parts,const MPM_PARTICLES<TV>& particles,ATTRIBUTE_INDEX id,const IT& it)
+{
+    ARRAY_COLLECTION_ELEMENT<VECTOR<U,d> >* c=dynamic_cast<ARRAY_COLLECTION_ELEMENT<VECTOR<U,d> >*>(particles.arrays(id));
+    if(!c) return false;
+    ARRAY_VIEW<VECTOR<U,d> > a(*c->array);
+    Partio::ParticleAttribute pa=parts->addAttribute(get_name(c->name).c_str(),Partio::VECTOR,d);
+    IT k(it);
+    for(int i=0;i<particles.number;i++)
+    {
+        VECTOR<U,d> w=a(i);
+        float *v=parts->dataWrite<float>(pa,k.index);
+        for(int j=0;j<d;j++) v[j]=w(j);
+        ++k;
+    }
+    LOG::printf("Wrote attribute %P as vector of size %P named %P.\n",c->name,d,get_name(c->name));
+    return true;
+}
+
+template<class U,class TV,class IT>
+bool Try_Write_Float(Partio::ParticlesDataMutable* parts,const MPM_PARTICLES<TV>& particles,ATTRIBUTE_INDEX id,const IT& it)
+{
+    ARRAY_COLLECTION_ELEMENT<U>* c=dynamic_cast<ARRAY_COLLECTION_ELEMENT<U>*>(particles.arrays(id));
+    if(!c) return false;
+    ARRAY_VIEW<U> a(*c->array);
+    Partio::ParticleAttribute pa=parts->addAttribute(get_name(c->name).c_str(),Partio::FLOAT,1);
+    IT k(it);
+    for(int i=0;i<particles.number;i++)
+    {
+        *parts->dataWrite<float>(pa,k.index)=a(i);
+        ++k;
+    }
+    LOG::printf("Wrote attribute %P as float named %P.\n",c->name,get_name(c->name));
+    return true;
+}
+
+template<class U,class TV,class IT>
+bool Try_Write_Int(Partio::ParticlesDataMutable* parts,const MPM_PARTICLES<TV>& particles,ATTRIBUTE_INDEX id,const IT& it)
+{
+    ARRAY_COLLECTION_ELEMENT<U>* c=dynamic_cast<ARRAY_COLLECTION_ELEMENT<U>*>(particles.arrays(id));
+    if(!c) return false;
+    ARRAY_VIEW<U> a(*c->array);
+    Partio::ParticleAttribute pa=parts->addAttribute(get_name(c->name).c_str(),Partio::INT,1);
+    IT k(it);
+    for(int i=0;i<particles.number;i++)
+    {
+        *parts->dataWrite<int>(pa,k.index)=a(i);
+        ++k;
+    }
+    LOG::printf("Wrote attribute %P as int named %P.\n",c->name,get_name(c->name));
+    return true;
+}
+
+template<class U,int d,class TV,class IT>
+bool Try_Write_Matrix(Partio::ParticlesDataMutable* parts,const MPM_PARTICLES<TV>& particles,ATTRIBUTE_INDEX id,const IT& it)
+{
+    ARRAY_COLLECTION_ELEMENT<MATRIX<U,d> >* c=dynamic_cast<ARRAY_COLLECTION_ELEMENT<MATRIX<U,d> >*>(particles.arrays(id));
+    if(!c) return false;
+    ARRAY_VIEW<MATRIX<U,d> > a(*c->array);
+    Partio::ParticleAttribute pa[d];
+    VECTOR<std::string,d> names;
+    for(int i=0;i<d;i++)
+    {
+        names(i)=get_name(c->name+"_"+"xyzabcd"[i]);
+        pa[i]=parts->addAttribute(names(i).c_str(),Partio::VECTOR,d);
+    }
+    IT k(it);
+    for(int i=0;i<particles.number;i++)
+    {
+        MATRIX<U,d> w=a(i);
+        for(int l=0;l<d;l++)
+        {
+            float *v=parts->dataWrite<float>(pa[l],k.index);
+            for(int j=0;j<d;j++) v[j]=w(j,l);
+        }
+        ++k;
+    }
+    LOG::printf("Wrote attribute %P as column vectors of size %P named %P.\n",c->name,d,names);
+    return true;
+}
+
 template<class T,int N>
 void writePartio(const std::string& output_filename,const MPM_PARTICLES<VECTOR<T,N> >& particles,bool dump_valid)
 {
     Partio::ParticlesDataMutable* parts=Partio::create();
-
+    auto it=parts->addParticles(particles.number);
+    for(ATTRIBUTE_INDEX id(0);id<particles.arrays.m;id++)
+    {
+        if(Try_Write_Float<T>(parts,particles,id,it)) continue;
+        if(Try_Write_Int<int>(parts,particles,id,it)) continue;
+        if(Try_Write_Int<bool>(parts,particles,id,it)) continue;
+        if(Try_Write_Vector<T,1>(parts,particles,id,it)) continue;
+        if(Try_Write_Vector<T,2>(parts,particles,id,it)) continue;
+        if(Try_Write_Vector<T,3>(parts,particles,id,it)) continue;
+        if(Try_Write_Matrix<T,1>(parts,particles,id,it)) continue;
+        if(Try_Write_Matrix<T,2>(parts,particles,id,it)) continue;
+        if(Try_Write_Matrix<T,3>(parts,particles,id,it)) continue;
+        LOG::printf("Attribute %P has unsupported type.\n",particles.arrays(id)->name);
+    }
+    Partio::write(output_filename.c_str(),*parts);
+    parts->release();
+/*    
     Partio::ParticleAttribute posH,vH,FxH,FyH,FzH,mH,volH,validH,colorH,prop4rH;
     posH=parts->addAttribute("position",Partio::VECTOR,3);
     vH=parts->addAttribute("v",Partio::VECTOR,3);
@@ -62,9 +169,9 @@ void writePartio(const std::string& output_filename,const MPM_PARTICLES<VECTOR<T
         if(myc) *parts->dataWrite<int>(colorH,idx)=(*myc)(i);
         if(prop4r) (parts->dataWrite<float>(prop4rH,idx))[0]=(*prop4r)(i);
         if(dump_valid) *parts->dataWrite<int>(validH,idx)=particles.valid(i);}
-
     Partio::write(output_filename.c_str(),*parts);
     parts->release();
+*/
 
     LOG::printf("Exported %d particles to %s\n",particles.number,output_filename);
 }
@@ -118,6 +225,8 @@ int main(int argc,char *argv[])
     parse_args.Extra(&output_filename_pattern,"output","Output partio file name. Use format string (e.g. %04d), if converting whole directory");
     parse_args.Parse();
 
+    name_map.Set("X","position");
+    
 #ifdef USE_OPENMP
     omp_set_num_threads(threads);
 #pragma omp parallel
