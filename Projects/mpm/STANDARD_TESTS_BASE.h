@@ -79,7 +79,7 @@ public:
     bool use_cohesion;
     bool use_vc=true;
     std::function<void ()> destroy;
-    std::string sph_rel="2k";
+    std::string sph_rel="1k";
     ARRAY<T> extra_T;
     ARRAY<int> extra_int;
     bool dump_collision_objects;

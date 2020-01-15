@@ -75,7 +75,7 @@ public:
     int write_substeps_level=-1;
     int substeps_delay_frame=-1;
     VIEWER_DIR viewer_dir{"output"};
-    std::string data_directory="../../Public_Data";
+    std::string data_directory="../../../Public_Data";
     std::string test_output_prefix;
     bool use_test_output=false;
     T mass_contour=-1;

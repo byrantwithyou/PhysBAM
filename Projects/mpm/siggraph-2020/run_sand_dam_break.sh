@@ -8,5 +8,5 @@ CMD="../mpm -3d 34 -strong_cfl -sound_cfl -symplectic_euler -max_dt 1 -use_refle
 
 $CMD -o $DIR"_hi_mu" -friction 1 >& /dev/null
 $CMD -o $DIR"_lo_mu" -friction .45 >& /dev/null
-$CMD -o $DIR"_slip" -slip >& /dev/null
-$CMD -o $DIR"_stick" -stick >& /dev/null
+# $CMD -o $DIR"_slip" -slip >& /dev/null
+# $CMD -o $DIR"_stick" -stick >& /dev/null

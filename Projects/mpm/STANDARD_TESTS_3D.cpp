@@ -2352,6 +2352,24 @@ Initialize()
             for(auto&x:particles.X) x=D*x;
             Add_Fixed_Corotated(1e3*unit_p*scale_E,0.3);
         } break;
+        case 76:{ // sphere_bc stick slip zero friciton .3 friciton
+            Set_Grid(RANGE<TV>(TV(),TV(30,20,30))*m,TV_INT(3,2,3));
+            T density=5*unit_rho*scale_mass;
+            TETRAHEDRALIZED_VOLUME<T> tv,tv1;
+            Read_From_File(data_directory+"/Tetrahedralized_Volumes/sphere-uniform-"+sph_rel+".tet.gz",tv);
+            SPHERE<TV> sphere(TV(2,12,15)*m,2*m);
+            T init_vel=(T)foo_T1*m/s;
+            tv1.particles.Add_Elements(tv.particles.X.m);
+            for(int i=0;i<tv.particles.X.m;i++){
+                tv1.particles.X(i)=tv.particles.X(i)*sphere.radius+sphere.center;}
+            tv1.mesh.elements=tv.mesh.elements;
+            tv1.Update_Number_Nodes();
+            auto& o=Seed_Lagrangian_Particles(tv1,[=](const TV& X){return TV(init_vel,0,0);},0,density,false,false);
+            o.Update_Number_Nodes();
+            Add_Fixed_Corotated(o,31.685*unit_p*scale_E,0.44022);
+            Add_Gravity(m/(s*s)*TV(0,-9.8,0));
+            Add_Walls(-1,COLLISION_TYPE::separate,.3,.1*m,false);
+        } break;
 
 
         default: PHYSBAM_FATAL_ERROR("test number not implemented");
