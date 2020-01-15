@@ -1224,6 +1224,9 @@ Reflect_Or_Invalidate_Particle(int p)
             f|=1<<i;
     TV A=example.grid.domain.min_corner;
     TV B=example.grid.domain.max_corner;
+    TV eps=std::numeric_limits<T>::epsilon()*4*(B-A);
+    A+=eps;
+    B-=eps; // avoid being on the edge and rasterizing to a grid cell outside the domain.
     TV& X=example.particles.X(p),&V=example.particles.V(p);
     for(int a=0;a<TV::m;a++){
         if(X(a)<A(a)){
