@@ -187,7 +187,6 @@ Simulate_To_Frame(const int frame)
             Step([=](){Advance_One_Time_Step();},"time-step");
             LOG::cout<<"actual dt: "<<example.dt<<std::endl;
 
-
             // Time step was reduced
             if(example.dt<original_dt){
                 LOG::printf("dt reduced: %g to %g  (%g)\n",original_dt,example.dt,original_dt-example.dt);
@@ -628,6 +627,7 @@ Grid_To_Particle_Limit_Dt() -> T
                     else if((*prop4r)(p)>h.s) (*prop4r)(p)=h.s;}}
             h.s=min(h.s,s_save);
         });
+    if(example.verbose_cfl) LOG::printf("F CFL %P\n",example.dt*s);
     return example.dt*s;
 }
 //#####################################################################

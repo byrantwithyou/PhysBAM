@@ -312,6 +312,22 @@ Initialize()
                 [=](const TV&){return MATRIX<T,3>::Cross_Product_Matrix(angular_velocity2);},density,particles_per_cell);
             Add_Neo_Hookean(1e4*unit_p*scale_E,0.3); //solve({E/(2*(1+r))=11,E*r/((1+r)*(1-2*r))=81},{E,r});
             Add_Walls(-1,COLLISION_TYPE::separate,.3,0,false);
+            auto func=[this]()
+                {
+                    T max_v=0,max_B=0,max_F=0;
+                    for(int p=0;p<particles.V.m;p++)
+                    {
+                        max_v=std::max(max_v,particles.V(p).Magnitude_Squared());
+                        max_B=std::max(max_B,particles.B(p).Frobenius_Norm_Squared());
+                        auto F=particles.F(p);
+                        max_F=std::max(max_F,(F.Transpose_Times(F)-1).Frobenius_Norm_Squared());
+                    }
+                    max_v=sqrt(max_v);
+                    max_B=sqrt(max_B)*(6-order)*grid.one_over_dX.Min();
+                    max_F=sqrt(max_F);
+                    LOG::printf("PLOT %P %P %P %P\n",dt,max_v,max_B,max_F);
+                };
+            Add_Callbacks(false,"time-step",func);
         } break;
         case 12:{ // surface tension test: fixed topology circle shell
             Set_Grid(RANGE<TV>(TV(-1.5,-1.5,-1.5),TV(1.5,1.5,1.5))*m);
