@@ -14,6 +14,8 @@ struct FLUID_BOUNDARY_VECTOR_PB:public FLUID_BOUNDARY_VECTOR<TV>
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
+
+    HASHTABLE<FACE_INDEX<TV::m>,T> V;
  
     FLUID_BOUNDARY_VECTOR_PB()=default;
     virtual ~FLUID_BOUNDARY_VECTOR_PB()=default;
