@@ -73,7 +73,7 @@ Compute_Dt(T time) const -> T
 // Function Simulate_Time_Step
 //#####################################################################
 template<class TV> void SOLID_SOLVER_PB<TV>::
-Simulate_Time_Step(SOLID_BC<TV>* bc,T time,T dt)
+Simulate_Time_Step(SOLID_BOUNDARY_VECTOR<TV>* force,T time,T dt)
 {
     driver->Advance_One_Time_Step(dt);
 }
@@ -223,10 +223,10 @@ Make_Boundary_Vector() const
 }
 
 //#####################################################################
-// Function Fill_Boundary_Vector
+// Function Get_Velocity
 //#####################################################################
 template<class TV> void SOLID_SOLVER_PB<TV>::
-Fill_Boundary_Vector(SOLID_BOUNDARY_VECTOR<TV>* v) const
+Get_Velocity(SOLID_BOUNDARY_VECTOR<TV>* v) const
 {
     SOLID_BOUNDARY_VECTOR_PB<TV>& bv=dynamic_cast<SOLID_BOUNDARY_VECTOR_PB<TV>&>(*v);
     const auto& V=driver->example.solid_body_collection.deformable_body_collection.particles.V;

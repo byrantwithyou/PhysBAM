@@ -230,13 +230,6 @@ template<class TV> void FLUIDS_PARAMETERS_CALLBACKS<TV>::
 Substitute_Coupling_Matrices(KRYLOV_SYSTEM_BASE<T>& coupled_system,T dt,T current_velocity_time,T current_position_time,bool velocity_update,bool leakproof_solve)
 {
 }
-//#####################################################################
-// Function Get_Unified_Boundary_Conditions
-//#####################################################################
-template<class TV> void FLUIDS_PARAMETERS_CALLBACKS<TV>::
-Get_Unified_Boundary_Conditions(BOUNDARY_CONDITION_DOUBLE_FINE<TV>* bc_fine,T time)
-{
-}
 namespace PhysBAM{
 template class FLUIDS_PARAMETERS_CALLBACKS<VECTOR<double,1> >;
 template class FLUIDS_PARAMETERS_CALLBACKS<VECTOR<double,2> >;

@@ -9,7 +9,6 @@
 
 #include <Core/Arrays_Nd/ARRAYS_ND.h>
 #include <Core/Data_Structures/HASHTABLE.h>
-#include <Core/Data_Structures/TRIPLE.h>
 #include <Grid_Tools/Grids/GRID.h>
 #include <Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 namespace PhysBAM{
@@ -30,7 +29,7 @@ public:
     int ghost;
     ARRAY<char,TV_INT> bc_type,bc_type_current;
     HASHTABLE<TV_INT,PAIR<T,int> > bc_p;
-    HASHTABLE<FACE_INDEX<TV::m>,TRIPLE<T,int,bool> > bc_u;
+    HASHTABLE<FACE_INDEX<TV::m>,PAIR<T,int> > bc_u;
 
     // Sufficient data to solve BC data extending out ghost cells.
     BOUNDARY_CONDITION_DOUBLE_FINE(const GRID<TV>& mac_grid,int ghost);
@@ -40,12 +39,18 @@ public:
 
     void Reset(char type);
 
-    void Set(const IMPLICIT_OBJECT<TV>* io,char type,std::function<T(const TV& X,int a)> f=0,bool thin=false,bool invert=false,T contour=0);
-    void Set(const T_SURFACE& surface,char type,std::function<T(const TV& X,int a)> f=0,bool thin=false);
-    void Set(T_OBJECT& object,char type,std::function<T(const TV& X,int a)> f=0,bool thin=false);
-    void Set_Domain_Walls(int side_mask,char type,std::function<T(const TV& X,int a)> f=0);
-
-    void Set_Current_Values(const RANGE<TV_INT>& domain,char type,std::function<T(const TV_INT& i0,const TV_INT& i1,int a)> f,bool thin);
+    struct CB_DATA
+    {
+        FACE_INDEX<TV::m> face;
+        TV_INT cell;
+        TV X;
+        int e;
+    };
+    
+    void Set(const IMPLICIT_OBJECT<TV>* io,char type,std::function<T(const CB_DATA& data)> f=0,bool thin=false,bool invert=false,T contour=0);
+    void Set(const T_SURFACE& surface,char type,std::function<T(const CB_DATA& data)> f=0,bool thin=false);
+    void Set(T_OBJECT& object,char type,std::function<T(const CB_DATA& data)> f=0,bool thin=false);
+    void Set_Domain_Walls(int side_mask,char type,std::function<T(const CB_DATA& data)> f=0);
 
     void Get_Pressure_Boundary_Conditions(ARRAY<bool,TV_INT>& psi_D,
         ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,ARRAY<T,TV_INT>& p,

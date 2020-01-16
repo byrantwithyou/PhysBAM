@@ -24,7 +24,7 @@ public:
     virtual void Write(int frame) const=0;
     virtual void Read(int frame)=0;
     virtual T Compute_Dt(T time) const=0;
-    virtual void Simulate_Time_Step(SOLID_BC<TV>* bc,T time,T dt)=0;
+    virtual void Simulate_Time_Step(SOLID_BOUNDARY_VECTOR<TV>* force,T time,T dt)=0;
     virtual void Before_Time_Step(T time)=0;
     virtual void After_Time_Step(T time,T dt)=0;
     virtual void Before_Frame(int frame)=0;
@@ -38,7 +38,7 @@ public:
     virtual T Diff_x(const SOLID_STATE<TV>* solid_state) const=0;
     virtual T Diff_v(const SOLID_STATE<TV>* solid_state) const=0;
 
-    virtual void Fill_Boundary_Vector(SOLID_BOUNDARY_VECTOR<TV>* v) const=0;
+    virtual void Get_Velocity(SOLID_BOUNDARY_VECTOR<TV>* v) const=0;
     virtual void Apply_Velocity_Change(T c,const SOLID_BOUNDARY_VECTOR<TV>* v) const=0;
     virtual T Inner_Product(const SOLID_BOUNDARY_VECTOR<TV>* u, const SOLID_BOUNDARY_VECTOR<TV>* v)=0;
     virtual void Mass_Inverse(SOLID_BOUNDARY_VECTOR<TV>* u, const SOLID_BOUNDARY_VECTOR<TV>* v)=0;

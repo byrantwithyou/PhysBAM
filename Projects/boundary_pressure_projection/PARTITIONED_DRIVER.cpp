@@ -121,19 +121,35 @@ Simulate_Time_Step(T dt)
     solid_solver->Save(solid_old_state);
     fluid_solver->Save(fluid_old_state);
 
+    SOLID_BOUNDARY_VECTOR<TV>* solid_vector=solid_solver->Make_Boundary_Vector();
+    FLUID_BOUNDARY_VECTOR<TV>* fluid_vector=fluid_solver->Make_Boundary_Vector();
+
+    interface->Compute_Coupling_Weights(solid_solver,fluid_solver,time,dt);
+    interface->Get_Boundary(solid_vector);
+    interface->Get_Boundary(fluid_vector);
+
     fluid_solver->Predict_Time_Step(time,dt);
 
+    
     for(int i=0;i<max_subiterations;i++)
     {
-        interface->Compute_BC(fluid_solver,solid_bc,time,dt);
+//        interface->Compute_BC(fluid_solver,solid_bc,time,dt);
+        fluid_solver->Get_Force(fluid_vector);
+        interface->Distribute_Force(solid_vector,fluid_vector);
         solid_solver->Restore(solid_old_state);
-        solid_solver->Simulate_Time_Step(solid_bc,time,dt);
+        solid_solver->Simulate_Time_Step(solid_vector,time,dt);
+
+        interface->Compute_Coupling_Weights(solid_solver,fluid_solver,time,dt);
+        interface->Get_Boundary(solid_vector);
+        interface->Get_Boundary(fluid_vector);
 
         if(use_bpp) BPP_Projection(dt); // NOTE: this chanages solid velocity
 
-        interface->Compute_BC(solid_solver,fluid_bc,time,dt);
+//        interface->Compute_BC(solid_solver,fluid_bc,time,dt);
+        solid_solver->Get_Velocity(solid_vector);
+        interface->Interpolate_Velocity(fluid_vector,solid_vector);
         fluid_solver->Restore(fluid_old_state);
-        fluid_solver->Simulate_Time_Step(fluid_bc,time,dt);
+        fluid_solver->Simulate_Time_Step(fluid_vector,time,dt);
 
         // Must wait for two states to be available to compute convergence
         if(i>0 && Is_Subiteration_Converged())
@@ -157,7 +173,7 @@ BPP_Projection(T dt)
 
     SOLID_BOUNDARY_VECTOR<TV>* solid_velocity=solid_solver->Make_Boundary_Vector();
     interface->Get_Boundary(solid_velocity);
-    solid_solver->Fill_Boundary_Vector(solid_velocity);
+    solid_solver->Get_Velocity(solid_velocity);
 
     ARRAY<SOLID_BOUNDARY_VECTOR<TV>*> Cs(C.m);
     ARRAY<SOLID_BOUNDARY_VECTOR<TV>*> Mi_Cs(C.m);

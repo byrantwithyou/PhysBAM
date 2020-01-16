@@ -24,7 +24,7 @@ public:
     virtual void Write(int frame) const=0;
     virtual void Read(int frame)=0;
     virtual T Compute_Dt(T time) const=0;
-    virtual void Simulate_Time_Step(FLUID_BC<TV>* bc,T time,T dt)=0;
+    virtual void Simulate_Time_Step(FLUID_BOUNDARY_VECTOR<TV>* velocity,T time,T dt)=0;
     virtual void Predict_Time_Step(T time,T dt)=0;
     virtual void Before_Time_Step(T time)=0;
     virtual void After_Time_Step(T time,T dt)=0;
@@ -40,6 +40,7 @@ public:
     virtual T Diff_p(const FLUID_STATE<TV>* fluid_state) const=0;
 
     virtual void Get_Constraints(ARRAY<FLUID_BOUNDARY_VECTOR<TV>*>& array) const=0;
+    virtual void Get_Force(FLUID_BOUNDARY_VECTOR<TV>* force) const=0;
 };
 }
 #endif

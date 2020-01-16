@@ -26,7 +26,7 @@ public:
     virtual void Write(int frame) const override;
     virtual void Read(int frame) override;
     virtual T Compute_Dt(T time) const override;
-    virtual void Simulate_Time_Step(SOLID_BC<TV>* bc,T time,T dt) override;
+    virtual void Simulate_Time_Step(SOLID_BOUNDARY_VECTOR<TV>* force,T time,T dt) override;
     virtual void Before_Time_Step(T time) override;
     virtual void After_Time_Step(T time,T dt) override;
     virtual void Before_Frame(int frame) override;
@@ -40,7 +40,7 @@ public:
     virtual T Diff_x(const SOLID_STATE<TV>* solid_state) const override;
     virtual T Diff_v(const SOLID_STATE<TV>* solid_state) const override;
 
-    virtual void Fill_Boundary_Vector(SOLID_BOUNDARY_VECTOR<TV>* v) const override;
+    virtual void Get_Velocity(SOLID_BOUNDARY_VECTOR<TV>* v) const override;
     virtual void Apply_Velocity_Change(T c,const SOLID_BOUNDARY_VECTOR<TV>* v) const override;
     virtual T Inner_Product(const SOLID_BOUNDARY_VECTOR<TV>* u, const SOLID_BOUNDARY_VECTOR<TV>* v) override;
     virtual void Mass_Inverse(SOLID_BOUNDARY_VECTOR<TV>* u, const SOLID_BOUNDARY_VECTOR<TV>* v) override;

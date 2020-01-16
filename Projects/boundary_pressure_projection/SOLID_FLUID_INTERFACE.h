@@ -29,7 +29,8 @@ public:
     virtual void Interpolate_Velocity(FLUID_BOUNDARY_VECTOR<TV>* u, const SOLID_BOUNDARY_VECTOR<TV>* v)=0; // Times W
     virtual void Distribute_Force(SOLID_BOUNDARY_VECTOR<TV>* v, const FLUID_BOUNDARY_VECTOR<TV>* u)=0; // Times W^T
     virtual void Get_Boundary(SOLID_BOUNDARY_VECTOR<TV>* v)=0;
-    virtual void Compute_Coupling_Weights(const SOLID_SOLVER<TV>* solid_solver,const FLUID_SOLVER<TV>* fluid_solver)=0;
+    virtual void Get_Boundary(FLUID_BOUNDARY_VECTOR<TV>* v)=0;
+    virtual void Compute_Coupling_Weights(const SOLID_SOLVER<TV>* solid_solver,const FLUID_SOLVER<TV>* fluid_solver,T time,T dt)=0;
 };
 }
 #endif

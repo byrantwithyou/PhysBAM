@@ -31,6 +31,8 @@ public:
     FLUIDS_PARAMETERS_CALLBACKS() = default;
     virtual ~FLUIDS_PARAMETERS_CALLBACKS() = default;
 
+    std::function<void(BOUNDARY_CONDITION_DOUBLE_FINE<TV>* bc_fine,const T time)> get_unified_boundary_conditions;
+
 //#####################################################################
     virtual void Initialize_Phi();
     virtual void Get_Source_Velocities(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,ARRAY<bool,FACE_INDEX<TV::m> >& psi_N,const T time);
@@ -61,7 +63,6 @@ public:
     virtual void Initialize_Fluids_Grids();
     virtual void Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time);
     virtual void Substitute_Coupling_Matrices(KRYLOV_SYSTEM_BASE<T>& coupled_system,T dt,T current_velocity_time,T current_position_time,bool velocity_update,bool leakproof_solve);
-    virtual void Get_Unified_Boundary_Conditions(BOUNDARY_CONDITION_DOUBLE_FINE<TV>* bc_fine,const T time);
 //#####################################################################
 };
 }

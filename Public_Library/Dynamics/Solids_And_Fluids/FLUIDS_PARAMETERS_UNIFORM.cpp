@@ -362,13 +362,9 @@ Get_Unified_Boundary_Conditions(LAPLACE_UNIFORM<TV>* elliptic_solver,
         POISSON_COLLIDABLE_UNIFORM<TV>* poisson=incompressible->projection.poisson_collidable;
         if(poisson) poisson->beta_face.Fill(1/density);}
 
-    // for(int axis=0;axis<TV::m;axis++)
-    //     for(int axis_side=0;axis_side<2;axis_side++){
-    //         char bc_type=domain_walls(axis)(axis_side)?bc_fine->bc_slip:bc_fine->bc_free;
-    //         int side=2*axis+axis_side;
-    //         bc_fine->Set_Domain_Walls(1<<side,bc_type,0);}
-
-    callbacks->Get_Unified_Boundary_Conditions(bc_fine,time);
+    bc_fine->Reset(0);
+    if(callbacks->get_unified_boundary_conditions)
+        callbacks->get_unified_boundary_conditions(bc_fine,time);
     bc_fine->Get_Pressure_Boundary_Conditions(elliptic_solver->psi_D,elliptic_solver->psi_N,elliptic_solver->u,face_velocities);
 }
 //#####################################################################

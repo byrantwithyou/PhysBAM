@@ -87,6 +87,15 @@ public:
         fluids_parameters.Use_Unified_Boundary_Conditions();
         io=Make_IO(circle);
         sc=TESSELLATION::Tessellate_Boundary(circle,sc_n);
+
+        this->get_unified_boundary_conditions=[this](BOUNDARY_CONDITION_DOUBLE_FINE<TV>* bc_fine,const T time)
+            {
+                if(use_sc) bc_fine->Set(*sc,bc_fine->bc_noslip,[](const auto& data){Add_Debug_Particle(data.X,VECTOR<T,3>(1,0,0));return 0;});
+                else bc_fine->Set(io,bc_fine->bc_noslip,0);
+                bc_fine->Set_Domain_Walls(1,bc_fine->bc_noslip,[](const auto& data){return TV(1,0)(data.face.axis);});
+                bc_fine->Set_Domain_Walls(2,bc_fine->bc_free,0);
+                bc_fine->Set_Domain_Walls(12,bc_fine->bc_slip,0);
+            };
     }
     
     ~FLOW_PAST_CIRCLE()
@@ -105,17 +114,6 @@ void Initialize_Bodies() override
     rigid_body.is_static=true;
     fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(solid_body_collection.rigid_body_collection);
     fluids_parameters.incompressible_iterations=1000;
-}
-//#####################################################################
-// Function Get_Unified_Boundary_Conditions
-//#####################################################################
-void Get_Unified_Boundary_Conditions(BOUNDARY_CONDITION_DOUBLE_FINE<TV>* bc_fine,const T time)
-{
-    if(use_sc) bc_fine->Set(*sc,bc_fine->bc_noslip,[](const TV& X,int a){Add_Debug_Particle(X,VECTOR<T,3>(1,0,0));return 0;});
-    else bc_fine->Set(io,bc_fine->bc_noslip,0);
-    bc_fine->Set_Domain_Walls(1,bc_fine->bc_noslip,[](const TV& X,int a){return TV(1,0)(a);});
-    bc_fine->Set_Domain_Walls(2,bc_fine->bc_free,0);
-    bc_fine->Set_Domain_Walls(12,bc_fine->bc_slip,0);
 }
 //#####################################################################
 // Function Construct_Levelsets_For_Objects

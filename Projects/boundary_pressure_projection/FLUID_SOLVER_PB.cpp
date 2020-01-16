@@ -2,11 +2,13 @@
 // Copyright 2019, Craig Schroeder, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <Geometry/Projection/BOUNDARY_CONDITION_DOUBLE_FINE.h>
 #include <Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
 #include <Fluids/Fluids/FLUID_COLLECTION.h>
 #include <Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS.h>
 #include <Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
 #include "FLUID_BC_PB.h"
+#include "FLUID_BOUNDARY_VECTOR_PB.h"
 #include "FLUID_SOLVER_PB.h"
 #include "FLUID_STATE_PB.h"
 namespace PhysBAM{
@@ -34,6 +36,7 @@ template<class TV> void FLUID_SOLVER_PB<TV>::
 Initialize()
 {
     driver->Initialize();
+    auto old_cb=driver->example.get_unified_boundary_conditions;
 }
 
 //#####################################################################
@@ -66,9 +69,35 @@ Compute_Dt(T time) const -> T
 // Function Simulate_Time_Step
 //#####################################################################
 template<class TV> void FLUID_SOLVER_PB<TV>::
-Simulate_Time_Step(FLUID_BC<TV>* bc,T time,T dt)
+Simulate_Time_Step(FLUID_BOUNDARY_VECTOR<TV>* velocity,T time,T dt)
 {
+    auto* bc_v=dynamic_cast<FLUID_BOUNDARY_VECTOR_PB<TV>*>(velocity);
+    auto* bc_fine=driver->example.fluids_parameters.bc_fine;
+
+    ARRAY<char,TV_INT> bc_type,bc_type_current;
+    HASHTABLE<TV_INT,PAIR<T,int> > bc_p;
+    HASHTABLE<FACE_INDEX<TV::m>,PAIR<T,int> > bc_u;
+
+    T bc_v_value=0;
+    for(auto& h:bc_fine->bc_u)
+        if(bc_v->V.Get(h.key,bc_v_value))
+            h.data={bc_v_value,1};
+            
+    bc_type.Exchange(bc_fine->bc_type);
+    bc_type_current.Exchange(bc_fine->bc_type_current);
+    bc_p.Exchange(bc_fine->bc_p);
+    bc_u.Exchange(bc_fine->bc_u);
+    auto old_cb=driver->example.get_unified_boundary_conditions;
+    driver->example.get_unified_boundary_conditions=
+        [&,this](BOUNDARY_CONDITION_DOUBLE_FINE<TV>* bc_fine,const T time)
+        {
+            bc_type.Exchange(bc_fine->bc_type);
+            bc_type_current.Exchange(bc_fine->bc_type_current);
+            bc_p.Exchange(bc_fine->bc_p);
+            bc_u.Exchange(bc_fine->bc_u);
+        };
     driver->Advance_One_Time_Step(dt);
+    driver->example.get_unified_boundary_conditions=old_cb;
 }
 
 //#####################################################################
@@ -185,7 +214,15 @@ Get_Constraints(ARRAY<FLUID_BOUNDARY_VECTOR<TV>*>& array) const
 template<class TV> FLUID_BOUNDARY_VECTOR<TV>* FLUID_SOLVER_PB<TV>::
 Make_Boundary_Vector() const
 {
-    return 0;
+    return new FLUID_BOUNDARY_VECTOR_PB<TV>;
+}
+
+//#####################################################################
+// Function Get_Force
+//#####################################################################
+template<class TV> void FLUID_SOLVER_PB<TV>::
+Get_Force(FLUID_BOUNDARY_VECTOR<TV>* force) const
+{
 }
 
 template class FLUID_SOLVER_PB<VECTOR<float,2> >;

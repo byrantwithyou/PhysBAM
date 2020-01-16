@@ -4,7 +4,6 @@
 //#####################################################################
 #include <Core/Data_Structures/HASHTABLE.h>
 #include <Core/Data_Structures/PAIR.h>
-#include <Core/Data_Structures/TRIPLE.h>
 #include <Core/Math_Tools/int_div.h>
 #include <Grid_Tools/Arrays/FACE_ARRAYS.h>
 #include <Grid_Tools/Grids/FACE_ITERATOR.h>
@@ -47,11 +46,18 @@ inline void set_bc(auto& bc_type,auto& bc_type_current,const auto& i,char type)
     char& c=bc_type(i);
     if(c>=bc_free || type==bc_noslip) c=type;
 }
+template<int d> inline PAIR<FACE_INDEX<d>,bool> Node_To_Face(VECTOR<int,d> p)
+{
+    int a=0;
+    for(int k=0;k<d;k++) a+=((p(k)&1)^1)*k;
+    if(d==3 && a==d) return {{},false};
+    return {{a,fdiv(p,2)},true};
+}
 //#####################################################################
 // Function Set
 //#####################################################################
 template<class TV> void BOUNDARY_CONDITION_DOUBLE_FINE<TV>::
-Set(const IMPLICIT_OBJECT<TV>* io,char type,std::function<T(const TV& X,int a)> f,bool thin,bool invert,T contour)
+Set(const IMPLICIT_OBJECT<TV>* io,char type,std::function<T(const CB_DATA& data)> f,bool thin,bool invert,T contour)
 {
     PHYSBAM_ASSERT(!thin || type==bc_noslip || type==bc_slip);
     RANGE<TV_INT> domain=bc_type.domain;
@@ -63,32 +69,50 @@ Set(const IMPLICIT_OBJECT<TV>* io,char type,std::function<T(const TV& X,int a)> 
         if(phi>0) bc_type_current(it.index)=0;
         else set_bc(bc_type,bc_type_current,it.index,type);
     }
-    if(f)
-        Set_Current_Values(domain,type,
-            [this,io,contour,&f](const TV_INT& i0,const TV_INT& i1,int a)
+
+    for(int axis=0;axis<TV::m;axis++)
+    {
+        int mn=bc_noslip?0:axis;
+        int mx=bc_noslip?TV::m-1:axis;
+        for(int a=mn;a<=mx;a++)
+        {
+            TV_INT off=TV_INT().Add_Axis(axis,1).Add_Axis(a,1);
+            RANGE<TV_INT> range(cdiv(bc_type.domain.min_corner-1+off,2),fdiv(bc_type.domain.max_corner-off,2));
+            for(FACE_RANGE_ITERATOR<TV::m> it(range,RF::none,axis);it.Valid();it.Next())
             {
+                TV_INT i=(it.face.index*2+1).Add_Axis(it.face.axis,-1);
+                TV_INT i0=i.Add_Axis(a,-1),i1=i.Add_Axis(a,1);
+                char t0=bc_type_current(i0),t1=bc_type_current(i1);
+                if(t0>=0 && t1>=0) continue;
+                if(t0==type && t1==type) continue;
                 TV X0=grid.Node(i0),X1=grid.Node(i1);
                 T phi0=io->Extended_Phi(grid.Node(i0))-contour;
                 T phi1=io->Extended_Phi(grid.Node(i1))-contour;
                 T t=phi0/(phi0-phi1);
-                TV Z=X0+(X1-X0)*t;
-                return f(Z,a);
-            },thin);
-    else Set_Current_Values(domain,type,0,thin);
-}
-template<int d> inline PAIR<FACE_INDEX<d>,bool> Node_To_Face(VECTOR<int,d> p)
-{
-    int a=0;
-    for(int k=0;k<d;k++) a+=((p(k)&1)^1)*k;
-    if(d==3 && a==d) return {{},false};
-    return {{a,fdiv(p,2)},true};
+                CB_DATA data={it.face,it.face.Cell_Index(t0>=0),X0+(X1-X0)*t};
+                T x=f?f(data):0;
+                if(type==bc_free)
+                {
+                    auto& z=bc_p.Get_Or_Insert(data.cell);
+                    z.x+=x;
+                    z.y++;
+                }
+                else
+                {
+                    auto& z=bc_u.Get_Or_Insert(it.face);
+                    z.x+=x;
+                    z.y++;
+                }
+            }
+        }
+    }
 }
 
 //#####################################################################
 // Function Set
 //#####################################################################
 template<class TV> void BOUNDARY_CONDITION_DOUBLE_FINE<TV>::
-Set(const T_SURFACE& surface,char type,std::function<T(const TV& X,int a)> f,bool thin)
+Set(const T_SURFACE& surface,char type,std::function<T(const CB_DATA& data)> f,bool thin)
 {
     PHYSBAM_ASSERT(!thin || type==bc_noslip || type==bc_slip);
 
@@ -125,32 +149,29 @@ Set(const T_SURFACE& surface,char type,std::function<T(const TV& X,int a)> f,boo
             T y=0;
             auto face_p=Node_To_Face(i[0].Add_Axis(h.key.axis,1));
             if(!face_p.y) continue;
+            CB_DATA data={face_p.x,face_p.x.Cell_Index(h.data.in[0]),TV()};
 
             if(f)
             {
                 for(const auto& t:h.data.cut_elements)
                 {
-                    TV Z=X0+(X1-X0)*t.y;
-                    y+=f(Z,face_p.x.axis);
+                    data.X=X0+(X1-X0)*t.y;
+                    data.e=t.x;
+                    y+=f(data);
                 }
                 y/=h.data.cut_elements.m;
             }
             if(type==bc_free)
             {
-                for(int j=0;j<2;j++)
-                    if(!h.data.in[j])
-                    {
-                        auto& z=bc_p.Get_Or_Insert(i[j]);
-                        z.x+=y;
-                        z.y++;
-                    }
+                auto& z=bc_p.Get_Or_Insert(data.cell);
+                z.x+=y;
+                z.y++;
             }
             else
             {
                 auto& z=bc_u.Get_Or_Insert(face_p.x);
                 z.x+=y;
                 z.y++;
-                if(thin) z.z=true;
             }
         }
     }
@@ -159,7 +180,7 @@ Set(const T_SURFACE& surface,char type,std::function<T(const TV& X,int a)> f,boo
 // Function Set
 //#####################################################################
 template<class TV> void BOUNDARY_CONDITION_DOUBLE_FINE<TV>::
-Set(T_OBJECT& object,char type,std::function<T(const TV& X,int a)> f,bool thin)
+Set(T_OBJECT& object,char type,std::function<T(const CB_DATA& data)> f,bool thin)
 {
     return Set(object.Get_Boundary_Object(),type,f,thin);
 }
@@ -167,7 +188,7 @@ Set(T_OBJECT& object,char type,std::function<T(const TV& X,int a)> f,bool thin)
 // Function Set_Domain_Walls
 //#####################################################################
 template<class TV> void BOUNDARY_CONDITION_DOUBLE_FINE<TV>::
-Set_Domain_Walls(int side_mask,char type,std::function<T(const TV& X,int a)> f)
+Set_Domain_Walls(int side_mask,char type,std::function<T(const CB_DATA& data)> f)
 {
     for(RANGE_ITERATOR<TV::m> it(bc_type.domain,grid.Node_Indices(),RI::side_mask|RI::ghost,side_mask);it.Valid();it.Next())
     {
@@ -178,8 +199,9 @@ Set_Domain_Walls(int side_mask,char type,std::function<T(const TV& X,int a)> f)
     {
         for(FACE_RANGE_ITERATOR<TV::m> it(mac_grid.Domain_Indices(),0,0,RF::side_mask|RF::ghost,side_mask);it.Valid();it.Next())
         {
-            auto& z=bc_p.Get_Or_Insert(it.face.Cell_Index(it.side%2));
-            if(f) z.x+=f(mac_grid.Face(it.face),0);
+            CB_DATA data={it.face,it.face.Cell_Index(it.side%2),mac_grid.Face(it.face)};
+            auto& z=bc_p.Get_Or_Insert(data.cell);
+            if(f) z.x+=f(data);
             z.y++;
         }
     }
@@ -190,47 +212,10 @@ Set_Domain_Walls(int side_mask,char type,std::function<T(const TV& X,int a)> f)
         if(ns) flags|=RF::skip_outer;
         for(FACE_RANGE_ITERATOR<TV::m> it(mac_grid.Domain_Indices(),ns,0,flags,side_mask);it.Valid();it.Next())
         {
+            CB_DATA data={it.face,TV_INT(),mac_grid.Face(it.face)};
             auto& z=bc_u.Get_Or_Insert(it.face);
-            if(f) z.x+=f(mac_grid.Face(it.face),it.face.axis);
+            if(f) z.x+=f(data);
             z.y++;
-        }
-    }
-}
-//#####################################################################
-// Function Set_Current_Values
-//#####################################################################
-template<class TV> void BOUNDARY_CONDITION_DOUBLE_FINE<TV>::
-Set_Current_Values(const RANGE<TV_INT>& domain,char type,std::function<T(const TV_INT& i0,const TV_INT& i1,int a)> f,bool thin)
-{
-    for(int axis=0;axis<TV::m;axis++)
-    {
-        int mn=bc_noslip?0:axis;
-        int mx=bc_noslip?TV::m-1:axis;
-        for(int a=mn;a<=mx;a++)
-        {
-            TV_INT off=TV_INT().Add_Axis(axis,1).Add_Axis(a,1);
-            RANGE<TV_INT> range(cdiv(bc_type.domain.min_corner-1+off,2),fdiv(bc_type.domain.max_corner-off,2));
-            for(FACE_RANGE_ITERATOR<TV::m> it(range,RF::none,axis);it.Valid();it.Next())
-            {
-                TV_INT i=(it.face.index*2+1).Add_Axis(it.face.axis,-1);
-                TV_INT i0=i.Add_Axis(a,-1),i1=i.Add_Axis(a,1);
-                char t0=bc_type_current(i0),t1=bc_type_current(i1);
-                if(t0>=0 && t1>=0) continue;
-                if(t0==type && t1==type) continue;
-                if(type==bc_free)
-                {
-                    auto& z=bc_p.Get_Or_Insert(it.face.Cell_Index(t0>=0));
-                    if(f) z.x+=f(i0,i1,it.face.axis);
-                    z.y++;
-                }
-                else
-                {
-                    auto& z=bc_u.Get_Or_Insert(it.face);
-                    if(f) z.x+=f(i0,i1,0);
-                    z.y++;
-                    z.z=thin;
-                }
-            }
         }
     }
 }
@@ -271,9 +256,8 @@ Get_Pressure_Boundary_Conditions(ARRAY<bool,TV_INT>& psi_D,
                 else
                 {
                     FACE_INDEX<TV::m> face(a,it.index.Add_Axis(a,s));
-                    TRIPLE<T,int,bool> z;
-                    if(bc_u.Get(face,z))
-                        u(face)=z.x/z.y;
+                    PAIR<T,int> z;
+                    if(bc_u.Get(face,z)) u(face)=z.x/z.y;
                     else u(face)=0;
                     psi_N(face)=true;
                 }
@@ -281,11 +265,10 @@ Get_Pressure_Boundary_Conditions(ARRAY<bool,TV_INT>& psi_D,
         }
     }
     for(auto z:bc_u)
-        if(z.data.z)
-        {
-            psi_N(z.key)=true;
-            u(z.key)=z.data.x/z.data.y;
-        }
+    {
+        psi_N(z.key)=true;
+        u(z.key)=z.data.x/z.data.y;
+    }
 }
 //#####################################################################
 // Function Get_Viscosity_Boundary_Conditions
@@ -315,18 +298,17 @@ Get_Viscosity_Boundary_Conditions(ARRAY<bool,TV_INT>& psi_D,
             else
             {
                 psi_D(it.index)=true;
-                TRIPLE<T,int,bool> z;
+                PAIR<T,int> z;
                 if(bc_u.Get({axis,it.index},z))
                     u(it.index)=z.x/z.y;
             }
         }
     }
     for(auto z:bc_u)
-        if(z.data.z)
-        {
-            psi_D(z.key.index)=true;
-            u(z.key.index)=z.data.x/z.data.y;
-        }
+    {
+        psi_D(z.key.index)=true;
+        u(z.key.index)=z.data.x/z.data.y;
+    }
 }
 template class BOUNDARY_CONDITION_DOUBLE_FINE<VECTOR<float,1> >;
 template class BOUNDARY_CONDITION_DOUBLE_FINE<VECTOR<float,2> >;
