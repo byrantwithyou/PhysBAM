@@ -67,6 +67,7 @@ STANDARD_TESTS_BASE(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
     parse_args.Add("-threads",&threads,"threads","Number of threads");
     parse_args.Add("-sph",&sph_rel,"sphere resolution","Sphere Resolution");
     parse_args.Add("-o",&viewer_dir.output_directory,&override_output_directory,"dir","Output directory");
+    parse_args.Add("-d",&this->data_directory,"dir","data directory");
     parse_args.Add("-mass_contour",&mass_contour,"contour","Draw mass contour as a scale to particle average mass");
     parse_args.Add("-framerate",&framerate,"rate","Number of frames per second");
     parse_args.Add("-frame_dt",&frame_dt,"rate","Number of frames per second");
