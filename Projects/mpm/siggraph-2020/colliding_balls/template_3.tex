@@ -1,0 +1,47 @@
+\documentclass[tikz]{standalone}
+\usepackage{pgfplotstable}
+\usepackage{pgfplots}
+\setlength{\fboxrule}{0pt}
+\pgfplotsset{compat=1.16}
+\begin{document}%
+\begin{tikzpicture}[every node/.style={inner sep=0,outer sep=0}]
+  \node[above,right] at (0,0){\includegraphics[width=1280px]{XXXX}};
+  \begin{scope}[shift={(4.5,5.8)},scale={2}]
+    \begin{axis}
+      [
+      x=30,
+      y=8,
+      xlabel=ABC,
+%      ylabel=DEF,
+      no markers,
+      xmin=0,
+      xmax=9,
+      ymin=-6,
+      ymax=6,
+      legend style={fill=none},
+      legend style={draw=none},
+      legend style={legend columns=-1},
+      legend style={column sep=1ex},
+      yticklabels={,,},
+      xticklabels={,,},
+      x label style={at={(axis description cs:0.5,-0.08)},anchor=south},
+      y label style={at={(axis description cs:-0.04,0.5)},anchor=west},
+      ]
+      \addplot table [x expr={\thisrow{time}}, y expr={min(6,max(-6,6+log10(\thisrow{best_min_dt})))}]{DATA}; \addlegendentry{$\Delta t$}
+      \addplot table [x expr={\thisrow{time}}, y expr={min(6,max(-6,log10(\thisrow{best_max_v})))}]{DATA}; \addlegendentry{$\|\mathbf{v}_p\|$}
+      \addplot table [x expr={\thisrow{time}}, y expr={min(6,max(-6,log10(\thisrow{best_max_c})))}]{DATA}; \addlegendentry{$\Delta x \|\mathbf{C}_p\|_F$}
+      \addplot table [x expr={\thisrow{time}}, y expr={min(6,max(-6,log10(\thisrow{best_max_f})))}]{DATA}; \addlegendentry{$\|\mathbf{F}^T\mathbf{F}-\mathbf{I}\|_F$}
+    \end{axis}
+  \end{scope}
+  \draw[fill=blue] (0.3,5.8) rectangle (1.3,DTV);
+  \draw[fill=blue] (1.7,5.8) rectangle (2.7,DTF);
+  \draw[fill=blue] (3.1,5.8) rectangle (4.1,DTC);
+  \node[below] at (0.8,5.5) {\scalebox{2}{$\Delta t_v$}};
+  \node[below] at (2.2,5.5) {\scalebox{2}{$\Delta t_F$}};
+  \node[below] at (3.6,5.5) {\scalebox{2}{$\Delta t_c$}};
+\end{tikzpicture}%
+\end{document}
+%time best_cfl_v best_cfl_f best_cfl_c best_max_v best_max_c best_max_f best_min_dt
+
+% 0 -> 9.1
+% 5 -> 12.0

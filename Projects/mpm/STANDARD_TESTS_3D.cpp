@@ -318,7 +318,7 @@ Initialize()
                     for(int p=0;p<particles.V.m;p++)
                     {
                         max_v=std::max(max_v,particles.V(p).Magnitude_Squared());
-                        max_B=std::max(max_B,particles.B(p).Frobenius_Norm_Squared());
+                        if(particles.B.m) max_B=std::max(max_B,particles.B(p).Frobenius_Norm_Squared());
                         auto F=particles.F(p);
                         max_F=std::max(max_F,(F.Transpose_Times(F)-1).Frobenius_Norm_Squared());
                     }
