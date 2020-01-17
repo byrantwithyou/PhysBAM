@@ -1101,8 +1101,8 @@ Initialize()
             TV gravity(0,-1.8*m/(s*s),0);
             T density=100*unit_rho*scale_mass;
             this->no_mu=true;
-            Add_Source(TV(.1,.7,.5)*m,TV(1,0,0),(T).15*m,init_vel,gravity,density,E,nu,0,5);
-            Add_Source(TV(.9,.7,.5)*m,TV(-1,0,0),(T).15*m,init_vel,gravity,density,E,nu,0,5);
+            Add_Source(TV(.1,.85-foo_T1,.5)*m,TV(1,0,0),foo_T1*m,init_vel,gravity,density,E,nu,0,5);
+            Add_Source(TV(.9,.85-foo_T1,.5)*m,TV(-1,0,0),foo_T1*m,init_vel,gravity,density,E,nu,0,5);
             Add_Gravity(gravity);
             Add_Fixed_Corotated(E,nu);
             Add_Walls(-1,COLLISION_TYPE::slip,.3,.025*m,false);
