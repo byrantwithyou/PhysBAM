@@ -51,6 +51,8 @@ private:
     SOLID_STATE<TV> * solid_prev_state = 0;
     FLUID_BC<TV> * fluid_bc = 0;
     SOLID_BC<TV> * solid_bc = 0;
+    FLUID_REGIONS<TV> * old_regions = 0;
+    FLUID_REGIONS<TV> * new_regions = 0;
 
     ARRAY<T> p0;
     

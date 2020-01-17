@@ -22,6 +22,8 @@ public:
 
     SOLIDS_FLUIDS_DRIVER_UNIFORM<TV>* driver = 0;
 
+    mutable ARRAY<int,TV_INT> last_colors;
+
     FLUID_SOLVER_PB();
     virtual ~FLUID_SOLVER_PB();
 
@@ -39,13 +41,18 @@ public:
     virtual FLUID_STATE<TV>* Make_State() const override;
     virtual FLUID_BC<TV>* Make_BC() const override;
     virtual FLUID_BOUNDARY_VECTOR<TV>* Make_Boundary_Vector() const override;
+    virtual FLUID_REGIONS<TV>* Make_Regions() const override;
 
     virtual void Save(FLUID_STATE<TV>* fluid_state) const override;
     virtual void Restore(const FLUID_STATE<TV>* fluid_state) override;
     virtual T Diff_u(const FLUID_STATE<TV>* fluid_state) const override;
     virtual T Diff_p(const FLUID_STATE<TV>* fluid_state) const override;
 
-    virtual void Get_Constraints(ARRAY<FLUID_BOUNDARY_VECTOR<TV>*>& array) const override;
+    virtual void Get_Constraints(const SOLID_FLUID_INTERFACE<TV>* interface,
+        ARRAY<FLUID_BOUNDARY_VECTOR<TV>*>& array,ARRAY<T>& rhs,
+        FLUID_REGIONS<TV>* regions) const override;
+    virtual void Compute_Region_Mapping(const FLUID_REGIONS<TV>* prev,
+        const FLUID_REGIONS<TV>* next,ARRAY<int>& next_to_prev) const override;
     virtual void Get_Force(FLUID_BOUNDARY_VECTOR<TV>* force) const override;
 };
 }

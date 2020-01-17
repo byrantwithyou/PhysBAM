@@ -30,6 +30,7 @@ template<class TV> void SOLID_FLUID_INTERFACE_PB<TV>::
 Compute_BC(const FLUID_SOLVER<TV>* fluid_solver,SOLID_BC<TV>* solid_bc,T time,T dt) const
 {
     LOG::printf("DO THIS: %s\n",__PRETTY_FUNCTION__);
+    // TODO go away?
 }
 
 //#####################################################################
@@ -39,6 +40,7 @@ template<class TV> void SOLID_FLUID_INTERFACE_PB<TV>::
 Compute_BC(const SOLID_SOLVER<TV>* solid_solver,FLUID_BC<TV>* fluid_bc,T time,T dt) const
 {
     LOG::printf("DO THIS: %s\n",__PRETTY_FUNCTION__);
+    // TODO go away?
 }
 
 //#####################################################################
@@ -82,7 +84,7 @@ Distribute_Force(SOLID_BOUNDARY_VECTOR<TV>* v, const FLUID_BOUNDARY_VECTOR<TV>* 
 // Function Get_Boundary
 //#####################################################################
 template<class TV> void SOLID_FLUID_INTERFACE_PB<TV>::
-Get_Boundary(SOLID_BOUNDARY_VECTOR<TV>* v)
+Get_Boundary(SOLID_BOUNDARY_VECTOR<TV>* v) const
 {
     auto* v_pb=dynamic_cast<SOLID_BOUNDARY_VECTOR_PB<TV>*>(v);
     v_pb->V.Remove_All();
@@ -95,7 +97,7 @@ Get_Boundary(SOLID_BOUNDARY_VECTOR<TV>* v)
 // Function Get_Boundary
 //#####################################################################
 template<class TV> void SOLID_FLUID_INTERFACE_PB<TV>::
-Get_Boundary(FLUID_BOUNDARY_VECTOR<TV>* v)
+Get_Boundary(FLUID_BOUNDARY_VECTOR<TV>* v) const
 {
     auto* v_pb=dynamic_cast<FLUID_BOUNDARY_VECTOR_PB<TV>*>(v);
     v_pb->V.Remove_All();

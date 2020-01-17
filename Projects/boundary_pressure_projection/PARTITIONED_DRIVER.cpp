@@ -6,6 +6,7 @@
 #include <Core/Matrices/MATRIX_MXN.h>
 #include "FLUID_BC.h"
 #include "FLUID_BOUNDARY_VECTOR.h"
+#include "FLUID_REGIONS.h"
 #include "FLUID_SOLVER.h"
 #include "FLUID_STATE.h"
 #include "PARTITIONED_DRIVER.h"
@@ -167,9 +168,23 @@ template<class TV> void PARTITIONED_DRIVER<TV>::
 BPP_Projection(T dt)
 {
     ARRAY<FLUID_BOUNDARY_VECTOR<TV>*> C;
-    fluid_solver->Get_Constraints(C);
+    ARRAY<T> rhs;
+    if(!new_regions) new_regions=fluid_solver->Make_Regions();
+    fluid_solver->Get_Constraints(interface,C,rhs,new_regions);
 
-    if(p0.m!=C.m) p0.Resize(C.m,init_all);
+    if(old_regions)
+    {
+        ARRAY<int> previous_index;
+        ARRAY<T> p(new_regions->num_regions);
+        fluid_solver->Compute_Region_Mapping(old_regions,new_regions,previous_index);
+        for(int i=0;i<p0.m;i++)
+        {
+            int j=previous_index(i);
+            if(j>=0) p(i)=p0(j);
+        }
+        p0.Exchange(p);
+    }
+    else p0.Resize(new_regions->num_regions);
 
     SOLID_BOUNDARY_VECTOR<TV>* solid_velocity=solid_solver->Make_Boundary_Vector();
     interface->Get_Boundary(solid_velocity);
@@ -177,7 +192,6 @@ BPP_Projection(T dt)
 
     ARRAY<SOLID_BOUNDARY_VECTOR<TV>*> Cs(C.m);
     ARRAY<SOLID_BOUNDARY_VECTOR<TV>*> Mi_Cs(C.m);
-    ARRAY<T> rhs(C.m);
 
     for(int i=0;i<C.m;i++)
     {
