@@ -10,14 +10,14 @@
     \begin{axis}
       [
       x=30,
-      y=8,
-      xlabel=ABC,
+      y=96,
+%      xlabel=ABC,
 %      ylabel=DEF,
       no markers,
       xmin=0,
       xmax=9,
-      ymin=-6,
-      ymax=6,
+      ymin=0,
+      ymax=1,
       legend style={fill=none},
       legend style={draw=none},
       legend style={legend columns=-1},
@@ -27,15 +27,15 @@
       x label style={at={(axis description cs:0.5,-0.08)},anchor=south},
       y label style={at={(axis description cs:-0.04,0.5)},anchor=west},
       ]
-      \addplot table [x expr={\thisrow{time}}, y expr={min(6,max(-6,6+log10(\thisrow{best_min_dt})))}]{DATA}; \addlegendentry{$\Delta t$}
-      \addplot table [x expr={\thisrow{time}}, y expr={min(6,max(-6,log10(\thisrow{best_max_v})))}]{DATA}; \addlegendentry{$\|\mathbf{v}_p\|$}
-      \addplot table [x expr={\thisrow{time}}, y expr={min(6,max(-6,log10(\thisrow{best_max_c})))}]{DATA}; \addlegendentry{$\Delta x \|\mathbf{C}_p\|_F$}
-      \addplot table [x expr={\thisrow{time}}, y expr={min(6,max(-6,log10(\thisrow{best_max_f})))}]{DATA}; \addlegendentry{$\|\mathbf{F}^T\mathbf{F}-\mathbf{I}\|_F$}
+      \addplot+[blue,very thick] table [x=time, y=best_min_dt]{DATA}; \addlegendentry{$\Delta t$}
+      \addplot+[red] table [x=time, y=best_max_v]{DATA}; \addlegendentry{$\|\mathbf{v}_p\|$}
+      \addplot+[green!50!black] table [x=time, y=best_max_c]{DATA}; \addlegendentry{$\Delta x \|\mathbf{C}_p\|_F$}
+      \addplot+[orange] table [x=time, y=best_max_f]{DATA}; \addlegendentry{$\|\mathbf{F}^T\mathbf{F}-\mathbf{I}\|_F$}
     \end{axis}
   \end{scope}
-  \draw[fill=blue] (0.3,5.8) rectangle (1.3,DTV);
-  \draw[fill=blue] (1.7,5.8) rectangle (2.7,DTF);
-  \draw[fill=blue] (3.1,5.8) rectangle (4.1,DTC);
+  \draw[fill=COLV] (0.3,5.8) rectangle (1.3,DTV);
+  \draw[fill=COLF] (1.7,5.8) rectangle (2.7,DTF);
+  \draw[fill=COLC] (3.1,5.8) rectangle (4.1,DTC);
   \node[below] at (0.8,5.5) {\scalebox{2}{$\Delta t_v$}};
   \node[below] at (2.2,5.5) {\scalebox{2}{$\Delta t_F$}};
   \node[below] at (3.6,5.5) {\scalebox{2}{$\Delta t_c$}};

@@ -583,12 +583,12 @@ Grid_To_Particle_Limit_Dt() -> T
     {
         TV V_pic,V_pic_s,V_weight_old;
         MATRIX<T,TV::m> grad_Vp,grad_Vp_s;
-        T s=1;
+        T s=100;
     };
 
     T dt=example.dt;
     T midpoint_frac=example.use_midpoint?(T).5:1;
-    T s=1;
+    T s=100;
     
     example.gather_scatter.template Gather<HELPER>(true,
         [&s](HELPER& h){s=std::min(s,h.s);},
@@ -613,7 +613,7 @@ Grid_To_Particle_Limit_Dt() -> T
         [this,dt](int p,HELPER& h)
         {
             T s_save=h.s;
-            h.s=1;
+            h.s=100;
             if(example.dilation_only) Enforce_Limit_Max(h.s,example.cfl_F,dt*h.grad_Vp.Trace(),dt*h.grad_Vp_s.Trace());
             else Enforce_Limit_Max(h.s,example.cfl_F,dt*h.grad_Vp,dt*h.grad_Vp_s);
             TV xp_new_s,xp_new_s2;
@@ -644,8 +644,9 @@ Limit_Dt_Sound_Speed() -> T
         LOG::printf("max sound speed: %.16P\n",max_speed);
         LOG::printf("dx: %.16P\n",example.grid.dX.Min());
         LOG::printf("dx/soundspeed: %.16P\n",Robust_Divide(example.grid.dX.Min(),max_speed));
-        dt=std::min(dt,Robust_Divide(example.grid.dX.Min(),max_speed)*example.cfl_sound);
-        LOG::printf("SOUND CFL %g %g (%g)\n",example.dt,dt,dt/example.dt);
+        T new_dt=Robust_Divide(example.grid.dX.Min(),max_speed)*example.cfl_sound;
+        LOG::printf("SOUND CFL %g %g (%g)\n",example.dt,new_dt,new_dt/example.dt);
+        dt=std::min(dt,new_dt);
     }
     if(example.use_single_particle_cfl && example.dilation_only)
     {
