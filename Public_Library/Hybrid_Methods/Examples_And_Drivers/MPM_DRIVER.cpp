@@ -645,7 +645,7 @@ Limit_Dt_Sound_Speed() -> T
         LOG::printf("dx: %.16P\n",example.grid.dX.Min());
         LOG::printf("dx/soundspeed: %.16P\n",Robust_Divide(example.grid.dX.Min(),max_speed));
         T new_dt=Robust_Divide(example.grid.dX.Min(),max_speed)*example.cfl_sound;
-        LOG::printf("SOUND CFL %g %g (%g)\n",example.dt,new_dt,new_dt/example.dt);
+        LOG::printf("SOUND CFL %g %g (%g)\n",example.dt,new_dt,Robust_Divide(new_dt,example.dt));
         dt=std::min(dt,new_dt);
     }
     if(example.use_single_particle_cfl && example.dilation_only)
